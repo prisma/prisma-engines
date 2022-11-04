@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/cursor/common.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>common.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/cursor/common.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>common.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -542,549 +542,549 @@
 <span id="542">542</span>
 <span id="543">543</span>
 <span id="544">544</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">collections::VecDeque</span>,
-    <span class="ident">marker::PhantomData</span>,
-    <span class="ident">pin::Pin</span>,
-    <span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>},
-    <span class="ident">time::Duration</span>,
+</pre><pre class="rust"><code><span class="kw">use </span>std::{
+    collections::VecDeque,
+    marker::PhantomData,
+    pin::Pin,
+    task::{Context, Poll},
+    time::Duration,
 };
 
-<span class="kw">use</span> <span class="ident">bson</span>::{<span class="ident">RawDocument</span>, <span class="ident">RawDocumentBuf</span>};
-<span class="kw">use</span> <span class="ident">derivative::Derivative</span>;
-<span class="kw">use</span> <span class="ident">futures_core</span>::{<span class="ident">future::BoxFuture</span>, <span class="ident">Future</span>, <span class="ident">Stream</span>};
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">de::DeserializeOwned</span>, <span class="ident">Deserialize</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">use</span> <span class="ident">tokio::sync::oneshot</span>;
+<span class="kw">use </span>bson::{RawDocument, RawDocumentBuf};
+<span class="kw">use </span>derivative::Derivative;
+<span class="kw">use </span>futures_core::{future::BoxFuture, Future, Stream};
+<span class="kw">use </span>serde::{de::DeserializeOwned, Deserialize};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">use </span>tokio::sync::oneshot;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">bson::Document</span>,
-    <span class="ident">change_stream::event::ResumeToken</span>,
-    <span class="ident">cmap::conn::PinnedConnectionHandle</span>,
-    <span class="ident">error</span>::{<span class="ident">Error</span>, <span class="ident">ErrorKind</span>, <span class="prelude-ty">Result</span>},
-    <span class="ident">operation</span>,
-    <span class="ident">options::ServerAddress</span>,
-    <span class="ident">results::GetMoreResult</span>,
-    <span class="ident">runtime</span>,
-    <span class="ident">Client</span>,
-    <span class="ident">Namespace</span>,
+<span class="kw">use crate</span>::{
+    bson::Document,
+    change_stream::event::ResumeToken,
+    cmap::conn::PinnedConnectionHandle,
+    error::{Error, ErrorKind, <span class="prelude-ty">Result</span>},
+    operation,
+    options::ServerAddress,
+    results::GetMoreResult,
+    runtime,
+    Client,
+    Namespace,
 };
 
-<span class="doccomment">/// An internal cursor that can be used in a variety of contexts depending on its `GetMoreProvider`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Derivative</span>)]</span>
-<span class="attribute">#[<span class="ident">derivative</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">GenericCursor</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">GetMoreProvider</span>,
+<span class="doccomment">/// An internal cursor that can be used in a variety of contexts depending on its `GetMoreProvider`.
+</span><span class="attribute">#[derive(Derivative)]
+#[derivative(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>GenericCursor&lt;P, T&gt;
+<span class="kw">where
+    </span>P: GetMoreProvider,
 {
-    <span class="attribute">#[<span class="ident">derivative</span>(<span class="ident">Debug</span> <span class="op">=</span> <span class="string">&quot;ignore&quot;</span>)]</span>
-    <span class="ident">provider</span>: <span class="ident">P</span>,
-    <span class="ident">client</span>: <span class="ident">Client</span>,
-    <span class="ident">info</span>: <span class="ident">CursorInformation</span>,
-    <span class="doccomment">/// This is an `Option` to allow it to be &quot;taken&quot; when the cursor is no longer needed</span>
-    <span class="doccomment">/// but may be resumed in the future for `SessionCursor`.</span>
-    <span class="ident">state</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CursorState</span><span class="op">&gt;</span>,
-    <span class="ident">_phantom</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+    <span class="attribute">#[derivative(Debug = <span class="string">&quot;ignore&quot;</span>)]
+    </span>provider: P,
+    client: Client,
+    info: CursorInformation,
+    <span class="doccomment">/// This is an `Option` to allow it to be &quot;taken&quot; when the cursor is no longer needed
+    /// but may be resumed in the future for `SessionCursor`.
+    </span>state: <span class="prelude-ty">Option</span>&lt;CursorState&gt;,
+    _phantom: PhantomData&lt;T&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">GenericCursor</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">GetMoreProvider</span>,
+<span class="kw">impl</span>&lt;P, T&gt; GenericCursor&lt;P, T&gt;
+<span class="kw">where
+    </span>P: GetMoreProvider,
 {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">client</span>: <span class="ident">Client</span>,
-        <span class="ident">spec</span>: <span class="ident">CursorSpecification</span>,
-        <span class="ident">pinned_connection</span>: <span class="ident">PinnedConnection</span>,
-        <span class="ident">get_more_provider</span>: <span class="ident">P</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">exhausted</span> <span class="op">=</span> <span class="ident">spec</span>.<span class="ident">id</span>() <span class="op">==</span> <span class="number">0</span>;
-        <span class="self">Self</span> {
-            <span class="ident">client</span>,
-            <span class="ident">provider</span>: <span class="ident">get_more_provider</span>,
-            <span class="ident">info</span>: <span class="ident">spec</span>.<span class="ident">info</span>,
-            <span class="ident">state</span>: <span class="prelude-val">Some</span>(<span class="ident">CursorState</span> {
-                <span class="ident">buffer</span>: <span class="ident">CursorBuffer::new</span>(<span class="ident">spec</span>.<span class="ident">initial_buffer</span>),
-                <span class="ident">exhausted</span>,
-                <span class="ident">post_batch_resume_token</span>: <span class="prelude-val">None</span>,
-                <span class="ident">pinned_connection</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new(
+        client: Client,
+        spec: CursorSpecification,
+        pinned_connection: PinnedConnection,
+        get_more_provider: P,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>exhausted = spec.id() == <span class="number">0</span>;
+        <span class="self">Self </span>{
+            client,
+            provider: get_more_provider,
+            info: spec.info,
+            state: <span class="prelude-val">Some</span>(CursorState {
+                buffer: CursorBuffer::new(spec.initial_buffer),
+                exhausted,
+                post_batch_resume_token: <span class="prelude-val">None</span>,
+                pinned_connection,
             }),
-            <span class="ident">_phantom</span>: <span class="ident">Default::default</span>(),
+            _phantom: Default::default(),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">from_state</span>(
-        <span class="ident">state</span>: <span class="ident">CursorState</span>,
-        <span class="ident">client</span>: <span class="ident">Client</span>,
-        <span class="ident">info</span>: <span class="ident">CursorInformation</span>,
-        <span class="ident">provider</span>: <span class="ident">P</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">provider</span>,
-            <span class="ident">client</span>,
-            <span class="ident">info</span>,
-            <span class="ident">_phantom</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">state</span>: <span class="ident">state</span>.<span class="ident">into</span>(),
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>from_state(
+        state: CursorState,
+        client: Client,
+        info: CursorInformation,
+        provider: P,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            provider,
+            client,
+            info,
+            _phantom: Default::default(),
+            state: state.into(),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">current</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">RawDocument</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">state</span>().<span class="ident">buffer</span>.<span class="ident">current</span>()
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>current(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>RawDocument&gt; {
+        <span class="self">self</span>.state().buffer.current()
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">current_batch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">RawDocumentBuf</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">state</span>().<span class="ident">buffer</span>.<span class="ident">as_ref</span>()
+    <span class="attribute">#[cfg(test)]
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>current_batch(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>VecDeque&lt;RawDocumentBuf&gt; {
+        <span class="self">self</span>.state().buffer.as_ref()
     }
 
-    <span class="kw">fn</span> <span class="ident">state_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CursorState</span> {
-        <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>()
+    <span class="kw">fn </span>state_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>CursorState {
+        <span class="self">self</span>.state.as_mut().unwrap()
     }
 
-    <span class="kw">fn</span> <span class="ident">state</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">CursorState</span> {
-        <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>()
+    <span class="kw">fn </span>state(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>CursorState {
+        <span class="self">self</span>.state.as_ref().unwrap()
     }
 
-    <span class="doccomment">/// Advance the cursor forward to the next document.</span>
-    <span class="doccomment">/// If there are no documents cached locally, perform getMores until</span>
-    <span class="doccomment">/// the cursor is exhausted or a result/error has been received.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-        <span class="kw">loop</span> {
-            <span class="self">self</span>.<span class="ident">state_mut</span>().<span class="ident">buffer</span>.<span class="ident">advance</span>();
+    <span class="doccomment">/// Advance the cursor forward to the next document.
+    /// If there are no documents cached locally, perform getMores until
+    /// the cursor is exhausted or a result/error has been received.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">async fn </span>advance(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;bool&gt; {
+        <span class="kw">loop </span>{
+            <span class="self">self</span>.state_mut().buffer.advance();
 
-            <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">state</span>().<span class="ident">buffer</span>.<span class="ident">is_empty</span>() {
+            <span class="kw">if </span>!<span class="self">self</span>.state().buffer.is_empty() {
                 <span class="kw">break</span>;
             }
 
-            <span class="comment">// if moving the offset puts us at the end of the buffer, perform another</span>
-            <span class="comment">// getMore if the cursor is still alive.</span>
+            <span class="comment">// if moving the offset puts us at the end of the buffer, perform another
+            // getMore if the cursor is still alive.
 
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">state</span>().<span class="ident">exhausted</span> {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>);
+            </span><span class="kw">if </span><span class="self">self</span>.state().exhausted {
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="bool-val">false</span>);
             }
 
-            <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">clone</span>();
-            <span class="kw">let</span> <span class="ident">spec</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">info</span>.<span class="ident">clone</span>();
-            <span class="kw">let</span> <span class="ident">pin</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>().<span class="ident">pinned_connection</span>.<span class="ident">replicate</span>();
+            <span class="kw">let </span>client = <span class="self">self</span>.client.clone();
+            <span class="kw">let </span>spec = <span class="self">self</span>.info.clone();
+            <span class="kw">let </span>pin = <span class="self">self</span>.state().pinned_connection.replicate();
 
-            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">provider</span>.<span class="ident">execute</span>(<span class="ident">spec</span>, <span class="ident">client</span>, <span class="ident">pin</span>).<span class="kw">await</span>;
-            <span class="self">self</span>.<span class="ident">handle_get_more_result</span>(<span class="ident">result</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>result = <span class="self">self</span>.provider.execute(spec, client, pin).<span class="kw">await</span>;
+            <span class="self">self</span>.handle_get_more_result(result)<span class="question-mark">?</span>;
         }
 
         <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">take_state</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">CursorState</span> {
-        <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>()
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>take_state(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; CursorState {
+        <span class="self">self</span>.state.take().unwrap()
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">is_exhausted</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">state</span>().<span class="ident">exhausted</span>
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>is_exhausted(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.state().exhausted
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i64</span> {
-        <span class="self">self</span>.<span class="ident">info</span>.<span class="ident">id</span>
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i64 {
+        <span class="self">self</span>.info.id
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">namespace</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Namespace</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">info</span>.<span class="ident">ns</span>
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>namespace(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Namespace {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.info.ns
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">address</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">ServerAddress</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">info</span>.<span class="ident">address</span>
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>address(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ServerAddress {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.info.address
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">pinned_connection</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">PinnedConnection</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span>().<span class="ident">pinned_connection</span>
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>pinned_connection(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>PinnedConnection {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.state().pinned_connection
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">post_batch_resume_token</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ResumeToken</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">state</span>().<span class="ident">post_batch_resume_token</span>.<span class="ident">as_ref</span>()
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>post_batch_resume_token(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ResumeToken&gt; {
+        <span class="self">self</span>.state().post_batch_resume_token.as_ref()
     }
 
-    <span class="kw">fn</span> <span class="ident">mark_exhausted</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">state_mut</span>().<span class="ident">exhausted</span> <span class="op">=</span> <span class="bool-val">true</span>;
-        <span class="self">self</span>.<span class="ident">state_mut</span>().<span class="ident">pinned_connection</span> <span class="op">=</span> <span class="ident">PinnedConnection::Unpinned</span>;
+    <span class="kw">fn </span>mark_exhausted(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.state_mut().exhausted = <span class="bool-val">true</span>;
+        <span class="self">self</span>.state_mut().pinned_connection = PinnedConnection::Unpinned;
     }
 
-    <span class="kw">fn</span> <span class="ident">handle_get_more_result</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">get_more_result</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GetMoreResult</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">get_more_result</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">get_more</span>) =&gt; {
-                <span class="kw">if</span> <span class="ident">get_more</span>.<span class="ident">exhausted</span> {
-                    <span class="self">self</span>.<span class="ident">mark_exhausted</span>();
+    <span class="kw">fn </span>handle_get_more_result(<span class="kw-2">&amp;mut </span><span class="self">self</span>, get_more_result: <span class="prelude-ty">Result</span>&lt;GetMoreResult&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">match </span>get_more_result {
+            <span class="prelude-val">Ok</span>(get_more) =&gt; {
+                <span class="kw">if </span>get_more.exhausted {
+                    <span class="self">self</span>.mark_exhausted();
                 }
-                <span class="self">self</span>.<span class="ident">state_mut</span>().<span class="ident">buffer</span> <span class="op">=</span> <span class="ident">CursorBuffer::new</span>(<span class="ident">get_more</span>.<span class="ident">batch</span>);
-                <span class="self">self</span>.<span class="ident">state_mut</span>().<span class="ident">post_batch_resume_token</span> <span class="op">=</span> <span class="ident">get_more</span>.<span class="ident">post_batch_resume_token</span>;
+                <span class="self">self</span>.state_mut().buffer = CursorBuffer::new(get_more.batch);
+                <span class="self">self</span>.state_mut().post_batch_resume_token = get_more.post_batch_resume_token;
 
                 <span class="prelude-val">Ok</span>(())
             }
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-                <span class="kw">if</span> <span class="macro">matches!</span>(<span class="kw-2">*</span><span class="ident">e</span>.<span class="ident">kind</span>, <span class="ident">ErrorKind::Command</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">code</span> <span class="op">==</span> <span class="number">43</span> <span class="op">|</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">code</span> <span class="op">==</span> <span class="number">237</span>) {
-                    <span class="self">self</span>.<span class="ident">mark_exhausted</span>();
+            <span class="prelude-val">Err</span>(e) =&gt; {
+                <span class="kw">if </span><span class="macro">matches!</span>(<span class="kw-2">*</span>e.kind, ErrorKind::Command(<span class="kw-2">ref </span>e) <span class="kw">if </span>e.code == <span class="number">43 </span>|| e.code == <span class="number">237</span>) {
+                    <span class="self">self</span>.mark_exhausted();
                 }
 
-                <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">is_network_error</span>() {
-                    <span class="comment">// Flag the connection as invalid, preventing a killCursors command,</span>
-                    <span class="comment">// but leave the connection pinned.</span>
-                    <span class="self">self</span>.<span class="ident">state_mut</span>().<span class="ident">pinned_connection</span>.<span class="ident">invalidate</span>();
+                <span class="kw">if </span>e.is_network_error() {
+                    <span class="comment">// Flag the connection as invalid, preventing a killCursors command,
+                    // but leave the connection pinned.
+                    </span><span class="self">self</span>.state_mut().pinned_connection.invalidate();
                 }
 
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>)
+                <span class="prelude-val">Err</span>(e)
             }
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">provider_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">P</span> {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">provider</span>
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>provider_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>P {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.provider
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">with_type</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="ident">GenericCursor</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">D</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>with_type&lt;<span class="lifetime">&#39;a</span>, D&gt;(<span class="self">self</span>) -&gt; GenericCursor&lt;P, D&gt;
+    <span class="kw">where
+        </span>D: Deserialize&lt;<span class="lifetime">&#39;a</span>&gt;,
     {
-        <span class="ident">GenericCursor</span> {
-            <span class="ident">client</span>: <span class="self">self</span>.<span class="ident">client</span>,
-            <span class="ident">provider</span>: <span class="self">self</span>.<span class="ident">provider</span>,
-            <span class="ident">info</span>: <span class="self">self</span>.<span class="ident">info</span>,
-            <span class="ident">state</span>: <span class="self">self</span>.<span class="ident">state</span>,
-            <span class="ident">_phantom</span>: <span class="ident">Default::default</span>(),
+        GenericCursor {
+            client: <span class="self">self</span>.client,
+            provider: <span class="self">self</span>.provider,
+            info: <span class="self">self</span>.info,
+            state: <span class="self">self</span>.state,
+            _phantom: Default::default(),
         }
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">CursorStream</span> {
-    <span class="kw">fn</span> <span class="ident">poll_next_in_batch</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BatchValue</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>CursorStream {
+    <span class="kw">fn </span>poll_next_in_batch(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;BatchValue&gt;&gt;;
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">BatchValue</span> {
-    <span class="prelude-val">Some</span> { <span class="ident">doc</span>: <span class="ident">RawDocumentBuf</span>, <span class="ident">is_last</span>: <span class="ident">bool</span> },
-    <span class="ident">Empty</span>,
-    <span class="ident">Exhausted</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>BatchValue {
+    <span class="prelude-val">Some </span>{ doc: RawDocumentBuf, is_last: bool },
+    Empty,
+    Exhausted,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">CursorStream</span> <span class="kw">for</span> <span class="ident">GenericCursor</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">GetMoreProvider</span>,
-    <span class="ident">T</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+<span class="kw">impl</span>&lt;P, T&gt; CursorStream <span class="kw">for </span>GenericCursor&lt;P, T&gt;
+<span class="kw">where
+    </span>P: GetMoreProvider,
+    T: DeserializeOwned + Unpin,
 {
-    <span class="kw">fn</span> <span class="ident">poll_next_in_batch</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BatchValue</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="comment">// If there is a get more in flight, check on its status.</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">future</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">provider</span>.<span class="ident">executing_future</span>() {
-            <span class="kw">match</span> <span class="ident">Pin::new</span>(<span class="ident">future</span>).<span class="ident">poll</span>(<span class="ident">cx</span>) {
-                <span class="comment">// If a result is ready, retrieve the buffer and update the exhausted status.</span>
-                <span class="ident">Poll::Ready</span>(<span class="ident">get_more_result</span>) =&gt; {
-                    <span class="kw">let</span> (<span class="ident">result</span>, <span class="ident">session</span>) <span class="op">=</span> <span class="ident">get_more_result</span>.<span class="ident">into_parts</span>();
-                    <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">handle_get_more_result</span>(<span class="ident">result</span>);
-                    <span class="self">self</span>.<span class="ident">provider</span>
-                        .<span class="ident">clear_execution</span>(<span class="ident">session</span>, <span class="self">self</span>.<span class="ident">state</span>().<span class="ident">exhausted</span>);
-                    <span class="ident">output</span><span class="question-mark">?</span>;
+    <span class="kw">fn </span>poll_next_in_batch(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;BatchValue&gt;&gt; {
+        <span class="comment">// If there is a get more in flight, check on its status.
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(future) = <span class="self">self</span>.provider.executing_future() {
+            <span class="kw">match </span>Pin::new(future).poll(cx) {
+                <span class="comment">// If a result is ready, retrieve the buffer and update the exhausted status.
+                </span>Poll::Ready(get_more_result) =&gt; {
+                    <span class="kw">let </span>(result, session) = get_more_result.into_parts();
+                    <span class="kw">let </span>output = <span class="self">self</span>.handle_get_more_result(result);
+                    <span class="self">self</span>.provider
+                        .clear_execution(session, <span class="self">self</span>.state().exhausted);
+                    output<span class="question-mark">?</span>;
                 }
-                <span class="ident">Poll::Pending</span> =&gt; <span class="kw">return</span> <span class="ident">Poll::Pending</span>,
+                Poll::Pending =&gt; <span class="kw">return </span>Poll::Pending,
             }
         }
 
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state_mut</span>().<span class="ident">buffer</span>.<span class="ident">next</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">doc</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">is_last</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>().<span class="ident">buffer</span>.<span class="ident">is_empty</span>();
+        <span class="kw">match </span><span class="self">self</span>.state_mut().buffer.next() {
+            <span class="prelude-val">Some</span>(doc) =&gt; {
+                <span class="kw">let </span>is_last = <span class="self">self</span>.state().buffer.is_empty();
 
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">BatchValue::Some</span> { <span class="ident">doc</span>, <span class="ident">is_last</span> }))
+                Poll::Ready(<span class="prelude-val">Ok</span>(BatchValue::Some { doc, is_last }))
             }
-            <span class="prelude-val">None</span> <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">state</span>().<span class="ident">exhausted</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">state</span>().<span class="ident">pinned_connection</span>.<span class="ident">is_invalid</span>() =&gt; {
-                <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">info</span>.<span class="ident">clone</span>();
-                <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">clone</span>();
-                <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>();
-                <span class="self">self</span>.<span class="ident">provider</span>
-                    .<span class="ident">start_execution</span>(<span class="ident">info</span>, <span class="ident">client</span>, <span class="ident">state</span>.<span class="ident">pinned_connection</span>.<span class="ident">handle</span>());
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">BatchValue::Empty</span>))
+            <span class="prelude-val">None </span><span class="kw">if </span>!<span class="self">self</span>.state().exhausted &amp;&amp; !<span class="self">self</span>.state().pinned_connection.is_invalid() =&gt; {
+                <span class="kw">let </span>info = <span class="self">self</span>.info.clone();
+                <span class="kw">let </span>client = <span class="self">self</span>.client.clone();
+                <span class="kw">let </span>state = <span class="self">self</span>.state.as_mut().unwrap();
+                <span class="self">self</span>.provider
+                    .start_execution(info, client, state.pinned_connection.handle());
+                Poll::Ready(<span class="prelude-val">Ok</span>(BatchValue::Empty))
             }
-            <span class="prelude-val">None</span> =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">BatchValue::Exhausted</span>)),
+            <span class="prelude-val">None </span>=&gt; Poll::Ready(<span class="prelude-val">Ok</span>(BatchValue::Exhausted)),
         }
     }
 }
 
-<span class="comment">// To avoid a private trait (`CursorStream`) in a public interface (`impl Stream`), this is provided</span>
-<span class="comment">// as a free function rather than a blanket impl.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">stream_poll_next</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">V</span><span class="op">&gt;</span>(<span class="ident">this</span>: <span class="kw-2">&amp;mut</span> <span class="ident">S</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">CursorStream</span>,
-    <span class="ident">V</span>: <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">serde::Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="comment">// To avoid a private trait (`CursorStream`) in a public interface (`impl Stream`), this is provided
+// as a free function rather than a blanket impl.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>stream_poll_next&lt;S, V&gt;(this: <span class="kw-2">&amp;mut </span>S, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Result</span>&lt;V&gt;&gt;&gt;
+<span class="kw">where
+    </span>S: CursorStream,
+    V: <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; serde::Deserialize&lt;<span class="lifetime">&#39;a</span>&gt;,
 {
-    <span class="kw">loop</span> {
-        <span class="kw">match</span> <span class="ident">this</span>.<span class="ident">poll_next_in_batch</span>(<span class="ident">cx</span>) {
-            <span class="ident">Poll::Pending</span> =&gt; <span class="kw">return</span> <span class="ident">Poll::Pending</span>,
-            <span class="ident">Poll::Ready</span>(<span class="ident">bv</span>) =&gt; <span class="kw">match</span> <span class="ident">bv</span><span class="question-mark">?</span> {
-                <span class="ident">BatchValue::Some</span> { <span class="ident">doc</span>, .. } =&gt; {
-                    <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">bson::from_slice</span>(<span class="ident">doc</span>.<span class="ident">as_bytes</span>())<span class="question-mark">?</span>)))
+    <span class="kw">loop </span>{
+        <span class="kw">match </span>this.poll_next_in_batch(cx) {
+            Poll::Pending =&gt; <span class="kw">return </span>Poll::Pending,
+            Poll::Ready(bv) =&gt; <span class="kw">match </span>bv<span class="question-mark">? </span>{
+                BatchValue::Some { doc, .. } =&gt; {
+                    <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(bson::from_slice(doc.as_bytes())<span class="question-mark">?</span>)))
                 }
-                <span class="ident">BatchValue::Empty</span> =&gt; <span class="kw">continue</span>,
-                <span class="ident">BatchValue::Exhausted</span> =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>),
+                BatchValue::Empty =&gt; <span class="kw">continue</span>,
+                BatchValue::Exhausted =&gt; <span class="kw">return </span>Poll::Ready(<span class="prelude-val">None</span>),
             },
         }
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">NextInBatchFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">T</span>);
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>NextInBatchFuture&lt;<span class="lifetime">&#39;a</span>, T&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>T);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">NextInBatchFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">CursorStream</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; NextInBatchFuture&lt;<span class="lifetime">&#39;a</span>, T&gt;
+<span class="kw">where
+    </span>T: CursorStream,
 {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">stream</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">stream</span>)
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(stream: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>T) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(stream)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">NextInBatchFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">CursorStream</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, C&gt; Future <span class="kw">for </span>NextInBatchFuture&lt;<span class="lifetime">&#39;a</span>, C&gt;
+<span class="kw">where
+    </span>C: CursorStream,
 {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BatchValue</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Output = <span class="prelude-ty">Result</span>&lt;BatchValue&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">poll_next_in_batch</span>(<span class="ident">cx</span>)
+    <span class="kw">fn </span>poll(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.poll_next_in_batch(cx)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">GenericCursor</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">GetMoreProvider</span>,
-    <span class="ident">T</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+<span class="kw">impl</span>&lt;P, T&gt; Stream <span class="kw">for </span>GenericCursor&lt;P, T&gt;
+<span class="kw">where
+    </span>P: GetMoreProvider,
+    T: DeserializeOwned + Unpin,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Item = <span class="prelude-ty">Result</span>&lt;T&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">stream_poll_next</span>(<span class="ident">Pin::into_inner</span>(<span class="self">self</span>), <span class="ident">cx</span>)
+    <span class="kw">fn </span>poll_next(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;&gt; {
+        stream_poll_next(Pin::into_inner(<span class="self">self</span>), cx)
     }
 }
 
-<span class="doccomment">/// A trait implemented by objects that can provide batches of documents to a cursor via the getMore</span>
-<span class="doccomment">/// command.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">trait</span> <span class="ident">GetMoreProvider</span>: <span class="ident">Unpin</span> {
-    <span class="doccomment">/// The result type that the future running the getMore evaluates to.</span>
-    <span class="kw">type</span> <span class="ident">ResultType</span>: <span class="ident">GetMoreProviderResult</span>;
+<span class="doccomment">/// A trait implemented by objects that can provide batches of documents to a cursor via the getMore
+/// command.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">trait </span>GetMoreProvider: Unpin {
+    <span class="doccomment">/// The result type that the future running the getMore evaluates to.
+    </span><span class="kw">type </span>ResultType: GetMoreProviderResult;
 
-    <span class="doccomment">/// The type of future created by this provider when running a getMore.</span>
-    <span class="kw">type</span> <span class="ident">GetMoreFuture</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::ResultType</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Unpin</span>;
+    <span class="doccomment">/// The type of future created by this provider when running a getMore.
+    </span><span class="kw">type </span>GetMoreFuture: Future&lt;Output = <span class="self">Self</span>::ResultType&gt; + Unpin;
 
-    <span class="doccomment">/// Get the future being evaluated, if there is one.</span>
-    <span class="kw">fn</span> <span class="ident">executing_future</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::GetMoreFuture</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Get the future being evaluated, if there is one.
+    </span><span class="kw">fn </span>executing_future(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>::GetMoreFuture&gt;;
 
-    <span class="doccomment">/// Clear out any state remaining from previous getMore executions.</span>
-    <span class="kw">fn</span> <span class="ident">clear_execution</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">session</span>: <span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::ResultType</span> <span class="kw">as</span> <span class="ident">GetMoreProviderResult</span><span class="op">&gt;</span><span class="ident">::Session</span>,
-        <span class="ident">exhausted</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Clear out any state remaining from previous getMore executions.
+    </span><span class="kw">fn </span>clear_execution(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        session: &lt;<span class="self">Self</span>::ResultType <span class="kw">as </span>GetMoreProviderResult&gt;::Session,
+        exhausted: bool,
     );
 
-    <span class="doccomment">/// Start executing a new getMore if one isn&#39;t already in flight.</span>
-    <span class="kw">fn</span> <span class="ident">start_execution</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">spec</span>: <span class="ident">CursorInformation</span>,
-        <span class="ident">client</span>: <span class="ident">Client</span>,
-        <span class="ident">pinned_connection</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PinnedConnectionHandle</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Start executing a new getMore if one isn&#39;t already in flight.
+    </span><span class="kw">fn </span>start_execution(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        spec: CursorInformation,
+        client: Client,
+        pinned_connection: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>PinnedConnectionHandle&gt;,
     );
 
-    <span class="doccomment">/// Return a future that will execute the getMore when polled.</span>
-    <span class="doccomment">/// This is useful in async functions that can await the entire getMore process.</span>
-    <span class="doccomment">/// `start_execution` and `clear_execution` should be used for contexts where the futures</span>
-    <span class="doccomment">/// need to be polled manually.</span>
-    <span class="kw">fn</span> <span class="ident">execute</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">_spec</span>: <span class="ident">CursorInformation</span>,
-        <span class="ident">_client</span>: <span class="ident">Client</span>,
-        <span class="ident">_pinned_conn</span>: <span class="ident">PinnedConnection</span>,
-    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GetMoreResult</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Return a future that will execute the getMore when polled.
+    /// This is useful in async functions that can await the entire getMore process.
+    /// `start_execution` and `clear_execution` should be used for contexts where the futures
+    /// need to be polled manually.
+    </span><span class="kw">fn </span>execute(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        _spec: CursorInformation,
+        _client: Client,
+        _pinned_conn: PinnedConnection,
+    ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, <span class="prelude-ty">Result</span>&lt;GetMoreResult&gt;&gt;;
 }
 
-<span class="doccomment">/// Trait describing results returned from a `GetMoreProvider`.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">GetMoreProviderResult</span> {
-    <span class="kw">type</span> <span class="ident">Session</span>;
+<span class="doccomment">/// Trait describing results returned from a `GetMoreProvider`.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>GetMoreProviderResult {
+    <span class="kw">type </span>Session;
 
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">GetMoreResult</span>, <span class="kw-2">&amp;</span><span class="ident">Error</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; std::result::Result&lt;<span class="kw-2">&amp;</span>GetMoreResult, <span class="kw-2">&amp;</span>Error&gt;;
 
-    <span class="kw">fn</span> <span class="ident">into_parts</span>(<span class="self">self</span>) -&gt; (<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GetMoreResult</span><span class="op">&gt;</span>, <span class="ident"><span class="self">Self</span>::Session</span>);
+    <span class="kw">fn </span>into_parts(<span class="self">self</span>) -&gt; (<span class="prelude-ty">Result</span>&lt;GetMoreResult&gt;, <span class="self">Self</span>::Session);
 }
 
-<span class="doccomment">/// Specification used to create a new cursor.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">CursorSpecification</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">info</span>: <span class="ident">CursorInformation</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">initial_buffer</span>: <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">RawDocumentBuf</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">post_batch_resume_token</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ResumeToken</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Specification used to create a new cursor.
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>CursorSpecification {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) info: CursorInformation,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) initial_buffer: VecDeque&lt;RawDocumentBuf&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) post_batch_resume_token: <span class="prelude-ty">Option</span>&lt;ResumeToken&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">CursorSpecification</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">info</span>: <span class="ident">operation::CursorInfo</span>,
-        <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
-        <span class="ident">batch_size</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">max_time</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">info</span>: <span class="ident">CursorInformation</span> {
-                <span class="ident">ns</span>: <span class="ident">info</span>.<span class="ident">ns</span>,
-                <span class="ident">id</span>: <span class="ident">info</span>.<span class="ident">id</span>,
-                <span class="ident">address</span>,
-                <span class="ident">batch_size</span>: <span class="ident">batch_size</span>.<span class="ident">into</span>(),
-                <span class="ident">max_time</span>: <span class="ident">max_time</span>.<span class="ident">into</span>(),
+<span class="kw">impl </span>CursorSpecification {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(
+        info: operation::CursorInfo,
+        address: ServerAddress,
+        batch_size: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;u32&gt;&gt;,
+        max_time: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;Duration&gt;&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            info: CursorInformation {
+                ns: info.ns,
+                id: info.id,
+                address,
+                batch_size: batch_size.into(),
+                max_time: max_time.into(),
             },
-            <span class="ident">initial_buffer</span>: <span class="ident">info</span>.<span class="ident">first_batch</span>,
-            <span class="ident">post_batch_resume_token</span>: <span class="ident">ResumeToken::from_raw</span>(<span class="ident">info</span>.<span class="ident">post_batch_resume_token</span>),
+            initial_buffer: info.first_batch,
+            post_batch_resume_token: ResumeToken::from_raw(info.post_batch_resume_token),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i64</span> {
-        <span class="self">self</span>.<span class="ident">info</span>.<span class="ident">id</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i64 {
+        <span class="self">self</span>.info.id
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">address</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">ServerAddress</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">info</span>.<span class="ident">address</span>
+    <span class="attribute">#[cfg(test)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>address(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ServerAddress {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.info.address
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">batch_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">info</span>.<span class="ident">batch_size</span>
+    <span class="attribute">#[cfg(test)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>batch_size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u32&gt; {
+        <span class="self">self</span>.info.batch_size
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">max_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">info</span>.<span class="ident">max_time</span>
+    <span class="attribute">#[cfg(test)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>max_time(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Duration&gt; {
+        <span class="self">self</span>.info.max_time
     }
 }
 
-<span class="doccomment">/// Static information about a cursor.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">CursorInformation</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">ns</span>: <span class="ident">Namespace</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">id</span>: <span class="ident">i64</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">batch_size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">max_time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Static information about a cursor.
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>CursorInformation {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) ns: Namespace,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) address: ServerAddress,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) id: i64,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) batch_size: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) max_time: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">PinnedConnection</span> {
-    <span class="ident">Valid</span>(<span class="ident">PinnedConnectionHandle</span>),
-    <span class="ident">Invalid</span>(<span class="ident">PinnedConnectionHandle</span>),
-    <span class="ident">Unpinned</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>PinnedConnection {
+    Valid(PinnedConnectionHandle),
+    Invalid(PinnedConnectionHandle),
+    Unpinned,
 }
 
-<span class="kw">impl</span> <span class="ident">PinnedConnection</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">handle</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PinnedConnectionHandle</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">handle</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">h</span>) =&gt; <span class="ident"><span class="self">Self</span>::Valid</span>(<span class="ident">h</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="ident"><span class="self">Self</span>::Unpinned</span>,
+<span class="kw">impl </span>PinnedConnection {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new(handle: <span class="prelude-ty">Option</span>&lt;PinnedConnectionHandle&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>handle {
+            <span class="prelude-val">Some</span>(h) =&gt; <span class="self">Self</span>::Valid(h),
+            <span class="prelude-val">None </span>=&gt; <span class="self">Self</span>::Unpinned,
         }
     }
 
-    <span class="doccomment">/// Make a new `PinnedConnection` that refers to the same connection as this one.</span>
-    <span class="doccomment">/// Use with care and only when &quot;lending&quot; a handle in a way that can&#39;t be expressed as a</span>
-    <span class="doccomment">/// normal borrow.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">replicate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Valid</span>(<span class="ident">h</span>) =&gt; <span class="ident"><span class="self">Self</span>::Valid</span>(<span class="ident">h</span>.<span class="ident">replicate</span>()),
-            <span class="ident"><span class="self">Self</span>::Invalid</span>(<span class="ident">h</span>) =&gt; <span class="ident"><span class="self">Self</span>::Invalid</span>(<span class="ident">h</span>.<span class="ident">replicate</span>()),
-            <span class="ident"><span class="self">Self</span>::Unpinned</span> =&gt; <span class="ident"><span class="self">Self</span>::Unpinned</span>,
+    <span class="doccomment">/// Make a new `PinnedConnection` that refers to the same connection as this one.
+    /// Use with care and only when &quot;lending&quot; a handle in a way that can&#39;t be expressed as a
+    /// normal borrow.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>replicate(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Valid(h) =&gt; <span class="self">Self</span>::Valid(h.replicate()),
+            <span class="self">Self</span>::Invalid(h) =&gt; <span class="self">Self</span>::Invalid(h.replicate()),
+            <span class="self">Self</span>::Unpinned =&gt; <span class="self">Self</span>::Unpinned,
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PinnedConnectionHandle</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Valid</span>(<span class="ident">h</span>) <span class="op">|</span> <span class="ident"><span class="self">Self</span>::Invalid</span>(<span class="ident">h</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">h</span>),
-            <span class="ident"><span class="self">Self</span>::Unpinned</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>handle(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>PinnedConnectionHandle&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Valid(h) | <span class="self">Self</span>::Invalid(h) =&gt; <span class="prelude-val">Some</span>(h),
+            <span class="self">Self</span>::Unpinned =&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">is_invalid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::Invalid</span>(<span class="kw">_</span>))
+    <span class="kw">fn </span>is_invalid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::Invalid(<span class="kw">_</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">invalidate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="ident">take_mut::take</span>(<span class="self">self</span>, <span class="op">|</span><span class="ident">self_</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="self">Self</span>::Valid</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="ident">self_</span> {
-                <span class="ident"><span class="self">Self</span>::Invalid</span>(<span class="ident">c</span>)
-            } <span class="kw">else</span> {
-                <span class="ident">self_</span>
+    <span class="kw">fn </span>invalidate(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        take_mut::take(<span class="self">self</span>, |self_| {
+            <span class="kw">if let </span><span class="self">Self</span>::Valid(c) = self_ {
+                <span class="self">Self</span>::Invalid(c)
+            } <span class="kw">else </span>{
+                self_
             }
         });
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">kill_cursor</span>(
-    <span class="ident">client</span>: <span class="ident">Client</span>,
-    <span class="ident">ns</span>: <span class="kw-2">&amp;</span><span class="ident">Namespace</span>,
-    <span class="ident">cursor_id</span>: <span class="ident">i64</span>,
-    <span class="ident">pinned_conn</span>: <span class="ident">PinnedConnection</span>,
-    <span class="ident">drop_address</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ServerAddress</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span> <span class="ident">kill_watcher</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">oneshot::Sender</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>kill_cursor(
+    client: Client,
+    ns: <span class="kw-2">&amp;</span>Namespace,
+    cursor_id: i64,
+    pinned_conn: PinnedConnection,
+    drop_address: <span class="prelude-ty">Option</span>&lt;ServerAddress&gt;,
+    <span class="attribute">#[cfg(test)] </span>kill_watcher: <span class="prelude-ty">Option</span>&lt;oneshot::Sender&lt;()&gt;&gt;,
 ) {
-    <span class="kw">let</span> <span class="ident">coll</span> <span class="op">=</span> <span class="ident">client</span>
-        .<span class="ident">database</span>(<span class="ident">ns</span>.<span class="ident">db</span>.<span class="ident">as_str</span>())
-        .<span class="ident">collection</span>::<span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>(<span class="ident">ns</span>.<span class="ident">coll</span>.<span class="ident">as_str</span>());
-    <span class="ident">runtime::execute</span>(<span class="kw">async</span> <span class="kw">move</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">pinned_conn</span>.<span class="ident">is_invalid</span>() {
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">coll</span>
-                .<span class="ident">kill_cursor</span>(<span class="ident">cursor_id</span>, <span class="ident">pinned_conn</span>.<span class="ident">handle</span>(), <span class="ident">drop_address</span>)
+    <span class="kw">let </span>coll = client
+        .database(ns.db.as_str())
+        .collection::&lt;Document&gt;(ns.coll.as_str());
+    runtime::execute(<span class="kw">async move </span>{
+        <span class="kw">if </span>!pinned_conn.is_invalid() {
+            <span class="kw">let _ </span>= coll
+                .kill_cursor(cursor_id, pinned_conn.handle(), drop_address)
                 .<span class="kw">await</span>;
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">tx</span>) <span class="op">=</span> <span class="ident">kill_watcher</span> {
-                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">tx</span>.<span class="ident">send</span>(());
+            <span class="attribute">#[cfg(test)]
+            </span><span class="kw">if let </span><span class="prelude-val">Some</span>(tx) = kill_watcher {
+                <span class="kw">let _ </span>= tx.send(());
             }
         }
     });
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">CursorState</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">buffer</span>: <span class="ident">CursorBuffer</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">exhausted</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">post_batch_resume_token</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ResumeToken</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">pinned_connection</span>: <span class="ident">PinnedConnection</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>CursorState {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) buffer: CursorBuffer,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) exhausted: bool,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) post_batch_resume_token: <span class="prelude-ty">Option</span>&lt;ResumeToken&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) pinned_connection: PinnedConnection,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">CursorBuffer</span> {
-    <span class="ident">docs</span>: <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">RawDocumentBuf</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// whether the buffer is at the front or not</span>
-    <span class="ident">fresh</span>: <span class="ident">bool</span>,
+<span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>CursorBuffer {
+    docs: VecDeque&lt;RawDocumentBuf&gt;,
+    <span class="doccomment">/// whether the buffer is at the front or not
+    </span>fresh: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">CursorBuffer</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">initial_buffer</span>: <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">RawDocumentBuf</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">docs</span>: <span class="ident">initial_buffer</span>,
-            <span class="ident">fresh</span>: <span class="bool-val">true</span>,
+<span class="kw">impl </span>CursorBuffer {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(initial_buffer: VecDeque&lt;RawDocumentBuf&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            docs: initial_buffer,
+            fresh: <span class="bool-val">true</span>,
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">docs</span>.<span class="ident">is_empty</span>()
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.docs.is_empty()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RawDocumentBuf</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">fresh</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        <span class="self">self</span>.<span class="ident">docs</span>.<span class="ident">pop_front</span>()
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;RawDocumentBuf&gt; {
+        <span class="self">self</span>.fresh = <span class="bool-val">false</span>;
+        <span class="self">self</span>.docs.pop_front()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="comment">// if at the front of the buffer, don&#39;t move forward as the first document</span>
-        <span class="comment">// hasn&#39;t been consumed yet.</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">fresh</span> {
-            <span class="self">self</span>.<span class="ident">fresh</span> <span class="op">=</span> <span class="bool-val">false</span>;
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>advance(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="comment">// if at the front of the buffer, don&#39;t move forward as the first document
+        // hasn&#39;t been consumed yet.
+        </span><span class="kw">if </span><span class="self">self</span>.fresh {
+            <span class="self">self</span>.fresh = <span class="bool-val">false</span>;
             <span class="kw">return</span>;
         }
-        <span class="self">self</span>.<span class="ident">next</span>();
+        <span class="self">self</span>.next();
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">current</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">RawDocument</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">docs</span>.<span class="ident">front</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">as_ref</span>())
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>current(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>RawDocument&gt; {
+        <span class="self">self</span>.docs.front().map(|d| d.as_ref())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">RawDocumentBuf</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CursorBuffer</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">RawDocumentBuf</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">docs</span>
+<span class="kw">impl </span>AsRef&lt;VecDeque&lt;RawDocumentBuf&gt;&gt; <span class="kw">for </span>CursorBuffer {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>VecDeque&lt;RawDocumentBuf&gt; {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.docs
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

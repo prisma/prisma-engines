@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/structopt-derive-0.4.18/src/attrs.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>attrs.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../structopt_derive/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../structopt_derive/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../structopt_derive/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/structopt-derive-0.4.18/src/attrs.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>attrs.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../structopt_derive/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../structopt_derive/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../structopt_derive/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -683,690 +683,690 @@
 <span id="683">683</span>
 <span id="684">684</span>
 <span id="685">685</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2018 Guillaume Pinot (@TeXitoi) &lt;texitoi@texitoi.eu&gt;</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license</span>
-<span class="comment">// &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. This file may not be copied, modified, or distributed</span>
-<span class="comment">// except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2018 Guillaume Pinot (@TeXitoi) &lt;texitoi@texitoi.eu&gt;
+//
+// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+// http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license
+// &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. This file may not be copied, modified, or distributed
+// except according to those terms.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::doc_comments::process_doc_comment</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">parse</span>::<span class="kw-2">*</span>, <span class="ident">spanned::Sp</span>, <span class="ident">ty::Ty</span>};
+</span><span class="kw">use </span><span class="kw">crate</span>::doc_comments::process_doc_comment;
+<span class="kw">use crate</span>::{parse::<span class="kw-2">*</span>, spanned::Sp, ty::Ty};
 
-<span class="kw">use</span> <span class="ident">std::env</span>;
+<span class="kw">use </span>std::env;
 
-<span class="kw">use</span> <span class="ident">heck</span>::{<span class="ident">CamelCase</span>, <span class="ident">KebabCase</span>, <span class="ident">MixedCase</span>, <span class="ident">ShoutySnakeCase</span>, <span class="ident">SnakeCase</span>};
-<span class="kw">use</span> <span class="ident">proc_macro2</span>::{<span class="ident">Span</span>, <span class="ident">TokenStream</span>};
-<span class="kw">use</span> <span class="ident">proc_macro_error::abort</span>;
-<span class="kw">use</span> <span class="ident">quote</span>::{<span class="ident">quote</span>, <span class="ident">quote_spanned</span>, <span class="ident">ToTokens</span>};
-<span class="kw">use</span> <span class="ident">syn</span>::{
-    <span class="self">self</span>, <span class="ident">ext::IdentExt</span>, <span class="ident">spanned::Spanned</span>, <span class="ident">Attribute</span>, <span class="ident">Expr</span>, <span class="ident">Ident</span>, <span class="ident">LitStr</span>, <span class="ident">MetaNameValue</span>, <span class="ident">Type</span>,
+<span class="kw">use </span>heck::{CamelCase, KebabCase, MixedCase, ShoutySnakeCase, SnakeCase};
+<span class="kw">use </span>proc_macro2::{Span, TokenStream};
+<span class="kw">use </span>proc_macro_error::abort;
+<span class="kw">use </span>quote::{quote, quote_spanned, ToTokens};
+<span class="kw">use </span>syn::{
+    <span class="self">self</span>, ext::IdentExt, spanned::Spanned, Attribute, Expr, Ident, LitStr, MetaNameValue, Type,
 };
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Kind</span> {
-    <span class="ident">Arg</span>(<span class="ident">Sp</span><span class="op">&lt;</span><span class="ident">Ty</span><span class="op">&gt;</span>),
-    <span class="ident">Subcommand</span>(<span class="ident">Sp</span><span class="op">&lt;</span><span class="ident">Ty</span><span class="op">&gt;</span>),
-    <span class="ident">ExternalSubcommand</span>,
-    <span class="ident">Flatten</span>,
-    <span class="ident">Skip</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Expr</span><span class="op">&gt;</span>),
+<span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub enum </span>Kind {
+    Arg(Sp&lt;Ty&gt;),
+    Subcommand(Sp&lt;Ty&gt;),
+    ExternalSubcommand,
+    Flatten,
+    Skip(<span class="prelude-ty">Option</span>&lt;Expr&gt;),
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Method</span> {
-    <span class="ident">name</span>: <span class="ident">Ident</span>,
-    <span class="ident">args</span>: <span class="ident">TokenStream</span>,
+<span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>Method {
+    name: Ident,
+    args: TokenStream,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Parser</span> {
-    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">Sp</span><span class="op">&lt;</span><span class="ident">ParserKind</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">func</span>: <span class="ident">TokenStream</span>,
+<span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>Parser {
+    <span class="kw">pub </span>kind: Sp&lt;ParserKind&gt;,
+    <span class="kw">pub </span>func: TokenStream,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ParserKind</span> {
-    <span class="ident">FromStr</span>,
-    <span class="ident">TryFromStr</span>,
-    <span class="ident">FromOsStr</span>,
-    <span class="ident">TryFromOsStr</span>,
-    <span class="ident">FromOccurrences</span>,
-    <span class="ident">FromFlag</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Clone)]
+</span><span class="kw">pub enum </span>ParserKind {
+    FromStr,
+    TryFromStr,
+    FromOsStr,
+    TryFromOsStr,
+    FromOccurrences,
+    FromFlag,
 }
 
-<span class="doccomment">/// Defines the casing for the attributes long representation.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CasingStyle</span> {
-    <span class="doccomment">/// Indicate word boundaries with uppercase letter, excluding the first word.</span>
-    <span class="ident">Camel</span>,
-    <span class="doccomment">/// Keep all letters lowercase and indicate word boundaries with hyphens.</span>
-    <span class="ident">Kebab</span>,
-    <span class="doccomment">/// Indicate word boundaries with uppercase letter, including the first word.</span>
-    <span class="ident">Pascal</span>,
-    <span class="doccomment">/// Keep all letters uppercase and indicate word boundaries with underscores.</span>
-    <span class="ident">ScreamingSnake</span>,
-    <span class="doccomment">/// Keep all letters lowercase and indicate word boundaries with underscores.</span>
-    <span class="ident">Snake</span>,
-    <span class="doccomment">/// Use the original attribute name defined in the code.</span>
-    <span class="ident">Verbatim</span>,
-    <span class="doccomment">/// Keep all letters lowercase and remove word boundaries.</span>
-    <span class="ident">Lower</span>,
-    <span class="doccomment">/// Keep all letters uppercase and remove word boundaries.</span>
-    <span class="ident">Upper</span>,
+<span class="doccomment">/// Defines the casing for the attributes long representation.
+</span><span class="attribute">#[derive(Copy, Clone, Debug, PartialEq)]
+</span><span class="kw">pub enum </span>CasingStyle {
+    <span class="doccomment">/// Indicate word boundaries with uppercase letter, excluding the first word.
+    </span>Camel,
+    <span class="doccomment">/// Keep all letters lowercase and indicate word boundaries with hyphens.
+    </span>Kebab,
+    <span class="doccomment">/// Indicate word boundaries with uppercase letter, including the first word.
+    </span>Pascal,
+    <span class="doccomment">/// Keep all letters uppercase and indicate word boundaries with underscores.
+    </span>ScreamingSnake,
+    <span class="doccomment">/// Keep all letters lowercase and indicate word boundaries with underscores.
+    </span>Snake,
+    <span class="doccomment">/// Use the original attribute name defined in the code.
+    </span>Verbatim,
+    <span class="doccomment">/// Keep all letters lowercase and remove word boundaries.
+    </span>Lower,
+    <span class="doccomment">/// Keep all letters uppercase and remove word boundaries.
+    </span>Upper,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Name</span> {
-    <span class="ident">Derived</span>(<span class="ident">Ident</span>),
-    <span class="ident">Assigned</span>(<span class="ident">TokenStream</span>),
+<span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub enum </span>Name {
+    Derived(Ident),
+    Assigned(TokenStream),
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Attrs</span> {
-    <span class="ident">name</span>: <span class="ident">Name</span>,
-    <span class="ident">casing</span>: <span class="ident">Sp</span><span class="op">&lt;</span><span class="ident">CasingStyle</span><span class="op">&gt;</span>,
-    <span class="ident">env_casing</span>: <span class="ident">Sp</span><span class="op">&lt;</span><span class="ident">CasingStyle</span><span class="op">&gt;</span>,
-    <span class="ident">ty</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Type</span><span class="op">&gt;</span>,
-    <span class="ident">doc_comment</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Method</span><span class="op">&gt;</span>,
-    <span class="ident">methods</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Method</span><span class="op">&gt;</span>,
-    <span class="ident">parser</span>: <span class="ident">Sp</span><span class="op">&lt;</span><span class="ident">Parser</span><span class="op">&gt;</span>,
-    <span class="ident">author</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Method</span><span class="op">&gt;</span>,
-    <span class="ident">about</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Method</span><span class="op">&gt;</span>,
-    <span class="ident">version</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Method</span><span class="op">&gt;</span>,
-    <span class="ident">no_version</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span>,
-    <span class="ident">verbatim_doc_comment</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span>,
-    <span class="ident">has_custom_parser</span>: <span class="ident">bool</span>,
-    <span class="ident">kind</span>: <span class="ident">Sp</span><span class="op">&lt;</span><span class="ident">Kind</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>Attrs {
+    name: Name,
+    casing: Sp&lt;CasingStyle&gt;,
+    env_casing: Sp&lt;CasingStyle&gt;,
+    ty: <span class="prelude-ty">Option</span>&lt;Type&gt;,
+    doc_comment: Vec&lt;Method&gt;,
+    methods: Vec&lt;Method&gt;,
+    parser: Sp&lt;Parser&gt;,
+    author: <span class="prelude-ty">Option</span>&lt;Method&gt;,
+    about: <span class="prelude-ty">Option</span>&lt;Method&gt;,
+    version: <span class="prelude-ty">Option</span>&lt;Method&gt;,
+    no_version: <span class="prelude-ty">Option</span>&lt;Ident&gt;,
+    verbatim_doc_comment: <span class="prelude-ty">Option</span>&lt;Ident&gt;,
+    has_custom_parser: bool,
+    kind: Sp&lt;Kind&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Method</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="ident">Ident</span>, <span class="ident">args</span>: <span class="ident">TokenStream</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Method</span> { <span class="ident">name</span>, <span class="ident">args</span> }
+<span class="kw">impl </span>Method {
+    <span class="kw">pub fn </span>new(name: Ident, args: TokenStream) -&gt; <span class="self">Self </span>{
+        Method { name, args }
     }
 
-    <span class="kw">fn</span> <span class="ident">from_lit_or_env</span>(<span class="ident">ident</span>: <span class="ident">Ident</span>, <span class="ident">lit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LitStr</span><span class="op">&gt;</span>, <span class="ident">env_var</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lit</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">lit</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">lit</span>) =&gt; <span class="ident">lit</span>,
+    <span class="kw">fn </span>from_lit_or_env(ident: Ident, lit: <span class="prelude-ty">Option</span>&lt;LitStr&gt;, env_var: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>lit = <span class="kw">match </span>lit {
+            <span class="prelude-val">Some</span>(lit) =&gt; lit,
 
-            <span class="prelude-val">None</span> =&gt; <span class="kw">match</span> <span class="ident">env::var</span>(<span class="ident">env_var</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">val</span>) =&gt; <span class="ident">LitStr::new</span>(<span class="kw-2">&amp;</span><span class="ident">val</span>, <span class="ident">ident</span>.<span class="ident">span</span>()),
+            <span class="prelude-val">None </span>=&gt; <span class="kw">match </span>env::var(env_var) {
+                <span class="prelude-val">Ok</span>(val) =&gt; LitStr::new(<span class="kw-2">&amp;</span>val, ident.span()),
                 <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-                    <span class="macro">abort!</span>(<span class="ident">ident</span>,
-                        <span class="string">&quot;cannot derive `{}` from Cargo.toml&quot;</span>, <span class="ident">ident</span>;
-                        <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;`{}` environment variable is not set&quot;</span>, <span class="ident">env_var</span>;
-                        <span class="ident">help</span> <span class="op">=</span> <span class="string">&quot;use `{} = \&quot;...\&quot;` to set {} manually&quot;</span>, <span class="ident">ident</span>, <span class="ident">ident</span>;
+                    <span class="macro">abort!</span>(ident,
+                        <span class="string">&quot;cannot derive `{}` from Cargo.toml&quot;</span>, ident;
+                        note = <span class="string">&quot;`{}` environment variable is not set&quot;</span>, env_var;
+                        help = <span class="string">&quot;use `{} = \&quot;...\&quot;` to set {} manually&quot;</span>, ident, ident;
                     );
                 }
             },
         };
 
-        <span class="kw">if</span> <span class="ident">ident</span> <span class="op">==</span> <span class="string">&quot;author&quot;</span> {
-            <span class="kw">let</span> <span class="ident">edited</span> <span class="op">=</span> <span class="ident">process_author_str</span>(<span class="kw-2">&amp;</span><span class="ident">lit</span>.<span class="ident">value</span>());
-            <span class="ident">lit</span> <span class="op">=</span> <span class="ident">LitStr::new</span>(<span class="kw-2">&amp;</span><span class="ident">edited</span>, <span class="ident">lit</span>.<span class="ident">span</span>());
+        <span class="kw">if </span>ident == <span class="string">&quot;author&quot; </span>{
+            <span class="kw">let </span>edited = process_author_str(<span class="kw-2">&amp;</span>lit.value());
+            lit = LitStr::new(<span class="kw-2">&amp;</span>edited, lit.span());
         }
 
-        <span class="ident">Method::new</span>(<span class="ident">ident</span>, <span class="macro">quote!</span>(#<span class="ident">lit</span>))
+        Method::new(ident, <span class="macro">quote!</span>(#lit))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ToTokens</span> <span class="kw">for</span> <span class="ident">Method</span> {
-    <span class="kw">fn</span> <span class="ident">to_tokens</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ts</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TokenStream</span>) {
-        <span class="kw">let</span> <span class="ident">Method</span> { <span class="kw-2">ref</span> <span class="ident">name</span>, <span class="kw-2">ref</span> <span class="ident">args</span> } <span class="op">=</span> <span class="self">self</span>;
-        <span class="macro">quote!</span>(.#<span class="ident">name</span>(#<span class="ident">args</span>)).<span class="ident">to_tokens</span>(<span class="ident">ts</span>);
+<span class="kw">impl </span>ToTokens <span class="kw">for </span>Method {
+    <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, ts: <span class="kw-2">&amp;mut </span>TokenStream) {
+        <span class="kw">let </span>Method { <span class="kw-2">ref </span>name, <span class="kw-2">ref </span>args } = <span class="self">self</span>;
+        <span class="macro">quote!</span>(.#name(#args)).to_tokens(ts);
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Parser</span> {
-    <span class="kw">fn</span> <span class="ident">default_spanned</span>(<span class="ident">span</span>: <span class="ident">Span</span>) -&gt; <span class="ident">Sp</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">Sp::new</span>(<span class="ident">ParserKind::TryFromStr</span>, <span class="ident">span</span>);
-        <span class="kw">let</span> <span class="ident">func</span> <span class="op">=</span> <span class="macro">quote_spanned!</span>(<span class="ident">span</span>=&gt; <span class="ident">::std::str::FromStr::from_str</span>);
-        <span class="ident">Sp::new</span>(<span class="ident">Parser</span> { <span class="ident">kind</span>, <span class="ident">func</span> }, <span class="ident">span</span>)
+<span class="kw">impl </span>Parser {
+    <span class="kw">fn </span>default_spanned(span: Span) -&gt; Sp&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>kind = Sp::new(ParserKind::TryFromStr, span);
+        <span class="kw">let </span>func = <span class="macro">quote_spanned!</span>(span=&gt; ::std::str::FromStr::from_str);
+        Sp::new(Parser { kind, func }, span)
     }
 
-    <span class="kw">fn</span> <span class="ident">from_spec</span>(<span class="ident">parse_ident</span>: <span class="ident">Ident</span>, <span class="ident">spec</span>: <span class="ident">ParserSpec</span>) -&gt; <span class="ident">Sp</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">ParserKind</span>::<span class="kw-2">*</span>;
+    <span class="kw">fn </span>from_spec(parse_ident: Ident, spec: ParserSpec) -&gt; Sp&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">use </span>ParserKind::<span class="kw-2">*</span>;
 
-        <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">spec</span>.<span class="ident">kind</span>.<span class="ident">to_string</span>() {
-            <span class="string">&quot;from_str&quot;</span> =&gt; <span class="ident">FromStr</span>,
-            <span class="string">&quot;try_from_str&quot;</span> =&gt; <span class="ident">TryFromStr</span>,
-            <span class="string">&quot;from_os_str&quot;</span> =&gt; <span class="ident">FromOsStr</span>,
-            <span class="string">&quot;try_from_os_str&quot;</span> =&gt; <span class="ident">TryFromOsStr</span>,
-            <span class="string">&quot;from_occurrences&quot;</span> =&gt; <span class="ident">FromOccurrences</span>,
-            <span class="string">&quot;from_flag&quot;</span> =&gt; <span class="ident">FromFlag</span>,
-            <span class="ident">s</span> =&gt; <span class="macro">abort!</span>(<span class="ident">spec</span>.<span class="ident">kind</span>, <span class="string">&quot;unsupported parser `{}`&quot;</span>, <span class="ident">s</span>),
+        <span class="kw">let </span>kind = <span class="kw">match </span><span class="kw-2">&amp;*</span>spec.kind.to_string() {
+            <span class="string">&quot;from_str&quot; </span>=&gt; FromStr,
+            <span class="string">&quot;try_from_str&quot; </span>=&gt; TryFromStr,
+            <span class="string">&quot;from_os_str&quot; </span>=&gt; FromOsStr,
+            <span class="string">&quot;try_from_os_str&quot; </span>=&gt; TryFromOsStr,
+            <span class="string">&quot;from_occurrences&quot; </span>=&gt; FromOccurrences,
+            <span class="string">&quot;from_flag&quot; </span>=&gt; FromFlag,
+            s =&gt; <span class="macro">abort!</span>(spec.kind, <span class="string">&quot;unsupported parser `{}`&quot;</span>, s),
         };
 
-        <span class="kw">let</span> <span class="ident">func</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">spec</span>.<span class="ident">parse_func</span> {
-            <span class="prelude-val">None</span> =&gt; <span class="kw">match</span> <span class="ident">kind</span> {
-                <span class="ident">FromStr</span> <span class="op">|</span> <span class="ident">FromOsStr</span> =&gt; {
-                    <span class="macro">quote_spanned!</span>(<span class="ident">spec</span>.<span class="ident">kind</span>.<span class="ident">span</span>()=&gt; <span class="ident">::std::convert::From::from</span>)
+        <span class="kw">let </span>func = <span class="kw">match </span>spec.parse_func {
+            <span class="prelude-val">None </span>=&gt; <span class="kw">match </span>kind {
+                FromStr | FromOsStr =&gt; {
+                    <span class="macro">quote_spanned!</span>(spec.kind.span()=&gt; ::std::convert::From::from)
                 }
-                <span class="ident">TryFromStr</span> =&gt; <span class="macro">quote_spanned!</span>(<span class="ident">spec</span>.<span class="ident">kind</span>.<span class="ident">span</span>()=&gt; <span class="ident">::std::str::FromStr::from_str</span>),
-                <span class="ident">TryFromOsStr</span> =&gt; <span class="macro">abort!</span>(
-                    <span class="ident">spec</span>.<span class="ident">kind</span>,
-                    <span class="string">&quot;you must set parser for `try_from_os_str` explicitly&quot;</span>
-                ),
-                <span class="ident">FromOccurrences</span> =&gt; <span class="macro">quote_spanned!</span>(<span class="ident">spec</span>.<span class="ident">kind</span>.<span class="ident">span</span>()=&gt; { <span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="kw">as</span> <span class="kw">_</span> }),
-                <span class="ident">FromFlag</span> =&gt; <span class="macro">quote_spanned!</span>(<span class="ident">spec</span>.<span class="ident">kind</span>.<span class="ident">span</span>()=&gt; <span class="ident">::std::convert::From::from</span>),
+                TryFromStr =&gt; <span class="macro">quote_spanned!</span>(spec.kind.span()=&gt; ::std::str::FromStr::from_str),
+                TryFromOsStr =&gt; <span class="macro">abort!</span>(
+                    spec.kind,
+                    <span class="string">&quot;you must set parser for `try_from_os_str` explicitly&quot;
+                </span>),
+                FromOccurrences =&gt; <span class="macro">quote_spanned!</span>(spec.kind.span()=&gt; { |v| v <span class="kw">as _ </span>}),
+                FromFlag =&gt; <span class="macro">quote_spanned!</span>(spec.kind.span()=&gt; ::std::convert::From::from),
             },
 
-            <span class="prelude-val">Some</span>(<span class="ident">func</span>) =&gt; <span class="kw">match</span> <span class="ident">func</span> {
-                <span class="ident">syn::Expr::Path</span>(<span class="kw">_</span>) =&gt; <span class="macro">quote!</span>(#<span class="ident">func</span>),
-                <span class="kw">_</span> =&gt; <span class="macro">abort!</span>(<span class="ident">func</span>, <span class="string">&quot;`parse` argument must be a function path&quot;</span>),
+            <span class="prelude-val">Some</span>(func) =&gt; <span class="kw">match </span>func {
+                syn::Expr::Path(<span class="kw">_</span>) =&gt; <span class="macro">quote!</span>(#func),
+                <span class="kw">_ </span>=&gt; <span class="macro">abort!</span>(func, <span class="string">&quot;`parse` argument must be a function path&quot;</span>),
             },
         };
 
-        <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">Sp::new</span>(<span class="ident">kind</span>, <span class="ident">spec</span>.<span class="ident">kind</span>.<span class="ident">span</span>());
-        <span class="kw">let</span> <span class="ident">parser</span> <span class="op">=</span> <span class="ident">Parser</span> { <span class="ident">kind</span>, <span class="ident">func</span> };
-        <span class="ident">Sp::new</span>(<span class="ident">parser</span>, <span class="ident">parse_ident</span>.<span class="ident">span</span>())
+        <span class="kw">let </span>kind = Sp::new(kind, spec.kind.span());
+        <span class="kw">let </span>parser = Parser { kind, func };
+        Sp::new(parser, parse_ident.span())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CasingStyle</span> {
-    <span class="kw">fn</span> <span class="ident">from_lit</span>(<span class="ident">name</span>: <span class="ident">LitStr</span>) -&gt; <span class="ident">Sp</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">CasingStyle</span>::<span class="kw-2">*</span>;
+<span class="kw">impl </span>CasingStyle {
+    <span class="kw">fn </span>from_lit(name: LitStr) -&gt; Sp&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">use </span>CasingStyle::<span class="kw-2">*</span>;
 
-        <span class="kw">let</span> <span class="ident">normalized</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">value</span>().<span class="ident">to_camel_case</span>().<span class="ident">to_lowercase</span>();
-        <span class="kw">let</span> <span class="ident">cs</span> <span class="op">=</span> <span class="op">|</span><span class="ident">kind</span><span class="op">|</span> <span class="ident">Sp::new</span>(<span class="ident">kind</span>, <span class="ident">name</span>.<span class="ident">span</span>());
+        <span class="kw">let </span>normalized = name.value().to_camel_case().to_lowercase();
+        <span class="kw">let </span>cs = |kind| Sp::new(kind, name.span());
 
-        <span class="kw">match</span> <span class="ident">normalized</span>.<span class="ident">as_ref</span>() {
-            <span class="string">&quot;camel&quot;</span> <span class="op">|</span> <span class="string">&quot;camelcase&quot;</span> =&gt; <span class="ident">cs</span>(<span class="ident">Camel</span>),
-            <span class="string">&quot;kebab&quot;</span> <span class="op">|</span> <span class="string">&quot;kebabcase&quot;</span> =&gt; <span class="ident">cs</span>(<span class="ident">Kebab</span>),
-            <span class="string">&quot;pascal&quot;</span> <span class="op">|</span> <span class="string">&quot;pascalcase&quot;</span> =&gt; <span class="ident">cs</span>(<span class="ident">Pascal</span>),
-            <span class="string">&quot;screamingsnake&quot;</span> <span class="op">|</span> <span class="string">&quot;screamingsnakecase&quot;</span> =&gt; <span class="ident">cs</span>(<span class="ident">ScreamingSnake</span>),
-            <span class="string">&quot;snake&quot;</span> <span class="op">|</span> <span class="string">&quot;snakecase&quot;</span> =&gt; <span class="ident">cs</span>(<span class="ident">Snake</span>),
-            <span class="string">&quot;verbatim&quot;</span> <span class="op">|</span> <span class="string">&quot;verbatimcase&quot;</span> =&gt; <span class="ident">cs</span>(<span class="ident">Verbatim</span>),
-            <span class="string">&quot;lower&quot;</span> <span class="op">|</span> <span class="string">&quot;lowercase&quot;</span> =&gt; <span class="ident">cs</span>(<span class="ident">Lower</span>),
-            <span class="string">&quot;upper&quot;</span> <span class="op">|</span> <span class="string">&quot;uppercase&quot;</span> =&gt; <span class="ident">cs</span>(<span class="ident">Upper</span>),
-            <span class="ident">s</span> =&gt; <span class="macro">abort!</span>(<span class="ident">name</span>, <span class="string">&quot;unsupported casing: `{}`&quot;</span>, <span class="ident">s</span>),
+        <span class="kw">match </span>normalized.as_ref() {
+            <span class="string">&quot;camel&quot; </span>| <span class="string">&quot;camelcase&quot; </span>=&gt; cs(Camel),
+            <span class="string">&quot;kebab&quot; </span>| <span class="string">&quot;kebabcase&quot; </span>=&gt; cs(Kebab),
+            <span class="string">&quot;pascal&quot; </span>| <span class="string">&quot;pascalcase&quot; </span>=&gt; cs(Pascal),
+            <span class="string">&quot;screamingsnake&quot; </span>| <span class="string">&quot;screamingsnakecase&quot; </span>=&gt; cs(ScreamingSnake),
+            <span class="string">&quot;snake&quot; </span>| <span class="string">&quot;snakecase&quot; </span>=&gt; cs(Snake),
+            <span class="string">&quot;verbatim&quot; </span>| <span class="string">&quot;verbatimcase&quot; </span>=&gt; cs(Verbatim),
+            <span class="string">&quot;lower&quot; </span>| <span class="string">&quot;lowercase&quot; </span>=&gt; cs(Lower),
+            <span class="string">&quot;upper&quot; </span>| <span class="string">&quot;uppercase&quot; </span>=&gt; cs(Upper),
+            s =&gt; <span class="macro">abort!</span>(name, <span class="string">&quot;unsupported casing: `{}`&quot;</span>, s),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Name</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">translate</span>(<span class="self">self</span>, <span class="ident">style</span>: <span class="ident">CasingStyle</span>) -&gt; <span class="ident">TokenStream</span> {
-        <span class="kw">use</span> <span class="ident">CasingStyle</span>::<span class="kw-2">*</span>;
+<span class="kw">impl </span>Name {
+    <span class="kw">pub fn </span>translate(<span class="self">self</span>, style: CasingStyle) -&gt; TokenStream {
+        <span class="kw">use </span>CasingStyle::<span class="kw-2">*</span>;
 
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Name::Assigned</span>(<span class="ident">tokens</span>) =&gt; <span class="ident">tokens</span>,
-            <span class="ident">Name::Derived</span>(<span class="ident">ident</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">ident</span>.<span class="ident">unraw</span>().<span class="ident">to_string</span>();
-                <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">style</span> {
-                    <span class="ident">Pascal</span> =&gt; <span class="ident">s</span>.<span class="ident">to_camel_case</span>(),
-                    <span class="ident">Kebab</span> =&gt; <span class="ident">s</span>.<span class="ident">to_kebab_case</span>(),
-                    <span class="ident">Camel</span> =&gt; <span class="ident">s</span>.<span class="ident">to_mixed_case</span>(),
-                    <span class="ident">ScreamingSnake</span> =&gt; <span class="ident">s</span>.<span class="ident">to_shouty_snake_case</span>(),
-                    <span class="ident">Snake</span> =&gt; <span class="ident">s</span>.<span class="ident">to_snake_case</span>(),
-                    <span class="ident">Verbatim</span> =&gt; <span class="ident">s</span>,
-                    <span class="ident">Lower</span> =&gt; <span class="ident">s</span>.<span class="ident">to_snake_case</span>().<span class="ident">replace</span>(<span class="string">&quot;_&quot;</span>, <span class="string">&quot;&quot;</span>),
-                    <span class="ident">Upper</span> =&gt; <span class="ident">s</span>.<span class="ident">to_shouty_snake_case</span>().<span class="ident">replace</span>(<span class="string">&quot;_&quot;</span>, <span class="string">&quot;&quot;</span>),
+        <span class="kw">match </span><span class="self">self </span>{
+            Name::Assigned(tokens) =&gt; tokens,
+            Name::Derived(ident) =&gt; {
+                <span class="kw">let </span>s = ident.unraw().to_string();
+                <span class="kw">let </span>s = <span class="kw">match </span>style {
+                    Pascal =&gt; s.to_camel_case(),
+                    Kebab =&gt; s.to_kebab_case(),
+                    Camel =&gt; s.to_mixed_case(),
+                    ScreamingSnake =&gt; s.to_shouty_snake_case(),
+                    Snake =&gt; s.to_snake_case(),
+                    Verbatim =&gt; s,
+                    Lower =&gt; s.to_snake_case().replace(<span class="string">&quot;_&quot;</span>, <span class="string">&quot;&quot;</span>),
+                    Upper =&gt; s.to_shouty_snake_case().replace(<span class="string">&quot;_&quot;</span>, <span class="string">&quot;&quot;</span>),
                 };
-                <span class="macro">quote_spanned!</span>(<span class="ident">ident</span>.<span class="ident">span</span>()=&gt; #<span class="ident">s</span>)
+                <span class="macro">quote_spanned!</span>(ident.span()=&gt; #s)
             }
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Attrs</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">default_span</span>: <span class="ident">Span</span>,
-        <span class="ident">name</span>: <span class="ident">Name</span>,
-        <span class="ident">parent_attrs</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Attrs</span><span class="op">&gt;</span>,
-        <span class="ident">ty</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Type</span><span class="op">&gt;</span>,
-        <span class="ident">casing</span>: <span class="ident">Sp</span><span class="op">&lt;</span><span class="ident">CasingStyle</span><span class="op">&gt;</span>,
-        <span class="ident">env_casing</span>: <span class="ident">Sp</span><span class="op">&lt;</span><span class="ident">CasingStyle</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">no_version</span> <span class="op">=</span> <span class="ident">parent_attrs</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">attrs</span><span class="op">|</span> <span class="ident">attrs</span>.<span class="ident">no_version</span>.<span class="ident">clone</span>())
-            .<span class="ident">unwrap_or</span>(<span class="prelude-val">None</span>);
+<span class="kw">impl </span>Attrs {
+    <span class="kw">fn </span>new(
+        default_span: Span,
+        name: Name,
+        parent_attrs: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Attrs&gt;,
+        ty: <span class="prelude-ty">Option</span>&lt;Type&gt;,
+        casing: Sp&lt;CasingStyle&gt;,
+        env_casing: Sp&lt;CasingStyle&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>no_version = parent_attrs
+            .as_ref()
+            .map(|attrs| attrs.no_version.clone())
+            .unwrap_or(<span class="prelude-val">None</span>);
 
-        <span class="self">Self</span> {
-            <span class="ident">name</span>,
-            <span class="ident">ty</span>,
-            <span class="ident">casing</span>,
-            <span class="ident">env_casing</span>,
-            <span class="ident">doc_comment</span>: <span class="macro">vec!</span>[],
-            <span class="ident">methods</span>: <span class="macro">vec!</span>[],
-            <span class="ident">parser</span>: <span class="ident">Parser::default_spanned</span>(<span class="ident">default_span</span>),
-            <span class="ident">about</span>: <span class="prelude-val">None</span>,
-            <span class="ident">author</span>: <span class="prelude-val">None</span>,
-            <span class="ident">version</span>: <span class="prelude-val">None</span>,
-            <span class="ident">no_version</span>,
-            <span class="ident">verbatim_doc_comment</span>: <span class="prelude-val">None</span>,
+        <span class="self">Self </span>{
+            name,
+            ty,
+            casing,
+            env_casing,
+            doc_comment: <span class="macro">vec!</span>[],
+            methods: <span class="macro">vec!</span>[],
+            parser: Parser::default_spanned(default_span),
+            about: <span class="prelude-val">None</span>,
+            author: <span class="prelude-val">None</span>,
+            version: <span class="prelude-val">None</span>,
+            no_version,
+            verbatim_doc_comment: <span class="prelude-val">None</span>,
 
-            <span class="ident">has_custom_parser</span>: <span class="bool-val">false</span>,
-            <span class="ident">kind</span>: <span class="ident">Sp::new</span>(<span class="ident">Kind::Arg</span>(<span class="ident">Sp::new</span>(<span class="ident">Ty::Other</span>, <span class="ident">default_span</span>)), <span class="ident">default_span</span>),
+            has_custom_parser: <span class="bool-val">false</span>,
+            kind: Sp::new(Kind::Arg(Sp::new(Ty::Other, default_span)), default_span),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">push_method</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">Ident</span>, <span class="ident">arg</span>: <span class="kw">impl</span> <span class="ident">ToTokens</span>) {
-        <span class="kw">if</span> <span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;name&quot;</span> {
-            <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">Name::Assigned</span>(<span class="macro">quote!</span>(#<span class="ident">arg</span>));
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;version&quot;</span> {
-            <span class="self">self</span>.<span class="ident">version</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Method::new</span>(<span class="ident">name</span>, <span class="macro">quote!</span>(#<span class="ident">arg</span>)));
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">methods</span>.<span class="ident">push</span>(<span class="ident">Method::new</span>(<span class="ident">name</span>, <span class="macro">quote!</span>(#<span class="ident">arg</span>)))
+    <span class="kw">fn </span>push_method(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: Ident, arg: <span class="kw">impl </span>ToTokens) {
+        <span class="kw">if </span>name == <span class="string">&quot;name&quot; </span>{
+            <span class="self">self</span>.name = Name::Assigned(<span class="macro">quote!</span>(#arg));
+        } <span class="kw">else if </span>name == <span class="string">&quot;version&quot; </span>{
+            <span class="self">self</span>.version = <span class="prelude-val">Some</span>(Method::new(name, <span class="macro">quote!</span>(#arg)));
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.methods.push(Method::new(name, <span class="macro">quote!</span>(#arg)))
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">push_attrs</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">attrs</span>: <span class="kw-2">&amp;</span>[<span class="ident">Attribute</span>]) {
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parse::StructOptAttr</span>::<span class="kw-2">*</span>;
+    <span class="kw">fn </span>push_attrs(<span class="kw-2">&amp;mut </span><span class="self">self</span>, attrs: <span class="kw-2">&amp;</span>[Attribute]) {
+        <span class="kw">use </span><span class="kw">crate</span>::parse::StructOptAttr::<span class="kw-2">*</span>;
 
-        <span class="kw">for</span> <span class="ident">attr</span> <span class="kw">in</span> <span class="ident">parse_structopt_attributes</span>(<span class="ident">attrs</span>) {
-            <span class="kw">match</span> <span class="ident">attr</span> {
-                <span class="ident">Short</span>(<span class="ident">ident</span>) <span class="op">|</span> <span class="ident">Long</span>(<span class="ident">ident</span>) =&gt; {
-                    <span class="self">self</span>.<span class="ident">push_method</span>(<span class="ident">ident</span>, <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">clone</span>().<span class="ident">translate</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">casing</span>));
+        <span class="kw">for </span>attr <span class="kw">in </span>parse_structopt_attributes(attrs) {
+            <span class="kw">match </span>attr {
+                Short(ident) | Long(ident) =&gt; {
+                    <span class="self">self</span>.push_method(ident, <span class="self">self</span>.name.clone().translate(<span class="kw-2">*</span><span class="self">self</span>.casing));
                 }
 
-                <span class="ident">Env</span>(<span class="ident">ident</span>) =&gt; {
-                    <span class="self">self</span>.<span class="ident">push_method</span>(<span class="ident">ident</span>, <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">clone</span>().<span class="ident">translate</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">env_casing</span>));
+                Env(ident) =&gt; {
+                    <span class="self">self</span>.push_method(ident, <span class="self">self</span>.name.clone().translate(<span class="kw-2">*</span><span class="self">self</span>.env_casing));
                 }
 
-                <span class="ident">Subcommand</span>(<span class="ident">ident</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="ident">Sp::call_site</span>(<span class="ident">Ty::Other</span>);
-                    <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">Sp::new</span>(<span class="ident">Kind::Subcommand</span>(<span class="ident">ty</span>), <span class="ident">ident</span>.<span class="ident">span</span>());
-                    <span class="self">self</span>.<span class="ident">set_kind</span>(<span class="ident">kind</span>);
+                Subcommand(ident) =&gt; {
+                    <span class="kw">let </span>ty = Sp::call_site(Ty::Other);
+                    <span class="kw">let </span>kind = Sp::new(Kind::Subcommand(ty), ident.span());
+                    <span class="self">self</span>.set_kind(kind);
                 }
 
-                <span class="ident">ExternalSubcommand</span>(<span class="ident">ident</span>) =&gt; {
-                    <span class="self">self</span>.<span class="ident">kind</span> <span class="op">=</span> <span class="ident">Sp::new</span>(<span class="ident">Kind::ExternalSubcommand</span>, <span class="ident">ident</span>.<span class="ident">span</span>());
+                ExternalSubcommand(ident) =&gt; {
+                    <span class="self">self</span>.kind = Sp::new(Kind::ExternalSubcommand, ident.span());
                 }
 
-                <span class="ident">Flatten</span>(<span class="ident">ident</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">Sp::new</span>(<span class="ident">Kind::Flatten</span>, <span class="ident">ident</span>.<span class="ident">span</span>());
-                    <span class="self">self</span>.<span class="ident">set_kind</span>(<span class="ident">kind</span>);
+                Flatten(ident) =&gt; {
+                    <span class="kw">let </span>kind = Sp::new(Kind::Flatten, ident.span());
+                    <span class="self">self</span>.set_kind(kind);
                 }
 
-                <span class="ident">Skip</span>(<span class="ident">ident</span>, <span class="ident">expr</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">Sp::new</span>(<span class="ident">Kind::Skip</span>(<span class="ident">expr</span>), <span class="ident">ident</span>.<span class="ident">span</span>());
-                    <span class="self">self</span>.<span class="ident">set_kind</span>(<span class="ident">kind</span>);
+                Skip(ident, expr) =&gt; {
+                    <span class="kw">let </span>kind = Sp::new(Kind::Skip(expr), ident.span());
+                    <span class="self">self</span>.set_kind(kind);
                 }
 
-                <span class="ident">NoVersion</span>(<span class="ident">ident</span>) =&gt; <span class="self">self</span>.<span class="ident">no_version</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ident</span>),
+                NoVersion(ident) =&gt; <span class="self">self</span>.no_version = <span class="prelude-val">Some</span>(ident),
 
-                <span class="ident">VerbatimDocComment</span>(<span class="ident">ident</span>) =&gt; <span class="self">self</span>.<span class="ident">verbatim_doc_comment</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ident</span>),
+                VerbatimDocComment(ident) =&gt; <span class="self">self</span>.verbatim_doc_comment = <span class="prelude-val">Some</span>(ident),
 
-                <span class="ident">DefaultValue</span>(<span class="ident">ident</span>, <span class="ident">lit</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">lit</span>) <span class="op">=</span> <span class="ident">lit</span> {
-                        <span class="macro">quote!</span>(#<span class="ident">lit</span>)
-                    } <span class="kw">else</span> {
-                        <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ty</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">ty</span>.<span class="ident">as_ref</span>() {
-                            <span class="ident">ty</span>
-                        } <span class="kw">else</span> {
+                DefaultValue(ident, lit) =&gt; {
+                    <span class="kw">let </span>val = <span class="kw">if let </span><span class="prelude-val">Some</span>(lit) = lit {
+                        <span class="macro">quote!</span>(#lit)
+                    } <span class="kw">else </span>{
+                        <span class="kw">let </span>ty = <span class="kw">if let </span><span class="prelude-val">Some</span>(ty) = <span class="self">self</span>.ty.as_ref() {
+                            ty
+                        } <span class="kw">else </span>{
                             <span class="macro">abort!</span>(
-                                <span class="ident">ident</span>,
+                                ident,
                                 <span class="string">&quot;#[structopt(default_value)] (without an argument) can be used \
                                 only on field level&quot;</span>;
 
-                                <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;see \
+                                note = <span class="string">&quot;see \
                                     https://docs.rs/structopt/0.3.5/structopt/#magical-methods&quot;</span>)
                         };
 
-                        <span class="macro">quote_spanned!</span>(<span class="ident">ident</span>.<span class="ident">span</span>()=&gt; {
-                            <span class="macro">::structopt::lazy_static::lazy_static!</span> {
-                                <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">DEFAULT_VALUE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> {
-                                    <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="op">&lt;</span>#<span class="ident">ty</span> <span class="kw">as</span> <span class="ident">::std::default::Default</span><span class="op">&gt;</span><span class="ident">::default</span>();
-                                    <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">::std::string::ToString::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">val</span>);
-                                    <span class="ident">::std::boxed::Box::leak</span>(<span class="ident">s</span>.<span class="ident">into_boxed_str</span>())
+                        <span class="macro">quote_spanned!</span>(ident.span()=&gt; {
+                            <span class="macro">::structopt::lazy_static::lazy_static! </span>{
+                                <span class="kw">static </span><span class="kw-2">ref </span>DEFAULT_VALUE: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = {
+                                    <span class="kw">let </span>val = &lt;#ty <span class="kw">as </span>::std::default::Default&gt;::default();
+                                    <span class="kw">let </span>s = ::std::string::ToString::to_string(<span class="kw-2">&amp;</span>val);
+                                    ::std::boxed::Box::leak(s.into_boxed_str())
                                 };
                             }
-                            <span class="kw-2">*</span><span class="ident">DEFAULT_VALUE</span>
+                            <span class="kw-2">*</span>DEFAULT_VALUE
                         })
                     };
 
-                    <span class="self">self</span>.<span class="ident">methods</span>.<span class="ident">push</span>(<span class="ident">Method::new</span>(<span class="ident">ident</span>, <span class="ident">val</span>));
+                    <span class="self">self</span>.methods.push(Method::new(ident, val));
                 }
 
-                <span class="ident">About</span>(<span class="ident">ident</span>, <span class="ident">about</span>) =&gt; {
-                    <span class="self">self</span>.<span class="ident">about</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Method::from_lit_or_env</span>(
-                        <span class="ident">ident</span>,
-                        <span class="ident">about</span>,
+                About(ident, about) =&gt; {
+                    <span class="self">self</span>.about = <span class="prelude-val">Some</span>(Method::from_lit_or_env(
+                        ident,
+                        about,
                         <span class="string">&quot;CARGO_PKG_DESCRIPTION&quot;</span>,
                     ));
                 }
 
-                <span class="ident">Author</span>(<span class="ident">ident</span>, <span class="ident">author</span>) =&gt; {
-                    <span class="self">self</span>.<span class="ident">author</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Method::from_lit_or_env</span>(<span class="ident">ident</span>, <span class="ident">author</span>, <span class="string">&quot;CARGO_PKG_AUTHORS&quot;</span>));
+                Author(ident, author) =&gt; {
+                    <span class="self">self</span>.author = <span class="prelude-val">Some</span>(Method::from_lit_or_env(ident, author, <span class="string">&quot;CARGO_PKG_AUTHORS&quot;</span>));
                 }
 
-                <span class="ident">Version</span>(<span class="ident">ident</span>, <span class="ident">version</span>) =&gt; {
-                    <span class="self">self</span>.<span class="ident">push_method</span>(<span class="ident">ident</span>, <span class="ident">version</span>);
+                Version(ident, version) =&gt; {
+                    <span class="self">self</span>.push_method(ident, version);
                 }
 
-                <span class="ident">NameLitStr</span>(<span class="ident">name</span>, <span class="ident">lit</span>) =&gt; {
-                    <span class="self">self</span>.<span class="ident">push_method</span>(<span class="ident">name</span>, <span class="ident">lit</span>);
+                NameLitStr(name, lit) =&gt; {
+                    <span class="self">self</span>.push_method(name, lit);
                 }
 
-                <span class="ident">NameExpr</span>(<span class="ident">name</span>, <span class="ident">expr</span>) =&gt; {
-                    <span class="self">self</span>.<span class="ident">push_method</span>(<span class="ident">name</span>, <span class="ident">expr</span>);
+                NameExpr(name, expr) =&gt; {
+                    <span class="self">self</span>.push_method(name, expr);
                 }
 
-                <span class="ident">MethodCall</span>(<span class="ident">name</span>, <span class="ident">args</span>) =&gt; <span class="self">self</span>.<span class="ident">push_method</span>(<span class="ident">name</span>, <span class="macro">quote!</span>(#(#<span class="ident">args</span>),<span class="kw-2">*</span>)),
+                MethodCall(name, args) =&gt; <span class="self">self</span>.push_method(name, <span class="macro">quote!</span>(#(#args),<span class="kw-2">*</span>)),
 
-                <span class="ident">RenameAll</span>(<span class="kw">_</span>, <span class="ident">casing_lit</span>) =&gt; {
-                    <span class="self">self</span>.<span class="ident">casing</span> <span class="op">=</span> <span class="ident">CasingStyle::from_lit</span>(<span class="ident">casing_lit</span>);
+                RenameAll(<span class="kw">_</span>, casing_lit) =&gt; {
+                    <span class="self">self</span>.casing = CasingStyle::from_lit(casing_lit);
                 }
 
-                <span class="ident">RenameAllEnv</span>(<span class="kw">_</span>, <span class="ident">casing_lit</span>) =&gt; {
-                    <span class="self">self</span>.<span class="ident">env_casing</span> <span class="op">=</span> <span class="ident">CasingStyle::from_lit</span>(<span class="ident">casing_lit</span>);
+                RenameAllEnv(<span class="kw">_</span>, casing_lit) =&gt; {
+                    <span class="self">self</span>.env_casing = CasingStyle::from_lit(casing_lit);
                 }
 
-                <span class="ident">Parse</span>(<span class="ident">ident</span>, <span class="ident">spec</span>) =&gt; {
-                    <span class="self">self</span>.<span class="ident">has_custom_parser</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                    <span class="self">self</span>.<span class="ident">parser</span> <span class="op">=</span> <span class="ident">Parser::from_spec</span>(<span class="ident">ident</span>, <span class="ident">spec</span>);
+                Parse(ident, spec) =&gt; {
+                    <span class="self">self</span>.has_custom_parser = <span class="bool-val">true</span>;
+                    <span class="self">self</span>.parser = Parser::from_spec(ident, spec);
                 }
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">push_doc_comment</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">attrs</span>: <span class="kw-2">&amp;</span>[<span class="ident">Attribute</span>], <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Lit</span>::<span class="kw-2">*</span>;
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Meta</span>::<span class="kw-2">*</span>;
+    <span class="kw">fn </span>push_doc_comment(<span class="kw-2">&amp;mut </span><span class="self">self</span>, attrs: <span class="kw-2">&amp;</span>[Attribute], name: <span class="kw-2">&amp;</span>str) {
+        <span class="kw">use </span><span class="kw">crate</span>::Lit::<span class="kw-2">*</span>;
+        <span class="kw">use </span><span class="kw">crate</span>::Meta::<span class="kw-2">*</span>;
 
-        <span class="kw">let</span> <span class="ident">comment_parts</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">attrs</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">attr</span><span class="op">|</span> <span class="ident">attr</span>.<span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="string">&quot;doc&quot;</span>))
-            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">attr</span><span class="op">|</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">NameValue</span>(<span class="ident">MetaNameValue</span> { <span class="ident">lit</span>: <span class="ident">Str</span>(<span class="ident">s</span>), .. })) <span class="op">=</span> <span class="ident">attr</span>.<span class="ident">parse_meta</span>() {
-                    <span class="prelude-val">Some</span>(<span class="ident">s</span>.<span class="ident">value</span>())
-                } <span class="kw">else</span> {
-                    <span class="comment">// non #[doc = &quot;...&quot;] attributes are not our concern</span>
-                    <span class="comment">// we leave them for rustc to handle</span>
-                    <span class="prelude-val">None</span>
-                }
+        <span class="kw">let </span>comment_parts: Vec&lt;<span class="kw">_</span>&gt; = attrs
+            .iter()
+            .filter(|attr| attr.path.is_ident(<span class="string">&quot;doc&quot;</span>))
+            .filter_map(|attr| {
+                <span class="kw">if let </span><span class="prelude-val">Ok</span>(NameValue(MetaNameValue { lit: Str(s), .. })) = attr.parse_meta() {
+                    <span class="prelude-val">Some</span>(s.value())
+                } <span class="kw">else </span>{
+                    <span class="comment">// non #[doc = &quot;...&quot;] attributes are not our concern
+                    // we leave them for rustc to handle
+                    </span><span class="prelude-val">None
+                </span>}
             })
-            .<span class="ident">collect</span>();
+            .collect();
 
-        <span class="self">self</span>.<span class="ident">doc_comment</span> <span class="op">=</span>
-            <span class="ident">process_doc_comment</span>(<span class="ident">comment_parts</span>, <span class="ident">name</span>, <span class="self">self</span>.<span class="ident">verbatim_doc_comment</span>.<span class="ident">is_none</span>());
+        <span class="self">self</span>.doc_comment =
+            process_doc_comment(comment_parts, name, <span class="self">self</span>.verbatim_doc_comment.is_none());
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_struct</span>(
-        <span class="ident">span</span>: <span class="ident">Span</span>,
-        <span class="ident">attrs</span>: <span class="kw-2">&amp;</span>[<span class="ident">Attribute</span>],
-        <span class="ident">name</span>: <span class="ident">Name</span>,
-        <span class="ident">parent_attrs</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Attrs</span><span class="op">&gt;</span>,
-        <span class="ident">argument_casing</span>: <span class="ident">Sp</span><span class="op">&lt;</span><span class="ident">CasingStyle</span><span class="op">&gt;</span>,
-        <span class="ident">env_casing</span>: <span class="ident">Sp</span><span class="op">&lt;</span><span class="ident">CasingStyle</span><span class="op">&gt;</span>,
-        <span class="ident">allow_skip</span>: <span class="ident">bool</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">span</span>, <span class="ident">name</span>, <span class="ident">parent_attrs</span>, <span class="prelude-val">None</span>, <span class="ident">argument_casing</span>, <span class="ident">env_casing</span>);
-        <span class="ident">res</span>.<span class="ident">push_attrs</span>(<span class="ident">attrs</span>);
-        <span class="ident">res</span>.<span class="ident">push_doc_comment</span>(<span class="ident">attrs</span>, <span class="string">&quot;about&quot;</span>);
+    <span class="kw">pub fn </span>from_struct(
+        span: Span,
+        attrs: <span class="kw-2">&amp;</span>[Attribute],
+        name: Name,
+        parent_attrs: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Attrs&gt;,
+        argument_casing: Sp&lt;CasingStyle&gt;,
+        env_casing: Sp&lt;CasingStyle&gt;,
+        allow_skip: bool,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>res = <span class="self">Self</span>::new(span, name, parent_attrs, <span class="prelude-val">None</span>, argument_casing, env_casing);
+        res.push_attrs(attrs);
+        res.push_doc_comment(attrs, <span class="string">&quot;about&quot;</span>);
 
-        <span class="kw">if</span> <span class="ident">res</span>.<span class="ident">has_custom_parser</span> {
+        <span class="kw">if </span>res.has_custom_parser {
             <span class="macro">abort!</span>(
-                <span class="ident">res</span>.<span class="ident">parser</span>.<span class="ident">span</span>(),
-                <span class="string">&quot;`parse` attribute is only allowed on fields&quot;</span>
-            );
+                res.parser.span(),
+                <span class="string">&quot;`parse` attribute is only allowed on fields&quot;
+            </span>);
         }
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">res</span>.<span class="ident">kind</span> {
-            <span class="ident">Kind::Subcommand</span>(<span class="kw">_</span>) =&gt; <span class="macro">abort!</span>(<span class="ident">res</span>.<span class="ident">kind</span>.<span class="ident">span</span>(), <span class="string">&quot;subcommand is only allowed on fields&quot;</span>),
-            <span class="ident">Kind::Skip</span>(<span class="kw">_</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">allow_skip</span> =&gt; {
-                <span class="macro">abort!</span>(<span class="ident">res</span>.<span class="ident">kind</span>.<span class="ident">span</span>(), <span class="string">&quot;skip is only allowed on fields&quot;</span>)
+        <span class="kw">match </span><span class="kw-2">&amp;*</span>res.kind {
+            Kind::Subcommand(<span class="kw">_</span>) =&gt; <span class="macro">abort!</span>(res.kind.span(), <span class="string">&quot;subcommand is only allowed on fields&quot;</span>),
+            Kind::Skip(<span class="kw">_</span>) <span class="kw">if </span>!allow_skip =&gt; {
+                <span class="macro">abort!</span>(res.kind.span(), <span class="string">&quot;skip is only allowed on fields&quot;</span>)
             }
-            <span class="ident">Kind::Arg</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">Kind::ExternalSubcommand</span> <span class="op">|</span> <span class="ident">Kind::Flatten</span> <span class="op">|</span> <span class="ident">Kind::Skip</span>(<span class="kw">_</span>) =&gt; <span class="ident">res</span>,
+            Kind::Arg(<span class="kw">_</span>) | Kind::ExternalSubcommand | Kind::Flatten | Kind::Skip(<span class="kw">_</span>) =&gt; res,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_field</span>(
-        <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Field</span>,
-        <span class="ident">parent_attrs</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Attrs</span><span class="op">&gt;</span>,
-        <span class="ident">struct_casing</span>: <span class="ident">Sp</span><span class="op">&lt;</span><span class="ident">CasingStyle</span><span class="op">&gt;</span>,
-        <span class="ident">env_casing</span>: <span class="ident">Sp</span><span class="op">&lt;</span><span class="ident">CasingStyle</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">ident</span>.<span class="ident">clone</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>(
-            <span class="ident">field</span>.<span class="ident">span</span>(),
-            <span class="ident">Name::Derived</span>(<span class="ident">name</span>),
-            <span class="ident">parent_attrs</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">ty</span>.<span class="ident">clone</span>()),
-            <span class="ident">struct_casing</span>,
-            <span class="ident">env_casing</span>,
+    <span class="kw">pub fn </span>from_field(
+        field: <span class="kw-2">&amp;</span>syn::Field,
+        parent_attrs: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Attrs&gt;,
+        struct_casing: Sp&lt;CasingStyle&gt;,
+        env_casing: Sp&lt;CasingStyle&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>name = field.ident.clone().unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>res = <span class="self">Self</span>::new(
+            field.span(),
+            Name::Derived(name),
+            parent_attrs,
+            <span class="prelude-val">Some</span>(field.ty.clone()),
+            struct_casing,
+            env_casing,
         );
-        <span class="ident">res</span>.<span class="ident">push_attrs</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">attrs</span>);
-        <span class="ident">res</span>.<span class="ident">push_doc_comment</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">attrs</span>, <span class="string">&quot;help&quot;</span>);
+        res.push_attrs(<span class="kw-2">&amp;</span>field.attrs);
+        res.push_doc_comment(<span class="kw-2">&amp;</span>field.attrs, <span class="string">&quot;help&quot;</span>);
 
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">res</span>.<span class="ident">kind</span> {
-            <span class="ident">Kind::Flatten</span> =&gt; {
-                <span class="kw">if</span> <span class="ident">res</span>.<span class="ident">has_custom_parser</span> {
+        <span class="kw">match </span><span class="kw-2">&amp;*</span>res.kind {
+            Kind::Flatten =&gt; {
+                <span class="kw">if </span>res.has_custom_parser {
                     <span class="macro">abort!</span>(
-                        <span class="ident">res</span>.<span class="ident">parser</span>.<span class="ident">span</span>(),
-                        <span class="string">&quot;parse attribute is not allowed for flattened entry&quot;</span>
-                    );
+                        res.parser.span(),
+                        <span class="string">&quot;parse attribute is not allowed for flattened entry&quot;
+                    </span>);
                 }
-                <span class="kw">if</span> <span class="ident">res</span>.<span class="ident">has_explicit_methods</span>() {
+                <span class="kw">if </span>res.has_explicit_methods() {
                     <span class="macro">abort!</span>(
-                        <span class="ident">res</span>.<span class="ident">kind</span>.<span class="ident">span</span>(),
-                        <span class="string">&quot;methods are not allowed for flattened entry&quot;</span>
-                    );
+                        res.kind.span(),
+                        <span class="string">&quot;methods are not allowed for flattened entry&quot;
+                    </span>);
                 }
 
-                <span class="kw">if</span> <span class="ident">res</span>.<span class="ident">has_doc_methods</span>() {
-                    <span class="ident">res</span>.<span class="ident">doc_comment</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+                <span class="kw">if </span>res.has_doc_methods() {
+                    res.doc_comment = <span class="macro">vec!</span>[];
                 }
             }
 
-            <span class="ident">Kind::ExternalSubcommand</span> =&gt; {}
+            Kind::ExternalSubcommand =&gt; {}
 
-            <span class="ident">Kind::Subcommand</span>(<span class="kw">_</span>) =&gt; {
-                <span class="kw">if</span> <span class="ident">res</span>.<span class="ident">has_custom_parser</span> {
+            Kind::Subcommand(<span class="kw">_</span>) =&gt; {
+                <span class="kw">if </span>res.has_custom_parser {
                     <span class="macro">abort!</span>(
-                        <span class="ident">res</span>.<span class="ident">parser</span>.<span class="ident">span</span>(),
-                        <span class="string">&quot;parse attribute is not allowed for subcommand&quot;</span>
-                    );
+                        res.parser.span(),
+                        <span class="string">&quot;parse attribute is not allowed for subcommand&quot;
+                    </span>);
                 }
-                <span class="kw">if</span> <span class="ident">res</span>.<span class="ident">has_explicit_methods</span>() {
+                <span class="kw">if </span>res.has_explicit_methods() {
                     <span class="macro">abort!</span>(
-                        <span class="ident">res</span>.<span class="ident">kind</span>.<span class="ident">span</span>(),
-                        <span class="string">&quot;methods in attributes are not allowed for subcommand&quot;</span>
-                    );
+                        res.kind.span(),
+                        <span class="string">&quot;methods in attributes are not allowed for subcommand&quot;
+                    </span>);
                 }
 
-                <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="ident">Ty::from_syn_ty</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">ty</span>);
-                <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">ty</span> {
-                    <span class="ident">Ty::OptionOption</span> =&gt; {
+                <span class="kw">let </span>ty = Ty::from_syn_ty(<span class="kw-2">&amp;</span>field.ty);
+                <span class="kw">match </span><span class="kw-2">*</span>ty {
+                    Ty::OptionOption =&gt; {
                         <span class="macro">abort!</span>(
-                            <span class="ident">field</span>.<span class="ident">ty</span>,
-                            <span class="string">&quot;Option&lt;Option&lt;T&gt;&gt; type is not allowed for subcommand&quot;</span>
-                        );
+                            field.ty,
+                            <span class="string">&quot;Option&lt;Option&lt;T&gt;&gt; type is not allowed for subcommand&quot;
+                        </span>);
                     }
-                    <span class="ident">Ty::OptionVec</span> =&gt; {
+                    Ty::OptionVec =&gt; {
                         <span class="macro">abort!</span>(
-                            <span class="ident">field</span>.<span class="ident">ty</span>,
-                            <span class="string">&quot;Option&lt;Vec&lt;T&gt;&gt; type is not allowed for subcommand&quot;</span>
-                        );
+                            field.ty,
+                            <span class="string">&quot;Option&lt;Vec&lt;T&gt;&gt; type is not allowed for subcommand&quot;
+                        </span>);
                     }
-                    <span class="kw">_</span> =&gt; (),
+                    <span class="kw">_ </span>=&gt; (),
                 }
 
-                <span class="ident">res</span>.<span class="ident">kind</span> <span class="op">=</span> <span class="ident">Sp::new</span>(<span class="ident">Kind::Subcommand</span>(<span class="ident">ty</span>), <span class="ident">res</span>.<span class="ident">kind</span>.<span class="ident">span</span>());
+                res.kind = Sp::new(Kind::Subcommand(ty), res.kind.span());
             }
-            <span class="ident">Kind::Skip</span>(<span class="kw">_</span>) =&gt; {
-                <span class="kw">if</span> <span class="ident">res</span>.<span class="ident">has_explicit_methods</span>() {
+            Kind::Skip(<span class="kw">_</span>) =&gt; {
+                <span class="kw">if </span>res.has_explicit_methods() {
                     <span class="macro">abort!</span>(
-                        <span class="ident">res</span>.<span class="ident">kind</span>.<span class="ident">span</span>(),
-                        <span class="string">&quot;methods are not allowed for skipped fields&quot;</span>
-                    );
+                        res.kind.span(),
+                        <span class="string">&quot;methods are not allowed for skipped fields&quot;
+                    </span>);
                 }
             }
-            <span class="ident">Kind::Arg</span>(<span class="ident">orig_ty</span>) =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ty</span> <span class="op">=</span> <span class="ident">Ty::from_syn_ty</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">ty</span>);
-                <span class="kw">if</span> <span class="ident">res</span>.<span class="ident">has_custom_parser</span> {
-                    <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">ty</span> {
-                        <span class="ident">Ty::Option</span> <span class="op">|</span> <span class="ident">Ty::Vec</span> <span class="op">|</span> <span class="ident">Ty::OptionVec</span> =&gt; (),
-                        <span class="kw">_</span> =&gt; <span class="ident">ty</span> <span class="op">=</span> <span class="ident">Sp::new</span>(<span class="ident">Ty::Other</span>, <span class="ident">ty</span>.<span class="ident">span</span>()),
+            Kind::Arg(orig_ty) =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>ty = Ty::from_syn_ty(<span class="kw-2">&amp;</span>field.ty);
+                <span class="kw">if </span>res.has_custom_parser {
+                    <span class="kw">match </span><span class="kw-2">*</span>ty {
+                        Ty::Option | Ty::Vec | Ty::OptionVec =&gt; (),
+                        <span class="kw">_ </span>=&gt; ty = Sp::new(Ty::Other, ty.span()),
                     }
                 }
 
-                <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">ty</span> {
-                    <span class="ident">Ty::Bool</span> =&gt; {
-                        <span class="kw">if</span> <span class="ident">res</span>.<span class="ident">is_positional</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">res</span>.<span class="ident">has_custom_parser</span> {
-                            <span class="macro">abort!</span>(<span class="ident">field</span>.<span class="ident">ty</span>,
+                <span class="kw">match </span><span class="kw-2">*</span>ty {
+                    Ty::Bool =&gt; {
+                        <span class="kw">if </span>res.is_positional() &amp;&amp; !res.has_custom_parser {
+                            <span class="macro">abort!</span>(field.ty,
                                 <span class="string">&quot;`bool` cannot be used as positional parameter with default parser&quot;</span>;
-                                <span class="ident">help</span> <span class="op">=</span> <span class="string">&quot;if you want to create a flag add `long` or `short`&quot;</span>;
-                                <span class="ident">help</span> <span class="op">=</span> <span class="string">&quot;If you really want a boolean parameter \
+                                help = <span class="string">&quot;if you want to create a flag add `long` or `short`&quot;</span>;
+                                help = <span class="string">&quot;If you really want a boolean parameter \
                                     add an explicit parser, for example `parse(try_from_str)`&quot;</span>;
-                                <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;see also https://github.com/TeXitoi/structopt/tree/master/examples/true_or_false.rs&quot;</span>;
+                                note = <span class="string">&quot;see also https://github.com/TeXitoi/structopt/tree/master/examples/true_or_false.rs&quot;</span>;
                             )
                         }
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">m</span>) <span class="op">=</span> <span class="ident">res</span>.<span class="ident">find_method</span>(<span class="string">&quot;default_value&quot;</span>) {
-                            <span class="macro">abort!</span>(<span class="ident">m</span>.<span class="ident">name</span>, <span class="string">&quot;default_value is meaningless for bool&quot;</span>)
+                        <span class="kw">if let </span><span class="prelude-val">Some</span>(m) = res.find_method(<span class="string">&quot;default_value&quot;</span>) {
+                            <span class="macro">abort!</span>(m.name, <span class="string">&quot;default_value is meaningless for bool&quot;</span>)
                         }
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">m</span>) <span class="op">=</span> <span class="ident">res</span>.<span class="ident">find_method</span>(<span class="string">&quot;required&quot;</span>) {
-                            <span class="macro">abort!</span>(<span class="ident">m</span>.<span class="ident">name</span>, <span class="string">&quot;required is meaningless for bool&quot;</span>)
-                        }
-                    }
-                    <span class="ident">Ty::Option</span> =&gt; {
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">m</span>) <span class="op">=</span> <span class="ident">res</span>.<span class="ident">find_method</span>(<span class="string">&quot;default_value&quot;</span>) {
-                            <span class="macro">abort!</span>(<span class="ident">m</span>.<span class="ident">name</span>, <span class="string">&quot;default_value is meaningless for Option&quot;</span>)
-                        }
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">m</span>) <span class="op">=</span> <span class="ident">res</span>.<span class="ident">find_method</span>(<span class="string">&quot;required&quot;</span>) {
-                            <span class="macro">abort!</span>(<span class="ident">m</span>.<span class="ident">name</span>, <span class="string">&quot;required is meaningless for Option&quot;</span>)
+                        <span class="kw">if let </span><span class="prelude-val">Some</span>(m) = res.find_method(<span class="string">&quot;required&quot;</span>) {
+                            <span class="macro">abort!</span>(m.name, <span class="string">&quot;required is meaningless for bool&quot;</span>)
                         }
                     }
-                    <span class="ident">Ty::OptionOption</span> =&gt; {
-                        <span class="kw">if</span> <span class="ident">res</span>.<span class="ident">is_positional</span>() {
+                    Ty::Option =&gt; {
+                        <span class="kw">if let </span><span class="prelude-val">Some</span>(m) = res.find_method(<span class="string">&quot;default_value&quot;</span>) {
+                            <span class="macro">abort!</span>(m.name, <span class="string">&quot;default_value is meaningless for Option&quot;</span>)
+                        }
+                        <span class="kw">if let </span><span class="prelude-val">Some</span>(m) = res.find_method(<span class="string">&quot;required&quot;</span>) {
+                            <span class="macro">abort!</span>(m.name, <span class="string">&quot;required is meaningless for Option&quot;</span>)
+                        }
+                    }
+                    Ty::OptionOption =&gt; {
+                        <span class="kw">if </span>res.is_positional() {
                             <span class="macro">abort!</span>(
-                                <span class="ident">field</span>.<span class="ident">ty</span>,
-                                <span class="string">&quot;Option&lt;Option&lt;T&gt;&gt; type is meaningless for positional argument&quot;</span>
-                            )
+                                field.ty,
+                                <span class="string">&quot;Option&lt;Option&lt;T&gt;&gt; type is meaningless for positional argument&quot;
+                            </span>)
                         }
                     }
-                    <span class="ident">Ty::OptionVec</span> =&gt; {
-                        <span class="kw">if</span> <span class="ident">res</span>.<span class="ident">is_positional</span>() {
+                    Ty::OptionVec =&gt; {
+                        <span class="kw">if </span>res.is_positional() {
                             <span class="macro">abort!</span>(
-                                <span class="ident">field</span>.<span class="ident">ty</span>,
-                                <span class="string">&quot;Option&lt;Vec&lt;T&gt;&gt; type is meaningless for positional argument&quot;</span>
-                            )
+                                field.ty,
+                                <span class="string">&quot;Option&lt;Vec&lt;T&gt;&gt; type is meaningless for positional argument&quot;
+                            </span>)
                         }
                     }
 
-                    <span class="kw">_</span> =&gt; (),
+                    <span class="kw">_ </span>=&gt; (),
                 }
-                <span class="ident">res</span>.<span class="ident">kind</span> <span class="op">=</span> <span class="ident">Sp::new</span>(<span class="ident">Kind::Arg</span>(<span class="ident">ty</span>), <span class="ident">orig_ty</span>.<span class="ident">span</span>());
+                res.kind = Sp::new(Kind::Arg(ty), orig_ty.span());
             }
         }
 
-        <span class="ident">res</span>
+        res
     }
 
-    <span class="kw">fn</span> <span class="ident">set_kind</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">kind</span>: <span class="ident">Sp</span><span class="op">&lt;</span><span class="ident">Kind</span><span class="op">&gt;</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Kind::Arg</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">kind</span> {
-            <span class="self">self</span>.<span class="ident">kind</span> <span class="op">=</span> <span class="ident">kind</span>;
-        } <span class="kw">else</span> {
+    <span class="kw">fn </span>set_kind(<span class="kw-2">&amp;mut </span><span class="self">self</span>, kind: Sp&lt;Kind&gt;) {
+        <span class="kw">if let </span>Kind::Arg(<span class="kw">_</span>) = <span class="kw-2">*</span><span class="self">self</span>.kind {
+            <span class="self">self</span>.kind = kind;
+        } <span class="kw">else </span>{
             <span class="macro">abort!</span>(
-                <span class="ident">kind</span>.<span class="ident">span</span>(),
-                <span class="string">&quot;subcommand, flatten and skip cannot be used together&quot;</span>
-            );
+                kind.span(),
+                <span class="string">&quot;subcommand, flatten and skip cannot be used together&quot;
+            </span>);
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_method</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">find_method</span>(<span class="ident">name</span>).<span class="ident">is_some</span>()
+    <span class="kw">pub fn </span>has_method(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        <span class="self">self</span>.find_method(name).is_some()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_method</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Method</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">methods</span>.<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">name</span>)
+    <span class="kw">pub fn </span>find_method(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Method&gt; {
+        <span class="self">self</span>.methods.iter().find(|m| m.name == name)
     }
 
-    <span class="doccomment">/// generate methods from attributes on top of struct or enum</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">top_level_methods</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TokenStream</span> {
-        <span class="kw">let</span> <span class="ident">author</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">author</span>;
-        <span class="kw">let</span> <span class="ident">about</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">about</span>;
-        <span class="kw">let</span> <span class="ident">methods</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">methods</span>;
-        <span class="kw">let</span> <span class="ident">doc_comment</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">doc_comment</span>;
+    <span class="doccomment">/// generate methods from attributes on top of struct or enum
+    </span><span class="kw">pub fn </span>top_level_methods(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TokenStream {
+        <span class="kw">let </span>author = <span class="kw-2">&amp;</span><span class="self">self</span>.author;
+        <span class="kw">let </span>about = <span class="kw-2">&amp;</span><span class="self">self</span>.about;
+        <span class="kw">let </span>methods = <span class="kw-2">&amp;</span><span class="self">self</span>.methods;
+        <span class="kw">let </span>doc_comment = <span class="kw-2">&amp;</span><span class="self">self</span>.doc_comment;
 
-        <span class="macro">quote!</span>( #(#<span class="ident">doc_comment</span>)<span class="op">*</span> #<span class="ident">author</span> #<span class="ident">about</span> #(#<span class="ident">methods</span>)<span class="op">*</span>  )
+        <span class="macro">quote!</span>( #(#doc_comment)* #author #about #(#methods)*  )
     }
 
-    <span class="doccomment">/// generate methods on top of a field</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field_methods</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TokenStream</span> {
-        <span class="kw">let</span> <span class="ident">methods</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">methods</span>;
-        <span class="kw">let</span> <span class="ident">doc_comment</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">doc_comment</span>;
-        <span class="macro">quote!</span>( #(#<span class="ident">doc_comment</span>)<span class="op">*</span> #(#<span class="ident">methods</span>)<span class="op">*</span> )
+    <span class="doccomment">/// generate methods on top of a field
+    </span><span class="kw">pub fn </span>field_methods(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TokenStream {
+        <span class="kw">let </span>methods = <span class="kw-2">&amp;</span><span class="self">self</span>.methods;
+        <span class="kw">let </span>doc_comment = <span class="kw-2">&amp;</span><span class="self">self</span>.doc_comment;
+        <span class="macro">quote!</span>( #(#doc_comment)* #(#methods)* )
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TokenStream</span> {
-        <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">no_version</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">version</span>) {
-            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) =&gt; <span class="ident">m</span>.<span class="ident">to_token_stream</span>(),
+    <span class="kw">pub fn </span>version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TokenStream {
+        <span class="kw">match </span>(<span class="kw-2">&amp;</span><span class="self">self</span>.no_version, <span class="kw-2">&amp;</span><span class="self">self</span>.version) {
+            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(m)) =&gt; m.to_token_stream(),
 
-            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="ident">std::env::var</span>(<span class="string">&quot;CARGO_PKG_VERSION&quot;</span>)
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">version</span><span class="op">|</span> <span class="macro">quote!</span>( .<span class="ident">version</span>(#<span class="ident">version</span>) ))
-                .<span class="ident">unwrap_or_default</span>(),
+            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; std::env::var(<span class="string">&quot;CARGO_PKG_VERSION&quot;</span>)
+                .map(|version| <span class="macro">quote!</span>( .version(#version) ))
+                .unwrap_or_default(),
 
-            <span class="kw">_</span> =&gt; <span class="macro">quote!</span>(),
+            <span class="kw">_ </span>=&gt; <span class="macro">quote!</span>(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cased_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TokenStream</span> {
-        <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">clone</span>().<span class="ident">translate</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">casing</span>)
+    <span class="kw">pub fn </span>cased_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TokenStream {
+        <span class="self">self</span>.name.clone().translate(<span class="kw-2">*</span><span class="self">self</span>.casing)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parser</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Sp</span><span class="op">&lt;</span><span class="ident">Parser</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">parser</span>
+    <span class="kw">pub fn </span>parser(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Sp&lt;Parser&gt; {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.parser
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Sp</span><span class="op">&lt;</span><span class="ident">Kind</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">kind</span>.<span class="ident">clone</span>()
+    <span class="kw">pub fn </span>kind(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Sp&lt;Kind&gt; {
+        <span class="self">self</span>.kind.clone()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">casing</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Sp</span><span class="op">&lt;</span><span class="ident">CasingStyle</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">casing</span>.<span class="ident">clone</span>()
+    <span class="kw">pub fn </span>casing(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Sp&lt;CasingStyle&gt; {
+        <span class="self">self</span>.casing.clone()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">env_casing</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Sp</span><span class="op">&lt;</span><span class="ident">CasingStyle</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">env_casing</span>.<span class="ident">clone</span>()
+    <span class="kw">pub fn </span>env_casing(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Sp&lt;CasingStyle&gt; {
+        <span class="self">self</span>.env_casing.clone()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_positional</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">methods</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">all</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">name</span> <span class="op">!</span><span class="op">=</span> <span class="string">&quot;long&quot;</span> <span class="op">&amp;&amp;</span> <span class="ident">m</span>.<span class="ident">name</span> <span class="op">!</span><span class="op">=</span> <span class="string">&quot;short&quot;</span>)
+    <span class="kw">pub fn </span>is_positional(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.methods
+            .iter()
+            .all(|m| m.name != <span class="string">&quot;long&quot; </span>&amp;&amp; m.name != <span class="string">&quot;short&quot;</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_explicit_methods</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">methods</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">name</span> <span class="op">!</span><span class="op">=</span> <span class="string">&quot;help&quot;</span> <span class="op">&amp;&amp;</span> <span class="ident">m</span>.<span class="ident">name</span> <span class="op">!</span><span class="op">=</span> <span class="string">&quot;long_help&quot;</span>)
+    <span class="kw">pub fn </span>has_explicit_methods(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.methods
+            .iter()
+            .any(|m| m.name != <span class="string">&quot;help&quot; </span>&amp;&amp; m.name != <span class="string">&quot;long_help&quot;</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_doc_methods</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="op">!</span><span class="self">self</span>.<span class="ident">doc_comment</span>.<span class="ident">is_empty</span>()
-            <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">methods</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> {
-                <span class="ident">m</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;help&quot;</span>
-                    <span class="op">|</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;long_help&quot;</span>
-                    <span class="op">|</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;about&quot;</span>
-                    <span class="op">|</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;long_about&quot;</span>
-            })
+    <span class="kw">pub fn </span>has_doc_methods(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        !<span class="self">self</span>.doc_comment.is_empty()
+            || <span class="self">self</span>.methods.iter().any(|m| {
+                m.name == <span class="string">&quot;help&quot;
+                    </span>|| m.name == <span class="string">&quot;long_help&quot;
+                    </span>|| m.name == <span class="string">&quot;about&quot;
+                    </span>|| m.name == <span class="string">&quot;long_about&quot;
+            </span>})
     }
 }
 
-<span class="doccomment">/// replace all `:` with `, ` when not inside the `&lt;&gt;`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `&quot;author1:author2:author3&quot; =&gt; &quot;author1, author2, author3&quot;`</span>
-<span class="doccomment">/// `&quot;author1 &lt;http://website1.com&gt;:author2&quot; =&gt; &quot;author1 &lt;http://website1.com&gt;, author2&quot;</span>
-<span class="kw">fn</span> <span class="ident">process_author_str</span>(<span class="ident">author</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="ident">author</span>.<span class="ident">len</span>());
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inside_angle_braces</span> <span class="op">=</span> <span class="number">0usize</span>;
+<span class="doccomment">/// replace all `:` with `, ` when not inside the `&lt;&gt;`
+///
+/// `&quot;author1:author2:author3&quot; =&gt; &quot;author1, author2, author3&quot;`
+/// `&quot;author1 &lt;http://website1.com&gt;:author2&quot; =&gt; &quot;author1 &lt;http://website1.com&gt;, author2&quot;
+</span><span class="kw">fn </span>process_author_str(author: <span class="kw-2">&amp;</span>str) -&gt; String {
+    <span class="kw">let </span><span class="kw-2">mut </span>res = String::with_capacity(author.len());
+    <span class="kw">let </span><span class="kw-2">mut </span>inside_angle_braces = <span class="number">0usize</span>;
 
-    <span class="kw">for</span> <span class="ident">ch</span> <span class="kw">in</span> <span class="ident">author</span>.<span class="ident">chars</span>() {
-        <span class="kw">if</span> <span class="ident">inside_angle_braces</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">ch</span> <span class="op">==</span> <span class="string">&#39;&gt;&#39;</span> {
-            <span class="ident">inside_angle_braces</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="ident">res</span>.<span class="ident">push</span>(<span class="ident">ch</span>);
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">ch</span> <span class="op">==</span> <span class="string">&#39;&lt;&#39;</span> {
-            <span class="ident">inside_angle_braces</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="ident">res</span>.<span class="ident">push</span>(<span class="ident">ch</span>);
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">inside_angle_braces</span> <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">ch</span> <span class="op">==</span> <span class="string">&#39;:&#39;</span> {
-            <span class="ident">res</span>.<span class="ident">push_str</span>(<span class="string">&quot;, &quot;</span>);
-        } <span class="kw">else</span> {
-            <span class="ident">res</span>.<span class="ident">push</span>(<span class="ident">ch</span>);
+    <span class="kw">for </span>ch <span class="kw">in </span>author.chars() {
+        <span class="kw">if </span>inside_angle_braces &gt; <span class="number">0 </span>&amp;&amp; ch == <span class="string">&#39;&gt;&#39; </span>{
+            inside_angle_braces -= <span class="number">1</span>;
+            res.push(ch);
+        } <span class="kw">else if </span>ch == <span class="string">&#39;&lt;&#39; </span>{
+            inside_angle_braces += <span class="number">1</span>;
+            res.push(ch);
+        } <span class="kw">else if </span>inside_angle_braces == <span class="number">0 </span>&amp;&amp; ch == <span class="string">&#39;:&#39; </span>{
+            res.push_str(<span class="string">&quot;, &quot;</span>);
+        } <span class="kw">else </span>{
+            res.push(ch);
         }
     }
 
-    <span class="ident">res</span>
+    res
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="structopt_derive" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="structopt_derive" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

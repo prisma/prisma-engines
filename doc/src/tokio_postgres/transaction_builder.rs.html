@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/rust-postgres-dc0fca9be721a90f/064a6a5/tokio-postgres/src/transaction_builder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>transaction_builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tokio_postgres/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/rust-postgres-dc0fca9be721a90f/064a6a5/tokio-postgres/src/transaction_builder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>transaction_builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tokio_postgres/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -111,118 +111,118 @@
 <span id="111">111</span>
 <span id="112">112</span>
 <span id="113">113</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Client</span>, <span class="ident">Error</span>, <span class="ident">Transaction</span>};
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{Client, Error, Transaction};
 
-<span class="doccomment">/// The isolation level of a database transaction.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">IsolationLevel</span> {
-    <span class="doccomment">/// Equivalent to `ReadCommitted`.</span>
-    <span class="ident">ReadUncommitted</span>,
+<span class="doccomment">/// The isolation level of a database transaction.
+</span><span class="attribute">#[derive(Debug, Copy, Clone)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>IsolationLevel {
+    <span class="doccomment">/// Equivalent to `ReadCommitted`.
+    </span>ReadUncommitted,
 
-    <span class="doccomment">/// An individual statement in the transaction will see rows committed before it began.</span>
-    <span class="ident">ReadCommitted</span>,
+    <span class="doccomment">/// An individual statement in the transaction will see rows committed before it began.
+    </span>ReadCommitted,
 
-    <span class="doccomment">/// All statements in the transaction will see the same view of rows committed before the first query in the</span>
-    <span class="doccomment">/// transaction.</span>
-    <span class="ident">RepeatableRead</span>,
+    <span class="doccomment">/// All statements in the transaction will see the same view of rows committed before the first query in the
+    /// transaction.
+    </span>RepeatableRead,
 
-    <span class="doccomment">/// The reads and writes in this transaction must be able to be committed as an atomic &quot;unit&quot; with respect to reads</span>
-    <span class="doccomment">/// and writes of all other concurrent serializable transactions without interleaving.</span>
-    <span class="ident">Serializable</span>,
+    <span class="doccomment">/// The reads and writes in this transaction must be able to be committed as an atomic &quot;unit&quot; with respect to reads
+    /// and writes of all other concurrent serializable transactions without interleaving.
+    </span>Serializable,
 }
 
-<span class="doccomment">/// A builder for database transactions.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TransactionBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Client</span>,
-    <span class="ident">isolation_level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IsolationLevel</span><span class="op">&gt;</span>,
-    <span class="ident">read_only</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="ident">deferrable</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A builder for database transactions.
+</span><span class="kw">pub struct </span>TransactionBuilder&lt;<span class="lifetime">&#39;a</span>&gt; {
+    client: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Client,
+    isolation_level: <span class="prelude-ty">Option</span>&lt;IsolationLevel&gt;,
+    read_only: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    deferrable: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">TransactionBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Client</span>) -&gt; <span class="ident">TransactionBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">TransactionBuilder</span> {
-            <span class="ident">client</span>,
-            <span class="ident">isolation_level</span>: <span class="prelude-val">None</span>,
-            <span class="ident">read_only</span>: <span class="prelude-val">None</span>,
-            <span class="ident">deferrable</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TransactionBuilder&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(client: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Client) -&gt; TransactionBuilder&lt;<span class="lifetime">&#39;a</span>&gt; {
+        TransactionBuilder {
+            client,
+            isolation_level: <span class="prelude-val">None</span>,
+            read_only: <span class="prelude-val">None</span>,
+            deferrable: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Sets the isolation level of the transaction.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">isolation_level</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">isolation_level</span>: <span class="ident">IsolationLevel</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">isolation_level</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">isolation_level</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the isolation level of the transaction.
+    </span><span class="kw">pub fn </span>isolation_level(<span class="kw-2">mut </span><span class="self">self</span>, isolation_level: IsolationLevel) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.isolation_level = <span class="prelude-val">Some</span>(isolation_level);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the access mode of the transaction.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_only</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">read_only</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">read_only</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">read_only</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the access mode of the transaction.
+    </span><span class="kw">pub fn </span>read_only(<span class="kw-2">mut </span><span class="self">self</span>, read_only: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.read_only = <span class="prelude-val">Some</span>(read_only);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the deferrability of the transaction.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the transaction is also serializable and read only, creation of the transaction may block, but when it</span>
-    <span class="doccomment">/// completes the transaction is able to run with less overhead and a guarantee that it will not be aborted due to</span>
-    <span class="doccomment">/// serialization failure.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deferrable</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">deferrable</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">deferrable</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">deferrable</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the deferrability of the transaction.
+    ///
+    /// If the transaction is also serializable and read only, creation of the transaction may block, but when it
+    /// completes the transaction is able to run with less overhead and a guarantee that it will not be aborted due to
+    /// serialization failure.
+    </span><span class="kw">pub fn </span>deferrable(<span class="kw-2">mut </span><span class="self">self</span>, deferrable: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.deferrable = <span class="prelude-val">Some</span>(deferrable);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Begins the transaction.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The transaction will roll back by default - use the `commit` method to commit it.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Transaction</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">query</span> <span class="op">=</span> <span class="string">&quot;START TRANSACTION&quot;</span>.<span class="ident">to_string</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">first</span> <span class="op">=</span> <span class="bool-val">true</span>;
+    <span class="doccomment">/// Begins the transaction.
+    ///
+    /// The transaction will roll back by default - use the `commit` method to commit it.
+    </span><span class="kw">pub async fn </span>start(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Transaction&lt;<span class="lifetime">&#39;a</span>&gt;, Error&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>query = <span class="string">&quot;START TRANSACTION&quot;</span>.to_string();
+        <span class="kw">let </span><span class="kw-2">mut </span>first = <span class="bool-val">true</span>;
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">level</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">isolation_level</span> {
-            <span class="ident">first</span> <span class="op">=</span> <span class="bool-val">false</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(level) = <span class="self">self</span>.isolation_level {
+            first = <span class="bool-val">false</span>;
 
-            <span class="ident">query</span>.<span class="ident">push_str</span>(<span class="string">&quot; ISOLATION LEVEL &quot;</span>);
-            <span class="kw">let</span> <span class="ident">level</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">level</span> {
-                <span class="ident">IsolationLevel::ReadUncommitted</span> =&gt; <span class="string">&quot;READ UNCOMMITTED&quot;</span>,
-                <span class="ident">IsolationLevel::ReadCommitted</span> =&gt; <span class="string">&quot;READ COMMITTED&quot;</span>,
-                <span class="ident">IsolationLevel::RepeatableRead</span> =&gt; <span class="string">&quot;REPEATABLE READ&quot;</span>,
-                <span class="ident">IsolationLevel::Serializable</span> =&gt; <span class="string">&quot;SERIALIZABLE&quot;</span>,
+            query.push_str(<span class="string">&quot; ISOLATION LEVEL &quot;</span>);
+            <span class="kw">let </span>level = <span class="kw">match </span>level {
+                IsolationLevel::ReadUncommitted =&gt; <span class="string">&quot;READ UNCOMMITTED&quot;</span>,
+                IsolationLevel::ReadCommitted =&gt; <span class="string">&quot;READ COMMITTED&quot;</span>,
+                IsolationLevel::RepeatableRead =&gt; <span class="string">&quot;REPEATABLE READ&quot;</span>,
+                IsolationLevel::Serializable =&gt; <span class="string">&quot;SERIALIZABLE&quot;</span>,
             };
-            <span class="ident">query</span>.<span class="ident">push_str</span>(<span class="ident">level</span>);
+            query.push_str(level);
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">read_only</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">read_only</span> {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">first</span> {
-                <span class="ident">query</span>.<span class="ident">push</span>(<span class="string">&#39;,&#39;</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(read_only) = <span class="self">self</span>.read_only {
+            <span class="kw">if </span>!first {
+                query.push(<span class="string">&#39;,&#39;</span>);
             }
-            <span class="ident">first</span> <span class="op">=</span> <span class="bool-val">false</span>;
+            first = <span class="bool-val">false</span>;
 
-            <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">read_only</span> {
-                <span class="string">&quot; READ ONLY&quot;</span>
-            } <span class="kw">else</span> {
-                <span class="string">&quot; READ WRITE&quot;</span>
-            };
-            <span class="ident">query</span>.<span class="ident">push_str</span>(<span class="ident">s</span>);
+            <span class="kw">let </span>s = <span class="kw">if </span>read_only {
+                <span class="string">&quot; READ ONLY&quot;
+            </span>} <span class="kw">else </span>{
+                <span class="string">&quot; READ WRITE&quot;
+            </span>};
+            query.push_str(s);
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">deferrable</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">deferrable</span> {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">first</span> {
-                <span class="ident">query</span>.<span class="ident">push</span>(<span class="string">&#39;,&#39;</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(deferrable) = <span class="self">self</span>.deferrable {
+            <span class="kw">if </span>!first {
+                query.push(<span class="string">&#39;,&#39;</span>);
             }
 
-            <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">deferrable</span> {
-                <span class="string">&quot; DEFERRABLE&quot;</span>
-            } <span class="kw">else</span> {
-                <span class="string">&quot; NOT DEFERRABLE&quot;</span>
-            };
-            <span class="ident">query</span>.<span class="ident">push_str</span>(<span class="ident">s</span>);
+            <span class="kw">let </span>s = <span class="kw">if </span>deferrable {
+                <span class="string">&quot; DEFERRABLE&quot;
+            </span>} <span class="kw">else </span>{
+                <span class="string">&quot; NOT DEFERRABLE&quot;
+            </span>};
+            query.push_str(s);
         }
 
-        <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">batch_execute</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.client.batch_execute(<span class="kw-2">&amp;</span>query).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">Transaction::new</span>(<span class="self">self</span>.<span class="ident">client</span>))
+        <span class="prelude-val">Ok</span>(Transaction::new(<span class="self">self</span>.client))
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio_postgres" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio_postgres" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

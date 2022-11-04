@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-epoch-0.9.10/src/sync/list.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>list.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../crossbeam_epoch/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../crossbeam_epoch/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../crossbeam_epoch/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-epoch-0.9.10/src/sync/list.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>list.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../crossbeam_epoch/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../crossbeam_epoch/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../crossbeam_epoch/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -485,492 +485,492 @@
 <span id="485">485</span>
 <span id="486">486</span>
 <span id="487">487</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Lock-free intrusive linked list.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Ideas from Michael.  High Performance Dynamic Lock-Free Hash Tables and List-Based Sets.  SPAA</span>
-<span class="doccomment">//! 2002.  &lt;http://dl.acm.org/citation.cfm?id=564870.564881&gt;</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Lock-free intrusive linked list.
+//!
+//! Ideas from Michael.  High Performance Dynamic Lock-Free Hash Tables and List-Based Sets.  SPAA
+//! 2002.  &lt;http://dl.acm.org/citation.cfm?id=564870.564881&gt;
 
-<span class="kw">use</span> <span class="ident">core::marker::PhantomData</span>;
-<span class="kw">use</span> <span class="ident">core::sync::atomic::Ordering</span>::{<span class="ident">Acquire</span>, <span class="ident">Relaxed</span>, <span class="ident">Release</span>};
+</span><span class="kw">use </span>core::marker::PhantomData;
+<span class="kw">use </span>core::sync::atomic::Ordering::{Acquire, Relaxed, Release};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">unprotected</span>, <span class="ident">Atomic</span>, <span class="ident">Guard</span>, <span class="ident">Shared</span>};
+<span class="kw">use crate</span>::{unprotected, Atomic, Guard, Shared};
 
-<span class="doccomment">/// An entry in a linked list.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// An Entry is accessed from multiple threads, so it would be beneficial to put it in a different</span>
-<span class="doccomment">/// cache-line than thread-local data in terms of performance.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Entry</span> {
-    <span class="doccomment">/// The next entry in the linked list.</span>
-    <span class="doccomment">/// If the tag is 1, this entry is marked as deleted.</span>
-    <span class="ident">next</span>: <span class="ident">Atomic</span><span class="op">&lt;</span><span class="ident">Entry</span><span class="op">&gt;</span>,
+<span class="doccomment">/// An entry in a linked list.
+///
+/// An Entry is accessed from multiple threads, so it would be beneficial to put it in a different
+/// cache-line than thread-local data in terms of performance.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Entry {
+    <span class="doccomment">/// The next entry in the linked list.
+    /// If the tag is 1, this entry is marked as deleted.
+    </span>next: Atomic&lt;Entry&gt;,
 }
 
-<span class="doccomment">/// Implementing this trait asserts that the type `T` can be used as an element in the intrusive</span>
-<span class="doccomment">/// linked list defined in this module. `T` has to contain (or otherwise be linked to) an instance</span>
-<span class="doccomment">/// of `Entry`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```ignore</span>
-<span class="doccomment">/// struct A {</span>
-<span class="doccomment">///     entry: Entry,</span>
-<span class="doccomment">///     data: usize,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// impl IsElement&lt;A&gt; for A {</span>
-<span class="doccomment">///     fn entry_of(a: &amp;A) -&gt; &amp;Entry {</span>
-<span class="doccomment">///         let entry_ptr = ((a as usize) + offset_of!(A, entry)) as *const Entry;</span>
-<span class="doccomment">///         unsafe { &amp;*entry_ptr }</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     unsafe fn element_of(entry: &amp;Entry) -&gt; &amp;T {</span>
-<span class="doccomment">///         let elem_ptr = ((entry as usize) - offset_of!(A, entry)) as *const T;</span>
-<span class="doccomment">///         &amp;*elem_ptr</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     unsafe fn finalize(entry: &amp;Entry, guard: &amp;Guard) {</span>
-<span class="doccomment">///         guard.defer_destroy(Shared::from(Self::element_of(entry) as *const _));</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This trait is implemented on a type separate from `T` (although it can be just `T`), because</span>
-<span class="doccomment">/// one type might be placeable into multiple lists, in which case it would require multiple</span>
-<span class="doccomment">/// implementations of `IsElement`. In such cases, each struct implementing `IsElement&lt;T&gt;`</span>
-<span class="doccomment">/// represents a distinct `Entry` in `T`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For example, we can insert the following struct into two lists using `entry1` for one</span>
-<span class="doccomment">/// and `entry2` for the other:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```ignore</span>
-<span class="doccomment">/// struct B {</span>
-<span class="doccomment">///     entry1: Entry,</span>
-<span class="doccomment">///     entry2: Entry,</span>
-<span class="doccomment">///     data: usize,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">IsElement</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns a reference to this element&#39;s `Entry`.</span>
-    <span class="kw">fn</span> <span class="ident">entry_of</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Entry</span>;
+<span class="doccomment">/// Implementing this trait asserts that the type `T` can be used as an element in the intrusive
+/// linked list defined in this module. `T` has to contain (or otherwise be linked to) an instance
+/// of `Entry`.
+///
+/// # Example
+///
+/// ```ignore
+/// struct A {
+///     entry: Entry,
+///     data: usize,
+/// }
+///
+/// impl IsElement&lt;A&gt; for A {
+///     fn entry_of(a: &amp;A) -&gt; &amp;Entry {
+///         let entry_ptr = ((a as usize) + offset_of!(A, entry)) as *const Entry;
+///         unsafe { &amp;*entry_ptr }
+///     }
+///
+///     unsafe fn element_of(entry: &amp;Entry) -&gt; &amp;T {
+///         let elem_ptr = ((entry as usize) - offset_of!(A, entry)) as *const T;
+///         &amp;*elem_ptr
+///     }
+///
+///     unsafe fn finalize(entry: &amp;Entry, guard: &amp;Guard) {
+///         guard.defer_destroy(Shared::from(Self::element_of(entry) as *const _));
+///     }
+/// }
+/// ```
+///
+/// This trait is implemented on a type separate from `T` (although it can be just `T`), because
+/// one type might be placeable into multiple lists, in which case it would require multiple
+/// implementations of `IsElement`. In such cases, each struct implementing `IsElement&lt;T&gt;`
+/// represents a distinct `Entry` in `T`.
+///
+/// For example, we can insert the following struct into two lists using `entry1` for one
+/// and `entry2` for the other:
+///
+/// ```ignore
+/// struct B {
+///     entry1: Entry,
+///     entry2: Entry,
+///     data: usize,
+/// }
+/// ```
+///
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>IsElement&lt;T&gt; {
+    <span class="doccomment">/// Returns a reference to this element&#39;s `Entry`.
+    </span><span class="kw">fn </span>entry_of(<span class="kw">_</span>: <span class="kw-2">&amp;</span>T) -&gt; <span class="kw-2">&amp;</span>Entry;
 
-    <span class="doccomment">/// Given a reference to an element&#39;s entry, returns that element.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// let elem = ListElement::new();</span>
-    <span class="doccomment">/// assert_eq!(elem.entry_of(),</span>
-    <span class="doccomment">///            unsafe { ListElement::element_of(elem.entry_of()) } );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The caller has to guarantee that the `Entry` is called with was retrieved from an instance</span>
-    <span class="doccomment">/// of the element type (`T`).</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">element_of</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Entry</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span>;
+    <span class="doccomment">/// Given a reference to an element&#39;s entry, returns that element.
+    ///
+    /// ```ignore
+    /// let elem = ListElement::new();
+    /// assert_eq!(elem.entry_of(),
+    ///            unsafe { ListElement::element_of(elem.entry_of()) } );
+    /// ```
+    ///
+    /// # Safety
+    ///
+    /// The caller has to guarantee that the `Entry` is called with was retrieved from an instance
+    /// of the element type (`T`).
+    </span><span class="kw">unsafe fn </span>element_of(<span class="kw">_</span>: <span class="kw-2">&amp;</span>Entry) -&gt; <span class="kw-2">&amp;</span>T;
 
-    <span class="doccomment">/// The function that is called when an entry is unlinked from list.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The caller has to guarantee that the `Entry` is called with was retrieved from an instance</span>
-    <span class="doccomment">/// of the element type (`T`).</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">finalize</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Entry</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Guard</span>);
+    <span class="doccomment">/// The function that is called when an entry is unlinked from list.
+    ///
+    /// # Safety
+    ///
+    /// The caller has to guarantee that the `Entry` is called with was retrieved from an instance
+    /// of the element type (`T`).
+    </span><span class="kw">unsafe fn </span>finalize(<span class="kw">_</span>: <span class="kw-2">&amp;</span>Entry, <span class="kw">_</span>: <span class="kw-2">&amp;</span>Guard);
 }
 
-<span class="doccomment">/// A lock-free, intrusive linked list of type `T`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">List</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span>: <span class="ident">IsElement</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The head of the linked list.</span>
-    <span class="ident">head</span>: <span class="ident">Atomic</span><span class="op">&lt;</span><span class="ident">Entry</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A lock-free, intrusive linked list of type `T`.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>List&lt;T, C: IsElement&lt;T&gt; = T&gt; {
+    <span class="doccomment">/// The head of the linked list.
+    </span>head: Atomic&lt;Entry&gt;,
 
-    <span class="doccomment">/// The phantom data for using `T` and `C`.</span>
-    <span class="ident">_marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span>(<span class="ident">T</span>, <span class="ident">C</span>)<span class="op">&gt;</span>,
+    <span class="doccomment">/// The phantom data for using `T` and `C`.
+    </span>_marker: PhantomData&lt;(T, C)&gt;,
 }
 
-<span class="doccomment">/// An iterator used for retrieving values from the list.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;g</span>, <span class="ident">T</span>, <span class="ident">C</span>: <span class="ident">IsElement</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The guard that protects the iteration.</span>
-    <span class="ident">guard</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;g</span> <span class="ident">Guard</span>,
+<span class="doccomment">/// An iterator used for retrieving values from the list.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Iter&lt;<span class="lifetime">&#39;g</span>, T, C: IsElement&lt;T&gt;&gt; {
+    <span class="doccomment">/// The guard that protects the iteration.
+    </span>guard: <span class="kw-2">&amp;</span><span class="lifetime">&#39;g </span>Guard,
 
-    <span class="doccomment">/// Pointer from the predecessor to the current entry.</span>
-    <span class="ident">pred</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;g</span> <span class="ident">Atomic</span><span class="op">&lt;</span><span class="ident">Entry</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Pointer from the predecessor to the current entry.
+    </span>pred: <span class="kw-2">&amp;</span><span class="lifetime">&#39;g </span>Atomic&lt;Entry&gt;,
 
-    <span class="doccomment">/// The current entry.</span>
-    <span class="ident">curr</span>: <span class="ident">Shared</span><span class="op">&lt;</span><span class="lifetime">&#39;g</span>, <span class="ident">Entry</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The current entry.
+    </span>curr: Shared&lt;<span class="lifetime">&#39;g</span>, Entry&gt;,
 
-    <span class="doccomment">/// The list head, needed for restarting iteration.</span>
-    <span class="ident">head</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;g</span> <span class="ident">Atomic</span><span class="op">&lt;</span><span class="ident">Entry</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The list head, needed for restarting iteration.
+    </span>head: <span class="kw-2">&amp;</span><span class="lifetime">&#39;g </span>Atomic&lt;Entry&gt;,
 
-    <span class="doccomment">/// Logically, we store a borrow of an instance of `T` and</span>
-    <span class="doccomment">/// use the type information from `C`.</span>
-    <span class="ident">_marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;g</span> <span class="ident">T</span>, <span class="ident">C</span>)<span class="op">&gt;</span>,
+    <span class="doccomment">/// Logically, we store a borrow of an instance of `T` and
+    /// use the type information from `C`.
+    </span>_marker: PhantomData&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;g </span>T, C)&gt;,
 }
 
-<span class="doccomment">/// An error that occurs during iteration over the list.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">IterError</span> {
-    <span class="doccomment">/// A concurrent thread modified the state of the list at the same place that this iterator</span>
-    <span class="doccomment">/// was inspecting. Subsequent iteration will restart from the beginning of the list.</span>
-    <span class="ident">Stalled</span>,
+<span class="doccomment">/// An error that occurs during iteration over the list.
+</span><span class="attribute">#[derive(PartialEq, Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>IterError {
+    <span class="doccomment">/// A concurrent thread modified the state of the list at the same place that this iterator
+    /// was inspecting. Subsequent iteration will restart from the beginning of the list.
+    </span>Stalled,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Entry</span> {
-    <span class="doccomment">/// Returns the empty entry.</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">next</span>: <span class="ident">Atomic::null</span>(),
+<span class="kw">impl </span>Default <span class="kw">for </span>Entry {
+    <span class="doccomment">/// Returns the empty entry.
+    </span><span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            next: Atomic::null(),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Entry</span> {
-    <span class="doccomment">/// Marks this entry as deleted, deferring the actual deallocation to a later iteration.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The entry should be a member of a linked list, and it should not have been deleted.</span>
-    <span class="doccomment">/// It should be safe to call `C::finalize` on the entry after the `guard` is dropped, where `C`</span>
-    <span class="doccomment">/// is the associated helper for the linked list.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guard</span>: <span class="kw-2">&amp;</span><span class="ident">Guard</span>) {
-        <span class="self">self</span>.<span class="ident">next</span>.<span class="ident">fetch_or</span>(<span class="number">1</span>, <span class="ident">Release</span>, <span class="ident">guard</span>);
+<span class="kw">impl </span>Entry {
+    <span class="doccomment">/// Marks this entry as deleted, deferring the actual deallocation to a later iteration.
+    ///
+    /// # Safety
+    ///
+    /// The entry should be a member of a linked list, and it should not have been deleted.
+    /// It should be safe to call `C::finalize` on the entry after the `guard` is dropped, where `C`
+    /// is the associated helper for the linked list.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe fn </span>delete(<span class="kw-2">&amp;</span><span class="self">self</span>, guard: <span class="kw-2">&amp;</span>Guard) {
+        <span class="self">self</span>.next.fetch_or(<span class="number">1</span>, Release, guard);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span>: <span class="ident">IsElement</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">List</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns a new, empty linked list.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">head</span>: <span class="ident">Atomic::null</span>(),
-            <span class="ident">_marker</span>: <span class="ident">PhantomData</span>,
+<span class="kw">impl</span>&lt;T, C: IsElement&lt;T&gt;&gt; List&lt;T, C&gt; {
+    <span class="doccomment">/// Returns a new, empty linked list.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            head: Atomic::null(),
+            _marker: PhantomData,
         }
     }
 
-    <span class="doccomment">/// Inserts `entry` into the head of the list.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// You should guarantee that:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - `container` is not null</span>
-    <span class="doccomment">/// - `container` is immovable, e.g. inside an `Owned`</span>
-    <span class="doccomment">/// - the same `Entry` is not inserted more than once</span>
-    <span class="doccomment">/// - the inserted object will be removed before the list is dropped</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">insert</span><span class="op">&lt;</span><span class="lifetime">&#39;g</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;g</span> <span class="self">self</span>, <span class="ident">container</span>: <span class="ident">Shared</span><span class="op">&lt;</span><span class="lifetime">&#39;g</span>, <span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">guard</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;g</span> <span class="ident">Guard</span>) {
-        <span class="comment">// Insert right after head, i.e. at the beginning of the list.</span>
-        <span class="kw">let</span> <span class="ident">to</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">head</span>;
-        <span class="comment">// Get the intrusively stored Entry of the new element to insert.</span>
-        <span class="kw">let</span> <span class="ident">entry</span>: <span class="kw-2">&amp;</span><span class="ident">Entry</span> <span class="op">=</span> <span class="ident">C::entry_of</span>(<span class="ident">container</span>.<span class="ident">deref</span>());
-        <span class="comment">// Make a Shared ptr to that Entry.</span>
-        <span class="kw">let</span> <span class="ident">entry_ptr</span> <span class="op">=</span> <span class="ident">Shared::from</span>(<span class="ident">entry</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>);
-        <span class="comment">// Read the current successor of where we want to insert.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">next</span> <span class="op">=</span> <span class="ident">to</span>.<span class="ident">load</span>(<span class="ident">Relaxed</span>, <span class="ident">guard</span>);
+    <span class="doccomment">/// Inserts `entry` into the head of the list.
+    ///
+    /// # Safety
+    ///
+    /// You should guarantee that:
+    ///
+    /// - `container` is not null
+    /// - `container` is immovable, e.g. inside an `Owned`
+    /// - the same `Entry` is not inserted more than once
+    /// - the inserted object will be removed before the list is dropped
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe fn </span>insert&lt;<span class="lifetime">&#39;g</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;g </span><span class="self">self</span>, container: Shared&lt;<span class="lifetime">&#39;g</span>, T&gt;, guard: <span class="kw-2">&amp;</span><span class="lifetime">&#39;g </span>Guard) {
+        <span class="comment">// Insert right after head, i.e. at the beginning of the list.
+        </span><span class="kw">let </span>to = <span class="kw-2">&amp;</span><span class="self">self</span>.head;
+        <span class="comment">// Get the intrusively stored Entry of the new element to insert.
+        </span><span class="kw">let </span>entry: <span class="kw-2">&amp;</span>Entry = C::entry_of(container.deref());
+        <span class="comment">// Make a Shared ptr to that Entry.
+        </span><span class="kw">let </span>entry_ptr = Shared::from(entry <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>);
+        <span class="comment">// Read the current successor of where we want to insert.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>next = to.load(Relaxed, guard);
 
-        <span class="kw">loop</span> {
-            <span class="comment">// Set the Entry of the to-be-inserted element to point to the previous successor of</span>
-            <span class="comment">// `to`.</span>
-            <span class="ident">entry</span>.<span class="ident">next</span>.<span class="ident">store</span>(<span class="ident">next</span>, <span class="ident">Relaxed</span>);
-            <span class="kw">match</span> <span class="ident">to</span>.<span class="ident">compare_exchange_weak</span>(<span class="ident">next</span>, <span class="ident">entry_ptr</span>, <span class="ident">Release</span>, <span class="ident">Relaxed</span>, <span class="ident">guard</span>) {
+        <span class="kw">loop </span>{
+            <span class="comment">// Set the Entry of the to-be-inserted element to point to the previous successor of
+            // `to`.
+            </span>entry.next.store(next, Relaxed);
+            <span class="kw">match </span>to.compare_exchange_weak(next, entry_ptr, Release, Relaxed, guard) {
                 <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">break</span>,
-                <span class="comment">// We lost the race or weak CAS failed spuriously. Update the successor and try</span>
-                <span class="comment">// again.</span>
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="ident">next</span> <span class="op">=</span> <span class="ident">err</span>.<span class="ident">current</span>,
+                <span class="comment">// We lost the race or weak CAS failed spuriously. Update the successor and try
+                // again.
+                </span><span class="prelude-val">Err</span>(err) =&gt; next = err.current,
             }
         }
     }
 
-    <span class="doccomment">/// Returns an iterator over all objects.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Caveat</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Every object that is inserted at the moment this function is called and persists at least</span>
-    <span class="doccomment">/// until the end of iteration will be returned. Since this iterator traverses a lock-free</span>
-    <span class="doccomment">/// linked list that may be concurrently modified, some additional caveats apply:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// 1. If a new object is inserted during iteration, it may or may not be returned.</span>
-    <span class="doccomment">/// 2. If an object is deleted during iteration, it may or may not be returned.</span>
-    <span class="doccomment">/// 3. The iteration may be aborted when it lost in a race condition. In this case, the winning</span>
-    <span class="doccomment">///    thread will continue to iterate over the same list.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">iter</span><span class="op">&lt;</span><span class="lifetime">&#39;g</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;g</span> <span class="self">self</span>, <span class="ident">guard</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;g</span> <span class="ident">Guard</span>) -&gt; <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;g</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-        <span class="ident">Iter</span> {
-            <span class="ident">guard</span>,
-            <span class="ident">pred</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">head</span>,
-            <span class="ident">curr</span>: <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">load</span>(<span class="ident">Acquire</span>, <span class="ident">guard</span>),
-            <span class="ident">head</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">head</span>,
-            <span class="ident">_marker</span>: <span class="ident">PhantomData</span>,
+    <span class="doccomment">/// Returns an iterator over all objects.
+    ///
+    /// # Caveat
+    ///
+    /// Every object that is inserted at the moment this function is called and persists at least
+    /// until the end of iteration will be returned. Since this iterator traverses a lock-free
+    /// linked list that may be concurrently modified, some additional caveats apply:
+    ///
+    /// 1. If a new object is inserted during iteration, it may or may not be returned.
+    /// 2. If an object is deleted during iteration, it may or may not be returned.
+    /// 3. The iteration may be aborted when it lost in a race condition. In this case, the winning
+    ///    thread will continue to iterate over the same list.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>iter&lt;<span class="lifetime">&#39;g</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;g </span><span class="self">self</span>, guard: <span class="kw-2">&amp;</span><span class="lifetime">&#39;g </span>Guard) -&gt; Iter&lt;<span class="lifetime">&#39;g</span>, T, C&gt; {
+        Iter {
+            guard,
+            pred: <span class="kw-2">&amp;</span><span class="self">self</span>.head,
+            curr: <span class="self">self</span>.head.load(Acquire, guard),
+            head: <span class="kw-2">&amp;</span><span class="self">self</span>.head,
+            _marker: PhantomData,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span>: <span class="ident">IsElement</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">List</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">guard</span> <span class="op">=</span> <span class="ident">unprotected</span>();
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">curr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">load</span>(<span class="ident">Relaxed</span>, <span class="ident">guard</span>);
-            <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="ident">curr</span>.<span class="ident">as_ref</span>() {
-                <span class="kw">let</span> <span class="ident">succ</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">next</span>.<span class="ident">load</span>(<span class="ident">Relaxed</span>, <span class="ident">guard</span>);
-                <span class="comment">// Verify that all elements have been removed from the list.</span>
-                <span class="macro">assert_eq!</span>(<span class="ident">succ</span>.<span class="ident">tag</span>(), <span class="number">1</span>);
+<span class="kw">impl</span>&lt;T, C: IsElement&lt;T&gt;&gt; Drop <span class="kw">for </span>List&lt;T, C&gt; {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span>guard = unprotected();
+            <span class="kw">let </span><span class="kw-2">mut </span>curr = <span class="self">self</span>.head.load(Relaxed, guard);
+            <span class="kw">while let </span><span class="prelude-val">Some</span>(c) = curr.as_ref() {
+                <span class="kw">let </span>succ = c.next.load(Relaxed, guard);
+                <span class="comment">// Verify that all elements have been removed from the list.
+                </span><span class="macro">assert_eq!</span>(succ.tag(), <span class="number">1</span>);
 
-                <span class="ident">C::finalize</span>(<span class="ident">curr</span>.<span class="ident">deref</span>(), <span class="ident">guard</span>);
-                <span class="ident">curr</span> <span class="op">=</span> <span class="ident">succ</span>;
+                C::finalize(curr.deref(), guard);
+                curr = succ;
             }
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;g</span>, <span class="ident">T</span>: <span class="lifetime">&#39;g</span>, <span class="ident">C</span>: <span class="ident">IsElement</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;g</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;g</span> <span class="ident">T</span>, <span class="ident">IterError</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;g</span>, T: <span class="lifetime">&#39;g</span>, C: IsElement&lt;T&gt;&gt; Iterator <span class="kw">for </span>Iter&lt;<span class="lifetime">&#39;g</span>, T, C&gt; {
+    <span class="kw">type </span>Item = <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;g </span>T, IterError&gt;;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">curr</span>.<span class="ident">as_ref</span>() } {
-            <span class="kw">let</span> <span class="ident">succ</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">next</span>.<span class="ident">load</span>(<span class="ident">Acquire</span>, <span class="self">self</span>.<span class="ident">guard</span>);
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(c) = <span class="kw">unsafe </span>{ <span class="self">self</span>.curr.as_ref() } {
+            <span class="kw">let </span>succ = c.next.load(Acquire, <span class="self">self</span>.guard);
 
-            <span class="kw">if</span> <span class="ident">succ</span>.<span class="ident">tag</span>() <span class="op">==</span> <span class="number">1</span> {
-                <span class="comment">// This entry was removed. Try unlinking it from the list.</span>
-                <span class="kw">let</span> <span class="ident">succ</span> <span class="op">=</span> <span class="ident">succ</span>.<span class="ident">with_tag</span>(<span class="number">0</span>);
+            <span class="kw">if </span>succ.tag() == <span class="number">1 </span>{
+                <span class="comment">// This entry was removed. Try unlinking it from the list.
+                </span><span class="kw">let </span>succ = succ.with_tag(<span class="number">0</span>);
 
-                <span class="comment">// The tag should always be zero, because removing a node after a logically deleted</span>
-                <span class="comment">// node leaves the list in an invalid state.</span>
-                <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">curr</span>.<span class="ident">tag</span>() <span class="op">==</span> <span class="number">0</span>);
+                <span class="comment">// The tag should always be zero, because removing a node after a logically deleted
+                // node leaves the list in an invalid state.
+                </span><span class="macro">debug_assert!</span>(<span class="self">self</span>.curr.tag() == <span class="number">0</span>);
 
-                <span class="comment">// Try to unlink `curr` from the list, and get the new value of `self.pred`.</span>
-                <span class="kw">let</span> <span class="ident">succ</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>
-                    .<span class="ident">pred</span>
-                    .<span class="ident">compare_exchange</span>(<span class="self">self</span>.<span class="ident">curr</span>, <span class="ident">succ</span>, <span class="ident">Acquire</span>, <span class="ident">Acquire</span>, <span class="self">self</span>.<span class="ident">guard</span>)
+                <span class="comment">// Try to unlink `curr` from the list, and get the new value of `self.pred`.
+                </span><span class="kw">let </span>succ = <span class="kw">match </span><span class="self">self
+                    </span>.pred
+                    .compare_exchange(<span class="self">self</span>.curr, succ, Acquire, Acquire, <span class="self">self</span>.guard)
                 {
                     <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {
-                        <span class="comment">// We succeeded in unlinking `curr`, so we have to schedule</span>
-                        <span class="comment">// deallocation. Deferred drop is okay, because `list.delete()` can only be</span>
-                        <span class="comment">// called if `T: &#39;static`.</span>
-                        <span class="kw">unsafe</span> {
-                            <span class="ident">C::finalize</span>(<span class="self">self</span>.<span class="ident">curr</span>.<span class="ident">deref</span>(), <span class="self">self</span>.<span class="ident">guard</span>);
+                        <span class="comment">// We succeeded in unlinking `curr`, so we have to schedule
+                        // deallocation. Deferred drop is okay, because `list.delete()` can only be
+                        // called if `T: &#39;static`.
+                        </span><span class="kw">unsafe </span>{
+                            C::finalize(<span class="self">self</span>.curr.deref(), <span class="self">self</span>.guard);
                         }
 
-                        <span class="comment">// `succ` is the new value of `self.pred`.</span>
-                        <span class="ident">succ</span>
+                        <span class="comment">// `succ` is the new value of `self.pred`.
+                        </span>succ
                     }
-                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-                        <span class="comment">// `e.current` is the current value of `self.pred`.</span>
-                        <span class="ident">e</span>.<span class="ident">current</span>
+                    <span class="prelude-val">Err</span>(e) =&gt; {
+                        <span class="comment">// `e.current` is the current value of `self.pred`.
+                        </span>e.current
                     }
                 };
 
-                <span class="comment">// If the predecessor node is already marked as deleted, we need to restart from</span>
-                <span class="comment">// `head`.</span>
-                <span class="kw">if</span> <span class="ident">succ</span>.<span class="ident">tag</span>() <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                    <span class="self">self</span>.<span class="ident">pred</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>;
-                    <span class="self">self</span>.<span class="ident">curr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">head</span>.<span class="ident">load</span>(<span class="ident">Acquire</span>, <span class="self">self</span>.<span class="ident">guard</span>);
+                <span class="comment">// If the predecessor node is already marked as deleted, we need to restart from
+                // `head`.
+                </span><span class="kw">if </span>succ.tag() != <span class="number">0 </span>{
+                    <span class="self">self</span>.pred = <span class="self">self</span>.head;
+                    <span class="self">self</span>.curr = <span class="self">self</span>.head.load(Acquire, <span class="self">self</span>.guard);
 
-                    <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">IterError::Stalled</span>));
+                    <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(IterError::Stalled));
                 }
 
-                <span class="comment">// Move over the removed by only advancing `curr`, not `pred`.</span>
-                <span class="self">self</span>.<span class="ident">curr</span> <span class="op">=</span> <span class="ident">succ</span>;
+                <span class="comment">// Move over the removed by only advancing `curr`, not `pred`.
+                </span><span class="self">self</span>.curr = succ;
                 <span class="kw">continue</span>;
             }
 
-            <span class="comment">// Move one step forward.</span>
-            <span class="self">self</span>.<span class="ident">pred</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">c</span>.<span class="ident">next</span>;
-            <span class="self">self</span>.<span class="ident">curr</span> <span class="op">=</span> <span class="ident">succ</span>;
+            <span class="comment">// Move one step forward.
+            </span><span class="self">self</span>.pred = <span class="kw-2">&amp;</span>c.next;
+            <span class="self">self</span>.curr = succ;
 
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="kw">unsafe</span> { <span class="ident">C::element_of</span>(<span class="ident">c</span>) }));
+            <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="kw">unsafe </span>{ C::element_of(c) }));
         }
 
-        <span class="comment">// We reached the end of the list.</span>
-        <span class="prelude-val">None</span>
-    }
+        <span class="comment">// We reached the end of the list.
+        </span><span class="prelude-val">None
+    </span>}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">not</span>(<span class="ident">crossbeam_loom</span>)))]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Collector</span>, <span class="ident">Owned</span>};
-    <span class="kw">use</span> <span class="ident">crossbeam_utils::thread</span>;
-    <span class="kw">use</span> <span class="ident">std::sync::Barrier</span>;
+<span class="attribute">#[cfg(all(test, not(crossbeam_loom)))]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use crate</span>::{Collector, Owned};
+    <span class="kw">use </span>crossbeam_utils::thread;
+    <span class="kw">use </span>std::sync::Barrier;
 
-    <span class="kw">impl</span> <span class="ident">IsElement</span><span class="op">&lt;</span><span class="ident">Entry</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Entry</span> {
-        <span class="kw">fn</span> <span class="ident">entry_of</span>(<span class="ident">entry</span>: <span class="kw-2">&amp;</span><span class="ident">Entry</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Entry</span> {
-            <span class="ident">entry</span>
+    <span class="kw">impl </span>IsElement&lt;Entry&gt; <span class="kw">for </span>Entry {
+        <span class="kw">fn </span>entry_of(entry: <span class="kw-2">&amp;</span>Entry) -&gt; <span class="kw-2">&amp;</span>Entry {
+            entry
         }
 
-        <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">element_of</span>(<span class="ident">entry</span>: <span class="kw-2">&amp;</span><span class="ident">Entry</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Entry</span> {
-            <span class="ident">entry</span>
+        <span class="kw">unsafe fn </span>element_of(entry: <span class="kw-2">&amp;</span>Entry) -&gt; <span class="kw-2">&amp;</span>Entry {
+            entry
         }
 
-        <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">finalize</span>(<span class="ident">entry</span>: <span class="kw-2">&amp;</span><span class="ident">Entry</span>, <span class="ident">guard</span>: <span class="kw-2">&amp;</span><span class="ident">Guard</span>) {
-            <span class="ident">guard</span>.<span class="ident">defer_destroy</span>(<span class="ident">Shared::from</span>(<span class="ident"><span class="self">Self</span>::element_of</span>(<span class="ident">entry</span>) <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>));
-        }
-    }
-
-    <span class="doccomment">/// Checks whether the list retains inserted elements</span>
-    <span class="doccomment">/// and returns them in the correct order.</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">insert</span>() {
-        <span class="kw">let</span> <span class="ident">collector</span> <span class="op">=</span> <span class="ident">Collector::new</span>();
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">collector</span>.<span class="ident">register</span>();
-        <span class="kw">let</span> <span class="ident">guard</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">pin</span>();
-
-        <span class="kw">let</span> <span class="ident">l</span>: <span class="ident">List</span><span class="op">&lt;</span><span class="ident">Entry</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">List::new</span>();
-
-        <span class="kw">let</span> <span class="ident">e1</span> <span class="op">=</span> <span class="ident">Owned::new</span>(<span class="ident">Entry::default</span>()).<span class="ident">into_shared</span>(<span class="kw-2">&amp;</span><span class="ident">guard</span>);
-        <span class="kw">let</span> <span class="ident">e2</span> <span class="op">=</span> <span class="ident">Owned::new</span>(<span class="ident">Entry::default</span>()).<span class="ident">into_shared</span>(<span class="kw-2">&amp;</span><span class="ident">guard</span>);
-        <span class="kw">let</span> <span class="ident">e3</span> <span class="op">=</span> <span class="ident">Owned::new</span>(<span class="ident">Entry::default</span>()).<span class="ident">into_shared</span>(<span class="kw-2">&amp;</span><span class="ident">guard</span>);
-
-        <span class="kw">unsafe</span> {
-            <span class="ident">l</span>.<span class="ident">insert</span>(<span class="ident">e1</span>, <span class="kw-2">&amp;</span><span class="ident">guard</span>);
-            <span class="ident">l</span>.<span class="ident">insert</span>(<span class="ident">e2</span>, <span class="kw-2">&amp;</span><span class="ident">guard</span>);
-            <span class="ident">l</span>.<span class="ident">insert</span>(<span class="ident">e3</span>, <span class="kw-2">&amp;</span><span class="ident">guard</span>);
-        }
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">l</span>.<span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="ident">guard</span>);
-        <span class="kw">let</span> <span class="ident">maybe_e3</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">next</span>();
-        <span class="macro">assert!</span>(<span class="ident">maybe_e3</span>.<span class="ident">is_some</span>());
-        <span class="macro">assert!</span>(<span class="ident">maybe_e3</span>.<span class="ident">unwrap</span>().<span class="ident">unwrap</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">Entry</span> <span class="op">==</span> <span class="ident">e3</span>.<span class="ident">as_raw</span>());
-        <span class="kw">let</span> <span class="ident">maybe_e2</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">next</span>();
-        <span class="macro">assert!</span>(<span class="ident">maybe_e2</span>.<span class="ident">is_some</span>());
-        <span class="macro">assert!</span>(<span class="ident">maybe_e2</span>.<span class="ident">unwrap</span>().<span class="ident">unwrap</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">Entry</span> <span class="op">==</span> <span class="ident">e2</span>.<span class="ident">as_raw</span>());
-        <span class="kw">let</span> <span class="ident">maybe_e1</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">next</span>();
-        <span class="macro">assert!</span>(<span class="ident">maybe_e1</span>.<span class="ident">is_some</span>());
-        <span class="macro">assert!</span>(<span class="ident">maybe_e1</span>.<span class="ident">unwrap</span>().<span class="ident">unwrap</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">Entry</span> <span class="op">==</span> <span class="ident">e1</span>.<span class="ident">as_raw</span>());
-        <span class="macro">assert!</span>(<span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">is_none</span>());
-
-        <span class="kw">unsafe</span> {
-            <span class="ident">e1</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="ident">guard</span>);
-            <span class="ident">e2</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="ident">guard</span>);
-            <span class="ident">e3</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="ident">guard</span>);
+        <span class="kw">unsafe fn </span>finalize(entry: <span class="kw-2">&amp;</span>Entry, guard: <span class="kw-2">&amp;</span>Guard) {
+            guard.defer_destroy(Shared::from(<span class="self">Self</span>::element_of(entry) <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>));
         }
     }
 
-    <span class="doccomment">/// Checks whether elements can be removed from the list and whether</span>
-    <span class="doccomment">/// the correct elements are removed.</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">delete</span>() {
-        <span class="kw">let</span> <span class="ident">collector</span> <span class="op">=</span> <span class="ident">Collector::new</span>();
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">collector</span>.<span class="ident">register</span>();
-        <span class="kw">let</span> <span class="ident">guard</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">pin</span>();
+    <span class="doccomment">/// Checks whether the list retains inserted elements
+    /// and returns them in the correct order.
+    </span><span class="attribute">#[test]
+    </span><span class="kw">fn </span>insert() {
+        <span class="kw">let </span>collector = Collector::new();
+        <span class="kw">let </span>handle = collector.register();
+        <span class="kw">let </span>guard = handle.pin();
 
-        <span class="kw">let</span> <span class="ident">l</span>: <span class="ident">List</span><span class="op">&lt;</span><span class="ident">Entry</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">List::new</span>();
+        <span class="kw">let </span>l: List&lt;Entry&gt; = List::new();
 
-        <span class="kw">let</span> <span class="ident">e1</span> <span class="op">=</span> <span class="ident">Owned::new</span>(<span class="ident">Entry::default</span>()).<span class="ident">into_shared</span>(<span class="kw-2">&amp;</span><span class="ident">guard</span>);
-        <span class="kw">let</span> <span class="ident">e2</span> <span class="op">=</span> <span class="ident">Owned::new</span>(<span class="ident">Entry::default</span>()).<span class="ident">into_shared</span>(<span class="kw-2">&amp;</span><span class="ident">guard</span>);
-        <span class="kw">let</span> <span class="ident">e3</span> <span class="op">=</span> <span class="ident">Owned::new</span>(<span class="ident">Entry::default</span>()).<span class="ident">into_shared</span>(<span class="kw-2">&amp;</span><span class="ident">guard</span>);
-        <span class="kw">unsafe</span> {
-            <span class="ident">l</span>.<span class="ident">insert</span>(<span class="ident">e1</span>, <span class="kw-2">&amp;</span><span class="ident">guard</span>);
-            <span class="ident">l</span>.<span class="ident">insert</span>(<span class="ident">e2</span>, <span class="kw-2">&amp;</span><span class="ident">guard</span>);
-            <span class="ident">l</span>.<span class="ident">insert</span>(<span class="ident">e3</span>, <span class="kw-2">&amp;</span><span class="ident">guard</span>);
-            <span class="ident">e2</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="ident">guard</span>);
+        <span class="kw">let </span>e1 = Owned::new(Entry::default()).into_shared(<span class="kw-2">&amp;</span>guard);
+        <span class="kw">let </span>e2 = Owned::new(Entry::default()).into_shared(<span class="kw-2">&amp;</span>guard);
+        <span class="kw">let </span>e3 = Owned::new(Entry::default()).into_shared(<span class="kw-2">&amp;</span>guard);
+
+        <span class="kw">unsafe </span>{
+            l.insert(e1, <span class="kw-2">&amp;</span>guard);
+            l.insert(e2, <span class="kw-2">&amp;</span>guard);
+            l.insert(e3, <span class="kw-2">&amp;</span>guard);
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">l</span>.<span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="ident">guard</span>);
-        <span class="kw">let</span> <span class="ident">maybe_e3</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">next</span>();
-        <span class="macro">assert!</span>(<span class="ident">maybe_e3</span>.<span class="ident">is_some</span>());
-        <span class="macro">assert!</span>(<span class="ident">maybe_e3</span>.<span class="ident">unwrap</span>().<span class="ident">unwrap</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">Entry</span> <span class="op">==</span> <span class="ident">e3</span>.<span class="ident">as_raw</span>());
-        <span class="kw">let</span> <span class="ident">maybe_e1</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">next</span>();
-        <span class="macro">assert!</span>(<span class="ident">maybe_e1</span>.<span class="ident">is_some</span>());
-        <span class="macro">assert!</span>(<span class="ident">maybe_e1</span>.<span class="ident">unwrap</span>().<span class="ident">unwrap</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">Entry</span> <span class="op">==</span> <span class="ident">e1</span>.<span class="ident">as_raw</span>());
-        <span class="macro">assert!</span>(<span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">is_none</span>());
+        <span class="kw">let </span><span class="kw-2">mut </span>iter = l.iter(<span class="kw-2">&amp;</span>guard);
+        <span class="kw">let </span>maybe_e3 = iter.next();
+        <span class="macro">assert!</span>(maybe_e3.is_some());
+        <span class="macro">assert!</span>(maybe_e3.unwrap().unwrap() <span class="kw">as </span><span class="kw-2">*const </span>Entry == e3.as_raw());
+        <span class="kw">let </span>maybe_e2 = iter.next();
+        <span class="macro">assert!</span>(maybe_e2.is_some());
+        <span class="macro">assert!</span>(maybe_e2.unwrap().unwrap() <span class="kw">as </span><span class="kw-2">*const </span>Entry == e2.as_raw());
+        <span class="kw">let </span>maybe_e1 = iter.next();
+        <span class="macro">assert!</span>(maybe_e1.is_some());
+        <span class="macro">assert!</span>(maybe_e1.unwrap().unwrap() <span class="kw">as </span><span class="kw-2">*const </span>Entry == e1.as_raw());
+        <span class="macro">assert!</span>(iter.next().is_none());
 
-        <span class="kw">unsafe</span> {
-            <span class="ident">e1</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="ident">guard</span>);
-            <span class="ident">e3</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="ident">guard</span>);
+        <span class="kw">unsafe </span>{
+            e1.as_ref().unwrap().delete(<span class="kw-2">&amp;</span>guard);
+            e2.as_ref().unwrap().delete(<span class="kw-2">&amp;</span>guard);
+            e3.as_ref().unwrap().delete(<span class="kw-2">&amp;</span>guard);
         }
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">l</span>.<span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="ident">guard</span>);
-        <span class="macro">assert!</span>(<span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">is_none</span>());
     }
 
-    <span class="kw">const</span> <span class="ident">THREADS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">8</span>;
-    <span class="kw">const</span> <span class="ident">ITERS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">512</span>;
+    <span class="doccomment">/// Checks whether elements can be removed from the list and whether
+    /// the correct elements are removed.
+    </span><span class="attribute">#[test]
+    </span><span class="kw">fn </span>delete() {
+        <span class="kw">let </span>collector = Collector::new();
+        <span class="kw">let </span>handle = collector.register();
+        <span class="kw">let </span>guard = handle.pin();
 
-    <span class="doccomment">/// Contends the list on insert and delete operations to make sure they can run concurrently.</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">insert_delete_multi</span>() {
-        <span class="kw">let</span> <span class="ident">collector</span> <span class="op">=</span> <span class="ident">Collector::new</span>();
+        <span class="kw">let </span>l: List&lt;Entry&gt; = List::new();
 
-        <span class="kw">let</span> <span class="ident">l</span>: <span class="ident">List</span><span class="op">&lt;</span><span class="ident">Entry</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">List::new</span>();
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">Barrier::new</span>(<span class="ident">THREADS</span>);
+        <span class="kw">let </span>e1 = Owned::new(Entry::default()).into_shared(<span class="kw-2">&amp;</span>guard);
+        <span class="kw">let </span>e2 = Owned::new(Entry::default()).into_shared(<span class="kw-2">&amp;</span>guard);
+        <span class="kw">let </span>e3 = Owned::new(Entry::default()).into_shared(<span class="kw-2">&amp;</span>guard);
+        <span class="kw">unsafe </span>{
+            l.insert(e1, <span class="kw-2">&amp;</span>guard);
+            l.insert(e2, <span class="kw-2">&amp;</span>guard);
+            l.insert(e3, <span class="kw-2">&amp;</span>guard);
+            e2.as_ref().unwrap().delete(<span class="kw-2">&amp;</span>guard);
+        }
 
-        <span class="ident">thread::scope</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
-            <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">THREADS</span> {
-                <span class="ident">s</span>.<span class="ident">spawn</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                    <span class="ident">b</span>.<span class="ident">wait</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>iter = l.iter(<span class="kw-2">&amp;</span>guard);
+        <span class="kw">let </span>maybe_e3 = iter.next();
+        <span class="macro">assert!</span>(maybe_e3.is_some());
+        <span class="macro">assert!</span>(maybe_e3.unwrap().unwrap() <span class="kw">as </span><span class="kw-2">*const </span>Entry == e3.as_raw());
+        <span class="kw">let </span>maybe_e1 = iter.next();
+        <span class="macro">assert!</span>(maybe_e1.is_some());
+        <span class="macro">assert!</span>(maybe_e1.unwrap().unwrap() <span class="kw">as </span><span class="kw-2">*const </span>Entry == e1.as_raw());
+        <span class="macro">assert!</span>(iter.next().is_none());
 
-                    <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">collector</span>.<span class="ident">register</span>();
-                    <span class="kw">let</span> <span class="ident">guard</span>: <span class="ident">Guard</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">pin</span>();
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">ITERS</span>);
+        <span class="kw">unsafe </span>{
+            e1.as_ref().unwrap().delete(<span class="kw-2">&amp;</span>guard);
+            e3.as_ref().unwrap().delete(<span class="kw-2">&amp;</span>guard);
+        }
 
-                    <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">ITERS</span> {
-                        <span class="kw">let</span> <span class="ident">e</span> <span class="op">=</span> <span class="ident">Owned::new</span>(<span class="ident">Entry::default</span>()).<span class="ident">into_shared</span>(<span class="kw-2">&amp;</span><span class="ident">guard</span>);
-                        <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">e</span>);
-                        <span class="kw">unsafe</span> {
-                            <span class="ident">l</span>.<span class="ident">insert</span>(<span class="ident">e</span>, <span class="kw-2">&amp;</span><span class="ident">guard</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>iter = l.iter(<span class="kw-2">&amp;</span>guard);
+        <span class="macro">assert!</span>(iter.next().is_none());
+    }
+
+    <span class="kw">const </span>THREADS: usize = <span class="number">8</span>;
+    <span class="kw">const </span>ITERS: usize = <span class="number">512</span>;
+
+    <span class="doccomment">/// Contends the list on insert and delete operations to make sure they can run concurrently.
+    </span><span class="attribute">#[test]
+    </span><span class="kw">fn </span>insert_delete_multi() {
+        <span class="kw">let </span>collector = Collector::new();
+
+        <span class="kw">let </span>l: List&lt;Entry&gt; = List::new();
+        <span class="kw">let </span>b = Barrier::new(THREADS);
+
+        thread::scope(|s| {
+            <span class="kw">for _ in </span><span class="number">0</span>..THREADS {
+                s.spawn(|<span class="kw">_</span>| {
+                    b.wait();
+
+                    <span class="kw">let </span>handle = collector.register();
+                    <span class="kw">let </span>guard: Guard = handle.pin();
+                    <span class="kw">let </span><span class="kw-2">mut </span>v = Vec::with_capacity(ITERS);
+
+                    <span class="kw">for _ in </span><span class="number">0</span>..ITERS {
+                        <span class="kw">let </span>e = Owned::new(Entry::default()).into_shared(<span class="kw-2">&amp;</span>guard);
+                        v.push(e);
+                        <span class="kw">unsafe </span>{
+                            l.insert(e, <span class="kw-2">&amp;</span>guard);
                         }
                     }
 
-                    <span class="kw">for</span> <span class="ident">e</span> <span class="kw">in</span> <span class="ident">v</span> {
-                        <span class="kw">unsafe</span> {
-                            <span class="ident">e</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="ident">guard</span>);
-                        }
-                    }
-                });
-            }
-        })
-        .<span class="ident">unwrap</span>();
-
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">collector</span>.<span class="ident">register</span>();
-        <span class="kw">let</span> <span class="ident">guard</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">pin</span>();
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">l</span>.<span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="ident">guard</span>);
-        <span class="macro">assert!</span>(<span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">is_none</span>());
-    }
-
-    <span class="doccomment">/// Contends the list on iteration to make sure that it can be iterated over concurrently.</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">iter_multi</span>() {
-        <span class="kw">let</span> <span class="ident">collector</span> <span class="op">=</span> <span class="ident">Collector::new</span>();
-
-        <span class="kw">let</span> <span class="ident">l</span>: <span class="ident">List</span><span class="op">&lt;</span><span class="ident">Entry</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">List::new</span>();
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">Barrier::new</span>(<span class="ident">THREADS</span>);
-
-        <span class="ident">thread::scope</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
-            <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">THREADS</span> {
-                <span class="ident">s</span>.<span class="ident">spawn</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                    <span class="ident">b</span>.<span class="ident">wait</span>();
-
-                    <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">collector</span>.<span class="ident">register</span>();
-                    <span class="kw">let</span> <span class="ident">guard</span>: <span class="ident">Guard</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">pin</span>();
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">ITERS</span>);
-
-                    <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">ITERS</span> {
-                        <span class="kw">let</span> <span class="ident">e</span> <span class="op">=</span> <span class="ident">Owned::new</span>(<span class="ident">Entry::default</span>()).<span class="ident">into_shared</span>(<span class="kw-2">&amp;</span><span class="ident">guard</span>);
-                        <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">e</span>);
-                        <span class="kw">unsafe</span> {
-                            <span class="ident">l</span>.<span class="ident">insert</span>(<span class="ident">e</span>, <span class="kw-2">&amp;</span><span class="ident">guard</span>);
-                        }
-                    }
-
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">l</span>.<span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="ident">guard</span>);
-                    <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">ITERS</span> {
-                        <span class="macro">assert!</span>(<span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">is_some</span>());
-                    }
-
-                    <span class="kw">for</span> <span class="ident">e</span> <span class="kw">in</span> <span class="ident">v</span> {
-                        <span class="kw">unsafe</span> {
-                            <span class="ident">e</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="ident">guard</span>);
+                    <span class="kw">for </span>e <span class="kw">in </span>v {
+                        <span class="kw">unsafe </span>{
+                            e.as_ref().unwrap().delete(<span class="kw-2">&amp;</span>guard);
                         }
                     }
                 });
             }
         })
-        .<span class="ident">unwrap</span>();
+        .unwrap();
 
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">collector</span>.<span class="ident">register</span>();
-        <span class="kw">let</span> <span class="ident">guard</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">pin</span>();
+        <span class="kw">let </span>handle = collector.register();
+        <span class="kw">let </span>guard = handle.pin();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">l</span>.<span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="ident">guard</span>);
-        <span class="macro">assert!</span>(<span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">is_none</span>());
+        <span class="kw">let </span><span class="kw-2">mut </span>iter = l.iter(<span class="kw-2">&amp;</span>guard);
+        <span class="macro">assert!</span>(iter.next().is_none());
+    }
+
+    <span class="doccomment">/// Contends the list on iteration to make sure that it can be iterated over concurrently.
+    </span><span class="attribute">#[test]
+    </span><span class="kw">fn </span>iter_multi() {
+        <span class="kw">let </span>collector = Collector::new();
+
+        <span class="kw">let </span>l: List&lt;Entry&gt; = List::new();
+        <span class="kw">let </span>b = Barrier::new(THREADS);
+
+        thread::scope(|s| {
+            <span class="kw">for _ in </span><span class="number">0</span>..THREADS {
+                s.spawn(|<span class="kw">_</span>| {
+                    b.wait();
+
+                    <span class="kw">let </span>handle = collector.register();
+                    <span class="kw">let </span>guard: Guard = handle.pin();
+                    <span class="kw">let </span><span class="kw-2">mut </span>v = Vec::with_capacity(ITERS);
+
+                    <span class="kw">for _ in </span><span class="number">0</span>..ITERS {
+                        <span class="kw">let </span>e = Owned::new(Entry::default()).into_shared(<span class="kw-2">&amp;</span>guard);
+                        v.push(e);
+                        <span class="kw">unsafe </span>{
+                            l.insert(e, <span class="kw-2">&amp;</span>guard);
+                        }
+                    }
+
+                    <span class="kw">let </span><span class="kw-2">mut </span>iter = l.iter(<span class="kw-2">&amp;</span>guard);
+                    <span class="kw">for _ in </span><span class="number">0</span>..ITERS {
+                        <span class="macro">assert!</span>(iter.next().is_some());
+                    }
+
+                    <span class="kw">for </span>e <span class="kw">in </span>v {
+                        <span class="kw">unsafe </span>{
+                            e.as_ref().unwrap().delete(<span class="kw-2">&amp;</span>guard);
+                        }
+                    }
+                });
+            }
+        })
+        .unwrap();
+
+        <span class="kw">let </span>handle = collector.register();
+        <span class="kw">let </span>guard = handle.pin();
+
+        <span class="kw">let </span><span class="kw-2">mut </span>iter = l.iter(<span class="kw-2">&amp;</span>guard);
+        <span class="macro">assert!</span>(iter.next().is_none());
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="crossbeam_epoch" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="crossbeam_epoch" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

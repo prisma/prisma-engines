@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/jsonrpc-derive-17.1.0/src/to_client.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>to_client.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../jsonrpc_derive/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../jsonrpc_derive/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../jsonrpc_derive/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/jsonrpc-derive-17.1.0/src/to_client.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>to_client.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../jsonrpc_derive/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../jsonrpc_derive/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../jsonrpc_derive/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -330,337 +330,337 @@
 <span id="330">330</span>
 <span id="331">331</span>
 <span id="332">332</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::options::DeriveOptions</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::params_style::ParamStyle</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::rpc_attr::AttributeKind</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::rpc_trait::crate_name</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::to_delegate</span>::{<span class="ident">generate_where_clause_serialization_predicates</span>, <span class="ident">MethodRegistration</span>};
-<span class="kw">use</span> <span class="ident">proc_macro2</span>::{<span class="ident">Ident</span>, <span class="ident">TokenStream</span>};
-<span class="kw">use</span> <span class="ident">quote::quote</span>;
-<span class="kw">use</span> <span class="ident">syn::punctuated::Punctuated</span>;
-<span class="kw">use</span> <span class="ident">syn::Result</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::options::DeriveOptions;
+<span class="kw">use </span><span class="kw">crate</span>::params_style::ParamStyle;
+<span class="kw">use </span><span class="kw">crate</span>::rpc_attr::AttributeKind;
+<span class="kw">use </span><span class="kw">crate</span>::rpc_trait::crate_name;
+<span class="kw">use </span><span class="kw">crate</span>::to_delegate::{generate_where_clause_serialization_predicates, MethodRegistration};
+<span class="kw">use </span>proc_macro2::{Ident, TokenStream};
+<span class="kw">use </span>quote::quote;
+<span class="kw">use </span>syn::punctuated::Punctuated;
+<span class="kw">use </span>syn::Result;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate_client_module</span>(
-	<span class="ident">methods</span>: <span class="kw-2">&amp;</span>[<span class="ident">MethodRegistration</span>],
-	<span class="ident">item_trait</span>: <span class="kw-2">&amp;</span><span class="ident">syn::ItemTrait</span>,
-	<span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">DeriveOptions</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TokenStream</span><span class="op">&gt;</span> {
-	<span class="kw">let</span> <span class="ident">client_methods</span> <span class="op">=</span> <span class="ident">generate_client_methods</span>(<span class="ident">methods</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>)<span class="question-mark">?</span>;
-	<span class="kw">let</span> <span class="ident">generics</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">item_trait</span>.<span class="ident">generics</span>;
-	<span class="kw">let</span> <span class="ident">where_clause</span> <span class="op">=</span> <span class="ident">generate_where_clause_serialization_predicates</span>(<span class="kw-2">&amp;</span><span class="ident">item_trait</span>, <span class="bool-val">true</span>);
-	<span class="kw">let</span> <span class="ident">where_clause2</span> <span class="op">=</span> <span class="ident">where_clause</span>.<span class="ident">clone</span>();
-	<span class="kw">let</span> <span class="ident">markers</span> <span class="op">=</span> <span class="ident">generics</span>
-		.<span class="ident">params</span>
-		.<span class="ident">iter</span>()
-		.<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">param</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">param</span> {
-			<span class="ident">syn::GenericParam::Type</span>(<span class="ident">syn::TypeParam</span> { <span class="ident">ident</span>, .. }) =&gt; <span class="prelude-val">Some</span>(<span class="ident">ident</span>),
-			<span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+<span class="kw">pub fn </span>generate_client_module(
+	methods: <span class="kw-2">&amp;</span>[MethodRegistration],
+	item_trait: <span class="kw-2">&amp;</span>syn::ItemTrait,
+	options: <span class="kw-2">&amp;</span>DeriveOptions,
+) -&gt; <span class="prelude-ty">Result</span>&lt;TokenStream&gt; {
+	<span class="kw">let </span>client_methods = generate_client_methods(methods, <span class="kw-2">&amp;</span>options)<span class="question-mark">?</span>;
+	<span class="kw">let </span>generics = <span class="kw-2">&amp;</span>item_trait.generics;
+	<span class="kw">let </span>where_clause = generate_where_clause_serialization_predicates(<span class="kw-2">&amp;</span>item_trait, <span class="bool-val">true</span>);
+	<span class="kw">let </span>where_clause2 = where_clause.clone();
+	<span class="kw">let </span>markers = generics
+		.params
+		.iter()
+		.filter_map(|param| <span class="kw">match </span>param {
+			syn::GenericParam::Type(syn::TypeParam { ident, .. }) =&gt; <span class="prelude-val">Some</span>(ident),
+			<span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
 		})
-		.<span class="ident">enumerate</span>()
-		.<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">i</span>, <span class="ident">ty</span>)<span class="op">|</span> {
-			<span class="kw">let</span> <span class="ident">field_name</span> <span class="op">=</span> <span class="string">&quot;_&quot;</span>.<span class="ident">to_string</span>() <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">i</span>.<span class="ident">to_string</span>();
-			<span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">Ident::new</span>(<span class="kw-2">&amp;</span><span class="ident">field_name</span>, <span class="ident">ty</span>.<span class="ident">span</span>());
-			(<span class="ident">field</span>, <span class="ident">ty</span>)
+		.enumerate()
+		.map(|(i, ty)| {
+			<span class="kw">let </span>field_name = <span class="string">&quot;_&quot;</span>.to_string() + <span class="kw-2">&amp;</span>i.to_string();
+			<span class="kw">let </span>field = Ident::new(<span class="kw-2">&amp;</span>field_name, ty.span());
+			(field, ty)
 		});
-	<span class="kw">let</span> (<span class="ident">markers_decl</span>, <span class="ident">markers_impl</span>): (<span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>) <span class="op">=</span> <span class="ident">markers</span>
-		.<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">field</span>, <span class="ident">ty</span>)<span class="op">|</span> {
+	<span class="kw">let </span>(markers_decl, markers_impl): (Vec&lt;<span class="kw">_</span>&gt;, Vec&lt;<span class="kw">_</span>&gt;) = markers
+		.map(|(field, ty)| {
 			(
-				<span class="macro">quote!</span> {
-					#<span class="ident">field</span>: <span class="ident">std::marker::PhantomData</span><span class="op">&lt;</span>#<span class="ident">ty</span><span class="op">&gt;</span>
+				<span class="macro">quote! </span>{
+					#field: std::marker::PhantomData&lt;#ty&gt;
 				},
-				<span class="macro">quote!</span> {
-					#<span class="ident">field</span>: <span class="ident">std::marker::PhantomData</span>
+				<span class="macro">quote! </span>{
+					#field: std::marker::PhantomData
 				},
 			)
 		})
-		.<span class="ident">unzip</span>();
-	<span class="kw">let</span> <span class="ident">client_name</span> <span class="op">=</span> <span class="ident">crate_name</span>(<span class="string">&quot;jsonrpc-core-client&quot;</span>)<span class="question-mark">?</span>;
-	<span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="macro">quote!</span> {
-		<span class="doccomment">/// The generated client module.</span>
-		<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">gen_client</span> {
-			<span class="kw">use</span> #<span class="ident">client_name</span> <span class="kw">as</span> <span class="ident">_jsonrpc_core_client</span>;
-			<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-			<span class="kw">use</span> <span class="ident">_jsonrpc_core</span>::{
-				<span class="ident">Call</span>, <span class="ident">Error</span>, <span class="ident">ErrorCode</span>, <span class="ident">Id</span>, <span class="ident">MethodCall</span>, <span class="ident">Params</span>, <span class="ident">Request</span>,
-				<span class="ident">Response</span>, <span class="ident">Version</span>,
+		.unzip();
+	<span class="kw">let </span>client_name = crate_name(<span class="string">&quot;jsonrpc-core-client&quot;</span>)<span class="question-mark">?</span>;
+	<span class="kw">let </span>client = <span class="macro">quote! </span>{
+		<span class="doccomment">/// The generated client module.
+		</span><span class="kw">pub mod </span>gen_client {
+			<span class="kw">use </span>#client_name <span class="kw">as </span>_jsonrpc_core_client;
+			<span class="kw">use super</span>::<span class="kw-2">*</span>;
+			<span class="kw">use </span>_jsonrpc_core::{
+				Call, Error, ErrorCode, Id, MethodCall, Params, Request,
+				Response, Version,
 			};
-			<span class="kw">use</span> <span class="ident">_jsonrpc_core::serde_json</span>::{<span class="self">self</span>, <span class="ident">Value</span>};
-			<span class="kw">use</span> <span class="ident">_jsonrpc_core_client::futures</span>::{<span class="ident">Future</span>, <span class="ident">FutureExt</span>, <span class="ident">channel</span>::{<span class="ident">mpsc</span>, <span class="ident">oneshot</span>}};
-			<span class="kw">use</span> <span class="ident">_jsonrpc_core_client</span>::{<span class="ident">RpcChannel</span>, <span class="ident">RpcResult</span>, <span class="ident">RpcFuture</span>, <span class="ident">TypedClient</span>, <span class="ident">TypedSubscriptionStream</span>};
+			<span class="kw">use </span>_jsonrpc_core::serde_json::{<span class="self">self</span>, Value};
+			<span class="kw">use </span>_jsonrpc_core_client::futures::{Future, FutureExt, channel::{mpsc, oneshot}};
+			<span class="kw">use </span>_jsonrpc_core_client::{RpcChannel, RpcResult, RpcFuture, TypedClient, TypedSubscriptionStream};
 
-			<span class="doccomment">/// The Client.</span>
-			<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-			<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Client</span>#<span class="ident">generics</span> {
-				<span class="ident">inner</span>: <span class="ident">TypedClient</span>,
-				#(#<span class="ident">markers_decl</span>),<span class="op">*</span>
+			<span class="doccomment">/// The Client.
+			</span><span class="attribute">#[derive(Clone)]
+			</span><span class="kw">pub struct </span>Client#generics {
+				inner: TypedClient,
+				#(#markers_decl),*
 			}
 
-			<span class="ident">impl</span>#<span class="ident">generics</span> <span class="ident">Client</span>#<span class="ident">generics</span>
-			<span class="kw">where</span>
-				#(#<span class="ident">where_clause</span>),<span class="op">*</span>
+			impl#generics Client#generics
+			<span class="kw">where
+				</span>#(#where_clause),*
 			{
-				<span class="doccomment">/// Creates a new `Client`.</span>
-				<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">sender</span>: <span class="ident">RpcChannel</span>) -&gt; <span class="self">Self</span> {
-					<span class="ident">Client</span> {
-						<span class="ident">inner</span>: <span class="ident">sender</span>.<span class="ident">into</span>(),
-						#(#<span class="ident">markers_impl</span>),<span class="op">*</span>
+				<span class="doccomment">/// Creates a new `Client`.
+				</span><span class="kw">pub fn </span>new(sender: RpcChannel) -&gt; <span class="self">Self </span>{
+					Client {
+						inner: sender.into(),
+						#(#markers_impl),*
 					}
 				}
 
-				#(#<span class="ident">client_methods</span>)<span class="op">*</span>
+				#(#client_methods)*
 			}
 
-			<span class="ident">impl</span>#<span class="ident">generics</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">RpcChannel</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Client</span>#<span class="ident">generics</span>
-			<span class="kw">where</span>
-				#(#<span class="ident">where_clause2</span>),<span class="op">*</span>
+			impl#generics From&lt;RpcChannel&gt; <span class="kw">for </span>Client#generics
+			<span class="kw">where
+				</span>#(#where_clause2),*
 			{
-				<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">channel</span>: <span class="ident">RpcChannel</span>) -&gt; <span class="self">Self</span> {
-					<span class="ident">Client::new</span>(<span class="ident">channel</span>.<span class="ident">into</span>())
+				<span class="kw">fn </span>from(channel: RpcChannel) -&gt; <span class="self">Self </span>{
+					Client::new(channel.into())
 				}
 			}
 		}
 	};
 
-	<span class="prelude-val">Ok</span>(<span class="ident">client</span>)
+	<span class="prelude-val">Ok</span>(client)
 }
 
-<span class="kw">fn</span> <span class="ident">generate_client_methods</span>(<span class="ident">methods</span>: <span class="kw-2">&amp;</span>[<span class="ident">MethodRegistration</span>], <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">DeriveOptions</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">syn::ImplItem</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client_methods</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-	<span class="kw">for</span> <span class="ident">method</span> <span class="kw">in</span> <span class="ident">methods</span> {
-		<span class="kw">match</span> <span class="ident">method</span> {
-			<span class="ident">MethodRegistration::Standard</span> { <span class="ident">method</span>, .. } =&gt; {
-				<span class="kw">let</span> <span class="ident">attrs</span> <span class="op">=</span> <span class="ident">get_doc_comments</span>(<span class="kw-2">&amp;</span><span class="ident">method</span>.<span class="ident">trait_item</span>.<span class="ident">attrs</span>);
-				<span class="kw">let</span> <span class="ident">rpc_name</span> <span class="op">=</span> <span class="ident">method</span>.<span class="ident">name</span>();
-				<span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">method</span>.<span class="ident">trait_item</span>.<span class="ident">sig</span>.<span class="ident">ident</span>;
-				<span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">compute_args</span>(<span class="kw-2">&amp;</span><span class="ident">method</span>.<span class="ident">trait_item</span>);
-				<span class="kw">let</span> <span class="ident">arg_names</span> <span class="op">=</span> <span class="ident">compute_arg_identifiers</span>(<span class="kw-2">&amp;</span><span class="ident">args</span>)<span class="question-mark">?</span>;
-				<span class="kw">let</span> <span class="ident">returns</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">method</span>.<span class="ident">attr</span>.<span class="ident">kind</span> {
-					<span class="ident">AttributeKind::Rpc</span> { <span class="ident">returns</span>, .. } =&gt; <span class="ident">compute_returns</span>(<span class="kw-2">&amp;</span><span class="ident">method</span>.<span class="ident">trait_item</span>, <span class="ident">returns</span>)<span class="question-mark">?</span>,
-					<span class="ident">AttributeKind::PubSub</span> { .. } =&gt; <span class="kw">continue</span>,
+<span class="kw">fn </span>generate_client_methods(methods: <span class="kw-2">&amp;</span>[MethodRegistration], options: <span class="kw-2">&amp;</span>DeriveOptions) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;syn::ImplItem&gt;&gt; {
+	<span class="kw">let </span><span class="kw-2">mut </span>client_methods = <span class="macro">vec!</span>[];
+	<span class="kw">for </span>method <span class="kw">in </span>methods {
+		<span class="kw">match </span>method {
+			MethodRegistration::Standard { method, .. } =&gt; {
+				<span class="kw">let </span>attrs = get_doc_comments(<span class="kw-2">&amp;</span>method.trait_item.attrs);
+				<span class="kw">let </span>rpc_name = method.name();
+				<span class="kw">let </span>name = <span class="kw-2">&amp;</span>method.trait_item.sig.ident;
+				<span class="kw">let </span>args = compute_args(<span class="kw-2">&amp;</span>method.trait_item);
+				<span class="kw">let </span>arg_names = compute_arg_identifiers(<span class="kw-2">&amp;</span>args)<span class="question-mark">?</span>;
+				<span class="kw">let </span>returns = <span class="kw">match </span><span class="kw-2">&amp;</span>method.attr.kind {
+					AttributeKind::Rpc { returns, .. } =&gt; compute_returns(<span class="kw-2">&amp;</span>method.trait_item, returns)<span class="question-mark">?</span>,
+					AttributeKind::PubSub { .. } =&gt; <span class="kw">continue</span>,
 				};
-				<span class="kw">let</span> <span class="ident">returns_str</span> <span class="op">=</span> <span class="macro">quote!</span>(#<span class="ident">returns</span>).<span class="ident">to_string</span>();
+				<span class="kw">let </span>returns_str = <span class="macro">quote!</span>(#returns).to_string();
 
-				<span class="kw">let</span> <span class="ident">args_serialized</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">method</span>.<span class="ident">attr</span>.<span class="ident">params_style</span>.<span class="ident">clone</span>().<span class="ident">unwrap_or</span>(<span class="ident">options</span>.<span class="ident">params_style</span>.<span class="ident">clone</span>()) {
-					<span class="ident">ParamStyle::Named</span> =&gt; {
-						<span class="macro">quote!</span> {  <span class="comment">// use object style serialization with field names taken from the function param names</span>
-							<span class="macro">serde_json::json!</span>({
-								#(<span class="macro">stringify!</span>(#<span class="ident">arg_names</span>): #<span class="ident">arg_names</span>,)<span class="op">*</span>
+				<span class="kw">let </span>args_serialized = <span class="kw">match </span>method.attr.params_style.clone().unwrap_or(options.params_style.clone()) {
+					ParamStyle::Named =&gt; {
+						<span class="macro">quote! </span>{  <span class="comment">// use object style serialization with field names taken from the function param names
+							</span><span class="macro">serde_json::json!</span>({
+								#(<span class="macro">stringify!</span>(#arg_names): #arg_names,)*
 							})
 						}
 					}
-					<span class="ident">ParamStyle::Positional</span> =&gt; <span class="macro">quote!</span> {  <span class="comment">// use tuple style serialization</span>
-						(#(#<span class="ident">arg_names</span>,)<span class="kw-2">*</span>)
+					ParamStyle::Positional =&gt; <span class="macro">quote! </span>{  <span class="comment">// use tuple style serialization
+						</span>(#(#arg_names,)<span class="kw-2">*</span>)
 					},
-					<span class="ident">ParamStyle::Raw</span> =&gt; <span class="kw">match</span> <span class="ident">arg_names</span>.<span class="ident">first</span>() {
-						<span class="prelude-val">Some</span>(<span class="ident">arg_name</span>) =&gt; <span class="macro">quote!</span> {#<span class="ident">arg_name</span>},
-						<span class="prelude-val">None</span> =&gt; <span class="macro">quote!</span> {<span class="ident">serde_json::Value::Null</span>},
+					ParamStyle::Raw =&gt; <span class="kw">match </span>arg_names.first() {
+						<span class="prelude-val">Some</span>(arg_name) =&gt; <span class="macro">quote! </span>{#arg_name},
+						<span class="prelude-val">None </span>=&gt; <span class="macro">quote! </span>{serde_json::Value::Null},
 					},
 				};
 
-				<span class="kw">let</span> <span class="ident">client_method</span> <span class="op">=</span> <span class="macro">syn::parse_quote!</span> {
-					#(#<span class="ident">attrs</span>)<span class="op">*</span>
-					<span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, #<span class="ident">args</span>) -&gt; <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">RpcResult</span><span class="op">&lt;</span>#<span class="ident">returns</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-						<span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> #<span class="ident">args_serialized</span>;
-						<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">call_method</span>(#<span class="ident">rpc_name</span>, #<span class="ident">returns_str</span>, <span class="ident">args</span>)
+				<span class="kw">let </span>client_method = <span class="macro">syn::parse_quote! </span>{
+					#(#attrs)*
+					<span class="kw">pub fn </span>#name(<span class="kw-2">&amp;</span><span class="self">self</span>, #args) -&gt; <span class="kw">impl </span>Future&lt;Output = RpcResult&lt;#returns&gt;&gt; {
+						<span class="kw">let </span>args = #args_serialized;
+						<span class="self">self</span>.inner.call_method(#rpc_name, #returns_str, args)
 					}
 				};
-				<span class="ident">client_methods</span>.<span class="ident">push</span>(<span class="ident">client_method</span>);
+				client_methods.push(client_method);
 			}
-			<span class="ident">MethodRegistration::PubSub</span> {
-				<span class="ident">name</span>: <span class="ident">subscription</span>,
-				<span class="ident">subscribes</span>,
-				<span class="ident">unsubscribe</span>,
+			MethodRegistration::PubSub {
+				name: subscription,
+				subscribes,
+				unsubscribe,
 			} =&gt; {
-				<span class="kw">for</span> <span class="ident">subscribe</span> <span class="kw">in</span> <span class="ident">subscribes</span> {
-					<span class="kw">let</span> <span class="ident">attrs</span> <span class="op">=</span> <span class="ident">get_doc_comments</span>(<span class="kw-2">&amp;</span><span class="ident">subscribe</span>.<span class="ident">trait_item</span>.<span class="ident">attrs</span>);
-					<span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">subscribe</span>.<span class="ident">trait_item</span>.<span class="ident">sig</span>.<span class="ident">ident</span>;
-					<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">compute_args</span>(<span class="kw-2">&amp;</span><span class="ident">subscribe</span>.<span class="ident">trait_item</span>).<span class="ident">into_iter</span>();
-					<span class="kw">let</span> <span class="ident">returns</span> <span class="op">=</span> <span class="ident">compute_subscription_type</span>(<span class="kw-2">&amp;</span><span class="ident">args</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>());
-					<span class="kw">let</span> <span class="ident">returns_str</span> <span class="op">=</span> <span class="macro">quote!</span>(#<span class="ident">returns</span>).<span class="ident">to_string</span>();
-					<span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">collect</span>();
-					<span class="kw">let</span> <span class="ident">arg_names</span> <span class="op">=</span> <span class="ident">compute_arg_identifiers</span>(<span class="kw-2">&amp;</span><span class="ident">args</span>)<span class="question-mark">?</span>;
-					<span class="kw">let</span> <span class="ident">subscribe</span> <span class="op">=</span> <span class="ident">subscribe</span>.<span class="ident">name</span>();
-					<span class="kw">let</span> <span class="ident">unsubscribe</span> <span class="op">=</span> <span class="ident">unsubscribe</span>.<span class="ident">name</span>();
-					<span class="kw">let</span> <span class="ident">client_method</span> <span class="op">=</span> <span class="macro">syn::parse_quote!</span>(
-						#(#<span class="ident">attrs</span>)<span class="op">*</span>
-						<span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, #<span class="ident">args</span>) -&gt; <span class="ident">RpcResult</span><span class="op">&lt;</span><span class="ident">TypedSubscriptionStream</span><span class="op">&lt;</span>#<span class="ident">returns</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-							<span class="kw">let</span> <span class="ident">args_tuple</span> <span class="op">=</span> (#(#<span class="ident">arg_names</span>,)<span class="kw-2">*</span>);
-							<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">subscribe</span>(#<span class="ident">subscribe</span>, <span class="ident">args_tuple</span>, #<span class="ident">subscription</span>, #<span class="ident">unsubscribe</span>, #<span class="ident">returns_str</span>)
+				<span class="kw">for </span>subscribe <span class="kw">in </span>subscribes {
+					<span class="kw">let </span>attrs = get_doc_comments(<span class="kw-2">&amp;</span>subscribe.trait_item.attrs);
+					<span class="kw">let </span>name = <span class="kw-2">&amp;</span>subscribe.trait_item.sig.ident;
+					<span class="kw">let </span><span class="kw-2">mut </span>args = compute_args(<span class="kw-2">&amp;</span>subscribe.trait_item).into_iter();
+					<span class="kw">let </span>returns = compute_subscription_type(<span class="kw-2">&amp;</span>args.next().unwrap());
+					<span class="kw">let </span>returns_str = <span class="macro">quote!</span>(#returns).to_string();
+					<span class="kw">let </span>args = args.collect();
+					<span class="kw">let </span>arg_names = compute_arg_identifiers(<span class="kw-2">&amp;</span>args)<span class="question-mark">?</span>;
+					<span class="kw">let </span>subscribe = subscribe.name();
+					<span class="kw">let </span>unsubscribe = unsubscribe.name();
+					<span class="kw">let </span>client_method = <span class="macro">syn::parse_quote!</span>(
+						#(#attrs)*
+						<span class="kw">pub fn </span>#name(<span class="kw-2">&amp;</span><span class="self">self</span>, #args) -&gt; RpcResult&lt;TypedSubscriptionStream&lt;#returns&gt;&gt; {
+							<span class="kw">let </span>args_tuple = (#(#arg_names,)<span class="kw-2">*</span>);
+							<span class="self">self</span>.inner.subscribe(#subscribe, args_tuple, #subscription, #unsubscribe, #returns_str)
 						}
 					);
-					<span class="ident">client_methods</span>.<span class="ident">push</span>(<span class="ident">client_method</span>);
+					client_methods.push(client_method);
 				}
 			}
-			<span class="ident">MethodRegistration::Notification</span> { <span class="ident">method</span>, .. } =&gt; {
-				<span class="kw">let</span> <span class="ident">attrs</span> <span class="op">=</span> <span class="ident">get_doc_comments</span>(<span class="kw-2">&amp;</span><span class="ident">method</span>.<span class="ident">trait_item</span>.<span class="ident">attrs</span>);
-				<span class="kw">let</span> <span class="ident">rpc_name</span> <span class="op">=</span> <span class="ident">method</span>.<span class="ident">name</span>();
-				<span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">method</span>.<span class="ident">trait_item</span>.<span class="ident">sig</span>.<span class="ident">ident</span>;
-				<span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">compute_args</span>(<span class="kw-2">&amp;</span><span class="ident">method</span>.<span class="ident">trait_item</span>);
-				<span class="kw">let</span> <span class="ident">arg_names</span> <span class="op">=</span> <span class="ident">compute_arg_identifiers</span>(<span class="kw-2">&amp;</span><span class="ident">args</span>)<span class="question-mark">?</span>;
-				<span class="kw">let</span> <span class="ident">client_method</span> <span class="op">=</span> <span class="macro">syn::parse_quote!</span> {
-					#(#<span class="ident">attrs</span>)<span class="op">*</span>
-					<span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, #<span class="ident">args</span>) -&gt; <span class="ident">RpcResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-						<span class="kw">let</span> <span class="ident">args_tuple</span> <span class="op">=</span> (#(#<span class="ident">arg_names</span>,)<span class="kw-2">*</span>);
-						<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">notify</span>(#<span class="ident">rpc_name</span>, <span class="ident">args_tuple</span>)
+			MethodRegistration::Notification { method, .. } =&gt; {
+				<span class="kw">let </span>attrs = get_doc_comments(<span class="kw-2">&amp;</span>method.trait_item.attrs);
+				<span class="kw">let </span>rpc_name = method.name();
+				<span class="kw">let </span>name = <span class="kw-2">&amp;</span>method.trait_item.sig.ident;
+				<span class="kw">let </span>args = compute_args(<span class="kw-2">&amp;</span>method.trait_item);
+				<span class="kw">let </span>arg_names = compute_arg_identifiers(<span class="kw-2">&amp;</span>args)<span class="question-mark">?</span>;
+				<span class="kw">let </span>client_method = <span class="macro">syn::parse_quote! </span>{
+					#(#attrs)*
+					<span class="kw">pub fn </span>#name(<span class="kw-2">&amp;</span><span class="self">self</span>, #args) -&gt; RpcResult&lt;()&gt; {
+						<span class="kw">let </span>args_tuple = (#(#arg_names,)<span class="kw-2">*</span>);
+						<span class="self">self</span>.inner.notify(#rpc_name, args_tuple)
 					}
 				};
-				<span class="ident">client_methods</span>.<span class="ident">push</span>(<span class="ident">client_method</span>);
+				client_methods.push(client_method);
 			}
 		}
 	}
-	<span class="prelude-val">Ok</span>(<span class="ident">client_methods</span>)
+	<span class="prelude-val">Ok</span>(client_methods)
 }
 
-<span class="kw">fn</span> <span class="ident">get_doc_comments</span>(<span class="ident">attrs</span>: <span class="kw-2">&amp;</span>[<span class="ident">syn::Attribute</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">syn::Attribute</span><span class="op">&gt;</span> {
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">doc_comments</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-	<span class="kw">for</span> <span class="ident">attr</span> <span class="kw">in</span> <span class="ident">attrs</span> {
-		<span class="kw">match</span> <span class="ident">attr</span> {
-			<span class="ident">syn::Attribute</span> {
-				<span class="ident">path</span>: <span class="ident">syn::Path</span> { <span class="ident">segments</span>, .. },
+<span class="kw">fn </span>get_doc_comments(attrs: <span class="kw-2">&amp;</span>[syn::Attribute]) -&gt; Vec&lt;syn::Attribute&gt; {
+	<span class="kw">let </span><span class="kw-2">mut </span>doc_comments = <span class="macro">vec!</span>[];
+	<span class="kw">for </span>attr <span class="kw">in </span>attrs {
+		<span class="kw">match </span>attr {
+			syn::Attribute {
+				path: syn::Path { segments, .. },
 				..
-			} =&gt; <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">segments</span>[<span class="number">0</span>] {
-				<span class="ident">syn::PathSegment</span> { <span class="ident">ident</span>, .. } =&gt; {
-					<span class="kw">if</span> <span class="ident">ident</span>.<span class="ident">to_string</span>() <span class="op">==</span> <span class="string">&quot;doc&quot;</span> {
-						<span class="ident">doc_comments</span>.<span class="ident">push</span>(<span class="ident">attr</span>.<span class="ident">to_owned</span>());
+			} =&gt; <span class="kw">match </span><span class="kw-2">&amp;</span>segments[<span class="number">0</span>] {
+				syn::PathSegment { ident, .. } =&gt; {
+					<span class="kw">if </span>ident.to_string() == <span class="string">&quot;doc&quot; </span>{
+						doc_comments.push(attr.to_owned());
 					}
 				}
 			},
 		}
 	}
-	<span class="ident">doc_comments</span>
+	doc_comments
 }
 
-<span class="kw">fn</span> <span class="ident">compute_args</span>(<span class="ident">method</span>: <span class="kw-2">&amp;</span><span class="ident">syn::TraitItemMethod</span>) -&gt; <span class="ident">Punctuated</span><span class="op">&lt;</span><span class="ident">syn::FnArg</span>, <span class="ident">syn::token::Comma</span><span class="op">&gt;</span> {
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">Punctuated::new</span>();
-	<span class="kw">for</span> <span class="ident">arg</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">method</span>.<span class="ident">sig</span>.<span class="ident">inputs</span> {
-		<span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">arg</span> {
-			<span class="ident">syn::FnArg::Typed</span>(<span class="ident">syn::PatType</span> { <span class="ident">ty</span>, .. }) =&gt; <span class="ident">ty</span>,
-			<span class="kw">_</span> =&gt; <span class="kw">continue</span>,
+<span class="kw">fn </span>compute_args(method: <span class="kw-2">&amp;</span>syn::TraitItemMethod) -&gt; Punctuated&lt;syn::FnArg, syn::token::Comma&gt; {
+	<span class="kw">let </span><span class="kw-2">mut </span>args = Punctuated::new();
+	<span class="kw">for </span>arg <span class="kw">in </span><span class="kw-2">&amp;</span>method.sig.inputs {
+		<span class="kw">let </span>ty = <span class="kw">match </span>arg {
+			syn::FnArg::Typed(syn::PatType { ty, .. }) =&gt; ty,
+			<span class="kw">_ </span>=&gt; <span class="kw">continue</span>,
 		};
-		<span class="kw">let</span> <span class="ident">segments</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">ty</span> {
-			<span class="ident">syn::Type::Path</span>(<span class="ident">syn::TypePath</span> {
-				<span class="ident">path</span>: <span class="ident">syn::Path</span> { <span class="kw-2">ref</span> <span class="ident">segments</span>, .. },
+		<span class="kw">let </span>segments = <span class="kw">match </span><span class="kw-2">&amp;**</span>ty {
+			syn::Type::Path(syn::TypePath {
+				path: syn::Path { <span class="kw-2">ref </span>segments, .. },
 				..
-			}) =&gt; <span class="ident">segments</span>,
-			<span class="kw">_</span> =&gt; <span class="kw">continue</span>,
+			}) =&gt; segments,
+			<span class="kw">_ </span>=&gt; <span class="kw">continue</span>,
 		};
-		<span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">segments</span>[<span class="number">0</span>] {
-			<span class="ident">syn::PathSegment</span> { <span class="ident">ident</span>, .. } =&gt; <span class="ident">ident</span>,
+		<span class="kw">let </span>ident = <span class="kw">match </span><span class="kw-2">&amp;</span>segments[<span class="number">0</span>] {
+			syn::PathSegment { ident, .. } =&gt; ident,
 		};
-		<span class="kw">if</span> <span class="ident">ident</span>.<span class="ident">to_string</span>() <span class="op">==</span> <span class="string">&quot;Self&quot;</span> {
+		<span class="kw">if </span>ident.to_string() == <span class="string">&quot;Self&quot; </span>{
 			<span class="kw">continue</span>;
 		}
-		<span class="ident">args</span>.<span class="ident">push</span>(<span class="ident">arg</span>.<span class="ident">to_owned</span>());
+		args.push(arg.to_owned());
 	}
-	<span class="ident">args</span>
+	args
 }
 
-<span class="kw">fn</span> <span class="ident">compute_arg_identifiers</span>(<span class="ident">args</span>: <span class="kw-2">&amp;</span><span class="ident">Punctuated</span><span class="op">&lt;</span><span class="ident">syn::FnArg</span>, <span class="ident">syn::token::Comma</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">syn::Ident</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">arg_names</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-	<span class="kw">for</span> <span class="ident">arg</span> <span class="kw">in</span> <span class="ident">args</span> {
-		<span class="kw">let</span> <span class="ident">pat</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">arg</span> {
-			<span class="ident">syn::FnArg::Typed</span>(<span class="ident">syn::PatType</span> { <span class="ident">pat</span>, .. }) =&gt; <span class="ident">pat</span>,
-			<span class="kw">_</span> =&gt; <span class="kw">continue</span>,
+<span class="kw">fn </span>compute_arg_identifiers(args: <span class="kw-2">&amp;</span>Punctuated&lt;syn::FnArg, syn::token::Comma&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="kw-2">&amp;</span>syn::Ident&gt;&gt; {
+	<span class="kw">let </span><span class="kw-2">mut </span>arg_names = <span class="macro">vec!</span>[];
+	<span class="kw">for </span>arg <span class="kw">in </span>args {
+		<span class="kw">let </span>pat = <span class="kw">match </span>arg {
+			syn::FnArg::Typed(syn::PatType { pat, .. }) =&gt; pat,
+			<span class="kw">_ </span>=&gt; <span class="kw">continue</span>,
 		};
-		<span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">pat</span> {
-			<span class="ident">syn::Pat::Ident</span>(<span class="ident">syn::PatIdent</span> { <span class="kw-2">ref</span> <span class="ident">ident</span>, .. }) =&gt; <span class="ident">ident</span>,
-			<span class="ident">syn::Pat::Wild</span>(<span class="kw-2">ref</span> <span class="ident">wild</span>) =&gt; {
-				<span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">wild</span>.<span class="ident">underscore_token</span>.<span class="ident">spans</span>[<span class="number">0</span>];
-				<span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;No wildcard patterns allowed in rpc trait.&quot;</span>;
-				<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new</span>(<span class="ident">span</span>, <span class="ident">msg</span>));
+		<span class="kw">let </span>ident = <span class="kw">match </span><span class="kw-2">**</span>pat {
+			syn::Pat::Ident(syn::PatIdent { <span class="kw-2">ref </span>ident, .. }) =&gt; ident,
+			syn::Pat::Wild(<span class="kw-2">ref </span>wild) =&gt; {
+				<span class="kw">let </span>span = wild.underscore_token.spans[<span class="number">0</span>];
+				<span class="kw">let </span>msg = <span class="string">&quot;No wildcard patterns allowed in rpc trait.&quot;</span>;
+				<span class="kw">return </span><span class="prelude-val">Err</span>(syn::Error::new(span, msg));
 			}
-			<span class="kw">_</span> =&gt; <span class="kw">continue</span>,
+			<span class="kw">_ </span>=&gt; <span class="kw">continue</span>,
 		};
-		<span class="ident">arg_names</span>.<span class="ident">push</span>(<span class="ident">ident</span>);
+		arg_names.push(ident);
 	}
-	<span class="prelude-val">Ok</span>(<span class="ident">arg_names</span>)
+	<span class="prelude-val">Ok</span>(arg_names)
 }
 
-<span class="kw">fn</span> <span class="ident">compute_returns</span>(<span class="ident">method</span>: <span class="kw-2">&amp;</span><span class="ident">syn::TraitItemMethod</span>, <span class="ident">returns</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">syn::Type</span><span class="op">&gt;</span> {
-	<span class="kw">let</span> <span class="ident">returns</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">syn::Type</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">returns</span> {
-		<span class="prelude-val">Some</span>(<span class="ident">returns</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">syn::parse_str</span>(<span class="ident">returns</span>)<span class="question-mark">?</span>),
-		<span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+<span class="kw">fn </span>compute_returns(method: <span class="kw-2">&amp;</span>syn::TraitItemMethod, returns: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;syn::Type&gt; {
+	<span class="kw">let </span>returns: <span class="prelude-ty">Option</span>&lt;syn::Type&gt; = <span class="kw">match </span>returns {
+		<span class="prelude-val">Some</span>(returns) =&gt; <span class="prelude-val">Some</span>(syn::parse_str(returns)<span class="question-mark">?</span>),
+		<span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
 	};
-	<span class="kw">let</span> <span class="ident">returns</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">returns</span> {
-		<span class="prelude-val">None</span> =&gt; <span class="ident">try_infer_returns</span>(<span class="kw-2">&amp;</span><span class="ident">method</span>.<span class="ident">sig</span>.<span class="ident">output</span>),
-		<span class="kw">_</span> =&gt; <span class="ident">returns</span>,
+	<span class="kw">let </span>returns = <span class="kw">match </span>returns {
+		<span class="prelude-val">None </span>=&gt; try_infer_returns(<span class="kw-2">&amp;</span>method.sig.output),
+		<span class="kw">_ </span>=&gt; returns,
 	};
-	<span class="kw">let</span> <span class="ident">returns</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">returns</span> {
-		<span class="prelude-val">Some</span>(<span class="ident">returns</span>) =&gt; <span class="ident">returns</span>,
-		<span class="prelude-val">None</span> =&gt; {
-			<span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">method</span>.<span class="ident">attrs</span>[<span class="number">0</span>].<span class="ident">pound_token</span>.<span class="ident">spans</span>[<span class="number">0</span>];
-			<span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;Missing returns attribute.&quot;</span>;
-			<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">syn::Error::new</span>(<span class="ident">span</span>, <span class="ident">msg</span>));
+	<span class="kw">let </span>returns = <span class="kw">match </span>returns {
+		<span class="prelude-val">Some</span>(returns) =&gt; returns,
+		<span class="prelude-val">None </span>=&gt; {
+			<span class="kw">let </span>span = method.attrs[<span class="number">0</span>].pound_token.spans[<span class="number">0</span>];
+			<span class="kw">let </span>msg = <span class="string">&quot;Missing returns attribute.&quot;</span>;
+			<span class="kw">return </span><span class="prelude-val">Err</span>(syn::Error::new(span, msg));
 		}
 	};
-	<span class="prelude-val">Ok</span>(<span class="ident">returns</span>)
+	<span class="prelude-val">Ok</span>(returns)
 }
 
-<span class="kw">fn</span> <span class="ident">try_infer_returns</span>(<span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="ident">syn::ReturnType</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">syn::Type</span><span class="op">&gt;</span> {
-	<span class="kw">let</span> <span class="ident">extract_path_segments</span> <span class="op">=</span> <span class="op">|</span><span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Type</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">ty</span> {
-		<span class="ident">syn::Type::Path</span>(<span class="ident">syn::TypePath</span> {
-			<span class="ident">path</span>: <span class="ident">syn::Path</span> { <span class="ident">segments</span>, .. },
+<span class="kw">fn </span>try_infer_returns(output: <span class="kw-2">&amp;</span>syn::ReturnType) -&gt; <span class="prelude-ty">Option</span>&lt;syn::Type&gt; {
+	<span class="kw">let </span>extract_path_segments = |ty: <span class="kw-2">&amp;</span>syn::Type| <span class="kw">match </span>ty {
+		syn::Type::Path(syn::TypePath {
+			path: syn::Path { segments, .. },
 			..
-		}) =&gt; <span class="prelude-val">Some</span>(<span class="ident">segments</span>.<span class="ident">clone</span>()),
-		<span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+		}) =&gt; <span class="prelude-val">Some</span>(segments.clone()),
+		<span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
 	};
 
-	<span class="kw">match</span> <span class="ident">output</span> {
-		<span class="ident">syn::ReturnType::Type</span>(<span class="kw">_</span>, <span class="ident">ty</span>) =&gt; {
-			<span class="kw">let</span> <span class="ident">segments</span> <span class="op">=</span> <span class="ident">extract_path_segments</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">ty</span>)<span class="question-mark">?</span>;
-			<span class="kw">let</span> <span class="ident">check_segment</span> <span class="op">=</span> <span class="op">|</span><span class="ident">seg</span>: <span class="kw-2">&amp;</span><span class="ident">syn::PathSegment</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">seg</span> {
-				<span class="ident">syn::PathSegment</span> { <span class="ident">ident</span>, <span class="ident">arguments</span>, .. } =&gt; {
-					<span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">ident</span>.<span class="ident">to_string</span>();
-					<span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">get_first_type_argument</span>(<span class="ident">arguments</span>);
-					<span class="kw">if</span> <span class="ident">id</span>.<span class="ident">ends_with</span>(<span class="string">&quot;Result&quot;</span>) {
-						<span class="prelude-val">Ok</span>(<span class="ident">inner</span>)
-					} <span class="kw">else</span> {
-						<span class="prelude-val">Err</span>(<span class="ident">inner</span>)
+	<span class="kw">match </span>output {
+		syn::ReturnType::Type(<span class="kw">_</span>, ty) =&gt; {
+			<span class="kw">let </span>segments = extract_path_segments(<span class="kw-2">&amp;**</span>ty)<span class="question-mark">?</span>;
+			<span class="kw">let </span>check_segment = |seg: <span class="kw-2">&amp;</span>syn::PathSegment| <span class="kw">match </span>seg {
+				syn::PathSegment { ident, arguments, .. } =&gt; {
+					<span class="kw">let </span>id = ident.to_string();
+					<span class="kw">let </span>inner = get_first_type_argument(arguments);
+					<span class="kw">if </span>id.ends_with(<span class="string">&quot;Result&quot;</span>) {
+						<span class="prelude-val">Ok</span>(inner)
+					} <span class="kw">else </span>{
+						<span class="prelude-val">Err</span>(inner)
 					}
 				}
 			};
-			<span class="comment">// Try out first argument (Result&lt;X&gt;) or nested types like:</span>
-			<span class="comment">// BoxFuture&lt;Result&lt;X&gt;&gt;</span>
-			<span class="kw">match</span> <span class="ident">check_segment</span>(<span class="kw-2">&amp;</span><span class="ident">segments</span>[<span class="number">0</span>]) {
-				<span class="prelude-val">Ok</span>(<span class="ident">returns</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">returns</span><span class="question-mark">?</span>),
-				<span class="prelude-val">Err</span>(<span class="ident">inner</span>) =&gt; {
-					<span class="kw">let</span> <span class="ident">segments</span> <span class="op">=</span> <span class="ident">extract_path_segments</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span><span class="question-mark">?</span>)<span class="question-mark">?</span>;
-					<span class="ident">check_segment</span>(<span class="kw-2">&amp;</span><span class="ident">segments</span>[<span class="number">0</span>]).<span class="ident">ok</span>().<span class="ident">flatten</span>()
+			<span class="comment">// Try out first argument (Result&lt;X&gt;) or nested types like:
+			// BoxFuture&lt;Result&lt;X&gt;&gt;
+			</span><span class="kw">match </span>check_segment(<span class="kw-2">&amp;</span>segments[<span class="number">0</span>]) {
+				<span class="prelude-val">Ok</span>(returns) =&gt; <span class="prelude-val">Some</span>(returns<span class="question-mark">?</span>),
+				<span class="prelude-val">Err</span>(inner) =&gt; {
+					<span class="kw">let </span>segments = extract_path_segments(<span class="kw-2">&amp;</span>inner<span class="question-mark">?</span>)<span class="question-mark">?</span>;
+					check_segment(<span class="kw-2">&amp;</span>segments[<span class="number">0</span>]).ok().flatten()
 				}
 			}
 		}
-		<span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+		<span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
 	}
 }
 
-<span class="kw">fn</span> <span class="ident">get_first_type_argument</span>(<span class="ident">args</span>: <span class="kw-2">&amp;</span><span class="ident">syn::PathArguments</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">syn::Type</span><span class="op">&gt;</span> {
-	<span class="kw">match</span> <span class="ident">args</span> {
-		<span class="ident">syn::PathArguments::AngleBracketed</span>(<span class="ident">syn::AngleBracketedGenericArguments</span> { <span class="ident">args</span>, .. }) =&gt; {
-			<span class="kw">if</span> <span class="op">!</span><span class="ident">args</span>.<span class="ident">is_empty</span>() {
-				<span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">args</span>[<span class="number">0</span>] {
-					<span class="ident">syn::GenericArgument::Type</span>(<span class="ident">ty</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">ty</span>.<span class="ident">clone</span>()),
-					<span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+<span class="kw">fn </span>get_first_type_argument(args: <span class="kw-2">&amp;</span>syn::PathArguments) -&gt; <span class="prelude-ty">Option</span>&lt;syn::Type&gt; {
+	<span class="kw">match </span>args {
+		syn::PathArguments::AngleBracketed(syn::AngleBracketedGenericArguments { args, .. }) =&gt; {
+			<span class="kw">if </span>!args.is_empty() {
+				<span class="kw">match </span><span class="kw-2">&amp;</span>args[<span class="number">0</span>] {
+					syn::GenericArgument::Type(ty) =&gt; <span class="prelude-val">Some</span>(ty.clone()),
+					<span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
 				}
-			} <span class="kw">else</span> {
-				<span class="prelude-val">None</span>
-			}
+			} <span class="kw">else </span>{
+				<span class="prelude-val">None
+			</span>}
 		}
-		<span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+		<span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
 	}
 }
 
-<span class="kw">fn</span> <span class="ident">compute_subscription_type</span>(<span class="ident">arg</span>: <span class="kw-2">&amp;</span><span class="ident">syn::FnArg</span>) -&gt; <span class="ident">syn::Type</span> {
-	<span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">arg</span> {
-		<span class="ident">syn::FnArg::Typed</span>(<span class="ident">cap</span>) =&gt; <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">cap</span>.<span class="ident">ty</span> {
-			<span class="ident">syn::Type::Path</span>(<span class="kw-2">ref</span> <span class="ident">path</span>) =&gt; {
-				<span class="kw">let</span> <span class="ident">last</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">path</span>.<span class="ident">path</span>.<span class="ident">segments</span>[<span class="kw-2">&amp;</span><span class="ident">path</span>.<span class="ident">path</span>.<span class="ident">segments</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>];
-				<span class="ident">get_first_type_argument</span>(<span class="kw-2">&amp;</span><span class="ident">last</span>.<span class="ident">arguments</span>)
+<span class="kw">fn </span>compute_subscription_type(arg: <span class="kw-2">&amp;</span>syn::FnArg) -&gt; syn::Type {
+	<span class="kw">let </span>ty = <span class="kw">match </span>arg {
+		syn::FnArg::Typed(cap) =&gt; <span class="kw">match </span><span class="kw-2">*</span>cap.ty {
+			syn::Type::Path(<span class="kw-2">ref </span>path) =&gt; {
+				<span class="kw">let </span>last = <span class="kw-2">&amp;</span>path.path.segments[<span class="kw-2">&amp;</span>path.path.segments.len() - <span class="number">1</span>];
+				get_first_type_argument(<span class="kw-2">&amp;</span>last.arguments)
 			}
-			<span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+			<span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
 		},
-		<span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+		<span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
 	};
-	<span class="ident">ty</span>.<span class="ident">expect</span>(<span class="string">&quot;a subscription needs a return type&quot;</span>)
+	ty.expect(<span class="string">&quot;a subscription needs a return type&quot;</span>)
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="jsonrpc_derive" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="jsonrpc_derive" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

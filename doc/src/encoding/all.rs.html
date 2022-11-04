@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/encoding-0.2.33/src/all.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>all.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../encoding/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../encoding/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../encoding/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/encoding-0.2.33/src/all.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>all.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../encoding/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../encoding/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../encoding/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -141,148 +141,148 @@
 <span id="141">141</span>
 <span id="142">142</span>
 <span id="143">143</span>
-</pre><pre class="rust"><code><span class="comment">// This is a part of rust-encoding.</span>
-<span class="comment">// Copyright (c) 2013, Kang Seonghoon.</span>
-<span class="comment">// See README.md and LICENSE.txt for details.</span>
+</pre><pre class="rust"><code><span class="comment">// This is a part of rust-encoding.
+// Copyright (c) 2013, Kang Seonghoon.
+// See README.md and LICENSE.txt for details.
 
-<span class="doccomment">//! A list of all supported encodings. Useful for encodings fixed in the compile time.</span>
+</span><span class="doccomment">//! A list of all supported encodings. Useful for encodings fixed in the compile time.
 
-<span class="kw">use</span> <span class="ident">index_singlebyte</span> <span class="kw">as</span> <span class="ident">index</span>;
-<span class="kw">use</span> <span class="ident">codec</span>;
-<span class="kw">use</span> <span class="ident">types::EncodingRef</span>;
+</span><span class="kw">use </span>index_singlebyte <span class="kw">as </span>index;
+<span class="kw">use </span>codec;
+<span class="kw">use </span>types::EncodingRef;
 
-<span class="macro">macro_rules!</span> <span class="ident">unique</span>(
-    ($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="ident">var</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>:<span class="ident">ident</span>, <span class="kw">mod</span><span class="op">=</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">module</span>:<span class="ident">ident</span>)::<span class="op">+</span>, <span class="ident">val</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">ident</span>) =&gt; (
-        <span class="macro">unique!</span>($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span> <span class="ident">var</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>, <span class="kw">mod</span><span class="op">=</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">module</span>)::<span class="op">+</span>, <span class="ident">ty</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>, <span class="ident">val</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>);
+<span class="macro">macro_rules! </span>unique(
+    ($(<span class="attribute">#[<span class="macro-nonterminal">$attr</span>:meta]</span>)* var=<span class="macro-nonterminal">$var</span>:ident, <span class="kw">mod</span>=$(<span class="macro-nonterminal">$module</span>:ident)::+, val=<span class="macro-nonterminal">$val</span>:ident) =&gt; (
+        <span class="macro">unique!</span>($(<span class="attribute">#[<span class="macro-nonterminal">$attr</span>]</span>)* var=<span class="macro-nonterminal">$var</span>, <span class="kw">mod</span>=$(<span class="macro-nonterminal">$module</span>)::+, ty=<span class="macro-nonterminal">$val</span>, val=<span class="macro-nonterminal">$val</span>);
     );
-    ($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="ident">var</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>:<span class="ident">ident</span>, <span class="kw">mod</span><span class="op">=</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">module</span>:<span class="ident">ident</span>)::<span class="op">+</span>, <span class="ident">ty</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">ident</span>, <span class="ident">val</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">ident</span>) =&gt; (
-        $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span> <span class="kw">pub</span> <span class="kw">const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">module</span>)::<span class="op">+</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span> <span class="op">=</span> <span class="kw-2">&amp;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">module</span>)::<span class="op">+</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>;
+    ($(<span class="attribute">#[<span class="macro-nonterminal">$attr</span>:meta]</span>)* var=<span class="macro-nonterminal">$var</span>:ident, <span class="kw">mod</span>=$(<span class="macro-nonterminal">$module</span>:ident)::+, ty=<span class="macro-nonterminal">$ty</span>:ident, val=<span class="macro-nonterminal">$val</span>:ident) =&gt; (
+        $(<span class="attribute">#[<span class="macro-nonterminal">$attr</span>]</span>)* <span class="kw">pub const </span><span class="macro-nonterminal">$var</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>$(<span class="macro-nonterminal">$module</span>)::+::<span class="macro-nonterminal">$ty </span>= <span class="kw-2">&amp;</span>$(<span class="macro-nonterminal">$module</span>)::+::<span class="macro-nonterminal">$val</span>;
     );
 );
 
-<span class="macro">macro_rules!</span> <span class="ident">singlebyte</span>(
-    ($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="ident">var</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>:<span class="ident">ident</span>, <span class="kw">mod</span><span class="op">=</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">module</span>:<span class="ident">ident</span>)::<span class="op">+</span>, <span class="ident">name</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">expr</span>) =&gt; (
-        <span class="macro">singlebyte!</span>($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span> <span class="ident">var</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>, <span class="kw">mod</span><span class="op">=</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">module</span>)::<span class="op">+</span>, <span class="ident">name</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>, <span class="ident">whatwg</span><span class="op">=</span><span class="prelude-val">None</span>);
+<span class="macro">macro_rules! </span>singlebyte(
+    ($(<span class="attribute">#[<span class="macro-nonterminal">$attr</span>:meta]</span>)* var=<span class="macro-nonterminal">$var</span>:ident, <span class="kw">mod</span>=$(<span class="macro-nonterminal">$module</span>:ident)::+, name=<span class="macro-nonterminal">$name</span>:expr) =&gt; (
+        <span class="macro">singlebyte!</span>($(<span class="attribute">#[<span class="macro-nonterminal">$attr</span>]</span>)* var=<span class="macro-nonterminal">$var</span>, <span class="kw">mod</span>=$(<span class="macro-nonterminal">$module</span>)::+, name=<span class="macro-nonterminal">$name</span>, whatwg=<span class="prelude-val">None</span>);
     );
-    ($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="ident">var</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>:<span class="ident">ident</span>, <span class="kw">mod</span><span class="op">=</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">module</span>:<span class="ident">ident</span>)::<span class="op">+</span>, <span class="ident">name</span><span class="op">|</span><span class="ident">whatwg</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">expr</span>) =&gt; (
-        <span class="macro">singlebyte!</span>($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span> <span class="ident">var</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>, <span class="kw">mod</span><span class="op">=</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">module</span>)::<span class="op">+</span>, <span class="ident">name</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>, <span class="ident">whatwg</span><span class="op">=</span><span class="prelude-val">Some</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>));
+    ($(<span class="attribute">#[<span class="macro-nonterminal">$attr</span>:meta]</span>)* var=<span class="macro-nonterminal">$var</span>:ident, <span class="kw">mod</span>=$(<span class="macro-nonterminal">$module</span>:ident)::+, name|whatwg=<span class="macro-nonterminal">$name</span>:expr) =&gt; (
+        <span class="macro">singlebyte!</span>($(<span class="attribute">#[<span class="macro-nonterminal">$attr</span>]</span>)* var=<span class="macro-nonterminal">$var</span>, <span class="kw">mod</span>=$(<span class="macro-nonterminal">$module</span>)::+, name=<span class="macro-nonterminal">$name</span>, whatwg=<span class="prelude-val">Some</span>(<span class="macro-nonterminal">$name</span>));
     );
-    ($(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>:<span class="ident">meta</span>]</span>)<span class="op">*</span> <span class="ident">var</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>:<span class="ident">ident</span>, <span class="kw">mod</span><span class="op">=</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">module</span>:<span class="ident">ident</span>)::<span class="op">+</span>,
-                       <span class="ident">name</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">expr</span>, <span class="ident">whatwg</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">whatwg</span>:<span class="ident">expr</span>) =&gt; (
-        $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">attr</span>]</span>)<span class="op">*</span> <span class="kw">pub</span> <span class="kw">const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">codec::singlebyte::SingleByteEncoding</span> <span class="op">=</span>
-            <span class="kw-2">&amp;</span><span class="ident">codec::singlebyte::SingleByteEncoding</span> {
-                <span class="ident">name</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>,
-                <span class="ident">whatwg_name</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">whatwg</span>,
-                <span class="ident">index_forward</span>: $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">module</span>)::<span class="op">+</span><span class="ident">::forward</span>,
-                <span class="ident">index_backward</span>: $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">module</span>)::<span class="op">+</span><span class="ident">::backward</span>,
+    ($(<span class="attribute">#[<span class="macro-nonterminal">$attr</span>:meta]</span>)* var=<span class="macro-nonterminal">$var</span>:ident, <span class="kw">mod</span>=$(<span class="macro-nonterminal">$module</span>:ident)::+,
+                       name=<span class="macro-nonterminal">$name</span>:expr, whatwg=<span class="macro-nonterminal">$whatwg</span>:expr) =&gt; (
+        $(<span class="attribute">#[<span class="macro-nonterminal">$attr</span>]</span>)* <span class="kw">pub const </span><span class="macro-nonterminal">$var</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>codec::singlebyte::SingleByteEncoding =
+            <span class="kw-2">&amp;</span>codec::singlebyte::SingleByteEncoding {
+                name: <span class="macro-nonterminal">$name</span>,
+                whatwg_name: <span class="macro-nonterminal">$whatwg</span>,
+                index_forward: $(<span class="macro-nonterminal">$module</span>)::+::forward,
+                index_backward: $(<span class="macro-nonterminal">$module</span>)::+::backward,
             };
     )
 );
 
-<span class="macro">unique!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">ERROR</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">codec::error</span>, <span class="ident">val</span><span class="op">=</span><span class="ident">ErrorEncoding</span>);
-<span class="macro">unique!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">ASCII</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">codec::ascii</span>, <span class="ident">val</span><span class="op">=</span><span class="ident">ASCIIEncoding</span>);
-<span class="macro">singlebyte!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">IBM866</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">index::ibm866</span>, <span class="ident">name</span><span class="op">|</span><span class="ident">whatwg</span><span class="op">=</span><span class="string">&quot;ibm866&quot;</span>);
-<span class="macro">singlebyte!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">ISO_8859_1</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">codec::singlebyte::iso_8859_1</span>, <span class="ident">name</span><span class="op">=</span><span class="string">&quot;iso-8859-1&quot;</span>);
-<span class="macro">singlebyte!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">ISO_8859_2</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">index::iso_8859_2</span>, <span class="ident">name</span><span class="op">|</span><span class="ident">whatwg</span><span class="op">=</span><span class="string">&quot;iso-8859-2&quot;</span>);
-<span class="macro">singlebyte!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">ISO_8859_3</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">index::iso_8859_3</span>, <span class="ident">name</span><span class="op">|</span><span class="ident">whatwg</span><span class="op">=</span><span class="string">&quot;iso-8859-3&quot;</span>);
-<span class="macro">singlebyte!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">ISO_8859_4</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">index::iso_8859_4</span>, <span class="ident">name</span><span class="op">|</span><span class="ident">whatwg</span><span class="op">=</span><span class="string">&quot;iso-8859-4&quot;</span>);
-<span class="macro">singlebyte!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">ISO_8859_5</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">index::iso_8859_5</span>, <span class="ident">name</span><span class="op">|</span><span class="ident">whatwg</span><span class="op">=</span><span class="string">&quot;iso-8859-5&quot;</span>);
-<span class="macro">singlebyte!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">ISO_8859_6</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">index::iso_8859_6</span>, <span class="ident">name</span><span class="op">|</span><span class="ident">whatwg</span><span class="op">=</span><span class="string">&quot;iso-8859-6&quot;</span>);
-<span class="macro">singlebyte!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">ISO_8859_7</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">index::iso_8859_7</span>, <span class="ident">name</span><span class="op">|</span><span class="ident">whatwg</span><span class="op">=</span><span class="string">&quot;iso-8859-7&quot;</span>);
-<span class="macro">singlebyte!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">ISO_8859_8</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">index::iso_8859_8</span>, <span class="ident">name</span><span class="op">|</span><span class="ident">whatwg</span><span class="op">=</span><span class="string">&quot;iso-8859-8&quot;</span>);
-<span class="macro">singlebyte!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">ISO_8859_10</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">index::iso_8859_10</span>, <span class="ident">name</span><span class="op">|</span><span class="ident">whatwg</span><span class="op">=</span><span class="string">&quot;iso-8859-10&quot;</span>);
-<span class="macro">singlebyte!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">ISO_8859_13</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">index::iso_8859_13</span>, <span class="ident">name</span><span class="op">|</span><span class="ident">whatwg</span><span class="op">=</span><span class="string">&quot;iso-8859-13&quot;</span>);
-<span class="macro">singlebyte!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">ISO_8859_14</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">index::iso_8859_14</span>, <span class="ident">name</span><span class="op">|</span><span class="ident">whatwg</span><span class="op">=</span><span class="string">&quot;iso-8859-14&quot;</span>);
-<span class="macro">singlebyte!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">ISO_8859_15</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">index::iso_8859_15</span>, <span class="ident">name</span><span class="op">|</span><span class="ident">whatwg</span><span class="op">=</span><span class="string">&quot;iso-8859-15&quot;</span>);
-<span class="macro">singlebyte!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">ISO_8859_16</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">index::iso_8859_16</span>, <span class="ident">name</span><span class="op">|</span><span class="ident">whatwg</span><span class="op">=</span><span class="string">&quot;iso-8859-16&quot;</span>);
-<span class="macro">singlebyte!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">KOI8_R</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">index::koi8_r</span>, <span class="ident">name</span><span class="op">|</span><span class="ident">whatwg</span><span class="op">=</span><span class="string">&quot;koi8-r&quot;</span>);
-<span class="macro">singlebyte!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">KOI8_U</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">index::koi8_u</span>, <span class="ident">name</span><span class="op">|</span><span class="ident">whatwg</span><span class="op">=</span><span class="string">&quot;koi8-u&quot;</span>);
-<span class="macro">singlebyte!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">MAC_ROMAN</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">index::macintosh</span>, <span class="ident">name</span><span class="op">=</span><span class="string">&quot;mac-roman&quot;</span>, <span class="ident">whatwg</span><span class="op">=</span><span class="prelude-val">Some</span>(<span class="string">&quot;macintosh&quot;</span>));
-<span class="macro">singlebyte!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">WINDOWS_874</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">index::windows_874</span>, <span class="ident">name</span><span class="op">|</span><span class="ident">whatwg</span><span class="op">=</span><span class="string">&quot;windows-874&quot;</span>);
-<span class="macro">singlebyte!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">WINDOWS_1250</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">index::windows_1250</span>, <span class="ident">name</span><span class="op">|</span><span class="ident">whatwg</span><span class="op">=</span><span class="string">&quot;windows-1250&quot;</span>);
-<span class="macro">singlebyte!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">WINDOWS_1251</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">index::windows_1251</span>, <span class="ident">name</span><span class="op">|</span><span class="ident">whatwg</span><span class="op">=</span><span class="string">&quot;windows-1251&quot;</span>);
-<span class="macro">singlebyte!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">WINDOWS_1252</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">index::windows_1252</span>, <span class="ident">name</span><span class="op">|</span><span class="ident">whatwg</span><span class="op">=</span><span class="string">&quot;windows-1252&quot;</span>);
-<span class="macro">singlebyte!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">WINDOWS_1253</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">index::windows_1253</span>, <span class="ident">name</span><span class="op">|</span><span class="ident">whatwg</span><span class="op">=</span><span class="string">&quot;windows-1253&quot;</span>);
-<span class="macro">singlebyte!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">WINDOWS_1254</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">index::windows_1254</span>, <span class="ident">name</span><span class="op">|</span><span class="ident">whatwg</span><span class="op">=</span><span class="string">&quot;windows-1254&quot;</span>);
-<span class="macro">singlebyte!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">WINDOWS_1255</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">index::windows_1255</span>, <span class="ident">name</span><span class="op">|</span><span class="ident">whatwg</span><span class="op">=</span><span class="string">&quot;windows-1255&quot;</span>);
-<span class="macro">singlebyte!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">WINDOWS_1256</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">index::windows_1256</span>, <span class="ident">name</span><span class="op">|</span><span class="ident">whatwg</span><span class="op">=</span><span class="string">&quot;windows-1256&quot;</span>);
-<span class="macro">singlebyte!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">WINDOWS_1257</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">index::windows_1257</span>, <span class="ident">name</span><span class="op">|</span><span class="ident">whatwg</span><span class="op">=</span><span class="string">&quot;windows-1257&quot;</span>);
-<span class="macro">singlebyte!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">WINDOWS_1258</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">index::windows_1258</span>, <span class="ident">name</span><span class="op">|</span><span class="ident">whatwg</span><span class="op">=</span><span class="string">&quot;windows-1258&quot;</span>);
-<span class="macro">singlebyte!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">MAC_CYRILLIC</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">index::x_mac_cyrillic</span>,
-            <span class="ident">name</span><span class="op">=</span><span class="string">&quot;mac-cyrillic&quot;</span>, <span class="ident">whatwg</span><span class="op">=</span><span class="prelude-val">Some</span>(<span class="string">&quot;x-mac-cyrillic&quot;</span>));
-<span class="macro">unique!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">UTF_8</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">codec::utf_8</span>, <span class="ident">val</span><span class="op">=</span><span class="ident">UTF8Encoding</span>);
-<span class="macro">unique!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">UTF_16LE</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">codec::utf_16</span>, <span class="ident">ty</span><span class="op">=</span><span class="ident">UTF16LEEncoding</span>, <span class="ident">val</span><span class="op">=</span><span class="ident">UTF_16LE_ENCODING</span>);
-<span class="macro">unique!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">UTF_16BE</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">codec::utf_16</span>, <span class="ident">ty</span><span class="op">=</span><span class="ident">UTF16BEEncoding</span>, <span class="ident">val</span><span class="op">=</span><span class="ident">UTF_16BE_ENCODING</span>);
-<span class="macro">unique!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">WINDOWS_949</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">codec::korean</span>, <span class="ident">val</span><span class="op">=</span><span class="ident">Windows949Encoding</span>);
-<span class="macro">unique!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">EUC_JP</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">codec::japanese</span>, <span class="ident">val</span><span class="op">=</span><span class="ident">EUCJPEncoding</span>);
-<span class="macro">unique!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">WINDOWS_31J</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">codec::japanese</span>, <span class="ident">val</span><span class="op">=</span><span class="ident">Windows31JEncoding</span>);
-<span class="macro">unique!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">ISO_2022_JP</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">codec::japanese</span>, <span class="ident">val</span><span class="op">=</span><span class="ident">ISO2022JPEncoding</span>);
-<span class="macro">unique!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">GBK</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">codec::simpchinese</span>, <span class="ident">ty</span><span class="op">=</span><span class="ident">GBKEncoding</span>, <span class="ident">val</span><span class="op">=</span><span class="ident">GBK_ENCODING</span>);
-<span class="macro">unique!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">GB18030</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">codec::simpchinese</span>, <span class="ident">ty</span><span class="op">=</span><span class="ident">GB18030Encoding</span>, <span class="ident">val</span><span class="op">=</span><span class="ident">GB18030_ENCODING</span>);
-<span class="macro">unique!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">HZ</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">codec::simpchinese</span>, <span class="ident">val</span><span class="op">=</span><span class="ident">HZEncoding</span>);
-<span class="macro">unique!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">BIG5_2003</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">codec::tradchinese</span>, <span class="ident">val</span><span class="op">=</span><span class="ident">BigFive2003Encoding</span>);
+<span class="macro">unique!</span>(var=ERROR, <span class="kw">mod</span>=codec::error, val=ErrorEncoding);
+<span class="macro">unique!</span>(var=ASCII, <span class="kw">mod</span>=codec::ascii, val=ASCIIEncoding);
+<span class="macro">singlebyte!</span>(var=IBM866, <span class="kw">mod</span>=index::ibm866, name|whatwg=<span class="string">&quot;ibm866&quot;</span>);
+<span class="macro">singlebyte!</span>(var=ISO_8859_1, <span class="kw">mod</span>=codec::singlebyte::iso_8859_1, name=<span class="string">&quot;iso-8859-1&quot;</span>);
+<span class="macro">singlebyte!</span>(var=ISO_8859_2, <span class="kw">mod</span>=index::iso_8859_2, name|whatwg=<span class="string">&quot;iso-8859-2&quot;</span>);
+<span class="macro">singlebyte!</span>(var=ISO_8859_3, <span class="kw">mod</span>=index::iso_8859_3, name|whatwg=<span class="string">&quot;iso-8859-3&quot;</span>);
+<span class="macro">singlebyte!</span>(var=ISO_8859_4, <span class="kw">mod</span>=index::iso_8859_4, name|whatwg=<span class="string">&quot;iso-8859-4&quot;</span>);
+<span class="macro">singlebyte!</span>(var=ISO_8859_5, <span class="kw">mod</span>=index::iso_8859_5, name|whatwg=<span class="string">&quot;iso-8859-5&quot;</span>);
+<span class="macro">singlebyte!</span>(var=ISO_8859_6, <span class="kw">mod</span>=index::iso_8859_6, name|whatwg=<span class="string">&quot;iso-8859-6&quot;</span>);
+<span class="macro">singlebyte!</span>(var=ISO_8859_7, <span class="kw">mod</span>=index::iso_8859_7, name|whatwg=<span class="string">&quot;iso-8859-7&quot;</span>);
+<span class="macro">singlebyte!</span>(var=ISO_8859_8, <span class="kw">mod</span>=index::iso_8859_8, name|whatwg=<span class="string">&quot;iso-8859-8&quot;</span>);
+<span class="macro">singlebyte!</span>(var=ISO_8859_10, <span class="kw">mod</span>=index::iso_8859_10, name|whatwg=<span class="string">&quot;iso-8859-10&quot;</span>);
+<span class="macro">singlebyte!</span>(var=ISO_8859_13, <span class="kw">mod</span>=index::iso_8859_13, name|whatwg=<span class="string">&quot;iso-8859-13&quot;</span>);
+<span class="macro">singlebyte!</span>(var=ISO_8859_14, <span class="kw">mod</span>=index::iso_8859_14, name|whatwg=<span class="string">&quot;iso-8859-14&quot;</span>);
+<span class="macro">singlebyte!</span>(var=ISO_8859_15, <span class="kw">mod</span>=index::iso_8859_15, name|whatwg=<span class="string">&quot;iso-8859-15&quot;</span>);
+<span class="macro">singlebyte!</span>(var=ISO_8859_16, <span class="kw">mod</span>=index::iso_8859_16, name|whatwg=<span class="string">&quot;iso-8859-16&quot;</span>);
+<span class="macro">singlebyte!</span>(var=KOI8_R, <span class="kw">mod</span>=index::koi8_r, name|whatwg=<span class="string">&quot;koi8-r&quot;</span>);
+<span class="macro">singlebyte!</span>(var=KOI8_U, <span class="kw">mod</span>=index::koi8_u, name|whatwg=<span class="string">&quot;koi8-u&quot;</span>);
+<span class="macro">singlebyte!</span>(var=MAC_ROMAN, <span class="kw">mod</span>=index::macintosh, name=<span class="string">&quot;mac-roman&quot;</span>, whatwg=<span class="prelude-val">Some</span>(<span class="string">&quot;macintosh&quot;</span>));
+<span class="macro">singlebyte!</span>(var=WINDOWS_874, <span class="kw">mod</span>=index::windows_874, name|whatwg=<span class="string">&quot;windows-874&quot;</span>);
+<span class="macro">singlebyte!</span>(var=WINDOWS_1250, <span class="kw">mod</span>=index::windows_1250, name|whatwg=<span class="string">&quot;windows-1250&quot;</span>);
+<span class="macro">singlebyte!</span>(var=WINDOWS_1251, <span class="kw">mod</span>=index::windows_1251, name|whatwg=<span class="string">&quot;windows-1251&quot;</span>);
+<span class="macro">singlebyte!</span>(var=WINDOWS_1252, <span class="kw">mod</span>=index::windows_1252, name|whatwg=<span class="string">&quot;windows-1252&quot;</span>);
+<span class="macro">singlebyte!</span>(var=WINDOWS_1253, <span class="kw">mod</span>=index::windows_1253, name|whatwg=<span class="string">&quot;windows-1253&quot;</span>);
+<span class="macro">singlebyte!</span>(var=WINDOWS_1254, <span class="kw">mod</span>=index::windows_1254, name|whatwg=<span class="string">&quot;windows-1254&quot;</span>);
+<span class="macro">singlebyte!</span>(var=WINDOWS_1255, <span class="kw">mod</span>=index::windows_1255, name|whatwg=<span class="string">&quot;windows-1255&quot;</span>);
+<span class="macro">singlebyte!</span>(var=WINDOWS_1256, <span class="kw">mod</span>=index::windows_1256, name|whatwg=<span class="string">&quot;windows-1256&quot;</span>);
+<span class="macro">singlebyte!</span>(var=WINDOWS_1257, <span class="kw">mod</span>=index::windows_1257, name|whatwg=<span class="string">&quot;windows-1257&quot;</span>);
+<span class="macro">singlebyte!</span>(var=WINDOWS_1258, <span class="kw">mod</span>=index::windows_1258, name|whatwg=<span class="string">&quot;windows-1258&quot;</span>);
+<span class="macro">singlebyte!</span>(var=MAC_CYRILLIC, <span class="kw">mod</span>=index::x_mac_cyrillic,
+            name=<span class="string">&quot;mac-cyrillic&quot;</span>, whatwg=<span class="prelude-val">Some</span>(<span class="string">&quot;x-mac-cyrillic&quot;</span>));
+<span class="macro">unique!</span>(var=UTF_8, <span class="kw">mod</span>=codec::utf_8, val=UTF8Encoding);
+<span class="macro">unique!</span>(var=UTF_16LE, <span class="kw">mod</span>=codec::utf_16, ty=UTF16LEEncoding, val=UTF_16LE_ENCODING);
+<span class="macro">unique!</span>(var=UTF_16BE, <span class="kw">mod</span>=codec::utf_16, ty=UTF16BEEncoding, val=UTF_16BE_ENCODING);
+<span class="macro">unique!</span>(var=WINDOWS_949, <span class="kw">mod</span>=codec::korean, val=Windows949Encoding);
+<span class="macro">unique!</span>(var=EUC_JP, <span class="kw">mod</span>=codec::japanese, val=EUCJPEncoding);
+<span class="macro">unique!</span>(var=WINDOWS_31J, <span class="kw">mod</span>=codec::japanese, val=Windows31JEncoding);
+<span class="macro">unique!</span>(var=ISO_2022_JP, <span class="kw">mod</span>=codec::japanese, val=ISO2022JPEncoding);
+<span class="macro">unique!</span>(var=GBK, <span class="kw">mod</span>=codec::simpchinese, ty=GBKEncoding, val=GBK_ENCODING);
+<span class="macro">unique!</span>(var=GB18030, <span class="kw">mod</span>=codec::simpchinese, ty=GB18030Encoding, val=GB18030_ENCODING);
+<span class="macro">unique!</span>(var=HZ, <span class="kw">mod</span>=codec::simpchinese, val=HZEncoding);
+<span class="macro">unique!</span>(var=BIG5_2003, <span class="kw">mod</span>=codec::tradchinese, val=BigFive2003Encoding);
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">whatwg</span> {
-    <span class="kw">use</span> <span class="ident">index_singlebyte</span> <span class="kw">as</span> <span class="ident">index</span>;
-    <span class="kw">use</span> <span class="ident">codec</span>;
+<span class="kw">pub mod </span>whatwg {
+    <span class="kw">use </span>index_singlebyte <span class="kw">as </span>index;
+    <span class="kw">use </span>codec;
 
-    <span class="macro">singlebyte!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">X_USER_DEFINED</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">codec::whatwg::x_user_defined</span>,
-                <span class="ident">name</span><span class="op">=</span><span class="string">&quot;pua-mapped-binary&quot;</span>, <span class="ident">whatwg</span><span class="op">=</span><span class="prelude-val">Some</span>(<span class="string">&quot;x-user-defined&quot;</span>));
-    <span class="macro">singlebyte!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">ISO_8859_8_I</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">index::iso_8859_8</span>, <span class="ident">name</span><span class="op">|</span><span class="ident">whatwg</span><span class="op">=</span><span class="string">&quot;iso-8859-8-i&quot;</span>);
-    <span class="macro">unique!</span>(<span class="ident">var</span><span class="op">=</span><span class="ident">REPLACEMENT</span>, <span class="kw">mod</span><span class="op">=</span><span class="ident">codec::whatwg</span>, <span class="ident">val</span><span class="op">=</span><span class="ident">EncoderOnlyUTF8Encoding</span>);
+    <span class="macro">singlebyte!</span>(var=X_USER_DEFINED, <span class="kw">mod</span>=codec::whatwg::x_user_defined,
+                name=<span class="string">&quot;pua-mapped-binary&quot;</span>, whatwg=<span class="prelude-val">Some</span>(<span class="string">&quot;x-user-defined&quot;</span>));
+    <span class="macro">singlebyte!</span>(var=ISO_8859_8_I, <span class="kw">mod</span>=index::iso_8859_8, name|whatwg=<span class="string">&quot;iso-8859-8-i&quot;</span>);
+    <span class="macro">unique!</span>(var=REPLACEMENT, <span class="kw">mod</span>=codec::whatwg, val=EncoderOnlyUTF8Encoding);
 }
 
-<span class="doccomment">/// Returns a list of references to the encodings available.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encodings</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">EncodingRef</span>] {
-    <span class="comment">// TODO should be generated automatically</span>
-    <span class="kw">const</span> <span class="ident">ENCODINGS</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">EncodingRef</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
-        <span class="ident">ERROR</span>,
-        <span class="ident">ASCII</span>,
-        <span class="ident">IBM866</span>,
-        <span class="ident">ISO_8859_1</span>,
-        <span class="ident">ISO_8859_2</span>,
-        <span class="ident">ISO_8859_3</span>,
-        <span class="ident">ISO_8859_4</span>,
-        <span class="ident">ISO_8859_5</span>,
-        <span class="ident">ISO_8859_6</span>,
-        <span class="ident">ISO_8859_7</span>,
-        <span class="ident">ISO_8859_8</span>,
-        <span class="ident">ISO_8859_10</span>,
-        <span class="ident">ISO_8859_13</span>,
-        <span class="ident">ISO_8859_14</span>,
-        <span class="ident">ISO_8859_15</span>,
-        <span class="ident">ISO_8859_16</span>,
-        <span class="ident">KOI8_R</span>,
-        <span class="ident">KOI8_U</span>,
-        <span class="ident">MAC_ROMAN</span>,
-        <span class="ident">WINDOWS_874</span>,
-        <span class="ident">WINDOWS_1250</span>,
-        <span class="ident">WINDOWS_1251</span>,
-        <span class="ident">WINDOWS_1252</span>,
-        <span class="ident">WINDOWS_1253</span>,
-        <span class="ident">WINDOWS_1254</span>,
-        <span class="ident">WINDOWS_1255</span>,
-        <span class="ident">WINDOWS_1256</span>,
-        <span class="ident">WINDOWS_1257</span>,
-        <span class="ident">WINDOWS_1258</span>,
-        <span class="ident">MAC_CYRILLIC</span>,
-        <span class="ident">UTF_8</span>,
-        <span class="ident">UTF_16LE</span>,
-        <span class="ident">UTF_16BE</span>,
-        <span class="ident">WINDOWS_949</span>,
-        <span class="ident">EUC_JP</span>,
-        <span class="ident">WINDOWS_31J</span>,
-        <span class="ident">ISO_2022_JP</span>,
-        <span class="ident">GBK</span>,
-        <span class="ident">GB18030</span>,
-        <span class="ident">HZ</span>,
-        <span class="ident">BIG5_2003</span>,
-        <span class="ident">whatwg::X_USER_DEFINED</span>,
-        <span class="ident">whatwg::ISO_8859_8_I</span>,
-        <span class="ident">whatwg::REPLACEMENT</span>,
+<span class="doccomment">/// Returns a list of references to the encodings available.
+</span><span class="kw">pub fn </span>encodings() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[EncodingRef] {
+    <span class="comment">// TODO should be generated automatically
+    </span><span class="kw">const </span>ENCODINGS: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[EncodingRef] = <span class="kw-2">&amp;</span>[
+        ERROR,
+        ASCII,
+        IBM866,
+        ISO_8859_1,
+        ISO_8859_2,
+        ISO_8859_3,
+        ISO_8859_4,
+        ISO_8859_5,
+        ISO_8859_6,
+        ISO_8859_7,
+        ISO_8859_8,
+        ISO_8859_10,
+        ISO_8859_13,
+        ISO_8859_14,
+        ISO_8859_15,
+        ISO_8859_16,
+        KOI8_R,
+        KOI8_U,
+        MAC_ROMAN,
+        WINDOWS_874,
+        WINDOWS_1250,
+        WINDOWS_1251,
+        WINDOWS_1252,
+        WINDOWS_1253,
+        WINDOWS_1254,
+        WINDOWS_1255,
+        WINDOWS_1256,
+        WINDOWS_1257,
+        WINDOWS_1258,
+        MAC_CYRILLIC,
+        UTF_8,
+        UTF_16LE,
+        UTF_16BE,
+        WINDOWS_949,
+        EUC_JP,
+        WINDOWS_31J,
+        ISO_2022_JP,
+        GBK,
+        GB18030,
+        HZ,
+        BIG5_2003,
+        whatwg::X_USER_DEFINED,
+        whatwg::ISO_8859_8_I,
+        whatwg::REPLACEMENT,
     ];
-    <span class="ident">ENCODINGS</span>
+    ENCODINGS
 }
 
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="encoding" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="encoding" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

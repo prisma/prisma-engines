@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/regex-automata-0.1.10/src/nfa/range_trie.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>range_trie.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../regex_automata/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../regex_automata/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../regex_automata/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/regex-automata-0.1.10/src/nfa/range_trie.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>range_trie.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../regex_automata/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../regex_automata/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../regex_automata/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1046,1053 +1046,1053 @@
 <span id="1046">1046</span>
 <span id="1047">1047</span>
 <span id="1048">1048</span>
-</pre><pre class="rust"><code><span class="comment">// I&#39;ve called the primary data structure in this module a &quot;range trie.&quot; As far</span>
-<span class="comment">// as I can tell, there is no prior art on a data structure like this, however,</span>
-<span class="comment">// it&#39;s likely someone somewhere has built something like it. Searching for</span>
-<span class="comment">// &quot;range trie&quot; turns up the paper &quot;Range Tries for Scalable Address Lookup,&quot;</span>
-<span class="comment">// but it does not appear relevant.</span>
-<span class="comment">//</span>
-<span class="comment">// The range trie is just like a trie in that it is a special case of a</span>
-<span class="comment">// deterministic finite state machine. It has states and each state has a set</span>
-<span class="comment">// of transitions to other states. It is acyclic, and, like a normal trie,</span>
-<span class="comment">// it makes no attempt to reuse common suffixes among its elements. The key</span>
-<span class="comment">// difference between a normal trie and a range trie below is that a range trie</span>
-<span class="comment">// operates on *contiguous sequences* of bytes instead of singleton bytes.</span>
-<span class="comment">// One could say say that our alphabet is ranges of bytes instead of bytes</span>
-<span class="comment">// themselves, except a key part of range trie construction is splitting ranges</span>
-<span class="comment">// apart to ensure there is at most one transition that can be taken for any</span>
-<span class="comment">// byte in a given state.</span>
-<span class="comment">//</span>
-<span class="comment">// I&#39;ve tried to explain the details of how the range trie works below, so</span>
-<span class="comment">// for now, we are left with trying to understand what problem we&#39;re trying to</span>
-<span class="comment">// solve. Which is itself fairly involved!</span>
-<span class="comment">//</span>
-<span class="comment">// At the highest level, here&#39;s what we want to do. We want to convert a</span>
-<span class="comment">// sequence of Unicode codepoints into a finite state machine whose transitions</span>
-<span class="comment">// are over *bytes* and *not* Unicode codepoints. We want this because it makes</span>
-<span class="comment">// said finite state machines much smaller and much faster to execute. As a</span>
-<span class="comment">// simple example, consider a byte oriented automaton for all Unicode scalar</span>
-<span class="comment">// values (0x00 through 0x10FFFF, not including surrogate codepoints):</span>
-<span class="comment">//</span>
-<span class="comment">//     [00-7F]</span>
-<span class="comment">//     [C2-DF][80-BF]</span>
-<span class="comment">//     [E0-E0][A0-BF][80-BF]</span>
-<span class="comment">//     [E1-EC][80-BF][80-BF]</span>
-<span class="comment">//     [ED-ED][80-9F][80-BF]</span>
-<span class="comment">//     [EE-EF][80-BF][80-BF]</span>
-<span class="comment">//     [F0-F0][90-BF][80-BF][80-BF]</span>
-<span class="comment">//     [F1-F3][80-BF][80-BF][80-BF]</span>
-<span class="comment">//     [F4-F4][80-8F][80-BF][80-BF]</span>
-<span class="comment">//</span>
-<span class="comment">// (These byte ranges are generated via the regex-syntax::utf8 module, which</span>
-<span class="comment">// was based on Russ Cox&#39;s code in RE2, which was in turn based on Ken</span>
-<span class="comment">// Thompson&#39;s implementation of the same idea in his Plan9 implementation of</span>
-<span class="comment">// grep.)</span>
-<span class="comment">//</span>
-<span class="comment">// It should be fairly straight-forward to see how one could compile this into</span>
-<span class="comment">// a DFA. The sequences are sorted and non-overlapping. Essentially, you could</span>
-<span class="comment">// build a trie from this fairly easy. The problem comes when your initial</span>
-<span class="comment">// range (in this case, 0x00-0x10FFFF) isn&#39;t so nice. For example, the class</span>
-<span class="comment">// represented by &#39;\w&#39; contains only a tenth of the codepoints that</span>
-<span class="comment">// 0x00-0x10FFFF contains, but if we were to write out the byte based ranges</span>
-<span class="comment">// as we did above, the list would stretch to 892 entries! This turns into</span>
-<span class="comment">// quite a large NFA with a few thousand states. Turning this beast into a DFA</span>
-<span class="comment">// takes quite a bit of time. We are thus left with trying to trim down the</span>
-<span class="comment">// number of states we produce as early as possible.</span>
-<span class="comment">//</span>
-<span class="comment">// One approach (used by RE2 and still by the regex crate, at time of writing)</span>
-<span class="comment">// is to try to find common suffixes while building NFA states for the above</span>
-<span class="comment">// and reuse them. This is very cheap to do and one can control precisely how</span>
-<span class="comment">// much extra memory you want to use for the cache.</span>
-<span class="comment">//</span>
-<span class="comment">// Another approach, however, is to reuse an algorithm for constructing a</span>
-<span class="comment">// *minimal* DFA from a sorted sequence of inputs. I don&#39;t want to go into</span>
-<span class="comment">// the full details here, but I explain it in more depth in my blog post on</span>
-<span class="comment">// FSTs[1]. Note that the algorithm not invented by me, but was published</span>
-<span class="comment">// in paper by Daciuk et al. in 2000 called &quot;Incremental Construction of</span>
-<span class="comment">// MinimalAcyclic Finite-State Automata.&quot; Like the suffix cache approach above,</span>
-<span class="comment">// it is also possible to control the amount of extra memory one uses, although</span>
-<span class="comment">// this usually comes with the cost of sacrificing true minimality. (But it&#39;s</span>
-<span class="comment">// typically close enough with a reasonably sized cache of states.)</span>
-<span class="comment">//</span>
-<span class="comment">// The catch is that Daciuk&#39;s algorithm only works if you add your keys in</span>
-<span class="comment">// lexicographic ascending order. In our case, since we&#39;re dealing with ranges,</span>
-<span class="comment">// we also need the additional requirement that ranges are either equivalent</span>
-<span class="comment">// or do not overlap at all. For example, if one were given the following byte</span>
-<span class="comment">// ranges:</span>
-<span class="comment">//</span>
-<span class="comment">//     [BC-BF][80-BF]</span>
-<span class="comment">//     [BC-BF][90-BF]</span>
-<span class="comment">//</span>
-<span class="comment">// Then Daciuk&#39;s algorithm also would not work, since there is nothing to</span>
-<span class="comment">// handle the fact that the ranges overlap. They would need to be split apart.</span>
-<span class="comment">// Thankfully, Thompson&#39;s algorithm for producing byte ranges for Unicode</span>
-<span class="comment">// codepoint ranges meets both of our requirements.</span>
-<span class="comment">//</span>
-<span class="comment">// ... however, we would also like to be able to compile UTF-8 automata in</span>
-<span class="comment">// reverse. We want this because in order to find the starting location of a</span>
-<span class="comment">// match using a DFA, we need to run a second DFA---a reversed version of the</span>
-<span class="comment">// forward DFA---backwards to discover the match location. Unfortunately, if</span>
-<span class="comment">// we reverse our byte sequences for 0x00-0x10FFFF, we get sequences that are</span>
-<span class="comment">// can overlap, even if they are sorted:</span>
-<span class="comment">//</span>
-<span class="comment">//     [00-7F]</span>
-<span class="comment">//     [80-BF][80-9F][ED-ED]</span>
-<span class="comment">//     [80-BF][80-BF][80-8F][F4-F4]</span>
-<span class="comment">//     [80-BF][80-BF][80-BF][F1-F3]</span>
-<span class="comment">//     [80-BF][80-BF][90-BF][F0-F0]</span>
-<span class="comment">//     [80-BF][80-BF][E1-EC]</span>
-<span class="comment">//     [80-BF][80-BF][EE-EF]</span>
-<span class="comment">//     [80-BF][A0-BF][E0-E0]</span>
-<span class="comment">//     [80-BF][C2-DF]</span>
-<span class="comment">//</span>
-<span class="comment">// For example, &#39;[80-BF][80-BF][EE-EF]&#39; and &#39;[80-BF][A0-BF][E0-E0]&#39; have</span>
-<span class="comment">// overlapping ranges between &#39;[80-BF]&#39; and &#39;[A0-BF]&#39;. Thus, there is no</span>
-<span class="comment">// simple way to apply Daciuk&#39;s algorithm.</span>
-<span class="comment">//</span>
-<span class="comment">// And thus, the range trie was born. The range trie&#39;s only purpose is to take</span>
-<span class="comment">// sequences of byte ranges like the ones above, collect them into a trie and</span>
-<span class="comment">// then spit them in a sorted fashion with no overlapping ranges. For example,</span>
-<span class="comment">// 0x00-0x10FFFF gets translated to:</span>
-<span class="comment">//</span>
-<span class="comment">//     [0-7F]</span>
-<span class="comment">//     [80-BF][80-9F][80-8F][F1-F3]</span>
-<span class="comment">//     [80-BF][80-9F][80-8F][F4]</span>
-<span class="comment">//     [80-BF][80-9F][90-BF][F0]</span>
-<span class="comment">//     [80-BF][80-9F][90-BF][F1-F3]</span>
-<span class="comment">//     [80-BF][80-9F][E1-EC]</span>
-<span class="comment">//     [80-BF][80-9F][ED]</span>
-<span class="comment">//     [80-BF][80-9F][EE-EF]</span>
-<span class="comment">//     [80-BF][A0-BF][80-8F][F1-F3]</span>
-<span class="comment">//     [80-BF][A0-BF][80-8F][F4]</span>
-<span class="comment">//     [80-BF][A0-BF][90-BF][F0]</span>
-<span class="comment">//     [80-BF][A0-BF][90-BF][F1-F3]</span>
-<span class="comment">//     [80-BF][A0-BF][E0]</span>
-<span class="comment">//     [80-BF][A0-BF][E1-EC]</span>
-<span class="comment">//     [80-BF][A0-BF][EE-EF]</span>
-<span class="comment">//     [80-BF][C2-DF]</span>
-<span class="comment">//</span>
-<span class="comment">// We&#39;ve thus satisfied our requirements for running Daciuk&#39;s algorithm. All</span>
-<span class="comment">// sequences of ranges are sorted, and any corresponding ranges are either</span>
-<span class="comment">// exactly equivalent or non-overlapping.</span>
-<span class="comment">//</span>
-<span class="comment">// In effect, a range trie is building a DFA from a sequence of arbitrary</span>
-<span class="comment">// byte ranges. But it uses an algoritm custom tailored to its input, so it</span>
-<span class="comment">// is not as costly as traditional DFA construction. While it is still quite</span>
-<span class="comment">// a bit more costly than the forward&#39;s case (which only needs Daciuk&#39;s</span>
-<span class="comment">// algorithm), it winds up saving a substantial amount of time if one is doing</span>
-<span class="comment">// a full DFA powerset construction later by virtue of producing a much much</span>
-<span class="comment">// smaller NFA.</span>
-<span class="comment">//</span>
-<span class="comment">// [1] - https://blog.burntsushi.net/transducers/</span>
-<span class="comment">// [2] - https://www.mitpressjournals.org/doi/pdfplus/10.1162/089120100561601</span>
+</pre><pre class="rust"><code><span class="comment">// I&#39;ve called the primary data structure in this module a &quot;range trie.&quot; As far
+// as I can tell, there is no prior art on a data structure like this, however,
+// it&#39;s likely someone somewhere has built something like it. Searching for
+// &quot;range trie&quot; turns up the paper &quot;Range Tries for Scalable Address Lookup,&quot;
+// but it does not appear relevant.
+//
+// The range trie is just like a trie in that it is a special case of a
+// deterministic finite state machine. It has states and each state has a set
+// of transitions to other states. It is acyclic, and, like a normal trie,
+// it makes no attempt to reuse common suffixes among its elements. The key
+// difference between a normal trie and a range trie below is that a range trie
+// operates on *contiguous sequences* of bytes instead of singleton bytes.
+// One could say say that our alphabet is ranges of bytes instead of bytes
+// themselves, except a key part of range trie construction is splitting ranges
+// apart to ensure there is at most one transition that can be taken for any
+// byte in a given state.
+//
+// I&#39;ve tried to explain the details of how the range trie works below, so
+// for now, we are left with trying to understand what problem we&#39;re trying to
+// solve. Which is itself fairly involved!
+//
+// At the highest level, here&#39;s what we want to do. We want to convert a
+// sequence of Unicode codepoints into a finite state machine whose transitions
+// are over *bytes* and *not* Unicode codepoints. We want this because it makes
+// said finite state machines much smaller and much faster to execute. As a
+// simple example, consider a byte oriented automaton for all Unicode scalar
+// values (0x00 through 0x10FFFF, not including surrogate codepoints):
+//
+//     [00-7F]
+//     [C2-DF][80-BF]
+//     [E0-E0][A0-BF][80-BF]
+//     [E1-EC][80-BF][80-BF]
+//     [ED-ED][80-9F][80-BF]
+//     [EE-EF][80-BF][80-BF]
+//     [F0-F0][90-BF][80-BF][80-BF]
+//     [F1-F3][80-BF][80-BF][80-BF]
+//     [F4-F4][80-8F][80-BF][80-BF]
+//
+// (These byte ranges are generated via the regex-syntax::utf8 module, which
+// was based on Russ Cox&#39;s code in RE2, which was in turn based on Ken
+// Thompson&#39;s implementation of the same idea in his Plan9 implementation of
+// grep.)
+//
+// It should be fairly straight-forward to see how one could compile this into
+// a DFA. The sequences are sorted and non-overlapping. Essentially, you could
+// build a trie from this fairly easy. The problem comes when your initial
+// range (in this case, 0x00-0x10FFFF) isn&#39;t so nice. For example, the class
+// represented by &#39;\w&#39; contains only a tenth of the codepoints that
+// 0x00-0x10FFFF contains, but if we were to write out the byte based ranges
+// as we did above, the list would stretch to 892 entries! This turns into
+// quite a large NFA with a few thousand states. Turning this beast into a DFA
+// takes quite a bit of time. We are thus left with trying to trim down the
+// number of states we produce as early as possible.
+//
+// One approach (used by RE2 and still by the regex crate, at time of writing)
+// is to try to find common suffixes while building NFA states for the above
+// and reuse them. This is very cheap to do and one can control precisely how
+// much extra memory you want to use for the cache.
+//
+// Another approach, however, is to reuse an algorithm for constructing a
+// *minimal* DFA from a sorted sequence of inputs. I don&#39;t want to go into
+// the full details here, but I explain it in more depth in my blog post on
+// FSTs[1]. Note that the algorithm not invented by me, but was published
+// in paper by Daciuk et al. in 2000 called &quot;Incremental Construction of
+// MinimalAcyclic Finite-State Automata.&quot; Like the suffix cache approach above,
+// it is also possible to control the amount of extra memory one uses, although
+// this usually comes with the cost of sacrificing true minimality. (But it&#39;s
+// typically close enough with a reasonably sized cache of states.)
+//
+// The catch is that Daciuk&#39;s algorithm only works if you add your keys in
+// lexicographic ascending order. In our case, since we&#39;re dealing with ranges,
+// we also need the additional requirement that ranges are either equivalent
+// or do not overlap at all. For example, if one were given the following byte
+// ranges:
+//
+//     [BC-BF][80-BF]
+//     [BC-BF][90-BF]
+//
+// Then Daciuk&#39;s algorithm also would not work, since there is nothing to
+// handle the fact that the ranges overlap. They would need to be split apart.
+// Thankfully, Thompson&#39;s algorithm for producing byte ranges for Unicode
+// codepoint ranges meets both of our requirements.
+//
+// ... however, we would also like to be able to compile UTF-8 automata in
+// reverse. We want this because in order to find the starting location of a
+// match using a DFA, we need to run a second DFA---a reversed version of the
+// forward DFA---backwards to discover the match location. Unfortunately, if
+// we reverse our byte sequences for 0x00-0x10FFFF, we get sequences that are
+// can overlap, even if they are sorted:
+//
+//     [00-7F]
+//     [80-BF][80-9F][ED-ED]
+//     [80-BF][80-BF][80-8F][F4-F4]
+//     [80-BF][80-BF][80-BF][F1-F3]
+//     [80-BF][80-BF][90-BF][F0-F0]
+//     [80-BF][80-BF][E1-EC]
+//     [80-BF][80-BF][EE-EF]
+//     [80-BF][A0-BF][E0-E0]
+//     [80-BF][C2-DF]
+//
+// For example, &#39;[80-BF][80-BF][EE-EF]&#39; and &#39;[80-BF][A0-BF][E0-E0]&#39; have
+// overlapping ranges between &#39;[80-BF]&#39; and &#39;[A0-BF]&#39;. Thus, there is no
+// simple way to apply Daciuk&#39;s algorithm.
+//
+// And thus, the range trie was born. The range trie&#39;s only purpose is to take
+// sequences of byte ranges like the ones above, collect them into a trie and
+// then spit them in a sorted fashion with no overlapping ranges. For example,
+// 0x00-0x10FFFF gets translated to:
+//
+//     [0-7F]
+//     [80-BF][80-9F][80-8F][F1-F3]
+//     [80-BF][80-9F][80-8F][F4]
+//     [80-BF][80-9F][90-BF][F0]
+//     [80-BF][80-9F][90-BF][F1-F3]
+//     [80-BF][80-9F][E1-EC]
+//     [80-BF][80-9F][ED]
+//     [80-BF][80-9F][EE-EF]
+//     [80-BF][A0-BF][80-8F][F1-F3]
+//     [80-BF][A0-BF][80-8F][F4]
+//     [80-BF][A0-BF][90-BF][F0]
+//     [80-BF][A0-BF][90-BF][F1-F3]
+//     [80-BF][A0-BF][E0]
+//     [80-BF][A0-BF][E1-EC]
+//     [80-BF][A0-BF][EE-EF]
+//     [80-BF][C2-DF]
+//
+// We&#39;ve thus satisfied our requirements for running Daciuk&#39;s algorithm. All
+// sequences of ranges are sorted, and any corresponding ranges are either
+// exactly equivalent or non-overlapping.
+//
+// In effect, a range trie is building a DFA from a sequence of arbitrary
+// byte ranges. But it uses an algoritm custom tailored to its input, so it
+// is not as costly as traditional DFA construction. While it is still quite
+// a bit more costly than the forward&#39;s case (which only needs Daciuk&#39;s
+// algorithm), it winds up saving a substantial amount of time if one is doing
+// a full DFA powerset construction later by virtue of producing a much much
+// smaller NFA.
+//
+// [1] - https://blog.burntsushi.net/transducers/
+// [2] - https://www.mitpressjournals.org/doi/pdfplus/10.1162/089120100561601
 
-<span class="kw">use</span> <span class="ident">std::cell::RefCell</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::mem</span>;
-<span class="kw">use</span> <span class="ident">std::ops::RangeInclusive</span>;
-<span class="kw">use</span> <span class="ident">std::u32</span>;
+</span><span class="kw">use </span>std::cell::RefCell;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::mem;
+<span class="kw">use </span>std::ops::RangeInclusive;
+<span class="kw">use </span>std::u32;
 
-<span class="kw">use</span> <span class="ident">regex_syntax::utf8::Utf8Range</span>;
+<span class="kw">use </span>regex_syntax::utf8::Utf8Range;
 
-<span class="doccomment">/// A smaller state ID means more effective use of the CPU cache and less</span>
-<span class="doccomment">/// time spent copying. The implementation below will panic if the state ID</span>
-<span class="doccomment">/// space is exhausted, but in order for that to happen, the range trie itself</span>
-<span class="doccomment">/// would use well over 100GB of memory. Moreover, it&#39;s likely impossible</span>
-<span class="doccomment">/// for the state ID space to get that big. In fact, it&#39;s likely that even a</span>
-<span class="doccomment">/// u16 would be good enough here. But it&#39;s not quite clear how to prove this.</span>
-<span class="kw">type</span> <span class="ident">StateID</span> <span class="op">=</span> <span class="ident">u32</span>;
+<span class="doccomment">/// A smaller state ID means more effective use of the CPU cache and less
+/// time spent copying. The implementation below will panic if the state ID
+/// space is exhausted, but in order for that to happen, the range trie itself
+/// would use well over 100GB of memory. Moreover, it&#39;s likely impossible
+/// for the state ID space to get that big. In fact, it&#39;s likely that even a
+/// u16 would be good enough here. But it&#39;s not quite clear how to prove this.
+</span><span class="kw">type </span>StateID = u32;
 
-<span class="doccomment">/// There is only one final state in this trie. Every sequence of byte ranges</span>
-<span class="doccomment">/// added shares the same final state.</span>
-<span class="kw">const</span> <span class="ident">FINAL</span>: <span class="ident">StateID</span> <span class="op">=</span> <span class="number">0</span>;
+<span class="doccomment">/// There is only one final state in this trie. Every sequence of byte ranges
+/// added shares the same final state.
+</span><span class="kw">const </span>FINAL: StateID = <span class="number">0</span>;
 
-<span class="doccomment">/// The root state of the trie.</span>
-<span class="kw">const</span> <span class="ident">ROOT</span>: <span class="ident">StateID</span> <span class="op">=</span> <span class="number">1</span>;
+<span class="doccomment">/// The root state of the trie.
+</span><span class="kw">const </span>ROOT: StateID = <span class="number">1</span>;
 
-<span class="doccomment">/// A range trie represents an ordered set of sequences of bytes.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A range trie accepts as input a sequence of byte ranges and merges</span>
-<span class="doccomment">/// them into the existing set such that the trie can produce a sorted</span>
-<span class="doccomment">/// non-overlapping sequence of byte ranges. The sequence emitted corresponds</span>
-<span class="doccomment">/// precisely to the sequence of bytes matched by the given keys, although the</span>
-<span class="doccomment">/// byte ranges themselves may be split at different boundaries.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The order complexity of this data structure seems difficult to analyze.</span>
-<span class="doccomment">/// If the size of a byte is held as a constant, then insertion is clearly</span>
-<span class="doccomment">/// O(n) where n is the number of byte ranges in the input key. However, if</span>
-<span class="doccomment">/// k=256 is our alphabet size, then insertion could be O(k^2 * n). In</span>
-<span class="doccomment">/// particular it seems possible for pathological inputs to cause insertion</span>
-<span class="doccomment">/// to do a lot of work. However, for what we use this data structure for,</span>
-<span class="doccomment">/// there should be no pathological inputs since the ultimate source is always</span>
-<span class="doccomment">/// a sorted set of Unicode scalar value ranges.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Internally, this trie is setup like a finite state machine. Note though</span>
-<span class="doccomment">/// that it is acyclic.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RangeTrie</span> {
-    <span class="doccomment">/// The states in this trie. The first is always the shared final state.</span>
-    <span class="doccomment">/// The second is always the root state. Otherwise, there is no</span>
-    <span class="doccomment">/// particular order.</span>
-    <span class="ident">states</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// A free-list of states. When a range trie is cleared, all of its states</span>
-    <span class="doccomment">/// are added to list. Creating a new state reuses states from this list</span>
-    <span class="doccomment">/// before allocating a new one.</span>
-    <span class="ident">free</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// A stack for traversing this trie to yield sequences of byte ranges in</span>
-    <span class="doccomment">/// lexicographic order.</span>
-    <span class="ident">iter_stack</span>: <span class="ident">RefCell</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NextIter</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// A bufer that stores the current sequence during iteration.</span>
-    <span class="ident">iter_ranges</span>: <span class="ident">RefCell</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Utf8Range</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// A stack used for traversing the trie in order to (deeply) duplicate</span>
-    <span class="doccomment">/// a state.</span>
-    <span class="ident">dupe_stack</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NextDupe</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// A stack used for traversing the trie during insertion of a new</span>
-    <span class="doccomment">/// sequence of byte ranges.</span>
-    <span class="ident">insert_stack</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NextInsert</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A range trie represents an ordered set of sequences of bytes.
+///
+/// A range trie accepts as input a sequence of byte ranges and merges
+/// them into the existing set such that the trie can produce a sorted
+/// non-overlapping sequence of byte ranges. The sequence emitted corresponds
+/// precisely to the sequence of bytes matched by the given keys, although the
+/// byte ranges themselves may be split at different boundaries.
+///
+/// The order complexity of this data structure seems difficult to analyze.
+/// If the size of a byte is held as a constant, then insertion is clearly
+/// O(n) where n is the number of byte ranges in the input key. However, if
+/// k=256 is our alphabet size, then insertion could be O(k^2 * n). In
+/// particular it seems possible for pathological inputs to cause insertion
+/// to do a lot of work. However, for what we use this data structure for,
+/// there should be no pathological inputs since the ultimate source is always
+/// a sorted set of Unicode scalar value ranges.
+///
+/// Internally, this trie is setup like a finite state machine. Note though
+/// that it is acyclic.
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>RangeTrie {
+    <span class="doccomment">/// The states in this trie. The first is always the shared final state.
+    /// The second is always the root state. Otherwise, there is no
+    /// particular order.
+    </span>states: Vec&lt;State&gt;,
+    <span class="doccomment">/// A free-list of states. When a range trie is cleared, all of its states
+    /// are added to list. Creating a new state reuses states from this list
+    /// before allocating a new one.
+    </span>free: Vec&lt;State&gt;,
+    <span class="doccomment">/// A stack for traversing this trie to yield sequences of byte ranges in
+    /// lexicographic order.
+    </span>iter_stack: RefCell&lt;Vec&lt;NextIter&gt;&gt;,
+    <span class="doccomment">/// A bufer that stores the current sequence during iteration.
+    </span>iter_ranges: RefCell&lt;Vec&lt;Utf8Range&gt;&gt;,
+    <span class="doccomment">/// A stack used for traversing the trie in order to (deeply) duplicate
+    /// a state.
+    </span>dupe_stack: Vec&lt;NextDupe&gt;,
+    <span class="doccomment">/// A stack used for traversing the trie during insertion of a new
+    /// sequence of byte ranges.
+    </span>insert_stack: Vec&lt;NextInsert&gt;,
 }
 
-<span class="doccomment">/// A single state in this trie.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">struct</span> <span class="ident">State</span> {
-    <span class="doccomment">/// A sorted sequence of non-overlapping transitions to other states. Each</span>
-    <span class="doccomment">/// transition corresponds to a single range of bytes.</span>
-    <span class="ident">transitions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Transition</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A single state in this trie.
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">struct </span>State {
+    <span class="doccomment">/// A sorted sequence of non-overlapping transitions to other states. Each
+    /// transition corresponds to a single range of bytes.
+    </span>transitions: Vec&lt;Transition&gt;,
 }
 
-<span class="doccomment">/// A transition is a single range of bytes. If a particular byte is in this</span>
-<span class="doccomment">/// range, then the corresponding machine may transition to the state pointed</span>
-<span class="doccomment">/// to by `next_id`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">struct</span> <span class="ident">Transition</span> {
-    <span class="doccomment">/// The byte range.</span>
-    <span class="ident">range</span>: <span class="ident">Utf8Range</span>,
-    <span class="doccomment">/// The next state to transition to.</span>
-    <span class="ident">next_id</span>: <span class="ident">StateID</span>,
+<span class="doccomment">/// A transition is a single range of bytes. If a particular byte is in this
+/// range, then the corresponding machine may transition to the state pointed
+/// to by `next_id`.
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">struct </span>Transition {
+    <span class="doccomment">/// The byte range.
+    </span>range: Utf8Range,
+    <span class="doccomment">/// The next state to transition to.
+    </span>next_id: StateID,
 }
 
-<span class="kw">impl</span> <span class="ident">RangeTrie</span> {
-    <span class="doccomment">/// Create a new empty range trie.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">RangeTrie</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">trie</span> <span class="op">=</span> <span class="ident">RangeTrie</span> {
-            <span class="ident">states</span>: <span class="macro">vec!</span>[],
-            <span class="ident">free</span>: <span class="macro">vec!</span>[],
-            <span class="ident">iter_stack</span>: <span class="ident">RefCell::new</span>(<span class="macro">vec!</span>[]),
-            <span class="ident">iter_ranges</span>: <span class="ident">RefCell::new</span>(<span class="macro">vec!</span>[]),
-            <span class="ident">dupe_stack</span>: <span class="macro">vec!</span>[],
-            <span class="ident">insert_stack</span>: <span class="macro">vec!</span>[],
+<span class="kw">impl </span>RangeTrie {
+    <span class="doccomment">/// Create a new empty range trie.
+    </span><span class="kw">pub fn </span>new() -&gt; RangeTrie {
+        <span class="kw">let </span><span class="kw-2">mut </span>trie = RangeTrie {
+            states: <span class="macro">vec!</span>[],
+            free: <span class="macro">vec!</span>[],
+            iter_stack: RefCell::new(<span class="macro">vec!</span>[]),
+            iter_ranges: RefCell::new(<span class="macro">vec!</span>[]),
+            dupe_stack: <span class="macro">vec!</span>[],
+            insert_stack: <span class="macro">vec!</span>[],
         };
-        <span class="ident">trie</span>.<span class="ident">clear</span>();
-        <span class="ident">trie</span>
+        trie.clear();
+        trie
     }
 
-    <span class="doccomment">/// Clear this range trie such that it is empty. Clearing a range trie</span>
-    <span class="doccomment">/// and reusing it can beneficial because this may reuse allocations.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">free</span>.<span class="ident">extend</span>(<span class="self">self</span>.<span class="ident">states</span>.<span class="ident">drain</span>(..));
-        <span class="self">self</span>.<span class="ident">add_empty</span>(); <span class="comment">// final</span>
-        <span class="self">self</span>.<span class="ident">add_empty</span>(); <span class="comment">// root</span>
-    }
+    <span class="doccomment">/// Clear this range trie such that it is empty. Clearing a range trie
+    /// and reusing it can beneficial because this may reuse allocations.
+    </span><span class="kw">pub fn </span>clear(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.free.extend(<span class="self">self</span>.states.drain(..));
+        <span class="self">self</span>.add_empty(); <span class="comment">// final
+        </span><span class="self">self</span>.add_empty(); <span class="comment">// root
+    </span>}
 
-    <span class="doccomment">/// Iterate over all of the sequences of byte ranges in this trie, and</span>
-    <span class="doccomment">/// call the provided function for each sequence. Iteration occurs in</span>
-    <span class="doccomment">/// lexicographic order.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span>[<span class="ident">Utf8Range</span>])<span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stack</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">iter_stack</span>.<span class="ident">borrow_mut</span>();
-        <span class="ident">stack</span>.<span class="ident">clear</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ranges</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">iter_ranges</span>.<span class="ident">borrow_mut</span>();
-        <span class="ident">ranges</span>.<span class="ident">clear</span>();
+    <span class="doccomment">/// Iterate over all of the sequences of byte ranges in this trie, and
+    /// call the provided function for each sequence. Iteration occurs in
+    /// lexicographic order.
+    </span><span class="kw">pub fn </span>iter&lt;F: FnMut(<span class="kw-2">&amp;</span>[Utf8Range])&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>f: F) {
+        <span class="kw">let </span><span class="kw-2">mut </span>stack = <span class="self">self</span>.iter_stack.borrow_mut();
+        stack.clear();
+        <span class="kw">let </span><span class="kw-2">mut </span>ranges = <span class="self">self</span>.iter_ranges.borrow_mut();
+        ranges.clear();
 
-        <span class="comment">// We do iteration in a way that permits us to use a single buffer</span>
-        <span class="comment">// for our keys. We iterate in a depth first fashion, while being</span>
-        <span class="comment">// careful to expand our frontier as we move deeper in the trie.</span>
-        <span class="ident">stack</span>.<span class="ident">push</span>(<span class="ident">NextIter</span> { <span class="ident">state_id</span>: <span class="ident">ROOT</span>, <span class="ident">tidx</span>: <span class="number">0</span> });
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">NextIter</span> { <span class="kw-2">mut</span> <span class="ident">state_id</span>, <span class="kw-2">mut</span> <span class="ident">tidx</span> }) <span class="op">=</span> <span class="ident">stack</span>.<span class="ident">pop</span>() {
-            <span class="comment">// This could be implemented more simply without an inner loop</span>
-            <span class="comment">// here, but at the cost of more stack pushes.</span>
-            <span class="kw">loop</span> {
-                <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>(<span class="ident">state_id</span>);
-                <span class="comment">// If we&#39;re visited all transitions in this state, then pop</span>
-                <span class="comment">// back to the parent state.</span>
-                <span class="kw">if</span> <span class="ident">tidx</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">state</span>.<span class="ident">transitions</span>.<span class="ident">len</span>() {
-                    <span class="ident">ranges</span>.<span class="ident">pop</span>();
+        <span class="comment">// We do iteration in a way that permits us to use a single buffer
+        // for our keys. We iterate in a depth first fashion, while being
+        // careful to expand our frontier as we move deeper in the trie.
+        </span>stack.push(NextIter { state_id: ROOT, tidx: <span class="number">0 </span>});
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(NextIter { <span class="kw-2">mut </span>state_id, <span class="kw-2">mut </span>tidx }) = stack.pop() {
+            <span class="comment">// This could be implemented more simply without an inner loop
+            // here, but at the cost of more stack pushes.
+            </span><span class="kw">loop </span>{
+                <span class="kw">let </span>state = <span class="self">self</span>.state(state_id);
+                <span class="comment">// If we&#39;re visited all transitions in this state, then pop
+                // back to the parent state.
+                </span><span class="kw">if </span>tidx &gt;= state.transitions.len() {
+                    ranges.pop();
                     <span class="kw">break</span>;
                 }
 
-                <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">state</span>.<span class="ident">transitions</span>[<span class="ident">tidx</span>];
-                <span class="ident">ranges</span>.<span class="ident">push</span>(<span class="ident">t</span>.<span class="ident">range</span>);
-                <span class="kw">if</span> <span class="ident">t</span>.<span class="ident">next_id</span> <span class="op">==</span> <span class="ident">FINAL</span> {
-                    <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="ident">ranges</span>);
-                    <span class="ident">ranges</span>.<span class="ident">pop</span>();
-                    <span class="ident">tidx</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                } <span class="kw">else</span> {
-                    <span class="comment">// Expand our frontier. Once we come back to this state</span>
-                    <span class="comment">// via the stack, start in on the next transition.</span>
-                    <span class="ident">stack</span>.<span class="ident">push</span>(<span class="ident">NextIter</span> { <span class="ident">state_id</span>, <span class="ident">tidx</span>: <span class="ident">tidx</span> <span class="op">+</span> <span class="number">1</span> });
-                    <span class="comment">// Otherwise, move to the first transition of the next</span>
-                    <span class="comment">// state.</span>
-                    <span class="ident">state_id</span> <span class="op">=</span> <span class="ident">t</span>.<span class="ident">next_id</span>;
-                    <span class="ident">tidx</span> <span class="op">=</span> <span class="number">0</span>;
+                <span class="kw">let </span>t = <span class="kw-2">&amp;</span>state.transitions[tidx];
+                ranges.push(t.range);
+                <span class="kw">if </span>t.next_id == FINAL {
+                    f(<span class="kw-2">&amp;</span>ranges);
+                    ranges.pop();
+                    tidx += <span class="number">1</span>;
+                } <span class="kw">else </span>{
+                    <span class="comment">// Expand our frontier. Once we come back to this state
+                    // via the stack, start in on the next transition.
+                    </span>stack.push(NextIter { state_id, tidx: tidx + <span class="number">1 </span>});
+                    <span class="comment">// Otherwise, move to the first transition of the next
+                    // state.
+                    </span>state_id = t.next_id;
+                    tidx = <span class="number">0</span>;
                 }
             }
         }
     }
 
-    <span class="doccomment">/// Inserts a new sequence of ranges into this trie.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The sequence given must be non-empty and must not have a length</span>
-    <span class="doccomment">/// exceeding 4.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ranges</span>: <span class="kw-2">&amp;</span>[<span class="ident">Utf8Range</span>]) {
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">ranges</span>.<span class="ident">is_empty</span>());
-        <span class="macro">assert!</span>(<span class="ident">ranges</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">4</span>);
+    <span class="doccomment">/// Inserts a new sequence of ranges into this trie.
+    ///
+    /// The sequence given must be non-empty and must not have a length
+    /// exceeding 4.
+    </span><span class="kw">pub fn </span>insert(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ranges: <span class="kw-2">&amp;</span>[Utf8Range]) {
+        <span class="macro">assert!</span>(!ranges.is_empty());
+        <span class="macro">assert!</span>(ranges.len() &lt;= <span class="number">4</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stack</span> <span class="op">=</span> <span class="ident">mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">insert_stack</span>, <span class="macro">vec!</span>[]);
-        <span class="ident">stack</span>.<span class="ident">clear</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>stack = mem::replace(<span class="kw-2">&amp;mut </span><span class="self">self</span>.insert_stack, <span class="macro">vec!</span>[]);
+        stack.clear();
 
-        <span class="ident">stack</span>.<span class="ident">push</span>(<span class="ident">NextInsert::new</span>(<span class="ident">ROOT</span>, <span class="ident">ranges</span>));
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">next</span>) <span class="op">=</span> <span class="ident">stack</span>.<span class="ident">pop</span>() {
-            <span class="kw">let</span> (<span class="ident">state_id</span>, <span class="ident">ranges</span>) <span class="op">=</span> (<span class="ident">next</span>.<span class="ident">state_id</span>(), <span class="ident">next</span>.<span class="ident">ranges</span>());
-            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">ranges</span>.<span class="ident">is_empty</span>());
+        stack.push(NextInsert::new(ROOT, ranges));
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(next) = stack.pop() {
+            <span class="kw">let </span>(state_id, ranges) = (next.state_id(), next.ranges());
+            <span class="macro">assert!</span>(!ranges.is_empty());
 
-            <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">new</span>, <span class="ident">rest</span>) <span class="op">=</span> (<span class="ident">ranges</span>[<span class="number">0</span>], <span class="kw-2">&amp;</span><span class="ident">ranges</span>[<span class="number">1</span>..]);
+            <span class="kw">let </span>(<span class="kw-2">mut </span>new, rest) = (ranges[<span class="number">0</span>], <span class="kw-2">&amp;</span>ranges[<span class="number">1</span>..]);
 
-            <span class="comment">// i corresponds to the position of the existing transition on</span>
-            <span class="comment">// which we are operating. Typically, the result is to remove the</span>
-            <span class="comment">// transition and replace it with two or more new transitions</span>
-            <span class="comment">// corresponding to the partitions generated by splitting the</span>
-            <span class="comment">// &#39;new&#39; with the ith transition&#39;s range.</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>(<span class="ident">state_id</span>).<span class="ident">find</span>(<span class="ident">new</span>);
+            <span class="comment">// i corresponds to the position of the existing transition on
+            // which we are operating. Typically, the result is to remove the
+            // transition and replace it with two or more new transitions
+            // corresponding to the partitions generated by splitting the
+            // &#39;new&#39; with the ith transition&#39;s range.
+            </span><span class="kw">let </span><span class="kw-2">mut </span>i = <span class="self">self</span>.state(state_id).find(new);
 
-            <span class="comment">// In this case, there is no overlap *and* the new range is greater</span>
-            <span class="comment">// than all existing ranges. So we can just add it to the end.</span>
-            <span class="kw">if</span> <span class="ident">i</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">state</span>(<span class="ident">state_id</span>).<span class="ident">transitions</span>.<span class="ident">len</span>() {
-                <span class="kw">let</span> <span class="ident">next_id</span> <span class="op">=</span> <span class="ident">NextInsert::push</span>(<span class="self">self</span>, <span class="kw-2">&amp;mut</span> <span class="ident">stack</span>, <span class="ident">rest</span>);
-                <span class="self">self</span>.<span class="ident">add_transition</span>(<span class="ident">state_id</span>, <span class="ident">new</span>, <span class="ident">next_id</span>);
+            <span class="comment">// In this case, there is no overlap *and* the new range is greater
+            // than all existing ranges. So we can just add it to the end.
+            </span><span class="kw">if </span>i == <span class="self">self</span>.state(state_id).transitions.len() {
+                <span class="kw">let </span>next_id = NextInsert::push(<span class="self">self</span>, <span class="kw-2">&amp;mut </span>stack, rest);
+                <span class="self">self</span>.add_transition(state_id, new, next_id);
                 <span class="kw">continue</span>;
             }
 
-            <span class="comment">// The need for this loop is a bit subtle, buf basically, after</span>
-            <span class="comment">// we&#39;ve handled the partitions from our initial split, it&#39;s</span>
-            <span class="comment">// possible that there will be a partition leftover that overlaps</span>
-            <span class="comment">// with a subsequent transition. If so, then we have to repeat</span>
-            <span class="comment">// the split process again with the leftovers and that subsequent</span>
-            <span class="comment">// transition.</span>
-            <span class="lifetime">&#39;OUTER</span>: <span class="kw">loop</span> {
-                <span class="kw">let</span> <span class="ident">old</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>(<span class="ident">state_id</span>).<span class="ident">transitions</span>[<span class="ident">i</span>].<span class="ident">clone</span>();
-                <span class="kw">let</span> <span class="ident">split</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">Split::new</span>(<span class="ident">old</span>.<span class="ident">range</span>, <span class="ident">new</span>) {
-                    <span class="prelude-val">Some</span>(<span class="ident">split</span>) =&gt; <span class="ident">split</span>,
-                    <span class="prelude-val">None</span> =&gt; {
-                        <span class="kw">let</span> <span class="ident">next_id</span> <span class="op">=</span> <span class="ident">NextInsert::push</span>(<span class="self">self</span>, <span class="kw-2">&amp;mut</span> <span class="ident">stack</span>, <span class="ident">rest</span>);
-                        <span class="self">self</span>.<span class="ident">add_transition_at</span>(<span class="ident">i</span>, <span class="ident">state_id</span>, <span class="ident">new</span>, <span class="ident">next_id</span>);
+            <span class="comment">// The need for this loop is a bit subtle, buf basically, after
+            // we&#39;ve handled the partitions from our initial split, it&#39;s
+            // possible that there will be a partition leftover that overlaps
+            // with a subsequent transition. If so, then we have to repeat
+            // the split process again with the leftovers and that subsequent
+            // transition.
+            </span><span class="lifetime">&#39;OUTER</span>: <span class="kw">loop </span>{
+                <span class="kw">let </span>old = <span class="self">self</span>.state(state_id).transitions[i].clone();
+                <span class="kw">let </span>split = <span class="kw">match </span>Split::new(old.range, new) {
+                    <span class="prelude-val">Some</span>(split) =&gt; split,
+                    <span class="prelude-val">None </span>=&gt; {
+                        <span class="kw">let </span>next_id = NextInsert::push(<span class="self">self</span>, <span class="kw-2">&amp;mut </span>stack, rest);
+                        <span class="self">self</span>.add_transition_at(i, state_id, new, next_id);
                         <span class="kw">continue</span>;
                     }
                 };
-                <span class="kw">let</span> <span class="ident">splits</span> <span class="op">=</span> <span class="ident">split</span>.<span class="ident">as_slice</span>();
-                <span class="comment">// If we only have one partition, then the ranges must be</span>
-                <span class="comment">// equivalent. There&#39;s nothing to do here for this state, so</span>
-                <span class="comment">// just move on to the next one.</span>
-                <span class="kw">if</span> <span class="ident">splits</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
-                    <span class="comment">// ... but only if we have anything left to do.</span>
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">rest</span>.<span class="ident">is_empty</span>() {
-                        <span class="ident">stack</span>.<span class="ident">push</span>(<span class="ident">NextInsert::new</span>(<span class="ident">old</span>.<span class="ident">next_id</span>, <span class="ident">rest</span>));
+                <span class="kw">let </span>splits = split.as_slice();
+                <span class="comment">// If we only have one partition, then the ranges must be
+                // equivalent. There&#39;s nothing to do here for this state, so
+                // just move on to the next one.
+                </span><span class="kw">if </span>splits.len() == <span class="number">1 </span>{
+                    <span class="comment">// ... but only if we have anything left to do.
+                    </span><span class="kw">if </span>!rest.is_empty() {
+                        stack.push(NextInsert::new(old.next_id, rest));
                     }
                     <span class="kw">break</span>;
                 }
-                <span class="comment">// At this point, we know that &#39;split&#39; is non-empty and there</span>
-                <span class="comment">// must be some overlap AND that the two ranges are not</span>
-                <span class="comment">// equivalent. Therefore, the existing range MUST be removed</span>
-                <span class="comment">// and split up somehow. Instead of actually doing the removal</span>
-                <span class="comment">// and then a subsequent insertion---with all the memory</span>
-                <span class="comment">// shuffling that entails---we simply overwrite the transition</span>
-                <span class="comment">// at position `i` for the first new transition we want to</span>
-                <span class="comment">// insert. After that, we&#39;re forced to do expensive inserts.</span>
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">first</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">add_trans</span> <span class="op">=</span>
-                    <span class="op">|</span><span class="ident">trie</span>: <span class="kw-2">&amp;mut</span> <span class="ident">RangeTrie</span>, <span class="ident">pos</span>, <span class="ident">from</span>, <span class="ident">range</span>, <span class="ident">to</span><span class="op">|</span> {
-                        <span class="kw">if</span> <span class="ident">first</span> {
-                            <span class="ident">trie</span>.<span class="ident">set_transition_at</span>(<span class="ident">pos</span>, <span class="ident">from</span>, <span class="ident">range</span>, <span class="ident">to</span>);
-                            <span class="ident">first</span> <span class="op">=</span> <span class="bool-val">false</span>;
-                        } <span class="kw">else</span> {
-                            <span class="ident">trie</span>.<span class="ident">add_transition_at</span>(<span class="ident">pos</span>, <span class="ident">from</span>, <span class="ident">range</span>, <span class="ident">to</span>);
+                <span class="comment">// At this point, we know that &#39;split&#39; is non-empty and there
+                // must be some overlap AND that the two ranges are not
+                // equivalent. Therefore, the existing range MUST be removed
+                // and split up somehow. Instead of actually doing the removal
+                // and then a subsequent insertion---with all the memory
+                // shuffling that entails---we simply overwrite the transition
+                // at position `i` for the first new transition we want to
+                // insert. After that, we&#39;re forced to do expensive inserts.
+                </span><span class="kw">let </span><span class="kw-2">mut </span>first = <span class="bool-val">true</span>;
+                <span class="kw">let </span><span class="kw-2">mut </span>add_trans =
+                    |trie: <span class="kw-2">&amp;mut </span>RangeTrie, pos, from, range, to| {
+                        <span class="kw">if </span>first {
+                            trie.set_transition_at(pos, from, range, to);
+                            first = <span class="bool-val">false</span>;
+                        } <span class="kw">else </span>{
+                            trie.add_transition_at(pos, from, range, to);
                         }
                     };
-                <span class="kw">for</span> (<span class="ident">j</span>, <span class="kw-2">&amp;</span><span class="ident">srange</span>) <span class="kw">in</span> <span class="ident">splits</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-                    <span class="kw">match</span> <span class="ident">srange</span> {
-                        <span class="ident">SplitRange::Old</span>(<span class="ident">r</span>) =&gt; {
-                            <span class="comment">// Deep clone the state pointed to by the ith</span>
-                            <span class="comment">// transition. This is always necessary since &#39;old&#39;</span>
-                            <span class="comment">// is always coupled with at least a &#39;both&#39;</span>
-                            <span class="comment">// partition. We don&#39;t want any new changes made</span>
-                            <span class="comment">// via the &#39;both&#39; partition to impact the part of</span>
-                            <span class="comment">// the transition that doesn&#39;t overlap with the</span>
-                            <span class="comment">// new range.</span>
-                            <span class="kw">let</span> <span class="ident">dup_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">duplicate</span>(<span class="ident">old</span>.<span class="ident">next_id</span>);
-                            <span class="ident">add_trans</span>(<span class="self">self</span>, <span class="ident">i</span>, <span class="ident">state_id</span>, <span class="ident">r</span>, <span class="ident">dup_id</span>);
+                <span class="kw">for </span>(j, <span class="kw-2">&amp;</span>srange) <span class="kw">in </span>splits.iter().enumerate() {
+                    <span class="kw">match </span>srange {
+                        SplitRange::Old(r) =&gt; {
+                            <span class="comment">// Deep clone the state pointed to by the ith
+                            // transition. This is always necessary since &#39;old&#39;
+                            // is always coupled with at least a &#39;both&#39;
+                            // partition. We don&#39;t want any new changes made
+                            // via the &#39;both&#39; partition to impact the part of
+                            // the transition that doesn&#39;t overlap with the
+                            // new range.
+                            </span><span class="kw">let </span>dup_id = <span class="self">self</span>.duplicate(old.next_id);
+                            add_trans(<span class="self">self</span>, i, state_id, r, dup_id);
                         }
-                        <span class="ident">SplitRange::New</span>(<span class="ident">r</span>) =&gt; {
-                            <span class="comment">// This is a bit subtle, but if this happens to be</span>
-                            <span class="comment">// the last partition in our split, it is possible</span>
-                            <span class="comment">// that this overlaps with a subsequent transition.</span>
-                            <span class="comment">// If it does, then we must repeat the whole</span>
-                            <span class="comment">// splitting process over again with `r` and the</span>
-                            <span class="comment">// subsequent transition.</span>
-                            {
-                                <span class="kw">let</span> <span class="ident">trans</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">state</span>(<span class="ident">state_id</span>).<span class="ident">transitions</span>;
-                                <span class="kw">if</span> <span class="ident">j</span> <span class="op">+</span> <span class="number">1</span> <span class="op">==</span> <span class="ident">splits</span>.<span class="ident">len</span>()
-                                    <span class="op">&amp;&amp;</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="ident">trans</span>.<span class="ident">len</span>()
-                                    <span class="op">&amp;&amp;</span> <span class="ident">intersects</span>(<span class="ident">r</span>, <span class="ident">trans</span>[<span class="ident">i</span>].<span class="ident">range</span>)
+                        SplitRange::New(r) =&gt; {
+                            <span class="comment">// This is a bit subtle, but if this happens to be
+                            // the last partition in our split, it is possible
+                            // that this overlaps with a subsequent transition.
+                            // If it does, then we must repeat the whole
+                            // splitting process over again with `r` and the
+                            // subsequent transition.
+                            </span>{
+                                <span class="kw">let </span>trans = <span class="kw-2">&amp;</span><span class="self">self</span>.state(state_id).transitions;
+                                <span class="kw">if </span>j + <span class="number">1 </span>== splits.len()
+                                    &amp;&amp; i &lt; trans.len()
+                                    &amp;&amp; intersects(r, trans[i].range)
                                 {
-                                    <span class="ident">new</span> <span class="op">=</span> <span class="ident">r</span>;
-                                    <span class="kw">continue</span> <span class="lifetime">&#39;OUTER</span>;
+                                    new = r;
+                                    <span class="kw">continue </span><span class="lifetime">&#39;OUTER</span>;
                                 }
                             }
 
-                            <span class="comment">// ... otherwise, setup exploration for a new</span>
-                            <span class="comment">// empty state and add a brand new transition for</span>
-                            <span class="comment">// this new range.</span>
-                            <span class="kw">let</span> <span class="ident">next_id</span> <span class="op">=</span>
-                                <span class="ident">NextInsert::push</span>(<span class="self">self</span>, <span class="kw-2">&amp;mut</span> <span class="ident">stack</span>, <span class="ident">rest</span>);
-                            <span class="ident">add_trans</span>(<span class="self">self</span>, <span class="ident">i</span>, <span class="ident">state_id</span>, <span class="ident">r</span>, <span class="ident">next_id</span>);
+                            <span class="comment">// ... otherwise, setup exploration for a new
+                            // empty state and add a brand new transition for
+                            // this new range.
+                            </span><span class="kw">let </span>next_id =
+                                NextInsert::push(<span class="self">self</span>, <span class="kw-2">&amp;mut </span>stack, rest);
+                            add_trans(<span class="self">self</span>, i, state_id, r, next_id);
                         }
-                        <span class="ident">SplitRange::Both</span>(<span class="ident">r</span>) =&gt; {
-                            <span class="comment">// Continue adding the remaining ranges on this</span>
-                            <span class="comment">// path and update the transition with the new</span>
-                            <span class="comment">// range.</span>
-                            <span class="kw">if</span> <span class="op">!</span><span class="ident">rest</span>.<span class="ident">is_empty</span>() {
-                                <span class="ident">stack</span>.<span class="ident">push</span>(<span class="ident">NextInsert::new</span>(<span class="ident">old</span>.<span class="ident">next_id</span>, <span class="ident">rest</span>));
+                        SplitRange::Both(r) =&gt; {
+                            <span class="comment">// Continue adding the remaining ranges on this
+                            // path and update the transition with the new
+                            // range.
+                            </span><span class="kw">if </span>!rest.is_empty() {
+                                stack.push(NextInsert::new(old.next_id, rest));
                             }
-                            <span class="ident">add_trans</span>(<span class="self">self</span>, <span class="ident">i</span>, <span class="ident">state_id</span>, <span class="ident">r</span>, <span class="ident">old</span>.<span class="ident">next_id</span>);
+                            add_trans(<span class="self">self</span>, i, state_id, r, old.next_id);
                         }
                     }
-                    <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                    i += <span class="number">1</span>;
                 }
-                <span class="comment">// If we&#39;ve reached this point, then we know that there are</span>
-                <span class="comment">// no subsequent transitions with any overlap. Therefore, we</span>
-                <span class="comment">// can stop processing this range and move on to the next one.</span>
-                <span class="kw">break</span>;
+                <span class="comment">// If we&#39;ve reached this point, then we know that there are
+                // no subsequent transitions with any overlap. Therefore, we
+                // can stop processing this range and move on to the next one.
+                </span><span class="kw">break</span>;
             }
         }
-        <span class="self">self</span>.<span class="ident">insert_stack</span> <span class="op">=</span> <span class="ident">stack</span>;
+        <span class="self">self</span>.insert_stack = stack;
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_empty</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">StateID</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">states</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span> <span class="op">&gt;</span> <span class="ident">u32::MAX</span> <span class="kw">as</span> <span class="ident">u64</span> {
-            <span class="comment">// This generally should not happen since a range trie is only</span>
-            <span class="comment">// ever used to compile a single sequence of Unicode scalar values.</span>
-            <span class="comment">// If we ever got to this point, we would, at *minimum*, be using</span>
-            <span class="comment">// 96GB in just the range trie alone.</span>
-            <span class="macro">panic!</span>(<span class="string">&quot;too many sequences added to range trie&quot;</span>);
+    <span class="kw">pub fn </span>add_empty(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; StateID {
+        <span class="kw">if </span><span class="self">self</span>.states.len() <span class="kw">as </span>u64 &gt; u32::MAX <span class="kw">as </span>u64 {
+            <span class="comment">// This generally should not happen since a range trie is only
+            // ever used to compile a single sequence of Unicode scalar values.
+            // If we ever got to this point, we would, at *minimum*, be using
+            // 96GB in just the range trie alone.
+            </span><span class="macro">panic!</span>(<span class="string">&quot;too many sequences added to range trie&quot;</span>);
         }
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">states</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">StateID</span>;
-        <span class="comment">// If we have some free states available, then use them to avoid</span>
-        <span class="comment">// more allocations.</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">state</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">free</span>.<span class="ident">pop</span>() {
-            <span class="ident">state</span>.<span class="ident">clear</span>();
-            <span class="self">self</span>.<span class="ident">states</span>.<span class="ident">push</span>(<span class="ident">state</span>);
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">states</span>.<span class="ident">push</span>(<span class="ident">State</span> { <span class="ident">transitions</span>: <span class="macro">vec!</span>[] });
+        <span class="kw">let </span>id = <span class="self">self</span>.states.len() <span class="kw">as </span>StateID;
+        <span class="comment">// If we have some free states available, then use them to avoid
+        // more allocations.
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>state) = <span class="self">self</span>.free.pop() {
+            state.clear();
+            <span class="self">self</span>.states.push(state);
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.states.push(State { transitions: <span class="macro">vec!</span>[] });
         }
-        <span class="ident">id</span>
+        id
     }
 
-    <span class="doccomment">/// Performs a deep clone of the given state and returns the duplicate&#39;s</span>
-    <span class="doccomment">/// state ID.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A &quot;deep clone&quot; in this context means that the state given along with</span>
-    <span class="doccomment">/// recursively all states that it points to are copied. Once complete,</span>
-    <span class="doccomment">/// the given state ID and the returned state ID share nothing.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is useful during range trie insertion when a new range overlaps</span>
-    <span class="doccomment">/// with an existing range that is bigger than the new one. The part of</span>
-    <span class="doccomment">/// the existing range that does *not* overlap with the new one is that</span>
-    <span class="doccomment">/// duplicated so that adding the new range to the overlap doesn&#39;t disturb</span>
-    <span class="doccomment">/// the non-overlapping portion.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// There&#39;s one exception: if old_id is the final state, then it is not</span>
-    <span class="doccomment">/// duplicated and the same final state is returned. This is because all</span>
-    <span class="doccomment">/// final states in this trie are equivalent.</span>
-    <span class="kw">fn</span> <span class="ident">duplicate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">old_id</span>: <span class="ident">StateID</span>) -&gt; <span class="ident">StateID</span> {
-        <span class="kw">if</span> <span class="ident">old_id</span> <span class="op">==</span> <span class="ident">FINAL</span> {
-            <span class="kw">return</span> <span class="ident">FINAL</span>;
+    <span class="doccomment">/// Performs a deep clone of the given state and returns the duplicate&#39;s
+    /// state ID.
+    ///
+    /// A &quot;deep clone&quot; in this context means that the state given along with
+    /// recursively all states that it points to are copied. Once complete,
+    /// the given state ID and the returned state ID share nothing.
+    ///
+    /// This is useful during range trie insertion when a new range overlaps
+    /// with an existing range that is bigger than the new one. The part of
+    /// the existing range that does *not* overlap with the new one is that
+    /// duplicated so that adding the new range to the overlap doesn&#39;t disturb
+    /// the non-overlapping portion.
+    ///
+    /// There&#39;s one exception: if old_id is the final state, then it is not
+    /// duplicated and the same final state is returned. This is because all
+    /// final states in this trie are equivalent.
+    </span><span class="kw">fn </span>duplicate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, old_id: StateID) -&gt; StateID {
+        <span class="kw">if </span>old_id == FINAL {
+            <span class="kw">return </span>FINAL;
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stack</span> <span class="op">=</span> <span class="ident">mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">dupe_stack</span>, <span class="macro">vec!</span>[]);
-        <span class="ident">stack</span>.<span class="ident">clear</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>stack = mem::replace(<span class="kw-2">&amp;mut </span><span class="self">self</span>.dupe_stack, <span class="macro">vec!</span>[]);
+        stack.clear();
 
-        <span class="kw">let</span> <span class="ident">new_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">add_empty</span>();
-        <span class="comment">// old_id is the state we&#39;re cloning and new_id is the ID of the</span>
-        <span class="comment">// duplicated state for old_id.</span>
-        <span class="ident">stack</span>.<span class="ident">push</span>(<span class="ident">NextDupe</span> { <span class="ident">old_id</span>, <span class="ident">new_id</span> });
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">NextDupe</span> { <span class="ident">old_id</span>, <span class="ident">new_id</span> }) <span class="op">=</span> <span class="ident">stack</span>.<span class="ident">pop</span>() {
-            <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="self">self</span>.<span class="ident">state</span>(<span class="ident">old_id</span>).<span class="ident">transitions</span>.<span class="ident">len</span>() {
-                <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>(<span class="ident">old_id</span>).<span class="ident">transitions</span>[<span class="ident">i</span>].<span class="ident">clone</span>();
-                <span class="kw">if</span> <span class="ident">t</span>.<span class="ident">next_id</span> <span class="op">==</span> <span class="ident">FINAL</span> {
-                    <span class="comment">// All final states are the same, so there&#39;s no need to</span>
-                    <span class="comment">// duplicate it.</span>
-                    <span class="self">self</span>.<span class="ident">add_transition</span>(<span class="ident">new_id</span>, <span class="ident">t</span>.<span class="ident">range</span>, <span class="ident">FINAL</span>);
+        <span class="kw">let </span>new_id = <span class="self">self</span>.add_empty();
+        <span class="comment">// old_id is the state we&#39;re cloning and new_id is the ID of the
+        // duplicated state for old_id.
+        </span>stack.push(NextDupe { old_id, new_id });
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(NextDupe { old_id, new_id }) = stack.pop() {
+            <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="self">self</span>.state(old_id).transitions.len() {
+                <span class="kw">let </span>t = <span class="self">self</span>.state(old_id).transitions[i].clone();
+                <span class="kw">if </span>t.next_id == FINAL {
+                    <span class="comment">// All final states are the same, so there&#39;s no need to
+                    // duplicate it.
+                    </span><span class="self">self</span>.add_transition(new_id, t.range, FINAL);
                     <span class="kw">continue</span>;
                 }
 
-                <span class="kw">let</span> <span class="ident">new_child_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">add_empty</span>();
-                <span class="self">self</span>.<span class="ident">add_transition</span>(<span class="ident">new_id</span>, <span class="ident">t</span>.<span class="ident">range</span>, <span class="ident">new_child_id</span>);
-                <span class="ident">stack</span>.<span class="ident">push</span>(<span class="ident">NextDupe</span> {
-                    <span class="ident">old_id</span>: <span class="ident">t</span>.<span class="ident">next_id</span>,
-                    <span class="ident">new_id</span>: <span class="ident">new_child_id</span>,
+                <span class="kw">let </span>new_child_id = <span class="self">self</span>.add_empty();
+                <span class="self">self</span>.add_transition(new_id, t.range, new_child_id);
+                stack.push(NextDupe {
+                    old_id: t.next_id,
+                    new_id: new_child_id,
                 });
             }
         }
-        <span class="self">self</span>.<span class="ident">dupe_stack</span> <span class="op">=</span> <span class="ident">stack</span>;
-        <span class="ident">new_id</span>
+        <span class="self">self</span>.dupe_stack = stack;
+        new_id
     }
 
-    <span class="doccomment">/// Adds the given transition to the given state.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Callers must ensure that all previous transitions in this state</span>
-    <span class="doccomment">/// are lexicographically smaller than the given range.</span>
-    <span class="kw">fn</span> <span class="ident">add_transition</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">from_id</span>: <span class="ident">StateID</span>,
-        <span class="ident">range</span>: <span class="ident">Utf8Range</span>,
-        <span class="ident">next_id</span>: <span class="ident">StateID</span>,
+    <span class="doccomment">/// Adds the given transition to the given state.
+    ///
+    /// Callers must ensure that all previous transitions in this state
+    /// are lexicographically smaller than the given range.
+    </span><span class="kw">fn </span>add_transition(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        from_id: StateID,
+        range: Utf8Range,
+        next_id: StateID,
     ) {
-        <span class="self">self</span>.<span class="ident">state_mut</span>(<span class="ident">from_id</span>)
-            .<span class="ident">transitions</span>
-            .<span class="ident">push</span>(<span class="ident">Transition</span> { <span class="ident">range</span>, <span class="ident">next_id</span> });
+        <span class="self">self</span>.state_mut(from_id)
+            .transitions
+            .push(Transition { range, next_id });
     }
 
-    <span class="doccomment">/// Like `add_transition`, except this inserts the transition just before</span>
-    <span class="doccomment">/// the ith transition.</span>
-    <span class="kw">fn</span> <span class="ident">add_transition_at</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">i</span>: <span class="ident">usize</span>,
-        <span class="ident">from_id</span>: <span class="ident">StateID</span>,
-        <span class="ident">range</span>: <span class="ident">Utf8Range</span>,
-        <span class="ident">next_id</span>: <span class="ident">StateID</span>,
+    <span class="doccomment">/// Like `add_transition`, except this inserts the transition just before
+    /// the ith transition.
+    </span><span class="kw">fn </span>add_transition_at(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        i: usize,
+        from_id: StateID,
+        range: Utf8Range,
+        next_id: StateID,
     ) {
-        <span class="self">self</span>.<span class="ident">state_mut</span>(<span class="ident">from_id</span>)
-            .<span class="ident">transitions</span>
-            .<span class="ident">insert</span>(<span class="ident">i</span>, <span class="ident">Transition</span> { <span class="ident">range</span>, <span class="ident">next_id</span> });
+        <span class="self">self</span>.state_mut(from_id)
+            .transitions
+            .insert(i, Transition { range, next_id });
     }
 
-    <span class="doccomment">/// Overwrites the transition at position i with the given transition.</span>
-    <span class="kw">fn</span> <span class="ident">set_transition_at</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">i</span>: <span class="ident">usize</span>,
-        <span class="ident">from_id</span>: <span class="ident">StateID</span>,
-        <span class="ident">range</span>: <span class="ident">Utf8Range</span>,
-        <span class="ident">next_id</span>: <span class="ident">StateID</span>,
+    <span class="doccomment">/// Overwrites the transition at position i with the given transition.
+    </span><span class="kw">fn </span>set_transition_at(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        i: usize,
+        from_id: StateID,
+        range: Utf8Range,
+        next_id: StateID,
     ) {
-        <span class="self">self</span>.<span class="ident">state_mut</span>(<span class="ident">from_id</span>).<span class="ident">transitions</span>[<span class="ident">i</span>] <span class="op">=</span> <span class="ident">Transition</span> { <span class="ident">range</span>, <span class="ident">next_id</span> };
+        <span class="self">self</span>.state_mut(from_id).transitions[i] = Transition { range, next_id };
     }
 
-    <span class="doccomment">/// Return an immutable borrow for the state with the given ID.</span>
-    <span class="kw">fn</span> <span class="ident">state</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">StateID</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">State</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">states</span>[<span class="ident">id</span> <span class="kw">as</span> <span class="ident">usize</span>]
+    <span class="doccomment">/// Return an immutable borrow for the state with the given ID.
+    </span><span class="kw">fn </span>state(<span class="kw-2">&amp;</span><span class="self">self</span>, id: StateID) -&gt; <span class="kw-2">&amp;</span>State {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.states[id <span class="kw">as </span>usize]
     }
 
-    <span class="doccomment">/// Return a mutable borrow for the state with the given ID.</span>
-    <span class="kw">fn</span> <span class="ident">state_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">StateID</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">State</span> {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">states</span>[<span class="ident">id</span> <span class="kw">as</span> <span class="ident">usize</span>]
+    <span class="doccomment">/// Return a mutable borrow for the state with the given ID.
+    </span><span class="kw">fn </span>state_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: StateID) -&gt; <span class="kw-2">&amp;mut </span>State {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.states[id <span class="kw">as </span>usize]
     }
 }
 
-<span class="kw">impl</span> <span class="ident">State</span> {
-    <span class="doccomment">/// Find the position at which the given range should be inserted in this</span>
-    <span class="doccomment">/// state.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The position returned is always in the inclusive range</span>
-    <span class="doccomment">/// [0, transitions.len()]. If &#39;transitions.len()&#39; is returned, then the</span>
-    <span class="doccomment">/// given range overlaps with no other range in this state *and* is greater</span>
-    <span class="doccomment">/// than all of them.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For all other possible positions, the given range either overlaps</span>
-    <span class="doccomment">/// with the transition at that position or is otherwise less than it</span>
-    <span class="doccomment">/// with no overlap (and is greater than the previous transition). In the</span>
-    <span class="doccomment">/// former case, careful attention must be paid to inserting this range</span>
-    <span class="doccomment">/// as a new transition. In the latter case, the range can be inserted as</span>
-    <span class="doccomment">/// a new transition at the given position without disrupting any other</span>
-    <span class="doccomment">/// transitions.</span>
-    <span class="kw">fn</span> <span class="ident">find</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">range</span>: <span class="ident">Utf8Range</span>) -&gt; <span class="ident">usize</span> {
-        <span class="doccomment">/// Returns the position `i` at which `pred(xs[i])` first returns true</span>
-        <span class="doccomment">/// such that for all `j &gt;= i`, `pred(xs[j]) == true`. If `pred` never</span>
-        <span class="doccomment">/// returns true, then `xs.len()` is returned.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// We roll our own binary search because it doesn&#39;t seem like the</span>
-        <span class="doccomment">/// standard library&#39;s binary search can be used here. Namely, if</span>
-        <span class="doccomment">/// there is an overlapping range, then we want to find the first such</span>
-        <span class="doccomment">/// occurrence, but there may be many. Or at least, it&#39;s not quite</span>
-        <span class="doccomment">/// clear to me how to do it.</span>
-        <span class="kw">fn</span> <span class="ident">binary_search</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">xs</span>: <span class="kw-2">&amp;</span>[<span class="ident">T</span>], <span class="kw-2">mut</span> <span class="ident">pred</span>: <span class="ident">F</span>) -&gt; <span class="ident">usize</span>
-        <span class="kw">where</span>
-            <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">bool</span>,
+<span class="kw">impl </span>State {
+    <span class="doccomment">/// Find the position at which the given range should be inserted in this
+    /// state.
+    ///
+    /// The position returned is always in the inclusive range
+    /// [0, transitions.len()]. If &#39;transitions.len()&#39; is returned, then the
+    /// given range overlaps with no other range in this state *and* is greater
+    /// than all of them.
+    ///
+    /// For all other possible positions, the given range either overlaps
+    /// with the transition at that position or is otherwise less than it
+    /// with no overlap (and is greater than the previous transition). In the
+    /// former case, careful attention must be paid to inserting this range
+    /// as a new transition. In the latter case, the range can be inserted as
+    /// a new transition at the given position without disrupting any other
+    /// transitions.
+    </span><span class="kw">fn </span>find(<span class="kw-2">&amp;</span><span class="self">self</span>, range: Utf8Range) -&gt; usize {
+        <span class="doccomment">/// Returns the position `i` at which `pred(xs[i])` first returns true
+        /// such that for all `j &gt;= i`, `pred(xs[j]) == true`. If `pred` never
+        /// returns true, then `xs.len()` is returned.
+        ///
+        /// We roll our own binary search because it doesn&#39;t seem like the
+        /// standard library&#39;s binary search can be used here. Namely, if
+        /// there is an overlapping range, then we want to find the first such
+        /// occurrence, but there may be many. Or at least, it&#39;s not quite
+        /// clear to me how to do it.
+        </span><span class="kw">fn </span>binary_search&lt;T, F&gt;(xs: <span class="kw-2">&amp;</span>[T], <span class="kw-2">mut </span>pred: F) -&gt; usize
+        <span class="kw">where
+            </span>F: FnMut(<span class="kw-2">&amp;</span>T) -&gt; bool,
         {
-            <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">left</span>, <span class="kw-2">mut</span> <span class="ident">right</span>) <span class="op">=</span> (<span class="number">0</span>, <span class="ident">xs</span>.<span class="ident">len</span>());
-            <span class="kw">while</span> <span class="ident">left</span> <span class="op">&lt;</span> <span class="ident">right</span> {
-                <span class="comment">// Overflow is impossible because xs.len() &lt;= 256.</span>
-                <span class="kw">let</span> <span class="ident">mid</span> <span class="op">=</span> (<span class="ident">left</span> <span class="op">+</span> <span class="ident">right</span>) <span class="op">/</span> <span class="number">2</span>;
-                <span class="kw">if</span> <span class="ident">pred</span>(<span class="kw-2">&amp;</span><span class="ident">xs</span>[<span class="ident">mid</span>]) {
-                    <span class="ident">right</span> <span class="op">=</span> <span class="ident">mid</span>;
-                } <span class="kw">else</span> {
-                    <span class="ident">left</span> <span class="op">=</span> <span class="ident">mid</span> <span class="op">+</span> <span class="number">1</span>;
+            <span class="kw">let </span>(<span class="kw-2">mut </span>left, <span class="kw-2">mut </span>right) = (<span class="number">0</span>, xs.len());
+            <span class="kw">while </span>left &lt; right {
+                <span class="comment">// Overflow is impossible because xs.len() &lt;= 256.
+                </span><span class="kw">let </span>mid = (left + right) / <span class="number">2</span>;
+                <span class="kw">if </span>pred(<span class="kw-2">&amp;</span>xs[mid]) {
+                    right = mid;
+                } <span class="kw">else </span>{
+                    left = mid + <span class="number">1</span>;
                 }
             }
-            <span class="ident">left</span>
+            left
         }
 
-        <span class="comment">// Benchmarks suggest that binary search is just a bit faster than</span>
-        <span class="comment">// straight linear search. Specifically when using the debug tool:</span>
-        <span class="comment">//</span>
-        <span class="comment">//   hyperfine &quot;regex-automata-debug debug -acqr &#39;\w{40} ecurB&#39;&quot;</span>
-        <span class="ident">binary_search</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">transitions</span>, <span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">range</span>.<span class="ident">start</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">t</span>.<span class="ident">range</span>.<span class="ident">end</span>)
+        <span class="comment">// Benchmarks suggest that binary search is just a bit faster than
+        // straight linear search. Specifically when using the debug tool:
+        //
+        //   hyperfine &quot;regex-automata-debug debug -acqr &#39;\w{40} ecurB&#39;&quot;
+        </span>binary_search(<span class="kw-2">&amp;</span><span class="self">self</span>.transitions, |t| range.start &lt;= t.range.end)
     }
 
-    <span class="doccomment">/// Clear this state such that it has zero transitions.</span>
-    <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">transitions</span>.<span class="ident">clear</span>();
+    <span class="doccomment">/// Clear this state such that it has zero transitions.
+    </span><span class="kw">fn </span>clear(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.transitions.clear();
     }
 }
 
-<span class="doccomment">/// The next state to process during duplication.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">NextDupe</span> {
-    <span class="doccomment">/// The state we want to duplicate.</span>
-    <span class="ident">old_id</span>: <span class="ident">StateID</span>,
-    <span class="doccomment">/// The ID of the new state that is a duplicate of old_id.</span>
-    <span class="ident">new_id</span>: <span class="ident">StateID</span>,
+<span class="doccomment">/// The next state to process during duplication.
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">struct </span>NextDupe {
+    <span class="doccomment">/// The state we want to duplicate.
+    </span>old_id: StateID,
+    <span class="doccomment">/// The ID of the new state that is a duplicate of old_id.
+    </span>new_id: StateID,
 }
 
-<span class="doccomment">/// The next state (and its corresponding transition) that we want to visit</span>
-<span class="doccomment">/// during iteration in lexicographic order.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">NextIter</span> {
-    <span class="ident">state_id</span>: <span class="ident">StateID</span>,
-    <span class="ident">tidx</span>: <span class="ident">usize</span>,
+<span class="doccomment">/// The next state (and its corresponding transition) that we want to visit
+/// during iteration in lexicographic order.
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">struct </span>NextIter {
+    state_id: StateID,
+    tidx: usize,
 }
 
-<span class="doccomment">/// The next state to process during insertion and any remaining ranges that we</span>
-<span class="doccomment">/// want to add for a partcular sequence of ranges. The first such instance</span>
-<span class="doccomment">/// is always the root state along with all ranges given.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">NextInsert</span> {
-    <span class="doccomment">/// The next state to begin inserting ranges. This state should be the</span>
-    <span class="doccomment">/// state at which `ranges[0]` should be inserted.</span>
-    <span class="ident">state_id</span>: <span class="ident">StateID</span>,
-    <span class="doccomment">/// The ranges to insert. We used a fixed-size array here to avoid an</span>
-    <span class="doccomment">/// allocation.</span>
-    <span class="ident">ranges</span>: [<span class="ident">Utf8Range</span>; <span class="number">4</span>],
-    <span class="doccomment">/// The number of valid ranges in the above array.</span>
-    <span class="ident">len</span>: <span class="ident">u8</span>,
+<span class="doccomment">/// The next state to process during insertion and any remaining ranges that we
+/// want to add for a partcular sequence of ranges. The first such instance
+/// is always the root state along with all ranges given.
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">struct </span>NextInsert {
+    <span class="doccomment">/// The next state to begin inserting ranges. This state should be the
+    /// state at which `ranges[0]` should be inserted.
+    </span>state_id: StateID,
+    <span class="doccomment">/// The ranges to insert. We used a fixed-size array here to avoid an
+    /// allocation.
+    </span>ranges: [Utf8Range; <span class="number">4</span>],
+    <span class="doccomment">/// The number of valid ranges in the above array.
+    </span>len: u8,
 }
 
-<span class="kw">impl</span> <span class="ident">NextInsert</span> {
-    <span class="doccomment">/// Create the next item to visit. The given state ID should correspond</span>
-    <span class="doccomment">/// to the state at which the first range in the given slice should be</span>
-    <span class="doccomment">/// inserted. The slice given must not be empty and it must be no longer</span>
-    <span class="doccomment">/// than 4.</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">state_id</span>: <span class="ident">StateID</span>, <span class="ident">ranges</span>: <span class="kw-2">&amp;</span>[<span class="ident">Utf8Range</span>]) -&gt; <span class="ident">NextInsert</span> {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">ranges</span>.<span class="ident">len</span>();
-        <span class="macro">assert!</span>(<span class="ident">len</span> <span class="op">&gt;</span> <span class="number">0</span>);
-        <span class="macro">assert!</span>(<span class="ident">len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">4</span>);
+<span class="kw">impl </span>NextInsert {
+    <span class="doccomment">/// Create the next item to visit. The given state ID should correspond
+    /// to the state at which the first range in the given slice should be
+    /// inserted. The slice given must not be empty and it must be no longer
+    /// than 4.
+    </span><span class="kw">fn </span>new(state_id: StateID, ranges: <span class="kw-2">&amp;</span>[Utf8Range]) -&gt; NextInsert {
+        <span class="kw">let </span>len = ranges.len();
+        <span class="macro">assert!</span>(len &gt; <span class="number">0</span>);
+        <span class="macro">assert!</span>(len &lt;= <span class="number">4</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tmp</span> <span class="op">=</span> [<span class="ident">Utf8Range</span> { <span class="ident">start</span>: <span class="number">0</span>, <span class="ident">end</span>: <span class="number">0</span> }; <span class="number">4</span>];
-        <span class="ident">tmp</span>[..<span class="ident">len</span>].<span class="ident">copy_from_slice</span>(<span class="ident">ranges</span>);
-        <span class="ident">NextInsert</span> { <span class="ident">state_id</span>, <span class="ident">ranges</span>: <span class="ident">tmp</span>, <span class="ident">len</span>: <span class="ident">len</span> <span class="kw">as</span> <span class="ident">u8</span> }
+        <span class="kw">let </span><span class="kw-2">mut </span>tmp = [Utf8Range { start: <span class="number">0</span>, end: <span class="number">0 </span>}; <span class="number">4</span>];
+        tmp[..len].copy_from_slice(ranges);
+        NextInsert { state_id, ranges: tmp, len: len <span class="kw">as </span>u8 }
     }
 
-    <span class="doccomment">/// Push a new empty state to visit along with any remaining ranges that</span>
-    <span class="doccomment">/// still need to be inserted. The ID of the new empty state is returned.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If ranges is empty, then no new state is created and FINAL is returned.</span>
-    <span class="kw">fn</span> <span class="ident">push</span>(
-        <span class="ident">trie</span>: <span class="kw-2">&amp;mut</span> <span class="ident">RangeTrie</span>,
-        <span class="ident">stack</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NextInsert</span><span class="op">&gt;</span>,
-        <span class="ident">ranges</span>: <span class="kw-2">&amp;</span>[<span class="ident">Utf8Range</span>],
-    ) -&gt; <span class="ident">StateID</span> {
-        <span class="kw">if</span> <span class="ident">ranges</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">FINAL</span>
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">next_id</span> <span class="op">=</span> <span class="ident">trie</span>.<span class="ident">add_empty</span>();
-            <span class="ident">stack</span>.<span class="ident">push</span>(<span class="ident">NextInsert::new</span>(<span class="ident">next_id</span>, <span class="ident">ranges</span>));
-            <span class="ident">next_id</span>
+    <span class="doccomment">/// Push a new empty state to visit along with any remaining ranges that
+    /// still need to be inserted. The ID of the new empty state is returned.
+    ///
+    /// If ranges is empty, then no new state is created and FINAL is returned.
+    </span><span class="kw">fn </span>push(
+        trie: <span class="kw-2">&amp;mut </span>RangeTrie,
+        stack: <span class="kw-2">&amp;mut </span>Vec&lt;NextInsert&gt;,
+        ranges: <span class="kw-2">&amp;</span>[Utf8Range],
+    ) -&gt; StateID {
+        <span class="kw">if </span>ranges.is_empty() {
+            FINAL
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>next_id = trie.add_empty();
+            stack.push(NextInsert::new(next_id, ranges));
+            next_id
         }
     }
 
-    <span class="doccomment">/// Return the ID of the state to visit.</span>
-    <span class="kw">fn</span> <span class="ident">state_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">StateID</span> {
-        <span class="self">self</span>.<span class="ident">state_id</span>
+    <span class="doccomment">/// Return the ID of the state to visit.
+    </span><span class="kw">fn </span>state_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; StateID {
+        <span class="self">self</span>.state_id
     }
 
-    <span class="doccomment">/// Return the remaining ranges to insert.</span>
-    <span class="kw">fn</span> <span class="ident">ranges</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">Utf8Range</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ranges</span>[..<span class="self">self</span>.<span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>]
+    <span class="doccomment">/// Return the remaining ranges to insert.
+    </span><span class="kw">fn </span>ranges(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[Utf8Range] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.ranges[..<span class="self">self</span>.len <span class="kw">as </span>usize]
     }
 }
 
-<span class="doccomment">/// Split represents a partitioning of two ranges into one or more ranges. This</span>
-<span class="doccomment">/// is the secret sauce that makes a range trie work, as it&#39;s what tells us</span>
-<span class="doccomment">/// how to deal with two overlapping but unequal ranges during insertion.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Essentially, either two ranges overlap or they don&#39;t. If they don&#39;t, then</span>
-<span class="doccomment">/// handling insertion is easy: just insert the new range into its</span>
-<span class="doccomment">/// lexicographically correct position. Since it does not overlap with anything</span>
-<span class="doccomment">/// else, no other transitions are impacted by the new range.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If they do overlap though, there are generally three possible cases to</span>
-<span class="doccomment">/// handle:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// 1. The part where the two ranges actually overlap. i.e., The intersection.</span>
-<span class="doccomment">/// 2. The part of the existing range that is not in the the new range.</span>
-<span class="doccomment">/// 3. The part of the new range that is not in the old range.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// (1) is guaranteed to always occur since all overlapping ranges have a</span>
-<span class="doccomment">/// non-empty intersection. If the two ranges are not equivalent, then at</span>
-<span class="doccomment">/// least one of (2) or (3) is guaranteed to occur as well. In some cases,</span>
-<span class="doccomment">/// e.g., `[0-4]` and `[4-9]`, all three cases will occur.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This `Split` type is responsible for providing (1), (2) and (3) for any</span>
-<span class="doccomment">/// possible pair of byte ranges.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// As for insertion, for the overlap in (1), the remaining ranges to insert</span>
-<span class="doccomment">/// should be added by following the corresponding transition. However, this</span>
-<span class="doccomment">/// should only be done for the overlapping parts of the range. If there was</span>
-<span class="doccomment">/// a part of the existing range that was not in the new range, then that</span>
-<span class="doccomment">/// existing part must be split off from the transition and duplicated. The</span>
-<span class="doccomment">/// remaining parts of the overlap can then be added to using the new ranges</span>
-<span class="doccomment">/// without disturbing the existing range.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Handling the case for the part of a new range that is not in an existing</span>
-<span class="doccomment">/// range is seemingly easy. Just treat it as if it were a non-overlapping</span>
-<span class="doccomment">/// range. The problem here is that if this new non-overlapping range occurs</span>
-<span class="doccomment">/// after both (1) and (2), then it&#39;s possible that it can overlap with the</span>
-<span class="doccomment">/// next transition in the current state. If it does, then the whole process</span>
-<span class="doccomment">/// must be repeated!</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Details of the 3 cases</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The following details the various cases that are implemented in code</span>
-<span class="doccomment">/// below. It&#39;s plausible that the number of cases is not actually minimal,</span>
-<span class="doccomment">/// but it&#39;s important for this code to remain at least somewhat readable.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Given [a,b] and [x,y], where a &lt;= b, x &lt;= y, b &lt; 256 and y &lt; 256, we define</span>
-<span class="doccomment">/// the follow distinct relationships where at least one must apply. The order</span>
-<span class="doccomment">/// of these matters, since multiple can match. The first to match applies.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   1. b &lt; x &lt;=&gt; [a,b] &lt; [x,y]</span>
-<span class="doccomment">///   2. y &lt; a &lt;=&gt; [x,y] &lt; [a,b]</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// In the case of (1) and (2), these are the only cases where there is no</span>
-<span class="doccomment">/// overlap. Or otherwise, the intersection of [a,b] and [x,y] is empty. In</span>
-<span class="doccomment">/// order to compute the intersection, one can do [max(a,x), min(b,y)]. The</span>
-<span class="doccomment">/// intersection in all of the following cases is non-empty.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    3. a = x &amp;&amp; b = y &lt;=&gt; [a,b] == [x,y]</span>
-<span class="doccomment">///    4. a = x &amp;&amp; b &lt; y &lt;=&gt; [x,y] right-extends [a,b]</span>
-<span class="doccomment">///    5. b = y &amp;&amp; a &gt; x &lt;=&gt; [x,y] left-extends [a,b]</span>
-<span class="doccomment">///    6. x = a &amp;&amp; y &lt; b &lt;=&gt; [a,b] right-extends [x,y]</span>
-<span class="doccomment">///    7. y = b &amp;&amp; x &gt; a &lt;=&gt; [a,b] left-extends [x,y]</span>
-<span class="doccomment">///    8. a &gt; x &amp;&amp; b &lt; y &lt;=&gt; [x,y] covers [a,b]</span>
-<span class="doccomment">///    9. x &gt; a &amp;&amp; y &lt; b &lt;=&gt; [a,b] covers [x,y]</span>
-<span class="doccomment">///   10. b = x &amp;&amp; a &lt; y &lt;=&gt; [a,b] is left-adjacent to [x,y]</span>
-<span class="doccomment">///   11. y = a &amp;&amp; x &lt; b &lt;=&gt; [x,y] is left-adjacent to [a,b]</span>
-<span class="doccomment">///   12. b &gt; x &amp;&amp; b &lt; y &lt;=&gt; [a,b] left-overlaps [x,y]</span>
-<span class="doccomment">///   13. y &gt; a &amp;&amp; y &lt; b &lt;=&gt; [x,y] left-overlaps [a,b]</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// In cases 3-13, we can form rules that partition the ranges into a</span>
-<span class="doccomment">/// non-overlapping ordered sequence of ranges:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    3. [a,b]</span>
-<span class="doccomment">///    4. [a,b], [b+1,y]</span>
-<span class="doccomment">///    5. [x,a-1], [a,b]</span>
-<span class="doccomment">///    6. [x,y], [y+1,b]</span>
-<span class="doccomment">///    7. [a,x-1], [x,y]</span>
-<span class="doccomment">///    8. [x,a-1], [a,b], [b+1,y]</span>
-<span class="doccomment">///    9. [a,x-1], [x,y], [y+1,b]</span>
-<span class="doccomment">///   10. [a,b-1], [b,b], [b+1,y]</span>
-<span class="doccomment">///   11. [x,y-1], [y,y], [y+1,b]</span>
-<span class="doccomment">///   12. [a,x-1], [x,b], [b+1,y]</span>
-<span class="doccomment">///   13. [x,a-1], [a,y], [y+1,b]</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// In the code below, we go a step further and identify each of the above</span>
-<span class="doccomment">/// outputs as belonging either to the overlap of the two ranges or to one</span>
-<span class="doccomment">/// of [a,b] or [x,y] exclusively.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">struct</span> <span class="ident">Split</span> {
-    <span class="ident">partitions</span>: [<span class="ident">SplitRange</span>; <span class="number">3</span>],
-    <span class="ident">len</span>: <span class="ident">usize</span>,
+<span class="doccomment">/// Split represents a partitioning of two ranges into one or more ranges. This
+/// is the secret sauce that makes a range trie work, as it&#39;s what tells us
+/// how to deal with two overlapping but unequal ranges during insertion.
+///
+/// Essentially, either two ranges overlap or they don&#39;t. If they don&#39;t, then
+/// handling insertion is easy: just insert the new range into its
+/// lexicographically correct position. Since it does not overlap with anything
+/// else, no other transitions are impacted by the new range.
+///
+/// If they do overlap though, there are generally three possible cases to
+/// handle:
+///
+/// 1. The part where the two ranges actually overlap. i.e., The intersection.
+/// 2. The part of the existing range that is not in the the new range.
+/// 3. The part of the new range that is not in the old range.
+///
+/// (1) is guaranteed to always occur since all overlapping ranges have a
+/// non-empty intersection. If the two ranges are not equivalent, then at
+/// least one of (2) or (3) is guaranteed to occur as well. In some cases,
+/// e.g., `[0-4]` and `[4-9]`, all three cases will occur.
+///
+/// This `Split` type is responsible for providing (1), (2) and (3) for any
+/// possible pair of byte ranges.
+///
+/// As for insertion, for the overlap in (1), the remaining ranges to insert
+/// should be added by following the corresponding transition. However, this
+/// should only be done for the overlapping parts of the range. If there was
+/// a part of the existing range that was not in the new range, then that
+/// existing part must be split off from the transition and duplicated. The
+/// remaining parts of the overlap can then be added to using the new ranges
+/// without disturbing the existing range.
+///
+/// Handling the case for the part of a new range that is not in an existing
+/// range is seemingly easy. Just treat it as if it were a non-overlapping
+/// range. The problem here is that if this new non-overlapping range occurs
+/// after both (1) and (2), then it&#39;s possible that it can overlap with the
+/// next transition in the current state. If it does, then the whole process
+/// must be repeated!
+///
+/// # Details of the 3 cases
+///
+/// The following details the various cases that are implemented in code
+/// below. It&#39;s plausible that the number of cases is not actually minimal,
+/// but it&#39;s important for this code to remain at least somewhat readable.
+///
+/// Given [a,b] and [x,y], where a &lt;= b, x &lt;= y, b &lt; 256 and y &lt; 256, we define
+/// the follow distinct relationships where at least one must apply. The order
+/// of these matters, since multiple can match. The first to match applies.
+///
+///   1. b &lt; x &lt;=&gt; [a,b] &lt; [x,y]
+///   2. y &lt; a &lt;=&gt; [x,y] &lt; [a,b]
+///
+/// In the case of (1) and (2), these are the only cases where there is no
+/// overlap. Or otherwise, the intersection of [a,b] and [x,y] is empty. In
+/// order to compute the intersection, one can do [max(a,x), min(b,y)]. The
+/// intersection in all of the following cases is non-empty.
+///
+///    3. a = x &amp;&amp; b = y &lt;=&gt; [a,b] == [x,y]
+///    4. a = x &amp;&amp; b &lt; y &lt;=&gt; [x,y] right-extends [a,b]
+///    5. b = y &amp;&amp; a &gt; x &lt;=&gt; [x,y] left-extends [a,b]
+///    6. x = a &amp;&amp; y &lt; b &lt;=&gt; [a,b] right-extends [x,y]
+///    7. y = b &amp;&amp; x &gt; a &lt;=&gt; [a,b] left-extends [x,y]
+///    8. a &gt; x &amp;&amp; b &lt; y &lt;=&gt; [x,y] covers [a,b]
+///    9. x &gt; a &amp;&amp; y &lt; b &lt;=&gt; [a,b] covers [x,y]
+///   10. b = x &amp;&amp; a &lt; y &lt;=&gt; [a,b] is left-adjacent to [x,y]
+///   11. y = a &amp;&amp; x &lt; b &lt;=&gt; [x,y] is left-adjacent to [a,b]
+///   12. b &gt; x &amp;&amp; b &lt; y &lt;=&gt; [a,b] left-overlaps [x,y]
+///   13. y &gt; a &amp;&amp; y &lt; b &lt;=&gt; [x,y] left-overlaps [a,b]
+///
+/// In cases 3-13, we can form rules that partition the ranges into a
+/// non-overlapping ordered sequence of ranges:
+///
+///    3. [a,b]
+///    4. [a,b], [b+1,y]
+///    5. [x,a-1], [a,b]
+///    6. [x,y], [y+1,b]
+///    7. [a,x-1], [x,y]
+///    8. [x,a-1], [a,b], [b+1,y]
+///    9. [a,x-1], [x,y], [y+1,b]
+///   10. [a,b-1], [b,b], [b+1,y]
+///   11. [x,y-1], [y,y], [y+1,b]
+///   12. [a,x-1], [x,b], [b+1,y]
+///   13. [x,a-1], [a,y], [y+1,b]
+///
+/// In the code below, we go a step further and identify each of the above
+/// outputs as belonging either to the overlap of the two ranges or to one
+/// of [a,b] or [x,y] exclusively.
+</span><span class="attribute">#[derive(Clone, Debug, Eq, PartialEq)]
+</span><span class="kw">struct </span>Split {
+    partitions: [SplitRange; <span class="number">3</span>],
+    len: usize,
 }
 
-<span class="doccomment">/// A tagged range indicating how it was derived from a pair of ranges.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">enum</span> <span class="ident">SplitRange</span> {
-    <span class="ident">Old</span>(<span class="ident">Utf8Range</span>),
-    <span class="ident">New</span>(<span class="ident">Utf8Range</span>),
-    <span class="ident">Both</span>(<span class="ident">Utf8Range</span>),
+<span class="doccomment">/// A tagged range indicating how it was derived from a pair of ranges.
+</span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+</span><span class="kw">enum </span>SplitRange {
+    Old(Utf8Range),
+    New(Utf8Range),
+    Both(Utf8Range),
 }
 
-<span class="kw">impl</span> <span class="ident">Split</span> {
-    <span class="doccomment">/// Create a partitioning of the given ranges.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the given ranges have an empty intersection, then None is returned.</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">o</span>: <span class="ident">Utf8Range</span>, <span class="ident">n</span>: <span class="ident">Utf8Range</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Split</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">range</span> <span class="op">=</span> <span class="op">|</span><span class="ident">r</span>: <span class="ident">RangeInclusive</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">|</span> <span class="ident">Utf8Range</span> {
-            <span class="ident">start</span>: <span class="kw-2">*</span><span class="ident">r</span>.<span class="ident">start</span>(),
-            <span class="ident">end</span>: <span class="kw-2">*</span><span class="ident">r</span>.<span class="ident">end</span>(),
+<span class="kw">impl </span>Split {
+    <span class="doccomment">/// Create a partitioning of the given ranges.
+    ///
+    /// If the given ranges have an empty intersection, then None is returned.
+    </span><span class="kw">fn </span>new(o: Utf8Range, n: Utf8Range) -&gt; <span class="prelude-ty">Option</span>&lt;Split&gt; {
+        <span class="kw">let </span>range = |r: RangeInclusive&lt;u8&gt;| Utf8Range {
+            start: <span class="kw-2">*</span>r.start(),
+            end: <span class="kw-2">*</span>r.end(),
         };
-        <span class="kw">let</span> <span class="ident">old</span> <span class="op">=</span> <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">SplitRange::Old</span>(<span class="ident">range</span>(<span class="ident">r</span>));
-        <span class="kw">let</span> <span class="ident">new</span> <span class="op">=</span> <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">SplitRange::New</span>(<span class="ident">range</span>(<span class="ident">r</span>));
-        <span class="kw">let</span> <span class="ident">both</span> <span class="op">=</span> <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">SplitRange::Both</span>(<span class="ident">range</span>(<span class="ident">r</span>));
+        <span class="kw">let </span>old = |r| SplitRange::Old(range(r));
+        <span class="kw">let </span>new = |r| SplitRange::New(range(r));
+        <span class="kw">let </span>both = |r| SplitRange::Both(range(r));
 
-        <span class="comment">// Use same names as the comment above to make it easier to compare.</span>
-        <span class="kw">let</span> (<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">x</span>, <span class="ident">y</span>) <span class="op">=</span> (<span class="ident">o</span>.<span class="ident">start</span>, <span class="ident">o</span>.<span class="ident">end</span>, <span class="ident">n</span>.<span class="ident">start</span>, <span class="ident">n</span>.<span class="ident">end</span>);
+        <span class="comment">// Use same names as the comment above to make it easier to compare.
+        </span><span class="kw">let </span>(a, b, x, y) = (o.start, o.end, n.start, n.end);
 
-        <span class="kw">if</span> <span class="ident">b</span> <span class="op">&lt;</span> <span class="ident">x</span> <span class="op">|</span><span class="op">|</span> <span class="ident">y</span> <span class="op">&lt;</span> <span class="ident">a</span> {
-            <span class="comment">// case 1, case 2</span>
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="ident">x</span> <span class="op">&amp;&amp;</span> <span class="ident">b</span> <span class="op">==</span> <span class="ident">y</span> {
-            <span class="comment">// case 3</span>
-            <span class="prelude-val">Some</span>(<span class="ident">Split::parts1</span>(<span class="ident">both</span>(<span class="ident">a</span>..<span class="op">=</span><span class="ident">b</span>)))
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="ident">x</span> <span class="op">&amp;&amp;</span> <span class="ident">b</span> <span class="op">&lt;</span> <span class="ident">y</span> {
-            <span class="comment">// case 4</span>
-            <span class="prelude-val">Some</span>(<span class="ident">Split::parts2</span>(<span class="ident">both</span>(<span class="ident">a</span>..<span class="op">=</span><span class="ident">b</span>), <span class="ident">new</span>(<span class="ident">b</span> <span class="op">+</span> <span class="number">1</span>..<span class="op">=</span><span class="ident">y</span>)))
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">b</span> <span class="op">==</span> <span class="ident">y</span> <span class="op">&amp;&amp;</span> <span class="ident">a</span> <span class="op">&gt;</span> <span class="ident">x</span> {
-            <span class="comment">// case 5</span>
-            <span class="prelude-val">Some</span>(<span class="ident">Split::parts2</span>(<span class="ident">new</span>(<span class="ident">x</span>..<span class="op">=</span><span class="ident">a</span> <span class="op">-</span> <span class="number">1</span>), <span class="ident">both</span>(<span class="ident">a</span>..<span class="op">=</span><span class="ident">b</span>)))
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">==</span> <span class="ident">a</span> <span class="op">&amp;&amp;</span> <span class="ident">y</span> <span class="op">&lt;</span> <span class="ident">b</span> {
-            <span class="comment">// case 6</span>
-            <span class="prelude-val">Some</span>(<span class="ident">Split::parts2</span>(<span class="ident">both</span>(<span class="ident">x</span>..<span class="op">=</span><span class="ident">y</span>), <span class="ident">old</span>(<span class="ident">y</span> <span class="op">+</span> <span class="number">1</span>..<span class="op">=</span><span class="ident">b</span>)))
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">y</span> <span class="op">==</span> <span class="ident">b</span> <span class="op">&amp;&amp;</span> <span class="ident">x</span> <span class="op">&gt;</span> <span class="ident">a</span> {
-            <span class="comment">// case 7</span>
-            <span class="prelude-val">Some</span>(<span class="ident">Split::parts2</span>(<span class="ident">old</span>(<span class="ident">a</span>..<span class="op">=</span><span class="ident">x</span> <span class="op">-</span> <span class="number">1</span>), <span class="ident">both</span>(<span class="ident">x</span>..<span class="op">=</span><span class="ident">y</span>)))
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">a</span> <span class="op">&gt;</span> <span class="ident">x</span> <span class="op">&amp;&amp;</span> <span class="ident">b</span> <span class="op">&lt;</span> <span class="ident">y</span> {
-            <span class="comment">// case 8</span>
-            <span class="prelude-val">Some</span>(<span class="ident">Split::parts3</span>(<span class="ident">new</span>(<span class="ident">x</span>..<span class="op">=</span><span class="ident">a</span> <span class="op">-</span> <span class="number">1</span>), <span class="ident">both</span>(<span class="ident">a</span>..<span class="op">=</span><span class="ident">b</span>), <span class="ident">new</span>(<span class="ident">b</span> <span class="op">+</span> <span class="number">1</span>..<span class="op">=</span><span class="ident">y</span>)))
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">&gt;</span> <span class="ident">a</span> <span class="op">&amp;&amp;</span> <span class="ident">y</span> <span class="op">&lt;</span> <span class="ident">b</span> {
-            <span class="comment">// case 9</span>
-            <span class="prelude-val">Some</span>(<span class="ident">Split::parts3</span>(<span class="ident">old</span>(<span class="ident">a</span>..<span class="op">=</span><span class="ident">x</span> <span class="op">-</span> <span class="number">1</span>), <span class="ident">both</span>(<span class="ident">x</span>..<span class="op">=</span><span class="ident">y</span>), <span class="ident">old</span>(<span class="ident">y</span> <span class="op">+</span> <span class="number">1</span>..<span class="op">=</span><span class="ident">b</span>)))
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">b</span> <span class="op">==</span> <span class="ident">x</span> <span class="op">&amp;&amp;</span> <span class="ident">a</span> <span class="op">&lt;</span> <span class="ident">y</span> {
-            <span class="comment">// case 10</span>
-            <span class="prelude-val">Some</span>(<span class="ident">Split::parts3</span>(<span class="ident">old</span>(<span class="ident">a</span>..<span class="op">=</span><span class="ident">b</span> <span class="op">-</span> <span class="number">1</span>), <span class="ident">both</span>(<span class="ident">b</span>..<span class="op">=</span><span class="ident">b</span>), <span class="ident">new</span>(<span class="ident">b</span> <span class="op">+</span> <span class="number">1</span>..<span class="op">=</span><span class="ident">y</span>)))
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">y</span> <span class="op">==</span> <span class="ident">a</span> <span class="op">&amp;&amp;</span> <span class="ident">x</span> <span class="op">&lt;</span> <span class="ident">b</span> {
-            <span class="comment">// case 11</span>
-            <span class="prelude-val">Some</span>(<span class="ident">Split::parts3</span>(<span class="ident">new</span>(<span class="ident">x</span>..<span class="op">=</span><span class="ident">y</span> <span class="op">-</span> <span class="number">1</span>), <span class="ident">both</span>(<span class="ident">y</span>..<span class="op">=</span><span class="ident">y</span>), <span class="ident">old</span>(<span class="ident">y</span> <span class="op">+</span> <span class="number">1</span>..<span class="op">=</span><span class="ident">b</span>)))
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">b</span> <span class="op">&gt;</span> <span class="ident">x</span> <span class="op">&amp;&amp;</span> <span class="ident">b</span> <span class="op">&lt;</span> <span class="ident">y</span> {
-            <span class="comment">// case 12</span>
-            <span class="prelude-val">Some</span>(<span class="ident">Split::parts3</span>(<span class="ident">old</span>(<span class="ident">a</span>..<span class="op">=</span><span class="ident">x</span> <span class="op">-</span> <span class="number">1</span>), <span class="ident">both</span>(<span class="ident">x</span>..<span class="op">=</span><span class="ident">b</span>), <span class="ident">new</span>(<span class="ident">b</span> <span class="op">+</span> <span class="number">1</span>..<span class="op">=</span><span class="ident">y</span>)))
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">y</span> <span class="op">&gt;</span> <span class="ident">a</span> <span class="op">&amp;&amp;</span> <span class="ident">y</span> <span class="op">&lt;</span> <span class="ident">b</span> {
-            <span class="comment">// case 13</span>
-            <span class="prelude-val">Some</span>(<span class="ident">Split::parts3</span>(<span class="ident">new</span>(<span class="ident">x</span>..<span class="op">=</span><span class="ident">a</span> <span class="op">-</span> <span class="number">1</span>), <span class="ident">both</span>(<span class="ident">a</span>..<span class="op">=</span><span class="ident">y</span>), <span class="ident">old</span>(<span class="ident">y</span> <span class="op">+</span> <span class="number">1</span>..<span class="op">=</span><span class="ident">b</span>)))
-        } <span class="kw">else</span> {
+        <span class="kw">if </span>b &lt; x || y &lt; a {
+            <span class="comment">// case 1, case 2
+            </span><span class="prelude-val">None
+        </span>} <span class="kw">else if </span>a == x &amp;&amp; b == y {
+            <span class="comment">// case 3
+            </span><span class="prelude-val">Some</span>(Split::parts1(both(a..=b)))
+        } <span class="kw">else if </span>a == x &amp;&amp; b &lt; y {
+            <span class="comment">// case 4
+            </span><span class="prelude-val">Some</span>(Split::parts2(both(a..=b), new(b + <span class="number">1</span>..=y)))
+        } <span class="kw">else if </span>b == y &amp;&amp; a &gt; x {
+            <span class="comment">// case 5
+            </span><span class="prelude-val">Some</span>(Split::parts2(new(x..=a - <span class="number">1</span>), both(a..=b)))
+        } <span class="kw">else if </span>x == a &amp;&amp; y &lt; b {
+            <span class="comment">// case 6
+            </span><span class="prelude-val">Some</span>(Split::parts2(both(x..=y), old(y + <span class="number">1</span>..=b)))
+        } <span class="kw">else if </span>y == b &amp;&amp; x &gt; a {
+            <span class="comment">// case 7
+            </span><span class="prelude-val">Some</span>(Split::parts2(old(a..=x - <span class="number">1</span>), both(x..=y)))
+        } <span class="kw">else if </span>a &gt; x &amp;&amp; b &lt; y {
+            <span class="comment">// case 8
+            </span><span class="prelude-val">Some</span>(Split::parts3(new(x..=a - <span class="number">1</span>), both(a..=b), new(b + <span class="number">1</span>..=y)))
+        } <span class="kw">else if </span>x &gt; a &amp;&amp; y &lt; b {
+            <span class="comment">// case 9
+            </span><span class="prelude-val">Some</span>(Split::parts3(old(a..=x - <span class="number">1</span>), both(x..=y), old(y + <span class="number">1</span>..=b)))
+        } <span class="kw">else if </span>b == x &amp;&amp; a &lt; y {
+            <span class="comment">// case 10
+            </span><span class="prelude-val">Some</span>(Split::parts3(old(a..=b - <span class="number">1</span>), both(b..=b), new(b + <span class="number">1</span>..=y)))
+        } <span class="kw">else if </span>y == a &amp;&amp; x &lt; b {
+            <span class="comment">// case 11
+            </span><span class="prelude-val">Some</span>(Split::parts3(new(x..=y - <span class="number">1</span>), both(y..=y), old(y + <span class="number">1</span>..=b)))
+        } <span class="kw">else if </span>b &gt; x &amp;&amp; b &lt; y {
+            <span class="comment">// case 12
+            </span><span class="prelude-val">Some</span>(Split::parts3(old(a..=x - <span class="number">1</span>), both(x..=b), new(b + <span class="number">1</span>..=y)))
+        } <span class="kw">else if </span>y &gt; a &amp;&amp; y &lt; b {
+            <span class="comment">// case 13
+            </span><span class="prelude-val">Some</span>(Split::parts3(new(x..=a - <span class="number">1</span>), both(a..=y), old(y + <span class="number">1</span>..=b)))
+        } <span class="kw">else </span>{
             <span class="macro">unreachable!</span>()
         }
     }
 
-    <span class="doccomment">/// Create a new split with a single partition. This only occurs when two</span>
-    <span class="doccomment">/// ranges are equivalent.</span>
-    <span class="kw">fn</span> <span class="ident">parts1</span>(<span class="ident">r1</span>: <span class="ident">SplitRange</span>) -&gt; <span class="ident">Split</span> {
-        <span class="comment">// This value doesn&#39;t matter since it is never accessed.</span>
-        <span class="kw">let</span> <span class="ident">nada</span> <span class="op">=</span> <span class="ident">SplitRange::Old</span>(<span class="ident">Utf8Range</span> { <span class="ident">start</span>: <span class="number">0</span>, <span class="ident">end</span>: <span class="number">0</span> });
-        <span class="ident">Split</span> { <span class="ident">partitions</span>: [<span class="ident">r1</span>, <span class="ident">nada</span>, <span class="ident">nada</span>], <span class="ident">len</span>: <span class="number">1</span> }
+    <span class="doccomment">/// Create a new split with a single partition. This only occurs when two
+    /// ranges are equivalent.
+    </span><span class="kw">fn </span>parts1(r1: SplitRange) -&gt; Split {
+        <span class="comment">// This value doesn&#39;t matter since it is never accessed.
+        </span><span class="kw">let </span>nada = SplitRange::Old(Utf8Range { start: <span class="number">0</span>, end: <span class="number">0 </span>});
+        Split { partitions: [r1, nada, nada], len: <span class="number">1 </span>}
     }
 
-    <span class="doccomment">/// Create a new split with two partitions.</span>
-    <span class="kw">fn</span> <span class="ident">parts2</span>(<span class="ident">r1</span>: <span class="ident">SplitRange</span>, <span class="ident">r2</span>: <span class="ident">SplitRange</span>) -&gt; <span class="ident">Split</span> {
-        <span class="comment">// This value doesn&#39;t matter since it is never accessed.</span>
-        <span class="kw">let</span> <span class="ident">nada</span> <span class="op">=</span> <span class="ident">SplitRange::Old</span>(<span class="ident">Utf8Range</span> { <span class="ident">start</span>: <span class="number">0</span>, <span class="ident">end</span>: <span class="number">0</span> });
-        <span class="ident">Split</span> { <span class="ident">partitions</span>: [<span class="ident">r1</span>, <span class="ident">r2</span>, <span class="ident">nada</span>], <span class="ident">len</span>: <span class="number">2</span> }
+    <span class="doccomment">/// Create a new split with two partitions.
+    </span><span class="kw">fn </span>parts2(r1: SplitRange, r2: SplitRange) -&gt; Split {
+        <span class="comment">// This value doesn&#39;t matter since it is never accessed.
+        </span><span class="kw">let </span>nada = SplitRange::Old(Utf8Range { start: <span class="number">0</span>, end: <span class="number">0 </span>});
+        Split { partitions: [r1, r2, nada], len: <span class="number">2 </span>}
     }
 
-    <span class="doccomment">/// Create a new split with three partitions.</span>
-    <span class="kw">fn</span> <span class="ident">parts3</span>(<span class="ident">r1</span>: <span class="ident">SplitRange</span>, <span class="ident">r2</span>: <span class="ident">SplitRange</span>, <span class="ident">r3</span>: <span class="ident">SplitRange</span>) -&gt; <span class="ident">Split</span> {
-        <span class="ident">Split</span> { <span class="ident">partitions</span>: [<span class="ident">r1</span>, <span class="ident">r2</span>, <span class="ident">r3</span>], <span class="ident">len</span>: <span class="number">3</span> }
+    <span class="doccomment">/// Create a new split with three partitions.
+    </span><span class="kw">fn </span>parts3(r1: SplitRange, r2: SplitRange, r3: SplitRange) -&gt; Split {
+        Split { partitions: [r1, r2, r3], len: <span class="number">3 </span>}
     }
 
-    <span class="doccomment">/// Return the partitions in this split as a slice.</span>
-    <span class="kw">fn</span> <span class="ident">as_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">SplitRange</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">partitions</span>[..<span class="self">self</span>.<span class="ident">len</span>]
+    <span class="doccomment">/// Return the partitions in this split as a slice.
+    </span><span class="kw">fn </span>as_slice(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[SplitRange] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.partitions[..<span class="self">self</span>.len]
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">RangeTrie</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;&quot;</span>)<span class="question-mark">?</span>;
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">state</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">states</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">i</span> <span class="op">==</span> <span class="ident">FINAL</span> <span class="kw">as</span> <span class="ident">usize</span> { <span class="string">&#39;*&#39;</span> } <span class="kw">else</span> { <span class="string">&#39; &#39;</span> };
-            <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;{}{:06}: {:?}&quot;</span>, <span class="ident">status</span>, <span class="ident">i</span>, <span class="ident">state</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>RangeTrie {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="macro">writeln!</span>(f, <span class="string">&quot;&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">for </span>(i, state) <span class="kw">in </span><span class="self">self</span>.states.iter().enumerate() {
+            <span class="kw">let </span>status = <span class="kw">if </span>i == FINAL <span class="kw">as </span>usize { <span class="string">&#39;*&#39; </span>} <span class="kw">else </span>{ <span class="string">&#39; &#39; </span>};
+            <span class="macro">writeln!</span>(f, <span class="string">&quot;{}{:06}: {:?}&quot;</span>, status, i, state)<span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">State</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="ident">rs</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">transitions</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">t</span>))
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-            .<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>);
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">rs</span>)
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>State {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">let </span>rs = <span class="self">self
+            </span>.transitions
+            .iter()
+            .map(|t| <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, t))
+            .collect::&lt;Vec&lt;String&gt;&gt;()
+            .join(<span class="string">&quot;, &quot;</span>);
+        <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, rs)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Transition</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">range</span>.<span class="ident">start</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">range</span>.<span class="ident">end</span> {
-            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{:02X} =&gt; {:02X}&quot;</span>, <span class="self">self</span>.<span class="ident">range</span>.<span class="ident">start</span>, <span class="self">self</span>.<span class="ident">next_id</span>)
-        } <span class="kw">else</span> {
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Transition {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">if </span><span class="self">self</span>.range.start == <span class="self">self</span>.range.end {
+            <span class="macro">write!</span>(f, <span class="string">&quot;{:02X} =&gt; {:02X}&quot;</span>, <span class="self">self</span>.range.start, <span class="self">self</span>.next_id)
+        } <span class="kw">else </span>{
             <span class="macro">write!</span>(
-                <span class="ident">f</span>,
+                f,
                 <span class="string">&quot;{:02X}-{:02X} =&gt; {:02X}&quot;</span>,
-                <span class="self">self</span>.<span class="ident">range</span>.<span class="ident">start</span>, <span class="self">self</span>.<span class="ident">range</span>.<span class="ident">end</span>, <span class="self">self</span>.<span class="ident">next_id</span>
+                <span class="self">self</span>.range.start, <span class="self">self</span>.range.end, <span class="self">self</span>.next_id
             )
         }
     }
 }
 
-<span class="doccomment">/// Returns true if and only if the given ranges intersect.</span>
-<span class="kw">fn</span> <span class="ident">intersects</span>(<span class="ident">r1</span>: <span class="ident">Utf8Range</span>, <span class="ident">r2</span>: <span class="ident">Utf8Range</span>) -&gt; <span class="ident">bool</span> {
-    <span class="op">!</span>(<span class="ident">r1</span>.<span class="ident">end</span> <span class="op">&lt;</span> <span class="ident">r2</span>.<span class="ident">start</span> <span class="op">|</span><span class="op">|</span> <span class="ident">r2</span>.<span class="ident">end</span> <span class="op">&lt;</span> <span class="ident">r1</span>.<span class="ident">start</span>)
+<span class="doccomment">/// Returns true if and only if the given ranges intersect.
+</span><span class="kw">fn </span>intersects(r1: Utf8Range, r2: Utf8Range) -&gt; bool {
+    !(r1.end &lt; r2.start || r2.end &lt; r1.start)
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident">std::ops::RangeInclusive</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span>std::ops::RangeInclusive;
 
-    <span class="kw">use</span> <span class="ident">regex_syntax::utf8::Utf8Range</span>;
+    <span class="kw">use </span>regex_syntax::utf8::Utf8Range;
 
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="kw">fn</span> <span class="ident">r</span>(<span class="ident">range</span>: <span class="ident">RangeInclusive</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) -&gt; <span class="ident">Utf8Range</span> {
-        <span class="ident">Utf8Range</span> { <span class="ident">start</span>: <span class="kw-2">*</span><span class="ident">range</span>.<span class="ident">start</span>(), <span class="ident">end</span>: <span class="kw-2">*</span><span class="ident">range</span>.<span class="ident">end</span>() }
+    <span class="kw">fn </span>r(range: RangeInclusive&lt;u8&gt;) -&gt; Utf8Range {
+        Utf8Range { start: <span class="kw-2">*</span>range.start(), end: <span class="kw-2">*</span>range.end() }
     }
 
-    <span class="kw">fn</span> <span class="ident">split_maybe</span>(
-        <span class="ident">old</span>: <span class="ident">RangeInclusive</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-        <span class="ident">new</span>: <span class="ident">RangeInclusive</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Split</span><span class="op">&gt;</span> {
-        <span class="ident">Split::new</span>(<span class="ident">r</span>(<span class="ident">old</span>), <span class="ident">r</span>(<span class="ident">new</span>))
+    <span class="kw">fn </span>split_maybe(
+        old: RangeInclusive&lt;u8&gt;,
+        new: RangeInclusive&lt;u8&gt;,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;Split&gt; {
+        Split::new(r(old), r(new))
     }
 
-    <span class="kw">fn</span> <span class="ident">split</span>(
-        <span class="ident">old</span>: <span class="ident">RangeInclusive</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-        <span class="ident">new</span>: <span class="ident">RangeInclusive</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SplitRange</span><span class="op">&gt;</span> {
-        <span class="ident">split_maybe</span>(<span class="ident">old</span>, <span class="ident">new</span>).<span class="ident">unwrap</span>().<span class="ident">as_slice</span>().<span class="ident">to_vec</span>()
+    <span class="kw">fn </span>split(
+        old: RangeInclusive&lt;u8&gt;,
+        new: RangeInclusive&lt;u8&gt;,
+    ) -&gt; Vec&lt;SplitRange&gt; {
+        split_maybe(old, new).unwrap().as_slice().to_vec()
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">no_splits</span>() {
-        <span class="comment">// case 1</span>
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, <span class="ident">split_maybe</span>(<span class="number">0</span>..<span class="op">=</span><span class="number">1</span>, <span class="number">2</span>..<span class="op">=</span><span class="number">3</span>));
-        <span class="comment">// case 2</span>
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, <span class="ident">split_maybe</span>(<span class="number">2</span>..<span class="op">=</span><span class="number">3</span>, <span class="number">0</span>..<span class="op">=</span><span class="number">1</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>no_splits() {
+        <span class="comment">// case 1
+        </span><span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, split_maybe(<span class="number">0</span>..=<span class="number">1</span>, <span class="number">2</span>..=<span class="number">3</span>));
+        <span class="comment">// case 2
+        </span><span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, split_maybe(<span class="number">2</span>..=<span class="number">3</span>, <span class="number">0</span>..=<span class="number">1</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">splits</span>() {
-        <span class="kw">let</span> <span class="ident">range</span> <span class="op">=</span> <span class="op">|</span><span class="ident">r</span>: <span class="ident">RangeInclusive</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">|</span> <span class="ident">Utf8Range</span> {
-            <span class="ident">start</span>: <span class="kw-2">*</span><span class="ident">r</span>.<span class="ident">start</span>(),
-            <span class="ident">end</span>: <span class="kw-2">*</span><span class="ident">r</span>.<span class="ident">end</span>(),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>splits() {
+        <span class="kw">let </span>range = |r: RangeInclusive&lt;u8&gt;| Utf8Range {
+            start: <span class="kw-2">*</span>r.start(),
+            end: <span class="kw-2">*</span>r.end(),
         };
-        <span class="kw">let</span> <span class="ident">old</span> <span class="op">=</span> <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">SplitRange::Old</span>(<span class="ident">range</span>(<span class="ident">r</span>));
-        <span class="kw">let</span> <span class="ident">new</span> <span class="op">=</span> <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">SplitRange::New</span>(<span class="ident">range</span>(<span class="ident">r</span>));
-        <span class="kw">let</span> <span class="ident">both</span> <span class="op">=</span> <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">SplitRange::Both</span>(<span class="ident">range</span>(<span class="ident">r</span>));
+        <span class="kw">let </span>old = |r| SplitRange::Old(range(r));
+        <span class="kw">let </span>new = |r| SplitRange::New(range(r));
+        <span class="kw">let </span>both = |r| SplitRange::Both(range(r));
 
-        <span class="comment">// case 3</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">split</span>(<span class="number">0</span>..<span class="op">=</span><span class="number">0</span>, <span class="number">0</span>..<span class="op">=</span><span class="number">0</span>), <span class="macro">vec!</span>[<span class="ident">both</span>(<span class="number">0</span>..<span class="op">=</span><span class="number">0</span>)]);
-        <span class="macro">assert_eq!</span>(<span class="ident">split</span>(<span class="number">9</span>..<span class="op">=</span><span class="number">9</span>, <span class="number">9</span>..<span class="op">=</span><span class="number">9</span>), <span class="macro">vec!</span>[<span class="ident">both</span>(<span class="number">9</span>..<span class="op">=</span><span class="number">9</span>)]);
+        <span class="comment">// case 3
+        </span><span class="macro">assert_eq!</span>(split(<span class="number">0</span>..=<span class="number">0</span>, <span class="number">0</span>..=<span class="number">0</span>), <span class="macro">vec!</span>[both(<span class="number">0</span>..=<span class="number">0</span>)]);
+        <span class="macro">assert_eq!</span>(split(<span class="number">9</span>..=<span class="number">9</span>, <span class="number">9</span>..=<span class="number">9</span>), <span class="macro">vec!</span>[both(<span class="number">9</span>..=<span class="number">9</span>)]);
 
-        <span class="comment">// case 4</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">split</span>(<span class="number">0</span>..<span class="op">=</span><span class="number">5</span>, <span class="number">0</span>..<span class="op">=</span><span class="number">6</span>), <span class="macro">vec!</span>[<span class="ident">both</span>(<span class="number">0</span>..<span class="op">=</span><span class="number">5</span>), <span class="ident">new</span>(<span class="number">6</span>..<span class="op">=</span><span class="number">6</span>)]);
-        <span class="macro">assert_eq!</span>(<span class="ident">split</span>(<span class="number">0</span>..<span class="op">=</span><span class="number">5</span>, <span class="number">0</span>..<span class="op">=</span><span class="number">8</span>), <span class="macro">vec!</span>[<span class="ident">both</span>(<span class="number">0</span>..<span class="op">=</span><span class="number">5</span>), <span class="ident">new</span>(<span class="number">6</span>..<span class="op">=</span><span class="number">8</span>)]);
-        <span class="macro">assert_eq!</span>(<span class="ident">split</span>(<span class="number">5</span>..<span class="op">=</span><span class="number">5</span>, <span class="number">5</span>..<span class="op">=</span><span class="number">8</span>), <span class="macro">vec!</span>[<span class="ident">both</span>(<span class="number">5</span>..<span class="op">=</span><span class="number">5</span>), <span class="ident">new</span>(<span class="number">6</span>..<span class="op">=</span><span class="number">8</span>)]);
+        <span class="comment">// case 4
+        </span><span class="macro">assert_eq!</span>(split(<span class="number">0</span>..=<span class="number">5</span>, <span class="number">0</span>..=<span class="number">6</span>), <span class="macro">vec!</span>[both(<span class="number">0</span>..=<span class="number">5</span>), new(<span class="number">6</span>..=<span class="number">6</span>)]);
+        <span class="macro">assert_eq!</span>(split(<span class="number">0</span>..=<span class="number">5</span>, <span class="number">0</span>..=<span class="number">8</span>), <span class="macro">vec!</span>[both(<span class="number">0</span>..=<span class="number">5</span>), new(<span class="number">6</span>..=<span class="number">8</span>)]);
+        <span class="macro">assert_eq!</span>(split(<span class="number">5</span>..=<span class="number">5</span>, <span class="number">5</span>..=<span class="number">8</span>), <span class="macro">vec!</span>[both(<span class="number">5</span>..=<span class="number">5</span>), new(<span class="number">6</span>..=<span class="number">8</span>)]);
 
-        <span class="comment">// case 5</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">split</span>(<span class="number">1</span>..<span class="op">=</span><span class="number">5</span>, <span class="number">0</span>..<span class="op">=</span><span class="number">5</span>), <span class="macro">vec!</span>[<span class="ident">new</span>(<span class="number">0</span>..<span class="op">=</span><span class="number">0</span>), <span class="ident">both</span>(<span class="number">1</span>..<span class="op">=</span><span class="number">5</span>)]);
-        <span class="macro">assert_eq!</span>(<span class="ident">split</span>(<span class="number">3</span>..<span class="op">=</span><span class="number">5</span>, <span class="number">0</span>..<span class="op">=</span><span class="number">5</span>), <span class="macro">vec!</span>[<span class="ident">new</span>(<span class="number">0</span>..<span class="op">=</span><span class="number">2</span>), <span class="ident">both</span>(<span class="number">3</span>..<span class="op">=</span><span class="number">5</span>)]);
-        <span class="macro">assert_eq!</span>(<span class="ident">split</span>(<span class="number">5</span>..<span class="op">=</span><span class="number">5</span>, <span class="number">0</span>..<span class="op">=</span><span class="number">5</span>), <span class="macro">vec!</span>[<span class="ident">new</span>(<span class="number">0</span>..<span class="op">=</span><span class="number">4</span>), <span class="ident">both</span>(<span class="number">5</span>..<span class="op">=</span><span class="number">5</span>)]);
+        <span class="comment">// case 5
+        </span><span class="macro">assert_eq!</span>(split(<span class="number">1</span>..=<span class="number">5</span>, <span class="number">0</span>..=<span class="number">5</span>), <span class="macro">vec!</span>[new(<span class="number">0</span>..=<span class="number">0</span>), both(<span class="number">1</span>..=<span class="number">5</span>)]);
+        <span class="macro">assert_eq!</span>(split(<span class="number">3</span>..=<span class="number">5</span>, <span class="number">0</span>..=<span class="number">5</span>), <span class="macro">vec!</span>[new(<span class="number">0</span>..=<span class="number">2</span>), both(<span class="number">3</span>..=<span class="number">5</span>)]);
+        <span class="macro">assert_eq!</span>(split(<span class="number">5</span>..=<span class="number">5</span>, <span class="number">0</span>..=<span class="number">5</span>), <span class="macro">vec!</span>[new(<span class="number">0</span>..=<span class="number">4</span>), both(<span class="number">5</span>..=<span class="number">5</span>)]);
 
-        <span class="comment">// case 6</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">split</span>(<span class="number">0</span>..<span class="op">=</span><span class="number">6</span>, <span class="number">0</span>..<span class="op">=</span><span class="number">5</span>), <span class="macro">vec!</span>[<span class="ident">both</span>(<span class="number">0</span>..<span class="op">=</span><span class="number">5</span>), <span class="ident">old</span>(<span class="number">6</span>..<span class="op">=</span><span class="number">6</span>)]);
-        <span class="macro">assert_eq!</span>(<span class="ident">split</span>(<span class="number">0</span>..<span class="op">=</span><span class="number">8</span>, <span class="number">0</span>..<span class="op">=</span><span class="number">5</span>), <span class="macro">vec!</span>[<span class="ident">both</span>(<span class="number">0</span>..<span class="op">=</span><span class="number">5</span>), <span class="ident">old</span>(<span class="number">6</span>..<span class="op">=</span><span class="number">8</span>)]);
-        <span class="macro">assert_eq!</span>(<span class="ident">split</span>(<span class="number">5</span>..<span class="op">=</span><span class="number">8</span>, <span class="number">5</span>..<span class="op">=</span><span class="number">5</span>), <span class="macro">vec!</span>[<span class="ident">both</span>(<span class="number">5</span>..<span class="op">=</span><span class="number">5</span>), <span class="ident">old</span>(<span class="number">6</span>..<span class="op">=</span><span class="number">8</span>)]);
+        <span class="comment">// case 6
+        </span><span class="macro">assert_eq!</span>(split(<span class="number">0</span>..=<span class="number">6</span>, <span class="number">0</span>..=<span class="number">5</span>), <span class="macro">vec!</span>[both(<span class="number">0</span>..=<span class="number">5</span>), old(<span class="number">6</span>..=<span class="number">6</span>)]);
+        <span class="macro">assert_eq!</span>(split(<span class="number">0</span>..=<span class="number">8</span>, <span class="number">0</span>..=<span class="number">5</span>), <span class="macro">vec!</span>[both(<span class="number">0</span>..=<span class="number">5</span>), old(<span class="number">6</span>..=<span class="number">8</span>)]);
+        <span class="macro">assert_eq!</span>(split(<span class="number">5</span>..=<span class="number">8</span>, <span class="number">5</span>..=<span class="number">5</span>), <span class="macro">vec!</span>[both(<span class="number">5</span>..=<span class="number">5</span>), old(<span class="number">6</span>..=<span class="number">8</span>)]);
 
-        <span class="comment">// case 7</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">split</span>(<span class="number">0</span>..<span class="op">=</span><span class="number">5</span>, <span class="number">1</span>..<span class="op">=</span><span class="number">5</span>), <span class="macro">vec!</span>[<span class="ident">old</span>(<span class="number">0</span>..<span class="op">=</span><span class="number">0</span>), <span class="ident">both</span>(<span class="number">1</span>..<span class="op">=</span><span class="number">5</span>)]);
-        <span class="macro">assert_eq!</span>(<span class="ident">split</span>(<span class="number">0</span>..<span class="op">=</span><span class="number">5</span>, <span class="number">3</span>..<span class="op">=</span><span class="number">5</span>), <span class="macro">vec!</span>[<span class="ident">old</span>(<span class="number">0</span>..<span class="op">=</span><span class="number">2</span>), <span class="ident">both</span>(<span class="number">3</span>..<span class="op">=</span><span class="number">5</span>)]);
-        <span class="macro">assert_eq!</span>(<span class="ident">split</span>(<span class="number">0</span>..<span class="op">=</span><span class="number">5</span>, <span class="number">5</span>..<span class="op">=</span><span class="number">5</span>), <span class="macro">vec!</span>[<span class="ident">old</span>(<span class="number">0</span>..<span class="op">=</span><span class="number">4</span>), <span class="ident">both</span>(<span class="number">5</span>..<span class="op">=</span><span class="number">5</span>)]);
+        <span class="comment">// case 7
+        </span><span class="macro">assert_eq!</span>(split(<span class="number">0</span>..=<span class="number">5</span>, <span class="number">1</span>..=<span class="number">5</span>), <span class="macro">vec!</span>[old(<span class="number">0</span>..=<span class="number">0</span>), both(<span class="number">1</span>..=<span class="number">5</span>)]);
+        <span class="macro">assert_eq!</span>(split(<span class="number">0</span>..=<span class="number">5</span>, <span class="number">3</span>..=<span class="number">5</span>), <span class="macro">vec!</span>[old(<span class="number">0</span>..=<span class="number">2</span>), both(<span class="number">3</span>..=<span class="number">5</span>)]);
+        <span class="macro">assert_eq!</span>(split(<span class="number">0</span>..=<span class="number">5</span>, <span class="number">5</span>..=<span class="number">5</span>), <span class="macro">vec!</span>[old(<span class="number">0</span>..=<span class="number">4</span>), both(<span class="number">5</span>..=<span class="number">5</span>)]);
 
-        <span class="comment">// case 8</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">split</span>(<span class="number">3</span>..<span class="op">=</span><span class="number">6</span>, <span class="number">2</span>..<span class="op">=</span><span class="number">7</span>),
-            <span class="macro">vec!</span>[<span class="ident">new</span>(<span class="number">2</span>..<span class="op">=</span><span class="number">2</span>), <span class="ident">both</span>(<span class="number">3</span>..<span class="op">=</span><span class="number">6</span>), <span class="ident">new</span>(<span class="number">7</span>..<span class="op">=</span><span class="number">7</span>)],
+        <span class="comment">// case 8
+        </span><span class="macro">assert_eq!</span>(
+            split(<span class="number">3</span>..=<span class="number">6</span>, <span class="number">2</span>..=<span class="number">7</span>),
+            <span class="macro">vec!</span>[new(<span class="number">2</span>..=<span class="number">2</span>), both(<span class="number">3</span>..=<span class="number">6</span>), new(<span class="number">7</span>..=<span class="number">7</span>)],
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">split</span>(<span class="number">3</span>..<span class="op">=</span><span class="number">6</span>, <span class="number">1</span>..<span class="op">=</span><span class="number">8</span>),
-            <span class="macro">vec!</span>[<span class="ident">new</span>(<span class="number">1</span>..<span class="op">=</span><span class="number">2</span>), <span class="ident">both</span>(<span class="number">3</span>..<span class="op">=</span><span class="number">6</span>), <span class="ident">new</span>(<span class="number">7</span>..<span class="op">=</span><span class="number">8</span>)],
-        );
-
-        <span class="comment">// case 9</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">split</span>(<span class="number">2</span>..<span class="op">=</span><span class="number">7</span>, <span class="number">3</span>..<span class="op">=</span><span class="number">6</span>),
-            <span class="macro">vec!</span>[<span class="ident">old</span>(<span class="number">2</span>..<span class="op">=</span><span class="number">2</span>), <span class="ident">both</span>(<span class="number">3</span>..<span class="op">=</span><span class="number">6</span>), <span class="ident">old</span>(<span class="number">7</span>..<span class="op">=</span><span class="number">7</span>)],
-        );
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">split</span>(<span class="number">1</span>..<span class="op">=</span><span class="number">8</span>, <span class="number">3</span>..<span class="op">=</span><span class="number">6</span>),
-            <span class="macro">vec!</span>[<span class="ident">old</span>(<span class="number">1</span>..<span class="op">=</span><span class="number">2</span>), <span class="ident">both</span>(<span class="number">3</span>..<span class="op">=</span><span class="number">6</span>), <span class="ident">old</span>(<span class="number">7</span>..<span class="op">=</span><span class="number">8</span>)],
+            split(<span class="number">3</span>..=<span class="number">6</span>, <span class="number">1</span>..=<span class="number">8</span>),
+            <span class="macro">vec!</span>[new(<span class="number">1</span>..=<span class="number">2</span>), both(<span class="number">3</span>..=<span class="number">6</span>), new(<span class="number">7</span>..=<span class="number">8</span>)],
         );
 
-        <span class="comment">// case 10</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">split</span>(<span class="number">3</span>..<span class="op">=</span><span class="number">6</span>, <span class="number">6</span>..<span class="op">=</span><span class="number">7</span>),
-            <span class="macro">vec!</span>[<span class="ident">old</span>(<span class="number">3</span>..<span class="op">=</span><span class="number">5</span>), <span class="ident">both</span>(<span class="number">6</span>..<span class="op">=</span><span class="number">6</span>), <span class="ident">new</span>(<span class="number">7</span>..<span class="op">=</span><span class="number">7</span>)],
+        <span class="comment">// case 9
+        </span><span class="macro">assert_eq!</span>(
+            split(<span class="number">2</span>..=<span class="number">7</span>, <span class="number">3</span>..=<span class="number">6</span>),
+            <span class="macro">vec!</span>[old(<span class="number">2</span>..=<span class="number">2</span>), both(<span class="number">3</span>..=<span class="number">6</span>), old(<span class="number">7</span>..=<span class="number">7</span>)],
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">split</span>(<span class="number">3</span>..<span class="op">=</span><span class="number">6</span>, <span class="number">6</span>..<span class="op">=</span><span class="number">8</span>),
-            <span class="macro">vec!</span>[<span class="ident">old</span>(<span class="number">3</span>..<span class="op">=</span><span class="number">5</span>), <span class="ident">both</span>(<span class="number">6</span>..<span class="op">=</span><span class="number">6</span>), <span class="ident">new</span>(<span class="number">7</span>..<span class="op">=</span><span class="number">8</span>)],
-        );
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">split</span>(<span class="number">5</span>..<span class="op">=</span><span class="number">6</span>, <span class="number">6</span>..<span class="op">=</span><span class="number">7</span>),
-            <span class="macro">vec!</span>[<span class="ident">old</span>(<span class="number">5</span>..<span class="op">=</span><span class="number">5</span>), <span class="ident">both</span>(<span class="number">6</span>..<span class="op">=</span><span class="number">6</span>), <span class="ident">new</span>(<span class="number">7</span>..<span class="op">=</span><span class="number">7</span>)],
+            split(<span class="number">1</span>..=<span class="number">8</span>, <span class="number">3</span>..=<span class="number">6</span>),
+            <span class="macro">vec!</span>[old(<span class="number">1</span>..=<span class="number">2</span>), both(<span class="number">3</span>..=<span class="number">6</span>), old(<span class="number">7</span>..=<span class="number">8</span>)],
         );
 
-        <span class="comment">// case 11</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">split</span>(<span class="number">6</span>..<span class="op">=</span><span class="number">7</span>, <span class="number">3</span>..<span class="op">=</span><span class="number">6</span>),
-            <span class="macro">vec!</span>[<span class="ident">new</span>(<span class="number">3</span>..<span class="op">=</span><span class="number">5</span>), <span class="ident">both</span>(<span class="number">6</span>..<span class="op">=</span><span class="number">6</span>), <span class="ident">old</span>(<span class="number">7</span>..<span class="op">=</span><span class="number">7</span>)],
+        <span class="comment">// case 10
+        </span><span class="macro">assert_eq!</span>(
+            split(<span class="number">3</span>..=<span class="number">6</span>, <span class="number">6</span>..=<span class="number">7</span>),
+            <span class="macro">vec!</span>[old(<span class="number">3</span>..=<span class="number">5</span>), both(<span class="number">6</span>..=<span class="number">6</span>), new(<span class="number">7</span>..=<span class="number">7</span>)],
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">split</span>(<span class="number">6</span>..<span class="op">=</span><span class="number">8</span>, <span class="number">3</span>..<span class="op">=</span><span class="number">6</span>),
-            <span class="macro">vec!</span>[<span class="ident">new</span>(<span class="number">3</span>..<span class="op">=</span><span class="number">5</span>), <span class="ident">both</span>(<span class="number">6</span>..<span class="op">=</span><span class="number">6</span>), <span class="ident">old</span>(<span class="number">7</span>..<span class="op">=</span><span class="number">8</span>)],
+            split(<span class="number">3</span>..=<span class="number">6</span>, <span class="number">6</span>..=<span class="number">8</span>),
+            <span class="macro">vec!</span>[old(<span class="number">3</span>..=<span class="number">5</span>), both(<span class="number">6</span>..=<span class="number">6</span>), new(<span class="number">7</span>..=<span class="number">8</span>)],
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">split</span>(<span class="number">6</span>..<span class="op">=</span><span class="number">7</span>, <span class="number">5</span>..<span class="op">=</span><span class="number">6</span>),
-            <span class="macro">vec!</span>[<span class="ident">new</span>(<span class="number">5</span>..<span class="op">=</span><span class="number">5</span>), <span class="ident">both</span>(<span class="number">6</span>..<span class="op">=</span><span class="number">6</span>), <span class="ident">old</span>(<span class="number">7</span>..<span class="op">=</span><span class="number">7</span>)],
-        );
-
-        <span class="comment">// case 12</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">split</span>(<span class="number">3</span>..<span class="op">=</span><span class="number">7</span>, <span class="number">5</span>..<span class="op">=</span><span class="number">9</span>),
-            <span class="macro">vec!</span>[<span class="ident">old</span>(<span class="number">3</span>..<span class="op">=</span><span class="number">4</span>), <span class="ident">both</span>(<span class="number">5</span>..<span class="op">=</span><span class="number">7</span>), <span class="ident">new</span>(<span class="number">8</span>..<span class="op">=</span><span class="number">9</span>)],
-        );
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">split</span>(<span class="number">3</span>..<span class="op">=</span><span class="number">5</span>, <span class="number">4</span>..<span class="op">=</span><span class="number">6</span>),
-            <span class="macro">vec!</span>[<span class="ident">old</span>(<span class="number">3</span>..<span class="op">=</span><span class="number">3</span>), <span class="ident">both</span>(<span class="number">4</span>..<span class="op">=</span><span class="number">5</span>), <span class="ident">new</span>(<span class="number">6</span>..<span class="op">=</span><span class="number">6</span>)],
+            split(<span class="number">5</span>..=<span class="number">6</span>, <span class="number">6</span>..=<span class="number">7</span>),
+            <span class="macro">vec!</span>[old(<span class="number">5</span>..=<span class="number">5</span>), both(<span class="number">6</span>..=<span class="number">6</span>), new(<span class="number">7</span>..=<span class="number">7</span>)],
         );
 
-        <span class="comment">// case 13</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">split</span>(<span class="number">5</span>..<span class="op">=</span><span class="number">9</span>, <span class="number">3</span>..<span class="op">=</span><span class="number">7</span>),
-            <span class="macro">vec!</span>[<span class="ident">new</span>(<span class="number">3</span>..<span class="op">=</span><span class="number">4</span>), <span class="ident">both</span>(<span class="number">5</span>..<span class="op">=</span><span class="number">7</span>), <span class="ident">old</span>(<span class="number">8</span>..<span class="op">=</span><span class="number">9</span>)],
+        <span class="comment">// case 11
+        </span><span class="macro">assert_eq!</span>(
+            split(<span class="number">6</span>..=<span class="number">7</span>, <span class="number">3</span>..=<span class="number">6</span>),
+            <span class="macro">vec!</span>[new(<span class="number">3</span>..=<span class="number">5</span>), both(<span class="number">6</span>..=<span class="number">6</span>), old(<span class="number">7</span>..=<span class="number">7</span>)],
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">split</span>(<span class="number">4</span>..<span class="op">=</span><span class="number">6</span>, <span class="number">3</span>..<span class="op">=</span><span class="number">5</span>),
-            <span class="macro">vec!</span>[<span class="ident">new</span>(<span class="number">3</span>..<span class="op">=</span><span class="number">3</span>), <span class="ident">both</span>(<span class="number">4</span>..<span class="op">=</span><span class="number">5</span>), <span class="ident">old</span>(<span class="number">6</span>..<span class="op">=</span><span class="number">6</span>)],
+            split(<span class="number">6</span>..=<span class="number">8</span>, <span class="number">3</span>..=<span class="number">6</span>),
+            <span class="macro">vec!</span>[new(<span class="number">3</span>..=<span class="number">5</span>), both(<span class="number">6</span>..=<span class="number">6</span>), old(<span class="number">7</span>..=<span class="number">8</span>)],
+        );
+        <span class="macro">assert_eq!</span>(
+            split(<span class="number">6</span>..=<span class="number">7</span>, <span class="number">5</span>..=<span class="number">6</span>),
+            <span class="macro">vec!</span>[new(<span class="number">5</span>..=<span class="number">5</span>), both(<span class="number">6</span>..=<span class="number">6</span>), old(<span class="number">7</span>..=<span class="number">7</span>)],
+        );
+
+        <span class="comment">// case 12
+        </span><span class="macro">assert_eq!</span>(
+            split(<span class="number">3</span>..=<span class="number">7</span>, <span class="number">5</span>..=<span class="number">9</span>),
+            <span class="macro">vec!</span>[old(<span class="number">3</span>..=<span class="number">4</span>), both(<span class="number">5</span>..=<span class="number">7</span>), new(<span class="number">8</span>..=<span class="number">9</span>)],
+        );
+        <span class="macro">assert_eq!</span>(
+            split(<span class="number">3</span>..=<span class="number">5</span>, <span class="number">4</span>..=<span class="number">6</span>),
+            <span class="macro">vec!</span>[old(<span class="number">3</span>..=<span class="number">3</span>), both(<span class="number">4</span>..=<span class="number">5</span>), new(<span class="number">6</span>..=<span class="number">6</span>)],
+        );
+
+        <span class="comment">// case 13
+        </span><span class="macro">assert_eq!</span>(
+            split(<span class="number">5</span>..=<span class="number">9</span>, <span class="number">3</span>..=<span class="number">7</span>),
+            <span class="macro">vec!</span>[new(<span class="number">3</span>..=<span class="number">4</span>), both(<span class="number">5</span>..=<span class="number">7</span>), old(<span class="number">8</span>..=<span class="number">9</span>)],
+        );
+        <span class="macro">assert_eq!</span>(
+            split(<span class="number">4</span>..=<span class="number">6</span>, <span class="number">3</span>..=<span class="number">5</span>),
+            <span class="macro">vec!</span>[new(<span class="number">3</span>..=<span class="number">3</span>), both(<span class="number">4</span>..=<span class="number">5</span>), old(<span class="number">6</span>..=<span class="number">6</span>)],
         );
     }
 
-    <span class="comment">// Arguably there should be more tests here, but in practice, this data</span>
-    <span class="comment">// structure is well covered by the huge number of regex tests.</span>
-}
+    <span class="comment">// Arguably there should be more tests here, but in practice, this data
+    // structure is well covered by the huge number of regex tests.
+</span>}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="regex_automata" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="regex_automata" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

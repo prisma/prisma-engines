@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sha2-0.10.5/src/sha512/x86.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>x86.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/RustCrypto/media/6ee8e381/logo.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../sha2/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/RustCrypto/media/6ee8e381/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../sha2/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sha2-0.10.5/src/sha512/x86.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>x86.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/RustCrypto/media/6ee8e381/logo.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../sha2/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/RustCrypto/media/6ee8e381/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../sha2/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/RustCrypto/media/6ee8e381/logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../sha2/index.html">
                         <img src="https://raw.githubusercontent.com/RustCrypto/media/6ee8e381/logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -357,362 +357,362 @@
 <span id="355">355</span>
 <span id="356">356</span>
 <span id="357">357</span>
-</pre><pre class="rust"><code><span class="doccomment">//! SHA-512 `x86`/`x86_64` backend</span>
+</pre><pre class="rust"><code><span class="doccomment">//! SHA-512 `x86`/`x86_64` backend
 
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::many_single_char_names</span>)]</span>
+</span><span class="attribute">#![allow(clippy::many_single_char_names)]
 
-<span class="kw">use</span> <span class="ident">core::mem::size_of</span>;
+</span><span class="kw">use </span>core::mem::size_of;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">core::arch::x86</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">core::arch::x86_64</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(target_arch = <span class="string">&quot;x86&quot;</span>)]
+</span><span class="kw">use </span>core::arch::x86::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(target_arch = <span class="string">&quot;x86_64&quot;</span>)]
+</span><span class="kw">use </span>core::arch::x86_64::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::consts::K64</span>;
+<span class="kw">use </span><span class="kw">crate</span>::consts::K64;
 
-<span class="macro">cpufeatures::new!</span>(<span class="ident">avx2_cpuid</span>, <span class="string">&quot;avx2&quot;</span>);
+<span class="macro">cpufeatures::new!</span>(avx2_cpuid, <span class="string">&quot;avx2&quot;</span>);
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compress</span>(<span class="ident">state</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u64</span>; <span class="number">8</span>], <span class="ident">blocks</span>: <span class="kw-2">&amp;</span>[[<span class="ident">u8</span>; <span class="number">128</span>]]) {
-    <span class="comment">// TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725</span>
-    <span class="comment">// after stabilization</span>
-    <span class="kw">if</span> <span class="ident">avx2_cpuid::get</span>() {
-        <span class="kw">unsafe</span> {
-            <span class="ident">sha512_compress_x86_64_avx2</span>(<span class="ident">state</span>, <span class="ident">blocks</span>);
+<span class="kw">pub fn </span>compress(state: <span class="kw-2">&amp;mut </span>[u64; <span class="number">8</span>], blocks: <span class="kw-2">&amp;</span>[[u8; <span class="number">128</span>]]) {
+    <span class="comment">// TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
+    // after stabilization
+    </span><span class="kw">if </span>avx2_cpuid::get() {
+        <span class="kw">unsafe </span>{
+            sha512_compress_x86_64_avx2(state, blocks);
         }
-    } <span class="kw">else</span> {
-        <span class="ident"><span class="kw">super</span>::soft::compress</span>(<span class="ident">state</span>, <span class="ident">blocks</span>);
+    } <span class="kw">else </span>{
+        <span class="kw">super</span>::soft::compress(state, blocks);
     }
 }
 
-<span class="attribute">#[<span class="ident">target_feature</span>(<span class="ident">enable</span> <span class="op">=</span> <span class="string">&quot;avx2&quot;</span>)]</span>
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">sha512_compress_x86_64_avx2</span>(<span class="ident">state</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u64</span>; <span class="number">8</span>], <span class="ident">blocks</span>: <span class="kw-2">&amp;</span>[[<span class="ident">u8</span>; <span class="number">128</span>]]) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">start_block</span> <span class="op">=</span> <span class="number">0</span>;
+<span class="attribute">#[target_feature(enable = <span class="string">&quot;avx2&quot;</span>)]
+</span><span class="kw">unsafe fn </span>sha512_compress_x86_64_avx2(state: <span class="kw-2">&amp;mut </span>[u64; <span class="number">8</span>], blocks: <span class="kw-2">&amp;</span>[[u8; <span class="number">128</span>]]) {
+    <span class="kw">let </span><span class="kw-2">mut </span>start_block = <span class="number">0</span>;
 
-    <span class="kw">if</span> <span class="ident">blocks</span>.<span class="ident">len</span>() <span class="op">&amp;</span> <span class="number">0b1</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-        <span class="ident">sha512_compress_x86_64_avx</span>(<span class="ident">state</span>, <span class="kw-2">&amp;</span><span class="ident">blocks</span>[<span class="number">0</span>]);
-        <span class="ident">start_block</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+    <span class="kw">if </span>blocks.len() &amp; <span class="number">0b1 </span>!= <span class="number">0 </span>{
+        sha512_compress_x86_64_avx(state, <span class="kw-2">&amp;</span>blocks[<span class="number">0</span>]);
+        start_block += <span class="number">1</span>;
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ms</span>: <span class="ident">MsgSchedule</span> <span class="op">=</span> [<span class="ident">_mm_setzero_si128</span>(); <span class="number">8</span>];
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">t2</span>: <span class="ident">RoundStates</span> <span class="op">=</span> [<span class="ident">_mm_setzero_si128</span>(); <span class="number">40</span>];
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">x</span> <span class="op">=</span> [<span class="ident">_mm256_setzero_si256</span>(); <span class="number">8</span>];
+    <span class="kw">let </span><span class="kw-2">mut </span>ms: MsgSchedule = [_mm_setzero_si128(); <span class="number">8</span>];
+    <span class="kw">let </span><span class="kw-2">mut </span>t2: RoundStates = [_mm_setzero_si128(); <span class="number">40</span>];
+    <span class="kw">let </span><span class="kw-2">mut </span>x = [_mm256_setzero_si256(); <span class="number">8</span>];
 
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> (<span class="ident">start_block</span>..<span class="ident">blocks</span>.<span class="ident">len</span>()).<span class="ident">step_by</span>(<span class="number">2</span>) {
-        <span class="ident">load_data_avx2</span>(<span class="kw-2">&amp;mut</span> <span class="ident">x</span>, <span class="kw-2">&amp;mut</span> <span class="ident">ms</span>, <span class="kw-2">&amp;mut</span> <span class="ident">t2</span>, <span class="ident">blocks</span>.<span class="ident">as_ptr</span>().<span class="ident">add</span>(<span class="ident">i</span>) <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>);
+    <span class="kw">for </span>i <span class="kw">in </span>(start_block..blocks.len()).step_by(<span class="number">2</span>) {
+        load_data_avx2(<span class="kw-2">&amp;mut </span>x, <span class="kw-2">&amp;mut </span>ms, <span class="kw-2">&amp;mut </span>t2, blocks.as_ptr().add(i) <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>);
 
-        <span class="comment">// First block</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">current_state</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">state</span>;
-        <span class="ident">rounds_0_63_avx2</span>(<span class="kw-2">&amp;mut</span> <span class="ident">current_state</span>, <span class="kw-2">&amp;mut</span> <span class="ident">x</span>, <span class="kw-2">&amp;mut</span> <span class="ident">ms</span>, <span class="kw-2">&amp;mut</span> <span class="ident">t2</span>);
-        <span class="ident">rounds_64_79</span>(<span class="kw-2">&amp;mut</span> <span class="ident">current_state</span>, <span class="kw-2">&amp;</span><span class="ident">ms</span>);
-        <span class="ident">accumulate_state</span>(<span class="ident">state</span>, <span class="kw-2">&amp;</span><span class="ident">current_state</span>);
+        <span class="comment">// First block
+        </span><span class="kw">let </span><span class="kw-2">mut </span>current_state = <span class="kw-2">*</span>state;
+        rounds_0_63_avx2(<span class="kw-2">&amp;mut </span>current_state, <span class="kw-2">&amp;mut </span>x, <span class="kw-2">&amp;mut </span>ms, <span class="kw-2">&amp;mut </span>t2);
+        rounds_64_79(<span class="kw-2">&amp;mut </span>current_state, <span class="kw-2">&amp;</span>ms);
+        accumulate_state(state, <span class="kw-2">&amp;</span>current_state);
 
-        <span class="comment">// Second block</span>
-        <span class="ident">current_state</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">state</span>;
-        <span class="ident">process_second_block</span>(<span class="kw-2">&amp;mut</span> <span class="ident">current_state</span>, <span class="kw-2">&amp;</span><span class="ident">t2</span>);
-        <span class="ident">accumulate_state</span>(<span class="ident">state</span>, <span class="kw-2">&amp;</span><span class="ident">current_state</span>);
+        <span class="comment">// Second block
+        </span>current_state = <span class="kw-2">*</span>state;
+        process_second_block(<span class="kw-2">&amp;mut </span>current_state, <span class="kw-2">&amp;</span>t2);
+        accumulate_state(state, <span class="kw-2">&amp;</span>current_state);
     }
 }
 
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">sha512_compress_x86_64_avx</span>(<span class="ident">state</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u64</span>; <span class="number">8</span>], <span class="ident">block</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">128</span>]) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ms</span> <span class="op">=</span> [<span class="ident">_mm_setzero_si128</span>(); <span class="number">8</span>];
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">x</span> <span class="op">=</span> [<span class="ident">_mm_setzero_si128</span>(); <span class="number">8</span>];
+<span class="attribute">#[inline(always)]
+</span><span class="kw">unsafe fn </span>sha512_compress_x86_64_avx(state: <span class="kw-2">&amp;mut </span>[u64; <span class="number">8</span>], block: <span class="kw-2">&amp;</span>[u8; <span class="number">128</span>]) {
+    <span class="kw">let </span><span class="kw-2">mut </span>ms = [_mm_setzero_si128(); <span class="number">8</span>];
+    <span class="kw">let </span><span class="kw-2">mut </span>x = [_mm_setzero_si128(); <span class="number">8</span>];
 
-    <span class="comment">// Reduced to single iteration</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">current_state</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">state</span>;
-    <span class="ident">load_data_avx</span>(<span class="kw-2">&amp;mut</span> <span class="ident">x</span>, <span class="kw-2">&amp;mut</span> <span class="ident">ms</span>, <span class="ident">block</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>);
-    <span class="ident">rounds_0_63_avx</span>(<span class="kw-2">&amp;mut</span> <span class="ident">current_state</span>, <span class="kw-2">&amp;mut</span> <span class="ident">x</span>, <span class="kw-2">&amp;mut</span> <span class="ident">ms</span>);
-    <span class="ident">rounds_64_79</span>(<span class="kw-2">&amp;mut</span> <span class="ident">current_state</span>, <span class="kw-2">&amp;</span><span class="ident">ms</span>);
-    <span class="ident">accumulate_state</span>(<span class="ident">state</span>, <span class="kw-2">&amp;</span><span class="ident">current_state</span>);
+    <span class="comment">// Reduced to single iteration
+    </span><span class="kw">let </span><span class="kw-2">mut </span>current_state = <span class="kw-2">*</span>state;
+    load_data_avx(<span class="kw-2">&amp;mut </span>x, <span class="kw-2">&amp;mut </span>ms, block.as_ptr() <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>);
+    rounds_0_63_avx(<span class="kw-2">&amp;mut </span>current_state, <span class="kw-2">&amp;mut </span>x, <span class="kw-2">&amp;mut </span>ms);
+    rounds_64_79(<span class="kw-2">&amp;mut </span>current_state, <span class="kw-2">&amp;</span>ms);
+    accumulate_state(state, <span class="kw-2">&amp;</span>current_state);
 }
 
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">load_data_avx</span>(<span class="ident">x</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">__m128i</span>; <span class="number">8</span>], <span class="ident">ms</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MsgSchedule</span>, <span class="ident">data</span>: <span class="kw-2">*const</span> <span class="ident">__m128i</span>) {
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
-    <span class="kw">let</span> <span class="ident">MASK</span> <span class="op">=</span> <span class="ident">_mm_setr_epi32</span>(<span class="number">0x04050607</span>, <span class="number">0x00010203</span>, <span class="number">0x0c0d0e0f</span>, <span class="number">0x08090a0b</span>);
+<span class="attribute">#[inline(always)]
+</span><span class="kw">unsafe fn </span>load_data_avx(x: <span class="kw-2">&amp;mut </span>[__m128i; <span class="number">8</span>], ms: <span class="kw-2">&amp;mut </span>MsgSchedule, data: <span class="kw-2">*const </span>__m128i) {
+    <span class="attribute">#[allow(non_snake_case)]
+    </span><span class="kw">let </span>MASK = _mm_setr_epi32(<span class="number">0x04050607</span>, <span class="number">0x00010203</span>, <span class="number">0x0c0d0e0f</span>, <span class="number">0x08090a0b</span>);
 
-    <span class="macro">macro_rules!</span> <span class="ident">unrolled_iterations</span> {
-        ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">literal</span>),<span class="kw-2">*</span>) =&gt; {$(
-            <span class="ident">x</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>] <span class="op">=</span> <span class="ident">_mm_loadu_si128</span>(<span class="ident">data</span>.<span class="ident">add</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>) <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>);
-            <span class="ident">x</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>] <span class="op">=</span> <span class="ident">_mm_shuffle_epi8</span>(<span class="ident">x</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>], <span class="ident">MASK</span>);
+    <span class="macro">macro_rules! </span>unrolled_iterations {
+        ($(<span class="macro-nonterminal">$i</span>:literal),<span class="kw-2">*</span>) =&gt; {$(
+            x[<span class="macro-nonterminal">$i</span>] = _mm_loadu_si128(data.add(<span class="macro-nonterminal">$i</span>) <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>);
+            x[<span class="macro-nonterminal">$i</span>] = _mm_shuffle_epi8(x[<span class="macro-nonterminal">$i</span>], MASK);
 
-            <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="ident">_mm_add_epi64</span>(
-                <span class="ident">x</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>],
-                <span class="ident">_mm_loadu_si128</span>(<span class="kw-2">&amp;</span><span class="ident">K64</span>[<span class="number">2</span> <span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>] <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u64</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>),
+            <span class="kw">let </span>y = _mm_add_epi64(
+                x[<span class="macro-nonterminal">$i</span>],
+                _mm_loadu_si128(<span class="kw-2">&amp;</span>K64[<span class="number">2 </span>* <span class="macro-nonterminal">$i</span>] <span class="kw">as </span><span class="kw-2">*const </span>u64 <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>),
             );
 
-            <span class="ident">ms</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>] <span class="op">=</span> <span class="ident">y</span>;
+            ms[<span class="macro-nonterminal">$i</span>] = y;
         )<span class="kw-2">*</span>};
     }
 
     <span class="macro">unrolled_iterations!</span>(<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>);
 }
 
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">load_data_avx2</span>(
-    <span class="ident">x</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">__m256i</span>; <span class="number">8</span>],
-    <span class="ident">ms</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MsgSchedule</span>,
-    <span class="ident">t2</span>: <span class="kw-2">&amp;mut</span> <span class="ident">RoundStates</span>,
-    <span class="ident">data</span>: <span class="kw-2">*const</span> <span class="ident">__m128i</span>,
+<span class="attribute">#[inline(always)]
+</span><span class="kw">unsafe fn </span>load_data_avx2(
+    x: <span class="kw-2">&amp;mut </span>[__m256i; <span class="number">8</span>],
+    ms: <span class="kw-2">&amp;mut </span>MsgSchedule,
+    t2: <span class="kw-2">&amp;mut </span>RoundStates,
+    data: <span class="kw-2">*const </span>__m128i,
 ) {
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
-    <span class="kw">let</span> <span class="ident">MASK</span> <span class="op">=</span> <span class="ident">_mm256_set_epi64x</span>(
+    <span class="attribute">#[allow(non_snake_case)]
+    </span><span class="kw">let </span>MASK = _mm256_set_epi64x(
         <span class="number">0x0809_0A0B_0C0D_0E0F_i64</span>,
         <span class="number">0x0001_0203_0405_0607_i64</span>,
         <span class="number">0x0809_0A0B_0C0D_0E0F_i64</span>,
         <span class="number">0x0001_0203_0405_0607_i64</span>,
     );
 
-    <span class="macro">macro_rules!</span> <span class="ident">unrolled_iterations</span> {
-        ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">literal</span>),<span class="kw-2">*</span>) =&gt; {$(
-            <span class="ident">x</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>] <span class="op">=</span> <span class="ident">_mm256_insertf128_si256</span>(<span class="ident">x</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>], <span class="ident">_mm_loadu_si128</span>(<span class="ident">data</span>.<span class="ident">add</span>(<span class="number">8</span> <span class="op">+</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>) <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>), <span class="number">1</span>);
-            <span class="ident">x</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>] <span class="op">=</span> <span class="ident">_mm256_insertf128_si256</span>(<span class="ident">x</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>], <span class="ident">_mm_loadu_si128</span>(<span class="ident">data</span>.<span class="ident">add</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>) <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>), <span class="number">0</span>);
+    <span class="macro">macro_rules! </span>unrolled_iterations {
+        ($(<span class="macro-nonterminal">$i</span>:literal),<span class="kw-2">*</span>) =&gt; {$(
+            x[<span class="macro-nonterminal">$i</span>] = _mm256_insertf128_si256(x[<span class="macro-nonterminal">$i</span>], _mm_loadu_si128(data.add(<span class="number">8 </span>+ <span class="macro-nonterminal">$i</span>) <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>), <span class="number">1</span>);
+            x[<span class="macro-nonterminal">$i</span>] = _mm256_insertf128_si256(x[<span class="macro-nonterminal">$i</span>], _mm_loadu_si128(data.add(<span class="macro-nonterminal">$i</span>) <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>), <span class="number">0</span>);
 
-            <span class="ident">x</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>] <span class="op">=</span> <span class="ident">_mm256_shuffle_epi8</span>(<span class="ident">x</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>], <span class="ident">MASK</span>);
+            x[<span class="macro-nonterminal">$i</span>] = _mm256_shuffle_epi8(x[<span class="macro-nonterminal">$i</span>], MASK);
 
-            <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">_mm_loadu_si128</span>(<span class="ident">K64</span>.<span class="ident">as_ptr</span>().<span class="ident">add</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span> <span class="op">*</span> <span class="number">2</span>) <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u64</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>);
-            <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="ident">_mm256_add_epi64</span>(<span class="ident">x</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>], <span class="ident">_mm256_set_m128i</span>(<span class="ident">t</span>, <span class="ident">t</span>));
+            <span class="kw">let </span>t = _mm_loadu_si128(K64.as_ptr().add(<span class="macro-nonterminal">$i </span>* <span class="number">2</span>) <span class="kw">as </span><span class="kw-2">*const </span>u64 <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>);
+            <span class="kw">let </span>y = _mm256_add_epi64(x[<span class="macro-nonterminal">$i</span>], _mm256_set_m128i(t, t));
 
-            <span class="ident">ms</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>] <span class="op">=</span> <span class="ident">_mm256_extracti128_si256</span>(<span class="ident">y</span>, <span class="number">0</span>);
-            <span class="ident">t2</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>] <span class="op">=</span> <span class="ident">_mm256_extracti128_si256</span>(<span class="ident">y</span>, <span class="number">1</span>);
+            ms[<span class="macro-nonterminal">$i</span>] = _mm256_extracti128_si256(y, <span class="number">0</span>);
+            t2[<span class="macro-nonterminal">$i</span>] = _mm256_extracti128_si256(y, <span class="number">1</span>);
         )<span class="kw-2">*</span>};
     }
 
     <span class="macro">unrolled_iterations!</span>(<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>);
 }
 
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">rounds_0_63_avx</span>(<span class="ident">current_state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">State</span>, <span class="ident">x</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">__m128i</span>; <span class="number">8</span>], <span class="ident">ms</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MsgSchedule</span>) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">k64_idx</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">SHA512_BLOCK_WORDS_NUM</span>;
+<span class="attribute">#[inline(always)]
+</span><span class="kw">unsafe fn </span>rounds_0_63_avx(current_state: <span class="kw-2">&amp;mut </span>State, x: <span class="kw-2">&amp;mut </span>[__m128i; <span class="number">8</span>], ms: <span class="kw-2">&amp;mut </span>MsgSchedule) {
+    <span class="kw">let </span><span class="kw-2">mut </span>k64_idx: usize = SHA512_BLOCK_WORDS_NUM;
 
-    <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">4</span> {
-        <span class="kw">for</span> <span class="ident">j</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">8</span> {
-            <span class="kw">let</span> <span class="ident">k64</span> <span class="op">=</span> <span class="ident">_mm_loadu_si128</span>(<span class="kw-2">&amp;</span><span class="ident">K64</span>[<span class="ident">k64_idx</span>] <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u64</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>);
-            <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="ident">sha512_update_x_avx</span>(<span class="ident">x</span>, <span class="ident">k64</span>);
+    <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">4 </span>{
+        <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..<span class="number">8 </span>{
+            <span class="kw">let </span>k64 = _mm_loadu_si128(<span class="kw-2">&amp;</span>K64[k64_idx] <span class="kw">as </span><span class="kw-2">*const </span>u64 <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>);
+            <span class="kw">let </span>y = sha512_update_x_avx(x, k64);
 
             {
-                <span class="kw">let</span> <span class="ident">ms</span> <span class="op">=</span> <span class="ident">cast_ms</span>(<span class="ident">ms</span>);
-                <span class="ident">sha_round</span>(<span class="ident">current_state</span>, <span class="ident">ms</span>[<span class="number">2</span> <span class="op">*</span> <span class="ident">j</span>]);
-                <span class="ident">sha_round</span>(<span class="ident">current_state</span>, <span class="ident">ms</span>[<span class="number">2</span> <span class="op">*</span> <span class="ident">j</span> <span class="op">+</span> <span class="number">1</span>]);
+                <span class="kw">let </span>ms = cast_ms(ms);
+                sha_round(current_state, ms[<span class="number">2 </span>* j]);
+                sha_round(current_state, ms[<span class="number">2 </span>* j + <span class="number">1</span>]);
             }
 
-            <span class="ident">ms</span>[<span class="ident">j</span>] <span class="op">=</span> <span class="ident">y</span>;
-            <span class="ident">k64_idx</span> <span class="op">+</span><span class="op">=</span> <span class="number">2</span>;
+            ms[j] = y;
+            k64_idx += <span class="number">2</span>;
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">rounds_0_63_avx2</span>(
-    <span class="ident">current_state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">State</span>,
-    <span class="ident">x</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">__m256i</span>; <span class="number">8</span>],
-    <span class="ident">ms</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MsgSchedule</span>,
-    <span class="ident">t2</span>: <span class="kw-2">&amp;mut</span> <span class="ident">RoundStates</span>,
+<span class="attribute">#[inline(always)]
+</span><span class="kw">unsafe fn </span>rounds_0_63_avx2(
+    current_state: <span class="kw-2">&amp;mut </span>State,
+    x: <span class="kw-2">&amp;mut </span>[__m256i; <span class="number">8</span>],
+    ms: <span class="kw-2">&amp;mut </span>MsgSchedule,
+    t2: <span class="kw-2">&amp;mut </span>RoundStates,
 ) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">k64x4_idx</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">SHA512_BLOCK_WORDS_NUM</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>k64x4_idx: usize = SHA512_BLOCK_WORDS_NUM;
 
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">1</span>..<span class="number">5</span> {
-        <span class="kw">for</span> <span class="ident">j</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">8</span> {
-            <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">_mm_loadu_si128</span>(<span class="ident">K64</span>.<span class="ident">as_ptr</span>().<span class="ident">add</span>(<span class="ident">k64x4_idx</span>) <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u64</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>);
-            <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="ident">sha512_update_x_avx2</span>(<span class="ident">x</span>, <span class="ident">_mm256_set_m128i</span>(<span class="ident">t</span>, <span class="ident">t</span>));
+    <span class="kw">for </span>i <span class="kw">in </span><span class="number">1</span>..<span class="number">5 </span>{
+        <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..<span class="number">8 </span>{
+            <span class="kw">let </span>t = _mm_loadu_si128(K64.as_ptr().add(k64x4_idx) <span class="kw">as </span><span class="kw-2">*const </span>u64 <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>);
+            <span class="kw">let </span>y = sha512_update_x_avx2(x, _mm256_set_m128i(t, t));
 
             {
-                <span class="kw">let</span> <span class="ident">ms</span> <span class="op">=</span> <span class="ident">cast_ms</span>(<span class="ident">ms</span>);
-                <span class="ident">sha_round</span>(<span class="ident">current_state</span>, <span class="ident">ms</span>[<span class="number">2</span> <span class="op">*</span> <span class="ident">j</span>]);
-                <span class="ident">sha_round</span>(<span class="ident">current_state</span>, <span class="ident">ms</span>[<span class="number">2</span> <span class="op">*</span> <span class="ident">j</span> <span class="op">+</span> <span class="number">1</span>]);
+                <span class="kw">let </span>ms = cast_ms(ms);
+                sha_round(current_state, ms[<span class="number">2 </span>* j]);
+                sha_round(current_state, ms[<span class="number">2 </span>* j + <span class="number">1</span>]);
             }
 
-            <span class="ident">ms</span>[<span class="ident">j</span>] <span class="op">=</span> <span class="ident">_mm256_extracti128_si256</span>(<span class="ident">y</span>, <span class="number">0</span>);
-            <span class="ident">t2</span>[<span class="number">8</span> <span class="op">*</span> <span class="ident">i</span> <span class="op">+</span> <span class="ident">j</span>] <span class="op">=</span> <span class="ident">_mm256_extracti128_si256</span>(<span class="ident">y</span>, <span class="number">1</span>);
+            ms[j] = _mm256_extracti128_si256(y, <span class="number">0</span>);
+            t2[<span class="number">8 </span>* i + j] = _mm256_extracti128_si256(y, <span class="number">1</span>);
 
-            <span class="ident">k64x4_idx</span> <span class="op">+</span><span class="op">=</span> <span class="number">2</span>;
+            k64x4_idx += <span class="number">2</span>;
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">rounds_64_79</span>(<span class="ident">current_state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">State</span>, <span class="ident">ms</span>: <span class="kw-2">&amp;</span><span class="ident">MsgSchedule</span>) {
-    <span class="kw">let</span> <span class="ident">ms</span> <span class="op">=</span> <span class="ident">cast_ms</span>(<span class="ident">ms</span>);
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">64</span>..<span class="number">80</span> {
-        <span class="ident">sha_round</span>(<span class="ident">current_state</span>, <span class="ident">ms</span>[<span class="ident">i</span> <span class="op">&amp;</span> <span class="number">0xf</span>]);
+<span class="attribute">#[inline(always)]
+</span><span class="kw">fn </span>rounds_64_79(current_state: <span class="kw-2">&amp;mut </span>State, ms: <span class="kw-2">&amp;</span>MsgSchedule) {
+    <span class="kw">let </span>ms = cast_ms(ms);
+    <span class="kw">for </span>i <span class="kw">in </span><span class="number">64</span>..<span class="number">80 </span>{
+        sha_round(current_state, ms[i &amp; <span class="number">0xf</span>]);
     }
 }
 
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">process_second_block</span>(<span class="ident">current_state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">State</span>, <span class="ident">t2</span>: <span class="kw-2">&amp;</span><span class="ident">RoundStates</span>) {
-    <span class="kw">for</span> <span class="ident">t2</span> <span class="kw">in</span> <span class="ident">cast_rs</span>(<span class="ident">t2</span>).<span class="ident">iter</span>() {
-        <span class="ident">sha_round</span>(<span class="ident">current_state</span>, <span class="kw-2">*</span><span class="ident">t2</span>);
+<span class="attribute">#[inline(always)]
+</span><span class="kw">fn </span>process_second_block(current_state: <span class="kw-2">&amp;mut </span>State, t2: <span class="kw-2">&amp;</span>RoundStates) {
+    <span class="kw">for </span>t2 <span class="kw">in </span>cast_rs(t2).iter() {
+        sha_round(current_state, <span class="kw-2">*</span>t2);
     }
 }
 
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">sha_round</span>(<span class="ident">s</span>: <span class="kw-2">&amp;mut</span> <span class="ident">State</span>, <span class="ident">x</span>: <span class="ident">u64</span>) {
-    <span class="macro">macro_rules!</span> <span class="ident">big_sigma0</span> {
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">expr</span>) =&gt; {
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>.<span class="ident">rotate_right</span>(<span class="number">28</span>) <span class="op">^</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>.<span class="ident">rotate_right</span>(<span class="number">34</span>) <span class="op">^</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>.<span class="ident">rotate_right</span>(<span class="number">39</span>)
+<span class="attribute">#[inline(always)]
+</span><span class="kw">fn </span>sha_round(s: <span class="kw-2">&amp;mut </span>State, x: u64) {
+    <span class="macro">macro_rules! </span>big_sigma0 {
+        (<span class="macro-nonterminal">$a</span>:expr) =&gt; {
+            <span class="macro-nonterminal">$a</span>.rotate_right(<span class="number">28</span>) ^ <span class="macro-nonterminal">$a</span>.rotate_right(<span class="number">34</span>) ^ <span class="macro-nonterminal">$a</span>.rotate_right(<span class="number">39</span>)
         };
     }
-    <span class="macro">macro_rules!</span> <span class="ident">big_sigma1</span> {
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">expr</span>) =&gt; {
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>.<span class="ident">rotate_right</span>(<span class="number">14</span>) <span class="op">^</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>.<span class="ident">rotate_right</span>(<span class="number">18</span>) <span class="op">^</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>.<span class="ident">rotate_right</span>(<span class="number">41</span>)
+    <span class="macro">macro_rules! </span>big_sigma1 {
+        (<span class="macro-nonterminal">$a</span>:expr) =&gt; {
+            <span class="macro-nonterminal">$a</span>.rotate_right(<span class="number">14</span>) ^ <span class="macro-nonterminal">$a</span>.rotate_right(<span class="number">18</span>) ^ <span class="macro-nonterminal">$a</span>.rotate_right(<span class="number">41</span>)
         };
     }
-    <span class="macro">macro_rules!</span> <span class="ident">bool3ary_202</span> {
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>:<span class="ident">expr</span>) =&gt; {
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span> <span class="op">^</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span> <span class="op">&amp;</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span> <span class="op">^</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>))
+    <span class="macro">macro_rules! </span>bool3ary_202 {
+        (<span class="macro-nonterminal">$a</span>:expr, <span class="macro-nonterminal">$b</span>:expr, <span class="macro-nonterminal">$c</span>:expr) =&gt; {
+            <span class="macro-nonterminal">$c </span>^ (<span class="macro-nonterminal">$a </span>&amp; (<span class="macro-nonterminal">$b </span>^ <span class="macro-nonterminal">$c</span>))
         };
-    } <span class="comment">// Choose, MD5F, SHA1C</span>
-    <span class="macro">macro_rules!</span> <span class="ident">bool3ary_232</span> {
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>:<span class="ident">expr</span>) =&gt; {
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span> <span class="op">&amp;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>) <span class="op">^</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span> <span class="op">&amp;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>) <span class="op">^</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span> <span class="op">&amp;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>)
+    } <span class="comment">// Choose, MD5F, SHA1C
+    </span><span class="macro">macro_rules! </span>bool3ary_232 {
+        (<span class="macro-nonterminal">$a</span>:expr, <span class="macro-nonterminal">$b</span>:expr, <span class="macro-nonterminal">$c</span>:expr) =&gt; {
+            (<span class="macro-nonterminal">$a </span>&amp; <span class="macro-nonterminal">$b</span>) ^ (<span class="macro-nonterminal">$a </span>&amp; <span class="macro-nonterminal">$c</span>) ^ (<span class="macro-nonterminal">$b </span>&amp; <span class="macro-nonterminal">$c</span>)
         };
-    } <span class="comment">// Majority, SHA1M</span>
+    } <span class="comment">// Majority, SHA1M
 
-    <span class="macro">macro_rules!</span> <span class="ident">rotate_state</span> {
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>:<span class="ident">ident</span>) =&gt; {{
-            <span class="kw">let</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>[<span class="number">7</span>];
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>[<span class="number">7</span>] <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>[<span class="number">6</span>];
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>[<span class="number">6</span>] <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>[<span class="number">5</span>];
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>[<span class="number">5</span>] <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>[<span class="number">4</span>];
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>[<span class="number">4</span>] <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>[<span class="number">3</span>];
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>[<span class="number">3</span>] <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>[<span class="number">2</span>];
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>[<span class="number">2</span>] <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>[<span class="number">1</span>];
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>[<span class="number">1</span>] <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>[<span class="number">0</span>];
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">s</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">tmp</span>;
+    </span><span class="macro">macro_rules! </span>rotate_state {
+        (<span class="macro-nonterminal">$s</span>:ident) =&gt; {{
+            <span class="kw">let </span>tmp = <span class="macro-nonterminal">$s</span>[<span class="number">7</span>];
+            <span class="macro-nonterminal">$s</span>[<span class="number">7</span>] = <span class="macro-nonterminal">$s</span>[<span class="number">6</span>];
+            <span class="macro-nonterminal">$s</span>[<span class="number">6</span>] = <span class="macro-nonterminal">$s</span>[<span class="number">5</span>];
+            <span class="macro-nonterminal">$s</span>[<span class="number">5</span>] = <span class="macro-nonterminal">$s</span>[<span class="number">4</span>];
+            <span class="macro-nonterminal">$s</span>[<span class="number">4</span>] = <span class="macro-nonterminal">$s</span>[<span class="number">3</span>];
+            <span class="macro-nonterminal">$s</span>[<span class="number">3</span>] = <span class="macro-nonterminal">$s</span>[<span class="number">2</span>];
+            <span class="macro-nonterminal">$s</span>[<span class="number">2</span>] = <span class="macro-nonterminal">$s</span>[<span class="number">1</span>];
+            <span class="macro-nonterminal">$s</span>[<span class="number">1</span>] = <span class="macro-nonterminal">$s</span>[<span class="number">0</span>];
+            <span class="macro-nonterminal">$s</span>[<span class="number">0</span>] = tmp;
         }};
     }
 
-    <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">x</span>
-        .<span class="ident">wrapping_add</span>(<span class="ident">s</span>[<span class="number">7</span>])
-        .<span class="ident">wrapping_add</span>(<span class="macro">big_sigma1!</span>(<span class="ident">s</span>[<span class="number">4</span>]))
-        .<span class="ident">wrapping_add</span>(<span class="macro">bool3ary_202!</span>(<span class="ident">s</span>[<span class="number">4</span>], <span class="ident">s</span>[<span class="number">5</span>], <span class="ident">s</span>[<span class="number">6</span>]));
+    <span class="kw">let </span>t = x
+        .wrapping_add(s[<span class="number">7</span>])
+        .wrapping_add(<span class="macro">big_sigma1!</span>(s[<span class="number">4</span>]))
+        .wrapping_add(<span class="macro">bool3ary_202!</span>(s[<span class="number">4</span>], s[<span class="number">5</span>], s[<span class="number">6</span>]));
 
-    <span class="ident">s</span>[<span class="number">7</span>] <span class="op">=</span> <span class="ident">t</span>
-        .<span class="ident">wrapping_add</span>(<span class="macro">big_sigma0!</span>(<span class="ident">s</span>[<span class="number">0</span>]))
-        .<span class="ident">wrapping_add</span>(<span class="macro">bool3ary_232!</span>(<span class="ident">s</span>[<span class="number">0</span>], <span class="ident">s</span>[<span class="number">1</span>], <span class="ident">s</span>[<span class="number">2</span>]));
-    <span class="ident">s</span>[<span class="number">3</span>] <span class="op">=</span> <span class="ident">s</span>[<span class="number">3</span>].<span class="ident">wrapping_add</span>(<span class="ident">t</span>);
+    s[<span class="number">7</span>] = t
+        .wrapping_add(<span class="macro">big_sigma0!</span>(s[<span class="number">0</span>]))
+        .wrapping_add(<span class="macro">bool3ary_232!</span>(s[<span class="number">0</span>], s[<span class="number">1</span>], s[<span class="number">2</span>]));
+    s[<span class="number">3</span>] = s[<span class="number">3</span>].wrapping_add(t);
 
-    <span class="macro">rotate_state!</span>(<span class="ident">s</span>);
+    <span class="macro">rotate_state!</span>(s);
 }
 
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">accumulate_state</span>(<span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">State</span>, <span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="ident">State</span>) {
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">SHA512_HASH_WORDS_NUM</span> {
-        <span class="ident">dst</span>[<span class="ident">i</span>] <span class="op">=</span> <span class="ident">dst</span>[<span class="ident">i</span>].<span class="ident">wrapping_add</span>(<span class="ident">src</span>[<span class="ident">i</span>]);
+<span class="attribute">#[inline(always)]
+</span><span class="kw">fn </span>accumulate_state(dst: <span class="kw-2">&amp;mut </span>State, src: <span class="kw-2">&amp;</span>State) {
+    <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..SHA512_HASH_WORDS_NUM {
+        dst[i] = dst[i].wrapping_add(src[i]);
     }
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">fn_sha512_update_x</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">ident</span>, {
-        <span class="ident">ADD64</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ADD64</span>:<span class="ident">ident</span>,
-        <span class="ident">ALIGNR8</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ALIGNR8</span>:<span class="ident">ident</span>,
-        <span class="ident">SRL64</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">SRL64</span>:<span class="ident">ident</span>,
-        <span class="ident">SLL64</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">SLL64</span>:<span class="ident">ident</span>,
-        <span class="ident">XOR</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">XOR</span>:<span class="ident">ident</span>,
+<span class="macro">macro_rules! </span>fn_sha512_update_x {
+    (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$ty</span>:ident, {
+        ADD64 = <span class="macro-nonterminal">$ADD64</span>:ident,
+        ALIGNR8 = <span class="macro-nonterminal">$ALIGNR8</span>:ident,
+        SRL64 = <span class="macro-nonterminal">$SRL64</span>:ident,
+        SLL64 = <span class="macro-nonterminal">$SLL64</span>:ident,
+        XOR = <span class="macro-nonterminal">$XOR</span>:ident,
     }) =&gt; {
-        <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="ident">x</span>: <span class="kw-2">&amp;mut</span> [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>; <span class="number">8</span>], <span class="ident">k64</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span> {
-            <span class="comment">// q[2:1]</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">t0</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ALIGNR8</span>(<span class="ident">x</span>[<span class="number">1</span>], <span class="ident">x</span>[<span class="number">0</span>], <span class="number">8</span>);
-            <span class="comment">// q[10:9]</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">t3</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ALIGNR8</span>(<span class="ident">x</span>[<span class="number">5</span>], <span class="ident">x</span>[<span class="number">4</span>], <span class="number">8</span>);
-            <span class="comment">// q[2:1] &gt;&gt; s0[0]</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">t2</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">SRL64</span>(<span class="ident">t0</span>, <span class="number">1</span>);
-            <span class="comment">// q[1:0] + q[10:9]</span>
-            <span class="ident">x</span>[<span class="number">0</span>] <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ADD64</span>(<span class="ident">x</span>[<span class="number">0</span>], <span class="ident">t3</span>);
-            <span class="comment">// q[2:1] &gt;&gt; s0[2]</span>
-            <span class="ident">t3</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">SRL64</span>(<span class="ident">t0</span>, <span class="number">7</span>);
-            <span class="comment">// q[2:1] &lt;&lt; (64 - s0[1])</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">t1</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">SLL64</span>(<span class="ident">t0</span>, <span class="number">64</span> <span class="op">-</span> <span class="number">8</span>);
-            <span class="comment">// (q[2:1] &gt;&gt; s0[2]) ^</span>
-            <span class="comment">// (q[2:1] &gt;&gt; s0[0])</span>
-            <span class="ident">t0</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">XOR</span>(<span class="ident">t3</span>, <span class="ident">t2</span>);
-            <span class="comment">// q[2:1] &gt;&gt; s0[1]</span>
-            <span class="ident">t2</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">SRL64</span>(<span class="ident">t2</span>, <span class="number">8</span> <span class="op">-</span> <span class="number">1</span>);
-            <span class="comment">// (q[2:1] &gt;&gt; s0[2]) ^</span>
-            <span class="comment">// (q[2:1] &gt;&gt; s0[0]) ^</span>
-            <span class="comment">// q[2:1] &lt;&lt; (64 - s0[1])</span>
-            <span class="ident">t0</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">XOR</span>(<span class="ident">t0</span>, <span class="ident">t1</span>);
-            <span class="comment">// q[2:1] &lt;&lt; (64 - s0[0])</span>
-            <span class="ident">t1</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">SLL64</span>(<span class="ident">t1</span>, <span class="number">8</span> <span class="op">-</span> <span class="number">1</span>);
-            <span class="comment">// sigma1(q[2:1])</span>
-            <span class="ident">t0</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">XOR</span>(<span class="ident">t0</span>, <span class="ident">t2</span>);
-            <span class="ident">t0</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">XOR</span>(<span class="ident">t0</span>, <span class="ident">t1</span>);
-            <span class="comment">// q[15:14] &gt;&gt; s1[2]</span>
-            <span class="ident">t3</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">SRL64</span>(<span class="ident">x</span>[<span class="number">7</span>], <span class="number">6</span>);
-            <span class="comment">// q[15:14] &gt;&gt; (64 - s1[1])</span>
-            <span class="ident">t2</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">SLL64</span>(<span class="ident">x</span>[<span class="number">7</span>], <span class="number">64</span> <span class="op">-</span> <span class="number">61</span>);
-            <span class="comment">// q[1:0] + sigma0(q[2:1])</span>
-            <span class="ident">x</span>[<span class="number">0</span>] <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ADD64</span>(<span class="ident">x</span>[<span class="number">0</span>], <span class="ident">t0</span>);
-            <span class="comment">// q[15:14] &gt;&gt; s1[0]</span>
-            <span class="ident">t1</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">SRL64</span>(<span class="ident">x</span>[<span class="number">7</span>], <span class="number">19</span>);
-            <span class="comment">// q[15:14] &gt;&gt; s1[2] ^</span>
-            <span class="comment">// q[15:14] &gt;&gt; (64 - s1[1])</span>
-            <span class="ident">t3</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">XOR</span>(<span class="ident">t3</span>, <span class="ident">t2</span>);
-            <span class="comment">// q[15:14] &gt;&gt; (64 - s1[0])</span>
-            <span class="ident">t2</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">SLL64</span>(<span class="ident">t2</span>, <span class="number">61</span> <span class="op">-</span> <span class="number">19</span>);
-            <span class="comment">// q[15:14] &gt;&gt; s1[2] ^</span>
-            <span class="comment">// q[15:14] &gt;&gt; (64 - s1[1] ^</span>
-            <span class="comment">// q[15:14] &gt;&gt; s1[0]</span>
-            <span class="ident">t3</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">XOR</span>(<span class="ident">t3</span>, <span class="ident">t1</span>);
-            <span class="comment">// q[15:14] &gt;&gt; s1[1]</span>
-            <span class="ident">t1</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">SRL64</span>(<span class="ident">t1</span>, <span class="number">61</span> <span class="op">-</span> <span class="number">19</span>);
-            <span class="comment">// sigma1(q[15:14])</span>
-            <span class="ident">t3</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">XOR</span>(<span class="ident">t3</span>, <span class="ident">t2</span>);
-            <span class="ident">t3</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">XOR</span>(<span class="ident">t3</span>, <span class="ident">t1</span>);
+        <span class="kw">unsafe fn </span><span class="macro-nonterminal">$name</span>(x: <span class="kw-2">&amp;mut </span>[<span class="macro-nonterminal">$ty</span>; <span class="number">8</span>], k64: <span class="macro-nonterminal">$ty</span>) -&gt; <span class="macro-nonterminal">$ty </span>{
+            <span class="comment">// q[2:1]
+            </span><span class="kw">let </span><span class="kw-2">mut </span>t0 = <span class="macro-nonterminal">$ALIGNR8</span>(x[<span class="number">1</span>], x[<span class="number">0</span>], <span class="number">8</span>);
+            <span class="comment">// q[10:9]
+            </span><span class="kw">let </span><span class="kw-2">mut </span>t3 = <span class="macro-nonterminal">$ALIGNR8</span>(x[<span class="number">5</span>], x[<span class="number">4</span>], <span class="number">8</span>);
+            <span class="comment">// q[2:1] &gt;&gt; s0[0]
+            </span><span class="kw">let </span><span class="kw-2">mut </span>t2 = <span class="macro-nonterminal">$SRL64</span>(t0, <span class="number">1</span>);
+            <span class="comment">// q[1:0] + q[10:9]
+            </span>x[<span class="number">0</span>] = <span class="macro-nonterminal">$ADD64</span>(x[<span class="number">0</span>], t3);
+            <span class="comment">// q[2:1] &gt;&gt; s0[2]
+            </span>t3 = <span class="macro-nonterminal">$SRL64</span>(t0, <span class="number">7</span>);
+            <span class="comment">// q[2:1] &lt;&lt; (64 - s0[1])
+            </span><span class="kw">let </span><span class="kw-2">mut </span>t1 = <span class="macro-nonterminal">$SLL64</span>(t0, <span class="number">64 </span>- <span class="number">8</span>);
+            <span class="comment">// (q[2:1] &gt;&gt; s0[2]) ^
+            // (q[2:1] &gt;&gt; s0[0])
+            </span>t0 = <span class="macro-nonterminal">$XOR</span>(t3, t2);
+            <span class="comment">// q[2:1] &gt;&gt; s0[1]
+            </span>t2 = <span class="macro-nonterminal">$SRL64</span>(t2, <span class="number">8 </span>- <span class="number">1</span>);
+            <span class="comment">// (q[2:1] &gt;&gt; s0[2]) ^
+            // (q[2:1] &gt;&gt; s0[0]) ^
+            // q[2:1] &lt;&lt; (64 - s0[1])
+            </span>t0 = <span class="macro-nonterminal">$XOR</span>(t0, t1);
+            <span class="comment">// q[2:1] &lt;&lt; (64 - s0[0])
+            </span>t1 = <span class="macro-nonterminal">$SLL64</span>(t1, <span class="number">8 </span>- <span class="number">1</span>);
+            <span class="comment">// sigma1(q[2:1])
+            </span>t0 = <span class="macro-nonterminal">$XOR</span>(t0, t2);
+            t0 = <span class="macro-nonterminal">$XOR</span>(t0, t1);
+            <span class="comment">// q[15:14] &gt;&gt; s1[2]
+            </span>t3 = <span class="macro-nonterminal">$SRL64</span>(x[<span class="number">7</span>], <span class="number">6</span>);
+            <span class="comment">// q[15:14] &gt;&gt; (64 - s1[1])
+            </span>t2 = <span class="macro-nonterminal">$SLL64</span>(x[<span class="number">7</span>], <span class="number">64 </span>- <span class="number">61</span>);
+            <span class="comment">// q[1:0] + sigma0(q[2:1])
+            </span>x[<span class="number">0</span>] = <span class="macro-nonterminal">$ADD64</span>(x[<span class="number">0</span>], t0);
+            <span class="comment">// q[15:14] &gt;&gt; s1[0]
+            </span>t1 = <span class="macro-nonterminal">$SRL64</span>(x[<span class="number">7</span>], <span class="number">19</span>);
+            <span class="comment">// q[15:14] &gt;&gt; s1[2] ^
+            // q[15:14] &gt;&gt; (64 - s1[1])
+            </span>t3 = <span class="macro-nonterminal">$XOR</span>(t3, t2);
+            <span class="comment">// q[15:14] &gt;&gt; (64 - s1[0])
+            </span>t2 = <span class="macro-nonterminal">$SLL64</span>(t2, <span class="number">61 </span>- <span class="number">19</span>);
+            <span class="comment">// q[15:14] &gt;&gt; s1[2] ^
+            // q[15:14] &gt;&gt; (64 - s1[1] ^
+            // q[15:14] &gt;&gt; s1[0]
+            </span>t3 = <span class="macro-nonterminal">$XOR</span>(t3, t1);
+            <span class="comment">// q[15:14] &gt;&gt; s1[1]
+            </span>t1 = <span class="macro-nonterminal">$SRL64</span>(t1, <span class="number">61 </span>- <span class="number">19</span>);
+            <span class="comment">// sigma1(q[15:14])
+            </span>t3 = <span class="macro-nonterminal">$XOR</span>(t3, t2);
+            t3 = <span class="macro-nonterminal">$XOR</span>(t3, t1);
 
-            <span class="comment">// q[1:0] + q[10:9] + sigma1(q[15:14]) + sigma0(q[2:1])</span>
-            <span class="ident">x</span>[<span class="number">0</span>] <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ADD64</span>(<span class="ident">x</span>[<span class="number">0</span>], <span class="ident">t3</span>);
+            <span class="comment">// q[1:0] + q[10:9] + sigma1(q[15:14]) + sigma0(q[2:1])
+            </span>x[<span class="number">0</span>] = <span class="macro-nonterminal">$ADD64</span>(x[<span class="number">0</span>], t3);
 
-            <span class="comment">// rotate</span>
-            <span class="kw">let</span> <span class="ident">temp</span> <span class="op">=</span> <span class="ident">x</span>[<span class="number">0</span>];
-            <span class="ident">x</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">x</span>[<span class="number">1</span>];
-            <span class="ident">x</span>[<span class="number">1</span>] <span class="op">=</span> <span class="ident">x</span>[<span class="number">2</span>];
-            <span class="ident">x</span>[<span class="number">2</span>] <span class="op">=</span> <span class="ident">x</span>[<span class="number">3</span>];
-            <span class="ident">x</span>[<span class="number">3</span>] <span class="op">=</span> <span class="ident">x</span>[<span class="number">4</span>];
-            <span class="ident">x</span>[<span class="number">4</span>] <span class="op">=</span> <span class="ident">x</span>[<span class="number">5</span>];
-            <span class="ident">x</span>[<span class="number">5</span>] <span class="op">=</span> <span class="ident">x</span>[<span class="number">6</span>];
-            <span class="ident">x</span>[<span class="number">6</span>] <span class="op">=</span> <span class="ident">x</span>[<span class="number">7</span>];
-            <span class="ident">x</span>[<span class="number">7</span>] <span class="op">=</span> <span class="ident">temp</span>;
+            <span class="comment">// rotate
+            </span><span class="kw">let </span>temp = x[<span class="number">0</span>];
+            x[<span class="number">0</span>] = x[<span class="number">1</span>];
+            x[<span class="number">1</span>] = x[<span class="number">2</span>];
+            x[<span class="number">2</span>] = x[<span class="number">3</span>];
+            x[<span class="number">3</span>] = x[<span class="number">4</span>];
+            x[<span class="number">4</span>] = x[<span class="number">5</span>];
+            x[<span class="number">5</span>] = x[<span class="number">6</span>];
+            x[<span class="number">6</span>] = x[<span class="number">7</span>];
+            x[<span class="number">7</span>] = temp;
 
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ADD64</span>(<span class="ident">x</span>[<span class="number">7</span>], <span class="ident">k64</span>)
+            <span class="macro-nonterminal">$ADD64</span>(x[<span class="number">7</span>], k64)
         }
     };
 }
 
-<span class="macro">fn_sha512_update_x!</span>(<span class="ident">sha512_update_x_avx</span>, <span class="ident">__m128i</span>, {
-        <span class="ident">ADD64</span> <span class="op">=</span> <span class="ident">_mm_add_epi64</span>,
-        <span class="ident">ALIGNR8</span> <span class="op">=</span> <span class="ident">_mm_alignr_epi8</span>,
-        <span class="ident">SRL64</span> <span class="op">=</span> <span class="ident">_mm_srli_epi64</span>,
-        <span class="ident">SLL64</span> <span class="op">=</span> <span class="ident">_mm_slli_epi64</span>,
-        <span class="ident">XOR</span> <span class="op">=</span> <span class="ident">_mm_xor_si128</span>,
+<span class="macro">fn_sha512_update_x!</span>(sha512_update_x_avx, __m128i, {
+        ADD64 = _mm_add_epi64,
+        ALIGNR8 = _mm_alignr_epi8,
+        SRL64 = _mm_srli_epi64,
+        SLL64 = _mm_slli_epi64,
+        XOR = _mm_xor_si128,
 });
 
-<span class="macro">fn_sha512_update_x!</span>(<span class="ident">sha512_update_x_avx2</span>, <span class="ident">__m256i</span>, {
-        <span class="ident">ADD64</span> <span class="op">=</span> <span class="ident">_mm256_add_epi64</span>,
-        <span class="ident">ALIGNR8</span> <span class="op">=</span> <span class="ident">_mm256_alignr_epi8</span>,
-        <span class="ident">SRL64</span> <span class="op">=</span> <span class="ident">_mm256_srli_epi64</span>,
-        <span class="ident">SLL64</span> <span class="op">=</span> <span class="ident">_mm256_slli_epi64</span>,
-        <span class="ident">XOR</span> <span class="op">=</span> <span class="ident">_mm256_xor_si256</span>,
+<span class="macro">fn_sha512_update_x!</span>(sha512_update_x_avx2, __m256i, {
+        ADD64 = _mm256_add_epi64,
+        ALIGNR8 = _mm256_alignr_epi8,
+        SRL64 = _mm256_srli_epi64,
+        SLL64 = _mm256_slli_epi64,
+        XOR = _mm256_xor_si256,
 });
 
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">cast_ms</span>(<span class="ident">ms</span>: <span class="kw-2">&amp;</span><span class="ident">MsgSchedule</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u64</span>; <span class="ident">SHA512_BLOCK_WORDS_NUM</span>] {
-    <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">ms</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">MsgSchedule</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>) }
+<span class="attribute">#[inline(always)]
+</span><span class="kw">fn </span>cast_ms(ms: <span class="kw-2">&amp;</span>MsgSchedule) -&gt; <span class="kw-2">&amp;</span>[u64; SHA512_BLOCK_WORDS_NUM] {
+    <span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>(ms <span class="kw">as </span><span class="kw-2">*const </span>MsgSchedule <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>) }
 }
 
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">cast_rs</span>(<span class="ident">rs</span>: <span class="kw-2">&amp;</span><span class="ident">RoundStates</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u64</span>; <span class="ident">SHA512_ROUNDS_NUM</span>] {
-    <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span>(<span class="ident">rs</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">RoundStates</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>) }
+<span class="attribute">#[inline(always)]
+</span><span class="kw">fn </span>cast_rs(rs: <span class="kw-2">&amp;</span>RoundStates) -&gt; <span class="kw-2">&amp;</span>[u64; SHA512_ROUNDS_NUM] {
+    <span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>(rs <span class="kw">as </span><span class="kw-2">*const </span>RoundStates <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>) }
 }
 
-<span class="kw">type</span> <span class="ident">State</span> <span class="op">=</span> [<span class="ident">u64</span>; <span class="ident">SHA512_HASH_WORDS_NUM</span>];
-<span class="kw">type</span> <span class="ident">MsgSchedule</span> <span class="op">=</span> [<span class="ident">__m128i</span>; <span class="ident">SHA512_BLOCK_WORDS_NUM</span> <span class="op">/</span> <span class="number">2</span>];
-<span class="kw">type</span> <span class="ident">RoundStates</span> <span class="op">=</span> [<span class="ident">__m128i</span>; <span class="ident">SHA512_ROUNDS_NUM</span> <span class="op">/</span> <span class="number">2</span>];
+<span class="kw">type </span>State = [u64; SHA512_HASH_WORDS_NUM];
+<span class="kw">type </span>MsgSchedule = [__m128i; SHA512_BLOCK_WORDS_NUM / <span class="number">2</span>];
+<span class="kw">type </span>RoundStates = [__m128i; SHA512_ROUNDS_NUM / <span class="number">2</span>];
 
-<span class="kw">const</span> <span class="ident">SHA512_BLOCK_BYTE_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">128</span>;
-<span class="kw">const</span> <span class="ident">SHA512_ROUNDS_NUM</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">80</span>;
-<span class="kw">const</span> <span class="ident">SHA512_HASH_BYTE_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">64</span>;
-<span class="kw">const</span> <span class="ident">SHA512_HASH_WORDS_NUM</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">SHA512_HASH_BYTE_LEN</span> <span class="op">/</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>();
-<span class="kw">const</span> <span class="ident">SHA512_BLOCK_WORDS_NUM</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">SHA512_BLOCK_BYTE_LEN</span> <span class="op">/</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>();
+<span class="kw">const </span>SHA512_BLOCK_BYTE_LEN: usize = <span class="number">128</span>;
+<span class="kw">const </span>SHA512_ROUNDS_NUM: usize = <span class="number">80</span>;
+<span class="kw">const </span>SHA512_HASH_BYTE_LEN: usize = <span class="number">64</span>;
+<span class="kw">const </span>SHA512_HASH_WORDS_NUM: usize = SHA512_HASH_BYTE_LEN / size_of::&lt;u64&gt;();
+<span class="kw">const </span>SHA512_BLOCK_WORDS_NUM: usize = SHA512_BLOCK_BYTE_LEN / size_of::&lt;u64&gt;();
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sha2" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sha2" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

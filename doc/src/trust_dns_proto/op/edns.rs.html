@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/op/edns.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>edns.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/op/edns.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>edns.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -258,237 +258,237 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */</span>
+ */
 
-<span class="doccomment">//! Extended DNS options</span>
+</span><span class="doccomment">//! Extended DNS options
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::rr::rdata::opt</span>::{<span class="self">self</span>, <span class="ident">EdnsCode</span>, <span class="ident">EdnsOption</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::rr::rdata::OPT</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::rr</span>::{<span class="ident">DNSClass</span>, <span class="ident">Name</span>, <span class="ident">RData</span>, <span class="ident">Record</span>, <span class="ident">RecordType</span>};
+</span><span class="kw">use </span><span class="kw">crate</span>::error::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::rr::rdata::opt::{<span class="self">self</span>, EdnsCode, EdnsOption};
+<span class="kw">use </span><span class="kw">crate</span>::rr::rdata::OPT;
+<span class="kw">use </span><span class="kw">crate</span>::rr::{DNSClass, Name, RData, Record, RecordType};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::serialize::binary</span>::{<span class="ident">BinEncodable</span>, <span class="ident">BinEncoder</span>};
+<span class="kw">use </span><span class="kw">crate</span>::serialize::binary::{BinEncodable, BinEncoder};
 
-<span class="doccomment">/// Edns implements the higher level concepts for working with extended dns as it is used to create or be</span>
-<span class="doccomment">/// created from OPT record data.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Edns</span> {
-    <span class="comment">// high 8 bits that make up the 12 bit total field when included with the 4bit rcode from the</span>
-    <span class="comment">//  header (from TTL)</span>
-    <span class="ident">rcode_high</span>: <span class="ident">u8</span>,
-    <span class="comment">// Indicates the implementation level of the setter. (from TTL)</span>
-    <span class="ident">version</span>: <span class="ident">u8</span>,
-    <span class="comment">// Is DNSSec supported (from TTL)</span>
-    <span class="ident">dnssec_ok</span>: <span class="ident">bool</span>,
-    <span class="comment">// max payload size, minimum of 512, (from RR CLASS)</span>
-    <span class="ident">max_payload</span>: <span class="ident">u16</span>,
+<span class="doccomment">/// Edns implements the higher level concepts for working with extended dns as it is used to create or be
+/// created from OPT record data.
+</span><span class="attribute">#[derive(Debug, PartialEq, Clone)]
+</span><span class="kw">pub struct </span>Edns {
+    <span class="comment">// high 8 bits that make up the 12 bit total field when included with the 4bit rcode from the
+    //  header (from TTL)
+    </span>rcode_high: u8,
+    <span class="comment">// Indicates the implementation level of the setter. (from TTL)
+    </span>version: u8,
+    <span class="comment">// Is DNSSec supported (from TTL)
+    </span>dnssec_ok: bool,
+    <span class="comment">// max payload size, minimum of 512, (from RR CLASS)
+    </span>max_payload: u16,
 
-    <span class="ident">options</span>: <span class="ident">OPT</span>,
+    options: OPT,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Edns</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">rcode_high</span>: <span class="number">0</span>,
-            <span class="ident">version</span>: <span class="number">0</span>,
-            <span class="ident">dnssec_ok</span>: <span class="bool-val">false</span>,
-            <span class="ident">max_payload</span>: <span class="number">512</span>,
-            <span class="ident">options</span>: <span class="ident">OPT::default</span>(),
+<span class="kw">impl </span>Default <span class="kw">for </span>Edns {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            rcode_high: <span class="number">0</span>,
+            version: <span class="number">0</span>,
+            dnssec_ok: <span class="bool-val">false</span>,
+            max_payload: <span class="number">512</span>,
+            options: OPT::default(),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Edns</span> {
-    <span class="doccomment">/// Creates a new extended DNS object.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::default</span>()
+<span class="kw">impl </span>Edns {
+    <span class="doccomment">/// Creates a new extended DNS object.
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
     }
 
-    <span class="doccomment">/// The high order bytes for the response code in the DNS Message</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rcode_high</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">rcode_high</span>
+    <span class="doccomment">/// The high order bytes for the response code in the DNS Message
+    </span><span class="kw">pub fn </span>rcode_high(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.rcode_high
     }
 
-    <span class="doccomment">/// Returns the EDNS version</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">version</span>
+    <span class="doccomment">/// Returns the EDNS version
+    </span><span class="kw">pub fn </span>version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.version
     }
 
-    <span class="doccomment">/// Specifies that DNSSec is supported for this Client or Server</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dnssec_ok</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">dnssec_ok</span>
+    <span class="doccomment">/// Specifies that DNSSec is supported for this Client or Server
+    </span><span class="kw">pub fn </span>dnssec_ok(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.dnssec_ok
     }
 
-    <span class="doccomment">/// Maximum supported size of the DNS payload</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_payload</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
-        <span class="self">self</span>.<span class="ident">max_payload</span>
+    <span class="doccomment">/// Maximum supported size of the DNS payload
+    </span><span class="kw">pub fn </span>max_payload(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
+        <span class="self">self</span>.max_payload
     }
 
-    <span class="doccomment">/// Returns the Option associated with the code</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">option</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">code</span>: <span class="ident">EdnsCode</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">EdnsOption</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">get</span>(<span class="ident">code</span>)
+    <span class="doccomment">/// Returns the Option associated with the code
+    </span><span class="kw">pub fn </span>option(<span class="kw-2">&amp;</span><span class="self">self</span>, code: EdnsCode) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>EdnsOption&gt; {
+        <span class="self">self</span>.options.get(code)
     }
 
-    <span class="doccomment">/// Returns the options portion of EDNS</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">options</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">OPT</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">options</span>
+    <span class="doccomment">/// Returns the options portion of EDNS
+    </span><span class="kw">pub fn </span>options(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>OPT {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.options
     }
 
-    <span class="doccomment">/// Returns a mutable options portion of EDNS</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">options_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">OPT</span> {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">options</span>
+    <span class="doccomment">/// Returns a mutable options portion of EDNS
+    </span><span class="kw">pub fn </span>options_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>OPT {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.options
     }
 
-    <span class="doccomment">/// Set the high order bits for the result code.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_rcode_high</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">rcode_high</span>: <span class="ident">u8</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">rcode_high</span> <span class="op">=</span> <span class="ident">rcode_high</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set the high order bits for the result code.
+    </span><span class="kw">pub fn </span>set_rcode_high(<span class="kw-2">&amp;mut </span><span class="self">self</span>, rcode_high: u8) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.rcode_high = rcode_high;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set the EDNS version</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_version</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">version</span>: <span class="ident">u8</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">version</span> <span class="op">=</span> <span class="ident">version</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set the EDNS version
+    </span><span class="kw">pub fn </span>set_version(<span class="kw-2">&amp;mut </span><span class="self">self</span>, version: u8) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.version = version;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set to true if DNSSec is supported</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_dnssec_ok</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">dnssec_ok</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">dnssec_ok</span> <span class="op">=</span> <span class="ident">dnssec_ok</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set to true if DNSSec is supported
+    </span><span class="kw">pub fn </span>set_dnssec_ok(<span class="kw-2">&amp;mut </span><span class="self">self</span>, dnssec_ok: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.dnssec_ok = dnssec_ok;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set the maximum payload which can be supported</span>
-    <span class="doccomment">/// From RFC 6891: `Values lower than 512 MUST be treated as equal to 512`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_max_payload</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">max_payload</span>: <span class="ident">u16</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">max_payload</span> <span class="op">=</span> <span class="ident">max_payload</span>.<span class="ident">max</span>(<span class="number">512</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Set the maximum payload which can be supported
+    /// From RFC 6891: `Values lower than 512 MUST be treated as equal to 512`
+    </span><span class="kw">pub fn </span>set_max_payload(<span class="kw-2">&amp;mut </span><span class="self">self</span>, max_payload: u16) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.max_payload = max_payload.max(<span class="number">512</span>);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Set the specified EDNS option</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Please use options_mut().insert() to modify&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_option</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">option</span>: <span class="ident">EdnsOption</span>) {
-        <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">insert</span>(<span class="ident">option</span>);
+    <span class="doccomment">/// Set the specified EDNS option
+    </span><span class="attribute">#[deprecated(note = <span class="string">&quot;Please use options_mut().insert() to modify&quot;</span>)]
+    </span><span class="kw">pub fn </span>set_option(<span class="kw-2">&amp;mut </span><span class="self">self</span>, option: EdnsOption) {
+        <span class="self">self</span>.options.insert(option);
     }
 }
 
-<span class="comment">// FIXME: this should be a TryFrom</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Record</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Edns</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Record</span>) -&gt; <span class="self">Self</span> {
-        <span class="macro">assert!</span>(<span class="ident">value</span>.<span class="ident">rr_type</span>() <span class="op">==</span> <span class="ident">RecordType::OPT</span>);
+<span class="comment">// FIXME: this should be a TryFrom
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Record&gt; <span class="kw">for </span>Edns {
+    <span class="kw">fn </span>from(value: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Record) -&gt; <span class="self">Self </span>{
+        <span class="macro">assert!</span>(value.rr_type() == RecordType::OPT);
 
-        <span class="kw">let</span> <span class="ident">rcode_high</span>: <span class="ident">u8</span> <span class="op">=</span> ((<span class="ident">value</span>.<span class="ident">ttl</span>() <span class="op">&amp;</span> <span class="number">0xFF00_0000u32</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">24</span>) <span class="kw">as</span> <span class="ident">u8</span>;
-        <span class="kw">let</span> <span class="ident">version</span>: <span class="ident">u8</span> <span class="op">=</span> ((<span class="ident">value</span>.<span class="ident">ttl</span>() <span class="op">&amp;</span> <span class="number">0x00FF_0000u32</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">16</span>) <span class="kw">as</span> <span class="ident">u8</span>;
-        <span class="kw">let</span> <span class="ident">dnssec_ok</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">ttl</span>() <span class="op">&amp;</span> <span class="number">0x0000_8000</span> <span class="op">==</span> <span class="number">0x0000_8000</span>;
-        <span class="kw">let</span> <span class="ident">max_payload</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="ident">u16::from</span>(<span class="ident">value</span>.<span class="ident">dns_class</span>());
+        <span class="kw">let </span>rcode_high: u8 = ((value.ttl() &amp; <span class="number">0xFF00_0000u32</span>) &gt;&gt; <span class="number">24</span>) <span class="kw">as </span>u8;
+        <span class="kw">let </span>version: u8 = ((value.ttl() &amp; <span class="number">0x00FF_0000u32</span>) &gt;&gt; <span class="number">16</span>) <span class="kw">as </span>u8;
+        <span class="kw">let </span>dnssec_ok: bool = value.ttl() &amp; <span class="number">0x0000_8000 </span>== <span class="number">0x0000_8000</span>;
+        <span class="kw">let </span>max_payload: u16 = u16::from(value.dns_class());
 
-        <span class="kw">let</span> <span class="ident">options</span>: <span class="ident">OPT</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">value</span>.<span class="ident">data</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">RData::NULL</span>(..)) <span class="op">|</span> <span class="prelude-val">None</span> =&gt; {
-                <span class="comment">// NULL, there was no data in the OPT</span>
-                <span class="ident">OPT::default</span>()
+        <span class="kw">let </span>options: OPT = <span class="kw">match </span>value.data() {
+            <span class="prelude-val">Some</span>(RData::NULL(..)) | <span class="prelude-val">None </span>=&gt; {
+                <span class="comment">// NULL, there was no data in the OPT
+                </span>OPT::default()
             }
-            <span class="prelude-val">Some</span>(<span class="ident">RData::OPT</span>(<span class="kw-2">ref</span> <span class="ident">option_data</span>)) =&gt; {
-                <span class="ident">option_data</span>.<span class="ident">clone</span>() <span class="comment">// TODO: Edns should just refer to this, have the same lifetime as the Record</span>
-            }
-            <span class="kw">_</span> =&gt; {
-                <span class="comment">// this should be a coding error, as opposed to a parsing error.</span>
-                <span class="macro">panic!</span>(<span class="string">&quot;rr_type doesn&#39;t match the RData: {:?}&quot;</span>, <span class="ident">value</span>.<span class="ident">data</span>()) <span class="comment">// valid panic, never should happen</span>
-            }
+            <span class="prelude-val">Some</span>(RData::OPT(<span class="kw-2">ref </span>option_data)) =&gt; {
+                option_data.clone() <span class="comment">// TODO: Edns should just refer to this, have the same lifetime as the Record
+            </span>}
+            <span class="kw">_ </span>=&gt; {
+                <span class="comment">// this should be a coding error, as opposed to a parsing error.
+                </span><span class="macro">panic!</span>(<span class="string">&quot;rr_type doesn&#39;t match the RData: {:?}&quot;</span>, value.data()) <span class="comment">// valid panic, never should happen
+            </span>}
         };
 
-        <span class="self">Self</span> {
-            <span class="ident">rcode_high</span>,
-            <span class="ident">version</span>,
-            <span class="ident">dnssec_ok</span>,
-            <span class="ident">max_payload</span>,
-            <span class="ident">options</span>,
+        <span class="self">Self </span>{
+            rcode_high,
+            version,
+            dnssec_ok,
+            max_payload,
+            options,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Edns</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Record</span> {
-    <span class="doccomment">/// This returns a Resource Record that is formatted for Edns(0).</span>
-    <span class="doccomment">/// Note: the rcode_high value is only part of the rcode, the rest is part of the base</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Edns</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">record</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>();
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Edns&gt; <span class="kw">for </span>Record {
+    <span class="doccomment">/// This returns a Resource Record that is formatted for Edns(0).
+    /// Note: the rcode_high value is only part of the rcode, the rest is part of the base
+    </span><span class="kw">fn </span>from(value: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Edns) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>record = <span class="self">Self</span>::new();
 
-        <span class="ident">record</span>.<span class="ident">set_name</span>(<span class="ident">Name::root</span>());
-        <span class="ident">record</span>.<span class="ident">set_rr_type</span>(<span class="ident">RecordType::OPT</span>);
-        <span class="ident">record</span>.<span class="ident">set_dns_class</span>(<span class="ident">DNSClass::for_opt</span>(<span class="ident">value</span>.<span class="ident">max_payload</span>()));
+        record.set_name(Name::root());
+        record.set_rr_type(RecordType::OPT);
+        record.set_dns_class(DNSClass::for_opt(value.max_payload()));
 
-        <span class="comment">// rebuild the TTL field</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ttl</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="ident">u32::from</span>(<span class="ident">value</span>.<span class="ident">rcode_high</span>()) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">24</span>;
-        <span class="ident">ttl</span> <span class="op">|</span><span class="op">=</span> <span class="ident">u32::from</span>(<span class="ident">value</span>.<span class="ident">version</span>()) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span>;
+        <span class="comment">// rebuild the TTL field
+        </span><span class="kw">let </span><span class="kw-2">mut </span>ttl: u32 = u32::from(value.rcode_high()) &lt;&lt; <span class="number">24</span>;
+        ttl |= u32::from(value.version()) &lt;&lt; <span class="number">16</span>;
 
-        <span class="kw">if</span> <span class="ident">value</span>.<span class="ident">dnssec_ok</span>() {
-            <span class="ident">ttl</span> <span class="op">|</span><span class="op">=</span> <span class="number">0x0000_8000</span>;
+        <span class="kw">if </span>value.dnssec_ok() {
+            ttl |= <span class="number">0x0000_8000</span>;
         }
-        <span class="ident">record</span>.<span class="ident">set_ttl</span>(<span class="ident">ttl</span>);
+        record.set_ttl(ttl);
 
-        <span class="comment">// now for each option, write out the option array</span>
-        <span class="comment">//  also, since this is a hash, there is no guarantee that ordering will be preserved from</span>
-        <span class="comment">//  the original binary format.</span>
-        <span class="comment">// maybe switch to: https://crates.io/crates/linked-hash-map/</span>
-        <span class="ident">record</span>.<span class="ident">set_data</span>(<span class="prelude-val">Some</span>(<span class="ident">RData::OPT</span>(<span class="ident">value</span>.<span class="ident">options</span>().<span class="ident">clone</span>())));
+        <span class="comment">// now for each option, write out the option array
+        //  also, since this is a hash, there is no guarantee that ordering will be preserved from
+        //  the original binary format.
+        // maybe switch to: https://crates.io/crates/linked-hash-map/
+        </span>record.set_data(<span class="prelude-val">Some</span>(RData::OPT(value.options().clone())));
 
-        <span class="ident">record</span>
+        record
     }
 }
 
-<span class="kw">impl</span> <span class="ident">BinEncodable</span> <span class="kw">for</span> <span class="ident">Edns</span> {
-    <span class="kw">fn</span> <span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">encoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">encoder</span>.<span class="ident">emit</span>(<span class="number">0</span>)<span class="question-mark">?</span>; <span class="comment">// Name::root</span>
-        <span class="ident">RecordType::OPT</span>.<span class="ident">emit</span>(<span class="ident">encoder</span>)<span class="question-mark">?</span>; <span class="comment">//self.rr_type.emit(encoder)?;</span>
-        <span class="ident">DNSClass::for_opt</span>(<span class="self">self</span>.<span class="ident">max_payload</span>()).<span class="ident">emit</span>(<span class="ident">encoder</span>)<span class="question-mark">?</span>; <span class="comment">// self.dns_class.emit(encoder)?;</span>
+<span class="kw">impl </span>BinEncodable <span class="kw">for </span>Edns {
+    <span class="kw">fn </span>emit(<span class="kw-2">&amp;</span><span class="self">self</span>, encoder: <span class="kw-2">&amp;mut </span>BinEncoder&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; ProtoResult&lt;()&gt; {
+        encoder.emit(<span class="number">0</span>)<span class="question-mark">?</span>; <span class="comment">// Name::root
+        </span>RecordType::OPT.emit(encoder)<span class="question-mark">?</span>; <span class="comment">//self.rr_type.emit(encoder)?;
+        </span>DNSClass::for_opt(<span class="self">self</span>.max_payload()).emit(encoder)<span class="question-mark">?</span>; <span class="comment">// self.dns_class.emit(encoder)?;
 
-        <span class="comment">// rebuild the TTL field</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ttl</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="ident">u32::from</span>(<span class="self">self</span>.<span class="ident">rcode_high</span>()) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">24</span>;
-        <span class="ident">ttl</span> <span class="op">|</span><span class="op">=</span> <span class="ident">u32::from</span>(<span class="self">self</span>.<span class="ident">version</span>()) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span>;
+        // rebuild the TTL field
+        </span><span class="kw">let </span><span class="kw-2">mut </span>ttl: u32 = u32::from(<span class="self">self</span>.rcode_high()) &lt;&lt; <span class="number">24</span>;
+        ttl |= u32::from(<span class="self">self</span>.version()) &lt;&lt; <span class="number">16</span>;
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">dnssec_ok</span>() {
-            <span class="ident">ttl</span> <span class="op">|</span><span class="op">=</span> <span class="number">0x0000_8000</span>;
+        <span class="kw">if </span><span class="self">self</span>.dnssec_ok() {
+            ttl |= <span class="number">0x0000_8000</span>;
         }
 
-        <span class="ident">encoder</span>.<span class="ident">emit_u32</span>(<span class="ident">ttl</span>)<span class="question-mark">?</span>;
+        encoder.emit_u32(ttl)<span class="question-mark">?</span>;
 
-        <span class="comment">// write the opts as rdata...</span>
-        <span class="kw">let</span> <span class="ident">place</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">place</span>::<span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-        <span class="ident">opt::emit</span>(<span class="ident">encoder</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">options</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">len_since_place</span>(<span class="kw-2">&amp;</span><span class="ident">place</span>);
-        <span class="macro">assert!</span>(<span class="ident">len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">u16::max_value</span>() <span class="kw">as</span> <span class="ident">usize</span>);
+        <span class="comment">// write the opts as rdata...
+        </span><span class="kw">let </span>place = encoder.place::&lt;u16&gt;()<span class="question-mark">?</span>;
+        opt::emit(encoder, <span class="kw-2">&amp;</span><span class="self">self</span>.options)<span class="question-mark">?</span>;
+        <span class="kw">let </span>len = encoder.len_since_place(<span class="kw-2">&amp;</span>place);
+        <span class="macro">assert!</span>(len &lt;= u16::max_value() <span class="kw">as </span>usize);
 
-        <span class="ident">place</span>.<span class="ident">replace</span>(<span class="ident">encoder</span>, <span class="ident">len</span> <span class="kw">as</span> <span class="ident">u16</span>)<span class="question-mark">?</span>;
+        place.replace(encoder, len <span class="kw">as </span>u16)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_encode_decode</span>() {
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::rr::dnssec::SupportedAlgorithms</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;dnssec&quot;</span>)]
+#[test]
+</span><span class="kw">fn </span>test_encode_decode() {
+    <span class="kw">use </span><span class="kw">crate</span>::rr::dnssec::SupportedAlgorithms;
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">edns</span>: <span class="ident">Edns</span> <span class="op">=</span> <span class="ident">Edns::new</span>();
+    <span class="kw">let </span><span class="kw-2">mut </span>edns: Edns = Edns::new();
 
-    <span class="ident">edns</span>.<span class="ident">set_dnssec_ok</span>(<span class="bool-val">true</span>);
-    <span class="ident">edns</span>.<span class="ident">set_max_payload</span>(<span class="number">0x8008</span>);
-    <span class="ident">edns</span>.<span class="ident">set_version</span>(<span class="number">0x40</span>);
-    <span class="ident">edns</span>.<span class="ident">set_rcode_high</span>(<span class="number">0x01</span>);
-    <span class="ident">edns</span>.<span class="ident">options_mut</span>()
-        .<span class="ident">insert</span>(<span class="ident">EdnsOption::DAU</span>(<span class="ident">SupportedAlgorithms::all</span>()));
+    edns.set_dnssec_ok(<span class="bool-val">true</span>);
+    edns.set_max_payload(<span class="number">0x8008</span>);
+    edns.set_version(<span class="number">0x40</span>);
+    edns.set_rcode_high(<span class="number">0x01</span>);
+    edns.options_mut()
+        .insert(EdnsOption::DAU(SupportedAlgorithms::all()));
 
-    <span class="kw">let</span> <span class="ident">record</span>: <span class="ident">Record</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="ident">edns</span>).<span class="ident">into</span>();
-    <span class="kw">let</span> <span class="ident">edns_decode</span>: <span class="ident">Edns</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="ident">record</span>).<span class="ident">into</span>();
+    <span class="kw">let </span>record: Record = (<span class="kw-2">&amp;</span>edns).into();
+    <span class="kw">let </span>edns_decode: Edns = (<span class="kw-2">&amp;</span>record).into();
 
-    <span class="macro">assert_eq!</span>(<span class="ident">edns</span>.<span class="ident">dnssec_ok</span>(), <span class="ident">edns_decode</span>.<span class="ident">dnssec_ok</span>());
-    <span class="macro">assert_eq!</span>(<span class="ident">edns</span>.<span class="ident">max_payload</span>(), <span class="ident">edns_decode</span>.<span class="ident">max_payload</span>());
-    <span class="macro">assert_eq!</span>(<span class="ident">edns</span>.<span class="ident">version</span>(), <span class="ident">edns_decode</span>.<span class="ident">version</span>());
-    <span class="macro">assert_eq!</span>(<span class="ident">edns</span>.<span class="ident">rcode_high</span>(), <span class="ident">edns_decode</span>.<span class="ident">rcode_high</span>());
-    <span class="macro">assert_eq!</span>(<span class="ident">edns</span>.<span class="ident">options</span>(), <span class="ident">edns_decode</span>.<span class="ident">options</span>());
+    <span class="macro">assert_eq!</span>(edns.dnssec_ok(), edns_decode.dnssec_ok());
+    <span class="macro">assert_eq!</span>(edns.max_payload(), edns_decode.max_payload());
+    <span class="macro">assert_eq!</span>(edns.version(), edns_decode.version());
+    <span class="macro">assert_eq!</span>(edns.rcode_high(), edns_decode.rcode_high());
+    <span class="macro">assert_eq!</span>(edns.options(), edns_decode.options());
 
-    <span class="comment">// re-insert and remove using mut</span>
-    <span class="ident">edns</span>.<span class="ident">options_mut</span>()
-        .<span class="ident">insert</span>(<span class="ident">EdnsOption::DAU</span>(<span class="ident">SupportedAlgorithms::all</span>()));
-    <span class="ident">edns</span>.<span class="ident">options_mut</span>().<span class="ident">remove</span>(<span class="ident">EdnsCode::DAU</span>);
-    <span class="macro">assert!</span>(<span class="ident">edns</span>.<span class="ident">option</span>(<span class="ident">EdnsCode::DAU</span>).<span class="ident">is_none</span>());
+    <span class="comment">// re-insert and remove using mut
+    </span>edns.options_mut()
+        .insert(EdnsOption::DAU(SupportedAlgorithms::all()));
+    edns.options_mut().remove(EdnsCode::DAU);
+    <span class="macro">assert!</span>(edns.option(EdnsCode::DAU).is_none());
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

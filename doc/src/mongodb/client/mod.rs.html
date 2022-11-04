@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/client/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/client/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -441,448 +441,448 @@
 <span id="441">441</span>
 <span id="442">442</span>
 <span id="443">443</span>
-</pre><pre class="rust"><code><span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">auth</span>;
-<span class="kw">mod</span> <span class="ident">executor</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">options</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">session</span>;
+</pre><pre class="rust"><code><span class="kw">pub mod </span>auth;
+<span class="kw">mod </span>executor;
+<span class="kw">pub mod </span>options;
+<span class="kw">pub mod </span>session;
 
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">sync::Arc</span>,
-    <span class="ident">time</span>::{<span class="ident">Duration</span>, <span class="ident">Instant</span>},
+<span class="kw">use </span>std::{
+    sync::Arc,
+    time::{Duration, Instant},
 };
 
-<span class="kw">use</span> <span class="ident">derivative::Derivative</span>;
+<span class="kw">use </span>derivative::Derivative;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::options::ServerAddress</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">bson::Document</span>,
-    <span class="ident">change_stream</span>::{
-        <span class="ident">event::ChangeStreamEvent</span>,
-        <span class="ident">options::ChangeStreamOptions</span>,
-        <span class="ident">session::SessionChangeStream</span>,
-        <span class="ident">ChangeStream</span>,
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">use </span><span class="kw">crate</span>::options::ServerAddress;
+<span class="kw">use crate</span>::{
+    bson::Document,
+    change_stream::{
+        event::ChangeStreamEvent,
+        options::ChangeStreamOptions,
+        session::SessionChangeStream,
+        ChangeStream,
     },
-    <span class="ident">concern</span>::{<span class="ident">ReadConcern</span>, <span class="ident">WriteConcern</span>},
-    <span class="ident">db::Database</span>,
-    <span class="ident">error</span>::{<span class="ident">ErrorKind</span>, <span class="prelude-ty">Result</span>},
-    <span class="ident">event::command::CommandEventHandler</span>,
-    <span class="ident">operation</span>::{<span class="ident">AggregateTarget</span>, <span class="ident">ListDatabases</span>},
-    <span class="ident">options</span>::{
-        <span class="ident">ClientOptions</span>,
-        <span class="ident">DatabaseOptions</span>,
-        <span class="ident">ListDatabasesOptions</span>,
-        <span class="ident">ReadPreference</span>,
-        <span class="ident">SelectionCriteria</span>,
-        <span class="ident">SessionOptions</span>,
+    concern::{ReadConcern, WriteConcern},
+    db::Database,
+    error::{ErrorKind, <span class="prelude-ty">Result</span>},
+    event::command::CommandEventHandler,
+    operation::{AggregateTarget, ListDatabases},
+    options::{
+        ClientOptions,
+        DatabaseOptions,
+        ListDatabasesOptions,
+        ReadPreference,
+        SelectionCriteria,
+        SessionOptions,
     },
-    <span class="ident">results::DatabaseSpecification</span>,
-    <span class="ident">sdam</span>::{<span class="ident">server_selection</span>, <span class="ident">SelectedServer</span>, <span class="ident">SessionSupportStatus</span>, <span class="ident">Topology</span>},
-    <span class="ident">ClientSession</span>,
+    results::DatabaseSpecification,
+    sdam::{server_selection, SelectedServer, SessionSupportStatus, Topology},
+    ClientSession,
 };
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">executor</span>::{<span class="ident">HELLO_COMMAND_NAMES</span>, <span class="ident">REDACTED_COMMANDS</span>};
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">session</span>::{<span class="ident">ClusterTime</span>, <span class="ident">SESSIONS_UNSUPPORTED_COMMANDS</span>};
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>executor::{HELLO_COMMAND_NAMES, REDACTED_COMMANDS};
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>session::{ClusterTime, SESSIONS_UNSUPPORTED_COMMANDS};
 
-<span class="kw">use</span> <span class="ident">session</span>::{<span class="ident">ServerSession</span>, <span class="ident">ServerSessionPool</span>};
+<span class="kw">use </span>session::{ServerSession, ServerSessionPool};
 
-<span class="kw">const</span> <span class="ident">DEFAULT_SERVER_SELECTION_TIMEOUT</span>: <span class="ident">Duration</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="number">30</span>);
+<span class="kw">const </span>DEFAULT_SERVER_SELECTION_TIMEOUT: Duration = Duration::from_secs(<span class="number">30</span>);
 
-<span class="doccomment">/// This is the main entry point for the API. A `Client` is used to connect to a MongoDB cluster.</span>
-<span class="doccomment">/// By default, it will monitor the topology of the cluster, keeping track of any changes, such</span>
-<span class="doccomment">/// as servers being added or removed.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `Client` uses [`std::sync::Arc`](https://doc.rust-lang.org/std/sync/struct.Arc.html) internally,</span>
-<span class="doccomment">/// so it can safely be shared across threads or async tasks. For example:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # #[cfg(all(not(feature = &quot;sync&quot;), not(feature = &quot;tokio-sync&quot;)))]</span>
-<span class="doccomment">/// # use mongodb::{bson::Document, Client, error::Result};</span>
-<span class="doccomment">/// # #[cfg(feature = &quot;async-std-runtime&quot;)]</span>
-<span class="doccomment">/// # use async_std::task;</span>
-<span class="doccomment">/// # #[cfg(feature = &quot;tokio-runtime&quot;)]</span>
-<span class="doccomment">/// # use tokio::task;</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # #[cfg(all(not(feature = &quot;sync&quot;), not(feature = &quot;tokio-sync&quot;)))]</span>
-<span class="doccomment">/// # async fn start_workers() -&gt; Result&lt;()&gt; {</span>
-<span class="doccomment">/// let client = Client::with_uri_str(&quot;mongodb://example.com&quot;).await?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// for i in 0..5 {</span>
-<span class="doccomment">///     let client_ref = client.clone();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     task::spawn(async move {</span>
-<span class="doccomment">///         let collection = client_ref.database(&quot;items&quot;).collection::&lt;Document&gt;(&amp;format!(&quot;coll{}&quot;, i));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///         // Do something with the collection</span>
-<span class="doccomment">///     });</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # Ok(())</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// ## Notes on performance</span>
-<span class="doccomment">/// Spawning many asynchronous tasks that use the driver concurrently like this is often the best</span>
-<span class="doccomment">/// way to achieve maximum performance, as the driver is designed to work well in such situations.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Additionally, using a custom Rust type that implements `Serialize` and `Deserialize` as the</span>
-<span class="doccomment">/// generic parameter of [`Collection`](../struct.Collection.html) instead of [`bson::Document`] can</span>
-<span class="doccomment">/// reduce the amount of time the driver and your application spends serializing and deserializing</span>
-<span class="doccomment">/// BSON, which can also lead to increased performance.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## TCP Keepalive</span>
-<span class="doccomment">/// TCP keepalive is enabled by default with ``tcp_keepalive_time`` set to 120 seconds. The</span>
-<span class="doccomment">/// driver does not set ``tcp_keepalive_intvl``. See the</span>
-<span class="doccomment">/// [MongoDB Diagnostics FAQ keepalive section](https://www.mongodb.com/docs/manual/faq/diagnostics/#does-tcp-keepalive-time-affect-mongodb-deployments)</span>
-<span class="doccomment">/// for instructions on setting these values at the system level.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Client</span> {
-    <span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ClientInner</span><span class="op">&gt;</span>,
+<span class="doccomment">/// This is the main entry point for the API. A `Client` is used to connect to a MongoDB cluster.
+/// By default, it will monitor the topology of the cluster, keeping track of any changes, such
+/// as servers being added or removed.
+///
+/// `Client` uses [`std::sync::Arc`](https://doc.rust-lang.org/std/sync/struct.Arc.html) internally,
+/// so it can safely be shared across threads or async tasks. For example:
+///
+/// ```rust
+/// # #[cfg(all(not(feature = &quot;sync&quot;), not(feature = &quot;tokio-sync&quot;)))]
+/// # use mongodb::{bson::Document, Client, error::Result};
+/// # #[cfg(feature = &quot;async-std-runtime&quot;)]
+/// # use async_std::task;
+/// # #[cfg(feature = &quot;tokio-runtime&quot;)]
+/// # use tokio::task;
+/// #
+/// # #[cfg(all(not(feature = &quot;sync&quot;), not(feature = &quot;tokio-sync&quot;)))]
+/// # async fn start_workers() -&gt; Result&lt;()&gt; {
+/// let client = Client::with_uri_str(&quot;mongodb://example.com&quot;).await?;
+///
+/// for i in 0..5 {
+///     let client_ref = client.clone();
+///
+///     task::spawn(async move {
+///         let collection = client_ref.database(&quot;items&quot;).collection::&lt;Document&gt;(&amp;format!(&quot;coll{}&quot;, i));
+///
+///         // Do something with the collection
+///     });
+/// }
+/// #
+/// # Ok(())
+/// # }
+/// ```
+/// ## Notes on performance
+/// Spawning many asynchronous tasks that use the driver concurrently like this is often the best
+/// way to achieve maximum performance, as the driver is designed to work well in such situations.
+///
+/// Additionally, using a custom Rust type that implements `Serialize` and `Deserialize` as the
+/// generic parameter of [`Collection`](../struct.Collection.html) instead of [`bson::Document`] can
+/// reduce the amount of time the driver and your application spends serializing and deserializing
+/// BSON, which can also lead to increased performance.
+///
+/// ## TCP Keepalive
+/// TCP keepalive is enabled by default with ``tcp_keepalive_time`` set to 120 seconds. The
+/// driver does not set ``tcp_keepalive_intvl``. See the
+/// [MongoDB Diagnostics FAQ keepalive section](https://www.mongodb.com/docs/manual/faq/diagnostics/#does-tcp-keepalive-time-affect-mongodb-deployments)
+/// for instructions on setting these values at the system level.
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub struct </span>Client {
+    inner: Arc&lt;ClientInner&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Derivative</span>)]</span>
-<span class="attribute">#[<span class="ident">derivative</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">ClientInner</span> {
-    <span class="ident">topology</span>: <span class="ident">Topology</span>,
-    <span class="ident">options</span>: <span class="ident">ClientOptions</span>,
-    <span class="ident">session_pool</span>: <span class="ident">ServerSessionPool</span>,
+<span class="attribute">#[derive(Derivative)]
+#[derivative(Debug)]
+</span><span class="kw">struct </span>ClientInner {
+    topology: Topology,
+    options: ClientOptions,
+    session_pool: ServerSessionPool,
 }
 
-<span class="kw">impl</span> <span class="ident">Client</span> {
-    <span class="doccomment">/// Creates a new `Client` connected to the cluster specified by `uri`. `uri` must be a valid</span>
-    <span class="doccomment">/// MongoDB connection string.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See the documentation on</span>
-    <span class="doccomment">/// [`ClientOptions::parse`](options/struct.ClientOptions.html#method.parse) for more details.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">with_uri_str</span>(<span class="ident">uri</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">ClientOptions::parse_uri</span>(<span class="ident">uri</span>.<span class="ident">as_ref</span>(), <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+<span class="kw">impl </span>Client {
+    <span class="doccomment">/// Creates a new `Client` connected to the cluster specified by `uri`. `uri` must be a valid
+    /// MongoDB connection string.
+    ///
+    /// See the documentation on
+    /// [`ClientOptions::parse`](options/struct.ClientOptions.html#method.parse) for more details.
+    </span><span class="kw">pub async fn </span>with_uri_str(uri: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>options = ClientOptions::parse_uri(uri.as_ref(), <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="ident">Client::with_options</span>(<span class="ident">options</span>)
+        Client::with_options(options)
     }
 
-    <span class="doccomment">/// Creates a new `Client` connected to the cluster specified by `options`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_options</span>(<span class="ident">options</span>: <span class="ident">ClientOptions</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">options</span>.<span class="ident">validate</span>()<span class="question-mark">?</span>;
+    <span class="doccomment">/// Creates a new `Client` connected to the cluster specified by `options`.
+    </span><span class="kw">pub fn </span>with_options(options: ClientOptions) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        options.validate()<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">ClientInner</span> {
-            <span class="ident">topology</span>: <span class="ident">Topology::new</span>(<span class="ident">options</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>,
-            <span class="ident">session_pool</span>: <span class="ident">ServerSessionPool::new</span>(),
-            <span class="ident">options</span>,
+        <span class="kw">let </span>inner = Arc::new(ClientInner {
+            topology: Topology::new(options.clone())<span class="question-mark">?</span>,
+            session_pool: ServerSessionPool::new(),
+            options,
         });
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> { <span class="ident">inner</span> })
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{ inner })
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">emit_command_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">emit</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">CommandEventHandler</span><span class="op">&gt;</span>)) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">handler</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">options</span>.<span class="ident">command_event_handler</span> {
-            <span class="ident">emit</span>(<span class="ident">handler</span>);
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>emit_command_event(<span class="kw-2">&amp;</span><span class="self">self</span>, emit: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;</span>Arc&lt;<span class="kw">dyn </span>CommandEventHandler&gt;)) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>handler) = <span class="self">self</span>.inner.options.command_event_handler {
+            emit(handler);
         }
     }
 
-    <span class="doccomment">/// Gets the default selection criteria the `Client` uses for operations..</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">selection_criteria</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SelectionCriteria</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">options</span>.<span class="ident">selection_criteria</span>.<span class="ident">as_ref</span>()
+    <span class="doccomment">/// Gets the default selection criteria the `Client` uses for operations..
+    </span><span class="kw">pub fn </span>selection_criteria(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>SelectionCriteria&gt; {
+        <span class="self">self</span>.inner.options.selection_criteria.as_ref()
     }
 
-    <span class="doccomment">/// Gets the default read concern the `Client` uses for operations.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_concern</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ReadConcern</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">options</span>.<span class="ident">read_concern</span>.<span class="ident">as_ref</span>()
+    <span class="doccomment">/// Gets the default read concern the `Client` uses for operations.
+    </span><span class="kw">pub fn </span>read_concern(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ReadConcern&gt; {
+        <span class="self">self</span>.inner.options.read_concern.as_ref()
     }
 
-    <span class="doccomment">/// Gets the default write concern the `Client` uses for operations.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_concern</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">WriteConcern</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">options</span>.<span class="ident">write_concern</span>.<span class="ident">as_ref</span>()
+    <span class="doccomment">/// Gets the default write concern the `Client` uses for operations.
+    </span><span class="kw">pub fn </span>write_concern(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>WriteConcern&gt; {
+        <span class="self">self</span>.inner.options.write_concern.as_ref()
     }
 
-    <span class="doccomment">/// Gets a handle to a database specified by `name` in the cluster the `Client` is connected to.</span>
-    <span class="doccomment">/// The `Database` options (e.g. read preference and write concern) will default to those of the</span>
-    <span class="doccomment">/// `Client`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method does not send or receive anything across the wire to the database, so it can be</span>
-    <span class="doccomment">/// used repeatedly without incurring any costs from I/O.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Database</span> {
-        <span class="ident">Database::new</span>(<span class="self">self</span>.<span class="ident">clone</span>(), <span class="ident">name</span>, <span class="prelude-val">None</span>)
+    <span class="doccomment">/// Gets a handle to a database specified by `name` in the cluster the `Client` is connected to.
+    /// The `Database` options (e.g. read preference and write concern) will default to those of the
+    /// `Client`.
+    ///
+    /// This method does not send or receive anything across the wire to the database, so it can be
+    /// used repeatedly without incurring any costs from I/O.
+    </span><span class="kw">pub fn </span>database(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; Database {
+        Database::new(<span class="self">self</span>.clone(), name, <span class="prelude-val">None</span>)
     }
 
-    <span class="doccomment">/// Gets a handle to a database specified by `name` in the cluster the `Client` is connected to.</span>
-    <span class="doccomment">/// Operations done with this `Database` will use the options specified by `options` by default</span>
-    <span class="doccomment">/// and will otherwise default to those of the `Client`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method does not send or receive anything across the wire to the database, so it can be</span>
-    <span class="doccomment">/// used repeatedly without incurring any costs from I/O.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">database_with_options</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">options</span>: <span class="ident">DatabaseOptions</span>) -&gt; <span class="ident">Database</span> {
-        <span class="ident">Database::new</span>(<span class="self">self</span>.<span class="ident">clone</span>(), <span class="ident">name</span>, <span class="prelude-val">Some</span>(<span class="ident">options</span>))
+    <span class="doccomment">/// Gets a handle to a database specified by `name` in the cluster the `Client` is connected to.
+    /// Operations done with this `Database` will use the options specified by `options` by default
+    /// and will otherwise default to those of the `Client`.
+    ///
+    /// This method does not send or receive anything across the wire to the database, so it can be
+    /// used repeatedly without incurring any costs from I/O.
+    </span><span class="kw">pub fn </span>database_with_options(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str, options: DatabaseOptions) -&gt; Database {
+        Database::new(<span class="self">self</span>.clone(), name, <span class="prelude-val">Some</span>(options))
     }
 
-    <span class="doccomment">/// Gets a handle to the default database specified in the `ClientOptions` or MongoDB connection</span>
-    <span class="doccomment">/// string used to construct this `Client`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If no default database was specified, `None` will be returned.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Database</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>
-            .<span class="ident">options</span>
-            .<span class="ident">default_database</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">db_name</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">database</span>(<span class="ident">db_name</span>))
+    <span class="doccomment">/// Gets a handle to the default database specified in the `ClientOptions` or MongoDB connection
+    /// string used to construct this `Client`.
+    ///
+    /// If no default database was specified, `None` will be returned.
+    </span><span class="kw">pub fn </span>default_database(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Database&gt; {
+        <span class="self">self</span>.inner
+            .options
+            .default_database
+            .as_ref()
+            .map(|db_name| <span class="self">self</span>.database(db_name))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">list_databases_common</span>(
+    <span class="kw">async fn </span>list_databases_common(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">filter</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ListDatabasesOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">session</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DatabaseSpecification</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">op</span> <span class="op">=</span> <span class="ident">ListDatabases::new</span>(<span class="ident">filter</span>.<span class="ident">into</span>(), <span class="bool-val">false</span>, <span class="ident">options</span>.<span class="ident">into</span>());
-        <span class="self">self</span>.<span class="ident">execute_operation</span>(<span class="ident">op</span>, <span class="ident">session</span>).<span class="kw">await</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">dbs</span><span class="op">|</span> {
-            <span class="ident">dbs</span>.<span class="ident">into_iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">db_spec</span><span class="op">|</span> {
-                    <span class="ident">bson::from_slice</span>(<span class="ident">db_spec</span>.<span class="ident">as_bytes</span>()).<span class="ident">map_err</span>(<span class="ident"><span class="kw">crate</span>::error::Error::from</span>)
+        filter: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;Document&gt;&gt;,
+        options: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;ListDatabasesOptions&gt;&gt;,
+        session: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>ClientSession&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;DatabaseSpecification&gt;&gt; {
+        <span class="kw">let </span>op = ListDatabases::new(filter.into(), <span class="bool-val">false</span>, options.into());
+        <span class="self">self</span>.execute_operation(op, session).<span class="kw">await</span>.and_then(|dbs| {
+            dbs.into_iter()
+                .map(|db_spec| {
+                    bson::from_slice(db_spec.as_bytes()).map_err(<span class="kw">crate</span>::error::Error::from)
                 })
-                .<span class="ident">collect</span>()
+                .collect()
         })
     }
 
-    <span class="doccomment">/// Gets information about each database present in the cluster the Client is connected to.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">list_databases</span>(
+    <span class="doccomment">/// Gets information about each database present in the cluster the Client is connected to.
+    </span><span class="kw">pub async fn </span>list_databases(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">filter</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ListDatabasesOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DatabaseSpecification</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">list_databases_common</span>(<span class="ident">filter</span>, <span class="ident">options</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
-    }
+        filter: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;Document&gt;&gt;,
+        options: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;ListDatabasesOptions&gt;&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;DatabaseSpecification&gt;&gt; {
+        <span class="self">self</span>.list_databases_common(filter, options, <span class="prelude-val">None</span>).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Gets information about each database present in the cluster the Client is connected to</span>
-    <span class="doccomment">/// using the provided `ClientSession`.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">list_databases_with_session</span>(
+    <span class="doccomment">/// Gets information about each database present in the cluster the Client is connected to
+    /// using the provided `ClientSession`.
+    </span><span class="kw">pub async fn </span>list_databases_with_session(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">filter</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ListDatabasesOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">session</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DatabaseSpecification</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">list_databases_common</span>(<span class="ident">filter</span>, <span class="ident">options</span>, <span class="prelude-val">Some</span>(<span class="ident">session</span>))
-            .<span class="kw">await</span>
-    }
+        filter: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;Document&gt;&gt;,
+        options: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;ListDatabasesOptions&gt;&gt;,
+        session: <span class="kw-2">&amp;mut </span>ClientSession,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;DatabaseSpecification&gt;&gt; {
+        <span class="self">self</span>.list_databases_common(filter, options, <span class="prelude-val">Some</span>(session))
+            .<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Gets the names of the databases present in the cluster the Client is connected to.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">list_database_names</span>(
+    <span class="doccomment">/// Gets the names of the databases present in the cluster the Client is connected to.
+    </span><span class="kw">pub async fn </span>list_database_names(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">filter</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ListDatabasesOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">op</span> <span class="op">=</span> <span class="ident">ListDatabases::new</span>(<span class="ident">filter</span>.<span class="ident">into</span>(), <span class="bool-val">true</span>, <span class="ident">options</span>.<span class="ident">into</span>());
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">execute_operation</span>(<span class="ident">op</span>, <span class="prelude-val">None</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">databases</span>) =&gt; <span class="ident">databases</span>
-                .<span class="ident">into_iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">doc</span><span class="op">|</span> {
-                    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">doc</span>
-                        .<span class="ident">get_str</span>(<span class="string">&quot;name&quot;</span>)
-                        .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">ErrorKind::InvalidResponse</span> {
-                            <span class="ident">message</span>: <span class="string">&quot;Expected \&quot;name\&quot; field in server response, but it was not \
-                                      found&quot;</span>
-                                .<span class="ident">to_string</span>(),
+        filter: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;Document&gt;&gt;,
+        options: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;ListDatabasesOptions&gt;&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;String&gt;&gt; {
+        <span class="kw">let </span>op = ListDatabases::new(filter.into(), <span class="bool-val">true</span>, options.into());
+        <span class="kw">match </span><span class="self">self</span>.execute_operation(op, <span class="prelude-val">None</span>).<span class="kw">await </span>{
+            <span class="prelude-val">Ok</span>(databases) =&gt; databases
+                .into_iter()
+                .map(|doc| {
+                    <span class="kw">let </span>name = doc
+                        .get_str(<span class="string">&quot;name&quot;</span>)
+                        .map_err(|<span class="kw">_</span>| ErrorKind::InvalidResponse {
+                            message: <span class="string">&quot;Expected \&quot;name\&quot; field in server response, but it was not \
+                                      found&quot;
+                                </span>.to_string(),
                         })<span class="question-mark">?</span>;
-                    <span class="prelude-val">Ok</span>(<span class="ident">name</span>.<span class="ident">to_string</span>())
+                    <span class="prelude-val">Ok</span>(name.to_string())
                 })
-                .<span class="ident">collect</span>(),
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">e</span>),
+                .collect(),
+            <span class="prelude-val">Err</span>(e) =&gt; <span class="prelude-val">Err</span>(e),
         }
     }
 
-    <span class="doccomment">/// Starts a new `ClientSession`.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_session</span>(
+    <span class="doccomment">/// Starts a new `ClientSession`.
+    </span><span class="kw">pub async fn </span>start_session(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SessionOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ClientSession</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">into</span>();
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">options</span>) <span class="op">=</span> <span class="ident">options</span> {
-            <span class="ident">options</span>.<span class="ident">validate</span>()<span class="question-mark">?</span>;
+        options: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;SessionOptions&gt;&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;ClientSession&gt; {
+        <span class="kw">let </span>options = options.into();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>options) = options {
+            options.validate()<span class="question-mark">?</span>;
         }
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get_session_support_status</span>().<span class="kw">await</span><span class="question-mark">?</span> {
-            <span class="ident">SessionSupportStatus::Supported</span> {
-                <span class="ident">logical_session_timeout</span>,
-            } =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>
-                .<span class="ident">start_session_with_timeout</span>(<span class="ident">logical_session_timeout</span>, <span class="ident">options</span>, <span class="bool-val">false</span>)
+        <span class="kw">match </span><span class="self">self</span>.get_session_support_status().<span class="kw">await</span><span class="question-mark">? </span>{
+            SessionSupportStatus::Supported {
+                logical_session_timeout,
+            } =&gt; <span class="prelude-val">Ok</span>(<span class="self">self
+                </span>.start_session_with_timeout(logical_session_timeout, options, <span class="bool-val">false</span>)
                 .<span class="kw">await</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::SessionsNotSupported</span>.<span class="ident">into</span>()),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(ErrorKind::SessionsNotSupported.into()),
         }
     }
 
-    <span class="doccomment">/// Starts a new [`ChangeStream`] that receives events for all changes in the cluster. The</span>
-    <span class="doccomment">/// stream does not observe changes from system collections or the &quot;config&quot;, &quot;local&quot; or</span>
-    <span class="doccomment">/// &quot;admin&quot; databases. Note that this method (`watch` on a cluster) is only supported in</span>
-    <span class="doccomment">/// MongoDB 4.0 or greater.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See the documentation [here](https://www.mongodb.com/docs/manual/changeStreams/) on change</span>
-    <span class="doccomment">/// streams.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Change streams require either a &quot;majority&quot; read concern or no read</span>
-    <span class="doccomment">/// concern. Anything else will cause a server error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that using a `$project` stage to remove any of the `_id` `operationType` or `ns` fields</span>
-    <span class="doccomment">/// will cause an error. The driver requires these fields to support resumability. For</span>
-    <span class="doccomment">/// more information on resumability, see the documentation for</span>
-    <span class="doccomment">/// [`ChangeStream`](change_stream/struct.ChangeStream.html)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the pipeline alters the structure of the returned events, the parsed type will need to be</span>
-    <span class="doccomment">/// changed via [`ChangeStream::with_type`].</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">watch</span>(
+    <span class="doccomment">/// Starts a new [`ChangeStream`] that receives events for all changes in the cluster. The
+    /// stream does not observe changes from system collections or the &quot;config&quot;, &quot;local&quot; or
+    /// &quot;admin&quot; databases. Note that this method (`watch` on a cluster) is only supported in
+    /// MongoDB 4.0 or greater.
+    ///
+    /// See the documentation [here](https://www.mongodb.com/docs/manual/changeStreams/) on change
+    /// streams.
+    ///
+    /// Change streams require either a &quot;majority&quot; read concern or no read
+    /// concern. Anything else will cause a server error.
+    ///
+    /// Note that using a `$project` stage to remove any of the `_id` `operationType` or `ns` fields
+    /// will cause an error. The driver requires these fields to support resumability. For
+    /// more information on resumability, see the documentation for
+    /// [`ChangeStream`](change_stream/struct.ChangeStream.html)
+    ///
+    /// If the pipeline alters the structure of the returned events, the parsed type will need to be
+    /// changed via [`ChangeStream::with_type`].
+    </span><span class="kw">pub async fn </span>watch(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">pipeline</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Document</span><span class="op">&gt;</span>,
-        <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChangeStreamOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ChangeStream</span><span class="op">&lt;</span><span class="ident">ChangeStreamEvent</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">into</span>();
-        <span class="macro">resolve_options!</span>(<span class="self">self</span>, <span class="ident">options</span>, [<span class="ident">read_concern</span>, <span class="ident">selection_criteria</span>]);
-        <span class="ident">options</span>
-            .<span class="ident">get_or_insert_with</span>(<span class="ident">Default::default</span>)
-            .<span class="ident">all_changes_for_cluster</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>);
-        <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="ident">AggregateTarget::Database</span>(<span class="string">&quot;admin&quot;</span>.<span class="ident">to_string</span>());
-        <span class="self">self</span>.<span class="ident">execute_watch</span>(<span class="ident">pipeline</span>, <span class="ident">options</span>, <span class="ident">target</span>, <span class="prelude-val">None</span>).<span class="kw">await</span>
-    }
+        pipeline: <span class="kw">impl </span>IntoIterator&lt;Item = Document&gt;,
+        options: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;ChangeStreamOptions&gt;&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;ChangeStream&lt;ChangeStreamEvent&lt;Document&gt;&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>options = options.into();
+        <span class="macro">resolve_options!</span>(<span class="self">self</span>, options, [read_concern, selection_criteria]);
+        options
+            .get_or_insert_with(Default::default)
+            .all_changes_for_cluster = <span class="prelude-val">Some</span>(<span class="bool-val">true</span>);
+        <span class="kw">let </span>target = AggregateTarget::Database(<span class="string">&quot;admin&quot;</span>.to_string());
+        <span class="self">self</span>.execute_watch(pipeline, options, target, <span class="prelude-val">None</span>).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Starts a new [`SessionChangeStream`] that receives events for all changes in the cluster</span>
-    <span class="doccomment">/// using the provided [`ClientSession`].  See [`Client::watch`] for more information.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">watch_with_session</span>(
+    <span class="doccomment">/// Starts a new [`SessionChangeStream`] that receives events for all changes in the cluster
+    /// using the provided [`ClientSession`].  See [`Client::watch`] for more information.
+    </span><span class="kw">pub async fn </span>watch_with_session(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">pipeline</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Document</span><span class="op">&gt;</span>,
-        <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChangeStreamOptions</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">session</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SessionChangeStream</span><span class="op">&lt;</span><span class="ident">ChangeStreamEvent</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">into</span>();
-        <span class="macro">resolve_read_concern_with_session!</span>(<span class="self">self</span>, <span class="ident">options</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">session</span>))<span class="question-mark">?</span>;
-        <span class="macro">resolve_selection_criteria_with_session!</span>(<span class="self">self</span>, <span class="ident">options</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">session</span>))<span class="question-mark">?</span>;
-        <span class="ident">options</span>
-            .<span class="ident">get_or_insert_with</span>(<span class="ident">Default::default</span>)
-            .<span class="ident">all_changes_for_cluster</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>);
-        <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="ident">AggregateTarget::Database</span>(<span class="string">&quot;admin&quot;</span>.<span class="ident">to_string</span>());
-        <span class="self">self</span>.<span class="ident">execute_watch_with_session</span>(<span class="ident">pipeline</span>, <span class="ident">options</span>, <span class="ident">target</span>, <span class="prelude-val">None</span>, <span class="ident">session</span>)
-            .<span class="kw">await</span>
-    }
+        pipeline: <span class="kw">impl </span>IntoIterator&lt;Item = Document&gt;,
+        options: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;ChangeStreamOptions&gt;&gt;,
+        session: <span class="kw-2">&amp;mut </span>ClientSession,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;SessionChangeStream&lt;ChangeStreamEvent&lt;Document&gt;&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>options = options.into();
+        <span class="macro">resolve_read_concern_with_session!</span>(<span class="self">self</span>, options, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut *</span>session))<span class="question-mark">?</span>;
+        <span class="macro">resolve_selection_criteria_with_session!</span>(<span class="self">self</span>, options, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut *</span>session))<span class="question-mark">?</span>;
+        options
+            .get_or_insert_with(Default::default)
+            .all_changes_for_cluster = <span class="prelude-val">Some</span>(<span class="bool-val">true</span>);
+        <span class="kw">let </span>target = AggregateTarget::Database(<span class="string">&quot;admin&quot;</span>.to_string());
+        <span class="self">self</span>.execute_watch_with_session(pipeline, options, target, <span class="prelude-val">None</span>, session)
+            .<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Check in a server session to the server session pool.</span>
-    <span class="doccomment">/// If the session is expired or dirty, or the topology no longer supports sessions, the session</span>
-    <span class="doccomment">/// will be discarded.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">check_in_server_session</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">session</span>: <span class="ident">ServerSession</span>) {
-        <span class="kw">let</span> <span class="ident">session_support_status</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">session_support_status</span>();
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">SessionSupportStatus::Supported</span> {
-            <span class="ident">logical_session_timeout</span>,
-        } <span class="op">=</span> <span class="ident">session_support_status</span>
+    <span class="doccomment">/// Check in a server session to the server session pool.
+    /// If the session is expired or dirty, or the topology no longer supports sessions, the session
+    /// will be discarded.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>check_in_server_session(<span class="kw-2">&amp;</span><span class="self">self</span>, session: ServerSession) {
+        <span class="kw">let </span>session_support_status = <span class="self">self</span>.inner.topology.session_support_status();
+        <span class="kw">if let </span>SessionSupportStatus::Supported {
+            logical_session_timeout,
+        } = session_support_status
         {
-            <span class="self">self</span>.<span class="ident">inner</span>
-                .<span class="ident">session_pool</span>
-                .<span class="ident">check_in</span>(<span class="ident">session</span>, <span class="ident">logical_session_timeout</span>)
+            <span class="self">self</span>.inner
+                .session_pool
+                .check_in(session, logical_session_timeout)
                 .<span class="kw">await</span>;
         }
     }
 
-    <span class="doccomment">/// Starts a `ClientSession`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method will attempt to re-use server sessions from the pool which are not about to</span>
-    <span class="doccomment">/// expire according to the provided logical session timeout. If no such sessions are</span>
-    <span class="doccomment">/// available, a new one will be created.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_session_with_timeout</span>(
+    <span class="doccomment">/// Starts a `ClientSession`.
+    ///
+    /// This method will attempt to re-use server sessions from the pool which are not about to
+    /// expire according to the provided logical session timeout. If no such sessions are
+    /// available, a new one will be created.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>start_session_with_timeout(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">logical_session_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-        <span class="ident">options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SessionOptions</span><span class="op">&gt;</span>,
-        <span class="ident">is_implicit</span>: <span class="ident">bool</span>,
-    ) -&gt; <span class="ident">ClientSession</span> {
-        <span class="ident">ClientSession::new</span>(
-            <span class="self">self</span>.<span class="ident">inner</span>
-                .<span class="ident">session_pool</span>
-                .<span class="ident">check_out</span>(<span class="ident">logical_session_timeout</span>)
+        logical_session_timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+        options: <span class="prelude-ty">Option</span>&lt;SessionOptions&gt;,
+        is_implicit: bool,
+    ) -&gt; ClientSession {
+        ClientSession::new(
+            <span class="self">self</span>.inner
+                .session_pool
+                .check_out(logical_session_timeout)
                 .<span class="kw">await</span>,
-            <span class="self">self</span>.<span class="ident">clone</span>(),
-            <span class="ident">options</span>,
-            <span class="ident">is_implicit</span>,
+            <span class="self">self</span>.clone(),
+            options,
+            is_implicit,
         )
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">clear_session_pool</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">session_pool</span>.<span class="ident">clear</span>().<span class="kw">await</span>;
+    <span class="attribute">#[cfg(test)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>clear_session_pool(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="self">self</span>.inner.session_pool.clear().<span class="kw">await</span>;
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">is_session_checked_in</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">Document</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">session_pool</span>.<span class="ident">contains</span>(<span class="ident">id</span>).<span class="kw">await</span>
-    }
+    <span class="attribute">#[cfg(test)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>is_session_checked_in(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="kw-2">&amp;</span>Document) -&gt; bool {
+        <span class="self">self</span>.inner.session_pool.contains(id).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Get the address of the server selected according to the given criteria.</span>
-    <span class="doccomment">/// This method is only used in tests.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_select_server</span>(
+    <span class="doccomment">/// Get the address of the server selected according to the given criteria.
+    /// This method is only used in tests.
+    </span><span class="attribute">#[cfg(test)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>test_select_server(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">criteria</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SelectionCriteria</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ServerAddress</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">server</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">select_server</span>(<span class="ident">criteria</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">server</span>.<span class="ident">address</span>.<span class="ident">clone</span>())
+        criteria: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>SelectionCriteria&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;ServerAddress&gt; {
+        <span class="kw">let </span>server = <span class="self">self</span>.select_server(criteria).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(server.address.clone())
     }
 
-    <span class="doccomment">/// Select a server using the provided criteria. If none is provided, a primary read preference</span>
-    <span class="doccomment">/// will be used instead.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">select_server</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">criteria</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SelectionCriteria</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SelectedServer</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">criteria</span> <span class="op">=</span>
-            <span class="ident">criteria</span>.<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span><span class="ident">SelectionCriteria::ReadPreference</span>(<span class="ident">ReadPreference::Primary</span>));
+    <span class="doccomment">/// Select a server using the provided criteria. If none is provided, a primary read preference
+    /// will be used instead.
+    </span><span class="kw">async fn </span>select_server(<span class="kw-2">&amp;</span><span class="self">self</span>, criteria: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>SelectionCriteria&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;SelectedServer&gt; {
+        <span class="kw">let </span>criteria =
+            criteria.unwrap_or(<span class="kw-2">&amp;</span>SelectionCriteria::ReadPreference(ReadPreference::Primary));
 
-        <span class="kw">let</span> <span class="ident">start_time</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
-        <span class="kw">let</span> <span class="ident">timeout</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">inner</span>
-            .<span class="ident">options</span>
-            .<span class="ident">server_selection_timeout</span>
-            .<span class="ident">unwrap_or</span>(<span class="ident">DEFAULT_SERVER_SELECTION_TIMEOUT</span>);
+        <span class="kw">let </span>start_time = Instant::now();
+        <span class="kw">let </span>timeout = <span class="self">self
+            </span>.inner
+            .options
+            .server_selection_timeout
+            .unwrap_or(DEFAULT_SERVER_SELECTION_TIMEOUT);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">watcher</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">watch</span>();
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">watcher</span>.<span class="ident">observe_latest</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>watcher = <span class="self">self</span>.inner.topology.watch();
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>state = watcher.observe_latest();
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">server</span>) <span class="op">=</span> <span class="ident">server_selection::attempt_to_select_server</span>(
-                <span class="ident">criteria</span>,
-                <span class="kw-2">&amp;</span><span class="ident">state</span>.<span class="ident">description</span>,
-                <span class="kw-2">&amp;</span><span class="ident">state</span>.<span class="ident">servers</span>,
-            )<span class="question-mark">?</span> {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">server</span>);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(server) = server_selection::attempt_to_select_server(
+                criteria,
+                <span class="kw-2">&amp;</span>state.description,
+                <span class="kw-2">&amp;</span>state.servers,
+            )<span class="question-mark">? </span>{
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(server);
             }
 
-            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">request_update</span>();
+            <span class="self">self</span>.inner.topology.request_update();
 
-            <span class="kw">let</span> <span class="ident">change_occurred</span> <span class="op">=</span> <span class="ident">start_time</span>.<span class="ident">elapsed</span>() <span class="op">&lt;</span> <span class="ident">timeout</span>
-                <span class="op">&amp;&amp;</span> <span class="ident">watcher</span>
-                    .<span class="ident">wait_for_update</span>(<span class="ident">timeout</span> <span class="op">-</span> <span class="ident">start_time</span>.<span class="ident">elapsed</span>())
+            <span class="kw">let </span>change_occurred = start_time.elapsed() &lt; timeout
+                &amp;&amp; watcher
+                    .wait_for_update(timeout - start_time.elapsed())
                     .<span class="kw">await</span>;
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">change_occurred</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::ServerSelection</span> {
-                    <span class="ident">message</span>: <span class="self">self</span>
-                        .<span class="ident">inner</span>
-                        .<span class="ident">topology</span>
-                        .<span class="ident">server_selection_timeout_error_message</span>(<span class="ident">criteria</span>),
+            <span class="kw">if </span>!change_occurred {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(ErrorKind::ServerSelection {
+                    message: <span class="self">self
+                        </span>.inner
+                        .topology
+                        .server_selection_timeout_error_message(criteria),
                 }
-                .<span class="ident">into</span>());
+                .into());
             }
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>), <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-sync&quot;</span>)))]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_hosts</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">watcher</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">watch</span>();
-        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">watcher</span>.<span class="ident">peek_latest</span>();
+    <span class="attribute">#[cfg(all(test, not(feature = <span class="string">&quot;sync&quot;</span>), not(feature = <span class="string">&quot;tokio-sync&quot;</span>)))]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>get_hosts(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;String&gt; {
+        <span class="kw">let </span>watcher = <span class="self">self</span>.inner.topology.watch();
+        <span class="kw">let </span>state = watcher.peek_latest();
 
-        <span class="kw">let</span> <span class="ident">servers</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">servers</span>.<span class="ident">keys</span>();
-        <span class="ident">servers</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">stream_address</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">stream_address</span>))
-            .<span class="ident">collect</span>()
+        <span class="kw">let </span>servers = state.servers.keys();
+        servers
+            .map(|stream_address| <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, stream_address))
+            .collect()
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">sync_workers</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">sync_workers</span>().<span class="kw">await</span>;
+    <span class="attribute">#[cfg(test)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>sync_workers(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="self">self</span>.inner.topology.sync_workers().<span class="kw">await</span>;
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">topology_description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::sdam::TopologyDescription</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>
-            .<span class="ident">topology</span>
-            .<span class="ident">watch</span>()
-            .<span class="ident">peek_latest</span>()
-            .<span class="ident">description</span>
-            .<span class="ident">clone</span>()
+    <span class="attribute">#[cfg(test)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>topology_description(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::sdam::TopologyDescription {
+        <span class="self">self</span>.inner
+            .topology
+            .watch()
+            .peek_latest()
+            .description
+            .clone()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

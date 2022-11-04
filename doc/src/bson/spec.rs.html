@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.4.0/src/spec.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>spec.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../bson/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.4.0/src/spec.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>spec.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../bson/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -192,199 +192,199 @@
 <span id="192">192</span>
 <span id="193">193</span>
 <span id="194">194</span>
-</pre><pre class="rust"><code><span class="comment">// The MIT License (MIT)</span>
+</pre><pre class="rust"><code><span class="comment">// The MIT License (MIT)
 
-<span class="comment">// Copyright (c) 2015 Y. T. Chung &lt;zonyitoo@gmail.com&gt;</span>
+// Copyright (c) 2015 Y. T. Chung &lt;zonyitoo@gmail.com&gt;
 
-<span class="comment">// Permission is hereby granted, free of charge, to any person obtaining a copy of</span>
-<span class="comment">// this software and associated documentation files (the &quot;Software&quot;), to deal in</span>
-<span class="comment">// the Software without restriction, including without limitation the rights to</span>
-<span class="comment">// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of</span>
-<span class="comment">// the Software, and to permit persons to whom the Software is furnished to do so,</span>
-<span class="comment">// subject to the following conditions:</span>
+// Permission is hereby granted, free of charge, to any person obtaining a copy of
+// this software and associated documentation files (the &quot;Software&quot;), to deal in
+// the Software without restriction, including without limitation the rights to
+// use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+// the Software, and to permit persons to whom the Software is furnished to do so,
+// subject to the following conditions:
 
-<span class="comment">// The above copyright notice and this permission notice shall be included in all</span>
-<span class="comment">// copies or substantial portions of the Software.</span>
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
 
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
-<span class="comment">// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS</span>
-<span class="comment">// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR</span>
-<span class="comment">// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER</span>
-<span class="comment">// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN</span>
-<span class="comment">// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</span>
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+// CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-<span class="doccomment">//! Constants derived from the [BSON Specification Version 1.1](http://bsonspec.org/spec.html).</span>
+</span><span class="doccomment">//! Constants derived from the [BSON Specification Version 1.1](http://bsonspec.org/spec.html).
 
-<span class="kw">use</span> <span class="ident">std::convert::From</span>;
+</span><span class="kw">use </span>std::convert::From;
 
-<span class="kw">const</span> <span class="ident">ELEMENT_TYPE_FLOATING_POINT</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0x01</span>;
-<span class="kw">const</span> <span class="ident">ELEMENT_TYPE_UTF8_STRING</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0x02</span>;
-<span class="kw">const</span> <span class="ident">ELEMENT_TYPE_EMBEDDED_DOCUMENT</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0x03</span>;
-<span class="kw">const</span> <span class="ident">ELEMENT_TYPE_ARRAY</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0x04</span>;
-<span class="kw">const</span> <span class="ident">ELEMENT_TYPE_BINARY</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0x05</span>;
-<span class="kw">const</span> <span class="ident">ELEMENT_TYPE_UNDEFINED</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0x06</span>; <span class="comment">// Deprecated</span>
-<span class="kw">const</span> <span class="ident">ELEMENT_TYPE_OBJECT_ID</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0x07</span>;
-<span class="kw">const</span> <span class="ident">ELEMENT_TYPE_BOOLEAN</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0x08</span>;
-<span class="kw">const</span> <span class="ident">ELEMENT_TYPE_UTC_DATETIME</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0x09</span>;
-<span class="kw">const</span> <span class="ident">ELEMENT_TYPE_NULL_VALUE</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0x0A</span>;
-<span class="kw">const</span> <span class="ident">ELEMENT_TYPE_REGULAR_EXPRESSION</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0x0B</span>;
-<span class="kw">const</span> <span class="ident">ELEMENT_TYPE_DBPOINTER</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0x0C</span>; <span class="comment">// Deprecated</span>
-<span class="kw">const</span> <span class="ident">ELEMENT_TYPE_JAVASCRIPT_CODE</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0x0D</span>;
-<span class="kw">const</span> <span class="ident">ELEMENT_TYPE_SYMBOL</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0x0E</span>; <span class="comment">// Deprecated</span>
-<span class="kw">const</span> <span class="ident">ELEMENT_TYPE_JAVASCRIPT_CODE_WITH_SCOPE</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0x0F</span>;
-<span class="kw">const</span> <span class="ident">ELEMENT_TYPE_32BIT_INTEGER</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0x10</span>;
-<span class="kw">const</span> <span class="ident">ELEMENT_TYPE_TIMESTAMP</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0x11</span>;
-<span class="kw">const</span> <span class="ident">ELEMENT_TYPE_64BIT_INTEGER</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0x12</span>;
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
-<span class="kw">const</span> <span class="ident">ELEMENT_TYPE_128BIT_DECIMAL</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0x13</span>;
-<span class="kw">const</span> <span class="ident">ELEMENT_TYPE_MINKEY</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0xFF</span>;
-<span class="kw">const</span> <span class="ident">ELEMENT_TYPE_MAXKEY</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0x7F</span>;
+<span class="kw">const </span>ELEMENT_TYPE_FLOATING_POINT: u8 = <span class="number">0x01</span>;
+<span class="kw">const </span>ELEMENT_TYPE_UTF8_STRING: u8 = <span class="number">0x02</span>;
+<span class="kw">const </span>ELEMENT_TYPE_EMBEDDED_DOCUMENT: u8 = <span class="number">0x03</span>;
+<span class="kw">const </span>ELEMENT_TYPE_ARRAY: u8 = <span class="number">0x04</span>;
+<span class="kw">const </span>ELEMENT_TYPE_BINARY: u8 = <span class="number">0x05</span>;
+<span class="kw">const </span>ELEMENT_TYPE_UNDEFINED: u8 = <span class="number">0x06</span>; <span class="comment">// Deprecated
+</span><span class="kw">const </span>ELEMENT_TYPE_OBJECT_ID: u8 = <span class="number">0x07</span>;
+<span class="kw">const </span>ELEMENT_TYPE_BOOLEAN: u8 = <span class="number">0x08</span>;
+<span class="kw">const </span>ELEMENT_TYPE_UTC_DATETIME: u8 = <span class="number">0x09</span>;
+<span class="kw">const </span>ELEMENT_TYPE_NULL_VALUE: u8 = <span class="number">0x0A</span>;
+<span class="kw">const </span>ELEMENT_TYPE_REGULAR_EXPRESSION: u8 = <span class="number">0x0B</span>;
+<span class="kw">const </span>ELEMENT_TYPE_DBPOINTER: u8 = <span class="number">0x0C</span>; <span class="comment">// Deprecated
+</span><span class="kw">const </span>ELEMENT_TYPE_JAVASCRIPT_CODE: u8 = <span class="number">0x0D</span>;
+<span class="kw">const </span>ELEMENT_TYPE_SYMBOL: u8 = <span class="number">0x0E</span>; <span class="comment">// Deprecated
+</span><span class="kw">const </span>ELEMENT_TYPE_JAVASCRIPT_CODE_WITH_SCOPE: u8 = <span class="number">0x0F</span>;
+<span class="kw">const </span>ELEMENT_TYPE_32BIT_INTEGER: u8 = <span class="number">0x10</span>;
+<span class="kw">const </span>ELEMENT_TYPE_TIMESTAMP: u8 = <span class="number">0x11</span>;
+<span class="kw">const </span>ELEMENT_TYPE_64BIT_INTEGER: u8 = <span class="number">0x12</span>;
+<span class="attribute">#[allow(unused)]
+</span><span class="kw">const </span>ELEMENT_TYPE_128BIT_DECIMAL: u8 = <span class="number">0x13</span>;
+<span class="kw">const </span>ELEMENT_TYPE_MINKEY: u8 = <span class="number">0xFF</span>;
+<span class="kw">const </span>ELEMENT_TYPE_MAXKEY: u8 = <span class="number">0x7F</span>;
 
-<span class="kw">const</span> <span class="ident">BINARY_SUBTYPE_GENERIC</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0x00</span>;
-<span class="kw">const</span> <span class="ident">BINARY_SUBTYPE_FUNCTION</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0x01</span>;
-<span class="kw">const</span> <span class="ident">BINARY_SUBTYPE_BINARY_OLD</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0x02</span>;
-<span class="kw">const</span> <span class="ident">BINARY_SUBTYPE_UUID_OLD</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0x03</span>;
-<span class="kw">const</span> <span class="ident">BINARY_SUBTYPE_UUID</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0x04</span>;
-<span class="kw">const</span> <span class="ident">BINARY_SUBTYPE_MD5</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0x05</span>;
-<span class="kw">const</span> <span class="ident">BINARY_SUBTYPE_ENCRYPTED</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0x06</span>;
-<span class="kw">const</span> <span class="ident">BINARY_SUBTYPE_COLUMN</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0x07</span>;
-<span class="kw">const</span> <span class="ident">BINARY_SUBTYPE_USER_DEFINED</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0x80</span>;
+<span class="kw">const </span>BINARY_SUBTYPE_GENERIC: u8 = <span class="number">0x00</span>;
+<span class="kw">const </span>BINARY_SUBTYPE_FUNCTION: u8 = <span class="number">0x01</span>;
+<span class="kw">const </span>BINARY_SUBTYPE_BINARY_OLD: u8 = <span class="number">0x02</span>;
+<span class="kw">const </span>BINARY_SUBTYPE_UUID_OLD: u8 = <span class="number">0x03</span>;
+<span class="kw">const </span>BINARY_SUBTYPE_UUID: u8 = <span class="number">0x04</span>;
+<span class="kw">const </span>BINARY_SUBTYPE_MD5: u8 = <span class="number">0x05</span>;
+<span class="kw">const </span>BINARY_SUBTYPE_ENCRYPTED: u8 = <span class="number">0x06</span>;
+<span class="kw">const </span>BINARY_SUBTYPE_COLUMN: u8 = <span class="number">0x07</span>;
+<span class="kw">const </span>BINARY_SUBTYPE_USER_DEFINED: u8 = <span class="number">0x80</span>;
 
-<span class="doccomment">/// All available BSON element types.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Not all element types are representable by the `Bson` type.</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ElementType</span> {
-    <span class="doccomment">/// 64-bit binary floating point</span>
-    <span class="ident">Double</span> <span class="op">=</span> <span class="ident">ELEMENT_TYPE_FLOATING_POINT</span>,
-    <span class="doccomment">/// UTF-8 string</span>
-    <span class="ident">String</span> <span class="op">=</span> <span class="ident">ELEMENT_TYPE_UTF8_STRING</span>,
-    <span class="doccomment">/// Embedded document</span>
-    <span class="ident">EmbeddedDocument</span> <span class="op">=</span> <span class="ident">ELEMENT_TYPE_EMBEDDED_DOCUMENT</span>,
-    <span class="doccomment">/// Array</span>
-    <span class="ident">Array</span> <span class="op">=</span> <span class="ident">ELEMENT_TYPE_ARRAY</span>,
-    <span class="doccomment">/// Binary data</span>
-    <span class="ident">Binary</span> <span class="op">=</span> <span class="ident">ELEMENT_TYPE_BINARY</span>,
-    <span class="doccomment">/// Deprecated. Undefined (value)</span>
-    <span class="ident">Undefined</span> <span class="op">=</span> <span class="ident">ELEMENT_TYPE_UNDEFINED</span>,
-    <span class="doccomment">/// [ObjectId](http://dochub.mongodb.org/core/objectids)</span>
-    <span class="ident">ObjectId</span> <span class="op">=</span> <span class="ident">ELEMENT_TYPE_OBJECT_ID</span>,
-    <span class="doccomment">/// Bool value</span>
-    <span class="ident">Boolean</span> <span class="op">=</span> <span class="ident">ELEMENT_TYPE_BOOLEAN</span>,
-    <span class="doccomment">/// UTC datetime</span>
-    <span class="ident">DateTime</span> <span class="op">=</span> <span class="ident">ELEMENT_TYPE_UTC_DATETIME</span>,
-    <span class="doccomment">/// Null value</span>
-    <span class="ident">Null</span> <span class="op">=</span> <span class="ident">ELEMENT_TYPE_NULL_VALUE</span>,
-    <span class="doccomment">/// Regular expression - The first cstring is the regex pattern, the second is the regex</span>
-    <span class="doccomment">/// options string. Options are identified by characters, which must be stored in</span>
-    <span class="doccomment">/// alphabetical order. Valid options are &#39;i&#39; for case insensitive matching, &#39;m&#39; for</span>
-    <span class="doccomment">/// multiline matching, &#39;x&#39; for verbose mode, &#39;l&#39; to make \w, \W, etc. locale dependent,</span>
-    <span class="doccomment">/// &#39;s&#39; for dotall mode (&#39;.&#39; matches everything), and &#39;u&#39; to make \w, \W, etc. match</span>
-    <span class="doccomment">/// unicode.</span>
-    <span class="ident">RegularExpression</span> <span class="op">=</span> <span class="ident">ELEMENT_TYPE_REGULAR_EXPRESSION</span>,
-    <span class="doccomment">/// Deprecated.</span>
-    <span class="ident">DbPointer</span> <span class="op">=</span> <span class="ident">ELEMENT_TYPE_DBPOINTER</span>,
-    <span class="doccomment">/// JavaScript code</span>
-    <span class="ident">JavaScriptCode</span> <span class="op">=</span> <span class="ident">ELEMENT_TYPE_JAVASCRIPT_CODE</span>,
-    <span class="doccomment">/// Deprecated.</span>
-    <span class="ident">Symbol</span> <span class="op">=</span> <span class="ident">ELEMENT_TYPE_SYMBOL</span>,
-    <span class="doccomment">/// JavaScript code w/ scope</span>
-    <span class="ident">JavaScriptCodeWithScope</span> <span class="op">=</span> <span class="ident">ELEMENT_TYPE_JAVASCRIPT_CODE_WITH_SCOPE</span>,
-    <span class="doccomment">/// 32-bit integer</span>
-    <span class="ident">Int32</span> <span class="op">=</span> <span class="ident">ELEMENT_TYPE_32BIT_INTEGER</span>,
-    <span class="doccomment">/// Timestamp</span>
-    <span class="ident">Timestamp</span> <span class="op">=</span> <span class="ident">ELEMENT_TYPE_TIMESTAMP</span>,
-    <span class="doccomment">/// 64-bit integer</span>
-    <span class="ident">Int64</span> <span class="op">=</span> <span class="ident">ELEMENT_TYPE_64BIT_INTEGER</span>,
-    <span class="doccomment">/// [128-bit decimal floating point](https://github.com/mongodb/specifications/blob/master/source/bson-decimal128/decimal128.rst)</span>
-    <span class="ident">Decimal128</span> <span class="op">=</span> <span class="ident">ELEMENT_TYPE_128BIT_DECIMAL</span>,
-    <span class="ident">MaxKey</span> <span class="op">=</span> <span class="ident">ELEMENT_TYPE_MAXKEY</span>,
-    <span class="ident">MinKey</span> <span class="op">=</span> <span class="ident">ELEMENT_TYPE_MINKEY</span>,
+<span class="doccomment">/// All available BSON element types.
+///
+/// Not all element types are representable by the `Bson` type.
+</span><span class="attribute">#[repr(u8)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+</span><span class="kw">pub enum </span>ElementType {
+    <span class="doccomment">/// 64-bit binary floating point
+    </span>Double = ELEMENT_TYPE_FLOATING_POINT,
+    <span class="doccomment">/// UTF-8 string
+    </span>String = ELEMENT_TYPE_UTF8_STRING,
+    <span class="doccomment">/// Embedded document
+    </span>EmbeddedDocument = ELEMENT_TYPE_EMBEDDED_DOCUMENT,
+    <span class="doccomment">/// Array
+    </span>Array = ELEMENT_TYPE_ARRAY,
+    <span class="doccomment">/// Binary data
+    </span>Binary = ELEMENT_TYPE_BINARY,
+    <span class="doccomment">/// Deprecated. Undefined (value)
+    </span>Undefined = ELEMENT_TYPE_UNDEFINED,
+    <span class="doccomment">/// [ObjectId](http://dochub.mongodb.org/core/objectids)
+    </span>ObjectId = ELEMENT_TYPE_OBJECT_ID,
+    <span class="doccomment">/// Bool value
+    </span>Boolean = ELEMENT_TYPE_BOOLEAN,
+    <span class="doccomment">/// UTC datetime
+    </span>DateTime = ELEMENT_TYPE_UTC_DATETIME,
+    <span class="doccomment">/// Null value
+    </span>Null = ELEMENT_TYPE_NULL_VALUE,
+    <span class="doccomment">/// Regular expression - The first cstring is the regex pattern, the second is the regex
+    /// options string. Options are identified by characters, which must be stored in
+    /// alphabetical order. Valid options are &#39;i&#39; for case insensitive matching, &#39;m&#39; for
+    /// multiline matching, &#39;x&#39; for verbose mode, &#39;l&#39; to make \w, \W, etc. locale dependent,
+    /// &#39;s&#39; for dotall mode (&#39;.&#39; matches everything), and &#39;u&#39; to make \w, \W, etc. match
+    /// unicode.
+    </span>RegularExpression = ELEMENT_TYPE_REGULAR_EXPRESSION,
+    <span class="doccomment">/// Deprecated.
+    </span>DbPointer = ELEMENT_TYPE_DBPOINTER,
+    <span class="doccomment">/// JavaScript code
+    </span>JavaScriptCode = ELEMENT_TYPE_JAVASCRIPT_CODE,
+    <span class="doccomment">/// Deprecated.
+    </span>Symbol = ELEMENT_TYPE_SYMBOL,
+    <span class="doccomment">/// JavaScript code w/ scope
+    </span>JavaScriptCodeWithScope = ELEMENT_TYPE_JAVASCRIPT_CODE_WITH_SCOPE,
+    <span class="doccomment">/// 32-bit integer
+    </span>Int32 = ELEMENT_TYPE_32BIT_INTEGER,
+    <span class="doccomment">/// Timestamp
+    </span>Timestamp = ELEMENT_TYPE_TIMESTAMP,
+    <span class="doccomment">/// 64-bit integer
+    </span>Int64 = ELEMENT_TYPE_64BIT_INTEGER,
+    <span class="doccomment">/// [128-bit decimal floating point](https://github.com/mongodb/specifications/blob/master/source/bson-decimal128/decimal128.rst)
+    </span>Decimal128 = ELEMENT_TYPE_128BIT_DECIMAL,
+    MaxKey = ELEMENT_TYPE_MAXKEY,
+    MinKey = ELEMENT_TYPE_MINKEY,
 }
 
-<span class="kw">impl</span> <span class="ident">ElementType</span> {
-    <span class="doccomment">/// Attempt to convert from a `u8`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">tag</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ElementType</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::ElementType</span>::<span class="kw-2">*</span>;
-        <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="ident">tag</span> {
-            <span class="ident">ELEMENT_TYPE_FLOATING_POINT</span> =&gt; <span class="ident"><span class="self">Self</span>::Double</span>,
-            <span class="ident">ELEMENT_TYPE_UTF8_STRING</span> =&gt; <span class="ident"><span class="self">Self</span>::String</span>,
-            <span class="ident">ELEMENT_TYPE_EMBEDDED_DOCUMENT</span> =&gt; <span class="ident">EmbeddedDocument</span>,
-            <span class="ident">ELEMENT_TYPE_ARRAY</span> =&gt; <span class="ident">Array</span>,
-            <span class="ident">ELEMENT_TYPE_BINARY</span> =&gt; <span class="ident">Binary</span>,
-            <span class="ident">ELEMENT_TYPE_UNDEFINED</span> =&gt; <span class="ident">Undefined</span>,
-            <span class="ident">ELEMENT_TYPE_OBJECT_ID</span> =&gt; <span class="ident">ObjectId</span>,
-            <span class="ident">ELEMENT_TYPE_BOOLEAN</span> =&gt; <span class="ident">Boolean</span>,
-            <span class="ident">ELEMENT_TYPE_UTC_DATETIME</span> =&gt; <span class="ident"><span class="self">Self</span>::DateTime</span>,
-            <span class="ident">ELEMENT_TYPE_NULL_VALUE</span> =&gt; <span class="ident"><span class="self">Self</span>::Null</span>,
-            <span class="ident">ELEMENT_TYPE_REGULAR_EXPRESSION</span> =&gt; <span class="ident">RegularExpression</span>,
-            <span class="ident">ELEMENT_TYPE_DBPOINTER</span> =&gt; <span class="ident">DbPointer</span>,
-            <span class="ident">ELEMENT_TYPE_JAVASCRIPT_CODE</span> =&gt; <span class="ident">JavaScriptCode</span>,
-            <span class="ident">ELEMENT_TYPE_SYMBOL</span> =&gt; <span class="ident">Symbol</span>,
-            <span class="ident">ELEMENT_TYPE_JAVASCRIPT_CODE_WITH_SCOPE</span> =&gt; <span class="ident">JavaScriptCodeWithScope</span>,
-            <span class="ident">ELEMENT_TYPE_32BIT_INTEGER</span> =&gt; <span class="ident">Int32</span>,
-            <span class="ident">ELEMENT_TYPE_TIMESTAMP</span> =&gt; <span class="ident">Timestamp</span>,
-            <span class="ident">ELEMENT_TYPE_64BIT_INTEGER</span> =&gt; <span class="ident">Int64</span>,
-            <span class="ident">ELEMENT_TYPE_128BIT_DECIMAL</span> =&gt; <span class="ident">Decimal128</span>,
-            <span class="ident">ELEMENT_TYPE_MAXKEY</span> =&gt; <span class="ident">MaxKey</span>,
-            <span class="ident">ELEMENT_TYPE_MINKEY</span> =&gt; <span class="ident">MinKey</span>,
-            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+<span class="kw">impl </span>ElementType {
+    <span class="doccomment">/// Attempt to convert from a `u8`.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>from(tag: u8) -&gt; <span class="prelude-ty">Option</span>&lt;ElementType&gt; {
+        <span class="kw">use </span><span class="self">self</span>::ElementType::<span class="kw-2">*</span>;
+        <span class="prelude-val">Some</span>(<span class="kw">match </span>tag {
+            ELEMENT_TYPE_FLOATING_POINT =&gt; <span class="self">Self</span>::Double,
+            ELEMENT_TYPE_UTF8_STRING =&gt; <span class="self">Self</span>::String,
+            ELEMENT_TYPE_EMBEDDED_DOCUMENT =&gt; EmbeddedDocument,
+            ELEMENT_TYPE_ARRAY =&gt; Array,
+            ELEMENT_TYPE_BINARY =&gt; Binary,
+            ELEMENT_TYPE_UNDEFINED =&gt; Undefined,
+            ELEMENT_TYPE_OBJECT_ID =&gt; ObjectId,
+            ELEMENT_TYPE_BOOLEAN =&gt; Boolean,
+            ELEMENT_TYPE_UTC_DATETIME =&gt; <span class="self">Self</span>::DateTime,
+            ELEMENT_TYPE_NULL_VALUE =&gt; <span class="self">Self</span>::Null,
+            ELEMENT_TYPE_REGULAR_EXPRESSION =&gt; RegularExpression,
+            ELEMENT_TYPE_DBPOINTER =&gt; DbPointer,
+            ELEMENT_TYPE_JAVASCRIPT_CODE =&gt; JavaScriptCode,
+            ELEMENT_TYPE_SYMBOL =&gt; Symbol,
+            ELEMENT_TYPE_JAVASCRIPT_CODE_WITH_SCOPE =&gt; JavaScriptCodeWithScope,
+            ELEMENT_TYPE_32BIT_INTEGER =&gt; Int32,
+            ELEMENT_TYPE_TIMESTAMP =&gt; Timestamp,
+            ELEMENT_TYPE_64BIT_INTEGER =&gt; Int64,
+            ELEMENT_TYPE_128BIT_DECIMAL =&gt; Decimal128,
+            ELEMENT_TYPE_MAXKEY =&gt; MaxKey,
+            ELEMENT_TYPE_MINKEY =&gt; MinKey,
+            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
         })
     }
 }
 
-<span class="doccomment">/// The available binary subtypes, plus a user-defined slot.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">BinarySubtype</span> {
-    <span class="ident">Generic</span>,
-    <span class="ident">Function</span>,
-    <span class="ident">BinaryOld</span>,
-    <span class="ident">UuidOld</span>,
-    <span class="ident">Uuid</span>,
-    <span class="ident">Md5</span>,
-    <span class="ident">Encrypted</span>,
-    <span class="ident">Column</span>,
-    <span class="ident">UserDefined</span>(<span class="ident">u8</span>),
-    <span class="ident">Reserved</span>(<span class="ident">u8</span>),
+<span class="doccomment">/// The available binary subtypes, plus a user-defined slot.
+</span><span class="attribute">#[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>BinarySubtype {
+    Generic,
+    Function,
+    BinaryOld,
+    UuidOld,
+    Uuid,
+    Md5,
+    Encrypted,
+    Column,
+    UserDefined(u8),
+    Reserved(u8),
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">BinarySubtype</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u8</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">t</span>: <span class="ident">BinarySubtype</span>) -&gt; <span class="ident">u8</span> {
-        <span class="kw">match</span> <span class="ident">t</span> {
-            <span class="ident">BinarySubtype::Generic</span> =&gt; <span class="ident">BINARY_SUBTYPE_GENERIC</span>,
-            <span class="ident">BinarySubtype::Function</span> =&gt; <span class="ident">BINARY_SUBTYPE_FUNCTION</span>,
-            <span class="ident">BinarySubtype::BinaryOld</span> =&gt; <span class="ident">BINARY_SUBTYPE_BINARY_OLD</span>,
-            <span class="ident">BinarySubtype::UuidOld</span> =&gt; <span class="ident">BINARY_SUBTYPE_UUID_OLD</span>,
-            <span class="ident">BinarySubtype::Uuid</span> =&gt; <span class="ident">BINARY_SUBTYPE_UUID</span>,
-            <span class="ident">BinarySubtype::Md5</span> =&gt; <span class="ident">BINARY_SUBTYPE_MD5</span>,
-            <span class="ident">BinarySubtype::Encrypted</span> =&gt; <span class="ident">BINARY_SUBTYPE_ENCRYPTED</span>,
-            <span class="ident">BinarySubtype::Column</span> =&gt; <span class="ident">BINARY_SUBTYPE_COLUMN</span>,
-            <span class="ident">BinarySubtype::UserDefined</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>,
-            <span class="ident">BinarySubtype::Reserved</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>,
+<span class="kw">impl </span>From&lt;BinarySubtype&gt; <span class="kw">for </span>u8 {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from(t: BinarySubtype) -&gt; u8 {
+        <span class="kw">match </span>t {
+            BinarySubtype::Generic =&gt; BINARY_SUBTYPE_GENERIC,
+            BinarySubtype::Function =&gt; BINARY_SUBTYPE_FUNCTION,
+            BinarySubtype::BinaryOld =&gt; BINARY_SUBTYPE_BINARY_OLD,
+            BinarySubtype::UuidOld =&gt; BINARY_SUBTYPE_UUID_OLD,
+            BinarySubtype::Uuid =&gt; BINARY_SUBTYPE_UUID,
+            BinarySubtype::Md5 =&gt; BINARY_SUBTYPE_MD5,
+            BinarySubtype::Encrypted =&gt; BINARY_SUBTYPE_ENCRYPTED,
+            BinarySubtype::Column =&gt; BINARY_SUBTYPE_COLUMN,
+            BinarySubtype::UserDefined(x) =&gt; x,
+            BinarySubtype::Reserved(x) =&gt; x,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BinarySubtype</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">t</span>: <span class="ident">u8</span>) -&gt; <span class="ident">BinarySubtype</span> {
-        <span class="kw">match</span> <span class="ident">t</span> {
-            <span class="ident">BINARY_SUBTYPE_GENERIC</span> =&gt; <span class="ident">BinarySubtype::Generic</span>,
-            <span class="ident">BINARY_SUBTYPE_FUNCTION</span> =&gt; <span class="ident">BinarySubtype::Function</span>,
-            <span class="ident">BINARY_SUBTYPE_BINARY_OLD</span> =&gt; <span class="ident">BinarySubtype::BinaryOld</span>,
-            <span class="ident">BINARY_SUBTYPE_UUID_OLD</span> =&gt; <span class="ident">BinarySubtype::UuidOld</span>,
-            <span class="ident">BINARY_SUBTYPE_UUID</span> =&gt; <span class="ident">BinarySubtype::Uuid</span>,
-            <span class="ident">BINARY_SUBTYPE_MD5</span> =&gt; <span class="ident">BinarySubtype::Md5</span>,
-            <span class="ident">BINARY_SUBTYPE_ENCRYPTED</span> =&gt; <span class="ident">BinarySubtype::Encrypted</span>,
-            <span class="ident">BINARY_SUBTYPE_COLUMN</span> =&gt; <span class="ident">BinarySubtype::Column</span>,
-            <span class="kw">_</span> <span class="kw">if</span> <span class="ident">t</span> <span class="op">&lt;</span> <span class="ident">BINARY_SUBTYPE_USER_DEFINED</span> =&gt; <span class="ident">BinarySubtype::Reserved</span>(<span class="ident">t</span>),
-            <span class="kw">_</span> =&gt; <span class="ident">BinarySubtype::UserDefined</span>(<span class="ident">t</span>),
+<span class="kw">impl </span>From&lt;u8&gt; <span class="kw">for </span>BinarySubtype {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from(t: u8) -&gt; BinarySubtype {
+        <span class="kw">match </span>t {
+            BINARY_SUBTYPE_GENERIC =&gt; BinarySubtype::Generic,
+            BINARY_SUBTYPE_FUNCTION =&gt; BinarySubtype::Function,
+            BINARY_SUBTYPE_BINARY_OLD =&gt; BinarySubtype::BinaryOld,
+            BINARY_SUBTYPE_UUID_OLD =&gt; BinarySubtype::UuidOld,
+            BINARY_SUBTYPE_UUID =&gt; BinarySubtype::Uuid,
+            BINARY_SUBTYPE_MD5 =&gt; BinarySubtype::Md5,
+            BINARY_SUBTYPE_ENCRYPTED =&gt; BinarySubtype::Encrypted,
+            BINARY_SUBTYPE_COLUMN =&gt; BinarySubtype::Column,
+            <span class="kw">_ if </span>t &lt; BINARY_SUBTYPE_USER_DEFINED =&gt; BinarySubtype::Reserved(t),
+            <span class="kw">_ </span>=&gt; BinarySubtype::UserDefined(t),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="bson" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="bson" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

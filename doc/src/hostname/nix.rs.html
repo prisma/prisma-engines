@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hostname-0.3.1/src/nix.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>nix.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../hostname/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../hostname/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../hostname/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hostname-0.3.1/src/nix.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>nix.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../hostname/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../hostname/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../hostname/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -114,121 +114,121 @@
 <span id="114">114</span>
 <span id="115">115</span>
 <span id="116">116</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::io</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;set&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::ffi::OsStr</span>;
-<span class="kw">use</span> <span class="ident">std::ffi::OsString</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;set&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::os::unix::ffi::OsStrExt</span>;
-<span class="kw">use</span> <span class="ident">std::os::unix::ffi::OsStringExt</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::io;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;set&quot;</span>)]
+</span><span class="kw">use </span>std::ffi::OsStr;
+<span class="kw">use </span>std::ffi::OsString;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;set&quot;</span>)]
+</span><span class="kw">use </span>std::os::unix::ffi::OsStrExt;
+<span class="kw">use </span>std::os::unix::ffi::OsStringExt;
 
-<span class="kw">use</span> <span class="ident">libc</span>;
+<span class="kw">use </span>libc;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>() -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">OsString</span><span class="op">&gt;</span> {
-    <span class="comment">// According to the POSIX specification,</span>
-    <span class="comment">// host names are limited to `HOST_NAME_MAX` bytes</span>
-    <span class="comment">//</span>
-    <span class="comment">// https://pubs.opengroup.org/onlinepubs/9699919799/functions/gethostname.html</span>
-    <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span>
-        <span class="kw">unsafe</span> { <span class="ident">libc::sysconf</span>(<span class="ident">libc::_SC_HOST_NAME_MAX</span>) <span class="kw">as</span> <span class="ident">libc::size_t</span> };
+<span class="kw">pub fn </span>get() -&gt; io::Result&lt;OsString&gt; {
+    <span class="comment">// According to the POSIX specification,
+    // host names are limited to `HOST_NAME_MAX` bytes
+    //
+    // https://pubs.opengroup.org/onlinepubs/9699919799/functions/gethostname.html
+    </span><span class="kw">let </span>size =
+        <span class="kw">unsafe </span>{ libc::sysconf(libc::_SC_HOST_NAME_MAX) <span class="kw">as </span>libc::size_t };
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="ident">size</span>];
+    <span class="kw">let </span><span class="kw-2">mut </span>buffer = <span class="macro">vec!</span>[<span class="number">0u8</span>; size];
 
-    <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-        <span class="ident">libc::gethostname</span>(<span class="ident">buffer</span>.<span class="ident">as_mut_ptr</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">libc::c_char</span>, <span class="ident">size</span>)
+    <span class="kw">let </span>result = <span class="kw">unsafe </span>{
+        libc::gethostname(buffer.as_mut_ptr() <span class="kw">as </span><span class="kw-2">*mut </span>libc::c_char, size)
     };
 
-    <span class="kw">if</span> <span class="ident">result</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::last_os_error</span>());
+    <span class="kw">if </span>result != <span class="number">0 </span>{
+        <span class="kw">return </span><span class="prelude-val">Err</span>(io::Error::last_os_error());
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">wrap_buffer</span>(<span class="ident">buffer</span>))
+    <span class="prelude-val">Ok</span>(wrap_buffer(buffer))
 }
 
-<span class="kw">fn</span> <span class="ident">wrap_buffer</span>(<span class="kw-2">mut</span> <span class="ident">bytes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) -&gt; <span class="ident">OsString</span> {
-    <span class="comment">// Returned name might be truncated if it does not fit</span>
-    <span class="comment">// and `buffer` will not contain the trailing \0 in that case.</span>
-    <span class="comment">// Manually capping the buffer length here.</span>
-    <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">bytes</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">position</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">byte</span><span class="op">|</span> <span class="ident">byte</span> <span class="op">==</span> <span class="number">0x00</span>)
-        .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">bytes</span>.<span class="ident">len</span>());
-    <span class="ident">bytes</span>.<span class="ident">resize</span>(<span class="ident">end</span>, <span class="number">0x00</span>);
+<span class="kw">fn </span>wrap_buffer(<span class="kw-2">mut </span>bytes: Vec&lt;u8&gt;) -&gt; OsString {
+    <span class="comment">// Returned name might be truncated if it does not fit
+    // and `buffer` will not contain the trailing \0 in that case.
+    // Manually capping the buffer length here.
+    </span><span class="kw">let </span>end = bytes
+        .iter()
+        .position(|<span class="kw-2">&amp;</span>byte| byte == <span class="number">0x00</span>)
+        .unwrap_or_else(|| bytes.len());
+    bytes.resize(end, <span class="number">0x00</span>);
 
-    <span class="ident">OsString::from_vec</span>(<span class="ident">bytes</span>)
+    OsString::from_vec(bytes)
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;set&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set</span>(<span class="ident">hostname</span>: <span class="kw-2">&amp;</span><span class="ident">OsStr</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;dragonfly&quot;</span>,
-                     <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;freebsd&quot;</span>,
-                     <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;ios&quot;</span>,
-                     <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;macos&quot;</span>)))]</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>)]</span>
-    <span class="kw">type</span> <span class="ident">hostname_len_t</span> <span class="op">=</span> <span class="ident">libc::size_t</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;set&quot;</span>)]
+</span><span class="kw">pub fn </span>set(hostname: <span class="kw-2">&amp;</span>OsStr) -&gt; io::Result&lt;()&gt; {
+    <span class="attribute">#[cfg(not(any(target_os = <span class="string">&quot;dragonfly&quot;</span>,
+                     target_os = <span class="string">&quot;freebsd&quot;</span>,
+                     target_os = <span class="string">&quot;ios&quot;</span>,
+                     target_os = <span class="string">&quot;macos&quot;</span>)))]
+    #[allow(non_camel_case_types)]
+    </span><span class="kw">type </span>hostname_len_t = libc::size_t;
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;dragonfly&quot;</span>,
-                     <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;freebsd&quot;</span>,
-                     <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;ios&quot;</span>,
-                     <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;macos&quot;</span>))]</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>)]</span>
-    <span class="kw">type</span> <span class="ident">hostname_len_t</span> <span class="op">=</span> <span class="ident">libc::c_int</span>;
+    <span class="attribute">#[cfg(any(target_os = <span class="string">&quot;dragonfly&quot;</span>,
+                     target_os = <span class="string">&quot;freebsd&quot;</span>,
+                     target_os = <span class="string">&quot;ios&quot;</span>,
+                     target_os = <span class="string">&quot;macos&quot;</span>))]
+    #[allow(non_camel_case_types)]
+    </span><span class="kw">type </span>hostname_len_t = libc::c_int;
 
-    <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">hostname</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">hostname_len_t</span>;
+    <span class="kw">let </span>size = hostname.len() <span class="kw">as </span>hostname_len_t;
 
-    <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-        <span class="ident">libc::sethostname</span>(
-            <span class="ident">hostname</span>.<span class="ident">as_bytes</span>().<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">libc::c_char</span>,
-            <span class="ident">size</span>,
+    <span class="kw">let </span>result = <span class="kw">unsafe </span>{
+        libc::sethostname(
+            hostname.as_bytes().as_ptr() <span class="kw">as </span><span class="kw-2">*const </span>libc::c_char,
+            size,
         )
     };
 
-    <span class="kw">if</span> <span class="ident">result</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">io::Error::last_os_error</span>())
-    } <span class="kw">else</span> {
+    <span class="kw">if </span>result != <span class="number">0 </span>{
+        <span class="prelude-val">Err</span>(io::Error::last_os_error())
+    } <span class="kw">else </span>{
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident">std::ffi::OsStr</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span>std::ffi::OsStr;
 
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::wrap_buffer</span>;
+    <span class="kw">use </span><span class="kw">super</span>::wrap_buffer;
 
-    <span class="comment">// Happy path case: there is a correct null terminated C string in a buffer</span>
-    <span class="comment">// and a bunch of NULL characters from the pre-allocated buffer</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_non_overflowed_buffer</span>() {
-        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="string">b&quot;potato\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0&quot;</span>.<span class="ident">to_vec</span>();
+    <span class="comment">// Happy path case: there is a correct null terminated C string in a buffer
+    // and a bunch of NULL characters from the pre-allocated buffer
+    </span><span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_non_overflowed_buffer() {
+        <span class="kw">let </span>buf = <span class="string">b&quot;potato\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0&quot;</span>.to_vec();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">wrap_buffer</span>(<span class="ident">buf</span>), <span class="ident">OsStr::new</span>(<span class="string">&quot;potato&quot;</span>));
+        <span class="macro">assert_eq!</span>(wrap_buffer(buf), OsStr::new(<span class="string">&quot;potato&quot;</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_empty_buffer</span>() {
-        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="string">b&quot;&quot;</span>.<span class="ident">to_vec</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_empty_buffer() {
+        <span class="kw">let </span>buf = <span class="string">b&quot;&quot;</span>.to_vec();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">wrap_buffer</span>(<span class="ident">buf</span>), <span class="ident">OsStr::new</span>(<span class="string">&quot;&quot;</span>));
+        <span class="macro">assert_eq!</span>(wrap_buffer(buf), OsStr::new(<span class="string">&quot;&quot;</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_filled_with_null_buffer</span>() {
-        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="string">b&quot;\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0&quot;</span>.<span class="ident">to_vec</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_filled_with_null_buffer() {
+        <span class="kw">let </span>buf = <span class="string">b&quot;\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0&quot;</span>.to_vec();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">wrap_buffer</span>(<span class="ident">buf</span>), <span class="ident">OsStr::new</span>(<span class="string">&quot;&quot;</span>));
+        <span class="macro">assert_eq!</span>(wrap_buffer(buf), OsStr::new(<span class="string">&quot;&quot;</span>));
     }
 
-    <span class="comment">// Hostname value had overflowed the buffer, so it was truncated</span>
-    <span class="comment">// and according to the POSIX documentation of the `gethostname`:</span>
-    <span class="comment">//</span>
-    <span class="comment">// &gt; it is unspecified whether the returned name is null-terminated.</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_overflowed_buffer</span>() {
-        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="string">b&quot;potat&quot;</span>.<span class="ident">to_vec</span>();
+    <span class="comment">// Hostname value had overflowed the buffer, so it was truncated
+    // and according to the POSIX documentation of the `gethostname`:
+    //
+    // &gt; it is unspecified whether the returned name is null-terminated.
+    </span><span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_overflowed_buffer() {
+        <span class="kw">let </span>buf = <span class="string">b&quot;potat&quot;</span>.to_vec();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">wrap_buffer</span>(<span class="ident">buf</span>), <span class="ident">OsStr::new</span>(<span class="string">&quot;potat&quot;</span>));
+        <span class="macro">assert_eq!</span>(wrap_buffer(buf), OsStr::new(<span class="string">&quot;potat&quot;</span>));
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="hostname" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="hostname" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

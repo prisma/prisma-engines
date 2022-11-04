@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/graphql-parser-0ee44412461ea4ee/6a3f58b/src/schema/ast.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ast.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../graphql_parser/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../graphql_parser/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../graphql_parser/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/graphql-parser-0ee44412461ea4ee/6a3f58b/src/schema/ast.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ast.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../graphql_parser/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../graphql_parser/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../graphql_parser/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -517,524 +517,524 @@
 <span id="517">517</span>
 <span id="518">518</span>
 <span id="519">519</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::str::FromStr;
 
-<span class="kw">use</span> <span class="ident">thiserror::Error</span>;
+<span class="kw">use </span>thiserror::Error;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common</span>::{<span class="ident">Directive</span>, <span class="ident">Type</span>, <span class="ident">Value</span>, <span class="ident">Text</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::position::Pos</span>;
+<span class="kw">pub use </span><span class="kw">crate</span>::common::{Directive, Type, Value, Text};
+<span class="kw">use </span><span class="kw">crate</span>::position::Pos;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Document</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
+<span class="attribute">#[derive(Debug, Clone, Default, PartialEq)]
+</span><span class="kw">pub struct </span>Document&lt;<span class="lifetime">&#39;a</span>, T: Text&lt;<span class="lifetime">&#39;a</span>&gt;&gt;
+    <span class="kw">where </span>T: Text&lt;<span class="lifetime">&#39;a</span>&gt;
 {
-    <span class="kw">pub</span> <span class="ident">definitions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Definition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub </span>definitions: Vec&lt;Definition&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Document</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_static</span>(<span class="self">self</span>) -&gt; <span class="ident">Document</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="comment">// To support both reference and owned values in the AST,</span>
-        <span class="comment">// all string data is represented with the ::common::Str&lt;&#39;a, T: Text&lt;&#39;a&gt;&gt;</span>
-        <span class="comment">// wrapper type.</span>
-        <span class="comment">// This type must carry the liftetime of the schema string,</span>
-        <span class="comment">// and is stored in a PhantomData value on the Str type.</span>
-        <span class="comment">// When using owned String types, the actual lifetime of</span>
-        <span class="comment">// the Ast nodes is &#39;static, since no references are kept,</span>
-        <span class="comment">// but the nodes will still carry the input lifetime.</span>
-        <span class="comment">// To continue working with Document&lt;String&gt; in a owned fasion</span>
-        <span class="comment">// the lifetime needs to be transmuted to &#39;static.</span>
-        <span class="comment">//</span>
-        <span class="comment">// This is safe because no references are present.</span>
-        <span class="comment">// Just the PhantomData lifetime reference is transmuted away.</span>
-        <span class="kw">unsafe</span> { <span class="ident">std::mem::transmute</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">Document</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>) }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Document&lt;<span class="lifetime">&#39;a</span>, String&gt; {
+    <span class="kw">pub fn </span>into_static(<span class="self">self</span>) -&gt; Document&lt;<span class="lifetime">&#39;static</span>, String&gt; {
+        <span class="comment">// To support both reference and owned values in the AST,
+        // all string data is represented with the ::common::Str&lt;&#39;a, T: Text&lt;&#39;a&gt;&gt;
+        // wrapper type.
+        // This type must carry the liftetime of the schema string,
+        // and is stored in a PhantomData value on the Str type.
+        // When using owned String types, the actual lifetime of
+        // the Ast nodes is &#39;static, since no references are kept,
+        // but the nodes will still carry the input lifetime.
+        // To continue working with Document&lt;String&gt; in a owned fasion
+        // the lifetime needs to be transmuted to &#39;static.
+        //
+        // This is safe because no references are present.
+        // Just the PhantomData lifetime reference is transmuted away.
+        </span><span class="kw">unsafe </span>{ std::mem::transmute::&lt;<span class="kw">_</span>, Document&lt;<span class="lifetime">&#39;static</span>, String&gt;&gt;(<span class="self">self</span>) }
     }
 }
 
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Definition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">SchemaDefinition</span>(<span class="ident">SchemaDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>),
-    <span class="ident">TypeDefinition</span>(<span class="ident">TypeDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>),
-    <span class="ident">TypeExtension</span>(<span class="ident">TypeExtension</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>),
-    <span class="ident">DirectiveDefinition</span>(<span class="ident">DirectiveDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>),
+<span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub enum </span>Definition&lt;<span class="lifetime">&#39;a</span>, T: Text&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    SchemaDefinition(SchemaDefinition&lt;<span class="lifetime">&#39;a</span>, T&gt;),
+    TypeDefinition(TypeDefinition&lt;<span class="lifetime">&#39;a</span>, T&gt;),
+    TypeExtension(TypeExtension&lt;<span class="lifetime">&#39;a</span>, T&gt;),
+    DirectiveDefinition(DirectiveDefinition&lt;<span class="lifetime">&#39;a</span>, T&gt;),
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SchemaDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">position</span>: <span class="ident">Pos</span>,
-    <span class="kw">pub</span> <span class="ident">directives</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Directive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">query</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T::Value</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">mutation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T::Value</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">subscription</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T::Value</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Clone, Default, PartialEq)]
+</span><span class="kw">pub struct </span>SchemaDefinition&lt;<span class="lifetime">&#39;a</span>, T: Text&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    <span class="kw">pub </span>position: Pos,
+    <span class="kw">pub </span>directives: Vec&lt;Directive&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;,
+    <span class="kw">pub </span>query: <span class="prelude-ty">Option</span>&lt;T::Value&gt;,
+    <span class="kw">pub </span>mutation: <span class="prelude-ty">Option</span>&lt;T::Value&gt;,
+    <span class="kw">pub </span>subscription: <span class="prelude-ty">Option</span>&lt;T::Value&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TypeDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">Scalar</span>(<span class="ident">ScalarType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>),
-    <span class="ident">Object</span>(<span class="ident">ObjectType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>),
-    <span class="ident">Interface</span>(<span class="ident">InterfaceType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>),
-    <span class="ident">Union</span>(<span class="ident">UnionType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>),
-    <span class="ident">Enum</span>(<span class="ident">EnumType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>),
-    <span class="ident">InputObject</span>(<span class="ident">InputObjectType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>),
+<span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub enum </span>TypeDefinition&lt;<span class="lifetime">&#39;a</span>, T: Text&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    Scalar(ScalarType&lt;<span class="lifetime">&#39;a</span>, T&gt;),
+    Object(ObjectType&lt;<span class="lifetime">&#39;a</span>, T&gt;),
+    Interface(InterfaceType&lt;<span class="lifetime">&#39;a</span>, T&gt;),
+    Union(UnionType&lt;<span class="lifetime">&#39;a</span>, T&gt;),
+    Enum(EnumType&lt;<span class="lifetime">&#39;a</span>, T&gt;),
+    InputObject(InputObjectType&lt;<span class="lifetime">&#39;a</span>, T&gt;),
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TypeExtension</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">Scalar</span>(<span class="ident">ScalarTypeExtension</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>),
-    <span class="ident">Object</span>(<span class="ident">ObjectTypeExtension</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>),
-    <span class="ident">Interface</span>(<span class="ident">InterfaceTypeExtension</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>),
-    <span class="ident">Union</span>(<span class="ident">UnionTypeExtension</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>),
-    <span class="ident">Enum</span>(<span class="ident">EnumTypeExtension</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>),
-    <span class="ident">InputObject</span>(<span class="ident">InputObjectTypeExtension</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>),
+<span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub enum </span>TypeExtension&lt;<span class="lifetime">&#39;a</span>, T: Text&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    Scalar(ScalarTypeExtension&lt;<span class="lifetime">&#39;a</span>, T&gt;),
+    Object(ObjectTypeExtension&lt;<span class="lifetime">&#39;a</span>, T&gt;),
+    Interface(InterfaceTypeExtension&lt;<span class="lifetime">&#39;a</span>, T&gt;),
+    Union(UnionTypeExtension&lt;<span class="lifetime">&#39;a</span>, T&gt;),
+    Enum(EnumTypeExtension&lt;<span class="lifetime">&#39;a</span>, T&gt;),
+    InputObject(InputObjectTypeExtension&lt;<span class="lifetime">&#39;a</span>, T&gt;),
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ScalarType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">position</span>: <span class="ident">Pos</span>,
-    <span class="kw">pub</span> <span class="ident">description</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">T::Value</span>,
-    <span class="kw">pub</span> <span class="ident">directives</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Directive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>ScalarType&lt;<span class="lifetime">&#39;a</span>, T: Text&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    <span class="kw">pub </span>position: Pos,
+    <span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>name: T::Value,
+    <span class="kw">pub </span>directives: Vec&lt;Directive&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">ScalarType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; ScalarType&lt;<span class="lifetime">&#39;a</span>, T&gt;
+    <span class="kw">where </span>T: Text&lt;<span class="lifetime">&#39;a</span>&gt;
 {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="ident">T::Value</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">position</span>: <span class="ident">Pos::default</span>(),
-            <span class="ident">description</span>: <span class="prelude-val">None</span>,
-            <span class="ident">name</span>,
-            <span class="ident">directives</span>: <span class="macro">vec!</span>[],
+    <span class="kw">pub fn </span>new(name: T::Value) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            position: Pos::default(),
+            description: <span class="prelude-val">None</span>,
+            name,
+            directives: <span class="macro">vec!</span>[],
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ScalarTypeExtension</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">position</span>: <span class="ident">Pos</span>,
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">T::Value</span>,
-    <span class="kw">pub</span> <span class="ident">directives</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Directive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>ScalarTypeExtension&lt;<span class="lifetime">&#39;a</span>, T: Text&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    <span class="kw">pub </span>position: Pos,
+    <span class="kw">pub </span>name: T::Value,
+    <span class="kw">pub </span>directives: Vec&lt;Directive&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">ScalarTypeExtension</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; ScalarTypeExtension&lt;<span class="lifetime">&#39;a</span>, T&gt;
+    <span class="kw">where </span>T: Text&lt;<span class="lifetime">&#39;a</span>&gt;
 {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="ident">T::Value</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">position</span>: <span class="ident">Pos::default</span>(),
-            <span class="ident">name</span>,
-            <span class="ident">directives</span>: <span class="macro">vec!</span>[],
+    <span class="kw">pub fn </span>new(name: T::Value) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            position: Pos::default(),
+            name,
+            directives: <span class="macro">vec!</span>[],
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ObjectType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">position</span>: <span class="ident">Pos</span>,
-    <span class="kw">pub</span> <span class="ident">description</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">T::Value</span>,
-    <span class="kw">pub</span> <span class="ident">implements_interfaces</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T::Value</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">directives</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Directive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>ObjectType&lt;<span class="lifetime">&#39;a</span>, T: Text&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    <span class="kw">pub </span>position: Pos,
+    <span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>name: T::Value,
+    <span class="kw">pub </span>implements_interfaces: Vec&lt;T::Value&gt;,
+    <span class="kw">pub </span>directives: Vec&lt;Directive&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;,
+    <span class="kw">pub </span>fields: Vec&lt;Field&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">ObjectType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; ObjectType&lt;<span class="lifetime">&#39;a</span>, T&gt;
+    <span class="kw">where </span>T: Text&lt;<span class="lifetime">&#39;a</span>&gt;
 {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="ident">T::Value</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">position</span>: <span class="ident">Pos::default</span>(),
-            <span class="ident">description</span>: <span class="prelude-val">None</span>,
-            <span class="ident">name</span>,
-            <span class="ident">implements_interfaces</span>: <span class="macro">vec!</span>[],
-            <span class="ident">directives</span>: <span class="macro">vec!</span>[],
-            <span class="ident">fields</span>: <span class="macro">vec!</span>[],
+    <span class="kw">pub fn </span>new(name: T::Value) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            position: Pos::default(),
+            description: <span class="prelude-val">None</span>,
+            name,
+            implements_interfaces: <span class="macro">vec!</span>[],
+            directives: <span class="macro">vec!</span>[],
+            fields: <span class="macro">vec!</span>[],
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ObjectTypeExtension</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">position</span>: <span class="ident">Pos</span>,
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">T::Value</span>,
-    <span class="kw">pub</span> <span class="ident">implements_interfaces</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T::Value</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">directives</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Directive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>ObjectTypeExtension&lt;<span class="lifetime">&#39;a</span>, T: Text&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    <span class="kw">pub </span>position: Pos,
+    <span class="kw">pub </span>name: T::Value,
+    <span class="kw">pub </span>implements_interfaces: Vec&lt;T::Value&gt;,
+    <span class="kw">pub </span>directives: Vec&lt;Directive&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;,
+    <span class="kw">pub </span>fields: Vec&lt;Field&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">ObjectTypeExtension</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; ObjectTypeExtension&lt;<span class="lifetime">&#39;a</span>, T&gt;
+    <span class="kw">where </span>T: Text&lt;<span class="lifetime">&#39;a</span>&gt;
 {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="ident">T::Value</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">position</span>: <span class="ident">Pos::default</span>(),
-            <span class="ident">name</span>,
-            <span class="ident">implements_interfaces</span>: <span class="macro">vec!</span>[],
-            <span class="ident">directives</span>: <span class="macro">vec!</span>[],
-            <span class="ident">fields</span>: <span class="macro">vec!</span>[],
+    <span class="kw">pub fn </span>new(name: T::Value) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            position: Pos::default(),
+            name,
+            implements_interfaces: <span class="macro">vec!</span>[],
+            directives: <span class="macro">vec!</span>[],
+            fields: <span class="macro">vec!</span>[],
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Field</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">position</span>: <span class="ident">Pos</span>,
-    <span class="kw">pub</span> <span class="ident">description</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">T::Value</span>,
-    <span class="kw">pub</span> <span class="ident">arguments</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">field_type</span>: <span class="ident">Type</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">directives</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Directive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>Field&lt;<span class="lifetime">&#39;a</span>, T: Text&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    <span class="kw">pub </span>position: Pos,
+    <span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>name: T::Value,
+    <span class="kw">pub </span>arguments: Vec&lt;InputValue&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;,
+    <span class="kw">pub </span>field_type: Type&lt;<span class="lifetime">&#39;a</span>, T&gt;,
+    <span class="kw">pub </span>directives: Vec&lt;Directive&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InputValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">position</span>: <span class="ident">Pos</span>,
-    <span class="kw">pub</span> <span class="ident">description</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">T::Value</span>,
-    <span class="kw">pub</span> <span class="ident">value_type</span>: <span class="ident">Type</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">default_value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">directives</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Directive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>InputValue&lt;<span class="lifetime">&#39;a</span>, T: Text&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    <span class="kw">pub </span>position: Pos,
+    <span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>name: T::Value,
+    <span class="kw">pub </span>value_type: Type&lt;<span class="lifetime">&#39;a</span>, T&gt;,
+    <span class="kw">pub </span>default_value: <span class="prelude-ty">Option</span>&lt;Value&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;,
+    <span class="kw">pub </span>directives: Vec&lt;Directive&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InterfaceType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">position</span>: <span class="ident">Pos</span>,
-    <span class="kw">pub</span> <span class="ident">description</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">T::Value</span>,
-    <span class="kw">pub</span> <span class="ident">directives</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Directive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>InterfaceType&lt;<span class="lifetime">&#39;a</span>, T: Text&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    <span class="kw">pub </span>position: Pos,
+    <span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>name: T::Value,
+    <span class="kw">pub </span>directives: Vec&lt;Directive&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;,
+    <span class="kw">pub </span>fields: Vec&lt;Field&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">InterfaceType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; InterfaceType&lt;<span class="lifetime">&#39;a</span>, T&gt;
+    <span class="kw">where </span>T: Text&lt;<span class="lifetime">&#39;a</span>&gt;
 {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="ident">T::Value</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">position</span>: <span class="ident">Pos::default</span>(),
-            <span class="ident">description</span>: <span class="prelude-val">None</span>,
-            <span class="ident">name</span>,
-            <span class="ident">directives</span>: <span class="macro">vec!</span>[],
-            <span class="ident">fields</span>: <span class="macro">vec!</span>[],
+    <span class="kw">pub fn </span>new(name: T::Value) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            position: Pos::default(),
+            description: <span class="prelude-val">None</span>,
+            name,
+            directives: <span class="macro">vec!</span>[],
+            fields: <span class="macro">vec!</span>[],
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InterfaceTypeExtension</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">position</span>: <span class="ident">Pos</span>,
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">T::Value</span>,
-    <span class="kw">pub</span> <span class="ident">directives</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Directive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>InterfaceTypeExtension&lt;<span class="lifetime">&#39;a</span>, T: Text&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    <span class="kw">pub </span>position: Pos,
+    <span class="kw">pub </span>name: T::Value,
+    <span class="kw">pub </span>directives: Vec&lt;Directive&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;,
+    <span class="kw">pub </span>fields: Vec&lt;Field&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">InterfaceTypeExtension</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; InterfaceTypeExtension&lt;<span class="lifetime">&#39;a</span>, T&gt;
+<span class="kw">where </span>T: Text&lt;<span class="lifetime">&#39;a</span>&gt;
 {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="ident">T::Value</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">position</span>: <span class="ident">Pos::default</span>(),
-            <span class="ident">name</span>,
-            <span class="ident">directives</span>: <span class="macro">vec!</span>[],
-            <span class="ident">fields</span>: <span class="macro">vec!</span>[],
+    <span class="kw">pub fn </span>new(name: T::Value) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            position: Pos::default(),
+            name,
+            directives: <span class="macro">vec!</span>[],
+            fields: <span class="macro">vec!</span>[],
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UnionType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">position</span>: <span class="ident">Pos</span>,
-    <span class="kw">pub</span> <span class="ident">description</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">T::Value</span>,
-    <span class="kw">pub</span> <span class="ident">directives</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Directive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T::Value</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>UnionType&lt;<span class="lifetime">&#39;a</span>, T: Text&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    <span class="kw">pub </span>position: Pos,
+    <span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>name: T::Value,
+    <span class="kw">pub </span>directives: Vec&lt;Directive&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;,
+    <span class="kw">pub </span>types: Vec&lt;T::Value&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">UnionType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; UnionType&lt;<span class="lifetime">&#39;a</span>, T&gt;
+<span class="kw">where </span>T: Text&lt;<span class="lifetime">&#39;a</span>&gt;
 {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="ident">T::Value</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">position</span>: <span class="ident">Pos::default</span>(),
-            <span class="ident">description</span>: <span class="prelude-val">None</span>,
-            <span class="ident">name</span>,
-            <span class="ident">directives</span>: <span class="macro">vec!</span>[],
-            <span class="ident">types</span>: <span class="macro">vec!</span>[],
+    <span class="kw">pub fn </span>new(name: T::Value) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            position: Pos::default(),
+            description: <span class="prelude-val">None</span>,
+            name,
+            directives: <span class="macro">vec!</span>[],
+            types: <span class="macro">vec!</span>[],
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UnionTypeExtension</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">position</span>: <span class="ident">Pos</span>,
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">T::Value</span>,
-    <span class="kw">pub</span> <span class="ident">directives</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Directive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T::Value</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>UnionTypeExtension&lt;<span class="lifetime">&#39;a</span>, T: Text&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    <span class="kw">pub </span>position: Pos,
+    <span class="kw">pub </span>name: T::Value,
+    <span class="kw">pub </span>directives: Vec&lt;Directive&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;,
+    <span class="kw">pub </span>types: Vec&lt;T::Value&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">UnionTypeExtension</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; UnionTypeExtension&lt;<span class="lifetime">&#39;a</span>, T&gt;
+<span class="kw">where </span>T: Text&lt;<span class="lifetime">&#39;a</span>&gt;
 {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="ident">T::Value</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">position</span>: <span class="ident">Pos::default</span>(),
-            <span class="ident">name</span>,
-            <span class="ident">directives</span>: <span class="macro">vec!</span>[],
-            <span class="ident">types</span>: <span class="macro">vec!</span>[],
+    <span class="kw">pub fn </span>new(name: T::Value) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            position: Pos::default(),
+            name,
+            directives: <span class="macro">vec!</span>[],
+            types: <span class="macro">vec!</span>[],
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EnumType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">position</span>: <span class="ident">Pos</span>,
-    <span class="kw">pub</span> <span class="ident">description</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">T::Value</span>,
-    <span class="kw">pub</span> <span class="ident">directives</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Directive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EnumValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>EnumType&lt;<span class="lifetime">&#39;a</span>, T: Text&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    <span class="kw">pub </span>position: Pos,
+    <span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>name: T::Value,
+    <span class="kw">pub </span>directives: Vec&lt;Directive&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;,
+    <span class="kw">pub </span>values: Vec&lt;EnumValue&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">EnumType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; EnumType&lt;<span class="lifetime">&#39;a</span>, T&gt;
+<span class="kw">where </span>T: Text&lt;<span class="lifetime">&#39;a</span>&gt;
 {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="ident">T::Value</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">position</span>: <span class="ident">Pos::default</span>(),
-            <span class="ident">description</span>: <span class="prelude-val">None</span>,
-            <span class="ident">name</span>,
-            <span class="ident">directives</span>: <span class="macro">vec!</span>[],
-            <span class="ident">values</span>: <span class="macro">vec!</span>[],
+    <span class="kw">pub fn </span>new(name: T::Value) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            position: Pos::default(),
+            description: <span class="prelude-val">None</span>,
+            name,
+            directives: <span class="macro">vec!</span>[],
+            values: <span class="macro">vec!</span>[],
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EnumValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">position</span>: <span class="ident">Pos</span>,
-    <span class="kw">pub</span> <span class="ident">description</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">T::Value</span>,
-    <span class="kw">pub</span> <span class="ident">directives</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Directive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>EnumValue&lt;<span class="lifetime">&#39;a</span>, T: Text&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    <span class="kw">pub </span>position: Pos,
+    <span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>name: T::Value,
+    <span class="kw">pub </span>directives: Vec&lt;Directive&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">EnumValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; EnumValue&lt;<span class="lifetime">&#39;a</span>, T&gt;
+<span class="kw">where </span>T: Text&lt;<span class="lifetime">&#39;a</span>&gt;
 {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="ident">T::Value</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">position</span>: <span class="ident">Pos::default</span>(),
-            <span class="ident">description</span>: <span class="prelude-val">None</span>,
-            <span class="ident">name</span>,
-            <span class="ident">directives</span>: <span class="macro">vec!</span>[],
+    <span class="kw">pub fn </span>new(name: T::Value) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            position: Pos::default(),
+            description: <span class="prelude-val">None</span>,
+            name,
+            directives: <span class="macro">vec!</span>[],
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EnumTypeExtension</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">position</span>: <span class="ident">Pos</span>,
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">T::Value</span>,
-    <span class="kw">pub</span> <span class="ident">directives</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Directive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EnumValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>EnumTypeExtension&lt;<span class="lifetime">&#39;a</span>, T: Text&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    <span class="kw">pub </span>position: Pos,
+    <span class="kw">pub </span>name: T::Value,
+    <span class="kw">pub </span>directives: Vec&lt;Directive&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;,
+    <span class="kw">pub </span>values: Vec&lt;EnumValue&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">EnumTypeExtension</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; EnumTypeExtension&lt;<span class="lifetime">&#39;a</span>, T&gt;
+<span class="kw">where </span>T: Text&lt;<span class="lifetime">&#39;a</span>&gt;
 {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="ident">T::Value</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">position</span>: <span class="ident">Pos::default</span>(),
-            <span class="ident">name</span>,
-            <span class="ident">directives</span>: <span class="macro">vec!</span>[],
-            <span class="ident">values</span>: <span class="macro">vec!</span>[],
+    <span class="kw">pub fn </span>new(name: T::Value) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            position: Pos::default(),
+            name,
+            directives: <span class="macro">vec!</span>[],
+            values: <span class="macro">vec!</span>[],
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InputObjectType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">position</span>: <span class="ident">Pos</span>,
-    <span class="kw">pub</span> <span class="ident">description</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">T::Value</span>,
-    <span class="kw">pub</span> <span class="ident">directives</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Directive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>InputObjectType&lt;<span class="lifetime">&#39;a</span>, T: Text&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    <span class="kw">pub </span>position: Pos,
+    <span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>name: T::Value,
+    <span class="kw">pub </span>directives: Vec&lt;Directive&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;,
+    <span class="kw">pub </span>fields: Vec&lt;InputValue&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">InputObjectType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; InputObjectType&lt;<span class="lifetime">&#39;a</span>, T&gt;
+<span class="kw">where </span>T: Text&lt;<span class="lifetime">&#39;a</span>&gt;
 {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="ident">T::Value</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">position</span>: <span class="ident">Pos::default</span>(),
-            <span class="ident">description</span>: <span class="prelude-val">None</span>,
-            <span class="ident">name</span>,
-            <span class="ident">directives</span>: <span class="macro">vec!</span>[],
-            <span class="ident">fields</span>: <span class="macro">vec!</span>[],
+    <span class="kw">pub fn </span>new(name: T::Value) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            position: Pos::default(),
+            description: <span class="prelude-val">None</span>,
+            name,
+            directives: <span class="macro">vec!</span>[],
+            fields: <span class="macro">vec!</span>[],
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InputObjectTypeExtension</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">position</span>: <span class="ident">Pos</span>,
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">T::Value</span>,
-    <span class="kw">pub</span> <span class="ident">directives</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Directive</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>InputObjectTypeExtension&lt;<span class="lifetime">&#39;a</span>, T: Text&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    <span class="kw">pub </span>position: Pos,
+    <span class="kw">pub </span>name: T::Value,
+    <span class="kw">pub </span>directives: Vec&lt;Directive&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;,
+    <span class="kw">pub </span>fields: Vec&lt;InputValue&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">InputObjectTypeExtension</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; InputObjectTypeExtension&lt;<span class="lifetime">&#39;a</span>, T&gt;
+<span class="kw">where </span>T: Text&lt;<span class="lifetime">&#39;a</span>&gt;
 {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="ident">T::Value</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">position</span>: <span class="ident">Pos::default</span>(),
-            <span class="ident">name</span>,
-            <span class="ident">directives</span>: <span class="macro">vec!</span>[],
-            <span class="ident">fields</span>: <span class="macro">vec!</span>[],
+    <span class="kw">pub fn </span>new(name: T::Value) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            position: Pos::default(),
+            name,
+            directives: <span class="macro">vec!</span>[],
+            fields: <span class="macro">vec!</span>[],
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DirectiveLocation</span> {
-    <span class="comment">// executable</span>
-    <span class="ident">Query</span>,
-    <span class="ident">Mutation</span>,
-    <span class="ident">Subscription</span>,
-    <span class="ident">Field</span>,
-    <span class="ident">FragmentDefinition</span>,
-    <span class="ident">FragmentSpread</span>,
-    <span class="ident">InlineFragment</span>,
+<span class="attribute">#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+</span><span class="kw">pub enum </span>DirectiveLocation {
+    <span class="comment">// executable
+    </span>Query,
+    Mutation,
+    Subscription,
+    Field,
+    FragmentDefinition,
+    FragmentSpread,
+    InlineFragment,
 
-    <span class="comment">// type_system</span>
-    <span class="ident">Schema</span>,
-    <span class="ident">Scalar</span>,
-    <span class="ident">Object</span>,
-    <span class="ident">FieldDefinition</span>,
-    <span class="ident">ArgumentDefinition</span>,
-    <span class="ident">Interface</span>,
-    <span class="ident">Union</span>,
-    <span class="ident">Enum</span>,
-    <span class="ident">EnumValue</span>,
-    <span class="ident">InputObject</span>,
-    <span class="ident">InputFieldDefinition</span>,
+    <span class="comment">// type_system
+    </span>Schema,
+    Scalar,
+    Object,
+    FieldDefinition,
+    ArgumentDefinition,
+    Interface,
+    Union,
+    Enum,
+    EnumValue,
+    InputObject,
+    InputFieldDefinition,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DirectiveDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">position</span>: <span class="ident">Pos</span>,
-    <span class="kw">pub</span> <span class="ident">description</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">T::Value</span>,
-    <span class="kw">pub</span> <span class="ident">arguments</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">locations</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DirectiveLocation</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>DirectiveDefinition&lt;<span class="lifetime">&#39;a</span>, T: Text&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    <span class="kw">pub </span>position: Pos,
+    <span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>name: T::Value,
+    <span class="kw">pub </span>arguments: Vec&lt;InputValue&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;,
+    <span class="kw">pub </span>locations: Vec&lt;DirectiveLocation&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">DirectiveDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; DirectiveDefinition&lt;<span class="lifetime">&#39;a</span>, T&gt;
+<span class="kw">where </span>T: Text&lt;<span class="lifetime">&#39;a</span>&gt;
 {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="ident">T::Value</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">position</span>: <span class="ident">Pos::default</span>(),
-            <span class="ident">description</span>: <span class="prelude-val">None</span>,
-            <span class="ident">name</span>,
-            <span class="ident">arguments</span>: <span class="macro">vec!</span>[],
-            <span class="ident">locations</span>: <span class="macro">vec!</span>[],
+    <span class="kw">pub fn </span>new(name: T::Value) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            position: Pos::default(),
+            description: <span class="prelude-val">None</span>,
+            name,
+            arguments: <span class="macro">vec!</span>[],
+            locations: <span class="macro">vec!</span>[],
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">DirectiveLocation</span> {
-    <span class="doccomment">/// Returns GraphQL syntax compatible name of the directive</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::DirectiveLocation</span>::<span class="kw-2">*</span>;
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Query</span> =&gt; <span class="string">&quot;QUERY&quot;</span>,
-            <span class="ident">Mutation</span> =&gt; <span class="string">&quot;MUTATION&quot;</span>,
-            <span class="ident">Subscription</span> =&gt; <span class="string">&quot;SUBSCRIPTION&quot;</span>,
-            <span class="ident">Field</span> =&gt; <span class="string">&quot;FIELD&quot;</span>,
-            <span class="ident">FragmentDefinition</span> =&gt; <span class="string">&quot;FRAGMENT_DEFINITION&quot;</span>,
-            <span class="ident">FragmentSpread</span> =&gt; <span class="string">&quot;FRAGMENT_SPREAD&quot;</span>,
-            <span class="ident">InlineFragment</span> =&gt; <span class="string">&quot;INLINE_FRAGMENT&quot;</span>,
-            <span class="ident">Schema</span> =&gt; <span class="string">&quot;SCHEMA&quot;</span>,
-            <span class="ident">Scalar</span> =&gt; <span class="string">&quot;SCALAR&quot;</span>,
-            <span class="ident">Object</span> =&gt; <span class="string">&quot;OBJECT&quot;</span>,
-            <span class="ident">FieldDefinition</span> =&gt; <span class="string">&quot;FIELD_DEFINITION&quot;</span>,
-            <span class="ident">ArgumentDefinition</span> =&gt; <span class="string">&quot;ARGUMENT_DEFINITION&quot;</span>,
-            <span class="ident">Interface</span> =&gt; <span class="string">&quot;INTERFACE&quot;</span>,
-            <span class="ident">Union</span> =&gt; <span class="string">&quot;UNION&quot;</span>,
-            <span class="ident">Enum</span> =&gt; <span class="string">&quot;ENUM&quot;</span>,
-            <span class="ident">EnumValue</span> =&gt; <span class="string">&quot;ENUM_VALUE&quot;</span>,
-            <span class="ident">InputObject</span> =&gt; <span class="string">&quot;INPUT_OBJECT&quot;</span>,
-            <span class="ident">InputFieldDefinition</span> =&gt; <span class="string">&quot;INPUT_FIELD_DEFINITION&quot;</span>,
+<span class="kw">impl </span>DirectiveLocation {
+    <span class="doccomment">/// Returns GraphQL syntax compatible name of the directive
+    </span><span class="kw">pub fn </span>as_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="kw">use </span><span class="self">self</span>::DirectiveLocation::<span class="kw-2">*</span>;
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Query =&gt; <span class="string">&quot;QUERY&quot;</span>,
+            Mutation =&gt; <span class="string">&quot;MUTATION&quot;</span>,
+            Subscription =&gt; <span class="string">&quot;SUBSCRIPTION&quot;</span>,
+            Field =&gt; <span class="string">&quot;FIELD&quot;</span>,
+            FragmentDefinition =&gt; <span class="string">&quot;FRAGMENT_DEFINITION&quot;</span>,
+            FragmentSpread =&gt; <span class="string">&quot;FRAGMENT_SPREAD&quot;</span>,
+            InlineFragment =&gt; <span class="string">&quot;INLINE_FRAGMENT&quot;</span>,
+            Schema =&gt; <span class="string">&quot;SCHEMA&quot;</span>,
+            Scalar =&gt; <span class="string">&quot;SCALAR&quot;</span>,
+            Object =&gt; <span class="string">&quot;OBJECT&quot;</span>,
+            FieldDefinition =&gt; <span class="string">&quot;FIELD_DEFINITION&quot;</span>,
+            ArgumentDefinition =&gt; <span class="string">&quot;ARGUMENT_DEFINITION&quot;</span>,
+            Interface =&gt; <span class="string">&quot;INTERFACE&quot;</span>,
+            Union =&gt; <span class="string">&quot;UNION&quot;</span>,
+            Enum =&gt; <span class="string">&quot;ENUM&quot;</span>,
+            EnumValue =&gt; <span class="string">&quot;ENUM_VALUE&quot;</span>,
+            InputObject =&gt; <span class="string">&quot;INPUT_OBJECT&quot;</span>,
+            InputFieldDefinition =&gt; <span class="string">&quot;INPUT_FIELD_DEFINITION&quot;</span>,
         }
     }
 
-    <span class="doccomment">/// Returns `true` if this location is for queries (execution)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::DirectiveLocation</span>::<span class="kw-2">*</span>;
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Query</span>
-            <span class="op">|</span> <span class="ident">Mutation</span>
-            <span class="op">|</span> <span class="ident">Subscription</span>
-            <span class="op">|</span> <span class="ident">Field</span>
-            <span class="op">|</span> <span class="ident">FragmentDefinition</span>
-            <span class="op">|</span> <span class="ident">FragmentSpread</span>
-            <span class="op">|</span> <span class="ident">InlineFragment</span>
+    <span class="doccomment">/// Returns `true` if this location is for queries (execution)
+    </span><span class="kw">pub fn </span>is_query(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">use </span><span class="self">self</span>::DirectiveLocation::<span class="kw-2">*</span>;
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Query
+            | Mutation
+            | Subscription
+            | Field
+            | FragmentDefinition
+            | FragmentSpread
+            | InlineFragment
                 =&gt; <span class="bool-val">true</span>,
 
-            <span class="ident">Schema</span>
-            <span class="op">|</span> <span class="ident">Scalar</span>
-            <span class="op">|</span> <span class="ident">Object</span>
-            <span class="op">|</span> <span class="ident">FieldDefinition</span>
-            <span class="op">|</span> <span class="ident">ArgumentDefinition</span>
-            <span class="op">|</span> <span class="ident">Interface</span>
-            <span class="op">|</span> <span class="ident">Union</span>
-            <span class="op">|</span> <span class="ident">Enum</span>
-            <span class="op">|</span> <span class="ident">EnumValue</span>
-            <span class="op">|</span> <span class="ident">InputObject</span>
-            <span class="op">|</span> <span class="ident">InputFieldDefinition</span>
+            Schema
+            | Scalar
+            | Object
+            | FieldDefinition
+            | ArgumentDefinition
+            | Interface
+            | Union
+            | Enum
+            | EnumValue
+            | InputObject
+            | InputFieldDefinition
                 =&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="doccomment">/// Returns `true` if this location is for schema</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_schema</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="op">!</span><span class="self">self</span>.<span class="ident">is_query</span>()
+    <span class="doccomment">/// Returns `true` if this location is for schema
+    </span><span class="kw">pub fn </span>is_schema(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        !<span class="self">self</span>.is_query()
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
-<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;invalid directive location&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InvalidDirectiveLocation</span>;
+<span class="attribute">#[derive(Debug, Error)]
+#[error(<span class="string">&quot;invalid directive location&quot;</span>)]
+</span><span class="kw">pub struct </span>InvalidDirectiveLocation;
 
 
-<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">DirectiveLocation</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">InvalidDirectiveLocation</span>;
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DirectiveLocation</span>, <span class="ident">InvalidDirectiveLocation</span><span class="op">&gt;</span>
+<span class="kw">impl </span>FromStr <span class="kw">for </span>DirectiveLocation {
+    <span class="kw">type </span><span class="prelude-val">Err </span>= InvalidDirectiveLocation;
+    <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;DirectiveLocation, InvalidDirectiveLocation&gt;
     {
-        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::DirectiveLocation</span>::<span class="kw-2">*</span>;
-        <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">s</span> {
-            <span class="string">&quot;QUERY&quot;</span> =&gt; <span class="ident">Query</span>,
-            <span class="string">&quot;MUTATION&quot;</span> =&gt; <span class="ident">Mutation</span>,
-            <span class="string">&quot;SUBSCRIPTION&quot;</span> =&gt; <span class="ident">Subscription</span>,
-            <span class="string">&quot;FIELD&quot;</span> =&gt; <span class="ident">Field</span>,
-            <span class="string">&quot;FRAGMENT_DEFINITION&quot;</span> =&gt; <span class="ident">FragmentDefinition</span>,
-            <span class="string">&quot;FRAGMENT_SPREAD&quot;</span> =&gt; <span class="ident">FragmentSpread</span>,
-            <span class="string">&quot;INLINE_FRAGMENT&quot;</span> =&gt; <span class="ident">InlineFragment</span>,
-            <span class="string">&quot;SCHEMA&quot;</span> =&gt; <span class="ident">Schema</span>,
-            <span class="string">&quot;SCALAR&quot;</span> =&gt; <span class="ident">Scalar</span>,
-            <span class="string">&quot;OBJECT&quot;</span> =&gt; <span class="ident">Object</span>,
-            <span class="string">&quot;FIELD_DEFINITION&quot;</span> =&gt; <span class="ident">FieldDefinition</span>,
-            <span class="string">&quot;ARGUMENT_DEFINITION&quot;</span> =&gt; <span class="ident">ArgumentDefinition</span>,
-            <span class="string">&quot;INTERFACE&quot;</span> =&gt; <span class="ident">Interface</span>,
-            <span class="string">&quot;UNION&quot;</span> =&gt; <span class="ident">Union</span>,
-            <span class="string">&quot;ENUM&quot;</span> =&gt; <span class="ident">Enum</span>,
-            <span class="string">&quot;ENUM_VALUE&quot;</span> =&gt; <span class="ident">EnumValue</span>,
-            <span class="string">&quot;INPUT_OBJECT&quot;</span> =&gt; <span class="ident">InputObject</span>,
-            <span class="string">&quot;INPUT_FIELD_DEFINITION&quot;</span> =&gt; <span class="ident">InputFieldDefinition</span>,
-            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">InvalidDirectiveLocation</span>),
+        <span class="kw">use </span><span class="self">self</span>::DirectiveLocation::<span class="kw-2">*</span>;
+        <span class="kw">let </span>val = <span class="kw">match </span>s {
+            <span class="string">&quot;QUERY&quot; </span>=&gt; Query,
+            <span class="string">&quot;MUTATION&quot; </span>=&gt; Mutation,
+            <span class="string">&quot;SUBSCRIPTION&quot; </span>=&gt; Subscription,
+            <span class="string">&quot;FIELD&quot; </span>=&gt; Field,
+            <span class="string">&quot;FRAGMENT_DEFINITION&quot; </span>=&gt; FragmentDefinition,
+            <span class="string">&quot;FRAGMENT_SPREAD&quot; </span>=&gt; FragmentSpread,
+            <span class="string">&quot;INLINE_FRAGMENT&quot; </span>=&gt; InlineFragment,
+            <span class="string">&quot;SCHEMA&quot; </span>=&gt; Schema,
+            <span class="string">&quot;SCALAR&quot; </span>=&gt; Scalar,
+            <span class="string">&quot;OBJECT&quot; </span>=&gt; Object,
+            <span class="string">&quot;FIELD_DEFINITION&quot; </span>=&gt; FieldDefinition,
+            <span class="string">&quot;ARGUMENT_DEFINITION&quot; </span>=&gt; ArgumentDefinition,
+            <span class="string">&quot;INTERFACE&quot; </span>=&gt; Interface,
+            <span class="string">&quot;UNION&quot; </span>=&gt; Union,
+            <span class="string">&quot;ENUM&quot; </span>=&gt; Enum,
+            <span class="string">&quot;ENUM_VALUE&quot; </span>=&gt; EnumValue,
+            <span class="string">&quot;INPUT_OBJECT&quot; </span>=&gt; InputObject,
+            <span class="string">&quot;INPUT_FIELD_DEFINITION&quot; </span>=&gt; InputFieldDefinition,
+            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(InvalidDirectiveLocation),
         };
 
-        <span class="prelude-val">Ok</span>(<span class="ident">val</span>)
+        <span class="prelude-val">Ok</span>(val)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="graphql_parser" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="graphql_parser" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

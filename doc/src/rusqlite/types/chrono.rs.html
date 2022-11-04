@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rusqlite-0.25.4/src/types/chrono.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>chrono.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rusqlite/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rusqlite-0.25.4/src/types/chrono.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>chrono.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rusqlite/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -271,278 +271,278 @@
 <span id="271">271</span>
 <span id="272">272</span>
 <span id="273">273</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Convert most of the [Time Strings](http://sqlite.org/lang_datefunc.html) to chrono types.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Convert most of the [Time Strings](http://sqlite.org/lang_datefunc.html) to chrono types.
 
-<span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">Local</span>, <span class="ident">NaiveDate</span>, <span class="ident">NaiveDateTime</span>, <span class="ident">NaiveTime</span>, <span class="ident">TimeZone</span>, <span class="ident">Utc</span>};
+</span><span class="kw">use </span>chrono::{DateTime, Local, NaiveDate, NaiveDateTime, NaiveTime, TimeZone, Utc};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::types</span>::{<span class="ident">FromSql</span>, <span class="ident">FromSqlError</span>, <span class="ident">FromSqlResult</span>, <span class="ident">ToSql</span>, <span class="ident">ToSqlOutput</span>, <span class="ident">ValueRef</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Result</span>;
+<span class="kw">use </span><span class="kw">crate</span>::types::{FromSql, FromSqlError, FromSqlResult, ToSql, ToSqlOutput, ValueRef};
+<span class="kw">use </span><span class="kw">crate</span>::Result;
 
-<span class="doccomment">/// ISO 8601 calendar date without timezone =&gt; &quot;YYYY-MM-DD&quot;</span>
-<span class="kw">impl</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="ident">NaiveDate</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ToSqlOutput</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">date_str</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">format</span>(<span class="string">&quot;%F&quot;</span>).<span class="ident">to_string</span>();
-        <span class="prelude-val">Ok</span>(<span class="ident">ToSqlOutput::from</span>(<span class="ident">date_str</span>))
+<span class="doccomment">/// ISO 8601 calendar date without timezone =&gt; &quot;YYYY-MM-DD&quot;
+</span><span class="kw">impl </span>ToSql <span class="kw">for </span>NaiveDate {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>to_sql(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;ToSqlOutput&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="kw">let </span>date_str = <span class="self">self</span>.format(<span class="string">&quot;%F&quot;</span>).to_string();
+        <span class="prelude-val">Ok</span>(ToSqlOutput::from(date_str))
     }
 }
 
-<span class="doccomment">/// &quot;YYYY-MM-DD&quot; =&gt; ISO 8601 calendar date without timezone.</span>
-<span class="kw">impl</span> <span class="ident">FromSql</span> <span class="kw">for</span> <span class="ident">NaiveDate</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">column_result</span>(<span class="ident">value</span>: <span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">FromSqlResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">value</span>
-            .<span class="ident">as_str</span>()
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">NaiveDate::parse_from_str</span>(<span class="ident">s</span>, <span class="string">&quot;%F&quot;</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">dt</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">dt</span>),
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromSqlError::Other</span>(<span class="ident">Box::new</span>(<span class="ident">err</span>))),
+<span class="doccomment">/// &quot;YYYY-MM-DD&quot; =&gt; ISO 8601 calendar date without timezone.
+</span><span class="kw">impl </span>FromSql <span class="kw">for </span>NaiveDate {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>column_result(value: ValueRef&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; FromSqlResult&lt;<span class="self">Self</span>&gt; {
+        value
+            .as_str()
+            .and_then(|s| <span class="kw">match </span>NaiveDate::parse_from_str(s, <span class="string">&quot;%F&quot;</span>) {
+                <span class="prelude-val">Ok</span>(dt) =&gt; <span class="prelude-val">Ok</span>(dt),
+                <span class="prelude-val">Err</span>(err) =&gt; <span class="prelude-val">Err</span>(FromSqlError::Other(Box::new(err))),
             })
     }
 }
 
-<span class="doccomment">/// ISO 8601 time without timezone =&gt; &quot;HH:MM:SS.SSS&quot;</span>
-<span class="kw">impl</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="ident">NaiveTime</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ToSqlOutput</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">date_str</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">format</span>(<span class="string">&quot;%T%.f&quot;</span>).<span class="ident">to_string</span>();
-        <span class="prelude-val">Ok</span>(<span class="ident">ToSqlOutput::from</span>(<span class="ident">date_str</span>))
+<span class="doccomment">/// ISO 8601 time without timezone =&gt; &quot;HH:MM:SS.SSS&quot;
+</span><span class="kw">impl </span>ToSql <span class="kw">for </span>NaiveTime {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>to_sql(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;ToSqlOutput&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="kw">let </span>date_str = <span class="self">self</span>.format(<span class="string">&quot;%T%.f&quot;</span>).to_string();
+        <span class="prelude-val">Ok</span>(ToSqlOutput::from(date_str))
     }
 }
 
-<span class="doccomment">/// &quot;HH:MM&quot;/&quot;HH:MM:SS&quot;/&quot;HH:MM:SS.SSS&quot; =&gt; ISO 8601 time without timezone.</span>
-<span class="kw">impl</span> <span class="ident">FromSql</span> <span class="kw">for</span> <span class="ident">NaiveTime</span> {
-    <span class="kw">fn</span> <span class="ident">column_result</span>(<span class="ident">value</span>: <span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">FromSqlResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">value</span>.<span class="ident">as_str</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">fmt</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">s</span>.<span class="ident">len</span>() {
-                <span class="number">5</span> =&gt; <span class="string">&quot;%H:%M&quot;</span>,
-                <span class="number">8</span> =&gt; <span class="string">&quot;%T&quot;</span>,
-                <span class="kw">_</span> =&gt; <span class="string">&quot;%T%.f&quot;</span>,
+<span class="doccomment">/// &quot;HH:MM&quot;/&quot;HH:MM:SS&quot;/&quot;HH:MM:SS.SSS&quot; =&gt; ISO 8601 time without timezone.
+</span><span class="kw">impl </span>FromSql <span class="kw">for </span>NaiveTime {
+    <span class="kw">fn </span>column_result(value: ValueRef&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; FromSqlResult&lt;<span class="self">Self</span>&gt; {
+        value.as_str().and_then(|s| {
+            <span class="kw">let </span>fmt = <span class="kw">match </span>s.len() {
+                <span class="number">5 </span>=&gt; <span class="string">&quot;%H:%M&quot;</span>,
+                <span class="number">8 </span>=&gt; <span class="string">&quot;%T&quot;</span>,
+                <span class="kw">_ </span>=&gt; <span class="string">&quot;%T%.f&quot;</span>,
             };
-            <span class="kw">match</span> <span class="ident">NaiveTime::parse_from_str</span>(<span class="ident">s</span>, <span class="ident">fmt</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">dt</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">dt</span>),
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromSqlError::Other</span>(<span class="ident">Box::new</span>(<span class="ident">err</span>))),
+            <span class="kw">match </span>NaiveTime::parse_from_str(s, fmt) {
+                <span class="prelude-val">Ok</span>(dt) =&gt; <span class="prelude-val">Ok</span>(dt),
+                <span class="prelude-val">Err</span>(err) =&gt; <span class="prelude-val">Err</span>(FromSqlError::Other(Box::new(err))),
             }
         })
     }
 }
 
-<span class="doccomment">/// ISO 8601 combined date and time without timezone =&gt;</span>
-<span class="doccomment">/// &quot;YYYY-MM-DD HH:MM:SS.SSS&quot;</span>
-<span class="kw">impl</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="ident">NaiveDateTime</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ToSqlOutput</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">date_str</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">format</span>(<span class="string">&quot;%F %T%.f&quot;</span>).<span class="ident">to_string</span>();
-        <span class="prelude-val">Ok</span>(<span class="ident">ToSqlOutput::from</span>(<span class="ident">date_str</span>))
+<span class="doccomment">/// ISO 8601 combined date and time without timezone =&gt;
+/// &quot;YYYY-MM-DD HH:MM:SS.SSS&quot;
+</span><span class="kw">impl </span>ToSql <span class="kw">for </span>NaiveDateTime {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>to_sql(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;ToSqlOutput&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="kw">let </span>date_str = <span class="self">self</span>.format(<span class="string">&quot;%F %T%.f&quot;</span>).to_string();
+        <span class="prelude-val">Ok</span>(ToSqlOutput::from(date_str))
     }
 }
 
-<span class="doccomment">/// &quot;YYYY-MM-DD HH:MM:SS&quot;/&quot;YYYY-MM-DD HH:MM:SS.SSS&quot; =&gt; ISO 8601 combined date</span>
-<span class="doccomment">/// and time without timezone. (&quot;YYYY-MM-DDTHH:MM:SS&quot;/&quot;YYYY-MM-DDTHH:MM:SS.SSS&quot;</span>
-<span class="doccomment">/// also supported)</span>
-<span class="kw">impl</span> <span class="ident">FromSql</span> <span class="kw">for</span> <span class="ident">NaiveDateTime</span> {
-    <span class="kw">fn</span> <span class="ident">column_result</span>(<span class="ident">value</span>: <span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">FromSqlResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">value</span>.<span class="ident">as_str</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">fmt</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">11</span> <span class="op">&amp;&amp;</span> <span class="ident">s</span>.<span class="ident">as_bytes</span>()[<span class="number">10</span>] <span class="op">==</span> <span class="string">b&#39;T&#39;</span> {
-                <span class="string">&quot;%FT%T%.f&quot;</span>
-            } <span class="kw">else</span> {
-                <span class="string">&quot;%F %T%.f&quot;</span>
-            };
+<span class="doccomment">/// &quot;YYYY-MM-DD HH:MM:SS&quot;/&quot;YYYY-MM-DD HH:MM:SS.SSS&quot; =&gt; ISO 8601 combined date
+/// and time without timezone. (&quot;YYYY-MM-DDTHH:MM:SS&quot;/&quot;YYYY-MM-DDTHH:MM:SS.SSS&quot;
+/// also supported)
+</span><span class="kw">impl </span>FromSql <span class="kw">for </span>NaiveDateTime {
+    <span class="kw">fn </span>column_result(value: ValueRef&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; FromSqlResult&lt;<span class="self">Self</span>&gt; {
+        value.as_str().and_then(|s| {
+            <span class="kw">let </span>fmt = <span class="kw">if </span>s.len() &gt;= <span class="number">11 </span>&amp;&amp; s.as_bytes()[<span class="number">10</span>] == <span class="string">b&#39;T&#39; </span>{
+                <span class="string">&quot;%FT%T%.f&quot;
+            </span>} <span class="kw">else </span>{
+                <span class="string">&quot;%F %T%.f&quot;
+            </span>};
 
-            <span class="kw">match</span> <span class="ident">NaiveDateTime::parse_from_str</span>(<span class="ident">s</span>, <span class="ident">fmt</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">dt</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">dt</span>),
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromSqlError::Other</span>(<span class="ident">Box::new</span>(<span class="ident">err</span>))),
+            <span class="kw">match </span>NaiveDateTime::parse_from_str(s, fmt) {
+                <span class="prelude-val">Ok</span>(dt) =&gt; <span class="prelude-val">Ok</span>(dt),
+                <span class="prelude-val">Err</span>(err) =&gt; <span class="prelude-val">Err</span>(FromSqlError::Other(Box::new(err))),
             }
         })
     }
 }
 
-<span class="doccomment">/// Date and time with time zone =&gt; UTC RFC3339 timestamp</span>
-<span class="doccomment">/// (&quot;YYYY-MM-DD HH:MM:SS.SSS+00:00&quot;).</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Tz</span>: <span class="ident">TimeZone</span><span class="op">&gt;</span> <span class="ident">ToSql</span> <span class="kw">for</span> <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ToSqlOutput</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">date_str</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">with_timezone</span>(<span class="kw-2">&amp;</span><span class="ident">Utc</span>).<span class="ident">format</span>(<span class="string">&quot;%F %T%.f%:z&quot;</span>).<span class="ident">to_string</span>();
-        <span class="prelude-val">Ok</span>(<span class="ident">ToSqlOutput::from</span>(<span class="ident">date_str</span>))
+<span class="doccomment">/// Date and time with time zone =&gt; UTC RFC3339 timestamp
+/// (&quot;YYYY-MM-DD HH:MM:SS.SSS+00:00&quot;).
+</span><span class="kw">impl</span>&lt;Tz: TimeZone&gt; ToSql <span class="kw">for </span>DateTime&lt;Tz&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>to_sql(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;ToSqlOutput&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="kw">let </span>date_str = <span class="self">self</span>.with_timezone(<span class="kw-2">&amp;</span>Utc).format(<span class="string">&quot;%F %T%.f%:z&quot;</span>).to_string();
+        <span class="prelude-val">Ok</span>(ToSqlOutput::from(date_str))
     }
 }
 
-<span class="doccomment">/// RFC3339 (&quot;YYYY-MM-DD HH:MM:SS.SSS[+-]HH:MM&quot;) into `DateTime&lt;Utc&gt;`.</span>
-<span class="kw">impl</span> <span class="ident">FromSql</span> <span class="kw">for</span> <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">column_result</span>(<span class="ident">value</span>: <span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">FromSqlResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+<span class="doccomment">/// RFC3339 (&quot;YYYY-MM-DD HH:MM:SS.SSS[+-]HH:MM&quot;) into `DateTime&lt;Utc&gt;`.
+</span><span class="kw">impl </span>FromSql <span class="kw">for </span>DateTime&lt;Utc&gt; {
+    <span class="kw">fn </span>column_result(value: ValueRef&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; FromSqlResult&lt;<span class="self">Self</span>&gt; {
         {
-            <span class="comment">// Try to parse value as rfc3339 first.</span>
-            <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">as_str</span>()<span class="question-mark">?</span>;
+            <span class="comment">// Try to parse value as rfc3339 first.
+            </span><span class="kw">let </span>s = value.as_str()<span class="question-mark">?</span>;
 
-            <span class="kw">let</span> <span class="ident">fmt</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">11</span> <span class="op">&amp;&amp;</span> <span class="ident">s</span>.<span class="ident">as_bytes</span>()[<span class="number">10</span>] <span class="op">==</span> <span class="string">b&#39;T&#39;</span> {
-                <span class="string">&quot;%FT%T%.f%#z&quot;</span>
-            } <span class="kw">else</span> {
-                <span class="string">&quot;%F %T%.f%#z&quot;</span>
-            };
+            <span class="kw">let </span>fmt = <span class="kw">if </span>s.len() &gt;= <span class="number">11 </span>&amp;&amp; s.as_bytes()[<span class="number">10</span>] == <span class="string">b&#39;T&#39; </span>{
+                <span class="string">&quot;%FT%T%.f%#z&quot;
+            </span>} <span class="kw">else </span>{
+                <span class="string">&quot;%F %T%.f%#z&quot;
+            </span>};
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">dt</span>) <span class="op">=</span> <span class="ident">DateTime::parse_from_str</span>(<span class="ident">s</span>, <span class="ident">fmt</span>) {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">dt</span>.<span class="ident">with_timezone</span>(<span class="kw-2">&amp;</span><span class="ident">Utc</span>));
+            <span class="kw">if let </span><span class="prelude-val">Ok</span>(dt) = DateTime::parse_from_str(s, fmt) {
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(dt.with_timezone(<span class="kw-2">&amp;</span>Utc));
             }
         }
 
-        <span class="comment">// Couldn&#39;t parse as rfc3339 - fall back to NaiveDateTime.</span>
-        <span class="ident">NaiveDateTime::column_result</span>(<span class="ident">value</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">dt</span><span class="op">|</span> <span class="ident">Utc</span>.<span class="ident">from_utc_datetime</span>(<span class="kw-2">&amp;</span><span class="ident">dt</span>))
+        <span class="comment">// Couldn&#39;t parse as rfc3339 - fall back to NaiveDateTime.
+        </span>NaiveDateTime::column_result(value).map(|dt| Utc.from_utc_datetime(<span class="kw-2">&amp;</span>dt))
     }
 }
 
-<span class="doccomment">/// RFC3339 (&quot;YYYY-MM-DD HH:MM:SS.SSS[+-]HH:MM&quot;) into `DateTime&lt;Local&gt;`.</span>
-<span class="kw">impl</span> <span class="ident">FromSql</span> <span class="kw">for</span> <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Local</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">column_result</span>(<span class="ident">value</span>: <span class="ident">ValueRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">FromSqlResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">utc_dt</span> <span class="op">=</span> <span class="ident">DateTime</span>::<span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="ident">::column_result</span>(<span class="ident">value</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">utc_dt</span>.<span class="ident">with_timezone</span>(<span class="kw-2">&amp;</span><span class="ident">Local</span>))
+<span class="doccomment">/// RFC3339 (&quot;YYYY-MM-DD HH:MM:SS.SSS[+-]HH:MM&quot;) into `DateTime&lt;Local&gt;`.
+</span><span class="kw">impl </span>FromSql <span class="kw">for </span>DateTime&lt;Local&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>column_result(value: ValueRef&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; FromSqlResult&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>utc_dt = DateTime::&lt;Utc&gt;::column_result(value)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(utc_dt.with_timezone(<span class="kw-2">&amp;</span>Local))
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">crate</span>::{
-        <span class="ident">types</span>::{<span class="ident">FromSql</span>, <span class="ident">ValueRef</span>},
-        <span class="ident">Connection</span>, <span class="prelude-ty">Result</span>,
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use crate</span>::{
+        types::{FromSql, ValueRef},
+        Connection, <span class="prelude-ty">Result</span>,
     };
-    <span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">Duration</span>, <span class="ident">Local</span>, <span class="ident">NaiveDate</span>, <span class="ident">NaiveDateTime</span>, <span class="ident">NaiveTime</span>, <span class="ident">TimeZone</span>, <span class="ident">Utc</span>};
+    <span class="kw">use </span>chrono::{DateTime, Duration, Local, NaiveDate, NaiveDateTime, NaiveTime, TimeZone, Utc};
 
-    <span class="kw">fn</span> <span class="ident">checked_memory_handle</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">Connection::open_in_memory</span>()<span class="question-mark">?</span>;
-        <span class="ident">db</span>.<span class="ident">execute_batch</span>(<span class="string">&quot;CREATE TABLE foo (t TEXT, i INTEGER, f FLOAT, b BLOB)&quot;</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">db</span>)
+    <span class="kw">fn </span>checked_memory_handle() -&gt; <span class="prelude-ty">Result</span>&lt;Connection&gt; {
+        <span class="kw">let </span>db = Connection::open_in_memory()<span class="question-mark">?</span>;
+        db.execute_batch(<span class="string">&quot;CREATE TABLE foo (t TEXT, i INTEGER, f FLOAT, b BLOB)&quot;</span>)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(db)
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_naive_date</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="ident">NaiveDate::from_ymd</span>(<span class="number">2016</span>, <span class="number">2</span>, <span class="number">23</span>);
-        <span class="ident">db</span>.<span class="ident">execute</span>(<span class="string">&quot;INSERT INTO foo (t) VALUES (?)&quot;</span>, [<span class="ident">date</span>])<span class="question-mark">?</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_naive_date() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>db = checked_memory_handle()<span class="question-mark">?</span>;
+        <span class="kw">let </span>date = NaiveDate::from_ymd(<span class="number">2016</span>, <span class="number">2</span>, <span class="number">23</span>);
+        db.execute(<span class="string">&quot;INSERT INTO foo (t) VALUES (?)&quot;</span>, [date])<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">s</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">query_row</span>(<span class="string">&quot;SELECT t FROM foo&quot;</span>, [], <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">get</span>(<span class="number">0</span>))<span class="question-mark">?</span>;
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;2016-02-23&quot;</span>, <span class="ident">s</span>);
-        <span class="kw">let</span> <span class="ident">t</span>: <span class="ident">NaiveDate</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">query_row</span>(<span class="string">&quot;SELECT t FROM foo&quot;</span>, [], <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">get</span>(<span class="number">0</span>))<span class="question-mark">?</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">date</span>, <span class="ident">t</span>);
+        <span class="kw">let </span>s: String = db.query_row(<span class="string">&quot;SELECT t FROM foo&quot;</span>, [], |r| r.get(<span class="number">0</span>))<span class="question-mark">?</span>;
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;2016-02-23&quot;</span>, s);
+        <span class="kw">let </span>t: NaiveDate = db.query_row(<span class="string">&quot;SELECT t FROM foo&quot;</span>, [], |r| r.get(<span class="number">0</span>))<span class="question-mark">?</span>;
+        <span class="macro">assert_eq!</span>(date, t);
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_naive_time</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">time</span> <span class="op">=</span> <span class="ident">NaiveTime::from_hms</span>(<span class="number">23</span>, <span class="number">56</span>, <span class="number">4</span>);
-        <span class="ident">db</span>.<span class="ident">execute</span>(<span class="string">&quot;INSERT INTO foo (t) VALUES (?)&quot;</span>, [<span class="ident">time</span>])<span class="question-mark">?</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_naive_time() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>db = checked_memory_handle()<span class="question-mark">?</span>;
+        <span class="kw">let </span>time = NaiveTime::from_hms(<span class="number">23</span>, <span class="number">56</span>, <span class="number">4</span>);
+        db.execute(<span class="string">&quot;INSERT INTO foo (t) VALUES (?)&quot;</span>, [time])<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">s</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">query_row</span>(<span class="string">&quot;SELECT t FROM foo&quot;</span>, [], <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">get</span>(<span class="number">0</span>))<span class="question-mark">?</span>;
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;23:56:04&quot;</span>, <span class="ident">s</span>);
-        <span class="kw">let</span> <span class="ident">v</span>: <span class="ident">NaiveTime</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">query_row</span>(<span class="string">&quot;SELECT t FROM foo&quot;</span>, [], <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">get</span>(<span class="number">0</span>))<span class="question-mark">?</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">time</span>, <span class="ident">v</span>);
+        <span class="kw">let </span>s: String = db.query_row(<span class="string">&quot;SELECT t FROM foo&quot;</span>, [], |r| r.get(<span class="number">0</span>))<span class="question-mark">?</span>;
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;23:56:04&quot;</span>, s);
+        <span class="kw">let </span>v: NaiveTime = db.query_row(<span class="string">&quot;SELECT t FROM foo&quot;</span>, [], |r| r.get(<span class="number">0</span>))<span class="question-mark">?</span>;
+        <span class="macro">assert_eq!</span>(time, v);
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_naive_date_time</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="ident">NaiveDate::from_ymd</span>(<span class="number">2016</span>, <span class="number">2</span>, <span class="number">23</span>);
-        <span class="kw">let</span> <span class="ident">time</span> <span class="op">=</span> <span class="ident">NaiveTime::from_hms</span>(<span class="number">23</span>, <span class="number">56</span>, <span class="number">4</span>);
-        <span class="kw">let</span> <span class="ident">dt</span> <span class="op">=</span> <span class="ident">NaiveDateTime::new</span>(<span class="ident">date</span>, <span class="ident">time</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_naive_date_time() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>db = checked_memory_handle()<span class="question-mark">?</span>;
+        <span class="kw">let </span>date = NaiveDate::from_ymd(<span class="number">2016</span>, <span class="number">2</span>, <span class="number">23</span>);
+        <span class="kw">let </span>time = NaiveTime::from_hms(<span class="number">23</span>, <span class="number">56</span>, <span class="number">4</span>);
+        <span class="kw">let </span>dt = NaiveDateTime::new(date, time);
 
-        <span class="ident">db</span>.<span class="ident">execute</span>(<span class="string">&quot;INSERT INTO foo (t) VALUES (?)&quot;</span>, [<span class="ident">dt</span>])<span class="question-mark">?</span>;
+        db.execute(<span class="string">&quot;INSERT INTO foo (t) VALUES (?)&quot;</span>, [dt])<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">s</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">query_row</span>(<span class="string">&quot;SELECT t FROM foo&quot;</span>, [], <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">get</span>(<span class="number">0</span>))<span class="question-mark">?</span>;
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;2016-02-23 23:56:04&quot;</span>, <span class="ident">s</span>);
-        <span class="kw">let</span> <span class="ident">v</span>: <span class="ident">NaiveDateTime</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">query_row</span>(<span class="string">&quot;SELECT t FROM foo&quot;</span>, [], <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">get</span>(<span class="number">0</span>))<span class="question-mark">?</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">dt</span>, <span class="ident">v</span>);
+        <span class="kw">let </span>s: String = db.query_row(<span class="string">&quot;SELECT t FROM foo&quot;</span>, [], |r| r.get(<span class="number">0</span>))<span class="question-mark">?</span>;
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;2016-02-23 23:56:04&quot;</span>, s);
+        <span class="kw">let </span>v: NaiveDateTime = db.query_row(<span class="string">&quot;SELECT t FROM foo&quot;</span>, [], |r| r.get(<span class="number">0</span>))<span class="question-mark">?</span>;
+        <span class="macro">assert_eq!</span>(dt, v);
 
-        <span class="ident">db</span>.<span class="ident">execute</span>(<span class="string">&quot;UPDATE foo set b = datetime(t)&quot;</span>, [])<span class="question-mark">?</span>; <span class="comment">// &quot;YYYY-MM-DD HH:MM:SS&quot;</span>
-        <span class="kw">let</span> <span class="ident">hms</span>: <span class="ident">NaiveDateTime</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">query_row</span>(<span class="string">&quot;SELECT b FROM foo&quot;</span>, [], <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">get</span>(<span class="number">0</span>))<span class="question-mark">?</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">dt</span>, <span class="ident">hms</span>);
+        db.execute(<span class="string">&quot;UPDATE foo set b = datetime(t)&quot;</span>, [])<span class="question-mark">?</span>; <span class="comment">// &quot;YYYY-MM-DD HH:MM:SS&quot;
+        </span><span class="kw">let </span>hms: NaiveDateTime = db.query_row(<span class="string">&quot;SELECT b FROM foo&quot;</span>, [], |r| r.get(<span class="number">0</span>))<span class="question-mark">?</span>;
+        <span class="macro">assert_eq!</span>(dt, hms);
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_date_time_utc</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="ident">NaiveDate::from_ymd</span>(<span class="number">2016</span>, <span class="number">2</span>, <span class="number">23</span>);
-        <span class="kw">let</span> <span class="ident">time</span> <span class="op">=</span> <span class="ident">NaiveTime::from_hms_milli</span>(<span class="number">23</span>, <span class="number">56</span>, <span class="number">4</span>, <span class="number">789</span>);
-        <span class="kw">let</span> <span class="ident">dt</span> <span class="op">=</span> <span class="ident">NaiveDateTime::new</span>(<span class="ident">date</span>, <span class="ident">time</span>);
-        <span class="kw">let</span> <span class="ident">utc</span> <span class="op">=</span> <span class="ident">Utc</span>.<span class="ident">from_utc_datetime</span>(<span class="kw-2">&amp;</span><span class="ident">dt</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_date_time_utc() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>db = checked_memory_handle()<span class="question-mark">?</span>;
+        <span class="kw">let </span>date = NaiveDate::from_ymd(<span class="number">2016</span>, <span class="number">2</span>, <span class="number">23</span>);
+        <span class="kw">let </span>time = NaiveTime::from_hms_milli(<span class="number">23</span>, <span class="number">56</span>, <span class="number">4</span>, <span class="number">789</span>);
+        <span class="kw">let </span>dt = NaiveDateTime::new(date, time);
+        <span class="kw">let </span>utc = Utc.from_utc_datetime(<span class="kw-2">&amp;</span>dt);
 
-        <span class="ident">db</span>.<span class="ident">execute</span>(<span class="string">&quot;INSERT INTO foo (t) VALUES (?)&quot;</span>, [<span class="ident">utc</span>])<span class="question-mark">?</span>;
+        db.execute(<span class="string">&quot;INSERT INTO foo (t) VALUES (?)&quot;</span>, [utc])<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">s</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">query_row</span>(<span class="string">&quot;SELECT t FROM foo&quot;</span>, [], <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">get</span>(<span class="number">0</span>))<span class="question-mark">?</span>;
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;2016-02-23 23:56:04.789+00:00&quot;</span>, <span class="ident">s</span>);
+        <span class="kw">let </span>s: String = db.query_row(<span class="string">&quot;SELECT t FROM foo&quot;</span>, [], |r| r.get(<span class="number">0</span>))<span class="question-mark">?</span>;
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;2016-02-23 23:56:04.789+00:00&quot;</span>, s);
 
-        <span class="kw">let</span> <span class="ident">v1</span>: <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">query_row</span>(<span class="string">&quot;SELECT t FROM foo&quot;</span>, [], <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">get</span>(<span class="number">0</span>))<span class="question-mark">?</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">utc</span>, <span class="ident">v1</span>);
+        <span class="kw">let </span>v1: DateTime&lt;Utc&gt; = db.query_row(<span class="string">&quot;SELECT t FROM foo&quot;</span>, [], |r| r.get(<span class="number">0</span>))<span class="question-mark">?</span>;
+        <span class="macro">assert_eq!</span>(utc, v1);
 
-        <span class="kw">let</span> <span class="ident">v2</span>: <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">db</span>.<span class="ident">query_row</span>(<span class="string">&quot;SELECT &#39;2016-02-23 23:56:04.789&#39;&quot;</span>, [], <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">get</span>(<span class="number">0</span>))<span class="question-mark">?</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">utc</span>, <span class="ident">v2</span>);
+        <span class="kw">let </span>v2: DateTime&lt;Utc&gt; =
+            db.query_row(<span class="string">&quot;SELECT &#39;2016-02-23 23:56:04.789&#39;&quot;</span>, [], |r| r.get(<span class="number">0</span>))<span class="question-mark">?</span>;
+        <span class="macro">assert_eq!</span>(utc, v2);
 
-        <span class="kw">let</span> <span class="ident">v3</span>: <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">query_row</span>(<span class="string">&quot;SELECT &#39;2016-02-23 23:56:04&#39;&quot;</span>, [], <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">get</span>(<span class="number">0</span>))<span class="question-mark">?</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">utc</span> <span class="op">-</span> <span class="ident">Duration::milliseconds</span>(<span class="number">789</span>), <span class="ident">v3</span>);
+        <span class="kw">let </span>v3: DateTime&lt;Utc&gt; = db.query_row(<span class="string">&quot;SELECT &#39;2016-02-23 23:56:04&#39;&quot;</span>, [], |r| r.get(<span class="number">0</span>))<span class="question-mark">?</span>;
+        <span class="macro">assert_eq!</span>(utc - Duration::milliseconds(<span class="number">789</span>), v3);
 
-        <span class="kw">let</span> <span class="ident">v4</span>: <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">db</span>.<span class="ident">query_row</span>(<span class="string">&quot;SELECT &#39;2016-02-23 23:56:04.789+00:00&#39;&quot;</span>, [], <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">get</span>(<span class="number">0</span>))<span class="question-mark">?</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">utc</span>, <span class="ident">v4</span>);
+        <span class="kw">let </span>v4: DateTime&lt;Utc&gt; =
+            db.query_row(<span class="string">&quot;SELECT &#39;2016-02-23 23:56:04.789+00:00&#39;&quot;</span>, [], |r| r.get(<span class="number">0</span>))<span class="question-mark">?</span>;
+        <span class="macro">assert_eq!</span>(utc, v4);
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_date_time_local</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="ident">NaiveDate::from_ymd</span>(<span class="number">2016</span>, <span class="number">2</span>, <span class="number">23</span>);
-        <span class="kw">let</span> <span class="ident">time</span> <span class="op">=</span> <span class="ident">NaiveTime::from_hms_milli</span>(<span class="number">23</span>, <span class="number">56</span>, <span class="number">4</span>, <span class="number">789</span>);
-        <span class="kw">let</span> <span class="ident">dt</span> <span class="op">=</span> <span class="ident">NaiveDateTime::new</span>(<span class="ident">date</span>, <span class="ident">time</span>);
-        <span class="kw">let</span> <span class="ident">local</span> <span class="op">=</span> <span class="ident">Local</span>.<span class="ident">from_local_datetime</span>(<span class="kw-2">&amp;</span><span class="ident">dt</span>).<span class="ident">single</span>().<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_date_time_local() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>db = checked_memory_handle()<span class="question-mark">?</span>;
+        <span class="kw">let </span>date = NaiveDate::from_ymd(<span class="number">2016</span>, <span class="number">2</span>, <span class="number">23</span>);
+        <span class="kw">let </span>time = NaiveTime::from_hms_milli(<span class="number">23</span>, <span class="number">56</span>, <span class="number">4</span>, <span class="number">789</span>);
+        <span class="kw">let </span>dt = NaiveDateTime::new(date, time);
+        <span class="kw">let </span>local = Local.from_local_datetime(<span class="kw-2">&amp;</span>dt).single().unwrap();
 
-        <span class="ident">db</span>.<span class="ident">execute</span>(<span class="string">&quot;INSERT INTO foo (t) VALUES (?)&quot;</span>, [<span class="ident">local</span>])<span class="question-mark">?</span>;
+        db.execute(<span class="string">&quot;INSERT INTO foo (t) VALUES (?)&quot;</span>, [local])<span class="question-mark">?</span>;
 
-        <span class="comment">// Stored string should be in UTC</span>
-        <span class="kw">let</span> <span class="ident">s</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">query_row</span>(<span class="string">&quot;SELECT t FROM foo&quot;</span>, [], <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">get</span>(<span class="number">0</span>))<span class="question-mark">?</span>;
-        <span class="macro">assert!</span>(<span class="ident">s</span>.<span class="ident">ends_with</span>(<span class="string">&quot;+00:00&quot;</span>));
+        <span class="comment">// Stored string should be in UTC
+        </span><span class="kw">let </span>s: String = db.query_row(<span class="string">&quot;SELECT t FROM foo&quot;</span>, [], |r| r.get(<span class="number">0</span>))<span class="question-mark">?</span>;
+        <span class="macro">assert!</span>(s.ends_with(<span class="string">&quot;+00:00&quot;</span>));
 
-        <span class="kw">let</span> <span class="ident">v</span>: <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Local</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">query_row</span>(<span class="string">&quot;SELECT t FROM foo&quot;</span>, [], <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">get</span>(<span class="number">0</span>))<span class="question-mark">?</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">local</span>, <span class="ident">v</span>);
+        <span class="kw">let </span>v: DateTime&lt;Local&gt; = db.query_row(<span class="string">&quot;SELECT t FROM foo&quot;</span>, [], |r| r.get(<span class="number">0</span>))<span class="question-mark">?</span>;
+        <span class="macro">assert_eq!</span>(local, v);
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_sqlite_functions</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">result</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NaiveTime</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">query_row</span>(<span class="string">&quot;SELECT CURRENT_TIME&quot;</span>, [], <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">get</span>(<span class="number">0</span>));
-        <span class="macro">assert!</span>(<span class="ident">result</span>.<span class="ident">is_ok</span>());
-        <span class="kw">let</span> <span class="ident">result</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NaiveDate</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">query_row</span>(<span class="string">&quot;SELECT CURRENT_DATE&quot;</span>, [], <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">get</span>(<span class="number">0</span>));
-        <span class="macro">assert!</span>(<span class="ident">result</span>.<span class="ident">is_ok</span>());
-        <span class="kw">let</span> <span class="ident">result</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NaiveDateTime</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">db</span>.<span class="ident">query_row</span>(<span class="string">&quot;SELECT CURRENT_TIMESTAMP&quot;</span>, [], <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">get</span>(<span class="number">0</span>));
-        <span class="macro">assert!</span>(<span class="ident">result</span>.<span class="ident">is_ok</span>());
-        <span class="kw">let</span> <span class="ident">result</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">db</span>.<span class="ident">query_row</span>(<span class="string">&quot;SELECT CURRENT_TIMESTAMP&quot;</span>, [], <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">get</span>(<span class="number">0</span>));
-        <span class="macro">assert!</span>(<span class="ident">result</span>.<span class="ident">is_ok</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_sqlite_functions() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>db = checked_memory_handle()<span class="question-mark">?</span>;
+        <span class="kw">let </span>result: <span class="prelude-ty">Result</span>&lt;NaiveTime&gt; = db.query_row(<span class="string">&quot;SELECT CURRENT_TIME&quot;</span>, [], |r| r.get(<span class="number">0</span>));
+        <span class="macro">assert!</span>(result.is_ok());
+        <span class="kw">let </span>result: <span class="prelude-ty">Result</span>&lt;NaiveDate&gt; = db.query_row(<span class="string">&quot;SELECT CURRENT_DATE&quot;</span>, [], |r| r.get(<span class="number">0</span>));
+        <span class="macro">assert!</span>(result.is_ok());
+        <span class="kw">let </span>result: <span class="prelude-ty">Result</span>&lt;NaiveDateTime&gt; =
+            db.query_row(<span class="string">&quot;SELECT CURRENT_TIMESTAMP&quot;</span>, [], |r| r.get(<span class="number">0</span>));
+        <span class="macro">assert!</span>(result.is_ok());
+        <span class="kw">let </span>result: <span class="prelude-ty">Result</span>&lt;DateTime&lt;Utc&gt;&gt; =
+            db.query_row(<span class="string">&quot;SELECT CURRENT_TIMESTAMP&quot;</span>, [], |r| r.get(<span class="number">0</span>));
+        <span class="macro">assert!</span>(result.is_ok());
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_naive_date_time_param</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">result</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">query_row</span>(<span class="string">&quot;SELECT 1 WHERE ? BETWEEN datetime(&#39;now&#39;, &#39;-1 minute&#39;) AND datetime(&#39;now&#39;, &#39;+1 minute&#39;)&quot;</span>, [<span class="ident">Utc::now</span>().<span class="ident">naive_utc</span>()], <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">get</span>(<span class="number">0</span>));
-        <span class="macro">assert!</span>(<span class="ident">result</span>.<span class="ident">is_ok</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_naive_date_time_param() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>db = checked_memory_handle()<span class="question-mark">?</span>;
+        <span class="kw">let </span>result: <span class="prelude-ty">Result</span>&lt;bool&gt; = db.query_row(<span class="string">&quot;SELECT 1 WHERE ? BETWEEN datetime(&#39;now&#39;, &#39;-1 minute&#39;) AND datetime(&#39;now&#39;, &#39;+1 minute&#39;)&quot;</span>, [Utc::now().naive_utc()], |r| r.get(<span class="number">0</span>));
+        <span class="macro">assert!</span>(result.is_ok());
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_date_time_param</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">checked_memory_handle</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">result</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">query_row</span>(<span class="string">&quot;SELECT 1 WHERE ? BETWEEN datetime(&#39;now&#39;, &#39;-1 minute&#39;) AND datetime(&#39;now&#39;, &#39;+1 minute&#39;)&quot;</span>, [<span class="ident">Utc::now</span>()], <span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">get</span>(<span class="number">0</span>));
-        <span class="macro">assert!</span>(<span class="ident">result</span>.<span class="ident">is_ok</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_date_time_param() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>db = checked_memory_handle()<span class="question-mark">?</span>;
+        <span class="kw">let </span>result: <span class="prelude-ty">Result</span>&lt;bool&gt; = db.query_row(<span class="string">&quot;SELECT 1 WHERE ? BETWEEN datetime(&#39;now&#39;, &#39;-1 minute&#39;) AND datetime(&#39;now&#39;, &#39;+1 minute&#39;)&quot;</span>, [Utc::now()], |r| r.get(<span class="number">0</span>));
+        <span class="macro">assert!</span>(result.is_ok());
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_lenient_parse_timezone</span>() {
-        <span class="macro">assert!</span>(<span class="ident">DateTime</span>::<span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="ident">::column_result</span>(<span class="ident">ValueRef::Text</span>(<span class="string">b&quot;1970-01-01T00:00:00Z&quot;</span>)).<span class="ident">is_ok</span>());
-        <span class="macro">assert!</span>(<span class="ident">DateTime</span>::<span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="ident">::column_result</span>(<span class="ident">ValueRef::Text</span>(<span class="string">b&quot;1970-01-01T00:00:00+00&quot;</span>)).<span class="ident">is_ok</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_lenient_parse_timezone() {
+        <span class="macro">assert!</span>(DateTime::&lt;Utc&gt;::column_result(ValueRef::Text(<span class="string">b&quot;1970-01-01T00:00:00Z&quot;</span>)).is_ok());
+        <span class="macro">assert!</span>(DateTime::&lt;Utc&gt;::column_result(ValueRef::Text(<span class="string">b&quot;1970-01-01T00:00:00+00&quot;</span>)).is_ok());
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rusqlite" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rusqlite" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

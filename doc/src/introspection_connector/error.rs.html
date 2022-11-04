@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/connectors/introspection-connector/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../introspection_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/connectors/introspection-connector/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../introspection_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -74,81 +74,81 @@
 <span id="74">74</span>
 <span id="75">75</span>
 <span id="76">76</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">thiserror::Error</span>;
-<span class="kw">use</span> <span class="ident">user_facing_errors::KnownError</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>thiserror::Error;
+<span class="kw">use </span>user_facing_errors::KnownError;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
-<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">kind</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConnectorError</span> {
-    <span class="doccomment">/// An optional error already rendered for users in case the introspection core does not handle it.</span>
-    <span class="kw">pub</span> <span class="ident">user_facing_error</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KnownError</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The error information for internal use.</span>
-    <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">ErrorKind</span>,
+<span class="attribute">#[derive(Debug, Error)]
+#[error(<span class="string">&quot;{}&quot;</span>, kind)]
+</span><span class="kw">pub struct </span>ConnectorError {
+    <span class="doccomment">/// An optional error already rendered for users in case the introspection core does not handle it.
+    </span><span class="kw">pub </span>user_facing_error: <span class="prelude-ty">Option</span>&lt;KnownError&gt;,
+    <span class="doccomment">/// The error information for internal use.
+    </span><span class="kw">pub </span>kind: ErrorKind,
 }
 
-<span class="kw">impl</span> <span class="ident">ConnectorError</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_kind</span>(<span class="ident">kind</span>: <span class="ident">ErrorKind</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">ConnectorError</span> {
-            <span class="ident">user_facing_error</span>: <span class="prelude-val">None</span>,
-            <span class="ident">kind</span>,
+<span class="kw">impl </span>ConnectorError {
+    <span class="kw">pub fn </span>from_kind(kind: ErrorKind) -&gt; <span class="self">Self </span>{
+        ConnectorError {
+            user_facing_error: <span class="prelude-val">None</span>,
+            kind,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_facing_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">KnownError</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">user_facing_error</span>.<span class="ident">as_ref</span>()
+    <span class="kw">pub fn </span>user_facing_error(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>KnownError&gt; {
+        <span class="self">self</span>.user_facing_error.as_ref()
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ErrorKind</span> {
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;{0}&quot;</span>)]</span>
-    <span class="ident">Generic</span>(<span class="ident">anyhow::Error</span>),
+<span class="attribute">#[derive(Debug, Error)]
+</span><span class="kw">pub enum </span>ErrorKind {
+    <span class="attribute">#[error(<span class="string">&quot;{0}&quot;</span>)]
+    </span>Generic(anyhow::Error),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Error querying the database: {0}&quot;</span>)]</span>
-    <span class="ident">QueryError</span>(<span class="ident">anyhow::Error</span>),
+    <span class="attribute">#[error(<span class="string">&quot;Error querying the database: {0}&quot;</span>)]
+    </span>QueryError(anyhow::Error),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Database &#39;{}&#39; does not exist&quot;</span>, <span class="ident">db_name</span>)]</span>
-    <span class="ident">DatabaseDoesNotExist</span> { <span class="ident">db_name</span>: <span class="ident">String</span> },
+    <span class="attribute">#[error(<span class="string">&quot;Database &#39;{}&#39; does not exist&quot;</span>, db_name)]
+    </span>DatabaseDoesNotExist { db_name: String },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Access denied to database &#39;{}&#39;&quot;</span>, <span class="ident">database_name</span>)]</span>
-    <span class="ident">DatabaseAccessDenied</span> { <span class="ident">database_name</span>: <span class="ident">String</span> },
+    <span class="attribute">#[error(<span class="string">&quot;Access denied to database &#39;{}&#39;&quot;</span>, database_name)]
+    </span>DatabaseAccessDenied { database_name: String },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Database &#39;{}&#39; already exists&quot;</span>, <span class="ident">db_name</span>)]</span>
-    <span class="ident">DatabaseAlreadyExists</span> { <span class="ident">db_name</span>: <span class="ident">String</span> },
+    <span class="attribute">#[error(<span class="string">&quot;Database &#39;{}&#39; already exists&quot;</span>, db_name)]
+    </span>DatabaseAlreadyExists { db_name: String },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Could not create the database. {}&quot;</span>, <span class="ident">explanation</span>)]</span>
-    <span class="ident">DatabaseCreationFailed</span> { <span class="ident">explanation</span>: <span class="ident">String</span> },
+    <span class="attribute">#[error(<span class="string">&quot;Could not create the database. {}&quot;</span>, explanation)]
+    </span>DatabaseCreationFailed { explanation: String },
 
-    <span class="attribute">#[<span class="ident">error</span>(
+    <span class="attribute">#[error(
         <span class="string">&quot;Could not introspect the database since the schema was inconsistent. {}&quot;</span>,
-        <span class="ident">explanation</span>
-    )]</span>
-    <span class="ident">DatabaseSchemaInconsistent</span> { <span class="ident">explanation</span>: <span class="ident">String</span> },
+        explanation
+    )]
+    </span>DatabaseSchemaInconsistent { explanation: String },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Authentication failed for user &#39;{}&#39;&quot;</span>, <span class="ident">user</span>)]</span>
-    <span class="ident">AuthenticationFailed</span> { <span class="ident">user</span>: <span class="ident">String</span> },
+    <span class="attribute">#[error(<span class="string">&quot;Authentication failed for user &#39;{}&#39;&quot;</span>, user)]
+    </span>AuthenticationFailed { user: String },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">InvalidDatabaseUrl</span>(<span class="ident">String</span>),
+    <span class="attribute">#[error(<span class="string">&quot;{}&quot;</span>, _0)]
+    </span>InvalidDatabaseUrl(String),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Failed to connect to the database at `{}`.&quot;</span>, <span class="ident">host</span>)]</span>
-    <span class="ident">ConnectionError</span> {
-        <span class="ident">host</span>: <span class="ident">String</span>,
-        <span class="attribute">#[<span class="ident">source</span>]</span>
-        <span class="ident">cause</span>: <span class="ident">anyhow::Error</span>,
+    <span class="attribute">#[error(<span class="string">&quot;Failed to connect to the database at `{}`.&quot;</span>, host)]
+    </span>ConnectionError {
+        host: String,
+        <span class="attribute">#[source]
+        </span>cause: anyhow::Error,
     },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Connect timed out&quot;</span>)]</span>
-    <span class="ident">ConnectTimeout</span>,
+    <span class="attribute">#[error(<span class="string">&quot;Connect timed out&quot;</span>)]
+    </span>ConnectTimeout,
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Operation timed out ({0})&quot;</span>)]</span>
-    <span class="ident">Timeout</span>(<span class="ident">String</span>),
+    <span class="attribute">#[error(<span class="string">&quot;Operation timed out ({0})&quot;</span>)]
+    </span>Timeout(String),
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Error opening a TLS connection. {}&quot;</span>, <span class="ident">message</span>)]</span>
-    <span class="ident">TlsError</span> { <span class="ident">message</span>: <span class="ident">String</span> },
+    <span class="attribute">#[error(<span class="string">&quot;Error opening a TLS connection. {}&quot;</span>, message)]
+    </span>TlsError { message: String },
 
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Preview feature not enabled: {}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">PreviewFeatureNotEnabled</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>),
+    <span class="attribute">#[error(<span class="string">&quot;Preview feature not enabled: {}&quot;</span>, _0)]
+    </span>PreviewFeatureNotEnabled(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str),
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="introspection_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="introspection_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

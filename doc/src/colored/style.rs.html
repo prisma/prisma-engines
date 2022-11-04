@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/colored-2.0.0/src/style.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>style.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../colored/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../colored/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../colored/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/colored-2.0.0/src/style.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>style.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../colored/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../colored/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../colored/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -291,298 +291,298 @@
 <span id="291">291</span>
 <span id="292">292</span>
 <span id="293">293</span>
-</pre><pre class="rust"><code><span class="kw">const</span> <span class="ident">CLEARV</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0b0000_0000</span>;
-<span class="kw">const</span> <span class="ident">BOLD</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0b0000_0001</span>;
-<span class="kw">const</span> <span class="ident">UNDERLINE</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0b0000_0010</span>;
-<span class="kw">const</span> <span class="ident">REVERSED</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0b0000_0100</span>;
-<span class="kw">const</span> <span class="ident">ITALIC</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0b0000_1000</span>;
-<span class="kw">const</span> <span class="ident">BLINK</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0b0001_0000</span>;
-<span class="kw">const</span> <span class="ident">HIDDEN</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0b0010_0000</span>;
-<span class="kw">const</span> <span class="ident">DIMMED</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0b0100_0000</span>;
-<span class="kw">const</span> <span class="ident">STRIKETHROUGH</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0b1000_0000</span>;
+</pre><pre class="rust"><code><span class="kw">const </span>CLEARV: u8 = <span class="number">0b0000_0000</span>;
+<span class="kw">const </span>BOLD: u8 = <span class="number">0b0000_0001</span>;
+<span class="kw">const </span>UNDERLINE: u8 = <span class="number">0b0000_0010</span>;
+<span class="kw">const </span>REVERSED: u8 = <span class="number">0b0000_0100</span>;
+<span class="kw">const </span>ITALIC: u8 = <span class="number">0b0000_1000</span>;
+<span class="kw">const </span>BLINK: u8 = <span class="number">0b0001_0000</span>;
+<span class="kw">const </span>HIDDEN: u8 = <span class="number">0b0010_0000</span>;
+<span class="kw">const </span>DIMMED: u8 = <span class="number">0b0100_0000</span>;
+<span class="kw">const </span>STRIKETHROUGH: u8 = <span class="number">0b1000_0000</span>;
 
-<span class="kw">static</span> <span class="ident">STYLES</span>: [(<span class="ident">u8</span>, <span class="ident">Styles</span>); <span class="number">8</span>] <span class="op">=</span> [
-    (<span class="ident">BOLD</span>, <span class="ident">Styles::Bold</span>),
-    (<span class="ident">DIMMED</span>, <span class="ident">Styles::Dimmed</span>),
-    (<span class="ident">UNDERLINE</span>, <span class="ident">Styles::Underline</span>),
-    (<span class="ident">REVERSED</span>, <span class="ident">Styles::Reversed</span>),
-    (<span class="ident">ITALIC</span>, <span class="ident">Styles::Italic</span>),
-    (<span class="ident">BLINK</span>, <span class="ident">Styles::Blink</span>),
-    (<span class="ident">HIDDEN</span>, <span class="ident">Styles::Hidden</span>),
-    (<span class="ident">STRIKETHROUGH</span>, <span class="ident">Styles::Strikethrough</span>),
+<span class="kw">static </span>STYLES: [(u8, Styles); <span class="number">8</span>] = [
+    (BOLD, Styles::Bold),
+    (DIMMED, Styles::Dimmed),
+    (UNDERLINE, Styles::Underline),
+    (REVERSED, Styles::Reversed),
+    (ITALIC, Styles::Italic),
+    (BLINK, Styles::Blink),
+    (HIDDEN, Styles::Hidden),
+    (STRIKETHROUGH, Styles::Strikethrough),
 ];
 
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">CLEAR</span>: <span class="ident">Style</span> <span class="op">=</span> <span class="ident">Style</span>(<span class="ident">CLEARV</span>);
+<span class="kw">pub static </span>CLEAR: Style = Style(CLEARV);
 
-<span class="doccomment">/// A combinatorial style such as bold, italics, dimmed, etc.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Style</span>(<span class="ident">u8</span>);
+<span class="doccomment">/// A combinatorial style such as bold, italics, dimmed, etc.
+</span><span class="attribute">#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+</span><span class="kw">pub struct </span>Style(u8);
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Styles</span> {
-    <span class="ident">Clear</span>,
-    <span class="ident">Bold</span>,
-    <span class="ident">Dimmed</span>,
-    <span class="ident">Underline</span>,
-    <span class="ident">Reversed</span>,
-    <span class="ident">Italic</span>,
-    <span class="ident">Blink</span>,
-    <span class="ident">Hidden</span>,
-    <span class="ident">Strikethrough</span>,
+<span class="attribute">#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+#[allow(missing_docs)]
+</span><span class="kw">pub enum </span>Styles {
+    Clear,
+    Bold,
+    Dimmed,
+    Underline,
+    Reversed,
+    Italic,
+    Blink,
+    Hidden,
+    Strikethrough,
 }
 
-<span class="kw">impl</span> <span class="ident">Styles</span> {
-    <span class="kw">fn</span> <span class="ident">to_str</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Styles::Clear</span> =&gt; <span class="string">&quot;&quot;</span>, <span class="comment">// unreachable, but we don&#39;t want to panic</span>
-            <span class="ident">Styles::Bold</span> =&gt; <span class="string">&quot;1&quot;</span>,
-            <span class="ident">Styles::Dimmed</span> =&gt; <span class="string">&quot;2&quot;</span>,
-            <span class="ident">Styles::Italic</span> =&gt; <span class="string">&quot;3&quot;</span>,
-            <span class="ident">Styles::Underline</span> =&gt; <span class="string">&quot;4&quot;</span>,
-            <span class="ident">Styles::Blink</span> =&gt; <span class="string">&quot;5&quot;</span>,
-            <span class="ident">Styles::Reversed</span> =&gt; <span class="string">&quot;7&quot;</span>,
-            <span class="ident">Styles::Hidden</span> =&gt; <span class="string">&quot;8&quot;</span>,
-            <span class="ident">Styles::Strikethrough</span> =&gt; <span class="string">&quot;9&quot;</span>,
+<span class="kw">impl </span>Styles {
+    <span class="kw">fn </span>to_str&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
+        <span class="kw">match </span><span class="self">self </span>{
+            Styles::Clear =&gt; <span class="string">&quot;&quot;</span>, <span class="comment">// unreachable, but we don&#39;t want to panic
+            </span>Styles::Bold =&gt; <span class="string">&quot;1&quot;</span>,
+            Styles::Dimmed =&gt; <span class="string">&quot;2&quot;</span>,
+            Styles::Italic =&gt; <span class="string">&quot;3&quot;</span>,
+            Styles::Underline =&gt; <span class="string">&quot;4&quot;</span>,
+            Styles::Blink =&gt; <span class="string">&quot;5&quot;</span>,
+            Styles::Reversed =&gt; <span class="string">&quot;7&quot;</span>,
+            Styles::Hidden =&gt; <span class="string">&quot;8&quot;</span>,
+            Styles::Strikethrough =&gt; <span class="string">&quot;9&quot;</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">to_u8</span>(<span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Styles::Clear</span> =&gt; <span class="ident">CLEARV</span>,
-            <span class="ident">Styles::Bold</span> =&gt; <span class="ident">BOLD</span>,
-            <span class="ident">Styles::Dimmed</span> =&gt; <span class="ident">DIMMED</span>,
-            <span class="ident">Styles::Italic</span> =&gt; <span class="ident">ITALIC</span>,
-            <span class="ident">Styles::Underline</span> =&gt; <span class="ident">UNDERLINE</span>,
-            <span class="ident">Styles::Blink</span> =&gt; <span class="ident">BLINK</span>,
-            <span class="ident">Styles::Reversed</span> =&gt; <span class="ident">REVERSED</span>,
-            <span class="ident">Styles::Hidden</span> =&gt; <span class="ident">HIDDEN</span>,
-            <span class="ident">Styles::Strikethrough</span> =&gt; <span class="ident">STRIKETHROUGH</span>,
+    <span class="kw">fn </span>to_u8(<span class="self">self</span>) -&gt; u8 {
+        <span class="kw">match </span><span class="self">self </span>{
+            Styles::Clear =&gt; CLEARV,
+            Styles::Bold =&gt; BOLD,
+            Styles::Dimmed =&gt; DIMMED,
+            Styles::Italic =&gt; ITALIC,
+            Styles::Underline =&gt; UNDERLINE,
+            Styles::Blink =&gt; BLINK,
+            Styles::Reversed =&gt; REVERSED,
+            Styles::Hidden =&gt; HIDDEN,
+            Styles::Strikethrough =&gt; STRIKETHROUGH,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">from_u8</span>(<span class="ident">u</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Styles</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">u</span> <span class="op">==</span> <span class="ident">CLEARV</span> {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="kw">fn </span>from_u8(u: u8) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;Styles&gt;&gt; {
+        <span class="kw">if </span>u == CLEARV {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Styles</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">STYLES</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="op">&amp;&amp;</span>(<span class="kw-2">ref</span> <span class="ident">mask</span>, <span class="kw">_</span>)<span class="op">|</span> (<span class="number">0</span> <span class="op">!</span><span class="op">=</span> (<span class="ident">u</span> <span class="op">&amp;</span> <span class="ident">mask</span>)))
-            .<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="ident">value</span>)<span class="op">|</span> <span class="ident">value</span>)
-            .<span class="ident">collect</span>();
-        <span class="kw">if</span> <span class="ident">res</span>.<span class="ident">is_empty</span>() {
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">res</span>)
+        <span class="kw">let </span>res: Vec&lt;Styles&gt; = STYLES
+            .iter()
+            .filter(|&amp;&amp;(<span class="kw-2">ref </span>mask, <span class="kw">_</span>)| (<span class="number">0 </span>!= (u &amp; mask)))
+            .map(|<span class="kw-2">&amp;</span>(<span class="kw">_</span>, value)| value)
+            .collect();
+        <span class="kw">if </span>res.is_empty() {
+            <span class="prelude-val">None
+        </span>} <span class="kw">else </span>{
+            <span class="prelude-val">Some</span>(res)
         }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Style</span> {
-    <span class="doccomment">/// Check if the current style has one of [`Styles`](Styles) switched on.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use colored::*;</span>
-    <span class="doccomment">/// let colored = &quot;&quot;.bold().italic();</span>
-    <span class="doccomment">/// assert_eq!(colored.style().contains(Styles::Bold), true);</span>
-    <span class="doccomment">/// assert_eq!(colored.style().contains(Styles::Italic), true);</span>
-    <span class="doccomment">/// assert_eq!(colored.style().contains(Styles::Dimmed), false);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains</span>(<span class="self">self</span>, <span class="ident">style</span>: <span class="ident">Styles</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">style</span>.<span class="ident">to_u8</span>();
-        <span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="ident">s</span> <span class="op">==</span> <span class="ident">s</span>
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_str</span>(<span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="ident">styles</span> <span class="op">=</span> <span class="ident">Styles::from_u8</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="ident">unwrap_or_default</span>();
-        <span class="ident">styles</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">to_str</span>())
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-            .<span class="ident">join</span>(<span class="string">&quot;;&quot;</span>)
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">add</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">two</span>: <span class="ident">Styles</span>) {
-        <span class="self">self</span>.<span class="number">0</span> <span class="op">|</span><span class="op">=</span> <span class="ident">two</span>.<span class="ident">to_u8</span>();
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="kw">impl </span>Style {
+    <span class="doccomment">/// Check if the current style has one of [`Styles`](Styles) switched on.
+    ///
+    /// ```rust
+    /// # use colored::*;
+    /// let colored = &quot;&quot;.bold().italic();
+    /// assert_eq!(colored.style().contains(Styles::Bold), true);
+    /// assert_eq!(colored.style().contains(Styles::Italic), true);
+    /// assert_eq!(colored.style().contains(Styles::Dimmed), false);
+    /// ```
+    </span><span class="kw">pub fn </span>contains(<span class="self">self</span>, style: Styles) -&gt; bool {
+        <span class="kw">let </span>s = style.to_u8();
+        <span class="self">self</span>.<span class="number">0 </span>&amp; s == s
+    }
 
-    <span class="kw">mod</span> <span class="ident">u8_to_styles_invalid_is_none</span> {
-        <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::Styles</span>;
-        <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::CLEARV</span>;
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>to_str(<span class="self">self</span>) -&gt; String {
+        <span class="kw">let </span>styles = Styles::from_u8(<span class="self">self</span>.<span class="number">0</span>).unwrap_or_default();
+        styles
+            .iter()
+            .map(|s| s.to_str())
+            .collect::&lt;Vec&lt;<span class="kw-2">&amp;</span>str&gt;&gt;()
+            .join(<span class="string">&quot;;&quot;</span>)
+    }
 
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">empty_is_none</span>() {
-            <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, <span class="ident">Styles::from_u8</span>(<span class="ident">CLEARV</span>))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>add(<span class="kw-2">&amp;mut </span><span class="self">self</span>, two: Styles) {
+        <span class="self">self</span>.<span class="number">0 </span>|= two.to_u8();
+    }
+}
+
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+
+    <span class="kw">mod </span>u8_to_styles_invalid_is_none {
+        <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::Styles;
+        <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::CLEARV;
+
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>empty_is_none() {
+            <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, Styles::from_u8(CLEARV))
         }
     }
 
-    <span class="kw">mod</span> <span class="ident">u8_to_styles_isomorphism</span> {
-        <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::Styles</span>;
-        <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span></span>::{
-            <span class="ident">BLINK</span>, <span class="ident">BOLD</span>, <span class="ident">DIMMED</span>, <span class="ident">HIDDEN</span>, <span class="ident">ITALIC</span>, <span class="ident">REVERSED</span>, <span class="ident">STRIKETHROUGH</span>, <span class="ident">UNDERLINE</span>,
+    <span class="kw">mod </span>u8_to_styles_isomorphism {
+        <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::Styles;
+        <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::{
+            BLINK, BOLD, DIMMED, HIDDEN, ITALIC, REVERSED, STRIKETHROUGH, UNDERLINE,
         };
 
-        <span class="macro">macro_rules!</span> <span class="ident">value_isomorph</span> {
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span>) =&gt; {
-                <span class="attribute">#[<span class="ident">test</span>]</span>
-                <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>() {
-                    <span class="kw">let</span> <span class="ident">u</span> <span class="op">=</span> <span class="ident">Styles::from_u8</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>);
+        <span class="macro">macro_rules! </span>value_isomorph {
+            (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$value</span>:expr) =&gt; {
+                <span class="attribute">#[test]
+                </span><span class="kw">fn </span><span class="macro-nonterminal">$name</span>() {
+                    <span class="kw">let </span>u = Styles::from_u8(<span class="macro-nonterminal">$value</span>);
                     <span class="macro">assert!</span>(
-                        <span class="ident">u</span>.<span class="ident">is_some</span>(),
+                        u.is_some(),
                         <span class="string">&quot;{}: Styles::from_u8 -&gt; None&quot;</span>,
-                        <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>)
+                        <span class="macro">stringify!</span>(<span class="macro-nonterminal">$value</span>)
                     );
-                    <span class="kw">let</span> <span class="ident">u</span> <span class="op">=</span> <span class="ident">u</span>.<span class="ident">unwrap</span>();
+                    <span class="kw">let </span>u = u.unwrap();
                     <span class="macro">assert!</span>(
-                        <span class="ident">u</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span>,
+                        u.len() == <span class="number">1</span>,
                         <span class="string">&quot;{}: Styles::from_u8 found {} styles (expected 1)&quot;</span>,
-                        <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>),
-                        <span class="ident">u</span>.<span class="ident">len</span>()
+                        <span class="macro">stringify!</span>(<span class="macro-nonterminal">$value</span>),
+                        u.len()
                     );
                     <span class="macro">assert!</span>(
-                        <span class="ident">u</span>[<span class="number">0</span>].<span class="ident">to_u8</span>() <span class="op">==</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>,
+                        u[<span class="number">0</span>].to_u8() == <span class="macro-nonterminal">$value</span>,
                         <span class="string">&quot;{}: to_u8() doesn&#39;t match its const value&quot;</span>,
-                        <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>)
+                        <span class="macro">stringify!</span>(<span class="macro-nonterminal">$value</span>)
                     );
                 }
             };
         }
 
-        <span class="macro">value_isomorph!</span>(<span class="ident">bold</span>, <span class="ident">BOLD</span>);
-        <span class="macro">value_isomorph!</span>(<span class="ident">underline</span>, <span class="ident">UNDERLINE</span>);
-        <span class="macro">value_isomorph!</span>(<span class="ident">reversed</span>, <span class="ident">REVERSED</span>);
-        <span class="macro">value_isomorph!</span>(<span class="ident">italic</span>, <span class="ident">ITALIC</span>);
-        <span class="macro">value_isomorph!</span>(<span class="ident">blink</span>, <span class="ident">BLINK</span>);
-        <span class="macro">value_isomorph!</span>(<span class="ident">hidden</span>, <span class="ident">HIDDEN</span>);
-        <span class="macro">value_isomorph!</span>(<span class="ident">dimmed</span>, <span class="ident">DIMMED</span>);
-        <span class="macro">value_isomorph!</span>(<span class="ident">strikethrough</span>, <span class="ident">STRIKETHROUGH</span>);
+        <span class="macro">value_isomorph!</span>(bold, BOLD);
+        <span class="macro">value_isomorph!</span>(underline, UNDERLINE);
+        <span class="macro">value_isomorph!</span>(reversed, REVERSED);
+        <span class="macro">value_isomorph!</span>(italic, ITALIC);
+        <span class="macro">value_isomorph!</span>(blink, BLINK);
+        <span class="macro">value_isomorph!</span>(hidden, HIDDEN);
+        <span class="macro">value_isomorph!</span>(dimmed, DIMMED);
+        <span class="macro">value_isomorph!</span>(strikethrough, STRIKETHROUGH);
     }
 
-    <span class="kw">mod</span> <span class="ident">styles_combine_complex</span> {
-        <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::Styles</span>::<span class="kw-2">*</span>;
-        <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span></span>::{<span class="ident">Style</span>, <span class="ident">Styles</span>};
+    <span class="kw">mod </span>styles_combine_complex {
+        <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::Styles::<span class="kw-2">*</span>;
+        <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::{Style, Styles};
 
-        <span class="kw">fn</span> <span class="ident">style_from_multiples</span>(<span class="ident">styles</span>: <span class="kw-2">&amp;</span>[<span class="ident">Styles</span>]) -&gt; <span class="ident">Style</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Style</span>(<span class="ident">styles</span>[<span class="number">0</span>].<span class="ident">to_u8</span>());
-            <span class="kw">for</span> <span class="ident">s</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">styles</span>[<span class="number">1</span>..] {
-                <span class="ident">res</span> <span class="op">=</span> <span class="ident">Style</span>(<span class="ident">res</span>.<span class="number">0</span> <span class="op">|</span> <span class="ident">s</span>.<span class="ident">to_u8</span>());
+        <span class="kw">fn </span>style_from_multiples(styles: <span class="kw-2">&amp;</span>[Styles]) -&gt; Style {
+            <span class="kw">let </span><span class="kw-2">mut </span>res = Style(styles[<span class="number">0</span>].to_u8());
+            <span class="kw">for </span>s <span class="kw">in </span><span class="kw-2">&amp;</span>styles[<span class="number">1</span>..] {
+                res = Style(res.<span class="number">0 </span>| s.to_u8());
             }
-            <span class="ident">res</span>
+            res
         }
 
-        <span class="macro">macro_rules!</span> <span class="ident">test_aggreg</span> {
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">styles</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">expect</span>:<span class="ident">expr</span>) =&gt; {{
-                <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">style_from_multiples</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">styles</span>);
-                <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">Styles::from_u8</span>(<span class="ident">v</span>.<span class="number">0</span>).<span class="ident">expect</span>(<span class="string">&quot;should find styles&quot;</span>);
-                <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">expect</span> <span class="kw">as</span> <span class="kw-2">&amp;</span>[<span class="ident">Styles</span>], <span class="kw-2">&amp;</span><span class="ident">r</span>[..])
+        <span class="macro">macro_rules! </span>test_aggreg {
+            (<span class="macro-nonterminal">$styles</span>:expr, <span class="macro-nonterminal">$expect</span>:expr) =&gt; {{
+                <span class="kw">let </span>v = style_from_multiples(<span class="macro-nonterminal">$styles</span>);
+                <span class="kw">let </span>r = Styles::from_u8(v.<span class="number">0</span>).expect(<span class="string">&quot;should find styles&quot;</span>);
+                <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$expect </span><span class="kw">as </span><span class="kw-2">&amp;</span>[Styles], <span class="kw-2">&amp;</span>r[..])
             }};
         }
 
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">aggreg1</span>() {
-            <span class="kw">let</span> <span class="ident">styles</span>: <span class="kw-2">&amp;</span>[<span class="ident">Styles</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="ident">Bold</span>, <span class="ident">Bold</span>, <span class="ident">Bold</span>];
-            <span class="macro">test_aggreg!</span>(<span class="ident">styles</span>, [<span class="ident">Bold</span>])
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>aggreg1() {
+            <span class="kw">let </span>styles: <span class="kw-2">&amp;</span>[Styles] = <span class="kw-2">&amp;</span>[Bold, Bold, Bold];
+            <span class="macro">test_aggreg!</span>(styles, [Bold])
         }
 
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">aggreg2</span>() {
-            <span class="kw">let</span> <span class="ident">styles</span>: <span class="kw-2">&amp;</span>[<span class="ident">Styles</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="ident">Italic</span>, <span class="ident">Italic</span>, <span class="ident">Bold</span>, <span class="ident">Bold</span>];
-            <span class="macro">test_aggreg!</span>(<span class="ident">styles</span>, [<span class="ident">Bold</span>, <span class="ident">Italic</span>])
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>aggreg2() {
+            <span class="kw">let </span>styles: <span class="kw-2">&amp;</span>[Styles] = <span class="kw-2">&amp;</span>[Italic, Italic, Bold, Bold];
+            <span class="macro">test_aggreg!</span>(styles, [Bold, Italic])
         }
 
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">aggreg3</span>() {
-            <span class="kw">let</span> <span class="ident">styles</span>: <span class="kw-2">&amp;</span>[<span class="ident">Styles</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="ident">Bold</span>, <span class="ident">Italic</span>, <span class="ident">Bold</span>];
-            <span class="macro">test_aggreg!</span>(<span class="ident">styles</span>, [<span class="ident">Bold</span>, <span class="ident">Italic</span>])
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>aggreg3() {
+            <span class="kw">let </span>styles: <span class="kw-2">&amp;</span>[Styles] = <span class="kw-2">&amp;</span>[Bold, Italic, Bold];
+            <span class="macro">test_aggreg!</span>(styles, [Bold, Italic])
         }
 
-        <span class="macro">macro_rules!</span> <span class="ident">test_combine</span> {
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">styles</span>:<span class="ident">expr</span>) =&gt; {{
-                <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">style_from_multiples</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">styles</span>);
-                <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">Styles::from_u8</span>(<span class="ident">v</span>.<span class="number">0</span>).<span class="ident">expect</span>(<span class="string">&quot;should find styles&quot;</span>);
-                <span class="macro">assert_eq!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">styles</span>, <span class="kw-2">&amp;</span><span class="ident">r</span>[..])
+        <span class="macro">macro_rules! </span>test_combine {
+            (<span class="macro-nonterminal">$styles</span>:expr) =&gt; {{
+                <span class="kw">let </span>v = style_from_multiples(<span class="macro-nonterminal">$styles</span>);
+                <span class="kw">let </span>r = Styles::from_u8(v.<span class="number">0</span>).expect(<span class="string">&quot;should find styles&quot;</span>);
+                <span class="macro">assert_eq!</span>(<span class="macro-nonterminal">$styles</span>, <span class="kw-2">&amp;</span>r[..])
             }};
         }
 
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">two1</span>() {
-            <span class="kw">let</span> <span class="ident">s</span>: <span class="kw-2">&amp;</span>[<span class="ident">Styles</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="ident">Bold</span>, <span class="ident">Underline</span>];
-            <span class="macro">test_combine!</span>(<span class="ident">s</span>)
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>two1() {
+            <span class="kw">let </span>s: <span class="kw-2">&amp;</span>[Styles] = <span class="kw-2">&amp;</span>[Bold, Underline];
+            <span class="macro">test_combine!</span>(s)
         }
 
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">two2</span>() {
-            <span class="kw">let</span> <span class="ident">s</span>: <span class="kw-2">&amp;</span>[<span class="ident">Styles</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="ident">Underline</span>, <span class="ident">Italic</span>];
-            <span class="macro">test_combine!</span>(<span class="ident">s</span>)
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>two2() {
+            <span class="kw">let </span>s: <span class="kw-2">&amp;</span>[Styles] = <span class="kw-2">&amp;</span>[Underline, Italic];
+            <span class="macro">test_combine!</span>(s)
         }
 
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">two3</span>() {
-            <span class="kw">let</span> <span class="ident">s</span>: <span class="kw-2">&amp;</span>[<span class="ident">Styles</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="ident">Bold</span>, <span class="ident">Italic</span>];
-            <span class="macro">test_combine!</span>(<span class="ident">s</span>)
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>two3() {
+            <span class="kw">let </span>s: <span class="kw-2">&amp;</span>[Styles] = <span class="kw-2">&amp;</span>[Bold, Italic];
+            <span class="macro">test_combine!</span>(s)
         }
 
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">three1</span>() {
-            <span class="kw">let</span> <span class="ident">s</span>: <span class="kw-2">&amp;</span>[<span class="ident">Styles</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="ident">Bold</span>, <span class="ident">Underline</span>, <span class="ident">Italic</span>];
-            <span class="macro">test_combine!</span>(<span class="ident">s</span>)
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>three1() {
+            <span class="kw">let </span>s: <span class="kw-2">&amp;</span>[Styles] = <span class="kw-2">&amp;</span>[Bold, Underline, Italic];
+            <span class="macro">test_combine!</span>(s)
         }
 
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">three2</span>() {
-            <span class="kw">let</span> <span class="ident">s</span>: <span class="kw-2">&amp;</span>[<span class="ident">Styles</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="ident">Dimmed</span>, <span class="ident">Underline</span>, <span class="ident">Italic</span>];
-            <span class="macro">test_combine!</span>(<span class="ident">s</span>)
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>three2() {
+            <span class="kw">let </span>s: <span class="kw-2">&amp;</span>[Styles] = <span class="kw-2">&amp;</span>[Dimmed, Underline, Italic];
+            <span class="macro">test_combine!</span>(s)
         }
 
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">four</span>() {
-            <span class="kw">let</span> <span class="ident">s</span>: <span class="kw-2">&amp;</span>[<span class="ident">Styles</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="ident">Dimmed</span>, <span class="ident">Underline</span>, <span class="ident">Italic</span>, <span class="ident">Hidden</span>];
-            <span class="macro">test_combine!</span>(<span class="ident">s</span>)
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>four() {
+            <span class="kw">let </span>s: <span class="kw-2">&amp;</span>[Styles] = <span class="kw-2">&amp;</span>[Dimmed, Underline, Italic, Hidden];
+            <span class="macro">test_combine!</span>(s)
         }
 
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">five</span>() {
-            <span class="kw">let</span> <span class="ident">s</span>: <span class="kw-2">&amp;</span>[<span class="ident">Styles</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="ident">Dimmed</span>, <span class="ident">Underline</span>, <span class="ident">Italic</span>, <span class="ident">Blink</span>, <span class="ident">Hidden</span>];
-            <span class="macro">test_combine!</span>(<span class="ident">s</span>)
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>five() {
+            <span class="kw">let </span>s: <span class="kw-2">&amp;</span>[Styles] = <span class="kw-2">&amp;</span>[Dimmed, Underline, Italic, Blink, Hidden];
+            <span class="macro">test_combine!</span>(s)
         }
 
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">six</span>() {
-            <span class="kw">let</span> <span class="ident">s</span>: <span class="kw-2">&amp;</span>[<span class="ident">Styles</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="ident">Bold</span>, <span class="ident">Dimmed</span>, <span class="ident">Underline</span>, <span class="ident">Italic</span>, <span class="ident">Blink</span>, <span class="ident">Hidden</span>];
-            <span class="macro">test_combine!</span>(<span class="ident">s</span>)
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>six() {
+            <span class="kw">let </span>s: <span class="kw-2">&amp;</span>[Styles] = <span class="kw-2">&amp;</span>[Bold, Dimmed, Underline, Italic, Blink, Hidden];
+            <span class="macro">test_combine!</span>(s)
         }
 
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">all</span>() {
-            <span class="kw">let</span> <span class="ident">s</span>: <span class="kw-2">&amp;</span>[<span class="ident">Styles</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
-                <span class="ident">Bold</span>,
-                <span class="ident">Dimmed</span>,
-                <span class="ident">Underline</span>,
-                <span class="ident">Reversed</span>,
-                <span class="ident">Italic</span>,
-                <span class="ident">Blink</span>,
-                <span class="ident">Hidden</span>,
-                <span class="ident">Strikethrough</span>,
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>all() {
+            <span class="kw">let </span>s: <span class="kw-2">&amp;</span>[Styles] = <span class="kw-2">&amp;</span>[
+                Bold,
+                Dimmed,
+                Underline,
+                Reversed,
+                Italic,
+                Blink,
+                Hidden,
+                Strikethrough,
             ];
-            <span class="macro">test_combine!</span>(<span class="ident">s</span>)
+            <span class="macro">test_combine!</span>(s)
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_style_contains</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">style</span> <span class="op">=</span> <span class="ident">Style</span>(<span class="ident">Styles::Bold</span>.<span class="ident">to_u8</span>());
-        <span class="ident">style</span>.<span class="ident">add</span>(<span class="ident">Styles::Italic</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_style_contains() {
+        <span class="kw">let </span><span class="kw-2">mut </span>style = Style(Styles::Bold.to_u8());
+        style.add(Styles::Italic);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">style</span>.<span class="ident">contains</span>(<span class="ident">Styles::Bold</span>), <span class="bool-val">true</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">style</span>.<span class="ident">contains</span>(<span class="ident">Styles::Italic</span>), <span class="bool-val">true</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">style</span>.<span class="ident">contains</span>(<span class="ident">Styles::Dimmed</span>), <span class="bool-val">false</span>);
+        <span class="macro">assert_eq!</span>(style.contains(Styles::Bold), <span class="bool-val">true</span>);
+        <span class="macro">assert_eq!</span>(style.contains(Styles::Italic), <span class="bool-val">true</span>);
+        <span class="macro">assert_eq!</span>(style.contains(Styles::Dimmed), <span class="bool-val">false</span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="colored" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="colored" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

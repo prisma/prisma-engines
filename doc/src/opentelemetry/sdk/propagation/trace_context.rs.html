@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/sdk/propagation/trace_context.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>trace_context.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../opentelemetry/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/sdk/propagation/trace_context.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>trace_context.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../opentelemetry/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../opentelemetry/index.html">
                         <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -292,178 +292,178 @@
 <span id="290">290</span>
 <span id="291">291</span>
 <span id="292">292</span>
-</pre><pre class="rust"><code><span class="doccomment">//! # W3C Trace Context Propagator</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The `traceparent` header represents the incoming request in a</span>
-<span class="doccomment">//! tracing system in a common format, understood by all vendors.</span>
-<span class="doccomment">//! Here’s an example of a `traceparent` header.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `traceparent: 00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The `traceparent` HTTP header field identifies the incoming request in a</span>
-<span class="doccomment">//! tracing system. It has four fields:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!    - version</span>
-<span class="doccomment">//!    - trace-id</span>
-<span class="doccomment">//!    - parent-id</span>
-<span class="doccomment">//!    - trace-flags</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! See the [w3c trace-context docs] for more details.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [w3c trace-context docs]: https://w3c.github.io/trace-context/</span>
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">propagation</span>::{<span class="ident">text_map_propagator::FieldIter</span>, <span class="ident">Extractor</span>, <span class="ident">Injector</span>, <span class="ident">TextMapPropagator</span>},
-    <span class="ident">trace</span>::{<span class="ident">SpanContext</span>, <span class="ident">SpanId</span>, <span class="ident">TraceContextExt</span>, <span class="ident">TraceFlags</span>, <span class="ident">TraceId</span>, <span class="ident">TraceState</span>},
-    <span class="ident">Context</span>,
+</pre><pre class="rust"><code><span class="doccomment">//! # W3C Trace Context Propagator
+//!
+//! The `traceparent` header represents the incoming request in a
+//! tracing system in a common format, understood by all vendors.
+//! Here’s an example of a `traceparent` header.
+//!
+//! `traceparent: 00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01`
+//!
+//! The `traceparent` HTTP header field identifies the incoming request in a
+//! tracing system. It has four fields:
+//!
+//!    - version
+//!    - trace-id
+//!    - parent-id
+//!    - trace-flags
+//!
+//! See the [w3c trace-context docs] for more details.
+//!
+//! [w3c trace-context docs]: https://w3c.github.io/trace-context/
+</span><span class="kw">use crate</span>::{
+    propagation::{text_map_propagator::FieldIter, Extractor, Injector, TextMapPropagator},
+    trace::{SpanContext, SpanId, TraceContextExt, TraceFlags, TraceId, TraceState},
+    Context,
 };
-<span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
+<span class="kw">use </span>std::str::FromStr;
 
-<span class="kw">const</span> <span class="ident">SUPPORTED_VERSION</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0</span>;
-<span class="kw">const</span> <span class="ident">MAX_VERSION</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">254</span>;
-<span class="kw">const</span> <span class="ident">TRACEPARENT_HEADER</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;traceparent&quot;</span>;
-<span class="kw">const</span> <span class="ident">TRACESTATE_HEADER</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;tracestate&quot;</span>;
+<span class="kw">const </span>SUPPORTED_VERSION: u8 = <span class="number">0</span>;
+<span class="kw">const </span>MAX_VERSION: u8 = <span class="number">254</span>;
+<span class="kw">const </span>TRACEPARENT_HEADER: <span class="kw-2">&amp;</span>str = <span class="string">&quot;traceparent&quot;</span>;
+<span class="kw">const </span>TRACESTATE_HEADER: <span class="kw-2">&amp;</span>str = <span class="string">&quot;tracestate&quot;</span>;
 
-<span class="macro">lazy_static::lazy_static!</span> {
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">TRACE_CONTEXT_HEADER_FIELDS</span>: [<span class="ident">String</span>; <span class="number">2</span>] <span class="op">=</span> [
-        <span class="ident">TRACEPARENT_HEADER</span>.<span class="ident">to_string</span>(),
-        <span class="ident">TRACESTATE_HEADER</span>.<span class="ident">to_string</span>()
+<span class="macro">lazy_static::lazy_static! </span>{
+    <span class="kw">static </span><span class="kw-2">ref </span>TRACE_CONTEXT_HEADER_FIELDS: [String; <span class="number">2</span>] = [
+        TRACEPARENT_HEADER.to_string(),
+        TRACESTATE_HEADER.to_string()
     ];
 }
 
-<span class="doccomment">/// Propagates `SpanContext`s in [W3C TraceContext] format.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [W3C TraceContext]: https://www.w3.org/TR/trace-context/</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TraceContextPropagator</span> {
-    <span class="ident">_private</span>: (),
+<span class="doccomment">/// Propagates `SpanContext`s in [W3C TraceContext] format.
+///
+/// [W3C TraceContext]: https://www.w3.org/TR/trace-context/
+</span><span class="attribute">#[derive(Clone, Debug, Default)]
+</span><span class="kw">pub struct </span>TraceContextPropagator {
+    _private: (),
 }
 
-<span class="kw">impl</span> <span class="ident">TraceContextPropagator</span> {
-    <span class="doccomment">/// Create a new `TraceContextPropagator`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">TraceContextPropagator</span> { <span class="ident">_private</span>: () }
+<span class="kw">impl </span>TraceContextPropagator {
+    <span class="doccomment">/// Create a new `TraceContextPropagator`.
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        TraceContextPropagator { _private: () }
     }
 
-    <span class="doccomment">/// Extract span context from w3c trace-context header.</span>
-    <span class="kw">fn</span> <span class="ident">extract_span_context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">extractor</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Extractor</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SpanContext</span>, ()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">header_value</span> <span class="op">=</span> <span class="ident">extractor</span>.<span class="ident">get</span>(<span class="ident">TRACEPARENT_HEADER</span>).<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>).<span class="ident">trim</span>();
-        <span class="kw">let</span> <span class="ident">parts</span> <span class="op">=</span> <span class="ident">header_value</span>.<span class="ident">split_terminator</span>(<span class="string">&#39;-&#39;</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-        <span class="comment">// Ensure parts are not out of range.</span>
-        <span class="kw">if</span> <span class="ident">parts</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">4</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(());
+    <span class="doccomment">/// Extract span context from w3c trace-context header.
+    </span><span class="kw">fn </span>extract_span_context(<span class="kw-2">&amp;</span><span class="self">self</span>, extractor: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Extractor) -&gt; <span class="prelude-ty">Result</span>&lt;SpanContext, ()&gt; {
+        <span class="kw">let </span>header_value = extractor.get(TRACEPARENT_HEADER).unwrap_or(<span class="string">&quot;&quot;</span>).trim();
+        <span class="kw">let </span>parts = header_value.split_terminator(<span class="string">&#39;-&#39;</span>).collect::&lt;Vec&lt;<span class="kw-2">&amp;</span>str&gt;&gt;();
+        <span class="comment">// Ensure parts are not out of range.
+        </span><span class="kw">if </span>parts.len() &lt; <span class="number">4 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(());
         }
 
-        <span class="comment">// Ensure version is within range, for version 0 there must be 4 parts.</span>
-        <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">u8::from_str_radix</span>(<span class="ident">parts</span>[<span class="number">0</span>], <span class="number">16</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">version</span> <span class="op">&gt;</span> <span class="ident">MAX_VERSION</span> <span class="op">|</span><span class="op">|</span> <span class="ident">version</span> <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">parts</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">4</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(());
+        <span class="comment">// Ensure version is within range, for version 0 there must be 4 parts.
+        </span><span class="kw">let </span>version = u8::from_str_radix(parts[<span class="number">0</span>], <span class="number">16</span>).map_err(|<span class="kw">_</span>| ())<span class="question-mark">?</span>;
+        <span class="kw">if </span>version &gt; MAX_VERSION || version == <span class="number">0 </span>&amp;&amp; parts.len() != <span class="number">4 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(());
         }
 
-        <span class="comment">// Ensure trace id is lowercase</span>
-        <span class="kw">if</span> <span class="ident">parts</span>[<span class="number">1</span>].<span class="ident">chars</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_ascii_uppercase</span>()) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(());
+        <span class="comment">// Ensure trace id is lowercase
+        </span><span class="kw">if </span>parts[<span class="number">1</span>].chars().any(|c| c.is_ascii_uppercase()) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(());
         }
 
-        <span class="comment">// Parse trace id section</span>
-        <span class="kw">let</span> <span class="ident">trace_id</span> <span class="op">=</span> <span class="ident">TraceId::from_hex</span>(<span class="ident">parts</span>[<span class="number">1</span>]).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())<span class="question-mark">?</span>;
+        <span class="comment">// Parse trace id section
+        </span><span class="kw">let </span>trace_id = TraceId::from_hex(parts[<span class="number">1</span>]).map_err(|<span class="kw">_</span>| ())<span class="question-mark">?</span>;
 
-        <span class="comment">// Ensure span id is lowercase</span>
-        <span class="kw">if</span> <span class="ident">parts</span>[<span class="number">2</span>].<span class="ident">chars</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_ascii_uppercase</span>()) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(());
+        <span class="comment">// Ensure span id is lowercase
+        </span><span class="kw">if </span>parts[<span class="number">2</span>].chars().any(|c| c.is_ascii_uppercase()) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(());
         }
 
-        <span class="comment">// Parse span id section</span>
-        <span class="kw">let</span> <span class="ident">span_id</span> <span class="op">=</span> <span class="ident">SpanId::from_hex</span>(<span class="ident">parts</span>[<span class="number">2</span>]).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())<span class="question-mark">?</span>;
+        <span class="comment">// Parse span id section
+        </span><span class="kw">let </span>span_id = SpanId::from_hex(parts[<span class="number">2</span>]).map_err(|<span class="kw">_</span>| ())<span class="question-mark">?</span>;
 
-        <span class="comment">// Parse trace flags section</span>
-        <span class="kw">let</span> <span class="ident">opts</span> <span class="op">=</span> <span class="ident">u8::from_str_radix</span>(<span class="ident">parts</span>[<span class="number">3</span>], <span class="number">16</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())<span class="question-mark">?</span>;
+        <span class="comment">// Parse trace flags section
+        </span><span class="kw">let </span>opts = u8::from_str_radix(parts[<span class="number">3</span>], <span class="number">16</span>).map_err(|<span class="kw">_</span>| ())<span class="question-mark">?</span>;
 
-        <span class="comment">// Ensure opts are valid for version 0</span>
-        <span class="kw">if</span> <span class="ident">version</span> <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">opts</span> <span class="op">&gt;</span> <span class="number">2</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(());
+        <span class="comment">// Ensure opts are valid for version 0
+        </span><span class="kw">if </span>version == <span class="number">0 </span>&amp;&amp; opts &gt; <span class="number">2 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(());
         }
 
-        <span class="comment">// Build trace flags clearing all flags other than the trace-context</span>
-        <span class="comment">// supported sampling bit.</span>
-        <span class="kw">let</span> <span class="ident">trace_flags</span> <span class="op">=</span> <span class="ident">TraceFlags::new</span>(<span class="ident">opts</span>) <span class="op">&amp;</span> <span class="ident">TraceFlags::SAMPLED</span>;
+        <span class="comment">// Build trace flags clearing all flags other than the trace-context
+        // supported sampling bit.
+        </span><span class="kw">let </span>trace_flags = TraceFlags::new(opts) &amp; TraceFlags::SAMPLED;
 
-        <span class="kw">let</span> <span class="ident">trace_state</span>: <span class="ident">TraceState</span> <span class="op">=</span>
-            <span class="ident">TraceState::from_str</span>(<span class="ident">extractor</span>.<span class="ident">get</span>(<span class="ident">TRACESTATE_HEADER</span>).<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>))
-                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">TraceState::default</span>());
+        <span class="kw">let </span>trace_state: TraceState =
+            TraceState::from_str(extractor.get(TRACESTATE_HEADER).unwrap_or(<span class="string">&quot;&quot;</span>))
+                .unwrap_or_else(|<span class="kw">_</span>| TraceState::default());
 
-        <span class="comment">// create context</span>
-        <span class="kw">let</span> <span class="ident">span_context</span> <span class="op">=</span> <span class="ident">SpanContext::new</span>(<span class="ident">trace_id</span>, <span class="ident">span_id</span>, <span class="ident">trace_flags</span>, <span class="bool-val">true</span>, <span class="ident">trace_state</span>);
+        <span class="comment">// create context
+        </span><span class="kw">let </span>span_context = SpanContext::new(trace_id, span_id, trace_flags, <span class="bool-val">true</span>, trace_state);
 
-        <span class="comment">// Ensure span is valid</span>
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">span_context</span>.<span class="ident">is_valid</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(());
+        <span class="comment">// Ensure span is valid
+        </span><span class="kw">if </span>!span_context.is_valid() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(());
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">span_context</span>)
+        <span class="prelude-val">Ok</span>(span_context)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TextMapPropagator</span> <span class="kw">for</span> <span class="ident">TraceContextPropagator</span> {
-    <span class="doccomment">/// Properly encodes the values of the `SpanContext` and injects them</span>
-    <span class="doccomment">/// into the `Injector`.</span>
-    <span class="kw">fn</span> <span class="ident">inject_context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">injector</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">Injector</span>) {
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">span</span>();
-        <span class="kw">let</span> <span class="ident">span_context</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">span_context</span>();
-        <span class="kw">if</span> <span class="ident">span_context</span>.<span class="ident">is_valid</span>() {
-            <span class="kw">let</span> <span class="ident">header_value</span> <span class="op">=</span> <span class="macro">format!</span>(
+<span class="kw">impl </span>TextMapPropagator <span class="kw">for </span>TraceContextPropagator {
+    <span class="doccomment">/// Properly encodes the values of the `SpanContext` and injects them
+    /// into the `Injector`.
+    </span><span class="kw">fn </span>inject_context(<span class="kw-2">&amp;</span><span class="self">self</span>, cx: <span class="kw-2">&amp;</span>Context, injector: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>Injector) {
+        <span class="kw">let </span>span = cx.span();
+        <span class="kw">let </span>span_context = span.span_context();
+        <span class="kw">if </span>span_context.is_valid() {
+            <span class="kw">let </span>header_value = <span class="macro">format!</span>(
                 <span class="string">&quot;{:02x}-{:032x}-{:016x}-{:02x}&quot;</span>,
-                <span class="ident">SUPPORTED_VERSION</span>,
-                <span class="ident">span_context</span>.<span class="ident">trace_id</span>(),
-                <span class="ident">span_context</span>.<span class="ident">span_id</span>(),
-                <span class="ident">span_context</span>.<span class="ident">trace_flags</span>() <span class="op">&amp;</span> <span class="ident">TraceFlags::SAMPLED</span>
+                SUPPORTED_VERSION,
+                span_context.trace_id(),
+                span_context.span_id(),
+                span_context.trace_flags() &amp; TraceFlags::SAMPLED
             );
-            <span class="ident">injector</span>.<span class="ident">set</span>(<span class="ident">TRACEPARENT_HEADER</span>, <span class="ident">header_value</span>);
-            <span class="ident">injector</span>.<span class="ident">set</span>(<span class="ident">TRACESTATE_HEADER</span>, <span class="ident">span_context</span>.<span class="ident">trace_state</span>().<span class="ident">header</span>());
+            injector.set(TRACEPARENT_HEADER, header_value);
+            injector.set(TRACESTATE_HEADER, span_context.trace_state().header());
         }
     }
 
-    <span class="doccomment">/// Retrieves encoded `SpanContext`s using the `Extractor`. It decodes</span>
-    <span class="doccomment">/// the `SpanContext` and returns it. If no `SpanContext` was retrieved</span>
-    <span class="doccomment">/// OR if the retrieved SpanContext is invalid then an empty `SpanContext`</span>
-    <span class="doccomment">/// is returned.</span>
-    <span class="kw">fn</span> <span class="ident">extract_with_context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">extractor</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Extractor</span>) -&gt; <span class="ident">Context</span> {
-        <span class="self">self</span>.<span class="ident">extract_span_context</span>(<span class="ident">extractor</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">sc</span><span class="op">|</span> <span class="ident">cx</span>.<span class="ident">with_remote_span_context</span>(<span class="ident">sc</span>))
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">cx</span>.<span class="ident">clone</span>())
+    <span class="doccomment">/// Retrieves encoded `SpanContext`s using the `Extractor`. It decodes
+    /// the `SpanContext` and returns it. If no `SpanContext` was retrieved
+    /// OR if the retrieved SpanContext is invalid then an empty `SpanContext`
+    /// is returned.
+    </span><span class="kw">fn </span>extract_with_context(<span class="kw-2">&amp;</span><span class="self">self</span>, cx: <span class="kw-2">&amp;</span>Context, extractor: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Extractor) -&gt; Context {
+        <span class="self">self</span>.extract_span_context(extractor)
+            .map(|sc| cx.with_remote_span_context(sc))
+            .unwrap_or_else(|<span class="kw">_</span>| cx.clone())
     }
 
-    <span class="kw">fn</span> <span class="ident">fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">FieldIter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">FieldIter::new</span>(<span class="ident">TRACE_CONTEXT_HEADER_FIELDS</span>.<span class="ident">as_ref</span>())
+    <span class="kw">fn </span>fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FieldIter&lt;<span class="lifetime">&#39;_</span>&gt; {
+        FieldIter::new(TRACE_CONTEXT_HEADER_FIELDS.as_ref())
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;testing&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;trace&quot;</span>))]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::testing::trace::TestSpan</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::{
-        <span class="ident">propagation</span>::{<span class="ident">Extractor</span>, <span class="ident">Injector</span>, <span class="ident">TextMapPropagator</span>},
-        <span class="ident">trace</span>::{<span class="ident">SpanContext</span>, <span class="ident">SpanId</span>, <span class="ident">TraceId</span>},
+<span class="attribute">#[cfg(all(test, feature = <span class="string">&quot;testing&quot;</span>, feature = <span class="string">&quot;trace&quot;</span>))]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::testing::trace::TestSpan;
+    <span class="kw">use crate</span>::{
+        propagation::{Extractor, Injector, TextMapPropagator},
+        trace::{SpanContext, SpanId, TraceId},
     };
-    <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
-    <span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
+    <span class="kw">use </span>std::collections::HashMap;
+    <span class="kw">use </span>std::str::FromStr;
 
-    <span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
-    <span class="kw">fn</span> <span class="ident">extract_data</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">SpanContext</span>)<span class="op">&gt;</span> {
+    <span class="attribute">#[rustfmt::skip]
+    </span><span class="kw">fn </span>extract_data() -&gt; Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, SpanContext)&gt; {
         <span class="macro">vec!</span>[
-            (<span class="string">&quot;00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-00&quot;</span>, <span class="string">&quot;foo=bar&quot;</span>, <span class="ident">SpanContext::new</span>(<span class="ident">TraceId::from_u128</span>(<span class="number">0x4bf9_2f35_77b3_4da6_a3ce_929d_0e0e_4736</span>), <span class="ident">SpanId::from_u64</span>(<span class="number">0x00f0_67aa_0ba9_02b7</span>), <span class="ident">TraceFlags::default</span>(), <span class="bool-val">true</span>, <span class="ident">TraceState::from_str</span>(<span class="string">&quot;foo=bar&quot;</span>).<span class="ident">unwrap</span>())),
-            (<span class="string">&quot;00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01&quot;</span>, <span class="string">&quot;foo=bar&quot;</span>, <span class="ident">SpanContext::new</span>(<span class="ident">TraceId::from_u128</span>(<span class="number">0x4bf9_2f35_77b3_4da6_a3ce_929d_0e0e_4736</span>), <span class="ident">SpanId::from_u64</span>(<span class="number">0x00f0_67aa_0ba9_02b7</span>), <span class="ident">TraceFlags::SAMPLED</span>, <span class="bool-val">true</span>, <span class="ident">TraceState::from_str</span>(<span class="string">&quot;foo=bar&quot;</span>).<span class="ident">unwrap</span>())),
-            (<span class="string">&quot;02-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01&quot;</span>, <span class="string">&quot;foo=bar&quot;</span>, <span class="ident">SpanContext::new</span>(<span class="ident">TraceId::from_u128</span>(<span class="number">0x4bf9_2f35_77b3_4da6_a3ce_929d_0e0e_4736</span>), <span class="ident">SpanId::from_u64</span>(<span class="number">0x00f0_67aa_0ba9_02b7</span>), <span class="ident">TraceFlags::SAMPLED</span>, <span class="bool-val">true</span>, <span class="ident">TraceState::from_str</span>(<span class="string">&quot;foo=bar&quot;</span>).<span class="ident">unwrap</span>())),
-            (<span class="string">&quot;02-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-09&quot;</span>, <span class="string">&quot;foo=bar&quot;</span>, <span class="ident">SpanContext::new</span>(<span class="ident">TraceId::from_u128</span>(<span class="number">0x4bf9_2f35_77b3_4da6_a3ce_929d_0e0e_4736</span>), <span class="ident">SpanId::from_u64</span>(<span class="number">0x00f0_67aa_0ba9_02b7</span>), <span class="ident">TraceFlags::SAMPLED</span>, <span class="bool-val">true</span>, <span class="ident">TraceState::from_str</span>(<span class="string">&quot;foo=bar&quot;</span>).<span class="ident">unwrap</span>())),
-            (<span class="string">&quot;02-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-08&quot;</span>, <span class="string">&quot;foo=bar&quot;</span>, <span class="ident">SpanContext::new</span>(<span class="ident">TraceId::from_u128</span>(<span class="number">0x4bf9_2f35_77b3_4da6_a3ce_929d_0e0e_4736</span>), <span class="ident">SpanId::from_u64</span>(<span class="number">0x00f0_67aa_0ba9_02b7</span>), <span class="ident">TraceFlags::default</span>(), <span class="bool-val">true</span>, <span class="ident">TraceState::from_str</span>(<span class="string">&quot;foo=bar&quot;</span>).<span class="ident">unwrap</span>())),
-            (<span class="string">&quot;02-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-09-XYZxsf09&quot;</span>, <span class="string">&quot;foo=bar&quot;</span>, <span class="ident">SpanContext::new</span>(<span class="ident">TraceId::from_u128</span>(<span class="number">0x4bf9_2f35_77b3_4da6_a3ce_929d_0e0e_4736</span>), <span class="ident">SpanId::from_u64</span>(<span class="number">0x00f0_67aa_0ba9_02b7</span>), <span class="ident">TraceFlags::SAMPLED</span>, <span class="bool-val">true</span>, <span class="ident">TraceState::from_str</span>(<span class="string">&quot;foo=bar&quot;</span>).<span class="ident">unwrap</span>())),
-            (<span class="string">&quot;00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01-&quot;</span>, <span class="string">&quot;foo=bar&quot;</span>, <span class="ident">SpanContext::new</span>(<span class="ident">TraceId::from_u128</span>(<span class="number">0x4bf9_2f35_77b3_4da6_a3ce_929d_0e0e_4736</span>), <span class="ident">SpanId::from_u64</span>(<span class="number">0x00f0_67aa_0ba9_02b7</span>), <span class="ident">TraceFlags::SAMPLED</span>, <span class="bool-val">true</span>, <span class="ident">TraceState::from_str</span>(<span class="string">&quot;foo=bar&quot;</span>).<span class="ident">unwrap</span>())),
-            (<span class="string">&quot;01-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-09-&quot;</span>, <span class="string">&quot;foo=bar&quot;</span>, <span class="ident">SpanContext::new</span>(<span class="ident">TraceId::from_u128</span>(<span class="number">0x4bf9_2f35_77b3_4da6_a3ce_929d_0e0e_4736</span>), <span class="ident">SpanId::from_u64</span>(<span class="number">0x00f0_67aa_0ba9_02b7</span>), <span class="ident">TraceFlags::SAMPLED</span>, <span class="bool-val">true</span>, <span class="ident">TraceState::from_str</span>(<span class="string">&quot;foo=bar&quot;</span>).<span class="ident">unwrap</span>())),
+            (<span class="string">&quot;00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-00&quot;</span>, <span class="string">&quot;foo=bar&quot;</span>, SpanContext::new(TraceId::from_u128(<span class="number">0x4bf9_2f35_77b3_4da6_a3ce_929d_0e0e_4736</span>), SpanId::from_u64(<span class="number">0x00f0_67aa_0ba9_02b7</span>), TraceFlags::default(), <span class="bool-val">true</span>, TraceState::from_str(<span class="string">&quot;foo=bar&quot;</span>).unwrap())),
+            (<span class="string">&quot;00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01&quot;</span>, <span class="string">&quot;foo=bar&quot;</span>, SpanContext::new(TraceId::from_u128(<span class="number">0x4bf9_2f35_77b3_4da6_a3ce_929d_0e0e_4736</span>), SpanId::from_u64(<span class="number">0x00f0_67aa_0ba9_02b7</span>), TraceFlags::SAMPLED, <span class="bool-val">true</span>, TraceState::from_str(<span class="string">&quot;foo=bar&quot;</span>).unwrap())),
+            (<span class="string">&quot;02-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01&quot;</span>, <span class="string">&quot;foo=bar&quot;</span>, SpanContext::new(TraceId::from_u128(<span class="number">0x4bf9_2f35_77b3_4da6_a3ce_929d_0e0e_4736</span>), SpanId::from_u64(<span class="number">0x00f0_67aa_0ba9_02b7</span>), TraceFlags::SAMPLED, <span class="bool-val">true</span>, TraceState::from_str(<span class="string">&quot;foo=bar&quot;</span>).unwrap())),
+            (<span class="string">&quot;02-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-09&quot;</span>, <span class="string">&quot;foo=bar&quot;</span>, SpanContext::new(TraceId::from_u128(<span class="number">0x4bf9_2f35_77b3_4da6_a3ce_929d_0e0e_4736</span>), SpanId::from_u64(<span class="number">0x00f0_67aa_0ba9_02b7</span>), TraceFlags::SAMPLED, <span class="bool-val">true</span>, TraceState::from_str(<span class="string">&quot;foo=bar&quot;</span>).unwrap())),
+            (<span class="string">&quot;02-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-08&quot;</span>, <span class="string">&quot;foo=bar&quot;</span>, SpanContext::new(TraceId::from_u128(<span class="number">0x4bf9_2f35_77b3_4da6_a3ce_929d_0e0e_4736</span>), SpanId::from_u64(<span class="number">0x00f0_67aa_0ba9_02b7</span>), TraceFlags::default(), <span class="bool-val">true</span>, TraceState::from_str(<span class="string">&quot;foo=bar&quot;</span>).unwrap())),
+            (<span class="string">&quot;02-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-09-XYZxsf09&quot;</span>, <span class="string">&quot;foo=bar&quot;</span>, SpanContext::new(TraceId::from_u128(<span class="number">0x4bf9_2f35_77b3_4da6_a3ce_929d_0e0e_4736</span>), SpanId::from_u64(<span class="number">0x00f0_67aa_0ba9_02b7</span>), TraceFlags::SAMPLED, <span class="bool-val">true</span>, TraceState::from_str(<span class="string">&quot;foo=bar&quot;</span>).unwrap())),
+            (<span class="string">&quot;00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01-&quot;</span>, <span class="string">&quot;foo=bar&quot;</span>, SpanContext::new(TraceId::from_u128(<span class="number">0x4bf9_2f35_77b3_4da6_a3ce_929d_0e0e_4736</span>), SpanId::from_u64(<span class="number">0x00f0_67aa_0ba9_02b7</span>), TraceFlags::SAMPLED, <span class="bool-val">true</span>, TraceState::from_str(<span class="string">&quot;foo=bar&quot;</span>).unwrap())),
+            (<span class="string">&quot;01-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-09-&quot;</span>, <span class="string">&quot;foo=bar&quot;</span>, SpanContext::new(TraceId::from_u128(<span class="number">0x4bf9_2f35_77b3_4da6_a3ce_929d_0e0e_4736</span>), SpanId::from_u64(<span class="number">0x00f0_67aa_0ba9_02b7</span>), TraceFlags::SAMPLED, <span class="bool-val">true</span>, TraceState::from_str(<span class="string">&quot;foo=bar&quot;</span>).unwrap())),
         ]
     }
 
-    <span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
-    <span class="kw">fn</span> <span class="ident">extract_data_invalid</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>)<span class="op">&gt;</span> {
+    <span class="attribute">#[rustfmt::skip]
+    </span><span class="kw">fn </span>extract_data_invalid() -&gt; Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str)&gt; {
         <span class="macro">vec!</span>[
             (<span class="string">&quot;0000-00000000000000000000000000000000-0000000000000000-01&quot;</span>, <span class="string">&quot;wrong version length&quot;</span>),
             (<span class="string">&quot;00-ab00000000000000000000000000000000-cd00000000000000-01&quot;</span>, <span class="string">&quot;wrong trace ID length&quot;</span>),
@@ -484,105 +484,105 @@
         ]
     }
 
-    <span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
-    <span class="kw">fn</span> <span class="ident">inject_data</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">SpanContext</span>)<span class="op">&gt;</span> {
+    <span class="attribute">#[rustfmt::skip]
+    </span><span class="kw">fn </span>inject_data() -&gt; Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, SpanContext)&gt; {
         <span class="macro">vec!</span>[
-            (<span class="string">&quot;00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01&quot;</span>, <span class="string">&quot;foo=bar&quot;</span>, <span class="ident">SpanContext::new</span>(<span class="ident">TraceId::from_u128</span>(<span class="number">0x4bf9_2f35_77b3_4da6_a3ce_929d_0e0e_4736</span>), <span class="ident">SpanId::from_u64</span>(<span class="number">0x00f0_67aa_0ba9_02b7</span>), <span class="ident">TraceFlags::SAMPLED</span>, <span class="bool-val">true</span>, <span class="ident">TraceState::from_str</span>(<span class="string">&quot;foo=bar&quot;</span>).<span class="ident">unwrap</span>())),
-            (<span class="string">&quot;00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-00&quot;</span>, <span class="string">&quot;foo=bar&quot;</span>, <span class="ident">SpanContext::new</span>(<span class="ident">TraceId::from_u128</span>(<span class="number">0x4bf9_2f35_77b3_4da6_a3ce_929d_0e0e_4736</span>), <span class="ident">SpanId::from_u64</span>(<span class="number">0x00f0_67aa_0ba9_02b7</span>), <span class="ident">TraceFlags::default</span>(), <span class="bool-val">true</span>, <span class="ident">TraceState::from_str</span>(<span class="string">&quot;foo=bar&quot;</span>).<span class="ident">unwrap</span>())),
-            (<span class="string">&quot;00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01&quot;</span>, <span class="string">&quot;foo=bar&quot;</span>, <span class="ident">SpanContext::new</span>(<span class="ident">TraceId::from_u128</span>(<span class="number">0x4bf9_2f35_77b3_4da6_a3ce_929d_0e0e_4736</span>), <span class="ident">SpanId::from_u64</span>(<span class="number">0x00f0_67aa_0ba9_02b7</span>), <span class="ident">TraceFlags::new</span>(<span class="number">0xff</span>), <span class="bool-val">true</span>, <span class="ident">TraceState::from_str</span>(<span class="string">&quot;foo=bar&quot;</span>).<span class="ident">unwrap</span>())),
-            (<span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="ident">SpanContext::empty_context</span>()),
+            (<span class="string">&quot;00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01&quot;</span>, <span class="string">&quot;foo=bar&quot;</span>, SpanContext::new(TraceId::from_u128(<span class="number">0x4bf9_2f35_77b3_4da6_a3ce_929d_0e0e_4736</span>), SpanId::from_u64(<span class="number">0x00f0_67aa_0ba9_02b7</span>), TraceFlags::SAMPLED, <span class="bool-val">true</span>, TraceState::from_str(<span class="string">&quot;foo=bar&quot;</span>).unwrap())),
+            (<span class="string">&quot;00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-00&quot;</span>, <span class="string">&quot;foo=bar&quot;</span>, SpanContext::new(TraceId::from_u128(<span class="number">0x4bf9_2f35_77b3_4da6_a3ce_929d_0e0e_4736</span>), SpanId::from_u64(<span class="number">0x00f0_67aa_0ba9_02b7</span>), TraceFlags::default(), <span class="bool-val">true</span>, TraceState::from_str(<span class="string">&quot;foo=bar&quot;</span>).unwrap())),
+            (<span class="string">&quot;00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01&quot;</span>, <span class="string">&quot;foo=bar&quot;</span>, SpanContext::new(TraceId::from_u128(<span class="number">0x4bf9_2f35_77b3_4da6_a3ce_929d_0e0e_4736</span>), SpanId::from_u64(<span class="number">0x00f0_67aa_0ba9_02b7</span>), TraceFlags::new(<span class="number">0xff</span>), <span class="bool-val">true</span>, TraceState::from_str(<span class="string">&quot;foo=bar&quot;</span>).unwrap())),
+            (<span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>, SpanContext::empty_context()),
         ]
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">extract_w3c</span>() {
-        <span class="kw">let</span> <span class="ident">propagator</span> <span class="op">=</span> <span class="ident">TraceContextPropagator::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>extract_w3c() {
+        <span class="kw">let </span>propagator = TraceContextPropagator::new();
 
-        <span class="kw">for</span> (<span class="ident">trace_parent</span>, <span class="ident">trace_state</span>, <span class="ident">expected_context</span>) <span class="kw">in</span> <span class="ident">extract_data</span>() {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">extractor</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-            <span class="ident">extractor</span>.<span class="ident">insert</span>(<span class="ident">TRACEPARENT_HEADER</span>.<span class="ident">to_string</span>(), <span class="ident">trace_parent</span>.<span class="ident">to_string</span>());
-            <span class="ident">extractor</span>.<span class="ident">insert</span>(<span class="ident">TRACESTATE_HEADER</span>.<span class="ident">to_string</span>(), <span class="ident">trace_state</span>.<span class="ident">to_string</span>());
+        <span class="kw">for </span>(trace_parent, trace_state, expected_context) <span class="kw">in </span>extract_data() {
+            <span class="kw">let </span><span class="kw-2">mut </span>extractor = HashMap::new();
+            extractor.insert(TRACEPARENT_HEADER.to_string(), trace_parent.to_string());
+            extractor.insert(TRACESTATE_HEADER.to_string(), trace_state.to_string());
 
             <span class="macro">assert_eq!</span>(
-                <span class="ident">propagator</span>.<span class="ident">extract</span>(<span class="kw-2">&amp;</span><span class="ident">extractor</span>).<span class="ident">span</span>().<span class="ident">span_context</span>(),
-                <span class="kw-2">&amp;</span><span class="ident">expected_context</span>
+                propagator.extract(<span class="kw-2">&amp;</span>extractor).span().span_context(),
+                <span class="kw-2">&amp;</span>expected_context
             )
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">extract_w3c_tracestate</span>() {
-        <span class="kw">let</span> <span class="ident">propagator</span> <span class="op">=</span> <span class="ident">TraceContextPropagator::new</span>();
-        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="string">&quot;foo=bar&quot;</span>.<span class="ident">to_string</span>();
-        <span class="kw">let</span> <span class="ident">parent</span> <span class="op">=</span> <span class="string">&quot;00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-00&quot;</span>.<span class="ident">to_string</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>extract_w3c_tracestate() {
+        <span class="kw">let </span>propagator = TraceContextPropagator::new();
+        <span class="kw">let </span>state = <span class="string">&quot;foo=bar&quot;</span>.to_string();
+        <span class="kw">let </span>parent = <span class="string">&quot;00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-00&quot;</span>.to_string();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">extractor</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-        <span class="ident">extractor</span>.<span class="ident">insert</span>(<span class="ident">TRACEPARENT_HEADER</span>.<span class="ident">to_string</span>(), <span class="ident">parent</span>);
-        <span class="ident">extractor</span>.<span class="ident">insert</span>(<span class="ident">TRACESTATE_HEADER</span>.<span class="ident">to_string</span>(), <span class="ident">state</span>.<span class="ident">clone</span>());
+        <span class="kw">let </span><span class="kw-2">mut </span>extractor = HashMap::new();
+        extractor.insert(TRACEPARENT_HEADER.to_string(), parent);
+        extractor.insert(TRACESTATE_HEADER.to_string(), state.clone());
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">propagator</span>
-                .<span class="ident">extract</span>(<span class="kw-2">&amp;</span><span class="ident">extractor</span>)
-                .<span class="ident">span</span>()
-                .<span class="ident">span_context</span>()
-                .<span class="ident">trace_state</span>()
-                .<span class="ident">header</span>(),
-            <span class="ident">state</span>
+            propagator
+                .extract(<span class="kw-2">&amp;</span>extractor)
+                .span()
+                .span_context()
+                .trace_state()
+                .header(),
+            state
         )
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">extract_w3c_reject_invalid</span>() {
-        <span class="kw">let</span> <span class="ident">propagator</span> <span class="op">=</span> <span class="ident">TraceContextPropagator::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>extract_w3c_reject_invalid() {
+        <span class="kw">let </span>propagator = TraceContextPropagator::new();
 
-        <span class="kw">for</span> (<span class="ident">invalid_header</span>, <span class="ident">reason</span>) <span class="kw">in</span> <span class="ident">extract_data_invalid</span>() {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">extractor</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-            <span class="ident">extractor</span>.<span class="ident">insert</span>(<span class="ident">TRACEPARENT_HEADER</span>.<span class="ident">to_string</span>(), <span class="ident">invalid_header</span>.<span class="ident">to_string</span>());
+        <span class="kw">for </span>(invalid_header, reason) <span class="kw">in </span>extract_data_invalid() {
+            <span class="kw">let </span><span class="kw-2">mut </span>extractor = HashMap::new();
+            extractor.insert(TRACEPARENT_HEADER.to_string(), invalid_header.to_string());
 
             <span class="macro">assert_eq!</span>(
-                <span class="ident">propagator</span>.<span class="ident">extract</span>(<span class="kw-2">&amp;</span><span class="ident">extractor</span>).<span class="ident">span</span>().<span class="ident">span_context</span>(),
-                <span class="kw-2">&amp;</span><span class="ident">SpanContext::empty_context</span>(),
+                propagator.extract(<span class="kw-2">&amp;</span>extractor).span().span_context(),
+                <span class="kw-2">&amp;</span>SpanContext::empty_context(),
                 <span class="string">&quot;{}&quot;</span>,
-                <span class="ident">reason</span>
+                reason
             )
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">inject_w3c</span>() {
-        <span class="kw">let</span> <span class="ident">propagator</span> <span class="op">=</span> <span class="ident">TraceContextPropagator::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>inject_w3c() {
+        <span class="kw">let </span>propagator = TraceContextPropagator::new();
 
-        <span class="kw">for</span> (<span class="ident">expected_trace_parent</span>, <span class="ident">expected_trace_state</span>, <span class="ident">context</span>) <span class="kw">in</span> <span class="ident">inject_data</span>() {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">injector</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-            <span class="ident">propagator</span>.<span class="ident">inject_context</span>(
-                <span class="kw-2">&amp;</span><span class="ident">Context::current_with_span</span>(<span class="ident">TestSpan</span>(<span class="ident">context</span>)),
-                <span class="kw-2">&amp;mut</span> <span class="ident">injector</span>,
+        <span class="kw">for </span>(expected_trace_parent, expected_trace_state, context) <span class="kw">in </span>inject_data() {
+            <span class="kw">let </span><span class="kw-2">mut </span>injector = HashMap::new();
+            propagator.inject_context(
+                <span class="kw-2">&amp;</span>Context::current_with_span(TestSpan(context)),
+                <span class="kw-2">&amp;mut </span>injector,
             );
 
             <span class="macro">assert_eq!</span>(
-                <span class="ident">Extractor::get</span>(<span class="kw-2">&amp;</span><span class="ident">injector</span>, <span class="ident">TRACEPARENT_HEADER</span>).<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>),
-                <span class="ident">expected_trace_parent</span>
+                Extractor::get(<span class="kw-2">&amp;</span>injector, TRACEPARENT_HEADER).unwrap_or(<span class="string">&quot;&quot;</span>),
+                expected_trace_parent
             );
 
             <span class="macro">assert_eq!</span>(
-                <span class="ident">Extractor::get</span>(<span class="kw-2">&amp;</span><span class="ident">injector</span>, <span class="ident">TRACESTATE_HEADER</span>).<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>),
-                <span class="ident">expected_trace_state</span>
+                Extractor::get(<span class="kw-2">&amp;</span>injector, TRACESTATE_HEADER).unwrap_or(<span class="string">&quot;&quot;</span>),
+                expected_trace_state
             );
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">inject_w3c_tracestate</span>() {
-        <span class="kw">let</span> <span class="ident">propagator</span> <span class="op">=</span> <span class="ident">TraceContextPropagator::new</span>();
-        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="string">&quot;foo=bar&quot;</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>inject_w3c_tracestate() {
+        <span class="kw">let </span>propagator = TraceContextPropagator::new();
+        <span class="kw">let </span>state = <span class="string">&quot;foo=bar&quot;</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">injector</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-        <span class="ident">injector</span>.<span class="ident">set</span>(<span class="ident">TRACESTATE_HEADER</span>, <span class="ident">state</span>.<span class="ident">to_string</span>());
+        <span class="kw">let </span><span class="kw-2">mut </span>injector: HashMap&lt;String, String&gt; = HashMap::new();
+        injector.set(TRACESTATE_HEADER, state.to_string());
 
-        <span class="ident">propagator</span>.<span class="ident">inject_context</span>(<span class="kw-2">&amp;</span><span class="ident">Context::current</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">injector</span>);
+        propagator.inject_context(<span class="kw-2">&amp;</span>Context::current(), <span class="kw-2">&amp;mut </span>injector);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">Extractor::get</span>(<span class="kw-2">&amp;</span><span class="ident">injector</span>, <span class="ident">TRACESTATE_HEADER</span>), <span class="prelude-val">Some</span>(<span class="ident">state</span>))
+        <span class="macro">assert_eq!</span>(Extractor::get(<span class="kw-2">&amp;</span>injector, TRACESTATE_HEADER), <span class="prelude-val">Some</span>(state))
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

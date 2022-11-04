@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/num-bigint-0.4.3/src/bigint/subtraction.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>subtraction.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../num_bigint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../num_bigint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../num_bigint/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/num-bigint-0.4.3/src/bigint/subtraction.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>subtraction.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../num_bigint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../num_bigint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../num_bigint/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -298,305 +298,305 @@
 <span id="298">298</span>
 <span id="299">299</span>
 <span id="300">300</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::CheckedUnsignedAbs</span>::{<span class="ident">Negative</span>, <span class="ident">Positive</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Sign</span>::{<span class="ident">Minus</span>, <span class="ident">NoSign</span>, <span class="ident">Plus</span>};
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">BigInt</span>, <span class="ident">UnsignedAbs</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::CheckedUnsignedAbs::{Negative, Positive};
+<span class="kw">use </span><span class="kw">super</span>::Sign::{Minus, NoSign, Plus};
+<span class="kw">use super</span>::{BigInt, UnsignedAbs};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">IsizePromotion</span>, <span class="ident">UsizePromotion</span>};
+<span class="kw">use crate</span>::{IsizePromotion, UsizePromotion};
 
-<span class="kw">use</span> <span class="ident">core::cmp::Ordering</span>::{<span class="ident">Equal</span>, <span class="ident">Greater</span>, <span class="ident">Less</span>};
-<span class="kw">use</span> <span class="ident">core::mem</span>;
-<span class="kw">use</span> <span class="ident">core::ops</span>::{<span class="ident">Sub</span>, <span class="ident">SubAssign</span>};
-<span class="kw">use</span> <span class="ident">num_traits</span>::{<span class="ident">CheckedSub</span>, <span class="ident">Zero</span>};
+<span class="kw">use </span>core::cmp::Ordering::{Equal, Greater, Less};
+<span class="kw">use </span>core::mem;
+<span class="kw">use </span>core::ops::{Sub, SubAssign};
+<span class="kw">use </span>num_traits::{CheckedSub, Zero};
 
-<span class="comment">// We want to forward to BigUint::sub, but it&#39;s not clear how that will go until</span>
-<span class="comment">// we compare both sign and magnitude.  So we duplicate this body for every</span>
-<span class="comment">// val/ref combination, deferring that decision to BigUint&#39;s own forwarding.</span>
-<span class="macro">macro_rules!</span> <span class="ident">bigint_sub</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a_owned</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a_data</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b_owned</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b_data</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="kw">match</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>.<span class="ident">sign</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>.<span class="ident">sign</span>) {
-            (<span class="kw">_</span>, <span class="ident">NoSign</span>) =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a_owned</span>,
-            (<span class="ident">NoSign</span>, <span class="kw">_</span>) =&gt; <span class="op">-</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">b_owned</span>,
-            <span class="comment">// opposite signs =&gt; keep the sign of the left with the sum of magnitudes</span>
-            (<span class="ident">Plus</span>, <span class="ident">Minus</span>) <span class="op">|</span> (<span class="ident">Minus</span>, <span class="ident">Plus</span>) =&gt; <span class="ident">BigInt::from_biguint</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>.<span class="ident">sign</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a_data</span> <span class="op">+</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b_data</span>),
-            <span class="comment">// same sign =&gt; keep or toggle the sign of the left with the difference of magnitudes</span>
-            (<span class="ident">Plus</span>, <span class="ident">Plus</span>) <span class="op">|</span> (<span class="ident">Minus</span>, <span class="ident">Minus</span>) =&gt; <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>.<span class="ident">data</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">b</span>.<span class="ident">data</span>) {
-                <span class="ident">Less</span> =&gt; <span class="ident">BigInt::from_biguint</span>(<span class="op">-</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>.<span class="ident">sign</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b_data</span> <span class="op">-</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a_data</span>),
-                <span class="ident">Greater</span> =&gt; <span class="ident">BigInt::from_biguint</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">a</span>.<span class="ident">sign</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">a_data</span> <span class="op">-</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">b_data</span>),
-                <span class="ident">Equal</span> =&gt; <span class="ident">Zero::zero</span>(),
+<span class="comment">// We want to forward to BigUint::sub, but it&#39;s not clear how that will go until
+// we compare both sign and magnitude.  So we duplicate this body for every
+// val/ref combination, deferring that decision to BigUint&#39;s own forwarding.
+</span><span class="macro">macro_rules! </span>bigint_sub {
+    (<span class="macro-nonterminal">$a</span>:expr, <span class="macro-nonterminal">$a_owned</span>:expr, <span class="macro-nonterminal">$a_data</span>:expr, <span class="macro-nonterminal">$b</span>:expr, <span class="macro-nonterminal">$b_owned</span>:expr, <span class="macro-nonterminal">$b_data</span>:expr) =&gt; {
+        <span class="kw">match </span>(<span class="macro-nonterminal">$a</span>.sign, <span class="macro-nonterminal">$b</span>.sign) {
+            (<span class="kw">_</span>, NoSign) =&gt; <span class="macro-nonterminal">$a_owned</span>,
+            (NoSign, <span class="kw">_</span>) =&gt; -<span class="macro-nonterminal">$b_owned</span>,
+            <span class="comment">// opposite signs =&gt; keep the sign of the left with the sum of magnitudes
+            </span>(Plus, Minus) | (Minus, Plus) =&gt; BigInt::from_biguint(<span class="macro-nonterminal">$a</span>.sign, <span class="macro-nonterminal">$a_data </span>+ <span class="macro-nonterminal">$b_data</span>),
+            <span class="comment">// same sign =&gt; keep or toggle the sign of the left with the difference of magnitudes
+            </span>(Plus, Plus) | (Minus, Minus) =&gt; <span class="kw">match </span><span class="macro-nonterminal">$a</span>.data.cmp(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$b</span>.data) {
+                Less =&gt; BigInt::from_biguint(-<span class="macro-nonterminal">$a</span>.sign, <span class="macro-nonterminal">$b_data </span>- <span class="macro-nonterminal">$a_data</span>),
+                Greater =&gt; BigInt::from_biguint(<span class="macro-nonterminal">$a</span>.sign, <span class="macro-nonterminal">$a_data </span>- <span class="macro-nonterminal">$b_data</span>),
+                Equal =&gt; Zero::zero(),
             },
         }
     };
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">BigInt</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigInt</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigInt</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; Sub&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>BigInt&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigInt {
+    <span class="kw">type </span>Output = BigInt;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">BigInt</span>) -&gt; <span class="ident">BigInt</span> {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>sub(<span class="self">self</span>, other: <span class="kw-2">&amp;</span>BigInt) -&gt; BigInt {
         <span class="macro">bigint_sub!</span>(
             <span class="self">self</span>,
-            <span class="self">self</span>.<span class="ident">clone</span>(),
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>,
-            <span class="ident">other</span>,
-            <span class="ident">other</span>.<span class="ident">clone</span>(),
-            <span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">data</span>
+            <span class="self">self</span>.clone(),
+            <span class="kw-2">&amp;</span><span class="self">self</span>.data,
+            other,
+            other.clone(),
+            <span class="kw-2">&amp;</span>other.data
         )
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">BigInt</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigInt</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigInt</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Sub&lt;BigInt&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigInt {
+    <span class="kw">type </span>Output = BigInt;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">BigInt</span>) -&gt; <span class="ident">BigInt</span> {
-        <span class="macro">bigint_sub!</span>(<span class="self">self</span>, <span class="self">self</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>, <span class="ident">other</span>, <span class="ident">other</span>, <span class="ident">other</span>.<span class="ident">data</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>sub(<span class="self">self</span>, other: BigInt) -&gt; BigInt {
+        <span class="macro">bigint_sub!</span>(<span class="self">self</span>, <span class="self">self</span>.clone(), <span class="kw-2">&amp;</span><span class="self">self</span>.data, other, other, other.data)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigInt</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigInt</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigInt</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Sub&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigInt&gt; <span class="kw">for </span>BigInt {
+    <span class="kw">type </span>Output = BigInt;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">BigInt</span>) -&gt; <span class="ident">BigInt</span> {
-        <span class="macro">bigint_sub!</span>(<span class="self">self</span>, <span class="self">self</span>, <span class="self">self</span>.<span class="ident">data</span>, <span class="ident">other</span>, <span class="ident">other</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">data</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>sub(<span class="self">self</span>, other: <span class="kw-2">&amp;</span>BigInt) -&gt; BigInt {
+        <span class="macro">bigint_sub!</span>(<span class="self">self</span>, <span class="self">self</span>, <span class="self">self</span>.data, other, other.clone(), <span class="kw-2">&amp;</span>other.data)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">BigInt</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigInt</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigInt</span>;
+<span class="kw">impl </span>Sub&lt;BigInt&gt; <span class="kw">for </span>BigInt {
+    <span class="kw">type </span>Output = BigInt;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">BigInt</span>) -&gt; <span class="ident">BigInt</span> {
-        <span class="macro">bigint_sub!</span>(<span class="self">self</span>, <span class="self">self</span>, <span class="self">self</span>.<span class="ident">data</span>, <span class="ident">other</span>, <span class="ident">other</span>, <span class="ident">other</span>.<span class="ident">data</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>sub(<span class="self">self</span>, other: BigInt) -&gt; BigInt {
+        <span class="macro">bigint_sub!</span>(<span class="self">self</span>, <span class="self">self</span>, <span class="self">self</span>.data, other, other, other.data)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">SubAssign</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigInt</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigInt</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">BigInt</span>) {
-        <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">mem::replace</span>(<span class="self">self</span>, <span class="ident">BigInt::zero</span>());
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">n</span> <span class="op">-</span> <span class="ident">other</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; SubAssign&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigInt&gt; <span class="kw">for </span>BigInt {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>sub_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>BigInt) {
+        <span class="kw">let </span>n = mem::replace(<span class="self">self</span>, BigInt::zero());
+        <span class="kw-2">*</span><span class="self">self </span>= n - other;
     }
 }
-<span class="macro">forward_val_assign!</span>(<span class="kw">impl</span> <span class="ident">SubAssign</span> <span class="kw">for</span> <span class="ident">BigInt</span>, <span class="ident">sub_assign</span>);
+<span class="macro">forward_val_assign!</span>(<span class="kw">impl </span>SubAssign <span class="kw">for </span>BigInt, sub_assign);
 
-<span class="macro">promote_all_scalars!</span>(<span class="kw">impl</span> <span class="ident">Sub</span> <span class="kw">for</span> <span class="ident">BigInt</span>, <span class="ident">sub</span>);
-<span class="macro">promote_all_scalars_assign!</span>(<span class="kw">impl</span> <span class="ident">SubAssign</span> <span class="kw">for</span> <span class="ident">BigInt</span>, <span class="ident">sub_assign</span>);
-<span class="macro">forward_all_scalar_binop_to_val_val!</span>(<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigInt</span>, <span class="ident">sub</span>);
-<span class="macro">forward_all_scalar_binop_to_val_val!</span>(<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigInt</span>, <span class="ident">sub</span>);
-<span class="macro">forward_all_scalar_binop_to_val_val!</span>(<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigInt</span>, <span class="ident">sub</span>);
+<span class="macro">promote_all_scalars!</span>(<span class="kw">impl </span>Sub <span class="kw">for </span>BigInt, sub);
+<span class="macro">promote_all_scalars_assign!</span>(<span class="kw">impl </span>SubAssign <span class="kw">for </span>BigInt, sub_assign);
+<span class="macro">forward_all_scalar_binop_to_val_val!</span>(<span class="kw">impl </span>Sub&lt;u32&gt; <span class="kw">for </span>BigInt, sub);
+<span class="macro">forward_all_scalar_binop_to_val_val!</span>(<span class="kw">impl </span>Sub&lt;u64&gt; <span class="kw">for </span>BigInt, sub);
+<span class="macro">forward_all_scalar_binop_to_val_val!</span>(<span class="kw">impl </span>Sub&lt;u128&gt; <span class="kw">for </span>BigInt, sub);
 
-<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigInt</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigInt</span>;
+<span class="kw">impl </span>Sub&lt;u32&gt; <span class="kw">for </span>BigInt {
+    <span class="kw">type </span>Output = BigInt;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">u32</span>) -&gt; <span class="ident">BigInt</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">sign</span> {
-            <span class="ident">NoSign</span> =&gt; <span class="op">-</span><span class="ident">BigInt::from</span>(<span class="ident">other</span>),
-            <span class="ident">Minus</span> =&gt; <span class="op">-</span><span class="ident">BigInt::from</span>(<span class="self">self</span>.<span class="ident">data</span> <span class="op">+</span> <span class="ident">other</span>),
-            <span class="ident">Plus</span> =&gt; <span class="kw">match</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">From::from</span>(<span class="ident">other</span>)) {
-                <span class="ident">Equal</span> =&gt; <span class="ident">Zero::zero</span>(),
-                <span class="ident">Greater</span> =&gt; <span class="ident">BigInt::from</span>(<span class="self">self</span>.<span class="ident">data</span> <span class="op">-</span> <span class="ident">other</span>),
-                <span class="ident">Less</span> =&gt; <span class="op">-</span><span class="ident">BigInt::from</span>(<span class="ident">other</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">data</span>),
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>sub(<span class="self">self</span>, other: u32) -&gt; BigInt {
+        <span class="kw">match </span><span class="self">self</span>.sign {
+            NoSign =&gt; -BigInt::from(other),
+            Minus =&gt; -BigInt::from(<span class="self">self</span>.data + other),
+            Plus =&gt; <span class="kw">match </span><span class="self">self</span>.data.cmp(<span class="kw-2">&amp;</span>From::from(other)) {
+                Equal =&gt; Zero::zero(),
+                Greater =&gt; BigInt::from(<span class="self">self</span>.data - other),
+                Less =&gt; -BigInt::from(other - <span class="self">self</span>.data),
             },
         }
     }
 }
-<span class="kw">impl</span> <span class="ident">SubAssign</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigInt</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">u32</span>) {
-        <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">mem::replace</span>(<span class="self">self</span>, <span class="ident">BigInt::zero</span>());
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">n</span> <span class="op">-</span> <span class="ident">other</span>;
+<span class="kw">impl </span>SubAssign&lt;u32&gt; <span class="kw">for </span>BigInt {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>sub_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: u32) {
+        <span class="kw">let </span>n = mem::replace(<span class="self">self</span>, BigInt::zero());
+        <span class="kw-2">*</span><span class="self">self </span>= n - other;
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">BigInt</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u32</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigInt</span>;
+<span class="kw">impl </span>Sub&lt;BigInt&gt; <span class="kw">for </span>u32 {
+    <span class="kw">type </span>Output = BigInt;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">BigInt</span>) -&gt; <span class="ident">BigInt</span> {
-        <span class="op">-</span>(<span class="ident">other</span> <span class="op">-</span> <span class="self">self</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>sub(<span class="self">self</span>, other: BigInt) -&gt; BigInt {
+        -(other - <span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">BigInt</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u64</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigInt</span>;
+<span class="kw">impl </span>Sub&lt;BigInt&gt; <span class="kw">for </span>u64 {
+    <span class="kw">type </span>Output = BigInt;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">BigInt</span>) -&gt; <span class="ident">BigInt</span> {
-        <span class="op">-</span>(<span class="ident">other</span> <span class="op">-</span> <span class="self">self</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>sub(<span class="self">self</span>, other: BigInt) -&gt; BigInt {
+        -(other - <span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">BigInt</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u128</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigInt</span>;
+<span class="kw">impl </span>Sub&lt;BigInt&gt; <span class="kw">for </span>u128 {
+    <span class="kw">type </span>Output = BigInt;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">BigInt</span>) -&gt; <span class="ident">BigInt</span> {
-        <span class="op">-</span>(<span class="ident">other</span> <span class="op">-</span> <span class="self">self</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>sub(<span class="self">self</span>, other: BigInt) -&gt; BigInt {
+        -(other - <span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigInt</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigInt</span>;
+<span class="kw">impl </span>Sub&lt;u64&gt; <span class="kw">for </span>BigInt {
+    <span class="kw">type </span>Output = BigInt;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">u64</span>) -&gt; <span class="ident">BigInt</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">sign</span> {
-            <span class="ident">NoSign</span> =&gt; <span class="op">-</span><span class="ident">BigInt::from</span>(<span class="ident">other</span>),
-            <span class="ident">Minus</span> =&gt; <span class="op">-</span><span class="ident">BigInt::from</span>(<span class="self">self</span>.<span class="ident">data</span> <span class="op">+</span> <span class="ident">other</span>),
-            <span class="ident">Plus</span> =&gt; <span class="kw">match</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">From::from</span>(<span class="ident">other</span>)) {
-                <span class="ident">Equal</span> =&gt; <span class="ident">Zero::zero</span>(),
-                <span class="ident">Greater</span> =&gt; <span class="ident">BigInt::from</span>(<span class="self">self</span>.<span class="ident">data</span> <span class="op">-</span> <span class="ident">other</span>),
-                <span class="ident">Less</span> =&gt; <span class="op">-</span><span class="ident">BigInt::from</span>(<span class="ident">other</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">data</span>),
-            },
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">SubAssign</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigInt</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">u64</span>) {
-        <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">mem::replace</span>(<span class="self">self</span>, <span class="ident">BigInt::zero</span>());
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">n</span> <span class="op">-</span> <span class="ident">other</span>;
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigInt</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigInt</span>;
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">u128</span>) -&gt; <span class="ident">BigInt</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">sign</span> {
-            <span class="ident">NoSign</span> =&gt; <span class="op">-</span><span class="ident">BigInt::from</span>(<span class="ident">other</span>),
-            <span class="ident">Minus</span> =&gt; <span class="op">-</span><span class="ident">BigInt::from</span>(<span class="self">self</span>.<span class="ident">data</span> <span class="op">+</span> <span class="ident">other</span>),
-            <span class="ident">Plus</span> =&gt; <span class="kw">match</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">From::from</span>(<span class="ident">other</span>)) {
-                <span class="ident">Equal</span> =&gt; <span class="ident">Zero::zero</span>(),
-                <span class="ident">Greater</span> =&gt; <span class="ident">BigInt::from</span>(<span class="self">self</span>.<span class="ident">data</span> <span class="op">-</span> <span class="ident">other</span>),
-                <span class="ident">Less</span> =&gt; <span class="op">-</span><span class="ident">BigInt::from</span>(<span class="ident">other</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">data</span>),
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>sub(<span class="self">self</span>, other: u64) -&gt; BigInt {
+        <span class="kw">match </span><span class="self">self</span>.sign {
+            NoSign =&gt; -BigInt::from(other),
+            Minus =&gt; -BigInt::from(<span class="self">self</span>.data + other),
+            Plus =&gt; <span class="kw">match </span><span class="self">self</span>.data.cmp(<span class="kw-2">&amp;</span>From::from(other)) {
+                Equal =&gt; Zero::zero(),
+                Greater =&gt; BigInt::from(<span class="self">self</span>.data - other),
+                Less =&gt; -BigInt::from(other - <span class="self">self</span>.data),
             },
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">SubAssign</span><span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigInt</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">u128</span>) {
-        <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">mem::replace</span>(<span class="self">self</span>, <span class="ident">BigInt::zero</span>());
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">n</span> <span class="op">-</span> <span class="ident">other</span>;
+<span class="kw">impl </span>SubAssign&lt;u64&gt; <span class="kw">for </span>BigInt {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>sub_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: u64) {
+        <span class="kw">let </span>n = mem::replace(<span class="self">self</span>, BigInt::zero());
+        <span class="kw-2">*</span><span class="self">self </span>= n - other;
     }
 }
 
-<span class="macro">forward_all_scalar_binop_to_val_val!</span>(<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigInt</span>, <span class="ident">sub</span>);
-<span class="macro">forward_all_scalar_binop_to_val_val!</span>(<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigInt</span>, <span class="ident">sub</span>);
-<span class="macro">forward_all_scalar_binop_to_val_val!</span>(<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">i128</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigInt</span>, <span class="ident">sub</span>);
+<span class="kw">impl </span>Sub&lt;u128&gt; <span class="kw">for </span>BigInt {
+    <span class="kw">type </span>Output = BigInt;
 
-<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigInt</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigInt</span>;
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">i32</span>) -&gt; <span class="ident">BigInt</span> {
-        <span class="kw">match</span> <span class="ident">other</span>.<span class="ident">checked_uabs</span>() {
-            <span class="ident">Positive</span>(<span class="ident">u</span>) =&gt; <span class="self">self</span> <span class="op">-</span> <span class="ident">u</span>,
-            <span class="ident">Negative</span>(<span class="ident">u</span>) =&gt; <span class="self">self</span> <span class="op">+</span> <span class="ident">u</span>,
-        }
-    }
-}
-<span class="kw">impl</span> <span class="ident">SubAssign</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigInt</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">i32</span>) {
-        <span class="kw">match</span> <span class="ident">other</span>.<span class="ident">checked_uabs</span>() {
-            <span class="ident">Positive</span>(<span class="ident">u</span>) =&gt; <span class="kw-2">*</span><span class="self">self</span> <span class="op">-</span><span class="op">=</span> <span class="ident">u</span>,
-            <span class="ident">Negative</span>(<span class="ident">u</span>) =&gt; <span class="kw-2">*</span><span class="self">self</span> <span class="op">+</span><span class="op">=</span> <span class="ident">u</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>sub(<span class="self">self</span>, other: u128) -&gt; BigInt {
+        <span class="kw">match </span><span class="self">self</span>.sign {
+            NoSign =&gt; -BigInt::from(other),
+            Minus =&gt; -BigInt::from(<span class="self">self</span>.data + other),
+            Plus =&gt; <span class="kw">match </span><span class="self">self</span>.data.cmp(<span class="kw-2">&amp;</span>From::from(other)) {
+                Equal =&gt; Zero::zero(),
+                Greater =&gt; BigInt::from(<span class="self">self</span>.data - other),
+                Less =&gt; -BigInt::from(other - <span class="self">self</span>.data),
+            },
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">BigInt</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">i32</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigInt</span>;
+<span class="kw">impl </span>SubAssign&lt;u128&gt; <span class="kw">for </span>BigInt {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>sub_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: u128) {
+        <span class="kw">let </span>n = mem::replace(<span class="self">self</span>, BigInt::zero());
+        <span class="kw-2">*</span><span class="self">self </span>= n - other;
+    }
+}
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">BigInt</span>) -&gt; <span class="ident">BigInt</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">checked_uabs</span>() {
-            <span class="ident">Positive</span>(<span class="ident">u</span>) =&gt; <span class="ident">u</span> <span class="op">-</span> <span class="ident">other</span>,
-            <span class="ident">Negative</span>(<span class="ident">u</span>) =&gt; <span class="op">-</span><span class="ident">other</span> <span class="op">-</span> <span class="ident">u</span>,
+<span class="macro">forward_all_scalar_binop_to_val_val!</span>(<span class="kw">impl </span>Sub&lt;i32&gt; <span class="kw">for </span>BigInt, sub);
+<span class="macro">forward_all_scalar_binop_to_val_val!</span>(<span class="kw">impl </span>Sub&lt;i64&gt; <span class="kw">for </span>BigInt, sub);
+<span class="macro">forward_all_scalar_binop_to_val_val!</span>(<span class="kw">impl </span>Sub&lt;i128&gt; <span class="kw">for </span>BigInt, sub);
+
+<span class="kw">impl </span>Sub&lt;i32&gt; <span class="kw">for </span>BigInt {
+    <span class="kw">type </span>Output = BigInt;
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>sub(<span class="self">self</span>, other: i32) -&gt; BigInt {
+        <span class="kw">match </span>other.checked_uabs() {
+            Positive(u) =&gt; <span class="self">self </span>- u,
+            Negative(u) =&gt; <span class="self">self </span>+ u,
+        }
+    }
+}
+<span class="kw">impl </span>SubAssign&lt;i32&gt; <span class="kw">for </span>BigInt {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>sub_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: i32) {
+        <span class="kw">match </span>other.checked_uabs() {
+            Positive(u) =&gt; <span class="kw-2">*</span><span class="self">self </span>-= u,
+            Negative(u) =&gt; <span class="kw-2">*</span><span class="self">self </span>+= u,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigInt</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigInt</span>;
+<span class="kw">impl </span>Sub&lt;BigInt&gt; <span class="kw">for </span>i32 {
+    <span class="kw">type </span>Output = BigInt;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">i64</span>) -&gt; <span class="ident">BigInt</span> {
-        <span class="kw">match</span> <span class="ident">other</span>.<span class="ident">checked_uabs</span>() {
-            <span class="ident">Positive</span>(<span class="ident">u</span>) =&gt; <span class="self">self</span> <span class="op">-</span> <span class="ident">u</span>,
-            <span class="ident">Negative</span>(<span class="ident">u</span>) =&gt; <span class="self">self</span> <span class="op">+</span> <span class="ident">u</span>,
-        }
-    }
-}
-<span class="kw">impl</span> <span class="ident">SubAssign</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigInt</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">i64</span>) {
-        <span class="kw">match</span> <span class="ident">other</span>.<span class="ident">checked_uabs</span>() {
-            <span class="ident">Positive</span>(<span class="ident">u</span>) =&gt; <span class="kw-2">*</span><span class="self">self</span> <span class="op">-</span><span class="op">=</span> <span class="ident">u</span>,
-            <span class="ident">Negative</span>(<span class="ident">u</span>) =&gt; <span class="kw-2">*</span><span class="self">self</span> <span class="op">+</span><span class="op">=</span> <span class="ident">u</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>sub(<span class="self">self</span>, other: BigInt) -&gt; BigInt {
+        <span class="kw">match </span><span class="self">self</span>.checked_uabs() {
+            Positive(u) =&gt; u - other,
+            Negative(u) =&gt; -other - u,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">BigInt</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">i64</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigInt</span>;
+<span class="kw">impl </span>Sub&lt;i64&gt; <span class="kw">for </span>BigInt {
+    <span class="kw">type </span>Output = BigInt;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">BigInt</span>) -&gt; <span class="ident">BigInt</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">checked_uabs</span>() {
-            <span class="ident">Positive</span>(<span class="ident">u</span>) =&gt; <span class="ident">u</span> <span class="op">-</span> <span class="ident">other</span>,
-            <span class="ident">Negative</span>(<span class="ident">u</span>) =&gt; <span class="op">-</span><span class="ident">other</span> <span class="op">-</span> <span class="ident">u</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>sub(<span class="self">self</span>, other: i64) -&gt; BigInt {
+        <span class="kw">match </span>other.checked_uabs() {
+            Positive(u) =&gt; <span class="self">self </span>- u,
+            Negative(u) =&gt; <span class="self">self </span>+ u,
+        }
+    }
+}
+<span class="kw">impl </span>SubAssign&lt;i64&gt; <span class="kw">for </span>BigInt {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>sub_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: i64) {
+        <span class="kw">match </span>other.checked_uabs() {
+            Positive(u) =&gt; <span class="kw-2">*</span><span class="self">self </span>-= u,
+            Negative(u) =&gt; <span class="kw-2">*</span><span class="self">self </span>+= u,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">i128</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigInt</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigInt</span>;
+<span class="kw">impl </span>Sub&lt;BigInt&gt; <span class="kw">for </span>i64 {
+    <span class="kw">type </span>Output = BigInt;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">i128</span>) -&gt; <span class="ident">BigInt</span> {
-        <span class="kw">match</span> <span class="ident">other</span>.<span class="ident">checked_uabs</span>() {
-            <span class="ident">Positive</span>(<span class="ident">u</span>) =&gt; <span class="self">self</span> <span class="op">-</span> <span class="ident">u</span>,
-            <span class="ident">Negative</span>(<span class="ident">u</span>) =&gt; <span class="self">self</span> <span class="op">+</span> <span class="ident">u</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>sub(<span class="self">self</span>, other: BigInt) -&gt; BigInt {
+        <span class="kw">match </span><span class="self">self</span>.checked_uabs() {
+            Positive(u) =&gt; u - other,
+            Negative(u) =&gt; -other - u,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">SubAssign</span><span class="op">&lt;</span><span class="ident">i128</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigInt</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">i128</span>) {
-        <span class="kw">match</span> <span class="ident">other</span>.<span class="ident">checked_uabs</span>() {
-            <span class="ident">Positive</span>(<span class="ident">u</span>) =&gt; <span class="kw-2">*</span><span class="self">self</span> <span class="op">-</span><span class="op">=</span> <span class="ident">u</span>,
-            <span class="ident">Negative</span>(<span class="ident">u</span>) =&gt; <span class="kw-2">*</span><span class="self">self</span> <span class="op">+</span><span class="op">=</span> <span class="ident">u</span>,
+<span class="kw">impl </span>Sub&lt;i128&gt; <span class="kw">for </span>BigInt {
+    <span class="kw">type </span>Output = BigInt;
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>sub(<span class="self">self</span>, other: i128) -&gt; BigInt {
+        <span class="kw">match </span>other.checked_uabs() {
+            Positive(u) =&gt; <span class="self">self </span>- u,
+            Negative(u) =&gt; <span class="self">self </span>+ u,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">BigInt</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">i128</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigInt</span>;
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">BigInt</span>) -&gt; <span class="ident">BigInt</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">checked_uabs</span>() {
-            <span class="ident">Positive</span>(<span class="ident">u</span>) =&gt; <span class="ident">u</span> <span class="op">-</span> <span class="ident">other</span>,
-            <span class="ident">Negative</span>(<span class="ident">u</span>) =&gt; <span class="op">-</span><span class="ident">other</span> <span class="op">-</span> <span class="ident">u</span>,
+<span class="kw">impl </span>SubAssign&lt;i128&gt; <span class="kw">for </span>BigInt {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>sub_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: i128) {
+        <span class="kw">match </span>other.checked_uabs() {
+            Positive(u) =&gt; <span class="kw-2">*</span><span class="self">self </span>-= u,
+            Negative(u) =&gt; <span class="kw-2">*</span><span class="self">self </span>+= u,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CheckedSub</span> <span class="kw">for</span> <span class="ident">BigInt</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">checked_sub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">BigInt</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BigInt</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">sub</span>(<span class="ident">v</span>))
+<span class="kw">impl </span>Sub&lt;BigInt&gt; <span class="kw">for </span>i128 {
+    <span class="kw">type </span>Output = BigInt;
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>sub(<span class="self">self</span>, other: BigInt) -&gt; BigInt {
+        <span class="kw">match </span><span class="self">self</span>.checked_uabs() {
+            Positive(u) =&gt; u - other,
+            Negative(u) =&gt; -other - u,
+        }
+    }
+}
+
+<span class="kw">impl </span>CheckedSub <span class="kw">for </span>BigInt {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>checked_sub(<span class="kw-2">&amp;</span><span class="self">self</span>, v: <span class="kw-2">&amp;</span>BigInt) -&gt; <span class="prelude-ty">Option</span>&lt;BigInt&gt; {
+        <span class="prelude-val">Some</span>(<span class="self">self</span>.sub(v))
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="num_bigint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="num_bigint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-util-0.8.5/src/assert.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>assert.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_util/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-util-0.8.5/src/assert.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>assert.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_util/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -91,98 +91,98 @@
 <span id="91">91</span>
 <span id="92">92</span>
 <span id="93">93</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Debugging assertions to check a radix is valid.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Debugging assertions to check a radix is valid.
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants::FormattedSize</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::format::NumberFormat</span>;
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;write&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::constants::FormattedSize;
+<span class="kw">use </span><span class="kw">crate</span>::format::NumberFormat;
 
-<span class="comment">// RADIX</span>
+<span class="comment">// RADIX
 
-<span class="doccomment">/// Check radix is in range `[2, 36]` in debug builds.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">debug_assert_radix</span>(<span class="ident">radix</span>: <span class="ident">u32</span>) {
-    <span class="macro">debug_assert!</span>((<span class="number">2</span>..<span class="op">=</span><span class="number">36</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">radix</span>), <span class="string">&quot;Numerical base must be from 2-36.&quot;</span>);
+</span><span class="doccomment">/// Check radix is in range `[2, 36]` in debug builds.
+</span><span class="attribute">#[inline]
+#[cfg(feature = <span class="string">&quot;radix&quot;</span>)]
+</span><span class="kw">pub fn </span>debug_assert_radix(radix: u32) {
+    <span class="macro">debug_assert!</span>((<span class="number">2</span>..=<span class="number">36</span>).contains(<span class="kw-2">&amp;</span>radix), <span class="string">&quot;Numerical base must be from 2-36.&quot;</span>);
 }
 
-<span class="doccomment">/// Check radix is is 10 or a power of 2.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">debug_assert_radix</span>(<span class="ident">radix</span>: <span class="ident">u32</span>) {
-    <span class="macro">debug_assert!</span>(<span class="macro">matches!</span>(<span class="ident">radix</span>, <span class="number">2</span> <span class="op">|</span> <span class="number">4</span> <span class="op">|</span> <span class="number">8</span> <span class="op">|</span> <span class="number">10</span> <span class="op">|</span> <span class="number">16</span> <span class="op">|</span> <span class="number">32</span>), <span class="string">&quot;Numerical base must be from 2-36.&quot;</span>);
+<span class="doccomment">/// Check radix is is 10 or a power of 2.
+</span><span class="attribute">#[inline]
+#[cfg(all(feature = <span class="string">&quot;power-of-two&quot;</span>, not(feature = <span class="string">&quot;radix&quot;</span>)))]
+</span><span class="kw">pub fn </span>debug_assert_radix(radix: u32) {
+    <span class="macro">debug_assert!</span>(<span class="macro">matches!</span>(radix, <span class="number">2 </span>| <span class="number">4 </span>| <span class="number">8 </span>| <span class="number">10 </span>| <span class="number">16 </span>| <span class="number">32</span>), <span class="string">&quot;Numerical base must be from 2-36.&quot;</span>);
 }
 
-<span class="doccomment">/// Check radix is equal to 10.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">debug_assert_radix</span>(<span class="ident">radix</span>: <span class="ident">u32</span>) {
-    <span class="macro">debug_assert!</span>(<span class="ident">radix</span> <span class="op">==</span> <span class="number">10</span>, <span class="string">&quot;Numerical base must be 10.&quot;</span>);
+<span class="doccomment">/// Check radix is equal to 10.
+</span><span class="attribute">#[inline]
+#[cfg(not(feature = <span class="string">&quot;power-of-two&quot;</span>))]
+</span><span class="kw">pub fn </span>debug_assert_radix(radix: u32) {
+    <span class="macro">debug_assert!</span>(radix == <span class="number">10</span>, <span class="string">&quot;Numerical base must be 10.&quot;</span>);
 }
 
-<span class="doccomment">/// Assert radix is in range `[2, 36]`.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_radix</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>() {
+<span class="doccomment">/// Assert radix is in range `[2, 36]`.
+</span><span class="attribute">#[inline]
+#[cfg(feature = <span class="string">&quot;radix&quot;</span>)]
+</span><span class="kw">pub fn </span>assert_radix&lt;<span class="kw">const </span>FORMAT: u128&gt;() {
     <span class="macro">assert!</span>(
-        (<span class="number">2</span>..<span class="op">=</span><span class="number">36</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span><span class="ident">::RADIX</span>),
-        <span class="string">&quot;Numerical base must be from 2-36.&quot;</span>
-    );
+        (<span class="number">2</span>..=<span class="number">36</span>).contains(<span class="kw-2">&amp;</span>NumberFormat::&lt;{ FORMAT }&gt;::RADIX),
+        <span class="string">&quot;Numerical base must be from 2-36.&quot;
+    </span>);
 }
 
-<span class="doccomment">/// Check radix is is 10 or a power of 2.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_radix</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>() {
+<span class="doccomment">/// Check radix is is 10 or a power of 2.
+</span><span class="attribute">#[inline]
+#[cfg(all(feature = <span class="string">&quot;power-of-two&quot;</span>, not(feature = <span class="string">&quot;radix&quot;</span>)))]
+</span><span class="kw">pub fn </span>assert_radix&lt;<span class="kw">const </span>FORMAT: u128&gt;() {
     <span class="macro">assert!</span>(
-        <span class="macro">matches!</span>(<span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span><span class="ident">::RADIX</span>, <span class="number">2</span> <span class="op">|</span> <span class="number">4</span> <span class="op">|</span> <span class="number">8</span> <span class="op">|</span> <span class="number">10</span> <span class="op">|</span> <span class="number">16</span> <span class="op">|</span> <span class="number">32</span>),
-        <span class="string">&quot;Numerical base must be from 2, 4, 8, 10, 16, or 32.&quot;</span>
-    );
+        <span class="macro">matches!</span>(NumberFormat::&lt;{ FORMAT }&gt;::RADIX, <span class="number">2 </span>| <span class="number">4 </span>| <span class="number">8 </span>| <span class="number">10 </span>| <span class="number">16 </span>| <span class="number">32</span>),
+        <span class="string">&quot;Numerical base must be from 2, 4, 8, 10, 16, or 32.&quot;
+    </span>);
 }
 
-<span class="doccomment">/// Check radix is equal to 10.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_radix</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>() {
-    <span class="macro">assert!</span>(<span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span><span class="ident">::RADIX</span> <span class="op">==</span> <span class="number">10</span>, <span class="string">&quot;Numerical base must be 10.&quot;</span>);
+<span class="doccomment">/// Check radix is equal to 10.
+</span><span class="attribute">#[inline]
+#[cfg(not(feature = <span class="string">&quot;power-of-two&quot;</span>))]
+</span><span class="kw">pub fn </span>assert_radix&lt;<span class="kw">const </span>FORMAT: u128&gt;() {
+    <span class="macro">assert!</span>(NumberFormat::&lt;{ FORMAT }&gt;::RADIX == <span class="number">10</span>, <span class="string">&quot;Numerical base must be 10.&quot;</span>);
 }
 
-<span class="comment">// BUFFER</span>
+<span class="comment">// BUFFER
 
-<span class="doccomment">/// Debug assertion the buffer has sufficient room for the output.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">debug_assert_buffer</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">FormattedSize</span><span class="op">&gt;</span>(<span class="ident">radix</span>: <span class="ident">u32</span>, <span class="ident">len</span>: <span class="ident">usize</span>) {
+</span><span class="doccomment">/// Debug assertion the buffer has sufficient room for the output.
+</span><span class="attribute">#[inline]
+#[cfg(feature = <span class="string">&quot;write&quot;</span>)]
+</span><span class="kw">pub fn </span>debug_assert_buffer&lt;T: FormattedSize&gt;(radix: u32, len: usize) {
     <span class="macro">debug_assert!</span>(
-        <span class="kw">match</span> <span class="ident">radix</span> {
-            <span class="number">10</span> =&gt; <span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">T::FORMATTED_SIZE_DECIMAL</span>,
-            <span class="kw">_</span> =&gt; <span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">T::FORMATTED_SIZE</span>,
+        <span class="kw">match </span>radix {
+            <span class="number">10 </span>=&gt; len &gt;= T::FORMATTED_SIZE_DECIMAL,
+            <span class="kw">_ </span>=&gt; len &gt;= T::FORMATTED_SIZE,
         },
-        <span class="string">&quot;Buffer is too small: may overwrite buffer in release builds.&quot;</span>
-    );
+        <span class="string">&quot;Buffer is too small: may overwrite buffer in release builds.&quot;
+    </span>);
 }
 
-<span class="doccomment">/// Assertion the buffer has sufficient room for the output.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write&quot;</span>))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_buffer</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">FormattedSize</span><span class="op">&gt;</span>(<span class="ident">radix</span>: <span class="ident">u32</span>, <span class="ident">len</span>: <span class="ident">usize</span>) {
+<span class="doccomment">/// Assertion the buffer has sufficient room for the output.
+</span><span class="attribute">#[inline]
+#[cfg(all(feature = <span class="string">&quot;power-of-two&quot;</span>, feature = <span class="string">&quot;write&quot;</span>))]
+</span><span class="kw">pub fn </span>assert_buffer&lt;T: FormattedSize&gt;(radix: u32, len: usize) {
     <span class="macro">assert!</span>(
-        <span class="kw">match</span> <span class="ident">radix</span> {
-            <span class="number">10</span> =&gt; <span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">T::FORMATTED_SIZE_DECIMAL</span>,
-            <span class="kw">_</span> =&gt; <span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">T::FORMATTED_SIZE</span>,
+        <span class="kw">match </span>radix {
+            <span class="number">10 </span>=&gt; len &gt;= T::FORMATTED_SIZE_DECIMAL,
+            <span class="kw">_ </span>=&gt; len &gt;= T::FORMATTED_SIZE,
         },
-        <span class="string">&quot;Buffer is too small: may overwrite buffer, panicking!&quot;</span>
-    );
+        <span class="string">&quot;Buffer is too small: may overwrite buffer, panicking!&quot;
+    </span>);
 }
 
-<span class="doccomment">/// Assertion the buffer has sufficient room for the output.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>), <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write&quot;</span>))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_buffer</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">FormattedSize</span><span class="op">&gt;</span>(<span class="kw">_</span>: <span class="ident">u32</span>, <span class="ident">len</span>: <span class="ident">usize</span>) {
+<span class="doccomment">/// Assertion the buffer has sufficient room for the output.
+</span><span class="attribute">#[inline]
+#[cfg(all(not(feature = <span class="string">&quot;power-of-two&quot;</span>), feature = <span class="string">&quot;write&quot;</span>))]
+</span><span class="kw">pub fn </span>assert_buffer&lt;T: FormattedSize&gt;(<span class="kw">_</span>: u32, len: usize) {
     <span class="macro">assert!</span>(
-        <span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">T::FORMATTED_SIZE_DECIMAL</span>,
-        <span class="string">&quot;Buffer is too small: may overwrite buffer, panicking!&quot;</span>
-    );
+        len &gt;= T::FORMATTED_SIZE_DECIMAL,
+        <span class="string">&quot;Buffer is too small: may overwrite buffer, panicking!&quot;
+    </span>);
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

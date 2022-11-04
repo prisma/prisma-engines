@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/sql_migration_persistence.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sql_migration_persistence.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_migration_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/sql_migration_persistence.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sql_migration_persistence.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_migration_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -140,147 +140,147 @@
 <span id="140">140</span>
 <span id="141">141</span>
 <span id="142">142</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::SqlMigrationConnector</span>;
-<span class="kw">use</span> <span class="ident">migration_connector</span>::{
-    <span class="ident">BoxFuture</span>, <span class="ident">ConnectorError</span>, <span class="ident">ConnectorResult</span>, <span class="ident">MigrationPersistence</span>, <span class="ident">MigrationRecord</span>, <span class="ident">PersistenceNotInitializedError</span>,
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::SqlMigrationConnector;
+<span class="kw">use </span>migration_connector::{
+    BoxFuture, ConnectorError, ConnectorResult, MigrationPersistence, MigrationRecord, PersistenceNotInitializedError,
 };
-<span class="kw">use</span> <span class="ident">quaint::ast</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">uuid::Uuid</span>;
+<span class="kw">use </span>quaint::ast::<span class="kw-2">*</span>;
+<span class="kw">use </span>uuid::Uuid;
 
-<span class="kw">impl</span> <span class="ident">MigrationPersistence</span> <span class="kw">for</span> <span class="ident">SqlMigrationConnector</span> {
-    <span class="kw">fn</span> <span class="ident">baseline_initialize</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">flavour</span>.<span class="ident">create_migrations_table</span>()
+<span class="kw">impl </span>MigrationPersistence <span class="kw">for </span>SqlMigrationConnector {
+    <span class="kw">fn </span>baseline_initialize(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;()&gt;&gt; {
+        <span class="self">self</span>.flavour.create_migrations_table()
     }
 
-    <span class="kw">fn</span> <span class="ident">initialize</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-            <span class="comment">// TODO(MultiSchema): We may need to change this too.</span>
-            <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">flavour</span>.<span class="ident">describe_schema</span>(<span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">fn </span>initialize(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;()&gt;&gt; {
+        Box::pin(<span class="kw">async move </span>{
+            <span class="comment">// TODO(MultiSchema): We may need to change this too.
+            </span><span class="kw">let </span>schema = <span class="self">self</span>.flavour.describe_schema(<span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-            <span class="kw">if</span> <span class="ident">schema</span>
-                .<span class="ident">table_walkers</span>()
-                .<span class="ident">any</span>(<span class="op">|</span><span class="ident">table</span><span class="op">|</span> <span class="ident">table</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident"><span class="kw">crate</span>::MIGRATIONS_TABLE_NAME</span>)
+            <span class="kw">if </span>schema
+                .table_walkers()
+                .any(|table| table.name() == <span class="kw">crate</span>::MIGRATIONS_TABLE_NAME)
             {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(());
             }
 
-            <span class="kw">if</span> <span class="ident">schema</span>
-                .<span class="ident">table_walkers</span>()
-                .<span class="ident">any</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">flavour</span>().<span class="ident">table_should_be_ignored</span>(<span class="ident">t</span>.<span class="ident">name</span>()))
+            <span class="kw">if </span>schema
+                .table_walkers()
+                .any(|t| !<span class="self">self</span>.flavour().table_should_be_ignored(t.name()))
             {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::user_facing</span>(
-                    <span class="ident">user_facing_errors::migration_engine::DatabaseSchemaNotEmpty</span>,
+                <span class="kw">return </span><span class="prelude-val">Err</span>(ConnectorError::user_facing(
+                    user_facing_errors::migration_engine::DatabaseSchemaNotEmpty,
                 ));
             }
 
-            <span class="self">self</span>.<span class="ident">flavour</span>.<span class="ident">create_migrations_table</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="self">self</span>.flavour.create_migrations_table().<span class="kw">await</span><span class="question-mark">?</span>;
 
             <span class="prelude-val">Ok</span>(())
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">mark_migration_applied_impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">migration_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-        <span class="ident">checksum</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-            <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">Uuid::new_v4</span>().<span class="ident">to_string</span>();
-            <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">chrono::Utc::now</span>();
+    <span class="kw">fn </span>mark_migration_applied_impl&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+        migration_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+        checksum: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ConnectorResult&lt;String&gt;&gt; {
+        Box::pin(<span class="kw">async move </span>{
+            <span class="kw">let </span>id = Uuid::new_v4().to_string();
+            <span class="kw">let </span>now = chrono::Utc::now();
 
-            <span class="kw">let</span> <span class="ident">insert</span> <span class="op">=</span> <span class="ident">Insert::single_into</span>(<span class="self">self</span>.<span class="ident">flavour</span>().<span class="ident">migrations_table</span>())
-                .<span class="ident">value</span>(<span class="string">&quot;id&quot;</span>, <span class="ident">id</span>.<span class="ident">as_str</span>())
-                .<span class="ident">value</span>(<span class="string">&quot;checksum&quot;</span>, <span class="ident">checksum</span>)
-                .<span class="ident">value</span>(<span class="string">&quot;logs&quot;</span>, <span class="string">&quot;&quot;</span>)
-                .<span class="ident">value</span>(<span class="string">&quot;started_at&quot;</span>, <span class="ident">now</span>)
-                .<span class="ident">value</span>(<span class="string">&quot;finished_at&quot;</span>, <span class="ident">now</span>)
-                .<span class="ident">value</span>(<span class="string">&quot;migration_name&quot;</span>, <span class="ident">migration_name</span>);
+            <span class="kw">let </span>insert = Insert::single_into(<span class="self">self</span>.flavour().migrations_table())
+                .value(<span class="string">&quot;id&quot;</span>, id.as_str())
+                .value(<span class="string">&quot;checksum&quot;</span>, checksum)
+                .value(<span class="string">&quot;logs&quot;</span>, <span class="string">&quot;&quot;</span>)
+                .value(<span class="string">&quot;started_at&quot;</span>, now)
+                .value(<span class="string">&quot;finished_at&quot;</span>, now)
+                .value(<span class="string">&quot;migration_name&quot;</span>, migration_name);
 
-            <span class="self">self</span>.<span class="ident">flavour</span>.<span class="ident">query</span>(<span class="ident">insert</span>.<span class="ident">into</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="self">self</span>.flavour.query(insert.into()).<span class="kw">await</span><span class="question-mark">?</span>;
 
-            <span class="prelude-val">Ok</span>(<span class="ident">id</span>)
+            <span class="prelude-val">Ok</span>(id)
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">mark_migration_rolled_back_by_id</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">migration_id</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">update</span> <span class="op">=</span> <span class="ident">Update::table</span>(<span class="self">self</span>.<span class="ident">flavour</span>().<span class="ident">migrations_table</span>())
-            .<span class="ident">so_that</span>(<span class="ident">Column::from</span>(<span class="string">&quot;id&quot;</span>).<span class="ident">equals</span>(<span class="ident">migration_id</span>))
-            .<span class="ident">set</span>(<span class="string">&quot;rolled_back_at&quot;</span>, <span class="ident">chrono::Utc::now</span>());
+    <span class="kw">fn </span>mark_migration_rolled_back_by_id&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, migration_id: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ConnectorResult&lt;()&gt;&gt; {
+        <span class="kw">let </span>update = Update::table(<span class="self">self</span>.flavour().migrations_table())
+            .so_that(Column::from(<span class="string">&quot;id&quot;</span>).equals(migration_id))
+            .set(<span class="string">&quot;rolled_back_at&quot;</span>, chrono::Utc::now());
 
-        <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-            <span class="self">self</span>.<span class="ident">flavour</span>.<span class="ident">query</span>(<span class="ident">update</span>.<span class="ident">into</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+        Box::pin(<span class="kw">async move </span>{
+            <span class="self">self</span>.flavour.query(update.into()).<span class="kw">await</span><span class="question-mark">?</span>;
 
             <span class="prelude-val">Ok</span>(())
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">record_migration_started_impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">migration_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-        <span class="ident">checksum</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-            <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">Uuid::new_v4</span>().<span class="ident">to_string</span>();
-            <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">chrono::Utc::now</span>();
+    <span class="kw">fn </span>record_migration_started_impl&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+        migration_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+        checksum: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ConnectorResult&lt;String&gt;&gt; {
+        Box::pin(<span class="kw">async move </span>{
+            <span class="kw">let </span>id = Uuid::new_v4().to_string();
+            <span class="kw">let </span>now = chrono::Utc::now();
 
-            <span class="kw">let</span> <span class="ident">insert</span> <span class="op">=</span> <span class="ident">Insert::single_into</span>(<span class="self">self</span>.<span class="ident">flavour</span>().<span class="ident">migrations_table</span>())
-                .<span class="ident">value</span>(<span class="string">&quot;id&quot;</span>, <span class="ident">id</span>.<span class="ident">as_str</span>())
-                .<span class="ident">value</span>(<span class="string">&quot;checksum&quot;</span>, <span class="ident">checksum</span>)
-                .<span class="ident">value</span>(<span class="string">&quot;started_at&quot;</span>, <span class="ident">now</span>)
-                .<span class="ident">value</span>(<span class="string">&quot;migration_name&quot;</span>, <span class="ident">migration_name</span>);
+            <span class="kw">let </span>insert = Insert::single_into(<span class="self">self</span>.flavour().migrations_table())
+                .value(<span class="string">&quot;id&quot;</span>, id.as_str())
+                .value(<span class="string">&quot;checksum&quot;</span>, checksum)
+                .value(<span class="string">&quot;started_at&quot;</span>, now)
+                .value(<span class="string">&quot;migration_name&quot;</span>, migration_name);
 
-            <span class="self">self</span>.<span class="ident">flavour</span>.<span class="ident">query</span>(<span class="ident">insert</span>.<span class="ident">into</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="self">self</span>.flavour.query(insert.into()).<span class="kw">await</span><span class="question-mark">?</span>;
 
-            <span class="prelude-val">Ok</span>(<span class="ident">id</span>)
+            <span class="prelude-val">Ok</span>(id)
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">record_successful_step</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">quaint::ast</span>::<span class="kw-2">*</span>;
+    <span class="kw">fn </span>record_successful_step&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, id: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ConnectorResult&lt;()&gt;&gt; {
+        <span class="kw">use </span>quaint::ast::<span class="kw-2">*</span>;
 
-        <span class="kw">let</span> <span class="ident">update</span> <span class="op">=</span> <span class="ident">Update::table</span>(<span class="self">self</span>.<span class="ident">flavour</span>().<span class="ident">migrations_table</span>())
-            .<span class="ident">so_that</span>(<span class="ident">Column::from</span>(<span class="string">&quot;id&quot;</span>).<span class="ident">equals</span>(<span class="ident">id</span>))
-            .<span class="ident">set</span>(
+        <span class="kw">let </span>update = Update::table(<span class="self">self</span>.flavour().migrations_table())
+            .so_that(Column::from(<span class="string">&quot;id&quot;</span>).equals(id))
+            .set(
                 <span class="string">&quot;applied_steps_count&quot;</span>,
-                <span class="ident">Expression::from</span>(<span class="ident">Column::from</span>(<span class="string">&quot;applied_steps_count&quot;</span>)) <span class="op">+</span> <span class="ident">Expression::from</span>(<span class="number">1</span>),
+                Expression::from(Column::from(<span class="string">&quot;applied_steps_count&quot;</span>)) + Expression::from(<span class="number">1</span>),
             );
 
-        <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-            <span class="self">self</span>.<span class="ident">flavour</span>.<span class="ident">query</span>(<span class="ident">update</span>.<span class="ident">into</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+        Box::pin(<span class="kw">async move </span>{
+            <span class="self">self</span>.flavour.query(update.into()).<span class="kw">await</span><span class="question-mark">?</span>;
 
             <span class="prelude-val">Ok</span>(())
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">record_failed_step</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">logs</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">update</span> <span class="op">=</span> <span class="ident">Update::table</span>(<span class="self">self</span>.<span class="ident">flavour</span>().<span class="ident">migrations_table</span>())
-            .<span class="ident">so_that</span>(<span class="ident">Column::from</span>(<span class="string">&quot;id&quot;</span>).<span class="ident">equals</span>(<span class="ident">id</span>))
-            .<span class="ident">set</span>(<span class="string">&quot;logs&quot;</span>, <span class="ident">logs</span>);
+    <span class="kw">fn </span>record_failed_step&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, id: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, logs: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ConnectorResult&lt;()&gt;&gt; {
+        <span class="kw">let </span>update = Update::table(<span class="self">self</span>.flavour().migrations_table())
+            .so_that(Column::from(<span class="string">&quot;id&quot;</span>).equals(id))
+            .set(<span class="string">&quot;logs&quot;</span>, logs);
 
-        <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-            <span class="self">self</span>.<span class="ident">flavour</span>.<span class="ident">query</span>(<span class="ident">update</span>.<span class="ident">into</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
-
-            <span class="prelude-val">Ok</span>(())
-        })
-    }
-
-    <span class="kw">fn</span> <span class="ident">record_migration_finished</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">update</span> <span class="op">=</span> <span class="ident">Update::table</span>(<span class="self">self</span>.<span class="ident">flavour</span>().<span class="ident">migrations_table</span>())
-            .<span class="ident">so_that</span>(<span class="ident">Column::from</span>(<span class="string">&quot;id&quot;</span>).<span class="ident">equals</span>(<span class="ident">id</span>))
-            .<span class="ident">set</span>(<span class="string">&quot;finished_at&quot;</span>, <span class="ident">chrono::Utc::now</span>()); <span class="comment">// TODO maybe use a database generated timestamp</span>
-        <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
-            <span class="self">self</span>.<span class="ident">flavour</span>.<span class="ident">query</span>(<span class="ident">update</span>.<span class="ident">into</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+        Box::pin(<span class="kw">async move </span>{
+            <span class="self">self</span>.flavour.query(update.into()).<span class="kw">await</span><span class="question-mark">?</span>;
 
             <span class="prelude-val">Ok</span>(())
         })
     }
 
-    <span class="attribute">#[<span class="ident">tracing::instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">list_migrations</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MigrationRecord</span><span class="op">&gt;</span>, <span class="ident">PersistenceNotInitializedError</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">flavour</span>.<span class="ident">load_migrations_table</span>()
+    <span class="kw">fn </span>record_migration_finished&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, id: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ConnectorResult&lt;()&gt;&gt; {
+        <span class="kw">let </span>update = Update::table(<span class="self">self</span>.flavour().migrations_table())
+            .so_that(Column::from(<span class="string">&quot;id&quot;</span>).equals(id))
+            .set(<span class="string">&quot;finished_at&quot;</span>, chrono::Utc::now()); <span class="comment">// TODO maybe use a database generated timestamp
+        </span>Box::pin(<span class="kw">async move </span>{
+            <span class="self">self</span>.flavour.query(update.into()).<span class="kw">await</span><span class="question-mark">?</span>;
+
+            <span class="prelude-val">Ok</span>(())
+        })
+    }
+
+    <span class="attribute">#[tracing::instrument(skip(<span class="self">self</span>))]
+    </span><span class="kw">fn </span>list_migrations(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+    ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ConnectorResult&lt;<span class="prelude-ty">Result</span>&lt;Vec&lt;MigrationRecord&gt;, PersistenceNotInitializedError&gt;&gt;&gt; {
+        <span class="self">self</span>.flavour.load_migrations_table()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

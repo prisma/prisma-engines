@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/sql_schema_differ/column.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>column.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../sql_migration_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/sql_schema_differ/column.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>column.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../sql_migration_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -214,221 +214,221 @@
 <span id="214">214</span>
 <span id="215">215</span>
 <span id="216">216</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">flavour::SqlFlavour</span>, <span class="ident">pair::Pair</span>};
-<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
-<span class="kw">use</span> <span class="ident">psl::dml::PrismaValue</span>;
-<span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="ident">walkers::ColumnWalker</span>, <span class="ident">DefaultKind</span>};
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{flavour::SqlFlavour, pair::Pair};
+<span class="kw">use </span>enumflags2::BitFlags;
+<span class="kw">use </span>psl::dml::PrismaValue;
+<span class="kw">use </span>sql_schema_describer::{walkers::ColumnWalker, DefaultKind};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">all_changes</span>(<span class="ident">cols</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">flavour</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">SqlFlavour</span>) -&gt; <span class="ident">ColumnChanges</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes</span> <span class="op">=</span> <span class="ident">BitFlags::empty</span>();
-    <span class="kw">let</span> <span class="ident">type_change</span> <span class="op">=</span> <span class="ident">flavour</span>.<span class="ident">column_type_change</span>(<span class="ident">cols</span>);
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>all_changes(cols: Pair&lt;ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;, flavour: <span class="kw-2">&amp;</span><span class="kw">dyn </span>SqlFlavour) -&gt; ColumnChanges {
+    <span class="kw">let </span><span class="kw-2">mut </span>changes = BitFlags::empty();
+    <span class="kw">let </span>type_change = flavour.column_type_change(cols);
 
-    <span class="kw">if</span> <span class="ident">cols</span>.<span class="ident">previous</span>.<span class="ident">arity</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">cols</span>.<span class="ident">next</span>.<span class="ident">arity</span>() {
-        <span class="ident">changes</span> <span class="op">|</span><span class="op">=</span> <span class="ident">ColumnChange::Arity</span>
+    <span class="kw">if </span>cols.previous.arity() != cols.next.arity() {
+        changes |= ColumnChange::Arity
     };
 
-    <span class="kw">if</span> <span class="ident">type_change</span>.<span class="ident">is_some</span>() {
-        <span class="ident">changes</span> <span class="op">|</span><span class="op">=</span> <span class="ident">ColumnChange::TypeChanged</span>;
+    <span class="kw">if </span>type_change.is_some() {
+        changes |= ColumnChange::TypeChanged;
     };
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">defaults_match</span>(<span class="ident">cols</span>, <span class="ident">flavour</span>) {
-        <span class="ident">changes</span> <span class="op">|</span><span class="op">=</span> <span class="ident">ColumnChange::Default</span>;
+    <span class="kw">if </span>!defaults_match(cols, flavour) {
+        changes |= ColumnChange::Default;
     };
 
-    <span class="kw">if</span> <span class="ident">flavour</span>.<span class="ident">column_autoincrement_changed</span>(<span class="ident">cols</span>) {
-        <span class="ident">changes</span> <span class="op">|</span><span class="op">=</span> <span class="ident">ColumnChange::Autoincrement</span>;
+    <span class="kw">if </span>flavour.column_autoincrement_changed(cols) {
+        changes |= ColumnChange::Autoincrement;
     }
 
-    <span class="ident">ColumnChanges</span> { <span class="ident">type_change</span>, <span class="ident">changes</span> }
+    ColumnChanges { type_change, changes }
 }
 
-<span class="doccomment">/// There are workarounds to cope with current migration and introspection limitations.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - We bail on a number of cases that are too complex to deal with right now or underspecified.</span>
-<span class="kw">fn</span> <span class="ident">defaults_match</span>(<span class="ident">cols</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">flavour</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">SqlFlavour</span>) -&gt; <span class="ident">bool</span> {
-    <span class="comment">// JSON defaults on MySQL should be ignored.</span>
-    <span class="kw">if</span> <span class="ident">flavour</span>.<span class="ident">should_ignore_json_defaults</span>()
-        <span class="op">&amp;&amp;</span> (<span class="ident">cols</span>.<span class="ident">previous</span>.<span class="ident">column_type_family</span>().<span class="ident">is_json</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">cols</span>.<span class="ident">next</span>.<span class="ident">column_type_family</span>().<span class="ident">is_json</span>())
+<span class="doccomment">/// There are workarounds to cope with current migration and introspection limitations.
+///
+/// - We bail on a number of cases that are too complex to deal with right now or underspecified.
+</span><span class="kw">fn </span>defaults_match(cols: Pair&lt;ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;, flavour: <span class="kw-2">&amp;</span><span class="kw">dyn </span>SqlFlavour) -&gt; bool {
+    <span class="comment">// JSON defaults on MySQL should be ignored.
+    </span><span class="kw">if </span>flavour.should_ignore_json_defaults()
+        &amp;&amp; (cols.previous.column_type_family().is_json() || cols.next.column_type_family().is_json())
     {
-        <span class="kw">return</span> <span class="bool-val">true</span>;
+        <span class="kw">return </span><span class="bool-val">true</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">prev</span> <span class="op">=</span> <span class="ident">cols</span>.<span class="ident">previous</span>.<span class="ident">default</span>();
-    <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="ident">cols</span>.<span class="ident">next</span>.<span class="ident">default</span>();
+    <span class="kw">let </span>prev = cols.previous.default();
+    <span class="kw">let </span>next = cols.next.default();
 
-    <span class="kw">let</span> <span class="ident">defaults</span> <span class="op">=</span> (<span class="ident">prev</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">kind</span>()), <span class="ident">next</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">kind</span>()));
+    <span class="kw">let </span>defaults = (prev.map(|d| d.kind()), next.map(|d| d.kind()));
 
-    <span class="kw">let</span> <span class="ident">names_match</span> <span class="op">=</span> {
-        <span class="kw">let</span> <span class="ident">prev_constraint</span> <span class="op">=</span> <span class="ident">prev</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">constraint_name</span>());
-        <span class="kw">let</span> <span class="ident">next_constraint</span> <span class="op">=</span> <span class="ident">next</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">constraint_name</span>());
+    <span class="kw">let </span>names_match = {
+        <span class="kw">let </span>prev_constraint = prev.and_then(|v| v.constraint_name());
+        <span class="kw">let </span>next_constraint = next.and_then(|v| v.constraint_name());
 
-        <span class="ident">prev_constraint</span> <span class="op">==</span> <span class="ident">next_constraint</span>
+        prev_constraint == next_constraint
     };
 
-    <span class="kw">match</span> <span class="ident">defaults</span> {
-        (<span class="prelude-val">Some</span>(<span class="ident">DefaultKind::DbGenerated</span>(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::List</span>(<span class="kw">_</span>))))
-        <span class="op">|</span> (<span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::List</span>(<span class="kw">_</span>))), <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::DbGenerated</span>(<span class="kw">_</span>)))
-            <span class="kw">if</span> <span class="ident">cols</span>.<span class="ident">previous</span>.<span class="ident">column_type_family</span>().<span class="ident">is_datetime</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">cols</span>.<span class="ident">next</span>.<span class="ident">column_type_family</span>().<span class="ident">is_datetime</span>() =&gt;
+    <span class="kw">match </span>defaults {
+        (<span class="prelude-val">Some</span>(DefaultKind::DbGenerated(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(DefaultKind::Value(PrismaValue::List(<span class="kw">_</span>))))
+        | (<span class="prelude-val">Some</span>(DefaultKind::Value(PrismaValue::List(<span class="kw">_</span>))), <span class="prelude-val">Some</span>(DefaultKind::DbGenerated(<span class="kw">_</span>)))
+            <span class="kw">if </span>cols.previous.column_type_family().is_datetime() || cols.next.column_type_family().is_datetime() =&gt;
         {
-            <span class="bool-val">true</span>
+            <span class="bool-val">true
+        </span>}
+
+        (<span class="prelude-val">Some</span>(DefaultKind::Value(PrismaValue::List(prev))), <span class="prelude-val">Some</span>(DefaultKind::Value(PrismaValue::List(next)))) =&gt; {
+            list_defaults_match(prev, next, flavour)
         }
 
-        (<span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::List</span>(<span class="ident">prev</span>))), <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::List</span>(<span class="ident">next</span>)))) =&gt; {
-            <span class="ident">list_defaults_match</span>(<span class="ident">prev</span>, <span class="ident">next</span>, <span class="ident">flavour</span>)
-        }
-
-        <span class="comment">// Avoid naive string comparisons for JSON defaults.</span>
-        (
-            <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::Json</span>(<span class="ident">prev_json</span>))),
-            <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::Json</span>(<span class="ident">next_json</span>))),
+        <span class="comment">// Avoid naive string comparisons for JSON defaults.
+        </span>(
+            <span class="prelude-val">Some</span>(DefaultKind::Value(PrismaValue::Json(prev_json))),
+            <span class="prelude-val">Some</span>(DefaultKind::Value(PrismaValue::Json(next_json))),
         )
-        <span class="op">|</span> (
-            <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::String</span>(<span class="ident">prev_json</span>))),
-            <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::Json</span>(<span class="ident">next_json</span>))),
+        | (
+            <span class="prelude-val">Some</span>(DefaultKind::Value(PrismaValue::String(prev_json))),
+            <span class="prelude-val">Some</span>(DefaultKind::Value(PrismaValue::Json(next_json))),
         )
-        <span class="op">|</span> (
-            <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::Json</span>(<span class="ident">prev_json</span>))),
-            <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::String</span>(<span class="ident">next_json</span>))),
-        ) =&gt; <span class="ident">json_defaults_match</span>(<span class="ident">prev_json</span>, <span class="ident">next_json</span>) <span class="op">&amp;&amp;</span> <span class="ident">names_match</span>,
+        | (
+            <span class="prelude-val">Some</span>(DefaultKind::Value(PrismaValue::Json(prev_json))),
+            <span class="prelude-val">Some</span>(DefaultKind::Value(PrismaValue::String(next_json))),
+        ) =&gt; json_defaults_match(prev_json, next_json) &amp;&amp; names_match,
 
-        <span class="comment">// Avoid naive string comparisons for datetime defaults.</span>
-        (<span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::DateTime</span>(<span class="kw">_</span>))), <span class="prelude-val">Some</span>(<span class="kw">_</span>))
-        <span class="op">|</span> (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::DateTime</span>(<span class="kw">_</span>)))) =&gt; <span class="bool-val">true</span>, <span class="comment">// can&#39;t diff these in at present</span>
+        <span class="comment">// Avoid naive string comparisons for datetime defaults.
+        </span>(<span class="prelude-val">Some</span>(DefaultKind::Value(PrismaValue::DateTime(<span class="kw">_</span>))), <span class="prelude-val">Some</span>(<span class="kw">_</span>))
+        | (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">Some</span>(DefaultKind::Value(PrismaValue::DateTime(<span class="kw">_</span>)))) =&gt; <span class="bool-val">true</span>, <span class="comment">// can&#39;t diff these in at present
 
-        (<span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::Int</span>(<span class="ident">i</span>))), <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::BigInt</span>(<span class="ident">j</span>))))
-        <span class="op">|</span> (<span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::BigInt</span>(<span class="ident">i</span>))), <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Value</span>(<span class="ident">PrismaValue::Int</span>(<span class="ident">j</span>)))) =&gt; <span class="ident">i</span> <span class="op">==</span> <span class="ident">j</span>,
-        (<span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Value</span>(<span class="ident">prev</span>)), <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Value</span>(<span class="ident">next</span>))) =&gt; (<span class="ident">prev</span> <span class="op">==</span> <span class="ident">next</span>) <span class="op">&amp;&amp;</span> <span class="ident">names_match</span>,
-        (<span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Value</span>(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Now</span>)) =&gt; <span class="bool-val">false</span>,
-        (<span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Value</span>(<span class="kw">_</span>)), <span class="prelude-val">None</span>) =&gt; <span class="bool-val">false</span>,
+        </span>(<span class="prelude-val">Some</span>(DefaultKind::Value(PrismaValue::Int(i))), <span class="prelude-val">Some</span>(DefaultKind::Value(PrismaValue::BigInt(j))))
+        | (<span class="prelude-val">Some</span>(DefaultKind::Value(PrismaValue::BigInt(i))), <span class="prelude-val">Some</span>(DefaultKind::Value(PrismaValue::Int(j)))) =&gt; i == j,
+        (<span class="prelude-val">Some</span>(DefaultKind::Value(prev)), <span class="prelude-val">Some</span>(DefaultKind::Value(next))) =&gt; (prev == next) &amp;&amp; names_match,
+        (<span class="prelude-val">Some</span>(DefaultKind::Value(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(DefaultKind::Now)) =&gt; <span class="bool-val">false</span>,
+        (<span class="prelude-val">Some</span>(DefaultKind::Value(<span class="kw">_</span>)), <span class="prelude-val">None</span>) =&gt; <span class="bool-val">false</span>,
 
-        (<span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Now</span>), <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Now</span>)) =&gt; <span class="bool-val">true</span>,
-        (<span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Now</span>), <span class="prelude-val">None</span>) =&gt; <span class="bool-val">false</span>,
-        (<span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Now</span>), <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Value</span>(<span class="kw">_</span>))) =&gt; <span class="bool-val">false</span>,
+        (<span class="prelude-val">Some</span>(DefaultKind::Now), <span class="prelude-val">Some</span>(DefaultKind::Now)) =&gt; <span class="bool-val">true</span>,
+        (<span class="prelude-val">Some</span>(DefaultKind::Now), <span class="prelude-val">None</span>) =&gt; <span class="bool-val">false</span>,
+        (<span class="prelude-val">Some</span>(DefaultKind::Now), <span class="prelude-val">Some</span>(DefaultKind::Value(<span class="kw">_</span>))) =&gt; <span class="bool-val">false</span>,
 
-        (<span class="prelude-val">Some</span>(<span class="ident">DefaultKind::DbGenerated</span>(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Value</span>(<span class="kw">_</span>))) =&gt; <span class="bool-val">false</span>,
-        (<span class="prelude-val">Some</span>(<span class="ident">DefaultKind::DbGenerated</span>(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Now</span>)) =&gt; <span class="bool-val">false</span>,
-        (<span class="prelude-val">Some</span>(<span class="ident">DefaultKind::DbGenerated</span>(<span class="kw">_</span>)), <span class="prelude-val">None</span>) =&gt; <span class="bool-val">false</span>,
-        (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::DbGenerated</span>(<span class="prelude-val">None</span>))) =&gt; <span class="bool-val">true</span>,
+        (<span class="prelude-val">Some</span>(DefaultKind::DbGenerated(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(DefaultKind::Value(<span class="kw">_</span>))) =&gt; <span class="bool-val">false</span>,
+        (<span class="prelude-val">Some</span>(DefaultKind::DbGenerated(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(DefaultKind::Now)) =&gt; <span class="bool-val">false</span>,
+        (<span class="prelude-val">Some</span>(DefaultKind::DbGenerated(<span class="kw">_</span>)), <span class="prelude-val">None</span>) =&gt; <span class="bool-val">false</span>,
+        (<span class="kw">_</span>, <span class="prelude-val">Some</span>(DefaultKind::DbGenerated(<span class="prelude-val">None</span>))) =&gt; <span class="bool-val">true</span>,
 
-        (<span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Sequence</span>(<span class="kw">_</span>)), <span class="prelude-val">None</span>) =&gt; <span class="bool-val">true</span>, <span class="comment">// sequences are dropped separately</span>
-        (<span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Sequence</span>(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Value</span>(<span class="kw">_</span>))) =&gt; <span class="bool-val">false</span>,
-        (<span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Sequence</span>(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Now</span>)) =&gt; <span class="bool-val">false</span>,
+        (<span class="prelude-val">Some</span>(DefaultKind::Sequence(<span class="kw">_</span>)), <span class="prelude-val">None</span>) =&gt; <span class="bool-val">true</span>, <span class="comment">// sequences are dropped separately
+        </span>(<span class="prelude-val">Some</span>(DefaultKind::Sequence(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(DefaultKind::Value(<span class="kw">_</span>))) =&gt; <span class="bool-val">false</span>,
+        (<span class="prelude-val">Some</span>(DefaultKind::Sequence(<span class="kw">_</span>)), <span class="prelude-val">Some</span>(DefaultKind::Now)) =&gt; <span class="bool-val">false</span>,
 
-        (<span class="prelude-val">Some</span>(<span class="ident">DefaultKind::UniqueRowid</span>), <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::UniqueRowid</span>)) =&gt; <span class="bool-val">true</span>,
-        (<span class="prelude-val">Some</span>(<span class="ident">DefaultKind::UniqueRowid</span>), <span class="kw">_</span>) <span class="op">|</span> (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::UniqueRowid</span>)) =&gt; <span class="bool-val">false</span>,
+        (<span class="prelude-val">Some</span>(DefaultKind::UniqueRowid), <span class="prelude-val">Some</span>(DefaultKind::UniqueRowid)) =&gt; <span class="bool-val">true</span>,
+        (<span class="prelude-val">Some</span>(DefaultKind::UniqueRowid), <span class="kw">_</span>) | (<span class="kw">_</span>, <span class="prelude-val">Some</span>(DefaultKind::UniqueRowid)) =&gt; <span class="bool-val">false</span>,
 
         (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="bool-val">true</span>,
-        (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Value</span>(<span class="kw">_</span>))) =&gt; <span class="bool-val">false</span>,
-        (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Now</span>)) =&gt; <span class="bool-val">false</span>,
+        (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(DefaultKind::Value(<span class="kw">_</span>))) =&gt; <span class="bool-val">false</span>,
+        (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(DefaultKind::Now)) =&gt; <span class="bool-val">false</span>,
 
-        (<span class="prelude-val">Some</span>(<span class="ident">DefaultKind::DbGenerated</span>(<span class="prelude-val">Some</span>(<span class="ident">prev</span>))), <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::DbGenerated</span>(<span class="prelude-val">Some</span>(<span class="ident">next</span>)))) =&gt; {
-            (<span class="ident">prev</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="ident">next</span>)) <span class="op">&amp;&amp;</span> <span class="ident">names_match</span>
+        (<span class="prelude-val">Some</span>(DefaultKind::DbGenerated(<span class="prelude-val">Some</span>(prev))), <span class="prelude-val">Some</span>(DefaultKind::DbGenerated(<span class="prelude-val">Some</span>(next)))) =&gt; {
+            (prev.eq_ignore_ascii_case(next)) &amp;&amp; names_match
         }
-        (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::DbGenerated</span>(<span class="kw">_</span>))) =&gt; <span class="bool-val">false</span>,
-        (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">DefaultKind::Sequence</span>(<span class="kw">_</span>))) =&gt; <span class="bool-val">true</span>,
+        (<span class="kw">_</span>, <span class="prelude-val">Some</span>(DefaultKind::DbGenerated(<span class="kw">_</span>))) =&gt; <span class="bool-val">false</span>,
+        (<span class="kw">_</span>, <span class="prelude-val">Some</span>(DefaultKind::Sequence(<span class="kw">_</span>))) =&gt; <span class="bool-val">true</span>,
     }
 }
 
-<span class="kw">fn</span> <span class="ident">json_defaults_match</span>(<span class="ident">previous</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">next</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-    <span class="ident">serde_json::from_str</span>::<span class="op">&lt;</span><span class="ident">serde_json::Value</span><span class="op">&gt;</span>(<span class="ident">previous</span>)
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">previous</span><span class="op">|</span> <span class="ident">serde_json::from_str</span>::<span class="op">&lt;</span><span class="ident">serde_json::Value</span><span class="op">&gt;</span>(<span class="ident">next</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">next</span><span class="op">|</span> (<span class="ident">previous</span>, <span class="ident">next</span>)))
-        .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">previous</span>, <span class="ident">next</span>)<span class="op">|</span> <span class="ident">previous</span> <span class="op">==</span> <span class="ident">next</span>)
-        .<span class="ident">unwrap_or</span>(<span class="bool-val">true</span>)
+<span class="kw">fn </span>json_defaults_match(previous: <span class="kw-2">&amp;</span>str, next: <span class="kw-2">&amp;</span>str) -&gt; bool {
+    serde_json::from_str::&lt;serde_json::Value&gt;(previous)
+        .and_then(|previous| serde_json::from_str::&lt;serde_json::Value&gt;(next).map(|next| (previous, next)))
+        .map(|(previous, next)| previous == next)
+        .unwrap_or(<span class="bool-val">true</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">list_defaults_match</span>(<span class="ident">prev</span>: <span class="kw-2">&amp;</span>[<span class="ident">PrismaValue</span>], <span class="ident">next</span>: <span class="kw-2">&amp;</span>[<span class="ident">PrismaValue</span>], <span class="ident">flavour</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">SqlFlavour</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">if</span> <span class="ident">prev</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">next</span>.<span class="ident">len</span>() {
-        <span class="kw">return</span> <span class="bool-val">false</span>;
+<span class="kw">fn </span>list_defaults_match(prev: <span class="kw-2">&amp;</span>[PrismaValue], next: <span class="kw-2">&amp;</span>[PrismaValue], flavour: <span class="kw-2">&amp;</span><span class="kw">dyn </span>SqlFlavour) -&gt; bool {
+    <span class="kw">if </span>prev.len() != next.len() {
+        <span class="kw">return </span><span class="bool-val">false</span>;
     }
 
-    <span class="ident">prev</span>.<span class="ident">iter</span>()
-        .<span class="ident">zip</span>(<span class="ident">next</span>.<span class="ident">iter</span>())
-        .<span class="ident">all</span>(<span class="op">|</span>(<span class="ident">prev_value</span>, <span class="ident">next_value</span>)<span class="op">|</span> <span class="kw">match</span> (<span class="ident">prev_value</span>, <span class="ident">next_value</span>) {
-            (<span class="ident">PrismaValue::String</span>(<span class="ident">string_val</span>), <span class="ident">PrismaValue::Json</span>(<span class="ident">json_val</span>))
-            <span class="op">|</span> (<span class="ident">PrismaValue::Json</span>(<span class="ident">json_val</span>), <span class="ident">PrismaValue::String</span>(<span class="ident">string_val</span>)) =&gt; {
-                <span class="ident">json_defaults_match</span>(<span class="ident">string_val</span>, <span class="ident">json_val</span>)
+    prev.iter()
+        .zip(next.iter())
+        .all(|(prev_value, next_value)| <span class="kw">match </span>(prev_value, next_value) {
+            (PrismaValue::String(string_val), PrismaValue::Json(json_val))
+            | (PrismaValue::Json(json_val), PrismaValue::String(string_val)) =&gt; {
+                json_defaults_match(string_val, json_val)
             }
 
-            (<span class="ident">PrismaValue::DateTime</span>(<span class="kw">_</span>), <span class="kw">_</span>) <span class="op">|</span> (<span class="kw">_</span>, <span class="ident">PrismaValue::DateTime</span>(<span class="kw">_</span>)) =&gt; <span class="bool-val">true</span>,
+            (PrismaValue::DateTime(<span class="kw">_</span>), <span class="kw">_</span>) | (<span class="kw">_</span>, PrismaValue::DateTime(<span class="kw">_</span>)) =&gt; <span class="bool-val">true</span>,
 
-            (<span class="ident">PrismaValue::Enum</span>(<span class="ident">enum_val</span>), <span class="ident">PrismaValue::Bytes</span>(<span class="ident">bytes_val</span>))
-            <span class="op">|</span> (<span class="ident">PrismaValue::Bytes</span>(<span class="ident">bytes_val</span>), <span class="ident">PrismaValue::Enum</span>(<span class="ident">enum_val</span>)) =&gt; {
-                <span class="ident">flavour</span>.<span class="ident">string_matches_bytes</span>(<span class="ident">enum_val</span>, <span class="ident">bytes_val</span>)
+            (PrismaValue::Enum(enum_val), PrismaValue::Bytes(bytes_val))
+            | (PrismaValue::Bytes(bytes_val), PrismaValue::Enum(enum_val)) =&gt; {
+                flavour.string_matches_bytes(enum_val, bytes_val)
             }
 
-            <span class="kw">_</span> =&gt; <span class="ident">prev_value</span> <span class="op">==</span> <span class="ident">next_value</span>,
+            <span class="kw">_ </span>=&gt; prev_value == next_value,
         })
 }
 
-<span class="attribute">#[<span class="ident">enumflags2::bitflags</span>]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">ColumnChange</span> {
-    <span class="ident">Arity</span>,
-    <span class="ident">Default</span>,
-    <span class="ident">TypeChanged</span>,
-    <span class="ident">Autoincrement</span>,
+<span class="attribute">#[enumflags2::bitflags]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[repr(u8)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>ColumnChange {
+    Arity,
+    Default,
+    TypeChanged,
+    Autoincrement,
 }
 
-<span class="comment">// This should be pub(crate), but SqlMigration is exported, so it has to be</span>
-<span class="comment">// public at the moment.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Default</span>, <span class="ident">Eq</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ColumnChanges</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">type_change</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ColumnTypeChange</span><span class="op">&gt;</span>,
-    <span class="ident">changes</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">ColumnChange</span><span class="op">&gt;</span>,
+<span class="comment">// This should be pub(crate), but SqlMigration is exported, so it has to be
+// public at the moment.
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq, Default, Eq, Copy)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ColumnChanges {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) type_change: <span class="prelude-ty">Option</span>&lt;ColumnTypeChange&gt;,
+    changes: BitFlags&lt;ColumnChange&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">ColumnChanges</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">std::cmp::Ordering</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">changes</span>.<span class="ident">bits</span>().<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">changes</span>.<span class="ident">bits</span>())
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">ColumnChanges</span> {
-    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">std::cmp::Ordering</span> {
-        <span class="self">self</span>.<span class="ident">changes</span>.<span class="ident">bits</span>().<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">changes</span>.<span class="ident">bits</span>())
+<span class="kw">impl </span>PartialOrd <span class="kw">for </span>ColumnChanges {
+    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;std::cmp::Ordering&gt; {
+        <span class="self">self</span>.changes.bits().partial_cmp(<span class="kw-2">&amp;</span>other.changes.bits())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ColumnChanges</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">differs_in_something</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="op">!</span><span class="self">self</span>.<span class="ident">changes</span>.<span class="ident">is_empty</span>()
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">autoincrement_changed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">changes</span>.<span class="ident">contains</span>(<span class="ident">ColumnChange::Autoincrement</span>)
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ColumnChange</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
-        <span class="self">self</span>.<span class="ident">changes</span>.<span class="ident">iter</span>()
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">type_changed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">changes</span>.<span class="ident">contains</span>(<span class="ident">ColumnChange::TypeChanged</span>)
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">arity_changed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">changes</span>.<span class="ident">contains</span>(<span class="ident">ColumnChange::Arity</span>)
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">default_changed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">changes</span>.<span class="ident">contains</span>(<span class="ident">ColumnChange::Default</span>)
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">only_default_changed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">changes</span> <span class="op">==</span> <span class="ident">ColumnChange::Default</span>
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">only_type_changed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">changes</span> <span class="op">==</span> <span class="ident">ColumnChange::TypeChanged</span>
+<span class="kw">impl </span>Ord <span class="kw">for </span>ColumnChanges {
+    <span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; std::cmp::Ordering {
+        <span class="self">self</span>.changes.bits().cmp(<span class="kw-2">&amp;</span>other.changes.bits())
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ColumnTypeChange</span> {
-    <span class="ident">SafeCast</span>,
-    <span class="ident">RiskyCast</span>,
-    <span class="ident">NotCastable</span>,
+<span class="kw">impl </span>ColumnChanges {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>differs_in_something(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        !<span class="self">self</span>.changes.is_empty()
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>autoincrement_changed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.changes.contains(ColumnChange::Autoincrement)
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = ColumnChange&gt; + <span class="lifetime">&#39;_ </span>{
+        <span class="self">self</span>.changes.iter()
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>type_changed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.changes.contains(ColumnChange::TypeChanged)
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>arity_changed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.changes.contains(ColumnChange::Arity)
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>default_changed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.changes.contains(ColumnChange::Default)
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>only_default_changed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.changes == ColumnChange::Default
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>only_type_changed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.changes == ColumnChange::TypeChanged
+    }
+}
+
+<span class="attribute">#[derive(Debug, Clone, PartialEq, Eq, Copy)]
+</span><span class="kw">pub enum </span>ColumnTypeChange {
+    SafeCast,
+    RiskyCast,
+    NotCastable,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

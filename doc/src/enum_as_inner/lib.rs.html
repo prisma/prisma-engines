@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/enum-as-inner-0.4.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../enum_as_inner/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../enum_as_inner/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../enum_as_inner/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/enum-as-inner-0.4.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../enum_as_inner/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../enum_as_inner/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../enum_as_inner/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -369,376 +369,376 @@
 <span id="369">369</span>
 <span id="370">370</span>
 <span id="371">371</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2018 Benjamin Fry &lt;benjaminfry@me.com&gt;</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2018 Benjamin Fry &lt;benjaminfry@me.com&gt;
+//
+// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="doccomment">//! # enum-as-inner</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! A deriving proc-macro for generating functions to automatically give access to the inner members of enum.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Basic unnamed field case</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The basic case is meant for single item enums, like:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! use enum_as_inner::EnumAsInner;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[derive(Debug, EnumAsInner)]</span>
-<span class="doccomment">//! enum OneEnum {</span>
-<span class="doccomment">//!     One(u32),</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let one = OneEnum::One(1);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! assert_eq!(*one.as_one().unwrap(), 1);</span>
-<span class="doccomment">//! assert_eq!(one.into_one().unwrap(), 1);</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! where the result is either a reference for inner items or a tuple containing the inner items.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Unit case</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This will return true if enum&#39;s variant matches the expected type</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! use enum_as_inner::EnumAsInner;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[derive(EnumAsInner)]</span>
-<span class="doccomment">//! enum UnitVariants {</span>
-<span class="doccomment">//!     Zero,</span>
-<span class="doccomment">//!     One,</span>
-<span class="doccomment">//!     Two,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let unit = UnitVariants::Two;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! assert!(unit.is_two());</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Mutliple, unnamed field case</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This will return a tuple of the inner types:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! use enum_as_inner::EnumAsInner;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[derive(Debug, EnumAsInner)]</span>
-<span class="doccomment">//! enum ManyVariants {</span>
-<span class="doccomment">//!     One(u32),</span>
-<span class="doccomment">//!     Two(u32, i32),</span>
-<span class="doccomment">//!     Three(bool, u32, i64),</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let many = ManyVariants::Three(true, 1, 2);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! assert_eq!(many.as_three().unwrap(), (&amp;true, &amp;1_u32, &amp;2_i64));</span>
-<span class="doccomment">//! assert_eq!(many.into_three().unwrap(), (true, 1_u32, 2_i64));</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Multiple, named field case</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This will return a tuple of the inner types, like the unnamed option:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! use enum_as_inner::EnumAsInner;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[derive(Debug, EnumAsInner)]</span>
-<span class="doccomment">//! enum ManyVariants {</span>
-<span class="doccomment">//!     One { one: u32 },</span>
-<span class="doccomment">//!     Two { one: u32, two: i32 },</span>
-<span class="doccomment">//!     Three { one: bool, two: u32, three: i64 },</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let many = ManyVariants::Three { one: true, two: 1, three: 2 };</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! assert_eq!(many.as_three().unwrap(), (&amp;true, &amp;1_u32, &amp;2_i64));</span>
-<span class="doccomment">//! assert_eq!(many.into_three().unwrap(), (true, 1_u32, 2_i64));</span>
-<span class="doccomment">//! ```</span>
+</span><span class="doccomment">//! # enum-as-inner
+//!
+//! A deriving proc-macro for generating functions to automatically give access to the inner members of enum.
+//!
+//! ## Basic unnamed field case
+//!
+//! The basic case is meant for single item enums, like:
+//!
+//! ```rust
+//! use enum_as_inner::EnumAsInner;
+//!
+//! #[derive(Debug, EnumAsInner)]
+//! enum OneEnum {
+//!     One(u32),
+//! }
+//!
+//! let one = OneEnum::One(1);
+//!
+//! assert_eq!(*one.as_one().unwrap(), 1);
+//! assert_eq!(one.into_one().unwrap(), 1);
+//! ```
+//!
+//! where the result is either a reference for inner items or a tuple containing the inner items.
+//!
+//! ## Unit case
+//!
+//! This will return true if enum&#39;s variant matches the expected type
+//!
+//! ```rust
+//! use enum_as_inner::EnumAsInner;
+//!
+//! #[derive(EnumAsInner)]
+//! enum UnitVariants {
+//!     Zero,
+//!     One,
+//!     Two,
+//! }
+//!
+//! let unit = UnitVariants::Two;
+//!
+//! assert!(unit.is_two());
+//! ```
+//!
+//! ## Mutliple, unnamed field case
+//!
+//! This will return a tuple of the inner types:
+//!
+//! ```rust
+//! use enum_as_inner::EnumAsInner;
+//!
+//! #[derive(Debug, EnumAsInner)]
+//! enum ManyVariants {
+//!     One(u32),
+//!     Two(u32, i32),
+//!     Three(bool, u32, i64),
+//! }
+//!
+//! let many = ManyVariants::Three(true, 1, 2);
+//!
+//! assert_eq!(many.as_three().unwrap(), (&amp;true, &amp;1_u32, &amp;2_i64));
+//! assert_eq!(many.into_three().unwrap(), (true, 1_u32, 2_i64));
+//! ```
+//!
+//! ## Multiple, named field case
+//!
+//! This will return a tuple of the inner types, like the unnamed option:
+//!
+//! ```rust
+//! use enum_as_inner::EnumAsInner;
+//!
+//! #[derive(Debug, EnumAsInner)]
+//! enum ManyVariants {
+//!     One { one: u32 },
+//!     Two { one: u32, two: i32 },
+//!     Three { one: bool, two: u32, three: i64 },
+//! }
+//!
+//! let many = ManyVariants::Three { one: true, two: 1, three: 2 };
+//!
+//! assert_eq!(many.as_three().unwrap(), (&amp;true, &amp;1_u32, &amp;2_i64));
+//! assert_eq!(many.into_three().unwrap(), (true, 1_u32, 2_i64));
+//! ```
 
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro2</span>;
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">syn</span>;
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">quote</span>;
+</span><span class="kw">extern crate </span>proc_macro;
+<span class="kw">extern crate </span>proc_macro2;
+<span class="attribute">#[macro_use]
+</span><span class="kw">extern crate </span>syn;
+<span class="attribute">#[macro_use]
+</span><span class="kw">extern crate </span>quote;
 
-<span class="kw">use</span> <span class="ident">heck::ToSnakeCase</span>;
-<span class="kw">use</span> <span class="ident">proc_macro2</span>::{<span class="ident">Ident</span>, <span class="ident">Span</span>, <span class="ident">TokenStream</span>};
-<span class="kw">use</span> <span class="ident">syn::DeriveInput</span>;
+<span class="kw">use </span>heck::ToSnakeCase;
+<span class="kw">use </span>proc_macro2::{Ident, Span, TokenStream};
+<span class="kw">use </span>syn::DeriveInput;
 
-<span class="doccomment">/// returns first the types to return, the match names, and then tokens to the field accesses</span>
-<span class="kw">fn</span> <span class="ident">unit_fields_return</span>(
-    <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Ident</span>,
-    <span class="ident">variant_name</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Ident</span>,
-    <span class="ident">function_name</span>: <span class="kw-2">&amp;</span><span class="ident">Ident</span>,
-    <span class="ident">doc</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-) -&gt; <span class="ident">TokenStream</span> {
+<span class="doccomment">/// returns first the types to return, the match names, and then tokens to the field accesses
+</span><span class="kw">fn </span>unit_fields_return(
+    name: <span class="kw-2">&amp;</span>syn::Ident,
+    variant_name: <span class="kw-2">&amp;</span>syn::Ident,
+    function_name: <span class="kw-2">&amp;</span>Ident,
+    doc: <span class="kw-2">&amp;</span>str,
+) -&gt; TokenStream {
     <span class="macro">quote!</span>(
-        <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> #<span class="ident">doc</span>]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">function_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-            <span class="macro">matches!</span>(<span class="self">self</span>, #<span class="ident">name</span>::#<span class="ident">variant_name</span>)
+        <span class="attribute">#[doc = #doc]
+        </span><span class="kw">pub fn </span>#function_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+            <span class="macro">matches!</span>(<span class="self">self</span>, #name::#variant_name)
         }
     )
 }
 
-<span class="doccomment">/// returns first the types to return, the match names, and then tokens to the field accesses</span>
-<span class="kw">fn</span> <span class="ident">unnamed_fields_return</span>(
-    <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Ident</span>,
-    <span class="ident">variant_name</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Ident</span>,
-    (<span class="ident">function_name_mut_ref</span>, <span class="ident">doc_mut_ref</span>): (<span class="kw-2">&amp;</span><span class="ident">Ident</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>),
-    (<span class="ident">function_name_ref</span>, <span class="ident">doc_ref</span>): (<span class="kw-2">&amp;</span><span class="ident">Ident</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>),
-    (<span class="ident">function_name_val</span>, <span class="ident">doc_val</span>): (<span class="kw-2">&amp;</span><span class="ident">Ident</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>),
-    <span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="ident">syn::FieldsUnnamed</span>,
-) -&gt; <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> (<span class="ident">returns_mut_ref</span>, <span class="ident">returns_ref</span>, <span class="ident">returns_val</span>, <span class="ident">matches</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">fields</span>.<span class="ident">unnamed</span>.<span class="ident">len</span>() {
-        <span class="number">1</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">fields</span>.<span class="ident">unnamed</span>.<span class="ident">first</span>().<span class="ident">expect</span>(<span class="string">&quot;no fields on type&quot;</span>);
+<span class="doccomment">/// returns first the types to return, the match names, and then tokens to the field accesses
+</span><span class="kw">fn </span>unnamed_fields_return(
+    name: <span class="kw-2">&amp;</span>syn::Ident,
+    variant_name: <span class="kw-2">&amp;</span>syn::Ident,
+    (function_name_mut_ref, doc_mut_ref): (<span class="kw-2">&amp;</span>Ident, <span class="kw-2">&amp;</span>str),
+    (function_name_ref, doc_ref): (<span class="kw-2">&amp;</span>Ident, <span class="kw-2">&amp;</span>str),
+    (function_name_val, doc_val): (<span class="kw-2">&amp;</span>Ident, <span class="kw-2">&amp;</span>str),
+    fields: <span class="kw-2">&amp;</span>syn::FieldsUnnamed,
+) -&gt; TokenStream {
+    <span class="kw">let </span>(returns_mut_ref, returns_ref, returns_val, matches) = <span class="kw">match </span>fields.unnamed.len() {
+        <span class="number">1 </span>=&gt; {
+            <span class="kw">let </span>field = fields.unnamed.first().expect(<span class="string">&quot;no fields on type&quot;</span>);
 
-            <span class="kw">let</span> <span class="ident">returns</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">ty</span>;
-            <span class="kw">let</span> <span class="ident">returns_mut_ref</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="kw-2">&amp;mut</span> #<span class="ident">returns</span>);
-            <span class="kw">let</span> <span class="ident">returns_ref</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="kw-2">&amp;</span>#<span class="ident">returns</span>);
-            <span class="kw">let</span> <span class="ident">returns_val</span> <span class="op">=</span> <span class="macro">quote!</span>(#<span class="ident">returns</span>);
-            <span class="kw">let</span> <span class="ident">matches</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="ident">inner</span>);
+            <span class="kw">let </span>returns = <span class="kw-2">&amp;</span>field.ty;
+            <span class="kw">let </span>returns_mut_ref = <span class="macro">quote!</span>(<span class="kw-2">&amp;mut </span>#returns);
+            <span class="kw">let </span>returns_ref = <span class="macro">quote!</span>(<span class="kw-2">&amp;</span>#returns);
+            <span class="kw">let </span>returns_val = <span class="macro">quote!</span>(#returns);
+            <span class="kw">let </span>matches = <span class="macro">quote!</span>(inner);
 
-            (<span class="ident">returns_mut_ref</span>, <span class="ident">returns_ref</span>, <span class="ident">returns_val</span>, <span class="ident">matches</span>)
+            (returns_mut_ref, returns_ref, returns_val, matches)
         }
-        <span class="number">0</span> =&gt; (<span class="macro">quote!</span>(()), <span class="macro">quote!</span>(()), <span class="macro">quote!</span>(()), <span class="macro">quote!</span>()),
-        <span class="kw">_</span> =&gt; {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">returns_mut_ref</span> <span class="op">=</span> <span class="ident">TokenStream::new</span>();
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">returns_ref</span> <span class="op">=</span> <span class="ident">TokenStream::new</span>();
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">returns_val</span> <span class="op">=</span> <span class="ident">TokenStream::new</span>();
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">matches</span> <span class="op">=</span> <span class="ident">TokenStream::new</span>();
+        <span class="number">0 </span>=&gt; (<span class="macro">quote!</span>(()), <span class="macro">quote!</span>(()), <span class="macro">quote!</span>(()), <span class="macro">quote!</span>()),
+        <span class="kw">_ </span>=&gt; {
+            <span class="kw">let </span><span class="kw-2">mut </span>returns_mut_ref = TokenStream::new();
+            <span class="kw">let </span><span class="kw-2">mut </span>returns_ref = TokenStream::new();
+            <span class="kw">let </span><span class="kw-2">mut </span>returns_val = TokenStream::new();
+            <span class="kw">let </span><span class="kw-2">mut </span>matches = TokenStream::new();
 
-            <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">field</span>) <span class="kw">in</span> <span class="ident">fields</span>.<span class="ident">unnamed</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-                <span class="kw">let</span> <span class="ident">rt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">ty</span>;
-                <span class="kw">let</span> <span class="ident">match_name</span> <span class="op">=</span> <span class="ident">Ident::new</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;match_{}&quot;</span>, <span class="ident">i</span>), <span class="ident">Span::call_site</span>());
-                <span class="ident">returns_mut_ref</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(<span class="kw-2">&amp;mut</span> #<span class="ident">rt</span>,));
-                <span class="ident">returns_ref</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(<span class="kw-2">&amp;</span>#<span class="ident">rt</span>,));
-                <span class="ident">returns_val</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(#<span class="ident">rt</span>,));
-                <span class="ident">matches</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(#<span class="ident">match_name</span>,));
+            <span class="kw">for </span>(i, field) <span class="kw">in </span>fields.unnamed.iter().enumerate() {
+                <span class="kw">let </span>rt = <span class="kw-2">&amp;</span>field.ty;
+                <span class="kw">let </span>match_name = Ident::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;match_{}&quot;</span>, i), Span::call_site());
+                returns_mut_ref.extend(<span class="macro">quote!</span>(<span class="kw-2">&amp;mut </span>#rt,));
+                returns_ref.extend(<span class="macro">quote!</span>(<span class="kw-2">&amp;</span>#rt,));
+                returns_val.extend(<span class="macro">quote!</span>(#rt,));
+                matches.extend(<span class="macro">quote!</span>(#match_name,));
             }
 
             (
-                <span class="macro">quote!</span>((#<span class="ident">returns_mut_ref</span>)),
-                <span class="macro">quote!</span>((#<span class="ident">returns_ref</span>)),
-                <span class="macro">quote!</span>((#<span class="ident">returns_val</span>)),
-                <span class="macro">quote!</span>(#<span class="ident">matches</span>),
+                <span class="macro">quote!</span>((#returns_mut_ref)),
+                <span class="macro">quote!</span>((#returns_ref)),
+                <span class="macro">quote!</span>((#returns_val)),
+                <span class="macro">quote!</span>(#matches),
             )
         }
     };
 
     <span class="macro">quote!</span>(
-        <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> #<span class="ident">doc_mut_ref</span> ]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">function_name_mut_ref</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>#<span class="ident">returns_mut_ref</span><span class="op">&gt;</span> {
-            <span class="kw">match</span> <span class="self">self</span> {
-                #<span class="ident">name</span>::#<span class="ident">variant_name</span>(#<span class="ident">matches</span>) =&gt; {
-                    <span class="prelude-val">Some</span>((#<span class="ident">matches</span>))
+        <span class="attribute">#[doc = #doc_mut_ref ]
+        </span><span class="kw">pub fn </span>#function_name_mut_ref(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;#returns_mut_ref&gt; {
+            <span class="kw">match </span><span class="self">self </span>{
+                #name::#variant_name(#matches) =&gt; {
+                    <span class="prelude-val">Some</span>((#matches))
                 }
-                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>
-            }
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">None
+            </span>}
         }
 
-        <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> #<span class="ident">doc_ref</span> ]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">function_name_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>#<span class="ident">returns_ref</span><span class="op">&gt;</span> {
-            <span class="kw">match</span> <span class="self">self</span> {
-                #<span class="ident">name</span>::#<span class="ident">variant_name</span>(#<span class="ident">matches</span>) =&gt; {
-                    <span class="prelude-val">Some</span>((#<span class="ident">matches</span>))
+        <span class="attribute">#[doc = #doc_ref ]
+        </span><span class="kw">pub fn </span>#function_name_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;#returns_ref&gt; {
+            <span class="kw">match </span><span class="self">self </span>{
+                #name::#variant_name(#matches) =&gt; {
+                    <span class="prelude-val">Some</span>((#matches))
                 }
-                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>
-            }
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">None
+            </span>}
         }
 
-        <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> #<span class="ident">doc_val</span> ]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">function_name_val</span>(<span class="self">self</span>) -&gt; <span class="ident">::core::result::Result</span><span class="op">&lt;</span>#<span class="ident">returns_val</span>, <span class="self">Self</span><span class="op">&gt;</span> {
-            <span class="kw">match</span> <span class="self">self</span> {
-                #<span class="ident">name</span>::#<span class="ident">variant_name</span>(#<span class="ident">matches</span>) =&gt; {
-                    <span class="prelude-val">Ok</span>((#<span class="ident">matches</span>))
+        <span class="attribute">#[doc = #doc_val ]
+        </span><span class="kw">pub fn </span>#function_name_val(<span class="self">self</span>) -&gt; ::core::result::Result&lt;#returns_val, <span class="self">Self</span>&gt; {
+            <span class="kw">match </span><span class="self">self </span>{
+                #name::#variant_name(#matches) =&gt; {
+                    <span class="prelude-val">Ok</span>((#matches))
                 },
-                <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="self">self</span>)
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(<span class="self">self</span>)
             }
         }
     )
 }
 
-<span class="doccomment">/// returns first the types to return, the match names, and then tokens to the field accesses</span>
-<span class="kw">fn</span> <span class="ident">named_fields_return</span>(
-    <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Ident</span>,
-    <span class="ident">variant_name</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Ident</span>,
-    (<span class="ident">function_name_mut_ref</span>, <span class="ident">doc_mut_ref</span>): (<span class="kw-2">&amp;</span><span class="ident">Ident</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>),
-    (<span class="ident">function_name_ref</span>, <span class="ident">doc_ref</span>): (<span class="kw-2">&amp;</span><span class="ident">Ident</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>),
-    (<span class="ident">function_name_val</span>, <span class="ident">doc_val</span>): (<span class="kw-2">&amp;</span><span class="ident">Ident</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>),
-    <span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="ident">syn::FieldsNamed</span>,
-) -&gt; <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> (<span class="ident">returns_mut_ref</span>, <span class="ident">returns_ref</span>, <span class="ident">returns_val</span>, <span class="ident">matches</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">fields</span>.<span class="ident">named</span>.<span class="ident">len</span>() {
-        <span class="number">1</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">fields</span>.<span class="ident">named</span>.<span class="ident">first</span>().<span class="ident">expect</span>(<span class="string">&quot;no fields on type&quot;</span>);
-            <span class="kw">let</span> <span class="ident">match_name</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">ident</span>.<span class="ident">as_ref</span>().<span class="ident">expect</span>(<span class="string">&quot;expected a named field&quot;</span>);
+<span class="doccomment">/// returns first the types to return, the match names, and then tokens to the field accesses
+</span><span class="kw">fn </span>named_fields_return(
+    name: <span class="kw-2">&amp;</span>syn::Ident,
+    variant_name: <span class="kw-2">&amp;</span>syn::Ident,
+    (function_name_mut_ref, doc_mut_ref): (<span class="kw-2">&amp;</span>Ident, <span class="kw-2">&amp;</span>str),
+    (function_name_ref, doc_ref): (<span class="kw-2">&amp;</span>Ident, <span class="kw-2">&amp;</span>str),
+    (function_name_val, doc_val): (<span class="kw-2">&amp;</span>Ident, <span class="kw-2">&amp;</span>str),
+    fields: <span class="kw-2">&amp;</span>syn::FieldsNamed,
+) -&gt; TokenStream {
+    <span class="kw">let </span>(returns_mut_ref, returns_ref, returns_val, matches) = <span class="kw">match </span>fields.named.len() {
+        <span class="number">1 </span>=&gt; {
+            <span class="kw">let </span>field = fields.named.first().expect(<span class="string">&quot;no fields on type&quot;</span>);
+            <span class="kw">let </span>match_name = field.ident.as_ref().expect(<span class="string">&quot;expected a named field&quot;</span>);
 
-            <span class="kw">let</span> <span class="ident">returns</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">ty</span>;
-            <span class="kw">let</span> <span class="ident">returns_mut_ref</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="kw-2">&amp;mut</span> #<span class="ident">returns</span>);
-            <span class="kw">let</span> <span class="ident">returns_ref</span> <span class="op">=</span> <span class="macro">quote!</span>(<span class="kw-2">&amp;</span>#<span class="ident">returns</span>);
-            <span class="kw">let</span> <span class="ident">returns_val</span> <span class="op">=</span> <span class="macro">quote!</span>(#<span class="ident">returns</span>);
-            <span class="kw">let</span> <span class="ident">matches</span> <span class="op">=</span> <span class="macro">quote!</span>(#<span class="ident">match_name</span>);
+            <span class="kw">let </span>returns = <span class="kw-2">&amp;</span>field.ty;
+            <span class="kw">let </span>returns_mut_ref = <span class="macro">quote!</span>(<span class="kw-2">&amp;mut </span>#returns);
+            <span class="kw">let </span>returns_ref = <span class="macro">quote!</span>(<span class="kw-2">&amp;</span>#returns);
+            <span class="kw">let </span>returns_val = <span class="macro">quote!</span>(#returns);
+            <span class="kw">let </span>matches = <span class="macro">quote!</span>(#match_name);
 
-            (<span class="ident">returns_mut_ref</span>, <span class="ident">returns_ref</span>, <span class="ident">returns_val</span>, <span class="ident">matches</span>)
+            (returns_mut_ref, returns_ref, returns_val, matches)
         }
-        <span class="number">0</span> =&gt; (<span class="macro">quote!</span>(()), <span class="macro">quote!</span>(()), <span class="macro">quote!</span>(()), <span class="macro">quote!</span>(())),
-        <span class="kw">_</span> =&gt; {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">returns_mut_ref</span> <span class="op">=</span> <span class="ident">TokenStream::new</span>();
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">returns_ref</span> <span class="op">=</span> <span class="ident">TokenStream::new</span>();
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">returns_val</span> <span class="op">=</span> <span class="ident">TokenStream::new</span>();
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">matches</span> <span class="op">=</span> <span class="ident">TokenStream::new</span>();
+        <span class="number">0 </span>=&gt; (<span class="macro">quote!</span>(()), <span class="macro">quote!</span>(()), <span class="macro">quote!</span>(()), <span class="macro">quote!</span>(())),
+        <span class="kw">_ </span>=&gt; {
+            <span class="kw">let </span><span class="kw-2">mut </span>returns_mut_ref = TokenStream::new();
+            <span class="kw">let </span><span class="kw-2">mut </span>returns_ref = TokenStream::new();
+            <span class="kw">let </span><span class="kw-2">mut </span>returns_val = TokenStream::new();
+            <span class="kw">let </span><span class="kw-2">mut </span>matches = TokenStream::new();
 
-            <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">fields</span>.<span class="ident">named</span>.<span class="ident">iter</span>() {
-                <span class="kw">let</span> <span class="ident">rt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">ty</span>;
-                <span class="kw">let</span> <span class="ident">match_name</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">ident</span>.<span class="ident">as_ref</span>().<span class="ident">expect</span>(<span class="string">&quot;expected a named field&quot;</span>);
+            <span class="kw">for </span>field <span class="kw">in </span>fields.named.iter() {
+                <span class="kw">let </span>rt = <span class="kw-2">&amp;</span>field.ty;
+                <span class="kw">let </span>match_name = field.ident.as_ref().expect(<span class="string">&quot;expected a named field&quot;</span>);
 
-                <span class="ident">returns_mut_ref</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(<span class="kw-2">&amp;mut</span> #<span class="ident">rt</span>,));
-                <span class="ident">returns_ref</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(<span class="kw-2">&amp;</span>#<span class="ident">rt</span>,));
-                <span class="ident">returns_val</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(#<span class="ident">rt</span>,));
-                <span class="ident">matches</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(#<span class="ident">match_name</span>,));
+                returns_mut_ref.extend(<span class="macro">quote!</span>(<span class="kw-2">&amp;mut </span>#rt,));
+                returns_ref.extend(<span class="macro">quote!</span>(<span class="kw-2">&amp;</span>#rt,));
+                returns_val.extend(<span class="macro">quote!</span>(#rt,));
+                matches.extend(<span class="macro">quote!</span>(#match_name,));
             }
 
             (
-                <span class="macro">quote!</span>((#<span class="ident">returns_mut_ref</span>)),
-                <span class="macro">quote!</span>((#<span class="ident">returns_ref</span>)),
-                <span class="macro">quote!</span>((#<span class="ident">returns_val</span>)),
-                <span class="macro">quote!</span>(#<span class="ident">matches</span>),
+                <span class="macro">quote!</span>((#returns_mut_ref)),
+                <span class="macro">quote!</span>((#returns_ref)),
+                <span class="macro">quote!</span>((#returns_val)),
+                <span class="macro">quote!</span>(#matches),
             )
         }
     };
 
     <span class="macro">quote!</span>(
-        <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> #<span class="ident">doc_mut_ref</span> ]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">function_name_mut_ref</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>#<span class="ident">returns_mut_ref</span><span class="op">&gt;</span> {
-            <span class="kw">match</span> <span class="self">self</span> {
-                #<span class="ident">name</span>::#<span class="ident">variant_name</span>{ #<span class="ident">matches</span> } =&gt; {
-                    <span class="prelude-val">Some</span>((#<span class="ident">matches</span>))
+        <span class="attribute">#[doc = #doc_mut_ref ]
+        </span><span class="kw">pub fn </span>#function_name_mut_ref(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;#returns_mut_ref&gt; {
+            <span class="kw">match </span><span class="self">self </span>{
+                #name::#variant_name{ #matches } =&gt; {
+                    <span class="prelude-val">Some</span>((#matches))
                 }
-                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>
-            }
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">None
+            </span>}
         }
 
-        <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> #<span class="ident">doc_ref</span> ]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">function_name_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>#<span class="ident">returns_ref</span><span class="op">&gt;</span> {
-            <span class="kw">match</span> <span class="self">self</span> {
-                #<span class="ident">name</span>::#<span class="ident">variant_name</span>{ #<span class="ident">matches</span> } =&gt; {
-                    <span class="prelude-val">Some</span>((#<span class="ident">matches</span>))
+        <span class="attribute">#[doc = #doc_ref ]
+        </span><span class="kw">pub fn </span>#function_name_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;#returns_ref&gt; {
+            <span class="kw">match </span><span class="self">self </span>{
+                #name::#variant_name{ #matches } =&gt; {
+                    <span class="prelude-val">Some</span>((#matches))
                 }
-                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>
-            }
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">None
+            </span>}
         }
 
-        <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> #<span class="ident">doc_val</span> ]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">function_name_val</span>(<span class="self">self</span>) -&gt; <span class="ident">::core::result::Result</span><span class="op">&lt;</span>#<span class="ident">returns_val</span>, <span class="self">Self</span><span class="op">&gt;</span> {
-            <span class="kw">match</span> <span class="self">self</span> {
-                #<span class="ident">name</span>::#<span class="ident">variant_name</span>{ #<span class="ident">matches</span> } =&gt; {
-                    <span class="prelude-val">Ok</span>((#<span class="ident">matches</span>))
+        <span class="attribute">#[doc = #doc_val ]
+        </span><span class="kw">pub fn </span>#function_name_val(<span class="self">self</span>) -&gt; ::core::result::Result&lt;#returns_val, <span class="self">Self</span>&gt; {
+            <span class="kw">match </span><span class="self">self </span>{
+                #name::#variant_name{ #matches } =&gt; {
+                    <span class="prelude-val">Ok</span>((#matches))
                 }
-                <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="self">self</span>)
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(<span class="self">self</span>)
             }
         }
     )
 }
 
-<span class="kw">fn</span> <span class="ident">impl_all_as_fns</span>(<span class="ident">ast</span>: <span class="kw-2">&amp;</span><span class="ident">DeriveInput</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ast</span>.<span class="ident">ident</span>;
-    <span class="kw">let</span> <span class="ident">generics</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ast</span>.<span class="ident">generics</span>;
+<span class="kw">fn </span>impl_all_as_fns(ast: <span class="kw-2">&amp;</span>DeriveInput) -&gt; TokenStream {
+    <span class="kw">let </span>name = <span class="kw-2">&amp;</span>ast.ident;
+    <span class="kw">let </span>generics = <span class="kw-2">&amp;</span>ast.generics;
 
-    <span class="kw">let</span> <span class="ident">enum_data</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">syn::Data::Enum</span>(<span class="ident">data</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ast</span>.<span class="ident">data</span> {
-        <span class="ident">data</span>
-    } <span class="kw">else</span> {
-        <span class="macro">panic!</span>(<span class="string">&quot;{} is not an enum&quot;</span>, <span class="ident">name</span>);
+    <span class="kw">let </span>enum_data = <span class="kw">if let </span>syn::Data::Enum(data) = <span class="kw-2">&amp;</span>ast.data {
+        data
+    } <span class="kw">else </span>{
+        <span class="macro">panic!</span>(<span class="string">&quot;{} is not an enum&quot;</span>, name);
     };
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">TokenStream::new</span>();
+    <span class="kw">let </span><span class="kw-2">mut </span>stream = TokenStream::new();
 
-    <span class="kw">for</span> <span class="ident">variant_data</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">enum_data</span>.<span class="ident">variants</span> {
-        <span class="kw">let</span> <span class="ident">variant_name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">variant_data</span>.<span class="ident">ident</span>;
-        <span class="kw">let</span> <span class="ident">function_name_ref</span> <span class="op">=</span> <span class="ident">Ident::new</span>(
-            <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;as_{}&quot;</span>, <span class="ident">variant_name</span>).<span class="ident">to_snake_case</span>(),
-            <span class="ident">Span::call_site</span>(),
+    <span class="kw">for </span>variant_data <span class="kw">in </span><span class="kw-2">&amp;</span>enum_data.variants {
+        <span class="kw">let </span>variant_name = <span class="kw-2">&amp;</span>variant_data.ident;
+        <span class="kw">let </span>function_name_ref = Ident::new(
+            <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;as_{}&quot;</span>, variant_name).to_snake_case(),
+            Span::call_site(),
         );
-        <span class="kw">let</span> <span class="ident">doc_ref</span> <span class="op">=</span> <span class="macro">format!</span>(
+        <span class="kw">let </span>doc_ref = <span class="macro">format!</span>(
             <span class="string">&quot;Optionally returns references to the inner fields if this is a `{}::{}`, otherwise `None`&quot;</span>,
-            <span class="ident">name</span>,
-            <span class="ident">variant_name</span>,
+            name,
+            variant_name,
         );
-        <span class="kw">let</span> <span class="ident">function_name_mut_ref</span> <span class="op">=</span> <span class="ident">Ident::new</span>(
-            <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;as_{}_mut&quot;</span>, <span class="ident">variant_name</span>).<span class="ident">to_snake_case</span>(),
-            <span class="ident">Span::call_site</span>(),
+        <span class="kw">let </span>function_name_mut_ref = Ident::new(
+            <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;as_{}_mut&quot;</span>, variant_name).to_snake_case(),
+            Span::call_site(),
         );
-        <span class="kw">let</span> <span class="ident">doc_mut_ref</span> <span class="op">=</span> <span class="macro">format!</span>(
+        <span class="kw">let </span>doc_mut_ref = <span class="macro">format!</span>(
             <span class="string">&quot;Optionally returns mutable references to the inner fields if this is a `{}::{}`, otherwise `None`&quot;</span>,
-            <span class="ident">name</span>,
-            <span class="ident">variant_name</span>,
+            name,
+            variant_name,
         );
 
-        <span class="kw">let</span> <span class="ident">function_name_val</span> <span class="op">=</span> <span class="ident">Ident::new</span>(
-            <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;into_{}&quot;</span>, <span class="ident">variant_name</span>).<span class="ident">to_snake_case</span>(),
-            <span class="ident">Span::call_site</span>(),
+        <span class="kw">let </span>function_name_val = Ident::new(
+            <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;into_{}&quot;</span>, variant_name).to_snake_case(),
+            Span::call_site(),
         );
-        <span class="kw">let</span> <span class="ident">doc_val</span> <span class="op">=</span> <span class="macro">format!</span>(
+        <span class="kw">let </span>doc_val = <span class="macro">format!</span>(
             <span class="string">&quot;Returns the inner fields if this is a `{}::{}`, otherwise returns back the enum in the `Err` case of the result&quot;</span>,
-            <span class="ident">name</span>,
-            <span class="ident">variant_name</span>,
+            name,
+            variant_name,
         );
 
-        <span class="kw">let</span> <span class="ident">function_name_is</span> <span class="op">=</span> <span class="ident">Ident::new</span>(
-            <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;is_{}&quot;</span>, <span class="ident">variant_name</span>).<span class="ident">to_snake_case</span>(),
-            <span class="ident">Span::call_site</span>(),
+        <span class="kw">let </span>function_name_is = Ident::new(
+            <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;is_{}&quot;</span>, variant_name).to_snake_case(),
+            Span::call_site(),
         );
-        <span class="kw">let</span> <span class="ident">doc_is</span> <span class="op">=</span> <span class="macro">format!</span>(
+        <span class="kw">let </span>doc_is = <span class="macro">format!</span>(
             <span class="string">&quot;Returns true if this is a `{}::{}`, otherwise false&quot;</span>,
-            <span class="ident">name</span>, <span class="ident">variant_name</span>,
+            name, variant_name,
         );
 
-        <span class="kw">let</span> <span class="ident">tokens</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">variant_data</span>.<span class="ident">fields</span> {
-            <span class="ident">syn::Fields::Unit</span> =&gt; <span class="ident">unit_fields_return</span>(<span class="ident">name</span>, <span class="ident">variant_name</span>, <span class="kw-2">&amp;</span><span class="ident">function_name_is</span>, <span class="kw-2">&amp;</span><span class="ident">doc_is</span>),
-            <span class="ident">syn::Fields::Unnamed</span>(<span class="ident">unnamed</span>) =&gt; <span class="ident">unnamed_fields_return</span>(
-                <span class="ident">name</span>,
-                <span class="ident">variant_name</span>,
-                (<span class="kw-2">&amp;</span><span class="ident">function_name_mut_ref</span>, <span class="kw-2">&amp;</span><span class="ident">doc_mut_ref</span>),
-                (<span class="kw-2">&amp;</span><span class="ident">function_name_ref</span>, <span class="kw-2">&amp;</span><span class="ident">doc_ref</span>),
-                (<span class="kw-2">&amp;</span><span class="ident">function_name_val</span>, <span class="kw-2">&amp;</span><span class="ident">doc_val</span>),
-                <span class="ident">unnamed</span>,
+        <span class="kw">let </span>tokens = <span class="kw">match </span><span class="kw-2">&amp;</span>variant_data.fields {
+            syn::Fields::Unit =&gt; unit_fields_return(name, variant_name, <span class="kw-2">&amp;</span>function_name_is, <span class="kw-2">&amp;</span>doc_is),
+            syn::Fields::Unnamed(unnamed) =&gt; unnamed_fields_return(
+                name,
+                variant_name,
+                (<span class="kw-2">&amp;</span>function_name_mut_ref, <span class="kw-2">&amp;</span>doc_mut_ref),
+                (<span class="kw-2">&amp;</span>function_name_ref, <span class="kw-2">&amp;</span>doc_ref),
+                (<span class="kw-2">&amp;</span>function_name_val, <span class="kw-2">&amp;</span>doc_val),
+                unnamed,
             ),
-            <span class="ident">syn::Fields::Named</span>(<span class="ident">named</span>) =&gt; <span class="ident">named_fields_return</span>(
-                <span class="ident">name</span>,
-                <span class="ident">variant_name</span>,
-                (<span class="kw-2">&amp;</span><span class="ident">function_name_mut_ref</span>, <span class="kw-2">&amp;</span><span class="ident">doc_mut_ref</span>),
-                (<span class="kw-2">&amp;</span><span class="ident">function_name_ref</span>, <span class="kw-2">&amp;</span><span class="ident">doc_ref</span>),
-                (<span class="kw-2">&amp;</span><span class="ident">function_name_val</span>, <span class="kw-2">&amp;</span><span class="ident">doc_val</span>),
-                <span class="ident">named</span>,
+            syn::Fields::Named(named) =&gt; named_fields_return(
+                name,
+                variant_name,
+                (<span class="kw-2">&amp;</span>function_name_mut_ref, <span class="kw-2">&amp;</span>doc_mut_ref),
+                (<span class="kw-2">&amp;</span>function_name_ref, <span class="kw-2">&amp;</span>doc_ref),
+                (<span class="kw-2">&amp;</span>function_name_val, <span class="kw-2">&amp;</span>doc_val),
+                named,
             ),
         };
 
-        <span class="ident">stream</span>.<span class="ident">extend</span>(<span class="ident">tokens</span>);
+        stream.extend(tokens);
     }
 
-    <span class="kw">let</span> (<span class="ident">impl_generics</span>, <span class="ident">ty_generics</span>, <span class="ident">where_clause</span>) <span class="op">=</span> <span class="ident">generics</span>.<span class="ident">split_for_impl</span>();
+    <span class="kw">let </span>(impl_generics, ty_generics, where_clause) = generics.split_for_impl();
 
     <span class="macro">quote!</span>(
-        <span class="kw">impl</span> #<span class="ident">impl_generics</span> #<span class="ident">name</span> #<span class="ident">ty_generics</span> #<span class="ident">where_clause</span> {
-            #<span class="ident">stream</span>
+        <span class="kw">impl </span>#impl_generics #name #ty_generics #where_clause {
+            #stream
         }
     )
 }
 
-<span class="attribute">#[<span class="ident">proc_macro_derive</span>(<span class="ident">EnumAsInner</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enum_as_inner</span>(<span class="ident">input</span>: <span class="ident">proc_macro::TokenStream</span>) -&gt; <span class="ident">proc_macro::TokenStream</span> {
-    <span class="comment">// get a usable token stream</span>
-    <span class="kw">let</span> <span class="ident">ast</span>: <span class="ident">DeriveInput</span> <span class="op">=</span> <span class="macro">parse_macro_input!</span>(<span class="ident">input</span> <span class="kw">as</span> <span class="ident">DeriveInput</span>);
+<span class="attribute">#[proc_macro_derive(EnumAsInner)]
+</span><span class="kw">pub fn </span>enum_as_inner(input: proc_macro::TokenStream) -&gt; proc_macro::TokenStream {
+    <span class="comment">// get a usable token stream
+    </span><span class="kw">let </span>ast: DeriveInput = <span class="macro">parse_macro_input!</span>(input <span class="kw">as </span>DeriveInput);
 
-    <span class="comment">// Build the impl</span>
-    <span class="kw">let</span> <span class="ident">expanded</span>: <span class="ident">TokenStream</span> <span class="op">=</span> <span class="ident">impl_all_as_fns</span>(<span class="kw-2">&amp;</span><span class="ident">ast</span>);
+    <span class="comment">// Build the impl
+    </span><span class="kw">let </span>expanded: TokenStream = impl_all_as_fns(<span class="kw-2">&amp;</span>ast);
 
-    <span class="comment">// Return the generated impl</span>
-    <span class="ident">proc_macro::TokenStream::from</span>(<span class="ident">expanded</span>)
+    <span class="comment">// Return the generated impl
+    </span>proc_macro::TokenStream::from(expanded)
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="enum_as_inner" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="enum_as_inner" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

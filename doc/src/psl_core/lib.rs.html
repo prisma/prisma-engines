@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/psl-core/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../psl_core/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/psl-core/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../psl_core/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -89,96 +89,96 @@
 <span id="89">89</span>
 <span id="90">90</span>
 <span id="91">91</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../README.md&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">unsafe_code</span>)]</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::derive_partial_eq_without_eq</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![doc = <span class="macro">include_str!</span>(<span class="string">&quot;../README.md&quot;</span>)]
+#![deny(rust_2018_idioms, unsafe_code)]
+#![allow(clippy::derive_partial_eq_without_eq)]
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">datamodel_connector</span>;
+</span><span class="kw">pub mod </span>datamodel_connector;
 
-<span class="doccomment">/// `mcf`: Turns a collection of `configuration::Datasource` and `configuration::Generator` into a</span>
-<span class="doccomment">/// JSON representation. This is the `get_config()` representation.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">mcf</span>;
+<span class="doccomment">/// `mcf`: Turns a collection of `configuration::Datasource` and `configuration::Generator` into a
+/// JSON representation. This is the `get_config()` representation.
+</span><span class="kw">pub mod </span>mcf;
 
-<span class="kw">mod</span> <span class="ident">common</span>;
-<span class="kw">mod</span> <span class="ident">configuration</span>;
-<span class="kw">mod</span> <span class="ident">reformat</span>;
-<span class="kw">mod</span> <span class="ident">validate</span>;
+<span class="kw">mod </span>common;
+<span class="kw">mod </span>configuration;
+<span class="kw">mod </span>reformat;
+<span class="kw">mod </span>validate;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">common</span>::{<span class="ident">PreviewFeature</span>, <span class="ident">RelationNames</span>, <span class="ident">ALL_PREVIEW_FEATURES</span>},
-    <span class="ident">configuration</span>::{<span class="ident">Configuration</span>, <span class="ident">Datasource</span>, <span class="ident">DatasourceConnectorData</span>, <span class="ident">Generator</span>, <span class="ident">StringFromEnvVar</span>},
-    <span class="ident">reformat::reformat</span>,
+<span class="kw">pub use crate</span>::{
+    common::{PreviewFeature, RelationNames, ALL_PREVIEW_FEATURES},
+    configuration::{Configuration, Datasource, DatasourceConnectorData, Generator, StringFromEnvVar},
+    reformat::reformat,
 };
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">diagnostics</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">parser_database</span>::{<span class="self">self</span>, <span class="ident">is_reserved_type_name</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">schema_ast</span>;
+<span class="kw">pub use </span>diagnostics;
+<span class="kw">pub use </span>parser_database::{<span class="self">self</span>, is_reserved_type_name};
+<span class="kw">pub use </span>schema_ast;
 
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::validate</span>::{<span class="ident">datasource_loader</span>, <span class="ident">generator_loader</span>};
-<span class="kw">use</span> <span class="ident">diagnostics::Diagnostics</span>;
-<span class="kw">use</span> <span class="ident">parser_database</span>::{<span class="ident">ast</span>, <span class="ident">ParserDatabase</span>, <span class="ident">SourceFile</span>};
+<span class="kw">use </span><span class="self">self</span>::validate::{datasource_loader, generator_loader};
+<span class="kw">use </span>diagnostics::Diagnostics;
+<span class="kw">use </span>parser_database::{ast, ParserDatabase, SourceFile};
 
-<span class="doccomment">/// The collection of all available connectors.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ConnectorRegistry</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">datamodel_connector::Connector</span>];
+<span class="doccomment">/// The collection of all available connectors.
+</span><span class="kw">pub type </span>ConnectorRegistry = <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>datamodel_connector::Connector];
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ValidatedSchema</span> {
-    <span class="kw">pub</span> <span class="ident">configuration</span>: <span class="ident">Configuration</span>,
-    <span class="kw">pub</span> <span class="ident">db</span>: <span class="ident">parser_database::ParserDatabase</span>,
-    <span class="kw">pub</span> <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">datamodel_connector::Connector</span>,
-    <span class="kw">pub</span> <span class="ident">diagnostics</span>: <span class="ident">Diagnostics</span>,
-    <span class="ident">relation_mode</span>: <span class="ident">datamodel_connector::RelationMode</span>,
+<span class="kw">pub struct </span>ValidatedSchema {
+    <span class="kw">pub </span>configuration: Configuration,
+    <span class="kw">pub </span>db: parser_database::ParserDatabase,
+    <span class="kw">pub </span>connector: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>datamodel_connector::Connector,
+    <span class="kw">pub </span>diagnostics: Diagnostics,
+    relation_mode: datamodel_connector::RelationMode,
 }
 
-<span class="kw">impl</span> <span class="ident">ValidatedSchema</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_mode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">datamodel_connector::RelationMode</span> {
-        <span class="self">self</span>.<span class="ident">relation_mode</span>
+<span class="kw">impl </span>ValidatedSchema {
+    <span class="kw">pub fn </span>relation_mode(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; datamodel_connector::RelationMode {
+        <span class="self">self</span>.relation_mode
     }
 }
 
-<span class="doccomment">/// The most general API for dealing with Prisma schemas. It accumulates what analysis and</span>
-<span class="doccomment">/// validation information it can, and returns it along with any error and warning diagnostics.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">validate</span>(<span class="ident">file</span>: <span class="ident">SourceFile</span>, <span class="ident">connectors</span>: <span class="ident">ConnectorRegistry</span>) -&gt; <span class="ident">ValidatedSchema</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">diagnostics</span> <span class="op">=</span> <span class="ident">Diagnostics::new</span>();
-    <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">ParserDatabase::new</span>(<span class="ident">file</span>, <span class="kw-2">&amp;mut</span> <span class="ident">diagnostics</span>);
-    <span class="kw">let</span> <span class="ident">configuration</span> <span class="op">=</span> <span class="ident">validate_configuration</span>(<span class="ident">db</span>.<span class="ident">ast</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">diagnostics</span>, <span class="ident">connectors</span>);
-    <span class="kw">let</span> <span class="ident">datasources</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">configuration</span>.<span class="ident">datasources</span>;
-    <span class="kw">let</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">validate::validate</span>(<span class="ident">db</span>, <span class="ident">datasources</span>, <span class="ident">configuration</span>.<span class="ident">preview_features</span>(), <span class="ident">diagnostics</span>);
+<span class="doccomment">/// The most general API for dealing with Prisma schemas. It accumulates what analysis and
+/// validation information it can, and returns it along with any error and warning diagnostics.
+</span><span class="kw">pub fn </span>validate(file: SourceFile, connectors: ConnectorRegistry) -&gt; ValidatedSchema {
+    <span class="kw">let </span><span class="kw-2">mut </span>diagnostics = Diagnostics::new();
+    <span class="kw">let </span>db = ParserDatabase::new(file, <span class="kw-2">&amp;mut </span>diagnostics);
+    <span class="kw">let </span>configuration = validate_configuration(db.ast(), <span class="kw-2">&amp;mut </span>diagnostics, connectors);
+    <span class="kw">let </span>datasources = <span class="kw-2">&amp;</span>configuration.datasources;
+    <span class="kw">let </span>out = validate::validate(db, datasources, configuration.preview_features(), diagnostics);
 
-    <span class="ident">ValidatedSchema</span> {
-        <span class="ident">diagnostics</span>: <span class="ident">out</span>.<span class="ident">diagnostics</span>,
-        <span class="ident">configuration</span>,
-        <span class="ident">connector</span>: <span class="ident">out</span>.<span class="ident">connector</span>,
-        <span class="ident">db</span>: <span class="ident">out</span>.<span class="ident">db</span>,
-        <span class="ident">relation_mode</span>: <span class="ident">out</span>.<span class="ident">relation_mode</span>,
+    ValidatedSchema {
+        diagnostics: out.diagnostics,
+        configuration,
+        connector: out.connector,
+        db: out.db,
+        relation_mode: out.relation_mode,
     }
 }
 
-<span class="doccomment">/// Loads all configuration blocks from a datamodel using the built-in source definitions.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_configuration</span>(
-    <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">connectors</span>: <span class="ident">ConnectorRegistry</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Configuration</span>, <span class="ident">diagnostics::Diagnostics</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">diagnostics</span> <span class="op">=</span> <span class="ident">Diagnostics::default</span>();
-    <span class="kw">let</span> <span class="ident">ast</span> <span class="op">=</span> <span class="ident">schema_ast::parse_schema</span>(<span class="ident">schema</span>, <span class="kw-2">&amp;mut</span> <span class="ident">diagnostics</span>);
-    <span class="kw">let</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">validate_configuration</span>(<span class="kw-2">&amp;</span><span class="ident">ast</span>, <span class="kw-2">&amp;mut</span> <span class="ident">diagnostics</span>, <span class="ident">connectors</span>);
-    <span class="ident">diagnostics</span>.<span class="ident">to_result</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">out</span>)
+<span class="doccomment">/// Loads all configuration blocks from a datamodel using the built-in source definitions.
+</span><span class="kw">pub fn </span>parse_configuration(
+    schema: <span class="kw-2">&amp;</span>str,
+    connectors: ConnectorRegistry,
+) -&gt; <span class="prelude-ty">Result</span>&lt;Configuration, diagnostics::Diagnostics&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>diagnostics = Diagnostics::default();
+    <span class="kw">let </span>ast = schema_ast::parse_schema(schema, <span class="kw-2">&amp;mut </span>diagnostics);
+    <span class="kw">let </span>out = validate_configuration(<span class="kw-2">&amp;</span>ast, <span class="kw-2">&amp;mut </span>diagnostics, connectors);
+    diagnostics.to_result().map(|<span class="kw">_</span>| out)
 }
 
-<span class="kw">fn</span> <span class="ident">validate_configuration</span>(
-    <span class="ident">schema_ast</span>: <span class="kw-2">&amp;</span><span class="ident">ast::SchemaAst</span>,
-    <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
-    <span class="ident">connectors</span>: <span class="ident">ConnectorRegistry</span>,
-) -&gt; <span class="ident">Configuration</span> {
-    <span class="kw">let</span> <span class="ident">generators</span> <span class="op">=</span> <span class="ident">generator_loader::load_generators_from_ast</span>(<span class="ident">schema_ast</span>, <span class="ident">diagnostics</span>);
-    <span class="kw">let</span> <span class="ident">preview_features</span> <span class="op">=</span> <span class="ident">generators</span>.<span class="ident">iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">gen</span><span class="op">|</span> <span class="ident">gen</span>.<span class="ident">preview_features</span>).<span class="ident">collect</span>();
+<span class="kw">fn </span>validate_configuration(
+    schema_ast: <span class="kw-2">&amp;</span>ast::SchemaAst,
+    diagnostics: <span class="kw-2">&amp;mut </span>Diagnostics,
+    connectors: ConnectorRegistry,
+) -&gt; Configuration {
+    <span class="kw">let </span>generators = generator_loader::load_generators_from_ast(schema_ast, diagnostics);
+    <span class="kw">let </span>preview_features = generators.iter().filter_map(|gen| gen.preview_features).collect();
 
-    <span class="kw">let</span> <span class="ident">datasources</span> <span class="op">=</span>
-        <span class="ident">datasource_loader::load_datasources_from_ast</span>(<span class="ident">schema_ast</span>, <span class="ident">preview_features</span>, <span class="ident">diagnostics</span>, <span class="ident">connectors</span>);
+    <span class="kw">let </span>datasources =
+        datasource_loader::load_datasources_from_ast(schema_ast, preview_features, diagnostics, connectors);
 
-    <span class="ident">Configuration</span> {
-        <span class="ident">generators</span>,
-        <span class="ident">datasources</span>,
-        <span class="ident">warnings</span>: <span class="ident">diagnostics</span>.<span class="ident">warnings</span>().<span class="ident">to_owned</span>(),
+    Configuration {
+        generators,
+        datasources,
+        warnings: diagnostics.warnings().to_owned(),
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="psl_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="psl_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

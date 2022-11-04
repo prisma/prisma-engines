@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/schema-builder/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../schema_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../schema_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../schema_builder/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/schema-builder/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../schema_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../schema_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../schema_builder/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -218,225 +218,225 @@
 <span id="218">218</span>
 <span id="219">219</span>
 <span id="220">220</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Query schema builder. Root for query schema building.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The schema builder creates all builders necessary for the process,</span>
-<span class="doccomment">//! and hands down references to the individual initializers as required.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Circular dependency schema building requires special consideration.</span>
-<span class="doccomment">//! Assume a data model looks like this, with arrows indicating some kind of relation between models:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```text</span>
-<span class="doccomment">//!       +---+</span>
-<span class="doccomment">//!   +---+ B +&lt;---+</span>
-<span class="doccomment">//!   |   +---+    |</span>
-<span class="doccomment">//!   v            |</span>
-<span class="doccomment">//! +-+-+        +-+-+      +---+</span>
-<span class="doccomment">//! | A +-------&gt;+ C +&lt;-----+ D |</span>
-<span class="doccomment">//! +---+        +---+      +---+</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The above would cause infinite builder recursion circular</span>
-<span class="doccomment">//! dependency (A -&gt; B -&gt; C -&gt; A) in relations (for example in filter building).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Without caching, processing D (in fact, visiting any type after the intial computation) would also</span>
-<span class="doccomment">//! trigger a complete recomputation of A, B, C.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Hence, all builders that produce input or output object types are required to</span>
-<span class="doccomment">//! implement CachedBuilder in some form to break recursive type building.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Additionally, the cache also acts as the component to prevent memory leaks from circular dependencies</span>
-<span class="doccomment">//! in the query schema later on, as described on the QuerySchema type.</span>
-<span class="doccomment">//! The cache can be consumed to produce a list of strong references to the individual input and output</span>
-<span class="doccomment">//! object types, which are then moved to the query schema to keep weak references alive (see TypeRefCache for additional infos).</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Query schema builder. Root for query schema building.
+//!
+//! The schema builder creates all builders necessary for the process,
+//! and hands down references to the individual initializers as required.
+//!
+//! Circular dependency schema building requires special consideration.
+//! Assume a data model looks like this, with arrows indicating some kind of relation between models:
+//!
+//! ```text
+//!       +---+
+//!   +---+ B +&lt;---+
+//!   |   +---+    |
+//!   v            |
+//! +-+-+        +-+-+      +---+
+//! | A +-------&gt;+ C +&lt;-----+ D |
+//! +---+        +---+      +---+
+//! ```
+//!
+//! The above would cause infinite builder recursion circular
+//! dependency (A -&gt; B -&gt; C -&gt; A) in relations (for example in filter building).
+//!
+//! Without caching, processing D (in fact, visiting any type after the intial computation) would also
+//! trigger a complete recomputation of A, B, C.
+//!
+//! Hence, all builders that produce input or output object types are required to
+//! implement CachedBuilder in some form to break recursive type building.
+//!
+//! Additionally, the cache also acts as the component to prevent memory leaks from circular dependencies
+//! in the query schema later on, as described on the QuerySchema type.
+//! The cache can be consumed to produce a list of strong references to the individual input and output
+//! object types, which are then moved to the query schema to keep weak references alive (see TypeRefCache for additional infos).
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">constants</span>;
+</span><span class="kw">pub mod </span>constants;
 
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">mod</span> <span class="ident">cache</span>;
-<span class="kw">mod</span> <span class="ident">enum_types</span>;
-<span class="kw">mod</span> <span class="ident">input_types</span>;
-<span class="kw">mod</span> <span class="ident">mutations</span>;
-<span class="kw">mod</span> <span class="ident">output_types</span>;
-<span class="kw">mod</span> <span class="ident">utils</span>;
+<span class="attribute">#[macro_use]
+</span><span class="kw">mod </span>cache;
+<span class="kw">mod </span>enum_types;
+<span class="kw">mod </span>input_types;
+<span class="kw">mod </span>mutations;
+<span class="kw">mod </span>output_types;
+<span class="kw">mod </span>utils;
 
-<span class="kw">use</span> <span class="ident">cache::TypeRefCache</span>;
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{
-    <span class="ident">psl::PreviewFeature</span>, <span class="ident">CompositeTypeRef</span>, <span class="ident">Field</span> <span class="kw">as</span> <span class="ident">ModelField</span>, <span class="ident">Index</span>, <span class="ident">InternalDataModelRef</span>, <span class="ident">ModelRef</span>,
-    <span class="ident">RelationFieldRef</span>, <span class="ident">TypeIdentifier</span>,
+<span class="kw">use </span>cache::TypeRefCache;
+<span class="kw">use </span>prisma_models::{
+    psl::PreviewFeature, CompositeTypeRef, Field <span class="kw">as </span>ModelField, Index, InternalDataModelRef, ModelRef,
+    RelationFieldRef, TypeIdentifier,
 };
-<span class="kw">use</span> <span class="ident">psl::datamodel_connector</span>::{<span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">RelationMode</span>};
-<span class="kw">use</span> <span class="ident">schema</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<span class="kw">use </span>psl::datamodel_connector::{Connector, ConnectorCapability, RelationMode};
+<span class="kw">use </span>schema::<span class="kw-2">*</span>;
+<span class="kw">use </span>std::sync::Arc;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">utils</span>::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>utils::<span class="kw-2">*</span>;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">BuilderContext</span> {
-    <span class="ident">internal_data_model</span>: <span class="ident">InternalDataModelRef</span>,
-    <span class="ident">enable_raw_queries</span>: <span class="ident">bool</span>,
-    <span class="ident">cache</span>: <span class="ident">TypeCache</span>,
-    <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">Connector</span>,
-    <span class="ident">preview_features</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
-    <span class="ident">nested_create_inputs_queue</span>: <span class="ident">NestedInputsQueue</span>,
-    <span class="ident">nested_update_inputs_queue</span>: <span class="ident">NestedInputsQueue</span>,
-    <span class="comment">// enums?</span>
-}
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>BuilderContext {
+    internal_data_model: InternalDataModelRef,
+    enable_raw_queries: bool,
+    cache: TypeCache,
+    connector: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>Connector,
+    preview_features: Vec&lt;PreviewFeature&gt;,
+    nested_create_inputs_queue: NestedInputsQueue,
+    nested_update_inputs_queue: NestedInputsQueue,
+    <span class="comment">// enums?
+</span>}
 
-<span class="kw">impl</span> <span class="ident">BuilderContext</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">internal_data_model</span>: <span class="ident">InternalDataModelRef</span>,
-        <span class="ident">enable_raw_queries</span>: <span class="ident">bool</span>,
-        <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">Connector</span>,
-        <span class="ident">preview_features</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">internal_data_model</span>,
-            <span class="ident">enable_raw_queries</span>,
-            <span class="ident">cache</span>: <span class="ident">TypeCache::new</span>(),
-            <span class="ident">connector</span>,
-            <span class="ident">preview_features</span>,
-            <span class="ident">nested_create_inputs_queue</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">nested_update_inputs_queue</span>: <span class="ident">Vec::new</span>(),
+<span class="kw">impl </span>BuilderContext {
+    <span class="kw">pub fn </span>new(
+        internal_data_model: InternalDataModelRef,
+        enable_raw_queries: bool,
+        connector: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>Connector,
+        preview_features: Vec&lt;PreviewFeature&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            internal_data_model,
+            enable_raw_queries,
+            cache: TypeCache::new(),
+            connector,
+            preview_features,
+            nested_create_inputs_queue: Vec::new(),
+            nested_update_inputs_queue: Vec::new(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_feature</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">feature</span>: <span class="kw-2">&amp;</span><span class="ident">PreviewFeature</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">preview_features</span>.<span class="ident">contains</span>(<span class="ident">feature</span>)
+    <span class="kw">pub fn </span>has_feature(<span class="kw-2">&amp;</span><span class="self">self</span>, feature: <span class="kw-2">&amp;</span>PreviewFeature) -&gt; bool {
+        <span class="self">self</span>.preview_features.contains(feature)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_capability</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">capability</span>: <span class="ident">ConnectorCapability</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">has_capability</span>(<span class="ident">capability</span>)
+    <span class="kw">pub fn </span>has_capability(<span class="kw-2">&amp;</span><span class="self">self</span>, capability: ConnectorCapability) -&gt; bool {
+        <span class="self">self</span>.connector.has_capability(capability)
     }
 
-    <span class="doccomment">/// Get an input (object) type.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_input_type</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">Identifier</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InputObjectTypeWeakRef</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">cache</span>.<span class="ident">input_types</span>.<span class="ident">get</span>(<span class="ident">ident</span>)
+    <span class="doccomment">/// Get an input (object) type.
+    </span><span class="kw">pub fn </span>get_input_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ident: <span class="kw-2">&amp;</span>Identifier) -&gt; <span class="prelude-ty">Option</span>&lt;InputObjectTypeWeakRef&gt; {
+        <span class="self">self</span>.cache.input_types.get(ident)
     }
 
-    <span class="doccomment">/// Get an output (object) type.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_output_type</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">Identifier</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ObjectTypeWeakRef</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">cache</span>.<span class="ident">output_types</span>.<span class="ident">get</span>(<span class="ident">ident</span>)
+    <span class="doccomment">/// Get an output (object) type.
+    </span><span class="kw">pub fn </span>get_output_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ident: <span class="kw-2">&amp;</span>Identifier) -&gt; <span class="prelude-ty">Option</span>&lt;ObjectTypeWeakRef&gt; {
+        <span class="self">self</span>.cache.output_types.get(ident)
     }
 
-    <span class="doccomment">/// Get an enum type.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_enum_type</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">Identifier</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EnumTypeWeakRef</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">cache</span>.<span class="ident">enum_types</span>.<span class="ident">get</span>(<span class="ident">ident</span>)
+    <span class="doccomment">/// Get an enum type.
+    </span><span class="kw">pub fn </span>get_enum_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ident: <span class="kw-2">&amp;</span>Identifier) -&gt; <span class="prelude-ty">Option</span>&lt;EnumTypeWeakRef&gt; {
+        <span class="self">self</span>.cache.enum_types.get(ident)
     }
 
-    <span class="doccomment">/// Caches an input (object) type.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cache_input_type</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">Identifier</span>, <span class="ident">typ</span>: <span class="ident">InputObjectTypeStrongRef</span>) {
-        <span class="self">self</span>.<span class="ident">cache</span>.<span class="ident">input_types</span>.<span class="ident">insert</span>(<span class="ident">ident</span>, <span class="ident">typ</span>);
+    <span class="doccomment">/// Caches an input (object) type.
+    </span><span class="kw">pub fn </span>cache_input_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ident: Identifier, typ: InputObjectTypeStrongRef) {
+        <span class="self">self</span>.cache.input_types.insert(ident, typ);
     }
 
-    <span class="doccomment">/// Caches an output (object) type.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cache_output_type</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">Identifier</span>, <span class="ident">typ</span>: <span class="ident">ObjectTypeStrongRef</span>) {
-        <span class="self">self</span>.<span class="ident">cache</span>.<span class="ident">output_types</span>.<span class="ident">insert</span>(<span class="ident">ident</span>, <span class="ident">typ</span>);
+    <span class="doccomment">/// Caches an output (object) type.
+    </span><span class="kw">pub fn </span>cache_output_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ident: Identifier, typ: ObjectTypeStrongRef) {
+        <span class="self">self</span>.cache.output_types.insert(ident, typ);
     }
 
-    <span class="doccomment">/// Caches an enum type.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cache_enum_type</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">Identifier</span>, <span class="ident">e</span>: <span class="ident">EnumTypeRef</span>) {
-        <span class="self">self</span>.<span class="ident">cache</span>.<span class="ident">enum_types</span>.<span class="ident">insert</span>(<span class="ident">ident</span>, <span class="ident">e</span>);
+    <span class="doccomment">/// Caches an enum type.
+    </span><span class="kw">pub fn </span>cache_enum_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ident: Identifier, e: EnumTypeRef) {
+        <span class="self">self</span>.cache.enum_types.insert(ident, e);
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">can_full_text_search</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">has_feature</span>(<span class="kw-2">&amp;</span><span class="ident">PreviewFeature::FullTextSearch</span>)
-            <span class="op">&amp;&amp;</span> (<span class="self">self</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::FullTextSearchWithoutIndex</span>)
-                <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::FullTextSearchWithIndex</span>))
+    <span class="kw">pub fn </span>can_full_text_search(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.has_feature(<span class="kw-2">&amp;</span>PreviewFeature::FullTextSearch)
+            &amp;&amp; (<span class="self">self</span>.has_capability(ConnectorCapability::FullTextSearchWithoutIndex)
+                || <span class="self">self</span>.has_capability(ConnectorCapability::FullTextSearchWithIndex))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">models</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ModelRef</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">internal_data_model</span>.<span class="ident">models_cloned</span>()
+    <span class="kw">pub fn </span>models(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;ModelRef&gt; {
+        <span class="self">self</span>.internal_data_model.models_cloned()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">composite_types</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CompositeTypeRef</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">internal_data_model</span>.<span class="ident">composite_types</span>().<span class="ident">to_owned</span>()
+    <span class="kw">pub fn </span>composite_types(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;CompositeTypeRef&gt; {
+        <span class="self">self</span>.internal_data_model.composite_types().to_owned()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">supports_any</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">capabilities</span>: <span class="kw-2">&amp;</span>[<span class="ident">ConnectorCapability</span>]) -&gt; <span class="ident">bool</span> {
-        <span class="ident">capabilities</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">has_capability</span>(<span class="kw-2">*</span><span class="ident">c</span>))
+    <span class="kw">pub fn </span>supports_any(<span class="kw-2">&amp;</span><span class="self">self</span>, capabilities: <span class="kw-2">&amp;</span>[ConnectorCapability]) -&gt; bool {
+        capabilities.iter().any(|c| <span class="self">self</span>.connector.has_capability(<span class="kw-2">*</span>c))
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">TypeCache</span> {
-    <span class="ident">input_types</span>: <span class="ident">TypeRefCache</span><span class="op">&lt;</span><span class="ident">InputObjectType</span><span class="op">&gt;</span>,
-    <span class="ident">output_types</span>: <span class="ident">TypeRefCache</span><span class="op">&lt;</span><span class="ident">ObjectType</span><span class="op">&gt;</span>,
-    <span class="ident">enum_types</span>: <span class="ident">TypeRefCache</span><span class="op">&lt;</span><span class="ident">EnumType</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">struct </span>TypeCache {
+    input_types: TypeRefCache&lt;InputObjectType&gt;,
+    output_types: TypeRefCache&lt;ObjectType&gt;,
+    enum_types: TypeRefCache&lt;EnumType&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">TypeCache</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">input_types</span>: <span class="ident">TypeRefCache::new</span>(),
-            <span class="ident">output_types</span>: <span class="ident">TypeRefCache::new</span>(),
-            <span class="ident">enum_types</span>: <span class="ident">TypeRefCache::new</span>(),
+<span class="kw">impl </span>TypeCache {
+    <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            input_types: TypeRefCache::new(),
+            output_types: TypeRefCache::new(),
+            enum_types: TypeRefCache::new(),
         }
     }
 
-    <span class="doccomment">/// Consumes the cache and collects all types to merge them into the vectors required to</span>
-    <span class="doccomment">/// finalize the query schema building.</span>
-    <span class="doccomment">/// Unwraps are safe because the cache is required to be the only strong Arc ref holder,</span>
-    <span class="doccomment">/// which makes the Arc counter 1, all other refs contained in the schema are weak refs.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">collect_types</span>(
+    <span class="doccomment">/// Consumes the cache and collects all types to merge them into the vectors required to
+    /// finalize the query schema building.
+    /// Unwraps are safe because the cache is required to be the only strong Arc ref holder,
+    /// which makes the Arc counter 1, all other refs contained in the schema are weak refs.
+    </span><span class="kw">pub fn </span>collect_types(
         <span class="self">self</span>,
     ) -&gt; (
-        <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputObjectTypeStrongRef</span><span class="op">&gt;</span>,
-        <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ObjectTypeStrongRef</span><span class="op">&gt;</span>,
-        <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">EnumTypeRef</span><span class="op">&gt;</span>,
+        Vec&lt;InputObjectTypeStrongRef&gt;,
+        Vec&lt;ObjectTypeStrongRef&gt;,
+        Vec&lt;EnumTypeRef&gt;,
     ) {
-        <span class="kw">let</span> <span class="ident">input_objects</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">input_types</span>.<span class="ident">into</span>();
-        <span class="kw">let</span> <span class="ident">output_objects</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">output_types</span>.<span class="ident">into</span>();
-        <span class="kw">let</span> <span class="ident">enum_types</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">enum_types</span>.<span class="ident">into</span>();
+        <span class="kw">let </span>input_objects = <span class="self">self</span>.input_types.into();
+        <span class="kw">let </span>output_objects = <span class="self">self</span>.output_types.into();
+        <span class="kw">let </span>enum_types = <span class="self">self</span>.enum_types.into();
 
-        (<span class="ident">input_objects</span>, <span class="ident">output_objects</span>, <span class="ident">enum_types</span>)
+        (input_objects, output_objects, enum_types)
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(
-    <span class="ident">internal_data_model</span>: <span class="ident">InternalDataModelRef</span>,
-    <span class="ident">enable_raw_queries</span>: <span class="ident">bool</span>,
-    <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">Connector</span>,
-    <span class="ident">preview_features</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
-    <span class="ident">relation_mode</span>: <span class="ident">RelationMode</span>,
-) -&gt; <span class="ident">QuerySchema</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">BuilderContext::new</span>(
-        <span class="ident">internal_data_model</span>,
-        <span class="ident">enable_raw_queries</span>,
-        <span class="ident">connector</span>,
-        <span class="ident">preview_features</span>.<span class="ident">clone</span>(),
+<span class="kw">pub fn </span>build(
+    internal_data_model: InternalDataModelRef,
+    enable_raw_queries: bool,
+    connector: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>Connector,
+    preview_features: Vec&lt;PreviewFeature&gt;,
+    relation_mode: RelationMode,
+) -&gt; QuerySchema {
+    <span class="kw">let </span><span class="kw-2">mut </span>ctx = BuilderContext::new(
+        internal_data_model,
+        enable_raw_queries,
+        connector,
+        preview_features.clone(),
     );
 
-    <span class="ident">output_types::objects::initialize_caches</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>);
+    output_types::objects::initialize_caches(<span class="kw-2">&amp;mut </span>ctx);
 
-    <span class="kw">let</span> (<span class="ident">query_type</span>, <span class="ident">query_object_ref</span>) <span class="op">=</span> <span class="ident">output_types::query_type::build</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>);
-    <span class="kw">let</span> (<span class="ident">mutation_type</span>, <span class="ident">mutation_object_ref</span>) <span class="op">=</span> <span class="ident">output_types::mutation_type::build</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>);
+    <span class="kw">let </span>(query_type, query_object_ref) = output_types::query_type::build(<span class="kw-2">&amp;mut </span>ctx);
+    <span class="kw">let </span>(mutation_type, mutation_object_ref) = output_types::mutation_type::build(<span class="kw-2">&amp;mut </span>ctx);
 
-    <span class="comment">// Add iTX isolation levels to the schema.</span>
-    <span class="ident">enum_types::itx_isolation_levels</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>);
+    <span class="comment">// Add iTX isolation levels to the schema.
+    </span>enum_types::itx_isolation_levels(<span class="kw-2">&amp;mut </span>ctx);
 
-    <span class="comment">// Finalize the schema.</span>
-    <span class="kw">let</span> (<span class="ident">input_objects</span>, <span class="kw-2">mut</span> <span class="ident">output_objects</span>, <span class="ident">enum_types</span>) <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">cache</span>.<span class="ident">collect_types</span>();
+    <span class="comment">// Finalize the schema.
+    </span><span class="kw">let </span>(input_objects, <span class="kw-2">mut </span>output_objects, enum_types) = ctx.cache.collect_types();
 
-    <span class="comment">// The mutation and query object types need to be part of the strong refs.</span>
-    <span class="ident">output_objects</span>.<span class="ident">push</span>(<span class="ident">query_object_ref</span>);
-    <span class="ident">output_objects</span>.<span class="ident">push</span>(<span class="ident">mutation_object_ref</span>);
+    <span class="comment">// The mutation and query object types need to be part of the strong refs.
+    </span>output_objects.push(query_object_ref);
+    output_objects.push(mutation_object_ref);
 
-    <span class="kw">let</span> <span class="ident">query_type</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">query_type</span>);
-    <span class="kw">let</span> <span class="ident">mutation_type</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">mutation_type</span>);
+    <span class="kw">let </span>query_type = Arc::new(query_type);
+    <span class="kw">let </span>mutation_type = Arc::new(mutation_type);
 
-    <span class="ident">QuerySchema::new</span>(
-        <span class="ident">query_type</span>,
-        <span class="ident">mutation_type</span>,
-        <span class="ident">input_objects</span>,
-        <span class="ident">output_objects</span>,
-        <span class="ident">enum_types</span>,
-        <span class="ident">ctx</span>.<span class="ident">internal_data_model</span>,
-        <span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">capabilities</span>().<span class="ident">to_owned</span>(),
-        <span class="ident">preview_features</span>,
-        <span class="ident">relation_mode</span>,
+    QuerySchema::new(
+        query_type,
+        mutation_type,
+        input_objects,
+        output_objects,
+        enum_types,
+        ctx.internal_data_model,
+        ctx.connector.capabilities().to_owned(),
+        preview_features,
+        relation_mode,
     )
 }
 
-<span class="kw">type</span> <span class="ident">NestedInputsQueue</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">InputObjectType</span><span class="op">&gt;</span>, <span class="ident">RelationFieldRef</span>)<span class="op">&gt;</span>;
+<span class="kw">type </span>NestedInputsQueue = Vec&lt;(Arc&lt;InputObjectType&gt;, RelationFieldRef)&gt;;
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="schema_builder" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="schema_builder" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

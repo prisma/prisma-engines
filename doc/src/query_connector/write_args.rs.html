@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/query-connector/src/write_args.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>write_args.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../query_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/query-connector/src/write_args.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>write_args.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../query_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -497,504 +497,504 @@
 <span id="497">497</span>
 <span id="498">498</span>
 <span id="499">499</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">error</span>::{<span class="ident">ConnectorError</span>, <span class="ident">ErrorKind</span>},
-    <span class="ident">Filter</span>,
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
+    error::{ConnectorError, ErrorKind},
+    Filter,
 };
-<span class="kw">use</span> <span class="ident">indexmap</span>::{<span class="ident">map::Keys</span>, <span class="ident">IndexMap</span>};
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{
-    <span class="ident">CompositeFieldRef</span>, <span class="ident">Field</span>, <span class="ident">ModelProjection</span>, <span class="ident">ModelRef</span>, <span class="ident">PrismaValue</span>, <span class="ident">ScalarFieldRef</span>, <span class="ident">SelectedField</span>, <span class="ident">SelectionResult</span>,
+<span class="kw">use </span>indexmap::{map::Keys, IndexMap};
+<span class="kw">use </span>prisma_models::{
+    CompositeFieldRef, Field, ModelProjection, ModelRef, PrismaValue, ScalarFieldRef, SelectedField, SelectionResult,
 };
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Borrow</span>, <span class="ident">convert::TryInto</span>, <span class="ident">ops::Deref</span>};
+<span class="kw">use </span>std::{borrow::Borrow, convert::TryInto, ops::Deref};
 
-<span class="doccomment">/// WriteArgs represent data to be written to an underlying data source.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WriteArgs</span> {
-    <span class="kw">pub</span> <span class="ident">request_now</span>: <span class="ident">PrismaValue</span>,
-    <span class="kw">pub</span> <span class="ident">args</span>: <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">DatasourceFieldName</span>, <span class="ident">WriteOperation</span><span class="op">&gt;</span>,
+<span class="doccomment">/// WriteArgs represent data to be written to an underlying data source.
+</span><span class="attribute">#[derive(Debug, PartialEq, Clone)]
+</span><span class="kw">pub struct </span>WriteArgs {
+    <span class="kw">pub </span>request_now: PrismaValue,
+    <span class="kw">pub </span>args: IndexMap&lt;DatasourceFieldName, WriteOperation&gt;,
 }
 
-<span class="doccomment">/// Wrapper struct to force a bit of a reflection whether or not the string passed</span>
-<span class="doccomment">/// to the write arguments is the data source field name, not the model field name.</span>
-<span class="doccomment">/// Also helps to avoid errors with convenient from-field conversions.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DatasourceFieldName</span>(<span class="kw">pub</span> <span class="ident">String</span>);
+<span class="doccomment">/// Wrapper struct to force a bit of a reflection whether or not the string passed
+/// to the write arguments is the data source field name, not the model field name.
+/// Also helps to avoid errors with convenient from-field conversions.
+</span><span class="attribute">#[derive(Debug, PartialEq, Clone, Hash, Eq)]
+</span><span class="kw">pub struct </span>DatasourceFieldName(<span class="kw">pub </span>String);
 
-<span class="kw">impl</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">DatasourceFieldName</span> {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">str</span>;
+<span class="kw">impl </span>Deref <span class="kw">for </span>DatasourceFieldName {
+    <span class="kw">type </span>Target = str;
 
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
-    }
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DatasourceFieldName</span> {
-    <span class="kw">fn</span> <span class="ident">borrow</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
-    }
+<span class="kw">impl </span>Borrow&lt;str&gt; <span class="kw">for </span>DatasourceFieldName {
+    <span class="kw">fn </span>borrow(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DatasourceFieldName</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">sf</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">DatasourceFieldName</span>(<span class="ident">sf</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>())
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DatasourceFieldName</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">cf</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">DatasourceFieldName</span>(<span class="ident">cf</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>())
+<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>ScalarFieldRef&gt; <span class="kw">for </span>DatasourceFieldName {
+    <span class="kw">fn </span>from(sf: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; <span class="self">Self </span>{
+        DatasourceFieldName(sf.db_name().to_owned())
     }
 }
 
-<span class="doccomment">/// A WriteExpression allows to express more complex operations on how the data is written,</span>
-<span class="doccomment">/// like field or inter-field arithmetic.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">WriteOperation</span> {
-    <span class="ident">Scalar</span>(<span class="ident">ScalarWriteOperation</span>),
-    <span class="ident">Composite</span>(<span class="ident">CompositeWriteOperation</span>),
+<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>CompositeFieldRef&gt; <span class="kw">for </span>DatasourceFieldName {
+    <span class="kw">fn </span>from(cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; <span class="self">Self </span>{
+        DatasourceFieldName(cf.db_name().to_owned())
+    }
 }
 
-<span class="kw">impl</span> <span class="ident">WriteOperation</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_set</span>(<span class="ident">pv</span>: <span class="ident">PrismaValue</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Scalar</span>(<span class="ident">ScalarWriteOperation::Set</span>(<span class="ident">pv</span>))
+<span class="doccomment">/// A WriteExpression allows to express more complex operations on how the data is written,
+/// like field or inter-field arithmetic.
+</span><span class="attribute">#[derive(Debug, PartialEq, Clone)]
+</span><span class="kw">pub enum </span>WriteOperation {
+    Scalar(ScalarWriteOperation),
+    Composite(CompositeWriteOperation),
+}
+
+<span class="kw">impl </span>WriteOperation {
+    <span class="kw">pub fn </span>scalar_set(pv: PrismaValue) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Scalar(ScalarWriteOperation::Set(pv))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_unset</span>(<span class="ident">should_unset</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Scalar</span>(<span class="ident">ScalarWriteOperation::Unset</span>(<span class="ident">should_unset</span>))
+    <span class="kw">pub fn </span>scalar_unset(should_unset: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Scalar(ScalarWriteOperation::Unset(should_unset))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_add</span>(<span class="ident">pv</span>: <span class="ident">PrismaValue</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Scalar</span>(<span class="ident">ScalarWriteOperation::Add</span>(<span class="ident">pv</span>))
+    <span class="kw">pub fn </span>scalar_add(pv: PrismaValue) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Scalar(ScalarWriteOperation::Add(pv))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_substract</span>(<span class="ident">pv</span>: <span class="ident">PrismaValue</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Scalar</span>(<span class="ident">ScalarWriteOperation::Substract</span>(<span class="ident">pv</span>))
+    <span class="kw">pub fn </span>scalar_substract(pv: PrismaValue) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Scalar(ScalarWriteOperation::Substract(pv))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_multiply</span>(<span class="ident">pv</span>: <span class="ident">PrismaValue</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Scalar</span>(<span class="ident">ScalarWriteOperation::Multiply</span>(<span class="ident">pv</span>))
+    <span class="kw">pub fn </span>scalar_multiply(pv: PrismaValue) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Scalar(ScalarWriteOperation::Multiply(pv))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_divide</span>(<span class="ident">pv</span>: <span class="ident">PrismaValue</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Scalar</span>(<span class="ident">ScalarWriteOperation::Divide</span>(<span class="ident">pv</span>))
+    <span class="kw">pub fn </span>scalar_divide(pv: PrismaValue) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Scalar(ScalarWriteOperation::Divide(pv))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">composite_set</span>(<span class="ident">pv</span>: <span class="ident">PrismaValue</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Composite</span>(<span class="ident">CompositeWriteOperation::Set</span>(<span class="ident">pv</span>))
+    <span class="kw">pub fn </span>composite_set(pv: PrismaValue) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Composite(CompositeWriteOperation::Set(pv))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">composite_unset</span>(<span class="ident">should_unset</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Composite</span>(<span class="ident">CompositeWriteOperation::Unset</span>(<span class="ident">should_unset</span>))
+    <span class="kw">pub fn </span>composite_unset(should_unset: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Composite(CompositeWriteOperation::Unset(should_unset))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">composite_update</span>(<span class="ident">writes</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">DatasourceFieldName</span>, <span class="ident">WriteOperation</span>)<span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Composite</span>(<span class="ident">CompositeWriteOperation::Update</span>(<span class="ident">NestedWrite</span> { <span class="ident">writes</span> }))
+    <span class="kw">pub fn </span>composite_update(writes: Vec&lt;(DatasourceFieldName, WriteOperation)&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Composite(CompositeWriteOperation::Update(NestedWrite { writes }))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">composite_push</span>(<span class="ident">pv</span>: <span class="ident">PrismaValue</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Composite</span>(<span class="ident">CompositeWriteOperation::Push</span>(<span class="ident">pv</span>))
+    <span class="kw">pub fn </span>composite_push(pv: PrismaValue) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Composite(CompositeWriteOperation::Push(pv))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">composite_upsert</span>(<span class="ident">set</span>: <span class="ident">CompositeWriteOperation</span>, <span class="ident">update</span>: <span class="ident">CompositeWriteOperation</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Composite</span>(<span class="ident">CompositeWriteOperation::Upsert</span> {
-            <span class="ident">set</span>: <span class="ident">Box::new</span>(<span class="ident">set</span>),
-            <span class="ident">update</span>: <span class="ident">Box::new</span>(<span class="ident">update</span>),
+    <span class="kw">pub fn </span>composite_upsert(set: CompositeWriteOperation, update: CompositeWriteOperation) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Composite(CompositeWriteOperation::Upsert {
+            set: Box::new(set),
+            update: Box::new(update),
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">composite_update_many</span>(<span class="ident">filter</span>: <span class="ident">Filter</span>, <span class="ident">update</span>: <span class="ident">CompositeWriteOperation</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Composite</span>(<span class="ident">CompositeWriteOperation::UpdateMany</span> {
-            <span class="ident">filter</span>,
-            <span class="ident">update</span>: <span class="ident">Box::new</span>(<span class="ident">update</span>),
+    <span class="kw">pub fn </span>composite_update_many(filter: Filter, update: CompositeWriteOperation) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Composite(CompositeWriteOperation::UpdateMany {
+            filter,
+            update: Box::new(update),
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">composite_delete_many</span>(<span class="ident">filter</span>: <span class="ident">Filter</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Composite</span>(<span class="ident">CompositeWriteOperation::DeleteMany</span> { <span class="ident">filter</span> })
+    <span class="kw">pub fn </span>composite_delete_many(filter: Filter) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Composite(CompositeWriteOperation::DeleteMany { filter })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_scalar</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ScalarWriteOperation</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="self">Self</span>::Scalar</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="self">self</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+    <span class="kw">pub fn </span>as_scalar(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ScalarWriteOperation&gt; {
+        <span class="kw">if let </span><span class="self">Self</span>::Scalar(v) = <span class="self">self </span>{
+            <span class="prelude-val">Some</span>(v)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_composite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">CompositeWriteOperation</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="self">Self</span>::Composite</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="self">self</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+    <span class="kw">pub fn </span>as_composite(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>CompositeWriteOperation&gt; {
+        <span class="kw">if let </span><span class="self">Self</span>::Composite(v) = <span class="self">self </span>{
+            <span class="prelude-val">Some</span>(v)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_into_scalar</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ScalarWriteOperation</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="self">Self</span>::Scalar</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="self">self</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+    <span class="kw">pub fn </span>try_into_scalar(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ScalarWriteOperation&gt; {
+        <span class="kw">if let </span><span class="self">Self</span>::Scalar(v) = <span class="self">self </span>{
+            <span class="prelude-val">Some</span>(v)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_into_composite</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CompositeWriteOperation</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="self">Self</span>::Composite</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="self">self</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+    <span class="kw">pub fn </span>try_into_composite(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;CompositeWriteOperation&gt; {
+        <span class="kw">if let </span><span class="self">Self</span>::Composite(v) = <span class="self">self </span>{
+            <span class="prelude-val">Some</span>(v)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ScalarWriteOperation</span> {
-    <span class="doccomment">/// Reference to another field on the same model (unused at the moment).</span>
-    <span class="ident">Field</span>(<span class="ident">DatasourceFieldName</span>),
+<span class="attribute">#[derive(Debug, PartialEq, Clone)]
+</span><span class="kw">pub enum </span>ScalarWriteOperation {
+    <span class="doccomment">/// Reference to another field on the same model (unused at the moment).
+    </span>Field(DatasourceFieldName),
 
-    <span class="doccomment">/// Write plain value to field.</span>
-    <span class="ident">Set</span>(<span class="ident">PrismaValue</span>),
+    <span class="doccomment">/// Write plain value to field.
+    </span>Set(PrismaValue),
 
-    <span class="doccomment">/// Unsets a field (only for MongoDB for now)</span>
-    <span class="ident">Unset</span>(<span class="ident">bool</span>),
+    <span class="doccomment">/// Unsets a field (only for MongoDB for now)
+    </span>Unset(bool),
 
-    <span class="doccomment">/// Add value to field.</span>
-    <span class="ident">Add</span>(<span class="ident">PrismaValue</span>),
+    <span class="doccomment">/// Add value to field.
+    </span>Add(PrismaValue),
 
-    <span class="doccomment">/// Substract value from field</span>
-    <span class="ident">Substract</span>(<span class="ident">PrismaValue</span>),
+    <span class="doccomment">/// Substract value from field
+    </span>Substract(PrismaValue),
 
-    <span class="doccomment">/// Multiply field by value.</span>
-    <span class="ident">Multiply</span>(<span class="ident">PrismaValue</span>),
+    <span class="doccomment">/// Multiply field by value.
+    </span>Multiply(PrismaValue),
 
-    <span class="doccomment">/// Divide field by value.</span>
-    <span class="ident">Divide</span>(<span class="ident">PrismaValue</span>),
+    <span class="doccomment">/// Divide field by value.
+    </span>Divide(PrismaValue),
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CompositeWriteOperation</span> {
-    <span class="ident">Set</span>(<span class="ident">PrismaValue</span>),
-    <span class="ident">Push</span>(<span class="ident">PrismaValue</span>),
-    <span class="ident">Unset</span>(<span class="ident">bool</span>),
-    <span class="ident">Update</span>(<span class="ident">NestedWrite</span>),
-    <span class="ident">Upsert</span> {
-        <span class="ident">set</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">CompositeWriteOperation</span><span class="op">&gt;</span>,
-        <span class="ident">update</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">CompositeWriteOperation</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Clone)]
+</span><span class="kw">pub enum </span>CompositeWriteOperation {
+    Set(PrismaValue),
+    Push(PrismaValue),
+    Unset(bool),
+    Update(NestedWrite),
+    Upsert {
+        set: Box&lt;CompositeWriteOperation&gt;,
+        update: Box&lt;CompositeWriteOperation&gt;,
     },
-    <span class="ident">UpdateMany</span> {
-        <span class="ident">filter</span>: <span class="ident">Filter</span>,
-        <span class="ident">update</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">CompositeWriteOperation</span><span class="op">&gt;</span>,
+    UpdateMany {
+        filter: Filter,
+        update: Box&lt;CompositeWriteOperation&gt;,
     },
-    <span class="ident">DeleteMany</span> {
-        <span class="ident">filter</span>: <span class="ident">Filter</span>,
+    DeleteMany {
+        filter: Filter,
     },
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NestedWrite</span> {
-    <span class="kw">pub</span> <span class="ident">writes</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">DatasourceFieldName</span>, <span class="ident">WriteOperation</span>)<span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Clone)]
+</span><span class="kw">pub struct </span>NestedWrite {
+    <span class="kw">pub </span>writes: Vec&lt;(DatasourceFieldName, WriteOperation)&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FieldPath</span> {
-    <span class="kw">pub</span> <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Clone, Default)]
+</span><span class="kw">pub struct </span>FieldPath {
+    <span class="kw">pub </span>alias: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>path: Vec&lt;String&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">FieldPath</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_from_segment</span>(<span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::default</span>();
-        <span class="ident">path</span>.<span class="ident">add_segment</span>(<span class="ident">field</span>);
+<span class="kw">impl </span>FieldPath {
+    <span class="kw">pub fn </span>new_from_segment(field: <span class="kw-2">&amp;</span>Field) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>path = <span class="self">Self</span>::default();
+        path.add_segment(field);
 
-        <span class="ident">path</span>
+        path
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_from_alias</span>(<span class="ident">alias</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">alias</span>: <span class="prelude-val">Some</span>(<span class="ident">alias</span>.<span class="ident">into</span>()),
-            <span class="ident">path</span>: <span class="macro">vec!</span>[],
+    <span class="kw">pub fn </span>new_from_alias(alias: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            alias: <span class="prelude-val">Some</span>(alias.into()),
+            path: <span class="macro">vec!</span>[],
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_segment</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>) {
-        <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">push</span>(<span class="ident">field</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>());
+    <span class="kw">pub fn </span>add_segment(<span class="kw-2">&amp;mut </span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>Field) {
+        <span class="self">self</span>.path.push(field.db_name().to_owned());
     }
 
-    <span class="doccomment">/// Keep only the last element of the path</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keep_last</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">drain</span>(<span class="number">0</span>..<span class="self">self</span>.<span class="ident">path</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>);
+    <span class="doccomment">/// Keep only the last element of the path
+    </span><span class="kw">pub fn </span>keep_last(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.path.drain(<span class="number">0</span>..<span class="self">self</span>.path.len() - <span class="number">1</span>);
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) {
-        <span class="self">self</span>.<span class="ident">path</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">path</span>[<span class="number">0</span>..<span class="ident">n</span>].<span class="ident">to_vec</span>();
+    <span class="kw">pub fn </span>take(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: usize) {
+        <span class="self">self</span>.path = <span class="self">self</span>.path[<span class="number">0</span>..n].to_vec();
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">include_alias</span>: <span class="ident">bool</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="ident">rendered_path</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">join</span>(<span class="string">&quot;.&quot;</span>);
+    <span class="kw">pub fn </span>path(<span class="kw-2">&amp;</span><span class="self">self</span>, include_alias: bool) -&gt; String {
+        <span class="kw">let </span>rendered_path = <span class="self">self</span>.path.join(<span class="string">&quot;.&quot;</span>);
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">include_alias</span> {
-            <span class="kw">return</span> <span class="ident">rendered_path</span>;
+        <span class="kw">if </span>!include_alias {
+            <span class="kw">return </span>rendered_path;
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">alias</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">alias</span> {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">is_empty</span>() {
-                <span class="ident">alias</span>.<span class="ident">to_owned</span>()
-            } <span class="kw">else</span> {
-                <span class="macro">format!</span>(<span class="string">&quot;${}.{}&quot;</span>, <span class="ident">alias</span>, <span class="ident">rendered_path</span>)
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(alias) = <span class="kw-2">&amp;</span><span class="self">self</span>.alias {
+            <span class="kw">if </span><span class="self">self</span>.path.is_empty() {
+                alias.to_owned()
+            } <span class="kw">else </span>{
+                <span class="macro">format!</span>(<span class="string">&quot;${}.{}&quot;</span>, alias, rendered_path)
             }
-        } <span class="kw">else</span> {
-            <span class="ident">rendered_path</span>
+        } <span class="kw">else </span>{
+            rendered_path
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dollar_path</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">include_alias</span>: <span class="ident">bool</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="self">self</span>.<span class="ident">path</span>(<span class="ident">include_alias</span>))
+    <span class="kw">pub fn </span>dollar_path(<span class="kw-2">&amp;</span><span class="self">self</span>, include_alias: bool) -&gt; String {
+        <span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="self">self</span>.path(include_alias))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">identifier</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="ident">rendered_path</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">join</span>(<span class="string">&quot;_&quot;</span>);
+    <span class="kw">pub fn </span>identifier(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="kw">let </span>rendered_path = <span class="self">self</span>.path.join(<span class="string">&quot;_&quot;</span>);
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">alias</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">alias</span> {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">path</span>.<span class="ident">is_empty</span>() {
-                <span class="ident">alias</span>.<span class="ident">to_owned</span>()
-            } <span class="kw">else</span> {
-                <span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, <span class="ident">alias</span>, <span class="ident">rendered_path</span>)
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(alias) = <span class="kw-2">&amp;</span><span class="self">self</span>.alias {
+            <span class="kw">if </span><span class="self">self</span>.path.is_empty() {
+                alias.to_owned()
+            } <span class="kw">else </span>{
+                <span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, alias, rendered_path)
             }
-        } <span class="kw">else</span> {
-            <span class="ident">rendered_path</span>
+        } <span class="kw">else </span>{
+            rendered_path
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">NestedWrite</span> {
-    <span class="doccomment">/// Unfolds nested writes into a flat list of `WriteOperation`s.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Given the following `NestedWrite`:</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// Vec [(</span>
-    <span class="doccomment">///       &quot;field_a&quot;,</span>
-    <span class="doccomment">///       WriteOperation::Composite(Update(Vec[(&quot;field_b&quot;, WriteOperation::Composite(Set(&quot;3&quot;)))]))</span>
-    <span class="doccomment">///     )]</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// `unfold` will roughly return:</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// Vec[(Set(&quot;3&quot;), Field(&quot;field_b&quot;), &quot;field_a.field_b&quot;)]</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// where:</span>
-    <span class="doccomment">///  - `Set(&quot;3&quot;)` is the write operation to execute</span>
-    <span class="doccomment">///  - `Field(&quot;field_b&quot;)` is the field on which to execute the write operation</span>
-    <span class="doccomment">/// - `&quot;field_a.field_b&quot;` is the path for MongoDB to access the nested field</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unfold</span>(<span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">field_path</span>: <span class="ident">FieldPath</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">WriteOperation</span>, <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">FieldPath</span>)<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">unfold_internal</span>(<span class="ident">field</span>, <span class="ident">field_path</span>)
+<span class="kw">impl </span>NestedWrite {
+    <span class="doccomment">/// Unfolds nested writes into a flat list of `WriteOperation`s.
+    ///
+    /// Given the following `NestedWrite`:
+    /// ```text
+    /// Vec [(
+    ///       &quot;field_a&quot;,
+    ///       WriteOperation::Composite(Update(Vec[(&quot;field_b&quot;, WriteOperation::Composite(Set(&quot;3&quot;)))]))
+    ///     )]
+    /// ```
+    /// `unfold` will roughly return:
+    /// ```text
+    /// Vec[(Set(&quot;3&quot;), Field(&quot;field_b&quot;), &quot;field_a.field_b&quot;)]
+    /// ```
+    /// where:
+    ///  - `Set(&quot;3&quot;)` is the write operation to execute
+    ///  - `Field(&quot;field_b&quot;)` is the field on which to execute the write operation
+    /// - `&quot;field_a.field_b&quot;` is the path for MongoDB to access the nested field
+    </span><span class="kw">pub fn </span>unfold(<span class="self">self</span>, field: <span class="kw-2">&amp;</span>Field, field_path: FieldPath) -&gt; Vec&lt;(WriteOperation, <span class="kw-2">&amp;</span>Field, FieldPath)&gt; {
+        <span class="self">self</span>.unfold_internal(field, field_path)
     }
 
-    <span class="kw">fn</span> <span class="ident">unfold_internal</span>(<span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="ident">Field</span>, <span class="ident">field_path</span>: <span class="ident">FieldPath</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">WriteOperation</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="ident">Field</span>, <span class="ident">FieldPath</span>)<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">nested_writes</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">WriteOperation</span>, <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">FieldPath</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+    <span class="kw">fn </span>unfold_internal(<span class="self">self</span>, field: <span class="kw-2">&amp;</span><span class="lifetime">&#39;_ </span>Field, field_path: FieldPath) -&gt; Vec&lt;(WriteOperation, <span class="kw-2">&amp;</span><span class="lifetime">&#39;_ </span>Field, FieldPath)&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>nested_writes: Vec&lt;(WriteOperation, <span class="kw-2">&amp;</span>Field, FieldPath)&gt; = <span class="macro">vec!</span>[];
 
-        <span class="kw">for</span> (<span class="ident">DatasourceFieldName</span>(<span class="ident">db_name</span>), <span class="ident">write</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">writes</span> {
-            <span class="kw">let</span> <span class="ident">nested_field</span> <span class="op">=</span> <span class="ident">field</span>
-                .<span class="ident">as_composite</span>()
-                .<span class="ident">unwrap</span>()
-                .<span class="ident">typ</span>
-                .<span class="ident">find_field_by_db_name</span>(<span class="kw-2">&amp;</span><span class="ident">db_name</span>)
-                .<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_path</span> <span class="op">=</span> <span class="ident">field_path</span>.<span class="ident">clone</span>();
+        <span class="kw">for </span>(DatasourceFieldName(db_name), write) <span class="kw">in </span><span class="self">self</span>.writes {
+            <span class="kw">let </span>nested_field = field
+                .as_composite()
+                .unwrap()
+                .typ
+                .find_field_by_db_name(<span class="kw-2">&amp;</span>db_name)
+                .unwrap();
+            <span class="kw">let </span><span class="kw-2">mut </span>new_path = field_path.clone();
 
-            <span class="ident">new_path</span>.<span class="ident">add_segment</span>(<span class="ident">nested_field</span>);
+            new_path.add_segment(nested_field);
 
-            <span class="kw">match</span> <span class="ident">write</span> {
-                <span class="ident">WriteOperation::Composite</span>(<span class="ident">CompositeWriteOperation::Update</span>(<span class="ident">nested_write</span>)) =&gt; {
-                    <span class="ident">nested_writes</span>.<span class="ident">extend</span>(<span class="ident">nested_write</span>.<span class="ident">unfold_internal</span>(<span class="ident">nested_field</span>, <span class="ident">new_path</span>));
+            <span class="kw">match </span>write {
+                WriteOperation::Composite(CompositeWriteOperation::Update(nested_write)) =&gt; {
+                    nested_writes.extend(nested_write.unfold_internal(nested_field, new_path));
                 }
-                <span class="kw">_</span> =&gt; {
-                    <span class="ident">nested_writes</span>.<span class="ident">push</span>((<span class="ident">write</span>, <span class="ident">nested_field</span>, <span class="ident">new_path</span>));
+                <span class="kw">_ </span>=&gt; {
+                    nested_writes.push((write, nested_field, new_path));
                 }
             }
         }
 
-        <span class="ident">nested_writes</span>
+        nested_writes
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>, <span class="ident">PrismaValue</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">WriteOperation</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>((<span class="kw">_</span>, <span class="ident">pv</span>): (<span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>, <span class="ident">PrismaValue</span>)) -&gt; <span class="self">Self</span> {
-        <span class="ident">WriteOperation::scalar_set</span>(<span class="ident">pv</span>)
+<span class="kw">impl </span>From&lt;(<span class="kw-2">&amp;</span>ScalarFieldRef, PrismaValue)&gt; <span class="kw">for </span>WriteOperation {
+    <span class="kw">fn </span>from((<span class="kw">_</span>, pv): (<span class="kw-2">&amp;</span>ScalarFieldRef, PrismaValue)) -&gt; <span class="self">Self </span>{
+        WriteOperation::scalar_set(pv)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>, <span class="ident">PrismaValue</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">WriteOperation</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>((<span class="kw">_</span>, <span class="ident">pv</span>): (<span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>, <span class="ident">PrismaValue</span>)) -&gt; <span class="self">Self</span> {
-        <span class="ident">WriteOperation::composite_set</span>(<span class="ident">pv</span>)
+<span class="kw">impl </span>From&lt;(<span class="kw-2">&amp;</span>CompositeFieldRef, PrismaValue)&gt; <span class="kw">for </span>WriteOperation {
+    <span class="kw">fn </span>from((<span class="kw">_</span>, pv): (<span class="kw-2">&amp;</span>CompositeFieldRef, PrismaValue)) -&gt; <span class="self">Self </span>{
+        WriteOperation::composite_set(pv)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">SelectedField</span>, <span class="ident">PrismaValue</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">WriteOperation</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>((<span class="ident">selection</span>, <span class="ident">pv</span>): (<span class="kw-2">&amp;</span><span class="ident">SelectedField</span>, <span class="ident">PrismaValue</span>)) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">selection</span> {
-            <span class="ident">SelectedField::Scalar</span>(<span class="ident">sf</span>) =&gt; (<span class="ident">sf</span>, <span class="ident">pv</span>).<span class="ident">into</span>(),
-            <span class="ident">SelectedField::Composite</span>(<span class="ident">cs</span>) =&gt; (<span class="kw-2">&amp;</span><span class="ident">cs</span>.<span class="ident">field</span>, <span class="ident">pv</span>).<span class="ident">into</span>(),
+<span class="kw">impl </span>From&lt;(<span class="kw-2">&amp;</span>SelectedField, PrismaValue)&gt; <span class="kw">for </span>WriteOperation {
+    <span class="kw">fn </span>from((selection, pv): (<span class="kw-2">&amp;</span>SelectedField, PrismaValue)) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>selection {
+            SelectedField::Scalar(sf) =&gt; (sf, pv).into(),
+            SelectedField::Composite(cs) =&gt; (<span class="kw-2">&amp;</span>cs.field, pv).into(),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">WriteOperation</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">ConnectorError</span>;
+<span class="kw">impl </span>TryInto&lt;PrismaValue&gt; <span class="kw">for </span>WriteOperation {
+    <span class="kw">type </span>Error = ConnectorError;
 
-    <span class="kw">fn</span> <span class="ident">try_into</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PrismaValue</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">WriteOperation::Scalar</span>(<span class="ident">ScalarWriteOperation::Set</span>(<span class="ident">pv</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">pv</span>),
-            <span class="ident">WriteOperation::Composite</span>(<span class="ident">CompositeWriteOperation::Set</span>(<span class="ident">pv</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">pv</span>),
-            <span class="ident">x</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::from_kind</span>(<span class="ident">ErrorKind::InternalConversionError</span>(<span class="macro">format!</span>(
+    <span class="kw">fn </span>try_into(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;PrismaValue, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            WriteOperation::Scalar(ScalarWriteOperation::Set(pv)) =&gt; <span class="prelude-val">Ok</span>(pv),
+            WriteOperation::Composite(CompositeWriteOperation::Set(pv)) =&gt; <span class="prelude-val">Ok</span>(pv),
+            x =&gt; <span class="prelude-val">Err</span>(ConnectorError::from_kind(ErrorKind::InternalConversionError(<span class="macro">format!</span>(
                 <span class="string">&quot;Unable to convert write expression {:?} into prisma value.&quot;</span>,
-                <span class="ident">x</span>
+                x
             )))),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">WriteArgs</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">args</span>: <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">DatasourceFieldName</span>, <span class="ident">WriteOperation</span><span class="op">&gt;</span>, <span class="ident">request_now</span>: <span class="ident">PrismaValue</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">args</span>, <span class="ident">request_now</span> }
+<span class="kw">impl </span>WriteArgs {
+    <span class="kw">pub fn </span>new(args: IndexMap&lt;DatasourceFieldName, WriteOperation&gt;, request_now: PrismaValue) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ args, request_now }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_empty</span>(<span class="ident">request_now</span>: <span class="ident">PrismaValue</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">args</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">request_now</span>,
+    <span class="kw">pub fn </span>new_empty(request_now: PrismaValue) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            args: Default::default(),
+            request_now,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="ident">T</span>, <span class="ident">arg</span>: <span class="ident">V</span>)
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">DatasourceFieldName</span><span class="op">&gt;</span>,
-        <span class="ident">V</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">WriteOperation</span><span class="op">&gt;</span>,
+    <span class="kw">pub fn </span>insert&lt;T, V&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: T, arg: V)
+    <span class="kw">where
+        </span>T: Into&lt;DatasourceFieldName&gt;,
+        V: Into&lt;WriteOperation&gt;,
     {
-        <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">insert</span>(<span class="ident">key</span>.<span class="ident">into</span>(), <span class="ident">arg</span>.<span class="ident">into</span>());
+        <span class="self">self</span>.args.insert(key.into(), arg.into());
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_arg_for</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">contains_key</span>(<span class="ident">field</span>)
+    <span class="kw">pub fn </span>has_arg_for(<span class="kw-2">&amp;</span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        <span class="self">self</span>.args.contains_key(field)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_field_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">WriteOperation</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">get</span>(<span class="ident">field</span>)
+    <span class="kw">pub fn </span>get_field_value(<span class="kw-2">&amp;</span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>WriteOperation&gt; {
+        <span class="self">self</span>.args.get(field)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_field_value</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">WriteOperation</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">remove</span>(<span class="ident">field</span>)
+    <span class="kw">pub fn </span>take_field_value(<span class="kw-2">&amp;mut </span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;WriteOperation&gt; {
+        <span class="self">self</span>.args.remove(field)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Keys</span><span class="op">&lt;</span><span class="ident">DatasourceFieldName</span>, <span class="ident">WriteOperation</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">keys</span>()
+    <span class="kw">pub fn </span>keys(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Keys&lt;DatasourceFieldName, WriteOperation&gt; {
+        <span class="self">self</span>.args.keys()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">is_empty</span>()
+    <span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.args.is_empty()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">len</span>()
+    <span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.args.len()
     }
 
-    <span class="comment">// @updatedAt</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_datetimes</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) {
-        <span class="kw">let</span> <span class="ident">updated_at_fields</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">updated_at</span>();
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">request_now</span>;
+    <span class="comment">// @updatedAt
+    </span><span class="kw">pub fn </span>add_datetimes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, model: <span class="kw-2">&amp;</span>ModelRef) {
+        <span class="kw">let </span>updated_at_fields = model.fields().updated_at();
+        <span class="kw">let </span>value = <span class="kw-2">&amp;</span><span class="self">self</span>.request_now;
 
-        <span class="kw">for</span> <span class="ident">f</span> <span class="kw">in</span> <span class="ident">updated_at_fields</span> {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">get</span>(<span class="ident">f</span>.<span class="ident">db_name</span>()).<span class="ident">is_none</span>() {
-                <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">insert</span>(<span class="ident">f</span>.<span class="ident">into</span>(), <span class="ident">WriteOperation::scalar_set</span>(<span class="ident">value</span>.<span class="ident">clone</span>()));
+        <span class="kw">for </span>f <span class="kw">in </span>updated_at_fields {
+            <span class="kw">if </span><span class="self">self</span>.args.get(f.db_name()).is_none() {
+                <span class="self">self</span>.args.insert(f.into(), WriteOperation::scalar_set(value.clone()));
             }
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update_datetimes</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) {
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">args</span>.<span class="ident">is_empty</span>() {
-            <span class="self">self</span>.<span class="ident">add_datetimes</span>(<span class="ident">model</span>)
+    <span class="kw">pub fn </span>update_datetimes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, model: <span class="kw-2">&amp;</span>ModelRef) {
+        <span class="kw">if </span>!<span class="self">self</span>.args.is_empty() {
+            <span class="self">self</span>.add_datetimes(model)
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_record_projection</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model_projection</span>: <span class="ident">ModelProjection</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">pairs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">model_projection</span>
-            .<span class="ident">scalar_fields</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">val</span>: <span class="ident">PrismaValue</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get_field_value</span>(<span class="ident">field</span>.<span class="ident">db_name</span>()) {
-                    <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
-                        <span class="comment">// Important: This causes write expressions that are not plain values to produce</span>
-                        <span class="comment">// null values. At the moment, this function is used to extract an ID for</span>
-                        <span class="comment">// create record calls, which only operate on plain values _for now_. As soon</span>
-                        <span class="comment">// as that changes we need to revisit the whole ID extraction on create / update topic.</span>
-                        <span class="kw">let</span> <span class="ident">p</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">val</span>.<span class="ident">clone</span>().<span class="ident">try_into</span>().<span class="ident">ok</span>();
-                        <span class="kw">match</span> <span class="ident">p</span> {
-                            <span class="prelude-val">Some</span>(<span class="ident">p</span>) =&gt; <span class="ident">p</span>,
-                            <span class="prelude-val">None</span> =&gt; <span class="ident">PrismaValue::Null</span>,
+    <span class="kw">pub fn </span>as_record_projection(<span class="kw-2">&amp;</span><span class="self">self</span>, model_projection: ModelProjection) -&gt; <span class="prelude-ty">Option</span>&lt;SelectionResult&gt; {
+        <span class="kw">let </span>pairs: Vec&lt;<span class="kw">_</span>&gt; = model_projection
+            .scalar_fields()
+            .map(|field| {
+                <span class="kw">let </span>val: PrismaValue = <span class="kw">match </span><span class="self">self</span>.get_field_value(field.db_name()) {
+                    <span class="prelude-val">Some</span>(val) =&gt; {
+                        <span class="comment">// Important: This causes write expressions that are not plain values to produce
+                        // null values. At the moment, this function is used to extract an ID for
+                        // create record calls, which only operate on plain values _for now_. As soon
+                        // as that changes we need to revisit the whole ID extraction on create / update topic.
+                        </span><span class="kw">let </span>p: <span class="prelude-ty">Option</span>&lt;PrismaValue&gt; = val.clone().try_into().ok();
+                        <span class="kw">match </span>p {
+                            <span class="prelude-val">Some</span>(p) =&gt; p,
+                            <span class="prelude-val">None </span>=&gt; PrismaValue::Null,
                         }
                     }
-                    <span class="prelude-val">None</span> =&gt; <span class="ident">PrismaValue::Null</span>,
+                    <span class="prelude-val">None </span>=&gt; PrismaValue::Null,
                 };
 
-                (<span class="ident">field</span>, <span class="ident">val</span>)
+                (field, val)
             })
-            .<span class="ident">collect</span>();
+            .collect();
 
-        <span class="prelude-val">Some</span>(<span class="ident">pairs</span>.<span class="ident">into</span>())
+        <span class="prelude-val">Some</span>(pairs.into())
     }
 }
 
-<span class="doccomment">/// Picks all arguments out of `args` that are updating a value for a field</span>
-<span class="doccomment">/// contained in `projection`, as those need to be merged into the records later on.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pick_args</span>(<span class="ident">projection</span>: <span class="kw-2">&amp;</span><span class="ident">ModelProjection</span>, <span class="ident">args</span>: <span class="kw-2">&amp;</span><span class="ident">WriteArgs</span>) -&gt; <span class="ident">WriteArgs</span> {
-    <span class="kw">let</span> <span class="ident">pairs</span> <span class="op">=</span> <span class="ident">projection</span>
-        .<span class="ident">scalar_fields</span>()
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> {
-            <span class="ident">args</span>.<span class="ident">get_field_value</span>(<span class="ident">field</span>.<span class="ident">db_name</span>())
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> (<span class="ident">DatasourceFieldName::from</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>), <span class="ident">v</span>.<span class="ident">clone</span>()))
+<span class="doccomment">/// Picks all arguments out of `args` that are updating a value for a field
+/// contained in `projection`, as those need to be merged into the records later on.
+</span><span class="kw">pub fn </span>pick_args(projection: <span class="kw-2">&amp;</span>ModelProjection, args: <span class="kw-2">&amp;</span>WriteArgs) -&gt; WriteArgs {
+    <span class="kw">let </span>pairs = projection
+        .scalar_fields()
+        .into_iter()
+        .filter_map(|field| {
+            args.get_field_value(field.db_name())
+                .map(|v| (DatasourceFieldName::from(<span class="kw-2">&amp;</span>field), v.clone()))
         })
-        .<span class="ident">collect</span>();
+        .collect();
 
-    <span class="ident">WriteArgs::new</span>(<span class="ident">pairs</span>, <span class="ident">args</span>.<span class="ident">request_now</span>.<span class="ident">clone</span>())
+    WriteArgs::new(pairs, args.request_now.clone())
 }
 
-<span class="doccomment">/// Merges the incoming write argument values into the given, already loaded, ids. Overwrites existing values.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">merge_write_args</span>(<span class="ident">loaded_ids</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span>, <span class="ident">incoming_args</span>: <span class="ident">WriteArgs</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">loaded_ids</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">incoming_args</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">return</span> <span class="ident">loaded_ids</span>;
+<span class="doccomment">/// Merges the incoming write argument values into the given, already loaded, ids. Overwrites existing values.
+</span><span class="kw">pub fn </span>merge_write_args(loaded_ids: Vec&lt;SelectionResult&gt;, incoming_args: WriteArgs) -&gt; Vec&lt;SelectionResult&gt; {
+    <span class="kw">if </span>loaded_ids.is_empty() || incoming_args.is_empty() {
+        <span class="kw">return </span>loaded_ids;
     }
 
-    <span class="comment">// Contains all positions that need to be updated with the given expression.</span>
-    <span class="kw">let</span> <span class="ident">positions</span>: <span class="ident">IndexMap</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="kw-2">&amp;</span><span class="ident">WriteOperation</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">loaded_ids</span>
-        .<span class="ident">first</span>()
-        .<span class="ident">unwrap</span>()
-        .<span class="ident">pairs</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">enumerate</span>()
-        .<span class="ident">filter_map</span>(<span class="op">|</span>(<span class="ident">i</span>, (<span class="ident">selection</span>, <span class="kw">_</span>))<span class="op">|</span> <span class="ident">incoming_args</span>.<span class="ident">get_field_value</span>(<span class="ident">selection</span>.<span class="ident">db_name</span>()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> (<span class="ident">i</span>, <span class="ident">val</span>)))
-        .<span class="ident">collect</span>();
+    <span class="comment">// Contains all positions that need to be updated with the given expression.
+    </span><span class="kw">let </span>positions: IndexMap&lt;usize, <span class="kw-2">&amp;</span>WriteOperation&gt; = loaded_ids
+        .first()
+        .unwrap()
+        .pairs
+        .iter()
+        .enumerate()
+        .filter_map(|(i, (selection, <span class="kw">_</span>))| incoming_args.get_field_value(selection.db_name()).map(|val| (i, val)))
+        .collect();
 
-    <span class="ident">loaded_ids</span>
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">id</span><span class="op">|</span> {
-            <span class="kw">for</span> (<span class="ident">position</span>, <span class="ident">write_op</span>) <span class="kw">in</span> <span class="ident">positions</span>.<span class="ident">iter</span>() {
-                <span class="kw">let</span> <span class="ident">current_val</span> <span class="op">=</span> <span class="ident">id</span>.<span class="ident">pairs</span>[<span class="ident">position</span>.<span class="ident">to_owned</span>()].<span class="number">1</span>.<span class="ident">clone</span>();
-                <span class="ident">id</span>.<span class="ident">pairs</span>[<span class="ident">position</span>.<span class="ident">to_owned</span>()].<span class="number">1</span> <span class="op">=</span>
-                    <span class="ident">apply_expression</span>(<span class="ident">current_val</span>, (<span class="kw-2">*</span><span class="ident">write_op</span>.<span class="ident">as_scalar</span>().<span class="ident">unwrap</span>()).<span class="ident">clone</span>());
+    loaded_ids
+        .into_iter()
+        .map(|<span class="kw-2">mut </span>id| {
+            <span class="kw">for </span>(position, write_op) <span class="kw">in </span>positions.iter() {
+                <span class="kw">let </span>current_val = id.pairs[position.to_owned()].<span class="number">1</span>.clone();
+                id.pairs[position.to_owned()].<span class="number">1 </span>=
+                    apply_expression(current_val, (<span class="kw-2">*</span>write_op.as_scalar().unwrap()).clone());
             }
 
-            <span class="ident">id</span>
+            id
         })
-        .<span class="ident">collect</span>()
+        .collect()
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">apply_expression</span>(<span class="ident">val</span>: <span class="ident">PrismaValue</span>, <span class="ident">scalar_write</span>: <span class="ident">ScalarWriteOperation</span>) -&gt; <span class="ident">PrismaValue</span> {
-    <span class="kw">match</span> <span class="ident">scalar_write</span> {
-        <span class="ident">ScalarWriteOperation::Field</span>(<span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(),
-        <span class="ident">ScalarWriteOperation::Set</span>(<span class="ident">pv</span>) =&gt; <span class="ident">pv</span>,
-        <span class="ident">ScalarWriteOperation::Add</span>(<span class="ident">rhs</span>) =&gt; <span class="ident">val</span> <span class="op">+</span> <span class="ident">rhs</span>,
-        <span class="ident">ScalarWriteOperation::Substract</span>(<span class="ident">rhs</span>) =&gt; <span class="ident">val</span> <span class="op">-</span> <span class="ident">rhs</span>,
-        <span class="ident">ScalarWriteOperation::Multiply</span>(<span class="ident">rhs</span>) =&gt; <span class="ident">val</span> <span class="op">*</span> <span class="ident">rhs</span>,
-        <span class="ident">ScalarWriteOperation::Divide</span>(<span class="ident">rhs</span>) =&gt; <span class="ident">val</span> <span class="op">/</span> <span class="ident">rhs</span>,
-        <span class="ident">ScalarWriteOperation::Unset</span>(<span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(),
+<span class="kw">pub fn </span>apply_expression(val: PrismaValue, scalar_write: ScalarWriteOperation) -&gt; PrismaValue {
+    <span class="kw">match </span>scalar_write {
+        ScalarWriteOperation::Field(<span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(),
+        ScalarWriteOperation::Set(pv) =&gt; pv,
+        ScalarWriteOperation::Add(rhs) =&gt; val + rhs,
+        ScalarWriteOperation::Substract(rhs) =&gt; val - rhs,
+        ScalarWriteOperation::Multiply(rhs) =&gt; val * rhs,
+        ScalarWriteOperation::Divide(rhs) =&gt; val / rhs,
+        ScalarWriteOperation::Unset(<span class="kw">_</span>) =&gt; <span class="macro">unimplemented!</span>(),
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

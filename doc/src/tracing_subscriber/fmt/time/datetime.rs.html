@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/fmt/time/datetime.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>datetime.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tracing_subscriber/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/fmt/time/datetime.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>datetime.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tracing_subscriber/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tracing_subscriber/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -410,415 +410,415 @@
 <span id="408">408</span>
 <span id="409">409</span>
 <span id="410">410</span>
-</pre><pre class="rust"><code><span class="comment">// musl as a whole is licensed under the following standard MIT license:</span>
-<span class="comment">//</span>
-<span class="comment">// ----------------------------------------------------------------------</span>
-<span class="comment">// Copyright © 2005-2020 Rich Felker, et al.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission is hereby granted, free of charge, to any person obtaining</span>
-<span class="comment">// a copy of this software and associated documentation files (the</span>
-<span class="comment">// &quot;Software&quot;), to deal in the Software without restriction, including</span>
-<span class="comment">// without limitation the rights to use, copy, modify, merge, publish,</span>
-<span class="comment">// distribute, sublicense, and/or sell copies of the Software, and to</span>
-<span class="comment">// permit persons to whom the Software is furnished to do so, subject to</span>
-<span class="comment">// the following conditions:</span>
-<span class="comment">//</span>
-<span class="comment">// The above copyright notice and this permission notice shall be</span>
-<span class="comment">// included in all copies or substantial portions of the Software.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,</span>
-<span class="comment">// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.</span>
-<span class="comment">// IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY</span>
-<span class="comment">// CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,</span>
-<span class="comment">// TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE</span>
-<span class="comment">// SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</span>
-<span class="comment">// ----------------------------------------------------------------------</span>
-<span class="comment">//</span>
-<span class="comment">// Authors/contributors include:</span>
-<span class="comment">//</span>
-<span class="comment">// A. Wilcox</span>
-<span class="comment">// Ada Worcester</span>
-<span class="comment">// Alex Dowad</span>
-<span class="comment">// Alex Suykov</span>
-<span class="comment">// Alexander Monakov</span>
-<span class="comment">// Andre McCurdy</span>
-<span class="comment">// Andrew Kelley</span>
-<span class="comment">// Anthony G. Basile</span>
-<span class="comment">// Aric Belsito</span>
-<span class="comment">// Arvid Picciani</span>
-<span class="comment">// Bartosz Brachaczek</span>
-<span class="comment">// Benjamin Peterson</span>
-<span class="comment">// Bobby Bingham</span>
-<span class="comment">// Boris Brezillon</span>
-<span class="comment">// Brent Cook</span>
-<span class="comment">// Chris Spiegel</span>
-<span class="comment">// Clément Vasseur</span>
-<span class="comment">// Daniel Micay</span>
-<span class="comment">// Daniel Sabogal</span>
-<span class="comment">// Daurnimator</span>
-<span class="comment">// David Carlier</span>
-<span class="comment">// David Edelsohn</span>
-<span class="comment">// Denys Vlasenko</span>
-<span class="comment">// Dmitry Ivanov</span>
-<span class="comment">// Dmitry V. Levin</span>
-<span class="comment">// Drew DeVault</span>
-<span class="comment">// Emil Renner Berthing</span>
-<span class="comment">// Fangrui Song</span>
-<span class="comment">// Felix Fietkau</span>
-<span class="comment">// Felix Janda</span>
-<span class="comment">// Gianluca Anzolin</span>
-<span class="comment">// Hauke Mehrtens</span>
-<span class="comment">// He X</span>
-<span class="comment">// Hiltjo Posthuma</span>
-<span class="comment">// Isaac Dunham</span>
-<span class="comment">// Jaydeep Patil</span>
-<span class="comment">// Jens Gustedt</span>
-<span class="comment">// Jeremy Huntwork</span>
-<span class="comment">// Jo-Philipp Wich</span>
-<span class="comment">// Joakim Sindholt</span>
-<span class="comment">// John Spencer</span>
-<span class="comment">// Julien Ramseier</span>
-<span class="comment">// Justin Cormack</span>
-<span class="comment">// Kaarle Ritvanen</span>
-<span class="comment">// Khem Raj</span>
-<span class="comment">// Kylie McClain</span>
-<span class="comment">// Leah Neukirchen</span>
-<span class="comment">// Luca Barbato</span>
-<span class="comment">// Luka Perkov</span>
-<span class="comment">// M Farkas-Dyck (Strake)</span>
-<span class="comment">// Mahesh Bodapati</span>
-<span class="comment">// Markus Wichmann</span>
-<span class="comment">// Masanori Ogino</span>
-<span class="comment">// Michael Clark</span>
-<span class="comment">// Michael Forney</span>
-<span class="comment">// Mikhail Kremnyov</span>
-<span class="comment">// Natanael Copa</span>
-<span class="comment">// Nicholas J. Kain</span>
-<span class="comment">// orc</span>
-<span class="comment">// Pascal Cuoq</span>
-<span class="comment">// Patrick Oppenlander</span>
-<span class="comment">// Petr Hosek</span>
-<span class="comment">// Petr Skocik</span>
-<span class="comment">// Pierre Carrier</span>
-<span class="comment">// Reini Urban</span>
-<span class="comment">// Rich Felker</span>
-<span class="comment">// Richard Pennington</span>
-<span class="comment">// Ryan Fairfax</span>
-<span class="comment">// Samuel Holland</span>
-<span class="comment">// Segev Finer</span>
-<span class="comment">// Shiz</span>
-<span class="comment">// sin</span>
-<span class="comment">// Solar Designer</span>
-<span class="comment">// Stefan Kristiansson</span>
-<span class="comment">// Stefan O&#39;Rear</span>
-<span class="comment">// Szabolcs Nagy</span>
-<span class="comment">// Timo Teräs</span>
-<span class="comment">// Trutz Behn</span>
-<span class="comment">// Valentin Ochs</span>
-<span class="comment">// Will Dietz</span>
-<span class="comment">// William Haddon</span>
-<span class="comment">// William Pitcock</span>
-<span class="comment">//</span>
-<span class="comment">// Portions of this software are derived from third-party works licensed</span>
-<span class="comment">// under terms compatible with the above MIT license:</span>
-<span class="comment">//</span>
-<span class="comment">// The TRE regular expression implementation (src/regex/reg* and</span>
-<span class="comment">// src/regex/tre*) is Copyright © 2001-2008 Ville Laurikari and licensed</span>
-<span class="comment">// under a 2-clause BSD license (license text in the source files). The</span>
-<span class="comment">// included version has been heavily modified by Rich Felker in 2012, in</span>
-<span class="comment">// the interests of size, simplicity, and namespace cleanliness.</span>
-<span class="comment">//</span>
-<span class="comment">// Much of the math library code (src/math/* and src/complex/*) is</span>
-<span class="comment">// Copyright © 1993,2004 Sun Microsystems or</span>
-<span class="comment">// Copyright © 2003-2011 David Schultz or</span>
-<span class="comment">// Copyright © 2003-2009 Steven G. Kargl or</span>
-<span class="comment">// Copyright © 2003-2009 Bruce D. Evans or</span>
-<span class="comment">// Copyright © 2008 Stephen L. Moshier or</span>
-<span class="comment">// Copyright © 2017-2018 Arm Limited</span>
-<span class="comment">// and labelled as such in comments in the individual source files. All</span>
-<span class="comment">// have been licensed under extremely permissive terms.</span>
-<span class="comment">//</span>
-<span class="comment">// The ARM memcpy code (src/string/arm/memcpy.S) is Copyright © 2008</span>
-<span class="comment">// The Android Open Source Project and is licensed under a two-clause BSD</span>
-<span class="comment">// license. It was taken from Bionic libc, used on Android.</span>
-<span class="comment">//</span>
-<span class="comment">// The AArch64 memcpy and memset code (src/string/aarch64/*) are</span>
-<span class="comment">// Copyright © 1999-2019, Arm Limited.</span>
-<span class="comment">//</span>
-<span class="comment">// The implementation of DES for crypt (src/crypt/crypt_des.c) is</span>
-<span class="comment">// Copyright © 1994 David Burren. It is licensed under a BSD license.</span>
-<span class="comment">//</span>
-<span class="comment">// The implementation of blowfish crypt (src/crypt/crypt_blowfish.c) was</span>
-<span class="comment">// originally written by Solar Designer and placed into the public</span>
-<span class="comment">// domain. The code also comes with a fallback permissive license for use</span>
-<span class="comment">// in jurisdictions that may not recognize the public domain.</span>
-<span class="comment">//</span>
-<span class="comment">// The smoothsort implementation (src/stdlib/qsort.c) is Copyright © 2011</span>
-<span class="comment">// Valentin Ochs and is licensed under an MIT-style license.</span>
-<span class="comment">//</span>
-<span class="comment">// The x86_64 port was written by Nicholas J. Kain and is licensed under</span>
-<span class="comment">// the standard MIT terms.</span>
-<span class="comment">//</span>
-<span class="comment">// The mips and microblaze ports were originally written by Richard</span>
-<span class="comment">// Pennington for use in the ellcc project. The original code was adapted</span>
-<span class="comment">// by Rich Felker for build system and code conventions during upstream</span>
-<span class="comment">// integration. It is licensed under the standard MIT terms.</span>
-<span class="comment">//</span>
-<span class="comment">// The mips64 port was contributed by Imagination Technologies and is</span>
-<span class="comment">// licensed under the standard MIT terms.</span>
-<span class="comment">//</span>
-<span class="comment">// The powerpc port was also originally written by Richard Pennington,</span>
-<span class="comment">// and later supplemented and integrated by John Spencer. It is licensed</span>
-<span class="comment">// under the standard MIT terms.</span>
-<span class="comment">//</span>
-<span class="comment">// All other files which have no copyright comments are original works</span>
-<span class="comment">// produced specifically for use as part of this library, written either</span>
-<span class="comment">// by Rich Felker, the main author of the library, or by one or more</span>
-<span class="comment">// contibutors listed above. Details on authorship of individual files</span>
-<span class="comment">// can be found in the git version control history of the project. The</span>
-<span class="comment">// omission of copyright and license comments in each file is in the</span>
-<span class="comment">// interest of source tree size.</span>
-<span class="comment">//</span>
-<span class="comment">// In addition, permission is hereby granted for all public header files</span>
-<span class="comment">// (include/* and arch/*/bits/*) and crt files intended to be linked into</span>
-<span class="comment">// applications (crt/*, ldso/dlstart.c, and arch/*/crt_arch.h) to omit</span>
-<span class="comment">// the copyright notice and permission notice otherwise required by the</span>
-<span class="comment">// license, and to use these files without any requirement of</span>
-<span class="comment">// attribution. These files include substantial contributions from:</span>
-<span class="comment">//</span>
-<span class="comment">// Bobby Bingham</span>
-<span class="comment">// John Spencer</span>
-<span class="comment">// Nicholas J. Kain</span>
-<span class="comment">// Rich Felker</span>
-<span class="comment">// Richard Pennington</span>
-<span class="comment">// Stefan Kristiansson</span>
-<span class="comment">// Szabolcs Nagy</span>
-<span class="comment">//</span>
-<span class="comment">// all of whom have explicitly granted such permission.</span>
-<span class="comment">//</span>
-<span class="comment">// This file previously contained text expressing a belief that most of</span>
-<span class="comment">// the files covered by the above exception were sufficiently trivial not</span>
-<span class="comment">// to be subject to copyright, resulting in confusion over whether it</span>
-<span class="comment">// negated the permissions granted in the license. In the spirit of</span>
-<span class="comment">// permissive licensing, and of not having licensing issues being an</span>
-<span class="comment">// obstacle to adoption, that text has been removed.</span>
+</pre><pre class="rust"><code><span class="comment">// musl as a whole is licensed under the following standard MIT license:
+//
+// ----------------------------------------------------------------------
+// Copyright © 2005-2020 Rich Felker, et al.
+//
+// Permission is hereby granted, free of charge, to any person obtaining
+// a copy of this software and associated documentation files (the
+// &quot;Software&quot;), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to
+// permit persons to whom the Software is furnished to do so, subject to
+// the following conditions:
+//
+// The above copyright notice and this permission notice shall be
+// included in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND,
+// EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+// IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+// CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+// TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+// SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// ----------------------------------------------------------------------
+//
+// Authors/contributors include:
+//
+// A. Wilcox
+// Ada Worcester
+// Alex Dowad
+// Alex Suykov
+// Alexander Monakov
+// Andre McCurdy
+// Andrew Kelley
+// Anthony G. Basile
+// Aric Belsito
+// Arvid Picciani
+// Bartosz Brachaczek
+// Benjamin Peterson
+// Bobby Bingham
+// Boris Brezillon
+// Brent Cook
+// Chris Spiegel
+// Clément Vasseur
+// Daniel Micay
+// Daniel Sabogal
+// Daurnimator
+// David Carlier
+// David Edelsohn
+// Denys Vlasenko
+// Dmitry Ivanov
+// Dmitry V. Levin
+// Drew DeVault
+// Emil Renner Berthing
+// Fangrui Song
+// Felix Fietkau
+// Felix Janda
+// Gianluca Anzolin
+// Hauke Mehrtens
+// He X
+// Hiltjo Posthuma
+// Isaac Dunham
+// Jaydeep Patil
+// Jens Gustedt
+// Jeremy Huntwork
+// Jo-Philipp Wich
+// Joakim Sindholt
+// John Spencer
+// Julien Ramseier
+// Justin Cormack
+// Kaarle Ritvanen
+// Khem Raj
+// Kylie McClain
+// Leah Neukirchen
+// Luca Barbato
+// Luka Perkov
+// M Farkas-Dyck (Strake)
+// Mahesh Bodapati
+// Markus Wichmann
+// Masanori Ogino
+// Michael Clark
+// Michael Forney
+// Mikhail Kremnyov
+// Natanael Copa
+// Nicholas J. Kain
+// orc
+// Pascal Cuoq
+// Patrick Oppenlander
+// Petr Hosek
+// Petr Skocik
+// Pierre Carrier
+// Reini Urban
+// Rich Felker
+// Richard Pennington
+// Ryan Fairfax
+// Samuel Holland
+// Segev Finer
+// Shiz
+// sin
+// Solar Designer
+// Stefan Kristiansson
+// Stefan O&#39;Rear
+// Szabolcs Nagy
+// Timo Teräs
+// Trutz Behn
+// Valentin Ochs
+// Will Dietz
+// William Haddon
+// William Pitcock
+//
+// Portions of this software are derived from third-party works licensed
+// under terms compatible with the above MIT license:
+//
+// The TRE regular expression implementation (src/regex/reg* and
+// src/regex/tre*) is Copyright © 2001-2008 Ville Laurikari and licensed
+// under a 2-clause BSD license (license text in the source files). The
+// included version has been heavily modified by Rich Felker in 2012, in
+// the interests of size, simplicity, and namespace cleanliness.
+//
+// Much of the math library code (src/math/* and src/complex/*) is
+// Copyright © 1993,2004 Sun Microsystems or
+// Copyright © 2003-2011 David Schultz or
+// Copyright © 2003-2009 Steven G. Kargl or
+// Copyright © 2003-2009 Bruce D. Evans or
+// Copyright © 2008 Stephen L. Moshier or
+// Copyright © 2017-2018 Arm Limited
+// and labelled as such in comments in the individual source files. All
+// have been licensed under extremely permissive terms.
+//
+// The ARM memcpy code (src/string/arm/memcpy.S) is Copyright © 2008
+// The Android Open Source Project and is licensed under a two-clause BSD
+// license. It was taken from Bionic libc, used on Android.
+//
+// The AArch64 memcpy and memset code (src/string/aarch64/*) are
+// Copyright © 1999-2019, Arm Limited.
+//
+// The implementation of DES for crypt (src/crypt/crypt_des.c) is
+// Copyright © 1994 David Burren. It is licensed under a BSD license.
+//
+// The implementation of blowfish crypt (src/crypt/crypt_blowfish.c) was
+// originally written by Solar Designer and placed into the public
+// domain. The code also comes with a fallback permissive license for use
+// in jurisdictions that may not recognize the public domain.
+//
+// The smoothsort implementation (src/stdlib/qsort.c) is Copyright © 2011
+// Valentin Ochs and is licensed under an MIT-style license.
+//
+// The x86_64 port was written by Nicholas J. Kain and is licensed under
+// the standard MIT terms.
+//
+// The mips and microblaze ports were originally written by Richard
+// Pennington for use in the ellcc project. The original code was adapted
+// by Rich Felker for build system and code conventions during upstream
+// integration. It is licensed under the standard MIT terms.
+//
+// The mips64 port was contributed by Imagination Technologies and is
+// licensed under the standard MIT terms.
+//
+// The powerpc port was also originally written by Richard Pennington,
+// and later supplemented and integrated by John Spencer. It is licensed
+// under the standard MIT terms.
+//
+// All other files which have no copyright comments are original works
+// produced specifically for use as part of this library, written either
+// by Rich Felker, the main author of the library, or by one or more
+// contibutors listed above. Details on authorship of individual files
+// can be found in the git version control history of the project. The
+// omission of copyright and license comments in each file is in the
+// interest of source tree size.
+//
+// In addition, permission is hereby granted for all public header files
+// (include/* and arch/*/bits/*) and crt files intended to be linked into
+// applications (crt/*, ldso/dlstart.c, and arch/*/crt_arch.h) to omit
+// the copyright notice and permission notice otherwise required by the
+// license, and to use these files without any requirement of
+// attribution. These files include substantial contributions from:
+//
+// Bobby Bingham
+// John Spencer
+// Nicholas J. Kain
+// Rich Felker
+// Richard Pennington
+// Stefan Kristiansson
+// Szabolcs Nagy
+//
+// all of whom have explicitly granted such permission.
+//
+// This file previously contained text expressing a belief that most of
+// the files covered by the above exception were sufficiently trivial not
+// to be subject to copyright, resulting in confusion over whether it
+// negated the permissions granted in the license. In the spirit of
+// permissive licensing, and of not having licensing issues being an
+// obstacle to adoption, that text has been removed.
 
 
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
+</span><span class="kw">use </span>std::fmt;
 
-<span class="doccomment">/// A date/time type which exists primarily to convert `SystemTime` timestamps into an ISO 8601</span>
-<span class="doccomment">/// formatted string.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Yes, this exists. Before you have a heart attack, understand that the meat of this is musl&#39;s</span>
-<span class="doccomment">/// [`__secs_to_tm`][1] converted to Rust via [c2rust][2] and then cleaned up by hand as part of</span>
-<span class="doccomment">/// the [kudu-rs project][3], [released under MIT][4].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [1] http://git.musl-libc.org/cgit/musl/tree/src/time/__secs_to_tm.c</span>
-<span class="doccomment">/// [2] https://c2rust.com/</span>
-<span class="doccomment">/// [3] https://github.com/danburkert/kudu-rs/blob/c9660067e5f4c1a54143f169b5eeb49446f82e54/src/timestamp.rs#L5-L18</span>
-<span class="doccomment">/// [4] https://github.com/tokio-rs/tracing/issues/1644#issuecomment-963888244</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// All existing `strftime`-like APIs I found were unable to handle the full range of timestamps representable</span>
-<span class="doccomment">/// by `SystemTime`, including `strftime` itself, since tm.tm_year is an int.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">DateTime</span> {
-    <span class="ident">year</span>: <span class="ident">i64</span>,
-    <span class="ident">month</span>: <span class="ident">u8</span>,
-    <span class="ident">day</span>: <span class="ident">u8</span>,
-    <span class="ident">hour</span>: <span class="ident">u8</span>,
-    <span class="ident">minute</span>: <span class="ident">u8</span>,
-    <span class="ident">second</span>: <span class="ident">u8</span>,
-    <span class="ident">nanos</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// A date/time type which exists primarily to convert `SystemTime` timestamps into an ISO 8601
+/// formatted string.
+///
+/// Yes, this exists. Before you have a heart attack, understand that the meat of this is musl&#39;s
+/// [`__secs_to_tm`][1] converted to Rust via [c2rust][2] and then cleaned up by hand as part of
+/// the [kudu-rs project][3], [released under MIT][4].
+///
+/// [1] http://git.musl-libc.org/cgit/musl/tree/src/time/__secs_to_tm.c
+/// [2] https://c2rust.com/
+/// [3] https://github.com/danburkert/kudu-rs/blob/c9660067e5f4c1a54143f169b5eeb49446f82e54/src/timestamp.rs#L5-L18
+/// [4] https://github.com/tokio-rs/tracing/issues/1644#issuecomment-963888244
+///
+/// All existing `strftime`-like APIs I found were unable to handle the full range of timestamps representable
+/// by `SystemTime`, including `strftime` itself, since tm.tm_year is an int.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>DateTime {
+    year: i64,
+    month: u8,
+    day: u8,
+    hour: u8,
+    minute: u8,
+    second: u8,
+    nanos: u32,
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">DateTime</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">year</span> <span class="op">&gt;</span> <span class="number">9999</span> {
-            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;+{}&quot;</span>, <span class="self">self</span>.<span class="ident">year</span>)<span class="question-mark">?</span>;
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">year</span> <span class="op">&lt;</span> <span class="number">0</span> {
-            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{:05}&quot;</span>, <span class="self">self</span>.<span class="ident">year</span>)<span class="question-mark">?</span>;
-        } <span class="kw">else</span> {
-            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{:04}&quot;</span>, <span class="self">self</span>.<span class="ident">year</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>DateTime {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">if </span><span class="self">self</span>.year &gt; <span class="number">9999 </span>{
+            <span class="macro">write!</span>(f, <span class="string">&quot;+{}&quot;</span>, <span class="self">self</span>.year)<span class="question-mark">?</span>;
+        } <span class="kw">else if </span><span class="self">self</span>.year &lt; <span class="number">0 </span>{
+            <span class="macro">write!</span>(f, <span class="string">&quot;{:05}&quot;</span>, <span class="self">self</span>.year)<span class="question-mark">?</span>;
+        } <span class="kw">else </span>{
+            <span class="macro">write!</span>(f, <span class="string">&quot;{:04}&quot;</span>, <span class="self">self</span>.year)<span class="question-mark">?</span>;
         }
 
         <span class="macro">write!</span>(
-            <span class="ident">f</span>,
+            f,
             <span class="string">&quot;-{:02}-{:02}T{:02}:{:02}:{:02}.{:06}Z&quot;</span>,
-            <span class="self">self</span>.<span class="ident">month</span>,
-            <span class="self">self</span>.<span class="ident">day</span>,
-            <span class="self">self</span>.<span class="ident">hour</span>,
-            <span class="self">self</span>.<span class="ident">minute</span>,
-            <span class="self">self</span>.<span class="ident">second</span>,
-            <span class="self">self</span>.<span class="ident">nanos</span> <span class="op">/</span> <span class="number">1_000</span>
-        )
+            <span class="self">self</span>.month,
+            <span class="self">self</span>.day,
+            <span class="self">self</span>.hour,
+            <span class="self">self</span>.minute,
+            <span class="self">self</span>.second,
+            <span class="self">self</span>.nanos / <span class="number">1_000
+        </span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">std::time::SystemTime</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DateTime</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">timestamp</span>: <span class="ident">std::time::SystemTime</span>) -&gt; <span class="ident">DateTime</span> {
-        <span class="kw">let</span> (<span class="ident">t</span>, <span class="ident">nanos</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">timestamp</span>.<span class="ident">duration_since</span>(<span class="ident">std::time::UNIX_EPOCH</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">duration</span>) =&gt; {
-                <span class="macro">debug_assert!</span>(<span class="ident">duration</span>.<span class="ident">as_secs</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">std::i64::MAX</span> <span class="kw">as</span> <span class="ident">u64</span>);
-                (<span class="ident">duration</span>.<span class="ident">as_secs</span>() <span class="kw">as</span> <span class="ident">i64</span>, <span class="ident">duration</span>.<span class="ident">subsec_nanos</span>())
+<span class="kw">impl </span>From&lt;std::time::SystemTime&gt; <span class="kw">for </span>DateTime {
+    <span class="kw">fn </span>from(timestamp: std::time::SystemTime) -&gt; DateTime {
+        <span class="kw">let </span>(t, nanos) = <span class="kw">match </span>timestamp.duration_since(std::time::UNIX_EPOCH) {
+            <span class="prelude-val">Ok</span>(duration) =&gt; {
+                <span class="macro">debug_assert!</span>(duration.as_secs() &lt;= std::i64::MAX <span class="kw">as </span>u64);
+                (duration.as_secs() <span class="kw">as </span>i64, duration.subsec_nanos())
             }
-            <span class="prelude-val">Err</span>(<span class="ident">error</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">duration</span> <span class="op">=</span> <span class="ident">error</span>.<span class="ident">duration</span>();
-                <span class="macro">debug_assert!</span>(<span class="ident">duration</span>.<span class="ident">as_secs</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">std::i64::MAX</span> <span class="kw">as</span> <span class="ident">u64</span>);
-                <span class="kw">let</span> (<span class="ident">secs</span>, <span class="ident">nanos</span>) <span class="op">=</span> (<span class="ident">duration</span>.<span class="ident">as_secs</span>() <span class="kw">as</span> <span class="ident">i64</span>, <span class="ident">duration</span>.<span class="ident">subsec_nanos</span>());
-                <span class="kw">if</span> <span class="ident">nanos</span> <span class="op">==</span> <span class="number">0</span> {
-                    (<span class="op">-</span><span class="ident">secs</span>, <span class="number">0</span>)
-                } <span class="kw">else</span> {
-                    (<span class="op">-</span><span class="ident">secs</span> <span class="op">-</span> <span class="number">1</span>, <span class="number">1_000_000_000</span> <span class="op">-</span> <span class="ident">nanos</span>)
+            <span class="prelude-val">Err</span>(error) =&gt; {
+                <span class="kw">let </span>duration = error.duration();
+                <span class="macro">debug_assert!</span>(duration.as_secs() &lt;= std::i64::MAX <span class="kw">as </span>u64);
+                <span class="kw">let </span>(secs, nanos) = (duration.as_secs() <span class="kw">as </span>i64, duration.subsec_nanos());
+                <span class="kw">if </span>nanos == <span class="number">0 </span>{
+                    (-secs, <span class="number">0</span>)
+                } <span class="kw">else </span>{
+                    (-secs - <span class="number">1</span>, <span class="number">1_000_000_000 </span>- nanos)
                 }
             }
         };
 
-        <span class="comment">// 2000-03-01 (mod 400 year, immediately after feb29</span>
-        <span class="kw">const</span> <span class="ident">LEAPOCH</span>: <span class="ident">i64</span> <span class="op">=</span> <span class="number">946_684_800</span> <span class="op">+</span> <span class="number">86400</span> <span class="op">*</span> (<span class="number">31</span> <span class="op">+</span> <span class="number">29</span>);
-        <span class="kw">const</span> <span class="ident">DAYS_PER_400Y</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">365</span> <span class="op">*</span> <span class="number">400</span> <span class="op">+</span> <span class="number">97</span>;
-        <span class="kw">const</span> <span class="ident">DAYS_PER_100Y</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">365</span> <span class="op">*</span> <span class="number">100</span> <span class="op">+</span> <span class="number">24</span>;
-        <span class="kw">const</span> <span class="ident">DAYS_PER_4Y</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">365</span> <span class="op">*</span> <span class="number">4</span> <span class="op">+</span> <span class="number">1</span>;
-        <span class="kw">static</span> <span class="ident">DAYS_IN_MONTH</span>: [<span class="ident">i8</span>; <span class="number">12</span>] <span class="op">=</span> [<span class="number">31</span>, <span class="number">30</span>, <span class="number">31</span>, <span class="number">30</span>, <span class="number">31</span>, <span class="number">31</span>, <span class="number">30</span>, <span class="number">31</span>, <span class="number">30</span>, <span class="number">31</span>, <span class="number">31</span>, <span class="number">29</span>];
+        <span class="comment">// 2000-03-01 (mod 400 year, immediately after feb29
+        </span><span class="kw">const </span>LEAPOCH: i64 = <span class="number">946_684_800 </span>+ <span class="number">86400 </span>* (<span class="number">31 </span>+ <span class="number">29</span>);
+        <span class="kw">const </span>DAYS_PER_400Y: i32 = <span class="number">365 </span>* <span class="number">400 </span>+ <span class="number">97</span>;
+        <span class="kw">const </span>DAYS_PER_100Y: i32 = <span class="number">365 </span>* <span class="number">100 </span>+ <span class="number">24</span>;
+        <span class="kw">const </span>DAYS_PER_4Y: i32 = <span class="number">365 </span>* <span class="number">4 </span>+ <span class="number">1</span>;
+        <span class="kw">static </span>DAYS_IN_MONTH: [i8; <span class="number">12</span>] = [<span class="number">31</span>, <span class="number">30</span>, <span class="number">31</span>, <span class="number">30</span>, <span class="number">31</span>, <span class="number">31</span>, <span class="number">30</span>, <span class="number">31</span>, <span class="number">30</span>, <span class="number">31</span>, <span class="number">31</span>, <span class="number">29</span>];
 
-        <span class="comment">// Note(dcb): this bit is rearranged slightly to avoid integer overflow.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">days</span>: <span class="ident">i64</span> <span class="op">=</span> (<span class="ident">t</span> <span class="op">/</span> <span class="number">86_400</span>) <span class="op">-</span> (<span class="ident">LEAPOCH</span> <span class="op">/</span> <span class="number">86_400</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">remsecs</span>: <span class="ident">i32</span> <span class="op">=</span> (<span class="ident">t</span> <span class="op">%</span> <span class="number">86_400</span>) <span class="kw">as</span> <span class="ident">i32</span>;
-        <span class="kw">if</span> <span class="ident">remsecs</span> <span class="op">&lt;</span> <span class="number">0i32</span> {
-            <span class="ident">remsecs</span> <span class="op">+</span><span class="op">=</span> <span class="number">86_400</span>;
-            <span class="ident">days</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>
+        <span class="comment">// Note(dcb): this bit is rearranged slightly to avoid integer overflow.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>days: i64 = (t / <span class="number">86_400</span>) - (LEAPOCH / <span class="number">86_400</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>remsecs: i32 = (t % <span class="number">86_400</span>) <span class="kw">as </span>i32;
+        <span class="kw">if </span>remsecs &lt; <span class="number">0i32 </span>{
+            remsecs += <span class="number">86_400</span>;
+            days -= <span class="number">1
+        </span>}
+
+        <span class="kw">let </span><span class="kw-2">mut </span>qc_cycles: i32 = (days / i64::from(DAYS_PER_400Y)) <span class="kw">as </span>i32;
+        <span class="kw">let </span><span class="kw-2">mut </span>remdays: i32 = (days % i64::from(DAYS_PER_400Y)) <span class="kw">as </span>i32;
+        <span class="kw">if </span>remdays &lt; <span class="number">0 </span>{
+            remdays += DAYS_PER_400Y;
+            qc_cycles -= <span class="number">1</span>;
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">qc_cycles</span>: <span class="ident">i32</span> <span class="op">=</span> (<span class="ident">days</span> <span class="op">/</span> <span class="ident">i64::from</span>(<span class="ident">DAYS_PER_400Y</span>)) <span class="kw">as</span> <span class="ident">i32</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">remdays</span>: <span class="ident">i32</span> <span class="op">=</span> (<span class="ident">days</span> <span class="op">%</span> <span class="ident">i64::from</span>(<span class="ident">DAYS_PER_400Y</span>)) <span class="kw">as</span> <span class="ident">i32</span>;
-        <span class="kw">if</span> <span class="ident">remdays</span> <span class="op">&lt;</span> <span class="number">0</span> {
-            <span class="ident">remdays</span> <span class="op">+</span><span class="op">=</span> <span class="ident">DAYS_PER_400Y</span>;
-            <span class="ident">qc_cycles</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>c_cycles: i32 = remdays / DAYS_PER_100Y;
+        <span class="kw">if </span>c_cycles == <span class="number">4 </span>{
+            c_cycles -= <span class="number">1</span>;
+        }
+        remdays -= c_cycles * DAYS_PER_100Y;
+
+        <span class="kw">let </span><span class="kw-2">mut </span>q_cycles: i32 = remdays / DAYS_PER_4Y;
+        <span class="kw">if </span>q_cycles == <span class="number">25 </span>{
+            q_cycles -= <span class="number">1</span>;
+        }
+        remdays -= q_cycles * DAYS_PER_4Y;
+
+        <span class="kw">let </span><span class="kw-2">mut </span>remyears: i32 = remdays / <span class="number">365</span>;
+        <span class="kw">if </span>remyears == <span class="number">4 </span>{
+            remyears -= <span class="number">1</span>;
+        }
+        remdays -= remyears * <span class="number">365</span>;
+
+        <span class="kw">let </span><span class="kw-2">mut </span>years: i64 = i64::from(remyears)
+            + <span class="number">4 </span>* i64::from(q_cycles)
+            + <span class="number">100 </span>* i64::from(c_cycles)
+            + <span class="number">400 </span>* i64::from(qc_cycles);
+
+        <span class="kw">let </span><span class="kw-2">mut </span>months: i32 = <span class="number">0</span>;
+        <span class="kw">while </span>i32::from(DAYS_IN_MONTH[months <span class="kw">as </span>usize]) &lt;= remdays {
+            remdays -= i32::from(DAYS_IN_MONTH[months <span class="kw">as </span>usize]);
+            months += <span class="number">1
+        </span>}
+
+        <span class="kw">if </span>months &gt;= <span class="number">10 </span>{
+            months -= <span class="number">12</span>;
+            years += <span class="number">1</span>;
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c_cycles</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="ident">remdays</span> <span class="op">/</span> <span class="ident">DAYS_PER_100Y</span>;
-        <span class="kw">if</span> <span class="ident">c_cycles</span> <span class="op">==</span> <span class="number">4</span> {
-            <span class="ident">c_cycles</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-        }
-        <span class="ident">remdays</span> <span class="op">-</span><span class="op">=</span> <span class="ident">c_cycles</span> <span class="op">*</span> <span class="ident">DAYS_PER_100Y</span>;
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">q_cycles</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="ident">remdays</span> <span class="op">/</span> <span class="ident">DAYS_PER_4Y</span>;
-        <span class="kw">if</span> <span class="ident">q_cycles</span> <span class="op">==</span> <span class="number">25</span> {
-            <span class="ident">q_cycles</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-        }
-        <span class="ident">remdays</span> <span class="op">-</span><span class="op">=</span> <span class="ident">q_cycles</span> <span class="op">*</span> <span class="ident">DAYS_PER_4Y</span>;
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">remyears</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="ident">remdays</span> <span class="op">/</span> <span class="number">365</span>;
-        <span class="kw">if</span> <span class="ident">remyears</span> <span class="op">==</span> <span class="number">4</span> {
-            <span class="ident">remyears</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-        }
-        <span class="ident">remdays</span> <span class="op">-</span><span class="op">=</span> <span class="ident">remyears</span> <span class="op">*</span> <span class="number">365</span>;
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">years</span>: <span class="ident">i64</span> <span class="op">=</span> <span class="ident">i64::from</span>(<span class="ident">remyears</span>)
-            <span class="op">+</span> <span class="number">4</span> <span class="op">*</span> <span class="ident">i64::from</span>(<span class="ident">q_cycles</span>)
-            <span class="op">+</span> <span class="number">100</span> <span class="op">*</span> <span class="ident">i64::from</span>(<span class="ident">c_cycles</span>)
-            <span class="op">+</span> <span class="number">400</span> <span class="op">*</span> <span class="ident">i64::from</span>(<span class="ident">qc_cycles</span>);
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">months</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">while</span> <span class="ident">i32::from</span>(<span class="ident">DAYS_IN_MONTH</span>[<span class="ident">months</span> <span class="kw">as</span> <span class="ident">usize</span>]) <span class="op">&lt;</span><span class="op">=</span> <span class="ident">remdays</span> {
-            <span class="ident">remdays</span> <span class="op">-</span><span class="op">=</span> <span class="ident">i32::from</span>(<span class="ident">DAYS_IN_MONTH</span>[<span class="ident">months</span> <span class="kw">as</span> <span class="ident">usize</span>]);
-            <span class="ident">months</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>
-        }
-
-        <span class="kw">if</span> <span class="ident">months</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">10</span> {
-            <span class="ident">months</span> <span class="op">-</span><span class="op">=</span> <span class="number">12</span>;
-            <span class="ident">years</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        }
-
-        <span class="ident">DateTime</span> {
-            <span class="ident">year</span>: <span class="ident">years</span> <span class="op">+</span> <span class="number">2000</span>,
-            <span class="ident">month</span>: (<span class="ident">months</span> <span class="op">+</span> <span class="number">3</span>) <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="ident">day</span>: (<span class="ident">remdays</span> <span class="op">+</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="ident">hour</span>: (<span class="ident">remsecs</span> <span class="op">/</span> <span class="number">3600</span>) <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="ident">minute</span>: (<span class="ident">remsecs</span> <span class="op">/</span> <span class="number">60</span> <span class="op">%</span> <span class="number">60</span>) <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="ident">second</span>: (<span class="ident">remsecs</span> <span class="op">%</span> <span class="number">60</span>) <span class="kw">as</span> <span class="ident">u8</span>,
-            <span class="ident">nanos</span>,
+        DateTime {
+            year: years + <span class="number">2000</span>,
+            month: (months + <span class="number">3</span>) <span class="kw">as </span>u8,
+            day: (remdays + <span class="number">1</span>) <span class="kw">as </span>u8,
+            hour: (remsecs / <span class="number">3600</span>) <span class="kw">as </span>u8,
+            minute: (remsecs / <span class="number">60 </span>% <span class="number">60</span>) <span class="kw">as </span>u8,
+            second: (remsecs % <span class="number">60</span>) <span class="kw">as </span>u8,
+            nanos,
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident">std::i32</span>;
-    <span class="kw">use</span> <span class="ident">std::time</span>::{<span class="ident">Duration</span>, <span class="ident">UNIX_EPOCH</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span>std::i32;
+    <span class="kw">use </span>std::time::{Duration, UNIX_EPOCH};
 
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_datetime</span>() {
-        <span class="kw">let</span> <span class="ident">case</span> <span class="op">=</span> <span class="op">|</span><span class="ident">expected</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">secs</span>: <span class="ident">i64</span>, <span class="ident">micros</span>: <span class="ident">u32</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">timestamp</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">secs</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> {
-                <span class="ident">UNIX_EPOCH</span> <span class="op">+</span> <span class="ident">Duration::new</span>(<span class="ident">secs</span> <span class="kw">as</span> <span class="ident">u64</span>, <span class="ident">micros</span> <span class="op">*</span> <span class="number">1_000</span>)
-            } <span class="kw">else</span> {
-                (<span class="ident">UNIX_EPOCH</span> <span class="op">-</span> <span class="ident">Duration::new</span>(<span class="op">!</span><span class="ident">secs</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">+</span> <span class="number">1</span>, <span class="number">0</span>)) <span class="op">+</span> <span class="ident">Duration::new</span>(<span class="number">0</span>, <span class="ident">micros</span> <span class="op">*</span> <span class="number">1_000</span>)
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_datetime() {
+        <span class="kw">let </span>case = |expected: <span class="kw-2">&amp;</span>str, secs: i64, micros: u32| {
+            <span class="kw">let </span>timestamp = <span class="kw">if </span>secs &gt;= <span class="number">0 </span>{
+                UNIX_EPOCH + Duration::new(secs <span class="kw">as </span>u64, micros * <span class="number">1_000</span>)
+            } <span class="kw">else </span>{
+                (UNIX_EPOCH - Duration::new(!secs <span class="kw">as </span>u64 + <span class="number">1</span>, <span class="number">0</span>)) + Duration::new(<span class="number">0</span>, micros * <span class="number">1_000</span>)
             };
             <span class="macro">assert_eq!</span>(
-                <span class="ident">expected</span>,
-                <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">DateTime::from</span>(<span class="ident">timestamp</span>)),
+                expected,
+                <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, DateTime::from(timestamp)),
                 <span class="string">&quot;secs: {}, micros: {}&quot;</span>,
-                <span class="ident">secs</span>,
-                <span class="ident">micros</span>
+                secs,
+                micros
             )
         };
 
-        <span class="comment">// Mostly generated with:</span>
-        <span class="comment">//  - date -jur &lt;secs&gt; +&quot;%Y-%m-%dT%H:%M:%S.000000Z&quot;</span>
-        <span class="comment">//  - http://unixtimestamp.50x.eu/</span>
+        <span class="comment">// Mostly generated with:
+        //  - date -jur &lt;secs&gt; +&quot;%Y-%m-%dT%H:%M:%S.000000Z&quot;
+        //  - http://unixtimestamp.50x.eu/
 
-        <span class="ident">case</span>(<span class="string">&quot;1970-01-01T00:00:00.000000Z&quot;</span>, <span class="number">0</span>, <span class="number">0</span>);
+        </span>case(<span class="string">&quot;1970-01-01T00:00:00.000000Z&quot;</span>, <span class="number">0</span>, <span class="number">0</span>);
 
-        <span class="ident">case</span>(<span class="string">&quot;1970-01-01T00:00:00.000001Z&quot;</span>, <span class="number">0</span>, <span class="number">1</span>);
-        <span class="ident">case</span>(<span class="string">&quot;1970-01-01T00:00:00.500000Z&quot;</span>, <span class="number">0</span>, <span class="number">500_000</span>);
-        <span class="ident">case</span>(<span class="string">&quot;1970-01-01T00:00:01.000001Z&quot;</span>, <span class="number">1</span>, <span class="number">1</span>);
-        <span class="ident">case</span>(<span class="string">&quot;1970-01-01T00:01:01.000001Z&quot;</span>, <span class="number">60</span> <span class="op">+</span> <span class="number">1</span>, <span class="number">1</span>);
-        <span class="ident">case</span>(<span class="string">&quot;1970-01-01T01:01:01.000001Z&quot;</span>, <span class="number">60</span> <span class="op">*</span> <span class="number">60</span> <span class="op">+</span> <span class="number">60</span> <span class="op">+</span> <span class="number">1</span>, <span class="number">1</span>);
-        <span class="ident">case</span>(
+        case(<span class="string">&quot;1970-01-01T00:00:00.000001Z&quot;</span>, <span class="number">0</span>, <span class="number">1</span>);
+        case(<span class="string">&quot;1970-01-01T00:00:00.500000Z&quot;</span>, <span class="number">0</span>, <span class="number">500_000</span>);
+        case(<span class="string">&quot;1970-01-01T00:00:01.000001Z&quot;</span>, <span class="number">1</span>, <span class="number">1</span>);
+        case(<span class="string">&quot;1970-01-01T00:01:01.000001Z&quot;</span>, <span class="number">60 </span>+ <span class="number">1</span>, <span class="number">1</span>);
+        case(<span class="string">&quot;1970-01-01T01:01:01.000001Z&quot;</span>, <span class="number">60 </span>* <span class="number">60 </span>+ <span class="number">60 </span>+ <span class="number">1</span>, <span class="number">1</span>);
+        case(
             <span class="string">&quot;1970-01-02T01:01:01.000001Z&quot;</span>,
-            <span class="number">24</span> <span class="op">*</span> <span class="number">60</span> <span class="op">*</span> <span class="number">60</span> <span class="op">+</span> <span class="number">60</span> <span class="op">*</span> <span class="number">60</span> <span class="op">+</span> <span class="number">60</span> <span class="op">+</span> <span class="number">1</span>,
+            <span class="number">24 </span>* <span class="number">60 </span>* <span class="number">60 </span>+ <span class="number">60 </span>* <span class="number">60 </span>+ <span class="number">60 </span>+ <span class="number">1</span>,
             <span class="number">1</span>,
         );
 
-        <span class="ident">case</span>(<span class="string">&quot;1969-12-31T23:59:59.000000Z&quot;</span>, <span class="op">-</span><span class="number">1</span>, <span class="number">0</span>);
-        <span class="ident">case</span>(<span class="string">&quot;1969-12-31T23:59:59.000001Z&quot;</span>, <span class="op">-</span><span class="number">1</span>, <span class="number">1</span>);
-        <span class="ident">case</span>(<span class="string">&quot;1969-12-31T23:59:59.500000Z&quot;</span>, <span class="op">-</span><span class="number">1</span>, <span class="number">500_000</span>);
-        <span class="ident">case</span>(<span class="string">&quot;1969-12-31T23:58:59.000001Z&quot;</span>, <span class="op">-</span><span class="number">60</span> <span class="op">-</span> <span class="number">1</span>, <span class="number">1</span>);
-        <span class="ident">case</span>(<span class="string">&quot;1969-12-31T22:58:59.000001Z&quot;</span>, <span class="op">-</span><span class="number">60</span> <span class="op">*</span> <span class="number">60</span> <span class="op">-</span> <span class="number">60</span> <span class="op">-</span> <span class="number">1</span>, <span class="number">1</span>);
-        <span class="ident">case</span>(
+        case(<span class="string">&quot;1969-12-31T23:59:59.000000Z&quot;</span>, -<span class="number">1</span>, <span class="number">0</span>);
+        case(<span class="string">&quot;1969-12-31T23:59:59.000001Z&quot;</span>, -<span class="number">1</span>, <span class="number">1</span>);
+        case(<span class="string">&quot;1969-12-31T23:59:59.500000Z&quot;</span>, -<span class="number">1</span>, <span class="number">500_000</span>);
+        case(<span class="string">&quot;1969-12-31T23:58:59.000001Z&quot;</span>, -<span class="number">60 </span>- <span class="number">1</span>, <span class="number">1</span>);
+        case(<span class="string">&quot;1969-12-31T22:58:59.000001Z&quot;</span>, -<span class="number">60 </span>* <span class="number">60 </span>- <span class="number">60 </span>- <span class="number">1</span>, <span class="number">1</span>);
+        case(
             <span class="string">&quot;1969-12-30T22:58:59.000001Z&quot;</span>,
-            <span class="op">-</span><span class="number">24</span> <span class="op">*</span> <span class="number">60</span> <span class="op">*</span> <span class="number">60</span> <span class="op">-</span> <span class="number">60</span> <span class="op">*</span> <span class="number">60</span> <span class="op">-</span> <span class="number">60</span> <span class="op">-</span> <span class="number">1</span>,
+            -<span class="number">24 </span>* <span class="number">60 </span>* <span class="number">60 </span>- <span class="number">60 </span>* <span class="number">60 </span>- <span class="number">60 </span>- <span class="number">1</span>,
             <span class="number">1</span>,
         );
 
-        <span class="ident">case</span>(<span class="string">&quot;2038-01-19T03:14:07.000000Z&quot;</span>, <span class="ident">std::i32::MAX</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">0</span>);
-        <span class="ident">case</span>(<span class="string">&quot;2038-01-19T03:14:08.000000Z&quot;</span>, <span class="ident">std::i32::MAX</span> <span class="kw">as</span> <span class="ident">i64</span> <span class="op">+</span> <span class="number">1</span>, <span class="number">0</span>);
-        <span class="ident">case</span>(<span class="string">&quot;1901-12-13T20:45:52.000000Z&quot;</span>, <span class="ident">i32::MIN</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">0</span>);
-        <span class="ident">case</span>(<span class="string">&quot;1901-12-13T20:45:51.000000Z&quot;</span>, <span class="ident">i32::MIN</span> <span class="kw">as</span> <span class="ident">i64</span> <span class="op">-</span> <span class="number">1</span>, <span class="number">0</span>);
+        case(<span class="string">&quot;2038-01-19T03:14:07.000000Z&quot;</span>, std::i32::MAX <span class="kw">as </span>i64, <span class="number">0</span>);
+        case(<span class="string">&quot;2038-01-19T03:14:08.000000Z&quot;</span>, std::i32::MAX <span class="kw">as </span>i64 + <span class="number">1</span>, <span class="number">0</span>);
+        case(<span class="string">&quot;1901-12-13T20:45:52.000000Z&quot;</span>, i32::MIN <span class="kw">as </span>i64, <span class="number">0</span>);
+        case(<span class="string">&quot;1901-12-13T20:45:51.000000Z&quot;</span>, i32::MIN <span class="kw">as </span>i64 - <span class="number">1</span>, <span class="number">0</span>);
 
-        <span class="comment">// Skipping these tests on windows as std::time::SysteTime range is low</span>
-        <span class="comment">// on Windows compared with that of Unix which can cause the following</span>
-        <span class="comment">// high date value tests to panic</span>
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>))]</span>
-        {
-            <span class="ident">case</span>(<span class="string">&quot;+292277026596-12-04T15:30:07.000000Z&quot;</span>, <span class="ident">std::i64::MAX</span>, <span class="number">0</span>);
-            <span class="ident">case</span>(<span class="string">&quot;+292277026596-12-04T15:30:06.000000Z&quot;</span>, <span class="ident">std::i64::MAX</span> <span class="op">-</span> <span class="number">1</span>, <span class="number">0</span>);
-            <span class="ident">case</span>(<span class="string">&quot;-292277022657-01-27T08:29:53.000000Z&quot;</span>, <span class="ident">i64::MIN</span> <span class="op">+</span> <span class="number">1</span>, <span class="number">0</span>);
+        <span class="comment">// Skipping these tests on windows as std::time::SysteTime range is low
+        // on Windows compared with that of Unix which can cause the following
+        // high date value tests to panic
+        </span><span class="attribute">#[cfg(not(target_os = <span class="string">&quot;windows&quot;</span>))]
+        </span>{
+            case(<span class="string">&quot;+292277026596-12-04T15:30:07.000000Z&quot;</span>, std::i64::MAX, <span class="number">0</span>);
+            case(<span class="string">&quot;+292277026596-12-04T15:30:06.000000Z&quot;</span>, std::i64::MAX - <span class="number">1</span>, <span class="number">0</span>);
+            case(<span class="string">&quot;-292277022657-01-27T08:29:53.000000Z&quot;</span>, i64::MIN + <span class="number">1</span>, <span class="number">0</span>);
         }
 
-        <span class="ident">case</span>(<span class="string">&quot;1900-01-01T00:00:00.000000Z&quot;</span>, <span class="op">-</span><span class="number">2208988800</span>, <span class="number">0</span>);
-        <span class="ident">case</span>(<span class="string">&quot;1899-12-31T23:59:59.000000Z&quot;</span>, <span class="op">-</span><span class="number">2208988801</span>, <span class="number">0</span>);
-        <span class="ident">case</span>(<span class="string">&quot;0000-01-01T00:00:00.000000Z&quot;</span>, <span class="op">-</span><span class="number">62167219200</span>, <span class="number">0</span>);
-        <span class="ident">case</span>(<span class="string">&quot;-0001-12-31T23:59:59.000000Z&quot;</span>, <span class="op">-</span><span class="number">62167219201</span>, <span class="number">0</span>);
+        case(<span class="string">&quot;1900-01-01T00:00:00.000000Z&quot;</span>, -<span class="number">2208988800</span>, <span class="number">0</span>);
+        case(<span class="string">&quot;1899-12-31T23:59:59.000000Z&quot;</span>, -<span class="number">2208988801</span>, <span class="number">0</span>);
+        case(<span class="string">&quot;0000-01-01T00:00:00.000000Z&quot;</span>, -<span class="number">62167219200</span>, <span class="number">0</span>);
+        case(<span class="string">&quot;-0001-12-31T23:59:59.000000Z&quot;</span>, -<span class="number">62167219201</span>, <span class="number">0</span>);
 
-        <span class="ident">case</span>(<span class="string">&quot;1234-05-06T07:08:09.000000Z&quot;</span>, <span class="op">-</span><span class="number">23215049511</span>, <span class="number">0</span>);
-        <span class="ident">case</span>(<span class="string">&quot;-1234-05-06T07:08:09.000000Z&quot;</span>, <span class="op">-</span><span class="number">101097651111</span>, <span class="number">0</span>);
-        <span class="ident">case</span>(<span class="string">&quot;2345-06-07T08:09:01.000000Z&quot;</span>, <span class="number">11847456541</span>, <span class="number">0</span>);
-        <span class="ident">case</span>(<span class="string">&quot;-2345-06-07T08:09:01.000000Z&quot;</span>, <span class="op">-</span><span class="number">136154620259</span>, <span class="number">0</span>);
+        case(<span class="string">&quot;1234-05-06T07:08:09.000000Z&quot;</span>, -<span class="number">23215049511</span>, <span class="number">0</span>);
+        case(<span class="string">&quot;-1234-05-06T07:08:09.000000Z&quot;</span>, -<span class="number">101097651111</span>, <span class="number">0</span>);
+        case(<span class="string">&quot;2345-06-07T08:09:01.000000Z&quot;</span>, <span class="number">11847456541</span>, <span class="number">0</span>);
+        case(<span class="string">&quot;-2345-06-07T08:09:01.000000Z&quot;</span>, -<span class="number">136154620259</span>, <span class="number">0</span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

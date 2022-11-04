@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/tls12/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/tls12/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -462,469 +462,469 @@
 <span id="462">462</span>
 <span id="463">463</span>
 <span id="464">464</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cipher</span>::{<span class="ident">MessageDecrypter</span>, <span class="ident">MessageEncrypter</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::conn</span>::{<span class="ident">CommonState</span>, <span class="ident">ConnectionRandoms</span>, <span class="ident">Side</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kx</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::codec</span>::{<span class="ident">Codec</span>, <span class="ident">Reader</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::enums</span>::{<span class="ident">AlertDescription</span>, <span class="ident">ContentType</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::enums</span>::{<span class="ident">CipherSuite</span>, <span class="ident">SignatureScheme</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::handshake::KeyExchangeAlgorithm</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::suites</span>::{<span class="ident">BulkAlgorithm</span>, <span class="ident">CipherSuiteCommon</span>, <span class="ident">SupportedCipherSuite</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Error</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cipher::{MessageDecrypter, MessageEncrypter};
+<span class="kw">use </span><span class="kw">crate</span>::conn::{CommonState, ConnectionRandoms, Side};
+<span class="kw">use </span><span class="kw">crate</span>::kx;
+<span class="kw">use </span><span class="kw">crate</span>::msgs::codec::{Codec, Reader};
+<span class="kw">use </span><span class="kw">crate</span>::msgs::enums::{AlertDescription, ContentType};
+<span class="kw">use </span><span class="kw">crate</span>::msgs::enums::{CipherSuite, SignatureScheme};
+<span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::KeyExchangeAlgorithm;
+<span class="kw">use </span><span class="kw">crate</span>::suites::{BulkAlgorithm, CipherSuiteCommon, SupportedCipherSuite};
+<span class="kw">use </span><span class="kw">crate</span>::Error;
 
-<span class="kw">use</span> <span class="ident">ring::aead</span>;
-<span class="kw">use</span> <span class="ident">ring::digest::Digest</span>;
+<span class="kw">use </span>ring::aead;
+<span class="kw">use </span>ring::digest::Digest;
 
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
+<span class="kw">use </span>std::fmt;
 
-<span class="kw">mod</span> <span class="ident">cipher</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">cipher</span>::{<span class="ident">AesGcm</span>, <span class="ident">ChaCha20Poly1305</span>, <span class="ident">Tls12AeadAlgorithm</span>};
+<span class="kw">mod </span>cipher;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>cipher::{AesGcm, ChaCha20Poly1305, Tls12AeadAlgorithm};
 
-<span class="kw">mod</span> <span class="ident">prf</span>;
+<span class="kw">mod </span>prf;
 
-<span class="doccomment">/// The TLS1.2 ciphersuite TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256</span>: <span class="ident">SupportedCipherSuite</span> <span class="op">=</span>
-    <span class="ident">SupportedCipherSuite::Tls12</span>(<span class="kw-2">&amp;</span><span class="ident">Tls12CipherSuite</span> {
-        <span class="ident">common</span>: <span class="ident">CipherSuiteCommon</span> {
-            <span class="ident">suite</span>: <span class="ident">CipherSuite::TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256</span>,
-            <span class="ident">bulk</span>: <span class="ident">BulkAlgorithm::Chacha20Poly1305</span>,
-            <span class="ident">aead_algorithm</span>: <span class="kw-2">&amp;</span><span class="ident">ring::aead::CHACHA20_POLY1305</span>,
+<span class="doccomment">/// The TLS1.2 ciphersuite TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+</span><span class="kw">pub static </span>TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256: SupportedCipherSuite =
+    SupportedCipherSuite::Tls12(<span class="kw-2">&amp;</span>Tls12CipherSuite {
+        common: CipherSuiteCommon {
+            suite: CipherSuite::TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256,
+            bulk: BulkAlgorithm::Chacha20Poly1305,
+            aead_algorithm: <span class="kw-2">&amp;</span>ring::aead::CHACHA20_POLY1305,
         },
-        <span class="ident">kx</span>: <span class="ident">KeyExchangeAlgorithm::ECDHE</span>,
-        <span class="ident">sign</span>: <span class="ident">TLS12_ECDSA_SCHEMES</span>,
-        <span class="ident">fixed_iv_len</span>: <span class="number">12</span>,
-        <span class="ident">explicit_nonce_len</span>: <span class="number">0</span>,
-        <span class="ident">aead_alg</span>: <span class="kw-2">&amp;</span><span class="ident">ChaCha20Poly1305</span>,
-        <span class="ident">hmac_algorithm</span>: <span class="ident">ring::hmac::HMAC_SHA256</span>,
+        kx: KeyExchangeAlgorithm::ECDHE,
+        sign: TLS12_ECDSA_SCHEMES,
+        fixed_iv_len: <span class="number">12</span>,
+        explicit_nonce_len: <span class="number">0</span>,
+        aead_alg: <span class="kw-2">&amp;</span>ChaCha20Poly1305,
+        hmac_algorithm: ring::hmac::HMAC_SHA256,
     });
 
-<span class="doccomment">/// The TLS1.2 ciphersuite TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256</span>: <span class="ident">SupportedCipherSuite</span> <span class="op">=</span>
-    <span class="ident">SupportedCipherSuite::Tls12</span>(<span class="kw-2">&amp;</span><span class="ident">Tls12CipherSuite</span> {
-        <span class="ident">common</span>: <span class="ident">CipherSuiteCommon</span> {
-            <span class="ident">suite</span>: <span class="ident">CipherSuite::TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256</span>,
-            <span class="ident">bulk</span>: <span class="ident">BulkAlgorithm::Chacha20Poly1305</span>,
-            <span class="ident">aead_algorithm</span>: <span class="kw-2">&amp;</span><span class="ident">ring::aead::CHACHA20_POLY1305</span>,
+<span class="doccomment">/// The TLS1.2 ciphersuite TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+</span><span class="kw">pub static </span>TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256: SupportedCipherSuite =
+    SupportedCipherSuite::Tls12(<span class="kw-2">&amp;</span>Tls12CipherSuite {
+        common: CipherSuiteCommon {
+            suite: CipherSuite::TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256,
+            bulk: BulkAlgorithm::Chacha20Poly1305,
+            aead_algorithm: <span class="kw-2">&amp;</span>ring::aead::CHACHA20_POLY1305,
         },
-        <span class="ident">kx</span>: <span class="ident">KeyExchangeAlgorithm::ECDHE</span>,
-        <span class="ident">sign</span>: <span class="ident">TLS12_RSA_SCHEMES</span>,
-        <span class="ident">fixed_iv_len</span>: <span class="number">12</span>,
-        <span class="ident">explicit_nonce_len</span>: <span class="number">0</span>,
-        <span class="ident">aead_alg</span>: <span class="kw-2">&amp;</span><span class="ident">ChaCha20Poly1305</span>,
-        <span class="ident">hmac_algorithm</span>: <span class="ident">ring::hmac::HMAC_SHA256</span>,
+        kx: KeyExchangeAlgorithm::ECDHE,
+        sign: TLS12_RSA_SCHEMES,
+        fixed_iv_len: <span class="number">12</span>,
+        explicit_nonce_len: <span class="number">0</span>,
+        aead_alg: <span class="kw-2">&amp;</span>ChaCha20Poly1305,
+        hmac_algorithm: ring::hmac::HMAC_SHA256,
     });
 
-<span class="doccomment">/// The TLS1.2 ciphersuite TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256</span>: <span class="ident">SupportedCipherSuite</span> <span class="op">=</span>
-    <span class="ident">SupportedCipherSuite::Tls12</span>(<span class="kw-2">&amp;</span><span class="ident">Tls12CipherSuite</span> {
-        <span class="ident">common</span>: <span class="ident">CipherSuiteCommon</span> {
-            <span class="ident">suite</span>: <span class="ident">CipherSuite::TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256</span>,
-            <span class="ident">bulk</span>: <span class="ident">BulkAlgorithm::Aes128Gcm</span>,
-            <span class="ident">aead_algorithm</span>: <span class="kw-2">&amp;</span><span class="ident">ring::aead::AES_128_GCM</span>,
+<span class="doccomment">/// The TLS1.2 ciphersuite TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+</span><span class="kw">pub static </span>TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256: SupportedCipherSuite =
+    SupportedCipherSuite::Tls12(<span class="kw-2">&amp;</span>Tls12CipherSuite {
+        common: CipherSuiteCommon {
+            suite: CipherSuite::TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+            bulk: BulkAlgorithm::Aes128Gcm,
+            aead_algorithm: <span class="kw-2">&amp;</span>ring::aead::AES_128_GCM,
         },
-        <span class="ident">kx</span>: <span class="ident">KeyExchangeAlgorithm::ECDHE</span>,
-        <span class="ident">sign</span>: <span class="ident">TLS12_RSA_SCHEMES</span>,
-        <span class="ident">fixed_iv_len</span>: <span class="number">4</span>,
-        <span class="ident">explicit_nonce_len</span>: <span class="number">8</span>,
-        <span class="ident">aead_alg</span>: <span class="kw-2">&amp;</span><span class="ident">AesGcm</span>,
-        <span class="ident">hmac_algorithm</span>: <span class="ident">ring::hmac::HMAC_SHA256</span>,
+        kx: KeyExchangeAlgorithm::ECDHE,
+        sign: TLS12_RSA_SCHEMES,
+        fixed_iv_len: <span class="number">4</span>,
+        explicit_nonce_len: <span class="number">8</span>,
+        aead_alg: <span class="kw-2">&amp;</span>AesGcm,
+        hmac_algorithm: ring::hmac::HMAC_SHA256,
     });
 
-<span class="doccomment">/// The TLS1.2 ciphersuite TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384</span>: <span class="ident">SupportedCipherSuite</span> <span class="op">=</span>
-    <span class="ident">SupportedCipherSuite::Tls12</span>(<span class="kw-2">&amp;</span><span class="ident">Tls12CipherSuite</span> {
-        <span class="ident">common</span>: <span class="ident">CipherSuiteCommon</span> {
-            <span class="ident">suite</span>: <span class="ident">CipherSuite::TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384</span>,
-            <span class="ident">bulk</span>: <span class="ident">BulkAlgorithm::Aes256Gcm</span>,
-            <span class="ident">aead_algorithm</span>: <span class="kw-2">&amp;</span><span class="ident">ring::aead::AES_256_GCM</span>,
+<span class="doccomment">/// The TLS1.2 ciphersuite TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+</span><span class="kw">pub static </span>TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384: SupportedCipherSuite =
+    SupportedCipherSuite::Tls12(<span class="kw-2">&amp;</span>Tls12CipherSuite {
+        common: CipherSuiteCommon {
+            suite: CipherSuite::TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+            bulk: BulkAlgorithm::Aes256Gcm,
+            aead_algorithm: <span class="kw-2">&amp;</span>ring::aead::AES_256_GCM,
         },
-        <span class="ident">kx</span>: <span class="ident">KeyExchangeAlgorithm::ECDHE</span>,
-        <span class="ident">sign</span>: <span class="ident">TLS12_RSA_SCHEMES</span>,
-        <span class="ident">fixed_iv_len</span>: <span class="number">4</span>,
-        <span class="ident">explicit_nonce_len</span>: <span class="number">8</span>,
-        <span class="ident">aead_alg</span>: <span class="kw-2">&amp;</span><span class="ident">AesGcm</span>,
-        <span class="ident">hmac_algorithm</span>: <span class="ident">ring::hmac::HMAC_SHA384</span>,
+        kx: KeyExchangeAlgorithm::ECDHE,
+        sign: TLS12_RSA_SCHEMES,
+        fixed_iv_len: <span class="number">4</span>,
+        explicit_nonce_len: <span class="number">8</span>,
+        aead_alg: <span class="kw-2">&amp;</span>AesGcm,
+        hmac_algorithm: ring::hmac::HMAC_SHA384,
     });
 
-<span class="doccomment">/// The TLS1.2 ciphersuite TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256</span>: <span class="ident">SupportedCipherSuite</span> <span class="op">=</span>
-    <span class="ident">SupportedCipherSuite::Tls12</span>(<span class="kw-2">&amp;</span><span class="ident">Tls12CipherSuite</span> {
-        <span class="ident">common</span>: <span class="ident">CipherSuiteCommon</span> {
-            <span class="ident">suite</span>: <span class="ident">CipherSuite::TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256</span>,
-            <span class="ident">bulk</span>: <span class="ident">BulkAlgorithm::Aes128Gcm</span>,
-            <span class="ident">aead_algorithm</span>: <span class="kw-2">&amp;</span><span class="ident">ring::aead::AES_128_GCM</span>,
+<span class="doccomment">/// The TLS1.2 ciphersuite TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+</span><span class="kw">pub static </span>TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256: SupportedCipherSuite =
+    SupportedCipherSuite::Tls12(<span class="kw-2">&amp;</span>Tls12CipherSuite {
+        common: CipherSuiteCommon {
+            suite: CipherSuite::TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
+            bulk: BulkAlgorithm::Aes128Gcm,
+            aead_algorithm: <span class="kw-2">&amp;</span>ring::aead::AES_128_GCM,
         },
-        <span class="ident">kx</span>: <span class="ident">KeyExchangeAlgorithm::ECDHE</span>,
-        <span class="ident">sign</span>: <span class="ident">TLS12_ECDSA_SCHEMES</span>,
-        <span class="ident">fixed_iv_len</span>: <span class="number">4</span>,
-        <span class="ident">explicit_nonce_len</span>: <span class="number">8</span>,
-        <span class="ident">aead_alg</span>: <span class="kw-2">&amp;</span><span class="ident">AesGcm</span>,
-        <span class="ident">hmac_algorithm</span>: <span class="ident">ring::hmac::HMAC_SHA256</span>,
+        kx: KeyExchangeAlgorithm::ECDHE,
+        sign: TLS12_ECDSA_SCHEMES,
+        fixed_iv_len: <span class="number">4</span>,
+        explicit_nonce_len: <span class="number">8</span>,
+        aead_alg: <span class="kw-2">&amp;</span>AesGcm,
+        hmac_algorithm: ring::hmac::HMAC_SHA256,
     });
 
-<span class="doccomment">/// The TLS1.2 ciphersuite TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384</span>: <span class="ident">SupportedCipherSuite</span> <span class="op">=</span>
-    <span class="ident">SupportedCipherSuite::Tls12</span>(<span class="kw-2">&amp;</span><span class="ident">Tls12CipherSuite</span> {
-        <span class="ident">common</span>: <span class="ident">CipherSuiteCommon</span> {
-            <span class="ident">suite</span>: <span class="ident">CipherSuite::TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384</span>,
-            <span class="ident">bulk</span>: <span class="ident">BulkAlgorithm::Aes256Gcm</span>,
-            <span class="ident">aead_algorithm</span>: <span class="kw-2">&amp;</span><span class="ident">ring::aead::AES_256_GCM</span>,
+<span class="doccomment">/// The TLS1.2 ciphersuite TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+</span><span class="kw">pub static </span>TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384: SupportedCipherSuite =
+    SupportedCipherSuite::Tls12(<span class="kw-2">&amp;</span>Tls12CipherSuite {
+        common: CipherSuiteCommon {
+            suite: CipherSuite::TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
+            bulk: BulkAlgorithm::Aes256Gcm,
+            aead_algorithm: <span class="kw-2">&amp;</span>ring::aead::AES_256_GCM,
         },
-        <span class="ident">kx</span>: <span class="ident">KeyExchangeAlgorithm::ECDHE</span>,
-        <span class="ident">sign</span>: <span class="ident">TLS12_ECDSA_SCHEMES</span>,
-        <span class="ident">fixed_iv_len</span>: <span class="number">4</span>,
-        <span class="ident">explicit_nonce_len</span>: <span class="number">8</span>,
-        <span class="ident">aead_alg</span>: <span class="kw-2">&amp;</span><span class="ident">AesGcm</span>,
-        <span class="ident">hmac_algorithm</span>: <span class="ident">ring::hmac::HMAC_SHA384</span>,
+        kx: KeyExchangeAlgorithm::ECDHE,
+        sign: TLS12_ECDSA_SCHEMES,
+        fixed_iv_len: <span class="number">4</span>,
+        explicit_nonce_len: <span class="number">8</span>,
+        aead_alg: <span class="kw-2">&amp;</span>AesGcm,
+        hmac_algorithm: ring::hmac::HMAC_SHA384,
     });
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-<span class="kw">static</span> <span class="ident">TLS12_ECDSA_SCHEMES</span>: <span class="kw-2">&amp;</span>[<span class="ident">SignatureScheme</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
-    <span class="ident">SignatureScheme::ED25519</span>,
-    <span class="ident">SignatureScheme::ECDSA_NISTP521_SHA512</span>,
-    <span class="ident">SignatureScheme::ECDSA_NISTP384_SHA384</span>,
-    <span class="ident">SignatureScheme::ECDSA_NISTP256_SHA256</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+</span><span class="kw">static </span>TLS12_ECDSA_SCHEMES: <span class="kw-2">&amp;</span>[SignatureScheme] = <span class="kw-2">&amp;</span>[
+    SignatureScheme::ED25519,
+    SignatureScheme::ECDSA_NISTP521_SHA512,
+    SignatureScheme::ECDSA_NISTP384_SHA384,
+    SignatureScheme::ECDSA_NISTP256_SHA256,
 ];
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-<span class="kw">static</span> <span class="ident">TLS12_RSA_SCHEMES</span>: <span class="kw-2">&amp;</span>[<span class="ident">SignatureScheme</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
-    <span class="ident">SignatureScheme::RSA_PSS_SHA512</span>,
-    <span class="ident">SignatureScheme::RSA_PSS_SHA384</span>,
-    <span class="ident">SignatureScheme::RSA_PSS_SHA256</span>,
-    <span class="ident">SignatureScheme::RSA_PKCS1_SHA512</span>,
-    <span class="ident">SignatureScheme::RSA_PKCS1_SHA384</span>,
-    <span class="ident">SignatureScheme::RSA_PKCS1_SHA256</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+</span><span class="kw">static </span>TLS12_RSA_SCHEMES: <span class="kw-2">&amp;</span>[SignatureScheme] = <span class="kw-2">&amp;</span>[
+    SignatureScheme::RSA_PSS_SHA512,
+    SignatureScheme::RSA_PSS_SHA384,
+    SignatureScheme::RSA_PSS_SHA256,
+    SignatureScheme::RSA_PKCS1_SHA512,
+    SignatureScheme::RSA_PKCS1_SHA384,
+    SignatureScheme::RSA_PKCS1_SHA256,
 ];
 
-<span class="doccomment">/// A TLS 1.2 cipher suite supported by rustls.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Tls12CipherSuite</span> {
-    <span class="doccomment">/// Common cipher suite fields.</span>
-    <span class="kw">pub</span> <span class="ident">common</span>: <span class="ident">CipherSuiteCommon</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">hmac_algorithm</span>: <span class="ident">ring::hmac::Algorithm</span>,
-    <span class="doccomment">/// How to exchange/agree keys.</span>
-    <span class="kw">pub</span> <span class="ident">kx</span>: <span class="ident">KeyExchangeAlgorithm</span>,
+<span class="doccomment">/// A TLS 1.2 cipher suite supported by rustls.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+</span><span class="kw">pub struct </span>Tls12CipherSuite {
+    <span class="doccomment">/// Common cipher suite fields.
+    </span><span class="kw">pub </span>common: CipherSuiteCommon,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) hmac_algorithm: ring::hmac::Algorithm,
+    <span class="doccomment">/// How to exchange/agree keys.
+    </span><span class="kw">pub </span>kx: KeyExchangeAlgorithm,
 
-    <span class="doccomment">/// How to sign messages for authentication.</span>
-    <span class="kw">pub</span> <span class="ident">sign</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">SignatureScheme</span>],
+    <span class="doccomment">/// How to sign messages for authentication.
+    </span><span class="kw">pub </span>sign: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[SignatureScheme],
 
-    <span class="doccomment">/// How long the fixed part of the &#39;IV&#39; is.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This isn&#39;t usually an IV, but we continue the</span>
-    <span class="doccomment">/// terminology misuse to match the standard.</span>
-    <span class="kw">pub</span> <span class="ident">fixed_iv_len</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// How long the fixed part of the &#39;IV&#39; is.
+    ///
+    /// This isn&#39;t usually an IV, but we continue the
+    /// terminology misuse to match the standard.
+    </span><span class="kw">pub </span>fixed_iv_len: usize,
 
-    <span class="doccomment">/// This is a non-standard extension which extends the</span>
-    <span class="doccomment">/// key block to provide an initial explicit nonce offset,</span>
-    <span class="doccomment">/// in a deterministic and safe way.  GCM needs this,</span>
-    <span class="doccomment">/// chacha20poly1305 works this way by design.</span>
-    <span class="kw">pub</span> <span class="ident">explicit_nonce_len</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// This is a non-standard extension which extends the
+    /// key block to provide an initial explicit nonce offset,
+    /// in a deterministic and safe way.  GCM needs this,
+    /// chacha20poly1305 works this way by design.
+    </span><span class="kw">pub </span>explicit_nonce_len: usize,
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">aead_alg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">dyn</span> <span class="ident">Tls12AeadAlgorithm</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) aead_alg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">dyn </span>Tls12AeadAlgorithm,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">Tls12CipherSuite</span> {
-    <span class="doccomment">/// Resolve the set of supported `SignatureScheme`s from the</span>
-    <span class="doccomment">/// offered `SupportedSignatureSchemes`.  If we return an empty</span>
-    <span class="doccomment">/// set, the handshake terminates.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">resolve_sig_schemes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">offered</span>: <span class="kw-2">&amp;</span>[<span class="ident">SignatureScheme</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SignatureScheme</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">sign</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">pref</span><span class="op">|</span> <span class="ident">offered</span>.<span class="ident">contains</span>(<span class="ident">pref</span>))
-            .<span class="ident">cloned</span>()
-            .<span class="ident">collect</span>()
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+</span><span class="kw">impl </span>Tls12CipherSuite {
+    <span class="doccomment">/// Resolve the set of supported `SignatureScheme`s from the
+    /// offered `SupportedSignatureSchemes`.  If we return an empty
+    /// set, the handshake terminates.
+    </span><span class="kw">pub fn </span>resolve_sig_schemes(<span class="kw-2">&amp;</span><span class="self">self</span>, offered: <span class="kw-2">&amp;</span>[SignatureScheme]) -&gt; Vec&lt;SignatureScheme&gt; {
+        <span class="self">self</span>.sign
+            .iter()
+            .filter(|pref| offered.contains(pref))
+            .cloned()
+            .collect()
     }
 
-    <span class="doccomment">/// Which hash function to use with this suite.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hash_algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">ring::digest::Algorithm</span> {
-        <span class="self">self</span>.<span class="ident">hmac_algorithm</span>.<span class="ident">digest_algorithm</span>()
-    }
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Tls12CipherSuite</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SupportedCipherSuite</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Tls12CipherSuite</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Tls12</span>(<span class="ident">s</span>)
+    <span class="doccomment">/// Which hash function to use with this suite.
+    </span><span class="kw">pub fn </span>hash_algorithm(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>ring::digest::Algorithm {
+        <span class="self">self</span>.hmac_algorithm.digest_algorithm()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">Tls12CipherSuite</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">common</span>.<span class="ident">suite</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">common</span>.<span class="ident">suite</span>
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+</span><span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls12CipherSuite&gt; <span class="kw">for </span>SupportedCipherSuite {
+    <span class="kw">fn </span>from(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls12CipherSuite) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Tls12(s)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Tls12CipherSuite</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Tls12CipherSuite&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;suite&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">common</span>.<span class="ident">suite</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;bulk&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">common</span>.<span class="ident">bulk</span>)
-            .<span class="ident">finish</span>()
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+</span><span class="kw">impl </span>PartialEq <span class="kw">for </span>Tls12CipherSuite {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="self">self</span>.common.suite == other.common.suite
     }
 }
 
-<span class="doccomment">/// TLS1.2 per-connection keying material</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ConnectionSecrets</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">randoms</span>: <span class="ident">ConnectionRandoms</span>,
-    <span class="ident">suite</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Tls12CipherSuite</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">master_secret</span>: [<span class="ident">u8</span>; <span class="number">48</span>],
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+</span><span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Tls12CipherSuite {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;Tls12CipherSuite&quot;</span>)
+            .field(<span class="string">&quot;suite&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.common.suite)
+            .field(<span class="string">&quot;bulk&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.common.bulk)
+            .finish()
+    }
 }
 
-<span class="kw">impl</span> <span class="ident">ConnectionSecrets</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_key_exchange</span>(
-        <span class="ident">kx</span>: <span class="ident">kx::KeyExchange</span>,
-        <span class="ident">peer_pub_key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-        <span class="ident">ems_seed</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Digest</span><span class="op">&gt;</span>,
-        <span class="ident">randoms</span>: <span class="ident">ConnectionRandoms</span>,
-        <span class="ident">suite</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Tls12CipherSuite</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="self">Self</span> {
-            <span class="ident">randoms</span>,
-            <span class="ident">suite</span>,
-            <span class="ident">master_secret</span>: [<span class="number">0u8</span>; <span class="number">48</span>],
+<span class="doccomment">/// TLS1.2 per-connection keying material
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ConnectionSecrets {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) randoms: ConnectionRandoms,
+    suite: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls12CipherSuite,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) master_secret: [u8; <span class="number">48</span>],
+}
+
+<span class="kw">impl </span>ConnectionSecrets {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_key_exchange(
+        kx: kx::KeyExchange,
+        peer_pub_key: <span class="kw-2">&amp;</span>[u8],
+        ems_seed: <span class="prelude-ty">Option</span>&lt;Digest&gt;,
+        randoms: ConnectionRandoms,
+        suite: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls12CipherSuite,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>ret = <span class="self">Self </span>{
+            randoms,
+            suite,
+            master_secret: [<span class="number">0u8</span>; <span class="number">48</span>],
         };
 
-        <span class="kw">let</span> (<span class="ident">label</span>, <span class="ident">seed</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">ems_seed</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">seed</span>) =&gt; (<span class="string">&quot;extended master secret&quot;</span>, <span class="ident">Seed::Ems</span>(<span class="ident">seed</span>)),
-            <span class="prelude-val">None</span> =&gt; (
+        <span class="kw">let </span>(label, seed) = <span class="kw">match </span>ems_seed {
+            <span class="prelude-val">Some</span>(seed) =&gt; (<span class="string">&quot;extended master secret&quot;</span>, Seed::Ems(seed)),
+            <span class="prelude-val">None </span>=&gt; (
                 <span class="string">&quot;master secret&quot;</span>,
-                <span class="ident">Seed::Randoms</span>(<span class="ident">join_randoms</span>(<span class="kw-2">&amp;</span><span class="ident">ret</span>.<span class="ident">randoms</span>.<span class="ident">client</span>, <span class="kw-2">&amp;</span><span class="ident">ret</span>.<span class="ident">randoms</span>.<span class="ident">server</span>)),
+                Seed::Randoms(join_randoms(<span class="kw-2">&amp;</span>ret.randoms.client, <span class="kw-2">&amp;</span>ret.randoms.server)),
             ),
         };
 
-        <span class="ident">kx</span>.<span class="ident">complete</span>(<span class="ident">peer_pub_key</span>, <span class="op">|</span><span class="ident">secret</span><span class="op">|</span> {
-            <span class="ident">prf::prf</span>(
-                <span class="kw-2">&amp;mut</span> <span class="ident">ret</span>.<span class="ident">master_secret</span>,
-                <span class="ident">suite</span>.<span class="ident">hmac_algorithm</span>,
-                <span class="ident">secret</span>,
-                <span class="ident">label</span>.<span class="ident">as_bytes</span>(),
-                <span class="ident">seed</span>.<span class="ident">as_ref</span>(),
+        kx.complete(peer_pub_key, |secret| {
+            prf::prf(
+                <span class="kw-2">&amp;mut </span>ret.master_secret,
+                suite.hmac_algorithm,
+                secret,
+                label.as_bytes(),
+                seed.as_ref(),
             );
             <span class="prelude-val">Ok</span>(())
         })<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">ret</span>)
+        <span class="prelude-val">Ok</span>(ret)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_resume</span>(
-        <span class="ident">randoms</span>: <span class="ident">ConnectionRandoms</span>,
-        <span class="ident">suite</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Tls12CipherSuite</span>,
-        <span class="ident">master_secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="self">Self</span> {
-            <span class="ident">randoms</span>,
-            <span class="ident">suite</span>,
-            <span class="ident">master_secret</span>: [<span class="number">0u8</span>; <span class="number">48</span>],
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new_resume(
+        randoms: ConnectionRandoms,
+        suite: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls12CipherSuite,
+        master_secret: <span class="kw-2">&amp;</span>[u8],
+    ) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>ret = <span class="self">Self </span>{
+            randoms,
+            suite,
+            master_secret: [<span class="number">0u8</span>; <span class="number">48</span>],
         };
-        <span class="ident">ret</span>.<span class="ident">master_secret</span>
-            .<span class="ident">copy_from_slice</span>(<span class="ident">master_secret</span>);
-        <span class="ident">ret</span>
+        ret.master_secret
+            .copy_from_slice(master_secret);
+        ret
     }
 
-    <span class="doccomment">/// Make a `MessageCipherPair` based on the given supported ciphersuite `scs`,</span>
-    <span class="doccomment">/// and the session&#39;s `secrets`.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">make_cipher_pair</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">side</span>: <span class="ident">Side</span>) -&gt; <span class="ident">MessageCipherPair</span> {
-        <span class="kw">fn</span> <span class="ident">split_key</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-            <span class="ident">key_block</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],
-            <span class="ident">alg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">aead::Algorithm</span>,
-        ) -&gt; (<span class="ident">aead::LessSafeKey</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) {
-            <span class="comment">// Might panic if the key block is too small.</span>
-            <span class="kw">let</span> (<span class="ident">key</span>, <span class="ident">rest</span>) <span class="op">=</span> <span class="ident">key_block</span>.<span class="ident">split_at</span>(<span class="ident">alg</span>.<span class="ident">key_len</span>());
-            <span class="comment">// Won&#39;t panic because its only prerequisite is that `key` is `alg.key_len()` bytes long.</span>
-            <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">aead::UnboundKey::new</span>(<span class="ident">alg</span>, <span class="ident">key</span>).<span class="ident">unwrap</span>();
-            (<span class="ident">aead::LessSafeKey::new</span>(<span class="ident">key</span>), <span class="ident">rest</span>)
+    <span class="doccomment">/// Make a `MessageCipherPair` based on the given supported ciphersuite `scs`,
+    /// and the session&#39;s `secrets`.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>make_cipher_pair(<span class="kw-2">&amp;</span><span class="self">self</span>, side: Side) -&gt; MessageCipherPair {
+        <span class="kw">fn </span>split_key&lt;<span class="lifetime">&#39;a</span>&gt;(
+            key_block: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8],
+            alg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>aead::Algorithm,
+        ) -&gt; (aead::LessSafeKey, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]) {
+            <span class="comment">// Might panic if the key block is too small.
+            </span><span class="kw">let </span>(key, rest) = key_block.split_at(alg.key_len());
+            <span class="comment">// Won&#39;t panic because its only prerequisite is that `key` is `alg.key_len()` bytes long.
+            </span><span class="kw">let </span>key = aead::UnboundKey::new(alg, key).unwrap();
+            (aead::LessSafeKey::new(key), rest)
         }
 
-        <span class="comment">// Make a key block, and chop it up.</span>
-        <span class="comment">// nb. we don&#39;t implement any ciphersuites with nonzero mac_key_len.</span>
-        <span class="kw">let</span> <span class="ident">key_block</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">make_key_block</span>();
+        <span class="comment">// Make a key block, and chop it up.
+        // nb. we don&#39;t implement any ciphersuites with nonzero mac_key_len.
+        </span><span class="kw">let </span>key_block = <span class="self">self</span>.make_key_block();
 
-        <span class="kw">let</span> <span class="ident">suite</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">suite</span>;
-        <span class="kw">let</span> <span class="ident">scs</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">suite</span>.<span class="ident">common</span>;
+        <span class="kw">let </span>suite = <span class="self">self</span>.suite;
+        <span class="kw">let </span>scs = <span class="kw-2">&amp;</span>suite.common;
 
-        <span class="kw">let</span> (<span class="ident">client_write_key</span>, <span class="ident">key_block</span>) <span class="op">=</span> <span class="ident">split_key</span>(<span class="kw-2">&amp;</span><span class="ident">key_block</span>, <span class="ident">scs</span>.<span class="ident">aead_algorithm</span>);
-        <span class="kw">let</span> (<span class="ident">server_write_key</span>, <span class="ident">key_block</span>) <span class="op">=</span> <span class="ident">split_key</span>(<span class="ident">key_block</span>, <span class="ident">scs</span>.<span class="ident">aead_algorithm</span>);
-        <span class="kw">let</span> (<span class="ident">client_write_iv</span>, <span class="ident">key_block</span>) <span class="op">=</span> <span class="ident">key_block</span>.<span class="ident">split_at</span>(<span class="ident">suite</span>.<span class="ident">fixed_iv_len</span>);
-        <span class="kw">let</span> (<span class="ident">server_write_iv</span>, <span class="ident">extra</span>) <span class="op">=</span> <span class="ident">key_block</span>.<span class="ident">split_at</span>(<span class="ident">suite</span>.<span class="ident">fixed_iv_len</span>);
+        <span class="kw">let </span>(client_write_key, key_block) = split_key(<span class="kw-2">&amp;</span>key_block, scs.aead_algorithm);
+        <span class="kw">let </span>(server_write_key, key_block) = split_key(key_block, scs.aead_algorithm);
+        <span class="kw">let </span>(client_write_iv, key_block) = key_block.split_at(suite.fixed_iv_len);
+        <span class="kw">let </span>(server_write_iv, extra) = key_block.split_at(suite.fixed_iv_len);
 
-        <span class="kw">let</span> (<span class="ident">write_key</span>, <span class="ident">write_iv</span>, <span class="ident">read_key</span>, <span class="ident">read_iv</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">side</span> {
-            <span class="ident">Side::Client</span> =&gt; (
-                <span class="ident">client_write_key</span>,
-                <span class="ident">client_write_iv</span>,
-                <span class="ident">server_write_key</span>,
-                <span class="ident">server_write_iv</span>,
+        <span class="kw">let </span>(write_key, write_iv, read_key, read_iv) = <span class="kw">match </span>side {
+            Side::Client =&gt; (
+                client_write_key,
+                client_write_iv,
+                server_write_key,
+                server_write_iv,
             ),
-            <span class="ident">Side::Server</span> =&gt; (
-                <span class="ident">server_write_key</span>,
-                <span class="ident">server_write_iv</span>,
-                <span class="ident">client_write_key</span>,
-                <span class="ident">client_write_iv</span>,
+            Side::Server =&gt; (
+                server_write_key,
+                server_write_iv,
+                client_write_key,
+                client_write_iv,
             ),
         };
 
         (
-            <span class="ident">suite</span>
-                .<span class="ident">aead_alg</span>
-                .<span class="ident">decrypter</span>(<span class="ident">read_key</span>, <span class="ident">read_iv</span>),
-            <span class="ident">suite</span>
-                .<span class="ident">aead_alg</span>
-                .<span class="ident">encrypter</span>(<span class="ident">write_key</span>, <span class="ident">write_iv</span>, <span class="ident">extra</span>),
+            suite
+                .aead_alg
+                .decrypter(read_key, read_iv),
+            suite
+                .aead_alg
+                .encrypter(write_key, write_iv, extra),
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">make_key_block</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">suite</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">suite</span>;
-        <span class="kw">let</span> <span class="ident">common</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">suite</span>.<span class="ident">common</span>;
+    <span class="kw">fn </span>make_key_block(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
+        <span class="kw">let </span>suite = <span class="kw-2">&amp;</span><span class="self">self</span>.suite;
+        <span class="kw">let </span>common = <span class="kw-2">&amp;</span><span class="self">self</span>.suite.common;
 
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span>
-            (<span class="ident">common</span>.<span class="ident">aead_algorithm</span>.<span class="ident">key_len</span>() <span class="op">+</span> <span class="ident">suite</span>.<span class="ident">fixed_iv_len</span>) <span class="op">*</span> <span class="number">2</span> <span class="op">+</span> <span class="ident">suite</span>.<span class="ident">explicit_nonce_len</span>;
+        <span class="kw">let </span>len =
+            (common.aead_algorithm.key_len() + suite.fixed_iv_len) * <span class="number">2 </span>+ suite.explicit_nonce_len;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="ident">out</span>.<span class="ident">resize</span>(<span class="ident">len</span>, <span class="number">0u8</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>out = Vec::new();
+        out.resize(len, <span class="number">0u8</span>);
 
-        <span class="comment">// NOTE: opposite order to above for no good reason.</span>
-        <span class="comment">// Don&#39;t design security protocols on drugs, kids.</span>
-        <span class="kw">let</span> <span class="ident">randoms</span> <span class="op">=</span> <span class="ident">join_randoms</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">randoms</span>.<span class="ident">server</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">randoms</span>.<span class="ident">client</span>);
-        <span class="ident">prf::prf</span>(
-            <span class="kw-2">&amp;mut</span> <span class="ident">out</span>,
-            <span class="self">self</span>.<span class="ident">suite</span>.<span class="ident">hmac_algorithm</span>,
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">master_secret</span>,
+        <span class="comment">// NOTE: opposite order to above for no good reason.
+        // Don&#39;t design security protocols on drugs, kids.
+        </span><span class="kw">let </span>randoms = join_randoms(<span class="kw-2">&amp;</span><span class="self">self</span>.randoms.server, <span class="kw-2">&amp;</span><span class="self">self</span>.randoms.client);
+        prf::prf(
+            <span class="kw-2">&amp;mut </span>out,
+            <span class="self">self</span>.suite.hmac_algorithm,
+            <span class="kw-2">&amp;</span><span class="self">self</span>.master_secret,
             <span class="string">b&quot;key expansion&quot;</span>,
-            <span class="kw-2">&amp;</span><span class="ident">randoms</span>,
+            <span class="kw-2">&amp;</span>randoms,
         );
 
-        <span class="ident">out</span>
+        out
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">suite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Tls12CipherSuite</span> {
-        <span class="self">self</span>.<span class="ident">suite</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>suite(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls12CipherSuite {
+        <span class="self">self</span>.suite
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_master_secret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="ident">ret</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">master_secret</span>);
-        <span class="ident">ret</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_master_secret(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>ret = Vec::new();
+        ret.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.master_secret);
+        ret
     }
 
-    <span class="kw">fn</span> <span class="ident">make_verify_data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">handshake_hash</span>: <span class="kw-2">&amp;</span><span class="ident">Digest</span>, <span class="ident">label</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="ident">out</span>.<span class="ident">resize</span>(<span class="number">12</span>, <span class="number">0u8</span>);
+    <span class="kw">fn </span>make_verify_data(<span class="kw-2">&amp;</span><span class="self">self</span>, handshake_hash: <span class="kw-2">&amp;</span>Digest, label: <span class="kw-2">&amp;</span>[u8]) -&gt; Vec&lt;u8&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>out = Vec::new();
+        out.resize(<span class="number">12</span>, <span class="number">0u8</span>);
 
-        <span class="ident">prf::prf</span>(
-            <span class="kw-2">&amp;mut</span> <span class="ident">out</span>,
-            <span class="self">self</span>.<span class="ident">suite</span>.<span class="ident">hmac_algorithm</span>,
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">master_secret</span>,
-            <span class="ident">label</span>,
-            <span class="ident">handshake_hash</span>.<span class="ident">as_ref</span>(),
+        prf::prf(
+            <span class="kw-2">&amp;mut </span>out,
+            <span class="self">self</span>.suite.hmac_algorithm,
+            <span class="kw-2">&amp;</span><span class="self">self</span>.master_secret,
+            label,
+            handshake_hash.as_ref(),
         );
-        <span class="ident">out</span>
+        out
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">client_verify_data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">handshake_hash</span>: <span class="kw-2">&amp;</span><span class="ident">Digest</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">make_verify_data</span>(<span class="ident">handshake_hash</span>, <span class="string">b&quot;client finished&quot;</span>)
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>client_verify_data(<span class="kw-2">&amp;</span><span class="self">self</span>, handshake_hash: <span class="kw-2">&amp;</span>Digest) -&gt; Vec&lt;u8&gt; {
+        <span class="self">self</span>.make_verify_data(handshake_hash, <span class="string">b&quot;client finished&quot;</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">server_verify_data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">handshake_hash</span>: <span class="kw-2">&amp;</span><span class="ident">Digest</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">make_verify_data</span>(<span class="ident">handshake_hash</span>, <span class="string">b&quot;server finished&quot;</span>)
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>server_verify_data(<span class="kw-2">&amp;</span><span class="self">self</span>, handshake_hash: <span class="kw-2">&amp;</span>Digest) -&gt; Vec&lt;u8&gt; {
+        <span class="self">self</span>.make_verify_data(handshake_hash, <span class="string">b&quot;server finished&quot;</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">export_keying_material</span>(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>export_keying_material(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">output</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-        <span class="ident">label</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-        <span class="ident">context</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
+        output: <span class="kw-2">&amp;mut </span>[u8],
+        label: <span class="kw-2">&amp;</span>[u8],
+        context: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[u8]&gt;,
     ) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">randoms</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="ident">randoms</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">randoms</span>.<span class="ident">client</span>);
-        <span class="ident">randoms</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">randoms</span>.<span class="ident">server</span>);
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">context</span>) <span class="op">=</span> <span class="ident">context</span> {
-            <span class="macro">assert!</span>(<span class="ident">context</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">0xffff</span>);
-            (<span class="ident">context</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u16</span>).<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">randoms</span>);
-            <span class="ident">randoms</span>.<span class="ident">extend_from_slice</span>(<span class="ident">context</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>randoms = Vec::new();
+        randoms.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.randoms.client);
+        randoms.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.randoms.server);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(context) = context {
+            <span class="macro">assert!</span>(context.len() &lt;= <span class="number">0xffff</span>);
+            (context.len() <span class="kw">as </span>u16).encode(<span class="kw-2">&amp;mut </span>randoms);
+            randoms.extend_from_slice(context);
         }
 
-        <span class="ident">prf::prf</span>(
-            <span class="ident">output</span>,
-            <span class="self">self</span>.<span class="ident">suite</span>.<span class="ident">hmac_algorithm</span>,
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">master_secret</span>,
-            <span class="ident">label</span>,
-            <span class="kw-2">&amp;</span><span class="ident">randoms</span>,
+        prf::prf(
+            output,
+            <span class="self">self</span>.suite.hmac_algorithm,
+            <span class="kw-2">&amp;</span><span class="self">self</span>.master_secret,
+            label,
+            <span class="kw-2">&amp;</span>randoms,
         )
     }
 }
 
-<span class="kw">enum</span> <span class="ident">Seed</span> {
-    <span class="ident">Ems</span>(<span class="ident">Digest</span>),
-    <span class="ident">Randoms</span>([<span class="ident">u8</span>; <span class="number">64</span>]),
+<span class="kw">enum </span>Seed {
+    Ems(Digest),
+    Randoms([u8; <span class="number">64</span>]),
 }
 
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Seed</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Seed::Ems</span>(<span class="ident">seed</span>) =&gt; <span class="ident">seed</span>.<span class="ident">as_ref</span>(),
-            <span class="ident">Seed::Randoms</span>(<span class="ident">randoms</span>) =&gt; <span class="ident">randoms</span>.<span class="ident">as_ref</span>(),
+<span class="kw">impl </span>AsRef&lt;[u8]&gt; <span class="kw">for </span>Seed {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="kw">match </span><span class="self">self </span>{
+            Seed::Ems(seed) =&gt; seed.as_ref(),
+            Seed::Randoms(randoms) =&gt; randoms.as_ref(),
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">join_randoms</span>(<span class="ident">first</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">32</span>], <span class="ident">second</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">32</span>]) -&gt; [<span class="ident">u8</span>; <span class="number">64</span>] {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">randoms</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">64</span>];
-    <span class="ident">randoms</span>[..<span class="number">32</span>].<span class="ident">copy_from_slice</span>(<span class="ident">first</span>);
-    <span class="ident">randoms</span>[<span class="number">32</span>..].<span class="ident">copy_from_slice</span>(<span class="ident">second</span>);
-    <span class="ident">randoms</span>
+<span class="kw">fn </span>join_randoms(first: <span class="kw-2">&amp;</span>[u8; <span class="number">32</span>], second: <span class="kw-2">&amp;</span>[u8; <span class="number">32</span>]) -&gt; [u8; <span class="number">64</span>] {
+    <span class="kw">let </span><span class="kw-2">mut </span>randoms = [<span class="number">0u8</span>; <span class="number">64</span>];
+    randoms[..<span class="number">32</span>].copy_from_slice(first);
+    randoms[<span class="number">32</span>..].copy_from_slice(second);
+    randoms
 }
 
-<span class="kw">type</span> <span class="ident">MessageCipherPair</span> <span class="op">=</span> (<span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">MessageDecrypter</span><span class="op">&gt;</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">MessageEncrypter</span><span class="op">&gt;</span>);
+<span class="kw">type </span>MessageCipherPair = (Box&lt;<span class="kw">dyn </span>MessageDecrypter&gt;, Box&lt;<span class="kw">dyn </span>MessageEncrypter&gt;);
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">decode_ecdh_params</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Codec</span><span class="op">&gt;</span>(
-    <span class="ident">common</span>: <span class="kw-2">&amp;mut</span> <span class="ident">CommonState</span>,
-    <span class="ident">kx_params</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="ident">decode_ecdh_params_</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">kx_params</span>).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-        <span class="ident">common</span>.<span class="ident">send_fatal_alert</span>(<span class="ident">AlertDescription::DecodeError</span>);
-        <span class="ident">Error::CorruptMessagePayload</span>(<span class="ident">ContentType::Handshake</span>)
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>decode_ecdh_params&lt;T: Codec&gt;(
+    common: <span class="kw-2">&amp;mut </span>CommonState,
+    kx_params: <span class="kw-2">&amp;</span>[u8],
+) -&gt; <span class="prelude-ty">Result</span>&lt;T, Error&gt; {
+    decode_ecdh_params_::&lt;T&gt;(kx_params).ok_or_else(|| {
+        common.send_fatal_alert(AlertDescription::DecodeError);
+        Error::CorruptMessagePayload(ContentType::Handshake)
     })
 }
 
-<span class="kw">fn</span> <span class="ident">decode_ecdh_params_</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Codec</span><span class="op">&gt;</span>(<span class="ident">kx_params</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rd</span> <span class="op">=</span> <span class="ident">Reader::init</span>(<span class="ident">kx_params</span>);
-    <span class="kw">let</span> <span class="ident">ecdh_params</span> <span class="op">=</span> <span class="ident">T::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rd</span>)<span class="question-mark">?</span>;
-    <span class="kw">match</span> <span class="ident">rd</span>.<span class="ident">any_left</span>() {
-        <span class="bool-val">false</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ecdh_params</span>),
-        <span class="bool-val">true</span> =&gt; <span class="prelude-val">None</span>,
+<span class="kw">fn </span>decode_ecdh_params_&lt;T: Codec&gt;(kx_params: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>rd = Reader::init(kx_params);
+    <span class="kw">let </span>ecdh_params = T::read(<span class="kw-2">&amp;mut </span>rd)<span class="question-mark">?</span>;
+    <span class="kw">match </span>rd.any_left() {
+        <span class="bool-val">false </span>=&gt; <span class="prelude-val">Some</span>(ecdh_params),
+        <span class="bool-val">true </span>=&gt; <span class="prelude-val">None</span>,
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">DOWNGRADE_SENTINEL</span>: [<span class="ident">u8</span>; <span class="number">8</span>] <span class="op">=</span> [<span class="number">0x44</span>, <span class="number">0x4f</span>, <span class="number">0x57</span>, <span class="number">0x4e</span>, <span class="number">0x47</span>, <span class="number">0x52</span>, <span class="number">0x44</span>, <span class="number">0x01</span>];
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>DOWNGRADE_SENTINEL: [u8; <span class="number">8</span>] = [<span class="number">0x44</span>, <span class="number">0x4f</span>, <span class="number">0x57</span>, <span class="number">0x4e</span>, <span class="number">0x47</span>, <span class="number">0x52</span>, <span class="number">0x44</span>, <span class="number">0x01</span>];
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::handshake</span>::{<span class="ident">ClientECDHParams</span>, <span class="ident">ServerECDHParams</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::{ClientECDHParams, ServerECDHParams};
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">server_ecdhe_remaining_bytes</span>() {
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">kx::KeyExchange::start</span>(<span class="kw-2">&amp;</span><span class="ident">kx::X25519</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">server_params</span> <span class="op">=</span> <span class="ident">ServerECDHParams::new</span>(<span class="ident">key</span>.<span class="ident">group</span>(), <span class="ident">key</span>.<span class="ident">pubkey</span>.<span class="ident">as_ref</span>());
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">server_buf</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="ident">server_params</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">server_buf</span>);
-        <span class="ident">server_buf</span>.<span class="ident">push</span>(<span class="number">34</span>);
-        <span class="macro">assert!</span>(<span class="ident">decode_ecdh_params_</span>::<span class="op">&lt;</span><span class="ident">ServerECDHParams</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">server_buf</span>).<span class="ident">is_none</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>server_ecdhe_remaining_bytes() {
+        <span class="kw">let </span>key = kx::KeyExchange::start(<span class="kw-2">&amp;</span>kx::X25519).unwrap();
+        <span class="kw">let </span>server_params = ServerECDHParams::new(key.group(), key.pubkey.as_ref());
+        <span class="kw">let </span><span class="kw-2">mut </span>server_buf = Vec::new();
+        server_params.encode(<span class="kw-2">&amp;mut </span>server_buf);
+        server_buf.push(<span class="number">34</span>);
+        <span class="macro">assert!</span>(decode_ecdh_params_::&lt;ServerECDHParams&gt;(<span class="kw-2">&amp;</span>server_buf).is_none());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">client_ecdhe_invalid</span>() {
-        <span class="macro">assert!</span>(<span class="ident">decode_ecdh_params_</span>::<span class="op">&lt;</span><span class="ident">ClientECDHParams</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span>[<span class="number">34</span>]).<span class="ident">is_none</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>client_ecdhe_invalid() {
+        <span class="macro">assert!</span>(decode_ecdh_params_::&lt;ClientECDHParams&gt;(<span class="kw-2">&amp;</span>[<span class="number">34</span>]).is_none());
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

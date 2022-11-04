@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/rr/type_bit_map.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>type_bit_map.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/rr/type_bit_map.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>type_bit_map.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -208,215 +208,215 @@
 <span id="208">208</span>
 <span id="209">209</span>
 <span id="210">210</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2021 Benjamin Fry &lt;benjaminfry@me.com&gt;</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2021 Benjamin Fry &lt;benjaminfry@me.com&gt;
+//
+// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="doccomment">//! type bit map helper definitions</span>
+</span><span class="doccomment">//! type bit map helper definitions
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::rr::RecordType</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::serialize::binary</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">std::collections::BTreeMap</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::error::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::rr::RecordType;
+<span class="kw">use </span><span class="kw">crate</span>::serialize::binary::<span class="kw-2">*</span>;
+<span class="kw">use </span>std::collections::BTreeMap;
 
-<span class="kw">enum</span> <span class="ident">BitMapReadState</span> {
-    <span class="ident">Window</span>,
-    <span class="ident">Len</span> {
-        <span class="ident">window</span>: <span class="ident">u8</span>,
+<span class="kw">enum </span>BitMapReadState {
+    Window,
+    Len {
+        window: u8,
     },
-    <span class="ident">RecordType</span> {
-        <span class="ident">window</span>: <span class="ident">u8</span>,
-        <span class="ident">len</span>: <span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-        <span class="ident">left</span>: <span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+    RecordType {
+        window: u8,
+        len: Restrict&lt;u8&gt;,
+        left: Restrict&lt;u8&gt;,
     },
 }
 
-<span class="doccomment">/// Encode the bit map</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Arguments</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * `encoder` - the encoder to write to</span>
-<span class="doccomment">/// * `type_bit_maps` - types to encode into the bitmap</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">encode_type_bit_maps</span>(
-    <span class="ident">encoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">type_bit_maps</span>: <span class="kw-2">&amp;</span>[<span class="ident">RecordType</span>],
-) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hash</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BTreeMap::new</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">type_bit_maps</span> <span class="op">=</span> <span class="ident">type_bit_maps</span>.<span class="ident">to_vec</span>();
-    <span class="ident">type_bit_maps</span>.<span class="ident">sort</span>();
+<span class="doccomment">/// Encode the bit map
+///
+/// # Arguments
+///
+/// * `encoder` - the encoder to write to
+/// * `type_bit_maps` - types to encode into the bitmap
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>encode_type_bit_maps(
+    encoder: <span class="kw-2">&amp;mut </span>BinEncoder&lt;<span class="lifetime">&#39;_</span>&gt;,
+    type_bit_maps: <span class="kw-2">&amp;</span>[RecordType],
+) -&gt; ProtoResult&lt;()&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>hash: BTreeMap&lt;u8, Vec&lt;u8&gt;&gt; = BTreeMap::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>type_bit_maps = type_bit_maps.to_vec();
+    type_bit_maps.sort();
 
-    <span class="comment">// collect the bitmaps</span>
-    <span class="kw">for</span> <span class="ident">rr_type</span> <span class="kw">in</span> <span class="ident">type_bit_maps</span> {
-        <span class="kw">let</span> <span class="ident">code</span>: <span class="ident">u16</span> <span class="op">=</span> (<span class="ident">rr_type</span>).<span class="ident">into</span>();
-        <span class="kw">let</span> <span class="ident">window</span>: <span class="ident">u8</span> <span class="op">=</span> (<span class="ident">code</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">8</span>) <span class="kw">as</span> <span class="ident">u8</span>;
-        <span class="kw">let</span> <span class="ident">low</span>: <span class="ident">u8</span> <span class="op">=</span> (<span class="ident">code</span> <span class="op">&amp;</span> <span class="number">0x00FF</span>) <span class="kw">as</span> <span class="ident">u8</span>;
+    <span class="comment">// collect the bitmaps
+    </span><span class="kw">for </span>rr_type <span class="kw">in </span>type_bit_maps {
+        <span class="kw">let </span>code: u16 = (rr_type).into();
+        <span class="kw">let </span>window: u8 = (code &gt;&gt; <span class="number">8</span>) <span class="kw">as </span>u8;
+        <span class="kw">let </span>low: u8 = (code &amp; <span class="number">0x00FF</span>) <span class="kw">as </span>u8;
 
-        <span class="kw">let</span> <span class="ident">bit_map</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">hash</span>.<span class="ident">entry</span>(<span class="ident">window</span>).<span class="ident">or_insert_with</span>(<span class="ident">Vec::new</span>);
-        <span class="comment">// len + left is the block in the bitmap, divided by 8 for the bits, + the bit in the current_byte</span>
-        <span class="kw">let</span> <span class="ident">index</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="ident">low</span> <span class="op">/</span> <span class="number">8</span>;
-        <span class="kw">let</span> <span class="ident">bit</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0b1000_0000</span> <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="ident">low</span> <span class="op">%</span> <span class="number">8</span>);
+        <span class="kw">let </span>bit_map: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt; = hash.entry(window).or_insert_with(Vec::new);
+        <span class="comment">// len + left is the block in the bitmap, divided by 8 for the bits, + the bit in the current_byte
+        </span><span class="kw">let </span>index: u8 = low / <span class="number">8</span>;
+        <span class="kw">let </span>bit: u8 = <span class="number">0b1000_0000 </span>&gt;&gt; (low % <span class="number">8</span>);
 
-        <span class="comment">// adding necessary space to the vector</span>
-        <span class="kw">if</span> <span class="ident">bit_map</span>.<span class="ident">len</span>() <span class="op">&lt;</span> (<span class="ident">index</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="number">1</span>) {
-            <span class="ident">bit_map</span>.<span class="ident">resize</span>(<span class="ident">index</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="number">1</span>, <span class="number">0_u8</span>);
+        <span class="comment">// adding necessary space to the vector
+        </span><span class="kw">if </span>bit_map.len() &lt; (index <span class="kw">as </span>usize + <span class="number">1</span>) {
+            bit_map.resize(index <span class="kw">as </span>usize + <span class="number">1</span>, <span class="number">0_u8</span>);
         }
 
-        <span class="ident">bit_map</span>[<span class="ident">index</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">|</span><span class="op">=</span> <span class="ident">bit</span>;
+        bit_map[index <span class="kw">as </span>usize] |= bit;
     }
 
-    <span class="comment">// output bitmaps</span>
-    <span class="kw">for</span> (<span class="ident">window</span>, <span class="ident">bitmap</span>) <span class="kw">in</span> <span class="ident">hash</span> {
-        <span class="ident">encoder</span>.<span class="ident">emit</span>(<span class="ident">window</span>)<span class="question-mark">?</span>;
-        <span class="comment">// the hashset should never be larger that 255 based on above logic.</span>
-        <span class="ident">encoder</span>.<span class="ident">emit</span>(<span class="ident">bitmap</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u8</span>)<span class="question-mark">?</span>;
-        <span class="kw">for</span> <span class="ident">bits</span> <span class="kw">in</span> <span class="ident">bitmap</span> {
-            <span class="ident">encoder</span>.<span class="ident">emit</span>(<span class="ident">bits</span>)<span class="question-mark">?</span>;
+    <span class="comment">// output bitmaps
+    </span><span class="kw">for </span>(window, bitmap) <span class="kw">in </span>hash {
+        encoder.emit(window)<span class="question-mark">?</span>;
+        <span class="comment">// the hashset should never be larger that 255 based on above logic.
+        </span>encoder.emit(bitmap.len() <span class="kw">as </span>u8)<span class="question-mark">?</span>;
+        <span class="kw">for </span>bits <span class="kw">in </span>bitmap {
+            encoder.emit(bits)<span class="question-mark">?</span>;
         }
     }
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="doccomment">/// Decodes the array of RecordTypes covered by this NSEC record</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Arguments</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * `decoder` - decoder to read from</span>
-<span class="doccomment">/// * `bit_map_len` - the number bytes in the bit map</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Returns</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The Array of covered types</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">decode_type_bit_maps</span>(
-    <span class="ident">decoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">bit_map_len</span>: <span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RecordType</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="comment">// 3.2.1.  Type Bit Maps Encoding</span>
-    <span class="comment">//</span>
-    <span class="comment">//  The encoding of the Type Bit Maps field is the same as that used by</span>
-    <span class="comment">//  the NSEC RR, described in [RFC4034].  It is explained and clarified</span>
-    <span class="comment">//  here for clarity.</span>
-    <span class="comment">//</span>
-    <span class="comment">//  The RR type space is split into 256 window blocks, each representing</span>
-    <span class="comment">//  the low-order 8 bits of the 16-bit RR type space.  Each block that</span>
-    <span class="comment">//  has at least one active RR type is encoded using a single octet</span>
-    <span class="comment">//  window number (from 0 to 255), a single octet bitmap length (from 1</span>
-    <span class="comment">//  to 32) indicating the number of octets used for the bitmap of the</span>
-    <span class="comment">//  window block, and up to 32 octets (256 bits) of bitmap.</span>
-    <span class="comment">//</span>
-    <span class="comment">//  Blocks are present in the NSEC3 RR RDATA in increasing numerical</span>
-    <span class="comment">//  order.</span>
-    <span class="comment">//</span>
-    <span class="comment">//     Type Bit Maps Field = ( Window Block # | Bitmap Length | Bitmap )+</span>
-    <span class="comment">//</span>
-    <span class="comment">//     where &quot;|&quot; denotes concatenation.</span>
-    <span class="comment">//</span>
-    <span class="comment">//  Each bitmap encodes the low-order 8 bits of RR types within the</span>
-    <span class="comment">//  window block, in network bit order.  The first bit is bit 0.  For</span>
-    <span class="comment">//  window block 0, bit 1 corresponds to RR type 1 (A), bit 2 corresponds</span>
-    <span class="comment">//  to RR type 2 (NS), and so forth.  For window block 1, bit 1</span>
-    <span class="comment">//  corresponds to RR type 257, bit 2 to RR type 258.  If a bit is set to</span>
-    <span class="comment">//  1, it indicates that an RRSet of that type is present for the</span>
-    <span class="comment">//  original owner name of the NSEC3 RR.  If a bit is set to 0, it</span>
-    <span class="comment">//  indicates that no RRSet of that type is present for the original</span>
-    <span class="comment">//  owner name of the NSEC3 RR.</span>
-    <span class="comment">//</span>
-    <span class="comment">//  Since bit 0 in window block 0 refers to the non-existing RR type 0,</span>
-    <span class="comment">//  it MUST be set to 0.  After verification, the validator MUST ignore</span>
-    <span class="comment">//  the value of bit 0 in window block 0.</span>
-    <span class="comment">//</span>
-    <span class="comment">//  Bits representing Meta-TYPEs or QTYPEs as specified in Section 3.1 of</span>
-    <span class="comment">//  [RFC2929] or within the range reserved for assignment only to QTYPEs</span>
-    <span class="comment">//  and Meta-TYPEs MUST be set to 0, since they do not appear in zone</span>
-    <span class="comment">//  data.  If encountered, they must be ignored upon reading.</span>
-    <span class="comment">//</span>
-    <span class="comment">//  Blocks with no types present MUST NOT be included.  Trailing zero</span>
-    <span class="comment">//  octets in the bitmap MUST be omitted.  The length of the bitmap of</span>
-    <span class="comment">//  each block is determined by the type code with the largest numerical</span>
-    <span class="comment">//  value, within that block, among the set of RR types present at the</span>
-    <span class="comment">//  original owner name of the NSEC3 RR.  Trailing octets not specified</span>
-    <span class="comment">//  MUST be interpreted as zero octets.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">record_types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RecordType</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span>: <span class="ident">BitMapReadState</span> <span class="op">=</span> <span class="ident">BitMapReadState::Window</span>;
+<span class="doccomment">/// Decodes the array of RecordTypes covered by this NSEC record
+///
+/// # Arguments
+///
+/// * `decoder` - decoder to read from
+/// * `bit_map_len` - the number bytes in the bit map
+///
+/// # Returns
+///
+/// The Array of covered types
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>decode_type_bit_maps(
+    decoder: <span class="kw-2">&amp;mut </span>BinDecoder&lt;<span class="lifetime">&#39;_</span>&gt;,
+    bit_map_len: Restrict&lt;usize&gt;,
+) -&gt; ProtoResult&lt;Vec&lt;RecordType&gt;&gt; {
+    <span class="comment">// 3.2.1.  Type Bit Maps Encoding
+    //
+    //  The encoding of the Type Bit Maps field is the same as that used by
+    //  the NSEC RR, described in [RFC4034].  It is explained and clarified
+    //  here for clarity.
+    //
+    //  The RR type space is split into 256 window blocks, each representing
+    //  the low-order 8 bits of the 16-bit RR type space.  Each block that
+    //  has at least one active RR type is encoded using a single octet
+    //  window number (from 0 to 255), a single octet bitmap length (from 1
+    //  to 32) indicating the number of octets used for the bitmap of the
+    //  window block, and up to 32 octets (256 bits) of bitmap.
+    //
+    //  Blocks are present in the NSEC3 RR RDATA in increasing numerical
+    //  order.
+    //
+    //     Type Bit Maps Field = ( Window Block # | Bitmap Length | Bitmap )+
+    //
+    //     where &quot;|&quot; denotes concatenation.
+    //
+    //  Each bitmap encodes the low-order 8 bits of RR types within the
+    //  window block, in network bit order.  The first bit is bit 0.  For
+    //  window block 0, bit 1 corresponds to RR type 1 (A), bit 2 corresponds
+    //  to RR type 2 (NS), and so forth.  For window block 1, bit 1
+    //  corresponds to RR type 257, bit 2 to RR type 258.  If a bit is set to
+    //  1, it indicates that an RRSet of that type is present for the
+    //  original owner name of the NSEC3 RR.  If a bit is set to 0, it
+    //  indicates that no RRSet of that type is present for the original
+    //  owner name of the NSEC3 RR.
+    //
+    //  Since bit 0 in window block 0 refers to the non-existing RR type 0,
+    //  it MUST be set to 0.  After verification, the validator MUST ignore
+    //  the value of bit 0 in window block 0.
+    //
+    //  Bits representing Meta-TYPEs or QTYPEs as specified in Section 3.1 of
+    //  [RFC2929] or within the range reserved for assignment only to QTYPEs
+    //  and Meta-TYPEs MUST be set to 0, since they do not appear in zone
+    //  data.  If encountered, they must be ignored upon reading.
+    //
+    //  Blocks with no types present MUST NOT be included.  Trailing zero
+    //  octets in the bitmap MUST be omitted.  The length of the bitmap of
+    //  each block is determined by the type code with the largest numerical
+    //  value, within that block, among the set of RR types present at the
+    //  original owner name of the NSEC3 RR.  Trailing octets not specified
+    //  MUST be interpreted as zero octets.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>record_types: Vec&lt;RecordType&gt; = Vec::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>state: BitMapReadState = BitMapReadState::Window;
 
-    <span class="comment">// loop through all the bytes in the bitmap</span>
-    <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">bit_map_len</span>.<span class="ident">unverified</span>(<span class="comment">/*bounded over any length of u16*/</span>) {
-        <span class="kw">let</span> <span class="ident">current_byte</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
+    <span class="comment">// loop through all the bytes in the bitmap
+    </span><span class="kw">for _ in </span><span class="number">0</span>..bit_map_len.unverified(<span class="comment">/*bounded over any length of u16*/</span>) {
+        <span class="kw">let </span>current_byte = decoder.read_u8()<span class="question-mark">?</span>;
 
-        <span class="ident">state</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">state</span> {
-            <span class="ident">BitMapReadState::Window</span> =&gt; <span class="ident">BitMapReadState::Len</span> {
-                <span class="ident">window</span>: <span class="ident">current_byte</span>.<span class="ident">unverified</span>(<span class="comment">/*window is any valid u8,*/</span>),
+        state = <span class="kw">match </span>state {
+            BitMapReadState::Window =&gt; BitMapReadState::Len {
+                window: current_byte.unverified(<span class="comment">/*window is any valid u8,*/</span>),
             },
-            <span class="ident">BitMapReadState::Len</span> { <span class="ident">window</span> } =&gt; <span class="ident">BitMapReadState::RecordType</span> {
-                <span class="ident">window</span>,
-                <span class="ident">len</span>: <span class="ident">current_byte</span>,
-                <span class="ident">left</span>: <span class="ident">current_byte</span>,
+            BitMapReadState::Len { window } =&gt; BitMapReadState::RecordType {
+                window,
+                len: current_byte,
+                left: current_byte,
             },
-            <span class="ident">BitMapReadState::RecordType</span> { <span class="ident">window</span>, <span class="ident">len</span>, <span class="ident">left</span> } =&gt; {
-                <span class="comment">// window is the Window Block # from above</span>
-                <span class="comment">// len is the Bitmap Length</span>
-                <span class="comment">// current_byte is the Bitmap</span>
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bit_map</span> <span class="op">=</span> <span class="ident">current_byte</span>.<span class="ident">unverified</span>(<span class="comment">/*validated and restricted in usage in following usage*/</span>);
+            BitMapReadState::RecordType { window, len, left } =&gt; {
+                <span class="comment">// window is the Window Block # from above
+                // len is the Bitmap Length
+                // current_byte is the Bitmap
+                </span><span class="kw">let </span><span class="kw-2">mut </span>bit_map = current_byte.unverified(<span class="comment">/*validated and restricted in usage in following usage*/</span>);
 
-                <span class="comment">// for all the bits in the current_byte</span>
-                <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">8</span> {
-                    <span class="comment">// if the current_bytes most significant bit is set</span>
-                    <span class="kw">if</span> <span class="ident">bit_map</span> <span class="op">&amp;</span> <span class="number">0b1000_0000</span> <span class="op">==</span> <span class="number">0b1000_0000</span> {
-                        <span class="comment">// len - left is the block in the bitmap, times 8 for the bits, + the bit in the current_byte</span>
-                        <span class="kw">let</span> <span class="ident">low_byte</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="ident">len</span>
-                            .<span class="ident">checked_sub</span>(<span class="ident">left</span>.<span class="ident">unverified</span>(<span class="comment">/*will fail as param in this call if invalid*/</span>))
-                            .<span class="ident">checked_mul</span>(<span class="number">8</span>)
-                            .<span class="ident">checked_add</span>(<span class="ident">i</span>)
-                            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="string">&quot;block len or left out of bounds in NSEC(3)&quot;</span>)<span class="question-mark">?</span>
-                            .<span class="ident">unverified</span>(<span class="comment">/*any u8 is valid at this point*/</span>);
-                        <span class="kw">let</span> <span class="ident">rr_type</span>: <span class="ident">u16</span> <span class="op">=</span> (<span class="ident">u16::from</span>(<span class="ident">window</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>) <span class="op">|</span> <span class="ident">u16::from</span>(<span class="ident">low_byte</span>);
-                        <span class="ident">record_types</span>.<span class="ident">push</span>(<span class="ident">RecordType::from</span>(<span class="ident">rr_type</span>));
+                <span class="comment">// for all the bits in the current_byte
+                </span><span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">8 </span>{
+                    <span class="comment">// if the current_bytes most significant bit is set
+                    </span><span class="kw">if </span>bit_map &amp; <span class="number">0b1000_0000 </span>== <span class="number">0b1000_0000 </span>{
+                        <span class="comment">// len - left is the block in the bitmap, times 8 for the bits, + the bit in the current_byte
+                        </span><span class="kw">let </span>low_byte: u8 = len
+                            .checked_sub(left.unverified(<span class="comment">/*will fail as param in this call if invalid*/</span>))
+                            .checked_mul(<span class="number">8</span>)
+                            .checked_add(i)
+                            .map_err(|<span class="kw">_</span>| <span class="string">&quot;block len or left out of bounds in NSEC(3)&quot;</span>)<span class="question-mark">?
+                            </span>.unverified(<span class="comment">/*any u8 is valid at this point*/</span>);
+                        <span class="kw">let </span>rr_type: u16 = (u16::from(window) &lt;&lt; <span class="number">8</span>) | u16::from(low_byte);
+                        record_types.push(RecordType::from(rr_type));
                     }
-                    <span class="comment">// shift left and look at the next bit</span>
-                    <span class="ident">bit_map</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="op">=</span> <span class="number">1</span>;
+                    <span class="comment">// shift left and look at the next bit
+                    </span>bit_map &lt;&lt;= <span class="number">1</span>;
                 }
 
-                <span class="comment">// move to the next section of the bit_map</span>
-                <span class="kw">let</span> <span class="ident">left</span> <span class="op">=</span> <span class="ident">left</span>
-                    .<span class="ident">checked_sub</span>(<span class="number">1</span>)
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">ProtoError::from</span>(<span class="string">&quot;block left out of bounds in NSEC(3)&quot;</span>))<span class="question-mark">?</span>;
-                <span class="kw">if</span> <span class="ident">left</span>.<span class="ident">unverified</span>(<span class="comment">/*comparison is safe*/</span>) <span class="op">==</span> <span class="number">0</span> {
-                    <span class="comment">// we&#39;ve exhausted this Window, move to the next</span>
-                    <span class="ident">BitMapReadState::Window</span>
-                } <span class="kw">else</span> {
-                    <span class="comment">// continue reading this Window</span>
-                    <span class="ident">BitMapReadState::RecordType</span> { <span class="ident">window</span>, <span class="ident">len</span>, <span class="ident">left</span> }
+                <span class="comment">// move to the next section of the bit_map
+                </span><span class="kw">let </span>left = left
+                    .checked_sub(<span class="number">1</span>)
+                    .map_err(|<span class="kw">_</span>| ProtoError::from(<span class="string">&quot;block left out of bounds in NSEC(3)&quot;</span>))<span class="question-mark">?</span>;
+                <span class="kw">if </span>left.unverified(<span class="comment">/*comparison is safe*/</span>) == <span class="number">0 </span>{
+                    <span class="comment">// we&#39;ve exhausted this Window, move to the next
+                    </span>BitMapReadState::Window
+                } <span class="kw">else </span>{
+                    <span class="comment">// continue reading this Window
+                    </span>BitMapReadState::RecordType { window, len, left }
                 }
             }
         };
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">record_types</span>)
+    <span class="prelude-val">Ok</span>(record_types)
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::dbg_macro</span>, <span class="ident">clippy::print_stdout</span>)]</span>
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="attribute">#![allow(clippy::dbg_macro, clippy::print_stdout)]
 
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+    </span><span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_encode_decode</span>() {
-        <span class="kw">let</span> <span class="ident">types</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">RecordType::A</span>, <span class="ident">RecordType::NS</span>];
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_encode_decode() {
+        <span class="kw">let </span>types = <span class="macro">vec!</span>[RecordType::A, RecordType::NS];
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span>: <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BinEncoder::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>);
-        <span class="macro">assert!</span>(<span class="ident">encode_type_bit_maps</span>(<span class="kw-2">&amp;mut</span> <span class="ident">encoder</span>, <span class="kw-2">&amp;</span><span class="ident">types</span>).<span class="ident">is_ok</span>());
-        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">into_bytes</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>bytes = Vec::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>encoder: BinEncoder&lt;<span class="lifetime">&#39;_</span>&gt; = BinEncoder::new(<span class="kw-2">&amp;mut </span>bytes);
+        <span class="macro">assert!</span>(encode_type_bit_maps(<span class="kw-2">&amp;mut </span>encoder, <span class="kw-2">&amp;</span>types).is_ok());
+        <span class="kw">let </span>bytes = encoder.into_bytes();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span>: <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BinDecoder::new</span>(<span class="ident">bytes</span>);
-        <span class="kw">let</span> <span class="ident">restrict</span> <span class="op">=</span> <span class="ident">Restrict::new</span>(<span class="ident">bytes</span>.<span class="ident">len</span>());
-        <span class="kw">let</span> <span class="ident">read_bit_map</span> <span class="op">=</span> <span class="ident">decode_type_bit_maps</span>(<span class="kw-2">&amp;mut</span> <span class="ident">decoder</span>, <span class="ident">restrict</span>).<span class="ident">expect</span>(<span class="string">&quot;Decoding error&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">types</span>, <span class="ident">read_bit_map</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>decoder: BinDecoder&lt;<span class="lifetime">&#39;_</span>&gt; = BinDecoder::new(bytes);
+        <span class="kw">let </span>restrict = Restrict::new(bytes.len());
+        <span class="kw">let </span>read_bit_map = decode_type_bit_maps(<span class="kw-2">&amp;mut </span>decoder, restrict).expect(<span class="string">&quot;Decoding error&quot;</span>);
+        <span class="macro">assert_eq!</span>(types, read_bit_map);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

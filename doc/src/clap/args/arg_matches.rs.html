@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/clap-2.34.0/src/args/arg_matches.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>arg_matches.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../clap/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/clap-2.34.0/src/args/arg_matches.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>arg_matches.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../clap/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -999,1006 +999,1006 @@
 <span id="999">999</span>
 <span id="1000">1000</span>
 <span id="1001">1001</span>
-</pre><pre class="rust"><code><span class="comment">// Std</span>
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">borrow::Cow</span>,
-    <span class="ident">collections::HashMap</span>,
-    <span class="ident">ffi</span>::{<span class="ident">OsStr</span>, <span class="ident">OsString</span>},
-    <span class="ident">iter::Map</span>,
-    <span class="ident">slice::Iter</span>,
+</pre><pre class="rust"><code><span class="comment">// Std
+</span><span class="kw">use </span>std::{
+    borrow::Cow,
+    collections::HashMap,
+    ffi::{OsStr, OsString},
+    iter::Map,
+    slice::Iter,
 };
 
-<span class="comment">// Internal</span>
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">args</span>::{<span class="ident">MatchedArg</span>, <span class="ident">SubCommand</span>},
-    <span class="ident">INVALID_UTF8</span>,
+<span class="comment">// Internal
+</span><span class="kw">use crate</span>::{
+    args::{MatchedArg, SubCommand},
+    INVALID_UTF8,
 };
 
-<span class="doccomment">/// Used to get information about the arguments that were supplied to the program at runtime by</span>
-<span class="doccomment">/// the user. New instances of this struct are obtained by using the [`App::get_matches`] family of</span>
-<span class="doccomment">/// methods.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```no_run</span>
-<span class="doccomment">/// # use clap::{App, Arg};</span>
-<span class="doccomment">/// let matches = App::new(&quot;MyApp&quot;)</span>
-<span class="doccomment">///     .arg(Arg::with_name(&quot;out&quot;)</span>
-<span class="doccomment">///         .long(&quot;output&quot;)</span>
-<span class="doccomment">///         .required(true)</span>
-<span class="doccomment">///         .takes_value(true))</span>
-<span class="doccomment">///     .arg(Arg::with_name(&quot;debug&quot;)</span>
-<span class="doccomment">///         .short(&quot;d&quot;)</span>
-<span class="doccomment">///         .multiple(true))</span>
-<span class="doccomment">///     .arg(Arg::with_name(&quot;cfg&quot;)</span>
-<span class="doccomment">///         .short(&quot;c&quot;)</span>
-<span class="doccomment">///         .takes_value(true))</span>
-<span class="doccomment">///     .get_matches(); // builds the instance of ArgMatches</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // to get information about the &quot;cfg&quot; argument we created, such as the value supplied we use</span>
-<span class="doccomment">/// // various ArgMatches methods, such as ArgMatches::value_of</span>
-<span class="doccomment">/// if let Some(c) = matches.value_of(&quot;cfg&quot;) {</span>
-<span class="doccomment">///     println!(&quot;Value for -c: {}&quot;, c);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // The ArgMatches::value_of method returns an Option because the user may not have supplied</span>
-<span class="doccomment">/// // that argument at runtime. But if we specified that the argument was &quot;required&quot; as we did</span>
-<span class="doccomment">/// // with the &quot;out&quot; argument, we can safely unwrap because `clap` verifies that was actually</span>
-<span class="doccomment">/// // used at runtime.</span>
-<span class="doccomment">/// println!(&quot;Value for --output: {}&quot;, matches.value_of(&quot;out&quot;).unwrap());</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // You can check the presence of an argument</span>
-<span class="doccomment">/// if matches.is_present(&quot;out&quot;) {</span>
-<span class="doccomment">///     // Another way to check if an argument was present, or if it occurred multiple times is to</span>
-<span class="doccomment">///     // use occurrences_of() which returns 0 if an argument isn&#39;t found at runtime, or the</span>
-<span class="doccomment">///     // number of times that it occurred, if it was. To allow an argument to appear more than</span>
-<span class="doccomment">///     // once, you must use the .multiple(true) method, otherwise it will only return 1 or 0.</span>
-<span class="doccomment">///     if matches.occurrences_of(&quot;debug&quot;) &gt; 2 {</span>
-<span class="doccomment">///         println!(&quot;Debug mode is REALLY on, don&#39;t be crazy&quot;);</span>
-<span class="doccomment">///     } else {</span>
-<span class="doccomment">///         println!(&quot;Debug mode kind of on&quot;);</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// [`App::get_matches`]: ./struct.App.html#method.get_matches</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ArgMatches</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">args</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">MatchedArg</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">subcommand</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">SubCommand</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">usage</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Used to get information about the arguments that were supplied to the program at runtime by
+/// the user. New instances of this struct are obtained by using the [`App::get_matches`] family of
+/// methods.
+///
+/// # Examples
+///
+/// ```no_run
+/// # use clap::{App, Arg};
+/// let matches = App::new(&quot;MyApp&quot;)
+///     .arg(Arg::with_name(&quot;out&quot;)
+///         .long(&quot;output&quot;)
+///         .required(true)
+///         .takes_value(true))
+///     .arg(Arg::with_name(&quot;debug&quot;)
+///         .short(&quot;d&quot;)
+///         .multiple(true))
+///     .arg(Arg::with_name(&quot;cfg&quot;)
+///         .short(&quot;c&quot;)
+///         .takes_value(true))
+///     .get_matches(); // builds the instance of ArgMatches
+///
+/// // to get information about the &quot;cfg&quot; argument we created, such as the value supplied we use
+/// // various ArgMatches methods, such as ArgMatches::value_of
+/// if let Some(c) = matches.value_of(&quot;cfg&quot;) {
+///     println!(&quot;Value for -c: {}&quot;, c);
+/// }
+///
+/// // The ArgMatches::value_of method returns an Option because the user may not have supplied
+/// // that argument at runtime. But if we specified that the argument was &quot;required&quot; as we did
+/// // with the &quot;out&quot; argument, we can safely unwrap because `clap` verifies that was actually
+/// // used at runtime.
+/// println!(&quot;Value for --output: {}&quot;, matches.value_of(&quot;out&quot;).unwrap());
+///
+/// // You can check the presence of an argument
+/// if matches.is_present(&quot;out&quot;) {
+///     // Another way to check if an argument was present, or if it occurred multiple times is to
+///     // use occurrences_of() which returns 0 if an argument isn&#39;t found at runtime, or the
+///     // number of times that it occurred, if it was. To allow an argument to appear more than
+///     // once, you must use the .multiple(true) method, otherwise it will only return 1 or 0.
+///     if matches.occurrences_of(&quot;debug&quot;) &gt; 2 {
+///         println!(&quot;Debug mode is REALLY on, don&#39;t be crazy&quot;);
+///     } else {
+///         println!(&quot;Debug mode kind of on&quot;);
+///     }
+/// }
+/// ```
+/// [`App::get_matches`]: ./struct.App.html#method.get_matches
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>ArgMatches&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>args: HashMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, MatchedArg&gt;,
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>subcommand: <span class="prelude-ty">Option</span>&lt;Box&lt;SubCommand&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt;,
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>usage: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ArgMatches</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">ArgMatches</span> {
-            <span class="ident">args</span>: <span class="ident">HashMap::new</span>(),
-            <span class="ident">subcommand</span>: <span class="prelude-val">None</span>,
-            <span class="ident">usage</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Default <span class="kw">for </span>ArgMatches&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        ArgMatches {
+            args: HashMap::new(),
+            subcommand: <span class="prelude-val">None</span>,
+            usage: <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ArgMatches</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">ArgMatches</span> {
-            ..<span class="ident">Default::default</span>()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ArgMatches&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        ArgMatches {
+            ..Default::default()
         }
     }
 
-    <span class="doccomment">/// Gets the value of a specific [option] or [positional] argument (i.e. an argument that takes</span>
-    <span class="doccomment">/// an additional value at runtime). If the option wasn&#39;t present at runtime</span>
-    <span class="doccomment">/// it returns `None`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// *NOTE:* If getting a value for an option or positional argument that allows multiples,</span>
-    <span class="doccomment">/// prefer [`ArgMatches::values_of`] as `ArgMatches::value_of` will only return the *first*</span>
-    <span class="doccomment">/// value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method will [`panic!`] if the value contains invalid UTF-8 code points.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg};</span>
-    <span class="doccomment">/// let m = App::new(&quot;myapp&quot;)</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;output&quot;)</span>
-    <span class="doccomment">///         .takes_value(true))</span>
-    <span class="doccomment">///     .get_matches_from(vec![&quot;myapp&quot;, &quot;something&quot;]);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(m.value_of(&quot;output&quot;), Some(&quot;something&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [option]: ./struct.Arg.html#method.takes_value</span>
-    <span class="doccomment">/// [positional]: ./struct.Arg.html#method.index</span>
-    <span class="doccomment">/// [`ArgMatches::values_of`]: ./struct.ArgMatches.html#method.values_of</span>
-    <span class="doccomment">/// [`panic!`]: https://doc.rust-lang.org/std/macro.panic!.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value_of</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">arg</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">get</span>(<span class="ident">name</span>.<span class="ident">as_ref</span>()) {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="ident">arg</span>.<span class="ident">vals</span>.<span class="ident">get</span>(<span class="number">0</span>) {
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>.<span class="ident">to_str</span>().<span class="ident">expect</span>(<span class="ident">INVALID_UTF8</span>));
+    <span class="doccomment">/// Gets the value of a specific [option] or [positional] argument (i.e. an argument that takes
+    /// an additional value at runtime). If the option wasn&#39;t present at runtime
+    /// it returns `None`.
+    ///
+    /// *NOTE:* If getting a value for an option or positional argument that allows multiples,
+    /// prefer [`ArgMatches::values_of`] as `ArgMatches::value_of` will only return the *first*
+    /// value.
+    ///
+    /// # Panics
+    ///
+    /// This method will [`panic!`] if the value contains invalid UTF-8 code points.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg};
+    /// let m = App::new(&quot;myapp&quot;)
+    ///     .arg(Arg::with_name(&quot;output&quot;)
+    ///         .takes_value(true))
+    ///     .get_matches_from(vec![&quot;myapp&quot;, &quot;something&quot;]);
+    ///
+    /// assert_eq!(m.value_of(&quot;output&quot;), Some(&quot;something&quot;));
+    /// ```
+    /// [option]: ./struct.Arg.html#method.takes_value
+    /// [positional]: ./struct.Arg.html#method.index
+    /// [`ArgMatches::values_of`]: ./struct.ArgMatches.html#method.values_of
+    /// [`panic!`]: https://doc.rust-lang.org/std/macro.panic!.html
+    </span><span class="kw">pub fn </span>value_of&lt;S: AsRef&lt;str&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, name: S) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(arg) = <span class="self">self</span>.args.get(name.as_ref()) {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(v) = arg.vals.get(<span class="number">0</span>) {
+                <span class="kw">return </span><span class="prelude-val">Some</span>(v.to_str().expect(INVALID_UTF8));
             }
         }
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">None
+    </span>}
 
-    <span class="doccomment">/// Gets the lossy value of a specific argument. If the argument wasn&#39;t present at runtime</span>
-    <span class="doccomment">/// it returns `None`. A lossy value is one which contains invalid UTF-8 code points, those</span>
-    <span class="doccomment">/// invalid points will be replaced with `\u{FFFD}`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// *NOTE:* If getting a value for an option or positional argument that allows multiples,</span>
-    <span class="doccomment">/// prefer [`Arg::values_of_lossy`] as `value_of_lossy()` will only return the *first* value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">unix</span>), <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; ```ignore&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">unix</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; ```&quot;</span>)]</span>
-    <span class="doccomment">/// # use clap::{App, Arg};</span>
-    <span class="doccomment">/// use std::ffi::OsString;</span>
-    <span class="doccomment">/// use std::os::unix::ffi::{OsStrExt,OsStringExt};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let m = App::new(&quot;utf8&quot;)</span>
-    <span class="doccomment">///     .arg(Arg::from_usage(&quot;&lt;arg&gt; &#39;some arg&#39;&quot;))</span>
-    <span class="doccomment">///     .get_matches_from(vec![OsString::from(&quot;myprog&quot;),</span>
-    <span class="doccomment">///                             // &quot;Hi {0xe9}!&quot;</span>
-    <span class="doccomment">///                             OsString::from_vec(vec![b&#39;H&#39;, b&#39;i&#39;, b&#39; &#39;, 0xe9, b&#39;!&#39;])]);</span>
-    <span class="doccomment">/// assert_eq!(&amp;*m.value_of_lossy(&quot;arg&quot;).unwrap(), &quot;Hi \u{FFFD}!&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [`Arg::values_of_lossy`]: ./struct.ArgMatches.html#method.values_of_lossy</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value_of_lossy</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">arg</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">get</span>(<span class="ident">name</span>.<span class="ident">as_ref</span>()) {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="ident">arg</span>.<span class="ident">vals</span>.<span class="ident">get</span>(<span class="number">0</span>) {
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>.<span class="ident">to_string_lossy</span>());
+    <span class="doccomment">/// Gets the lossy value of a specific argument. If the argument wasn&#39;t present at runtime
+    /// it returns `None`. A lossy value is one which contains invalid UTF-8 code points, those
+    /// invalid points will be replaced with `\u{FFFD}`
+    ///
+    /// *NOTE:* If getting a value for an option or positional argument that allows multiples,
+    /// prefer [`Arg::values_of_lossy`] as `value_of_lossy()` will only return the *first* value.
+    ///
+    /// # Examples
+    ///
+    </span><span class="attribute">#[cfg_attr(not(unix), doc = <span class="string">&quot; ```ignore&quot;</span>)]
+    #[cfg_attr(unix, doc = <span class="string">&quot; ```&quot;</span>)]
+    </span><span class="doccomment">/// # use clap::{App, Arg};
+    /// use std::ffi::OsString;
+    /// use std::os::unix::ffi::{OsStrExt,OsStringExt};
+    ///
+    /// let m = App::new(&quot;utf8&quot;)
+    ///     .arg(Arg::from_usage(&quot;&lt;arg&gt; &#39;some arg&#39;&quot;))
+    ///     .get_matches_from(vec![OsString::from(&quot;myprog&quot;),
+    ///                             // &quot;Hi {0xe9}!&quot;
+    ///                             OsString::from_vec(vec![b&#39;H&#39;, b&#39;i&#39;, b&#39; &#39;, 0xe9, b&#39;!&#39;])]);
+    /// assert_eq!(&amp;*m.value_of_lossy(&quot;arg&quot;).unwrap(), &quot;Hi \u{FFFD}!&quot;);
+    /// ```
+    /// [`Arg::values_of_lossy`]: ./struct.ArgMatches.html#method.values_of_lossy
+    </span><span class="kw">pub fn </span>value_of_lossy&lt;S: AsRef&lt;str&gt;&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, name: S) -&gt; <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(arg) = <span class="self">self</span>.args.get(name.as_ref()) {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(v) = arg.vals.get(<span class="number">0</span>) {
+                <span class="kw">return </span><span class="prelude-val">Some</span>(v.to_string_lossy());
             }
         }
-        <span class="prelude-val">None</span>
+        <span class="prelude-val">None
+    </span>}
+
+    <span class="doccomment">/// Gets the OS version of a string value of a specific argument. If the option wasn&#39;t present
+    /// at runtime it returns `None`. An OS value on Unix-like systems is any series of bytes,
+    /// regardless of whether or not they contain valid UTF-8 code points. Since [`String`]s in
+    /// Rust are guaranteed to be valid UTF-8, a valid filename on a Unix system as an argument
+    /// value may contain invalid UTF-8 code points.
+    ///
+    /// *NOTE:* If getting a value for an option or positional argument that allows multiples,
+    /// prefer [`ArgMatches::values_of_os`] as `Arg::value_of_os` will only return the *first*
+    /// value.
+    ///
+    /// # Examples
+    ///
+    </span><span class="attribute">#[cfg_attr(not(unix), doc = <span class="string">&quot; ```ignore&quot;</span>)]
+    #[cfg_attr(unix, doc = <span class="string">&quot; ```&quot;</span>)]
+    </span><span class="doccomment">/// # use clap::{App, Arg};
+    /// use std::ffi::OsString;
+    /// use std::os::unix::ffi::{OsStrExt,OsStringExt};
+    ///
+    /// let m = App::new(&quot;utf8&quot;)
+    ///     .arg(Arg::from_usage(&quot;&lt;arg&gt; &#39;some arg&#39;&quot;))
+    ///     .get_matches_from(vec![OsString::from(&quot;myprog&quot;),
+    ///                             // &quot;Hi {0xe9}!&quot;
+    ///                             OsString::from_vec(vec![b&#39;H&#39;, b&#39;i&#39;, b&#39; &#39;, 0xe9, b&#39;!&#39;])]);
+    /// assert_eq!(&amp;*m.value_of_os(&quot;arg&quot;).unwrap().as_bytes(), [b&#39;H&#39;, b&#39;i&#39;, b&#39; &#39;, 0xe9, b&#39;!&#39;]);
+    /// ```
+    /// [`String`]: https://doc.rust-lang.org/std/string/struct.String.html
+    /// [`ArgMatches::values_of_os`]: ./struct.ArgMatches.html#method.values_of_os
+    </span><span class="kw">pub fn </span>value_of_os&lt;S: AsRef&lt;str&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, name: S) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>OsStr&gt; {
+        <span class="self">self</span>.args
+            .get(name.as_ref())
+            .and_then(|arg| arg.vals.get(<span class="number">0</span>).map(|v| v.as_os_str()))
     }
 
-    <span class="doccomment">/// Gets the OS version of a string value of a specific argument. If the option wasn&#39;t present</span>
-    <span class="doccomment">/// at runtime it returns `None`. An OS value on Unix-like systems is any series of bytes,</span>
-    <span class="doccomment">/// regardless of whether or not they contain valid UTF-8 code points. Since [`String`]s in</span>
-    <span class="doccomment">/// Rust are guaranteed to be valid UTF-8, a valid filename on a Unix system as an argument</span>
-    <span class="doccomment">/// value may contain invalid UTF-8 code points.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// *NOTE:* If getting a value for an option or positional argument that allows multiples,</span>
-    <span class="doccomment">/// prefer [`ArgMatches::values_of_os`] as `Arg::value_of_os` will only return the *first*</span>
-    <span class="doccomment">/// value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">unix</span>), <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; ```ignore&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">unix</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; ```&quot;</span>)]</span>
-    <span class="doccomment">/// # use clap::{App, Arg};</span>
-    <span class="doccomment">/// use std::ffi::OsString;</span>
-    <span class="doccomment">/// use std::os::unix::ffi::{OsStrExt,OsStringExt};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let m = App::new(&quot;utf8&quot;)</span>
-    <span class="doccomment">///     .arg(Arg::from_usage(&quot;&lt;arg&gt; &#39;some arg&#39;&quot;))</span>
-    <span class="doccomment">///     .get_matches_from(vec![OsString::from(&quot;myprog&quot;),</span>
-    <span class="doccomment">///                             // &quot;Hi {0xe9}!&quot;</span>
-    <span class="doccomment">///                             OsString::from_vec(vec![b&#39;H&#39;, b&#39;i&#39;, b&#39; &#39;, 0xe9, b&#39;!&#39;])]);</span>
-    <span class="doccomment">/// assert_eq!(&amp;*m.value_of_os(&quot;arg&quot;).unwrap().as_bytes(), [b&#39;H&#39;, b&#39;i&#39;, b&#39; &#39;, 0xe9, b&#39;!&#39;]);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [`String`]: https://doc.rust-lang.org/std/string/struct.String.html</span>
-    <span class="doccomment">/// [`ArgMatches::values_of_os`]: ./struct.ArgMatches.html#method.values_of_os</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value_of_os</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">OsStr</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">args</span>
-            .<span class="ident">get</span>(<span class="ident">name</span>.<span class="ident">as_ref</span>())
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">arg</span>.<span class="ident">vals</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_os_str</span>()))
-    }
-
-    <span class="doccomment">/// Gets a [`Values`] struct which implements [`Iterator`] for values of a specific argument</span>
-    <span class="doccomment">/// (i.e. an argument that takes multiple values at runtime). If the option wasn&#39;t present at</span>
-    <span class="doccomment">/// runtime it returns `None`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method will panic if any of the values contain invalid UTF-8 code points.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg};</span>
-    <span class="doccomment">/// let m = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;output&quot;)</span>
-    <span class="doccomment">///         .multiple(true)</span>
-    <span class="doccomment">///         .short(&quot;o&quot;)</span>
-    <span class="doccomment">///         .takes_value(true))</span>
-    <span class="doccomment">///     .get_matches_from(vec![</span>
-    <span class="doccomment">///         &quot;myprog&quot;, &quot;-o&quot;, &quot;val1&quot;, &quot;val2&quot;, &quot;val3&quot;</span>
-    <span class="doccomment">///     ]);</span>
-    <span class="doccomment">/// let vals: Vec&lt;&amp;str&gt; = m.values_of(&quot;output&quot;).unwrap().collect();</span>
-    <span class="doccomment">/// assert_eq!(vals, [&quot;val1&quot;, &quot;val2&quot;, &quot;val3&quot;]);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [`Values`]: ./struct.Values.html</span>
-    <span class="doccomment">/// [`Iterator`]: https://doc.rust-lang.org/std/iter/trait.Iterator.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">values_of</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Values</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">arg</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">get</span>(<span class="ident">name</span>.<span class="ident">as_ref</span>()) {
-            <span class="kw">fn</span> <span class="ident">to_str_slice</span>(<span class="ident">o</span>: <span class="kw-2">&amp;</span><span class="ident">OsString</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-                <span class="ident">o</span>.<span class="ident">to_str</span>().<span class="ident">expect</span>(<span class="ident">INVALID_UTF8</span>)
+    <span class="doccomment">/// Gets a [`Values`] struct which implements [`Iterator`] for values of a specific argument
+    /// (i.e. an argument that takes multiple values at runtime). If the option wasn&#39;t present at
+    /// runtime it returns `None`
+    ///
+    /// # Panics
+    ///
+    /// This method will panic if any of the values contain invalid UTF-8 code points.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg};
+    /// let m = App::new(&quot;myprog&quot;)
+    ///     .arg(Arg::with_name(&quot;output&quot;)
+    ///         .multiple(true)
+    ///         .short(&quot;o&quot;)
+    ///         .takes_value(true))
+    ///     .get_matches_from(vec![
+    ///         &quot;myprog&quot;, &quot;-o&quot;, &quot;val1&quot;, &quot;val2&quot;, &quot;val3&quot;
+    ///     ]);
+    /// let vals: Vec&lt;&amp;str&gt; = m.values_of(&quot;output&quot;).unwrap().collect();
+    /// assert_eq!(vals, [&quot;val1&quot;, &quot;val2&quot;, &quot;val3&quot;]);
+    /// ```
+    /// [`Values`]: ./struct.Values.html
+    /// [`Iterator`]: https://doc.rust-lang.org/std/iter/trait.Iterator.html
+    </span><span class="kw">pub fn </span>values_of&lt;S: AsRef&lt;str&gt;&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, name: S) -&gt; <span class="prelude-ty">Option</span>&lt;Values&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(arg) = <span class="self">self</span>.args.get(name.as_ref()) {
+            <span class="kw">fn </span>to_str_slice(o: <span class="kw-2">&amp;</span>OsString) -&gt; <span class="kw-2">&amp;</span>str {
+                o.to_str().expect(INVALID_UTF8)
             }
-            <span class="kw">let</span> <span class="ident">to_str_slice</span>: <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="ident">OsString</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="ident">to_str_slice</span>; <span class="comment">// coerce to fn pointer</span>
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">Values</span> {
-                <span class="ident">iter</span>: <span class="ident">arg</span>.<span class="ident">vals</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">to_str_slice</span>),
+            <span class="kw">let </span>to_str_slice: <span class="kw">fn</span>(<span class="kw-2">&amp;</span>OsString) -&gt; <span class="kw-2">&amp;</span>str = to_str_slice; <span class="comment">// coerce to fn pointer
+            </span><span class="kw">return </span><span class="prelude-val">Some</span>(Values {
+                iter: arg.vals.iter().map(to_str_slice),
             });
         }
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">None
+    </span>}
 
-    <span class="doccomment">/// Gets the lossy values of a specific argument. If the option wasn&#39;t present at runtime</span>
-    <span class="doccomment">/// it returns `None`. A lossy value is one where if it contains invalid UTF-8 code points,</span>
-    <span class="doccomment">/// those invalid points will be replaced with `\u{FFFD}`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">unix</span>), <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; ```ignore&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">unix</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; ```&quot;</span>)]</span>
-    <span class="doccomment">/// # use clap::{App, Arg};</span>
-    <span class="doccomment">/// use std::ffi::OsString;</span>
-    <span class="doccomment">/// use std::os::unix::ffi::OsStringExt;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let m = App::new(&quot;utf8&quot;)</span>
-    <span class="doccomment">///     .arg(Arg::from_usage(&quot;&lt;arg&gt;... &#39;some arg&#39;&quot;))</span>
-    <span class="doccomment">///     .get_matches_from(vec![OsString::from(&quot;myprog&quot;),</span>
-    <span class="doccomment">///                             // &quot;Hi&quot;</span>
-    <span class="doccomment">///                             OsString::from_vec(vec![b&#39;H&#39;, b&#39;i&#39;]),</span>
-    <span class="doccomment">///                             // &quot;{0xe9}!&quot;</span>
-    <span class="doccomment">///                             OsString::from_vec(vec![0xe9, b&#39;!&#39;])]);</span>
-    <span class="doccomment">/// let mut itr = m.values_of_lossy(&quot;arg&quot;).unwrap().into_iter();</span>
-    <span class="doccomment">/// assert_eq!(&amp;itr.next().unwrap()[..], &quot;Hi&quot;);</span>
-    <span class="doccomment">/// assert_eq!(&amp;itr.next().unwrap()[..], &quot;\u{FFFD}!&quot;);</span>
-    <span class="doccomment">/// assert_eq!(itr.next(), None);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">values_of_lossy</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">arg</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">get</span>(<span class="ident">name</span>.<span class="ident">as_ref</span>()) {
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(
-                <span class="ident">arg</span>.<span class="ident">vals</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">to_string_lossy</span>().<span class="ident">into_owned</span>())
-                    .<span class="ident">collect</span>(),
+    <span class="doccomment">/// Gets the lossy values of a specific argument. If the option wasn&#39;t present at runtime
+    /// it returns `None`. A lossy value is one where if it contains invalid UTF-8 code points,
+    /// those invalid points will be replaced with `\u{FFFD}`
+    ///
+    /// # Examples
+    ///
+    </span><span class="attribute">#[cfg_attr(not(unix), doc = <span class="string">&quot; ```ignore&quot;</span>)]
+    #[cfg_attr(unix, doc = <span class="string">&quot; ```&quot;</span>)]
+    </span><span class="doccomment">/// # use clap::{App, Arg};
+    /// use std::ffi::OsString;
+    /// use std::os::unix::ffi::OsStringExt;
+    ///
+    /// let m = App::new(&quot;utf8&quot;)
+    ///     .arg(Arg::from_usage(&quot;&lt;arg&gt;... &#39;some arg&#39;&quot;))
+    ///     .get_matches_from(vec![OsString::from(&quot;myprog&quot;),
+    ///                             // &quot;Hi&quot;
+    ///                             OsString::from_vec(vec![b&#39;H&#39;, b&#39;i&#39;]),
+    ///                             // &quot;{0xe9}!&quot;
+    ///                             OsString::from_vec(vec![0xe9, b&#39;!&#39;])]);
+    /// let mut itr = m.values_of_lossy(&quot;arg&quot;).unwrap().into_iter();
+    /// assert_eq!(&amp;itr.next().unwrap()[..], &quot;Hi&quot;);
+    /// assert_eq!(&amp;itr.next().unwrap()[..], &quot;\u{FFFD}!&quot;);
+    /// assert_eq!(itr.next(), None);
+    /// ```
+    </span><span class="kw">pub fn </span>values_of_lossy&lt;S: AsRef&lt;str&gt;&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, name: S) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(arg) = <span class="self">self</span>.args.get(name.as_ref()) {
+            <span class="kw">return </span><span class="prelude-val">Some</span>(
+                arg.vals
+                    .iter()
+                    .map(|v| v.to_string_lossy().into_owned())
+                    .collect(),
             );
         }
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">None
+    </span>}
 
-    <span class="doccomment">/// Gets a [`OsValues`] struct which is implements [`Iterator`] for [`OsString`] values of a</span>
-    <span class="doccomment">/// specific argument. If the option wasn&#39;t present at runtime it returns `None`. An OS value</span>
-    <span class="doccomment">/// on Unix-like systems is any series of bytes, regardless of whether or not they contain</span>
-    <span class="doccomment">/// valid UTF-8 code points. Since [`String`]s in Rust are guaranteed to be valid UTF-8, a valid</span>
-    <span class="doccomment">/// filename as an argument value on Linux (for example) may contain invalid UTF-8 code points.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">unix</span>), <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; ```ignore&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">unix</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; ```&quot;</span>)]</span>
-    <span class="doccomment">/// # use clap::{App, Arg};</span>
-    <span class="doccomment">/// use std::ffi::{OsStr,OsString};</span>
-    <span class="doccomment">/// use std::os::unix::ffi::{OsStrExt,OsStringExt};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let m = App::new(&quot;utf8&quot;)</span>
-    <span class="doccomment">///     .arg(Arg::from_usage(&quot;&lt;arg&gt;... &#39;some arg&#39;&quot;))</span>
-    <span class="doccomment">///     .get_matches_from(vec![OsString::from(&quot;myprog&quot;),</span>
-    <span class="doccomment">///                                 // &quot;Hi&quot;</span>
-    <span class="doccomment">///                                 OsString::from_vec(vec![b&#39;H&#39;, b&#39;i&#39;]),</span>
-    <span class="doccomment">///                                 // &quot;{0xe9}!&quot;</span>
-    <span class="doccomment">///                                 OsString::from_vec(vec![0xe9, b&#39;!&#39;])]);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut itr = m.values_of_os(&quot;arg&quot;).unwrap().into_iter();</span>
-    <span class="doccomment">/// assert_eq!(itr.next(), Some(OsStr::new(&quot;Hi&quot;)));</span>
-    <span class="doccomment">/// assert_eq!(itr.next(), Some(OsStr::from_bytes(&amp;[0xe9, b&#39;!&#39;])));</span>
-    <span class="doccomment">/// assert_eq!(itr.next(), None);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [`OsValues`]: ./struct.OsValues.html</span>
-    <span class="doccomment">/// [`Iterator`]: https://doc.rust-lang.org/std/iter/trait.Iterator.html</span>
-    <span class="doccomment">/// [`OsString`]: https://doc.rust-lang.org/std/ffi/struct.OsString.html</span>
-    <span class="doccomment">/// [`String`]: https://doc.rust-lang.org/std/string/struct.String.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">values_of_os</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OsValues</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">to_str_slice</span>(<span class="ident">o</span>: <span class="kw-2">&amp;</span><span class="ident">OsString</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">OsStr</span> {
-            <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">o</span>
+    <span class="doccomment">/// Gets a [`OsValues`] struct which is implements [`Iterator`] for [`OsString`] values of a
+    /// specific argument. If the option wasn&#39;t present at runtime it returns `None`. An OS value
+    /// on Unix-like systems is any series of bytes, regardless of whether or not they contain
+    /// valid UTF-8 code points. Since [`String`]s in Rust are guaranteed to be valid UTF-8, a valid
+    /// filename as an argument value on Linux (for example) may contain invalid UTF-8 code points.
+    ///
+    /// # Examples
+    ///
+    </span><span class="attribute">#[cfg_attr(not(unix), doc = <span class="string">&quot; ```ignore&quot;</span>)]
+    #[cfg_attr(unix, doc = <span class="string">&quot; ```&quot;</span>)]
+    </span><span class="doccomment">/// # use clap::{App, Arg};
+    /// use std::ffi::{OsStr,OsString};
+    /// use std::os::unix::ffi::{OsStrExt,OsStringExt};
+    ///
+    /// let m = App::new(&quot;utf8&quot;)
+    ///     .arg(Arg::from_usage(&quot;&lt;arg&gt;... &#39;some arg&#39;&quot;))
+    ///     .get_matches_from(vec![OsString::from(&quot;myprog&quot;),
+    ///                                 // &quot;Hi&quot;
+    ///                                 OsString::from_vec(vec![b&#39;H&#39;, b&#39;i&#39;]),
+    ///                                 // &quot;{0xe9}!&quot;
+    ///                                 OsString::from_vec(vec![0xe9, b&#39;!&#39;])]);
+    ///
+    /// let mut itr = m.values_of_os(&quot;arg&quot;).unwrap().into_iter();
+    /// assert_eq!(itr.next(), Some(OsStr::new(&quot;Hi&quot;)));
+    /// assert_eq!(itr.next(), Some(OsStr::from_bytes(&amp;[0xe9, b&#39;!&#39;])));
+    /// assert_eq!(itr.next(), None);
+    /// ```
+    /// [`OsValues`]: ./struct.OsValues.html
+    /// [`Iterator`]: https://doc.rust-lang.org/std/iter/trait.Iterator.html
+    /// [`OsString`]: https://doc.rust-lang.org/std/ffi/struct.OsString.html
+    /// [`String`]: https://doc.rust-lang.org/std/string/struct.String.html
+    </span><span class="kw">pub fn </span>values_of_os&lt;S: AsRef&lt;str&gt;&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, name: S) -&gt; <span class="prelude-ty">Option</span>&lt;OsValues&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="kw">fn </span>to_str_slice(o: <span class="kw-2">&amp;</span>OsString) -&gt; <span class="kw-2">&amp;</span>OsStr {
+            <span class="kw-2">&amp;*</span>o
         }
-        <span class="kw">let</span> <span class="ident">to_str_slice</span>: <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">OsString</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">OsStr</span> <span class="op">=</span> <span class="ident">to_str_slice</span>; <span class="comment">// coerce to fn pointer</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">arg</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">get</span>(<span class="ident">name</span>.<span class="ident">as_ref</span>()) {
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">OsValues</span> {
-                <span class="ident">iter</span>: <span class="ident">arg</span>.<span class="ident">vals</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">to_str_slice</span>),
+        <span class="kw">let </span>to_str_slice: <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>OsString) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>OsStr = to_str_slice; <span class="comment">// coerce to fn pointer
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(arg) = <span class="self">self</span>.args.get(name.as_ref()) {
+            <span class="kw">return </span><span class="prelude-val">Some</span>(OsValues {
+                iter: arg.vals.iter().map(to_str_slice),
             });
         }
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">None
+    </span>}
 
-    <span class="doccomment">/// Returns `true` if an argument was present at runtime, otherwise `false`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg};</span>
-    <span class="doccomment">/// let m = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;debug&quot;)</span>
-    <span class="doccomment">///         .short(&quot;d&quot;))</span>
-    <span class="doccomment">///     .get_matches_from(vec![</span>
-    <span class="doccomment">///         &quot;myprog&quot;, &quot;-d&quot;</span>
-    <span class="doccomment">///     ]);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(m.is_present(&quot;debug&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_present</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">S</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">sc</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">subcommand</span> {
-            <span class="kw">if</span> <span class="ident">sc</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">name</span>.<span class="ident">as_ref</span>() {
-                <span class="kw">return</span> <span class="bool-val">true</span>;
+    <span class="doccomment">/// Returns `true` if an argument was present at runtime, otherwise `false`.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg};
+    /// let m = App::new(&quot;myprog&quot;)
+    ///     .arg(Arg::with_name(&quot;debug&quot;)
+    ///         .short(&quot;d&quot;))
+    ///     .get_matches_from(vec![
+    ///         &quot;myprog&quot;, &quot;-d&quot;
+    ///     ]);
+    ///
+    /// assert!(m.is_present(&quot;debug&quot;));
+    /// ```
+    </span><span class="kw">pub fn </span>is_present&lt;S: AsRef&lt;str&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, name: S) -&gt; bool {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>sc) = <span class="self">self</span>.subcommand {
+            <span class="kw">if </span>sc.name == name.as_ref() {
+                <span class="kw">return </span><span class="bool-val">true</span>;
             }
         }
-        <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">contains_key</span>(<span class="ident">name</span>.<span class="ident">as_ref</span>())
+        <span class="self">self</span>.args.contains_key(name.as_ref())
     }
 
-    <span class="doccomment">/// Returns the number of times an argument was used at runtime. If an argument isn&#39;t present</span>
-    <span class="doccomment">/// it will return `0`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **NOTE:** This returns the number of times the argument was used, *not* the number of</span>
-    <span class="doccomment">/// values. For example, `-o val1 val2 val3 -o val4` would return `2` (2 occurrences, but 4</span>
-    <span class="doccomment">/// values).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg};</span>
-    <span class="doccomment">/// let m = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;debug&quot;)</span>
-    <span class="doccomment">///         .short(&quot;d&quot;)</span>
-    <span class="doccomment">///         .multiple(true))</span>
-    <span class="doccomment">///     .get_matches_from(vec![</span>
-    <span class="doccomment">///         &quot;myprog&quot;, &quot;-d&quot;, &quot;-d&quot;, &quot;-d&quot;</span>
-    <span class="doccomment">///     ]);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(m.occurrences_of(&quot;debug&quot;), 3);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This next example shows that counts actual uses of the argument, not just `-`&#39;s</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg};</span>
-    <span class="doccomment">/// let m = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;debug&quot;)</span>
-    <span class="doccomment">///         .short(&quot;d&quot;)</span>
-    <span class="doccomment">///         .multiple(true))</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;flag&quot;)</span>
-    <span class="doccomment">///         .short(&quot;f&quot;))</span>
-    <span class="doccomment">///     .get_matches_from(vec![</span>
-    <span class="doccomment">///         &quot;myprog&quot;, &quot;-ddfd&quot;</span>
-    <span class="doccomment">///     ]);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(m.occurrences_of(&quot;debug&quot;), 3);</span>
-    <span class="doccomment">/// assert_eq!(m.occurrences_of(&quot;flag&quot;), 1);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">occurrences_of</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">S</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">get</span>(<span class="ident">name</span>.<span class="ident">as_ref</span>()).<span class="ident">map_or</span>(<span class="number">0</span>, <span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">occurs</span>)
+    <span class="doccomment">/// Returns the number of times an argument was used at runtime. If an argument isn&#39;t present
+    /// it will return `0`.
+    ///
+    /// **NOTE:** This returns the number of times the argument was used, *not* the number of
+    /// values. For example, `-o val1 val2 val3 -o val4` would return `2` (2 occurrences, but 4
+    /// values).
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg};
+    /// let m = App::new(&quot;myprog&quot;)
+    ///     .arg(Arg::with_name(&quot;debug&quot;)
+    ///         .short(&quot;d&quot;)
+    ///         .multiple(true))
+    ///     .get_matches_from(vec![
+    ///         &quot;myprog&quot;, &quot;-d&quot;, &quot;-d&quot;, &quot;-d&quot;
+    ///     ]);
+    ///
+    /// assert_eq!(m.occurrences_of(&quot;debug&quot;), 3);
+    /// ```
+    ///
+    /// This next example shows that counts actual uses of the argument, not just `-`&#39;s
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg};
+    /// let m = App::new(&quot;myprog&quot;)
+    ///     .arg(Arg::with_name(&quot;debug&quot;)
+    ///         .short(&quot;d&quot;)
+    ///         .multiple(true))
+    ///     .arg(Arg::with_name(&quot;flag&quot;)
+    ///         .short(&quot;f&quot;))
+    ///     .get_matches_from(vec![
+    ///         &quot;myprog&quot;, &quot;-ddfd&quot;
+    ///     ]);
+    ///
+    /// assert_eq!(m.occurrences_of(&quot;debug&quot;), 3);
+    /// assert_eq!(m.occurrences_of(&quot;flag&quot;), 1);
+    /// ```
+    </span><span class="kw">pub fn </span>occurrences_of&lt;S: AsRef&lt;str&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, name: S) -&gt; u64 {
+        <span class="self">self</span>.args.get(name.as_ref()).map_or(<span class="number">0</span>, |a| a.occurs)
     }
 
-    <span class="doccomment">/// Gets the starting index of the argument in respect to all other arguments. Indices are</span>
-    <span class="doccomment">/// similar to argv indices, but are not exactly 1:1.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For flags (i.e. those arguments which don&#39;t have an associated value), indices refer</span>
-    <span class="doccomment">/// to occurrence of the switch, such as `-f`, or `--flag`. However, for options the indices</span>
-    <span class="doccomment">/// refer to the *values* `-o val` would therefore not represent two distinct indices, only the</span>
-    <span class="doccomment">/// index for `val` would be recorded. This is by design.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Besides the flag/option descrepancy, the primary difference between an argv index and clap</span>
-    <span class="doccomment">/// index, is that clap continues counting once all arguments have properly seperated, whereas</span>
-    <span class="doccomment">/// an argv index does not.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The examples should clear this up.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// *NOTE:* If an argument is allowed multiple times, this method will only give the *first*</span>
-    <span class="doccomment">/// index.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The argv indices are listed in the comments below. See how they correspond to the clap</span>
-    <span class="doccomment">/// indices. Note that if it&#39;s not listed in a clap index, this is becuase it&#39;s not saved in</span>
-    <span class="doccomment">/// in an `ArgMatches` struct for querying.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg};</span>
-    <span class="doccomment">/// let m = App::new(&quot;myapp&quot;)</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;flag&quot;)</span>
-    <span class="doccomment">///         .short(&quot;f&quot;))</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;option&quot;)</span>
-    <span class="doccomment">///         .short(&quot;o&quot;)</span>
-    <span class="doccomment">///         .takes_value(true))</span>
-    <span class="doccomment">///     .get_matches_from(vec![&quot;myapp&quot;, &quot;-f&quot;, &quot;-o&quot;, &quot;val&quot;]);</span>
-    <span class="doccomment">///             // ARGV idices: ^0       ^1    ^2    ^3</span>
-    <span class="doccomment">///             // clap idices:          ^1          ^3</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(m.index_of(&quot;flag&quot;), Some(1));</span>
-    <span class="doccomment">/// assert_eq!(m.index_of(&quot;option&quot;), Some(3));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Now notice, if we use one of the other styles of options:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg};</span>
-    <span class="doccomment">/// let m = App::new(&quot;myapp&quot;)</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;flag&quot;)</span>
-    <span class="doccomment">///         .short(&quot;f&quot;))</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;option&quot;)</span>
-    <span class="doccomment">///         .short(&quot;o&quot;)</span>
-    <span class="doccomment">///         .takes_value(true))</span>
-    <span class="doccomment">///     .get_matches_from(vec![&quot;myapp&quot;, &quot;-f&quot;, &quot;-o=val&quot;]);</span>
-    <span class="doccomment">///             // ARGV idices: ^0       ^1    ^2</span>
-    <span class="doccomment">///             // clap idices:          ^1       ^3</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(m.index_of(&quot;flag&quot;), Some(1));</span>
-    <span class="doccomment">/// assert_eq!(m.index_of(&quot;option&quot;), Some(3));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Things become much more complicated, or clear if we look at a more complex combination of</span>
-    <span class="doccomment">/// flags. Let&#39;s also throw in the final option style for good measure.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg};</span>
-    <span class="doccomment">/// let m = App::new(&quot;myapp&quot;)</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;flag&quot;)</span>
-    <span class="doccomment">///         .short(&quot;f&quot;))</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;flag2&quot;)</span>
-    <span class="doccomment">///         .short(&quot;F&quot;))</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;flag3&quot;)</span>
-    <span class="doccomment">///         .short(&quot;z&quot;))</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;option&quot;)</span>
-    <span class="doccomment">///         .short(&quot;o&quot;)</span>
-    <span class="doccomment">///         .takes_value(true))</span>
-    <span class="doccomment">///     .get_matches_from(vec![&quot;myapp&quot;, &quot;-fzF&quot;, &quot;-oval&quot;]);</span>
-    <span class="doccomment">///             // ARGV idices: ^0      ^1       ^2</span>
-    <span class="doccomment">///             // clap idices:         ^1,2,3    ^5</span>
-    <span class="doccomment">///             //</span>
-    <span class="doccomment">///             // clap sees the above as &#39;myapp -f -z -F -o val&#39;</span>
-    <span class="doccomment">///             //                         ^0    ^1 ^2 ^3 ^4 ^5</span>
-    <span class="doccomment">/// assert_eq!(m.index_of(&quot;flag&quot;), Some(1));</span>
-    <span class="doccomment">/// assert_eq!(m.index_of(&quot;flag2&quot;), Some(3));</span>
-    <span class="doccomment">/// assert_eq!(m.index_of(&quot;flag3&quot;), Some(2));</span>
-    <span class="doccomment">/// assert_eq!(m.index_of(&quot;option&quot;), Some(5));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// One final combination of flags/options to see how they combine:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg};</span>
-    <span class="doccomment">/// let m = App::new(&quot;myapp&quot;)</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;flag&quot;)</span>
-    <span class="doccomment">///         .short(&quot;f&quot;))</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;flag2&quot;)</span>
-    <span class="doccomment">///         .short(&quot;F&quot;))</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;flag3&quot;)</span>
-    <span class="doccomment">///         .short(&quot;z&quot;))</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;option&quot;)</span>
-    <span class="doccomment">///         .short(&quot;o&quot;)</span>
-    <span class="doccomment">///         .takes_value(true)</span>
-    <span class="doccomment">///         .multiple(true))</span>
-    <span class="doccomment">///     .get_matches_from(vec![&quot;myapp&quot;, &quot;-fzFoval&quot;]);</span>
-    <span class="doccomment">///             // ARGV idices: ^0       ^1</span>
-    <span class="doccomment">///             // clap idices:          ^1,2,3^5</span>
-    <span class="doccomment">///             //</span>
-    <span class="doccomment">///             // clap sees the above as &#39;myapp -f -z -F -o val&#39;</span>
-    <span class="doccomment">///             //                         ^0    ^1 ^2 ^3 ^4 ^5</span>
-    <span class="doccomment">/// assert_eq!(m.index_of(&quot;flag&quot;), Some(1));</span>
-    <span class="doccomment">/// assert_eq!(m.index_of(&quot;flag2&quot;), Some(3));</span>
-    <span class="doccomment">/// assert_eq!(m.index_of(&quot;flag3&quot;), Some(2));</span>
-    <span class="doccomment">/// assert_eq!(m.index_of(&quot;option&quot;), Some(5));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The last part to mention is when values are sent in multiple groups with a [delimiter].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg};</span>
-    <span class="doccomment">/// let m = App::new(&quot;myapp&quot;)</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;option&quot;)</span>
-    <span class="doccomment">///         .short(&quot;o&quot;)</span>
-    <span class="doccomment">///         .takes_value(true)</span>
-    <span class="doccomment">///         .multiple(true))</span>
-    <span class="doccomment">///     .get_matches_from(vec![&quot;myapp&quot;, &quot;-o=val1,val2,val3&quot;]);</span>
-    <span class="doccomment">///             // ARGV idices: ^0       ^1</span>
-    <span class="doccomment">///             // clap idices:             ^2   ^3   ^4</span>
-    <span class="doccomment">///             //</span>
-    <span class="doccomment">///             // clap sees the above as &#39;myapp -o val1 val2 val3&#39;</span>
-    <span class="doccomment">///             //                         ^0    ^1 ^2   ^3   ^4</span>
-    <span class="doccomment">/// assert_eq!(m.index_of(&quot;option&quot;), Some(2));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [`ArgMatches`]: ./struct.ArgMatches.html</span>
-    <span class="doccomment">/// [delimiter]: ./struct.Arg.html#method.value_delimiter</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index_of</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">arg</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">get</span>(<span class="ident">name</span>.<span class="ident">as_ref</span>()) {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span> <span class="ident">arg</span>.<span class="ident">indices</span>.<span class="ident">get</span>(<span class="number">0</span>) {
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">i</span>);
+    <span class="doccomment">/// Gets the starting index of the argument in respect to all other arguments. Indices are
+    /// similar to argv indices, but are not exactly 1:1.
+    ///
+    /// For flags (i.e. those arguments which don&#39;t have an associated value), indices refer
+    /// to occurrence of the switch, such as `-f`, or `--flag`. However, for options the indices
+    /// refer to the *values* `-o val` would therefore not represent two distinct indices, only the
+    /// index for `val` would be recorded. This is by design.
+    ///
+    /// Besides the flag/option descrepancy, the primary difference between an argv index and clap
+    /// index, is that clap continues counting once all arguments have properly seperated, whereas
+    /// an argv index does not.
+    ///
+    /// The examples should clear this up.
+    ///
+    /// *NOTE:* If an argument is allowed multiple times, this method will only give the *first*
+    /// index.
+    ///
+    /// # Examples
+    ///
+    /// The argv indices are listed in the comments below. See how they correspond to the clap
+    /// indices. Note that if it&#39;s not listed in a clap index, this is becuase it&#39;s not saved in
+    /// in an `ArgMatches` struct for querying.
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg};
+    /// let m = App::new(&quot;myapp&quot;)
+    ///     .arg(Arg::with_name(&quot;flag&quot;)
+    ///         .short(&quot;f&quot;))
+    ///     .arg(Arg::with_name(&quot;option&quot;)
+    ///         .short(&quot;o&quot;)
+    ///         .takes_value(true))
+    ///     .get_matches_from(vec![&quot;myapp&quot;, &quot;-f&quot;, &quot;-o&quot;, &quot;val&quot;]);
+    ///             // ARGV idices: ^0       ^1    ^2    ^3
+    ///             // clap idices:          ^1          ^3
+    ///
+    /// assert_eq!(m.index_of(&quot;flag&quot;), Some(1));
+    /// assert_eq!(m.index_of(&quot;option&quot;), Some(3));
+    /// ```
+    ///
+    /// Now notice, if we use one of the other styles of options:
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg};
+    /// let m = App::new(&quot;myapp&quot;)
+    ///     .arg(Arg::with_name(&quot;flag&quot;)
+    ///         .short(&quot;f&quot;))
+    ///     .arg(Arg::with_name(&quot;option&quot;)
+    ///         .short(&quot;o&quot;)
+    ///         .takes_value(true))
+    ///     .get_matches_from(vec![&quot;myapp&quot;, &quot;-f&quot;, &quot;-o=val&quot;]);
+    ///             // ARGV idices: ^0       ^1    ^2
+    ///             // clap idices:          ^1       ^3
+    ///
+    /// assert_eq!(m.index_of(&quot;flag&quot;), Some(1));
+    /// assert_eq!(m.index_of(&quot;option&quot;), Some(3));
+    /// ```
+    ///
+    /// Things become much more complicated, or clear if we look at a more complex combination of
+    /// flags. Let&#39;s also throw in the final option style for good measure.
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg};
+    /// let m = App::new(&quot;myapp&quot;)
+    ///     .arg(Arg::with_name(&quot;flag&quot;)
+    ///         .short(&quot;f&quot;))
+    ///     .arg(Arg::with_name(&quot;flag2&quot;)
+    ///         .short(&quot;F&quot;))
+    ///     .arg(Arg::with_name(&quot;flag3&quot;)
+    ///         .short(&quot;z&quot;))
+    ///     .arg(Arg::with_name(&quot;option&quot;)
+    ///         .short(&quot;o&quot;)
+    ///         .takes_value(true))
+    ///     .get_matches_from(vec![&quot;myapp&quot;, &quot;-fzF&quot;, &quot;-oval&quot;]);
+    ///             // ARGV idices: ^0      ^1       ^2
+    ///             // clap idices:         ^1,2,3    ^5
+    ///             //
+    ///             // clap sees the above as &#39;myapp -f -z -F -o val&#39;
+    ///             //                         ^0    ^1 ^2 ^3 ^4 ^5
+    /// assert_eq!(m.index_of(&quot;flag&quot;), Some(1));
+    /// assert_eq!(m.index_of(&quot;flag2&quot;), Some(3));
+    /// assert_eq!(m.index_of(&quot;flag3&quot;), Some(2));
+    /// assert_eq!(m.index_of(&quot;option&quot;), Some(5));
+    /// ```
+    ///
+    /// One final combination of flags/options to see how they combine:
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg};
+    /// let m = App::new(&quot;myapp&quot;)
+    ///     .arg(Arg::with_name(&quot;flag&quot;)
+    ///         .short(&quot;f&quot;))
+    ///     .arg(Arg::with_name(&quot;flag2&quot;)
+    ///         .short(&quot;F&quot;))
+    ///     .arg(Arg::with_name(&quot;flag3&quot;)
+    ///         .short(&quot;z&quot;))
+    ///     .arg(Arg::with_name(&quot;option&quot;)
+    ///         .short(&quot;o&quot;)
+    ///         .takes_value(true)
+    ///         .multiple(true))
+    ///     .get_matches_from(vec![&quot;myapp&quot;, &quot;-fzFoval&quot;]);
+    ///             // ARGV idices: ^0       ^1
+    ///             // clap idices:          ^1,2,3^5
+    ///             //
+    ///             // clap sees the above as &#39;myapp -f -z -F -o val&#39;
+    ///             //                         ^0    ^1 ^2 ^3 ^4 ^5
+    /// assert_eq!(m.index_of(&quot;flag&quot;), Some(1));
+    /// assert_eq!(m.index_of(&quot;flag2&quot;), Some(3));
+    /// assert_eq!(m.index_of(&quot;flag3&quot;), Some(2));
+    /// assert_eq!(m.index_of(&quot;option&quot;), Some(5));
+    /// ```
+    ///
+    /// The last part to mention is when values are sent in multiple groups with a [delimiter].
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg};
+    /// let m = App::new(&quot;myapp&quot;)
+    ///     .arg(Arg::with_name(&quot;option&quot;)
+    ///         .short(&quot;o&quot;)
+    ///         .takes_value(true)
+    ///         .multiple(true))
+    ///     .get_matches_from(vec![&quot;myapp&quot;, &quot;-o=val1,val2,val3&quot;]);
+    ///             // ARGV idices: ^0       ^1
+    ///             // clap idices:             ^2   ^3   ^4
+    ///             //
+    ///             // clap sees the above as &#39;myapp -o val1 val2 val3&#39;
+    ///             //                         ^0    ^1 ^2   ^3   ^4
+    /// assert_eq!(m.index_of(&quot;option&quot;), Some(2));
+    /// ```
+    /// [`ArgMatches`]: ./struct.ArgMatches.html
+    /// [delimiter]: ./struct.Arg.html#method.value_delimiter
+    </span><span class="kw">pub fn </span>index_of&lt;S: AsRef&lt;str&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, name: S) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(arg) = <span class="self">self</span>.args.get(name.as_ref()) {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(i) = arg.indices.get(<span class="number">0</span>) {
+                <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="kw-2">*</span>i);
             }
         }
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">None
+    </span>}
 
-    <span class="doccomment">/// Gets all indices of the argument in respect to all other arguments. Indices are</span>
-    <span class="doccomment">/// similar to argv indices, but are not exactly 1:1.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For flags (i.e. those arguments which don&#39;t have an associated value), indices refer</span>
-    <span class="doccomment">/// to occurrence of the switch, such as `-f`, or `--flag`. However, for options the indices</span>
-    <span class="doccomment">/// refer to the *values* `-o val` would therefore not represent two distinct indices, only the</span>
-    <span class="doccomment">/// index for `val` would be recorded. This is by design.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// *NOTE:* For more information about how clap indices compare to argv indices, see</span>
-    <span class="doccomment">/// [`ArgMatches::index_of`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg};</span>
-    <span class="doccomment">/// let m = App::new(&quot;myapp&quot;)</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;option&quot;)</span>
-    <span class="doccomment">///         .short(&quot;o&quot;)</span>
-    <span class="doccomment">///         .takes_value(true)</span>
-    <span class="doccomment">///         .use_delimiter(true)</span>
-    <span class="doccomment">///         .multiple(true))</span>
-    <span class="doccomment">///     .get_matches_from(vec![&quot;myapp&quot;, &quot;-o=val1,val2,val3&quot;]);</span>
-    <span class="doccomment">///             // ARGV idices: ^0       ^1</span>
-    <span class="doccomment">///             // clap idices:             ^2   ^3   ^4</span>
-    <span class="doccomment">///             //</span>
-    <span class="doccomment">///             // clap sees the above as &#39;myapp -o val1 val2 val3&#39;</span>
-    <span class="doccomment">///             //                         ^0    ^1 ^2   ^3   ^4</span>
-    <span class="doccomment">/// assert_eq!(m.indices_of(&quot;option&quot;).unwrap().collect::&lt;Vec&lt;_&gt;&gt;(), &amp;[2, 3, 4]);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Another quick example is when flags and options are used together</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg};</span>
-    <span class="doccomment">/// let m = App::new(&quot;myapp&quot;)</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;option&quot;)</span>
-    <span class="doccomment">///         .short(&quot;o&quot;)</span>
-    <span class="doccomment">///         .takes_value(true)</span>
-    <span class="doccomment">///         .multiple(true))</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;flag&quot;)</span>
-    <span class="doccomment">///         .short(&quot;f&quot;)</span>
-    <span class="doccomment">///         .multiple(true))</span>
-    <span class="doccomment">///     .get_matches_from(vec![&quot;myapp&quot;, &quot;-o&quot;, &quot;val1&quot;, &quot;-f&quot;, &quot;-o&quot;, &quot;val2&quot;, &quot;-f&quot;]);</span>
-    <span class="doccomment">///             // ARGV idices: ^0       ^1    ^2      ^3    ^4    ^5      ^6</span>
-    <span class="doccomment">///             // clap idices:                ^2      ^3          ^5      ^6</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(m.indices_of(&quot;option&quot;).unwrap().collect::&lt;Vec&lt;_&gt;&gt;(), &amp;[2, 5]);</span>
-    <span class="doccomment">/// assert_eq!(m.indices_of(&quot;flag&quot;).unwrap().collect::&lt;Vec&lt;_&gt;&gt;(), &amp;[3, 6]);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// One final example, which is an odd case; if we *don&#39;t* use  value delimiter as we did with</span>
-    <span class="doccomment">/// the first example above instead of `val1`, `val2` and `val3` all being distinc values, they</span>
-    <span class="doccomment">/// would all be a single value of `val1,val2,val3`, in which case case they&#39;d only receive a</span>
-    <span class="doccomment">/// single index.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg};</span>
-    <span class="doccomment">/// let m = App::new(&quot;myapp&quot;)</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;option&quot;)</span>
-    <span class="doccomment">///         .short(&quot;o&quot;)</span>
-    <span class="doccomment">///         .takes_value(true)</span>
-    <span class="doccomment">///         .multiple(true))</span>
-    <span class="doccomment">///     .get_matches_from(vec![&quot;myapp&quot;, &quot;-o=val1,val2,val3&quot;]);</span>
-    <span class="doccomment">///             // ARGV idices: ^0       ^1</span>
-    <span class="doccomment">///             // clap idices:             ^2</span>
-    <span class="doccomment">///             //</span>
-    <span class="doccomment">///             // clap sees the above as &#39;myapp -o &quot;val1,val2,val3&quot;&#39;</span>
-    <span class="doccomment">///             //                         ^0    ^1  ^2</span>
-    <span class="doccomment">/// assert_eq!(m.indices_of(&quot;option&quot;).unwrap().collect::&lt;Vec&lt;_&gt;&gt;(), &amp;[2]);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [`ArgMatches`]: ./struct.ArgMatches.html</span>
-    <span class="doccomment">/// [`ArgMatches::index_of`]: ./struct.ArgMatches.html#method.index_of</span>
-    <span class="doccomment">/// [delimiter]: ./struct.Arg.html#method.value_delimiter</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">indices_of</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Indices</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">arg</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">get</span>(<span class="ident">name</span>.<span class="ident">as_ref</span>()) {
-            <span class="kw">fn</span> <span class="ident">to_usize</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
-                <span class="kw-2">*</span><span class="ident">i</span>
+    <span class="doccomment">/// Gets all indices of the argument in respect to all other arguments. Indices are
+    /// similar to argv indices, but are not exactly 1:1.
+    ///
+    /// For flags (i.e. those arguments which don&#39;t have an associated value), indices refer
+    /// to occurrence of the switch, such as `-f`, or `--flag`. However, for options the indices
+    /// refer to the *values* `-o val` would therefore not represent two distinct indices, only the
+    /// index for `val` would be recorded. This is by design.
+    ///
+    /// *NOTE:* For more information about how clap indices compare to argv indices, see
+    /// [`ArgMatches::index_of`]
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg};
+    /// let m = App::new(&quot;myapp&quot;)
+    ///     .arg(Arg::with_name(&quot;option&quot;)
+    ///         .short(&quot;o&quot;)
+    ///         .takes_value(true)
+    ///         .use_delimiter(true)
+    ///         .multiple(true))
+    ///     .get_matches_from(vec![&quot;myapp&quot;, &quot;-o=val1,val2,val3&quot;]);
+    ///             // ARGV idices: ^0       ^1
+    ///             // clap idices:             ^2   ^3   ^4
+    ///             //
+    ///             // clap sees the above as &#39;myapp -o val1 val2 val3&#39;
+    ///             //                         ^0    ^1 ^2   ^3   ^4
+    /// assert_eq!(m.indices_of(&quot;option&quot;).unwrap().collect::&lt;Vec&lt;_&gt;&gt;(), &amp;[2, 3, 4]);
+    /// ```
+    ///
+    /// Another quick example is when flags and options are used together
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg};
+    /// let m = App::new(&quot;myapp&quot;)
+    ///     .arg(Arg::with_name(&quot;option&quot;)
+    ///         .short(&quot;o&quot;)
+    ///         .takes_value(true)
+    ///         .multiple(true))
+    ///     .arg(Arg::with_name(&quot;flag&quot;)
+    ///         .short(&quot;f&quot;)
+    ///         .multiple(true))
+    ///     .get_matches_from(vec![&quot;myapp&quot;, &quot;-o&quot;, &quot;val1&quot;, &quot;-f&quot;, &quot;-o&quot;, &quot;val2&quot;, &quot;-f&quot;]);
+    ///             // ARGV idices: ^0       ^1    ^2      ^3    ^4    ^5      ^6
+    ///             // clap idices:                ^2      ^3          ^5      ^6
+    ///
+    /// assert_eq!(m.indices_of(&quot;option&quot;).unwrap().collect::&lt;Vec&lt;_&gt;&gt;(), &amp;[2, 5]);
+    /// assert_eq!(m.indices_of(&quot;flag&quot;).unwrap().collect::&lt;Vec&lt;_&gt;&gt;(), &amp;[3, 6]);
+    /// ```
+    ///
+    /// One final example, which is an odd case; if we *don&#39;t* use  value delimiter as we did with
+    /// the first example above instead of `val1`, `val2` and `val3` all being distinc values, they
+    /// would all be a single value of `val1,val2,val3`, in which case case they&#39;d only receive a
+    /// single index.
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg};
+    /// let m = App::new(&quot;myapp&quot;)
+    ///     .arg(Arg::with_name(&quot;option&quot;)
+    ///         .short(&quot;o&quot;)
+    ///         .takes_value(true)
+    ///         .multiple(true))
+    ///     .get_matches_from(vec![&quot;myapp&quot;, &quot;-o=val1,val2,val3&quot;]);
+    ///             // ARGV idices: ^0       ^1
+    ///             // clap idices:             ^2
+    ///             //
+    ///             // clap sees the above as &#39;myapp -o &quot;val1,val2,val3&quot;&#39;
+    ///             //                         ^0    ^1  ^2
+    /// assert_eq!(m.indices_of(&quot;option&quot;).unwrap().collect::&lt;Vec&lt;_&gt;&gt;(), &amp;[2]);
+    /// ```
+    /// [`ArgMatches`]: ./struct.ArgMatches.html
+    /// [`ArgMatches::index_of`]: ./struct.ArgMatches.html#method.index_of
+    /// [delimiter]: ./struct.Arg.html#method.value_delimiter
+    </span><span class="kw">pub fn </span>indices_of&lt;S: AsRef&lt;str&gt;&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, name: S) -&gt; <span class="prelude-ty">Option</span>&lt;Indices&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(arg) = <span class="self">self</span>.args.get(name.as_ref()) {
+            <span class="kw">fn </span>to_usize(i: <span class="kw-2">&amp;</span>usize) -&gt; usize {
+                <span class="kw-2">*</span>i
             }
-            <span class="kw">let</span> <span class="ident">to_usize</span>: <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="ident">usize</span>) -&gt; <span class="ident">usize</span> <span class="op">=</span> <span class="ident">to_usize</span>; <span class="comment">// coerce to fn pointer</span>
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">Indices</span> {
-                <span class="ident">iter</span>: <span class="ident">arg</span>.<span class="ident">indices</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">to_usize</span>),
+            <span class="kw">let </span>to_usize: <span class="kw">fn</span>(<span class="kw-2">&amp;</span>usize) -&gt; usize = to_usize; <span class="comment">// coerce to fn pointer
+            </span><span class="kw">return </span><span class="prelude-val">Some</span>(Indices {
+                iter: arg.indices.iter().map(to_usize),
             });
         }
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">None
+    </span>}
 
-    <span class="doccomment">/// Because [`Subcommand`]s are essentially &quot;sub-[`App`]s&quot; they have their own [`ArgMatches`]</span>
-    <span class="doccomment">/// as well. This method returns the [`ArgMatches`] for a particular subcommand or `None` if</span>
-    <span class="doccomment">/// the subcommand wasn&#39;t present at runtime.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg, SubCommand};</span>
-    <span class="doccomment">/// let app_m = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;debug&quot;)</span>
-    <span class="doccomment">///         .short(&quot;d&quot;))</span>
-    <span class="doccomment">///     .subcommand(SubCommand::with_name(&quot;test&quot;)</span>
-    <span class="doccomment">///         .arg(Arg::with_name(&quot;opt&quot;)</span>
-    <span class="doccomment">///             .long(&quot;option&quot;)</span>
-    <span class="doccomment">///             .takes_value(true)))</span>
-    <span class="doccomment">///     .get_matches_from(vec![</span>
-    <span class="doccomment">///         &quot;myprog&quot;, &quot;-d&quot;, &quot;test&quot;, &quot;--option&quot;, &quot;val&quot;</span>
-    <span class="doccomment">///     ]);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Both parent commands, and child subcommands can have arguments present at the same times</span>
-    <span class="doccomment">/// assert!(app_m.is_present(&quot;debug&quot;));</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Get the subcommand&#39;s ArgMatches instance</span>
-    <span class="doccomment">/// if let Some(sub_m) = app_m.subcommand_matches(&quot;test&quot;) {</span>
-    <span class="doccomment">///     // Use the struct like normal</span>
-    <span class="doccomment">///     assert_eq!(sub_m.value_of(&quot;opt&quot;), Some(&quot;val&quot;));</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [`Subcommand`]: ./struct.SubCommand.html</span>
-    <span class="doccomment">/// [`App`]: ./struct.App.html</span>
-    <span class="doccomment">/// [`ArgMatches`]: ./struct.ArgMatches.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">subcommand_matches</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ArgMatches</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">s</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">subcommand</span> {
-            <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">name</span>.<span class="ident">as_ref</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>.<span class="ident">matches</span>);
+    <span class="doccomment">/// Because [`Subcommand`]s are essentially &quot;sub-[`App`]s&quot; they have their own [`ArgMatches`]
+    /// as well. This method returns the [`ArgMatches`] for a particular subcommand or `None` if
+    /// the subcommand wasn&#39;t present at runtime.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg, SubCommand};
+    /// let app_m = App::new(&quot;myprog&quot;)
+    ///     .arg(Arg::with_name(&quot;debug&quot;)
+    ///         .short(&quot;d&quot;))
+    ///     .subcommand(SubCommand::with_name(&quot;test&quot;)
+    ///         .arg(Arg::with_name(&quot;opt&quot;)
+    ///             .long(&quot;option&quot;)
+    ///             .takes_value(true)))
+    ///     .get_matches_from(vec![
+    ///         &quot;myprog&quot;, &quot;-d&quot;, &quot;test&quot;, &quot;--option&quot;, &quot;val&quot;
+    ///     ]);
+    ///
+    /// // Both parent commands, and child subcommands can have arguments present at the same times
+    /// assert!(app_m.is_present(&quot;debug&quot;));
+    ///
+    /// // Get the subcommand&#39;s ArgMatches instance
+    /// if let Some(sub_m) = app_m.subcommand_matches(&quot;test&quot;) {
+    ///     // Use the struct like normal
+    ///     assert_eq!(sub_m.value_of(&quot;opt&quot;), Some(&quot;val&quot;));
+    /// }
+    /// ```
+    /// [`Subcommand`]: ./struct.SubCommand.html
+    /// [`App`]: ./struct.App.html
+    /// [`ArgMatches`]: ./struct.ArgMatches.html
+    </span><span class="kw">pub fn </span>subcommand_matches&lt;S: AsRef&lt;str&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, name: S) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ArgMatches&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>s) = <span class="self">self</span>.subcommand {
+            <span class="kw">if </span>s.name == name.as_ref() {
+                <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>s.matches);
             }
         }
-        <span class="prelude-val">None</span>
+        <span class="prelude-val">None
+    </span>}
+
+    <span class="doccomment">/// Because [`Subcommand`]s are essentially &quot;sub-[`App`]s&quot; they have their own [`ArgMatches`]
+    /// as well.But simply getting the sub-[`ArgMatches`] doesn&#39;t help much if we don&#39;t also know
+    /// which subcommand was actually used. This method returns the name of the subcommand that was
+    /// used at runtime, or `None` if one wasn&#39;t.
+    ///
+    /// *NOTE*: Subcommands form a hierarchy, where multiple subcommands can be used at runtime,
+    /// but only a single subcommand from any group of sibling commands may used at once.
+    ///
+    /// An ASCII art depiction may help explain this better...Using a fictional version of `git` as
+    /// the demo subject. Imagine the following are all subcommands of `git` (note, the author is
+    /// aware these aren&#39;t actually all subcommands in the real `git` interface, but it makes
+    /// explanation easier)
+    ///
+    /// ```notrust
+    ///              Top Level App (git)                         TOP
+    ///                              |
+    ///       -----------------------------------------
+    ///      /             |                \          \
+    ///   clone          push              add       commit      LEVEL 1
+    ///     |           /    \            /    \       |
+    ///    url      origin   remote    ref    name   message     LEVEL 2
+    ///             /                  /\
+    ///          path            remote  local                   LEVEL 3
+    /// ```
+    ///
+    /// Given the above fictional subcommand hierarchy, valid runtime uses would be (not an all
+    /// inclusive list, and not including argument options per command for brevity and clarity):
+    ///
+    /// ```sh
+    /// $ git clone url
+    /// $ git push origin path
+    /// $ git add ref local
+    /// $ git commit message
+    /// ```
+    ///
+    /// Notice only one command per &quot;level&quot; may be used. You could not, for example, do `$ git
+    /// clone url push origin path`
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// # use clap::{App, Arg, SubCommand};
+    ///  let app_m = App::new(&quot;git&quot;)
+    ///      .subcommand(SubCommand::with_name(&quot;clone&quot;))
+    ///      .subcommand(SubCommand::with_name(&quot;push&quot;))
+    ///      .subcommand(SubCommand::with_name(&quot;commit&quot;))
+    ///      .get_matches();
+    ///
+    /// match app_m.subcommand_name() {
+    ///     Some(&quot;clone&quot;)  =&gt; {}, // clone was used
+    ///     Some(&quot;push&quot;)   =&gt; {}, // push was used
+    ///     Some(&quot;commit&quot;) =&gt; {}, // commit was used
+    ///     _              =&gt; {}, // Either no subcommand or one not tested for...
+    /// }
+    /// ```
+    /// [`Subcommand`]: ./struct.SubCommand.html
+    /// [`App`]: ./struct.App.html
+    /// [`ArgMatches`]: ./struct.ArgMatches.html
+    </span><span class="kw">pub fn </span>subcommand_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.subcommand.as_ref().map(|sc| <span class="kw-2">&amp;</span>sc.name[..])
     }
 
-    <span class="doccomment">/// Because [`Subcommand`]s are essentially &quot;sub-[`App`]s&quot; they have their own [`ArgMatches`]</span>
-    <span class="doccomment">/// as well.But simply getting the sub-[`ArgMatches`] doesn&#39;t help much if we don&#39;t also know</span>
-    <span class="doccomment">/// which subcommand was actually used. This method returns the name of the subcommand that was</span>
-    <span class="doccomment">/// used at runtime, or `None` if one wasn&#39;t.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// *NOTE*: Subcommands form a hierarchy, where multiple subcommands can be used at runtime,</span>
-    <span class="doccomment">/// but only a single subcommand from any group of sibling commands may used at once.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// An ASCII art depiction may help explain this better...Using a fictional version of `git` as</span>
-    <span class="doccomment">/// the demo subject. Imagine the following are all subcommands of `git` (note, the author is</span>
-    <span class="doccomment">/// aware these aren&#39;t actually all subcommands in the real `git` interface, but it makes</span>
-    <span class="doccomment">/// explanation easier)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```notrust</span>
-    <span class="doccomment">///              Top Level App (git)                         TOP</span>
-    <span class="doccomment">///                              |</span>
-    <span class="doccomment">///       -----------------------------------------</span>
-    <span class="doccomment">///      /             |                \          \</span>
-    <span class="doccomment">///   clone          push              add       commit      LEVEL 1</span>
-    <span class="doccomment">///     |           /    \            /    \       |</span>
-    <span class="doccomment">///    url      origin   remote    ref    name   message     LEVEL 2</span>
-    <span class="doccomment">///             /                  /\</span>
-    <span class="doccomment">///          path            remote  local                   LEVEL 3</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Given the above fictional subcommand hierarchy, valid runtime uses would be (not an all</span>
-    <span class="doccomment">/// inclusive list, and not including argument options per command for brevity and clarity):</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```sh</span>
-    <span class="doccomment">/// $ git clone url</span>
-    <span class="doccomment">/// $ git push origin path</span>
-    <span class="doccomment">/// $ git add ref local</span>
-    <span class="doccomment">/// $ git commit message</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Notice only one command per &quot;level&quot; may be used. You could not, for example, do `$ git</span>
-    <span class="doccomment">/// clone url push origin path`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # use clap::{App, Arg, SubCommand};</span>
-    <span class="doccomment">///  let app_m = App::new(&quot;git&quot;)</span>
-    <span class="doccomment">///      .subcommand(SubCommand::with_name(&quot;clone&quot;))</span>
-    <span class="doccomment">///      .subcommand(SubCommand::with_name(&quot;push&quot;))</span>
-    <span class="doccomment">///      .subcommand(SubCommand::with_name(&quot;commit&quot;))</span>
-    <span class="doccomment">///      .get_matches();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// match app_m.subcommand_name() {</span>
-    <span class="doccomment">///     Some(&quot;clone&quot;)  =&gt; {}, // clone was used</span>
-    <span class="doccomment">///     Some(&quot;push&quot;)   =&gt; {}, // push was used</span>
-    <span class="doccomment">///     Some(&quot;commit&quot;) =&gt; {}, // commit was used</span>
-    <span class="doccomment">///     _              =&gt; {}, // Either no subcommand or one not tested for...</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [`Subcommand`]: ./struct.SubCommand.html</span>
-    <span class="doccomment">/// [`App`]: ./struct.App.html</span>
-    <span class="doccomment">/// [`ArgMatches`]: ./struct.ArgMatches.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">subcommand_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">subcommand</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">sc</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">sc</span>.<span class="ident">name</span>[..])
+    <span class="doccomment">/// This brings together [`ArgMatches::subcommand_matches`] and [`ArgMatches::subcommand_name`]
+    /// by returning a tuple with both pieces of information.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// # use clap::{App, Arg, SubCommand};
+    ///  let app_m = App::new(&quot;git&quot;)
+    ///      .subcommand(SubCommand::with_name(&quot;clone&quot;))
+    ///      .subcommand(SubCommand::with_name(&quot;push&quot;))
+    ///      .subcommand(SubCommand::with_name(&quot;commit&quot;))
+    ///      .get_matches();
+    ///
+    /// match app_m.subcommand() {
+    ///     (&quot;clone&quot;,  Some(sub_m)) =&gt; {}, // clone was used
+    ///     (&quot;push&quot;,   Some(sub_m)) =&gt; {}, // push was used
+    ///     (&quot;commit&quot;, Some(sub_m)) =&gt; {}, // commit was used
+    ///     _                       =&gt; {}, // Either no subcommand or one not tested for...
+    /// }
+    /// ```
+    ///
+    /// Another useful scenario is when you want to support third party, or external, subcommands.
+    /// In these cases you can&#39;t know the subcommand name ahead of time, so use a variable instead
+    /// with pattern matching!
+    ///
+    /// ```rust
+    /// # use clap::{App, AppSettings};
+    /// // Assume there is an external subcommand named &quot;subcmd&quot;
+    /// let app_m = App::new(&quot;myprog&quot;)
+    ///     .setting(AppSettings::AllowExternalSubcommands)
+    ///     .get_matches_from(vec![
+    ///         &quot;myprog&quot;, &quot;subcmd&quot;, &quot;--option&quot;, &quot;value&quot;, &quot;-fff&quot;, &quot;--flag&quot;
+    ///     ]);
+    ///
+    /// // All trailing arguments will be stored under the subcommand&#39;s sub-matches using an empty
+    /// // string argument name
+    /// match app_m.subcommand() {
+    ///     (external, Some(sub_m)) =&gt; {
+    ///          let ext_args: Vec&lt;&amp;str&gt; = sub_m.values_of(&quot;&quot;).unwrap().collect();
+    ///          assert_eq!(external, &quot;subcmd&quot;);
+    ///          assert_eq!(ext_args, [&quot;--option&quot;, &quot;value&quot;, &quot;-fff&quot;, &quot;--flag&quot;]);
+    ///     },
+    ///     _ =&gt; {},
+    /// }
+    /// ```
+    /// [`ArgMatches::subcommand_matches`]: ./struct.ArgMatches.html#method.subcommand_matches
+    /// [`ArgMatches::subcommand_name`]: ./struct.ArgMatches.html#method.subcommand_name
+    </span><span class="kw">pub fn </span>subcommand(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="kw-2">&amp;</span>str, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ArgMatches&lt;<span class="lifetime">&#39;a</span>&gt;&gt;) {
+        <span class="self">self</span>.subcommand
+            .as_ref()
+            .map_or((<span class="string">&quot;&quot;</span>, <span class="prelude-val">None</span>), |sc| (<span class="kw-2">&amp;</span>sc.name[..], <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>sc.matches)))
     }
 
-    <span class="doccomment">/// This brings together [`ArgMatches::subcommand_matches`] and [`ArgMatches::subcommand_name`]</span>
-    <span class="doccomment">/// by returning a tuple with both pieces of information.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # use clap::{App, Arg, SubCommand};</span>
-    <span class="doccomment">///  let app_m = App::new(&quot;git&quot;)</span>
-    <span class="doccomment">///      .subcommand(SubCommand::with_name(&quot;clone&quot;))</span>
-    <span class="doccomment">///      .subcommand(SubCommand::with_name(&quot;push&quot;))</span>
-    <span class="doccomment">///      .subcommand(SubCommand::with_name(&quot;commit&quot;))</span>
-    <span class="doccomment">///      .get_matches();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// match app_m.subcommand() {</span>
-    <span class="doccomment">///     (&quot;clone&quot;,  Some(sub_m)) =&gt; {}, // clone was used</span>
-    <span class="doccomment">///     (&quot;push&quot;,   Some(sub_m)) =&gt; {}, // push was used</span>
-    <span class="doccomment">///     (&quot;commit&quot;, Some(sub_m)) =&gt; {}, // commit was used</span>
-    <span class="doccomment">///     _                       =&gt; {}, // Either no subcommand or one not tested for...</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Another useful scenario is when you want to support third party, or external, subcommands.</span>
-    <span class="doccomment">/// In these cases you can&#39;t know the subcommand name ahead of time, so use a variable instead</span>
-    <span class="doccomment">/// with pattern matching!</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, AppSettings};</span>
-    <span class="doccomment">/// // Assume there is an external subcommand named &quot;subcmd&quot;</span>
-    <span class="doccomment">/// let app_m = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .setting(AppSettings::AllowExternalSubcommands)</span>
-    <span class="doccomment">///     .get_matches_from(vec![</span>
-    <span class="doccomment">///         &quot;myprog&quot;, &quot;subcmd&quot;, &quot;--option&quot;, &quot;value&quot;, &quot;-fff&quot;, &quot;--flag&quot;</span>
-    <span class="doccomment">///     ]);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // All trailing arguments will be stored under the subcommand&#39;s sub-matches using an empty</span>
-    <span class="doccomment">/// // string argument name</span>
-    <span class="doccomment">/// match app_m.subcommand() {</span>
-    <span class="doccomment">///     (external, Some(sub_m)) =&gt; {</span>
-    <span class="doccomment">///          let ext_args: Vec&lt;&amp;str&gt; = sub_m.values_of(&quot;&quot;).unwrap().collect();</span>
-    <span class="doccomment">///          assert_eq!(external, &quot;subcmd&quot;);</span>
-    <span class="doccomment">///          assert_eq!(ext_args, [&quot;--option&quot;, &quot;value&quot;, &quot;-fff&quot;, &quot;--flag&quot;]);</span>
-    <span class="doccomment">///     },</span>
-    <span class="doccomment">///     _ =&gt; {},</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [`ArgMatches::subcommand_matches`]: ./struct.ArgMatches.html#method.subcommand_matches</span>
-    <span class="doccomment">/// [`ArgMatches::subcommand_name`]: ./struct.ArgMatches.html#method.subcommand_name</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">subcommand</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ArgMatches</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">subcommand</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">map_or</span>((<span class="string">&quot;&quot;</span>, <span class="prelude-val">None</span>), <span class="op">|</span><span class="ident">sc</span><span class="op">|</span> (<span class="kw-2">&amp;</span><span class="ident">sc</span>.<span class="ident">name</span>[..], <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">sc</span>.<span class="ident">matches</span>)))
-    }
-
-    <span class="doccomment">/// Returns a string slice of the usage statement for the [`App`] or [`SubCommand`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # use clap::{App, Arg, SubCommand};</span>
-    <span class="doccomment">/// let app_m = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .subcommand(SubCommand::with_name(&quot;test&quot;))</span>
-    <span class="doccomment">///     .get_matches();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// println!(&quot;{}&quot;, app_m.usage());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [`Subcommand`]: ./struct.SubCommand.html</span>
-    <span class="doccomment">/// [`App`]: ./struct.App.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">usage</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">usage</span>.<span class="ident">as_ref</span>().<span class="ident">map_or</span>(<span class="string">&quot;&quot;</span>, <span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">u</span>[..])
-    }
-}
-
-<span class="comment">// The following were taken and adapated from vec_map source</span>
-<span class="comment">// repo: https://github.com/contain-rs/vec-map</span>
-<span class="comment">// commit: be5e1fa3c26e351761b33010ddbdaf5f05dbcc33</span>
-<span class="comment">// license: MIT - Copyright (c) 2015 The Rust Project Developers</span>
-
-<span class="doccomment">/// An iterator for getting multiple values out of an argument via the [`ArgMatches::values_of`]</span>
-<span class="doccomment">/// method.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use clap::{App, Arg};</span>
-<span class="doccomment">/// let m = App::new(&quot;myapp&quot;)</span>
-<span class="doccomment">///     .arg(Arg::with_name(&quot;output&quot;)</span>
-<span class="doccomment">///         .short(&quot;o&quot;)</span>
-<span class="doccomment">///         .multiple(true)</span>
-<span class="doccomment">///         .takes_value(true))</span>
-<span class="doccomment">///     .get_matches_from(vec![&quot;myapp&quot;, &quot;-o&quot;, &quot;val1&quot;, &quot;val2&quot;]);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut values = m.values_of(&quot;output&quot;).unwrap();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(values.next(), Some(&quot;val1&quot;));</span>
-<span class="doccomment">/// assert_eq!(values.next(), Some(&quot;val2&quot;));</span>
-<span class="doccomment">/// assert_eq!(values.next(), None);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// [`ArgMatches::values_of`]: ./struct.ArgMatches.html#method.values_of</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Values</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">iter</span>: <span class="ident">Map</span><span class="op">&lt;</span><span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">OsString</span><span class="op">&gt;</span>, <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">OsString</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Values</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>;
-
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">next</span>()
-    }
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">size_hint</span>()
+    <span class="doccomment">/// Returns a string slice of the usage statement for the [`App`] or [`SubCommand`]
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// # use clap::{App, Arg, SubCommand};
+    /// let app_m = App::new(&quot;myprog&quot;)
+    ///     .subcommand(SubCommand::with_name(&quot;test&quot;))
+    ///     .get_matches();
+    ///
+    /// println!(&quot;{}&quot;, app_m.usage());
+    /// ```
+    /// [`Subcommand`]: ./struct.SubCommand.html
+    /// [`App`]: ./struct.App.html
+    </span><span class="kw">pub fn </span>usage(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.usage.as_ref().map_or(<span class="string">&quot;&quot;</span>, |u| <span class="kw-2">&amp;</span>u[..])
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">DoubleEndedIterator</span> <span class="kw">for</span> <span class="ident">Values</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">next_back</span>()
+<span class="comment">// The following were taken and adapated from vec_map source
+// repo: https://github.com/contain-rs/vec-map
+// commit: be5e1fa3c26e351761b33010ddbdaf5f05dbcc33
+// license: MIT - Copyright (c) 2015 The Rust Project Developers
+
+</span><span class="doccomment">/// An iterator for getting multiple values out of an argument via the [`ArgMatches::values_of`]
+/// method.
+///
+/// # Examples
+///
+/// ```rust
+/// # use clap::{App, Arg};
+/// let m = App::new(&quot;myapp&quot;)
+///     .arg(Arg::with_name(&quot;output&quot;)
+///         .short(&quot;o&quot;)
+///         .multiple(true)
+///         .takes_value(true))
+///     .get_matches_from(vec![&quot;myapp&quot;, &quot;-o&quot;, &quot;val1&quot;, &quot;val2&quot;]);
+///
+/// let mut values = m.values_of(&quot;output&quot;).unwrap();
+///
+/// assert_eq!(values.next(), Some(&quot;val1&quot;));
+/// assert_eq!(values.next(), Some(&quot;val2&quot;));
+/// assert_eq!(values.next(), None);
+/// ```
+/// [`ArgMatches::values_of`]: ./struct.ArgMatches.html#method.values_of
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>Values&lt;<span class="lifetime">&#39;a</span>&gt; {
+    iter: Map&lt;Iter&lt;<span class="lifetime">&#39;a</span>, OsString&gt;, <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>OsString) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>Values&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str;
+
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
+        <span class="self">self</span>.iter.next()
+    }
+    <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
+        <span class="self">self</span>.iter.size_hint()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ExactSizeIterator</span> <span class="kw">for</span> <span class="ident">Values</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; DoubleEndedIterator <span class="kw">for </span>Values&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>next_back(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
+        <span class="self">self</span>.iter.next_back()
+    }
+}
 
-<span class="doccomment">/// Creates an empty iterator.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Values</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="kw">static</span> <span class="ident">EMPTY</span>: [<span class="ident">OsString</span>; <span class="number">0</span>] <span class="op">=</span> [];
-        <span class="comment">// This is never called because the iterator is empty:</span>
-        <span class="kw">fn</span> <span class="ident">to_str_slice</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">OsString</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ExactSizeIterator <span class="kw">for </span>Values&lt;<span class="lifetime">&#39;a</span>&gt; {}
+
+<span class="doccomment">/// Creates an empty iterator.
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Default <span class="kw">for </span>Values&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="kw">static </span>EMPTY: [OsString; <span class="number">0</span>] = [];
+        <span class="comment">// This is never called because the iterator is empty:
+        </span><span class="kw">fn </span>to_str_slice(<span class="kw">_</span>: <span class="kw-2">&amp;</span>OsString) -&gt; <span class="kw-2">&amp;</span>str {
             <span class="macro">unreachable!</span>()
         }
-        <span class="ident">Values</span> {
-            <span class="ident">iter</span>: <span class="ident">EMPTY</span>[..].<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">to_str_slice</span>),
+        Values {
+            iter: EMPTY[..].iter().map(to_str_slice),
         }
     }
 }
 
-<span class="doccomment">/// An iterator for getting multiple values out of an argument via the [`ArgMatches::values_of_os`]</span>
-<span class="doccomment">/// method. Usage of this iterator allows values which contain invalid UTF-8 code points unlike</span>
-<span class="doccomment">/// [`Values`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">unix</span>), <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; ```ignore&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">unix</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; ```&quot;</span>)]</span>
-<span class="doccomment">/// # use clap::{App, Arg};</span>
-<span class="doccomment">/// use std::ffi::OsString;</span>
-<span class="doccomment">/// use std::os::unix::ffi::{OsStrExt,OsStringExt};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let m = App::new(&quot;utf8&quot;)</span>
-<span class="doccomment">///     .arg(Arg::from_usage(&quot;&lt;arg&gt; &#39;some arg&#39;&quot;))</span>
-<span class="doccomment">///     .get_matches_from(vec![OsString::from(&quot;myprog&quot;),</span>
-<span class="doccomment">///                             // &quot;Hi {0xe9}!&quot;</span>
-<span class="doccomment">///                             OsString::from_vec(vec![b&#39;H&#39;, b&#39;i&#39;, b&#39; &#39;, 0xe9, b&#39;!&#39;])]);</span>
-<span class="doccomment">/// assert_eq!(&amp;*m.value_of_os(&quot;arg&quot;).unwrap().as_bytes(), [b&#39;H&#39;, b&#39;i&#39;, b&#39; &#39;, 0xe9, b&#39;!&#39;]);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// [`ArgMatches::values_of_os`]: ./struct.ArgMatches.html#method.values_of_os</span>
-<span class="doccomment">/// [`Values`]: ./struct.Values.html</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OsValues</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">iter</span>: <span class="ident">Map</span><span class="op">&lt;</span><span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">OsString</span><span class="op">&gt;</span>, <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">OsString</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">OsStr</span><span class="op">&gt;</span>,
+<span class="doccomment">/// An iterator for getting multiple values out of an argument via the [`ArgMatches::values_of_os`]
+/// method. Usage of this iterator allows values which contain invalid UTF-8 code points unlike
+/// [`Values`].
+///
+/// # Examples
+///
+</span><span class="attribute">#[cfg_attr(not(unix), doc = <span class="string">&quot; ```ignore&quot;</span>)]
+#[cfg_attr(unix, doc = <span class="string">&quot; ```&quot;</span>)]
+</span><span class="doccomment">/// # use clap::{App, Arg};
+/// use std::ffi::OsString;
+/// use std::os::unix::ffi::{OsStrExt,OsStringExt};
+///
+/// let m = App::new(&quot;utf8&quot;)
+///     .arg(Arg::from_usage(&quot;&lt;arg&gt; &#39;some arg&#39;&quot;))
+///     .get_matches_from(vec![OsString::from(&quot;myprog&quot;),
+///                             // &quot;Hi {0xe9}!&quot;
+///                             OsString::from_vec(vec![b&#39;H&#39;, b&#39;i&#39;, b&#39; &#39;, 0xe9, b&#39;!&#39;])]);
+/// assert_eq!(&amp;*m.value_of_os(&quot;arg&quot;).unwrap().as_bytes(), [b&#39;H&#39;, b&#39;i&#39;, b&#39; &#39;, 0xe9, b&#39;!&#39;]);
+/// ```
+/// [`ArgMatches::values_of_os`]: ./struct.ArgMatches.html#method.values_of_os
+/// [`Values`]: ./struct.Values.html
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>OsValues&lt;<span class="lifetime">&#39;a</span>&gt; {
+    iter: Map&lt;Iter&lt;<span class="lifetime">&#39;a</span>, OsString&gt;, <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>OsString) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>OsStr&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">OsValues</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">OsStr</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>OsValues&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>OsStr;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">OsStr</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">next</span>()
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>OsStr&gt; {
+        <span class="self">self</span>.iter.next()
     }
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">size_hint</span>()
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">DoubleEndedIterator</span> <span class="kw">for</span> <span class="ident">OsValues</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">OsStr</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">next_back</span>()
+    <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
+        <span class="self">self</span>.iter.size_hint()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ExactSizeIterator</span> <span class="kw">for</span> <span class="ident">OsValues</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; DoubleEndedIterator <span class="kw">for </span>OsValues&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>next_back(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>OsStr&gt; {
+        <span class="self">self</span>.iter.next_back()
+    }
+}
 
-<span class="doccomment">/// Creates an empty iterator.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">OsValues</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="kw">static</span> <span class="ident">EMPTY</span>: [<span class="ident">OsString</span>; <span class="number">0</span>] <span class="op">=</span> [];
-        <span class="comment">// This is never called because the iterator is empty:</span>
-        <span class="kw">fn</span> <span class="ident">to_str_slice</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">OsString</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">OsStr</span> {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ExactSizeIterator <span class="kw">for </span>OsValues&lt;<span class="lifetime">&#39;a</span>&gt; {}
+
+<span class="doccomment">/// Creates an empty iterator.
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Default <span class="kw">for </span>OsValues&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="kw">static </span>EMPTY: [OsString; <span class="number">0</span>] = [];
+        <span class="comment">// This is never called because the iterator is empty:
+        </span><span class="kw">fn </span>to_str_slice(<span class="kw">_</span>: <span class="kw-2">&amp;</span>OsString) -&gt; <span class="kw-2">&amp;</span>OsStr {
             <span class="macro">unreachable!</span>()
         }
-        <span class="ident">OsValues</span> {
-            <span class="ident">iter</span>: <span class="ident">EMPTY</span>[..].<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">to_str_slice</span>),
+        OsValues {
+            iter: EMPTY[..].iter().map(to_str_slice),
         }
     }
 }
 
-<span class="doccomment">/// An iterator for getting multiple indices out of an argument via the [`ArgMatches::indices_of`]</span>
-<span class="doccomment">/// method.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use clap::{App, Arg};</span>
-<span class="doccomment">/// let m = App::new(&quot;myapp&quot;)</span>
-<span class="doccomment">///     .arg(Arg::with_name(&quot;output&quot;)</span>
-<span class="doccomment">///         .short(&quot;o&quot;)</span>
-<span class="doccomment">///         .multiple(true)</span>
-<span class="doccomment">///         .takes_value(true))</span>
-<span class="doccomment">///     .get_matches_from(vec![&quot;myapp&quot;, &quot;-o&quot;, &quot;val1&quot;, &quot;val2&quot;]);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut indices = m.indices_of(&quot;output&quot;).unwrap();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(indices.next(), Some(2));</span>
-<span class="doccomment">/// assert_eq!(indices.next(), Some(3));</span>
-<span class="doccomment">/// assert_eq!(indices.next(), None);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// [`ArgMatches::indices_of`]: ./struct.ArgMatches.html#method.indices_of</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Indices</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="comment">// would rather use &#39;_, but: https://github.com/rust-lang/rust/issues/48469</span>
-    <span class="ident">iter</span>: <span class="ident">Map</span><span class="op">&lt;</span><span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">usize</span><span class="op">&gt;</span>, <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">usize</span>) -&gt; <span class="ident">usize</span><span class="op">&gt;</span>,
+<span class="doccomment">/// An iterator for getting multiple indices out of an argument via the [`ArgMatches::indices_of`]
+/// method.
+///
+/// # Examples
+///
+/// ```rust
+/// # use clap::{App, Arg};
+/// let m = App::new(&quot;myapp&quot;)
+///     .arg(Arg::with_name(&quot;output&quot;)
+///         .short(&quot;o&quot;)
+///         .multiple(true)
+///         .takes_value(true))
+///     .get_matches_from(vec![&quot;myapp&quot;, &quot;-o&quot;, &quot;val1&quot;, &quot;val2&quot;]);
+///
+/// let mut indices = m.indices_of(&quot;output&quot;).unwrap();
+///
+/// assert_eq!(indices.next(), Some(2));
+/// assert_eq!(indices.next(), Some(3));
+/// assert_eq!(indices.next(), None);
+/// ```
+/// [`ArgMatches::indices_of`]: ./struct.ArgMatches.html#method.indices_of
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>Indices&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="comment">// would rather use &#39;_, but: https://github.com/rust-lang/rust/issues/48469
+    </span>iter: Map&lt;Iter&lt;<span class="lifetime">&#39;a</span>, usize&gt;, <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>usize) -&gt; usize&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Indices</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">usize</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>Indices&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Item = usize;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">next</span>()
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+        <span class="self">self</span>.iter.next()
     }
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">size_hint</span>()
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">DoubleEndedIterator</span> <span class="kw">for</span> <span class="ident">Indices</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">next_back</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">next_back</span>()
+    <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
+        <span class="self">self</span>.iter.size_hint()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ExactSizeIterator</span> <span class="kw">for</span> <span class="ident">Indices</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; DoubleEndedIterator <span class="kw">for </span>Indices&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>next_back(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+        <span class="self">self</span>.iter.next_back()
+    }
+}
 
-<span class="doccomment">/// Creates an empty iterator.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Indices</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="kw">static</span> <span class="ident">EMPTY</span>: [<span class="ident">usize</span>; <span class="number">0</span>] <span class="op">=</span> [];
-        <span class="comment">// This is never called because the iterator is empty:</span>
-        <span class="kw">fn</span> <span class="ident">to_usize</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ExactSizeIterator <span class="kw">for </span>Indices&lt;<span class="lifetime">&#39;a</span>&gt; {}
+
+<span class="doccomment">/// Creates an empty iterator.
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Default <span class="kw">for </span>Indices&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="kw">static </span>EMPTY: [usize; <span class="number">0</span>] = [];
+        <span class="comment">// This is never called because the iterator is empty:
+        </span><span class="kw">fn </span>to_usize(<span class="kw">_</span>: <span class="kw-2">&amp;</span>usize) -&gt; usize {
             <span class="macro">unreachable!</span>()
         }
-        <span class="ident">Indices</span> {
-            <span class="ident">iter</span>: <span class="ident">EMPTY</span>[..].<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">to_usize</span>),
+        Indices {
+            iter: EMPTY[..].iter().map(to_usize),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_default_values</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">values</span>: <span class="ident">Values</span> <span class="op">=</span> <span class="ident">Values::default</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">values</span>.<span class="ident">next</span>(), <span class="prelude-val">None</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_default_values() {
+        <span class="kw">let </span><span class="kw-2">mut </span>values: Values = Values::default();
+        <span class="macro">assert_eq!</span>(values.next(), <span class="prelude-val">None</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_default_values_with_shorter_lifetime</span>() {
-        <span class="kw">let</span> <span class="ident">matches</span> <span class="op">=</span> <span class="ident">ArgMatches::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">values</span> <span class="op">=</span> <span class="ident">matches</span>.<span class="ident">values_of</span>(<span class="string">&quot;&quot;</span>).<span class="ident">unwrap_or_default</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">values</span>.<span class="ident">next</span>(), <span class="prelude-val">None</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_default_values_with_shorter_lifetime() {
+        <span class="kw">let </span>matches = ArgMatches::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>values = matches.values_of(<span class="string">&quot;&quot;</span>).unwrap_or_default();
+        <span class="macro">assert_eq!</span>(values.next(), <span class="prelude-val">None</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_default_osvalues</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">values</span>: <span class="ident">OsValues</span> <span class="op">=</span> <span class="ident">OsValues::default</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">values</span>.<span class="ident">next</span>(), <span class="prelude-val">None</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_default_osvalues() {
+        <span class="kw">let </span><span class="kw-2">mut </span>values: OsValues = OsValues::default();
+        <span class="macro">assert_eq!</span>(values.next(), <span class="prelude-val">None</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_default_osvalues_with_shorter_lifetime</span>() {
-        <span class="kw">let</span> <span class="ident">matches</span> <span class="op">=</span> <span class="ident">ArgMatches::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">values</span> <span class="op">=</span> <span class="ident">matches</span>.<span class="ident">values_of_os</span>(<span class="string">&quot;&quot;</span>).<span class="ident">unwrap_or_default</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">values</span>.<span class="ident">next</span>(), <span class="prelude-val">None</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_default_osvalues_with_shorter_lifetime() {
+        <span class="kw">let </span>matches = ArgMatches::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>values = matches.values_of_os(<span class="string">&quot;&quot;</span>).unwrap_or_default();
+        <span class="macro">assert_eq!</span>(values.next(), <span class="prelude-val">None</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_default_indices</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">indices</span>: <span class="ident">Indices</span> <span class="op">=</span> <span class="ident">Indices::default</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">indices</span>.<span class="ident">next</span>(), <span class="prelude-val">None</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_default_indices() {
+        <span class="kw">let </span><span class="kw-2">mut </span>indices: Indices = Indices::default();
+        <span class="macro">assert_eq!</span>(indices.next(), <span class="prelude-val">None</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_default_indices_with_shorter_lifetime</span>() {
-        <span class="kw">let</span> <span class="ident">matches</span> <span class="op">=</span> <span class="ident">ArgMatches::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">indices</span> <span class="op">=</span> <span class="ident">matches</span>.<span class="ident">indices_of</span>(<span class="string">&quot;&quot;</span>).<span class="ident">unwrap_or_default</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">indices</span>.<span class="ident">next</span>(), <span class="prelude-val">None</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_default_indices_with_shorter_lifetime() {
+        <span class="kw">let </span>matches = ArgMatches::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>indices = matches.indices_of(<span class="string">&quot;&quot;</span>).unwrap_or_default();
+        <span class="macro">assert_eq!</span>(indices.next(), <span class="prelude-val">None</span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="clap" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="clap" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-resolver-0.21.2/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../trust_dns_resolver/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../trust_dns_resolver/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../trust_dns_resolver/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-resolver-0.21.2/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../trust_dns_resolver/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../trust_dns_resolver/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../trust_dns_resolver/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -349,356 +349,356 @@
 <span id="349">349</span>
 <span id="350">350</span>
 <span id="351">351</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2020 Benjamin Fry &lt;benjaminfry@me.com&gt;</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2020 Benjamin Fry &lt;benjaminfry@me.com&gt;
+//
+// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="doccomment">//! Error types for the crate</span>
+</span><span class="doccomment">//! Error types for the crate
 
-<span class="kw">use</span> <span class="ident">std::cmp::Ordering</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">io</span>, <span class="ident">sync</span>};
+</span><span class="kw">use </span>std::cmp::Ordering;
+<span class="kw">use </span>std::{fmt, io, sync};
 
-<span class="kw">use</span> <span class="ident">thiserror::Error</span>;
+<span class="kw">use </span>thiserror::Error;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proto::error</span>::{<span class="ident">ProtoError</span>, <span class="ident">ProtoErrorKind</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proto::op</span>::{<span class="ident">Query</span>, <span class="ident">ResponseCode</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proto::rr::rdata::SOA</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proto::xfer::retry_dns_handle::RetryableError</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proto::xfer::DnsResponse</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;backtrace&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proto</span>::{<span class="ident">trace</span>, <span class="ident">ExtBacktrace</span>};
+<span class="kw">use </span><span class="kw">crate</span>::proto::error::{ProtoError, ProtoErrorKind};
+<span class="kw">use </span><span class="kw">crate</span>::proto::op::{Query, ResponseCode};
+<span class="kw">use </span><span class="kw">crate</span>::proto::rr::rdata::SOA;
+<span class="kw">use </span><span class="kw">crate</span>::proto::xfer::retry_dns_handle::RetryableError;
+<span class="kw">use </span><span class="kw">crate</span>::proto::xfer::DnsResponse;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;backtrace&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::proto::{trace, ExtBacktrace};
 
-<span class="doccomment">/// An alias for results returned by functions of this crate</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ResolveResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">::std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span>;
+<span class="doccomment">/// An alias for results returned by functions of this crate
+</span><span class="kw">pub type </span>ResolveResult&lt;T&gt; = ::std::result::Result&lt;T, ResolveError&gt;;
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::large_enum_variant</span>)]</span>
-<span class="doccomment">/// The error kind for errors that get returned in the crate</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Error</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ResolveErrorKind</span> {
-    <span class="doccomment">/// An error with an arbitrary message, referenced as &amp;&#39;static str</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;{0}&quot;</span>)]</span>
-    <span class="ident">Message</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>),
+<span class="attribute">#[allow(clippy::large_enum_variant)]
+</span><span class="doccomment">/// The error kind for errors that get returned in the crate
+</span><span class="attribute">#[derive(Debug, Error)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>ResolveErrorKind {
+    <span class="doccomment">/// An error with an arbitrary message, referenced as &amp;&#39;static str
+    </span><span class="attribute">#[error(<span class="string">&quot;{0}&quot;</span>)]
+    </span>Message(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str),
 
-    <span class="doccomment">/// An error with an arbitrary message, stored as String</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;{0}&quot;</span>)]</span>
-    <span class="ident">Msg</span>(<span class="ident">String</span>),
+    <span class="doccomment">/// An error with an arbitrary message, stored as String
+    </span><span class="attribute">#[error(<span class="string">&quot;{0}&quot;</span>)]
+    </span>Msg(String),
 
-    <span class="doccomment">/// No resolvers available</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;No connections available&quot;</span>)]</span>
-    <span class="ident">NoConnections</span>,
+    <span class="doccomment">/// No resolvers available
+    </span><span class="attribute">#[error(<span class="string">&quot;No connections available&quot;</span>)]
+    </span>NoConnections,
 
-    <span class="doccomment">/// No records were found for a query</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;no record found for {query}&quot;</span>)]</span>
-    <span class="ident">NoRecordsFound</span> {
-        <span class="doccomment">/// The query for which no records were found.</span>
-        <span class="ident">query</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Query</span><span class="op">&gt;</span>,
-        <span class="doccomment">/// If an SOA is present, then this is an authoritative response.</span>
-        <span class="ident">soa</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">SOA</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="doccomment">/// negative ttl, as determined from DnsResponse::negative_ttl</span>
-        <span class="doccomment">///  this will only be present if the SOA was also present.</span>
-        <span class="ident">negative_ttl</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-        <span class="doccomment">/// ResponseCode, if `NXDOMAIN`, the domain does not exist (and no other types).</span>
-        <span class="doccomment">///   If `NoError`, then the domain exists but there exist either other types at the same label, or subzones of that label.</span>
-        <span class="ident">response_code</span>: <span class="ident">ResponseCode</span>,
-        <span class="doccomment">/// If we trust `NXDOMAIN` errors from this server</span>
-        <span class="ident">trusted</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// No records were found for a query
+    </span><span class="attribute">#[error(<span class="string">&quot;no record found for {query}&quot;</span>)]
+    </span>NoRecordsFound {
+        <span class="doccomment">/// The query for which no records were found.
+        </span>query: Box&lt;Query&gt;,
+        <span class="doccomment">/// If an SOA is present, then this is an authoritative response.
+        </span>soa: <span class="prelude-ty">Option</span>&lt;Box&lt;SOA&gt;&gt;,
+        <span class="doccomment">/// negative ttl, as determined from DnsResponse::negative_ttl
+        ///  this will only be present if the SOA was also present.
+        </span>negative_ttl: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+        <span class="doccomment">/// ResponseCode, if `NXDOMAIN`, the domain does not exist (and no other types).
+        ///   If `NoError`, then the domain exists but there exist either other types at the same label, or subzones of that label.
+        </span>response_code: ResponseCode,
+        <span class="doccomment">/// If we trust `NXDOMAIN` errors from this server
+        </span>trusted: bool,
     },
 
-    <span class="comment">// foreign</span>
-    <span class="doccomment">/// An error got returned from IO</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;io error: {0}&quot;</span>)]</span>
-    <span class="ident">Io</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">std::io::Error</span>),
+    <span class="comment">// foreign
+    </span><span class="doccomment">/// An error got returned from IO
+    </span><span class="attribute">#[error(<span class="string">&quot;io error: {0}&quot;</span>)]
+    </span>Io(<span class="attribute">#[from] </span>std::io::Error),
 
-    <span class="doccomment">/// An error got returned by the trust-dns-proto crate</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;proto error: {0}&quot;</span>)]</span>
-    <span class="ident">Proto</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">ProtoError</span>),
+    <span class="doccomment">/// An error got returned by the trust-dns-proto crate
+    </span><span class="attribute">#[error(<span class="string">&quot;proto error: {0}&quot;</span>)]
+    </span>Proto(<span class="attribute">#[from] </span>ProtoError),
 
-    <span class="doccomment">/// A request timed out</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;request timed out&quot;</span>)]</span>
-    <span class="ident">Timeout</span>,
+    <span class="doccomment">/// A request timed out
+    </span><span class="attribute">#[error(<span class="string">&quot;request timed out&quot;</span>)]
+    </span>Timeout,
 }
 
-<span class="kw">impl</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">ResolveErrorKind</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::ResolveErrorKind</span>::<span class="kw-2">*</span>;
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">NoConnections</span> =&gt; <span class="ident">NoConnections</span>,
-            <span class="ident">Message</span>(<span class="ident">msg</span>) =&gt; <span class="ident">Message</span>(<span class="ident">msg</span>),
-            <span class="ident">Msg</span>(<span class="kw-2">ref</span> <span class="ident">msg</span>) =&gt; <span class="ident">Msg</span>(<span class="ident">msg</span>.<span class="ident">clone</span>()),
-            <span class="ident">NoRecordsFound</span> {
-                <span class="kw-2">ref</span> <span class="ident">query</span>,
-                <span class="kw-2">ref</span> <span class="ident">soa</span>,
-                <span class="ident">negative_ttl</span>,
-                <span class="ident">response_code</span>,
-                <span class="ident">trusted</span>,
-            } =&gt; <span class="ident">NoRecordsFound</span> {
-                <span class="ident">query</span>: <span class="ident">query</span>.<span class="ident">clone</span>(),
-                <span class="ident">soa</span>: <span class="ident">soa</span>.<span class="ident">clone</span>(),
-                <span class="ident">negative_ttl</span>: <span class="kw-2">*</span><span class="ident">negative_ttl</span>,
-                <span class="ident">response_code</span>: <span class="kw-2">*</span><span class="ident">response_code</span>,
-                <span class="ident">trusted</span>: <span class="kw-2">*</span><span class="ident">trusted</span>,
+<span class="kw">impl </span>Clone <span class="kw">for </span>ResolveErrorKind {
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">use </span><span class="self">self</span>::ResolveErrorKind::<span class="kw-2">*</span>;
+        <span class="kw">match </span><span class="self">self </span>{
+            NoConnections =&gt; NoConnections,
+            Message(msg) =&gt; Message(msg),
+            Msg(<span class="kw-2">ref </span>msg) =&gt; Msg(msg.clone()),
+            NoRecordsFound {
+                <span class="kw-2">ref </span>query,
+                <span class="kw-2">ref </span>soa,
+                negative_ttl,
+                response_code,
+                trusted,
+            } =&gt; NoRecordsFound {
+                query: query.clone(),
+                soa: soa.clone(),
+                negative_ttl: <span class="kw-2">*</span>negative_ttl,
+                response_code: <span class="kw-2">*</span>response_code,
+                trusted: <span class="kw-2">*</span>trusted,
             },
-            <span class="comment">// foreign</span>
-            <span class="ident">Io</span>(<span class="ident">io</span>) =&gt; <span class="ident"><span class="self">Self</span>::from</span>(<span class="ident">std::io::Error::from</span>(<span class="ident">io</span>.<span class="ident">kind</span>())),
-            <span class="ident">Proto</span>(<span class="ident">proto</span>) =&gt; <span class="ident"><span class="self">Self</span>::from</span>(<span class="ident">proto</span>.<span class="ident">clone</span>()),
-            <span class="ident">Timeout</span> =&gt; <span class="ident">Timeout</span>,
+            <span class="comment">// foreign
+            </span>Io(io) =&gt; <span class="self">Self</span>::from(std::io::Error::from(io.kind())),
+            Proto(proto) =&gt; <span class="self">Self</span>::from(proto.clone()),
+            Timeout =&gt; Timeout,
         }
     }
 }
 
-<span class="doccomment">/// The error type for errors that get returned in the crate</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Error</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ResolveError</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">kind</span>: <span class="ident">ResolveErrorKind</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;backtrace&quot;</span>)]</span>
-    <span class="ident">backtrack</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ExtBacktrace</span><span class="op">&gt;</span>,
+<span class="doccomment">/// The error type for errors that get returned in the crate
+</span><span class="attribute">#[derive(Debug, Clone, Error)]
+</span><span class="kw">pub struct </span>ResolveError {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) kind: ResolveErrorKind,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;backtrace&quot;</span>)]
+    </span>backtrack: <span class="prelude-ty">Option</span>&lt;ExtBacktrace&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">ResolveError</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">nx_error</span>(
-        <span class="ident">query</span>: <span class="ident">Query</span>,
-        <span class="ident">soa</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SOA</span><span class="op">&gt;</span>,
-        <span class="ident">negative_ttl</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-        <span class="ident">response_code</span>: <span class="ident">ResponseCode</span>,
-        <span class="ident">trusted</span>: <span class="ident">bool</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="ident">ResolveErrorKind::NoRecordsFound</span> {
-            <span class="ident">query</span>: <span class="ident">Box::new</span>(<span class="ident">query</span>),
-            <span class="ident">soa</span>: <span class="ident">soa</span>.<span class="ident">map</span>(<span class="ident">Box::new</span>),
-            <span class="ident">negative_ttl</span>,
-            <span class="ident">response_code</span>,
-            <span class="ident">trusted</span>,
+<span class="kw">impl </span>ResolveError {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>nx_error(
+        query: Query,
+        soa: <span class="prelude-ty">Option</span>&lt;SOA&gt;,
+        negative_ttl: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+        response_code: ResponseCode,
+        trusted: bool,
+    ) -&gt; <span class="self">Self </span>{
+        ResolveErrorKind::NoRecordsFound {
+            query: Box::new(query),
+            soa: soa.map(Box::new),
+            negative_ttl,
+            response_code,
+            trusted,
         }
-        .<span class="ident">into</span>()
+        .into()
     }
 
-    <span class="doccomment">/// Get the kind of the error</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">ResolveErrorKind</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">kind</span>
+    <span class="doccomment">/// Get the kind of the error
+    </span><span class="kw">pub fn </span>kind(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ResolveErrorKind {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.kind
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">no_connections</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">kind</span>: <span class="ident">ResolveErrorKind::NoConnections</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;backtrace&quot;</span>)]</span>
-            <span class="ident">backtrack</span>: <span class="macro">trace!</span>(),
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>no_connections() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            kind: ResolveErrorKind::NoConnections,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;backtrace&quot;</span>)]
+            </span>backtrack: <span class="macro">trace!</span>(),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_no_connections</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">kind</span>, <span class="ident">ResolveErrorKind::NoConnections</span>)
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_no_connections(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>.kind, ResolveErrorKind::NoConnections)
     }
 
-    <span class="doccomment">/// A conversion to determine if the response is an error</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_response</span>(<span class="ident">response</span>: <span class="ident">DnsResponse</span>, <span class="ident">trust_nx</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="macro">debug!</span>(<span class="string">&quot;Response:{}&quot;</span>, <span class="ident">response</span>.<span class="ident">header</span>());
+    <span class="doccomment">/// A conversion to determine if the response is an error
+    </span><span class="kw">pub fn </span>from_response(response: DnsResponse, trust_nx: bool) -&gt; <span class="prelude-ty">Result</span>&lt;DnsResponse, <span class="self">Self</span>&gt; {
+        <span class="macro">debug!</span>(<span class="string">&quot;Response:{}&quot;</span>, response.header());
 
-        <span class="kw">match</span> <span class="ident">response</span>.<span class="ident">response_code</span>() {
-            <span class="ident">response_code</span> @ <span class="ident">ResponseCode::ServFail</span>
-            <span class="op">|</span> <span class="ident">response_code</span> @ <span class="ident">ResponseCode::Refused</span>
-            <span class="op">|</span> <span class="ident">response_code</span> @ <span class="ident">ResponseCode::FormErr</span>
-            <span class="op">|</span> <span class="ident">response_code</span> @ <span class="ident">ResponseCode::NotImp</span>
-            <span class="op">|</span> <span class="ident">response_code</span> @ <span class="ident">ResponseCode::YXDomain</span>
-            <span class="op">|</span> <span class="ident">response_code</span> @ <span class="ident">ResponseCode::YXRRSet</span>
-            <span class="op">|</span> <span class="ident">response_code</span> @ <span class="ident">ResponseCode::NXRRSet</span>
-            <span class="op">|</span> <span class="ident">response_code</span> @ <span class="ident">ResponseCode::NotAuth</span>
-            <span class="op">|</span> <span class="ident">response_code</span> @ <span class="ident">ResponseCode::NotZone</span>
-            <span class="op">|</span> <span class="ident">response_code</span> @ <span class="ident">ResponseCode::BADVERS</span>
-            <span class="op">|</span> <span class="ident">response_code</span> @ <span class="ident">ResponseCode::BADSIG</span>
-            <span class="op">|</span> <span class="ident">response_code</span> @ <span class="ident">ResponseCode::BADKEY</span>
-            <span class="op">|</span> <span class="ident">response_code</span> @ <span class="ident">ResponseCode::BADTIME</span>
-            <span class="op">|</span> <span class="ident">response_code</span> @ <span class="ident">ResponseCode::BADMODE</span>
-            <span class="op">|</span> <span class="ident">response_code</span> @ <span class="ident">ResponseCode::BADNAME</span>
-            <span class="op">|</span> <span class="ident">response_code</span> @ <span class="ident">ResponseCode::BADALG</span>
-            <span class="op">|</span> <span class="ident">response_code</span> @ <span class="ident">ResponseCode::BADTRUNC</span>
-            <span class="op">|</span> <span class="ident">response_code</span> @ <span class="ident">ResponseCode::BADCOOKIE</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">response</span>;
-                <span class="kw">let</span> <span class="ident">soa</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">soa</span>();
-                <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">take_queries</span>().<span class="ident">drain</span>(..).<span class="ident">next</span>().<span class="ident">unwrap_or_default</span>();
-                <span class="kw">let</span> <span class="ident">error_kind</span> <span class="op">=</span> <span class="ident">ResolveErrorKind::NoRecordsFound</span> {
-                    <span class="ident">query</span>: <span class="ident">Box::new</span>(<span class="ident">query</span>),
-                    <span class="ident">soa</span>: <span class="ident">soa</span>.<span class="ident">map</span>(<span class="ident">Box::new</span>),
-                    <span class="ident">negative_ttl</span>: <span class="prelude-val">None</span>,
-                    <span class="ident">response_code</span>,
-                    <span class="ident">trusted</span>: <span class="bool-val">false</span>,
+        <span class="kw">match </span>response.response_code() {
+            response_code @ ResponseCode::ServFail
+            | response_code @ ResponseCode::Refused
+            | response_code @ ResponseCode::FormErr
+            | response_code @ ResponseCode::NotImp
+            | response_code @ ResponseCode::YXDomain
+            | response_code @ ResponseCode::YXRRSet
+            | response_code @ ResponseCode::NXRRSet
+            | response_code @ ResponseCode::NotAuth
+            | response_code @ ResponseCode::NotZone
+            | response_code @ ResponseCode::BADVERS
+            | response_code @ ResponseCode::BADSIG
+            | response_code @ ResponseCode::BADKEY
+            | response_code @ ResponseCode::BADTIME
+            | response_code @ ResponseCode::BADMODE
+            | response_code @ ResponseCode::BADNAME
+            | response_code @ ResponseCode::BADALG
+            | response_code @ ResponseCode::BADTRUNC
+            | response_code @ ResponseCode::BADCOOKIE =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>response = response;
+                <span class="kw">let </span>soa = response.soa();
+                <span class="kw">let </span>query = response.take_queries().drain(..).next().unwrap_or_default();
+                <span class="kw">let </span>error_kind = ResolveErrorKind::NoRecordsFound {
+                    query: Box::new(query),
+                    soa: soa.map(Box::new),
+                    negative_ttl: <span class="prelude-val">None</span>,
+                    response_code,
+                    trusted: <span class="bool-val">false</span>,
                 };
 
-                <span class="prelude-val">Err</span>(<span class="ident"><span class="self">Self</span>::from</span>(<span class="ident">error_kind</span>))
+                <span class="prelude-val">Err</span>(<span class="self">Self</span>::from(error_kind))
             }
-            <span class="comment">// Some NXDOMAIN responses contain CNAME referrals, that will not be an error</span>
-            <span class="ident">response_code</span> @ <span class="ident">ResponseCode::NXDomain</span> <span class="op">|</span>
-            <span class="comment">// No answers are available, CNAME referrals are not failures</span>
-            <span class="ident">response_code</span> @ <span class="ident">ResponseCode::NoError</span>
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">response</span>.<span class="ident">contains_answer</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">response</span>.<span class="ident">truncated</span>() =&gt; {
-                <span class="comment">// TODO: if authoritative, this is cacheable, store a TTL (currently that requires time, need a &quot;now&quot; here)</span>
-                <span class="comment">// let valid_until = if response.is_authoritative() { now + response.get_negative_ttl() };</span>
+            <span class="comment">// Some NXDOMAIN responses contain CNAME referrals, that will not be an error
+            </span>response_code @ ResponseCode::NXDomain |
+            <span class="comment">// No answers are available, CNAME referrals are not failures
+            </span>response_code @ ResponseCode::NoError
+            <span class="kw">if </span>!response.contains_answer() &amp;&amp; !response.truncated() =&gt; {
+                <span class="comment">// TODO: if authoritative, this is cacheable, store a TTL (currently that requires time, need a &quot;now&quot; here)
+                // let valid_until = if response.is_authoritative() { now + response.get_negative_ttl() };
 
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">response</span>;
-                <span class="kw">let</span> <span class="ident">soa</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">soa</span>();
-                <span class="kw">let</span> <span class="ident">negative_ttl</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">negative_ttl</span>();
-                <span class="kw">let</span> <span class="ident">trusted</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">response_code</span> <span class="op">==</span> <span class="ident">ResponseCode::NoError</span> { <span class="bool-val">false</span> } <span class="kw">else</span> { <span class="ident">trust_nx</span> };
-                <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">take_queries</span>().<span class="ident">drain</span>(..).<span class="ident">next</span>().<span class="ident">unwrap_or_default</span>();
-                <span class="kw">let</span> <span class="ident">error_kind</span> <span class="op">=</span> <span class="ident">ResolveErrorKind::NoRecordsFound</span> {
-                    <span class="ident">query</span>: <span class="ident">Box::new</span>(<span class="ident">query</span>),
-                    <span class="ident">soa</span>: <span class="ident">soa</span>.<span class="ident">map</span>(<span class="ident">Box::new</span>),
-                    <span class="ident">negative_ttl</span>,
-                    <span class="ident">response_code</span>,
-                    <span class="ident">trusted</span>,
+                </span><span class="kw">let </span><span class="kw-2">mut </span>response = response;
+                <span class="kw">let </span>soa = response.soa();
+                <span class="kw">let </span>negative_ttl = response.negative_ttl();
+                <span class="kw">let </span>trusted = <span class="kw">if </span>response_code == ResponseCode::NoError { <span class="bool-val">false </span>} <span class="kw">else </span>{ trust_nx };
+                <span class="kw">let </span>query = response.take_queries().drain(..).next().unwrap_or_default();
+                <span class="kw">let </span>error_kind = ResolveErrorKind::NoRecordsFound {
+                    query: Box::new(query),
+                    soa: soa.map(Box::new),
+                    negative_ttl,
+                    response_code,
+                    trusted,
                 };
 
-                <span class="prelude-val">Err</span>(<span class="ident"><span class="self">Self</span>::from</span>(<span class="ident">error_kind</span>))
+                <span class="prelude-val">Err</span>(<span class="self">Self</span>::from(error_kind))
             }
-            <span class="ident">ResponseCode::NXDomain</span>
-            <span class="op">|</span> <span class="ident">ResponseCode::NoError</span>
-            <span class="op">|</span> <span class="ident">ResponseCode::Unknown</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">response</span>),
+            ResponseCode::NXDomain
+            | ResponseCode::NoError
+            | ResponseCode::Unknown(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(response),
         }
     }
 
-    <span class="doccomment">/// Compare two errors to see if one contains a server response.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">cmp_specificity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">Ordering</span> {
-        <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">kind</span>();
-        <span class="kw">let</span> <span class="ident">other</span> <span class="op">=</span> <span class="ident">other</span>.<span class="ident">kind</span>();
+    <span class="doccomment">/// Compare two errors to see if one contains a server response.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>cmp_specificity(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; Ordering {
+        <span class="kw">let </span>kind = <span class="self">self</span>.kind();
+        <span class="kw">let </span>other = other.kind();
 
-        <span class="kw">match</span> (<span class="ident">kind</span>, <span class="ident">other</span>) {
-            (<span class="ident">ResolveErrorKind::NoRecordsFound</span> { .. }, <span class="ident">ResolveErrorKind::NoRecordsFound</span> { .. }) =&gt; {
-                <span class="kw">return</span> <span class="ident">Ordering::Equal</span>
+        <span class="kw">match </span>(kind, other) {
+            (ResolveErrorKind::NoRecordsFound { .. }, ResolveErrorKind::NoRecordsFound { .. }) =&gt; {
+                <span class="kw">return </span>Ordering::Equal
             }
-            (<span class="ident">ResolveErrorKind::NoRecordsFound</span> { .. }, <span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="ident">Ordering::Greater</span>,
-            (<span class="kw">_</span>, <span class="ident">ResolveErrorKind::NoRecordsFound</span> { .. }) =&gt; <span class="kw">return</span> <span class="ident">Ordering::Less</span>,
-            <span class="kw">_</span> =&gt; (),
+            (ResolveErrorKind::NoRecordsFound { .. }, <span class="kw">_</span>) =&gt; <span class="kw">return </span>Ordering::Greater,
+            (<span class="kw">_</span>, ResolveErrorKind::NoRecordsFound { .. }) =&gt; <span class="kw">return </span>Ordering::Less,
+            <span class="kw">_ </span>=&gt; (),
         }
 
-        <span class="kw">match</span> (<span class="ident">kind</span>, <span class="ident">other</span>) {
-            (<span class="ident">ResolveErrorKind::Io</span> { .. }, <span class="ident">ResolveErrorKind::Io</span> { .. }) =&gt; <span class="kw">return</span> <span class="ident">Ordering::Equal</span>,
-            (<span class="ident">ResolveErrorKind::Io</span> { .. }, <span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="ident">Ordering::Greater</span>,
-            (<span class="kw">_</span>, <span class="ident">ResolveErrorKind::Io</span> { .. }) =&gt; <span class="kw">return</span> <span class="ident">Ordering::Less</span>,
-            <span class="kw">_</span> =&gt; (),
+        <span class="kw">match </span>(kind, other) {
+            (ResolveErrorKind::Io { .. }, ResolveErrorKind::Io { .. }) =&gt; <span class="kw">return </span>Ordering::Equal,
+            (ResolveErrorKind::Io { .. }, <span class="kw">_</span>) =&gt; <span class="kw">return </span>Ordering::Greater,
+            (<span class="kw">_</span>, ResolveErrorKind::Io { .. }) =&gt; <span class="kw">return </span>Ordering::Less,
+            <span class="kw">_ </span>=&gt; (),
         }
 
-        <span class="kw">match</span> (<span class="ident">kind</span>, <span class="ident">other</span>) {
-            (<span class="ident">ResolveErrorKind::Proto</span> { .. }, <span class="ident">ResolveErrorKind::Proto</span> { .. }) =&gt; {
-                <span class="kw">return</span> <span class="ident">Ordering::Equal</span>
+        <span class="kw">match </span>(kind, other) {
+            (ResolveErrorKind::Proto { .. }, ResolveErrorKind::Proto { .. }) =&gt; {
+                <span class="kw">return </span>Ordering::Equal
             }
-            (<span class="ident">ResolveErrorKind::Proto</span> { .. }, <span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="ident">Ordering::Greater</span>,
-            (<span class="kw">_</span>, <span class="ident">ResolveErrorKind::Proto</span> { .. }) =&gt; <span class="kw">return</span> <span class="ident">Ordering::Less</span>,
-            <span class="kw">_</span> =&gt; (),
+            (ResolveErrorKind::Proto { .. }, <span class="kw">_</span>) =&gt; <span class="kw">return </span>Ordering::Greater,
+            (<span class="kw">_</span>, ResolveErrorKind::Proto { .. }) =&gt; <span class="kw">return </span>Ordering::Less,
+            <span class="kw">_ </span>=&gt; (),
         }
 
-        <span class="kw">match</span> (<span class="ident">kind</span>, <span class="ident">other</span>) {
-            (<span class="ident">ResolveErrorKind::Timeout</span>, <span class="ident">ResolveErrorKind::Timeout</span>) =&gt; <span class="kw">return</span> <span class="ident">Ordering::Equal</span>,
-            (<span class="ident">ResolveErrorKind::Timeout</span>, <span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="ident">Ordering::Greater</span>,
-            (<span class="kw">_</span>, <span class="ident">ResolveErrorKind::Timeout</span>) =&gt; <span class="kw">return</span> <span class="ident">Ordering::Less</span>,
-            <span class="kw">_</span> =&gt; (),
+        <span class="kw">match </span>(kind, other) {
+            (ResolveErrorKind::Timeout, ResolveErrorKind::Timeout) =&gt; <span class="kw">return </span>Ordering::Equal,
+            (ResolveErrorKind::Timeout, <span class="kw">_</span>) =&gt; <span class="kw">return </span>Ordering::Greater,
+            (<span class="kw">_</span>, ResolveErrorKind::Timeout) =&gt; <span class="kw">return </span>Ordering::Less,
+            <span class="kw">_ </span>=&gt; (),
         }
 
-        <span class="ident">Ordering::Equal</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">RetryableError</span> <span class="kw">for</span> <span class="ident">ResolveError</span> {
-    <span class="kw">fn</span> <span class="ident">should_retry</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span>() {
-            <span class="ident">ResolveErrorKind::Message</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">ResolveErrorKind::Msg</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">ResolveErrorKind::NoConnections</span>
-            <span class="op">|</span> <span class="ident">ResolveErrorKind::NoRecordsFound</span> { .. } =&gt; <span class="bool-val">false</span>,
-            <span class="ident">ResolveErrorKind::Io</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">ResolveErrorKind::Proto</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">ResolveErrorKind::Timeout</span> =&gt; {
-                <span class="bool-val">true</span>
-            }
-        }
-    }
-
-    <span class="kw">fn</span> <span class="ident">attempted</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span>() {
-            <span class="ident">ResolveErrorKind::Proto</span>(<span class="ident">e</span>) =&gt; <span class="op">!</span><span class="macro">matches!</span>(<span class="ident">e</span>.<span class="ident">kind</span>(), <span class="ident">ProtoErrorKind::Busy</span>),
-            <span class="kw">_</span> =&gt; <span class="bool-val">true</span>,
-        }
+        Ordering::Equal
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ResolveError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">cfg_if::cfg_if!</span> {
-            <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;backtrace&quot;</span>)]</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">backtrace</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">backtrack</span> {
-                    <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">kind</span>, <span class="ident">f</span>)<span class="question-mark">?</span>;
-                    <span class="ident">fmt::Debug::fmt</span>(<span class="ident">backtrace</span>, <span class="ident">f</span>)
-                } <span class="kw">else</span> {
-                    <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">kind</span>, <span class="ident">f</span>)
+<span class="kw">impl </span>RetryableError <span class="kw">for </span>ResolveError {
+    <span class="kw">fn </span>should_retry(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="self">self</span>.kind() {
+            ResolveErrorKind::Message(<span class="kw">_</span>)
+            | ResolveErrorKind::Msg(<span class="kw">_</span>)
+            | ResolveErrorKind::NoConnections
+            | ResolveErrorKind::NoRecordsFound { .. } =&gt; <span class="bool-val">false</span>,
+            ResolveErrorKind::Io(<span class="kw">_</span>) | ResolveErrorKind::Proto(<span class="kw">_</span>) | ResolveErrorKind::Timeout =&gt; {
+                <span class="bool-val">true
+            </span>}
+        }
+    }
+
+    <span class="kw">fn </span>attempted(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="self">self</span>.kind() {
+            ResolveErrorKind::Proto(e) =&gt; !<span class="macro">matches!</span>(e.kind(), ProtoErrorKind::Busy),
+            <span class="kw">_ </span>=&gt; <span class="bool-val">true</span>,
+        }
+    }
+}
+
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>ResolveError {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">cfg_if::cfg_if! </span>{
+            <span class="kw">if </span><span class="attribute">#[cfg(feature = <span class="string">&quot;backtrace&quot;</span>)] </span>{
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>backtrace) = <span class="self">self</span>.backtrack {
+                    fmt::Display::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.kind, f)<span class="question-mark">?</span>;
+                    fmt::Debug::fmt(backtrace, f)
+                } <span class="kw">else </span>{
+                    fmt::Display::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.kind, f)
                 }
-            } <span class="kw">else</span> {
-                <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">kind</span>, <span class="ident">f</span>)
+            } <span class="kw">else </span>{
+                fmt::Display::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.kind, f)
             }
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ResolveErrorKind</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ResolveError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">kind</span>: <span class="ident">ResolveErrorKind</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">kind</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;backtrace&quot;</span>)]</span>
-            <span class="ident">backtrack</span>: <span class="macro">trace!</span>(),
+<span class="kw">impl </span>From&lt;ResolveErrorKind&gt; <span class="kw">for </span>ResolveError {
+    <span class="kw">fn </span>from(kind: ResolveErrorKind) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            kind,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;backtrace&quot;</span>)]
+            </span>backtrack: <span class="macro">trace!</span>(),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ResolveError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">ResolveErrorKind::Message</span>(<span class="ident">msg</span>).<span class="ident">into</span>()
+<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; <span class="kw">for </span>ResolveError {
+    <span class="kw">fn </span>from(msg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="self">Self </span>{
+        ResolveErrorKind::Message(msg).into()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;system-config&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;system-config&quot;</span>, <span class="ident">windows</span>))))]</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ipconfig::error::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ResolveError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">ipconfig::error::Error</span>) -&gt; <span class="ident">ResolveError</span> {
-        <span class="ident">ResolveErrorKind::Msg</span>(<span class="macro">format!</span>(<span class="string">&quot;failed to read from registry: {}&quot;</span>, <span class="ident">e</span>)).<span class="ident">into</span>()
+<span class="attribute">#[cfg(target_os = <span class="string">&quot;windows&quot;</span>)]
+#[cfg(feature = <span class="string">&quot;system-config&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(all(feature = <span class="string">&quot;system-config&quot;</span>, windows))))]
+</span><span class="kw">impl </span>From&lt;ipconfig::error::Error&gt; <span class="kw">for </span>ResolveError {
+    <span class="kw">fn </span>from(e: ipconfig::error::Error) -&gt; ResolveError {
+        ResolveErrorKind::Msg(<span class="macro">format!</span>(<span class="string">&quot;failed to read from registry: {}&quot;</span>, e)).into()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ResolveError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">msg</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">ResolveErrorKind::Msg</span>(<span class="ident">msg</span>).<span class="ident">into</span>()
+<span class="kw">impl </span>From&lt;String&gt; <span class="kw">for </span>ResolveError {
+    <span class="kw">fn </span>from(msg: String) -&gt; <span class="self">Self </span>{
+        ResolveErrorKind::Msg(msg).into()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">io::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ResolveError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">io::Error</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">e</span>.<span class="ident">kind</span>() {
-            <span class="ident">io::ErrorKind::TimedOut</span> =&gt; <span class="ident">ResolveErrorKind::Timeout</span>.<span class="ident">into</span>(),
-            <span class="kw">_</span> =&gt; <span class="ident">ResolveErrorKind::from</span>(<span class="ident">e</span>).<span class="ident">into</span>(),
+<span class="kw">impl </span>From&lt;io::Error&gt; <span class="kw">for </span>ResolveError {
+    <span class="kw">fn </span>from(e: io::Error) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>e.kind() {
+            io::ErrorKind::TimedOut =&gt; ResolveErrorKind::Timeout.into(),
+            <span class="kw">_ </span>=&gt; ResolveErrorKind::from(e).into(),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ProtoError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ResolveError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">ProtoError</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">e</span>.<span class="ident">kind</span>() {
-            <span class="ident">ProtoErrorKind::Timeout</span> =&gt; <span class="ident">ResolveErrorKind::Timeout</span>.<span class="ident">into</span>(),
-            <span class="kw">_</span> =&gt; <span class="ident">ResolveErrorKind::from</span>(<span class="ident">e</span>).<span class="ident">into</span>(),
+<span class="kw">impl </span>From&lt;ProtoError&gt; <span class="kw">for </span>ResolveError {
+    <span class="kw">fn </span>from(e: ProtoError) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span><span class="kw-2">*</span>e.kind() {
+            ProtoErrorKind::Timeout =&gt; ResolveErrorKind::Timeout.into(),
+            <span class="kw">_ </span>=&gt; ResolveErrorKind::from(e).into(),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ResolveError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">io::Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">ResolveError</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">e</span>.<span class="ident">kind</span>() {
-            <span class="ident">ResolveErrorKind::Timeout</span> =&gt; <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">io::ErrorKind::TimedOut</span>, <span class="ident">e</span>),
-            <span class="kw">_</span> =&gt; <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">io::ErrorKind::Other</span>, <span class="ident">e</span>),
+<span class="kw">impl </span>From&lt;ResolveError&gt; <span class="kw">for </span>io::Error {
+    <span class="kw">fn </span>from(e: ResolveError) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>e.kind() {
+            ResolveErrorKind::Timeout =&gt; <span class="self">Self</span>::new(io::ErrorKind::TimedOut, e),
+            <span class="kw">_ </span>=&gt; <span class="self">Self</span>::new(io::ErrorKind::Other, e),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">sync::PoisonError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ResolveError</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">sync::PoisonError</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">ResolveErrorKind::Msg</span>(<span class="macro">format!</span>(<span class="string">&quot;lock was poisoned, this is non-recoverable: {}&quot;</span>, <span class="ident">e</span>)).<span class="ident">into</span>()
+<span class="kw">impl</span>&lt;T&gt; From&lt;sync::PoisonError&lt;T&gt;&gt; <span class="kw">for </span>ResolveError {
+    <span class="kw">fn </span>from(e: sync::PoisonError&lt;T&gt;) -&gt; <span class="self">Self </span>{
+        ResolveErrorKind::Msg(<span class="macro">format!</span>(<span class="string">&quot;lock was poisoned, this is non-recoverable: {}&quot;</span>, e)).into()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="trust_dns_resolver" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="trust_dns_resolver" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

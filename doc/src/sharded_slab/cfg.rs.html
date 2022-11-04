@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sharded-slab-0.1.4/src/cfg.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>cfg.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sharded_slab/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sharded_slab/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sharded_slab/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sharded-slab-0.1.4/src/cfg.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>cfg.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sharded_slab/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sharded_slab/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sharded_slab/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -213,220 +213,220 @@
 <span id="213">213</span>
 <span id="214">214</span>
 <span id="215">215</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::page</span>::{
-    <span class="ident">slot</span>::{<span class="ident">Generation</span>, <span class="ident">RefCount</span>},
-    <span class="ident">Addr</span>,
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::page::{
+    slot::{Generation, RefCount},
+    Addr,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Pack</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">marker::PhantomData</span>};
-<span class="doccomment">/// Configuration parameters which can be overridden to tune the behavior of a slab.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Config</span>: <span class="ident">Sized</span> {
-    <span class="doccomment">/// The maximum number of threads which can access the slab.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This value (rounded to a power of two) determines the number of shards</span>
-    <span class="doccomment">/// in the slab. If a thread is created, accesses the slab, and then terminates,</span>
-    <span class="doccomment">/// its shard may be reused and thus does not count against the maximum</span>
-    <span class="doccomment">/// number of threads once the thread has terminated.</span>
-    <span class="kw">const</span> <span class="ident">MAX_THREADS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">DefaultConfig::MAX_THREADS</span>;
-    <span class="doccomment">/// The maximum number of pages in each shard in the slab.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This value, in combination with `INITIAL_PAGE_SIZE`, determines how many</span>
-    <span class="doccomment">/// bits of each index are used to represent page addresses.</span>
-    <span class="kw">const</span> <span class="ident">MAX_PAGES</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">DefaultConfig::MAX_PAGES</span>;
-    <span class="doccomment">/// The size of the first page in each shard.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When a page in a shard has been filled with values, a new page</span>
-    <span class="doccomment">/// will be allocated that is twice as large as the previous page. Thus, the</span>
-    <span class="doccomment">/// second page will be twice this size, and the third will be four times</span>
-    <span class="doccomment">/// this size, and so on.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that page sizes must be powers of two. If this value is not a power</span>
-    <span class="doccomment">/// of two, it will be rounded to the next power of two.</span>
-    <span class="kw">const</span> <span class="ident">INITIAL_PAGE_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">DefaultConfig::INITIAL_PAGE_SIZE</span>;
-    <span class="doccomment">/// Sets a number of high-order bits in each index which are reserved from</span>
-    <span class="doccomment">/// user code.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that these bits are taken from the generation counter; if the page</span>
-    <span class="doccomment">/// address and thread IDs are configured to use a large number of bits,</span>
-    <span class="doccomment">/// reserving additional bits will decrease the period of the generation</span>
-    <span class="doccomment">/// counter. These should thus be used relatively sparingly, to ensure that</span>
-    <span class="doccomment">/// generation counters are able to effectively prevent the ABA problem.</span>
-    <span class="kw">const</span> <span class="ident">RESERVED_BITS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
+<span class="kw">use </span><span class="kw">crate</span>::Pack;
+<span class="kw">use </span>std::{fmt, marker::PhantomData};
+<span class="doccomment">/// Configuration parameters which can be overridden to tune the behavior of a slab.
+</span><span class="kw">pub trait </span>Config: Sized {
+    <span class="doccomment">/// The maximum number of threads which can access the slab.
+    ///
+    /// This value (rounded to a power of two) determines the number of shards
+    /// in the slab. If a thread is created, accesses the slab, and then terminates,
+    /// its shard may be reused and thus does not count against the maximum
+    /// number of threads once the thread has terminated.
+    </span><span class="kw">const </span>MAX_THREADS: usize = DefaultConfig::MAX_THREADS;
+    <span class="doccomment">/// The maximum number of pages in each shard in the slab.
+    ///
+    /// This value, in combination with `INITIAL_PAGE_SIZE`, determines how many
+    /// bits of each index are used to represent page addresses.
+    </span><span class="kw">const </span>MAX_PAGES: usize = DefaultConfig::MAX_PAGES;
+    <span class="doccomment">/// The size of the first page in each shard.
+    ///
+    /// When a page in a shard has been filled with values, a new page
+    /// will be allocated that is twice as large as the previous page. Thus, the
+    /// second page will be twice this size, and the third will be four times
+    /// this size, and so on.
+    ///
+    /// Note that page sizes must be powers of two. If this value is not a power
+    /// of two, it will be rounded to the next power of two.
+    </span><span class="kw">const </span>INITIAL_PAGE_SIZE: usize = DefaultConfig::INITIAL_PAGE_SIZE;
+    <span class="doccomment">/// Sets a number of high-order bits in each index which are reserved from
+    /// user code.
+    ///
+    /// Note that these bits are taken from the generation counter; if the page
+    /// address and thread IDs are configured to use a large number of bits,
+    /// reserving additional bits will decrease the period of the generation
+    /// counter. These should thus be used relatively sparingly, to ensure that
+    /// generation counters are able to effectively prevent the ABA problem.
+    </span><span class="kw">const </span>RESERVED_BITS: usize = <span class="number">0</span>;
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">CfgPrivate</span>: <span class="ident">Config</span> {
-    <span class="kw">const</span> <span class="ident">USED_BITS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">Generation</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="ident">::LEN</span> <span class="op">+</span> <span class="ident">Generation</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="ident">::SHIFT</span>;
-    <span class="kw">const</span> <span class="ident">INITIAL_SZ</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">next_pow2</span>(<span class="ident"><span class="self">Self</span>::INITIAL_PAGE_SIZE</span>);
-    <span class="kw">const</span> <span class="ident">MAX_SHARDS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">next_pow2</span>(<span class="ident"><span class="self">Self</span>::MAX_THREADS</span> <span class="op">-</span> <span class="number">1</span>);
-    <span class="kw">const</span> <span class="ident">ADDR_INDEX_SHIFT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::INITIAL_SZ</span>.<span class="ident">trailing_zeros</span>() <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="number">1</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>CfgPrivate: Config {
+    <span class="kw">const </span>USED_BITS: usize = Generation::&lt;<span class="self">Self</span>&gt;::LEN + Generation::&lt;<span class="self">Self</span>&gt;::SHIFT;
+    <span class="kw">const </span>INITIAL_SZ: usize = next_pow2(<span class="self">Self</span>::INITIAL_PAGE_SIZE);
+    <span class="kw">const </span>MAX_SHARDS: usize = next_pow2(<span class="self">Self</span>::MAX_THREADS - <span class="number">1</span>);
+    <span class="kw">const </span>ADDR_INDEX_SHIFT: usize = <span class="self">Self</span>::INITIAL_SZ.trailing_zeros() <span class="kw">as </span>usize + <span class="number">1</span>;
 
-    <span class="kw">fn</span> <span class="ident">page_size</span>(<span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
-        <span class="ident"><span class="self">Self</span>::INITIAL_SZ</span> <span class="op">*</span> <span class="number">2usize</span>.<span class="ident">pow</span>(<span class="ident">n</span> <span class="kw">as</span> <span class="kw">_</span>)
+    <span class="kw">fn </span>page_size(n: usize) -&gt; usize {
+        <span class="self">Self</span>::INITIAL_SZ * <span class="number">2usize</span>.pow(n <span class="kw">as _</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">debug</span>() -&gt; <span class="ident">DebugConfig</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">DebugConfig</span> { <span class="ident">_cfg</span>: <span class="ident">PhantomData</span> }
+    <span class="kw">fn </span>debug() -&gt; DebugConfig&lt;<span class="self">Self</span>&gt; {
+        DebugConfig { _cfg: PhantomData }
     }
 
-    <span class="kw">fn</span> <span class="ident">validate</span>() {
+    <span class="kw">fn </span>validate() {
         <span class="macro">assert!</span>(
-            <span class="ident"><span class="self">Self</span>::INITIAL_SZ</span>.<span class="ident">is_power_of_two</span>(),
+            <span class="self">Self</span>::INITIAL_SZ.is_power_of_two(),
             <span class="string">&quot;invalid Config: {:#?}&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::debug</span>(),
+            <span class="self">Self</span>::debug(),
         );
         <span class="macro">assert!</span>(
-            <span class="ident"><span class="self">Self</span>::INITIAL_SZ</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">Addr</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="ident">::BITS</span>,
+            <span class="self">Self</span>::INITIAL_SZ &lt;= Addr::&lt;<span class="self">Self</span>&gt;::BITS,
             <span class="string">&quot;invalid Config: {:#?}&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::debug</span>()
+            <span class="self">Self</span>::debug()
         );
 
         <span class="macro">assert!</span>(
-            <span class="ident">Generation</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="ident">::BITS</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">3</span>,
+            Generation::&lt;<span class="self">Self</span>&gt;::BITS &gt;= <span class="number">3</span>,
             <span class="string">&quot;invalid Config: {:#?}\ngeneration counter should be at least 3 bits!&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::debug</span>()
+            <span class="self">Self</span>::debug()
         );
 
         <span class="macro">assert!</span>(
-            <span class="ident"><span class="self">Self</span>::USED_BITS</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">WIDTH</span>,
+            <span class="self">Self</span>::USED_BITS &lt;= WIDTH,
             <span class="string">&quot;invalid Config: {:#?}\ntotal number of bits per index is too large to fit in a word!&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::debug</span>()
+            <span class="self">Self</span>::debug()
         );
 
         <span class="macro">assert!</span>(
-            <span class="ident">WIDTH</span> <span class="op">-</span> <span class="ident"><span class="self">Self</span>::USED_BITS</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident"><span class="self">Self</span>::RESERVED_BITS</span>,
+            WIDTH - <span class="self">Self</span>::USED_BITS &gt;= <span class="self">Self</span>::RESERVED_BITS,
             <span class="string">&quot;invalid Config: {:#?}\nindices are too large to fit reserved bits!&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::debug</span>()
+            <span class="self">Self</span>::debug()
         );
 
         <span class="macro">assert!</span>(
-            <span class="ident">RefCount</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="ident">::MAX</span> <span class="op">&gt;</span> <span class="number">1</span>,
+            RefCount::&lt;<span class="self">Self</span>&gt;::MAX &gt; <span class="number">1</span>,
             <span class="string">&quot;invalid config: {:#?}\n maximum concurrent references would be {}&quot;</span>,
-            <span class="ident"><span class="self">Self</span>::debug</span>(),
-            <span class="ident">RefCount</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="ident">::MAX</span>,
+            <span class="self">Self</span>::debug(),
+            RefCount::&lt;<span class="self">Self</span>&gt;::MAX,
         );
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">unpack</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">Pack</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">packed</span>: <span class="ident">usize</span>) -&gt; <span class="ident">A</span> {
-        <span class="ident">A::from_packed</span>(<span class="ident">packed</span>)
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>unpack&lt;A: Pack&lt;<span class="self">Self</span>&gt;&gt;(packed: usize) -&gt; A {
+        A::from_packed(packed)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">unpack_addr</span>(<span class="ident">packed</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Addr</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::unpack</span>(<span class="ident">packed</span>)
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>unpack_addr(packed: usize) -&gt; Addr&lt;<span class="self">Self</span>&gt; {
+        <span class="self">Self</span>::unpack(packed)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">unpack_tid</span>(<span class="ident">packed</span>: <span class="ident">usize</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Tid</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::unpack</span>(<span class="ident">packed</span>)
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>unpack_tid(packed: usize) -&gt; <span class="kw">crate</span>::Tid&lt;<span class="self">Self</span>&gt; {
+        <span class="self">Self</span>::unpack(packed)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">unpack_gen</span>(<span class="ident">packed</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Generation</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::unpack</span>(<span class="ident">packed</span>)
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>unpack_gen(packed: usize) -&gt; Generation&lt;<span class="self">Self</span>&gt; {
+        <span class="self">Self</span>::unpack(packed)
     }
 }
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Config</span><span class="op">&gt;</span> <span class="ident">CfgPrivate</span> <span class="kw">for</span> <span class="ident">C</span> {}
+<span class="kw">impl</span>&lt;C: Config&gt; CfgPrivate <span class="kw">for </span>C {}
 
-<span class="doccomment">/// Default slab configuration values.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DefaultConfig</span> {
-    <span class="ident">_p</span>: (),
+<span class="doccomment">/// Default slab configuration values.
+</span><span class="attribute">#[derive(Copy, Clone)]
+</span><span class="kw">pub struct </span>DefaultConfig {
+    _p: (),
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">DebugConfig</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Config</span><span class="op">&gt;</span> {
-    <span class="ident">_cfg</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">C</span>)<span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>DebugConfig&lt;C: Config&gt; {
+    _cfg: PhantomData&lt;<span class="kw">fn</span>(C)&gt;,
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">WIDTH</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>() <span class="op">*</span> <span class="number">8</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>WIDTH: usize = std::mem::size_of::&lt;usize&gt;() * <span class="number">8</span>;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">next_pow2</span>(<span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
-    <span class="kw">let</span> <span class="ident">pow2</span> <span class="op">=</span> <span class="ident">n</span>.<span class="ident">count_ones</span>() <span class="op">==</span> <span class="number">1</span>;
-    <span class="kw">let</span> <span class="ident">zeros</span> <span class="op">=</span> <span class="ident">n</span>.<span class="ident">leading_zeros</span>();
-    <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="ident">WIDTH</span> <span class="op">-</span> <span class="ident">zeros</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="ident">pow2</span> <span class="kw">as</span> <span class="ident">usize</span>)
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const fn </span>next_pow2(n: usize) -&gt; usize {
+    <span class="kw">let </span>pow2 = n.count_ones() == <span class="number">1</span>;
+    <span class="kw">let </span>zeros = n.leading_zeros();
+    <span class="number">1 </span>&lt;&lt; (WIDTH - zeros <span class="kw">as </span>usize - pow2 <span class="kw">as </span>usize)
 }
 
-<span class="comment">// === impl DefaultConfig ===</span>
+<span class="comment">// === impl DefaultConfig ===
 
-<span class="kw">impl</span> <span class="ident">Config</span> <span class="kw">for</span> <span class="ident">DefaultConfig</span> {
-    <span class="kw">const</span> <span class="ident">INITIAL_PAGE_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">32</span>;
+</span><span class="kw">impl </span>Config <span class="kw">for </span>DefaultConfig {
+    <span class="kw">const </span>INITIAL_PAGE_SIZE: usize = <span class="number">32</span>;
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;64&quot;</span>)]</span>
-    <span class="kw">const</span> <span class="ident">MAX_THREADS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4096</span>;
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;32&quot;</span>)]</span>
-    <span class="comment">// TODO(eliza): can we find enough bits to give 32-bit platforms more threads?</span>
-    <span class="kw">const</span> <span class="ident">MAX_THREADS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">128</span>;
+    <span class="attribute">#[cfg(target_pointer_width = <span class="string">&quot;64&quot;</span>)]
+    </span><span class="kw">const </span>MAX_THREADS: usize = <span class="number">4096</span>;
+    <span class="attribute">#[cfg(target_pointer_width = <span class="string">&quot;32&quot;</span>)]
+    </span><span class="comment">// TODO(eliza): can we find enough bits to give 32-bit platforms more threads?
+    </span><span class="kw">const </span>MAX_THREADS: usize = <span class="number">128</span>;
 
-    <span class="kw">const</span> <span class="ident">MAX_PAGES</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">WIDTH</span> <span class="op">/</span> <span class="number">2</span>;
+    <span class="kw">const </span>MAX_PAGES: usize = WIDTH / <span class="number">2</span>;
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">DefaultConfig</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident"><span class="self">Self</span>::debug</span>().<span class="ident">fmt</span>(<span class="ident">f</span>)
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Config</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">DebugConfig</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="ident">std::any::type_name</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>())
-            .<span class="ident">field</span>(<span class="string">&quot;initial_page_size&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">C::INITIAL_SZ</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;max_shards&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">C::MAX_SHARDS</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;max_pages&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">C::MAX_PAGES</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;used_bits&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">C::USED_BITS</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;reserved_bits&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">C::RESERVED_BITS</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;pointer_width&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">WIDTH</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;max_concurrent_references&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">RefCount</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::MAX</span>)
-            .<span class="ident">finish</span>()
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>DefaultConfig {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="self">Self</span>::debug().fmt(f)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::test_util</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Slab</span>;
+<span class="kw">impl</span>&lt;C: Config&gt; fmt::Debug <span class="kw">for </span>DebugConfig&lt;C&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(std::any::type_name::&lt;C&gt;())
+            .field(<span class="string">&quot;initial_page_size&quot;</span>, <span class="kw-2">&amp;</span>C::INITIAL_SZ)
+            .field(<span class="string">&quot;max_shards&quot;</span>, <span class="kw-2">&amp;</span>C::MAX_SHARDS)
+            .field(<span class="string">&quot;max_pages&quot;</span>, <span class="kw-2">&amp;</span>C::MAX_PAGES)
+            .field(<span class="string">&quot;used_bits&quot;</span>, <span class="kw-2">&amp;</span>C::USED_BITS)
+            .field(<span class="string">&quot;reserved_bits&quot;</span>, <span class="kw-2">&amp;</span>C::RESERVED_BITS)
+            .field(<span class="string">&quot;pointer_width&quot;</span>, <span class="kw-2">&amp;</span>WIDTH)
+            .field(<span class="string">&quot;max_concurrent_references&quot;</span>, <span class="kw-2">&amp;</span>RefCount::&lt;C&gt;::MAX)
+            .finish()
+    }
+}
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">loom</span>, <span class="ident">ignore</span>)]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>]</span>
-    <span class="kw">fn</span> <span class="ident">validates_max_refs</span>() {
-        <span class="kw">struct</span> <span class="ident">GiantGenConfig</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::test_util;
+    <span class="kw">use </span><span class="kw">crate</span>::Slab;
 
-        <span class="comment">// Configure the slab with a very large number of bits for the generation</span>
-        <span class="comment">// counter. This will only leave 1 bit to use for the slot reference</span>
-        <span class="comment">// counter, which will fail to validate.</span>
-        <span class="kw">impl</span> <span class="ident">Config</span> <span class="kw">for</span> <span class="ident">GiantGenConfig</span> {
-            <span class="kw">const</span> <span class="ident">INITIAL_PAGE_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span>;
-            <span class="kw">const</span> <span class="ident">MAX_THREADS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span>;
-            <span class="kw">const</span> <span class="ident">MAX_PAGES</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span>;
+    <span class="attribute">#[test]
+    #[cfg_attr(loom, ignore)]
+    #[should_panic]
+    </span><span class="kw">fn </span>validates_max_refs() {
+        <span class="kw">struct </span>GiantGenConfig;
+
+        <span class="comment">// Configure the slab with a very large number of bits for the generation
+        // counter. This will only leave 1 bit to use for the slot reference
+        // counter, which will fail to validate.
+        </span><span class="kw">impl </span>Config <span class="kw">for </span>GiantGenConfig {
+            <span class="kw">const </span>INITIAL_PAGE_SIZE: usize = <span class="number">1</span>;
+            <span class="kw">const </span>MAX_THREADS: usize = <span class="number">1</span>;
+            <span class="kw">const </span>MAX_PAGES: usize = <span class="number">1</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">_slab</span> <span class="op">=</span> <span class="ident">Slab</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="ident">::new_with_config</span>::<span class="op">&lt;</span><span class="ident">GiantGenConfig</span><span class="op">&gt;</span>();
+        <span class="kw">let </span>_slab = Slab::&lt;usize&gt;::new_with_config::&lt;GiantGenConfig&gt;();
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">loom</span>, <span class="ident">ignore</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">big</span>() {
-        <span class="kw">let</span> <span class="ident">slab</span> <span class="op">=</span> <span class="ident">Slab::new</span>();
+    <span class="attribute">#[test]
+    #[cfg_attr(loom, ignore)]
+    </span><span class="kw">fn </span>big() {
+        <span class="kw">let </span>slab = Slab::new();
 
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">10000</span> {
-            <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">i</span>);
-            <span class="kw">let</span> <span class="ident">k</span> <span class="op">=</span> <span class="ident">slab</span>.<span class="ident">insert</span>(<span class="ident">i</span>).<span class="ident">expect</span>(<span class="string">&quot;insert&quot;</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">slab</span>.<span class="ident">get</span>(<span class="ident">k</span>).<span class="ident">expect</span>(<span class="string">&quot;get&quot;</span>), <span class="ident">i</span>);
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">10000 </span>{
+            <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, i);
+            <span class="kw">let </span>k = slab.insert(i).expect(<span class="string">&quot;insert&quot;</span>);
+            <span class="macro">assert_eq!</span>(slab.get(k).expect(<span class="string">&quot;get&quot;</span>), i);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">loom</span>, <span class="ident">ignore</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">custom_page_sz</span>() {
-        <span class="kw">let</span> <span class="ident">slab</span> <span class="op">=</span> <span class="ident">Slab::new_with_config</span>::<span class="op">&lt;</span><span class="ident">test_util::TinyConfig</span><span class="op">&gt;</span>();
+    <span class="attribute">#[test]
+    #[cfg_attr(loom, ignore)]
+    </span><span class="kw">fn </span>custom_page_sz() {
+        <span class="kw">let </span>slab = Slab::new_with_config::&lt;test_util::TinyConfig&gt;();
 
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">4096</span> {
-            <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">i</span>);
-            <span class="kw">let</span> <span class="ident">k</span> <span class="op">=</span> <span class="ident">slab</span>.<span class="ident">insert</span>(<span class="ident">i</span>).<span class="ident">expect</span>(<span class="string">&quot;insert&quot;</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">slab</span>.<span class="ident">get</span>(<span class="ident">k</span>).<span class="ident">expect</span>(<span class="string">&quot;get&quot;</span>), <span class="ident">i</span>);
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">4096 </span>{
+            <span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, i);
+            <span class="kw">let </span>k = slab.insert(i).expect(<span class="string">&quot;insert&quot;</span>);
+            <span class="macro">assert_eq!</span>(slab.get(k).expect(<span class="string">&quot;get&quot;</span>), i);
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sharded_slab" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sharded_slab" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

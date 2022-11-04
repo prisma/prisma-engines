@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/client/auth/scram.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>scram.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mongodb/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/client/auth/scram.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>scram.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mongodb/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -746,335 +746,335 @@
 <span id="746">746</span>
 <span id="747">747</span>
 <span id="748">748</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">borrow::Cow</span>,
-    <span class="ident">collections</span>::{<span class="ident">hash_map::Entry</span>, <span class="ident">HashMap</span>},
-    <span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Display</span>, <span class="ident">Formatter</span>},
-    <span class="ident">ops</span>::{<span class="ident">BitXor</span>, <span class="ident">Range</span>},
-    <span class="ident">str</span>,
+</pre><pre class="rust"><code><span class="kw">use </span>std::{
+    borrow::Cow,
+    collections::{hash_map::Entry, HashMap},
+    fmt::{<span class="self">self</span>, Display, Formatter},
+    ops::{BitXor, Range},
+    str,
 };
 
-<span class="kw">use</span> <span class="ident">hmac</span>::{
-    <span class="ident">digest</span>::{<span class="ident">Digest</span>, <span class="ident">FixedOutput</span>, <span class="ident">KeyInit</span>},
-    <span class="ident">Hmac</span>,
-    <span class="ident">Mac</span>,
+<span class="kw">use </span>hmac::{
+    digest::{Digest, FixedOutput, KeyInit},
+    Hmac,
+    Mac,
 };
-<span class="kw">use</span> <span class="ident">lazy_static::lazy_static</span>;
-<span class="kw">use</span> <span class="ident">md5::Md5</span>;
-<span class="kw">use</span> <span class="ident">sha1::Sha1</span>;
-<span class="kw">use</span> <span class="ident">sha2::Sha256</span>;
-<span class="kw">use</span> <span class="ident">tokio::sync::RwLock</span>;
+<span class="kw">use </span>lazy_static::lazy_static;
+<span class="kw">use </span>md5::Md5;
+<span class="kw">use </span>sha1::Sha1;
+<span class="kw">use </span>sha2::Sha256;
+<span class="kw">use </span>tokio::sync::RwLock;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">bson</span>::{<span class="ident">doc</span>, <span class="ident">Bson</span>, <span class="ident">Document</span>},
-    <span class="ident">client</span>::{
-        <span class="ident">auth</span>::{
+<span class="kw">use crate</span>::{
+    bson::{doc, Bson, Document},
+    client::{
+        auth::{
             <span class="self">self</span>,
-            <span class="ident">sasl</span>::{<span class="ident">SaslContinue</span>, <span class="ident">SaslResponse</span>, <span class="ident">SaslStart</span>},
-            <span class="ident">AuthMechanism</span>,
-            <span class="ident">Credential</span>,
+            sasl::{SaslContinue, SaslResponse, SaslStart},
+            AuthMechanism,
+            Credential,
         },
-        <span class="ident">options::ServerApi</span>,
+        options::ServerApi,
     },
-    <span class="ident">cmap</span>::{<span class="ident">Command</span>, <span class="ident">Connection</span>},
-    <span class="ident">error</span>::{<span class="ident">Error</span>, <span class="prelude-ty">Result</span>},
+    cmap::{Command, Connection},
+    error::{Error, <span class="prelude-ty">Result</span>},
 };
 
-<span class="comment">// The single letter attribute keys in SCRAM messages.</span>
-<span class="kw">const</span> <span class="ident">ITERATION_COUNT_KEY</span>: <span class="ident">char</span> <span class="op">=</span> <span class="string">&#39;i&#39;</span>;
-<span class="kw">const</span> <span class="ident">ERROR_KEY</span>: <span class="ident">char</span> <span class="op">=</span> <span class="string">&#39;e&#39;</span>;
-<span class="kw">const</span> <span class="ident">PROOF_KEY</span>: <span class="ident">char</span> <span class="op">=</span> <span class="string">&#39;p&#39;</span>;
-<span class="kw">const</span> <span class="ident">VERIFIER_KEY</span>: <span class="ident">char</span> <span class="op">=</span> <span class="string">&#39;v&#39;</span>;
-<span class="kw">const</span> <span class="ident">NONCE_KEY</span>: <span class="ident">char</span> <span class="op">=</span> <span class="string">&#39;r&#39;</span>;
-<span class="kw">const</span> <span class="ident">SALT_KEY</span>: <span class="ident">char</span> <span class="op">=</span> <span class="string">&#39;s&#39;</span>;
-<span class="kw">const</span> <span class="ident">CHANNEL_BINDING_KEY</span>: <span class="ident">char</span> <span class="op">=</span> <span class="string">&#39;c&#39;</span>;
-<span class="kw">const</span> <span class="ident">USERNAME_KEY</span>: <span class="ident">char</span> <span class="op">=</span> <span class="string">&#39;n&#39;</span>;
+<span class="comment">// The single letter attribute keys in SCRAM messages.
+</span><span class="kw">const </span>ITERATION_COUNT_KEY: char = <span class="string">&#39;i&#39;</span>;
+<span class="kw">const </span>ERROR_KEY: char = <span class="string">&#39;e&#39;</span>;
+<span class="kw">const </span>PROOF_KEY: char = <span class="string">&#39;p&#39;</span>;
+<span class="kw">const </span>VERIFIER_KEY: char = <span class="string">&#39;v&#39;</span>;
+<span class="kw">const </span>NONCE_KEY: char = <span class="string">&#39;r&#39;</span>;
+<span class="kw">const </span>SALT_KEY: char = <span class="string">&#39;s&#39;</span>;
+<span class="kw">const </span>CHANNEL_BINDING_KEY: char = <span class="string">&#39;c&#39;</span>;
+<span class="kw">const </span>USERNAME_KEY: char = <span class="string">&#39;n&#39;</span>;
 
-<span class="doccomment">/// Constant specifying that we won&#39;t be using channel binding.</span>
-<span class="kw">const</span> <span class="ident">NO_CHANNEL_BINDING</span>: <span class="ident">char</span> <span class="op">=</span> <span class="string">&#39;n&#39;</span>;
+<span class="doccomment">/// Constant specifying that we won&#39;t be using channel binding.
+</span><span class="kw">const </span>NO_CHANNEL_BINDING: char = <span class="string">&#39;n&#39;</span>;
 
-<span class="doccomment">/// The minimum number of iterations of the hash function that we will accept from the server.</span>
-<span class="kw">const</span> <span class="ident">MIN_ITERATION_COUNT</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">4096</span>;
+<span class="doccomment">/// The minimum number of iterations of the hash function that we will accept from the server.
+</span><span class="kw">const </span>MIN_ITERATION_COUNT: u32 = <span class="number">4096</span>;
 
-<span class="macro">lazy_static!</span> {
-    <span class="doccomment">/// Cache of pre-computed salted passwords.</span>
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">CREDENTIAL_CACHE</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">CacheEntry</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> {
-        <span class="ident">RwLock::new</span>(<span class="ident">HashMap::new</span>())
+<span class="macro">lazy_static! </span>{
+    <span class="doccomment">/// Cache of pre-computed salted passwords.
+    </span><span class="kw">static </span><span class="kw-2">ref </span>CREDENTIAL_CACHE: RwLock&lt;HashMap&lt;CacheEntry, Vec&lt;u8&gt;&gt;&gt; = {
+        RwLock::new(HashMap::new())
     };
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Hash</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">struct</span> <span class="ident">CacheEntry</span> {
-    <span class="ident">password</span>: <span class="ident">String</span>,
-    <span class="ident">salt</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="ident">i</span>: <span class="ident">u32</span>,
-    <span class="ident">mechanism</span>: <span class="ident">ScramVersion</span>,
+<span class="attribute">#[derive(Hash, Eq, PartialEq)]
+</span><span class="kw">struct </span>CacheEntry {
+    password: String,
+    salt: Vec&lt;u8&gt;,
+    i: u32,
+    mechanism: ScramVersion,
 }
 
-<span class="doccomment">/// The versions of SCRAM supported by the driver (classified according to hash function used).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Hash</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">ScramVersion</span> {
-    <span class="ident">Sha1</span>,
-    <span class="ident">Sha256</span>,
+<span class="doccomment">/// The versions of SCRAM supported by the driver (classified according to hash function used).
+</span><span class="attribute">#[derive(Debug, Hash, Eq, PartialEq, Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>ScramVersion {
+    Sha1,
+    Sha256,
 }
 
-<span class="doccomment">/// Contains the authentication info derived from a Credential.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ClientAuthInfo</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">username</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">password</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
+<span class="doccomment">/// Contains the authentication info derived from a Credential.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ClientAuthInfo&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) username: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) password: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) source: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
 }
 
-<span class="doccomment">/// The contents of the first round of a SCRAM handshake.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">FirstRound</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">client_first</span>: <span class="ident">ClientFirst</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">server_first</span>: <span class="ident">Document</span>,
+<span class="doccomment">/// The contents of the first round of a SCRAM handshake.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>FirstRound {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) client_first: ClientFirst,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) server_first: Document,
 }
 
-<span class="kw">impl</span> <span class="ident">ScramVersion</span> {
-    <span class="doccomment">/// Derives the authentication info from a credential.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">client_auth_info</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+<span class="kw">impl </span>ScramVersion {
+    <span class="doccomment">/// Derives the authentication info from a credential.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>client_auth_info&lt;<span class="lifetime">&#39;a</span>&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">credential</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Credential</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ClientAuthInfo</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">username</span> <span class="op">=</span> <span class="ident">credential</span>
-            .<span class="ident">username</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Error::authentication_error</span>(<span class="string">&quot;SCRAM&quot;</span>, <span class="string">&quot;no username supplied&quot;</span>))<span class="question-mark">?</span>;
+        credential: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Credential,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;ClientAuthInfo&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="kw">let </span>username = credential
+            .username
+            .as_ref()
+            .ok_or_else(|| Error::authentication_error(<span class="string">&quot;SCRAM&quot;</span>, <span class="string">&quot;no username supplied&quot;</span>))<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">password</span> <span class="op">=</span> <span class="ident">credential</span>
-            .<span class="ident">password</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Error::authentication_error</span>(<span class="string">&quot;SCRAM&quot;</span>, <span class="string">&quot;no password supplied&quot;</span>))<span class="question-mark">?</span>;
+        <span class="kw">let </span>password = credential
+            .password
+            .as_ref()
+            .ok_or_else(|| Error::authentication_error(<span class="string">&quot;SCRAM&quot;</span>, <span class="string">&quot;no password supplied&quot;</span>))<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">source</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">credential</span>.<span class="ident">source</span>.<span class="ident">as_ref</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">as_str</span>(),
-            <span class="prelude-val">None</span> =&gt; <span class="string">&quot;admin&quot;</span>,
+        <span class="kw">let </span>source = <span class="kw">match </span>credential.source.as_ref() {
+            <span class="prelude-val">Some</span>(s) =&gt; s.as_str(),
+            <span class="prelude-val">None </span>=&gt; <span class="string">&quot;admin&quot;</span>,
         };
 
-        <span class="kw">if</span> <span class="ident">credential</span>.<span class="ident">mechanism_properties</span>.<span class="ident">is_some</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::authentication_error</span>(
+        <span class="kw">if </span>credential.mechanism_properties.is_some() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::authentication_error(
                 <span class="string">&quot;SCRAM&quot;</span>,
                 <span class="string">&quot;mechanism properties MUST NOT be specified&quot;</span>,
             ));
         };
 
-        <span class="prelude-val">Ok</span>(<span class="ident">ClientAuthInfo</span> {
-            <span class="ident">username</span>,
-            <span class="ident">password</span>,
-            <span class="ident">source</span>,
+        <span class="prelude-val">Ok</span>(ClientAuthInfo {
+            username,
+            password,
+            source,
         })
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">build_speculative_client_first</span>(
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>build_speculative_client_first(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">credential</span>: <span class="kw-2">&amp;</span><span class="ident">Credential</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ClientFirst</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">build_client_first</span>(<span class="ident">credential</span>, <span class="bool-val">true</span>, <span class="prelude-val">None</span>)
+        credential: <span class="kw-2">&amp;</span>Credential,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;ClientFirst&gt; {
+        <span class="self">self</span>.build_client_first(credential, <span class="bool-val">true</span>, <span class="prelude-val">None</span>)
     }
 
-    <span class="doccomment">/// Constructs the first client message in the SCRAM handshake.</span>
-    <span class="kw">fn</span> <span class="ident">build_client_first</span>(
+    <span class="doccomment">/// Constructs the first client message in the SCRAM handshake.
+    </span><span class="kw">fn </span>build_client_first(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">credential</span>: <span class="kw-2">&amp;</span><span class="ident">Credential</span>,
-        <span class="ident">include_db</span>: <span class="ident">bool</span>,
-        <span class="ident">server_api</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ServerApi</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ClientFirst</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client_auth_info</span>(<span class="ident">credential</span>)<span class="question-mark">?</span>;
+        credential: <span class="kw-2">&amp;</span>Credential,
+        include_db: bool,
+        server_api: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ServerApi&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;ClientFirst&gt; {
+        <span class="kw">let </span>info = <span class="self">self</span>.client_auth_info(credential)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">ClientFirst::new</span>(
-            <span class="ident">info</span>.<span class="ident">source</span>,
-            <span class="ident">info</span>.<span class="ident">username</span>,
-            <span class="ident">include_db</span>,
-            <span class="ident">server_api</span>.<span class="ident">cloned</span>(),
+        <span class="prelude-val">Ok</span>(ClientFirst::new(
+            info.source,
+            info.username,
+            include_db,
+            server_api.cloned(),
         ))
     }
 
-    <span class="doccomment">/// Sends the first client message in the SCRAM handshake.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send_client_first</span>(
+    <span class="doccomment">/// Sends the first client message in the SCRAM handshake.
+    </span><span class="kw">async fn </span>send_client_first(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">conn</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Connection</span>,
-        <span class="ident">credential</span>: <span class="kw-2">&amp;</span><span class="ident">Credential</span>,
-        <span class="ident">server_api</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ServerApi</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">FirstRound</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">client_first</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">build_client_first</span>(<span class="ident">credential</span>, <span class="bool-val">false</span>, <span class="ident">server_api</span>)<span class="question-mark">?</span>;
+        conn: <span class="kw-2">&amp;mut </span>Connection,
+        credential: <span class="kw-2">&amp;</span>Credential,
+        server_api: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ServerApi&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;FirstRound&gt; {
+        <span class="kw">let </span>client_first = <span class="self">self</span>.build_client_first(credential, <span class="bool-val">false</span>, server_api)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">command</span> <span class="op">=</span> <span class="ident">client_first</span>.<span class="ident">to_command</span>(<span class="self">self</span>);
+        <span class="kw">let </span>command = client_first.to_command(<span class="self">self</span>);
 
-        <span class="kw">let</span> <span class="ident">server_first</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">send_command</span>(<span class="ident">command</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>server_first = conn.send_command(command, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">FirstRound</span> {
-            <span class="ident">client_first</span>,
-            <span class="ident">server_first</span>: <span class="ident">server_first</span>.<span class="ident">auth_response_body</span>(<span class="string">&quot;SCRAM&quot;</span>)<span class="question-mark">?</span>,
+        <span class="prelude-val">Ok</span>(FirstRound {
+            client_first,
+            server_first: server_first.auth_response_body(<span class="string">&quot;SCRAM&quot;</span>)<span class="question-mark">?</span>,
         })
     }
 
-    <span class="doccomment">/// Perform SCRAM authentication for a given stream.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">authenticate_stream</span>(
+    <span class="doccomment">/// Perform SCRAM authentication for a given stream.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>authenticate_stream(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">conn</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Connection</span>,
-        <span class="ident">credential</span>: <span class="kw-2">&amp;</span><span class="ident">Credential</span>,
-        <span class="ident">server_api</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ServerApi</span><span class="op">&gt;</span>,
-        <span class="ident">first_round</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FirstRound</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">FirstRound</span> {
-            <span class="ident">client_first</span>,
-            <span class="ident">server_first</span>,
-        } <span class="op">=</span> <span class="kw">match</span> <span class="ident">first_round</span>.<span class="ident">into</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">first_round</span>) =&gt; <span class="ident">first_round</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="self">self</span>.<span class="ident">send_client_first</span>(<span class="ident">conn</span>, <span class="ident">credential</span>, <span class="ident">server_api</span>).<span class="kw">await</span><span class="question-mark">?</span>,
+        conn: <span class="kw-2">&amp;mut </span>Connection,
+        credential: <span class="kw-2">&amp;</span>Credential,
+        server_api: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ServerApi&gt;,
+        first_round: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;FirstRound&gt;&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>FirstRound {
+            client_first,
+            server_first,
+        } = <span class="kw">match </span>first_round.into() {
+            <span class="prelude-val">Some</span>(first_round) =&gt; first_round,
+            <span class="prelude-val">None </span>=&gt; <span class="self">self</span>.send_client_first(conn, credential, server_api).<span class="kw">await</span><span class="question-mark">?</span>,
         };
 
-        <span class="kw">let</span> <span class="ident">ClientAuthInfo</span> {
-            <span class="ident">username</span>,
-            <span class="ident">password</span>,
-            <span class="ident">source</span>,
-        } <span class="op">=</span> <span class="self">self</span>.<span class="ident">client_auth_info</span>(<span class="ident">credential</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>ClientAuthInfo {
+            username,
+            password,
+            source,
+        } = <span class="self">self</span>.client_auth_info(credential)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">server_first</span> <span class="op">=</span> <span class="ident">ServerFirst::parse</span>(<span class="ident">server_first</span>)<span class="question-mark">?</span>;
-        <span class="ident">server_first</span>.<span class="ident">validate</span>(<span class="ident">client_first</span>.<span class="ident">nonce</span>.<span class="ident">as_str</span>())<span class="question-mark">?</span>;
+        <span class="kw">let </span>server_first = ServerFirst::parse(server_first)<span class="question-mark">?</span>;
+        server_first.validate(client_first.nonce.as_str())<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">cache_entry_key</span> <span class="op">=</span> <span class="ident">CacheEntry</span> {
-            <span class="ident">password</span>: <span class="ident">password</span>.<span class="ident">to_string</span>(),
-            <span class="ident">salt</span>: <span class="ident">server_first</span>.<span class="ident">salt</span>().<span class="ident">to_vec</span>(),
-            <span class="ident">i</span>: <span class="ident">server_first</span>.<span class="ident">i</span>(),
-            <span class="ident">mechanism</span>: <span class="self">self</span>.<span class="ident">clone</span>(),
+        <span class="kw">let </span>cache_entry_key = CacheEntry {
+            password: password.to_string(),
+            salt: server_first.salt().to_vec(),
+            i: server_first.i(),
+            mechanism: <span class="self">self</span>.clone(),
         };
-        <span class="kw">let</span> (<span class="ident">should_update_cache</span>, <span class="ident">salted_password</span>) <span class="op">=</span>
-            <span class="kw">match</span> <span class="ident">CREDENTIAL_CACHE</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">cache_entry_key</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">pwd</span>) =&gt; (<span class="bool-val">false</span>, <span class="ident">pwd</span>.<span class="ident">clone</span>()),
-                <span class="prelude-val">None</span> =&gt; (
+        <span class="kw">let </span>(should_update_cache, salted_password) =
+            <span class="kw">match </span>CREDENTIAL_CACHE.read().<span class="kw">await</span>.get(<span class="kw-2">&amp;</span>cache_entry_key) {
+                <span class="prelude-val">Some</span>(pwd) =&gt; (<span class="bool-val">false</span>, pwd.clone()),
+                <span class="prelude-val">None </span>=&gt; (
                     <span class="bool-val">true</span>,
-                    <span class="self">self</span>.<span class="ident">compute_salted_password</span>(
-                        <span class="ident">username</span>,
-                        <span class="ident">password</span>,
-                        <span class="ident">server_first</span>.<span class="ident">i</span>(),
-                        <span class="ident">server_first</span>.<span class="ident">salt</span>(),
+                    <span class="self">self</span>.compute_salted_password(
+                        username,
+                        password,
+                        server_first.i(),
+                        server_first.salt(),
                     )<span class="question-mark">?</span>,
                 ),
             };
 
-        <span class="kw">let</span> <span class="ident">client_final</span> <span class="op">=</span> <span class="ident">ClientFinal::new</span>(
-            <span class="ident">source</span>,
-            <span class="ident">salted_password</span>.<span class="ident">as_slice</span>(),
-            <span class="kw-2">&amp;</span><span class="ident">client_first</span>,
-            <span class="kw-2">&amp;</span><span class="ident">server_first</span>,
+        <span class="kw">let </span>client_final = ClientFinal::new(
+            source,
+            salted_password.as_slice(),
+            <span class="kw-2">&amp;</span>client_first,
+            <span class="kw-2">&amp;</span>server_first,
             <span class="self">self</span>,
-            <span class="ident">server_api</span>.<span class="ident">cloned</span>(),
+            server_api.cloned(),
         )<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">command</span> <span class="op">=</span> <span class="ident">client_final</span>.<span class="ident">to_command</span>();
+        <span class="kw">let </span>command = client_final.to_command();
 
-        <span class="kw">let</span> <span class="ident">server_final_response</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">send_command</span>(<span class="ident">command</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">server_final</span> <span class="op">=</span> <span class="ident">ServerFinal::parse</span>(<span class="ident">server_final_response</span>.<span class="ident">auth_response_body</span>(<span class="string">&quot;SCRAM&quot;</span>)<span class="question-mark">?</span>)<span class="question-mark">?</span>;
-        <span class="ident">server_final</span>.<span class="ident">validate</span>(<span class="ident">salted_password</span>.<span class="ident">as_slice</span>(), <span class="kw-2">&amp;</span><span class="ident">client_final</span>, <span class="self">self</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>server_final_response = conn.send_command(command, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>server_final = ServerFinal::parse(server_final_response.auth_response_body(<span class="string">&quot;SCRAM&quot;</span>)<span class="question-mark">?</span>)<span class="question-mark">?</span>;
+        server_final.validate(salted_password.as_slice(), <span class="kw-2">&amp;</span>client_final, <span class="self">self</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">server_final</span>.<span class="ident">done</span> {
-            <span class="comment">// Normal SCRAM implementations would cease here. The following round trip is MongoDB</span>
-            <span class="comment">// implementation specific on server versions &lt; 4.4 and just consists of a client no-op</span>
-            <span class="comment">// followed by a server no-op with &quot;done: true&quot;.</span>
-            <span class="kw">let</span> <span class="ident">noop</span> <span class="op">=</span> <span class="ident">SaslContinue::new</span>(
-                <span class="ident">source</span>.<span class="ident">into</span>(),
-                <span class="ident">server_final</span>.<span class="ident">conversation_id</span>().<span class="ident">clone</span>(),
-                <span class="ident">Vec::new</span>(),
-                <span class="ident">server_api</span>.<span class="ident">cloned</span>(),
+        <span class="kw">if </span>!server_final.done {
+            <span class="comment">// Normal SCRAM implementations would cease here. The following round trip is MongoDB
+            // implementation specific on server versions &lt; 4.4 and just consists of a client no-op
+            // followed by a server no-op with &quot;done: true&quot;.
+            </span><span class="kw">let </span>noop = SaslContinue::new(
+                source.into(),
+                server_final.conversation_id().clone(),
+                Vec::new(),
+                server_api.cloned(),
             );
-            <span class="kw">let</span> <span class="ident">command</span> <span class="op">=</span> <span class="ident">noop</span>.<span class="ident">into_command</span>();
+            <span class="kw">let </span>command = noop.into_command();
 
-            <span class="kw">let</span> <span class="ident">server_noop_response</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">send_command</span>(<span class="ident">command</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">server_noop_response_document</span>: <span class="ident">Document</span> <span class="op">=</span>
-                <span class="ident">server_noop_response</span>.<span class="ident">auth_response_body</span>(<span class="string">&quot;SCRAM&quot;</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>server_noop_response = conn.send_command(command, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="kw">let </span>server_noop_response_document: Document =
+                server_noop_response.auth_response_body(<span class="string">&quot;SCRAM&quot;</span>)<span class="question-mark">?</span>;
 
-            <span class="kw">if</span> <span class="ident">server_noop_response_document</span>
-                .<span class="ident">get</span>(<span class="string">&quot;conversationId&quot;</span>)
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="ident">id</span> <span class="op">==</span> <span class="ident">server_final</span>.<span class="ident">conversation_id</span>())
-                <span class="op">!</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)
+            <span class="kw">if </span>server_noop_response_document
+                .get(<span class="string">&quot;conversationId&quot;</span>)
+                .map(|id| id == server_final.conversation_id())
+                != <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)
             {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::authentication_error</span>(
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::authentication_error(
                     <span class="string">&quot;SCRAM&quot;</span>,
                     <span class="string">&quot;mismatched conversationId&#39;s&quot;</span>,
                 ));
             };
 
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">server_noop_response_document</span>
-                .<span class="ident">get_bool</span>(<span class="string">&quot;done&quot;</span>)
-                .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+            <span class="kw">if </span>!server_noop_response_document
+                .get_bool(<span class="string">&quot;done&quot;</span>)
+                .unwrap_or(<span class="bool-val">false</span>)
             {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::authentication_error</span>(
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::authentication_error(
                     <span class="string">&quot;SCRAM&quot;</span>,
                     <span class="string">&quot;authentication did not complete successfully&quot;</span>,
                 ));
             }
         }
 
-        <span class="kw">if</span> <span class="ident">should_update_cache</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">CREDENTIAL_CACHE</span>.<span class="ident">write</span>().<span class="kw">await</span>;
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Entry::Vacant</span>(<span class="ident">entry</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">entry</span>(<span class="ident">cache_entry_key</span>) {
-                <span class="ident">entry</span>.<span class="ident">insert</span>(<span class="ident">salted_password</span>);
+        <span class="kw">if </span>should_update_cache {
+            <span class="kw">let </span><span class="kw-2">mut </span>cache = CREDENTIAL_CACHE.write().<span class="kw">await</span>;
+            <span class="kw">if let </span>Entry::Vacant(entry) = cache.entry(cache_entry_key) {
+                entry.insert(salted_password);
             }
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// HMAC function used as part of SCRAM authentication.</span>
-    <span class="kw">fn</span> <span class="ident">hmac</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ScramVersion::Sha1</span> =&gt; <span class="ident">auth::mac</span>::<span class="op">&lt;</span><span class="ident">Hmac</span><span class="op">&lt;</span><span class="ident">Sha1</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">key</span>, <span class="ident">input</span>, <span class="string">&quot;SCRAM&quot;</span>)<span class="question-mark">?</span>
-                .<span class="ident">as_ref</span>()
-                .<span class="ident">into</span>(),
-            <span class="ident">ScramVersion::Sha256</span> =&gt; <span class="ident">auth::mac</span>::<span class="op">&lt;</span><span class="ident">Hmac</span><span class="op">&lt;</span><span class="ident">Sha256</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">key</span>, <span class="ident">input</span>, <span class="string">&quot;SCRAM&quot;</span>)<span class="question-mark">?</span>
-                .<span class="ident">as_ref</span>()
-                .<span class="ident">into</span>(),
+    <span class="doccomment">/// HMAC function used as part of SCRAM authentication.
+    </span><span class="kw">fn </span>hmac(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>[u8], input: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;&gt; {
+        <span class="kw">let </span>bytes = <span class="kw">match </span><span class="self">self </span>{
+            ScramVersion::Sha1 =&gt; auth::mac::&lt;Hmac&lt;Sha1&gt;&gt;(key, input, <span class="string">&quot;SCRAM&quot;</span>)<span class="question-mark">?
+                </span>.as_ref()
+                .into(),
+            ScramVersion::Sha256 =&gt; auth::mac::&lt;Hmac&lt;Sha256&gt;&gt;(key, input, <span class="string">&quot;SCRAM&quot;</span>)<span class="question-mark">?
+                </span>.as_ref()
+                .into(),
         };
 
-        <span class="prelude-val">Ok</span>(<span class="ident">bytes</span>)
+        <span class="prelude-val">Ok</span>(bytes)
     }
 
-    <span class="doccomment">/// Compute the HMAC of the given key and input and verify it matches the given signature.</span>
-    <span class="kw">fn</span> <span class="ident">hmac_verify</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">signature</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ScramVersion::Sha1</span> =&gt; <span class="ident">mac_verify</span>::<span class="op">&lt;</span><span class="ident">Hmac</span><span class="op">&lt;</span><span class="ident">Sha1</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">key</span>, <span class="ident">input</span>, <span class="ident">signature</span>),
-            <span class="ident">ScramVersion::Sha256</span> =&gt; <span class="ident">mac_verify</span>::<span class="op">&lt;</span><span class="ident">Hmac</span><span class="op">&lt;</span><span class="ident">Sha256</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">key</span>, <span class="ident">input</span>, <span class="ident">signature</span>),
+    <span class="doccomment">/// Compute the HMAC of the given key and input and verify it matches the given signature.
+    </span><span class="kw">fn </span>hmac_verify(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>[u8], input: <span class="kw-2">&amp;</span>[u8], signature: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            ScramVersion::Sha1 =&gt; mac_verify::&lt;Hmac&lt;Sha1&gt;&gt;(key, input, signature),
+            ScramVersion::Sha256 =&gt; mac_verify::&lt;Hmac&lt;Sha256&gt;&gt;(key, input, signature),
         }
     }
 
-    <span class="doccomment">/// The &quot;h&quot; function defined in the SCRAM RFC.</span>
-    <span class="kw">fn</span> <span class="ident">h</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">str</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ScramVersion::Sha1</span> =&gt; <span class="ident">hash</span>::<span class="op">&lt;</span><span class="ident">Sha1</span><span class="op">&gt;</span>(<span class="ident">str</span>),
-            <span class="ident">ScramVersion::Sha256</span> =&gt; <span class="ident">hash</span>::<span class="op">&lt;</span><span class="ident">Sha256</span><span class="op">&gt;</span>(<span class="ident">str</span>),
+    <span class="doccomment">/// The &quot;h&quot; function defined in the SCRAM RFC.
+    </span><span class="kw">fn </span>h(<span class="kw-2">&amp;</span><span class="self">self</span>, str: <span class="kw-2">&amp;</span>[u8]) -&gt; Vec&lt;u8&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            ScramVersion::Sha1 =&gt; hash::&lt;Sha1&gt;(str),
+            ScramVersion::Sha256 =&gt; hash::&lt;Sha256&gt;(str),
         }
     }
 
-    <span class="doccomment">/// The &quot;h_i&quot; function as defined in the SCRAM RFC.</span>
-    <span class="kw">fn</span> <span class="ident">h_i</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">salt</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">iterations</span>: <span class="ident">u32</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ScramVersion::Sha1</span> =&gt; <span class="ident">h_i</span>::<span class="op">&lt;</span><span class="ident">Hmac</span><span class="op">&lt;</span><span class="ident">Sha1</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">str</span>, <span class="ident">salt</span>, <span class="ident">iterations</span>, <span class="number">160</span> <span class="op">/</span> <span class="number">8</span>),
-            <span class="ident">ScramVersion::Sha256</span> =&gt; <span class="ident">h_i</span>::<span class="op">&lt;</span><span class="ident">Hmac</span><span class="op">&lt;</span><span class="ident">Sha256</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">str</span>, <span class="ident">salt</span>, <span class="ident">iterations</span>, <span class="number">256</span> <span class="op">/</span> <span class="number">8</span>),
+    <span class="doccomment">/// The &quot;h_i&quot; function as defined in the SCRAM RFC.
+    </span><span class="kw">fn </span>h_i(<span class="kw-2">&amp;</span><span class="self">self</span>, str: <span class="kw-2">&amp;</span>str, salt: <span class="kw-2">&amp;</span>[u8], iterations: u32) -&gt; Vec&lt;u8&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            ScramVersion::Sha1 =&gt; h_i::&lt;Hmac&lt;Sha1&gt;&gt;(str, salt, iterations, <span class="number">160 </span>/ <span class="number">8</span>),
+            ScramVersion::Sha256 =&gt; h_i::&lt;Hmac&lt;Sha256&gt;&gt;(str, salt, iterations, <span class="number">256 </span>/ <span class="number">8</span>),
         }
     }
 
-    <span class="doccomment">/// Computes the salted password according to the SCRAM RFC and the MongoDB specific password</span>
-    <span class="doccomment">/// hashing algorithm.</span>
-    <span class="kw">fn</span> <span class="ident">compute_salted_password</span>(
+    <span class="doccomment">/// Computes the salted password according to the SCRAM RFC and the MongoDB specific password
+    /// hashing algorithm.
+    </span><span class="kw">fn </span>compute_salted_password(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">username</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">password</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">i</span>: <span class="ident">u32</span>,
-        <span class="ident">salt</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">normalized_password</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ScramVersion::Sha1</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">md5</span> <span class="op">=</span> <span class="ident">Md5::new</span>();
-                <span class="ident">md5</span>.<span class="ident">update</span>(<span class="macro">format!</span>(<span class="string">&quot;{}:mongo:{}&quot;</span>, <span class="ident">username</span>, <span class="ident">password</span>));
-                <span class="ident">Cow::Owned</span>(<span class="ident">hex::encode</span>(<span class="ident">md5</span>.<span class="ident">finalize</span>()))
+        username: <span class="kw-2">&amp;</span>str,
+        password: <span class="kw-2">&amp;</span>str,
+        i: u32,
+        salt: <span class="kw-2">&amp;</span>[u8],
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;&gt; {
+        <span class="kw">let </span>normalized_password = <span class="kw">match </span><span class="self">self </span>{
+            ScramVersion::Sha1 =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>md5 = Md5::new();
+                md5.update(<span class="macro">format!</span>(<span class="string">&quot;{}:mongo:{}&quot;</span>, username, password));
+                Cow::Owned(hex::encode(md5.finalize()))
             }
-            <span class="ident">ScramVersion::Sha256</span> =&gt; <span class="kw">match</span> <span class="ident">stringprep::saslprep</span>(<span class="ident">password</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">p</span>) =&gt; <span class="ident">p</span>,
+            ScramVersion::Sha256 =&gt; <span class="kw">match </span>stringprep::saslprep(password) {
+                <span class="prelude-val">Ok</span>(p) =&gt; p,
                 <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::authentication_error</span>(
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(Error::authentication_error(
                         <span class="string">&quot;SCRAM-SHA-256&quot;</span>,
                         <span class="string">&quot;saslprep failure&quot;</span>,
                     ))
@@ -1082,417 +1082,417 @@
             },
         };
 
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">h_i</span>(<span class="ident">normalized_password</span>.<span class="ident">as_ref</span>(), <span class="ident">salt</span>, <span class="ident">i</span>))
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.h_i(normalized_password.as_ref(), salt, i))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">ScramVersion</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ScramVersion::Sha1</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;SCRAM-SHA-1&quot;</span>),
-            <span class="ident">ScramVersion::Sha256</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;SCRAM-SHA-256&quot;</span>),
+<span class="kw">impl </span>Display <span class="kw">for </span>ScramVersion {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            ScramVersion::Sha1 =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;SCRAM-SHA-1&quot;</span>),
+            ScramVersion::Sha256 =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;SCRAM-SHA-256&quot;</span>),
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">xor</span>(<span class="ident">lhs</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">rhs</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-    <span class="macro">assert_eq!</span>(<span class="ident">lhs</span>.<span class="ident">len</span>(), <span class="ident">rhs</span>.<span class="ident">len</span>());
+<span class="kw">fn </span>xor(lhs: <span class="kw-2">&amp;</span>[u8], rhs: <span class="kw-2">&amp;</span>[u8]) -&gt; Vec&lt;u8&gt; {
+    <span class="macro">assert_eq!</span>(lhs.len(), rhs.len());
 
-    <span class="ident">lhs</span>.<span class="ident">iter</span>()
-        .<span class="ident">zip</span>(<span class="ident">rhs</span>.<span class="ident">iter</span>())
-        .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">l</span>, <span class="ident">r</span>)<span class="op">|</span> <span class="ident">l</span>.<span class="ident">bitxor</span>(<span class="ident">r</span>))
-        .<span class="ident">collect</span>()
+    lhs.iter()
+        .zip(rhs.iter())
+        .map(|(l, r)| l.bitxor(r))
+        .collect()
 }
 
-<span class="kw">fn</span> <span class="ident">mac_verify</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Mac</span> <span class="op">+</span> <span class="ident">KeyInit</span><span class="op">&gt;</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">signature</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mac</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">M</span> <span class="kw">as</span> <span class="ident">Mac</span><span class="op">&gt;</span><span class="ident">::new_from_slice</span>(<span class="ident">key</span>)
-        .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::unknown_authentication_error</span>(<span class="string">&quot;SCRAM&quot;</span>))<span class="question-mark">?</span>;
-    <span class="ident">mac</span>.<span class="ident">update</span>(<span class="ident">input</span>);
-    <span class="kw">match</span> <span class="ident">mac</span>.<span class="ident">verify_slice</span>(<span class="ident">signature</span>) {
+<span class="kw">fn </span>mac_verify&lt;M: Mac + KeyInit&gt;(key: <span class="kw-2">&amp;</span>[u8], input: <span class="kw-2">&amp;</span>[u8], signature: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>mac = &lt;M <span class="kw">as </span>Mac&gt;::new_from_slice(key)
+        .map_err(|<span class="kw">_</span>| Error::unknown_authentication_error(<span class="string">&quot;SCRAM&quot;</span>))<span class="question-mark">?</span>;
+    mac.update(input);
+    <span class="kw">match </span>mac.verify_slice(signature) {
         <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(()),
-        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::authentication_error</span>(
+        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(Error::authentication_error(
             <span class="string">&quot;SCRAM&quot;</span>,
             <span class="string">&quot;Authentication failed.&quot;</span>,
         )),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Digest</span><span class="op">&gt;</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hash</span> <span class="op">=</span> <span class="ident">D::new</span>();
-    <span class="ident">hash</span>.<span class="ident">update</span>(<span class="ident">val</span>);
-    <span class="ident">hash</span>.<span class="ident">finalize</span>().<span class="ident">to_vec</span>()
+<span class="kw">fn </span>hash&lt;D: Digest&gt;(val: <span class="kw-2">&amp;</span>[u8]) -&gt; Vec&lt;u8&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>hash = D::new();
+    hash.update(val);
+    hash.finalize().to_vec()
 }
 
-<span class="kw">fn</span> <span class="ident">h_i</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">KeyInit</span> <span class="op">+</span> <span class="ident">FixedOutput</span> <span class="op">+</span> <span class="ident">Mac</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Clone</span><span class="op">&gt;</span>(
-    <span class="ident">str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">salt</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    <span class="ident">iterations</span>: <span class="ident">u32</span>,
-    <span class="ident">output_size</span>: <span class="ident">usize</span>,
-) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="ident">output_size</span>];
-    <span class="ident">pbkdf2::pbkdf2</span>::<span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(<span class="ident">str</span>.<span class="ident">as_bytes</span>(), <span class="ident">salt</span>, <span class="ident">iterations</span>, <span class="ident">buf</span>.<span class="ident">as_mut_slice</span>());
-    <span class="ident">buf</span>
+<span class="kw">fn </span>h_i&lt;M: KeyInit + FixedOutput + Mac + Sync + Clone&gt;(
+    str: <span class="kw-2">&amp;</span>str,
+    salt: <span class="kw-2">&amp;</span>[u8],
+    iterations: u32,
+    output_size: usize,
+) -&gt; Vec&lt;u8&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>buf = <span class="macro">vec!</span>[<span class="number">0u8</span>; output_size];
+    pbkdf2::pbkdf2::&lt;M&gt;(str.as_bytes(), salt, iterations, buf.as_mut_slice());
+    buf
 }
 
-<span class="doccomment">/// Parses a string slice of the form &quot;&lt;expected_key&gt;=&lt;body&gt;&quot; into &quot;&lt;body&gt;&quot;, if possible.</span>
-<span class="kw">fn</span> <span class="ident">parse_kvp</span>(<span class="ident">str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">expected_key</span>: <span class="ident">char</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">str</span>.<span class="ident">starts_with</span>(<span class="ident">expected_key</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">str</span>.<span class="ident">chars</span>().<span class="ident">nth</span>(<span class="number">1</span>) <span class="op">!</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="string">&#39;=&#39;</span>) {
-        <span class="prelude-val">Err</span>(<span class="ident">Error::invalid_authentication_response</span>(<span class="string">&quot;SCRAM&quot;</span>))
-    } <span class="kw">else</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">str</span>.<span class="ident">chars</span>().<span class="ident">skip</span>(<span class="number">2</span>).<span class="ident">collect</span>())
+<span class="doccomment">/// Parses a string slice of the form &quot;&lt;expected_key&gt;=&lt;body&gt;&quot; into &quot;&lt;body&gt;&quot;, if possible.
+</span><span class="kw">fn </span>parse_kvp(str: <span class="kw-2">&amp;</span>str, expected_key: char) -&gt; <span class="prelude-ty">Result</span>&lt;String&gt; {
+    <span class="kw">if </span>!str.starts_with(expected_key) || str.chars().nth(<span class="number">1</span>) != <span class="prelude-val">Some</span>(<span class="string">&#39;=&#39;</span>) {
+        <span class="prelude-val">Err</span>(Error::invalid_authentication_response(<span class="string">&quot;SCRAM&quot;</span>))
+    } <span class="kw">else </span>{
+        <span class="prelude-val">Ok</span>(str.chars().skip(<span class="number">2</span>).collect())
     }
 }
 
-<span class="doccomment">/// Model of the first message sent by the client.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ClientFirst</span> {
-    <span class="ident">source</span>: <span class="ident">String</span>,
+<span class="doccomment">/// Model of the first message sent by the client.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ClientFirst {
+    source: String,
 
-    <span class="ident">message</span>: <span class="ident">String</span>,
+    message: String,
 
-    <span class="ident">gs2_header</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+    gs2_header: Range&lt;usize&gt;,
 
-    <span class="ident">bare</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+    bare: Range&lt;usize&gt;,
 
-    <span class="ident">nonce</span>: <span class="ident">String</span>,
+    nonce: String,
 
-    <span class="ident">include_db</span>: <span class="ident">bool</span>,
+    include_db: bool,
 
-    <span class="ident">server_api</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ServerApi</span><span class="op">&gt;</span>,
+    server_api: <span class="prelude-ty">Option</span>&lt;ServerApi&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">ClientFirst</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">username</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">include_db</span>: <span class="ident">bool</span>, <span class="ident">server_api</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ServerApi</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">nonce</span> <span class="op">=</span> <span class="ident">auth::generate_nonce</span>();
-        <span class="kw">let</span> <span class="ident">gs2_header</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{},,&quot;</span>, <span class="ident">NO_CHANNEL_BINDING</span>);
-        <span class="kw">let</span> <span class="ident">bare</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}={},{}={}&quot;</span>, <span class="ident">USERNAME_KEY</span>, <span class="ident">username</span>, <span class="ident">NONCE_KEY</span>, <span class="ident">nonce</span>);
-        <span class="kw">let</span> <span class="ident">full</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">gs2_header</span>, <span class="kw-2">&amp;</span><span class="ident">bare</span>);
-        <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">full</span>.<span class="ident">len</span>();
-        <span class="ident">ClientFirst</span> {
-            <span class="ident">source</span>: <span class="ident">source</span>.<span class="ident">into</span>(),
-            <span class="ident">message</span>: <span class="ident">full</span>,
-            <span class="ident">gs2_header</span>: <span class="ident">Range</span> {
-                <span class="ident">start</span>: <span class="number">0</span>,
-                <span class="ident">end</span>: <span class="ident">gs2_header</span>.<span class="ident">len</span>(),
+<span class="kw">impl </span>ClientFirst {
+    <span class="kw">fn </span>new(source: <span class="kw-2">&amp;</span>str, username: <span class="kw-2">&amp;</span>str, include_db: bool, server_api: <span class="prelude-ty">Option</span>&lt;ServerApi&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>nonce = auth::generate_nonce();
+        <span class="kw">let </span>gs2_header = <span class="macro">format!</span>(<span class="string">&quot;{},,&quot;</span>, NO_CHANNEL_BINDING);
+        <span class="kw">let </span>bare = <span class="macro">format!</span>(<span class="string">&quot;{}={},{}={}&quot;</span>, USERNAME_KEY, username, NONCE_KEY, nonce);
+        <span class="kw">let </span>full = <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="kw-2">&amp;</span>gs2_header, <span class="kw-2">&amp;</span>bare);
+        <span class="kw">let </span>end = full.len();
+        ClientFirst {
+            source: source.into(),
+            message: full,
+            gs2_header: Range {
+                start: <span class="number">0</span>,
+                end: gs2_header.len(),
             },
-            <span class="ident">bare</span>: <span class="ident">Range</span> {
-                <span class="ident">start</span>: <span class="ident">gs2_header</span>.<span class="ident">len</span>(),
-                <span class="ident">end</span>,
+            bare: Range {
+                start: gs2_header.len(),
+                end,
             },
-            <span class="ident">nonce</span>,
-            <span class="ident">include_db</span>,
-            <span class="ident">server_api</span>,
+            nonce,
+            include_db,
+            server_api,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">bare_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">message</span>[<span class="self">self</span>.<span class="ident">bare</span>.<span class="ident">clone</span>()]
+    <span class="kw">fn </span>bare_message(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.message[<span class="self">self</span>.bare.clone()]
     }
 
-    <span class="kw">fn</span> <span class="ident">gs2_header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">message</span>[<span class="self">self</span>.<span class="ident">gs2_header</span>.<span class="ident">clone</span>()]
+    <span class="kw">fn </span>gs2_header(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.message[<span class="self">self</span>.gs2_header.clone()]
     }
 
-    <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">message</span>[..]
+    <span class="kw">fn </span>message(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.message[..]
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">to_command</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">scram</span>: <span class="kw-2">&amp;</span><span class="ident">ScramVersion</span>) -&gt; <span class="ident">Command</span> {
-        <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">message</span>().<span class="ident">as_bytes</span>().<span class="ident">to_vec</span>();
-        <span class="kw">let</span> <span class="ident">auth_mech</span> <span class="op">=</span> <span class="ident">AuthMechanism::from_scram_version</span>(<span class="ident">scram</span>);
-        <span class="kw">let</span> <span class="ident">sasl_start</span> <span class="op">=</span> <span class="ident">SaslStart::new</span>(
-            <span class="self">self</span>.<span class="ident">source</span>.<span class="ident">clone</span>(),
-            <span class="ident">auth_mech</span>,
-            <span class="ident">payload</span>,
-            <span class="self">self</span>.<span class="ident">server_api</span>.<span class="ident">clone</span>(),
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>to_command(<span class="kw-2">&amp;</span><span class="self">self</span>, scram: <span class="kw-2">&amp;</span>ScramVersion) -&gt; Command {
+        <span class="kw">let </span>payload = <span class="self">self</span>.message().as_bytes().to_vec();
+        <span class="kw">let </span>auth_mech = AuthMechanism::from_scram_version(scram);
+        <span class="kw">let </span>sasl_start = SaslStart::new(
+            <span class="self">self</span>.source.clone(),
+            auth_mech,
+            payload,
+            <span class="self">self</span>.server_api.clone(),
         );
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cmd</span> <span class="op">=</span> <span class="ident">sasl_start</span>.<span class="ident">into_command</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>cmd = sasl_start.into_command();
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">include_db</span> {
-            <span class="ident">cmd</span>.<span class="ident">body</span>.<span class="ident">insert</span>(<span class="string">&quot;db&quot;</span>, <span class="self">self</span>.<span class="ident">source</span>.<span class="ident">clone</span>());
+        <span class="kw">if </span><span class="self">self</span>.include_db {
+            cmd.body.insert(<span class="string">&quot;db&quot;</span>, <span class="self">self</span>.source.clone());
         }
 
-        <span class="ident">cmd</span>
+        cmd
     }
 }
 
-<span class="doccomment">/// Model of the first message received from the server.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This MUST be validated before sending the `ClientFinal` message back to the server.</span>
-<span class="kw">struct</span> <span class="ident">ServerFirst</span> {
-    <span class="ident">conversation_id</span>: <span class="ident">Bson</span>,
-    <span class="ident">done</span>: <span class="ident">bool</span>,
-    <span class="ident">message</span>: <span class="ident">String</span>,
-    <span class="ident">nonce</span>: <span class="ident">String</span>,
-    <span class="ident">salt</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="ident">i</span>: <span class="ident">u32</span>,
+<span class="doccomment">/// Model of the first message received from the server.
+///
+/// This MUST be validated before sending the `ClientFinal` message back to the server.
+</span><span class="kw">struct </span>ServerFirst {
+    conversation_id: Bson,
+    done: bool,
+    message: String,
+    nonce: String,
+    salt: Vec&lt;u8&gt;,
+    i: u32,
 }
 
-<span class="kw">impl</span> <span class="ident">ServerFirst</span> {
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">response</span>: <span class="ident">Document</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">SaslResponse</span> {
-            <span class="ident">conversation_id</span>,
-            <span class="ident">payload</span>,
-            <span class="ident">done</span>,
-        } <span class="op">=</span> <span class="ident">SaslResponse::parse</span>(<span class="string">&quot;SCRAM&quot;</span>, <span class="ident">response</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>ServerFirst {
+    <span class="kw">fn </span>parse(response: Document) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>SaslResponse {
+            conversation_id,
+            payload,
+            done,
+        } = SaslResponse::parse(<span class="string">&quot;SCRAM&quot;</span>, response)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">str::from_utf8</span>(<span class="kw-2">&amp;</span><span class="ident">payload</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::invalid_authentication_response</span>(<span class="string">&quot;SCRAM&quot;</span>))<span class="question-mark">?</span>;
+        <span class="kw">let </span>message = str::from_utf8(<span class="kw-2">&amp;</span>payload)
+            .map_err(|<span class="kw">_</span>| Error::invalid_authentication_response(<span class="string">&quot;SCRAM&quot;</span>))<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">parts</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">message</span>.<span class="ident">split</span>(<span class="string">&#39;,&#39;</span>).<span class="ident">collect</span>();
+        <span class="kw">let </span>parts: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = message.split(<span class="string">&#39;,&#39;</span>).collect();
 
-        <span class="kw">if</span> <span class="ident">parts</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">3</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::invalid_authentication_response</span>(<span class="string">&quot;SCRAM&quot;</span>));
+        <span class="kw">if </span>parts.len() &lt; <span class="number">3 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::invalid_authentication_response(<span class="string">&quot;SCRAM&quot;</span>));
         };
 
-        <span class="kw">let</span> <span class="ident">full_nonce</span> <span class="op">=</span> <span class="ident">parse_kvp</span>(<span class="ident">parts</span>[<span class="number">0</span>], <span class="ident">NONCE_KEY</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>full_nonce = parse_kvp(parts[<span class="number">0</span>], NONCE_KEY)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">salt</span> <span class="op">=</span> <span class="ident">base64::decode</span>(<span class="ident">parse_kvp</span>(<span class="ident">parts</span>[<span class="number">1</span>], <span class="ident">SALT_KEY</span>)<span class="question-mark">?</span>.<span class="ident">as_str</span>())
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::invalid_authentication_response</span>(<span class="string">&quot;SCRAM&quot;</span>))<span class="question-mark">?</span>;
+        <span class="kw">let </span>salt = base64::decode(parse_kvp(parts[<span class="number">1</span>], SALT_KEY)<span class="question-mark">?</span>.as_str())
+            .map_err(|<span class="kw">_</span>| Error::invalid_authentication_response(<span class="string">&quot;SCRAM&quot;</span>))<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">i</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">parse_kvp</span>(<span class="ident">parts</span>[<span class="number">2</span>], <span class="ident">ITERATION_COUNT_KEY</span>)<span class="question-mark">?</span>.<span class="ident">parse</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">num</span>) =&gt; <span class="ident">num</span>,
+        <span class="kw">let </span>i: u32 = <span class="kw">match </span>parse_kvp(parts[<span class="number">2</span>], ITERATION_COUNT_KEY)<span class="question-mark">?</span>.parse() {
+            <span class="prelude-val">Ok</span>(num) =&gt; num,
             <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::authentication_error</span>(
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::authentication_error(
                     <span class="string">&quot;SCRAM&quot;</span>,
                     <span class="string">&quot;iteration count invalid&quot;</span>,
                 ))
             }
         };
 
-        <span class="prelude-val">Ok</span>(<span class="ident">ServerFirst</span> {
-            <span class="ident">conversation_id</span>,
-            <span class="ident">done</span>,
-            <span class="ident">message</span>: <span class="ident">message</span>.<span class="ident">to_string</span>(),
-            <span class="ident">nonce</span>: <span class="ident">full_nonce</span>,
-            <span class="ident">salt</span>,
-            <span class="ident">i</span>,
+        <span class="prelude-val">Ok</span>(ServerFirst {
+            conversation_id,
+            done,
+            message: message.to_string(),
+            nonce: full_nonce,
+            salt,
+            i,
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">conversation_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Bson</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">conversation_id</span>
+    <span class="kw">fn </span>conversation_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Bson {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.conversation_id
     }
 
-    <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">message</span>.<span class="ident">as_str</span>()
+    <span class="kw">fn </span>message(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.message.as_str()
     }
 
-    <span class="kw">fn</span> <span class="ident">nonce</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">nonce</span>.<span class="ident">as_str</span>()
+    <span class="kw">fn </span>nonce(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.nonce.as_str()
     }
 
-    <span class="kw">fn</span> <span class="ident">salt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="ident">salt</span>.<span class="ident">as_slice</span>()
+    <span class="kw">fn </span>salt(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="self">self</span>.salt.as_slice()
     }
 
-    <span class="kw">fn</span> <span class="ident">i</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">i</span>
+    <span class="kw">fn </span>i(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.i
     }
 
-    <span class="kw">fn</span> <span class="ident">validate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">nonce</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">done</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">Error::authentication_error</span>(
+    <span class="kw">fn </span>validate(<span class="kw-2">&amp;</span><span class="self">self</span>, nonce: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">if </span><span class="self">self</span>.done {
+            <span class="prelude-val">Err</span>(Error::authentication_error(
                 <span class="string">&quot;SCRAM&quot;</span>,
                 <span class="string">&quot;handshake terminated early&quot;</span>,
             ))
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">nonce</span>[<span class="number">0</span>..<span class="ident">nonce</span>.<span class="ident">len</span>()] <span class="op">!</span><span class="op">=</span> <span class="ident">nonce</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">Error::authentication_error</span>(<span class="string">&quot;SCRAM&quot;</span>, <span class="string">&quot;mismatched nonce&quot;</span>))
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">i</span> <span class="op">&lt;</span> <span class="ident">MIN_ITERATION_COUNT</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">Error::authentication_error</span>(
+        } <span class="kw">else if </span><span class="kw-2">&amp;</span><span class="self">self</span>.nonce[<span class="number">0</span>..nonce.len()] != nonce {
+            <span class="prelude-val">Err</span>(Error::authentication_error(<span class="string">&quot;SCRAM&quot;</span>, <span class="string">&quot;mismatched nonce&quot;</span>))
+        } <span class="kw">else if </span><span class="self">self</span>.i &lt; MIN_ITERATION_COUNT {
+            <span class="prelude-val">Err</span>(Error::authentication_error(
                 <span class="string">&quot;SCRAM&quot;</span>,
                 <span class="string">&quot;iteration count too low&quot;</span>,
             ))
-        } <span class="kw">else</span> {
+        } <span class="kw">else </span>{
             <span class="prelude-val">Ok</span>(())
         }
     }
 }
 
-<span class="doccomment">/// Model of the final message sent by the client.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Contains the &quot;AuthMessage&quot; mentioned in the RFC used in computing the client and server</span>
-<span class="doccomment">/// signatures.</span>
-<span class="kw">struct</span> <span class="ident">ClientFinal</span> {
-    <span class="ident">source</span>: <span class="ident">String</span>,
-    <span class="ident">message</span>: <span class="ident">String</span>,
-    <span class="ident">auth_message</span>: <span class="ident">String</span>,
-    <span class="ident">conversation_id</span>: <span class="ident">Bson</span>,
-    <span class="ident">server_api</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ServerApi</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Model of the final message sent by the client.
+///
+/// Contains the &quot;AuthMessage&quot; mentioned in the RFC used in computing the client and server
+/// signatures.
+</span><span class="kw">struct </span>ClientFinal {
+    source: String,
+    message: String,
+    auth_message: String,
+    conversation_id: Bson,
+    server_api: <span class="prelude-ty">Option</span>&lt;ServerApi&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">ClientFinal</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">salted_password</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-        <span class="ident">client_first</span>: <span class="kw-2">&amp;</span><span class="ident">ClientFirst</span>,
-        <span class="ident">server_first</span>: <span class="kw-2">&amp;</span><span class="ident">ServerFirst</span>,
-        <span class="ident">scram</span>: <span class="kw-2">&amp;</span><span class="ident">ScramVersion</span>,
-        <span class="ident">server_api</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ServerApi</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">client_key</span> <span class="op">=</span> <span class="ident">scram</span>.<span class="ident">hmac</span>(<span class="ident">salted_password</span>, <span class="string">b&quot;Client Key&quot;</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">stored_key</span> <span class="op">=</span> <span class="ident">scram</span>.<span class="ident">h</span>(<span class="ident">client_key</span>.<span class="ident">as_ref</span>());
+<span class="kw">impl </span>ClientFinal {
+    <span class="kw">fn </span>new(
+        source: <span class="kw-2">&amp;</span>str,
+        salted_password: <span class="kw-2">&amp;</span>[u8],
+        client_first: <span class="kw-2">&amp;</span>ClientFirst,
+        server_first: <span class="kw-2">&amp;</span>ServerFirst,
+        scram: <span class="kw-2">&amp;</span>ScramVersion,
+        server_api: <span class="prelude-ty">Option</span>&lt;ServerApi&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>client_key = scram.hmac(salted_password, <span class="string">b&quot;Client Key&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>stored_key = scram.h(client_key.as_ref());
 
-        <span class="kw">let</span> <span class="ident">without_proof</span> <span class="op">=</span> <span class="macro">format!</span>(
+        <span class="kw">let </span>without_proof = <span class="macro">format!</span>(
             <span class="string">&quot;{}={},{}={}&quot;</span>,
-            <span class="ident">CHANNEL_BINDING_KEY</span>,
-            <span class="ident">base64::encode</span>(<span class="ident">client_first</span>.<span class="ident">gs2_header</span>()),
-            <span class="ident">NONCE_KEY</span>,
-            <span class="ident">server_first</span>.<span class="ident">nonce</span>()
+            CHANNEL_BINDING_KEY,
+            base64::encode(client_first.gs2_header()),
+            NONCE_KEY,
+            server_first.nonce()
         );
-        <span class="kw">let</span> <span class="ident">auth_message</span> <span class="op">=</span> <span class="macro">format!</span>(
+        <span class="kw">let </span>auth_message = <span class="macro">format!</span>(
             <span class="string">&quot;{},{},{}&quot;</span>,
-            <span class="ident">client_first</span>.<span class="ident">bare_message</span>(),
-            <span class="ident">server_first</span>.<span class="ident">message</span>(),
-            <span class="ident">without_proof</span>.<span class="ident">as_str</span>()
+            client_first.bare_message(),
+            server_first.message(),
+            without_proof.as_str()
         );
-        <span class="kw">let</span> <span class="ident">client_signature</span> <span class="op">=</span> <span class="ident">scram</span>.<span class="ident">hmac</span>(<span class="ident">stored_key</span>.<span class="ident">as_slice</span>(), <span class="ident">auth_message</span>.<span class="ident">as_bytes</span>())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">client_proof</span> <span class="op">=</span>
-            <span class="ident">base64::encode</span>(<span class="ident">xor</span>(<span class="ident">client_key</span>.<span class="ident">as_ref</span>(), <span class="ident">client_signature</span>.<span class="ident">as_ref</span>()).<span class="ident">as_slice</span>());
+        <span class="kw">let </span>client_signature = scram.hmac(stored_key.as_slice(), auth_message.as_bytes())<span class="question-mark">?</span>;
+        <span class="kw">let </span>client_proof =
+            base64::encode(xor(client_key.as_ref(), client_signature.as_ref()).as_slice());
 
-        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{},{}={}&quot;</span>, <span class="ident">without_proof</span>, <span class="ident">PROOF_KEY</span>, <span class="ident">client_proof</span>);
+        <span class="kw">let </span>message = <span class="macro">format!</span>(<span class="string">&quot;{},{}={}&quot;</span>, without_proof, PROOF_KEY, client_proof);
 
-        <span class="prelude-val">Ok</span>(<span class="ident">ClientFinal</span> {
-            <span class="ident">source</span>: <span class="ident">source</span>.<span class="ident">into</span>(),
-            <span class="ident">message</span>,
-            <span class="ident">auth_message</span>,
-            <span class="ident">conversation_id</span>: <span class="ident">server_first</span>.<span class="ident">conversation_id</span>().<span class="ident">clone</span>(),
-            <span class="ident">server_api</span>,
+        <span class="prelude-val">Ok</span>(ClientFinal {
+            source: source.into(),
+            message,
+            auth_message,
+            conversation_id: server_first.conversation_id().clone(),
+            server_api,
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">payload</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">message</span>().<span class="ident">as_bytes</span>().<span class="ident">to_vec</span>()
+    <span class="kw">fn </span>payload(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
+        <span class="self">self</span>.message().as_bytes().to_vec()
     }
 
-    <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">message</span>.<span class="ident">as_str</span>()
+    <span class="kw">fn </span>message(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.message.as_str()
     }
 
-    <span class="kw">fn</span> <span class="ident">auth_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">auth_message</span>.<span class="ident">as_str</span>()
+    <span class="kw">fn </span>auth_message(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.auth_message.as_str()
     }
 
-    <span class="kw">fn</span> <span class="ident">to_command</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Command</span> {
-        <span class="ident">SaslContinue::new</span>(
-            <span class="self">self</span>.<span class="ident">source</span>.<span class="ident">clone</span>(),
-            <span class="self">self</span>.<span class="ident">conversation_id</span>.<span class="ident">clone</span>(),
-            <span class="self">self</span>.<span class="ident">payload</span>(),
-            <span class="self">self</span>.<span class="ident">server_api</span>.<span class="ident">clone</span>(),
+    <span class="kw">fn </span>to_command(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Command {
+        SaslContinue::new(
+            <span class="self">self</span>.source.clone(),
+            <span class="self">self</span>.conversation_id.clone(),
+            <span class="self">self</span>.payload(),
+            <span class="self">self</span>.server_api.clone(),
         )
-        .<span class="ident">into_command</span>()
+        .into_command()
     }
 }
 
-<span class="kw">enum</span> <span class="ident">ServerFinalBody</span> {
-    <span class="ident">Error</span>(<span class="ident">String</span>),
-    <span class="ident">Verifier</span>(<span class="ident">String</span>),
+<span class="kw">enum </span>ServerFinalBody {
+    Error(String),
+    Verifier(String),
 }
 
-<span class="doccomment">/// Model of the final message received from the server.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This MUST be validated before sending the final no-op message to the server.</span>
-<span class="kw">struct</span> <span class="ident">ServerFinal</span> {
-    <span class="ident">conversation_id</span>: <span class="ident">Bson</span>,
-    <span class="ident">done</span>: <span class="ident">bool</span>,
-    <span class="ident">body</span>: <span class="ident">ServerFinalBody</span>,
+<span class="doccomment">/// Model of the final message received from the server.
+///
+/// This MUST be validated before sending the final no-op message to the server.
+</span><span class="kw">struct </span>ServerFinal {
+    conversation_id: Bson,
+    done: bool,
+    body: ServerFinalBody,
 }
 
-<span class="kw">impl</span> <span class="ident">ServerFinal</span> {
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">response</span>: <span class="ident">Document</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">SaslResponse</span> {
-            <span class="ident">conversation_id</span>,
-            <span class="ident">payload</span>,
-            <span class="ident">done</span>,
-        } <span class="op">=</span> <span class="ident">SaslResponse::parse</span>(<span class="string">&quot;SCRAM&quot;</span>, <span class="ident">response</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>ServerFinal {
+    <span class="kw">fn </span>parse(response: Document) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>SaslResponse {
+            conversation_id,
+            payload,
+            done,
+        } = SaslResponse::parse(<span class="string">&quot;SCRAM&quot;</span>, response)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">str::from_utf8</span>(<span class="kw-2">&amp;</span><span class="ident">payload</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::invalid_authentication_response</span>(<span class="string">&quot;SCRAM&quot;</span>))<span class="question-mark">?</span>;
+        <span class="kw">let </span>message = str::from_utf8(<span class="kw-2">&amp;</span>payload)
+            .map_err(|<span class="kw">_</span>| Error::invalid_authentication_response(<span class="string">&quot;SCRAM&quot;</span>))<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">first</span> <span class="op">=</span> <span class="ident">message</span>
-            .<span class="ident">chars</span>()
-            .<span class="ident">next</span>()
-            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Error::invalid_authentication_response</span>(<span class="string">&quot;SCRAM&quot;</span>))<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">first</span> <span class="op">==</span> <span class="ident">ERROR_KEY</span> {
-            <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">parse_kvp</span>(<span class="ident">message</span>, <span class="ident">ERROR_KEY</span>)<span class="question-mark">?</span>;
-            <span class="ident">ServerFinalBody::Error</span>(<span class="ident">error</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">first</span> <span class="op">==</span> <span class="ident">VERIFIER_KEY</span> {
-            <span class="kw">let</span> <span class="ident">verifier</span> <span class="op">=</span> <span class="ident">parse_kvp</span>(<span class="ident">message</span>, <span class="ident">VERIFIER_KEY</span>)<span class="question-mark">?</span>;
-            <span class="ident">ServerFinalBody::Verifier</span>(<span class="ident">verifier</span>)
-        } <span class="kw">else</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::invalid_authentication_response</span>(<span class="string">&quot;SCRAM&quot;</span>));
+        <span class="kw">let </span>first = message
+            .chars()
+            .next()
+            .ok_or_else(|| Error::invalid_authentication_response(<span class="string">&quot;SCRAM&quot;</span>))<span class="question-mark">?</span>;
+        <span class="kw">let </span>body = <span class="kw">if </span>first == ERROR_KEY {
+            <span class="kw">let </span>error = parse_kvp(message, ERROR_KEY)<span class="question-mark">?</span>;
+            ServerFinalBody::Error(error)
+        } <span class="kw">else if </span>first == VERIFIER_KEY {
+            <span class="kw">let </span>verifier = parse_kvp(message, VERIFIER_KEY)<span class="question-mark">?</span>;
+            ServerFinalBody::Verifier(verifier)
+        } <span class="kw">else </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::invalid_authentication_response(<span class="string">&quot;SCRAM&quot;</span>));
         };
 
-        <span class="prelude-val">Ok</span>(<span class="ident">ServerFinal</span> {
-            <span class="ident">conversation_id</span>,
-            <span class="ident">done</span>,
-            <span class="ident">body</span>,
+        <span class="prelude-val">Ok</span>(ServerFinal {
+            conversation_id,
+            done,
+            body,
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">validate</span>(
+    <span class="kw">fn </span>validate(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">salted_password</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-        <span class="ident">client_final</span>: <span class="kw-2">&amp;</span><span class="ident">ClientFinal</span>,
-        <span class="ident">scram</span>: <span class="kw-2">&amp;</span><span class="ident">ScramVersion</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">conversation_id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">client_final</span>.<span class="ident">conversation_id</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::authentication_error</span>(
+        salted_password: <span class="kw-2">&amp;</span>[u8],
+        client_final: <span class="kw-2">&amp;</span>ClientFinal,
+        scram: <span class="kw-2">&amp;</span>ScramVersion,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">if </span><span class="self">self</span>.conversation_id != client_final.conversation_id {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::authentication_error(
                 <span class="string">&quot;SCRAM&quot;</span>,
                 <span class="string">&quot;mismatched conversationId&#39;s&quot;</span>,
             ));
         };
 
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">body</span> {
-            <span class="ident">ServerFinalBody::Verifier</span>(<span class="kw-2">ref</span> <span class="ident">body</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">server_key</span> <span class="op">=</span> <span class="ident">scram</span>.<span class="ident">hmac</span>(<span class="ident">salted_password</span>, <span class="string">b&quot;Server Key&quot;</span>)<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">body_decoded</span> <span class="op">=</span> <span class="ident">base64::decode</span>(<span class="ident">body</span>.<span class="ident">as_bytes</span>())
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::invalid_authentication_response</span>(<span class="string">&quot;SCRAM&quot;</span>))<span class="question-mark">?</span>;
+        <span class="kw">match </span><span class="self">self</span>.body {
+            ServerFinalBody::Verifier(<span class="kw-2">ref </span>body) =&gt; {
+                <span class="kw">let </span>server_key = scram.hmac(salted_password, <span class="string">b&quot;Server Key&quot;</span>)<span class="question-mark">?</span>;
+                <span class="kw">let </span>body_decoded = base64::decode(body.as_bytes())
+                    .map_err(|<span class="kw">_</span>| Error::invalid_authentication_response(<span class="string">&quot;SCRAM&quot;</span>))<span class="question-mark">?</span>;
 
-                <span class="ident">scram</span>.<span class="ident">hmac_verify</span>(
-                    <span class="ident">server_key</span>.<span class="ident">as_ref</span>(),
-                    <span class="ident">client_final</span>.<span class="ident">auth_message</span>().<span class="ident">as_bytes</span>(),
-                    <span class="ident">body_decoded</span>.<span class="ident">as_slice</span>(),
+                scram.hmac_verify(
+                    server_key.as_ref(),
+                    client_final.auth_message().as_bytes(),
+                    body_decoded.as_slice(),
                 )
             }
-            <span class="ident">ServerFinalBody::Error</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; {
-                <span class="prelude-val">Err</span>(<span class="ident">Error::authentication_error</span>(<span class="string">&quot;SCRAM&quot;</span>, <span class="ident">err</span>.<span class="ident">as_str</span>()))
+            ServerFinalBody::Error(<span class="kw-2">ref </span>err) =&gt; {
+                <span class="prelude-val">Err</span>(Error::authentication_error(<span class="string">&quot;SCRAM&quot;</span>, err.as_str()))
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">conversation_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Bson</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">conversation_id</span>
+    <span class="kw">fn </span>conversation_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Bson {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.conversation_id
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::bson::Bson</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">crate</span>::bson::Bson;
 
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ServerFirst</span>;
+    <span class="kw">use </span><span class="kw">super</span>::ServerFirst;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_iteration_count</span>() {
-        <span class="kw">let</span> <span class="ident">nonce</span> <span class="op">=</span> <span class="string">&quot;mocked&quot;</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_iteration_count() {
+        <span class="kw">let </span>nonce = <span class="string">&quot;mocked&quot;</span>;
 
-        <span class="kw">let</span> <span class="ident">invalid_iteration_count</span> <span class="op">=</span> <span class="ident">ServerFirst</span> {
-            <span class="ident">conversation_id</span>: <span class="ident">Bson::Null</span>,
-            <span class="ident">done</span>: <span class="bool-val">false</span>,
-            <span class="ident">message</span>: <span class="string">&quot;mocked&quot;</span>.<span class="ident">to_string</span>(),
-            <span class="ident">nonce</span>: <span class="ident">nonce</span>.<span class="ident">to_string</span>(),
-            <span class="ident">salt</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">i</span>: <span class="number">42</span>,
+        <span class="kw">let </span>invalid_iteration_count = ServerFirst {
+            conversation_id: Bson::Null,
+            done: <span class="bool-val">false</span>,
+            message: <span class="string">&quot;mocked&quot;</span>.to_string(),
+            nonce: nonce.to_string(),
+            salt: Vec::new(),
+            i: <span class="number">42</span>,
         };
-        <span class="macro">assert!</span>(<span class="ident">invalid_iteration_count</span>.<span class="ident">validate</span>(<span class="ident">nonce</span>).<span class="ident">is_err</span>());
+        <span class="macro">assert!</span>(invalid_iteration_count.validate(nonce).is_err());
 
-        <span class="kw">let</span> <span class="ident">valid_iteration_count</span> <span class="op">=</span> <span class="ident">ServerFirst</span> {
-            <span class="ident">i</span>: <span class="number">4096</span>,
-            ..<span class="ident">invalid_iteration_count</span>
+        <span class="kw">let </span>valid_iteration_count = ServerFirst {
+            i: <span class="number">4096</span>,
+            ..invalid_iteration_count
         };
-        <span class="macro">assert!</span>(<span class="ident">valid_iteration_count</span>.<span class="ident">validate</span>(<span class="ident">nonce</span>).<span class="ident">is_ok</span>())
+        <span class="macro">assert!</span>(valid_iteration_count.validate(nonce).is_ok())
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

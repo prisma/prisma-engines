@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.4.0/src/serde_helpers.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>serde_helpers.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../bson/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.4.0/src/serde_helpers.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>serde_helpers.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../bson/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -755,762 +755,762 @@
 <span id="755">755</span>
 <span id="756">756</span>
 <span id="757">757</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Collection of helper functions for serializing to and deserializing from BSON using Serde</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Collection of helper functions for serializing to and deserializing from BSON using Serde
 
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::TryFrom</span>, <span class="ident">result::Result</span>};
+</span><span class="kw">use </span>std::{convert::TryFrom, result::Result};
 
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">ser</span>, <span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
+<span class="kw">use </span>serde::{ser, Serialize, Serializer};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::oid::ObjectId</span>;
+<span class="kw">use </span><span class="kw">crate</span>::oid::ObjectId;
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">bson_datetime_as_rfc3339_string</span>::{
-    <span class="ident">deserialize</span> <span class="kw">as</span> <span class="ident">deserialize_bson_datetime_from_rfc3339_string</span>,
-    <span class="ident">serialize</span> <span class="kw">as</span> <span class="ident">serialize_bson_datetime_as_rfc3339_string</span>,
+<span class="attribute">#[doc(inline)]
+</span><span class="kw">pub use </span>bson_datetime_as_rfc3339_string::{
+    deserialize <span class="kw">as </span>deserialize_bson_datetime_from_rfc3339_string,
+    serialize <span class="kw">as </span>serialize_bson_datetime_as_rfc3339_string,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono-0_4&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">chrono_datetime_as_bson_datetime</span>::{
-    <span class="ident">deserialize</span> <span class="kw">as</span> <span class="ident">deserialize_chrono_datetime_from_bson_datetime</span>,
-    <span class="ident">serialize</span> <span class="kw">as</span> <span class="ident">serialize_chrono_datetime_as_bson_datetime</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;chrono-0_4&quot;</span>)]
+#[doc(inline)]
+</span><span class="kw">pub use </span>chrono_datetime_as_bson_datetime::{
+    deserialize <span class="kw">as </span>deserialize_chrono_datetime_from_bson_datetime,
+    serialize <span class="kw">as </span>serialize_chrono_datetime_as_bson_datetime,
 };
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">hex_string_as_object_id</span>::{
-    <span class="ident">deserialize</span> <span class="kw">as</span> <span class="ident">deserialize_hex_string_from_object_id</span>,
-    <span class="ident">serialize</span> <span class="kw">as</span> <span class="ident">serialize_hex_string_as_object_id</span>,
+<span class="attribute">#[doc(inline)]
+</span><span class="kw">pub use </span>hex_string_as_object_id::{
+    deserialize <span class="kw">as </span>deserialize_hex_string_from_object_id,
+    serialize <span class="kw">as </span>serialize_hex_string_as_object_id,
 };
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">rfc3339_string_as_bson_datetime</span>::{
-    <span class="ident">deserialize</span> <span class="kw">as</span> <span class="ident">deserialize_rfc3339_string_from_bson_datetime</span>,
-    <span class="ident">serialize</span> <span class="kw">as</span> <span class="ident">serialize_rfc3339_string_as_bson_datetime</span>,
+<span class="attribute">#[doc(inline)]
+</span><span class="kw">pub use </span>rfc3339_string_as_bson_datetime::{
+    deserialize <span class="kw">as </span>deserialize_rfc3339_string_from_bson_datetime,
+    serialize <span class="kw">as </span>serialize_rfc3339_string_as_bson_datetime,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time-0_3&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">time_0_3_offsetdatetime_as_bson_datetime</span>::{
-    <span class="ident">deserialize</span> <span class="kw">as</span> <span class="ident">deserialize_time_0_3_offsetdatetime_from_bson_datetime</span>,
-    <span class="ident">serialize</span> <span class="kw">as</span> <span class="ident">serialize_time_0_3_offsetdatetime_as_bson_datetime</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;time-0_3&quot;</span>)]
+#[doc(inline)]
+</span><span class="kw">pub use </span>time_0_3_offsetdatetime_as_bson_datetime::{
+    deserialize <span class="kw">as </span>deserialize_time_0_3_offsetdatetime_from_bson_datetime,
+    serialize <span class="kw">as </span>serialize_time_0_3_offsetdatetime_as_bson_datetime,
 };
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">timestamp_as_u32</span>::{
-    <span class="ident">deserialize</span> <span class="kw">as</span> <span class="ident">deserialize_timestamp_from_u32</span>,
-    <span class="ident">serialize</span> <span class="kw">as</span> <span class="ident">serialize_timestamp_as_u32</span>,
+<span class="attribute">#[doc(inline)]
+</span><span class="kw">pub use </span>timestamp_as_u32::{
+    deserialize <span class="kw">as </span>deserialize_timestamp_from_u32,
+    serialize <span class="kw">as </span>serialize_timestamp_as_u32,
 };
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">u32_as_f64</span>::{<span class="ident">deserialize</span> <span class="kw">as</span> <span class="ident">deserialize_u32_from_f64</span>, <span class="ident">serialize</span> <span class="kw">as</span> <span class="ident">serialize_u32_as_f64</span>};
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">u32_as_timestamp</span>::{
-    <span class="ident">deserialize</span> <span class="kw">as</span> <span class="ident">deserialize_u32_from_timestamp</span>,
-    <span class="ident">serialize</span> <span class="kw">as</span> <span class="ident">serialize_u32_as_timestamp</span>,
+<span class="attribute">#[doc(inline)]
+</span><span class="kw">pub use </span>u32_as_f64::{deserialize <span class="kw">as </span>deserialize_u32_from_f64, serialize <span class="kw">as </span>serialize_u32_as_f64};
+<span class="attribute">#[doc(inline)]
+</span><span class="kw">pub use </span>u32_as_timestamp::{
+    deserialize <span class="kw">as </span>deserialize_u32_from_timestamp,
+    serialize <span class="kw">as </span>serialize_u32_as_timestamp,
 };
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">u64_as_f64</span>::{<span class="ident">deserialize</span> <span class="kw">as</span> <span class="ident">deserialize_u64_from_f64</span>, <span class="ident">serialize</span> <span class="kw">as</span> <span class="ident">serialize_u64_as_f64</span>};
+<span class="attribute">#[doc(inline)]
+</span><span class="kw">pub use </span>u64_as_f64::{deserialize <span class="kw">as </span>deserialize_u64_from_f64, serialize <span class="kw">as </span>serialize_u64_as_f64};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-1&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">uuid_1_as_binary</span>::{
-    <span class="ident">deserialize</span> <span class="kw">as</span> <span class="ident">deserialize_uuid_1_from_binary</span>,
-    <span class="ident">serialize</span> <span class="kw">as</span> <span class="ident">serialize_uuid_1_as_binary</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;uuid-1&quot;</span>)]
+#[doc(inline)]
+</span><span class="kw">pub use </span>uuid_1_as_binary::{
+    deserialize <span class="kw">as </span>deserialize_uuid_1_from_binary,
+    serialize <span class="kw">as </span>serialize_uuid_1_as_binary,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-1&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">uuid_1_as_c_sharp_legacy_binary</span>::{
-    <span class="ident">deserialize</span> <span class="kw">as</span> <span class="ident">deserialize_uuid_1_from_c_sharp_legacy_binary</span>,
-    <span class="ident">serialize</span> <span class="kw">as</span> <span class="ident">serialize_uuid_1_as_c_sharp_legacy_binary</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;uuid-1&quot;</span>)]
+#[doc(inline)]
+</span><span class="kw">pub use </span>uuid_1_as_c_sharp_legacy_binary::{
+    deserialize <span class="kw">as </span>deserialize_uuid_1_from_c_sharp_legacy_binary,
+    serialize <span class="kw">as </span>serialize_uuid_1_as_c_sharp_legacy_binary,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-1&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">uuid_1_as_java_legacy_binary</span>::{
-    <span class="ident">deserialize</span> <span class="kw">as</span> <span class="ident">deserialize_uuid_1_from_java_legacy_binary</span>,
-    <span class="ident">serialize</span> <span class="kw">as</span> <span class="ident">serialize_uuid_1_as_java_legacy_binary</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;uuid-1&quot;</span>)]
+#[doc(inline)]
+</span><span class="kw">pub use </span>uuid_1_as_java_legacy_binary::{
+    deserialize <span class="kw">as </span>deserialize_uuid_1_from_java_legacy_binary,
+    serialize <span class="kw">as </span>serialize_uuid_1_as_java_legacy_binary,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-1&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">uuid_1_as_python_legacy_binary</span>::{
-    <span class="ident">deserialize</span> <span class="kw">as</span> <span class="ident">deserialize_uuid_1_from_python_legacy_binary</span>,
-    <span class="ident">serialize</span> <span class="kw">as</span> <span class="ident">serialize_uuid_1_as_python_legacy_binary</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;uuid-1&quot;</span>)]
+#[doc(inline)]
+</span><span class="kw">pub use </span>uuid_1_as_python_legacy_binary::{
+    deserialize <span class="kw">as </span>deserialize_uuid_1_from_python_legacy_binary,
+    serialize <span class="kw">as </span>serialize_uuid_1_as_python_legacy_binary,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-0_8&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">uuid_as_binary</span>::{
-    <span class="ident">deserialize</span> <span class="kw">as</span> <span class="ident">deserialize_uuid_from_binary</span>,
-    <span class="ident">serialize</span> <span class="kw">as</span> <span class="ident">serialize_uuid_as_binary</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;uuid-0_8&quot;</span>)]
+#[doc(inline)]
+</span><span class="kw">pub use </span>uuid_as_binary::{
+    deserialize <span class="kw">as </span>deserialize_uuid_from_binary,
+    serialize <span class="kw">as </span>serialize_uuid_as_binary,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-0_8&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">uuid_as_c_sharp_legacy_binary</span>::{
-    <span class="ident">deserialize</span> <span class="kw">as</span> <span class="ident">deserialize_uuid_from_c_sharp_legacy_binary</span>,
-    <span class="ident">serialize</span> <span class="kw">as</span> <span class="ident">serialize_uuid_as_c_sharp_legacy_binary</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;uuid-0_8&quot;</span>)]
+#[doc(inline)]
+</span><span class="kw">pub use </span>uuid_as_c_sharp_legacy_binary::{
+    deserialize <span class="kw">as </span>deserialize_uuid_from_c_sharp_legacy_binary,
+    serialize <span class="kw">as </span>serialize_uuid_as_c_sharp_legacy_binary,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-0_8&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">uuid_as_java_legacy_binary</span>::{
-    <span class="ident">deserialize</span> <span class="kw">as</span> <span class="ident">deserialize_uuid_from_java_legacy_binary</span>,
-    <span class="ident">serialize</span> <span class="kw">as</span> <span class="ident">serialize_uuid_as_java_legacy_binary</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;uuid-0_8&quot;</span>)]
+#[doc(inline)]
+</span><span class="kw">pub use </span>uuid_as_java_legacy_binary::{
+    deserialize <span class="kw">as </span>deserialize_uuid_from_java_legacy_binary,
+    serialize <span class="kw">as </span>serialize_uuid_as_java_legacy_binary,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-0_8&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">uuid_as_python_legacy_binary</span>::{
-    <span class="ident">deserialize</span> <span class="kw">as</span> <span class="ident">deserialize_uuid_from_python_legacy_binary</span>,
-    <span class="ident">serialize</span> <span class="kw">as</span> <span class="ident">serialize_uuid_as_python_legacy_binary</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;uuid-0_8&quot;</span>)]
+#[doc(inline)]
+</span><span class="kw">pub use </span>uuid_as_python_legacy_binary::{
+    deserialize <span class="kw">as </span>deserialize_uuid_from_python_legacy_binary,
+    serialize <span class="kw">as </span>serialize_uuid_as_python_legacy_binary,
 };
 
-<span class="doccomment">/// Attempts to serialize a u32 as an i32. Errors if an exact conversion is not possible.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize_u32_as_i32</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">u32</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">i32::try_from</span>(<span class="kw-2">*</span><span class="ident">val</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">val</span>) =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_i32</span>(<span class="ident">val</span>),
-        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="macro">format!</span>(<span class="string">&quot;cannot convert {} to i32&quot;</span>, <span class="ident">val</span>))),
+<span class="doccomment">/// Attempts to serialize a u32 as an i32. Errors if an exact conversion is not possible.
+</span><span class="kw">pub fn </span>serialize_u32_as_i32&lt;S: Serializer&gt;(val: <span class="kw-2">&amp;</span>u32, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
+    <span class="kw">match </span>i32::try_from(<span class="kw-2">*</span>val) {
+        <span class="prelude-val">Ok</span>(val) =&gt; serializer.serialize_i32(val),
+        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(ser::Error::custom(<span class="macro">format!</span>(<span class="string">&quot;cannot convert {} to i32&quot;</span>, val))),
     }
 }
 
-<span class="doccomment">/// Serializes a u32 as an i64.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize_u32_as_i64</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">u32</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-    <span class="ident">serializer</span>.<span class="ident">serialize_i64</span>(<span class="kw-2">*</span><span class="ident">val</span> <span class="kw">as</span> <span class="ident">i64</span>)
+<span class="doccomment">/// Serializes a u32 as an i64.
+</span><span class="kw">pub fn </span>serialize_u32_as_i64&lt;S: Serializer&gt;(val: <span class="kw-2">&amp;</span>u32, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
+    serializer.serialize_i64(<span class="kw-2">*</span>val <span class="kw">as </span>i64)
 }
 
-<span class="doccomment">/// Attempts to serialize a u64 as an i32. Errors if an exact conversion is not possible.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize_u64_as_i32</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">u64</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">i32::try_from</span>(<span class="kw-2">*</span><span class="ident">val</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">val</span>) =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_i32</span>(<span class="ident">val</span>),
-        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="macro">format!</span>(<span class="string">&quot;cannot convert {} to i32&quot;</span>, <span class="ident">val</span>))),
+<span class="doccomment">/// Attempts to serialize a u64 as an i32. Errors if an exact conversion is not possible.
+</span><span class="kw">pub fn </span>serialize_u64_as_i32&lt;S: Serializer&gt;(val: <span class="kw-2">&amp;</span>u64, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
+    <span class="kw">match </span>i32::try_from(<span class="kw-2">*</span>val) {
+        <span class="prelude-val">Ok</span>(val) =&gt; serializer.serialize_i32(val),
+        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(ser::Error::custom(<span class="macro">format!</span>(<span class="string">&quot;cannot convert {} to i32&quot;</span>, val))),
     }
 }
 
-<span class="doccomment">/// Attempts to serialize a u64 as an i64. Errors if an exact conversion is not possible.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize_u64_as_i64</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">u64</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">i64::try_from</span>(<span class="kw-2">*</span><span class="ident">val</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">val</span>) =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_i64</span>(<span class="ident">val</span>),
-        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="macro">format!</span>(<span class="string">&quot;cannot convert {} to i64&quot;</span>, <span class="ident">val</span>))),
+<span class="doccomment">/// Attempts to serialize a u64 as an i64. Errors if an exact conversion is not possible.
+</span><span class="kw">pub fn </span>serialize_u64_as_i64&lt;S: Serializer&gt;(val: <span class="kw-2">&amp;</span>u64, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
+    <span class="kw">match </span>i64::try_from(<span class="kw-2">*</span>val) {
+        <span class="prelude-val">Ok</span>(val) =&gt; serializer.serialize_i64(val),
+        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(ser::Error::custom(<span class="macro">format!</span>(<span class="string">&quot;cannot convert {} to i64&quot;</span>, val))),
     }
 }
 
-<span class="doccomment">/// Serializes an [`ObjectId`] as a hex string.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize_object_id_as_hex_string</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(
-    <span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">ObjectId</span>,
-    <span class="ident">serializer</span>: <span class="ident">S</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-    <span class="ident">val</span>.<span class="ident">to_hex</span>().<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+<span class="doccomment">/// Serializes an [`ObjectId`] as a hex string.
+</span><span class="kw">pub fn </span>serialize_object_id_as_hex_string&lt;S: Serializer&gt;(
+    val: <span class="kw-2">&amp;</span>ObjectId,
+    serializer: S,
+) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
+    val.to_hex().serialize(serializer)
 }
 
-<span class="doccomment">/// Contains functions to serialize a u32 as an f64 (BSON double) and deserialize a</span>
-<span class="doccomment">/// u32 from an f64 (BSON double).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use serde::{Serialize, Deserialize};</span>
-<span class="doccomment">/// # use bson::serde_helpers::u32_as_f64;</span>
-<span class="doccomment">/// #[derive(Serialize, Deserialize)]</span>
-<span class="doccomment">/// struct FileInfo {</span>
-<span class="doccomment">///     #[serde(with = &quot;u32_as_f64&quot;)]</span>
-<span class="doccomment">///     pub size_bytes: u32,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">u32_as_f64</span> {
-    <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">de</span>, <span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serializer</span>};
+<span class="doccomment">/// Contains functions to serialize a u32 as an f64 (BSON double) and deserialize a
+/// u32 from an f64 (BSON double).
+///
+/// ```rust
+/// # use serde::{Serialize, Deserialize};
+/// # use bson::serde_helpers::u32_as_f64;
+/// #[derive(Serialize, Deserialize)]
+/// struct FileInfo {
+///     #[serde(with = &quot;u32_as_f64&quot;)]
+///     pub size_bytes: u32,
+/// }
+/// ```
+</span><span class="kw">pub mod </span>u32_as_f64 {
+    <span class="kw">use </span>serde::{de, Deserialize, Deserializer, Serializer};
 
-    <span class="doccomment">/// Deserializes a u32 from an f64 (BSON double). Errors if an exact conversion is not possible.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Deserializes a u32 from an f64 (BSON double). Errors if an exact conversion is not possible.
+    </span><span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>, D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;u32, D::Error&gt;
+    <span class="kw">where
+        </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">f64::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-        <span class="kw">if</span> (<span class="ident">f</span> <span class="op">-</span> <span class="ident">f</span> <span class="kw">as</span> <span class="ident">u32</span> <span class="kw">as</span> <span class="ident">f64</span>).<span class="ident">abs</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">f64::EPSILON</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">f</span> <span class="kw">as</span> <span class="ident">u32</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">de::Error::custom</span>(<span class="macro">format!</span>(
+        <span class="kw">let </span>f = f64::deserialize(deserializer)<span class="question-mark">?</span>;
+        <span class="kw">if </span>(f - f <span class="kw">as </span>u32 <span class="kw">as </span>f64).abs() &lt;= f64::EPSILON {
+            <span class="prelude-val">Ok</span>(f <span class="kw">as </span>u32)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(de::Error::custom(<span class="macro">format!</span>(
                 <span class="string">&quot;cannot convert f64 (BSON double) {} to u32&quot;</span>,
-                <span class="ident">f</span>
+                f
             )))
         }
     }
 
-    <span class="doccomment">/// Serializes a u32 as an f64 (BSON double).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">u32</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-        <span class="ident">serializer</span>.<span class="ident">serialize_f64</span>(<span class="kw-2">*</span><span class="ident">val</span> <span class="kw">as</span> <span class="ident">f64</span>)
+    <span class="doccomment">/// Serializes a u32 as an f64 (BSON double).
+    </span><span class="kw">pub fn </span>serialize&lt;S: Serializer&gt;(val: <span class="kw-2">&amp;</span>u32, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
+        serializer.serialize_f64(<span class="kw-2">*</span>val <span class="kw">as </span>f64)
     }
 }
 
-<span class="doccomment">/// Contains functions to serialize a u64 as an f64 (BSON double) and deserialize a</span>
-<span class="doccomment">/// u64 from an f64 (BSON double).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use serde::{Serialize, Deserialize};</span>
-<span class="doccomment">/// # use bson::serde_helpers::u64_as_f64;</span>
-<span class="doccomment">/// #[derive(Serialize, Deserialize)]</span>
-<span class="doccomment">/// struct FileInfo {</span>
-<span class="doccomment">///     #[serde(with = &quot;u64_as_f64&quot;)]</span>
-<span class="doccomment">///     pub size_bytes: u64,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">u64_as_f64</span> {
-    <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">de</span>, <span class="ident">ser</span>, <span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serializer</span>};
+<span class="doccomment">/// Contains functions to serialize a u64 as an f64 (BSON double) and deserialize a
+/// u64 from an f64 (BSON double).
+///
+/// ```rust
+/// # use serde::{Serialize, Deserialize};
+/// # use bson::serde_helpers::u64_as_f64;
+/// #[derive(Serialize, Deserialize)]
+/// struct FileInfo {
+///     #[serde(with = &quot;u64_as_f64&quot;)]
+///     pub size_bytes: u64,
+/// }
+/// ```
+</span><span class="kw">pub mod </span>u64_as_f64 {
+    <span class="kw">use </span>serde::{de, ser, Deserialize, Deserializer, Serializer};
 
-    <span class="doccomment">/// Deserializes a u64 from an f64 (BSON double). Errors if an exact conversion is not possible.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Deserializes a u64 from an f64 (BSON double). Errors if an exact conversion is not possible.
+    </span><span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>, D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;u64, D::Error&gt;
+    <span class="kw">where
+        </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">f64::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-        <span class="kw">if</span> (<span class="ident">f</span> <span class="op">-</span> <span class="ident">f</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="kw">as</span> <span class="ident">f64</span>).<span class="ident">abs</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">f64::EPSILON</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">f</span> <span class="kw">as</span> <span class="ident">u64</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">de::Error::custom</span>(<span class="macro">format!</span>(
+        <span class="kw">let </span>f = f64::deserialize(deserializer)<span class="question-mark">?</span>;
+        <span class="kw">if </span>(f - f <span class="kw">as </span>u64 <span class="kw">as </span>f64).abs() &lt;= f64::EPSILON {
+            <span class="prelude-val">Ok</span>(f <span class="kw">as </span>u64)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(de::Error::custom(<span class="macro">format!</span>(
                 <span class="string">&quot;cannot convert f64 (BSON double) {} to u64&quot;</span>,
-                <span class="ident">f</span>
+                f
             )))
         }
     }
 
-    <span class="doccomment">/// Serializes a u64 as an f64 (BSON double). Errors if an exact conversion is not possible.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">u64</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">val</span> <span class="op">&lt;</span> <span class="kw-2">&amp;</span><span class="ident">u64::MAX</span> <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">val</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">val</span> <span class="kw">as</span> <span class="ident">f64</span> <span class="kw">as</span> <span class="ident">u64</span> {
-            <span class="ident">serializer</span>.<span class="ident">serialize_f64</span>(<span class="kw-2">*</span><span class="ident">val</span> <span class="kw">as</span> <span class="ident">f64</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="macro">format!</span>(
+    <span class="doccomment">/// Serializes a u64 as an f64 (BSON double). Errors if an exact conversion is not possible.
+    </span><span class="kw">pub fn </span>serialize&lt;S: Serializer&gt;(val: <span class="kw-2">&amp;</span>u64, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
+        <span class="kw">if </span>val &lt; <span class="kw-2">&amp;</span>u64::MAX &amp;&amp; <span class="kw-2">*</span>val == <span class="kw-2">*</span>val <span class="kw">as </span>f64 <span class="kw">as </span>u64 {
+            serializer.serialize_f64(<span class="kw-2">*</span>val <span class="kw">as </span>f64)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(ser::Error::custom(<span class="macro">format!</span>(
                 <span class="string">&quot;cannot convert u64 {} to f64 (BSON double)&quot;</span>,
-                <span class="ident">val</span>
+                val
             )))
         }
     }
 }
 
-<span class="doccomment">/// Contains functions to serialize a [`time::OffsetDateTime`] as a [`crate::DateTime`] and</span>
-<span class="doccomment">/// deserialize a [`time::OffsetDateTime`] from a [`crate::DateTime`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # #[cfg(feature = &quot;time-0_3&quot;)]</span>
-<span class="doccomment">/// # {</span>
-<span class="doccomment">/// # use serde::{Serialize, Deserialize};</span>
-<span class="doccomment">/// # use bson::serde_helpers::time_0_3_offsetdatetime_as_bson_datetime;</span>
-<span class="doccomment">/// #[derive(Serialize, Deserialize)]</span>
-<span class="doccomment">/// struct Event {</span>
-<span class="doccomment">///     #[serde(with = &quot;time_0_3_offsetdatetime_as_bson_datetime&quot;)]</span>
-<span class="doccomment">///     pub date: time::OffsetDateTime,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time-0_3&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time-0_3&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">time_0_3_offsetdatetime_as_bson_datetime</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::DateTime</span>;
-    <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
-    <span class="kw">use</span> <span class="ident">std::result::Result</span>;
+<span class="doccomment">/// Contains functions to serialize a [`time::OffsetDateTime`] as a [`crate::DateTime`] and
+/// deserialize a [`time::OffsetDateTime`] from a [`crate::DateTime`].
+///
+/// ```rust
+/// # #[cfg(feature = &quot;time-0_3&quot;)]
+/// # {
+/// # use serde::{Serialize, Deserialize};
+/// # use bson::serde_helpers::time_0_3_offsetdatetime_as_bson_datetime;
+/// #[derive(Serialize, Deserialize)]
+/// struct Event {
+///     #[serde(with = &quot;time_0_3_offsetdatetime_as_bson_datetime&quot;)]
+///     pub date: time::OffsetDateTime,
+/// }
+/// # }
+/// ```
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;time-0_3&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;time-0_3&quot;</span>)))]
+</span><span class="kw">pub mod </span>time_0_3_offsetdatetime_as_bson_datetime {
+    <span class="kw">use </span><span class="kw">crate</span>::DateTime;
+    <span class="kw">use </span>serde::{Deserialize, Deserializer, Serialize, Serializer};
+    <span class="kw">use </span>std::result::Result;
 
-    <span class="doccomment">/// Deserializes a [`time::OffsetDateTime`] from a [`crate::DateTime`].</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time-0_3&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">time::OffsetDateTime</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Deserializes a [`time::OffsetDateTime`] from a [`crate::DateTime`].
+    </span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;time-0_3&quot;</span>)))]
+    </span><span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>, D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;time::OffsetDateTime, D::Error&gt;
+    <span class="kw">where
+        </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">let</span> <span class="ident">datetime</span> <span class="op">=</span> <span class="ident">DateTime::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">datetime</span>.<span class="ident">to_time_0_3</span>())
+        <span class="kw">let </span>datetime = DateTime::deserialize(deserializer)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(datetime.to_time_0_3())
     }
 
-    <span class="doccomment">/// Serializes a [`time::OffsetDateTime`] as a [`crate::DateTime`].</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time-0_3&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(
-        <span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">time::OffsetDateTime</span>,
-        <span class="ident">serializer</span>: <span class="ident">S</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">datetime</span> <span class="op">=</span> <span class="ident">DateTime::from_time_0_3</span>(<span class="ident">val</span>.<span class="ident">to_owned</span>());
-        <span class="ident">datetime</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+    <span class="doccomment">/// Serializes a [`time::OffsetDateTime`] as a [`crate::DateTime`].
+    </span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;time-0_3&quot;</span>)))]
+    </span><span class="kw">pub fn </span>serialize&lt;S: Serializer&gt;(
+        val: <span class="kw-2">&amp;</span>time::OffsetDateTime,
+        serializer: S,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
+        <span class="kw">let </span>datetime = DateTime::from_time_0_3(val.to_owned());
+        datetime.serialize(serializer)
     }
 }
 
-<span class="doccomment">/// Contains functions to serialize a [`chrono::DateTime`] as a [`crate::DateTime`] and deserialize</span>
-<span class="doccomment">/// a [`chrono::DateTime`] from a [`crate::DateTime`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # #[cfg(feature = &quot;chrono-0_4&quot;)]</span>
-<span class="doccomment">/// # {</span>
-<span class="doccomment">/// # use serde::{Serialize, Deserialize};</span>
-<span class="doccomment">/// # use bson::serde_helpers::chrono_datetime_as_bson_datetime;</span>
-<span class="doccomment">/// #[derive(Serialize, Deserialize)]</span>
-<span class="doccomment">/// struct Event {</span>
-<span class="doccomment">///     #[serde(with = &quot;chrono_datetime_as_bson_datetime&quot;)]</span>
-<span class="doccomment">///     pub date: chrono::DateTime&lt;chrono::Utc&gt;,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono-0_4&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono-0_4&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">chrono_datetime_as_bson_datetime</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::DateTime</span>;
-    <span class="kw">use</span> <span class="ident">chrono::Utc</span>;
-    <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
-    <span class="kw">use</span> <span class="ident">std::result::Result</span>;
+<span class="doccomment">/// Contains functions to serialize a [`chrono::DateTime`] as a [`crate::DateTime`] and deserialize
+/// a [`chrono::DateTime`] from a [`crate::DateTime`].
+///
+/// ```rust
+/// # #[cfg(feature = &quot;chrono-0_4&quot;)]
+/// # {
+/// # use serde::{Serialize, Deserialize};
+/// # use bson::serde_helpers::chrono_datetime_as_bson_datetime;
+/// #[derive(Serialize, Deserialize)]
+/// struct Event {
+///     #[serde(with = &quot;chrono_datetime_as_bson_datetime&quot;)]
+///     pub date: chrono::DateTime&lt;chrono::Utc&gt;,
+/// }
+/// # }
+/// ```
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;chrono-0_4&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;chrono-0_4&quot;</span>)))]
+</span><span class="kw">pub mod </span>chrono_datetime_as_bson_datetime {
+    <span class="kw">use </span><span class="kw">crate</span>::DateTime;
+    <span class="kw">use </span>chrono::Utc;
+    <span class="kw">use </span>serde::{Deserialize, Deserializer, Serialize, Serializer};
+    <span class="kw">use </span>std::result::Result;
 
-    <span class="doccomment">/// Deserializes a [`chrono::DateTime`] from a [`crate::DateTime`].</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono-0_4&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Deserializes a [`chrono::DateTime`] from a [`crate::DateTime`].
+    </span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;chrono-0_4&quot;</span>)))]
+    </span><span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>, D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;chrono::DateTime&lt;Utc&gt;, D::Error&gt;
+    <span class="kw">where
+        </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">let</span> <span class="ident">datetime</span> <span class="op">=</span> <span class="ident">DateTime::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">datetime</span>.<span class="ident">to_chrono</span>())
+        <span class="kw">let </span>datetime = DateTime::deserialize(deserializer)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(datetime.to_chrono())
     }
 
-    <span class="doccomment">/// Serializes a [`chrono::DateTime`] as a [`crate::DateTime`].</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono-0_4&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(
-        <span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">chrono::DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span>,
-        <span class="ident">serializer</span>: <span class="ident">S</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">datetime</span> <span class="op">=</span> <span class="ident">DateTime::from_chrono</span>(<span class="ident">val</span>.<span class="ident">to_owned</span>());
-        <span class="ident">datetime</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+    <span class="doccomment">/// Serializes a [`chrono::DateTime`] as a [`crate::DateTime`].
+    </span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;chrono-0_4&quot;</span>)))]
+    </span><span class="kw">pub fn </span>serialize&lt;S: Serializer&gt;(
+        val: <span class="kw-2">&amp;</span>chrono::DateTime&lt;Utc&gt;,
+        serializer: S,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
+        <span class="kw">let </span>datetime = DateTime::from_chrono(val.to_owned());
+        datetime.serialize(serializer)
     }
 }
 
-<span class="doccomment">/// Contains functions to serialize an RFC 3339 (ISO 8601) formatted string as a [`crate::DateTime`]</span>
-<span class="doccomment">/// and deserialize an RFC 3339 (ISO 8601) formatted string from a [`crate::DateTime`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use serde::{Serialize, Deserialize};</span>
-<span class="doccomment">/// # use bson::serde_helpers::rfc3339_string_as_bson_datetime;</span>
-<span class="doccomment">/// #[derive(Serialize, Deserialize)]</span>
-<span class="doccomment">/// struct Event {</span>
-<span class="doccomment">///     #[serde(with = &quot;rfc3339_string_as_bson_datetime&quot;)]</span>
-<span class="doccomment">///     pub date: String,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">rfc3339_string_as_bson_datetime</span> {
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Bson</span>, <span class="ident">DateTime</span>};
-    <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">de</span>, <span class="ident">ser</span>, <span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
-    <span class="kw">use</span> <span class="ident">std::result::Result</span>;
+<span class="doccomment">/// Contains functions to serialize an RFC 3339 (ISO 8601) formatted string as a [`crate::DateTime`]
+/// and deserialize an RFC 3339 (ISO 8601) formatted string from a [`crate::DateTime`].
+///
+/// ```rust
+/// # use serde::{Serialize, Deserialize};
+/// # use bson::serde_helpers::rfc3339_string_as_bson_datetime;
+/// #[derive(Serialize, Deserialize)]
+/// struct Event {
+///     #[serde(with = &quot;rfc3339_string_as_bson_datetime&quot;)]
+///     pub date: String,
+/// }
+/// ```
+</span><span class="kw">pub mod </span>rfc3339_string_as_bson_datetime {
+    <span class="kw">use crate</span>::{Bson, DateTime};
+    <span class="kw">use </span>serde::{de, ser, Deserialize, Deserializer, Serialize, Serializer};
+    <span class="kw">use </span>std::result::Result;
 
-    <span class="doccomment">/// Deserializes an ISO string from a DateTime.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Deserializes an ISO string from a DateTime.
+    </span><span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>, D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;String, D::Error&gt;
+    <span class="kw">where
+        </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="ident">DateTime::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-        <span class="ident">date</span>.<span class="ident">try_to_rfc3339_string</span>()
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">de::Error::custom</span>(<span class="macro">format!</span>(<span class="string">&quot;cannot format {} as RFC 3339: {}&quot;</span>, <span class="ident">date</span>, <span class="ident">e</span>)))
+        <span class="kw">let </span>date = DateTime::deserialize(deserializer)<span class="question-mark">?</span>;
+        date.try_to_rfc3339_string()
+            .map_err(|e| de::Error::custom(<span class="macro">format!</span>(<span class="string">&quot;cannot format {} as RFC 3339: {}&quot;</span>, date, e)))
     }
 
-    <span class="doccomment">/// Serializes an ISO string as a DateTime.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::DateTime::parse_rfc3339_str</span>(<span class="ident">val</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">ser::Error::custom</span>(<span class="macro">format!</span>(<span class="string">&quot;cannot convert {} to DateTime&quot;</span>, <span class="ident">val</span>)))<span class="question-mark">?</span>;
-        <span class="ident">Bson::DateTime</span>(<span class="ident">date</span>).<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+    <span class="doccomment">/// Serializes an ISO string as a DateTime.
+    </span><span class="kw">pub fn </span>serialize&lt;S: Serializer&gt;(val: <span class="kw-2">&amp;</span>str, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
+        <span class="kw">let </span>date = <span class="kw">crate</span>::DateTime::parse_rfc3339_str(val)
+            .map_err(|<span class="kw">_</span>| ser::Error::custom(<span class="macro">format!</span>(<span class="string">&quot;cannot convert {} to DateTime&quot;</span>, val)))<span class="question-mark">?</span>;
+        Bson::DateTime(date).serialize(serializer)
     }
 }
 
-<span class="doccomment">/// Contains functions to serialize a [`crate::DateTime`] as an RFC 3339 (ISO 8601) formatted string</span>
-<span class="doccomment">/// and deserialize a [`crate::DateTime`] from an RFC 3339 (ISO 8601) formatted string.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use serde::{Serialize, Deserialize};</span>
-<span class="doccomment">/// # use bson::serde_helpers::bson_datetime_as_rfc3339_string;</span>
-<span class="doccomment">/// #[derive(Serialize, Deserialize)]</span>
-<span class="doccomment">/// struct Event {</span>
-<span class="doccomment">///     #[serde(with = &quot;bson_datetime_as_rfc3339_string&quot;)]</span>
-<span class="doccomment">///     pub date: bson::DateTime,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">bson_datetime_as_rfc3339_string</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::DateTime</span>;
-    <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">de</span>, <span class="ident">ser</span>, <span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serializer</span>};
-    <span class="kw">use</span> <span class="ident">std::result::Result</span>;
+<span class="doccomment">/// Contains functions to serialize a [`crate::DateTime`] as an RFC 3339 (ISO 8601) formatted string
+/// and deserialize a [`crate::DateTime`] from an RFC 3339 (ISO 8601) formatted string.
+///
+/// ```rust
+/// # use serde::{Serialize, Deserialize};
+/// # use bson::serde_helpers::bson_datetime_as_rfc3339_string;
+/// #[derive(Serialize, Deserialize)]
+/// struct Event {
+///     #[serde(with = &quot;bson_datetime_as_rfc3339_string&quot;)]
+///     pub date: bson::DateTime,
+/// }
+/// ```
+</span><span class="kw">pub mod </span>bson_datetime_as_rfc3339_string {
+    <span class="kw">use </span><span class="kw">crate</span>::DateTime;
+    <span class="kw">use </span>serde::{de, ser, Deserialize, Deserializer, Serializer};
+    <span class="kw">use </span>std::result::Result;
 
-    <span class="doccomment">/// Deserializes a [`crate::DateTime`] from an RFC 3339 formatted string.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DateTime</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Deserializes a [`crate::DateTime`] from an RFC 3339 formatted string.
+    </span><span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>, D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;DateTime, D::Error&gt;
+    <span class="kw">where
+        </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">let</span> <span class="ident">iso</span> <span class="op">=</span> <span class="ident">String::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">date</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::DateTime::parse_rfc3339_str</span>(<span class="kw-2">&amp;</span><span class="ident">iso</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-            <span class="ident">de::Error::custom</span>(<span class="macro">format!</span>(<span class="string">&quot;cannot parse RFC 3339 datetime from \&quot;{}\&quot;&quot;</span>, <span class="ident">iso</span>))
+        <span class="kw">let </span>iso = String::deserialize(deserializer)<span class="question-mark">?</span>;
+        <span class="kw">let </span>date = <span class="kw">crate</span>::DateTime::parse_rfc3339_str(<span class="kw-2">&amp;</span>iso).map_err(|<span class="kw">_</span>| {
+            de::Error::custom(<span class="macro">format!</span>(<span class="string">&quot;cannot parse RFC 3339 datetime from \&quot;{}\&quot;&quot;</span>, iso))
         })<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">date</span>)
+        <span class="prelude-val">Ok</span>(date)
     }
 
-    <span class="doccomment">/// Serializes a [`crate::DateTime`] as an RFC 3339 (ISO 8601) formatted string.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">DateTime</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">formatted</span> <span class="op">=</span> <span class="ident">val</span>
-            .<span class="ident">try_to_rfc3339_string</span>()
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">ser::Error::custom</span>(<span class="macro">format!</span>(<span class="string">&quot;cannot format {} as RFC 3339: {}&quot;</span>, <span class="ident">val</span>, <span class="ident">e</span>)))<span class="question-mark">?</span>;
-        <span class="ident">serializer</span>.<span class="ident">serialize_str</span>(<span class="kw-2">&amp;</span><span class="ident">formatted</span>)
+    <span class="doccomment">/// Serializes a [`crate::DateTime`] as an RFC 3339 (ISO 8601) formatted string.
+    </span><span class="kw">pub fn </span>serialize&lt;S: Serializer&gt;(val: <span class="kw-2">&amp;</span>DateTime, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
+        <span class="kw">let </span>formatted = val
+            .try_to_rfc3339_string()
+            .map_err(|e| ser::Error::custom(<span class="macro">format!</span>(<span class="string">&quot;cannot format {} as RFC 3339: {}&quot;</span>, val, e)))<span class="question-mark">?</span>;
+        serializer.serialize_str(<span class="kw-2">&amp;</span>formatted)
     }
 }
 
-<span class="doccomment">/// Contains functions to serialize a hex string as an ObjectId and deserialize a</span>
-<span class="doccomment">/// hex string from an ObjectId</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use serde::{Serialize, Deserialize};</span>
-<span class="doccomment">/// # use bson::serde_helpers::hex_string_as_object_id;</span>
-<span class="doccomment">/// #[derive(Serialize, Deserialize)]</span>
-<span class="doccomment">/// struct Item {</span>
-<span class="doccomment">///     #[serde(with = &quot;hex_string_as_object_id&quot;)]</span>
-<span class="doccomment">///     pub id: String,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">hex_string_as_object_id</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::oid::ObjectId</span>;
-    <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">ser</span>, <span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
+<span class="doccomment">/// Contains functions to serialize a hex string as an ObjectId and deserialize a
+/// hex string from an ObjectId
+///
+/// ```rust
+/// # use serde::{Serialize, Deserialize};
+/// # use bson::serde_helpers::hex_string_as_object_id;
+/// #[derive(Serialize, Deserialize)]
+/// struct Item {
+///     #[serde(with = &quot;hex_string_as_object_id&quot;)]
+///     pub id: String,
+/// }
+/// ```
+</span><span class="kw">pub mod </span>hex_string_as_object_id {
+    <span class="kw">use </span><span class="kw">crate</span>::oid::ObjectId;
+    <span class="kw">use </span>serde::{ser, Deserialize, Deserializer, Serialize, Serializer};
 
-    <span class="doccomment">/// Deserializes a hex string from an ObjectId.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Deserializes a hex string from an ObjectId.
+    </span><span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>, D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;String, D::Error&gt;
+    <span class="kw">where
+        </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">let</span> <span class="ident">object_id</span> <span class="op">=</span> <span class="ident">ObjectId::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">object_id</span>.<span class="ident">to_hex</span>())
+        <span class="kw">let </span>object_id = ObjectId::deserialize(deserializer)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(object_id.to_hex())
     }
 
-    <span class="doccomment">/// Serializes a hex string as an ObjectId.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">ObjectId::parse_str</span>(<span class="ident">val</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">oid</span>) =&gt; <span class="ident">oid</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>),
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(<span class="macro">format!</span>(
+    <span class="doccomment">/// Serializes a hex string as an ObjectId.
+    </span><span class="kw">pub fn </span>serialize&lt;S: Serializer&gt;(val: <span class="kw-2">&amp;</span>str, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
+        <span class="kw">match </span>ObjectId::parse_str(val) {
+            <span class="prelude-val">Ok</span>(oid) =&gt; oid.serialize(serializer),
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(ser::Error::custom(<span class="macro">format!</span>(
                 <span class="string">&quot;cannot convert {} to ObjectId&quot;</span>,
-                <span class="ident">val</span>
+                val
             ))),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_macros</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">as_binary_mod</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">feat</span>:<span class="ident">meta</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">uu</span>:<span class="ident">path</span>) =&gt; {
-        <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
-        <span class="kw">use</span> <span class="ident">std::result::Result</span>;
-        <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">uu</span>;
+<span class="attribute">#[allow(unused_macros)]
+</span><span class="macro">macro_rules! </span>as_binary_mod {
+    (<span class="macro-nonterminal">$feat</span>:meta, <span class="macro-nonterminal">$uu</span>:path) =&gt; {
+        <span class="kw">use </span>serde::{Deserialize, Deserializer, Serialize, Serializer};
+        <span class="kw">use </span>std::result::Result;
+        <span class="kw">use </span><span class="macro-nonterminal">$uu</span>;
 
-        <span class="doccomment">/// Serializes a Uuid as a Binary.</span>
-        <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">feat</span>))]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">Uuid</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-            <span class="ident"><span class="kw">crate</span>::uuid::Uuid::from</span>(<span class="kw-2">*</span><span class="ident">val</span>).<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+        <span class="doccomment">/// Serializes a Uuid as a Binary.
+        </span><span class="attribute">#[cfg_attr(docsrs, doc(<span class="macro-nonterminal">$feat</span>))]
+        </span><span class="kw">pub fn </span>serialize&lt;S: Serializer&gt;(val: <span class="kw-2">&amp;</span>Uuid, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
+            <span class="kw">crate</span>::uuid::Uuid::from(<span class="kw-2">*</span>val).serialize(serializer)
         }
 
-        <span class="doccomment">/// Deserializes a Uuid from a Binary.</span>
-        <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">feat</span>))]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Uuid</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-        <span class="kw">where</span>
-            <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+        <span class="doccomment">/// Deserializes a Uuid from a Binary.
+        </span><span class="attribute">#[cfg_attr(docsrs, doc(<span class="macro-nonterminal">$feat</span>))]
+        </span><span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>, D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;Uuid, D::Error&gt;
+        <span class="kw">where
+            </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
         {
-            <span class="kw">let</span> <span class="ident">bson_uuid</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::uuid::Uuid::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(<span class="ident">bson_uuid</span>.<span class="ident">into</span>())
+            <span class="kw">let </span>bson_uuid = <span class="kw">crate</span>::uuid::Uuid::deserialize(deserializer)<span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(bson_uuid.into())
         }
     };
 }
 
-<span class="doccomment">/// Contains functions to serialize a [`uuid_0_8::Uuid`] as a [`crate::Binary`] and deserialize a</span>
-<span class="doccomment">/// [`uuid_0_8::Uuid`] from a [`crate::Binary`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # #[cfg(feature = &quot;uuid-0_8&quot;)]</span>
-<span class="doccomment">/// # {</span>
-<span class="doccomment">/// use serde::{Serialize, Deserialize};</span>
-<span class="doccomment">/// use uuid_0_8::Uuid;</span>
-<span class="doccomment">/// use bson::serde_helpers::uuid_as_binary;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[derive(Serialize, Deserialize)]</span>
-<span class="doccomment">/// struct Item {</span>
-<span class="doccomment">///     #[serde(with = &quot;uuid_as_binary&quot;)]</span>
-<span class="doccomment">///     pub id: Uuid,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-0_8&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-0_8&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">uuid_as_binary</span> {
-    <span class="macro">as_binary_mod!</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-0_8&quot;</span>), <span class="ident">uuid_0_8::Uuid</span>);
+<span class="doccomment">/// Contains functions to serialize a [`uuid_0_8::Uuid`] as a [`crate::Binary`] and deserialize a
+/// [`uuid_0_8::Uuid`] from a [`crate::Binary`].
+///
+/// ```rust
+/// # #[cfg(feature = &quot;uuid-0_8&quot;)]
+/// # {
+/// use serde::{Serialize, Deserialize};
+/// use uuid_0_8::Uuid;
+/// use bson::serde_helpers::uuid_as_binary;
+///
+/// #[derive(Serialize, Deserialize)]
+/// struct Item {
+///     #[serde(with = &quot;uuid_as_binary&quot;)]
+///     pub id: Uuid,
+/// }
+/// # }
+/// ```
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;uuid-0_8&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;uuid-0_8&quot;</span>)))]
+</span><span class="kw">pub mod </span>uuid_as_binary {
+    <span class="macro">as_binary_mod!</span>(cfg(feature = <span class="string">&quot;uuid-0_8&quot;</span>), uuid_0_8::Uuid);
 }
 
-<span class="doccomment">/// Contains functions to serialize a [`uuid::Uuid`] as a [`crate::Binary`] and deserialize a</span>
-<span class="doccomment">/// [`uuid::Uuid`] from a [`crate::Binary`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # #[cfg(feature = &quot;uuid-1&quot;)]</span>
-<span class="doccomment">/// # {</span>
-<span class="doccomment">/// use serde::{Serialize, Deserialize};</span>
-<span class="doccomment">/// use uuid::Uuid;</span>
-<span class="doccomment">/// use bson::serde_helpers::uuid_1_as_binary;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[derive(Serialize, Deserialize)]</span>
-<span class="doccomment">/// struct Item {</span>
-<span class="doccomment">///     #[serde(with = &quot;uuid_1_as_binary&quot;)]</span>
-<span class="doccomment">///     pub id: Uuid,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-1&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-1&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">uuid_1_as_binary</span> {
-    <span class="macro">as_binary_mod!</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-1&quot;</span>), <span class="ident">uuid::Uuid</span>);
+<span class="doccomment">/// Contains functions to serialize a [`uuid::Uuid`] as a [`crate::Binary`] and deserialize a
+/// [`uuid::Uuid`] from a [`crate::Binary`].
+///
+/// ```rust
+/// # #[cfg(feature = &quot;uuid-1&quot;)]
+/// # {
+/// use serde::{Serialize, Deserialize};
+/// use uuid::Uuid;
+/// use bson::serde_helpers::uuid_1_as_binary;
+///
+/// #[derive(Serialize, Deserialize)]
+/// struct Item {
+///     #[serde(with = &quot;uuid_1_as_binary&quot;)]
+///     pub id: Uuid,
+/// }
+/// # }
+/// ```
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;uuid-1&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;uuid-1&quot;</span>)))]
+</span><span class="kw">pub mod </span>uuid_1_as_binary {
+    <span class="macro">as_binary_mod!</span>(cfg(feature = <span class="string">&quot;uuid-1&quot;</span>), uuid::Uuid);
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_macros</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">as_legacy_binary_mod</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">feat</span>:<span class="ident">meta</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">uu</span>:<span class="ident">path</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">rep</span>:<span class="ident">path</span>) =&gt; {
-        <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">uuid::UuidRepresentation</span>, <span class="ident">Binary</span>};
-        <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">de</span>, <span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
-        <span class="kw">use</span> <span class="ident">std::result::Result</span>;
-        <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">uu</span>;
+<span class="attribute">#[allow(unused_macros)]
+</span><span class="macro">macro_rules! </span>as_legacy_binary_mod {
+    (<span class="macro-nonterminal">$feat</span>:meta, <span class="macro-nonterminal">$uu</span>:path, <span class="macro-nonterminal">$rep</span>:path) =&gt; {
+        <span class="kw">use crate</span>::{uuid::UuidRepresentation, Binary};
+        <span class="kw">use </span>serde::{de, Deserialize, Deserializer, Serialize, Serializer};
+        <span class="kw">use </span>std::result::Result;
+        <span class="kw">use </span><span class="macro-nonterminal">$uu</span>;
 
-        <span class="doccomment">/// Serializes a Uuid as a Binary in the legacy UUID format.</span>
-        <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">feat</span>))]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">Uuid</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">binary</span> <span class="op">=</span> <span class="ident">Binary::from_uuid_with_representation</span>(<span class="ident"><span class="kw">crate</span>::uuid::Uuid::from</span>(<span class="kw-2">*</span><span class="ident">val</span>), <span class="macro-nonterminal">$</span><span class="macro-nonterminal">rep</span>);
-            <span class="ident">binary</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+        <span class="doccomment">/// Serializes a Uuid as a Binary in the legacy UUID format.
+        </span><span class="attribute">#[cfg_attr(docsrs, doc(<span class="macro-nonterminal">$feat</span>))]
+        </span><span class="kw">pub fn </span>serialize&lt;S: Serializer&gt;(val: <span class="kw-2">&amp;</span>Uuid, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
+            <span class="kw">let </span>binary = Binary::from_uuid_with_representation(<span class="kw">crate</span>::uuid::Uuid::from(<span class="kw-2">*</span>val), <span class="macro-nonterminal">$rep</span>);
+            binary.serialize(serializer)
         }
 
-        <span class="doccomment">/// Deserializes a Uuid from a Binary in the legacy UUID format.</span>
-        <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">feat</span>))]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Uuid</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-        <span class="kw">where</span>
-            <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+        <span class="doccomment">/// Deserializes a Uuid from a Binary in the legacy UUID format.
+        </span><span class="attribute">#[cfg_attr(docsrs, doc(<span class="macro-nonterminal">$feat</span>))]
+        </span><span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>, D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;Uuid, D::Error&gt;
+        <span class="kw">where
+            </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
         {
-            <span class="kw">let</span> <span class="ident">binary</span> <span class="op">=</span> <span class="ident">Binary::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">uuid</span> <span class="op">=</span> <span class="ident">binary</span>
-                .<span class="ident">to_uuid_with_representation</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rep</span>)
-                .<span class="ident">map_err</span>(<span class="ident">de::Error::custom</span>)<span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(<span class="ident">uuid</span>.<span class="ident">into</span>())
+            <span class="kw">let </span>binary = Binary::deserialize(deserializer)<span class="question-mark">?</span>;
+            <span class="kw">let </span>uuid = binary
+                .to_uuid_with_representation(<span class="macro-nonterminal">$rep</span>)
+                .map_err(de::Error::custom)<span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(uuid.into())
         }
     };
 }
 
-<span class="doccomment">/// Contains functions to serialize a [`uuid_0_8::Uuid`] to a [`crate::Binary`] in the legacy</span>
-<span class="doccomment">/// Java driver UUID format and deserialize [`uuid_0_8::Uuid`] from a [`crate::Binary`] in the</span>
-<span class="doccomment">/// legacy Java driver format.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// #[cfg(feature = &quot;uuid-0_8&quot;)]</span>
-<span class="doccomment">/// # {</span>
-<span class="doccomment">/// use serde::{Serialize, Deserialize};</span>
-<span class="doccomment">/// use uuid_0_8::Uuid;</span>
-<span class="doccomment">/// use bson::serde_helpers::uuid_as_java_legacy_binary;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[derive(Serialize, Deserialize)]</span>
-<span class="doccomment">/// struct Item {</span>
-<span class="doccomment">///     #[serde(with = &quot;uuid_as_java_legacy_binary&quot;)]</span>
-<span class="doccomment">///     pub id: Uuid,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-0_8&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-0_8&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">uuid_as_java_legacy_binary</span> {
+<span class="doccomment">/// Contains functions to serialize a [`uuid_0_8::Uuid`] to a [`crate::Binary`] in the legacy
+/// Java driver UUID format and deserialize [`uuid_0_8::Uuid`] from a [`crate::Binary`] in the
+/// legacy Java driver format.
+///
+/// ```rust
+/// #[cfg(feature = &quot;uuid-0_8&quot;)]
+/// # {
+/// use serde::{Serialize, Deserialize};
+/// use uuid_0_8::Uuid;
+/// use bson::serde_helpers::uuid_as_java_legacy_binary;
+///
+/// #[derive(Serialize, Deserialize)]
+/// struct Item {
+///     #[serde(with = &quot;uuid_as_java_legacy_binary&quot;)]
+///     pub id: Uuid,
+/// }
+/// # }
+/// ```
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;uuid-0_8&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;uuid-0_8&quot;</span>)))]
+</span><span class="kw">pub mod </span>uuid_as_java_legacy_binary {
     <span class="macro">as_legacy_binary_mod!</span>(
-        <span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-0_8&quot;</span>),
-        <span class="ident">uuid_0_8::Uuid</span>,
-        <span class="ident">UuidRepresentation::JavaLegacy</span>
+        cfg(feature = <span class="string">&quot;uuid-0_8&quot;</span>),
+        uuid_0_8::Uuid,
+        UuidRepresentation::JavaLegacy
     );
 }
 
-<span class="doccomment">/// Contains functions to serialize a [`uuid::Uuid`] to a [`crate::Binary`] in the legacy</span>
-<span class="doccomment">/// Java driver UUID format and deserialize [`uuid::Uuid`] from a [`crate::Binary`] in the legacy</span>
-<span class="doccomment">/// Java driver format.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// #[cfg(feature = &quot;uuid-1&quot;)]</span>
-<span class="doccomment">/// # {</span>
-<span class="doccomment">/// use serde::{Serialize, Deserialize};</span>
-<span class="doccomment">/// use uuid::Uuid;</span>
-<span class="doccomment">/// use bson::serde_helpers::uuid_1_as_java_legacy_binary;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[derive(Serialize, Deserialize)]</span>
-<span class="doccomment">/// struct Item {</span>
-<span class="doccomment">///     #[serde(with = &quot;uuid_1_as_java_legacy_binary&quot;)]</span>
-<span class="doccomment">///     pub id: Uuid,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-1&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-1&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">uuid_1_as_java_legacy_binary</span> {
+<span class="doccomment">/// Contains functions to serialize a [`uuid::Uuid`] to a [`crate::Binary`] in the legacy
+/// Java driver UUID format and deserialize [`uuid::Uuid`] from a [`crate::Binary`] in the legacy
+/// Java driver format.
+///
+/// ```rust
+/// #[cfg(feature = &quot;uuid-1&quot;)]
+/// # {
+/// use serde::{Serialize, Deserialize};
+/// use uuid::Uuid;
+/// use bson::serde_helpers::uuid_1_as_java_legacy_binary;
+///
+/// #[derive(Serialize, Deserialize)]
+/// struct Item {
+///     #[serde(with = &quot;uuid_1_as_java_legacy_binary&quot;)]
+///     pub id: Uuid,
+/// }
+/// # }
+/// ```
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;uuid-1&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;uuid-1&quot;</span>)))]
+</span><span class="kw">pub mod </span>uuid_1_as_java_legacy_binary {
     <span class="macro">as_legacy_binary_mod!</span>(
-        <span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-1&quot;</span>),
-        <span class="ident">uuid::Uuid</span>,
-        <span class="ident">UuidRepresentation::JavaLegacy</span>
+        cfg(feature = <span class="string">&quot;uuid-1&quot;</span>),
+        uuid::Uuid,
+        UuidRepresentation::JavaLegacy
     );
 }
 
-<span class="doccomment">/// Contains functions to serialize a [`uuid_0_8::Uuid`] to a [`crate::Binary`] in the legacy Python</span>
-<span class="doccomment">/// driver UUID format and deserialize [`uuid_0_8::Uuid`] from a [`crate::Binary`] in the legacy</span>
-<span class="doccomment">/// Python driver format.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # #[cfg(feature = &quot;uuid-0_8&quot;)]</span>
-<span class="doccomment">/// # {</span>
-<span class="doccomment">/// use serde::{Serialize, Deserialize};</span>
-<span class="doccomment">/// use uuid_0_8::Uuid;</span>
-<span class="doccomment">/// use bson::serde_helpers::uuid_as_python_legacy_binary;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[derive(Serialize, Deserialize)]</span>
-<span class="doccomment">/// struct Item {</span>
-<span class="doccomment">///     #[serde(with = &quot;uuid_as_python_legacy_binary&quot;)]</span>
-<span class="doccomment">///     pub id: Uuid,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-0_8&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-0_8&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">uuid_as_python_legacy_binary</span> {
+<span class="doccomment">/// Contains functions to serialize a [`uuid_0_8::Uuid`] to a [`crate::Binary`] in the legacy Python
+/// driver UUID format and deserialize [`uuid_0_8::Uuid`] from a [`crate::Binary`] in the legacy
+/// Python driver format.
+///
+/// ```rust
+/// # #[cfg(feature = &quot;uuid-0_8&quot;)]
+/// # {
+/// use serde::{Serialize, Deserialize};
+/// use uuid_0_8::Uuid;
+/// use bson::serde_helpers::uuid_as_python_legacy_binary;
+///
+/// #[derive(Serialize, Deserialize)]
+/// struct Item {
+///     #[serde(with = &quot;uuid_as_python_legacy_binary&quot;)]
+///     pub id: Uuid,
+/// }
+/// # }
+/// ```
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;uuid-0_8&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;uuid-0_8&quot;</span>)))]
+</span><span class="kw">pub mod </span>uuid_as_python_legacy_binary {
     <span class="macro">as_legacy_binary_mod!</span>(
-        <span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-0_8&quot;</span>),
-        <span class="ident">uuid_0_8::Uuid</span>,
-        <span class="ident">UuidRepresentation::PythonLegacy</span>
+        cfg(feature = <span class="string">&quot;uuid-0_8&quot;</span>),
+        uuid_0_8::Uuid,
+        UuidRepresentation::PythonLegacy
     );
 }
 
-<span class="doccomment">/// Contains functions to serialize a [`uuid::Uuid`] to a [`crate::Binary`] in the legacy Python</span>
-<span class="doccomment">/// driver UUID format and deserialize [`uuid::Uuid`] from a [`crate::Binary`] in the legacy Python</span>
-<span class="doccomment">/// driver format.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # #[cfg(feature = &quot;uuid-1&quot;)]</span>
-<span class="doccomment">/// # {</span>
-<span class="doccomment">/// use serde::{Serialize, Deserialize};</span>
-<span class="doccomment">/// use uuid::Uuid;</span>
-<span class="doccomment">/// use bson::serde_helpers::uuid_1_as_python_legacy_binary;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[derive(Serialize, Deserialize)]</span>
-<span class="doccomment">/// struct Item {</span>
-<span class="doccomment">///     #[serde(with = &quot;uuid_1_as_python_legacy_binary&quot;)]</span>
-<span class="doccomment">///     pub id: Uuid,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-1&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-1&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">uuid_1_as_python_legacy_binary</span> {
+<span class="doccomment">/// Contains functions to serialize a [`uuid::Uuid`] to a [`crate::Binary`] in the legacy Python
+/// driver UUID format and deserialize [`uuid::Uuid`] from a [`crate::Binary`] in the legacy Python
+/// driver format.
+///
+/// ```rust
+/// # #[cfg(feature = &quot;uuid-1&quot;)]
+/// # {
+/// use serde::{Serialize, Deserialize};
+/// use uuid::Uuid;
+/// use bson::serde_helpers::uuid_1_as_python_legacy_binary;
+///
+/// #[derive(Serialize, Deserialize)]
+/// struct Item {
+///     #[serde(with = &quot;uuid_1_as_python_legacy_binary&quot;)]
+///     pub id: Uuid,
+/// }
+/// # }
+/// ```
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;uuid-1&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;uuid-1&quot;</span>)))]
+</span><span class="kw">pub mod </span>uuid_1_as_python_legacy_binary {
     <span class="macro">as_legacy_binary_mod!</span>(
-        <span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-1&quot;</span>),
-        <span class="ident">uuid::Uuid</span>,
-        <span class="ident">UuidRepresentation::PythonLegacy</span>
+        cfg(feature = <span class="string">&quot;uuid-1&quot;</span>),
+        uuid::Uuid,
+        UuidRepresentation::PythonLegacy
     );
 }
 
-<span class="doccomment">/// Contains functions to serialize a [`uuid_0_8::Uuid`] to a [`crate::Binary`] in the legacy C#</span>
-<span class="doccomment">/// driver UUID format and deserialize [`uuid_0_8::Uuid`] from a [`crate::Binary`] in the legacy C#</span>
-<span class="doccomment">/// driver format.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # #[cfg(feature = &quot;uuid-0_8&quot;)]</span>
-<span class="doccomment">/// # {</span>
-<span class="doccomment">/// use serde::{Serialize, Deserialize};</span>
-<span class="doccomment">/// use uuid_0_8::Uuid;</span>
-<span class="doccomment">/// use bson::serde_helpers::uuid_as_c_sharp_legacy_binary;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[derive(Serialize, Deserialize)]</span>
-<span class="doccomment">/// struct Item {</span>
-<span class="doccomment">///     #[serde(with = &quot;uuid_as_c_sharp_legacy_binary&quot;)]</span>
-<span class="doccomment">///     pub id: Uuid,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-0_8&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-0_8&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">uuid_as_c_sharp_legacy_binary</span> {
+<span class="doccomment">/// Contains functions to serialize a [`uuid_0_8::Uuid`] to a [`crate::Binary`] in the legacy C#
+/// driver UUID format and deserialize [`uuid_0_8::Uuid`] from a [`crate::Binary`] in the legacy C#
+/// driver format.
+///
+/// ```rust
+/// # #[cfg(feature = &quot;uuid-0_8&quot;)]
+/// # {
+/// use serde::{Serialize, Deserialize};
+/// use uuid_0_8::Uuid;
+/// use bson::serde_helpers::uuid_as_c_sharp_legacy_binary;
+///
+/// #[derive(Serialize, Deserialize)]
+/// struct Item {
+///     #[serde(with = &quot;uuid_as_c_sharp_legacy_binary&quot;)]
+///     pub id: Uuid,
+/// }
+/// # }
+/// ```
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;uuid-0_8&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;uuid-0_8&quot;</span>)))]
+</span><span class="kw">pub mod </span>uuid_as_c_sharp_legacy_binary {
     <span class="macro">as_legacy_binary_mod!</span>(
-        <span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-0_8&quot;</span>),
-        <span class="ident">uuid_0_8::Uuid</span>,
-        <span class="ident">UuidRepresentation::CSharpLegacy</span>
+        cfg(feature = <span class="string">&quot;uuid-0_8&quot;</span>),
+        uuid_0_8::Uuid,
+        UuidRepresentation::CSharpLegacy
     );
 }
 
-<span class="doccomment">/// Contains functions to serialize a [`uuid::Uuid`] to a [`crate::Binary`] in the legacy C# driver</span>
-<span class="doccomment">/// UUID format and deserialize [`uuid::Uuid`] from a [`crate::Binary`] in the legacy C# driver</span>
-<span class="doccomment">/// format.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # #[cfg(feature = &quot;uuid-1&quot;)]</span>
-<span class="doccomment">/// # {</span>
-<span class="doccomment">/// use serde::{Serialize, Deserialize};</span>
-<span class="doccomment">/// use uuid::Uuid;</span>
-<span class="doccomment">/// use bson::serde_helpers::uuid_1_as_c_sharp_legacy_binary;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[derive(Serialize, Deserialize)]</span>
-<span class="doccomment">/// struct Item {</span>
-<span class="doccomment">///     #[serde(with = &quot;uuid_1_as_c_sharp_legacy_binary&quot;)]</span>
-<span class="doccomment">///     pub id: Uuid,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-1&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-1&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">uuid_1_as_c_sharp_legacy_binary</span> {
+<span class="doccomment">/// Contains functions to serialize a [`uuid::Uuid`] to a [`crate::Binary`] in the legacy C# driver
+/// UUID format and deserialize [`uuid::Uuid`] from a [`crate::Binary`] in the legacy C# driver
+/// format.
+///
+/// ```rust
+/// # #[cfg(feature = &quot;uuid-1&quot;)]
+/// # {
+/// use serde::{Serialize, Deserialize};
+/// use uuid::Uuid;
+/// use bson::serde_helpers::uuid_1_as_c_sharp_legacy_binary;
+///
+/// #[derive(Serialize, Deserialize)]
+/// struct Item {
+///     #[serde(with = &quot;uuid_1_as_c_sharp_legacy_binary&quot;)]
+///     pub id: Uuid,
+/// }
+/// # }
+/// ```
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;uuid-1&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;uuid-1&quot;</span>)))]
+</span><span class="kw">pub mod </span>uuid_1_as_c_sharp_legacy_binary {
     <span class="macro">as_legacy_binary_mod!</span>(
-        <span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid-1&quot;</span>),
-        <span class="ident">uuid::Uuid</span>,
-        <span class="ident">UuidRepresentation::CSharpLegacy</span>
+        cfg(feature = <span class="string">&quot;uuid-1&quot;</span>),
+        uuid::Uuid,
+        UuidRepresentation::CSharpLegacy
     );
 }
 
-<span class="doccomment">/// Contains functions to serialize a u32 as a bson::Timestamp and deserialize a u32 from a</span>
-<span class="doccomment">/// bson::Timestamp. The u32 should represent seconds since the Unix epoch.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use serde::{Serialize, Deserialize};</span>
-<span class="doccomment">/// # use bson::serde_helpers::u32_as_timestamp;</span>
-<span class="doccomment">/// #[derive(Serialize, Deserialize)]</span>
-<span class="doccomment">/// struct Event {</span>
-<span class="doccomment">///     #[serde(with = &quot;u32_as_timestamp&quot;)]</span>
-<span class="doccomment">///     pub time: u32,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">u32_as_timestamp</span> {
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Bson</span>, <span class="ident">Timestamp</span>};
-    <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
-    <span class="kw">use</span> <span class="ident">std::result::Result</span>;
+<span class="doccomment">/// Contains functions to serialize a u32 as a bson::Timestamp and deserialize a u32 from a
+/// bson::Timestamp. The u32 should represent seconds since the Unix epoch.
+///
+/// ```rust
+/// # use serde::{Serialize, Deserialize};
+/// # use bson::serde_helpers::u32_as_timestamp;
+/// #[derive(Serialize, Deserialize)]
+/// struct Event {
+///     #[serde(with = &quot;u32_as_timestamp&quot;)]
+///     pub time: u32,
+/// }
+/// ```
+</span><span class="kw">pub mod </span>u32_as_timestamp {
+    <span class="kw">use crate</span>::{Bson, Timestamp};
+    <span class="kw">use </span>serde::{Deserialize, Deserializer, Serialize, Serializer};
+    <span class="kw">use </span>std::result::Result;
 
-    <span class="doccomment">/// Serializes a u32 as a bson::Timestamp.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">u32</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">timestamp</span> <span class="op">=</span> <span class="ident">Bson::Timestamp</span>(<span class="ident">Timestamp</span> {
-            <span class="ident">time</span>: <span class="kw-2">*</span><span class="ident">val</span>,
-            <span class="ident">increment</span>: <span class="number">0</span>,
+    <span class="doccomment">/// Serializes a u32 as a bson::Timestamp.
+    </span><span class="kw">pub fn </span>serialize&lt;S: Serializer&gt;(val: <span class="kw-2">&amp;</span>u32, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
+        <span class="kw">let </span>timestamp = Bson::Timestamp(Timestamp {
+            time: <span class="kw-2">*</span>val,
+            increment: <span class="number">0</span>,
         });
-        <span class="ident">timestamp</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+        timestamp.serialize(serializer)
     }
 
-    <span class="doccomment">/// Deserializes a u32 from a bson::Timestamp.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Deserializes a u32 from a bson::Timestamp.
+    </span><span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>, D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;u32, D::Error&gt;
+    <span class="kw">where
+        </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">let</span> <span class="ident">timestamp</span> <span class="op">=</span> <span class="ident">Timestamp::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">timestamp</span>.<span class="ident">time</span>)
+        <span class="kw">let </span>timestamp = Timestamp::deserialize(deserializer)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(timestamp.time)
     }
 }
 
-<span class="doccomment">/// Contains functions to serialize a bson::Timestamp as a u32 and deserialize a bson::Timestamp</span>
-<span class="doccomment">/// from a u32. The u32 should represent seconds since the Unix epoch. Serialization will return an</span>
-<span class="doccomment">/// error if the Timestamp has a non-zero increment.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use serde::{Serialize, Deserialize};</span>
-<span class="doccomment">/// # use bson::{serde_helpers::timestamp_as_u32, Timestamp};</span>
-<span class="doccomment">/// #[derive(Serialize, Deserialize)]</span>
-<span class="doccomment">/// struct Item {</span>
-<span class="doccomment">///     #[serde(with = &quot;timestamp_as_u32&quot;)]</span>
-<span class="doccomment">///     pub timestamp: Timestamp,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">timestamp_as_u32</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Timestamp</span>;
-    <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">ser</span>, <span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Serializer</span>};
-    <span class="kw">use</span> <span class="ident">std::result::Result</span>;
+<span class="doccomment">/// Contains functions to serialize a bson::Timestamp as a u32 and deserialize a bson::Timestamp
+/// from a u32. The u32 should represent seconds since the Unix epoch. Serialization will return an
+/// error if the Timestamp has a non-zero increment.
+///
+/// ```rust
+/// # use serde::{Serialize, Deserialize};
+/// # use bson::{serde_helpers::timestamp_as_u32, Timestamp};
+/// #[derive(Serialize, Deserialize)]
+/// struct Item {
+///     #[serde(with = &quot;timestamp_as_u32&quot;)]
+///     pub timestamp: Timestamp,
+/// }
+/// ```
+</span><span class="kw">pub mod </span>timestamp_as_u32 {
+    <span class="kw">use </span><span class="kw">crate</span>::Timestamp;
+    <span class="kw">use </span>serde::{ser, Deserialize, Deserializer, Serializer};
+    <span class="kw">use </span>std::result::Result;
 
-    <span class="doccomment">/// Serializes a bson::Timestamp as a u32. Returns an error if the conversion is lossy (i.e. the</span>
-    <span class="doccomment">/// Timestamp has a non-zero increment).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">Timestamp</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">val</span>.<span class="ident">increment</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ser::Error::custom</span>(
+    <span class="doccomment">/// Serializes a bson::Timestamp as a u32. Returns an error if the conversion is lossy (i.e. the
+    /// Timestamp has a non-zero increment).
+    </span><span class="kw">pub fn </span>serialize&lt;S: Serializer&gt;(val: <span class="kw-2">&amp;</span>Timestamp, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt; {
+        <span class="kw">if </span>val.increment != <span class="number">0 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(ser::Error::custom(
                 <span class="string">&quot;Cannot convert Timestamp with a non-zero increment to u32&quot;</span>,
             ));
         }
-        <span class="ident">serializer</span>.<span class="ident">serialize_u32</span>(<span class="ident">val</span>.<span class="ident">time</span>)
+        serializer.serialize_u32(val.time)
     }
 
-    <span class="doccomment">/// Deserializes a bson::Timestamp from a u32.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Timestamp</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Deserializes a bson::Timestamp from a u32.
+    </span><span class="kw">pub fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>, D&gt;(deserializer: D) -&gt; <span class="prelude-ty">Result</span>&lt;Timestamp, D::Error&gt;
+    <span class="kw">where
+        </span>D: Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="kw">let</span> <span class="ident">time</span> <span class="op">=</span> <span class="ident">u32::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">Timestamp</span> { <span class="ident">time</span>, <span class="ident">increment</span>: <span class="number">0</span> })
+        <span class="kw">let </span>time = u32::deserialize(deserializer)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(Timestamp { time, increment: <span class="number">0 </span>})
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="bson" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="bson" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

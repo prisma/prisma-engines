@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/openssl-0.10.41/src/srtp.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>srtp.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../openssl/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../openssl/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../openssl/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/openssl-0.10.41/src/srtp.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>srtp.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../openssl/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../openssl/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../openssl/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -58,65 +58,65 @@
 <span id="58">58</span>
 <span id="59">59</span>
 <span id="60">60</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::stack::Stackable</span>;
-<span class="kw">use</span> <span class="ident">foreign_types::ForeignTypeRef</span>;
-<span class="kw">use</span> <span class="ident">libc::c_ulong</span>;
-<span class="kw">use</span> <span class="ident">std::ffi::CStr</span>;
-<span class="kw">use</span> <span class="ident">std::str</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::stack::Stackable;
+<span class="kw">use </span>foreign_types::ForeignTypeRef;
+<span class="kw">use </span>libc::c_ulong;
+<span class="kw">use </span>std::ffi::CStr;
+<span class="kw">use </span>std::str;
 
-<span class="doccomment">/// fake free method, since SRTP_PROTECTION_PROFILE is static</span>
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">free</span>(<span class="ident">_profile</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::SRTP_PROTECTION_PROFILE</span>) {}
+<span class="doccomment">/// fake free method, since SRTP_PROTECTION_PROFILE is static
+</span><span class="kw">unsafe fn </span>free(_profile: <span class="kw-2">*mut </span>ffi::SRTP_PROTECTION_PROFILE) {}
 
-<span class="macro">foreign_type_and_impl_send_sync!</span> {
-    <span class="kw">type</span> <span class="ident">CType</span> <span class="op">=</span> <span class="ident">ffi::SRTP_PROTECTION_PROFILE</span>;
-    <span class="kw">fn</span> <span class="ident">drop</span> <span class="op">=</span> <span class="ident">free</span>;
+<span class="macro">foreign_type_and_impl_send_sync! </span>{
+    <span class="kw">type </span>CType = ffi::SRTP_PROTECTION_PROFILE;
+    <span class="kw">fn </span>drop = free;
 
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SrtpProtectionProfile</span>;
-    <span class="doccomment">/// Reference to `SrtpProtectionProfile`.</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SrtpProtectionProfileRef</span>;
+    <span class="kw">pub struct </span>SrtpProtectionProfile;
+    <span class="doccomment">/// Reference to `SrtpProtectionProfile`.
+    </span><span class="kw">pub struct </span>SrtpProtectionProfileRef;
 }
 
-<span class="kw">impl</span> <span class="ident">Stackable</span> <span class="kw">for</span> <span class="ident">SrtpProtectionProfile</span> {
-    <span class="kw">type</span> <span class="ident">StackType</span> <span class="op">=</span> <span class="ident">ffi::stack_st_SRTP_PROTECTION_PROFILE</span>;
+<span class="kw">impl </span>Stackable <span class="kw">for </span>SrtpProtectionProfile {
+    <span class="kw">type </span>StackType = ffi::stack_st_SRTP_PROTECTION_PROFILE;
 }
 
-<span class="kw">impl</span> <span class="ident">SrtpProtectionProfileRef</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SrtpProfileId</span> {
-        <span class="ident">SrtpProfileId::from_raw</span>(<span class="kw">unsafe</span> { (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">as_ptr</span>()).<span class="ident">id</span> })
+<span class="kw">impl </span>SrtpProtectionProfileRef {
+    <span class="kw">pub fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SrtpProfileId {
+        SrtpProfileId::from_raw(<span class="kw">unsafe </span>{ (<span class="kw-2">*</span><span class="self">self</span>.as_ptr()).id })
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="kw">unsafe</span> { <span class="ident">CStr::from_ptr</span>((<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">as_ptr</span>()).<span class="ident">name</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>) }
-            .<span class="ident">to_str</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;should be UTF-8&quot;</span>)
+    <span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="kw">unsafe </span>{ CStr::from_ptr((<span class="kw-2">*</span><span class="self">self</span>.as_ptr()).name <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>) }
+            .to_str()
+            .expect(<span class="string">&quot;should be UTF-8&quot;</span>)
     }
 }
 
-<span class="doccomment">/// An identifier of an SRTP protection profile.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SrtpProfileId</span>(<span class="ident">c_ulong</span>);
+<span class="doccomment">/// An identifier of an SRTP protection profile.
+</span><span class="attribute">#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+</span><span class="kw">pub struct </span>SrtpProfileId(c_ulong);
 
-<span class="kw">impl</span> <span class="ident">SrtpProfileId</span> {
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SRTP_AES128_CM_SHA1_80</span>: <span class="ident">SrtpProfileId</span> <span class="op">=</span> <span class="ident">SrtpProfileId</span>(<span class="ident">ffi::SRTP_AES128_CM_SHA1_80</span>);
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SRTP_AES128_CM_SHA1_32</span>: <span class="ident">SrtpProfileId</span> <span class="op">=</span> <span class="ident">SrtpProfileId</span>(<span class="ident">ffi::SRTP_AES128_CM_SHA1_32</span>);
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SRTP_AES128_F8_SHA1_80</span>: <span class="ident">SrtpProfileId</span> <span class="op">=</span> <span class="ident">SrtpProfileId</span>(<span class="ident">ffi::SRTP_AES128_F8_SHA1_80</span>);
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SRTP_AES128_F8_SHA1_32</span>: <span class="ident">SrtpProfileId</span> <span class="op">=</span> <span class="ident">SrtpProfileId</span>(<span class="ident">ffi::SRTP_AES128_F8_SHA1_32</span>);
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SRTP_NULL_SHA1_80</span>: <span class="ident">SrtpProfileId</span> <span class="op">=</span> <span class="ident">SrtpProfileId</span>(<span class="ident">ffi::SRTP_NULL_SHA1_80</span>);
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SRTP_NULL_SHA1_32</span>: <span class="ident">SrtpProfileId</span> <span class="op">=</span> <span class="ident">SrtpProfileId</span>(<span class="ident">ffi::SRTP_NULL_SHA1_32</span>);
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">ossl110</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SRTP_AEAD_AES_128_GCM</span>: <span class="ident">SrtpProfileId</span> <span class="op">=</span> <span class="ident">SrtpProfileId</span>(<span class="ident">ffi::SRTP_AEAD_AES_128_GCM</span>);
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">ossl110</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SRTP_AEAD_AES_256_GCM</span>: <span class="ident">SrtpProfileId</span> <span class="op">=</span> <span class="ident">SrtpProfileId</span>(<span class="ident">ffi::SRTP_AEAD_AES_256_GCM</span>);
+<span class="kw">impl </span>SrtpProfileId {
+    <span class="kw">pub const </span>SRTP_AES128_CM_SHA1_80: SrtpProfileId = SrtpProfileId(ffi::SRTP_AES128_CM_SHA1_80);
+    <span class="kw">pub const </span>SRTP_AES128_CM_SHA1_32: SrtpProfileId = SrtpProfileId(ffi::SRTP_AES128_CM_SHA1_32);
+    <span class="kw">pub const </span>SRTP_AES128_F8_SHA1_80: SrtpProfileId = SrtpProfileId(ffi::SRTP_AES128_F8_SHA1_80);
+    <span class="kw">pub const </span>SRTP_AES128_F8_SHA1_32: SrtpProfileId = SrtpProfileId(ffi::SRTP_AES128_F8_SHA1_32);
+    <span class="kw">pub const </span>SRTP_NULL_SHA1_80: SrtpProfileId = SrtpProfileId(ffi::SRTP_NULL_SHA1_80);
+    <span class="kw">pub const </span>SRTP_NULL_SHA1_32: SrtpProfileId = SrtpProfileId(ffi::SRTP_NULL_SHA1_32);
+    <span class="attribute">#[cfg(ossl110)]
+    </span><span class="kw">pub const </span>SRTP_AEAD_AES_128_GCM: SrtpProfileId = SrtpProfileId(ffi::SRTP_AEAD_AES_128_GCM);
+    <span class="attribute">#[cfg(ossl110)]
+    </span><span class="kw">pub const </span>SRTP_AEAD_AES_256_GCM: SrtpProfileId = SrtpProfileId(ffi::SRTP_AEAD_AES_256_GCM);
 
-    <span class="doccomment">/// Creates a `SrtpProfileId` from an integer representation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_raw</span>(<span class="ident">value</span>: <span class="ident">c_ulong</span>) -&gt; <span class="ident">SrtpProfileId</span> {
-        <span class="ident">SrtpProfileId</span>(<span class="ident">value</span>)
+    <span class="doccomment">/// Creates a `SrtpProfileId` from an integer representation.
+    </span><span class="kw">pub fn </span>from_raw(value: c_ulong) -&gt; SrtpProfileId {
+        SrtpProfileId(value)
     }
 
-    <span class="doccomment">/// Returns the integer representation of `SrtpProfileId`.</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::trivially_copy_pass_by_ref</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">c_ulong</span> {
-        <span class="self">self</span>.<span class="number">0</span>
-    }
+    <span class="doccomment">/// Returns the integer representation of `SrtpProfileId`.
+    </span><span class="attribute">#[allow(clippy::trivially_copy_pass_by_ref)]
+    </span><span class="kw">pub fn </span>as_raw(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; c_ulong {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="openssl" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="openssl" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

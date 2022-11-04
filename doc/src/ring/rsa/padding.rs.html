@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/rsa/padding.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>padding.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../ring/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/rsa/padding.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>padding.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../ring/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -599,601 +599,601 @@
 <span id="599">599</span>
 <span id="600">600</span>
 <span id="601">601</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2016 Brian Smith.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
-<span class="comment">// purpose with or without fee is hereby granted, provided that the above</span>
-<span class="comment">// copyright notice and this permission notice appear in all copies.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES</span>
-<span class="comment">// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY</span>
-<span class="comment">// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span>
-<span class="comment">// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION</span>
-<span class="comment">// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN</span>
-<span class="comment">// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2016 Brian Smith.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY
+// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::PUBLIC_KEY_PUBLIC_MODULUS_MAX_LEN</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">bits</span>, <span class="ident">digest</span>, <span class="ident">error</span>, <span class="ident">io::der</span>};
+</span><span class="kw">use </span><span class="kw">super</span>::PUBLIC_KEY_PUBLIC_MODULUS_MAX_LEN;
+<span class="kw">use crate</span>::{bits, digest, error, io::der};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::rand</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::rand;
 
-<span class="doccomment">/// Common features of both RSA padding encoding and RSA padding verification.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Padding</span>: <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident"><span class="kw">crate</span>::sealed::Sealed</span> <span class="op">+</span> <span class="ident">core::fmt::Debug</span> {
-    <span class="comment">// The digest algorithm used for digesting the message (and maybe for</span>
-    <span class="comment">// other things).</span>
-    <span class="kw">fn</span> <span class="ident">digest_alg</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">digest::Algorithm</span>;
+<span class="doccomment">/// Common features of both RSA padding encoding and RSA padding verification.
+</span><span class="kw">pub trait </span>Padding: <span class="lifetime">&#39;static </span>+ Sync + <span class="kw">crate</span>::sealed::Sealed + core::fmt::Debug {
+    <span class="comment">// The digest algorithm used for digesting the message (and maybe for
+    // other things).
+    </span><span class="kw">fn </span>digest_alg(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>digest::Algorithm;
 }
 
-<span class="doccomment">/// An RSA signature encoding as described in [RFC 3447 Section 8].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [RFC 3447 Section 8]: https://tools.ietf.org/html/rfc3447#section-8</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">RsaEncoding</span>: <span class="ident">Padding</span> {
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">encode</span>(
+<span class="doccomment">/// An RSA signature encoding as described in [RFC 3447 Section 8].
+///
+/// [RFC 3447 Section 8]: https://tools.ietf.org/html/rfc3447#section-8
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">pub trait </span>RsaEncoding: Padding {
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">fn </span>encode(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">m_hash</span>: <span class="kw-2">&amp;</span><span class="ident">digest::Digest</span>,
-        <span class="ident">m_out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-        <span class="ident">mod_bits</span>: <span class="ident">bits::BitLength</span>,
-        <span class="ident">rng</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">rand::SecureRandom</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span>;
+        m_hash: <span class="kw-2">&amp;</span>digest::Digest,
+        m_out: <span class="kw-2">&amp;mut </span>[u8],
+        mod_bits: bits::BitLength,
+        rng: <span class="kw-2">&amp;</span><span class="kw">dyn </span>rand::SecureRandom,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt;;
 }
 
-<span class="doccomment">/// Verification of an RSA signature encoding as described in</span>
-<span class="doccomment">/// [RFC 3447 Section 8].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [RFC 3447 Section 8]: https://tools.ietf.org/html/rfc3447#section-8</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Verification</span>: <span class="ident">Padding</span> {
-    <span class="kw">fn</span> <span class="ident">verify</span>(
+<span class="doccomment">/// Verification of an RSA signature encoding as described in
+/// [RFC 3447 Section 8].
+///
+/// [RFC 3447 Section 8]: https://tools.ietf.org/html/rfc3447#section-8
+</span><span class="kw">pub trait </span>Verification: Padding {
+    <span class="kw">fn </span>verify(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">m_hash</span>: <span class="kw-2">&amp;</span><span class="ident">digest::Digest</span>,
-        <span class="ident">m</span>: <span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span>,
-        <span class="ident">mod_bits</span>: <span class="ident">bits::BitLength</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span>;
+        m_hash: <span class="kw-2">&amp;</span>digest::Digest,
+        m: <span class="kw-2">&amp;mut </span>untrusted::Reader,
+        mod_bits: bits::BitLength,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt;;
 }
 
-<span class="doccomment">/// PKCS#1 1.5 padding as described in [RFC 3447 Section 8.2].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See &quot;`RSA_PSS_*` Details\&quot; in `ring::signature`&#39;s module-level</span>
-<span class="doccomment">/// documentation for more details.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [RFC 3447 Section 8.2]: https://tools.ietf.org/html/rfc3447#section-8.2</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PKCS1</span> {
-    <span class="ident">digest_alg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">digest::Algorithm</span>,
-    <span class="ident">digestinfo_prefix</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>],
+<span class="doccomment">/// PKCS#1 1.5 padding as described in [RFC 3447 Section 8.2].
+///
+/// See &quot;`RSA_PSS_*` Details\&quot; in `ring::signature`&#39;s module-level
+/// documentation for more details.
+///
+/// [RFC 3447 Section 8.2]: https://tools.ietf.org/html/rfc3447#section-8.2
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>PKCS1 {
+    digest_alg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>digest::Algorithm,
+    digestinfo_prefix: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[u8],
 }
 
-<span class="kw">impl</span> <span class="ident"><span class="kw">crate</span>::sealed::Sealed</span> <span class="kw">for</span> <span class="ident">PKCS1</span> {}
+<span class="kw">impl </span><span class="kw">crate</span>::sealed::Sealed <span class="kw">for </span>PKCS1 {}
 
-<span class="kw">impl</span> <span class="ident">Padding</span> <span class="kw">for</span> <span class="ident">PKCS1</span> {
-    <span class="kw">fn</span> <span class="ident">digest_alg</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">digest::Algorithm</span> {
-        <span class="self">self</span>.<span class="ident">digest_alg</span>
+<span class="kw">impl </span>Padding <span class="kw">for </span>PKCS1 {
+    <span class="kw">fn </span>digest_alg(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>digest::Algorithm {
+        <span class="self">self</span>.digest_alg
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">RsaEncoding</span> <span class="kw">for</span> <span class="ident">PKCS1</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(
+<span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">impl </span>RsaEncoding <span class="kw">for </span>PKCS1 {
+    <span class="kw">fn </span>encode(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">m_hash</span>: <span class="kw-2">&amp;</span><span class="ident">digest::Digest</span>,
-        <span class="ident">m_out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-        <span class="ident">_mod_bits</span>: <span class="ident">bits::BitLength</span>,
-        <span class="ident">_rng</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">rand::SecureRandom</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-        <span class="ident">pkcs1_encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">m_hash</span>, <span class="ident">m_out</span>);
+        m_hash: <span class="kw-2">&amp;</span>digest::Digest,
+        m_out: <span class="kw-2">&amp;mut </span>[u8],
+        _mod_bits: bits::BitLength,
+        _rng: <span class="kw-2">&amp;</span><span class="kw">dyn </span>rand::SecureRandom,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt; {
+        pkcs1_encode(<span class="kw-2">&amp;</span><span class="self">self</span>, m_hash, m_out);
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Verification</span> <span class="kw">for</span> <span class="ident">PKCS1</span> {
-    <span class="kw">fn</span> <span class="ident">verify</span>(
+<span class="kw">impl </span>Verification <span class="kw">for </span>PKCS1 {
+    <span class="kw">fn </span>verify(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">m_hash</span>: <span class="kw-2">&amp;</span><span class="ident">digest::Digest</span>,
-        <span class="ident">m</span>: <span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span>,
-        <span class="ident">mod_bits</span>: <span class="ident">bits::BitLength</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-        <span class="comment">// `mod_bits.as_usize_bytes_rounded_up() &lt;=</span>
-        <span class="comment">//      PUBLIC_KEY_PUBLIC_MODULUS_MAX_LEN` is ensured by `verify_rsa_()`.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">calculated</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="ident">PUBLIC_KEY_PUBLIC_MODULUS_MAX_LEN</span>];
-        <span class="kw">let</span> <span class="ident">calculated</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">calculated</span>[..<span class="ident">mod_bits</span>.<span class="ident">as_usize_bytes_rounded_up</span>()];
-        <span class="ident">pkcs1_encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">m_hash</span>, <span class="ident">calculated</span>);
-        <span class="kw">if</span> <span class="ident">m</span>.<span class="ident">read_bytes_to_end</span>() <span class="op">!</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">calculated</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>);
+        m_hash: <span class="kw-2">&amp;</span>digest::Digest,
+        m: <span class="kw-2">&amp;mut </span>untrusted::Reader,
+        mod_bits: bits::BitLength,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt; {
+        <span class="comment">// `mod_bits.as_usize_bytes_rounded_up() &lt;=
+        //      PUBLIC_KEY_PUBLIC_MODULUS_MAX_LEN` is ensured by `verify_rsa_()`.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>calculated = [<span class="number">0u8</span>; PUBLIC_KEY_PUBLIC_MODULUS_MAX_LEN];
+        <span class="kw">let </span>calculated = <span class="kw-2">&amp;mut </span>calculated[..mod_bits.as_usize_bytes_rounded_up()];
+        pkcs1_encode(<span class="kw-2">&amp;</span><span class="self">self</span>, m_hash, calculated);
+        <span class="kw">if </span>m.read_bytes_to_end() != <span class="kw-2">*</span>calculated {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(error::Unspecified);
         }
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="comment">// Implement padding procedure per EMSA-PKCS1-v1_5,</span>
-<span class="comment">// https://tools.ietf.org/html/rfc3447#section-9.2. This is used by both</span>
-<span class="comment">// verification and signing so it needs to be able to handle moduli of the</span>
-<span class="comment">// minimum and maximum sizes for both operations.</span>
-<span class="kw">fn</span> <span class="ident">pkcs1_encode</span>(<span class="ident">pkcs1</span>: <span class="kw-2">&amp;</span><span class="ident">PKCS1</span>, <span class="ident">m_hash</span>: <span class="kw-2">&amp;</span><span class="ident">digest::Digest</span>, <span class="ident">m_out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) {
-    <span class="kw">let</span> <span class="ident">em</span> <span class="op">=</span> <span class="ident">m_out</span>;
+<span class="comment">// Implement padding procedure per EMSA-PKCS1-v1_5,
+// https://tools.ietf.org/html/rfc3447#section-9.2. This is used by both
+// verification and signing so it needs to be able to handle moduli of the
+// minimum and maximum sizes for both operations.
+</span><span class="kw">fn </span>pkcs1_encode(pkcs1: <span class="kw-2">&amp;</span>PKCS1, m_hash: <span class="kw-2">&amp;</span>digest::Digest, m_out: <span class="kw-2">&amp;mut </span>[u8]) {
+    <span class="kw">let </span>em = m_out;
 
-    <span class="kw">let</span> <span class="ident">digest_len</span> <span class="op">=</span> <span class="ident">pkcs1</span>.<span class="ident">digestinfo_prefix</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">pkcs1</span>.<span class="ident">digest_alg</span>.<span class="ident">output_len</span>;
+    <span class="kw">let </span>digest_len = pkcs1.digestinfo_prefix.len() + pkcs1.digest_alg.output_len;
 
-    <span class="comment">// The specification requires at least 8 bytes of padding. Since we</span>
-    <span class="comment">// disallow keys smaller than 1024 bits, this should always be true.</span>
-    <span class="macro">assert!</span>(<span class="ident">em</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">digest_len</span> <span class="op">+</span> <span class="number">11</span>);
-    <span class="kw">let</span> <span class="ident">pad_len</span> <span class="op">=</span> <span class="ident">em</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">digest_len</span> <span class="op">-</span> <span class="number">3</span>;
-    <span class="ident">em</span>[<span class="number">0</span>] <span class="op">=</span> <span class="number">0</span>;
-    <span class="ident">em</span>[<span class="number">1</span>] <span class="op">=</span> <span class="number">1</span>;
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">pad_len</span> {
-        <span class="ident">em</span>[<span class="number">2</span> <span class="op">+</span> <span class="ident">i</span>] <span class="op">=</span> <span class="number">0xff</span>;
+    <span class="comment">// The specification requires at least 8 bytes of padding. Since we
+    // disallow keys smaller than 1024 bits, this should always be true.
+    </span><span class="macro">assert!</span>(em.len() &gt;= digest_len + <span class="number">11</span>);
+    <span class="kw">let </span>pad_len = em.len() - digest_len - <span class="number">3</span>;
+    em[<span class="number">0</span>] = <span class="number">0</span>;
+    em[<span class="number">1</span>] = <span class="number">1</span>;
+    <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..pad_len {
+        em[<span class="number">2 </span>+ i] = <span class="number">0xff</span>;
     }
-    <span class="ident">em</span>[<span class="number">2</span> <span class="op">+</span> <span class="ident">pad_len</span>] <span class="op">=</span> <span class="number">0</span>;
+    em[<span class="number">2 </span>+ pad_len] = <span class="number">0</span>;
 
-    <span class="kw">let</span> (<span class="ident">digest_prefix</span>, <span class="ident">digest_dst</span>) <span class="op">=</span> <span class="ident">em</span>[<span class="number">3</span> <span class="op">+</span> <span class="ident">pad_len</span>..].<span class="ident">split_at_mut</span>(<span class="ident">pkcs1</span>.<span class="ident">digestinfo_prefix</span>.<span class="ident">len</span>());
-    <span class="ident">digest_prefix</span>.<span class="ident">copy_from_slice</span>(<span class="ident">pkcs1</span>.<span class="ident">digestinfo_prefix</span>);
-    <span class="ident">digest_dst</span>.<span class="ident">copy_from_slice</span>(<span class="ident">m_hash</span>.<span class="ident">as_ref</span>());
+    <span class="kw">let </span>(digest_prefix, digest_dst) = em[<span class="number">3 </span>+ pad_len..].split_at_mut(pkcs1.digestinfo_prefix.len());
+    digest_prefix.copy_from_slice(pkcs1.digestinfo_prefix);
+    digest_dst.copy_from_slice(m_hash.as_ref());
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">rsa_pkcs1_padding</span> {
-    ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">PADDING_ALGORITHM</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">digest_alg</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">digestinfo_prefix</span>:<span class="ident">expr</span>,
-      <span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc_str</span>:<span class="ident">expr</span> ) =&gt; {
-        <span class="attribute">#[<span class="ident">doc</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc_str</span>]</span>
-        <span class="kw">pub</span> <span class="kw">static</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">PADDING_ALGORITHM</span>: <span class="ident">PKCS1</span> <span class="op">=</span> <span class="ident">PKCS1</span> {
-            <span class="ident">digest_alg</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">digest_alg</span>,
-            <span class="ident">digestinfo_prefix</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">digestinfo_prefix</span>,
+<span class="macro">macro_rules! </span>rsa_pkcs1_padding {
+    ( <span class="macro-nonterminal">$PADDING_ALGORITHM</span>:ident, <span class="macro-nonterminal">$digest_alg</span>:expr, <span class="macro-nonterminal">$digestinfo_prefix</span>:expr,
+      <span class="macro-nonterminal">$doc_str</span>:expr ) =&gt; {
+        <span class="attribute">#[doc=<span class="macro-nonterminal">$doc_str</span>]
+        </span><span class="kw">pub static </span><span class="macro-nonterminal">$PADDING_ALGORITHM</span>: PKCS1 = PKCS1 {
+            digest_alg: <span class="macro-nonterminal">$digest_alg</span>,
+            digestinfo_prefix: <span class="macro-nonterminal">$digestinfo_prefix</span>,
         };
     };
 }
 
 <span class="macro">rsa_pkcs1_padding!</span>(
-    <span class="ident">RSA_PKCS1_SHA1_FOR_LEGACY_USE_ONLY</span>,
-    <span class="kw-2">&amp;</span><span class="ident">digest::SHA1_FOR_LEGACY_USE_ONLY</span>,
-    <span class="kw-2">&amp;</span><span class="ident">SHA1_PKCS1_DIGESTINFO_PREFIX</span>,
-    <span class="string">&quot;PKCS#1 1.5 padding using SHA-1 for RSA signatures.&quot;</span>
-);
+    RSA_PKCS1_SHA1_FOR_LEGACY_USE_ONLY,
+    <span class="kw-2">&amp;</span>digest::SHA1_FOR_LEGACY_USE_ONLY,
+    <span class="kw-2">&amp;</span>SHA1_PKCS1_DIGESTINFO_PREFIX,
+    <span class="string">&quot;PKCS#1 1.5 padding using SHA-1 for RSA signatures.&quot;
+</span>);
 <span class="macro">rsa_pkcs1_padding!</span>(
-    <span class="ident">RSA_PKCS1_SHA256</span>,
-    <span class="kw-2">&amp;</span><span class="ident">digest::SHA256</span>,
-    <span class="kw-2">&amp;</span><span class="ident">SHA256_PKCS1_DIGESTINFO_PREFIX</span>,
-    <span class="string">&quot;PKCS#1 1.5 padding using SHA-256 for RSA signatures.&quot;</span>
-);
+    RSA_PKCS1_SHA256,
+    <span class="kw-2">&amp;</span>digest::SHA256,
+    <span class="kw-2">&amp;</span>SHA256_PKCS1_DIGESTINFO_PREFIX,
+    <span class="string">&quot;PKCS#1 1.5 padding using SHA-256 for RSA signatures.&quot;
+</span>);
 <span class="macro">rsa_pkcs1_padding!</span>(
-    <span class="ident">RSA_PKCS1_SHA384</span>,
-    <span class="kw-2">&amp;</span><span class="ident">digest::SHA384</span>,
-    <span class="kw-2">&amp;</span><span class="ident">SHA384_PKCS1_DIGESTINFO_PREFIX</span>,
-    <span class="string">&quot;PKCS#1 1.5 padding using SHA-384 for RSA signatures.&quot;</span>
-);
+    RSA_PKCS1_SHA384,
+    <span class="kw-2">&amp;</span>digest::SHA384,
+    <span class="kw-2">&amp;</span>SHA384_PKCS1_DIGESTINFO_PREFIX,
+    <span class="string">&quot;PKCS#1 1.5 padding using SHA-384 for RSA signatures.&quot;
+</span>);
 <span class="macro">rsa_pkcs1_padding!</span>(
-    <span class="ident">RSA_PKCS1_SHA512</span>,
-    <span class="kw-2">&amp;</span><span class="ident">digest::SHA512</span>,
-    <span class="kw-2">&amp;</span><span class="ident">SHA512_PKCS1_DIGESTINFO_PREFIX</span>,
-    <span class="string">&quot;PKCS#1 1.5 padding using SHA-512 for RSA signatures.&quot;</span>
-);
+    RSA_PKCS1_SHA512,
+    <span class="kw-2">&amp;</span>digest::SHA512,
+    <span class="kw-2">&amp;</span>SHA512_PKCS1_DIGESTINFO_PREFIX,
+    <span class="string">&quot;PKCS#1 1.5 padding using SHA-512 for RSA signatures.&quot;
+</span>);
 
-<span class="macro">macro_rules!</span> <span class="ident">pkcs1_digestinfo_prefix</span> {
-    ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">digest_len</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">digest_oid_len</span>:<span class="ident">expr</span>,
-      [ $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">digest_oid</span>:<span class="ident">expr</span> ),<span class="op">*</span> ] ) =&gt; {
-        <span class="kw">static</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: [<span class="ident">u8</span>; <span class="number">2</span> <span class="op">+</span> <span class="number">8</span> <span class="op">+</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">digest_oid_len</span>] <span class="op">=</span> [
-            <span class="ident">der::Tag::Sequence</span> <span class="kw">as</span> <span class="ident">u8</span>, <span class="number">8</span> <span class="op">+</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">digest_oid_len</span> <span class="op">+</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">digest_len</span>,
-                <span class="ident">der::Tag::Sequence</span> <span class="kw">as</span> <span class="ident">u8</span>, <span class="number">2</span> <span class="op">+</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">digest_oid_len</span> <span class="op">+</span> <span class="number">2</span>,
-                    <span class="ident">der::Tag::OID</span> <span class="kw">as</span> <span class="ident">u8</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">digest_oid_len</span>, $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">digest_oid</span> ),<span class="kw-2">*</span>,
-                    <span class="ident">der::Tag::Null</span> <span class="kw">as</span> <span class="ident">u8</span>, <span class="number">0</span>,
-                <span class="ident">der::Tag::OctetString</span> <span class="kw">as</span> <span class="ident">u8</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">digest_len</span>,
+<span class="macro">macro_rules! </span>pkcs1_digestinfo_prefix {
+    ( <span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$digest_len</span>:expr, <span class="macro-nonterminal">$digest_oid_len</span>:expr,
+      [ $( <span class="macro-nonterminal">$digest_oid</span>:expr ),* ] ) =&gt; {
+        <span class="kw">static </span><span class="macro-nonterminal">$name</span>: [u8; <span class="number">2 </span>+ <span class="number">8 </span>+ <span class="macro-nonterminal">$digest_oid_len</span>] = [
+            der::Tag::Sequence <span class="kw">as </span>u8, <span class="number">8 </span>+ <span class="macro-nonterminal">$digest_oid_len </span>+ <span class="macro-nonterminal">$digest_len</span>,
+                der::Tag::Sequence <span class="kw">as </span>u8, <span class="number">2 </span>+ <span class="macro-nonterminal">$digest_oid_len </span>+ <span class="number">2</span>,
+                    der::Tag::OID <span class="kw">as </span>u8, <span class="macro-nonterminal">$digest_oid_len</span>, $( <span class="macro-nonterminal">$digest_oid </span>),<span class="kw-2">*</span>,
+                    der::Tag::Null <span class="kw">as </span>u8, <span class="number">0</span>,
+                der::Tag::OctetString <span class="kw">as </span>u8, <span class="macro-nonterminal">$digest_len</span>,
         ];
     }
 }
 
 <span class="macro">pkcs1_digestinfo_prefix!</span>(
-    <span class="ident">SHA1_PKCS1_DIGESTINFO_PREFIX</span>,
+    SHA1_PKCS1_DIGESTINFO_PREFIX,
     <span class="number">20</span>,
     <span class="number">5</span>,
     [<span class="number">0x2b</span>, <span class="number">0x0e</span>, <span class="number">0x03</span>, <span class="number">0x02</span>, <span class="number">0x1a</span>]
 );
 
 <span class="macro">pkcs1_digestinfo_prefix!</span>(
-    <span class="ident">SHA256_PKCS1_DIGESTINFO_PREFIX</span>,
+    SHA256_PKCS1_DIGESTINFO_PREFIX,
     <span class="number">32</span>,
     <span class="number">9</span>,
     [<span class="number">0x60</span>, <span class="number">0x86</span>, <span class="number">0x48</span>, <span class="number">0x01</span>, <span class="number">0x65</span>, <span class="number">0x03</span>, <span class="number">0x04</span>, <span class="number">0x02</span>, <span class="number">0x01</span>]
 );
 
 <span class="macro">pkcs1_digestinfo_prefix!</span>(
-    <span class="ident">SHA384_PKCS1_DIGESTINFO_PREFIX</span>,
+    SHA384_PKCS1_DIGESTINFO_PREFIX,
     <span class="number">48</span>,
     <span class="number">9</span>,
     [<span class="number">0x60</span>, <span class="number">0x86</span>, <span class="number">0x48</span>, <span class="number">0x01</span>, <span class="number">0x65</span>, <span class="number">0x03</span>, <span class="number">0x04</span>, <span class="number">0x02</span>, <span class="number">0x02</span>]
 );
 
 <span class="macro">pkcs1_digestinfo_prefix!</span>(
-    <span class="ident">SHA512_PKCS1_DIGESTINFO_PREFIX</span>,
+    SHA512_PKCS1_DIGESTINFO_PREFIX,
     <span class="number">64</span>,
     <span class="number">9</span>,
     [<span class="number">0x60</span>, <span class="number">0x86</span>, <span class="number">0x48</span>, <span class="number">0x01</span>, <span class="number">0x65</span>, <span class="number">0x03</span>, <span class="number">0x04</span>, <span class="number">0x02</span>, <span class="number">0x03</span>]
 );
 
-<span class="doccomment">/// RSA PSS padding as described in [RFC 3447 Section 8.1].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See &quot;`RSA_PSS_*` Details\&quot; in `ring::signature`&#39;s module-level</span>
-<span class="doccomment">/// documentation for more details.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [RFC 3447 Section 8.1]: https://tools.ietf.org/html/rfc3447#section-8.1</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PSS</span> {
-    <span class="ident">digest_alg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">digest::Algorithm</span>,
+<span class="doccomment">/// RSA PSS padding as described in [RFC 3447 Section 8.1].
+///
+/// See &quot;`RSA_PSS_*` Details\&quot; in `ring::signature`&#39;s module-level
+/// documentation for more details.
+///
+/// [RFC 3447 Section 8.1]: https://tools.ietf.org/html/rfc3447#section-8.1
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>PSS {
+    digest_alg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>digest::Algorithm,
 }
 
-<span class="kw">impl</span> <span class="ident"><span class="kw">crate</span>::sealed::Sealed</span> <span class="kw">for</span> <span class="ident">PSS</span> {}
+<span class="kw">impl </span><span class="kw">crate</span>::sealed::Sealed <span class="kw">for </span>PSS {}
 
-<span class="comment">// Maximum supported length of the salt in bytes.</span>
-<span class="comment">// In practice, this is constrained by the maximum digest length.</span>
-<span class="kw">const</span> <span class="ident">MAX_SALT_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">digest::MAX_OUTPUT_LEN</span>;
+<span class="comment">// Maximum supported length of the salt in bytes.
+// In practice, this is constrained by the maximum digest length.
+</span><span class="kw">const </span>MAX_SALT_LEN: usize = digest::MAX_OUTPUT_LEN;
 
-<span class="kw">impl</span> <span class="ident">Padding</span> <span class="kw">for</span> <span class="ident">PSS</span> {
-    <span class="kw">fn</span> <span class="ident">digest_alg</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">digest::Algorithm</span> {
-        <span class="self">self</span>.<span class="ident">digest_alg</span>
+<span class="kw">impl </span>Padding <span class="kw">for </span>PSS {
+    <span class="kw">fn </span>digest_alg(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>digest::Algorithm {
+        <span class="self">self</span>.digest_alg
     }
 }
 
-<span class="kw">impl</span> <span class="ident">RsaEncoding</span> <span class="kw">for</span> <span class="ident">PSS</span> {
-    <span class="comment">// Implement padding procedure per EMSA-PSS,</span>
-    <span class="comment">// https://tools.ietf.org/html/rfc3447#section-9.1.</span>
-    <span class="kw">fn</span> <span class="ident">encode</span>(
+<span class="kw">impl </span>RsaEncoding <span class="kw">for </span>PSS {
+    <span class="comment">// Implement padding procedure per EMSA-PSS,
+    // https://tools.ietf.org/html/rfc3447#section-9.1.
+    </span><span class="kw">fn </span>encode(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">m_hash</span>: <span class="kw-2">&amp;</span><span class="ident">digest::Digest</span>,
-        <span class="ident">m_out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-        <span class="ident">mod_bits</span>: <span class="ident">bits::BitLength</span>,
-        <span class="ident">rng</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">rand::SecureRandom</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">metrics</span> <span class="op">=</span> <span class="ident">PSSMetrics::new</span>(<span class="self">self</span>.<span class="ident">digest_alg</span>, <span class="ident">mod_bits</span>)<span class="question-mark">?</span>;
+        m_hash: <span class="kw-2">&amp;</span>digest::Digest,
+        m_out: <span class="kw-2">&amp;mut </span>[u8],
+        mod_bits: bits::BitLength,
+        rng: <span class="kw-2">&amp;</span><span class="kw">dyn </span>rand::SecureRandom,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt; {
+        <span class="kw">let </span>metrics = PSSMetrics::new(<span class="self">self</span>.digest_alg, mod_bits)<span class="question-mark">?</span>;
 
-        <span class="comment">// The `m_out` this function fills is the big-endian-encoded value of `m`</span>
-        <span class="comment">// from the specification, padded to `k` bytes, where `k` is the length</span>
-        <span class="comment">// in bytes of the public modulus. The spec says &quot;Note that emLen will</span>
-        <span class="comment">// be one less than k if modBits - 1 is divisible by 8 and equal to k</span>
-        <span class="comment">// otherwise.&quot; In other words we might need to prefix `em` with a</span>
-        <span class="comment">// leading zero byte to form a correct value of `m`.</span>
-        <span class="kw">let</span> <span class="ident">em</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">metrics</span>.<span class="ident">top_byte_mask</span> <span class="op">==</span> <span class="number">0xff</span> {
-            <span class="ident">m_out</span>[<span class="number">0</span>] <span class="op">=</span> <span class="number">0</span>;
-            <span class="kw-2">&amp;mut</span> <span class="ident">m_out</span>[<span class="number">1</span>..]
-        } <span class="kw">else</span> {
-            <span class="ident">m_out</span>
+        <span class="comment">// The `m_out` this function fills is the big-endian-encoded value of `m`
+        // from the specification, padded to `k` bytes, where `k` is the length
+        // in bytes of the public modulus. The spec says &quot;Note that emLen will
+        // be one less than k if modBits - 1 is divisible by 8 and equal to k
+        // otherwise.&quot; In other words we might need to prefix `em` with a
+        // leading zero byte to form a correct value of `m`.
+        </span><span class="kw">let </span>em = <span class="kw">if </span>metrics.top_byte_mask == <span class="number">0xff </span>{
+            m_out[<span class="number">0</span>] = <span class="number">0</span>;
+            <span class="kw-2">&amp;mut </span>m_out[<span class="number">1</span>..]
+        } <span class="kw">else </span>{
+            m_out
         };
-        <span class="macro">assert_eq!</span>(<span class="ident">em</span>.<span class="ident">len</span>(), <span class="ident">metrics</span>.<span class="ident">em_len</span>);
+        <span class="macro">assert_eq!</span>(em.len(), metrics.em_len);
 
-        <span class="comment">// Steps 1 and 2 are done by the caller to produce `m_hash`.</span>
+        <span class="comment">// Steps 1 and 2 are done by the caller to produce `m_hash`.
 
-        <span class="comment">// Step 3 is done by `PSSMetrics::new()` above.</span>
+        // Step 3 is done by `PSSMetrics::new()` above.
 
-        <span class="comment">// Step 4.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">salt</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="ident">MAX_SALT_LEN</span>];
-        <span class="kw">let</span> <span class="ident">salt</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">salt</span>[..<span class="ident">metrics</span>.<span class="ident">s_len</span>];
-        <span class="ident">rng</span>.<span class="ident">fill</span>(<span class="ident">salt</span>)<span class="question-mark">?</span>;
+        // Step 4.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>salt = [<span class="number">0u8</span>; MAX_SALT_LEN];
+        <span class="kw">let </span>salt = <span class="kw-2">&amp;mut </span>salt[..metrics.s_len];
+        rng.fill(salt)<span class="question-mark">?</span>;
 
-        <span class="comment">// Step 5 and 6.</span>
-        <span class="kw">let</span> <span class="ident">h_hash</span> <span class="op">=</span> <span class="ident">pss_digest</span>(<span class="self">self</span>.<span class="ident">digest_alg</span>, <span class="ident">m_hash</span>, <span class="ident">salt</span>);
+        <span class="comment">// Step 5 and 6.
+        </span><span class="kw">let </span>h_hash = pss_digest(<span class="self">self</span>.digest_alg, m_hash, salt);
 
-        <span class="comment">// Re-order steps 7, 8, 9 and 10 so that we first output the db mask</span>
-        <span class="comment">// into `em`, and then XOR the value of db.</span>
+        <span class="comment">// Re-order steps 7, 8, 9 and 10 so that we first output the db mask
+        // into `em`, and then XOR the value of db.
 
-        <span class="comment">// Step 9. First output the mask into the out buffer.</span>
-        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">masked_db</span>, <span class="ident">digest_terminator</span>) <span class="op">=</span> <span class="ident">em</span>.<span class="ident">split_at_mut</span>(<span class="ident">metrics</span>.<span class="ident">db_len</span>);
-        <span class="ident">mgf1</span>(<span class="self">self</span>.<span class="ident">digest_alg</span>, <span class="ident">h_hash</span>.<span class="ident">as_ref</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">masked_db</span>)<span class="question-mark">?</span>;
+        // Step 9. First output the mask into the out buffer.
+        </span><span class="kw">let </span>(<span class="kw-2">mut </span>masked_db, digest_terminator) = em.split_at_mut(metrics.db_len);
+        mgf1(<span class="self">self</span>.digest_alg, h_hash.as_ref(), <span class="kw-2">&amp;mut </span>masked_db)<span class="question-mark">?</span>;
 
         {
-            <span class="comment">// Steps 7.</span>
-            <span class="kw">let</span> <span class="ident">masked_db</span> <span class="op">=</span> <span class="ident">masked_db</span>.<span class="ident">iter_mut</span>();
-            <span class="comment">// `PS` is all zero bytes, so skipping `ps_len` bytes is equivalent</span>
-            <span class="comment">// to XORing `PS` onto `db`.</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">masked_db</span> <span class="op">=</span> <span class="ident">masked_db</span>.<span class="ident">skip</span>(<span class="ident">metrics</span>.<span class="ident">ps_len</span>);
+            <span class="comment">// Steps 7.
+            </span><span class="kw">let </span>masked_db = masked_db.iter_mut();
+            <span class="comment">// `PS` is all zero bytes, so skipping `ps_len` bytes is equivalent
+            // to XORing `PS` onto `db`.
+            </span><span class="kw">let </span><span class="kw-2">mut </span>masked_db = masked_db.skip(metrics.ps_len);
 
-            <span class="comment">// Step 8.</span>
-            <span class="kw-2">*</span>(<span class="ident">masked_db</span>.<span class="ident">next</span>().<span class="ident">ok_or</span>(<span class="ident">error::Unspecified</span>)<span class="question-mark">?</span>) <span class="op">^</span><span class="op">=</span> <span class="number">0x01</span>;
+            <span class="comment">// Step 8.
+            </span><span class="kw-2">*</span>(masked_db.next().ok_or(error::Unspecified)<span class="question-mark">?</span>) ^= <span class="number">0x01</span>;
 
-            <span class="comment">// Step 10.</span>
-            <span class="kw">for</span> (<span class="ident">masked_db_b</span>, <span class="ident">salt_b</span>) <span class="kw">in</span> <span class="ident">masked_db</span>.<span class="ident">zip</span>(<span class="ident">salt</span>) {
-                <span class="kw-2">*</span><span class="ident">masked_db_b</span> <span class="op">^</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">salt_b</span>;
+            <span class="comment">// Step 10.
+            </span><span class="kw">for </span>(masked_db_b, salt_b) <span class="kw">in </span>masked_db.zip(salt) {
+                <span class="kw-2">*</span>masked_db_b ^= <span class="kw-2">*</span>salt_b;
             }
         }
 
-        <span class="comment">// Step 11.</span>
-        <span class="ident">masked_db</span>[<span class="number">0</span>] <span class="op">&amp;=</span> <span class="ident">metrics</span>.<span class="ident">top_byte_mask</span>;
+        <span class="comment">// Step 11.
+        </span>masked_db[<span class="number">0</span>] &amp;= metrics.top_byte_mask;
 
-        <span class="comment">// Step 12.</span>
-        <span class="ident">digest_terminator</span>[..<span class="ident">metrics</span>.<span class="ident">h_len</span>].<span class="ident">copy_from_slice</span>(<span class="ident">h_hash</span>.<span class="ident">as_ref</span>());
-        <span class="ident">digest_terminator</span>[<span class="ident">metrics</span>.<span class="ident">h_len</span>] <span class="op">=</span> <span class="number">0xbc</span>;
+        <span class="comment">// Step 12.
+        </span>digest_terminator[..metrics.h_len].copy_from_slice(h_hash.as_ref());
+        digest_terminator[metrics.h_len] = <span class="number">0xbc</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Verification</span> <span class="kw">for</span> <span class="ident">PSS</span> {
-    <span class="comment">// RSASSA-PSS-VERIFY from https://tools.ietf.org/html/rfc3447#section-8.1.2</span>
-    <span class="comment">// where steps 1, 2(a), and 2(b) have been done for us.</span>
-    <span class="kw">fn</span> <span class="ident">verify</span>(
+<span class="kw">impl </span>Verification <span class="kw">for </span>PSS {
+    <span class="comment">// RSASSA-PSS-VERIFY from https://tools.ietf.org/html/rfc3447#section-8.1.2
+    // where steps 1, 2(a), and 2(b) have been done for us.
+    </span><span class="kw">fn </span>verify(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">m_hash</span>: <span class="kw-2">&amp;</span><span class="ident">digest::Digest</span>,
-        <span class="ident">m</span>: <span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span>,
-        <span class="ident">mod_bits</span>: <span class="ident">bits::BitLength</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">metrics</span> <span class="op">=</span> <span class="ident">PSSMetrics::new</span>(<span class="self">self</span>.<span class="ident">digest_alg</span>, <span class="ident">mod_bits</span>)<span class="question-mark">?</span>;
+        m_hash: <span class="kw-2">&amp;</span>digest::Digest,
+        m: <span class="kw-2">&amp;mut </span>untrusted::Reader,
+        mod_bits: bits::BitLength,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt; {
+        <span class="kw">let </span>metrics = PSSMetrics::new(<span class="self">self</span>.digest_alg, mod_bits)<span class="question-mark">?</span>;
 
-        <span class="comment">// RSASSA-PSS-VERIFY Step 2(c). The `m` this function is given is the</span>
-        <span class="comment">// big-endian-encoded value of `m` from the specification, padded to</span>
-        <span class="comment">// `k` bytes, where `k` is the length in bytes of the public modulus.</span>
-        <span class="comment">// The spec. says &quot;Note that emLen will be one less than k if</span>
-        <span class="comment">// modBits - 1 is divisible by 8 and equal to k otherwise,&quot; where `k`</span>
-        <span class="comment">// is the length in octets of the RSA public modulus `n`. In other</span>
-        <span class="comment">// words, `em` might have an extra leading zero byte that we need to</span>
-        <span class="comment">// strip before we start the PSS decoding steps which is an artifact of</span>
-        <span class="comment">// the `Verification` interface.</span>
-        <span class="kw">if</span> <span class="ident">metrics</span>.<span class="ident">top_byte_mask</span> <span class="op">==</span> <span class="number">0xff</span> {
-            <span class="kw">if</span> <span class="ident">m</span>.<span class="ident">read_byte</span>()<span class="question-mark">?</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>);
+        <span class="comment">// RSASSA-PSS-VERIFY Step 2(c). The `m` this function is given is the
+        // big-endian-encoded value of `m` from the specification, padded to
+        // `k` bytes, where `k` is the length in bytes of the public modulus.
+        // The spec. says &quot;Note that emLen will be one less than k if
+        // modBits - 1 is divisible by 8 and equal to k otherwise,&quot; where `k`
+        // is the length in octets of the RSA public modulus `n`. In other
+        // words, `em` might have an extra leading zero byte that we need to
+        // strip before we start the PSS decoding steps which is an artifact of
+        // the `Verification` interface.
+        </span><span class="kw">if </span>metrics.top_byte_mask == <span class="number">0xff </span>{
+            <span class="kw">if </span>m.read_byte()<span class="question-mark">? </span>!= <span class="number">0 </span>{
+                <span class="kw">return </span><span class="prelude-val">Err</span>(error::Unspecified);
             }
         };
-        <span class="kw">let</span> <span class="ident">em</span> <span class="op">=</span> <span class="ident">m</span>;
+        <span class="kw">let </span>em = m;
 
-        <span class="comment">// The rest of this function is EMSA-PSS-VERIFY from</span>
-        <span class="comment">// https://tools.ietf.org/html/rfc3447#section-9.1.2.</span>
+        <span class="comment">// The rest of this function is EMSA-PSS-VERIFY from
+        // https://tools.ietf.org/html/rfc3447#section-9.1.2.
 
-        <span class="comment">// Steps 1 and 2 are done by the caller to produce `m_hash`.</span>
+        // Steps 1 and 2 are done by the caller to produce `m_hash`.
 
-        <span class="comment">// Step 3 is done by `PSSMetrics::new()` above.</span>
+        // Step 3 is done by `PSSMetrics::new()` above.
 
-        <span class="comment">// Step 5, out of order.</span>
-        <span class="kw">let</span> <span class="ident">masked_db</span> <span class="op">=</span> <span class="ident">em</span>.<span class="ident">read_bytes</span>(<span class="ident">metrics</span>.<span class="ident">db_len</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">h_hash</span> <span class="op">=</span> <span class="ident">em</span>.<span class="ident">read_bytes</span>(<span class="ident">metrics</span>.<span class="ident">h_len</span>)<span class="question-mark">?</span>;
+        // Step 5, out of order.
+        </span><span class="kw">let </span>masked_db = em.read_bytes(metrics.db_len)<span class="question-mark">?</span>;
+        <span class="kw">let </span>h_hash = em.read_bytes(metrics.h_len)<span class="question-mark">?</span>;
 
-        <span class="comment">// Step 4.</span>
-        <span class="kw">if</span> <span class="ident">em</span>.<span class="ident">read_byte</span>()<span class="question-mark">?</span> <span class="op">!</span><span class="op">=</span> <span class="number">0xbc</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>);
+        <span class="comment">// Step 4.
+        </span><span class="kw">if </span>em.read_byte()<span class="question-mark">? </span>!= <span class="number">0xbc </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(error::Unspecified);
         }
 
-        <span class="comment">// Step 7.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">db</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="ident">PUBLIC_KEY_PUBLIC_MODULUS_MAX_LEN</span>];
-        <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">db</span>[..<span class="ident">metrics</span>.<span class="ident">db_len</span>];
+        <span class="comment">// Step 7.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>db = [<span class="number">0u8</span>; PUBLIC_KEY_PUBLIC_MODULUS_MAX_LEN];
+        <span class="kw">let </span>db = <span class="kw-2">&amp;mut </span>db[..metrics.db_len];
 
-        <span class="ident">mgf1</span>(<span class="self">self</span>.<span class="ident">digest_alg</span>, <span class="ident">h_hash</span>.<span class="ident">as_slice_less_safe</span>(), <span class="ident">db</span>)<span class="question-mark">?</span>;
+        mgf1(<span class="self">self</span>.digest_alg, h_hash.as_slice_less_safe(), db)<span class="question-mark">?</span>;
 
-        <span class="ident">masked_db</span>.<span class="ident">read_all</span>(<span class="ident">error::Unspecified</span>, <span class="op">|</span><span class="ident">masked_bytes</span><span class="op">|</span> {
-            <span class="comment">// Step 6. Check the top bits of first byte are zero.</span>
-            <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">masked_bytes</span>.<span class="ident">read_byte</span>()<span class="question-mark">?</span>;
-            <span class="kw">if</span> <span class="ident">b</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">metrics</span>.<span class="ident">top_byte_mask</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>);
+        masked_db.read_all(error::Unspecified, |masked_bytes| {
+            <span class="comment">// Step 6. Check the top bits of first byte are zero.
+            </span><span class="kw">let </span>b = masked_bytes.read_byte()<span class="question-mark">?</span>;
+            <span class="kw">if </span>b &amp; !metrics.top_byte_mask != <span class="number">0 </span>{
+                <span class="kw">return </span><span class="prelude-val">Err</span>(error::Unspecified);
             }
-            <span class="ident">db</span>[<span class="number">0</span>] <span class="op">^</span><span class="op">=</span> <span class="ident">b</span>;
+            db[<span class="number">0</span>] ^= b;
 
-            <span class="comment">// Step 8.</span>
-            <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">1</span>..<span class="ident">db</span>.<span class="ident">len</span>() {
-                <span class="ident">db</span>[<span class="ident">i</span>] <span class="op">^</span><span class="op">=</span> <span class="ident">masked_bytes</span>.<span class="ident">read_byte</span>()<span class="question-mark">?</span>;
+            <span class="comment">// Step 8.
+            </span><span class="kw">for </span>i <span class="kw">in </span><span class="number">1</span>..db.len() {
+                db[i] ^= masked_bytes.read_byte()<span class="question-mark">?</span>;
             }
             <span class="prelude-val">Ok</span>(())
         })<span class="question-mark">?</span>;
 
-        <span class="comment">// Step 9.</span>
-        <span class="ident">db</span>[<span class="number">0</span>] <span class="op">&amp;=</span> <span class="ident">metrics</span>.<span class="ident">top_byte_mask</span>;
+        <span class="comment">// Step 9.
+        </span>db[<span class="number">0</span>] &amp;= metrics.top_byte_mask;
 
-        <span class="comment">// Step 10.</span>
-        <span class="kw">let</span> <span class="ident">ps_len</span> <span class="op">=</span> <span class="ident">metrics</span>.<span class="ident">ps_len</span>;
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">ps_len</span> {
-            <span class="kw">if</span> <span class="ident">db</span>[<span class="ident">i</span>] <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>);
+        <span class="comment">// Step 10.
+        </span><span class="kw">let </span>ps_len = metrics.ps_len;
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..ps_len {
+            <span class="kw">if </span>db[i] != <span class="number">0 </span>{
+                <span class="kw">return </span><span class="prelude-val">Err</span>(error::Unspecified);
             }
         }
-        <span class="kw">if</span> <span class="ident">db</span>[<span class="ident">metrics</span>.<span class="ident">ps_len</span>] <span class="op">!</span><span class="op">=</span> <span class="number">1</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>);
+        <span class="kw">if </span>db[metrics.ps_len] != <span class="number">1 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(error::Unspecified);
         }
 
-        <span class="comment">// Step 11.</span>
-        <span class="kw">let</span> <span class="ident">salt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">db</span>[(<span class="ident">db</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">metrics</span>.<span class="ident">s_len</span>)..];
+        <span class="comment">// Step 11.
+        </span><span class="kw">let </span>salt = <span class="kw-2">&amp;</span>db[(db.len() - metrics.s_len)..];
 
-        <span class="comment">// Step 12 and 13.</span>
-        <span class="kw">let</span> <span class="ident">h_prime</span> <span class="op">=</span> <span class="ident">pss_digest</span>(<span class="self">self</span>.<span class="ident">digest_alg</span>, <span class="ident">m_hash</span>, <span class="ident">salt</span>);
+        <span class="comment">// Step 12 and 13.
+        </span><span class="kw">let </span>h_prime = pss_digest(<span class="self">self</span>.digest_alg, m_hash, salt);
 
-        <span class="comment">// Step 14.</span>
-        <span class="kw">if</span> <span class="ident">h_hash</span> <span class="op">!</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">h_prime</span>.<span class="ident">as_ref</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>);
+        <span class="comment">// Step 14.
+        </span><span class="kw">if </span>h_hash != <span class="kw-2">*</span>h_prime.as_ref() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(error::Unspecified);
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">struct</span> <span class="ident">PSSMetrics</span> {
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>), <span class="ident">allow</span>(<span class="ident">dead_code</span>))]</span>
-    <span class="ident">em_len</span>: <span class="ident">usize</span>,
-    <span class="ident">db_len</span>: <span class="ident">usize</span>,
-    <span class="ident">ps_len</span>: <span class="ident">usize</span>,
-    <span class="ident">s_len</span>: <span class="ident">usize</span>,
-    <span class="ident">h_len</span>: <span class="ident">usize</span>,
-    <span class="ident">top_byte_mask</span>: <span class="ident">u8</span>,
+<span class="kw">struct </span>PSSMetrics {
+    <span class="attribute">#[cfg_attr(not(feature = <span class="string">&quot;alloc&quot;</span>), allow(dead_code))]
+    </span>em_len: usize,
+    db_len: usize,
+    ps_len: usize,
+    s_len: usize,
+    h_len: usize,
+    top_byte_mask: u8,
 }
 
-<span class="kw">impl</span> <span class="ident">PSSMetrics</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">digest_alg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">digest::Algorithm</span>,
-        <span class="ident">mod_bits</span>: <span class="ident">bits::BitLength</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PSSMetrics</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">em_bits</span> <span class="op">=</span> <span class="ident">mod_bits</span>.<span class="ident">try_sub_1</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">em_len</span> <span class="op">=</span> <span class="ident">em_bits</span>.<span class="ident">as_usize_bytes_rounded_up</span>();
-        <span class="kw">let</span> <span class="ident">leading_zero_bits</span> <span class="op">=</span> (<span class="number">8</span> <span class="op">*</span> <span class="ident">em_len</span>) <span class="op">-</span> <span class="ident">em_bits</span>.<span class="ident">as_usize_bits</span>();
-        <span class="macro">debug_assert!</span>(<span class="ident">leading_zero_bits</span> <span class="op">&lt;</span> <span class="number">8</span>);
-        <span class="kw">let</span> <span class="ident">top_byte_mask</span> <span class="op">=</span> <span class="number">0xffu8</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">leading_zero_bits</span>;
+<span class="kw">impl </span>PSSMetrics {
+    <span class="kw">fn </span>new(
+        digest_alg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>digest::Algorithm,
+        mod_bits: bits::BitLength,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;PSSMetrics, error::Unspecified&gt; {
+        <span class="kw">let </span>em_bits = mod_bits.try_sub_1()<span class="question-mark">?</span>;
+        <span class="kw">let </span>em_len = em_bits.as_usize_bytes_rounded_up();
+        <span class="kw">let </span>leading_zero_bits = (<span class="number">8 </span>* em_len) - em_bits.as_usize_bits();
+        <span class="macro">debug_assert!</span>(leading_zero_bits &lt; <span class="number">8</span>);
+        <span class="kw">let </span>top_byte_mask = <span class="number">0xffu8 </span>&gt;&gt; leading_zero_bits;
 
-        <span class="kw">let</span> <span class="ident">h_len</span> <span class="op">=</span> <span class="ident">digest_alg</span>.<span class="ident">output_len</span>;
+        <span class="kw">let </span>h_len = digest_alg.output_len;
 
-        <span class="comment">// We require the salt length to be equal to the digest length.</span>
-        <span class="kw">let</span> <span class="ident">s_len</span> <span class="op">=</span> <span class="ident">h_len</span>;
+        <span class="comment">// We require the salt length to be equal to the digest length.
+        </span><span class="kw">let </span>s_len = h_len;
 
-        <span class="comment">// Step 3 of both `EMSA-PSS-ENCODE` is `EMSA-PSS-VERIFY` requires that</span>
-        <span class="comment">// we reject inputs where &quot;emLen &lt; hLen + sLen + 2&quot;. The definition of</span>
-        <span class="comment">// `emBits` in RFC 3447 Sections 9.1.1 and 9.1.2 says `emBits` must be</span>
-        <span class="comment">// &quot;at least 8hLen + 8sLen + 9&quot;. Since 9 bits requires two bytes, these</span>
-        <span class="comment">// two conditions are equivalent. 9 bits are required as the 0x01</span>
-        <span class="comment">// before the salt requires 1 bit and the 0xbc after the digest</span>
-        <span class="comment">// requires 8 bits.</span>
-        <span class="kw">let</span> <span class="ident">db_len</span> <span class="op">=</span> <span class="ident">em_len</span>.<span class="ident">checked_sub</span>(<span class="number">1</span> <span class="op">+</span> <span class="ident">s_len</span>).<span class="ident">ok_or</span>(<span class="ident">error::Unspecified</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">ps_len</span> <span class="op">=</span> <span class="ident">db_len</span>.<span class="ident">checked_sub</span>(<span class="ident">h_len</span> <span class="op">+</span> <span class="number">1</span>).<span class="ident">ok_or</span>(<span class="ident">error::Unspecified</span>)<span class="question-mark">?</span>;
+        <span class="comment">// Step 3 of both `EMSA-PSS-ENCODE` is `EMSA-PSS-VERIFY` requires that
+        // we reject inputs where &quot;emLen &lt; hLen + sLen + 2&quot;. The definition of
+        // `emBits` in RFC 3447 Sections 9.1.1 and 9.1.2 says `emBits` must be
+        // &quot;at least 8hLen + 8sLen + 9&quot;. Since 9 bits requires two bytes, these
+        // two conditions are equivalent. 9 bits are required as the 0x01
+        // before the salt requires 1 bit and the 0xbc after the digest
+        // requires 8 bits.
+        </span><span class="kw">let </span>db_len = em_len.checked_sub(<span class="number">1 </span>+ s_len).ok_or(error::Unspecified)<span class="question-mark">?</span>;
+        <span class="kw">let </span>ps_len = db_len.checked_sub(h_len + <span class="number">1</span>).ok_or(error::Unspecified)<span class="question-mark">?</span>;
 
-        <span class="macro">debug_assert!</span>(<span class="ident">em_bits</span>.<span class="ident">as_usize_bits</span>() <span class="op">&gt;</span><span class="op">=</span> (<span class="number">8</span> <span class="op">*</span> <span class="ident">h_len</span>) <span class="op">+</span> (<span class="number">8</span> <span class="op">*</span> <span class="ident">s_len</span>) <span class="op">+</span> <span class="number">9</span>);
+        <span class="macro">debug_assert!</span>(em_bits.as_usize_bits() &gt;= (<span class="number">8 </span>* h_len) + (<span class="number">8 </span>* s_len) + <span class="number">9</span>);
 
-        <span class="prelude-val">Ok</span>(<span class="ident">PSSMetrics</span> {
-            <span class="ident">em_len</span>,
-            <span class="ident">db_len</span>,
-            <span class="ident">ps_len</span>,
-            <span class="ident">s_len</span>,
-            <span class="ident">h_len</span>,
-            <span class="ident">top_byte_mask</span>,
+        <span class="prelude-val">Ok</span>(PSSMetrics {
+            em_len,
+            db_len,
+            ps_len,
+            s_len,
+            h_len,
+            top_byte_mask,
         })
     }
 }
 
-<span class="comment">// Mask-generating function MGF1 as described in</span>
-<span class="comment">// https://tools.ietf.org/html/rfc3447#appendix-B.2.1.</span>
-<span class="kw">fn</span> <span class="ident">mgf1</span>(
-    <span class="ident">digest_alg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">digest::Algorithm</span>,
-    <span class="ident">seed</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    <span class="ident">mask</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">digest_len</span> <span class="op">=</span> <span class="ident">digest_alg</span>.<span class="ident">output_len</span>;
+<span class="comment">// Mask-generating function MGF1 as described in
+// https://tools.ietf.org/html/rfc3447#appendix-B.2.1.
+</span><span class="kw">fn </span>mgf1(
+    digest_alg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>digest::Algorithm,
+    seed: <span class="kw-2">&amp;</span>[u8],
+    mask: <span class="kw-2">&amp;mut </span>[u8],
+) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt; {
+    <span class="kw">let </span>digest_len = digest_alg.output_len;
 
-    <span class="comment">// Maximum counter value is the value of (mask_len / digest_len) rounded up.</span>
-    <span class="kw">let</span> <span class="ident">ctr_max</span> <span class="op">=</span> (<span class="ident">mask</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>) <span class="op">/</span> <span class="ident">digest_len</span>;
-    <span class="macro">assert!</span>(<span class="ident">ctr_max</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">u32::max_value</span>() <span class="kw">as</span> <span class="ident">usize</span>);
-    <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">mask_chunk</span>) <span class="kw">in</span> <span class="ident">mask</span>.<span class="ident">chunks_mut</span>(<span class="ident">digest_len</span>).<span class="ident">enumerate</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">digest::Context::new</span>(<span class="ident">digest_alg</span>);
-        <span class="ident">ctx</span>.<span class="ident">update</span>(<span class="ident">seed</span>);
-        <span class="ident">ctx</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">u32::to_be_bytes</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">u32</span>));
-        <span class="kw">let</span> <span class="ident">digest</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">finish</span>();
-        <span class="kw">let</span> <span class="ident">mask_chunk_len</span> <span class="op">=</span> <span class="ident">mask_chunk</span>.<span class="ident">len</span>();
-        <span class="ident">mask_chunk</span>.<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">digest</span>.<span class="ident">as_ref</span>()[..<span class="ident">mask_chunk_len</span>]);
+    <span class="comment">// Maximum counter value is the value of (mask_len / digest_len) rounded up.
+    </span><span class="kw">let </span>ctr_max = (mask.len() - <span class="number">1</span>) / digest_len;
+    <span class="macro">assert!</span>(ctr_max &lt;= u32::max_value() <span class="kw">as </span>usize);
+    <span class="kw">for </span>(i, mask_chunk) <span class="kw">in </span>mask.chunks_mut(digest_len).enumerate() {
+        <span class="kw">let </span><span class="kw-2">mut </span>ctx = digest::Context::new(digest_alg);
+        ctx.update(seed);
+        ctx.update(<span class="kw-2">&amp;</span>u32::to_be_bytes(i <span class="kw">as </span>u32));
+        <span class="kw">let </span>digest = ctx.finish();
+        <span class="kw">let </span>mask_chunk_len = mask_chunk.len();
+        mask_chunk.copy_from_slice(<span class="kw-2">&amp;</span>digest.as_ref()[..mask_chunk_len]);
     }
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">fn</span> <span class="ident">pss_digest</span>(
-    <span class="ident">digest_alg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">digest::Algorithm</span>,
-    <span class="ident">m_hash</span>: <span class="kw-2">&amp;</span><span class="ident">digest::Digest</span>,
-    <span class="ident">salt</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-) -&gt; <span class="ident">digest::Digest</span> {
-    <span class="comment">// Fixed prefix.</span>
-    <span class="kw">const</span> <span class="ident">PREFIX_ZEROS</span>: [<span class="ident">u8</span>; <span class="number">8</span>] <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">8</span>];
+<span class="kw">fn </span>pss_digest(
+    digest_alg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>digest::Algorithm,
+    m_hash: <span class="kw-2">&amp;</span>digest::Digest,
+    salt: <span class="kw-2">&amp;</span>[u8],
+) -&gt; digest::Digest {
+    <span class="comment">// Fixed prefix.
+    </span><span class="kw">const </span>PREFIX_ZEROS: [u8; <span class="number">8</span>] = [<span class="number">0u8</span>; <span class="number">8</span>];
 
-    <span class="comment">// Encoding step 5 and 6, Verification step 12 and 13.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">digest::Context::new</span>(<span class="ident">digest_alg</span>);
-    <span class="ident">ctx</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">PREFIX_ZEROS</span>);
-    <span class="ident">ctx</span>.<span class="ident">update</span>(<span class="ident">m_hash</span>.<span class="ident">as_ref</span>());
-    <span class="ident">ctx</span>.<span class="ident">update</span>(<span class="ident">salt</span>);
-    <span class="ident">ctx</span>.<span class="ident">finish</span>()
+    <span class="comment">// Encoding step 5 and 6, Verification step 12 and 13.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>ctx = digest::Context::new(digest_alg);
+    ctx.update(<span class="kw-2">&amp;</span>PREFIX_ZEROS);
+    ctx.update(m_hash.as_ref());
+    ctx.update(salt);
+    ctx.finish()
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">rsa_pss_padding</span> {
-    ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">PADDING_ALGORITHM</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">digest_alg</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc_str</span>:<span class="ident">expr</span> ) =&gt; {
-        <span class="attribute">#[<span class="ident">doc</span><span class="op">=</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">doc_str</span>]</span>
-        <span class="kw">pub</span> <span class="kw">static</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">PADDING_ALGORITHM</span>: <span class="ident">PSS</span> <span class="op">=</span> <span class="ident">PSS</span> {
-            <span class="ident">digest_alg</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">digest_alg</span>,
+<span class="macro">macro_rules! </span>rsa_pss_padding {
+    ( <span class="macro-nonterminal">$PADDING_ALGORITHM</span>:ident, <span class="macro-nonterminal">$digest_alg</span>:expr, <span class="macro-nonterminal">$doc_str</span>:expr ) =&gt; {
+        <span class="attribute">#[doc=<span class="macro-nonterminal">$doc_str</span>]
+        </span><span class="kw">pub static </span><span class="macro-nonterminal">$PADDING_ALGORITHM</span>: PSS = PSS {
+            digest_alg: <span class="macro-nonterminal">$digest_alg</span>,
         };
     };
 }
 
 <span class="macro">rsa_pss_padding!</span>(
-    <span class="ident">RSA_PSS_SHA256</span>,
-    <span class="kw-2">&amp;</span><span class="ident">digest::SHA256</span>,
+    RSA_PSS_SHA256,
+    <span class="kw-2">&amp;</span>digest::SHA256,
     <span class="string">&quot;RSA PSS padding using SHA-256 for RSA signatures.\n\nSee
                  \&quot;`RSA_PSS_*` Details\&quot; in `ring::signature`&#39;s module-level
-                 documentation for more details.&quot;</span>
-);
+                 documentation for more details.&quot;
+</span>);
 <span class="macro">rsa_pss_padding!</span>(
-    <span class="ident">RSA_PSS_SHA384</span>,
-    <span class="kw-2">&amp;</span><span class="ident">digest::SHA384</span>,
+    RSA_PSS_SHA384,
+    <span class="kw-2">&amp;</span>digest::SHA384,
     <span class="string">&quot;RSA PSS padding using SHA-384 for RSA signatures.\n\nSee
                  \&quot;`RSA_PSS_*` Details\&quot; in `ring::signature`&#39;s module-level
-                 documentation for more details.&quot;</span>
-);
+                 documentation for more details.&quot;
+</span>);
 <span class="macro">rsa_pss_padding!</span>(
-    <span class="ident">RSA_PSS_SHA512</span>,
-    <span class="kw-2">&amp;</span><span class="ident">digest::SHA512</span>,
+    RSA_PSS_SHA512,
+    <span class="kw-2">&amp;</span>digest::SHA512,
     <span class="string">&quot;RSA PSS padding using SHA-512 for RSA signatures.\n\nSee
                  \&quot;`RSA_PSS_*` Details\&quot; in `ring::signature`&#39;s module-level
-                 documentation for more details.&quot;</span>
-);
+                 documentation for more details.&quot;
+</span>);
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">digest</span>, <span class="ident">error</span>, <span class="ident">test</span>};
-    <span class="kw">use</span> <span class="ident">alloc::vec</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use crate</span>::{digest, error, test};
+    <span class="kw">use </span>alloc::vec;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_pss_padding_verify</span>() {
-        <span class="ident">test::run</span>(
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_pss_padding_verify() {
+        test::run(
             <span class="macro">test_file!</span>(<span class="string">&quot;rsa_pss_padding_tests.txt&quot;</span>),
-            <span class="op">|</span><span class="ident">section</span>, <span class="ident">test_case</span><span class="op">|</span> {
-                <span class="macro">assert_eq!</span>(<span class="ident">section</span>, <span class="string">&quot;&quot;</span>);
+            |section, test_case| {
+                <span class="macro">assert_eq!</span>(section, <span class="string">&quot;&quot;</span>);
 
-                <span class="kw">let</span> <span class="ident">digest_name</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_string</span>(<span class="string">&quot;Digest&quot;</span>);
-                <span class="kw">let</span> <span class="ident">alg</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">digest_name</span>.<span class="ident">as_ref</span>() {
-                    <span class="string">&quot;SHA256&quot;</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">RSA_PSS_SHA256</span>,
-                    <span class="string">&quot;SHA384&quot;</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">RSA_PSS_SHA384</span>,
-                    <span class="string">&quot;SHA512&quot;</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">RSA_PSS_SHA512</span>,
-                    <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unsupported digest: {}&quot;</span>, <span class="ident">digest_name</span>),
+                <span class="kw">let </span>digest_name = test_case.consume_string(<span class="string">&quot;Digest&quot;</span>);
+                <span class="kw">let </span>alg = <span class="kw">match </span>digest_name.as_ref() {
+                    <span class="string">&quot;SHA256&quot; </span>=&gt; <span class="kw-2">&amp;</span>RSA_PSS_SHA256,
+                    <span class="string">&quot;SHA384&quot; </span>=&gt; <span class="kw-2">&amp;</span>RSA_PSS_SHA384,
+                    <span class="string">&quot;SHA512&quot; </span>=&gt; <span class="kw-2">&amp;</span>RSA_PSS_SHA512,
+                    <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unsupported digest: {}&quot;</span>, digest_name),
                 };
 
-                <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_bytes</span>(<span class="string">&quot;Msg&quot;</span>);
-                <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">untrusted::Input::from</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>);
-                <span class="kw">let</span> <span class="ident">m_hash</span> <span class="op">=</span> <span class="ident">digest::digest</span>(<span class="ident">alg</span>.<span class="ident">digest_alg</span>(), <span class="ident">msg</span>.<span class="ident">as_slice_less_safe</span>());
+                <span class="kw">let </span>msg = test_case.consume_bytes(<span class="string">&quot;Msg&quot;</span>);
+                <span class="kw">let </span>msg = untrusted::Input::from(<span class="kw-2">&amp;</span>msg);
+                <span class="kw">let </span>m_hash = digest::digest(alg.digest_alg(), msg.as_slice_less_safe());
 
-                <span class="kw">let</span> <span class="ident">encoded</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_bytes</span>(<span class="string">&quot;EM&quot;</span>);
-                <span class="kw">let</span> <span class="ident">encoded</span> <span class="op">=</span> <span class="ident">untrusted::Input::from</span>(<span class="kw-2">&amp;</span><span class="ident">encoded</span>);
+                <span class="kw">let </span>encoded = test_case.consume_bytes(<span class="string">&quot;EM&quot;</span>);
+                <span class="kw">let </span>encoded = untrusted::Input::from(<span class="kw-2">&amp;</span>encoded);
 
-                <span class="comment">// Salt is recomputed in verification algorithm.</span>
-                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_bytes</span>(<span class="string">&quot;Salt&quot;</span>);
+                <span class="comment">// Salt is recomputed in verification algorithm.
+                </span><span class="kw">let _ </span>= test_case.consume_bytes(<span class="string">&quot;Salt&quot;</span>);
 
-                <span class="kw">let</span> <span class="ident">bit_len</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_usize_bits</span>(<span class="string">&quot;Len&quot;</span>);
-                <span class="kw">let</span> <span class="ident">is_valid</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_string</span>(<span class="string">&quot;Result&quot;</span>) <span class="op">==</span> <span class="string">&quot;P&quot;</span>;
+                <span class="kw">let </span>bit_len = test_case.consume_usize_bits(<span class="string">&quot;Len&quot;</span>);
+                <span class="kw">let </span>is_valid = test_case.consume_string(<span class="string">&quot;Result&quot;</span>) == <span class="string">&quot;P&quot;</span>;
 
-                <span class="kw">let</span> <span class="ident">actual_result</span> <span class="op">=</span>
-                    <span class="ident">encoded</span>.<span class="ident">read_all</span>(<span class="ident">error::Unspecified</span>, <span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">alg</span>.<span class="ident">verify</span>(<span class="kw-2">&amp;</span><span class="ident">m_hash</span>, <span class="ident">m</span>, <span class="ident">bit_len</span>));
-                <span class="macro">assert_eq!</span>(<span class="ident">actual_result</span>.<span class="ident">is_ok</span>(), <span class="ident">is_valid</span>);
+                <span class="kw">let </span>actual_result =
+                    encoded.read_all(error::Unspecified, |m| alg.verify(<span class="kw-2">&amp;</span>m_hash, m, bit_len));
+                <span class="macro">assert_eq!</span>(actual_result.is_ok(), is_valid);
 
                 <span class="prelude-val">Ok</span>(())
             },
         );
     }
 
-    <span class="comment">// Tests PSS encoding for various public modulus lengths.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_pss_padding_encode</span>() {
-        <span class="ident">test::run</span>(
+    <span class="comment">// Tests PSS encoding for various public modulus lengths.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+    #[test]
+    </span><span class="kw">fn </span>test_pss_padding_encode() {
+        test::run(
             <span class="macro">test_file!</span>(<span class="string">&quot;rsa_pss_padding_tests.txt&quot;</span>),
-            <span class="op">|</span><span class="ident">section</span>, <span class="ident">test_case</span><span class="op">|</span> {
-                <span class="macro">assert_eq!</span>(<span class="ident">section</span>, <span class="string">&quot;&quot;</span>);
+            |section, test_case| {
+                <span class="macro">assert_eq!</span>(section, <span class="string">&quot;&quot;</span>);
 
-                <span class="kw">let</span> <span class="ident">digest_name</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_string</span>(<span class="string">&quot;Digest&quot;</span>);
-                <span class="kw">let</span> <span class="ident">alg</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">digest_name</span>.<span class="ident">as_ref</span>() {
-                    <span class="string">&quot;SHA256&quot;</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">RSA_PSS_SHA256</span>,
-                    <span class="string">&quot;SHA384&quot;</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">RSA_PSS_SHA384</span>,
-                    <span class="string">&quot;SHA512&quot;</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">RSA_PSS_SHA512</span>,
-                    <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unsupported digest: {}&quot;</span>, <span class="ident">digest_name</span>),
+                <span class="kw">let </span>digest_name = test_case.consume_string(<span class="string">&quot;Digest&quot;</span>);
+                <span class="kw">let </span>alg = <span class="kw">match </span>digest_name.as_ref() {
+                    <span class="string">&quot;SHA256&quot; </span>=&gt; <span class="kw-2">&amp;</span>RSA_PSS_SHA256,
+                    <span class="string">&quot;SHA384&quot; </span>=&gt; <span class="kw-2">&amp;</span>RSA_PSS_SHA384,
+                    <span class="string">&quot;SHA512&quot; </span>=&gt; <span class="kw-2">&amp;</span>RSA_PSS_SHA512,
+                    <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unsupported digest: {}&quot;</span>, digest_name),
                 };
 
-                <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_bytes</span>(<span class="string">&quot;Msg&quot;</span>);
-                <span class="kw">let</span> <span class="ident">salt</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_bytes</span>(<span class="string">&quot;Salt&quot;</span>);
-                <span class="kw">let</span> <span class="ident">encoded</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_bytes</span>(<span class="string">&quot;EM&quot;</span>);
-                <span class="kw">let</span> <span class="ident">bit_len</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_usize_bits</span>(<span class="string">&quot;Len&quot;</span>);
-                <span class="kw">let</span> <span class="ident">expected_result</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_string</span>(<span class="string">&quot;Result&quot;</span>);
+                <span class="kw">let </span>msg = test_case.consume_bytes(<span class="string">&quot;Msg&quot;</span>);
+                <span class="kw">let </span>salt = test_case.consume_bytes(<span class="string">&quot;Salt&quot;</span>);
+                <span class="kw">let </span>encoded = test_case.consume_bytes(<span class="string">&quot;EM&quot;</span>);
+                <span class="kw">let </span>bit_len = test_case.consume_usize_bits(<span class="string">&quot;Len&quot;</span>);
+                <span class="kw">let </span>expected_result = test_case.consume_string(<span class="string">&quot;Result&quot;</span>);
 
-                <span class="comment">// Only test the valid outputs</span>
-                <span class="kw">if</span> <span class="ident">expected_result</span> <span class="op">!</span><span class="op">=</span> <span class="string">&quot;P&quot;</span> {
-                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+                <span class="comment">// Only test the valid outputs
+                </span><span class="kw">if </span>expected_result != <span class="string">&quot;P&quot; </span>{
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>(());
                 }
 
-                <span class="kw">let</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">test::rand::FixedSliceRandom</span> { <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="ident">salt</span> };
+                <span class="kw">let </span>rng = test::rand::FixedSliceRandom { bytes: <span class="kw-2">&amp;</span>salt };
 
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m_out</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="ident">bit_len</span>.<span class="ident">as_usize_bytes_rounded_up</span>()];
-                <span class="kw">let</span> <span class="ident">digest</span> <span class="op">=</span> <span class="ident">digest::digest</span>(<span class="ident">alg</span>.<span class="ident">digest_alg</span>(), <span class="kw-2">&amp;</span><span class="ident">msg</span>);
-                <span class="ident">alg</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="ident">digest</span>, <span class="kw-2">&amp;mut</span> <span class="ident">m_out</span>, <span class="ident">bit_len</span>, <span class="kw-2">&amp;</span><span class="ident">rng</span>).<span class="ident">unwrap</span>();
-                <span class="macro">assert_eq!</span>(<span class="ident">m_out</span>, <span class="ident">encoded</span>);
+                <span class="kw">let </span><span class="kw-2">mut </span>m_out = <span class="macro">vec!</span>[<span class="number">0u8</span>; bit_len.as_usize_bytes_rounded_up()];
+                <span class="kw">let </span>digest = digest::digest(alg.digest_alg(), <span class="kw-2">&amp;</span>msg);
+                alg.encode(<span class="kw-2">&amp;</span>digest, <span class="kw-2">&amp;mut </span>m_out, bit_len, <span class="kw-2">&amp;</span>rng).unwrap();
+                <span class="macro">assert_eq!</span>(m_out, encoded);
 
                 <span class="prelude-val">Ok</span>(())
             },
@@ -1201,4 +1201,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

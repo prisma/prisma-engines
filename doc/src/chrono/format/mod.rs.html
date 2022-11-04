@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/chrono-0.4.20/src/format/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../chrono/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../chrono/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../chrono/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/chrono-0.4.20/src/format/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../chrono/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../chrono/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../chrono/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -969,460 +969,460 @@
 <span id="969">969</span>
 <span id="970">970</span>
 <span id="971">971</span>
-</pre><pre class="rust"><code><span class="comment">// This is a part of Chrono.</span>
-<span class="comment">// See README.md and LICENSE.txt for details.</span>
+</pre><pre class="rust"><code><span class="comment">// This is a part of Chrono.
+// See README.md and LICENSE.txt for details.
 
-<span class="doccomment">//! Formatting (and parsing) utilities for date and time.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This module provides the common types and routines to implement,</span>
-<span class="doccomment">//! for example, [`DateTime::format`](../struct.DateTime.html#method.format) or</span>
-<span class="doccomment">//! [`DateTime::parse_from_str`](../struct.DateTime.html#method.parse_from_str) methods.</span>
-<span class="doccomment">//! For most cases you should use these high-level interfaces.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Internally the formatting and parsing shares the same abstract **formatting items**,</span>
-<span class="doccomment">//! which are just an [`Iterator`](https://doc.rust-lang.org/std/iter/trait.Iterator.html) of</span>
-<span class="doccomment">//! the [`Item`](./enum.Item.html) type.</span>
-<span class="doccomment">//! They are generated from more readable **format strings**;</span>
-<span class="doccomment">//! currently Chrono supports a built-in syntax closely resembling</span>
-<span class="doccomment">//! C&#39;s `strftime` format. The available options can be found [here](./strftime/index.html).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Example</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! # use std::error::Error;</span>
-<span class="doccomment">//! use chrono::prelude::*;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let date_time = Utc.ymd(2020, 11, 10).and_hms(0, 1, 32);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let formatted = format!(&quot;{}&quot;, date_time.format(&quot;%Y-%m-%d %H:%M:%S&quot;));</span>
-<span class="doccomment">//! assert_eq!(formatted, &quot;2020-11-10 00:01:32&quot;);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let parsed = Utc.datetime_from_str(&amp;formatted, &quot;%Y-%m-%d %H:%M:%S&quot;)?;</span>
-<span class="doccomment">//! assert_eq!(parsed, date_time);</span>
-<span class="doccomment">//! # Ok::&lt;(), chrono::ParseError&gt;(())</span>
-<span class="doccomment">//! ```</span>
+</span><span class="doccomment">//! Formatting (and parsing) utilities for date and time.
+//!
+//! This module provides the common types and routines to implement,
+//! for example, [`DateTime::format`](../struct.DateTime.html#method.format) or
+//! [`DateTime::parse_from_str`](../struct.DateTime.html#method.parse_from_str) methods.
+//! For most cases you should use these high-level interfaces.
+//!
+//! Internally the formatting and parsing shares the same abstract **formatting items**,
+//! which are just an [`Iterator`](https://doc.rust-lang.org/std/iter/trait.Iterator.html) of
+//! the [`Item`](./enum.Item.html) type.
+//! They are generated from more readable **format strings**;
+//! currently Chrono supports a built-in syntax closely resembling
+//! C&#39;s `strftime` format. The available options can be found [here](./strftime/index.html).
+//!
+//! # Example
+//! ```rust
+//! # use std::error::Error;
+//! use chrono::prelude::*;
+//!
+//! let date_time = Utc.ymd(2020, 11, 10).and_hms(0, 1, 32);
+//!
+//! let formatted = format!(&quot;{}&quot;, date_time.format(&quot;%Y-%m-%d %H:%M:%S&quot;));
+//! assert_eq!(formatted, &quot;2020-11-10 00:01:32&quot;);
+//!
+//! let parsed = Utc.datetime_from_str(&amp;formatted, &quot;%Y-%m-%d %H:%M:%S&quot;)?;
+//! assert_eq!(parsed, date_time);
+//! # Ok::&lt;(), chrono::ParseError&gt;(())
+//! ```
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">alloc</span>;
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">extern crate </span>alloc;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">alloc::boxed::Box</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">alloc::string</span>::{<span class="ident">String</span>, <span class="ident">ToString</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">test</span>))]</span>
-<span class="kw">use</span> <span class="ident">core::borrow::Borrow</span>;
-<span class="kw">use</span> <span class="ident">core::fmt</span>;
-<span class="kw">use</span> <span class="ident">core::str::FromStr</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">test</span>))]</span>
-<span class="kw">use</span> <span class="ident">std::error::Error</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">use </span>alloc::boxed::Box;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">use </span>alloc::string::{String, ToString};
+<span class="attribute">#[cfg(any(feature = <span class="string">&quot;alloc&quot;</span>, feature = <span class="string">&quot;std&quot;</span>, test))]
+</span><span class="kw">use </span>core::borrow::Borrow;
+<span class="kw">use </span>core::fmt;
+<span class="kw">use </span>core::str::FromStr;
+<span class="attribute">#[cfg(any(feature = <span class="string">&quot;std&quot;</span>, test))]
+</span><span class="kw">use </span>std::error::Error;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">test</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::naive</span>::{<span class="ident">NaiveDate</span>, <span class="ident">NaiveTime</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">test</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::offset</span>::{<span class="ident">FixedOffset</span>, <span class="ident">Offset</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">test</span>))]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Datelike</span>, <span class="ident">Timelike</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Month</span>, <span class="ident">ParseMonthError</span>, <span class="ident">ParseWeekdayError</span>, <span class="ident">Weekday</span>};
+<span class="attribute">#[cfg(any(feature = <span class="string">&quot;alloc&quot;</span>, feature = <span class="string">&quot;std&quot;</span>, test))]
+</span><span class="kw">use </span><span class="kw">crate</span>::naive::{NaiveDate, NaiveTime};
+<span class="attribute">#[cfg(any(feature = <span class="string">&quot;alloc&quot;</span>, feature = <span class="string">&quot;std&quot;</span>, test))]
+</span><span class="kw">use </span><span class="kw">crate</span>::offset::{FixedOffset, Offset};
+<span class="attribute">#[cfg(any(feature = <span class="string">&quot;alloc&quot;</span>, feature = <span class="string">&quot;std&quot;</span>, test))]
+</span><span class="kw">use crate</span>::{Datelike, Timelike};
+<span class="kw">use crate</span>::{Month, ParseMonthError, ParseWeekdayError, Weekday};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable-locales&quot;</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">locales</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;unstable-locales&quot;</span>)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>locales;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">parse::parse</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">parsed::Parsed</span>;
-<span class="doccomment">/// L10n locales.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable-locales&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">pure_rust_locales::Locale</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">strftime::StrftimeItems</span>;
+<span class="kw">pub use </span>parse::parse;
+<span class="kw">pub use </span>parsed::Parsed;
+<span class="doccomment">/// L10n locales.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;unstable-locales&quot;</span>)]
+</span><span class="kw">pub use </span>pure_rust_locales::Locale;
+<span class="kw">pub use </span>strftime::StrftimeItems;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable-locales&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">Locale</span>;
+<span class="attribute">#[cfg(not(feature = <span class="string">&quot;unstable-locales&quot;</span>))]
+#[derive(Debug)]
+</span><span class="kw">struct </span>Locale;
 
-<span class="doccomment">/// An uninhabited type used for `InternalNumeric` and `InternalFixed` below.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">enum</span> <span class="ident">Void</span> {}
+<span class="doccomment">/// An uninhabited type used for `InternalNumeric` and `InternalFixed` below.
+</span><span class="attribute">#[derive(Clone, PartialEq, Eq)]
+</span><span class="kw">enum </span>Void {}
 
-<span class="doccomment">/// Padding characters for numeric items.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Pad</span> {
-    <span class="doccomment">/// No padding.</span>
-    <span class="prelude-val">None</span>,
-    <span class="doccomment">/// Zero (`0`) padding.</span>
-    <span class="ident">Zero</span>,
-    <span class="doccomment">/// Space padding.</span>
-    <span class="ident">Space</span>,
+<span class="doccomment">/// Padding characters for numeric items.
+</span><span class="attribute">#[derive(Copy, Clone, PartialEq, Eq, Debug)]
+</span><span class="kw">pub enum </span>Pad {
+    <span class="doccomment">/// No padding.
+    </span><span class="prelude-val">None</span>,
+    <span class="doccomment">/// Zero (`0`) padding.
+    </span>Zero,
+    <span class="doccomment">/// Space padding.
+    </span>Space,
 }
 
-<span class="doccomment">/// Numeric item types.</span>
-<span class="doccomment">/// They have associated formatting width (FW) and parsing width (PW).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The **formatting width** is the minimal width to be formatted.</span>
-<span class="doccomment">/// If the number is too short, and the padding is not [`Pad::None`](./enum.Pad.html#variant.None),</span>
-<span class="doccomment">/// then it is left-padded.</span>
-<span class="doccomment">/// If the number is too long or (in some cases) negative, it is printed as is.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The **parsing width** is the maximal width to be scanned.</span>
-<span class="doccomment">/// The parser only tries to consume from one to given number of digits (greedily).</span>
-<span class="doccomment">/// It also trims the preceding whitespace if any.</span>
-<span class="doccomment">/// It cannot parse the negative number, so some date and time cannot be formatted then</span>
-<span class="doccomment">/// parsed with the same formatting items.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Numeric</span> {
-    <span class="doccomment">/// Full Gregorian year (FW=4, PW=∞).</span>
-    <span class="doccomment">/// May accept years before 1 BCE or after 9999 CE, given an initial sign.</span>
-    <span class="ident">Year</span>,
-    <span class="doccomment">/// Gregorian year divided by 100 (century number; FW=PW=2). Implies the non-negative year.</span>
-    <span class="ident">YearDiv100</span>,
-    <span class="doccomment">/// Gregorian year modulo 100 (FW=PW=2). Cannot be negative.</span>
-    <span class="ident">YearMod100</span>,
-    <span class="doccomment">/// Year in the ISO week date (FW=4, PW=∞).</span>
-    <span class="doccomment">/// May accept years before 1 BCE or after 9999 CE, given an initial sign.</span>
-    <span class="ident">IsoYear</span>,
-    <span class="doccomment">/// Year in the ISO week date, divided by 100 (FW=PW=2). Implies the non-negative year.</span>
-    <span class="ident">IsoYearDiv100</span>,
-    <span class="doccomment">/// Year in the ISO week date, modulo 100 (FW=PW=2). Cannot be negative.</span>
-    <span class="ident">IsoYearMod100</span>,
-    <span class="doccomment">/// Month (FW=PW=2).</span>
-    <span class="ident">Month</span>,
-    <span class="doccomment">/// Day of the month (FW=PW=2).</span>
-    <span class="ident">Day</span>,
-    <span class="doccomment">/// Week number, where the week 1 starts at the first Sunday of January (FW=PW=2).</span>
-    <span class="ident">WeekFromSun</span>,
-    <span class="doccomment">/// Week number, where the week 1 starts at the first Monday of January (FW=PW=2).</span>
-    <span class="ident">WeekFromMon</span>,
-    <span class="doccomment">/// Week number in the ISO week date (FW=PW=2).</span>
-    <span class="ident">IsoWeek</span>,
-    <span class="doccomment">/// Day of the week, where Sunday = 0 and Saturday = 6 (FW=PW=1).</span>
-    <span class="ident">NumDaysFromSun</span>,
-    <span class="doccomment">/// Day of the week, where Monday = 1 and Sunday = 7 (FW=PW=1).</span>
-    <span class="ident">WeekdayFromMon</span>,
-    <span class="doccomment">/// Day of the year (FW=PW=3).</span>
-    <span class="ident">Ordinal</span>,
-    <span class="doccomment">/// Hour number in the 24-hour clocks (FW=PW=2).</span>
-    <span class="ident">Hour</span>,
-    <span class="doccomment">/// Hour number in the 12-hour clocks (FW=PW=2).</span>
-    <span class="ident">Hour12</span>,
-    <span class="doccomment">/// The number of minutes since the last whole hour (FW=PW=2).</span>
-    <span class="ident">Minute</span>,
-    <span class="doccomment">/// The number of seconds since the last whole minute (FW=PW=2).</span>
-    <span class="ident">Second</span>,
-    <span class="doccomment">/// The number of nanoseconds since the last whole second (FW=PW=9).</span>
-    <span class="doccomment">/// Note that this is *not* left-aligned;</span>
-    <span class="doccomment">/// see also [`Fixed::Nanosecond`](./enum.Fixed.html#variant.Nanosecond).</span>
-    <span class="ident">Nanosecond</span>,
-    <span class="doccomment">/// The number of non-leap seconds since the midnight UTC on January 1, 1970 (FW=1, PW=∞).</span>
-    <span class="doccomment">/// For formatting, it assumes UTC upon the absence of time zone offset.</span>
-    <span class="ident">Timestamp</span>,
+<span class="doccomment">/// Numeric item types.
+/// They have associated formatting width (FW) and parsing width (PW).
+///
+/// The **formatting width** is the minimal width to be formatted.
+/// If the number is too short, and the padding is not [`Pad::None`](./enum.Pad.html#variant.None),
+/// then it is left-padded.
+/// If the number is too long or (in some cases) negative, it is printed as is.
+///
+/// The **parsing width** is the maximal width to be scanned.
+/// The parser only tries to consume from one to given number of digits (greedily).
+/// It also trims the preceding whitespace if any.
+/// It cannot parse the negative number, so some date and time cannot be formatted then
+/// parsed with the same formatting items.
+</span><span class="attribute">#[derive(Clone, PartialEq, Eq, Debug)]
+</span><span class="kw">pub enum </span>Numeric {
+    <span class="doccomment">/// Full Gregorian year (FW=4, PW=∞).
+    /// May accept years before 1 BCE or after 9999 CE, given an initial sign.
+    </span>Year,
+    <span class="doccomment">/// Gregorian year divided by 100 (century number; FW=PW=2). Implies the non-negative year.
+    </span>YearDiv100,
+    <span class="doccomment">/// Gregorian year modulo 100 (FW=PW=2). Cannot be negative.
+    </span>YearMod100,
+    <span class="doccomment">/// Year in the ISO week date (FW=4, PW=∞).
+    /// May accept years before 1 BCE or after 9999 CE, given an initial sign.
+    </span>IsoYear,
+    <span class="doccomment">/// Year in the ISO week date, divided by 100 (FW=PW=2). Implies the non-negative year.
+    </span>IsoYearDiv100,
+    <span class="doccomment">/// Year in the ISO week date, modulo 100 (FW=PW=2). Cannot be negative.
+    </span>IsoYearMod100,
+    <span class="doccomment">/// Month (FW=PW=2).
+    </span>Month,
+    <span class="doccomment">/// Day of the month (FW=PW=2).
+    </span>Day,
+    <span class="doccomment">/// Week number, where the week 1 starts at the first Sunday of January (FW=PW=2).
+    </span>WeekFromSun,
+    <span class="doccomment">/// Week number, where the week 1 starts at the first Monday of January (FW=PW=2).
+    </span>WeekFromMon,
+    <span class="doccomment">/// Week number in the ISO week date (FW=PW=2).
+    </span>IsoWeek,
+    <span class="doccomment">/// Day of the week, where Sunday = 0 and Saturday = 6 (FW=PW=1).
+    </span>NumDaysFromSun,
+    <span class="doccomment">/// Day of the week, where Monday = 1 and Sunday = 7 (FW=PW=1).
+    </span>WeekdayFromMon,
+    <span class="doccomment">/// Day of the year (FW=PW=3).
+    </span>Ordinal,
+    <span class="doccomment">/// Hour number in the 24-hour clocks (FW=PW=2).
+    </span>Hour,
+    <span class="doccomment">/// Hour number in the 12-hour clocks (FW=PW=2).
+    </span>Hour12,
+    <span class="doccomment">/// The number of minutes since the last whole hour (FW=PW=2).
+    </span>Minute,
+    <span class="doccomment">/// The number of seconds since the last whole minute (FW=PW=2).
+    </span>Second,
+    <span class="doccomment">/// The number of nanoseconds since the last whole second (FW=PW=9).
+    /// Note that this is *not* left-aligned;
+    /// see also [`Fixed::Nanosecond`](./enum.Fixed.html#variant.Nanosecond).
+    </span>Nanosecond,
+    <span class="doccomment">/// The number of non-leap seconds since the midnight UTC on January 1, 1970 (FW=1, PW=∞).
+    /// For formatting, it assumes UTC upon the absence of time zone offset.
+    </span>Timestamp,
 
-    <span class="doccomment">/// Internal uses only.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This item exists so that one can add additional internal-only formatting</span>
-    <span class="doccomment">/// without breaking major compatibility (as enum variants cannot be selectively private).</span>
-    <span class="ident">Internal</span>(<span class="ident">InternalNumeric</span>),
+    <span class="doccomment">/// Internal uses only.
+    ///
+    /// This item exists so that one can add additional internal-only formatting
+    /// without breaking major compatibility (as enum variants cannot be selectively private).
+    </span>Internal(InternalNumeric),
 }
 
-<span class="doccomment">/// An opaque type representing numeric item types for internal uses only.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InternalNumeric</span> {
-    <span class="ident">_dummy</span>: <span class="ident">Void</span>,
+<span class="doccomment">/// An opaque type representing numeric item types for internal uses only.
+</span><span class="kw">pub struct </span>InternalNumeric {
+    _dummy: Void,
 }
 
-<span class="kw">impl</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">InternalNumeric</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">_dummy</span> {}
+<span class="kw">impl </span>Clone <span class="kw">for </span>InternalNumeric {
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span><span class="self">self</span>._dummy {}
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">InternalNumeric</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_other</span>: <span class="kw-2">&amp;</span><span class="ident">InternalNumeric</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">_dummy</span> {}
+<span class="kw">impl </span>PartialEq <span class="kw">for </span>InternalNumeric {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, _other: <span class="kw-2">&amp;</span>InternalNumeric) -&gt; bool {
+        <span class="kw">match </span><span class="self">self</span>._dummy {}
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">InternalNumeric</span> {}
+<span class="kw">impl </span>Eq <span class="kw">for </span>InternalNumeric {}
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">InternalNumeric</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;&lt;InternalNumeric&gt;&quot;</span>)
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>InternalNumeric {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;&lt;InternalNumeric&gt;&quot;</span>)
     }
 }
 
-<span class="doccomment">/// Fixed-format item types.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// They have their own rules of formatting and parsing.</span>
-<span class="doccomment">/// Otherwise noted, they print in the specified cases but parse case-insensitively.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Fixed</span> {
-    <span class="doccomment">/// Abbreviated month names.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Prints a three-letter-long name in the title case, reads the same name in any case.</span>
-    <span class="ident">ShortMonthName</span>,
-    <span class="doccomment">/// Full month names.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Prints a full name in the title case, reads either a short or full name in any case.</span>
-    <span class="ident">LongMonthName</span>,
-    <span class="doccomment">/// Abbreviated day of the week names.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Prints a three-letter-long name in the title case, reads the same name in any case.</span>
-    <span class="ident">ShortWeekdayName</span>,
-    <span class="doccomment">/// Full day of the week names.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Prints a full name in the title case, reads either a short or full name in any case.</span>
-    <span class="ident">LongWeekdayName</span>,
-    <span class="doccomment">/// AM/PM.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Prints in lower case, reads in any case.</span>
-    <span class="ident">LowerAmPm</span>,
-    <span class="doccomment">/// AM/PM.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Prints in upper case, reads in any case.</span>
-    <span class="ident">UpperAmPm</span>,
-    <span class="doccomment">/// An optional dot plus one or more digits for left-aligned nanoseconds.</span>
-    <span class="doccomment">/// May print nothing, 3, 6 or 9 digits according to the available accuracy.</span>
-    <span class="doccomment">/// See also [`Numeric::Nanosecond`](./enum.Numeric.html#variant.Nanosecond).</span>
-    <span class="ident">Nanosecond</span>,
-    <span class="doccomment">/// Same as [`Nanosecond`](#variant.Nanosecond) but the accuracy is fixed to 3.</span>
-    <span class="ident">Nanosecond3</span>,
-    <span class="doccomment">/// Same as [`Nanosecond`](#variant.Nanosecond) but the accuracy is fixed to 6.</span>
-    <span class="ident">Nanosecond6</span>,
-    <span class="doccomment">/// Same as [`Nanosecond`](#variant.Nanosecond) but the accuracy is fixed to 9.</span>
-    <span class="ident">Nanosecond9</span>,
-    <span class="doccomment">/// Timezone name.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// It does not support parsing, its use in the parser is an immediate failure.</span>
-    <span class="ident">TimezoneName</span>,
-    <span class="doccomment">/// Offset from the local time to UTC (`+09:00` or `-04:00` or `+00:00`).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// In the parser, the colon can be omitted and/or surrounded with any amount of whitespace.</span>
-    <span class="doccomment">/// The offset is limited from `-24:00` to `+24:00`,</span>
-    <span class="doccomment">/// which is the same as [`FixedOffset`](../offset/struct.FixedOffset.html)&#39;s range.</span>
-    <span class="ident">TimezoneOffsetColon</span>,
-    <span class="doccomment">/// Offset from the local time to UTC (`+09:00` or `-04:00` or `Z`).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// In the parser, the colon can be omitted and/or surrounded with any amount of whitespace,</span>
-    <span class="doccomment">/// and `Z` can be either in upper case or in lower case.</span>
-    <span class="doccomment">/// The offset is limited from `-24:00` to `+24:00`,</span>
-    <span class="doccomment">/// which is the same as [`FixedOffset`](../offset/struct.FixedOffset.html)&#39;s range.</span>
-    <span class="ident">TimezoneOffsetColonZ</span>,
-    <span class="doccomment">/// Same as [`TimezoneOffsetColon`](#variant.TimezoneOffsetColon) but prints no colon.</span>
-    <span class="doccomment">/// Parsing allows an optional colon.</span>
-    <span class="ident">TimezoneOffset</span>,
-    <span class="doccomment">/// Same as [`TimezoneOffsetColonZ`](#variant.TimezoneOffsetColonZ) but prints no colon.</span>
-    <span class="doccomment">/// Parsing allows an optional colon.</span>
-    <span class="ident">TimezoneOffsetZ</span>,
-    <span class="doccomment">/// RFC 2822 date and time syntax. Commonly used for email and MIME date and time.</span>
-    <span class="ident">RFC2822</span>,
-    <span class="doccomment">/// RFC 3339 &amp; ISO 8601 date and time syntax.</span>
-    <span class="ident">RFC3339</span>,
+<span class="doccomment">/// Fixed-format item types.
+///
+/// They have their own rules of formatting and parsing.
+/// Otherwise noted, they print in the specified cases but parse case-insensitively.
+</span><span class="attribute">#[derive(Clone, PartialEq, Eq, Debug)]
+</span><span class="kw">pub enum </span>Fixed {
+    <span class="doccomment">/// Abbreviated month names.
+    ///
+    /// Prints a three-letter-long name in the title case, reads the same name in any case.
+    </span>ShortMonthName,
+    <span class="doccomment">/// Full month names.
+    ///
+    /// Prints a full name in the title case, reads either a short or full name in any case.
+    </span>LongMonthName,
+    <span class="doccomment">/// Abbreviated day of the week names.
+    ///
+    /// Prints a three-letter-long name in the title case, reads the same name in any case.
+    </span>ShortWeekdayName,
+    <span class="doccomment">/// Full day of the week names.
+    ///
+    /// Prints a full name in the title case, reads either a short or full name in any case.
+    </span>LongWeekdayName,
+    <span class="doccomment">/// AM/PM.
+    ///
+    /// Prints in lower case, reads in any case.
+    </span>LowerAmPm,
+    <span class="doccomment">/// AM/PM.
+    ///
+    /// Prints in upper case, reads in any case.
+    </span>UpperAmPm,
+    <span class="doccomment">/// An optional dot plus one or more digits for left-aligned nanoseconds.
+    /// May print nothing, 3, 6 or 9 digits according to the available accuracy.
+    /// See also [`Numeric::Nanosecond`](./enum.Numeric.html#variant.Nanosecond).
+    </span>Nanosecond,
+    <span class="doccomment">/// Same as [`Nanosecond`](#variant.Nanosecond) but the accuracy is fixed to 3.
+    </span>Nanosecond3,
+    <span class="doccomment">/// Same as [`Nanosecond`](#variant.Nanosecond) but the accuracy is fixed to 6.
+    </span>Nanosecond6,
+    <span class="doccomment">/// Same as [`Nanosecond`](#variant.Nanosecond) but the accuracy is fixed to 9.
+    </span>Nanosecond9,
+    <span class="doccomment">/// Timezone name.
+    ///
+    /// It does not support parsing, its use in the parser is an immediate failure.
+    </span>TimezoneName,
+    <span class="doccomment">/// Offset from the local time to UTC (`+09:00` or `-04:00` or `+00:00`).
+    ///
+    /// In the parser, the colon can be omitted and/or surrounded with any amount of whitespace.
+    /// The offset is limited from `-24:00` to `+24:00`,
+    /// which is the same as [`FixedOffset`](../offset/struct.FixedOffset.html)&#39;s range.
+    </span>TimezoneOffsetColon,
+    <span class="doccomment">/// Offset from the local time to UTC (`+09:00` or `-04:00` or `Z`).
+    ///
+    /// In the parser, the colon can be omitted and/or surrounded with any amount of whitespace,
+    /// and `Z` can be either in upper case or in lower case.
+    /// The offset is limited from `-24:00` to `+24:00`,
+    /// which is the same as [`FixedOffset`](../offset/struct.FixedOffset.html)&#39;s range.
+    </span>TimezoneOffsetColonZ,
+    <span class="doccomment">/// Same as [`TimezoneOffsetColon`](#variant.TimezoneOffsetColon) but prints no colon.
+    /// Parsing allows an optional colon.
+    </span>TimezoneOffset,
+    <span class="doccomment">/// Same as [`TimezoneOffsetColonZ`](#variant.TimezoneOffsetColonZ) but prints no colon.
+    /// Parsing allows an optional colon.
+    </span>TimezoneOffsetZ,
+    <span class="doccomment">/// RFC 2822 date and time syntax. Commonly used for email and MIME date and time.
+    </span>RFC2822,
+    <span class="doccomment">/// RFC 3339 &amp; ISO 8601 date and time syntax.
+    </span>RFC3339,
 
-    <span class="doccomment">/// Internal uses only.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This item exists so that one can add additional internal-only formatting</span>
-    <span class="doccomment">/// without breaking major compatibility (as enum variants cannot be selectively private).</span>
-    <span class="ident">Internal</span>(<span class="ident">InternalFixed</span>),
+    <span class="doccomment">/// Internal uses only.
+    ///
+    /// This item exists so that one can add additional internal-only formatting
+    /// without breaking major compatibility (as enum variants cannot be selectively private).
+    </span>Internal(InternalFixed),
 }
 
-<span class="doccomment">/// An opaque type representing fixed-format item types for internal uses only.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InternalFixed</span> {
-    <span class="ident">val</span>: <span class="ident">InternalInternal</span>,
+<span class="doccomment">/// An opaque type representing fixed-format item types for internal uses only.
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq, Eq)]
+</span><span class="kw">pub struct </span>InternalFixed {
+    val: InternalInternal,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">enum</span> <span class="ident">InternalInternal</span> {
-    <span class="doccomment">/// Same as [`TimezoneOffsetColonZ`](#variant.TimezoneOffsetColonZ), but</span>
-    <span class="doccomment">/// allows missing minutes (per [ISO 8601][iso8601]).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If you try to use this for printing.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [iso8601]: https://en.wikipedia.org/wiki/ISO_8601#Time_offsets_from_UTC</span>
-    <span class="ident">TimezoneOffsetPermissive</span>,
-    <span class="doccomment">/// Same as [`Nanosecond`](#variant.Nanosecond) but the accuracy is fixed to 3 and there is no leading dot.</span>
-    <span class="ident">Nanosecond3NoDot</span>,
-    <span class="doccomment">/// Same as [`Nanosecond`](#variant.Nanosecond) but the accuracy is fixed to 6 and there is no leading dot.</span>
-    <span class="ident">Nanosecond6NoDot</span>,
-    <span class="doccomment">/// Same as [`Nanosecond`](#variant.Nanosecond) but the accuracy is fixed to 9 and there is no leading dot.</span>
-    <span class="ident">Nanosecond9NoDot</span>,
+<span class="attribute">#[derive(Debug, Clone, PartialEq, Eq)]
+</span><span class="kw">enum </span>InternalInternal {
+    <span class="doccomment">/// Same as [`TimezoneOffsetColonZ`](#variant.TimezoneOffsetColonZ), but
+    /// allows missing minutes (per [ISO 8601][iso8601]).
+    ///
+    /// # Panics
+    ///
+    /// If you try to use this for printing.
+    ///
+    /// [iso8601]: https://en.wikipedia.org/wiki/ISO_8601#Time_offsets_from_UTC
+    </span>TimezoneOffsetPermissive,
+    <span class="doccomment">/// Same as [`Nanosecond`](#variant.Nanosecond) but the accuracy is fixed to 3 and there is no leading dot.
+    </span>Nanosecond3NoDot,
+    <span class="doccomment">/// Same as [`Nanosecond`](#variant.Nanosecond) but the accuracy is fixed to 6 and there is no leading dot.
+    </span>Nanosecond6NoDot,
+    <span class="doccomment">/// Same as [`Nanosecond`](#variant.Nanosecond) but the accuracy is fixed to 9 and there is no leading dot.
+    </span>Nanosecond9NoDot,
 }
 
-<span class="doccomment">/// A single formatting item. This is used for both formatting and parsing.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Item</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// A literally printed and parsed text.</span>
-    <span class="ident">Literal</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>),
-    <span class="doccomment">/// Same as `Literal` but with the string owned by the item.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">test</span>))]</span>
-    <span class="ident">OwnedLiteral</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>),
-    <span class="doccomment">/// Whitespace. Prints literally but reads zero or more whitespace.</span>
-    <span class="ident">Space</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>),
-    <span class="doccomment">/// Same as `Space` but with the string owned by the item.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">test</span>))]</span>
-    <span class="ident">OwnedSpace</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>),
-    <span class="doccomment">/// Numeric item. Can be optionally padded to the maximal length (if any) when formatting;</span>
-    <span class="doccomment">/// the parser simply ignores any padded whitespace and zeroes.</span>
-    <span class="ident">Numeric</span>(<span class="ident">Numeric</span>, <span class="ident">Pad</span>),
-    <span class="doccomment">/// Fixed-format item.</span>
-    <span class="ident">Fixed</span>(<span class="ident">Fixed</span>),
-    <span class="doccomment">/// Issues a formatting error. Used to signal an invalid format string.</span>
-    <span class="ident">Error</span>,
+<span class="doccomment">/// A single formatting item. This is used for both formatting and parsing.
+</span><span class="attribute">#[derive(Clone, PartialEq, Eq, Debug)]
+</span><span class="kw">pub enum </span>Item&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// A literally printed and parsed text.
+    </span>Literal(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str),
+    <span class="doccomment">/// Same as `Literal` but with the string owned by the item.
+    </span><span class="attribute">#[cfg(any(feature = <span class="string">&quot;alloc&quot;</span>, feature = <span class="string">&quot;std&quot;</span>, test))]
+    </span>OwnedLiteral(Box&lt;str&gt;),
+    <span class="doccomment">/// Whitespace. Prints literally but reads zero or more whitespace.
+    </span>Space(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str),
+    <span class="doccomment">/// Same as `Space` but with the string owned by the item.
+    </span><span class="attribute">#[cfg(any(feature = <span class="string">&quot;alloc&quot;</span>, feature = <span class="string">&quot;std&quot;</span>, test))]
+    </span>OwnedSpace(Box&lt;str&gt;),
+    <span class="doccomment">/// Numeric item. Can be optionally padded to the maximal length (if any) when formatting;
+    /// the parser simply ignores any padded whitespace and zeroes.
+    </span>Numeric(Numeric, Pad),
+    <span class="doccomment">/// Fixed-format item.
+    </span>Fixed(Fixed),
+    <span class="doccomment">/// Issues a formatting error. Used to signal an invalid format string.
+    </span>Error,
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">lit</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="ident">Item::Literal</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>)
+<span class="macro">macro_rules! </span>lit {
+    (<span class="macro-nonterminal">$x</span>:expr) =&gt; {
+        Item::Literal(<span class="macro-nonterminal">$x</span>)
     };
 }
-<span class="macro">macro_rules!</span> <span class="ident">sp</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="ident">Item::Space</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>)
+<span class="macro">macro_rules! </span>sp {
+    (<span class="macro-nonterminal">$x</span>:expr) =&gt; {
+        Item::Space(<span class="macro-nonterminal">$x</span>)
     };
 }
-<span class="macro">macro_rules!</span> <span class="ident">num</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">ident</span>) =&gt; {
-        <span class="ident">Item::Numeric</span>(<span class="ident">Numeric</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>, <span class="ident">Pad::None</span>)
+<span class="macro">macro_rules! </span>num {
+    (<span class="macro-nonterminal">$x</span>:ident) =&gt; {
+        Item::Numeric(Numeric::<span class="macro-nonterminal">$x</span>, Pad::None)
     };
 }
-<span class="macro">macro_rules!</span> <span class="ident">num0</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">ident</span>) =&gt; {
-        <span class="ident">Item::Numeric</span>(<span class="ident">Numeric</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>, <span class="ident">Pad::Zero</span>)
+<span class="macro">macro_rules! </span>num0 {
+    (<span class="macro-nonterminal">$x</span>:ident) =&gt; {
+        Item::Numeric(Numeric::<span class="macro-nonterminal">$x</span>, Pad::Zero)
     };
 }
-<span class="macro">macro_rules!</span> <span class="ident">nums</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">ident</span>) =&gt; {
-        <span class="ident">Item::Numeric</span>(<span class="ident">Numeric</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>, <span class="ident">Pad::Space</span>)
+<span class="macro">macro_rules! </span>nums {
+    (<span class="macro-nonterminal">$x</span>:ident) =&gt; {
+        Item::Numeric(Numeric::<span class="macro-nonterminal">$x</span>, Pad::Space)
     };
 }
-<span class="macro">macro_rules!</span> <span class="ident">fix</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">ident</span>) =&gt; {
-        <span class="ident">Item::Fixed</span>(<span class="ident">Fixed</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>)
+<span class="macro">macro_rules! </span>fix {
+    (<span class="macro-nonterminal">$x</span>:ident) =&gt; {
+        Item::Fixed(Fixed::<span class="macro-nonterminal">$x</span>)
     };
 }
-<span class="macro">macro_rules!</span> <span class="ident">internal_fix</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span>:<span class="ident">ident</span>) =&gt; {
-        <span class="ident">Item::Fixed</span>(<span class="ident">Fixed::Internal</span>(<span class="ident">InternalFixed</span> { <span class="ident">val</span>: <span class="ident">InternalInternal</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">x</span> }))
+<span class="macro">macro_rules! </span>internal_fix {
+    (<span class="macro-nonterminal">$x</span>:ident) =&gt; {
+        Item::Fixed(Fixed::Internal(InternalFixed { val: InternalInternal::<span class="macro-nonterminal">$x </span>}))
     };
 }
 
-<span class="doccomment">/// An error from the `parse` function.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ParseError</span>(<span class="ident">ParseErrorKind</span>);
+<span class="doccomment">/// An error from the `parse` function.
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq, Eq, Copy)]
+</span><span class="kw">pub struct </span>ParseError(ParseErrorKind);
 
-<span class="kw">impl</span> <span class="ident">ParseError</span> {
-    <span class="doccomment">/// The category of parse error</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ParseErrorKind</span> {
-        <span class="self">self</span>.<span class="number">0</span>
-    }
+<span class="kw">impl </span>ParseError {
+    <span class="doccomment">/// The category of parse error
+    </span><span class="kw">pub fn </span>kind(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ParseErrorKind {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
 }
 
-<span class="doccomment">/// The category of parse error</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ParseErrorKind</span> {
-    <span class="doccomment">/// Given field is out of permitted range.</span>
-    <span class="ident">OutOfRange</span>,
+<span class="doccomment">/// The category of parse error
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq, Eq, Copy)]
+</span><span class="kw">pub enum </span>ParseErrorKind {
+    <span class="doccomment">/// Given field is out of permitted range.
+    </span>OutOfRange,
 
-    <span class="doccomment">/// There is no possible date and time value with given set of fields.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This does not include the out-of-range conditions, which are trivially invalid.</span>
-    <span class="doccomment">/// It includes the case that there are one or more fields that are inconsistent to each other.</span>
-    <span class="ident">Impossible</span>,
+    <span class="doccomment">/// There is no possible date and time value with given set of fields.
+    ///
+    /// This does not include the out-of-range conditions, which are trivially invalid.
+    /// It includes the case that there are one or more fields that are inconsistent to each other.
+    </span>Impossible,
 
-    <span class="doccomment">/// Given set of fields is not enough to make a requested date and time value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that there *may* be a case that given fields constrain the possible values so much</span>
-    <span class="doccomment">/// that there is a unique possible value. Chrono only tries to be correct for</span>
-    <span class="doccomment">/// most useful sets of fields however, as such constraint solving can be expensive.</span>
-    <span class="ident">NotEnough</span>,
+    <span class="doccomment">/// Given set of fields is not enough to make a requested date and time value.
+    ///
+    /// Note that there *may* be a case that given fields constrain the possible values so much
+    /// that there is a unique possible value. Chrono only tries to be correct for
+    /// most useful sets of fields however, as such constraint solving can be expensive.
+    </span>NotEnough,
 
-    <span class="doccomment">/// The input string has some invalid character sequence for given formatting items.</span>
-    <span class="ident">Invalid</span>,
+    <span class="doccomment">/// The input string has some invalid character sequence for given formatting items.
+    </span>Invalid,
 
-    <span class="doccomment">/// The input string has been prematurely ended.</span>
-    <span class="ident">TooShort</span>,
+    <span class="doccomment">/// The input string has been prematurely ended.
+    </span>TooShort,
 
-    <span class="doccomment">/// All formatting items have been read but there is a remaining input.</span>
-    <span class="ident">TooLong</span>,
+    <span class="doccomment">/// All formatting items have been read but there is a remaining input.
+    </span>TooLong,
 
-    <span class="doccomment">/// There was an error on the formatting string, or there were non-supported formating items.</span>
-    <span class="ident">BadFormat</span>,
+    <span class="doccomment">/// There was an error on the formatting string, or there were non-supported formating items.
+    </span>BadFormat,
 
-    <span class="comment">// TODO: Change this to `#[non_exhaustive]` (on the enum) when MSRV is increased</span>
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="ident">__Nonexhaustive</span>,
+    <span class="comment">// TODO: Change this to `#[non_exhaustive]` (on the enum) when MSRV is increased
+    </span><span class="attribute">#[doc(hidden)]
+    </span>__Nonexhaustive,
 }
 
-<span class="doccomment">/// Same as `Result&lt;T, ParseError&gt;`.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">ParseError</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Same as `Result&lt;T, ParseError&gt;`.
+</span><span class="kw">pub type </span>ParseResult&lt;T&gt; = <span class="prelude-ty">Result</span>&lt;T, ParseError&gt;;
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ParseError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span> {
-            <span class="ident">ParseErrorKind::OutOfRange</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;input is out of range&quot;</span>),
-            <span class="ident">ParseErrorKind::Impossible</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;no possible date and time matching input&quot;</span>),
-            <span class="ident">ParseErrorKind::NotEnough</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;input is not enough for unique date and time&quot;</span>),
-            <span class="ident">ParseErrorKind::Invalid</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;input contains invalid characters&quot;</span>),
-            <span class="ident">ParseErrorKind::TooShort</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;premature end of input&quot;</span>),
-            <span class="ident">ParseErrorKind::TooLong</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;trailing input&quot;</span>),
-            <span class="ident">ParseErrorKind::BadFormat</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;bad or unsupported format string&quot;</span>),
-            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>ParseError {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self</span>.<span class="number">0 </span>{
+            ParseErrorKind::OutOfRange =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;input is out of range&quot;</span>),
+            ParseErrorKind::Impossible =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;no possible date and time matching input&quot;</span>),
+            ParseErrorKind::NotEnough =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;input is not enough for unique date and time&quot;</span>),
+            ParseErrorKind::Invalid =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;input contains invalid characters&quot;</span>),
+            ParseErrorKind::TooShort =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;premature end of input&quot;</span>),
+            ParseErrorKind::TooLong =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;trailing input&quot;</span>),
+            ParseErrorKind::BadFormat =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;bad or unsupported format string&quot;</span>),
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">test</span>))]</span>
-<span class="kw">impl</span> <span class="ident">Error</span> <span class="kw">for</span> <span class="ident">ParseError</span> {
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="string">&quot;parser error, see to_string() for details&quot;</span>
-    }
+<span class="attribute">#[cfg(any(feature = <span class="string">&quot;std&quot;</span>, test))]
+</span><span class="kw">impl </span>Error <span class="kw">for </span>ParseError {
+    <span class="attribute">#[allow(deprecated)]
+    </span><span class="kw">fn </span>description(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="string">&quot;parser error, see to_string() for details&quot;
+    </span>}
 }
 
-<span class="comment">// to be used in this module and submodules</span>
-<span class="kw">const</span> <span class="ident">OUT_OF_RANGE</span>: <span class="ident">ParseError</span> <span class="op">=</span> <span class="ident">ParseError</span>(<span class="ident">ParseErrorKind::OutOfRange</span>);
-<span class="kw">const</span> <span class="ident">IMPOSSIBLE</span>: <span class="ident">ParseError</span> <span class="op">=</span> <span class="ident">ParseError</span>(<span class="ident">ParseErrorKind::Impossible</span>);
-<span class="kw">const</span> <span class="ident">NOT_ENOUGH</span>: <span class="ident">ParseError</span> <span class="op">=</span> <span class="ident">ParseError</span>(<span class="ident">ParseErrorKind::NotEnough</span>);
-<span class="kw">const</span> <span class="ident">INVALID</span>: <span class="ident">ParseError</span> <span class="op">=</span> <span class="ident">ParseError</span>(<span class="ident">ParseErrorKind::Invalid</span>);
-<span class="kw">const</span> <span class="ident">TOO_SHORT</span>: <span class="ident">ParseError</span> <span class="op">=</span> <span class="ident">ParseError</span>(<span class="ident">ParseErrorKind::TooShort</span>);
-<span class="kw">const</span> <span class="ident">TOO_LONG</span>: <span class="ident">ParseError</span> <span class="op">=</span> <span class="ident">ParseError</span>(<span class="ident">ParseErrorKind::TooLong</span>);
-<span class="kw">const</span> <span class="ident">BAD_FORMAT</span>: <span class="ident">ParseError</span> <span class="op">=</span> <span class="ident">ParseError</span>(<span class="ident">ParseErrorKind::BadFormat</span>);
+<span class="comment">// to be used in this module and submodules
+</span><span class="kw">const </span>OUT_OF_RANGE: ParseError = ParseError(ParseErrorKind::OutOfRange);
+<span class="kw">const </span>IMPOSSIBLE: ParseError = ParseError(ParseErrorKind::Impossible);
+<span class="kw">const </span>NOT_ENOUGH: ParseError = ParseError(ParseErrorKind::NotEnough);
+<span class="kw">const </span>INVALID: ParseError = ParseError(ParseErrorKind::Invalid);
+<span class="kw">const </span>TOO_SHORT: ParseError = ParseError(ParseErrorKind::TooShort);
+<span class="kw">const </span>TOO_LONG: ParseError = ParseError(ParseErrorKind::TooLong);
+<span class="kw">const </span>BAD_FORMAT: ParseError = ParseError(ParseErrorKind::BadFormat);
 
-<span class="doccomment">/// Formats single formatting item</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">test</span>))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">format_item</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">w</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>,
-    <span class="ident">date</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">NaiveDate</span><span class="op">&gt;</span>,
-    <span class="ident">time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">NaiveTime</span><span class="op">&gt;</span>,
-    <span class="ident">off</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="ident">String</span>, <span class="ident">FixedOffset</span>)<span class="op">&gt;</span>,
-    <span class="ident">item</span>: <span class="kw-2">&amp;</span><span class="ident">Item</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">fmt::Result</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">String::new</span>();
-    <span class="ident">format_inner</span>(<span class="kw-2">&amp;mut</span> <span class="ident">result</span>, <span class="ident">date</span>, <span class="ident">time</span>, <span class="ident">off</span>, <span class="ident">item</span>, <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
-    <span class="ident">w</span>.<span class="ident">pad</span>(<span class="kw-2">&amp;</span><span class="ident">result</span>)
+<span class="doccomment">/// Formats single formatting item
+</span><span class="attribute">#[cfg(any(feature = <span class="string">&quot;alloc&quot;</span>, feature = <span class="string">&quot;std&quot;</span>, test))]
+</span><span class="kw">pub fn </span>format_item&lt;<span class="lifetime">&#39;a</span>&gt;(
+    w: <span class="kw-2">&amp;mut </span>fmt::Formatter,
+    date: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>NaiveDate&gt;,
+    time: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>NaiveTime&gt;,
+    off: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>(String, FixedOffset)&gt;,
+    item: <span class="kw-2">&amp;</span>Item&lt;<span class="lifetime">&#39;a</span>&gt;,
+) -&gt; fmt::Result {
+    <span class="kw">let </span><span class="kw-2">mut </span>result = String::new();
+    format_inner(<span class="kw-2">&amp;mut </span>result, date, time, off, item, <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+    w.pad(<span class="kw-2">&amp;</span>result)
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">test</span>))]</span>
-<span class="kw">fn</span> <span class="ident">format_inner</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">result</span>: <span class="kw-2">&amp;mut</span> <span class="ident">String</span>,
-    <span class="ident">date</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">NaiveDate</span><span class="op">&gt;</span>,
-    <span class="ident">time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">NaiveTime</span><span class="op">&gt;</span>,
-    <span class="ident">off</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="ident">String</span>, <span class="ident">FixedOffset</span>)<span class="op">&gt;</span>,
-    <span class="ident">item</span>: <span class="kw-2">&amp;</span><span class="ident">Item</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="ident">_locale</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Locale</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">fmt::Result</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable-locales&quot;</span>)]</span>
-    <span class="kw">let</span> (<span class="ident">short_months</span>, <span class="ident">long_months</span>, <span class="ident">short_weekdays</span>, <span class="ident">long_weekdays</span>, <span class="ident">am_pm</span>, <span class="ident">am_pm_lowercase</span>) <span class="op">=</span> {
-        <span class="kw">let</span> <span class="ident">locale</span> <span class="op">=</span> <span class="ident">_locale</span>.<span class="ident">unwrap_or</span>(<span class="ident">Locale::POSIX</span>);
-        <span class="kw">let</span> <span class="ident">am_pm</span> <span class="op">=</span> <span class="ident">locales::am_pm</span>(<span class="ident">locale</span>);
+<span class="attribute">#[cfg(any(feature = <span class="string">&quot;alloc&quot;</span>, feature = <span class="string">&quot;std&quot;</span>, test))]
+</span><span class="kw">fn </span>format_inner&lt;<span class="lifetime">&#39;a</span>&gt;(
+    result: <span class="kw-2">&amp;mut </span>String,
+    date: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>NaiveDate&gt;,
+    time: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>NaiveTime&gt;,
+    off: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>(String, FixedOffset)&gt;,
+    item: <span class="kw-2">&amp;</span>Item&lt;<span class="lifetime">&#39;a</span>&gt;,
+    _locale: <span class="prelude-ty">Option</span>&lt;Locale&gt;,
+) -&gt; fmt::Result {
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;unstable-locales&quot;</span>)]
+    </span><span class="kw">let </span>(short_months, long_months, short_weekdays, long_weekdays, am_pm, am_pm_lowercase) = {
+        <span class="kw">let </span>locale = _locale.unwrap_or(Locale::POSIX);
+        <span class="kw">let </span>am_pm = locales::am_pm(locale);
         (
-            <span class="ident">locales::short_months</span>(<span class="ident">locale</span>),
-            <span class="ident">locales::long_months</span>(<span class="ident">locale</span>),
-            <span class="ident">locales::short_weekdays</span>(<span class="ident">locale</span>),
-            <span class="ident">locales::long_weekdays</span>(<span class="ident">locale</span>),
-            <span class="ident">am_pm</span>,
-            <span class="kw-2">&amp;</span>[<span class="ident">am_pm</span>[<span class="number">0</span>].<span class="ident">to_lowercase</span>(), <span class="ident">am_pm</span>[<span class="number">1</span>].<span class="ident">to_lowercase</span>()],
+            locales::short_months(locale),
+            locales::long_months(locale),
+            locales::short_weekdays(locale),
+            locales::long_weekdays(locale),
+            am_pm,
+            <span class="kw-2">&amp;</span>[am_pm[<span class="number">0</span>].to_lowercase(), am_pm[<span class="number">1</span>].to_lowercase()],
         )
     };
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable-locales&quot;</span>))]</span>
-    <span class="kw">let</span> (<span class="ident">short_months</span>, <span class="ident">long_months</span>, <span class="ident">short_weekdays</span>, <span class="ident">long_weekdays</span>, <span class="ident">am_pm</span>, <span class="ident">am_pm_lowercase</span>) <span class="op">=</span> {
+    <span class="attribute">#[cfg(not(feature = <span class="string">&quot;unstable-locales&quot;</span>))]
+    </span><span class="kw">let </span>(short_months, long_months, short_weekdays, long_weekdays, am_pm, am_pm_lowercase) = {
         (
             <span class="kw-2">&amp;</span>[<span class="string">&quot;Jan&quot;</span>, <span class="string">&quot;Feb&quot;</span>, <span class="string">&quot;Mar&quot;</span>, <span class="string">&quot;Apr&quot;</span>, <span class="string">&quot;May&quot;</span>, <span class="string">&quot;Jun&quot;</span>, <span class="string">&quot;Jul&quot;</span>, <span class="string">&quot;Aug&quot;</span>, <span class="string">&quot;Sep&quot;</span>, <span class="string">&quot;Oct&quot;</span>, <span class="string">&quot;Nov&quot;</span>, <span class="string">&quot;Dec&quot;</span>],
             <span class="kw-2">&amp;</span>[
@@ -1446,499 +1446,499 @@
         )
     };
 
-    <span class="kw">use</span> <span class="ident">core::fmt::Write</span>;
-    <span class="kw">use</span> <span class="ident">num_integer</span>::{<span class="ident">div_floor</span>, <span class="ident">mod_floor</span>};
+    <span class="kw">use </span>core::fmt::Write;
+    <span class="kw">use </span>num_integer::{div_floor, mod_floor};
 
-    <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">item</span> {
-        <span class="ident">Item::Literal</span>(<span class="ident">s</span>) <span class="op">|</span> <span class="ident">Item::Space</span>(<span class="ident">s</span>) =&gt; <span class="ident">result</span>.<span class="ident">push_str</span>(<span class="ident">s</span>),
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">test</span>))]</span>
-        <span class="ident">Item::OwnedLiteral</span>(<span class="kw-2">ref</span> <span class="ident">s</span>) <span class="op">|</span> <span class="ident">Item::OwnedSpace</span>(<span class="kw-2">ref</span> <span class="ident">s</span>) =&gt; <span class="ident">result</span>.<span class="ident">push_str</span>(<span class="ident">s</span>),
+    <span class="kw">match </span><span class="kw-2">*</span>item {
+        Item::Literal(s) | Item::Space(s) =&gt; result.push_str(s),
+        <span class="attribute">#[cfg(any(feature = <span class="string">&quot;alloc&quot;</span>, feature = <span class="string">&quot;std&quot;</span>, test))]
+        </span>Item::OwnedLiteral(<span class="kw-2">ref </span>s) | Item::OwnedSpace(<span class="kw-2">ref </span>s) =&gt; result.push_str(s),
 
-        <span class="ident">Item::Numeric</span>(<span class="kw-2">ref</span> <span class="ident">spec</span>, <span class="kw-2">ref</span> <span class="ident">pad</span>) =&gt; {
-            <span class="kw">use</span> <span class="ident"><span class="self">self</span>::Numeric</span>::<span class="kw-2">*</span>;
+        Item::Numeric(<span class="kw-2">ref </span>spec, <span class="kw-2">ref </span>pad) =&gt; {
+            <span class="kw">use </span><span class="self">self</span>::Numeric::<span class="kw-2">*</span>;
 
-            <span class="kw">let</span> <span class="ident">week_from_sun</span> <span class="op">=</span> <span class="op">|</span><span class="ident">d</span>: <span class="kw-2">&amp;</span><span class="ident">NaiveDate</span><span class="op">|</span> {
-                (<span class="ident">d</span>.<span class="ident">ordinal</span>() <span class="kw">as</span> <span class="ident">i32</span> <span class="op">-</span> <span class="ident">d</span>.<span class="ident">weekday</span>().<span class="ident">num_days_from_sunday</span>() <span class="kw">as</span> <span class="ident">i32</span> <span class="op">+</span> <span class="number">7</span>) <span class="op">/</span> <span class="number">7</span>
-            };
-            <span class="kw">let</span> <span class="ident">week_from_mon</span> <span class="op">=</span> <span class="op">|</span><span class="ident">d</span>: <span class="kw-2">&amp;</span><span class="ident">NaiveDate</span><span class="op">|</span> {
-                (<span class="ident">d</span>.<span class="ident">ordinal</span>() <span class="kw">as</span> <span class="ident">i32</span> <span class="op">-</span> <span class="ident">d</span>.<span class="ident">weekday</span>().<span class="ident">num_days_from_monday</span>() <span class="kw">as</span> <span class="ident">i32</span> <span class="op">+</span> <span class="number">7</span>) <span class="op">/</span> <span class="number">7</span>
-            };
+            <span class="kw">let </span>week_from_sun = |d: <span class="kw-2">&amp;</span>NaiveDate| {
+                (d.ordinal() <span class="kw">as </span>i32 - d.weekday().num_days_from_sunday() <span class="kw">as </span>i32 + <span class="number">7</span>) / <span class="number">7
+            </span>};
+            <span class="kw">let </span>week_from_mon = |d: <span class="kw-2">&amp;</span>NaiveDate| {
+                (d.ordinal() <span class="kw">as </span>i32 - d.weekday().num_days_from_monday() <span class="kw">as </span>i32 + <span class="number">7</span>) / <span class="number">7
+            </span>};
 
-            <span class="kw">let</span> (<span class="ident">width</span>, <span class="ident">v</span>) <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">spec</span> {
-                <span class="ident">Year</span> =&gt; (<span class="number">4</span>, <span class="ident">date</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">i64::from</span>(<span class="ident">d</span>.<span class="ident">year</span>()))),
-                <span class="ident">YearDiv100</span> =&gt; (<span class="number">2</span>, <span class="ident">date</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">div_floor</span>(<span class="ident">i64::from</span>(<span class="ident">d</span>.<span class="ident">year</span>()), <span class="number">100</span>))),
-                <span class="ident">YearMod100</span> =&gt; (<span class="number">2</span>, <span class="ident">date</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">mod_floor</span>(<span class="ident">i64::from</span>(<span class="ident">d</span>.<span class="ident">year</span>()), <span class="number">100</span>))),
-                <span class="ident">IsoYear</span> =&gt; (<span class="number">4</span>, <span class="ident">date</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">i64::from</span>(<span class="ident">d</span>.<span class="ident">iso_week</span>().<span class="ident">year</span>()))),
-                <span class="ident">IsoYearDiv100</span> =&gt; (<span class="number">2</span>, <span class="ident">date</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">div_floor</span>(<span class="ident">i64::from</span>(<span class="ident">d</span>.<span class="ident">iso_week</span>().<span class="ident">year</span>()), <span class="number">100</span>))),
-                <span class="ident">IsoYearMod100</span> =&gt; (<span class="number">2</span>, <span class="ident">date</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">mod_floor</span>(<span class="ident">i64::from</span>(<span class="ident">d</span>.<span class="ident">iso_week</span>().<span class="ident">year</span>()), <span class="number">100</span>))),
-                <span class="ident">Month</span> =&gt; (<span class="number">2</span>, <span class="ident">date</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">i64::from</span>(<span class="ident">d</span>.<span class="ident">month</span>()))),
-                <span class="ident">Day</span> =&gt; (<span class="number">2</span>, <span class="ident">date</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">i64::from</span>(<span class="ident">d</span>.<span class="ident">day</span>()))),
-                <span class="ident">WeekFromSun</span> =&gt; (<span class="number">2</span>, <span class="ident">date</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">i64::from</span>(<span class="ident">week_from_sun</span>(<span class="ident">d</span>)))),
-                <span class="ident">WeekFromMon</span> =&gt; (<span class="number">2</span>, <span class="ident">date</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">i64::from</span>(<span class="ident">week_from_mon</span>(<span class="ident">d</span>)))),
-                <span class="ident">IsoWeek</span> =&gt; (<span class="number">2</span>, <span class="ident">date</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">i64::from</span>(<span class="ident">d</span>.<span class="ident">iso_week</span>().<span class="ident">week</span>()))),
-                <span class="ident">NumDaysFromSun</span> =&gt; (<span class="number">1</span>, <span class="ident">date</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">i64::from</span>(<span class="ident">d</span>.<span class="ident">weekday</span>().<span class="ident">num_days_from_sunday</span>()))),
-                <span class="ident">WeekdayFromMon</span> =&gt; (<span class="number">1</span>, <span class="ident">date</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">i64::from</span>(<span class="ident">d</span>.<span class="ident">weekday</span>().<span class="ident">number_from_monday</span>()))),
-                <span class="ident">Ordinal</span> =&gt; (<span class="number">3</span>, <span class="ident">date</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">i64::from</span>(<span class="ident">d</span>.<span class="ident">ordinal</span>()))),
-                <span class="ident">Hour</span> =&gt; (<span class="number">2</span>, <span class="ident">time</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">i64::from</span>(<span class="ident">t</span>.<span class="ident">hour</span>()))),
-                <span class="ident">Hour12</span> =&gt; (<span class="number">2</span>, <span class="ident">time</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">i64::from</span>(<span class="ident">t</span>.<span class="ident">hour12</span>().<span class="number">1</span>))),
-                <span class="ident">Minute</span> =&gt; (<span class="number">2</span>, <span class="ident">time</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">i64::from</span>(<span class="ident">t</span>.<span class="ident">minute</span>()))),
-                <span class="ident">Second</span> =&gt; (<span class="number">2</span>, <span class="ident">time</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">i64::from</span>(<span class="ident">t</span>.<span class="ident">second</span>() <span class="op">+</span> <span class="ident">t</span>.<span class="ident">nanosecond</span>() <span class="op">/</span> <span class="number">1_000_000_000</span>))),
-                <span class="ident">Nanosecond</span> =&gt; (<span class="number">9</span>, <span class="ident">time</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">i64::from</span>(<span class="ident">t</span>.<span class="ident">nanosecond</span>() <span class="op">%</span> <span class="number">1_000_000_000</span>))),
-                <span class="ident">Timestamp</span> =&gt; (
+            <span class="kw">let </span>(width, v) = <span class="kw">match </span><span class="kw-2">*</span>spec {
+                Year =&gt; (<span class="number">4</span>, date.map(|d| i64::from(d.year()))),
+                YearDiv100 =&gt; (<span class="number">2</span>, date.map(|d| div_floor(i64::from(d.year()), <span class="number">100</span>))),
+                YearMod100 =&gt; (<span class="number">2</span>, date.map(|d| mod_floor(i64::from(d.year()), <span class="number">100</span>))),
+                IsoYear =&gt; (<span class="number">4</span>, date.map(|d| i64::from(d.iso_week().year()))),
+                IsoYearDiv100 =&gt; (<span class="number">2</span>, date.map(|d| div_floor(i64::from(d.iso_week().year()), <span class="number">100</span>))),
+                IsoYearMod100 =&gt; (<span class="number">2</span>, date.map(|d| mod_floor(i64::from(d.iso_week().year()), <span class="number">100</span>))),
+                Month =&gt; (<span class="number">2</span>, date.map(|d| i64::from(d.month()))),
+                Day =&gt; (<span class="number">2</span>, date.map(|d| i64::from(d.day()))),
+                WeekFromSun =&gt; (<span class="number">2</span>, date.map(|d| i64::from(week_from_sun(d)))),
+                WeekFromMon =&gt; (<span class="number">2</span>, date.map(|d| i64::from(week_from_mon(d)))),
+                IsoWeek =&gt; (<span class="number">2</span>, date.map(|d| i64::from(d.iso_week().week()))),
+                NumDaysFromSun =&gt; (<span class="number">1</span>, date.map(|d| i64::from(d.weekday().num_days_from_sunday()))),
+                WeekdayFromMon =&gt; (<span class="number">1</span>, date.map(|d| i64::from(d.weekday().number_from_monday()))),
+                Ordinal =&gt; (<span class="number">3</span>, date.map(|d| i64::from(d.ordinal()))),
+                Hour =&gt; (<span class="number">2</span>, time.map(|t| i64::from(t.hour()))),
+                Hour12 =&gt; (<span class="number">2</span>, time.map(|t| i64::from(t.hour12().<span class="number">1</span>))),
+                Minute =&gt; (<span class="number">2</span>, time.map(|t| i64::from(t.minute()))),
+                Second =&gt; (<span class="number">2</span>, time.map(|t| i64::from(t.second() + t.nanosecond() / <span class="number">1_000_000_000</span>))),
+                Nanosecond =&gt; (<span class="number">9</span>, time.map(|t| i64::from(t.nanosecond() % <span class="number">1_000_000_000</span>))),
+                Timestamp =&gt; (
                     <span class="number">1</span>,
-                    <span class="kw">match</span> (<span class="ident">date</span>, <span class="ident">time</span>, <span class="ident">off</span>) {
-                        (<span class="prelude-val">Some</span>(<span class="ident">d</span>), <span class="prelude-val">Some</span>(<span class="ident">t</span>), <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">d</span>.<span class="ident">and_time</span>(<span class="kw-2">*</span><span class="ident">t</span>).<span class="ident">timestamp</span>()),
-                        (<span class="prelude-val">Some</span>(<span class="ident">d</span>), <span class="prelude-val">Some</span>(<span class="ident">t</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="ident">off</span>))) =&gt; {
-                            <span class="prelude-val">Some</span>((<span class="ident">d</span>.<span class="ident">and_time</span>(<span class="kw-2">*</span><span class="ident">t</span>) <span class="op">-</span> <span class="ident">off</span>).<span class="ident">timestamp</span>())
+                    <span class="kw">match </span>(date, time, off) {
+                        (<span class="prelude-val">Some</span>(d), <span class="prelude-val">Some</span>(t), <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Some</span>(d.and_time(<span class="kw-2">*</span>t).timestamp()),
+                        (<span class="prelude-val">Some</span>(d), <span class="prelude-val">Some</span>(t), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(<span class="kw">_</span>, off))) =&gt; {
+                            <span class="prelude-val">Some</span>((d.and_time(<span class="kw-2">*</span>t) - off).timestamp())
                         }
                         (<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
                     },
                 ),
 
-                <span class="comment">// for the future expansion</span>
-                <span class="ident">Internal</span>(<span class="kw-2">ref</span> <span class="ident">int</span>) =&gt; <span class="kw">match</span> <span class="ident">int</span>.<span class="ident">_dummy</span> {},
+                <span class="comment">// for the future expansion
+                </span>Internal(<span class="kw-2">ref </span>int) =&gt; <span class="kw">match </span>int._dummy {},
             };
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="ident">v</span> {
-                <span class="kw">if</span> (<span class="ident">spec</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">Year</span> <span class="op">|</span><span class="op">|</span> <span class="ident">spec</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">IsoYear</span>) <span class="op">&amp;&amp;</span> <span class="op">!</span>(<span class="number">0</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">v</span> <span class="op">&amp;&amp;</span> <span class="ident">v</span> <span class="op">&lt;</span> <span class="number">10_000</span>) {
-                    <span class="comment">// non-four-digit years require an explicit sign as per ISO 8601</span>
-                    <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">pad</span> {
-                        <span class="ident">Pad::None</span> =&gt; <span class="macro">write!</span>(<span class="ident">result</span>, <span class="string">&quot;{:+}&quot;</span>, <span class="ident">v</span>),
-                        <span class="ident">Pad::Zero</span> =&gt; <span class="macro">write!</span>(<span class="ident">result</span>, <span class="string">&quot;{:+01$}&quot;</span>, <span class="ident">v</span>, <span class="ident">width</span> <span class="op">+</span> <span class="number">1</span>),
-                        <span class="ident">Pad::Space</span> =&gt; <span class="macro">write!</span>(<span class="ident">result</span>, <span class="string">&quot;{:+1$}&quot;</span>, <span class="ident">v</span>, <span class="ident">width</span> <span class="op">+</span> <span class="number">1</span>),
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(v) = v {
+                <span class="kw">if </span>(spec == <span class="kw-2">&amp;</span>Year || spec == <span class="kw-2">&amp;</span>IsoYear) &amp;&amp; !(<span class="number">0 </span>&lt;= v &amp;&amp; v &lt; <span class="number">10_000</span>) {
+                    <span class="comment">// non-four-digit years require an explicit sign as per ISO 8601
+                    </span><span class="kw">match </span><span class="kw-2">*</span>pad {
+                        Pad::None =&gt; <span class="macro">write!</span>(result, <span class="string">&quot;{:+}&quot;</span>, v),
+                        Pad::Zero =&gt; <span class="macro">write!</span>(result, <span class="string">&quot;{:+01$}&quot;</span>, v, width + <span class="number">1</span>),
+                        Pad::Space =&gt; <span class="macro">write!</span>(result, <span class="string">&quot;{:+1$}&quot;</span>, v, width + <span class="number">1</span>),
                     }
-                } <span class="kw">else</span> {
-                    <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">pad</span> {
-                        <span class="ident">Pad::None</span> =&gt; <span class="macro">write!</span>(<span class="ident">result</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">v</span>),
-                        <span class="ident">Pad::Zero</span> =&gt; <span class="macro">write!</span>(<span class="ident">result</span>, <span class="string">&quot;{:01$}&quot;</span>, <span class="ident">v</span>, <span class="ident">width</span>),
-                        <span class="ident">Pad::Space</span> =&gt; <span class="macro">write!</span>(<span class="ident">result</span>, <span class="string">&quot;{:1$}&quot;</span>, <span class="ident">v</span>, <span class="ident">width</span>),
+                } <span class="kw">else </span>{
+                    <span class="kw">match </span><span class="kw-2">*</span>pad {
+                        Pad::None =&gt; <span class="macro">write!</span>(result, <span class="string">&quot;{}&quot;</span>, v),
+                        Pad::Zero =&gt; <span class="macro">write!</span>(result, <span class="string">&quot;{:01$}&quot;</span>, v, width),
+                        Pad::Space =&gt; <span class="macro">write!</span>(result, <span class="string">&quot;{:1$}&quot;</span>, v, width),
                     }
-                }<span class="question-mark">?</span>
-            } <span class="kw">else</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">fmt::Error</span>); <span class="comment">// insufficient arguments for given format</span>
-            }
+                }<span class="question-mark">?
+            </span>} <span class="kw">else </span>{
+                <span class="kw">return </span><span class="prelude-val">Err</span>(fmt::Error); <span class="comment">// insufficient arguments for given format
+            </span>}
         }
 
-        <span class="ident">Item::Fixed</span>(<span class="kw-2">ref</span> <span class="ident">spec</span>) =&gt; {
-            <span class="kw">use</span> <span class="ident"><span class="self">self</span>::Fixed</span>::<span class="kw-2">*</span>;
+        Item::Fixed(<span class="kw-2">ref </span>spec) =&gt; {
+            <span class="kw">use </span><span class="self">self</span>::Fixed::<span class="kw-2">*</span>;
 
-            <span class="doccomment">/// Prints an offset from UTC in the format of `+HHMM` or `+HH:MM`.</span>
-            <span class="doccomment">/// `Z` instead of `+00[:]00` is allowed when `allow_zulu` is true.</span>
-            <span class="kw">fn</span> <span class="ident">write_local_minus_utc</span>(
-                <span class="ident">result</span>: <span class="kw-2">&amp;mut</span> <span class="ident">String</span>,
-                <span class="ident">off</span>: <span class="ident">FixedOffset</span>,
-                <span class="ident">allow_zulu</span>: <span class="ident">bool</span>,
-                <span class="ident">use_colon</span>: <span class="ident">bool</span>,
-            ) -&gt; <span class="ident">fmt::Result</span> {
-                <span class="kw">let</span> <span class="ident">off</span> <span class="op">=</span> <span class="ident">off</span>.<span class="ident">local_minus_utc</span>();
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">allow_zulu</span> <span class="op">|</span><span class="op">|</span> <span class="ident">off</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                    <span class="kw">let</span> (<span class="ident">sign</span>, <span class="ident">off</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">off</span> <span class="op">&lt;</span> <span class="number">0</span> { (<span class="string">&#39;-&#39;</span>, <span class="op">-</span><span class="ident">off</span>) } <span class="kw">else</span> { (<span class="string">&#39;+&#39;</span>, <span class="ident">off</span>) };
-                    <span class="kw">if</span> <span class="ident">use_colon</span> {
-                        <span class="macro">write!</span>(<span class="ident">result</span>, <span class="string">&quot;{}{:02}:{:02}&quot;</span>, <span class="ident">sign</span>, <span class="ident">off</span> <span class="op">/</span> <span class="number">3600</span>, <span class="ident">off</span> <span class="op">/</span> <span class="number">60</span> <span class="op">%</span> <span class="number">60</span>)
-                    } <span class="kw">else</span> {
-                        <span class="macro">write!</span>(<span class="ident">result</span>, <span class="string">&quot;{}{:02}{:02}&quot;</span>, <span class="ident">sign</span>, <span class="ident">off</span> <span class="op">/</span> <span class="number">3600</span>, <span class="ident">off</span> <span class="op">/</span> <span class="number">60</span> <span class="op">%</span> <span class="number">60</span>)
+            <span class="doccomment">/// Prints an offset from UTC in the format of `+HHMM` or `+HH:MM`.
+            /// `Z` instead of `+00[:]00` is allowed when `allow_zulu` is true.
+            </span><span class="kw">fn </span>write_local_minus_utc(
+                result: <span class="kw-2">&amp;mut </span>String,
+                off: FixedOffset,
+                allow_zulu: bool,
+                use_colon: bool,
+            ) -&gt; fmt::Result {
+                <span class="kw">let </span>off = off.local_minus_utc();
+                <span class="kw">if </span>!allow_zulu || off != <span class="number">0 </span>{
+                    <span class="kw">let </span>(sign, off) = <span class="kw">if </span>off &lt; <span class="number">0 </span>{ (<span class="string">&#39;-&#39;</span>, -off) } <span class="kw">else </span>{ (<span class="string">&#39;+&#39;</span>, off) };
+                    <span class="kw">if </span>use_colon {
+                        <span class="macro">write!</span>(result, <span class="string">&quot;{}{:02}:{:02}&quot;</span>, sign, off / <span class="number">3600</span>, off / <span class="number">60 </span>% <span class="number">60</span>)
+                    } <span class="kw">else </span>{
+                        <span class="macro">write!</span>(result, <span class="string">&quot;{}{:02}{:02}&quot;</span>, sign, off / <span class="number">3600</span>, off / <span class="number">60 </span>% <span class="number">60</span>)
                     }
-                } <span class="kw">else</span> {
-                    <span class="ident">result</span>.<span class="ident">push</span>(<span class="string">&#39;Z&#39;</span>);
+                } <span class="kw">else </span>{
+                    result.push(<span class="string">&#39;Z&#39;</span>);
                     <span class="prelude-val">Ok</span>(())
                 }
             }
 
-            <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span>
-                <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">spec</span> {
-                    <span class="ident">ShortMonthName</span> =&gt; <span class="ident">date</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> {
-                        <span class="ident">result</span>.<span class="ident">push_str</span>(<span class="ident">short_months</span>[<span class="ident">d</span>.<span class="ident">month0</span>() <span class="kw">as</span> <span class="ident">usize</span>]);
+            <span class="kw">let </span>ret =
+                <span class="kw">match </span><span class="kw-2">*</span>spec {
+                    ShortMonthName =&gt; date.map(|d| {
+                        result.push_str(short_months[d.month0() <span class="kw">as </span>usize]);
                         <span class="prelude-val">Ok</span>(())
                     }),
-                    <span class="ident">LongMonthName</span> =&gt; <span class="ident">date</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> {
-                        <span class="ident">result</span>.<span class="ident">push_str</span>(<span class="ident">long_months</span>[<span class="ident">d</span>.<span class="ident">month0</span>() <span class="kw">as</span> <span class="ident">usize</span>]);
+                    LongMonthName =&gt; date.map(|d| {
+                        result.push_str(long_months[d.month0() <span class="kw">as </span>usize]);
                         <span class="prelude-val">Ok</span>(())
                     }),
-                    <span class="ident">ShortWeekdayName</span> =&gt; <span class="ident">date</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> {
-                        <span class="ident">result</span>
-                            .<span class="ident">push_str</span>(<span class="ident">short_weekdays</span>[<span class="ident">d</span>.<span class="ident">weekday</span>().<span class="ident">num_days_from_sunday</span>() <span class="kw">as</span> <span class="ident">usize</span>]);
+                    ShortWeekdayName =&gt; date.map(|d| {
+                        result
+                            .push_str(short_weekdays[d.weekday().num_days_from_sunday() <span class="kw">as </span>usize]);
                         <span class="prelude-val">Ok</span>(())
                     }),
-                    <span class="ident">LongWeekdayName</span> =&gt; <span class="ident">date</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> {
-                        <span class="ident">result</span>.<span class="ident">push_str</span>(<span class="ident">long_weekdays</span>[<span class="ident">d</span>.<span class="ident">weekday</span>().<span class="ident">num_days_from_sunday</span>() <span class="kw">as</span> <span class="ident">usize</span>]);
+                    LongWeekdayName =&gt; date.map(|d| {
+                        result.push_str(long_weekdays[d.weekday().num_days_from_sunday() <span class="kw">as </span>usize]);
                         <span class="prelude-val">Ok</span>(())
                     }),
-                    <span class="ident">LowerAmPm</span> =&gt; <span class="ident">time</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> {
-                        <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cargo-clippy&quot;</span>, <span class="ident">allow</span>(<span class="ident">clippy::useless_asref</span>))]</span>
-                        {
-                            <span class="ident">result</span>.<span class="ident">push_str</span>(<span class="kw">if</span> <span class="ident">t</span>.<span class="ident">hour12</span>().<span class="number">0</span> {
-                                <span class="ident">am_pm_lowercase</span>[<span class="number">1</span>].<span class="ident">as_ref</span>()
-                            } <span class="kw">else</span> {
-                                <span class="ident">am_pm_lowercase</span>[<span class="number">0</span>].<span class="ident">as_ref</span>()
+                    LowerAmPm =&gt; time.map(|t| {
+                        <span class="attribute">#[cfg_attr(feature = <span class="string">&quot;cargo-clippy&quot;</span>, allow(clippy::useless_asref))]
+                        </span>{
+                            result.push_str(<span class="kw">if </span>t.hour12().<span class="number">0 </span>{
+                                am_pm_lowercase[<span class="number">1</span>].as_ref()
+                            } <span class="kw">else </span>{
+                                am_pm_lowercase[<span class="number">0</span>].as_ref()
                             });
                         }
                         <span class="prelude-val">Ok</span>(())
                     }),
-                    <span class="ident">UpperAmPm</span> =&gt; <span class="ident">time</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> {
-                        <span class="ident">result</span>.<span class="ident">push_str</span>(<span class="kw">if</span> <span class="ident">t</span>.<span class="ident">hour12</span>().<span class="number">0</span> { <span class="ident">am_pm</span>[<span class="number">1</span>] } <span class="kw">else</span> { <span class="ident">am_pm</span>[<span class="number">0</span>] });
+                    UpperAmPm =&gt; time.map(|t| {
+                        result.push_str(<span class="kw">if </span>t.hour12().<span class="number">0 </span>{ am_pm[<span class="number">1</span>] } <span class="kw">else </span>{ am_pm[<span class="number">0</span>] });
                         <span class="prelude-val">Ok</span>(())
                     }),
-                    <span class="ident">Nanosecond</span> =&gt; <span class="ident">time</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> {
-                        <span class="kw">let</span> <span class="ident">nano</span> <span class="op">=</span> <span class="ident">t</span>.<span class="ident">nanosecond</span>() <span class="op">%</span> <span class="number">1_000_000_000</span>;
-                        <span class="kw">if</span> <span class="ident">nano</span> <span class="op">==</span> <span class="number">0</span> {
+                    Nanosecond =&gt; time.map(|t| {
+                        <span class="kw">let </span>nano = t.nanosecond() % <span class="number">1_000_000_000</span>;
+                        <span class="kw">if </span>nano == <span class="number">0 </span>{
                             <span class="prelude-val">Ok</span>(())
-                        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">nano</span> <span class="op">%</span> <span class="number">1_000_000</span> <span class="op">==</span> <span class="number">0</span> {
-                            <span class="macro">write!</span>(<span class="ident">result</span>, <span class="string">&quot;.{:03}&quot;</span>, <span class="ident">nano</span> <span class="op">/</span> <span class="number">1_000_000</span>)
-                        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">nano</span> <span class="op">%</span> <span class="number">1_000</span> <span class="op">==</span> <span class="number">0</span> {
-                            <span class="macro">write!</span>(<span class="ident">result</span>, <span class="string">&quot;.{:06}&quot;</span>, <span class="ident">nano</span> <span class="op">/</span> <span class="number">1_000</span>)
-                        } <span class="kw">else</span> {
-                            <span class="macro">write!</span>(<span class="ident">result</span>, <span class="string">&quot;.{:09}&quot;</span>, <span class="ident">nano</span>)
+                        } <span class="kw">else if </span>nano % <span class="number">1_000_000 </span>== <span class="number">0 </span>{
+                            <span class="macro">write!</span>(result, <span class="string">&quot;.{:03}&quot;</span>, nano / <span class="number">1_000_000</span>)
+                        } <span class="kw">else if </span>nano % <span class="number">1_000 </span>== <span class="number">0 </span>{
+                            <span class="macro">write!</span>(result, <span class="string">&quot;.{:06}&quot;</span>, nano / <span class="number">1_000</span>)
+                        } <span class="kw">else </span>{
+                            <span class="macro">write!</span>(result, <span class="string">&quot;.{:09}&quot;</span>, nano)
                         }
                     }),
-                    <span class="ident">Nanosecond3</span> =&gt; <span class="ident">time</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> {
-                        <span class="kw">let</span> <span class="ident">nano</span> <span class="op">=</span> <span class="ident">t</span>.<span class="ident">nanosecond</span>() <span class="op">%</span> <span class="number">1_000_000_000</span>;
-                        <span class="macro">write!</span>(<span class="ident">result</span>, <span class="string">&quot;.{:03}&quot;</span>, <span class="ident">nano</span> <span class="op">/</span> <span class="number">1_000_000</span>)
+                    Nanosecond3 =&gt; time.map(|t| {
+                        <span class="kw">let </span>nano = t.nanosecond() % <span class="number">1_000_000_000</span>;
+                        <span class="macro">write!</span>(result, <span class="string">&quot;.{:03}&quot;</span>, nano / <span class="number">1_000_000</span>)
                     }),
-                    <span class="ident">Nanosecond6</span> =&gt; <span class="ident">time</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> {
-                        <span class="kw">let</span> <span class="ident">nano</span> <span class="op">=</span> <span class="ident">t</span>.<span class="ident">nanosecond</span>() <span class="op">%</span> <span class="number">1_000_000_000</span>;
-                        <span class="macro">write!</span>(<span class="ident">result</span>, <span class="string">&quot;.{:06}&quot;</span>, <span class="ident">nano</span> <span class="op">/</span> <span class="number">1_000</span>)
+                    Nanosecond6 =&gt; time.map(|t| {
+                        <span class="kw">let </span>nano = t.nanosecond() % <span class="number">1_000_000_000</span>;
+                        <span class="macro">write!</span>(result, <span class="string">&quot;.{:06}&quot;</span>, nano / <span class="number">1_000</span>)
                     }),
-                    <span class="ident">Nanosecond9</span> =&gt; <span class="ident">time</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> {
-                        <span class="kw">let</span> <span class="ident">nano</span> <span class="op">=</span> <span class="ident">t</span>.<span class="ident">nanosecond</span>() <span class="op">%</span> <span class="number">1_000_000_000</span>;
-                        <span class="macro">write!</span>(<span class="ident">result</span>, <span class="string">&quot;.{:09}&quot;</span>, <span class="ident">nano</span>)
+                    Nanosecond9 =&gt; time.map(|t| {
+                        <span class="kw">let </span>nano = t.nanosecond() % <span class="number">1_000_000_000</span>;
+                        <span class="macro">write!</span>(result, <span class="string">&quot;.{:09}&quot;</span>, nano)
                     }),
-                    <span class="ident">Internal</span>(<span class="ident">InternalFixed</span> { <span class="ident">val</span>: <span class="ident">InternalInternal::Nanosecond3NoDot</span> }) =&gt; <span class="ident">time</span>
-                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> {
-                            <span class="kw">let</span> <span class="ident">nano</span> <span class="op">=</span> <span class="ident">t</span>.<span class="ident">nanosecond</span>() <span class="op">%</span> <span class="number">1_000_000_000</span>;
-                            <span class="macro">write!</span>(<span class="ident">result</span>, <span class="string">&quot;{:03}&quot;</span>, <span class="ident">nano</span> <span class="op">/</span> <span class="number">1_000_000</span>)
+                    Internal(InternalFixed { val: InternalInternal::Nanosecond3NoDot }) =&gt; time
+                        .map(|t| {
+                            <span class="kw">let </span>nano = t.nanosecond() % <span class="number">1_000_000_000</span>;
+                            <span class="macro">write!</span>(result, <span class="string">&quot;{:03}&quot;</span>, nano / <span class="number">1_000_000</span>)
                         }),
-                    <span class="ident">Internal</span>(<span class="ident">InternalFixed</span> { <span class="ident">val</span>: <span class="ident">InternalInternal::Nanosecond6NoDot</span> }) =&gt; <span class="ident">time</span>
-                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> {
-                            <span class="kw">let</span> <span class="ident">nano</span> <span class="op">=</span> <span class="ident">t</span>.<span class="ident">nanosecond</span>() <span class="op">%</span> <span class="number">1_000_000_000</span>;
-                            <span class="macro">write!</span>(<span class="ident">result</span>, <span class="string">&quot;{:06}&quot;</span>, <span class="ident">nano</span> <span class="op">/</span> <span class="number">1_000</span>)
+                    Internal(InternalFixed { val: InternalInternal::Nanosecond6NoDot }) =&gt; time
+                        .map(|t| {
+                            <span class="kw">let </span>nano = t.nanosecond() % <span class="number">1_000_000_000</span>;
+                            <span class="macro">write!</span>(result, <span class="string">&quot;{:06}&quot;</span>, nano / <span class="number">1_000</span>)
                         }),
-                    <span class="ident">Internal</span>(<span class="ident">InternalFixed</span> { <span class="ident">val</span>: <span class="ident">InternalInternal::Nanosecond9NoDot</span> }) =&gt; <span class="ident">time</span>
-                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> {
-                            <span class="kw">let</span> <span class="ident">nano</span> <span class="op">=</span> <span class="ident">t</span>.<span class="ident">nanosecond</span>() <span class="op">%</span> <span class="number">1_000_000_000</span>;
-                            <span class="macro">write!</span>(<span class="ident">result</span>, <span class="string">&quot;{:09}&quot;</span>, <span class="ident">nano</span>)
+                    Internal(InternalFixed { val: InternalInternal::Nanosecond9NoDot }) =&gt; time
+                        .map(|t| {
+                            <span class="kw">let </span>nano = t.nanosecond() % <span class="number">1_000_000_000</span>;
+                            <span class="macro">write!</span>(result, <span class="string">&quot;{:09}&quot;</span>, nano)
                         }),
-                    <span class="ident">TimezoneName</span> =&gt; <span class="ident">off</span>.<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="kw-2">ref</span> <span class="ident">name</span>, <span class="kw">_</span>)<span class="op">|</span> {
-                        <span class="ident">result</span>.<span class="ident">push_str</span>(<span class="ident">name</span>);
+                    TimezoneName =&gt; off.map(|<span class="kw-2">&amp;</span>(<span class="kw-2">ref </span>name, <span class="kw">_</span>)| {
+                        result.push_str(name);
                         <span class="prelude-val">Ok</span>(())
                     }),
-                    <span class="ident">TimezoneOffsetColon</span> =&gt; {
-                        <span class="ident">off</span>.<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="ident">off</span>)<span class="op">|</span> <span class="ident">write_local_minus_utc</span>(<span class="ident">result</span>, <span class="ident">off</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>))
+                    TimezoneOffsetColon =&gt; {
+                        off.map(|<span class="kw-2">&amp;</span>(<span class="kw">_</span>, off)| write_local_minus_utc(result, off, <span class="bool-val">false</span>, <span class="bool-val">true</span>))
                     }
-                    <span class="ident">TimezoneOffsetColonZ</span> =&gt; {
-                        <span class="ident">off</span>.<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="ident">off</span>)<span class="op">|</span> <span class="ident">write_local_minus_utc</span>(<span class="ident">result</span>, <span class="ident">off</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>))
+                    TimezoneOffsetColonZ =&gt; {
+                        off.map(|<span class="kw-2">&amp;</span>(<span class="kw">_</span>, off)| write_local_minus_utc(result, off, <span class="bool-val">true</span>, <span class="bool-val">true</span>))
                     }
-                    <span class="ident">TimezoneOffset</span> =&gt; {
-                        <span class="ident">off</span>.<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="ident">off</span>)<span class="op">|</span> <span class="ident">write_local_minus_utc</span>(<span class="ident">result</span>, <span class="ident">off</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>))
+                    TimezoneOffset =&gt; {
+                        off.map(|<span class="kw-2">&amp;</span>(<span class="kw">_</span>, off)| write_local_minus_utc(result, off, <span class="bool-val">false</span>, <span class="bool-val">false</span>))
                     }
-                    <span class="ident">TimezoneOffsetZ</span> =&gt; {
-                        <span class="ident">off</span>.<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="ident">off</span>)<span class="op">|</span> <span class="ident">write_local_minus_utc</span>(<span class="ident">result</span>, <span class="ident">off</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>))
+                    TimezoneOffsetZ =&gt; {
+                        off.map(|<span class="kw-2">&amp;</span>(<span class="kw">_</span>, off)| write_local_minus_utc(result, off, <span class="bool-val">true</span>, <span class="bool-val">false</span>))
                     }
-                    <span class="ident">Internal</span>(<span class="ident">InternalFixed</span> { <span class="ident">val</span>: <span class="ident">InternalInternal::TimezoneOffsetPermissive</span> }) =&gt; {
+                    Internal(InternalFixed { val: InternalInternal::TimezoneOffsetPermissive }) =&gt; {
                         <span class="macro">panic!</span>(<span class="string">&quot;Do not try to write %#z it is undefined&quot;</span>)
                     }
-                    <span class="ident">RFC2822</span> =&gt;
-                    <span class="comment">// same as `%a, %d %b %Y %H:%M:%S %z`</span>
-                    {
-                        <span class="kw">if</span> <span class="kw">let</span> (<span class="prelude-val">Some</span>(<span class="ident">d</span>), <span class="prelude-val">Some</span>(<span class="ident">t</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="ident">off</span>))) <span class="op">=</span> (<span class="ident">date</span>, <span class="ident">time</span>, <span class="ident">off</span>) {
-                            <span class="kw">let</span> <span class="ident">sec</span> <span class="op">=</span> <span class="ident">t</span>.<span class="ident">second</span>() <span class="op">+</span> <span class="ident">t</span>.<span class="ident">nanosecond</span>() <span class="op">/</span> <span class="number">1_000_000_000</span>;
+                    RFC2822 =&gt;
+                    <span class="comment">// same as `%a, %d %b %Y %H:%M:%S %z`
+                    </span>{
+                        <span class="kw">if let </span>(<span class="prelude-val">Some</span>(d), <span class="prelude-val">Some</span>(t), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(<span class="kw">_</span>, off))) = (date, time, off) {
+                            <span class="kw">let </span>sec = t.second() + t.nanosecond() / <span class="number">1_000_000_000</span>;
                             <span class="macro">write!</span>(
-                                <span class="ident">result</span>,
+                                result,
                                 <span class="string">&quot;{}, {:02} {} {:04} {:02}:{:02}:{:02} &quot;</span>,
-                                <span class="ident">short_weekdays</span>[<span class="ident">d</span>.<span class="ident">weekday</span>().<span class="ident">num_days_from_sunday</span>() <span class="kw">as</span> <span class="ident">usize</span>],
-                                <span class="ident">d</span>.<span class="ident">day</span>(),
-                                <span class="ident">short_months</span>[<span class="ident">d</span>.<span class="ident">month0</span>() <span class="kw">as</span> <span class="ident">usize</span>],
-                                <span class="ident">d</span>.<span class="ident">year</span>(),
-                                <span class="ident">t</span>.<span class="ident">hour</span>(),
-                                <span class="ident">t</span>.<span class="ident">minute</span>(),
-                                <span class="ident">sec</span>
+                                short_weekdays[d.weekday().num_days_from_sunday() <span class="kw">as </span>usize],
+                                d.day(),
+                                short_months[d.month0() <span class="kw">as </span>usize],
+                                d.year(),
+                                t.hour(),
+                                t.minute(),
+                                sec
                             )<span class="question-mark">?</span>;
-                            <span class="prelude-val">Some</span>(<span class="ident">write_local_minus_utc</span>(<span class="ident">result</span>, <span class="ident">off</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>))
-                        } <span class="kw">else</span> {
-                            <span class="prelude-val">None</span>
-                        }
+                            <span class="prelude-val">Some</span>(write_local_minus_utc(result, off, <span class="bool-val">false</span>, <span class="bool-val">false</span>))
+                        } <span class="kw">else </span>{
+                            <span class="prelude-val">None
+                        </span>}
                     }
-                    <span class="ident">RFC3339</span> =&gt;
-                    <span class="comment">// same as `%Y-%m-%dT%H:%M:%S%.f%:z`</span>
-                    {
-                        <span class="kw">if</span> <span class="kw">let</span> (<span class="prelude-val">Some</span>(<span class="ident">d</span>), <span class="prelude-val">Some</span>(<span class="ident">t</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="ident">off</span>))) <span class="op">=</span> (<span class="ident">date</span>, <span class="ident">time</span>, <span class="ident">off</span>) {
-                            <span class="comment">// reuse `Debug` impls which already print ISO 8601 format.</span>
-                            <span class="comment">// this is faster in this way.</span>
-                            <span class="macro">write!</span>(<span class="ident">result</span>, <span class="string">&quot;{:?}T{:?}&quot;</span>, <span class="ident">d</span>, <span class="ident">t</span>)<span class="question-mark">?</span>;
-                            <span class="prelude-val">Some</span>(<span class="ident">write_local_minus_utc</span>(<span class="ident">result</span>, <span class="ident">off</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>))
-                        } <span class="kw">else</span> {
-                            <span class="prelude-val">None</span>
-                        }
+                    RFC3339 =&gt;
+                    <span class="comment">// same as `%Y-%m-%dT%H:%M:%S%.f%:z`
+                    </span>{
+                        <span class="kw">if let </span>(<span class="prelude-val">Some</span>(d), <span class="prelude-val">Some</span>(t), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(<span class="kw">_</span>, off))) = (date, time, off) {
+                            <span class="comment">// reuse `Debug` impls which already print ISO 8601 format.
+                            // this is faster in this way.
+                            </span><span class="macro">write!</span>(result, <span class="string">&quot;{:?}T{:?}&quot;</span>, d, t)<span class="question-mark">?</span>;
+                            <span class="prelude-val">Some</span>(write_local_minus_utc(result, off, <span class="bool-val">false</span>, <span class="bool-val">true</span>))
+                        } <span class="kw">else </span>{
+                            <span class="prelude-val">None
+                        </span>}
                     }
                 };
 
-            <span class="kw">match</span> <span class="ident">ret</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">ret</span>) =&gt; <span class="ident">ret</span><span class="question-mark">?</span>,
-                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">fmt::Error</span>), <span class="comment">// insufficient arguments for given format</span>
-            }
+            <span class="kw">match </span>ret {
+                <span class="prelude-val">Some</span>(ret) =&gt; ret<span class="question-mark">?</span>,
+                <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(fmt::Error), <span class="comment">// insufficient arguments for given format
+            </span>}
         }
 
-        <span class="ident">Item::Error</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">fmt::Error</span>),
+        Item::Error =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(fmt::Error),
     }
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="doccomment">/// Tries to format given arguments with given formatting items.</span>
-<span class="doccomment">/// Internally used by `DelayedFormat`.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">test</span>))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">format</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">I</span>, <span class="ident">B</span><span class="op">&gt;</span>(
-    <span class="ident">w</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>,
-    <span class="ident">date</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">NaiveDate</span><span class="op">&gt;</span>,
-    <span class="ident">time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">NaiveTime</span><span class="op">&gt;</span>,
-    <span class="ident">off</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="ident">String</span>, <span class="ident">FixedOffset</span>)<span class="op">&gt;</span>,
-    <span class="ident">items</span>: <span class="ident">I</span>,
-) -&gt; <span class="ident">fmt::Result</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">B</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="ident">B</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Tries to format given arguments with given formatting items.
+/// Internally used by `DelayedFormat`.
+</span><span class="attribute">#[cfg(any(feature = <span class="string">&quot;alloc&quot;</span>, feature = <span class="string">&quot;std&quot;</span>, test))]
+</span><span class="kw">pub fn </span>format&lt;<span class="lifetime">&#39;a</span>, I, B&gt;(
+    w: <span class="kw-2">&amp;mut </span>fmt::Formatter,
+    date: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>NaiveDate&gt;,
+    time: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>NaiveTime&gt;,
+    off: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>(String, FixedOffset)&gt;,
+    items: I,
+) -&gt; fmt::Result
+<span class="kw">where
+    </span>I: Iterator&lt;Item = B&gt; + Clone,
+    B: Borrow&lt;Item&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">String::new</span>();
-    <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="ident">items</span> {
-        <span class="ident">format_inner</span>(<span class="kw-2">&amp;mut</span> <span class="ident">result</span>, <span class="ident">date</span>, <span class="ident">time</span>, <span class="ident">off</span>, <span class="ident">item</span>.<span class="ident">borrow</span>(), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>result = String::new();
+    <span class="kw">for </span>item <span class="kw">in </span>items {
+        format_inner(<span class="kw-2">&amp;mut </span>result, date, time, off, item.borrow(), <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
     }
-    <span class="ident">w</span>.<span class="ident">pad</span>(<span class="kw-2">&amp;</span><span class="ident">result</span>)
+    w.pad(<span class="kw-2">&amp;</span>result)
 }
 
-<span class="kw">mod</span> <span class="ident">parsed</span>;
+<span class="kw">mod </span>parsed;
 
-<span class="comment">// due to the size of parsing routines, they are in separate modules.</span>
-<span class="kw">mod</span> <span class="ident">parse</span>;
-<span class="kw">mod</span> <span class="ident">scan</span>;
+<span class="comment">// due to the size of parsing routines, they are in separate modules.
+</span><span class="kw">mod </span>parse;
+<span class="kw">mod </span>scan;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">strftime</span>;
+<span class="kw">pub mod </span>strftime;
 
-<span class="doccomment">/// A *temporary* object which can be used as an argument to `format!` or others.</span>
-<span class="doccomment">/// This is normally constructed via `format` methods of each date and time type.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">test</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DelayedFormat</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The date view, if any.</span>
-    <span class="ident">date</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NaiveDate</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The time view, if any.</span>
-    <span class="ident">time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NaiveTime</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The name and local-to-UTC difference for the offset (timezone), if any.</span>
-    <span class="ident">off</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">FixedOffset</span>)<span class="op">&gt;</span>,
-    <span class="doccomment">/// An iterator returning formatting items.</span>
-    <span class="ident">items</span>: <span class="ident">I</span>,
-    <span class="doccomment">/// Locale used for text.</span>
-    <span class="comment">// TODO: Only used with the locale feature. We should make this property</span>
-    <span class="comment">// only present when the feature is enabled.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable-locales&quot;</span>)]</span>
-    <span class="ident">locale</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Locale</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A *temporary* object which can be used as an argument to `format!` or others.
+/// This is normally constructed via `format` methods of each date and time type.
+</span><span class="attribute">#[cfg(any(feature = <span class="string">&quot;alloc&quot;</span>, feature = <span class="string">&quot;std&quot;</span>, test))]
+#[derive(Debug)]
+</span><span class="kw">pub struct </span>DelayedFormat&lt;I&gt; {
+    <span class="doccomment">/// The date view, if any.
+    </span>date: <span class="prelude-ty">Option</span>&lt;NaiveDate&gt;,
+    <span class="doccomment">/// The time view, if any.
+    </span>time: <span class="prelude-ty">Option</span>&lt;NaiveTime&gt;,
+    <span class="doccomment">/// The name and local-to-UTC difference for the offset (timezone), if any.
+    </span>off: <span class="prelude-ty">Option</span>&lt;(String, FixedOffset)&gt;,
+    <span class="doccomment">/// An iterator returning formatting items.
+    </span>items: I,
+    <span class="doccomment">/// Locale used for text.
+    </span><span class="comment">// TODO: Only used with the locale feature. We should make this property
+    // only present when the feature is enabled.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;unstable-locales&quot;</span>)]
+    </span>locale: <span class="prelude-ty">Option</span>&lt;Locale&gt;,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">test</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">B</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clone</span>, <span class="ident">B</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">DelayedFormat</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Makes a new `DelayedFormat` value out of local date and time.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">date</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NaiveDate</span><span class="op">&gt;</span>, <span class="ident">time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NaiveTime</span><span class="op">&gt;</span>, <span class="ident">items</span>: <span class="ident">I</span>) -&gt; <span class="ident">DelayedFormat</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> {
-        <span class="ident">DelayedFormat</span> {
-            <span class="ident">date</span>,
-            <span class="ident">time</span>,
-            <span class="ident">off</span>: <span class="prelude-val">None</span>,
-            <span class="ident">items</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable-locales&quot;</span>)]</span>
-            <span class="ident">locale</span>: <span class="prelude-val">None</span>,
+<span class="attribute">#[cfg(any(feature = <span class="string">&quot;alloc&quot;</span>, feature = <span class="string">&quot;std&quot;</span>, test))]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, I: Iterator&lt;Item = B&gt; + Clone, B: Borrow&lt;Item&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt; DelayedFormat&lt;I&gt; {
+    <span class="doccomment">/// Makes a new `DelayedFormat` value out of local date and time.
+    </span><span class="kw">pub fn </span>new(date: <span class="prelude-ty">Option</span>&lt;NaiveDate&gt;, time: <span class="prelude-ty">Option</span>&lt;NaiveTime&gt;, items: I) -&gt; DelayedFormat&lt;I&gt; {
+        DelayedFormat {
+            date,
+            time,
+            off: <span class="prelude-val">None</span>,
+            items,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;unstable-locales&quot;</span>)]
+            </span>locale: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Makes a new `DelayedFormat` value out of local date and time and UTC offset.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_offset</span><span class="op">&lt;</span><span class="ident">Off</span><span class="op">&gt;</span>(
-        <span class="ident">date</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NaiveDate</span><span class="op">&gt;</span>,
-        <span class="ident">time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NaiveTime</span><span class="op">&gt;</span>,
-        <span class="ident">offset</span>: <span class="kw-2">&amp;</span><span class="ident">Off</span>,
-        <span class="ident">items</span>: <span class="ident">I</span>,
-    ) -&gt; <span class="ident">DelayedFormat</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">Off</span>: <span class="ident">Offset</span> <span class="op">+</span> <span class="ident">fmt::Display</span>,
+    <span class="doccomment">/// Makes a new `DelayedFormat` value out of local date and time and UTC offset.
+    </span><span class="kw">pub fn </span>new_with_offset&lt;Off&gt;(
+        date: <span class="prelude-ty">Option</span>&lt;NaiveDate&gt;,
+        time: <span class="prelude-ty">Option</span>&lt;NaiveTime&gt;,
+        offset: <span class="kw-2">&amp;</span>Off,
+        items: I,
+    ) -&gt; DelayedFormat&lt;I&gt;
+    <span class="kw">where
+        </span>Off: Offset + fmt::Display,
     {
-        <span class="kw">let</span> <span class="ident">name_and_diff</span> <span class="op">=</span> (<span class="ident">offset</span>.<span class="ident">to_string</span>(), <span class="ident">offset</span>.<span class="ident">fix</span>());
-        <span class="ident">DelayedFormat</span> {
-            <span class="ident">date</span>,
-            <span class="ident">time</span>,
-            <span class="ident">off</span>: <span class="prelude-val">Some</span>(<span class="ident">name_and_diff</span>),
-            <span class="ident">items</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable-locales&quot;</span>)]</span>
-            <span class="ident">locale</span>: <span class="prelude-val">None</span>,
+        <span class="kw">let </span>name_and_diff = (offset.to_string(), offset.fix());
+        DelayedFormat {
+            date,
+            time,
+            off: <span class="prelude-val">Some</span>(name_and_diff),
+            items,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;unstable-locales&quot;</span>)]
+            </span>locale: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Makes a new `DelayedFormat` value out of local date and time and locale.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable-locales&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_locale</span>(
-        <span class="ident">date</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NaiveDate</span><span class="op">&gt;</span>,
-        <span class="ident">time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NaiveTime</span><span class="op">&gt;</span>,
-        <span class="ident">items</span>: <span class="ident">I</span>,
-        <span class="ident">locale</span>: <span class="ident">Locale</span>,
-    ) -&gt; <span class="ident">DelayedFormat</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> {
-        <span class="ident">DelayedFormat</span> { <span class="ident">date</span>, <span class="ident">time</span>, <span class="ident">off</span>: <span class="prelude-val">None</span>, <span class="ident">items</span>, <span class="ident">locale</span>: <span class="prelude-val">Some</span>(<span class="ident">locale</span>) }
+    <span class="doccomment">/// Makes a new `DelayedFormat` value out of local date and time and locale.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;unstable-locales&quot;</span>)]
+    </span><span class="kw">pub fn </span>new_with_locale(
+        date: <span class="prelude-ty">Option</span>&lt;NaiveDate&gt;,
+        time: <span class="prelude-ty">Option</span>&lt;NaiveTime&gt;,
+        items: I,
+        locale: Locale,
+    ) -&gt; DelayedFormat&lt;I&gt; {
+        DelayedFormat { date, time, off: <span class="prelude-val">None</span>, items, locale: <span class="prelude-val">Some</span>(locale) }
     }
 
-    <span class="doccomment">/// Makes a new `DelayedFormat` value out of local date and time, UTC offset and locale.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable-locales&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_offset_and_locale</span><span class="op">&lt;</span><span class="ident">Off</span><span class="op">&gt;</span>(
-        <span class="ident">date</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NaiveDate</span><span class="op">&gt;</span>,
-        <span class="ident">time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NaiveTime</span><span class="op">&gt;</span>,
-        <span class="ident">offset</span>: <span class="kw-2">&amp;</span><span class="ident">Off</span>,
-        <span class="ident">items</span>: <span class="ident">I</span>,
-        <span class="ident">locale</span>: <span class="ident">Locale</span>,
-    ) -&gt; <span class="ident">DelayedFormat</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">Off</span>: <span class="ident">Offset</span> <span class="op">+</span> <span class="ident">fmt::Display</span>,
+    <span class="doccomment">/// Makes a new `DelayedFormat` value out of local date and time, UTC offset and locale.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;unstable-locales&quot;</span>)]
+    </span><span class="kw">pub fn </span>new_with_offset_and_locale&lt;Off&gt;(
+        date: <span class="prelude-ty">Option</span>&lt;NaiveDate&gt;,
+        time: <span class="prelude-ty">Option</span>&lt;NaiveTime&gt;,
+        offset: <span class="kw-2">&amp;</span>Off,
+        items: I,
+        locale: Locale,
+    ) -&gt; DelayedFormat&lt;I&gt;
+    <span class="kw">where
+        </span>Off: Offset + fmt::Display,
     {
-        <span class="kw">let</span> <span class="ident">name_and_diff</span> <span class="op">=</span> (<span class="ident">offset</span>.<span class="ident">to_string</span>(), <span class="ident">offset</span>.<span class="ident">fix</span>());
-        <span class="ident">DelayedFormat</span> { <span class="ident">date</span>, <span class="ident">time</span>, <span class="ident">off</span>: <span class="prelude-val">Some</span>(<span class="ident">name_and_diff</span>), <span class="ident">items</span>, <span class="ident">locale</span>: <span class="prelude-val">Some</span>(<span class="ident">locale</span>) }
+        <span class="kw">let </span>name_and_diff = (offset.to_string(), offset.fix());
+        DelayedFormat { date, time, off: <span class="prelude-val">Some</span>(name_and_diff), items, locale: <span class="prelude-val">Some</span>(locale) }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">test</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">B</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clone</span>, <span class="ident">B</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">DelayedFormat</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable-locales&quot;</span>)]</span>
-        {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">locale</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">locale</span> {
-                <span class="kw">return</span> <span class="ident">format_localized</span>(
-                    <span class="ident">f</span>,
-                    <span class="self">self</span>.<span class="ident">date</span>.<span class="ident">as_ref</span>(),
-                    <span class="self">self</span>.<span class="ident">time</span>.<span class="ident">as_ref</span>(),
-                    <span class="self">self</span>.<span class="ident">off</span>.<span class="ident">as_ref</span>(),
-                    <span class="self">self</span>.<span class="ident">items</span>.<span class="ident">clone</span>(),
-                    <span class="ident">locale</span>,
+<span class="attribute">#[cfg(any(feature = <span class="string">&quot;alloc&quot;</span>, feature = <span class="string">&quot;std&quot;</span>, test))]
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, I: Iterator&lt;Item = B&gt; + Clone, B: Borrow&lt;Item&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt; fmt::Display <span class="kw">for </span>DelayedFormat&lt;I&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;unstable-locales&quot;</span>)]
+        </span>{
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(locale) = <span class="self">self</span>.locale {
+                <span class="kw">return </span>format_localized(
+                    f,
+                    <span class="self">self</span>.date.as_ref(),
+                    <span class="self">self</span>.time.as_ref(),
+                    <span class="self">self</span>.off.as_ref(),
+                    <span class="self">self</span>.items.clone(),
+                    locale,
                 );
             }
         }
 
-        <span class="ident">format</span>(<span class="ident">f</span>, <span class="self">self</span>.<span class="ident">date</span>.<span class="ident">as_ref</span>(), <span class="self">self</span>.<span class="ident">time</span>.<span class="ident">as_ref</span>(), <span class="self">self</span>.<span class="ident">off</span>.<span class="ident">as_ref</span>(), <span class="self">self</span>.<span class="ident">items</span>.<span class="ident">clone</span>())
+        format(f, <span class="self">self</span>.date.as_ref(), <span class="self">self</span>.time.as_ref(), <span class="self">self</span>.off.as_ref(), <span class="self">self</span>.items.clone())
     }
 }
 
-<span class="comment">// this implementation is here only because we need some private code from `scan`</span>
+<span class="comment">// this implementation is here only because we need some private code from `scan`
 
-<span class="doccomment">/// Parsing a `str` into a `Weekday` uses the format [`%W`](./format/strftime/index.html).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use chrono::Weekday;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(&quot;Sunday&quot;.parse::&lt;Weekday&gt;(), Ok(Weekday::Sun));</span>
-<span class="doccomment">/// assert!(&quot;any day&quot;.parse::&lt;Weekday&gt;().is_err());</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The parsing is case-insensitive.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use chrono::Weekday;</span>
-<span class="doccomment">/// assert_eq!(&quot;mON&quot;.parse::&lt;Weekday&gt;(), Ok(Weekday::Mon));</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Only the shortest form (e.g. `sun`) and the longest form (e.g. `sunday`) is accepted.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use chrono::Weekday;</span>
-<span class="doccomment">/// assert!(&quot;thurs&quot;.parse::&lt;Weekday&gt;().is_err());</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">Weekday</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">ParseWeekdayError</span>;
+</span><span class="doccomment">/// Parsing a `str` into a `Weekday` uses the format [`%W`](./format/strftime/index.html).
+///
+/// # Example
+///
+/// ```
+/// use chrono::Weekday;
+///
+/// assert_eq!(&quot;Sunday&quot;.parse::&lt;Weekday&gt;(), Ok(Weekday::Sun));
+/// assert!(&quot;any day&quot;.parse::&lt;Weekday&gt;().is_err());
+/// ```
+///
+/// The parsing is case-insensitive.
+///
+/// ```
+/// # use chrono::Weekday;
+/// assert_eq!(&quot;mON&quot;.parse::&lt;Weekday&gt;(), Ok(Weekday::Mon));
+/// ```
+///
+/// Only the shortest form (e.g. `sun`) and the longest form (e.g. `sunday`) is accepted.
+///
+/// ```
+/// # use chrono::Weekday;
+/// assert!(&quot;thurs&quot;.parse::&lt;Weekday&gt;().is_err());
+/// ```
+</span><span class="kw">impl </span>FromStr <span class="kw">for </span>Weekday {
+    <span class="kw">type </span><span class="prelude-val">Err </span>= ParseWeekdayError;
 
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="ident">w</span>)) <span class="op">=</span> <span class="ident">scan::short_or_long_weekday</span>(<span class="ident">s</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">w</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">ParseWeekdayError</span> { <span class="ident">_dummy</span>: () })
+    <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, w)) = scan::short_or_long_weekday(s) {
+            <span class="prelude-val">Ok</span>(w)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(ParseWeekdayError { _dummy: () })
         }
     }
 }
 
-<span class="doccomment">/// Formats single formatting item</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable-locales&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">format_item_localized</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">w</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>,
-    <span class="ident">date</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">NaiveDate</span><span class="op">&gt;</span>,
-    <span class="ident">time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">NaiveTime</span><span class="op">&gt;</span>,
-    <span class="ident">off</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="ident">String</span>, <span class="ident">FixedOffset</span>)<span class="op">&gt;</span>,
-    <span class="ident">item</span>: <span class="kw-2">&amp;</span><span class="ident">Item</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="ident">locale</span>: <span class="ident">Locale</span>,
-) -&gt; <span class="ident">fmt::Result</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">String::new</span>();
-    <span class="ident">format_inner</span>(<span class="kw-2">&amp;mut</span> <span class="ident">result</span>, <span class="ident">date</span>, <span class="ident">time</span>, <span class="ident">off</span>, <span class="ident">item</span>, <span class="prelude-val">Some</span>(<span class="ident">locale</span>))<span class="question-mark">?</span>;
-    <span class="ident">w</span>.<span class="ident">pad</span>(<span class="kw-2">&amp;</span><span class="ident">result</span>)
+<span class="doccomment">/// Formats single formatting item
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;unstable-locales&quot;</span>)]
+</span><span class="kw">pub fn </span>format_item_localized&lt;<span class="lifetime">&#39;a</span>&gt;(
+    w: <span class="kw-2">&amp;mut </span>fmt::Formatter,
+    date: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>NaiveDate&gt;,
+    time: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>NaiveTime&gt;,
+    off: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>(String, FixedOffset)&gt;,
+    item: <span class="kw-2">&amp;</span>Item&lt;<span class="lifetime">&#39;a</span>&gt;,
+    locale: Locale,
+) -&gt; fmt::Result {
+    <span class="kw">let </span><span class="kw-2">mut </span>result = String::new();
+    format_inner(<span class="kw-2">&amp;mut </span>result, date, time, off, item, <span class="prelude-val">Some</span>(locale))<span class="question-mark">?</span>;
+    w.pad(<span class="kw-2">&amp;</span>result)
 }
 
-<span class="doccomment">/// Tries to format given arguments with given formatting items.</span>
-<span class="doccomment">/// Internally used by `DelayedFormat`.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable-locales&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">format_localized</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">I</span>, <span class="ident">B</span><span class="op">&gt;</span>(
-    <span class="ident">w</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>,
-    <span class="ident">date</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">NaiveDate</span><span class="op">&gt;</span>,
-    <span class="ident">time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">NaiveTime</span><span class="op">&gt;</span>,
-    <span class="ident">off</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="ident">String</span>, <span class="ident">FixedOffset</span>)<span class="op">&gt;</span>,
-    <span class="ident">items</span>: <span class="ident">I</span>,
-    <span class="ident">locale</span>: <span class="ident">Locale</span>,
-) -&gt; <span class="ident">fmt::Result</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">B</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="ident">B</span>: <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Tries to format given arguments with given formatting items.
+/// Internally used by `DelayedFormat`.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;unstable-locales&quot;</span>)]
+</span><span class="kw">pub fn </span>format_localized&lt;<span class="lifetime">&#39;a</span>, I, B&gt;(
+    w: <span class="kw-2">&amp;mut </span>fmt::Formatter,
+    date: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>NaiveDate&gt;,
+    time: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>NaiveTime&gt;,
+    off: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>(String, FixedOffset)&gt;,
+    items: I,
+    locale: Locale,
+) -&gt; fmt::Result
+<span class="kw">where
+    </span>I: Iterator&lt;Item = B&gt; + Clone,
+    B: Borrow&lt;Item&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">String::new</span>();
-    <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="ident">items</span> {
-        <span class="ident">format_inner</span>(<span class="kw-2">&amp;mut</span> <span class="ident">result</span>, <span class="ident">date</span>, <span class="ident">time</span>, <span class="ident">off</span>, <span class="ident">item</span>.<span class="ident">borrow</span>(), <span class="prelude-val">Some</span>(<span class="ident">locale</span>))<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>result = String::new();
+    <span class="kw">for </span>item <span class="kw">in </span>items {
+        format_inner(<span class="kw-2">&amp;mut </span>result, date, time, off, item.borrow(), <span class="prelude-val">Some</span>(locale))<span class="question-mark">?</span>;
     }
-    <span class="ident">w</span>.<span class="ident">pad</span>(<span class="kw-2">&amp;</span><span class="ident">result</span>)
+    w.pad(<span class="kw-2">&amp;</span>result)
 }
 
-<span class="doccomment">/// Parsing a `str` into a `Month` uses the format [`%W`](./format/strftime/index.html).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use chrono::Month;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(&quot;January&quot;.parse::&lt;Month&gt;(), Ok(Month::January));</span>
-<span class="doccomment">/// assert!(&quot;any day&quot;.parse::&lt;Month&gt;().is_err());</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The parsing is case-insensitive.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use chrono::Month;</span>
-<span class="doccomment">/// assert_eq!(&quot;fEbruARy&quot;.parse::&lt;Month&gt;(), Ok(Month::February));</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Only the shortest form (e.g. `jan`) and the longest form (e.g. `january`) is accepted.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use chrono::Month;</span>
-<span class="doccomment">/// assert!(&quot;septem&quot;.parse::&lt;Month&gt;().is_err());</span>
-<span class="doccomment">/// assert!(&quot;Augustin&quot;.parse::&lt;Month&gt;().is_err());</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">Month</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">ParseMonthError</span>;
+<span class="doccomment">/// Parsing a `str` into a `Month` uses the format [`%W`](./format/strftime/index.html).
+///
+/// # Example
+///
+/// ```
+/// use chrono::Month;
+///
+/// assert_eq!(&quot;January&quot;.parse::&lt;Month&gt;(), Ok(Month::January));
+/// assert!(&quot;any day&quot;.parse::&lt;Month&gt;().is_err());
+/// ```
+///
+/// The parsing is case-insensitive.
+///
+/// ```
+/// # use chrono::Month;
+/// assert_eq!(&quot;fEbruARy&quot;.parse::&lt;Month&gt;(), Ok(Month::February));
+/// ```
+///
+/// Only the shortest form (e.g. `jan`) and the longest form (e.g. `january`) is accepted.
+///
+/// ```
+/// # use chrono::Month;
+/// assert!(&quot;septem&quot;.parse::&lt;Month&gt;().is_err());
+/// assert!(&quot;Augustin&quot;.parse::&lt;Month&gt;().is_err());
+/// ```
+</span><span class="kw">impl </span>FromStr <span class="kw">for </span>Month {
+    <span class="kw">type </span><span class="prelude-val">Err </span>= ParseMonthError;
 
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="ident">w</span>)) <span class="op">=</span> <span class="ident">scan::short_or_long_month0</span>(<span class="ident">s</span>) {
-            <span class="kw">match</span> <span class="ident">w</span> {
-                <span class="number">0</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Month::January</span>),
-                <span class="number">1</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Month::February</span>),
-                <span class="number">2</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Month::March</span>),
-                <span class="number">3</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Month::April</span>),
-                <span class="number">4</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Month::May</span>),
-                <span class="number">5</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Month::June</span>),
-                <span class="number">6</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Month::July</span>),
-                <span class="number">7</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Month::August</span>),
-                <span class="number">8</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Month::September</span>),
-                <span class="number">9</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Month::October</span>),
-                <span class="number">10</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Month::November</span>),
-                <span class="number">11</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Month::December</span>),
-                <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ParseMonthError</span> { <span class="ident">_dummy</span>: () }),
+    <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, w)) = scan::short_or_long_month0(s) {
+            <span class="kw">match </span>w {
+                <span class="number">0 </span>=&gt; <span class="prelude-val">Ok</span>(Month::January),
+                <span class="number">1 </span>=&gt; <span class="prelude-val">Ok</span>(Month::February),
+                <span class="number">2 </span>=&gt; <span class="prelude-val">Ok</span>(Month::March),
+                <span class="number">3 </span>=&gt; <span class="prelude-val">Ok</span>(Month::April),
+                <span class="number">4 </span>=&gt; <span class="prelude-val">Ok</span>(Month::May),
+                <span class="number">5 </span>=&gt; <span class="prelude-val">Ok</span>(Month::June),
+                <span class="number">6 </span>=&gt; <span class="prelude-val">Ok</span>(Month::July),
+                <span class="number">7 </span>=&gt; <span class="prelude-val">Ok</span>(Month::August),
+                <span class="number">8 </span>=&gt; <span class="prelude-val">Ok</span>(Month::September),
+                <span class="number">9 </span>=&gt; <span class="prelude-val">Ok</span>(Month::October),
+                <span class="number">10 </span>=&gt; <span class="prelude-val">Ok</span>(Month::November),
+                <span class="number">11 </span>=&gt; <span class="prelude-val">Ok</span>(Month::December),
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(ParseMonthError { _dummy: () }),
             }
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">ParseMonthError</span> { <span class="ident">_dummy</span>: () })
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(ParseMonthError { _dummy: () })
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="chrono" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="chrono" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

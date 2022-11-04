@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/combine-3.8.1/src/parser/function.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>function.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../combine/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/combine-3.8.1/src/parser/function.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>function.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../combine/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -178,185 +178,185 @@
 <span id="178">178</span>
 <span id="179">179</span>
 <span id="180">180</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Parsers constructor from regular functions</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Parsers constructor from regular functions
 
-<span class="kw">use</span> <span class="ident">lib::marker::PhantomData</span>;
+</span><span class="kw">use </span>lib::marker::PhantomData;
 
-<span class="kw">use</span> <span class="ident">error</span>::{<span class="ident">ConsumedResult</span>, <span class="ident">ParseResult</span>};
-<span class="kw">use</span> <span class="ident">stream::Stream</span>;
-<span class="kw">use</span> <span class="ident">Parser</span>;
+<span class="kw">use </span>error::{ConsumedResult, ParseResult};
+<span class="kw">use </span>stream::Stream;
+<span class="kw">use </span>Parser;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">I</span>: <span class="ident">Stream</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">FnMut</span>(<span class="kw-2">&amp;mut</span> <span class="ident">I</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">I</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
-    <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">O</span>;
-    <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ();
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, I: Stream, O&gt; Parser <span class="kw">for </span>FnMut(<span class="kw-2">&amp;mut </span>I) -&gt; ParseResult&lt;O, I&gt; + <span class="lifetime">&#39;a </span>{
+    <span class="kw">type </span>Input = I;
+    <span class="kw">type </span>Output = O;
+    <span class="kw">type </span>PartialState = ();
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">I</span><span class="op">&gt;</span> {
-        <span class="self">self</span>(<span class="ident">input</span>).<span class="ident">into</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>parse_lazy(<span class="kw-2">&amp;mut </span><span class="self">self</span>, input: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Input) -&gt; ConsumedResult&lt;O, I&gt; {
+        <span class="self">self</span>(input).into()
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FnParser</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">F</span>, <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">I</span>) -&gt; <span class="ident">I</span><span class="op">&gt;</span>);
+<span class="attribute">#[derive(Copy, Clone)]
+</span><span class="kw">pub struct </span>FnParser&lt;I, F&gt;(F, PhantomData&lt;<span class="kw">fn</span>(I) -&gt; I&gt;);
 
-<span class="doccomment">/// Wraps a function, turning it into a parser.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Mainly needed to turn closures into parsers as function types can be casted to function pointers</span>
-<span class="doccomment">/// to make them usable as a parser.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// extern crate combine;</span>
-<span class="doccomment">/// # use combine::*;</span>
-<span class="doccomment">/// # use combine::parser::char::digit;</span>
-<span class="doccomment">/// # use combine::error::{Consumed, StreamError};</span>
-<span class="doccomment">/// # use combine::stream::easy;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// let mut even_digit = parser(|input| {</span>
-<span class="doccomment">///     // Help type inference out</span>
-<span class="doccomment">///     let _: &amp;mut easy::Stream&lt;&amp;str&gt; = input;</span>
-<span class="doccomment">///     let position = input.position();</span>
-<span class="doccomment">///     let (char_digit, consumed) = try!(digit().parse_stream(input));</span>
-<span class="doccomment">///     let d = (char_digit as i32) - (&#39;0&#39; as i32);</span>
-<span class="doccomment">///     if d % 2 == 0 {</span>
-<span class="doccomment">///         Ok((d, consumed))</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">///     else {</span>
-<span class="doccomment">///         //Return an empty error since we only tested the first token of the stream</span>
-<span class="doccomment">///         let errors = easy::Errors::new(</span>
-<span class="doccomment">///             position,</span>
-<span class="doccomment">///             StreamError::expected(From::from(&quot;even number&quot;))</span>
-<span class="doccomment">///         );</span>
-<span class="doccomment">///         Err(Consumed::Empty(errors.into()))</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// });</span>
-<span class="doccomment">/// let result = even_digit</span>
-<span class="doccomment">///     .easy_parse(&quot;8&quot;)</span>
-<span class="doccomment">///     .map(|x| x.0);</span>
-<span class="doccomment">/// assert_eq!(result, Ok(8));</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parser</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">O</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">FnParser</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;mut</span> <span class="ident">I</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">I</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Wraps a function, turning it into a parser.
+///
+/// Mainly needed to turn closures into parsers as function types can be casted to function pointers
+/// to make them usable as a parser.
+///
+/// ```
+/// extern crate combine;
+/// # use combine::*;
+/// # use combine::parser::char::digit;
+/// # use combine::error::{Consumed, StreamError};
+/// # use combine::stream::easy;
+/// # fn main() {
+/// let mut even_digit = parser(|input| {
+///     // Help type inference out
+///     let _: &amp;mut easy::Stream&lt;&amp;str&gt; = input;
+///     let position = input.position();
+///     let (char_digit, consumed) = try!(digit().parse_stream(input));
+///     let d = (char_digit as i32) - (&#39;0&#39; as i32);
+///     if d % 2 == 0 {
+///         Ok((d, consumed))
+///     }
+///     else {
+///         //Return an empty error since we only tested the first token of the stream
+///         let errors = easy::Errors::new(
+///             position,
+///             StreamError::expected(From::from(&quot;even number&quot;))
+///         );
+///         Err(Consumed::Empty(errors.into()))
+///     }
+/// });
+/// let result = even_digit
+///     .easy_parse(&quot;8&quot;)
+///     .map(|x| x.0);
+/// assert_eq!(result, Ok(8));
+/// # }
+/// ```
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>parser&lt;I, O, F&gt;(f: F) -&gt; FnParser&lt;I, F&gt;
+<span class="kw">where
+    </span>I: Stream,
+    F: FnMut(<span class="kw-2">&amp;mut </span>I) -&gt; ParseResult&lt;O, I&gt;,
 {
-    <span class="ident">FnParser</span>(<span class="ident">f</span>, <span class="ident">PhantomData</span>)
+    FnParser(f, PhantomData)
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">O</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">FnParser</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;mut</span> <span class="ident">I</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">I</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;I, O, F&gt; Parser <span class="kw">for </span>FnParser&lt;I, F&gt;
+<span class="kw">where
+    </span>I: Stream,
+    F: FnMut(<span class="kw-2">&amp;mut </span>I) -&gt; ParseResult&lt;O, I&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">O</span>;
-    <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ();
+    <span class="kw">type </span>Input = I;
+    <span class="kw">type </span>Output = O;
+    <span class="kw">type </span>PartialState = ();
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">I</span><span class="op">&gt;</span> {
-        (<span class="self">self</span>.<span class="number">0</span>)(<span class="ident">input</span>).<span class="ident">into</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>parse_lazy(<span class="kw-2">&amp;mut </span><span class="self">self</span>, input: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Input) -&gt; ConsumedResult&lt;O, I&gt; {
+        (<span class="self">self</span>.<span class="number">0</span>)(input).into()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="kw">fn</span>(<span class="kw-2">&amp;mut</span> <span class="ident">I</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
+<span class="kw">impl</span>&lt;I, O&gt; Parser <span class="kw">for fn</span>(<span class="kw-2">&amp;mut </span>I) -&gt; ParseResult&lt;O, I&gt;
+<span class="kw">where
+    </span>I: Stream,
 {
-    <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">O</span>;
-    <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ();
+    <span class="kw">type </span>Input = I;
+    <span class="kw">type </span>Output = O;
+    <span class="kw">type </span>PartialState = ();
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">I</span><span class="op">&gt;</span> {
-        <span class="self">self</span>(<span class="ident">input</span>).<span class="ident">into</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>parse_lazy(<span class="kw-2">&amp;mut </span><span class="self">self</span>, input: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Input) -&gt; ConsumedResult&lt;O, I&gt; {
+        <span class="self">self</span>(input).into()
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EnvParser</span><span class="op">&lt;</span><span class="ident">E</span>, <span class="ident">I</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
+<span class="attribute">#[derive(Copy)]
+</span><span class="kw">pub struct </span>EnvParser&lt;E, I, T&gt;
+<span class="kw">where
+    </span>I: Stream,
 {
-    <span class="ident">env</span>: <span class="ident">E</span>,
-    <span class="ident">parser</span>: <span class="kw">fn</span>(<span class="ident">E</span>, <span class="kw-2">&amp;mut</span> <span class="ident">I</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span><span class="op">&gt;</span>,
+    env: E,
+    parser: <span class="kw">fn</span>(E, <span class="kw-2">&amp;mut </span>I) -&gt; ParseResult&lt;T, I&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">E</span>, <span class="ident">I</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">EnvParser</span><span class="op">&lt;</span><span class="ident">E</span>, <span class="ident">I</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
-    <span class="ident">E</span>: <span class="ident">Clone</span>,
+<span class="kw">impl</span>&lt;E, I, T&gt; Clone <span class="kw">for </span>EnvParser&lt;E, I, T&gt;
+<span class="kw">where
+    </span>I: Stream,
+    E: Clone,
 {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">EnvParser</span> {
-            <span class="ident">env</span>: <span class="self">self</span>.<span class="ident">env</span>.<span class="ident">clone</span>(),
-            <span class="ident">parser</span>: <span class="self">self</span>.<span class="ident">parser</span>,
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        EnvParser {
+            env: <span class="self">self</span>.env.clone(),
+            parser: <span class="self">self</span>.parser,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">E</span>, <span class="ident">I</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">EnvParser</span><span class="op">&lt;</span><span class="ident">E</span>, <span class="ident">I</span>, <span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">E</span>: <span class="ident">Clone</span>,
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
+<span class="kw">impl</span>&lt;E, I, O&gt; Parser <span class="kw">for </span>EnvParser&lt;E, I, O&gt;
+<span class="kw">where
+    </span>E: Clone,
+    I: Stream,
 {
-    <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">O</span>;
-    <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ();
+    <span class="kw">type </span>Input = I;
+    <span class="kw">type </span>Output = O;
+    <span class="kw">type </span>PartialState = ();
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">I</span><span class="op">&gt;</span> {
-        (<span class="self">self</span>.<span class="ident">parser</span>)(<span class="self">self</span>.<span class="ident">env</span>.<span class="ident">clone</span>(), <span class="ident">input</span>).<span class="ident">into</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>parse_lazy(<span class="kw-2">&amp;mut </span><span class="self">self</span>, input: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Input) -&gt; ConsumedResult&lt;O, I&gt; {
+        (<span class="self">self</span>.parser)(<span class="self">self</span>.env.clone(), input).into()
     }
 }
 
-<span class="doccomment">/// Constructs a parser out of an environment and a function which needs the given environment to</span>
-<span class="doccomment">/// do the parsing. This is commonly useful to allow multiple parsers to share some environment</span>
-<span class="doccomment">/// while still allowing the parsers to be written in separate functions.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # extern crate combine;</span>
-<span class="doccomment">/// # use std::collections::HashMap;</span>
-<span class="doccomment">/// # use combine::*;</span>
-<span class="doccomment">/// # use combine::char::letter;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// struct Interner(HashMap&lt;String, u32&gt;);</span>
-<span class="doccomment">/// impl Interner {</span>
-<span class="doccomment">///     fn string&lt;I&gt;(&amp;self, input: &amp;mut I) -&gt; ParseResult&lt;u32, I&gt;</span>
-<span class="doccomment">///         where I: Stream&lt;Item=char&gt;,</span>
-<span class="doccomment">///               I::Error: ParseError&lt;I::Item, I::Range, I::Position&gt;,</span>
-<span class="doccomment">///     {</span>
-<span class="doccomment">///         many(letter())</span>
-<span class="doccomment">///             .map(|s: String| self.0.get(&amp;s).cloned().unwrap_or(0))</span>
-<span class="doccomment">///             .parse_stream(input)</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut map = HashMap::new();</span>
-<span class="doccomment">/// map.insert(&quot;hello&quot;.into(), 1);</span>
-<span class="doccomment">/// map.insert(&quot;test&quot;.into(), 2);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let env = Interner(map);</span>
-<span class="doccomment">/// let mut parser = env_parser(&amp;env, Interner::string);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let result = parser.parse(&quot;hello&quot;);</span>
-<span class="doccomment">/// assert_eq!(result, Ok((1, &quot;&quot;)));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let result = parser.parse(&quot;world&quot;);</span>
-<span class="doccomment">/// assert_eq!(result, Ok((0, &quot;&quot;)));</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">env_parser</span><span class="op">&lt;</span><span class="ident">E</span>, <span class="ident">I</span>, <span class="ident">O</span><span class="op">&gt;</span>(<span class="ident">env</span>: <span class="ident">E</span>, <span class="ident">parser</span>: <span class="kw">fn</span>(<span class="ident">E</span>, <span class="kw-2">&amp;mut</span> <span class="ident">I</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">I</span><span class="op">&gt;</span>) -&gt; <span class="ident">EnvParser</span><span class="op">&lt;</span><span class="ident">E</span>, <span class="ident">I</span>, <span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">E</span>: <span class="ident">Clone</span>,
-    <span class="ident">I</span>: <span class="ident">Stream</span>,
+<span class="doccomment">/// Constructs a parser out of an environment and a function which needs the given environment to
+/// do the parsing. This is commonly useful to allow multiple parsers to share some environment
+/// while still allowing the parsers to be written in separate functions.
+///
+/// ```
+/// # extern crate combine;
+/// # use std::collections::HashMap;
+/// # use combine::*;
+/// # use combine::char::letter;
+/// # fn main() {
+/// struct Interner(HashMap&lt;String, u32&gt;);
+/// impl Interner {
+///     fn string&lt;I&gt;(&amp;self, input: &amp;mut I) -&gt; ParseResult&lt;u32, I&gt;
+///         where I: Stream&lt;Item=char&gt;,
+///               I::Error: ParseError&lt;I::Item, I::Range, I::Position&gt;,
+///     {
+///         many(letter())
+///             .map(|s: String| self.0.get(&amp;s).cloned().unwrap_or(0))
+///             .parse_stream(input)
+///     }
+/// }
+///
+/// let mut map = HashMap::new();
+/// map.insert(&quot;hello&quot;.into(), 1);
+/// map.insert(&quot;test&quot;.into(), 2);
+///
+/// let env = Interner(map);
+/// let mut parser = env_parser(&amp;env, Interner::string);
+///
+/// let result = parser.parse(&quot;hello&quot;);
+/// assert_eq!(result, Ok((1, &quot;&quot;)));
+///
+/// let result = parser.parse(&quot;world&quot;);
+/// assert_eq!(result, Ok((0, &quot;&quot;)));
+/// # }
+/// ```
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>env_parser&lt;E, I, O&gt;(env: E, parser: <span class="kw">fn</span>(E, <span class="kw-2">&amp;mut </span>I) -&gt; ParseResult&lt;O, I&gt;) -&gt; EnvParser&lt;E, I, O&gt;
+<span class="kw">where
+    </span>E: Clone,
+    I: Stream,
 {
-    <span class="ident">EnvParser</span> {
-        <span class="ident">env</span>: <span class="ident">env</span>,
-        <span class="ident">parser</span>: <span class="ident">parser</span>,
+    EnvParser {
+        env: env,
+        parser: parser,
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="combine" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="combine" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

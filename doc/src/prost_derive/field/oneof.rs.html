@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/prost-derive-0.9.0/src/field/oneof.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>oneof.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../prost_derive/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../prost_derive/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../prost_derive/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/prost-derive-0.9.0/src/field/oneof.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>oneof.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../prost_derive/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../prost_derive/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../prost_derive/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -97,104 +97,104 @@
 <span id="97">97</span>
 <span id="98">98</span>
 <span id="99">99</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">anyhow</span>::{<span class="ident">bail</span>, <span class="ident">Error</span>};
-<span class="kw">use</span> <span class="ident">proc_macro2::TokenStream</span>;
-<span class="kw">use</span> <span class="ident">quote::quote</span>;
-<span class="kw">use</span> <span class="ident">syn</span>::{<span class="ident">parse_str</span>, <span class="ident">Lit</span>, <span class="ident">Meta</span>, <span class="ident">MetaNameValue</span>, <span class="ident">NestedMeta</span>, <span class="ident">Path</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>anyhow::{bail, Error};
+<span class="kw">use </span>proc_macro2::TokenStream;
+<span class="kw">use </span>quote::quote;
+<span class="kw">use </span>syn::{parse_str, Lit, Meta, MetaNameValue, NestedMeta, Path};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::field</span>::{<span class="ident">set_option</span>, <span class="ident">tags_attr</span>};
+<span class="kw">use </span><span class="kw">crate</span>::field::{set_option, tags_attr};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Field</span> {
-    <span class="kw">pub</span> <span class="ident">ty</span>: <span class="ident">Path</span>,
-    <span class="kw">pub</span> <span class="ident">tags</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>Field {
+    <span class="kw">pub </span>ty: Path,
+    <span class="kw">pub </span>tags: Vec&lt;u32&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Field</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">attrs</span>: <span class="kw-2">&amp;</span>[<span class="ident">Meta</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ty</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tags</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">unknown_attrs</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+<span class="kw">impl </span>Field {
+    <span class="kw">pub fn </span>new(attrs: <span class="kw-2">&amp;</span>[Meta]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Field&gt;, Error&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>ty = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>tags = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>unknown_attrs = Vec::new();
 
-        <span class="kw">for</span> <span class="ident">attr</span> <span class="kw">in</span> <span class="ident">attrs</span> {
-            <span class="kw">if</span> <span class="ident">attr</span>.<span class="ident">path</span>().<span class="ident">is_ident</span>(<span class="string">&quot;oneof&quot;</span>) {
-                <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">attr</span> {
-                    <span class="ident">Meta::NameValue</span>(<span class="ident">MetaNameValue</span> {
-                        <span class="ident">lit</span>: <span class="ident">Lit::Str</span>(<span class="kw-2">ref</span> <span class="ident">lit</span>),
+        <span class="kw">for </span>attr <span class="kw">in </span>attrs {
+            <span class="kw">if </span>attr.path().is_ident(<span class="string">&quot;oneof&quot;</span>) {
+                <span class="kw">let </span>t = <span class="kw">match </span><span class="kw-2">*</span>attr {
+                    Meta::NameValue(MetaNameValue {
+                        lit: Lit::Str(<span class="kw-2">ref </span>lit),
                         ..
-                    }) =&gt; <span class="ident">parse_str</span>::<span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">lit</span>.<span class="ident">value</span>())<span class="question-mark">?</span>,
-                    <span class="ident">Meta::List</span>(<span class="kw-2">ref</span> <span class="ident">list</span>) <span class="kw">if</span> <span class="ident">list</span>.<span class="ident">nested</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> =&gt; {
-                        <span class="comment">// TODO(rustlang/rust#23121): slice pattern matching would make this much nicer.</span>
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">NestedMeta::Meta</span>(<span class="ident">Meta::Path</span>(<span class="kw-2">ref</span> <span class="ident">path</span>)) <span class="op">=</span> <span class="ident">list</span>.<span class="ident">nested</span>[<span class="number">0</span>] {
-                            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ident</span>) <span class="op">=</span> <span class="ident">path</span>.<span class="ident">get_ident</span>() {
-                                <span class="ident">Path::from</span>(<span class="ident">ident</span>.<span class="ident">clone</span>())
-                            } <span class="kw">else</span> {
+                    }) =&gt; parse_str::&lt;Path&gt;(<span class="kw-2">&amp;</span>lit.value())<span class="question-mark">?</span>,
+                    Meta::List(<span class="kw-2">ref </span>list) <span class="kw">if </span>list.nested.len() == <span class="number">1 </span>=&gt; {
+                        <span class="comment">// TODO(rustlang/rust#23121): slice pattern matching would make this much nicer.
+                        </span><span class="kw">if let </span>NestedMeta::Meta(Meta::Path(<span class="kw-2">ref </span>path)) = list.nested[<span class="number">0</span>] {
+                            <span class="kw">if let </span><span class="prelude-val">Some</span>(ident) = path.get_ident() {
+                                Path::from(ident.clone())
+                            } <span class="kw">else </span>{
                                 <span class="macro">bail!</span>(<span class="string">&quot;invalid oneof attribute: item must be an identifier&quot;</span>);
                             }
-                        } <span class="kw">else</span> {
+                        } <span class="kw">else </span>{
                             <span class="macro">bail!</span>(<span class="string">&quot;invalid oneof attribute: item must be an identifier&quot;</span>);
                         }
                     }
-                    <span class="kw">_</span> =&gt; <span class="macro">bail!</span>(<span class="string">&quot;invalid oneof attribute: {:?}&quot;</span>, <span class="ident">attr</span>),
+                    <span class="kw">_ </span>=&gt; <span class="macro">bail!</span>(<span class="string">&quot;invalid oneof attribute: {:?}&quot;</span>, attr),
                 };
-                <span class="ident">set_option</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ty</span>, <span class="ident">t</span>, <span class="string">&quot;duplicate oneof attribute&quot;</span>)<span class="question-mark">?</span>;
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">t</span>) <span class="op">=</span> <span class="ident">tags_attr</span>(<span class="ident">attr</span>)<span class="question-mark">?</span> {
-                <span class="ident">set_option</span>(<span class="kw-2">&amp;mut</span> <span class="ident">tags</span>, <span class="ident">t</span>, <span class="string">&quot;duplicate tags attributes&quot;</span>)<span class="question-mark">?</span>;
-            } <span class="kw">else</span> {
-                <span class="ident">unknown_attrs</span>.<span class="ident">push</span>(<span class="ident">attr</span>);
+                set_option(<span class="kw-2">&amp;mut </span>ty, t, <span class="string">&quot;duplicate oneof attribute&quot;</span>)<span class="question-mark">?</span>;
+            } <span class="kw">else if let </span><span class="prelude-val">Some</span>(t) = tags_attr(attr)<span class="question-mark">? </span>{
+                set_option(<span class="kw-2">&amp;mut </span>tags, t, <span class="string">&quot;duplicate tags attributes&quot;</span>)<span class="question-mark">?</span>;
+            } <span class="kw">else </span>{
+                unknown_attrs.push(attr);
             }
         }
 
-        <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ty</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">ty</span>) =&gt; <span class="ident">ty</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+        <span class="kw">let </span>ty = <span class="kw">match </span>ty {
+            <span class="prelude-val">Some</span>(ty) =&gt; ty,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
         };
 
-        <span class="kw">match</span> <span class="ident">unknown_attrs</span>.<span class="ident">len</span>() {
-            <span class="number">0</span> =&gt; (),
-            <span class="number">1</span> =&gt; <span class="macro">bail!</span>(
+        <span class="kw">match </span>unknown_attrs.len() {
+            <span class="number">0 </span>=&gt; (),
+            <span class="number">1 </span>=&gt; <span class="macro">bail!</span>(
                 <span class="string">&quot;unknown attribute for message field: {:?}&quot;</span>,
-                <span class="ident">unknown_attrs</span>[<span class="number">0</span>]
+                unknown_attrs[<span class="number">0</span>]
             ),
-            <span class="kw">_</span> =&gt; <span class="macro">bail!</span>(<span class="string">&quot;unknown attributes for message field: {:?}&quot;</span>, <span class="ident">unknown_attrs</span>),
+            <span class="kw">_ </span>=&gt; <span class="macro">bail!</span>(<span class="string">&quot;unknown attributes for message field: {:?}&quot;</span>, unknown_attrs),
         }
 
-        <span class="kw">let</span> <span class="ident">tags</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">tags</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">tags</span>) =&gt; <span class="ident">tags</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="macro">bail!</span>(<span class="string">&quot;oneof field is missing a tags attribute&quot;</span>),
+        <span class="kw">let </span>tags = <span class="kw">match </span>tags {
+            <span class="prelude-val">Some</span>(tags) =&gt; tags,
+            <span class="prelude-val">None </span>=&gt; <span class="macro">bail!</span>(<span class="string">&quot;oneof field is missing a tags attribute&quot;</span>),
         };
 
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Field</span> { <span class="ident">ty</span>, <span class="ident">tags</span> }))
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(Field { ty, tags }))
     }
 
-    <span class="doccomment">/// Returns a statement which encodes the oneof field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-        <span class="macro">quote!</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">oneof</span>) <span class="op">=</span> #<span class="ident">ident</span> {
-                <span class="ident">oneof</span>.<span class="ident">encode</span>(<span class="ident">buf</span>)
+    <span class="doccomment">/// Returns a statement which encodes the oneof field.
+    </span><span class="kw">pub fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, ident: TokenStream) -&gt; TokenStream {
+        <span class="macro">quote! </span>{
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>oneof) = #ident {
+                oneof.encode(buf)
             }
         }
     }
 
-    <span class="doccomment">/// Returns an expression which evaluates to the result of decoding the oneof field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">merge</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-        <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ty</span>;
-        <span class="macro">quote!</span> {
-            #<span class="ident">ty::merge</span>(#<span class="ident">ident</span>, <span class="ident">tag</span>, <span class="ident">wire_type</span>, <span class="ident">buf</span>, <span class="ident">ctx</span>)
+    <span class="doccomment">/// Returns an expression which evaluates to the result of decoding the oneof field.
+    </span><span class="kw">pub fn </span>merge(<span class="kw-2">&amp;</span><span class="self">self</span>, ident: TokenStream) -&gt; TokenStream {
+        <span class="kw">let </span>ty = <span class="kw-2">&amp;</span><span class="self">self</span>.ty;
+        <span class="macro">quote! </span>{
+            #ty::merge(#ident, tag, wire_type, buf, ctx)
         }
     }
 
-    <span class="doccomment">/// Returns an expression which evaluates to the encoded length of the oneof field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encoded_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-        <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ty</span>;
-        <span class="macro">quote!</span> {
-            #<span class="ident">ident</span>.<span class="ident">as_ref</span>().<span class="ident">map_or</span>(<span class="number">0</span>, #<span class="ident">ty::encoded_len</span>)
+    <span class="doccomment">/// Returns an expression which evaluates to the encoded length of the oneof field.
+    </span><span class="kw">pub fn </span>encoded_len(<span class="kw-2">&amp;</span><span class="self">self</span>, ident: TokenStream) -&gt; TokenStream {
+        <span class="kw">let </span>ty = <span class="kw-2">&amp;</span><span class="self">self</span>.ty;
+        <span class="macro">quote! </span>{
+            #ident.as_ref().map_or(<span class="number">0</span>, #ty::encoded_len)
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ident</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-        <span class="macro">quote!</span>(#<span class="ident">ident</span> <span class="op">=</span> <span class="ident">::core::option::Option::None</span>)
+    <span class="kw">pub fn </span>clear(<span class="kw-2">&amp;</span><span class="self">self</span>, ident: TokenStream) -&gt; TokenStream {
+        <span class="macro">quote!</span>(#ident = ::core::option::Option::None)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="prost_derive" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="prost_derive" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

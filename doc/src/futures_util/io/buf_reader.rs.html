@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-util-0.3.24/src/io/buf_reader.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>buf_reader.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../futures_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../futures_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../futures_util/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-util-0.3.24/src/io/buf_reader.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>buf_reader.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../futures_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../futures_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../futures_util/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -261,268 +261,268 @@
 <span id="261">261</span>
 <span id="262">262</span>
 <span id="263">263</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::DEFAULT_BUF_SIZE</span>;
-<span class="kw">use</span> <span class="ident">futures_core::future::Future</span>;
-<span class="kw">use</span> <span class="ident">futures_core::ready</span>;
-<span class="kw">use</span> <span class="ident">futures_core::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
-<span class="kw">use</span> <span class="ident">futures_io</span>::{<span class="ident">AsyncBufRead</span>, <span class="ident">AsyncRead</span>, <span class="ident">AsyncSeek</span>, <span class="ident">AsyncWrite</span>, <span class="ident">IoSliceMut</span>, <span class="ident">SeekFrom</span>};
-<span class="kw">use</span> <span class="ident">pin_project_lite::pin_project</span>;
-<span class="kw">use</span> <span class="ident">std::io</span>::{<span class="self">self</span>, <span class="ident">Read</span>};
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">cmp</span>, <span class="ident">fmt</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::DEFAULT_BUF_SIZE;
+<span class="kw">use </span>futures_core::future::Future;
+<span class="kw">use </span>futures_core::ready;
+<span class="kw">use </span>futures_core::task::{Context, Poll};
+<span class="kw">use </span>futures_io::{AsyncBufRead, AsyncRead, AsyncSeek, AsyncWrite, IoSliceMut, SeekFrom};
+<span class="kw">use </span>pin_project_lite::pin_project;
+<span class="kw">use </span>std::io::{<span class="self">self</span>, Read};
+<span class="kw">use </span>std::pin::Pin;
+<span class="kw">use </span>std::{cmp, fmt};
 
-<span class="macro">pin_project!</span> {
-    <span class="doccomment">/// The `BufReader` struct adds buffering to any reader.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// It can be excessively inefficient to work directly with a [`AsyncRead`]</span>
-    <span class="doccomment">/// instance. A `BufReader` performs large, infrequent reads on the underlying</span>
-    <span class="doccomment">/// [`AsyncRead`] and maintains an in-memory buffer of the results.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `BufReader` can improve the speed of programs that make *small* and</span>
-    <span class="doccomment">/// *repeated* read calls to the same file or network socket. It does not</span>
-    <span class="doccomment">/// help when reading very large amounts at once, or reading just one or a few</span>
-    <span class="doccomment">/// times. It also provides no advantage when reading from a source that is</span>
-    <span class="doccomment">/// already in memory, like a `Vec&lt;u8&gt;`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When the `BufReader` is dropped, the contents of its buffer will be</span>
-    <span class="doccomment">/// discarded. Creating multiple instances of a `BufReader` on the same</span>
-    <span class="doccomment">/// stream can cause data loss.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`AsyncRead`]: futures_io::AsyncRead</span>
-    <span class="doccomment">///</span>
-    <span class="comment">// TODO: Examples</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BufReader</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">pin</span>]</span>
-        <span class="ident">inner</span>: <span class="ident">R</span>,
-        <span class="ident">buffer</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-        <span class="ident">pos</span>: <span class="ident">usize</span>,
-        <span class="ident">cap</span>: <span class="ident">usize</span>,
+<span class="macro">pin_project! </span>{
+    <span class="doccomment">/// The `BufReader` struct adds buffering to any reader.
+    ///
+    /// It can be excessively inefficient to work directly with a [`AsyncRead`]
+    /// instance. A `BufReader` performs large, infrequent reads on the underlying
+    /// [`AsyncRead`] and maintains an in-memory buffer of the results.
+    ///
+    /// `BufReader` can improve the speed of programs that make *small* and
+    /// *repeated* read calls to the same file or network socket. It does not
+    /// help when reading very large amounts at once, or reading just one or a few
+    /// times. It also provides no advantage when reading from a source that is
+    /// already in memory, like a `Vec&lt;u8&gt;`.
+    ///
+    /// When the `BufReader` is dropped, the contents of its buffer will be
+    /// discarded. Creating multiple instances of a `BufReader` on the same
+    /// stream can cause data loss.
+    ///
+    /// [`AsyncRead`]: futures_io::AsyncRead
+    ///
+    </span><span class="comment">// TODO: Examples
+    </span><span class="kw">pub struct </span>BufReader&lt;R&gt; {
+        <span class="attribute">#[pin]
+        </span>inner: R,
+        buffer: Box&lt;[u8]&gt;,
+        pos: usize,
+        cap: usize,
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">AsyncRead</span><span class="op">&gt;</span> <span class="ident">BufReader</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Creates a new `BufReader` with a default buffer capacity. The default is currently 8 KB,</span>
-    <span class="doccomment">/// but may change in the future.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">R</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::with_capacity</span>(<span class="ident">DEFAULT_BUF_SIZE</span>, <span class="ident">inner</span>)
+<span class="kw">impl</span>&lt;R: AsyncRead&gt; BufReader&lt;R&gt; {
+    <span class="doccomment">/// Creates a new `BufReader` with a default buffer capacity. The default is currently 8 KB,
+    /// but may change in the future.
+    </span><span class="kw">pub fn </span>new(inner: R) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::with_capacity(DEFAULT_BUF_SIZE, inner)
     }
 
-    <span class="doccomment">/// Creates a new `BufReader` with the specified buffer capacity.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">capacity</span>: <span class="ident">usize</span>, <span class="ident">inner</span>: <span class="ident">R</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">capacity</span>);
-            <span class="ident">buffer</span>.<span class="ident">set_len</span>(<span class="ident">capacity</span>);
-            <span class="ident"><span class="kw">super</span>::initialize</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>, <span class="kw-2">&amp;mut</span> <span class="ident">buffer</span>);
-            <span class="self">Self</span> { <span class="ident">inner</span>, <span class="ident">buffer</span>: <span class="ident">buffer</span>.<span class="ident">into_boxed_slice</span>(), <span class="ident">pos</span>: <span class="number">0</span>, <span class="ident">cap</span>: <span class="number">0</span> }
+    <span class="doccomment">/// Creates a new `BufReader` with the specified buffer capacity.
+    </span><span class="kw">pub fn </span>with_capacity(capacity: usize, inner: R) -&gt; <span class="self">Self </span>{
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>buffer = Vec::with_capacity(capacity);
+            buffer.set_len(capacity);
+            <span class="kw">super</span>::initialize(<span class="kw-2">&amp;</span>inner, <span class="kw-2">&amp;mut </span>buffer);
+            <span class="self">Self </span>{ inner, buffer: buffer.into_boxed_slice(), pos: <span class="number">0</span>, cap: <span class="number">0 </span>}
         }
     }
 
-    <span class="macro">delegate_access_inner!</span>(<span class="ident">inner</span>, <span class="ident">R</span>, ());
+    <span class="macro">delegate_access_inner!</span>(inner, R, ());
 
-    <span class="doccomment">/// Returns a reference to the internally buffered data.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Unlike `fill_buf`, this will not attempt to fill the buffer if it is empty.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">buffer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">buffer</span>[<span class="self">self</span>.<span class="ident">pos</span>..<span class="self">self</span>.<span class="ident">cap</span>]
+    <span class="doccomment">/// Returns a reference to the internally buffered data.
+    ///
+    /// Unlike `fill_buf`, this will not attempt to fill the buffer if it is empty.
+    </span><span class="kw">pub fn </span>buffer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.buffer[<span class="self">self</span>.pos..<span class="self">self</span>.cap]
     }
 
-    <span class="doccomment">/// Invalidates all data in the internal buffer.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">discard_buffer</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
-        <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">pos</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">cap</span> <span class="op">=</span> <span class="number">0</span>;
+    <span class="doccomment">/// Invalidates all data in the internal buffer.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>discard_buffer(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;) {
+        <span class="kw">let </span>this = <span class="self">self</span>.project();
+        <span class="kw-2">*</span>this.pos = <span class="number">0</span>;
+        <span class="kw-2">*</span>this.cap = <span class="number">0</span>;
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncSeek</span><span class="op">&gt;</span> <span class="ident">BufReader</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Seeks relative to the current position. If the new position lies within the buffer,</span>
-    <span class="doccomment">/// the buffer will not be flushed, allowing for more efficient seeks.</span>
-    <span class="doccomment">/// This method does not return the location of the underlying reader, so the caller</span>
-    <span class="doccomment">/// must track this information themselves if it is required.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">seek_relative</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">offset</span>: <span class="ident">i64</span>) -&gt; <span class="ident">SeeKRelative</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="ident">SeeKRelative</span> { <span class="ident">inner</span>: <span class="self">self</span>, <span class="ident">offset</span>, <span class="ident">first</span>: <span class="bool-val">true</span> }
+<span class="kw">impl</span>&lt;R: AsyncRead + AsyncSeek&gt; BufReader&lt;R&gt; {
+    <span class="doccomment">/// Seeks relative to the current position. If the new position lies within the buffer,
+    /// the buffer will not be flushed, allowing for more efficient seeks.
+    /// This method does not return the location of the underlying reader, so the caller
+    /// must track this information themselves if it is required.
+    </span><span class="kw">pub fn </span>seek_relative(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, offset: i64) -&gt; SeeKRelative&lt;<span class="lifetime">&#39;_</span>, R&gt; {
+        SeeKRelative { inner: <span class="self">self</span>, offset, first: <span class="bool-val">true </span>}
     }
 
-    <span class="doccomment">/// Attempts to seek relative to the current position. If the new position lies within the buffer,</span>
-    <span class="doccomment">/// the buffer will not be flushed, allowing for more efficient seeks.</span>
-    <span class="doccomment">/// This method does not return the location of the underlying reader, so the caller</span>
-    <span class="doccomment">/// must track this information themselves if it is required.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_seek_relative</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">offset</span>: <span class="ident">i64</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">pos</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pos</span> <span class="kw">as</span> <span class="ident">u64</span>;
-        <span class="kw">if</span> <span class="ident">offset</span> <span class="op">&lt;</span> <span class="number">0</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">new_pos</span>) <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">checked_sub</span>((<span class="op">-</span><span class="ident">offset</span>) <span class="kw">as</span> <span class="ident">u64</span>) {
-                <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">project</span>().<span class="ident">pos</span> <span class="op">=</span> <span class="ident">new_pos</span> <span class="kw">as</span> <span class="ident">usize</span>;
-                <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()));
+    <span class="doccomment">/// Attempts to seek relative to the current position. If the new position lies within the buffer,
+    /// the buffer will not be flushed, allowing for more efficient seeks.
+    /// This method does not return the location of the underlying reader, so the caller
+    /// must track this information themselves if it is required.
+    </span><span class="kw">pub fn </span>poll_seek_relative(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        offset: i64,
+    ) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+        <span class="kw">let </span>pos = <span class="self">self</span>.pos <span class="kw">as </span>u64;
+        <span class="kw">if </span>offset &lt; <span class="number">0 </span>{
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(new_pos) = pos.checked_sub((-offset) <span class="kw">as </span>u64) {
+                <span class="kw-2">*</span><span class="self">self</span>.project().pos = new_pos <span class="kw">as </span>usize;
+                <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Ok</span>(()));
             }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">new_pos</span>) <span class="op">=</span> <span class="ident">pos</span>.<span class="ident">checked_add</span>(<span class="ident">offset</span> <span class="kw">as</span> <span class="ident">u64</span>) {
-            <span class="kw">if</span> <span class="ident">new_pos</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">cap</span> <span class="kw">as</span> <span class="ident">u64</span> {
-                <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">project</span>().<span class="ident">pos</span> <span class="op">=</span> <span class="ident">new_pos</span> <span class="kw">as</span> <span class="ident">usize</span>;
-                <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()));
+        } <span class="kw">else if let </span><span class="prelude-val">Some</span>(new_pos) = pos.checked_add(offset <span class="kw">as </span>u64) {
+            <span class="kw">if </span>new_pos &lt;= <span class="self">self</span>.cap <span class="kw">as </span>u64 {
+                <span class="kw-2">*</span><span class="self">self</span>.project().pos = new_pos <span class="kw">as </span>usize;
+                <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Ok</span>(()));
             }
         }
-        <span class="self">self</span>.<span class="ident">poll_seek</span>(<span class="ident">cx</span>, <span class="ident">SeekFrom::Current</span>(<span class="ident">offset</span>)).<span class="ident">map</span>(<span class="op">|</span><span class="ident">res</span><span class="op">|</span> <span class="ident">res</span>.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ()))
+        <span class="self">self</span>.poll_seek(cx, SeekFrom::Current(offset)).map(|res| res.map(|<span class="kw">_</span>| ()))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">AsyncRead</span><span class="op">&gt;</span> <span class="ident">AsyncRead</span> <span class="kw">for</span> <span class="ident">BufReader</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">poll_read</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="comment">// If we don&#39;t have any buffered data and we&#39;re doing a massive read</span>
-        <span class="comment">// (larger than our internal buffer), bypass our internal buffer</span>
-        <span class="comment">// entirely.</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">pos</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">cap</span> <span class="op">&amp;&amp;</span> <span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">len</span>() {
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">as_mut</span>().<span class="ident">project</span>().<span class="ident">inner</span>.<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="ident">buf</span>));
-            <span class="self">self</span>.<span class="ident">discard_buffer</span>();
-            <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="ident">res</span>);
+<span class="kw">impl</span>&lt;R: AsyncRead&gt; AsyncRead <span class="kw">for </span>BufReader&lt;R&gt; {
+    <span class="kw">fn </span>poll_read(
+        <span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        buf: <span class="kw-2">&amp;mut </span>[u8],
+    ) -&gt; Poll&lt;io::Result&lt;usize&gt;&gt; {
+        <span class="comment">// If we don&#39;t have any buffered data and we&#39;re doing a massive read
+        // (larger than our internal buffer), bypass our internal buffer
+        // entirely.
+        </span><span class="kw">if </span><span class="self">self</span>.pos == <span class="self">self</span>.cap &amp;&amp; buf.len() &gt;= <span class="self">self</span>.buffer.len() {
+            <span class="kw">let </span>res = <span class="macro">ready!</span>(<span class="self">self</span>.as_mut().project().inner.poll_read(cx, buf));
+            <span class="self">self</span>.discard_buffer();
+            <span class="kw">return </span>Poll::Ready(res);
         }
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rem</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">as_mut</span>().<span class="ident">poll_fill_buf</span>(<span class="ident">cx</span>))<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">nread</span> <span class="op">=</span> <span class="ident">rem</span>.<span class="ident">read</span>(<span class="ident">buf</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">consume</span>(<span class="ident">nread</span>);
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">nread</span>))
+        <span class="kw">let </span><span class="kw-2">mut </span>rem = <span class="macro">ready!</span>(<span class="self">self</span>.as_mut().poll_fill_buf(cx))<span class="question-mark">?</span>;
+        <span class="kw">let </span>nread = rem.read(buf)<span class="question-mark">?</span>;
+        <span class="self">self</span>.consume(nread);
+        Poll::Ready(<span class="prelude-val">Ok</span>(nread))
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_read_vectored</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">bufs</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">IoSliceMut</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>],
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">total_len</span> <span class="op">=</span> <span class="ident">bufs</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span>.<span class="ident">len</span>()).<span class="ident">sum</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>();
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">pos</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">cap</span> <span class="op">&amp;&amp;</span> <span class="ident">total_len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">len</span>() {
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">as_mut</span>().<span class="ident">project</span>().<span class="ident">inner</span>.<span class="ident">poll_read_vectored</span>(<span class="ident">cx</span>, <span class="ident">bufs</span>));
-            <span class="self">self</span>.<span class="ident">discard_buffer</span>();
-            <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="ident">res</span>);
+    <span class="kw">fn </span>poll_read_vectored(
+        <span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        bufs: <span class="kw-2">&amp;mut </span>[IoSliceMut&lt;<span class="lifetime">&#39;_</span>&gt;],
+    ) -&gt; Poll&lt;io::Result&lt;usize&gt;&gt; {
+        <span class="kw">let </span>total_len = bufs.iter().map(|b| b.len()).sum::&lt;usize&gt;();
+        <span class="kw">if </span><span class="self">self</span>.pos == <span class="self">self</span>.cap &amp;&amp; total_len &gt;= <span class="self">self</span>.buffer.len() {
+            <span class="kw">let </span>res = <span class="macro">ready!</span>(<span class="self">self</span>.as_mut().project().inner.poll_read_vectored(cx, bufs));
+            <span class="self">self</span>.discard_buffer();
+            <span class="kw">return </span>Poll::Ready(res);
         }
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rem</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">as_mut</span>().<span class="ident">poll_fill_buf</span>(<span class="ident">cx</span>))<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">nread</span> <span class="op">=</span> <span class="ident">rem</span>.<span class="ident">read_vectored</span>(<span class="ident">bufs</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">consume</span>(<span class="ident">nread</span>);
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">nread</span>))
+        <span class="kw">let </span><span class="kw-2">mut </span>rem = <span class="macro">ready!</span>(<span class="self">self</span>.as_mut().poll_fill_buf(cx))<span class="question-mark">?</span>;
+        <span class="kw">let </span>nread = rem.read_vectored(bufs)<span class="question-mark">?</span>;
+        <span class="self">self</span>.consume(nread);
+        Poll::Ready(<span class="prelude-val">Ok</span>(nread))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">AsyncRead</span><span class="op">&gt;</span> <span class="ident">AsyncBufRead</span> <span class="kw">for</span> <span class="ident">BufReader</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">poll_fill_buf</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
+<span class="kw">impl</span>&lt;R: AsyncRead&gt; AsyncBufRead <span class="kw">for </span>BufReader&lt;R&gt; {
+    <span class="kw">fn </span>poll_fill_buf(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;io::Result&lt;<span class="kw-2">&amp;</span>[u8]&gt;&gt; {
+        <span class="kw">let </span>this = <span class="self">self</span>.project();
 
-        <span class="comment">// If we&#39;ve reached the end of our internal buffer then we need to fetch</span>
-        <span class="comment">// some more data from the underlying reader.</span>
-        <span class="comment">// Branch using `&gt;=` instead of the more correct `==`</span>
-        <span class="comment">// to tell the compiler that the pos..cap slice is always valid.</span>
-        <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">pos</span> <span class="op">&gt;</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">cap</span> {
-            <span class="macro">debug_assert!</span>(<span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">pos</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">cap</span>);
-            <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">cap</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="ident">this</span>.<span class="ident">inner</span>.<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="ident">this</span>.<span class="ident">buffer</span>))<span class="question-mark">?</span>;
-            <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">pos</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="comment">// If we&#39;ve reached the end of our internal buffer then we need to fetch
+        // some more data from the underlying reader.
+        // Branch using `&gt;=` instead of the more correct `==`
+        // to tell the compiler that the pos..cap slice is always valid.
+        </span><span class="kw">if </span><span class="kw-2">*</span>this.pos &gt;= <span class="kw-2">*</span>this.cap {
+            <span class="macro">debug_assert!</span>(<span class="kw-2">*</span>this.pos == <span class="kw-2">*</span>this.cap);
+            <span class="kw-2">*</span>this.cap = <span class="macro">ready!</span>(this.inner.poll_read(cx, this.buffer))<span class="question-mark">?</span>;
+            <span class="kw-2">*</span>this.pos = <span class="number">0</span>;
         }
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span><span class="ident">this</span>.<span class="ident">buffer</span>[<span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">pos</span>..<span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">cap</span>]))
+        Poll::Ready(<span class="prelude-val">Ok</span>(<span class="kw-2">&amp;</span>this.buffer[<span class="kw-2">*</span>this.pos..<span class="kw-2">*</span>this.cap]))
     }
 
-    <span class="kw">fn</span> <span class="ident">consume</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">amt</span>: <span class="ident">usize</span>) {
-        <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">project</span>().<span class="ident">pos</span> <span class="op">=</span> <span class="ident">cmp::min</span>(<span class="self">self</span>.<span class="ident">pos</span> <span class="op">+</span> <span class="ident">amt</span>, <span class="self">self</span>.<span class="ident">cap</span>);
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">AsyncWrite</span><span class="op">&gt;</span> <span class="ident">AsyncWrite</span> <span class="kw">for</span> <span class="ident">BufReader</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="macro">delegate_async_write!</span>(<span class="ident">inner</span>);
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">fmt::Debug</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">BufReader</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;BufReader&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;reader&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;buffer&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{}/{}&quot;</span>, <span class="self">self</span>.<span class="ident">cap</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">pos</span>, <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">len</span>()))
-            .<span class="ident">finish</span>()
+    <span class="kw">fn </span>consume(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, amt: usize) {
+        <span class="kw-2">*</span><span class="self">self</span>.project().pos = cmp::min(<span class="self">self</span>.pos + amt, <span class="self">self</span>.cap);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncSeek</span><span class="op">&gt;</span> <span class="ident">AsyncSeek</span> <span class="kw">for</span> <span class="ident">BufReader</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Seek to an offset, in bytes, in the underlying reader.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The position used for seeking with `SeekFrom::Current(_)` is the</span>
-    <span class="doccomment">/// position the underlying reader would be at if the `BufReader` had no</span>
-    <span class="doccomment">/// internal buffer.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Seeking always discards the internal buffer, even if the seek position</span>
-    <span class="doccomment">/// would otherwise fall within it. This guarantees that calling</span>
-    <span class="doccomment">/// `.into_inner()` immediately after a seek yields the underlying reader</span>
-    <span class="doccomment">/// at the same position.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// To seek without discarding the internal buffer, use</span>
-    <span class="doccomment">/// [`BufReader::seek_relative`](BufReader::seek_relative) or</span>
-    <span class="doccomment">/// [`BufReader::poll_seek_relative`](BufReader::poll_seek_relative).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See [`AsyncSeek`](futures_io::AsyncSeek) for more details.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note: In the edge case where you&#39;re seeking with `SeekFrom::Current(n)`</span>
-    <span class="doccomment">/// where `n` minus the internal buffer length overflows an `i64`, two</span>
-    <span class="doccomment">/// seeks will be performed instead of one. If the second seek returns</span>
-    <span class="doccomment">/// `Err`, the underlying reader will be left at the same position it would</span>
-    <span class="doccomment">/// have if you called `seek` with `SeekFrom::Current(0)`.</span>
-    <span class="kw">fn</span> <span class="ident">poll_seek</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">pos</span>: <span class="ident">SeekFrom</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">result</span>: <span class="ident">u64</span>;
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">SeekFrom::Current</span>(<span class="ident">n</span>) <span class="op">=</span> <span class="ident">pos</span> {
-            <span class="kw">let</span> <span class="ident">remainder</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">cap</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">pos</span>) <span class="kw">as</span> <span class="ident">i64</span>;
-            <span class="comment">// it should be safe to assume that remainder fits within an i64 as the alternative</span>
-            <span class="comment">// means we managed to allocate 8 exbibytes and that&#39;s absurd.</span>
-            <span class="comment">// But it&#39;s not out of the realm of possibility for some weird underlying reader to</span>
-            <span class="comment">// support seeking by i64::min_value() so we need to handle underflow when subtracting</span>
-            <span class="comment">// remainder.</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">offset</span>) <span class="op">=</span> <span class="ident">n</span>.<span class="ident">checked_sub</span>(<span class="ident">remainder</span>) {
-                <span class="ident">result</span> <span class="op">=</span>
-                    <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">as_mut</span>().<span class="ident">project</span>().<span class="ident">inner</span>.<span class="ident">poll_seek</span>(<span class="ident">cx</span>, <span class="ident">SeekFrom::Current</span>(<span class="ident">offset</span>)))<span class="question-mark">?</span>;
-            } <span class="kw">else</span> {
-                <span class="comment">// seek backwards by our remainder, and then by the offset</span>
-                <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">as_mut</span>().<span class="ident">project</span>().<span class="ident">inner</span>.<span class="ident">poll_seek</span>(<span class="ident">cx</span>, <span class="ident">SeekFrom::Current</span>(<span class="op">-</span><span class="ident">remainder</span>)))<span class="question-mark">?</span>;
-                <span class="self">self</span>.<span class="ident">as_mut</span>().<span class="ident">discard_buffer</span>();
-                <span class="ident">result</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">as_mut</span>().<span class="ident">project</span>().<span class="ident">inner</span>.<span class="ident">poll_seek</span>(<span class="ident">cx</span>, <span class="ident">SeekFrom::Current</span>(<span class="ident">n</span>)))<span class="question-mark">?</span>;
+<span class="kw">impl</span>&lt;R: AsyncWrite&gt; AsyncWrite <span class="kw">for </span>BufReader&lt;R&gt; {
+    <span class="macro">delegate_async_write!</span>(inner);
+}
+
+<span class="kw">impl</span>&lt;R: fmt::Debug&gt; fmt::Debug <span class="kw">for </span>BufReader&lt;R&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;BufReader&quot;</span>)
+            .field(<span class="string">&quot;reader&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.inner)
+            .field(<span class="string">&quot;buffer&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format_args!</span>(<span class="string">&quot;{}/{}&quot;</span>, <span class="self">self</span>.cap - <span class="self">self</span>.pos, <span class="self">self</span>.buffer.len()))
+            .finish()
+    }
+}
+
+<span class="kw">impl</span>&lt;R: AsyncRead + AsyncSeek&gt; AsyncSeek <span class="kw">for </span>BufReader&lt;R&gt; {
+    <span class="doccomment">/// Seek to an offset, in bytes, in the underlying reader.
+    ///
+    /// The position used for seeking with `SeekFrom::Current(_)` is the
+    /// position the underlying reader would be at if the `BufReader` had no
+    /// internal buffer.
+    ///
+    /// Seeking always discards the internal buffer, even if the seek position
+    /// would otherwise fall within it. This guarantees that calling
+    /// `.into_inner()` immediately after a seek yields the underlying reader
+    /// at the same position.
+    ///
+    /// To seek without discarding the internal buffer, use
+    /// [`BufReader::seek_relative`](BufReader::seek_relative) or
+    /// [`BufReader::poll_seek_relative`](BufReader::poll_seek_relative).
+    ///
+    /// See [`AsyncSeek`](futures_io::AsyncSeek) for more details.
+    ///
+    /// Note: In the edge case where you&#39;re seeking with `SeekFrom::Current(n)`
+    /// where `n` minus the internal buffer length overflows an `i64`, two
+    /// seeks will be performed instead of one. If the second seek returns
+    /// `Err`, the underlying reader will be left at the same position it would
+    /// have if you called `seek` with `SeekFrom::Current(0)`.
+    </span><span class="kw">fn </span>poll_seek(
+        <span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        pos: SeekFrom,
+    ) -&gt; Poll&lt;io::Result&lt;u64&gt;&gt; {
+        <span class="kw">let </span>result: u64;
+        <span class="kw">if let </span>SeekFrom::Current(n) = pos {
+            <span class="kw">let </span>remainder = (<span class="self">self</span>.cap - <span class="self">self</span>.pos) <span class="kw">as </span>i64;
+            <span class="comment">// it should be safe to assume that remainder fits within an i64 as the alternative
+            // means we managed to allocate 8 exbibytes and that&#39;s absurd.
+            // But it&#39;s not out of the realm of possibility for some weird underlying reader to
+            // support seeking by i64::min_value() so we need to handle underflow when subtracting
+            // remainder.
+            </span><span class="kw">if let </span><span class="prelude-val">Some</span>(offset) = n.checked_sub(remainder) {
+                result =
+                    <span class="macro">ready!</span>(<span class="self">self</span>.as_mut().project().inner.poll_seek(cx, SeekFrom::Current(offset)))<span class="question-mark">?</span>;
+            } <span class="kw">else </span>{
+                <span class="comment">// seek backwards by our remainder, and then by the offset
+                </span><span class="macro">ready!</span>(<span class="self">self</span>.as_mut().project().inner.poll_seek(cx, SeekFrom::Current(-remainder)))<span class="question-mark">?</span>;
+                <span class="self">self</span>.as_mut().discard_buffer();
+                result = <span class="macro">ready!</span>(<span class="self">self</span>.as_mut().project().inner.poll_seek(cx, SeekFrom::Current(n)))<span class="question-mark">?</span>;
             }
-        } <span class="kw">else</span> {
-            <span class="comment">// Seeking with Start/End doesn&#39;t care about our buffer length.</span>
-            <span class="ident">result</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">as_mut</span>().<span class="ident">project</span>().<span class="ident">inner</span>.<span class="ident">poll_seek</span>(<span class="ident">cx</span>, <span class="ident">pos</span>))<span class="question-mark">?</span>;
+        } <span class="kw">else </span>{
+            <span class="comment">// Seeking with Start/End doesn&#39;t care about our buffer length.
+            </span>result = <span class="macro">ready!</span>(<span class="self">self</span>.as_mut().project().inner.poll_seek(cx, pos))<span class="question-mark">?</span>;
         }
-        <span class="self">self</span>.<span class="ident">discard_buffer</span>();
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">result</span>))
+        <span class="self">self</span>.discard_buffer();
+        Poll::Ready(<span class="prelude-val">Ok</span>(result))
     }
 }
 
-<span class="doccomment">/// Future for the [`BufReader::seek_relative`](self::BufReader::seek_relative) method.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;futures do nothing unless polled&quot;</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SeeKRelative</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="ident">inner</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">BufReader</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">offset</span>: <span class="ident">i64</span>,
-    <span class="ident">first</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// Future for the [`BufReader::seek_relative`](self::BufReader::seek_relative) method.
+</span><span class="attribute">#[derive(Debug)]
+#[must_use = <span class="string">&quot;futures do nothing unless polled&quot;</span>]
+</span><span class="kw">pub struct </span>SeeKRelative&lt;<span class="lifetime">&#39;a</span>, R&gt; {
+    inner: Pin&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>BufReader&lt;R&gt;&gt;,
+    offset: i64,
+    first: bool,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">SeeKRelative</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">R</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">R</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncSeek</span>,
+<span class="kw">impl</span>&lt;R&gt; Future <span class="kw">for </span>SeeKRelative&lt;<span class="lifetime">&#39;_</span>, R&gt;
+<span class="kw">where
+    </span>R: AsyncRead + AsyncSeek,
 {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+    <span class="kw">type </span>Output = io::Result&lt;()&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">offset</span>;
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">first</span> {
-            <span class="self">self</span>.<span class="ident">first</span> <span class="op">=</span> <span class="bool-val">false</span>;
-            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">as_mut</span>().<span class="ident">poll_seek_relative</span>(<span class="ident">cx</span>, <span class="ident">offset</span>)
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">inner</span>
-                .<span class="ident">as_mut</span>()
-                .<span class="ident">as_mut</span>()
-                .<span class="ident">poll_seek</span>(<span class="ident">cx</span>, <span class="ident">SeekFrom::Current</span>(<span class="ident">offset</span>))
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">res</span><span class="op">|</span> <span class="ident">res</span>.<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ()))
+    <span class="kw">fn </span>poll(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="kw">let </span>offset = <span class="self">self</span>.offset;
+        <span class="kw">if </span><span class="self">self</span>.first {
+            <span class="self">self</span>.first = <span class="bool-val">false</span>;
+            <span class="self">self</span>.inner.as_mut().poll_seek_relative(cx, offset)
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.inner
+                .as_mut()
+                .as_mut()
+                .poll_seek(cx, SeekFrom::Current(offset))
+                .map(|res| res.map(|<span class="kw">_</span>| ()))
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="futures_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="futures_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rand-0.8.5/src/rngs/small.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>small.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" href="https://www.rust-lang.org/favicon.ico"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rand/index.html"><div class="logo-container"><img src="https://www.rust-lang.org/logos/rust-logo-128x128-blk.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rand/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rand-0.8.5/src/rngs/small.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>small.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" href="https://www.rust-lang.org/favicon.ico"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rand/index.html"><div class="logo-container"><img src="https://www.rust-lang.org/logos/rust-logo-128x128-blk.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rand/index.html"><div class="logo-container">
                     <img src="https://www.rust-lang.org/logos/rust-logo-128x128-blk.png" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rand/index.html">
                         <img src="https://www.rust-lang.org/logos/rust-logo-128x128-blk.png" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -117,122 +117,122 @@
 <span id="115">115</span>
 <span id="116">116</span>
 <span id="117">117</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2018 Developers of the Rand project.</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// https://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license</span>
-<span class="comment">// &lt;LICENSE-MIT or https://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. This file may not be copied, modified, or distributed</span>
-<span class="comment">// except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2018 Developers of the Rand project.
+//
+// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+// https://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license
+// &lt;LICENSE-MIT or https://opensource.org/licenses/MIT&gt;, at your
+// option. This file may not be copied, modified, or distributed
+// except according to those terms.
 
-<span class="doccomment">//! A small fast RNG</span>
+</span><span class="doccomment">//! A small fast RNG
 
-<span class="kw">use</span> <span class="ident">rand_core</span>::{<span class="ident">Error</span>, <span class="ident">RngCore</span>, <span class="ident">SeedableRng</span>};
+</span><span class="kw">use </span>rand_core::{Error, RngCore, SeedableRng};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;64&quot;</span>)]</span>
-<span class="kw">type</span> <span class="ident">Rng</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::xoshiro256plusplus::Xoshiro256PlusPlus</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;64&quot;</span>))]</span>
-<span class="kw">type</span> <span class="ident">Rng</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::xoshiro128plusplus::Xoshiro128PlusPlus</span>;
+<span class="attribute">#[cfg(target_pointer_width = <span class="string">&quot;64&quot;</span>)]
+</span><span class="kw">type </span>Rng = <span class="kw">super</span>::xoshiro256plusplus::Xoshiro256PlusPlus;
+<span class="attribute">#[cfg(not(target_pointer_width = <span class="string">&quot;64&quot;</span>))]
+</span><span class="kw">type </span>Rng = <span class="kw">super</span>::xoshiro128plusplus::Xoshiro128PlusPlus;
 
-<span class="doccomment">/// A small-state, fast non-crypto PRNG</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `SmallRng` may be a good choice when a PRNG with small state, cheap</span>
-<span class="doccomment">/// initialization, good statistical quality and good performance are required.</span>
-<span class="doccomment">/// Note that depending on the application, [`StdRng`] may be faster on many</span>
-<span class="doccomment">/// modern platforms while providing higher-quality randomness. Furthermore,</span>
-<span class="doccomment">/// `SmallRng` is **not** a good choice when:</span>
-<span class="doccomment">/// - Security against prediction is important. Use [`StdRng`] instead.</span>
-<span class="doccomment">/// - Seeds with many zeros are provided. In such cases, it takes `SmallRng`</span>
-<span class="doccomment">///   about 10 samples to produce 0 and 1 bits with equal probability. Either</span>
-<span class="doccomment">///   provide seeds with an approximately equal number of 0 and 1 (for example</span>
-<span class="doccomment">///   by using [`SeedableRng::from_entropy`] or [`SeedableRng::seed_from_u64`]),</span>
-<span class="doccomment">///   or use [`StdRng`] instead.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The algorithm is deterministic but should not be considered reproducible</span>
-<span class="doccomment">/// due to dependence on platform and possible replacement in future</span>
-<span class="doccomment">/// library versions. For a reproducible generator, use a named PRNG from an</span>
-<span class="doccomment">/// external crate, e.g. [rand_xoshiro] or [rand_chacha].</span>
-<span class="doccomment">/// Refer also to [The Book](https://rust-random.github.io/book/guide-rngs.html).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The PRNG algorithm in `SmallRng` is chosen to be efficient on the current</span>
-<span class="doccomment">/// platform, without consideration for cryptography or security. The size of</span>
-<span class="doccomment">/// its state is much smaller than [`StdRng`]. The current algorithm is</span>
-<span class="doccomment">/// `Xoshiro256PlusPlus` on 64-bit platforms and `Xoshiro128PlusPlus` on 32-bit</span>
-<span class="doccomment">/// platforms. Both are also implemented by the [rand_xoshiro] crate.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Initializing `SmallRng` with a random seed can be done using [`SeedableRng::from_entropy`]:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use rand::{Rng, SeedableRng};</span>
-<span class="doccomment">/// use rand::rngs::SmallRng;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Create small, cheap to initialize and fast RNG with a random seed.</span>
-<span class="doccomment">/// // The randomness is supplied by the operating system.</span>
-<span class="doccomment">/// let mut small_rng = SmallRng::from_entropy();</span>
-<span class="doccomment">/// # let v: u32 = small_rng.gen();</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// When initializing a lot of `SmallRng`&#39;s, using [`thread_rng`] can be more</span>
-<span class="doccomment">/// efficient:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use rand::{SeedableRng, thread_rng};</span>
-<span class="doccomment">/// use rand::rngs::SmallRng;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Create a big, expensive to initialize and slower, but unpredictable RNG.</span>
-<span class="doccomment">/// // This is cached and done only once per thread.</span>
-<span class="doccomment">/// let mut thread_rng = thread_rng();</span>
-<span class="doccomment">/// // Create small, cheap to initialize and fast RNGs with random seeds.</span>
-<span class="doccomment">/// // One can generally assume this won&#39;t fail.</span>
-<span class="doccomment">/// let rngs: Vec&lt;SmallRng&gt; = (0..10)</span>
-<span class="doccomment">///     .map(|_| SmallRng::from_rng(&amp;mut thread_rng).unwrap())</span>
-<span class="doccomment">///     .collect();</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`StdRng`]: crate::rngs::StdRng</span>
-<span class="doccomment">/// [`thread_rng`]: crate::thread_rng</span>
-<span class="doccomment">/// [rand_chacha]: https://crates.io/crates/rand_chacha</span>
-<span class="doccomment">/// [rand_xoshiro]: https://crates.io/crates/rand_xoshiro</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">doc_cfg</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;small_rng&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SmallRng</span>(<span class="ident">Rng</span>);
+<span class="doccomment">/// A small-state, fast non-crypto PRNG
+///
+/// `SmallRng` may be a good choice when a PRNG with small state, cheap
+/// initialization, good statistical quality and good performance are required.
+/// Note that depending on the application, [`StdRng`] may be faster on many
+/// modern platforms while providing higher-quality randomness. Furthermore,
+/// `SmallRng` is **not** a good choice when:
+/// - Security against prediction is important. Use [`StdRng`] instead.
+/// - Seeds with many zeros are provided. In such cases, it takes `SmallRng`
+///   about 10 samples to produce 0 and 1 bits with equal probability. Either
+///   provide seeds with an approximately equal number of 0 and 1 (for example
+///   by using [`SeedableRng::from_entropy`] or [`SeedableRng::seed_from_u64`]),
+///   or use [`StdRng`] instead.
+///
+/// The algorithm is deterministic but should not be considered reproducible
+/// due to dependence on platform and possible replacement in future
+/// library versions. For a reproducible generator, use a named PRNG from an
+/// external crate, e.g. [rand_xoshiro] or [rand_chacha].
+/// Refer also to [The Book](https://rust-random.github.io/book/guide-rngs.html).
+///
+/// The PRNG algorithm in `SmallRng` is chosen to be efficient on the current
+/// platform, without consideration for cryptography or security. The size of
+/// its state is much smaller than [`StdRng`]. The current algorithm is
+/// `Xoshiro256PlusPlus` on 64-bit platforms and `Xoshiro128PlusPlus` on 32-bit
+/// platforms. Both are also implemented by the [rand_xoshiro] crate.
+///
+/// # Examples
+///
+/// Initializing `SmallRng` with a random seed can be done using [`SeedableRng::from_entropy`]:
+///
+/// ```
+/// use rand::{Rng, SeedableRng};
+/// use rand::rngs::SmallRng;
+///
+/// // Create small, cheap to initialize and fast RNG with a random seed.
+/// // The randomness is supplied by the operating system.
+/// let mut small_rng = SmallRng::from_entropy();
+/// # let v: u32 = small_rng.gen();
+/// ```
+///
+/// When initializing a lot of `SmallRng`&#39;s, using [`thread_rng`] can be more
+/// efficient:
+///
+/// ```
+/// use rand::{SeedableRng, thread_rng};
+/// use rand::rngs::SmallRng;
+///
+/// // Create a big, expensive to initialize and slower, but unpredictable RNG.
+/// // This is cached and done only once per thread.
+/// let mut thread_rng = thread_rng();
+/// // Create small, cheap to initialize and fast RNGs with random seeds.
+/// // One can generally assume this won&#39;t fail.
+/// let rngs: Vec&lt;SmallRng&gt; = (0..10)
+///     .map(|_| SmallRng::from_rng(&amp;mut thread_rng).unwrap())
+///     .collect();
+/// ```
+///
+/// [`StdRng`]: crate::rngs::StdRng
+/// [`thread_rng`]: crate::thread_rng
+/// [rand_chacha]: https://crates.io/crates/rand_chacha
+/// [rand_xoshiro]: https://crates.io/crates/rand_xoshiro
+</span><span class="attribute">#[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">&quot;small_rng&quot;</span>)))]
+#[derive(Clone, Debug, PartialEq, Eq)]
+</span><span class="kw">pub struct </span>SmallRng(Rng);
 
-<span class="kw">impl</span> <span class="ident">RngCore</span> <span class="kw">for</span> <span class="ident">SmallRng</span> {
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">next_u32</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">next_u32</span>()
+<span class="kw">impl </span>RngCore <span class="kw">for </span>SmallRng {
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>next_u32(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.<span class="number">0</span>.next_u32()
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">next_u64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">next_u64</span>()
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>next_u64(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; u64 {
+        <span class="self">self</span>.<span class="number">0</span>.next_u64()
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">fill_bytes</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">dest</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">fill_bytes</span>(<span class="ident">dest</span>);
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>fill_bytes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, dest: <span class="kw-2">&amp;mut </span>[u8]) {
+        <span class="self">self</span>.<span class="number">0</span>.fill_bytes(dest);
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">try_fill_bytes</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">dest</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">try_fill_bytes</span>(<span class="ident">dest</span>)
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>try_fill_bytes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, dest: <span class="kw-2">&amp;mut </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.try_fill_bytes(dest)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">SeedableRng</span> <span class="kw">for</span> <span class="ident">SmallRng</span> {
-    <span class="kw">type</span> <span class="ident">Seed</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">Rng</span> <span class="kw">as</span> <span class="ident">SeedableRng</span><span class="op">&gt;</span><span class="ident">::Seed</span>;
+<span class="kw">impl </span>SeedableRng <span class="kw">for </span>SmallRng {
+    <span class="kw">type </span>Seed = &lt;Rng <span class="kw">as </span>SeedableRng&gt;::Seed;
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">from_seed</span>(<span class="ident">seed</span>: <span class="ident"><span class="self">Self</span>::Seed</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">SmallRng</span>(<span class="ident">Rng::from_seed</span>(<span class="ident">seed</span>))
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>from_seed(seed: <span class="self">Self</span>::Seed) -&gt; <span class="self">Self </span>{
+        SmallRng(Rng::from_seed(seed))
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">from_rng</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">RngCore</span><span class="op">&gt;</span>(<span class="ident">rng</span>: <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="ident">Rng::from_rng</span>(<span class="ident">rng</span>).<span class="ident">map</span>(<span class="ident">SmallRng</span>)
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>from_rng&lt;R: RngCore&gt;(rng: R) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        Rng::from_rng(rng).map(SmallRng)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rand" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rand" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

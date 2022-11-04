@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/utf8-width-0.1.6/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../utf8_width/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../utf8_width/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../utf8_width/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/utf8-width-0.1.6/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../utf8_width/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../utf8_width/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../utf8_width/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -112,79 +112,79 @@ assert_eq!(3, utf8_width::get_width(&quot;中&quot;.as_bytes()[0]));
 cargo bench
 ```
 
-*/</span>
+*/
 
-<span class="attribute">#![<span class="ident">no_std</span>]</span>
+</span><span class="attribute">#![no_std]
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MIN_0_1</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0x80</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX_0_1</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0xC1</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MIN_0_2</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0xF5</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX_0_2</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0xFF</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MIN_1</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0x00</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX_1</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0x7F</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MIN_2</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0xC2</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX_2</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0xDF</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MIN_3</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0xE0</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX_3</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0xEF</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MIN_4</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0xF0</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX_4</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0xF4</span>;
+</span><span class="kw">pub const </span>MIN_0_1: u8 = <span class="number">0x80</span>;
+<span class="kw">pub const </span>MAX_0_1: u8 = <span class="number">0xC1</span>;
+<span class="kw">pub const </span>MIN_0_2: u8 = <span class="number">0xF5</span>;
+<span class="kw">pub const </span>MAX_0_2: u8 = <span class="number">0xFF</span>;
+<span class="kw">pub const </span>MIN_1: u8 = <span class="number">0x00</span>;
+<span class="kw">pub const </span>MAX_1: u8 = <span class="number">0x7F</span>;
+<span class="kw">pub const </span>MIN_2: u8 = <span class="number">0xC2</span>;
+<span class="kw">pub const </span>MAX_2: u8 = <span class="number">0xDF</span>;
+<span class="kw">pub const </span>MIN_3: u8 = <span class="number">0xE0</span>;
+<span class="kw">pub const </span>MAX_3: u8 = <span class="number">0xEF</span>;
+<span class="kw">pub const </span>MIN_4: u8 = <span class="number">0xF0</span>;
+<span class="kw">pub const </span>MAX_4: u8 = <span class="number">0xF4</span>;
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_width_1</span>(<span class="ident">byte</span>: <span class="ident">u8</span>) -&gt; <span class="ident">bool</span> {
-    <span class="ident">byte</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">MAX_1</span> <span class="comment">// no need to check `MIN_1 &lt;= byte`</span>
+<span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>is_width_1(byte: u8) -&gt; bool {
+    byte &lt;= MAX_1 <span class="comment">// no need to check `MIN_1 &lt;= byte`
+</span>}
+
+<span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>is_width_2(byte: u8) -&gt; bool {
+    (MIN_2..=MAX_2).contains(<span class="kw-2">&amp;</span>byte)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_width_2</span>(<span class="ident">byte</span>: <span class="ident">u8</span>) -&gt; <span class="ident">bool</span> {
-    (<span class="ident">MIN_2</span>..<span class="op">=</span><span class="ident">MAX_2</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">byte</span>)
+<span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>is_width_3(byte: u8) -&gt; bool {
+    (MIN_3..=MAX_3).contains(<span class="kw-2">&amp;</span>byte)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_width_3</span>(<span class="ident">byte</span>: <span class="ident">u8</span>) -&gt; <span class="ident">bool</span> {
-    (<span class="ident">MIN_3</span>..<span class="op">=</span><span class="ident">MAX_3</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">byte</span>)
+<span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>is_width_4(byte: u8) -&gt; bool {
+    (MIN_4..=MAX_4).contains(<span class="kw-2">&amp;</span>byte)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_width_4</span>(<span class="ident">byte</span>: <span class="ident">u8</span>) -&gt; <span class="ident">bool</span> {
-    (<span class="ident">MIN_4</span>..<span class="op">=</span><span class="ident">MAX_4</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">byte</span>)
+<span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>is_width_0(byte: u8) -&gt; bool {
+    (MIN_0_1..=MAX_0_1).contains(<span class="kw-2">&amp;</span>byte) || MIN_0_2 &lt;= byte <span class="comment">// no need to check `byte &lt;= MAX_0_2`
+</span>}
+
+<span class="doccomment">/// Given a first byte, determines how many bytes are in this UTF-8 character. If the UTF-8 character is invalid, returns `0`, otherwise returns `1` ~ `4`,
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>get_width(byte: u8) -&gt; usize {
+    <span class="kw">if </span>is_width_1(byte) {
+        <span class="number">1
+    </span>} <span class="kw">else if </span>is_width_2(byte) {
+        <span class="number">2
+    </span>} <span class="kw">else if </span>byte &lt;= MAX_3 {
+        <span class="comment">// no need to check `MIN_3 &lt;= byte`
+        </span><span class="number">3
+    </span>} <span class="kw">else if </span>byte &lt;= MAX_4 {
+        <span class="comment">// no need to check `MIN_4 &lt;= byte`
+        </span><span class="number">4
+    </span>} <span class="kw">else </span>{
+        <span class="number">0
+    </span>}
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_width_0</span>(<span class="ident">byte</span>: <span class="ident">u8</span>) -&gt; <span class="ident">bool</span> {
-    (<span class="ident">MIN_0_1</span>..<span class="op">=</span><span class="ident">MAX_0_1</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">byte</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">MIN_0_2</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">byte</span> <span class="comment">// no need to check `byte &lt;= MAX_0_2`</span>
-}
-
-<span class="doccomment">/// Given a first byte, determines how many bytes are in this UTF-8 character. If the UTF-8 character is invalid, returns `0`, otherwise returns `1` ~ `4`,</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_width</span>(<span class="ident">byte</span>: <span class="ident">u8</span>) -&gt; <span class="ident">usize</span> {
-    <span class="kw">if</span> <span class="ident">is_width_1</span>(<span class="ident">byte</span>) {
-        <span class="number">1</span>
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">is_width_2</span>(<span class="ident">byte</span>) {
-        <span class="number">2</span>
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">byte</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">MAX_3</span> {
-        <span class="comment">// no need to check `MIN_3 &lt;= byte`</span>
-        <span class="number">3</span>
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">byte</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">MAX_4</span> {
-        <span class="comment">// no need to check `MIN_4 &lt;= byte`</span>
-        <span class="number">4</span>
-    } <span class="kw">else</span> {
-        <span class="number">0</span>
-    }
-}
-
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_safety_doc</span>)]</span>
-<span class="doccomment">/// *Assume the input first byte is from a valid UTF-8 character.* Given a first byte, determines how many bytes are in this UTF-8 character. It returns `1` ~ `4`,</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">get_width_assume_valid</span>(<span class="ident">byte</span>: <span class="ident">u8</span>) -&gt; <span class="ident">usize</span> {
-    <span class="kw">if</span> <span class="ident">byte</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">MAX_1</span> {
-        <span class="number">1</span>
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">byte</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">MAX_2</span> {
-        <span class="number">2</span>
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">byte</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">MAX_3</span> {
-        <span class="number">3</span>
-    } <span class="kw">else</span> {
-        <span class="number">4</span>
-    }
+<span class="attribute">#[allow(clippy::missing_safety_doc)]
+</span><span class="doccomment">/// *Assume the input first byte is from a valid UTF-8 character.* Given a first byte, determines how many bytes are in this UTF-8 character. It returns `1` ~ `4`,
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub unsafe fn </span>get_width_assume_valid(byte: u8) -&gt; usize {
+    <span class="kw">if </span>byte &lt;= MAX_1 {
+        <span class="number">1
+    </span>} <span class="kw">else if </span>byte &lt;= MAX_2 {
+        <span class="number">2
+    </span>} <span class="kw">else if </span>byte &lt;= MAX_3 {
+        <span class="number">3
+    </span>} <span class="kw">else </span>{
+        <span class="number">4
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="utf8_width" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="utf8_width" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

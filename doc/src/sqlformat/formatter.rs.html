@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sqlformat-0.2.0/src/formatter.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>formatter.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sqlformat/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sqlformat/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sqlformat/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sqlformat-0.2.0/src/formatter.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>formatter.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sqlformat/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sqlformat/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sqlformat/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -269,276 +269,276 @@
 <span id="269">269</span>
 <span id="270">270</span>
 <span id="271">271</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::indentation::Indentation</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::inline_block::InlineBlock</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::params::Params</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tokenizer</span>::{<span class="ident">Token</span>, <span class="ident">TokenKind</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">FormatOptions</span>, <span class="ident">QueryParams</span>};
-<span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::indentation::Indentation;
+<span class="kw">use </span><span class="kw">crate</span>::inline_block::InlineBlock;
+<span class="kw">use </span><span class="kw">crate</span>::params::Params;
+<span class="kw">use </span><span class="kw">crate</span>::tokenizer::{Token, TokenKind};
+<span class="kw">use crate</span>::{FormatOptions, QueryParams};
+<span class="kw">use </span>itertools::Itertools;
+<span class="kw">use </span>std::borrow::Cow;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">format</span>(<span class="ident">tokens</span>: <span class="kw-2">&amp;</span>[<span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>], <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="ident">QueryParams</span>, <span class="ident">options</span>: <span class="ident">FormatOptions</span>) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">formatter</span> <span class="op">=</span> <span class="ident">Formatter::new</span>(<span class="ident">tokens</span>, <span class="ident">params</span>, <span class="ident">options</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">formatted_query</span> <span class="op">=</span> <span class="ident">String::new</span>();
-    <span class="kw">for</span> (<span class="ident">index</span>, <span class="ident">token</span>) <span class="kw">in</span> <span class="ident">tokens</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-        <span class="ident">formatter</span>.<span class="ident">index</span> <span class="op">=</span> <span class="ident">index</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>format(tokens: <span class="kw-2">&amp;</span>[Token&lt;<span class="lifetime">&#39;_</span>&gt;], params: <span class="kw-2">&amp;</span>QueryParams, options: FormatOptions) -&gt; String {
+    <span class="kw">let </span><span class="kw-2">mut </span>formatter = Formatter::new(tokens, params, options);
+    <span class="kw">let </span><span class="kw-2">mut </span>formatted_query = String::new();
+    <span class="kw">for </span>(index, token) <span class="kw">in </span>tokens.iter().enumerate() {
+        formatter.index = index;
 
-        <span class="kw">if</span> <span class="ident">token</span>.<span class="ident">kind</span> <span class="op">==</span> <span class="ident">TokenKind::Whitespace</span> {
-            <span class="comment">// ignore (we do our own whitespace formatting)</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">token</span>.<span class="ident">kind</span> <span class="op">==</span> <span class="ident">TokenKind::LineComment</span> {
-            <span class="ident">formatter</span>.<span class="ident">format_line_comment</span>(<span class="ident">token</span>, <span class="kw-2">&amp;mut</span> <span class="ident">formatted_query</span>);
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">token</span>.<span class="ident">kind</span> <span class="op">==</span> <span class="ident">TokenKind::BlockComment</span> {
-            <span class="ident">formatter</span>.<span class="ident">format_block_comment</span>(<span class="ident">token</span>, <span class="kw-2">&amp;mut</span> <span class="ident">formatted_query</span>);
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">token</span>.<span class="ident">kind</span> <span class="op">==</span> <span class="ident">TokenKind::ReservedTopLevel</span> {
-            <span class="ident">formatter</span>.<span class="ident">format_top_level_reserved_word</span>(<span class="ident">token</span>, <span class="kw-2">&amp;mut</span> <span class="ident">formatted_query</span>);
-            <span class="ident">formatter</span>.<span class="ident">previous_reserved_word</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">token</span>);
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">token</span>.<span class="ident">kind</span> <span class="op">==</span> <span class="ident">TokenKind::ReservedTopLevelNoIndent</span> {
-            <span class="ident">formatter</span>.<span class="ident">format_top_level_reserved_word_no_indent</span>(<span class="ident">token</span>, <span class="kw-2">&amp;mut</span> <span class="ident">formatted_query</span>);
-            <span class="ident">formatter</span>.<span class="ident">previous_reserved_word</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">token</span>);
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">token</span>.<span class="ident">kind</span> <span class="op">==</span> <span class="ident">TokenKind::ReservedNewline</span> {
-            <span class="ident">formatter</span>.<span class="ident">format_newline_reserved_word</span>(<span class="ident">token</span>, <span class="kw-2">&amp;mut</span> <span class="ident">formatted_query</span>);
-            <span class="ident">formatter</span>.<span class="ident">previous_reserved_word</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">token</span>);
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">token</span>.<span class="ident">kind</span> <span class="op">==</span> <span class="ident">TokenKind::Reserved</span> {
-            <span class="ident">formatter</span>.<span class="ident">format_with_spaces</span>(<span class="ident">token</span>, <span class="kw-2">&amp;mut</span> <span class="ident">formatted_query</span>);
-            <span class="ident">formatter</span>.<span class="ident">previous_reserved_word</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">token</span>);
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">token</span>.<span class="ident">kind</span> <span class="op">==</span> <span class="ident">TokenKind::OpenParen</span> {
-            <span class="ident">formatter</span>.<span class="ident">format_opening_parentheses</span>(<span class="ident">token</span>, <span class="kw-2">&amp;mut</span> <span class="ident">formatted_query</span>);
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">token</span>.<span class="ident">kind</span> <span class="op">==</span> <span class="ident">TokenKind::CloseParen</span> {
-            <span class="ident">formatter</span>.<span class="ident">format_closing_parentheses</span>(<span class="ident">token</span>, <span class="kw-2">&amp;mut</span> <span class="ident">formatted_query</span>);
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">token</span>.<span class="ident">kind</span> <span class="op">==</span> <span class="ident">TokenKind::Placeholder</span> {
-            <span class="ident">formatter</span>.<span class="ident">format_placeholder</span>(<span class="ident">token</span>, <span class="kw-2">&amp;mut</span> <span class="ident">formatted_query</span>);
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">token</span>.<span class="ident">value</span> <span class="op">==</span> <span class="string">&quot;,&quot;</span> {
-            <span class="ident">formatter</span>.<span class="ident">format_comma</span>(<span class="ident">token</span>, <span class="kw-2">&amp;mut</span> <span class="ident">formatted_query</span>);
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">token</span>.<span class="ident">value</span> <span class="op">==</span> <span class="string">&quot;:&quot;</span> {
-            <span class="ident">formatter</span>.<span class="ident">format_with_space_after</span>(<span class="ident">token</span>, <span class="kw-2">&amp;mut</span> <span class="ident">formatted_query</span>);
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">token</span>.<span class="ident">value</span> <span class="op">==</span> <span class="string">&quot;.&quot;</span> {
-            <span class="ident">formatter</span>.<span class="ident">format_without_spaces</span>(<span class="ident">token</span>, <span class="kw-2">&amp;mut</span> <span class="ident">formatted_query</span>);
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">token</span>.<span class="ident">value</span> <span class="op">==</span> <span class="string">&quot;;&quot;</span> {
-            <span class="ident">formatter</span>.<span class="ident">format_query_separator</span>(<span class="ident">token</span>, <span class="kw-2">&amp;mut</span> <span class="ident">formatted_query</span>);
-        } <span class="kw">else</span> {
-            <span class="ident">formatter</span>.<span class="ident">format_with_spaces</span>(<span class="ident">token</span>, <span class="kw-2">&amp;mut</span> <span class="ident">formatted_query</span>);
+        <span class="kw">if </span>token.kind == TokenKind::Whitespace {
+            <span class="comment">// ignore (we do our own whitespace formatting)
+        </span>} <span class="kw">else if </span>token.kind == TokenKind::LineComment {
+            formatter.format_line_comment(token, <span class="kw-2">&amp;mut </span>formatted_query);
+        } <span class="kw">else if </span>token.kind == TokenKind::BlockComment {
+            formatter.format_block_comment(token, <span class="kw-2">&amp;mut </span>formatted_query);
+        } <span class="kw">else if </span>token.kind == TokenKind::ReservedTopLevel {
+            formatter.format_top_level_reserved_word(token, <span class="kw-2">&amp;mut </span>formatted_query);
+            formatter.previous_reserved_word = <span class="prelude-val">Some</span>(token);
+        } <span class="kw">else if </span>token.kind == TokenKind::ReservedTopLevelNoIndent {
+            formatter.format_top_level_reserved_word_no_indent(token, <span class="kw-2">&amp;mut </span>formatted_query);
+            formatter.previous_reserved_word = <span class="prelude-val">Some</span>(token);
+        } <span class="kw">else if </span>token.kind == TokenKind::ReservedNewline {
+            formatter.format_newline_reserved_word(token, <span class="kw-2">&amp;mut </span>formatted_query);
+            formatter.previous_reserved_word = <span class="prelude-val">Some</span>(token);
+        } <span class="kw">else if </span>token.kind == TokenKind::Reserved {
+            formatter.format_with_spaces(token, <span class="kw-2">&amp;mut </span>formatted_query);
+            formatter.previous_reserved_word = <span class="prelude-val">Some</span>(token);
+        } <span class="kw">else if </span>token.kind == TokenKind::OpenParen {
+            formatter.format_opening_parentheses(token, <span class="kw-2">&amp;mut </span>formatted_query);
+        } <span class="kw">else if </span>token.kind == TokenKind::CloseParen {
+            formatter.format_closing_parentheses(token, <span class="kw-2">&amp;mut </span>formatted_query);
+        } <span class="kw">else if </span>token.kind == TokenKind::Placeholder {
+            formatter.format_placeholder(token, <span class="kw-2">&amp;mut </span>formatted_query);
+        } <span class="kw">else if </span>token.value == <span class="string">&quot;,&quot; </span>{
+            formatter.format_comma(token, <span class="kw-2">&amp;mut </span>formatted_query);
+        } <span class="kw">else if </span>token.value == <span class="string">&quot;:&quot; </span>{
+            formatter.format_with_space_after(token, <span class="kw-2">&amp;mut </span>formatted_query);
+        } <span class="kw">else if </span>token.value == <span class="string">&quot;.&quot; </span>{
+            formatter.format_without_spaces(token, <span class="kw-2">&amp;mut </span>formatted_query);
+        } <span class="kw">else if </span>token.value == <span class="string">&quot;;&quot; </span>{
+            formatter.format_query_separator(token, <span class="kw-2">&amp;mut </span>formatted_query);
+        } <span class="kw">else </span>{
+            formatter.format_with_spaces(token, <span class="kw-2">&amp;mut </span>formatted_query);
         }
     }
-    <span class="ident">formatted_query</span>.<span class="ident">trim</span>().<span class="ident">to_string</span>()
+    formatted_query.trim().to_string()
 }
 
-<span class="kw">struct</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">index</span>: <span class="ident">usize</span>,
-    <span class="ident">previous_reserved_word</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">tokens</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>],
-    <span class="ident">params</span>: <span class="ident">Params</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="ident">options</span>: <span class="ident">FormatOptions</span>,
-    <span class="ident">indentation</span>: <span class="ident">Indentation</span>,
-    <span class="ident">inline_block</span>: <span class="ident">InlineBlock</span>,
+<span class="kw">struct </span>Formatter&lt;<span class="lifetime">&#39;a</span>&gt; {
+    index: usize,
+    previous_reserved_word: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Token&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    tokens: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[Token&lt;<span class="lifetime">&#39;a</span>&gt;],
+    params: Params&lt;<span class="lifetime">&#39;a</span>&gt;,
+    options: FormatOptions,
+    indentation: Indentation,
+    inline_block: InlineBlock,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">tokens</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>], <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">QueryParams</span>, <span class="ident">options</span>: <span class="ident">FormatOptions</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Formatter</span> {
-            <span class="ident">index</span>: <span class="number">0</span>,
-            <span class="ident">previous_reserved_word</span>: <span class="prelude-val">None</span>,
-            <span class="ident">tokens</span>,
-            <span class="ident">params</span>: <span class="ident">Params::new</span>(<span class="ident">params</span>),
-            <span class="ident">options</span>,
-            <span class="ident">indentation</span>: <span class="ident">Indentation::new</span>(<span class="ident">options</span>),
-            <span class="ident">inline_block</span>: <span class="ident">InlineBlock::new</span>(),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Formatter&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>new(tokens: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[Token&lt;<span class="lifetime">&#39;a</span>&gt;], params: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>QueryParams, options: FormatOptions) -&gt; <span class="self">Self </span>{
+        Formatter {
+            index: <span class="number">0</span>,
+            previous_reserved_word: <span class="prelude-val">None</span>,
+            tokens,
+            params: Params::new(params),
+            options,
+            indentation: Indentation::new(options),
+            inline_block: InlineBlock::new(),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">format_line_comment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">query</span>: <span class="kw-2">&amp;mut</span> <span class="ident">String</span>) {
-        <span class="ident">query</span>.<span class="ident">push_str</span>(<span class="ident">token</span>.<span class="ident">value</span>);
-        <span class="self">self</span>.<span class="ident">add_new_line</span>(<span class="ident">query</span>);
+    <span class="kw">fn </span>format_line_comment(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="kw-2">&amp;</span>Token&lt;<span class="lifetime">&#39;_</span>&gt;, query: <span class="kw-2">&amp;mut </span>String) {
+        query.push_str(token.value);
+        <span class="self">self</span>.add_new_line(query);
     }
 
-    <span class="kw">fn</span> <span class="ident">format_block_comment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">query</span>: <span class="kw-2">&amp;mut</span> <span class="ident">String</span>) {
-        <span class="self">self</span>.<span class="ident">add_new_line</span>(<span class="ident">query</span>);
-        <span class="ident">query</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">indent_comment</span>(<span class="ident">token</span>.<span class="ident">value</span>));
-        <span class="self">self</span>.<span class="ident">add_new_line</span>(<span class="ident">query</span>);
+    <span class="kw">fn </span>format_block_comment(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="kw-2">&amp;</span>Token&lt;<span class="lifetime">&#39;_</span>&gt;, query: <span class="kw-2">&amp;mut </span>String) {
+        <span class="self">self</span>.add_new_line(query);
+        query.push_str(<span class="kw-2">&amp;</span><span class="self">self</span>.indent_comment(token.value));
+        <span class="self">self</span>.add_new_line(query);
     }
 
-    <span class="kw">fn</span> <span class="ident">format_top_level_reserved_word</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">query</span>: <span class="kw-2">&amp;mut</span> <span class="ident">String</span>) {
-        <span class="self">self</span>.<span class="ident">indentation</span>.<span class="ident">decrease_top_level</span>();
-        <span class="self">self</span>.<span class="ident">add_new_line</span>(<span class="ident">query</span>);
-        <span class="self">self</span>.<span class="ident">indentation</span>.<span class="ident">increase_top_level</span>();
-        <span class="ident">query</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">equalize_whitespace</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">format_reserved_word</span>(<span class="ident">token</span>.<span class="ident">value</span>)));
-        <span class="self">self</span>.<span class="ident">add_new_line</span>(<span class="ident">query</span>);
+    <span class="kw">fn </span>format_top_level_reserved_word(<span class="kw-2">&amp;mut </span><span class="self">self</span>, token: <span class="kw-2">&amp;</span>Token&lt;<span class="lifetime">&#39;_</span>&gt;, query: <span class="kw-2">&amp;mut </span>String) {
+        <span class="self">self</span>.indentation.decrease_top_level();
+        <span class="self">self</span>.add_new_line(query);
+        <span class="self">self</span>.indentation.increase_top_level();
+        query.push_str(<span class="kw-2">&amp;</span><span class="self">self</span>.equalize_whitespace(<span class="kw-2">&amp;</span><span class="self">self</span>.format_reserved_word(token.value)));
+        <span class="self">self</span>.add_new_line(query);
     }
 
-    <span class="kw">fn</span> <span class="ident">format_top_level_reserved_word_no_indent</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">query</span>: <span class="kw-2">&amp;mut</span> <span class="ident">String</span>) {
-        <span class="self">self</span>.<span class="ident">indentation</span>.<span class="ident">decrease_top_level</span>();
-        <span class="self">self</span>.<span class="ident">add_new_line</span>(<span class="ident">query</span>);
-        <span class="ident">query</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">equalize_whitespace</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">format_reserved_word</span>(<span class="ident">token</span>.<span class="ident">value</span>)));
-        <span class="self">self</span>.<span class="ident">add_new_line</span>(<span class="ident">query</span>);
+    <span class="kw">fn </span>format_top_level_reserved_word_no_indent(<span class="kw-2">&amp;mut </span><span class="self">self</span>, token: <span class="kw-2">&amp;</span>Token&lt;<span class="lifetime">&#39;_</span>&gt;, query: <span class="kw-2">&amp;mut </span>String) {
+        <span class="self">self</span>.indentation.decrease_top_level();
+        <span class="self">self</span>.add_new_line(query);
+        query.push_str(<span class="kw-2">&amp;</span><span class="self">self</span>.equalize_whitespace(<span class="kw-2">&amp;</span><span class="self">self</span>.format_reserved_word(token.value)));
+        <span class="self">self</span>.add_new_line(query);
     }
 
-    <span class="kw">fn</span> <span class="ident">format_newline_reserved_word</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">query</span>: <span class="kw-2">&amp;mut</span> <span class="ident">String</span>) {
-        <span class="self">self</span>.<span class="ident">add_new_line</span>(<span class="ident">query</span>);
-        <span class="ident">query</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">equalize_whitespace</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">format_reserved_word</span>(<span class="ident">token</span>.<span class="ident">value</span>)));
-        <span class="ident">query</span>.<span class="ident">push</span>(<span class="string">&#39; &#39;</span>);
+    <span class="kw">fn </span>format_newline_reserved_word(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="kw-2">&amp;</span>Token&lt;<span class="lifetime">&#39;_</span>&gt;, query: <span class="kw-2">&amp;mut </span>String) {
+        <span class="self">self</span>.add_new_line(query);
+        query.push_str(<span class="kw-2">&amp;</span><span class="self">self</span>.equalize_whitespace(<span class="kw-2">&amp;</span><span class="self">self</span>.format_reserved_word(token.value)));
+        query.push(<span class="string">&#39; &#39;</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">format_with_spaces</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">query</span>: <span class="kw-2">&amp;mut</span> <span class="ident">String</span>) {
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">token</span>.<span class="ident">kind</span> <span class="op">==</span> <span class="ident">TokenKind::Reserved</span> {
-            <span class="self">self</span>.<span class="ident">format_reserved_word</span>(<span class="ident">token</span>.<span class="ident">value</span>)
-        } <span class="kw">else</span> {
-            <span class="ident">Cow::Borrowed</span>(<span class="ident">token</span>.<span class="ident">value</span>)
+    <span class="kw">fn </span>format_with_spaces(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="kw-2">&amp;</span>Token&lt;<span class="lifetime">&#39;_</span>&gt;, query: <span class="kw-2">&amp;mut </span>String) {
+        <span class="kw">let </span>value = <span class="kw">if </span>token.kind == TokenKind::Reserved {
+            <span class="self">self</span>.format_reserved_word(token.value)
+        } <span class="kw">else </span>{
+            Cow::Borrowed(token.value)
         };
-        <span class="ident">query</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>);
-        <span class="ident">query</span>.<span class="ident">push</span>(<span class="string">&#39; &#39;</span>);
+        query.push_str(<span class="kw-2">&amp;</span>value);
+        query.push(<span class="string">&#39; &#39;</span>);
     }
 
-    <span class="comment">// Opening parentheses increase the block indent level and start a new line</span>
-    <span class="kw">fn</span> <span class="ident">format_opening_parentheses</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">query</span>: <span class="kw-2">&amp;mut</span> <span class="ident">String</span>) {
-        <span class="kw">const</span> <span class="ident">PRESERVE_WHITESPACE_FOR</span>: <span class="kw-2">&amp;</span>[<span class="ident">TokenKind</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
-            <span class="ident">TokenKind::Whitespace</span>,
-            <span class="ident">TokenKind::OpenParen</span>,
-            <span class="ident">TokenKind::LineComment</span>,
+    <span class="comment">// Opening parentheses increase the block indent level and start a new line
+    </span><span class="kw">fn </span>format_opening_parentheses(<span class="kw-2">&amp;mut </span><span class="self">self</span>, token: <span class="kw-2">&amp;</span>Token&lt;<span class="lifetime">&#39;_</span>&gt;, query: <span class="kw-2">&amp;mut </span>String) {
+        <span class="kw">const </span>PRESERVE_WHITESPACE_FOR: <span class="kw-2">&amp;</span>[TokenKind] = <span class="kw-2">&amp;</span>[
+            TokenKind::Whitespace,
+            TokenKind::OpenParen,
+            TokenKind::LineComment,
         ];
 
-        <span class="comment">// Take out the preceding space unless there was whitespace there in the original query</span>
-        <span class="comment">// or another opening parens or line comment</span>
-        <span class="kw">let</span> <span class="ident">previous_token</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">previous_token</span>();
-        <span class="kw">if</span> <span class="ident">previous_token</span>.<span class="ident">is_none</span>()
-            <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">PRESERVE_WHITESPACE_FOR</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">previous_token</span>.<span class="ident">unwrap</span>().<span class="ident">kind</span>)
+        <span class="comment">// Take out the preceding space unless there was whitespace there in the original query
+        // or another opening parens or line comment
+        </span><span class="kw">let </span>previous_token = <span class="self">self</span>.previous_token();
+        <span class="kw">if </span>previous_token.is_none()
+            || !PRESERVE_WHITESPACE_FOR.contains(<span class="kw-2">&amp;</span>previous_token.unwrap().kind)
         {
-            <span class="self">self</span>.<span class="ident">trim_spaces_end</span>(<span class="ident">query</span>);
+            <span class="self">self</span>.trim_spaces_end(query);
         }
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">uppercase</span> {
-            <span class="ident">query</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>.<span class="ident">value</span>.<span class="ident">to_uppercase</span>());
-        } <span class="kw">else</span> {
-            <span class="ident">query</span>.<span class="ident">push_str</span>(<span class="ident">token</span>.<span class="ident">value</span>);
+        <span class="kw">if </span><span class="self">self</span>.options.uppercase {
+            query.push_str(<span class="kw-2">&amp;</span>token.value.to_uppercase());
+        } <span class="kw">else </span>{
+            query.push_str(token.value);
         };
 
-        <span class="self">self</span>.<span class="ident">inline_block</span>.<span class="ident">begin_if_possible</span>(<span class="self">self</span>.<span class="ident">tokens</span>, <span class="self">self</span>.<span class="ident">index</span>);
+        <span class="self">self</span>.inline_block.begin_if_possible(<span class="self">self</span>.tokens, <span class="self">self</span>.index);
 
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">inline_block</span>.<span class="ident">is_active</span>() {
-            <span class="self">self</span>.<span class="ident">indentation</span>.<span class="ident">increase_block_level</span>();
-            <span class="self">self</span>.<span class="ident">add_new_line</span>(<span class="ident">query</span>);
+        <span class="kw">if </span>!<span class="self">self</span>.inline_block.is_active() {
+            <span class="self">self</span>.indentation.increase_block_level();
+            <span class="self">self</span>.add_new_line(query);
         }
     }
 
-    <span class="comment">// Closing parentheses decrease the block indent level</span>
-    <span class="kw">fn</span> <span class="ident">format_closing_parentheses</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">query</span>: <span class="kw-2">&amp;mut</span> <span class="ident">String</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">token</span> <span class="op">=</span> <span class="ident">token</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">uppercase</span> {
-            <span class="ident">token</span>.<span class="ident">value</span>.<span class="ident">to_uppercase</span>()
-        } <span class="kw">else</span> {
-            <span class="ident">token</span>.<span class="ident">value</span>.<span class="ident">to_string</span>()
+    <span class="comment">// Closing parentheses decrease the block indent level
+    </span><span class="kw">fn </span>format_closing_parentheses(<span class="kw-2">&amp;mut </span><span class="self">self</span>, token: <span class="kw-2">&amp;</span>Token&lt;<span class="lifetime">&#39;_</span>&gt;, query: <span class="kw-2">&amp;mut </span>String) {
+        <span class="kw">let </span><span class="kw-2">mut </span>token = token.clone();
+        <span class="kw">let </span>value = <span class="kw">if </span><span class="self">self</span>.options.uppercase {
+            token.value.to_uppercase()
+        } <span class="kw">else </span>{
+            token.value.to_string()
         };
-        <span class="ident">token</span>.<span class="ident">value</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">value</span>;
+        token.value = <span class="kw-2">&amp;</span>value;
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">inline_block</span>.<span class="ident">is_active</span>() {
-            <span class="self">self</span>.<span class="ident">inline_block</span>.<span class="ident">end</span>();
-            <span class="self">self</span>.<span class="ident">format_with_space_after</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>, <span class="ident">query</span>);
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">indentation</span>.<span class="ident">decrease_block_level</span>();
-            <span class="self">self</span>.<span class="ident">add_new_line</span>(<span class="ident">query</span>);
-            <span class="self">self</span>.<span class="ident">format_with_spaces</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>, <span class="ident">query</span>);
+        <span class="kw">if </span><span class="self">self</span>.inline_block.is_active() {
+            <span class="self">self</span>.inline_block.end();
+            <span class="self">self</span>.format_with_space_after(<span class="kw-2">&amp;</span>token, query);
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.indentation.decrease_block_level();
+            <span class="self">self</span>.add_new_line(query);
+            <span class="self">self</span>.format_with_spaces(<span class="kw-2">&amp;</span>token, query);
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">format_placeholder</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">query</span>: <span class="kw-2">&amp;mut</span> <span class="ident">String</span>) {
-        <span class="ident">query</span>.<span class="ident">push_str</span>(<span class="self">self</span>.<span class="ident">params</span>.<span class="ident">get</span>(<span class="ident">token</span>));
-        <span class="ident">query</span>.<span class="ident">push</span>(<span class="string">&#39; &#39;</span>);
+    <span class="kw">fn </span>format_placeholder(<span class="kw-2">&amp;mut </span><span class="self">self</span>, token: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Token&lt;<span class="lifetime">&#39;a</span>&gt;, query: <span class="kw-2">&amp;mut </span>String) {
+        query.push_str(<span class="self">self</span>.params.get(token));
+        query.push(<span class="string">&#39; &#39;</span>);
     }
 
-    <span class="comment">// Commas start a new line (unless within inline parentheses or SQL &quot;LIMIT&quot; clause)</span>
-    <span class="kw">fn</span> <span class="ident">format_comma</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">query</span>: <span class="kw-2">&amp;mut</span> <span class="ident">String</span>) {
-        <span class="self">self</span>.<span class="ident">trim_spaces_end</span>(<span class="ident">query</span>);
-        <span class="ident">query</span>.<span class="ident">push_str</span>(<span class="ident">token</span>.<span class="ident">value</span>);
-        <span class="ident">query</span>.<span class="ident">push</span>(<span class="string">&#39; &#39;</span>);
+    <span class="comment">// Commas start a new line (unless within inline parentheses or SQL &quot;LIMIT&quot; clause)
+    </span><span class="kw">fn </span>format_comma(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="kw-2">&amp;</span>Token&lt;<span class="lifetime">&#39;_</span>&gt;, query: <span class="kw-2">&amp;mut </span>String) {
+        <span class="self">self</span>.trim_spaces_end(query);
+        query.push_str(token.value);
+        query.push(<span class="string">&#39; &#39;</span>);
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">inline_block</span>.<span class="ident">is_active</span>() {
+        <span class="kw">if </span><span class="self">self</span>.inline_block.is_active() {
             <span class="kw">return</span>;
         }
-        <span class="kw">if</span> <span class="self">self</span>
-            .<span class="ident">previous_reserved_word</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">word</span><span class="op">|</span> <span class="ident">word</span>.<span class="ident">value</span>.<span class="ident">to_lowercase</span>() <span class="op">==</span> <span class="string">&quot;limit&quot;</span>)
-            .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+        <span class="kw">if </span><span class="self">self
+            </span>.previous_reserved_word
+            .map(|word| word.value.to_lowercase() == <span class="string">&quot;limit&quot;</span>)
+            .unwrap_or(<span class="bool-val">false</span>)
         {
             <span class="kw">return</span>;
         }
-        <span class="self">self</span>.<span class="ident">add_new_line</span>(<span class="ident">query</span>);
+        <span class="self">self</span>.add_new_line(query);
     }
 
-    <span class="kw">fn</span> <span class="ident">format_with_space_after</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">query</span>: <span class="kw-2">&amp;mut</span> <span class="ident">String</span>) {
-        <span class="self">self</span>.<span class="ident">trim_spaces_end</span>(<span class="ident">query</span>);
-        <span class="ident">query</span>.<span class="ident">push_str</span>(<span class="ident">token</span>.<span class="ident">value</span>);
-        <span class="ident">query</span>.<span class="ident">push</span>(<span class="string">&#39; &#39;</span>);
+    <span class="kw">fn </span>format_with_space_after(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="kw-2">&amp;</span>Token&lt;<span class="lifetime">&#39;_</span>&gt;, query: <span class="kw-2">&amp;mut </span>String) {
+        <span class="self">self</span>.trim_spaces_end(query);
+        query.push_str(token.value);
+        query.push(<span class="string">&#39; &#39;</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">format_without_spaces</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">query</span>: <span class="kw-2">&amp;mut</span> <span class="ident">String</span>) {
-        <span class="self">self</span>.<span class="ident">trim_spaces_end</span>(<span class="ident">query</span>);
-        <span class="ident">query</span>.<span class="ident">push_str</span>(<span class="ident">token</span>.<span class="ident">value</span>);
+    <span class="kw">fn </span>format_without_spaces(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="kw-2">&amp;</span>Token&lt;<span class="lifetime">&#39;_</span>&gt;, query: <span class="kw-2">&amp;mut </span>String) {
+        <span class="self">self</span>.trim_spaces_end(query);
+        query.push_str(token.value);
     }
 
-    <span class="kw">fn</span> <span class="ident">format_query_separator</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">query</span>: <span class="kw-2">&amp;mut</span> <span class="ident">String</span>) {
-        <span class="self">self</span>.<span class="ident">indentation</span>.<span class="ident">reset_indentation</span>();
-        <span class="self">self</span>.<span class="ident">trim_spaces_end</span>(<span class="ident">query</span>);
-        <span class="ident">query</span>.<span class="ident">push_str</span>(<span class="ident">token</span>.<span class="ident">value</span>);
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="self">self</span>.<span class="ident">options</span>.<span class="ident">lines_between_queries</span> {
-            <span class="ident">query</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
+    <span class="kw">fn </span>format_query_separator(<span class="kw-2">&amp;mut </span><span class="self">self</span>, token: <span class="kw-2">&amp;</span>Token&lt;<span class="lifetime">&#39;_</span>&gt;, query: <span class="kw-2">&amp;mut </span>String) {
+        <span class="self">self</span>.indentation.reset_indentation();
+        <span class="self">self</span>.trim_spaces_end(query);
+        query.push_str(token.value);
+        <span class="kw">for _ in </span><span class="number">0</span>..<span class="self">self</span>.options.lines_between_queries {
+            query.push(<span class="string">&#39;\n&#39;</span>);
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">add_new_line</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">query</span>: <span class="kw-2">&amp;mut</span> <span class="ident">String</span>) {
-        <span class="self">self</span>.<span class="ident">trim_spaces_end</span>(<span class="ident">query</span>);
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">query</span>.<span class="ident">ends_with</span>(<span class="string">&#39;\n&#39;</span>) {
-            <span class="ident">query</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
+    <span class="kw">fn </span>add_new_line(<span class="kw-2">&amp;</span><span class="self">self</span>, query: <span class="kw-2">&amp;mut </span>String) {
+        <span class="self">self</span>.trim_spaces_end(query);
+        <span class="kw">if </span>!query.ends_with(<span class="string">&#39;\n&#39;</span>) {
+            query.push(<span class="string">&#39;\n&#39;</span>);
         }
-        <span class="ident">query</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">indentation</span>.<span class="ident">get_indent</span>());
+        query.push_str(<span class="kw-2">&amp;</span><span class="self">self</span>.indentation.get_indent());
     }
 
-    <span class="kw">fn</span> <span class="ident">trim_spaces_end</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">query</span>: <span class="kw-2">&amp;mut</span> <span class="ident">String</span>) {
-        <span class="ident">query</span>.<span class="ident">truncate</span>(<span class="ident">query</span>.<span class="ident">trim_end_matches</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39; &#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;\t&#39;</span>).<span class="ident">len</span>());
+    <span class="kw">fn </span>trim_spaces_end(<span class="kw-2">&amp;</span><span class="self">self</span>, query: <span class="kw-2">&amp;mut </span>String) {
+        query.truncate(query.trim_end_matches(|c| c == <span class="string">&#39; &#39; </span>|| c == <span class="string">&#39;\t&#39;</span>).len());
     }
 
-    <span class="kw">fn</span> <span class="ident">indent_comment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-        <span class="ident">token</span>
-            .<span class="ident">split</span>(<span class="string">&#39;\n&#39;</span>)
-            .<span class="ident">enumerate</span>()
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">i</span>, <span class="ident">line</span>)<span class="op">|</span> {
-                <span class="kw">if</span> <span class="ident">i</span> <span class="op">==</span> <span class="number">0</span> {
-                    <span class="kw">return</span> <span class="ident">line</span>.<span class="ident">to_string</span>();
+    <span class="kw">fn </span>indent_comment(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="kw-2">&amp;</span>str) -&gt; String {
+        token
+            .split(<span class="string">&#39;\n&#39;</span>)
+            .enumerate()
+            .map(|(i, line)| {
+                <span class="kw">if </span>i == <span class="number">0 </span>{
+                    <span class="kw">return </span>line.to_string();
                 }
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">line</span>.<span class="ident">starts_with</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39; &#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;\t&#39;</span>) {
-                    <span class="kw">return</span> <span class="ident">line</span>.<span class="ident">to_string</span>();
+                <span class="kw">if </span>!line.starts_with(|c| c == <span class="string">&#39; &#39; </span>|| c == <span class="string">&#39;\t&#39;</span>) {
+                    <span class="kw">return </span>line.to_string();
                 }
                 <span class="macro">format!</span>(
                     <span class="string">&quot;{} {}&quot;</span>,
-                    <span class="self">self</span>.<span class="ident">indentation</span>.<span class="ident">get_indent</span>(),
-                    <span class="ident">line</span>.<span class="ident">chars</span>()
-                        .<span class="ident">skip_while</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39; &#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;\t&#39;</span>)
-                        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>()
+                    <span class="self">self</span>.indentation.get_indent(),
+                    line.chars()
+                        .skip_while(|<span class="kw-2">&amp;</span>c| c == <span class="string">&#39; &#39; </span>|| c == <span class="string">&#39;\t&#39;</span>)
+                        .collect::&lt;String&gt;()
                 )
             })
-            .<span class="ident">join</span>(<span class="string">&quot;\n&quot;</span>)
+            .join(<span class="string">&quot;\n&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">format_reserved_word</span><span class="op">&lt;</span><span class="lifetime">&#39;t</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;t</span> <span class="ident">str</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;t</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">uppercase</span> {
-            <span class="ident">Cow::Owned</span>(<span class="ident">token</span>.<span class="ident">to_uppercase</span>())
-        } <span class="kw">else</span> {
-            <span class="ident">Cow::Borrowed</span>(<span class="ident">token</span>)
+    <span class="kw">fn </span>format_reserved_word&lt;<span class="lifetime">&#39;t</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="kw-2">&amp;</span><span class="lifetime">&#39;t </span>str) -&gt; Cow&lt;<span class="lifetime">&#39;t</span>, str&gt; {
+        <span class="kw">if </span><span class="self">self</span>.options.uppercase {
+            Cow::Owned(token.to_uppercase())
+        } <span class="kw">else </span>{
+            Cow::Borrowed(token)
         }
     }
 
-    <span class="comment">// Replace any sequence of whitespace characters with single space</span>
-    <span class="kw">fn</span> <span class="ident">equalize_whitespace</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-        <span class="ident">token</span>
-            .<span class="ident">split</span>(<span class="ident">char::is_whitespace</span>)
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="op">!</span><span class="ident">s</span>.<span class="ident">is_empty</span>())
-            .<span class="ident">join</span>(<span class="string">&quot; &quot;</span>)
+    <span class="comment">// Replace any sequence of whitespace characters with single space
+    </span><span class="kw">fn </span>equalize_whitespace(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="kw-2">&amp;</span>str) -&gt; String {
+        token
+            .split(char::is_whitespace)
+            .filter(|s| !s.is_empty())
+            .join(<span class="string">&quot; &quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">previous_token</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Token</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index</span>.<span class="ident">checked_sub</span>(<span class="number">1</span>);
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">index</span>) <span class="op">=</span> <span class="ident">index</span> {
-            <span class="self">self</span>.<span class="ident">tokens</span>.<span class="ident">get</span>(<span class="ident">index</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+    <span class="kw">fn </span>previous_token(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Token&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="kw">let </span>index = <span class="self">self</span>.index.checked_sub(<span class="number">1</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(index) = index {
+            <span class="self">self</span>.tokens.get(index)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sqlformat" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sqlformat" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

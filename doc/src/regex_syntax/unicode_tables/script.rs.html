@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/regex-syntax-0.6.27/src/unicode_tables/script.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>script.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../regex_syntax/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../regex_syntax/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../regex_syntax/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/regex-syntax-0.6.27/src/unicode_tables/script.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>script.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../regex_syntax/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../regex_syntax/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../regex_syntax/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1242,187 +1242,187 @@
 <span id="1242">1242</span>
 <span id="1243">1243</span>
 <span id="1244">1244</span>
-</pre><pre class="rust"><code><span class="comment">// DO NOT EDIT THIS FILE. IT WAS AUTOMATICALLY GENERATED BY:</span>
-<span class="comment">//</span>
-<span class="comment">//   ucd-generate script /tmp/ucd --chars</span>
-<span class="comment">//</span>
-<span class="comment">// Unicode version: 14.0.0.</span>
-<span class="comment">//</span>
-<span class="comment">// ucd-generate 0.2.11 is available on crates.io.</span>
+</pre><pre class="rust"><code><span class="comment">// DO NOT EDIT THIS FILE. IT WAS AUTOMATICALLY GENERATED BY:
+//
+//   ucd-generate script /tmp/ucd --chars
+//
+// Unicode version: 14.0.0.
+//
+// ucd-generate 0.2.11 is available on crates.io.
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">BY_NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)])] <span class="op">=</span> <span class="kw-2">&amp;</span>[
-    (<span class="string">&quot;Adlam&quot;</span>, <span class="ident">ADLAM</span>),
-    (<span class="string">&quot;Ahom&quot;</span>, <span class="ident">AHOM</span>),
-    (<span class="string">&quot;Anatolian_Hieroglyphs&quot;</span>, <span class="ident">ANATOLIAN_HIEROGLYPHS</span>),
-    (<span class="string">&quot;Arabic&quot;</span>, <span class="ident">ARABIC</span>),
-    (<span class="string">&quot;Armenian&quot;</span>, <span class="ident">ARMENIAN</span>),
-    (<span class="string">&quot;Avestan&quot;</span>, <span class="ident">AVESTAN</span>),
-    (<span class="string">&quot;Balinese&quot;</span>, <span class="ident">BALINESE</span>),
-    (<span class="string">&quot;Bamum&quot;</span>, <span class="ident">BAMUM</span>),
-    (<span class="string">&quot;Bassa_Vah&quot;</span>, <span class="ident">BASSA_VAH</span>),
-    (<span class="string">&quot;Batak&quot;</span>, <span class="ident">BATAK</span>),
-    (<span class="string">&quot;Bengali&quot;</span>, <span class="ident">BENGALI</span>),
-    (<span class="string">&quot;Bhaiksuki&quot;</span>, <span class="ident">BHAIKSUKI</span>),
-    (<span class="string">&quot;Bopomofo&quot;</span>, <span class="ident">BOPOMOFO</span>),
-    (<span class="string">&quot;Brahmi&quot;</span>, <span class="ident">BRAHMI</span>),
-    (<span class="string">&quot;Braille&quot;</span>, <span class="ident">BRAILLE</span>),
-    (<span class="string">&quot;Buginese&quot;</span>, <span class="ident">BUGINESE</span>),
-    (<span class="string">&quot;Buhid&quot;</span>, <span class="ident">BUHID</span>),
-    (<span class="string">&quot;Canadian_Aboriginal&quot;</span>, <span class="ident">CANADIAN_ABORIGINAL</span>),
-    (<span class="string">&quot;Carian&quot;</span>, <span class="ident">CARIAN</span>),
-    (<span class="string">&quot;Caucasian_Albanian&quot;</span>, <span class="ident">CAUCASIAN_ALBANIAN</span>),
-    (<span class="string">&quot;Chakma&quot;</span>, <span class="ident">CHAKMA</span>),
-    (<span class="string">&quot;Cham&quot;</span>, <span class="ident">CHAM</span>),
-    (<span class="string">&quot;Cherokee&quot;</span>, <span class="ident">CHEROKEE</span>),
-    (<span class="string">&quot;Chorasmian&quot;</span>, <span class="ident">CHORASMIAN</span>),
-    (<span class="string">&quot;Common&quot;</span>, <span class="ident">COMMON</span>),
-    (<span class="string">&quot;Coptic&quot;</span>, <span class="ident">COPTIC</span>),
-    (<span class="string">&quot;Cuneiform&quot;</span>, <span class="ident">CUNEIFORM</span>),
-    (<span class="string">&quot;Cypriot&quot;</span>, <span class="ident">CYPRIOT</span>),
-    (<span class="string">&quot;Cypro_Minoan&quot;</span>, <span class="ident">CYPRO_MINOAN</span>),
-    (<span class="string">&quot;Cyrillic&quot;</span>, <span class="ident">CYRILLIC</span>),
-    (<span class="string">&quot;Deseret&quot;</span>, <span class="ident">DESERET</span>),
-    (<span class="string">&quot;Devanagari&quot;</span>, <span class="ident">DEVANAGARI</span>),
-    (<span class="string">&quot;Dives_Akuru&quot;</span>, <span class="ident">DIVES_AKURU</span>),
-    (<span class="string">&quot;Dogra&quot;</span>, <span class="ident">DOGRA</span>),
-    (<span class="string">&quot;Duployan&quot;</span>, <span class="ident">DUPLOYAN</span>),
-    (<span class="string">&quot;Egyptian_Hieroglyphs&quot;</span>, <span class="ident">EGYPTIAN_HIEROGLYPHS</span>),
-    (<span class="string">&quot;Elbasan&quot;</span>, <span class="ident">ELBASAN</span>),
-    (<span class="string">&quot;Elymaic&quot;</span>, <span class="ident">ELYMAIC</span>),
-    (<span class="string">&quot;Ethiopic&quot;</span>, <span class="ident">ETHIOPIC</span>),
-    (<span class="string">&quot;Georgian&quot;</span>, <span class="ident">GEORGIAN</span>),
-    (<span class="string">&quot;Glagolitic&quot;</span>, <span class="ident">GLAGOLITIC</span>),
-    (<span class="string">&quot;Gothic&quot;</span>, <span class="ident">GOTHIC</span>),
-    (<span class="string">&quot;Grantha&quot;</span>, <span class="ident">GRANTHA</span>),
-    (<span class="string">&quot;Greek&quot;</span>, <span class="ident">GREEK</span>),
-    (<span class="string">&quot;Gujarati&quot;</span>, <span class="ident">GUJARATI</span>),
-    (<span class="string">&quot;Gunjala_Gondi&quot;</span>, <span class="ident">GUNJALA_GONDI</span>),
-    (<span class="string">&quot;Gurmukhi&quot;</span>, <span class="ident">GURMUKHI</span>),
-    (<span class="string">&quot;Han&quot;</span>, <span class="ident">HAN</span>),
-    (<span class="string">&quot;Hangul&quot;</span>, <span class="ident">HANGUL</span>),
-    (<span class="string">&quot;Hanifi_Rohingya&quot;</span>, <span class="ident">HANIFI_ROHINGYA</span>),
-    (<span class="string">&quot;Hanunoo&quot;</span>, <span class="ident">HANUNOO</span>),
-    (<span class="string">&quot;Hatran&quot;</span>, <span class="ident">HATRAN</span>),
-    (<span class="string">&quot;Hebrew&quot;</span>, <span class="ident">HEBREW</span>),
-    (<span class="string">&quot;Hiragana&quot;</span>, <span class="ident">HIRAGANA</span>),
-    (<span class="string">&quot;Imperial_Aramaic&quot;</span>, <span class="ident">IMPERIAL_ARAMAIC</span>),
-    (<span class="string">&quot;Inherited&quot;</span>, <span class="ident">INHERITED</span>),
-    (<span class="string">&quot;Inscriptional_Pahlavi&quot;</span>, <span class="ident">INSCRIPTIONAL_PAHLAVI</span>),
-    (<span class="string">&quot;Inscriptional_Parthian&quot;</span>, <span class="ident">INSCRIPTIONAL_PARTHIAN</span>),
-    (<span class="string">&quot;Javanese&quot;</span>, <span class="ident">JAVANESE</span>),
-    (<span class="string">&quot;Kaithi&quot;</span>, <span class="ident">KAITHI</span>),
-    (<span class="string">&quot;Kannada&quot;</span>, <span class="ident">KANNADA</span>),
-    (<span class="string">&quot;Katakana&quot;</span>, <span class="ident">KATAKANA</span>),
-    (<span class="string">&quot;Kayah_Li&quot;</span>, <span class="ident">KAYAH_LI</span>),
-    (<span class="string">&quot;Kharoshthi&quot;</span>, <span class="ident">KHAROSHTHI</span>),
-    (<span class="string">&quot;Khitan_Small_Script&quot;</span>, <span class="ident">KHITAN_SMALL_SCRIPT</span>),
-    (<span class="string">&quot;Khmer&quot;</span>, <span class="ident">KHMER</span>),
-    (<span class="string">&quot;Khojki&quot;</span>, <span class="ident">KHOJKI</span>),
-    (<span class="string">&quot;Khudawadi&quot;</span>, <span class="ident">KHUDAWADI</span>),
-    (<span class="string">&quot;Lao&quot;</span>, <span class="ident">LAO</span>),
-    (<span class="string">&quot;Latin&quot;</span>, <span class="ident">LATIN</span>),
-    (<span class="string">&quot;Lepcha&quot;</span>, <span class="ident">LEPCHA</span>),
-    (<span class="string">&quot;Limbu&quot;</span>, <span class="ident">LIMBU</span>),
-    (<span class="string">&quot;Linear_A&quot;</span>, <span class="ident">LINEAR_A</span>),
-    (<span class="string">&quot;Linear_B&quot;</span>, <span class="ident">LINEAR_B</span>),
-    (<span class="string">&quot;Lisu&quot;</span>, <span class="ident">LISU</span>),
-    (<span class="string">&quot;Lycian&quot;</span>, <span class="ident">LYCIAN</span>),
-    (<span class="string">&quot;Lydian&quot;</span>, <span class="ident">LYDIAN</span>),
-    (<span class="string">&quot;Mahajani&quot;</span>, <span class="ident">MAHAJANI</span>),
-    (<span class="string">&quot;Makasar&quot;</span>, <span class="ident">MAKASAR</span>),
-    (<span class="string">&quot;Malayalam&quot;</span>, <span class="ident">MALAYALAM</span>),
-    (<span class="string">&quot;Mandaic&quot;</span>, <span class="ident">MANDAIC</span>),
-    (<span class="string">&quot;Manichaean&quot;</span>, <span class="ident">MANICHAEAN</span>),
-    (<span class="string">&quot;Marchen&quot;</span>, <span class="ident">MARCHEN</span>),
-    (<span class="string">&quot;Masaram_Gondi&quot;</span>, <span class="ident">MASARAM_GONDI</span>),
-    (<span class="string">&quot;Medefaidrin&quot;</span>, <span class="ident">MEDEFAIDRIN</span>),
-    (<span class="string">&quot;Meetei_Mayek&quot;</span>, <span class="ident">MEETEI_MAYEK</span>),
-    (<span class="string">&quot;Mende_Kikakui&quot;</span>, <span class="ident">MENDE_KIKAKUI</span>),
-    (<span class="string">&quot;Meroitic_Cursive&quot;</span>, <span class="ident">MEROITIC_CURSIVE</span>),
-    (<span class="string">&quot;Meroitic_Hieroglyphs&quot;</span>, <span class="ident">MEROITIC_HIEROGLYPHS</span>),
-    (<span class="string">&quot;Miao&quot;</span>, <span class="ident">MIAO</span>),
-    (<span class="string">&quot;Modi&quot;</span>, <span class="ident">MODI</span>),
-    (<span class="string">&quot;Mongolian&quot;</span>, <span class="ident">MONGOLIAN</span>),
-    (<span class="string">&quot;Mro&quot;</span>, <span class="ident">MRO</span>),
-    (<span class="string">&quot;Multani&quot;</span>, <span class="ident">MULTANI</span>),
-    (<span class="string">&quot;Myanmar&quot;</span>, <span class="ident">MYANMAR</span>),
-    (<span class="string">&quot;Nabataean&quot;</span>, <span class="ident">NABATAEAN</span>),
-    (<span class="string">&quot;Nandinagari&quot;</span>, <span class="ident">NANDINAGARI</span>),
-    (<span class="string">&quot;New_Tai_Lue&quot;</span>, <span class="ident">NEW_TAI_LUE</span>),
-    (<span class="string">&quot;Newa&quot;</span>, <span class="ident">NEWA</span>),
-    (<span class="string">&quot;Nko&quot;</span>, <span class="ident">NKO</span>),
-    (<span class="string">&quot;Nushu&quot;</span>, <span class="ident">NUSHU</span>),
-    (<span class="string">&quot;Nyiakeng_Puachue_Hmong&quot;</span>, <span class="ident">NYIAKENG_PUACHUE_HMONG</span>),
-    (<span class="string">&quot;Ogham&quot;</span>, <span class="ident">OGHAM</span>),
-    (<span class="string">&quot;Ol_Chiki&quot;</span>, <span class="ident">OL_CHIKI</span>),
-    (<span class="string">&quot;Old_Hungarian&quot;</span>, <span class="ident">OLD_HUNGARIAN</span>),
-    (<span class="string">&quot;Old_Italic&quot;</span>, <span class="ident">OLD_ITALIC</span>),
-    (<span class="string">&quot;Old_North_Arabian&quot;</span>, <span class="ident">OLD_NORTH_ARABIAN</span>),
-    (<span class="string">&quot;Old_Permic&quot;</span>, <span class="ident">OLD_PERMIC</span>),
-    (<span class="string">&quot;Old_Persian&quot;</span>, <span class="ident">OLD_PERSIAN</span>),
-    (<span class="string">&quot;Old_Sogdian&quot;</span>, <span class="ident">OLD_SOGDIAN</span>),
-    (<span class="string">&quot;Old_South_Arabian&quot;</span>, <span class="ident">OLD_SOUTH_ARABIAN</span>),
-    (<span class="string">&quot;Old_Turkic&quot;</span>, <span class="ident">OLD_TURKIC</span>),
-    (<span class="string">&quot;Old_Uyghur&quot;</span>, <span class="ident">OLD_UYGHUR</span>),
-    (<span class="string">&quot;Oriya&quot;</span>, <span class="ident">ORIYA</span>),
-    (<span class="string">&quot;Osage&quot;</span>, <span class="ident">OSAGE</span>),
-    (<span class="string">&quot;Osmanya&quot;</span>, <span class="ident">OSMANYA</span>),
-    (<span class="string">&quot;Pahawh_Hmong&quot;</span>, <span class="ident">PAHAWH_HMONG</span>),
-    (<span class="string">&quot;Palmyrene&quot;</span>, <span class="ident">PALMYRENE</span>),
-    (<span class="string">&quot;Pau_Cin_Hau&quot;</span>, <span class="ident">PAU_CIN_HAU</span>),
-    (<span class="string">&quot;Phags_Pa&quot;</span>, <span class="ident">PHAGS_PA</span>),
-    (<span class="string">&quot;Phoenician&quot;</span>, <span class="ident">PHOENICIAN</span>),
-    (<span class="string">&quot;Psalter_Pahlavi&quot;</span>, <span class="ident">PSALTER_PAHLAVI</span>),
-    (<span class="string">&quot;Rejang&quot;</span>, <span class="ident">REJANG</span>),
-    (<span class="string">&quot;Runic&quot;</span>, <span class="ident">RUNIC</span>),
-    (<span class="string">&quot;Samaritan&quot;</span>, <span class="ident">SAMARITAN</span>),
-    (<span class="string">&quot;Saurashtra&quot;</span>, <span class="ident">SAURASHTRA</span>),
-    (<span class="string">&quot;Sharada&quot;</span>, <span class="ident">SHARADA</span>),
-    (<span class="string">&quot;Shavian&quot;</span>, <span class="ident">SHAVIAN</span>),
-    (<span class="string">&quot;Siddham&quot;</span>, <span class="ident">SIDDHAM</span>),
-    (<span class="string">&quot;SignWriting&quot;</span>, <span class="ident">SIGNWRITING</span>),
-    (<span class="string">&quot;Sinhala&quot;</span>, <span class="ident">SINHALA</span>),
-    (<span class="string">&quot;Sogdian&quot;</span>, <span class="ident">SOGDIAN</span>),
-    (<span class="string">&quot;Sora_Sompeng&quot;</span>, <span class="ident">SORA_SOMPENG</span>),
-    (<span class="string">&quot;Soyombo&quot;</span>, <span class="ident">SOYOMBO</span>),
-    (<span class="string">&quot;Sundanese&quot;</span>, <span class="ident">SUNDANESE</span>),
-    (<span class="string">&quot;Syloti_Nagri&quot;</span>, <span class="ident">SYLOTI_NAGRI</span>),
-    (<span class="string">&quot;Syriac&quot;</span>, <span class="ident">SYRIAC</span>),
-    (<span class="string">&quot;Tagalog&quot;</span>, <span class="ident">TAGALOG</span>),
-    (<span class="string">&quot;Tagbanwa&quot;</span>, <span class="ident">TAGBANWA</span>),
-    (<span class="string">&quot;Tai_Le&quot;</span>, <span class="ident">TAI_LE</span>),
-    (<span class="string">&quot;Tai_Tham&quot;</span>, <span class="ident">TAI_THAM</span>),
-    (<span class="string">&quot;Tai_Viet&quot;</span>, <span class="ident">TAI_VIET</span>),
-    (<span class="string">&quot;Takri&quot;</span>, <span class="ident">TAKRI</span>),
-    (<span class="string">&quot;Tamil&quot;</span>, <span class="ident">TAMIL</span>),
-    (<span class="string">&quot;Tangsa&quot;</span>, <span class="ident">TANGSA</span>),
-    (<span class="string">&quot;Tangut&quot;</span>, <span class="ident">TANGUT</span>),
-    (<span class="string">&quot;Telugu&quot;</span>, <span class="ident">TELUGU</span>),
-    (<span class="string">&quot;Thaana&quot;</span>, <span class="ident">THAANA</span>),
-    (<span class="string">&quot;Thai&quot;</span>, <span class="ident">THAI</span>),
-    (<span class="string">&quot;Tibetan&quot;</span>, <span class="ident">TIBETAN</span>),
-    (<span class="string">&quot;Tifinagh&quot;</span>, <span class="ident">TIFINAGH</span>),
-    (<span class="string">&quot;Tirhuta&quot;</span>, <span class="ident">TIRHUTA</span>),
-    (<span class="string">&quot;Toto&quot;</span>, <span class="ident">TOTO</span>),
-    (<span class="string">&quot;Ugaritic&quot;</span>, <span class="ident">UGARITIC</span>),
-    (<span class="string">&quot;Vai&quot;</span>, <span class="ident">VAI</span>),
-    (<span class="string">&quot;Vithkuqi&quot;</span>, <span class="ident">VITHKUQI</span>),
-    (<span class="string">&quot;Wancho&quot;</span>, <span class="ident">WANCHO</span>),
-    (<span class="string">&quot;Warang_Citi&quot;</span>, <span class="ident">WARANG_CITI</span>),
-    (<span class="string">&quot;Yezidi&quot;</span>, <span class="ident">YEZIDI</span>),
-    (<span class="string">&quot;Yi&quot;</span>, <span class="ident">YI</span>),
-    (<span class="string">&quot;Zanabazar_Square&quot;</span>, <span class="ident">ZANABAZAR_SQUARE</span>),
+</span><span class="kw">pub const </span>BY_NAME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)])] = <span class="kw-2">&amp;</span>[
+    (<span class="string">&quot;Adlam&quot;</span>, ADLAM),
+    (<span class="string">&quot;Ahom&quot;</span>, AHOM),
+    (<span class="string">&quot;Anatolian_Hieroglyphs&quot;</span>, ANATOLIAN_HIEROGLYPHS),
+    (<span class="string">&quot;Arabic&quot;</span>, ARABIC),
+    (<span class="string">&quot;Armenian&quot;</span>, ARMENIAN),
+    (<span class="string">&quot;Avestan&quot;</span>, AVESTAN),
+    (<span class="string">&quot;Balinese&quot;</span>, BALINESE),
+    (<span class="string">&quot;Bamum&quot;</span>, BAMUM),
+    (<span class="string">&quot;Bassa_Vah&quot;</span>, BASSA_VAH),
+    (<span class="string">&quot;Batak&quot;</span>, BATAK),
+    (<span class="string">&quot;Bengali&quot;</span>, BENGALI),
+    (<span class="string">&quot;Bhaiksuki&quot;</span>, BHAIKSUKI),
+    (<span class="string">&quot;Bopomofo&quot;</span>, BOPOMOFO),
+    (<span class="string">&quot;Brahmi&quot;</span>, BRAHMI),
+    (<span class="string">&quot;Braille&quot;</span>, BRAILLE),
+    (<span class="string">&quot;Buginese&quot;</span>, BUGINESE),
+    (<span class="string">&quot;Buhid&quot;</span>, BUHID),
+    (<span class="string">&quot;Canadian_Aboriginal&quot;</span>, CANADIAN_ABORIGINAL),
+    (<span class="string">&quot;Carian&quot;</span>, CARIAN),
+    (<span class="string">&quot;Caucasian_Albanian&quot;</span>, CAUCASIAN_ALBANIAN),
+    (<span class="string">&quot;Chakma&quot;</span>, CHAKMA),
+    (<span class="string">&quot;Cham&quot;</span>, CHAM),
+    (<span class="string">&quot;Cherokee&quot;</span>, CHEROKEE),
+    (<span class="string">&quot;Chorasmian&quot;</span>, CHORASMIAN),
+    (<span class="string">&quot;Common&quot;</span>, COMMON),
+    (<span class="string">&quot;Coptic&quot;</span>, COPTIC),
+    (<span class="string">&quot;Cuneiform&quot;</span>, CUNEIFORM),
+    (<span class="string">&quot;Cypriot&quot;</span>, CYPRIOT),
+    (<span class="string">&quot;Cypro_Minoan&quot;</span>, CYPRO_MINOAN),
+    (<span class="string">&quot;Cyrillic&quot;</span>, CYRILLIC),
+    (<span class="string">&quot;Deseret&quot;</span>, DESERET),
+    (<span class="string">&quot;Devanagari&quot;</span>, DEVANAGARI),
+    (<span class="string">&quot;Dives_Akuru&quot;</span>, DIVES_AKURU),
+    (<span class="string">&quot;Dogra&quot;</span>, DOGRA),
+    (<span class="string">&quot;Duployan&quot;</span>, DUPLOYAN),
+    (<span class="string">&quot;Egyptian_Hieroglyphs&quot;</span>, EGYPTIAN_HIEROGLYPHS),
+    (<span class="string">&quot;Elbasan&quot;</span>, ELBASAN),
+    (<span class="string">&quot;Elymaic&quot;</span>, ELYMAIC),
+    (<span class="string">&quot;Ethiopic&quot;</span>, ETHIOPIC),
+    (<span class="string">&quot;Georgian&quot;</span>, GEORGIAN),
+    (<span class="string">&quot;Glagolitic&quot;</span>, GLAGOLITIC),
+    (<span class="string">&quot;Gothic&quot;</span>, GOTHIC),
+    (<span class="string">&quot;Grantha&quot;</span>, GRANTHA),
+    (<span class="string">&quot;Greek&quot;</span>, GREEK),
+    (<span class="string">&quot;Gujarati&quot;</span>, GUJARATI),
+    (<span class="string">&quot;Gunjala_Gondi&quot;</span>, GUNJALA_GONDI),
+    (<span class="string">&quot;Gurmukhi&quot;</span>, GURMUKHI),
+    (<span class="string">&quot;Han&quot;</span>, HAN),
+    (<span class="string">&quot;Hangul&quot;</span>, HANGUL),
+    (<span class="string">&quot;Hanifi_Rohingya&quot;</span>, HANIFI_ROHINGYA),
+    (<span class="string">&quot;Hanunoo&quot;</span>, HANUNOO),
+    (<span class="string">&quot;Hatran&quot;</span>, HATRAN),
+    (<span class="string">&quot;Hebrew&quot;</span>, HEBREW),
+    (<span class="string">&quot;Hiragana&quot;</span>, HIRAGANA),
+    (<span class="string">&quot;Imperial_Aramaic&quot;</span>, IMPERIAL_ARAMAIC),
+    (<span class="string">&quot;Inherited&quot;</span>, INHERITED),
+    (<span class="string">&quot;Inscriptional_Pahlavi&quot;</span>, INSCRIPTIONAL_PAHLAVI),
+    (<span class="string">&quot;Inscriptional_Parthian&quot;</span>, INSCRIPTIONAL_PARTHIAN),
+    (<span class="string">&quot;Javanese&quot;</span>, JAVANESE),
+    (<span class="string">&quot;Kaithi&quot;</span>, KAITHI),
+    (<span class="string">&quot;Kannada&quot;</span>, KANNADA),
+    (<span class="string">&quot;Katakana&quot;</span>, KATAKANA),
+    (<span class="string">&quot;Kayah_Li&quot;</span>, KAYAH_LI),
+    (<span class="string">&quot;Kharoshthi&quot;</span>, KHAROSHTHI),
+    (<span class="string">&quot;Khitan_Small_Script&quot;</span>, KHITAN_SMALL_SCRIPT),
+    (<span class="string">&quot;Khmer&quot;</span>, KHMER),
+    (<span class="string">&quot;Khojki&quot;</span>, KHOJKI),
+    (<span class="string">&quot;Khudawadi&quot;</span>, KHUDAWADI),
+    (<span class="string">&quot;Lao&quot;</span>, LAO),
+    (<span class="string">&quot;Latin&quot;</span>, LATIN),
+    (<span class="string">&quot;Lepcha&quot;</span>, LEPCHA),
+    (<span class="string">&quot;Limbu&quot;</span>, LIMBU),
+    (<span class="string">&quot;Linear_A&quot;</span>, LINEAR_A),
+    (<span class="string">&quot;Linear_B&quot;</span>, LINEAR_B),
+    (<span class="string">&quot;Lisu&quot;</span>, LISU),
+    (<span class="string">&quot;Lycian&quot;</span>, LYCIAN),
+    (<span class="string">&quot;Lydian&quot;</span>, LYDIAN),
+    (<span class="string">&quot;Mahajani&quot;</span>, MAHAJANI),
+    (<span class="string">&quot;Makasar&quot;</span>, MAKASAR),
+    (<span class="string">&quot;Malayalam&quot;</span>, MALAYALAM),
+    (<span class="string">&quot;Mandaic&quot;</span>, MANDAIC),
+    (<span class="string">&quot;Manichaean&quot;</span>, MANICHAEAN),
+    (<span class="string">&quot;Marchen&quot;</span>, MARCHEN),
+    (<span class="string">&quot;Masaram_Gondi&quot;</span>, MASARAM_GONDI),
+    (<span class="string">&quot;Medefaidrin&quot;</span>, MEDEFAIDRIN),
+    (<span class="string">&quot;Meetei_Mayek&quot;</span>, MEETEI_MAYEK),
+    (<span class="string">&quot;Mende_Kikakui&quot;</span>, MENDE_KIKAKUI),
+    (<span class="string">&quot;Meroitic_Cursive&quot;</span>, MEROITIC_CURSIVE),
+    (<span class="string">&quot;Meroitic_Hieroglyphs&quot;</span>, MEROITIC_HIEROGLYPHS),
+    (<span class="string">&quot;Miao&quot;</span>, MIAO),
+    (<span class="string">&quot;Modi&quot;</span>, MODI),
+    (<span class="string">&quot;Mongolian&quot;</span>, MONGOLIAN),
+    (<span class="string">&quot;Mro&quot;</span>, MRO),
+    (<span class="string">&quot;Multani&quot;</span>, MULTANI),
+    (<span class="string">&quot;Myanmar&quot;</span>, MYANMAR),
+    (<span class="string">&quot;Nabataean&quot;</span>, NABATAEAN),
+    (<span class="string">&quot;Nandinagari&quot;</span>, NANDINAGARI),
+    (<span class="string">&quot;New_Tai_Lue&quot;</span>, NEW_TAI_LUE),
+    (<span class="string">&quot;Newa&quot;</span>, NEWA),
+    (<span class="string">&quot;Nko&quot;</span>, NKO),
+    (<span class="string">&quot;Nushu&quot;</span>, NUSHU),
+    (<span class="string">&quot;Nyiakeng_Puachue_Hmong&quot;</span>, NYIAKENG_PUACHUE_HMONG),
+    (<span class="string">&quot;Ogham&quot;</span>, OGHAM),
+    (<span class="string">&quot;Ol_Chiki&quot;</span>, OL_CHIKI),
+    (<span class="string">&quot;Old_Hungarian&quot;</span>, OLD_HUNGARIAN),
+    (<span class="string">&quot;Old_Italic&quot;</span>, OLD_ITALIC),
+    (<span class="string">&quot;Old_North_Arabian&quot;</span>, OLD_NORTH_ARABIAN),
+    (<span class="string">&quot;Old_Permic&quot;</span>, OLD_PERMIC),
+    (<span class="string">&quot;Old_Persian&quot;</span>, OLD_PERSIAN),
+    (<span class="string">&quot;Old_Sogdian&quot;</span>, OLD_SOGDIAN),
+    (<span class="string">&quot;Old_South_Arabian&quot;</span>, OLD_SOUTH_ARABIAN),
+    (<span class="string">&quot;Old_Turkic&quot;</span>, OLD_TURKIC),
+    (<span class="string">&quot;Old_Uyghur&quot;</span>, OLD_UYGHUR),
+    (<span class="string">&quot;Oriya&quot;</span>, ORIYA),
+    (<span class="string">&quot;Osage&quot;</span>, OSAGE),
+    (<span class="string">&quot;Osmanya&quot;</span>, OSMANYA),
+    (<span class="string">&quot;Pahawh_Hmong&quot;</span>, PAHAWH_HMONG),
+    (<span class="string">&quot;Palmyrene&quot;</span>, PALMYRENE),
+    (<span class="string">&quot;Pau_Cin_Hau&quot;</span>, PAU_CIN_HAU),
+    (<span class="string">&quot;Phags_Pa&quot;</span>, PHAGS_PA),
+    (<span class="string">&quot;Phoenician&quot;</span>, PHOENICIAN),
+    (<span class="string">&quot;Psalter_Pahlavi&quot;</span>, PSALTER_PAHLAVI),
+    (<span class="string">&quot;Rejang&quot;</span>, REJANG),
+    (<span class="string">&quot;Runic&quot;</span>, RUNIC),
+    (<span class="string">&quot;Samaritan&quot;</span>, SAMARITAN),
+    (<span class="string">&quot;Saurashtra&quot;</span>, SAURASHTRA),
+    (<span class="string">&quot;Sharada&quot;</span>, SHARADA),
+    (<span class="string">&quot;Shavian&quot;</span>, SHAVIAN),
+    (<span class="string">&quot;Siddham&quot;</span>, SIDDHAM),
+    (<span class="string">&quot;SignWriting&quot;</span>, SIGNWRITING),
+    (<span class="string">&quot;Sinhala&quot;</span>, SINHALA),
+    (<span class="string">&quot;Sogdian&quot;</span>, SOGDIAN),
+    (<span class="string">&quot;Sora_Sompeng&quot;</span>, SORA_SOMPENG),
+    (<span class="string">&quot;Soyombo&quot;</span>, SOYOMBO),
+    (<span class="string">&quot;Sundanese&quot;</span>, SUNDANESE),
+    (<span class="string">&quot;Syloti_Nagri&quot;</span>, SYLOTI_NAGRI),
+    (<span class="string">&quot;Syriac&quot;</span>, SYRIAC),
+    (<span class="string">&quot;Tagalog&quot;</span>, TAGALOG),
+    (<span class="string">&quot;Tagbanwa&quot;</span>, TAGBANWA),
+    (<span class="string">&quot;Tai_Le&quot;</span>, TAI_LE),
+    (<span class="string">&quot;Tai_Tham&quot;</span>, TAI_THAM),
+    (<span class="string">&quot;Tai_Viet&quot;</span>, TAI_VIET),
+    (<span class="string">&quot;Takri&quot;</span>, TAKRI),
+    (<span class="string">&quot;Tamil&quot;</span>, TAMIL),
+    (<span class="string">&quot;Tangsa&quot;</span>, TANGSA),
+    (<span class="string">&quot;Tangut&quot;</span>, TANGUT),
+    (<span class="string">&quot;Telugu&quot;</span>, TELUGU),
+    (<span class="string">&quot;Thaana&quot;</span>, THAANA),
+    (<span class="string">&quot;Thai&quot;</span>, THAI),
+    (<span class="string">&quot;Tibetan&quot;</span>, TIBETAN),
+    (<span class="string">&quot;Tifinagh&quot;</span>, TIFINAGH),
+    (<span class="string">&quot;Tirhuta&quot;</span>, TIRHUTA),
+    (<span class="string">&quot;Toto&quot;</span>, TOTO),
+    (<span class="string">&quot;Ugaritic&quot;</span>, UGARITIC),
+    (<span class="string">&quot;Vai&quot;</span>, VAI),
+    (<span class="string">&quot;Vithkuqi&quot;</span>, VITHKUQI),
+    (<span class="string">&quot;Wancho&quot;</span>, WANCHO),
+    (<span class="string">&quot;Warang_Citi&quot;</span>, WARANG_CITI),
+    (<span class="string">&quot;Yezidi&quot;</span>, YEZIDI),
+    (<span class="string">&quot;Yi&quot;</span>, YI),
+    (<span class="string">&quot;Zanabazar_Square&quot;</span>, ZANABAZAR_SQUARE),
 ];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ADLAM</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>ADLAM: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;𞤀&#39;</span>, <span class="string">&#39;𞥋&#39;</span>), (<span class="string">&#39;𞥐&#39;</span>, <span class="string">&#39;𞥙&#39;</span>), (<span class="string">&#39;𞥞&#39;</span>, <span class="string">&#39;𞥟&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">AHOM</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>AHOM: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;𑜀&#39;</span>, <span class="string">&#39;𑜚&#39;</span>), (<span class="string">&#39;\u{1171d}&#39;</span>, <span class="string">&#39;\u{1172b}&#39;</span>), (<span class="string">&#39;𑜰&#39;</span>, <span class="string">&#39;𑝆&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ANATOLIAN_HIEROGLYPHS</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𔐀&#39;</span>, <span class="string">&#39;𔙆&#39;</span>)];
+<span class="kw">pub const </span>ANATOLIAN_HIEROGLYPHS: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𔐀&#39;</span>, <span class="string">&#39;𔙆&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ARABIC</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">pub const </span>ARABIC: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[
     (<span class="string">&#39;\u{600}&#39;</span>, <span class="string">&#39;\u{604}&#39;</span>),
     (<span class="string">&#39;؆&#39;</span>, <span class="string">&#39;؋&#39;</span>),
     (<span class="string">&#39;؍&#39;</span>, <span class="string">&#39;\u{61a}&#39;</span>),
@@ -1482,21 +1482,21 @@
     (<span class="string">&#39;𞻰&#39;</span>, <span class="string">&#39;𞻱&#39;</span>),
 ];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ARMENIAN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>ARMENIAN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;Ա&#39;</span>, <span class="string">&#39;Ֆ&#39;</span>), (<span class="string">&#39;ՙ&#39;</span>, <span class="string">&#39;֊&#39;</span>), (<span class="string">&#39;֍&#39;</span>, <span class="string">&#39;֏&#39;</span>), (<span class="string">&#39;ﬓ&#39;</span>, <span class="string">&#39;ﬗ&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">AVESTAN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐬀&#39;</span>, <span class="string">&#39;𐬵&#39;</span>), (<span class="string">&#39;𐬹&#39;</span>, <span class="string">&#39;𐬿&#39;</span>)];
+<span class="kw">pub const </span>AVESTAN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐬀&#39;</span>, <span class="string">&#39;𐬵&#39;</span>), (<span class="string">&#39;𐬹&#39;</span>, <span class="string">&#39;𐬿&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">BALINESE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;\u{1b00}&#39;</span>, <span class="string">&#39;ᭌ&#39;</span>), (<span class="string">&#39;᭐&#39;</span>, <span class="string">&#39;᭾&#39;</span>)];
+<span class="kw">pub const </span>BALINESE: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;\u{1b00}&#39;</span>, <span class="string">&#39;ᭌ&#39;</span>), (<span class="string">&#39;᭐&#39;</span>, <span class="string">&#39;᭾&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">BAMUM</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;ꚠ&#39;</span>, <span class="string">&#39;꛷&#39;</span>), (<span class="string">&#39;𖠀&#39;</span>, <span class="string">&#39;𖨸&#39;</span>)];
+<span class="kw">pub const </span>BAMUM: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;ꚠ&#39;</span>, <span class="string">&#39;꛷&#39;</span>), (<span class="string">&#39;𖠀&#39;</span>, <span class="string">&#39;𖨸&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">BASSA_VAH</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>BASSA_VAH: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;𖫐&#39;</span>, <span class="string">&#39;𖫭&#39;</span>), (<span class="string">&#39;\u{16af0}&#39;</span>, <span class="string">&#39;𖫵&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">BATAK</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;ᯀ&#39;</span>, <span class="string">&#39;᯳&#39;</span>), (<span class="string">&#39;᯼&#39;</span>, <span class="string">&#39;᯿&#39;</span>)];
+<span class="kw">pub const </span>BATAK: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;ᯀ&#39;</span>, <span class="string">&#39;᯳&#39;</span>), (<span class="string">&#39;᯼&#39;</span>, <span class="string">&#39;᯿&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">BENGALI</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">pub const </span>BENGALI: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[
     (<span class="string">&#39;ঀ&#39;</span>, <span class="string">&#39;ঃ&#39;</span>),
     (<span class="string">&#39;অ&#39;</span>, <span class="string">&#39;ঌ&#39;</span>),
     (<span class="string">&#39;এ&#39;</span>, <span class="string">&#39;ঐ&#39;</span>),
@@ -1513,41 +1513,41 @@
     (<span class="string">&#39;০&#39;</span>, <span class="string">&#39;\u{9fe}&#39;</span>),
 ];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">BHAIKSUKI</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>BHAIKSUKI: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;𑰀&#39;</span>, <span class="string">&#39;𑰈&#39;</span>), (<span class="string">&#39;𑰊&#39;</span>, <span class="string">&#39;\u{11c36}&#39;</span>), (<span class="string">&#39;\u{11c38}&#39;</span>, <span class="string">&#39;𑱅&#39;</span>), (<span class="string">&#39;𑱐&#39;</span>, <span class="string">&#39;𑱬&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">BOPOMOFO</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>BOPOMOFO: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;˪&#39;</span>, <span class="string">&#39;˫&#39;</span>), (<span class="string">&#39;ㄅ&#39;</span>, <span class="string">&#39;ㄯ&#39;</span>), (<span class="string">&#39;ㆠ&#39;</span>, <span class="string">&#39;ㆿ&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">BRAHMI</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>BRAHMI: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;𑀀&#39;</span>, <span class="string">&#39;𑁍&#39;</span>), (<span class="string">&#39;𑁒&#39;</span>, <span class="string">&#39;𑁵&#39;</span>), (<span class="string">&#39;\u{1107f}&#39;</span>, <span class="string">&#39;\u{1107f}&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">BRAILLE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;⠀&#39;</span>, <span class="string">&#39;⣿&#39;</span>)];
+<span class="kw">pub const </span>BRAILLE: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;⠀&#39;</span>, <span class="string">&#39;⣿&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">BUGINESE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;ᨀ&#39;</span>, <span class="string">&#39;\u{1a1b}&#39;</span>), (<span class="string">&#39;᨞&#39;</span>, <span class="string">&#39;᨟&#39;</span>)];
+<span class="kw">pub const </span>BUGINESE: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;ᨀ&#39;</span>, <span class="string">&#39;\u{1a1b}&#39;</span>), (<span class="string">&#39;᨞&#39;</span>, <span class="string">&#39;᨟&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">BUHID</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;ᝀ&#39;</span>, <span class="string">&#39;\u{1753}&#39;</span>)];
+<span class="kw">pub const </span>BUHID: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;ᝀ&#39;</span>, <span class="string">&#39;\u{1753}&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CANADIAN_ABORIGINAL</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>CANADIAN_ABORIGINAL: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;᐀&#39;</span>, <span class="string">&#39;ᙿ&#39;</span>), (<span class="string">&#39;ᢰ&#39;</span>, <span class="string">&#39;ᣵ&#39;</span>), (<span class="string">&#39;𑪰&#39;</span>, <span class="string">&#39;𑪿&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CARIAN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐊠&#39;</span>, <span class="string">&#39;𐋐&#39;</span>)];
+<span class="kw">pub const </span>CARIAN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐊠&#39;</span>, <span class="string">&#39;𐋐&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CAUCASIAN_ALBANIAN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>CAUCASIAN_ALBANIAN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐔰&#39;</span>, <span class="string">&#39;𐕣&#39;</span>), (<span class="string">&#39;𐕯&#39;</span>, <span class="string">&#39;𐕯&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CHAKMA</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>CHAKMA: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;\u{11100}&#39;</span>, <span class="string">&#39;\u{11134}&#39;</span>), (<span class="string">&#39;𑄶&#39;</span>, <span class="string">&#39;𑅇&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CHAM</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>CHAM: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;ꨀ&#39;</span>, <span class="string">&#39;\u{aa36}&#39;</span>), (<span class="string">&#39;ꩀ&#39;</span>, <span class="string">&#39;ꩍ&#39;</span>), (<span class="string">&#39;꩐&#39;</span>, <span class="string">&#39;꩙&#39;</span>), (<span class="string">&#39;꩜&#39;</span>, <span class="string">&#39;꩟&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CHEROKEE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>CHEROKEE: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;Ꭰ&#39;</span>, <span class="string">&#39;Ᏽ&#39;</span>), (<span class="string">&#39;ᏸ&#39;</span>, <span class="string">&#39;ᏽ&#39;</span>), (<span class="string">&#39;ꭰ&#39;</span>, <span class="string">&#39;ꮿ&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CHORASMIAN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐾰&#39;</span>, <span class="string">&#39;𐿋&#39;</span>)];
+<span class="kw">pub const </span>CHORASMIAN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐾰&#39;</span>, <span class="string">&#39;𐿋&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">COMMON</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">pub const </span>COMMON: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[
     (<span class="string">&#39;\0&#39;</span>, <span class="string">&#39;@&#39;</span>),
     (<span class="string">&#39;[&#39;</span>, <span class="string">&#39;`&#39;</span>),
     (<span class="string">&#39;{&#39;</span>, <span class="string">&#39;©&#39;</span>),
@@ -1724,18 +1724,18 @@
     (<span class="string">&#39;\u{e0020}&#39;</span>, <span class="string">&#39;\u{e007f}&#39;</span>),
 ];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">COPTIC</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>COPTIC: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;Ϣ&#39;</span>, <span class="string">&#39;ϯ&#39;</span>), (<span class="string">&#39;Ⲁ&#39;</span>, <span class="string">&#39;ⳳ&#39;</span>), (<span class="string">&#39;⳹&#39;</span>, <span class="string">&#39;⳿&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CUNEIFORM</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>CUNEIFORM: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;𒀀&#39;</span>, <span class="string">&#39;𒎙&#39;</span>), (<span class="string">&#39;𒐀&#39;</span>, <span class="string">&#39;𒑮&#39;</span>), (<span class="string">&#39;𒑰&#39;</span>, <span class="string">&#39;𒑴&#39;</span>), (<span class="string">&#39;𒒀&#39;</span>, <span class="string">&#39;𒕃&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CYPRIOT</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>CYPRIOT: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐠀&#39;</span>, <span class="string">&#39;𐠅&#39;</span>), (<span class="string">&#39;𐠈&#39;</span>, <span class="string">&#39;𐠈&#39;</span>), (<span class="string">&#39;𐠊&#39;</span>, <span class="string">&#39;𐠵&#39;</span>), (<span class="string">&#39;𐠷&#39;</span>, <span class="string">&#39;𐠸&#39;</span>), (<span class="string">&#39;𐠼&#39;</span>, <span class="string">&#39;𐠼&#39;</span>), (<span class="string">&#39;𐠿&#39;</span>, <span class="string">&#39;𐠿&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CYPRO_MINOAN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𒾐&#39;</span>, <span class="string">&#39;𒿲&#39;</span>)];
+<span class="kw">pub const </span>CYPRO_MINOAN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𒾐&#39;</span>, <span class="string">&#39;𒿲&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CYRILLIC</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">pub const </span>CYRILLIC: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[
     (<span class="string">&#39;Ѐ&#39;</span>, <span class="string">&#39;\u{484}&#39;</span>),
     (<span class="string">&#39;\u{487}&#39;</span>, <span class="string">&#39;ԯ&#39;</span>),
     (<span class="string">&#39;ᲀ&#39;</span>, <span class="string">&#39;ᲈ&#39;</span>),
@@ -1746,16 +1746,16 @@
     (<span class="string">&#39;\u{fe2e}&#39;</span>, <span class="string">&#39;\u{fe2f}&#39;</span>),
 ];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DESERET</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐐀&#39;</span>, <span class="string">&#39;𐑏&#39;</span>)];
+<span class="kw">pub const </span>DESERET: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐐀&#39;</span>, <span class="string">&#39;𐑏&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DEVANAGARI</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">pub const </span>DEVANAGARI: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[
     (<span class="string">&#39;\u{900}&#39;</span>, <span class="string">&#39;ॐ&#39;</span>),
     (<span class="string">&#39;\u{955}&#39;</span>, <span class="string">&#39;\u{963}&#39;</span>),
     (<span class="string">&#39;०&#39;</span>, <span class="string">&#39;ॿ&#39;</span>),
     (<span class="string">&#39;\u{a8e0}&#39;</span>, <span class="string">&#39;\u{a8ff}&#39;</span>),
 ];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DIVES_AKURU</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">pub const </span>DIVES_AKURU: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[
     (<span class="string">&#39;𑤀&#39;</span>, <span class="string">&#39;𑤆&#39;</span>),
     (<span class="string">&#39;𑤉&#39;</span>, <span class="string">&#39;𑤉&#39;</span>),
     (<span class="string">&#39;𑤌&#39;</span>, <span class="string">&#39;𑤓&#39;</span>),
@@ -1766,19 +1766,19 @@
     (<span class="string">&#39;𑥐&#39;</span>, <span class="string">&#39;𑥙&#39;</span>),
 ];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DOGRA</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𑠀&#39;</span>, <span class="string">&#39;𑠻&#39;</span>)];
+<span class="kw">pub const </span>DOGRA: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𑠀&#39;</span>, <span class="string">&#39;𑠻&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DUPLOYAN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>DUPLOYAN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;𛰀&#39;</span>, <span class="string">&#39;𛱪&#39;</span>), (<span class="string">&#39;𛱰&#39;</span>, <span class="string">&#39;𛱼&#39;</span>), (<span class="string">&#39;𛲀&#39;</span>, <span class="string">&#39;𛲈&#39;</span>), (<span class="string">&#39;𛲐&#39;</span>, <span class="string">&#39;𛲙&#39;</span>), (<span class="string">&#39;𛲜&#39;</span>, <span class="string">&#39;𛲟&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">EGYPTIAN_HIEROGLYPHS</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>EGYPTIAN_HIEROGLYPHS: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;𓀀&#39;</span>, <span class="string">&#39;𓐮&#39;</span>), (<span class="string">&#39;\u{13430}&#39;</span>, <span class="string">&#39;\u{13438}&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ELBASAN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐔀&#39;</span>, <span class="string">&#39;𐔧&#39;</span>)];
+<span class="kw">pub const </span>ELBASAN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐔀&#39;</span>, <span class="string">&#39;𐔧&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ELYMAIC</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐿠&#39;</span>, <span class="string">&#39;𐿶&#39;</span>)];
+<span class="kw">pub const </span>ELYMAIC: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐿠&#39;</span>, <span class="string">&#39;𐿶&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ETHIOPIC</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">pub const </span>ETHIOPIC: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[
     (<span class="string">&#39;ሀ&#39;</span>, <span class="string">&#39;ቈ&#39;</span>),
     (<span class="string">&#39;ቊ&#39;</span>, <span class="string">&#39;ቍ&#39;</span>),
     (<span class="string">&#39;ቐ&#39;</span>, <span class="string">&#39;ቖ&#39;</span>),
@@ -1817,7 +1817,7 @@
     (<span class="string">&#39;𞟰&#39;</span>, <span class="string">&#39;𞟾&#39;</span>),
 ];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">GEORGIAN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">pub const </span>GEORGIAN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[
     (<span class="string">&#39;Ⴀ&#39;</span>, <span class="string">&#39;Ⴥ&#39;</span>),
     (<span class="string">&#39;Ⴧ&#39;</span>, <span class="string">&#39;Ⴧ&#39;</span>),
     (<span class="string">&#39;Ⴭ&#39;</span>, <span class="string">&#39;Ⴭ&#39;</span>),
@@ -1830,7 +1830,7 @@
     (<span class="string">&#39;ⴭ&#39;</span>, <span class="string">&#39;ⴭ&#39;</span>),
 ];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">GLAGOLITIC</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">pub const </span>GLAGOLITIC: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[
     (<span class="string">&#39;Ⰰ&#39;</span>, <span class="string">&#39;ⱟ&#39;</span>),
     (<span class="string">&#39;\u{1e000}&#39;</span>, <span class="string">&#39;\u{1e006}&#39;</span>),
     (<span class="string">&#39;\u{1e008}&#39;</span>, <span class="string">&#39;\u{1e018}&#39;</span>),
@@ -1839,9 +1839,9 @@
     (<span class="string">&#39;\u{1e026}&#39;</span>, <span class="string">&#39;\u{1e02a}&#39;</span>),
 ];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">GOTHIC</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐌰&#39;</span>, <span class="string">&#39;𐍊&#39;</span>)];
+<span class="kw">pub const </span>GOTHIC: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐌰&#39;</span>, <span class="string">&#39;𐍊&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">GRANTHA</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">pub const </span>GRANTHA: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[
     (<span class="string">&#39;\u{11300}&#39;</span>, <span class="string">&#39;𑌃&#39;</span>),
     (<span class="string">&#39;𑌅&#39;</span>, <span class="string">&#39;𑌌&#39;</span>),
     (<span class="string">&#39;𑌏&#39;</span>, <span class="string">&#39;𑌐&#39;</span>),
@@ -1859,7 +1859,7 @@
     (<span class="string">&#39;\u{11370}&#39;</span>, <span class="string">&#39;\u{11374}&#39;</span>),
 ];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">GREEK</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">pub const </span>GREEK: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[
     (<span class="string">&#39;Ͱ&#39;</span>, <span class="string">&#39;ͳ&#39;</span>),
     (<span class="string">&#39;͵&#39;</span>, <span class="string">&#39;ͷ&#39;</span>),
     (<span class="string">&#39;ͺ&#39;</span>, <span class="string">&#39;ͽ&#39;</span>),
@@ -1898,7 +1898,7 @@
     (<span class="string">&#39;𝈀&#39;</span>, <span class="string">&#39;𝉅&#39;</span>),
 ];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">GUJARATI</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">pub const </span>GUJARATI: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[
     (<span class="string">&#39;\u{a81}&#39;</span>, <span class="string">&#39;ઃ&#39;</span>),
     (<span class="string">&#39;અ&#39;</span>, <span class="string">&#39;ઍ&#39;</span>),
     (<span class="string">&#39;એ&#39;</span>, <span class="string">&#39;ઑ&#39;</span>),
@@ -1915,7 +1915,7 @@
     (<span class="string">&#39;ૹ&#39;</span>, <span class="string">&#39;\u{aff}&#39;</span>),
 ];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">GUNJALA_GONDI</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">pub const </span>GUNJALA_GONDI: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[
     (<span class="string">&#39;𑵠&#39;</span>, <span class="string">&#39;𑵥&#39;</span>),
     (<span class="string">&#39;𑵧&#39;</span>, <span class="string">&#39;𑵨&#39;</span>),
     (<span class="string">&#39;𑵪&#39;</span>, <span class="string">&#39;𑶎&#39;</span>),
@@ -1924,7 +1924,7 @@
     (<span class="string">&#39;𑶠&#39;</span>, <span class="string">&#39;𑶩&#39;</span>),
 ];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">GURMUKHI</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">pub const </span>GURMUKHI: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[
     (<span class="string">&#39;\u{a01}&#39;</span>, <span class="string">&#39;ਃ&#39;</span>),
     (<span class="string">&#39;ਅ&#39;</span>, <span class="string">&#39;ਊ&#39;</span>),
     (<span class="string">&#39;ਏ&#39;</span>, <span class="string">&#39;ਐ&#39;</span>),
@@ -1943,7 +1943,7 @@
     (<span class="string">&#39;੦&#39;</span>, <span class="string">&#39;੶&#39;</span>),
 ];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">HAN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">pub const </span>HAN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[
     (<span class="string">&#39;⺀&#39;</span>, <span class="string">&#39;⺙&#39;</span>),
     (<span class="string">&#39;⺛&#39;</span>, <span class="string">&#39;⻳&#39;</span>),
     (<span class="string">&#39;⼀&#39;</span>, <span class="string">&#39;⿕&#39;</span>),
@@ -1966,7 +1966,7 @@
     (<span class="string">&#39;𰀀&#39;</span>, <span class="string">&#39;𱍊&#39;</span>),
 ];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">HANGUL</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">pub const </span>HANGUL: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[
     (<span class="string">&#39;ᄀ&#39;</span>, <span class="string">&#39;ᇿ&#39;</span>),
     (<span class="string">&#39;\u{302e}&#39;</span>, <span class="string">&#39;\u{302f}&#39;</span>),
     (<span class="string">&#39;ㄱ&#39;</span>, <span class="string">&#39;ㆎ&#39;</span>),
@@ -1983,15 +1983,15 @@
     (<span class="string">&#39;ￚ&#39;</span>, <span class="string">&#39;ￜ&#39;</span>),
 ];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">HANIFI_ROHINGYA</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>HANIFI_ROHINGYA: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐴀&#39;</span>, <span class="string">&#39;\u{10d27}&#39;</span>), (<span class="string">&#39;𐴰&#39;</span>, <span class="string">&#39;𐴹&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">HANUNOO</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;ᜠ&#39;</span>, <span class="string">&#39;᜴&#39;</span>)];
+<span class="kw">pub const </span>HANUNOO: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;ᜠ&#39;</span>, <span class="string">&#39;᜴&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">HATRAN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>HATRAN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐣠&#39;</span>, <span class="string">&#39;𐣲&#39;</span>), (<span class="string">&#39;𐣴&#39;</span>, <span class="string">&#39;𐣵&#39;</span>), (<span class="string">&#39;𐣻&#39;</span>, <span class="string">&#39;𐣿&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">HEBREW</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">pub const </span>HEBREW: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[
     (<span class="string">&#39;\u{591}&#39;</span>, <span class="string">&#39;\u{5c7}&#39;</span>),
     (<span class="string">&#39;א&#39;</span>, <span class="string">&#39;ת&#39;</span>),
     (<span class="string">&#39;ׯ&#39;</span>, <span class="string">&#39;״&#39;</span>),
@@ -2003,13 +2003,13 @@
     (<span class="string">&#39;צּ&#39;</span>, <span class="string">&#39;ﭏ&#39;</span>),
 ];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">HIRAGANA</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>HIRAGANA: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;ぁ&#39;</span>, <span class="string">&#39;ゖ&#39;</span>), (<span class="string">&#39;ゝ&#39;</span>, <span class="string">&#39;ゟ&#39;</span>), (<span class="string">&#39;𛀁&#39;</span>, <span class="string">&#39;𛄟&#39;</span>), (<span class="string">&#39;𛅐&#39;</span>, <span class="string">&#39;𛅒&#39;</span>), (<span class="string">&#39;🈀&#39;</span>, <span class="string">&#39;🈀&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">IMPERIAL_ARAMAIC</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>IMPERIAL_ARAMAIC: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐡀&#39;</span>, <span class="string">&#39;𐡕&#39;</span>), (<span class="string">&#39;𐡗&#39;</span>, <span class="string">&#39;𐡟&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">INHERITED</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">pub const </span>INHERITED: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[
     (<span class="string">&#39;\u{300}&#39;</span>, <span class="string">&#39;\u{36f}&#39;</span>),
     (<span class="string">&#39;\u{485}&#39;</span>, <span class="string">&#39;\u{486}&#39;</span>),
     (<span class="string">&#39;\u{64b}&#39;</span>, <span class="string">&#39;\u{655}&#39;</span>),
@@ -2041,19 +2041,19 @@
     (<span class="string">&#39;\u{e0100}&#39;</span>, <span class="string">&#39;\u{e01ef}&#39;</span>),
 ];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">INSCRIPTIONAL_PAHLAVI</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>INSCRIPTIONAL_PAHLAVI: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐭠&#39;</span>, <span class="string">&#39;𐭲&#39;</span>), (<span class="string">&#39;𐭸&#39;</span>, <span class="string">&#39;𐭿&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">INSCRIPTIONAL_PARTHIAN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>INSCRIPTIONAL_PARTHIAN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐭀&#39;</span>, <span class="string">&#39;𐭕&#39;</span>), (<span class="string">&#39;𐭘&#39;</span>, <span class="string">&#39;𐭟&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">JAVANESE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>JAVANESE: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;\u{a980}&#39;</span>, <span class="string">&#39;꧍&#39;</span>), (<span class="string">&#39;꧐&#39;</span>, <span class="string">&#39;꧙&#39;</span>), (<span class="string">&#39;꧞&#39;</span>, <span class="string">&#39;꧟&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">KAITHI</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>KAITHI: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;\u{11080}&#39;</span>, <span class="string">&#39;\u{110c2}&#39;</span>), (<span class="string">&#39;\u{110cd}&#39;</span>, <span class="string">&#39;\u{110cd}&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">KANNADA</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">pub const </span>KANNADA: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[
     (<span class="string">&#39;ಀ&#39;</span>, <span class="string">&#39;ಌ&#39;</span>),
     (<span class="string">&#39;ಎ&#39;</span>, <span class="string">&#39;ಐ&#39;</span>),
     (<span class="string">&#39;ಒ&#39;</span>, <span class="string">&#39;ನ&#39;</span>),
@@ -2069,7 +2069,7 @@
     (<span class="string">&#39;ೱ&#39;</span>, <span class="string">&#39;ೲ&#39;</span>),
 ];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">KATAKANA</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">pub const </span>KATAKANA: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[
     (<span class="string">&#39;ァ&#39;</span>, <span class="string">&#39;ヺ&#39;</span>),
     (<span class="string">&#39;ヽ&#39;</span>, <span class="string">&#39;ヿ&#39;</span>),
     (<span class="string">&#39;ㇰ&#39;</span>, <span class="string">&#39;ㇿ&#39;</span>),
@@ -2085,9 +2085,9 @@
     (<span class="string">&#39;𛅤&#39;</span>, <span class="string">&#39;𛅧&#39;</span>),
 ];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">KAYAH_LI</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;꤀&#39;</span>, <span class="string">&#39;\u{a92d}&#39;</span>), (<span class="string">&#39;꤯&#39;</span>, <span class="string">&#39;꤯&#39;</span>)];
+<span class="kw">pub const </span>KAYAH_LI: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;꤀&#39;</span>, <span class="string">&#39;\u{a92d}&#39;</span>), (<span class="string">&#39;꤯&#39;</span>, <span class="string">&#39;꤯&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">KHAROSHTHI</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">pub const </span>KHAROSHTHI: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[
     (<span class="string">&#39;𐨀&#39;</span>, <span class="string">&#39;\u{10a03}&#39;</span>),
     (<span class="string">&#39;\u{10a05}&#39;</span>, <span class="string">&#39;\u{10a06}&#39;</span>),
     (<span class="string">&#39;\u{10a0c}&#39;</span>, <span class="string">&#39;𐨓&#39;</span>),
@@ -2098,18 +2098,18 @@
     (<span class="string">&#39;𐩐&#39;</span>, <span class="string">&#39;𐩘&#39;</span>),
 ];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">KHITAN_SMALL_SCRIPT</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>KHITAN_SMALL_SCRIPT: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;\u{16fe4}&#39;</span>, <span class="string">&#39;\u{16fe4}&#39;</span>), (<span class="string">&#39;𘬀&#39;</span>, <span class="string">&#39;𘳕&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">KHMER</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>KHMER: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;ក&#39;</span>, <span class="string">&#39;\u{17dd}&#39;</span>), (<span class="string">&#39;០&#39;</span>, <span class="string">&#39;៩&#39;</span>), (<span class="string">&#39;៰&#39;</span>, <span class="string">&#39;៹&#39;</span>), (<span class="string">&#39;᧠&#39;</span>, <span class="string">&#39;᧿&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">KHOJKI</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𑈀&#39;</span>, <span class="string">&#39;𑈑&#39;</span>), (<span class="string">&#39;𑈓&#39;</span>, <span class="string">&#39;\u{1123e}&#39;</span>)];
+<span class="kw">pub const </span>KHOJKI: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𑈀&#39;</span>, <span class="string">&#39;𑈑&#39;</span>), (<span class="string">&#39;𑈓&#39;</span>, <span class="string">&#39;\u{1123e}&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">KHUDAWADI</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>KHUDAWADI: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;𑊰&#39;</span>, <span class="string">&#39;\u{112ea}&#39;</span>), (<span class="string">&#39;𑋰&#39;</span>, <span class="string">&#39;𑋹&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">LAO</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">pub const </span>LAO: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[
     (<span class="string">&#39;ກ&#39;</span>, <span class="string">&#39;ຂ&#39;</span>),
     (<span class="string">&#39;ຄ&#39;</span>, <span class="string">&#39;ຄ&#39;</span>),
     (<span class="string">&#39;ຆ&#39;</span>, <span class="string">&#39;ຊ&#39;</span>),
@@ -2123,7 +2123,7 @@
     (<span class="string">&#39;ໜ&#39;</span>, <span class="string">&#39;ໟ&#39;</span>),
 ];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">LATIN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">pub const </span>LATIN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[
     (<span class="string">&#39;A&#39;</span>, <span class="string">&#39;Z&#39;</span>),
     (<span class="string">&#39;a&#39;</span>, <span class="string">&#39;z&#39;</span>),
     (<span class="string">&#39;ª&#39;</span>, <span class="string">&#39;ª&#39;</span>),
@@ -2164,10 +2164,10 @@
     (<span class="string">&#39;𝼀&#39;</span>, <span class="string">&#39;𝼞&#39;</span>),
 ];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">LEPCHA</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>LEPCHA: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;ᰀ&#39;</span>, <span class="string">&#39;\u{1c37}&#39;</span>), (<span class="string">&#39;᰻&#39;</span>, <span class="string">&#39;᱉&#39;</span>), (<span class="string">&#39;ᱍ&#39;</span>, <span class="string">&#39;ᱏ&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">LIMBU</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">pub const </span>LIMBU: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[
     (<span class="string">&#39;ᤀ&#39;</span>, <span class="string">&#39;ᤞ&#39;</span>),
     (<span class="string">&#39;\u{1920}&#39;</span>, <span class="string">&#39;ᤫ&#39;</span>),
     (<span class="string">&#39;ᤰ&#39;</span>, <span class="string">&#39;\u{193b}&#39;</span>),
@@ -2175,10 +2175,10 @@
     (<span class="string">&#39;᥄&#39;</span>, <span class="string">&#39;᥏&#39;</span>),
 ];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">LINEAR_A</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>LINEAR_A: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐘀&#39;</span>, <span class="string">&#39;𐜶&#39;</span>), (<span class="string">&#39;𐝀&#39;</span>, <span class="string">&#39;𐝕&#39;</span>), (<span class="string">&#39;𐝠&#39;</span>, <span class="string">&#39;𐝧&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">LINEAR_B</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">pub const </span>LINEAR_B: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[
     (<span class="string">&#39;𐀀&#39;</span>, <span class="string">&#39;𐀋&#39;</span>),
     (<span class="string">&#39;𐀍&#39;</span>, <span class="string">&#39;𐀦&#39;</span>),
     (<span class="string">&#39;𐀨&#39;</span>, <span class="string">&#39;𐀺&#39;</span>),
@@ -2188,17 +2188,17 @@
     (<span class="string">&#39;𐂀&#39;</span>, <span class="string">&#39;𐃺&#39;</span>),
 ];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">LISU</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;ꓐ&#39;</span>, <span class="string">&#39;꓿&#39;</span>), (<span class="string">&#39;𑾰&#39;</span>, <span class="string">&#39;𑾰&#39;</span>)];
+<span class="kw">pub const </span>LISU: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;ꓐ&#39;</span>, <span class="string">&#39;꓿&#39;</span>), (<span class="string">&#39;𑾰&#39;</span>, <span class="string">&#39;𑾰&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">LYCIAN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐊀&#39;</span>, <span class="string">&#39;𐊜&#39;</span>)];
+<span class="kw">pub const </span>LYCIAN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐊀&#39;</span>, <span class="string">&#39;𐊜&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">LYDIAN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐤠&#39;</span>, <span class="string">&#39;𐤹&#39;</span>), (<span class="string">&#39;𐤿&#39;</span>, <span class="string">&#39;𐤿&#39;</span>)];
+<span class="kw">pub const </span>LYDIAN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐤠&#39;</span>, <span class="string">&#39;𐤹&#39;</span>), (<span class="string">&#39;𐤿&#39;</span>, <span class="string">&#39;𐤿&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAHAJANI</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𑅐&#39;</span>, <span class="string">&#39;𑅶&#39;</span>)];
+<span class="kw">pub const </span>MAHAJANI: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𑅐&#39;</span>, <span class="string">&#39;𑅶&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAKASAR</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𑻠&#39;</span>, <span class="string">&#39;𑻸&#39;</span>)];
+<span class="kw">pub const </span>MAKASAR: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𑻠&#39;</span>, <span class="string">&#39;𑻸&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MALAYALAM</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">pub const </span>MALAYALAM: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[
     (<span class="string">&#39;\u{d00}&#39;</span>, <span class="string">&#39;ഌ&#39;</span>),
     (<span class="string">&#39;എ&#39;</span>, <span class="string">&#39;ഐ&#39;</span>),
     (<span class="string">&#39;ഒ&#39;</span>, <span class="string">&#39;\u{d44}&#39;</span>),
@@ -2208,15 +2208,15 @@
     (<span class="string">&#39;൦&#39;</span>, <span class="string">&#39;ൿ&#39;</span>),
 ];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MANDAIC</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;ࡀ&#39;</span>, <span class="string">&#39;\u{85b}&#39;</span>), (<span class="string">&#39;࡞&#39;</span>, <span class="string">&#39;࡞&#39;</span>)];
+<span class="kw">pub const </span>MANDAIC: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;ࡀ&#39;</span>, <span class="string">&#39;\u{85b}&#39;</span>), (<span class="string">&#39;࡞&#39;</span>, <span class="string">&#39;࡞&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MANICHAEAN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>MANICHAEAN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐫀&#39;</span>, <span class="string">&#39;\u{10ae6}&#39;</span>), (<span class="string">&#39;𐫫&#39;</span>, <span class="string">&#39;𐫶&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MARCHEN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>MARCHEN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;𑱰&#39;</span>, <span class="string">&#39;𑲏&#39;</span>), (<span class="string">&#39;\u{11c92}&#39;</span>, <span class="string">&#39;\u{11ca7}&#39;</span>), (<span class="string">&#39;𑲩&#39;</span>, <span class="string">&#39;\u{11cb6}&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MASARAM_GONDI</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">pub const </span>MASARAM_GONDI: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[
     (<span class="string">&#39;𑴀&#39;</span>, <span class="string">&#39;𑴆&#39;</span>),
     (<span class="string">&#39;𑴈&#39;</span>, <span class="string">&#39;𑴉&#39;</span>),
     (<span class="string">&#39;𑴋&#39;</span>, <span class="string">&#39;\u{11d36}&#39;</span>),
@@ -2226,76 +2226,76 @@
     (<span class="string">&#39;𑵐&#39;</span>, <span class="string">&#39;𑵙&#39;</span>),
 ];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MEDEFAIDRIN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𖹀&#39;</span>, <span class="string">&#39;𖺚&#39;</span>)];
+<span class="kw">pub const </span>MEDEFAIDRIN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𖹀&#39;</span>, <span class="string">&#39;𖺚&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MEETEI_MAYEK</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>MEETEI_MAYEK: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;ꫠ&#39;</span>, <span class="string">&#39;\u{aaf6}&#39;</span>), (<span class="string">&#39;ꯀ&#39;</span>, <span class="string">&#39;\u{abed}&#39;</span>), (<span class="string">&#39;꯰&#39;</span>, <span class="string">&#39;꯹&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MENDE_KIKAKUI</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>MENDE_KIKAKUI: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;𞠀&#39;</span>, <span class="string">&#39;𞣄&#39;</span>), (<span class="string">&#39;𞣇&#39;</span>, <span class="string">&#39;\u{1e8d6}&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MEROITIC_CURSIVE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>MEROITIC_CURSIVE: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐦠&#39;</span>, <span class="string">&#39;𐦷&#39;</span>), (<span class="string">&#39;𐦼&#39;</span>, <span class="string">&#39;𐧏&#39;</span>), (<span class="string">&#39;𐧒&#39;</span>, <span class="string">&#39;𐧿&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MEROITIC_HIEROGLYPHS</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐦀&#39;</span>, <span class="string">&#39;𐦟&#39;</span>)];
+<span class="kw">pub const </span>MEROITIC_HIEROGLYPHS: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐦀&#39;</span>, <span class="string">&#39;𐦟&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MIAO</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>MIAO: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;𖼀&#39;</span>, <span class="string">&#39;𖽊&#39;</span>), (<span class="string">&#39;\u{16f4f}&#39;</span>, <span class="string">&#39;𖾇&#39;</span>), (<span class="string">&#39;\u{16f8f}&#39;</span>, <span class="string">&#39;𖾟&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MODI</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𑘀&#39;</span>, <span class="string">&#39;𑙄&#39;</span>), (<span class="string">&#39;𑙐&#39;</span>, <span class="string">&#39;𑙙&#39;</span>)];
+<span class="kw">pub const </span>MODI: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𑘀&#39;</span>, <span class="string">&#39;𑙄&#39;</span>), (<span class="string">&#39;𑙐&#39;</span>, <span class="string">&#39;𑙙&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MONGOLIAN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>MONGOLIAN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;᠀&#39;</span>, <span class="string">&#39;᠁&#39;</span>), (<span class="string">&#39;᠄&#39;</span>, <span class="string">&#39;᠄&#39;</span>), (<span class="string">&#39;᠆&#39;</span>, <span class="string">&#39;᠙&#39;</span>), (<span class="string">&#39;ᠠ&#39;</span>, <span class="string">&#39;ᡸ&#39;</span>), (<span class="string">&#39;ᢀ&#39;</span>, <span class="string">&#39;ᢪ&#39;</span>), (<span class="string">&#39;𑙠&#39;</span>, <span class="string">&#39;𑙬&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MRO</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𖩀&#39;</span>, <span class="string">&#39;𖩞&#39;</span>), (<span class="string">&#39;𖩠&#39;</span>, <span class="string">&#39;𖩩&#39;</span>), (<span class="string">&#39;𖩮&#39;</span>, <span class="string">&#39;𖩯&#39;</span>)];
+<span class="kw">pub const </span>MRO: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𖩀&#39;</span>, <span class="string">&#39;𖩞&#39;</span>), (<span class="string">&#39;𖩠&#39;</span>, <span class="string">&#39;𖩩&#39;</span>), (<span class="string">&#39;𖩮&#39;</span>, <span class="string">&#39;𖩯&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MULTANI</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>MULTANI: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;𑊀&#39;</span>, <span class="string">&#39;𑊆&#39;</span>), (<span class="string">&#39;𑊈&#39;</span>, <span class="string">&#39;𑊈&#39;</span>), (<span class="string">&#39;𑊊&#39;</span>, <span class="string">&#39;𑊍&#39;</span>), (<span class="string">&#39;𑊏&#39;</span>, <span class="string">&#39;𑊝&#39;</span>), (<span class="string">&#39;𑊟&#39;</span>, <span class="string">&#39;𑊩&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MYANMAR</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>MYANMAR: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;က&#39;</span>, <span class="string">&#39;႟&#39;</span>), (<span class="string">&#39;ꧠ&#39;</span>, <span class="string">&#39;ꧾ&#39;</span>), (<span class="string">&#39;ꩠ&#39;</span>, <span class="string">&#39;ꩿ&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">NABATAEAN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐢀&#39;</span>, <span class="string">&#39;𐢞&#39;</span>), (<span class="string">&#39;𐢧&#39;</span>, <span class="string">&#39;𐢯&#39;</span>)];
+<span class="kw">pub const </span>NABATAEAN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐢀&#39;</span>, <span class="string">&#39;𐢞&#39;</span>), (<span class="string">&#39;𐢧&#39;</span>, <span class="string">&#39;𐢯&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">NANDINAGARI</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>NANDINAGARI: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;𑦠&#39;</span>, <span class="string">&#39;𑦧&#39;</span>), (<span class="string">&#39;𑦪&#39;</span>, <span class="string">&#39;\u{119d7}&#39;</span>), (<span class="string">&#39;\u{119da}&#39;</span>, <span class="string">&#39;𑧤&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">NEW_TAI_LUE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>NEW_TAI_LUE: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;ᦀ&#39;</span>, <span class="string">&#39;ᦫ&#39;</span>), (<span class="string">&#39;ᦰ&#39;</span>, <span class="string">&#39;ᧉ&#39;</span>), (<span class="string">&#39;᧐&#39;</span>, <span class="string">&#39;᧚&#39;</span>), (<span class="string">&#39;᧞&#39;</span>, <span class="string">&#39;᧟&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">NEWA</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𑐀&#39;</span>, <span class="string">&#39;𑑛&#39;</span>), (<span class="string">&#39;𑑝&#39;</span>, <span class="string">&#39;𑑡&#39;</span>)];
+<span class="kw">pub const </span>NEWA: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𑐀&#39;</span>, <span class="string">&#39;𑑛&#39;</span>), (<span class="string">&#39;𑑝&#39;</span>, <span class="string">&#39;𑑡&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">NKO</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;߀&#39;</span>, <span class="string">&#39;ߺ&#39;</span>), (<span class="string">&#39;\u{7fd}&#39;</span>, <span class="string">&#39;߿&#39;</span>)];
+<span class="kw">pub const </span>NKO: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;߀&#39;</span>, <span class="string">&#39;ߺ&#39;</span>), (<span class="string">&#39;\u{7fd}&#39;</span>, <span class="string">&#39;߿&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">NUSHU</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𖿡&#39;</span>, <span class="string">&#39;𖿡&#39;</span>), (<span class="string">&#39;𛅰&#39;</span>, <span class="string">&#39;𛋻&#39;</span>)];
+<span class="kw">pub const </span>NUSHU: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𖿡&#39;</span>, <span class="string">&#39;𖿡&#39;</span>), (<span class="string">&#39;𛅰&#39;</span>, <span class="string">&#39;𛋻&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">NYIAKENG_PUACHUE_HMONG</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>NYIAKENG_PUACHUE_HMONG: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;𞄀&#39;</span>, <span class="string">&#39;𞄬&#39;</span>), (<span class="string">&#39;\u{1e130}&#39;</span>, <span class="string">&#39;𞄽&#39;</span>), (<span class="string">&#39;𞅀&#39;</span>, <span class="string">&#39;𞅉&#39;</span>), (<span class="string">&#39;𞅎&#39;</span>, <span class="string">&#39;𞅏&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">OGHAM</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;\u{1680}&#39;</span>, <span class="string">&#39;᚜&#39;</span>)];
+<span class="kw">pub const </span>OGHAM: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;\u{1680}&#39;</span>, <span class="string">&#39;᚜&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">OL_CHIKI</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;᱐&#39;</span>, <span class="string">&#39;᱿&#39;</span>)];
+<span class="kw">pub const </span>OL_CHIKI: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;᱐&#39;</span>, <span class="string">&#39;᱿&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">OLD_HUNGARIAN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>OLD_HUNGARIAN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐲀&#39;</span>, <span class="string">&#39;𐲲&#39;</span>), (<span class="string">&#39;𐳀&#39;</span>, <span class="string">&#39;𐳲&#39;</span>), (<span class="string">&#39;𐳺&#39;</span>, <span class="string">&#39;𐳿&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">OLD_ITALIC</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐌀&#39;</span>, <span class="string">&#39;𐌣&#39;</span>), (<span class="string">&#39;𐌭&#39;</span>, <span class="string">&#39;𐌯&#39;</span>)];
+<span class="kw">pub const </span>OLD_ITALIC: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐌀&#39;</span>, <span class="string">&#39;𐌣&#39;</span>), (<span class="string">&#39;𐌭&#39;</span>, <span class="string">&#39;𐌯&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">OLD_NORTH_ARABIAN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐪀&#39;</span>, <span class="string">&#39;𐪟&#39;</span>)];
+<span class="kw">pub const </span>OLD_NORTH_ARABIAN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐪀&#39;</span>, <span class="string">&#39;𐪟&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">OLD_PERMIC</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐍐&#39;</span>, <span class="string">&#39;\u{1037a}&#39;</span>)];
+<span class="kw">pub const </span>OLD_PERMIC: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐍐&#39;</span>, <span class="string">&#39;\u{1037a}&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">OLD_PERSIAN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐎠&#39;</span>, <span class="string">&#39;𐏃&#39;</span>), (<span class="string">&#39;𐏈&#39;</span>, <span class="string">&#39;𐏕&#39;</span>)];
+<span class="kw">pub const </span>OLD_PERSIAN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐎠&#39;</span>, <span class="string">&#39;𐏃&#39;</span>), (<span class="string">&#39;𐏈&#39;</span>, <span class="string">&#39;𐏕&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">OLD_SOGDIAN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐼀&#39;</span>, <span class="string">&#39;𐼧&#39;</span>)];
+<span class="kw">pub const </span>OLD_SOGDIAN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐼀&#39;</span>, <span class="string">&#39;𐼧&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">OLD_SOUTH_ARABIAN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐩠&#39;</span>, <span class="string">&#39;𐩿&#39;</span>)];
+<span class="kw">pub const </span>OLD_SOUTH_ARABIAN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐩠&#39;</span>, <span class="string">&#39;𐩿&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">OLD_TURKIC</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐰀&#39;</span>, <span class="string">&#39;𐱈&#39;</span>)];
+<span class="kw">pub const </span>OLD_TURKIC: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐰀&#39;</span>, <span class="string">&#39;𐱈&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">OLD_UYGHUR</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐽰&#39;</span>, <span class="string">&#39;𐾉&#39;</span>)];
+<span class="kw">pub const </span>OLD_UYGHUR: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐽰&#39;</span>, <span class="string">&#39;𐾉&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ORIYA</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">pub const </span>ORIYA: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[
     (<span class="string">&#39;\u{b01}&#39;</span>, <span class="string">&#39;ଃ&#39;</span>),
     (<span class="string">&#39;ଅ&#39;</span>, <span class="string">&#39;ଌ&#39;</span>),
     (<span class="string">&#39;ଏ&#39;</span>, <span class="string">&#39;ଐ&#39;</span>),
@@ -2312,44 +2312,44 @@
     (<span class="string">&#39;୦&#39;</span>, <span class="string">&#39;୷&#39;</span>),
 ];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">OSAGE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐒰&#39;</span>, <span class="string">&#39;𐓓&#39;</span>), (<span class="string">&#39;𐓘&#39;</span>, <span class="string">&#39;𐓻&#39;</span>)];
+<span class="kw">pub const </span>OSAGE: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐒰&#39;</span>, <span class="string">&#39;𐓓&#39;</span>), (<span class="string">&#39;𐓘&#39;</span>, <span class="string">&#39;𐓻&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">OSMANYA</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐒀&#39;</span>, <span class="string">&#39;𐒝&#39;</span>), (<span class="string">&#39;𐒠&#39;</span>, <span class="string">&#39;𐒩&#39;</span>)];
+<span class="kw">pub const </span>OSMANYA: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐒀&#39;</span>, <span class="string">&#39;𐒝&#39;</span>), (<span class="string">&#39;𐒠&#39;</span>, <span class="string">&#39;𐒩&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PAHAWH_HMONG</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>PAHAWH_HMONG: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;𖬀&#39;</span>, <span class="string">&#39;𖭅&#39;</span>), (<span class="string">&#39;𖭐&#39;</span>, <span class="string">&#39;𖭙&#39;</span>), (<span class="string">&#39;𖭛&#39;</span>, <span class="string">&#39;𖭡&#39;</span>), (<span class="string">&#39;𖭣&#39;</span>, <span class="string">&#39;𖭷&#39;</span>), (<span class="string">&#39;𖭽&#39;</span>, <span class="string">&#39;𖮏&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PALMYRENE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐡠&#39;</span>, <span class="string">&#39;𐡿&#39;</span>)];
+<span class="kw">pub const </span>PALMYRENE: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐡠&#39;</span>, <span class="string">&#39;𐡿&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PAU_CIN_HAU</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𑫀&#39;</span>, <span class="string">&#39;𑫸&#39;</span>)];
+<span class="kw">pub const </span>PAU_CIN_HAU: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𑫀&#39;</span>, <span class="string">&#39;𑫸&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PHAGS_PA</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;ꡀ&#39;</span>, <span class="string">&#39;꡷&#39;</span>)];
+<span class="kw">pub const </span>PHAGS_PA: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;ꡀ&#39;</span>, <span class="string">&#39;꡷&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PHOENICIAN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐤀&#39;</span>, <span class="string">&#39;𐤛&#39;</span>), (<span class="string">&#39;𐤟&#39;</span>, <span class="string">&#39;𐤟&#39;</span>)];
+<span class="kw">pub const </span>PHOENICIAN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐤀&#39;</span>, <span class="string">&#39;𐤛&#39;</span>), (<span class="string">&#39;𐤟&#39;</span>, <span class="string">&#39;𐤟&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PSALTER_PAHLAVI</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>PSALTER_PAHLAVI: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐮀&#39;</span>, <span class="string">&#39;𐮑&#39;</span>), (<span class="string">&#39;𐮙&#39;</span>, <span class="string">&#39;𐮜&#39;</span>), (<span class="string">&#39;𐮩&#39;</span>, <span class="string">&#39;𐮯&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">REJANG</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;ꤰ&#39;</span>, <span class="string">&#39;꥓&#39;</span>), (<span class="string">&#39;꥟&#39;</span>, <span class="string">&#39;꥟&#39;</span>)];
+<span class="kw">pub const </span>REJANG: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;ꤰ&#39;</span>, <span class="string">&#39;꥓&#39;</span>), (<span class="string">&#39;꥟&#39;</span>, <span class="string">&#39;꥟&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">RUNIC</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;ᚠ&#39;</span>, <span class="string">&#39;ᛪ&#39;</span>), (<span class="string">&#39;ᛮ&#39;</span>, <span class="string">&#39;ᛸ&#39;</span>)];
+<span class="kw">pub const </span>RUNIC: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;ᚠ&#39;</span>, <span class="string">&#39;ᛪ&#39;</span>), (<span class="string">&#39;ᛮ&#39;</span>, <span class="string">&#39;ᛸ&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SAMARITAN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;ࠀ&#39;</span>, <span class="string">&#39;\u{82d}&#39;</span>), (<span class="string">&#39;࠰&#39;</span>, <span class="string">&#39;࠾&#39;</span>)];
+<span class="kw">pub const </span>SAMARITAN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;ࠀ&#39;</span>, <span class="string">&#39;\u{82d}&#39;</span>), (<span class="string">&#39;࠰&#39;</span>, <span class="string">&#39;࠾&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SAURASHTRA</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>SAURASHTRA: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;ꢀ&#39;</span>, <span class="string">&#39;\u{a8c5}&#39;</span>), (<span class="string">&#39;꣎&#39;</span>, <span class="string">&#39;꣙&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SHARADA</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;\u{11180}&#39;</span>, <span class="string">&#39;𑇟&#39;</span>)];
+<span class="kw">pub const </span>SHARADA: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;\u{11180}&#39;</span>, <span class="string">&#39;𑇟&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SHAVIAN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐑐&#39;</span>, <span class="string">&#39;𐑿&#39;</span>)];
+<span class="kw">pub const </span>SHAVIAN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐑐&#39;</span>, <span class="string">&#39;𐑿&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SIDDHAM</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>SIDDHAM: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;𑖀&#39;</span>, <span class="string">&#39;\u{115b5}&#39;</span>), (<span class="string">&#39;𑖸&#39;</span>, <span class="string">&#39;\u{115dd}&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SIGNWRITING</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>SIGNWRITING: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;𝠀&#39;</span>, <span class="string">&#39;𝪋&#39;</span>), (<span class="string">&#39;\u{1da9b}&#39;</span>, <span class="string">&#39;\u{1da9f}&#39;</span>), (<span class="string">&#39;\u{1daa1}&#39;</span>, <span class="string">&#39;\u{1daaf}&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SINHALA</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">pub const </span>SINHALA: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[
     (<span class="string">&#39;\u{d81}&#39;</span>, <span class="string">&#39;ඃ&#39;</span>),
     (<span class="string">&#39;අ&#39;</span>, <span class="string">&#39;ඖ&#39;</span>),
     (<span class="string">&#39;ක&#39;</span>, <span class="string">&#39;න&#39;</span>),
@@ -2365,28 +2365,28 @@
     (<span class="string">&#39;𑇡&#39;</span>, <span class="string">&#39;𑇴&#39;</span>),
 ];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SOGDIAN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐼰&#39;</span>, <span class="string">&#39;𐽙&#39;</span>)];
+<span class="kw">pub const </span>SOGDIAN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐼰&#39;</span>, <span class="string">&#39;𐽙&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SORA_SOMPENG</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𑃐&#39;</span>, <span class="string">&#39;𑃨&#39;</span>), (<span class="string">&#39;𑃰&#39;</span>, <span class="string">&#39;𑃹&#39;</span>)];
+<span class="kw">pub const </span>SORA_SOMPENG: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𑃐&#39;</span>, <span class="string">&#39;𑃨&#39;</span>), (<span class="string">&#39;𑃰&#39;</span>, <span class="string">&#39;𑃹&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SOYOMBO</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𑩐&#39;</span>, <span class="string">&#39;𑪢&#39;</span>)];
+<span class="kw">pub const </span>SOYOMBO: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𑩐&#39;</span>, <span class="string">&#39;𑪢&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SUNDANESE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>SUNDANESE: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;\u{1b80}&#39;</span>, <span class="string">&#39;ᮿ&#39;</span>), (<span class="string">&#39;᳀&#39;</span>, <span class="string">&#39;᳇&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SYLOTI_NAGRI</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;ꠀ&#39;</span>, <span class="string">&#39;\u{a82c}&#39;</span>)];
+<span class="kw">pub const </span>SYLOTI_NAGRI: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;ꠀ&#39;</span>, <span class="string">&#39;\u{a82c}&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SYRIAC</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>SYRIAC: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;܀&#39;</span>, <span class="string">&#39;܍&#39;</span>), (<span class="string">&#39;\u{70f}&#39;</span>, <span class="string">&#39;\u{74a}&#39;</span>), (<span class="string">&#39;ݍ&#39;</span>, <span class="string">&#39;ݏ&#39;</span>), (<span class="string">&#39;ࡠ&#39;</span>, <span class="string">&#39;ࡪ&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TAGALOG</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;ᜀ&#39;</span>, <span class="string">&#39;᜕&#39;</span>), (<span class="string">&#39;ᜟ&#39;</span>, <span class="string">&#39;ᜟ&#39;</span>)];
+<span class="kw">pub const </span>TAGALOG: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;ᜀ&#39;</span>, <span class="string">&#39;᜕&#39;</span>), (<span class="string">&#39;ᜟ&#39;</span>, <span class="string">&#39;ᜟ&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TAGBANWA</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>TAGBANWA: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;ᝠ&#39;</span>, <span class="string">&#39;ᝬ&#39;</span>), (<span class="string">&#39;ᝮ&#39;</span>, <span class="string">&#39;ᝰ&#39;</span>), (<span class="string">&#39;\u{1772}&#39;</span>, <span class="string">&#39;\u{1773}&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TAI_LE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;ᥐ&#39;</span>, <span class="string">&#39;ᥭ&#39;</span>), (<span class="string">&#39;ᥰ&#39;</span>, <span class="string">&#39;ᥴ&#39;</span>)];
+<span class="kw">pub const </span>TAI_LE: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;ᥐ&#39;</span>, <span class="string">&#39;ᥭ&#39;</span>), (<span class="string">&#39;ᥰ&#39;</span>, <span class="string">&#39;ᥴ&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TAI_THAM</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">pub const </span>TAI_THAM: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[
     (<span class="string">&#39;ᨠ&#39;</span>, <span class="string">&#39;\u{1a5e}&#39;</span>),
     (<span class="string">&#39;\u{1a60}&#39;</span>, <span class="string">&#39;\u{1a7c}&#39;</span>),
     (<span class="string">&#39;\u{1a7f}&#39;</span>, <span class="string">&#39;᪉&#39;</span>),
@@ -2394,11 +2394,11 @@
     (<span class="string">&#39;᪠&#39;</span>, <span class="string">&#39;᪭&#39;</span>),
 ];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TAI_VIET</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;ꪀ&#39;</span>, <span class="string">&#39;ꫂ&#39;</span>), (<span class="string">&#39;ꫛ&#39;</span>, <span class="string">&#39;꫟&#39;</span>)];
+<span class="kw">pub const </span>TAI_VIET: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;ꪀ&#39;</span>, <span class="string">&#39;ꫂ&#39;</span>), (<span class="string">&#39;ꫛ&#39;</span>, <span class="string">&#39;꫟&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TAKRI</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𑚀&#39;</span>, <span class="string">&#39;𑚹&#39;</span>), (<span class="string">&#39;𑛀&#39;</span>, <span class="string">&#39;𑛉&#39;</span>)];
+<span class="kw">pub const </span>TAKRI: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𑚀&#39;</span>, <span class="string">&#39;𑚹&#39;</span>), (<span class="string">&#39;𑛀&#39;</span>, <span class="string">&#39;𑛉&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TAMIL</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">pub const </span>TAMIL: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[
     (<span class="string">&#39;\u{b82}&#39;</span>, <span class="string">&#39;ஃ&#39;</span>),
     (<span class="string">&#39;அ&#39;</span>, <span class="string">&#39;ஊ&#39;</span>),
     (<span class="string">&#39;எ&#39;</span>, <span class="string">&#39;ஐ&#39;</span>),
@@ -2419,12 +2419,12 @@
     (<span class="string">&#39;𑿿&#39;</span>, <span class="string">&#39;𑿿&#39;</span>),
 ];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TANGSA</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𖩰&#39;</span>, <span class="string">&#39;𖪾&#39;</span>), (<span class="string">&#39;𖫀&#39;</span>, <span class="string">&#39;𖫉&#39;</span>)];
+<span class="kw">pub const </span>TANGSA: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𖩰&#39;</span>, <span class="string">&#39;𖪾&#39;</span>), (<span class="string">&#39;𖫀&#39;</span>, <span class="string">&#39;𖫉&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TANGUT</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>TANGUT: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;𖿠&#39;</span>, <span class="string">&#39;𖿠&#39;</span>), (<span class="string">&#39;𗀀&#39;</span>, <span class="string">&#39;𘟷&#39;</span>), (<span class="string">&#39;𘠀&#39;</span>, <span class="string">&#39;𘫿&#39;</span>), (<span class="string">&#39;𘴀&#39;</span>, <span class="string">&#39;𘴈&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TELUGU</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">pub const </span>TELUGU: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[
     (<span class="string">&#39;\u{c00}&#39;</span>, <span class="string">&#39;ఌ&#39;</span>),
     (<span class="string">&#39;ఎ&#39;</span>, <span class="string">&#39;ఐ&#39;</span>),
     (<span class="string">&#39;ఒ&#39;</span>, <span class="string">&#39;న&#39;</span>),
@@ -2440,11 +2440,11 @@
     (<span class="string">&#39;౷&#39;</span>, <span class="string">&#39;౿&#39;</span>),
 ];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">THAANA</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;ހ&#39;</span>, <span class="string">&#39;ޱ&#39;</span>)];
+<span class="kw">pub const </span>THAANA: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;ހ&#39;</span>, <span class="string">&#39;ޱ&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">THAI</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;ก&#39;</span>, <span class="string">&#39;\u{e3a}&#39;</span>), (<span class="string">&#39;เ&#39;</span>, <span class="string">&#39;๛&#39;</span>)];
+<span class="kw">pub const </span>THAI: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;ก&#39;</span>, <span class="string">&#39;\u{e3a}&#39;</span>), (<span class="string">&#39;เ&#39;</span>, <span class="string">&#39;๛&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TIBETAN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">pub const </span>TIBETAN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[
     (<span class="string">&#39;ༀ&#39;</span>, <span class="string">&#39;ཇ&#39;</span>),
     (<span class="string">&#39;ཉ&#39;</span>, <span class="string">&#39;ཬ&#39;</span>),
     (<span class="string">&#39;\u{f71}&#39;</span>, <span class="string">&#39;\u{f97}&#39;</span>),
@@ -2454,18 +2454,18 @@
     (<span class="string">&#39;࿙&#39;</span>, <span class="string">&#39;࿚&#39;</span>),
 ];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TIFINAGH</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>TIFINAGH: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;ⴰ&#39;</span>, <span class="string">&#39;ⵧ&#39;</span>), (<span class="string">&#39;ⵯ&#39;</span>, <span class="string">&#39;⵰&#39;</span>), (<span class="string">&#39;\u{2d7f}&#39;</span>, <span class="string">&#39;\u{2d7f}&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TIRHUTA</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𑒀&#39;</span>, <span class="string">&#39;𑓇&#39;</span>), (<span class="string">&#39;𑓐&#39;</span>, <span class="string">&#39;𑓙&#39;</span>)];
+<span class="kw">pub const </span>TIRHUTA: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𑒀&#39;</span>, <span class="string">&#39;𑓇&#39;</span>), (<span class="string">&#39;𑓐&#39;</span>, <span class="string">&#39;𑓙&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TOTO</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𞊐&#39;</span>, <span class="string">&#39;\u{1e2ae}&#39;</span>)];
+<span class="kw">pub const </span>TOTO: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𞊐&#39;</span>, <span class="string">&#39;\u{1e2ae}&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">UGARITIC</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐎀&#39;</span>, <span class="string">&#39;𐎝&#39;</span>), (<span class="string">&#39;𐎟&#39;</span>, <span class="string">&#39;𐎟&#39;</span>)];
+<span class="kw">pub const </span>UGARITIC: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐎀&#39;</span>, <span class="string">&#39;𐎝&#39;</span>), (<span class="string">&#39;𐎟&#39;</span>, <span class="string">&#39;𐎟&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">VAI</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;ꔀ&#39;</span>, <span class="string">&#39;ꘫ&#39;</span>)];
+<span class="kw">pub const </span>VAI: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;ꔀ&#39;</span>, <span class="string">&#39;ꘫ&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">VITHKUQI</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">pub const </span>VITHKUQI: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[
     (<span class="string">&#39;𐕰&#39;</span>, <span class="string">&#39;𐕺&#39;</span>),
     (<span class="string">&#39;𐕼&#39;</span>, <span class="string">&#39;𐖊&#39;</span>),
     (<span class="string">&#39;𐖌&#39;</span>, <span class="string">&#39;𐖒&#39;</span>),
@@ -2476,15 +2476,15 @@
     (<span class="string">&#39;𐖻&#39;</span>, <span class="string">&#39;𐖼&#39;</span>),
 ];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">WANCHO</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𞋀&#39;</span>, <span class="string">&#39;𞋹&#39;</span>), (<span class="string">&#39;𞋿&#39;</span>, <span class="string">&#39;𞋿&#39;</span>)];
+<span class="kw">pub const </span>WANCHO: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𞋀&#39;</span>, <span class="string">&#39;𞋹&#39;</span>), (<span class="string">&#39;𞋿&#39;</span>, <span class="string">&#39;𞋿&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">WARANG_CITI</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𑢠&#39;</span>, <span class="string">&#39;𑣲&#39;</span>), (<span class="string">&#39;𑣿&#39;</span>, <span class="string">&#39;𑣿&#39;</span>)];
+<span class="kw">pub const </span>WARANG_CITI: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𑢠&#39;</span>, <span class="string">&#39;𑣲&#39;</span>), (<span class="string">&#39;𑣿&#39;</span>, <span class="string">&#39;𑣿&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">YEZIDI</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span>
+<span class="kw">pub const </span>YEZIDI: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] =
     <span class="kw-2">&amp;</span>[(<span class="string">&#39;𐺀&#39;</span>, <span class="string">&#39;𐺩&#39;</span>), (<span class="string">&#39;\u{10eab}&#39;</span>, <span class="string">&#39;𐺭&#39;</span>), (<span class="string">&#39;𐺰&#39;</span>, <span class="string">&#39;𐺱&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">YI</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;ꀀ&#39;</span>, <span class="string">&#39;ꒌ&#39;</span>), (<span class="string">&#39;꒐&#39;</span>, <span class="string">&#39;꓆&#39;</span>)];
+<span class="kw">pub const </span>YI: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;ꀀ&#39;</span>, <span class="string">&#39;ꒌ&#39;</span>), (<span class="string">&#39;꒐&#39;</span>, <span class="string">&#39;꓆&#39;</span>)];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ZANABAZAR_SQUARE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [(<span class="ident">char</span>, <span class="ident">char</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[(<span class="string">&#39;𑨀&#39;</span>, <span class="string">&#39;\u{11a47}&#39;</span>)];
+<span class="kw">pub const </span>ZANABAZAR_SQUARE: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[(char, char)] = <span class="kw-2">&amp;</span>[(<span class="string">&#39;𑨀&#39;</span>, <span class="string">&#39;\u{11a47}&#39;</span>)];
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="regex_syntax" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="regex_syntax" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

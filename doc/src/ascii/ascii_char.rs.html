@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ascii-0.9.3/src/ascii_char.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ascii_char.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../ascii/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../ascii/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../ascii/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ascii-0.9.3/src/ascii_char.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ascii_char.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../ascii/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../ascii/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../ascii/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -864,871 +864,871 @@
 <span id="864">864</span>
 <span id="865">865</span>
 <span id="866">866</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">rustfmt</span>, <span class="ident">rustfmt_skip</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![cfg_attr(rustfmt, rustfmt_skip)]
 
-<span class="comment">// #[allow(deprecated)] doesn&#39;t silence warnings on the method invocations,</span>
-<span class="comment">// which would call the inherent methods if AsciiExt wasn&#39;t in scope.</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">allow</span>(<span class="ident">deprecated</span>))]</span>
+</span><span class="comment">// #[allow(deprecated)] doesn&#39;t silence warnings on the method invocations,
+// which would call the inherent methods if AsciiExt wasn&#39;t in scope.
+</span><span class="attribute">#![cfg_attr(feature = <span class="string">&quot;std&quot;</span>, allow(deprecated))]
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quickcheck&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">quickcheck</span>::{<span class="ident">Arbitrary</span>, <span class="ident">Gen</span>};
+#[cfg(feature = <span class="string">&quot;quickcheck&quot;</span>)]
+</span><span class="kw">use </span>quickcheck::{Arbitrary, Gen};
 
-<span class="kw">use</span> <span class="ident">core::mem</span>;
-<span class="kw">use</span> <span class="ident">core::cmp::Ordering</span>;
-<span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">fmt</span>, <span class="ident">char</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::error::Error</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::ascii::AsciiExt</span>;
+<span class="kw">use </span>core::mem;
+<span class="kw">use </span>core::cmp::Ordering;
+<span class="kw">use </span>core::{fmt, char};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">use </span>std::error::Error;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">use </span>std::ascii::AsciiExt;
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>)]</span>
-<span class="doccomment">/// An ASCII character. It wraps a `u8`, with the highest bit always zero.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Copy</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">AsciiChar</span> {
-    <span class="doccomment">/// `&#39;\0&#39;`</span>
-    <span class="ident">Null</span> <span class="op">=</span> <span class="number">0</span>,
-    <span class="doccomment">/// [Start Of Heading](http://en.wikipedia.org/wiki/Start_of_Heading)</span>
-    <span class="ident">SOH</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="doccomment">/// [Start Of teXt](http://en.wikipedia.org/wiki/Start_of_Text)</span>
-    <span class="ident">SOX</span> <span class="op">=</span> <span class="number">2</span>,
-    <span class="doccomment">/// [End of TeXt](http://en.wikipedia.org/wiki/End-of-Text_character)</span>
-    <span class="ident">ETX</span> <span class="op">=</span> <span class="number">3</span>,
-    <span class="doccomment">/// [End Of Transmission](http://en.wikipedia.org/wiki/End-of-Transmission_character)</span>
-    <span class="ident">EOT</span> <span class="op">=</span> <span class="number">4</span>,
-    <span class="doccomment">/// [Enquiry](http://en.wikipedia.org/wiki/Enquiry_character)</span>
-    <span class="ident">ENQ</span> <span class="op">=</span> <span class="number">5</span>,
-    <span class="doccomment">/// [Acknowledgement](http://en.wikipedia.org/wiki/Acknowledge_character)</span>
-    <span class="ident">ACK</span> <span class="op">=</span> <span class="number">6</span>,
-    <span class="doccomment">/// [bell / alarm / audible](http://en.wikipedia.org/wiki/Bell_character)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `&#39;\a&#39;` is not recognized by Rust.</span>
-    <span class="ident">Bell</span> <span class="op">=</span> <span class="number">7</span>,
-    <span class="doccomment">/// [Backspace](http://en.wikipedia.org/wiki/Backspace)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `&#39;\b&#39;` is not recognized by Rust.</span>
-    <span class="ident">BackSpace</span> <span class="op">=</span> <span class="number">8</span>,
-    <span class="doccomment">/// `&#39;\t&#39;`</span>
-    <span class="ident">Tab</span> <span class="op">=</span> <span class="number">9</span>,
-    <span class="doccomment">/// `&#39;\n&#39;`</span>
-    <span class="ident">LineFeed</span> <span class="op">=</span> <span class="number">10</span>,
-    <span class="doccomment">/// [Vertical tab](http://en.wikipedia.org/wiki/Vertical_Tab)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `&#39;\v&#39;` is not recognized by Rust.</span>
-    <span class="ident">VT</span> <span class="op">=</span> <span class="number">11</span>,
-    <span class="doccomment">/// [Form Feed](http://en.wikipedia.org/wiki/Form_Feed)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `&#39;\f&#39;` is not recognized by Rust.</span>
-    <span class="ident">FF</span> <span class="op">=</span> <span class="number">12</span>,
-    <span class="doccomment">/// `&#39;\r&#39;`</span>
-    <span class="ident">CarriageReturn</span> <span class="op">=</span> <span class="number">13</span>,
-    <span class="doccomment">/// [Shift In](http://en.wikipedia.org/wiki/Shift_Out_and_Shift_In_characters)</span>
-    <span class="ident">SI</span> <span class="op">=</span> <span class="number">14</span>,
-    <span class="doccomment">/// [Shift Out](http://en.wikipedia.org/wiki/Shift_Out_and_Shift_In_characters)</span>
-    <span class="ident">SO</span> <span class="op">=</span> <span class="number">15</span>,
-    <span class="doccomment">/// [Data Link Escape](http://en.wikipedia.org/wiki/Data_Link_Escape)</span>
-    <span class="ident">DLE</span> <span class="op">=</span> <span class="number">16</span>,
-    <span class="doccomment">/// [Device control 1, often XON](http://en.wikipedia.org/wiki/Device_Control_1)</span>
-    <span class="ident">DC1</span> <span class="op">=</span> <span class="number">17</span>,
-    <span class="doccomment">/// Device control 2</span>
-    <span class="ident">DC2</span> <span class="op">=</span> <span class="number">18</span>,
-    <span class="doccomment">/// Device control 3, Often XOFF</span>
-    <span class="ident">DC3</span> <span class="op">=</span> <span class="number">19</span>,
-    <span class="doccomment">/// Device control 4</span>
-    <span class="ident">DC4</span> <span class="op">=</span> <span class="number">20</span>,
-    <span class="doccomment">/// [Negative AcKnowledgement](http://en.wikipedia.org/wiki/Negative-acknowledge_character)</span>
-    <span class="ident">NAK</span> <span class="op">=</span> <span class="number">21</span>,
-    <span class="doccomment">/// [Synchronous idle](http://en.wikipedia.org/wiki/Synchronous_Idle)</span>
-    <span class="ident">SYN</span> <span class="op">=</span> <span class="number">22</span>,
-    <span class="doccomment">/// [End of Transmission Block](http://en.wikipedia.org/wiki/End-of-Transmission-Block_character)</span>
-    <span class="ident">ETB</span> <span class="op">=</span> <span class="number">23</span>,
-    <span class="doccomment">/// [Cancel](http://en.wikipedia.org/wiki/Cancel_character)</span>
-    <span class="ident">CAN</span> <span class="op">=</span> <span class="number">24</span>,
-    <span class="doccomment">/// [End of Medium](http://en.wikipedia.org/wiki/End_of_Medium)</span>
-    <span class="ident">EM</span> <span class="op">=</span> <span class="number">25</span>,
-    <span class="doccomment">/// [Substitute](http://en.wikipedia.org/wiki/Substitute_character)</span>
-    <span class="ident">SUB</span> <span class="op">=</span> <span class="number">26</span>,
-    <span class="doccomment">/// [Escape](http://en.wikipedia.org/wiki/Escape_character)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `&#39;\e&#39;` is not recognized by Rust.</span>
-    <span class="ident">ESC</span> <span class="op">=</span> <span class="number">27</span>,
-    <span class="doccomment">/// [File Separator](http://en.wikipedia.org/wiki/File_separator)</span>
-    <span class="ident">FS</span> <span class="op">=</span> <span class="number">28</span>,
-    <span class="doccomment">/// [Group Separator](http://en.wikipedia.org/wiki/Group_separator)</span>
-    <span class="ident">GS</span> <span class="op">=</span> <span class="number">29</span>,
-    <span class="doccomment">/// [Record Separator](http://en.wikipedia.org/wiki/Record_separator)</span>
-    <span class="ident">RS</span> <span class="op">=</span> <span class="number">30</span>,
-    <span class="doccomment">/// [Unit Separator](http://en.wikipedia.org/wiki/Unit_separator)</span>
-    <span class="ident">US</span> <span class="op">=</span> <span class="number">31</span>,
-    <span class="doccomment">/// `&#39; &#39;`</span>
-    <span class="ident">Space</span> <span class="op">=</span> <span class="number">32</span>,
-    <span class="doccomment">/// `&#39;!&#39;`</span>
-    <span class="ident">Exclamation</span> <span class="op">=</span> <span class="number">33</span>,
-    <span class="doccomment">/// `&#39;&quot;&#39;`</span>
-    <span class="ident">Quotation</span> <span class="op">=</span> <span class="number">34</span>,
-    <span class="doccomment">/// `&#39;#&#39;`</span>
-    <span class="ident">Hash</span> <span class="op">=</span> <span class="number">35</span>,
-    <span class="doccomment">/// `&#39;$&#39;`</span>
-    <span class="ident">Dollar</span> <span class="op">=</span> <span class="number">36</span>,
-    <span class="doccomment">/// `&#39;%&#39;`</span>
-    <span class="ident">Percent</span> <span class="op">=</span> <span class="number">37</span>,
-    <span class="doccomment">/// `&#39;&amp;&#39;`</span>
-    <span class="ident">Ampersand</span> <span class="op">=</span> <span class="number">38</span>,
-    <span class="doccomment">/// `&#39;\&#39;&#39;`</span>
-    <span class="ident">Apostrophe</span> <span class="op">=</span> <span class="number">39</span>,
-    <span class="doccomment">/// `&#39;(&#39;`</span>
-    <span class="ident">ParenOpen</span> <span class="op">=</span> <span class="number">40</span>,
-    <span class="doccomment">/// `&#39;)&#39;`</span>
-    <span class="ident">ParenClose</span> <span class="op">=</span> <span class="number">41</span>,
-    <span class="doccomment">/// `&#39;*&#39;`</span>
-    <span class="ident">Asterisk</span> <span class="op">=</span> <span class="number">42</span>,
-    <span class="doccomment">/// `&#39;+&#39;`</span>
-    <span class="ident">Plus</span> <span class="op">=</span> <span class="number">43</span>,
-    <span class="doccomment">/// `&#39;,&#39;`</span>
-    <span class="ident">Comma</span> <span class="op">=</span> <span class="number">44</span>,
-    <span class="doccomment">/// `&#39;-&#39;`</span>
-    <span class="ident">Minus</span> <span class="op">=</span> <span class="number">45</span>,
-    <span class="doccomment">/// `&#39;.&#39;`</span>
-    <span class="ident">Dot</span> <span class="op">=</span> <span class="number">46</span>,
-    <span class="doccomment">/// `&#39;/&#39;`</span>
-    <span class="ident">Slash</span> <span class="op">=</span> <span class="number">47</span>,
-    <span class="doccomment">/// `&#39;0&#39;`</span>
-    <span class="ident">_0</span> <span class="op">=</span> <span class="number">48</span>,
-    <span class="doccomment">/// `&#39;1&#39;`</span>
-    <span class="ident">_1</span> <span class="op">=</span> <span class="number">49</span>,
-    <span class="doccomment">/// `&#39;2&#39;`</span>
-    <span class="ident">_2</span> <span class="op">=</span> <span class="number">50</span>,
-    <span class="doccomment">/// `&#39;3&#39;`</span>
-    <span class="ident">_3</span> <span class="op">=</span> <span class="number">51</span>,
-    <span class="doccomment">/// `&#39;4&#39;`</span>
-    <span class="ident">_4</span> <span class="op">=</span> <span class="number">52</span>,
-    <span class="doccomment">/// `&#39;5&#39;`</span>
-    <span class="ident">_5</span> <span class="op">=</span> <span class="number">53</span>,
-    <span class="doccomment">/// `&#39;6&#39;`</span>
-    <span class="ident">_6</span> <span class="op">=</span> <span class="number">54</span>,
-    <span class="doccomment">/// `&#39;7&#39;`</span>
-    <span class="ident">_7</span> <span class="op">=</span> <span class="number">55</span>,
-    <span class="doccomment">/// `&#39;8&#39;`</span>
-    <span class="ident">_8</span> <span class="op">=</span> <span class="number">56</span>,
-    <span class="doccomment">/// `&#39;9&#39;`</span>
-    <span class="ident">_9</span> <span class="op">=</span> <span class="number">57</span>,
-    <span class="doccomment">/// `&#39;:&#39;`</span>
-    <span class="ident">Colon</span> <span class="op">=</span> <span class="number">58</span>,
-    <span class="doccomment">/// `&#39;;&#39;`</span>
-    <span class="ident">Semicolon</span> <span class="op">=</span> <span class="number">59</span>,
-    <span class="doccomment">/// `&#39;&lt;&#39;`</span>
-    <span class="ident">LessThan</span> <span class="op">=</span> <span class="number">60</span>,
-    <span class="doccomment">/// `&#39;=&#39;`</span>
-    <span class="ident">Equal</span> <span class="op">=</span> <span class="number">61</span>,
-    <span class="doccomment">/// `&#39;&gt;&#39;`</span>
-    <span class="ident">GreaterThan</span> <span class="op">=</span> <span class="number">62</span>,
-    <span class="doccomment">/// `&#39;?&#39;`</span>
-    <span class="ident">Question</span> <span class="op">=</span> <span class="number">63</span>,
-    <span class="doccomment">/// `&#39;@&#39;`</span>
-    <span class="ident">At</span> <span class="op">=</span> <span class="number">64</span>,
-    <span class="doccomment">/// `&#39;A&#39;`</span>
-    <span class="ident">A</span> <span class="op">=</span> <span class="number">65</span>,
-    <span class="doccomment">/// `&#39;B&#39;`</span>
-    <span class="ident">B</span> <span class="op">=</span> <span class="number">66</span>,
-    <span class="doccomment">/// `&#39;C&#39;`</span>
-    <span class="ident">C</span> <span class="op">=</span> <span class="number">67</span>,
-    <span class="doccomment">/// `&#39;D&#39;`</span>
-    <span class="ident">D</span> <span class="op">=</span> <span class="number">68</span>,
-    <span class="doccomment">/// `&#39;E&#39;`</span>
-    <span class="ident">E</span> <span class="op">=</span> <span class="number">69</span>,
-    <span class="doccomment">/// `&#39;F&#39;`</span>
-    <span class="ident">F</span> <span class="op">=</span> <span class="number">70</span>,
-    <span class="doccomment">/// `&#39;G&#39;`</span>
-    <span class="ident">G</span> <span class="op">=</span> <span class="number">71</span>,
-    <span class="doccomment">/// `&#39;H&#39;`</span>
-    <span class="ident">H</span> <span class="op">=</span> <span class="number">72</span>,
-    <span class="doccomment">/// `&#39;I&#39;`</span>
-    <span class="ident">I</span> <span class="op">=</span> <span class="number">73</span>,
-    <span class="doccomment">/// `&#39;J&#39;`</span>
-    <span class="ident">J</span> <span class="op">=</span> <span class="number">74</span>,
-    <span class="doccomment">/// `&#39;K&#39;`</span>
-    <span class="ident">K</span> <span class="op">=</span> <span class="number">75</span>,
-    <span class="doccomment">/// `&#39;L&#39;`</span>
-    <span class="ident">L</span> <span class="op">=</span> <span class="number">76</span>,
-    <span class="doccomment">/// `&#39;M&#39;`</span>
-    <span class="ident">M</span> <span class="op">=</span> <span class="number">77</span>,
-    <span class="doccomment">/// `&#39;N&#39;`</span>
-    <span class="ident">N</span> <span class="op">=</span> <span class="number">78</span>,
-    <span class="doccomment">/// `&#39;O&#39;`</span>
-    <span class="ident">O</span> <span class="op">=</span> <span class="number">79</span>,
-    <span class="doccomment">/// `&#39;P&#39;`</span>
-    <span class="ident">P</span> <span class="op">=</span> <span class="number">80</span>,
-    <span class="doccomment">/// `&#39;Q&#39;`</span>
-    <span class="ident">Q</span> <span class="op">=</span> <span class="number">81</span>,
-    <span class="doccomment">/// `&#39;R&#39;`</span>
-    <span class="ident">R</span> <span class="op">=</span> <span class="number">82</span>,
-    <span class="doccomment">/// `&#39;S&#39;`</span>
-    <span class="ident">S</span> <span class="op">=</span> <span class="number">83</span>,
-    <span class="doccomment">/// `&#39;T&#39;`</span>
-    <span class="ident">T</span> <span class="op">=</span> <span class="number">84</span>,
-    <span class="doccomment">/// `&#39;U&#39;`</span>
-    <span class="ident">U</span> <span class="op">=</span> <span class="number">85</span>,
-    <span class="doccomment">/// `&#39;V&#39;`</span>
-    <span class="ident">V</span> <span class="op">=</span> <span class="number">86</span>,
-    <span class="doccomment">/// `&#39;W&#39;`</span>
-    <span class="ident">W</span> <span class="op">=</span> <span class="number">87</span>,
-    <span class="doccomment">/// `&#39;X&#39;`</span>
-    <span class="ident">X</span> <span class="op">=</span> <span class="number">88</span>,
-    <span class="doccomment">/// `&#39;Y&#39;`</span>
-    <span class="ident">Y</span> <span class="op">=</span> <span class="number">89</span>,
-    <span class="doccomment">/// `&#39;Z&#39;`</span>
-    <span class="ident">Z</span> <span class="op">=</span> <span class="number">90</span>,
-    <span class="doccomment">/// `&#39;[&#39;`</span>
-    <span class="ident">BracketOpen</span> <span class="op">=</span> <span class="number">91</span>,
-    <span class="doccomment">/// `&#39;\&#39;`</span>
-    <span class="ident">BackSlash</span> <span class="op">=</span> <span class="number">92</span>,
-    <span class="doccomment">/// `&#39;]&#39;`</span>
-    <span class="ident">BracketClose</span> <span class="op">=</span> <span class="number">93</span>,
-    <span class="doccomment">/// `&#39;_&#39;`</span>
-    <span class="ident">Caret</span> <span class="op">=</span> <span class="number">94</span>,
-    <span class="doccomment">/// `&#39;_&#39;`</span>
-    <span class="ident">UnderScore</span> <span class="op">=</span> <span class="number">95</span>,
-    <span class="doccomment">/// `&#39;`&#39;`</span>
-    <span class="ident">Grave</span> <span class="op">=</span> <span class="number">96</span>,
-    <span class="doccomment">/// `&#39;a&#39;`</span>
-    <span class="ident">a</span> <span class="op">=</span> <span class="number">97</span>,
-    <span class="doccomment">/// `&#39;b&#39;`</span>
-    <span class="ident">b</span> <span class="op">=</span> <span class="number">98</span>,
-    <span class="doccomment">/// `&#39;c&#39;`</span>
-    <span class="ident">c</span> <span class="op">=</span> <span class="number">99</span>,
-    <span class="doccomment">/// `&#39;d&#39;`</span>
-    <span class="ident">d</span> <span class="op">=</span> <span class="number">100</span>,
-    <span class="doccomment">/// `&#39;e&#39;`</span>
-    <span class="ident">e</span> <span class="op">=</span> <span class="number">101</span>,
-    <span class="doccomment">/// `&#39;f&#39;`</span>
-    <span class="ident">f</span> <span class="op">=</span> <span class="number">102</span>,
-    <span class="doccomment">/// `&#39;g&#39;`</span>
-    <span class="ident">g</span> <span class="op">=</span> <span class="number">103</span>,
-    <span class="doccomment">/// `&#39;h&#39;`</span>
-    <span class="ident">h</span> <span class="op">=</span> <span class="number">104</span>,
-    <span class="doccomment">/// `&#39;i&#39;`</span>
-    <span class="ident">i</span> <span class="op">=</span> <span class="number">105</span>,
-    <span class="doccomment">/// `&#39;j&#39;`</span>
-    <span class="ident">j</span> <span class="op">=</span> <span class="number">106</span>,
-    <span class="doccomment">/// `&#39;k&#39;`</span>
-    <span class="ident">k</span> <span class="op">=</span> <span class="number">107</span>,
-    <span class="doccomment">/// `&#39;l&#39;`</span>
-    <span class="ident">l</span> <span class="op">=</span> <span class="number">108</span>,
-    <span class="doccomment">/// `&#39;m&#39;`</span>
-    <span class="ident">m</span> <span class="op">=</span> <span class="number">109</span>,
-    <span class="doccomment">/// `&#39;n&#39;`</span>
-    <span class="ident">n</span> <span class="op">=</span> <span class="number">110</span>,
-    <span class="doccomment">/// `&#39;o&#39;`</span>
-    <span class="ident">o</span> <span class="op">=</span> <span class="number">111</span>,
-    <span class="doccomment">/// `&#39;p&#39;`</span>
-    <span class="ident">p</span> <span class="op">=</span> <span class="number">112</span>,
-    <span class="doccomment">/// `&#39;q&#39;`</span>
-    <span class="ident">q</span> <span class="op">=</span> <span class="number">113</span>,
-    <span class="doccomment">/// `&#39;r&#39;`</span>
-    <span class="ident">r</span> <span class="op">=</span> <span class="number">114</span>,
-    <span class="doccomment">/// `&#39;s&#39;`</span>
-    <span class="ident">s</span> <span class="op">=</span> <span class="number">115</span>,
-    <span class="doccomment">/// `&#39;t&#39;`</span>
-    <span class="ident">t</span> <span class="op">=</span> <span class="number">116</span>,
-    <span class="doccomment">/// `&#39;u&#39;`</span>
-    <span class="ident">u</span> <span class="op">=</span> <span class="number">117</span>,
-    <span class="doccomment">/// `&#39;v&#39;`</span>
-    <span class="ident">v</span> <span class="op">=</span> <span class="number">118</span>,
-    <span class="doccomment">/// `&#39;w&#39;`</span>
-    <span class="ident">w</span> <span class="op">=</span> <span class="number">119</span>,
-    <span class="doccomment">/// `&#39;x&#39;`</span>
-    <span class="ident">x</span> <span class="op">=</span> <span class="number">120</span>,
-    <span class="doccomment">/// `&#39;y&#39;`</span>
-    <span class="ident">y</span> <span class="op">=</span> <span class="number">121</span>,
-    <span class="doccomment">/// `&#39;z&#39;`</span>
-    <span class="ident">z</span> <span class="op">=</span> <span class="number">122</span>,
-    <span class="doccomment">/// `&#39;{&#39;`</span>
-    <span class="ident">CurlyBraceOpen</span> <span class="op">=</span> <span class="number">123</span>,
-    <span class="doccomment">/// `&#39;|&#39;`</span>
-    <span class="ident">VerticalBar</span> <span class="op">=</span> <span class="number">124</span>,
-    <span class="doccomment">/// `&#39;}&#39;`</span>
-    <span class="ident">CurlyBraceClose</span> <span class="op">=</span> <span class="number">125</span>,
-    <span class="doccomment">/// `&#39;~&#39;`</span>
-    <span class="ident">Tilde</span> <span class="op">=</span> <span class="number">126</span>,
-    <span class="doccomment">/// [Delete](http://en.wikipedia.org/wiki/Delete_character)</span>
-    <span class="ident">DEL</span> <span class="op">=</span> <span class="number">127</span>,
+<span class="attribute">#[allow(non_camel_case_types)]
+</span><span class="doccomment">/// An ASCII character. It wraps a `u8`, with the highest bit always zero.
+</span><span class="attribute">#[derive(Clone, PartialEq, PartialOrd, Ord, Eq, Hash, Copy)]
+#[repr(u8)]
+</span><span class="kw">pub enum </span>AsciiChar {
+    <span class="doccomment">/// `&#39;\0&#39;`
+    </span>Null = <span class="number">0</span>,
+    <span class="doccomment">/// [Start Of Heading](http://en.wikipedia.org/wiki/Start_of_Heading)
+    </span>SOH = <span class="number">1</span>,
+    <span class="doccomment">/// [Start Of teXt](http://en.wikipedia.org/wiki/Start_of_Text)
+    </span>SOX = <span class="number">2</span>,
+    <span class="doccomment">/// [End of TeXt](http://en.wikipedia.org/wiki/End-of-Text_character)
+    </span>ETX = <span class="number">3</span>,
+    <span class="doccomment">/// [End Of Transmission](http://en.wikipedia.org/wiki/End-of-Transmission_character)
+    </span>EOT = <span class="number">4</span>,
+    <span class="doccomment">/// [Enquiry](http://en.wikipedia.org/wiki/Enquiry_character)
+    </span>ENQ = <span class="number">5</span>,
+    <span class="doccomment">/// [Acknowledgement](http://en.wikipedia.org/wiki/Acknowledge_character)
+    </span>ACK = <span class="number">6</span>,
+    <span class="doccomment">/// [bell / alarm / audible](http://en.wikipedia.org/wiki/Bell_character)
+    ///
+    /// `&#39;\a&#39;` is not recognized by Rust.
+    </span>Bell = <span class="number">7</span>,
+    <span class="doccomment">/// [Backspace](http://en.wikipedia.org/wiki/Backspace)
+    ///
+    /// `&#39;\b&#39;` is not recognized by Rust.
+    </span>BackSpace = <span class="number">8</span>,
+    <span class="doccomment">/// `&#39;\t&#39;`
+    </span>Tab = <span class="number">9</span>,
+    <span class="doccomment">/// `&#39;\n&#39;`
+    </span>LineFeed = <span class="number">10</span>,
+    <span class="doccomment">/// [Vertical tab](http://en.wikipedia.org/wiki/Vertical_Tab)
+    ///
+    /// `&#39;\v&#39;` is not recognized by Rust.
+    </span>VT = <span class="number">11</span>,
+    <span class="doccomment">/// [Form Feed](http://en.wikipedia.org/wiki/Form_Feed)
+    ///
+    /// `&#39;\f&#39;` is not recognized by Rust.
+    </span>FF = <span class="number">12</span>,
+    <span class="doccomment">/// `&#39;\r&#39;`
+    </span>CarriageReturn = <span class="number">13</span>,
+    <span class="doccomment">/// [Shift In](http://en.wikipedia.org/wiki/Shift_Out_and_Shift_In_characters)
+    </span>SI = <span class="number">14</span>,
+    <span class="doccomment">/// [Shift Out](http://en.wikipedia.org/wiki/Shift_Out_and_Shift_In_characters)
+    </span>SO = <span class="number">15</span>,
+    <span class="doccomment">/// [Data Link Escape](http://en.wikipedia.org/wiki/Data_Link_Escape)
+    </span>DLE = <span class="number">16</span>,
+    <span class="doccomment">/// [Device control 1, often XON](http://en.wikipedia.org/wiki/Device_Control_1)
+    </span>DC1 = <span class="number">17</span>,
+    <span class="doccomment">/// Device control 2
+    </span>DC2 = <span class="number">18</span>,
+    <span class="doccomment">/// Device control 3, Often XOFF
+    </span>DC3 = <span class="number">19</span>,
+    <span class="doccomment">/// Device control 4
+    </span>DC4 = <span class="number">20</span>,
+    <span class="doccomment">/// [Negative AcKnowledgement](http://en.wikipedia.org/wiki/Negative-acknowledge_character)
+    </span>NAK = <span class="number">21</span>,
+    <span class="doccomment">/// [Synchronous idle](http://en.wikipedia.org/wiki/Synchronous_Idle)
+    </span>SYN = <span class="number">22</span>,
+    <span class="doccomment">/// [End of Transmission Block](http://en.wikipedia.org/wiki/End-of-Transmission-Block_character)
+    </span>ETB = <span class="number">23</span>,
+    <span class="doccomment">/// [Cancel](http://en.wikipedia.org/wiki/Cancel_character)
+    </span>CAN = <span class="number">24</span>,
+    <span class="doccomment">/// [End of Medium](http://en.wikipedia.org/wiki/End_of_Medium)
+    </span>EM = <span class="number">25</span>,
+    <span class="doccomment">/// [Substitute](http://en.wikipedia.org/wiki/Substitute_character)
+    </span>SUB = <span class="number">26</span>,
+    <span class="doccomment">/// [Escape](http://en.wikipedia.org/wiki/Escape_character)
+    ///
+    /// `&#39;\e&#39;` is not recognized by Rust.
+    </span>ESC = <span class="number">27</span>,
+    <span class="doccomment">/// [File Separator](http://en.wikipedia.org/wiki/File_separator)
+    </span>FS = <span class="number">28</span>,
+    <span class="doccomment">/// [Group Separator](http://en.wikipedia.org/wiki/Group_separator)
+    </span>GS = <span class="number">29</span>,
+    <span class="doccomment">/// [Record Separator](http://en.wikipedia.org/wiki/Record_separator)
+    </span>RS = <span class="number">30</span>,
+    <span class="doccomment">/// [Unit Separator](http://en.wikipedia.org/wiki/Unit_separator)
+    </span>US = <span class="number">31</span>,
+    <span class="doccomment">/// `&#39; &#39;`
+    </span>Space = <span class="number">32</span>,
+    <span class="doccomment">/// `&#39;!&#39;`
+    </span>Exclamation = <span class="number">33</span>,
+    <span class="doccomment">/// `&#39;&quot;&#39;`
+    </span>Quotation = <span class="number">34</span>,
+    <span class="doccomment">/// `&#39;#&#39;`
+    </span>Hash = <span class="number">35</span>,
+    <span class="doccomment">/// `&#39;$&#39;`
+    </span>Dollar = <span class="number">36</span>,
+    <span class="doccomment">/// `&#39;%&#39;`
+    </span>Percent = <span class="number">37</span>,
+    <span class="doccomment">/// `&#39;&amp;&#39;`
+    </span>Ampersand = <span class="number">38</span>,
+    <span class="doccomment">/// `&#39;\&#39;&#39;`
+    </span>Apostrophe = <span class="number">39</span>,
+    <span class="doccomment">/// `&#39;(&#39;`
+    </span>ParenOpen = <span class="number">40</span>,
+    <span class="doccomment">/// `&#39;)&#39;`
+    </span>ParenClose = <span class="number">41</span>,
+    <span class="doccomment">/// `&#39;*&#39;`
+    </span>Asterisk = <span class="number">42</span>,
+    <span class="doccomment">/// `&#39;+&#39;`
+    </span>Plus = <span class="number">43</span>,
+    <span class="doccomment">/// `&#39;,&#39;`
+    </span>Comma = <span class="number">44</span>,
+    <span class="doccomment">/// `&#39;-&#39;`
+    </span>Minus = <span class="number">45</span>,
+    <span class="doccomment">/// `&#39;.&#39;`
+    </span>Dot = <span class="number">46</span>,
+    <span class="doccomment">/// `&#39;/&#39;`
+    </span>Slash = <span class="number">47</span>,
+    <span class="doccomment">/// `&#39;0&#39;`
+    </span>_0 = <span class="number">48</span>,
+    <span class="doccomment">/// `&#39;1&#39;`
+    </span>_1 = <span class="number">49</span>,
+    <span class="doccomment">/// `&#39;2&#39;`
+    </span>_2 = <span class="number">50</span>,
+    <span class="doccomment">/// `&#39;3&#39;`
+    </span>_3 = <span class="number">51</span>,
+    <span class="doccomment">/// `&#39;4&#39;`
+    </span>_4 = <span class="number">52</span>,
+    <span class="doccomment">/// `&#39;5&#39;`
+    </span>_5 = <span class="number">53</span>,
+    <span class="doccomment">/// `&#39;6&#39;`
+    </span>_6 = <span class="number">54</span>,
+    <span class="doccomment">/// `&#39;7&#39;`
+    </span>_7 = <span class="number">55</span>,
+    <span class="doccomment">/// `&#39;8&#39;`
+    </span>_8 = <span class="number">56</span>,
+    <span class="doccomment">/// `&#39;9&#39;`
+    </span>_9 = <span class="number">57</span>,
+    <span class="doccomment">/// `&#39;:&#39;`
+    </span>Colon = <span class="number">58</span>,
+    <span class="doccomment">/// `&#39;;&#39;`
+    </span>Semicolon = <span class="number">59</span>,
+    <span class="doccomment">/// `&#39;&lt;&#39;`
+    </span>LessThan = <span class="number">60</span>,
+    <span class="doccomment">/// `&#39;=&#39;`
+    </span>Equal = <span class="number">61</span>,
+    <span class="doccomment">/// `&#39;&gt;&#39;`
+    </span>GreaterThan = <span class="number">62</span>,
+    <span class="doccomment">/// `&#39;?&#39;`
+    </span>Question = <span class="number">63</span>,
+    <span class="doccomment">/// `&#39;@&#39;`
+    </span>At = <span class="number">64</span>,
+    <span class="doccomment">/// `&#39;A&#39;`
+    </span>A = <span class="number">65</span>,
+    <span class="doccomment">/// `&#39;B&#39;`
+    </span>B = <span class="number">66</span>,
+    <span class="doccomment">/// `&#39;C&#39;`
+    </span>C = <span class="number">67</span>,
+    <span class="doccomment">/// `&#39;D&#39;`
+    </span>D = <span class="number">68</span>,
+    <span class="doccomment">/// `&#39;E&#39;`
+    </span>E = <span class="number">69</span>,
+    <span class="doccomment">/// `&#39;F&#39;`
+    </span>F = <span class="number">70</span>,
+    <span class="doccomment">/// `&#39;G&#39;`
+    </span>G = <span class="number">71</span>,
+    <span class="doccomment">/// `&#39;H&#39;`
+    </span>H = <span class="number">72</span>,
+    <span class="doccomment">/// `&#39;I&#39;`
+    </span>I = <span class="number">73</span>,
+    <span class="doccomment">/// `&#39;J&#39;`
+    </span>J = <span class="number">74</span>,
+    <span class="doccomment">/// `&#39;K&#39;`
+    </span>K = <span class="number">75</span>,
+    <span class="doccomment">/// `&#39;L&#39;`
+    </span>L = <span class="number">76</span>,
+    <span class="doccomment">/// `&#39;M&#39;`
+    </span>M = <span class="number">77</span>,
+    <span class="doccomment">/// `&#39;N&#39;`
+    </span>N = <span class="number">78</span>,
+    <span class="doccomment">/// `&#39;O&#39;`
+    </span>O = <span class="number">79</span>,
+    <span class="doccomment">/// `&#39;P&#39;`
+    </span>P = <span class="number">80</span>,
+    <span class="doccomment">/// `&#39;Q&#39;`
+    </span>Q = <span class="number">81</span>,
+    <span class="doccomment">/// `&#39;R&#39;`
+    </span>R = <span class="number">82</span>,
+    <span class="doccomment">/// `&#39;S&#39;`
+    </span>S = <span class="number">83</span>,
+    <span class="doccomment">/// `&#39;T&#39;`
+    </span>T = <span class="number">84</span>,
+    <span class="doccomment">/// `&#39;U&#39;`
+    </span>U = <span class="number">85</span>,
+    <span class="doccomment">/// `&#39;V&#39;`
+    </span>V = <span class="number">86</span>,
+    <span class="doccomment">/// `&#39;W&#39;`
+    </span>W = <span class="number">87</span>,
+    <span class="doccomment">/// `&#39;X&#39;`
+    </span>X = <span class="number">88</span>,
+    <span class="doccomment">/// `&#39;Y&#39;`
+    </span>Y = <span class="number">89</span>,
+    <span class="doccomment">/// `&#39;Z&#39;`
+    </span>Z = <span class="number">90</span>,
+    <span class="doccomment">/// `&#39;[&#39;`
+    </span>BracketOpen = <span class="number">91</span>,
+    <span class="doccomment">/// `&#39;\&#39;`
+    </span>BackSlash = <span class="number">92</span>,
+    <span class="doccomment">/// `&#39;]&#39;`
+    </span>BracketClose = <span class="number">93</span>,
+    <span class="doccomment">/// `&#39;_&#39;`
+    </span>Caret = <span class="number">94</span>,
+    <span class="doccomment">/// `&#39;_&#39;`
+    </span>UnderScore = <span class="number">95</span>,
+    <span class="doccomment">/// `&#39;`&#39;`
+    </span>Grave = <span class="number">96</span>,
+    <span class="doccomment">/// `&#39;a&#39;`
+    </span>a = <span class="number">97</span>,
+    <span class="doccomment">/// `&#39;b&#39;`
+    </span>b = <span class="number">98</span>,
+    <span class="doccomment">/// `&#39;c&#39;`
+    </span>c = <span class="number">99</span>,
+    <span class="doccomment">/// `&#39;d&#39;`
+    </span>d = <span class="number">100</span>,
+    <span class="doccomment">/// `&#39;e&#39;`
+    </span>e = <span class="number">101</span>,
+    <span class="doccomment">/// `&#39;f&#39;`
+    </span>f = <span class="number">102</span>,
+    <span class="doccomment">/// `&#39;g&#39;`
+    </span>g = <span class="number">103</span>,
+    <span class="doccomment">/// `&#39;h&#39;`
+    </span>h = <span class="number">104</span>,
+    <span class="doccomment">/// `&#39;i&#39;`
+    </span>i = <span class="number">105</span>,
+    <span class="doccomment">/// `&#39;j&#39;`
+    </span>j = <span class="number">106</span>,
+    <span class="doccomment">/// `&#39;k&#39;`
+    </span>k = <span class="number">107</span>,
+    <span class="doccomment">/// `&#39;l&#39;`
+    </span>l = <span class="number">108</span>,
+    <span class="doccomment">/// `&#39;m&#39;`
+    </span>m = <span class="number">109</span>,
+    <span class="doccomment">/// `&#39;n&#39;`
+    </span>n = <span class="number">110</span>,
+    <span class="doccomment">/// `&#39;o&#39;`
+    </span>o = <span class="number">111</span>,
+    <span class="doccomment">/// `&#39;p&#39;`
+    </span>p = <span class="number">112</span>,
+    <span class="doccomment">/// `&#39;q&#39;`
+    </span>q = <span class="number">113</span>,
+    <span class="doccomment">/// `&#39;r&#39;`
+    </span>r = <span class="number">114</span>,
+    <span class="doccomment">/// `&#39;s&#39;`
+    </span>s = <span class="number">115</span>,
+    <span class="doccomment">/// `&#39;t&#39;`
+    </span>t = <span class="number">116</span>,
+    <span class="doccomment">/// `&#39;u&#39;`
+    </span>u = <span class="number">117</span>,
+    <span class="doccomment">/// `&#39;v&#39;`
+    </span>v = <span class="number">118</span>,
+    <span class="doccomment">/// `&#39;w&#39;`
+    </span>w = <span class="number">119</span>,
+    <span class="doccomment">/// `&#39;x&#39;`
+    </span>x = <span class="number">120</span>,
+    <span class="doccomment">/// `&#39;y&#39;`
+    </span>y = <span class="number">121</span>,
+    <span class="doccomment">/// `&#39;z&#39;`
+    </span>z = <span class="number">122</span>,
+    <span class="doccomment">/// `&#39;{&#39;`
+    </span>CurlyBraceOpen = <span class="number">123</span>,
+    <span class="doccomment">/// `&#39;|&#39;`
+    </span>VerticalBar = <span class="number">124</span>,
+    <span class="doccomment">/// `&#39;}&#39;`
+    </span>CurlyBraceClose = <span class="number">125</span>,
+    <span class="doccomment">/// `&#39;~&#39;`
+    </span>Tilde = <span class="number">126</span>,
+    <span class="doccomment">/// [Delete](http://en.wikipedia.org/wiki/Delete_character)
+    </span>DEL = <span class="number">127</span>,
 }
 
-<span class="kw">impl</span> <span class="ident">AsciiChar</span> {
-    <span class="doccomment">/// Constructs an ASCII character from a `u8`, `char` or other character type.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Failure</span>
-    <span class="doccomment">/// Returns `Err(())` if the character can&#39;t be ASCII encoded.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use ascii::AsciiChar;</span>
-    <span class="doccomment">/// let a = AsciiChar::from(&#39;g&#39;).unwrap();</span>
-    <span class="doccomment">/// assert_eq!(a.as_char(), &#39;g&#39;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">ToAsciiChar</span><span class="op">&gt;</span>(<span class="ident">ch</span>: <span class="ident">C</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">ToAsciiCharError</span><span class="op">&gt;</span> {
-        <span class="ident">ch</span>.<span class="ident">to_ascii_char</span>()
+<span class="kw">impl </span>AsciiChar {
+    <span class="doccomment">/// Constructs an ASCII character from a `u8`, `char` or other character type.
+    ///
+    /// # Failure
+    /// Returns `Err(())` if the character can&#39;t be ASCII encoded.
+    ///
+    /// # Example
+    /// ```
+    /// # use ascii::AsciiChar;
+    /// let a = AsciiChar::from(&#39;g&#39;).unwrap();
+    /// assert_eq!(a.as_char(), &#39;g&#39;);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>from&lt;C: ToAsciiChar&gt;(ch: C) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, ToAsciiCharError&gt; {
+        ch.to_ascii_char()
     }
 
-    <span class="doccomment">/// Constructs an ASCII character from a `char` or `u8` without any checks.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_unchecked</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">ToAsciiChar</span><span class="op">&gt;</span>(<span class="ident">ch</span>: <span class="ident">C</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">ch</span>.<span class="ident">to_ascii_char_unchecked</span>()
+    <span class="doccomment">/// Constructs an ASCII character from a `char` or `u8` without any checks.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub unsafe fn </span>from_unchecked&lt;C: ToAsciiChar&gt;(ch: C) -&gt; <span class="self">Self </span>{
+        ch.to_ascii_char_unchecked()
     }
 
-    <span class="doccomment">/// Converts an ASCII character into a `u8`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_byte</span>(<span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="self">self</span> <span class="kw">as</span> <span class="ident">u8</span>
+    <span class="doccomment">/// Converts an ASCII character into a `u8`.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>as_byte(<span class="self">self</span>) -&gt; u8 {
+        <span class="self">self </span><span class="kw">as </span>u8
     }
 
-    <span class="doccomment">/// Converts an ASCII character into a `char`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_char</span>(<span class="self">self</span>) -&gt; <span class="ident">char</span> {
-        <span class="self">self</span>.<span class="ident">as_byte</span>() <span class="kw">as</span> <span class="ident">char</span>
+    <span class="doccomment">/// Converts an ASCII character into a `char`.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>as_char(<span class="self">self</span>) -&gt; char {
+        <span class="self">self</span>.as_byte() <span class="kw">as </span>char
     }
 
-    <span class="comment">// the following methods are like ctype, and the implementation is inspired by musl</span>
+    <span class="comment">// the following methods are like ctype, and the implementation is inspired by musl
 
-    <span class="doccomment">/// Check if the character is a letter (a-z, A-Z)</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_alphabetic</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_byte</span>() <span class="op">|</span> <span class="number">0b010_0000</span>; <span class="comment">// Turns uppercase into lowercase.</span>
-        <span class="ident">c</span> <span class="op">&gt;</span><span class="op">=</span> <span class="string">b&#39;a&#39;</span> <span class="op">&amp;&amp;</span> <span class="ident">c</span> <span class="op">&lt;</span><span class="op">=</span> <span class="string">b&#39;z&#39;</span>
+    </span><span class="doccomment">/// Check if the character is a letter (a-z, A-Z)
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_alphabetic(<span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span>c = <span class="self">self</span>.as_byte() | <span class="number">0b010_0000</span>; <span class="comment">// Turns uppercase into lowercase.
+        </span>c &gt;= <span class="string">b&#39;a&#39; </span>&amp;&amp; c &lt;= <span class="string">b&#39;z&#39;
+    </span>}
+
+    <span class="doccomment">/// Check if the character is a number (0-9)
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_digit(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self </span>&gt;= AsciiChar::_0 &amp;&amp; <span class="self">self </span>&lt;= AsciiChar::_9
     }
 
-    <span class="doccomment">/// Check if the character is a number (0-9)</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_digit</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">AsciiChar::_0</span> <span class="op">&amp;&amp;</span> <span class="self">self</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">AsciiChar::_9</span>
+    <span class="doccomment">/// Check if the character is a letter or number
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_alphanumeric(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.is_alphabetic() || <span class="self">self</span>.is_digit()
     }
 
-    <span class="doccomment">/// Check if the character is a letter or number</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_alphanumeric</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">is_alphabetic</span>() <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">is_digit</span>()
+    <span class="doccomment">/// Check if the character is a space or horizontal tab
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_blank(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self </span>== AsciiChar::Space || <span class="self">self </span>== AsciiChar::Tab
     }
 
-    <span class="doccomment">/// Check if the character is a space or horizontal tab</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_blank</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span> <span class="op">==</span> <span class="ident">AsciiChar::Space</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span> <span class="op">==</span> <span class="ident">AsciiChar::Tab</span>
+    <span class="doccomment">/// Check if the character is a &#39; &#39;, &#39;\t&#39;, &#39;\n&#39; or &#39;\r&#39;
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_whitespace(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.is_blank() || <span class="self">self </span>== AsciiChar::LineFeed || <span class="self">self </span>== AsciiChar::CarriageReturn
     }
 
-    <span class="doccomment">/// Check if the character is a &#39; &#39;, &#39;\t&#39;, &#39;\n&#39; or &#39;\r&#39;</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_whitespace</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">is_blank</span>() <span class="op">|</span><span class="op">|</span> <span class="self">self</span> <span class="op">==</span> <span class="ident">AsciiChar::LineFeed</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span> <span class="op">==</span> <span class="ident">AsciiChar::CarriageReturn</span>
+    <span class="doccomment">/// Check if the character is a control character
+    ///
+    /// # Examples
+    /// ```
+    /// use ascii::ToAsciiChar;
+    /// assert_eq!(&#39;\0&#39;.to_ascii_char().unwrap().is_control(), true);
+    /// assert_eq!(&#39;n&#39;.to_ascii_char().unwrap().is_control(), false);
+    /// assert_eq!(&#39; &#39;.to_ascii_char().unwrap().is_control(), false);
+    /// assert_eq!(&#39;\n&#39;.to_ascii_char().unwrap().is_control(), true);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_control(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self </span>&lt; AsciiChar::Space || <span class="self">self </span>== AsciiChar::DEL
     }
 
-    <span class="doccomment">/// Check if the character is a control character</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ascii::ToAsciiChar;</span>
-    <span class="doccomment">/// assert_eq!(&#39;\0&#39;.to_ascii_char().unwrap().is_control(), true);</span>
-    <span class="doccomment">/// assert_eq!(&#39;n&#39;.to_ascii_char().unwrap().is_control(), false);</span>
-    <span class="doccomment">/// assert_eq!(&#39; &#39;.to_ascii_char().unwrap().is_control(), false);</span>
-    <span class="doccomment">/// assert_eq!(&#39;\n&#39;.to_ascii_char().unwrap().is_control(), true);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_control</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span> <span class="op">&lt;</span> <span class="ident">AsciiChar::Space</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span> <span class="op">==</span> <span class="ident">AsciiChar::DEL</span>
+    <span class="doccomment">/// Checks if the character is printable (except space)
+    ///
+    /// # Examples
+    /// ```
+    /// use ascii::ToAsciiChar;
+    /// assert_eq!(&#39;n&#39;.to_ascii_char().unwrap().is_graph(), true);
+    /// assert_eq!(&#39; &#39;.to_ascii_char().unwrap().is_graph(), false);
+    /// assert_eq!(&#39;\n&#39;.to_ascii_char().unwrap().is_graph(), false);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_graph(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.as_byte().wrapping_sub(<span class="string">b&#39; &#39; </span>+ <span class="number">1</span>) &lt; <span class="number">0x5E
+    </span>}
+
+    <span class="doccomment">/// Checks if the character is printable (including space)
+    ///
+    /// # Examples
+    /// ```
+    /// use ascii::ToAsciiChar;
+    /// assert_eq!(&#39;n&#39;.to_ascii_char().unwrap().is_print(), true);
+    /// assert_eq!(&#39; &#39;.to_ascii_char().unwrap().is_print(), true);
+    /// assert_eq!(&#39;\n&#39;.to_ascii_char().unwrap().is_print(), false);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_print(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.as_byte().wrapping_sub(<span class="string">b&#39; &#39;</span>) &lt; <span class="number">0x5F
+    </span>}
+
+    <span class="doccomment">/// Checks if the character is alphabetic and lowercase
+    ///
+    /// # Examples
+    /// ```
+    /// use ascii::ToAsciiChar;
+    /// assert_eq!(&#39;a&#39;.to_ascii_char().unwrap().is_lowercase(), true);
+    /// assert_eq!(&#39;A&#39;.to_ascii_char().unwrap().is_lowercase(), false);
+    /// assert_eq!(&#39;@&#39;.to_ascii_char().unwrap().is_lowercase(), false);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_lowercase(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.as_byte().wrapping_sub(<span class="string">b&#39;a&#39;</span>) &lt; <span class="number">26
+    </span>}
+
+    <span class="doccomment">/// Checks if the character is alphabetic and uppercase
+    ///
+    /// # Examples
+    /// ```
+    /// use ascii::ToAsciiChar;
+    /// assert_eq!(&#39;A&#39;.to_ascii_char().unwrap().is_uppercase(), true);
+    /// assert_eq!(&#39;a&#39;.to_ascii_char().unwrap().is_uppercase(), false);
+    /// assert_eq!(&#39;@&#39;.to_ascii_char().unwrap().is_uppercase(), false);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_uppercase(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.as_byte().wrapping_sub(<span class="string">b&#39;A&#39;</span>) &lt; <span class="number">26
+    </span>}
+
+    <span class="doccomment">/// Checks if the character is punctuation
+    ///
+    /// # Examples
+    /// ```
+    /// use ascii::ToAsciiChar;
+    /// assert_eq!(&#39;n&#39;.to_ascii_char().unwrap().is_punctuation(), false);
+    /// assert_eq!(&#39; &#39;.to_ascii_char().unwrap().is_punctuation(), false);
+    /// assert_eq!(&#39;_&#39;.to_ascii_char().unwrap().is_punctuation(), true);
+    /// assert_eq!(&#39;~&#39;.to_ascii_char().unwrap().is_punctuation(), true);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_punctuation(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.is_graph() &amp;&amp; !<span class="self">self</span>.is_alphanumeric()
     }
 
-    <span class="doccomment">/// Checks if the character is printable (except space)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ascii::ToAsciiChar;</span>
-    <span class="doccomment">/// assert_eq!(&#39;n&#39;.to_ascii_char().unwrap().is_graph(), true);</span>
-    <span class="doccomment">/// assert_eq!(&#39; &#39;.to_ascii_char().unwrap().is_graph(), false);</span>
-    <span class="doccomment">/// assert_eq!(&#39;\n&#39;.to_ascii_char().unwrap().is_graph(), false);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_graph</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">as_byte</span>().<span class="ident">wrapping_sub</span>(<span class="string">b&#39; &#39;</span> <span class="op">+</span> <span class="number">1</span>) <span class="op">&lt;</span> <span class="number">0x5E</span>
-    }
+    <span class="doccomment">/// Checks if the character is a valid hex digit
+    ///
+    /// # Examples
+    /// ```
+    /// use ascii::ToAsciiChar;
+    /// assert_eq!(&#39;5&#39;.to_ascii_char().unwrap().is_hex(), true);
+    /// assert_eq!(&#39;a&#39;.to_ascii_char().unwrap().is_hex(), true);
+    /// assert_eq!(&#39;F&#39;.to_ascii_char().unwrap().is_hex(), true);
+    /// assert_eq!(&#39;G&#39;.to_ascii_char().unwrap().is_hex(), false);
+    /// assert_eq!(&#39; &#39;.to_ascii_char().unwrap().is_hex(), false);
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_hex(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.is_digit() || (<span class="self">self</span>.as_byte() | <span class="number">0x20u8</span>).wrapping_sub(<span class="string">b&#39;a&#39;</span>) &lt; <span class="number">6
+    </span>}
 
-    <span class="doccomment">/// Checks if the character is printable (including space)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ascii::ToAsciiChar;</span>
-    <span class="doccomment">/// assert_eq!(&#39;n&#39;.to_ascii_char().unwrap().is_print(), true);</span>
-    <span class="doccomment">/// assert_eq!(&#39; &#39;.to_ascii_char().unwrap().is_print(), true);</span>
-    <span class="doccomment">/// assert_eq!(&#39;\n&#39;.to_ascii_char().unwrap().is_print(), false);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_print</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">as_byte</span>().<span class="ident">wrapping_sub</span>(<span class="string">b&#39; &#39;</span>) <span class="op">&lt;</span> <span class="number">0x5F</span>
-    }
-
-    <span class="doccomment">/// Checks if the character is alphabetic and lowercase</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ascii::ToAsciiChar;</span>
-    <span class="doccomment">/// assert_eq!(&#39;a&#39;.to_ascii_char().unwrap().is_lowercase(), true);</span>
-    <span class="doccomment">/// assert_eq!(&#39;A&#39;.to_ascii_char().unwrap().is_lowercase(), false);</span>
-    <span class="doccomment">/// assert_eq!(&#39;@&#39;.to_ascii_char().unwrap().is_lowercase(), false);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_lowercase</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">as_byte</span>().<span class="ident">wrapping_sub</span>(<span class="string">b&#39;a&#39;</span>) <span class="op">&lt;</span> <span class="number">26</span>
-    }
-
-    <span class="doccomment">/// Checks if the character is alphabetic and uppercase</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ascii::ToAsciiChar;</span>
-    <span class="doccomment">/// assert_eq!(&#39;A&#39;.to_ascii_char().unwrap().is_uppercase(), true);</span>
-    <span class="doccomment">/// assert_eq!(&#39;a&#39;.to_ascii_char().unwrap().is_uppercase(), false);</span>
-    <span class="doccomment">/// assert_eq!(&#39;@&#39;.to_ascii_char().unwrap().is_uppercase(), false);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_uppercase</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">as_byte</span>().<span class="ident">wrapping_sub</span>(<span class="string">b&#39;A&#39;</span>) <span class="op">&lt;</span> <span class="number">26</span>
-    }
-
-    <span class="doccomment">/// Checks if the character is punctuation</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ascii::ToAsciiChar;</span>
-    <span class="doccomment">/// assert_eq!(&#39;n&#39;.to_ascii_char().unwrap().is_punctuation(), false);</span>
-    <span class="doccomment">/// assert_eq!(&#39; &#39;.to_ascii_char().unwrap().is_punctuation(), false);</span>
-    <span class="doccomment">/// assert_eq!(&#39;_&#39;.to_ascii_char().unwrap().is_punctuation(), true);</span>
-    <span class="doccomment">/// assert_eq!(&#39;~&#39;.to_ascii_char().unwrap().is_punctuation(), true);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_punctuation</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">is_graph</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_alphanumeric</span>()
-    }
-
-    <span class="doccomment">/// Checks if the character is a valid hex digit</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ascii::ToAsciiChar;</span>
-    <span class="doccomment">/// assert_eq!(&#39;5&#39;.to_ascii_char().unwrap().is_hex(), true);</span>
-    <span class="doccomment">/// assert_eq!(&#39;a&#39;.to_ascii_char().unwrap().is_hex(), true);</span>
-    <span class="doccomment">/// assert_eq!(&#39;F&#39;.to_ascii_char().unwrap().is_hex(), true);</span>
-    <span class="doccomment">/// assert_eq!(&#39;G&#39;.to_ascii_char().unwrap().is_hex(), false);</span>
-    <span class="doccomment">/// assert_eq!(&#39; &#39;.to_ascii_char().unwrap().is_hex(), false);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_hex</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">is_digit</span>() <span class="op">|</span><span class="op">|</span> (<span class="self">self</span>.<span class="ident">as_byte</span>() <span class="op">|</span> <span class="number">0x20u8</span>).<span class="ident">wrapping_sub</span>(<span class="string">b&#39;a&#39;</span>) <span class="op">&lt;</span> <span class="number">6</span>
-    }
-
-    <span class="doccomment">/// Unicode has printable versions of the ASCII control codes, like &#39;␛&#39;.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function is identical with `.as_char()`</span>
-    <span class="doccomment">/// for all values `.is_printable()` returns true for,</span>
-    <span class="doccomment">/// but replaces the control codes with those unicodes printable versions.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use ascii::ToAsciiChar;</span>
-    <span class="doccomment">/// assert_eq!(&#39;\0&#39;.to_ascii_char().unwrap().as_printable_char(), &#39;␀&#39;);</span>
-    <span class="doccomment">/// assert_eq!(&#39;\n&#39;.to_ascii_char().unwrap().as_printable_char(), &#39;␊&#39;);</span>
-    <span class="doccomment">/// assert_eq!(&#39; &#39;.to_ascii_char().unwrap().as_printable_char(), &#39; &#39;);</span>
-    <span class="doccomment">/// assert_eq!(&#39;p&#39;.to_ascii_char().unwrap().as_printable_char(), &#39;p&#39;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_printable_char</span>(<span class="self">self</span>) -&gt; <span class="ident">char</span> {
-        <span class="kw">unsafe</span> {
-            <span class="kw">match</span> <span class="self">self</span> <span class="kw">as</span> <span class="ident">u8</span> {
-                <span class="string">b&#39; &#39;</span>...<span class="string">b&#39;~&#39;</span> =&gt; <span class="self">self</span>.<span class="ident">as_char</span>(),
-                <span class="number">127</span> =&gt; <span class="string">&#39;␡&#39;</span>,
-                <span class="kw">_</span> =&gt; <span class="ident">char::from_u32_unchecked</span>(<span class="self">self</span> <span class="kw">as</span> <span class="ident">u32</span> <span class="op">+</span> <span class="string">&#39;␀&#39;</span> <span class="kw">as</span> <span class="ident">u32</span>),
+    <span class="doccomment">/// Unicode has printable versions of the ASCII control codes, like &#39;␛&#39;.
+    ///
+    /// This function is identical with `.as_char()`
+    /// for all values `.is_printable()` returns true for,
+    /// but replaces the control codes with those unicodes printable versions.
+    ///
+    /// # Examples
+    /// ```
+    /// # use ascii::ToAsciiChar;
+    /// assert_eq!(&#39;\0&#39;.to_ascii_char().unwrap().as_printable_char(), &#39;␀&#39;);
+    /// assert_eq!(&#39;\n&#39;.to_ascii_char().unwrap().as_printable_char(), &#39;␊&#39;);
+    /// assert_eq!(&#39; &#39;.to_ascii_char().unwrap().as_printable_char(), &#39; &#39;);
+    /// assert_eq!(&#39;p&#39;.to_ascii_char().unwrap().as_printable_char(), &#39;p&#39;);
+    /// ```
+    </span><span class="kw">pub fn </span>as_printable_char(<span class="self">self</span>) -&gt; char {
+        <span class="kw">unsafe </span>{
+            <span class="kw">match </span><span class="self">self </span><span class="kw">as </span>u8 {
+                <span class="string">b&#39; &#39;</span>...<span class="string">b&#39;~&#39; </span>=&gt; <span class="self">self</span>.as_char(),
+                <span class="number">127 </span>=&gt; <span class="string">&#39;␡&#39;</span>,
+                <span class="kw">_ </span>=&gt; char::from_u32_unchecked(<span class="self">self </span><span class="kw">as </span>u32 + <span class="string">&#39;␀&#39; </span><span class="kw">as </span>u32),
             }
         }
     }
 
-    <span class="doccomment">/// Replaces letters `a` to `z` with `A` to `Z`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">make_ascii_uppercase</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">to_ascii_uppercase</span>()
+    <span class="doccomment">/// Replaces letters `a` to `z` with `A` to `Z`
+    </span><span class="kw">pub fn </span>make_ascii_uppercase(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw-2">*</span><span class="self">self </span>= <span class="self">self</span>.to_ascii_uppercase()
     }
 
-    <span class="doccomment">/// Replaces letters `A` to `Z` with `a` to `z`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">make_ascii_lowercase</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">to_ascii_lowercase</span>()
+    <span class="doccomment">/// Replaces letters `A` to `Z` with `a` to `z`
+    </span><span class="kw">pub fn </span>make_ascii_lowercase(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw-2">*</span><span class="self">self </span>= <span class="self">self</span>.to_ascii_lowercase()
     }
 
-    <span class="doccomment">/// Maps letters `a`...`z` to `A`...`Z` and returns everything else unchanged.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_ascii_uppercase</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">unsafe</span> {
-            <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> <span class="kw">as</span> <span class="ident">u8</span> {
-                <span class="string">b&#39;a&#39;</span>...<span class="string">b&#39;z&#39;</span> =&gt; <span class="ident">AsciiChar::from_unchecked</span>(<span class="self">self</span>.<span class="ident">as_byte</span>() <span class="op">-</span> (<span class="string">b&#39;a&#39;</span> <span class="op">-</span> <span class="string">b&#39;A&#39;</span>)),
-                <span class="kw">_</span> =&gt; <span class="kw-2">*</span><span class="self">self</span>,
+    <span class="doccomment">/// Maps letters `a`...`z` to `A`...`Z` and returns everything else unchanged.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>to_ascii_uppercase(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">unsafe </span>{
+            <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span><span class="kw">as </span>u8 {
+                <span class="string">b&#39;a&#39;</span>...<span class="string">b&#39;z&#39; </span>=&gt; AsciiChar::from_unchecked(<span class="self">self</span>.as_byte() - (<span class="string">b&#39;a&#39; </span>- <span class="string">b&#39;A&#39;</span>)),
+                <span class="kw">_ </span>=&gt; <span class="kw-2">*</span><span class="self">self</span>,
             }
         }
     }
 
-    <span class="doccomment">/// Maps letters `A`...`Z` to `a`...`z` and returns everything else unchanged.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_ascii_lowercase</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">unsafe</span> {
-            <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> <span class="kw">as</span> <span class="ident">u8</span> {
-                <span class="string">b&#39;A&#39;</span>...<span class="string">b&#39;Z&#39;</span> =&gt; <span class="ident">AsciiChar::from_unchecked</span>(<span class="self">self</span>.<span class="ident">as_byte</span>() <span class="op">+</span> (<span class="string">b&#39;a&#39;</span> <span class="op">-</span> <span class="string">b&#39;A&#39;</span>)),
-                <span class="kw">_</span> =&gt; <span class="kw-2">*</span><span class="self">self</span>,
+    <span class="doccomment">/// Maps letters `A`...`Z` to `a`...`z` and returns everything else unchanged.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>to_ascii_lowercase(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">unsafe </span>{
+            <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span><span class="kw">as </span>u8 {
+                <span class="string">b&#39;A&#39;</span>...<span class="string">b&#39;Z&#39; </span>=&gt; AsciiChar::from_unchecked(<span class="self">self</span>.as_byte() + (<span class="string">b&#39;a&#39; </span>- <span class="string">b&#39;A&#39;</span>)),
+                <span class="kw">_ </span>=&gt; <span class="kw-2">*</span><span class="self">self</span>,
             }
         }
     }
 
-    <span class="doccomment">/// Compares two characters case-insensitively.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">eq_ignore_ascii_case</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">to_ascii_lowercase</span>() <span class="op">==</span> <span class="ident">other</span>.<span class="ident">to_ascii_lowercase</span>()
+    <span class="doccomment">/// Compares two characters case-insensitively.
+    </span><span class="kw">pub fn </span>eq_ignore_ascii_case(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="self">self</span>.to_ascii_lowercase() == other.to_ascii_lowercase()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">AsciiChar</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="self">self</span>.<span class="ident">as_char</span>().<span class="ident">fmt</span>(<span class="ident">f</span>)
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>AsciiChar {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="self">self</span>.as_char().fmt(f)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">AsciiChar</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="self">self</span>.<span class="ident">as_char</span>().<span class="ident">fmt</span>(<span class="ident">f</span>)
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>AsciiChar {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="self">self</span>.as_char().fmt(f)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">AsciiExt</span> <span class="kw">for</span> <span class="ident">AsciiChar</span> {
-    <span class="kw">type</span> <span class="ident">Owned</span> <span class="op">=</span> <span class="ident">AsciiChar</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">impl </span>AsciiExt <span class="kw">for </span>AsciiChar {
+    <span class="kw">type </span>Owned = AsciiChar;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_ascii</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">true</span>
-    }
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_ascii(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">true
+    </span>}
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">to_ascii_uppercase</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">AsciiChar</span> {
-        <span class="kw">unsafe</span> {
-            <span class="self">self</span>.<span class="ident">as_byte</span>()
-                .<span class="ident">to_ascii_uppercase</span>()
-                .<span class="ident">to_ascii_char_unchecked</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>to_ascii_uppercase(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; AsciiChar {
+        <span class="kw">unsafe </span>{
+            <span class="self">self</span>.as_byte()
+                .to_ascii_uppercase()
+                .to_ascii_char_unchecked()
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">to_ascii_lowercase</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">AsciiChar</span> {
-        <span class="kw">unsafe</span> {
-            <span class="self">self</span>.<span class="ident">as_byte</span>()
-                .<span class="ident">to_ascii_lowercase</span>()
-                .<span class="ident">to_ascii_char_unchecked</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>to_ascii_lowercase(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; AsciiChar {
+        <span class="kw">unsafe </span>{
+            <span class="self">self</span>.as_byte()
+                .to_ascii_lowercase()
+                .to_ascii_char_unchecked()
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">eq_ignore_ascii_case</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">as_byte</span>().<span class="ident">eq_ignore_ascii_case</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">as_byte</span>())
+    <span class="kw">fn </span>eq_ignore_ascii_case(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="self">self</span>.as_byte().eq_ignore_ascii_case(<span class="kw-2">&amp;</span>other.as_byte())
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">make_ascii_uppercase</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">to_ascii_uppercase</span>();
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>make_ascii_uppercase(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw-2">*</span><span class="self">self </span>= <span class="self">self</span>.to_ascii_uppercase();
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">make_ascii_lowercase</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">to_ascii_lowercase</span>();
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>make_ascii_lowercase(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw-2">*</span><span class="self">self </span>= <span class="self">self</span>.to_ascii_lowercase();
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">AsciiChar</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">AsciiChar</span> {
-        <span class="ident">AsciiChar::Null</span>
+<span class="kw">impl </span>Default <span class="kw">for </span>AsciiChar {
+    <span class="kw">fn </span>default() -&gt; AsciiChar {
+        AsciiChar::Null
     }
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">impl_into_partial_eq_ord</span> {(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">wider</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">to_wider</span>:<span class="ident">expr</span>) =&gt; {
-    <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">AsciiChar</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">wider</span> {
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">a</span>: <span class="ident">AsciiChar</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">wider</span> {
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">to_wider</span>(<span class="ident">a</span>)
+<span class="macro">macro_rules! </span>impl_into_partial_eq_ord {(<span class="macro-nonterminal">$wider</span>:ty, <span class="macro-nonterminal">$to_wider</span>:expr) =&gt; {
+    <span class="kw">impl </span>From&lt;AsciiChar&gt; <span class="kw">for </span><span class="macro-nonterminal">$wider </span>{
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>from(a: AsciiChar) -&gt; <span class="macro-nonterminal">$wider </span>{
+            <span class="macro-nonterminal">$to_wider</span>(a)
         }
     }
-    <span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">wider</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AsciiChar</span> {
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">wider</span>) -&gt; <span class="ident">bool</span> {
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">to_wider</span>(<span class="kw-2">*</span><span class="self">self</span>) <span class="op">==</span> <span class="kw-2">*</span><span class="ident">rhs</span>
+    <span class="kw">impl </span>PartialEq&lt;<span class="macro-nonterminal">$wider</span>&gt; <span class="kw">for </span>AsciiChar {
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$wider</span>) -&gt; bool {
+            <span class="macro-nonterminal">$to_wider</span>(<span class="kw-2">*</span><span class="self">self</span>) == <span class="kw-2">*</span>rhs
         }
     }
-    <span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">AsciiChar</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">wider</span> {
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="ident">AsciiChar</span>) -&gt; <span class="ident">bool</span> {
-            <span class="kw-2">*</span><span class="self">self</span> <span class="op">==</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">to_wider</span>(<span class="kw-2">*</span><span class="ident">rhs</span>)
+    <span class="kw">impl </span>PartialEq&lt;AsciiChar&gt; <span class="kw">for </span><span class="macro-nonterminal">$wider </span>{
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs: <span class="kw-2">&amp;</span>AsciiChar) -&gt; bool {
+            <span class="kw-2">*</span><span class="self">self </span>== <span class="macro-nonterminal">$to_wider</span>(<span class="kw-2">*</span>rhs)
         }
     }
-    <span class="kw">impl</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">wider</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AsciiChar</span> {
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">wider</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">to_wider</span>(<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">partial_cmp</span>(<span class="ident">rhs</span>)
+    <span class="kw">impl </span>PartialOrd&lt;<span class="macro-nonterminal">$wider</span>&gt; <span class="kw">for </span>AsciiChar {
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$wider</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Ordering&gt; {
+            <span class="macro-nonterminal">$to_wider</span>(<span class="kw-2">*</span><span class="self">self</span>).partial_cmp(rhs)
         }
     }
-    <span class="kw">impl</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">AsciiChar</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">wider</span> {
-        <span class="attribute">#[<span class="ident">inline</span>]</span>
-        <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="ident">AsciiChar</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
-            <span class="self">self</span>.<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">to_wider</span>(<span class="kw-2">*</span><span class="ident">rhs</span>))
+    <span class="kw">impl </span>PartialOrd&lt;AsciiChar&gt; <span class="kw">for </span><span class="macro-nonterminal">$wider </span>{
+        <span class="attribute">#[inline]
+        </span><span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs: <span class="kw-2">&amp;</span>AsciiChar) -&gt; <span class="prelude-ty">Option</span>&lt;Ordering&gt; {
+            <span class="self">self</span>.partial_cmp(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$to_wider</span>(<span class="kw-2">*</span>rhs))
         }
     }
 }}
-<span class="macro">impl_into_partial_eq_ord!</span>{<span class="ident">u8</span>, <span class="ident">AsciiChar::as_byte</span>}
-<span class="macro">impl_into_partial_eq_ord!</span>{<span class="ident">char</span>, <span class="ident">AsciiChar::as_char</span>}
+<span class="macro">impl_into_partial_eq_ord!</span>{u8, AsciiChar::as_byte}
+<span class="macro">impl_into_partial_eq_ord!</span>{char, AsciiChar::as_char}
 
 
-<span class="doccomment">/// Error returned by `ToAsciiChar`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ToAsciiCharError</span>(());
+<span class="doccomment">/// Error returned by `ToAsciiChar`.
+</span><span class="attribute">#[derive(Clone, Copy, PartialEq, Eq)]
+</span><span class="kw">pub struct </span>ToAsciiCharError(());
 
-<span class="kw">const</span> <span class="ident">ERRORMSG_CHAR</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;not an ASCII character&quot;</span>;
+<span class="kw">const </span>ERRORMSG_CHAR: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;not an ASCII character&quot;</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-<span class="kw">impl</span> <span class="ident">ToAsciiCharError</span> {
-    <span class="doccomment">/// Returns a description for this error, like `std::error::Error::description`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="ident">ERRORMSG_CHAR</span>
+<span class="attribute">#[cfg(not(feature = <span class="string">&quot;std&quot;</span>))]
+</span><span class="kw">impl </span>ToAsciiCharError {
+    <span class="doccomment">/// Returns a description for this error, like `std::error::Error::description`.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>description(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        ERRORMSG_CHAR
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">ToAsciiCharError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmtr</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">fmtr</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">ERRORMSG_CHAR</span>)
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>ToAsciiCharError {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmtr: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="macro">write!</span>(fmtr, <span class="string">&quot;{}&quot;</span>, ERRORMSG_CHAR)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ToAsciiCharError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmtr</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">fmtr</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">ERRORMSG_CHAR</span>)
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>ToAsciiCharError {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmtr: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="macro">write!</span>(fmtr, <span class="string">&quot;{}&quot;</span>, ERRORMSG_CHAR)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">Error</span> <span class="kw">for</span> <span class="ident">ToAsciiCharError</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="ident">ERRORMSG_CHAR</span>
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">impl </span>Error <span class="kw">for </span>ToAsciiCharError {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>description(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        ERRORMSG_CHAR
     }
 }
 
-<span class="doccomment">/// Convert `char`, `u8` and other character types to `AsciiChar`.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ToAsciiChar</span> {
-    <span class="doccomment">/// Convert to `AsciiChar` without checking that it is an ASCII character.</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">to_ascii_char_unchecked</span>(<span class="self">self</span>) -&gt; <span class="ident">AsciiChar</span>;
-    <span class="doccomment">/// Convert to `AsciiChar`.</span>
-    <span class="kw">fn</span> <span class="ident">to_ascii_char</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AsciiChar</span>, <span class="ident">ToAsciiCharError</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Convert `char`, `u8` and other character types to `AsciiChar`.
+</span><span class="kw">pub trait </span>ToAsciiChar {
+    <span class="doccomment">/// Convert to `AsciiChar` without checking that it is an ASCII character.
+    </span><span class="kw">unsafe fn </span>to_ascii_char_unchecked(<span class="self">self</span>) -&gt; AsciiChar;
+    <span class="doccomment">/// Convert to `AsciiChar`.
+    </span><span class="kw">fn </span>to_ascii_char(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;AsciiChar, ToAsciiCharError&gt;;
 }
 
-<span class="kw">impl</span> <span class="ident">ToAsciiChar</span> <span class="kw">for</span> <span class="ident">AsciiChar</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">to_ascii_char</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AsciiChar</span>, <span class="ident">ToAsciiCharError</span><span class="op">&gt;</span> {
+<span class="kw">impl </span>ToAsciiChar <span class="kw">for </span>AsciiChar {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>to_ascii_char(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;AsciiChar, ToAsciiCharError&gt; {
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">to_ascii_char_unchecked</span>(<span class="self">self</span>) -&gt; <span class="ident">AsciiChar</span> {
-        <span class="self">self</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">unsafe fn </span>to_ascii_char_unchecked(<span class="self">self</span>) -&gt; AsciiChar {
+        <span class="self">self
+    </span>}
+}
+
+<span class="kw">impl </span>ToAsciiChar <span class="kw">for </span>u8 {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>to_ascii_char(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;AsciiChar, ToAsciiCharError&gt; {
+        (<span class="self">self </span><span class="kw">as </span>u32).to_ascii_char()
+    }
+    <span class="attribute">#[inline]
+    </span><span class="kw">unsafe fn </span>to_ascii_char_unchecked(<span class="self">self</span>) -&gt; AsciiChar {
+        mem::transmute(<span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ToAsciiChar</span> <span class="kw">for</span> <span class="ident">u8</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">to_ascii_char</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AsciiChar</span>, <span class="ident">ToAsciiCharError</span><span class="op">&gt;</span> {
-        (<span class="self">self</span> <span class="kw">as</span> <span class="ident">u32</span>).<span class="ident">to_ascii_char</span>()
+<span class="kw">impl </span>ToAsciiChar <span class="kw">for </span>i8 {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>to_ascii_char(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;AsciiChar, ToAsciiCharError&gt; {
+        (<span class="self">self </span><span class="kw">as </span>u32).to_ascii_char()
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">to_ascii_char_unchecked</span>(<span class="self">self</span>) -&gt; <span class="ident">AsciiChar</span> {
-        <span class="ident">mem::transmute</span>(<span class="self">self</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">ToAsciiChar</span> <span class="kw">for</span> <span class="ident">i8</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">to_ascii_char</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AsciiChar</span>, <span class="ident">ToAsciiCharError</span><span class="op">&gt;</span> {
-        (<span class="self">self</span> <span class="kw">as</span> <span class="ident">u32</span>).<span class="ident">to_ascii_char</span>()
-    }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">to_ascii_char_unchecked</span>(<span class="self">self</span>) -&gt; <span class="ident">AsciiChar</span> {
-        <span class="ident">mem::transmute</span>(<span class="self">self</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">unsafe fn </span>to_ascii_char_unchecked(<span class="self">self</span>) -&gt; AsciiChar {
+        mem::transmute(<span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ToAsciiChar</span> <span class="kw">for</span> <span class="ident">char</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">to_ascii_char</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AsciiChar</span>, <span class="ident">ToAsciiCharError</span><span class="op">&gt;</span> {
-        (<span class="self">self</span> <span class="kw">as</span> <span class="ident">u32</span>).<span class="ident">to_ascii_char</span>()
+<span class="kw">impl </span>ToAsciiChar <span class="kw">for </span>char {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>to_ascii_char(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;AsciiChar, ToAsciiCharError&gt; {
+        (<span class="self">self </span><span class="kw">as </span>u32).to_ascii_char()
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">to_ascii_char_unchecked</span>(<span class="self">self</span>) -&gt; <span class="ident">AsciiChar</span> {
-        (<span class="self">self</span> <span class="kw">as</span> <span class="ident">u32</span>).<span class="ident">to_ascii_char_unchecked</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">unsafe fn </span>to_ascii_char_unchecked(<span class="self">self</span>) -&gt; AsciiChar {
+        (<span class="self">self </span><span class="kw">as </span>u32).to_ascii_char_unchecked()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ToAsciiChar</span> <span class="kw">for</span> <span class="ident">u32</span> {
-    <span class="kw">fn</span> <span class="ident">to_ascii_char</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AsciiChar</span>, <span class="ident">ToAsciiCharError</span><span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> {
-            <span class="kw">match</span> <span class="self">self</span> {
-                <span class="number">0</span>..<span class="op">=</span><span class="number">127</span> =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">to_ascii_char_unchecked</span>()),
-                <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ToAsciiCharError</span>(()))
+<span class="kw">impl </span>ToAsciiChar <span class="kw">for </span>u32 {
+    <span class="kw">fn </span>to_ascii_char(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;AsciiChar, ToAsciiCharError&gt; {
+        <span class="kw">unsafe </span>{
+            <span class="kw">match </span><span class="self">self </span>{
+                <span class="number">0</span>..=<span class="number">127 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.to_ascii_char_unchecked()),
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(ToAsciiCharError(()))
             }
         }
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">to_ascii_char_unchecked</span>(<span class="self">self</span>) -&gt; <span class="ident">AsciiChar</span> {
-        (<span class="self">self</span> <span class="kw">as</span> <span class="ident">u8</span>).<span class="ident">to_ascii_char_unchecked</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">unsafe fn </span>to_ascii_char_unchecked(<span class="self">self</span>) -&gt; AsciiChar {
+        (<span class="self">self </span><span class="kw">as </span>u8).to_ascii_char_unchecked()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ToAsciiChar</span> <span class="kw">for</span> <span class="ident">u16</span> {
-    <span class="kw">fn</span> <span class="ident">to_ascii_char</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AsciiChar</span>, <span class="ident">ToAsciiCharError</span><span class="op">&gt;</span> {
-        (<span class="self">self</span> <span class="kw">as</span> <span class="ident">u32</span>).<span class="ident">to_ascii_char</span>()
+<span class="kw">impl </span>ToAsciiChar <span class="kw">for </span>u16 {
+    <span class="kw">fn </span>to_ascii_char(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;AsciiChar, ToAsciiCharError&gt; {
+        (<span class="self">self </span><span class="kw">as </span>u32).to_ascii_char()
     }
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">to_ascii_char_unchecked</span>(<span class="self">self</span>) -&gt; <span class="ident">AsciiChar</span> {
-        (<span class="self">self</span> <span class="kw">as</span> <span class="ident">u8</span>).<span class="ident">to_ascii_char_unchecked</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">unsafe fn </span>to_ascii_char_unchecked(<span class="self">self</span>) -&gt; AsciiChar {
+        (<span class="self">self </span><span class="kw">as </span>u8).to_ascii_char_unchecked()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quickcheck&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">Arbitrary</span> <span class="kw">for</span> <span class="ident">AsciiChar</span> {
-    <span class="kw">fn</span> <span class="ident">arbitrary</span><span class="op">&lt;</span><span class="ident">G</span>: <span class="ident">Gen</span><span class="op">&gt;</span>(<span class="ident">g</span>: <span class="kw-2">&amp;mut</span> <span class="ident">G</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">mode</span> <span class="op">=</span> <span class="ident">g</span>.<span class="ident">gen_range</span>(<span class="number">0</span>, <span class="number">100</span>);
-        <span class="kw">match</span> <span class="ident">mode</span> {
-            <span class="number">0</span>...<span class="number">14</span> =&gt; {
-                <span class="comment">// Control characters</span>
-                <span class="kw">unsafe</span> { <span class="ident">AsciiChar::from_unchecked</span>(<span class="ident">g</span>.<span class="ident">gen_range</span>(<span class="number">0</span>, <span class="number">0x1F</span>) <span class="kw">as</span> <span class="ident">u8</span>) }
+<span class="attribute">#[cfg(feature = <span class="string">&quot;quickcheck&quot;</span>)]
+</span><span class="kw">impl </span>Arbitrary <span class="kw">for </span>AsciiChar {
+    <span class="kw">fn </span>arbitrary&lt;G: Gen&gt;(g: <span class="kw-2">&amp;mut </span>G) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>mode = g.gen_range(<span class="number">0</span>, <span class="number">100</span>);
+        <span class="kw">match </span>mode {
+            <span class="number">0</span>...<span class="number">14 </span>=&gt; {
+                <span class="comment">// Control characters
+                </span><span class="kw">unsafe </span>{ AsciiChar::from_unchecked(g.gen_range(<span class="number">0</span>, <span class="number">0x1F</span>) <span class="kw">as </span>u8) }
             }
-            <span class="number">15</span>...<span class="number">39</span> =&gt; {
-                <span class="comment">// Characters often used in programming languages</span>
-                <span class="kw-2">*</span><span class="ident">g</span>.<span class="ident">choose</span>(<span class="kw-2">&amp;</span>[
-                    <span class="ident">AsciiChar::Space</span>, <span class="ident">AsciiChar::Tab</span>, <span class="ident">AsciiChar::LineFeed</span>, <span class="ident">AsciiChar::Tilde</span>,
-                    <span class="ident">AsciiChar::Grave</span>, <span class="ident">AsciiChar::Exclamation</span>, <span class="ident">AsciiChar::At</span>, <span class="ident">AsciiChar::Hash</span>,
-                    <span class="ident">AsciiChar::Dollar</span>, <span class="ident">AsciiChar::Percent</span>, <span class="ident">AsciiChar::Ampersand</span>,
-                    <span class="ident">AsciiChar::Asterisk</span>, <span class="ident">AsciiChar::ParenOpen</span>, <span class="ident">AsciiChar::ParenClose</span>,
-                    <span class="ident">AsciiChar::UnderScore</span>, <span class="ident">AsciiChar::Minus</span>, <span class="ident">AsciiChar::Equal</span>, <span class="ident">AsciiChar::Plus</span>,
-                    <span class="ident">AsciiChar::BracketOpen</span>, <span class="ident">AsciiChar::BracketClose</span>, <span class="ident">AsciiChar::CurlyBraceOpen</span>,
-                    <span class="ident">AsciiChar::CurlyBraceClose</span>, <span class="ident">AsciiChar::Colon</span>, <span class="ident">AsciiChar::Semicolon</span>,
-                    <span class="ident">AsciiChar::Apostrophe</span>, <span class="ident">AsciiChar::Quotation</span>, <span class="ident">AsciiChar::BackSlash</span>,
-                    <span class="ident">AsciiChar::VerticalBar</span>, <span class="ident">AsciiChar::Caret</span>, <span class="ident">AsciiChar::Comma</span>, <span class="ident">AsciiChar::LessThan</span>,
-                    <span class="ident">AsciiChar::GreaterThan</span>, <span class="ident">AsciiChar::Dot</span>, <span class="ident">AsciiChar::Slash</span>, <span class="ident">AsciiChar::Question</span>,
-                    <span class="ident">AsciiChar::_0</span>, <span class="ident">AsciiChar::_1</span>, <span class="ident">AsciiChar::_2</span>, <span class="ident">AsciiChar::_3</span>, <span class="ident">AsciiChar::_3</span>,
-                    <span class="ident">AsciiChar::_4</span> , <span class="ident">AsciiChar::_6</span>, <span class="ident">AsciiChar::_7</span>, <span class="ident">AsciiChar::_8</span>, <span class="ident">AsciiChar::_9</span>,
-                ]).<span class="ident">unwrap</span>()
+            <span class="number">15</span>...<span class="number">39 </span>=&gt; {
+                <span class="comment">// Characters often used in programming languages
+                </span><span class="kw-2">*</span>g.choose(<span class="kw-2">&amp;</span>[
+                    AsciiChar::Space, AsciiChar::Tab, AsciiChar::LineFeed, AsciiChar::Tilde,
+                    AsciiChar::Grave, AsciiChar::Exclamation, AsciiChar::At, AsciiChar::Hash,
+                    AsciiChar::Dollar, AsciiChar::Percent, AsciiChar::Ampersand,
+                    AsciiChar::Asterisk, AsciiChar::ParenOpen, AsciiChar::ParenClose,
+                    AsciiChar::UnderScore, AsciiChar::Minus, AsciiChar::Equal, AsciiChar::Plus,
+                    AsciiChar::BracketOpen, AsciiChar::BracketClose, AsciiChar::CurlyBraceOpen,
+                    AsciiChar::CurlyBraceClose, AsciiChar::Colon, AsciiChar::Semicolon,
+                    AsciiChar::Apostrophe, AsciiChar::Quotation, AsciiChar::BackSlash,
+                    AsciiChar::VerticalBar, AsciiChar::Caret, AsciiChar::Comma, AsciiChar::LessThan,
+                    AsciiChar::GreaterThan, AsciiChar::Dot, AsciiChar::Slash, AsciiChar::Question,
+                    AsciiChar::_0, AsciiChar::_1, AsciiChar::_2, AsciiChar::_3, AsciiChar::_3,
+                    AsciiChar::_4 , AsciiChar::_6, AsciiChar::_7, AsciiChar::_8, AsciiChar::_9,
+                ]).unwrap()
             }
-            <span class="number">40</span>...<span class="number">99</span> =&gt; {
-                <span class="comment">// Completely arbitrary characters</span>
-                <span class="kw">unsafe</span> { <span class="ident">AsciiChar::from_unchecked</span>(<span class="ident">g</span>.<span class="ident">gen_range</span>(<span class="number">0</span>, <span class="number">0x80</span>) <span class="kw">as</span> <span class="ident">u8</span>) }
+            <span class="number">40</span>...<span class="number">99 </span>=&gt; {
+                <span class="comment">// Completely arbitrary characters
+                </span><span class="kw">unsafe </span>{ AsciiChar::from_unchecked(g.gen_range(<span class="number">0</span>, <span class="number">0x80</span>) <span class="kw">as </span>u8) }
             }
-            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">shrink</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Box::new</span>((<span class="kw-2">*</span><span class="self">self</span> <span class="kw">as</span> <span class="ident">u8</span>).<span class="ident">shrink</span>().<span class="ident">filter_map</span>(
-            <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">AsciiChar::from</span>(<span class="ident">x</span>).<span class="ident">ok</span>(),
+    <span class="kw">fn </span>shrink(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Box&lt;Iterator&lt;Item = <span class="self">Self</span>&gt;&gt; {
+        Box::new((<span class="kw-2">*</span><span class="self">self </span><span class="kw">as </span>u8).shrink().filter_map(
+            |x| AsciiChar::from(x).ok(),
         ))
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">AsciiChar</span>, <span class="ident">ToAsciiChar</span>, <span class="ident">ToAsciiCharError</span>};
-    <span class="kw">use</span> <span class="ident">AsciiChar</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::{AsciiChar, ToAsciiChar, ToAsciiCharError};
+    <span class="kw">use </span>AsciiChar::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">to_ascii_char</span>() {
-        <span class="kw">fn</span> <span class="ident">generic</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">ToAsciiChar</span><span class="op">&gt;</span>(<span class="ident">ch</span>: <span class="ident">C</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AsciiChar</span>, <span class="ident">ToAsciiCharError</span><span class="op">&gt;</span> {
-            <span class="ident">ch</span>.<span class="ident">to_ascii_char</span>()
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>to_ascii_char() {
+        <span class="kw">fn </span>generic&lt;C: ToAsciiChar&gt;(ch: C) -&gt; <span class="prelude-ty">Result</span>&lt;AsciiChar, ToAsciiCharError&gt; {
+            ch.to_ascii_char()
         }
-        <span class="macro">assert_eq!</span>(<span class="ident">generic</span>(<span class="ident">A</span>), <span class="prelude-val">Ok</span>(<span class="ident">A</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">generic</span>(<span class="string">b&#39;A&#39;</span>), <span class="prelude-val">Ok</span>(<span class="ident">A</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">generic</span>(<span class="string">&#39;A&#39;</span>), <span class="prelude-val">Ok</span>(<span class="ident">A</span>));
-        <span class="macro">assert!</span>(<span class="ident">generic</span>(<span class="number">200u16</span>).<span class="ident">is_err</span>());
-        <span class="macro">assert!</span>(<span class="ident">generic</span>(<span class="string">&#39;λ&#39;</span>).<span class="ident">is_err</span>());
+        <span class="macro">assert_eq!</span>(generic(A), <span class="prelude-val">Ok</span>(A));
+        <span class="macro">assert_eq!</span>(generic(<span class="string">b&#39;A&#39;</span>), <span class="prelude-val">Ok</span>(A));
+        <span class="macro">assert_eq!</span>(generic(<span class="string">&#39;A&#39;</span>), <span class="prelude-val">Ok</span>(A));
+        <span class="macro">assert!</span>(generic(<span class="number">200u16</span>).is_err());
+        <span class="macro">assert!</span>(generic(<span class="string">&#39;λ&#39;</span>).is_err());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">as_byte_and_char</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">A</span>.<span class="ident">as_byte</span>(), <span class="string">b&#39;A&#39;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">A</span>.<span class="ident">as_char</span>(), <span class="string">&#39;A&#39;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>as_byte_and_char() {
+        <span class="macro">assert_eq!</span>(A.as_byte(), <span class="string">b&#39;A&#39;</span>);
+        <span class="macro">assert_eq!</span>(A.as_char(), <span class="string">&#39;A&#39;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_digit</span>() {
-        <span class="macro">assert_eq!</span>(<span class="string">&#39;0&#39;</span>.<span class="ident">to_ascii_char</span>().<span class="ident">unwrap</span>().<span class="ident">is_digit</span>(), <span class="bool-val">true</span>);
-        <span class="macro">assert_eq!</span>(<span class="string">&#39;9&#39;</span>.<span class="ident">to_ascii_char</span>().<span class="ident">unwrap</span>().<span class="ident">is_digit</span>(), <span class="bool-val">true</span>);
-        <span class="macro">assert_eq!</span>(<span class="string">&#39;/&#39;</span>.<span class="ident">to_ascii_char</span>().<span class="ident">unwrap</span>().<span class="ident">is_digit</span>(), <span class="bool-val">false</span>);
-        <span class="macro">assert_eq!</span>(<span class="string">&#39;:&#39;</span>.<span class="ident">to_ascii_char</span>().<span class="ident">unwrap</span>().<span class="ident">is_digit</span>(), <span class="bool-val">false</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>is_digit() {
+        <span class="macro">assert_eq!</span>(<span class="string">&#39;0&#39;</span>.to_ascii_char().unwrap().is_digit(), <span class="bool-val">true</span>);
+        <span class="macro">assert_eq!</span>(<span class="string">&#39;9&#39;</span>.to_ascii_char().unwrap().is_digit(), <span class="bool-val">true</span>);
+        <span class="macro">assert_eq!</span>(<span class="string">&#39;/&#39;</span>.to_ascii_char().unwrap().is_digit(), <span class="bool-val">false</span>);
+        <span class="macro">assert_eq!</span>(<span class="string">&#39;:&#39;</span>.to_ascii_char().unwrap().is_digit(), <span class="bool-val">false</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_control</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">US</span>.<span class="ident">is_control</span>(), <span class="bool-val">true</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">DEL</span>.<span class="ident">is_control</span>(), <span class="bool-val">true</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Space</span>.<span class="ident">is_control</span>(), <span class="bool-val">false</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>is_control() {
+        <span class="macro">assert_eq!</span>(US.is_control(), <span class="bool-val">true</span>);
+        <span class="macro">assert_eq!</span>(DEL.is_control(), <span class="bool-val">true</span>);
+        <span class="macro">assert_eq!</span>(Space.is_control(), <span class="bool-val">false</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">cmp_wider</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">A</span>, <span class="string">&#39;A&#39;</span>);
-        <span class="macro">assert_eq!</span>(<span class="string">b&#39;b&#39;</span>, <span class="ident">b</span>);
-        <span class="macro">assert!</span>(<span class="ident">a</span> <span class="op">&lt;</span> <span class="string">&#39;z&#39;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>cmp_wider() {
+        <span class="macro">assert_eq!</span>(A, <span class="string">&#39;A&#39;</span>);
+        <span class="macro">assert_eq!</span>(<span class="string">b&#39;b&#39;</span>, b);
+        <span class="macro">assert!</span>(a &lt; <span class="string">&#39;z&#39;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">ascii_case</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">At</span>.<span class="ident">to_ascii_lowercase</span>(), <span class="ident">At</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">At</span>.<span class="ident">to_ascii_uppercase</span>(), <span class="ident">At</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">A</span>.<span class="ident">to_ascii_lowercase</span>(), <span class="ident">a</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">A</span>.<span class="ident">to_ascii_uppercase</span>(), <span class="ident">A</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">a</span>.<span class="ident">to_ascii_lowercase</span>(), <span class="ident">a</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">a</span>.<span class="ident">to_ascii_uppercase</span>(), <span class="ident">A</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>ascii_case() {
+        <span class="macro">assert_eq!</span>(At.to_ascii_lowercase(), At);
+        <span class="macro">assert_eq!</span>(At.to_ascii_uppercase(), At);
+        <span class="macro">assert_eq!</span>(A.to_ascii_lowercase(), a);
+        <span class="macro">assert_eq!</span>(A.to_ascii_uppercase(), A);
+        <span class="macro">assert_eq!</span>(a.to_ascii_lowercase(), a);
+        <span class="macro">assert_eq!</span>(a.to_ascii_uppercase(), A);
 
-        <span class="macro">assert!</span>(<span class="ident">LineFeed</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="kw-2">&amp;</span><span class="ident">LineFeed</span>));
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">LineFeed</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="kw-2">&amp;</span><span class="ident">CarriageReturn</span>));
-        <span class="macro">assert!</span>(<span class="ident">z</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="kw-2">&amp;</span><span class="ident">Z</span>));
-        <span class="macro">assert!</span>(<span class="ident">Z</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="kw-2">&amp;</span><span class="ident">z</span>));
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">Z</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="kw-2">&amp;</span><span class="ident">DEL</span>));
+        <span class="macro">assert!</span>(LineFeed.eq_ignore_ascii_case(<span class="kw-2">&amp;</span>LineFeed));
+        <span class="macro">assert!</span>(!LineFeed.eq_ignore_ascii_case(<span class="kw-2">&amp;</span>CarriageReturn));
+        <span class="macro">assert!</span>(z.eq_ignore_ascii_case(<span class="kw-2">&amp;</span>Z));
+        <span class="macro">assert!</span>(Z.eq_ignore_ascii_case(<span class="kw-2">&amp;</span>z));
+        <span class="macro">assert!</span>(!Z.eq_ignore_ascii_case(<span class="kw-2">&amp;</span>DEL));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">ascii_ext</span>() {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
-        <span class="kw">use</span> <span class="ident">std::ascii::AsciiExt</span>;
-        <span class="macro">assert!</span>(<span class="ident">AsciiExt::is_ascii</span>(<span class="kw-2">&amp;</span><span class="ident">Null</span>));
-        <span class="macro">assert!</span>(<span class="ident">AsciiExt::is_ascii</span>(<span class="kw-2">&amp;</span><span class="ident">DEL</span>));
-        <span class="macro">assert!</span>(<span class="ident">AsciiExt::eq_ignore_ascii_case</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>, <span class="kw-2">&amp;</span><span class="ident">A</span>));
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">AsciiExt::eq_ignore_ascii_case</span>(<span class="kw-2">&amp;</span><span class="ident">A</span>, <span class="kw-2">&amp;</span><span class="ident">At</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">AsciiExt::to_ascii_lowercase</span>(<span class="kw-2">&amp;</span><span class="ident">A</span>), <span class="ident">a</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">AsciiExt::to_ascii_uppercase</span>(<span class="kw-2">&amp;</span><span class="ident">A</span>), <span class="ident">A</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">AsciiExt::to_ascii_lowercase</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>), <span class="ident">a</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">AsciiExt::to_ascii_uppercase</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>), <span class="ident">A</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">AsciiExt::to_ascii_lowercase</span>(<span class="kw-2">&amp;</span><span class="ident">At</span>), <span class="ident">At</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">AsciiExt::to_ascii_uppercase</span>(<span class="kw-2">&amp;</span><span class="ident">At</span>), <span class="ident">At</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mutable</span> <span class="op">=</span> (<span class="ident">A</span>,<span class="ident">a</span>);
-        <span class="ident">AsciiExt::make_ascii_lowercase</span>(<span class="kw-2">&amp;mut</span> <span class="ident">mutable</span>.<span class="number">0</span>);
-        <span class="ident">AsciiExt::make_ascii_uppercase</span>(<span class="kw-2">&amp;mut</span> <span class="ident">mutable</span>.<span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">mutable</span>.<span class="number">0</span>, <span class="ident">a</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">mutable</span>.<span class="number">1</span>, <span class="ident">A</span>);
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+    </span><span class="kw">fn </span>ascii_ext() {
+        <span class="attribute">#[allow(deprecated)]
+        </span><span class="kw">use </span>std::ascii::AsciiExt;
+        <span class="macro">assert!</span>(AsciiExt::is_ascii(<span class="kw-2">&amp;</span>Null));
+        <span class="macro">assert!</span>(AsciiExt::is_ascii(<span class="kw-2">&amp;</span>DEL));
+        <span class="macro">assert!</span>(AsciiExt::eq_ignore_ascii_case(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>A));
+        <span class="macro">assert!</span>(!AsciiExt::eq_ignore_ascii_case(<span class="kw-2">&amp;</span>A, <span class="kw-2">&amp;</span>At));
+        <span class="macro">assert_eq!</span>(AsciiExt::to_ascii_lowercase(<span class="kw-2">&amp;</span>A), a);
+        <span class="macro">assert_eq!</span>(AsciiExt::to_ascii_uppercase(<span class="kw-2">&amp;</span>A), A);
+        <span class="macro">assert_eq!</span>(AsciiExt::to_ascii_lowercase(<span class="kw-2">&amp;</span>a), a);
+        <span class="macro">assert_eq!</span>(AsciiExt::to_ascii_uppercase(<span class="kw-2">&amp;</span>a), A);
+        <span class="macro">assert_eq!</span>(AsciiExt::to_ascii_lowercase(<span class="kw-2">&amp;</span>At), At);
+        <span class="macro">assert_eq!</span>(AsciiExt::to_ascii_uppercase(<span class="kw-2">&amp;</span>At), At);
+        <span class="kw">let </span><span class="kw-2">mut </span>mutable = (A,a);
+        AsciiExt::make_ascii_lowercase(<span class="kw-2">&amp;mut </span>mutable.<span class="number">0</span>);
+        AsciiExt::make_ascii_uppercase(<span class="kw-2">&amp;mut </span>mutable.<span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(mutable.<span class="number">0</span>, a);
+        <span class="macro">assert_eq!</span>(mutable.<span class="number">1</span>, A);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">fmt_ascii</span>() {
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">t</span>), <span class="string">&quot;t&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">t</span>), <span class="string">&quot;&#39;t&#39;&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">LineFeed</span>), <span class="string">&quot;\n&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">LineFeed</span>), <span class="string">&quot;&#39;\\n&#39;&quot;</span>);
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+    </span><span class="kw">fn </span>fmt_ascii() {
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, t), <span class="string">&quot;t&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, t), <span class="string">&quot;&#39;t&#39;&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, LineFeed), <span class="string">&quot;\n&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, LineFeed), <span class="string">&quot;&#39;\\n&#39;&quot;</span>);
     }
 
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ascii" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ascii" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

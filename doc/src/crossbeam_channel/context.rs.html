@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-channel-0.5.6/src/context.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>context.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../crossbeam_channel/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../crossbeam_channel/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../crossbeam_channel/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-channel-0.5.6/src/context.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>context.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../crossbeam_channel/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../crossbeam_channel/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../crossbeam_channel/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -191,198 +191,198 @@
 <span id="191">191</span>
 <span id="192">192</span>
 <span id="193">193</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Thread-local context used in select.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Thread-local context used in select.
 
-<span class="kw">use</span> <span class="ident">std::cell::Cell</span>;
-<span class="kw">use</span> <span class="ident">std::ptr</span>;
-<span class="kw">use</span> <span class="ident">std::sync::atomic</span>::{<span class="ident">AtomicPtr</span>, <span class="ident">AtomicUsize</span>, <span class="ident">Ordering</span>};
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
-<span class="kw">use</span> <span class="ident">std::thread</span>::{<span class="self">self</span>, <span class="ident">Thread</span>, <span class="ident">ThreadId</span>};
-<span class="kw">use</span> <span class="ident">std::time::Instant</span>;
+</span><span class="kw">use </span>std::cell::Cell;
+<span class="kw">use </span>std::ptr;
+<span class="kw">use </span>std::sync::atomic::{AtomicPtr, AtomicUsize, Ordering};
+<span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>std::thread::{<span class="self">self</span>, Thread, ThreadId};
+<span class="kw">use </span>std::time::Instant;
 
-<span class="kw">use</span> <span class="ident">crossbeam_utils::Backoff</span>;
+<span class="kw">use </span>crossbeam_utils::Backoff;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::select::Selected</span>;
+<span class="kw">use </span><span class="kw">crate</span>::select::Selected;
 
-<span class="doccomment">/// Thread-local context used in select.</span>
-<span class="comment">// This is a private API that is used by the select macro.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Context</span> {
-    <span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Inner</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Thread-local context used in select.
+</span><span class="comment">// This is a private API that is used by the select macro.
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>Context {
+    inner: Arc&lt;Inner&gt;,
 }
 
-<span class="doccomment">/// Inner representation of `Context`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">Inner</span> {
-    <span class="doccomment">/// Selected operation.</span>
-    <span class="ident">select</span>: <span class="ident">AtomicUsize</span>,
+<span class="doccomment">/// Inner representation of `Context`.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">struct </span>Inner {
+    <span class="doccomment">/// Selected operation.
+    </span>select: AtomicUsize,
 
-    <span class="doccomment">/// A slot into which another thread may store a pointer to its `Packet`.</span>
-    <span class="ident">packet</span>: <span class="ident">AtomicPtr</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
+    <span class="doccomment">/// A slot into which another thread may store a pointer to its `Packet`.
+    </span>packet: AtomicPtr&lt;()&gt;,
 
-    <span class="doccomment">/// Thread handle.</span>
-    <span class="ident">thread</span>: <span class="ident">Thread</span>,
+    <span class="doccomment">/// Thread handle.
+    </span>thread: Thread,
 
-    <span class="doccomment">/// Thread id.</span>
-    <span class="ident">thread_id</span>: <span class="ident">ThreadId</span>,
+    <span class="doccomment">/// Thread id.
+    </span>thread_id: ThreadId,
 }
 
-<span class="kw">impl</span> <span class="ident">Context</span> {
-    <span class="doccomment">/// Creates a new context for the duration of the closure.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">R</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="ident">R</span>,
+<span class="kw">impl </span>Context {
+    <span class="doccomment">/// Creates a new context for the duration of the closure.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>with&lt;F, R&gt;(f: F) -&gt; R
+    <span class="kw">where
+        </span>F: FnOnce(<span class="kw-2">&amp;</span>Context) -&gt; R,
     {
-        <span class="macro">thread_local!</span> {
-            <span class="doccomment">/// Cached thread-local context.</span>
-            <span class="kw">static</span> <span class="ident">CONTEXT</span>: <span class="ident">Cell</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Context</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Cell::new</span>(<span class="prelude-val">Some</span>(<span class="ident">Context::new</span>()));
+        <span class="macro">thread_local! </span>{
+            <span class="doccomment">/// Cached thread-local context.
+            </span><span class="kw">static </span>CONTEXT: Cell&lt;<span class="prelude-ty">Option</span>&lt;Context&gt;&gt; = Cell::new(<span class="prelude-val">Some</span>(Context::new()));
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">f</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">f</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">f</span> <span class="op">=</span> <span class="op">|</span><span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span><span class="op">|</span> -&gt; <span class="ident">R</span> {
-            <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>();
-            <span class="ident">f</span>(<span class="ident">cx</span>)
+        <span class="kw">let </span><span class="kw-2">mut </span>f = <span class="prelude-val">Some</span>(f);
+        <span class="kw">let </span><span class="kw-2">mut </span>f = |cx: <span class="kw-2">&amp;</span>Context| -&gt; R {
+            <span class="kw">let </span>f = f.take().unwrap();
+            f(cx)
         };
 
-        <span class="ident">CONTEXT</span>
-            .<span class="ident">try_with</span>(<span class="op">|</span><span class="ident">cell</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">cell</span>.<span class="ident">take</span>() {
-                <span class="prelude-val">None</span> =&gt; <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="ident">Context::new</span>()),
-                <span class="prelude-val">Some</span>(<span class="ident">cx</span>) =&gt; {
-                    <span class="ident">cx</span>.<span class="ident">reset</span>();
-                    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="ident">cx</span>);
-                    <span class="ident">cell</span>.<span class="ident">set</span>(<span class="prelude-val">Some</span>(<span class="ident">cx</span>));
-                    <span class="ident">res</span>
+        CONTEXT
+            .try_with(|cell| <span class="kw">match </span>cell.take() {
+                <span class="prelude-val">None </span>=&gt; f(<span class="kw-2">&amp;</span>Context::new()),
+                <span class="prelude-val">Some</span>(cx) =&gt; {
+                    cx.reset();
+                    <span class="kw">let </span>res = f(<span class="kw-2">&amp;</span>cx);
+                    cell.set(<span class="prelude-val">Some</span>(cx));
+                    res
                 }
             })
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="ident">Context::new</span>()))
+            .unwrap_or_else(|<span class="kw">_</span>| f(<span class="kw-2">&amp;</span>Context::new()))
     }
 
-    <span class="doccomment">/// Creates a new `Context`.</span>
-    <span class="attribute">#[<span class="ident">cold</span>]</span>
-    <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Context</span> {
-        <span class="ident">Context</span> {
-            <span class="ident">inner</span>: <span class="ident">Arc::new</span>(<span class="ident">Inner</span> {
-                <span class="ident">select</span>: <span class="ident">AtomicUsize::new</span>(<span class="ident">Selected::Waiting</span>.<span class="ident">into</span>()),
-                <span class="ident">packet</span>: <span class="ident">AtomicPtr::new</span>(<span class="ident">ptr::null_mut</span>()),
-                <span class="ident">thread</span>: <span class="ident">thread::current</span>(),
-                <span class="ident">thread_id</span>: <span class="ident">thread::current</span>().<span class="ident">id</span>(),
+    <span class="doccomment">/// Creates a new `Context`.
+    </span><span class="attribute">#[cold]
+    </span><span class="kw">fn </span>new() -&gt; Context {
+        Context {
+            inner: Arc::new(Inner {
+                select: AtomicUsize::new(Selected::Waiting.into()),
+                packet: AtomicPtr::new(ptr::null_mut()),
+                thread: thread::current(),
+                thread_id: thread::current().id(),
             }),
         }
     }
 
-    <span class="doccomment">/// Resets `select` and `packet`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>
-            .<span class="ident">select</span>
-            .<span class="ident">store</span>(<span class="ident">Selected::Waiting</span>.<span class="ident">into</span>(), <span class="ident">Ordering::Release</span>);
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">packet</span>.<span class="ident">store</span>(<span class="ident">ptr::null_mut</span>(), <span class="ident">Ordering::Release</span>);
+    <span class="doccomment">/// Resets `select` and `packet`.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>reset(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="self">self</span>.inner
+            .select
+            .store(Selected::Waiting.into(), Ordering::Release);
+        <span class="self">self</span>.inner.packet.store(ptr::null_mut(), Ordering::Release);
     }
 
-    <span class="doccomment">/// Attempts to select an operation.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// On failure, the previously selected operation is returned.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_select</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">select</span>: <span class="ident">Selected</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Selected</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>
-            .<span class="ident">select</span>
-            .<span class="ident">compare_exchange</span>(
-                <span class="ident">Selected::Waiting</span>.<span class="ident">into</span>(),
-                <span class="ident">select</span>.<span class="ident">into</span>(),
-                <span class="ident">Ordering::AcqRel</span>,
-                <span class="ident">Ordering::Acquire</span>,
+    <span class="doccomment">/// Attempts to select an operation.
+    ///
+    /// On failure, the previously selected operation is returned.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>try_select(<span class="kw-2">&amp;</span><span class="self">self</span>, select: Selected) -&gt; <span class="prelude-ty">Result</span>&lt;(), Selected&gt; {
+        <span class="self">self</span>.inner
+            .select
+            .compare_exchange(
+                Selected::Waiting.into(),
+                select.into(),
+                Ordering::AcqRel,
+                Ordering::Acquire,
             )
-            .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">into</span>())
+            .map(|<span class="kw">_</span>| ())
+            .map_err(|e| e.into())
     }
 
-    <span class="doccomment">/// Returns the selected operation.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">selected</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Selected</span> {
-        <span class="ident">Selected::from</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">select</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>))
+    <span class="doccomment">/// Returns the selected operation.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>selected(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Selected {
+        Selected::from(<span class="self">self</span>.inner.select.load(Ordering::Acquire))
     }
 
-    <span class="doccomment">/// Stores a packet.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method must be called after `try_select` succeeds and there is a packet to provide.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">store_packet</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">packet</span>: <span class="kw-2">*mut</span> ()) {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">packet</span>.<span class="ident">is_null</span>() {
-            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">packet</span>.<span class="ident">store</span>(<span class="ident">packet</span>, <span class="ident">Ordering::Release</span>);
+    <span class="doccomment">/// Stores a packet.
+    ///
+    /// This method must be called after `try_select` succeeds and there is a packet to provide.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>store_packet(<span class="kw-2">&amp;</span><span class="self">self</span>, packet: <span class="kw-2">*mut </span>()) {
+        <span class="kw">if </span>!packet.is_null() {
+            <span class="self">self</span>.inner.packet.store(packet, Ordering::Release);
         }
     }
 
-    <span class="doccomment">/// Waits until a packet is provided and returns it.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wait_packet</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut</span> () {
-        <span class="kw">let</span> <span class="ident">backoff</span> <span class="op">=</span> <span class="ident">Backoff::new</span>();
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">packet</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">packet</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">packet</span>.<span class="ident">is_null</span>() {
-                <span class="kw">return</span> <span class="ident">packet</span>;
+    <span class="doccomment">/// Waits until a packet is provided and returns it.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>wait_packet(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>() {
+        <span class="kw">let </span>backoff = Backoff::new();
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>packet = <span class="self">self</span>.inner.packet.load(Ordering::Acquire);
+            <span class="kw">if </span>!packet.is_null() {
+                <span class="kw">return </span>packet;
             }
-            <span class="ident">backoff</span>.<span class="ident">snooze</span>();
+            backoff.snooze();
         }
     }
 
-    <span class="doccomment">/// Waits until an operation is selected and returns it.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the deadline is reached, `Selected::Aborted` will be selected.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wait_until</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">deadline</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span>) -&gt; <span class="ident">Selected</span> {
-        <span class="comment">// Spin for a short time, waiting until an operation is selected.</span>
-        <span class="kw">let</span> <span class="ident">backoff</span> <span class="op">=</span> <span class="ident">Backoff::new</span>();
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">sel</span> <span class="op">=</span> <span class="ident">Selected::from</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">select</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>));
-            <span class="kw">if</span> <span class="ident">sel</span> <span class="op">!</span><span class="op">=</span> <span class="ident">Selected::Waiting</span> {
-                <span class="kw">return</span> <span class="ident">sel</span>;
+    <span class="doccomment">/// Waits until an operation is selected and returns it.
+    ///
+    /// If the deadline is reached, `Selected::Aborted` will be selected.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>wait_until(<span class="kw-2">&amp;</span><span class="self">self</span>, deadline: <span class="prelude-ty">Option</span>&lt;Instant&gt;) -&gt; Selected {
+        <span class="comment">// Spin for a short time, waiting until an operation is selected.
+        </span><span class="kw">let </span>backoff = Backoff::new();
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>sel = Selected::from(<span class="self">self</span>.inner.select.load(Ordering::Acquire));
+            <span class="kw">if </span>sel != Selected::Waiting {
+                <span class="kw">return </span>sel;
             }
 
-            <span class="kw">if</span> <span class="ident">backoff</span>.<span class="ident">is_completed</span>() {
+            <span class="kw">if </span>backoff.is_completed() {
                 <span class="kw">break</span>;
-            } <span class="kw">else</span> {
-                <span class="ident">backoff</span>.<span class="ident">snooze</span>();
+            } <span class="kw">else </span>{
+                backoff.snooze();
             }
         }
 
-        <span class="kw">loop</span> {
-            <span class="comment">// Check whether an operation has been selected.</span>
-            <span class="kw">let</span> <span class="ident">sel</span> <span class="op">=</span> <span class="ident">Selected::from</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">select</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>));
-            <span class="kw">if</span> <span class="ident">sel</span> <span class="op">!</span><span class="op">=</span> <span class="ident">Selected::Waiting</span> {
-                <span class="kw">return</span> <span class="ident">sel</span>;
+        <span class="kw">loop </span>{
+            <span class="comment">// Check whether an operation has been selected.
+            </span><span class="kw">let </span>sel = Selected::from(<span class="self">self</span>.inner.select.load(Ordering::Acquire));
+            <span class="kw">if </span>sel != Selected::Waiting {
+                <span class="kw">return </span>sel;
             }
 
-            <span class="comment">// If there&#39;s a deadline, park the current thread until the deadline is reached.</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">end</span>) <span class="op">=</span> <span class="ident">deadline</span> {
-                <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
+            <span class="comment">// If there&#39;s a deadline, park the current thread until the deadline is reached.
+            </span><span class="kw">if let </span><span class="prelude-val">Some</span>(end) = deadline {
+                <span class="kw">let </span>now = Instant::now();
 
-                <span class="kw">if</span> <span class="ident">now</span> <span class="op">&lt;</span> <span class="ident">end</span> {
-                    <span class="ident">thread::park_timeout</span>(<span class="ident">end</span> <span class="op">-</span> <span class="ident">now</span>);
-                } <span class="kw">else</span> {
-                    <span class="comment">// The deadline has been reached. Try aborting select.</span>
-                    <span class="kw">return</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">try_select</span>(<span class="ident">Selected::Aborted</span>) {
-                        <span class="prelude-val">Ok</span>(()) =&gt; <span class="ident">Selected::Aborted</span>,
-                        <span class="prelude-val">Err</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>,
+                <span class="kw">if </span>now &lt; end {
+                    thread::park_timeout(end - now);
+                } <span class="kw">else </span>{
+                    <span class="comment">// The deadline has been reached. Try aborting select.
+                    </span><span class="kw">return match </span><span class="self">self</span>.try_select(Selected::Aborted) {
+                        <span class="prelude-val">Ok</span>(()) =&gt; Selected::Aborted,
+                        <span class="prelude-val">Err</span>(s) =&gt; s,
                     };
                 }
-            } <span class="kw">else</span> {
-                <span class="ident">thread::park</span>();
+            } <span class="kw">else </span>{
+                thread::park();
             }
         }
     }
 
-    <span class="doccomment">/// Unparks the thread this context belongs to.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unpark</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">thread</span>.<span class="ident">unpark</span>();
+    <span class="doccomment">/// Unparks the thread this context belongs to.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>unpark(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="self">self</span>.inner.thread.unpark();
     }
 
-    <span class="doccomment">/// Returns the id of the thread this context belongs to.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">thread_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ThreadId</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">thread_id</span>
+    <span class="doccomment">/// Returns the id of the thread this context belongs to.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>thread_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ThreadId {
+        <span class="self">self</span>.inner.thread_id
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="crossbeam_channel" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="crossbeam_channel" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

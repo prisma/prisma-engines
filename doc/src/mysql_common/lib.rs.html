@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mysql_common/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mysql_common/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -282,289 +282,289 @@
 <span id="282">282</span>
 <span id="283">283</span>
 <span id="284">284</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2017 Anatoly Ikorsky</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2017 Anatoly Ikorsky
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="doccomment">//! This crate is an implementation of basic MySql protocol primitives.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This crate:</span>
-<span class="doccomment">//! * defines basic MySql constants;</span>
-<span class="doccomment">//! * implements necessary functionality for MySql `cached_sha2_password`,</span>
-<span class="doccomment">//!   `mysql_native_password` and legacy authentication plugins;</span>
-<span class="doccomment">//! * implements helper traits for MySql protocol IO;</span>
-<span class="doccomment">//! * implements support of named parameters for prepared statements;</span>
-<span class="doccomment">//! * implements parsers for a subset of MySql protocol packets (including binlog packets);</span>
-<span class="doccomment">//! * defines rust representation of MySql protocol value and row;</span>
-<span class="doccomment">//! * implements conversion between MySql values and rust types, between MySql rows and tuples</span>
-<span class="doccomment">//!   of rust types.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Supported rust types</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Crate offers conversion from/to MySql values for following types (please see MySql documentation</span>
-<span class="doccomment">//! on supported ranges for numeric types). Following table refers to MySql protocol types</span>
-<span class="doccomment">//! (see `Value` struct) and not to MySql column types. Please see [MySql documentation][1] for</span>
-<span class="doccomment">//! column and protocol type correspondence:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! | Type                                 | Notes                                                     |</span>
-<span class="doccomment">//! | ------------------------------------ | -------------------------------------------------------   |</span>
-<span class="doccomment">//! | `{i,u}8..{i,u}128`, `{i,u}size`      | MySql int/uint will be converted, bytes will be parsed.&lt;br&gt;⚠️ Note that range of `{i,u}128` is greater than supported by MySql integer types but it&#39;ll be serialized anyway (as decimal bytes string). |</span>
-<span class="doccomment">//! | `f32`                                | MySql float will be converted to `f32`, bytes will be parsed as `f32`.&lt;br&gt;⚠️ MySql double won&#39;t be converted to `f32` to avoid precision loss (see #17) |</span>
-<span class="doccomment">//! | `f64`                                | MySql float and double will be converted to `f64`, bytes will be parsed as `f64`. |</span>
-<span class="doccomment">//! | `bool`                               | MySql int {`0`, `1`} or bytes {`&quot;0x30&quot;`, `&quot;0x31&quot;`}        |</span>
-<span class="doccomment">//! | `Vec&lt;u8&gt;`                            | MySql bytes                                               |</span>
-<span class="doccomment">//! | `String`                             | MySql bytes parsed as utf8                                |</span>
-<span class="doccomment">//! | `Duration` (`std` and `time`)        | MySql time or bytes parsed as MySql time string           |</span>
-<span class="doccomment">//! | [`time::PrimitiveDateTime`] (v0.2.x) | MySql date time or bytes parsed as MySql date time string (⚠️ lossy! microseconds are ignored)           |</span>
-<span class="doccomment">//! | [`time::Date`] (v0.2.x)              | MySql date or bytes parsed as MySql date string (⚠️ lossy! microseconds are ignored)           |</span>
-<span class="doccomment">//! | [`time::Time`] (v0.2.x)              | MySql time or bytes parsed as MySql time string (⚠️ lossy! microseconds are ignored)           |</span>
-<span class="doccomment">//! | [`time::Duration`] (v0.2.x)          | MySql time or bytes parsed as MySql time string           |</span>
-<span class="doccomment">//! | [`time::PrimitiveDateTime`] (v0.3.x) | MySql date time or bytes parsed as MySql date time string (⚠️ lossy! microseconds are ignored)           |</span>
-<span class="doccomment">//! | [`time::Date`] (v0.3.x)              | MySql date or bytes parsed as MySql date string (⚠️ lossy! microseconds are ignored)           |</span>
-<span class="doccomment">//! | [`time::Time`] (v0.3.x)              | MySql time or bytes parsed as MySql time string (⚠️ lossy! microseconds are ignored)           |</span>
-<span class="doccomment">//! | [`time::Duration`] (v0.3.x)          | MySql time or bytes parsed as MySql time string           |</span>
-<span class="doccomment">//! | [`chrono::NaiveTime`]                | MySql date or bytes parsed as MySql date string           |</span>
-<span class="doccomment">//! | [`chrono::NaiveDate`]                | MySql date or bytes parsed as MySql date string           |</span>
-<span class="doccomment">//! | [`chrono::NaiveDateTime`]            | MySql date or bytes parsed as MySql date string           |</span>
-<span class="doccomment">//! | [`uuid::Uuid`]                       | MySql bytes parsed using `Uuid::from_slice`               |</span>
-<span class="doccomment">//! | [`serde_json::Value`]                | MySql bytes parsed using `serde_json::from_str`           |</span>
-<span class="doccomment">//! | `mysql_common::Deserialized&lt;T : DeserializeOwned&gt;` | MySql bytes parsed using `serde_json::from_str` |</span>
-<span class="doccomment">//! | `Option&lt;T: FromValue&gt;`               | Must be used for nullable columns to avoid errors         |</span>
-<span class="doccomment">//! | [`decimal::Decimal`]                 | MySql int, uint or bytes parsed using `Decimal::from_str`.&lt;br&gt;⚠️ Note that this type doesn&#39;t support full range of MySql `DECIMAL` type. |</span>
-<span class="doccomment">//! | [`bigdecimal::BigDecimal`] (v0.2.x)  | MySql int, uint, floats or bytes parsed using `BigDecimal::parse_bytes`.&lt;br&gt;⚠️ Note that range of this type is greater than supported by MySql `DECIMAL` type but it&#39;ll be serialized anyway. |</span>
-<span class="doccomment">//! | [`bigdecimal::BigDecimal`] (v0.3.x)  | MySql int, uint, floats or bytes parsed using `BigDecimal::parse_bytes`.&lt;br&gt;⚠️ Note that range of this type is greater than supported by MySql `DECIMAL` type but it&#39;ll be serialized anyway. |</span>
-<span class="doccomment">//! | `num_bigint::{BigInt, BigUint}`      | MySql int, uint or bytes parsed using `_::parse_bytes`.&lt;br&gt;⚠️ Note that range of this type is greater than supported by MySql integer types but it&#39;ll be serialized anyway (as decimal bytes string). |</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Also crate provides from-row convertion for the following list of types (see `FromRow` trait):</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! | Type                                            | Notes                                             |</span>
-<span class="doccomment">//! | ----------------------------------------------- | ------------------------------------------------- |</span>
-<span class="doccomment">//! | `Row`                                           | Trivial conversion for `Row` itself.              |</span>
-<span class="doccomment">//! | `T: FromValue`                                  | For rows with a single column.                    |</span>
-<span class="doccomment">//! | `(T1: FromValue [, ..., T12: FromValue])`       | Row to a tuple of arity 1-12.                     |</span>
-<span class="doccomment">//! | [`frunk::Hlist!`] types                         | Usefull to overcome tuple arity limitation        |</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Crate features</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! | Feature        | Description                                 | Default |</span>
-<span class="doccomment">//! | -------------- | ------------------------------------------- | ------- |</span>
-<span class="doccomment">//! | `bigdecimal`   | Enables `bigdecimal` v0.2.x types support   | 🔴      |</span>
-<span class="doccomment">//! | `bigdecimal03` | Enables `bigdecimal` v0.3.x types support   | 🟢      |</span>
-<span class="doccomment">//! | `chrono`       | Enables `chrono` types support              | 🔴      |</span>
-<span class="doccomment">//! | `rust_decimal` | Enables `rust_decimal` types support        | 🟢      |</span>
-<span class="doccomment">//! | `time`         | Enables `time` v0.2.x types support         | 🔴      |</span>
-<span class="doccomment">//! | `time03`       | Enables `time` v0.3.x types support         | 🟢      |</span>
-<span class="doccomment">//! | `uuid`         | Enables `Uuid` type support                 | 🟢      |</span>
-<span class="doccomment">//! | `frunk`        | Enables `FromRow` for `frunk::Hlist!` types | 🟢      |</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [1]: https://dev.mysql.com/doc/internals/en/binary-protocol-value.html</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>, <span class="ident">feature</span>(<span class="ident">test</span>, <span class="ident">const_fn</span>))]</span>
+</span><span class="doccomment">//! This crate is an implementation of basic MySql protocol primitives.
+//!
+//! This crate:
+//! * defines basic MySql constants;
+//! * implements necessary functionality for MySql `cached_sha2_password`,
+//!   `mysql_native_password` and legacy authentication plugins;
+//! * implements helper traits for MySql protocol IO;
+//! * implements support of named parameters for prepared statements;
+//! * implements parsers for a subset of MySql protocol packets (including binlog packets);
+//! * defines rust representation of MySql protocol value and row;
+//! * implements conversion between MySql values and rust types, between MySql rows and tuples
+//!   of rust types.
+//!
+//! ## Supported rust types
+//!
+//! Crate offers conversion from/to MySql values for following types (please see MySql documentation
+//! on supported ranges for numeric types). Following table refers to MySql protocol types
+//! (see `Value` struct) and not to MySql column types. Please see [MySql documentation][1] for
+//! column and protocol type correspondence:
+//!
+//! | Type                                 | Notes                                                     |
+//! | ------------------------------------ | -------------------------------------------------------   |
+//! | `{i,u}8..{i,u}128`, `{i,u}size`      | MySql int/uint will be converted, bytes will be parsed.&lt;br&gt;⚠️ Note that range of `{i,u}128` is greater than supported by MySql integer types but it&#39;ll be serialized anyway (as decimal bytes string). |
+//! | `f32`                                | MySql float will be converted to `f32`, bytes will be parsed as `f32`.&lt;br&gt;⚠️ MySql double won&#39;t be converted to `f32` to avoid precision loss (see #17) |
+//! | `f64`                                | MySql float and double will be converted to `f64`, bytes will be parsed as `f64`. |
+//! | `bool`                               | MySql int {`0`, `1`} or bytes {`&quot;0x30&quot;`, `&quot;0x31&quot;`}        |
+//! | `Vec&lt;u8&gt;`                            | MySql bytes                                               |
+//! | `String`                             | MySql bytes parsed as utf8                                |
+//! | `Duration` (`std` and `time`)        | MySql time or bytes parsed as MySql time string           |
+//! | [`time::PrimitiveDateTime`] (v0.2.x) | MySql date time or bytes parsed as MySql date time string (⚠️ lossy! microseconds are ignored)           |
+//! | [`time::Date`] (v0.2.x)              | MySql date or bytes parsed as MySql date string (⚠️ lossy! microseconds are ignored)           |
+//! | [`time::Time`] (v0.2.x)              | MySql time or bytes parsed as MySql time string (⚠️ lossy! microseconds are ignored)           |
+//! | [`time::Duration`] (v0.2.x)          | MySql time or bytes parsed as MySql time string           |
+//! | [`time::PrimitiveDateTime`] (v0.3.x) | MySql date time or bytes parsed as MySql date time string (⚠️ lossy! microseconds are ignored)           |
+//! | [`time::Date`] (v0.3.x)              | MySql date or bytes parsed as MySql date string (⚠️ lossy! microseconds are ignored)           |
+//! | [`time::Time`] (v0.3.x)              | MySql time or bytes parsed as MySql time string (⚠️ lossy! microseconds are ignored)           |
+//! | [`time::Duration`] (v0.3.x)          | MySql time or bytes parsed as MySql time string           |
+//! | [`chrono::NaiveTime`]                | MySql date or bytes parsed as MySql date string           |
+//! | [`chrono::NaiveDate`]                | MySql date or bytes parsed as MySql date string           |
+//! | [`chrono::NaiveDateTime`]            | MySql date or bytes parsed as MySql date string           |
+//! | [`uuid::Uuid`]                       | MySql bytes parsed using `Uuid::from_slice`               |
+//! | [`serde_json::Value`]                | MySql bytes parsed using `serde_json::from_str`           |
+//! | `mysql_common::Deserialized&lt;T : DeserializeOwned&gt;` | MySql bytes parsed using `serde_json::from_str` |
+//! | `Option&lt;T: FromValue&gt;`               | Must be used for nullable columns to avoid errors         |
+//! | [`decimal::Decimal`]                 | MySql int, uint or bytes parsed using `Decimal::from_str`.&lt;br&gt;⚠️ Note that this type doesn&#39;t support full range of MySql `DECIMAL` type. |
+//! | [`bigdecimal::BigDecimal`] (v0.2.x)  | MySql int, uint, floats or bytes parsed using `BigDecimal::parse_bytes`.&lt;br&gt;⚠️ Note that range of this type is greater than supported by MySql `DECIMAL` type but it&#39;ll be serialized anyway. |
+//! | [`bigdecimal::BigDecimal`] (v0.3.x)  | MySql int, uint, floats or bytes parsed using `BigDecimal::parse_bytes`.&lt;br&gt;⚠️ Note that range of this type is greater than supported by MySql `DECIMAL` type but it&#39;ll be serialized anyway. |
+//! | `num_bigint::{BigInt, BigUint}`      | MySql int, uint or bytes parsed using `_::parse_bytes`.&lt;br&gt;⚠️ Note that range of this type is greater than supported by MySql integer types but it&#39;ll be serialized anyway (as decimal bytes string). |
+//!
+//! Also crate provides from-row convertion for the following list of types (see `FromRow` trait):
+//!
+//! | Type                                            | Notes                                             |
+//! | ----------------------------------------------- | ------------------------------------------------- |
+//! | `Row`                                           | Trivial conversion for `Row` itself.              |
+//! | `T: FromValue`                                  | For rows with a single column.                    |
+//! | `(T1: FromValue [, ..., T12: FromValue])`       | Row to a tuple of arity 1-12.                     |
+//! | [`frunk::Hlist!`] types                         | Usefull to overcome tuple arity limitation        |
+//!
+//! ### Crate features
+//!
+//! | Feature        | Description                                 | Default |
+//! | -------------- | ------------------------------------------- | ------- |
+//! | `bigdecimal`   | Enables `bigdecimal` v0.2.x types support   | 🔴      |
+//! | `bigdecimal03` | Enables `bigdecimal` v0.3.x types support   | 🟢      |
+//! | `chrono`       | Enables `chrono` types support              | 🔴      |
+//! | `rust_decimal` | Enables `rust_decimal` types support        | 🟢      |
+//! | `time`         | Enables `time` v0.2.x types support         | 🔴      |
+//! | `time03`       | Enables `time` v0.3.x types support         | 🟢      |
+//! | `uuid`         | Enables `Uuid` type support                 | 🟢      |
+//! | `frunk`        | Enables `FromRow` for `frunk::Hlist!` types | 🟢      |
+//!
+//! [1]: https://dev.mysql.com/doc/internals/en/binary-protocol-value.html
+</span><span class="attribute">#![cfg_attr(feature = <span class="string">&quot;nightly&quot;</span>, feature(test, const_fn))]
 
-<span class="comment">// The `test` feature is required to compile tests.</span>
-<span class="comment">// It&#39;ll bind test binaries to an official C++ impl of MySql decimals (see build.rs)</span>
-<span class="comment">// The idea is to test our rust impl agaist C++ impl.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;test&quot;</span>), <span class="ident">test</span>))]</span>
-<span class="macro">compile_error!</span>(<span class="string">&quot;Please invoke `cargo test` with `--features test` flags&quot;</span>);
+</span><span class="comment">// The `test` feature is required to compile tests.
+// It&#39;ll bind test binaries to an official C++ impl of MySql decimals (see build.rs)
+// The idea is to test our rust impl agaist C++ impl.
+</span><span class="attribute">#[cfg(all(not(feature = <span class="string">&quot;test&quot;</span>), test))]
+</span><span class="macro">compile_error!</span>(<span class="string">&quot;Please invoke `cargo test` with `--features test` flags&quot;</span>);
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>)]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">test</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;nightly&quot;</span>)]
+</span><span class="kw">extern crate </span>test;
 
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">bitflags_ext</span>;
+<span class="attribute">#[macro_use]
+</span><span class="kw">pub mod </span>bitflags_ext;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bigdecimal&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">bigdecimal</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;bigdecimal&quot;</span>)]
+</span><span class="kw">pub use </span>bigdecimal;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bigdecimal03&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">bigdecimal03</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;bigdecimal03&quot;</span>)]
+</span><span class="kw">pub use </span>bigdecimal03;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;chrono&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">chrono</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;chrono&quot;</span>)]
+</span><span class="kw">pub use </span>chrono;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;frunk&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">frunk</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;frunk&quot;</span>)]
+</span><span class="kw">pub use </span>frunk;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rust_decimal&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">rust_decimal</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;rust_decimal&quot;</span>)]
+</span><span class="kw">pub use </span>rust_decimal;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">time</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;time&quot;</span>)]
+</span><span class="kw">pub use </span>time;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;time03&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">time03</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;time03&quot;</span>)]
+</span><span class="kw">pub use </span>time03;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">uuid</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
+</span><span class="kw">pub use </span>uuid;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">num_bigint</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">serde</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">serde_json</span>;
+<span class="kw">pub use </span>num_bigint;
+<span class="kw">pub use </span>serde;
+<span class="kw">pub use </span>serde_json;
 
-<span class="doccomment">/// This macro is a convenient way to pass named parameters to a statement.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```ignore</span>
-<span class="doccomment">/// let foo = 42;</span>
-<span class="doccomment">/// conn.prep_exec(&quot;SELECT :foo, :foo2x&quot;, params! {</span>
-<span class="doccomment">///     foo,</span>
-<span class="doccomment">///     &quot;foo2x&quot; =&gt; foo * 2,</span>
-<span class="doccomment">/// });</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">params</span> {
+<span class="doccomment">/// This macro is a convenient way to pass named parameters to a statement.
+///
+/// ```ignore
+/// let foo = 42;
+/// conn.prep_exec(&quot;SELECT :foo, :foo2x&quot;, params! {
+///     foo,
+///     &quot;foo2x&quot; =&gt; foo * 2,
+/// });
+/// ```
+</span><span class="attribute">#[macro_export]
+</span><span class="macro">macro_rules! </span>params {
     () =&gt; {};
-    (@<span class="ident">to_pair</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">expr</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span>) =&gt; (
-        <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>.<span class="ident">entry</span>(<span class="ident">std::vec::Vec</span>::<span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="ident">::from</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>));
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">std::collections::hash_map::Entry::Occupied</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="ident">entry</span> {
-            <span class="macro">panic!</span>(<span class="string">&quot;Redefinition of named parameter `{}&#39;&quot;</span>, <span class="ident">std::string::String::from_utf8_lossy</span>(<span class="ident">entry</span>.<span class="ident">key</span>()));
-        } <span class="kw">else</span> {
-            <span class="ident">entry</span>.<span class="ident">or_insert</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::value::Value::from</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>));
+    (@to_pair <span class="macro-nonterminal">$map</span>:expr, <span class="macro-nonterminal">$name</span>:expr =&gt; <span class="macro-nonterminal">$value</span>:expr) =&gt; (
+        <span class="kw">let </span>entry = <span class="macro-nonterminal">$map</span>.entry(std::vec::Vec::&lt;u8&gt;::from(<span class="macro-nonterminal">$name</span>));
+        <span class="kw">if let </span>std::collections::hash_map::Entry::Occupied(<span class="kw">_</span>) = entry {
+            <span class="macro">panic!</span>(<span class="string">&quot;Redefinition of named parameter `{}&#39;&quot;</span>, std::string::String::from_utf8_lossy(entry.key()));
+        } <span class="kw">else </span>{
+            entry.or_insert(<span class="macro-nonterminal">$crate::value::Value::from</span>(<span class="macro-nonterminal">$value</span>));
         }
     );
-    (@<span class="ident">to_pair</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>) =&gt; (
-        <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>.<span class="ident">entry</span>(<span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>).<span class="ident">as_bytes</span>().<span class="ident">to_vec</span>());
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">std::collections::hash_map::Entry::Occupied</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="ident">entry</span> {
-            <span class="macro">panic!</span>(<span class="string">&quot;Redefinition of named parameter `{}&#39;&quot;</span>, <span class="ident">std::string::String::from_utf8_lossy</span>(<span class="ident">entry</span>.<span class="ident">key</span>()));
-        } <span class="kw">else</span> {
-            <span class="ident">entry</span>.<span class="ident">or_insert</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::value::Value::from</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>));
+    (@to_pair <span class="macro-nonterminal">$map</span>:expr, <span class="macro-nonterminal">$name</span>:ident) =&gt; (
+        <span class="kw">let </span>entry = <span class="macro-nonterminal">$map</span>.entry(<span class="macro">stringify!</span>(<span class="macro-nonterminal">$name</span>).as_bytes().to_vec());
+        <span class="kw">if let </span>std::collections::hash_map::Entry::Occupied(<span class="kw">_</span>) = entry {
+            <span class="macro">panic!</span>(<span class="string">&quot;Redefinition of named parameter `{}&#39;&quot;</span>, std::string::String::from_utf8_lossy(entry.key()));
+        } <span class="kw">else </span>{
+            entry.or_insert(<span class="macro-nonterminal">$crate::value::Value::from</span>(<span class="macro-nonterminal">$name</span>));
         }
     );
-    (@<span class="ident">expand</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>:<span class="ident">expr</span>;) =&gt; {};
-    (@<span class="ident">expand</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>:<span class="ident">expr</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">expr</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro">params!</span>(@<span class="ident">to_pair</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>);
-        <span class="macro">params!</span>(@<span class="ident">expand</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="kw-2">*</span>);
+    (@expand <span class="macro-nonterminal">$map</span>:expr;) =&gt; {};
+    (@expand <span class="macro-nonterminal">$map</span>:expr; <span class="macro-nonterminal">$name</span>:expr =&gt; <span class="macro-nonterminal">$value</span>:expr, $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro">params!</span>(@to_pair <span class="macro-nonterminal">$map</span>, <span class="macro-nonterminal">$name </span>=&gt; <span class="macro-nonterminal">$value</span>);
+        <span class="macro">params!</span>(@expand <span class="macro-nonterminal">$map</span>; $(<span class="macro-nonterminal">$tail</span>)<span class="kw-2">*</span>);
     };
-    (@<span class="ident">expand</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>:<span class="ident">expr</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">expr</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro">params!</span>(@<span class="ident">to_pair</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>);
-        <span class="macro">params!</span>(@<span class="ident">expand</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="kw-2">*</span>);
+    (@expand <span class="macro-nonterminal">$map</span>:expr; <span class="macro-nonterminal">$name</span>:expr =&gt; <span class="macro-nonterminal">$value</span>:expr $(, <span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro">params!</span>(@to_pair <span class="macro-nonterminal">$map</span>, <span class="macro-nonterminal">$name </span>=&gt; <span class="macro-nonterminal">$value</span>);
+        <span class="macro">params!</span>(@expand <span class="macro-nonterminal">$map</span>; $(<span class="macro-nonterminal">$tail</span>)<span class="kw-2">*</span>);
     };
-    (@<span class="ident">expand</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>:<span class="ident">expr</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro">params!</span>(@<span class="ident">to_pair</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>);
-        <span class="macro">params!</span>(@<span class="ident">expand</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="kw-2">*</span>);
+    (@expand <span class="macro-nonterminal">$map</span>:expr; <span class="macro-nonterminal">$name</span>:ident, $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro">params!</span>(@to_pair <span class="macro-nonterminal">$map</span>, <span class="macro-nonterminal">$name</span>);
+        <span class="macro">params!</span>(@expand <span class="macro-nonterminal">$map</span>; $(<span class="macro-nonterminal">$tail</span>)<span class="kw-2">*</span>);
     };
-    (@<span class="ident">expand</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>:<span class="ident">expr</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro">params!</span>(@<span class="ident">to_pair</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>);
-        <span class="macro">params!</span>(@<span class="ident">expand</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="kw-2">*</span>);
+    (@expand <span class="macro-nonterminal">$map</span>:expr; <span class="macro-nonterminal">$name</span>:ident $(, <span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro">params!</span>(@to_pair <span class="macro-nonterminal">$map</span>, <span class="macro-nonterminal">$name</span>);
+        <span class="macro">params!</span>(@expand <span class="macro-nonterminal">$map</span>; $(<span class="macro-nonterminal">$tail</span>)<span class="kw-2">*</span>);
     };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">ident</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
+    (<span class="macro-nonterminal">$i</span>:ident, $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; {
         {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span>: <span class="ident">std::collections::HashMap</span><span class="op">&lt;</span><span class="ident">std::vec::Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::value::Value</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::default::Default::default</span>();
-            <span class="macro">params!</span>(@<span class="ident">expand</span> (<span class="kw-2">&amp;mut</span> <span class="ident">map</span>); <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="kw-2">*</span>);
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::params::Params::Named</span>(<span class="ident">map</span>)
+            <span class="kw">let </span><span class="kw-2">mut </span>map: std::collections::HashMap&lt;std::vec::Vec&lt;u8&gt;, <span class="macro-nonterminal">$crate::value::Value</span>, <span class="kw">_</span>&gt; = std::default::Default::default();
+            <span class="macro">params!</span>(@expand (<span class="kw-2">&amp;mut </span>map); <span class="macro-nonterminal">$i</span>, $(<span class="macro-nonterminal">$tail</span>)<span class="kw-2">*</span>);
+            <span class="macro-nonterminal">$crate::params::Params::Named</span>(map)
         }
     };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">expr</span> =&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
+    (<span class="macro-nonterminal">$i</span>:expr =&gt; $(<span class="macro-nonterminal">$tail</span>:tt)<span class="kw-2">*</span>) =&gt; {
         {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span>: <span class="ident">std::collections::HashMap</span><span class="op">&lt;</span><span class="ident">std::vec::Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::value::Value</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::default::Default::default</span>();
-            <span class="macro">params!</span>(@<span class="ident">expand</span> (<span class="kw-2">&amp;mut</span> <span class="ident">map</span>); <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span> =&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>)<span class="kw-2">*</span>);
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::params::Params::Named</span>(<span class="ident">map</span>)
+            <span class="kw">let </span><span class="kw-2">mut </span>map: std::collections::HashMap&lt;std::vec::Vec&lt;u8&gt;, <span class="macro-nonterminal">$crate::value::Value</span>, <span class="kw">_</span>&gt; = std::default::Default::default();
+            <span class="macro">params!</span>(@expand (<span class="kw-2">&amp;mut </span>map); <span class="macro-nonterminal">$i </span>=&gt; $(<span class="macro-nonterminal">$tail</span>)<span class="kw-2">*</span>);
+            <span class="macro-nonterminal">$crate::params::Params::Named</span>(map)
         }
     };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">ident</span>) =&gt; {
+    (<span class="macro-nonterminal">$i</span>:ident) =&gt; {
         {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span>: <span class="ident">std::collections::HashMap</span><span class="op">&lt;</span><span class="ident">std::vec::Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::value::Value</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::default::Default::default</span>();
-            <span class="macro">params!</span>(@<span class="ident">expand</span> (<span class="kw-2">&amp;mut</span> <span class="ident">map</span>); <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>);
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::params::Params::Named</span>(<span class="ident">map</span>)
+            <span class="kw">let </span><span class="kw-2">mut </span>map: std::collections::HashMap&lt;std::vec::Vec&lt;u8&gt;, <span class="macro-nonterminal">$crate::value::Value</span>, <span class="kw">_</span>&gt; = std::default::Default::default();
+            <span class="macro">params!</span>(@expand (<span class="kw-2">&amp;mut </span>map); <span class="macro-nonterminal">$i</span>);
+            <span class="macro-nonterminal">$crate::params::Params::Named</span>(map)
         }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">constants</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">crypto</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">io</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">misc</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">named_params</span>;
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">packets</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">params</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">proto</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">row</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">scramble</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">value</span>;
+<span class="kw">pub mod </span>constants;
+<span class="kw">pub mod </span>crypto;
+<span class="kw">pub mod </span>io;
+<span class="kw">pub mod </span>misc;
+<span class="kw">pub mod </span>named_params;
+<span class="attribute">#[macro_use]
+</span><span class="kw">pub mod </span>packets;
+<span class="kw">pub mod </span>params;
+<span class="kw">pub mod </span>proto;
+<span class="kw">pub mod </span>row;
+<span class="kw">pub mod </span>scramble;
+<span class="kw">pub mod </span>value;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">binlog</span>;
+<span class="kw">pub mod </span>binlog;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">params_macro_test</span>() {
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">params::Params</span>, <span class="ident">value::Value</span>};
+<span class="attribute">#[cfg(test)]
+#[test]
+</span><span class="kw">fn </span>params_macro_test() {
+    <span class="kw">use crate</span>::{params::Params, value::Value};
 
-    <span class="kw">let</span> <span class="ident">foo</span> <span class="op">=</span> <span class="number">42</span>;
-    <span class="kw">let</span> <span class="ident">bar</span> <span class="op">=</span> <span class="string">&quot;bar&quot;</span>;
+    <span class="kw">let </span>foo = <span class="number">42</span>;
+    <span class="kw">let </span>bar = <span class="string">&quot;bar&quot;</span>;
 
     <span class="macro">assert_eq!</span>(
-        <span class="ident">Params::from</span>(<span class="macro">vec!</span>[(<span class="ident">String::from</span>(<span class="string">&quot;foo&quot;</span>), <span class="ident">Value::Int</span>(<span class="number">42</span>))]),
-        <span class="macro">params!</span> { <span class="ident">foo</span> }
+        Params::from(<span class="macro">vec!</span>[(String::from(<span class="string">&quot;foo&quot;</span>), Value::Int(<span class="number">42</span>))]),
+        <span class="macro">params! </span>{ foo }
     );
     <span class="macro">assert_eq!</span>(
-        <span class="ident">Params::from</span>(<span class="macro">vec!</span>[(<span class="ident">String::from</span>(<span class="string">&quot;foo&quot;</span>), <span class="ident">Value::Int</span>(<span class="number">42</span>))]),
-        <span class="macro">params!</span> { <span class="ident">foo</span>, }
+        Params::from(<span class="macro">vec!</span>[(String::from(<span class="string">&quot;foo&quot;</span>), Value::Int(<span class="number">42</span>))]),
+        <span class="macro">params! </span>{ foo, }
     );
     <span class="macro">assert_eq!</span>(
-        <span class="ident">Params::from</span>(<span class="macro">vec!</span>[
-            (<span class="ident">String::from</span>(<span class="string">&quot;foo&quot;</span>), <span class="ident">Value::Int</span>(<span class="number">42</span>)),
-            (<span class="ident">String::from</span>(<span class="string">&quot;bar&quot;</span>), <span class="ident">Value::Bytes</span>((<span class="kw-2">&amp;</span><span class="string">b&quot;bar&quot;</span>[..]).<span class="ident">into</span>())),
+        Params::from(<span class="macro">vec!</span>[
+            (String::from(<span class="string">&quot;foo&quot;</span>), Value::Int(<span class="number">42</span>)),
+            (String::from(<span class="string">&quot;bar&quot;</span>), Value::Bytes((<span class="kw-2">&amp;</span><span class="string">b&quot;bar&quot;</span>[..]).into())),
         ]),
-        <span class="macro">params!</span> { <span class="ident">foo</span>, <span class="ident">bar</span> }
+        <span class="macro">params! </span>{ foo, bar }
     );
     <span class="macro">assert_eq!</span>(
-        <span class="ident">Params::from</span>(<span class="macro">vec!</span>[
-            (<span class="ident">String::from</span>(<span class="string">&quot;foo&quot;</span>), <span class="ident">Value::Int</span>(<span class="number">42</span>)),
-            (<span class="ident">String::from</span>(<span class="string">&quot;bar&quot;</span>), <span class="ident">Value::Bytes</span>((<span class="kw-2">&amp;</span><span class="string">b&quot;bar&quot;</span>[..]).<span class="ident">into</span>())),
+        Params::from(<span class="macro">vec!</span>[
+            (String::from(<span class="string">&quot;foo&quot;</span>), Value::Int(<span class="number">42</span>)),
+            (String::from(<span class="string">&quot;bar&quot;</span>), Value::Bytes((<span class="kw-2">&amp;</span><span class="string">b&quot;bar&quot;</span>[..]).into())),
         ]),
-        <span class="macro">params!</span> { <span class="ident">foo</span>, <span class="ident">bar</span>, }
+        <span class="macro">params! </span>{ foo, bar, }
     );
     <span class="macro">assert_eq!</span>(
-        <span class="ident">Params::from</span>(<span class="macro">vec!</span>[
-            (<span class="ident">String::from</span>(<span class="string">&quot;foo&quot;</span>), <span class="ident">Value::Int</span>(<span class="number">42</span>)),
-            (<span class="ident">String::from</span>(<span class="string">&quot;bar&quot;</span>), <span class="ident">Value::Bytes</span>((<span class="kw-2">&amp;</span><span class="string">b&quot;bar&quot;</span>[..]).<span class="ident">into</span>())),
+        Params::from(<span class="macro">vec!</span>[
+            (String::from(<span class="string">&quot;foo&quot;</span>), Value::Int(<span class="number">42</span>)),
+            (String::from(<span class="string">&quot;bar&quot;</span>), Value::Bytes((<span class="kw-2">&amp;</span><span class="string">b&quot;bar&quot;</span>[..]).into())),
         ]),
-        <span class="macro">params!</span> { <span class="string">&quot;foo&quot;</span> =&gt; <span class="ident">foo</span>, <span class="string">&quot;bar&quot;</span> =&gt; <span class="ident">bar</span> }
+        <span class="macro">params! </span>{ <span class="string">&quot;foo&quot; </span>=&gt; foo, <span class="string">&quot;bar&quot; </span>=&gt; bar }
     );
     <span class="macro">assert_eq!</span>(
-        <span class="ident">Params::from</span>(<span class="macro">vec!</span>[
-            (<span class="ident">String::from</span>(<span class="string">&quot;foo&quot;</span>), <span class="ident">Value::Int</span>(<span class="number">42</span>)),
-            (<span class="ident">String::from</span>(<span class="string">&quot;bar&quot;</span>), <span class="ident">Value::Bytes</span>((<span class="kw-2">&amp;</span><span class="string">b&quot;bar&quot;</span>[..]).<span class="ident">into</span>())),
+        Params::from(<span class="macro">vec!</span>[
+            (String::from(<span class="string">&quot;foo&quot;</span>), Value::Int(<span class="number">42</span>)),
+            (String::from(<span class="string">&quot;bar&quot;</span>), Value::Bytes((<span class="kw-2">&amp;</span><span class="string">b&quot;bar&quot;</span>[..]).into())),
         ]),
-        <span class="macro">params!</span> { <span class="string">&quot;foo&quot;</span> =&gt; <span class="ident">foo</span>, <span class="string">&quot;bar&quot;</span> =&gt; <span class="ident">bar</span>, }
+        <span class="macro">params! </span>{ <span class="string">&quot;foo&quot; </span>=&gt; foo, <span class="string">&quot;bar&quot; </span>=&gt; bar, }
     );
     <span class="macro">assert_eq!</span>(
-        <span class="ident">Params::from</span>(<span class="macro">vec!</span>[
-            (<span class="ident">String::from</span>(<span class="string">&quot;foo&quot;</span>), <span class="ident">Value::Int</span>(<span class="number">42</span>)),
-            (<span class="ident">String::from</span>(<span class="string">&quot;bar&quot;</span>), <span class="ident">Value::Bytes</span>((<span class="kw-2">&amp;</span><span class="string">b&quot;bar&quot;</span>[..]).<span class="ident">into</span>())),
+        Params::from(<span class="macro">vec!</span>[
+            (String::from(<span class="string">&quot;foo&quot;</span>), Value::Int(<span class="number">42</span>)),
+            (String::from(<span class="string">&quot;bar&quot;</span>), Value::Bytes((<span class="kw-2">&amp;</span><span class="string">b&quot;bar&quot;</span>[..]).into())),
         ]),
-        <span class="macro">params!</span> { <span class="ident">foo</span>, <span class="string">&quot;bar&quot;</span> =&gt; <span class="ident">bar</span> }
+        <span class="macro">params! </span>{ foo, <span class="string">&quot;bar&quot; </span>=&gt; bar }
     );
     <span class="macro">assert_eq!</span>(
-        <span class="ident">Params::from</span>(<span class="macro">vec!</span>[
-            (<span class="ident">String::from</span>(<span class="string">&quot;foo&quot;</span>), <span class="ident">Value::Int</span>(<span class="number">42</span>)),
-            (<span class="ident">String::from</span>(<span class="string">&quot;bar&quot;</span>), <span class="ident">Value::Bytes</span>((<span class="kw-2">&amp;</span><span class="string">b&quot;bar&quot;</span>[..]).<span class="ident">into</span>())),
+        Params::from(<span class="macro">vec!</span>[
+            (String::from(<span class="string">&quot;foo&quot;</span>), Value::Int(<span class="number">42</span>)),
+            (String::from(<span class="string">&quot;bar&quot;</span>), Value::Bytes((<span class="kw-2">&amp;</span><span class="string">b&quot;bar&quot;</span>[..]).into())),
         ]),
-        <span class="macro">params!</span> { <span class="string">&quot;foo&quot;</span> =&gt; <span class="ident">foo</span>, <span class="ident">bar</span> }
+        <span class="macro">params! </span>{ <span class="string">&quot;foo&quot; </span>=&gt; foo, bar }
     );
     <span class="macro">assert_eq!</span>(
-        <span class="ident">Params::from</span>(<span class="macro">vec!</span>[
-            (<span class="ident">String::from</span>(<span class="string">&quot;foo&quot;</span>), <span class="ident">Value::Int</span>(<span class="number">42</span>)),
-            (<span class="ident">String::from</span>(<span class="string">&quot;bar&quot;</span>), <span class="ident">Value::Bytes</span>((<span class="kw-2">&amp;</span><span class="string">b&quot;bar&quot;</span>[..]).<span class="ident">into</span>())),
+        Params::from(<span class="macro">vec!</span>[
+            (String::from(<span class="string">&quot;foo&quot;</span>), Value::Int(<span class="number">42</span>)),
+            (String::from(<span class="string">&quot;bar&quot;</span>), Value::Bytes((<span class="kw-2">&amp;</span><span class="string">b&quot;bar&quot;</span>[..]).into())),
         ]),
-        <span class="macro">params!</span> { <span class="ident">foo</span>, <span class="string">&quot;bar&quot;</span> =&gt; <span class="ident">bar</span>, }
+        <span class="macro">params! </span>{ foo, <span class="string">&quot;bar&quot; </span>=&gt; bar, }
     );
     <span class="macro">assert_eq!</span>(
-        <span class="ident">Params::from</span>(<span class="macro">vec!</span>[
-            (<span class="ident">String::from</span>(<span class="string">&quot;foo&quot;</span>), <span class="ident">Value::Int</span>(<span class="number">42</span>)),
-            (<span class="ident">String::from</span>(<span class="string">&quot;bar&quot;</span>), <span class="ident">Value::Bytes</span>((<span class="kw-2">&amp;</span><span class="string">b&quot;bar&quot;</span>[..]).<span class="ident">into</span>())),
+        Params::from(<span class="macro">vec!</span>[
+            (String::from(<span class="string">&quot;foo&quot;</span>), Value::Int(<span class="number">42</span>)),
+            (String::from(<span class="string">&quot;bar&quot;</span>), Value::Bytes((<span class="kw-2">&amp;</span><span class="string">b&quot;bar&quot;</span>[..]).into())),
         ]),
-        <span class="macro">params!</span> { <span class="string">&quot;foo&quot;</span> =&gt; <span class="ident">foo</span>, <span class="ident">bar</span>, }
+        <span class="macro">params! </span>{ <span class="string">&quot;foo&quot; </span>=&gt; foo, bar, }
     );
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="attribute">#[<span class="ident">should_panic</span>(<span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;Redefinition of named parameter `a&#39;&quot;</span>)]</span>
-<span class="kw">fn</span> <span class="ident">params_macro_should_panic_on_named_param_redefinition</span>() {
-    <span class="macro">params!</span> {<span class="string">&quot;a&quot;</span> =&gt; <span class="number">1</span>, <span class="string">&quot;b&quot;</span> =&gt; <span class="number">2</span>, <span class="string">&quot;a&quot;</span> =&gt; <span class="number">3</span>};
+<span class="attribute">#[test]
+#[should_panic(expected = <span class="string">&quot;Redefinition of named parameter `a&#39;&quot;</span>)]
+</span><span class="kw">fn </span>params_macro_should_panic_on_named_param_redefinition() {
+    <span class="macro">params! </span>{<span class="string">&quot;a&quot; </span>=&gt; <span class="number">1</span>, <span class="string">&quot;b&quot; </span>=&gt; <span class="number">2</span>, <span class="string">&quot;a&quot; </span>=&gt; <span class="number">3</span>};
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

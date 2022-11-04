@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/vte-0.10.1/src/params.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>params.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../vte/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../vte/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../vte/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/vte-0.10.1/src/params.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>params.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../vte/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../vte/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../vte/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -140,147 +140,147 @@
 <span id="140">140</span>
 <span id="141">141</span>
 <span id="142">142</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Fixed size parameters list with optional subparameters.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Fixed size parameters list with optional subparameters.
 
-<span class="kw">use</span> <span class="ident">core::fmt</span>::{<span class="self">self</span>, <span class="ident">Debug</span>, <span class="ident">Formatter</span>};
+</span><span class="kw">use </span>core::fmt::{<span class="self">self</span>, Debug, Formatter};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">MAX_PARAMS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">32</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>MAX_PARAMS: usize = <span class="number">32</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Params</span> {
-    <span class="doccomment">/// Number of subparameters for each parameter.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For each entry in the `params` slice, this stores the length of the param as number of</span>
-    <span class="doccomment">/// subparams at the same index as the param in the `params` slice.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// At the subparam positions the length will always be `0`.</span>
-    <span class="ident">subparams</span>: [<span class="ident">u8</span>; <span class="ident">MAX_PARAMS</span>],
+<span class="attribute">#[derive(Default)]
+</span><span class="kw">pub struct </span>Params {
+    <span class="doccomment">/// Number of subparameters for each parameter.
+    ///
+    /// For each entry in the `params` slice, this stores the length of the param as number of
+    /// subparams at the same index as the param in the `params` slice.
+    ///
+    /// At the subparam positions the length will always be `0`.
+    </span>subparams: [u8; MAX_PARAMS],
 
-    <span class="doccomment">/// All parameters and subparameters.</span>
-    <span class="ident">params</span>: [<span class="ident">u16</span>; <span class="ident">MAX_PARAMS</span>],
+    <span class="doccomment">/// All parameters and subparameters.
+    </span>params: [u16; MAX_PARAMS],
 
-    <span class="doccomment">/// Number of suparameters in the current parameter.</span>
-    <span class="ident">current_subparams</span>: <span class="ident">u8</span>,
+    <span class="doccomment">/// Number of suparameters in the current parameter.
+    </span>current_subparams: u8,
 
-    <span class="doccomment">/// Total number of parameters and subparameters.</span>
-    <span class="ident">len</span>: <span class="ident">usize</span>,
+    <span class="doccomment">/// Total number of parameters and subparameters.
+    </span>len: usize,
 }
 
-<span class="kw">impl</span> <span class="ident">Params</span> {
-    <span class="doccomment">/// Returns the number of parameters.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">len</span>
+<span class="kw">impl </span>Params {
+    <span class="doccomment">/// Returns the number of parameters.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.len
     }
 
-    <span class="doccomment">/// Returns `true` if there are no parameters present.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">len</span> <span class="op">==</span> <span class="number">0</span>
+    <span class="doccomment">/// Returns `true` if there are no parameters present.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.len == <span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Returns an iterator over all parameters and subparameters.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ParamsIter&lt;<span class="lifetime">&#39;_</span>&gt; {
+        ParamsIter::new(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Returns an iterator over all parameters and subparameters.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ParamsIter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">ParamsIter::new</span>(<span class="self">self</span>)
+    <span class="doccomment">/// Returns `true` if there is no more space for additional parameters.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_full(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.len == MAX_PARAMS
     }
 
-    <span class="doccomment">/// Returns `true` if there is no more space for additional parameters.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_full</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">len</span> <span class="op">==</span> <span class="ident">MAX_PARAMS</span>
+    <span class="doccomment">/// Clear all parameters.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>clear(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.current_subparams = <span class="number">0</span>;
+        <span class="self">self</span>.len = <span class="number">0</span>;
     }
 
-    <span class="doccomment">/// Clear all parameters.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">current_subparams</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="self">self</span>.<span class="ident">len</span> <span class="op">=</span> <span class="number">0</span>;
+    <span class="doccomment">/// Add an additional parameter.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>push(<span class="kw-2">&amp;mut </span><span class="self">self</span>, item: u16) {
+        <span class="self">self</span>.subparams[<span class="self">self</span>.len - <span class="self">self</span>.current_subparams <span class="kw">as </span>usize] = <span class="self">self</span>.current_subparams + <span class="number">1</span>;
+        <span class="self">self</span>.params[<span class="self">self</span>.len] = item;
+        <span class="self">self</span>.current_subparams = <span class="number">0</span>;
+        <span class="self">self</span>.len += <span class="number">1</span>;
     }
 
-    <span class="doccomment">/// Add an additional parameter.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">item</span>: <span class="ident">u16</span>) {
-        <span class="self">self</span>.<span class="ident">subparams</span>[<span class="self">self</span>.<span class="ident">len</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">current_subparams</span> <span class="kw">as</span> <span class="ident">usize</span>] <span class="op">=</span> <span class="self">self</span>.<span class="ident">current_subparams</span> <span class="op">+</span> <span class="number">1</span>;
-        <span class="self">self</span>.<span class="ident">params</span>[<span class="self">self</span>.<span class="ident">len</span>] <span class="op">=</span> <span class="ident">item</span>;
-        <span class="self">self</span>.<span class="ident">current_subparams</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="self">self</span>.<span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-    }
-
-    <span class="doccomment">/// Add an additional subparameter to the current parameter.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">extend</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">item</span>: <span class="ident">u16</span>) {
-        <span class="self">self</span>.<span class="ident">params</span>[<span class="self">self</span>.<span class="ident">len</span>] <span class="op">=</span> <span class="ident">item</span>;
-        <span class="self">self</span>.<span class="ident">current_subparams</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="self">self</span>.<span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Params</span> {
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">ParamsIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u16</span>];
-
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-        <span class="self">self</span>.<span class="ident">iter</span>()
+    <span class="doccomment">/// Add an additional subparameter to the current parameter.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>extend(<span class="kw-2">&amp;mut </span><span class="self">self</span>, item: u16) {
+        <span class="self">self</span>.params[<span class="self">self</span>.len] = item;
+        <span class="self">self</span>.current_subparams += <span class="number">1</span>;
+        <span class="self">self</span>.len += <span class="number">1</span>;
     }
 }
 
-<span class="doccomment">/// Immutable subparameter iterator.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ParamsIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Params</span>,
-    <span class="ident">index</span>: <span class="ident">usize</span>,
-}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntoIterator <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Params {
+    <span class="kw">type </span>IntoIter = ParamsIter&lt;<span class="lifetime">&#39;a</span>&gt;;
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u16];
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ParamsIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Params</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">params</span>, <span class="ident">index</span>: <span class="number">0</span> }
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+        <span class="self">self</span>.iter()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">ParamsIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u16</span>];
+<span class="doccomment">/// Immutable subparameter iterator.
+</span><span class="kw">pub struct </span>ParamsIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+    params: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Params,
+    index: usize,
+}
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">params</span>.<span class="ident">len</span>() {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ParamsIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>new(params: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Params) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ params, index: <span class="number">0 </span>}
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>ParamsIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u16];
+
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">if </span><span class="self">self</span>.index &gt;= <span class="self">self</span>.params.len() {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
 
-        <span class="comment">// Get all subparameters for the current parameter.</span>
-        <span class="kw">let</span> <span class="ident">num_subparams</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">params</span>.<span class="ident">subparams</span>[<span class="self">self</span>.<span class="ident">index</span>];
-        <span class="kw">let</span> <span class="ident">param</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">params</span>.<span class="ident">params</span>[<span class="self">self</span>.<span class="ident">index</span>..<span class="self">self</span>.<span class="ident">index</span> <span class="op">+</span> <span class="ident">num_subparams</span> <span class="kw">as</span> <span class="ident">usize</span>];
+        <span class="comment">// Get all subparameters for the current parameter.
+        </span><span class="kw">let </span>num_subparams = <span class="self">self</span>.params.subparams[<span class="self">self</span>.index];
+        <span class="kw">let </span>param = <span class="kw-2">&amp;</span><span class="self">self</span>.params.params[<span class="self">self</span>.index..<span class="self">self</span>.index + num_subparams <span class="kw">as </span>usize];
 
-        <span class="comment">// Jump to the next parameter.</span>
-        <span class="self">self</span>.<span class="ident">index</span> <span class="op">+</span><span class="op">=</span> <span class="ident">num_subparams</span> <span class="kw">as</span> <span class="ident">usize</span>;
+        <span class="comment">// Jump to the next parameter.
+        </span><span class="self">self</span>.index += num_subparams <span class="kw">as </span>usize;
 
-        <span class="prelude-val">Some</span>(<span class="ident">param</span>)
+        <span class="prelude-val">Some</span>(param)
     }
 
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">remaining</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">params</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="self">self</span>.<span class="ident">index</span>;
-        (<span class="ident">remaining</span>, <span class="prelude-val">Some</span>(<span class="ident">remaining</span>))
+    <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
+        <span class="kw">let </span>remaining = <span class="self">self</span>.params.len() - <span class="self">self</span>.index;
+        (remaining, <span class="prelude-val">Some</span>(remaining))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Params</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;[&quot;</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>Debug <span class="kw">for </span>Params {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;[&quot;</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">param</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">if</span> <span class="ident">i</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;;&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">for </span>(i, param) <span class="kw">in </span><span class="self">self</span>.iter().enumerate() {
+            <span class="kw">if </span>i != <span class="number">0 </span>{
+                <span class="macro">write!</span>(f, <span class="string">&quot;;&quot;</span>)<span class="question-mark">?</span>;
             }
 
-            <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">subparam</span>) <span class="kw">in</span> <span class="ident">param</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-                <span class="kw">if</span> <span class="ident">i</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                    <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;:&quot;</span>)<span class="question-mark">?</span>;
+            <span class="kw">for </span>(i, subparam) <span class="kw">in </span>param.iter().enumerate() {
+                <span class="kw">if </span>i != <span class="number">0 </span>{
+                    <span class="macro">write!</span>(f, <span class="string">&quot;:&quot;</span>)<span class="question-mark">?</span>;
                 }
 
-                <span class="ident">subparam</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)<span class="question-mark">?</span>;
+                subparam.fmt(f)<span class="question-mark">?</span>;
             }
         }
 
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;]&quot;</span>)
+        <span class="macro">write!</span>(f, <span class="string">&quot;]&quot;</span>)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="vte" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="vte" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

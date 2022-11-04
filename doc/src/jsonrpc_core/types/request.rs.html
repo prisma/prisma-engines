@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/jsonrpc-core-17.1.0/src/types/request.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>request.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../jsonrpc_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../jsonrpc_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../jsonrpc_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/jsonrpc-core-17.1.0/src/types/request.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>request.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../jsonrpc_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../jsonrpc_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../jsonrpc_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -296,303 +296,303 @@
 <span id="296">296</span>
 <span id="297">297</span>
 <span id="298">298</span>
-</pre><pre class="rust"><code><span class="doccomment">//! jsonrpc request</span>
+</pre><pre class="rust"><code><span class="doccomment">//! jsonrpc request
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Id</span>, <span class="ident">Params</span>, <span class="ident">Version</span>};
+</span><span class="kw">use super</span>::{Id, Params, Version};
 
-<span class="doccomment">/// Represents jsonrpc request which is a method call.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deny_unknown_fields</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MethodCall</span> {
-	<span class="doccomment">/// A String specifying the version of the JSON-RPC protocol.</span>
-	<span class="kw">pub</span> <span class="ident">jsonrpc</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Version</span><span class="op">&gt;</span>,
-	<span class="doccomment">/// A String containing the name of the method to be invoked.</span>
-	<span class="kw">pub</span> <span class="ident">method</span>: <span class="ident">String</span>,
-	<span class="doccomment">/// A Structured value that holds the parameter values to be used</span>
-	<span class="doccomment">/// during the invocation of the method. This member MAY be omitted.</span>
-	<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;default_params&quot;</span>)]</span>
-	<span class="kw">pub</span> <span class="ident">params</span>: <span class="ident">Params</span>,
-	<span class="doccomment">/// An identifier established by the Client that MUST contain a String,</span>
-	<span class="doccomment">/// Number, or NULL value if included. If it is not included it is assumed</span>
-	<span class="doccomment">/// to be a notification.</span>
-	<span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">Id</span>,
+<span class="doccomment">/// Represents jsonrpc request which is a method call.
+</span><span class="attribute">#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+</span><span class="kw">pub struct </span>MethodCall {
+	<span class="doccomment">/// A String specifying the version of the JSON-RPC protocol.
+	</span><span class="kw">pub </span>jsonrpc: <span class="prelude-ty">Option</span>&lt;Version&gt;,
+	<span class="doccomment">/// A String containing the name of the method to be invoked.
+	</span><span class="kw">pub </span>method: String,
+	<span class="doccomment">/// A Structured value that holds the parameter values to be used
+	/// during the invocation of the method. This member MAY be omitted.
+	</span><span class="attribute">#[serde(default = <span class="string">&quot;default_params&quot;</span>)]
+	</span><span class="kw">pub </span>params: Params,
+	<span class="doccomment">/// An identifier established by the Client that MUST contain a String,
+	/// Number, or NULL value if included. If it is not included it is assumed
+	/// to be a notification.
+	</span><span class="kw">pub </span>id: Id,
 }
 
-<span class="doccomment">/// Represents jsonrpc request which is a notification.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deny_unknown_fields</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Notification</span> {
-	<span class="doccomment">/// A String specifying the version of the JSON-RPC protocol.</span>
-	<span class="kw">pub</span> <span class="ident">jsonrpc</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Version</span><span class="op">&gt;</span>,
-	<span class="doccomment">/// A String containing the name of the method to be invoked.</span>
-	<span class="kw">pub</span> <span class="ident">method</span>: <span class="ident">String</span>,
-	<span class="doccomment">/// A Structured value that holds the parameter values to be used</span>
-	<span class="doccomment">/// during the invocation of the method. This member MAY be omitted.</span>
-	<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;default_params&quot;</span>)]</span>
-	<span class="kw">pub</span> <span class="ident">params</span>: <span class="ident">Params</span>,
+<span class="doccomment">/// Represents jsonrpc request which is a notification.
+</span><span class="attribute">#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+</span><span class="kw">pub struct </span>Notification {
+	<span class="doccomment">/// A String specifying the version of the JSON-RPC protocol.
+	</span><span class="kw">pub </span>jsonrpc: <span class="prelude-ty">Option</span>&lt;Version&gt;,
+	<span class="doccomment">/// A String containing the name of the method to be invoked.
+	</span><span class="kw">pub </span>method: String,
+	<span class="doccomment">/// A Structured value that holds the parameter values to be used
+	/// during the invocation of the method. This member MAY be omitted.
+	</span><span class="attribute">#[serde(default = <span class="string">&quot;default_params&quot;</span>)]
+	</span><span class="kw">pub </span>params: Params,
 }
 
-<span class="doccomment">/// Represents single jsonrpc call.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">untagged</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Call</span> {
-	<span class="doccomment">/// Call method</span>
-	<span class="ident">MethodCall</span>(<span class="ident">MethodCall</span>),
-	<span class="doccomment">/// Fire notification</span>
-	<span class="ident">Notification</span>(<span class="ident">Notification</span>),
-	<span class="doccomment">/// Invalid call</span>
-	<span class="ident">Invalid</span> {
-		<span class="doccomment">/// Call id (if known)</span>
-		<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;default_id&quot;</span>)]</span>
-		<span class="ident">id</span>: <span class="ident">Id</span>,
+<span class="doccomment">/// Represents single jsonrpc call.
+</span><span class="attribute">#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(untagged)]
+</span><span class="kw">pub enum </span>Call {
+	<span class="doccomment">/// Call method
+	</span>MethodCall(MethodCall),
+	<span class="doccomment">/// Fire notification
+	</span>Notification(Notification),
+	<span class="doccomment">/// Invalid call
+	</span>Invalid {
+		<span class="doccomment">/// Call id (if known)
+		</span><span class="attribute">#[serde(default = <span class="string">&quot;default_id&quot;</span>)]
+		</span>id: Id,
 	},
 }
 
-<span class="kw">fn</span> <span class="ident">default_params</span>() -&gt; <span class="ident">Params</span> {
-	<span class="ident">Params::None</span>
+<span class="kw">fn </span>default_params() -&gt; Params {
+	Params::None
 }
 
-<span class="kw">fn</span> <span class="ident">default_id</span>() -&gt; <span class="ident">Id</span> {
-	<span class="ident">Id::Null</span>
+<span class="kw">fn </span>default_id() -&gt; Id {
+	Id::Null
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">MethodCall</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Call</span> {
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">mc</span>: <span class="ident">MethodCall</span>) -&gt; <span class="self">Self</span> {
-		<span class="ident">Call::MethodCall</span>(<span class="ident">mc</span>)
+<span class="kw">impl </span>From&lt;MethodCall&gt; <span class="kw">for </span>Call {
+	<span class="kw">fn </span>from(mc: MethodCall) -&gt; <span class="self">Self </span>{
+		Call::MethodCall(mc)
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Notification</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Call</span> {
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">n</span>: <span class="ident">Notification</span>) -&gt; <span class="self">Self</span> {
-		<span class="ident">Call::Notification</span>(<span class="ident">n</span>)
+<span class="kw">impl </span>From&lt;Notification&gt; <span class="kw">for </span>Call {
+	<span class="kw">fn </span>from(n: Notification) -&gt; <span class="self">Self </span>{
+		Call::Notification(n)
 	}
 }
 
-<span class="doccomment">/// Represents jsonrpc request.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deny_unknown_fields</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">untagged</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Request</span> {
-	<span class="doccomment">/// Single request (call)</span>
-	<span class="ident">Single</span>(<span class="ident">Call</span>),
-	<span class="doccomment">/// Batch of requests (calls)</span>
-	<span class="ident">Batch</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Call</span><span class="op">&gt;</span>),
+<span class="doccomment">/// Represents jsonrpc request.
+</span><span class="attribute">#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[serde(deny_unknown_fields)]
+#[serde(untagged)]
+</span><span class="kw">pub enum </span>Request {
+	<span class="doccomment">/// Single request (call)
+	</span>Single(Call),
+	<span class="doccomment">/// Batch of requests (calls)
+	</span>Batch(Vec&lt;Call&gt;),
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-	<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-	<span class="kw">use</span> <span class="ident">serde_json::Value</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+	<span class="kw">use super</span>::<span class="kw-2">*</span>;
+	<span class="kw">use </span>serde_json::Value;
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">method_call_serialize</span>() {
-		<span class="kw">use</span> <span class="ident">serde_json</span>;
-		<span class="kw">use</span> <span class="ident">serde_json::Value</span>;
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>method_call_serialize() {
+		<span class="kw">use </span>serde_json;
+		<span class="kw">use </span>serde_json::Value;
 
-		<span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">MethodCall</span> {
-			<span class="ident">jsonrpc</span>: <span class="prelude-val">Some</span>(<span class="ident">Version::V2</span>),
-			<span class="ident">method</span>: <span class="string">&quot;update&quot;</span>.<span class="ident">to_owned</span>(),
-			<span class="ident">params</span>: <span class="ident">Params::Array</span>(<span class="macro">vec!</span>[<span class="ident">Value::from</span>(<span class="number">1</span>), <span class="ident">Value::from</span>(<span class="number">2</span>)]),
-			<span class="ident">id</span>: <span class="ident">Id::Num</span>(<span class="number">1</span>),
+		<span class="kw">let </span>m = MethodCall {
+			jsonrpc: <span class="prelude-val">Some</span>(Version::V2),
+			method: <span class="string">&quot;update&quot;</span>.to_owned(),
+			params: Params::Array(<span class="macro">vec!</span>[Value::from(<span class="number">1</span>), Value::from(<span class="number">2</span>)]),
+			id: Id::Num(<span class="number">1</span>),
 		};
 
-		<span class="kw">let</span> <span class="ident">serialized</span> <span class="op">=</span> <span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>).<span class="ident">unwrap</span>();
+		<span class="kw">let </span>serialized = serde_json::to_string(<span class="kw-2">&amp;</span>m).unwrap();
 		<span class="macro">assert_eq!</span>(
-			<span class="ident">serialized</span>,
-			<span class="string">r#&quot;{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;method&quot;:&quot;update&quot;,&quot;params&quot;:[1,2],&quot;id&quot;:1}&quot;#</span>
-		);
+			serialized,
+			<span class="string">r#&quot;{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;method&quot;:&quot;update&quot;,&quot;params&quot;:[1,2],&quot;id&quot;:1}&quot;#
+		</span>);
 	}
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">notification_serialize</span>() {
-		<span class="kw">use</span> <span class="ident">serde_json</span>;
-		<span class="kw">use</span> <span class="ident">serde_json::Value</span>;
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>notification_serialize() {
+		<span class="kw">use </span>serde_json;
+		<span class="kw">use </span>serde_json::Value;
 
-		<span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">Notification</span> {
-			<span class="ident">jsonrpc</span>: <span class="prelude-val">Some</span>(<span class="ident">Version::V2</span>),
-			<span class="ident">method</span>: <span class="string">&quot;update&quot;</span>.<span class="ident">to_owned</span>(),
-			<span class="ident">params</span>: <span class="ident">Params::Array</span>(<span class="macro">vec!</span>[<span class="ident">Value::from</span>(<span class="number">1</span>), <span class="ident">Value::from</span>(<span class="number">2</span>)]),
+		<span class="kw">let </span>n = Notification {
+			jsonrpc: <span class="prelude-val">Some</span>(Version::V2),
+			method: <span class="string">&quot;update&quot;</span>.to_owned(),
+			params: Params::Array(<span class="macro">vec!</span>[Value::from(<span class="number">1</span>), Value::from(<span class="number">2</span>)]),
 		};
 
-		<span class="kw">let</span> <span class="ident">serialized</span> <span class="op">=</span> <span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>).<span class="ident">unwrap</span>();
-		<span class="macro">assert_eq!</span>(<span class="ident">serialized</span>, <span class="string">r#&quot;{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;method&quot;:&quot;update&quot;,&quot;params&quot;:[1,2]}&quot;#</span>);
+		<span class="kw">let </span>serialized = serde_json::to_string(<span class="kw-2">&amp;</span>n).unwrap();
+		<span class="macro">assert_eq!</span>(serialized, <span class="string">r#&quot;{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;method&quot;:&quot;update&quot;,&quot;params&quot;:[1,2]}&quot;#</span>);
 	}
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">call_serialize</span>() {
-		<span class="kw">use</span> <span class="ident">serde_json</span>;
-		<span class="kw">use</span> <span class="ident">serde_json::Value</span>;
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>call_serialize() {
+		<span class="kw">use </span>serde_json;
+		<span class="kw">use </span>serde_json::Value;
 
-		<span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">Call::Notification</span>(<span class="ident">Notification</span> {
-			<span class="ident">jsonrpc</span>: <span class="prelude-val">Some</span>(<span class="ident">Version::V2</span>),
-			<span class="ident">method</span>: <span class="string">&quot;update&quot;</span>.<span class="ident">to_owned</span>(),
-			<span class="ident">params</span>: <span class="ident">Params::Array</span>(<span class="macro">vec!</span>[<span class="ident">Value::from</span>(<span class="number">1</span>)]),
+		<span class="kw">let </span>n = Call::Notification(Notification {
+			jsonrpc: <span class="prelude-val">Some</span>(Version::V2),
+			method: <span class="string">&quot;update&quot;</span>.to_owned(),
+			params: Params::Array(<span class="macro">vec!</span>[Value::from(<span class="number">1</span>)]),
 		});
 
-		<span class="kw">let</span> <span class="ident">serialized</span> <span class="op">=</span> <span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">n</span>).<span class="ident">unwrap</span>();
-		<span class="macro">assert_eq!</span>(<span class="ident">serialized</span>, <span class="string">r#&quot;{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;method&quot;:&quot;update&quot;,&quot;params&quot;:[1]}&quot;#</span>);
+		<span class="kw">let </span>serialized = serde_json::to_string(<span class="kw-2">&amp;</span>n).unwrap();
+		<span class="macro">assert_eq!</span>(serialized, <span class="string">r#&quot;{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;method&quot;:&quot;update&quot;,&quot;params&quot;:[1]}&quot;#</span>);
 	}
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">request_serialize_batch</span>() {
-		<span class="kw">use</span> <span class="ident">serde_json</span>;
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>request_serialize_batch() {
+		<span class="kw">use </span>serde_json;
 
-		<span class="kw">let</span> <span class="ident">batch</span> <span class="op">=</span> <span class="ident">Request::Batch</span>(<span class="macro">vec!</span>[
-			<span class="ident">Call::MethodCall</span>(<span class="ident">MethodCall</span> {
-				<span class="ident">jsonrpc</span>: <span class="prelude-val">Some</span>(<span class="ident">Version::V2</span>),
-				<span class="ident">method</span>: <span class="string">&quot;update&quot;</span>.<span class="ident">to_owned</span>(),
-				<span class="ident">params</span>: <span class="ident">Params::Array</span>(<span class="macro">vec!</span>[<span class="ident">Value::from</span>(<span class="number">1</span>), <span class="ident">Value::from</span>(<span class="number">2</span>)]),
-				<span class="ident">id</span>: <span class="ident">Id::Num</span>(<span class="number">1</span>),
+		<span class="kw">let </span>batch = Request::Batch(<span class="macro">vec!</span>[
+			Call::MethodCall(MethodCall {
+				jsonrpc: <span class="prelude-val">Some</span>(Version::V2),
+				method: <span class="string">&quot;update&quot;</span>.to_owned(),
+				params: Params::Array(<span class="macro">vec!</span>[Value::from(<span class="number">1</span>), Value::from(<span class="number">2</span>)]),
+				id: Id::Num(<span class="number">1</span>),
 			}),
-			<span class="ident">Call::Notification</span>(<span class="ident">Notification</span> {
-				<span class="ident">jsonrpc</span>: <span class="prelude-val">Some</span>(<span class="ident">Version::V2</span>),
-				<span class="ident">method</span>: <span class="string">&quot;update&quot;</span>.<span class="ident">to_owned</span>(),
-				<span class="ident">params</span>: <span class="ident">Params::Array</span>(<span class="macro">vec!</span>[<span class="ident">Value::from</span>(<span class="number">1</span>)]),
+			Call::Notification(Notification {
+				jsonrpc: <span class="prelude-val">Some</span>(Version::V2),
+				method: <span class="string">&quot;update&quot;</span>.to_owned(),
+				params: Params::Array(<span class="macro">vec!</span>[Value::from(<span class="number">1</span>)]),
 			}),
 		]);
 
-		<span class="kw">let</span> <span class="ident">serialized</span> <span class="op">=</span> <span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">batch</span>).<span class="ident">unwrap</span>();
+		<span class="kw">let </span>serialized = serde_json::to_string(<span class="kw-2">&amp;</span>batch).unwrap();
 		<span class="macro">assert_eq!</span>(
-			<span class="ident">serialized</span>,
-			<span class="string">r#&quot;[{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;method&quot;:&quot;update&quot;,&quot;params&quot;:[1,2],&quot;id&quot;:1},{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;method&quot;:&quot;update&quot;,&quot;params&quot;:[1]}]&quot;#</span>
-		);
+			serialized,
+			<span class="string">r#&quot;[{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;method&quot;:&quot;update&quot;,&quot;params&quot;:[1,2],&quot;id&quot;:1},{&quot;jsonrpc&quot;:&quot;2.0&quot;,&quot;method&quot;:&quot;update&quot;,&quot;params&quot;:[1]}]&quot;#
+		</span>);
 	}
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">notification_deserialize</span>() {
-		<span class="kw">use</span> <span class="ident">serde_json</span>;
-		<span class="kw">use</span> <span class="ident">serde_json::Value</span>;
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>notification_deserialize() {
+		<span class="kw">use </span>serde_json;
+		<span class="kw">use </span>serde_json::Value;
 
-		<span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="string">r#&quot;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;update&quot;, &quot;params&quot;: [1,2]}&quot;#</span>;
-		<span class="kw">let</span> <span class="ident">deserialized</span>: <span class="ident">Notification</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">s</span>).<span class="ident">unwrap</span>();
+		<span class="kw">let </span>s = <span class="string">r#&quot;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;update&quot;, &quot;params&quot;: [1,2]}&quot;#</span>;
+		<span class="kw">let </span>deserialized: Notification = serde_json::from_str(s).unwrap();
 
 		<span class="macro">assert_eq!</span>(
-			<span class="ident">deserialized</span>,
-			<span class="ident">Notification</span> {
-				<span class="ident">jsonrpc</span>: <span class="prelude-val">Some</span>(<span class="ident">Version::V2</span>),
-				<span class="ident">method</span>: <span class="string">&quot;update&quot;</span>.<span class="ident">to_owned</span>(),
-				<span class="ident">params</span>: <span class="ident">Params::Array</span>(<span class="macro">vec!</span>[<span class="ident">Value::from</span>(<span class="number">1</span>), <span class="ident">Value::from</span>(<span class="number">2</span>)])
+			deserialized,
+			Notification {
+				jsonrpc: <span class="prelude-val">Some</span>(Version::V2),
+				method: <span class="string">&quot;update&quot;</span>.to_owned(),
+				params: Params::Array(<span class="macro">vec!</span>[Value::from(<span class="number">1</span>), Value::from(<span class="number">2</span>)])
 			}
 		);
 
-		<span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="string">r#&quot;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;foobar&quot;}&quot;#</span>;
-		<span class="kw">let</span> <span class="ident">deserialized</span>: <span class="ident">Notification</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">s</span>).<span class="ident">unwrap</span>();
+		<span class="kw">let </span>s = <span class="string">r#&quot;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;foobar&quot;}&quot;#</span>;
+		<span class="kw">let </span>deserialized: Notification = serde_json::from_str(s).unwrap();
 
 		<span class="macro">assert_eq!</span>(
-			<span class="ident">deserialized</span>,
-			<span class="ident">Notification</span> {
-				<span class="ident">jsonrpc</span>: <span class="prelude-val">Some</span>(<span class="ident">Version::V2</span>),
-				<span class="ident">method</span>: <span class="string">&quot;foobar&quot;</span>.<span class="ident">to_owned</span>(),
-				<span class="ident">params</span>: <span class="ident">Params::None</span>,
+			deserialized,
+			Notification {
+				jsonrpc: <span class="prelude-val">Some</span>(Version::V2),
+				method: <span class="string">&quot;foobar&quot;</span>.to_owned(),
+				params: Params::None,
 			}
 		);
 
-		<span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="string">r#&quot;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;update&quot;, &quot;params&quot;: [1,2], &quot;id&quot;: 1}&quot;#</span>;
-		<span class="kw">let</span> <span class="ident">deserialized</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Notification</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">s</span>);
-		<span class="macro">assert!</span>(<span class="ident">deserialized</span>.<span class="ident">is_err</span>());
+		<span class="kw">let </span>s = <span class="string">r#&quot;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;update&quot;, &quot;params&quot;: [1,2], &quot;id&quot;: 1}&quot;#</span>;
+		<span class="kw">let </span>deserialized: <span class="prelude-ty">Result</span>&lt;Notification, <span class="kw">_</span>&gt; = serde_json::from_str(s);
+		<span class="macro">assert!</span>(deserialized.is_err());
 	}
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">call_deserialize</span>() {
-		<span class="kw">use</span> <span class="ident">serde_json</span>;
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>call_deserialize() {
+		<span class="kw">use </span>serde_json;
 
-		<span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="string">r#&quot;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;update&quot;, &quot;params&quot;: [1]}&quot;#</span>;
-		<span class="kw">let</span> <span class="ident">deserialized</span>: <span class="ident">Call</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">s</span>).<span class="ident">unwrap</span>();
+		<span class="kw">let </span>s = <span class="string">r#&quot;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;update&quot;, &quot;params&quot;: [1]}&quot;#</span>;
+		<span class="kw">let </span>deserialized: Call = serde_json::from_str(s).unwrap();
 		<span class="macro">assert_eq!</span>(
-			<span class="ident">deserialized</span>,
-			<span class="ident">Call::Notification</span>(<span class="ident">Notification</span> {
-				<span class="ident">jsonrpc</span>: <span class="prelude-val">Some</span>(<span class="ident">Version::V2</span>),
-				<span class="ident">method</span>: <span class="string">&quot;update&quot;</span>.<span class="ident">to_owned</span>(),
-				<span class="ident">params</span>: <span class="ident">Params::Array</span>(<span class="macro">vec!</span>[<span class="ident">Value::from</span>(<span class="number">1</span>)])
+			deserialized,
+			Call::Notification(Notification {
+				jsonrpc: <span class="prelude-val">Some</span>(Version::V2),
+				method: <span class="string">&quot;update&quot;</span>.to_owned(),
+				params: Params::Array(<span class="macro">vec!</span>[Value::from(<span class="number">1</span>)])
 			})
 		);
 
-		<span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="string">r#&quot;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;update&quot;, &quot;params&quot;: [1], &quot;id&quot;: 1}&quot;#</span>;
-		<span class="kw">let</span> <span class="ident">deserialized</span>: <span class="ident">Call</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">s</span>).<span class="ident">unwrap</span>();
+		<span class="kw">let </span>s = <span class="string">r#&quot;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;update&quot;, &quot;params&quot;: [1], &quot;id&quot;: 1}&quot;#</span>;
+		<span class="kw">let </span>deserialized: Call = serde_json::from_str(s).unwrap();
 		<span class="macro">assert_eq!</span>(
-			<span class="ident">deserialized</span>,
-			<span class="ident">Call::MethodCall</span>(<span class="ident">MethodCall</span> {
-				<span class="ident">jsonrpc</span>: <span class="prelude-val">Some</span>(<span class="ident">Version::V2</span>),
-				<span class="ident">method</span>: <span class="string">&quot;update&quot;</span>.<span class="ident">to_owned</span>(),
-				<span class="ident">params</span>: <span class="ident">Params::Array</span>(<span class="macro">vec!</span>[<span class="ident">Value::from</span>(<span class="number">1</span>)]),
-				<span class="ident">id</span>: <span class="ident">Id::Num</span>(<span class="number">1</span>)
+			deserialized,
+			Call::MethodCall(MethodCall {
+				jsonrpc: <span class="prelude-val">Some</span>(Version::V2),
+				method: <span class="string">&quot;update&quot;</span>.to_owned(),
+				params: Params::Array(<span class="macro">vec!</span>[Value::from(<span class="number">1</span>)]),
+				id: Id::Num(<span class="number">1</span>)
 			})
 		);
 
-		<span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="string">r#&quot;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;update&quot;, &quot;params&quot;: [], &quot;id&quot;: 1}&quot;#</span>;
-		<span class="kw">let</span> <span class="ident">deserialized</span>: <span class="ident">Call</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">s</span>).<span class="ident">unwrap</span>();
+		<span class="kw">let </span>s = <span class="string">r#&quot;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;update&quot;, &quot;params&quot;: [], &quot;id&quot;: 1}&quot;#</span>;
+		<span class="kw">let </span>deserialized: Call = serde_json::from_str(s).unwrap();
 		<span class="macro">assert_eq!</span>(
-			<span class="ident">deserialized</span>,
-			<span class="ident">Call::MethodCall</span>(<span class="ident">MethodCall</span> {
-				<span class="ident">jsonrpc</span>: <span class="prelude-val">Some</span>(<span class="ident">Version::V2</span>),
-				<span class="ident">method</span>: <span class="string">&quot;update&quot;</span>.<span class="ident">to_owned</span>(),
-				<span class="ident">params</span>: <span class="ident">Params::Array</span>(<span class="macro">vec!</span>[]),
-				<span class="ident">id</span>: <span class="ident">Id::Num</span>(<span class="number">1</span>)
+			deserialized,
+			Call::MethodCall(MethodCall {
+				jsonrpc: <span class="prelude-val">Some</span>(Version::V2),
+				method: <span class="string">&quot;update&quot;</span>.to_owned(),
+				params: Params::Array(<span class="macro">vec!</span>[]),
+				id: Id::Num(<span class="number">1</span>)
 			})
 		);
 
-		<span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="string">r#&quot;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;update&quot;, &quot;params&quot;: null, &quot;id&quot;: 1}&quot;#</span>;
-		<span class="kw">let</span> <span class="ident">deserialized</span>: <span class="ident">Call</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">s</span>).<span class="ident">unwrap</span>();
+		<span class="kw">let </span>s = <span class="string">r#&quot;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;update&quot;, &quot;params&quot;: null, &quot;id&quot;: 1}&quot;#</span>;
+		<span class="kw">let </span>deserialized: Call = serde_json::from_str(s).unwrap();
 		<span class="macro">assert_eq!</span>(
-			<span class="ident">deserialized</span>,
-			<span class="ident">Call::MethodCall</span>(<span class="ident">MethodCall</span> {
-				<span class="ident">jsonrpc</span>: <span class="prelude-val">Some</span>(<span class="ident">Version::V2</span>),
-				<span class="ident">method</span>: <span class="string">&quot;update&quot;</span>.<span class="ident">to_owned</span>(),
-				<span class="ident">params</span>: <span class="ident">Params::None</span>,
-				<span class="ident">id</span>: <span class="ident">Id::Num</span>(<span class="number">1</span>)
+			deserialized,
+			Call::MethodCall(MethodCall {
+				jsonrpc: <span class="prelude-val">Some</span>(Version::V2),
+				method: <span class="string">&quot;update&quot;</span>.to_owned(),
+				params: Params::None,
+				id: Id::Num(<span class="number">1</span>)
 			})
 		);
 
-		<span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="string">r#&quot;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;update&quot;, &quot;id&quot;: 1}&quot;#</span>;
-		<span class="kw">let</span> <span class="ident">deserialized</span>: <span class="ident">Call</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">s</span>).<span class="ident">unwrap</span>();
+		<span class="kw">let </span>s = <span class="string">r#&quot;{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;update&quot;, &quot;id&quot;: 1}&quot;#</span>;
+		<span class="kw">let </span>deserialized: Call = serde_json::from_str(s).unwrap();
 		<span class="macro">assert_eq!</span>(
-			<span class="ident">deserialized</span>,
-			<span class="ident">Call::MethodCall</span>(<span class="ident">MethodCall</span> {
-				<span class="ident">jsonrpc</span>: <span class="prelude-val">Some</span>(<span class="ident">Version::V2</span>),
-				<span class="ident">method</span>: <span class="string">&quot;update&quot;</span>.<span class="ident">to_owned</span>(),
-				<span class="ident">params</span>: <span class="ident">Params::None</span>,
-				<span class="ident">id</span>: <span class="ident">Id::Num</span>(<span class="number">1</span>)
+			deserialized,
+			Call::MethodCall(MethodCall {
+				jsonrpc: <span class="prelude-val">Some</span>(Version::V2),
+				method: <span class="string">&quot;update&quot;</span>.to_owned(),
+				params: Params::None,
+				id: Id::Num(<span class="number">1</span>)
 			})
 		);
 	}
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">request_deserialize_batch</span>() {
-		<span class="kw">use</span> <span class="ident">serde_json</span>;
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>request_deserialize_batch() {
+		<span class="kw">use </span>serde_json;
 
-		<span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="string">r#&quot;[{}, {&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;update&quot;, &quot;params&quot;: [1,2], &quot;id&quot;: 1},{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;update&quot;, &quot;params&quot;: [1]}]&quot;#</span>;
-		<span class="kw">let</span> <span class="ident">deserialized</span>: <span class="ident">Request</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">s</span>).<span class="ident">unwrap</span>();
+		<span class="kw">let </span>s = <span class="string">r#&quot;[{}, {&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;update&quot;, &quot;params&quot;: [1,2], &quot;id&quot;: 1},{&quot;jsonrpc&quot;: &quot;2.0&quot;, &quot;method&quot;: &quot;update&quot;, &quot;params&quot;: [1]}]&quot;#</span>;
+		<span class="kw">let </span>deserialized: Request = serde_json::from_str(s).unwrap();
 		<span class="macro">assert_eq!</span>(
-			<span class="ident">deserialized</span>,
-			<span class="ident">Request::Batch</span>(<span class="macro">vec!</span>[
-				<span class="ident">Call::Invalid</span> { <span class="ident">id</span>: <span class="ident">Id::Null</span> },
-				<span class="ident">Call::MethodCall</span>(<span class="ident">MethodCall</span> {
-					<span class="ident">jsonrpc</span>: <span class="prelude-val">Some</span>(<span class="ident">Version::V2</span>),
-					<span class="ident">method</span>: <span class="string">&quot;update&quot;</span>.<span class="ident">to_owned</span>(),
-					<span class="ident">params</span>: <span class="ident">Params::Array</span>(<span class="macro">vec!</span>[<span class="ident">Value::from</span>(<span class="number">1</span>), <span class="ident">Value::from</span>(<span class="number">2</span>)]),
-					<span class="ident">id</span>: <span class="ident">Id::Num</span>(<span class="number">1</span>)
+			deserialized,
+			Request::Batch(<span class="macro">vec!</span>[
+				Call::Invalid { id: Id::Null },
+				Call::MethodCall(MethodCall {
+					jsonrpc: <span class="prelude-val">Some</span>(Version::V2),
+					method: <span class="string">&quot;update&quot;</span>.to_owned(),
+					params: Params::Array(<span class="macro">vec!</span>[Value::from(<span class="number">1</span>), Value::from(<span class="number">2</span>)]),
+					id: Id::Num(<span class="number">1</span>)
 				}),
-				<span class="ident">Call::Notification</span>(<span class="ident">Notification</span> {
-					<span class="ident">jsonrpc</span>: <span class="prelude-val">Some</span>(<span class="ident">Version::V2</span>),
-					<span class="ident">method</span>: <span class="string">&quot;update&quot;</span>.<span class="ident">to_owned</span>(),
-					<span class="ident">params</span>: <span class="ident">Params::Array</span>(<span class="macro">vec!</span>[<span class="ident">Value::from</span>(<span class="number">1</span>)])
+				Call::Notification(Notification {
+					jsonrpc: <span class="prelude-val">Some</span>(Version::V2),
+					method: <span class="string">&quot;update&quot;</span>.to_owned(),
+					params: Params::Array(<span class="macro">vec!</span>[Value::from(<span class="number">1</span>)])
 				})
 			])
 		)
 	}
 
-	<span class="attribute">#[<span class="ident">test</span>]</span>
-	<span class="kw">fn</span> <span class="ident">request_invalid_returns_id</span>() {
-		<span class="kw">use</span> <span class="ident">serde_json</span>;
+	<span class="attribute">#[test]
+	</span><span class="kw">fn </span>request_invalid_returns_id() {
+		<span class="kw">use </span>serde_json;
 
-		<span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="string">r#&quot;{&quot;id&quot;:120,&quot;method&quot;:&quot;my_method&quot;,&quot;params&quot;:[&quot;foo&quot;, &quot;bar&quot;],&quot;extra_field&quot;:[]}&quot;#</span>;
-		<span class="kw">let</span> <span class="ident">deserialized</span>: <span class="ident">Request</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">s</span>).<span class="ident">unwrap</span>();
+		<span class="kw">let </span>s = <span class="string">r#&quot;{&quot;id&quot;:120,&quot;method&quot;:&quot;my_method&quot;,&quot;params&quot;:[&quot;foo&quot;, &quot;bar&quot;],&quot;extra_field&quot;:[]}&quot;#</span>;
+		<span class="kw">let </span>deserialized: Request = serde_json::from_str(s).unwrap();
 
-		<span class="kw">match</span> <span class="ident">deserialized</span> {
-			<span class="ident">Request::Single</span>(<span class="ident">Call::Invalid</span> { <span class="ident">id</span>: <span class="ident">Id::Num</span>(<span class="number">120</span>) }) =&gt; {}
-			<span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Request wrongly deserialized: {:?}&quot;</span>, <span class="ident">deserialized</span>),
+		<span class="kw">match </span>deserialized {
+			Request::Single(Call::Invalid { id: Id::Num(<span class="number">120</span>) }) =&gt; {}
+			<span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Request wrongly deserialized: {:?}&quot;</span>, deserialized),
 		}
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="jsonrpc_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="jsonrpc_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

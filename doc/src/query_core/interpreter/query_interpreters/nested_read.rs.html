@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/interpreter/query_interpreters/nested_read.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>nested_read.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../query_core/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/interpreter/query_interpreters/nested_read.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>nested_read.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../query_core/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -263,270 +263,270 @@
 <span id="263">263</span>
 <span id="264">264</span>
 <span id="265">265</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">inmemory_record_processor::InMemoryRecordProcessor</span>, <span class="ident">read</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">interpreter::InterpretationResult</span>, <span class="ident">query_ast</span>::<span class="kw-2">*</span>};
-<span class="kw">use</span> <span class="ident">connector</span>::{
-    <span class="self">self</span>, <span class="ident">filter::Filter</span>, <span class="ident">ConditionListValue</span>, <span class="ident">ConnectionLike</span>, <span class="ident">QueryArguments</span>, <span class="ident">RelAggregationRow</span>,
-    <span class="ident">RelAggregationSelection</span>, <span class="ident">ScalarCompare</span>,
+</pre><pre class="rust"><code><span class="kw">use super</span>::{inmemory_record_processor::InMemoryRecordProcessor, read};
+<span class="kw">use crate</span>::{interpreter::InterpretationResult, query_ast::<span class="kw-2">*</span>};
+<span class="kw">use </span>connector::{
+    <span class="self">self</span>, filter::Filter, ConditionListValue, ConnectionLike, QueryArguments, RelAggregationRow,
+    RelAggregationSelection, ScalarCompare,
 };
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">FieldSelection</span>, <span class="ident">ManyRecords</span>, <span class="ident">Record</span>, <span class="ident">RelationFieldRef</span>, <span class="ident">SelectionResult</span>};
-<span class="kw">use</span> <span class="ident">prisma_value::PrismaValue</span>;
-<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+<span class="kw">use </span>prisma_models::{FieldSelection, ManyRecords, Record, RelationFieldRef, SelectionResult};
+<span class="kw">use </span>prisma_value::PrismaValue;
+<span class="kw">use </span>std::collections::HashMap;
 
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">m2m</span>(
-    <span class="ident">tx</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">ConnectionLike</span>,
-    <span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="ident">RelatedRecordsQuery</span>,
-    <span class="ident">parent_result</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ManyRecords</span><span class="op">&gt;</span>,
-    <span class="ident">processor</span>: <span class="ident">InMemoryRecordProcessor</span>,
-    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">InterpretationResult</span><span class="op">&lt;</span>(<span class="ident">ManyRecords</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelAggregationRow</span><span class="op">&gt;</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">parent_field</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">query</span>.<span class="ident">parent_field</span>;
-    <span class="kw">let</span> <span class="ident">child_link_id</span> <span class="op">=</span> <span class="ident">parent_field</span>.<span class="ident">related_field</span>().<span class="ident">linking_fields</span>();
+<span class="kw">pub async fn </span>m2m(
+    tx: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>ConnectionLike,
+    query: <span class="kw-2">&amp;</span>RelatedRecordsQuery,
+    parent_result: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ManyRecords&gt;,
+    processor: InMemoryRecordProcessor,
+    trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+) -&gt; InterpretationResult&lt;(ManyRecords, <span class="prelude-ty">Option</span>&lt;Vec&lt;RelAggregationRow&gt;&gt;)&gt; {
+    <span class="kw">let </span>parent_field = <span class="kw-2">&amp;</span>query.parent_field;
+    <span class="kw">let </span>child_link_id = parent_field.related_field().linking_fields();
 
-    <span class="comment">// We know that in a m2m scenario, we always require the ID of the parent, nothing else.</span>
-    <span class="kw">let</span> <span class="ident">parent_ids</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">query</span>.<span class="ident">parent_results</span> {
-        <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">links</span>) =&gt; <span class="ident">links</span>.<span class="ident">clone</span>(),
-        <span class="prelude-val">None</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">parent_model_id</span> <span class="op">=</span> <span class="ident">query</span>.<span class="ident">parent_field</span>.<span class="ident">model</span>().<span class="ident">primary_identifier</span>();
-            <span class="ident">parent_result</span>
-                .<span class="ident">expect</span>(<span class="string">&quot;[ID retrieval] No parent results present in the query graph for reading related records.&quot;</span>)
-                .<span class="ident">extract_selection_results</span>(<span class="kw-2">&amp;</span><span class="ident">parent_model_id</span>)<span class="question-mark">?</span>
-        }
+    <span class="comment">// We know that in a m2m scenario, we always require the ID of the parent, nothing else.
+    </span><span class="kw">let </span>parent_ids = <span class="kw">match </span>query.parent_results {
+        <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>links) =&gt; links.clone(),
+        <span class="prelude-val">None </span>=&gt; {
+            <span class="kw">let </span>parent_model_id = query.parent_field.model().primary_identifier();
+            parent_result
+                .expect(<span class="string">&quot;[ID retrieval] No parent results present in the query graph for reading related records.&quot;</span>)
+                .extract_selection_results(<span class="kw-2">&amp;</span>parent_model_id)<span class="question-mark">?
+        </span>}
     };
 
-    <span class="kw">if</span> <span class="ident">parent_ids</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="ident">ManyRecords::empty</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>.<span class="ident">selected_fields</span>), <span class="prelude-val">None</span>));
+    <span class="kw">if </span>parent_ids.is_empty() {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>((ManyRecords::empty(<span class="kw-2">&amp;</span>query.selected_fields), <span class="prelude-val">None</span>));
     }
 
-    <span class="kw">let</span> <span class="ident">ids</span> <span class="op">=</span> <span class="ident">tx</span>
-        .<span class="ident">get_related_m2m_record_ids</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>.<span class="ident">parent_field</span>, <span class="kw-2">&amp;</span><span class="ident">parent_ids</span>, <span class="ident">trace_id</span>.<span class="ident">clone</span>())
+    <span class="kw">let </span>ids = tx
+        .get_related_m2m_record_ids(<span class="kw-2">&amp;</span>query.parent_field, <span class="kw-2">&amp;</span>parent_ids, trace_id.clone())
         .<span class="kw">await</span><span class="question-mark">?</span>;
-    <span class="kw">if</span> <span class="ident">ids</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="ident">ManyRecords::empty</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>.<span class="ident">selected_fields</span>), <span class="prelude-val">None</span>));
+    <span class="kw">if </span>ids.is_empty() {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>((ManyRecords::empty(<span class="kw-2">&amp;</span>query.selected_fields), <span class="prelude-val">None</span>));
     }
 
-    <span class="kw">let</span> <span class="ident">child_model_id</span> <span class="op">=</span> <span class="ident">query</span>.<span class="ident">parent_field</span>.<span class="ident">related_model</span>().<span class="ident">primary_identifier</span>();
+    <span class="kw">let </span>child_model_id = query.parent_field.related_model().primary_identifier();
 
-    <span class="kw">let</span> <span class="ident">child_ids</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ids</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">ri</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">proj</span> <span class="op">=</span> <span class="ident">child_model_id</span>.<span class="ident">assimilate</span>(<span class="ident">ri</span>.<span class="number">1</span>.<span class="ident">clone</span>());
-            <span class="ident">proj</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">ri</span><span class="op">|</span> <span class="ident">ri</span>.<span class="ident">values</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>())
+    <span class="kw">let </span>child_ids: Vec&lt;Vec&lt;PrismaValue&gt;&gt; = ids
+        .iter()
+        .map(|ri| {
+            <span class="kw">let </span>proj = child_model_id.assimilate(ri.<span class="number">1</span>.clone());
+            proj.map(|ri| ri.values().collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;())
         })
-        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+        .collect::&lt;std::result::Result&lt;Vec&lt;<span class="kw">_</span>&gt;, <span class="kw">_</span>&gt;&gt;()<span class="question-mark">?</span>;
 
-    <span class="comment">// a roundtrip can be avoided if:</span>
-    <span class="comment">// - there is no additional filter</span>
-    <span class="comment">// - there is no aggregation selection</span>
-    <span class="comment">// - the selection set is the child_link_id</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">scalars</span> <span class="op">=</span>
-        <span class="kw">if</span> <span class="ident">query</span>.<span class="ident">args</span>.<span class="ident">do_nothing</span>() <span class="op">&amp;&amp;</span> <span class="ident">query</span>.<span class="ident">aggregation_selections</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="ident">child_link_id</span> <span class="op">==</span> <span class="ident">query</span>.<span class="ident">selected_fields</span>
+    <span class="comment">// a roundtrip can be avoided if:
+    // - there is no additional filter
+    // - there is no aggregation selection
+    // - the selection set is the child_link_id
+    </span><span class="kw">let </span><span class="kw-2">mut </span>scalars =
+        <span class="kw">if </span>query.args.do_nothing() &amp;&amp; query.aggregation_selections.is_empty() &amp;&amp; child_link_id == query.selected_fields
         {
-            <span class="ident">ManyRecords::from</span>((<span class="ident">child_ids</span>, <span class="kw-2">&amp;</span><span class="ident">query</span>.<span class="ident">selected_fields</span>)).<span class="ident">with_unique_records</span>()
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">query</span>.<span class="ident">args</span>.<span class="ident">clone</span>();
-            <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">child_link_id</span>.<span class="ident">is_in</span>(<span class="ident">ConditionListValue::list</span>(<span class="ident">child_ids</span>));
+            ManyRecords::from((child_ids, <span class="kw-2">&amp;</span>query.selected_fields)).with_unique_records()
+        } <span class="kw">else </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>args = query.args.clone();
+            <span class="kw">let </span>filter = child_link_id.is_in(ConditionListValue::list(child_ids));
 
-            <span class="ident">args</span>.<span class="ident">filter</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">args</span>.<span class="ident">filter</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">existing_filter</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">Filter::and</span>(<span class="macro">vec!</span>[<span class="ident">existing_filter</span>, <span class="ident">filter</span>])),
-                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">filter</span>),
+            args.filter = <span class="kw">match </span>args.filter {
+                <span class="prelude-val">Some</span>(existing_filter) =&gt; <span class="prelude-val">Some</span>(Filter::and(<span class="macro">vec!</span>[existing_filter, filter])),
+                <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Some</span>(filter),
             };
 
-            <span class="ident">tx</span>.<span class="ident">get_many_records</span>(
-                <span class="kw-2">&amp;</span><span class="ident">query</span>.<span class="ident">parent_field</span>.<span class="ident">related_model</span>(),
-                <span class="ident">args</span>,
-                <span class="kw-2">&amp;</span><span class="ident">query</span>.<span class="ident">selected_fields</span>,
-                <span class="kw-2">&amp;</span><span class="ident">query</span>.<span class="ident">aggregation_selections</span>,
-                <span class="ident">trace_id</span>.<span class="ident">clone</span>(),
+            tx.get_many_records(
+                <span class="kw-2">&amp;</span>query.parent_field.related_model(),
+                args,
+                <span class="kw-2">&amp;</span>query.selected_fields,
+                <span class="kw-2">&amp;</span>query.aggregation_selections,
+                trace_id.clone(),
             )
-            .<span class="kw">await</span><span class="question-mark">?</span>
-        };
+            .<span class="kw">await</span><span class="question-mark">?
+        </span>};
 
-    <span class="comment">// Child id to parent ids</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">id_map</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">SelectionResult</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
+    <span class="comment">// Child id to parent ids
+    </span><span class="kw">let </span><span class="kw-2">mut </span>id_map: HashMap&lt;SelectionResult, Vec&lt;SelectionResult&gt;&gt; = HashMap::new();
 
-    <span class="kw">for</span> (<span class="ident">parent_id</span>, <span class="ident">child_id</span>) <span class="kw">in</span> <span class="ident">ids</span> {
-        <span class="kw">let</span> <span class="ident">parent_id</span> <span class="op">=</span> <span class="ident">parent_id</span>.<span class="ident">coerce_values</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">child_id</span> <span class="op">=</span> <span class="ident">child_id</span>.<span class="ident">coerce_values</span>()<span class="question-mark">?</span>;
+    <span class="kw">for </span>(parent_id, child_id) <span class="kw">in </span>ids {
+        <span class="kw">let </span>parent_id = parent_id.coerce_values()<span class="question-mark">?</span>;
+        <span class="kw">let </span>child_id = child_id.coerce_values()<span class="question-mark">?</span>;
 
-        <span class="kw">match</span> <span class="ident">id_map</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="ident">child_id</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">parent_id</span>),
-            <span class="prelude-val">None</span> =&gt; {
-                <span class="ident">id_map</span>.<span class="ident">insert</span>(<span class="ident">child_id</span>, <span class="macro">vec!</span>[<span class="ident">parent_id</span>]);
+        <span class="kw">match </span>id_map.get_mut(<span class="kw-2">&amp;</span>child_id) {
+            <span class="prelude-val">Some</span>(v) =&gt; v.push(parent_id),
+            <span class="prelude-val">None </span>=&gt; {
+                id_map.insert(child_id, <span class="macro">vec!</span>[parent_id]);
             }
         };
     }
 
-    <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">scalars</span>.<span class="ident">field_names</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">additional_records</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Record</span><span class="op">&gt;</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+    <span class="kw">let </span>fields = <span class="kw-2">&amp;</span>scalars.field_names;
+    <span class="kw">let </span><span class="kw-2">mut </span>additional_records: Vec&lt;(usize, Vec&lt;Record&gt;)&gt; = <span class="macro">vec!</span>[];
 
-    <span class="kw">for</span> (<span class="ident">index</span>, <span class="ident">record</span>) <span class="kw">in</span> <span class="ident">scalars</span>.<span class="ident">records</span>.<span class="ident">iter_mut</span>().<span class="ident">enumerate</span>() {
-        <span class="kw">let</span> <span class="ident">record_id</span> <span class="op">=</span> <span class="ident">record</span>.<span class="ident">extract_selection_result</span>(<span class="ident">fields</span>, <span class="kw-2">&amp;</span><span class="ident">child_model_id</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parent_ids</span> <span class="op">=</span> <span class="ident">id_map</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">record_id</span>).<span class="ident">expect</span>(<span class="string">&quot;1&quot;</span>);
-        <span class="kw">let</span> <span class="ident">first</span> <span class="op">=</span> <span class="ident">parent_ids</span>.<span class="ident">pop</span>().<span class="ident">expect</span>(<span class="string">&quot;2&quot;</span>);
+    <span class="kw">for </span>(index, record) <span class="kw">in </span>scalars.records.iter_mut().enumerate() {
+        <span class="kw">let </span>record_id = record.extract_selection_result(fields, <span class="kw-2">&amp;</span>child_model_id)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>parent_ids = id_map.remove(<span class="kw-2">&amp;</span>record_id).expect(<span class="string">&quot;1&quot;</span>);
+        <span class="kw">let </span>first = parent_ids.pop().expect(<span class="string">&quot;2&quot;</span>);
 
-        <span class="ident">record</span>.<span class="ident">parent_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">first</span>);
+        record.parent_id = <span class="prelude-val">Some</span>(first);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">more_records</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+        <span class="kw">let </span><span class="kw-2">mut </span>more_records = <span class="macro">vec!</span>[];
 
-        <span class="kw">for</span> <span class="ident">parent_id</span> <span class="kw">in</span> <span class="ident">parent_ids</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">record</span> <span class="op">=</span> <span class="ident">record</span>.<span class="ident">clone</span>();
+        <span class="kw">for </span>parent_id <span class="kw">in </span>parent_ids {
+            <span class="kw">let </span><span class="kw-2">mut </span>record = record.clone();
 
-            <span class="ident">record</span>.<span class="ident">parent_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">parent_id</span>);
-            <span class="ident">more_records</span>.<span class="ident">push</span>(<span class="ident">record</span>);
+            record.parent_id = <span class="prelude-val">Some</span>(parent_id);
+            more_records.push(record);
         }
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">more_records</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">additional_records</span>.<span class="ident">push</span>((<span class="ident">index</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">more_records</span>));
-        }
-    }
-
-    <span class="comment">// Start to insert in the back to keep other indices valid.</span>
-    <span class="ident">additional_records</span>.<span class="ident">reverse</span>();
-
-    <span class="kw">for</span> (<span class="ident">index</span>, <span class="ident">records</span>) <span class="kw">in</span> <span class="ident">additional_records</span> {
-        <span class="kw">for</span> (<span class="ident">offset</span>, <span class="ident">record</span>) <span class="kw">in</span> <span class="ident">records</span>.<span class="ident">into_iter</span>().<span class="ident">enumerate</span>() {
-            <span class="ident">scalars</span>.<span class="ident">records</span>.<span class="ident">insert</span>(<span class="ident">index</span> <span class="op">+</span> <span class="ident">offset</span>, <span class="ident">record</span>);
+        <span class="kw">if </span>!more_records.is_empty() {
+            additional_records.push((index + <span class="number">1</span>, more_records));
         }
     }
 
-    <span class="kw">let</span> <span class="ident">scalars</span> <span class="op">=</span> <span class="ident">processor</span>.<span class="ident">apply</span>(<span class="ident">scalars</span>);
-    <span class="kw">let</span> (<span class="ident">scalars</span>, <span class="ident">aggregation_rows</span>) <span class="op">=</span>
-        <span class="ident">read::extract_aggregation_rows_from_scalars</span>(<span class="ident">scalars</span>, <span class="ident">query</span>.<span class="ident">aggregation_selections</span>.<span class="ident">clone</span>());
+    <span class="comment">// Start to insert in the back to keep other indices valid.
+    </span>additional_records.reverse();
 
-    <span class="prelude-val">Ok</span>((<span class="ident">scalars</span>, <span class="ident">aggregation_rows</span>))
+    <span class="kw">for </span>(index, records) <span class="kw">in </span>additional_records {
+        <span class="kw">for </span>(offset, record) <span class="kw">in </span>records.into_iter().enumerate() {
+            scalars.records.insert(index + offset, record);
+        }
+    }
+
+    <span class="kw">let </span>scalars = processor.apply(scalars);
+    <span class="kw">let </span>(scalars, aggregation_rows) =
+        read::extract_aggregation_rows_from_scalars(scalars, query.aggregation_selections.clone());
+
+    <span class="prelude-val">Ok</span>((scalars, aggregation_rows))
 }
 
-<span class="comment">// [DTODO] This is implemented in an inefficient fashion, e.g. too much Arc cloning going on.</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::too_many_arguments</span>)]</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">one2m</span>(
-    <span class="ident">tx</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">ConnectionLike</span>,
-    <span class="ident">parent_field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-    <span class="ident">parent_selections</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">parent_result</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ManyRecords</span><span class="op">&gt;</span>,
-    <span class="ident">query_args</span>: <span class="ident">QueryArguments</span>,
-    <span class="ident">selected_fields</span>: <span class="kw-2">&amp;</span><span class="ident">FieldSelection</span>,
-    <span class="ident">aggr_selections</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelAggregationSelection</span><span class="op">&gt;</span>,
-    <span class="ident">processor</span>: <span class="ident">InMemoryRecordProcessor</span>,
-    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">InterpretationResult</span><span class="op">&lt;</span>(<span class="ident">ManyRecords</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelAggregationRow</span><span class="op">&gt;</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">parent_model_id</span> <span class="op">=</span> <span class="ident">parent_field</span>.<span class="ident">model</span>().<span class="ident">primary_identifier</span>();
-    <span class="kw">let</span> <span class="ident">parent_link_id</span> <span class="op">=</span> <span class="ident">parent_field</span>.<span class="ident">linking_fields</span>();
-    <span class="kw">let</span> <span class="ident">child_link_id</span> <span class="op">=</span> <span class="ident">parent_field</span>.<span class="ident">related_field</span>().<span class="ident">linking_fields</span>();
+<span class="comment">// [DTODO] This is implemented in an inefficient fashion, e.g. too much Arc cloning going on.
+</span><span class="attribute">#[allow(clippy::too_many_arguments)]
+</span><span class="kw">pub async fn </span>one2m(
+    tx: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>ConnectionLike,
+    parent_field: <span class="kw-2">&amp;</span>RelationFieldRef,
+    parent_selections: <span class="prelude-ty">Option</span>&lt;Vec&lt;SelectionResult&gt;&gt;,
+    parent_result: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ManyRecords&gt;,
+    query_args: QueryArguments,
+    selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
+    aggr_selections: Vec&lt;RelAggregationSelection&gt;,
+    processor: InMemoryRecordProcessor,
+    trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+) -&gt; InterpretationResult&lt;(ManyRecords, <span class="prelude-ty">Option</span>&lt;Vec&lt;RelAggregationRow&gt;&gt;)&gt; {
+    <span class="kw">let </span>parent_model_id = parent_field.model().primary_identifier();
+    <span class="kw">let </span>parent_link_id = parent_field.linking_fields();
+    <span class="kw">let </span>child_link_id = parent_field.related_field().linking_fields();
 
-    <span class="comment">// Primary ID to link ID</span>
-    <span class="kw">let</span> <span class="ident">joined_results</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">parent_selections</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">selections</span>) =&gt; <span class="ident">selections</span>,
-        <span class="prelude-val">None</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">extractor</span> <span class="op">=</span> <span class="ident">parent_model_id</span>.<span class="ident">clone</span>().<span class="ident">merge</span>(<span class="ident">parent_link_id</span>.<span class="ident">clone</span>());
-            <span class="ident">parent_result</span>
-                .<span class="ident">expect</span>(<span class="string">&quot;[ID retrieval] No parent results present in the query graph for reading related records.&quot;</span>)
-                .<span class="ident">extract_selection_results</span>(<span class="kw-2">&amp;</span><span class="ident">extractor</span>)<span class="question-mark">?</span>
-        }
+    <span class="comment">// Primary ID to link ID
+    </span><span class="kw">let </span>joined_results = <span class="kw">match </span>parent_selections {
+        <span class="prelude-val">Some</span>(selections) =&gt; selections,
+        <span class="prelude-val">None </span>=&gt; {
+            <span class="kw">let </span>extractor = parent_model_id.clone().merge(parent_link_id.clone());
+            parent_result
+                .expect(<span class="string">&quot;[ID retrieval] No parent results present in the query graph for reading related records.&quot;</span>)
+                .extract_selection_results(<span class="kw-2">&amp;</span>extractor)<span class="question-mark">?
+        </span>}
     };
 
-    <span class="comment">// Maps the identifying link values to all primary IDs they are tied to.</span>
-    <span class="comment">// Only the values are hashed for easier comparison.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">link_mapping</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-    <span class="kw">let</span> <span class="ident">link_idents</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">parent_model_id</span>, <span class="ident">parent_link_id</span>];
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">uniq_selections</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+    <span class="comment">// Maps the identifying link values to all primary IDs they are tied to.
+    // Only the values are hashed for easier comparison.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>link_mapping: HashMap&lt;Vec&lt;PrismaValue&gt;, Vec&lt;SelectionResult&gt;&gt; = HashMap::new();
+    <span class="kw">let </span>link_idents = <span class="macro">vec!</span>[parent_model_id, parent_link_id];
+    <span class="kw">let </span><span class="kw-2">mut </span>uniq_selections = Vec::new();
 
-    <span class="kw">for</span> <span class="ident">result</span> <span class="kw">in</span> <span class="ident">joined_results</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">split</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">split_into</span>(<span class="kw-2">&amp;</span><span class="ident">link_idents</span>);
-        <span class="kw">let</span> <span class="ident">link_id</span> <span class="op">=</span> <span class="ident">split</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">split</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">link_values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">link_id</span>.<span class="ident">pairs</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">v</span>)<span class="op">|</span> <span class="ident">v</span>).<span class="ident">collect</span>();
+    <span class="kw">for </span>result <span class="kw">in </span>joined_results {
+        <span class="kw">let </span><span class="kw-2">mut </span>split = result.split_into(<span class="kw-2">&amp;</span>link_idents);
+        <span class="kw">let </span>link_id = split.pop().unwrap();
+        <span class="kw">let </span>id = split.pop().unwrap();
+        <span class="kw">let </span>link_values: Vec&lt;PrismaValue&gt; = link_id.pairs.into_iter().map(|(<span class="kw">_</span>, v)| v).collect();
 
-        <span class="kw">match</span> <span class="ident">link_mapping</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="ident">link_values</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">records</span>) =&gt; <span class="ident">records</span>.<span class="ident">push</span>(<span class="ident">id</span>),
-            <span class="prelude-val">None</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ids</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+        <span class="kw">match </span>link_mapping.get_mut(<span class="kw-2">&amp;</span>link_values) {
+            <span class="prelude-val">Some</span>(records) =&gt; records.push(id),
+            <span class="prelude-val">None </span>=&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>ids = Vec::new();
 
-                <span class="ident">ids</span>.<span class="ident">push</span>(<span class="ident">id</span>);
-                <span class="ident">uniq_selections</span>.<span class="ident">push</span>(<span class="ident">link_values</span>.<span class="ident">clone</span>());
-                <span class="ident">link_mapping</span>.<span class="ident">insert</span>(<span class="ident">link_values</span>, <span class="ident">ids</span>);
+                ids.push(id);
+                uniq_selections.push(link_values.clone());
+                link_mapping.insert(link_values, ids);
             }
         }
     }
 
-    <span class="kw">let</span> <span class="ident">uniq_selections</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">uniq_selections</span>
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="op">!</span><span class="ident">p</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">is_null</span>()))
-        .<span class="ident">collect</span>();
+    <span class="kw">let </span>uniq_selections: Vec&lt;Vec&lt;PrismaValue&gt;&gt; = uniq_selections
+        .into_iter()
+        .filter(|p| !p.iter().any(|v| v.is_null()))
+        .collect();
 
-    <span class="kw">if</span> <span class="ident">uniq_selections</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="ident">ManyRecords::empty</span>(<span class="ident">selected_fields</span>), <span class="prelude-val">None</span>));
+    <span class="kw">if </span>uniq_selections.is_empty() {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>((ManyRecords::empty(selected_fields), <span class="prelude-val">None</span>));
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">scalars</span> <span class="op">=</span> {
-        <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">child_link_id</span>.<span class="ident">is_in</span>(<span class="ident">ConditionListValue::list</span>(<span class="ident">uniq_selections</span>));
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">query_args</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>scalars = {
+        <span class="kw">let </span>filter = child_link_id.is_in(ConditionListValue::list(uniq_selections));
+        <span class="kw">let </span><span class="kw-2">mut </span>args = query_args;
 
-        <span class="ident">args</span>.<span class="ident">filter</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">args</span>.<span class="ident">filter</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">existing_filter</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">Filter::and</span>(<span class="macro">vec!</span>[<span class="ident">existing_filter</span>, <span class="ident">filter</span>])),
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">filter</span>),
+        args.filter = <span class="kw">match </span>args.filter {
+            <span class="prelude-val">Some</span>(existing_filter) =&gt; <span class="prelude-val">Some</span>(Filter::and(<span class="macro">vec!</span>[existing_filter, filter])),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Some</span>(filter),
         };
-        <span class="ident">tx</span>.<span class="ident">get_many_records</span>(
-            <span class="kw-2">&amp;</span><span class="ident">parent_field</span>.<span class="ident">related_model</span>(),
-            <span class="ident">args</span>,
-            <span class="ident">selected_fields</span>,
-            <span class="kw-2">&amp;</span><span class="ident">aggr_selections</span>,
-            <span class="ident">trace_id</span>,
+        tx.get_many_records(
+            <span class="kw-2">&amp;</span>parent_field.related_model(),
+            args,
+            selected_fields,
+            <span class="kw-2">&amp;</span>aggr_selections,
+            trace_id,
         )
-        .<span class="kw">await</span><span class="question-mark">?</span>
-    };
+        .<span class="kw">await</span><span class="question-mark">?
+    </span>};
 
-    <span class="comment">// Inlining is done on the parent, this means that we need to write the primary parent ID</span>
-    <span class="comment">// into the child records that we retrieved. The matching is done based on the parent link values.</span>
-    <span class="kw">if</span> <span class="ident">parent_field</span>.<span class="ident">is_inlined_on_enclosing_model</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">additional_records</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+    <span class="comment">// Inlining is done on the parent, this means that we need to write the primary parent ID
+    // into the child records that we retrieved. The matching is done based on the parent link values.
+    </span><span class="kw">if </span>parent_field.is_inlined_on_enclosing_model() {
+        <span class="kw">let </span><span class="kw-2">mut </span>additional_records = <span class="macro">vec!</span>[];
 
-        <span class="kw">for</span> <span class="kw-2">mut</span> <span class="ident">record</span> <span class="kw">in</span> <span class="ident">scalars</span>.<span class="ident">records</span>.<span class="ident">iter_mut</span>() {
-            <span class="kw">let</span> <span class="ident">child_link</span>: <span class="ident">SelectionResult</span> <span class="op">=</span> <span class="ident">record</span>.<span class="ident">extract_selection_result</span>(<span class="kw-2">&amp;</span><span class="ident">scalars</span>.<span class="ident">field_names</span>, <span class="kw-2">&amp;</span><span class="ident">child_link_id</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">child_link_values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">child_link</span>.<span class="ident">pairs</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">v</span>)<span class="op">|</span> <span class="ident">v</span>).<span class="ident">collect</span>();
+        <span class="kw">for </span><span class="kw-2">mut </span>record <span class="kw">in </span>scalars.records.iter_mut() {
+            <span class="kw">let </span>child_link: SelectionResult = record.extract_selection_result(<span class="kw-2">&amp;</span>scalars.field_names, <span class="kw-2">&amp;</span>child_link_id)<span class="question-mark">?</span>;
+            <span class="kw">let </span>child_link_values: Vec&lt;PrismaValue&gt; = child_link.pairs.into_iter().map(|(<span class="kw">_</span>, v)| v).collect();
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">parent_ids</span>) <span class="op">=</span> <span class="ident">link_mapping</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="ident">child_link_values</span>) {
-                <span class="ident">parent_ids</span>.<span class="ident">reverse</span>();
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(parent_ids) = link_mapping.get_mut(<span class="kw-2">&amp;</span>child_link_values) {
+                parent_ids.reverse();
 
-                <span class="kw">let</span> <span class="ident">parent_id</span> <span class="op">=</span> <span class="ident">parent_ids</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>();
-                <span class="ident">record</span>.<span class="ident">parent_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">parent_id</span>);
+                <span class="kw">let </span>parent_id = parent_ids.pop().unwrap();
+                record.parent_id = <span class="prelude-val">Some</span>(parent_id);
 
-                <span class="kw">for</span> <span class="ident">parent_id</span> <span class="kw">in</span> <span class="ident">parent_ids</span> {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">record</span> <span class="op">=</span> <span class="ident">record</span>.<span class="ident">clone</span>();
+                <span class="kw">for </span>parent_id <span class="kw">in </span>parent_ids {
+                    <span class="kw">let </span><span class="kw-2">mut </span>record = record.clone();
 
-                    <span class="ident">record</span>.<span class="ident">parent_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>((<span class="kw-2">*</span><span class="ident">parent_id</span>).<span class="ident">clone</span>());
-                    <span class="ident">additional_records</span>.<span class="ident">push</span>(<span class="ident">record</span>);
+                    record.parent_id = <span class="prelude-val">Some</span>((<span class="kw-2">*</span>parent_id).clone());
+                    additional_records.push(record);
                 }
             }
         }
 
-        <span class="ident">scalars</span>.<span class="ident">records</span>.<span class="ident">extend</span>(<span class="ident">additional_records</span>);
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">parent_field</span>.<span class="ident">related_field</span>().<span class="ident">is_inlined_on_enclosing_model</span>() {
-        <span class="comment">// Parent to map is inlined on the child records</span>
-        <span class="kw">let</span> <span class="ident">child_link_fields</span> <span class="op">=</span> <span class="ident">parent_field</span>.<span class="ident">related_field</span>().<span class="ident">linking_fields</span>();
+        scalars.records.extend(additional_records);
+    } <span class="kw">else if </span>parent_field.related_field().is_inlined_on_enclosing_model() {
+        <span class="comment">// Parent to map is inlined on the child records
+        </span><span class="kw">let </span>child_link_fields = parent_field.related_field().linking_fields();
 
-        <span class="kw">for</span> <span class="ident">record</span> <span class="kw">in</span> <span class="ident">scalars</span>.<span class="ident">records</span>.<span class="ident">iter_mut</span>() {
-            <span class="kw">let</span> <span class="ident">child_link</span>: <span class="ident">SelectionResult</span> <span class="op">=</span>
-                <span class="ident">record</span>.<span class="ident">extract_selection_result</span>(<span class="kw-2">&amp;</span><span class="ident">scalars</span>.<span class="ident">field_names</span>, <span class="kw-2">&amp;</span><span class="ident">child_link_fields</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">child_link_values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">child_link</span>.<span class="ident">pairs</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">v</span>)<span class="op">|</span> <span class="ident">v</span>).<span class="ident">collect</span>();
+        <span class="kw">for </span>record <span class="kw">in </span>scalars.records.iter_mut() {
+            <span class="kw">let </span>child_link: SelectionResult =
+                record.extract_selection_result(<span class="kw-2">&amp;</span>scalars.field_names, <span class="kw-2">&amp;</span>child_link_fields)<span class="question-mark">?</span>;
+            <span class="kw">let </span>child_link_values: Vec&lt;PrismaValue&gt; = child_link.pairs.into_iter().map(|(<span class="kw">_</span>, v)| v).collect();
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">parent_ids</span>) <span class="op">=</span> <span class="ident">link_mapping</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">child_link_values</span>) {
-                <span class="kw">let</span> <span class="ident">parent_id</span> <span class="op">=</span> <span class="ident">parent_ids</span>.<span class="ident">last</span>().<span class="ident">unwrap</span>();
-                <span class="ident">record</span>.<span class="ident">parent_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">parent_id</span>.<span class="ident">clone</span>());
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(parent_ids) = link_mapping.get(<span class="kw-2">&amp;</span>child_link_values) {
+                <span class="kw">let </span>parent_id = parent_ids.last().unwrap();
+                record.parent_id = <span class="prelude-val">Some</span>(parent_id.clone());
             }
         }
-    } <span class="kw">else</span> {
+    } <span class="kw">else </span>{
         <span class="macro">panic!</span>(
             <span class="string">&quot;parent result: {:?}, relation: {:?}&quot;</span>,
-            <span class="kw-2">&amp;</span><span class="ident">parent_result</span>,
-            <span class="kw-2">&amp;</span><span class="ident">parent_field</span>.<span class="ident">relation</span>()
+            <span class="kw-2">&amp;</span>parent_result,
+            <span class="kw-2">&amp;</span>parent_field.relation()
         );
     }
 
-    <span class="kw">let</span> <span class="ident">scalars</span> <span class="op">=</span> <span class="ident">processor</span>.<span class="ident">apply</span>(<span class="ident">scalars</span>);
-    <span class="kw">let</span> (<span class="ident">scalars</span>, <span class="ident">aggregation_rows</span>) <span class="op">=</span> <span class="ident">read::extract_aggregation_rows_from_scalars</span>(<span class="ident">scalars</span>, <span class="ident">aggr_selections</span>);
+    <span class="kw">let </span>scalars = processor.apply(scalars);
+    <span class="kw">let </span>(scalars, aggregation_rows) = read::extract_aggregation_rows_from_scalars(scalars, aggr_selections);
 
-    <span class="prelude-val">Ok</span>((<span class="ident">scalars</span>, <span class="ident">aggregation_rows</span>))
+    <span class="prelude-val">Ok</span>((scalars, aggregation_rows))
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/migration-engine-tests/src/multi_engine_test_api.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>multi_engine_test_api.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../migration_engine_tests/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../migration_engine_tests/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../migration_engine_tests/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/migration-engine-tests/src/multi_engine_test_api.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>multi_engine_test_api.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../migration_engine_tests/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../migration_engine_tests/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../migration_engine_tests/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -317,324 +317,324 @@
 <span id="317">317</span>
 <span id="318">318</span>
 <span id="319">319</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_docs</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![deny(missing_docs)]
 
-<span class="doccomment">//! A TestApi that is initialized without IO or async code and can instantiate</span>
-<span class="doccomment">//! multiple migration engines.</span>
+</span><span class="doccomment">//! A TestApi that is initialized without IO or async code and can instantiate
+//! multiple migration engines.
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">test_macros::test_connector</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">test_setup::sqlite_test_url</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">test_setup</span>::{<span class="ident">runtime::run_with_thread_local_runtime</span> <span class="kw">as</span> <span class="ident">tok</span>, <span class="ident">BitFlags</span>, <span class="ident">Capabilities</span>, <span class="ident">Tags</span>};
+</span><span class="kw">pub use </span>test_macros::test_connector;
+<span class="kw">pub use </span>test_setup::sqlite_test_url;
+<span class="kw">pub use </span>test_setup::{runtime::run_with_thread_local_runtime <span class="kw">as </span>tok, BitFlags, Capabilities, Tags};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">assertions::SchemaAssertion</span>,
-    <span class="ident">commands</span>::{<span class="ident">ApplyMigrations</span>, <span class="ident">CreateMigration</span>, <span class="ident">DiagnoseMigrationHistory</span>, <span class="ident">Reset</span>, <span class="ident">SchemaPush</span>},
+<span class="kw">use crate</span>::{
+    assertions::SchemaAssertion,
+    commands::{ApplyMigrations, CreateMigration, DiagnoseMigrationHistory, Reset, SchemaPush},
 };
-<span class="kw">use</span> <span class="ident">migration_core::migration_connector</span>::{<span class="ident">ConnectorParams</span>, <span class="ident">MigrationConnector</span>};
-<span class="kw">use</span> <span class="ident">psl::PreviewFeature</span>;
-<span class="kw">use</span> <span class="ident">quaint</span>::{
-    <span class="ident">prelude</span>::{<span class="ident">ConnectionInfo</span>, <span class="ident">Queryable</span>, <span class="ident">ResultSet</span>},
-    <span class="ident">single::Quaint</span>,
+<span class="kw">use </span>migration_core::migration_connector::{ConnectorParams, MigrationConnector};
+<span class="kw">use </span>psl::PreviewFeature;
+<span class="kw">use </span>quaint::{
+    prelude::{ConnectionInfo, Queryable, ResultSet},
+    single::Quaint,
 };
-<span class="kw">use</span> <span class="ident">sql_migration_connector::SqlMigrationConnector</span>;
-<span class="kw">use</span> <span class="ident">tempfile::TempDir</span>;
-<span class="kw">use</span> <span class="ident">test_setup</span>::{<span class="ident">DatasourceBlock</span>, <span class="ident">TestApiArgs</span>};
+<span class="kw">use </span>sql_migration_connector::SqlMigrationConnector;
+<span class="kw">use </span>tempfile::TempDir;
+<span class="kw">use </span>test_setup::{DatasourceBlock, TestApiArgs};
 
-<span class="doccomment">/// The multi-engine test API.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestApi</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">args</span>: <span class="ident">TestApiArgs</span>,
-    <span class="ident">connection_string</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">admin_conn</span>: <span class="ident">Quaint</span>,
-    <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
+<span class="doccomment">/// The multi-engine test API.
+</span><span class="kw">pub struct </span>TestApi {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) args: TestApiArgs,
+    connection_string: String,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) admin_conn: Quaint,
+    preview_features: BitFlags&lt;PreviewFeature&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">TestApi</span> {
-    <span class="doccomment">/// Initializer, called by the test macros.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">args</span>: <span class="ident">TestApiArgs</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">tags</span> <span class="op">=</span> <span class="ident">args</span>.<span class="ident">tags</span>();
+<span class="kw">impl </span>TestApi {
+    <span class="doccomment">/// Initializer, called by the test macros.
+    </span><span class="kw">pub fn </span>new(args: TestApiArgs) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>tags = args.tags();
 
-        <span class="kw">let</span> <span class="ident">preview_features</span> <span class="op">=</span> <span class="ident">args</span>
-            .<span class="ident">preview_features</span>()
-            .<span class="ident">iter</span>()
-            .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">PreviewFeature::parse_opt</span>(<span class="ident">f</span>))
-            .<span class="ident">collect</span>();
+        <span class="kw">let </span>preview_features = args
+            .preview_features()
+            .iter()
+            .flat_map(|f| PreviewFeature::parse_opt(f))
+            .collect();
 
-        <span class="kw">let</span> (<span class="ident">admin_conn</span>, <span class="ident">connection_string</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">tags</span>.<span class="ident">contains</span>(<span class="ident">Tags::Postgres</span>) {
-            <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">q</span>, <span class="ident">cs</span>) <span class="op">=</span> <span class="ident">tok</span>(<span class="ident">args</span>.<span class="ident">create_postgres_database</span>());
-            (<span class="ident">q</span>, <span class="ident">cs</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">tags</span>.<span class="ident">contains</span>(<span class="ident">Tags::Vitess</span>) {
-            <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">ConnectorParams</span> {
-                <span class="ident">connection_string</span>: <span class="ident">args</span>.<span class="ident">database_url</span>().<span class="ident">to_owned</span>(),
-                <span class="ident">preview_features</span>,
-                <span class="ident">shadow_database_connection_string</span>: <span class="ident">args</span>.<span class="ident">shadow_database_url</span>().<span class="ident">map</span>(<span class="ident">String::from</span>),
+        <span class="kw">let </span>(admin_conn, connection_string) = <span class="kw">if </span>tags.contains(Tags::Postgres) {
+            <span class="kw">let </span>(<span class="kw">_</span>, q, cs) = tok(args.create_postgres_database());
+            (q, cs)
+        } <span class="kw">else if </span>tags.contains(Tags::Vitess) {
+            <span class="kw">let </span>params = ConnectorParams {
+                connection_string: args.database_url().to_owned(),
+                preview_features,
+                shadow_database_connection_string: args.shadow_database_url().map(String::from),
             };
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">SqlMigrationConnector::new_mysql</span>();
-            <span class="ident">conn</span>.<span class="ident">set_params</span>(<span class="ident">params</span>).<span class="ident">unwrap</span>();
-            <span class="ident">tok</span>(<span class="ident">conn</span>.<span class="ident">reset</span>(<span class="bool-val">false</span>, <span class="prelude-val">None</span>)).<span class="ident">unwrap</span>();
+            <span class="kw">let </span><span class="kw-2">mut </span>conn = SqlMigrationConnector::new_mysql();
+            conn.set_params(params).unwrap();
+            tok(conn.reset(<span class="bool-val">false</span>, <span class="prelude-val">None</span>)).unwrap();
 
             (
-                <span class="ident">tok</span>(<span class="ident">Quaint::new</span>(<span class="ident">args</span>.<span class="ident">database_url</span>())).<span class="ident">unwrap</span>(),
-                <span class="ident">args</span>.<span class="ident">database_url</span>().<span class="ident">to_owned</span>(),
+                tok(Quaint::new(args.database_url())).unwrap(),
+                args.database_url().to_owned(),
             )
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">tags</span>.<span class="ident">contains</span>(<span class="ident">Tags::Mysql</span>) {
-            <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">cs</span>) <span class="op">=</span> <span class="ident">tok</span>(<span class="ident">args</span>.<span class="ident">create_mysql_database</span>());
-            (<span class="ident">tok</span>(<span class="ident">Quaint::new</span>(<span class="kw-2">&amp;</span><span class="ident">cs</span>)).<span class="ident">unwrap</span>(), <span class="ident">cs</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">tags</span>.<span class="ident">contains</span>(<span class="ident">Tags::Mssql</span>) {
-            <span class="ident">tok</span>(<span class="ident">args</span>.<span class="ident">create_mssql_database</span>())
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">tags</span>.<span class="ident">contains</span>(<span class="ident">Tags::Sqlite</span>) {
-            <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">test_setup::sqlite_test_url</span>(<span class="ident">args</span>.<span class="ident">test_function_name</span>());
+        } <span class="kw">else if </span>tags.contains(Tags::Mysql) {
+            <span class="kw">let </span>(<span class="kw">_</span>, cs) = tok(args.create_mysql_database());
+            (tok(Quaint::new(<span class="kw-2">&amp;</span>cs)).unwrap(), cs)
+        } <span class="kw">else if </span>tags.contains(Tags::Mssql) {
+            tok(args.create_mssql_database())
+        } <span class="kw">else if </span>tags.contains(Tags::Sqlite) {
+            <span class="kw">let </span>url = test_setup::sqlite_test_url(args.test_function_name());
 
-            (<span class="ident">tok</span>(<span class="ident">Quaint::new</span>(<span class="kw-2">&amp;</span><span class="ident">url</span>)).<span class="ident">unwrap</span>(), <span class="ident">url</span>)
-        } <span class="kw">else</span> {
+            (tok(Quaint::new(<span class="kw-2">&amp;</span>url)).unwrap(), url)
+        } <span class="kw">else </span>{
             <span class="macro">unreachable!</span>()
         };
 
-        <span class="ident">TestApi</span> {
-            <span class="ident">args</span>,
-            <span class="ident">connection_string</span>,
-            <span class="ident">admin_conn</span>,
-            <span class="ident">preview_features</span>,
+        TestApi {
+            args,
+            connection_string,
+            admin_conn,
+            preview_features,
         }
     }
 
-    <span class="doccomment">/// Equivalent to quaint&#39;s query_raw()</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="ident">quaint::Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) -&gt; <span class="ident">quaint::Result</span><span class="op">&lt;</span><span class="ident">ResultSet</span><span class="op">&gt;</span> {
-        <span class="ident">tok</span>(<span class="self">self</span>.<span class="ident">admin_conn</span>.<span class="ident">query_raw</span>(<span class="ident">sql</span>, <span class="ident">params</span>))
+    <span class="doccomment">/// Equivalent to quaint&#39;s query_raw()
+    </span><span class="kw">pub fn </span>query_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[quaint::Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; quaint::Result&lt;ResultSet&gt; {
+        tok(<span class="self">self</span>.admin_conn.query_raw(sql, params))
     }
 
-    <span class="doccomment">/// Send a SQL command to the database, and expect it to succeed.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="ident">tok</span>(<span class="self">self</span>.<span class="ident">admin_conn</span>.<span class="ident">raw_cmd</span>(<span class="ident">sql</span>)).<span class="ident">unwrap</span>()
+    <span class="doccomment">/// Send a SQL command to the database, and expect it to succeed.
+    </span><span class="kw">pub fn </span>raw_cmd(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str) {
+        tok(<span class="self">self</span>.admin_conn.raw_cmd(sql)).unwrap()
     }
 
-    <span class="doccomment">/// The connection string for the database associated with the test.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connection_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">connection_string</span>
+    <span class="doccomment">/// The connection string for the database associated with the test.
+    </span><span class="kw">pub fn </span>connection_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.connection_string
     }
 
-    <span class="doccomment">/// The ConnectionInfo based on the connection string</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connection_info</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectionInfo</span> {
-        <span class="ident">ConnectionInfo::from_url</span>(<span class="self">self</span>.<span class="ident">connection_string</span>()).<span class="ident">unwrap</span>()
+    <span class="doccomment">/// The ConnectionInfo based on the connection string
+    </span><span class="kw">pub fn </span>connection_info(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ConnectionInfo {
+        ConnectionInfo::from_url(<span class="self">self</span>.connection_string()).unwrap()
     }
 
-    <span class="doccomment">/// Create a temporary directory to serve as a test migrations directory.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_migrations_directory</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TempDir</span> {
-        <span class="ident">tempfile::tempdir</span>().<span class="ident">unwrap</span>()
+    <span class="doccomment">/// Create a temporary directory to serve as a test migrations directory.
+    </span><span class="kw">pub fn </span>create_migrations_directory(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TempDir {
+        tempfile::tempdir().unwrap()
     }
 
-    <span class="doccomment">/// Render a valid datasource block, including database URL.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">datasource_block</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DatasourceBlock</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">datasource_block</span>(<span class="self">self</span>.<span class="ident">args</span>.<span class="ident">database_url</span>(), <span class="kw-2">&amp;</span>[])
+    <span class="doccomment">/// Render a valid datasource block, including database URL.
+    </span><span class="kw">pub fn </span>datasource_block(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; DatasourceBlock&lt;<span class="lifetime">&#39;_</span>&gt; {
+        <span class="self">self</span>.args.datasource_block(<span class="self">self</span>.args.database_url(), <span class="kw-2">&amp;</span>[])
     }
 
-    <span class="doccomment">/// Returns true only when testing on MSSQL.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_mssql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">tags</span>().<span class="ident">contains</span>(<span class="ident">Tags::Mssql</span>)
+    <span class="doccomment">/// Returns true only when testing on MSSQL.
+    </span><span class="kw">pub fn </span>is_mssql(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.tags().contains(Tags::Mssql)
     }
 
-    <span class="doccomment">/// Returns true only when testing on MySQL.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_mysql</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">tags</span>().<span class="ident">contains</span>(<span class="ident">Tags::Mysql</span>)
+    <span class="doccomment">/// Returns true only when testing on MySQL.
+    </span><span class="kw">pub fn </span>is_mysql(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.tags().contains(Tags::Mysql)
     }
 
-    <span class="doccomment">/// Returns true only when testing on MariaDB.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_mysql_mariadb</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">tags</span>().<span class="ident">contains</span>(<span class="ident">Tags::Mariadb</span>)
+    <span class="doccomment">/// Returns true only when testing on MariaDB.
+    </span><span class="kw">pub fn </span>is_mysql_mariadb(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.tags().contains(Tags::Mariadb)
     }
 
-    <span class="doccomment">/// Returns true only when testing on MySQL 5.6.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_mysql_5_6</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">tags</span>().<span class="ident">contains</span>(<span class="ident">Tags::Mysql56</span>)
+    <span class="doccomment">/// Returns true only when testing on MySQL 5.6.
+    </span><span class="kw">pub fn </span>is_mysql_5_6(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.tags().contains(Tags::Mysql56)
     }
 
-    <span class="doccomment">/// Returns true only when testing on MySQL 8.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_mysql_8</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">tags</span>().<span class="ident">contains</span>(<span class="ident">Tags::Mysql8</span>)
+    <span class="doccomment">/// Returns true only when testing on MySQL 8.
+    </span><span class="kw">pub fn </span>is_mysql_8(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.tags().contains(Tags::Mysql8)
     }
 
-    <span class="doccomment">/// Returns true only when testing on postgres.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_postgres</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">tags</span>().<span class="ident">contains</span>(<span class="ident">Tags::Postgres</span>)
+    <span class="doccomment">/// Returns true only when testing on postgres.
+    </span><span class="kw">pub fn </span>is_postgres(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.tags().contains(Tags::Postgres)
     }
 
-    <span class="doccomment">/// Returns true only when testing on postgres version 15.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_postgres_15</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">tags</span>().<span class="ident">contains</span>(<span class="ident">Tags::Postgres15</span>)
+    <span class="doccomment">/// Returns true only when testing on postgres version 15.
+    </span><span class="kw">pub fn </span>is_postgres_15(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.tags().contains(Tags::Postgres15)
     }
 
-    <span class="doccomment">/// Returns true only when testing on cockroach.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_cockroach</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">tags</span>().<span class="ident">contains</span>(<span class="ident">Tags::CockroachDb</span>)
+    <span class="doccomment">/// Returns true only when testing on cockroach.
+    </span><span class="kw">pub fn </span>is_cockroach(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.tags().contains(Tags::CockroachDb)
     }
 
-    <span class="doccomment">/// Returns true only when testing on sqlite.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_sqlite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">tags</span>().<span class="ident">contains</span>(<span class="ident">Tags::Sqlite</span>)
+    <span class="doccomment">/// Returns true only when testing on sqlite.
+    </span><span class="kw">pub fn </span>is_sqlite(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.tags().contains(Tags::Sqlite)
     }
 
-    <span class="doccomment">/// Returns true only when testing on vitess.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_vitess</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">tags</span>().<span class="ident">contains</span>(<span class="ident">Tags::Vitess</span>)
+    <span class="doccomment">/// Returns true only when testing on vitess.
+    </span><span class="kw">pub fn </span>is_vitess(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.tags().contains(Tags::Vitess)
     }
 
-    <span class="doccomment">/// Returns whether the database automatically lower-cases table names.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lower_cases_table_names</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">tags</span>().<span class="ident">contains</span>(<span class="ident">Tags::LowerCasesTableNames</span>)
+    <span class="doccomment">/// Returns whether the database automatically lower-cases table names.
+    </span><span class="kw">pub fn </span>lower_cases_table_names(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.tags().contains(Tags::LowerCasesTableNames)
     }
 
-    <span class="doccomment">/// Instantiate a new migration engine for the current database.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_engine</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">EngineTestApi</span> {
-        <span class="kw">let</span> <span class="ident">shadow_db</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">shadow_database_url</span>().<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">ToString::to_string</span>);
-        <span class="self">self</span>.<span class="ident">new_engine_with_connection_strings</span>(<span class="self">self</span>.<span class="ident">connection_string</span>.<span class="ident">clone</span>(), <span class="ident">shadow_db</span>)
+    <span class="doccomment">/// Instantiate a new migration engine for the current database.
+    </span><span class="kw">pub fn </span>new_engine(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; EngineTestApi {
+        <span class="kw">let </span>shadow_db = <span class="self">self</span>.args.shadow_database_url().as_ref().map(ToString::to_string);
+        <span class="self">self</span>.new_engine_with_connection_strings(<span class="self">self</span>.connection_string.clone(), shadow_db)
     }
 
-    <span class="doccomment">/// Instantiate a new migration with the provided connection string.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_engine_with_connection_strings</span>(
+    <span class="doccomment">/// Instantiate a new migration with the provided connection string.
+    </span><span class="kw">pub fn </span>new_engine_with_connection_strings(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">connection_string</span>: <span class="ident">String</span>,
-        <span class="ident">shadow_database_connection_string</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">EngineTestApi</span> {
-        <span class="kw">let</span> <span class="ident">connection_info</span> <span class="op">=</span> <span class="ident">ConnectionInfo::from_url</span>(<span class="kw-2">&amp;</span><span class="ident">connection_string</span>).<span class="ident">unwrap</span>();
+        connection_string: String,
+        shadow_database_connection_string: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; EngineTestApi {
+        <span class="kw">let </span>connection_info = ConnectionInfo::from_url(<span class="kw-2">&amp;</span>connection_string).unwrap();
 
-        <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">ConnectorParams</span> {
-            <span class="ident">connection_string</span>,
-            <span class="ident">preview_features</span>: <span class="self">self</span>.<span class="ident">preview_features</span>,
-            <span class="ident">shadow_database_connection_string</span>,
+        <span class="kw">let </span>params = ConnectorParams {
+            connection_string,
+            preview_features: <span class="self">self</span>.preview_features,
+            shadow_database_connection_string,
         };
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">connector</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">connection_info</span> {
-            <span class="ident">ConnectionInfo::Postgres</span>(<span class="kw">_</span>) =&gt; {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">provider</span>() <span class="op">==</span> <span class="string">&quot;cockroachdb&quot;</span> {
-                    <span class="ident">SqlMigrationConnector::new_cockroach</span>()
-                } <span class="kw">else</span> {
-                    <span class="ident">SqlMigrationConnector::new_postgres</span>()
+        <span class="kw">let </span><span class="kw-2">mut </span>connector = <span class="kw">match </span><span class="kw-2">&amp;</span>connection_info {
+            ConnectionInfo::Postgres(<span class="kw">_</span>) =&gt; {
+                <span class="kw">if </span><span class="self">self</span>.args.provider() == <span class="string">&quot;cockroachdb&quot; </span>{
+                    SqlMigrationConnector::new_cockroach()
+                } <span class="kw">else </span>{
+                    SqlMigrationConnector::new_postgres()
                 }
             }
-            <span class="ident">ConnectionInfo::Mysql</span>(<span class="kw">_</span>) =&gt; <span class="ident">SqlMigrationConnector::new_mysql</span>(),
-            <span class="ident">ConnectionInfo::Mssql</span>(<span class="kw">_</span>) =&gt; <span class="ident">SqlMigrationConnector::new_mssql</span>(),
-            <span class="ident">ConnectionInfo::Sqlite</span> { .. } =&gt; <span class="ident">SqlMigrationConnector::new_sqlite</span>(),
-            <span class="ident">ConnectionInfo::InMemorySqlite</span> { .. } =&gt; <span class="macro">unreachable!</span>(),
+            ConnectionInfo::Mysql(<span class="kw">_</span>) =&gt; SqlMigrationConnector::new_mysql(),
+            ConnectionInfo::Mssql(<span class="kw">_</span>) =&gt; SqlMigrationConnector::new_mssql(),
+            ConnectionInfo::Sqlite { .. } =&gt; SqlMigrationConnector::new_sqlite(),
+            ConnectionInfo::InMemorySqlite { .. } =&gt; <span class="macro">unreachable!</span>(),
         };
-        <span class="ident">connector</span>.<span class="ident">set_params</span>(<span class="ident">params</span>).<span class="ident">unwrap</span>();
+        connector.set_params(params).unwrap();
 
-        <span class="ident">EngineTestApi</span> {
-            <span class="ident">connector</span>,
-            <span class="ident">connection_info</span>,
-            <span class="ident">tags</span>: <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">tags</span>(),
+        EngineTestApi {
+            connector,
+            connection_info,
+            tags: <span class="self">self</span>.args.tags(),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">tags</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">Tags</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">tags</span>()
+    <span class="kw">fn </span>tags(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BitFlags&lt;Tags&gt; {
+        <span class="self">self</span>.args.tags()
     }
 
-    <span class="doccomment">/// The name of the test function, as a string.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_fn_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">test_function_name</span>()
+    <span class="doccomment">/// The name of the test function, as a string.
+    </span><span class="kw">pub fn </span>test_fn_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.args.test_function_name()
     }
 
-    <span class="doccomment">/// Render a datamodel including provider and generator block.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">datamodel_with_provider</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="number">320</span> <span class="op">+</span> <span class="ident">schema</span>.<span class="ident">len</span>());
+    <span class="doccomment">/// Render a datamodel including provider and generator block.
+    </span><span class="kw">pub fn </span>datamodel_with_provider(<span class="kw-2">&amp;</span><span class="self">self</span>, schema: <span class="kw-2">&amp;</span>str) -&gt; String {
+        <span class="kw">let </span><span class="kw-2">mut </span>out = String::with_capacity(<span class="number">320 </span>+ schema.len());
 
-        <span class="self">self</span>.<span class="ident">write_datasource_block</span>(<span class="kw-2">&amp;mut</span> <span class="ident">out</span>);
-        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">generator_block</span>());
-        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="ident">schema</span>);
+        <span class="self">self</span>.write_datasource_block(<span class="kw-2">&amp;mut </span>out);
+        out.push_str(<span class="kw-2">&amp;</span><span class="self">self</span>.generator_block());
+        out.push_str(schema);
 
-        <span class="ident">out</span>
+        out
     }
 
-    <span class="doccomment">/// Render a valid datasource block, including database URL.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_datasource_block</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">std::fmt::Write</span>) {
-        <span class="macro">write!</span>(<span class="ident">out</span>, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">args</span>.<span class="ident">datasource_block</span>(<span class="self">self</span>.<span class="ident">args</span>.<span class="ident">database_url</span>(), <span class="kw-2">&amp;</span>[])).<span class="ident">unwrap</span>()
+    <span class="doccomment">/// Render a valid datasource block, including database URL.
+    </span><span class="kw">pub fn </span>write_datasource_block(<span class="kw-2">&amp;</span><span class="self">self</span>, out: <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>std::fmt::Write) {
+        <span class="macro">write!</span>(out, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.args.datasource_block(<span class="self">self</span>.args.database_url(), <span class="kw-2">&amp;</span>[])).unwrap()
     }
 
-    <span class="doccomment">/// Currently enabled preview features.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">preview_features</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">preview_features</span>
+    <span class="doccomment">/// Currently enabled preview features.
+    </span><span class="kw">pub fn </span>preview_features(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BitFlags&lt;PreviewFeature&gt; {
+        <span class="self">self</span>.preview_features
     }
 
-    <span class="kw">fn</span> <span class="ident">generator_block</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="ident">preview_features</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">args</span>
-            .<span class="ident">preview_features</span>()
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">pf</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">r#&quot;&quot;{}&quot;&quot;#</span>, <span class="ident">pf</span>))
-            .<span class="ident">collect</span>();
+    <span class="kw">fn </span>generator_block(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="kw">let </span>preview_features: Vec&lt;String&gt; = <span class="self">self
+            </span>.args
+            .preview_features()
+            .iter()
+            .map(|pf| <span class="macro">format!</span>(<span class="string">r#&quot;&quot;{}&quot;&quot;#</span>, pf))
+            .collect();
 
-        <span class="kw">let</span> <span class="ident">preview_feature_string</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">preview_features</span>.<span class="ident">is_empty</span>() {
-            <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>()
-        } <span class="kw">else</span> {
-            <span class="macro">format!</span>(<span class="string">&quot;\npreviewFeatures = [{}]&quot;</span>, <span class="ident">preview_features</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>))
+        <span class="kw">let </span>preview_feature_string = <span class="kw">if </span>preview_features.is_empty() {
+            <span class="string">&quot;&quot;</span>.to_string()
+        } <span class="kw">else </span>{
+            <span class="macro">format!</span>(<span class="string">&quot;\npreviewFeatures = [{}]&quot;</span>, preview_features.join(<span class="string">&quot;, &quot;</span>))
         };
 
-        <span class="kw">let</span> <span class="ident">generator_block</span> <span class="op">=</span> <span class="macro">format!</span>(
+        <span class="kw">let </span>generator_block = <span class="macro">format!</span>(
             <span class="string">r#&quot;generator client {{
                  provider = &quot;prisma-client-js&quot;{}
                }}&quot;#</span>,
-            <span class="ident">preview_feature_string</span>
+            preview_feature_string
         );
-        <span class="ident">generator_block</span>
+        generator_block
     }
 }
 
-<span class="doccomment">/// A wrapper around a migration engine instance optimized for convenience in</span>
-<span class="doccomment">/// writing tests.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EngineTestApi</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">connector</span>: <span class="ident">SqlMigrationConnector</span>,
-    <span class="ident">connection_info</span>: <span class="ident">ConnectionInfo</span>,
-    <span class="ident">tags</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">Tags</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A wrapper around a migration engine instance optimized for convenience in
+/// writing tests.
+</span><span class="kw">pub struct </span>EngineTestApi {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) connector: SqlMigrationConnector,
+    connection_info: ConnectionInfo,
+    tags: BitFlags&lt;Tags&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">EngineTestApi</span> {
-    <span class="doccomment">/// Plan an `applyMigrations` command</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">apply_migrations</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">migrations_directory</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TempDir</span>) -&gt; <span class="ident">ApplyMigrations</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">ApplyMigrations::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">connector</span>, <span class="ident">migrations_directory</span>)
+<span class="kw">impl </span>EngineTestApi {
+    <span class="doccomment">/// Plan an `applyMigrations` command
+    </span><span class="kw">pub fn </span>apply_migrations&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, migrations_directory: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>TempDir) -&gt; ApplyMigrations&lt;<span class="lifetime">&#39;a</span>&gt; {
+        ApplyMigrations::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.connector, migrations_directory)
     }
 
-    <span class="doccomment">/// Plan a `createMigration` command</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_migration</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-        <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-        <span class="ident">migrations_directory</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TempDir</span>,
-    ) -&gt; <span class="ident">CreateMigration</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">CreateMigration::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">connector</span>, <span class="ident">name</span>, <span class="ident">schema</span>, <span class="ident">migrations_directory</span>)
+    <span class="doccomment">/// Plan a `createMigration` command
+    </span><span class="kw">pub fn </span>create_migration&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+        name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+        schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+        migrations_directory: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>TempDir,
+    ) -&gt; CreateMigration&lt;<span class="lifetime">&#39;a</span>&gt; {
+        CreateMigration::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.connector, name, schema, migrations_directory)
     }
 
-    <span class="doccomment">/// Builder and assertions to call the DiagnoseMigrationHistory command.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">diagnose_migration_history</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">migrations_directory</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">TempDir</span>,
-    ) -&gt; <span class="ident">DiagnoseMigrationHistory</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">DiagnoseMigrationHistory::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">connector</span>, <span class="ident">migrations_directory</span>)
+    <span class="doccomment">/// Builder and assertions to call the DiagnoseMigrationHistory command.
+    </span><span class="kw">pub fn </span>diagnose_migration_history&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+        migrations_directory: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>TempDir,
+    ) -&gt; DiagnoseMigrationHistory&lt;<span class="lifetime">&#39;a</span>&gt; {
+        DiagnoseMigrationHistory::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.connector, migrations_directory)
     }
 
-    <span class="doccomment">/// Assert facts about the database schema</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">assert_schema</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">SchemaAssertion</span> {
-        <span class="ident">SchemaAssertion::new</span>(<span class="ident">tok</span>(<span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">describe_schema</span>(<span class="prelude-val">None</span>)).<span class="ident">unwrap</span>(), <span class="self">self</span>.<span class="ident">tags</span>)
+    <span class="doccomment">/// Assert facts about the database schema
+    </span><span class="kw">pub fn </span>assert_schema(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; SchemaAssertion {
+        SchemaAssertion::new(tok(<span class="self">self</span>.connector.describe_schema(<span class="prelude-val">None</span>)).unwrap(), <span class="self">self</span>.tags)
     }
 
-    <span class="doccomment">/// Plan a `reset` command</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Reset</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">Reset::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">connector</span>)
+    <span class="doccomment">/// Plan a `reset` command
+    </span><span class="kw">pub fn </span>reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Reset&lt;<span class="lifetime">&#39;_</span>&gt; {
+        Reset::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.connector)
     }
 
-    <span class="doccomment">/// Plan a `schemaPush` command</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schema_push</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">dm</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="ident">SchemaPush</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">SchemaPush::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">connector</span>, <span class="ident">dm</span>.<span class="ident">into</span>())
+    <span class="doccomment">/// Plan a `schemaPush` command
+    </span><span class="kw">pub fn </span>schema_push(<span class="kw-2">&amp;mut </span><span class="self">self</span>, dm: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; SchemaPush&lt;<span class="lifetime">&#39;_</span>&gt; {
+        SchemaPush::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.connector, dm.into())
     }
 
-    <span class="doccomment">/// The schema name of the current connected database.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schema_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">connection_info</span>.<span class="ident">schema_name</span>()
+    <span class="doccomment">/// The schema name of the current connected database.
+    </span><span class="kw">pub fn </span>schema_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.connection_info.schema_name()
     }
 
-    <span class="doccomment">/// Execute a raw SQL command and expect it to succeed.</span>
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">raw_cmd</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cmd</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="ident">tok</span>(<span class="self">self</span>.<span class="ident">connector</span>.<span class="ident">raw_cmd</span>(<span class="ident">cmd</span>)).<span class="ident">unwrap</span>()
+    <span class="doccomment">/// Execute a raw SQL command and expect it to succeed.
+    </span><span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>raw_cmd(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cmd: <span class="kw-2">&amp;</span>str) {
+        tok(<span class="self">self</span>.connector.raw_cmd(cmd)).unwrap()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="migration_engine_tests" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="migration_engine_tests" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

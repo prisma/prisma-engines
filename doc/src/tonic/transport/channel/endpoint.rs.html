@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/transport/channel/endpoint.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>endpoint.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tonic/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/transport/channel/endpoint.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>endpoint.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tonic/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tonic/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -442,447 +442,447 @@
 <span id="440">440</span>
 <span id="441">441</span>
 <span id="442">442</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::service</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Channel</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::ClientTlsConfig</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::transport::service::TlsConnector</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::transport::Error</span>;
-<span class="kw">use</span> <span class="ident">bytes::Bytes</span>;
-<span class="kw">use</span> <span class="ident">http</span>::{
-    <span class="ident">uri</span>::{<span class="ident">InvalidUri</span>, <span class="ident">Uri</span>},
-    <span class="ident">HeaderValue</span>,
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::service;
+<span class="kw">use </span><span class="kw">super</span>::Channel;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">super</span>::ClientTlsConfig;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::transport::service::TlsConnector;
+<span class="kw">use </span><span class="kw">crate</span>::transport::Error;
+<span class="kw">use </span>bytes::Bytes;
+<span class="kw">use </span>http::{
+    uri::{InvalidUri, Uri},
+    HeaderValue,
 };
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">convert</span>::{<span class="ident">TryFrom</span>, <span class="ident">TryInto</span>},
-    <span class="ident">fmt</span>,
-    <span class="ident">str::FromStr</span>,
-    <span class="ident">time::Duration</span>,
+<span class="kw">use </span>std::{
+    convert::{TryFrom, TryInto},
+    fmt,
+    str::FromStr,
+    time::Duration,
 };
-<span class="kw">use</span> <span class="ident">tower::make::MakeConnection</span>;
+<span class="kw">use </span>tower::make::MakeConnection;
 
-<span class="doccomment">/// Channel builder.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This struct is used to build and configure HTTP/2 channels.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Endpoint</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">uri</span>: <span class="ident">Uri</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">user_agent</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HeaderValue</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">concurrency_limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">rate_limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">u64</span>, <span class="ident">Duration</span>)<span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">tls</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TlsConnector</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">buffer_size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">init_stream_window_size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">init_connection_window_size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">tcp_keepalive</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">tcp_nodelay</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">http2_keep_alive_interval</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">http2_keep_alive_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">http2_keep_alive_while_idle</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">connect_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">http2_adaptive_window</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Channel builder.
+///
+/// This struct is used to build and configure HTTP/2 channels.
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>Endpoint {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) uri: Uri,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) user_agent: <span class="prelude-ty">Option</span>&lt;HeaderValue&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) concurrency_limit: <span class="prelude-ty">Option</span>&lt;usize&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) rate_limit: <span class="prelude-ty">Option</span>&lt;(u64, Duration)&gt;,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) tls: <span class="prelude-ty">Option</span>&lt;TlsConnector&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) buffer_size: <span class="prelude-ty">Option</span>&lt;usize&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) init_stream_window_size: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) init_connection_window_size: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) tcp_keepalive: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) tcp_nodelay: bool,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) http2_keep_alive_interval: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) http2_keep_alive_timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) http2_keep_alive_while_idle: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) connect_timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) http2_adaptive_window: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Endpoint</span> {
-    <span class="comment">// FIXME: determine if we want to expose this or not. This is really</span>
-    <span class="comment">// just used in codegen for a shortcut.</span>
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">dst</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">TryInto</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">D::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>,
+<span class="kw">impl </span>Endpoint {
+    <span class="comment">// FIXME: determine if we want to expose this or not. This is really
+    // just used in codegen for a shortcut.
+    </span><span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub fn </span>new&lt;D&gt;(dst: D) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt;
+    <span class="kw">where
+        </span>D: TryInto&lt;<span class="self">Self</span>&gt;,
+        D::Error: Into&lt;<span class="kw">crate</span>::Error&gt;,
     {
-        <span class="kw">let</span> <span class="ident">me</span> <span class="op">=</span> <span class="ident">dst</span>.<span class="ident">try_into</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">Error::from_source</span>(<span class="ident">e</span>.<span class="ident">into</span>()))<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">me</span>)
+        <span class="kw">let </span>me = dst.try_into().map_err(|e| Error::from_source(e.into()))<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(me)
     }
 
-    <span class="doccomment">/// Convert an `Endpoint` from a static string.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function panics if the argument is an invalid URI.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tonic::transport::Endpoint;</span>
-    <span class="doccomment">/// Endpoint::from_static(&quot;https://example.com&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_static</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">uri</span> <span class="op">=</span> <span class="ident">Uri::from_static</span>(<span class="ident">s</span>);
-        <span class="ident"><span class="self">Self</span>::from</span>(<span class="ident">uri</span>)
+    <span class="doccomment">/// Convert an `Endpoint` from a static string.
+    ///
+    /// # Panics
+    ///
+    /// This function panics if the argument is an invalid URI.
+    ///
+    /// ```
+    /// # use tonic::transport::Endpoint;
+    /// Endpoint::from_static(&quot;https://example.com&quot;);
+    /// ```
+    </span><span class="kw">pub fn </span>from_static(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>uri = Uri::from_static(s);
+        <span class="self">Self</span>::from(uri)
     }
 
-    <span class="doccomment">/// Convert an `Endpoint` from shared bytes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tonic::transport::Endpoint;</span>
-    <span class="doccomment">/// Endpoint::from_shared(&quot;https://example.com&quot;.to_string());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_shared</span>(<span class="ident">s</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">InvalidUri</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">uri</span> <span class="op">=</span> <span class="ident">Uri::from_maybe_shared</span>(<span class="ident">s</span>.<span class="ident">into</span>())<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::from</span>(<span class="ident">uri</span>))
+    <span class="doccomment">/// Convert an `Endpoint` from shared bytes.
+    ///
+    /// ```
+    /// # use tonic::transport::Endpoint;
+    /// Endpoint::from_shared(&quot;https://example.com&quot;.to_string());
+    /// ```
+    </span><span class="kw">pub fn </span>from_shared(s: <span class="kw">impl </span>Into&lt;Bytes&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidUri&gt; {
+        <span class="kw">let </span>uri = Uri::from_maybe_shared(s.into())<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>::from(uri))
     }
 
-    <span class="doccomment">/// Set a custom user-agent header.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `user_agent` will be prepended to Tonic&#39;s default user-agent string (`tonic/x.x.x`).</span>
-    <span class="doccomment">/// It must be a value that can be converted into a valid  `http::HeaderValue` or building</span>
-    <span class="doccomment">/// the endpoint will fail.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tonic::transport::Endpoint;</span>
-    <span class="doccomment">/// # let mut builder = Endpoint::from_static(&quot;https://example.com&quot;);</span>
-    <span class="doccomment">/// builder.user_agent(&quot;Greeter&quot;).expect(&quot;Greeter should be a valid header value&quot;);</span>
-    <span class="doccomment">/// // user-agent: &quot;Greeter tonic/x.x.x&quot;</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_agent</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">user_agent</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">TryInto</span><span class="op">&lt;</span><span class="ident">HeaderValue</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Set a custom user-agent header.
+    ///
+    /// `user_agent` will be prepended to Tonic&#39;s default user-agent string (`tonic/x.x.x`).
+    /// It must be a value that can be converted into a valid  `http::HeaderValue` or building
+    /// the endpoint will fail.
+    /// ```
+    /// # use tonic::transport::Endpoint;
+    /// # let mut builder = Endpoint::from_static(&quot;https://example.com&quot;);
+    /// builder.user_agent(&quot;Greeter&quot;).expect(&quot;Greeter should be a valid header value&quot;);
+    /// // user-agent: &quot;Greeter tonic/x.x.x&quot;
+    /// ```
+    </span><span class="kw">pub fn </span>user_agent&lt;T&gt;(<span class="self">self</span>, user_agent: T) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt;
+    <span class="kw">where
+        </span>T: TryInto&lt;HeaderValue&gt;,
     {
-        <span class="ident">user_agent</span>
-            .<span class="ident">try_into</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">ua</span><span class="op">|</span> <span class="ident">Endpoint</span> {
-                <span class="ident">user_agent</span>: <span class="prelude-val">Some</span>(<span class="ident">ua</span>),
-                ..<span class="self">self</span>
-            })
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::new_invalid_user_agent</span>())
+        user_agent
+            .try_into()
+            .map(|ua| Endpoint {
+                user_agent: <span class="prelude-val">Some</span>(ua),
+                ..<span class="self">self
+            </span>})
+            .map_err(|<span class="kw">_</span>| Error::new_invalid_user_agent())
     }
 
-    <span class="doccomment">/// Apply a timeout to each request.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tonic::transport::Endpoint;</span>
-    <span class="doccomment">/// # use std::time::Duration;</span>
-    <span class="doccomment">/// # let mut builder = Endpoint::from_static(&quot;https://example.com&quot;);</span>
-    <span class="doccomment">/// builder.timeout(Duration::from_secs(5));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Notes</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This does **not** set the timeout metadata (`grpc-timeout` header) on</span>
-    <span class="doccomment">/// the request, meaning the server will not be informed of this timeout,</span>
-    <span class="doccomment">/// for that use [`Request::set_timeout`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Request::set_timeout`]: crate::Request::set_timeout</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timeout</span>(<span class="self">self</span>, <span class="ident">dur</span>: <span class="ident">Duration</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Endpoint</span> {
-            <span class="ident">timeout</span>: <span class="prelude-val">Some</span>(<span class="ident">dur</span>),
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Apply a timeout to each request.
+    ///
+    /// ```
+    /// # use tonic::transport::Endpoint;
+    /// # use std::time::Duration;
+    /// # let mut builder = Endpoint::from_static(&quot;https://example.com&quot;);
+    /// builder.timeout(Duration::from_secs(5));
+    /// ```
+    ///
+    /// # Notes
+    ///
+    /// This does **not** set the timeout metadata (`grpc-timeout` header) on
+    /// the request, meaning the server will not be informed of this timeout,
+    /// for that use [`Request::set_timeout`].
+    ///
+    /// [`Request::set_timeout`]: crate::Request::set_timeout
+    </span><span class="kw">pub fn </span>timeout(<span class="self">self</span>, dur: Duration) -&gt; <span class="self">Self </span>{
+        Endpoint {
+            timeout: <span class="prelude-val">Some</span>(dur),
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Apply a timeout to connecting to the uri.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Defaults to no timeout.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tonic::transport::Endpoint;</span>
-    <span class="doccomment">/// # use std::time::Duration;</span>
-    <span class="doccomment">/// # let mut builder = Endpoint::from_static(&quot;https://example.com&quot;);</span>
-    <span class="doccomment">/// builder.connect_timeout(Duration::from_secs(5));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connect_timeout</span>(<span class="self">self</span>, <span class="ident">dur</span>: <span class="ident">Duration</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Endpoint</span> {
-            <span class="ident">connect_timeout</span>: <span class="prelude-val">Some</span>(<span class="ident">dur</span>),
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Apply a timeout to connecting to the uri.
+    ///
+    /// Defaults to no timeout.
+    ///
+    /// ```
+    /// # use tonic::transport::Endpoint;
+    /// # use std::time::Duration;
+    /// # let mut builder = Endpoint::from_static(&quot;https://example.com&quot;);
+    /// builder.connect_timeout(Duration::from_secs(5));
+    /// ```
+    </span><span class="kw">pub fn </span>connect_timeout(<span class="self">self</span>, dur: Duration) -&gt; <span class="self">Self </span>{
+        Endpoint {
+            connect_timeout: <span class="prelude-val">Some</span>(dur),
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Set whether TCP keepalive messages are enabled on accepted connections.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If `None` is specified, keepalive is disabled, otherwise the duration</span>
-    <span class="doccomment">/// specified will be the time to remain idle before sending TCP keepalive</span>
-    <span class="doccomment">/// probes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Default is no keepalive (`None`)</span>
-    <span class="doccomment">///</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tcp_keepalive</span>(<span class="self">self</span>, <span class="ident">tcp_keepalive</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Endpoint</span> {
-            <span class="ident">tcp_keepalive</span>,
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Set whether TCP keepalive messages are enabled on accepted connections.
+    ///
+    /// If `None` is specified, keepalive is disabled, otherwise the duration
+    /// specified will be the time to remain idle before sending TCP keepalive
+    /// probes.
+    ///
+    /// Default is no keepalive (`None`)
+    ///
+    </span><span class="kw">pub fn </span>tcp_keepalive(<span class="self">self</span>, tcp_keepalive: <span class="prelude-ty">Option</span>&lt;Duration&gt;) -&gt; <span class="self">Self </span>{
+        Endpoint {
+            tcp_keepalive,
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Apply a concurrency limit to each request.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tonic::transport::Endpoint;</span>
-    <span class="doccomment">/// # let mut builder = Endpoint::from_static(&quot;https://example.com&quot;);</span>
-    <span class="doccomment">/// builder.concurrency_limit(256);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">concurrency_limit</span>(<span class="self">self</span>, <span class="ident">limit</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Endpoint</span> {
-            <span class="ident">concurrency_limit</span>: <span class="prelude-val">Some</span>(<span class="ident">limit</span>),
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Apply a concurrency limit to each request.
+    ///
+    /// ```
+    /// # use tonic::transport::Endpoint;
+    /// # let mut builder = Endpoint::from_static(&quot;https://example.com&quot;);
+    /// builder.concurrency_limit(256);
+    /// ```
+    </span><span class="kw">pub fn </span>concurrency_limit(<span class="self">self</span>, limit: usize) -&gt; <span class="self">Self </span>{
+        Endpoint {
+            concurrency_limit: <span class="prelude-val">Some</span>(limit),
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Apply a rate limit to each request.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tonic::transport::Endpoint;</span>
-    <span class="doccomment">/// # use std::time::Duration;</span>
-    <span class="doccomment">/// # let mut builder = Endpoint::from_static(&quot;https://example.com&quot;);</span>
-    <span class="doccomment">/// builder.rate_limit(32, Duration::from_secs(1));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rate_limit</span>(<span class="self">self</span>, <span class="ident">limit</span>: <span class="ident">u64</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Endpoint</span> {
-            <span class="ident">rate_limit</span>: <span class="prelude-val">Some</span>((<span class="ident">limit</span>, <span class="ident">duration</span>)),
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Apply a rate limit to each request.
+    ///
+    /// ```
+    /// # use tonic::transport::Endpoint;
+    /// # use std::time::Duration;
+    /// # let mut builder = Endpoint::from_static(&quot;https://example.com&quot;);
+    /// builder.rate_limit(32, Duration::from_secs(1));
+    /// ```
+    </span><span class="kw">pub fn </span>rate_limit(<span class="self">self</span>, limit: u64, duration: Duration) -&gt; <span class="self">Self </span>{
+        Endpoint {
+            rate_limit: <span class="prelude-val">Some</span>((limit, duration)),
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Sets the [`SETTINGS_INITIAL_WINDOW_SIZE`][spec] option for HTTP2</span>
-    <span class="doccomment">/// stream-level flow control.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Default is 65,535</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [spec]: https://http2.github.io/http2-spec/#SETTINGS_INITIAL_WINDOW_SIZE</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">initial_stream_window_size</span>(<span class="self">self</span>, <span class="ident">sz</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Endpoint</span> {
-            <span class="ident">init_stream_window_size</span>: <span class="ident">sz</span>.<span class="ident">into</span>(),
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Sets the [`SETTINGS_INITIAL_WINDOW_SIZE`][spec] option for HTTP2
+    /// stream-level flow control.
+    ///
+    /// Default is 65,535
+    ///
+    /// [spec]: https://http2.github.io/http2-spec/#SETTINGS_INITIAL_WINDOW_SIZE
+    </span><span class="kw">pub fn </span>initial_stream_window_size(<span class="self">self</span>, sz: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;u32&gt;&gt;) -&gt; <span class="self">Self </span>{
+        Endpoint {
+            init_stream_window_size: sz.into(),
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Sets the max connection-level flow control for HTTP2</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Default is 65,535</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">initial_connection_window_size</span>(<span class="self">self</span>, <span class="ident">sz</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Endpoint</span> {
-            <span class="ident">init_connection_window_size</span>: <span class="ident">sz</span>.<span class="ident">into</span>(),
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Sets the max connection-level flow control for HTTP2
+    ///
+    /// Default is 65,535
+    </span><span class="kw">pub fn </span>initial_connection_window_size(<span class="self">self</span>, sz: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;u32&gt;&gt;) -&gt; <span class="self">Self </span>{
+        Endpoint {
+            init_connection_window_size: sz.into(),
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Configures TLS for the endpoint.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tls_config</span>(<span class="self">self</span>, <span class="ident">tls_config</span>: <span class="ident">ClientTlsConfig</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">Endpoint</span> {
-            <span class="ident">tls</span>: <span class="prelude-val">Some</span>(
-                <span class="ident">tls_config</span>
-                    .<span class="ident">tls_connector</span>(<span class="self">self</span>.<span class="ident">uri</span>.<span class="ident">clone</span>())
-                    .<span class="ident">map_err</span>(<span class="ident">Error::from_source</span>)<span class="question-mark">?</span>,
+    <span class="doccomment">/// Configures TLS for the endpoint.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;tls&quot;</span>)))]
+    </span><span class="kw">pub fn </span>tls_config(<span class="self">self</span>, tls_config: ClientTlsConfig) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="prelude-val">Ok</span>(Endpoint {
+            tls: <span class="prelude-val">Some</span>(
+                tls_config
+                    .tls_connector(<span class="self">self</span>.uri.clone())
+                    .map_err(Error::from_source)<span class="question-mark">?</span>,
             ),
-            ..<span class="self">self</span>
-        })
+            ..<span class="self">self
+        </span>})
     }
 
-    <span class="doccomment">/// Set the value of `TCP_NODELAY` option for accepted connections. Enabled by default.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tcp_nodelay</span>(<span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Endpoint</span> {
-            <span class="ident">tcp_nodelay</span>: <span class="ident">enabled</span>,
-            ..<span class="self">self</span>
+    <span class="doccomment">/// Set the value of `TCP_NODELAY` option for accepted connections. Enabled by default.
+    </span><span class="kw">pub fn </span>tcp_nodelay(<span class="self">self</span>, enabled: bool) -&gt; <span class="self">Self </span>{
+        Endpoint {
+            tcp_nodelay: enabled,
+            ..<span class="self">self
+        </span>}
+    }
+
+    <span class="doccomment">/// Set http2 KEEP_ALIVE_INTERVAL. Uses `hyper`&#39;s default otherwise.
+    </span><span class="kw">pub fn </span>http2_keep_alive_interval(<span class="self">self</span>, interval: Duration) -&gt; <span class="self">Self </span>{
+        Endpoint {
+            http2_keep_alive_interval: <span class="prelude-val">Some</span>(interval),
+            ..<span class="self">self
+        </span>}
+    }
+
+    <span class="doccomment">/// Set http2 KEEP_ALIVE_TIMEOUT. Uses `hyper`&#39;s default otherwise.
+    </span><span class="kw">pub fn </span>keep_alive_timeout(<span class="self">self</span>, duration: Duration) -&gt; <span class="self">Self </span>{
+        Endpoint {
+            http2_keep_alive_timeout: <span class="prelude-val">Some</span>(duration),
+            ..<span class="self">self
+        </span>}
+    }
+
+    <span class="doccomment">/// Set http2 KEEP_ALIVE_WHILE_IDLE. Uses `hyper`&#39;s default otherwise.
+    </span><span class="kw">pub fn </span>keep_alive_while_idle(<span class="self">self</span>, enabled: bool) -&gt; <span class="self">Self </span>{
+        Endpoint {
+            http2_keep_alive_while_idle: <span class="prelude-val">Some</span>(enabled),
+            ..<span class="self">self
+        </span>}
+    }
+
+    <span class="doccomment">/// Sets whether to use an adaptive flow control. Uses `hyper`&#39;s default otherwise.
+    </span><span class="kw">pub fn </span>http2_adaptive_window(<span class="self">self</span>, enabled: bool) -&gt; <span class="self">Self </span>{
+        Endpoint {
+            http2_adaptive_window: <span class="prelude-val">Some</span>(enabled),
+            ..<span class="self">self
+        </span>}
+    }
+
+    <span class="doccomment">/// Create a channel from this config.
+    </span><span class="kw">pub async fn </span>connect(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Channel, Error&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>http = hyper::client::connect::HttpConnector::new();
+        http.enforce_http(<span class="bool-val">false</span>);
+        http.set_nodelay(<span class="self">self</span>.tcp_nodelay);
+        http.set_keepalive(<span class="self">self</span>.tcp_keepalive);
+
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+        </span><span class="kw">let </span>connector = service::connector(http, <span class="self">self</span>.tls.clone());
+
+        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;tls&quot;</span>))]
+        </span><span class="kw">let </span>connector = service::connector(http);
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(connect_timeout) = <span class="self">self</span>.connect_timeout {
+            <span class="kw">let </span><span class="kw-2">mut </span>connector = hyper_timeout::TimeoutConnector::new(connector);
+            connector.set_connect_timeout(<span class="prelude-val">Some</span>(connect_timeout));
+            Channel::connect(connector, <span class="self">self</span>.clone()).<span class="kw">await
+        </span>} <span class="kw">else </span>{
+            Channel::connect(connector, <span class="self">self</span>.clone()).<span class="kw">await
+        </span>}
+    }
+
+    <span class="doccomment">/// Create a channel from this config.
+    ///
+    /// The channel returned by this method does not attempt to connect to the endpoint until first
+    /// use.
+    </span><span class="kw">pub fn </span>connect_lazy(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Channel {
+        <span class="kw">let </span><span class="kw-2">mut </span>http = hyper::client::connect::HttpConnector::new();
+        http.enforce_http(<span class="bool-val">false</span>);
+        http.set_nodelay(<span class="self">self</span>.tcp_nodelay);
+        http.set_keepalive(<span class="self">self</span>.tcp_keepalive);
+
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+        </span><span class="kw">let </span>connector = service::connector(http, <span class="self">self</span>.tls.clone());
+
+        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;tls&quot;</span>))]
+        </span><span class="kw">let </span>connector = service::connector(http);
+
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(connect_timeout) = <span class="self">self</span>.connect_timeout {
+            <span class="kw">let </span><span class="kw-2">mut </span>connector = hyper_timeout::TimeoutConnector::new(connector);
+            connector.set_connect_timeout(<span class="prelude-val">Some</span>(connect_timeout));
+            Channel::new(connector, <span class="self">self</span>.clone())
+        } <span class="kw">else </span>{
+            Channel::new(connector, <span class="self">self</span>.clone())
         }
     }
 
-    <span class="doccomment">/// Set http2 KEEP_ALIVE_INTERVAL. Uses `hyper`&#39;s default otherwise.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http2_keep_alive_interval</span>(<span class="self">self</span>, <span class="ident">interval</span>: <span class="ident">Duration</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Endpoint</span> {
-            <span class="ident">http2_keep_alive_interval</span>: <span class="prelude-val">Some</span>(<span class="ident">interval</span>),
-            ..<span class="self">self</span>
-        }
-    }
-
-    <span class="doccomment">/// Set http2 KEEP_ALIVE_TIMEOUT. Uses `hyper`&#39;s default otherwise.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keep_alive_timeout</span>(<span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Endpoint</span> {
-            <span class="ident">http2_keep_alive_timeout</span>: <span class="prelude-val">Some</span>(<span class="ident">duration</span>),
-            ..<span class="self">self</span>
-        }
-    }
-
-    <span class="doccomment">/// Set http2 KEEP_ALIVE_WHILE_IDLE. Uses `hyper`&#39;s default otherwise.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keep_alive_while_idle</span>(<span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Endpoint</span> {
-            <span class="ident">http2_keep_alive_while_idle</span>: <span class="prelude-val">Some</span>(<span class="ident">enabled</span>),
-            ..<span class="self">self</span>
-        }
-    }
-
-    <span class="doccomment">/// Sets whether to use an adaptive flow control. Uses `hyper`&#39;s default otherwise.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http2_adaptive_window</span>(<span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Endpoint</span> {
-            <span class="ident">http2_adaptive_window</span>: <span class="prelude-val">Some</span>(<span class="ident">enabled</span>),
-            ..<span class="self">self</span>
-        }
-    }
-
-    <span class="doccomment">/// Create a channel from this config.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Channel</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">http</span> <span class="op">=</span> <span class="ident">hyper::client::connect::HttpConnector::new</span>();
-        <span class="ident">http</span>.<span class="ident">enforce_http</span>(<span class="bool-val">false</span>);
-        <span class="ident">http</span>.<span class="ident">set_nodelay</span>(<span class="self">self</span>.<span class="ident">tcp_nodelay</span>);
-        <span class="ident">http</span>.<span class="ident">set_keepalive</span>(<span class="self">self</span>.<span class="ident">tcp_keepalive</span>);
-
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-        <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">service::connector</span>(<span class="ident">http</span>, <span class="self">self</span>.<span class="ident">tls</span>.<span class="ident">clone</span>());
-
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>))]</span>
-        <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">service::connector</span>(<span class="ident">http</span>);
-
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">connect_timeout</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">connect_timeout</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">hyper_timeout::TimeoutConnector::new</span>(<span class="ident">connector</span>);
-            <span class="ident">connector</span>.<span class="ident">set_connect_timeout</span>(<span class="prelude-val">Some</span>(<span class="ident">connect_timeout</span>));
-            <span class="ident">Channel::connect</span>(<span class="ident">connector</span>, <span class="self">self</span>.<span class="ident">clone</span>()).<span class="kw">await</span>
-        } <span class="kw">else</span> {
-            <span class="ident">Channel::connect</span>(<span class="ident">connector</span>, <span class="self">self</span>.<span class="ident">clone</span>()).<span class="kw">await</span>
-        }
-    }
-
-    <span class="doccomment">/// Create a channel from this config.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The channel returned by this method does not attempt to connect to the endpoint until first</span>
-    <span class="doccomment">/// use.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connect_lazy</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Channel</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">http</span> <span class="op">=</span> <span class="ident">hyper::client::connect::HttpConnector::new</span>();
-        <span class="ident">http</span>.<span class="ident">enforce_http</span>(<span class="bool-val">false</span>);
-        <span class="ident">http</span>.<span class="ident">set_nodelay</span>(<span class="self">self</span>.<span class="ident">tcp_nodelay</span>);
-        <span class="ident">http</span>.<span class="ident">set_keepalive</span>(<span class="self">self</span>.<span class="ident">tcp_keepalive</span>);
-
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-        <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">service::connector</span>(<span class="ident">http</span>, <span class="self">self</span>.<span class="ident">tls</span>.<span class="ident">clone</span>());
-
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>))]</span>
-        <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">service::connector</span>(<span class="ident">http</span>);
-
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">connect_timeout</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">connect_timeout</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">hyper_timeout::TimeoutConnector::new</span>(<span class="ident">connector</span>);
-            <span class="ident">connector</span>.<span class="ident">set_connect_timeout</span>(<span class="prelude-val">Some</span>(<span class="ident">connect_timeout</span>));
-            <span class="ident">Channel::new</span>(<span class="ident">connector</span>, <span class="self">self</span>.<span class="ident">clone</span>())
-        } <span class="kw">else</span> {
-            <span class="ident">Channel::new</span>(<span class="ident">connector</span>, <span class="self">self</span>.<span class="ident">clone</span>())
-        }
-    }
-
-    <span class="doccomment">/// Connect with a custom connector.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This allows you to build a [Channel](struct.Channel.html) that uses a non-HTTP transport.</span>
-    <span class="doccomment">/// See the `uds` example for an example on how to use this function to build channel that</span>
-    <span class="doccomment">/// uses a Unix socket transport.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The [`connect_timeout`](Endpoint::connect_timeout) will still be applied.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect_with_connector</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connector</span>: <span class="ident">C</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Channel</span>, <span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">C</span>: <span class="ident">MakeConnection</span><span class="op">&lt;</span><span class="ident">Uri</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">C::Connection</span>: <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">C::Future</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident"><span class="kw">crate</span>::Error</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">C::Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="doccomment">/// Connect with a custom connector.
+    ///
+    /// This allows you to build a [Channel](struct.Channel.html) that uses a non-HTTP transport.
+    /// See the `uds` example for an example on how to use this function to build channel that
+    /// uses a Unix socket transport.
+    ///
+    /// The [`connect_timeout`](Endpoint::connect_timeout) will still be applied.
+    </span><span class="kw">pub async fn </span>connect_with_connector&lt;C&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, connector: C) -&gt; <span class="prelude-ty">Result</span>&lt;Channel, Error&gt;
+    <span class="kw">where
+        </span>C: MakeConnection&lt;Uri&gt; + Send + <span class="lifetime">&#39;static</span>,
+        C::Connection: Unpin + Send + <span class="lifetime">&#39;static</span>,
+        C::Future: Send + <span class="lifetime">&#39;static</span>,
+        <span class="kw">crate</span>::Error: From&lt;C::Error&gt; + Send + <span class="lifetime">&#39;static</span>,
     {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-        <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">service::connector</span>(<span class="ident">connector</span>, <span class="self">self</span>.<span class="ident">tls</span>.<span class="ident">clone</span>());
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+        </span><span class="kw">let </span>connector = service::connector(connector, <span class="self">self</span>.tls.clone());
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>))]</span>
-        <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">service::connector</span>(<span class="ident">connector</span>);
+        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;tls&quot;</span>))]
+        </span><span class="kw">let </span>connector = service::connector(connector);
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">connect_timeout</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">connect_timeout</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">hyper_timeout::TimeoutConnector::new</span>(<span class="ident">connector</span>);
-            <span class="ident">connector</span>.<span class="ident">set_connect_timeout</span>(<span class="prelude-val">Some</span>(<span class="ident">connect_timeout</span>));
-            <span class="ident">Channel::connect</span>(<span class="ident">connector</span>, <span class="self">self</span>.<span class="ident">clone</span>()).<span class="kw">await</span>
-        } <span class="kw">else</span> {
-            <span class="ident">Channel::connect</span>(<span class="ident">connector</span>, <span class="self">self</span>.<span class="ident">clone</span>()).<span class="kw">await</span>
-        }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(connect_timeout) = <span class="self">self</span>.connect_timeout {
+            <span class="kw">let </span><span class="kw-2">mut </span>connector = hyper_timeout::TimeoutConnector::new(connector);
+            connector.set_connect_timeout(<span class="prelude-val">Some</span>(connect_timeout));
+            Channel::connect(connector, <span class="self">self</span>.clone()).<span class="kw">await
+        </span>} <span class="kw">else </span>{
+            Channel::connect(connector, <span class="self">self</span>.clone()).<span class="kw">await
+        </span>}
     }
 
-    <span class="doccomment">/// Connect with a custom connector lazily.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This allows you to build a [Channel](struct.Channel.html) that uses a non-HTTP transport</span>
-    <span class="doccomment">/// connec to it lazily.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See the `uds` example for an example on how to use this function to build channel that</span>
-    <span class="doccomment">/// uses a Unix socket transport.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connect_with_connector_lazy</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">connector</span>: <span class="ident">C</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Channel</span>, <span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">C</span>: <span class="ident">MakeConnection</span><span class="op">&lt;</span><span class="ident">Uri</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">C::Connection</span>: <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">C::Future</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident"><span class="kw">crate</span>::Error</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="ident">C::Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="doccomment">/// Connect with a custom connector lazily.
+    ///
+    /// This allows you to build a [Channel](struct.Channel.html) that uses a non-HTTP transport
+    /// connec to it lazily.
+    ///
+    /// See the `uds` example for an example on how to use this function to build channel that
+    /// uses a Unix socket transport.
+    </span><span class="kw">pub fn </span>connect_with_connector_lazy&lt;C&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, connector: C) -&gt; <span class="prelude-ty">Result</span>&lt;Channel, Error&gt;
+    <span class="kw">where
+        </span>C: MakeConnection&lt;Uri&gt; + Send + <span class="lifetime">&#39;static</span>,
+        C::Connection: Unpin + Send + <span class="lifetime">&#39;static</span>,
+        C::Future: Send + <span class="lifetime">&#39;static</span>,
+        <span class="kw">crate</span>::Error: From&lt;C::Error&gt; + Send + <span class="lifetime">&#39;static</span>,
     {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-        <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">service::connector</span>(<span class="ident">connector</span>, <span class="self">self</span>.<span class="ident">tls</span>.<span class="ident">clone</span>());
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+        </span><span class="kw">let </span>connector = service::connector(connector, <span class="self">self</span>.tls.clone());
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>))]</span>
-        <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">service::connector</span>(<span class="ident">connector</span>);
+        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;tls&quot;</span>))]
+        </span><span class="kw">let </span>connector = service::connector(connector);
 
-        <span class="prelude-val">Ok</span>(<span class="ident">Channel::new</span>(<span class="ident">connector</span>, <span class="self">self</span>.<span class="ident">clone</span>()))
+        <span class="prelude-val">Ok</span>(Channel::new(connector, <span class="self">self</span>.clone()))
     }
 
-    <span class="doccomment">/// Get the endpoint uri.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tonic::transport::Endpoint;</span>
-    <span class="doccomment">/// # use http::Uri;</span>
-    <span class="doccomment">/// let endpoint = Endpoint::from_static(&quot;https://example.com&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(endpoint.uri(), &amp;Uri::from_static(&quot;https://example.com&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">uri</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Uri</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">uri</span>
+    <span class="doccomment">/// Get the endpoint uri.
+    ///
+    /// ```
+    /// # use tonic::transport::Endpoint;
+    /// # use http::Uri;
+    /// let endpoint = Endpoint::from_static(&quot;https://example.com&quot;);
+    ///
+    /// assert_eq!(endpoint.uri(), &amp;Uri::from_static(&quot;https://example.com&quot;));
+    /// ```
+    </span><span class="kw">pub fn </span>uri(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Uri {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.uri
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Uri</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Endpoint</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">uri</span>: <span class="ident">Uri</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">uri</span>,
-            <span class="ident">user_agent</span>: <span class="prelude-val">None</span>,
-            <span class="ident">concurrency_limit</span>: <span class="prelude-val">None</span>,
-            <span class="ident">rate_limit</span>: <span class="prelude-val">None</span>,
-            <span class="ident">timeout</span>: <span class="prelude-val">None</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-            <span class="ident">tls</span>: <span class="prelude-val">None</span>,
-            <span class="ident">buffer_size</span>: <span class="prelude-val">None</span>,
-            <span class="ident">init_stream_window_size</span>: <span class="prelude-val">None</span>,
-            <span class="ident">init_connection_window_size</span>: <span class="prelude-val">None</span>,
-            <span class="ident">tcp_keepalive</span>: <span class="prelude-val">None</span>,
-            <span class="ident">tcp_nodelay</span>: <span class="bool-val">true</span>,
-            <span class="ident">http2_keep_alive_interval</span>: <span class="prelude-val">None</span>,
-            <span class="ident">http2_keep_alive_timeout</span>: <span class="prelude-val">None</span>,
-            <span class="ident">http2_keep_alive_while_idle</span>: <span class="prelude-val">None</span>,
-            <span class="ident">connect_timeout</span>: <span class="prelude-val">None</span>,
-            <span class="ident">http2_adaptive_window</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl </span>From&lt;Uri&gt; <span class="kw">for </span>Endpoint {
+    <span class="kw">fn </span>from(uri: Uri) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            uri,
+            user_agent: <span class="prelude-val">None</span>,
+            concurrency_limit: <span class="prelude-val">None</span>,
+            rate_limit: <span class="prelude-val">None</span>,
+            timeout: <span class="prelude-val">None</span>,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+            </span>tls: <span class="prelude-val">None</span>,
+            buffer_size: <span class="prelude-val">None</span>,
+            init_stream_window_size: <span class="prelude-val">None</span>,
+            init_connection_window_size: <span class="prelude-val">None</span>,
+            tcp_keepalive: <span class="prelude-val">None</span>,
+            tcp_nodelay: <span class="bool-val">true</span>,
+            http2_keep_alive_interval: <span class="prelude-val">None</span>,
+            http2_keep_alive_timeout: <span class="prelude-val">None</span>,
+            http2_keep_alive_while_idle: <span class="prelude-val">None</span>,
+            connect_timeout: <span class="prelude-val">None</span>,
+            http2_adaptive_window: <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Endpoint</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">InvalidUri</span>;
+<span class="kw">impl </span>TryFrom&lt;Bytes&gt; <span class="kw">for </span>Endpoint {
+    <span class="kw">type </span>Error = InvalidUri;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">t</span>: <span class="ident">Bytes</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::from_shared</span>(<span class="ident">t</span>)
+    <span class="kw">fn </span>try_from(t: Bytes) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="self">Self</span>::from_shared(t)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Endpoint</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">InvalidUri</span>;
+<span class="kw">impl </span>TryFrom&lt;String&gt; <span class="kw">for </span>Endpoint {
+    <span class="kw">type </span>Error = InvalidUri;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">t</span>: <span class="ident">String</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::from_shared</span>(<span class="ident">t</span>.<span class="ident">into_bytes</span>())
+    <span class="kw">fn </span>try_from(t: String) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="self">Self</span>::from_shared(t.into_bytes())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Endpoint</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">InvalidUri</span>;
+<span class="kw">impl </span>TryFrom&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; <span class="kw">for </span>Endpoint {
+    <span class="kw">type </span>Error = InvalidUri;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">t</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::from_shared</span>(<span class="ident">t</span>.<span class="ident">as_bytes</span>())
+    <span class="kw">fn </span>try_from(t: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="self">Self</span>::from_shared(t.as_bytes())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Endpoint</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Endpoint&quot;</span>).<span class="ident">finish</span>()
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Endpoint {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;Endpoint&quot;</span>).finish()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">Endpoint</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">InvalidUri</span>;
+<span class="kw">impl </span>FromStr <span class="kw">for </span>Endpoint {
+    <span class="kw">type </span><span class="prelude-val">Err </span>= InvalidUri;
 
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::try_from</span>(<span class="ident">s</span>.<span class="ident">to_string</span>())
+    <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
+        <span class="self">Self</span>::try_from(s.to_string())
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tonic" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tonic" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/h2-0.3.14/src/codec/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../h2/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/h2-0.3.14/src/codec/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../h2/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -199,206 +199,206 @@
 <span id="199">199</span>
 <span id="200">200</span>
 <span id="201">201</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">error</span>;
-<span class="kw">mod</span> <span class="ident">framed_read</span>;
-<span class="kw">mod</span> <span class="ident">framed_write</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>error;
+<span class="kw">mod </span>framed_read;
+<span class="kw">mod </span>framed_write;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::error</span>::{<span class="ident">SendError</span>, <span class="ident">UserError</span>};
+<span class="kw">pub use </span><span class="self">self</span>::error::{SendError, UserError};
 
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::framed_read::FramedRead</span>;
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::framed_write::FramedWrite</span>;
+<span class="kw">use </span><span class="self">self</span>::framed_read::FramedRead;
+<span class="kw">use </span><span class="self">self</span>::framed_write::FramedWrite;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::frame</span>::{<span class="self">self</span>, <span class="ident">Data</span>, <span class="ident">Frame</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proto::Error</span>;
+<span class="kw">use </span><span class="kw">crate</span>::frame::{<span class="self">self</span>, Data, Frame};
+<span class="kw">use </span><span class="kw">crate</span>::proto::Error;
 
-<span class="kw">use</span> <span class="ident">bytes::Buf</span>;
-<span class="kw">use</span> <span class="ident">futures_core::Stream</span>;
-<span class="kw">use</span> <span class="ident">futures_sink::Sink</span>;
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
-<span class="kw">use</span> <span class="ident">tokio::io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>};
-<span class="kw">use</span> <span class="ident">tokio_util::codec::length_delimited</span>;
+<span class="kw">use </span>bytes::Buf;
+<span class="kw">use </span>futures_core::Stream;
+<span class="kw">use </span>futures_sink::Sink;
+<span class="kw">use </span>std::pin::Pin;
+<span class="kw">use </span>std::task::{Context, Poll};
+<span class="kw">use </span>tokio::io::{AsyncRead, AsyncWrite};
+<span class="kw">use </span>tokio_util::codec::length_delimited;
 
-<span class="kw">use</span> <span class="ident">std::io</span>;
+<span class="kw">use </span>std::io;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Codec</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="ident">inner</span>: <span class="ident">FramedRead</span><span class="op">&lt;</span><span class="ident">FramedWrite</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Codec&lt;T, B&gt; {
+    inner: FramedRead&lt;FramedWrite&lt;T, B&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span> <span class="ident">Codec</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-    <span class="ident">B</span>: <span class="ident">Buf</span>,
+<span class="kw">impl</span>&lt;T, B&gt; Codec&lt;T, B&gt;
+<span class="kw">where
+    </span>T: AsyncRead + AsyncWrite + Unpin,
+    B: Buf,
 {
-    <span class="doccomment">/// Returns a new `Codec` with the default max frame size</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">io</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::with_max_recv_frame_size</span>(<span class="ident">io</span>, <span class="ident">frame::DEFAULT_MAX_FRAME_SIZE</span> <span class="kw">as</span> <span class="ident">usize</span>)
+    <span class="doccomment">/// Returns a new `Codec` with the default max frame size
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>new(io: T) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::with_max_recv_frame_size(io, frame::DEFAULT_MAX_FRAME_SIZE <span class="kw">as </span>usize)
     }
 
-    <span class="doccomment">/// Returns a new `Codec` with the given maximum frame size</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_max_recv_frame_size</span>(<span class="ident">io</span>: <span class="ident">T</span>, <span class="ident">max_frame_size</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="comment">// Wrap with writer</span>
-        <span class="kw">let</span> <span class="ident">framed_write</span> <span class="op">=</span> <span class="ident">FramedWrite::new</span>(<span class="ident">io</span>);
+    <span class="doccomment">/// Returns a new `Codec` with the given maximum frame size
+    </span><span class="kw">pub fn </span>with_max_recv_frame_size(io: T, max_frame_size: usize) -&gt; <span class="self">Self </span>{
+        <span class="comment">// Wrap with writer
+        </span><span class="kw">let </span>framed_write = FramedWrite::new(io);
 
-        <span class="comment">// Delimit the frames</span>
-        <span class="kw">let</span> <span class="ident">delimited</span> <span class="op">=</span> <span class="ident">length_delimited::Builder::new</span>()
-            .<span class="ident">big_endian</span>()
-            .<span class="ident">length_field_length</span>(<span class="number">3</span>)
-            .<span class="ident">length_adjustment</span>(<span class="number">9</span>)
-            .<span class="ident">num_skip</span>(<span class="number">0</span>) <span class="comment">// Don&#39;t skip the header</span>
-            .<span class="ident">new_read</span>(<span class="ident">framed_write</span>);
+        <span class="comment">// Delimit the frames
+        </span><span class="kw">let </span>delimited = length_delimited::Builder::new()
+            .big_endian()
+            .length_field_length(<span class="number">3</span>)
+            .length_adjustment(<span class="number">9</span>)
+            .num_skip(<span class="number">0</span>) <span class="comment">// Don&#39;t skip the header
+            </span>.new_read(framed_write);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">FramedRead::new</span>(<span class="ident">delimited</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>inner = FramedRead::new(delimited);
 
-        <span class="comment">// Use FramedRead&#39;s method since it checks the value is within range.</span>
-        <span class="ident">inner</span>.<span class="ident">set_max_frame_size</span>(<span class="ident">max_frame_size</span>);
+        <span class="comment">// Use FramedRead&#39;s method since it checks the value is within range.
+        </span>inner.set_max_frame_size(max_frame_size);
 
-        <span class="ident">Codec</span> { <span class="ident">inner</span> }
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span> <span class="ident">Codec</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Updates the max received frame size.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The change takes effect the next time a frame is decoded. In other</span>
-    <span class="doccomment">/// words, if a frame is currently in process of being decoded with a frame</span>
-    <span class="doccomment">/// size greater than `val` but less than the max frame size in effect</span>
-    <span class="doccomment">/// before calling this function, then the frame will be allowed.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_max_recv_frame_size</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">usize</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">set_max_frame_size</span>(<span class="ident">val</span>)
-    }
-
-    <span class="doccomment">/// Returns the current max received frame size setting.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is the largest size this codec will accept from the wire. Larger</span>
-    <span class="doccomment">/// frames will be rejected.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_recv_frame_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">max_frame_size</span>()
-    }
-
-    <span class="doccomment">/// Returns the max frame size that can be sent to the peer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_send_frame_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_ref</span>().<span class="ident">max_frame_size</span>()
-    }
-
-    <span class="doccomment">/// Set the peer&#39;s max frame size.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_max_send_frame_size</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">usize</span>) {
-        <span class="self">self</span>.<span class="ident">framed_write</span>().<span class="ident">set_max_frame_size</span>(<span class="ident">val</span>)
-    }
-
-    <span class="doccomment">/// Set the peer&#39;s header table size size.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_send_header_table_size</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">usize</span>) {
-        <span class="self">self</span>.<span class="ident">framed_write</span>().<span class="ident">set_header_table_size</span>(<span class="ident">val</span>)
-    }
-
-    <span class="doccomment">/// Set the max header list size that can be received.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_max_recv_header_list_size</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">val</span>: <span class="ident">usize</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">set_max_header_list_size</span>(<span class="ident">val</span>);
-    }
-
-    <span class="doccomment">/// Get a reference to the inner stream.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_ref</span>().<span class="ident">get_ref</span>()
-    }
-
-    <span class="doccomment">/// Get a mutable reference to the inner stream.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">T</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_mut</span>().<span class="ident">get_mut</span>()
-    }
-
-    <span class="doccomment">/// Takes the data payload value that was fully written to the socket</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">take_last_data_frame</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Data</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">framed_write</span>().<span class="ident">take_last_data_frame</span>()
-    }
-
-    <span class="kw">fn</span> <span class="ident">framed_write</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">FramedWrite</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">get_mut</span>()
+        Codec { inner }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span> <span class="ident">Codec</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-    <span class="ident">B</span>: <span class="ident">Buf</span>,
+<span class="kw">impl</span>&lt;T, B&gt; Codec&lt;T, B&gt; {
+    <span class="doccomment">/// Updates the max received frame size.
+    ///
+    /// The change takes effect the next time a frame is decoded. In other
+    /// words, if a frame is currently in process of being decoded with a frame
+    /// size greater than `val` but less than the max frame size in effect
+    /// before calling this function, then the frame will be allowed.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>set_max_recv_frame_size(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: usize) {
+        <span class="self">self</span>.inner.set_max_frame_size(val)
+    }
+
+    <span class="doccomment">/// Returns the current max received frame size setting.
+    ///
+    /// This is the largest size this codec will accept from the wire. Larger
+    /// frames will be rejected.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;unstable&quot;</span>)]
+    #[inline]
+    </span><span class="kw">pub fn </span>max_recv_frame_size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.inner.max_frame_size()
+    }
+
+    <span class="doccomment">/// Returns the max frame size that can be sent to the peer.
+    </span><span class="kw">pub fn </span>max_send_frame_size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.inner.get_ref().max_frame_size()
+    }
+
+    <span class="doccomment">/// Set the peer&#39;s max frame size.
+    </span><span class="kw">pub fn </span>set_max_send_frame_size(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: usize) {
+        <span class="self">self</span>.framed_write().set_max_frame_size(val)
+    }
+
+    <span class="doccomment">/// Set the peer&#39;s header table size size.
+    </span><span class="kw">pub fn </span>set_send_header_table_size(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: usize) {
+        <span class="self">self</span>.framed_write().set_header_table_size(val)
+    }
+
+    <span class="doccomment">/// Set the max header list size that can be received.
+    </span><span class="kw">pub fn </span>set_max_recv_header_list_size(<span class="kw-2">&amp;mut </span><span class="self">self</span>, val: usize) {
+        <span class="self">self</span>.inner.set_max_header_list_size(val);
+    }
+
+    <span class="doccomment">/// Get a reference to the inner stream.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;unstable&quot;</span>)]
+    </span><span class="kw">pub fn </span>get_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
+        <span class="self">self</span>.inner.get_ref().get_ref()
+    }
+
+    <span class="doccomment">/// Get a mutable reference to the inner stream.
+    </span><span class="kw">pub fn </span>get_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>T {
+        <span class="self">self</span>.inner.get_mut().get_mut()
+    }
+
+    <span class="doccomment">/// Takes the data payload value that was fully written to the socket
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>take_last_data_frame(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Data&lt;B&gt;&gt; {
+        <span class="self">self</span>.framed_write().take_last_data_frame()
+    }
+
+    <span class="kw">fn </span>framed_write(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>FramedWrite&lt;T, B&gt; {
+        <span class="self">self</span>.inner.get_mut()
+    }
+}
+
+<span class="kw">impl</span>&lt;T, B&gt; Codec&lt;T, B&gt;
+<span class="kw">where
+    </span>T: AsyncWrite + Unpin,
+    B: Buf,
 {
-    <span class="doccomment">/// Returns `Ready` when the codec can buffer a frame</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">framed_write</span>().<span class="ident">poll_ready</span>(<span class="ident">cx</span>)
+    <span class="doccomment">/// Returns `Ready` when the codec can buffer a frame
+    </span><span class="kw">pub fn </span>poll_ready(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+        <span class="self">self</span>.framed_write().poll_ready(cx)
     }
 
-    <span class="doccomment">/// Buffer a frame.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `poll_ready` must be called first to ensure that a frame may be</span>
-    <span class="doccomment">/// accepted.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// TODO: Rename this to avoid conflicts with Sink::buffer</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">buffer</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">item</span>: <span class="ident">Frame</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">UserError</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">framed_write</span>().<span class="ident">buffer</span>(<span class="ident">item</span>)
+    <span class="doccomment">/// Buffer a frame.
+    ///
+    /// `poll_ready` must be called first to ensure that a frame may be
+    /// accepted.
+    ///
+    /// TODO: Rename this to avoid conflicts with Sink::buffer
+    </span><span class="kw">pub fn </span>buffer(<span class="kw-2">&amp;mut </span><span class="self">self</span>, item: Frame&lt;B&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), UserError&gt; {
+        <span class="self">self</span>.framed_write().buffer(item)
     }
 
-    <span class="doccomment">/// Flush buffered data to the wire</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flush</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">framed_write</span>().<span class="ident">flush</span>(<span class="ident">cx</span>)
+    <span class="doccomment">/// Flush buffered data to the wire
+    </span><span class="kw">pub fn </span>flush(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+        <span class="self">self</span>.framed_write().flush(cx)
     }
 
-    <span class="doccomment">/// Shutdown the send half</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shutdown</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">framed_write</span>().<span class="ident">shutdown</span>(<span class="ident">cx</span>)
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">Codec</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-{
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Frame</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
-
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>).<span class="ident">poll_next</span>(<span class="ident">cx</span>)
+    <span class="doccomment">/// Shutdown the send half
+    </span><span class="kw">pub fn </span>shutdown(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+        <span class="self">self</span>.framed_write().shutdown(cx)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span> <span class="ident">Sink</span><span class="op">&lt;</span><span class="ident">Frame</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Codec</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-    <span class="ident">B</span>: <span class="ident">Buf</span>,
+<span class="kw">impl</span>&lt;T, B&gt; Stream <span class="kw">for </span>Codec&lt;T, B&gt;
+<span class="kw">where
+    </span>T: AsyncRead + Unpin,
 {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">SendError</span>;
+    <span class="kw">type </span>Item = <span class="prelude-ty">Result</span>&lt;Frame, Error&gt;;
 
-    <span class="kw">fn</span> <span class="ident">start_send</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">item</span>: <span class="ident">Frame</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="ident">Codec::buffer</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">item</span>)<span class="question-mark">?</span>;
+    <span class="kw">fn </span>poll_next(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;&gt; {
+        Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.inner).poll_next(cx)
+    }
+}
+
+<span class="kw">impl</span>&lt;T, B&gt; Sink&lt;Frame&lt;B&gt;&gt; <span class="kw">for </span>Codec&lt;T, B&gt;
+<span class="kw">where
+    </span>T: AsyncWrite + Unpin,
+    B: Buf,
+{
+    <span class="kw">type </span>Error = SendError;
+
+    <span class="kw">fn </span>start_send(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, item: Frame&lt;B&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt; {
+        Codec::buffer(<span class="kw-2">&amp;mut </span><span class="self">self</span>, item)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
-    <span class="doccomment">/// Returns `Ready` when the codec can buffer a frame</span>
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">framed_write</span>().<span class="ident">poll_ready</span>(<span class="ident">cx</span>).<span class="ident">map_err</span>(<span class="ident">Into::into</span>)
+    <span class="doccomment">/// Returns `Ready` when the codec can buffer a frame
+    </span><span class="kw">fn </span>poll_ready(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt;&gt; {
+        <span class="self">self</span>.framed_write().poll_ready(cx).map_err(Into::into)
     }
 
-    <span class="doccomment">/// Flush buffered data to the wire</span>
-    <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">framed_write</span>().<span class="ident">flush</span>(<span class="ident">cx</span>).<span class="ident">map_err</span>(<span class="ident">Into::into</span>)
+    <span class="doccomment">/// Flush buffered data to the wire
+    </span><span class="kw">fn </span>poll_flush(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt;&gt; {
+        <span class="self">self</span>.framed_write().flush(cx).map_err(Into::into)
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_close</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">shutdown</span>(<span class="ident">cx</span>))<span class="question-mark">?</span>;
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
+    <span class="kw">fn </span>poll_close(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt;&gt; {
+        <span class="macro">ready!</span>(<span class="self">self</span>.shutdown(cx))<span class="question-mark">?</span>;
+        Poll::Ready(<span class="prelude-val">Ok</span>(()))
     }
 }
 
-<span class="comment">// TODO: remove (or improve) this</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Codec</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">bytes::Bytes</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+<span class="comment">// TODO: remove (or improve) this
+</span><span class="kw">impl</span>&lt;T&gt; From&lt;T&gt; <span class="kw">for </span>Codec&lt;T, bytes::Bytes&gt;
+<span class="kw">where
+    </span>T: AsyncRead + AsyncWrite + Unpin,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">src</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">src</span>)
+    <span class="kw">fn </span>from(src: T) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new(src)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="h2" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="h2" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.4.0/src/raw/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../bson/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.4.0/src/raw/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../bson/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -273,280 +273,280 @@
 <span id="273">273</span>
 <span id="274">274</span>
 <span id="275">275</span>
-</pre><pre class="rust"><code><span class="doccomment">//! An API for interacting with raw BSON bytes.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This module provides two document types, [`RawDocumentBuf`] and [`RawDocument`] (akin to</span>
-<span class="doccomment">//! [`std::string::String`] and [`str`]), for working with raw BSON documents. These types differ</span>
-<span class="doccomment">//! from the regular [`crate::Document`] type in that their storage is BSON bytes rather than a</span>
-<span class="doccomment">//! hash-map like Rust type. In certain circumstances, these types can be leveraged for increased</span>
-<span class="doccomment">//! performance.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This module also provides a [`RawBson`] type for modeling any borrowed BSON element and a</span>
-<span class="doccomment">//! [`RawArray`] type for modeling a borrowed slice of a document containing a BSON array element.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! A [`RawDocumentBuf`] can be created from a `Vec&lt;u8&gt;` containing raw BSON data. A</span>
-<span class="doccomment">//! [`RawDocument`] can be created from anything that can be borrowed as a `&amp;[u8]`. Both types</span>
-<span class="doccomment">//! can access elements via methods similar to those available on the [`crate::Document`] type.</span>
-<span class="doccomment">//! Note that [`RawDocument::get`] (which [`RawDocument`] calls through to via its `Deref`</span>
-<span class="doccomment">//! implementation) returns a `Result`, since the bytes contained in the document are not fully</span>
-<span class="doccomment">//! validated until trying to access the contained data.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! use bson::raw::{</span>
-<span class="doccomment">//!     RawBson,</span>
-<span class="doccomment">//!     RawDocumentBuf,</span>
-<span class="doccomment">//! };</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // See http://bsonspec.org/spec.html for details on the binary encoding of BSON.</span>
-<span class="doccomment">//! let doc = RawDocumentBuf::from_bytes(b&quot;\x13\x00\x00\x00\x02hi\x00\x06\x00\x00\x00y&#39;all\x00\x00&quot;.to_vec())?;</span>
-<span class="doccomment">//! let elem = doc.get(&quot;hi&quot;)?.unwrap();</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! assert_eq!(</span>
-<span class="doccomment">//!   elem.as_str(),</span>
-<span class="doccomment">//!   Some(&quot;y&#39;all&quot;),</span>
-<span class="doccomment">//! );</span>
-<span class="doccomment">//! # Ok::&lt;(), bson::raw::Error&gt;(())</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### [`crate::Document`] interop</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! A [`RawDocument`] can be created from a [`crate::Document`]. Internally, this</span>
-<span class="doccomment">//! serializes the [`crate::Document`] to a `Vec&lt;u8&gt;`, and then includes those bytes in the</span>
-<span class="doccomment">//! [`RawDocument`].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! use bson::{</span>
-<span class="doccomment">//!     raw::RawDocumentBuf,</span>
-<span class="doccomment">//!     doc,</span>
-<span class="doccomment">//! };</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let document = doc! {</span>
-<span class="doccomment">//!    &quot;goodbye&quot;: {</span>
-<span class="doccomment">//!        &quot;cruel&quot;: &quot;world&quot;</span>
-<span class="doccomment">//!    }</span>
-<span class="doccomment">//! };</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let raw = RawDocumentBuf::from_document(&amp;document)?;</span>
-<span class="doccomment">//! let value = raw</span>
-<span class="doccomment">//!     .get_document(&quot;goodbye&quot;)?</span>
-<span class="doccomment">//!     .get_str(&quot;cruel&quot;)?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! assert_eq!(</span>
-<span class="doccomment">//!     value,</span>
-<span class="doccomment">//!     &quot;world&quot;,</span>
-<span class="doccomment">//! );</span>
-<span class="doccomment">//! # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Reference type ([`RawDocument`])</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! A BSON document can also be accessed with the [`RawDocument`] type, which is an</span>
-<span class="doccomment">//! unsized type that represents the BSON payload as a `[u8]`. This allows accessing nested</span>
-<span class="doccomment">//! documents without reallocation. [`RawDocument`] must always be accessed via a pointer type,</span>
-<span class="doccomment">//! similar to `[T]` and `str`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The below example constructs a bson document in a stack-based array,</span>
-<span class="doccomment">//! and extracts a `&amp;str` from it, performing no heap allocation.</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! use bson::raw::RawDocument;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let bytes = b&quot;\x13\x00\x00\x00\x02hi\x00\x06\x00\x00\x00y&#39;all\x00\x00&quot;;</span>
-<span class="doccomment">//! assert_eq!(RawDocument::from_bytes(bytes)?.get_str(&quot;hi&quot;)?, &quot;y&#39;all&quot;);</span>
-<span class="doccomment">//! # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Iteration</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`RawDocument`] implements [`IntoIterator`](std::iter::IntoIterator), which can also be</span>
-<span class="doccomment">//! accessed via [`RawDocumentBuf::iter`].</span>
+</pre><pre class="rust"><code><span class="doccomment">//! An API for interacting with raw BSON bytes.
+//!
+//! This module provides two document types, [`RawDocumentBuf`] and [`RawDocument`] (akin to
+//! [`std::string::String`] and [`str`]), for working with raw BSON documents. These types differ
+//! from the regular [`crate::Document`] type in that their storage is BSON bytes rather than a
+//! hash-map like Rust type. In certain circumstances, these types can be leveraged for increased
+//! performance.
+//!
+//! This module also provides a [`RawBson`] type for modeling any borrowed BSON element and a
+//! [`RawArray`] type for modeling a borrowed slice of a document containing a BSON array element.
+//!
+//! A [`RawDocumentBuf`] can be created from a `Vec&lt;u8&gt;` containing raw BSON data. A
+//! [`RawDocument`] can be created from anything that can be borrowed as a `&amp;[u8]`. Both types
+//! can access elements via methods similar to those available on the [`crate::Document`] type.
+//! Note that [`RawDocument::get`] (which [`RawDocument`] calls through to via its `Deref`
+//! implementation) returns a `Result`, since the bytes contained in the document are not fully
+//! validated until trying to access the contained data.
+//!
+//! ```rust
+//! use bson::raw::{
+//!     RawBson,
+//!     RawDocumentBuf,
+//! };
+//!
+//! // See http://bsonspec.org/spec.html for details on the binary encoding of BSON.
+//! let doc = RawDocumentBuf::from_bytes(b&quot;\x13\x00\x00\x00\x02hi\x00\x06\x00\x00\x00y&#39;all\x00\x00&quot;.to_vec())?;
+//! let elem = doc.get(&quot;hi&quot;)?.unwrap();
+//!
+//! assert_eq!(
+//!   elem.as_str(),
+//!   Some(&quot;y&#39;all&quot;),
+//! );
+//! # Ok::&lt;(), bson::raw::Error&gt;(())
+//! ```
+//!
+//! ### [`crate::Document`] interop
+//!
+//! A [`RawDocument`] can be created from a [`crate::Document`]. Internally, this
+//! serializes the [`crate::Document`] to a `Vec&lt;u8&gt;`, and then includes those bytes in the
+//! [`RawDocument`].
+//!
+//! ```rust
+//! use bson::{
+//!     raw::RawDocumentBuf,
+//!     doc,
+//! };
+//!
+//! let document = doc! {
+//!    &quot;goodbye&quot;: {
+//!        &quot;cruel&quot;: &quot;world&quot;
+//!    }
+//! };
+//!
+//! let raw = RawDocumentBuf::from_document(&amp;document)?;
+//! let value = raw
+//!     .get_document(&quot;goodbye&quot;)?
+//!     .get_str(&quot;cruel&quot;)?;
+//!
+//! assert_eq!(
+//!     value,
+//!     &quot;world&quot;,
+//! );
+//! # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())
+//! ```
+//!
+//! ### Reference type ([`RawDocument`])
+//!
+//! A BSON document can also be accessed with the [`RawDocument`] type, which is an
+//! unsized type that represents the BSON payload as a `[u8]`. This allows accessing nested
+//! documents without reallocation. [`RawDocument`] must always be accessed via a pointer type,
+//! similar to `[T]` and `str`.
+//!
+//! The below example constructs a bson document in a stack-based array,
+//! and extracts a `&amp;str` from it, performing no heap allocation.
+//! ```rust
+//! use bson::raw::RawDocument;
+//!
+//! let bytes = b&quot;\x13\x00\x00\x00\x02hi\x00\x06\x00\x00\x00y&#39;all\x00\x00&quot;;
+//! assert_eq!(RawDocument::from_bytes(bytes)?.get_str(&quot;hi&quot;)?, &quot;y&#39;all&quot;);
+//! # Ok::&lt;(), Box&lt;dyn std::error::Error&gt;&gt;(())
+//! ```
+//!
+//! ### Iteration
+//!
+//! [`RawDocument`] implements [`IntoIterator`](std::iter::IntoIterator), which can also be
+//! accessed via [`RawDocumentBuf::iter`].
 
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! use bson::{</span>
-<span class="doccomment">//!    raw::{</span>
-<span class="doccomment">//!        RawBsonRef,</span>
-<span class="doccomment">//!        RawDocumentBuf,</span>
-<span class="doccomment">//!    },</span>
-<span class="doccomment">//!    doc,</span>
-<span class="doccomment">//! };</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let original_doc = doc! {</span>
-<span class="doccomment">//!     &quot;crate&quot;: &quot;bson&quot;,</span>
-<span class="doccomment">//!     &quot;year&quot;: &quot;2021&quot;,</span>
-<span class="doccomment">//! };</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let doc = RawDocumentBuf::from_document(&amp;original_doc)?;</span>
-<span class="doccomment">//! let mut doc_iter = doc.iter();</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let (key, value): (&amp;str, RawBsonRef) = doc_iter.next().unwrap()?;</span>
-<span class="doccomment">//! assert_eq!(key, &quot;crate&quot;);</span>
-<span class="doccomment">//! assert_eq!(value.as_str(), Some(&quot;bson&quot;));</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let (key, value): (&amp;str, RawBsonRef) = doc_iter.next().unwrap()?;</span>
-<span class="doccomment">//! assert_eq!(key, &quot;year&quot;);</span>
-<span class="doccomment">//! assert_eq!(value.as_str(), Some(&quot;2021&quot;));</span>
-<span class="doccomment">//! # Ok::&lt;(), bson::raw::Error&gt;(())</span>
-<span class="doccomment">//! ```</span>
+//! ```rust
+//! use bson::{
+//!    raw::{
+//!        RawBsonRef,
+//!        RawDocumentBuf,
+//!    },
+//!    doc,
+//! };
+//!
+//! let original_doc = doc! {
+//!     &quot;crate&quot;: &quot;bson&quot;,
+//!     &quot;year&quot;: &quot;2021&quot;,
+//! };
+//!
+//! let doc = RawDocumentBuf::from_document(&amp;original_doc)?;
+//! let mut doc_iter = doc.iter();
+//!
+//! let (key, value): (&amp;str, RawBsonRef) = doc_iter.next().unwrap()?;
+//! assert_eq!(key, &quot;crate&quot;);
+//! assert_eq!(value.as_str(), Some(&quot;bson&quot;));
+//!
+//! let (key, value): (&amp;str, RawBsonRef) = doc_iter.next().unwrap()?;
+//! assert_eq!(key, &quot;year&quot;);
+//! assert_eq!(value.as_str(), Some(&quot;2021&quot;));
+//! # Ok::&lt;(), bson::raw::Error&gt;(())
+//! ```
 
-<span class="kw">mod</span> <span class="ident">array</span>;
-<span class="kw">mod</span> <span class="ident">array_buf</span>;
-<span class="kw">mod</span> <span class="ident">bson</span>;
-<span class="kw">mod</span> <span class="ident">bson_ref</span>;
-<span class="kw">mod</span> <span class="ident">document</span>;
-<span class="kw">mod</span> <span class="ident">document_buf</span>;
-<span class="kw">mod</span> <span class="ident">error</span>;
-<span class="kw">mod</span> <span class="ident">iter</span>;
-<span class="kw">mod</span> <span class="ident">serde</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span>;
+</span><span class="kw">mod </span>array;
+<span class="kw">mod </span>array_buf;
+<span class="kw">mod </span>bson;
+<span class="kw">mod </span>bson_ref;
+<span class="kw">mod </span>document;
+<span class="kw">mod </span>document_buf;
+<span class="kw">mod </span>error;
+<span class="kw">mod </span>iter;
+<span class="kw">mod </span>serde;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test;
 
-<span class="kw">use</span> <span class="ident">std::convert</span>::{<span class="ident">TryFrom</span>, <span class="ident">TryInto</span>};
+<span class="kw">use </span>std::convert::{TryFrom, TryInto};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::de::MIN_BSON_STRING_SIZE</span>;
+<span class="kw">use </span><span class="kw">crate</span>::de::MIN_BSON_STRING_SIZE;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::{
-    <span class="ident">array</span>::{<span class="ident">RawArray</span>, <span class="ident">RawArrayIter</span>},
-    <span class="ident">array_buf::RawArrayBuf</span>,
-    <span class="ident">bson</span>::{<span class="ident">RawBson</span>, <span class="ident">RawJavaScriptCodeWithScope</span>},
-    <span class="ident">bson_ref</span>::{
-        <span class="ident">RawBinaryRef</span>,
-        <span class="ident">RawBsonRef</span>,
-        <span class="ident">RawDbPointerRef</span>,
-        <span class="ident">RawJavaScriptCodeWithScopeRef</span>,
-        <span class="ident">RawRegexRef</span>,
+<span class="kw">pub use </span><span class="self">self</span>::{
+    array::{RawArray, RawArrayIter},
+    array_buf::RawArrayBuf,
+    bson::{RawBson, RawJavaScriptCodeWithScope},
+    bson_ref::{
+        RawBinaryRef,
+        RawBsonRef,
+        RawDbPointerRef,
+        RawJavaScriptCodeWithScopeRef,
+        RawRegexRef,
     },
-    <span class="ident">document::RawDocument</span>,
-    <span class="ident">document_buf::RawDocumentBuf</span>,
-    <span class="ident">error</span>::{<span class="ident">Error</span>, <span class="ident">ErrorKind</span>, <span class="prelude-ty">Result</span>, <span class="ident">ValueAccessError</span>, <span class="ident">ValueAccessErrorKind</span>, <span class="ident">ValueAccessResult</span>},
-    <span class="ident">iter::Iter</span>,
+    document::RawDocument,
+    document_buf::RawDocumentBuf,
+    error::{Error, ErrorKind, <span class="prelude-ty">Result</span>, ValueAccessError, ValueAccessErrorKind, ValueAccessResult},
+    iter::Iter,
 };
 
-<span class="doccomment">/// Special newtype name indicating that the type being (de)serialized is a raw BSON document.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">RAW_DOCUMENT_NEWTYPE</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;$__private__bson_RawDocument&quot;</span>;
+<span class="doccomment">/// Special newtype name indicating that the type being (de)serialized is a raw BSON document.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>RAW_DOCUMENT_NEWTYPE: <span class="kw-2">&amp;</span>str = <span class="string">&quot;$__private__bson_RawDocument&quot;</span>;
 
-<span class="doccomment">/// Special newtype name indicating that the type being (de)serialized is a raw BSON array.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">RAW_ARRAY_NEWTYPE</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;$__private__bson_RawArray&quot;</span>;
+<span class="doccomment">/// Special newtype name indicating that the type being (de)serialized is a raw BSON array.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>RAW_ARRAY_NEWTYPE: <span class="kw-2">&amp;</span>str = <span class="string">&quot;$__private__bson_RawArray&quot;</span>;
 
-<span class="doccomment">/// Special newtype name indicating that the type being (de)serialized is a raw BSON value.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">RAW_BSON_NEWTYPE</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;$__private__bson_RawBson&quot;</span>;
+<span class="doccomment">/// Special newtype name indicating that the type being (de)serialized is a raw BSON value.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>RAW_BSON_NEWTYPE: <span class="kw-2">&amp;</span>str = <span class="string">&quot;$__private__bson_RawBson&quot;</span>;
 
-<span class="doccomment">/// Given a u8 slice, return an i32 calculated from the first four bytes in</span>
-<span class="doccomment">/// little endian order.</span>
-<span class="kw">fn</span> <span class="ident">f64_from_slice</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">arr</span> <span class="op">=</span> <span class="ident">val</span>
-        .<span class="ident">get</span>(<span class="number">0</span>..<span class="number">8</span>)
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">try_into</span>().<span class="ident">ok</span>())
-        .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">Error::new_without_key</span>(<span class="ident">ErrorKind::MalformedValue</span> {
-                <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;expected 8 bytes to read double, instead got {}&quot;</span>, <span class="ident">val</span>.<span class="ident">len</span>()),
+<span class="doccomment">/// Given a u8 slice, return an i32 calculated from the first four bytes in
+/// little endian order.
+</span><span class="kw">fn </span>f64_from_slice(val: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;f64&gt; {
+    <span class="kw">let </span>arr = val
+        .get(<span class="number">0</span>..<span class="number">8</span>)
+        .and_then(|s| s.try_into().ok())
+        .ok_or_else(|| {
+            Error::new_without_key(ErrorKind::MalformedValue {
+                message: <span class="macro">format!</span>(<span class="string">&quot;expected 8 bytes to read double, instead got {}&quot;</span>, val.len()),
             })
         })<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>(<span class="ident">f64::from_le_bytes</span>(<span class="ident">arr</span>))
+    <span class="prelude-val">Ok</span>(f64::from_le_bytes(arr))
 }
 
-<span class="doccomment">/// Given a u8 slice, return an i32 calculated from the first four bytes in</span>
-<span class="doccomment">/// little endian order.</span>
-<span class="kw">fn</span> <span class="ident">i32_from_slice</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">arr</span>: [<span class="ident">u8</span>; <span class="number">4</span>] <span class="op">=</span> <span class="ident">val</span>
-        .<span class="ident">get</span>(<span class="number">0</span>..<span class="number">4</span>)
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">try_into</span>().<span class="ident">ok</span>())
-        .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">Error::new_without_key</span>(<span class="ident">ErrorKind::MalformedValue</span> {
-                <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;expected 4 bytes to read i32, instead got {}&quot;</span>, <span class="ident">val</span>.<span class="ident">len</span>()),
+<span class="doccomment">/// Given a u8 slice, return an i32 calculated from the first four bytes in
+/// little endian order.
+</span><span class="kw">fn </span>i32_from_slice(val: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;i32&gt; {
+    <span class="kw">let </span>arr: [u8; <span class="number">4</span>] = val
+        .get(<span class="number">0</span>..<span class="number">4</span>)
+        .and_then(|s| s.try_into().ok())
+        .ok_or_else(|| {
+            Error::new_without_key(ErrorKind::MalformedValue {
+                message: <span class="macro">format!</span>(<span class="string">&quot;expected 4 bytes to read i32, instead got {}&quot;</span>, val.len()),
             })
         })<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>(<span class="ident">i32::from_le_bytes</span>(<span class="ident">arr</span>))
+    <span class="prelude-val">Ok</span>(i32::from_le_bytes(arr))
 }
 
-<span class="doccomment">/// Given an u8 slice, return an i64 calculated from the first 8 bytes in</span>
-<span class="doccomment">/// little endian order.</span>
-<span class="kw">fn</span> <span class="ident">i64_from_slice</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">arr</span> <span class="op">=</span> <span class="ident">val</span>
-        .<span class="ident">get</span>(<span class="number">0</span>..<span class="number">8</span>)
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">try_into</span>().<span class="ident">ok</span>())
-        .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">Error::new_without_key</span>(<span class="ident">ErrorKind::MalformedValue</span> {
-                <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;expected 8 bytes to read i64, instead got {}&quot;</span>, <span class="ident">val</span>.<span class="ident">len</span>()),
+<span class="doccomment">/// Given an u8 slice, return an i64 calculated from the first 8 bytes in
+/// little endian order.
+</span><span class="kw">fn </span>i64_from_slice(val: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;i64&gt; {
+    <span class="kw">let </span>arr = val
+        .get(<span class="number">0</span>..<span class="number">8</span>)
+        .and_then(|s| s.try_into().ok())
+        .ok_or_else(|| {
+            Error::new_without_key(ErrorKind::MalformedValue {
+                message: <span class="macro">format!</span>(<span class="string">&quot;expected 8 bytes to read i64, instead got {}&quot;</span>, val.len()),
             })
         })<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>(<span class="ident">i64::from_le_bytes</span>(<span class="ident">arr</span>))
+    <span class="prelude-val">Ok</span>(i64::from_le_bytes(arr))
 }
 
-<span class="kw">fn</span> <span class="ident">read_nullterminated</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">splits</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">splitn</span>(<span class="number">2</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">x</span> <span class="op">==</span> <span class="number">0</span>);
-    <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">splits</span>.<span class="ident">next</span>().<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-        <span class="ident">Error::new_without_key</span>(<span class="ident">ErrorKind::MalformedValue</span> {
-            <span class="ident">message</span>: <span class="string">&quot;no value&quot;</span>.<span class="ident">into</span>(),
+<span class="kw">fn </span>read_nullterminated(buf: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>splits = buf.splitn(<span class="number">2</span>, |x| <span class="kw-2">*</span>x == <span class="number">0</span>);
+    <span class="kw">let </span>value = splits.next().ok_or_else(|| {
+        Error::new_without_key(ErrorKind::MalformedValue {
+            message: <span class="string">&quot;no value&quot;</span>.into(),
         })
     })<span class="question-mark">?</span>;
-    <span class="kw">if</span> <span class="ident">splits</span>.<span class="ident">next</span>().<span class="ident">is_some</span>() {
-        <span class="prelude-val">Ok</span>(<span class="ident">try_to_str</span>(<span class="ident">value</span>)<span class="question-mark">?</span>)
-    } <span class="kw">else</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">Error::new_without_key</span>(<span class="ident">ErrorKind::MalformedValue</span> {
-            <span class="ident">message</span>: <span class="string">&quot;expected null terminator&quot;</span>.<span class="ident">into</span>(),
+    <span class="kw">if </span>splits.next().is_some() {
+        <span class="prelude-val">Ok</span>(try_to_str(value)<span class="question-mark">?</span>)
+    } <span class="kw">else </span>{
+        <span class="prelude-val">Err</span>(Error::new_without_key(ErrorKind::MalformedValue {
+            message: <span class="string">&quot;expected null terminator&quot;</span>.into(),
         }))
     }
 }
 
-<span class="kw">fn</span> <span class="ident">read_lenencoded</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">4</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new_without_key</span>(<span class="ident">ErrorKind::MalformedValue</span> {
-            <span class="ident">message</span>: <span class="macro">format!</span>(
+<span class="kw">fn </span>read_lenencoded(buf: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+    <span class="kw">if </span>buf.len() &lt; <span class="number">4 </span>{
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new_without_key(ErrorKind::MalformedValue {
+            message: <span class="macro">format!</span>(
                 <span class="string">&quot;expected buffer with string to contain at least 4 bytes, but it only has {}&quot;</span>,
-                <span class="ident">buf</span>.<span class="ident">len</span>()
+                buf.len()
             ),
         }));
     }
 
-    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">i32_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>[..<span class="number">4</span>])<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">checked_add</span>(<span class="ident">usize_try_from_i32</span>(<span class="ident">length</span>)<span class="question-mark">?</span>, <span class="number">4</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>length = i32_from_slice(<span class="kw-2">&amp;</span>buf[..<span class="number">4</span>])<span class="question-mark">?</span>;
+    <span class="kw">let </span>end = checked_add(usize_try_from_i32(length)<span class="question-mark">?</span>, <span class="number">4</span>)<span class="question-mark">?</span>;
 
-    <span class="kw">if</span> <span class="ident">end</span> <span class="op">&lt;</span> <span class="ident">MIN_BSON_STRING_SIZE</span> <span class="kw">as</span> <span class="ident">usize</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new_without_key</span>(<span class="ident">ErrorKind::MalformedValue</span> {
-            <span class="ident">message</span>: <span class="macro">format!</span>(
+    <span class="kw">if </span>end &lt; MIN_BSON_STRING_SIZE <span class="kw">as </span>usize {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new_without_key(ErrorKind::MalformedValue {
+            message: <span class="macro">format!</span>(
                 <span class="string">&quot;BSON length encoded string needs to be at least {} bytes, instead got {}&quot;</span>,
-                <span class="ident">MIN_BSON_STRING_SIZE</span>, <span class="ident">end</span>
+                MIN_BSON_STRING_SIZE, end
             ),
         }));
     }
 
-    <span class="kw">if</span> <span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="ident">end</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new_without_key</span>(<span class="ident">ErrorKind::MalformedValue</span> {
-            <span class="ident">message</span>: <span class="macro">format!</span>(
+    <span class="kw">if </span>buf.len() &lt; end {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new_without_key(ErrorKind::MalformedValue {
+            message: <span class="macro">format!</span>(
                 <span class="string">&quot;expected buffer to contain at least {} bytes, but it only has {}&quot;</span>,
-                <span class="ident">end</span>,
-                <span class="ident">buf</span>.<span class="ident">len</span>()
+                end,
+                buf.len()
             ),
         }));
     }
 
-    <span class="kw">if</span> <span class="ident">buf</span>[<span class="ident">end</span> <span class="op">-</span> <span class="number">1</span>] <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new_without_key</span>(<span class="ident">ErrorKind::MalformedValue</span> {
-            <span class="ident">message</span>: <span class="string">&quot;expected string to be null-terminated&quot;</span>.<span class="ident">to_string</span>(),
+    <span class="kw">if </span>buf[end - <span class="number">1</span>] != <span class="number">0 </span>{
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new_without_key(ErrorKind::MalformedValue {
+            message: <span class="string">&quot;expected string to be null-terminated&quot;</span>.to_string(),
         }));
     }
 
-    <span class="comment">// exclude null byte</span>
-    <span class="ident">try_to_str</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>[<span class="number">4</span>..(<span class="ident">end</span> <span class="op">-</span> <span class="number">1</span>)])
+    <span class="comment">// exclude null byte
+    </span>try_to_str(<span class="kw-2">&amp;</span>buf[<span class="number">4</span>..(end - <span class="number">1</span>)])
 }
 
-<span class="kw">fn</span> <span class="ident">try_to_str</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="ident">std::str::from_utf8</span>(<span class="ident">data</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">Error::new_without_key</span>(<span class="ident">ErrorKind::Utf8EncodingError</span>(<span class="ident">e</span>)))
+<span class="kw">fn </span>try_to_str(data: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+    std::str::from_utf8(data).map_err(|e| Error::new_without_key(ErrorKind::Utf8EncodingError(e)))
 }
 
-<span class="kw">fn</span> <span class="ident">usize_try_from_i32</span>(<span class="ident">i</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-    <span class="ident">usize::try_from</span>(<span class="ident">i</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
-        <span class="ident">Error::new_without_key</span>(<span class="ident">ErrorKind::MalformedValue</span> {
-            <span class="ident">message</span>: <span class="ident">e</span>.<span class="ident">to_string</span>(),
+<span class="kw">fn </span>usize_try_from_i32(i: i32) -&gt; <span class="prelude-ty">Result</span>&lt;usize&gt; {
+    usize::try_from(i).map_err(|e| {
+        Error::new_without_key(ErrorKind::MalformedValue {
+            message: e.to_string(),
         })
     })
 }
 
-<span class="kw">fn</span> <span class="ident">checked_add</span>(<span class="ident">lhs</span>: <span class="ident">usize</span>, <span class="ident">rhs</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-    <span class="ident">lhs</span>.<span class="ident">checked_add</span>(<span class="ident">rhs</span>).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-        <span class="ident">Error::new_without_key</span>(<span class="ident">ErrorKind::MalformedValue</span> {
-            <span class="ident">message</span>: <span class="string">&quot;attempted to add with overflow&quot;</span>.<span class="ident">to_string</span>(),
+<span class="kw">fn </span>checked_add(lhs: usize, rhs: usize) -&gt; <span class="prelude-ty">Result</span>&lt;usize&gt; {
+    lhs.checked_add(rhs).ok_or_else(|| {
+        Error::new_without_key(ErrorKind::MalformedValue {
+            message: <span class="string">&quot;attempted to add with overflow&quot;</span>.to_string(),
         })
     })
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bson" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bson" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

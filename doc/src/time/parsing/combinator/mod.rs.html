@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-0.3.14/src/parsing/combinator/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="icon" href="https://avatars0.githubusercontent.com/u/55999857"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../time/index.html"><div class="logo-container"><img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../time/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-0.3.14/src/parsing/combinator/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="icon" href="https://avatars0.githubusercontent.com/u/55999857"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../time/index.html"><div class="logo-container"><img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../time/index.html"><div class="logo-container">
                     <img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../time/index.html">
                         <img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -192,197 +192,197 @@
 <span id="190">190</span>
 <span id="191">191</span>
 <span id="192">192</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Implementations of the low-level parser combinators.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Implementations of the low-level parser combinators.
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">rfc</span>;
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>rfc;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::format_description::modifier::Padding</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parsing::shim</span>::{<span class="ident">Integer</span>, <span class="ident">IntegerParseBytes</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parsing::ParsedItem</span>;
+<span class="kw">use </span><span class="kw">crate</span>::format_description::modifier::Padding;
+<span class="kw">use </span><span class="kw">crate</span>::parsing::shim::{Integer, IntegerParseBytes};
+<span class="kw">use </span><span class="kw">crate</span>::parsing::ParsedItem;
 
-<span class="doccomment">/// Parse a &quot;+&quot; or &quot;-&quot; sign. Returns the ASCII byte representing the sign, if present.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">sign</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedItem</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">input</span> {
-        [<span class="ident">sign</span> @ (<span class="string">b&#39;-&#39;</span> <span class="op">|</span> <span class="string">b&#39;+&#39;</span>), <span class="ident">remaining</span> @ ..] =&gt; <span class="prelude-val">Some</span>(<span class="ident">ParsedItem</span>(<span class="ident">remaining</span>, <span class="kw-2">*</span><span class="ident">sign</span>)),
-        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+<span class="doccomment">/// Parse a &quot;+&quot; or &quot;-&quot; sign. Returns the ASCII byte representing the sign, if present.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const fn </span>sign(input: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;ParsedItem&lt;<span class="lifetime">&#39;_</span>, u8&gt;&gt; {
+    <span class="kw">match </span>input {
+        [sign @ (<span class="string">b&#39;-&#39; </span>| <span class="string">b&#39;+&#39;</span>), remaining @ ..] =&gt; <span class="prelude-val">Some</span>(ParsedItem(remaining, <span class="kw-2">*</span>sign)),
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
     }
 }
 
-<span class="doccomment">/// Consume the first matching item, returning its associated value.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">first_match</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(
-    <span class="ident">options</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="ident">T</span>)<span class="op">&gt;</span>,
-    <span class="ident">case_sensitive</span>: <span class="ident">bool</span>,
-) -&gt; <span class="kw">impl</span> <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">into_iter</span>();
-    <span class="kw">move</span> <span class="op">|</span><span class="ident">input</span><span class="op">|</span> {
-        <span class="ident">options</span>.<span class="ident">find_map</span>(<span class="op">|</span>(<span class="ident">expected</span>, <span class="ident">t</span>)<span class="op">|</span> {
-            <span class="kw">if</span> <span class="ident">case_sensitive</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">ParsedItem</span>(<span class="ident">input</span>.<span class="ident">strip_prefix</span>(<span class="ident">expected</span>)<span class="question-mark">?</span>, <span class="ident">t</span>))
-            } <span class="kw">else</span> {
-                <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">expected</span>.<span class="ident">len</span>();
-                <span class="kw">if</span> <span class="ident">n</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">input</span>.<span class="ident">len</span>() {
-                    <span class="kw">let</span> (<span class="ident">head</span>, <span class="ident">tail</span>) <span class="op">=</span> <span class="ident">input</span>.<span class="ident">split_at</span>(<span class="ident">n</span>);
-                    <span class="kw">if</span> <span class="ident">head</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="ident">expected</span>) {
-                        <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">ParsedItem</span>(<span class="ident">tail</span>, <span class="ident">t</span>));
+<span class="doccomment">/// Consume the first matching item, returning its associated value.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>first_match&lt;<span class="lifetime">&#39;a</span>, T&gt;(
+    options: <span class="kw">impl </span>IntoIterator&lt;Item = (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8], T)&gt;,
+    case_sensitive: bool,
+) -&gt; <span class="kw">impl </span>FnMut(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;ParsedItem&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>options = options.into_iter();
+    <span class="kw">move </span>|input| {
+        options.find_map(|(expected, t)| {
+            <span class="kw">if </span>case_sensitive {
+                <span class="prelude-val">Some</span>(ParsedItem(input.strip_prefix(expected)<span class="question-mark">?</span>, t))
+            } <span class="kw">else </span>{
+                <span class="kw">let </span>n = expected.len();
+                <span class="kw">if </span>n &lt;= input.len() {
+                    <span class="kw">let </span>(head, tail) = input.split_at(n);
+                    <span class="kw">if </span>head.eq_ignore_ascii_case(expected) {
+                        <span class="kw">return </span><span class="prelude-val">Some</span>(ParsedItem(tail, t));
                     }
                 }
-                <span class="prelude-val">None</span>
-            }
+                <span class="prelude-val">None
+            </span>}
         })
     }
 }
 
-<span class="doccomment">/// Consume zero or more instances of the provided parser. The parser must return the unit value.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">zero_or_more</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">P</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, ()<span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(
-    <span class="ident">parser</span>: <span class="ident">P</span>,
-) -&gt; <span class="kw">impl</span> <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">ParsedItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, ()<span class="op">&gt;</span> {
-    <span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">input</span><span class="op">|</span> {
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">remaining</span>) <span class="op">=</span> <span class="ident">parser</span>(<span class="ident">input</span>) {
-            <span class="ident">input</span> <span class="op">=</span> <span class="ident">remaining</span>.<span class="ident">into_inner</span>();
+<span class="doccomment">/// Consume zero or more instances of the provided parser. The parser must return the unit value.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>zero_or_more&lt;<span class="lifetime">&#39;a</span>, P: Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;ParsedItem&lt;<span class="lifetime">&#39;a</span>, ()&gt;&gt;&gt;(
+    parser: P,
+) -&gt; <span class="kw">impl </span>FnMut(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]) -&gt; ParsedItem&lt;<span class="lifetime">&#39;a</span>, ()&gt; {
+    <span class="kw">move </span>|<span class="kw-2">mut </span>input| {
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(remaining) = parser(input) {
+            input = remaining.into_inner();
         }
-        <span class="ident">ParsedItem</span>(<span class="ident">input</span>, ())
+        ParsedItem(input, ())
     }
 }
 
-<span class="doccomment">/// Consume one of or more instances of the provided parser. The parser must produce the unit value.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">one_or_more</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">P</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, ()<span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(
-    <span class="ident">parser</span>: <span class="ident">P</span>,
-) -&gt; <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, ()<span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">input</span><span class="op">|</span> {
-        <span class="ident">input</span> <span class="op">=</span> <span class="ident">parser</span>(<span class="ident">input</span>)<span class="question-mark">?</span>.<span class="ident">into_inner</span>();
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">remaining</span>) <span class="op">=</span> <span class="ident">parser</span>(<span class="ident">input</span>) {
-            <span class="ident">input</span> <span class="op">=</span> <span class="ident">remaining</span>.<span class="ident">into_inner</span>();
+<span class="doccomment">/// Consume one of or more instances of the provided parser. The parser must produce the unit value.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>one_or_more&lt;<span class="lifetime">&#39;a</span>, P: Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;ParsedItem&lt;<span class="lifetime">&#39;a</span>, ()&gt;&gt;&gt;(
+    parser: P,
+) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;ParsedItem&lt;<span class="lifetime">&#39;a</span>, ()&gt;&gt; {
+    <span class="kw">move </span>|<span class="kw-2">mut </span>input| {
+        input = parser(input)<span class="question-mark">?</span>.into_inner();
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(remaining) = parser(input) {
+            input = remaining.into_inner();
         }
-        <span class="prelude-val">Some</span>(<span class="ident">ParsedItem</span>(<span class="ident">input</span>, ()))
+        <span class="prelude-val">Some</span>(ParsedItem(input, ()))
     }
 }
 
-<span class="doccomment">/// Consume between `n` and `m` instances of the provided parser.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">n_to_m</span><span class="op">&lt;</span>
+<span class="doccomment">/// Consume between `n` and `m` instances of the provided parser.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>n_to_m&lt;
     <span class="lifetime">&#39;a</span>,
-    <span class="kw">const</span> <span class="ident">N</span>: <span class="ident">u8</span>,
-    <span class="kw">const</span> <span class="ident">M</span>: <span class="ident">u8</span>,
-    <span class="ident">T</span>,
-    <span class="ident">P</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-<span class="op">&gt;</span>(
-    <span class="ident">parser</span>: <span class="ident">P</span>,
-) -&gt; <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="macro">debug_assert!</span>(<span class="ident">M</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">N</span>);
-    <span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">input</span><span class="op">|</span> {
-        <span class="comment">// We need to keep this to determine the total length eventually consumed.</span>
-        <span class="kw">let</span> <span class="ident">orig_input</span> <span class="op">=</span> <span class="ident">input</span>;
+    <span class="kw">const </span>N: u8,
+    <span class="kw">const </span>M: u8,
+    T,
+    P: Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;ParsedItem&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;,
+&gt;(
+    parser: P,
+) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;ParsedItem&lt;<span class="lifetime">&#39;a</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]&gt;&gt; {
+    <span class="macro">debug_assert!</span>(M &gt;= N);
+    <span class="kw">move </span>|<span class="kw-2">mut </span>input| {
+        <span class="comment">// We need to keep this to determine the total length eventually consumed.
+        </span><span class="kw">let </span>orig_input = input;
 
-        <span class="comment">// Mandatory</span>
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">N</span> {
-            <span class="ident">input</span> <span class="op">=</span> <span class="ident">parser</span>(<span class="ident">input</span>)<span class="question-mark">?</span>.<span class="number">0</span>;
+        <span class="comment">// Mandatory
+        </span><span class="kw">for _ in </span><span class="number">0</span>..N {
+            input = parser(input)<span class="question-mark">?</span>.<span class="number">0</span>;
         }
 
-        <span class="comment">// Optional</span>
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="ident">N</span>..<span class="ident">M</span> {
-            <span class="kw">match</span> <span class="ident">parser</span>(<span class="ident">input</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">parsed</span>) =&gt; <span class="ident">input</span> <span class="op">=</span> <span class="ident">parsed</span>.<span class="number">0</span>,
-                <span class="prelude-val">None</span> =&gt; <span class="kw">break</span>,
+        <span class="comment">// Optional
+        </span><span class="kw">for _ in </span>N..M {
+            <span class="kw">match </span>parser(input) {
+                <span class="prelude-val">Some</span>(parsed) =&gt; input = parsed.<span class="number">0</span>,
+                <span class="prelude-val">None </span>=&gt; <span class="kw">break</span>,
             }
         }
 
-        <span class="prelude-val">Some</span>(<span class="ident">ParsedItem</span>(
-            <span class="ident">input</span>,
-            <span class="kw-2">&amp;</span><span class="ident">orig_input</span>[..(<span class="ident">orig_input</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">input</span>.<span class="ident">len</span>())],
+        <span class="prelude-val">Some</span>(ParsedItem(
+            input,
+            <span class="kw-2">&amp;</span>orig_input[..(orig_input.len() - input.len())],
         ))
     }
 }
 
-<span class="doccomment">/// Consume between `n` and `m` digits, returning the numerical value.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">n_to_m_digits</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">N</span>: <span class="ident">u8</span>, <span class="kw">const</span> <span class="ident">M</span>: <span class="ident">u8</span>, <span class="ident">T</span>: <span class="ident">Integer</span><span class="op">&gt;</span>(
-    <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedItem</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="macro">debug_assert!</span>(<span class="ident">M</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">N</span>);
-    <span class="ident">n_to_m</span>::<span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">M</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">any_digit</span>)(<span class="ident">input</span>)<span class="question-mark">?</span>.<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">parse_bytes</span>())
+<span class="doccomment">/// Consume between `n` and `m` digits, returning the numerical value.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>n_to_m_digits&lt;<span class="kw">const </span>N: u8, <span class="kw">const </span>M: u8, T: Integer&gt;(
+    input: <span class="kw-2">&amp;</span>[u8],
+) -&gt; <span class="prelude-ty">Option</span>&lt;ParsedItem&lt;<span class="lifetime">&#39;_</span>, T&gt;&gt; {
+    <span class="macro">debug_assert!</span>(M &gt;= N);
+    n_to_m::&lt;N, M, <span class="kw">_</span>, <span class="kw">_</span>&gt;(any_digit)(input)<span class="question-mark">?</span>.flat_map(|value| value.parse_bytes())
 }
 
-<span class="doccomment">/// Consume exactly `n` digits, returning the numerical value.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">exactly_n_digits</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">N</span>: <span class="ident">u8</span>, <span class="ident">T</span>: <span class="ident">Integer</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedItem</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">n_to_m_digits</span>::<span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">N</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">input</span>)
+<span class="doccomment">/// Consume exactly `n` digits, returning the numerical value.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>exactly_n_digits&lt;<span class="kw">const </span>N: u8, T: Integer&gt;(input: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;ParsedItem&lt;<span class="lifetime">&#39;_</span>, T&gt;&gt; {
+    n_to_m_digits::&lt;N, N, <span class="kw">_</span>&gt;(input)
 }
 
-<span class="doccomment">/// Consume exactly `n` digits, returning the numerical value.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">exactly_n_digits_padded</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="kw">const</span> <span class="ident">N</span>: <span class="ident">u8</span>, <span class="ident">T</span>: <span class="ident">Integer</span><span class="op">&gt;</span>(
-    <span class="ident">padding</span>: <span class="ident">Padding</span>,
-) -&gt; <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">n_to_m_digits_padded</span>::<span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">N</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">padding</span>)
+<span class="doccomment">/// Consume exactly `n` digits, returning the numerical value.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>exactly_n_digits_padded&lt;<span class="lifetime">&#39;a</span>, <span class="kw">const </span>N: u8, T: Integer&gt;(
+    padding: Padding,
+) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;ParsedItem&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt; {
+    n_to_m_digits_padded::&lt;N, N, <span class="kw">_</span>&gt;(padding)
 }
 
-<span class="doccomment">/// Consume between `n` and `m` digits, returning the numerical value.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">n_to_m_digits_padded</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="kw">const</span> <span class="ident">N</span>: <span class="ident">u8</span>, <span class="kw">const</span> <span class="ident">M</span>: <span class="ident">u8</span>, <span class="ident">T</span>: <span class="ident">Integer</span><span class="op">&gt;</span>(
-    <span class="ident">padding</span>: <span class="ident">Padding</span>,
-) -&gt; <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="macro">debug_assert!</span>(<span class="ident">M</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">N</span>);
-    <span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">input</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">padding</span> {
-        <span class="ident">Padding::None</span> =&gt; <span class="ident">n_to_m_digits</span>::<span class="op">&lt;</span><span class="number">1</span>, <span class="ident">M</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">input</span>),
-        <span class="ident">Padding::Space</span> =&gt; {
-            <span class="macro">debug_assert!</span>(<span class="ident">N</span> <span class="op">&gt;</span> <span class="number">0</span>);
+<span class="doccomment">/// Consume between `n` and `m` digits, returning the numerical value.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>n_to_m_digits_padded&lt;<span class="lifetime">&#39;a</span>, <span class="kw">const </span>N: u8, <span class="kw">const </span>M: u8, T: Integer&gt;(
+    padding: Padding,
+) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;ParsedItem&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt; {
+    <span class="macro">debug_assert!</span>(M &gt;= N);
+    <span class="kw">move </span>|<span class="kw-2">mut </span>input| <span class="kw">match </span>padding {
+        Padding::None =&gt; n_to_m_digits::&lt;<span class="number">1</span>, M, <span class="kw">_</span>&gt;(input),
+        Padding::Space =&gt; {
+            <span class="macro">debug_assert!</span>(N &gt; <span class="number">0</span>);
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">orig_input</span> <span class="op">=</span> <span class="ident">input</span>;
-            <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..(<span class="ident">N</span> <span class="op">-</span> <span class="number">1</span>) {
-                <span class="kw">match</span> <span class="ident">ascii_char</span>::<span class="op">&lt;</span><span class="string">b&#39; &#39;</span><span class="op">&gt;</span>(<span class="ident">input</span>) {
-                    <span class="prelude-val">Some</span>(<span class="ident">parsed</span>) =&gt; <span class="ident">input</span> <span class="op">=</span> <span class="ident">parsed</span>.<span class="number">0</span>,
-                    <span class="prelude-val">None</span> =&gt; <span class="kw">break</span>,
+            <span class="kw">let </span><span class="kw-2">mut </span>orig_input = input;
+            <span class="kw">for _ in </span><span class="number">0</span>..(N - <span class="number">1</span>) {
+                <span class="kw">match </span>ascii_char::&lt;<span class="string">b&#39; &#39;</span>&gt;(input) {
+                    <span class="prelude-val">Some</span>(parsed) =&gt; input = parsed.<span class="number">0</span>,
+                    <span class="prelude-val">None </span>=&gt; <span class="kw">break</span>,
                 }
             }
-            <span class="kw">let</span> <span class="ident">pad_width</span> <span class="op">=</span> (<span class="ident">orig_input</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">input</span>.<span class="ident">len</span>()) <span class="kw">as</span> <span class="ident">u8</span>;
+            <span class="kw">let </span>pad_width = (orig_input.len() - input.len()) <span class="kw">as </span>u8;
 
-            <span class="ident">orig_input</span> <span class="op">=</span> <span class="ident">input</span>;
-            <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..(<span class="ident">N</span> <span class="op">-</span> <span class="ident">pad_width</span>) {
-                <span class="ident">input</span> <span class="op">=</span> <span class="ident">any_digit</span>(<span class="ident">input</span>)<span class="question-mark">?</span>.<span class="number">0</span>;
+            orig_input = input;
+            <span class="kw">for _ in </span><span class="number">0</span>..(N - pad_width) {
+                input = any_digit(input)<span class="question-mark">?</span>.<span class="number">0</span>;
             }
-            <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="ident">N</span>..<span class="ident">M</span> {
-                <span class="kw">match</span> <span class="ident">any_digit</span>(<span class="ident">input</span>) {
-                    <span class="prelude-val">Some</span>(<span class="ident">parsed</span>) =&gt; <span class="ident">input</span> <span class="op">=</span> <span class="ident">parsed</span>.<span class="number">0</span>,
-                    <span class="prelude-val">None</span> =&gt; <span class="kw">break</span>,
+            <span class="kw">for _ in </span>N..M {
+                <span class="kw">match </span>any_digit(input) {
+                    <span class="prelude-val">Some</span>(parsed) =&gt; input = parsed.<span class="number">0</span>,
+                    <span class="prelude-val">None </span>=&gt; <span class="kw">break</span>,
                 }
             }
 
-            <span class="ident">ParsedItem</span>(<span class="ident">input</span>, <span class="kw-2">&amp;</span><span class="ident">orig_input</span>[..(<span class="ident">orig_input</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">input</span>.<span class="ident">len</span>())])
-                .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">parse_bytes</span>())
+            ParsedItem(input, <span class="kw-2">&amp;</span>orig_input[..(orig_input.len() - input.len())])
+                .flat_map(|value| value.parse_bytes())
         }
-        <span class="ident">Padding::Zero</span> =&gt; <span class="ident">n_to_m_digits</span>::<span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">M</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">input</span>),
+        Padding::Zero =&gt; n_to_m_digits::&lt;N, M, <span class="kw">_</span>&gt;(input),
     }
 }
 
-<span class="doccomment">/// Consume exactly one digit.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">any_digit</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedItem</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">input</span> {
-        [<span class="ident">c</span>, <span class="ident">remaining</span> @ ..] <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_ascii_digit</span>() =&gt; <span class="prelude-val">Some</span>(<span class="ident">ParsedItem</span>(<span class="ident">remaining</span>, <span class="kw-2">*</span><span class="ident">c</span>)),
-        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+<span class="doccomment">/// Consume exactly one digit.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const fn </span>any_digit(input: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;ParsedItem&lt;<span class="lifetime">&#39;_</span>, u8&gt;&gt; {
+    <span class="kw">match </span>input {
+        [c, remaining @ ..] <span class="kw">if </span>c.is_ascii_digit() =&gt; <span class="prelude-val">Some</span>(ParsedItem(remaining, <span class="kw-2">*</span>c)),
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
     }
 }
 
-<span class="doccomment">/// Consume exactly one of the provided ASCII characters.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">ascii_char</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">CHAR</span>: <span class="ident">u8</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedItem</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, ()<span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="macro">debug_assert!</span>(<span class="ident">CHAR</span>.<span class="ident">is_ascii_graphic</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">CHAR</span>.<span class="ident">is_ascii_whitespace</span>());
-    <span class="kw">match</span> <span class="ident">input</span> {
-        [<span class="ident">c</span>, <span class="ident">remaining</span> @ ..] <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">c</span> <span class="op">==</span> <span class="ident">CHAR</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">ParsedItem</span>(<span class="ident">remaining</span>, ())),
-        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+<span class="doccomment">/// Consume exactly one of the provided ASCII characters.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>ascii_char&lt;<span class="kw">const </span>CHAR: u8&gt;(input: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;ParsedItem&lt;<span class="lifetime">&#39;_</span>, ()&gt;&gt; {
+    <span class="macro">debug_assert!</span>(CHAR.is_ascii_graphic() || CHAR.is_ascii_whitespace());
+    <span class="kw">match </span>input {
+        [c, remaining @ ..] <span class="kw">if </span><span class="kw-2">*</span>c == CHAR =&gt; <span class="prelude-val">Some</span>(ParsedItem(remaining, ())),
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
     }
 }
 
-<span class="doccomment">/// Consume exactly one of the provided ASCII characters, case-insensitive.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">ascii_char_ignore_case</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">CHAR</span>: <span class="ident">u8</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedItem</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, ()<span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="macro">debug_assert!</span>(<span class="ident">CHAR</span>.<span class="ident">is_ascii_graphic</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">CHAR</span>.<span class="ident">is_ascii_whitespace</span>());
-    <span class="kw">match</span> <span class="ident">input</span> {
-        [<span class="ident">c</span>, <span class="ident">remaining</span> @ ..] <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="kw-2">&amp;</span><span class="ident">CHAR</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">ParsedItem</span>(<span class="ident">remaining</span>, ())),
-        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+<span class="doccomment">/// Consume exactly one of the provided ASCII characters, case-insensitive.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>ascii_char_ignore_case&lt;<span class="kw">const </span>CHAR: u8&gt;(input: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;ParsedItem&lt;<span class="lifetime">&#39;_</span>, ()&gt;&gt; {
+    <span class="macro">debug_assert!</span>(CHAR.is_ascii_graphic() || CHAR.is_ascii_whitespace());
+    <span class="kw">match </span>input {
+        [c, remaining @ ..] <span class="kw">if </span>c.eq_ignore_ascii_case(<span class="kw-2">&amp;</span>CHAR) =&gt; <span class="prelude-val">Some</span>(ParsedItem(remaining, ())),
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
     }
 }
 
-<span class="doccomment">/// Optionally consume an input with a given parser.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">opt</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>(
-    <span class="ident">parser</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ParsedItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-) -&gt; <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">ParsedItem</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">move</span> <span class="op">|</span><span class="ident">input</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">parser</span>(<span class="ident">input</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="ident">value</span>.<span class="ident">map</span>(<span class="prelude-val">Some</span>),
-        <span class="prelude-val">None</span> =&gt; <span class="ident">ParsedItem</span>(<span class="ident">input</span>, <span class="prelude-val">None</span>),
+<span class="doccomment">/// Optionally consume an input with a given parser.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>opt&lt;<span class="lifetime">&#39;a</span>, T&gt;(
+    parser: <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;ParsedItem&lt;<span class="lifetime">&#39;a</span>, T&gt;&gt;,
+) -&gt; <span class="kw">impl </span>Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]) -&gt; ParsedItem&lt;<span class="lifetime">&#39;a</span>, <span class="prelude-ty">Option</span>&lt;T&gt;&gt; {
+    <span class="kw">move </span>|input| <span class="kw">match </span>parser(input) {
+        <span class="prelude-val">Some</span>(value) =&gt; value.map(<span class="prelude-val">Some</span>),
+        <span class="prelude-val">None </span>=&gt; ParsedItem(input, <span class="prelude-val">None</span>),
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="time" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="time" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

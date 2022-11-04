@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hex-0.4.3/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../hex/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../hex/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../hex/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hex-0.4.3/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../hex/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../hex/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../hex/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -523,530 +523,530 @@
 <span id="523">523</span>
 <span id="524">524</span>
 <span id="525">525</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2013-2014 The Rust Project Developers.</span>
-<span class="comment">// Copyright (c) 2015-2020 The rust-hex Developers.</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license</span>
-<span class="comment">// &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. This file may not be copied, modified, or distributed</span>
-<span class="comment">// except according to those terms.</span>
-<span class="doccomment">//! Encoding and decoding hex strings.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! For most cases, you can simply use the [`decode`], [`encode`] and</span>
-<span class="doccomment">//! [`encode_upper`] functions. If you need a bit more control, use the traits</span>
-<span class="doccomment">//! [`ToHex`] and [`FromHex`] instead.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Example</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # #[cfg(not(feature = &quot;alloc&quot;))]</span>
-<span class="doccomment">//! # let mut output = [0; 0x18];</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # #[cfg(not(feature = &quot;alloc&quot;))]</span>
-<span class="doccomment">//! # hex::encode_to_slice(b&quot;Hello world!&quot;, &amp;mut output).unwrap();</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # #[cfg(not(feature = &quot;alloc&quot;))]</span>
-<span class="doccomment">//! # let hex_string = ::core::str::from_utf8(&amp;output).unwrap();</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # #[cfg(feature = &quot;alloc&quot;)]</span>
-<span class="doccomment">//! let hex_string = hex::encode(&quot;Hello world!&quot;);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! println!(&quot;{}&quot;, hex_string); // Prints &quot;48656c6c6f20776f726c6421&quot;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # assert_eq!(hex_string, &quot;48656c6c6f20776f726c6421&quot;);</span>
-<span class="doccomment">//! ```</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2013-2014 The Rust Project Developers.
+// Copyright (c) 2015-2020 The rust-hex Developers.
+//
+// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+// http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license
+// &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. This file may not be copied, modified, or distributed
+// except according to those terms.
+</span><span class="doccomment">//! Encoding and decoding hex strings.
+//!
+//! For most cases, you can simply use the [`decode`], [`encode`] and
+//! [`encode_upper`] functions. If you need a bit more control, use the traits
+//! [`ToHex`] and [`FromHex`] instead.
+//!
+//! # Example
+//!
+//! ```
+//! # #[cfg(not(feature = &quot;alloc&quot;))]
+//! # let mut output = [0; 0x18];
+//! #
+//! # #[cfg(not(feature = &quot;alloc&quot;))]
+//! # hex::encode_to_slice(b&quot;Hello world!&quot;, &amp;mut output).unwrap();
+//! #
+//! # #[cfg(not(feature = &quot;alloc&quot;))]
+//! # let hex_string = ::core::str::from_utf8(&amp;output).unwrap();
+//! #
+//! # #[cfg(feature = &quot;alloc&quot;)]
+//! let hex_string = hex::encode(&quot;Hello world!&quot;);
+//!
+//! println!(&quot;{}&quot;, hex_string); // Prints &quot;48656c6c6f20776f726c6421&quot;
+//!
+//! # assert_eq!(hex_string, &quot;48656c6c6f20776f726c6421&quot;);
+//! ```
 
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/hex/0.4.3&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>), <span class="ident">no_std</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">feature</span>(<span class="ident">doc_cfg</span>))]</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::unreadable_literal</span>)]</span>
+</span><span class="attribute">#![doc(html_root_url = <span class="string">&quot;https://docs.rs/hex/0.4.3&quot;</span>)]
+#![cfg_attr(not(feature = <span class="string">&quot;std&quot;</span>), no_std)]
+#![cfg_attr(docsrs, feature(doc_cfg))]
+#![allow(clippy::unreadable_literal)]
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">alloc</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">string::String</span>, <span class="ident">vec::Vec</span>};
+#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">extern crate </span>alloc;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">use </span>alloc::{string::String, vec::Vec};
 
-<span class="kw">use</span> <span class="ident">core::iter</span>;
+<span class="kw">use </span>core::iter;
 
-<span class="kw">mod</span> <span class="ident">error</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::FromHexError</span>;
+<span class="kw">mod </span>error;
+<span class="kw">pub use </span><span class="kw">crate</span>::error::FromHexError;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">serde</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::serde::deserialize</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>))]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::serde</span>::{<span class="ident">serialize</span>, <span class="ident">serialize_upper</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;serde&quot;</span>)))]
+</span><span class="kw">pub mod </span>serde;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde&quot;</span>)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::serde::deserialize;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;alloc&quot;</span>, feature = <span class="string">&quot;serde&quot;</span>))]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::serde::{serialize, serialize_upper};
 
-<span class="doccomment">/// Encoding values as hex string.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This trait is implemented for all `T` which implement `AsRef&lt;[u8]&gt;`. This</span>
-<span class="doccomment">/// includes `String`, `str`, `Vec&lt;u8&gt;` and `[u8]`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use hex::ToHex;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// println!(&quot;{}&quot;, &quot;Hello world!&quot;.encode_hex::&lt;String&gt;());</span>
-<span class="doccomment">/// # assert_eq!(&quot;Hello world!&quot;.encode_hex::&lt;String&gt;(), &quot;48656c6c6f20776f726c6421&quot;.to_string());</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// *Note*: instead of using this trait, you might want to use [`encode()`].</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ToHex</span> {
-    <span class="doccomment">/// Encode the hex strict representing `self` into the result. Lower case</span>
-    <span class="doccomment">/// letters are used (e.g. `f9b4ca`)</span>
-    <span class="kw">fn</span> <span class="ident">encode_hex</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">iter::FromIterator</span><span class="op">&lt;</span><span class="ident">char</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">T</span>;
+<span class="doccomment">/// Encoding values as hex string.
+///
+/// This trait is implemented for all `T` which implement `AsRef&lt;[u8]&gt;`. This
+/// includes `String`, `str`, `Vec&lt;u8&gt;` and `[u8]`.
+///
+/// # Example
+///
+/// ```
+/// use hex::ToHex;
+///
+/// println!(&quot;{}&quot;, &quot;Hello world!&quot;.encode_hex::&lt;String&gt;());
+/// # assert_eq!(&quot;Hello world!&quot;.encode_hex::&lt;String&gt;(), &quot;48656c6c6f20776f726c6421&quot;.to_string());
+/// ```
+///
+/// *Note*: instead of using this trait, you might want to use [`encode()`].
+</span><span class="kw">pub trait </span>ToHex {
+    <span class="doccomment">/// Encode the hex strict representing `self` into the result. Lower case
+    /// letters are used (e.g. `f9b4ca`)
+    </span><span class="kw">fn </span>encode_hex&lt;T: iter::FromIterator&lt;char&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; T;
 
-    <span class="doccomment">/// Encode the hex strict representing `self` into the result. Upper case</span>
-    <span class="doccomment">/// letters are used (e.g. `F9B4CA`)</span>
-    <span class="kw">fn</span> <span class="ident">encode_hex_upper</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">iter::FromIterator</span><span class="op">&lt;</span><span class="ident">char</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">T</span>;
+    <span class="doccomment">/// Encode the hex strict representing `self` into the result. Upper case
+    /// letters are used (e.g. `F9B4CA`)
+    </span><span class="kw">fn </span>encode_hex_upper&lt;T: iter::FromIterator&lt;char&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; T;
 }
 
-<span class="kw">const</span> <span class="ident">HEX_CHARS_LOWER</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">16</span>] <span class="op">=</span> <span class="string">b&quot;0123456789abcdef&quot;</span>;
-<span class="kw">const</span> <span class="ident">HEX_CHARS_UPPER</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">16</span>] <span class="op">=</span> <span class="string">b&quot;0123456789ABCDEF&quot;</span>;
+<span class="kw">const </span>HEX_CHARS_LOWER: <span class="kw-2">&amp;</span>[u8; <span class="number">16</span>] = <span class="string">b&quot;0123456789abcdef&quot;</span>;
+<span class="kw">const </span>HEX_CHARS_UPPER: <span class="kw-2">&amp;</span>[u8; <span class="number">16</span>] = <span class="string">b&quot;0123456789ABCDEF&quot;</span>;
 
-<span class="kw">struct</span> <span class="ident">BytesToHexChars</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">inner</span>: <span class="ident">::core::slice::Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>; <span class="number">16</span>],
-    <span class="ident">next</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">char</span><span class="op">&gt;</span>,
+<span class="kw">struct </span>BytesToHexChars&lt;<span class="lifetime">&#39;a</span>&gt; {
+    inner: ::core::slice::Iter&lt;<span class="lifetime">&#39;a</span>, u8&gt;,
+    table: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[u8; <span class="number">16</span>],
+    next: <span class="prelude-ty">Option</span>&lt;char&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">BytesToHexChars</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>; <span class="number">16</span>]) -&gt; <span class="ident">BytesToHexChars</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">BytesToHexChars</span> {
-            <span class="ident">inner</span>: <span class="ident">inner</span>.<span class="ident">iter</span>(),
-            <span class="ident">table</span>,
-            <span class="ident">next</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; BytesToHexChars&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>new(inner: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8], table: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[u8; <span class="number">16</span>]) -&gt; BytesToHexChars&lt;<span class="lifetime">&#39;a</span>&gt; {
+        BytesToHexChars {
+            inner: inner.iter(),
+            table,
+            next: <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">BytesToHexChars</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">char</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>BytesToHexChars&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Item = char;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">next</span>.<span class="ident">take</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">current</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">current</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">next</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">byte</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">current</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">table</span>[(<span class="ident">byte</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">4</span>) <span class="kw">as</span> <span class="ident">usize</span>] <span class="kw">as</span> <span class="ident">char</span>;
-                <span class="self">self</span>.<span class="ident">next</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">table</span>[(<span class="ident">byte</span> <span class="op">&amp;</span> <span class="number">0x0F</span>) <span class="kw">as</span> <span class="ident">usize</span>] <span class="kw">as</span> <span class="ident">char</span>);
-                <span class="ident">current</span>
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">match </span><span class="self">self</span>.next.take() {
+            <span class="prelude-val">Some</span>(current) =&gt; <span class="prelude-val">Some</span>(current),
+            <span class="prelude-val">None </span>=&gt; <span class="self">self</span>.inner.next().map(|byte| {
+                <span class="kw">let </span>current = <span class="self">self</span>.table[(byte &gt;&gt; <span class="number">4</span>) <span class="kw">as </span>usize] <span class="kw">as </span>char;
+                <span class="self">self</span>.next = <span class="prelude-val">Some</span>(<span class="self">self</span>.table[(byte &amp; <span class="number">0x0F</span>) <span class="kw">as </span>usize] <span class="kw">as </span>char);
+                current
             }),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
-        (<span class="ident">length</span>, <span class="prelude-val">Some</span>(<span class="ident">length</span>))
+    <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
+        <span class="kw">let </span>length = <span class="self">self</span>.len();
+        (length, <span class="prelude-val">Some</span>(length))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">iter::ExactSizeIterator</span> <span class="kw">for</span> <span class="ident">BytesToHexChars</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">length</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span>;
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">next</span>.<span class="ident">is_some</span>() {
-            <span class="ident">length</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; iter::ExactSizeIterator <span class="kw">for </span>BytesToHexChars&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="kw">let </span><span class="kw-2">mut </span>length = <span class="self">self</span>.inner.len() * <span class="number">2</span>;
+        <span class="kw">if </span><span class="self">self</span>.next.is_some() {
+            length += <span class="number">1</span>;
         }
-        <span class="ident">length</span>
+        length
     }
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">encode_to_iter</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">iter::FromIterator</span><span class="op">&lt;</span><span class="ident">char</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>; <span class="number">16</span>], <span class="ident">source</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">T</span> {
-    <span class="ident">BytesToHexChars::new</span>(<span class="ident">source</span>, <span class="ident">table</span>).<span class="ident">collect</span>()
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>encode_to_iter&lt;T: iter::FromIterator&lt;char&gt;&gt;(table: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[u8; <span class="number">16</span>], source: <span class="kw-2">&amp;</span>[u8]) -&gt; T {
+    BytesToHexChars::new(source, table).collect()
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">ToHex</span> <span class="kw">for</span> <span class="ident">T</span> {
-    <span class="kw">fn</span> <span class="ident">encode_hex</span><span class="op">&lt;</span><span class="ident">U</span>: <span class="ident">iter::FromIterator</span><span class="op">&lt;</span><span class="ident">char</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">U</span> {
-        <span class="ident">encode_to_iter</span>(<span class="ident">HEX_CHARS_LOWER</span>, <span class="self">self</span>.<span class="ident">as_ref</span>())
+<span class="kw">impl</span>&lt;T: AsRef&lt;[u8]&gt;&gt; ToHex <span class="kw">for </span>T {
+    <span class="kw">fn </span>encode_hex&lt;U: iter::FromIterator&lt;char&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; U {
+        encode_to_iter(HEX_CHARS_LOWER, <span class="self">self</span>.as_ref())
     }
 
-    <span class="kw">fn</span> <span class="ident">encode_hex_upper</span><span class="op">&lt;</span><span class="ident">U</span>: <span class="ident">iter::FromIterator</span><span class="op">&lt;</span><span class="ident">char</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">U</span> {
-        <span class="ident">encode_to_iter</span>(<span class="ident">HEX_CHARS_UPPER</span>, <span class="self">self</span>.<span class="ident">as_ref</span>())
+    <span class="kw">fn </span>encode_hex_upper&lt;U: iter::FromIterator&lt;char&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; U {
+        encode_to_iter(HEX_CHARS_UPPER, <span class="self">self</span>.as_ref())
     }
 }
 
-<span class="doccomment">/// Types that can be decoded from a hex string.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This trait is implemented for `Vec&lt;u8&gt;` and small `u8`-arrays.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use core::str;</span>
-<span class="doccomment">/// use hex::FromHex;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let buffer = &lt;[u8; 12]&gt;::from_hex(&quot;48656c6c6f20776f726c6421&quot;)?;</span>
-<span class="doccomment">/// let string = str::from_utf8(&amp;buffer).expect(&quot;invalid buffer length&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// println!(&quot;{}&quot;, string); // prints &quot;Hello world!&quot;</span>
-<span class="doccomment">/// # assert_eq!(&quot;Hello world!&quot;, string);</span>
-<span class="doccomment">/// # Ok::&lt;(), hex::FromHexError&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">FromHex</span>: <span class="ident">Sized</span> {
-    <span class="kw">type</span> <span class="ident">Error</span>;
+<span class="doccomment">/// Types that can be decoded from a hex string.
+///
+/// This trait is implemented for `Vec&lt;u8&gt;` and small `u8`-arrays.
+///
+/// # Example
+///
+/// ```
+/// use core::str;
+/// use hex::FromHex;
+///
+/// let buffer = &lt;[u8; 12]&gt;::from_hex(&quot;48656c6c6f20776f726c6421&quot;)?;
+/// let string = str::from_utf8(&amp;buffer).expect(&quot;invalid buffer length&quot;);
+///
+/// println!(&quot;{}&quot;, string); // prints &quot;Hello world!&quot;
+/// # assert_eq!(&quot;Hello world!&quot;, string);
+/// # Ok::&lt;(), hex::FromHexError&gt;(())
+/// ```
+</span><span class="kw">pub trait </span>FromHex: Sized {
+    <span class="kw">type </span>Error;
 
-    <span class="doccomment">/// Creates an instance of type `Self` from the given hex string, or fails</span>
-    <span class="doccomment">/// with a custom error type.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Both, upper and lower case characters are valid and can even be</span>
-    <span class="doccomment">/// mixed (e.g. `f9b4ca`, `F9B4CA` and `f9B4Ca` are all valid strings).</span>
-    <span class="kw">fn</span> <span class="ident">from_hex</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">hex</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Creates an instance of type `Self` from the given hex string, or fails
+    /// with a custom error type.
+    ///
+    /// Both, upper and lower case characters are valid and can even be
+    /// mixed (e.g. `f9b4ca`, `F9B4CA` and `f9B4Ca` are all valid strings).
+    </span><span class="kw">fn </span>from_hex&lt;T: AsRef&lt;[u8]&gt;&gt;(hex: T) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt;;
 }
 
-<span class="kw">fn</span> <span class="ident">val</span>(<span class="ident">c</span>: <span class="ident">u8</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="ident">FromHexError</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">c</span> {
-        <span class="string">b&#39;A&#39;</span>..<span class="op">=</span><span class="string">b&#39;F&#39;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">c</span> <span class="op">-</span> <span class="string">b&#39;A&#39;</span> <span class="op">+</span> <span class="number">10</span>),
-        <span class="string">b&#39;a&#39;</span>..<span class="op">=</span><span class="string">b&#39;f&#39;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">c</span> <span class="op">-</span> <span class="string">b&#39;a&#39;</span> <span class="op">+</span> <span class="number">10</span>),
-        <span class="string">b&#39;0&#39;</span>..<span class="op">=</span><span class="string">b&#39;9&#39;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">c</span> <span class="op">-</span> <span class="string">b&#39;0&#39;</span>),
-        <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">FromHexError::InvalidHexCharacter</span> {
-            <span class="ident">c</span>: <span class="ident">c</span> <span class="kw">as</span> <span class="ident">char</span>,
-            <span class="ident">index</span>: <span class="ident">idx</span>,
+<span class="kw">fn </span>val(c: u8, idx: usize) -&gt; <span class="prelude-ty">Result</span>&lt;u8, FromHexError&gt; {
+    <span class="kw">match </span>c {
+        <span class="string">b&#39;A&#39;</span>..=<span class="string">b&#39;F&#39; </span>=&gt; <span class="prelude-val">Ok</span>(c - <span class="string">b&#39;A&#39; </span>+ <span class="number">10</span>),
+        <span class="string">b&#39;a&#39;</span>..=<span class="string">b&#39;f&#39; </span>=&gt; <span class="prelude-val">Ok</span>(c - <span class="string">b&#39;a&#39; </span>+ <span class="number">10</span>),
+        <span class="string">b&#39;0&#39;</span>..=<span class="string">b&#39;9&#39; </span>=&gt; <span class="prelude-val">Ok</span>(c - <span class="string">b&#39;0&#39;</span>),
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(FromHexError::InvalidHexCharacter {
+            c: c <span class="kw">as </span>char,
+            index: idx,
         }),
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">FromHex</span> <span class="kw">for</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">FromHexError</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">impl </span>FromHex <span class="kw">for </span>Vec&lt;u8&gt; {
+    <span class="kw">type </span>Error = FromHexError;
 
-    <span class="kw">fn</span> <span class="ident">from_hex</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">hex</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">hex</span> <span class="op">=</span> <span class="ident">hex</span>.<span class="ident">as_ref</span>();
-        <span class="kw">if</span> <span class="ident">hex</span>.<span class="ident">len</span>() <span class="op">%</span> <span class="number">2</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">FromHexError::OddLength</span>);
+    <span class="kw">fn </span>from_hex&lt;T: AsRef&lt;[u8]&gt;&gt;(hex: T) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">let </span>hex = hex.as_ref();
+        <span class="kw">if </span>hex.len() % <span class="number">2 </span>!= <span class="number">0 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(FromHexError::OddLength);
         }
 
-        <span class="ident">hex</span>.<span class="ident">chunks</span>(<span class="number">2</span>)
-            .<span class="ident">enumerate</span>()
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">i</span>, <span class="ident">pair</span>)<span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="ident">val</span>(<span class="ident">pair</span>[<span class="number">0</span>], <span class="number">2</span> <span class="op">*</span> <span class="ident">i</span>)<span class="question-mark">?</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span> <span class="op">|</span> <span class="ident">val</span>(<span class="ident">pair</span>[<span class="number">1</span>], <span class="number">2</span> <span class="op">*</span> <span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>)<span class="question-mark">?</span>))
-            .<span class="ident">collect</span>()
+        hex.chunks(<span class="number">2</span>)
+            .enumerate()
+            .map(|(i, pair)| <span class="prelude-val">Ok</span>(val(pair[<span class="number">0</span>], <span class="number">2 </span>* i)<span class="question-mark">? </span>&lt;&lt; <span class="number">4 </span>| val(pair[<span class="number">1</span>], <span class="number">2 </span>* i + <span class="number">1</span>)<span class="question-mark">?</span>))
+            .collect()
     }
 }
 
-<span class="comment">// Helper macro to implement the trait for a few fixed sized arrays. Once Rust</span>
-<span class="comment">// has type level integers, this should be removed.</span>
-<span class="macro">macro_rules!</span> <span class="ident">from_hex_array_impl</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>:<span class="ident">expr</span>)<span class="op">+</span>) =&gt; {$(
-        <span class="kw">impl</span> <span class="ident">FromHex</span> <span class="kw">for</span> [<span class="ident">u8</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>] {
-            <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">FromHexError</span>;
+<span class="comment">// Helper macro to implement the trait for a few fixed sized arrays. Once Rust
+// has type level integers, this should be removed.
+</span><span class="macro">macro_rules! </span>from_hex_array_impl {
+    ($(<span class="macro-nonterminal">$len</span>:expr)+) =&gt; {$(
+        <span class="kw">impl </span>FromHex <span class="kw">for </span>[u8; <span class="macro-nonterminal">$len</span>] {
+            <span class="kw">type </span>Error = FromHexError;
 
-            <span class="kw">fn</span> <span class="ident">from_hex</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">hex</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> [<span class="number">0_u8</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">len</span>];
-                <span class="ident">decode_to_slice</span>(<span class="ident">hex</span>, <span class="kw-2">&amp;mut</span> <span class="ident">out</span> <span class="kw">as</span> <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>])<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">out</span>)
+            <span class="kw">fn </span>from_hex&lt;T: AsRef&lt;[u8]&gt;&gt;(hex: T) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>out = [<span class="number">0_u8</span>; <span class="macro-nonterminal">$len</span>];
+                decode_to_slice(hex, <span class="kw-2">&amp;mut </span>out <span class="kw">as </span><span class="kw-2">&amp;mut </span>[u8])<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(out)
             }
         }
-    )<span class="op">+</span>}
+    )+}
 }
 
-<span class="macro">from_hex_array_impl!</span> {
-    <span class="number">1</span> <span class="number">2</span> <span class="number">3</span> <span class="number">4</span> <span class="number">5</span> <span class="number">6</span> <span class="number">7</span> <span class="number">8</span> <span class="number">9</span> <span class="number">10</span> <span class="number">11</span> <span class="number">12</span> <span class="number">13</span> <span class="number">14</span> <span class="number">15</span> <span class="number">16</span>
-    <span class="number">17</span> <span class="number">18</span> <span class="number">19</span> <span class="number">20</span> <span class="number">21</span> <span class="number">22</span> <span class="number">23</span> <span class="number">24</span> <span class="number">25</span> <span class="number">26</span> <span class="number">27</span> <span class="number">28</span> <span class="number">29</span> <span class="number">30</span> <span class="number">31</span> <span class="number">32</span>
-    <span class="number">33</span> <span class="number">34</span> <span class="number">35</span> <span class="number">36</span> <span class="number">37</span> <span class="number">38</span> <span class="number">39</span> <span class="number">40</span> <span class="number">41</span> <span class="number">42</span> <span class="number">43</span> <span class="number">44</span> <span class="number">45</span> <span class="number">46</span> <span class="number">47</span> <span class="number">48</span>
-    <span class="number">49</span> <span class="number">50</span> <span class="number">51</span> <span class="number">52</span> <span class="number">53</span> <span class="number">54</span> <span class="number">55</span> <span class="number">56</span> <span class="number">57</span> <span class="number">58</span> <span class="number">59</span> <span class="number">60</span> <span class="number">61</span> <span class="number">62</span> <span class="number">63</span> <span class="number">64</span>
-    <span class="number">65</span> <span class="number">66</span> <span class="number">67</span> <span class="number">68</span> <span class="number">69</span> <span class="number">70</span> <span class="number">71</span> <span class="number">72</span> <span class="number">73</span> <span class="number">74</span> <span class="number">75</span> <span class="number">76</span> <span class="number">77</span> <span class="number">78</span> <span class="number">79</span> <span class="number">80</span>
-    <span class="number">81</span> <span class="number">82</span> <span class="number">83</span> <span class="number">84</span> <span class="number">85</span> <span class="number">86</span> <span class="number">87</span> <span class="number">88</span> <span class="number">89</span> <span class="number">90</span> <span class="number">91</span> <span class="number">92</span> <span class="number">93</span> <span class="number">94</span> <span class="number">95</span> <span class="number">96</span>
-    <span class="number">97</span> <span class="number">98</span> <span class="number">99</span> <span class="number">100</span> <span class="number">101</span> <span class="number">102</span> <span class="number">103</span> <span class="number">104</span> <span class="number">105</span> <span class="number">106</span> <span class="number">107</span> <span class="number">108</span> <span class="number">109</span> <span class="number">110</span> <span class="number">111</span> <span class="number">112</span>
-    <span class="number">113</span> <span class="number">114</span> <span class="number">115</span> <span class="number">116</span> <span class="number">117</span> <span class="number">118</span> <span class="number">119</span> <span class="number">120</span> <span class="number">121</span> <span class="number">122</span> <span class="number">123</span> <span class="number">124</span> <span class="number">125</span> <span class="number">126</span> <span class="number">127</span> <span class="number">128</span>
-    <span class="number">160</span> <span class="number">192</span> <span class="number">200</span> <span class="number">224</span> <span class="number">256</span> <span class="number">384</span> <span class="number">512</span> <span class="number">768</span> <span class="number">1024</span> <span class="number">2048</span> <span class="number">4096</span> <span class="number">8192</span> <span class="number">16384</span> <span class="number">32768</span>
+<span class="macro">from_hex_array_impl! </span>{
+    <span class="number">1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
+    17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32
+    33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48
+    49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64
+    65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80
+    81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96
+    97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112
+    113 114 115 116 117 118 119 120 121 122 123 124 125 126 127 128
+    160 192 200 224 256 384 512 768 1024 2048 4096 8192 16384 32768
+</span>}
+
+<span class="attribute">#[cfg(any(target_pointer_width = <span class="string">&quot;32&quot;</span>, target_pointer_width = <span class="string">&quot;64&quot;</span>))]
+</span><span class="macro">from_hex_array_impl! </span>{
+    <span class="number">65536 131072 262144 524288 1048576 2097152 4194304 8388608
+    16777216 33554432 67108864 134217728 268435456 536870912
+    1073741824 2147483648
+</span>}
+
+<span class="attribute">#[cfg(target_pointer_width = <span class="string">&quot;64&quot;</span>)]
+</span><span class="macro">from_hex_array_impl! </span>{
+    <span class="number">4294967296
+</span>}
+
+<span class="doccomment">/// Encodes `data` as hex string using lowercase characters.
+///
+/// Lowercase characters are used (e.g. `f9b4ca`). The resulting string&#39;s
+/// length is always even, each byte in `data` is always encoded using two hex
+/// digits. Thus, the resulting string contains exactly twice as many bytes as
+/// the input data.
+///
+/// # Example
+///
+/// ```
+/// assert_eq!(hex::encode(&quot;Hello world!&quot;), &quot;48656c6c6f20776f726c6421&quot;);
+/// assert_eq!(hex::encode(vec![1, 2, 3, 15, 16]), &quot;0102030f10&quot;);
+/// ```
+</span><span class="attribute">#[must_use]
+#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">pub fn </span>encode&lt;T: AsRef&lt;[u8]&gt;&gt;(data: T) -&gt; String {
+    data.encode_hex()
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;32&quot;</span>, <span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;64&quot;</span>))]</span>
-<span class="macro">from_hex_array_impl!</span> {
-    <span class="number">65536</span> <span class="number">131072</span> <span class="number">262144</span> <span class="number">524288</span> <span class="number">1048576</span> <span class="number">2097152</span> <span class="number">4194304</span> <span class="number">8388608</span>
-    <span class="number">16777216</span> <span class="number">33554432</span> <span class="number">67108864</span> <span class="number">134217728</span> <span class="number">268435456</span> <span class="number">536870912</span>
-    <span class="number">1073741824</span> <span class="number">2147483648</span>
+<span class="doccomment">/// Encodes `data` as hex string using uppercase characters.
+///
+/// Apart from the characters&#39; casing, this works exactly like `encode()`.
+///
+/// # Example
+///
+/// ```
+/// assert_eq!(hex::encode_upper(&quot;Hello world!&quot;), &quot;48656C6C6F20776F726C6421&quot;);
+/// assert_eq!(hex::encode_upper(vec![1, 2, 3, 15, 16]), &quot;0102030F10&quot;);
+/// ```
+</span><span class="attribute">#[must_use]
+#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">pub fn </span>encode_upper&lt;T: AsRef&lt;[u8]&gt;&gt;(data: T) -&gt; String {
+    data.encode_hex_upper()
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;64&quot;</span>)]</span>
-<span class="macro">from_hex_array_impl!</span> {
-    <span class="number">4294967296</span>
+<span class="doccomment">/// Decodes a hex string into raw bytes.
+///
+/// Both, upper and lower case characters are valid in the input string and can
+/// even be mixed (e.g. `f9b4ca`, `F9B4CA` and `f9B4Ca` are all valid strings).
+///
+/// # Example
+///
+/// ```
+/// assert_eq!(
+///     hex::decode(&quot;48656c6c6f20776f726c6421&quot;),
+///     Ok(&quot;Hello world!&quot;.to_owned().into_bytes())
+/// );
+///
+/// assert_eq!(hex::decode(&quot;123&quot;), Err(hex::FromHexError::OddLength));
+/// assert!(hex::decode(&quot;foo&quot;).is_err());
+/// ```
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">pub fn </span>decode&lt;T: AsRef&lt;[u8]&gt;&gt;(data: T) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;, FromHexError&gt; {
+    FromHex::from_hex(data)
 }
 
-<span class="doccomment">/// Encodes `data` as hex string using lowercase characters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Lowercase characters are used (e.g. `f9b4ca`). The resulting string&#39;s</span>
-<span class="doccomment">/// length is always even, each byte in `data` is always encoded using two hex</span>
-<span class="doccomment">/// digits. Thus, the resulting string contains exactly twice as many bytes as</span>
-<span class="doccomment">/// the input data.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// assert_eq!(hex::encode(&quot;Hello world!&quot;), &quot;48656c6c6f20776f726c6421&quot;);</span>
-<span class="doccomment">/// assert_eq!(hex::encode(vec![1, 2, 3, 15, 16]), &quot;0102030f10&quot;);</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">data</span>: <span class="ident">T</span>) -&gt; <span class="ident">String</span> {
-    <span class="ident">data</span>.<span class="ident">encode_hex</span>()
-}
+<span class="doccomment">/// Decode a hex string into a mutable bytes slice.
+///
+/// Both, upper and lower case characters are valid in the input string and can
+/// even be mixed (e.g. `f9b4ca`, `F9B4CA` and `f9B4Ca` are all valid strings).
+///
+/// # Example
+///
+/// ```
+/// let mut bytes = [0u8; 4];
+/// assert_eq!(hex::decode_to_slice(&quot;6b697769&quot;, &amp;mut bytes as &amp;mut [u8]), Ok(()));
+/// assert_eq!(&amp;bytes, b&quot;kiwi&quot;);
+/// ```
+</span><span class="kw">pub fn </span>decode_to_slice&lt;T: AsRef&lt;[u8]&gt;&gt;(data: T, out: <span class="kw-2">&amp;mut </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;(), FromHexError&gt; {
+    <span class="kw">let </span>data = data.as_ref();
 
-<span class="doccomment">/// Encodes `data` as hex string using uppercase characters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Apart from the characters&#39; casing, this works exactly like `encode()`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// assert_eq!(hex::encode_upper(&quot;Hello world!&quot;), &quot;48656C6C6F20776F726C6421&quot;);</span>
-<span class="doccomment">/// assert_eq!(hex::encode_upper(vec![1, 2, 3, 15, 16]), &quot;0102030F10&quot;);</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode_upper</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">data</span>: <span class="ident">T</span>) -&gt; <span class="ident">String</span> {
-    <span class="ident">data</span>.<span class="ident">encode_hex_upper</span>()
-}
-
-<span class="doccomment">/// Decodes a hex string into raw bytes.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Both, upper and lower case characters are valid in the input string and can</span>
-<span class="doccomment">/// even be mixed (e.g. `f9b4ca`, `F9B4CA` and `f9B4Ca` are all valid strings).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///     hex::decode(&quot;48656c6c6f20776f726c6421&quot;),</span>
-<span class="doccomment">///     Ok(&quot;Hello world!&quot;.to_owned().into_bytes())</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(hex::decode(&quot;123&quot;), Err(hex::FromHexError::OddLength));</span>
-<span class="doccomment">/// assert!(hex::decode(&quot;foo&quot;).is_err());</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">data</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">FromHexError</span><span class="op">&gt;</span> {
-    <span class="ident">FromHex::from_hex</span>(<span class="ident">data</span>)
-}
-
-<span class="doccomment">/// Decode a hex string into a mutable bytes slice.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Both, upper and lower case characters are valid in the input string and can</span>
-<span class="doccomment">/// even be mixed (e.g. `f9b4ca`, `F9B4CA` and `f9B4Ca` are all valid strings).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// let mut bytes = [0u8; 4];</span>
-<span class="doccomment">/// assert_eq!(hex::decode_to_slice(&quot;6b697769&quot;, &amp;mut bytes as &amp;mut [u8]), Ok(()));</span>
-<span class="doccomment">/// assert_eq!(&amp;bytes, b&quot;kiwi&quot;);</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode_to_slice</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">data</span>: <span class="ident">T</span>, <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">FromHexError</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">as_ref</span>();
-
-    <span class="kw">if</span> <span class="ident">data</span>.<span class="ident">len</span>() <span class="op">%</span> <span class="number">2</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">FromHexError::OddLength</span>);
+    <span class="kw">if </span>data.len() % <span class="number">2 </span>!= <span class="number">0 </span>{
+        <span class="kw">return </span><span class="prelude-val">Err</span>(FromHexError::OddLength);
     }
-    <span class="kw">if</span> <span class="ident">data</span>.<span class="ident">len</span>() <span class="op">/</span> <span class="number">2</span> <span class="op">!</span><span class="op">=</span> <span class="ident">out</span>.<span class="ident">len</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">FromHexError::InvalidStringLength</span>);
+    <span class="kw">if </span>data.len() / <span class="number">2 </span>!= out.len() {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(FromHexError::InvalidStringLength);
     }
 
-    <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">byte</span>) <span class="kw">in</span> <span class="ident">out</span>.<span class="ident">iter_mut</span>().<span class="ident">enumerate</span>() {
-        <span class="kw-2">*</span><span class="ident">byte</span> <span class="op">=</span> <span class="ident">val</span>(<span class="ident">data</span>[<span class="number">2</span> <span class="op">*</span> <span class="ident">i</span>], <span class="number">2</span> <span class="op">*</span> <span class="ident">i</span>)<span class="question-mark">?</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span> <span class="op">|</span> <span class="ident">val</span>(<span class="ident">data</span>[<span class="number">2</span> <span class="op">*</span> <span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>], <span class="number">2</span> <span class="op">*</span> <span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>)<span class="question-mark">?</span>;
+    <span class="kw">for </span>(i, byte) <span class="kw">in </span>out.iter_mut().enumerate() {
+        <span class="kw-2">*</span>byte = val(data[<span class="number">2 </span>* i], <span class="number">2 </span>* i)<span class="question-mark">? </span>&lt;&lt; <span class="number">4 </span>| val(data[<span class="number">2 </span>* i + <span class="number">1</span>], <span class="number">2 </span>* i + <span class="number">1</span>)<span class="question-mark">?</span>;
     }
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="comment">// generates an iterator like this</span>
-<span class="comment">// (0, 1)</span>
-<span class="comment">// (2, 3)</span>
-<span class="comment">// (4, 5)</span>
-<span class="comment">// (6, 7)</span>
-<span class="comment">// ...</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">generate_iter</span>(<span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">usize</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
-    (<span class="number">0</span>..<span class="ident">len</span>).<span class="ident">step_by</span>(<span class="number">2</span>).<span class="ident">zip</span>((<span class="number">0</span>..<span class="ident">len</span>).<span class="ident">skip</span>(<span class="number">1</span>).<span class="ident">step_by</span>(<span class="number">2</span>))
+<span class="comment">// generates an iterator like this
+// (0, 1)
+// (2, 3)
+// (4, 5)
+// (6, 7)
+// ...
+</span><span class="attribute">#[inline]
+</span><span class="kw">fn </span>generate_iter(len: usize) -&gt; <span class="kw">impl </span>Iterator&lt;Item = (usize, usize)&gt; {
+    (<span class="number">0</span>..len).step_by(<span class="number">2</span>).zip((<span class="number">0</span>..len).skip(<span class="number">1</span>).step_by(<span class="number">2</span>))
 }
 
-<span class="comment">// the inverse of `val`.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="kw">fn</span> <span class="ident">byte2hex</span>(<span class="ident">byte</span>: <span class="ident">u8</span>, <span class="ident">table</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">16</span>]) -&gt; (<span class="ident">u8</span>, <span class="ident">u8</span>) {
-    <span class="kw">let</span> <span class="ident">high</span> <span class="op">=</span> <span class="ident">table</span>[((<span class="ident">byte</span> <span class="op">&amp;</span> <span class="number">0xf0</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">4</span>) <span class="kw">as</span> <span class="ident">usize</span>];
-    <span class="kw">let</span> <span class="ident">low</span> <span class="op">=</span> <span class="ident">table</span>[(<span class="ident">byte</span> <span class="op">&amp;</span> <span class="number">0x0f</span>) <span class="kw">as</span> <span class="ident">usize</span>];
+<span class="comment">// the inverse of `val`.
+</span><span class="attribute">#[inline]
+#[must_use]
+</span><span class="kw">fn </span>byte2hex(byte: u8, table: <span class="kw-2">&amp;</span>[u8; <span class="number">16</span>]) -&gt; (u8, u8) {
+    <span class="kw">let </span>high = table[((byte &amp; <span class="number">0xf0</span>) &gt;&gt; <span class="number">4</span>) <span class="kw">as </span>usize];
+    <span class="kw">let </span>low = table[(byte &amp; <span class="number">0x0f</span>) <span class="kw">as </span>usize];
 
-    (<span class="ident">high</span>, <span class="ident">low</span>)
+    (high, low)
 }
 
-<span class="doccomment">/// Encodes some bytes into a mutable slice of bytes.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The output buffer, has to be able to hold at least `input.len() * 2` bytes,</span>
-<span class="doccomment">/// otherwise this function will return an error.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use hex::FromHexError;</span>
-<span class="doccomment">/// # fn main() -&gt; Result&lt;(), FromHexError&gt; {</span>
-<span class="doccomment">/// let mut bytes = [0u8; 4 * 2];</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// hex::encode_to_slice(b&quot;kiwi&quot;, &amp;mut bytes)?;</span>
-<span class="doccomment">/// assert_eq!(&amp;bytes, b&quot;6b697769&quot;);</span>
-<span class="doccomment">/// # Ok(())</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode_to_slice</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="ident">T</span>, <span class="ident">output</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">FromHexError</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">as_ref</span>().<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span> <span class="op">!</span><span class="op">=</span> <span class="ident">output</span>.<span class="ident">len</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">FromHexError::InvalidStringLength</span>);
+<span class="doccomment">/// Encodes some bytes into a mutable slice of bytes.
+///
+/// The output buffer, has to be able to hold at least `input.len() * 2` bytes,
+/// otherwise this function will return an error.
+///
+/// # Example
+///
+/// ```
+/// # use hex::FromHexError;
+/// # fn main() -&gt; Result&lt;(), FromHexError&gt; {
+/// let mut bytes = [0u8; 4 * 2];
+///
+/// hex::encode_to_slice(b&quot;kiwi&quot;, &amp;mut bytes)?;
+/// assert_eq!(&amp;bytes, b&quot;6b697769&quot;);
+/// # Ok(())
+/// # }
+/// ```
+</span><span class="kw">pub fn </span>encode_to_slice&lt;T: AsRef&lt;[u8]&gt;&gt;(input: T, output: <span class="kw-2">&amp;mut </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;(), FromHexError&gt; {
+    <span class="kw">if </span>input.as_ref().len() * <span class="number">2 </span>!= output.len() {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(FromHexError::InvalidStringLength);
     }
 
-    <span class="kw">for</span> (<span class="ident">byte</span>, (<span class="ident">i</span>, <span class="ident">j</span>)) <span class="kw">in</span> <span class="ident">input</span>
-        .<span class="ident">as_ref</span>()
-        .<span class="ident">iter</span>()
-        .<span class="ident">zip</span>(<span class="ident">generate_iter</span>(<span class="ident">input</span>.<span class="ident">as_ref</span>().<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span>))
+    <span class="kw">for </span>(byte, (i, j)) <span class="kw">in </span>input
+        .as_ref()
+        .iter()
+        .zip(generate_iter(input.as_ref().len() * <span class="number">2</span>))
     {
-        <span class="kw">let</span> (<span class="ident">high</span>, <span class="ident">low</span>) <span class="op">=</span> <span class="ident">byte2hex</span>(<span class="kw-2">*</span><span class="ident">byte</span>, <span class="ident">HEX_CHARS_LOWER</span>);
-        <span class="ident">output</span>[<span class="ident">i</span>] <span class="op">=</span> <span class="ident">high</span>;
-        <span class="ident">output</span>[<span class="ident">j</span>] <span class="op">=</span> <span class="ident">low</span>;
+        <span class="kw">let </span>(high, low) = byte2hex(<span class="kw-2">*</span>byte, HEX_CHARS_LOWER);
+        output[i] = high;
+        output[j] = low;
     }
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-    <span class="kw">use</span> <span class="ident">alloc::string::ToString</span>;
-    <span class="kw">use</span> <span class="ident">pretty_assertions::assert_eq</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+    </span><span class="kw">use </span>alloc::string::ToString;
+    <span class="kw">use </span>pretty_assertions::assert_eq;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">test_gen_iter</span>() {
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">1</span>), (<span class="number">2</span>, <span class="number">3</span>)];
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+    </span><span class="kw">fn </span>test_gen_iter() {
+        <span class="kw">let </span>result = <span class="macro">vec!</span>[(<span class="number">0</span>, <span class="number">1</span>), (<span class="number">2</span>, <span class="number">3</span>)];
 
-        <span class="macro">assert_eq!</span>(<span class="ident">generate_iter</span>(<span class="number">5</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(), <span class="ident">result</span>);
+        <span class="macro">assert_eq!</span>(generate_iter(<span class="number">5</span>).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;(), result);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_encode_to_slice</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output_1</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">4</span> <span class="op">*</span> <span class="number">2</span>];
-        <span class="ident">encode_to_slice</span>(<span class="string">b&quot;kiwi&quot;</span>, <span class="kw-2">&amp;mut</span> <span class="ident">output_1</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">output_1</span>, <span class="string">b&quot;6b697769&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_encode_to_slice() {
+        <span class="kw">let </span><span class="kw-2">mut </span>output_1 = [<span class="number">0</span>; <span class="number">4 </span>* <span class="number">2</span>];
+        encode_to_slice(<span class="string">b&quot;kiwi&quot;</span>, <span class="kw-2">&amp;mut </span>output_1).unwrap();
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>output_1, <span class="string">b&quot;6b697769&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output_2</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">5</span> <span class="op">*</span> <span class="number">2</span>];
-        <span class="ident">encode_to_slice</span>(<span class="string">b&quot;kiwis&quot;</span>, <span class="kw-2">&amp;mut</span> <span class="ident">output_2</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">output_2</span>, <span class="string">b&quot;6b69776973&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>output_2 = [<span class="number">0</span>; <span class="number">5 </span>* <span class="number">2</span>];
+        encode_to_slice(<span class="string">b&quot;kiwis&quot;</span>, <span class="kw-2">&amp;mut </span>output_2).unwrap();
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>output_2, <span class="string">b&quot;6b69776973&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output_3</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">100</span>];
+        <span class="kw">let </span><span class="kw-2">mut </span>output_3 = [<span class="number">0</span>; <span class="number">100</span>];
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">encode_to_slice</span>(<span class="string">b&quot;kiwis&quot;</span>, <span class="kw-2">&amp;mut</span> <span class="ident">output_3</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">FromHexError::InvalidStringLength</span>)
+            encode_to_slice(<span class="string">b&quot;kiwis&quot;</span>, <span class="kw-2">&amp;mut </span>output_3),
+            <span class="prelude-val">Err</span>(FromHexError::InvalidStringLength)
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_decode_to_slice</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output_1</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">4</span>];
-        <span class="ident">decode_to_slice</span>(<span class="string">b&quot;6b697769&quot;</span>, <span class="kw-2">&amp;mut</span> <span class="ident">output_1</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">output_1</span>, <span class="string">b&quot;kiwi&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_decode_to_slice() {
+        <span class="kw">let </span><span class="kw-2">mut </span>output_1 = [<span class="number">0</span>; <span class="number">4</span>];
+        decode_to_slice(<span class="string">b&quot;6b697769&quot;</span>, <span class="kw-2">&amp;mut </span>output_1).unwrap();
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>output_1, <span class="string">b&quot;kiwi&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output_2</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">5</span>];
-        <span class="ident">decode_to_slice</span>(<span class="string">b&quot;6b69776973&quot;</span>, <span class="kw-2">&amp;mut</span> <span class="ident">output_2</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">output_2</span>, <span class="string">b&quot;kiwis&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>output_2 = [<span class="number">0</span>; <span class="number">5</span>];
+        decode_to_slice(<span class="string">b&quot;6b69776973&quot;</span>, <span class="kw-2">&amp;mut </span>output_2).unwrap();
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>output_2, <span class="string">b&quot;kiwis&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output_3</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">4</span>];
+        <span class="kw">let </span><span class="kw-2">mut </span>output_3 = [<span class="number">0</span>; <span class="number">4</span>];
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">decode_to_slice</span>(<span class="string">b&quot;6&quot;</span>, <span class="kw-2">&amp;mut</span> <span class="ident">output_3</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">FromHexError::OddLength</span>)
+            decode_to_slice(<span class="string">b&quot;6&quot;</span>, <span class="kw-2">&amp;mut </span>output_3),
+            <span class="prelude-val">Err</span>(FromHexError::OddLength)
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">test_encode</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">encode</span>(<span class="string">&quot;foobar&quot;</span>), <span class="string">&quot;666f6f626172&quot;</span>);
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+    </span><span class="kw">fn </span>test_encode() {
+        <span class="macro">assert_eq!</span>(encode(<span class="string">&quot;foobar&quot;</span>), <span class="string">&quot;666f6f626172&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">test_decode</span>() {
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+    </span><span class="kw">fn </span>test_decode() {
         <span class="macro">assert_eq!</span>(
-            <span class="ident">decode</span>(<span class="string">&quot;666f6f626172&quot;</span>),
-            <span class="prelude-val">Ok</span>(<span class="ident">String::from</span>(<span class="string">&quot;foobar&quot;</span>).<span class="ident">into_bytes</span>())
+            decode(<span class="string">&quot;666f6f626172&quot;</span>),
+            <span class="prelude-val">Ok</span>(String::from(<span class="string">&quot;foobar&quot;</span>).into_bytes())
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_from_hex_okay_str</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">Vec::from_hex</span>(<span class="string">&quot;666f6f626172&quot;</span>).<span class="ident">unwrap</span>(), <span class="string">b&quot;foobar&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Vec::from_hex</span>(<span class="string">&quot;666F6F626172&quot;</span>).<span class="ident">unwrap</span>(), <span class="string">b&quot;foobar&quot;</span>);
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+    </span><span class="kw">pub fn </span>test_from_hex_okay_str() {
+        <span class="macro">assert_eq!</span>(Vec::from_hex(<span class="string">&quot;666f6f626172&quot;</span>).unwrap(), <span class="string">b&quot;foobar&quot;</span>);
+        <span class="macro">assert_eq!</span>(Vec::from_hex(<span class="string">&quot;666F6F626172&quot;</span>).unwrap(), <span class="string">b&quot;foobar&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_from_hex_okay_bytes</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">Vec::from_hex</span>(<span class="string">b&quot;666f6f626172&quot;</span>).<span class="ident">unwrap</span>(), <span class="string">b&quot;foobar&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Vec::from_hex</span>(<span class="string">b&quot;666F6F626172&quot;</span>).<span class="ident">unwrap</span>(), <span class="string">b&quot;foobar&quot;</span>);
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+    </span><span class="kw">pub fn </span>test_from_hex_okay_bytes() {
+        <span class="macro">assert_eq!</span>(Vec::from_hex(<span class="string">b&quot;666f6f626172&quot;</span>).unwrap(), <span class="string">b&quot;foobar&quot;</span>);
+        <span class="macro">assert_eq!</span>(Vec::from_hex(<span class="string">b&quot;666F6F626172&quot;</span>).unwrap(), <span class="string">b&quot;foobar&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_invalid_length</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">Vec::from_hex</span>(<span class="string">&quot;1&quot;</span>).<span class="ident">unwrap_err</span>(), <span class="ident">FromHexError::OddLength</span>);
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+    </span><span class="kw">pub fn </span>test_invalid_length() {
+        <span class="macro">assert_eq!</span>(Vec::from_hex(<span class="string">&quot;1&quot;</span>).unwrap_err(), FromHexError::OddLength);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">Vec::from_hex</span>(<span class="string">&quot;666f6f6261721&quot;</span>).<span class="ident">unwrap_err</span>(),
-            <span class="ident">FromHexError::OddLength</span>
+            Vec::from_hex(<span class="string">&quot;666f6f6261721&quot;</span>).unwrap_err(),
+            FromHexError::OddLength
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_invalid_char</span>() {
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+    </span><span class="kw">pub fn </span>test_invalid_char() {
         <span class="macro">assert_eq!</span>(
-            <span class="ident">Vec::from_hex</span>(<span class="string">&quot;66ag&quot;</span>).<span class="ident">unwrap_err</span>(),
-            <span class="ident">FromHexError::InvalidHexCharacter</span> { <span class="ident">c</span>: <span class="string">&#39;g&#39;</span>, <span class="ident">index</span>: <span class="number">3</span> }
+            Vec::from_hex(<span class="string">&quot;66ag&quot;</span>).unwrap_err(),
+            FromHexError::InvalidHexCharacter { c: <span class="string">&#39;g&#39;</span>, index: <span class="number">3 </span>}
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_empty</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">Vec::from_hex</span>(<span class="string">&quot;&quot;</span>).<span class="ident">unwrap</span>(), <span class="string">b&quot;&quot;</span>);
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+    </span><span class="kw">pub fn </span>test_empty() {
+        <span class="macro">assert_eq!</span>(Vec::from_hex(<span class="string">&quot;&quot;</span>).unwrap(), <span class="string">b&quot;&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_from_hex_whitespace</span>() {
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+    </span><span class="kw">pub fn </span>test_from_hex_whitespace() {
         <span class="macro">assert_eq!</span>(
-            <span class="ident">Vec::from_hex</span>(<span class="string">&quot;666f 6f62617&quot;</span>).<span class="ident">unwrap_err</span>(),
-            <span class="ident">FromHexError::InvalidHexCharacter</span> { <span class="ident">c</span>: <span class="string">&#39; &#39;</span>, <span class="ident">index</span>: <span class="number">4</span> }
+            Vec::from_hex(<span class="string">&quot;666f 6f62617&quot;</span>).unwrap_err(),
+            FromHexError::InvalidHexCharacter { c: <span class="string">&#39; &#39;</span>, index: <span class="number">4 </span>}
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_from_hex_array</span>() {
+    <span class="attribute">#[test]
+    </span><span class="kw">pub fn </span>test_from_hex_array() {
         <span class="macro">assert_eq!</span>(
-            <span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">6</span>] <span class="kw">as</span> <span class="ident">FromHex</span><span class="op">&gt;</span><span class="ident">::from_hex</span>(<span class="string">&quot;666f6f626172&quot;</span>),
+            &lt;[u8; <span class="number">6</span>] <span class="kw">as </span>FromHex&gt;::from_hex(<span class="string">&quot;666f6f626172&quot;</span>),
             <span class="prelude-val">Ok</span>([<span class="number">0x66</span>, <span class="number">0x6f</span>, <span class="number">0x6f</span>, <span class="number">0x62</span>, <span class="number">0x61</span>, <span class="number">0x72</span>])
         );
 
         <span class="macro">assert_eq!</span>(
-            <span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">5</span>] <span class="kw">as</span> <span class="ident">FromHex</span><span class="op">&gt;</span><span class="ident">::from_hex</span>(<span class="string">&quot;666f6f626172&quot;</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">FromHexError::InvalidStringLength</span>)
+            &lt;[u8; <span class="number">5</span>] <span class="kw">as </span>FromHex&gt;::from_hex(<span class="string">&quot;666f6f626172&quot;</span>),
+            <span class="prelude-val">Err</span>(FromHexError::InvalidStringLength)
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">test_to_hex</span>() {
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+    </span><span class="kw">fn </span>test_to_hex() {
         <span class="macro">assert_eq!</span>(
-            [<span class="number">0x66</span>, <span class="number">0x6f</span>, <span class="number">0x6f</span>, <span class="number">0x62</span>, <span class="number">0x61</span>, <span class="number">0x72</span>].<span class="ident">encode_hex</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>(),
-            <span class="string">&quot;666f6f626172&quot;</span>.<span class="ident">to_string</span>(),
+            [<span class="number">0x66</span>, <span class="number">0x6f</span>, <span class="number">0x6f</span>, <span class="number">0x62</span>, <span class="number">0x61</span>, <span class="number">0x72</span>].encode_hex::&lt;String&gt;(),
+            <span class="string">&quot;666f6f626172&quot;</span>.to_string(),
         );
 
         <span class="macro">assert_eq!</span>(
-            [<span class="number">0x66</span>, <span class="number">0x6f</span>, <span class="number">0x6f</span>, <span class="number">0x62</span>, <span class="number">0x61</span>, <span class="number">0x72</span>].<span class="ident">encode_hex_upper</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>(),
-            <span class="string">&quot;666F6F626172&quot;</span>.<span class="ident">to_string</span>(),
+            [<span class="number">0x66</span>, <span class="number">0x6f</span>, <span class="number">0x6f</span>, <span class="number">0x62</span>, <span class="number">0x61</span>, <span class="number">0x72</span>].encode_hex_upper::&lt;String&gt;(),
+            <span class="string">&quot;666F6F626172&quot;</span>.to_string(),
         );
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="hex" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="hex" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

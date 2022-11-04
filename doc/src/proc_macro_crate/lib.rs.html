@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro-crate-0.1.5/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../proc_macro_crate/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../proc_macro_crate/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../proc_macro_crate/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/proc-macro-crate-0.1.5/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../proc_macro_crate/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../proc_macro_crate/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../proc_macro_crate/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -323,228 +323,228 @@ Licensed under either of
  * [MIT license](http://opensource.org/licenses/MIT)
 
 at your option.
-*/</span>
+*/
 
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">collections::HashMap</span>,
-    <span class="ident">env</span>,
-    <span class="ident">fmt::Display</span>,
-    <span class="ident">fs::File</span>,
-    <span class="ident">io::Read</span>,
-    <span class="ident">path</span>::{<span class="ident">Path</span>, <span class="ident">PathBuf</span>},
+</span><span class="kw">use </span>std::{
+    collections::HashMap,
+    env,
+    fmt::Display,
+    fs::File,
+    io::Read,
+    path::{Path, PathBuf},
 };
 
-<span class="kw">use</span> <span class="ident">toml</span>::{<span class="self">self</span>, <span class="ident">value::Table</span>};
+<span class="kw">use </span>toml::{<span class="self">self</span>, value::Table};
 
-<span class="kw">type</span> <span class="ident">CargoToml</span> <span class="op">=</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">toml::Value</span><span class="op">&gt;</span>;
+<span class="kw">type </span>CargoToml = HashMap&lt;String, toml::Value&gt;;
 
-<span class="doccomment">/// Find the crate name for the given `orig_name` in the current `Cargo.toml`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `orig_name` should be the original name of the searched crate.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The current `Cargo.toml` is determined by taking `CARGO_MANIFEST_DIR/Cargo.toml`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Returns</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - `Ok(orig_name)` if the crate was found, but not renamed in the `Cargo.toml`.</span>
-<span class="doccomment">/// - `Ok(RENAMED)` if the crate was found, but is renamed in the `Cargo.toml`. `RENAMED` will be</span>
-<span class="doccomment">/// the renamed name.</span>
-<span class="doccomment">/// - `Err` if an error occurred.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The returned crate name is sanitized in such a way that it is a valid rust identifier. Thus,</span>
-<span class="doccomment">/// it is ready to be used in `extern crate` as identifier.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">crate_name</span>(<span class="ident">orig_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">manifest_dir</span> <span class="op">=</span> <span class="ident">env::var</span>(<span class="string">&quot;CARGO_MANIFEST_DIR&quot;</span>)
-        .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="string">&quot;Could not find `CARGO_MANIFEST_DIR` env variable.&quot;</span>)<span class="question-mark">?</span>;
+<span class="doccomment">/// Find the crate name for the given `orig_name` in the current `Cargo.toml`.
+///
+/// `orig_name` should be the original name of the searched crate.
+///
+/// The current `Cargo.toml` is determined by taking `CARGO_MANIFEST_DIR/Cargo.toml`.
+///
+/// # Returns
+///
+/// - `Ok(orig_name)` if the crate was found, but not renamed in the `Cargo.toml`.
+/// - `Ok(RENAMED)` if the crate was found, but is renamed in the `Cargo.toml`. `RENAMED` will be
+/// the renamed name.
+/// - `Err` if an error occurred.
+///
+/// The returned crate name is sanitized in such a way that it is a valid rust identifier. Thus,
+/// it is ready to be used in `extern crate` as identifier.
+</span><span class="kw">pub fn </span>crate_name(orig_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;String, String&gt; {
+    <span class="kw">let </span>manifest_dir = env::var(<span class="string">&quot;CARGO_MANIFEST_DIR&quot;</span>)
+        .map_err(|<span class="kw">_</span>| <span class="string">&quot;Could not find `CARGO_MANIFEST_DIR` env variable.&quot;</span>)<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">cargo_toml_path</span> <span class="op">=</span> <span class="ident">PathBuf::from</span>(<span class="ident">manifest_dir</span>).<span class="ident">join</span>(<span class="string">&quot;Cargo.toml&quot;</span>);
+    <span class="kw">let </span>cargo_toml_path = PathBuf::from(manifest_dir).join(<span class="string">&quot;Cargo.toml&quot;</span>);
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">cargo_toml_path</span>.<span class="ident">exists</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;`{}` does not exist.&quot;</span>, <span class="ident">cargo_toml_path</span>.<span class="ident">display</span>()));
+    <span class="kw">if </span>!cargo_toml_path.exists() {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;`{}` does not exist.&quot;</span>, cargo_toml_path.display()));
     }
 
-    <span class="kw">let</span> <span class="ident">cargo_toml</span> <span class="op">=</span> <span class="ident">open_cargo_toml</span>(<span class="kw-2">&amp;</span><span class="ident">cargo_toml_path</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>cargo_toml = open_cargo_toml(<span class="kw-2">&amp;</span>cargo_toml_path)<span class="question-mark">?</span>;
 
-    <span class="ident">extract_crate_name</span>(<span class="ident">orig_name</span>, <span class="ident">cargo_toml</span>, <span class="kw-2">&amp;</span><span class="ident">cargo_toml_path</span>).<span class="ident">map</span>(<span class="ident">sanitize_crate_name</span>)
+    extract_crate_name(orig_name, cargo_toml, <span class="kw-2">&amp;</span>cargo_toml_path).map(sanitize_crate_name)
 }
 
-<span class="doccomment">/// Make sure that the given crate name is a valid rust identifier.</span>
-<span class="kw">fn</span> <span class="ident">sanitize_crate_name</span>(<span class="ident">name</span>: <span class="ident">String</span>) -&gt; <span class="ident">String</span> {
-    <span class="ident">name</span>.<span class="ident">replace</span>(<span class="string">&quot;-&quot;</span>, <span class="string">&quot;_&quot;</span>)
+<span class="doccomment">/// Make sure that the given crate name is a valid rust identifier.
+</span><span class="kw">fn </span>sanitize_crate_name(name: String) -&gt; String {
+    name.replace(<span class="string">&quot;-&quot;</span>, <span class="string">&quot;_&quot;</span>)
 }
 
-<span class="doccomment">/// Open the given `Cargo.toml` and parse it into a hashmap.</span>
-<span class="kw">fn</span> <span class="ident">open_cargo_toml</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CargoToml</span>, <span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">String::new</span>();
-    <span class="ident">File::open</span>(<span class="ident">path</span>)
-        .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;Could not open `{}`: {:?}&quot;</span>, <span class="ident">path</span>.<span class="ident">display</span>(), <span class="ident">e</span>))<span class="question-mark">?</span>
-        .<span class="ident">read_to_string</span>(<span class="kw-2">&amp;mut</span> <span class="ident">content</span>)
-        .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;Could not read `{}` to string: {:?}&quot;</span>, <span class="ident">path</span>.<span class="ident">display</span>(), <span class="ident">e</span>))<span class="question-mark">?</span>;
-    <span class="ident">toml::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">content</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">e</span>))
+<span class="doccomment">/// Open the given `Cargo.toml` and parse it into a hashmap.
+</span><span class="kw">fn </span>open_cargo_toml(path: <span class="kw-2">&amp;</span>Path) -&gt; <span class="prelude-ty">Result</span>&lt;CargoToml, String&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>content = String::new();
+    File::open(path)
+        .map_err(|e| <span class="macro">format!</span>(<span class="string">&quot;Could not open `{}`: {:?}&quot;</span>, path.display(), e))<span class="question-mark">?
+        </span>.read_to_string(<span class="kw-2">&amp;mut </span>content)
+        .map_err(|e| <span class="macro">format!</span>(<span class="string">&quot;Could not read `{}` to string: {:?}&quot;</span>, path.display(), e))<span class="question-mark">?</span>;
+    toml::from_str(<span class="kw-2">&amp;</span>content).map_err(|e| <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, e))
 }
 
-<span class="doccomment">/// Create the not found error.</span>
-<span class="kw">fn</span> <span class="ident">create_not_found_err</span>(<span class="ident">orig_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Display</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> {
+<span class="doccomment">/// Create the not found error.
+</span><span class="kw">fn </span>create_not_found_err(orig_name: <span class="kw-2">&amp;</span>str, path: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Display) -&gt; <span class="prelude-ty">Result</span>&lt;String, String&gt; {
     <span class="prelude-val">Err</span>(<span class="macro">format!</span>(
         <span class="string">&quot;Could not find `{}` in `dependencies` or `dev-dependencies` in `{}`!&quot;</span>,
-        <span class="ident">orig_name</span>, <span class="ident">path</span>
+        orig_name, path
     ))
 }
 
-<span class="doccomment">/// Extract the crate name for the given `orig_name` from the given `Cargo.toml` by checking the</span>
-<span class="doccomment">/// `dependencies` and `dev-dependencies`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Returns `Ok(orig_name)` if the crate is not renamed in the `Cargo.toml` or otherwise</span>
-<span class="doccomment">/// the renamed identifier.</span>
-<span class="kw">fn</span> <span class="ident">extract_crate_name</span>(
-    <span class="ident">orig_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="kw-2">mut</span> <span class="ident">cargo_toml</span>: <span class="ident">CargoToml</span>,
-    <span class="ident">cargo_toml_path</span>: <span class="kw-2">&amp;</span><span class="ident">Path</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> [<span class="string">&quot;dependencies&quot;</span>, <span class="string">&quot;dev-dependencies&quot;</span>]
-        .<span class="ident">iter</span>()
-        .<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">k</span><span class="op">|</span> <span class="ident">search_crate_at_key</span>(<span class="ident">k</span>, <span class="ident">orig_name</span>, <span class="kw-2">&amp;mut</span> <span class="ident">cargo_toml</span>))
+<span class="doccomment">/// Extract the crate name for the given `orig_name` from the given `Cargo.toml` by checking the
+/// `dependencies` and `dev-dependencies`.
+///
+/// Returns `Ok(orig_name)` if the crate is not renamed in the `Cargo.toml` or otherwise
+/// the renamed identifier.
+</span><span class="kw">fn </span>extract_crate_name(
+    orig_name: <span class="kw-2">&amp;</span>str,
+    <span class="kw-2">mut </span>cargo_toml: CargoToml,
+    cargo_toml_path: <span class="kw-2">&amp;</span>Path,
+) -&gt; <span class="prelude-ty">Result</span>&lt;String, String&gt; {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(name) = [<span class="string">&quot;dependencies&quot;</span>, <span class="string">&quot;dev-dependencies&quot;</span>]
+        .iter()
+        .find_map(|k| search_crate_at_key(k, orig_name, <span class="kw-2">&amp;mut </span>cargo_toml))
     {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">name</span>);
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(name);
     }
 
-    <span class="comment">// Start searching `target.xy.dependencies`</span>
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">cargo_toml</span>
-        .<span class="ident">remove</span>(<span class="string">&quot;target&quot;</span>)
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">try_into</span>::<span class="op">&lt;</span><span class="ident">Table</span><span class="op">&gt;</span>().<span class="ident">ok</span>())
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> {
-            <span class="ident">t</span>.<span class="ident">values</span>()
-                .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_table</span>())
-                .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;dependencies&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">as_table</span>()))
-                .<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">extract_crate_name_from_deps</span>(<span class="ident">orig_name</span>, <span class="ident">t</span>.<span class="ident">clone</span>()))
+    <span class="comment">// Start searching `target.xy.dependencies`
+    </span><span class="kw">if let </span><span class="prelude-val">Some</span>(name) = cargo_toml
+        .remove(<span class="string">&quot;target&quot;</span>)
+        .and_then(|t| t.try_into::&lt;Table&gt;().ok())
+        .and_then(|t| {
+            t.values()
+                .filter_map(|v| v.as_table())
+                .filter_map(|t| t.get(<span class="string">&quot;dependencies&quot;</span>).and_then(|t| t.as_table()))
+                .find_map(|t| extract_crate_name_from_deps(orig_name, t.clone()))
         })
     {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">name</span>);
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(name);
     }
 
-    <span class="ident">create_not_found_err</span>(<span class="ident">orig_name</span>, <span class="kw-2">&amp;</span><span class="ident">cargo_toml_path</span>.<span class="ident">display</span>())
+    create_not_found_err(orig_name, <span class="kw-2">&amp;</span>cargo_toml_path.display())
 }
 
-<span class="doccomment">/// Search the `orig_name` crate at the given `key` in `cargo_toml`.</span>
-<span class="kw">fn</span> <span class="ident">search_crate_at_key</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">orig_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">cargo_toml</span>: <span class="kw-2">&amp;mut</span> <span class="ident">CargoToml</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="ident">cargo_toml</span>
-        .<span class="ident">remove</span>(<span class="ident">key</span>)
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">try_into</span>::<span class="op">&lt;</span><span class="ident">Table</span><span class="op">&gt;</span>().<span class="ident">ok</span>())
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">extract_crate_name_from_deps</span>(<span class="ident">orig_name</span>, <span class="ident">t</span>))
+<span class="doccomment">/// Search the `orig_name` crate at the given `key` in `cargo_toml`.
+</span><span class="kw">fn </span>search_crate_at_key(key: <span class="kw-2">&amp;</span>str, orig_name: <span class="kw-2">&amp;</span>str, cargo_toml: <span class="kw-2">&amp;mut </span>CargoToml) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+    cargo_toml
+        .remove(key)
+        .and_then(|v| v.try_into::&lt;Table&gt;().ok())
+        .and_then(|t| extract_crate_name_from_deps(orig_name, t))
 }
 
-<span class="doccomment">/// Extract the crate name from the given dependencies.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Returns `Some(orig_name)` if the crate is not renamed in the `Cargo.toml` or otherwise</span>
-<span class="doccomment">/// the renamed identifier.</span>
-<span class="kw">fn</span> <span class="ident">extract_crate_name_from_deps</span>(<span class="ident">orig_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">deps</span>: <span class="ident">Table</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">for</span> (<span class="ident">key</span>, <span class="ident">value</span>) <span class="kw">in</span> <span class="ident">deps</span>.<span class="ident">into_iter</span>() {
-        <span class="kw">let</span> <span class="ident">renamed</span> <span class="op">=</span> <span class="ident">value</span>
-            .<span class="ident">try_into</span>::<span class="op">&lt;</span><span class="ident">Table</span><span class="op">&gt;</span>()
-            .<span class="ident">ok</span>()
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="string">&quot;package&quot;</span>).<span class="ident">cloned</span>())
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">as_str</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">orig_name</span>))
-            .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>);
+<span class="doccomment">/// Extract the crate name from the given dependencies.
+///
+/// Returns `Some(orig_name)` if the crate is not renamed in the `Cargo.toml` or otherwise
+/// the renamed identifier.
+</span><span class="kw">fn </span>extract_crate_name_from_deps(orig_name: <span class="kw-2">&amp;</span>str, deps: Table) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+    <span class="kw">for </span>(key, value) <span class="kw">in </span>deps.into_iter() {
+        <span class="kw">let </span>renamed = value
+            .try_into::&lt;Table&gt;()
+            .ok()
+            .and_then(|t| t.get(<span class="string">&quot;package&quot;</span>).cloned())
+            .map(|t| t.as_str() == <span class="prelude-val">Some</span>(orig_name))
+            .unwrap_or(<span class="bool-val">false</span>);
 
-        <span class="kw">if</span> <span class="ident">key</span> <span class="op">==</span> <span class="ident">orig_name</span> <span class="op">|</span><span class="op">|</span> <span class="ident">renamed</span> {
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">key</span>.<span class="ident">clone</span>());
+        <span class="kw">if </span>key == orig_name || renamed {
+            <span class="kw">return </span><span class="prelude-val">Some</span>(key.clone());
         }
     }
 
-    <span class="prelude-val">None</span>
-}
+    <span class="prelude-val">None
+</span>}
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="macro">macro_rules!</span> <span class="ident">create_test</span> {
+    <span class="macro">macro_rules! </span>create_test {
         (
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>,
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">cargo_toml</span>:<span class="ident">expr</span>,
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>:<span class="ident">expr</span>,
+            <span class="macro-nonterminal">$name</span>:ident,
+            <span class="macro-nonterminal">$cargo_toml</span>:expr,
+            <span class="macro-nonterminal">$result</span>:expr,
         ) =&gt; {
-            <span class="attribute">#[<span class="ident">test</span>]</span>
-            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>() {
-                <span class="kw">let</span> <span class="ident">cargo_toml</span> <span class="op">=</span> <span class="ident">toml::from_str</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">cargo_toml</span>).<span class="ident">expect</span>(<span class="string">&quot;Parses `Cargo.toml`&quot;</span>);
-                <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">PathBuf::from</span>(<span class="string">&quot;test-path&quot;</span>);
+            <span class="attribute">#[test]
+            </span><span class="kw">fn </span><span class="macro-nonterminal">$name</span>() {
+                <span class="kw">let </span>cargo_toml = toml::from_str(<span class="macro-nonterminal">$cargo_toml</span>).expect(<span class="string">&quot;Parses `Cargo.toml`&quot;</span>);
+                <span class="kw">let </span>path = PathBuf::from(<span class="string">&quot;test-path&quot;</span>);
 
-                <span class="macro">assert_eq!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>, <span class="ident">extract_crate_name</span>(<span class="string">&quot;my_crate&quot;</span>, <span class="ident">cargo_toml</span>, <span class="kw-2">&amp;</span><span class="ident">path</span>));
+                <span class="macro">assert_eq!</span>(<span class="macro-nonterminal">$result</span>, extract_crate_name(<span class="string">&quot;my_crate&quot;</span>, cargo_toml, <span class="kw-2">&amp;</span>path));
             }
         };
     }
 
-    <span class="macro">create_test!</span> {
-        <span class="ident">deps_with_crate</span>,
+    <span class="macro">create_test! </span>{
+        deps_with_crate,
         <span class="string">r#&quot;
             [dependencies]
             my_crate = &quot;0.1&quot;
         &quot;#</span>,
-        <span class="prelude-val">Ok</span>(<span class="string">&quot;my_crate&quot;</span>.<span class="ident">into</span>()),
+        <span class="prelude-val">Ok</span>(<span class="string">&quot;my_crate&quot;</span>.into()),
     }
 
-    <span class="macro">create_test!</span> {
-        <span class="ident">dev_deps_with_crate</span>,
+    <span class="macro">create_test! </span>{
+        dev_deps_with_crate,
         <span class="string">r#&quot;
             [dev-dependencies]
             my_crate = &quot;0.1&quot;
         &quot;#</span>,
-        <span class="prelude-val">Ok</span>(<span class="string">&quot;my_crate&quot;</span>.<span class="ident">into</span>()),
+        <span class="prelude-val">Ok</span>(<span class="string">&quot;my_crate&quot;</span>.into()),
     }
 
-    <span class="macro">create_test!</span> {
-        <span class="ident">deps_with_crate_renamed</span>,
+    <span class="macro">create_test! </span>{
+        deps_with_crate_renamed,
         <span class="string">r#&quot;
             [dependencies]
             cool = { package = &quot;my_crate&quot;, version = &quot;0.1&quot; }
         &quot;#</span>,
-        <span class="prelude-val">Ok</span>(<span class="string">&quot;cool&quot;</span>.<span class="ident">into</span>()),
+        <span class="prelude-val">Ok</span>(<span class="string">&quot;cool&quot;</span>.into()),
     }
 
-    <span class="macro">create_test!</span> {
-        <span class="ident">deps_with_crate_renamed_second</span>,
+    <span class="macro">create_test! </span>{
+        deps_with_crate_renamed_second,
         <span class="string">r#&quot;
             [dependencies.cool]
             package = &quot;my_crate&quot;
             version = &quot;0.1&quot;
         &quot;#</span>,
-        <span class="prelude-val">Ok</span>(<span class="string">&quot;cool&quot;</span>.<span class="ident">into</span>()),
+        <span class="prelude-val">Ok</span>(<span class="string">&quot;cool&quot;</span>.into()),
     }
 
-    <span class="macro">create_test!</span> {
-        <span class="ident">deps_empty</span>,
+    <span class="macro">create_test! </span>{
+        deps_empty,
         <span class="string">r#&quot;
             [dependencies]
         &quot;#</span>,
-        <span class="ident">create_not_found_err</span>(<span class="string">&quot;my_crate&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;test-path&quot;</span>),
+        create_not_found_err(<span class="string">&quot;my_crate&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;test-path&quot;</span>),
     }
 
-    <span class="macro">create_test!</span> {
-        <span class="ident">crate_not_found</span>,
+    <span class="macro">create_test! </span>{
+        crate_not_found,
         <span class="string">r#&quot;
             [dependencies]
             serde = &quot;1.0&quot;
         &quot;#</span>,
-        <span class="ident">create_not_found_err</span>(<span class="string">&quot;my_crate&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;test-path&quot;</span>),
+        create_not_found_err(<span class="string">&quot;my_crate&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;test-path&quot;</span>),
     }
 
-    <span class="macro">create_test!</span> {
-        <span class="ident">target_dependency</span>,
+    <span class="macro">create_test! </span>{
+        target_dependency,
         <span class="string">r#&quot;
             [target.&#39;cfg(target_os=&quot;android&quot;)&#39;.dependencies]
             my_crate = &quot;0.1&quot;
         &quot;#</span>,
-        <span class="prelude-val">Ok</span>(<span class="string">&quot;my_crate&quot;</span>.<span class="ident">into</span>()),
+        <span class="prelude-val">Ok</span>(<span class="string">&quot;my_crate&quot;</span>.into()),
     }
 
-    <span class="macro">create_test!</span> {
-        <span class="ident">target_dependency2</span>,
+    <span class="macro">create_test! </span>{
+        target_dependency2,
         <span class="string">r#&quot;
             [target.x86_64-pc-windows-gnu.dependencies]
             my_crate = &quot;0.1&quot;
         &quot;#</span>,
-        <span class="prelude-val">Ok</span>(<span class="string">&quot;my_crate&quot;</span>.<span class="ident">into</span>()),
+        <span class="prelude-val">Ok</span>(<span class="string">&quot;my_crate&quot;</span>.into()),
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="proc_macro_crate" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="proc_macro_crate" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

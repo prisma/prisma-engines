@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_json-1.0.85/src/lexical/errors.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>errors.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serde_json/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serde_json/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serde_json/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_json-1.0.85/src/lexical/errors.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>errors.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serde_json/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serde_json/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serde_json/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -131,138 +131,138 @@
 <span id="131">131</span>
 <span id="132">132</span>
 <span id="133">133</span>
-</pre><pre class="rust"><code><span class="comment">// Adapted from https://github.com/Alexhuszagh/rust-lexical.</span>
+</pre><pre class="rust"><code><span class="comment">// Adapted from https://github.com/Alexhuszagh/rust-lexical.
 
-<span class="doccomment">//! Estimate the error in an 80-bit approximation of a float.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This estimates the error in a floating-point representation.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This implementation is loosely based off the Golang implementation,</span>
-<span class="doccomment">//! found here:</span>
-<span class="doccomment">//!     https://golang.org/src/strconv/atof.go</span>
+</span><span class="doccomment">//! Estimate the error in an 80-bit approximation of a float.
+//!
+//! This estimates the error in a floating-point representation.
+//!
+//! This implementation is loosely based off the Golang implementation,
+//! found here:
+//!     https://golang.org/src/strconv/atof.go
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::float</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::num</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::rounding</span>::<span class="kw-2">*</span>;
+</span><span class="kw">use </span><span class="kw">super</span>::float::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">super</span>::num::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">super</span>::rounding::<span class="kw-2">*</span>;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">FloatErrors</span> {
-    <span class="doccomment">/// Get the full error scale.</span>
-    <span class="kw">fn</span> <span class="ident">error_scale</span>() -&gt; <span class="ident">u32</span>;
-    <span class="doccomment">/// Get the half error scale.</span>
-    <span class="kw">fn</span> <span class="ident">error_halfscale</span>() -&gt; <span class="ident">u32</span>;
-    <span class="doccomment">/// Determine if the number of errors is tolerable for float precision.</span>
-    <span class="kw">fn</span> <span class="ident">error_is_accurate</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Float</span><span class="op">&gt;</span>(<span class="ident">count</span>: <span class="ident">u32</span>, <span class="ident">fp</span>: <span class="kw-2">&amp;</span><span class="ident">ExtendedFloat</span>) -&gt; <span class="ident">bool</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>FloatErrors {
+    <span class="doccomment">/// Get the full error scale.
+    </span><span class="kw">fn </span>error_scale() -&gt; u32;
+    <span class="doccomment">/// Get the half error scale.
+    </span><span class="kw">fn </span>error_halfscale() -&gt; u32;
+    <span class="doccomment">/// Determine if the number of errors is tolerable for float precision.
+    </span><span class="kw">fn </span>error_is_accurate&lt;F: Float&gt;(count: u32, fp: <span class="kw-2">&amp;</span>ExtendedFloat) -&gt; bool;
 }
 
-<span class="doccomment">/// Check if the error is accurate with a round-nearest rounding scheme.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">nearest_error_is_accurate</span>(<span class="ident">errors</span>: <span class="ident">u64</span>, <span class="ident">fp</span>: <span class="kw-2">&amp;</span><span class="ident">ExtendedFloat</span>, <span class="ident">extrabits</span>: <span class="ident">u64</span>) -&gt; <span class="ident">bool</span> {
-    <span class="comment">// Round-to-nearest, need to use the halfway point.</span>
-    <span class="kw">if</span> <span class="ident">extrabits</span> <span class="op">==</span> <span class="number">65</span> {
-        <span class="comment">// Underflow, we have a shift larger than the mantissa.</span>
-        <span class="comment">// Representation is valid **only** if the value is close enough</span>
-        <span class="comment">// overflow to the next bit within errors. If it overflows,</span>
-        <span class="comment">// the representation is **not** valid.</span>
-        <span class="op">!</span><span class="ident">fp</span>.<span class="ident">mant</span>.<span class="ident">overflowing_add</span>(<span class="ident">errors</span>).<span class="number">1</span>
-    } <span class="kw">else</span> {
-        <span class="kw">let</span> <span class="ident">mask</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">lower_n_mask</span>(<span class="ident">extrabits</span>);
-        <span class="kw">let</span> <span class="ident">extra</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">&amp;</span> <span class="ident">mask</span>;
+<span class="doccomment">/// Check if the error is accurate with a round-nearest rounding scheme.
+</span><span class="attribute">#[inline]
+</span><span class="kw">fn </span>nearest_error_is_accurate(errors: u64, fp: <span class="kw-2">&amp;</span>ExtendedFloat, extrabits: u64) -&gt; bool {
+    <span class="comment">// Round-to-nearest, need to use the halfway point.
+    </span><span class="kw">if </span>extrabits == <span class="number">65 </span>{
+        <span class="comment">// Underflow, we have a shift larger than the mantissa.
+        // Representation is valid **only** if the value is close enough
+        // overflow to the next bit within errors. If it overflows,
+        // the representation is **not** valid.
+        </span>!fp.mant.overflowing_add(errors).<span class="number">1
+    </span>} <span class="kw">else </span>{
+        <span class="kw">let </span>mask: u64 = lower_n_mask(extrabits);
+        <span class="kw">let </span>extra: u64 = fp.mant &amp; mask;
 
-        <span class="comment">// Round-to-nearest, need to check if we&#39;re close to halfway.</span>
-        <span class="comment">// IE, b10100 | 100000, where `|` signifies the truncation point.</span>
-        <span class="kw">let</span> <span class="ident">halfway</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="ident">lower_n_halfway</span>(<span class="ident">extrabits</span>);
-        <span class="kw">let</span> <span class="ident">cmp1</span> <span class="op">=</span> <span class="ident">halfway</span>.<span class="ident">wrapping_sub</span>(<span class="ident">errors</span>) <span class="op">&lt;</span> <span class="ident">extra</span>;
-        <span class="kw">let</span> <span class="ident">cmp2</span> <span class="op">=</span> <span class="ident">extra</span> <span class="op">&lt;</span> <span class="ident">halfway</span>.<span class="ident">wrapping_add</span>(<span class="ident">errors</span>);
+        <span class="comment">// Round-to-nearest, need to check if we&#39;re close to halfway.
+        // IE, b10100 | 100000, where `|` signifies the truncation point.
+        </span><span class="kw">let </span>halfway: u64 = lower_n_halfway(extrabits);
+        <span class="kw">let </span>cmp1 = halfway.wrapping_sub(errors) &lt; extra;
+        <span class="kw">let </span>cmp2 = extra &lt; halfway.wrapping_add(errors);
 
-        <span class="comment">// If both comparisons are true, we have significant rounding error,</span>
-        <span class="comment">// and the value cannot be exactly represented. Otherwise, the</span>
-        <span class="comment">// representation is valid.</span>
-        <span class="op">!</span>(<span class="ident">cmp1</span> <span class="op">&amp;&amp;</span> <span class="ident">cmp2</span>)
+        <span class="comment">// If both comparisons are true, we have significant rounding error,
+        // and the value cannot be exactly represented. Otherwise, the
+        // representation is valid.
+        </span>!(cmp1 &amp;&amp; cmp2)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">FloatErrors</span> <span class="kw">for</span> <span class="ident">u64</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">error_scale</span>() -&gt; <span class="ident">u32</span> {
-        <span class="number">8</span>
-    }
+<span class="kw">impl </span>FloatErrors <span class="kw">for </span>u64 {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>error_scale() -&gt; u32 {
+        <span class="number">8
+    </span>}
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">error_halfscale</span>() -&gt; <span class="ident">u32</span> {
-        <span class="ident">u64::error_scale</span>() <span class="op">/</span> <span class="number">2</span>
-    }
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>error_halfscale() -&gt; u32 {
+        u64::error_scale() / <span class="number">2
+    </span>}
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">error_is_accurate</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Float</span><span class="op">&gt;</span>(<span class="ident">count</span>: <span class="ident">u32</span>, <span class="ident">fp</span>: <span class="kw-2">&amp;</span><span class="ident">ExtendedFloat</span>) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// Determine if extended-precision float is a good approximation.</span>
-        <span class="comment">// If the error has affected too many units, the float will be</span>
-        <span class="comment">// inaccurate, or if the representation is too close to halfway</span>
-        <span class="comment">// that any operations could affect this halfway representation.</span>
-        <span class="comment">// See the documentation for dtoa for more information.</span>
-        <span class="kw">let</span> <span class="ident">bias</span> <span class="op">=</span> <span class="op">-</span>(<span class="ident">F::EXPONENT_BIAS</span> <span class="op">-</span> <span class="ident">F::MANTISSA_SIZE</span>);
-        <span class="kw">let</span> <span class="ident">denormal_exp</span> <span class="op">=</span> <span class="ident">bias</span> <span class="op">-</span> <span class="number">63</span>;
-        <span class="comment">// This is always a valid u32, since (denormal_exp - fp.exp)</span>
-        <span class="comment">// will always be positive and the significand size is {23, 52}.</span>
-        <span class="kw">let</span> <span class="ident">extrabits</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">fp</span>.<span class="ident">exp</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">denormal_exp</span> {
-            <span class="number">64</span> <span class="op">-</span> <span class="ident">F::MANTISSA_SIZE</span> <span class="op">+</span> <span class="ident">denormal_exp</span> <span class="op">-</span> <span class="ident">fp</span>.<span class="ident">exp</span>
-        } <span class="kw">else</span> {
-            <span class="number">63</span> <span class="op">-</span> <span class="ident">F::MANTISSA_SIZE</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>error_is_accurate&lt;F: Float&gt;(count: u32, fp: <span class="kw-2">&amp;</span>ExtendedFloat) -&gt; bool {
+        <span class="comment">// Determine if extended-precision float is a good approximation.
+        // If the error has affected too many units, the float will be
+        // inaccurate, or if the representation is too close to halfway
+        // that any operations could affect this halfway representation.
+        // See the documentation for dtoa for more information.
+        </span><span class="kw">let </span>bias = -(F::EXPONENT_BIAS - F::MANTISSA_SIZE);
+        <span class="kw">let </span>denormal_exp = bias - <span class="number">63</span>;
+        <span class="comment">// This is always a valid u32, since (denormal_exp - fp.exp)
+        // will always be positive and the significand size is {23, 52}.
+        </span><span class="kw">let </span>extrabits = <span class="kw">if </span>fp.exp &lt;= denormal_exp {
+            <span class="number">64 </span>- F::MANTISSA_SIZE + denormal_exp - fp.exp
+        } <span class="kw">else </span>{
+            <span class="number">63 </span>- F::MANTISSA_SIZE
         };
 
-        <span class="comment">// Our logic is as follows: we want to determine if the actual</span>
-        <span class="comment">// mantissa and the errors during calculation differ significantly</span>
-        <span class="comment">// from the rounding point. The rounding point for round-nearest</span>
-        <span class="comment">// is the halfway point, IE, this when the truncated bits start</span>
-        <span class="comment">// with b1000..., while the rounding point for the round-toward</span>
-        <span class="comment">// is when the truncated bits are equal to 0.</span>
-        <span class="comment">// To do so, we can check whether the rounding point +/- the error</span>
-        <span class="comment">// are &gt;/&lt; the actual lower n bits.</span>
-        <span class="comment">//</span>
-        <span class="comment">// For whether we need to use signed or unsigned types for this</span>
-        <span class="comment">// analysis, see this example, using u8 rather than u64 to simplify</span>
-        <span class="comment">// things.</span>
-        <span class="comment">//</span>
-        <span class="comment">// # Comparisons</span>
-        <span class="comment">//      cmp1 = (halfway - errors) &lt; extra</span>
-        <span class="comment">//      cmp1 = extra &lt; (halfway + errors)</span>
-        <span class="comment">//</span>
-        <span class="comment">// # Large Extrabits, Low Errors</span>
-        <span class="comment">//</span>
-        <span class="comment">//      extrabits = 8</span>
-        <span class="comment">//      halfway          =  0b10000000</span>
-        <span class="comment">//      extra            =  0b10000010</span>
-        <span class="comment">//      errors           =  0b00000100</span>
-        <span class="comment">//      halfway - errors =  0b01111100</span>
-        <span class="comment">//      halfway + errors =  0b10000100</span>
-        <span class="comment">//</span>
-        <span class="comment">//      Unsigned:</span>
-        <span class="comment">//          halfway - errors = 124</span>
-        <span class="comment">//          halfway + errors = 132</span>
-        <span class="comment">//          extra            = 130</span>
-        <span class="comment">//          cmp1             = true</span>
-        <span class="comment">//          cmp2             = true</span>
-        <span class="comment">//      Signed:</span>
-        <span class="comment">//          halfway - errors = 124</span>
-        <span class="comment">//          halfway + errors = -124</span>
-        <span class="comment">//          extra            = -126</span>
-        <span class="comment">//          cmp1             = false</span>
-        <span class="comment">//          cmp2             = true</span>
-        <span class="comment">//</span>
-        <span class="comment">// # Conclusion</span>
-        <span class="comment">//</span>
-        <span class="comment">// Since errors will always be small, and since we want to detect</span>
-        <span class="comment">// if the representation is accurate, we need to use an **unsigned**</span>
-        <span class="comment">// type for comparisons.</span>
+        <span class="comment">// Our logic is as follows: we want to determine if the actual
+        // mantissa and the errors during calculation differ significantly
+        // from the rounding point. The rounding point for round-nearest
+        // is the halfway point, IE, this when the truncated bits start
+        // with b1000..., while the rounding point for the round-toward
+        // is when the truncated bits are equal to 0.
+        // To do so, we can check whether the rounding point +/- the error
+        // are &gt;/&lt; the actual lower n bits.
+        //
+        // For whether we need to use signed or unsigned types for this
+        // analysis, see this example, using u8 rather than u64 to simplify
+        // things.
+        //
+        // # Comparisons
+        //      cmp1 = (halfway - errors) &lt; extra
+        //      cmp1 = extra &lt; (halfway + errors)
+        //
+        // # Large Extrabits, Low Errors
+        //
+        //      extrabits = 8
+        //      halfway          =  0b10000000
+        //      extra            =  0b10000010
+        //      errors           =  0b00000100
+        //      halfway - errors =  0b01111100
+        //      halfway + errors =  0b10000100
+        //
+        //      Unsigned:
+        //          halfway - errors = 124
+        //          halfway + errors = 132
+        //          extra            = 130
+        //          cmp1             = true
+        //          cmp2             = true
+        //      Signed:
+        //          halfway - errors = 124
+        //          halfway + errors = -124
+        //          extra            = -126
+        //          cmp1             = false
+        //          cmp2             = true
+        //
+        // # Conclusion
+        //
+        // Since errors will always be small, and since we want to detect
+        // if the representation is accurate, we need to use an **unsigned**
+        // type for comparisons.
 
-        <span class="kw">let</span> <span class="ident">extrabits</span> <span class="op">=</span> <span class="ident">extrabits</span> <span class="kw">as</span> <span class="ident">u64</span>;
-        <span class="kw">let</span> <span class="ident">errors</span> <span class="op">=</span> <span class="ident">count</span> <span class="kw">as</span> <span class="ident">u64</span>;
-        <span class="kw">if</span> <span class="ident">extrabits</span> <span class="op">&gt;</span> <span class="number">65</span> {
-            <span class="comment">// Underflow, we have a literal 0.</span>
-            <span class="kw">return</span> <span class="bool-val">true</span>;
+        </span><span class="kw">let </span>extrabits = extrabits <span class="kw">as </span>u64;
+        <span class="kw">let </span>errors = count <span class="kw">as </span>u64;
+        <span class="kw">if </span>extrabits &gt; <span class="number">65 </span>{
+            <span class="comment">// Underflow, we have a literal 0.
+            </span><span class="kw">return </span><span class="bool-val">true</span>;
         }
 
-        <span class="ident">nearest_error_is_accurate</span>(<span class="ident">errors</span>, <span class="ident">fp</span>, <span class="ident">extrabits</span>)
+        nearest_error_is_accurate(errors, fp, extrabits)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serde_json" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serde_json" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

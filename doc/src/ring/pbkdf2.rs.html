@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/pbkdf2.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>pbkdf2.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../ring/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/pbkdf2.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>pbkdf2.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../ring/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -270,277 +270,277 @@
 <span id="270">270</span>
 <span id="271">271</span>
 <span id="272">272</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015 Brian Smith.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
-<span class="comment">// purpose with or without fee is hereby granted, provided that the above</span>
-<span class="comment">// copyright notice and this permission notice appear in all copies.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES</span>
-<span class="comment">// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY</span>
-<span class="comment">// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span>
-<span class="comment">// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION</span>
-<span class="comment">// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN</span>
-<span class="comment">// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015 Brian Smith.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY
+// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-<span class="doccomment">//! PBKDF2 derivation and verification.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Use `derive` to derive PBKDF2 outputs. Use `verify` to verify secret</span>
-<span class="doccomment">//! against previously-derived outputs.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! PBKDF2 is specified in [RFC 2898 Section 5.2] with test vectors given in</span>
-<span class="doccomment">//! [RFC 6070]. See also [NIST Special Publication 800-132].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [RFC 2898 Section 5.2]: https://tools.ietf.org/html/rfc2898#section-5.2</span>
-<span class="doccomment">//! [RFC 6070]: https://tools.ietf.org/html/rfc6070</span>
-<span class="doccomment">//! [NIST Special Publication 800-132]:</span>
-<span class="doccomment">//!    http://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-132.pdf</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Examples</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Password Database Example</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! use ring::{digest, pbkdf2};</span>
-<span class="doccomment">//! use std::{collections::HashMap, num::NonZeroU32};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! static PBKDF2_ALG: pbkdf2::Algorithm = pbkdf2::PBKDF2_HMAC_SHA256;</span>
-<span class="doccomment">//! const CREDENTIAL_LEN: usize = digest::SHA256_OUTPUT_LEN;</span>
-<span class="doccomment">//! pub type Credential = [u8; CREDENTIAL_LEN];</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! enum Error {</span>
-<span class="doccomment">//!     WrongUsernameOrPassword</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! struct PasswordDatabase {</span>
-<span class="doccomment">//!     pbkdf2_iterations: NonZeroU32,</span>
-<span class="doccomment">//!     db_salt_component: [u8; 16],</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     // Normally this would be a persistent database.</span>
-<span class="doccomment">//!     storage: HashMap&lt;String, Credential&gt;,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! impl PasswordDatabase {</span>
-<span class="doccomment">//!     pub fn store_password(&amp;mut self, username: &amp;str, password: &amp;str) {</span>
-<span class="doccomment">//!         let salt = self.salt(username);</span>
-<span class="doccomment">//!         let mut to_store: Credential = [0u8; CREDENTIAL_LEN];</span>
-<span class="doccomment">//!         pbkdf2::derive(PBKDF2_ALG, self.pbkdf2_iterations, &amp;salt,</span>
-<span class="doccomment">//!                        password.as_bytes(), &amp;mut to_store);</span>
-<span class="doccomment">//!         self.storage.insert(String::from(username), to_store);</span>
-<span class="doccomment">//!     }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     pub fn verify_password(&amp;self, username: &amp;str, attempted_password: &amp;str)</span>
-<span class="doccomment">//!                            -&gt; Result&lt;(), Error&gt; {</span>
-<span class="doccomment">//!         match self.storage.get(username) {</span>
-<span class="doccomment">//!            Some(actual_password) =&gt; {</span>
-<span class="doccomment">//!                let salt = self.salt(username);</span>
-<span class="doccomment">//!                pbkdf2::verify(PBKDF2_ALG, self.pbkdf2_iterations, &amp;salt,</span>
-<span class="doccomment">//!                               attempted_password.as_bytes(),</span>
-<span class="doccomment">//!                               actual_password)</span>
-<span class="doccomment">//!                     .map_err(|_| Error::WrongUsernameOrPassword)</span>
-<span class="doccomment">//!            },</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!            None =&gt; Err(Error::WrongUsernameOrPassword)</span>
-<span class="doccomment">//!         }</span>
-<span class="doccomment">//!     }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     // The salt should have a user-specific component so that an attacker</span>
-<span class="doccomment">//!     // cannot crack one password for multiple users in the database. It</span>
-<span class="doccomment">//!     // should have a database-unique component so that an attacker cannot</span>
-<span class="doccomment">//!     // crack the same user&#39;s password across databases in the unfortunate</span>
-<span class="doccomment">//!     // but common case that the user has used the same password for</span>
-<span class="doccomment">//!     // multiple systems.</span>
-<span class="doccomment">//!     fn salt(&amp;self, username: &amp;str) -&gt; Vec&lt;u8&gt; {</span>
-<span class="doccomment">//!         let mut salt = Vec::with_capacity(self.db_salt_component.len() +</span>
-<span class="doccomment">//!                                           username.as_bytes().len());</span>
-<span class="doccomment">//!         salt.extend(self.db_salt_component.as_ref());</span>
-<span class="doccomment">//!         salt.extend(username.as_bytes());</span>
-<span class="doccomment">//!         salt</span>
-<span class="doccomment">//!     }</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! fn main() {</span>
-<span class="doccomment">//!     // Normally these parameters would be loaded from a configuration file.</span>
-<span class="doccomment">//!     let mut db = PasswordDatabase {</span>
-<span class="doccomment">//!         pbkdf2_iterations: NonZeroU32::new(100_000).unwrap(),</span>
-<span class="doccomment">//!         db_salt_component: [</span>
-<span class="doccomment">//!             // This value was generated from a secure PRNG.</span>
-<span class="doccomment">//!             0xd6, 0x26, 0x98, 0xda, 0xf4, 0xdc, 0x50, 0x52,</span>
-<span class="doccomment">//!             0x24, 0xf2, 0x27, 0xd1, 0xfe, 0x39, 0x01, 0x8a</span>
-<span class="doccomment">//!         ],</span>
-<span class="doccomment">//!         storage: HashMap::new(),</span>
-<span class="doccomment">//!     };</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     db.store_password(&quot;alice&quot;, &quot;@74d7]404j|W}6u&quot;);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     // An attempt to log in with the wrong password fails.</span>
-<span class="doccomment">//!     assert!(db.verify_password(&quot;alice&quot;, &quot;wrong password&quot;).is_err());</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     // Normally there should be an expoentially-increasing delay between</span>
-<span class="doccomment">//!     // attempts to further protect against online attacks.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     // An attempt to log in with the right password succeeds.</span>
-<span class="doccomment">//!     assert!(db.verify_password(&quot;alice&quot;, &quot;@74d7]404j|W}6u&quot;).is_ok());</span>
-<span class="doccomment">//! }</span>
+</span><span class="doccomment">//! PBKDF2 derivation and verification.
+//!
+//! Use `derive` to derive PBKDF2 outputs. Use `verify` to verify secret
+//! against previously-derived outputs.
+//!
+//! PBKDF2 is specified in [RFC 2898 Section 5.2] with test vectors given in
+//! [RFC 6070]. See also [NIST Special Publication 800-132].
+//!
+//! [RFC 2898 Section 5.2]: https://tools.ietf.org/html/rfc2898#section-5.2
+//! [RFC 6070]: https://tools.ietf.org/html/rfc6070
+//! [NIST Special Publication 800-132]:
+//!    http://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-132.pdf
+//!
+//! # Examples
+//!
+//! ## Password Database Example
+//!
+//! ```
+//! use ring::{digest, pbkdf2};
+//! use std::{collections::HashMap, num::NonZeroU32};
+//!
+//! static PBKDF2_ALG: pbkdf2::Algorithm = pbkdf2::PBKDF2_HMAC_SHA256;
+//! const CREDENTIAL_LEN: usize = digest::SHA256_OUTPUT_LEN;
+//! pub type Credential = [u8; CREDENTIAL_LEN];
+//!
+//! enum Error {
+//!     WrongUsernameOrPassword
+//! }
+//!
+//! struct PasswordDatabase {
+//!     pbkdf2_iterations: NonZeroU32,
+//!     db_salt_component: [u8; 16],
+//!
+//!     // Normally this would be a persistent database.
+//!     storage: HashMap&lt;String, Credential&gt;,
+//! }
+//!
+//! impl PasswordDatabase {
+//!     pub fn store_password(&amp;mut self, username: &amp;str, password: &amp;str) {
+//!         let salt = self.salt(username);
+//!         let mut to_store: Credential = [0u8; CREDENTIAL_LEN];
+//!         pbkdf2::derive(PBKDF2_ALG, self.pbkdf2_iterations, &amp;salt,
+//!                        password.as_bytes(), &amp;mut to_store);
+//!         self.storage.insert(String::from(username), to_store);
+//!     }
+//!
+//!     pub fn verify_password(&amp;self, username: &amp;str, attempted_password: &amp;str)
+//!                            -&gt; Result&lt;(), Error&gt; {
+//!         match self.storage.get(username) {
+//!            Some(actual_password) =&gt; {
+//!                let salt = self.salt(username);
+//!                pbkdf2::verify(PBKDF2_ALG, self.pbkdf2_iterations, &amp;salt,
+//!                               attempted_password.as_bytes(),
+//!                               actual_password)
+//!                     .map_err(|_| Error::WrongUsernameOrPassword)
+//!            },
+//!
+//!            None =&gt; Err(Error::WrongUsernameOrPassword)
+//!         }
+//!     }
+//!
+//!     // The salt should have a user-specific component so that an attacker
+//!     // cannot crack one password for multiple users in the database. It
+//!     // should have a database-unique component so that an attacker cannot
+//!     // crack the same user&#39;s password across databases in the unfortunate
+//!     // but common case that the user has used the same password for
+//!     // multiple systems.
+//!     fn salt(&amp;self, username: &amp;str) -&gt; Vec&lt;u8&gt; {
+//!         let mut salt = Vec::with_capacity(self.db_salt_component.len() +
+//!                                           username.as_bytes().len());
+//!         salt.extend(self.db_salt_component.as_ref());
+//!         salt.extend(username.as_bytes());
+//!         salt
+//!     }
+//! }
+//!
+//! fn main() {
+//!     // Normally these parameters would be loaded from a configuration file.
+//!     let mut db = PasswordDatabase {
+//!         pbkdf2_iterations: NonZeroU32::new(100_000).unwrap(),
+//!         db_salt_component: [
+//!             // This value was generated from a secure PRNG.
+//!             0xd6, 0x26, 0x98, 0xda, 0xf4, 0xdc, 0x50, 0x52,
+//!             0x24, 0xf2, 0x27, 0xd1, 0xfe, 0x39, 0x01, 0x8a
+//!         ],
+//!         storage: HashMap::new(),
+//!     };
+//!
+//!     db.store_password(&quot;alice&quot;, &quot;@74d7]404j|W}6u&quot;);
+//!
+//!     // An attempt to log in with the wrong password fails.
+//!     assert!(db.verify_password(&quot;alice&quot;, &quot;wrong password&quot;).is_err());
+//!
+//!     // Normally there should be an expoentially-increasing delay between
+//!     // attempts to further protect against online attacks.
+//!
+//!     // An attempt to log in with the right password succeeds.
+//!     assert!(db.verify_password(&quot;alice&quot;, &quot;@74d7]404j|W}6u&quot;).is_ok());
+//! }
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">constant_time</span>, <span class="ident">digest</span>, <span class="ident">error</span>, <span class="ident">hmac</span>, <span class="ident">polyfill</span>};
-<span class="kw">use</span> <span class="ident">core::num::NonZeroU32</span>;
+</span><span class="kw">use crate</span>::{constant_time, digest, error, hmac, polyfill};
+<span class="kw">use </span>core::num::NonZeroU32;
 
-<span class="doccomment">/// A PBKDF2 algorithm.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Algorithm</span>(<span class="ident">hmac::Algorithm</span>);
+<span class="doccomment">/// A PBKDF2 algorithm.
+</span><span class="attribute">#[derive(Clone, Copy, PartialEq, Eq)]
+</span><span class="kw">pub struct </span>Algorithm(hmac::Algorithm);
 
-<span class="doccomment">/// PBKDF2 using HMAC-SHA1.</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">PBKDF2_HMAC_SHA1</span>: <span class="ident">Algorithm</span> <span class="op">=</span> <span class="ident">Algorithm</span>(<span class="ident">hmac::HMAC_SHA1_FOR_LEGACY_USE_ONLY</span>);
+<span class="doccomment">/// PBKDF2 using HMAC-SHA1.
+</span><span class="kw">pub static </span>PBKDF2_HMAC_SHA1: Algorithm = Algorithm(hmac::HMAC_SHA1_FOR_LEGACY_USE_ONLY);
 
-<span class="doccomment">/// PBKDF2 using HMAC-SHA256.</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">PBKDF2_HMAC_SHA256</span>: <span class="ident">Algorithm</span> <span class="op">=</span> <span class="ident">Algorithm</span>(<span class="ident">hmac::HMAC_SHA256</span>);
+<span class="doccomment">/// PBKDF2 using HMAC-SHA256.
+</span><span class="kw">pub static </span>PBKDF2_HMAC_SHA256: Algorithm = Algorithm(hmac::HMAC_SHA256);
 
-<span class="doccomment">/// PBKDF2 using HMAC-SHA384.</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">PBKDF2_HMAC_SHA384</span>: <span class="ident">Algorithm</span> <span class="op">=</span> <span class="ident">Algorithm</span>(<span class="ident">hmac::HMAC_SHA384</span>);
+<span class="doccomment">/// PBKDF2 using HMAC-SHA384.
+</span><span class="kw">pub static </span>PBKDF2_HMAC_SHA384: Algorithm = Algorithm(hmac::HMAC_SHA384);
 
-<span class="doccomment">/// PBKDF2 using HMAC-SHA512.</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">PBKDF2_HMAC_SHA512</span>: <span class="ident">Algorithm</span> <span class="op">=</span> <span class="ident">Algorithm</span>(<span class="ident">hmac::HMAC_SHA512</span>);
+<span class="doccomment">/// PBKDF2 using HMAC-SHA512.
+</span><span class="kw">pub static </span>PBKDF2_HMAC_SHA512: Algorithm = Algorithm(hmac::HMAC_SHA512);
 
-<span class="doccomment">/// Fills `out` with the key derived using PBKDF2 with the given inputs.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Do not use `derive` as part of verifying a secret; use `verify` instead, to</span>
-<span class="doccomment">/// minimize the effectiveness of timing attacks.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `out.len()` must be no larger than the digest length * (2**32 - 1), per the</span>
-<span class="doccomment">/// PBKDF2 specification.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// | Parameter   | RFC 2898 Section 5.2 Term</span>
-<span class="doccomment">/// |-------------|-------------------------------------------</span>
-<span class="doccomment">/// | digest_alg  | PRF (HMAC with the given digest algorithm)</span>
-<span class="doccomment">/// | iterations  | c (iteration count)</span>
-<span class="doccomment">/// | salt        | S (salt)</span>
-<span class="doccomment">/// | secret      | P (password)</span>
-<span class="doccomment">/// | out         | dk (derived key)</span>
-<span class="doccomment">/// | out.len()   | dkLen (derived key length)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Panics</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `derive` panics if `out.len()` is larger than (2**32 - 1) * the digest</span>
-<span class="doccomment">/// algorithm&#39;s output length, per the PBKDF2 specification.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">derive</span>(
-    <span class="ident">algorithm</span>: <span class="ident">Algorithm</span>,
-    <span class="ident">iterations</span>: <span class="ident">NonZeroU32</span>,
-    <span class="ident">salt</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
+<span class="doccomment">/// Fills `out` with the key derived using PBKDF2 with the given inputs.
+///
+/// Do not use `derive` as part of verifying a secret; use `verify` instead, to
+/// minimize the effectiveness of timing attacks.
+///
+/// `out.len()` must be no larger than the digest length * (2**32 - 1), per the
+/// PBKDF2 specification.
+///
+/// | Parameter   | RFC 2898 Section 5.2 Term
+/// |-------------|-------------------------------------------
+/// | digest_alg  | PRF (HMAC with the given digest algorithm)
+/// | iterations  | c (iteration count)
+/// | salt        | S (salt)
+/// | secret      | P (password)
+/// | out         | dk (derived key)
+/// | out.len()   | dkLen (derived key length)
+///
+/// # Panics
+///
+/// `derive` panics if `out.len()` is larger than (2**32 - 1) * the digest
+/// algorithm&#39;s output length, per the PBKDF2 specification.
+</span><span class="kw">pub fn </span>derive(
+    algorithm: Algorithm,
+    iterations: NonZeroU32,
+    salt: <span class="kw-2">&amp;</span>[u8],
+    secret: <span class="kw-2">&amp;</span>[u8],
+    out: <span class="kw-2">&amp;mut </span>[u8],
 ) {
-    <span class="kw">let</span> <span class="ident">digest_alg</span> <span class="op">=</span> <span class="ident">algorithm</span>.<span class="number">0</span>.<span class="ident">digest_algorithm</span>();
-    <span class="kw">let</span> <span class="ident">output_len</span> <span class="op">=</span> <span class="ident">digest_alg</span>.<span class="ident">output_len</span>;
+    <span class="kw">let </span>digest_alg = algorithm.<span class="number">0</span>.digest_algorithm();
+    <span class="kw">let </span>output_len = digest_alg.output_len;
 
-    <span class="comment">// This implementation&#39;s performance is asymptotically optimal as described</span>
-    <span class="comment">// in https://jbp.io/2015/08/11/pbkdf2-performance-matters/. However, it</span>
-    <span class="comment">// hasn&#39;t been optimized to the same extent as fastpbkdf2. In particular,</span>
-    <span class="comment">// this implementation is probably doing a lot of unnecessary copying.</span>
+    <span class="comment">// This implementation&#39;s performance is asymptotically optimal as described
+    // in https://jbp.io/2015/08/11/pbkdf2-performance-matters/. However, it
+    // hasn&#39;t been optimized to the same extent as fastpbkdf2. In particular,
+    // this implementation is probably doing a lot of unnecessary copying.
 
-    <span class="kw">let</span> <span class="ident">secret</span> <span class="op">=</span> <span class="ident">hmac::Key::new</span>(<span class="ident">algorithm</span>.<span class="number">0</span>, <span class="ident">secret</span>);
+    </span><span class="kw">let </span>secret = hmac::Key::new(algorithm.<span class="number">0</span>, secret);
 
-    <span class="comment">// Clear |out|.</span>
-    <span class="ident">polyfill::slice::fill</span>(<span class="ident">out</span>, <span class="number">0</span>);
+    <span class="comment">// Clear |out|.
+    </span>polyfill::slice::fill(out, <span class="number">0</span>);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">idx</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>idx: u32 = <span class="number">0</span>;
 
-    <span class="kw">for</span> <span class="ident">chunk</span> <span class="kw">in</span> <span class="ident">out</span>.<span class="ident">chunks_mut</span>(<span class="ident">output_len</span>) {
-        <span class="ident">idx</span> <span class="op">=</span> <span class="ident">idx</span>.<span class="ident">checked_add</span>(<span class="number">1</span>).<span class="ident">expect</span>(<span class="string">&quot;derived key too long&quot;</span>);
-        <span class="ident">derive_block</span>(<span class="kw-2">&amp;</span><span class="ident">secret</span>, <span class="ident">iterations</span>, <span class="ident">salt</span>, <span class="ident">idx</span>, <span class="ident">chunk</span>);
+    <span class="kw">for </span>chunk <span class="kw">in </span>out.chunks_mut(output_len) {
+        idx = idx.checked_add(<span class="number">1</span>).expect(<span class="string">&quot;derived key too long&quot;</span>);
+        derive_block(<span class="kw-2">&amp;</span>secret, iterations, salt, idx, chunk);
     }
 }
 
-<span class="kw">fn</span> <span class="ident">derive_block</span>(<span class="ident">secret</span>: <span class="kw-2">&amp;</span><span class="ident">hmac::Key</span>, <span class="ident">iterations</span>: <span class="ident">NonZeroU32</span>, <span class="ident">salt</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">idx</span>: <span class="ident">u32</span>, <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">hmac::Context::with_key</span>(<span class="ident">secret</span>);
-    <span class="ident">ctx</span>.<span class="ident">update</span>(<span class="ident">salt</span>);
-    <span class="ident">ctx</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">u32::to_be_bytes</span>(<span class="ident">idx</span>));
+<span class="kw">fn </span>derive_block(secret: <span class="kw-2">&amp;</span>hmac::Key, iterations: NonZeroU32, salt: <span class="kw-2">&amp;</span>[u8], idx: u32, out: <span class="kw-2">&amp;mut </span>[u8]) {
+    <span class="kw">let </span><span class="kw-2">mut </span>ctx = hmac::Context::with_key(secret);
+    ctx.update(salt);
+    ctx.update(<span class="kw-2">&amp;</span>u32::to_be_bytes(idx));
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">u</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">sign</span>();
+    <span class="kw">let </span><span class="kw-2">mut </span>u = ctx.sign();
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">remaining</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="ident">iterations</span>.<span class="ident">into</span>();
-    <span class="kw">loop</span> {
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">out</span>.<span class="ident">len</span>() {
-            <span class="ident">out</span>[<span class="ident">i</span>] <span class="op">^</span><span class="op">=</span> <span class="ident">u</span>.<span class="ident">as_ref</span>()[<span class="ident">i</span>];
+    <span class="kw">let </span><span class="kw-2">mut </span>remaining: u32 = iterations.into();
+    <span class="kw">loop </span>{
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..out.len() {
+            out[i] ^= u.as_ref()[i];
         }
 
-        <span class="kw">if</span> <span class="ident">remaining</span> <span class="op">==</span> <span class="number">1</span> {
+        <span class="kw">if </span>remaining == <span class="number">1 </span>{
             <span class="kw">break</span>;
         }
-        <span class="ident">remaining</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+        remaining -= <span class="number">1</span>;
 
-        <span class="ident">u</span> <span class="op">=</span> <span class="ident">hmac::sign</span>(<span class="ident">secret</span>, <span class="ident">u</span>.<span class="ident">as_ref</span>());
+        u = hmac::sign(secret, u.as_ref());
     }
 }
 
-<span class="doccomment">/// Verifies that a previously-derived (e.g., using `derive`) PBKDF2 value</span>
-<span class="doccomment">/// matches the PBKDF2 value derived from the other inputs.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The comparison is done in constant time to prevent timing attacks. The</span>
-<span class="doccomment">/// comparison will fail if `previously_derived` is empty (has a length of</span>
-<span class="doccomment">/// zero).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// | Parameter                  | RFC 2898 Section 5.2 Term</span>
-<span class="doccomment">/// |----------------------------|--------------------------------------------</span>
-<span class="doccomment">/// | digest_alg                 | PRF (HMAC with the given digest algorithm).</span>
-<span class="doccomment">/// | `iterations`               | c (iteration count)</span>
-<span class="doccomment">/// | `salt`                     | S (salt)</span>
-<span class="doccomment">/// | `secret`                   | P (password)</span>
-<span class="doccomment">/// | `previously_derived`       | dk (derived key)</span>
-<span class="doccomment">/// | `previously_derived.len()` | dkLen (derived key length)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Panics</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `verify` panics if `out.len()` is larger than (2**32 - 1) * the digest</span>
-<span class="doccomment">/// algorithm&#39;s output length, per the PBKDF2 specification.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">verify</span>(
-    <span class="ident">algorithm</span>: <span class="ident">Algorithm</span>,
-    <span class="ident">iterations</span>: <span class="ident">NonZeroU32</span>,
-    <span class="ident">salt</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    <span class="ident">previously_derived</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">digest_alg</span> <span class="op">=</span> <span class="ident">algorithm</span>.<span class="number">0</span>.<span class="ident">digest_algorithm</span>();
+<span class="doccomment">/// Verifies that a previously-derived (e.g., using `derive`) PBKDF2 value
+/// matches the PBKDF2 value derived from the other inputs.
+///
+/// The comparison is done in constant time to prevent timing attacks. The
+/// comparison will fail if `previously_derived` is empty (has a length of
+/// zero).
+///
+/// | Parameter                  | RFC 2898 Section 5.2 Term
+/// |----------------------------|--------------------------------------------
+/// | digest_alg                 | PRF (HMAC with the given digest algorithm).
+/// | `iterations`               | c (iteration count)
+/// | `salt`                     | S (salt)
+/// | `secret`                   | P (password)
+/// | `previously_derived`       | dk (derived key)
+/// | `previously_derived.len()` | dkLen (derived key length)
+///
+/// # Panics
+///
+/// `verify` panics if `out.len()` is larger than (2**32 - 1) * the digest
+/// algorithm&#39;s output length, per the PBKDF2 specification.
+</span><span class="kw">pub fn </span>verify(
+    algorithm: Algorithm,
+    iterations: NonZeroU32,
+    salt: <span class="kw-2">&amp;</span>[u8],
+    secret: <span class="kw-2">&amp;</span>[u8],
+    previously_derived: <span class="kw-2">&amp;</span>[u8],
+) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt; {
+    <span class="kw">let </span>digest_alg = algorithm.<span class="number">0</span>.digest_algorithm();
 
-    <span class="kw">if</span> <span class="ident">previously_derived</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>);
+    <span class="kw">if </span>previously_derived.is_empty() {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(error::Unspecified);
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">derived_buf</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="ident">digest::MAX_OUTPUT_LEN</span>];
+    <span class="kw">let </span><span class="kw-2">mut </span>derived_buf = [<span class="number">0u8</span>; digest::MAX_OUTPUT_LEN];
 
-    <span class="kw">let</span> <span class="ident">output_len</span> <span class="op">=</span> <span class="ident">digest_alg</span>.<span class="ident">output_len</span>;
-    <span class="kw">let</span> <span class="ident">secret</span> <span class="op">=</span> <span class="ident">hmac::Key::new</span>(<span class="ident">algorithm</span>.<span class="number">0</span>, <span class="ident">secret</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">idx</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0</span>;
+    <span class="kw">let </span>output_len = digest_alg.output_len;
+    <span class="kw">let </span>secret = hmac::Key::new(algorithm.<span class="number">0</span>, secret);
+    <span class="kw">let </span><span class="kw-2">mut </span>idx: u32 = <span class="number">0</span>;
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">matches</span> <span class="op">=</span> <span class="number">1</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>matches = <span class="number">1</span>;
 
-    <span class="kw">for</span> <span class="ident">previously_derived_chunk</span> <span class="kw">in</span> <span class="ident">previously_derived</span>.<span class="ident">chunks</span>(<span class="ident">output_len</span>) {
-        <span class="ident">idx</span> <span class="op">=</span> <span class="ident">idx</span>.<span class="ident">checked_add</span>(<span class="number">1</span>).<span class="ident">expect</span>(<span class="string">&quot;derived key too long&quot;</span>);
+    <span class="kw">for </span>previously_derived_chunk <span class="kw">in </span>previously_derived.chunks(output_len) {
+        idx = idx.checked_add(<span class="number">1</span>).expect(<span class="string">&quot;derived key too long&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">derived_chunk</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">derived_buf</span>[..<span class="ident">previously_derived_chunk</span>.<span class="ident">len</span>()];
-        <span class="ident">polyfill::slice::fill</span>(<span class="ident">derived_chunk</span>, <span class="number">0</span>);
+        <span class="kw">let </span>derived_chunk = <span class="kw-2">&amp;mut </span>derived_buf[..previously_derived_chunk.len()];
+        polyfill::slice::fill(derived_chunk, <span class="number">0</span>);
 
-        <span class="ident">derive_block</span>(<span class="kw-2">&amp;</span><span class="ident">secret</span>, <span class="ident">iterations</span>, <span class="ident">salt</span>, <span class="ident">idx</span>, <span class="ident">derived_chunk</span>);
+        derive_block(<span class="kw-2">&amp;</span>secret, iterations, salt, idx, derived_chunk);
 
-        <span class="comment">// XXX: This isn&#39;t fully constant-time-safe. TODO: Fix that.</span>
-        <span class="kw">let</span> <span class="ident">current_block_matches</span> <span class="op">=</span>
-            <span class="kw">if</span> <span class="ident">constant_time::verify_slices_are_equal</span>(<span class="ident">derived_chunk</span>, <span class="ident">previously_derived_chunk</span>)
-                .<span class="ident">is_ok</span>()
+        <span class="comment">// XXX: This isn&#39;t fully constant-time-safe. TODO: Fix that.
+        </span><span class="kw">let </span>current_block_matches =
+            <span class="kw">if </span>constant_time::verify_slices_are_equal(derived_chunk, previously_derived_chunk)
+                .is_ok()
             {
-                <span class="number">1</span>
-            } <span class="kw">else</span> {
-                <span class="number">0</span>
-            };
+                <span class="number">1
+            </span>} <span class="kw">else </span>{
+                <span class="number">0
+            </span>};
 
-        <span class="ident">matches</span> <span class="op">&amp;=</span> <span class="ident">current_block_matches</span>;
+        matches &amp;= current_block_matches;
     }
 
-    <span class="kw">if</span> <span class="ident">matches</span> <span class="op">==</span> <span class="number">0</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>);
+    <span class="kw">if </span>matches == <span class="number">0 </span>{
+        <span class="kw">return </span><span class="prelude-val">Err</span>(error::Unspecified);
     }
 
     <span class="prelude-val">Ok</span>(())
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

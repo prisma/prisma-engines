@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-0.4.13/src/load/pending_requests.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>pending_requests.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tower/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-0.4.13/src/load/pending_requests.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>pending_requests.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tower/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -214,221 +214,221 @@
 <span id="214">214</span>
 <span id="215">215</span>
 <span id="216">216</span>
-</pre><pre class="rust"><code><span class="doccomment">//! A [`Load`] implementation that measures load using the number of in-flight requests.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! A [`Load`] implementation that measures load using the number of in-flight requests.
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;discover&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::discover</span>::{<span class="ident">Change</span>, <span class="ident">Discover</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;discover&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">futures_core</span>::{<span class="ident">ready</span>, <span class="ident">Stream</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;discover&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">pin_project_lite::pin_project</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;discover&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;discover&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::discover::{Change, Discover};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;discover&quot;</span>)]
+</span><span class="kw">use </span>futures_core::{ready, Stream};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;discover&quot;</span>)]
+</span><span class="kw">use </span>pin_project_lite::pin_project;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;discover&quot;</span>)]
+</span><span class="kw">use </span>std::pin::Pin;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::completion</span>::{<span class="ident">CompleteOnResponse</span>, <span class="ident">TrackCompletion</span>, <span class="ident">TrackCompletionFuture</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Load</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
-<span class="kw">use</span> <span class="ident">tower_service::Service</span>;
+<span class="kw">use </span><span class="kw">super</span>::completion::{CompleteOnResponse, TrackCompletion, TrackCompletionFuture};
+<span class="kw">use </span><span class="kw">super</span>::Load;
+<span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>std::task::{Context, Poll};
+<span class="kw">use </span>tower_service::Service;
 
-<span class="doccomment">/// Measures the load of the underlying service using the number of currently-pending requests.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PendingRequests</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">C</span> <span class="op">=</span> <span class="ident">CompleteOnResponse</span><span class="op">&gt;</span> {
-    <span class="ident">service</span>: <span class="ident">S</span>,
-    <span class="ident">ref_count</span>: <span class="ident">RefCount</span>,
-    <span class="ident">completion</span>: <span class="ident">C</span>,
+<span class="doccomment">/// Measures the load of the underlying service using the number of currently-pending requests.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>PendingRequests&lt;S, C = CompleteOnResponse&gt; {
+    service: S,
+    ref_count: RefCount,
+    completion: C,
 }
 
-<span class="doccomment">/// Shared between instances of [`PendingRequests`] and [`Handle`] to track active references.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">struct</span> <span class="ident">RefCount</span>(<span class="ident">Arc</span><span class="op">&lt;</span>()<span class="op">&gt;</span>);
+<span class="doccomment">/// Shared between instances of [`PendingRequests`] and [`Handle`] to track active references.
+</span><span class="attribute">#[derive(Clone, Debug, Default)]
+</span><span class="kw">struct </span>RefCount(Arc&lt;()&gt;);
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;discover&quot;</span>)]</span>
-<span class="macro">pin_project!</span> {
-    <span class="doccomment">/// Wraps a `D`-typed stream of discovered services with [`PendingRequests`].</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;discover&quot;</span>)))]</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PendingRequestsDiscover</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">C</span> <span class="op">=</span> <span class="ident">CompleteOnResponse</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">pin</span>]</span>
-        <span class="ident">discover</span>: <span class="ident">D</span>,
-        <span class="ident">completion</span>: <span class="ident">C</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;discover&quot;</span>)]
+</span><span class="macro">pin_project! </span>{
+    <span class="doccomment">/// Wraps a `D`-typed stream of discovered services with [`PendingRequests`].
+    </span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;discover&quot;</span>)))]
+    #[derive(Debug)]
+    </span><span class="kw">pub struct </span>PendingRequestsDiscover&lt;D, C = CompleteOnResponse&gt; {
+        <span class="attribute">#[pin]
+        </span>discover: D,
+        completion: C,
     }
 }
 
-<span class="doccomment">/// Represents the number of currently-pending requests to a given service.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">PartialOrd</span>, <span class="ident">PartialEq</span>, <span class="ident">Ord</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Count</span>(<span class="ident">usize</span>);
+<span class="doccomment">/// Represents the number of currently-pending requests to a given service.
+</span><span class="attribute">#[derive(Clone, Copy, Debug, Default, PartialOrd, PartialEq, Ord, Eq)]
+</span><span class="kw">pub struct </span>Count(usize);
 
-<span class="doccomment">/// Tracks an in-flight request by reference count.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Handle</span>(<span class="ident">RefCount</span>);
+<span class="doccomment">/// Tracks an in-flight request by reference count.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Handle(RefCount);
 
-<span class="comment">// ===== impl PendingRequests =====</span>
+<span class="comment">// ===== impl PendingRequests =====
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">PendingRequests</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Wraps an `S`-typed service so that its load is tracked by the number of pending requests.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">service</span>: <span class="ident">S</span>, <span class="ident">completion</span>: <span class="ident">C</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">service</span>,
-            <span class="ident">completion</span>,
-            <span class="ident">ref_count</span>: <span class="ident">RefCount::default</span>(),
+</span><span class="kw">impl</span>&lt;S, C&gt; PendingRequests&lt;S, C&gt; {
+    <span class="doccomment">/// Wraps an `S`-typed service so that its load is tracked by the number of pending requests.
+    </span><span class="kw">pub fn </span>new(service: S, completion: C) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            service,
+            completion,
+            ref_count: RefCount::default(),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Handle</span> {
-        <span class="ident">Handle</span>(<span class="self">self</span>.<span class="ident">ref_count</span>.<span class="ident">clone</span>())
+    <span class="kw">fn </span>handle(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Handle {
+        Handle(<span class="self">self</span>.ref_count.clone())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">Load</span> <span class="kw">for</span> <span class="ident">PendingRequests</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Metric</span> <span class="op">=</span> <span class="ident">Count</span>;
+<span class="kw">impl</span>&lt;S, C&gt; Load <span class="kw">for </span>PendingRequests&lt;S, C&gt; {
+    <span class="kw">type </span>Metric = Count;
 
-    <span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Count</span> {
-        <span class="comment">// Count the number of references that aren&#39;t `self`.</span>
-        <span class="ident">Count</span>(<span class="self">self</span>.<span class="ident">ref_count</span>.<span class="ident">ref_count</span>() <span class="op">-</span> <span class="number">1</span>)
+    <span class="kw">fn </span>load(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Count {
+        <span class="comment">// Count the number of references that aren&#39;t `self`.
+        </span>Count(<span class="self">self</span>.ref_count.ref_count() - <span class="number">1</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">C</span>, <span class="ident">Request</span><span class="op">&gt;</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PendingRequests</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>,
-    <span class="ident">C</span>: <span class="ident">TrackCompletion</span><span class="op">&lt;</span><span class="ident">Handle</span>, <span class="ident">S::Response</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;S, C, Request&gt; Service&lt;Request&gt; <span class="kw">for </span>PendingRequests&lt;S, C&gt;
+<span class="kw">where
+    </span>S: Service&lt;Request&gt;,
+    C: TrackCompletion&lt;Handle, S::Response&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> <span class="ident">C::Output</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">S::Error</span>;
-    <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">TrackCompletionFuture</span><span class="op">&lt;</span><span class="ident">S::Future</span>, <span class="ident">C</span>, <span class="ident">Handle</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Response = C::Output;
+    <span class="kw">type </span>Error = S::Error;
+    <span class="kw">type </span>Future = TrackCompletionFuture&lt;S::Future, C, Handle&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">service</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>)
+    <span class="kw">fn </span>poll_ready(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt;&gt; {
+        <span class="self">self</span>.service.poll_ready(cx)
     }
 
-    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">req</span>: <span class="ident">Request</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
-        <span class="ident">TrackCompletionFuture::new</span>(
-            <span class="self">self</span>.<span class="ident">completion</span>.<span class="ident">clone</span>(),
-            <span class="self">self</span>.<span class="ident">handle</span>(),
-            <span class="self">self</span>.<span class="ident">service</span>.<span class="ident">call</span>(<span class="ident">req</span>),
+    <span class="kw">fn </span>call(<span class="kw-2">&amp;mut </span><span class="self">self</span>, req: Request) -&gt; <span class="self">Self</span>::Future {
+        TrackCompletionFuture::new(
+            <span class="self">self</span>.completion.clone(),
+            <span class="self">self</span>.handle(),
+            <span class="self">self</span>.service.call(req),
         )
     }
 }
 
-<span class="comment">// ===== impl PendingRequestsDiscover =====</span>
+<span class="comment">// ===== impl PendingRequestsDiscover =====
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;discover&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">PendingRequestsDiscover</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Wraps a [`Discover`], wrapping all of its services with [`PendingRequests`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>(<span class="ident">discover</span>: <span class="ident">D</span>, <span class="ident">completion</span>: <span class="ident">C</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">Discover</span>,
-        <span class="ident">D::Service</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>,
-        <span class="ident">C</span>: <span class="ident">TrackCompletion</span><span class="op">&lt;</span><span class="ident">Handle</span>, <span class="op">&lt;</span><span class="ident">D::Service</span> <span class="kw">as</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Response</span><span class="op">&gt;</span>,
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;discover&quot;</span>)]
+</span><span class="kw">impl</span>&lt;D, C&gt; PendingRequestsDiscover&lt;D, C&gt; {
+    <span class="doccomment">/// Wraps a [`Discover`], wrapping all of its services with [`PendingRequests`].
+    </span><span class="kw">pub fn </span>new&lt;Request&gt;(discover: D, completion: C) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>D: Discover,
+        D::Service: Service&lt;Request&gt;,
+        C: TrackCompletion&lt;Handle, &lt;D::Service <span class="kw">as </span>Service&lt;Request&gt;&gt;::Response&gt;,
     {
-        <span class="self">Self</span> {
-            <span class="ident">discover</span>,
-            <span class="ident">completion</span>,
+        <span class="self">Self </span>{
+            discover,
+            completion,
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;discover&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">PendingRequestsDiscover</span><span class="op">&lt;</span><span class="ident">D</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">D</span>: <span class="ident">Discover</span>,
-    <span class="ident">C</span>: <span class="ident">Clone</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;discover&quot;</span>)]
+</span><span class="kw">impl</span>&lt;D, C&gt; Stream <span class="kw">for </span>PendingRequestsDiscover&lt;D, C&gt;
+<span class="kw">where
+    </span>D: Discover,
+    C: Clone,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Change</span><span class="op">&lt;</span><span class="ident">D::Key</span>, <span class="ident">PendingRequests</span><span class="op">&lt;</span><span class="ident">D::Service</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Item = <span class="prelude-ty">Result</span>&lt;Change&lt;D::Key, PendingRequests&lt;D::Service, C&gt;&gt;, D::Error&gt;;
 
-    <span class="doccomment">/// Yields the next discovery change set.</span>
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::Change</span>::<span class="kw-2">*</span>;
+    <span class="doccomment">/// Yields the next discovery change set.
+    </span><span class="kw">fn </span>poll_next(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;&gt; {
+        <span class="kw">use </span><span class="self">self</span>::Change::<span class="kw-2">*</span>;
 
-        <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
-        <span class="kw">let</span> <span class="ident">change</span> <span class="op">=</span> <span class="kw">match</span> <span class="macro">ready!</span>(<span class="ident">this</span>.<span class="ident">discover</span>.<span class="ident">poll_discover</span>(<span class="ident">cx</span>)).<span class="ident">transpose</span>()<span class="question-mark">?</span> {
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>),
-            <span class="prelude-val">Some</span>(<span class="ident">Insert</span>(<span class="ident">k</span>, <span class="ident">svc</span>)) =&gt; <span class="ident">Insert</span>(<span class="ident">k</span>, <span class="ident">PendingRequests::new</span>(<span class="ident">svc</span>, <span class="ident">this</span>.<span class="ident">completion</span>.<span class="ident">clone</span>())),
-            <span class="prelude-val">Some</span>(<span class="ident">Remove</span>(<span class="ident">k</span>)) =&gt; <span class="ident">Remove</span>(<span class="ident">k</span>),
+        <span class="kw">let </span>this = <span class="self">self</span>.project();
+        <span class="kw">let </span>change = <span class="kw">match </span><span class="macro">ready!</span>(this.discover.poll_discover(cx)).transpose()<span class="question-mark">? </span>{
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span>Poll::Ready(<span class="prelude-val">None</span>),
+            <span class="prelude-val">Some</span>(Insert(k, svc)) =&gt; Insert(k, PendingRequests::new(svc, this.completion.clone())),
+            <span class="prelude-val">Some</span>(Remove(k)) =&gt; Remove(k),
         };
 
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">change</span>)))
+        Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(change)))
     }
 }
 
-<span class="comment">// ==== RefCount ====</span>
+<span class="comment">// ==== RefCount ====
 
-<span class="kw">impl</span> <span class="ident">RefCount</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">ref_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="ident">Arc::strong_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>)
+</span><span class="kw">impl </span>RefCount {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>ref_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        Arc::strong_count(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">futures_util::future</span>;
-    <span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>futures_util::future;
+    <span class="kw">use </span>std::task::{Context, Poll};
 
-    <span class="kw">struct</span> <span class="ident">Svc</span>;
-    <span class="kw">impl</span> <span class="ident">Service</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Svc</span> {
-        <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> ();
-        <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> ();
-        <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">future::Ready</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="kw">struct </span>Svc;
+    <span class="kw">impl </span>Service&lt;()&gt; <span class="kw">for </span>Svc {
+        <span class="kw">type </span>Response = ();
+        <span class="kw">type </span>Error = ();
+        <span class="kw">type </span>Future = future::Ready&lt;<span class="prelude-ty">Result</span>&lt;(), ()&gt;&gt;;
 
-        <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
+        <span class="kw">fn </span>poll_ready(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), ()&gt;&gt; {
+            Poll::Ready(<span class="prelude-val">Ok</span>(()))
         }
 
-        <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, (): ()) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
-            <span class="ident">future::ok</span>(())
+        <span class="kw">fn </span>call(<span class="kw-2">&amp;mut </span><span class="self">self</span>, (): ()) -&gt; <span class="self">Self</span>::Future {
+            future::ok(())
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">svc</span> <span class="op">=</span> <span class="ident">PendingRequests::new</span>(<span class="ident">Svc</span>, <span class="ident">CompleteOnResponse</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">svc</span>.<span class="ident">load</span>(), <span class="ident">Count</span>(<span class="number">0</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>default() {
+        <span class="kw">let </span><span class="kw-2">mut </span>svc = PendingRequests::new(Svc, CompleteOnResponse);
+        <span class="macro">assert_eq!</span>(svc.load(), Count(<span class="number">0</span>));
 
-        <span class="kw">let</span> <span class="ident">rsp0</span> <span class="op">=</span> <span class="ident">svc</span>.<span class="ident">call</span>(());
-        <span class="macro">assert_eq!</span>(<span class="ident">svc</span>.<span class="ident">load</span>(), <span class="ident">Count</span>(<span class="number">1</span>));
+        <span class="kw">let </span>rsp0 = svc.call(());
+        <span class="macro">assert_eq!</span>(svc.load(), Count(<span class="number">1</span>));
 
-        <span class="kw">let</span> <span class="ident">rsp1</span> <span class="op">=</span> <span class="ident">svc</span>.<span class="ident">call</span>(());
-        <span class="macro">assert_eq!</span>(<span class="ident">svc</span>.<span class="ident">load</span>(), <span class="ident">Count</span>(<span class="number">2</span>));
+        <span class="kw">let </span>rsp1 = svc.call(());
+        <span class="macro">assert_eq!</span>(svc.load(), Count(<span class="number">2</span>));
 
-        <span class="kw">let</span> () <span class="op">=</span> <span class="ident">tokio_test::block_on</span>(<span class="ident">rsp0</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">svc</span>.<span class="ident">load</span>(), <span class="ident">Count</span>(<span class="number">1</span>));
+        <span class="kw">let </span>() = tokio_test::block_on(rsp0).unwrap();
+        <span class="macro">assert_eq!</span>(svc.load(), Count(<span class="number">1</span>));
 
-        <span class="kw">let</span> () <span class="op">=</span> <span class="ident">tokio_test::block_on</span>(<span class="ident">rsp1</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">svc</span>.<span class="ident">load</span>(), <span class="ident">Count</span>(<span class="number">0</span>));
+        <span class="kw">let </span>() = tokio_test::block_on(rsp1).unwrap();
+        <span class="macro">assert_eq!</span>(svc.load(), Count(<span class="number">0</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">with_completion</span>() {
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">IntoHandle</span>;
-        <span class="kw">impl</span> <span class="ident">TrackCompletion</span><span class="op">&lt;</span><span class="ident">Handle</span>, ()<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">IntoHandle</span> {
-            <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Handle</span>;
-            <span class="kw">fn</span> <span class="ident">track_completion</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">i</span>: <span class="ident">Handle</span>, (): ()) -&gt; <span class="ident">Handle</span> {
-                <span class="ident">i</span>
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>with_completion() {
+        <span class="attribute">#[derive(Clone)]
+        </span><span class="kw">struct </span>IntoHandle;
+        <span class="kw">impl </span>TrackCompletion&lt;Handle, ()&gt; <span class="kw">for </span>IntoHandle {
+            <span class="kw">type </span>Output = Handle;
+            <span class="kw">fn </span>track_completion(<span class="kw-2">&amp;</span><span class="self">self</span>, i: Handle, (): ()) -&gt; Handle {
+                i
             }
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">svc</span> <span class="op">=</span> <span class="ident">PendingRequests::new</span>(<span class="ident">Svc</span>, <span class="ident">IntoHandle</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">svc</span>.<span class="ident">load</span>(), <span class="ident">Count</span>(<span class="number">0</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>svc = PendingRequests::new(Svc, IntoHandle);
+        <span class="macro">assert_eq!</span>(svc.load(), Count(<span class="number">0</span>));
 
-        <span class="kw">let</span> <span class="ident">rsp</span> <span class="op">=</span> <span class="ident">svc</span>.<span class="ident">call</span>(());
-        <span class="macro">assert_eq!</span>(<span class="ident">svc</span>.<span class="ident">load</span>(), <span class="ident">Count</span>(<span class="number">1</span>));
-        <span class="kw">let</span> <span class="ident">i0</span> <span class="op">=</span> <span class="ident">tokio_test::block_on</span>(<span class="ident">rsp</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">svc</span>.<span class="ident">load</span>(), <span class="ident">Count</span>(<span class="number">1</span>));
+        <span class="kw">let </span>rsp = svc.call(());
+        <span class="macro">assert_eq!</span>(svc.load(), Count(<span class="number">1</span>));
+        <span class="kw">let </span>i0 = tokio_test::block_on(rsp).unwrap();
+        <span class="macro">assert_eq!</span>(svc.load(), Count(<span class="number">1</span>));
 
-        <span class="kw">let</span> <span class="ident">rsp</span> <span class="op">=</span> <span class="ident">svc</span>.<span class="ident">call</span>(());
-        <span class="macro">assert_eq!</span>(<span class="ident">svc</span>.<span class="ident">load</span>(), <span class="ident">Count</span>(<span class="number">2</span>));
-        <span class="kw">let</span> <span class="ident">i1</span> <span class="op">=</span> <span class="ident">tokio_test::block_on</span>(<span class="ident">rsp</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">svc</span>.<span class="ident">load</span>(), <span class="ident">Count</span>(<span class="number">2</span>));
+        <span class="kw">let </span>rsp = svc.call(());
+        <span class="macro">assert_eq!</span>(svc.load(), Count(<span class="number">2</span>));
+        <span class="kw">let </span>i1 = tokio_test::block_on(rsp).unwrap();
+        <span class="macro">assert_eq!</span>(svc.load(), Count(<span class="number">2</span>));
 
-        <span class="ident">drop</span>(<span class="ident">i1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">svc</span>.<span class="ident">load</span>(), <span class="ident">Count</span>(<span class="number">1</span>));
+        drop(i1);
+        <span class="macro">assert_eq!</span>(svc.load(), Count(<span class="number">1</span>));
 
-        <span class="ident">drop</span>(<span class="ident">i0</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">svc</span>.<span class="ident">load</span>(), <span class="ident">Count</span>(<span class="number">0</span>));
+        drop(i0);
+        <span class="macro">assert_eq!</span>(svc.load(), Count(<span class="number">0</span>));
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tower" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tower" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/http-0.2.8/src/method.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>method.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../http/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../http/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../http/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/http-0.2.8/src/method.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>method.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../http/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../http/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../http/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -471,478 +471,478 @@
 <span id="471">471</span>
 <span id="472">472</span>
 <span id="473">473</span>
-</pre><pre class="rust"><code><span class="doccomment">//! The HTTP request method</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This module contains HTTP-method related structs and errors and such. The</span>
-<span class="doccomment">//! main type of this module, `Method`, is also reexported at the root of the</span>
-<span class="doccomment">//! crate as `http::Method` and is intended for import through that location</span>
-<span class="doccomment">//! primarily.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Examples</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! use http::Method;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! assert_eq!(Method::GET, Method::from_bytes(b&quot;GET&quot;).unwrap());</span>
-<span class="doccomment">//! assert!(Method::GET.is_idempotent());</span>
-<span class="doccomment">//! assert_eq!(Method::POST.as_str(), &quot;POST&quot;);</span>
-<span class="doccomment">//! ```</span>
+</pre><pre class="rust"><code><span class="doccomment">//! The HTTP request method
+//!
+//! This module contains HTTP-method related structs and errors and such. The
+//! main type of this module, `Method`, is also reexported at the root of the
+//! crate as `http::Method` and is intended for import through that location
+//! primarily.
+//!
+//! # Examples
+//!
+//! ```
+//! use http::Method;
+//!
+//! assert_eq!(Method::GET, Method::from_bytes(b&quot;GET&quot;).unwrap());
+//! assert!(Method::GET.is_idempotent());
+//! assert_eq!(Method::POST.as_str(), &quot;POST&quot;);
+//! ```
 
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::Inner</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::extension</span>::{<span class="ident">InlineExtension</span>, <span class="ident">AllocatedExtension</span>};
+</span><span class="kw">use </span><span class="self">self</span>::Inner::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="self">self</span>::extension::{InlineExtension, AllocatedExtension};
 
-<span class="kw">use</span> <span class="ident">std::convert::AsRef</span>;
-<span class="kw">use</span> <span class="ident">std::error::Error</span>;
-<span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
-<span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">str</span>};
+<span class="kw">use </span>std::convert::AsRef;
+<span class="kw">use </span>std::error::Error;
+<span class="kw">use </span>std::str::FromStr;
+<span class="kw">use </span>std::convert::TryFrom;
+<span class="kw">use </span>std::{fmt, str};
 
-<span class="doccomment">/// The Request Method (VERB)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This type also contains constants for a number of common HTTP methods such</span>
-<span class="doccomment">/// as GET, POST, etc.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Currently includes 8 variants representing the 8 methods defined in</span>
-<span class="doccomment">/// [RFC 7230](https://tools.ietf.org/html/rfc7231#section-4.1), plus PATCH,</span>
-<span class="doccomment">/// and an Extension variant for all extensions.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use http::Method;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(Method::GET, Method::from_bytes(b&quot;GET&quot;).unwrap());</span>
-<span class="doccomment">/// assert!(Method::GET.is_idempotent());</span>
-<span class="doccomment">/// assert_eq!(Method::POST.as_str(), &quot;POST&quot;);</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Method</span>(<span class="ident">Inner</span>);
+<span class="doccomment">/// The Request Method (VERB)
+///
+/// This type also contains constants for a number of common HTTP methods such
+/// as GET, POST, etc.
+///
+/// Currently includes 8 variants representing the 8 methods defined in
+/// [RFC 7230](https://tools.ietf.org/html/rfc7231#section-4.1), plus PATCH,
+/// and an Extension variant for all extensions.
+///
+/// # Examples
+///
+/// ```
+/// use http::Method;
+///
+/// assert_eq!(Method::GET, Method::from_bytes(b&quot;GET&quot;).unwrap());
+/// assert!(Method::GET.is_idempotent());
+/// assert_eq!(Method::POST.as_str(), &quot;POST&quot;);
+/// ```
+</span><span class="attribute">#[derive(Clone, PartialEq, Eq, Hash)]
+</span><span class="kw">pub struct </span>Method(Inner);
 
-<span class="doccomment">/// A possible error value when converting `Method` from bytes.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InvalidMethod</span> {
-    <span class="ident">_priv</span>: (),
+<span class="doccomment">/// A possible error value when converting `Method` from bytes.
+</span><span class="kw">pub struct </span>InvalidMethod {
+    _priv: (),
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">enum</span> <span class="ident">Inner</span> {
-    <span class="ident">Options</span>,
-    <span class="ident">Get</span>,
-    <span class="ident">Post</span>,
-    <span class="ident">Put</span>,
-    <span class="ident">Delete</span>,
-    <span class="ident">Head</span>,
-    <span class="ident">Trace</span>,
-    <span class="ident">Connect</span>,
-    <span class="ident">Patch</span>,
-    <span class="comment">// If the extension is short enough, store it inline</span>
-    <span class="ident">ExtensionInline</span>(<span class="ident">InlineExtension</span>),
-    <span class="comment">// Otherwise, allocate it</span>
-    <span class="ident">ExtensionAllocated</span>(<span class="ident">AllocatedExtension</span>),
+<span class="attribute">#[derive(Clone, PartialEq, Eq, Hash)]
+</span><span class="kw">enum </span>Inner {
+    Options,
+    Get,
+    Post,
+    Put,
+    Delete,
+    Head,
+    Trace,
+    Connect,
+    Patch,
+    <span class="comment">// If the extension is short enough, store it inline
+    </span>ExtensionInline(InlineExtension),
+    <span class="comment">// Otherwise, allocate it
+    </span>ExtensionAllocated(AllocatedExtension),
 }
 
 
-<span class="kw">impl</span> <span class="ident">Method</span> {
-    <span class="doccomment">/// GET</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">GET</span>: <span class="ident">Method</span> <span class="op">=</span> <span class="ident">Method</span>(<span class="ident">Get</span>);
+<span class="kw">impl </span>Method {
+    <span class="doccomment">/// GET
+    </span><span class="kw">pub const </span>GET: Method = Method(Get);
 
-    <span class="doccomment">/// POST</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">POST</span>: <span class="ident">Method</span> <span class="op">=</span> <span class="ident">Method</span>(<span class="ident">Post</span>);
+    <span class="doccomment">/// POST
+    </span><span class="kw">pub const </span>POST: Method = Method(Post);
 
-    <span class="doccomment">/// PUT</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PUT</span>: <span class="ident">Method</span> <span class="op">=</span> <span class="ident">Method</span>(<span class="ident">Put</span>);
+    <span class="doccomment">/// PUT
+    </span><span class="kw">pub const </span>PUT: Method = Method(Put);
 
-    <span class="doccomment">/// DELETE</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DELETE</span>: <span class="ident">Method</span> <span class="op">=</span> <span class="ident">Method</span>(<span class="ident">Delete</span>);
+    <span class="doccomment">/// DELETE
+    </span><span class="kw">pub const </span>DELETE: Method = Method(Delete);
 
-    <span class="doccomment">/// HEAD</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">HEAD</span>: <span class="ident">Method</span> <span class="op">=</span> <span class="ident">Method</span>(<span class="ident">Head</span>);
+    <span class="doccomment">/// HEAD
+    </span><span class="kw">pub const </span>HEAD: Method = Method(Head);
 
-    <span class="doccomment">/// OPTIONS</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">OPTIONS</span>: <span class="ident">Method</span> <span class="op">=</span> <span class="ident">Method</span>(<span class="ident">Options</span>);
+    <span class="doccomment">/// OPTIONS
+    </span><span class="kw">pub const </span>OPTIONS: Method = Method(Options);
 
-    <span class="doccomment">/// CONNECT</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CONNECT</span>: <span class="ident">Method</span> <span class="op">=</span> <span class="ident">Method</span>(<span class="ident">Connect</span>);
+    <span class="doccomment">/// CONNECT
+    </span><span class="kw">pub const </span>CONNECT: Method = Method(Connect);
 
-    <span class="doccomment">/// PATCH</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PATCH</span>: <span class="ident">Method</span> <span class="op">=</span> <span class="ident">Method</span>(<span class="ident">Patch</span>);
+    <span class="doccomment">/// PATCH
+    </span><span class="kw">pub const </span>PATCH: Method = Method(Patch);
 
-    <span class="doccomment">/// TRACE</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TRACE</span>: <span class="ident">Method</span> <span class="op">=</span> <span class="ident">Method</span>(<span class="ident">Trace</span>);
+    <span class="doccomment">/// TRACE
+    </span><span class="kw">pub const </span>TRACE: Method = Method(Trace);
 
-    <span class="doccomment">/// Converts a slice of bytes to an HTTP method.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_bytes</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Method</span>, <span class="ident">InvalidMethod</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">src</span>.<span class="ident">len</span>() {
-            <span class="number">0</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">InvalidMethod::new</span>()),
-            <span class="number">3</span> =&gt; <span class="kw">match</span> <span class="ident">src</span> {
-                <span class="string">b&quot;GET&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Method</span>(<span class="ident">Get</span>)),
-                <span class="string">b&quot;PUT&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Method</span>(<span class="ident">Put</span>)),
-                <span class="kw">_</span> =&gt; <span class="ident">Method::extension_inline</span>(<span class="ident">src</span>),
+    <span class="doccomment">/// Converts a slice of bytes to an HTTP method.
+    </span><span class="kw">pub fn </span>from_bytes(src: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;Method, InvalidMethod&gt; {
+        <span class="kw">match </span>src.len() {
+            <span class="number">0 </span>=&gt; <span class="prelude-val">Err</span>(InvalidMethod::new()),
+            <span class="number">3 </span>=&gt; <span class="kw">match </span>src {
+                <span class="string">b&quot;GET&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Method(Get)),
+                <span class="string">b&quot;PUT&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Method(Put)),
+                <span class="kw">_ </span>=&gt; Method::extension_inline(src),
             },
-            <span class="number">4</span> =&gt; <span class="kw">match</span> <span class="ident">src</span> {
-                <span class="string">b&quot;POST&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Method</span>(<span class="ident">Post</span>)),
-                <span class="string">b&quot;HEAD&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Method</span>(<span class="ident">Head</span>)),
-                <span class="kw">_</span> =&gt; <span class="ident">Method::extension_inline</span>(<span class="ident">src</span>),
+            <span class="number">4 </span>=&gt; <span class="kw">match </span>src {
+                <span class="string">b&quot;POST&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Method(Post)),
+                <span class="string">b&quot;HEAD&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Method(Head)),
+                <span class="kw">_ </span>=&gt; Method::extension_inline(src),
             },
-            <span class="number">5</span> =&gt; <span class="kw">match</span> <span class="ident">src</span> {
-                <span class="string">b&quot;PATCH&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Method</span>(<span class="ident">Patch</span>)),
-                <span class="string">b&quot;TRACE&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Method</span>(<span class="ident">Trace</span>)),
-                <span class="kw">_</span> =&gt; <span class="ident">Method::extension_inline</span>(<span class="ident">src</span>),
+            <span class="number">5 </span>=&gt; <span class="kw">match </span>src {
+                <span class="string">b&quot;PATCH&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Method(Patch)),
+                <span class="string">b&quot;TRACE&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Method(Trace)),
+                <span class="kw">_ </span>=&gt; Method::extension_inline(src),
             },
-            <span class="number">6</span> =&gt; <span class="kw">match</span> <span class="ident">src</span> {
-                <span class="string">b&quot;DELETE&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Method</span>(<span class="ident">Delete</span>)),
-                <span class="kw">_</span> =&gt; <span class="ident">Method::extension_inline</span>(<span class="ident">src</span>),
+            <span class="number">6 </span>=&gt; <span class="kw">match </span>src {
+                <span class="string">b&quot;DELETE&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Method(Delete)),
+                <span class="kw">_ </span>=&gt; Method::extension_inline(src),
             },
-            <span class="number">7</span> =&gt; <span class="kw">match</span> <span class="ident">src</span> {
-                <span class="string">b&quot;OPTIONS&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Method</span>(<span class="ident">Options</span>)),
-                <span class="string">b&quot;CONNECT&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Method</span>(<span class="ident">Connect</span>)),
-                <span class="kw">_</span> =&gt; <span class="ident">Method::extension_inline</span>(<span class="ident">src</span>),
+            <span class="number">7 </span>=&gt; <span class="kw">match </span>src {
+                <span class="string">b&quot;OPTIONS&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Method(Options)),
+                <span class="string">b&quot;CONNECT&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Method(Connect)),
+                <span class="kw">_ </span>=&gt; Method::extension_inline(src),
             },
-            <span class="kw">_</span> =&gt; {
-                <span class="kw">if</span> <span class="ident">src</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="ident">InlineExtension::MAX</span> {
-                    <span class="ident">Method::extension_inline</span>(<span class="ident">src</span>)
-                } <span class="kw">else</span> {
-                    <span class="kw">let</span> <span class="ident">allocated</span> <span class="op">=</span> <span class="ident">AllocatedExtension::new</span>(<span class="ident">src</span>)<span class="question-mark">?</span>;
+            <span class="kw">_ </span>=&gt; {
+                <span class="kw">if </span>src.len() &lt; InlineExtension::MAX {
+                    Method::extension_inline(src)
+                } <span class="kw">else </span>{
+                    <span class="kw">let </span>allocated = AllocatedExtension::new(src)<span class="question-mark">?</span>;
 
-                    <span class="prelude-val">Ok</span>(<span class="ident">Method</span>(<span class="ident">ExtensionAllocated</span>(<span class="ident">allocated</span>)))
+                    <span class="prelude-val">Ok</span>(Method(ExtensionAllocated(allocated)))
                 }
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">extension_inline</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Method</span>, <span class="ident">InvalidMethod</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">inline</span> <span class="op">=</span> <span class="ident">InlineExtension::new</span>(<span class="ident">src</span>)<span class="question-mark">?</span>;
+    <span class="kw">fn </span>extension_inline(src: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;Method, InvalidMethod&gt; {
+        <span class="kw">let </span>inline = InlineExtension::new(src)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">Method</span>(<span class="ident">ExtensionInline</span>(<span class="ident">inline</span>)))
+        <span class="prelude-val">Ok</span>(Method(ExtensionInline(inline)))
     }
 
-    <span class="doccomment">/// Whether a method is considered &quot;safe&quot;, meaning the request is</span>
-    <span class="doccomment">/// essentially read-only.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See [the spec](https://tools.ietf.org/html/rfc7231#section-4.2.1)</span>
-    <span class="doccomment">/// for more words.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_safe</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span> {
-            <span class="ident">Get</span> <span class="op">|</span> <span class="ident">Head</span> <span class="op">|</span> <span class="ident">Options</span> <span class="op">|</span> <span class="ident">Trace</span> =&gt; <span class="bool-val">true</span>,
-            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+    <span class="doccomment">/// Whether a method is considered &quot;safe&quot;, meaning the request is
+    /// essentially read-only.
+    ///
+    /// See [the spec](https://tools.ietf.org/html/rfc7231#section-4.2.1)
+    /// for more words.
+    </span><span class="kw">pub fn </span>is_safe(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="self">self</span>.<span class="number">0 </span>{
+            Get | Head | Options | Trace =&gt; <span class="bool-val">true</span>,
+            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="doccomment">/// Whether a method is considered &quot;idempotent&quot;, meaning the request has</span>
-    <span class="doccomment">/// the same result if executed multiple times.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See [the spec](https://tools.ietf.org/html/rfc7231#section-4.2.2) for</span>
-    <span class="doccomment">/// more words.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_idempotent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span> {
-            <span class="ident">Put</span> <span class="op">|</span> <span class="ident">Delete</span> =&gt; <span class="bool-val">true</span>,
-            <span class="kw">_</span> =&gt; <span class="self">self</span>.<span class="ident">is_safe</span>(),
+    <span class="doccomment">/// Whether a method is considered &quot;idempotent&quot;, meaning the request has
+    /// the same result if executed multiple times.
+    ///
+    /// See [the spec](https://tools.ietf.org/html/rfc7231#section-4.2.2) for
+    /// more words.
+    </span><span class="kw">pub fn </span>is_idempotent(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="self">self</span>.<span class="number">0 </span>{
+            Put | Delete =&gt; <span class="bool-val">true</span>,
+            <span class="kw">_ </span>=&gt; <span class="self">self</span>.is_safe(),
         }
     }
 
-    <span class="doccomment">/// Return a &amp;str representation of the HTTP method</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span> {
-            <span class="ident">Options</span> =&gt; <span class="string">&quot;OPTIONS&quot;</span>,
-            <span class="ident">Get</span> =&gt; <span class="string">&quot;GET&quot;</span>,
-            <span class="ident">Post</span> =&gt; <span class="string">&quot;POST&quot;</span>,
-            <span class="ident">Put</span> =&gt; <span class="string">&quot;PUT&quot;</span>,
-            <span class="ident">Delete</span> =&gt; <span class="string">&quot;DELETE&quot;</span>,
-            <span class="ident">Head</span> =&gt; <span class="string">&quot;HEAD&quot;</span>,
-            <span class="ident">Trace</span> =&gt; <span class="string">&quot;TRACE&quot;</span>,
-            <span class="ident">Connect</span> =&gt; <span class="string">&quot;CONNECT&quot;</span>,
-            <span class="ident">Patch</span> =&gt; <span class="string">&quot;PATCH&quot;</span>,
-            <span class="ident">ExtensionInline</span>(<span class="kw-2">ref</span> <span class="ident">inline</span>) =&gt; <span class="ident">inline</span>.<span class="ident">as_str</span>(),
-            <span class="ident">ExtensionAllocated</span>(<span class="kw-2">ref</span> <span class="ident">allocated</span>) =&gt; <span class="ident">allocated</span>.<span class="ident">as_str</span>(),
+    <span class="doccomment">/// Return a &amp;str representation of the HTTP method
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>as_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw">match </span><span class="self">self</span>.<span class="number">0 </span>{
+            Options =&gt; <span class="string">&quot;OPTIONS&quot;</span>,
+            Get =&gt; <span class="string">&quot;GET&quot;</span>,
+            Post =&gt; <span class="string">&quot;POST&quot;</span>,
+            Put =&gt; <span class="string">&quot;PUT&quot;</span>,
+            Delete =&gt; <span class="string">&quot;DELETE&quot;</span>,
+            Head =&gt; <span class="string">&quot;HEAD&quot;</span>,
+            Trace =&gt; <span class="string">&quot;TRACE&quot;</span>,
+            Connect =&gt; <span class="string">&quot;CONNECT&quot;</span>,
+            Patch =&gt; <span class="string">&quot;PATCH&quot;</span>,
+            ExtensionInline(<span class="kw-2">ref </span>inline) =&gt; inline.as_str(),
+            ExtensionAllocated(<span class="kw-2">ref </span>allocated) =&gt; allocated.as_str(),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Method</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">as_str</span>()
+<span class="kw">impl </span>AsRef&lt;str&gt; <span class="kw">for </span>Method {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.as_str()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Method</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Method</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="op">&amp;&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Method</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">other</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; PartialEq&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Method&gt; <span class="kw">for </span>Method {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: &amp;&amp;<span class="lifetime">&#39;a </span>Method) -&gt; bool {
+        <span class="self">self </span>== <span class="kw-2">*</span>other
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">Method</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Method</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Method</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">==</span> <span class="ident">other</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; PartialEq&lt;Method&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Method {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Method) -&gt; bool {
+        <span class="kw-2">*</span><span class="self">self </span>== other
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Method</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">as_ref</span>() <span class="op">==</span> <span class="ident">other</span>
+<span class="kw">impl </span>PartialEq&lt;str&gt; <span class="kw">for </span>Method {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        <span class="self">self</span>.as_ref() == other
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">Method</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">str</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Method</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">as_ref</span>()
+<span class="kw">impl </span>PartialEq&lt;Method&gt; <span class="kw">for </span>str {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Method) -&gt; bool {
+        <span class="self">self </span>== other.as_ref()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Method</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="op">&amp;&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">as_ref</span>() <span class="op">==</span> <span class="kw-2">*</span><span class="ident">other</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; PartialEq&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; <span class="kw">for </span>Method {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: &amp;&amp;<span class="lifetime">&#39;a </span>str) -&gt; bool {
+        <span class="self">self</span>.as_ref() == <span class="kw-2">*</span>other
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">Method</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Method</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">as_ref</span>()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; PartialEq&lt;Method&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Method) -&gt; bool {
+        <span class="kw-2">*</span><span class="self">self </span>== other.as_ref()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Method</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="self">self</span>.<span class="ident">as_ref</span>())
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Method {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.write_str(<span class="self">self</span>.as_ref())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Method</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="self">self</span>.<span class="ident">as_ref</span>())
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Method {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        fmt.write_str(<span class="self">self</span>.as_ref())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Method</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">Method</span> {
-        <span class="ident">Method::GET</span>
+<span class="kw">impl </span>Default <span class="kw">for </span>Method {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>default() -&gt; Method {
+        Method::GET
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Method</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Method</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">t</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Method</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">t</span>.<span class="ident">clone</span>()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Method&gt; <span class="kw">for </span>Method {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from(t: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Method) -&gt; <span class="self">Self </span>{
+        t.clone()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Method</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">InvalidMethod</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TryFrom&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]&gt; <span class="kw">for </span>Method {
+    <span class="kw">type </span>Error = InvalidMethod;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">t</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="ident">Method::from_bytes</span>(<span class="ident">t</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>try_from(t: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        Method::from_bytes(t)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Method</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">InvalidMethod</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TryFrom&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; <span class="kw">for </span>Method {
+    <span class="kw">type </span>Error = InvalidMethod;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">t</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="ident">TryFrom::try_from</span>(<span class="ident">t</span>.<span class="ident">as_bytes</span>())
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>try_from(t: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        TryFrom::try_from(t.as_bytes())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">Method</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">InvalidMethod</span>;
+<span class="kw">impl </span>FromStr <span class="kw">for </span>Method {
+    <span class="kw">type </span><span class="prelude-val">Err </span>= InvalidMethod;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">t</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
-        <span class="ident">TryFrom::try_from</span>(<span class="ident">t</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from_str(t: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
+        TryFrom::try_from(t)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">InvalidMethod</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">InvalidMethod</span> {
-        <span class="ident">InvalidMethod</span> { <span class="ident">_priv</span>: () }
+<span class="kw">impl </span>InvalidMethod {
+    <span class="kw">fn </span>new() -&gt; InvalidMethod {
+        InvalidMethod { _priv: () }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">InvalidMethod</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;InvalidMethod&quot;</span>)
-            <span class="comment">// skip _priv noise</span>
-            .<span class="ident">finish</span>()
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>InvalidMethod {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;InvalidMethod&quot;</span>)
+            <span class="comment">// skip _priv noise
+            </span>.finish()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">InvalidMethod</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;invalid HTTP method&quot;</span>)
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>InvalidMethod {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.write_str(<span class="string">&quot;invalid HTTP method&quot;</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Error</span> <span class="kw">for</span> <span class="ident">InvalidMethod</span> {}
+<span class="kw">impl </span>Error <span class="kw">for </span>InvalidMethod {}
 
-<span class="kw">mod</span> <span class="ident">extension</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::InvalidMethod</span>;
-    <span class="kw">use</span> <span class="ident">std::str</span>;
+<span class="kw">mod </span>extension {
+    <span class="kw">use </span><span class="kw">super</span>::InvalidMethod;
+    <span class="kw">use </span>std::str;
 
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-    <span class="comment">// Invariant: the first self.1 bytes of self.0 are valid UTF-8.</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InlineExtension</span>([<span class="ident">u8</span>; <span class="ident">InlineExtension::MAX</span>], <span class="ident">u8</span>);
+    <span class="attribute">#[derive(Clone, PartialEq, Eq, Hash)]
+    </span><span class="comment">// Invariant: the first self.1 bytes of self.0 are valid UTF-8.
+    </span><span class="kw">pub struct </span>InlineExtension([u8; InlineExtension::MAX], u8);
 
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-    <span class="comment">// Invariant: self.0 contains valid UTF-8.</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AllocatedExtension</span>(<span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>);
+    <span class="attribute">#[derive(Clone, PartialEq, Eq, Hash)]
+    </span><span class="comment">// Invariant: self.0 contains valid UTF-8.
+    </span><span class="kw">pub struct </span>AllocatedExtension(Box&lt;[u8]&gt;);
 
-    <span class="kw">impl</span> <span class="ident">InlineExtension</span> {
-        <span class="comment">// Method::from_bytes() assumes this is at least 7</span>
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">15</span>;
+    <span class="kw">impl </span>InlineExtension {
+        <span class="comment">// Method::from_bytes() assumes this is at least 7
+        </span><span class="kw">pub const </span>MAX: usize = <span class="number">15</span>;
 
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">InlineExtension</span>, <span class="ident">InvalidMethod</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span>: [<span class="ident">u8</span>; <span class="ident">InlineExtension::MAX</span>] <span class="op">=</span> <span class="ident">Default::default</span>();
+        <span class="kw">pub fn </span>new(src: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;InlineExtension, InvalidMethod&gt; {
+            <span class="kw">let </span><span class="kw-2">mut </span>data: [u8; InlineExtension::MAX] = Default::default();
 
-            <span class="ident">write_checked</span>(<span class="ident">src</span>, <span class="kw-2">&amp;mut</span> <span class="ident">data</span>)<span class="question-mark">?</span>;
+            write_checked(src, <span class="kw-2">&amp;mut </span>data)<span class="question-mark">?</span>;
 
-            <span class="comment">// Invariant: write_checked ensures that the first src.len() bytes</span>
-            <span class="comment">// of data are valid UTF-8.</span>
-            <span class="prelude-val">Ok</span>(<span class="ident">InlineExtension</span>(<span class="ident">data</span>, <span class="ident">src</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u8</span>))
+            <span class="comment">// Invariant: write_checked ensures that the first src.len() bytes
+            // of data are valid UTF-8.
+            </span><span class="prelude-val">Ok</span>(InlineExtension(data, src.len() <span class="kw">as </span>u8))
         }
 
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-            <span class="kw">let</span> <span class="ident">InlineExtension</span>(<span class="kw-2">ref</span> <span class="ident">data</span>, <span class="ident">len</span>) <span class="op">=</span> <span class="self">self</span>;
-            <span class="comment">// Safety: the invariant of InlineExtension ensures that the first</span>
-            <span class="comment">// len bytes of data contain valid UTF-8.</span>
-            <span class="kw">unsafe</span> {<span class="ident">str::from_utf8_unchecked</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>[..<span class="kw-2">*</span><span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>])}
-        }
-    }
-
-    <span class="kw">impl</span> <span class="ident">AllocatedExtension</span> {
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AllocatedExtension</span>, <span class="ident">InvalidMethod</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">src</span>.<span class="ident">len</span>()];
-
-            <span class="ident">write_checked</span>(<span class="ident">src</span>, <span class="kw-2">&amp;mut</span> <span class="ident">data</span>)<span class="question-mark">?</span>;
-
-            <span class="comment">// Invariant: data is exactly src.len() long and write_checked</span>
-            <span class="comment">// ensures that the first src.len() bytes of data are valid UTF-8.</span>
-            <span class="prelude-val">Ok</span>(<span class="ident">AllocatedExtension</span>(<span class="ident">data</span>.<span class="ident">into_boxed_slice</span>()))
-        }
-
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-            <span class="comment">// Safety: the invariant of AllocatedExtension ensures that self.0</span>
-            <span class="comment">// contains valid UTF-8.</span>
-            <span class="kw">unsafe</span> {<span class="ident">str::from_utf8_unchecked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>)}
+        <span class="kw">pub fn </span>as_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+            <span class="kw">let </span>InlineExtension(<span class="kw-2">ref </span>data, len) = <span class="self">self</span>;
+            <span class="comment">// Safety: the invariant of InlineExtension ensures that the first
+            // len bytes of data contain valid UTF-8.
+            </span><span class="kw">unsafe </span>{str::from_utf8_unchecked(<span class="kw-2">&amp;</span>data[..<span class="kw-2">*</span>len <span class="kw">as </span>usize])}
         }
     }
 
-    <span class="comment">// From the HTTP spec section 5.1.1, the HTTP method is case-sensitive and can</span>
-    <span class="comment">// contain the following characters:</span>
-    <span class="comment">//</span>
-    <span class="comment">// ```</span>
-    <span class="comment">// method = token</span>
-    <span class="comment">// token = 1*tchar</span>
-    <span class="comment">// tchar = &quot;!&quot; / &quot;#&quot; / &quot;$&quot; / &quot;%&quot; / &quot;&amp;&quot; / &quot;&#39;&quot; / &quot;*&quot; / &quot;+&quot; / &quot;-&quot; / &quot;.&quot; /</span>
-    <span class="comment">//     &quot;^&quot; / &quot;_&quot; / &quot;`&quot; / &quot;|&quot; / &quot;~&quot; / DIGIT / ALPHA</span>
-    <span class="comment">// ```</span>
-    <span class="comment">//</span>
-    <span class="comment">// https://www.w3.org/Protocols/HTTP/1.1/draft-ietf-http-v11-spec-01#Method</span>
-    <span class="comment">//</span>
-    <span class="comment">// Note that this definition means that any &amp;[u8] that consists solely of valid</span>
-    <span class="comment">// characters is also valid UTF-8 because the valid method characters are a</span>
-    <span class="comment">// subset of the valid 1 byte UTF-8 encoding.</span>
-    <span class="kw">const</span> <span class="ident">METHOD_CHARS</span>: [<span class="ident">u8</span>; <span class="number">256</span>] <span class="op">=</span> [
-        <span class="comment">//  0      1      2      3      4      5      6      7      8      9</span>
-        <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="comment">//   x</span>
-        <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="comment">//  1x</span>
-        <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="comment">//  2x</span>
-        <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>,  <span class="string">b&#39;!&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="comment">//  3x</span>
-        <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>,  <span class="string">b&#39;*&#39;</span>,  <span class="string">b&#39;+&#39;</span>, <span class="string">b&#39;\0&#39;</span>,  <span class="string">b&#39;-&#39;</span>,  <span class="string">b&#39;.&#39;</span>, <span class="string">b&#39;\0&#39;</span>,  <span class="string">b&#39;0&#39;</span>,  <span class="string">b&#39;1&#39;</span>, <span class="comment">//  4x</span>
-         <span class="string">b&#39;2&#39;</span>,  <span class="string">b&#39;3&#39;</span>,  <span class="string">b&#39;4&#39;</span>,  <span class="string">b&#39;5&#39;</span>,  <span class="string">b&#39;6&#39;</span>,  <span class="string">b&#39;7&#39;</span>,  <span class="string">b&#39;8&#39;</span>,  <span class="string">b&#39;9&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="comment">//  5x</span>
-        <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>,  <span class="string">b&#39;A&#39;</span>,  <span class="string">b&#39;B&#39;</span>,  <span class="string">b&#39;C&#39;</span>,  <span class="string">b&#39;D&#39;</span>,  <span class="string">b&#39;E&#39;</span>, <span class="comment">//  6x</span>
-         <span class="string">b&#39;F&#39;</span>,  <span class="string">b&#39;G&#39;</span>,  <span class="string">b&#39;H&#39;</span>,  <span class="string">b&#39;I&#39;</span>,  <span class="string">b&#39;J&#39;</span>,  <span class="string">b&#39;K&#39;</span>,  <span class="string">b&#39;L&#39;</span>,  <span class="string">b&#39;M&#39;</span>,  <span class="string">b&#39;N&#39;</span>,  <span class="string">b&#39;O&#39;</span>, <span class="comment">//  7x</span>
-         <span class="string">b&#39;P&#39;</span>,  <span class="string">b&#39;Q&#39;</span>,  <span class="string">b&#39;R&#39;</span>,  <span class="string">b&#39;S&#39;</span>,  <span class="string">b&#39;T&#39;</span>,  <span class="string">b&#39;U&#39;</span>,  <span class="string">b&#39;V&#39;</span>,  <span class="string">b&#39;W&#39;</span>,  <span class="string">b&#39;X&#39;</span>,  <span class="string">b&#39;Y&#39;</span>, <span class="comment">//  8x</span>
-         <span class="string">b&#39;Z&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>,  <span class="string">b&#39;^&#39;</span>,  <span class="string">b&#39;_&#39;</span>,  <span class="string">b&#39;`&#39;</span>,  <span class="string">b&#39;a&#39;</span>,  <span class="string">b&#39;b&#39;</span>,  <span class="string">b&#39;c&#39;</span>, <span class="comment">//  9x</span>
-         <span class="string">b&#39;d&#39;</span>,  <span class="string">b&#39;e&#39;</span>,  <span class="string">b&#39;f&#39;</span>,  <span class="string">b&#39;g&#39;</span>,  <span class="string">b&#39;h&#39;</span>,  <span class="string">b&#39;i&#39;</span>,  <span class="string">b&#39;j&#39;</span>,  <span class="string">b&#39;k&#39;</span>,  <span class="string">b&#39;l&#39;</span>,  <span class="string">b&#39;m&#39;</span>, <span class="comment">// 10x</span>
-         <span class="string">b&#39;n&#39;</span>,  <span class="string">b&#39;o&#39;</span>,  <span class="string">b&#39;p&#39;</span>,  <span class="string">b&#39;q&#39;</span>,  <span class="string">b&#39;r&#39;</span>,  <span class="string">b&#39;s&#39;</span>,  <span class="string">b&#39;t&#39;</span>,  <span class="string">b&#39;u&#39;</span>,  <span class="string">b&#39;v&#39;</span>,  <span class="string">b&#39;w&#39;</span>, <span class="comment">// 11x</span>
-         <span class="string">b&#39;x&#39;</span>,  <span class="string">b&#39;y&#39;</span>,  <span class="string">b&#39;z&#39;</span>, <span class="string">b&#39;\0&#39;</span>,  <span class="string">b&#39;|&#39;</span>, <span class="string">b&#39;\0&#39;</span>,  <span class="string">b&#39;~&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="comment">// 12x</span>
-        <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="comment">// 13x</span>
-        <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="comment">// 14x</span>
-        <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="comment">// 15x</span>
-        <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="comment">// 16x</span>
-        <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="comment">// 17x</span>
-        <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="comment">// 18x</span>
-        <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="comment">// 19x</span>
-        <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="comment">// 20x</span>
-        <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="comment">// 21x</span>
-        <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="comment">// 22x</span>
-        <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="comment">// 23x</span>
-        <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="comment">// 24x</span>
-        <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>                              <span class="comment">// 25x</span>
-    ];
+    <span class="kw">impl </span>AllocatedExtension {
+        <span class="kw">pub fn </span>new(src: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;AllocatedExtension, InvalidMethod&gt; {
+            <span class="kw">let </span><span class="kw-2">mut </span>data: Vec&lt;u8&gt; = <span class="macro">vec!</span>[<span class="number">0</span>; src.len()];
 
-    <span class="comment">// write_checked ensures (among other things) that the first src.len() bytes</span>
-    <span class="comment">// of dst are valid UTF-8</span>
-    <span class="kw">fn</span> <span class="ident">write_checked</span>(<span class="ident">src</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">InvalidMethod</span><span class="op">&gt;</span> {
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="kw-2">&amp;</span><span class="ident">b</span>) <span class="kw">in</span> <span class="ident">src</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">METHOD_CHARS</span>[<span class="ident">b</span> <span class="kw">as</span> <span class="ident">usize</span>];
+            write_checked(src, <span class="kw-2">&amp;mut </span>data)<span class="question-mark">?</span>;
 
-            <span class="kw">if</span> <span class="ident">b</span> <span class="op">==</span> <span class="number">0</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">InvalidMethod::new</span>());
+            <span class="comment">// Invariant: data is exactly src.len() long and write_checked
+            // ensures that the first src.len() bytes of data are valid UTF-8.
+            </span><span class="prelude-val">Ok</span>(AllocatedExtension(data.into_boxed_slice()))
+        }
+
+        <span class="kw">pub fn </span>as_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+            <span class="comment">// Safety: the invariant of AllocatedExtension ensures that self.0
+            // contains valid UTF-8.
+            </span><span class="kw">unsafe </span>{str::from_utf8_unchecked(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>)}
+        }
+    }
+
+    <span class="comment">// From the HTTP spec section 5.1.1, the HTTP method is case-sensitive and can
+    // contain the following characters:
+    //
+    // ```
+    // method = token
+    // token = 1*tchar
+    // tchar = &quot;!&quot; / &quot;#&quot; / &quot;$&quot; / &quot;%&quot; / &quot;&amp;&quot; / &quot;&#39;&quot; / &quot;*&quot; / &quot;+&quot; / &quot;-&quot; / &quot;.&quot; /
+    //     &quot;^&quot; / &quot;_&quot; / &quot;`&quot; / &quot;|&quot; / &quot;~&quot; / DIGIT / ALPHA
+    // ```
+    //
+    // https://www.w3.org/Protocols/HTTP/1.1/draft-ietf-http-v11-spec-01#Method
+    //
+    // Note that this definition means that any &amp;[u8] that consists solely of valid
+    // characters is also valid UTF-8 because the valid method characters are a
+    // subset of the valid 1 byte UTF-8 encoding.
+    </span><span class="kw">const </span>METHOD_CHARS: [u8; <span class="number">256</span>] = [
+        <span class="comment">//  0      1      2      3      4      5      6      7      8      9
+        </span><span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="comment">//   x
+        </span><span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="comment">//  1x
+        </span><span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="comment">//  2x
+        </span><span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>,  <span class="string">b&#39;!&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="comment">//  3x
+        </span><span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>,  <span class="string">b&#39;*&#39;</span>,  <span class="string">b&#39;+&#39;</span>, <span class="string">b&#39;\0&#39;</span>,  <span class="string">b&#39;-&#39;</span>,  <span class="string">b&#39;.&#39;</span>, <span class="string">b&#39;\0&#39;</span>,  <span class="string">b&#39;0&#39;</span>,  <span class="string">b&#39;1&#39;</span>, <span class="comment">//  4x
+         </span><span class="string">b&#39;2&#39;</span>,  <span class="string">b&#39;3&#39;</span>,  <span class="string">b&#39;4&#39;</span>,  <span class="string">b&#39;5&#39;</span>,  <span class="string">b&#39;6&#39;</span>,  <span class="string">b&#39;7&#39;</span>,  <span class="string">b&#39;8&#39;</span>,  <span class="string">b&#39;9&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="comment">//  5x
+        </span><span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>,  <span class="string">b&#39;A&#39;</span>,  <span class="string">b&#39;B&#39;</span>,  <span class="string">b&#39;C&#39;</span>,  <span class="string">b&#39;D&#39;</span>,  <span class="string">b&#39;E&#39;</span>, <span class="comment">//  6x
+         </span><span class="string">b&#39;F&#39;</span>,  <span class="string">b&#39;G&#39;</span>,  <span class="string">b&#39;H&#39;</span>,  <span class="string">b&#39;I&#39;</span>,  <span class="string">b&#39;J&#39;</span>,  <span class="string">b&#39;K&#39;</span>,  <span class="string">b&#39;L&#39;</span>,  <span class="string">b&#39;M&#39;</span>,  <span class="string">b&#39;N&#39;</span>,  <span class="string">b&#39;O&#39;</span>, <span class="comment">//  7x
+         </span><span class="string">b&#39;P&#39;</span>,  <span class="string">b&#39;Q&#39;</span>,  <span class="string">b&#39;R&#39;</span>,  <span class="string">b&#39;S&#39;</span>,  <span class="string">b&#39;T&#39;</span>,  <span class="string">b&#39;U&#39;</span>,  <span class="string">b&#39;V&#39;</span>,  <span class="string">b&#39;W&#39;</span>,  <span class="string">b&#39;X&#39;</span>,  <span class="string">b&#39;Y&#39;</span>, <span class="comment">//  8x
+         </span><span class="string">b&#39;Z&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>,  <span class="string">b&#39;^&#39;</span>,  <span class="string">b&#39;_&#39;</span>,  <span class="string">b&#39;`&#39;</span>,  <span class="string">b&#39;a&#39;</span>,  <span class="string">b&#39;b&#39;</span>,  <span class="string">b&#39;c&#39;</span>, <span class="comment">//  9x
+         </span><span class="string">b&#39;d&#39;</span>,  <span class="string">b&#39;e&#39;</span>,  <span class="string">b&#39;f&#39;</span>,  <span class="string">b&#39;g&#39;</span>,  <span class="string">b&#39;h&#39;</span>,  <span class="string">b&#39;i&#39;</span>,  <span class="string">b&#39;j&#39;</span>,  <span class="string">b&#39;k&#39;</span>,  <span class="string">b&#39;l&#39;</span>,  <span class="string">b&#39;m&#39;</span>, <span class="comment">// 10x
+         </span><span class="string">b&#39;n&#39;</span>,  <span class="string">b&#39;o&#39;</span>,  <span class="string">b&#39;p&#39;</span>,  <span class="string">b&#39;q&#39;</span>,  <span class="string">b&#39;r&#39;</span>,  <span class="string">b&#39;s&#39;</span>,  <span class="string">b&#39;t&#39;</span>,  <span class="string">b&#39;u&#39;</span>,  <span class="string">b&#39;v&#39;</span>,  <span class="string">b&#39;w&#39;</span>, <span class="comment">// 11x
+         </span><span class="string">b&#39;x&#39;</span>,  <span class="string">b&#39;y&#39;</span>,  <span class="string">b&#39;z&#39;</span>, <span class="string">b&#39;\0&#39;</span>,  <span class="string">b&#39;|&#39;</span>, <span class="string">b&#39;\0&#39;</span>,  <span class="string">b&#39;~&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="comment">// 12x
+        </span><span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="comment">// 13x
+        </span><span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="comment">// 14x
+        </span><span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="comment">// 15x
+        </span><span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="comment">// 16x
+        </span><span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="comment">// 17x
+        </span><span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="comment">// 18x
+        </span><span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="comment">// 19x
+        </span><span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="comment">// 20x
+        </span><span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="comment">// 21x
+        </span><span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="comment">// 22x
+        </span><span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="comment">// 23x
+        </span><span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="comment">// 24x
+        </span><span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;</span>, <span class="string">b&#39;\0&#39;                              </span><span class="comment">// 25x
+    </span>];
+
+    <span class="comment">// write_checked ensures (among other things) that the first src.len() bytes
+    // of dst are valid UTF-8
+    </span><span class="kw">fn </span>write_checked(src: <span class="kw-2">&amp;</span>[u8], dst: <span class="kw-2">&amp;mut </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;(), InvalidMethod&gt; {
+        <span class="kw">for </span>(i, <span class="kw-2">&amp;</span>b) <span class="kw">in </span>src.iter().enumerate() {
+            <span class="kw">let </span>b = METHOD_CHARS[b <span class="kw">as </span>usize];
+
+            <span class="kw">if </span>b == <span class="number">0 </span>{
+                <span class="kw">return </span><span class="prelude-val">Err</span>(InvalidMethod::new());
             }
 
-            <span class="ident">dst</span>[<span class="ident">i</span>] <span class="op">=</span> <span class="ident">b</span>;
+            dst[i] = b;
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_method_eq</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">Method::GET</span>, <span class="ident">Method::GET</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Method::GET</span>, <span class="string">&quot;GET&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">Method::GET</span>, <span class="string">&quot;GET&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_method_eq() {
+        <span class="macro">assert_eq!</span>(Method::GET, Method::GET);
+        <span class="macro">assert_eq!</span>(Method::GET, <span class="string">&quot;GET&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>Method::GET, <span class="string">&quot;GET&quot;</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;GET&quot;</span>, <span class="ident">Method::GET</span>);
-        <span class="macro">assert_eq!</span>(<span class="string">&quot;GET&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">Method::GET</span>);
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;GET&quot;</span>, Method::GET);
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;GET&quot;</span>, <span class="kw-2">&amp;</span>Method::GET);
 
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">Method::GET</span>, <span class="ident">Method::GET</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Method::GET</span>, <span class="kw-2">&amp;</span><span class="ident">Method::GET</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>Method::GET, Method::GET);
+        <span class="macro">assert_eq!</span>(Method::GET, <span class="kw-2">&amp;</span>Method::GET);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_invalid_method</span>() {
-        <span class="macro">assert!</span>(<span class="ident">Method::from_str</span>(<span class="string">&quot;&quot;</span>).<span class="ident">is_err</span>());
-        <span class="macro">assert!</span>(<span class="ident">Method::from_bytes</span>(<span class="string">b&quot;&quot;</span>).<span class="ident">is_err</span>());
-        <span class="macro">assert!</span>(<span class="ident">Method::from_bytes</span>(<span class="kw-2">&amp;</span>[<span class="number">0xC0</span>]).<span class="ident">is_err</span>()); <span class="comment">// invalid utf-8</span>
-        <span class="macro">assert!</span>(<span class="ident">Method::from_bytes</span>(<span class="kw-2">&amp;</span>[<span class="number">0x10</span>]).<span class="ident">is_err</span>()); <span class="comment">// invalid method characters</span>
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_invalid_method() {
+        <span class="macro">assert!</span>(Method::from_str(<span class="string">&quot;&quot;</span>).is_err());
+        <span class="macro">assert!</span>(Method::from_bytes(<span class="string">b&quot;&quot;</span>).is_err());
+        <span class="macro">assert!</span>(Method::from_bytes(<span class="kw-2">&amp;</span>[<span class="number">0xC0</span>]).is_err()); <span class="comment">// invalid utf-8
+        </span><span class="macro">assert!</span>(Method::from_bytes(<span class="kw-2">&amp;</span>[<span class="number">0x10</span>]).is_err()); <span class="comment">// invalid method characters
+    </span>}
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_is_idempotent() {
+        <span class="macro">assert!</span>(Method::OPTIONS.is_idempotent());
+        <span class="macro">assert!</span>(Method::GET.is_idempotent());
+        <span class="macro">assert!</span>(Method::PUT.is_idempotent());
+        <span class="macro">assert!</span>(Method::DELETE.is_idempotent());
+        <span class="macro">assert!</span>(Method::HEAD.is_idempotent());
+        <span class="macro">assert!</span>(Method::TRACE.is_idempotent());
+
+        <span class="macro">assert!</span>(!Method::POST.is_idempotent());
+        <span class="macro">assert!</span>(!Method::CONNECT.is_idempotent());
+        <span class="macro">assert!</span>(!Method::PATCH.is_idempotent());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_is_idempotent</span>() {
-        <span class="macro">assert!</span>(<span class="ident">Method::OPTIONS</span>.<span class="ident">is_idempotent</span>());
-        <span class="macro">assert!</span>(<span class="ident">Method::GET</span>.<span class="ident">is_idempotent</span>());
-        <span class="macro">assert!</span>(<span class="ident">Method::PUT</span>.<span class="ident">is_idempotent</span>());
-        <span class="macro">assert!</span>(<span class="ident">Method::DELETE</span>.<span class="ident">is_idempotent</span>());
-        <span class="macro">assert!</span>(<span class="ident">Method::HEAD</span>.<span class="ident">is_idempotent</span>());
-        <span class="macro">assert!</span>(<span class="ident">Method::TRACE</span>.<span class="ident">is_idempotent</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_extention_method() {
+        <span class="macro">assert_eq!</span>(Method::from_str(<span class="string">&quot;WOW&quot;</span>).unwrap(), <span class="string">&quot;WOW&quot;</span>);
+        <span class="macro">assert_eq!</span>(Method::from_str(<span class="string">&quot;wOw!!&quot;</span>).unwrap(), <span class="string">&quot;wOw!!&quot;</span>);
 
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">Method::POST</span>.<span class="ident">is_idempotent</span>());
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">Method::CONNECT</span>.<span class="ident">is_idempotent</span>());
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">Method::PATCH</span>.<span class="ident">is_idempotent</span>());
-    }
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_extention_method</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">Method::from_str</span>(<span class="string">&quot;WOW&quot;</span>).<span class="ident">unwrap</span>(), <span class="string">&quot;WOW&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Method::from_str</span>(<span class="string">&quot;wOw!!&quot;</span>).<span class="ident">unwrap</span>(), <span class="string">&quot;wOw!!&quot;</span>);
-
-        <span class="kw">let</span> <span class="ident">long_method</span> <span class="op">=</span> <span class="string">&quot;This_is_a_very_long_method.It_is_valid_but_unlikely.&quot;</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">Method::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">long_method</span>).<span class="ident">unwrap</span>(), <span class="ident">long_method</span>);
+        <span class="kw">let </span>long_method = <span class="string">&quot;This_is_a_very_long_method.It_is_valid_but_unlikely.&quot;</span>;
+        <span class="macro">assert_eq!</span>(Method::from_str(<span class="kw-2">&amp;</span>long_method).unwrap(), long_method);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="http" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="http" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

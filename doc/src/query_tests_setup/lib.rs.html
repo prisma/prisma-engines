@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connector-test-kit-rs/query-tests-setup/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../query_tests_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../query_tests_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../query_tests_setup/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connector-test-kit-rs/query-tests-setup/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../query_tests_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../query_tests_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../query_tests_setup/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -310,317 +310,317 @@
 <span id="310">310</span>
 <span id="311">311</span>
 <span id="312">312</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::derive_partial_eq_without_eq</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(clippy::derive_partial_eq_without_eq)]
 
-<span class="kw">mod</span> <span class="ident">config</span>;
-<span class="kw">mod</span> <span class="ident">connector_tag</span>;
-<span class="kw">mod</span> <span class="ident">datamodel_rendering</span>;
-<span class="kw">mod</span> <span class="ident">error</span>;
-<span class="kw">mod</span> <span class="ident">logging</span>;
-<span class="kw">mod</span> <span class="ident">query_result</span>;
-<span class="kw">mod</span> <span class="ident">runner</span>;
-<span class="kw">mod</span> <span class="ident">schema_gen</span>;
-<span class="kw">mod</span> <span class="ident">templating</span>;
+</span><span class="kw">mod </span>config;
+<span class="kw">mod </span>connector_tag;
+<span class="kw">mod </span>datamodel_rendering;
+<span class="kw">mod </span>error;
+<span class="kw">mod </span>logging;
+<span class="kw">mod </span>query_result;
+<span class="kw">mod </span>runner;
+<span class="kw">mod </span>schema_gen;
+<span class="kw">mod </span>templating;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">config</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">connector_tag</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">datamodel_rendering</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">error</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">logging</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">query_core</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">query_result</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">runner</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">schema_gen</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">templating</span>::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>config::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>connector_tag::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>datamodel_rendering::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>error::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>logging::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>query_core;
+<span class="kw">pub use </span>query_result::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>runner::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>schema_gen::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>templating::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident">colored::Colorize</span>;
-<span class="kw">use</span> <span class="ident">lazy_static::lazy_static</span>;
-<span class="kw">use</span> <span class="ident">psl::datamodel_connector::ConnectorCapability</span>;
-<span class="kw">use</span> <span class="ident">query_engine_metrics::MetricRegistry</span>;
-<span class="kw">use</span> <span class="ident">std::future::Future</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Once</span>;
-<span class="kw">use</span> <span class="ident">tokio::runtime::Builder</span>;
-<span class="kw">use</span> <span class="ident">tokio::sync::mpsc</span>::{<span class="ident">unbounded_channel</span>, <span class="ident">UnboundedReceiver</span>, <span class="ident">UnboundedSender</span>};
-<span class="kw">use</span> <span class="ident">tracing_futures::WithSubscriber</span>;
+<span class="kw">use </span>colored::Colorize;
+<span class="kw">use </span>lazy_static::lazy_static;
+<span class="kw">use </span>psl::datamodel_connector::ConnectorCapability;
+<span class="kw">use </span>query_engine_metrics::MetricRegistry;
+<span class="kw">use </span>std::future::Future;
+<span class="kw">use </span>std::sync::Once;
+<span class="kw">use </span>tokio::runtime::Builder;
+<span class="kw">use </span>tokio::sync::mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender};
+<span class="kw">use </span>tracing_futures::WithSubscriber;
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">TestResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">TestError</span><span class="op">&gt;</span>;
+<span class="kw">pub type </span>TestResult&lt;T&gt; = <span class="prelude-ty">Result</span>&lt;T, TestError&gt;;
 
-<span class="macro">lazy_static!</span> {
-    <span class="doccomment">/// Test configuration, loaded once at runtime.</span>
-    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">CONFIG</span>: <span class="ident">TestConfig</span> <span class="op">=</span> <span class="ident">TestConfig::load</span>().<span class="ident">unwrap</span>();
+<span class="macro">lazy_static! </span>{
+    <span class="doccomment">/// Test configuration, loaded once at runtime.
+    </span><span class="kw">pub static </span><span class="kw-2">ref </span>CONFIG: TestConfig = TestConfig::load().unwrap();
 
-    <span class="doccomment">/// The log level from the environment.</span>
-    <span class="kw">pub</span> <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">ENV_LOG_LEVEL</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">std::env::var</span>(<span class="string">&quot;LOG_LEVEL&quot;</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="string">&quot;info&quot;</span>.<span class="ident">to_owned</span>());
+    <span class="doccomment">/// The log level from the environment.
+    </span><span class="kw">pub static </span><span class="kw-2">ref </span>ENV_LOG_LEVEL: String = std::env::var(<span class="string">&quot;LOG_LEVEL&quot;</span>).unwrap_or_else(|<span class="kw">_</span>| <span class="string">&quot;info&quot;</span>.to_owned());
 }
 
-<span class="doccomment">/// Setup of everything as defined in the passed datamodel.</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">setup_project</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">db_schemas</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>]) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="prelude-val">Ok</span>(<span class="ident">qe_setup::setup</span>(<span class="ident">datamodel</span>, <span class="ident">db_schemas</span>).<span class="kw">await</span><span class="question-mark">?</span>)
+<span class="doccomment">/// Setup of everything as defined in the passed datamodel.
+</span><span class="kw">pub async fn </span>setup_project(datamodel: <span class="kw-2">&amp;</span>str, db_schemas: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str]) -&gt; TestResult&lt;()&gt; {
+    <span class="prelude-val">Ok</span>(qe_setup::setup(datamodel, db_schemas).<span class="kw">await</span><span class="question-mark">?</span>)
 }
 
-<span class="doccomment">/// Teardown of a test setup.</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">teardown_project</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">db_schemas</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>]) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="prelude-val">Ok</span>(<span class="ident">qe_setup::teardown</span>(<span class="ident">datamodel</span>, <span class="ident">db_schemas</span>).<span class="kw">await</span><span class="question-mark">?</span>)
+<span class="doccomment">/// Teardown of a test setup.
+</span><span class="kw">pub async fn </span>teardown_project(datamodel: <span class="kw-2">&amp;</span>str, db_schemas: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str]) -&gt; TestResult&lt;()&gt; {
+    <span class="prelude-val">Ok</span>(qe_setup::teardown(datamodel, db_schemas).<span class="kw">await</span><span class="question-mark">?</span>)
 }
 
-<span class="doccomment">/// Helper method to allow a sync shell function to run the async test blocks.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run_with_tokio</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">F</span>: <span class="ident">std::future::Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">O</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">fut</span>: <span class="ident">F</span>) -&gt; <span class="ident">O</span> {
-    <span class="ident">Builder::new_current_thread</span>()
-        .<span class="ident">enable_all</span>()
-        .<span class="ident">build</span>()
-        .<span class="ident">unwrap</span>()
-        .<span class="ident">block_on</span>(<span class="ident">fut</span>)
+<span class="doccomment">/// Helper method to allow a sync shell function to run the async test blocks.
+</span><span class="kw">pub fn </span>run_with_tokio&lt;O, F: std::future::Future&lt;Output = O&gt;&gt;(fut: F) -&gt; O {
+    Builder::new_current_thread()
+        .enable_all()
+        .build()
+        .unwrap()
+        .block_on(fut)
 }
 
-<span class="kw">static</span> <span class="ident">METRIC_RECORDER</span>: <span class="ident">Once</span> <span class="op">=</span> <span class="ident">Once::new</span>();
+<span class="kw">static </span>METRIC_RECORDER: Once = Once::new();
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">setup_metrics</span>() -&gt; <span class="ident">MetricRegistry</span> {
-    <span class="kw">let</span> <span class="ident">metrics</span> <span class="op">=</span> <span class="ident">MetricRegistry::new</span>();
-    <span class="ident">METRIC_RECORDER</span>.<span class="ident">call_once</span>(<span class="op">|</span><span class="op">|</span> {
-        <span class="ident">query_engine_metrics::setup</span>();
+<span class="kw">pub fn </span>setup_metrics() -&gt; MetricRegistry {
+    <span class="kw">let </span>metrics = MetricRegistry::new();
+    METRIC_RECORDER.call_once(|| {
+        query_engine_metrics::setup();
     });
-    <span class="ident">metrics</span>
+    metrics
 }
 
-<span class="doccomment">/// Taken from Reddit. Enables taking an async function pointer which takes references as param</span>
-<span class="doccomment">/// https://www.reddit.com/r/rust/comments/jvqorj/hrtb_with_async_functions/</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AsyncFn</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span>: <span class="lifetime">&#39;a</span>, <span class="ident">B</span>: <span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>: <span class="ident">Copy</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> {
-    <span class="kw">type</span> <span class="ident">Fut</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>;
+<span class="doccomment">/// Taken from Reddit. Enables taking an async function pointer which takes references as param
+/// https://www.reddit.com/r/rust/comments/jvqorj/hrtb_with_async_functions/
+</span><span class="kw">pub trait </span>AsyncFn&lt;<span class="lifetime">&#39;a</span>, A: <span class="lifetime">&#39;a</span>, B: <span class="lifetime">&#39;a</span>, T&gt;: Copy + <span class="lifetime">&#39;static </span>{
+    <span class="kw">type </span>Fut: Future&lt;Output = T&gt; + <span class="lifetime">&#39;a</span>;
 
-    <span class="kw">fn</span> <span class="ident">call</span>(<span class="self">self</span>, <span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">A</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">B</span>) -&gt; <span class="ident"><span class="self">Self</span>::Fut</span>;
+    <span class="kw">fn </span>call(<span class="self">self</span>, a: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>A, b: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>B) -&gt; <span class="self">Self</span>::Fut;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span>: <span class="lifetime">&#39;a</span>, <span class="ident">B</span>: <span class="lifetime">&#39;a</span>, <span class="ident">Fut</span>: <span class="ident">Future</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>, <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">A</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">B</span>) -&gt; <span class="ident">Fut</span> <span class="op">+</span> <span class="ident">Copy</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="ident">AsyncFn</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">Fut::Output</span><span class="op">&gt;</span>
-    <span class="kw">for</span> <span class="ident">F</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, A: <span class="lifetime">&#39;a</span>, B: <span class="lifetime">&#39;a</span>, Fut: Future + <span class="lifetime">&#39;a</span>, F: Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>A, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>B) -&gt; Fut + Copy + <span class="lifetime">&#39;static</span>&gt; AsyncFn&lt;<span class="lifetime">&#39;a</span>, A, B, Fut::Output&gt;
+    <span class="kw">for </span>F
 {
-    <span class="kw">type</span> <span class="ident">Fut</span> <span class="op">=</span> <span class="ident">Fut</span>;
+    <span class="kw">type </span>Fut = Fut;
 
-    <span class="kw">fn</span> <span class="ident">call</span>(<span class="self">self</span>, <span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">A</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">B</span>) -&gt; <span class="ident"><span class="self">Self</span>::Fut</span> {
-        <span class="self">self</span>(<span class="ident">a</span>, <span class="ident">b</span>)
+    <span class="kw">fn </span>call(<span class="self">self</span>, a: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>A, b: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>B) -&gt; <span class="self">Self</span>::Fut {
+        <span class="self">self</span>(a, b)
     }
 }
 
-<span class="kw">type</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::pin::Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::future::Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">O</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="kw">type </span>BoxFuture&lt;<span class="lifetime">&#39;a</span>, O&gt; = std::pin::Pin&lt;Box&lt;<span class="kw">dyn </span>std::future::Future&lt;Output = O&gt; + <span class="lifetime">&#39;a</span>&gt;&gt;;
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::too_many_arguments</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run_relation_link_test</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
-    <span class="ident">enabled_connectors</span>: <span class="kw-2">&amp;</span>[<span class="ident">ConnectorTag</span>],
-    <span class="ident">capabilities</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorCapability</span><span class="op">&gt;</span>,
-    <span class="ident">required_capabilities</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>],
-    <span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">dm_with_params</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">test_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">test_database</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">test_fn</span>: <span class="ident">F</span>,
-) <span class="kw">where</span>
-    <span class="ident">F</span>: (<span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">AsyncFn</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Runner</span>, <span class="ident">DatamodelWithParams</span>, <span class="ident">TestResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="attribute">#[allow(clippy::too_many_arguments)]
+</span><span class="kw">pub fn </span>run_relation_link_test&lt;F&gt;(
+    enabled_connectors: <span class="kw-2">&amp;</span>[ConnectorTag],
+    capabilities: <span class="kw-2">&amp;mut </span>Vec&lt;ConnectorCapability&gt;,
+    required_capabilities: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str],
+    datamodel: <span class="kw-2">&amp;</span>str,
+    dm_with_params: <span class="kw-2">&amp;</span>str,
+    test_name: <span class="kw-2">&amp;</span>str,
+    test_database: <span class="kw-2">&amp;</span>str,
+    test_fn: F,
+) <span class="kw">where
+    </span>F: (<span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; AsyncFn&lt;<span class="lifetime">&#39;a</span>, Runner, DatamodelWithParams, TestResult&lt;()&gt;&gt;) + <span class="lifetime">&#39;static</span>,
 {
-    <span class="comment">// The implementation of the function is separated from this façade because of monomorphization</span>
-    <span class="comment">// cost. Only `boxify` is instantiated for each instance of run_relation_link_test, not the</span>
-    <span class="comment">// whole larger function body. This measurably improves compile times of query-engine-tests.</span>
-    <span class="doccomment">/// Helper for test return type erasure.</span>
-    <span class="kw">fn</span> <span class="ident">boxify</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="kw">impl</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Runner</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">DatamodelWithParams</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">TestResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: (<span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">AsyncFn</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Runner</span>, <span class="ident">DatamodelWithParams</span>, <span class="ident">TestResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="comment">// The implementation of the function is separated from this façade because of monomorphization
+    // cost. Only `boxify` is instantiated for each instance of run_relation_link_test, not the
+    // whole larger function body. This measurably improves compile times of query-engine-tests.
+    </span><span class="doccomment">/// Helper for test return type erasure.
+    </span><span class="kw">fn </span>boxify&lt;F&gt;(f: F) -&gt; <span class="kw">impl for</span>&lt;<span class="lifetime">&#39;a</span>&gt; Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Runner, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>DatamodelWithParams) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, TestResult&lt;()&gt;&gt;
+    <span class="kw">where
+        </span>F: (<span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; AsyncFn&lt;<span class="lifetime">&#39;a</span>, Runner, DatamodelWithParams, TestResult&lt;()&gt;&gt;) + <span class="lifetime">&#39;static</span>,
     {
-        <span class="kw">move</span> <span class="op">|</span><span class="ident">runner</span>, <span class="ident">datamodel</span><span class="op">|</span> <span class="ident">Box::pin</span>(<span class="kw">async</span> <span class="kw">move</span> { <span class="ident">f</span>.<span class="ident">call</span>(<span class="ident">runner</span>, <span class="ident">datamodel</span>).<span class="kw">await</span> })
+        <span class="kw">move </span>|runner, datamodel| Box::pin(<span class="kw">async move </span>{ f.call(runner, datamodel).<span class="kw">await </span>})
     }
 
-    <span class="ident">run_relation_link_test_impl</span>(
-        <span class="ident">enabled_connectors</span>,
-        <span class="ident">capabilities</span>,
-        <span class="ident">required_capabilities</span>,
-        <span class="ident">datamodel</span>,
-        <span class="ident">dm_with_params</span>,
-        <span class="ident">test_name</span>,
-        <span class="ident">test_database</span>,
-        <span class="kw-2">&amp;</span><span class="ident">boxify</span>(<span class="ident">test_fn</span>),
+    run_relation_link_test_impl(
+        enabled_connectors,
+        capabilities,
+        required_capabilities,
+        datamodel,
+        dm_with_params,
+        test_name,
+        test_database,
+        <span class="kw-2">&amp;</span>boxify(test_fn),
     )
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::too_many_arguments</span>)]</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">never</span>)]</span> <span class="comment">// currently not inlined, but let&#39;s make sure it doesn&#39;t change</span>
-<span class="kw">fn</span> <span class="ident">run_relation_link_test_impl</span>(
-    <span class="ident">enabled_connectors</span>: <span class="kw-2">&amp;</span>[<span class="ident">ConnectorTag</span>],
-    <span class="ident">capabilities</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorCapability</span><span class="op">&gt;</span>,
-    <span class="ident">required_capabilities</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>],
-    <span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">dm_with_params</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">test_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">test_database</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">test_fn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Runner</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">DatamodelWithParams</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">TestResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="attribute">#[allow(clippy::too_many_arguments)]
+#[inline(never)] </span><span class="comment">// currently not inlined, but let&#39;s make sure it doesn&#39;t change
+</span><span class="kw">fn </span>run_relation_link_test_impl(
+    enabled_connectors: <span class="kw-2">&amp;</span>[ConnectorTag],
+    capabilities: <span class="kw-2">&amp;mut </span>Vec&lt;ConnectorCapability&gt;,
+    required_capabilities: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str],
+    datamodel: <span class="kw-2">&amp;</span>str,
+    dm_with_params: <span class="kw-2">&amp;</span>str,
+    test_name: <span class="kw-2">&amp;</span>str,
+    test_database: <span class="kw-2">&amp;</span>str,
+    test_fn: <span class="kw-2">&amp;</span><span class="kw">dyn for</span>&lt;<span class="lifetime">&#39;a</span>&gt; Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Runner, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>DatamodelWithParams) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, TestResult&lt;()&gt;&gt;,
 ) {
-    <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">CONFIG</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">required_capabilities</span> <span class="op">=</span> <span class="ident">required_capabilities</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">cap</span><span class="op">|</span> <span class="ident">cap</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">ConnectorCapability</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>())
-        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+    <span class="kw">let </span>config = <span class="kw-2">&amp;</span>CONFIG;
+    <span class="kw">let </span><span class="kw-2">mut </span>required_capabilities = required_capabilities
+        .iter()
+        .map(|cap| cap.parse::&lt;ConnectorCapability&gt;().unwrap())
+        .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">required_capabilities</span>.<span class="ident">is_empty</span>() {
-        <span class="ident">capabilities</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">required_capabilities</span>);
+    <span class="kw">if </span>!required_capabilities.is_empty() {
+        capabilities.append(<span class="kw-2">&amp;mut </span>required_capabilities);
     }
 
-    <span class="kw">let</span> <span class="ident">template</span> <span class="op">=</span> <span class="ident">datamodel</span>.<span class="ident">to_string</span>();
-    <span class="kw">let</span> <span class="ident">dm_with_params_json</span>: <span class="ident">DatamodelWithParams</span> <span class="op">=</span> <span class="ident">dm_with_params</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>();
+    <span class="kw">let </span>template = datamodel.to_string();
+    <span class="kw">let </span>dm_with_params_json: DatamodelWithParams = dm_with_params.parse().unwrap();
 
-    <span class="kw">if</span> <span class="ident">ConnectorTag::should_run</span>(<span class="ident">config</span>, <span class="ident">enabled_connectors</span>, <span class="ident">capabilities</span>, <span class="ident">test_name</span>) {
-        <span class="kw">let</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident">render_test_datamodel</span>(<span class="ident">config</span>, <span class="ident">test_database</span>, <span class="ident">template</span>, <span class="kw-2">&amp;</span>[], <span class="prelude-val">None</span>, <span class="ident">Default::default</span>(), <span class="prelude-val">None</span>);
-        <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">test_connector_tag</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">requires_teardown</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">requires_teardown</span>();
-        <span class="kw">let</span> <span class="ident">metrics</span> <span class="op">=</span> <span class="ident">setup_metrics</span>();
-        <span class="kw">let</span> <span class="ident">metrics_for_subscriber</span> <span class="op">=</span> <span class="ident">metrics</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> (<span class="ident">log_capture</span>, <span class="ident">log_tx</span>) <span class="op">=</span> <span class="ident">TestLogCapture::new</span>();
+    <span class="kw">if </span>ConnectorTag::should_run(config, enabled_connectors, capabilities, test_name) {
+        <span class="kw">let </span>datamodel = render_test_datamodel(config, test_database, template, <span class="kw-2">&amp;</span>[], <span class="prelude-val">None</span>, Default::default(), <span class="prelude-val">None</span>);
+        <span class="kw">let </span>connector = config.test_connector_tag().unwrap();
+        <span class="kw">let </span>requires_teardown = connector.requires_teardown();
+        <span class="kw">let </span>metrics = setup_metrics();
+        <span class="kw">let </span>metrics_for_subscriber = metrics.clone();
+        <span class="kw">let </span>(log_capture, log_tx) = TestLogCapture::new();
 
-        <span class="ident">run_with_tokio</span>(
-            <span class="kw">async</span> <span class="kw">move</span> {
-                <span class="macro">tracing::debug!</span>(<span class="string">&quot;Used datamodel:\n {}&quot;</span>, <span class="ident">datamodel</span>.<span class="ident">clone</span>().<span class="ident">yellow</span>());
-                <span class="ident">setup_project</span>(<span class="kw-2">&amp;</span><span class="ident">datamodel</span>, <span class="ident">Default::default</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        run_with_tokio(
+            <span class="kw">async move </span>{
+                <span class="macro">tracing::debug!</span>(<span class="string">&quot;Used datamodel:\n {}&quot;</span>, datamodel.clone().yellow());
+                setup_project(<span class="kw-2">&amp;</span>datamodel, Default::default()).<span class="kw">await</span>.unwrap();
 
-                <span class="kw">let</span> <span class="ident">runner</span> <span class="op">=</span> <span class="ident">Runner::load</span>(<span class="ident">config</span>.<span class="ident">runner</span>(), <span class="ident">datamodel</span>.<span class="ident">clone</span>(), <span class="ident">connector</span>, <span class="ident">metrics</span>, <span class="ident">log_capture</span>)
-                    .<span class="kw">await</span>
-                    .<span class="ident">unwrap</span>();
+                <span class="kw">let </span>runner = Runner::load(config.runner(), datamodel.clone(), connector, metrics, log_capture)
+                    .<span class="kw">await
+                    </span>.unwrap();
 
-                <span class="ident">test_fn</span>(<span class="kw-2">&amp;</span><span class="ident">runner</span>, <span class="kw-2">&amp;</span><span class="ident">dm_with_params_json</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+                test_fn(<span class="kw-2">&amp;</span>runner, <span class="kw-2">&amp;</span>dm_with_params_json).<span class="kw">await</span>.unwrap();
 
-                <span class="kw">if</span> <span class="ident">requires_teardown</span> {
-                    <span class="ident">teardown_project</span>(<span class="kw-2">&amp;</span><span class="ident">datamodel</span>, <span class="ident">Default::default</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+                <span class="kw">if </span>requires_teardown {
+                    teardown_project(<span class="kw-2">&amp;</span>datamodel, Default::default()).<span class="kw">await</span>.unwrap();
                 }
             }
-            .<span class="ident">with_subscriber</span>(<span class="ident">test_tracing_subscriber</span>(<span class="kw-2">&amp;</span><span class="ident">ENV_LOG_LEVEL</span>, <span class="ident">metrics_for_subscriber</span>, <span class="ident">log_tx</span>)),
+            .with_subscriber(test_tracing_subscriber(<span class="kw-2">&amp;</span>ENV_LOG_LEVEL, metrics_for_subscriber, log_tx)),
         );
     }
 }
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ConnectorTestFn</span>: <span class="ident">Copy</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> {
-    <span class="kw">type</span> <span class="ident">Fut</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">TestResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="kw">pub trait </span>ConnectorTestFn: Copy + <span class="lifetime">&#39;static </span>{
+    <span class="kw">type </span>Fut: Future&lt;Output = TestResult&lt;()&gt;&gt;;
 
-    <span class="kw">fn</span> <span class="ident">call</span>(<span class="self">self</span>, <span class="ident">runner</span>: <span class="ident">Runner</span>) -&gt; <span class="ident"><span class="self">Self</span>::Fut</span>;
+    <span class="kw">fn </span>call(<span class="self">self</span>, runner: Runner) -&gt; <span class="self">Self</span>::Fut;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">ConnectorTestFn</span> <span class="kw">for</span> <span class="ident">T</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Fn</span>(<span class="ident">Runner</span>) -&gt; <span class="ident">F</span> <span class="op">+</span> <span class="ident">Copy</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">TestResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T, F&gt; ConnectorTestFn <span class="kw">for </span>T
+<span class="kw">where
+    </span>T: Fn(Runner) -&gt; F + Copy + <span class="lifetime">&#39;static</span>,
+    F: Future&lt;Output = TestResult&lt;()&gt;&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Fut</span> <span class="op">=</span> <span class="ident">F</span>;
+    <span class="kw">type </span>Fut = F;
 
-    <span class="kw">fn</span> <span class="ident">call</span>(<span class="self">self</span>, <span class="ident">runner</span>: <span class="ident">Runner</span>) -&gt; <span class="ident"><span class="self">Self</span>::Fut</span> {
-        <span class="self">self</span>(<span class="ident">runner</span>)
+    <span class="kw">fn </span>call(<span class="self">self</span>, runner: Runner) -&gt; <span class="self">Self</span>::Fut {
+        <span class="self">self</span>(runner)
     }
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::too_many_arguments</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run_connector_test</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
-    <span class="ident">test_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-    <span class="ident">test_database_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">enabled_connectors</span>: <span class="kw-2">&amp;</span>[<span class="ident">ConnectorTag</span>],
-    <span class="ident">capabilities</span>: <span class="kw-2">&amp;</span>[<span class="ident">ConnectorCapability</span>],
-    <span class="ident">excluded_features</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>],
-    <span class="ident">handler</span>: <span class="kw">fn</span>() -&gt; <span class="ident">String</span>,
-    <span class="ident">db_schemas</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>],
-    <span class="ident">referential_override</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">test_fn</span>: <span class="ident">T</span>,
-) <span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">ConnectorTestFn</span>,
+<span class="attribute">#[allow(clippy::too_many_arguments)]
+</span><span class="kw">pub fn </span>run_connector_test&lt;T&gt;(
+    test_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    test_database_name: <span class="kw-2">&amp;</span>str,
+    enabled_connectors: <span class="kw-2">&amp;</span>[ConnectorTag],
+    capabilities: <span class="kw-2">&amp;</span>[ConnectorCapability],
+    excluded_features: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str],
+    handler: <span class="kw">fn</span>() -&gt; String,
+    db_schemas: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str],
+    referential_override: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    test_fn: T,
+) <span class="kw">where
+    </span>T: ConnectorTestFn,
 {
-    <span class="comment">// The implementation of the function is separated from this façade because of monomorphization</span>
-    <span class="comment">// cost. Only `boxify` is instantiated for each instance of run_connector_test, not the whole</span>
-    <span class="comment">// larger function body. This measurably improves compile times of query-engine-tests.</span>
-    <span class="kw">fn</span> <span class="ident">boxify</span>(<span class="ident">test_fn</span>: <span class="kw">impl</span> <span class="ident">ConnectorTestFn</span>) -&gt; <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">Runner</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">TestResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">move</span> <span class="op">|</span><span class="ident">runner</span><span class="op">|</span> <span class="ident">Box::pin</span>(<span class="ident">test_fn</span>.<span class="ident">call</span>(<span class="ident">runner</span>))
+    <span class="comment">// The implementation of the function is separated from this façade because of monomorphization
+    // cost. Only `boxify` is instantiated for each instance of run_connector_test, not the whole
+    // larger function body. This measurably improves compile times of query-engine-tests.
+    </span><span class="kw">fn </span>boxify(test_fn: <span class="kw">impl </span>ConnectorTestFn) -&gt; <span class="kw">impl </span>Fn(Runner) -&gt; BoxFuture&lt;<span class="lifetime">&#39;static</span>, TestResult&lt;()&gt;&gt; {
+        <span class="kw">move </span>|runner| Box::pin(test_fn.call(runner))
     }
 
-    <span class="ident">run_connector_test_impl</span>(
-        <span class="ident">test_name</span>,
-        <span class="ident">test_database_name</span>,
-        <span class="ident">enabled_connectors</span>,
-        <span class="ident">capabilities</span>,
-        <span class="ident">excluded_features</span>,
-        <span class="ident">handler</span>,
-        <span class="ident">db_schemas</span>,
-        <span class="ident">referential_override</span>,
-        <span class="kw-2">&amp;</span><span class="ident">boxify</span>(<span class="ident">test_fn</span>),
+    run_connector_test_impl(
+        test_name,
+        test_database_name,
+        enabled_connectors,
+        capabilities,
+        excluded_features,
+        handler,
+        db_schemas,
+        referential_override,
+        <span class="kw-2">&amp;</span>boxify(test_fn),
     )
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::too_many_arguments</span>)]</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">never</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run_connector_test_impl</span>(
-    <span class="ident">test_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-    <span class="ident">test_database_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">enabled_connectors</span>: <span class="kw-2">&amp;</span>[<span class="ident">ConnectorTag</span>],
-    <span class="ident">capabilities</span>: <span class="kw-2">&amp;</span>[<span class="ident">ConnectorCapability</span>],
-    <span class="ident">excluded_features</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>],
-    <span class="ident">handler</span>: <span class="kw">fn</span>() -&gt; <span class="ident">String</span>,
-    <span class="ident">db_schemas</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>],
-    <span class="ident">referential_override</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">test_fn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="ident">Runner</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">TestResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="attribute">#[allow(clippy::too_many_arguments)]
+#[inline(never)]
+</span><span class="kw">pub fn </span>run_connector_test_impl(
+    test_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    test_database_name: <span class="kw-2">&amp;</span>str,
+    enabled_connectors: <span class="kw-2">&amp;</span>[ConnectorTag],
+    capabilities: <span class="kw-2">&amp;</span>[ConnectorCapability],
+    excluded_features: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str],
+    handler: <span class="kw">fn</span>() -&gt; String,
+    db_schemas: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str],
+    referential_override: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    test_fn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Fn(Runner) -&gt; BoxFuture&lt;<span class="lifetime">&#39;static</span>, TestResult&lt;()&gt;&gt;,
 ) {
-    <span class="kw">let</span> <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="kw">_</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident"><span class="kw">crate</span>::CONFIG</span>;
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">ConnectorTag::should_run</span>(<span class="ident">config</span>, <span class="ident">enabled_connectors</span>, <span class="ident">capabilities</span>, <span class="ident">test_name</span>) {
+    <span class="kw">let </span>config: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span><span class="kw">_ </span>= <span class="kw-2">&amp;</span><span class="kw">crate</span>::CONFIG;
+    <span class="kw">if </span>!ConnectorTag::should_run(config, enabled_connectors, capabilities, test_name) {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">template</span> <span class="op">=</span> <span class="ident">handler</span>();
-    <span class="kw">let</span> <span class="ident">datamodel</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::render_test_datamodel</span>(
-        <span class="ident">config</span>,
-        <span class="ident">test_database_name</span>,
-        <span class="ident">template</span>,
-        <span class="ident">excluded_features</span>,
-        <span class="ident">referential_override</span>,
-        <span class="ident">db_schemas</span>,
+    <span class="kw">let </span>template = handler();
+    <span class="kw">let </span>datamodel = <span class="kw">crate</span>::render_test_datamodel(
+        config,
+        test_database_name,
+        template,
+        excluded_features,
+        referential_override,
+        db_schemas,
         <span class="prelude-val">None</span>,
     );
-    <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">test_connector_tag</span>().<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">metrics</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::setup_metrics</span>();
-    <span class="kw">let</span> <span class="ident">metrics_for_subscriber</span> <span class="op">=</span> <span class="ident">metrics</span>.<span class="ident">clone</span>();
+    <span class="kw">let </span>connector = config.test_connector_tag().unwrap();
+    <span class="kw">let </span>metrics = <span class="kw">crate</span>::setup_metrics();
+    <span class="kw">let </span>metrics_for_subscriber = metrics.clone();
 
-    <span class="kw">let</span> (<span class="ident">log_capture</span>, <span class="ident">log_tx</span>) <span class="op">=</span> <span class="ident">TestLogCapture::new</span>();
+    <span class="kw">let </span>(log_capture, log_tx) = TestLogCapture::new();
 
-    <span class="ident"><span class="kw">crate</span>::run_with_tokio</span>(
-        <span class="kw">async</span> {
-            <span class="ident"><span class="kw">crate</span>::setup_project</span>(<span class="kw-2">&amp;</span><span class="ident">datamodel</span>, <span class="ident">db_schemas</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+    <span class="kw">crate</span>::run_with_tokio(
+        <span class="kw">async </span>{
+            <span class="kw">crate</span>::setup_project(<span class="kw-2">&amp;</span>datamodel, db_schemas).<span class="kw">await</span>.unwrap();
 
-            <span class="kw">let</span> <span class="ident">requires_teardown</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">requires_teardown</span>();
-            <span class="kw">let</span> <span class="ident">runner</span> <span class="op">=</span> <span class="ident">Runner::load</span>(
-                <span class="ident"><span class="kw">crate</span>::CONFIG</span>.<span class="ident">runner</span>(),
-                <span class="ident">datamodel</span>.<span class="ident">clone</span>(),
-                <span class="ident">connector</span>,
-                <span class="ident">metrics</span>,
-                <span class="ident">log_capture</span>,
+            <span class="kw">let </span>requires_teardown = connector.requires_teardown();
+            <span class="kw">let </span>runner = Runner::load(
+                <span class="kw">crate</span>::CONFIG.runner(),
+                datamodel.clone(),
+                connector,
+                metrics,
+                log_capture,
             )
-            .<span class="kw">await</span>
-            .<span class="ident">unwrap</span>();
+            .<span class="kw">await
+            </span>.unwrap();
 
-            <span class="ident">test_fn</span>(<span class="ident">runner</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+            test_fn(runner).<span class="kw">await</span>.unwrap();
 
-            <span class="kw">if</span> <span class="ident">requires_teardown</span> {
-                <span class="ident"><span class="kw">crate</span>::teardown_project</span>(<span class="kw-2">&amp;</span><span class="ident">datamodel</span>, <span class="ident">db_schemas</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+            <span class="kw">if </span>requires_teardown {
+                <span class="kw">crate</span>::teardown_project(<span class="kw-2">&amp;</span>datamodel, db_schemas).<span class="kw">await</span>.unwrap();
             }
         }
-        .<span class="ident">with_subscriber</span>(<span class="ident">test_tracing_subscriber</span>(<span class="kw-2">&amp;</span><span class="ident">ENV_LOG_LEVEL</span>, <span class="ident">metrics_for_subscriber</span>, <span class="ident">log_tx</span>)),
+        .with_subscriber(test_tracing_subscriber(<span class="kw-2">&amp;</span>ENV_LOG_LEVEL, metrics_for_subscriber, log_tx)),
     );
 }
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">LogEmit</span> <span class="op">=</span> <span class="ident">UnboundedSender</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>;
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestLogCapture</span> {
-    <span class="ident">rx</span>: <span class="ident">UnboundedReceiver</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="kw">pub type </span>LogEmit = UnboundedSender&lt;String&gt;;
+<span class="kw">pub struct </span>TestLogCapture {
+    rx: UnboundedReceiver&lt;String&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">TestLogCapture</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; (<span class="self">Self</span>, <span class="ident">LogEmit</span>) {
-        <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">unbounded_channel</span>();
-        (<span class="self">Self</span> { <span class="ident">rx</span> }, <span class="ident">tx</span>)
+<span class="kw">impl </span>TestLogCapture {
+    <span class="kw">pub fn </span>new() -&gt; (<span class="self">Self</span>, LogEmit) {
+        <span class="kw">let </span>(tx, rx) = unbounded_channel();
+        (<span class="self">Self </span>{ rx }, tx)
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_logs</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">logs</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">log_line</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">rx</span>.<span class="ident">try_recv</span>() {
-            <span class="ident">logs</span>.<span class="ident">push</span>(<span class="ident">log_line</span>)
+    <span class="kw">pub async fn </span>get_logs(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Vec&lt;String&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>logs = Vec::new();
+        <span class="kw">while let </span><span class="prelude-val">Ok</span>(log_line) = <span class="self">self</span>.rx.try_recv() {
+            logs.push(log_line)
         }
 
-        <span class="ident">logs</span>
+        logs
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="query_tests_setup" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="query_tests_setup" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

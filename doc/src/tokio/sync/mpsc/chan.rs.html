@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.21.0/src/sync/mpsc/chan.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>chan.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tokio/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.21.0/src/sync/mpsc/chan.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>chan.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tokio/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -425,432 +425,432 @@
 <span id="425">425</span>
 <span id="426">426</span>
 <span id="427">427</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::loom::cell::UnsafeCell</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::loom::future::AtomicWaker</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::loom::sync::atomic::AtomicUsize</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::loom::sync::Arc</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::park::thread::CachedParkThread</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::park::Park</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::mpsc::error::TryRecvError</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::mpsc::list</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::notify::Notify</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::loom::cell::UnsafeCell;
+<span class="kw">use </span><span class="kw">crate</span>::loom::future::AtomicWaker;
+<span class="kw">use </span><span class="kw">crate</span>::loom::sync::atomic::AtomicUsize;
+<span class="kw">use </span><span class="kw">crate</span>::loom::sync::Arc;
+<span class="kw">use </span><span class="kw">crate</span>::park::thread::CachedParkThread;
+<span class="kw">use </span><span class="kw">crate</span>::park::Park;
+<span class="kw">use </span><span class="kw">crate</span>::sync::mpsc::error::TryRecvError;
+<span class="kw">use </span><span class="kw">crate</span>::sync::mpsc::list;
+<span class="kw">use </span><span class="kw">crate</span>::sync::notify::Notify;
 
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::process</span>;
-<span class="kw">use</span> <span class="ident">std::sync::atomic::Ordering</span>::{<span class="ident">AcqRel</span>, <span class="ident">Acquire</span>, <span class="ident">Relaxed</span>, <span class="ident">Release</span>};
-<span class="kw">use</span> <span class="ident">std::task::Poll</span>::{<span class="ident">Pending</span>, <span class="ident">Ready</span>};
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
-<span class="kw">use</span> <span class="ident">std::usize</span>;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::process;
+<span class="kw">use </span>std::sync::atomic::Ordering::{AcqRel, Acquire, Relaxed, Release};
+<span class="kw">use </span>std::task::Poll::{Pending, Ready};
+<span class="kw">use </span>std::task::{Context, Poll};
+<span class="kw">use </span>std::usize;
 
-<span class="doccomment">/// Channel sender.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Tx</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Chan</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Channel sender.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Tx&lt;T, S&gt; {
+    inner: Arc&lt;Chan&lt;T, S&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span>: <span class="ident">fmt::Debug</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Tx</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">fmt</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Tx&quot;</span>).<span class="ident">field</span>(<span class="string">&quot;inner&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>).<span class="ident">finish</span>()
+<span class="kw">impl</span>&lt;T, S: fmt::Debug&gt; fmt::Debug <span class="kw">for </span>Tx&lt;T, S&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        fmt.debug_struct(<span class="string">&quot;Tx&quot;</span>).field(<span class="string">&quot;inner&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.inner).finish()
     }
 }
 
-<span class="doccomment">/// Channel receiver.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Rx</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span>: <span class="ident">Semaphore</span><span class="op">&gt;</span> {
-    <span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Chan</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Channel receiver.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Rx&lt;T, S: Semaphore&gt; {
+    inner: Arc&lt;Chan&lt;T, S&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span>: <span class="ident">Semaphore</span> <span class="op">+</span> <span class="ident">fmt::Debug</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Rx</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">fmt</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Rx&quot;</span>).<span class="ident">field</span>(<span class="string">&quot;inner&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>).<span class="ident">finish</span>()
+<span class="kw">impl</span>&lt;T, S: Semaphore + fmt::Debug&gt; fmt::Debug <span class="kw">for </span>Rx&lt;T, S&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        fmt.debug_struct(<span class="string">&quot;Rx&quot;</span>).field(<span class="string">&quot;inner&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.inner).finish()
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">Semaphore</span> {
-    <span class="kw">fn</span> <span class="ident">is_idle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>Semaphore {
+    <span class="kw">fn </span>is_idle(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool;
 
-    <span class="kw">fn</span> <span class="ident">add_permit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>);
+    <span class="kw">fn </span>add_permit(<span class="kw-2">&amp;</span><span class="self">self</span>);
 
-    <span class="kw">fn</span> <span class="ident">close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>);
+    <span class="kw">fn </span>close(<span class="kw-2">&amp;</span><span class="self">self</span>);
 
-    <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="kw">fn </span>is_closed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool;
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">Chan</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Notifies all tasks listening for the receiver being dropped.</span>
-    <span class="ident">notify_rx_closed</span>: <span class="ident">Notify</span>,
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>Chan&lt;T, S&gt; {
+    <span class="doccomment">/// Notifies all tasks listening for the receiver being dropped.
+    </span>notify_rx_closed: Notify,
 
-    <span class="doccomment">/// Handle to the push half of the lock-free list.</span>
-    <span class="ident">tx</span>: <span class="ident">list::Tx</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Handle to the push half of the lock-free list.
+    </span>tx: list::Tx&lt;T&gt;,
 
-    <span class="doccomment">/// Coordinates access to channel&#39;s capacity.</span>
-    <span class="ident">semaphore</span>: <span class="ident">S</span>,
+    <span class="doccomment">/// Coordinates access to channel&#39;s capacity.
+    </span>semaphore: S,
 
-    <span class="doccomment">/// Receiver waker. Notified when a value is pushed into the channel.</span>
-    <span class="ident">rx_waker</span>: <span class="ident">AtomicWaker</span>,
+    <span class="doccomment">/// Receiver waker. Notified when a value is pushed into the channel.
+    </span>rx_waker: AtomicWaker,
 
-    <span class="doccomment">/// Tracks the number of outstanding sender handles.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When this drops to zero, the send half of the channel is closed.</span>
-    <span class="ident">tx_count</span>: <span class="ident">AtomicUsize</span>,
+    <span class="doccomment">/// Tracks the number of outstanding sender handles.
+    ///
+    /// When this drops to zero, the send half of the channel is closed.
+    </span>tx_count: AtomicUsize,
 
-    <span class="doccomment">/// Only accessed by `Rx` handle.</span>
-    <span class="ident">rx_fields</span>: <span class="ident">UnsafeCell</span><span class="op">&lt;</span><span class="ident">RxFields</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Only accessed by `Rx` handle.
+    </span>rx_fields: UnsafeCell&lt;RxFields&lt;T&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Chan</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">fmt::Debug</span>,
+<span class="kw">impl</span>&lt;T, S&gt; fmt::Debug <span class="kw">for </span>Chan&lt;T, S&gt;
+<span class="kw">where
+    </span>S: fmt::Debug,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">fmt</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Chan&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;tx&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">tx</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;semaphore&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">semaphore</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;rx_waker&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">rx_waker</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;tx_count&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">tx_count</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;rx_fields&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;...&quot;</span>)
-            .<span class="ident">finish</span>()
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        fmt.debug_struct(<span class="string">&quot;Chan&quot;</span>)
+            .field(<span class="string">&quot;tx&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.tx)
+            .field(<span class="string">&quot;semaphore&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.semaphore)
+            .field(<span class="string">&quot;rx_waker&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.rx_waker)
+            .field(<span class="string">&quot;tx_count&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.tx_count)
+            .field(<span class="string">&quot;rx_fields&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;...&quot;</span>)
+            .finish()
     }
 }
 
-<span class="doccomment">/// Fields only accessed by `Rx` handle.</span>
-<span class="kw">struct</span> <span class="ident">RxFields</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Channel receiver. This field is only accessed by the `Receiver` type.</span>
-    <span class="ident">list</span>: <span class="ident">list::Rx</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Fields only accessed by `Rx` handle.
+</span><span class="kw">struct </span>RxFields&lt;T&gt; {
+    <span class="doccomment">/// Channel receiver. This field is only accessed by the `Receiver` type.
+    </span>list: list::Rx&lt;T&gt;,
 
-    <span class="doccomment">/// `true` if `Rx::close` is called.</span>
-    <span class="ident">rx_closed</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// `true` if `Rx::close` is called.
+    </span>rx_closed: bool,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">RxFields</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">fmt</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;RxFields&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;list&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">list</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;rx_closed&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">rx_closed</span>)
-            .<span class="ident">finish</span>()
+<span class="kw">impl</span>&lt;T&gt; fmt::Debug <span class="kw">for </span>RxFields&lt;T&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        fmt.debug_struct(<span class="string">&quot;RxFields&quot;</span>)
+            .field(<span class="string">&quot;list&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.list)
+            .field(<span class="string">&quot;rx_closed&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.rx_closed)
+            .finish()
     }
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span>, <span class="ident">S</span>: <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">Chan</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {}
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span>, <span class="ident">S</span>: <span class="ident">Sync</span><span class="op">&gt;</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">Chan</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {}
+<span class="kw">unsafe impl</span>&lt;T: Send, S: Send&gt; Send <span class="kw">for </span>Chan&lt;T, S&gt; {}
+<span class="kw">unsafe impl</span>&lt;T: Send, S: Sync&gt; Sync <span class="kw">for </span>Chan&lt;T, S&gt; {}
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">channel</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span>: <span class="ident">Semaphore</span><span class="op">&gt;</span>(<span class="ident">semaphore</span>: <span class="ident">S</span>) -&gt; (<span class="ident">Tx</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">Rx</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">list::channel</span>();
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>channel&lt;T, S: Semaphore&gt;(semaphore: S) -&gt; (Tx&lt;T, S&gt;, Rx&lt;T, S&gt;) {
+    <span class="kw">let </span>(tx, rx) = list::channel();
 
-    <span class="kw">let</span> <span class="ident">chan</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Chan</span> {
-        <span class="ident">notify_rx_closed</span>: <span class="ident">Notify::new</span>(),
-        <span class="ident">tx</span>,
-        <span class="ident">semaphore</span>,
-        <span class="ident">rx_waker</span>: <span class="ident">AtomicWaker::new</span>(),
-        <span class="ident">tx_count</span>: <span class="ident">AtomicUsize::new</span>(<span class="number">1</span>),
-        <span class="ident">rx_fields</span>: <span class="ident">UnsafeCell::new</span>(<span class="ident">RxFields</span> {
-            <span class="ident">list</span>: <span class="ident">rx</span>,
-            <span class="ident">rx_closed</span>: <span class="bool-val">false</span>,
+    <span class="kw">let </span>chan = Arc::new(Chan {
+        notify_rx_closed: Notify::new(),
+        tx,
+        semaphore,
+        rx_waker: AtomicWaker::new(),
+        tx_count: AtomicUsize::new(<span class="number">1</span>),
+        rx_fields: UnsafeCell::new(RxFields {
+            list: rx,
+            rx_closed: <span class="bool-val">false</span>,
         }),
     });
 
-    (<span class="ident">Tx::new</span>(<span class="ident">chan</span>.<span class="ident">clone</span>()), <span class="ident">Rx::new</span>(<span class="ident">chan</span>))
+    (Tx::new(chan.clone()), Rx::new(chan))
 }
 
-<span class="comment">// ===== impl Tx =====</span>
+<span class="comment">// ===== impl Tx =====
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Tx</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">chan</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Chan</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">Tx</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-        <span class="ident">Tx</span> { <span class="ident">inner</span>: <span class="ident">chan</span> }
+</span><span class="kw">impl</span>&lt;T, S&gt; Tx&lt;T, S&gt; {
+    <span class="kw">fn </span>new(chan: Arc&lt;Chan&lt;T, S&gt;&gt;) -&gt; Tx&lt;T, S&gt; {
+        Tx { inner: chan }
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">downgrade</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Chan</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">clone</span>()
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>downgrade(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Arc&lt;Chan&lt;T, S&gt;&gt; {
+        <span class="self">self</span>.inner.clone()
     }
 
-    <span class="comment">// Returns the upgraded channel or None if the upgrade failed.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">upgrade</span>(<span class="ident">chan</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Chan</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tx_count</span> <span class="op">=</span> <span class="ident">chan</span>.<span class="ident">tx_count</span>.<span class="ident">load</span>(<span class="ident">Acquire</span>);
+    <span class="comment">// Returns the upgraded channel or None if the upgrade failed.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>upgrade(chan: Arc&lt;Chan&lt;T, S&gt;&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>tx_count = chan.tx_count.load(Acquire);
 
-        <span class="kw">loop</span> {
-            <span class="kw">if</span> <span class="ident">tx_count</span> <span class="op">==</span> <span class="number">0</span> {
-                <span class="comment">// channel is closed</span>
-                <span class="kw">return</span> <span class="prelude-val">None</span>;
+        <span class="kw">loop </span>{
+            <span class="kw">if </span>tx_count == <span class="number">0 </span>{
+                <span class="comment">// channel is closed
+                </span><span class="kw">return </span><span class="prelude-val">None</span>;
             }
 
-            <span class="kw">match</span> <span class="ident">chan</span>
-                .<span class="ident">tx_count</span>
-                .<span class="ident">compare_exchange_weak</span>(<span class="ident">tx_count</span>, <span class="ident">tx_count</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">AcqRel</span>, <span class="ident">Acquire</span>)
+            <span class="kw">match </span>chan
+                .tx_count
+                .compare_exchange_weak(tx_count, tx_count + <span class="number">1</span>, AcqRel, Acquire)
             {
-                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">Tx</span> { <span class="ident">inner</span>: <span class="ident">chan</span> }),
-                <span class="prelude-val">Err</span>(<span class="ident">prev_count</span>) =&gt; <span class="ident">tx_count</span> <span class="op">=</span> <span class="ident">prev_count</span>,
+                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Some</span>(Tx { inner: chan }),
+                <span class="prelude-val">Err</span>(prev_count) =&gt; tx_count = prev_count,
             }
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">semaphore</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">S</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">semaphore</span>
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>semaphore(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>S {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.inner.semaphore
     }
 
-    <span class="doccomment">/// Send a message and notify the receiver.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">send</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">send</span>(<span class="ident">value</span>);
+    <span class="doccomment">/// Send a message and notify the receiver.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>send(<span class="kw-2">&amp;</span><span class="self">self</span>, value: T) {
+        <span class="self">self</span>.inner.send(value);
     }
 
-    <span class="doccomment">/// Wake the receive half</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">wake_rx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">rx_waker</span>.<span class="ident">wake</span>();
+    <span class="doccomment">/// Wake the receive half
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>wake_rx(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="self">self</span>.inner.rx_waker.wake();
     }
 
-    <span class="doccomment">/// Returns `true` if senders belong to the same channel.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">same_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">Arc::ptr_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>, <span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">inner</span>)
+    <span class="doccomment">/// Returns `true` if senders belong to the same channel.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>same_channel(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        Arc::ptr_eq(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, <span class="kw-2">&amp;</span>other.inner)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span>: <span class="ident">Semaphore</span><span class="op">&gt;</span> <span class="ident">Tx</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">semaphore</span>.<span class="ident">is_closed</span>()
+<span class="kw">impl</span>&lt;T, S: Semaphore&gt; Tx&lt;T, S&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_closed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.inner.semaphore.is_closed()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="comment">// In order to avoid a race condition, we first request a notification,</span>
-        <span class="comment">// **then** check whether the semaphore is closed. If the semaphore is</span>
-        <span class="comment">// closed the notification request is dropped.</span>
-        <span class="kw">let</span> <span class="ident">notified</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">notify_rx_closed</span>.<span class="ident">notified</span>();
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>closed(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="comment">// In order to avoid a race condition, we first request a notification,
+        // **then** check whether the semaphore is closed. If the semaphore is
+        // closed the notification request is dropped.
+        </span><span class="kw">let </span>notified = <span class="self">self</span>.inner.notify_rx_closed.notified();
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">semaphore</span>.<span class="ident">is_closed</span>() {
+        <span class="kw">if </span><span class="self">self</span>.inner.semaphore.is_closed() {
             <span class="kw">return</span>;
         }
-        <span class="ident">notified</span>.<span class="kw">await</span>;
+        notified.<span class="kw">await</span>;
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Tx</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Tx</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-        <span class="comment">// Using a Relaxed ordering here is sufficient as the caller holds a</span>
-        <span class="comment">// strong ref to `self`, preventing a concurrent decrement to zero.</span>
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">tx_count</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Relaxed</span>);
+<span class="kw">impl</span>&lt;T, S&gt; Clone <span class="kw">for </span>Tx&lt;T, S&gt; {
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Tx&lt;T, S&gt; {
+        <span class="comment">// Using a Relaxed ordering here is sufficient as the caller holds a
+        // strong ref to `self`, preventing a concurrent decrement to zero.
+        </span><span class="self">self</span>.inner.tx_count.fetch_add(<span class="number">1</span>, Relaxed);
 
-        <span class="ident">Tx</span> {
-            <span class="ident">inner</span>: <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">clone</span>(),
+        Tx {
+            inner: <span class="self">self</span>.inner.clone(),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Tx</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">tx_count</span>.<span class="ident">fetch_sub</span>(<span class="number">1</span>, <span class="ident">AcqRel</span>) <span class="op">!</span><span class="op">=</span> <span class="number">1</span> {
+<span class="kw">impl</span>&lt;T, S&gt; Drop <span class="kw">for </span>Tx&lt;T, S&gt; {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">if </span><span class="self">self</span>.inner.tx_count.fetch_sub(<span class="number">1</span>, AcqRel) != <span class="number">1 </span>{
             <span class="kw">return</span>;
         }
 
-        <span class="comment">// Close the list, which sends a `Close` message</span>
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">tx</span>.<span class="ident">close</span>();
+        <span class="comment">// Close the list, which sends a `Close` message
+        </span><span class="self">self</span>.inner.tx.close();
 
-        <span class="comment">// Notify the receiver</span>
-        <span class="self">self</span>.<span class="ident">wake_rx</span>();
+        <span class="comment">// Notify the receiver
+        </span><span class="self">self</span>.wake_rx();
     }
 }
 
-<span class="comment">// ===== impl Rx =====</span>
+<span class="comment">// ===== impl Rx =====
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span>: <span class="ident">Semaphore</span><span class="op">&gt;</span> <span class="ident">Rx</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">chan</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Chan</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">Rx</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-        <span class="ident">Rx</span> { <span class="ident">inner</span>: <span class="ident">chan</span> }
+</span><span class="kw">impl</span>&lt;T, S: Semaphore&gt; Rx&lt;T, S&gt; {
+    <span class="kw">fn </span>new(chan: Arc&lt;Chan&lt;T, S&gt;&gt;) -&gt; Rx&lt;T, S&gt; {
+        Rx { inner: chan }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">close</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">rx_fields</span>.<span class="ident">with_mut</span>(<span class="op">|</span><span class="ident">rx_fields_ptr</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">rx_fields</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">rx_fields_ptr</span> };
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>close(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.inner.rx_fields.with_mut(|rx_fields_ptr| {
+            <span class="kw">let </span>rx_fields = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span>rx_fields_ptr };
 
-            <span class="kw">if</span> <span class="ident">rx_fields</span>.<span class="ident">rx_closed</span> {
+            <span class="kw">if </span>rx_fields.rx_closed {
                 <span class="kw">return</span>;
             }
 
-            <span class="ident">rx_fields</span>.<span class="ident">rx_closed</span> <span class="op">=</span> <span class="bool-val">true</span>;
+            rx_fields.rx_closed = <span class="bool-val">true</span>;
         });
 
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">semaphore</span>.<span class="ident">close</span>();
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">notify_rx_closed</span>.<span class="ident">notify_waiters</span>();
+        <span class="self">self</span>.inner.semaphore.close();
+        <span class="self">self</span>.inner.notify_rx_closed.notify_waiters();
     }
 
-    <span class="doccomment">/// Receive the next value</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">recv</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::block::Read</span>::<span class="kw-2">*</span>;
+    <span class="doccomment">/// Receive the next value
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>recv(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;T&gt;&gt; {
+        <span class="kw">use </span><span class="kw">super</span>::block::Read::<span class="kw-2">*</span>;
 
-        <span class="comment">// Keep track of task budget</span>
-        <span class="kw">let</span> <span class="ident">coop</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="ident"><span class="kw">crate</span>::coop::poll_proceed</span>(<span class="ident">cx</span>));
+        <span class="comment">// Keep track of task budget
+        </span><span class="kw">let </span>coop = <span class="macro">ready!</span>(<span class="kw">crate</span>::coop::poll_proceed(cx));
 
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">rx_fields</span>.<span class="ident">with_mut</span>(<span class="op">|</span><span class="ident">rx_fields_ptr</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">rx_fields</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">rx_fields_ptr</span> };
+        <span class="self">self</span>.inner.rx_fields.with_mut(|rx_fields_ptr| {
+            <span class="kw">let </span>rx_fields = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span>rx_fields_ptr };
 
-            <span class="macro">macro_rules!</span> <span class="ident">try_recv</span> {
+            <span class="macro">macro_rules! </span>try_recv {
                 () =&gt; {
-                    <span class="kw">match</span> <span class="ident">rx_fields</span>.<span class="ident">list</span>.<span class="ident">pop</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">tx</span>) {
-                        <span class="prelude-val">Some</span>(<span class="ident">Value</span>(<span class="ident">value</span>)) =&gt; {
-                            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">semaphore</span>.<span class="ident">add_permit</span>();
-                            <span class="ident">coop</span>.<span class="ident">made_progress</span>();
-                            <span class="kw">return</span> <span class="ident">Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">value</span>));
+                    <span class="kw">match </span>rx_fields.list.pop(<span class="kw-2">&amp;</span><span class="self">self</span>.inner.tx) {
+                        <span class="prelude-val">Some</span>(Value(value)) =&gt; {
+                            <span class="self">self</span>.inner.semaphore.add_permit();
+                            coop.made_progress();
+                            <span class="kw">return </span>Ready(<span class="prelude-val">Some</span>(value));
                         }
-                        <span class="prelude-val">Some</span>(<span class="ident">Closed</span>) =&gt; {
-                            <span class="comment">// TODO: This check may not be required as it most</span>
-                            <span class="comment">// likely can only return `true` at this point. A</span>
-                            <span class="comment">// channel is closed when all tx handles are</span>
-                            <span class="comment">// dropped. Dropping a tx handle releases memory,</span>
-                            <span class="comment">// which ensures that if dropping the tx handle is</span>
-                            <span class="comment">// visible, then all messages sent are also visible.</span>
-                            <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">semaphore</span>.<span class="ident">is_idle</span>());
-                            <span class="ident">coop</span>.<span class="ident">made_progress</span>();
-                            <span class="kw">return</span> <span class="ident">Ready</span>(<span class="prelude-val">None</span>);
+                        <span class="prelude-val">Some</span>(Closed) =&gt; {
+                            <span class="comment">// TODO: This check may not be required as it most
+                            // likely can only return `true` at this point. A
+                            // channel is closed when all tx handles are
+                            // dropped. Dropping a tx handle releases memory,
+                            // which ensures that if dropping the tx handle is
+                            // visible, then all messages sent are also visible.
+                            </span><span class="macro">assert!</span>(<span class="self">self</span>.inner.semaphore.is_idle());
+                            coop.made_progress();
+                            <span class="kw">return </span>Ready(<span class="prelude-val">None</span>);
                         }
-                        <span class="prelude-val">None</span> =&gt; {} <span class="comment">// fall through</span>
-                    }
+                        <span class="prelude-val">None </span>=&gt; {} <span class="comment">// fall through
+                    </span>}
                 };
             }
 
             <span class="macro">try_recv!</span>();
 
-            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">rx_waker</span>.<span class="ident">register_by_ref</span>(<span class="ident">cx</span>.<span class="ident">waker</span>());
+            <span class="self">self</span>.inner.rx_waker.register_by_ref(cx.waker());
 
-            <span class="comment">// It is possible that a value was pushed between attempting to read</span>
-            <span class="comment">// and registering the task, so we have to check the channel a</span>
-            <span class="comment">// second time here.</span>
-            <span class="macro">try_recv!</span>();
+            <span class="comment">// It is possible that a value was pushed between attempting to read
+            // and registering the task, so we have to check the channel a
+            // second time here.
+            </span><span class="macro">try_recv!</span>();
 
-            <span class="kw">if</span> <span class="ident">rx_fields</span>.<span class="ident">rx_closed</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">semaphore</span>.<span class="ident">is_idle</span>() {
-                <span class="ident">coop</span>.<span class="ident">made_progress</span>();
-                <span class="ident">Ready</span>(<span class="prelude-val">None</span>)
-            } <span class="kw">else</span> {
-                <span class="ident">Pending</span>
+            <span class="kw">if </span>rx_fields.rx_closed &amp;&amp; <span class="self">self</span>.inner.semaphore.is_idle() {
+                coop.made_progress();
+                Ready(<span class="prelude-val">None</span>)
+            } <span class="kw">else </span>{
+                Pending
             }
         })
     }
 
-    <span class="doccomment">/// Try to receive the next value.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">try_recv</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">TryRecvError</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::list::TryPopResult</span>;
+    <span class="doccomment">/// Try to receive the next value.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>try_recv(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;T, TryRecvError&gt; {
+        <span class="kw">use </span><span class="kw">super</span>::list::TryPopResult;
 
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">rx_fields</span>.<span class="ident">with_mut</span>(<span class="op">|</span><span class="ident">rx_fields_ptr</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">rx_fields</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">rx_fields_ptr</span> };
+        <span class="self">self</span>.inner.rx_fields.with_mut(|rx_fields_ptr| {
+            <span class="kw">let </span>rx_fields = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span>rx_fields_ptr };
 
-            <span class="macro">macro_rules!</span> <span class="ident">try_recv</span> {
+            <span class="macro">macro_rules! </span>try_recv {
                 () =&gt; {
-                    <span class="kw">match</span> <span class="ident">rx_fields</span>.<span class="ident">list</span>.<span class="ident">try_pop</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">tx</span>) {
-                        <span class="ident">TryPopResult::Ok</span>(<span class="ident">value</span>) =&gt; {
-                            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">semaphore</span>.<span class="ident">add_permit</span>();
-                            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">value</span>);
+                    <span class="kw">match </span>rx_fields.list.try_pop(<span class="kw-2">&amp;</span><span class="self">self</span>.inner.tx) {
+                        TryPopResult::Ok(value) =&gt; {
+                            <span class="self">self</span>.inner.semaphore.add_permit();
+                            <span class="kw">return </span><span class="prelude-val">Ok</span>(value);
                         }
-                        <span class="ident">TryPopResult::Closed</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">TryRecvError::Disconnected</span>),
-                        <span class="ident">TryPopResult::Empty</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">TryRecvError::Empty</span>),
-                        <span class="ident">TryPopResult::Busy</span> =&gt; {} <span class="comment">// fall through</span>
-                    }
+                        TryPopResult::Closed =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(TryRecvError::Disconnected),
+                        TryPopResult::Empty =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(TryRecvError::Empty),
+                        TryPopResult::Busy =&gt; {} <span class="comment">// fall through
+                    </span>}
                 };
             }
 
             <span class="macro">try_recv!</span>();
 
-            <span class="comment">// If a previous `poll_recv` call has set a waker, we wake it here.</span>
-            <span class="comment">// This allows us to put our own CachedParkThread waker in the</span>
-            <span class="comment">// AtomicWaker slot instead.</span>
-            <span class="comment">//</span>
-            <span class="comment">// This is not a spurious wakeup to `poll_recv` since we just got a</span>
-            <span class="comment">// Busy from `try_pop`, which only happens if there are messages in</span>
-            <span class="comment">// the queue.</span>
-            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">rx_waker</span>.<span class="ident">wake</span>();
+            <span class="comment">// If a previous `poll_recv` call has set a waker, we wake it here.
+            // This allows us to put our own CachedParkThread waker in the
+            // AtomicWaker slot instead.
+            //
+            // This is not a spurious wakeup to `poll_recv` since we just got a
+            // Busy from `try_pop`, which only happens if there are messages in
+            // the queue.
+            </span><span class="self">self</span>.inner.rx_waker.wake();
 
-            <span class="comment">// Park the thread until the problematic send has completed.</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">park</span> <span class="op">=</span> <span class="ident">CachedParkThread::new</span>();
-            <span class="kw">let</span> <span class="ident">waker</span> <span class="op">=</span> <span class="ident">park</span>.<span class="ident">unpark</span>().<span class="ident">into_waker</span>();
-            <span class="kw">loop</span> {
-                <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">rx_waker</span>.<span class="ident">register_by_ref</span>(<span class="kw-2">&amp;</span><span class="ident">waker</span>);
-                <span class="comment">// It is possible that the problematic send has now completed,</span>
-                <span class="comment">// so we have to check for messages again.</span>
-                <span class="macro">try_recv!</span>();
-                <span class="ident">park</span>.<span class="ident">park</span>().<span class="ident">expect</span>(<span class="string">&quot;park failed&quot;</span>);
+            <span class="comment">// Park the thread until the problematic send has completed.
+            </span><span class="kw">let </span><span class="kw-2">mut </span>park = CachedParkThread::new();
+            <span class="kw">let </span>waker = park.unpark().into_waker();
+            <span class="kw">loop </span>{
+                <span class="self">self</span>.inner.rx_waker.register_by_ref(<span class="kw-2">&amp;</span>waker);
+                <span class="comment">// It is possible that the problematic send has now completed,
+                // so we have to check for messages again.
+                </span><span class="macro">try_recv!</span>();
+                park.park().expect(<span class="string">&quot;park failed&quot;</span>);
             }
         })
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span>: <span class="ident">Semaphore</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Rx</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::block::Read::Value</span>;
+<span class="kw">impl</span>&lt;T, S: Semaphore&gt; Drop <span class="kw">for </span>Rx&lt;T, S&gt; {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">use </span><span class="kw">super</span>::block::Read::Value;
 
-        <span class="self">self</span>.<span class="ident">close</span>();
+        <span class="self">self</span>.close();
 
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">rx_fields</span>.<span class="ident">with_mut</span>(<span class="op">|</span><span class="ident">rx_fields_ptr</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">rx_fields</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">rx_fields_ptr</span> };
+        <span class="self">self</span>.inner.rx_fields.with_mut(|rx_fields_ptr| {
+            <span class="kw">let </span>rx_fields = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span>rx_fields_ptr };
 
-            <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">Value</span>(<span class="kw">_</span>)) <span class="op">=</span> <span class="ident">rx_fields</span>.<span class="ident">list</span>.<span class="ident">pop</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">tx</span>) {
-                <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">semaphore</span>.<span class="ident">add_permit</span>();
+            <span class="kw">while let </span><span class="prelude-val">Some</span>(Value(<span class="kw">_</span>)) = rx_fields.list.pop(<span class="kw-2">&amp;</span><span class="self">self</span>.inner.tx) {
+                <span class="self">self</span>.inner.semaphore.add_permit();
             }
         })
     }
 }
 
-<span class="comment">// ===== impl Chan =====</span>
+<span class="comment">// ===== impl Chan =====
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Chan</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">send</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) {
-        <span class="comment">// Push the value</span>
-        <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">push</span>(<span class="ident">value</span>);
+</span><span class="kw">impl</span>&lt;T, S&gt; Chan&lt;T, S&gt; {
+    <span class="kw">fn </span>send(<span class="kw-2">&amp;</span><span class="self">self</span>, value: T) {
+        <span class="comment">// Push the value
+        </span><span class="self">self</span>.tx.push(value);
 
-        <span class="comment">// Notify the rx task</span>
-        <span class="self">self</span>.<span class="ident">rx_waker</span>.<span class="ident">wake</span>();
+        <span class="comment">// Notify the rx task
+        </span><span class="self">self</span>.rx_waker.wake();
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Chan</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::block::Read::Value</span>;
+<span class="kw">impl</span>&lt;T, S&gt; Drop <span class="kw">for </span>Chan&lt;T, S&gt; {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">use </span><span class="kw">super</span>::block::Read::Value;
 
-        <span class="comment">// Safety: the only owner of the rx fields is Chan, and being</span>
-        <span class="comment">// inside its own Drop means we&#39;re the last ones to touch it.</span>
-        <span class="self">self</span>.<span class="ident">rx_fields</span>.<span class="ident">with_mut</span>(<span class="op">|</span><span class="ident">rx_fields_ptr</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">rx_fields</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">rx_fields_ptr</span> };
+        <span class="comment">// Safety: the only owner of the rx fields is Chan, and being
+        // inside its own Drop means we&#39;re the last ones to touch it.
+        </span><span class="self">self</span>.rx_fields.with_mut(|rx_fields_ptr| {
+            <span class="kw">let </span>rx_fields = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span>rx_fields_ptr };
 
-            <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">Value</span>(<span class="kw">_</span>)) <span class="op">=</span> <span class="ident">rx_fields</span>.<span class="ident">list</span>.<span class="ident">pop</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">tx</span>) {}
-            <span class="kw">unsafe</span> { <span class="ident">rx_fields</span>.<span class="ident">list</span>.<span class="ident">free_blocks</span>() };
+            <span class="kw">while let </span><span class="prelude-val">Some</span>(Value(<span class="kw">_</span>)) = rx_fields.list.pop(<span class="kw-2">&amp;</span><span class="self">self</span>.tx) {}
+            <span class="kw">unsafe </span>{ rx_fields.list.free_blocks() };
         });
     }
 }
 
-<span class="comment">// ===== impl Semaphore for (::Semaphore, capacity) =====</span>
+<span class="comment">// ===== impl Semaphore for (::Semaphore, capacity) =====
 
-<span class="kw">impl</span> <span class="ident">Semaphore</span> <span class="kw">for</span> (<span class="ident"><span class="kw">crate</span>::sync::batch_semaphore::Semaphore</span>, <span class="ident">usize</span>) {
-    <span class="kw">fn</span> <span class="ident">add_permit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">release</span>(<span class="number">1</span>)
+</span><span class="kw">impl </span>Semaphore <span class="kw">for </span>(<span class="kw">crate</span>::sync::batch_semaphore::Semaphore, usize) {
+    <span class="kw">fn </span>add_permit(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="self">self</span>.<span class="number">0</span>.release(<span class="number">1</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">is_idle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">available_permits</span>() <span class="op">==</span> <span class="self">self</span>.<span class="number">1</span>
+    <span class="kw">fn </span>is_idle(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.<span class="number">0</span>.available_permits() == <span class="self">self</span>.<span class="number">1
+    </span>}
+
+    <span class="kw">fn </span>close(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="self">self</span>.<span class="number">0</span>.close();
     }
 
-    <span class="kw">fn</span> <span class="ident">close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">close</span>();
-    }
-
-    <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">is_closed</span>()
+    <span class="kw">fn </span>is_closed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.<span class="number">0</span>.is_closed()
     }
 }
 
-<span class="comment">// ===== impl Semaphore for AtomicUsize =====</span>
+<span class="comment">// ===== impl Semaphore for AtomicUsize =====
 
-<span class="kw">impl</span> <span class="ident">Semaphore</span> <span class="kw">for</span> <span class="ident">AtomicUsize</span> {
-    <span class="kw">fn</span> <span class="ident">add_permit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">let</span> <span class="ident">prev</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fetch_sub</span>(<span class="number">2</span>, <span class="ident">Release</span>);
+</span><span class="kw">impl </span>Semaphore <span class="kw">for </span>AtomicUsize {
+    <span class="kw">fn </span>add_permit(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">let </span>prev = <span class="self">self</span>.fetch_sub(<span class="number">2</span>, Release);
 
-        <span class="kw">if</span> <span class="ident">prev</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">1</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="comment">// Something went wrong</span>
-            <span class="ident">process::abort</span>();
+        <span class="kw">if </span>prev &gt;&gt; <span class="number">1 </span>== <span class="number">0 </span>{
+            <span class="comment">// Something went wrong
+            </span>process::abort();
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">is_idle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">load</span>(<span class="ident">Acquire</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">1</span> <span class="op">==</span> <span class="number">0</span>
+    <span class="kw">fn </span>is_idle(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.load(Acquire) &gt;&gt; <span class="number">1 </span>== <span class="number">0
+    </span>}
+
+    <span class="kw">fn </span>close(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="self">self</span>.fetch_or(<span class="number">1</span>, Release);
     }
 
-    <span class="kw">fn</span> <span class="ident">close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">fetch_or</span>(<span class="number">1</span>, <span class="ident">Release</span>);
-    }
-
-    <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">load</span>(<span class="ident">Acquire</span>) <span class="op">&amp;</span> <span class="number">1</span> <span class="op">==</span> <span class="number">1</span>
-    }
+    <span class="kw">fn </span>is_closed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.load(Acquire) &amp; <span class="number">1 </span>== <span class="number">1
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

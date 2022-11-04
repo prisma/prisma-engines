@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/async-native-tls-0.4.0/src/acceptor.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>acceptor.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../async_native_tls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../async_native_tls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../async_native_tls/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/async-native-tls-0.4.0/src/acceptor.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>acceptor.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../async_native_tls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../async_native_tls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../async_native_tls/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -132,139 +132,139 @@
 <span id="132">132</span>
 <span id="133">133</span>
 <span id="134">134</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::marker::Unpin</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::marker::Unpin;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::handshake::handshake</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncReadExt</span>, <span class="ident">AsyncWrite</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::TlsStream</span>;
+<span class="kw">use </span><span class="kw">crate</span>::handshake::handshake;
+<span class="kw">use </span><span class="kw">crate</span>::runtime::{AsyncRead, AsyncReadExt, AsyncWrite};
+<span class="kw">use </span><span class="kw">crate</span>::TlsStream;
 
-<span class="doccomment">/// A wrapper around a `native_tls::TlsAcceptor`, providing an async `accept`</span>
-<span class="doccomment">/// method.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```no_run</span>
-<span class="doccomment">/// # #[cfg(feature = &quot;runtime-async-std&quot;)]</span>
-<span class="doccomment">/// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error + Send + Sync + &#39;static&gt;&gt; { async_std::task::block_on(async {</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// use async_std::prelude::*;</span>
-<span class="doccomment">/// use async_std::net::TcpListener;</span>
-<span class="doccomment">/// use async_std::fs::File;</span>
-<span class="doccomment">/// use async_native_tls::TlsAcceptor;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let key = File::open(&quot;tests/identity.pfx&quot;).await?;</span>
-<span class="doccomment">/// let acceptor = TlsAcceptor::new(key, &quot;hello&quot;).await?;</span>
-<span class="doccomment">/// let listener = TcpListener::bind(&quot;127.0.0.1:8443&quot;).await?;</span>
-<span class="doccomment">/// let mut incoming = listener.incoming();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// while let Some(stream) = incoming.next().await {</span>
-<span class="doccomment">///     let acceptor = acceptor.clone();</span>
-<span class="doccomment">///     let stream = stream?;</span>
-<span class="doccomment">///     async_std::task::spawn(async move {</span>
-<span class="doccomment">///         let stream = acceptor.accept(stream).await.unwrap();</span>
-<span class="doccomment">///         // handle stream here</span>
-<span class="doccomment">///     });</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # Ok(()) }) }</span>
-<span class="doccomment">/// # #[cfg(feature = &quot;runtime-tokio&quot;)]</span>
-<span class="doccomment">/// # fn main() {}</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TlsAcceptor</span>(<span class="ident">native_tls::TlsAcceptor</span>);
+<span class="doccomment">/// A wrapper around a `native_tls::TlsAcceptor`, providing an async `accept`
+/// method.
+///
+/// # Example
+///
+/// ```no_run
+/// # #[cfg(feature = &quot;runtime-async-std&quot;)]
+/// # fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error + Send + Sync + &#39;static&gt;&gt; { async_std::task::block_on(async {
+/// #
+/// use async_std::prelude::*;
+/// use async_std::net::TcpListener;
+/// use async_std::fs::File;
+/// use async_native_tls::TlsAcceptor;
+///
+/// let key = File::open(&quot;tests/identity.pfx&quot;).await?;
+/// let acceptor = TlsAcceptor::new(key, &quot;hello&quot;).await?;
+/// let listener = TcpListener::bind(&quot;127.0.0.1:8443&quot;).await?;
+/// let mut incoming = listener.incoming();
+///
+/// while let Some(stream) = incoming.next().await {
+///     let acceptor = acceptor.clone();
+///     let stream = stream?;
+///     async_std::task::spawn(async move {
+///         let stream = acceptor.accept(stream).await.unwrap();
+///         // handle stream here
+///     });
+/// }
+/// #
+/// # Ok(()) }) }
+/// # #[cfg(feature = &quot;runtime-tokio&quot;)]
+/// # fn main() {}
+/// ```
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>TlsAcceptor(native_tls::TlsAcceptor);
 
-<span class="doccomment">/// An error returned from creating an acceptor.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">thiserror::Error</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Error</span> {
-    <span class="doccomment">/// NativeTls error.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;NativeTls({})&quot;</span>, <span class="number">0</span>)]</span>
-    <span class="ident">NativeTls</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">native_tls::Error</span>),
-    <span class="doccomment">/// Io error.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Io({})&quot;</span>, <span class="number">0</span>)]</span>
-    <span class="ident">Io</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">std::io::Error</span>),
+<span class="doccomment">/// An error returned from creating an acceptor.
+</span><span class="attribute">#[derive(thiserror::Error, Debug)]
+</span><span class="kw">pub enum </span>Error {
+    <span class="doccomment">/// NativeTls error.
+    </span><span class="attribute">#[error(<span class="string">&quot;NativeTls({})&quot;</span>, <span class="number">0</span>)]
+    </span>NativeTls(<span class="attribute">#[from] </span>native_tls::Error),
+    <span class="doccomment">/// Io error.
+    </span><span class="attribute">#[error(<span class="string">&quot;Io({})&quot;</span>, <span class="number">0</span>)]
+    </span>Io(<span class="attribute">#[from] </span>std::io::Error),
 }
 
-<span class="kw">impl</span> <span class="ident">TlsAcceptor</span> {
-    <span class="doccomment">/// Create a new TlsAcceptor based on an identity file and matching password.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">file</span>: <span class="ident">R</span>, <span class="ident">password</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">R</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-        <span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>,
+<span class="kw">impl </span>TlsAcceptor {
+    <span class="doccomment">/// Create a new TlsAcceptor based on an identity file and matching password.
+    </span><span class="kw">pub async fn </span>new&lt;R, S&gt;(<span class="kw-2">mut </span>file: R, password: S) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt;
+    <span class="kw">where
+        </span>R: AsyncRead + Unpin,
+        S: AsRef&lt;str&gt;,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">identity</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-        <span class="ident">file</span>.<span class="ident">read_to_end</span>(<span class="kw-2">&amp;mut</span> <span class="ident">identity</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>identity = <span class="macro">vec!</span>[];
+        file.read_to_end(<span class="kw-2">&amp;mut </span>identity).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">identity</span> <span class="op">=</span> <span class="ident">native_tls::Identity::from_pkcs12</span>(<span class="kw-2">&amp;</span><span class="ident">identity</span>, <span class="ident">password</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">TlsAcceptor</span>(<span class="ident">native_tls::TlsAcceptor::new</span>(<span class="ident">identity</span>)<span class="question-mark">?</span>))
+        <span class="kw">let </span>identity = native_tls::Identity::from_pkcs12(<span class="kw-2">&amp;</span>identity, password.as_ref())<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(TlsAcceptor(native_tls::TlsAcceptor::new(identity)<span class="question-mark">?</span>))
     }
 
-    <span class="doccomment">/// Accepts a new client connection with the provided stream.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function will internally call `TlsAcceptor::accept` to connect</span>
-    <span class="doccomment">/// the stream and returns a future representing the resolution of the</span>
-    <span class="doccomment">/// connection operation. The returned future will resolve to either</span>
-    <span class="doccomment">/// `TlsStream&lt;S&gt;` or `Error` depending if it&#39;s successful or not.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is typically used after a new socket has been accepted from a</span>
-    <span class="doccomment">/// `TcpListener`. That socket is then passed to this function to perform</span>
-    <span class="doccomment">/// the server half of accepting a client connection.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">accept</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TlsStream</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">native_tls::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+    <span class="doccomment">/// Accepts a new client connection with the provided stream.
+    ///
+    /// This function will internally call `TlsAcceptor::accept` to connect
+    /// the stream and returns a future representing the resolution of the
+    /// connection operation. The returned future will resolve to either
+    /// `TlsStream&lt;S&gt;` or `Error` depending if it&#39;s successful or not.
+    ///
+    /// This is typically used after a new socket has been accepted from a
+    /// `TcpListener`. That socket is then passed to this function to perform
+    /// the server half of accepting a client connection.
+    </span><span class="kw">pub async fn </span>accept&lt;S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, stream: S) -&gt; <span class="prelude-ty">Result</span>&lt;TlsStream&lt;S&gt;, native_tls::Error&gt;
+    <span class="kw">where
+        </span>S: AsyncRead + AsyncWrite + Unpin,
     {
-        <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">handshake</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">accept</span>(<span class="ident">s</span>), <span class="ident">stream</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">stream</span>)
+        <span class="kw">let </span>stream = handshake(<span class="kw">move </span>|s| <span class="self">self</span>.<span class="number">0</span>.accept(s), stream).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(stream)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">TlsAcceptor</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;TlsAcceptor&quot;</span>).<span class="ident">finish</span>()
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>TlsAcceptor {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;TlsAcceptor&quot;</span>).finish()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">native_tls::TlsAcceptor</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TlsAcceptor</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">inner</span>: <span class="ident">native_tls::TlsAcceptor</span>) -&gt; <span class="ident">TlsAcceptor</span> {
-        <span class="ident">TlsAcceptor</span>(<span class="ident">inner</span>)
+<span class="kw">impl </span>From&lt;native_tls::TlsAcceptor&gt; <span class="kw">for </span>TlsAcceptor {
+    <span class="kw">fn </span>from(inner: native_tls::TlsAcceptor) -&gt; TlsAcceptor {
+        TlsAcceptor(inner)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime-async-std&quot;</span>))]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime::AsyncWriteExt</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::TlsConnector</span>;
-    <span class="kw">use</span> <span class="ident">async_std::fs::File</span>;
-    <span class="kw">use</span> <span class="ident">async_std::net</span>::{<span class="ident">TcpListener</span>, <span class="ident">TcpStream</span>};
-    <span class="kw">use</span> <span class="ident">async_std::stream::StreamExt</span>;
+<span class="attribute">#[cfg(all(test, feature = <span class="string">&quot;runtime-async-std&quot;</span>))]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::runtime::AsyncWriteExt;
+    <span class="kw">use </span><span class="kw">crate</span>::TlsConnector;
+    <span class="kw">use </span>async_std::fs::File;
+    <span class="kw">use </span>async_std::net::{TcpListener, TcpStream};
+    <span class="kw">use </span>async_std::stream::StreamExt;
 
-    <span class="attribute">#[<span class="ident">async_std::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_acceptor</span>() {
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">File::open</span>(<span class="string">&quot;tests/identity.pfx&quot;</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">acceptor</span> <span class="op">=</span> <span class="ident">TlsAcceptor::new</span>(<span class="ident">key</span>, <span class="string">&quot;hello&quot;</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">listener</span> <span class="op">=</span> <span class="ident">TcpListener::bind</span>(<span class="string">&quot;127.0.0.1:8443&quot;</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
-        <span class="ident">async_std::task::spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">incoming</span> <span class="op">=</span> <span class="ident">listener</span>.<span class="ident">incoming</span>();
+    <span class="attribute">#[async_std::test]
+    </span><span class="kw">async fn </span>test_acceptor() {
+        <span class="kw">let </span>key = File::open(<span class="string">&quot;tests/identity.pfx&quot;</span>).<span class="kw">await</span>.unwrap();
+        <span class="kw">let </span>acceptor = TlsAcceptor::new(key, <span class="string">&quot;hello&quot;</span>).<span class="kw">await</span>.unwrap();
+        <span class="kw">let </span>listener = TcpListener::bind(<span class="string">&quot;127.0.0.1:8443&quot;</span>).<span class="kw">await</span>.unwrap();
+        async_std::task::spawn(<span class="kw">async move </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>incoming = listener.incoming();
 
-            <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">stream</span>) <span class="op">=</span> <span class="ident">incoming</span>.<span class="ident">next</span>().<span class="kw">await</span> {
-                <span class="kw">let</span> <span class="ident">acceptor</span> <span class="op">=</span> <span class="ident">acceptor</span>.<span class="ident">clone</span>();
-                <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">stream</span>.<span class="ident">unwrap</span>();
-                <span class="ident">async_std::task::spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">acceptor</span>.<span class="ident">accept</span>(<span class="ident">stream</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
-                    <span class="ident">stream</span>.<span class="ident">write_all</span>(<span class="string">b&quot;hello&quot;</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+            <span class="kw">while let </span><span class="prelude-val">Some</span>(stream) = incoming.next().<span class="kw">await </span>{
+                <span class="kw">let </span>acceptor = acceptor.clone();
+                <span class="kw">let </span>stream = stream.unwrap();
+                async_std::task::spawn(<span class="kw">async move </span>{
+                    <span class="kw">let </span><span class="kw-2">mut </span>stream = acceptor.accept(stream).<span class="kw">await</span>.unwrap();
+                    stream.write_all(<span class="string">b&quot;hello&quot;</span>).<span class="kw">await</span>.unwrap();
                 });
             }
         });
 
-        <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">TcpStream::connect</span>(<span class="string">&quot;127.0.01:8443&quot;</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">TlsConnector::new</span>().<span class="ident">danger_accept_invalid_certs</span>(<span class="bool-val">true</span>);
+        <span class="kw">let </span>stream = TcpStream::connect(<span class="string">&quot;127.0.01:8443&quot;</span>).<span class="kw">await</span>.unwrap();
+        <span class="kw">let </span>connector = TlsConnector::new().danger_accept_invalid_certs(<span class="bool-val">true</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">connect</span>(<span class="string">&quot;127.0.0.1&quot;</span>, <span class="ident">stream</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="ident">stream</span>.<span class="ident">read_to_end</span>(<span class="kw-2">&amp;mut</span> <span class="ident">res</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">res</span>, <span class="string">b&quot;hello&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>stream = connector.connect(<span class="string">&quot;127.0.0.1&quot;</span>, stream).<span class="kw">await</span>.unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>res = Vec::new();
+        stream.read_to_end(<span class="kw-2">&amp;mut </span>res).<span class="kw">await</span>.unwrap();
+        <span class="macro">assert_eq!</span>(res, <span class="string">b&quot;hello&quot;</span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="async_native_tls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="async_native_tls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

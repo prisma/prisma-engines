@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-util-0.8.5/src/noskip.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>noskip.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_util/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-util-0.8.5/src/noskip.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>noskip.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_util/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -324,331 +324,331 @@
 <span id="324">324</span>
 <span id="325">325</span>
 <span id="326">326</span>
-</pre><pre class="rust"><code><span class="doccomment">//! An iterator over a slice.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This iterator has both the length of the original slice, as</span>
-<span class="doccomment">//! well as the current position of the iterator in the buffer.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! An iterator over a slice.
+//!
+//! This iterator has both the length of the original slice, as
+//! well as the current position of the iterator in the buffer.
 
-<span class="attribute">#![<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parse&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)))]</span>
+</span><span class="attribute">#![cfg(all(feature = <span class="string">&quot;parse&quot;</span>, not(feature = <span class="string">&quot;format&quot;</span>)))]
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::iterator::BytesIter</span>;
-<span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">mem</span>, <span class="ident">ptr</span>};
+</span><span class="kw">use </span><span class="kw">crate</span>::iterator::BytesIter;
+<span class="kw">use </span>core::{mem, ptr};
 
-<span class="comment">// AS DIGITS</span>
-<span class="comment">// ---------</span>
+<span class="comment">// AS DIGITS
+// ---------
 
-<span class="doccomment">/// Trait to simplify creation of a `Bytes` object.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AsBytes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Create `Bytes` from object.</span>
-    <span class="kw">fn</span> <span class="ident">bytes</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">__</span>: <span class="ident">u128</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="ident">Bytes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">__</span><span class="op">&gt;</span>;
+</span><span class="doccomment">/// Trait to simplify creation of a `Bytes` object.
+</span><span class="kw">pub trait </span>AsBytes&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Create `Bytes` from object.
+    </span><span class="kw">fn </span>bytes&lt;<span class="kw">const </span>__: u128&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; Bytes&lt;<span class="lifetime">&#39;a</span>, __&gt;;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">AsBytes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> [<span class="ident">u8</span>] {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">bytes</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">__</span>: <span class="ident">u128</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="ident">Bytes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">__</span><span class="op">&gt;</span> {
-        <span class="ident">Bytes::new</span>(<span class="self">self</span>)
-    }
-}
-
-<span class="comment">// DIGITS</span>
-<span class="comment">// ------</span>
-
-<span class="doccomment">/// Slice iterator that stores the original length of the slice.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Bytes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="kw">const</span> <span class="ident">__</span>: <span class="ident">u128</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The raw slice for the iterator.</span>
-    <span class="ident">slc</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],
-    <span class="doccomment">/// Current index of the iterator in the slice.</span>
-    <span class="ident">index</span>: <span class="ident">usize</span>,
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="kw">const</span> <span class="ident">__</span>: <span class="ident">u128</span><span class="op">&gt;</span> <span class="ident">Bytes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">__</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// If each yielded value is adjacent in memory.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">IS_CONTIGUOUS</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="bool-val">true</span>;
-
-    <span class="doccomment">/// Create new byte object.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">slc</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">slc</span>,
-            <span class="ident">index</span>: <span class="number">0</span>,
-        }
-    }
-
-    <span class="doccomment">/// Get a ptr to the current start of the iterator.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const</span> <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">as_slice</span>().<span class="ident">as_ptr</span>()
-    }
-
-    <span class="doccomment">/// Get a slice to the current start of the iterator.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] {
-        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">index</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">length</span>());
-        <span class="comment">// SAFETY: safe since index must be in range.</span>
-        <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">slc</span>.<span class="ident">get_unchecked</span>(<span class="self">self</span>.<span class="ident">index</span>..) }
-    }
-
-    <span class="doccomment">/// Get the total number of elements in the underlying slice.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">slc</span>.<span class="ident">len</span>()
-    }
-
-    <span class="doccomment">/// Get the current index of the iterator in the slice.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cursor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">index</span>
-    }
-
-    <span class="doccomment">/// Set the current index of the iterator in the slice.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Safe if `index &lt;= self.length()`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">set_cursor</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) {
-        <span class="macro">debug_assert!</span>(<span class="ident">index</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">length</span>());
-        <span class="self">self</span>.<span class="ident">index</span> <span class="op">=</span> <span class="ident">index</span>
-    }
-
-    <span class="doccomment">/// Get the current number of values returned by the iterator.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">current_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">index</span>
-    }
-
-    <span class="doccomment">/// Get if the buffer underlying the iterator is empty.</span>
-    <span class="doccomment">/// Same as `is_consumed`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_done</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">slc</span>.<span class="ident">len</span>()
-    }
-
-    <span class="doccomment">/// Read a value of a difference type from the iterator.</span>
-    <span class="doccomment">/// This advances the internal state of the iterator.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Safe as long as the number of the buffer is contains as least as</span>
-    <span class="doccomment">/// many bytes as the size of V.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::assertions_on_constants</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">read_unchecked</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">V</span> {
-        <span class="macro">debug_assert!</span>(<span class="ident"><span class="self">Self</span>::IS_CONTIGUOUS</span>);
-        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">as_slice</span>().<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>());
-
-        <span class="kw">let</span> <span class="ident">slc</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_slice</span>();
-        <span class="comment">// SAFETY: safe as long as the slice has at least count elements.</span>
-        <span class="kw">unsafe</span> { <span class="ident">ptr::read_unaligned</span>::<span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="ident">slc</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>) }
-    }
-
-    <span class="doccomment">/// Try to read a value of a different type from the iterator.</span>
-    <span class="doccomment">/// This advances the internal state of the iterator.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident"><span class="self">Self</span>::IS_CONTIGUOUS</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">as_slice</span>().<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>() {
-            <span class="comment">// SAFETY: safe since we&#39;ve guaranteed the buffer is greater than</span>
-            <span class="comment">// the number of elements read.</span>
-            <span class="kw">unsafe</span> { <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">read_unchecked</span>()) }
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
-    }
-
-    <span class="doccomment">/// Check if the next element is a given value.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">first_is</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u8</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">slc</span>.<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">index</span>) {
-            <span class="ident">c</span> <span class="op">==</span> <span class="ident">value</span>
-        } <span class="kw">else</span> {
-            <span class="bool-val">false</span>
-        }
-    }
-
-    <span class="doccomment">/// Check if the next element is a given value without case sensitivity.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">case_insensitive_first_is</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u8</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">slc</span>.<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">index</span>) {
-            <span class="ident">c</span>.<span class="ident">to_ascii_lowercase</span>() <span class="op">==</span> <span class="ident">value</span>.<span class="ident">to_ascii_lowercase</span>()
-        } <span class="kw">else</span> {
-            <span class="bool-val">false</span>
-        }
-    }
-
-    <span class="doccomment">/// Get iterator over integer digits.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">integer_iter</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">BytesIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="ident">__</span><span class="op">&gt;</span> {
-        <span class="ident">BytesIterator</span> {
-            <span class="ident">byte</span>: <span class="self">self</span>,
-        }
-    }
-
-    <span class="doccomment">/// Get iterator over fraction digits.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fraction_iter</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">BytesIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="ident">__</span><span class="op">&gt;</span> {
-        <span class="ident">BytesIterator</span> {
-            <span class="ident">byte</span>: <span class="self">self</span>,
-        }
-    }
-
-    <span class="doccomment">/// Get iterator over exponent digits.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exponent_iter</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">BytesIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="ident">__</span><span class="op">&gt;</span> {
-        <span class="ident">BytesIterator</span> {
-            <span class="ident">byte</span>: <span class="self">self</span>,
-        }
-    }
-
-    <span class="doccomment">/// Get iterator over special floating point values.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">special_iter</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">BytesIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="ident">__</span><span class="op">&gt;</span> {
-        <span class="ident">BytesIterator</span> {
-            <span class="ident">byte</span>: <span class="self">self</span>,
-        }
-    }
-
-    <span class="doccomment">/// Advance the byte by `N` elements.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// As long as the iterator is at least `N` elements, this</span>
-    <span class="doccomment">/// is safe.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::assertions_on_constants</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">step_by_unchecked</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">count</span>: <span class="ident">usize</span>) {
-        <span class="macro">debug_assert!</span>(<span class="ident"><span class="self">Self</span>::IS_CONTIGUOUS</span>);
-        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">as_slice</span>().<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">count</span>);
-        <span class="self">self</span>.<span class="ident">index</span> <span class="op">+</span><span class="op">=</span> <span class="ident">count</span>;
-    }
-
-    <span class="doccomment">/// Advance the byte by 1 element.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Safe as long as the iterator is not empty.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::assertions_on_constants</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">step_unchecked</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="macro">debug_assert!</span>(<span class="ident"><span class="self">Self</span>::IS_CONTIGUOUS</span>);
-        <span class="macro">debug_assert!</span>(<span class="op">!</span><span class="self">self</span>.<span class="ident">as_slice</span>().<span class="ident">is_empty</span>());
-        <span class="self">self</span>.<span class="ident">index</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; AsBytes&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>[u8] {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>bytes&lt;<span class="kw">const </span>__: u128&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; Bytes&lt;<span class="lifetime">&#39;a</span>, __&gt; {
+        Bytes::new(<span class="self">self</span>)
     }
 }
 
-<span class="comment">// DIGITS ITERATOR</span>
-<span class="comment">// ---------------</span>
+<span class="comment">// DIGITS
+// ------
 
-<span class="doccomment">/// Slice iterator that stores the original length of the slice.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BytesIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;b</span>, <span class="kw">const</span> <span class="ident">__</span>: <span class="ident">u128</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The internal byte object for the noskip iterator.</span>
-    <span class="ident">byte</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">Bytes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">__</span><span class="op">&gt;</span>,
+</span><span class="doccomment">/// Slice iterator that stores the original length of the slice.
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>Bytes&lt;<span class="lifetime">&#39;a</span>, <span class="kw">const </span>__: u128&gt; {
+    <span class="doccomment">/// The raw slice for the iterator.
+    </span>slc: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8],
+    <span class="doccomment">/// Current index of the iterator in the slice.
+    </span>index: usize,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;b</span>, <span class="kw">const</span> <span class="ident">__</span>: <span class="ident">u128</span><span class="op">&gt;</span> <span class="ident">BytesIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BytesIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="ident">__</span><span class="op">&gt;</span> {
-    <span class="kw">const</span> <span class="ident">IS_CONTIGUOUS</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="ident">Bytes</span>::<span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">__</span><span class="op">&gt;</span><span class="ident">::IS_CONTIGUOUS</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="kw">const </span>__: u128&gt; Bytes&lt;<span class="lifetime">&#39;a</span>, __&gt; {
+    <span class="doccomment">/// If each yielded value is adjacent in memory.
+    </span><span class="kw">pub const </span>IS_CONTIGUOUS: bool = <span class="bool-val">true</span>;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">as_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const</span> <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">byte</span>.<span class="ident">as_ptr</span>()
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">as_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="ident">byte</span>.<span class="ident">as_slice</span>()
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">byte</span>.<span class="ident">length</span>()
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">cursor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">byte</span>.<span class="ident">cursor</span>()
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">set_cursor</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) {
-        <span class="macro">debug_assert!</span>(<span class="ident">index</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">length</span>());
-        <span class="comment">// SAFETY: safe if `index &lt;= self.length()`.</span>
-        <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">byte</span>.<span class="ident">set_cursor</span>(<span class="ident">index</span>) };
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">current_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">byte</span>.<span class="ident">current_count</span>()
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_consumed</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident"><span class="self">Self</span>::is_done</span>(<span class="self">self</span>)
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_done</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">byte</span>.<span class="ident">is_done</span>()
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">peek_unchecked</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Iterator</span><span class="op">&gt;</span><span class="ident">::Item</span> {
-        <span class="comment">// SAFETY: safe if `self.cursor() &lt; self.length()`.</span>
-        <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">byte</span>.<span class="ident">slc</span>.<span class="ident">get_unchecked</span>(<span class="self">self</span>.<span class="ident">byte</span>.<span class="ident">index</span>) }
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">peek</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">Iterator</span><span class="op">&gt;</span><span class="ident">::Item</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">byte</span>.<span class="ident">index</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">byte</span>.<span class="ident">slc</span>.<span class="ident">len</span>() {
-            <span class="comment">// SAFETY: the slice cannot be empty, so this is safe</span>
-            <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">peek_unchecked</span>() })
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
+    <span class="doccomment">/// Create new byte object.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub const fn </span>new(slc: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            slc,
+            index: <span class="number">0</span>,
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">read_unchecked</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">V</span> {
-        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">as_slice</span>().<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>());
-        <span class="comment">// SAFETY: safe as long as the slice has at least count elements.</span>
-        <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">byte</span>.<span class="ident">read_unchecked</span>() }
+    <span class="doccomment">/// Get a ptr to the current start of the iterator.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const </span>u8 {
+        <span class="self">self</span>.as_slice().as_ptr()
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">read</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">byte</span>.<span class="ident">read</span>()
+    <span class="doccomment">/// Get a slice to the current start of the iterator.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>as_slice(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
+        <span class="macro">debug_assert!</span>(<span class="self">self</span>.index &lt;= <span class="self">self</span>.length());
+        <span class="comment">// SAFETY: safe since index must be in range.
+        </span><span class="kw">unsafe </span>{ <span class="self">self</span>.slc.get_unchecked(<span class="self">self</span>.index..) }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">step_by_unchecked</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">count</span>: <span class="ident">usize</span>) {
-        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">as_slice</span>().<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">count</span>);
-        <span class="comment">// SAFETY: safe as long as `slc.len() &gt;= count`.</span>
-        <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">byte</span>.<span class="ident">step_by_unchecked</span>(<span class="ident">count</span>) }
+    <span class="doccomment">/// Get the total number of elements in the underlying slice.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.slc.len()
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">step_unchecked</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="macro">debug_assert!</span>(<span class="op">!</span><span class="self">self</span>.<span class="ident">as_slice</span>().<span class="ident">is_empty</span>());
-        <span class="comment">// SAFETY: safe as long as `slc.len() &gt;= 1`.</span>
-        <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">byte</span>.<span class="ident">step_unchecked</span>() }
+    <span class="doccomment">/// Get the current index of the iterator in the slice.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>cursor(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.index
+    }
+
+    <span class="doccomment">/// Set the current index of the iterator in the slice.
+    ///
+    /// # Safety
+    ///
+    /// Safe if `index &lt;= self.length()`.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub unsafe fn </span>set_cursor(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize) {
+        <span class="macro">debug_assert!</span>(index &lt;= <span class="self">self</span>.length());
+        <span class="self">self</span>.index = index
+    }
+
+    <span class="doccomment">/// Get the current number of values returned by the iterator.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>current_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.index
+    }
+
+    <span class="doccomment">/// Get if the buffer underlying the iterator is empty.
+    /// Same as `is_consumed`.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_done(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.index &gt;= <span class="self">self</span>.slc.len()
+    }
+
+    <span class="doccomment">/// Read a value of a difference type from the iterator.
+    /// This advances the internal state of the iterator.
+    ///
+    /// # Safety
+    ///
+    /// Safe as long as the number of the buffer is contains as least as
+    /// many bytes as the size of V.
+    </span><span class="attribute">#[inline]
+    #[allow(clippy::assertions_on_constants)]
+    </span><span class="kw">pub unsafe fn </span>read_unchecked&lt;V&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; V {
+        <span class="macro">debug_assert!</span>(<span class="self">Self</span>::IS_CONTIGUOUS);
+        <span class="macro">debug_assert!</span>(<span class="self">self</span>.as_slice().len() &gt;= mem::size_of::&lt;V&gt;());
+
+        <span class="kw">let </span>slc = <span class="self">self</span>.as_slice();
+        <span class="comment">// SAFETY: safe as long as the slice has at least count elements.
+        </span><span class="kw">unsafe </span>{ ptr::read_unaligned::&lt;V&gt;(slc.as_ptr() <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>) }
+    }
+
+    <span class="doccomment">/// Try to read a value of a different type from the iterator.
+    /// This advances the internal state of the iterator.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>read&lt;V&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;V&gt; {
+        <span class="kw">if </span><span class="self">Self</span>::IS_CONTIGUOUS &amp;&amp; <span class="self">self</span>.as_slice().len() &gt;= mem::size_of::&lt;V&gt;() {
+            <span class="comment">// SAFETY: safe since we&#39;ve guaranteed the buffer is greater than
+            // the number of elements read.
+            </span><span class="kw">unsafe </span>{ <span class="prelude-val">Some</span>(<span class="self">self</span>.read_unchecked()) }
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
+    }
+
+    <span class="doccomment">/// Check if the next element is a given value.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>first_is(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: u8) -&gt; bool {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>c) = <span class="self">self</span>.slc.get(<span class="self">self</span>.index) {
+            c == value
+        } <span class="kw">else </span>{
+            <span class="bool-val">false
+        </span>}
+    }
+
+    <span class="doccomment">/// Check if the next element is a given value without case sensitivity.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>case_insensitive_first_is(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: u8) -&gt; bool {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>c) = <span class="self">self</span>.slc.get(<span class="self">self</span>.index) {
+            c.to_ascii_lowercase() == value.to_ascii_lowercase()
+        } <span class="kw">else </span>{
+            <span class="bool-val">false
+        </span>}
+    }
+
+    <span class="doccomment">/// Get iterator over integer digits.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>integer_iter&lt;<span class="lifetime">&#39;b</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="kw-2">mut </span><span class="self">self</span>) -&gt; BytesIterator&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, __&gt; {
+        BytesIterator {
+            byte: <span class="self">self</span>,
+        }
+    }
+
+    <span class="doccomment">/// Get iterator over fraction digits.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>fraction_iter&lt;<span class="lifetime">&#39;b</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="kw-2">mut </span><span class="self">self</span>) -&gt; BytesIterator&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, __&gt; {
+        BytesIterator {
+            byte: <span class="self">self</span>,
+        }
+    }
+
+    <span class="doccomment">/// Get iterator over exponent digits.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>exponent_iter&lt;<span class="lifetime">&#39;b</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="kw-2">mut </span><span class="self">self</span>) -&gt; BytesIterator&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, __&gt; {
+        BytesIterator {
+            byte: <span class="self">self</span>,
+        }
+    }
+
+    <span class="doccomment">/// Get iterator over special floating point values.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>special_iter&lt;<span class="lifetime">&#39;b</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="kw-2">mut </span><span class="self">self</span>) -&gt; BytesIterator&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, __&gt; {
+        BytesIterator {
+            byte: <span class="self">self</span>,
+        }
+    }
+
+    <span class="doccomment">/// Advance the byte by `N` elements.
+    ///
+    /// # Safety
+    ///
+    /// As long as the iterator is at least `N` elements, this
+    /// is safe.
+    </span><span class="attribute">#[inline]
+    #[allow(clippy::assertions_on_constants)]
+    </span><span class="kw">pub unsafe fn </span>step_by_unchecked(<span class="kw-2">&amp;mut </span><span class="self">self</span>, count: usize) {
+        <span class="macro">debug_assert!</span>(<span class="self">Self</span>::IS_CONTIGUOUS);
+        <span class="macro">debug_assert!</span>(<span class="self">self</span>.as_slice().len() &gt;= count);
+        <span class="self">self</span>.index += count;
+    }
+
+    <span class="doccomment">/// Advance the byte by 1 element.
+    ///
+    /// # Safety
+    ///
+    /// Safe as long as the iterator is not empty.
+    </span><span class="attribute">#[inline]
+    #[allow(clippy::assertions_on_constants)]
+    </span><span class="kw">pub unsafe fn </span>step_unchecked(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="macro">debug_assert!</span>(<span class="self">Self</span>::IS_CONTIGUOUS);
+        <span class="macro">debug_assert!</span>(!<span class="self">self</span>.as_slice().is_empty());
+        <span class="self">self</span>.index += <span class="number">1</span>;
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;b</span>, <span class="kw">const</span> <span class="ident">__</span>: <span class="ident">u128</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">BytesIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="ident">__</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">u8</span>;
+<span class="comment">// DIGITS ITERATOR
+// ---------------
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">byte</span>.<span class="ident">slc</span>.<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">byte</span>.<span class="ident">index</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">byte</span>.<span class="ident">index</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="prelude-val">Some</span>(<span class="ident">value</span>)
+</span><span class="doccomment">/// Slice iterator that stores the original length of the slice.
+</span><span class="kw">pub struct </span>BytesIterator&lt;<span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;b</span>, <span class="kw">const </span>__: u128&gt; {
+    <span class="doccomment">/// The internal byte object for the noskip iterator.
+    </span>byte: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="kw-2">mut </span>Bytes&lt;<span class="lifetime">&#39;a</span>, __&gt;,
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;b</span>, <span class="kw">const </span>__: u128&gt; BytesIter&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>BytesIterator&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, __&gt; {
+    <span class="kw">const </span>IS_CONTIGUOUS: bool = Bytes::&lt;<span class="lifetime">&#39;a</span>, __&gt;::IS_CONTIGUOUS;
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const </span>u8 {
+        <span class="self">self</span>.byte.as_ptr()
+    }
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>as_slice(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
+        <span class="self">self</span>.byte.as_slice()
+    }
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.byte.length()
+    }
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>cursor(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.byte.cursor()
+    }
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">unsafe fn </span>set_cursor(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize) {
+        <span class="macro">debug_assert!</span>(index &lt;= <span class="self">self</span>.length());
+        <span class="comment">// SAFETY: safe if `index &lt;= self.length()`.
+        </span><span class="kw">unsafe </span>{ <span class="self">self</span>.byte.set_cursor(index) };
+    }
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>current_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.byte.current_count()
+    }
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_consumed(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; bool {
+        <span class="self">Self</span>::is_done(<span class="self">self</span>)
+    }
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_done(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.byte.is_done()
+    }
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">unsafe fn </span>peek_unchecked(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; &lt;<span class="self">Self </span><span class="kw">as </span>Iterator&gt;::Item {
+        <span class="comment">// SAFETY: safe if `self.cursor() &lt; self.length()`.
+        </span><span class="kw">unsafe </span>{ <span class="self">self</span>.byte.slc.get_unchecked(<span class="self">self</span>.byte.index) }
+    }
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>peek(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;&lt;<span class="self">Self </span><span class="kw">as </span>Iterator&gt;::Item&gt; {
+        <span class="kw">if </span><span class="self">self</span>.byte.index &lt; <span class="self">self</span>.byte.slc.len() {
+            <span class="comment">// SAFETY: the slice cannot be empty, so this is safe
+            </span><span class="prelude-val">Some</span>(<span class="kw">unsafe </span>{ <span class="self">self</span>.peek_unchecked() })
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
+    }
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">unsafe fn </span>read_unchecked&lt;V&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; V {
+        <span class="macro">debug_assert!</span>(<span class="self">self</span>.as_slice().len() &gt;= mem::size_of::&lt;V&gt;());
+        <span class="comment">// SAFETY: safe as long as the slice has at least count elements.
+        </span><span class="kw">unsafe </span>{ <span class="self">self</span>.byte.read_unchecked() }
+    }
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>read&lt;V&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;V&gt; {
+        <span class="self">self</span>.byte.read()
+    }
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">unsafe fn </span>step_by_unchecked(<span class="kw-2">&amp;mut </span><span class="self">self</span>, count: usize) {
+        <span class="macro">debug_assert!</span>(<span class="self">self</span>.as_slice().len() &gt;= count);
+        <span class="comment">// SAFETY: safe as long as `slc.len() &gt;= count`.
+        </span><span class="kw">unsafe </span>{ <span class="self">self</span>.byte.step_by_unchecked(count) }
+    }
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">unsafe fn </span>step_unchecked(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="macro">debug_assert!</span>(!<span class="self">self</span>.as_slice().is_empty());
+        <span class="comment">// SAFETY: safe as long as `slc.len() &gt;= 1`.
+        </span><span class="kw">unsafe </span>{ <span class="self">self</span>.byte.step_unchecked() }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;b</span>, <span class="kw">const</span> <span class="ident">__</span>: <span class="ident">u128</span><span class="op">&gt;</span> <span class="ident">ExactSizeIterator</span> <span class="kw">for</span> <span class="ident">BytesIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="ident">__</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">length</span>() <span class="op">-</span> <span class="self">self</span>.<span class="ident">cursor</span>()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;b</span>, <span class="kw">const </span>__: u128&gt; Iterator <span class="kw">for </span>BytesIterator&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, __&gt; {
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>u8;
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">let </span>value = <span class="self">self</span>.byte.slc.get(<span class="self">self</span>.byte.index)<span class="question-mark">?</span>;
+        <span class="self">self</span>.byte.index += <span class="number">1</span>;
+        <span class="prelude-val">Some</span>(value)
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;b</span>, <span class="kw">const </span>__: u128&gt; ExactSizeIterator <span class="kw">for </span>BytesIterator&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, __&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.length() - <span class="self">self</span>.cursor()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

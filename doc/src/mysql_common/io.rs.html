@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/io.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>io.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mysql_common/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/io.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>io.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mysql_common/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -415,422 +415,422 @@
 <span id="415">415</span>
 <span id="416">416</span>
 <span id="417">417</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2017 Anatoly Ikorsky</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2017 Anatoly Ikorsky
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident">byteorder</span>::{<span class="ident">LittleEndian</span> <span class="kw">as</span> <span class="ident">LE</span>, <span class="ident">ReadBytesExt</span>, <span class="ident">WriteBytesExt</span>};
-<span class="kw">use</span> <span class="ident">bytes::BufMut</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">cmp::min</span>, <span class="ident">io</span>};
+</span><span class="kw">use </span>byteorder::{LittleEndian <span class="kw">as </span>LE, ReadBytesExt, WriteBytesExt};
+<span class="kw">use </span>bytes::BufMut;
+<span class="kw">use </span>std::{cmp::min, io};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proto::MyDeserialize</span>;
+<span class="kw">use </span><span class="kw">crate</span>::proto::MyDeserialize;
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">BufMutExt</span>: <span class="ident">BufMut</span> {
-    <span class="doccomment">/// Writes an unsigned integer to self as MySql length-encoded integer.</span>
-    <span class="kw">fn</span> <span class="ident">put_lenenc_int</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">u64</span>) {
-        <span class="kw">if</span> <span class="ident">n</span> <span class="op">&lt;</span> <span class="number">251</span> {
-            <span class="self">self</span>.<span class="ident">put_u8</span>(<span class="ident">n</span> <span class="kw">as</span> <span class="ident">u8</span>);
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">n</span> <span class="op">&lt;</span> <span class="number">65_536</span> {
-            <span class="self">self</span>.<span class="ident">put_u8</span>(<span class="number">0xFC</span>);
-            <span class="self">self</span>.<span class="ident">put_uint_le</span>(<span class="ident">n</span>, <span class="number">2</span>);
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">n</span> <span class="op">&lt;</span> <span class="number">16_777_216</span> {
-            <span class="self">self</span>.<span class="ident">put_u8</span>(<span class="number">0xFD</span>);
-            <span class="self">self</span>.<span class="ident">put_uint_le</span>(<span class="ident">n</span>, <span class="number">3</span>);
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">put_u8</span>(<span class="number">0xFE</span>);
-            <span class="self">self</span>.<span class="ident">put_uint_le</span>(<span class="ident">n</span>, <span class="number">8</span>);
+<span class="kw">pub trait </span>BufMutExt: BufMut {
+    <span class="doccomment">/// Writes an unsigned integer to self as MySql length-encoded integer.
+    </span><span class="kw">fn </span>put_lenenc_int(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: u64) {
+        <span class="kw">if </span>n &lt; <span class="number">251 </span>{
+            <span class="self">self</span>.put_u8(n <span class="kw">as </span>u8);
+        } <span class="kw">else if </span>n &lt; <span class="number">65_536 </span>{
+            <span class="self">self</span>.put_u8(<span class="number">0xFC</span>);
+            <span class="self">self</span>.put_uint_le(n, <span class="number">2</span>);
+        } <span class="kw">else if </span>n &lt; <span class="number">16_777_216 </span>{
+            <span class="self">self</span>.put_u8(<span class="number">0xFD</span>);
+            <span class="self">self</span>.put_uint_le(n, <span class="number">3</span>);
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.put_u8(<span class="number">0xFE</span>);
+            <span class="self">self</span>.put_uint_le(n, <span class="number">8</span>);
         }
     }
 
-    <span class="doccomment">/// Writes a slice to self as MySql length-encoded string.</span>
-    <span class="kw">fn</span> <span class="ident">put_lenenc_str</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
-        <span class="self">self</span>.<span class="ident">put_lenenc_int</span>(<span class="ident">s</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>);
-        <span class="self">self</span>.<span class="ident">put_slice</span>(<span class="ident">s</span>);
+    <span class="doccomment">/// Writes a slice to self as MySql length-encoded string.
+    </span><span class="kw">fn </span>put_lenenc_str(<span class="kw-2">&amp;mut </span><span class="self">self</span>, s: <span class="kw-2">&amp;</span>[u8]) {
+        <span class="self">self</span>.put_lenenc_int(s.len() <span class="kw">as </span>u64);
+        <span class="self">self</span>.put_slice(s);
     }
 
-    <span class="doccomment">/// Writes a 3-bytes unsigned integer.</span>
-    <span class="kw">fn</span> <span class="ident">put_u24_le</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">x</span>: <span class="ident">u32</span>) {
-        <span class="self">self</span>.<span class="ident">put_uint_le</span>(<span class="ident">x</span> <span class="kw">as</span> <span class="ident">u64</span>, <span class="number">3</span>);
+    <span class="doccomment">/// Writes a 3-bytes unsigned integer.
+    </span><span class="kw">fn </span>put_u24_le(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x: u32) {
+        <span class="self">self</span>.put_uint_le(x <span class="kw">as </span>u64, <span class="number">3</span>);
     }
 
-    <span class="doccomment">/// Writes a 3-bytes signed integer.</span>
-    <span class="kw">fn</span> <span class="ident">put_i24_le</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">x</span>: <span class="ident">i32</span>) {
-        <span class="self">self</span>.<span class="ident">put_int_le</span>(<span class="ident">x</span> <span class="kw">as</span> <span class="ident">i64</span>, <span class="number">3</span>);
+    <span class="doccomment">/// Writes a 3-bytes signed integer.
+    </span><span class="kw">fn </span>put_i24_le(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x: i32) {
+        <span class="self">self</span>.put_int_le(x <span class="kw">as </span>i64, <span class="number">3</span>);
     }
 
-    <span class="doccomment">/// Writes a 6-bytes unsigned integer.</span>
-    <span class="kw">fn</span> <span class="ident">put_u48_le</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">x</span>: <span class="ident">u64</span>) {
-        <span class="self">self</span>.<span class="ident">put_uint_le</span>(<span class="ident">x</span>, <span class="number">6</span>);
+    <span class="doccomment">/// Writes a 6-bytes unsigned integer.
+    </span><span class="kw">fn </span>put_u48_le(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x: u64) {
+        <span class="self">self</span>.put_uint_le(x, <span class="number">6</span>);
     }
 
-    <span class="doccomment">/// Writes a 7-bytes unsigned integer.</span>
-    <span class="kw">fn</span> <span class="ident">put_u56_le</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">x</span>: <span class="ident">u64</span>) {
-        <span class="self">self</span>.<span class="ident">put_uint_le</span>(<span class="ident">x</span>, <span class="number">7</span>);
+    <span class="doccomment">/// Writes a 7-bytes unsigned integer.
+    </span><span class="kw">fn </span>put_u56_le(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x: u64) {
+        <span class="self">self</span>.put_uint_le(x, <span class="number">7</span>);
     }
 
-    <span class="doccomment">/// Writes a 7-bytes signed integer.</span>
-    <span class="kw">fn</span> <span class="ident">put_i56_le</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">x</span>: <span class="ident">i64</span>) {
-        <span class="self">self</span>.<span class="ident">put_int_le</span>(<span class="ident">x</span>, <span class="number">7</span>);
+    <span class="doccomment">/// Writes a 7-bytes signed integer.
+    </span><span class="kw">fn </span>put_i56_le(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x: i64) {
+        <span class="self">self</span>.put_int_le(x, <span class="number">7</span>);
     }
 
-    <span class="doccomment">/// Writes a string with u8 length prefix. Truncates, if the length is greater that `u8::MAX`.</span>
-    <span class="kw">fn</span> <span class="ident">put_u8_str</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">std::cmp::min</span>(<span class="ident">s</span>.<span class="ident">len</span>(), <span class="ident">u8::MAX</span> <span class="kw">as</span> <span class="ident">usize</span>);
-        <span class="self">self</span>.<span class="ident">put_u8</span>(<span class="ident">len</span> <span class="kw">as</span> <span class="ident">u8</span>);
-        <span class="self">self</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>[..<span class="ident">len</span>]);
+    <span class="doccomment">/// Writes a string with u8 length prefix. Truncates, if the length is greater that `u8::MAX`.
+    </span><span class="kw">fn </span>put_u8_str(<span class="kw-2">&amp;mut </span><span class="self">self</span>, s: <span class="kw-2">&amp;</span>[u8]) {
+        <span class="kw">let </span>len = std::cmp::min(s.len(), u8::MAX <span class="kw">as </span>usize);
+        <span class="self">self</span>.put_u8(len <span class="kw">as </span>u8);
+        <span class="self">self</span>.put_slice(<span class="kw-2">&amp;</span>s[..len]);
     }
 
-    <span class="doccomment">/// Writes a string with u32 length prefix. Truncates, if the length is greater that `u32::MAX`.</span>
-    <span class="kw">fn</span> <span class="ident">put_u32_str</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">std::cmp::min</span>(<span class="ident">s</span>.<span class="ident">len</span>(), <span class="ident">u32::MAX</span> <span class="kw">as</span> <span class="ident">usize</span>);
-        <span class="self">self</span>.<span class="ident">put_u32_le</span>(<span class="ident">len</span> <span class="kw">as</span> <span class="ident">u32</span>);
-        <span class="self">self</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>[..<span class="ident">len</span>]);
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">BufMut</span><span class="op">&gt;</span> <span class="ident">BufMutExt</span> <span class="kw">for</span> <span class="ident">T</span> {}
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw">pub</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]);
-
-<span class="kw">impl</span> <span class="ident">io::Read</span> <span class="kw">for</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">min</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">len</span>(), <span class="ident">buf</span>.<span class="ident">len</span>());
-        (<span class="ident">buf</span>[..<span class="ident">count</span>]).<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>[..<span class="ident">count</span>]);
-        <span class="self">self</span>.<span class="number">0</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>[<span class="ident">count</span>..];
-        <span class="prelude-val">Ok</span>(<span class="ident">count</span>)
+    <span class="doccomment">/// Writes a string with u32 length prefix. Truncates, if the length is greater that `u32::MAX`.
+    </span><span class="kw">fn </span>put_u32_str(<span class="kw-2">&amp;mut </span><span class="self">self</span>, s: <span class="kw-2">&amp;</span>[u8]) {
+        <span class="kw">let </span>len = std::cmp::min(s.len(), u32::MAX <span class="kw">as </span>usize);
+        <span class="self">self</span>.put_u32_le(len <span class="kw">as </span>u32);
+        <span class="self">self</span>.put_slice(<span class="kw-2">&amp;</span>s[..len]);
     }
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">eat_num</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">checked</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ident</span>::<span class="macro-nonterminal">$</span><span class="kw">fn</span>:<span class="macro-nonterminal">ident</span>) =&gt; {
-        <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;Consumes a number from the head of the buffer.&quot;</span>]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
-            <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>();
-            <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">eat</span>(<span class="ident">SIZE</span>);
-            <span class="kw">unsafe</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>::<span class="macro-nonterminal">$</span><span class="kw">fn</span>(<span class="kw-2">*</span>(<span class="macro-nonterminal">bytes</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*const</span> [<span class="kw">_</span>; <span class="ident">SIZE</span>])) }
+<span class="kw">impl</span>&lt;T: BufMut&gt; BufMutExt <span class="kw">for </span>T {}
+
+<span class="attribute">#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+</span><span class="kw">pub struct </span>ParseBuf&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw">pub </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]);
+
+<span class="kw">impl </span>io::Read <span class="kw">for </span>ParseBuf&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>read(<span class="kw-2">&amp;mut </span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>[u8]) -&gt; io::Result&lt;usize&gt; {
+        <span class="kw">let </span>count = min(<span class="self">self</span>.<span class="number">0</span>.len(), buf.len());
+        (buf[..count]).copy_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>[..count]);
+        <span class="self">self</span>.<span class="number">0 </span>= <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>[count..];
+        <span class="prelude-val">Ok</span>(count)
+    }
+}
+
+<span class="macro">macro_rules! </span>eat_num {
+    (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$checked</span>:ident, <span class="macro-nonterminal">$t</span>:ident::<span class="macro-nonterminal">$</span><span class="kw">fn</span>:<span class="macro-nonterminal">ident</span>) =&gt; {
+        <span class="attribute">#[doc = <span class="string">&quot;Consumes a number from the head of the buffer.&quot;</span>]
+        </span><span class="kw">pub fn </span><span class="macro-nonterminal">$name</span>(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="macro-nonterminal">$t </span>{
+            <span class="kw">const </span>SIZE: usize = std::mem::size_of::&lt;<span class="macro-nonterminal">$t</span>&gt;();
+            <span class="kw">let </span>bytes = <span class="self">self</span>.eat(SIZE);
+            <span class="kw">unsafe </span>{ <span class="macro-nonterminal">$t</span>::<span class="macro-nonterminal">$</span><span class="kw">fn</span>(<span class="kw-2">*</span>(<span class="macro-nonterminal">bytes </span><span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span><span class="kw-2">*const </span>[<span class="kw">_</span>; SIZE])) }
         }
 
-        <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;Consumes a number from the head of the buffer. Returns `None` if buffer is too small.&quot;</span>]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">checked</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>() {
-                <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>())
-            } <span class="kw">else</span> {
-                <span class="prelude-val">None</span>
-            }
+        <span class="attribute">#[doc = <span class="string">&quot;Consumes a number from the head of the buffer. Returns `None` if buffer is too small.&quot;</span>]
+        </span><span class="kw">pub fn </span><span class="macro-nonterminal">$checked</span>(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="macro-nonterminal">$t</span>&gt; {
+            <span class="kw">if </span><span class="self">self</span>.len() &gt;= std::mem::size_of::&lt;<span class="macro-nonterminal">$t</span>&gt;() {
+                <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="macro-nonterminal">$name</span>())
+            } <span class="kw">else </span>{
+                <span class="prelude-val">None
+            </span>}
         }
     };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">checked</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">size</span>:<span class="ident">literal</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">offset</span>:<span class="ident">literal</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ident</span>::<span class="macro-nonterminal">$</span><span class="kw">fn</span>:<span class="macro-nonterminal">ident</span>) =&gt; {
-        <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;Consumes a number from the head of the buffer.&quot;</span>]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
-            <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">size</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">x</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> <span class="op">=</span> <span class="number">0</span>;
-            <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">eat</span>(<span class="ident">SIZE</span>);
-            <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">b</span>) <span class="kw">in</span> <span class="ident">bytes</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-                <span class="ident">x</span> <span class="op">|</span><span class="op">=</span> (<span class="kw-2">*</span><span class="ident">b</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>) <span class="op">&lt;</span><span class="op">&lt;</span> ((<span class="number">8</span> <span class="op">*</span> <span class="ident">i</span>) <span class="op">+</span> (<span class="number">8</span> <span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">offset</span>));
+    (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$checked</span>:ident, <span class="macro-nonterminal">$size</span>:literal, <span class="macro-nonterminal">$offset</span>:literal, <span class="macro-nonterminal">$t</span>:ident::<span class="macro-nonterminal">$</span><span class="kw">fn</span>:<span class="macro-nonterminal">ident</span>) =&gt; {
+        <span class="attribute">#[doc = <span class="string">&quot;Consumes a number from the head of the buffer.&quot;</span>]
+        </span><span class="kw">pub fn </span><span class="macro-nonterminal">$name</span>(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="macro-nonterminal">$t </span>{
+            <span class="kw">const </span>SIZE: usize = <span class="macro-nonterminal">$size</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>x: <span class="macro-nonterminal">$t </span>= <span class="number">0</span>;
+            <span class="kw">let </span>bytes = <span class="self">self</span>.eat(SIZE);
+            <span class="kw">for </span>(i, b) <span class="kw">in </span>bytes.iter().enumerate() {
+                x |= (<span class="kw-2">*</span>b <span class="kw">as </span><span class="macro-nonterminal">$t</span>) &lt;&lt; ((<span class="number">8 </span>* i) + (<span class="number">8 </span>* <span class="macro-nonterminal">$offset</span>));
             }
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>::<span class="macro-nonterminal">$</span><span class="kw">fn</span>(<span class="macro-nonterminal">x</span>)
+            <span class="macro-nonterminal">$t</span>::<span class="macro-nonterminal">$</span><span class="kw">fn</span>(<span class="macro-nonterminal">x</span>)
         }
 
-        <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;Consumes a number from the head of the buffer. Returns `None` if buffer is too small.&quot;</span>]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">checked</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">size</span> {
-                <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>())
-            } <span class="kw">else</span> {
-                <span class="prelude-val">None</span>
-            }
+        <span class="attribute">#[doc = <span class="string">&quot;Consumes a number from the head of the buffer. Returns `None` if buffer is too small.&quot;</span>]
+        </span><span class="kw">pub fn </span><span class="macro-nonterminal">$checked</span>(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="macro-nonterminal">$t</span>&gt; {
+            <span class="kw">if </span><span class="self">self</span>.len() &gt;= <span class="macro-nonterminal">$size </span>{
+                <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="macro-nonterminal">$name</span>())
+            } <span class="kw">else </span>{
+                <span class="prelude-val">None
+            </span>}
         }
     };
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns `T: MyDeserialize` deserialized from `self`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note, that this may panic if `T::SIZE.is_some()` and less than `self.0.len()`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_unchecked</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ctx</span>: <span class="ident">T::Ctx</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">MyDeserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ParseBuf&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Returns `T: MyDeserialize` deserialized from `self`.
+    ///
+    /// Note, that this may panic if `T::SIZE.is_some()` and less than `self.0.len()`.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub fn </span>parse_unchecked&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ctx: T::Ctx) -&gt; io::Result&lt;T&gt;
+    <span class="kw">where
+        </span>T: MyDeserialize&lt;<span class="lifetime">&#39;a</span>&gt;,
     {
-        <span class="ident">T::deserialize</span>(<span class="ident">ctx</span>, <span class="self">self</span>)
+        T::deserialize(ctx, <span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Checked `parse`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ctx</span>: <span class="ident">T::Ctx</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">MyDeserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Checked `parse`.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub fn </span>parse&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ctx: T::Ctx) -&gt; io::Result&lt;T&gt;
+    <span class="kw">where
+        </span>T: MyDeserialize&lt;<span class="lifetime">&#39;a</span>&gt;,
     {
-        <span class="kw">match</span> <span class="ident">T::SIZE</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">size</span>) =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span>: <span class="ident">ParseBuf</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">parse_unchecked</span>(<span class="ident">size</span>)<span class="question-mark">?</span>;
-                <span class="ident">buf</span>.<span class="ident">parse_unchecked</span>(<span class="ident">ctx</span>)
+        <span class="kw">match </span>T::SIZE {
+            <span class="prelude-val">Some</span>(size) =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>buf: ParseBuf = <span class="self">self</span>.parse_unchecked(size)<span class="question-mark">?</span>;
+                buf.parse_unchecked(ctx)
             }
-            <span class="prelude-val">None</span> =&gt; <span class="self">self</span>.<span class="ident">parse_unchecked</span>(<span class="ident">ctx</span>),
+            <span class="prelude-val">None </span>=&gt; <span class="self">self</span>.parse_unchecked(ctx),
         }
     }
 
-    <span class="doccomment">/// Returns true if buffer is empty.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>
+    <span class="doccomment">/// Returns true if buffer is empty.
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.len() == <span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Returns the number of bytes in the buffer.
+    </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.<span class="number">0</span>.len()
     }
 
-    <span class="doccomment">/// Returns the number of bytes in the buffer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">len</span>()
+    <span class="doccomment">/// Skips the given number of bytes.
+    ///
+    /// Afterwards self contains elements `[cnt, len)`.
+    </span><span class="kw">pub fn </span>skip(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cnt: usize) {
+        <span class="self">self</span>.<span class="number">0 </span>= <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>[cnt..];
     }
 
-    <span class="doccomment">/// Skips the given number of bytes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Afterwards self contains elements `[cnt, len)`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">skip</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cnt</span>: <span class="ident">usize</span>) {
-        <span class="self">self</span>.<span class="number">0</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>[<span class="ident">cnt</span>..];
+    <span class="doccomment">/// Same as `skip` but returns `false` if buffer is too small.
+    </span><span class="kw">pub fn </span>checked_skip(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cnt: usize) -&gt; bool {
+        <span class="kw">if </span><span class="self">self</span>.len() &gt;= cnt {
+            <span class="self">self</span>.skip(cnt);
+            <span class="bool-val">true
+        </span>} <span class="kw">else </span>{
+            <span class="bool-val">false
+        </span>}
     }
 
-    <span class="doccomment">/// Same as `skip` but returns `false` if buffer is too small.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_skip</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cnt</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">cnt</span> {
-            <span class="self">self</span>.<span class="ident">skip</span>(<span class="ident">cnt</span>);
-            <span class="bool-val">true</span>
-        } <span class="kw">else</span> {
-            <span class="bool-val">false</span>
+    <span class="doccomment">/// Splits the buffer into two at the given index. Returns elements `[0, n)`.
+    ///
+    /// Afterwards self contains elements `[n, len)`.
+    ///
+    /// # Panic
+    ///
+    /// Will panic if `n &gt; self.len()`.
+    </span><span class="kw">pub fn </span>eat(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: usize) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
+        <span class="kw">let </span>(left, right) = <span class="self">self</span>.<span class="number">0</span>.split_at(n);
+        <span class="self">self</span>.<span class="number">0 </span>= right;
+        left
+    }
+
+    <span class="kw">pub fn </span>eat_buf(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: usize) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(<span class="self">self</span>.eat(n))
+    }
+
+    <span class="doccomment">/// Same as `eat`. Returns `None` if buffer is too small.
+    </span><span class="kw">pub fn </span>checked_eat(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]&gt; {
+        <span class="kw">if </span><span class="self">self</span>.len() &gt;= n {
+            <span class="prelude-val">Some</span>(<span class="self">self</span>.eat(n))
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
+    }
+
+    <span class="kw">pub fn </span>checked_eat_buf(<span class="kw-2">&amp;mut </span><span class="self">self</span>, n: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="prelude-val">Some</span>(<span class="self">Self</span>(<span class="self">self</span>.checked_eat(n)<span class="question-mark">?</span>))
+    }
+
+    <span class="kw">pub fn </span>eat_all(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
+        <span class="self">self</span>.eat(<span class="self">self</span>.len())
+    }
+
+    <span class="macro">eat_num!</span>(eat_u8, checked_eat_u8, u8::from_le_bytes);
+    <span class="macro">eat_num!</span>(eat_i8, checked_eat_i8, i8::from_le_bytes);
+    <span class="macro">eat_num!</span>(eat_u16_le, checked_eat_u16_le, u16::from_le_bytes);
+    <span class="macro">eat_num!</span>(eat_i16_le, checked_eat_i16_le, i16::from_le_bytes);
+    <span class="macro">eat_num!</span>(eat_u16_be, checked_eat_u16_be, u16::from_be_bytes);
+    <span class="macro">eat_num!</span>(eat_i16_be, checked_eat_i16_be, i16::from_be_bytes);
+    <span class="macro">eat_num!</span>(eat_u24_le, checked_eat_u24_le, <span class="number">3</span>, <span class="number">0</span>, u32::from_le);
+    <span class="macro">eat_num!</span>(eat_i24_le, checked_eat_i24_le, <span class="number">3</span>, <span class="number">0</span>, i32::from_le);
+    <span class="macro">eat_num!</span>(eat_u24_be, checked_eat_u24_be, <span class="number">3</span>, <span class="number">1</span>, u32::from_be);
+    <span class="macro">eat_num!</span>(eat_i24_be, checked_eat_i24_be, <span class="number">3</span>, <span class="number">1</span>, i32::from_be);
+    <span class="macro">eat_num!</span>(eat_u32_le, checked_eat_u32_le, u32::from_le_bytes);
+    <span class="macro">eat_num!</span>(eat_i32_le, checked_eat_i32_le, i32::from_le_bytes);
+    <span class="macro">eat_num!</span>(eat_u32_be, checked_eat_u32_be, u32::from_be_bytes);
+    <span class="macro">eat_num!</span>(eat_i32_be, checked_eat_i32_be, i32::from_be_bytes);
+    <span class="macro">eat_num!</span>(eat_u40_le, checked_eat_u40_le, <span class="number">5</span>, <span class="number">0</span>, u64::from_le);
+    <span class="macro">eat_num!</span>(eat_i40_le, checked_eat_i40_le, <span class="number">5</span>, <span class="number">0</span>, i64::from_le);
+    <span class="macro">eat_num!</span>(eat_u40_be, checked_eat_u40_be, <span class="number">5</span>, <span class="number">3</span>, u64::from_be);
+    <span class="macro">eat_num!</span>(eat_i40_be, checked_eat_i40_be, <span class="number">5</span>, <span class="number">3</span>, i64::from_be);
+    <span class="macro">eat_num!</span>(eat_u48_le, checked_eat_u48_le, <span class="number">6</span>, <span class="number">0</span>, u64::from_le);
+    <span class="macro">eat_num!</span>(eat_i48_le, checked_eat_i48_le, <span class="number">6</span>, <span class="number">0</span>, i64::from_le);
+    <span class="macro">eat_num!</span>(eat_u48_be, checked_eat_u48_be, <span class="number">6</span>, <span class="number">2</span>, u64::from_be);
+    <span class="macro">eat_num!</span>(eat_i48_be, checked_eat_i48_be, <span class="number">6</span>, <span class="number">2</span>, i64::from_be);
+    <span class="macro">eat_num!</span>(eat_u56_le, checked_eat_u56_le, <span class="number">7</span>, <span class="number">0</span>, u64::from_le);
+    <span class="macro">eat_num!</span>(eat_i56_le, checked_eat_i56_le, <span class="number">7</span>, <span class="number">0</span>, i64::from_le);
+    <span class="macro">eat_num!</span>(eat_u56_be, checked_eat_u56_be, <span class="number">7</span>, <span class="number">1</span>, u64::from_be);
+    <span class="macro">eat_num!</span>(eat_i56_be, checked_eat_i56_be, <span class="number">7</span>, <span class="number">1</span>, i64::from_be);
+    <span class="macro">eat_num!</span>(eat_u64_le, checked_eat_u64_le, u64::from_le_bytes);
+    <span class="macro">eat_num!</span>(eat_i64_le, checked_eat_i64_le, i64::from_le_bytes);
+    <span class="macro">eat_num!</span>(eat_u64_be, checked_eat_u64_be, u64::from_be_bytes);
+    <span class="macro">eat_num!</span>(eat_i64_be, checked_eat_i64_be, i64::from_be_bytes);
+    <span class="macro">eat_num!</span>(eat_u128_le, checked_eat_u128_le, u128::from_le_bytes);
+    <span class="macro">eat_num!</span>(eat_i128_le, checked_eat_i128_le, i128::from_le_bytes);
+    <span class="macro">eat_num!</span>(eat_u128_be, checked_eat_u128_be, u128::from_be_bytes);
+    <span class="macro">eat_num!</span>(eat_i128_be, checked_eat_i128_be, i128::from_be_bytes);
+
+    <span class="macro">eat_num!</span>(eat_f32_le, checked_eat_f32_le, f32::from_le_bytes);
+    <span class="macro">eat_num!</span>(eat_f32_be, checked_eat_f32_be, f32::from_be_bytes);
+
+    <span class="macro">eat_num!</span>(eat_f64_le, checked_eat_f64_le, f64::from_le_bytes);
+    <span class="macro">eat_num!</span>(eat_f64_be, checked_eat_f64_be, f64::from_be_bytes);
+
+    <span class="doccomment">/// Consumes MySql length-encoded integer from the head of the buffer.
+    ///
+    /// Returns `0` if integer is maliformed (starts with 0xff or 0xfb). First byte will be eaten.
+    </span><span class="kw">pub fn </span>eat_lenenc_int(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; u64 {
+        <span class="kw">match </span><span class="self">self</span>.eat_u8() {
+            x @ <span class="number">0</span>..=<span class="number">0xfa </span>=&gt; x <span class="kw">as </span>u64,
+            <span class="number">0xfc </span>=&gt; <span class="self">self</span>.eat_u16_le() <span class="kw">as </span>u64,
+            <span class="number">0xfd </span>=&gt; <span class="self">self</span>.eat_u24_le() <span class="kw">as </span>u64,
+            <span class="number">0xfe </span>=&gt; <span class="self">self</span>.eat_u64_le(),
+            <span class="number">0xfb </span>| <span class="number">0xff </span>=&gt; <span class="number">0</span>,
         }
     }
 
-    <span class="doccomment">/// Splits the buffer into two at the given index. Returns elements `[0, n)`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Afterwards self contains elements `[n, len)`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panic</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Will panic if `n &gt; self.len()`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">eat</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] {
-        <span class="kw">let</span> (<span class="ident">left</span>, <span class="ident">right</span>) <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">split_at</span>(<span class="ident">n</span>);
-        <span class="self">self</span>.<span class="number">0</span> <span class="op">=</span> <span class="ident">right</span>;
-        <span class="ident">left</span>
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">eat_buf</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="self">self</span>.<span class="ident">eat</span>(<span class="ident">n</span>))
-    }
-
-    <span class="doccomment">/// Same as `eat`. Returns `None` if buffer is too small.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_eat</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">n</span> {
-            <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">eat</span>(<span class="ident">n</span>))
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
+    <span class="doccomment">/// Same as `eat_lenenc_int`. Returns `None` if buffer is too small.
+    </span><span class="kw">pub fn </span>checked_eat_lenenc_int(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u64&gt; {
+        <span class="kw">match </span><span class="self">self</span>.checked_eat_u8()<span class="question-mark">? </span>{
+            x @ <span class="number">0</span>..=<span class="number">0xfa </span>=&gt; <span class="prelude-val">Some</span>(x <span class="kw">as </span>u64),
+            <span class="number">0xfc </span>=&gt; <span class="self">self</span>.checked_eat_u16_le().map(|x| x <span class="kw">as </span>u64),
+            <span class="number">0xfd </span>=&gt; <span class="self">self</span>.checked_eat_u24_le().map(|x| x <span class="kw">as </span>u64),
+            <span class="number">0xfe </span>=&gt; <span class="self">self</span>.checked_eat_u64_le(),
+            <span class="number">0xfb </span>| <span class="number">0xff </span>=&gt; <span class="prelude-val">Some</span>(<span class="number">0</span>),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_eat_buf</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="self">Self</span>(<span class="self">self</span>.<span class="ident">checked_eat</span>(<span class="ident">n</span>)<span class="question-mark">?</span>))
+    <span class="doccomment">/// Consumes MySql length-encoded string from the head of the buffer.
+    ///
+    /// Returns an empty slice if length is maliformed (starts with 0xff). First byte will be eaten.
+    </span><span class="kw">pub fn </span>eat_lenenc_str(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
+        <span class="kw">let </span>len = <span class="self">self</span>.eat_lenenc_int();
+        <span class="self">self</span>.eat(len <span class="kw">as </span>usize)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">eat_all</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="ident">eat</span>(<span class="self">self</span>.<span class="ident">len</span>())
+    <span class="doccomment">/// Same as `eat_lenenc_str`. Returns `None` if buffer is too small.
+    </span><span class="kw">pub fn </span>checked_eat_lenenc_str(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]&gt; {
+        <span class="kw">let </span>len = <span class="self">self</span>.checked_eat_lenenc_int()<span class="question-mark">?</span>;
+        <span class="self">self</span>.checked_eat(len <span class="kw">as </span>usize)
     }
 
-    <span class="macro">eat_num!</span>(<span class="ident">eat_u8</span>, <span class="ident">checked_eat_u8</span>, <span class="ident">u8::from_le_bytes</span>);
-    <span class="macro">eat_num!</span>(<span class="ident">eat_i8</span>, <span class="ident">checked_eat_i8</span>, <span class="ident">i8::from_le_bytes</span>);
-    <span class="macro">eat_num!</span>(<span class="ident">eat_u16_le</span>, <span class="ident">checked_eat_u16_le</span>, <span class="ident">u16::from_le_bytes</span>);
-    <span class="macro">eat_num!</span>(<span class="ident">eat_i16_le</span>, <span class="ident">checked_eat_i16_le</span>, <span class="ident">i16::from_le_bytes</span>);
-    <span class="macro">eat_num!</span>(<span class="ident">eat_u16_be</span>, <span class="ident">checked_eat_u16_be</span>, <span class="ident">u16::from_be_bytes</span>);
-    <span class="macro">eat_num!</span>(<span class="ident">eat_i16_be</span>, <span class="ident">checked_eat_i16_be</span>, <span class="ident">i16::from_be_bytes</span>);
-    <span class="macro">eat_num!</span>(<span class="ident">eat_u24_le</span>, <span class="ident">checked_eat_u24_le</span>, <span class="number">3</span>, <span class="number">0</span>, <span class="ident">u32::from_le</span>);
-    <span class="macro">eat_num!</span>(<span class="ident">eat_i24_le</span>, <span class="ident">checked_eat_i24_le</span>, <span class="number">3</span>, <span class="number">0</span>, <span class="ident">i32::from_le</span>);
-    <span class="macro">eat_num!</span>(<span class="ident">eat_u24_be</span>, <span class="ident">checked_eat_u24_be</span>, <span class="number">3</span>, <span class="number">1</span>, <span class="ident">u32::from_be</span>);
-    <span class="macro">eat_num!</span>(<span class="ident">eat_i24_be</span>, <span class="ident">checked_eat_i24_be</span>, <span class="number">3</span>, <span class="number">1</span>, <span class="ident">i32::from_be</span>);
-    <span class="macro">eat_num!</span>(<span class="ident">eat_u32_le</span>, <span class="ident">checked_eat_u32_le</span>, <span class="ident">u32::from_le_bytes</span>);
-    <span class="macro">eat_num!</span>(<span class="ident">eat_i32_le</span>, <span class="ident">checked_eat_i32_le</span>, <span class="ident">i32::from_le_bytes</span>);
-    <span class="macro">eat_num!</span>(<span class="ident">eat_u32_be</span>, <span class="ident">checked_eat_u32_be</span>, <span class="ident">u32::from_be_bytes</span>);
-    <span class="macro">eat_num!</span>(<span class="ident">eat_i32_be</span>, <span class="ident">checked_eat_i32_be</span>, <span class="ident">i32::from_be_bytes</span>);
-    <span class="macro">eat_num!</span>(<span class="ident">eat_u40_le</span>, <span class="ident">checked_eat_u40_le</span>, <span class="number">5</span>, <span class="number">0</span>, <span class="ident">u64::from_le</span>);
-    <span class="macro">eat_num!</span>(<span class="ident">eat_i40_le</span>, <span class="ident">checked_eat_i40_le</span>, <span class="number">5</span>, <span class="number">0</span>, <span class="ident">i64::from_le</span>);
-    <span class="macro">eat_num!</span>(<span class="ident">eat_u40_be</span>, <span class="ident">checked_eat_u40_be</span>, <span class="number">5</span>, <span class="number">3</span>, <span class="ident">u64::from_be</span>);
-    <span class="macro">eat_num!</span>(<span class="ident">eat_i40_be</span>, <span class="ident">checked_eat_i40_be</span>, <span class="number">5</span>, <span class="number">3</span>, <span class="ident">i64::from_be</span>);
-    <span class="macro">eat_num!</span>(<span class="ident">eat_u48_le</span>, <span class="ident">checked_eat_u48_le</span>, <span class="number">6</span>, <span class="number">0</span>, <span class="ident">u64::from_le</span>);
-    <span class="macro">eat_num!</span>(<span class="ident">eat_i48_le</span>, <span class="ident">checked_eat_i48_le</span>, <span class="number">6</span>, <span class="number">0</span>, <span class="ident">i64::from_le</span>);
-    <span class="macro">eat_num!</span>(<span class="ident">eat_u48_be</span>, <span class="ident">checked_eat_u48_be</span>, <span class="number">6</span>, <span class="number">2</span>, <span class="ident">u64::from_be</span>);
-    <span class="macro">eat_num!</span>(<span class="ident">eat_i48_be</span>, <span class="ident">checked_eat_i48_be</span>, <span class="number">6</span>, <span class="number">2</span>, <span class="ident">i64::from_be</span>);
-    <span class="macro">eat_num!</span>(<span class="ident">eat_u56_le</span>, <span class="ident">checked_eat_u56_le</span>, <span class="number">7</span>, <span class="number">0</span>, <span class="ident">u64::from_le</span>);
-    <span class="macro">eat_num!</span>(<span class="ident">eat_i56_le</span>, <span class="ident">checked_eat_i56_le</span>, <span class="number">7</span>, <span class="number">0</span>, <span class="ident">i64::from_le</span>);
-    <span class="macro">eat_num!</span>(<span class="ident">eat_u56_be</span>, <span class="ident">checked_eat_u56_be</span>, <span class="number">7</span>, <span class="number">1</span>, <span class="ident">u64::from_be</span>);
-    <span class="macro">eat_num!</span>(<span class="ident">eat_i56_be</span>, <span class="ident">checked_eat_i56_be</span>, <span class="number">7</span>, <span class="number">1</span>, <span class="ident">i64::from_be</span>);
-    <span class="macro">eat_num!</span>(<span class="ident">eat_u64_le</span>, <span class="ident">checked_eat_u64_le</span>, <span class="ident">u64::from_le_bytes</span>);
-    <span class="macro">eat_num!</span>(<span class="ident">eat_i64_le</span>, <span class="ident">checked_eat_i64_le</span>, <span class="ident">i64::from_le_bytes</span>);
-    <span class="macro">eat_num!</span>(<span class="ident">eat_u64_be</span>, <span class="ident">checked_eat_u64_be</span>, <span class="ident">u64::from_be_bytes</span>);
-    <span class="macro">eat_num!</span>(<span class="ident">eat_i64_be</span>, <span class="ident">checked_eat_i64_be</span>, <span class="ident">i64::from_be_bytes</span>);
-    <span class="macro">eat_num!</span>(<span class="ident">eat_u128_le</span>, <span class="ident">checked_eat_u128_le</span>, <span class="ident">u128::from_le_bytes</span>);
-    <span class="macro">eat_num!</span>(<span class="ident">eat_i128_le</span>, <span class="ident">checked_eat_i128_le</span>, <span class="ident">i128::from_le_bytes</span>);
-    <span class="macro">eat_num!</span>(<span class="ident">eat_u128_be</span>, <span class="ident">checked_eat_u128_be</span>, <span class="ident">u128::from_be_bytes</span>);
-    <span class="macro">eat_num!</span>(<span class="ident">eat_i128_be</span>, <span class="ident">checked_eat_i128_be</span>, <span class="ident">i128::from_be_bytes</span>);
-
-    <span class="macro">eat_num!</span>(<span class="ident">eat_f32_le</span>, <span class="ident">checked_eat_f32_le</span>, <span class="ident">f32::from_le_bytes</span>);
-    <span class="macro">eat_num!</span>(<span class="ident">eat_f32_be</span>, <span class="ident">checked_eat_f32_be</span>, <span class="ident">f32::from_be_bytes</span>);
-
-    <span class="macro">eat_num!</span>(<span class="ident">eat_f64_le</span>, <span class="ident">checked_eat_f64_le</span>, <span class="ident">f64::from_le_bytes</span>);
-    <span class="macro">eat_num!</span>(<span class="ident">eat_f64_be</span>, <span class="ident">checked_eat_f64_be</span>, <span class="ident">f64::from_be_bytes</span>);
-
-    <span class="doccomment">/// Consumes MySql length-encoded integer from the head of the buffer.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `0` if integer is maliformed (starts with 0xff or 0xfb). First byte will be eaten.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">eat_lenenc_int</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">eat_u8</span>() {
-            <span class="ident">x</span> @ <span class="number">0</span>..<span class="op">=</span><span class="number">0xfa</span> =&gt; <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u64</span>,
-            <span class="number">0xfc</span> =&gt; <span class="self">self</span>.<span class="ident">eat_u16_le</span>() <span class="kw">as</span> <span class="ident">u64</span>,
-            <span class="number">0xfd</span> =&gt; <span class="self">self</span>.<span class="ident">eat_u24_le</span>() <span class="kw">as</span> <span class="ident">u64</span>,
-            <span class="number">0xfe</span> =&gt; <span class="self">self</span>.<span class="ident">eat_u64_le</span>(),
-            <span class="number">0xfb</span> <span class="op">|</span> <span class="number">0xff</span> =&gt; <span class="number">0</span>,
-        }
+    <span class="doccomment">/// Consumes MySql string with u8 length prefix from the head of the buffer.
+    </span><span class="kw">pub fn </span>eat_u8_str(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
+        <span class="kw">let </span>len = <span class="self">self</span>.eat_u8();
+        <span class="self">self</span>.eat(len <span class="kw">as </span>usize)
     }
 
-    <span class="doccomment">/// Same as `eat_lenenc_int`. Returns `None` if buffer is too small.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_eat_lenenc_int</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">checked_eat_u8</span>()<span class="question-mark">?</span> {
-            <span class="ident">x</span> @ <span class="number">0</span>..<span class="op">=</span><span class="number">0xfa</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">x</span> <span class="kw">as</span> <span class="ident">u64</span>),
-            <span class="number">0xfc</span> =&gt; <span class="self">self</span>.<span class="ident">checked_eat_u16_le</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u64</span>),
-            <span class="number">0xfd</span> =&gt; <span class="self">self</span>.<span class="ident">checked_eat_u24_le</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="kw">as</span> <span class="ident">u64</span>),
-            <span class="number">0xfe</span> =&gt; <span class="self">self</span>.<span class="ident">checked_eat_u64_le</span>(),
-            <span class="number">0xfb</span> <span class="op">|</span> <span class="number">0xff</span> =&gt; <span class="prelude-val">Some</span>(<span class="number">0</span>),
-        }
+    <span class="doccomment">/// Same as `eat_u8_str`. Returns `None` if buffer is too small.
+    </span><span class="kw">pub fn </span>checked_eat_u8_str(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]&gt; {
+        <span class="kw">let </span>len = <span class="self">self</span>.checked_eat_u8()<span class="question-mark">?</span>;
+        <span class="self">self</span>.checked_eat(len <span class="kw">as </span>usize)
     }
 
-    <span class="doccomment">/// Consumes MySql length-encoded string from the head of the buffer.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns an empty slice if length is maliformed (starts with 0xff). First byte will be eaten.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">eat_lenenc_str</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">eat_lenenc_int</span>();
-        <span class="self">self</span>.<span class="ident">eat</span>(<span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>)
+    <span class="doccomment">/// Consumes MySql string with u32 length prefix from the head of the buffer.
+    </span><span class="kw">pub fn </span>eat_u32_str(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
+        <span class="kw">let </span>len = <span class="self">self</span>.eat_u32_le();
+        <span class="self">self</span>.eat(len <span class="kw">as </span>usize)
     }
 
-    <span class="doccomment">/// Same as `eat_lenenc_str`. Returns `None` if buffer is too small.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_eat_lenenc_str</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">checked_eat_lenenc_int</span>()<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">checked_eat</span>(<span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>)
+    <span class="doccomment">/// Same as `eat_u32_str`. Returns `None` if buffer is too small.
+    </span><span class="kw">pub fn </span>checked_eat_u32_str(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]&gt; {
+        <span class="kw">let </span>len = <span class="self">self</span>.checked_eat_u32_le()<span class="question-mark">?</span>;
+        <span class="self">self</span>.checked_eat(len <span class="kw">as </span>usize)
     }
 
-    <span class="doccomment">/// Consumes MySql string with u8 length prefix from the head of the buffer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">eat_u8_str</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">eat_u8</span>();
-        <span class="self">self</span>.<span class="ident">eat</span>(<span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>)
-    }
-
-    <span class="doccomment">/// Same as `eat_u8_str`. Returns `None` if buffer is too small.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_eat_u8_str</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">checked_eat_u8</span>()<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">checked_eat</span>(<span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>)
-    }
-
-    <span class="doccomment">/// Consumes MySql string with u32 length prefix from the head of the buffer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">eat_u32_str</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">eat_u32_le</span>();
-        <span class="self">self</span>.<span class="ident">eat</span>(<span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>)
-    }
-
-    <span class="doccomment">/// Same as `eat_u32_str`. Returns `None` if buffer is too small.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_eat_u32_str</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">checked_eat_u32_le</span>()<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">checked_eat</span>(<span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>)
-    }
-
-    <span class="doccomment">/// Consumes null-terminated string from the head of the buffer.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Consumes whole buffer if there is no `0`-byte.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">eat_null_str</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] {
-        <span class="kw">let</span> <span class="ident">pos</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="number">0</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">position</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">x</span> <span class="op">==</span> <span class="number">0</span>)
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">len</span>());
-        <span class="self">self</span>.<span class="ident">eat</span>(<span class="ident">pos</span>)
+    <span class="doccomment">/// Consumes null-terminated string from the head of the buffer.
+    ///
+    /// Consumes whole buffer if there is no `0`-byte.
+    </span><span class="kw">pub fn </span>eat_null_str(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
+        <span class="kw">let </span>pos = <span class="self">self
+            </span>.<span class="number">0
+            </span>.iter()
+            .position(|x| <span class="kw-2">*</span>x == <span class="number">0</span>)
+            .unwrap_or_else(|| <span class="self">self</span>.len());
+        <span class="self">self</span>.eat(pos)
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">thiserror::Error</span>)]</span>
-<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Invalid length-encoded integer value (starts with 0xfb|0xff)&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InvalidLenghEncodedInteger</span>;
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, thiserror::Error)]
+#[error(<span class="string">&quot;Invalid length-encoded integer value (starts with 0xfb|0xff)&quot;</span>)]
+</span><span class="kw">pub struct </span>InvalidLenghEncodedInteger;
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ReadMysqlExt</span>: <span class="ident">ReadBytesExt</span> {
-    <span class="doccomment">/// Reads MySql&#39;s length-encoded integer.</span>
-    <span class="kw">fn</span> <span class="ident">read_lenenc_int</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span> {
-            <span class="ident">x</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">0xfa</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">x</span>.<span class="ident">into</span>()),
-            <span class="number">0xfc</span> =&gt; <span class="self">self</span>.<span class="ident">read_uint</span>::<span class="op">&lt;</span><span class="ident">LE</span><span class="op">&gt;</span>(<span class="number">2</span>),
-            <span class="number">0xfd</span> =&gt; <span class="self">self</span>.<span class="ident">read_uint</span>::<span class="op">&lt;</span><span class="ident">LE</span><span class="op">&gt;</span>(<span class="number">3</span>),
-            <span class="number">0xfe</span> =&gt; <span class="self">self</span>.<span class="ident">read_uint</span>::<span class="op">&lt;</span><span class="ident">LE</span><span class="op">&gt;</span>(<span class="number">8</span>),
-            <span class="number">0xfb</span> <span class="op">|</span> <span class="number">0xff</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
-                <span class="ident">io::ErrorKind::Other</span>,
-                <span class="ident">InvalidLenghEncodedInteger</span>,
+<span class="kw">pub trait </span>ReadMysqlExt: ReadBytesExt {
+    <span class="doccomment">/// Reads MySql&#39;s length-encoded integer.
+    </span><span class="kw">fn </span>read_lenenc_int(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;u64&gt; {
+        <span class="kw">match </span><span class="self">self</span>.read_u8()<span class="question-mark">? </span>{
+            x <span class="kw">if </span>x &lt;= <span class="number">0xfa </span>=&gt; <span class="prelude-val">Ok</span>(x.into()),
+            <span class="number">0xfc </span>=&gt; <span class="self">self</span>.read_uint::&lt;LE&gt;(<span class="number">2</span>),
+            <span class="number">0xfd </span>=&gt; <span class="self">self</span>.read_uint::&lt;LE&gt;(<span class="number">3</span>),
+            <span class="number">0xfe </span>=&gt; <span class="self">self</span>.read_uint::&lt;LE&gt;(<span class="number">8</span>),
+            <span class="number">0xfb </span>| <span class="number">0xff </span>=&gt; <span class="prelude-val">Err</span>(io::Error::new(
+                io::ErrorKind::Other,
+                InvalidLenghEncodedInteger,
             )),
-            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
         }
     }
 
-    <span class="doccomment">/// Reads MySql&#39;s length-encoded string.</span>
-    <span class="kw">fn</span> <span class="ident">read_lenenc_str</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">read_lenenc_int</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0_u8</span>; <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>];
-        <span class="self">self</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">output</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">output</span>)
+    <span class="doccomment">/// Reads MySql&#39;s length-encoded string.
+    </span><span class="kw">fn </span>read_lenenc_str(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;Vec&lt;u8&gt;&gt; {
+        <span class="kw">let </span>len = <span class="self">self</span>.read_lenenc_int()<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>output = <span class="macro">vec!</span>[<span class="number">0_u8</span>; len <span class="kw">as </span>usize];
+        <span class="self">self</span>.read_exact(<span class="kw-2">&amp;mut </span>output)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(output)
     }
 }
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">WriteMysqlExt</span>: <span class="ident">WriteBytesExt</span> {
-    <span class="doccomment">/// Writes MySql&#39;s length-encoded integer.</span>
-    <span class="kw">fn</span> <span class="ident">write_lenenc_int</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">x</span>: <span class="ident">u64</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">x</span> <span class="op">&lt;</span> <span class="number">251</span> {
-            <span class="self">self</span>.<span class="ident">write_u8</span>(<span class="ident">x</span> <span class="kw">as</span> <span class="ident">u8</span>)<span class="question-mark">?</span>;
+<span class="kw">pub trait </span>WriteMysqlExt: WriteBytesExt {
+    <span class="doccomment">/// Writes MySql&#39;s length-encoded integer.
+    </span><span class="kw">fn </span>write_lenenc_int(<span class="kw-2">&amp;mut </span><span class="self">self</span>, x: u64) -&gt; io::Result&lt;u64&gt; {
+        <span class="kw">if </span>x &lt; <span class="number">251 </span>{
+            <span class="self">self</span>.write_u8(x <span class="kw">as </span>u8)<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(<span class="number">1</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">&lt;</span> <span class="number">65_536</span> {
-            <span class="self">self</span>.<span class="ident">write_u8</span>(<span class="number">0xFC</span>)<span class="question-mark">?</span>;
-            <span class="self">self</span>.<span class="ident">write_uint</span>::<span class="op">&lt;</span><span class="ident">LE</span><span class="op">&gt;</span>(<span class="ident">x</span>, <span class="number">2</span>)<span class="question-mark">?</span>;
+        } <span class="kw">else if </span>x &lt; <span class="number">65_536 </span>{
+            <span class="self">self</span>.write_u8(<span class="number">0xFC</span>)<span class="question-mark">?</span>;
+            <span class="self">self</span>.write_uint::&lt;LE&gt;(x, <span class="number">2</span>)<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(<span class="number">3</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">x</span> <span class="op">&lt;</span> <span class="number">16_777_216</span> {
-            <span class="self">self</span>.<span class="ident">write_u8</span>(<span class="number">0xFD</span>)<span class="question-mark">?</span>;
-            <span class="self">self</span>.<span class="ident">write_uint</span>::<span class="op">&lt;</span><span class="ident">LE</span><span class="op">&gt;</span>(<span class="ident">x</span>, <span class="number">3</span>)<span class="question-mark">?</span>;
+        } <span class="kw">else if </span>x &lt; <span class="number">16_777_216 </span>{
+            <span class="self">self</span>.write_u8(<span class="number">0xFD</span>)<span class="question-mark">?</span>;
+            <span class="self">self</span>.write_uint::&lt;LE&gt;(x, <span class="number">3</span>)<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(<span class="number">4</span>)
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">write_u8</span>(<span class="number">0xFE</span>)<span class="question-mark">?</span>;
-            <span class="self">self</span>.<span class="ident">write_uint</span>::<span class="op">&lt;</span><span class="ident">LE</span><span class="op">&gt;</span>(<span class="ident">x</span>, <span class="number">8</span>)<span class="question-mark">?</span>;
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.write_u8(<span class="number">0xFE</span>)<span class="question-mark">?</span>;
+            <span class="self">self</span>.write_uint::&lt;LE&gt;(x, <span class="number">8</span>)<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(<span class="number">9</span>)
         }
     }
 
-    <span class="doccomment">/// Writes MySql&#39;s length-encoded string.</span>
-    <span class="kw">fn</span> <span class="ident">write_lenenc_str</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">written</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">write_lenenc_int</span>(<span class="ident">bytes</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">write_all</span>(<span class="ident">bytes</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">written</span> <span class="op">+</span> <span class="ident">bytes</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>)
+    <span class="doccomment">/// Writes MySql&#39;s length-encoded string.
+    </span><span class="kw">fn </span>write_lenenc_str(<span class="kw-2">&amp;mut </span><span class="self">self</span>, bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; io::Result&lt;u64&gt; {
+        <span class="kw">let </span>written = <span class="self">self</span>.write_lenenc_int(bytes.len() <span class="kw">as </span>u64)<span class="question-mark">?</span>;
+        <span class="self">self</span>.write_all(bytes)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(written + bytes.len() <span class="kw">as </span>u64)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">ReadMysqlExt</span> <span class="kw">for</span> <span class="ident">T</span> <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">ReadBytesExt</span> {}
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">WriteMysqlExt</span> <span class="kw">for</span> <span class="ident">T</span> <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">WriteBytesExt</span> {}
+<span class="kw">impl</span>&lt;T&gt; ReadMysqlExt <span class="kw">for </span>T <span class="kw">where </span>T: ReadBytesExt {}
+<span class="kw">impl</span>&lt;T&gt; WriteMysqlExt <span class="kw">for </span>T <span class="kw">where </span>T: WriteBytesExt {}
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">be_le</span>() {
-        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">ParseBuf</span>(<span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>]);
-        <span class="macro">assert_eq!</span>(<span class="ident">buf</span>.<span class="ident">clone</span>().<span class="ident">eat_u24_le</span>(), <span class="number">0x00020100</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">buf</span>.<span class="ident">clone</span>().<span class="ident">eat_u24_be</span>(), <span class="number">0x00000102</span>);
-        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">ParseBuf</span>(<span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>]);
-        <span class="macro">assert_eq!</span>(<span class="ident">buf</span>.<span class="ident">clone</span>().<span class="ident">eat_u40_le</span>(), <span class="number">0x0000000403020100</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">buf</span>.<span class="ident">clone</span>().<span class="ident">eat_u40_be</span>(), <span class="number">0x0000000001020304</span>);
-        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">ParseBuf</span>(<span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>]);
-        <span class="macro">assert_eq!</span>(<span class="ident">buf</span>.<span class="ident">clone</span>().<span class="ident">eat_u48_le</span>(), <span class="number">0x0000050403020100</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">buf</span>.<span class="ident">clone</span>().<span class="ident">eat_u48_be</span>(), <span class="number">0x0000000102030405</span>);
-        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">ParseBuf</span>(<span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>]);
-        <span class="macro">assert_eq!</span>(<span class="ident">buf</span>.<span class="ident">clone</span>().<span class="ident">eat_u56_le</span>(), <span class="number">0x0006050403020100</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">buf</span>.<span class="ident">clone</span>().<span class="ident">eat_u56_be</span>(), <span class="number">0x0000010203040506</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>be_le() {
+        <span class="kw">let </span>buf = ParseBuf(<span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>]);
+        <span class="macro">assert_eq!</span>(buf.clone().eat_u24_le(), <span class="number">0x00020100</span>);
+        <span class="macro">assert_eq!</span>(buf.clone().eat_u24_be(), <span class="number">0x00000102</span>);
+        <span class="kw">let </span>buf = ParseBuf(<span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>]);
+        <span class="macro">assert_eq!</span>(buf.clone().eat_u40_le(), <span class="number">0x0000000403020100</span>);
+        <span class="macro">assert_eq!</span>(buf.clone().eat_u40_be(), <span class="number">0x0000000001020304</span>);
+        <span class="kw">let </span>buf = ParseBuf(<span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>]);
+        <span class="macro">assert_eq!</span>(buf.clone().eat_u48_le(), <span class="number">0x0000050403020100</span>);
+        <span class="macro">assert_eq!</span>(buf.clone().eat_u48_be(), <span class="number">0x0000000102030405</span>);
+        <span class="kw">let </span>buf = ParseBuf(<span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>]);
+        <span class="macro">assert_eq!</span>(buf.clone().eat_u56_le(), <span class="number">0x0006050403020100</span>);
+        <span class="macro">assert_eq!</span>(buf.clone().eat_u56_be(), <span class="number">0x0000010203040506</span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

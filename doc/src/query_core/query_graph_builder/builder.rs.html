@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_graph_builder/builder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_graph_builder/builder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -96,103 +96,103 @@
 <span id="96">96</span>
 <span id="97">97</span>
 <span id="98">98</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::fmt;
 
-<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">query_document</span>::<span class="kw-2">*</span>, <span class="ident">query_graph</span>::<span class="kw-2">*</span>, <span class="ident">schema</span>::<span class="kw-2">*</span>, <span class="ident">IrSerializer</span>};
+<span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use crate</span>::{query_document::<span class="kw-2">*</span>, query_graph::<span class="kw-2">*</span>, schema::<span class="kw-2">*</span>, IrSerializer};
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">QueryGraphBuilder</span> {
-    <span class="kw">pub</span> <span class="ident">query_schema</span>: <span class="ident">QuerySchemaRef</span>,
+<span class="kw">pub struct </span>QueryGraphBuilder {
+    <span class="kw">pub </span>query_schema: QuerySchemaRef,
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">QueryGraphBuilder</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;QueryGraphBuilder&quot;</span>).<span class="ident">finish</span>()
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>QueryGraphBuilder {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;QueryGraphBuilder&quot;</span>).finish()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">QueryGraphBuilder</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">query_schema</span>: <span class="ident">QuerySchemaRef</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">query_schema</span> }
+<span class="kw">impl </span>QueryGraphBuilder {
+    <span class="kw">pub fn </span>new(query_schema: QuerySchemaRef) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ query_schema }
     }
 
-    <span class="doccomment">/// Maps an operation to a query.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>, <span class="ident">operation</span>: <span class="ident">Operation</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>(<span class="ident">QueryGraph</span>, <span class="ident">IrSerializer</span>)<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">_span</span> <span class="op">=</span> <span class="macro">info_span!</span>(<span class="string">&quot;prisma:engine:build_graph&quot;</span>);
-        <span class="kw">match</span> <span class="ident">operation</span> {
-            <span class="ident">Operation::Read</span>(<span class="ident">selection</span>) =&gt; <span class="self">self</span>.<span class="ident">build_internal</span>(<span class="ident">selection</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">query_schema</span>.<span class="ident">query</span>()),
-            <span class="ident">Operation::Write</span>(<span class="ident">selection</span>) =&gt; <span class="self">self</span>.<span class="ident">build_internal</span>(<span class="ident">selection</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">query_schema</span>.<span class="ident">mutation</span>()),
+    <span class="doccomment">/// Maps an operation to a query.
+    </span><span class="kw">pub fn </span>build(<span class="self">self</span>, operation: Operation) -&gt; QueryGraphBuilderResult&lt;(QueryGraph, IrSerializer)&gt; {
+        <span class="kw">let </span>_span = <span class="macro">info_span!</span>(<span class="string">&quot;prisma:engine:build_graph&quot;</span>);
+        <span class="kw">match </span>operation {
+            Operation::Read(selection) =&gt; <span class="self">self</span>.build_internal(selection, <span class="kw-2">&amp;</span><span class="self">self</span>.query_schema.query()),
+            Operation::Write(selection) =&gt; <span class="self">self</span>.build_internal(selection, <span class="kw-2">&amp;</span><span class="self">self</span>.query_schema.mutation()),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">build_internal</span>(
+    <span class="kw">fn </span>build_internal(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">selection</span>: <span class="ident">Selection</span>,
-        <span class="ident">root_object</span>: <span class="kw-2">&amp;</span><span class="ident">ObjectTypeStrongRef</span>, <span class="comment">// Either the query or mutation object.</span>
-    ) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>(<span class="ident">QueryGraph</span>, <span class="ident">IrSerializer</span>)<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">selections</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">selection</span>];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parsed_object</span> <span class="op">=</span> <span class="ident">QueryDocumentParser::new</span>(<span class="ident"><span class="kw">crate</span>::executor::get_request_now</span>()).<span class="ident">parse_object</span>(
-            <span class="ident">QueryPath::default</span>(),
-            <span class="kw-2">&amp;</span><span class="ident">selections</span>,
-            <span class="ident">root_object</span>,
+        selection: Selection,
+        root_object: <span class="kw-2">&amp;</span>ObjectTypeStrongRef, <span class="comment">// Either the query or mutation object.
+    </span>) -&gt; QueryGraphBuilderResult&lt;(QueryGraph, IrSerializer)&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>selections = <span class="macro">vec!</span>[selection];
+        <span class="kw">let </span><span class="kw-2">mut </span>parsed_object = QueryDocumentParser::new(<span class="kw">crate</span>::executor::get_request_now()).parse_object(
+            QueryPath::default(),
+            <span class="kw-2">&amp;</span>selections,
+            root_object,
         )<span class="question-mark">?</span>;
 
-        <span class="comment">// Because we&#39;re processing root objects, there can only be one query / mutation.</span>
-        <span class="kw">let</span> <span class="ident">field_pair</span> <span class="op">=</span> <span class="ident">parsed_object</span>.<span class="ident">fields</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">serializer</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::derive_serializer</span>(<span class="kw-2">&amp;</span><span class="ident">selections</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>(), <span class="kw-2">&amp;</span><span class="ident">field_pair</span>.<span class="ident">schema_field</span>);
+        <span class="comment">// Because we&#39;re processing root objects, there can only be one query / mutation.
+        </span><span class="kw">let </span>field_pair = parsed_object.fields.pop().unwrap();
+        <span class="kw">let </span>serializer = <span class="self">Self</span>::derive_serializer(<span class="kw-2">&amp;</span>selections.pop().unwrap(), <span class="kw-2">&amp;</span>field_pair.schema_field);
 
-        <span class="kw">if</span> <span class="ident">field_pair</span>.<span class="ident">schema_field</span>.<span class="ident">query_info</span>.<span class="ident">is_some</span>() {
-            <span class="kw">let</span> <span class="ident">graph</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">dispatch_build</span>(<span class="ident">field_pair</span>)<span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>((<span class="ident">graph</span>, <span class="ident">serializer</span>))
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::SchemaError</span>(<span class="macro">format!</span>(
+        <span class="kw">if </span>field_pair.schema_field.query_info.is_some() {
+            <span class="kw">let </span>graph = <span class="self">self</span>.dispatch_build(field_pair)<span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>((graph, serializer))
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(QueryGraphBuilderError::SchemaError(<span class="macro">format!</span>(
                 <span class="string">&quot;Expected query information to be attached on schema object &#39;{}&#39;, field &#39;{}&#39;.&quot;</span>,
-                <span class="ident">root_object</span>.<span class="ident">identifier</span>.<span class="ident">name</span>(),
-                <span class="ident">field_pair</span>.<span class="ident">parsed_field</span>.<span class="ident">name</span>
+                root_object.identifier.name(),
+                field_pair.parsed_field.name
             )))
         }
     }
 
-    <span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
-    <span class="kw">fn</span> <span class="ident">dispatch_build</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">field_pair</span>: <span class="ident">FieldPair</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">QueryGraph</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">query_info</span> <span class="op">=</span> <span class="ident">field_pair</span>.<span class="ident">schema_field</span>.<span class="ident">query_info</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">parsed_field</span> <span class="op">=</span> <span class="ident">field_pair</span>.<span class="ident">parsed_field</span>;
-        <span class="kw">let</span> <span class="ident">connector_ctx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">query_schema</span>.<span class="ident">context</span>();
+    <span class="attribute">#[rustfmt::skip]
+    </span><span class="kw">fn </span>dispatch_build(<span class="kw-2">&amp;</span><span class="self">self</span>, field_pair: FieldPair) -&gt; QueryGraphBuilderResult&lt;QueryGraph&gt; {
+        <span class="kw">let </span>query_info = field_pair.schema_field.query_info.as_ref().unwrap();
+        <span class="kw">let </span>parsed_field = field_pair.parsed_field;
+        <span class="kw">let </span>connector_ctx = <span class="self">self</span>.query_schema.context();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">graph</span> <span class="op">=</span> <span class="kw">match</span> (<span class="kw-2">&amp;</span><span class="ident">query_info</span>.<span class="ident">tag</span>, <span class="ident">query_info</span>.<span class="ident">model</span>.<span class="ident">clone</span>()) {
-            (<span class="ident">QueryTag::FindUnique</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) =&gt; <span class="ident">read::find_unique</span>(<span class="ident">parsed_field</span>, <span class="ident">m</span>).<span class="ident">map</span>(<span class="ident">Into::into</span>),
-            (<span class="ident">QueryTag::FindFirst</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) =&gt; <span class="ident">read::find_first</span>(<span class="ident">parsed_field</span>, <span class="ident">m</span>).<span class="ident">map</span>(<span class="ident">Into::into</span>),
-            (<span class="ident">QueryTag::FindMany</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) =&gt; <span class="ident">read::find_many</span>(<span class="ident">parsed_field</span>, <span class="ident">m</span>).<span class="ident">map</span>(<span class="ident">Into::into</span>),
-            (<span class="ident">QueryTag::Aggregate</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) =&gt; <span class="ident">read::aggregate</span>(<span class="ident">parsed_field</span>, <span class="ident">m</span>).<span class="ident">map</span>(<span class="ident">Into::into</span>),
-            (<span class="ident">QueryTag::GroupBy</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) =&gt; <span class="ident">read::group_by</span>(<span class="ident">parsed_field</span>, <span class="ident">m</span>).<span class="ident">map</span>(<span class="ident">Into::into</span>),
-            (<span class="ident">QueryTag::CreateOne</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) =&gt; <span class="ident">QueryGraph::root</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="ident">write::create_record</span>(<span class="ident">g</span>, <span class="ident">connector_ctx</span>, <span class="ident">m</span>, <span class="ident">parsed_field</span>)),
-            (<span class="ident">QueryTag::CreateMany</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) =&gt; <span class="ident">QueryGraph::root</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="ident">write::create_many_records</span>(<span class="ident">g</span>,  <span class="ident">connector_ctx</span>,<span class="ident">m</span>, <span class="ident">parsed_field</span>)),
-            (<span class="ident">QueryTag::UpdateOne</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) =&gt; <span class="ident">QueryGraph::root</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="ident">write::update_record</span>(<span class="ident">g</span>, <span class="ident">connector_ctx</span>, <span class="ident">m</span>, <span class="ident">parsed_field</span>)),
-            (<span class="ident">QueryTag::UpdateMany</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) =&gt; <span class="ident">QueryGraph::root</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="ident">write::update_many_records</span>(<span class="ident">g</span>, <span class="ident">connector_ctx</span>, <span class="ident">m</span>, <span class="ident">parsed_field</span>)),
-            (<span class="ident">QueryTag::UpsertOne</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) =&gt; <span class="ident">QueryGraph::root</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="ident">write::upsert_record</span>(<span class="ident">g</span>, <span class="ident">connector_ctx</span>, <span class="ident">m</span>, <span class="ident">parsed_field</span>)),
-            (<span class="ident">QueryTag::DeleteOne</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) =&gt; <span class="ident">QueryGraph::root</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="ident">write::delete_record</span>(<span class="ident">g</span>, <span class="ident">connector_ctx</span>, <span class="ident">m</span>, <span class="ident">parsed_field</span>)),
-            (<span class="ident">QueryTag::DeleteMany</span>, <span class="prelude-val">Some</span>(<span class="ident">m</span>)) =&gt; <span class="ident">QueryGraph::root</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="ident">write::delete_many_records</span>(<span class="ident">g</span>, <span class="ident">connector_ctx</span>, <span class="ident">m</span>, <span class="ident">parsed_field</span>)),
-            (<span class="ident">QueryTag::ExecuteRaw</span>, <span class="kw">_</span>) =&gt; <span class="ident">QueryGraph::root</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="ident">write::execute_raw</span>(<span class="ident">g</span>, <span class="ident">parsed_field</span>)),
-            (<span class="ident">QueryTag::QueryRaw</span> { <span class="ident">query_type</span> }, <span class="ident">m</span>) =&gt; <span class="ident">QueryGraph::root</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="ident">write::query_raw</span>(<span class="ident">g</span>, <span class="ident">m</span>, <span class="ident">query_type</span>, <span class="ident">parsed_field</span>)),
-            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Query builder dispatching failed.&quot;</span>),
+        <span class="kw">let </span><span class="kw-2">mut </span>graph = <span class="kw">match </span>(<span class="kw-2">&amp;</span>query_info.tag, query_info.model.clone()) {
+            (QueryTag::FindUnique, <span class="prelude-val">Some</span>(m)) =&gt; read::find_unique(parsed_field, m).map(Into::into),
+            (QueryTag::FindFirst, <span class="prelude-val">Some</span>(m)) =&gt; read::find_first(parsed_field, m).map(Into::into),
+            (QueryTag::FindMany, <span class="prelude-val">Some</span>(m)) =&gt; read::find_many(parsed_field, m).map(Into::into),
+            (QueryTag::Aggregate, <span class="prelude-val">Some</span>(m)) =&gt; read::aggregate(parsed_field, m).map(Into::into),
+            (QueryTag::GroupBy, <span class="prelude-val">Some</span>(m)) =&gt; read::group_by(parsed_field, m).map(Into::into),
+            (QueryTag::CreateOne, <span class="prelude-val">Some</span>(m)) =&gt; QueryGraph::root(|g| write::create_record(g, connector_ctx, m, parsed_field)),
+            (QueryTag::CreateMany, <span class="prelude-val">Some</span>(m)) =&gt; QueryGraph::root(|g| write::create_many_records(g,  connector_ctx,m, parsed_field)),
+            (QueryTag::UpdateOne, <span class="prelude-val">Some</span>(m)) =&gt; QueryGraph::root(|g| write::update_record(g, connector_ctx, m, parsed_field)),
+            (QueryTag::UpdateMany, <span class="prelude-val">Some</span>(m)) =&gt; QueryGraph::root(|g| write::update_many_records(g, connector_ctx, m, parsed_field)),
+            (QueryTag::UpsertOne, <span class="prelude-val">Some</span>(m)) =&gt; QueryGraph::root(|g| write::upsert_record(g, connector_ctx, m, parsed_field)),
+            (QueryTag::DeleteOne, <span class="prelude-val">Some</span>(m)) =&gt; QueryGraph::root(|g| write::delete_record(g, connector_ctx, m, parsed_field)),
+            (QueryTag::DeleteMany, <span class="prelude-val">Some</span>(m)) =&gt; QueryGraph::root(|g| write::delete_many_records(g, connector_ctx, m, parsed_field)),
+            (QueryTag::ExecuteRaw, <span class="kw">_</span>) =&gt; QueryGraph::root(|g| write::execute_raw(g, parsed_field)),
+            (QueryTag::QueryRaw { query_type }, m) =&gt; QueryGraph::root(|g| write::query_raw(g, m, query_type, parsed_field)),
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Query builder dispatching failed.&quot;</span>),
         }<span class="question-mark">?</span>;
 
-        <span class="comment">// Run final transformations.</span>
-        <span class="ident">graph</span>.<span class="ident">finalize</span>()<span class="question-mark">?</span>;
-        <span class="macro">trace!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">graph</span>);
+        <span class="comment">// Run final transformations.
+        </span>graph.finalize()<span class="question-mark">?</span>;
+        <span class="macro">trace!</span>(<span class="string">&quot;{}&quot;</span>, graph);
 
-        <span class="prelude-val">Ok</span>(<span class="ident">graph</span>)
+        <span class="prelude-val">Ok</span>(graph)
     }
 
-    <span class="kw">fn</span> <span class="ident">derive_serializer</span>(<span class="ident">selection</span>: <span class="kw-2">&amp;</span><span class="ident">Selection</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">OutputFieldRef</span>) -&gt; <span class="ident">IrSerializer</span> {
-        <span class="ident">IrSerializer</span> {
-            <span class="ident">key</span>: <span class="ident">selection</span>
-                .<span class="ident">alias</span>()
-                .<span class="ident">clone</span>()
-                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">selection</span>.<span class="ident">name</span>().<span class="ident">to_string</span>()),
-            <span class="ident">output_field</span>: <span class="ident">field</span>.<span class="ident">clone</span>(),
+    <span class="kw">fn </span>derive_serializer(selection: <span class="kw-2">&amp;</span>Selection, field: <span class="kw-2">&amp;</span>OutputFieldRef) -&gt; IrSerializer {
+        IrSerializer {
+            key: selection
+                .alias()
+                .clone()
+                .unwrap_or_else(|| selection.name().to_string()),
+            output_field: field.clone(),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

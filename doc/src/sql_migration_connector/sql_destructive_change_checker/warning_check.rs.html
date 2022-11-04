@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/sql_destructive_change_checker/warning_check.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>warning_check.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../sql_migration_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/sql_destructive_change_checker/warning_check.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>warning_check.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../sql_migration_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -110,117 +110,117 @@
 <span id="110">110</span>
 <span id="111">111</span>
 <span id="112">112</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">check::Check</span>, <span class="ident">database_inspection_results::DatabaseInspectionResults</span>};
+</pre><pre class="rust"><code><span class="kw">use super</span>::{check::Check, database_inspection_results::DatabaseInspectionResults};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum</span> <span class="ident">SqlMigrationWarningCheck</span> {
-    <span class="ident">DropAndRecreateColumn</span> {
-        <span class="ident">table</span>: <span class="ident">String</span>,
-        <span class="ident">column</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum </span>SqlMigrationWarningCheck {
+    DropAndRecreateColumn {
+        table: String,
+        column: String,
     },
-    <span class="ident">NonEmptyColumnDrop</span> {
-        <span class="ident">table</span>: <span class="ident">String</span>,
-        <span class="ident">column</span>: <span class="ident">String</span>,
+    NonEmptyColumnDrop {
+        table: String,
+        column: String,
     },
-    <span class="ident">NonEmptyTableDrop</span> {
-        <span class="ident">table</span>: <span class="ident">String</span>,
+    NonEmptyTableDrop {
+        table: String,
     },
-    <span class="ident">RiskyCast</span> {
-        <span class="ident">table</span>: <span class="ident">String</span>,
-        <span class="ident">column</span>: <span class="ident">String</span>,
-        <span class="ident">previous_type</span>: <span class="ident">String</span>,
-        <span class="ident">next_type</span>: <span class="ident">String</span>,
+    RiskyCast {
+        table: String,
+        column: String,
+        previous_type: String,
+        next_type: String,
     },
-    <span class="ident">NotCastable</span> {
-        <span class="ident">table</span>: <span class="ident">String</span>,
-        <span class="ident">column</span>: <span class="ident">String</span>,
-        <span class="ident">previous_type</span>: <span class="ident">String</span>,
-        <span class="ident">next_type</span>: <span class="ident">String</span>,
+    NotCastable {
+        table: String,
+        column: String,
+        previous_type: String,
+        next_type: String,
     },
-    <span class="ident">PrimaryKeyChange</span> {
-        <span class="ident">table</span>: <span class="ident">String</span>,
+    PrimaryKeyChange {
+        table: String,
     },
-    <span class="ident">UniqueConstraintAddition</span> {
-        <span class="ident">table</span>: <span class="ident">String</span>,
-        <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    UniqueConstraintAddition {
+        table: String,
+        columns: Vec&lt;String&gt;,
     },
-    <span class="ident">EnumValueRemoval</span> {
-        <span class="ident">enm</span>: <span class="ident">String</span>,
-        <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    EnumValueRemoval {
+        enm: String,
+        values: Vec&lt;String&gt;,
     },
 }
 
-<span class="kw">impl</span> <span class="ident">Check</span> <span class="kw">for</span> <span class="ident">SqlMigrationWarningCheck</span> {
-    <span class="kw">fn</span> <span class="ident">needed_table_row_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">SqlMigrationWarningCheck::NonEmptyTableDrop</span> { <span class="ident">table</span> }
-            <span class="op">|</span> <span class="ident">SqlMigrationWarningCheck::PrimaryKeyChange</span> { <span class="ident">table</span> }
-            <span class="op">|</span> <span class="ident">SqlMigrationWarningCheck::DropAndRecreateColumn</span> { <span class="ident">table</span>, <span class="ident">column</span>: <span class="kw">_</span> } =&gt; <span class="prelude-val">Some</span>(<span class="ident">table</span>),
-            <span class="ident">SqlMigrationWarningCheck::NonEmptyColumnDrop</span> { .. } <span class="op">|</span> <span class="ident">SqlMigrationWarningCheck::RiskyCast</span> { .. } =&gt; <span class="prelude-val">None</span>,
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+<span class="kw">impl </span>Check <span class="kw">for </span>SqlMigrationWarningCheck {
+    <span class="kw">fn </span>needed_table_row_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            SqlMigrationWarningCheck::NonEmptyTableDrop { table }
+            | SqlMigrationWarningCheck::PrimaryKeyChange { table }
+            | SqlMigrationWarningCheck::DropAndRecreateColumn { table, column: <span class="kw">_ </span>} =&gt; <span class="prelude-val">Some</span>(table),
+            SqlMigrationWarningCheck::NonEmptyColumnDrop { .. } | SqlMigrationWarningCheck::RiskyCast { .. } =&gt; <span class="prelude-val">None</span>,
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">needed_column_value_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>)<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">SqlMigrationWarningCheck::NonEmptyColumnDrop</span> { <span class="ident">table</span>, <span class="ident">column</span> }
-            <span class="op">|</span> <span class="ident">SqlMigrationWarningCheck::RiskyCast</span> { <span class="ident">table</span>, <span class="ident">column</span>, .. }
-            <span class="op">|</span> <span class="ident">SqlMigrationWarningCheck::DropAndRecreateColumn</span> { <span class="ident">table</span>, <span class="ident">column</span> } =&gt; <span class="prelude-val">Some</span>((<span class="ident">table</span>, <span class="ident">column</span>)),
+    <span class="kw">fn </span>needed_column_value_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str)&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            SqlMigrationWarningCheck::NonEmptyColumnDrop { table, column }
+            | SqlMigrationWarningCheck::RiskyCast { table, column, .. }
+            | SqlMigrationWarningCheck::DropAndRecreateColumn { table, column } =&gt; <span class="prelude-val">Some</span>((table, column)),
 
-            <span class="ident">SqlMigrationWarningCheck::NonEmptyTableDrop</span> { .. } <span class="op">|</span> <span class="ident">SqlMigrationWarningCheck::PrimaryKeyChange</span> { .. } =&gt; {
-                <span class="prelude-val">None</span>
-            }
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+            SqlMigrationWarningCheck::NonEmptyTableDrop { .. } | SqlMigrationWarningCheck::PrimaryKeyChange { .. } =&gt; {
+                <span class="prelude-val">None
+            </span>}
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">evaluate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">database_check_results</span>: <span class="kw-2">&amp;</span><span class="ident">DatabaseInspectionResults</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">SqlMigrationWarningCheck::DropAndRecreateColumn</span> { <span class="ident">table</span>, <span class="ident">column</span> } =&gt; {
-                <span class="kw">match</span> <span class="ident">database_check_results</span>.<span class="ident">get_row_and_non_null_value_count</span>(<span class="ident">table</span>, <span class="ident">column</span>) {
+    <span class="kw">fn </span>evaluate(<span class="kw-2">&amp;</span><span class="self">self</span>, database_check_results: <span class="kw-2">&amp;</span>DatabaseInspectionResults) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            SqlMigrationWarningCheck::DropAndRecreateColumn { table, column } =&gt; {
+                <span class="kw">match </span>database_check_results.get_row_and_non_null_value_count(table, column) {
                 (<span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
                 (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="number">0</span>)) =&gt; <span class="prelude-val">None</span>,
-                (<span class="kw">_</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;The `{}` column on the `{}` table would be dropped and recreated. This will lead to data loss if there is data in the column.&quot;</span>, <span class="ident">column</span>, <span class="ident">table</span>)),
-                (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">_row_count</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;The `{}` column on the `{}` table would be dropped and recreated. This will lead to data loss.&quot;</span>, <span class="ident">column</span>, <span class="ident">table</span>)),
+                (<span class="kw">_</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;The `{}` column on the `{}` table would be dropped and recreated. This will lead to data loss if there is data in the column.&quot;</span>, column, table)),
+                (<span class="kw">_</span>, <span class="prelude-val">Some</span>(_row_count)) =&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;The `{}` column on the `{}` table would be dropped and recreated. This will lead to data loss.&quot;</span>, column, table)),
 
             }
         },
-            <span class="ident">SqlMigrationWarningCheck::NonEmptyTableDrop</span> { <span class="ident">table</span> } =&gt; <span class="kw">match</span> <span class="ident">database_check_results</span>.<span class="ident">get_row_count</span>(<span class="ident">table</span>) {
-                <span class="prelude-val">Some</span>(<span class="number">0</span>) =&gt; <span class="prelude-val">None</span>, <span class="comment">// dropping the table is safe if it&#39;s empty</span>
-                <span class="prelude-val">Some</span>(<span class="ident">rows_count</span>) =&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;You are about to drop the `{table_name}` table, which is not empty ({rows_count} rows).&quot;</span>, <span class="ident">table_name</span> <span class="op">=</span> <span class="ident">table</span>, <span class="ident">rows_count</span> <span class="op">=</span> <span class="ident">rows_count</span>)),
-                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;You are about to drop the `{}` table. If the table is not empty, all the data it contains will be lost.&quot;</span>, <span class="ident">table</span>)),
+            SqlMigrationWarningCheck::NonEmptyTableDrop { table } =&gt; <span class="kw">match </span>database_check_results.get_row_count(table) {
+                <span class="prelude-val">Some</span>(<span class="number">0</span>) =&gt; <span class="prelude-val">None</span>, <span class="comment">// dropping the table is safe if it&#39;s empty
+                </span><span class="prelude-val">Some</span>(rows_count) =&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;You are about to drop the `{table_name}` table, which is not empty ({rows_count} rows).&quot;</span>, table_name = table, rows_count = rows_count)),
+                <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;You are about to drop the `{}` table. If the table is not empty, all the data it contains will be lost.&quot;</span>, table)),
             },
-            <span class="ident">SqlMigrationWarningCheck::NonEmptyColumnDrop</span> { <span class="ident">table</span>, <span class="ident">column</span> } =&gt; <span class="kw">match</span> <span class="ident">database_check_results</span>.<span class="ident">get_row_and_non_null_value_count</span>(<span class="ident">table</span>, <span class="ident">column</span>) {
-                (<span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>, <span class="comment">// it&#39;s safe to drop a column on an empty table</span>
-                (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="number">0</span>)) =&gt; <span class="prelude-val">None</span>, <span class="comment">// it&#39;s safe to drop a column if it only contains null values</span>
-                (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">value_count</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;You are about to drop the column `{column_name}` on the `{table_name}` table, which still contains {value_count} non-null values.&quot;</span>, <span class="ident">column_name</span> <span class="op">=</span> <span class="ident">column</span>, <span class="ident">table_name</span> <span class="op">=</span> <span class="ident">table</span>, <span class="ident">value_count</span> <span class="op">=</span> <span class="ident">value_count</span>)),
-                (<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;You are about to drop the column `{column_name}` on the `{table_name}` table. All the data in the column will be lost.&quot;</span>, <span class="ident">column_name</span> <span class="op">=</span> <span class="ident">column</span>, <span class="ident">table_name</span> <span class="op">=</span> <span class="ident">table</span>)),
+            SqlMigrationWarningCheck::NonEmptyColumnDrop { table, column } =&gt; <span class="kw">match </span>database_check_results.get_row_and_non_null_value_count(table, column) {
+                (<span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>, <span class="comment">// it&#39;s safe to drop a column on an empty table
+                </span>(<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="number">0</span>)) =&gt; <span class="prelude-val">None</span>, <span class="comment">// it&#39;s safe to drop a column if it only contains null values
+                </span>(<span class="kw">_</span>, <span class="prelude-val">Some</span>(value_count)) =&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;You are about to drop the column `{column_name}` on the `{table_name}` table, which still contains {value_count} non-null values.&quot;</span>, column_name = column, table_name = table, value_count = value_count)),
+                (<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;You are about to drop the column `{column_name}` on the `{table_name}` table. All the data in the column will be lost.&quot;</span>, column_name = column, table_name = table)),
             },
-            <span class="ident">SqlMigrationWarningCheck::RiskyCast</span> { <span class="ident">table</span>, <span class="ident">column</span>, <span class="ident">previous_type</span>, <span class="ident">next_type</span> } =&gt; <span class="kw">match</span> <span class="ident">database_check_results</span>.<span class="ident">get_row_and_non_null_value_count</span>(<span class="ident">table</span>, <span class="ident">column</span>) {
-                (<span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>, <span class="comment">// it&#39;s safe to alter a column on an empty table</span>
-                (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="number">0</span>)) =&gt; <span class="prelude-val">None</span>, <span class="comment">// it&#39;s safe to alter a column if it only contains null values</span>
-                (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">value_count</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;You are about to alter the column `{column_name}` on the `{table_name}` table, which contains {value_count} non-null values. The data in that column will be cast from `{old_type}` to `{new_type}`.&quot;</span>, <span class="ident">column_name</span> <span class="op">=</span> <span class="ident">column</span>, <span class="ident">table_name</span> <span class="op">=</span> <span class="ident">table</span>, <span class="ident">value_count</span> <span class="op">=</span> <span class="ident">value_count</span>, <span class="ident">old_type</span> <span class="op">=</span> <span class="ident">previous_type</span>, <span class="ident">new_type</span> <span class="op">=</span> <span class="ident">next_type</span>)),
-                (<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;You are about to alter the column `{column_name}` on the `{table_name}` table. The data in that column could be lost. The data in that column will be cast from `{old_type}` to `{new_type}`.&quot;</span>, <span class="ident">column_name</span> <span class="op">=</span> <span class="ident">column</span>, <span class="ident">table_name</span> <span class="op">=</span> <span class="ident">table</span>, <span class="ident">old_type</span> <span class="op">=</span> <span class="ident">previous_type</span>, <span class="ident">new_type</span> <span class="op">=</span> <span class="ident">next_type</span>)),
+            SqlMigrationWarningCheck::RiskyCast { table, column, previous_type, next_type } =&gt; <span class="kw">match </span>database_check_results.get_row_and_non_null_value_count(table, column) {
+                (<span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>, <span class="comment">// it&#39;s safe to alter a column on an empty table
+                </span>(<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="number">0</span>)) =&gt; <span class="prelude-val">None</span>, <span class="comment">// it&#39;s safe to alter a column if it only contains null values
+                </span>(<span class="kw">_</span>, <span class="prelude-val">Some</span>(value_count)) =&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;You are about to alter the column `{column_name}` on the `{table_name}` table, which contains {value_count} non-null values. The data in that column will be cast from `{old_type}` to `{new_type}`.&quot;</span>, column_name = column, table_name = table, value_count = value_count, old_type = previous_type, new_type = next_type)),
+                (<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;You are about to alter the column `{column_name}` on the `{table_name}` table. The data in that column could be lost. The data in that column will be cast from `{old_type}` to `{new_type}`.&quot;</span>, column_name = column, table_name = table, old_type = previous_type, new_type = next_type)),
 
             },
 
-            <span class="comment">// todo this seems to not be reached when only a table is dropped and recreated</span>
-            <span class="ident">SqlMigrationWarningCheck::NotCastable</span> { <span class="ident">table</span>, <span class="ident">column</span>, <span class="ident">previous_type</span>, <span class="ident">next_type</span> } =&gt; <span class="kw">match</span> <span class="ident">database_check_results</span>.<span class="ident">get_row_and_non_null_value_count</span>(<span class="ident">table</span>, <span class="ident">column</span>) {
-                (<span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>, <span class="comment">// it&#39;s safe to alter a column on an empty table</span>
-                (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="number">0</span>)) =&gt; <span class="prelude-val">None</span>, <span class="comment">// it&#39;s safe to alter a column if it only contains null values</span>
-                (<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">value_count</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;You are about to alter the column `{column_name}` on the `{table_name}` table, which contains {value_count} non-null values. The data in that column will be cast from `{old_type}` to `{new_type}`. This cast may fail. Please make sure the data in the column can be cast.&quot;</span>, <span class="ident">column_name</span> <span class="op">=</span> <span class="ident">column</span>, <span class="ident">table_name</span> <span class="op">=</span> <span class="ident">table</span>, <span class="ident">value_count</span> <span class="op">=</span> <span class="ident">value_count</span>, <span class="ident">old_type</span> <span class="op">=</span> <span class="ident">previous_type</span>, <span class="ident">new_type</span> <span class="op">=</span> <span class="ident">next_type</span>)),
-                (<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;You are about to alter the column `{column_name}` on the `{table_name}` table. The data in that column will be cast from `{old_type}` to `{new_type}`. This cast may fail. Please make sure the data in the column can be cast.&quot;</span>, <span class="ident">column_name</span> <span class="op">=</span> <span class="ident">column</span>, <span class="ident">table_name</span> <span class="op">=</span> <span class="ident">table</span>, <span class="ident">old_type</span> <span class="op">=</span> <span class="ident">previous_type</span>, <span class="ident">new_type</span> <span class="op">=</span> <span class="ident">next_type</span>)),
+            <span class="comment">// todo this seems to not be reached when only a table is dropped and recreated
+            </span>SqlMigrationWarningCheck::NotCastable { table, column, previous_type, next_type } =&gt; <span class="kw">match </span>database_check_results.get_row_and_non_null_value_count(table, column) {
+                (<span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>, <span class="comment">// it&#39;s safe to alter a column on an empty table
+                </span>(<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="number">0</span>)) =&gt; <span class="prelude-val">None</span>, <span class="comment">// it&#39;s safe to alter a column if it only contains null values
+                </span>(<span class="kw">_</span>, <span class="prelude-val">Some</span>(value_count)) =&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;You are about to alter the column `{column_name}` on the `{table_name}` table, which contains {value_count} non-null values. The data in that column will be cast from `{old_type}` to `{new_type}`. This cast may fail. Please make sure the data in the column can be cast.&quot;</span>, column_name = column, table_name = table, value_count = value_count, old_type = previous_type, new_type = next_type)),
+                (<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;You are about to alter the column `{column_name}` on the `{table_name}` table. The data in that column will be cast from `{old_type}` to `{new_type}`. This cast may fail. Please make sure the data in the column can be cast.&quot;</span>, column_name = column, table_name = table, old_type = previous_type, new_type = next_type)),
 
             },
-            <span class="ident">SqlMigrationWarningCheck::PrimaryKeyChange</span> { <span class="ident">table</span> } =&gt; <span class="kw">match</span> <span class="ident">database_check_results</span>.<span class="ident">get_row_count</span>(<span class="ident">table</span>) {
+            SqlMigrationWarningCheck::PrimaryKeyChange { table } =&gt; <span class="kw">match </span>database_check_results.get_row_count(table) {
                 <span class="prelude-val">Some</span>(<span class="number">0</span>) =&gt; <span class="prelude-val">None</span>,
-                <span class="kw">_</span> =&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;The primary key for the `{table}` table will be changed. If it partially fails, the table could be left without primary key constraint.&quot;</span>, <span class="ident">table</span> <span class="op">=</span> <span class="ident">table</span>)),
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;The primary key for the `{table}` table will be changed. If it partially fails, the table could be left without primary key constraint.&quot;</span>, table = table)),
             },
-            <span class="ident">SqlMigrationWarningCheck::UniqueConstraintAddition</span> { <span class="ident">table</span>, <span class="ident">columns</span> } =&gt;  <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;A unique constraint covering the columns `[{columns}]` on the table `{table}` will be added. If there are existing duplicate values, this will fail.&quot;</span>, <span class="ident">table</span> <span class="op">=</span> <span class="ident">table</span>, <span class="ident">columns</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>))),
-            <span class="ident">SqlMigrationWarningCheck::EnumValueRemoval</span> { <span class="ident">enm</span>, <span class="ident">values</span> } =&gt;  <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;The values [{values}] on the enum `{enm}` will be removed. If these variants are still used in the database, this will fail.&quot;</span>, <span class="ident">enm</span> <span class="op">=</span> <span class="ident">enm</span>, <span class="ident">values</span> <span class="op">=</span> <span class="ident">values</span>.<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>))),
+            SqlMigrationWarningCheck::UniqueConstraintAddition { table, columns } =&gt;  <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;A unique constraint covering the columns `[{columns}]` on the table `{table}` will be added. If there are existing duplicate values, this will fail.&quot;</span>, table = table, columns = columns.join(<span class="string">&quot;,&quot;</span>))),
+            SqlMigrationWarningCheck::EnumValueRemoval { enm, values } =&gt;  <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;The values [{values}] on the enum `{enm}` will be removed. If these variants are still used in the database, this will fail.&quot;</span>, enm = enm, values = values.join(<span class="string">&quot;,&quot;</span>))),
 
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

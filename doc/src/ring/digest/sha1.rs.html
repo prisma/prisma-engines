@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/digest/sha1.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sha1.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../ring/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/digest/sha1.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sha1.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../ring/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -109,116 +109,116 @@
 <span id="109">109</span>
 <span id="110">110</span>
 <span id="111">111</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2016 Brian Smith.</span>
-<span class="comment">// Copyright 2016 Simon Sapin.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
-<span class="comment">// purpose with or without fee is hereby granted, provided that the above</span>
-<span class="comment">// copyright notice and this permission notice appear in all copies.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES</span>
-<span class="comment">// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY</span>
-<span class="comment">// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span>
-<span class="comment">// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION</span>
-<span class="comment">// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN</span>
-<span class="comment">// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2016 Brian Smith.
+// Copyright 2016 Simon Sapin.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY
+// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::sha2</span>::{<span class="ident">ch</span>, <span class="ident">maj</span>, <span class="ident">Word</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::c</span>;
-<span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">convert::TryInto</span>, <span class="ident">num::Wrapping</span>};
+</span><span class="kw">use </span><span class="kw">super</span>::sha2::{ch, maj, Word};
+<span class="kw">use </span><span class="kw">crate</span>::c;
+<span class="kw">use </span>core::{convert::TryInto, num::Wrapping};
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">BLOCK_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">512</span> <span class="op">/</span> <span class="number">8</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CHAINING_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">160</span> <span class="op">/</span> <span class="number">8</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">OUTPUT_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">160</span> <span class="op">/</span> <span class="number">8</span>;
-<span class="kw">const</span> <span class="ident">CHAINING_WORDS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">CHAINING_LEN</span> <span class="op">/</span> <span class="number">4</span>;
+<span class="kw">pub const </span>BLOCK_LEN: usize = <span class="number">512 </span>/ <span class="number">8</span>;
+<span class="kw">pub const </span>CHAINING_LEN: usize = <span class="number">160 </span>/ <span class="number">8</span>;
+<span class="kw">pub const </span>OUTPUT_LEN: usize = <span class="number">160 </span>/ <span class="number">8</span>;
+<span class="kw">const </span>CHAINING_WORDS: usize = CHAINING_LEN / <span class="number">4</span>;
 
-<span class="kw">type</span> <span class="ident">W32</span> <span class="op">=</span> <span class="ident">Wrapping</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>;
+<span class="kw">type </span>W32 = Wrapping&lt;u32&gt;;
 
-<span class="comment">// FIPS 180-4 4.1.1</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">parity</span>(<span class="ident">x</span>: <span class="ident">W32</span>, <span class="ident">y</span>: <span class="ident">W32</span>, <span class="ident">z</span>: <span class="ident">W32</span>) -&gt; <span class="ident">W32</span> {
-    <span class="ident">x</span> <span class="op">^</span> <span class="ident">y</span> <span class="op">^</span> <span class="ident">z</span>
+<span class="comment">// FIPS 180-4 4.1.1
+</span><span class="attribute">#[inline]
+</span><span class="kw">fn </span>parity(x: W32, y: W32, z: W32) -&gt; W32 {
+    x ^ y ^ z
 }
 
-<span class="kw">type</span> <span class="ident">State</span> <span class="op">=</span> [<span class="ident">W32</span>; <span class="ident">CHAINING_WORDS</span>];
-<span class="kw">const</span> <span class="ident">ROUNDS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">80</span>;
+<span class="kw">type </span>State = [W32; CHAINING_WORDS];
+<span class="kw">const </span>ROUNDS: usize = <span class="number">80</span>;
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">block_data_order</span>(
-    <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">super</span>::State</span>,
-    <span class="ident">data</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>,
-    <span class="ident">num</span>: <span class="ident">c::size_t</span>,
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>block_data_order(
+    state: <span class="kw-2">&amp;mut </span><span class="kw">super</span>::State,
+    data: <span class="kw-2">*const </span>u8,
+    num: c::size_t,
 ) {
-    <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> <span class="ident">state</span>.<span class="ident">as32</span> };
-    <span class="kw">let</span> <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">State</span> <span class="op">=</span> (<span class="kw-2">&amp;mut</span> <span class="ident">state</span>[..<span class="ident">CHAINING_WORDS</span>]).<span class="ident">try_into</span>().<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">data</span> <span class="kw">as</span> <span class="kw-2">*const</span> [<span class="op">&lt;</span><span class="ident">W32</span> <span class="kw">as</span> <span class="ident">Word</span><span class="op">&gt;</span><span class="ident">::InputBytes</span>; <span class="number">16</span>];
-    <span class="kw">let</span> <span class="ident">blocks</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">core::slice::from_raw_parts</span>(<span class="ident">data</span>, <span class="ident">num</span>) };
-    <span class="kw-2">*</span><span class="ident">state</span> <span class="op">=</span> <span class="ident">block_data_order_</span>(<span class="kw-2">*</span><span class="ident">state</span>, <span class="ident">blocks</span>)
+    <span class="kw">let </span>state = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut </span>state.as32 };
+    <span class="kw">let </span>state: <span class="kw-2">&amp;mut </span>State = (<span class="kw-2">&amp;mut </span>state[..CHAINING_WORDS]).try_into().unwrap();
+    <span class="kw">let </span>data = data <span class="kw">as </span><span class="kw-2">*const </span>[&lt;W32 <span class="kw">as </span>Word&gt;::InputBytes; <span class="number">16</span>];
+    <span class="kw">let </span>blocks = <span class="kw">unsafe </span>{ core::slice::from_raw_parts(data, num) };
+    <span class="kw-2">*</span>state = block_data_order_(<span class="kw-2">*</span>state, blocks)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
-<span class="kw">fn</span> <span class="ident">block_data_order_</span>(<span class="kw-2">mut</span> <span class="ident">H</span>: <span class="ident">State</span>, <span class="ident">M</span>: <span class="kw-2">&amp;</span>[[<span class="op">&lt;</span><span class="ident">W32</span> <span class="kw">as</span> <span class="ident">Word</span><span class="op">&gt;</span><span class="ident">::InputBytes</span>; <span class="number">16</span>]]) -&gt; <span class="ident">State</span> {
-    <span class="kw">for</span> <span class="ident">M</span> <span class="kw">in</span> <span class="ident">M</span> {
-        <span class="comment">// FIPS 180-4 6.1.2 Step 1</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">W</span>: [<span class="ident">W32</span>; <span class="ident">ROUNDS</span>] <span class="op">=</span> [<span class="ident">W32::ZERO</span>; <span class="ident">ROUNDS</span>];
-        <span class="kw">for</span> <span class="ident">t</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">16</span> {
-            <span class="ident">W</span>[<span class="ident">t</span>] <span class="op">=</span> <span class="ident">W32::from_be_bytes</span>(<span class="ident">M</span>[<span class="ident">t</span>]);
+<span class="attribute">#[inline]
+#[rustfmt::skip]
+</span><span class="kw">fn </span>block_data_order_(<span class="kw-2">mut </span>H: State, M: <span class="kw-2">&amp;</span>[[&lt;W32 <span class="kw">as </span>Word&gt;::InputBytes; <span class="number">16</span>]]) -&gt; State {
+    <span class="kw">for </span>M <span class="kw">in </span>M {
+        <span class="comment">// FIPS 180-4 6.1.2 Step 1
+        </span><span class="kw">let </span><span class="kw-2">mut </span>W: [W32; ROUNDS] = [W32::ZERO; ROUNDS];
+        <span class="kw">for </span>t <span class="kw">in </span><span class="number">0</span>..<span class="number">16 </span>{
+            W[t] = W32::from_be_bytes(M[t]);
         }
-        <span class="kw">for</span> <span class="ident">t</span> <span class="kw">in</span> <span class="number">16</span>..<span class="ident">ROUNDS</span> {
-            <span class="kw">let</span> <span class="ident">wt</span> <span class="op">=</span> <span class="ident">W</span>[<span class="ident">t</span> <span class="op">-</span> <span class="number">3</span>] <span class="op">^</span> <span class="ident">W</span>[<span class="ident">t</span> <span class="op">-</span> <span class="number">8</span>] <span class="op">^</span> <span class="ident">W</span>[<span class="ident">t</span> <span class="op">-</span> <span class="number">14</span>] <span class="op">^</span> <span class="ident">W</span>[<span class="ident">t</span> <span class="op">-</span> <span class="number">16</span>];
-            <span class="ident">W</span>[<span class="ident">t</span>] <span class="op">=</span> <span class="ident">rotl</span>(<span class="ident">wt</span>, <span class="number">1</span>);
+        <span class="kw">for </span>t <span class="kw">in </span><span class="number">16</span>..ROUNDS {
+            <span class="kw">let </span>wt = W[t - <span class="number">3</span>] ^ W[t - <span class="number">8</span>] ^ W[t - <span class="number">14</span>] ^ W[t - <span class="number">16</span>];
+            W[t] = rotl(wt, <span class="number">1</span>);
         }
 
-        <span class="comment">// FIPS 180-4 6.1.2 Step 2</span>
-        <span class="kw">let</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">H</span>[<span class="number">0</span>];
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">H</span>[<span class="number">1</span>];
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">H</span>[<span class="number">2</span>];
-        <span class="kw">let</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">H</span>[<span class="number">3</span>];
-        <span class="kw">let</span> <span class="ident">e</span> <span class="op">=</span> <span class="ident">H</span>[<span class="number">4</span>];
+        <span class="comment">// FIPS 180-4 6.1.2 Step 2
+        </span><span class="kw">let </span>a = H[<span class="number">0</span>];
+        <span class="kw">let </span>b = H[<span class="number">1</span>];
+        <span class="kw">let </span>c = H[<span class="number">2</span>];
+        <span class="kw">let </span>d = H[<span class="number">3</span>];
+        <span class="kw">let </span>e = H[<span class="number">4</span>];
 
-        <span class="comment">// FIPS 180-4 6.1.2 Step 3 with constants and functions from FIPS 180-4 {4.1.1, 4.2.1}</span>
-        <span class="kw">let</span> (<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">e</span>) <span class="op">=</span> <span class="ident">step3</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">e</span>, <span class="ident">W</span>[ <span class="number">0</span>..<span class="number">20</span>].<span class="ident">try_into</span>().<span class="ident">unwrap</span>(), <span class="ident">Wrapping</span>(<span class="number">0x5a827999</span>), <span class="ident">ch</span>);
-        <span class="kw">let</span> (<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">e</span>) <span class="op">=</span> <span class="ident">step3</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">e</span>, <span class="ident">W</span>[<span class="number">20</span>..<span class="number">40</span>].<span class="ident">try_into</span>().<span class="ident">unwrap</span>(), <span class="ident">Wrapping</span>(<span class="number">0x6ed9eba1</span>), <span class="ident">parity</span>);
-        <span class="kw">let</span> (<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">e</span>) <span class="op">=</span> <span class="ident">step3</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">e</span>, <span class="ident">W</span>[<span class="number">40</span>..<span class="number">60</span>].<span class="ident">try_into</span>().<span class="ident">unwrap</span>(), <span class="ident">Wrapping</span>(<span class="number">0x8f1bbcdc</span>), <span class="ident">maj</span>);
-        <span class="kw">let</span> (<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">e</span>) <span class="op">=</span> <span class="ident">step3</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">e</span>, <span class="ident">W</span>[<span class="number">60</span>..<span class="number">80</span>].<span class="ident">try_into</span>().<span class="ident">unwrap</span>(), <span class="ident">Wrapping</span>(<span class="number">0xca62c1d6</span>), <span class="ident">parity</span>);
+        <span class="comment">// FIPS 180-4 6.1.2 Step 3 with constants and functions from FIPS 180-4 {4.1.1, 4.2.1}
+        </span><span class="kw">let </span>(a, b, c, d, e) = step3(a, b, c, d, e, W[ <span class="number">0</span>..<span class="number">20</span>].try_into().unwrap(), Wrapping(<span class="number">0x5a827999</span>), ch);
+        <span class="kw">let </span>(a, b, c, d, e) = step3(a, b, c, d, e, W[<span class="number">20</span>..<span class="number">40</span>].try_into().unwrap(), Wrapping(<span class="number">0x6ed9eba1</span>), parity);
+        <span class="kw">let </span>(a, b, c, d, e) = step3(a, b, c, d, e, W[<span class="number">40</span>..<span class="number">60</span>].try_into().unwrap(), Wrapping(<span class="number">0x8f1bbcdc</span>), maj);
+        <span class="kw">let </span>(a, b, c, d, e) = step3(a, b, c, d, e, W[<span class="number">60</span>..<span class="number">80</span>].try_into().unwrap(), Wrapping(<span class="number">0xca62c1d6</span>), parity);
 
-        <span class="comment">// FIPS 180-4 6.1.2 Step 4</span>
-        <span class="ident">H</span>[<span class="number">0</span>] <span class="op">+</span><span class="op">=</span> <span class="ident">a</span>;
-        <span class="ident">H</span>[<span class="number">1</span>] <span class="op">+</span><span class="op">=</span> <span class="ident">b</span>;
-        <span class="ident">H</span>[<span class="number">2</span>] <span class="op">+</span><span class="op">=</span> <span class="ident">c</span>;
-        <span class="ident">H</span>[<span class="number">3</span>] <span class="op">+</span><span class="op">=</span> <span class="ident">d</span>;
-        <span class="ident">H</span>[<span class="number">4</span>] <span class="op">+</span><span class="op">=</span> <span class="ident">e</span>;
+        <span class="comment">// FIPS 180-4 6.1.2 Step 4
+        </span>H[<span class="number">0</span>] += a;
+        H[<span class="number">1</span>] += b;
+        H[<span class="number">2</span>] += c;
+        H[<span class="number">3</span>] += d;
+        H[<span class="number">4</span>] += e;
     }
 
-    <span class="ident">H</span>
+    H
 }
 
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">step3</span>(
-    <span class="kw-2">mut</span> <span class="ident">a</span>: <span class="ident">W32</span>,
-    <span class="kw-2">mut</span> <span class="ident">b</span>: <span class="ident">W32</span>,
-    <span class="kw-2">mut</span> <span class="ident">c</span>: <span class="ident">W32</span>,
-    <span class="kw-2">mut</span> <span class="ident">d</span>: <span class="ident">W32</span>,
-    <span class="kw-2">mut</span> <span class="ident">e</span>: <span class="ident">W32</span>,
-    <span class="ident">W</span>: [<span class="ident">W32</span>; <span class="number">20</span>],
-    <span class="ident">k</span>: <span class="ident">W32</span>,
-    <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">W32</span>, <span class="ident">W32</span>, <span class="ident">W32</span>) -&gt; <span class="ident">W32</span>,
-) -&gt; (<span class="ident">W32</span>, <span class="ident">W32</span>, <span class="ident">W32</span>, <span class="ident">W32</span>, <span class="ident">W32</span>) {
-    <span class="kw">for</span> <span class="ident">W_t</span> <span class="kw">in</span> <span class="ident">W</span>.<span class="ident">iter</span>() {
-        <span class="kw">let</span> <span class="ident">T</span> <span class="op">=</span> <span class="ident">rotl</span>(<span class="ident">a</span>, <span class="number">5</span>) <span class="op">+</span> <span class="ident">f</span>(<span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>) <span class="op">+</span> <span class="ident">e</span> <span class="op">+</span> <span class="ident">k</span> <span class="op">+</span> <span class="ident">W_t</span>;
-        <span class="ident">e</span> <span class="op">=</span> <span class="ident">d</span>;
-        <span class="ident">d</span> <span class="op">=</span> <span class="ident">c</span>;
-        <span class="ident">c</span> <span class="op">=</span> <span class="ident">rotl</span>(<span class="ident">b</span>, <span class="number">30</span>);
-        <span class="ident">b</span> <span class="op">=</span> <span class="ident">a</span>;
-        <span class="ident">a</span> <span class="op">=</span> <span class="ident">T</span>;
+<span class="attribute">#[inline(always)]
+</span><span class="kw">fn </span>step3(
+    <span class="kw-2">mut </span>a: W32,
+    <span class="kw-2">mut </span>b: W32,
+    <span class="kw-2">mut </span>c: W32,
+    <span class="kw-2">mut </span>d: W32,
+    <span class="kw-2">mut </span>e: W32,
+    W: [W32; <span class="number">20</span>],
+    k: W32,
+    f: <span class="kw">impl </span>Fn(W32, W32, W32) -&gt; W32,
+) -&gt; (W32, W32, W32, W32, W32) {
+    <span class="kw">for </span>W_t <span class="kw">in </span>W.iter() {
+        <span class="kw">let </span>T = rotl(a, <span class="number">5</span>) + f(b, c, d) + e + k + W_t;
+        e = d;
+        d = c;
+        c = rotl(b, <span class="number">30</span>);
+        b = a;
+        a = T;
     }
-    (<span class="ident">a</span>, <span class="ident">b</span>, <span class="ident">c</span>, <span class="ident">d</span>, <span class="ident">e</span>)
+    (a, b, c, d, e)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">fn</span> <span class="ident">rotl</span>(<span class="ident">x</span>: <span class="ident">W32</span>, <span class="ident">n</span>: <span class="ident">u32</span>) -&gt; <span class="ident">W32</span> {
-    <span class="ident">Wrapping</span>(<span class="ident">x</span>.<span class="number">0</span>.<span class="ident">rotate_left</span>(<span class="ident">n</span>))
+<span class="attribute">#[inline(always)]
+</span><span class="kw">fn </span>rotl(x: W32, n: u32) -&gt; W32 {
+    Wrapping(x.<span class="number">0</span>.rotate_left(n))
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

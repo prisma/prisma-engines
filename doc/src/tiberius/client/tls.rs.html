@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tiberius-0.11.2/src/client/tls.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tls.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tiberius/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tiberius-0.11.2/src/client/tls.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tls.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tiberius/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -275,282 +275,282 @@
 <span id="275">275</span>
 <span id="276">276</span>
 <span id="277">277</span>
-</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls&quot;</span>,
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native-tls&quot;</span>,
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vendored-openssl&quot;</span>
-))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::tls_stream::TlsStream</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tds</span>::{
-    <span class="ident">codec</span>::{<span class="ident">Decode</span>, <span class="ident">Encode</span>, <span class="ident">PacketHeader</span>, <span class="ident">PacketStatus</span>, <span class="ident">PacketType</span>},
-    <span class="ident">HEADER_BYTES</span>,
+</pre><pre class="rust"><code><span class="attribute">#[cfg(any(
+    feature = <span class="string">&quot;rustls&quot;</span>,
+    feature = <span class="string">&quot;native-tls&quot;</span>,
+    feature = <span class="string">&quot;vendored-openssl&quot;
+</span>))]
+</span><span class="kw">use </span><span class="kw">super</span>::tls_stream::TlsStream;
+<span class="kw">use </span><span class="kw">crate</span>::tds::{
+    codec::{Decode, Encode, PacketHeader, PacketStatus, PacketType},
+    HEADER_BYTES,
 };
-<span class="kw">use</span> <span class="ident">bytes::BytesMut</span>;
-<span class="kw">use</span> <span class="ident">futures::ready</span>;
-<span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">cmp</span>, <span class="ident">io</span>,
-    <span class="ident">pin::Pin</span>,
-    <span class="ident">task</span>::{<span class="self">self</span>, <span class="ident">Poll</span>},
+<span class="kw">use </span>bytes::BytesMut;
+<span class="kw">use </span>futures::ready;
+<span class="kw">use </span>futures::{AsyncRead, AsyncWrite};
+<span class="kw">use </span>std::{
+    cmp, io,
+    pin::Pin,
+    task::{<span class="self">self</span>, Poll},
 };
-<span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">event</span>, <span class="ident">Level</span>};
+<span class="kw">use </span>tracing::{event, Level};
 
-<span class="doccomment">/// A wrapper to handle either TLS or bare connections.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">MaybeTlsStream</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span> {
-    <span class="ident">Raw</span>(<span class="ident">S</span>),
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-        <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls&quot;</span>,
-        <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native-tls&quot;</span>,
-        <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vendored-openssl&quot;</span>
-    ))]</span>
-    <span class="ident">Tls</span>(<span class="ident">TlsStream</span><span class="op">&lt;</span><span class="ident">TlsPreloginWrapper</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span>),
+<span class="doccomment">/// A wrapper to handle either TLS or bare connections.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>MaybeTlsStream&lt;S: AsyncRead + AsyncWrite + Unpin + Send&gt; {
+    Raw(S),
+    <span class="attribute">#[cfg(any(
+        feature = <span class="string">&quot;rustls&quot;</span>,
+        feature = <span class="string">&quot;native-tls&quot;</span>,
+        feature = <span class="string">&quot;vendored-openssl&quot;
+    </span>))]
+    </span>Tls(TlsStream&lt;TlsPreloginWrapper&lt;S&gt;&gt;),
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls&quot;</span>,
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native-tls&quot;</span>,
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vendored-openssl&quot;</span>
-))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">MaybeTlsStream</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="ident">S</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Raw</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-                <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls&quot;</span>,
-                <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native-tls&quot;</span>,
-                <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vendored-openssl&quot;</span>
-            ))]</span>
-            <span class="ident"><span class="self">Self</span>::Tls</span>(<span class="kw-2">mut</span> <span class="ident">tls</span>) =&gt; <span class="ident">tls</span>.<span class="ident">get_mut</span>().<span class="ident">stream</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>(),
-        }
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">AsyncRead</span> <span class="kw">for</span> <span class="ident">MaybeTlsStream</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">poll_read</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get_mut</span>() {
-            <span class="ident">MaybeTlsStream::Raw</span>(<span class="ident">s</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">s</span>).<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="ident">buf</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-                <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls&quot;</span>,
-                <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native-tls&quot;</span>,
-                <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vendored-openssl&quot;</span>
-            ))]</span>
-            <span class="ident">MaybeTlsStream::Tls</span>(<span class="ident">s</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">s</span>).<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="ident">buf</span>),
+<span class="attribute">#[cfg(any(
+    feature = <span class="string">&quot;rustls&quot;</span>,
+    feature = <span class="string">&quot;native-tls&quot;</span>,
+    feature = <span class="string">&quot;vendored-openssl&quot;
+</span>))]
+</span><span class="kw">impl</span>&lt;S: AsyncRead + AsyncWrite + Unpin + Send&gt; MaybeTlsStream&lt;S&gt; {
+    <span class="kw">pub fn </span>into_inner(<span class="self">self</span>) -&gt; S {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Raw(s) =&gt; s,
+            <span class="attribute">#[cfg(any(
+                feature = <span class="string">&quot;rustls&quot;</span>,
+                feature = <span class="string">&quot;native-tls&quot;</span>,
+                feature = <span class="string">&quot;vendored-openssl&quot;
+            </span>))]
+            </span><span class="self">Self</span>::Tls(<span class="kw-2">mut </span>tls) =&gt; tls.get_mut().stream.take().unwrap(),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">AsyncWrite</span> <span class="kw">for</span> <span class="ident">MaybeTlsStream</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">poll_write</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get_mut</span>() {
-            <span class="ident">MaybeTlsStream::Raw</span>(<span class="ident">s</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">s</span>).<span class="ident">poll_write</span>(<span class="ident">cx</span>, <span class="ident">buf</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-                <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls&quot;</span>,
-                <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native-tls&quot;</span>,
-                <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vendored-openssl&quot;</span>
-            ))]</span>
-            <span class="ident">MaybeTlsStream::Tls</span>(<span class="ident">s</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">s</span>).<span class="ident">poll_write</span>(<span class="ident">cx</span>, <span class="ident">buf</span>),
-        }
-    }
-
-    <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get_mut</span>() {
-            <span class="ident">MaybeTlsStream::Raw</span>(<span class="ident">s</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">s</span>).<span class="ident">poll_flush</span>(<span class="ident">cx</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-                <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls&quot;</span>,
-                <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native-tls&quot;</span>,
-                <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vendored-openssl&quot;</span>
-            ))]</span>
-            <span class="ident">MaybeTlsStream::Tls</span>(<span class="ident">s</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">s</span>).<span class="ident">poll_flush</span>(<span class="ident">cx</span>),
-        }
-    }
-
-    <span class="kw">fn</span> <span class="ident">poll_close</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get_mut</span>() {
-            <span class="ident">MaybeTlsStream::Raw</span>(<span class="ident">s</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">s</span>).<span class="ident">poll_close</span>(<span class="ident">cx</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-                <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls&quot;</span>,
-                <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native-tls&quot;</span>,
-                <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vendored-openssl&quot;</span>
-            ))]</span>
-            <span class="ident">MaybeTlsStream::Tls</span>(<span class="ident">s</span>) =&gt; <span class="ident">Pin::new</span>(<span class="ident">s</span>).<span class="ident">poll_close</span>(<span class="ident">cx</span>),
+<span class="kw">impl</span>&lt;S: AsyncRead + AsyncWrite + Unpin + Send&gt; AsyncRead <span class="kw">for </span>MaybeTlsStream&lt;S&gt; {
+    <span class="kw">fn </span>poll_read(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        buf: <span class="kw-2">&amp;mut </span>[u8],
+    ) -&gt; Poll&lt;io::Result&lt;usize&gt;&gt; {
+        <span class="kw">match </span><span class="self">self</span>.get_mut() {
+            MaybeTlsStream::Raw(s) =&gt; Pin::new(s).poll_read(cx, buf),
+            <span class="attribute">#[cfg(any(
+                feature = <span class="string">&quot;rustls&quot;</span>,
+                feature = <span class="string">&quot;native-tls&quot;</span>,
+                feature = <span class="string">&quot;vendored-openssl&quot;
+            </span>))]
+            </span>MaybeTlsStream::Tls(s) =&gt; Pin::new(s).poll_read(cx, buf),
         }
     }
 }
 
-<span class="doccomment">/// On TLS handshake, the server expects to get and sends back normal TDS</span>
-<span class="doccomment">/// packets. To use a common TLS library, we must implement a wrapper for</span>
-<span class="doccomment">/// packet handling on this stage.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// What it does is it interferes on handshake for TDS packet handling,</span>
-<span class="doccomment">/// and when complete, just passes the calls to the underlying connection.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">TlsPreloginWrapper</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="ident">stream</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
-    <span class="ident">pending_handshake</span>: <span class="ident">bool</span>,
-
-    <span class="ident">header_buf</span>: [<span class="ident">u8</span>; <span class="ident">HEADER_BYTES</span>],
-    <span class="ident">header_pos</span>: <span class="ident">usize</span>,
-    <span class="ident">read_remaining</span>: <span class="ident">usize</span>,
-
-    <span class="ident">wr_buf</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="ident">header_written</span>: <span class="ident">bool</span>,
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls&quot;</span>,
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native-tls&quot;</span>,
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vendored-openssl&quot;</span>
-))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">TlsPreloginWrapper</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">stream</span>: <span class="ident">S</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">TlsPreloginWrapper</span> {
-            <span class="ident">stream</span>: <span class="prelude-val">Some</span>(<span class="ident">stream</span>),
-            <span class="ident">pending_handshake</span>: <span class="bool-val">true</span>,
-
-            <span class="ident">header_buf</span>: [<span class="number">0u8</span>; <span class="ident">HEADER_BYTES</span>],
-            <span class="ident">header_pos</span>: <span class="number">0</span>,
-            <span class="ident">read_remaining</span>: <span class="number">0</span>,
-            <span class="ident">wr_buf</span>: <span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="ident">HEADER_BYTES</span>],
-            <span class="ident">header_written</span>: <span class="bool-val">false</span>,
+<span class="kw">impl</span>&lt;S: AsyncRead + AsyncWrite + Unpin + Send&gt; AsyncWrite <span class="kw">for </span>MaybeTlsStream&lt;S&gt; {
+    <span class="kw">fn </span>poll_write(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        buf: <span class="kw-2">&amp;</span>[u8],
+    ) -&gt; Poll&lt;io::Result&lt;usize&gt;&gt; {
+        <span class="kw">match </span><span class="self">self</span>.get_mut() {
+            MaybeTlsStream::Raw(s) =&gt; Pin::new(s).poll_write(cx, buf),
+            <span class="attribute">#[cfg(any(
+                feature = <span class="string">&quot;rustls&quot;</span>,
+                feature = <span class="string">&quot;native-tls&quot;</span>,
+                feature = <span class="string">&quot;vendored-openssl&quot;
+            </span>))]
+            </span>MaybeTlsStream::Tls(s) =&gt; Pin::new(s).poll_write(cx, buf),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handshake_complete</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">pending_handshake</span> <span class="op">=</span> <span class="bool-val">false</span>;
+    <span class="kw">fn </span>poll_flush(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+        <span class="kw">match </span><span class="self">self</span>.get_mut() {
+            MaybeTlsStream::Raw(s) =&gt; Pin::new(s).poll_flush(cx),
+            <span class="attribute">#[cfg(any(
+                feature = <span class="string">&quot;rustls&quot;</span>,
+                feature = <span class="string">&quot;native-tls&quot;</span>,
+                feature = <span class="string">&quot;vendored-openssl&quot;
+            </span>))]
+            </span>MaybeTlsStream::Tls(s) =&gt; Pin::new(s).poll_flush(cx),
+        }
+    }
+
+    <span class="kw">fn </span>poll_close(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+        <span class="kw">match </span><span class="self">self</span>.get_mut() {
+            MaybeTlsStream::Raw(s) =&gt; Pin::new(s).poll_close(cx),
+            <span class="attribute">#[cfg(any(
+                feature = <span class="string">&quot;rustls&quot;</span>,
+                feature = <span class="string">&quot;native-tls&quot;</span>,
+                feature = <span class="string">&quot;vendored-openssl&quot;
+            </span>))]
+            </span>MaybeTlsStream::Tls(s) =&gt; Pin::new(s).poll_close(cx),
+        }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">AsyncRead</span> <span class="kw">for</span> <span class="ident">TlsPreloginWrapper</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">poll_read</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="comment">// Normal operation does not need any extra treatment, we handle packets</span>
-        <span class="comment">// in the codec.</span>
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">pending_handshake</span> {
-            <span class="kw">return</span> <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>()).<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="ident">buf</span>);
+<span class="doccomment">/// On TLS handshake, the server expects to get and sends back normal TDS
+/// packets. To use a common TLS library, we must implement a wrapper for
+/// packet handling on this stage.
+///
+/// What it does is it interferes on handshake for TDS packet handling,
+/// and when complete, just passes the calls to the underlying connection.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TlsPreloginWrapper&lt;S&gt; {
+    stream: <span class="prelude-ty">Option</span>&lt;S&gt;,
+    pending_handshake: bool,
+
+    header_buf: [u8; HEADER_BYTES],
+    header_pos: usize,
+    read_remaining: usize,
+
+    wr_buf: Vec&lt;u8&gt;,
+    header_written: bool,
+}
+
+<span class="attribute">#[cfg(any(
+    feature = <span class="string">&quot;rustls&quot;</span>,
+    feature = <span class="string">&quot;native-tls&quot;</span>,
+    feature = <span class="string">&quot;vendored-openssl&quot;
+</span>))]
+</span><span class="kw">impl</span>&lt;S&gt; TlsPreloginWrapper&lt;S&gt; {
+    <span class="kw">pub fn </span>new(stream: S) -&gt; <span class="self">Self </span>{
+        TlsPreloginWrapper {
+            stream: <span class="prelude-val">Some</span>(stream),
+            pending_handshake: <span class="bool-val">true</span>,
+
+            header_buf: [<span class="number">0u8</span>; HEADER_BYTES],
+            header_pos: <span class="number">0</span>,
+            read_remaining: <span class="number">0</span>,
+            wr_buf: <span class="macro">vec!</span>[<span class="number">0u8</span>; HEADER_BYTES],
+            header_written: <span class="bool-val">false</span>,
+        }
+    }
+
+    <span class="kw">pub fn </span>handshake_complete(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.pending_handshake = <span class="bool-val">false</span>;
+    }
+}
+
+<span class="kw">impl</span>&lt;S: AsyncRead + AsyncWrite + Unpin + Send&gt; AsyncRead <span class="kw">for </span>TlsPreloginWrapper&lt;S&gt; {
+    <span class="kw">fn </span>poll_read(
+        <span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        buf: <span class="kw-2">&amp;mut </span>[u8],
+    ) -&gt; Poll&lt;io::Result&lt;usize&gt;&gt; {
+        <span class="comment">// Normal operation does not need any extra treatment, we handle packets
+        // in the codec.
+        </span><span class="kw">if </span>!<span class="self">self</span>.pending_handshake {
+            <span class="kw">return </span>Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.stream.as_mut().unwrap()).poll_read(cx, buf);
         }
 
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_mut</span>();
+        <span class="kw">let </span>inner = <span class="self">self</span>.get_mut();
 
-        <span class="comment">// Read the headers separately and do not send them to the Tls</span>
-        <span class="comment">// connection handling.</span>
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">inner</span>.<span class="ident">header_buf</span>[<span class="ident">inner</span>.<span class="ident">header_pos</span>..].<span class="ident">is_empty</span>() {
-            <span class="kw">while</span> <span class="op">!</span><span class="ident">inner</span>.<span class="ident">header_buf</span>[<span class="ident">inner</span>.<span class="ident">header_pos</span>..].<span class="ident">is_empty</span>() {
-                <span class="kw">let</span> <span class="ident">read</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="ident">inner</span>.<span class="ident">stream</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>())
-                    .<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="kw-2">&amp;mut</span> <span class="ident">inner</span>.<span class="ident">header_buf</span>[<span class="ident">inner</span>.<span class="ident">header_pos</span>..]))<span class="question-mark">?</span>;
+        <span class="comment">// Read the headers separately and do not send them to the Tls
+        // connection handling.
+        </span><span class="kw">if </span>!inner.header_buf[inner.header_pos..].is_empty() {
+            <span class="kw">while </span>!inner.header_buf[inner.header_pos..].is_empty() {
+                <span class="kw">let </span>read = <span class="macro">ready!</span>(Pin::new(inner.stream.as_mut().unwrap())
+                    .poll_read(cx, <span class="kw-2">&amp;mut </span>inner.header_buf[inner.header_pos..]))<span class="question-mark">?</span>;
 
-                <span class="kw">if</span> <span class="ident">read</span> <span class="op">==</span> <span class="number">0</span> {
-                    <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="number">0</span>));
+                <span class="kw">if </span>read == <span class="number">0 </span>{
+                    <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Ok</span>(<span class="number">0</span>));
                 }
 
-                <span class="ident">inner</span>.<span class="ident">header_pos</span> <span class="op">+</span><span class="op">=</span> <span class="ident">read</span>;
+                inner.header_pos += read;
             }
 
-            <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">PacketHeader::decode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">BytesMut::from</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">header_buf</span>[..]))
-                .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::Other</span>, <span class="ident">err</span>))<span class="question-mark">?</span>;
+            <span class="kw">let </span>header = PacketHeader::decode(<span class="kw-2">&amp;mut </span>BytesMut::from(<span class="kw-2">&amp;</span>inner.header_buf[..]))
+                .map_err(|err| io::Error::new(io::ErrorKind::Other, err))<span class="question-mark">?</span>;
 
-            <span class="comment">// We only get pre-login packets in the handshake process.</span>
-            <span class="macro">assert_eq!</span>(<span class="ident">header</span>.<span class="ident">r#type</span>(), <span class="ident">PacketType::PreLogin</span>);
+            <span class="comment">// We only get pre-login packets in the handshake process.
+            </span><span class="macro">assert_eq!</span>(header.r#type(), PacketType::PreLogin);
 
-            <span class="comment">// And we know from this point on how much data we should expect</span>
-            <span class="ident">inner</span>.<span class="ident">read_remaining</span> <span class="op">=</span> <span class="ident">header</span>.<span class="ident">length</span>() <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="ident">HEADER_BYTES</span>;
+            <span class="comment">// And we know from this point on how much data we should expect
+            </span>inner.read_remaining = header.length() <span class="kw">as </span>usize - HEADER_BYTES;
 
             <span class="macro">event!</span>(
-                <span class="ident">Level::TRACE</span>,
+                Level::TRACE,
                 <span class="string">&quot;Reading packet of {} bytes&quot;</span>,
-                <span class="ident">inner</span>.<span class="ident">read_remaining</span>,
+                inner.read_remaining,
             );
         }
 
-        <span class="kw">let</span> <span class="ident">max_read</span> <span class="op">=</span> <span class="ident">cmp::min</span>(<span class="ident">inner</span>.<span class="ident">read_remaining</span>, <span class="ident">buf</span>.<span class="ident">len</span>());
+        <span class="kw">let </span>max_read = cmp::min(inner.read_remaining, buf.len());
 
-        <span class="comment">// TLS connector gets whatever we have after the header.</span>
-        <span class="kw">let</span> <span class="ident">read</span> <span class="op">=</span> <span class="macro">ready!</span>(
-            <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">inner</span>.<span class="ident">stream</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>()).<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="kw-2">&amp;mut</span> <span class="ident">buf</span>[..<span class="ident">max_read</span>])
+        <span class="comment">// TLS connector gets whatever we have after the header.
+        </span><span class="kw">let </span>read = <span class="macro">ready!</span>(
+            Pin::new(<span class="kw-2">&amp;mut </span>inner.stream.as_mut().unwrap()).poll_read(cx, <span class="kw-2">&amp;mut </span>buf[..max_read])
         )<span class="question-mark">?</span>;
 
-        <span class="ident">inner</span>.<span class="ident">read_remaining</span> <span class="op">-</span><span class="op">=</span> <span class="ident">read</span>;
+        inner.read_remaining -= read;
 
-        <span class="comment">// All data is read, after this we&#39;re expecting a new header.</span>
-        <span class="kw">if</span> <span class="ident">inner</span>.<span class="ident">read_remaining</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="ident">inner</span>.<span class="ident">header_pos</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="comment">// All data is read, after this we&#39;re expecting a new header.
+        </span><span class="kw">if </span>inner.read_remaining == <span class="number">0 </span>{
+            inner.header_pos = <span class="number">0</span>;
         }
 
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">read</span>))
+        Poll::Ready(<span class="prelude-val">Ok</span>(read))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">AsyncWrite</span> <span class="kw">for</span> <span class="ident">TlsPreloginWrapper</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">poll_write</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="comment">// Normal operation does not need any extra treatment, we handle</span>
-        <span class="comment">// packets in the codec.</span>
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">pending_handshake</span> {
-            <span class="kw">return</span> <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>()).<span class="ident">poll_write</span>(<span class="ident">cx</span>, <span class="ident">buf</span>);
+<span class="kw">impl</span>&lt;S: AsyncRead + AsyncWrite + Unpin + Send&gt; AsyncWrite <span class="kw">for </span>TlsPreloginWrapper&lt;S&gt; {
+    <span class="kw">fn </span>poll_write(
+        <span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        buf: <span class="kw-2">&amp;</span>[u8],
+    ) -&gt; Poll&lt;io::Result&lt;usize&gt;&gt; {
+        <span class="comment">// Normal operation does not need any extra treatment, we handle
+        // packets in the codec.
+        </span><span class="kw">if </span>!<span class="self">self</span>.pending_handshake {
+            <span class="kw">return </span>Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.stream.as_mut().unwrap()).poll_write(cx, buf);
         }
 
-        <span class="comment">// Buffering data.</span>
-        <span class="self">self</span>.<span class="ident">wr_buf</span>.<span class="ident">extend_from_slice</span>(<span class="ident">buf</span>);
+        <span class="comment">// Buffering data.
+        </span><span class="self">self</span>.wr_buf.extend_from_slice(buf);
 
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">buf</span>.<span class="ident">len</span>()))
+        Poll::Ready(<span class="prelude-val">Ok</span>(buf.len()))
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_mut</span>();
+    <span class="kw">fn </span>poll_flush(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+        <span class="kw">let </span>inner = <span class="self">self</span>.get_mut();
 
-        <span class="comment">// If on handshake mode, wraps the data to a TDS packet before sending.</span>
-        <span class="kw">if</span> <span class="ident">inner</span>.<span class="ident">pending_handshake</span> <span class="op">&amp;&amp;</span> <span class="ident">inner</span>.<span class="ident">wr_buf</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">HEADER_BYTES</span> {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">inner</span>.<span class="ident">header_written</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">PacketHeader::new</span>(<span class="ident">inner</span>.<span class="ident">wr_buf</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+        <span class="comment">// If on handshake mode, wraps the data to a TDS packet before sending.
+        </span><span class="kw">if </span>inner.pending_handshake &amp;&amp; inner.wr_buf.len() &gt; HEADER_BYTES {
+            <span class="kw">if </span>!inner.header_written {
+                <span class="kw">let </span><span class="kw-2">mut </span>header = PacketHeader::new(inner.wr_buf.len(), <span class="number">0</span>);
 
-                <span class="ident">header</span>.<span class="ident">set_type</span>(<span class="ident">PacketType::PreLogin</span>);
-                <span class="ident">header</span>.<span class="ident">set_status</span>(<span class="ident">PacketStatus::EndOfMessage</span>);
+                header.set_type(PacketType::PreLogin);
+                header.set_status(PacketStatus::EndOfMessage);
 
-                <span class="ident">header</span>
-                    .<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">&amp;mut</span> <span class="ident">inner</span>.<span class="ident">wr_buf</span>[<span class="number">0</span>..<span class="ident">HEADER_BYTES</span>])
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                        <span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::InvalidInput</span>, <span class="string">&quot;Could not encode header.&quot;</span>)
+                header
+                    .encode(<span class="kw-2">&amp;mut &amp;mut </span>inner.wr_buf[<span class="number">0</span>..HEADER_BYTES])
+                    .map_err(|<span class="kw">_</span>| {
+                        io::Error::new(io::ErrorKind::InvalidInput, <span class="string">&quot;Could not encode header.&quot;</span>)
                     })<span class="question-mark">?</span>;
 
-                <span class="ident">inner</span>.<span class="ident">header_written</span> <span class="op">=</span> <span class="bool-val">true</span>;
+                inner.header_written = <span class="bool-val">true</span>;
             }
 
-            <span class="kw">while</span> <span class="op">!</span><span class="ident">inner</span>.<span class="ident">wr_buf</span>.<span class="ident">is_empty</span>() {
+            <span class="kw">while </span>!inner.wr_buf.is_empty() {
                 <span class="macro">event!</span>(
-                    <span class="ident">Level::TRACE</span>,
+                    Level::TRACE,
                     <span class="string">&quot;Writing a packet of {} bytes&quot;</span>,
-                    <span class="ident">inner</span>.<span class="ident">wr_buf</span>.<span class="ident">len</span>(),
+                    inner.wr_buf.len(),
                 );
 
-                <span class="kw">let</span> <span class="ident">written</span> <span class="op">=</span> <span class="macro">ready!</span>(
-                    <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">inner</span>.<span class="ident">stream</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>()).<span class="ident">poll_write</span>(<span class="ident">cx</span>, <span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">wr_buf</span>)
+                <span class="kw">let </span>written = <span class="macro">ready!</span>(
+                    Pin::new(<span class="kw-2">&amp;mut </span>inner.stream.as_mut().unwrap()).poll_write(cx, <span class="kw-2">&amp;</span>inner.wr_buf)
                 )<span class="question-mark">?</span>;
 
-                <span class="ident">inner</span>.<span class="ident">wr_buf</span>.<span class="ident">drain</span>(..<span class="ident">written</span>);
+                inner.wr_buf.drain(..written);
             }
 
-            <span class="ident">inner</span>.<span class="ident">wr_buf</span>.<span class="ident">resize</span>(<span class="ident">HEADER_BYTES</span>, <span class="number">0</span>);
-            <span class="ident">inner</span>.<span class="ident">header_written</span> <span class="op">=</span> <span class="bool-val">false</span>;
+            inner.wr_buf.resize(HEADER_BYTES, <span class="number">0</span>);
+            inner.header_written = <span class="bool-val">false</span>;
         }
 
-        <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">inner</span>.<span class="ident">stream</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>()).<span class="ident">poll_flush</span>(<span class="ident">cx</span>)
+        Pin::new(<span class="kw-2">&amp;mut </span>inner.stream.as_mut().unwrap()).poll_flush(cx)
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_close</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">stream</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>()).<span class="ident">poll_close</span>(<span class="ident">cx</span>)
+    <span class="kw">fn </span>poll_close(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+        Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.stream.as_mut().unwrap()).poll_close(cx)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tiberius" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tiberius" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

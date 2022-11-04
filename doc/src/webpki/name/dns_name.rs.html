@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/webpki-0.22.0/src/name/dns_name.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>dns_name.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../webpki/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../webpki/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../webpki/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/webpki-0.22.0/src/name/dns_name.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>dns_name.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../webpki/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../webpki/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../webpki/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -794,603 +794,603 @@
 <span id="794">794</span>
 <span id="795">795</span>
 <span id="796">796</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2020 Brian Smith.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
-<span class="comment">// purpose with or without fee is hereby granted, provided that the above</span>
-<span class="comment">// copyright notice and this permission notice appear in all copies.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES</span>
-<span class="comment">// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR</span>
-<span class="comment">// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span>
-<span class="comment">// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN</span>
-<span class="comment">// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF</span>
-<span class="comment">// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2020 Brian Smith.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR
+// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">alloc::string::String</span>;
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">use </span>alloc::string::String;
 
-<span class="doccomment">/// A DNS Name suitable for use in the TLS Server Name Indication (SNI)</span>
-<span class="doccomment">/// extension and/or for use as the reference hostname for which to verify a</span>
-<span class="doccomment">/// certificate.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A `DnsName` is guaranteed to be syntactically valid. The validity rules are</span>
-<span class="doccomment">/// specified in [RFC 5280 Section 7.2], except that underscores are also</span>
-<span class="doccomment">/// allowed.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `DnsName` stores a copy of the input it was constructed from in a `String`</span>
-<span class="doccomment">/// and so it is only available when the `std` default feature is enabled.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `Eq`, `PartialEq`, etc. are not implemented because name comparison</span>
-<span class="doccomment">/// frequently should be done case-insensitively and/or with other caveats that</span>
-<span class="doccomment">/// depend on the specific circumstances in which the comparison is done.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [RFC 5280 Section 7.2]: https://tools.ietf.org/html/rfc5280#section-7.2</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Requires the `alloc` feature.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DnsName</span>(<span class="ident">String</span>);
+<span class="doccomment">/// A DNS Name suitable for use in the TLS Server Name Indication (SNI)
+/// extension and/or for use as the reference hostname for which to verify a
+/// certificate.
+///
+/// A `DnsName` is guaranteed to be syntactically valid. The validity rules are
+/// specified in [RFC 5280 Section 7.2], except that underscores are also
+/// allowed.
+///
+/// `DnsName` stores a copy of the input it was constructed from in a `String`
+/// and so it is only available when the `std` default feature is enabled.
+///
+/// `Eq`, `PartialEq`, etc. are not implemented because name comparison
+/// frequently should be done case-insensitively and/or with other caveats that
+/// depend on the specific circumstances in which the comparison is done.
+///
+/// [RFC 5280 Section 7.2]: https://tools.ietf.org/html/rfc5280#section-7.2
+///
+/// Requires the `alloc` feature.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+#[derive(Clone, Debug, Eq, PartialEq, Hash)]
+</span><span class="kw">pub struct </span>DnsName(String);
 
-<span class="doccomment">/// Requires the `alloc` feature.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">DnsName</span> {
-    <span class="doccomment">/// Returns a `DnsNameRef` that refers to this `DnsName`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DnsNameRef</span> {
-        <span class="ident">DnsNameRef</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_bytes</span>())
+<span class="doccomment">/// Requires the `alloc` feature.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">impl </span>DnsName {
+    <span class="doccomment">/// Returns a `DnsNameRef` that refers to this `DnsName`.
+    </span><span class="kw">pub fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; DnsNameRef {
+        DnsNameRef(<span class="self">self</span>.<span class="number">0</span>.as_bytes())
     }
 }
 
-<span class="doccomment">/// Requires the `alloc` feature.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DnsName</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_ref</span>()
+<span class="doccomment">/// Requires the `alloc` feature.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">impl </span>AsRef&lt;str&gt; <span class="kw">for </span>DnsName {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.<span class="number">0</span>.as_ref()
     }
 }
 
-<span class="doccomment">/// Requires the `alloc` feature.</span>
-<span class="comment">// Deprecated</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">DnsNameRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DnsName</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">dns_name</span>: <span class="ident">DnsNameRef</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">dns_name</span>.<span class="ident">to_owned</span>()
+<span class="doccomment">/// Requires the `alloc` feature.
+</span><span class="comment">// Deprecated
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">impl </span>From&lt;DnsNameRef&lt;<span class="lifetime">&#39;_</span>&gt;&gt; <span class="kw">for </span>DnsName {
+    <span class="kw">fn </span>from(dns_name: DnsNameRef) -&gt; <span class="self">Self </span>{
+        dns_name.to_owned()
     }
 }
 
-<span class="doccomment">/// A reference to a DNS Name suitable for use in the TLS Server Name Indication</span>
-<span class="doccomment">/// (SNI) extension and/or for use as the reference hostname for which to verify</span>
-<span class="doccomment">/// a certificate.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A `DnsNameRef` is guaranteed to be syntactically valid. The validity rules</span>
-<span class="doccomment">/// are specified in [RFC 5280 Section 7.2], except that underscores are also</span>
-<span class="doccomment">/// allowed.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `Eq`, `PartialEq`, etc. are not implemented because name comparison</span>
-<span class="doccomment">/// frequently should be done case-insensitively and/or with other caveats that</span>
-<span class="doccomment">/// depend on the specific circumstances in which the comparison is done.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [RFC 5280 Section 7.2]: https://tools.ietf.org/html/rfc5280#section-7.2</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DnsNameRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]);
+<span class="doccomment">/// A reference to a DNS Name suitable for use in the TLS Server Name Indication
+/// (SNI) extension and/or for use as the reference hostname for which to verify
+/// a certificate.
+///
+/// A `DnsNameRef` is guaranteed to be syntactically valid. The validity rules
+/// are specified in [RFC 5280 Section 7.2], except that underscores are also
+/// allowed.
+///
+/// `Eq`, `PartialEq`, etc. are not implemented because name comparison
+/// frequently should be done case-insensitively and/or with other caveats that
+/// depend on the specific circumstances in which the comparison is done.
+///
+/// [RFC 5280 Section 7.2]: https://tools.ietf.org/html/rfc5280#section-7.2
+</span><span class="attribute">#[derive(Clone, Copy)]
+</span><span class="kw">pub struct </span>DnsNameRef&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]);
 
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DnsNameRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="number">0</span>
+<span class="kw">impl </span>AsRef&lt;[u8]&gt; <span class="kw">for </span>DnsNameRef&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
+}
+
+<span class="doccomment">/// An error indicating that a `DnsNameRef` could not built because the input
+/// is not a syntactically-valid DNS Name.
+</span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+</span><span class="kw">pub struct </span>InvalidDnsNameError;
+
+<span class="kw">impl </span>core::fmt::Display <span class="kw">for </span>InvalidDnsNameError {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter) -&gt; core::fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;{:?}&quot;</span>, <span class="self">self</span>)
     }
 }
 
-<span class="doccomment">/// An error indicating that a `DnsNameRef` could not built because the input</span>
-<span class="doccomment">/// is not a syntactically-valid DNS Name.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InvalidDnsNameError</span>;
+<span class="doccomment">/// Requires the `std` feature.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">impl </span>::std::error::Error <span class="kw">for </span>InvalidDnsNameError {}
 
-<span class="kw">impl</span> <span class="ident">core::fmt::Display</span> <span class="kw">for</span> <span class="ident">InvalidDnsNameError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">core::fmt::Formatter</span>) -&gt; <span class="ident">core::fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{:?}&quot;</span>, <span class="self">self</span>)
-    }
-}
-
-<span class="doccomment">/// Requires the `std` feature.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">::std::error::Error</span> <span class="kw">for</span> <span class="ident">InvalidDnsNameError</span> {}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">DnsNameRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Constructs a `DnsNameRef` from the given input if the input is a</span>
-    <span class="doccomment">/// syntactically-valid DNS name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_from_ascii</span>(<span class="ident">dns_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">InvalidDnsNameError</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">is_valid_reference_dns_id</span>(<span class="ident">untrusted::Input::from</span>(<span class="ident">dns_name</span>)) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">InvalidDnsNameError</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; DnsNameRef&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Constructs a `DnsNameRef` from the given input if the input is a
+    /// syntactically-valid DNS name.
+    </span><span class="kw">pub fn </span>try_from_ascii(dns_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidDnsNameError&gt; {
+        <span class="kw">if </span>!is_valid_reference_dns_id(untrusted::Input::from(dns_name)) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(InvalidDnsNameError);
         }
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(<span class="ident">dns_name</span>))
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(dns_name))
     }
 
-    <span class="doccomment">/// Constructs a `DnsNameRef` from the given input if the input is a</span>
-    <span class="doccomment">/// syntactically-valid DNS name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">try_from_ascii_str</span>(<span class="ident">dns_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">InvalidDnsNameError</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::try_from_ascii</span>(<span class="ident">dns_name</span>.<span class="ident">as_bytes</span>())
+    <span class="doccomment">/// Constructs a `DnsNameRef` from the given input if the input is a
+    /// syntactically-valid DNS name.
+    </span><span class="kw">pub fn </span>try_from_ascii_str(dns_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidDnsNameError&gt; {
+        <span class="self">Self</span>::try_from_ascii(dns_name.as_bytes())
     }
 
-    <span class="doccomment">/// Constructs a `DnsName` from this `DnsNameRef`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires the `alloc` feature.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_owned</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DnsName</span> {
-        <span class="comment">// DnsNameRef is already guaranteed to be valid ASCII, which is a</span>
-        <span class="comment">// subset of UTF-8.</span>
-        <span class="kw">let</span> <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">into</span>();
-        <span class="ident">DnsName</span>(<span class="ident">s</span>.<span class="ident">to_ascii_lowercase</span>())
-    }
-}
-
-<span class="doccomment">/// Requires the `alloc` feature.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">core::fmt::Debug</span> <span class="kw">for</span> <span class="ident">DnsNameRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">core::fmt::Formatter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">core::fmt::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">lowercase</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">to_owned</span>();
-        <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;DnsNameRef&quot;</span>).<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="ident">lowercase</span>.<span class="number">0</span>).<span class="ident">finish</span>()
+    <span class="doccomment">/// Constructs a `DnsName` from this `DnsNameRef`
+    ///
+    /// Requires the `alloc` feature.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+    </span><span class="kw">pub fn </span>to_owned(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; DnsName {
+        <span class="comment">// DnsNameRef is already guaranteed to be valid ASCII, which is a
+        // subset of UTF-8.
+        </span><span class="kw">let </span>s: <span class="kw-2">&amp;</span>str = <span class="self">self</span>.clone().into();
+        DnsName(s.to_ascii_lowercase())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">DnsNameRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">DnsNameRef</span>(<span class="ident">d</span>): <span class="ident">DnsNameRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="comment">// The unwrap won&#39;t fail because DnsNameRefs are guaranteed to be ASCII</span>
-        <span class="comment">// and ASCII is a subset of UTF-8.</span>
-        <span class="ident">core::str::from_utf8</span>(<span class="ident">d</span>).<span class="ident">unwrap</span>()
+<span class="doccomment">/// Requires the `alloc` feature.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">impl </span>core::fmt::Debug <span class="kw">for </span>DnsNameRef&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter) -&gt; <span class="prelude-ty">Result</span>&lt;(), core::fmt::Error&gt; {
+        <span class="kw">let </span>lowercase = <span class="self">self</span>.clone().to_owned();
+        f.debug_tuple(<span class="string">&quot;DnsNameRef&quot;</span>).field(<span class="kw-2">&amp;</span>lowercase.<span class="number">0</span>).finish()
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">presented_id_matches_reference_id</span>(
-    <span class="ident">presented_dns_id</span>: <span class="ident">untrusted::Input</span>,
-    <span class="ident">reference_dns_id</span>: <span class="ident">untrusted::Input</span>,
-) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-    <span class="ident">presented_id_matches_reference_id_internal</span>(
-        <span class="ident">presented_dns_id</span>,
-        <span class="ident">IdRole::Reference</span>,
-        <span class="ident">reference_dns_id</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;DnsNameRef&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
+    <span class="kw">fn </span>from(DnsNameRef(d): DnsNameRef&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="comment">// The unwrap won&#39;t fail because DnsNameRefs are guaranteed to be ASCII
+        // and ASCII is a subset of UTF-8.
+        </span>core::str::from_utf8(d).unwrap()
+    }
+}
+
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>presented_id_matches_reference_id(
+    presented_dns_id: untrusted::Input,
+    reference_dns_id: untrusted::Input,
+) -&gt; <span class="prelude-ty">Option</span>&lt;bool&gt; {
+    presented_id_matches_reference_id_internal(
+        presented_dns_id,
+        IdRole::Reference,
+        reference_dns_id,
     )
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">presented_id_matches_constraint</span>(
-    <span class="ident">presented_dns_id</span>: <span class="ident">untrusted::Input</span>,
-    <span class="ident">reference_dns_id</span>: <span class="ident">untrusted::Input</span>,
-) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-    <span class="ident">presented_id_matches_reference_id_internal</span>(
-        <span class="ident">presented_dns_id</span>,
-        <span class="ident">IdRole::NameConstraint</span>,
-        <span class="ident">reference_dns_id</span>,
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>presented_id_matches_constraint(
+    presented_dns_id: untrusted::Input,
+    reference_dns_id: untrusted::Input,
+) -&gt; <span class="prelude-ty">Option</span>&lt;bool&gt; {
+    presented_id_matches_reference_id_internal(
+        presented_dns_id,
+        IdRole::NameConstraint,
+        reference_dns_id,
     )
 }
 
-<span class="comment">// We do not distinguish between a syntactically-invalid presented_dns_id and</span>
-<span class="comment">// one that is syntactically valid but does not match reference_dns_id; in both</span>
-<span class="comment">// cases, the result is false.</span>
-<span class="comment">//</span>
-<span class="comment">// We assume that both presented_dns_id and reference_dns_id are encoded in</span>
-<span class="comment">// such a way that US-ASCII (7-bit) characters are encoded in one byte and no</span>
-<span class="comment">// encoding of a non-US-ASCII character contains a code point in the range</span>
-<span class="comment">// 0-127. For example, UTF-8 is OK but UTF-16 is not.</span>
-<span class="comment">//</span>
-<span class="comment">// RFC6125 says that a wildcard label may be of the form &lt;x&gt;*&lt;y&gt;.&lt;DNSID&gt;, where</span>
-<span class="comment">// &lt;x&gt; and/or &lt;y&gt; may be empty. However, NSS requires &lt;y&gt; to be empty, and we</span>
-<span class="comment">// follow NSS&#39;s stricter policy by accepting wildcards only of the form</span>
-<span class="comment">// &lt;x&gt;*.&lt;DNSID&gt;, where &lt;x&gt; may be empty.</span>
-<span class="comment">//</span>
-<span class="comment">// An relative presented DNS ID matches both an absolute reference ID and a</span>
-<span class="comment">// relative reference ID. Absolute presented DNS IDs are not supported:</span>
-<span class="comment">//</span>
-<span class="comment">//      Presented ID   Reference ID  Result</span>
-<span class="comment">//      -------------------------------------</span>
-<span class="comment">//      example.com    example.com   Match</span>
-<span class="comment">//      example.com.   example.com   Mismatch</span>
-<span class="comment">//      example.com    example.com.  Match</span>
-<span class="comment">//      example.com.   example.com.  Mismatch</span>
-<span class="comment">//</span>
-<span class="comment">// There are more subtleties documented inline in the code.</span>
-<span class="comment">//</span>
-<span class="comment">// Name constraints ///////////////////////////////////////////////////////////</span>
-<span class="comment">//</span>
-<span class="comment">// This is all RFC 5280 has to say about dNSName constraints:</span>
-<span class="comment">//</span>
-<span class="comment">//     DNS name restrictions are expressed as host.example.com.  Any DNS</span>
-<span class="comment">//     name that can be constructed by simply adding zero or more labels to</span>
-<span class="comment">//     the left-hand side of the name satisfies the name constraint.  For</span>
-<span class="comment">//     example, www.host.example.com would satisfy the constraint but</span>
-<span class="comment">//     host1.example.com would not.</span>
-<span class="comment">//</span>
-<span class="comment">// This lack of specificity has lead to a lot of uncertainty regarding</span>
-<span class="comment">// subdomain matching. In particular, the following questions have been</span>
-<span class="comment">// raised and answered:</span>
-<span class="comment">//</span>
-<span class="comment">//     Q: Does a presented identifier equal (case insensitive) to the name</span>
-<span class="comment">//        constraint match the constraint? For example, does the presented</span>
-<span class="comment">//        ID &quot;host.example.com&quot; match a &quot;host.example.com&quot; constraint?</span>
-<span class="comment">//     A: Yes. RFC5280 says &quot;by simply adding zero or more labels&quot; and this</span>
-<span class="comment">//        is the case of adding zero labels.</span>
-<span class="comment">//</span>
-<span class="comment">//     Q: When the name constraint does not start with &quot;.&quot;, do subdomain</span>
-<span class="comment">//        presented identifiers match it? For example, does the presented</span>
-<span class="comment">//        ID &quot;www.host.example.com&quot; match a &quot;host.example.com&quot; constraint?</span>
-<span class="comment">//     A: Yes. RFC5280 says &quot;by simply adding zero or more labels&quot; and this</span>
-<span class="comment">//        is the case of adding more than zero labels. The example is the</span>
-<span class="comment">//        one from RFC 5280.</span>
-<span class="comment">//</span>
-<span class="comment">//     Q: When the name constraint does not start with &quot;.&quot;, does a</span>
-<span class="comment">//        non-subdomain prefix match it? For example, does &quot;bigfoo.bar.com&quot;</span>
-<span class="comment">//        match &quot;foo.bar.com&quot;? [4]</span>
-<span class="comment">//     A: No. We interpret RFC 5280&#39;s language of &quot;adding zero or more labels&quot;</span>
-<span class="comment">//        to mean that whole labels must be prefixed.</span>
-<span class="comment">//</span>
-<span class="comment">//     (Note that the above three scenarios are the same as the RFC 6265</span>
-<span class="comment">//     domain matching rules [0].)</span>
-<span class="comment">//</span>
-<span class="comment">//     Q: Is a name constraint that starts with &quot;.&quot; valid, and if so, what</span>
-<span class="comment">//        semantics does it have? For example, does a presented ID of</span>
-<span class="comment">//        &quot;www.example.com&quot; match a constraint of &quot;.example.com&quot;? Does a</span>
-<span class="comment">//        presented ID of &quot;example.com&quot; match a constraint of &quot;.example.com&quot;?</span>
-<span class="comment">//     A: This implementation, NSS[1], and SChannel[2] all support a</span>
-<span class="comment">//        leading &quot;.&quot;, but OpenSSL[3] does not yet. Amongst the</span>
-<span class="comment">//        implementations that support it, a leading &quot;.&quot; is legal and means</span>
-<span class="comment">//        the same thing as when the &quot;.&quot; is omitted, EXCEPT that a</span>
-<span class="comment">//        presented identifier equal (case insensitive) to the name</span>
-<span class="comment">//        constraint is not matched; i.e. presented dNSName identifiers</span>
-<span class="comment">//        must be subdomains. Some CAs in Mozilla&#39;s CA program (e.g. HARICA)</span>
-<span class="comment">//        have name constraints with the leading &quot;.&quot; in their root</span>
-<span class="comment">//        certificates. The name constraints imposed on DCISS by Mozilla also</span>
-<span class="comment">//        have the it, so supporting this is a requirement for backward</span>
-<span class="comment">//        compatibility, even if it is not yet standardized. So, for example, a</span>
-<span class="comment">//        presented ID of &quot;www.example.com&quot; matches a constraint of</span>
-<span class="comment">//        &quot;.example.com&quot; but a presented ID of &quot;example.com&quot; does not.</span>
-<span class="comment">//</span>
-<span class="comment">//     Q: Is there a way to prevent subdomain matches?</span>
-<span class="comment">//     A: Yes.</span>
-<span class="comment">//</span>
-<span class="comment">//        Some people have proposed that dNSName constraints that do not</span>
-<span class="comment">//        start with a &quot;.&quot; should be restricted to exact (case insensitive)</span>
-<span class="comment">//        matches. However, such a change of semantics from what RFC5280</span>
-<span class="comment">//        specifies would be a non-backward-compatible change in the case of</span>
-<span class="comment">//        permittedSubtrees constraints, and it would be a security issue for</span>
-<span class="comment">//        excludedSubtrees constraints.</span>
-<span class="comment">//</span>
-<span class="comment">//        However, it can be done with a combination of permittedSubtrees and</span>
-<span class="comment">//        excludedSubtrees, e.g. &quot;example.com&quot; in permittedSubtrees and</span>
-<span class="comment">//        &quot;.example.com&quot; in excludedSubtrees.</span>
-<span class="comment">//</span>
-<span class="comment">//     Q: Are name constraints allowed to be specified as absolute names?</span>
-<span class="comment">//        For example, does a presented ID of &quot;example.com&quot; match a name</span>
-<span class="comment">//        constraint of &quot;example.com.&quot; and vice versa.</span>
-<span class="comment">//     A: Absolute names are not supported as presented IDs or name</span>
-<span class="comment">//        constraints. Only reference IDs may be absolute.</span>
-<span class="comment">//</span>
-<span class="comment">//     Q: Is &quot;&quot; a valid dNSName constraint? If so, what does it mean?</span>
-<span class="comment">//     A: Yes. Any valid presented dNSName can be formed &quot;by simply adding zero</span>
-<span class="comment">//        or more labels to the left-hand side&quot; of &quot;&quot;. In particular, an</span>
-<span class="comment">//        excludedSubtrees dNSName constraint of &quot;&quot; forbids all dNSNames.</span>
-<span class="comment">//</span>
-<span class="comment">//     Q: Is &quot;.&quot; a valid dNSName constraint? If so, what does it mean?</span>
-<span class="comment">//     A: No, because absolute names are not allowed (see above).</span>
-<span class="comment">//</span>
-<span class="comment">// [0] RFC 6265 (Cookies) Domain Matching rules:</span>
-<span class="comment">//     http://tools.ietf.org/html/rfc6265#section-5.1.3</span>
-<span class="comment">// [1] NSS source code:</span>
-<span class="comment">//     https://mxr.mozilla.org/nss/source/lib/certdb/genname.c?rev=2a7348f013cb#1209</span>
-<span class="comment">// [2] Description of SChannel&#39;s behavior from Microsoft:</span>
-<span class="comment">//     http://www.imc.org/ietf-pkix/mail-archive/msg04668.html</span>
-<span class="comment">// [3] Proposal to add such support to OpenSSL:</span>
-<span class="comment">//     http://www.mail-archive.com/openssl-dev%40openssl.org/msg36204.html</span>
-<span class="comment">//     https://rt.openssl.org/Ticket/Display.html?id=3562</span>
-<span class="comment">// [4] Feedback on the lack of clarify in the definition that never got</span>
-<span class="comment">//     incorporated into the spec:</span>
-<span class="comment">//     https://www.ietf.org/mail-archive/web/pkix/current/msg21192.html</span>
-<span class="kw">fn</span> <span class="ident">presented_id_matches_reference_id_internal</span>(
-    <span class="ident">presented_dns_id</span>: <span class="ident">untrusted::Input</span>,
-    <span class="ident">reference_dns_id_role</span>: <span class="ident">IdRole</span>,
-    <span class="ident">reference_dns_id</span>: <span class="ident">untrusted::Input</span>,
-) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">is_valid_dns_id</span>(<span class="ident">presented_dns_id</span>, <span class="ident">IdRole::Presented</span>, <span class="ident">AllowWildcards::Yes</span>) {
-        <span class="kw">return</span> <span class="prelude-val">None</span>;
+<span class="comment">// We do not distinguish between a syntactically-invalid presented_dns_id and
+// one that is syntactically valid but does not match reference_dns_id; in both
+// cases, the result is false.
+//
+// We assume that both presented_dns_id and reference_dns_id are encoded in
+// such a way that US-ASCII (7-bit) characters are encoded in one byte and no
+// encoding of a non-US-ASCII character contains a code point in the range
+// 0-127. For example, UTF-8 is OK but UTF-16 is not.
+//
+// RFC6125 says that a wildcard label may be of the form &lt;x&gt;*&lt;y&gt;.&lt;DNSID&gt;, where
+// &lt;x&gt; and/or &lt;y&gt; may be empty. However, NSS requires &lt;y&gt; to be empty, and we
+// follow NSS&#39;s stricter policy by accepting wildcards only of the form
+// &lt;x&gt;*.&lt;DNSID&gt;, where &lt;x&gt; may be empty.
+//
+// An relative presented DNS ID matches both an absolute reference ID and a
+// relative reference ID. Absolute presented DNS IDs are not supported:
+//
+//      Presented ID   Reference ID  Result
+//      -------------------------------------
+//      example.com    example.com   Match
+//      example.com.   example.com   Mismatch
+//      example.com    example.com.  Match
+//      example.com.   example.com.  Mismatch
+//
+// There are more subtleties documented inline in the code.
+//
+// Name constraints ///////////////////////////////////////////////////////////
+//
+// This is all RFC 5280 has to say about dNSName constraints:
+//
+//     DNS name restrictions are expressed as host.example.com.  Any DNS
+//     name that can be constructed by simply adding zero or more labels to
+//     the left-hand side of the name satisfies the name constraint.  For
+//     example, www.host.example.com would satisfy the constraint but
+//     host1.example.com would not.
+//
+// This lack of specificity has lead to a lot of uncertainty regarding
+// subdomain matching. In particular, the following questions have been
+// raised and answered:
+//
+//     Q: Does a presented identifier equal (case insensitive) to the name
+//        constraint match the constraint? For example, does the presented
+//        ID &quot;host.example.com&quot; match a &quot;host.example.com&quot; constraint?
+//     A: Yes. RFC5280 says &quot;by simply adding zero or more labels&quot; and this
+//        is the case of adding zero labels.
+//
+//     Q: When the name constraint does not start with &quot;.&quot;, do subdomain
+//        presented identifiers match it? For example, does the presented
+//        ID &quot;www.host.example.com&quot; match a &quot;host.example.com&quot; constraint?
+//     A: Yes. RFC5280 says &quot;by simply adding zero or more labels&quot; and this
+//        is the case of adding more than zero labels. The example is the
+//        one from RFC 5280.
+//
+//     Q: When the name constraint does not start with &quot;.&quot;, does a
+//        non-subdomain prefix match it? For example, does &quot;bigfoo.bar.com&quot;
+//        match &quot;foo.bar.com&quot;? [4]
+//     A: No. We interpret RFC 5280&#39;s language of &quot;adding zero or more labels&quot;
+//        to mean that whole labels must be prefixed.
+//
+//     (Note that the above three scenarios are the same as the RFC 6265
+//     domain matching rules [0].)
+//
+//     Q: Is a name constraint that starts with &quot;.&quot; valid, and if so, what
+//        semantics does it have? For example, does a presented ID of
+//        &quot;www.example.com&quot; match a constraint of &quot;.example.com&quot;? Does a
+//        presented ID of &quot;example.com&quot; match a constraint of &quot;.example.com&quot;?
+//     A: This implementation, NSS[1], and SChannel[2] all support a
+//        leading &quot;.&quot;, but OpenSSL[3] does not yet. Amongst the
+//        implementations that support it, a leading &quot;.&quot; is legal and means
+//        the same thing as when the &quot;.&quot; is omitted, EXCEPT that a
+//        presented identifier equal (case insensitive) to the name
+//        constraint is not matched; i.e. presented dNSName identifiers
+//        must be subdomains. Some CAs in Mozilla&#39;s CA program (e.g. HARICA)
+//        have name constraints with the leading &quot;.&quot; in their root
+//        certificates. The name constraints imposed on DCISS by Mozilla also
+//        have the it, so supporting this is a requirement for backward
+//        compatibility, even if it is not yet standardized. So, for example, a
+//        presented ID of &quot;www.example.com&quot; matches a constraint of
+//        &quot;.example.com&quot; but a presented ID of &quot;example.com&quot; does not.
+//
+//     Q: Is there a way to prevent subdomain matches?
+//     A: Yes.
+//
+//        Some people have proposed that dNSName constraints that do not
+//        start with a &quot;.&quot; should be restricted to exact (case insensitive)
+//        matches. However, such a change of semantics from what RFC5280
+//        specifies would be a non-backward-compatible change in the case of
+//        permittedSubtrees constraints, and it would be a security issue for
+//        excludedSubtrees constraints.
+//
+//        However, it can be done with a combination of permittedSubtrees and
+//        excludedSubtrees, e.g. &quot;example.com&quot; in permittedSubtrees and
+//        &quot;.example.com&quot; in excludedSubtrees.
+//
+//     Q: Are name constraints allowed to be specified as absolute names?
+//        For example, does a presented ID of &quot;example.com&quot; match a name
+//        constraint of &quot;example.com.&quot; and vice versa.
+//     A: Absolute names are not supported as presented IDs or name
+//        constraints. Only reference IDs may be absolute.
+//
+//     Q: Is &quot;&quot; a valid dNSName constraint? If so, what does it mean?
+//     A: Yes. Any valid presented dNSName can be formed &quot;by simply adding zero
+//        or more labels to the left-hand side&quot; of &quot;&quot;. In particular, an
+//        excludedSubtrees dNSName constraint of &quot;&quot; forbids all dNSNames.
+//
+//     Q: Is &quot;.&quot; a valid dNSName constraint? If so, what does it mean?
+//     A: No, because absolute names are not allowed (see above).
+//
+// [0] RFC 6265 (Cookies) Domain Matching rules:
+//     http://tools.ietf.org/html/rfc6265#section-5.1.3
+// [1] NSS source code:
+//     https://mxr.mozilla.org/nss/source/lib/certdb/genname.c?rev=2a7348f013cb#1209
+// [2] Description of SChannel&#39;s behavior from Microsoft:
+//     http://www.imc.org/ietf-pkix/mail-archive/msg04668.html
+// [3] Proposal to add such support to OpenSSL:
+//     http://www.mail-archive.com/openssl-dev%40openssl.org/msg36204.html
+//     https://rt.openssl.org/Ticket/Display.html?id=3562
+// [4] Feedback on the lack of clarify in the definition that never got
+//     incorporated into the spec:
+//     https://www.ietf.org/mail-archive/web/pkix/current/msg21192.html
+</span><span class="kw">fn </span>presented_id_matches_reference_id_internal(
+    presented_dns_id: untrusted::Input,
+    reference_dns_id_role: IdRole,
+    reference_dns_id: untrusted::Input,
+) -&gt; <span class="prelude-ty">Option</span>&lt;bool&gt; {
+    <span class="kw">if </span>!is_valid_dns_id(presented_dns_id, IdRole::Presented, AllowWildcards::Yes) {
+        <span class="kw">return </span><span class="prelude-val">None</span>;
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">is_valid_dns_id</span>(<span class="ident">reference_dns_id</span>, <span class="ident">reference_dns_id_role</span>, <span class="ident">AllowWildcards::No</span>) {
-        <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="kw">if </span>!is_valid_dns_id(reference_dns_id, reference_dns_id_role, AllowWildcards::No) {
+        <span class="kw">return </span><span class="prelude-val">None</span>;
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">presented</span> <span class="op">=</span> <span class="ident">untrusted::Reader::new</span>(<span class="ident">presented_dns_id</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reference</span> <span class="op">=</span> <span class="ident">untrusted::Reader::new</span>(<span class="ident">reference_dns_id</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>presented = untrusted::Reader::new(presented_dns_id);
+    <span class="kw">let </span><span class="kw-2">mut </span>reference = untrusted::Reader::new(reference_dns_id);
 
-    <span class="kw">match</span> <span class="ident">reference_dns_id_role</span> {
-        <span class="ident">IdRole::Reference</span> =&gt; (),
+    <span class="kw">match </span>reference_dns_id_role {
+        IdRole::Reference =&gt; (),
 
-        <span class="ident">IdRole::NameConstraint</span> <span class="kw">if</span> <span class="ident">presented_dns_id</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">reference_dns_id</span>.<span class="ident">len</span>() =&gt; {
-            <span class="kw">if</span> <span class="ident">reference_dns_id</span>.<span class="ident">is_empty</span>() {
-                <span class="comment">// An empty constraint matches everything.</span>
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>);
+        IdRole::NameConstraint <span class="kw">if </span>presented_dns_id.len() &gt; reference_dns_id.len() =&gt; {
+            <span class="kw">if </span>reference_dns_id.is_empty() {
+                <span class="comment">// An empty constraint matches everything.
+                </span><span class="kw">return </span><span class="prelude-val">Some</span>(<span class="bool-val">true</span>);
             }
 
-            <span class="comment">// If the reference ID starts with a dot then skip the prefix of</span>
-            <span class="comment">// the presented ID and start the comparison at the position of</span>
-            <span class="comment">// that dot. Examples:</span>
-            <span class="comment">//</span>
-            <span class="comment">//                                       Matches     Doesn&#39;t Match</span>
-            <span class="comment">//     -----------------------------------------------------------</span>
-            <span class="comment">//       original presented ID:  www.example.com    badexample.com</span>
-            <span class="comment">//                     skipped:  www                ba</span>
-            <span class="comment">//     presented ID w/o prefix:     .example.com      dexample.com</span>
-            <span class="comment">//                reference ID:     .example.com      .example.com</span>
-            <span class="comment">//</span>
-            <span class="comment">// If the reference ID does not start with a dot then we skip</span>
-            <span class="comment">// the prefix of the presented ID but also verify that the</span>
-            <span class="comment">// prefix ends with a dot. Examples:</span>
-            <span class="comment">//</span>
-            <span class="comment">//                                       Matches     Doesn&#39;t Match</span>
-            <span class="comment">//     -----------------------------------------------------------</span>
-            <span class="comment">//       original presented ID:  www.example.com    badexample.com</span>
-            <span class="comment">//                     skipped:  www                ba</span>
-            <span class="comment">//                 must be &#39;.&#39;:     .                 d</span>
-            <span class="comment">//     presented ID w/o prefix:      example.com       example.com</span>
-            <span class="comment">//                reference ID:      example.com       example.com</span>
-            <span class="comment">//</span>
-            <span class="kw">if</span> <span class="ident">reference</span>.<span class="ident">peek</span>(<span class="string">b&#39;.&#39;</span>) {
-                <span class="kw">if</span> <span class="ident">presented</span>
-                    .<span class="ident">skip</span>(<span class="ident">presented_dns_id</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">reference_dns_id</span>.<span class="ident">len</span>())
-                    .<span class="ident">is_err</span>()
+            <span class="comment">// If the reference ID starts with a dot then skip the prefix of
+            // the presented ID and start the comparison at the position of
+            // that dot. Examples:
+            //
+            //                                       Matches     Doesn&#39;t Match
+            //     -----------------------------------------------------------
+            //       original presented ID:  www.example.com    badexample.com
+            //                     skipped:  www                ba
+            //     presented ID w/o prefix:     .example.com      dexample.com
+            //                reference ID:     .example.com      .example.com
+            //
+            // If the reference ID does not start with a dot then we skip
+            // the prefix of the presented ID but also verify that the
+            // prefix ends with a dot. Examples:
+            //
+            //                                       Matches     Doesn&#39;t Match
+            //     -----------------------------------------------------------
+            //       original presented ID:  www.example.com    badexample.com
+            //                     skipped:  www                ba
+            //                 must be &#39;.&#39;:     .                 d
+            //     presented ID w/o prefix:      example.com       example.com
+            //                reference ID:      example.com       example.com
+            //
+            </span><span class="kw">if </span>reference.peek(<span class="string">b&#39;.&#39;</span>) {
+                <span class="kw">if </span>presented
+                    .skip(presented_dns_id.len() - reference_dns_id.len())
+                    .is_err()
                 {
                     <span class="macro">unreachable!</span>();
                 }
-            } <span class="kw">else</span> {
-                <span class="kw">if</span> <span class="ident">presented</span>
-                    .<span class="ident">skip</span>(<span class="ident">presented_dns_id</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">reference_dns_id</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>)
-                    .<span class="ident">is_err</span>()
+            } <span class="kw">else </span>{
+                <span class="kw">if </span>presented
+                    .skip(presented_dns_id.len() - reference_dns_id.len() - <span class="number">1</span>)
+                    .is_err()
                 {
                     <span class="macro">unreachable!</span>();
                 }
-                <span class="kw">if</span> <span class="ident">presented</span>.<span class="ident">read_byte</span>() <span class="op">!</span><span class="op">=</span> <span class="prelude-val">Ok</span>(<span class="string">b&#39;.&#39;</span>) {
-                    <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="bool-val">false</span>);
+                <span class="kw">if </span>presented.read_byte() != <span class="prelude-val">Ok</span>(<span class="string">b&#39;.&#39;</span>) {
+                    <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="bool-val">false</span>);
                 }
             }
         }
 
-        <span class="ident">IdRole::NameConstraint</span> =&gt; (),
+        IdRole::NameConstraint =&gt; (),
 
-        <span class="ident">IdRole::Presented</span> =&gt; <span class="macro">unreachable!</span>(),
+        IdRole::Presented =&gt; <span class="macro">unreachable!</span>(),
     }
 
-    <span class="comment">// Only allow wildcard labels that consist only of &#39;*&#39;.</span>
-    <span class="kw">if</span> <span class="ident">presented</span>.<span class="ident">peek</span>(<span class="string">b&#39;*&#39;</span>) {
-        <span class="kw">if</span> <span class="ident">presented</span>.<span class="ident">skip</span>(<span class="number">1</span>).<span class="ident">is_err</span>() {
+    <span class="comment">// Only allow wildcard labels that consist only of &#39;*&#39;.
+    </span><span class="kw">if </span>presented.peek(<span class="string">b&#39;*&#39;</span>) {
+        <span class="kw">if </span>presented.skip(<span class="number">1</span>).is_err() {
             <span class="macro">unreachable!</span>();
         }
 
-        <span class="kw">loop</span> {
-            <span class="kw">if</span> <span class="ident">reference</span>.<span class="ident">read_byte</span>().<span class="ident">is_err</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="bool-val">false</span>);
+        <span class="kw">loop </span>{
+            <span class="kw">if </span>reference.read_byte().is_err() {
+                <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="bool-val">false</span>);
             }
-            <span class="kw">if</span> <span class="ident">reference</span>.<span class="ident">peek</span>(<span class="string">b&#39;.&#39;</span>) {
+            <span class="kw">if </span>reference.peek(<span class="string">b&#39;.&#39;</span>) {
                 <span class="kw">break</span>;
             }
         }
     }
 
-    <span class="kw">loop</span> {
-        <span class="kw">let</span> <span class="ident">presented_byte</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">presented</span>.<span class="ident">read_byte</span>(), <span class="ident">reference</span>.<span class="ident">read_byte</span>()) {
-            (<span class="prelude-val">Ok</span>(<span class="ident">p</span>), <span class="prelude-val">Ok</span>(<span class="ident">r</span>)) <span class="kw">if</span> <span class="ident">ascii_lower</span>(<span class="ident">p</span>) <span class="op">==</span> <span class="ident">ascii_lower</span>(<span class="ident">r</span>) =&gt; <span class="ident">p</span>,
-            <span class="kw">_</span> =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="bool-val">false</span>);
+    <span class="kw">loop </span>{
+        <span class="kw">let </span>presented_byte = <span class="kw">match </span>(presented.read_byte(), reference.read_byte()) {
+            (<span class="prelude-val">Ok</span>(p), <span class="prelude-val">Ok</span>(r)) <span class="kw">if </span>ascii_lower(p) == ascii_lower(r) =&gt; p,
+            <span class="kw">_ </span>=&gt; {
+                <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="bool-val">false</span>);
             }
         };
 
-        <span class="kw">if</span> <span class="ident">presented</span>.<span class="ident">at_end</span>() {
-            <span class="comment">// Don&#39;t allow presented IDs to be absolute.</span>
-            <span class="kw">if</span> <span class="ident">presented_byte</span> <span class="op">==</span> <span class="string">b&#39;.&#39;</span> {
-                <span class="kw">return</span> <span class="prelude-val">None</span>;
+        <span class="kw">if </span>presented.at_end() {
+            <span class="comment">// Don&#39;t allow presented IDs to be absolute.
+            </span><span class="kw">if </span>presented_byte == <span class="string">b&#39;.&#39; </span>{
+                <span class="kw">return </span><span class="prelude-val">None</span>;
             }
             <span class="kw">break</span>;
         }
     }
 
-    <span class="comment">// Allow a relative presented DNS ID to match an absolute reference DNS ID,</span>
-    <span class="comment">// unless we&#39;re matching a name constraint.</span>
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">reference</span>.<span class="ident">at_end</span>() {
-        <span class="kw">if</span> <span class="ident">reference_dns_id_role</span> <span class="op">!</span><span class="op">=</span> <span class="ident">IdRole::NameConstraint</span> {
-            <span class="kw">match</span> <span class="ident">reference</span>.<span class="ident">read_byte</span>() {
+    <span class="comment">// Allow a relative presented DNS ID to match an absolute reference DNS ID,
+    // unless we&#39;re matching a name constraint.
+    </span><span class="kw">if </span>!reference.at_end() {
+        <span class="kw">if </span>reference_dns_id_role != IdRole::NameConstraint {
+            <span class="kw">match </span>reference.read_byte() {
                 <span class="prelude-val">Ok</span>(<span class="string">b&#39;.&#39;</span>) =&gt; (),
-                <span class="kw">_</span> =&gt; {
-                    <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="bool-val">false</span>);
+                <span class="kw">_ </span>=&gt; {
+                    <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="bool-val">false</span>);
                 }
             };
         }
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">reference</span>.<span class="ident">at_end</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="bool-val">false</span>);
+        <span class="kw">if </span>!reference.at_end() {
+            <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="bool-val">false</span>);
         }
     }
 
-    <span class="macro">assert!</span>(<span class="ident">presented</span>.<span class="ident">at_end</span>());
-    <span class="macro">assert!</span>(<span class="ident">reference</span>.<span class="ident">at_end</span>());
+    <span class="macro">assert!</span>(presented.at_end());
+    <span class="macro">assert!</span>(reference.at_end());
 
     <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">ascii_lower</span>(<span class="ident">b</span>: <span class="ident">u8</span>) -&gt; <span class="ident">u8</span> {
-    <span class="kw">match</span> <span class="ident">b</span> {
-        <span class="string">b&#39;A&#39;</span>..<span class="op">=</span><span class="string">b&#39;Z&#39;</span> =&gt; <span class="ident">b</span> <span class="op">+</span> <span class="string">b&#39;a&#39;</span> <span class="op">-</span> <span class="string">b&#39;A&#39;</span>,
-        <span class="kw">_</span> =&gt; <span class="ident">b</span>,
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>ascii_lower(b: u8) -&gt; u8 {
+    <span class="kw">match </span>b {
+        <span class="string">b&#39;A&#39;</span>..=<span class="string">b&#39;Z&#39; </span>=&gt; b + <span class="string">b&#39;a&#39; </span>- <span class="string">b&#39;A&#39;</span>,
+        <span class="kw">_ </span>=&gt; b,
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">enum</span> <span class="ident">AllowWildcards</span> {
-    <span class="ident">No</span>,
-    <span class="ident">Yes</span>,
+<span class="attribute">#[derive(Clone, Copy, PartialEq)]
+</span><span class="kw">enum </span>AllowWildcards {
+    No,
+    Yes,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">enum</span> <span class="ident">IdRole</span> {
-    <span class="ident">Reference</span>,
-    <span class="ident">Presented</span>,
-    <span class="ident">NameConstraint</span>,
+<span class="attribute">#[derive(Clone, Copy, PartialEq)]
+</span><span class="kw">enum </span>IdRole {
+    Reference,
+    Presented,
+    NameConstraint,
 }
 
-<span class="kw">fn</span> <span class="ident">is_valid_reference_dns_id</span>(<span class="ident">hostname</span>: <span class="ident">untrusted::Input</span>) -&gt; <span class="ident">bool</span> {
-    <span class="ident">is_valid_dns_id</span>(<span class="ident">hostname</span>, <span class="ident">IdRole::Reference</span>, <span class="ident">AllowWildcards::No</span>)
+<span class="kw">fn </span>is_valid_reference_dns_id(hostname: untrusted::Input) -&gt; bool {
+    is_valid_dns_id(hostname, IdRole::Reference, AllowWildcards::No)
 }
 
-<span class="comment">// https://tools.ietf.org/html/rfc5280#section-4.2.1.6:</span>
-<span class="comment">//</span>
-<span class="comment">//   When the subjectAltName extension contains a domain name system</span>
-<span class="comment">//   label, the domain name MUST be stored in the dNSName (an IA5String).</span>
-<span class="comment">//   The name MUST be in the &quot;preferred name syntax&quot;, as specified by</span>
-<span class="comment">//   Section 3.5 of [RFC1034] and as modified by Section 2.1 of</span>
-<span class="comment">//   [RFC1123].</span>
-<span class="comment">//</span>
-<span class="comment">// https://bugzilla.mozilla.org/show_bug.cgi?id=1136616: As an exception to the</span>
-<span class="comment">// requirement above, underscores are also allowed in names for compatibility.</span>
-<span class="kw">fn</span> <span class="ident">is_valid_dns_id</span>(
-    <span class="ident">hostname</span>: <span class="ident">untrusted::Input</span>,
-    <span class="ident">id_role</span>: <span class="ident">IdRole</span>,
-    <span class="ident">allow_wildcards</span>: <span class="ident">AllowWildcards</span>,
-) -&gt; <span class="ident">bool</span> {
-    <span class="comment">// https://blogs.msdn.microsoft.com/oldnewthing/20120412-00/?p=7873/</span>
-    <span class="kw">if</span> <span class="ident">hostname</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">253</span> {
-        <span class="kw">return</span> <span class="bool-val">false</span>;
+<span class="comment">// https://tools.ietf.org/html/rfc5280#section-4.2.1.6:
+//
+//   When the subjectAltName extension contains a domain name system
+//   label, the domain name MUST be stored in the dNSName (an IA5String).
+//   The name MUST be in the &quot;preferred name syntax&quot;, as specified by
+//   Section 3.5 of [RFC1034] and as modified by Section 2.1 of
+//   [RFC1123].
+//
+// https://bugzilla.mozilla.org/show_bug.cgi?id=1136616: As an exception to the
+// requirement above, underscores are also allowed in names for compatibility.
+</span><span class="kw">fn </span>is_valid_dns_id(
+    hostname: untrusted::Input,
+    id_role: IdRole,
+    allow_wildcards: AllowWildcards,
+) -&gt; bool {
+    <span class="comment">// https://blogs.msdn.microsoft.com/oldnewthing/20120412-00/?p=7873/
+    </span><span class="kw">if </span>hostname.len() &gt; <span class="number">253 </span>{
+        <span class="kw">return </span><span class="bool-val">false</span>;
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">untrusted::Reader::new</span>(<span class="ident">hostname</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>input = untrusted::Reader::new(hostname);
 
-    <span class="kw">if</span> <span class="ident">id_role</span> <span class="op">==</span> <span class="ident">IdRole::NameConstraint</span> <span class="op">&amp;&amp;</span> <span class="ident">input</span>.<span class="ident">at_end</span>() {
-        <span class="kw">return</span> <span class="bool-val">true</span>;
+    <span class="kw">if </span>id_role == IdRole::NameConstraint &amp;&amp; input.at_end() {
+        <span class="kw">return </span><span class="bool-val">true</span>;
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dot_count</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">label_length</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">label_is_all_numeric</span> <span class="op">=</span> <span class="bool-val">false</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">label_ends_with_hyphen</span> <span class="op">=</span> <span class="bool-val">false</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>dot_count = <span class="number">0</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>label_length = <span class="number">0</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>label_is_all_numeric = <span class="bool-val">false</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>label_ends_with_hyphen = <span class="bool-val">false</span>;
 
-    <span class="comment">// Only presented IDs are allowed to have wildcard labels. And, like</span>
-    <span class="comment">// Chromium, be stricter than RFC 6125 requires by insisting that a</span>
-    <span class="comment">// wildcard label consist only of &#39;*&#39;.</span>
-    <span class="kw">let</span> <span class="ident">is_wildcard</span> <span class="op">=</span> <span class="ident">allow_wildcards</span> <span class="op">==</span> <span class="ident">AllowWildcards::Yes</span> <span class="op">&amp;&amp;</span> <span class="ident">input</span>.<span class="ident">peek</span>(<span class="string">b&#39;*&#39;</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">is_first_byte</span> <span class="op">=</span> <span class="op">!</span><span class="ident">is_wildcard</span>;
-    <span class="kw">if</span> <span class="ident">is_wildcard</span> {
-        <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">read_byte</span>() <span class="op">!</span><span class="op">=</span> <span class="prelude-val">Ok</span>(<span class="string">b&#39;*&#39;</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">input</span>.<span class="ident">read_byte</span>() <span class="op">!</span><span class="op">=</span> <span class="prelude-val">Ok</span>(<span class="string">b&#39;.&#39;</span>) {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+    <span class="comment">// Only presented IDs are allowed to have wildcard labels. And, like
+    // Chromium, be stricter than RFC 6125 requires by insisting that a
+    // wildcard label consist only of &#39;*&#39;.
+    </span><span class="kw">let </span>is_wildcard = allow_wildcards == AllowWildcards::Yes &amp;&amp; input.peek(<span class="string">b&#39;*&#39;</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>is_first_byte = !is_wildcard;
+    <span class="kw">if </span>is_wildcard {
+        <span class="kw">if </span>input.read_byte() != <span class="prelude-val">Ok</span>(<span class="string">b&#39;*&#39;</span>) || input.read_byte() != <span class="prelude-val">Ok</span>(<span class="string">b&#39;.&#39;</span>) {
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
-        <span class="ident">dot_count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        dot_count += <span class="number">1</span>;
     }
 
-    <span class="kw">loop</span> {
-        <span class="kw">const</span> <span class="ident">MAX_LABEL_LENGTH</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">63</span>;
+    <span class="kw">loop </span>{
+        <span class="kw">const </span>MAX_LABEL_LENGTH: usize = <span class="number">63</span>;
 
-        <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">read_byte</span>() {
+        <span class="kw">match </span>input.read_byte() {
             <span class="prelude-val">Ok</span>(<span class="string">b&#39;-&#39;</span>) =&gt; {
-                <span class="kw">if</span> <span class="ident">label_length</span> <span class="op">==</span> <span class="number">0</span> {
-                    <span class="kw">return</span> <span class="bool-val">false</span>; <span class="comment">// Labels must not start with a hyphen.</span>
-                }
-                <span class="ident">label_is_all_numeric</span> <span class="op">=</span> <span class="bool-val">false</span>;
-                <span class="ident">label_ends_with_hyphen</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                <span class="ident">label_length</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="kw">if</span> <span class="ident">label_length</span> <span class="op">&gt;</span> <span class="ident">MAX_LABEL_LENGTH</span> {
-                    <span class="kw">return</span> <span class="bool-val">false</span>;
-                }
-            }
-
-            <span class="prelude-val">Ok</span>(<span class="string">b&#39;0&#39;</span>..<span class="op">=</span><span class="string">b&#39;9&#39;</span>) =&gt; {
-                <span class="kw">if</span> <span class="ident">label_length</span> <span class="op">==</span> <span class="number">0</span> {
-                    <span class="ident">label_is_all_numeric</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                }
-                <span class="ident">label_ends_with_hyphen</span> <span class="op">=</span> <span class="bool-val">false</span>;
-                <span class="ident">label_length</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="kw">if</span> <span class="ident">label_length</span> <span class="op">&gt;</span> <span class="ident">MAX_LABEL_LENGTH</span> {
-                    <span class="kw">return</span> <span class="bool-val">false</span>;
+                <span class="kw">if </span>label_length == <span class="number">0 </span>{
+                    <span class="kw">return </span><span class="bool-val">false</span>; <span class="comment">// Labels must not start with a hyphen.
+                </span>}
+                label_is_all_numeric = <span class="bool-val">false</span>;
+                label_ends_with_hyphen = <span class="bool-val">true</span>;
+                label_length += <span class="number">1</span>;
+                <span class="kw">if </span>label_length &gt; MAX_LABEL_LENGTH {
+                    <span class="kw">return </span><span class="bool-val">false</span>;
                 }
             }
 
-            <span class="prelude-val">Ok</span>(<span class="string">b&#39;a&#39;</span>..<span class="op">=</span><span class="string">b&#39;z&#39;</span>) <span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="string">b&#39;A&#39;</span>..<span class="op">=</span><span class="string">b&#39;Z&#39;</span>) <span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="string">b&#39;_&#39;</span>) =&gt; {
-                <span class="ident">label_is_all_numeric</span> <span class="op">=</span> <span class="bool-val">false</span>;
-                <span class="ident">label_ends_with_hyphen</span> <span class="op">=</span> <span class="bool-val">false</span>;
-                <span class="ident">label_length</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="kw">if</span> <span class="ident">label_length</span> <span class="op">&gt;</span> <span class="ident">MAX_LABEL_LENGTH</span> {
-                    <span class="kw">return</span> <span class="bool-val">false</span>;
+            <span class="prelude-val">Ok</span>(<span class="string">b&#39;0&#39;</span>..=<span class="string">b&#39;9&#39;</span>) =&gt; {
+                <span class="kw">if </span>label_length == <span class="number">0 </span>{
+                    label_is_all_numeric = <span class="bool-val">true</span>;
+                }
+                label_ends_with_hyphen = <span class="bool-val">false</span>;
+                label_length += <span class="number">1</span>;
+                <span class="kw">if </span>label_length &gt; MAX_LABEL_LENGTH {
+                    <span class="kw">return </span><span class="bool-val">false</span>;
+                }
+            }
+
+            <span class="prelude-val">Ok</span>(<span class="string">b&#39;a&#39;</span>..=<span class="string">b&#39;z&#39;</span>) | <span class="prelude-val">Ok</span>(<span class="string">b&#39;A&#39;</span>..=<span class="string">b&#39;Z&#39;</span>) | <span class="prelude-val">Ok</span>(<span class="string">b&#39;_&#39;</span>) =&gt; {
+                label_is_all_numeric = <span class="bool-val">false</span>;
+                label_ends_with_hyphen = <span class="bool-val">false</span>;
+                label_length += <span class="number">1</span>;
+                <span class="kw">if </span>label_length &gt; MAX_LABEL_LENGTH {
+                    <span class="kw">return </span><span class="bool-val">false</span>;
                 }
             }
 
             <span class="prelude-val">Ok</span>(<span class="string">b&#39;.&#39;</span>) =&gt; {
-                <span class="ident">dot_count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="kw">if</span> <span class="ident">label_length</span> <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> (<span class="ident">id_role</span> <span class="op">!</span><span class="op">=</span> <span class="ident">IdRole::NameConstraint</span> <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">is_first_byte</span>) {
-                    <span class="kw">return</span> <span class="bool-val">false</span>;
+                dot_count += <span class="number">1</span>;
+                <span class="kw">if </span>label_length == <span class="number">0 </span>&amp;&amp; (id_role != IdRole::NameConstraint || !is_first_byte) {
+                    <span class="kw">return </span><span class="bool-val">false</span>;
                 }
-                <span class="kw">if</span> <span class="ident">label_ends_with_hyphen</span> {
-                    <span class="kw">return</span> <span class="bool-val">false</span>; <span class="comment">// Labels must not end with a hyphen.</span>
-                }
-                <span class="ident">label_length</span> <span class="op">=</span> <span class="number">0</span>;
+                <span class="kw">if </span>label_ends_with_hyphen {
+                    <span class="kw">return </span><span class="bool-val">false</span>; <span class="comment">// Labels must not end with a hyphen.
+                </span>}
+                label_length = <span class="number">0</span>;
             }
 
-            <span class="kw">_</span> =&gt; {
-                <span class="kw">return</span> <span class="bool-val">false</span>;
+            <span class="kw">_ </span>=&gt; {
+                <span class="kw">return </span><span class="bool-val">false</span>;
             }
         }
-        <span class="ident">is_first_byte</span> <span class="op">=</span> <span class="bool-val">false</span>;
+        is_first_byte = <span class="bool-val">false</span>;
 
-        <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">at_end</span>() {
+        <span class="kw">if </span>input.at_end() {
             <span class="kw">break</span>;
         }
     }
 
-    <span class="comment">// Only reference IDs, not presented IDs or name constraints, may be</span>
-    <span class="comment">// absolute.</span>
-    <span class="kw">if</span> <span class="ident">label_length</span> <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">id_role</span> <span class="op">!</span><span class="op">=</span> <span class="ident">IdRole::Reference</span> {
-        <span class="kw">return</span> <span class="bool-val">false</span>;
+    <span class="comment">// Only reference IDs, not presented IDs or name constraints, may be
+    // absolute.
+    </span><span class="kw">if </span>label_length == <span class="number">0 </span>&amp;&amp; id_role != IdRole::Reference {
+        <span class="kw">return </span><span class="bool-val">false</span>;
     }
 
-    <span class="kw">if</span> <span class="ident">label_ends_with_hyphen</span> {
-        <span class="kw">return</span> <span class="bool-val">false</span>; <span class="comment">// Labels must not end with a hyphen.</span>
-    }
+    <span class="kw">if </span>label_ends_with_hyphen {
+        <span class="kw">return </span><span class="bool-val">false</span>; <span class="comment">// Labels must not end with a hyphen.
+    </span>}
 
-    <span class="kw">if</span> <span class="ident">label_is_all_numeric</span> {
-        <span class="kw">return</span> <span class="bool-val">false</span>; <span class="comment">// Last label must not be all numeric.</span>
-    }
+    <span class="kw">if </span>label_is_all_numeric {
+        <span class="kw">return </span><span class="bool-val">false</span>; <span class="comment">// Last label must not be all numeric.
+    </span>}
 
-    <span class="kw">if</span> <span class="ident">is_wildcard</span> {
-        <span class="comment">// If the DNS ID ends with a dot, the last dot signifies an absolute ID.</span>
-        <span class="kw">let</span> <span class="ident">label_count</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">label_length</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="ident">dot_count</span>
-        } <span class="kw">else</span> {
-            <span class="ident">dot_count</span> <span class="op">+</span> <span class="number">1</span>
-        };
+    <span class="kw">if </span>is_wildcard {
+        <span class="comment">// If the DNS ID ends with a dot, the last dot signifies an absolute ID.
+        </span><span class="kw">let </span>label_count = <span class="kw">if </span>label_length == <span class="number">0 </span>{
+            dot_count
+        } <span class="kw">else </span>{
+            dot_count + <span class="number">1
+        </span>};
 
-        <span class="comment">// Like NSS, require at least two labels to follow the wildcard label.</span>
-        <span class="comment">// TODO: Allow the TrustDomain to control this on a per-eTLD+1 basis,</span>
-        <span class="comment">// similar to Chromium. Even then, it might be better to still enforce</span>
-        <span class="comment">// that there are at least two labels after the wildcard.</span>
-        <span class="kw">if</span> <span class="ident">label_count</span> <span class="op">&lt;</span> <span class="number">3</span> {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+        <span class="comment">// Like NSS, require at least two labels to follow the wildcard label.
+        // TODO: Allow the TrustDomain to control this on a per-eTLD+1 basis,
+        // similar to Chromium. Even then, it might be better to still enforce
+        // that there are at least two labels after the wildcard.
+        </span><span class="kw">if </span>label_count &lt; <span class="number">3 </span>{
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
     }
 
-    <span class="bool-val">true</span>
-}
+    <span class="bool-val">true
+</span>}
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="kw">const</span> <span class="ident">PRESENTED_MATCHES_REFERENCE</span>: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>)] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+    <span class="kw">const </span>PRESENTED_MATCHES_REFERENCE: <span class="kw-2">&amp;</span>[(<span class="kw-2">&amp;</span>[u8], <span class="kw-2">&amp;</span>[u8], <span class="prelude-ty">Option</span>&lt;bool&gt;)] = <span class="kw-2">&amp;</span>[
         (<span class="string">b&quot;&quot;</span>, <span class="string">b&quot;a&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;a&quot;</span>, <span class="string">b&quot;a&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)),
         (<span class="string">b&quot;b&quot;</span>, <span class="string">b&quot;a&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">false</span>)),
         (<span class="string">b&quot;*.b.a&quot;</span>, <span class="string">b&quot;c.b.a&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)),
         (<span class="string">b&quot;*.b.a&quot;</span>, <span class="string">b&quot;b.a&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">false</span>)),
         (<span class="string">b&quot;*.b.a&quot;</span>, <span class="string">b&quot;b.a.&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">false</span>)),
-        <span class="comment">// Wildcard not in leftmost label</span>
-        (<span class="string">b&quot;d.c.b.a&quot;</span>, <span class="string">b&quot;d.c.b.a&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)),
+        <span class="comment">// Wildcard not in leftmost label
+        </span>(<span class="string">b&quot;d.c.b.a&quot;</span>, <span class="string">b&quot;d.c.b.a&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)),
         (<span class="string">b&quot;d.*.b.a&quot;</span>, <span class="string">b&quot;d.c.b.a&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;d.c*.b.a&quot;</span>, <span class="string">b&quot;d.c.b.a&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;d.c*.b.a&quot;</span>, <span class="string">b&quot;d.cc.b.a&quot;</span>, <span class="prelude-val">None</span>),
-        <span class="comment">// case sensitivity</span>
-        (
+        <span class="comment">// case sensitivity
+        </span>(
             <span class="string">b&quot;abcdefghijklmnopqrstuvwxyz&quot;</span>,
             <span class="string">b&quot;ABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;</span>,
             <span class="prelude-val">Some</span>(<span class="bool-val">true</span>),
@@ -1401,11 +1401,11 @@
             <span class="prelude-val">Some</span>(<span class="bool-val">true</span>),
         ),
         (<span class="string">b&quot;aBc&quot;</span>, <span class="string">b&quot;Abc&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)),
-        <span class="comment">// digits</span>
-        (<span class="string">b&quot;a1&quot;</span>, <span class="string">b&quot;a1&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)),
-        <span class="comment">// A trailing dot indicates an absolute name, and absolute names can match</span>
-        <span class="comment">// relative names, and vice-versa.</span>
-        (<span class="string">b&quot;example&quot;</span>, <span class="string">b&quot;example&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)),
+        <span class="comment">// digits
+        </span>(<span class="string">b&quot;a1&quot;</span>, <span class="string">b&quot;a1&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)),
+        <span class="comment">// A trailing dot indicates an absolute name, and absolute names can match
+        // relative names, and vice-versa.
+        </span>(<span class="string">b&quot;example&quot;</span>, <span class="string">b&quot;example&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)),
         (<span class="string">b&quot;example.&quot;</span>, <span class="string">b&quot;example.&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;example&quot;</span>, <span class="string">b&quot;example.&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)),
         (<span class="string">b&quot;example.&quot;</span>, <span class="string">b&quot;example&quot;</span>, <span class="prelude-val">None</span>),
@@ -1416,8 +1416,8 @@
         (<span class="string">b&quot;example.com..&quot;</span>, <span class="string">b&quot;example.com.&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;example.com..&quot;</span>, <span class="string">b&quot;example.com&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;example.com...&quot;</span>, <span class="string">b&quot;example.com.&quot;</span>, <span class="prelude-val">None</span>),
-        <span class="comment">// xn-- IDN prefix</span>
-        (<span class="string">b&quot;x*.b.a&quot;</span>, <span class="string">b&quot;xa.b.a&quot;</span>, <span class="prelude-val">None</span>),
+        <span class="comment">// xn-- IDN prefix
+        </span>(<span class="string">b&quot;x*.b.a&quot;</span>, <span class="string">b&quot;xa.b.a&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;x*.b.a&quot;</span>, <span class="string">b&quot;xna.b.a&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;x*.b.a&quot;</span>, <span class="string">b&quot;xn-a.b.a&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;x*.b.a&quot;</span>, <span class="string">b&quot;xn--a.b.a&quot;</span>, <span class="prelude-val">None</span>),
@@ -1428,15 +1428,15 @@
         (<span class="string">b&quot;xn-*.b.a&quot;</span>, <span class="string">b&quot;xn--a.b.a&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;xn--*.b.a&quot;</span>, <span class="string">b&quot;xn--a.b.a&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;xn---*.b.a&quot;</span>, <span class="string">b&quot;xn--a.b.a&quot;</span>, <span class="prelude-val">None</span>),
-        <span class="comment">// &quot;*&quot; cannot expand to nothing.</span>
-        (<span class="string">b&quot;c*.b.a&quot;</span>, <span class="string">b&quot;c.b.a&quot;</span>, <span class="prelude-val">None</span>),
-        <span class="comment">// --------------------------------------------------------------------------</span>
-        <span class="comment">// The rest of these are test cases adapted from Chromium&#39;s</span>
-        <span class="comment">// x509_certificate_unittest.cc. The parameter order is the opposite in</span>
-        <span class="comment">// Chromium&#39;s tests. Also, they some tests were modified to fit into this</span>
-        <span class="comment">// framework or due to intentional differences between mozilla::pkix and</span>
-        <span class="comment">// Chromium.</span>
-        (<span class="string">b&quot;foo.com&quot;</span>, <span class="string">b&quot;foo.com&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)),
+        <span class="comment">// &quot;*&quot; cannot expand to nothing.
+        </span>(<span class="string">b&quot;c*.b.a&quot;</span>, <span class="string">b&quot;c.b.a&quot;</span>, <span class="prelude-val">None</span>),
+        <span class="comment">// --------------------------------------------------------------------------
+        // The rest of these are test cases adapted from Chromium&#39;s
+        // x509_certificate_unittest.cc. The parameter order is the opposite in
+        // Chromium&#39;s tests. Also, they some tests were modified to fit into this
+        // framework or due to intentional differences between mozilla::pkix and
+        // Chromium.
+        </span>(<span class="string">b&quot;foo.com&quot;</span>, <span class="string">b&quot;foo.com&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)),
         (<span class="string">b&quot;f&quot;</span>, <span class="string">b&quot;f&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)),
         (<span class="string">b&quot;i&quot;</span>, <span class="string">b&quot;h&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">false</span>)),
         (<span class="string">b&quot;*.foo.com&quot;</span>, <span class="string">b&quot;bar.foo.com&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)),
@@ -1444,44 +1444,44 @@
         (<span class="string">b&quot;*.test.FR&quot;</span>, <span class="string">b&quot;wwW.tESt.fr&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)),
         (<span class="string">b&quot;.uk&quot;</span>, <span class="string">b&quot;f.uk&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;?.bar.foo.com&quot;</span>, <span class="string">b&quot;w.bar.foo.com&quot;</span>, <span class="prelude-val">None</span>),
-        (<span class="string">b&quot;(www|ftp).foo.com&quot;</span>, <span class="string">b&quot;www.foo.com&quot;</span>, <span class="prelude-val">None</span>), <span class="comment">// regex!</span>
-        (<span class="string">b&quot;www.foo.com\0&quot;</span>, <span class="string">b&quot;www.foo.com&quot;</span>, <span class="prelude-val">None</span>),
+        (<span class="string">b&quot;(www|ftp).foo.com&quot;</span>, <span class="string">b&quot;www.foo.com&quot;</span>, <span class="prelude-val">None</span>), <span class="comment">// regex!
+        </span>(<span class="string">b&quot;www.foo.com\0&quot;</span>, <span class="string">b&quot;www.foo.com&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;www.foo.com\0*.foo.com&quot;</span>, <span class="string">b&quot;www.foo.com&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;ww.house.example&quot;</span>, <span class="string">b&quot;www.house.example&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">false</span>)),
         (<span class="string">b&quot;www.test.org&quot;</span>, <span class="string">b&quot;test.org&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">false</span>)),
         (<span class="string">b&quot;*.test.org&quot;</span>, <span class="string">b&quot;test.org&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">false</span>)),
         (<span class="string">b&quot;*.org&quot;</span>, <span class="string">b&quot;test.org&quot;</span>, <span class="prelude-val">None</span>),
-        <span class="comment">// &#39;*&#39; must be the only character in the wildcard label</span>
-        (<span class="string">b&quot;w*.bar.foo.com&quot;</span>, <span class="string">b&quot;w.bar.foo.com&quot;</span>, <span class="prelude-val">None</span>),
+        <span class="comment">// &#39;*&#39; must be the only character in the wildcard label
+        </span>(<span class="string">b&quot;w*.bar.foo.com&quot;</span>, <span class="string">b&quot;w.bar.foo.com&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;ww*ww.bar.foo.com&quot;</span>, <span class="string">b&quot;www.bar.foo.com&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;ww*ww.bar.foo.com&quot;</span>, <span class="string">b&quot;wwww.bar.foo.com&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;w*w.bar.foo.com&quot;</span>, <span class="string">b&quot;wwww.bar.foo.com&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;w*w.bar.foo.c0m&quot;</span>, <span class="string">b&quot;wwww.bar.foo.com&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;wa*.bar.foo.com&quot;</span>, <span class="string">b&quot;WALLY.bar.foo.com&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;*Ly.bar.foo.com&quot;</span>, <span class="string">b&quot;wally.bar.foo.com&quot;</span>, <span class="prelude-val">None</span>),
-        <span class="comment">// Chromium does URL decoding of the reference ID, but we don&#39;t, and we also</span>
-        <span class="comment">// require that the reference ID is valid, so we can&#39;t test these two.</span>
-        <span class="comment">//     (b&quot;www.foo.com&quot;, b&quot;ww%57.foo.com&quot;, Some(true)),</span>
-        <span class="comment">//     (b&quot;www&amp;.foo.com&quot;, b&quot;www%26.foo.com&quot;, Some(true)),</span>
-        (<span class="string">b&quot;*.test.de&quot;</span>, <span class="string">b&quot;www.test.co.jp&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">false</span>)),
+        <span class="comment">// Chromium does URL decoding of the reference ID, but we don&#39;t, and we also
+        // require that the reference ID is valid, so we can&#39;t test these two.
+        //     (b&quot;www.foo.com&quot;, b&quot;ww%57.foo.com&quot;, Some(true)),
+        //     (b&quot;www&amp;.foo.com&quot;, b&quot;www%26.foo.com&quot;, Some(true)),
+        </span>(<span class="string">b&quot;*.test.de&quot;</span>, <span class="string">b&quot;www.test.co.jp&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">false</span>)),
         (<span class="string">b&quot;*.jp&quot;</span>, <span class="string">b&quot;www.test.co.jp&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;www.test.co.uk&quot;</span>, <span class="string">b&quot;www.test.co.jp&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">false</span>)),
         (<span class="string">b&quot;www.*.co.jp&quot;</span>, <span class="string">b&quot;www.test.co.jp&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;www.bar.foo.com&quot;</span>, <span class="string">b&quot;www.bar.foo.com&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)),
         (<span class="string">b&quot;*.foo.com&quot;</span>, <span class="string">b&quot;www.bar.foo.com&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">false</span>)),
         (<span class="string">b&quot;*.*.foo.com&quot;</span>, <span class="string">b&quot;www.bar.foo.com&quot;</span>, <span class="prelude-val">None</span>),
-        <span class="comment">// Our matcher requires the reference ID to be a valid DNS name, so we cannot</span>
-        <span class="comment">// test this case.</span>
-        <span class="comment">//     (b&quot;*.*.bar.foo.com&quot;, b&quot;*..bar.foo.com&quot;, Some(false)),</span>
-        (<span class="string">b&quot;www.bath.org&quot;</span>, <span class="string">b&quot;www.bath.org&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)),
-        <span class="comment">// Our matcher requires the reference ID to be a valid DNS name, so we cannot</span>
-        <span class="comment">// test these cases.</span>
-        <span class="comment">// DNS_ID_MISMATCH(&quot;www.bath.org&quot;, &quot;&quot;),</span>
-        <span class="comment">//     (b&quot;www.bath.org&quot;, b&quot;20.30.40.50&quot;, Some(false)),</span>
-        <span class="comment">//     (b&quot;www.bath.org&quot;, b&quot;66.77.88.99&quot;, Some(false)),</span>
+        <span class="comment">// Our matcher requires the reference ID to be a valid DNS name, so we cannot
+        // test this case.
+        //     (b&quot;*.*.bar.foo.com&quot;, b&quot;*..bar.foo.com&quot;, Some(false)),
+        </span>(<span class="string">b&quot;www.bath.org&quot;</span>, <span class="string">b&quot;www.bath.org&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)),
+        <span class="comment">// Our matcher requires the reference ID to be a valid DNS name, so we cannot
+        // test these cases.
+        // DNS_ID_MISMATCH(&quot;www.bath.org&quot;, &quot;&quot;),
+        //     (b&quot;www.bath.org&quot;, b&quot;20.30.40.50&quot;, Some(false)),
+        //     (b&quot;www.bath.org&quot;, b&quot;66.77.88.99&quot;, Some(false)),
 
-        <span class="comment">// IDN tests</span>
-        (
+        // IDN tests
+        </span>(
             <span class="string">b&quot;xn--poema-9qae5a.com.br&quot;</span>,
             <span class="string">b&quot;xn--poema-9qae5a.com.br&quot;</span>,
             <span class="prelude-val">Some</span>(<span class="bool-val">true</span>),
@@ -1499,32 +1499,32 @@
         (<span class="string">b&quot;xn--poema-*.com.br&quot;</span>, <span class="string">b&quot;xn--poema-9qae5a.com.br&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;xn--*-9qae5a.com.br&quot;</span>, <span class="string">b&quot;xn--poema-9qae5a.com.br&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;*--poema-9qae5a.com.br&quot;</span>, <span class="string">b&quot;xn--poema-9qae5a.com.br&quot;</span>, <span class="prelude-val">None</span>),
-        <span class="comment">// The following are adapted from the examples quoted from</span>
-        <span class="comment">//   http://tools.ietf.org/html/rfc6125#section-6.4.3</span>
-        <span class="comment">// (e.g., *.example.com would match foo.example.com but</span>
-        <span class="comment">// not bar.foo.example.com or example.com).</span>
-        (<span class="string">b&quot;*.example.com&quot;</span>, <span class="string">b&quot;foo.example.com&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)),
+        <span class="comment">// The following are adapted from the examples quoted from
+        //   http://tools.ietf.org/html/rfc6125#section-6.4.3
+        // (e.g., *.example.com would match foo.example.com but
+        // not bar.foo.example.com or example.com).
+        </span>(<span class="string">b&quot;*.example.com&quot;</span>, <span class="string">b&quot;foo.example.com&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)),
         (<span class="string">b&quot;*.example.com&quot;</span>, <span class="string">b&quot;bar.foo.example.com&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">false</span>)),
         (<span class="string">b&quot;*.example.com&quot;</span>, <span class="string">b&quot;example.com&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">false</span>)),
         (<span class="string">b&quot;baz*.example.net&quot;</span>, <span class="string">b&quot;baz1.example.net&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;*baz.example.net&quot;</span>, <span class="string">b&quot;foobaz.example.net&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;b*z.example.net&quot;</span>, <span class="string">b&quot;buzz.example.net&quot;</span>, <span class="prelude-val">None</span>),
-        <span class="comment">// Wildcards should not be valid for public registry controlled domains,</span>
-        <span class="comment">// and unknown/unrecognized domains, at least three domain components must</span>
-        <span class="comment">// be present. For mozilla::pkix and NSS, there must always be at least two</span>
-        <span class="comment">// labels after the wildcard label.</span>
-        (<span class="string">b&quot;*.test.example&quot;</span>, <span class="string">b&quot;www.test.example&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)),
+        <span class="comment">// Wildcards should not be valid for public registry controlled domains,
+        // and unknown/unrecognized domains, at least three domain components must
+        // be present. For mozilla::pkix and NSS, there must always be at least two
+        // labels after the wildcard label.
+        </span>(<span class="string">b&quot;*.test.example&quot;</span>, <span class="string">b&quot;www.test.example&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)),
         (<span class="string">b&quot;*.example.co.uk&quot;</span>, <span class="string">b&quot;test.example.co.uk&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)),
         (<span class="string">b&quot;*.example&quot;</span>, <span class="string">b&quot;test.example&quot;</span>, <span class="prelude-val">None</span>),
-        <span class="comment">// The result is different than Chromium, because Chromium takes into account</span>
-        <span class="comment">// the additional knowledge it has that &quot;co.uk&quot; is a TLD. mozilla::pkix does</span>
-        <span class="comment">// not know that.</span>
-        (<span class="string">b&quot;*.co.uk&quot;</span>, <span class="string">b&quot;example.co.uk&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)),
+        <span class="comment">// The result is different than Chromium, because Chromium takes into account
+        // the additional knowledge it has that &quot;co.uk&quot; is a TLD. mozilla::pkix does
+        // not know that.
+        </span>(<span class="string">b&quot;*.co.uk&quot;</span>, <span class="string">b&quot;example.co.uk&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)),
         (<span class="string">b&quot;*.com&quot;</span>, <span class="string">b&quot;foo.com&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;*.us&quot;</span>, <span class="string">b&quot;foo.us&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;*&quot;</span>, <span class="string">b&quot;foo&quot;</span>, <span class="prelude-val">None</span>),
-        <span class="comment">// IDN variants of wildcards and registry controlled domains.</span>
-        (
+        <span class="comment">// IDN variants of wildcards and registry controlled domains.
+        </span>(
             <span class="string">b&quot;*.xn--poema-9qae5a.com.br&quot;</span>,
             <span class="string">b&quot;www.xn--poema-9qae5a.com.br&quot;</span>,
             <span class="prelude-val">Some</span>(<span class="bool-val">true</span>),
@@ -1534,23 +1534,23 @@
             <span class="string">b&quot;test.example.xn--mgbaam7a8h&quot;</span>,
             <span class="prelude-val">Some</span>(<span class="bool-val">true</span>),
         ),
-        <span class="comment">// RFC6126 allows this, and NSS accepts it, but Chromium disallows it.</span>
-        <span class="comment">// TODO: File bug against Chromium.</span>
-        (<span class="string">b&quot;*.com.br&quot;</span>, <span class="string">b&quot;xn--poema-9qae5a.com.br&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)),
+        <span class="comment">// RFC6126 allows this, and NSS accepts it, but Chromium disallows it.
+        // TODO: File bug against Chromium.
+        </span>(<span class="string">b&quot;*.com.br&quot;</span>, <span class="string">b&quot;xn--poema-9qae5a.com.br&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)),
         (<span class="string">b&quot;*.xn--mgbaam7a8h&quot;</span>, <span class="string">b&quot;example.xn--mgbaam7a8h&quot;</span>, <span class="prelude-val">None</span>),
-        <span class="comment">// Wildcards should be permissible for &#39;private&#39; registry-controlled</span>
-        <span class="comment">// domains. (In mozilla::pkix, we do not know if it is a private registry-</span>
-        <span class="comment">// controlled domain or not.)</span>
-        (<span class="string">b&quot;*.appspot.com&quot;</span>, <span class="string">b&quot;www.appspot.com&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)),
+        <span class="comment">// Wildcards should be permissible for &#39;private&#39; registry-controlled
+        // domains. (In mozilla::pkix, we do not know if it is a private registry-
+        // controlled domain or not.)
+        </span>(<span class="string">b&quot;*.appspot.com&quot;</span>, <span class="string">b&quot;www.appspot.com&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)),
         (<span class="string">b&quot;*.s3.amazonaws.com&quot;</span>, <span class="string">b&quot;foo.s3.amazonaws.com&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)),
-        <span class="comment">// Multiple wildcards are not valid.</span>
-        (<span class="string">b&quot;*.*.com&quot;</span>, <span class="string">b&quot;foo.example.com&quot;</span>, <span class="prelude-val">None</span>),
+        <span class="comment">// Multiple wildcards are not valid.
+        </span>(<span class="string">b&quot;*.*.com&quot;</span>, <span class="string">b&quot;foo.example.com&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;*.bar.*.com&quot;</span>, <span class="string">b&quot;foo.bar.example.com&quot;</span>, <span class="prelude-val">None</span>),
-        <span class="comment">// Absolute vs relative DNS name tests. Although not explicitly specified</span>
-        <span class="comment">// in RFC 6125, absolute reference names (those ending in a .) should</span>
-        <span class="comment">// match either absolute or relative presented names.</span>
-        <span class="comment">// TODO: File errata against RFC 6125 about this.</span>
-        (<span class="string">b&quot;foo.com.&quot;</span>, <span class="string">b&quot;foo.com&quot;</span>, <span class="prelude-val">None</span>),
+        <span class="comment">// Absolute vs relative DNS name tests. Although not explicitly specified
+        // in RFC 6125, absolute reference names (those ending in a .) should
+        // match either absolute or relative presented names.
+        // TODO: File errata against RFC 6125 about this.
+        </span>(<span class="string">b&quot;foo.com.&quot;</span>, <span class="string">b&quot;foo.com&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;foo.com&quot;</span>, <span class="string">b&quot;foo.com.&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)),
         (<span class="string">b&quot;foo.com.&quot;</span>, <span class="string">b&quot;foo.com.&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;f.&quot;</span>, <span class="string">b&quot;f&quot;</span>, <span class="prelude-val">None</span>),
@@ -1559,36 +1559,36 @@
         (<span class="string">b&quot;*.bar.foo.com.&quot;</span>, <span class="string">b&quot;www-3.bar.foo.com&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;*.bar.foo.com&quot;</span>, <span class="string">b&quot;www-3.bar.foo.com.&quot;</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)),
         (<span class="string">b&quot;*.bar.foo.com.&quot;</span>, <span class="string">b&quot;www-3.bar.foo.com.&quot;</span>, <span class="prelude-val">None</span>),
-        <span class="comment">// We require the reference ID to be a valid DNS name, so we cannot test this</span>
-        <span class="comment">// case.</span>
-        <span class="comment">//     (b&quot;.&quot;, b&quot;.&quot;, Some(false)),</span>
-        (<span class="string">b&quot;*.com.&quot;</span>, <span class="string">b&quot;example.com&quot;</span>, <span class="prelude-val">None</span>),
+        <span class="comment">// We require the reference ID to be a valid DNS name, so we cannot test this
+        // case.
+        //     (b&quot;.&quot;, b&quot;.&quot;, Some(false)),
+        </span>(<span class="string">b&quot;*.com.&quot;</span>, <span class="string">b&quot;example.com&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;*.com&quot;</span>, <span class="string">b&quot;example.com.&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;*.com.&quot;</span>, <span class="string">b&quot;example.com.&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;*.&quot;</span>, <span class="string">b&quot;foo.&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;*.&quot;</span>, <span class="string">b&quot;foo&quot;</span>, <span class="prelude-val">None</span>),
-        <span class="comment">// The result is different than Chromium because we don&#39;t know that co.uk is</span>
-        <span class="comment">// a TLD.</span>
-        (<span class="string">b&quot;*.co.uk.&quot;</span>, <span class="string">b&quot;foo.co.uk&quot;</span>, <span class="prelude-val">None</span>),
+        <span class="comment">// The result is different than Chromium because we don&#39;t know that co.uk is
+        // a TLD.
+        </span>(<span class="string">b&quot;*.co.uk.&quot;</span>, <span class="string">b&quot;foo.co.uk&quot;</span>, <span class="prelude-val">None</span>),
         (<span class="string">b&quot;*.co.uk.&quot;</span>, <span class="string">b&quot;foo.co.uk.&quot;</span>, <span class="prelude-val">None</span>),
     ];
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">presented_matches_reference_test</span>() {
-        <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="ident">presented</span>, <span class="ident">reference</span>, <span class="ident">expected_result</span>) <span class="kw">in</span> <span class="ident">PRESENTED_MATCHES_REFERENCE</span> {
-            <span class="kw">let</span> <span class="ident">actual_result</span> <span class="op">=</span> <span class="ident">presented_id_matches_reference_id</span>(
-                <span class="ident">untrusted::Input::from</span>(<span class="ident">presented</span>),
-                <span class="ident">untrusted::Input::from</span>(<span class="ident">reference</span>),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>presented_matches_reference_test() {
+        <span class="kw">for </span><span class="kw-2">&amp;</span>(presented, reference, expected_result) <span class="kw">in </span>PRESENTED_MATCHES_REFERENCE {
+            <span class="kw">let </span>actual_result = presented_id_matches_reference_id(
+                untrusted::Input::from(presented),
+                untrusted::Input::from(reference),
             );
             <span class="macro">assert_eq!</span>(
-                <span class="ident">actual_result</span>,
-                <span class="ident">expected_result</span>,
+                actual_result,
+                expected_result,
                 <span class="string">&quot;presented_dns_id_matches_reference_dns_id(\&quot;{:?}\&quot;, IDRole::ReferenceID, \&quot;{:?}\&quot;)&quot;</span>,
-                <span class="ident">presented</span>,
-                <span class="ident">reference</span>
+                presented,
+                reference
             );
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="webpki" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="webpki" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

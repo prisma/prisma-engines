@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/query-connector/src/query_arguments.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>query_arguments.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../query_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/query-connector/src/query_arguments.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>query_arguments.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../query_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -241,248 +241,248 @@
 <span id="241">241</span>
 <span id="242">242</span>
 <span id="243">243</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::filter::Filter</span>;
-<span class="kw">use</span> <span class="ident">prisma_models</span>::<span class="kw-2">*</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::filter::Filter;
+<span class="kw">use </span>prisma_models::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SkipAndLimit</span> {
-    <span class="kw">pub</span> <span class="ident">skip</span>: <span class="ident">usize</span>,
-    <span class="kw">pub</span> <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq)]
+</span><span class="kw">pub struct </span>SkipAndLimit {
+    <span class="kw">pub </span>skip: usize,
+    <span class="kw">pub </span>limit: <span class="prelude-ty">Option</span>&lt;usize&gt;,
 }
 
-<span class="doccomment">/// `QueryArguments` define various constraints queried data should fulfill:</span>
-<span class="doccomment">/// - `cursor`, `take`, `skip` page through the data.</span>
-<span class="doccomment">/// - `filter` scopes the data by defining conditions (akin to `WHERE` in SQL).</span>
-<span class="doccomment">/// - `order_by` defines the ordering of records, from most high to low precedence.</span>
-<span class="doccomment">/// - `distinct` designates the fields on which the records should be distinct.</span>
-<span class="doccomment">/// - The `ignore_*` flags are a temporary bandaid to tell the connector to do not</span>
-<span class="doccomment">///   include certain constraints when building queries, because the core is already</span>
-<span class="doccomment">///   performing these action in a different manner (e.g. in-memory on all records).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A query argument struct is always valid over a single model only, meaning that all</span>
-<span class="doccomment">/// data referenced in a single query argument instance is always refering to data of</span>
-<span class="doccomment">/// a single model (e.g. the cursor projection, distinct projection, orderby, ...).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">QueryArguments</span> {
-    <span class="kw">pub</span> <span class="ident">model</span>: <span class="ident">ModelRef</span>,
-    <span class="kw">pub</span> <span class="ident">cursor</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">take</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">skip</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">filter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">order_by</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OrderBy</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">distinct</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FieldSelection</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">ignore_skip</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span> <span class="ident">ignore_take</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// `QueryArguments` define various constraints queried data should fulfill:
+/// - `cursor`, `take`, `skip` page through the data.
+/// - `filter` scopes the data by defining conditions (akin to `WHERE` in SQL).
+/// - `order_by` defines the ordering of records, from most high to low precedence.
+/// - `distinct` designates the fields on which the records should be distinct.
+/// - The `ignore_*` flags are a temporary bandaid to tell the connector to do not
+///   include certain constraints when building queries, because the core is already
+///   performing these action in a different manner (e.g. in-memory on all records).
+///
+/// A query argument struct is always valid over a single model only, meaning that all
+/// data referenced in a single query argument instance is always refering to data of
+/// a single model (e.g. the cursor projection, distinct projection, orderby, ...).
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>QueryArguments {
+    <span class="kw">pub </span>model: ModelRef,
+    <span class="kw">pub </span>cursor: <span class="prelude-ty">Option</span>&lt;SelectionResult&gt;,
+    <span class="kw">pub </span>take: <span class="prelude-ty">Option</span>&lt;i64&gt;,
+    <span class="kw">pub </span>skip: <span class="prelude-ty">Option</span>&lt;i64&gt;,
+    <span class="kw">pub </span>filter: <span class="prelude-ty">Option</span>&lt;Filter&gt;,
+    <span class="kw">pub </span>order_by: Vec&lt;OrderBy&gt;,
+    <span class="kw">pub </span>distinct: <span class="prelude-ty">Option</span>&lt;FieldSelection&gt;,
+    <span class="kw">pub </span>ignore_skip: bool,
+    <span class="kw">pub </span>ignore_take: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">QueryArguments</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;QueryArguments&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;model&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">model</span>.<span class="ident">name</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;cursor&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cursor</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;take&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">take</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;skip&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">skip</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;filter&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">filter</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;order_by&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">order_by</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;distinct&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">distinct</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;ignore_skip&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ignore_skip</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;ignore_take&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ignore_take</span>)
-            .<span class="ident">finish</span>()
+<span class="kw">impl </span>std::fmt::Debug <span class="kw">for </span>QueryArguments {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        f.debug_struct(<span class="string">&quot;QueryArguments&quot;</span>)
+            .field(<span class="string">&quot;model&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.model.name)
+            .field(<span class="string">&quot;cursor&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.cursor)
+            .field(<span class="string">&quot;take&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.take)
+            .field(<span class="string">&quot;skip&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.skip)
+            .field(<span class="string">&quot;filter&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.filter)
+            .field(<span class="string">&quot;order_by&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.order_by)
+            .field(<span class="string">&quot;distinct&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.distinct)
+            .field(<span class="string">&quot;ignore_skip&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.ignore_skip)
+            .field(<span class="string">&quot;ignore_take&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.ignore_take)
+            .finish()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">QueryArguments</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">model</span>: <span class="ident">ModelRef</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">model</span>,
-            <span class="ident">cursor</span>: <span class="prelude-val">None</span>,
-            <span class="ident">take</span>: <span class="prelude-val">None</span>,
-            <span class="ident">skip</span>: <span class="prelude-val">None</span>,
-            <span class="ident">filter</span>: <span class="prelude-val">None</span>,
-            <span class="ident">order_by</span>: <span class="macro">vec!</span>[],
-            <span class="ident">distinct</span>: <span class="prelude-val">None</span>,
-            <span class="ident">ignore_take</span>: <span class="bool-val">false</span>,
-            <span class="ident">ignore_skip</span>: <span class="bool-val">false</span>,
+<span class="kw">impl </span>QueryArguments {
+    <span class="kw">pub fn </span>new(model: ModelRef) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            model,
+            cursor: <span class="prelude-val">None</span>,
+            take: <span class="prelude-val">None</span>,
+            skip: <span class="prelude-val">None</span>,
+            filter: <span class="prelude-val">None</span>,
+            order_by: <span class="macro">vec!</span>[],
+            distinct: <span class="prelude-val">None</span>,
+            ignore_take: <span class="bool-val">false</span>,
+            ignore_skip: <span class="bool-val">false</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">do_nothing</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">cursor</span>.<span class="ident">is_none</span>()
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">take</span>.<span class="ident">is_none</span>()
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">skip</span>.<span class="ident">is_none</span>()
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">is_none</span>()
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">order_by</span>.<span class="ident">is_empty</span>()
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">distinct</span>.<span class="ident">is_none</span>()
+    <span class="kw">pub fn </span>do_nothing(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.cursor.is_none()
+            &amp;&amp; <span class="self">self</span>.take.is_none()
+            &amp;&amp; <span class="self">self</span>.skip.is_none()
+            &amp;&amp; <span class="self">self</span>.filter.is_none()
+            &amp;&amp; <span class="self">self</span>.order_by.is_empty()
+            &amp;&amp; <span class="self">self</span>.distinct.is_none()
     }
 
-    <span class="doccomment">/// We can&#39;t execute all operations on the DB level reliably.</span>
-    <span class="doccomment">/// This is a marker that generally expresses whether or not a set of records can be</span>
-    <span class="doccomment">/// retrieved by the connector or if it requires the query engine to fetch a raw set</span>
-    <span class="doccomment">/// of records and perform certain operations itself, in-memory.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">requires_inmemory_processing</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">distinct</span>.<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">contains_unstable_cursor</span>() <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">contains_null_cursor</span>()
+    <span class="doccomment">/// We can&#39;t execute all operations on the DB level reliably.
+    /// This is a marker that generally expresses whether or not a set of records can be
+    /// retrieved by the connector or if it requires the query engine to fetch a raw set
+    /// of records and perform certain operations itself, in-memory.
+    </span><span class="kw">pub fn </span>requires_inmemory_processing(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.distinct.is_some() || <span class="self">self</span>.contains_unstable_cursor() || <span class="self">self</span>.contains_null_cursor()
     }
 
-    <span class="doccomment">/// An unstable cursor is a cursor that is used in conjunction with an unstable (non-unique) combination of orderBys.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains_unstable_cursor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">cursor</span>.<span class="ident">is_some</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_stable_ordering</span>()
+    <span class="doccomment">/// An unstable cursor is a cursor that is used in conjunction with an unstable (non-unique) combination of orderBys.
+    </span><span class="kw">pub fn </span>contains_unstable_cursor(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.cursor.is_some() &amp;&amp; !<span class="self">self</span>.is_stable_ordering()
     }
 
-    <span class="doccomment">/// A null cursor is a cursor that is used in conjunction with a nullable order by (i.e. a field is optional).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains_null_cursor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">cursor</span>.<span class="ident">is_some</span>()
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">order_by</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">o</span> {
-                <span class="ident">OrderBy::Scalar</span>(<span class="ident">o</span>) =&gt; <span class="op">!</span><span class="ident">o</span>.<span class="ident">field</span>.<span class="ident">is_required</span>(),
-                <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+    <span class="doccomment">/// A null cursor is a cursor that is used in conjunction with a nullable order by (i.e. a field is optional).
+    </span><span class="kw">pub fn </span>contains_null_cursor(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.cursor.is_some()
+            &amp;&amp; <span class="self">self</span>.order_by.iter().any(|o| <span class="kw">match </span>o {
+                OrderBy::Scalar(o) =&gt; !o.field.is_required(),
+                <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
             })
     }
 
-    <span class="doccomment">/// Checks if the orderBy provided is guaranteeing a stable ordering of records for the model.</span>
-    <span class="doccomment">/// For that purpose we need to distinguish orderings on the source model, i.e. the model that</span>
-    <span class="doccomment">/// we&#39;re sorting on the top level (where orderBys are located that are done without relations)</span>
-    <span class="doccomment">/// and orderings that require a relation or composite hop. Scalar orderings that require a hop are</span>
-    <span class="doccomment">/// only guaranteed stable ordering if they are strictly over 1:1. As soon as there&#39;s</span>
-    <span class="doccomment">/// a m:1 (or m:n for later implementations) hop involved a unique on the to-one side can&#39;t</span>
-    <span class="doccomment">/// be considered unique anymore for the purpose of ordering records, as many left hand records</span>
-    <span class="doccomment">/// (the many side) can have the one side. A simple example would be a User &lt;&gt; Post relation</span>
-    <span class="doccomment">/// where a post can have only one author but an author (User) can have many posts. If posts</span>
-    <span class="doccomment">/// are ordered by related author id, then we can&#39;t reliably order posts, as the following can happen:</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// post_id, post_title, author_id</span>
-    <span class="doccomment">/// 1        post1       1</span>
-    <span class="doccomment">/// 2        post2       1</span>
-    <span class="doccomment">/// 3        post3       2</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// So even though the id is unique, it&#39;s not guaranteeing a stable ordering in the context of orderBy here.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns:</span>
-    <span class="doccomment">/// - `true`, if:</span>
-    <span class="doccomment">///      * no orderings are done, or ...</span>
-    <span class="doccomment">///      * at least one unique field is present on the source model `orderBy`, or ...</span>
-    <span class="doccomment">///      * source model contains a combination of fields that is marked as unique, or ...</span>
-    <span class="doccomment">///      * an orderBy hop contains a unique and is done solely over 1:1 relations.</span>
-    <span class="doccomment">/// - `false` otherwise.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_stable_ordering</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">order_by</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="bool-val">true</span>;
+    <span class="doccomment">/// Checks if the orderBy provided is guaranteeing a stable ordering of records for the model.
+    /// For that purpose we need to distinguish orderings on the source model, i.e. the model that
+    /// we&#39;re sorting on the top level (where orderBys are located that are done without relations)
+    /// and orderings that require a relation or composite hop. Scalar orderings that require a hop are
+    /// only guaranteed stable ordering if they are strictly over 1:1. As soon as there&#39;s
+    /// a m:1 (or m:n for later implementations) hop involved a unique on the to-one side can&#39;t
+    /// be considered unique anymore for the purpose of ordering records, as many left hand records
+    /// (the many side) can have the one side. A simple example would be a User &lt;&gt; Post relation
+    /// where a post can have only one author but an author (User) can have many posts. If posts
+    /// are ordered by related author id, then we can&#39;t reliably order posts, as the following can happen:
+    /// ```text
+    /// post_id, post_title, author_id
+    /// 1        post1       1
+    /// 2        post2       1
+    /// 3        post3       2
+    /// ```
+    /// So even though the id is unique, it&#39;s not guaranteeing a stable ordering in the context of orderBy here.
+    ///
+    /// Returns:
+    /// - `true`, if:
+    ///      * no orderings are done, or ...
+    ///      * at least one unique field is present on the source model `orderBy`, or ...
+    ///      * source model contains a combination of fields that is marked as unique, or ...
+    ///      * an orderBy hop contains a unique and is done solely over 1:1 relations.
+    /// - `false` otherwise.
+    </span><span class="kw">pub fn </span>is_stable_ordering(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">if </span><span class="self">self</span>.order_by.is_empty() {
+            <span class="kw">return </span><span class="bool-val">true</span>;
         }
 
-        <span class="comment">// We&#39;re filtering order by aggregation &amp; relevance since they will never lead to stable ordering anyway.</span>
-        <span class="kw">let</span> <span class="ident">stable_candidates</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">order_by</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">o</span> {
-                <span class="ident">OrderBy::Scalar</span>(<span class="ident">o</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">o</span>),
-                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+        <span class="comment">// We&#39;re filtering order by aggregation &amp; relevance since they will never lead to stable ordering anyway.
+        </span><span class="kw">let </span>stable_candidates: Vec&lt;<span class="kw">_</span>&gt; = <span class="self">self
+            </span>.order_by
+            .iter()
+            .filter_map(|o| <span class="kw">match </span>o {
+                OrderBy::Scalar(o) =&gt; <span class="prelude-val">Some</span>(o),
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
             })
-            .<span class="ident">collect</span>();
+            .collect();
 
-        <span class="comment">// Partition into orderings on the same model and ones that require hops.</span>
-        <span class="comment">// Note: One ordering is always on one scalar in the end.</span>
-        <span class="kw">let</span> (<span class="ident">on_model</span>, <span class="ident">on_relation</span>): (<span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">OrderByScalar</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">OrderByScalar</span><span class="op">&gt;</span>) <span class="op">=</span>
-            <span class="ident">stable_candidates</span>.<span class="ident">iter</span>().<span class="ident">partition</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="ident">o</span>.<span class="ident">path</span>.<span class="ident">is_empty</span>());
+        <span class="comment">// Partition into orderings on the same model and ones that require hops.
+        // Note: One ordering is always on one scalar in the end.
+        </span><span class="kw">let </span>(on_model, on_relation): (Vec&lt;<span class="kw-2">&amp;</span>OrderByScalar&gt;, Vec&lt;<span class="kw-2">&amp;</span>OrderByScalar&gt;) =
+            stable_candidates.iter().partition(|o| o.path.is_empty());
 
-        <span class="comment">// Indicates whether or not a combination of contained fields is on the source model (we don&#39;t check for relations for now).</span>
-        <span class="kw">let</span> <span class="ident">order_by_contains_unique_index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">model</span>.<span class="ident">unique_indexes</span>().<span class="ident">into_iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> {
-            <span class="ident">index</span>
-                .<span class="ident">fields</span>()
-                .<span class="ident">into_iter</span>()
-                .<span class="ident">all</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">on_model</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="ident">o</span>.<span class="ident">field</span> <span class="op">==</span> <span class="ident">f</span>))
+        <span class="comment">// Indicates whether or not a combination of contained fields is on the source model (we don&#39;t check for relations for now).
+        </span><span class="kw">let </span>order_by_contains_unique_index = <span class="self">self</span>.model.unique_indexes().into_iter().any(|index| {
+            index
+                .fields()
+                .into_iter()
+                .all(|f| on_model.iter().any(|o| o.field == f))
         });
 
-        <span class="kw">let</span> <span class="ident">source_contains_unique</span> <span class="op">=</span> <span class="ident">on_model</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="ident">o</span>.<span class="ident">field</span>.<span class="ident">unique</span>());
-        <span class="kw">let</span> <span class="ident">relations_contain_1to1_unique</span> <span class="op">=</span> <span class="ident">on_relation</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> {
-            <span class="ident">o</span>.<span class="ident">field</span>.<span class="ident">unique</span>()
-                <span class="op">&amp;&amp;</span> <span class="ident">o</span>.<span class="ident">path</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">hop</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">hop</span> {
-                    <span class="ident">OrderByHop::Relation</span>(<span class="ident">rf</span>) =&gt; <span class="ident">rf</span>.<span class="ident">relation</span>().<span class="ident">is_one_to_one</span>(),
-                    <span class="ident">OrderByHop::Composite</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>, <span class="comment">// Composites do not have uniques, as such they can&#39;t fulfill uniqueness requirement even if they&#39;re 1:1.</span>
-                })
+        <span class="kw">let </span>source_contains_unique = on_model.iter().any(|o| o.field.unique());
+        <span class="kw">let </span>relations_contain_1to1_unique = on_relation.iter().any(|o| {
+            o.field.unique()
+                &amp;&amp; o.path.iter().all(|hop| <span class="kw">match </span>hop {
+                    OrderByHop::Relation(rf) =&gt; rf.relation().is_one_to_one(),
+                    OrderByHop::Composite(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>, <span class="comment">// Composites do not have uniques, as such they can&#39;t fulfill uniqueness requirement even if they&#39;re 1:1.
+                </span>})
         });
 
-        <span class="kw">let</span> <span class="ident">has_optional_hop</span> <span class="op">=</span> <span class="ident">on_relation</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> {
-            <span class="ident">o</span>.<span class="ident">path</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">hop</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">hop</span> {
-                <span class="ident">OrderByHop::Relation</span>(<span class="ident">rf</span>) =&gt; <span class="ident">rf</span>.<span class="ident">arity</span> <span class="op">==</span> <span class="ident">dml::FieldArity::Optional</span>,
-                <span class="ident">OrderByHop::Composite</span>(<span class="ident">cf</span>) =&gt; <span class="op">!</span><span class="ident">cf</span>.<span class="ident">is_required</span>(),
+        <span class="kw">let </span>has_optional_hop = on_relation.iter().any(|o| {
+            o.path.iter().any(|hop| <span class="kw">match </span>hop {
+                OrderByHop::Relation(rf) =&gt; rf.arity == dml::FieldArity::Optional,
+                OrderByHop::Composite(cf) =&gt; !cf.is_required(),
             })
         });
 
-        <span class="comment">// [Dom] I&#39;m not entirely sure why we&#39;re doing this, but I assume that optionals introduce NULLs that make the ordering inherently unstable?</span>
-        <span class="kw">if</span> <span class="ident">has_optional_hop</span> {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+        <span class="comment">// [Dom] I&#39;m not entirely sure why we&#39;re doing this, but I assume that optionals introduce NULLs that make the ordering inherently unstable?
+        </span><span class="kw">if </span>has_optional_hop {
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
 
-        <span class="ident">source_contains_unique</span> <span class="op">|</span><span class="op">|</span> <span class="ident">order_by_contains_unique_index</span> <span class="op">|</span><span class="op">|</span> <span class="ident">relations_contain_1to1_unique</span>
+        source_contains_unique || order_by_contains_unique_index || relations_contain_1to1_unique
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_abs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">take</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="kw">if</span> <span class="ident">t</span> <span class="op">&lt;</span> <span class="number">0</span> { <span class="op">-</span><span class="ident">t</span> } <span class="kw">else</span> { <span class="ident">t</span> })
+    <span class="kw">pub fn </span>take_abs(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;i64&gt; {
+        <span class="self">self</span>.take.map(|t| <span class="kw">if </span>t &lt; <span class="number">0 </span>{ -t } <span class="kw">else </span>{ t })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_unbatchable_ordering</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">order_by</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="op">!</span><span class="macro">matches!</span>(<span class="ident">o</span>, <span class="ident">OrderBy::Scalar</span>(<span class="kw">_</span>)))
+    <span class="kw">pub fn </span>has_unbatchable_ordering(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.order_by.iter().any(|o| !<span class="macro">matches!</span>(o, OrderBy::Scalar(<span class="kw">_</span>)))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_unbatchable_filters</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">filter</span> {
-            <span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">filter</span>) =&gt; <span class="op">!</span><span class="ident">filter</span>.<span class="ident">can_batch</span>(),
+    <span class="kw">pub fn </span>has_unbatchable_filters(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.filter {
+            <span class="prelude-val">None </span>=&gt; <span class="bool-val">false</span>,
+            <span class="prelude-val">Some</span>(filter) =&gt; !filter.can_batch(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">should_batch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">chunk_size</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">filter</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">filter</span><span class="op">|</span> <span class="ident">filter</span>.<span class="ident">should_batch</span>(<span class="ident">chunk_size</span>))
-            .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">cursor</span>.<span class="ident">is_none</span>()
+    <span class="kw">pub fn </span>should_batch(<span class="kw-2">&amp;</span><span class="self">self</span>, chunk_size: usize) -&gt; bool {
+        <span class="self">self</span>.filter
+            .as_ref()
+            .map(|filter| filter.should_batch(chunk_size))
+            .unwrap_or(<span class="bool-val">false</span>)
+            &amp;&amp; <span class="self">self</span>.cursor.is_none()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">batched</span>(<span class="self">self</span>, <span class="ident">chunk_size</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">filter</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">filter</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">model</span>;
-                <span class="kw">let</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cursor</span>;
-                <span class="kw">let</span> <span class="ident">take</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">take</span>;
-                <span class="kw">let</span> <span class="ident">skip</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">skip</span>;
-                <span class="kw">let</span> <span class="ident">order_by</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">order_by</span>;
-                <span class="kw">let</span> <span class="ident">distinct</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">distinct</span>;
-                <span class="kw">let</span> <span class="ident">ignore_skip</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ignore_skip</span>;
-                <span class="kw">let</span> <span class="ident">ignore_take</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ignore_take</span>;
+    <span class="kw">pub fn </span>batched(<span class="self">self</span>, chunk_size: usize) -&gt; Vec&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">match </span><span class="self">self</span>.filter {
+            <span class="prelude-val">Some</span>(filter) =&gt; {
+                <span class="kw">let </span>model = <span class="self">self</span>.model;
+                <span class="kw">let </span>cursor = <span class="self">self</span>.cursor;
+                <span class="kw">let </span>take = <span class="self">self</span>.take;
+                <span class="kw">let </span>skip = <span class="self">self</span>.skip;
+                <span class="kw">let </span>order_by = <span class="self">self</span>.order_by;
+                <span class="kw">let </span>distinct = <span class="self">self</span>.distinct;
+                <span class="kw">let </span>ignore_skip = <span class="self">self</span>.ignore_skip;
+                <span class="kw">let </span>ignore_take = <span class="self">self</span>.ignore_take;
 
-                <span class="ident">filter</span>
-                    .<span class="ident">batched</span>(<span class="ident">chunk_size</span>)
-                    .<span class="ident">into_iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">filter</span><span class="op">|</span> <span class="ident">QueryArguments</span> {
-                        <span class="ident">model</span>: <span class="ident">model</span>.<span class="ident">clone</span>(),
-                        <span class="ident">cursor</span>: <span class="ident">cursor</span>.<span class="ident">clone</span>(),
-                        <span class="ident">take</span>,
-                        <span class="ident">skip</span>,
-                        <span class="ident">filter</span>: <span class="prelude-val">Some</span>(<span class="ident">filter</span>),
-                        <span class="ident">order_by</span>: <span class="ident">order_by</span>.<span class="ident">clone</span>(),
-                        <span class="ident">distinct</span>: <span class="ident">distinct</span>.<span class="ident">clone</span>(),
-                        <span class="ident">ignore_skip</span>,
-                        <span class="ident">ignore_take</span>,
+                filter
+                    .batched(chunk_size)
+                    .into_iter()
+                    .map(|filter| QueryArguments {
+                        model: model.clone(),
+                        cursor: cursor.clone(),
+                        take,
+                        skip,
+                        filter: <span class="prelude-val">Some</span>(filter),
+                        order_by: order_by.clone(),
+                        distinct: distinct.clone(),
+                        ignore_skip,
+                        ignore_take,
                     })
-                    .<span class="ident">collect</span>()
+                    .collect()
             }
-            <span class="kw">_</span> =&gt; <span class="macro">vec!</span>[<span class="self">self</span>],
+            <span class="kw">_ </span>=&gt; <span class="macro">vec!</span>[<span class="self">self</span>],
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">ModelRef</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">model</span>
+    <span class="kw">pub fn </span>model(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ModelRef {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.model
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="ident">ModelRef</span>, <span class="ident">T</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">QueryArguments</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T&gt; From&lt;(ModelRef, T)&gt; <span class="kw">for </span>QueryArguments
+<span class="kw">where
+    </span>T: Into&lt;Filter&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">model_filter</span>: (<span class="ident">ModelRef</span>, <span class="ident">T</span>)) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">query_arguments</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">model_filter</span>.<span class="number">0</span>);
-        <span class="ident">query_arguments</span>.<span class="ident">filter</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">model_filter</span>.<span class="number">1</span>.<span class="ident">into</span>());
-        <span class="ident">query_arguments</span>
+    <span class="kw">fn </span>from(model_filter: (ModelRef, T)) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>query_arguments = <span class="self">Self</span>::new(model_filter.<span class="number">0</span>);
+        query_arguments.filter = <span class="prelude-val">Some</span>(model_filter.<span class="number">1</span>.into());
+        query_arguments
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-util-0.8.5/src/api.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>api.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_util/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-util-0.8.5/src/api.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>api.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_util/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -291,298 +291,298 @@
 <span id="291">291</span>
 <span id="292">292</span>
 <span id="293">293</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Implement string conversion routines in a single trait.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Implement string conversion routines in a single trait.
 
-<span class="comment">// NOTE:</span>
-<span class="comment">//  We use macros to define the traits, rather than implement here</span>
-<span class="comment">//  since we can&#39;t define traits for types when both are defined outside</span>
-<span class="comment">//  the current crate, including in workspaces.</span>
+</span><span class="comment">// NOTE:
+//  We use macros to define the traits, rather than implement here
+//  since we can&#39;t define traits for types when both are defined outside
+//  the current crate, including in workspaces.
 
-<span class="comment">// FROM LEXICAL</span>
+// FROM LEXICAL
 
-<span class="doccomment">/// Define FromLexical trait.</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parse&quot;</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">from_lexical</span> {
+</span><span class="doccomment">/// Define FromLexical trait.
+</span><span class="attribute">#[macro_export]
+#[cfg(feature = <span class="string">&quot;parse&quot;</span>)]
+</span><span class="macro">macro_rules! </span>from_lexical {
     () =&gt; {
-        <span class="doccomment">/// Trait for numerical types that can be parsed from bytes.</span>
-        <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">FromLexical</span>: <span class="ident">lexical_util::num::Number</span> {
-            <span class="doccomment">/// Checked parser for a string-to-number conversion.</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// This method parses the entire string, returning an error if</span>
-            <span class="doccomment">/// any invalid digits are found during parsing. Returns a `Result`</span>
-            <span class="doccomment">/// containing either the parsed value, or an error containing</span>
-            <span class="doccomment">/// any errors that occurred during parsing.</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// * `bytes`   - Slice containing a numeric string.</span>
-            <span class="kw">fn</span> <span class="ident">from_lexical</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">lexical_util::result::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+        <span class="doccomment">/// Trait for numerical types that can be parsed from bytes.
+        </span><span class="kw">pub trait </span>FromLexical: lexical_util::num::Number {
+            <span class="doccomment">/// Checked parser for a string-to-number conversion.
+            ///
+            /// This method parses the entire string, returning an error if
+            /// any invalid digits are found during parsing. Returns a `Result`
+            /// containing either the parsed value, or an error containing
+            /// any errors that occurred during parsing.
+            ///
+            /// * `bytes`   - Slice containing a numeric string.
+            </span><span class="kw">fn </span>from_lexical(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; lexical_util::result::Result&lt;<span class="self">Self</span>&gt;;
 
-            <span class="doccomment">/// Checked parser for a string-to-number conversion.</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// This method parses until an invalid digit is found (or the end</span>
-            <span class="doccomment">/// of the string), returning the number of processed digits</span>
-            <span class="doccomment">/// and the parsed value until that point. Returns a `Result`</span>
-            <span class="doccomment">/// containing either the parsed value and the number of processed</span>
-            <span class="doccomment">/// digits, or an error containing any errors that occurred during</span>
-            <span class="doccomment">/// parsing.</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// * `bytes`   - Slice containing a numeric string.</span>
-            <span class="kw">fn</span> <span class="ident">from_lexical_partial</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">lexical_util::result::Result</span><span class="op">&lt;</span>(<span class="self">Self</span>, <span class="ident">usize</span>)<span class="op">&gt;</span>;
+            <span class="doccomment">/// Checked parser for a string-to-number conversion.
+            ///
+            /// This method parses until an invalid digit is found (or the end
+            /// of the string), returning the number of processed digits
+            /// and the parsed value until that point. Returns a `Result`
+            /// containing either the parsed value and the number of processed
+            /// digits, or an error containing any errors that occurred during
+            /// parsing.
+            ///
+            /// * `bytes`   - Slice containing a numeric string.
+            </span><span class="kw">fn </span>from_lexical_partial(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; lexical_util::result::Result&lt;(<span class="self">Self</span>, usize)&gt;;
         }
     };
 }
 
-<span class="doccomment">/// Define FromLexicalWithOptions trait.</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parse&quot;</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">from_lexical_with_options</span> {
+<span class="doccomment">/// Define FromLexicalWithOptions trait.
+</span><span class="attribute">#[macro_export]
+#[cfg(feature = <span class="string">&quot;parse&quot;</span>)]
+</span><span class="macro">macro_rules! </span>from_lexical_with_options {
     () =&gt; {
-        <span class="doccomment">/// Trait for numerical types that can be parsed from bytes with custom options.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// The `Options` type specifies the configurable options to provide.</span>
-        <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">FromLexicalWithOptions</span>: <span class="ident">lexical_util::num::Number</span> {
-            <span class="doccomment">/// Custom formatting options for parsing a number.</span>
-            <span class="kw">type</span> <span class="ident">Options</span>: <span class="ident">lexical_util::options::ParseOptions</span>;
+        <span class="doccomment">/// Trait for numerical types that can be parsed from bytes with custom options.
+        ///
+        /// The `Options` type specifies the configurable options to provide.
+        </span><span class="kw">pub trait </span>FromLexicalWithOptions: lexical_util::num::Number {
+            <span class="doccomment">/// Custom formatting options for parsing a number.
+            </span><span class="kw">type </span>Options: lexical_util::options::ParseOptions;
 
-            <span class="doccomment">/// Checked parser for a string-to-number conversion.</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// This method parses the entire string, returning an error if</span>
-            <span class="doccomment">/// any invalid digits are found during parsing. The parsing</span>
-            <span class="doccomment">/// is dictated by the options, which specifies special</span>
-            <span class="doccomment">/// float strings, required float components, digit separators,</span>
-            <span class="doccomment">/// exponent characters, and more. Returns a `Result` containing</span>
-            <span class="doccomment">/// either the parsed value, or an error containing any errors</span>
-            <span class="doccomment">/// that occurred during parsing.</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// * `FORMAT`  - Flags and characters designating the number grammar.</span>
-            <span class="doccomment">/// * `bytes`   - Slice containing a numeric string.</span>
-            <span class="doccomment">/// * `options` - Options to dictate number parsing.</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// The `FORMAT` packed struct is built using [`NumberFormatBuilder`].</span>
-            <span class="doccomment">/// Any invalid number format will prevent parsing, returning</span>
-            <span class="doccomment">/// the appropriate format error. If you are unsure which format</span>
-            <span class="doccomment">/// to use, use [`STANDARD`].</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// [`NumberFormatBuilder`]: lexical_util::format::NumberFormatBuilder</span>
-            <span class="doccomment">/// [`STANDARD`]: lexical_util::format::STANDARD</span>
-            <span class="kw">fn</span> <span class="ident">from_lexical_with_options</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
-                <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-                <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Options</span>,
-            ) -&gt; <span class="ident">lexical_util::result::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+            <span class="doccomment">/// Checked parser for a string-to-number conversion.
+            ///
+            /// This method parses the entire string, returning an error if
+            /// any invalid digits are found during parsing. The parsing
+            /// is dictated by the options, which specifies special
+            /// float strings, required float components, digit separators,
+            /// exponent characters, and more. Returns a `Result` containing
+            /// either the parsed value, or an error containing any errors
+            /// that occurred during parsing.
+            ///
+            /// * `FORMAT`  - Flags and characters designating the number grammar.
+            /// * `bytes`   - Slice containing a numeric string.
+            /// * `options` - Options to dictate number parsing.
+            ///
+            /// The `FORMAT` packed struct is built using [`NumberFormatBuilder`].
+            /// Any invalid number format will prevent parsing, returning
+            /// the appropriate format error. If you are unsure which format
+            /// to use, use [`STANDARD`].
+            ///
+            /// [`NumberFormatBuilder`]: lexical_util::format::NumberFormatBuilder
+            /// [`STANDARD`]: lexical_util::format::STANDARD
+            </span><span class="kw">fn </span>from_lexical_with_options&lt;<span class="kw">const </span>FORMAT: u128&gt;(
+                bytes: <span class="kw-2">&amp;</span>[u8],
+                options: <span class="kw-2">&amp;</span><span class="self">Self</span>::Options,
+            ) -&gt; lexical_util::result::Result&lt;<span class="self">Self</span>&gt;;
 
-            <span class="doccomment">/// Checked parser for a string-to-number conversion.</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// This method parses until an invalid digit is found (or the end</span>
-            <span class="doccomment">/// of the string), returning the number of processed digits</span>
-            <span class="doccomment">/// and the parsed value until that point. Returns a `Result`</span>
-            <span class="doccomment">/// containing either the parsed value and the number of</span>
-            <span class="doccomment">/// processed digits, or an error containing any errors that</span>
-            <span class="doccomment">/// occurred during parsing.</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// * `FORMAT`  - Flags and characters designating the number grammar.</span>
-            <span class="doccomment">/// * `bytes`   - Slice containing a numeric string.</span>
-            <span class="doccomment">/// * `options` - Options to dictate number parsing.</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// The `FORMAT` packed struct is built using [`NumberFormatBuilder`].</span>
-            <span class="doccomment">/// Any invalid number format will prevent parsing, returning</span>
-            <span class="doccomment">/// the appropriate format error. If you are unsure which format</span>
-            <span class="doccomment">/// to use, use [`STANDARD`].</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// [`NumberFormatBuilder`]: lexical_util::format::NumberFormatBuilder</span>
-            <span class="doccomment">/// [`STANDARD`]: lexical_util::format::STANDARD</span>
-            <span class="kw">fn</span> <span class="ident">from_lexical_partial_with_options</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
-                <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-                <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Options</span>,
-            ) -&gt; <span class="ident">lexical_util::result::Result</span><span class="op">&lt;</span>(<span class="self">Self</span>, <span class="ident">usize</span>)<span class="op">&gt;</span>;
+            <span class="doccomment">/// Checked parser for a string-to-number conversion.
+            ///
+            /// This method parses until an invalid digit is found (or the end
+            /// of the string), returning the number of processed digits
+            /// and the parsed value until that point. Returns a `Result`
+            /// containing either the parsed value and the number of
+            /// processed digits, or an error containing any errors that
+            /// occurred during parsing.
+            ///
+            /// * `FORMAT`  - Flags and characters designating the number grammar.
+            /// * `bytes`   - Slice containing a numeric string.
+            /// * `options` - Options to dictate number parsing.
+            ///
+            /// The `FORMAT` packed struct is built using [`NumberFormatBuilder`].
+            /// Any invalid number format will prevent parsing, returning
+            /// the appropriate format error. If you are unsure which format
+            /// to use, use [`STANDARD`].
+            ///
+            /// [`NumberFormatBuilder`]: lexical_util::format::NumberFormatBuilder
+            /// [`STANDARD`]: lexical_util::format::STANDARD
+            </span><span class="kw">fn </span>from_lexical_partial_with_options&lt;<span class="kw">const </span>FORMAT: u128&gt;(
+                bytes: <span class="kw-2">&amp;</span>[u8],
+                options: <span class="kw-2">&amp;</span><span class="self">Self</span>::Options,
+            ) -&gt; lexical_util::result::Result&lt;(<span class="self">Self</span>, usize)&gt;;
         }
     };
 }
 
-<span class="comment">// TO LEXICAL</span>
+<span class="comment">// TO LEXICAL
 
-<span class="doccomment">/// Define ToLexical trait.</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write&quot;</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">to_lexical</span> {
+</span><span class="doccomment">/// Define ToLexical trait.
+</span><span class="attribute">#[macro_export]
+#[cfg(feature = <span class="string">&quot;write&quot;</span>)]
+</span><span class="macro">macro_rules! </span>to_lexical {
     () =&gt; {
-        <span class="doccomment">/// Trait for numerical types that can be serialized to bytes.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// To determine the number of bytes required to serialize a value to</span>
-        <span class="doccomment">/// string, check the associated constants from a required trait:</span>
-        <span class="doccomment">/// - [`FORMATTED_SIZE`]</span>
-        <span class="doccomment">/// - [`FORMATTED_SIZE_DECIMAL`]</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`FORMATTED_SIZE`]: lexical_util::constants::FormattedSize::FORMATTED_SIZE</span>
-        <span class="doccomment">/// [`FORMATTED_SIZE_DECIMAL`]: lexical_util::constants::FormattedSize::FORMATTED_SIZE_DECIMAL</span>
-        <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ToLexical</span>:
-            <span class="ident">lexical_util::constants::FormattedSize</span> <span class="op">+</span> <span class="ident">lexical_util::num::Number</span>
+        <span class="doccomment">/// Trait for numerical types that can be serialized to bytes.
+        ///
+        /// To determine the number of bytes required to serialize a value to
+        /// string, check the associated constants from a required trait:
+        /// - [`FORMATTED_SIZE`]
+        /// - [`FORMATTED_SIZE_DECIMAL`]
+        ///
+        /// [`FORMATTED_SIZE`]: lexical_util::constants::FormattedSize::FORMATTED_SIZE
+        /// [`FORMATTED_SIZE_DECIMAL`]: lexical_util::constants::FormattedSize::FORMATTED_SIZE_DECIMAL
+        </span><span class="kw">pub trait </span>ToLexical:
+            lexical_util::constants::FormattedSize + lexical_util::num::Number
         {
-            <span class="doccomment">/// Serializer for a number-to-string conversion.</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// Returns a subslice of the input buffer containing the written bytes,</span>
-            <span class="doccomment">/// starting from the same address in memory as the input slice.</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// * `value`   - Number to serialize.</span>
-            <span class="doccomment">/// * `bytes`   - Buffer to write number to.</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// # Safety</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// Safe as long as the caller has provided a buffer of at least</span>
-            <span class="doccomment">/// [`FORMATTED_SIZE_DECIMAL`] elements. If a smaller buffer is</span>
-            <span class="doccomment">/// provided, a buffer overflow is very likely.</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// [`FORMATTED_SIZE_DECIMAL`]: lexical_util::constants::FormattedSize::FORMATTED_SIZE_DECIMAL</span>
-            <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">to_lexical_unchecked</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>]) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>];
+            <span class="doccomment">/// Serializer for a number-to-string conversion.
+            ///
+            /// Returns a subslice of the input buffer containing the written bytes,
+            /// starting from the same address in memory as the input slice.
+            ///
+            /// * `value`   - Number to serialize.
+            /// * `bytes`   - Buffer to write number to.
+            ///
+            /// # Safety
+            ///
+            /// Safe as long as the caller has provided a buffer of at least
+            /// [`FORMATTED_SIZE_DECIMAL`] elements. If a smaller buffer is
+            /// provided, a buffer overflow is very likely.
+            ///
+            /// [`FORMATTED_SIZE_DECIMAL`]: lexical_util::constants::FormattedSize::FORMATTED_SIZE_DECIMAL
+            </span><span class="kw">unsafe fn </span>to_lexical_unchecked&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>, bytes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8]) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8];
 
-            <span class="doccomment">/// Serializer for a number-to-string conversion.</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// Returns a subslice of the input buffer containing the written bytes,</span>
-            <span class="doccomment">/// starting from the same address in memory as the input slice.</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// * `value`   - Number to serialize.</span>
-            <span class="doccomment">/// * `bytes`   - Buffer to write number to.</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// # Panics</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// Panics if the buffer is not of sufficient size. The caller</span>
-            <span class="doccomment">/// must provide a slice of sufficient size. In order to ensure</span>
-            <span class="doccomment">/// the function will not panic, ensure the buffer has at least</span>
-            <span class="doccomment">/// [`FORMATTED_SIZE_DECIMAL`] elements.</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// [`FORMATTED_SIZE_DECIMAL`]: lexical_util::constants::FormattedSize::FORMATTED_SIZE_DECIMAL</span>
-            <span class="kw">fn</span> <span class="ident">to_lexical</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>]) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>];
+            <span class="doccomment">/// Serializer for a number-to-string conversion.
+            ///
+            /// Returns a subslice of the input buffer containing the written bytes,
+            /// starting from the same address in memory as the input slice.
+            ///
+            /// * `value`   - Number to serialize.
+            /// * `bytes`   - Buffer to write number to.
+            ///
+            /// # Panics
+            ///
+            /// Panics if the buffer is not of sufficient size. The caller
+            /// must provide a slice of sufficient size. In order to ensure
+            /// the function will not panic, ensure the buffer has at least
+            /// [`FORMATTED_SIZE_DECIMAL`] elements.
+            ///
+            /// [`FORMATTED_SIZE_DECIMAL`]: lexical_util::constants::FormattedSize::FORMATTED_SIZE_DECIMAL
+            </span><span class="kw">fn </span>to_lexical&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>, bytes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8]) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8];
         }
     };
 }
 
-<span class="doccomment">/// Define ToLexicalWithOptions trait.</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write&quot;</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">to_lexical_with_options</span> {
+<span class="doccomment">/// Define ToLexicalWithOptions trait.
+</span><span class="attribute">#[macro_export]
+#[cfg(feature = <span class="string">&quot;write&quot;</span>)]
+</span><span class="macro">macro_rules! </span>to_lexical_with_options {
     () =&gt; {
-        <span class="doccomment">/// Trait for numerical types that can be serialized to bytes with custom options.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// To determine the number of bytes required to serialize a value to</span>
-        <span class="doccomment">/// string, check the associated constants from a required trait:</span>
-        <span class="doccomment">/// - [`FORMATTED_SIZE`]</span>
-        <span class="doccomment">/// - [`FORMATTED_SIZE_DECIMAL`]</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// The `Options` type specifies the configurable options to provide.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`FORMATTED_SIZE`]: lexical_util::constants::FormattedSize::FORMATTED_SIZE</span>
-        <span class="doccomment">/// [`FORMATTED_SIZE_DECIMAL`]: lexical_util::constants::FormattedSize::FORMATTED_SIZE_DECIMAL</span>
-        <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ToLexicalWithOptions</span>:
-            <span class="ident">lexical_util::constants::FormattedSize</span> <span class="op">+</span> <span class="ident">lexical_util::num::Number</span>
+        <span class="doccomment">/// Trait for numerical types that can be serialized to bytes with custom options.
+        ///
+        /// To determine the number of bytes required to serialize a value to
+        /// string, check the associated constants from a required trait:
+        /// - [`FORMATTED_SIZE`]
+        /// - [`FORMATTED_SIZE_DECIMAL`]
+        ///
+        /// The `Options` type specifies the configurable options to provide.
+        ///
+        /// [`FORMATTED_SIZE`]: lexical_util::constants::FormattedSize::FORMATTED_SIZE
+        /// [`FORMATTED_SIZE_DECIMAL`]: lexical_util::constants::FormattedSize::FORMATTED_SIZE_DECIMAL
+        </span><span class="kw">pub trait </span>ToLexicalWithOptions:
+            lexical_util::constants::FormattedSize + lexical_util::num::Number
         {
-            <span class="doccomment">/// Custom formatting options for writing a number.</span>
-            <span class="kw">type</span> <span class="ident">Options</span>: <span class="ident">lexical_util::options::WriteOptions</span>;
+            <span class="doccomment">/// Custom formatting options for writing a number.
+            </span><span class="kw">type </span>Options: lexical_util::options::WriteOptions;
 
-            <span class="doccomment">/// Serializer for a number-to-string conversion.</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// Returns a subslice of the input buffer containing the written bytes,</span>
-            <span class="doccomment">/// starting from the same address in memory as the input slice.</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// * `FORMAT`  - Flags and characters designating the number grammar.</span>
-            <span class="doccomment">/// * `value`   - Number to serialize.</span>
-            <span class="doccomment">/// * `bytes`   - Buffer to write number to.</span>
-            <span class="doccomment">/// * `options` - Options for number formatting.</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// # Safety</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// Safe as long as the caller has provided a buffer of at least</span>
-            <span class="doccomment">/// [`FORMATTED_SIZE`] elements. If a smaller buffer is provided, a</span>
-            <span class="doccomment">/// buffer overflow is very likely. If you are changing the</span>
-            <span class="doccomment">/// number significant digits written, the exponent break points,</span>
-            <span class="doccomment">/// or disabling scientific notation, you will need a larger buffer</span>
-            <span class="doccomment">/// than the one provided. An upper limit on the buffer size can</span>
-            <span class="doccomment">/// then be determined using [`WriteOptions::buffer_size`]. If you</span>
-            <span class="doccomment">/// are not using `min_significant_digits`, 1200 bytes is always</span>
-            <span class="doccomment">/// enough to hold the the output for a custom radix, and `400`</span>
-            <span class="doccomment">/// is always enough for decimal strings.</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// # Panics</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// **Floats Only**</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// These panics are only when using uncommon features for float</span>
-            <span class="doccomment">/// writing, represent configuration errors, so runtime error</span>
-            <span class="doccomment">/// handling is not provided.</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// Panics if the provided number format is invalid, or if the</span>
-            <span class="doccomment">/// mantissa radix is not equal to the exponent base</span>
-            <span class="doccomment">/// and the mantissa radix/exponent base combinations are</span>
-            <span class="doccomment">/// not in the following list:</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// - `4, 2`</span>
-            <span class="doccomment">/// - `8, 2`</span>
-            <span class="doccomment">/// - `16, 2`</span>
-            <span class="doccomment">/// - `32, 2`</span>
-            <span class="doccomment">/// - `16, 4`</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// Panics as well if the NaN or Inf string provided to the writer</span>
-            <span class="doccomment">/// is disabled, but the value provided is NaN or Inf, respectively.</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// [`WriteOptions::buffer_size`]: lexical_util::options::WriteOptions::buffer_size</span>
-            <span class="doccomment">/// [`FORMATTED_SIZE`]: lexical_util::constants::FormattedSize::FORMATTED_SIZE</span>
-            <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">to_lexical_with_options_unchecked</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
+            <span class="doccomment">/// Serializer for a number-to-string conversion.
+            ///
+            /// Returns a subslice of the input buffer containing the written bytes,
+            /// starting from the same address in memory as the input slice.
+            ///
+            /// * `FORMAT`  - Flags and characters designating the number grammar.
+            /// * `value`   - Number to serialize.
+            /// * `bytes`   - Buffer to write number to.
+            /// * `options` - Options for number formatting.
+            ///
+            /// # Safety
+            ///
+            /// Safe as long as the caller has provided a buffer of at least
+            /// [`FORMATTED_SIZE`] elements. If a smaller buffer is provided, a
+            /// buffer overflow is very likely. If you are changing the
+            /// number significant digits written, the exponent break points,
+            /// or disabling scientific notation, you will need a larger buffer
+            /// than the one provided. An upper limit on the buffer size can
+            /// then be determined using [`WriteOptions::buffer_size`]. If you
+            /// are not using `min_significant_digits`, 1200 bytes is always
+            /// enough to hold the the output for a custom radix, and `400`
+            /// is always enough for decimal strings.
+            ///
+            /// # Panics
+            ///
+            /// **Floats Only**
+            ///
+            /// These panics are only when using uncommon features for float
+            /// writing, represent configuration errors, so runtime error
+            /// handling is not provided.
+            ///
+            /// Panics if the provided number format is invalid, or if the
+            /// mantissa radix is not equal to the exponent base
+            /// and the mantissa radix/exponent base combinations are
+            /// not in the following list:
+            ///
+            /// - `4, 2`
+            /// - `8, 2`
+            /// - `16, 2`
+            /// - `32, 2`
+            /// - `16, 4`
+            ///
+            /// Panics as well if the NaN or Inf string provided to the writer
+            /// is disabled, but the value provided is NaN or Inf, respectively.
+            ///
+            /// [`WriteOptions::buffer_size`]: lexical_util::options::WriteOptions::buffer_size
+            /// [`FORMATTED_SIZE`]: lexical_util::constants::FormattedSize::FORMATTED_SIZE
+            </span><span class="kw">unsafe fn </span>to_lexical_with_options_unchecked&lt;<span class="lifetime">&#39;a</span>, <span class="kw">const </span>FORMAT: u128&gt;(
                 <span class="self">self</span>,
-                <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>],
-                <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Options</span>,
-            ) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>];
+                bytes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8],
+                options: <span class="kw-2">&amp;</span><span class="self">Self</span>::Options,
+            ) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8];
 
-            <span class="doccomment">/// Serializer for a number-to-string conversion.</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// Returns a subslice of the input buffer containing the written bytes,</span>
-            <span class="doccomment">/// starting from the same address in memory as the input slice.</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// * `FORMAT`  - Flags and characters designating the number grammar.</span>
-            <span class="doccomment">/// * `value`   - Number to serialize.</span>
-            <span class="doccomment">/// * `bytes`   - Buffer to write number to.</span>
-            <span class="doccomment">/// * `options` - Options for number formatting.</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// # Panics</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// Panics if the buffer is not of sufficient size. The caller</span>
-            <span class="doccomment">/// must provide a slice of sufficient size. In order to ensure</span>
-            <span class="doccomment">/// the function will not panic, ensure the buffer has at least</span>
-            <span class="doccomment">/// [`FORMATTED_SIZE`] elements. If you are changing the</span>
-            <span class="doccomment">/// number significant digits written, the exponent break points,</span>
-            <span class="doccomment">/// or disabling scientific notation, you will need a larger buffer</span>
-            <span class="doccomment">/// than the one provided. An upper limit on the buffer size can</span>
-            <span class="doccomment">/// then be determined using [`WriteOptions::buffer_size`]. If you</span>
-            <span class="doccomment">/// are not using `min_significant_digits`, 1200 bytes is always</span>
-            <span class="doccomment">/// enough to hold the the output for a custom radix, and `400`</span>
-            <span class="doccomment">/// is always enough for decimal strings.</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// **Floats Only**</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// These panics are only when using uncommon features for float</span>
-            <span class="doccomment">/// writing, represent configuration errors, so runtime error</span>
-            <span class="doccomment">/// handling is not provided.</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// Also panics if the provided number format is invalid, or</span>
-            <span class="doccomment">/// if the mantissa radix is not equal to the exponent base</span>
-            <span class="doccomment">/// and the mantissa radix/exponent base combinations are</span>
-            <span class="doccomment">/// not in the following list:</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// - `4, 2`</span>
-            <span class="doccomment">/// - `8, 2`</span>
-            <span class="doccomment">/// - `16, 2`</span>
-            <span class="doccomment">/// - `32, 2`</span>
-            <span class="doccomment">/// - `16, 4`</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// Panics as well if the NaN or Inf string provided to the writer</span>
-            <span class="doccomment">/// is disabled, but the value provided is NaN or Inf, respectively.</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// [`WriteOptions::buffer_size`]: lexical_util::options::WriteOptions::buffer_size</span>
-            <span class="doccomment">/// [`FORMATTED_SIZE`]: lexical_util::constants::FormattedSize::FORMATTED_SIZE</span>
-            <span class="kw">fn</span> <span class="ident">to_lexical_with_options</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
+            <span class="doccomment">/// Serializer for a number-to-string conversion.
+            ///
+            /// Returns a subslice of the input buffer containing the written bytes,
+            /// starting from the same address in memory as the input slice.
+            ///
+            /// * `FORMAT`  - Flags and characters designating the number grammar.
+            /// * `value`   - Number to serialize.
+            /// * `bytes`   - Buffer to write number to.
+            /// * `options` - Options for number formatting.
+            ///
+            /// # Panics
+            ///
+            /// Panics if the buffer is not of sufficient size. The caller
+            /// must provide a slice of sufficient size. In order to ensure
+            /// the function will not panic, ensure the buffer has at least
+            /// [`FORMATTED_SIZE`] elements. If you are changing the
+            /// number significant digits written, the exponent break points,
+            /// or disabling scientific notation, you will need a larger buffer
+            /// than the one provided. An upper limit on the buffer size can
+            /// then be determined using [`WriteOptions::buffer_size`]. If you
+            /// are not using `min_significant_digits`, 1200 bytes is always
+            /// enough to hold the the output for a custom radix, and `400`
+            /// is always enough for decimal strings.
+            ///
+            /// **Floats Only**
+            ///
+            /// These panics are only when using uncommon features for float
+            /// writing, represent configuration errors, so runtime error
+            /// handling is not provided.
+            ///
+            /// Also panics if the provided number format is invalid, or
+            /// if the mantissa radix is not equal to the exponent base
+            /// and the mantissa radix/exponent base combinations are
+            /// not in the following list:
+            ///
+            /// - `4, 2`
+            /// - `8, 2`
+            /// - `16, 2`
+            /// - `32, 2`
+            /// - `16, 4`
+            ///
+            /// Panics as well if the NaN or Inf string provided to the writer
+            /// is disabled, but the value provided is NaN or Inf, respectively.
+            ///
+            /// [`WriteOptions::buffer_size`]: lexical_util::options::WriteOptions::buffer_size
+            /// [`FORMATTED_SIZE`]: lexical_util::constants::FormattedSize::FORMATTED_SIZE
+            </span><span class="kw">fn </span>to_lexical_with_options&lt;<span class="lifetime">&#39;a</span>, <span class="kw">const </span>FORMAT: u128&gt;(
                 <span class="self">self</span>,
-                <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>],
-                <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Options</span>,
-            ) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>];
+                bytes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8],
+                options: <span class="kw-2">&amp;</span><span class="self">Self</span>::Options,
+            ) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8];
         }
     };
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

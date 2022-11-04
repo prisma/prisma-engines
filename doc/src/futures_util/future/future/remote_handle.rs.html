@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-util-0.3.24/src/future/future/remote_handle.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>remote_handle.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../futures_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../futures_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../futures_util/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-util-0.3.24/src/future/future/remote_handle.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>remote_handle.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../futures_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../futures_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../futures_util/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -124,131 +124,131 @@
 <span id="124">124</span>
 <span id="125">125</span>
 <span id="126">126</span>
-</pre><pre class="rust"><code><span class="kw">use</span> {
-    <span class="ident"><span class="kw">crate</span>::future</span>::{<span class="ident">CatchUnwind</span>, <span class="ident">FutureExt</span>},
-    <span class="ident">futures_channel::oneshot</span>::{<span class="self">self</span>, <span class="ident">Receiver</span>, <span class="ident">Sender</span>},
-    <span class="ident">futures_core</span>::{
-        <span class="ident">future::Future</span>,
-        <span class="ident">ready</span>,
-        <span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>},
+</pre><pre class="rust"><code><span class="kw">use </span>{
+    <span class="kw">crate</span>::future::{CatchUnwind, FutureExt},
+    futures_channel::oneshot::{<span class="self">self</span>, Receiver, Sender},
+    futures_core::{
+        future::Future,
+        ready,
+        task::{Context, Poll},
     },
-    <span class="ident">pin_project_lite::pin_project</span>,
-    <span class="ident">std</span>::{
-        <span class="ident">any::Any</span>,
-        <span class="ident">fmt</span>,
-        <span class="ident">panic</span>::{<span class="self">self</span>, <span class="ident">AssertUnwindSafe</span>},
-        <span class="ident">pin::Pin</span>,
-        <span class="ident">sync</span>::{
-            <span class="ident">atomic</span>::{<span class="ident">AtomicBool</span>, <span class="ident">Ordering</span>},
-            <span class="ident">Arc</span>,
+    pin_project_lite::pin_project,
+    std::{
+        any::Any,
+        fmt,
+        panic::{<span class="self">self</span>, AssertUnwindSafe},
+        pin::Pin,
+        sync::{
+            atomic::{AtomicBool, Ordering},
+            Arc,
         },
-        <span class="ident">thread</span>,
+        thread,
     },
 };
 
-<span class="doccomment">/// The handle to a remote future returned by</span>
-<span class="doccomment">/// [`remote_handle`](crate::future::FutureExt::remote_handle). When you drop this,</span>
-<span class="doccomment">/// the remote future will be woken up to be dropped by the executor.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Unwind safety</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// When the remote future panics, [Remote] will catch the unwind and transfer it to</span>
-<span class="doccomment">/// the thread where `RemoteHandle` is being awaited. This is good for the common</span>
-<span class="doccomment">/// case where [Remote] is spawned on a threadpool. It is unlikely that other code</span>
-<span class="doccomment">/// in the executor working thread shares mutable data with the spawned future and we</span>
-<span class="doccomment">/// preserve the executor from losing its working threads.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If you run the future locally and send the handle of to be awaited elsewhere, you</span>
-<span class="doccomment">/// must be careful with regard to unwind safety because the thread in which the future</span>
-<span class="doccomment">/// is polled will keep running after the panic and the thread running the [RemoteHandle]</span>
-<span class="doccomment">/// will unwind.</span>
-<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;dropping a remote handle cancels the underlying future&quot;</span>]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;channel&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RemoteHandle</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">rx</span>: <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">thread::Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">keep_running</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">AtomicBool</span><span class="op">&gt;</span>,
+<span class="doccomment">/// The handle to a remote future returned by
+/// [`remote_handle`](crate::future::FutureExt::remote_handle). When you drop this,
+/// the remote future will be woken up to be dropped by the executor.
+///
+/// ## Unwind safety
+///
+/// When the remote future panics, [Remote] will catch the unwind and transfer it to
+/// the thread where `RemoteHandle` is being awaited. This is good for the common
+/// case where [Remote] is spawned on a threadpool. It is unlikely that other code
+/// in the executor working thread shares mutable data with the spawned future and we
+/// preserve the executor from losing its working threads.
+///
+/// If you run the future locally and send the handle of to be awaited elsewhere, you
+/// must be careful with regard to unwind safety because the thread in which the future
+/// is polled will keep running after the panic and the thread running the [RemoteHandle]
+/// will unwind.
+</span><span class="attribute">#[must_use = <span class="string">&quot;dropping a remote handle cancels the underlying future&quot;</span>]
+#[derive(Debug)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;channel&quot;</span>)))]
+</span><span class="kw">pub struct </span>RemoteHandle&lt;T&gt; {
+    rx: Receiver&lt;thread::Result&lt;T&gt;&gt;,
+    keep_running: Arc&lt;AtomicBool&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">RemoteHandle</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Drops this handle *without* canceling the underlying future.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method can be used if you want to drop the handle, but let the</span>
-    <span class="doccomment">/// execution continue.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">forget</span>(<span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">keep_running</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">Ordering::SeqCst</span>);
+<span class="kw">impl</span>&lt;T&gt; RemoteHandle&lt;T&gt; {
+    <span class="doccomment">/// Drops this handle *without* canceling the underlying future.
+    ///
+    /// This method can be used if you want to drop the handle, but let the
+    /// execution continue.
+    </span><span class="kw">pub fn </span>forget(<span class="self">self</span>) {
+        <span class="self">self</span>.keep_running.store(<span class="bool-val">true</span>, Ordering::SeqCst);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">RemoteHandle</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span>;
+<span class="kw">impl</span>&lt;T: <span class="lifetime">&#39;static</span>&gt; Future <span class="kw">for </span>RemoteHandle&lt;T&gt; {
+    <span class="kw">type </span>Output = T;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">rx</span>.<span class="ident">poll_unpin</span>(<span class="ident">cx</span>)) {
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(<span class="ident">output</span>)) =&gt; <span class="ident">Poll::Ready</span>(<span class="ident">output</span>),
-            <span class="comment">// the remote future panicked.</span>
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) =&gt; <span class="ident">panic::resume_unwind</span>(<span class="ident">e</span>),
-            <span class="comment">// The oneshot sender was dropped.</span>
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="ident">panic::resume_unwind</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)),
+    <span class="kw">fn </span>poll(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;T&gt; {
+        <span class="kw">match </span><span class="macro">ready!</span>(<span class="self">self</span>.rx.poll_unpin(cx)) {
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(output)) =&gt; Poll::Ready(output),
+            <span class="comment">// the remote future panicked.
+            </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(e)) =&gt; panic::resume_unwind(e),
+            <span class="comment">// The oneshot sender was dropped.
+            </span><span class="prelude-val">Err</span>(e) =&gt; panic::resume_unwind(Box::new(e)),
         }
     }
 }
 
-<span class="kw">type</span> <span class="ident">SendMsg</span><span class="op">&lt;</span><span class="ident">Fut</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">Fut</span> <span class="kw">as</span> <span class="ident">Future</span><span class="op">&gt;</span><span class="ident">::Output</span>, <span class="ident">Box</span><span class="op">&lt;</span>(<span class="kw">dyn</span> <span class="ident">Any</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="kw">type </span>SendMsg&lt;Fut&gt; = <span class="prelude-ty">Result</span>&lt;&lt;Fut <span class="kw">as </span>Future&gt;::Output, Box&lt;(<span class="kw">dyn </span>Any + Send + <span class="lifetime">&#39;static</span>)&gt;&gt;;
 
-<span class="macro">pin_project!</span> {
-    <span class="doccomment">/// A future which sends its output to the corresponding `RemoteHandle`.</span>
-    <span class="doccomment">/// Created by [`remote_handle`](crate::future::FutureExt::remote_handle).</span>
-    <span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;futures do nothing unless you `.await` or poll them&quot;</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;channel&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Remote</span><span class="op">&lt;</span><span class="ident">Fut</span>: <span class="ident">Future</span><span class="op">&gt;</span> {
-        <span class="ident">tx</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">SendMsg</span><span class="op">&lt;</span><span class="ident">Fut</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">keep_running</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">AtomicBool</span><span class="op">&gt;</span>,
-        <span class="attribute">#[<span class="ident">pin</span>]</span>
-        <span class="ident">future</span>: <span class="ident">CatchUnwind</span><span class="op">&lt;</span><span class="ident">AssertUnwindSafe</span><span class="op">&lt;</span><span class="ident">Fut</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="macro">pin_project! </span>{
+    <span class="doccomment">/// A future which sends its output to the corresponding `RemoteHandle`.
+    /// Created by [`remote_handle`](crate::future::FutureExt::remote_handle).
+    </span><span class="attribute">#[must_use = <span class="string">&quot;futures do nothing unless you `.await` or poll them&quot;</span>]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;channel&quot;</span>)))]
+    </span><span class="kw">pub struct </span>Remote&lt;Fut: Future&gt; {
+        tx: <span class="prelude-ty">Option</span>&lt;Sender&lt;SendMsg&lt;Fut&gt;&gt;&gt;,
+        keep_running: Arc&lt;AtomicBool&gt;,
+        <span class="attribute">#[pin]
+        </span>future: CatchUnwind&lt;AssertUnwindSafe&lt;Fut&gt;&gt;,
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Fut</span>: <span class="ident">Future</span> <span class="op">+</span> <span class="ident">fmt::Debug</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Remote</span><span class="op">&lt;</span><span class="ident">Fut</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;Remote&quot;</span>).<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">future</span>).<span class="ident">finish</span>()
+<span class="kw">impl</span>&lt;Fut: Future + fmt::Debug&gt; fmt::Debug <span class="kw">for </span>Remote&lt;Fut&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_tuple(<span class="string">&quot;Remote&quot;</span>).field(<span class="kw-2">&amp;</span><span class="self">self</span>.future).finish()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Fut</span>: <span class="ident">Future</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">Remote</span><span class="op">&lt;</span><span class="ident">Fut</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
+<span class="kw">impl</span>&lt;Fut: Future&gt; Future <span class="kw">for </span>Remote&lt;Fut&gt; {
+    <span class="kw">type </span>Output = ();
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
+    <span class="kw">fn </span>poll(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;()&gt; {
+        <span class="kw">let </span>this = <span class="self">self</span>.project();
 
-        <span class="kw">if</span> <span class="ident">this</span>.<span class="ident">tx</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">poll_canceled</span>(<span class="ident">cx</span>).<span class="ident">is_ready</span>()
-            <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">this</span>.<span class="ident">keep_running</span>.<span class="ident">load</span>(<span class="ident">Ordering::SeqCst</span>)
+        <span class="kw">if </span>this.tx.as_mut().unwrap().poll_canceled(cx).is_ready()
+            &amp;&amp; !this.keep_running.load(Ordering::SeqCst)
         {
-            <span class="comment">// Cancelled, bail out</span>
-            <span class="kw">return</span> <span class="ident">Poll::Ready</span>(());
+            <span class="comment">// Cancelled, bail out
+            </span><span class="kw">return </span>Poll::Ready(());
         }
 
-        <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="ident">this</span>.<span class="ident">future</span>.<span class="ident">poll</span>(<span class="ident">cx</span>));
+        <span class="kw">let </span>output = <span class="macro">ready!</span>(this.future.poll(cx));
 
-        <span class="comment">// if the receiving end has gone away then that&#39;s ok, we just ignore the</span>
-        <span class="comment">// send error here.</span>
-        <span class="ident">drop</span>(<span class="ident">this</span>.<span class="ident">tx</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>().<span class="ident">send</span>(<span class="ident">output</span>));
-        <span class="ident">Poll::Ready</span>(())
+        <span class="comment">// if the receiving end has gone away then that&#39;s ok, we just ignore the
+        // send error here.
+        </span>drop(this.tx.take().unwrap().send(output));
+        Poll::Ready(())
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">remote_handle</span><span class="op">&lt;</span><span class="ident">Fut</span>: <span class="ident">Future</span><span class="op">&gt;</span>(<span class="ident">future</span>: <span class="ident">Fut</span>) -&gt; (<span class="ident">Remote</span><span class="op">&lt;</span><span class="ident">Fut</span><span class="op">&gt;</span>, <span class="ident">RemoteHandle</span><span class="op">&lt;</span><span class="ident">Fut::Output</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="ident">oneshot::channel</span>();
-    <span class="kw">let</span> <span class="ident">keep_running</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">AtomicBool::new</span>(<span class="bool-val">false</span>));
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>remote_handle&lt;Fut: Future&gt;(future: Fut) -&gt; (Remote&lt;Fut&gt;, RemoteHandle&lt;Fut::Output&gt;) {
+    <span class="kw">let </span>(tx, rx) = oneshot::channel();
+    <span class="kw">let </span>keep_running = Arc::new(AtomicBool::new(<span class="bool-val">false</span>));
 
-    <span class="comment">// Unwind Safety: See the docs for RemoteHandle.</span>
-    <span class="kw">let</span> <span class="ident">wrapped</span> <span class="op">=</span> <span class="ident">Remote</span> {
-        <span class="ident">future</span>: <span class="ident">AssertUnwindSafe</span>(<span class="ident">future</span>).<span class="ident">catch_unwind</span>(),
-        <span class="ident">tx</span>: <span class="prelude-val">Some</span>(<span class="ident">tx</span>),
-        <span class="ident">keep_running</span>: <span class="ident">keep_running</span>.<span class="ident">clone</span>(),
+    <span class="comment">// Unwind Safety: See the docs for RemoteHandle.
+    </span><span class="kw">let </span>wrapped = Remote {
+        future: AssertUnwindSafe(future).catch_unwind(),
+        tx: <span class="prelude-val">Some</span>(tx),
+        keep_running: keep_running.clone(),
     };
 
-    (<span class="ident">wrapped</span>, <span class="ident">RemoteHandle</span> { <span class="ident">rx</span>, <span class="ident">keep_running</span> })
+    (wrapped, RemoteHandle { rx, keep_running })
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="futures_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="futures_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

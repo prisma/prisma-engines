@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/psl-core/src/datamodel_connector.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>datamodel_connector.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../psl_core/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/psl-core/src/datamodel_connector.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>datamodel_connector.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../psl_core/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -380,387 +380,387 @@
 <span id="380">380</span>
 <span id="381">381</span>
 <span id="382">382</span>
-</pre><pre class="rust"><code><span class="doccomment">//! The interface implemented by connectors for Prisma schema validation and interpretation.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! The interface implemented by connectors for Prisma schema validation and interpretation.
 
-<span class="doccomment">/// Connector capabilities</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">capabilities</span>;
-<span class="doccomment">/// Constraint name defaults.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">constraint_names</span>;
-<span class="doccomment">/// Extensions for parser database walkers with context from the connector.</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">walker_ext_traits</span>;
+/// Connector capabilities
+</span><span class="kw">pub mod </span>capabilities;
+<span class="doccomment">/// Constraint name defaults.
+</span><span class="kw">pub mod </span>constraint_names;
+<span class="doccomment">/// Extensions for parser database walkers with context from the connector.
+</span><span class="kw">pub mod </span>walker_ext_traits;
 
-<span class="kw">mod</span> <span class="ident">empty_connector</span>;
-<span class="kw">mod</span> <span class="ident">filters</span>;
-<span class="kw">mod</span> <span class="ident">native_types</span>;
-<span class="kw">mod</span> <span class="ident">relation_mode</span>;
+<span class="kw">mod </span>empty_connector;
+<span class="kw">mod </span>filters;
+<span class="kw">mod </span>native_types;
+<span class="kw">mod </span>relation_mode;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::{
-    <span class="ident">capabilities</span>::{<span class="ident">ConnectorCapabilities</span>, <span class="ident">ConnectorCapability</span>},
-    <span class="ident">empty_connector::EmptyDatamodelConnector</span>,
-    <span class="ident">filters</span>::<span class="kw-2">*</span>,
-    <span class="ident">native_types</span>::{<span class="ident">NativeTypeArguments</span>, <span class="ident">NativeTypeConstructor</span>, <span class="ident">NativeTypeInstance</span>},
-    <span class="ident">relation_mode::RelationMode</span>,
+<span class="kw">pub use </span><span class="self">self</span>::{
+    capabilities::{ConnectorCapabilities, ConnectorCapability},
+    empty_connector::EmptyDatamodelConnector,
+    filters::<span class="kw-2">*</span>,
+    native_types::{NativeTypeArguments, NativeTypeConstructor, NativeTypeInstance},
+    relation_mode::RelationMode,
 };
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">configuration::DatasourceConnectorData</span>, <span class="ident">Datasource</span>, <span class="ident">PreviewFeature</span>};
-<span class="kw">use</span> <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>, <span class="ident">NativeTypeErrorFactory</span>, <span class="ident">Span</span>};
-<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
-<span class="kw">use</span> <span class="ident">lsp_types::CompletionList</span>;
-<span class="kw">use</span> <span class="ident">parser_database</span>::{
-    <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">SchemaPosition</span>},
-    <span class="ident">walkers</span>, <span class="ident">IndexAlgorithm</span>, <span class="ident">ParserDatabase</span>, <span class="ident">ReferentialAction</span>, <span class="ident">ScalarType</span>,
+<span class="kw">use crate</span>::{configuration::DatasourceConnectorData, Datasource, PreviewFeature};
+<span class="kw">use </span>diagnostics::{DatamodelError, Diagnostics, NativeTypeErrorFactory, Span};
+<span class="kw">use </span>enumflags2::BitFlags;
+<span class="kw">use </span>lsp_types::CompletionList;
+<span class="kw">use </span>parser_database::{
+    ast::{<span class="self">self</span>, SchemaPosition},
+    walkers, IndexAlgorithm, ParserDatabase, ReferentialAction, ScalarType,
 };
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">borrow::Cow</span>,
-    <span class="ident">collections</span>::{<span class="ident">BTreeMap</span>, <span class="ident">HashMap</span>},
+<span class="kw">use </span>std::{
+    borrow::Cow,
+    collections::{BTreeMap, HashMap},
 };
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">EXTENSIONS_KEY</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;extensions&quot;</span>;
+<span class="kw">pub const </span>EXTENSIONS_KEY: <span class="kw-2">&amp;</span>str = <span class="string">&quot;extensions&quot;</span>;
 
-<span class="doccomment">/// The datamodel connector API.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Connector</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
-    <span class="doccomment">/// The name of the provider, for string comparisons determining which connector we are on.</span>
-    <span class="kw">fn</span> <span class="ident">provider_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>;
+<span class="doccomment">/// The datamodel connector API.
+</span><span class="kw">pub trait </span>Connector: Send + Sync {
+    <span class="doccomment">/// The name of the provider, for string comparisons determining which connector we are on.
+    </span><span class="kw">fn </span>provider_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str;
 
-    <span class="doccomment">/// Must return true whenever the passed in provider name is a match.</span>
-    <span class="kw">fn</span> <span class="ident">is_provider</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">name</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">provider_name</span>()
+    <span class="doccomment">/// Must return true whenever the passed in provider name is a match.
+    </span><span class="kw">fn </span>is_provider(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        name == <span class="self">self</span>.provider_name()
     }
 
-    <span class="doccomment">/// The name of the connector. Can be used in error messages.</span>
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span>;
+    <span class="doccomment">/// The name of the connector. Can be used in error messages.
+    </span><span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str;
 
-    <span class="doccomment">/// The static list of capabilities for the connector.</span>
-    <span class="kw">fn</span> <span class="ident">capabilities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">ConnectorCapability</span>];
+    <span class="doccomment">/// The static list of capabilities for the connector.
+    </span><span class="kw">fn </span>capabilities(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[ConnectorCapability];
 
-    <span class="doccomment">/// Does the connector have this capability?</span>
-    <span class="kw">fn</span> <span class="ident">has_capability</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">capability</span>: <span class="ident">ConnectorCapability</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">capabilities</span>().<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">capability</span>)
+    <span class="doccomment">/// Does the connector have this capability?
+    </span><span class="kw">fn </span>has_capability(<span class="kw-2">&amp;</span><span class="self">self</span>, capability: ConnectorCapability) -&gt; bool {
+        <span class="self">self</span>.capabilities().contains(<span class="kw-2">&amp;</span>capability)
     }
 
-    <span class="doccomment">/// The maximum length of constraint names in bytes. Connectors without a</span>
-    <span class="doccomment">/// limit should return usize::MAX.</span>
-    <span class="kw">fn</span> <span class="ident">max_identifier_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span>;
+    <span class="doccomment">/// The maximum length of constraint names in bytes. Connectors without a
+    /// limit should return usize::MAX.
+    </span><span class="kw">fn </span>max_identifier_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize;
 
-    <span class="comment">// Relation mode</span>
+    <span class="comment">// Relation mode
 
-    <span class="doccomment">/// The relation modes that can be set through the relationMode datasource</span>
-    <span class="doccomment">/// argument.</span>
-    <span class="kw">fn</span> <span class="ident">allowed_relation_mode_settings</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">RelationMode</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">RelationMode</span>::<span class="kw-2">*</span>;
+    </span><span class="doccomment">/// The relation modes that can be set through the relationMode datasource
+    /// argument.
+    </span><span class="kw">fn </span>allowed_relation_mode_settings(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BitFlags&lt;RelationMode&gt; {
+        <span class="kw">use </span>RelationMode::<span class="kw-2">*</span>;
 
-        <span class="ident">ForeignKeys</span> <span class="op">|</span> <span class="ident">Prisma</span>
+        ForeignKeys | Prisma
     }
 
-    <span class="doccomment">/// The default relation mode to assume for this connector.</span>
-    <span class="kw">fn</span> <span class="ident">default_relation_mode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RelationMode</span> {
-        <span class="ident">RelationMode::ForeignKeys</span>
+    <span class="doccomment">/// The default relation mode to assume for this connector.
+    </span><span class="kw">fn </span>default_relation_mode(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RelationMode {
+        RelationMode::ForeignKeys
     }
 
-    <span class="doccomment">/// The referential actions supported by the connector.</span>
-    <span class="kw">fn</span> <span class="ident">referential_actions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// The referential actions supported by the connector.
+    </span><span class="kw">fn </span>referential_actions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BitFlags&lt;ReferentialAction&gt;;
 
-    <span class="doccomment">/// The referential actions supported when using relationMode = &quot;prisma&quot; by the connector.</span>
-    <span class="doccomment">/// There are in fact scenarios in which the set of emulated referential actions supported may change</span>
-    <span class="doccomment">/// depending on the connector. For example, Postgres&#39; NoAction mode behaves similarly to Restrict</span>
-    <span class="doccomment">/// (raising an error if any referencing rows still exist when the constraint is checked), but with</span>
-    <span class="doccomment">/// a subtle twist we decided not to emulate: NO ACTION allows the check to be deferred until later</span>
-    <span class="doccomment">/// in the transaction, whereas RESTRICT does not.</span>
-    <span class="kw">fn</span> <span class="ident">emulated_referential_actions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
-        <span class="ident">RelationMode::allowed_emulated_referential_actions_default</span>()
+    <span class="doccomment">/// The referential actions supported when using relationMode = &quot;prisma&quot; by the connector.
+    /// There are in fact scenarios in which the set of emulated referential actions supported may change
+    /// depending on the connector. For example, Postgres&#39; NoAction mode behaves similarly to Restrict
+    /// (raising an error if any referencing rows still exist when the constraint is checked), but with
+    /// a subtle twist we decided not to emulate: NO ACTION allows the check to be deferred until later
+    /// in the transaction, whereas RESTRICT does not.
+    </span><span class="kw">fn </span>emulated_referential_actions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BitFlags&lt;ReferentialAction&gt; {
+        RelationMode::allowed_emulated_referential_actions_default()
     }
 
-    <span class="kw">fn</span> <span class="ident">supports_composite_types</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::CompositeTypes</span>)
+    <span class="kw">fn </span>supports_composite_types(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.has_capability(ConnectorCapability::CompositeTypes)
     }
 
-    <span class="kw">fn</span> <span class="ident">supports_named_primary_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::NamedPrimaryKeys</span>)
+    <span class="kw">fn </span>supports_named_primary_keys(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.has_capability(ConnectorCapability::NamedPrimaryKeys)
     }
 
-    <span class="kw">fn</span> <span class="ident">supports_named_foreign_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::NamedForeignKeys</span>)
+    <span class="kw">fn </span>supports_named_foreign_keys(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.has_capability(ConnectorCapability::NamedForeignKeys)
     }
 
-    <span class="kw">fn</span> <span class="ident">supports_named_default_values</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::NamedDefaultValues</span>)
+    <span class="kw">fn </span>supports_named_default_values(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.has_capability(ConnectorCapability::NamedDefaultValues)
     }
 
-    <span class="kw">fn</span> <span class="ident">supports_referential_action</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">relation_mode</span>: <span class="kw-2">&amp;</span><span class="ident">RelationMode</span>, <span class="ident">action</span>: <span class="ident">ReferentialAction</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="ident">relation_mode</span> {
-            <span class="ident">RelationMode::ForeignKeys</span> =&gt; <span class="self">self</span>.<span class="ident">referential_actions</span>().<span class="ident">contains</span>(<span class="ident">action</span>),
-            <span class="ident">RelationMode::Prisma</span> =&gt; <span class="self">self</span>.<span class="ident">emulated_referential_actions</span>().<span class="ident">contains</span>(<span class="ident">action</span>),
+    <span class="kw">fn </span>supports_referential_action(<span class="kw-2">&amp;</span><span class="self">self</span>, relation_mode: <span class="kw-2">&amp;</span>RelationMode, action: ReferentialAction) -&gt; bool {
+        <span class="kw">match </span>relation_mode {
+            RelationMode::ForeignKeys =&gt; <span class="self">self</span>.referential_actions().contains(action),
+            RelationMode::Prisma =&gt; <span class="self">self</span>.emulated_referential_actions().contains(action),
         }
     }
 
-    <span class="doccomment">/// This is used by the query engine schema builder.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For a given scalar type + native type combination, this method should return the name to be</span>
-    <span class="doccomment">/// given to the filter input objects for the type. The significance of that name is that the</span>
-    <span class="doccomment">/// resulting input objects will be cached by name, so for a given filter input object name,</span>
-    <span class="doccomment">/// the filters should always be identical.</span>
-    <span class="kw">fn</span> <span class="ident">scalar_filter_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">scalar_type_name</span>: <span class="ident">String</span>, <span class="ident">_native_type_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="ident">Cow::Owned</span>(<span class="ident">scalar_type_name</span>)
+    <span class="doccomment">/// This is used by the query engine schema builder.
+    ///
+    /// For a given scalar type + native type combination, this method should return the name to be
+    /// given to the filter input objects for the type. The significance of that name is that the
+    /// resulting input objects will be cached by name, so for a given filter input object name,
+    /// the filters should always be identical.
+    </span><span class="kw">fn </span>scalar_filter_name(<span class="kw-2">&amp;</span><span class="self">self</span>, scalar_type_name: String, _native_type_name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; Cow&lt;<span class="lifetime">&#39;_</span>, str&gt; {
+        Cow::Owned(scalar_type_name)
     }
 
-    <span class="doccomment">/// This is used by the query engine schema builder. It is only called for filters of String</span>
-    <span class="doccomment">/// fields and aggregates.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For a given filter input object type name returned by `scalar_filter_name`, it should</span>
-    <span class="doccomment">/// return the string operations to be made available in the Client API.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Implementations of this method _must_ always associate the same filters to the same input</span>
-    <span class="doccomment">/// object type name. This is because the filter types are cached by name, so if different</span>
-    <span class="doccomment">/// calls to the method return different filters, only the first return value will be used.</span>
-    <span class="kw">fn</span> <span class="ident">string_filters</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">input_object_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">StringFilter</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">input_object_name</span> {
-            <span class="string">&quot;String&quot;</span> =&gt; <span class="ident">BitFlags::all</span>(), <span class="comment">// all the filters are available by default</span>
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected scalar input object name for string filters: `{input_object_name}`&quot;</span>),
+    <span class="doccomment">/// This is used by the query engine schema builder. It is only called for filters of String
+    /// fields and aggregates.
+    ///
+    /// For a given filter input object type name returned by `scalar_filter_name`, it should
+    /// return the string operations to be made available in the Client API.
+    ///
+    /// Implementations of this method _must_ always associate the same filters to the same input
+    /// object type name. This is because the filter types are cached by name, so if different
+    /// calls to the method return different filters, only the first return value will be used.
+    </span><span class="kw">fn </span>string_filters(<span class="kw-2">&amp;</span><span class="self">self</span>, input_object_name: <span class="kw-2">&amp;</span>str) -&gt; BitFlags&lt;StringFilter&gt; {
+        <span class="kw">match </span>input_object_name {
+            <span class="string">&quot;String&quot; </span>=&gt; BitFlags::all(), <span class="comment">// all the filters are available by default
+            </span><span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unexpected scalar input object name for string filters: `{input_object_name}`&quot;</span>),
         }
     }
 
-    <span class="doccomment">/// Validate that the arguments passed to a native type attribute are valid.</span>
-    <span class="kw">fn</span> <span class="ident">validate_native_type_arguments</span>(
+    <span class="doccomment">/// Validate that the arguments passed to a native type attribute are valid.
+    </span><span class="kw">fn </span>validate_native_type_arguments(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">_native_type</span>: <span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span>,
-        <span class="ident">_scalar_type</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarType</span>,
-        <span class="ident">_span</span>: <span class="ident">Span</span>,
-        <span class="kw">_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
+        _native_type: <span class="kw-2">&amp;</span>NativeTypeInstance,
+        _scalar_type: <span class="kw-2">&amp;</span>ScalarType,
+        _span: Span,
+        <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Diagnostics,
     ) {
     }
 
-    <span class="kw">fn</span> <span class="ident">validate_enum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_enum</span>: <span class="ident">walkers::EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="kw">_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) {}
-    <span class="kw">fn</span> <span class="ident">validate_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_model</span>: <span class="ident">walkers::ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="kw">_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) {}
-    <span class="kw">fn</span> <span class="ident">validate_datasource</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Datasource</span>, <span class="kw">_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) {}
+    <span class="kw">fn </span>validate_enum(<span class="kw-2">&amp;</span><span class="self">self</span>, _enum: walkers::EnumWalker&lt;<span class="lifetime">&#39;_</span>&gt;, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Diagnostics) {}
+    <span class="kw">fn </span>validate_model(<span class="kw-2">&amp;</span><span class="self">self</span>, _model: walkers::ModelWalker&lt;<span class="lifetime">&#39;_</span>&gt;, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Diagnostics) {}
+    <span class="kw">fn </span>validate_datasource(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: BitFlags&lt;PreviewFeature&gt;, <span class="kw">_</span>: <span class="kw-2">&amp;</span>Datasource, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Diagnostics) {}
 
-    <span class="kw">fn</span> <span class="ident">validate_scalar_field_unknown_default_functions</span>(
+    <span class="kw">fn </span>validate_scalar_field_unknown_default_functions(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">parser_database::ParserDatabase</span>,
-        <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
+        db: <span class="kw-2">&amp;</span>parser_database::ParserDatabase,
+        diagnostics: <span class="kw-2">&amp;mut </span>Diagnostics,
     ) {
-        <span class="kw">for</span> <span class="ident">d</span> <span class="kw">in</span> <span class="ident">db</span>.<span class="ident">walk_scalar_field_defaults_with_unknown_function</span>() {
-            <span class="kw">let</span> (<span class="ident">func_name</span>, <span class="kw">_</span>, <span class="ident">span</span>) <span class="op">=</span> <span class="ident">d</span>.<span class="ident">value</span>().<span class="ident">as_function</span>().<span class="ident">unwrap</span>();
-            <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_default_unknown_function</span>(<span class="ident">func_name</span>, <span class="ident">span</span>));
+        <span class="kw">for </span>d <span class="kw">in </span>db.walk_scalar_field_defaults_with_unknown_function() {
+            <span class="kw">let </span>(func_name, <span class="kw">_</span>, span) = d.value().as_function().unwrap();
+            diagnostics.push_error(DatamodelError::new_default_unknown_function(func_name, span));
         }
     }
 
-    <span class="doccomment">/// The scopes in which a constraint name should be validated. If empty, doesn&#39;t check for name</span>
-    <span class="doccomment">/// clashes in the validation phase.</span>
-    <span class="kw">fn</span> <span class="ident">constraint_violation_scopes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">ConstraintScope</span>] {
+    <span class="doccomment">/// The scopes in which a constraint name should be validated. If empty, doesn&#39;t check for name
+    /// clashes in the validation phase.
+    </span><span class="kw">fn </span>constraint_violation_scopes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[ConstraintScope] {
         <span class="kw-2">&amp;</span>[]
     }
 
-    <span class="doccomment">/// Returns all available native type constructors available through this connector.</span>
-    <span class="doccomment">/// Powers the auto completion of the VSCode plugin.</span>
-    <span class="kw">fn</span> <span class="ident">available_native_type_constructors</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">NativeTypeConstructor</span>];
+    <span class="doccomment">/// Returns all available native type constructors available through this connector.
+    /// Powers the auto completion of the VSCode plugin.
+    </span><span class="kw">fn </span>available_native_type_constructors(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[NativeTypeConstructor];
 
-    <span class="doccomment">/// Returns the default scalar type for the given native type</span>
-    <span class="kw">fn</span> <span class="ident">scalar_type_for_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">native_type</span>: <span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span>) -&gt; <span class="ident">ScalarType</span>;
+    <span class="doccomment">/// Returns the default scalar type for the given native type
+    </span><span class="kw">fn </span>scalar_type_for_native_type(<span class="kw-2">&amp;</span><span class="self">self</span>, native_type: <span class="kw-2">&amp;</span>NativeTypeInstance) -&gt; ScalarType;
 
-    <span class="doccomment">/// On each connector, each built-in Prisma scalar type (`Boolean`,</span>
-    <span class="doccomment">/// `String`, `Float`, etc.) has a corresponding native type.</span>
-    <span class="kw">fn</span> <span class="ident">default_native_type_for_scalar_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">scalar_type</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarType</span>) -&gt; <span class="ident">NativeTypeInstance</span>;
+    <span class="doccomment">/// On each connector, each built-in Prisma scalar type (`Boolean`,
+    /// `String`, `Float`, etc.) has a corresponding native type.
+    </span><span class="kw">fn </span>default_native_type_for_scalar_type(<span class="kw-2">&amp;</span><span class="self">self</span>, scalar_type: <span class="kw-2">&amp;</span>ScalarType) -&gt; NativeTypeInstance;
 
-    <span class="doccomment">/// Same mapping as `default_native_type_for_scalar_type()`, but in the opposite direction.</span>
-    <span class="kw">fn</span> <span class="ident">native_type_is_default_for_scalar_type</span>(
+    <span class="doccomment">/// Same mapping as `default_native_type_for_scalar_type()`, but in the opposite direction.
+    </span><span class="kw">fn </span>native_type_is_default_for_scalar_type(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">native_type</span>: <span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span>,
-        <span class="ident">scalar_type</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarType</span>,
-    ) -&gt; <span class="ident">bool</span>;
+        native_type: <span class="kw-2">&amp;</span>NativeTypeInstance,
+        scalar_type: <span class="kw-2">&amp;</span>ScalarType,
+    ) -&gt; bool;
 
-    <span class="doccomment">/// Debug/error representation of a native type.</span>
-    <span class="kw">fn</span> <span class="ident">native_type_to_parts</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">native_type</span>: <span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span>) -&gt; (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>);
+    <span class="doccomment">/// Debug/error representation of a native type.
+    </span><span class="kw">fn </span>native_type_to_parts(<span class="kw-2">&amp;</span><span class="self">self</span>, native_type: <span class="kw-2">&amp;</span>NativeTypeInstance) -&gt; (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, Vec&lt;String&gt;);
 
-    <span class="kw">fn</span> <span class="ident">find_native_type_constructor</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">NativeTypeConstructor</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">available_native_type_constructors</span>()
-            .<span class="ident">iter</span>()
-            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">constructor</span><span class="op">|</span> <span class="ident">constructor</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">name</span>)
+    <span class="kw">fn </span>find_native_type_constructor(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>NativeTypeConstructor&gt; {
+        <span class="self">self</span>.available_native_type_constructors()
+            .iter()
+            .find(|constructor| constructor.name == name)
     }
 
-    <span class="doccomment">/// This function is used during Schema parsing to calculate the concrete native type.</span>
-    <span class="kw">fn</span> <span class="ident">parse_native_type</span>(
+    <span class="doccomment">/// This function is used during Schema parsing to calculate the concrete native type.
+    </span><span class="kw">fn </span>parse_native_type(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">args</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>],
-        <span class="ident">span</span>: <span class="ident">Span</span>,
-        <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span>;
+        name: <span class="kw-2">&amp;</span>str,
+        args: <span class="kw-2">&amp;</span>[String],
+        span: Span,
+        diagnostics: <span class="kw-2">&amp;mut </span>Diagnostics,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;NativeTypeInstance&gt;;
 
-    <span class="kw">fn</span> <span class="ident">set_config_dir</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">config_dir</span>: <span class="kw-2">&amp;</span><span class="ident">std::path::Path</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">set_root</span> <span class="op">=</span> <span class="op">|</span><span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">std::path::Path::new</span>(<span class="ident">path</span>);
+    <span class="kw">fn </span>set_config_dir&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, config_dir: <span class="kw-2">&amp;</span>std::path::Path, url: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; Cow&lt;<span class="lifetime">&#39;a</span>, str&gt; {
+        <span class="kw">let </span>set_root = |path: <span class="kw-2">&amp;</span>str| {
+            <span class="kw">let </span>path = std::path::Path::new(path);
 
-            <span class="kw">if</span> <span class="ident">path</span>.<span class="ident">is_relative</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">config_dir</span>.<span class="ident">join</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>).<span class="ident">to_str</span>().<span class="ident">map</span>(<span class="ident">ToString::to_string</span>).<span class="ident">unwrap</span>())
-            } <span class="kw">else</span> {
-                <span class="prelude-val">None</span>
-            }
+            <span class="kw">if </span>path.is_relative() {
+                <span class="prelude-val">Some</span>(config_dir.join(path).to_str().map(ToString::to_string).unwrap())
+            } <span class="kw">else </span>{
+                <span class="prelude-val">None
+            </span>}
         };
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">url</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">url::Url::parse</span>(<span class="ident">url</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">url</span>) =&gt; <span class="ident">url</span>,
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="ident">Cow::from</span>(<span class="ident">url</span>), <span class="comment">// bail</span>
-        };
+        <span class="kw">let </span><span class="kw-2">mut </span>url = <span class="kw">match </span>url::Url::parse(url) {
+            <span class="prelude-val">Ok</span>(url) =&gt; url,
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return </span>Cow::from(url), <span class="comment">// bail
+        </span>};
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">params</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">url</span>.<span class="ident">query_pairs</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> (<span class="ident">k</span>.<span class="ident">to_string</span>(), <span class="ident">v</span>.<span class="ident">to_string</span>())).<span class="ident">collect</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>params: BTreeMap&lt;String, String&gt; =
+            url.query_pairs().map(|(k, v)| (k.to_string(), v.to_string())).collect();
 
-        <span class="ident">url</span>.<span class="ident">query_pairs_mut</span>().<span class="ident">clear</span>();
+        url.query_pairs_mut().clear();
 
-        <span class="comment">// Only for PostgreSQL + MySQL</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">path</span>) <span class="op">=</span> <span class="ident">params</span>.<span class="ident">get</span>(<span class="string">&quot;sslcert&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">as_str</span>()).<span class="ident">and_then</span>(<span class="ident">set_root</span>) {
-            <span class="ident">params</span>.<span class="ident">insert</span>(<span class="string">&quot;sslcert&quot;</span>.<span class="ident">into</span>(), <span class="ident">path</span>);
+        <span class="comment">// Only for PostgreSQL + MySQL
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(path) = params.get(<span class="string">&quot;sslcert&quot;</span>).map(|s| s.as_str()).and_then(set_root) {
+            params.insert(<span class="string">&quot;sslcert&quot;</span>.into(), path);
         }
 
-        <span class="comment">// Only for PostgreSQL + MySQL</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">path</span>) <span class="op">=</span> <span class="ident">params</span>.<span class="ident">get</span>(<span class="string">&quot;sslidentity&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">as_str</span>()).<span class="ident">and_then</span>(<span class="ident">set_root</span>) {
-            <span class="ident">params</span>.<span class="ident">insert</span>(<span class="string">&quot;sslidentity&quot;</span>.<span class="ident">into</span>(), <span class="ident">path</span>);
+        <span class="comment">// Only for PostgreSQL + MySQL
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(path) = params.get(<span class="string">&quot;sslidentity&quot;</span>).map(|s| s.as_str()).and_then(set_root) {
+            params.insert(<span class="string">&quot;sslidentity&quot;</span>.into(), path);
         }
 
-        <span class="comment">// Only for MongoDB</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">path</span>) <span class="op">=</span> <span class="ident">params</span>.<span class="ident">get</span>(<span class="string">&quot;tlsCAFile&quot;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">as_str</span>()).<span class="ident">and_then</span>(<span class="ident">set_root</span>) {
-            <span class="ident">params</span>.<span class="ident">insert</span>(<span class="string">&quot;tlsCAFile&quot;</span>.<span class="ident">into</span>(), <span class="ident">path</span>);
+        <span class="comment">// Only for MongoDB
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(path) = params.get(<span class="string">&quot;tlsCAFile&quot;</span>).map(|s| s.as_str()).and_then(set_root) {
+            params.insert(<span class="string">&quot;tlsCAFile&quot;</span>.into(), path);
         }
 
-        <span class="kw">for</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="kw">in</span> <span class="ident">params</span>.<span class="ident">into_iter</span>() {
-            <span class="ident">url</span>.<span class="ident">query_pairs_mut</span>().<span class="ident">append_pair</span>(<span class="kw-2">&amp;</span><span class="ident">k</span>, <span class="kw-2">&amp;</span><span class="ident">v</span>);
+        <span class="kw">for </span>(k, v) <span class="kw">in </span>params.into_iter() {
+            url.query_pairs_mut().append_pair(<span class="kw-2">&amp;</span>k, <span class="kw-2">&amp;</span>v);
         }
 
-        <span class="ident">url</span>.<span class="ident">to_string</span>().<span class="ident">into</span>()
+        url.to_string().into()
     }
 
-    <span class="kw">fn</span> <span class="ident">supports_scalar_lists</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::ScalarLists</span>)
+    <span class="kw">fn </span>supports_scalar_lists(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.has_capability(ConnectorCapability::ScalarLists)
     }
 
-    <span class="kw">fn</span> <span class="ident">supports_enums</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::Enums</span>)
+    <span class="kw">fn </span>supports_enums(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.has_capability(ConnectorCapability::Enums)
     }
 
-    <span class="kw">fn</span> <span class="ident">supports_json</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::Json</span>)
+    <span class="kw">fn </span>supports_json(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.has_capability(ConnectorCapability::Json)
     }
 
-    <span class="kw">fn</span> <span class="ident">supports_json_lists</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::JsonLists</span>)
+    <span class="kw">fn </span>supports_json_lists(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.has_capability(ConnectorCapability::JsonLists)
     }
 
-    <span class="kw">fn</span> <span class="ident">supports_auto_increment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::AutoIncrement</span>)
+    <span class="kw">fn </span>supports_auto_increment(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.has_capability(ConnectorCapability::AutoIncrement)
     }
 
-    <span class="kw">fn</span> <span class="ident">supports_non_id_auto_increment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::AutoIncrementAllowedOnNonId</span>)
+    <span class="kw">fn </span>supports_non_id_auto_increment(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.has_capability(ConnectorCapability::AutoIncrementAllowedOnNonId)
     }
 
-    <span class="kw">fn</span> <span class="ident">supports_multiple_auto_increment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::AutoIncrementMultipleAllowed</span>)
+    <span class="kw">fn </span>supports_multiple_auto_increment(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.has_capability(ConnectorCapability::AutoIncrementMultipleAllowed)
     }
 
-    <span class="kw">fn</span> <span class="ident">supports_non_indexed_auto_increment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::AutoIncrementNonIndexedAllowed</span>)
+    <span class="kw">fn </span>supports_non_indexed_auto_increment(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.has_capability(ConnectorCapability::AutoIncrementNonIndexedAllowed)
     }
 
-    <span class="kw">fn</span> <span class="ident">supports_compound_ids</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::CompoundIds</span>)
+    <span class="kw">fn </span>supports_compound_ids(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.has_capability(ConnectorCapability::CompoundIds)
     }
 
-    <span class="kw">fn</span> <span class="ident">supports_decimal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::DecimalType</span>)
+    <span class="kw">fn </span>supports_decimal(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.has_capability(ConnectorCapability::DecimalType)
     }
 
-    <span class="kw">fn</span> <span class="ident">supported_index_types</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">IndexAlgorithm</span><span class="op">&gt;</span> {
-        <span class="ident">IndexAlgorithm::BTree</span>.<span class="ident">into</span>()
+    <span class="kw">fn </span>supported_index_types(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BitFlags&lt;IndexAlgorithm&gt; {
+        IndexAlgorithm::BTree.into()
     }
 
-    <span class="kw">fn</span> <span class="ident">supports_index_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">algo</span>: <span class="ident">IndexAlgorithm</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">supported_index_types</span>().<span class="ident">contains</span>(<span class="ident">algo</span>)
+    <span class="kw">fn </span>supports_index_type(<span class="kw-2">&amp;</span><span class="self">self</span>, algo: IndexAlgorithm) -&gt; bool {
+        <span class="self">self</span>.supported_index_types().contains(algo)
     }
 
-    <span class="kw">fn</span> <span class="ident">allows_relation_fields_in_arbitrary_order</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::RelationFieldsInArbitraryOrder</span>)
+    <span class="kw">fn </span>allows_relation_fields_in_arbitrary_order(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.has_capability(ConnectorCapability::RelationFieldsInArbitraryOrder)
     }
 
-    <span class="kw">fn</span> <span class="ident">native_type_to_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">instance</span>: <span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> (<span class="ident">name</span>, <span class="ident">args</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">native_type_to_parts</span>(<span class="ident">instance</span>);
-        <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">args</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">String::new</span>()
-        } <span class="kw">else</span> {
-            <span class="macro">format!</span>(<span class="string">&quot;({})&quot;</span>, <span class="ident">args</span>.<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>))
+    <span class="kw">fn </span>native_type_to_string(<span class="kw-2">&amp;</span><span class="self">self</span>, instance: <span class="kw-2">&amp;</span>NativeTypeInstance) -&gt; String {
+        <span class="kw">let </span>(name, args) = <span class="self">self</span>.native_type_to_parts(instance);
+        <span class="kw">let </span>args = <span class="kw">if </span>args.is_empty() {
+            String::new()
+        } <span class="kw">else </span>{
+            <span class="macro">format!</span>(<span class="string">&quot;({})&quot;</span>, args.join(<span class="string">&quot;,&quot;</span>))
         };
         <span class="macro">format!</span>(<span class="string">&quot;{name}{args}&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">native_instance_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">instance</span>: <span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span>) -&gt; <span class="ident">NativeTypeErrorFactory</span> {
-        <span class="ident">NativeTypeErrorFactory::new</span>(<span class="self">self</span>.<span class="ident">native_type_to_string</span>(<span class="ident">instance</span>), <span class="self">self</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>())
+    <span class="kw">fn </span>native_instance_error(<span class="kw-2">&amp;</span><span class="self">self</span>, instance: <span class="kw-2">&amp;</span>NativeTypeInstance) -&gt; NativeTypeErrorFactory {
+        NativeTypeErrorFactory::new(<span class="self">self</span>.native_type_to_string(instance), <span class="self">self</span>.name().to_owned())
     }
 
-    <span class="kw">fn</span> <span class="ident">validate_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>validate_url(<span class="kw-2">&amp;</span><span class="self">self</span>, url: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt;;
 
-    <span class="kw">fn</span> <span class="ident">push_completions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_db</span>: <span class="kw-2">&amp;</span><span class="ident">ParserDatabase</span>, <span class="ident">_position</span>: <span class="ident">SchemaPosition</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">_completions</span>: <span class="kw-2">&amp;mut</span> <span class="ident">CompletionList</span>) {
+    <span class="kw">fn </span>push_completions(<span class="kw-2">&amp;</span><span class="self">self</span>, _db: <span class="kw-2">&amp;</span>ParserDatabase, _position: SchemaPosition&lt;<span class="lifetime">&#39;_</span>&gt;, _completions: <span class="kw-2">&amp;mut </span>CompletionList) {
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_datasource_properties</span>(
+    <span class="kw">fn </span>parse_datasource_properties(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">_args</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Span</span>, <span class="kw-2">&amp;</span><span class="ident">ast::Expression</span>)<span class="op">&gt;</span>,
-        <span class="ident">_diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
-    ) -&gt; <span class="ident">DatasourceConnectorData</span> {
-        <span class="ident">Default::default</span>()
+        _args: <span class="kw-2">&amp;mut </span>HashMap&lt;<span class="kw-2">&amp;</span>str, (Span, <span class="kw-2">&amp;</span>ast::Expression)&gt;,
+        _diagnostics: <span class="kw-2">&amp;mut </span>Diagnostics,
+    ) -&gt; DatasourceConnectorData {
+        Default::default()
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Ord</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ConstraintType</span> {
-    <span class="ident">PrimaryKey</span>,
-    <span class="ident">ForeignKey</span>,
-    <span class="ident">KeyOrIdx</span>,
-    <span class="ident">Default</span>,
+<span class="attribute">#[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd)]
+</span><span class="kw">pub enum </span>ConstraintType {
+    PrimaryKey,
+    ForeignKey,
+    KeyOrIdx,
+    Default,
 }
 
-<span class="doccomment">/// A scope where a constraint name must be unique.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Ord</span>, <span class="ident">PartialOrd</span>, <span class="ident">Hash</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ConstraintScope</span> {
-    <span class="doccomment">/// Globally indices and unique constraints</span>
-    <span class="ident">GlobalKeyIndex</span>,
-    <span class="doccomment">/// Globally foreign keys</span>
-    <span class="ident">GlobalForeignKey</span>,
-    <span class="doccomment">/// Globally primary keys, indices and unique constraints</span>
-    <span class="ident">GlobalPrimaryKeyKeyIndex</span>,
-    <span class="doccomment">/// Globally primary keys, foreign keys and default constraints</span>
-    <span class="ident">GlobalPrimaryKeyForeignKeyDefault</span>,
-    <span class="doccomment">/// Per model indices and unique constraints</span>
-    <span class="ident">ModelKeyIndex</span>,
-    <span class="doccomment">/// Per model primary keys, indices and unique constraints</span>
-    <span class="ident">ModelPrimaryKeyKeyIndex</span>,
-    <span class="doccomment">/// Per model primary keys, foreign keys, indices and unique constraints</span>
-    <span class="ident">ModelPrimaryKeyKeyIndexForeignKey</span>,
+<span class="doccomment">/// A scope where a constraint name must be unique.
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, Ord, PartialOrd, Hash, Clone, Copy)]
+</span><span class="kw">pub enum </span>ConstraintScope {
+    <span class="doccomment">/// Globally indices and unique constraints
+    </span>GlobalKeyIndex,
+    <span class="doccomment">/// Globally foreign keys
+    </span>GlobalForeignKey,
+    <span class="doccomment">/// Globally primary keys, indices and unique constraints
+    </span>GlobalPrimaryKeyKeyIndex,
+    <span class="doccomment">/// Globally primary keys, foreign keys and default constraints
+    </span>GlobalPrimaryKeyForeignKeyDefault,
+    <span class="doccomment">/// Per model indices and unique constraints
+    </span>ModelKeyIndex,
+    <span class="doccomment">/// Per model primary keys, indices and unique constraints
+    </span>ModelPrimaryKeyKeyIndex,
+    <span class="doccomment">/// Per model primary keys, foreign keys, indices and unique constraints
+    </span>ModelPrimaryKeyKeyIndexForeignKey,
 }
 
-<span class="kw">impl</span> <span class="ident">ConstraintScope</span> {
-    <span class="doccomment">/// A beefed-up display for errors.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">description</span>(<span class="self">self</span>, <span class="ident">model_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ConstraintScope::GlobalKeyIndex</span> =&gt; <span class="ident">Cow::from</span>(<span class="string">&quot;global for indexes and unique constraints&quot;</span>),
-            <span class="ident">ConstraintScope::GlobalForeignKey</span> =&gt; <span class="ident">Cow::from</span>(<span class="string">&quot;global for foreign keys&quot;</span>),
-            <span class="ident">ConstraintScope::GlobalPrimaryKeyKeyIndex</span> =&gt; {
-                <span class="ident">Cow::from</span>(<span class="string">&quot;global for primary key, indexes and unique constraints&quot;</span>)
+<span class="kw">impl </span>ConstraintScope {
+    <span class="doccomment">/// A beefed-up display for errors.
+    </span><span class="kw">pub fn </span>description(<span class="self">self</span>, model_name: <span class="kw-2">&amp;</span>str) -&gt; Cow&lt;<span class="lifetime">&#39;static</span>, str&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            ConstraintScope::GlobalKeyIndex =&gt; Cow::from(<span class="string">&quot;global for indexes and unique constraints&quot;</span>),
+            ConstraintScope::GlobalForeignKey =&gt; Cow::from(<span class="string">&quot;global for foreign keys&quot;</span>),
+            ConstraintScope::GlobalPrimaryKeyKeyIndex =&gt; {
+                Cow::from(<span class="string">&quot;global for primary key, indexes and unique constraints&quot;</span>)
             }
-            <span class="ident">ConstraintScope::GlobalPrimaryKeyForeignKeyDefault</span> =&gt; {
-                <span class="ident">Cow::from</span>(<span class="string">&quot;global for primary keys, foreign keys and default constraints&quot;</span>)
+            ConstraintScope::GlobalPrimaryKeyForeignKeyDefault =&gt; {
+                Cow::from(<span class="string">&quot;global for primary keys, foreign keys and default constraints&quot;</span>)
             }
-            <span class="ident">ConstraintScope::ModelKeyIndex</span> =&gt; {
-                <span class="ident">Cow::from</span>(<span class="macro">format!</span>(<span class="string">&quot;on model `{}` for indexes and unique constraints&quot;</span>, <span class="ident">model_name</span>))
+            ConstraintScope::ModelKeyIndex =&gt; {
+                Cow::from(<span class="macro">format!</span>(<span class="string">&quot;on model `{}` for indexes and unique constraints&quot;</span>, model_name))
             }
-            <span class="ident">ConstraintScope::ModelPrimaryKeyKeyIndex</span> =&gt; <span class="ident">Cow::from</span>(<span class="macro">format!</span>(
+            ConstraintScope::ModelPrimaryKeyKeyIndex =&gt; Cow::from(<span class="macro">format!</span>(
                 <span class="string">&quot;on model `{}` for primary key, indexes and unique constraints&quot;</span>,
-                <span class="ident">model_name</span>
+                model_name
             )),
-            <span class="ident">ConstraintScope::ModelPrimaryKeyKeyIndexForeignKey</span> =&gt; <span class="ident">Cow::from</span>(<span class="macro">format!</span>(
+            ConstraintScope::ModelPrimaryKeyKeyIndexForeignKey =&gt; Cow::from(<span class="macro">format!</span>(
                 <span class="string">&quot;on model `{}` for primary key, indexes, unique constraints and foreign keys&quot;</span>,
-                <span class="ident">model_name</span>
+                model_name
             )),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="psl_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="psl_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

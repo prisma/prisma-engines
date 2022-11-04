@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-resolver-0.21.2/src/resolver.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>resolver.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../trust_dns_resolver/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../trust_dns_resolver/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../trust_dns_resolver/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-resolver-0.21.2/src/resolver.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>resolver.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../trust_dns_resolver/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../trust_dns_resolver/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../trust_dns_resolver/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -221,198 +221,198 @@
 <span id="221">221</span>
 <span id="222">222</span>
 <span id="223">223</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2017 Benjamin Fry &lt;benjaminfry@me.com&gt;</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2017 Benjamin Fry &lt;benjaminfry@me.com&gt;
+//
+// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="doccomment">//! Structs for creating and using a Resolver</span>
-<span class="kw">use</span> <span class="ident">std::io</span>;
-<span class="kw">use</span> <span class="ident">std::net::IpAddr</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Mutex</span>;
+</span><span class="doccomment">//! Structs for creating and using a Resolver
+</span><span class="kw">use </span>std::io;
+<span class="kw">use </span>std::net::IpAddr;
+<span class="kw">use </span>std::sync::Mutex;
 
-<span class="kw">use</span> <span class="ident">proto::rr::domain::TryParseIp</span>;
-<span class="kw">use</span> <span class="ident">proto::rr::IntoName</span>;
-<span class="kw">use</span> <span class="ident">proto::rr::RecordType</span>;
-<span class="kw">use</span> <span class="ident">tokio::runtime</span>::{<span class="self">self</span>, <span class="ident">Runtime</span>};
-<span class="kw">use</span> <span class="ident">trust_dns_proto::xfer::DnsRequestOptions</span>;
+<span class="kw">use </span>proto::rr::domain::TryParseIp;
+<span class="kw">use </span>proto::rr::IntoName;
+<span class="kw">use </span>proto::rr::RecordType;
+<span class="kw">use </span>tokio::runtime::{<span class="self">self</span>, Runtime};
+<span class="kw">use </span>trust_dns_proto::xfer::DnsRequestOptions;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config</span>::{<span class="ident">ResolverConfig</span>, <span class="ident">ResolverOpts</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::lookup</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::lookup::Lookup</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::lookup_ip::LookupIp</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::name_server</span>::{<span class="ident">TokioConnection</span>, <span class="ident">TokioConnectionProvider</span>, <span class="ident">TokioHandle</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::AsyncResolver</span>;
+<span class="kw">use </span><span class="kw">crate</span>::config::{ResolverConfig, ResolverOpts};
+<span class="kw">use </span><span class="kw">crate</span>::error::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::lookup;
+<span class="kw">use </span><span class="kw">crate</span>::lookup::Lookup;
+<span class="kw">use </span><span class="kw">crate</span>::lookup_ip::LookupIp;
+<span class="kw">use </span><span class="kw">crate</span>::name_server::{TokioConnection, TokioConnectionProvider, TokioHandle};
+<span class="kw">use </span><span class="kw">crate</span>::AsyncResolver;
 
-<span class="doccomment">/// The Resolver is used for performing DNS queries.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For forward (A) lookups, hostname -&gt; IP address, see: `Resolver::lookup_ip`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Special note about resource consumption. The Resolver and all Trust-DNS software is built around the Tokio async-io library. This synchronous Resolver is intended to be a simpler wrapper for of the [`AsyncResolver`]. To allow the `Resolver` to be [`Send`] + [`Sync`], the construction of the `AsyncResolver` is lazy, this means some of the features of the `AsyncResolver`, like performance based resolution via the most efficient `NameServer` will be lost (the lookup cache is shared across invocations of the `Resolver`). If these other features of the Trust-DNS Resolver are desired, please use the tokio based [`AsyncResolver`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// *Note: Threaded/Sync usage*: In multithreaded scenarios, the internal Tokio Runtime will block on an internal Mutex for the tokio Runtime in use. For higher performance, it&#39;s recommended to use the [`AsyncResolver`].</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Resolver</span> {
-    <span class="comment">// TODO: Mutex allows this to be Sync, another option would be to instantiate a thread_local, but that has other</span>
-    <span class="comment">//   drawbacks. One major issues, is if this Resolver is shared across threads, it will cause all to block on any</span>
-    <span class="comment">//   query. A TLS on the other hand would not, at the cost of only allowing a Resolver to be configured once per Thread</span>
-    <span class="ident">runtime</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Runtime</span><span class="op">&gt;</span>,
-    <span class="ident">async_resolver</span>: <span class="ident">AsyncResolver</span><span class="op">&lt;</span><span class="ident">TokioConnection</span>, <span class="ident">TokioConnectionProvider</span><span class="op">&gt;</span>,
+<span class="doccomment">/// The Resolver is used for performing DNS queries.
+///
+/// For forward (A) lookups, hostname -&gt; IP address, see: `Resolver::lookup_ip`
+///
+/// Special note about resource consumption. The Resolver and all Trust-DNS software is built around the Tokio async-io library. This synchronous Resolver is intended to be a simpler wrapper for of the [`AsyncResolver`]. To allow the `Resolver` to be [`Send`] + [`Sync`], the construction of the `AsyncResolver` is lazy, this means some of the features of the `AsyncResolver`, like performance based resolution via the most efficient `NameServer` will be lost (the lookup cache is shared across invocations of the `Resolver`). If these other features of the Trust-DNS Resolver are desired, please use the tokio based [`AsyncResolver`].
+///
+/// *Note: Threaded/Sync usage*: In multithreaded scenarios, the internal Tokio Runtime will block on an internal Mutex for the tokio Runtime in use. For higher performance, it&#39;s recommended to use the [`AsyncResolver`].
+</span><span class="kw">pub struct </span>Resolver {
+    <span class="comment">// TODO: Mutex allows this to be Sync, another option would be to instantiate a thread_local, but that has other
+    //   drawbacks. One major issues, is if this Resolver is shared across threads, it will cause all to block on any
+    //   query. A TLS on the other hand would not, at the cost of only allowing a Resolver to be configured once per Thread
+    </span>runtime: Mutex&lt;Runtime&gt;,
+    async_resolver: AsyncResolver&lt;TokioConnection, TokioConnectionProvider&gt;,
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">lookup_fn</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span>:<span class="ident">ty</span>) =&gt; {
-        <span class="doccomment">/// Performs a lookup for the associated type.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// *hint* queries that end with a &#39;.&#39; are fully qualified names and are cheaper lookups</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// # Arguments</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// * `query` - a `&amp;str` which parses to a domain name, failure to parse will return an error</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">IntoName</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">query</span>: <span class="ident">N</span>) -&gt; <span class="ident">ResolveResult</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">lookup</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">async_resolver</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span>(<span class="ident">query</span>);
-            <span class="self">self</span>.<span class="ident">runtime</span>.<span class="ident">lock</span>()<span class="question-mark">?</span>.<span class="ident">block_on</span>(<span class="ident">lookup</span>)
+<span class="macro">macro_rules! </span>lookup_fn {
+    (<span class="macro-nonterminal">$p</span>:ident, <span class="macro-nonterminal">$l</span>:ty) =&gt; {
+        <span class="doccomment">/// Performs a lookup for the associated type.
+        ///
+        /// *hint* queries that end with a &#39;.&#39; are fully qualified names and are cheaper lookups
+        ///
+        /// # Arguments
+        ///
+        /// * `query` - a `&amp;str` which parses to a domain name, failure to parse will return an error
+        </span><span class="kw">pub fn </span><span class="macro-nonterminal">$p</span>&lt;N: IntoName&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, query: N) -&gt; ResolveResult&lt;<span class="macro-nonterminal">$l</span>&gt; {
+            <span class="kw">let </span>lookup = <span class="self">self</span>.async_resolver.<span class="macro-nonterminal">$p</span>(query);
+            <span class="self">self</span>.runtime.lock()<span class="question-mark">?</span>.block_on(lookup)
         }
     };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>) =&gt; {
-        <span class="doccomment">/// Performs a lookup for the associated type.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// # Arguments</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// * `query` - a type which can be converted to `Name` via `From`.</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">query</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>) -&gt; <span class="ident">ResolveResult</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">lookup</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">async_resolver</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">p</span>(<span class="ident">query</span>);
-            <span class="self">self</span>.<span class="ident">runtime</span>.<span class="ident">lock</span>()<span class="question-mark">?</span>.<span class="ident">block_on</span>(<span class="ident">lookup</span>)
+    (<span class="macro-nonterminal">$p</span>:ident, <span class="macro-nonterminal">$l</span>:ty, <span class="macro-nonterminal">$t</span>:ty) =&gt; {
+        <span class="doccomment">/// Performs a lookup for the associated type.
+        ///
+        /// # Arguments
+        ///
+        /// * `query` - a type which can be converted to `Name` via `From`.
+        </span><span class="kw">pub fn </span><span class="macro-nonterminal">$p</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, query: <span class="macro-nonterminal">$t</span>) -&gt; ResolveResult&lt;<span class="macro-nonterminal">$l</span>&gt; {
+            <span class="kw">let </span>lookup = <span class="self">self</span>.async_resolver.<span class="macro-nonterminal">$p</span>(query);
+            <span class="self">self</span>.runtime.lock()<span class="question-mark">?</span>.block_on(lookup)
         }
     };
 }
 
-<span class="kw">impl</span> <span class="ident">Resolver</span> {
-    <span class="doccomment">/// Constructs a new Resolver with the specified configuration.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `config` - configuration for the resolver</span>
-    <span class="doccomment">/// * `options` - resolver options for performing lookups</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Returns</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A new `Resolver` or an error if there was an error with the configuration.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">config</span>: <span class="ident">ResolverConfig</span>, <span class="ident">options</span>: <span class="ident">ResolverOpts</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">runtime::Builder::new_current_thread</span>();
-        <span class="ident">builder</span>.<span class="ident">enable_all</span>();
+<span class="kw">impl </span>Resolver {
+    <span class="doccomment">/// Constructs a new Resolver with the specified configuration.
+    ///
+    /// # Arguments
+    /// * `config` - configuration for the resolver
+    /// * `options` - resolver options for performing lookups
+    ///
+    /// # Returns
+    ///
+    /// A new `Resolver` or an error if there was an error with the configuration.
+    </span><span class="kw">pub fn </span>new(config: ResolverConfig, options: ResolverOpts) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>builder = runtime::Builder::new_current_thread();
+        builder.enable_all();
 
-        <span class="kw">let</span> <span class="ident">runtime</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">build</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">async_resolver</span> <span class="op">=</span>
-            <span class="ident">AsyncResolver::new</span>(<span class="ident">config</span>, <span class="ident">options</span>, <span class="ident">TokioHandle</span>).<span class="ident">expect</span>(<span class="string">&quot;failed to create resolver&quot;</span>);
+        <span class="kw">let </span>runtime = builder.build()<span class="question-mark">?</span>;
+        <span class="kw">let </span>async_resolver =
+            AsyncResolver::new(config, options, TokioHandle).expect(<span class="string">&quot;failed to create resolver&quot;</span>);
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">runtime</span>: <span class="ident">Mutex::new</span>(<span class="ident">runtime</span>),
-            <span class="ident">async_resolver</span>,
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            runtime: Mutex::new(runtime),
+            async_resolver,
         })
     }
 
-    <span class="doccomment">/// Constructs a new Resolver with default config and default options.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See [`ResolverConfig::default`] and [`ResolverOpts::default`] for more information.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Returns</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A new `Resolver` or an error if there was an error with the configuration.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">ResolverConfig::default</span>(), <span class="ident">ResolverOpts::default</span>())
+    <span class="doccomment">/// Constructs a new Resolver with default config and default options.
+    ///
+    /// See [`ResolverConfig::default`] and [`ResolverOpts::default`] for more information.
+    ///
+    /// # Returns
+    ///
+    /// A new `Resolver` or an error if there was an error with the configuration.
+    </span><span class="kw">pub fn </span>default() -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="self">Self</span>::new(ResolverConfig::default(), ResolverOpts::default())
     }
 
-    <span class="doccomment">/// Constructs a new Resolver with the system configuration.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will use `/etc/resolv.conf` on Unix OSes and the registry on Windows.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">unix</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>))]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;system-config&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(
-        <span class="ident">docsrs</span>,
-        <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;system-config&quot;</span>, <span class="ident">any</span>(<span class="ident">unix</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>))))
-    )]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_system_conf</span>() -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">config</span>, <span class="ident">options</span>) <span class="op">=</span> <span class="ident"><span class="kw">super</span>::system_conf::read_system_conf</span>()<span class="question-mark">?</span>;
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">config</span>, <span class="ident">options</span>)
+    <span class="doccomment">/// Constructs a new Resolver with the system configuration.
+    ///
+    /// This will use `/etc/resolv.conf` on Unix OSes and the registry on Windows.
+    </span><span class="attribute">#[cfg(any(unix, target_os = <span class="string">&quot;windows&quot;</span>))]
+    #[cfg(feature = <span class="string">&quot;system-config&quot;</span>)]
+    #[cfg_attr(
+        docsrs,
+        doc(cfg(all(feature = <span class="string">&quot;system-config&quot;</span>, any(unix, target_os = <span class="string">&quot;windows&quot;</span>))))
+    )]
+    </span><span class="kw">pub fn </span>from_system_conf() -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>(config, options) = <span class="kw">super</span>::system_conf::read_system_conf()<span class="question-mark">?</span>;
+        <span class="self">Self</span>::new(config, options)
     }
 
-    <span class="doccomment">/// Flushes/Removes all entries from the cache</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear_cache</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">ResolveResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">clearing</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">async_resolver</span>.<span class="ident">clear_cache</span>();
-        <span class="self">self</span>.<span class="ident">runtime</span>.<span class="ident">lock</span>()<span class="question-mark">?</span>.<span class="ident">block_on</span>(<span class="ident">clearing</span>);
+    <span class="doccomment">/// Flushes/Removes all entries from the cache
+    </span><span class="kw">pub fn </span>clear_cache(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; ResolveResult&lt;()&gt; {
+        <span class="kw">let </span>clearing = <span class="self">self</span>.async_resolver.clear_cache();
+        <span class="self">self</span>.runtime.lock()<span class="question-mark">?</span>.block_on(clearing);
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Generic lookup for any RecordType</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// *WARNING* This interface may change in the future, please use [`Self::lookup_ip`] or another variant for more stable interfaces.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `name` - name of the record to lookup, if name is not a valid domain name, an error will be returned</span>
-    <span class="doccomment">/// * `record_type` - type of record to lookup</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lookup</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">IntoName</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="ident">N</span>, <span class="ident">record_type</span>: <span class="ident">RecordType</span>) -&gt; <span class="ident">ResolveResult</span><span class="op">&lt;</span><span class="ident">Lookup</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">lookup</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">async_resolver</span>
-            .<span class="ident">lookup</span>(<span class="ident">name</span>, <span class="ident">record_type</span>, <span class="ident">DnsRequestOptions::default</span>());
-        <span class="self">self</span>.<span class="ident">runtime</span>.<span class="ident">lock</span>()<span class="question-mark">?</span>.<span class="ident">block_on</span>(<span class="ident">lookup</span>)
+    <span class="doccomment">/// Generic lookup for any RecordType
+    ///
+    /// *WARNING* This interface may change in the future, please use [`Self::lookup_ip`] or another variant for more stable interfaces.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - name of the record to lookup, if name is not a valid domain name, an error will be returned
+    /// * `record_type` - type of record to lookup
+    </span><span class="kw">pub fn </span>lookup&lt;N: IntoName&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, name: N, record_type: RecordType) -&gt; ResolveResult&lt;Lookup&gt; {
+        <span class="kw">let </span>lookup = <span class="self">self
+            </span>.async_resolver
+            .lookup(name, record_type, DnsRequestOptions::default());
+        <span class="self">self</span>.runtime.lock()<span class="question-mark">?</span>.block_on(lookup)
     }
 
-    <span class="doccomment">/// Performs a dual-stack DNS lookup for the IP for the given hostname.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See the configuration and options parameters for controlling the way in which A(Ipv4) and AAAA(Ipv6) lookups will be performed. For the least expensive query a fully-qualified-domain-name, FQDN, which ends in a final `.`, e.g. `www.example.com.`, will only issue one query. Anything else will always incur the cost of querying the `ResolverConfig::domain` and `ResolverConfig::search`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `host` - string hostname, if this is an invalid hostname, an error will be returned.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lookup_ip</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">IntoName</span> <span class="op">+</span> <span class="ident">TryParseIp</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">host</span>: <span class="ident">N</span>) -&gt; <span class="ident">ResolveResult</span><span class="op">&lt;</span><span class="ident">LookupIp</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">lookup</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">async_resolver</span>.<span class="ident">lookup_ip</span>(<span class="ident">host</span>);
-        <span class="self">self</span>.<span class="ident">runtime</span>.<span class="ident">lock</span>()<span class="question-mark">?</span>.<span class="ident">block_on</span>(<span class="ident">lookup</span>)
+    <span class="doccomment">/// Performs a dual-stack DNS lookup for the IP for the given hostname.
+    ///
+    /// See the configuration and options parameters for controlling the way in which A(Ipv4) and AAAA(Ipv6) lookups will be performed. For the least expensive query a fully-qualified-domain-name, FQDN, which ends in a final `.`, e.g. `www.example.com.`, will only issue one query. Anything else will always incur the cost of querying the `ResolverConfig::domain` and `ResolverConfig::search`.
+    ///
+    /// # Arguments
+    ///
+    /// * `host` - string hostname, if this is an invalid hostname, an error will be returned.
+    </span><span class="kw">pub fn </span>lookup_ip&lt;N: IntoName + TryParseIp&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, host: N) -&gt; ResolveResult&lt;LookupIp&gt; {
+        <span class="kw">let </span>lookup = <span class="self">self</span>.async_resolver.lookup_ip(host);
+        <span class="self">self</span>.runtime.lock()<span class="question-mark">?</span>.block_on(lookup)
     }
 
-    <span class="macro">lookup_fn!</span>(<span class="ident">reverse_lookup</span>, <span class="ident">lookup::ReverseLookup</span>, <span class="ident">IpAddr</span>);
-    <span class="macro">lookup_fn!</span>(<span class="ident">ipv4_lookup</span>, <span class="ident">lookup::Ipv4Lookup</span>);
-    <span class="macro">lookup_fn!</span>(<span class="ident">ipv6_lookup</span>, <span class="ident">lookup::Ipv6Lookup</span>);
-    <span class="macro">lookup_fn!</span>(<span class="ident">mx_lookup</span>, <span class="ident">lookup::MxLookup</span>);
-    <span class="macro">lookup_fn!</span>(<span class="ident">ns_lookup</span>, <span class="ident">lookup::NsLookup</span>);
-    <span class="macro">lookup_fn!</span>(<span class="ident">soa_lookup</span>, <span class="ident">lookup::SoaLookup</span>);
-    <span class="macro">lookup_fn!</span>(<span class="ident">srv_lookup</span>, <span class="ident">lookup::SrvLookup</span>);
-    <span class="macro">lookup_fn!</span>(<span class="ident">tlsa_lookup</span>, <span class="ident">lookup::TlsaLookup</span>);
-    <span class="macro">lookup_fn!</span>(<span class="ident">txt_lookup</span>, <span class="ident">lookup::TxtLookup</span>);
+    <span class="macro">lookup_fn!</span>(reverse_lookup, lookup::ReverseLookup, IpAddr);
+    <span class="macro">lookup_fn!</span>(ipv4_lookup, lookup::Ipv4Lookup);
+    <span class="macro">lookup_fn!</span>(ipv6_lookup, lookup::Ipv6Lookup);
+    <span class="macro">lookup_fn!</span>(mx_lookup, lookup::MxLookup);
+    <span class="macro">lookup_fn!</span>(ns_lookup, lookup::NsLookup);
+    <span class="macro">lookup_fn!</span>(soa_lookup, lookup::SoaLookup);
+    <span class="macro">lookup_fn!</span>(srv_lookup, lookup::SrvLookup);
+    <span class="macro">lookup_fn!</span>(tlsa_lookup, lookup::TlsaLookup);
+    <span class="macro">lookup_fn!</span>(txt_lookup, lookup::TxtLookup);
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::dbg_macro</span>, <span class="ident">clippy::print_stdout</span>)]</span>
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="attribute">#![allow(clippy::dbg_macro, clippy::print_stdout)]
 
-    <span class="kw">use</span> <span class="ident">std::net</span>::<span class="kw-2">*</span>;
+    </span><span class="kw">use </span>std::net::<span class="kw-2">*</span>;
 
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="kw">fn</span> <span class="ident">require_send_sync</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>() {}
+    <span class="kw">fn </span>require_send_sync&lt;S: Send + Sync&gt;() {}
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_resolver_sendable</span>() {
-        <span class="ident">require_send_sync</span>::<span class="op">&lt;</span><span class="ident">Resolver</span><span class="op">&gt;</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_resolver_sendable() {
+        require_send_sync::&lt;Resolver&gt;();
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_lookup</span>() {
-        <span class="kw">let</span> <span class="ident">resolver</span> <span class="op">=</span> <span class="ident">Resolver::new</span>(<span class="ident">ResolverConfig::default</span>(), <span class="ident">ResolverOpts::default</span>()).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_lookup() {
+        <span class="kw">let </span>resolver = Resolver::new(ResolverConfig::default(), ResolverOpts::default()).unwrap();
 
-        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">resolver</span>.<span class="ident">lookup_ip</span>(<span class="string">&quot;www.example.com.&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="macro">println!</span>(<span class="string">&quot;response records: {:?}&quot;</span>, <span class="ident">response</span>);
+        <span class="kw">let </span>response = resolver.lookup_ip(<span class="string">&quot;www.example.com.&quot;</span>).unwrap();
+        <span class="macro">println!</span>(<span class="string">&quot;response records: {:?}&quot;</span>, response);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">response</span>.<span class="ident">iter</span>().<span class="ident">count</span>(), <span class="number">1</span>);
-        <span class="kw">for</span> <span class="ident">address</span> <span class="kw">in</span> <span class="ident">response</span>.<span class="ident">iter</span>() {
-            <span class="kw">if</span> <span class="ident">address</span>.<span class="ident">is_ipv4</span>() {
-                <span class="macro">assert_eq!</span>(<span class="ident">address</span>, <span class="ident">IpAddr::V4</span>(<span class="ident">Ipv4Addr::new</span>(<span class="number">93</span>, <span class="number">184</span>, <span class="number">216</span>, <span class="number">34</span>)));
-            } <span class="kw">else</span> {
+        <span class="macro">assert_eq!</span>(response.iter().count(), <span class="number">1</span>);
+        <span class="kw">for </span>address <span class="kw">in </span>response.iter() {
+            <span class="kw">if </span>address.is_ipv4() {
+                <span class="macro">assert_eq!</span>(address, IpAddr::V4(Ipv4Addr::new(<span class="number">93</span>, <span class="number">184</span>, <span class="number">216</span>, <span class="number">34</span>)));
+            } <span class="kw">else </span>{
                 <span class="macro">assert_eq!</span>(
-                    <span class="ident">address</span>,
-                    <span class="ident">IpAddr::V6</span>(<span class="ident">Ipv6Addr::new</span>(
+                    address,
+                    IpAddr::V6(Ipv6Addr::new(
                         <span class="number">0x2606</span>, <span class="number">0x2800</span>, <span class="number">0x220</span>, <span class="number">0x1</span>, <span class="number">0x248</span>, <span class="number">0x1893</span>, <span class="number">0x25c8</span>, <span class="number">0x1946</span>,
                     ))
                 );
@@ -420,23 +420,23 @@
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">ignore</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">unix</span>, <span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">test_system_lookup</span>() {
-        <span class="kw">let</span> <span class="ident">resolver</span> <span class="op">=</span> <span class="ident">Resolver::from_system_conf</span>().<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    #[ignore]
+    #[cfg(any(unix, target_os = <span class="string">&quot;windows&quot;</span>))]
+    </span><span class="kw">fn </span>test_system_lookup() {
+        <span class="kw">let </span>resolver = Resolver::from_system_conf().unwrap();
 
-        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="ident">resolver</span>.<span class="ident">lookup_ip</span>(<span class="string">&quot;www.example.com.&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="macro">println!</span>(<span class="string">&quot;response records: {:?}&quot;</span>, <span class="ident">response</span>);
+        <span class="kw">let </span>response = resolver.lookup_ip(<span class="string">&quot;www.example.com.&quot;</span>).unwrap();
+        <span class="macro">println!</span>(<span class="string">&quot;response records: {:?}&quot;</span>, response);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">response</span>.<span class="ident">iter</span>().<span class="ident">count</span>(), <span class="number">1</span>);
-        <span class="kw">for</span> <span class="ident">address</span> <span class="kw">in</span> <span class="ident">response</span>.<span class="ident">iter</span>() {
-            <span class="kw">if</span> <span class="ident">address</span>.<span class="ident">is_ipv4</span>() {
-                <span class="macro">assert_eq!</span>(<span class="ident">address</span>, <span class="ident">IpAddr::V4</span>(<span class="ident">Ipv4Addr::new</span>(<span class="number">93</span>, <span class="number">184</span>, <span class="number">216</span>, <span class="number">34</span>)));
-            } <span class="kw">else</span> {
+        <span class="macro">assert_eq!</span>(response.iter().count(), <span class="number">1</span>);
+        <span class="kw">for </span>address <span class="kw">in </span>response.iter() {
+            <span class="kw">if </span>address.is_ipv4() {
+                <span class="macro">assert_eq!</span>(address, IpAddr::V4(Ipv4Addr::new(<span class="number">93</span>, <span class="number">184</span>, <span class="number">216</span>, <span class="number">34</span>)));
+            } <span class="kw">else </span>{
                 <span class="macro">assert_eq!</span>(
-                    <span class="ident">address</span>,
-                    <span class="ident">IpAddr::V6</span>(<span class="ident">Ipv6Addr::new</span>(
+                    address,
+                    IpAddr::V6(Ipv6Addr::new(
                         <span class="number">0x2606</span>, <span class="number">0x2800</span>, <span class="number">0x220</span>, <span class="number">0x1</span>, <span class="number">0x248</span>, <span class="number">0x1893</span>, <span class="number">0x25c8</span>, <span class="number">0x1946</span>,
                     ))
                 );
@@ -445,4 +445,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="trust_dns_resolver" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="trust_dns_resolver" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

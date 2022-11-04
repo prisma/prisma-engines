@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/client/executor.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>executor.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/client/executor.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>executor.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1014,1006 +1014,1006 @@
 <span id="1014">1014</span>
 <span id="1015">1015</span>
 <span id="1016">1016</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">bson</span>::{<span class="ident">doc</span>, <span class="ident">RawBsonRef</span>, <span class="ident">RawDocument</span>, <span class="ident">Timestamp</span>};
-<span class="kw">use</span> <span class="ident">lazy_static::lazy_static</span>;
-<span class="kw">use</span> <span class="ident">serde::de::DeserializeOwned</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>bson::{doc, RawBsonRef, RawDocument, Timestamp};
+<span class="kw">use </span>lazy_static::lazy_static;
+<span class="kw">use </span>serde::de::DeserializeOwned;
 
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashSet</span>, <span class="ident">sync::Arc</span>, <span class="ident">time::Instant</span>};
+<span class="kw">use </span>std::{collections::HashSet, sync::Arc, time::Instant};
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">session::TransactionState</span>, <span class="ident">Client</span>, <span class="ident">ClientSession</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">bson::Document</span>,
-    <span class="ident">change_stream</span>::{
-        <span class="ident">event::ChangeStreamEvent</span>,
-        <span class="ident">session::SessionChangeStream</span>,
-        <span class="ident">ChangeStream</span>,
-        <span class="ident">ChangeStreamData</span>,
-        <span class="ident">WatchArgs</span>,
+<span class="kw">use super</span>::{session::TransactionState, Client, ClientSession};
+<span class="kw">use crate</span>::{
+    bson::Document,
+    change_stream::{
+        event::ChangeStreamEvent,
+        session::SessionChangeStream,
+        ChangeStream,
+        ChangeStreamData,
+        WatchArgs,
     },
-    <span class="ident">cmap</span>::{
-        <span class="ident">conn::PinnedConnectionHandle</span>,
-        <span class="ident">Connection</span>,
-        <span class="ident">ConnectionPool</span>,
-        <span class="ident">RawCommand</span>,
-        <span class="ident">RawCommandResponse</span>,
+    cmap::{
+        conn::PinnedConnectionHandle,
+        Connection,
+        ConnectionPool,
+        RawCommand,
+        RawCommandResponse,
     },
-    <span class="ident">cursor</span>::{<span class="ident">session::SessionCursor</span>, <span class="ident">Cursor</span>, <span class="ident">CursorSpecification</span>},
-    <span class="ident">error</span>::{
-        <span class="ident">Error</span>,
-        <span class="ident">ErrorKind</span>,
+    cursor::{session::SessionCursor, Cursor, CursorSpecification},
+    error::{
+        Error,
+        ErrorKind,
         <span class="prelude-ty">Result</span>,
-        <span class="ident">RETRYABLE_WRITE_ERROR</span>,
-        <span class="ident">TRANSIENT_TRANSACTION_ERROR</span>,
-        <span class="ident">UNKNOWN_TRANSACTION_COMMIT_RESULT</span>,
+        RETRYABLE_WRITE_ERROR,
+        TRANSIENT_TRANSACTION_ERROR,
+        UNKNOWN_TRANSACTION_COMMIT_RESULT,
     },
-    <span class="ident">event::command</span>::{<span class="ident">CommandFailedEvent</span>, <span class="ident">CommandStartedEvent</span>, <span class="ident">CommandSucceededEvent</span>},
-    <span class="ident">hello::LEGACY_HELLO_COMMAND_NAME_LOWERCASE</span>,
-    <span class="ident">operation</span>::{
-        <span class="ident">AbortTransaction</span>,
-        <span class="ident">AggregateTarget</span>,
-        <span class="ident">ChangeStreamAggregate</span>,
-        <span class="ident">CommandErrorBody</span>,
-        <span class="ident">CommitTransaction</span>,
-        <span class="ident">Operation</span>,
-        <span class="ident">Retryability</span>,
+    event::command::{CommandFailedEvent, CommandStartedEvent, CommandSucceededEvent},
+    hello::LEGACY_HELLO_COMMAND_NAME_LOWERCASE,
+    operation::{
+        AbortTransaction,
+        AggregateTarget,
+        ChangeStreamAggregate,
+        CommandErrorBody,
+        CommitTransaction,
+        Operation,
+        Retryability,
     },
-    <span class="ident">options</span>::{<span class="ident">ChangeStreamOptions</span>, <span class="ident">SelectionCriteria</span>},
-    <span class="ident">sdam</span>::{
-        <span class="ident">HandshakePhase</span>,
-        <span class="ident">SelectedServer</span>,
-        <span class="ident">ServerType</span>,
-        <span class="ident">SessionSupportStatus</span>,
-        <span class="ident">TopologyType</span>,
-        <span class="ident">TransactionSupportStatus</span>,
+    options::{ChangeStreamOptions, SelectionCriteria},
+    sdam::{
+        HandshakePhase,
+        SelectedServer,
+        ServerType,
+        SessionSupportStatus,
+        TopologyType,
+        TransactionSupportStatus,
     },
-    <span class="ident">selection_criteria::ReadPreference</span>,
-    <span class="ident">ClusterTime</span>,
+    selection_criteria::ReadPreference,
+    ClusterTime,
 };
 
-<span class="macro">lazy_static!</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">REDACTED_COMMANDS</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hash_set</span> <span class="op">=</span> <span class="ident">HashSet::new</span>();
-        <span class="ident">hash_set</span>.<span class="ident">insert</span>(<span class="string">&quot;authenticate&quot;</span>);
-        <span class="ident">hash_set</span>.<span class="ident">insert</span>(<span class="string">&quot;saslstart&quot;</span>);
-        <span class="ident">hash_set</span>.<span class="ident">insert</span>(<span class="string">&quot;saslcontinue&quot;</span>);
-        <span class="ident">hash_set</span>.<span class="ident">insert</span>(<span class="string">&quot;getnonce&quot;</span>);
-        <span class="ident">hash_set</span>.<span class="ident">insert</span>(<span class="string">&quot;createuser&quot;</span>);
-        <span class="ident">hash_set</span>.<span class="ident">insert</span>(<span class="string">&quot;updateuser&quot;</span>);
-        <span class="ident">hash_set</span>.<span class="ident">insert</span>(<span class="string">&quot;copydbgetnonce&quot;</span>);
-        <span class="ident">hash_set</span>.<span class="ident">insert</span>(<span class="string">&quot;copydbsaslstart&quot;</span>);
-        <span class="ident">hash_set</span>.<span class="ident">insert</span>(<span class="string">&quot;copydb&quot;</span>);
-        <span class="ident">hash_set</span>
+<span class="macro">lazy_static! </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">static </span><span class="kw-2">ref </span>REDACTED_COMMANDS: HashSet&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; = {
+        <span class="kw">let </span><span class="kw-2">mut </span>hash_set = HashSet::new();
+        hash_set.insert(<span class="string">&quot;authenticate&quot;</span>);
+        hash_set.insert(<span class="string">&quot;saslstart&quot;</span>);
+        hash_set.insert(<span class="string">&quot;saslcontinue&quot;</span>);
+        hash_set.insert(<span class="string">&quot;getnonce&quot;</span>);
+        hash_set.insert(<span class="string">&quot;createuser&quot;</span>);
+        hash_set.insert(<span class="string">&quot;updateuser&quot;</span>);
+        hash_set.insert(<span class="string">&quot;copydbgetnonce&quot;</span>);
+        hash_set.insert(<span class="string">&quot;copydbsaslstart&quot;</span>);
+        hash_set.insert(<span class="string">&quot;copydb&quot;</span>);
+        hash_set
     };
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">HELLO_COMMAND_NAMES</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hash_set</span> <span class="op">=</span> <span class="ident">HashSet::new</span>();
-        <span class="ident">hash_set</span>.<span class="ident">insert</span>(<span class="string">&quot;hello&quot;</span>);
-        <span class="ident">hash_set</span>.<span class="ident">insert</span>(<span class="ident">LEGACY_HELLO_COMMAND_NAME_LOWERCASE</span>);
-        <span class="ident">hash_set</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">static </span><span class="kw-2">ref </span>HELLO_COMMAND_NAMES: HashSet&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; = {
+        <span class="kw">let </span><span class="kw-2">mut </span>hash_set = HashSet::new();
+        hash_set.insert(<span class="string">&quot;hello&quot;</span>);
+        hash_set.insert(LEGACY_HELLO_COMMAND_NAME_LOWERCASE);
+        hash_set
     };
 }
 
-<span class="kw">impl</span> <span class="ident">Client</span> {
-    <span class="doccomment">/// Execute the given operation.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Server selection will performed using the criteria specified on the operation, if any, and</span>
-    <span class="doccomment">/// an implicit session will be created if the operation and write concern are compatible with</span>
-    <span class="doccomment">/// sessions and an explicit session is not provided.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_operation</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Operation</span><span class="op">&gt;</span>(
+<span class="kw">impl </span>Client {
+    <span class="doccomment">/// Execute the given operation.
+    ///
+    /// Server selection will performed using the criteria specified on the operation, if any, and
+    /// an implicit session will be created if the operation and write concern are compatible with
+    /// sessions and an explicit session is not provided.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>execute_operation&lt;T: Operation&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">op</span>: <span class="ident">T</span>,
-        <span class="ident">session</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T::O</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">execute_operation_with_details</span>(<span class="ident">op</span>, <span class="ident">session</span>)
-            .<span class="kw">await</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">details</span><span class="op">|</span> <span class="ident">details</span>.<span class="ident">output</span>.<span class="ident">operation_output</span>)
+        op: T,
+        session: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>ClientSession&gt;&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;T::O&gt; {
+        <span class="self">self</span>.execute_operation_with_details(op, session)
+            .<span class="kw">await
+            </span>.map(|details| details.output.operation_output)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_operation_with_details</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Operation</span><span class="op">&gt;</span>(
+    <span class="kw">async fn </span>execute_operation_with_details&lt;T: Operation&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">op</span>: <span class="ident">T</span>,
-        <span class="ident">session</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ExecutionDetails</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Box::pin</span>(<span class="kw">async</span> {
-            <span class="comment">// TODO RUST-9: allow unacknowledged write concerns</span>
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">op</span>.<span class="ident">is_acknowledged</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
-                    <span class="ident">message</span>: <span class="string">&quot;Unacknowledged write concerns are not supported&quot;</span>.<span class="ident">to_string</span>(),
+        op: T,
+        session: <span class="kw">impl </span>Into&lt;<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>ClientSession&gt;&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;ExecutionDetails&lt;T&gt;&gt; {
+        Box::pin(<span class="kw">async </span>{
+            <span class="comment">// TODO RUST-9: allow unacknowledged write concerns
+            </span><span class="kw">if </span>!op.is_acknowledged() {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(ErrorKind::InvalidArgument {
+                    message: <span class="string">&quot;Unacknowledged write concerns are not supported&quot;</span>.to_string(),
                 }
-                .<span class="ident">into</span>());
+                .into());
             }
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">implicit_session</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-            <span class="kw">let</span> <span class="ident">session</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">session</span>.<span class="ident">into</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">session</span>) =&gt; {
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">Arc::ptr_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>, <span class="kw-2">&amp;</span><span class="ident">session</span>.<span class="ident">client</span>().<span class="ident">inner</span>) {
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
-                            <span class="ident">message</span>: <span class="string">&quot;the session provided to an operation must be created from \
-                                      the same client as the collection/database&quot;</span>
-                                .<span class="ident">into</span>(),
+            <span class="kw">let </span><span class="kw-2">mut </span>implicit_session = <span class="prelude-val">None</span>;
+            <span class="kw">let </span>session = <span class="kw">match </span>session.into() {
+                <span class="prelude-val">Some</span>(session) =&gt; {
+                    <span class="kw">if </span>!Arc::ptr_eq(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, <span class="kw-2">&amp;</span>session.client().inner) {
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(ErrorKind::InvalidArgument {
+                            message: <span class="string">&quot;the session provided to an operation must be created from \
+                                      the same client as the collection/database&quot;
+                                </span>.into(),
                         }
-                        .<span class="ident">into</span>());
+                        .into());
                     }
 
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">SelectionCriteria::ReadPreference</span>(<span class="ident">read_preference</span>)) <span class="op">=</span>
-                        <span class="ident">op</span>.<span class="ident">selection_criteria</span>()
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(SelectionCriteria::ReadPreference(read_preference)) =
+                        op.selection_criteria()
                     {
-                        <span class="kw">if</span> <span class="ident">session</span>.<span class="ident">in_transaction</span>() <span class="op">&amp;&amp;</span> <span class="ident">read_preference</span> <span class="op">!</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ReadPreference::Primary</span> {
-                            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::Transaction</span> {
-                                <span class="ident">message</span>: <span class="string">&quot;read preference in a transaction must be primary&quot;</span>.<span class="ident">into</span>(),
+                        <span class="kw">if </span>session.in_transaction() &amp;&amp; read_preference != <span class="kw-2">&amp;</span>ReadPreference::Primary {
+                            <span class="kw">return </span><span class="prelude-val">Err</span>(ErrorKind::Transaction {
+                                message: <span class="string">&quot;read preference in a transaction must be primary&quot;</span>.into(),
                             }
-                            .<span class="ident">into</span>());
+                            .into());
                         }
                     }
-                    <span class="prelude-val">Some</span>(<span class="ident">session</span>)
+                    <span class="prelude-val">Some</span>(session)
                 }
-                <span class="prelude-val">None</span> =&gt; {
-                    <span class="ident">implicit_session</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">start_implicit_session</span>(<span class="kw-2">&amp;</span><span class="ident">op</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-                    <span class="ident">implicit_session</span>.<span class="ident">as_mut</span>()
+                <span class="prelude-val">None </span>=&gt; {
+                    implicit_session = <span class="self">self</span>.start_implicit_session(<span class="kw-2">&amp;</span>op).<span class="kw">await</span><span class="question-mark">?</span>;
+                    implicit_session.as_mut()
                 }
             };
-            <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">execute_operation_with_retry</span>(<span class="ident">op</span>, <span class="ident">session</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(<span class="ident">ExecutionDetails</span> {
-                <span class="ident">output</span>,
-                <span class="ident">implicit_session</span>,
+            <span class="kw">let </span>output = <span class="self">self</span>.execute_operation_with_retry(op, session).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(ExecutionDetails {
+                output,
+                implicit_session,
             })
         })
-        .<span class="kw">await</span>
-    }
+        .<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Execute the given operation, returning the cursor created by the operation.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Server selection be will performed using the criteria specified on the operation, if any.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_cursor_operation</span><span class="op">&lt;</span><span class="ident">Op</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">op</span>: <span class="ident">Op</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">Op</span>: <span class="ident">Operation</span><span class="op">&lt;</span><span class="ident">O</span> <span class="op">=</span> <span class="ident">CursorSpecification</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Execute the given operation, returning the cursor created by the operation.
+    ///
+    /// Server selection be will performed using the criteria specified on the operation, if any.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>execute_cursor_operation&lt;Op, T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, op: Op) -&gt; <span class="prelude-ty">Result</span>&lt;Cursor&lt;T&gt;&gt;
+    <span class="kw">where
+        </span>Op: Operation&lt;O = CursorSpecification&gt;,
     {
-        <span class="ident">Box::pin</span>(<span class="kw">async</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">details</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">execute_operation_with_details</span>(<span class="ident">op</span>, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">pinned</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pin_connection_for_cursor</span>(
-                <span class="kw-2">&amp;</span><span class="ident">details</span>.<span class="ident">output</span>.<span class="ident">operation_output</span>,
-                <span class="kw-2">&amp;mut</span> <span class="ident">details</span>.<span class="ident">output</span>.<span class="ident">connection</span>,
+        Box::pin(<span class="kw">async </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>details = <span class="self">self</span>.execute_operation_with_details(op, <span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="kw">let </span>pinned = <span class="self">self</span>.pin_connection_for_cursor(
+                <span class="kw-2">&amp;</span>details.output.operation_output,
+                <span class="kw-2">&amp;mut </span>details.output.connection,
             )<span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(<span class="ident">Cursor::new</span>(
-                <span class="self">self</span>.<span class="ident">clone</span>(),
-                <span class="ident">details</span>.<span class="ident">output</span>.<span class="ident">operation_output</span>,
-                <span class="ident">details</span>.<span class="ident">implicit_session</span>,
-                <span class="ident">pinned</span>,
+            <span class="prelude-val">Ok</span>(Cursor::new(
+                <span class="self">self</span>.clone(),
+                details.output.operation_output,
+                details.implicit_session,
+                pinned,
             ))
         })
-        .<span class="kw">await</span>
-    }
+        .<span class="kw">await
+    </span>}
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_session_cursor_operation</span><span class="op">&lt;</span><span class="ident">Op</span>, <span class="ident">T</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>execute_session_cursor_operation&lt;Op, T&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">op</span>: <span class="ident">Op</span>,
-        <span class="ident">session</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SessionCursor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">Op</span>: <span class="ident">Operation</span><span class="op">&lt;</span><span class="ident">O</span> <span class="op">=</span> <span class="ident">CursorSpecification</span><span class="op">&gt;</span>,
+        op: Op,
+        session: <span class="kw-2">&amp;mut </span>ClientSession,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;SessionCursor&lt;T&gt;&gt;
+    <span class="kw">where
+        </span>Op: Operation&lt;O = CursorSpecification&gt;,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">details</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">execute_operation_with_details</span>(<span class="ident">op</span>, <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">session</span>)
+        <span class="kw">let </span><span class="kw-2">mut </span>details = <span class="self">self
+            </span>.execute_operation_with_details(op, <span class="kw-2">&amp;mut *</span>session)
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">pinned</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pin_connection_for_session</span>(
-            <span class="kw-2">&amp;</span><span class="ident">details</span>.<span class="ident">output</span>.<span class="ident">operation_output</span>,
-            <span class="kw-2">&amp;mut</span> <span class="ident">details</span>.<span class="ident">output</span>.<span class="ident">connection</span>,
-            <span class="ident">session</span>,
+        <span class="kw">let </span>pinned = <span class="self">self</span>.pin_connection_for_session(
+            <span class="kw-2">&amp;</span>details.output.operation_output,
+            <span class="kw-2">&amp;mut </span>details.output.connection,
+            session,
         )<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">SessionCursor::new</span>(
-            <span class="self">self</span>.<span class="ident">clone</span>(),
-            <span class="ident">details</span>.<span class="ident">output</span>.<span class="ident">operation_output</span>,
-            <span class="ident">pinned</span>,
+        <span class="prelude-val">Ok</span>(SessionCursor::new(
+            <span class="self">self</span>.clone(),
+            details.output.operation_output,
+            pinned,
         ))
     }
 
-    <span class="kw">fn</span> <span class="ident">is_load_balanced</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">options</span>.<span class="ident">load_balanced</span>.<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+    <span class="kw">fn </span>is_load_balanced(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.inner.options.load_balanced.unwrap_or(<span class="bool-val">false</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">pin_connection_for_cursor</span>(
+    <span class="kw">fn </span>pin_connection_for_cursor(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">spec</span>: <span class="kw-2">&amp;</span><span class="ident">CursorSpecification</span>,
-        <span class="ident">conn</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Connection</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PinnedConnectionHandle</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_load_balanced</span>() <span class="op">&amp;&amp;</span> <span class="ident">spec</span>.<span class="ident">info</span>.<span class="ident">id</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">conn</span>.<span class="ident">pin</span>()<span class="question-mark">?</span>))
-        } <span class="kw">else</span> {
+        spec: <span class="kw-2">&amp;</span>CursorSpecification,
+        conn: <span class="kw-2">&amp;mut </span>Connection,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;PinnedConnectionHandle&gt;&gt; {
+        <span class="kw">if </span><span class="self">self</span>.is_load_balanced() &amp;&amp; spec.info.id != <span class="number">0 </span>{
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(conn.pin()<span class="question-mark">?</span>))
+        } <span class="kw">else </span>{
             <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">pin_connection_for_session</span>(
+    <span class="kw">fn </span>pin_connection_for_session(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">spec</span>: <span class="kw-2">&amp;</span><span class="ident">CursorSpecification</span>,
-        <span class="ident">conn</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Connection</span>,
-        <span class="ident">session</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PinnedConnectionHandle</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">handle</span>) <span class="op">=</span> <span class="ident">session</span>.<span class="ident">transaction</span>.<span class="ident">pinned_connection</span>() {
-            <span class="comment">// Cursor operations on a transaction share the same pinned connection.</span>
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">handle</span>.<span class="ident">replicate</span>()))
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">pin_connection_for_cursor</span>(<span class="ident">spec</span>, <span class="ident">conn</span>)
+        spec: <span class="kw-2">&amp;</span>CursorSpecification,
+        conn: <span class="kw-2">&amp;mut </span>Connection,
+        session: <span class="kw-2">&amp;mut </span>ClientSession,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;PinnedConnectionHandle&gt;&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(handle) = session.transaction.pinned_connection() {
+            <span class="comment">// Cursor operations on a transaction share the same pinned connection.
+            </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(handle.replicate()))
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.pin_connection_for_cursor(spec, conn)
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_watch</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>execute_watch&lt;T&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">pipeline</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Document</span><span class="op">&gt;</span>,
-        <span class="ident">options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChangeStreamOptions</span><span class="op">&gt;</span>,
-        <span class="ident">target</span>: <span class="ident">AggregateTarget</span>,
-        <span class="kw-2">mut</span> <span class="ident">resume_data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChangeStreamData</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ChangeStream</span><span class="op">&lt;</span><span class="ident">ChangeStreamEvent</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>,
+        pipeline: <span class="kw">impl </span>IntoIterator&lt;Item = Document&gt;,
+        options: <span class="prelude-ty">Option</span>&lt;ChangeStreamOptions&gt;,
+        target: AggregateTarget,
+        <span class="kw-2">mut </span>resume_data: <span class="prelude-ty">Option</span>&lt;ChangeStreamData&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;ChangeStream&lt;ChangeStreamEvent&lt;T&gt;&gt;&gt;
+    <span class="kw">where
+        </span>T: DeserializeOwned + Unpin + Send + Sync,
     {
-        <span class="ident">Box::pin</span>(<span class="kw">async</span> {
-            <span class="kw">let</span> <span class="ident">pipeline</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">pipeline</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>();
-            <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">WatchArgs</span> {
-                <span class="ident">pipeline</span>,
-                <span class="ident">target</span>,
-                <span class="ident">options</span>,
+        Box::pin(<span class="kw">async </span>{
+            <span class="kw">let </span>pipeline: Vec&lt;<span class="kw">_</span>&gt; = pipeline.into_iter().collect();
+            <span class="kw">let </span>args = WatchArgs {
+                pipeline,
+                target,
+                options,
             };
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">implicit_session</span> <span class="op">=</span> <span class="ident">resume_data</span>
-                .<span class="ident">as_mut</span>()
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">rd</span><span class="op">|</span> <span class="ident">rd</span>.<span class="ident">implicit_session</span>.<span class="ident">take</span>());
-            <span class="kw">let</span> <span class="ident">op</span> <span class="op">=</span> <span class="ident">ChangeStreamAggregate::new</span>(<span class="kw-2">&amp;</span><span class="ident">args</span>, <span class="ident">resume_data</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>implicit_session = resume_data
+                .as_mut()
+                .and_then(|rd| rd.implicit_session.take());
+            <span class="kw">let </span>op = ChangeStreamAggregate::new(<span class="kw-2">&amp;</span>args, resume_data)<span class="question-mark">?</span>;
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">details</span> <span class="op">=</span> <span class="self">self</span>
-                .<span class="ident">execute_operation_with_details</span>(<span class="ident">op</span>, <span class="ident">implicit_session</span>.<span class="ident">as_mut</span>())
+            <span class="kw">let </span><span class="kw-2">mut </span>details = <span class="self">self
+                </span>.execute_operation_with_details(op, implicit_session.as_mut())
                 .<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">session</span>) <span class="op">=</span> <span class="ident">implicit_session</span> {
-                <span class="ident">details</span>.<span class="ident">implicit_session</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">session</span>);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(session) = implicit_session {
+                details.implicit_session = <span class="prelude-val">Some</span>(session);
             }
-            <span class="kw">let</span> (<span class="ident">cursor_spec</span>, <span class="ident">cs_data</span>) <span class="op">=</span> <span class="ident">details</span>.<span class="ident">output</span>.<span class="ident">operation_output</span>;
-            <span class="kw">let</span> <span class="ident">pinned</span> <span class="op">=</span>
-                <span class="self">self</span>.<span class="ident">pin_connection_for_cursor</span>(<span class="kw-2">&amp;</span><span class="ident">cursor_spec</span>, <span class="kw-2">&amp;mut</span> <span class="ident">details</span>.<span class="ident">output</span>.<span class="ident">connection</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">Cursor::new</span>(<span class="self">self</span>.<span class="ident">clone</span>(), <span class="ident">cursor_spec</span>, <span class="ident">details</span>.<span class="ident">implicit_session</span>, <span class="ident">pinned</span>);
+            <span class="kw">let </span>(cursor_spec, cs_data) = details.output.operation_output;
+            <span class="kw">let </span>pinned =
+                <span class="self">self</span>.pin_connection_for_cursor(<span class="kw-2">&amp;</span>cursor_spec, <span class="kw-2">&amp;mut </span>details.output.connection)<span class="question-mark">?</span>;
+            <span class="kw">let </span>cursor = Cursor::new(<span class="self">self</span>.clone(), cursor_spec, details.implicit_session, pinned);
 
-            <span class="prelude-val">Ok</span>(<span class="ident">ChangeStream::new</span>(<span class="ident">cursor</span>, <span class="ident">args</span>, <span class="ident">cs_data</span>))
+            <span class="prelude-val">Ok</span>(ChangeStream::new(cursor, args, cs_data))
         })
-        .<span class="kw">await</span>
-    }
+        .<span class="kw">await
+    </span>}
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_watch_with_session</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>execute_watch_with_session&lt;T&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">pipeline</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Document</span><span class="op">&gt;</span>,
-        <span class="ident">options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChangeStreamOptions</span><span class="op">&gt;</span>,
-        <span class="ident">target</span>: <span class="ident">AggregateTarget</span>,
-        <span class="ident">resume_data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChangeStreamData</span><span class="op">&gt;</span>,
-        <span class="ident">session</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SessionChangeStream</span><span class="op">&lt;</span><span class="ident">ChangeStreamEvent</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">DeserializeOwned</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>,
+        pipeline: <span class="kw">impl </span>IntoIterator&lt;Item = Document&gt;,
+        options: <span class="prelude-ty">Option</span>&lt;ChangeStreamOptions&gt;,
+        target: AggregateTarget,
+        resume_data: <span class="prelude-ty">Option</span>&lt;ChangeStreamData&gt;,
+        session: <span class="kw-2">&amp;mut </span>ClientSession,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;SessionChangeStream&lt;ChangeStreamEvent&lt;T&gt;&gt;&gt;
+    <span class="kw">where
+        </span>T: DeserializeOwned + Unpin + Send + Sync,
     {
-        <span class="ident">Box::pin</span>(<span class="kw">async</span> {
-            <span class="kw">let</span> <span class="ident">pipeline</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">pipeline</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>();
-            <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">WatchArgs</span> {
-                <span class="ident">pipeline</span>,
-                <span class="ident">target</span>,
-                <span class="ident">options</span>,
+        Box::pin(<span class="kw">async </span>{
+            <span class="kw">let </span>pipeline: Vec&lt;<span class="kw">_</span>&gt; = pipeline.into_iter().collect();
+            <span class="kw">let </span>args = WatchArgs {
+                pipeline,
+                target,
+                options,
             };
-            <span class="kw">let</span> <span class="ident">op</span> <span class="op">=</span> <span class="ident">ChangeStreamAggregate::new</span>(<span class="kw-2">&amp;</span><span class="ident">args</span>, <span class="ident">resume_data</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>op = ChangeStreamAggregate::new(<span class="kw-2">&amp;</span>args, resume_data)<span class="question-mark">?</span>;
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">details</span> <span class="op">=</span> <span class="self">self</span>
-                .<span class="ident">execute_operation_with_details</span>(<span class="ident">op</span>, <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">session</span>)
+            <span class="kw">let </span><span class="kw-2">mut </span>details = <span class="self">self
+                </span>.execute_operation_with_details(op, <span class="kw-2">&amp;mut *</span>session)
                 .<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="kw">let</span> (<span class="ident">cursor_spec</span>, <span class="ident">cs_data</span>) <span class="op">=</span> <span class="ident">details</span>.<span class="ident">output</span>.<span class="ident">operation_output</span>;
-            <span class="kw">let</span> <span class="ident">pinned</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pin_connection_for_session</span>(
-                <span class="kw-2">&amp;</span><span class="ident">cursor_spec</span>,
-                <span class="kw-2">&amp;mut</span> <span class="ident">details</span>.<span class="ident">output</span>.<span class="ident">connection</span>,
-                <span class="ident">session</span>,
+            <span class="kw">let </span>(cursor_spec, cs_data) = details.output.operation_output;
+            <span class="kw">let </span>pinned = <span class="self">self</span>.pin_connection_for_session(
+                <span class="kw-2">&amp;</span>cursor_spec,
+                <span class="kw-2">&amp;mut </span>details.output.connection,
+                session,
             )<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">cursor</span> <span class="op">=</span> <span class="ident">SessionCursor::new</span>(<span class="self">self</span>.<span class="ident">clone</span>(), <span class="ident">cursor_spec</span>, <span class="ident">pinned</span>);
+            <span class="kw">let </span>cursor = SessionCursor::new(<span class="self">self</span>.clone(), cursor_spec, pinned);
 
-            <span class="prelude-val">Ok</span>(<span class="ident">SessionChangeStream::new</span>(<span class="ident">cursor</span>, <span class="ident">args</span>, <span class="ident">cs_data</span>))
+            <span class="prelude-val">Ok</span>(SessionChangeStream::new(cursor, args, cs_data))
         })
-        .<span class="kw">await</span>
-    }
+        .<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Selects a server and executes the given operation on it, optionally using a provided</span>
-    <span class="doccomment">/// session. Retries the operation upon failure if retryability is supported.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_operation_with_retry</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Operation</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Selects a server and executes the given operation on it, optionally using a provided
+    /// session. Retries the operation upon failure if retryability is supported.
+    </span><span class="kw">async fn </span>execute_operation_with_retry&lt;T: Operation&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="kw-2">mut</span> <span class="ident">op</span>: <span class="ident">T</span>,
-        <span class="kw-2">mut</span> <span class="ident">session</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ExecutionOutput</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="comment">// If the current transaction has been committed/aborted and it is not being</span>
-        <span class="comment">// re-committed/re-aborted, reset the transaction&#39;s state to TransactionState::None.</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">session</span>) <span class="op">=</span> <span class="ident">session</span> {
-            <span class="kw">if</span> <span class="macro">matches!</span>(
-                <span class="ident">session</span>.<span class="ident">transaction</span>.<span class="ident">state</span>,
-                <span class="ident">TransactionState::Committed</span> { .. }
-            ) <span class="op">&amp;&amp;</span> <span class="ident">op</span>.<span class="ident">name</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">CommitTransaction::NAME</span>
-                <span class="op">|</span><span class="op">|</span> <span class="ident">session</span>.<span class="ident">transaction</span>.<span class="ident">state</span> <span class="op">==</span> <span class="ident">TransactionState::Aborted</span>
-                    <span class="op">&amp;&amp;</span> <span class="ident">op</span>.<span class="ident">name</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">AbortTransaction::NAME</span>
+        <span class="kw-2">mut </span>op: T,
+        <span class="kw-2">mut </span>session: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>ClientSession&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;ExecutionOutput&lt;T&gt;&gt; {
+        <span class="comment">// If the current transaction has been committed/aborted and it is not being
+        // re-committed/re-aborted, reset the transaction&#39;s state to TransactionState::None.
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref mut </span>session) = session {
+            <span class="kw">if </span><span class="macro">matches!</span>(
+                session.transaction.state,
+                TransactionState::Committed { .. }
+            ) &amp;&amp; op.name() != CommitTransaction::NAME
+                || session.transaction.state == TransactionState::Aborted
+                    &amp;&amp; op.name() != AbortTransaction::NAME
             {
-                <span class="ident">session</span>.<span class="ident">transaction</span>.<span class="ident">reset</span>();
+                session.transaction.reset();
             }
         }
 
-        <span class="kw">let</span> <span class="ident">selection_criteria</span> <span class="op">=</span> <span class="ident">session</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">transaction</span>.<span class="ident">pinned_mongos</span>())
-            .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">op</span>.<span class="ident">selection_criteria</span>());
+        <span class="kw">let </span>selection_criteria = session
+            .as_ref()
+            .and_then(|s| s.transaction.pinned_mongos())
+            .or_else(|| op.selection_criteria());
 
-        <span class="kw">let</span> <span class="ident">server</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">select_server</span>(<span class="ident">selection_criteria</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">server</span>) =&gt; <span class="ident">server</span>,
-            <span class="prelude-val">Err</span>(<span class="kw-2">mut</span> <span class="ident">err</span>) =&gt; {
-                <span class="ident">err</span>.<span class="ident">add_labels_and_update_pin</span>(<span class="prelude-val">None</span>, <span class="kw-2">&amp;mut</span> <span class="ident">session</span>, <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>);
+        <span class="kw">let </span>server = <span class="kw">match </span><span class="self">self</span>.select_server(selection_criteria).<span class="kw">await </span>{
+            <span class="prelude-val">Ok</span>(server) =&gt; server,
+            <span class="prelude-val">Err</span>(<span class="kw-2">mut </span>err) =&gt; {
+                err.add_labels_and_update_pin(<span class="prelude-val">None</span>, <span class="kw-2">&amp;mut </span>session, <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+                <span class="kw">return </span><span class="prelude-val">Err</span>(err);
             }
         };
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">get_connection</span>(<span class="kw-2">&amp;</span><span class="ident">session</span>, <span class="kw-2">&amp;</span><span class="ident">op</span>, <span class="kw-2">&amp;</span><span class="ident">server</span>.<span class="ident">pool</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">c</span>) =&gt; <span class="ident">c</span>,
-            <span class="prelude-val">Err</span>(<span class="kw-2">mut</span> <span class="ident">err</span>) =&gt; {
-                <span class="ident">err</span>.<span class="ident">add_labels_and_update_pin</span>(<span class="prelude-val">None</span>, <span class="kw-2">&amp;mut</span> <span class="ident">session</span>, <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
-                <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">is_read_retryable</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">options</span>.<span class="ident">retry_writes</span> <span class="op">!</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">false</span>) {
-                    <span class="ident">err</span>.<span class="ident">add_label</span>(<span class="ident">RETRYABLE_WRITE_ERROR</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>conn = <span class="kw">match </span>get_connection(<span class="kw-2">&amp;</span>session, <span class="kw-2">&amp;</span>op, <span class="kw-2">&amp;</span>server.pool).<span class="kw">await </span>{
+            <span class="prelude-val">Ok</span>(c) =&gt; c,
+            <span class="prelude-val">Err</span>(<span class="kw-2">mut </span>err) =&gt; {
+                err.add_labels_and_update_pin(<span class="prelude-val">None</span>, <span class="kw-2">&amp;mut </span>session, <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+                <span class="kw">if </span>err.is_read_retryable() &amp;&amp; <span class="self">self</span>.inner.options.retry_writes != <span class="prelude-val">Some</span>(<span class="bool-val">false</span>) {
+                    err.add_label(RETRYABLE_WRITE_ERROR);
                 }
 
-                <span class="kw">let</span> <span class="ident">op_retry</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get_op_retryability</span>(<span class="kw-2">&amp;</span><span class="ident">op</span>, <span class="kw-2">&amp;</span><span class="ident">session</span>) {
-                    <span class="ident">Retryability::Read</span> =&gt; <span class="ident">err</span>.<span class="ident">is_read_retryable</span>(),
-                    <span class="ident">Retryability::Write</span> =&gt; <span class="ident">err</span>.<span class="ident">is_write_retryable</span>(),
-                    <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+                <span class="kw">let </span>op_retry = <span class="kw">match </span><span class="self">self</span>.get_op_retryability(<span class="kw-2">&amp;</span>op, <span class="kw-2">&amp;</span>session) {
+                    Retryability::Read =&gt; err.is_read_retryable(),
+                    Retryability::Write =&gt; err.is_write_retryable(),
+                    <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
                 };
-                <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">is_pool_cleared</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">op_retry</span> {
-                    <span class="kw">return</span> <span class="self">self</span>.<span class="ident">execute_retry</span>(<span class="kw-2">&amp;mut</span> <span class="ident">op</span>, <span class="kw-2">&amp;mut</span> <span class="ident">session</span>, <span class="prelude-val">None</span>, <span class="ident">err</span>).<span class="kw">await</span>;
-                } <span class="kw">else</span> {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>);
+                <span class="kw">if </span>err.is_pool_cleared() || op_retry {
+                    <span class="kw">return </span><span class="self">self</span>.execute_retry(<span class="kw-2">&amp;mut </span>op, <span class="kw-2">&amp;mut </span>session, <span class="prelude-val">None</span>, err).<span class="kw">await</span>;
+                } <span class="kw">else </span>{
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(err);
                 }
             }
         };
 
-        <span class="kw">let</span> <span class="ident">retryability</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_retryability</span>(<span class="kw-2">&amp;</span><span class="ident">conn</span>, <span class="kw-2">&amp;</span><span class="ident">op</span>, <span class="kw-2">&amp;</span><span class="ident">session</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>retryability = <span class="self">self</span>.get_retryability(<span class="kw-2">&amp;</span>conn, <span class="kw-2">&amp;</span>op, <span class="kw-2">&amp;</span>session)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">txn_number</span> <span class="op">=</span> <span class="ident">get_txn_number</span>(<span class="kw-2">&amp;mut</span> <span class="ident">session</span>, <span class="ident">retryability</span>);
+        <span class="kw">let </span>txn_number = get_txn_number(<span class="kw-2">&amp;mut </span>session, retryability);
 
-        <span class="kw">match</span> <span class="self">self</span>
-            .<span class="ident">execute_operation_on_connection</span>(
-                <span class="kw-2">&amp;mut</span> <span class="ident">op</span>,
-                <span class="kw-2">&amp;mut</span> <span class="ident">conn</span>,
-                <span class="kw-2">&amp;mut</span> <span class="ident">session</span>,
-                <span class="ident">txn_number</span>,
-                <span class="ident">retryability</span>,
+        <span class="kw">match </span><span class="self">self
+            </span>.execute_operation_on_connection(
+                <span class="kw-2">&amp;mut </span>op,
+                <span class="kw-2">&amp;mut </span>conn,
+                <span class="kw-2">&amp;mut </span>session,
+                txn_number,
+                retryability,
             )
-            .<span class="kw">await</span>
-        {
-            <span class="prelude-val">Ok</span>(<span class="ident">operation_output</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ExecutionOutput</span> {
-                <span class="ident">operation_output</span>,
-                <span class="ident">connection</span>: <span class="ident">conn</span>,
+            .<span class="kw">await
+        </span>{
+            <span class="prelude-val">Ok</span>(operation_output) =&gt; <span class="prelude-val">Ok</span>(ExecutionOutput {
+                operation_output,
+                connection: conn,
             }),
-            <span class="prelude-val">Err</span>(<span class="kw-2">mut</span> <span class="ident">err</span>) =&gt; {
-                <span class="ident">err</span>.<span class="ident">wire_version</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">stream_description</span>()<span class="question-mark">?</span>.<span class="ident">max_wire_version</span>;
+            <span class="prelude-val">Err</span>(<span class="kw-2">mut </span>err) =&gt; {
+                err.wire_version = conn.stream_description()<span class="question-mark">?</span>.max_wire_version;
 
-                <span class="comment">// Retryable writes are only supported by storage engines with document-level</span>
-                <span class="comment">// locking, so users need to disable retryable writes if using mmapv1.</span>
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ErrorKind::Command</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">command_error</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">err</span>.<span class="ident">kind</span> {
-                    <span class="kw">if</span> <span class="ident">command_error</span>.<span class="ident">code</span> <span class="op">==</span> <span class="number">20</span>
-                        <span class="op">&amp;&amp;</span> <span class="ident">command_error</span>.<span class="ident">message</span>.<span class="ident">starts_with</span>(<span class="string">&quot;Transaction numbers&quot;</span>)
+                <span class="comment">// Retryable writes are only supported by storage engines with document-level
+                // locking, so users need to disable retryable writes if using mmapv1.
+                </span><span class="kw">if let </span>ErrorKind::Command(<span class="kw-2">ref mut </span>command_error) = <span class="kw-2">*</span>err.kind {
+                    <span class="kw">if </span>command_error.code == <span class="number">20
+                        </span>&amp;&amp; command_error.message.starts_with(<span class="string">&quot;Transaction numbers&quot;</span>)
                     {
-                        <span class="ident">command_error</span>.<span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;This MongoDB deployment does not support \
+                        command_error.message = <span class="string">&quot;This MongoDB deployment does not support \
                                                  retryable writes. Please add retryWrites=false \
-                                                 to your connection string.&quot;</span>
-                            .<span class="ident">to_string</span>();
+                                                 to your connection string.&quot;
+                            </span>.to_string();
                     }
                 }
 
-                <span class="self">self</span>.<span class="ident">inner</span>
-                    .<span class="ident">topology</span>
-                    .<span class="ident">handle_application_error</span>(
-                        <span class="ident">server</span>.<span class="ident">address</span>.<span class="ident">clone</span>(),
-                        <span class="ident">err</span>.<span class="ident">clone</span>(),
-                        <span class="ident">HandshakePhase::after_completion</span>(<span class="kw-2">&amp;</span><span class="ident">conn</span>),
+                <span class="self">self</span>.inner
+                    .topology
+                    .handle_application_error(
+                        server.address.clone(),
+                        err.clone(),
+                        HandshakePhase::after_completion(<span class="kw-2">&amp;</span>conn),
                     )
                     .<span class="kw">await</span>;
-                <span class="comment">// release the connection to be processed by the connection pool</span>
-                <span class="ident">drop</span>(<span class="ident">conn</span>);
-                <span class="comment">// release the selected server to decrement its operation count</span>
-                <span class="ident">drop</span>(<span class="ident">server</span>);
+                <span class="comment">// release the connection to be processed by the connection pool
+                </span>drop(conn);
+                <span class="comment">// release the selected server to decrement its operation count
+                </span>drop(server);
 
-                <span class="kw">if</span> <span class="ident">retryability</span> <span class="op">==</span> <span class="ident">Retryability::Read</span> <span class="op">&amp;&amp;</span> <span class="ident">err</span>.<span class="ident">is_read_retryable</span>()
-                    <span class="op">|</span><span class="op">|</span> <span class="ident">retryability</span> <span class="op">==</span> <span class="ident">Retryability::Write</span> <span class="op">&amp;&amp;</span> <span class="ident">err</span>.<span class="ident">is_write_retryable</span>()
+                <span class="kw">if </span>retryability == Retryability::Read &amp;&amp; err.is_read_retryable()
+                    || retryability == Retryability::Write &amp;&amp; err.is_write_retryable()
                 {
-                    <span class="self">self</span>.<span class="ident">execute_retry</span>(<span class="kw-2">&amp;mut</span> <span class="ident">op</span>, <span class="kw-2">&amp;mut</span> <span class="ident">session</span>, <span class="ident">txn_number</span>, <span class="ident">err</span>)
-                        .<span class="kw">await</span>
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">Err</span>(<span class="ident">err</span>)
+                    <span class="self">self</span>.execute_retry(<span class="kw-2">&amp;mut </span>op, <span class="kw-2">&amp;mut </span>session, txn_number, err)
+                        .<span class="kw">await
+                </span>} <span class="kw">else </span>{
+                    <span class="prelude-val">Err</span>(err)
                 }
             }
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_retry</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Operation</span><span class="op">&gt;</span>(
+    <span class="kw">async fn </span>execute_retry&lt;T: Operation&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">op</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>,
-        <span class="ident">session</span>: <span class="kw-2">&amp;mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span>,
-        <span class="ident">prior_txn_number</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>,
-        <span class="ident">first_error</span>: <span class="ident">Error</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ExecutionOutput</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">op</span>.<span class="ident">update_for_retry</span>();
+        op: <span class="kw-2">&amp;mut </span>T,
+        session: <span class="kw-2">&amp;mut </span><span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>ClientSession&gt;,
+        prior_txn_number: <span class="prelude-ty">Option</span>&lt;i64&gt;,
+        first_error: Error,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;ExecutionOutput&lt;T&gt;&gt; {
+        op.update_for_retry();
 
-        <span class="kw">let</span> <span class="ident">server</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">select_server</span>(<span class="ident">op</span>.<span class="ident">selection_criteria</span>()).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">server</span>) =&gt; <span class="ident">server</span>,
+        <span class="kw">let </span>server = <span class="kw">match </span><span class="self">self</span>.select_server(op.selection_criteria()).<span class="kw">await </span>{
+            <span class="prelude-val">Ok</span>(server) =&gt; server,
             <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">first_error</span>);
+                <span class="kw">return </span><span class="prelude-val">Err</span>(first_error);
             }
         };
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">get_connection</span>(<span class="ident">session</span>, <span class="ident">op</span>, <span class="kw-2">&amp;</span><span class="ident">server</span>.<span class="ident">pool</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">c</span>) =&gt; <span class="ident">c</span>,
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">first_error</span>),
+        <span class="kw">let </span><span class="kw-2">mut </span>conn = <span class="kw">match </span>get_connection(session, op, <span class="kw-2">&amp;</span>server.pool).<span class="kw">await </span>{
+            <span class="prelude-val">Ok</span>(c) =&gt; c,
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(first_error),
         };
 
-        <span class="kw">let</span> <span class="ident">retryability</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_retryability</span>(<span class="kw-2">&amp;</span><span class="ident">conn</span>, <span class="ident">op</span>, <span class="ident">session</span>)<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">retryability</span> <span class="op">==</span> <span class="ident">Retryability::None</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">first_error</span>);
+        <span class="kw">let </span>retryability = <span class="self">self</span>.get_retryability(<span class="kw-2">&amp;</span>conn, op, session)<span class="question-mark">?</span>;
+        <span class="kw">if </span>retryability == Retryability::None {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(first_error);
         }
 
-        <span class="kw">let</span> <span class="ident">txn_number</span> <span class="op">=</span> <span class="ident">prior_txn_number</span>.<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">get_txn_number</span>(<span class="ident">session</span>, <span class="ident">retryability</span>));
+        <span class="kw">let </span>txn_number = prior_txn_number.or_else(|| get_txn_number(session, retryability));
 
-        <span class="kw">match</span> <span class="self">self</span>
-            .<span class="ident">execute_operation_on_connection</span>(<span class="ident">op</span>, <span class="kw-2">&amp;mut</span> <span class="ident">conn</span>, <span class="ident">session</span>, <span class="ident">txn_number</span>, <span class="ident">retryability</span>)
-            .<span class="kw">await</span>
-        {
-            <span class="prelude-val">Ok</span>(<span class="ident">operation_output</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ExecutionOutput</span> {
-                <span class="ident">operation_output</span>,
-                <span class="ident">connection</span>: <span class="ident">conn</span>,
+        <span class="kw">match </span><span class="self">self
+            </span>.execute_operation_on_connection(op, <span class="kw-2">&amp;mut </span>conn, session, txn_number, retryability)
+            .<span class="kw">await
+        </span>{
+            <span class="prelude-val">Ok</span>(operation_output) =&gt; <span class="prelude-val">Ok</span>(ExecutionOutput {
+                operation_output,
+                connection: conn,
             }),
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">inner</span>
-                    .<span class="ident">topology</span>
-                    .<span class="ident">handle_application_error</span>(
-                        <span class="ident">server</span>.<span class="ident">address</span>.<span class="ident">clone</span>(),
-                        <span class="ident">err</span>.<span class="ident">clone</span>(),
-                        <span class="ident">HandshakePhase::after_completion</span>(<span class="kw-2">&amp;</span><span class="ident">conn</span>),
+            <span class="prelude-val">Err</span>(err) =&gt; {
+                <span class="self">self</span>.inner
+                    .topology
+                    .handle_application_error(
+                        server.address.clone(),
+                        err.clone(),
+                        HandshakePhase::after_completion(<span class="kw-2">&amp;</span>conn),
                     )
                     .<span class="kw">await</span>;
-                <span class="ident">drop</span>(<span class="ident">server</span>);
+                drop(server);
 
-                <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">is_server_error</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">is_read_retryable</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">err</span>.<span class="ident">is_write_retryable</span>() {
-                    <span class="prelude-val">Err</span>(<span class="ident">err</span>)
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">Err</span>(<span class="ident">first_error</span>)
+                <span class="kw">if </span>err.is_server_error() || err.is_read_retryable() || err.is_write_retryable() {
+                    <span class="prelude-val">Err</span>(err)
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">Err</span>(first_error)
                 }
             }
         }
     }
 
-    <span class="doccomment">/// Executes an operation on a given connection, optionally using a provided session.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_operation_on_connection</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Operation</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Executes an operation on a given connection, optionally using a provided session.
+    </span><span class="kw">async fn </span>execute_operation_on_connection&lt;T: Operation&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">op</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>,
-        <span class="ident">connection</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Connection</span>,
-        <span class="ident">session</span>: <span class="kw-2">&amp;mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span>,
-        <span class="ident">txn_number</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>,
-        <span class="ident">retryability</span>: <span class="ident">Retryability</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T::O</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">wc</span>) <span class="op">=</span> <span class="ident">op</span>.<span class="ident">write_concern</span>() {
-            <span class="ident">wc</span>.<span class="ident">validate</span>()<span class="question-mark">?</span>;
+        op: <span class="kw-2">&amp;mut </span>T,
+        connection: <span class="kw-2">&amp;mut </span>Connection,
+        session: <span class="kw-2">&amp;mut </span><span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>ClientSession&gt;,
+        txn_number: <span class="prelude-ty">Option</span>&lt;i64&gt;,
+        retryability: Retryability,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;T::O&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(wc) = op.write_concern() {
+            wc.validate()<span class="question-mark">?</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">stream_description</span> <span class="op">=</span> <span class="ident">connection</span>.<span class="ident">stream_description</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">is_sharded</span> <span class="op">=</span> <span class="ident">stream_description</span>.<span class="ident">initial_server_type</span> <span class="op">==</span> <span class="ident">ServerType::Mongos</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cmd</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">build</span>(<span class="ident">stream_description</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">update_command_with_read_pref</span>(
-            <span class="ident">connection</span>.<span class="ident">address</span>(),
-            <span class="kw-2">&amp;mut</span> <span class="ident">cmd</span>,
-            <span class="ident">op</span>.<span class="ident">selection_criteria</span>(),
+        <span class="kw">let </span>stream_description = connection.stream_description()<span class="question-mark">?</span>;
+        <span class="kw">let </span>is_sharded = stream_description.initial_server_type == ServerType::Mongos;
+        <span class="kw">let </span><span class="kw-2">mut </span>cmd = op.build(stream_description)<span class="question-mark">?</span>;
+        <span class="self">self</span>.inner.topology.update_command_with_read_pref(
+            connection.address(),
+            <span class="kw-2">&amp;mut </span>cmd,
+            op.selection_criteria(),
         );
 
-        <span class="kw">match</span> <span class="ident">session</span> {
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">session</span>) <span class="kw">if</span> <span class="ident">op</span>.<span class="ident">supports_sessions</span>() <span class="op">&amp;&amp;</span> <span class="ident">op</span>.<span class="ident">is_acknowledged</span>() =&gt; {
-                <span class="ident">cmd</span>.<span class="ident">set_session</span>(<span class="ident">session</span>);
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">txn_number</span>) <span class="op">=</span> <span class="ident">txn_number</span> {
-                    <span class="ident">cmd</span>.<span class="ident">set_txn_number</span>(<span class="ident">txn_number</span>);
+        <span class="kw">match </span>session {
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref mut </span>session) <span class="kw">if </span>op.supports_sessions() &amp;&amp; op.is_acknowledged() =&gt; {
+                cmd.set_session(session);
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(txn_number) = txn_number {
+                    cmd.set_txn_number(txn_number);
                 }
-                <span class="kw">if</span> <span class="ident">session</span>
-                    .<span class="ident">options</span>()
-                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">opts</span><span class="op">|</span> <span class="ident">opts</span>.<span class="ident">snapshot</span>)
-                    .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+                <span class="kw">if </span>session
+                    .options()
+                    .and_then(|opts| opts.snapshot)
+                    .unwrap_or(<span class="bool-val">false</span>)
                 {
-                    <span class="kw">if</span> <span class="ident">connection</span>
-                        .<span class="ident">stream_description</span>()<span class="question-mark">?</span>
-                        .<span class="ident">max_wire_version</span>
-                        .<span class="ident">unwrap_or</span>(<span class="number">0</span>)
-                        <span class="op">&lt;</span> <span class="number">13</span>
-                    {
-                        <span class="kw">let</span> <span class="ident">labels</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(
-                            <span class="ident">ErrorKind::IncompatibleServer</span> {
-                                <span class="ident">message</span>: <span class="string">&quot;Snapshot reads require MongoDB 5.0 or later&quot;</span>.<span class="ident">into</span>(),
+                    <span class="kw">if </span>connection
+                        .stream_description()<span class="question-mark">?
+                        </span>.max_wire_version
+                        .unwrap_or(<span class="number">0</span>)
+                        &lt; <span class="number">13
+                    </span>{
+                        <span class="kw">let </span>labels: <span class="prelude-ty">Option</span>&lt;Vec&lt;<span class="kw">_</span>&gt;&gt; = <span class="prelude-val">None</span>;
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new(
+                            ErrorKind::IncompatibleServer {
+                                message: <span class="string">&quot;Snapshot reads require MongoDB 5.0 or later&quot;</span>.into(),
                             },
-                            <span class="ident">labels</span>,
+                            labels,
                         ));
                     }
-                    <span class="ident">cmd</span>.<span class="ident">set_snapshot_read_concern</span>(<span class="ident">session</span>);
+                    cmd.set_snapshot_read_concern(session);
                 }
-                <span class="comment">// If this is a causally consistent session, set `readConcern.afterClusterTime`.</span>
-                <span class="comment">// Causal consistency defaults to true, unless snapshot is true.</span>
-                <span class="kw">else</span> <span class="kw">if</span> <span class="ident">session</span>
-                    .<span class="ident">options</span>()
-                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">opts</span><span class="op">|</span> <span class="ident">opts</span>.<span class="ident">causal_consistency</span>)
-                    .<span class="ident">unwrap_or</span>(<span class="bool-val">true</span>)
-                    <span class="op">&amp;&amp;</span> <span class="macro">matches!</span>(
-                        <span class="ident">session</span>.<span class="ident">transaction</span>.<span class="ident">state</span>,
-                        <span class="ident">TransactionState::None</span> <span class="op">|</span> <span class="ident">TransactionState::Starting</span>
+                <span class="comment">// If this is a causally consistent session, set `readConcern.afterClusterTime`.
+                // Causal consistency defaults to true, unless snapshot is true.
+                </span><span class="kw">else if </span>session
+                    .options()
+                    .and_then(|opts| opts.causal_consistency)
+                    .unwrap_or(<span class="bool-val">true</span>)
+                    &amp;&amp; <span class="macro">matches!</span>(
+                        session.transaction.state,
+                        TransactionState::None | TransactionState::Starting
                     )
-                    <span class="op">&amp;&amp;</span> <span class="ident">op</span>.<span class="ident">supports_read_concern</span>(<span class="ident">stream_description</span>)
+                    &amp;&amp; op.supports_read_concern(stream_description)
                 {
-                    <span class="ident">cmd</span>.<span class="ident">set_after_cluster_time</span>(<span class="ident">session</span>);
+                    cmd.set_after_cluster_time(session);
                 }
 
-                <span class="kw">match</span> <span class="ident">session</span>.<span class="ident">transaction</span>.<span class="ident">state</span> {
-                    <span class="ident">TransactionState::Starting</span> =&gt; {
-                        <span class="ident">cmd</span>.<span class="ident">set_start_transaction</span>();
-                        <span class="ident">cmd</span>.<span class="ident">set_autocommit</span>();
+                <span class="kw">match </span>session.transaction.state {
+                    TransactionState::Starting =&gt; {
+                        cmd.set_start_transaction();
+                        cmd.set_autocommit();
 
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">options</span>) <span class="op">=</span> <span class="ident">session</span>.<span class="ident">transaction</span>.<span class="ident">options</span> {
-                            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">read_concern</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">read_concern</span> {
-                                <span class="ident">cmd</span>.<span class="ident">set_read_concern_level</span>(<span class="ident">read_concern</span>.<span class="ident">level</span>.<span class="ident">clone</span>());
+                        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>options) = session.transaction.options {
+                            <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>read_concern) = options.read_concern {
+                                cmd.set_read_concern_level(read_concern.level.clone());
                             }
                         }
-                        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_load_balanced</span>() {
-                            <span class="ident">session</span>.<span class="ident">pin_connection</span>(<span class="ident">connection</span>.<span class="ident">pin</span>()<span class="question-mark">?</span>);
-                        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">is_sharded</span> {
-                            <span class="ident">session</span>.<span class="ident">pin_mongos</span>(<span class="ident">connection</span>.<span class="ident">address</span>().<span class="ident">clone</span>());
+                        <span class="kw">if </span><span class="self">self</span>.is_load_balanced() {
+                            session.pin_connection(connection.pin()<span class="question-mark">?</span>);
+                        } <span class="kw">else if </span>is_sharded {
+                            session.pin_mongos(connection.address().clone());
                         }
-                        <span class="ident">session</span>.<span class="ident">transaction</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">TransactionState::InProgress</span>;
+                        session.transaction.state = TransactionState::InProgress;
                     }
-                    <span class="ident">TransactionState::InProgress</span> =&gt; <span class="ident">cmd</span>.<span class="ident">set_autocommit</span>(),
-                    <span class="ident">TransactionState::Committed</span> { .. } <span class="op">|</span> <span class="ident">TransactionState::Aborted</span> =&gt; {
-                        <span class="ident">cmd</span>.<span class="ident">set_autocommit</span>();
+                    TransactionState::InProgress =&gt; cmd.set_autocommit(),
+                    TransactionState::Committed { .. } | TransactionState::Aborted =&gt; {
+                        cmd.set_autocommit();
 
-                        <span class="comment">// Append the recovery token to the command if we are committing or aborting</span>
-                        <span class="comment">// on a sharded transaction.</span>
-                        <span class="kw">if</span> <span class="ident">is_sharded</span> {
-                            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">recovery_token</span>) <span class="op">=</span> <span class="ident">session</span>.<span class="ident">transaction</span>.<span class="ident">recovery_token</span> {
-                                <span class="ident">cmd</span>.<span class="ident">set_recovery_token</span>(<span class="ident">recovery_token</span>);
+                        <span class="comment">// Append the recovery token to the command if we are committing or aborting
+                        // on a sharded transaction.
+                        </span><span class="kw">if </span>is_sharded {
+                            <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>recovery_token) = session.transaction.recovery_token {
+                                cmd.set_recovery_token(recovery_token);
                             }
                         }
                     }
-                    <span class="kw">_</span> =&gt; {}
+                    <span class="kw">_ </span>=&gt; {}
                 }
-                <span class="ident">session</span>.<span class="ident">update_last_use</span>();
+                session.update_last_use();
             }
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">session</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">op</span>.<span class="ident">supports_sessions</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">session</span>.<span class="ident">is_implicit</span>() =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
-                    <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;{} does not support sessions&quot;</span>, <span class="ident">cmd</span>.<span class="ident">name</span>),
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>session) <span class="kw">if </span>!op.supports_sessions() &amp;&amp; !session.is_implicit() =&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(ErrorKind::InvalidArgument {
+                    message: <span class="macro">format!</span>(<span class="string">&quot;{} does not support sessions&quot;</span>, cmd.name),
                 }
-                .<span class="ident">into</span>());
+                .into());
             }
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">session</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">op</span>.<span class="ident">is_acknowledged</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">session</span>.<span class="ident">is_implicit</span>() =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidArgument</span> {
-                    <span class="ident">message</span>: <span class="string">&quot;Cannot use ClientSessions with unacknowledged write concern&quot;</span>
-                        .<span class="ident">to_string</span>(),
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>session) <span class="kw">if </span>!op.is_acknowledged() &amp;&amp; !session.is_implicit() =&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(ErrorKind::InvalidArgument {
+                    message: <span class="string">&quot;Cannot use ClientSessions with unacknowledged write concern&quot;
+                        </span>.to_string(),
                 }
-                .<span class="ident">into</span>());
+                .into());
             }
-            <span class="kw">_</span> =&gt; {}
+            <span class="kw">_ </span>=&gt; {}
         }
 
-        <span class="kw">let</span> <span class="ident">session_cluster_time</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">session</span><span class="op">|</span> <span class="ident">session</span>.<span class="ident">cluster_time</span>());
-        <span class="kw">let</span> <span class="ident">client_cluster_time</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">cluster_time</span>();
-        <span class="kw">let</span> <span class="ident">max_cluster_time</span> <span class="op">=</span> <span class="ident">std::cmp::max</span>(<span class="ident">session_cluster_time</span>, <span class="ident">client_cluster_time</span>.<span class="ident">as_ref</span>());
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cluster_time</span>) <span class="op">=</span> <span class="ident">max_cluster_time</span> {
-            <span class="ident">cmd</span>.<span class="ident">set_cluster_time</span>(<span class="ident">cluster_time</span>);
+        <span class="kw">let </span>session_cluster_time = session.as_ref().and_then(|session| session.cluster_time());
+        <span class="kw">let </span>client_cluster_time = <span class="self">self</span>.inner.topology.cluster_time();
+        <span class="kw">let </span>max_cluster_time = std::cmp::max(session_cluster_time, client_cluster_time.as_ref());
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(cluster_time) = max_cluster_time {
+            cmd.set_cluster_time(cluster_time);
         }
 
-        <span class="kw">let</span> <span class="ident">connection_info</span> <span class="op">=</span> <span class="ident">connection</span>.<span class="ident">info</span>();
-        <span class="kw">let</span> <span class="ident">service_id</span> <span class="op">=</span> <span class="ident">connection</span>.<span class="ident">service_id</span>();
-        <span class="kw">let</span> <span class="ident">request_id</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::cmap::conn::next_request_id</span>();
+        <span class="kw">let </span>connection_info = connection.info();
+        <span class="kw">let </span>service_id = connection.service_id();
+        <span class="kw">let </span>request_id = <span class="kw">crate</span>::cmap::conn::next_request_id();
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">server_api</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">options</span>.<span class="ident">server_api</span> {
-            <span class="ident">cmd</span>.<span class="ident">set_server_api</span>(<span class="ident">server_api</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>server_api) = <span class="self">self</span>.inner.options.server_api {
+            cmd.set_server_api(server_api);
         }
 
-        <span class="kw">let</span> <span class="ident">should_redact</span> <span class="op">=</span> <span class="ident">cmd</span>.<span class="ident">should_redact</span>();
+        <span class="kw">let </span>should_redact = cmd.should_redact();
 
-        <span class="kw">let</span> <span class="ident">cmd_name</span> <span class="op">=</span> <span class="ident">cmd</span>.<span class="ident">name</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">target_db</span> <span class="op">=</span> <span class="ident">cmd</span>.<span class="ident">target_db</span>.<span class="ident">clone</span>();
+        <span class="kw">let </span>cmd_name = cmd.name.clone();
+        <span class="kw">let </span>target_db = cmd.target_db.clone();
 
-        <span class="kw">let</span> <span class="ident">serialized</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">serialize_command</span>(<span class="ident">cmd</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">raw_cmd</span> <span class="op">=</span> <span class="ident">RawCommand</span> {
-            <span class="ident">name</span>: <span class="ident">cmd_name</span>.<span class="ident">clone</span>(),
-            <span class="ident">target_db</span>,
-            <span class="ident">bytes</span>: <span class="ident">serialized</span>,
+        <span class="kw">let </span>serialized = op.serialize_command(cmd)<span class="question-mark">?</span>;
+        <span class="kw">let </span>raw_cmd = RawCommand {
+            name: cmd_name.clone(),
+            target_db,
+            bytes: serialized,
         };
 
-        <span class="self">self</span>.<span class="ident">emit_command_event</span>(<span class="op">|</span><span class="ident">handler</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">command_body</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">should_redact</span> {
-                <span class="ident">Document::new</span>()
-            } <span class="kw">else</span> {
-                <span class="ident">Document::from_reader</span>(<span class="ident">raw_cmd</span>.<span class="ident">bytes</span>.<span class="ident">as_slice</span>())
-                    .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="macro">doc!</span> { <span class="string">&quot;serialization error&quot;</span>: <span class="ident">e</span>.<span class="ident">to_string</span>() })
+        <span class="self">self</span>.emit_command_event(|handler| {
+            <span class="kw">let </span>command_body = <span class="kw">if </span>should_redact {
+                Document::new()
+            } <span class="kw">else </span>{
+                Document::from_reader(raw_cmd.bytes.as_slice())
+                    .unwrap_or_else(|e| <span class="macro">doc! </span>{ <span class="string">&quot;serialization error&quot;</span>: e.to_string() })
             };
-            <span class="kw">let</span> <span class="ident">command_started_event</span> <span class="op">=</span> <span class="ident">CommandStartedEvent</span> {
-                <span class="ident">command</span>: <span class="ident">command_body</span>,
-                <span class="ident">db</span>: <span class="ident">raw_cmd</span>.<span class="ident">target_db</span>.<span class="ident">clone</span>(),
-                <span class="ident">command_name</span>: <span class="ident">raw_cmd</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-                <span class="ident">request_id</span>,
-                <span class="ident">connection</span>: <span class="ident">connection_info</span>.<span class="ident">clone</span>(),
-                <span class="ident">service_id</span>,
+            <span class="kw">let </span>command_started_event = CommandStartedEvent {
+                command: command_body,
+                db: raw_cmd.target_db.clone(),
+                command_name: raw_cmd.name.clone(),
+                request_id,
+                connection: connection_info.clone(),
+                service_id,
             };
 
-            <span class="ident">handler</span>.<span class="ident">handle_command_started_event</span>(<span class="ident">command_started_event</span>);
+            handler.handle_command_started_event(command_started_event);
         });
 
-        <span class="kw">let</span> <span class="ident">start_time</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
-        <span class="kw">let</span> <span class="ident">command_result</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">connection</span>.<span class="ident">send_raw_command</span>(<span class="ident">raw_cmd</span>, <span class="ident">request_id</span>).<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">response</span>) =&gt; {
-                <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_response</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Operation</span><span class="op">&gt;</span>(
-                    <span class="ident">client</span>: <span class="kw-2">&amp;</span><span class="ident">Client</span>,
-                    <span class="ident">op</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
-                    <span class="ident">session</span>: <span class="kw-2">&amp;mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span>,
-                    <span class="ident">is_sharded</span>: <span class="ident">bool</span>,
-                    <span class="ident">response</span>: <span class="ident">RawCommandResponse</span>,
-                ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RawCommandResponse</span><span class="op">&gt;</span> {
-                    <span class="kw">let</span> <span class="ident">raw_doc</span> <span class="op">=</span> <span class="ident">RawDocument::from_bytes</span>(<span class="ident">response</span>.<span class="ident">as_bytes</span>())<span class="question-mark">?</span>;
+        <span class="kw">let </span>start_time = Instant::now();
+        <span class="kw">let </span>command_result = <span class="kw">match </span>connection.send_raw_command(raw_cmd, request_id).<span class="kw">await </span>{
+            <span class="prelude-val">Ok</span>(response) =&gt; {
+                <span class="kw">async fn </span>handle_response&lt;T: Operation&gt;(
+                    client: <span class="kw-2">&amp;</span>Client,
+                    op: <span class="kw-2">&amp;</span>T,
+                    session: <span class="kw-2">&amp;mut </span><span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>ClientSession&gt;,
+                    is_sharded: bool,
+                    response: RawCommandResponse,
+                ) -&gt; <span class="prelude-ty">Result</span>&lt;RawCommandResponse&gt; {
+                    <span class="kw">let </span>raw_doc = RawDocument::from_bytes(response.as_bytes())<span class="question-mark">?</span>;
 
-                    <span class="kw">let</span> <span class="ident">ok</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">raw_doc</span>.<span class="ident">get</span>(<span class="string">&quot;ok&quot;</span>)<span class="question-mark">?</span> {
-                        <span class="prelude-val">Some</span>(<span class="ident">b</span>) =&gt; <span class="ident"><span class="kw">crate</span>::bson_util::get_int_raw</span>(<span class="ident">b</span>).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                            <span class="ident">ErrorKind::InvalidResponse</span> {
-                                <span class="ident">message</span>: <span class="macro">format!</span>(
+                    <span class="kw">let </span>ok = <span class="kw">match </span>raw_doc.get(<span class="string">&quot;ok&quot;</span>)<span class="question-mark">? </span>{
+                        <span class="prelude-val">Some</span>(b) =&gt; <span class="kw">crate</span>::bson_util::get_int_raw(b).ok_or_else(|| {
+                            ErrorKind::InvalidResponse {
+                                message: <span class="macro">format!</span>(
                                     <span class="string">&quot;expected ok value to be a number, instead got {:?}&quot;</span>,
-                                    <span class="ident">b</span>
+                                    b
                                 ),
                             }
                         })<span class="question-mark">?</span>,
-                        <span class="prelude-val">None</span> =&gt; {
-                            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidResponse</span> {
-                                <span class="ident">message</span>: <span class="string">&quot;missing &#39;ok&#39; value in response&quot;</span>.<span class="ident">to_string</span>(),
+                        <span class="prelude-val">None </span>=&gt; {
+                            <span class="kw">return </span><span class="prelude-val">Err</span>(ErrorKind::InvalidResponse {
+                                message: <span class="string">&quot;missing &#39;ok&#39; value in response&quot;</span>.to_string(),
                             }
-                            .<span class="ident">into</span>())
+                            .into())
                         }
                     };
 
-                    <span class="kw">let</span> <span class="ident">cluster_time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClusterTime</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">raw_doc</span>
-                        .<span class="ident">get</span>(<span class="string">&quot;$clusterTime&quot;</span>)<span class="question-mark">?</span>
-                        .<span class="ident">and_then</span>(<span class="ident">RawBsonRef::as_document</span>)
-                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">bson::from_slice</span>(<span class="ident">d</span>.<span class="ident">as_bytes</span>()))
-                        .<span class="ident">transpose</span>()<span class="question-mark">?</span>;
+                    <span class="kw">let </span>cluster_time: <span class="prelude-ty">Option</span>&lt;ClusterTime&gt; = raw_doc
+                        .get(<span class="string">&quot;$clusterTime&quot;</span>)<span class="question-mark">?
+                        </span>.and_then(RawBsonRef::as_document)
+                        .map(|d| bson::from_slice(d.as_bytes()))
+                        .transpose()<span class="question-mark">?</span>;
 
-                    <span class="kw">let</span> <span class="ident">at_cluster_time</span> <span class="op">=</span> <span class="ident">op</span>.<span class="ident">extract_at_cluster_time</span>(<span class="ident">raw_doc</span>)<span class="question-mark">?</span>;
+                    <span class="kw">let </span>at_cluster_time = op.extract_at_cluster_time(raw_doc)<span class="question-mark">?</span>;
 
-                    <span class="ident">client</span>
-                        .<span class="ident">update_cluster_time</span>(<span class="ident">cluster_time</span>, <span class="ident">at_cluster_time</span>, <span class="ident">session</span>)
+                    client
+                        .update_cluster_time(cluster_time, at_cluster_time, session)
                         .<span class="kw">await</span>;
 
-                    <span class="kw">if</span> <span class="kw">let</span> (<span class="prelude-val">Some</span>(<span class="ident">session</span>), <span class="prelude-val">Some</span>(<span class="ident">ts</span>)) <span class="op">=</span> (
-                        <span class="ident">session</span>.<span class="ident">as_mut</span>(),
-                        <span class="ident">raw_doc</span>
-                            .<span class="ident">get</span>(<span class="string">&quot;operationTime&quot;</span>)<span class="question-mark">?</span>
-                            .<span class="ident">and_then</span>(<span class="ident">RawBsonRef::as_timestamp</span>),
+                    <span class="kw">if let </span>(<span class="prelude-val">Some</span>(session), <span class="prelude-val">Some</span>(ts)) = (
+                        session.as_mut(),
+                        raw_doc
+                            .get(<span class="string">&quot;operationTime&quot;</span>)<span class="question-mark">?
+                            </span>.and_then(RawBsonRef::as_timestamp),
                     ) {
-                        <span class="ident">session</span>.<span class="ident">advance_operation_time</span>(<span class="ident">ts</span>);
+                        session.advance_operation_time(ts);
                     }
 
-                    <span class="kw">if</span> <span class="ident">ok</span> <span class="op">==</span> <span class="number">1</span> {
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">session</span>) <span class="op">=</span> <span class="ident">session</span> {
-                            <span class="kw">if</span> <span class="ident">is_sharded</span> <span class="op">&amp;&amp;</span> <span class="ident">session</span>.<span class="ident">in_transaction</span>() {
-                                <span class="kw">let</span> <span class="ident">recovery_token</span> <span class="op">=</span> <span class="ident">raw_doc</span>
-                                    .<span class="ident">get</span>(<span class="string">&quot;recoveryToken&quot;</span>)<span class="question-mark">?</span>
-                                    .<span class="ident">and_then</span>(<span class="ident">RawBsonRef::as_document</span>)
-                                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">bson::from_slice</span>(<span class="ident">d</span>.<span class="ident">as_bytes</span>()))
-                                    .<span class="ident">transpose</span>()<span class="question-mark">?</span>;
-                                <span class="ident">session</span>.<span class="ident">transaction</span>.<span class="ident">recovery_token</span> <span class="op">=</span> <span class="ident">recovery_token</span>;
+                    <span class="kw">if </span>ok == <span class="number">1 </span>{
+                        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref mut </span>session) = session {
+                            <span class="kw">if </span>is_sharded &amp;&amp; session.in_transaction() {
+                                <span class="kw">let </span>recovery_token = raw_doc
+                                    .get(<span class="string">&quot;recoveryToken&quot;</span>)<span class="question-mark">?
+                                    </span>.and_then(RawBsonRef::as_document)
+                                    .map(|d| bson::from_slice(d.as_bytes()))
+                                    .transpose()<span class="question-mark">?</span>;
+                                session.transaction.recovery_token = recovery_token;
                             }
                         }
 
-                        <span class="prelude-val">Ok</span>(<span class="ident">response</span>)
-                    } <span class="kw">else</span> {
-                        <span class="prelude-val">Err</span>(<span class="ident">response</span>
-                            .<span class="ident">body</span>::<span class="op">&lt;</span><span class="ident">CommandErrorBody</span><span class="op">&gt;</span>()
-                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">error_response</span><span class="op">|</span> <span class="ident">error_response</span>.<span class="ident">into</span>())
-                            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
-                                <span class="ident">Error::from</span>(<span class="ident">ErrorKind::InvalidResponse</span> {
-                                    <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;error deserializing command error: {}&quot;</span>, <span class="ident">e</span>),
+                        <span class="prelude-val">Ok</span>(response)
+                    } <span class="kw">else </span>{
+                        <span class="prelude-val">Err</span>(response
+                            .body::&lt;CommandErrorBody&gt;()
+                            .map(|error_response| error_response.into())
+                            .unwrap_or_else(|e| {
+                                Error::from(ErrorKind::InvalidResponse {
+                                    message: <span class="macro">format!</span>(<span class="string">&quot;error deserializing command error: {}&quot;</span>, e),
                                 })
                             }))
                     }
                 }
 
-                <span class="ident">handle_response</span>(<span class="self">self</span>, <span class="ident">op</span>, <span class="ident">session</span>, <span class="ident">is_sharded</span>, <span class="ident">response</span>).<span class="kw">await</span>
-            }
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">err</span>),
+                handle_response(<span class="self">self</span>, op, session, is_sharded, response).<span class="kw">await
+            </span>}
+            <span class="prelude-val">Err</span>(err) =&gt; <span class="prelude-val">Err</span>(err),
         };
 
-        <span class="kw">let</span> <span class="ident">duration</span> <span class="op">=</span> <span class="ident">start_time</span>.<span class="ident">elapsed</span>();
+        <span class="kw">let </span>duration = start_time.elapsed();
 
-        <span class="kw">match</span> <span class="ident">command_result</span> {
-            <span class="prelude-val">Err</span>(<span class="kw-2">mut</span> <span class="ident">err</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">emit_command_event</span>(<span class="op">|</span><span class="ident">handler</span><span class="op">|</span> {
-                    <span class="kw">let</span> <span class="ident">command_failed_event</span> <span class="op">=</span> <span class="ident">CommandFailedEvent</span> {
-                        <span class="ident">duration</span>,
-                        <span class="ident">command_name</span>: <span class="ident">cmd_name</span>,
-                        <span class="ident">failure</span>: <span class="ident">err</span>.<span class="ident">clone</span>(),
-                        <span class="ident">request_id</span>,
-                        <span class="ident">connection</span>: <span class="ident">connection_info</span>,
-                        <span class="ident">service_id</span>,
+        <span class="kw">match </span>command_result {
+            <span class="prelude-val">Err</span>(<span class="kw-2">mut </span>err) =&gt; {
+                <span class="self">self</span>.emit_command_event(|handler| {
+                    <span class="kw">let </span>command_failed_event = CommandFailedEvent {
+                        duration,
+                        command_name: cmd_name,
+                        failure: err.clone(),
+                        request_id,
+                        connection: connection_info,
+                        service_id,
                     };
 
-                    <span class="ident">handler</span>.<span class="ident">handle_command_failed_event</span>(<span class="ident">command_failed_event</span>);
+                    handler.handle_command_failed_event(command_failed_event);
                 });
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">session</span>) <span class="op">=</span> <span class="ident">session</span> {
-                    <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">is_network_error</span>() {
-                        <span class="ident">session</span>.<span class="ident">mark_dirty</span>();
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref mut </span>session) = session {
+                    <span class="kw">if </span>err.is_network_error() {
+                        session.mark_dirty();
                     }
                 }
 
-                <span class="ident">err</span>.<span class="ident">add_labels_and_update_pin</span>(<span class="prelude-val">Some</span>(<span class="ident">connection</span>), <span class="ident">session</span>, <span class="prelude-val">Some</span>(<span class="ident">retryability</span>))<span class="question-mark">?</span>;
-                <span class="ident">op</span>.<span class="ident">handle_error</span>(<span class="ident">err</span>)
+                err.add_labels_and_update_pin(<span class="prelude-val">Some</span>(connection), session, <span class="prelude-val">Some</span>(retryability))<span class="question-mark">?</span>;
+                op.handle_error(err)
             }
-            <span class="prelude-val">Ok</span>(<span class="ident">response</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">emit_command_event</span>(<span class="op">|</span><span class="ident">handler</span><span class="op">|</span> {
-                    <span class="kw">let</span> <span class="ident">reply</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">should_redact</span> {
-                        <span class="ident">Document::new</span>()
-                    } <span class="kw">else</span> {
-                        <span class="ident">response</span>
-                            .<span class="ident">body</span>()
-                            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="macro">doc!</span> { <span class="string">&quot;deserialization error&quot;</span>: <span class="ident">e</span>.<span class="ident">to_string</span>() })
+            <span class="prelude-val">Ok</span>(response) =&gt; {
+                <span class="self">self</span>.emit_command_event(|handler| {
+                    <span class="kw">let </span>reply = <span class="kw">if </span>should_redact {
+                        Document::new()
+                    } <span class="kw">else </span>{
+                        response
+                            .body()
+                            .unwrap_or_else(|e| <span class="macro">doc! </span>{ <span class="string">&quot;deserialization error&quot;</span>: e.to_string() })
                     };
 
-                    <span class="kw">let</span> <span class="ident">command_succeeded_event</span> <span class="op">=</span> <span class="ident">CommandSucceededEvent</span> {
-                        <span class="ident">duration</span>,
-                        <span class="ident">reply</span>,
-                        <span class="ident">command_name</span>: <span class="ident">cmd_name</span>.<span class="ident">clone</span>(),
-                        <span class="ident">request_id</span>,
-                        <span class="ident">connection</span>: <span class="ident">connection_info</span>,
-                        <span class="ident">service_id</span>,
+                    <span class="kw">let </span>command_succeeded_event = CommandSucceededEvent {
+                        duration,
+                        reply,
+                        command_name: cmd_name.clone(),
+                        request_id,
+                        connection: connection_info,
+                        service_id,
                     };
-                    <span class="ident">handler</span>.<span class="ident">handle_command_succeeded_event</span>(<span class="ident">command_succeeded_event</span>);
+                    handler.handle_command_succeeded_event(command_succeeded_event);
                 });
 
-                <span class="kw">match</span> <span class="ident">op</span>.<span class="ident">handle_response</span>(<span class="ident">response</span>, <span class="ident">connection</span>.<span class="ident">stream_description</span>()<span class="question-mark">?</span>) {
-                    <span class="prelude-val">Ok</span>(<span class="ident">response</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">response</span>),
-                    <span class="prelude-val">Err</span>(<span class="kw-2">mut</span> <span class="ident">err</span>) =&gt; {
-                        <span class="ident">err</span>.<span class="ident">add_labels_and_update_pin</span>(
-                            <span class="prelude-val">Some</span>(<span class="ident">connection</span>),
-                            <span class="ident">session</span>,
-                            <span class="prelude-val">Some</span>(<span class="ident">retryability</span>),
+                <span class="kw">match </span>op.handle_response(response, connection.stream_description()<span class="question-mark">?</span>) {
+                    <span class="prelude-val">Ok</span>(response) =&gt; <span class="prelude-val">Ok</span>(response),
+                    <span class="prelude-val">Err</span>(<span class="kw-2">mut </span>err) =&gt; {
+                        err.add_labels_and_update_pin(
+                            <span class="prelude-val">Some</span>(connection),
+                            session,
+                            <span class="prelude-val">Some</span>(retryability),
                         )<span class="question-mark">?</span>;
-                        <span class="prelude-val">Err</span>(<span class="ident">err</span>)
+                        <span class="prelude-val">Err</span>(err)
                     }
                 }
             }
         }
     }
 
-    <span class="doccomment">/// Start an implicit session if the operation and write concern are compatible with sessions.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_implicit_session</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Operation</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">op</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClientSession</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get_session_support_status</span>().<span class="kw">await</span><span class="question-mark">?</span> {
-            <span class="ident">SessionSupportStatus::Supported</span> {
-                <span class="ident">logical_session_timeout</span>,
-            } <span class="kw">if</span> <span class="ident">op</span>.<span class="ident">supports_sessions</span>() <span class="op">&amp;&amp;</span> <span class="ident">op</span>.<span class="ident">is_acknowledged</span>() =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(
-                <span class="self">self</span>.<span class="ident">start_session_with_timeout</span>(<span class="ident">logical_session_timeout</span>, <span class="prelude-val">None</span>, <span class="bool-val">true</span>)
+    <span class="doccomment">/// Start an implicit session if the operation and write concern are compatible with sessions.
+    </span><span class="kw">async fn </span>start_implicit_session&lt;T: Operation&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, op: <span class="kw-2">&amp;</span>T) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;ClientSession&gt;&gt; {
+        <span class="kw">match </span><span class="self">self</span>.get_session_support_status().<span class="kw">await</span><span class="question-mark">? </span>{
+            SessionSupportStatus::Supported {
+                logical_session_timeout,
+            } <span class="kw">if </span>op.supports_sessions() &amp;&amp; op.is_acknowledged() =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(
+                <span class="self">self</span>.start_session_with_timeout(logical_session_timeout, <span class="prelude-val">None</span>, <span class="bool-val">true</span>)
                     .<span class="kw">await</span>,
             )),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">select_data_bearing_server</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">topology_type</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">topology_type</span>();
-        <span class="kw">let</span> <span class="ident">criteria</span> <span class="op">=</span> <span class="ident">SelectionCriteria::Predicate</span>(<span class="ident">Arc::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">server_info</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">server_type</span> <span class="op">=</span> <span class="ident">server_info</span>.<span class="ident">server_type</span>();
-            (<span class="macro">matches!</span>(<span class="ident">topology_type</span>, <span class="ident">TopologyType::Single</span>) <span class="op">&amp;&amp;</span> <span class="ident">server_type</span>.<span class="ident">is_available</span>())
-                <span class="op">|</span><span class="op">|</span> <span class="ident">server_type</span>.<span class="ident">is_data_bearing</span>()
+    <span class="kw">async fn </span>select_data_bearing_server(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>topology_type = <span class="self">self</span>.inner.topology.topology_type();
+        <span class="kw">let </span>criteria = SelectionCriteria::Predicate(Arc::new(<span class="kw">move </span>|server_info| {
+            <span class="kw">let </span>server_type = server_info.server_type();
+            (<span class="macro">matches!</span>(topology_type, TopologyType::Single) &amp;&amp; server_type.is_available())
+                || server_type.is_data_bearing()
         }));
-        <span class="kw">let</span> <span class="kw">_</span>: <span class="ident">SelectedServer</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">select_server</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">criteria</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let _</span>: SelectedServer = <span class="self">self</span>.select_server(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>criteria)).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Gets whether the topology supports sessions, and if so, returns the topology&#39;s logical</span>
-    <span class="doccomment">/// session timeout. If it has yet to be determined if the topology supports sessions, this</span>
-    <span class="doccomment">/// method will perform a server selection that will force that determination to be made.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_session_support_status</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">SessionSupportStatus</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">initial_status</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">session_support_status</span>();
+    <span class="doccomment">/// Gets whether the topology supports sessions, and if so, returns the topology&#39;s logical
+    /// session timeout. If it has yet to be determined if the topology supports sessions, this
+    /// method will perform a server selection that will force that determination to be made.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>get_session_support_status(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;SessionSupportStatus&gt; {
+        <span class="kw">let </span>initial_status = <span class="self">self</span>.inner.topology.session_support_status();
 
-        <span class="comment">// Need to guarantee that we&#39;re connected to at least one server that can determine if</span>
-        <span class="comment">// sessions are supported or not.</span>
-        <span class="kw">match</span> <span class="ident">initial_status</span> {
-            <span class="ident">SessionSupportStatus::Undetermined</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">select_data_bearing_server</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">session_support_status</span>())
+        <span class="comment">// Need to guarantee that we&#39;re connected to at least one server that can determine if
+        // sessions are supported or not.
+        </span><span class="kw">match </span>initial_status {
+            SessionSupportStatus::Undetermined =&gt; {
+                <span class="self">self</span>.select_data_bearing_server().<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(<span class="self">self</span>.inner.topology.session_support_status())
             }
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">initial_status</span>),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(initial_status),
         }
     }
 
-    <span class="doccomment">/// Gets whether the topology supports transactions. If it has yet to be determined if the</span>
-    <span class="doccomment">/// topology supports transactions, this method will perform a server selection that will force</span>
-    <span class="doccomment">/// that determination to be made.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">transaction_support_status</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TransactionSupportStatus</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">initial_status</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">transaction_support_status</span>();
+    <span class="doccomment">/// Gets whether the topology supports transactions. If it has yet to be determined if the
+    /// topology supports transactions, this method will perform a server selection that will force
+    /// that determination to be made.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>transaction_support_status(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;TransactionSupportStatus&gt; {
+        <span class="kw">let </span>initial_status = <span class="self">self</span>.inner.topology.transaction_support_status();
 
-        <span class="comment">// Need to guarantee that we&#39;re connected to at least one server that can determine if</span>
-        <span class="comment">// sessions are supported or not.</span>
-        <span class="kw">match</span> <span class="ident">initial_status</span> {
-            <span class="ident">TransactionSupportStatus::Undetermined</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">select_data_bearing_server</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">topology</span>.<span class="ident">transaction_support_status</span>())
+        <span class="comment">// Need to guarantee that we&#39;re connected to at least one server that can determine if
+        // sessions are supported or not.
+        </span><span class="kw">match </span>initial_status {
+            TransactionSupportStatus::Undetermined =&gt; {
+                <span class="self">self</span>.select_data_bearing_server().<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>(<span class="self">self</span>.inner.topology.transaction_support_status())
             }
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">initial_status</span>),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(initial_status),
         }
     }
 
-    <span class="doccomment">/// Returns the retryability level for the execution of this operation.</span>
-    <span class="kw">fn</span> <span class="ident">get_op_retryability</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Operation</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Returns the retryability level for the execution of this operation.
+    </span><span class="kw">fn </span>get_op_retryability&lt;T: Operation&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">op</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
-        <span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Retryability</span> {
-        <span class="kw">if</span> <span class="ident">session</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">session</span><span class="op">|</span> <span class="ident">session</span>.<span class="ident">in_transaction</span>())
-            .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+        op: <span class="kw-2">&amp;</span>T,
+        session: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>ClientSession&gt;,
+    ) -&gt; Retryability {
+        <span class="kw">if </span>session
+            .as_ref()
+            .map(|session| session.in_transaction())
+            .unwrap_or(<span class="bool-val">false</span>)
         {
-            <span class="kw">return</span> <span class="ident">Retryability::None</span>;
+            <span class="kw">return </span>Retryability::None;
         }
-        <span class="kw">match</span> <span class="ident">op</span>.<span class="ident">retryability</span>() {
-            <span class="ident">Retryability::Read</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">options</span>.<span class="ident">retry_reads</span> <span class="op">!</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">false</span>) =&gt; {
-                <span class="ident">Retryability::Read</span>
+        <span class="kw">match </span>op.retryability() {
+            Retryability::Read <span class="kw">if </span><span class="self">self</span>.inner.options.retry_reads != <span class="prelude-val">Some</span>(<span class="bool-val">false</span>) =&gt; {
+                Retryability::Read
             }
-            <span class="comment">// commitTransaction and abortTransaction should be retried regardless of the</span>
-            <span class="comment">// value for retry_writes set on the Client</span>
-            <span class="ident">Retryability::Write</span>
-                <span class="kw">if</span> <span class="ident">op</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">CommitTransaction::NAME</span>
-                    <span class="op">|</span><span class="op">|</span> <span class="ident">op</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">AbortTransaction::NAME</span>
-                    <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">options</span>.<span class="ident">retry_writes</span> <span class="op">!</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">false</span>) =&gt;
+            <span class="comment">// commitTransaction and abortTransaction should be retried regardless of the
+            // value for retry_writes set on the Client
+            </span>Retryability::Write
+                <span class="kw">if </span>op.name() == CommitTransaction::NAME
+                    || op.name() == AbortTransaction::NAME
+                    || <span class="self">self</span>.inner.options.retry_writes != <span class="prelude-val">Some</span>(<span class="bool-val">false</span>) =&gt;
             {
-                <span class="ident">Retryability::Write</span>
+                Retryability::Write
             }
-            <span class="kw">_</span> =&gt; <span class="ident">Retryability::None</span>,
+            <span class="kw">_ </span>=&gt; Retryability::None,
         }
     }
 
-    <span class="doccomment">/// Returns the retryability level for the execution of this operation on this connection.</span>
-    <span class="kw">fn</span> <span class="ident">get_retryability</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Operation</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Returns the retryability level for the execution of this operation on this connection.
+    </span><span class="kw">fn </span>get_retryability&lt;T: Operation&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>,
-        <span class="ident">op</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
-        <span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Retryability</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get_op_retryability</span>(<span class="ident">op</span>, <span class="ident">session</span>) {
-            <span class="ident">Retryability::Read</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Retryability::Read</span>),
-            <span class="ident">Retryability::Write</span> <span class="kw">if</span> <span class="ident">conn</span>.<span class="ident">stream_description</span>()<span class="question-mark">?</span>.<span class="ident">supports_retryable_writes</span>() =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="ident">Retryability::Write</span>)
+        conn: <span class="kw-2">&amp;</span>Connection,
+        op: <span class="kw-2">&amp;</span>T,
+        session: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>ClientSession&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Retryability&gt; {
+        <span class="kw">match </span><span class="self">self</span>.get_op_retryability(op, session) {
+            Retryability::Read =&gt; <span class="prelude-val">Ok</span>(Retryability::Read),
+            Retryability::Write <span class="kw">if </span>conn.stream_description()<span class="question-mark">?</span>.supports_retryable_writes() =&gt; {
+                <span class="prelude-val">Ok</span>(Retryability::Write)
             }
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Retryability::None</span>),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(Retryability::None),
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update_cluster_time</span>(
+    <span class="kw">async fn </span>update_cluster_time(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">cluster_time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClusterTime</span><span class="op">&gt;</span>,
-        <span class="ident">at_cluster_time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span>,
-        <span class="ident">session</span>: <span class="kw-2">&amp;mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span>,
+        cluster_time: <span class="prelude-ty">Option</span>&lt;ClusterTime&gt;,
+        at_cluster_time: <span class="prelude-ty">Option</span>&lt;Timestamp&gt;,
+        session: <span class="kw-2">&amp;mut </span><span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>ClientSession&gt;,
     ) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">cluster_time</span>) <span class="op">=</span> <span class="ident">cluster_time</span> {
-            <span class="self">self</span>.<span class="ident">inner</span>
-                .<span class="ident">topology</span>
-                .<span class="ident">advance_cluster_time</span>(<span class="ident">cluster_time</span>.<span class="ident">clone</span>())
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>cluster_time) = cluster_time {
+            <span class="self">self</span>.inner
+                .topology
+                .advance_cluster_time(cluster_time.clone())
                 .<span class="kw">await</span>;
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">session</span>) <span class="op">=</span> <span class="ident">session</span> {
-                <span class="ident">session</span>.<span class="ident">advance_cluster_time</span>(<span class="ident">cluster_time</span>)
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref mut </span>session) = session {
+                session.advance_cluster_time(cluster_time)
             }
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">timestamp</span>) <span class="op">=</span> <span class="ident">at_cluster_time</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">session</span>) <span class="op">=</span> <span class="ident">session</span> {
-                <span class="ident">session</span>.<span class="ident">snapshot_time</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">timestamp</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(timestamp) = at_cluster_time {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref mut </span>session) = session {
+                session.snapshot_time = <span class="prelude-val">Some</span>(timestamp);
             }
         }
     }
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_connection</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Operation</span><span class="op">&gt;</span>(
-    <span class="ident">session</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span>,
-    <span class="ident">op</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
-    <span class="ident">pool</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectionPool</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">session_pinned</span> <span class="op">=</span> <span class="ident">session</span>
-        .<span class="ident">as_ref</span>()
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">transaction</span>.<span class="ident">pinned_connection</span>());
-    <span class="kw">match</span> (<span class="ident">session_pinned</span>, <span class="ident">op</span>.<span class="ident">pinned_connection</span>()) {
-        (<span class="prelude-val">Some</span>(<span class="ident">c</span>), <span class="prelude-val">None</span>) <span class="op">|</span> (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">c</span>)) =&gt; <span class="ident">c</span>.<span class="ident">take_connection</span>().<span class="kw">await</span>,
-        (<span class="prelude-val">Some</span>(<span class="ident">session_handle</span>), <span class="prelude-val">Some</span>(<span class="ident">op_handle</span>)) =&gt; {
-            <span class="comment">// An operation executing in a transaction should be sharing the same pinned connection.</span>
-            <span class="macro">debug_assert_eq!</span>(<span class="ident">session_handle</span>.<span class="ident">id</span>(), <span class="ident">op_handle</span>.<span class="ident">id</span>());
-            <span class="ident">session_handle</span>.<span class="ident">take_connection</span>().<span class="kw">await</span>
-        }
-        (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="ident">pool</span>.<span class="ident">check_out</span>().<span class="kw">await</span>,
+<span class="kw">async fn </span>get_connection&lt;T: Operation&gt;(
+    session: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>ClientSession&gt;,
+    op: <span class="kw-2">&amp;</span>T,
+    pool: <span class="kw-2">&amp;</span>ConnectionPool,
+) -&gt; <span class="prelude-ty">Result</span>&lt;Connection&gt; {
+    <span class="kw">let </span>session_pinned = session
+        .as_ref()
+        .and_then(|s| s.transaction.pinned_connection());
+    <span class="kw">match </span>(session_pinned, op.pinned_connection()) {
+        (<span class="prelude-val">Some</span>(c), <span class="prelude-val">None</span>) | (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(c)) =&gt; c.take_connection().<span class="kw">await</span>,
+        (<span class="prelude-val">Some</span>(session_handle), <span class="prelude-val">Some</span>(op_handle)) =&gt; {
+            <span class="comment">// An operation executing in a transaction should be sharing the same pinned connection.
+            </span><span class="macro">debug_assert_eq!</span>(session_handle.id(), op_handle.id());
+            session_handle.take_connection().<span class="kw">await
+        </span>}
+        (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; pool.check_out().<span class="kw">await</span>,
     }
 }
 
-<span class="kw">fn</span> <span class="ident">get_txn_number</span>(
-    <span class="ident">session</span>: <span class="kw-2">&amp;mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span>,
-    <span class="ident">retryability</span>: <span class="ident">Retryability</span>,
-) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">session</span> {
-        <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">session</span>) =&gt; {
-            <span class="kw">if</span> <span class="ident">session</span>.<span class="ident">transaction</span>.<span class="ident">state</span> <span class="op">!</span><span class="op">=</span> <span class="ident">TransactionState::None</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">session</span>.<span class="ident">txn_number</span>())
-            } <span class="kw">else</span> {
-                <span class="kw">match</span> <span class="ident">retryability</span> {
-                    <span class="ident">Retryability::Write</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">session</span>.<span class="ident">get_and_increment_txn_number</span>()),
-                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+<span class="kw">fn </span>get_txn_number(
+    session: <span class="kw-2">&amp;mut </span><span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>ClientSession&gt;,
+    retryability: Retryability,
+) -&gt; <span class="prelude-ty">Option</span>&lt;i64&gt; {
+    <span class="kw">match </span>session {
+        <span class="prelude-val">Some</span>(<span class="kw-2">ref mut </span>session) =&gt; {
+            <span class="kw">if </span>session.transaction.state != TransactionState::None {
+                <span class="prelude-val">Some</span>(session.txn_number())
+            } <span class="kw">else </span>{
+                <span class="kw">match </span>retryability {
+                    Retryability::Write =&gt; <span class="prelude-val">Some</span>(session.get_and_increment_txn_number()),
+                    <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
                 }
             }
         }
-        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+        <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Error</span> {
-    <span class="doccomment">/// Adds the necessary labels to this Error, and unpins the session if needed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A TransientTransactionError label should be added if a transaction is in progress and the</span>
-    <span class="doccomment">/// error is a network or server selection error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// On a pre-4.4 connection, a RetryableWriteError label should be added to any write-retryable</span>
-    <span class="doccomment">/// error. On a 4.4+ connection, a label should only be added to network errors. Regardless of</span>
-    <span class="doccomment">/// server version, a label should only be added if the `retry_writes` client option is not set</span>
-    <span class="doccomment">/// to `false`, the operation during which the error occured is write-retryable, and a</span>
-    <span class="doccomment">/// TransientTransactionError label has not already been added.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the TransientTransactionError or UnknownTransactionCommitResult labels are added, the</span>
-    <span class="doccomment">/// ClientSession should be unpinned.</span>
-    <span class="kw">fn</span> <span class="ident">add_labels_and_update_pin</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">conn</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Connection</span><span class="op">&gt;</span>,
-        <span class="ident">session</span>: <span class="kw-2">&amp;mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span><span class="op">&gt;</span>,
-        <span class="ident">retryability</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Retryability</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">transaction_state</span> <span class="op">=</span> <span class="ident">session</span>.<span class="ident">as_ref</span>().<span class="ident">map_or</span>(<span class="kw-2">&amp;</span><span class="ident">TransactionState::None</span>, <span class="op">|</span><span class="ident">session</span><span class="op">|</span> {
-            <span class="kw-2">&amp;</span><span class="ident">session</span>.<span class="ident">transaction</span>.<span class="ident">state</span>
+<span class="kw">impl </span>Error {
+    <span class="doccomment">/// Adds the necessary labels to this Error, and unpins the session if needed.
+    ///
+    /// A TransientTransactionError label should be added if a transaction is in progress and the
+    /// error is a network or server selection error.
+    ///
+    /// On a pre-4.4 connection, a RetryableWriteError label should be added to any write-retryable
+    /// error. On a 4.4+ connection, a label should only be added to network errors. Regardless of
+    /// server version, a label should only be added if the `retry_writes` client option is not set
+    /// to `false`, the operation during which the error occured is write-retryable, and a
+    /// TransientTransactionError label has not already been added.
+    ///
+    /// If the TransientTransactionError or UnknownTransactionCommitResult labels are added, the
+    /// ClientSession should be unpinned.
+    </span><span class="kw">fn </span>add_labels_and_update_pin(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        conn: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Connection&gt;,
+        session: <span class="kw-2">&amp;mut </span><span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>ClientSession&gt;,
+        retryability: <span class="prelude-ty">Option</span>&lt;Retryability&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span>transaction_state = session.as_ref().map_or(<span class="kw-2">&amp;</span>TransactionState::None, |session| {
+            <span class="kw-2">&amp;</span>session.transaction.state
         });
-        <span class="kw">let</span> <span class="ident">max_wire_version</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">conn</span>) <span class="op">=</span> <span class="ident">conn</span> {
-            <span class="ident">conn</span>.<span class="ident">stream_description</span>()<span class="question-mark">?</span>.<span class="ident">max_wire_version</span>
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        };
-        <span class="kw">match</span> <span class="ident">transaction_state</span> {
-            <span class="ident">TransactionState::Starting</span> <span class="op">|</span> <span class="ident">TransactionState::InProgress</span> =&gt; {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_network_error</span>() <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">is_server_selection_error</span>() {
-                    <span class="self">self</span>.<span class="ident">add_label</span>(<span class="ident">TRANSIENT_TRANSACTION_ERROR</span>);
+        <span class="kw">let </span>max_wire_version = <span class="kw">if let </span><span class="prelude-val">Some</span>(conn) = conn {
+            conn.stream_description()<span class="question-mark">?</span>.max_wire_version
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>};
+        <span class="kw">match </span>transaction_state {
+            TransactionState::Starting | TransactionState::InProgress =&gt; {
+                <span class="kw">if </span><span class="self">self</span>.is_network_error() || <span class="self">self</span>.is_server_selection_error() {
+                    <span class="self">self</span>.add_label(TRANSIENT_TRANSACTION_ERROR);
                 }
             }
-            <span class="ident">TransactionState::Committed</span> { .. } =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">max_wire_version</span>) <span class="op">=</span> <span class="ident">max_wire_version</span> {
-                    <span class="kw">if</span> <span class="self">self</span>.<span class="ident">should_add_retryable_write_label</span>(<span class="ident">max_wire_version</span>) {
-                        <span class="self">self</span>.<span class="ident">add_label</span>(<span class="ident">RETRYABLE_WRITE_ERROR</span>);
+            TransactionState::Committed { .. } =&gt; {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(max_wire_version) = max_wire_version {
+                    <span class="kw">if </span><span class="self">self</span>.should_add_retryable_write_label(max_wire_version) {
+                        <span class="self">self</span>.add_label(RETRYABLE_WRITE_ERROR);
                     }
                 }
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">should_add_unknown_transaction_commit_result_label</span>() {
-                    <span class="self">self</span>.<span class="ident">add_label</span>(<span class="ident">UNKNOWN_TRANSACTION_COMMIT_RESULT</span>);
+                <span class="kw">if </span><span class="self">self</span>.should_add_unknown_transaction_commit_result_label() {
+                    <span class="self">self</span>.add_label(UNKNOWN_TRANSACTION_COMMIT_RESULT);
                 }
             }
-            <span class="ident">TransactionState::Aborted</span> =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">max_wire_version</span>) <span class="op">=</span> <span class="ident">max_wire_version</span> {
-                    <span class="kw">if</span> <span class="self">self</span>.<span class="ident">should_add_retryable_write_label</span>(<span class="ident">max_wire_version</span>) {
-                        <span class="self">self</span>.<span class="ident">add_label</span>(<span class="ident">RETRYABLE_WRITE_ERROR</span>);
+            TransactionState::Aborted =&gt; {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(max_wire_version) = max_wire_version {
+                    <span class="kw">if </span><span class="self">self</span>.should_add_retryable_write_label(max_wire_version) {
+                        <span class="self">self</span>.add_label(RETRYABLE_WRITE_ERROR);
                     }
                 }
             }
-            <span class="ident">TransactionState::None</span> =&gt; {
-                <span class="kw">if</span> <span class="ident">retryability</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">Retryability::Write</span>) {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">max_wire_version</span>) <span class="op">=</span> <span class="ident">max_wire_version</span> {
-                        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">should_add_retryable_write_label</span>(<span class="ident">max_wire_version</span>) {
-                            <span class="self">self</span>.<span class="ident">add_label</span>(<span class="ident">RETRYABLE_WRITE_ERROR</span>);
+            TransactionState::None =&gt; {
+                <span class="kw">if </span>retryability == <span class="prelude-val">Some</span>(Retryability::Write) {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(max_wire_version) = max_wire_version {
+                        <span class="kw">if </span><span class="self">self</span>.should_add_retryable_write_label(max_wire_version) {
+                            <span class="self">self</span>.add_label(RETRYABLE_WRITE_ERROR);
                         }
                     }
                 }
             }
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">session</span>) <span class="op">=</span> <span class="ident">session</span> {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">contains_label</span>(<span class="ident">TRANSIENT_TRANSACTION_ERROR</span>)
-                <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">contains_label</span>(<span class="ident">UNKNOWN_TRANSACTION_COMMIT_RESULT</span>)
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref mut </span>session) = session {
+            <span class="kw">if </span><span class="self">self</span>.contains_label(TRANSIENT_TRANSACTION_ERROR)
+                || <span class="self">self</span>.contains_label(UNKNOWN_TRANSACTION_COMMIT_RESULT)
             {
-                <span class="ident">session</span>.<span class="ident">unpin</span>();
+                session.unpin();
             }
         }
 
@@ -2021,14 +2021,14 @@
     }
 }
 
-<span class="kw">struct</span> <span class="ident">ExecutionDetails</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Operation</span><span class="op">&gt;</span> {
-    <span class="ident">output</span>: <span class="ident">ExecutionOutput</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">implicit_session</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClientSession</span><span class="op">&gt;</span>,
+<span class="kw">struct </span>ExecutionDetails&lt;T: Operation&gt; {
+    output: ExecutionOutput&lt;T&gt;,
+    implicit_session: <span class="prelude-ty">Option</span>&lt;ClientSession&gt;,
 }
 
-<span class="kw">struct</span> <span class="ident">ExecutionOutput</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Operation</span><span class="op">&gt;</span> {
-    <span class="ident">operation_output</span>: <span class="ident">T::O</span>,
-    <span class="ident">connection</span>: <span class="ident">Connection</span>,
+<span class="kw">struct </span>ExecutionOutput&lt;T: Operation&gt; {
+    operation_output: T::O,
+    connection: Connection,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/rr/rdata/tlsa.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tlsa.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/rr/rdata/tlsa.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tlsa.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -540,547 +540,547 @@
 <span id="540">540</span>
 <span id="541">541</span>
 <span id="542">542</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2017 Benjamin Fry &lt;benjaminfry@me.com&gt;</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2017 Benjamin Fry &lt;benjaminfry@me.com&gt;
+//
+// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="doccomment">//! TLSA records for storing TLS certificate validation information</span>
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
+</span><span class="doccomment">//! TLSA records for storing TLS certificate validation information
+</span><span class="kw">use </span>std::fmt;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde-config&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::sshfp</span>;
+<span class="kw">use </span><span class="kw">super</span>::sshfp;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::serialize::binary</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::error::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::serialize::binary::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// [RFC 6698, DNS-Based Authentication for TLS](https://tools.ietf.org/html/rfc6698#section-2.1)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// 2.1.  TLSA RDATA Wire Format</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    The RDATA for a TLSA RR consists of a one-octet certificate usage</span>
-<span class="doccomment">///    field, a one-octet selector field, a one-octet matching type field,</span>
-<span class="doccomment">///    and the certificate association data field.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///                         1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3</span>
-<span class="doccomment">///     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1</span>
-<span class="doccomment">///    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
-<span class="doccomment">///    |  Cert. Usage  |   Selector    | Matching Type |               /</span>
-<span class="doccomment">///    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               /</span>
-<span class="doccomment">///    /                                                               /</span>
-<span class="doccomment">///    /                 Certificate Association Data                  /</span>
-<span class="doccomment">///    /                                                               /</span>
-<span class="doccomment">///    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TLSA</span> {
-    <span class="ident">cert_usage</span>: <span class="ident">CertUsage</span>,
-    <span class="ident">selector</span>: <span class="ident">Selector</span>,
-    <span class="ident">matching</span>: <span class="ident">Matching</span>,
-    <span class="ident">cert_data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+<span class="doccomment">/// [RFC 6698, DNS-Based Authentication for TLS](https://tools.ietf.org/html/rfc6698#section-2.1)
+///
+/// ```text
+/// 2.1.  TLSA RDATA Wire Format
+///
+///    The RDATA for a TLSA RR consists of a one-octet certificate usage
+///    field, a one-octet selector field, a one-octet matching type field,
+///    and the certificate association data field.
+///
+///                         1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3
+///     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+///    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+///    |  Cert. Usage  |   Selector    | Matching Type |               /
+///    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               /
+///    /                                                               /
+///    /                 Certificate Association Data                  /
+///    /                                                               /
+///    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+/// ```
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serde-config&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Debug, PartialEq, Eq, Hash, Clone)]
+</span><span class="kw">pub struct </span>TLSA {
+    cert_usage: CertUsage,
+    selector: Selector,
+    matching: Matching,
+    cert_data: Vec&lt;u8&gt;,
 }
 
-<span class="doccomment">/// [RFC 6698, DNS-Based Authentication for TLS](https://tools.ietf.org/html/rfc6698#section-2.1.1)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// 2.1.1.  The Certificate Usage Field</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    A one-octet value, called &quot;certificate usage&quot;, specifies the provided</span>
-<span class="doccomment">///    association that will be used to match the certificate presented in</span>
-<span class="doccomment">///    the TLS handshake.  This value is defined in a new IANA registry (see</span>
-<span class="doccomment">///    Section 7.2) in order to make it easier to add additional certificate</span>
-<span class="doccomment">///    usages in the future.  The certificate usages defined in this</span>
-<span class="doccomment">///    document are:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///       0 -- CA</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///       1 -- Service</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///       2 -- TrustAnchor</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///       3 -- DomainIssued</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    The certificate usages defined in this document explicitly only apply</span>
-<span class="doccomment">///    to PKIX-formatted certificates in DER encoding [X.690].  If TLS</span>
-<span class="doccomment">///    allows other formats later, or if extensions to this RRtype are made</span>
-<span class="doccomment">///    that accept other formats for certificates, those certificates will</span>
-<span class="doccomment">///    need their own certificate usage values.</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CertUsage</span> {
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">///       0 -- Certificate usage 0 is used to specify a CA certificate, or</span>
-    <span class="doccomment">///       the public key of such a certificate, that MUST be found in any of</span>
-    <span class="doccomment">///       the PKIX certification paths for the end entity certificate given</span>
-    <span class="doccomment">///       by the server in TLS.  This certificate usage is sometimes</span>
-    <span class="doccomment">///       referred to as &quot;CA constraint&quot; because it limits which CA can be</span>
-    <span class="doccomment">///       used to issue certificates for a given service on a host.  The</span>
-    <span class="doccomment">///       presented certificate MUST pass PKIX certification path</span>
-    <span class="doccomment">///       validation, and a CA certificate that matches the TLSA record MUST</span>
-    <span class="doccomment">///       be included as part of a valid certification path.  Because this</span>
-    <span class="doccomment">///       certificate usage allows both trust anchors and CA certificates,</span>
-    <span class="doccomment">///       the certificate might or might not have the basicConstraints</span>
-    <span class="doccomment">///       extension present.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">CA</span>,
+<span class="doccomment">/// [RFC 6698, DNS-Based Authentication for TLS](https://tools.ietf.org/html/rfc6698#section-2.1.1)
+///
+/// ```text
+/// 2.1.1.  The Certificate Usage Field
+///
+///    A one-octet value, called &quot;certificate usage&quot;, specifies the provided
+///    association that will be used to match the certificate presented in
+///    the TLS handshake.  This value is defined in a new IANA registry (see
+///    Section 7.2) in order to make it easier to add additional certificate
+///    usages in the future.  The certificate usages defined in this
+///    document are:
+///
+///       0 -- CA
+///
+///       1 -- Service
+///
+///       2 -- TrustAnchor
+///
+///       3 -- DomainIssued
+///
+///    The certificate usages defined in this document explicitly only apply
+///    to PKIX-formatted certificates in DER encoding [X.690].  If TLS
+///    allows other formats later, or if extensions to this RRtype are made
+///    that accept other formats for certificates, those certificates will
+///    need their own certificate usage values.
+/// ```
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serde-config&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
+</span><span class="kw">pub enum </span>CertUsage {
+    <span class="doccomment">/// ```text
+    ///       0 -- Certificate usage 0 is used to specify a CA certificate, or
+    ///       the public key of such a certificate, that MUST be found in any of
+    ///       the PKIX certification paths for the end entity certificate given
+    ///       by the server in TLS.  This certificate usage is sometimes
+    ///       referred to as &quot;CA constraint&quot; because it limits which CA can be
+    ///       used to issue certificates for a given service on a host.  The
+    ///       presented certificate MUST pass PKIX certification path
+    ///       validation, and a CA certificate that matches the TLSA record MUST
+    ///       be included as part of a valid certification path.  Because this
+    ///       certificate usage allows both trust anchors and CA certificates,
+    ///       the certificate might or might not have the basicConstraints
+    ///       extension present.
+    /// ```
+    </span>CA,
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">///       1 -- Certificate usage 1 is used to specify an end entity</span>
-    <span class="doccomment">///       certificate, or the public key of such a certificate, that MUST be</span>
-    <span class="doccomment">///       matched with the end entity certificate given by the server in</span>
-    <span class="doccomment">///       TLS.  This certificate usage is sometimes referred to as &quot;service</span>
-    <span class="doccomment">///       certificate constraint&quot; because it limits which end entity</span>
-    <span class="doccomment">///       certificate can be used by a given service on a host.  The target</span>
-    <span class="doccomment">///       certificate MUST pass PKIX certification path validation and MUST</span>
-    <span class="doccomment">///       match the TLSA record.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">Service</span>,
+    <span class="doccomment">/// ```text
+    ///       1 -- Certificate usage 1 is used to specify an end entity
+    ///       certificate, or the public key of such a certificate, that MUST be
+    ///       matched with the end entity certificate given by the server in
+    ///       TLS.  This certificate usage is sometimes referred to as &quot;service
+    ///       certificate constraint&quot; because it limits which end entity
+    ///       certificate can be used by a given service on a host.  The target
+    ///       certificate MUST pass PKIX certification path validation and MUST
+    ///       match the TLSA record.
+    /// ```
+    </span>Service,
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">///       2 -- Certificate usage 2 is used to specify a certificate, or the</span>
-    <span class="doccomment">///       public key of such a certificate, that MUST be used as the trust</span>
-    <span class="doccomment">///       anchor when validating the end entity certificate given by the</span>
-    <span class="doccomment">///       server in TLS.  This certificate usage is sometimes referred to as</span>
-    <span class="doccomment">///       &quot;trust anchor assertion&quot; and allows a domain name administrator to</span>
-    <span class="doccomment">///       specify a new trust anchor -- for example, if the domain issues</span>
-    <span class="doccomment">///       its own certificates under its own CA that is not expected to be</span>
-    <span class="doccomment">///       in the end users&#39; collection of trust anchors.  The target</span>
-    <span class="doccomment">///       certificate MUST pass PKIX certification path validation, with any</span>
-    <span class="doccomment">///       certificate matching the TLSA record considered to be a trust</span>
-    <span class="doccomment">///       anchor for this certification path validation.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">TrustAnchor</span>,
+    <span class="doccomment">/// ```text
+    ///       2 -- Certificate usage 2 is used to specify a certificate, or the
+    ///       public key of such a certificate, that MUST be used as the trust
+    ///       anchor when validating the end entity certificate given by the
+    ///       server in TLS.  This certificate usage is sometimes referred to as
+    ///       &quot;trust anchor assertion&quot; and allows a domain name administrator to
+    ///       specify a new trust anchor -- for example, if the domain issues
+    ///       its own certificates under its own CA that is not expected to be
+    ///       in the end users&#39; collection of trust anchors.  The target
+    ///       certificate MUST pass PKIX certification path validation, with any
+    ///       certificate matching the TLSA record considered to be a trust
+    ///       anchor for this certification path validation.
+    /// ```
+    </span>TrustAnchor,
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">///       3 -- Certificate usage 3 is used to specify a certificate, or the</span>
-    <span class="doccomment">///       public key of such a certificate, that MUST match the end entity</span>
-    <span class="doccomment">///       certificate given by the server in TLS.  This certificate usage is</span>
-    <span class="doccomment">///       sometimes referred to as &quot;domain-issued certificate&quot; because it</span>
-    <span class="doccomment">///       allows for a domain name administrator to issue certificates for a</span>
-    <span class="doccomment">///       domain without involving a third-party CA.  The target certificate</span>
-    <span class="doccomment">///       MUST match the TLSA record.  The difference between certificate</span>
-    <span class="doccomment">///       usage 1 and certificate usage 3 is that certificate usage 1</span>
-    <span class="doccomment">///       requires that the certificate pass PKIX validation, but PKIX</span>
-    <span class="doccomment">///       validation is not tested for certificate usage 3.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">DomainIssued</span>,
+    <span class="doccomment">/// ```text
+    ///       3 -- Certificate usage 3 is used to specify a certificate, or the
+    ///       public key of such a certificate, that MUST match the end entity
+    ///       certificate given by the server in TLS.  This certificate usage is
+    ///       sometimes referred to as &quot;domain-issued certificate&quot; because it
+    ///       allows for a domain name administrator to issue certificates for a
+    ///       domain without involving a third-party CA.  The target certificate
+    ///       MUST match the TLSA record.  The difference between certificate
+    ///       usage 1 and certificate usage 3 is that certificate usage 1
+    ///       requires that the certificate pass PKIX validation, but PKIX
+    ///       validation is not tested for certificate usage 3.
+    /// ```
+    </span>DomainIssued,
 
-    <span class="doccomment">/// Unassigned at the time of this implementation</span>
-    <span class="ident">Unassigned</span>(<span class="ident">u8</span>),
+    <span class="doccomment">/// Unassigned at the time of this implementation
+    </span>Unassigned(u8),
 
-    <span class="doccomment">/// Private usage</span>
-    <span class="ident">Private</span>,
+    <span class="doccomment">/// Private usage
+    </span>Private,
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CertUsage</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">usage</span>: <span class="ident">u8</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">usage</span> {
-            <span class="number">0</span> =&gt; <span class="ident"><span class="self">Self</span>::CA</span>,
-            <span class="number">1</span> =&gt; <span class="ident"><span class="self">Self</span>::Service</span>,
-            <span class="number">2</span> =&gt; <span class="ident"><span class="self">Self</span>::TrustAnchor</span>,
-            <span class="number">3</span> =&gt; <span class="ident"><span class="self">Self</span>::DomainIssued</span>,
-            <span class="number">4</span>..<span class="op">=</span><span class="number">254</span> =&gt; <span class="ident"><span class="self">Self</span>::Unassigned</span>(<span class="ident">usage</span>),
-            <span class="number">255</span> =&gt; <span class="ident"><span class="self">Self</span>::Private</span>,
+<span class="kw">impl </span>From&lt;u8&gt; <span class="kw">for </span>CertUsage {
+    <span class="kw">fn </span>from(usage: u8) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>usage {
+            <span class="number">0 </span>=&gt; <span class="self">Self</span>::CA,
+            <span class="number">1 </span>=&gt; <span class="self">Self</span>::Service,
+            <span class="number">2 </span>=&gt; <span class="self">Self</span>::TrustAnchor,
+            <span class="number">3 </span>=&gt; <span class="self">Self</span>::DomainIssued,
+            <span class="number">4</span>..=<span class="number">254 </span>=&gt; <span class="self">Self</span>::Unassigned(usage),
+            <span class="number">255 </span>=&gt; <span class="self">Self</span>::Private,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">CertUsage</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u8</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">usage</span>: <span class="ident">CertUsage</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">usage</span> {
-            <span class="ident">CertUsage::CA</span> =&gt; <span class="number">0</span>,
-            <span class="ident">CertUsage::Service</span> =&gt; <span class="number">1</span>,
-            <span class="ident">CertUsage::TrustAnchor</span> =&gt; <span class="number">2</span>,
-            <span class="ident">CertUsage::DomainIssued</span> =&gt; <span class="number">3</span>,
-            <span class="ident">CertUsage::Unassigned</span>(<span class="ident">usage</span>) =&gt; <span class="ident">usage</span>,
-            <span class="ident">CertUsage::Private</span> =&gt; <span class="number">255</span>,
+<span class="kw">impl </span>From&lt;CertUsage&gt; <span class="kw">for </span>u8 {
+    <span class="kw">fn </span>from(usage: CertUsage) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>usage {
+            CertUsage::CA =&gt; <span class="number">0</span>,
+            CertUsage::Service =&gt; <span class="number">1</span>,
+            CertUsage::TrustAnchor =&gt; <span class="number">2</span>,
+            CertUsage::DomainIssued =&gt; <span class="number">3</span>,
+            CertUsage::Unassigned(usage) =&gt; usage,
+            CertUsage::Private =&gt; <span class="number">255</span>,
         }
     }
 }
 
-<span class="doccomment">/// [RFC 6698, DNS-Based Authentication for TLS](https://tools.ietf.org/html/rfc6698#section-2.1.1)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// 2.1.2.  The Selector Field</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    A one-octet value, called &quot;selector&quot;, specifies which part of the TLS</span>
-<span class="doccomment">///    certificate presented by the server will be matched against the</span>
-<span class="doccomment">///    association data.  This value is defined in a new IANA registry (see</span>
-<span class="doccomment">///    Section 7.3).  The selectors defined in this document are:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///       0 -- Full</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///       1 -- Spki</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    (Note that the use of &quot;selector&quot; in this document is completely</span>
-<span class="doccomment">///    unrelated to the use of &quot;selector&quot; in DomainKeys Identified Mail</span>
-<span class="doccomment">///    (DKIM) [RFC6376].)</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Selector</span> {
-    <span class="doccomment">/// Full certificate: the Certificate binary structure as defined in [RFC5280](https://tools.ietf.org/html/rfc5280)</span>
-    <span class="ident">Full</span>,
+<span class="doccomment">/// [RFC 6698, DNS-Based Authentication for TLS](https://tools.ietf.org/html/rfc6698#section-2.1.1)
+///
+/// ```text
+/// 2.1.2.  The Selector Field
+///
+///    A one-octet value, called &quot;selector&quot;, specifies which part of the TLS
+///    certificate presented by the server will be matched against the
+///    association data.  This value is defined in a new IANA registry (see
+///    Section 7.3).  The selectors defined in this document are:
+///
+///       0 -- Full
+///
+///       1 -- Spki
+///
+///    (Note that the use of &quot;selector&quot; in this document is completely
+///    unrelated to the use of &quot;selector&quot; in DomainKeys Identified Mail
+///    (DKIM) [RFC6376].)
+/// ```
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serde-config&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
+</span><span class="kw">pub enum </span>Selector {
+    <span class="doccomment">/// Full certificate: the Certificate binary structure as defined in [RFC5280](https://tools.ietf.org/html/rfc5280)
+    </span>Full,
 
-    <span class="doccomment">/// SubjectPublicKeyInfo: DER-encoded binary structure as defined in [RFC5280](https://tools.ietf.org/html/rfc5280)</span>
-    <span class="ident">Spki</span>,
+    <span class="doccomment">/// SubjectPublicKeyInfo: DER-encoded binary structure as defined in [RFC5280](https://tools.ietf.org/html/rfc5280)
+    </span>Spki,
 
-    <span class="doccomment">/// Unassigned at the time of this writing</span>
-    <span class="ident">Unassigned</span>(<span class="ident">u8</span>),
+    <span class="doccomment">/// Unassigned at the time of this writing
+    </span>Unassigned(u8),
 
-    <span class="doccomment">/// Private usage</span>
-    <span class="ident">Private</span>,
+    <span class="doccomment">/// Private usage
+    </span>Private,
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Selector</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">selector</span>: <span class="ident">u8</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">selector</span> {
-            <span class="number">0</span> =&gt; <span class="ident"><span class="self">Self</span>::Full</span>,
-            <span class="number">1</span> =&gt; <span class="ident"><span class="self">Self</span>::Spki</span>,
-            <span class="number">2</span>..<span class="op">=</span><span class="number">254</span> =&gt; <span class="ident"><span class="self">Self</span>::Unassigned</span>(<span class="ident">selector</span>),
-            <span class="number">255</span> =&gt; <span class="ident"><span class="self">Self</span>::Private</span>,
+<span class="kw">impl </span>From&lt;u8&gt; <span class="kw">for </span>Selector {
+    <span class="kw">fn </span>from(selector: u8) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>selector {
+            <span class="number">0 </span>=&gt; <span class="self">Self</span>::Full,
+            <span class="number">1 </span>=&gt; <span class="self">Self</span>::Spki,
+            <span class="number">2</span>..=<span class="number">254 </span>=&gt; <span class="self">Self</span>::Unassigned(selector),
+            <span class="number">255 </span>=&gt; <span class="self">Self</span>::Private,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Selector</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u8</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">selector</span>: <span class="ident">Selector</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">selector</span> {
-            <span class="ident">Selector::Full</span> =&gt; <span class="number">0</span>,
-            <span class="ident">Selector::Spki</span> =&gt; <span class="number">1</span>,
-            <span class="ident">Selector::Unassigned</span>(<span class="ident">selector</span>) =&gt; <span class="ident">selector</span>,
-            <span class="ident">Selector::Private</span> =&gt; <span class="number">255</span>,
+<span class="kw">impl </span>From&lt;Selector&gt; <span class="kw">for </span>u8 {
+    <span class="kw">fn </span>from(selector: Selector) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>selector {
+            Selector::Full =&gt; <span class="number">0</span>,
+            Selector::Spki =&gt; <span class="number">1</span>,
+            Selector::Unassigned(selector) =&gt; selector,
+            Selector::Private =&gt; <span class="number">255</span>,
         }
     }
 }
 
-<span class="doccomment">/// [RFC 6698, DNS-Based Authentication for TLS](https://tools.ietf.org/html/rfc6698#section-2.1.3)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// 2.1.3.  The Matching Type Field</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    A one-octet value, called &quot;matching type&quot;, specifies how the</span>
-<span class="doccomment">///    certificate association is presented.  This value is defined in a new</span>
-<span class="doccomment">///    IANA registry (see Section 7.4).  The types defined in this document</span>
-<span class="doccomment">///    are:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///       0 -- Raw</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///       1 -- Sha256</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///       2 -- Sha512</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    If the TLSA record&#39;s matching type is a hash, having the record use</span>
-<span class="doccomment">///    the same hash algorithm that was used in the signature in the</span>
-<span class="doccomment">///    certificate (if possible) will assist clients that support a small</span>
-<span class="doccomment">///    number of hash algorithms.</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Matching</span> {
-    <span class="doccomment">/// Exact match on selected content</span>
-    <span class="ident">Raw</span>,
+<span class="doccomment">/// [RFC 6698, DNS-Based Authentication for TLS](https://tools.ietf.org/html/rfc6698#section-2.1.3)
+///
+/// ```text
+/// 2.1.3.  The Matching Type Field
+///
+///    A one-octet value, called &quot;matching type&quot;, specifies how the
+///    certificate association is presented.  This value is defined in a new
+///    IANA registry (see Section 7.4).  The types defined in this document
+///    are:
+///
+///       0 -- Raw
+///
+///       1 -- Sha256
+///
+///       2 -- Sha512
+///
+///    If the TLSA record&#39;s matching type is a hash, having the record use
+///    the same hash algorithm that was used in the signature in the
+///    certificate (if possible) will assist clients that support a small
+///    number of hash algorithms.
+/// ```
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serde-config&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
+</span><span class="kw">pub enum </span>Matching {
+    <span class="doccomment">/// Exact match on selected content
+    </span>Raw,
 
-    <span class="doccomment">/// SHA-256 hash of selected content [RFC6234](https://tools.ietf.org/html/rfc6234)</span>
-    <span class="ident">Sha256</span>,
+    <span class="doccomment">/// SHA-256 hash of selected content [RFC6234](https://tools.ietf.org/html/rfc6234)
+    </span>Sha256,
 
-    <span class="doccomment">/// SHA-512 hash of selected content [RFC6234](https://tools.ietf.org/html/rfc6234)</span>
-    <span class="ident">Sha512</span>,
+    <span class="doccomment">/// SHA-512 hash of selected content [RFC6234](https://tools.ietf.org/html/rfc6234)
+    </span>Sha512,
 
-    <span class="doccomment">/// Unassigned at the time of this writing</span>
-    <span class="ident">Unassigned</span>(<span class="ident">u8</span>),
+    <span class="doccomment">/// Unassigned at the time of this writing
+    </span>Unassigned(u8),
 
-    <span class="doccomment">/// Private usage</span>
-    <span class="ident">Private</span>,
+    <span class="doccomment">/// Private usage
+    </span>Private,
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Matching</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">matching</span>: <span class="ident">u8</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">matching</span> {
-            <span class="number">0</span> =&gt; <span class="ident"><span class="self">Self</span>::Raw</span>,
-            <span class="number">1</span> =&gt; <span class="ident"><span class="self">Self</span>::Sha256</span>,
-            <span class="number">2</span> =&gt; <span class="ident"><span class="self">Self</span>::Sha512</span>,
-            <span class="number">3</span>..<span class="op">=</span><span class="number">254</span> =&gt; <span class="ident"><span class="self">Self</span>::Unassigned</span>(<span class="ident">matching</span>),
-            <span class="number">255</span> =&gt; <span class="ident"><span class="self">Self</span>::Private</span>,
+<span class="kw">impl </span>From&lt;u8&gt; <span class="kw">for </span>Matching {
+    <span class="kw">fn </span>from(matching: u8) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>matching {
+            <span class="number">0 </span>=&gt; <span class="self">Self</span>::Raw,
+            <span class="number">1 </span>=&gt; <span class="self">Self</span>::Sha256,
+            <span class="number">2 </span>=&gt; <span class="self">Self</span>::Sha512,
+            <span class="number">3</span>..=<span class="number">254 </span>=&gt; <span class="self">Self</span>::Unassigned(matching),
+            <span class="number">255 </span>=&gt; <span class="self">Self</span>::Private,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Matching</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u8</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">matching</span>: <span class="ident">Matching</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">matching</span> {
-            <span class="ident">Matching::Raw</span> =&gt; <span class="number">0</span>,
-            <span class="ident">Matching::Sha256</span> =&gt; <span class="number">1</span>,
-            <span class="ident">Matching::Sha512</span> =&gt; <span class="number">2</span>,
-            <span class="ident">Matching::Unassigned</span>(<span class="ident">matching</span>) =&gt; <span class="ident">matching</span>,
-            <span class="ident">Matching::Private</span> =&gt; <span class="number">255</span>,
+<span class="kw">impl </span>From&lt;Matching&gt; <span class="kw">for </span>u8 {
+    <span class="kw">fn </span>from(matching: Matching) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>matching {
+            Matching::Raw =&gt; <span class="number">0</span>,
+            Matching::Sha256 =&gt; <span class="number">1</span>,
+            Matching::Sha512 =&gt; <span class="number">2</span>,
+            Matching::Unassigned(matching) =&gt; matching,
+            Matching::Private =&gt; <span class="number">255</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TLSA</span> {
-    <span class="doccomment">/// Constructs a new TLSA</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [RFC 6698, DNS-Based Authentication for TLS](https://tools.ietf.org/html/rfc6698#section-2)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// 2.  The TLSA Resource Record</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///    The TLSA DNS resource record (RR) is used to associate a TLS server</span>
-    <span class="doccomment">///    certificate or public key with the domain name where the record is</span>
-    <span class="doccomment">///    found, thus forming a &quot;TLSA certificate association&quot;.  The semantics</span>
-    <span class="doccomment">///    of how the TLSA RR is interpreted are given later in this document.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///    The type value for the TLSA RR type is defined in Section 7.1.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///    The TLSA RR is class independent.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///    The TLSA RR has no special Time to Live (TTL) requirements.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">cert_usage</span>: <span class="ident">CertUsage</span>,
-        <span class="ident">selector</span>: <span class="ident">Selector</span>,
-        <span class="ident">matching</span>: <span class="ident">Matching</span>,
-        <span class="ident">cert_data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">cert_usage</span>,
-            <span class="ident">selector</span>,
-            <span class="ident">matching</span>,
-            <span class="ident">cert_data</span>,
+<span class="kw">impl </span>TLSA {
+    <span class="doccomment">/// Constructs a new TLSA
+    ///
+    /// [RFC 6698, DNS-Based Authentication for TLS](https://tools.ietf.org/html/rfc6698#section-2)
+    ///
+    /// ```text
+    /// 2.  The TLSA Resource Record
+    ///
+    ///    The TLSA DNS resource record (RR) is used to associate a TLS server
+    ///    certificate or public key with the domain name where the record is
+    ///    found, thus forming a &quot;TLSA certificate association&quot;.  The semantics
+    ///    of how the TLSA RR is interpreted are given later in this document.
+    ///
+    ///    The type value for the TLSA RR type is defined in Section 7.1.
+    ///
+    ///    The TLSA RR is class independent.
+    ///
+    ///    The TLSA RR has no special Time to Live (TTL) requirements.
+    /// ```
+    </span><span class="kw">pub fn </span>new(
+        cert_usage: CertUsage,
+        selector: Selector,
+        matching: Matching,
+        cert_data: Vec&lt;u8&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            cert_usage,
+            selector,
+            matching,
+            cert_data,
         }
     }
 
-    <span class="doccomment">/// Specifies the provided association that will be used to match the certificate presented in the TLS handshake</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cert_usage</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CertUsage</span> {
-        <span class="self">self</span>.<span class="ident">cert_usage</span>
+    <span class="doccomment">/// Specifies the provided association that will be used to match the certificate presented in the TLS handshake
+    </span><span class="kw">pub fn </span>cert_usage(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; CertUsage {
+        <span class="self">self</span>.cert_usage
     }
 
-    <span class="doccomment">/// Specifies which part of the TLS certificate presented by the server will be matched against the association data</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">selector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Selector</span> {
-        <span class="self">self</span>.<span class="ident">selector</span>
+    <span class="doccomment">/// Specifies which part of the TLS certificate presented by the server will be matched against the association data
+    </span><span class="kw">pub fn </span>selector(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Selector {
+        <span class="self">self</span>.selector
     }
 
-    <span class="doccomment">/// Specifies how the certificate association is presented</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">matching</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Matching</span> {
-        <span class="self">self</span>.<span class="ident">matching</span>
+    <span class="doccomment">/// Specifies how the certificate association is presented
+    </span><span class="kw">pub fn </span>matching(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Matching {
+        <span class="self">self</span>.matching
     }
 
-    <span class="doccomment">/// Binary data for validating the cert, see other members to understand format</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cert_data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cert_data</span>
+    <span class="doccomment">/// Binary data for validating the cert, see other members to understand format
+    </span><span class="kw">pub fn </span>cert_data(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.cert_data
     }
 }
 
-<span class="doccomment">/// Read the RData from the given Decoder</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">///                         1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3</span>
-<span class="doccomment">///     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1</span>
-<span class="doccomment">///    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
-<span class="doccomment">///    |  Cert. Usage  |   Selector    | Matching Type |               /</span>
-<span class="doccomment">///    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               /</span>
-<span class="doccomment">///    /                                                               /</span>
-<span class="doccomment">///    /                 Certificate Association Data                  /</span>
-<span class="doccomment">///    /                                                               /</span>
-<span class="doccomment">///    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">rdata_length</span>: <span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">TLSA</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">cert_usage</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*CertUsage is verified*/</span>).<span class="ident">into</span>();
-    <span class="kw">let</span> <span class="ident">selector</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*Selector is verified*/</span>).<span class="ident">into</span>();
-    <span class="kw">let</span> <span class="ident">matching</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*Matching is verified*/</span>).<span class="ident">into</span>();
+<span class="doccomment">/// Read the RData from the given Decoder
+///
+/// ```text
+///                         1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3
+///     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+///    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+///    |  Cert. Usage  |   Selector    | Matching Type |               /
+///    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               /
+///    /                                                               /
+///    /                 Certificate Association Data                  /
+///    /                                                               /
+///    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+/// ```
+</span><span class="kw">pub fn </span>read(decoder: <span class="kw-2">&amp;mut </span>BinDecoder&lt;<span class="lifetime">&#39;_</span>&gt;, rdata_length: Restrict&lt;u16&gt;) -&gt; ProtoResult&lt;TLSA&gt; {
+    <span class="kw">let </span>cert_usage = decoder.read_u8()<span class="question-mark">?</span>.unverified(<span class="comment">/*CertUsage is verified*/</span>).into();
+    <span class="kw">let </span>selector = decoder.read_u8()<span class="question-mark">?</span>.unverified(<span class="comment">/*Selector is verified*/</span>).into();
+    <span class="kw">let </span>matching = decoder.read_u8()<span class="question-mark">?</span>.unverified(<span class="comment">/*Matching is verified*/</span>).into();
 
-    <span class="comment">// the remaining data is for the cert</span>
-    <span class="kw">let</span> <span class="ident">cert_len</span> <span class="op">=</span> <span class="ident">rdata_length</span>
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">u</span> <span class="kw">as</span> <span class="ident">usize</span>)
-        .<span class="ident">checked_sub</span>(<span class="number">3</span>)
-        .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">ProtoError::from</span>(<span class="string">&quot;invalid rdata length in TLSA&quot;</span>))<span class="question-mark">?</span>
-        .<span class="ident">unverified</span>(<span class="comment">/*used purely as length safely*/</span>);
-    <span class="kw">let</span> <span class="ident">cert_data</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">read_vec</span>(<span class="ident">cert_len</span>)<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*will fail in usage if invalid*/</span>);
+    <span class="comment">// the remaining data is for the cert
+    </span><span class="kw">let </span>cert_len = rdata_length
+        .map(|u| u <span class="kw">as </span>usize)
+        .checked_sub(<span class="number">3</span>)
+        .map_err(|<span class="kw">_</span>| ProtoError::from(<span class="string">&quot;invalid rdata length in TLSA&quot;</span>))<span class="question-mark">?
+        </span>.unverified(<span class="comment">/*used purely as length safely*/</span>);
+    <span class="kw">let </span>cert_data = decoder.read_vec(cert_len)<span class="question-mark">?</span>.unverified(<span class="comment">/*will fail in usage if invalid*/</span>);
 
-    <span class="prelude-val">Ok</span>(<span class="ident">TLSA</span> {
-        <span class="ident">cert_usage</span>,
-        <span class="ident">selector</span>,
-        <span class="ident">matching</span>,
-        <span class="ident">cert_data</span>,
+    <span class="prelude-val">Ok</span>(TLSA {
+        cert_usage,
+        selector,
+        matching,
+        cert_data,
     })
 }
 
-<span class="doccomment">/// Write the RData from the given Decoder</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emit</span>(<span class="ident">encoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">tlsa</span>: <span class="kw-2">&amp;</span><span class="ident">TLSA</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="ident">encoder</span>.<span class="ident">emit_u8</span>(<span class="ident">tlsa</span>.<span class="ident">cert_usage</span>.<span class="ident">into</span>())<span class="question-mark">?</span>;
-    <span class="ident">encoder</span>.<span class="ident">emit_u8</span>(<span class="ident">tlsa</span>.<span class="ident">selector</span>.<span class="ident">into</span>())<span class="question-mark">?</span>;
-    <span class="ident">encoder</span>.<span class="ident">emit_u8</span>(<span class="ident">tlsa</span>.<span class="ident">matching</span>.<span class="ident">into</span>())<span class="question-mark">?</span>;
-    <span class="ident">encoder</span>.<span class="ident">emit_vec</span>(<span class="kw-2">&amp;</span><span class="ident">tlsa</span>.<span class="ident">cert_data</span>)<span class="question-mark">?</span>;
+<span class="doccomment">/// Write the RData from the given Decoder
+</span><span class="kw">pub fn </span>emit(encoder: <span class="kw-2">&amp;mut </span>BinEncoder&lt;<span class="lifetime">&#39;_</span>&gt;, tlsa: <span class="kw-2">&amp;</span>TLSA) -&gt; ProtoResult&lt;()&gt; {
+    encoder.emit_u8(tlsa.cert_usage.into())<span class="question-mark">?</span>;
+    encoder.emit_u8(tlsa.selector.into())<span class="question-mark">?</span>;
+    encoder.emit_u8(tlsa.matching.into())<span class="question-mark">?</span>;
+    encoder.emit_vec(<span class="kw-2">&amp;</span>tlsa.cert_data)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="doccomment">/// [RFC 6698, DNS-Based Authentication for TLS](https://tools.ietf.org/html/rfc6698#section-2.2)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// 2.2.  TLSA RR Presentation Format</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   The presentation format of the RDATA portion (as defined in</span>
-<span class="doccomment">///   [RFC1035]) is as follows:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   o  The certificate usage field MUST be represented as an 8-bit</span>
-<span class="doccomment">///      unsigned integer.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   o  The selector field MUST be represented as an 8-bit unsigned</span>
-<span class="doccomment">///      integer.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   o  The matching type field MUST be represented as an 8-bit unsigned</span>
-<span class="doccomment">///      integer.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   o  The certificate association data field MUST be represented as a</span>
-<span class="doccomment">///      string of hexadecimal characters.  Whitespace is allowed within</span>
-<span class="doccomment">///      the string of hexadecimal characters, as described in [RFC1035].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// 2.3.  TLSA RR Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    In the following examples, the domain name is formed using the rules</span>
-<span class="doccomment">///    in Section 3.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    An example of a hashed (SHA-256) association of a PKIX CA</span>
-<span class="doccomment">///    certificate:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    _443._tcp.www.example.com. IN TLSA (</span>
-<span class="doccomment">///       0 0 1 d2abde240d7cd3ee6b4b28c54df034b9</span>
-<span class="doccomment">///             7983a1d16e8a410e4561cb106618e971 )</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    An example of a hashed (SHA-512) subject public key association of a</span>
-<span class="doccomment">///    PKIX end entity certificate:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    _443._tcp.www.example.com. IN TLSA (</span>
-<span class="doccomment">///       1 1 2 92003ba34942dc74152e2f2c408d29ec</span>
-<span class="doccomment">///             a5a520e7f2e06bb944f4dca346baf63c</span>
-<span class="doccomment">///             1b177615d466f6c4b71c216a50292bd5</span>
-<span class="doccomment">///             8c9ebdd2f74e38fe51ffd48c43326cbc )</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    An example of a full certificate association of a PKIX end entity</span>
-<span class="doccomment">///    certificate:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    _443._tcp.www.example.com. IN TLSA (</span>
-<span class="doccomment">///       3 0 0 30820307308201efa003020102020... )</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">TLSA</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+<span class="doccomment">/// [RFC 6698, DNS-Based Authentication for TLS](https://tools.ietf.org/html/rfc6698#section-2.2)
+///
+/// ```text
+/// 2.2.  TLSA RR Presentation Format
+///
+///   The presentation format of the RDATA portion (as defined in
+///   [RFC1035]) is as follows:
+///
+///   o  The certificate usage field MUST be represented as an 8-bit
+///      unsigned integer.
+///
+///   o  The selector field MUST be represented as an 8-bit unsigned
+///      integer.
+///
+///   o  The matching type field MUST be represented as an 8-bit unsigned
+///      integer.
+///
+///   o  The certificate association data field MUST be represented as a
+///      string of hexadecimal characters.  Whitespace is allowed within
+///      the string of hexadecimal characters, as described in [RFC1035].
+///
+/// 2.3.  TLSA RR Examples
+///
+///    In the following examples, the domain name is formed using the rules
+///    in Section 3.
+///
+///    An example of a hashed (SHA-256) association of a PKIX CA
+///    certificate:
+///
+///    _443._tcp.www.example.com. IN TLSA (
+///       0 0 1 d2abde240d7cd3ee6b4b28c54df034b9
+///             7983a1d16e8a410e4561cb106618e971 )
+///
+///    An example of a hashed (SHA-512) subject public key association of a
+///    PKIX end entity certificate:
+///
+///    _443._tcp.www.example.com. IN TLSA (
+///       1 1 2 92003ba34942dc74152e2f2c408d29ec
+///             a5a520e7f2e06bb944f4dca346baf63c
+///             1b177615d466f6c4b71c216a50292bd5
+///             8c9ebdd2f74e38fe51ffd48c43326cbc )
+///
+///    An example of a full certificate association of a PKIX end entity
+///    certificate:
+///
+///    _443._tcp.www.example.com. IN TLSA (
+///       3 0 0 30820307308201efa003020102020... )
+/// ```
+</span><span class="kw">impl </span>fmt::Display <span class="kw">for </span>TLSA {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), fmt::Error&gt; {
         <span class="macro">write!</span>(
-            <span class="ident">f</span>,
+            f,
             <span class="string">&quot;{usage} {selector} {matching} {cert}&quot;</span>,
-            <span class="ident">usage</span> <span class="op">=</span> <span class="ident">u8::from</span>(<span class="self">self</span>.<span class="ident">cert_usage</span>),
-            <span class="ident">selector</span> <span class="op">=</span> <span class="ident">u8::from</span>(<span class="self">self</span>.<span class="ident">selector</span>),
-            <span class="ident">matching</span> <span class="op">=</span> <span class="ident">u8::from</span>(<span class="self">self</span>.<span class="ident">matching</span>),
-            <span class="ident">cert</span> <span class="op">=</span> <span class="ident">sshfp::HEX</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cert_data</span>),
+            usage = u8::from(<span class="self">self</span>.cert_usage),
+            selector = u8::from(<span class="self">self</span>.selector),
+            matching = u8::from(<span class="self">self</span>.matching),
+            cert = sshfp::HEX.encode(<span class="kw-2">&amp;</span><span class="self">self</span>.cert_data),
         )
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::dbg_macro</span>, <span class="ident">clippy::print_stdout</span>)]</span>
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="attribute">#![allow(clippy::dbg_macro, clippy::print_stdout)]
 
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+    </span><span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">read_cert_usage</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">CertUsage::CA</span>, <span class="ident">CertUsage::from</span>(<span class="number">0</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">CertUsage::Service</span>, <span class="ident">CertUsage::from</span>(<span class="number">1</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">CertUsage::TrustAnchor</span>, <span class="ident">CertUsage::from</span>(<span class="number">2</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">CertUsage::DomainIssued</span>, <span class="ident">CertUsage::from</span>(<span class="number">3</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">CertUsage::Unassigned</span>(<span class="number">4</span>), <span class="ident">CertUsage::from</span>(<span class="number">4</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">CertUsage::Unassigned</span>(<span class="number">254</span>), <span class="ident">CertUsage::from</span>(<span class="number">254</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">CertUsage::Private</span>, <span class="ident">CertUsage::from</span>(<span class="number">255</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>read_cert_usage() {
+        <span class="macro">assert_eq!</span>(CertUsage::CA, CertUsage::from(<span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(CertUsage::Service, CertUsage::from(<span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(CertUsage::TrustAnchor, CertUsage::from(<span class="number">2</span>));
+        <span class="macro">assert_eq!</span>(CertUsage::DomainIssued, CertUsage::from(<span class="number">3</span>));
+        <span class="macro">assert_eq!</span>(CertUsage::Unassigned(<span class="number">4</span>), CertUsage::from(<span class="number">4</span>));
+        <span class="macro">assert_eq!</span>(CertUsage::Unassigned(<span class="number">254</span>), CertUsage::from(<span class="number">254</span>));
+        <span class="macro">assert_eq!</span>(CertUsage::Private, CertUsage::from(<span class="number">255</span>));
 
-        <span class="macro">assert_eq!</span>(<span class="ident">u8::from</span>(<span class="ident">CertUsage::CA</span>), <span class="number">0</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">u8::from</span>(<span class="ident">CertUsage::Service</span>), <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">u8::from</span>(<span class="ident">CertUsage::TrustAnchor</span>), <span class="number">2</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">u8::from</span>(<span class="ident">CertUsage::DomainIssued</span>), <span class="number">3</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">u8::from</span>(<span class="ident">CertUsage::Unassigned</span>(<span class="number">4</span>)), <span class="number">4</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">u8::from</span>(<span class="ident">CertUsage::Unassigned</span>(<span class="number">254</span>)), <span class="number">254</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">u8::from</span>(<span class="ident">CertUsage::Private</span>), <span class="number">255</span>);
+        <span class="macro">assert_eq!</span>(u8::from(CertUsage::CA), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(u8::from(CertUsage::Service), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(u8::from(CertUsage::TrustAnchor), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(u8::from(CertUsage::DomainIssued), <span class="number">3</span>);
+        <span class="macro">assert_eq!</span>(u8::from(CertUsage::Unassigned(<span class="number">4</span>)), <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(u8::from(CertUsage::Unassigned(<span class="number">254</span>)), <span class="number">254</span>);
+        <span class="macro">assert_eq!</span>(u8::from(CertUsage::Private), <span class="number">255</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">read_selector</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">Selector::Full</span>, <span class="ident">Selector::from</span>(<span class="number">0</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">Selector::Spki</span>, <span class="ident">Selector::from</span>(<span class="number">1</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">Selector::Unassigned</span>(<span class="number">2</span>), <span class="ident">Selector::from</span>(<span class="number">2</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">Selector::Unassigned</span>(<span class="number">254</span>), <span class="ident">Selector::from</span>(<span class="number">254</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">Selector::Private</span>, <span class="ident">Selector::from</span>(<span class="number">255</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>read_selector() {
+        <span class="macro">assert_eq!</span>(Selector::Full, Selector::from(<span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(Selector::Spki, Selector::from(<span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(Selector::Unassigned(<span class="number">2</span>), Selector::from(<span class="number">2</span>));
+        <span class="macro">assert_eq!</span>(Selector::Unassigned(<span class="number">254</span>), Selector::from(<span class="number">254</span>));
+        <span class="macro">assert_eq!</span>(Selector::Private, Selector::from(<span class="number">255</span>));
 
-        <span class="macro">assert_eq!</span>(<span class="ident">u8::from</span>(<span class="ident">Selector::Full</span>), <span class="number">0</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">u8::from</span>(<span class="ident">Selector::Spki</span>), <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">u8::from</span>(<span class="ident">Selector::Unassigned</span>(<span class="number">2</span>)), <span class="number">2</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">u8::from</span>(<span class="ident">Selector::Unassigned</span>(<span class="number">254</span>)), <span class="number">254</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">u8::from</span>(<span class="ident">Selector::Private</span>), <span class="number">255</span>);
+        <span class="macro">assert_eq!</span>(u8::from(Selector::Full), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(u8::from(Selector::Spki), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(u8::from(Selector::Unassigned(<span class="number">2</span>)), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(u8::from(Selector::Unassigned(<span class="number">254</span>)), <span class="number">254</span>);
+        <span class="macro">assert_eq!</span>(u8::from(Selector::Private), <span class="number">255</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">read_matching</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">Matching::Raw</span>, <span class="ident">Matching::from</span>(<span class="number">0</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">Matching::Sha256</span>, <span class="ident">Matching::from</span>(<span class="number">1</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">Matching::Sha512</span>, <span class="ident">Matching::from</span>(<span class="number">2</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">Matching::Unassigned</span>(<span class="number">3</span>), <span class="ident">Matching::from</span>(<span class="number">3</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">Matching::Unassigned</span>(<span class="number">254</span>), <span class="ident">Matching::from</span>(<span class="number">254</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">Matching::Private</span>, <span class="ident">Matching::from</span>(<span class="number">255</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>read_matching() {
+        <span class="macro">assert_eq!</span>(Matching::Raw, Matching::from(<span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(Matching::Sha256, Matching::from(<span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(Matching::Sha512, Matching::from(<span class="number">2</span>));
+        <span class="macro">assert_eq!</span>(Matching::Unassigned(<span class="number">3</span>), Matching::from(<span class="number">3</span>));
+        <span class="macro">assert_eq!</span>(Matching::Unassigned(<span class="number">254</span>), Matching::from(<span class="number">254</span>));
+        <span class="macro">assert_eq!</span>(Matching::Private, Matching::from(<span class="number">255</span>));
 
-        <span class="macro">assert_eq!</span>(<span class="ident">u8::from</span>(<span class="ident">Matching::Raw</span>), <span class="number">0</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">u8::from</span>(<span class="ident">Matching::Sha256</span>), <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">u8::from</span>(<span class="ident">Matching::Sha512</span>), <span class="number">2</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">u8::from</span>(<span class="ident">Matching::Unassigned</span>(<span class="number">3</span>)), <span class="number">3</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">u8::from</span>(<span class="ident">Matching::Unassigned</span>(<span class="number">254</span>)), <span class="number">254</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">u8::from</span>(<span class="ident">Matching::Private</span>), <span class="number">255</span>);
+        <span class="macro">assert_eq!</span>(u8::from(Matching::Raw), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(u8::from(Matching::Sha256), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(u8::from(Matching::Sha512), <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(u8::from(Matching::Unassigned(<span class="number">3</span>)), <span class="number">3</span>);
+        <span class="macro">assert_eq!</span>(u8::from(Matching::Unassigned(<span class="number">254</span>)), <span class="number">254</span>);
+        <span class="macro">assert_eq!</span>(u8::from(Matching::Private), <span class="number">255</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">test_encode_decode</span>(<span class="ident">rdata</span>: <span class="ident">TLSA</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span>: <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BinEncoder::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>);
-        <span class="ident">emit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">encoder</span>, <span class="kw-2">&amp;</span><span class="ident">rdata</span>).<span class="ident">expect</span>(<span class="string">&quot;failed to emit tlsa&quot;</span>);
-        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">into_bytes</span>();
+    <span class="kw">fn </span>test_encode_decode(rdata: TLSA) {
+        <span class="kw">let </span><span class="kw-2">mut </span>bytes = Vec::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>encoder: BinEncoder&lt;<span class="lifetime">&#39;_</span>&gt; = BinEncoder::new(<span class="kw-2">&amp;mut </span>bytes);
+        emit(<span class="kw-2">&amp;mut </span>encoder, <span class="kw-2">&amp;</span>rdata).expect(<span class="string">&quot;failed to emit tlsa&quot;</span>);
+        <span class="kw">let </span>bytes = encoder.into_bytes();
 
-        <span class="macro">println!</span>(<span class="string">&quot;bytes: {:?}&quot;</span>, <span class="ident">bytes</span>);
+        <span class="macro">println!</span>(<span class="string">&quot;bytes: {:?}&quot;</span>, bytes);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span>: <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BinDecoder::new</span>(<span class="ident">bytes</span>);
-        <span class="kw">let</span> <span class="ident">read_rdata</span> <span class="op">=</span>
-            <span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">decoder</span>, <span class="ident">Restrict::new</span>(<span class="ident">bytes</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u16</span>)).<span class="ident">expect</span>(<span class="string">&quot;failed to read back&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">rdata</span>, <span class="ident">read_rdata</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>decoder: BinDecoder&lt;<span class="lifetime">&#39;_</span>&gt; = BinDecoder::new(bytes);
+        <span class="kw">let </span>read_rdata =
+            read(<span class="kw-2">&amp;mut </span>decoder, Restrict::new(bytes.len() <span class="kw">as </span>u16)).expect(<span class="string">&quot;failed to read back&quot;</span>);
+        <span class="macro">assert_eq!</span>(rdata, read_rdata);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_encode_decode_tlsa</span>() {
-        <span class="ident">test_encode_decode</span>(<span class="ident">TLSA::new</span>(
-            <span class="ident">CertUsage::Service</span>,
-            <span class="ident">Selector::Spki</span>,
-            <span class="ident">Matching::Sha256</span>,
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_encode_decode_tlsa() {
+        test_encode_decode(TLSA::new(
+            CertUsage::Service,
+            Selector::Spki,
+            Matching::Sha256,
             <span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>],
         ));
-        <span class="ident">test_encode_decode</span>(<span class="ident">TLSA::new</span>(
-            <span class="ident">CertUsage::CA</span>,
-            <span class="ident">Selector::Full</span>,
-            <span class="ident">Matching::Raw</span>,
+        test_encode_decode(TLSA::new(
+            CertUsage::CA,
+            Selector::Full,
+            Matching::Raw,
             <span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>],
         ));
-        <span class="ident">test_encode_decode</span>(<span class="ident">TLSA::new</span>(
-            <span class="ident">CertUsage::DomainIssued</span>,
-            <span class="ident">Selector::Full</span>,
-            <span class="ident">Matching::Sha512</span>,
+        test_encode_decode(TLSA::new(
+            CertUsage::DomainIssued,
+            Selector::Full,
+            Matching::Sha512,
             <span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>],
         ));
-        <span class="ident">test_encode_decode</span>(<span class="ident">TLSA::new</span>(
-            <span class="ident">CertUsage::Unassigned</span>(<span class="number">40</span>),
-            <span class="ident">Selector::Unassigned</span>(<span class="number">39</span>),
-            <span class="ident">Matching::Unassigned</span>(<span class="number">6</span>),
+        test_encode_decode(TLSA::new(
+            CertUsage::Unassigned(<span class="number">40</span>),
+            Selector::Unassigned(<span class="number">39</span>),
+            Matching::Unassigned(<span class="number">6</span>),
             <span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>],
         ));
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

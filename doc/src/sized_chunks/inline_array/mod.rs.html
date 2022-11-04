@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sized-chunks-0.6.5/src/inline_array/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../sized_chunks/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../sized_chunks/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../sized_chunks/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sized-chunks-0.6.5/src/inline_array/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../sized_chunks/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../sized_chunks/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../sized_chunks/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -734,741 +734,741 @@
 <span id="734">734</span>
 <span id="735">735</span>
 <span id="736">736</span>
-</pre><pre class="rust"><code><span class="comment">// This Source Code Form is subject to the terms of the Mozilla Public</span>
-<span class="comment">// License, v. 2.0. If a copy of the MPL was not distributed with this</span>
-<span class="comment">// file, You can obtain one at http://mozilla.org/MPL/2.0/.</span>
+</pre><pre class="rust"><code><span class="comment">// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-<span class="doccomment">//! A fixed capacity array sized to match some other type `T`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! See [`InlineArray`](struct.InlineArray.html)</span>
+</span><span class="doccomment">//! A fixed capacity array sized to match some other type `T`.
+//!
+//! See [`InlineArray`](struct.InlineArray.html)
 
-<span class="kw">use</span> <span class="ident">core::borrow</span>::{<span class="ident">Borrow</span>, <span class="ident">BorrowMut</span>};
-<span class="kw">use</span> <span class="ident">core::cmp::Ordering</span>;
-<span class="kw">use</span> <span class="ident">core::fmt</span>::{<span class="ident">Debug</span>, <span class="ident">Error</span>, <span class="ident">Formatter</span>};
-<span class="kw">use</span> <span class="ident">core::hash</span>::{<span class="ident">Hash</span>, <span class="ident">Hasher</span>};
-<span class="kw">use</span> <span class="ident">core::iter::FromIterator</span>;
-<span class="kw">use</span> <span class="ident">core::marker::PhantomData</span>;
-<span class="kw">use</span> <span class="ident">core::mem</span>::{<span class="self">self</span>, <span class="ident">MaybeUninit</span>};
-<span class="kw">use</span> <span class="ident">core::ops</span>::{<span class="ident">Deref</span>, <span class="ident">DerefMut</span>};
-<span class="kw">use</span> <span class="ident">core::ptr</span>;
-<span class="kw">use</span> <span class="ident">core::ptr::NonNull</span>;
-<span class="kw">use</span> <span class="ident">core::slice</span>::{<span class="ident">from_raw_parts</span>, <span class="ident">from_raw_parts_mut</span>, <span class="ident">Iter</span> <span class="kw">as</span> <span class="ident">SliceIter</span>, <span class="ident">IterMut</span> <span class="kw">as</span> <span class="ident">SliceIterMut</span>};
+</span><span class="kw">use </span>core::borrow::{Borrow, BorrowMut};
+<span class="kw">use </span>core::cmp::Ordering;
+<span class="kw">use </span>core::fmt::{Debug, Error, Formatter};
+<span class="kw">use </span>core::hash::{Hash, Hasher};
+<span class="kw">use </span>core::iter::FromIterator;
+<span class="kw">use </span>core::marker::PhantomData;
+<span class="kw">use </span>core::mem::{<span class="self">self</span>, MaybeUninit};
+<span class="kw">use </span>core::ops::{Deref, DerefMut};
+<span class="kw">use </span>core::ptr;
+<span class="kw">use </span>core::ptr::NonNull;
+<span class="kw">use </span>core::slice::{from_raw_parts, from_raw_parts_mut, Iter <span class="kw">as </span>SliceIter, IterMut <span class="kw">as </span>SliceIterMut};
 
-<span class="kw">mod</span> <span class="ident">iter</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::iter</span>::{<span class="ident">Drain</span>, <span class="ident">Iter</span>};
+<span class="kw">mod </span>iter;
+<span class="kw">pub use </span><span class="self">self</span>::iter::{Drain, Iter};
 
-<span class="doccomment">/// A fixed capacity array sized to match some other type `T`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This works like a vector, but allocated on the stack (and thus marginally</span>
-<span class="doccomment">/// faster than `Vec`), with the allocated space exactly matching the size of</span>
-<span class="doccomment">/// the given type `T`. The vector consists of a `usize` tracking its current</span>
-<span class="doccomment">/// length and zero or more elements of type `A`. The capacity is thus</span>
-<span class="doccomment">/// `( size_of::&lt;T&gt;() - size_of::&lt;usize&gt;() ) / size_of::&lt;A&gt;()`. This could lead</span>
-<span class="doccomment">/// to situations where the capacity is zero, if `size_of::&lt;A&gt;()` is greater</span>
-<span class="doccomment">/// than `size_of::&lt;T&gt;() - size_of::&lt;usize&gt;()`, which is not an error and</span>
-<span class="doccomment">/// handled properly by the data structure.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If `size_of::&lt;T&gt;()` is less than `size_of::&lt;usize&gt;()`, meaning the vector</span>
-<span class="doccomment">/// has no space to store its length, `InlineArray::new()` will panic.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is meant to facilitate optimisations where a list data structure</span>
-<span class="doccomment">/// allocates a fairly large struct for itself, allowing you to replace it with</span>
-<span class="doccomment">/// an `InlineArray` until it grows beyond its capacity. This not only gives you</span>
-<span class="doccomment">/// a performance boost at very small sizes, it also saves you from having to</span>
-<span class="doccomment">/// allocate anything on the heap until absolutely necessary.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For instance, `im::Vector&lt;A&gt;` in its final form currently looks like this</span>
-<span class="doccomment">/// (approximately):</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust, ignore</span>
-<span class="doccomment">/// struct RRB&lt;A&gt; {</span>
-<span class="doccomment">///     length: usize,</span>
-<span class="doccomment">///     tree_height: usize,</span>
-<span class="doccomment">///     outer_head: Rc&lt;Chunk&lt;A&gt;&gt;,</span>
-<span class="doccomment">///     inner_head: Rc&lt;Chunk&lt;A&gt;&gt;,</span>
-<span class="doccomment">///     tree: Rc&lt;TreeNode&lt;A&gt;&gt;,</span>
-<span class="doccomment">///     inner_tail: Rc&lt;Chunk&lt;A&gt;&gt;,</span>
-<span class="doccomment">///     outer_tail: Rc&lt;Chunk&lt;A&gt;&gt;,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// That&#39;s two `usize`s and five `Rc`s, which comes in at 56 bytes on x86_64</span>
-<span class="doccomment">/// architectures. With `InlineArray`, that leaves us with 56 -</span>
-<span class="doccomment">/// `size_of::&lt;usize&gt;()` = 48 bytes we can use before having to expand into the</span>
-<span class="doccomment">/// full data struture. If `A` is `u8`, that&#39;s 48 elements, and even if `A` is a</span>
-<span class="doccomment">/// pointer we can still keep 6 of them inline before we run out of capacity.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// We can declare an enum like this:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust, ignore</span>
-<span class="doccomment">/// enum VectorWrapper&lt;A&gt; {</span>
-<span class="doccomment">///     Inline(InlineArray&lt;A, RRB&lt;A&gt;&gt;),</span>
-<span class="doccomment">///     Full(RRB&lt;A&gt;),</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Both of these will have the same size, and we can swap the `Inline` case out</span>
-<span class="doccomment">/// with the `Full` case once the `InlineArray` runs out of capacity.</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InlineArray</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="comment">// Alignment tricks</span>
-    <span class="comment">//</span>
-    <span class="comment">// We need both the `_header_align` and `data` to be properly aligned in memory. We do a few tricks</span>
-    <span class="comment">// to handle that.</span>
-    <span class="comment">//</span>
-    <span class="comment">// * An alignment is always power of 2. Therefore, with a pair of alignments, one is always</span>
-    <span class="comment">//   a multiple of the other (one way or the other).</span>
-    <span class="comment">// * A struct is aligned to at least the max alignment of each of its fields.</span>
-    <span class="comment">// * A `repr(C)` struct follows the order of fields and pushes each as close to the previous one</span>
-    <span class="comment">//   as allowed by alignment.</span>
-    <span class="comment">//</span>
-    <span class="comment">// By placing two &quot;fake&quot; fields that have 0 size, but an alignment first, we make sure that all</span>
-    <span class="comment">// 3 start at the beginning of the struct and that all of them are aligned to their maximum</span>
-    <span class="comment">// alignment.</span>
-    <span class="comment">//</span>
-    <span class="comment">// Unfortunately, we can&#39;t use `[A; 0]` to align to actual alignment of the type `A`, because</span>
-    <span class="comment">// it prevents use of `InlineArray` in recursive types.</span>
-    <span class="comment">// We rely on alignment of `u64`/`usize` or `T` to be sufficient, and panic otherwise. We use</span>
-    <span class="comment">// `u64` to handle all common types on 32-bit systems too.</span>
-    <span class="comment">//</span>
-    <span class="comment">// Furthermore, because we don&#39;t know if `u64` or `A` has bigger alignment, we decide on case by</span>
-    <span class="comment">// case basis if the header or the elements go first. By placing the one with higher alignment</span>
-    <span class="comment">// requirements first, we align that one and the other one will be aligned &quot;automatically&quot; when</span>
-    <span class="comment">// placed just after it.</span>
-    <span class="comment">//</span>
-    <span class="comment">// To the best of our knowledge, this is all guaranteed by the compiler. But just to make sure,</span>
-    <span class="comment">// we have bunch of asserts in the constructor to check; as these are invariants enforced by</span>
-    <span class="comment">// the compiler, it should be trivial for it to remove the checks so they are for free (if we</span>
-    <span class="comment">// are correct) or will save us (if we are not).</span>
-    <span class="ident">_header_align</span>: [(<span class="ident">u64</span>, <span class="ident">usize</span>); <span class="number">0</span>],
-    <span class="ident">_phantom</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
-    <span class="ident">data</span>: <span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A fixed capacity array sized to match some other type `T`.
+///
+/// This works like a vector, but allocated on the stack (and thus marginally
+/// faster than `Vec`), with the allocated space exactly matching the size of
+/// the given type `T`. The vector consists of a `usize` tracking its current
+/// length and zero or more elements of type `A`. The capacity is thus
+/// `( size_of::&lt;T&gt;() - size_of::&lt;usize&gt;() ) / size_of::&lt;A&gt;()`. This could lead
+/// to situations where the capacity is zero, if `size_of::&lt;A&gt;()` is greater
+/// than `size_of::&lt;T&gt;() - size_of::&lt;usize&gt;()`, which is not an error and
+/// handled properly by the data structure.
+///
+/// If `size_of::&lt;T&gt;()` is less than `size_of::&lt;usize&gt;()`, meaning the vector
+/// has no space to store its length, `InlineArray::new()` will panic.
+///
+/// This is meant to facilitate optimisations where a list data structure
+/// allocates a fairly large struct for itself, allowing you to replace it with
+/// an `InlineArray` until it grows beyond its capacity. This not only gives you
+/// a performance boost at very small sizes, it also saves you from having to
+/// allocate anything on the heap until absolutely necessary.
+///
+/// For instance, `im::Vector&lt;A&gt;` in its final form currently looks like this
+/// (approximately):
+///
+/// ```rust, ignore
+/// struct RRB&lt;A&gt; {
+///     length: usize,
+///     tree_height: usize,
+///     outer_head: Rc&lt;Chunk&lt;A&gt;&gt;,
+///     inner_head: Rc&lt;Chunk&lt;A&gt;&gt;,
+///     tree: Rc&lt;TreeNode&lt;A&gt;&gt;,
+///     inner_tail: Rc&lt;Chunk&lt;A&gt;&gt;,
+///     outer_tail: Rc&lt;Chunk&lt;A&gt;&gt;,
+/// }
+/// ```
+///
+/// That&#39;s two `usize`s and five `Rc`s, which comes in at 56 bytes on x86_64
+/// architectures. With `InlineArray`, that leaves us with 56 -
+/// `size_of::&lt;usize&gt;()` = 48 bytes we can use before having to expand into the
+/// full data struture. If `A` is `u8`, that&#39;s 48 elements, and even if `A` is a
+/// pointer we can still keep 6 of them inline before we run out of capacity.
+///
+/// We can declare an enum like this:
+///
+/// ```rust, ignore
+/// enum VectorWrapper&lt;A&gt; {
+///     Inline(InlineArray&lt;A, RRB&lt;A&gt;&gt;),
+///     Full(RRB&lt;A&gt;),
+/// }
+/// ```
+///
+/// Both of these will have the same size, and we can swap the `Inline` case out
+/// with the `Full` case once the `InlineArray` runs out of capacity.
+</span><span class="attribute">#[repr(C)]
+</span><span class="kw">pub struct </span>InlineArray&lt;A, T&gt; {
+    <span class="comment">// Alignment tricks
+    //
+    // We need both the `_header_align` and `data` to be properly aligned in memory. We do a few tricks
+    // to handle that.
+    //
+    // * An alignment is always power of 2. Therefore, with a pair of alignments, one is always
+    //   a multiple of the other (one way or the other).
+    // * A struct is aligned to at least the max alignment of each of its fields.
+    // * A `repr(C)` struct follows the order of fields and pushes each as close to the previous one
+    //   as allowed by alignment.
+    //
+    // By placing two &quot;fake&quot; fields that have 0 size, but an alignment first, we make sure that all
+    // 3 start at the beginning of the struct and that all of them are aligned to their maximum
+    // alignment.
+    //
+    // Unfortunately, we can&#39;t use `[A; 0]` to align to actual alignment of the type `A`, because
+    // it prevents use of `InlineArray` in recursive types.
+    // We rely on alignment of `u64`/`usize` or `T` to be sufficient, and panic otherwise. We use
+    // `u64` to handle all common types on 32-bit systems too.
+    //
+    // Furthermore, because we don&#39;t know if `u64` or `A` has bigger alignment, we decide on case by
+    // case basis if the header or the elements go first. By placing the one with higher alignment
+    // requirements first, we align that one and the other one will be aligned &quot;automatically&quot; when
+    // placed just after it.
+    //
+    // To the best of our knowledge, this is all guaranteed by the compiler. But just to make sure,
+    // we have bunch of asserts in the constructor to check; as these are invariants enforced by
+    // the compiler, it should be trivial for it to remove the checks so they are for free (if we
+    // are correct) or will save us (if we are not).
+    </span>_header_align: [(u64, usize); <span class="number">0</span>],
+    _phantom: PhantomData&lt;A&gt;,
+    data: MaybeUninit&lt;T&gt;,
 }
 
-<span class="kw">const</span> <span class="kw">fn</span> <span class="ident">capacity</span>(
-    <span class="ident">host_size</span>: <span class="ident">usize</span>,
-    <span class="ident">header_size</span>: <span class="ident">usize</span>,
-    <span class="ident">element_size</span>: <span class="ident">usize</span>,
-    <span class="ident">element_align</span>: <span class="ident">usize</span>,
-    <span class="ident">container_align</span>: <span class="ident">usize</span>,
-) -&gt; <span class="ident">usize</span> {
-    <span class="kw">if</span> <span class="ident">element_size</span> <span class="op">==</span> <span class="number">0</span> {
-        <span class="ident">usize::MAX</span>
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">element_align</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">container_align</span> <span class="op">&amp;&amp;</span> <span class="ident">host_size</span> <span class="op">&gt;</span> <span class="ident">header_size</span> {
-        (<span class="ident">host_size</span> <span class="op">-</span> <span class="ident">header_size</span>) <span class="op">/</span> <span class="ident">element_size</span>
-    } <span class="kw">else</span> {
-        <span class="number">0</span> <span class="comment">// larger alignment can&#39;t be guaranteed, so it&#39;d be unsafe to store any elements</span>
-    }
+<span class="kw">const fn </span>capacity(
+    host_size: usize,
+    header_size: usize,
+    element_size: usize,
+    element_align: usize,
+    container_align: usize,
+) -&gt; usize {
+    <span class="kw">if </span>element_size == <span class="number">0 </span>{
+        usize::MAX
+    } <span class="kw">else if </span>element_align &lt;= container_align &amp;&amp; host_size &gt; header_size {
+        (host_size - header_size) / element_size
+    } <span class="kw">else </span>{
+        <span class="number">0 </span><span class="comment">// larger alignment can&#39;t be guaranteed, so it&#39;d be unsafe to store any elements
+    </span>}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">InlineArray</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">const</span> <span class="ident">HOST_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>();
-    <span class="kw">const</span> <span class="ident">ELEMENT_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>();
-    <span class="kw">const</span> <span class="ident">HEADER_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>();
-    <span class="comment">// Do we place the header before the elements or the other way around?</span>
-    <span class="kw">const</span> <span class="ident">HEADER_FIRST</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="ident">mem::align_of</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">mem::align_of</span>::<span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>();
-    <span class="comment">// Note: one of the following is always 0</span>
-    <span class="comment">// How many usizes to skip before the first element?</span>
-    <span class="kw">const</span> <span class="ident">ELEMENT_SKIP</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::HEADER_FIRST</span> <span class="kw">as</span> <span class="ident">usize</span>;
-    <span class="comment">// How many elements to skip before the header</span>
-    <span class="kw">const</span> <span class="ident">HEADER_SKIP</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::CAPACITY</span> <span class="op">*</span> (<span class="number">1</span> <span class="op">-</span> <span class="ident"><span class="self">Self</span>::ELEMENT_SKIP</span>);
+<span class="kw">impl</span>&lt;A, T&gt; InlineArray&lt;A, T&gt; {
+    <span class="kw">const </span>HOST_SIZE: usize = mem::size_of::&lt;T&gt;();
+    <span class="kw">const </span>ELEMENT_SIZE: usize = mem::size_of::&lt;A&gt;();
+    <span class="kw">const </span>HEADER_SIZE: usize = mem::size_of::&lt;usize&gt;();
+    <span class="comment">// Do we place the header before the elements or the other way around?
+    </span><span class="kw">const </span>HEADER_FIRST: bool = mem::align_of::&lt;usize&gt;() &gt;= mem::align_of::&lt;A&gt;();
+    <span class="comment">// Note: one of the following is always 0
+    // How many usizes to skip before the first element?
+    </span><span class="kw">const </span>ELEMENT_SKIP: usize = <span class="self">Self</span>::HEADER_FIRST <span class="kw">as </span>usize;
+    <span class="comment">// How many elements to skip before the header
+    </span><span class="kw">const </span>HEADER_SKIP: usize = <span class="self">Self</span>::CAPACITY * (<span class="number">1 </span>- <span class="self">Self</span>::ELEMENT_SKIP);
 
-    <span class="doccomment">/// The maximum number of elements the `InlineArray` can hold.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CAPACITY</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">capacity</span>(
-        <span class="ident"><span class="self">Self</span>::HOST_SIZE</span>,
-        <span class="ident"><span class="self">Self</span>::HEADER_SIZE</span>,
-        <span class="ident"><span class="self">Self</span>::ELEMENT_SIZE</span>,
-        <span class="ident">mem::align_of</span>::<span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>(),
-        <span class="ident">mem::align_of</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>(),
+    <span class="doccomment">/// The maximum number of elements the `InlineArray` can hold.
+    </span><span class="kw">pub const </span>CAPACITY: usize = capacity(
+        <span class="self">Self</span>::HOST_SIZE,
+        <span class="self">Self</span>::HEADER_SIZE,
+        <span class="self">Self</span>::ELEMENT_SIZE,
+        mem::align_of::&lt;A&gt;(),
+        mem::align_of::&lt;<span class="self">Self</span>&gt;(),
     );
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">len_const</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const</span> <span class="ident">usize</span> {
-        <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">data</span>
-            .<span class="ident">as_ptr</span>()
-            .<span class="ident">cast</span>::<span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>()
-            .<span class="ident">add</span>(<span class="ident"><span class="self">Self</span>::HEADER_SKIP</span>)
-            .<span class="ident">cast</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>();
-        <span class="macro">debug_assert!</span>(<span class="ident">ptr</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">%</span> <span class="ident">mem::align_of</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="number">0</span>);
-        <span class="ident">ptr</span>
+    <span class="attribute">#[inline]
+    #[must_use]
+    </span><span class="kw">unsafe fn </span>len_const(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const </span>usize {
+        <span class="kw">let </span>ptr = <span class="self">self
+            </span>.data
+            .as_ptr()
+            .cast::&lt;A&gt;()
+            .add(<span class="self">Self</span>::HEADER_SKIP)
+            .cast::&lt;usize&gt;();
+        <span class="macro">debug_assert!</span>(ptr <span class="kw">as </span>usize % mem::align_of::&lt;usize&gt;() == <span class="number">0</span>);
+        ptr
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">len_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">usize</span> {
-        <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">data</span>
-            .<span class="ident">as_mut_ptr</span>()
-            .<span class="ident">cast</span>::<span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>()
-            .<span class="ident">add</span>(<span class="ident"><span class="self">Self</span>::HEADER_SKIP</span>)
-            .<span class="ident">cast</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>();
-        <span class="macro">debug_assert!</span>(<span class="ident">ptr</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">%</span> <span class="ident">mem::align_of</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="number">0</span>);
-        <span class="ident">ptr</span>
+    <span class="attribute">#[inline]
+    #[must_use]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe fn </span>len_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>usize {
+        <span class="kw">let </span>ptr = <span class="self">self
+            </span>.data
+            .as_mut_ptr()
+            .cast::&lt;A&gt;()
+            .add(<span class="self">Self</span>::HEADER_SKIP)
+            .cast::&lt;usize&gt;();
+        <span class="macro">debug_assert!</span>(ptr <span class="kw">as </span>usize % mem::align_of::&lt;usize&gt;() == <span class="number">0</span>);
+        ptr
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const</span> <span class="ident">A</span> {
-        <span class="kw">if</span> <span class="ident"><span class="self">Self</span>::CAPACITY</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="ident">NonNull</span>::<span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="ident">::dangling</span>().<span class="ident">as_ptr</span>();
+    <span class="attribute">#[inline]
+    #[must_use]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe fn </span>data(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const </span>A {
+        <span class="kw">if </span><span class="self">Self</span>::CAPACITY == <span class="number">0 </span>{
+            <span class="kw">return </span>NonNull::&lt;A&gt;::dangling().as_ptr();
         }
-        <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">data</span>
-            .<span class="ident">as_ptr</span>()
-            .<span class="ident">cast</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>()
-            .<span class="ident">add</span>(<span class="ident"><span class="self">Self</span>::ELEMENT_SKIP</span>)
-            .<span class="ident">cast</span>::<span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>();
-        <span class="macro">debug_assert!</span>(<span class="ident">ptr</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">%</span> <span class="ident">mem::align_of</span>::<span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="number">0</span>);
-        <span class="ident">ptr</span>
+        <span class="kw">let </span>ptr = <span class="self">self
+            </span>.data
+            .as_ptr()
+            .cast::&lt;usize&gt;()
+            .add(<span class="self">Self</span>::ELEMENT_SKIP)
+            .cast::&lt;A&gt;();
+        <span class="macro">debug_assert!</span>(ptr <span class="kw">as </span>usize % mem::align_of::&lt;A&gt;() == <span class="number">0</span>);
+        ptr
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">data_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">A</span> {
-        <span class="kw">if</span> <span class="ident"><span class="self">Self</span>::CAPACITY</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="ident">NonNull</span>::<span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="ident">::dangling</span>().<span class="ident">as_ptr</span>();
+    <span class="attribute">#[inline]
+    #[must_use]
+    </span><span class="kw">unsafe fn </span>data_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>A {
+        <span class="kw">if </span><span class="self">Self</span>::CAPACITY == <span class="number">0 </span>{
+            <span class="kw">return </span>NonNull::&lt;A&gt;::dangling().as_ptr();
         }
-        <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">data</span>
-            .<span class="ident">as_mut_ptr</span>()
-            .<span class="ident">cast</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>()
-            .<span class="ident">add</span>(<span class="ident"><span class="self">Self</span>::ELEMENT_SKIP</span>)
-            .<span class="ident">cast</span>::<span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>();
-        <span class="macro">debug_assert!</span>(<span class="ident">ptr</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">%</span> <span class="ident">mem::align_of</span>::<span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="number">0</span>);
-        <span class="ident">ptr</span>
+        <span class="kw">let </span>ptr = <span class="self">self
+            </span>.data
+            .as_mut_ptr()
+            .cast::&lt;usize&gt;()
+            .add(<span class="self">Self</span>::ELEMENT_SKIP)
+            .cast::&lt;A&gt;();
+        <span class="macro">debug_assert!</span>(ptr <span class="kw">as </span>usize % mem::align_of::&lt;A&gt;() == <span class="number">0</span>);
+        ptr
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">ptr_at</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">*const</span> <span class="ident">A</span> {
-        <span class="macro">debug_assert!</span>(<span class="ident">index</span> <span class="op">&lt;</span> <span class="ident"><span class="self">Self</span>::CAPACITY</span>);
-        <span class="self">self</span>.<span class="ident">data</span>().<span class="ident">add</span>(<span class="ident">index</span>)
+    <span class="attribute">#[inline]
+    #[must_use]
+    </span><span class="kw">unsafe fn </span>ptr_at(<span class="kw-2">&amp;</span><span class="self">self</span>, index: usize) -&gt; <span class="kw-2">*const </span>A {
+        <span class="macro">debug_assert!</span>(index &lt; <span class="self">Self</span>::CAPACITY);
+        <span class="self">self</span>.data().add(index)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">ptr_at_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">A</span> {
-        <span class="macro">debug_assert!</span>(<span class="ident">index</span> <span class="op">&lt;</span> <span class="ident"><span class="self">Self</span>::CAPACITY</span>);
-        <span class="self">self</span>.<span class="ident">data_mut</span>().<span class="ident">add</span>(<span class="ident">index</span>)
+    <span class="attribute">#[inline]
+    #[must_use]
+    </span><span class="kw">unsafe fn </span>ptr_at_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize) -&gt; <span class="kw-2">*mut </span>A {
+        <span class="macro">debug_assert!</span>(index &lt; <span class="self">Self</span>::CAPACITY);
+        <span class="self">self</span>.data_mut().add(index)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">read_at</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">A</span> {
-        <span class="ident">ptr::read</span>(<span class="self">self</span>.<span class="ident">ptr_at</span>(<span class="ident">index</span>))
+    <span class="attribute">#[inline]
+    </span><span class="kw">unsafe fn </span>read_at(<span class="kw-2">&amp;</span><span class="self">self</span>, index: usize) -&gt; A {
+        ptr::read(<span class="self">self</span>.ptr_at(index))
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">write_at</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>, <span class="ident">value</span>: <span class="ident">A</span>) {
-        <span class="ident">ptr::write</span>(<span class="self">self</span>.<span class="ident">ptr_at_mut</span>(<span class="ident">index</span>), <span class="ident">value</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">unsafe fn </span>write_at(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize, value: A) {
+        ptr::write(<span class="self">self</span>.ptr_at_mut(index), value);
     }
 
-    <span class="doccomment">/// Get the length of the array.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">unsafe</span> { <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">len_const</span>() }
+    <span class="doccomment">/// Get the length of the array.
+    </span><span class="attribute">#[inline]
+    #[must_use]
+    </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="kw">unsafe </span>{ <span class="kw-2">*</span><span class="self">self</span>.len_const() }
     }
 
-    <span class="doccomment">/// Test if the array is empty.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>
+    <span class="doccomment">/// Test if the array is empty.
+    </span><span class="attribute">#[inline]
+    #[must_use]
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.len() == <span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Test if the array is at capacity.
+    </span><span class="attribute">#[inline]
+    #[must_use]
+    </span><span class="kw">pub fn </span>is_full(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.len() &gt;= <span class="self">Self</span>::CAPACITY
     }
 
-    <span class="doccomment">/// Test if the array is at capacity.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_full</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident"><span class="self">Self</span>::CAPACITY</span>
-    }
-
-    <span class="doccomment">/// Construct a new empty array.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the element type requires large alignment, which is larger than</span>
-    <span class="doccomment">/// both alignment of `usize` and alignment of the type that provides the capacity.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="macro">assert!</span>(<span class="ident"><span class="self">Self</span>::HOST_SIZE</span> <span class="op">&gt;</span> <span class="ident"><span class="self">Self</span>::HEADER_SIZE</span>);
+    <span class="doccomment">/// Construct a new empty array.
+    ///
+    /// # Panics
+    ///
+    /// If the element type requires large alignment, which is larger than
+    /// both alignment of `usize` and alignment of the type that provides the capacity.
+    </span><span class="attribute">#[inline]
+    #[must_use]
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="macro">assert!</span>(<span class="self">Self</span>::HOST_SIZE &gt; <span class="self">Self</span>::HEADER_SIZE);
         <span class="macro">assert!</span>(
-            (<span class="ident"><span class="self">Self</span>::CAPACITY</span> <span class="op">==</span> <span class="number">0</span>) <span class="op">|</span><span class="op">|</span> (<span class="ident">mem::align_of</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>() <span class="op">%</span> <span class="ident">mem::align_of</span>::<span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="number">0</span>),
+            (<span class="self">Self</span>::CAPACITY == <span class="number">0</span>) || (mem::align_of::&lt;<span class="self">Self</span>&gt;() % mem::align_of::&lt;A&gt;() == <span class="number">0</span>),
             <span class="string">&quot;InlineArray can&#39;t satisfy alignment of {}&quot;</span>,
-            <span class="ident">core::any::type_name</span>::<span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>()
+            core::any::type_name::&lt;A&gt;()
         );
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">self_</span> <span class="op">=</span> <span class="self">Self</span> {
-            <span class="ident">_header_align</span>: [],
-            <span class="ident">_phantom</span>: <span class="ident">PhantomData</span>,
-            <span class="ident">data</span>: <span class="ident">MaybeUninit::uninit</span>(),
+        <span class="kw">let </span><span class="kw-2">mut </span>self_ = <span class="self">Self </span>{
+            _header_align: [],
+            _phantom: PhantomData,
+            data: MaybeUninit::uninit(),
         };
-        <span class="comment">// Sanity check our assumptions about what is guaranteed by the compiler. If we are right,</span>
-        <span class="comment">// these should completely optimize out of the resulting binary.</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="kw-2">&amp;</span><span class="ident">self_</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span>,
-            <span class="ident">self_</span>.<span class="ident">data</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>,
+        <span class="comment">// Sanity check our assumptions about what is guaranteed by the compiler. If we are right,
+        // these should completely optimize out of the resulting binary.
+        </span><span class="macro">assert_eq!</span>(
+            <span class="kw-2">&amp;</span>self_ <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span>usize,
+            self_.data.as_ptr() <span class="kw">as </span>usize,
             <span class="string">&quot;Padding at the start of struct&quot;</span>,
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">self_</span>.<span class="ident">data</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span> <span class="op">%</span> <span class="ident">mem::align_of</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>(),
+            self_.data.as_ptr() <span class="kw">as </span>usize % mem::align_of::&lt;usize&gt;(),
             <span class="number">0</span>,
-            <span class="string">&quot;Unaligned header&quot;</span>
-        );
-        <span class="macro">assert!</span>(<span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">mem::align_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="op">&lt;</span> <span class="ident">mem::align_of</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>());
-        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="kw">unsafe</span> { <span class="ident">self_</span>.<span class="ident">data</span>() } <span class="kw">as</span> <span class="ident">usize</span> <span class="op">%</span> <span class="ident">mem::align_of</span>::<span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>());
-        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="kw">unsafe</span> { <span class="ident">self_</span>.<span class="ident">data_mut</span>() } <span class="kw">as</span> <span class="ident">usize</span> <span class="op">%</span> <span class="ident">mem::align_of</span>::<span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>());
-        <span class="macro">assert!</span>(<span class="ident"><span class="self">Self</span>::ELEMENT_SKIP</span> <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident"><span class="self">Self</span>::HEADER_SKIP</span> <span class="op">==</span> <span class="number">0</span>);
-        <span class="kw">unsafe</span> { <span class="ident">ptr::write</span>(<span class="ident">self_</span>.<span class="ident">len_mut</span>(), <span class="number">0usize</span>) };
-        <span class="ident">self_</span>
+            <span class="string">&quot;Unaligned header&quot;
+        </span>);
+        <span class="macro">assert!</span>(mem::size_of::&lt;<span class="self">Self</span>&gt;() == mem::size_of::&lt;T&gt;() || mem::align_of::&lt;T&gt;() &lt; mem::align_of::&lt;<span class="self">Self</span>&gt;());
+        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="kw">unsafe </span>{ self_.data() } <span class="kw">as </span>usize % mem::align_of::&lt;A&gt;());
+        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="kw">unsafe </span>{ self_.data_mut() } <span class="kw">as </span>usize % mem::align_of::&lt;A&gt;());
+        <span class="macro">assert!</span>(<span class="self">Self</span>::ELEMENT_SKIP == <span class="number">0 </span>|| <span class="self">Self</span>::HEADER_SKIP == <span class="number">0</span>);
+        <span class="kw">unsafe </span>{ ptr::write(self_.len_mut(), <span class="number">0usize</span>) };
+        self_
     }
 
-    <span class="doccomment">/// Push an item to the back of the array.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if the capacity of the array is exceeded.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Time: O(1)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">A</span>) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_full</span>() {
+    <span class="doccomment">/// Push an item to the back of the array.
+    ///
+    /// Panics if the capacity of the array is exceeded.
+    ///
+    /// Time: O(1)
+    </span><span class="kw">pub fn </span>push(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: A) {
+        <span class="kw">if </span><span class="self">self</span>.is_full() {
             <span class="macro">panic!</span>(<span class="string">&quot;InlineArray::push: chunk size overflow&quot;</span>);
         }
-        <span class="kw">unsafe</span> {
-            <span class="self">self</span>.<span class="ident">write_at</span>(<span class="self">self</span>.<span class="ident">len</span>(), <span class="ident">value</span>);
-            <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">len_mut</span>() <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="kw">unsafe </span>{
+            <span class="self">self</span>.write_at(<span class="self">self</span>.len(), value);
+            <span class="kw-2">*</span><span class="self">self</span>.len_mut() += <span class="number">1</span>;
         }
     }
 
-    <span class="doccomment">/// Pop an item from the back of the array.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `None` if the array is empty.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Time: O(1)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_empty</span>() {
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
-            <span class="kw">unsafe</span> {
-                <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">len_mut</span>() <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+    <span class="doccomment">/// Pop an item from the back of the array.
+    ///
+    /// Returns `None` if the array is empty.
+    ///
+    /// Time: O(1)
+    </span><span class="kw">pub fn </span>pop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;A&gt; {
+        <span class="kw">if </span><span class="self">self</span>.is_empty() {
+            <span class="prelude-val">None
+        </span>} <span class="kw">else </span>{
+            <span class="kw">unsafe </span>{
+                <span class="kw-2">*</span><span class="self">self</span>.len_mut() -= <span class="number">1</span>;
             }
-            <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">read_at</span>(<span class="self">self</span>.<span class="ident">len</span>()) })
+            <span class="prelude-val">Some</span>(<span class="kw">unsafe </span>{ <span class="self">self</span>.read_at(<span class="self">self</span>.len()) })
         }
     }
 
-    <span class="doccomment">/// Insert a new value at index `index`, shifting all the following values</span>
-    <span class="doccomment">/// to the right.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if the index is out of bounds or the array is at capacity.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Time: O(n) for the number of items shifted</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>, <span class="ident">value</span>: <span class="ident">A</span>) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_full</span>() {
+    <span class="doccomment">/// Insert a new value at index `index`, shifting all the following values
+    /// to the right.
+    ///
+    /// Panics if the index is out of bounds or the array is at capacity.
+    ///
+    /// Time: O(n) for the number of items shifted
+    </span><span class="kw">pub fn </span>insert(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize, value: A) {
+        <span class="kw">if </span><span class="self">self</span>.is_full() {
             <span class="macro">panic!</span>(<span class="string">&quot;InlineArray::push: chunk size overflow&quot;</span>);
         }
-        <span class="kw">if</span> <span class="ident">index</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">len</span>() {
+        <span class="kw">if </span>index &gt; <span class="self">self</span>.len() {
             <span class="macro">panic!</span>(<span class="string">&quot;InlineArray::insert: index out of bounds&quot;</span>);
         }
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">src</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ptr_at_mut</span>(<span class="ident">index</span>);
-            <span class="ident">ptr::copy</span>(<span class="ident">src</span>, <span class="ident">src</span>.<span class="ident">add</span>(<span class="number">1</span>), <span class="self">self</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">index</span>);
-            <span class="ident">ptr::write</span>(<span class="ident">src</span>, <span class="ident">value</span>);
-            <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">len_mut</span>() <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span>src = <span class="self">self</span>.ptr_at_mut(index);
+            ptr::copy(src, src.add(<span class="number">1</span>), <span class="self">self</span>.len() - index);
+            ptr::write(src, value);
+            <span class="kw-2">*</span><span class="self">self</span>.len_mut() += <span class="number">1</span>;
         }
     }
 
-    <span class="doccomment">/// Remove the value at index `index`, shifting all the following values to</span>
-    <span class="doccomment">/// the left.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns the removed value, or `None` if the array is empty or the index</span>
-    <span class="doccomment">/// is out of bounds.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Time: O(n) for the number of items shifted</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>() {
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
-            <span class="kw">unsafe</span> {
-                <span class="kw">let</span> <span class="ident">src</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ptr_at_mut</span>(<span class="ident">index</span>);
-                <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">ptr::read</span>(<span class="ident">src</span>);
-                <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">len_mut</span>() <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="ident">ptr::copy</span>(<span class="ident">src</span>.<span class="ident">add</span>(<span class="number">1</span>), <span class="ident">src</span>, <span class="self">self</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">index</span>);
-                <span class="prelude-val">Some</span>(<span class="ident">value</span>)
+    <span class="doccomment">/// Remove the value at index `index`, shifting all the following values to
+    /// the left.
+    ///
+    /// Returns the removed value, or `None` if the array is empty or the index
+    /// is out of bounds.
+    ///
+    /// Time: O(n) for the number of items shifted
+    </span><span class="kw">pub fn </span>remove(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize) -&gt; <span class="prelude-ty">Option</span>&lt;A&gt; {
+        <span class="kw">if </span>index &gt;= <span class="self">self</span>.len() {
+            <span class="prelude-val">None
+        </span>} <span class="kw">else </span>{
+            <span class="kw">unsafe </span>{
+                <span class="kw">let </span>src = <span class="self">self</span>.ptr_at_mut(index);
+                <span class="kw">let </span>value = ptr::read(src);
+                <span class="kw-2">*</span><span class="self">self</span>.len_mut() -= <span class="number">1</span>;
+                ptr::copy(src.add(<span class="number">1</span>), src, <span class="self">self</span>.len() - index);
+                <span class="prelude-val">Some</span>(value)
             }
         }
     }
 
-    <span class="doccomment">/// Split an array into two, the original array containing</span>
-    <span class="doccomment">/// everything up to `index` and the returned array containing</span>
-    <span class="doccomment">/// everything from `index` onwards.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if `index` is out of bounds.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Time: O(n) for the number of items in the new chunk</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">split_off</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="ident">index</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">len</span>() {
+    <span class="doccomment">/// Split an array into two, the original array containing
+    /// everything up to `index` and the returned array containing
+    /// everything from `index` onwards.
+    ///
+    /// Panics if `index` is out of bounds.
+    ///
+    /// Time: O(n) for the number of items in the new chunk
+    </span><span class="kw">pub fn </span>split_off(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize) -&gt; <span class="self">Self </span>{
+        <span class="kw">if </span>index &gt; <span class="self">self</span>.len() {
             <span class="macro">panic!</span>(<span class="string">&quot;InlineArray::split_off: index out of bounds&quot;</span>);
         }
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>();
-        <span class="kw">if</span> <span class="ident">index</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">len</span>() {
-            <span class="kw">unsafe</span> {
-                <span class="ident">ptr::copy</span>(<span class="self">self</span>.<span class="ident">ptr_at</span>(<span class="ident">index</span>), <span class="ident">out</span>.<span class="ident">data_mut</span>(), <span class="self">self</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">index</span>);
-                <span class="kw-2">*</span><span class="ident">out</span>.<span class="ident">len_mut</span>() <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">index</span>;
-                <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">len_mut</span>() <span class="op">=</span> <span class="ident">index</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>out = <span class="self">Self</span>::new();
+        <span class="kw">if </span>index &lt; <span class="self">self</span>.len() {
+            <span class="kw">unsafe </span>{
+                ptr::copy(<span class="self">self</span>.ptr_at(index), out.data_mut(), <span class="self">self</span>.len() - index);
+                <span class="kw-2">*</span>out.len_mut() = <span class="self">self</span>.len() - index;
+                <span class="kw-2">*</span><span class="self">self</span>.len_mut() = index;
             }
         }
-        <span class="ident">out</span>
+        out
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">drop_contents</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="ident">ptr::drop_in_place</span>::<span class="op">&lt;</span>[<span class="ident">A</span>]<span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>) <span class="comment">// uses DerefMut</span>
-    }
+    <span class="attribute">#[inline]
+    </span><span class="kw">unsafe fn </span>drop_contents(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        ptr::drop_in_place::&lt;[A]&gt;(<span class="kw-2">&amp;mut **</span><span class="self">self</span>) <span class="comment">// uses DerefMut
+    </span>}
 
-    <span class="doccomment">/// Discard the contents of the array.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Time: O(n)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="self">self</span>.<span class="ident">drop_contents</span>();
-            <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">len_mut</span>() <span class="op">=</span> <span class="number">0</span>;
+    <span class="doccomment">/// Discard the contents of the array.
+    ///
+    /// Time: O(n)
+    </span><span class="kw">pub fn </span>clear(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{
+            <span class="self">self</span>.drop_contents();
+            <span class="kw-2">*</span><span class="self">self</span>.len_mut() = <span class="number">0</span>;
         }
     }
 
-    <span class="doccomment">/// Construct an iterator that drains values from the front of the array.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">drain</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Drain</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">Drain</span> { <span class="ident">array</span>: <span class="self">self</span> }
+    <span class="doccomment">/// Construct an iterator that drains values from the front of the array.
+    </span><span class="kw">pub fn </span>drain(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Drain&lt;<span class="lifetime">&#39;_</span>, A, T&gt; {
+        Drain { array: <span class="self">self </span>}
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">InlineArray</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">drop_contents</span>() }
+<span class="kw">impl</span>&lt;A, T&gt; Drop <span class="kw">for </span>InlineArray&lt;A, T&gt; {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{ <span class="self">self</span>.drop_contents() }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">InlineArray</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>()
+<span class="kw">impl</span>&lt;A, T&gt; Default <span class="kw">for </span>InlineArray&lt;A, T&gt; {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new()
     }
 }
 
-<span class="comment">// WANT:</span>
-<span class="comment">// impl&lt;A, T&gt; Copy for InlineArray&lt;A, T&gt; where A: Copy {}</span>
+<span class="comment">// WANT:
+// impl&lt;A, T&gt; Copy for InlineArray&lt;A, T&gt; where A: Copy {}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">InlineArray</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Clone</span>,
+</span><span class="kw">impl</span>&lt;A, T&gt; Clone <span class="kw">for </span>InlineArray&lt;A, T&gt;
+<span class="kw">where
+    </span>A: Clone,
 {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">copy</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>();
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="self">self</span>.<span class="ident">len</span>() {
-            <span class="kw">unsafe</span> {
-                <span class="ident">copy</span>.<span class="ident">write_at</span>(<span class="ident">i</span>, <span class="self">self</span>.<span class="ident">get_unchecked</span>(<span class="ident">i</span>).<span class="ident">clone</span>());
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>copy = <span class="self">Self</span>::new();
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="self">self</span>.len() {
+            <span class="kw">unsafe </span>{
+                copy.write_at(i, <span class="self">self</span>.get_unchecked(i).clone());
             }
         }
-        <span class="kw">unsafe</span> {
-            <span class="kw-2">*</span><span class="ident">copy</span>.<span class="ident">len_mut</span>() <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
+        <span class="kw">unsafe </span>{
+            <span class="kw-2">*</span>copy.len_mut() = <span class="self">self</span>.len();
         }
-        <span class="ident">copy</span>
+        copy
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">InlineArray</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> [<span class="ident">A</span>];
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="kw">unsafe</span> { <span class="ident">from_raw_parts</span>(<span class="self">self</span>.<span class="ident">data</span>(), <span class="self">self</span>.<span class="ident">len</span>()) }
+<span class="kw">impl</span>&lt;A, T&gt; Deref <span class="kw">for </span>InlineArray&lt;A, T&gt; {
+    <span class="kw">type </span>Target = [A];
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+        <span class="kw">unsafe </span>{ from_raw_parts(<span class="self">self</span>.data(), <span class="self">self</span>.len()) }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">DerefMut</span> <span class="kw">for</span> <span class="ident">InlineArray</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="kw">unsafe</span> { <span class="ident">from_raw_parts_mut</span>(<span class="self">self</span>.<span class="ident">data_mut</span>(), <span class="self">self</span>.<span class="ident">len</span>()) }
+<span class="kw">impl</span>&lt;A, T&gt; DerefMut <span class="kw">for </span>InlineArray&lt;A, T&gt; {
+    <span class="kw">fn </span>deref_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Target {
+        <span class="kw">unsafe </span>{ from_raw_parts_mut(<span class="self">self</span>.data_mut(), <span class="self">self</span>.len()) }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Borrow</span><span class="op">&lt;</span>[<span class="ident">A</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InlineArray</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">borrow</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">A</span>] {
-        <span class="self">self</span>.<span class="ident">deref</span>()
+<span class="kw">impl</span>&lt;A, T&gt; Borrow&lt;[A]&gt; <span class="kw">for </span>InlineArray&lt;A, T&gt; {
+    <span class="kw">fn </span>borrow(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[A] {
+        <span class="self">self</span>.deref()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">BorrowMut</span><span class="op">&lt;</span>[<span class="ident">A</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InlineArray</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">borrow_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> [<span class="ident">A</span>] {
-        <span class="self">self</span>.<span class="ident">deref_mut</span>()
+<span class="kw">impl</span>&lt;A, T&gt; BorrowMut&lt;[A]&gt; <span class="kw">for </span>InlineArray&lt;A, T&gt; {
+    <span class="kw">fn </span>borrow_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>[A] {
+        <span class="self">self</span>.deref_mut()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">A</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InlineArray</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">A</span>] {
-        <span class="self">self</span>.<span class="ident">deref</span>()
+<span class="kw">impl</span>&lt;A, T&gt; AsRef&lt;[A]&gt; <span class="kw">for </span>InlineArray&lt;A, T&gt; {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[A] {
+        <span class="self">self</span>.deref()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">AsMut</span><span class="op">&lt;</span>[<span class="ident">A</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InlineArray</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">as_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> [<span class="ident">A</span>] {
-        <span class="self">self</span>.<span class="ident">deref_mut</span>()
+<span class="kw">impl</span>&lt;A, T&gt; AsMut&lt;[A]&gt; <span class="kw">for </span>InlineArray&lt;A, T&gt; {
+    <span class="kw">fn </span>as_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>[A] {
+        <span class="self">self</span>.deref_mut()
     }
 }
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span>, <span class="ident">Slice</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">Slice</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InlineArray</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">Slice</span>: <span class="ident">Borrow</span><span class="op">&lt;</span>[<span class="ident">A</span>]<span class="op">&gt;</span>,
-    <span class="ident">A</span>: <span class="ident">PartialEq</span>,
+<span class="kw">impl</span>&lt;A, T, Slice&gt; PartialEq&lt;Slice&gt; <span class="kw">for </span>InlineArray&lt;A, T&gt;
+<span class="kw">where
+    </span>Slice: Borrow&lt;[A]&gt;,
+    A: PartialEq,
 {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Slice</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">deref</span>() <span class="op">==</span> <span class="ident">other</span>.<span class="ident">borrow</span>()
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Slice) -&gt; bool {
+        <span class="self">self</span>.deref() == other.borrow()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">InlineArray</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">A</span>: <span class="ident">Eq</span> {}
+<span class="kw">impl</span>&lt;A, T&gt; Eq <span class="kw">for </span>InlineArray&lt;A, T&gt; <span class="kw">where </span>A: Eq {}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">InlineArray</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">PartialOrd</span>,
+<span class="kw">impl</span>&lt;A, T&gt; PartialOrd <span class="kw">for </span>InlineArray&lt;A, T&gt;
+<span class="kw">where
+    </span>A: PartialOrd,
 {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">partial_cmp</span>(<span class="ident">other</span>.<span class="ident">iter</span>())
+    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Ordering&gt; {
+        <span class="self">self</span>.iter().partial_cmp(other.iter())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">InlineArray</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Ord</span>,
+<span class="kw">impl</span>&lt;A, T&gt; Ord <span class="kw">for </span>InlineArray&lt;A, T&gt;
+<span class="kw">where
+    </span>A: Ord,
 {
-    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">Ordering</span> {
-        <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">cmp</span>(<span class="ident">other</span>.<span class="ident">iter</span>())
+    <span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; Ordering {
+        <span class="self">self</span>.iter().cmp(other.iter())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">InlineArray</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Debug</span>,
+<span class="kw">impl</span>&lt;A, T&gt; Debug <span class="kw">for </span>InlineArray&lt;A, T&gt;
+<span class="kw">where
+    </span>A: Debug,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Chunk&quot;</span>)<span class="question-mark">?</span>;
-        <span class="ident">f</span>.<span class="ident">debug_list</span>().<span class="ident">entries</span>(<span class="self">self</span>.<span class="ident">iter</span>()).<span class="ident">finish</span>()
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        f.write_str(<span class="string">&quot;Chunk&quot;</span>)<span class="question-mark">?</span>;
+        f.debug_list().entries(<span class="self">self</span>.iter()).finish()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Hash</span> <span class="kw">for</span> <span class="ident">InlineArray</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Hash</span>,
+<span class="kw">impl</span>&lt;A, T&gt; Hash <span class="kw">for </span>InlineArray&lt;A, T&gt;
+<span class="kw">where
+    </span>A: Hash,
 {
-    <span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">hasher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">H</span>)
-    <span class="kw">where</span>
-        <span class="ident">H</span>: <span class="ident">Hasher</span>,
+    <span class="kw">fn </span>hash&lt;H&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, hasher: <span class="kw-2">&amp;mut </span>H)
+    <span class="kw">where
+        </span>H: Hasher,
     {
-        <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="self">self</span> {
-            <span class="ident">item</span>.<span class="ident">hash</span>(<span class="ident">hasher</span>)
+        <span class="kw">for </span>item <span class="kw">in </span><span class="self">self </span>{
+            item.hash(hasher)
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="ident">InlineArray</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">A</span>;
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-        <span class="ident">Iter</span> { <span class="ident">array</span>: <span class="self">self</span> }
+<span class="kw">impl</span>&lt;A, T&gt; IntoIterator <span class="kw">for </span>InlineArray&lt;A, T&gt; {
+    <span class="kw">type </span>Item = A;
+    <span class="kw">type </span>IntoIter = Iter&lt;A, T&gt;;
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+        Iter { array: <span class="self">self </span>}
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">FromIterator</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InlineArray</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from_iter</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">it</span>: <span class="ident">I</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">A</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;A, T&gt; FromIterator&lt;A&gt; <span class="kw">for </span>InlineArray&lt;A, T&gt; {
+    <span class="kw">fn </span>from_iter&lt;I&gt;(it: I) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>I: IntoIterator&lt;Item = A&gt;,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chunk</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>();
-        <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="ident">it</span> {
-            <span class="ident">chunk</span>.<span class="ident">push</span>(<span class="ident">item</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>chunk = <span class="self">Self</span>::new();
+        <span class="kw">for </span>item <span class="kw">in </span>it {
+            chunk.push(item);
         }
-        <span class="ident">chunk</span>
+        chunk
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">InlineArray</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">A</span>;
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">SliceIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-        <span class="self">self</span>.<span class="ident">iter</span>()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, A, T&gt; IntoIterator <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>InlineArray&lt;A, T&gt; {
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>A;
+    <span class="kw">type </span>IntoIter = SliceIter&lt;<span class="lifetime">&#39;a</span>, A&gt;;
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+        <span class="self">self</span>.iter()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">InlineArray</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">A</span>;
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">SliceIterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-        <span class="self">self</span>.<span class="ident">iter_mut</span>()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, A, T&gt; IntoIterator <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>InlineArray&lt;A, T&gt; {
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>A;
+    <span class="kw">type </span>IntoIter = SliceIterMut&lt;<span class="lifetime">&#39;a</span>, A&gt;;
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+        <span class="self">self</span>.iter_mut()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Extend</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InlineArray</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Append the contents of the iterator to the back of the array.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if the array exceeds its capacity.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Time: O(n) for the length of the iterator</span>
-    <span class="kw">fn</span> <span class="ident">extend</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">it</span>: <span class="ident">I</span>)
-    <span class="kw">where</span>
-        <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">A</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;A, T&gt; Extend&lt;A&gt; <span class="kw">for </span>InlineArray&lt;A, T&gt; {
+    <span class="doccomment">/// Append the contents of the iterator to the back of the array.
+    ///
+    /// Panics if the array exceeds its capacity.
+    ///
+    /// Time: O(n) for the length of the iterator
+    </span><span class="kw">fn </span>extend&lt;I&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, it: I)
+    <span class="kw">where
+        </span>I: IntoIterator&lt;Item = A&gt;,
     {
-        <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="ident">it</span> {
-            <span class="self">self</span>.<span class="ident">push</span>(<span class="ident">item</span>);
+        <span class="kw">for </span>item <span class="kw">in </span>it {
+            <span class="self">self</span>.push(item);
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Extend</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">A</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">InlineArray</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">Copy</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, A, T&gt; Extend&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>A&gt; <span class="kw">for </span>InlineArray&lt;A, T&gt;
+<span class="kw">where
+    </span>A: <span class="lifetime">&#39;a </span>+ Copy,
 {
-    <span class="doccomment">/// Append the contents of the iterator to the back of the array.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if the array exceeds its capacity.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Time: O(n) for the length of the iterator</span>
-    <span class="kw">fn</span> <span class="ident">extend</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">it</span>: <span class="ident">I</span>)
-    <span class="kw">where</span>
-        <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">A</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Append the contents of the iterator to the back of the array.
+    ///
+    /// Panics if the array exceeds its capacity.
+    ///
+    /// Time: O(n) for the length of the iterator
+    </span><span class="kw">fn </span>extend&lt;I&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, it: I)
+    <span class="kw">where
+        </span>I: IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>A&gt;,
     {
-        <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="ident">it</span> {
-            <span class="self">self</span>.<span class="ident">push</span>(<span class="kw-2">*</span><span class="ident">item</span>);
+        <span class="kw">for </span>item <span class="kw">in </span>it {
+            <span class="self">self</span>.push(<span class="kw-2">*</span>item);
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tests::DropTest</span>;
-    <span class="kw">use</span> <span class="ident">std::sync::atomic</span>::{<span class="ident">AtomicUsize</span>, <span class="ident">Ordering</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::tests::DropTest;
+    <span class="kw">use </span>std::sync::atomic::{AtomicUsize, Ordering};
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">dropping</span>() {
-        <span class="kw">let</span> <span class="ident">counter</span> <span class="op">=</span> <span class="ident">AtomicUsize::new</span>(<span class="number">0</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>dropping() {
+        <span class="kw">let </span>counter = AtomicUsize::new(<span class="number">0</span>);
         {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chunk</span>: <span class="ident">InlineArray</span><span class="op">&lt;</span><span class="ident">DropTest</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, [<span class="ident">usize</span>; <span class="number">32</span>]<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">InlineArray::new</span>();
-            <span class="kw">for</span> <span class="ident">_i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">16</span> {
-                <span class="ident">chunk</span>.<span class="ident">push</span>(<span class="ident">DropTest::new</span>(<span class="kw-2">&amp;</span><span class="ident">counter</span>));
+            <span class="kw">let </span><span class="kw-2">mut </span>chunk: InlineArray&lt;DropTest&lt;<span class="lifetime">&#39;_</span>&gt;, [usize; <span class="number">32</span>]&gt; = InlineArray::new();
+            <span class="kw">for </span>_i <span class="kw">in </span><span class="number">0</span>..<span class="number">16 </span>{
+                chunk.push(DropTest::new(<span class="kw-2">&amp;</span>counter));
             }
-            <span class="macro">assert_eq!</span>(<span class="number">16</span>, <span class="ident">counter</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>));
-            <span class="kw">for</span> <span class="ident">_i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">8</span> {
-                <span class="ident">chunk</span>.<span class="ident">pop</span>();
+            <span class="macro">assert_eq!</span>(<span class="number">16</span>, counter.load(Ordering::Relaxed));
+            <span class="kw">for </span>_i <span class="kw">in </span><span class="number">0</span>..<span class="number">8 </span>{
+                chunk.pop();
             }
-            <span class="macro">assert_eq!</span>(<span class="number">8</span>, <span class="ident">counter</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>));
+            <span class="macro">assert_eq!</span>(<span class="number">8</span>, counter.load(Ordering::Relaxed));
         }
-        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="ident">counter</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>));
+        <span class="macro">assert_eq!</span>(<span class="number">0</span>, counter.load(Ordering::Relaxed));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">zero_sized_values</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chunk</span>: <span class="ident">InlineArray</span><span class="op">&lt;</span>(), [<span class="ident">usize</span>; <span class="number">32</span>]<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">InlineArray::new</span>();
-        <span class="kw">for</span> <span class="ident">_i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">65536</span> {
-            <span class="ident">chunk</span>.<span class="ident">push</span>(());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>zero_sized_values() {
+        <span class="kw">let </span><span class="kw-2">mut </span>chunk: InlineArray&lt;(), [usize; <span class="number">32</span>]&gt; = InlineArray::new();
+        <span class="kw">for </span>_i <span class="kw">in </span><span class="number">0</span>..<span class="number">65536 </span>{
+            chunk.push(());
         }
-        <span class="macro">assert_eq!</span>(<span class="number">65536</span>, <span class="ident">chunk</span>.<span class="ident">len</span>());
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(()), <span class="ident">chunk</span>.<span class="ident">pop</span>());
+        <span class="macro">assert_eq!</span>(<span class="number">65536</span>, chunk.len());
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(()), chunk.pop());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">low_align_base</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chunk</span>: <span class="ident">InlineArray</span><span class="op">&lt;</span><span class="ident">String</span>, [<span class="ident">u8</span>; <span class="number">512</span>]<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">InlineArray::new</span>();
-        <span class="ident">chunk</span>.<span class="ident">push</span>(<span class="string">&quot;Hello&quot;</span>.<span class="ident">to_owned</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">chunk</span>[<span class="number">0</span>], <span class="string">&quot;Hello&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>low_align_base() {
+        <span class="kw">let </span><span class="kw-2">mut </span>chunk: InlineArray&lt;String, [u8; <span class="number">512</span>]&gt; = InlineArray::new();
+        chunk.push(<span class="string">&quot;Hello&quot;</span>.to_owned());
+        <span class="macro">assert_eq!</span>(chunk[<span class="number">0</span>], <span class="string">&quot;Hello&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chunk</span>: <span class="ident">InlineArray</span><span class="op">&lt;</span><span class="ident">String</span>, [<span class="ident">u16</span>; <span class="number">512</span>]<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">InlineArray::new</span>();
-        <span class="ident">chunk</span>.<span class="ident">push</span>(<span class="string">&quot;Hello&quot;</span>.<span class="ident">to_owned</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">chunk</span>[<span class="number">0</span>], <span class="string">&quot;Hello&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>chunk: InlineArray&lt;String, [u16; <span class="number">512</span>]&gt; = InlineArray::new();
+        chunk.push(<span class="string">&quot;Hello&quot;</span>.to_owned());
+        <span class="macro">assert_eq!</span>(chunk[<span class="number">0</span>], <span class="string">&quot;Hello&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">float_align</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chunk</span>: <span class="ident">InlineArray</span><span class="op">&lt;</span><span class="ident">f64</span>, [<span class="ident">u8</span>; <span class="number">16</span>]<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">InlineArray::new</span>();
-        <span class="ident">chunk</span>.<span class="ident">push</span>(<span class="number">1234.</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">chunk</span>[<span class="number">0</span>], <span class="number">1234.</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>float_align() {
+        <span class="kw">let </span><span class="kw-2">mut </span>chunk: InlineArray&lt;f64, [u8; <span class="number">16</span>]&gt; = InlineArray::new();
+        chunk.push(<span class="number">1234.</span>);
+        <span class="macro">assert_eq!</span>(chunk[<span class="number">0</span>], <span class="number">1234.</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chunk</span>: <span class="ident">InlineArray</span><span class="op">&lt;</span><span class="ident">f64</span>, [<span class="ident">u8</span>; <span class="number">17</span>]<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">InlineArray::new</span>();
-        <span class="ident">chunk</span>.<span class="ident">push</span>(<span class="number">1234.</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">chunk</span>[<span class="number">0</span>], <span class="number">1234.</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>chunk: InlineArray&lt;f64, [u8; <span class="number">17</span>]&gt; = InlineArray::new();
+        chunk.push(<span class="number">1234.</span>);
+        <span class="macro">assert_eq!</span>(chunk[<span class="number">0</span>], <span class="number">1234.</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">recursive_types_compile</span>() {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-        <span class="kw">enum</span> <span class="ident">Recursive</span> {
-            <span class="ident">A</span>(<span class="ident">InlineArray</span><span class="op">&lt;</span><span class="ident">Recursive</span>, <span class="ident">u64</span><span class="op">&gt;</span>),
-            <span class="ident">B</span>,
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>recursive_types_compile() {
+        <span class="attribute">#[allow(dead_code)]
+        </span><span class="kw">enum </span>Recursive {
+            A(InlineArray&lt;Recursive, u64&gt;),
+            B,
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">insufficient_alignment1</span>() {
-        <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">align</span>(<span class="number">256</span>))]</span>
-        <span class="kw">struct</span> <span class="ident">BigAlign</span>(<span class="ident">u8</span>);
-        <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">align</span>(<span class="number">32</span>))]</span>
-        <span class="kw">struct</span> <span class="ident">MediumAlign</span>(<span class="ident">u8</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>insufficient_alignment1() {
+        <span class="attribute">#[repr(align(<span class="number">256</span>))]
+        </span><span class="kw">struct </span>BigAlign(u8);
+        <span class="attribute">#[repr(align(<span class="number">32</span>))]
+        </span><span class="kw">struct </span>MediumAlign(u8);
 
-        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="ident">InlineArray</span>::<span class="op">&lt;</span><span class="ident">BigAlign</span>, [<span class="ident">usize</span>; <span class="number">256</span>]<span class="op">&gt;</span><span class="ident">::CAPACITY</span>);
-        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="ident">InlineArray</span>::<span class="op">&lt;</span><span class="ident">BigAlign</span>, [<span class="ident">u64</span>; <span class="number">256</span>]<span class="op">&gt;</span><span class="ident">::CAPACITY</span>);
-        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="ident">InlineArray</span>::<span class="op">&lt;</span><span class="ident">BigAlign</span>, [<span class="ident">f64</span>; <span class="number">256</span>]<span class="op">&gt;</span><span class="ident">::CAPACITY</span>);
-        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="ident">InlineArray</span>::<span class="op">&lt;</span><span class="ident">BigAlign</span>, [<span class="ident">MediumAlign</span>; <span class="number">256</span>]<span class="op">&gt;</span><span class="ident">::CAPACITY</span>);
+        <span class="macro">assert_eq!</span>(<span class="number">0</span>, InlineArray::&lt;BigAlign, [usize; <span class="number">256</span>]&gt;::CAPACITY);
+        <span class="macro">assert_eq!</span>(<span class="number">0</span>, InlineArray::&lt;BigAlign, [u64; <span class="number">256</span>]&gt;::CAPACITY);
+        <span class="macro">assert_eq!</span>(<span class="number">0</span>, InlineArray::&lt;BigAlign, [f64; <span class="number">256</span>]&gt;::CAPACITY);
+        <span class="macro">assert_eq!</span>(<span class="number">0</span>, InlineArray::&lt;BigAlign, [MediumAlign; <span class="number">256</span>]&gt;::CAPACITY);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">insufficient_alignment2</span>() {
-        <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">align</span>(<span class="number">256</span>))]</span>
-        <span class="kw">struct</span> <span class="ident">BigAlign</span>(<span class="ident">usize</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>insufficient_alignment2() {
+        <span class="attribute">#[repr(align(<span class="number">256</span>))]
+        </span><span class="kw">struct </span>BigAlign(usize);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bad</span>: <span class="ident">InlineArray</span><span class="op">&lt;</span><span class="ident">BigAlign</span>, [<span class="ident">usize</span>; <span class="number">256</span>]<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">InlineArray::new</span>();
-        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="ident">InlineArray</span>::<span class="op">&lt;</span><span class="ident">BigAlign</span>, [<span class="ident">usize</span>; <span class="number">256</span>]<span class="op">&gt;</span><span class="ident">::CAPACITY</span>);
-        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="ident">bad</span>.<span class="ident">len</span>());
-        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="ident">bad</span>[..].<span class="ident">len</span>());
-        <span class="macro">assert_eq!</span>(<span class="bool-val">true</span>, <span class="ident">bad</span>.<span class="ident">is_full</span>());
-        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="ident">bad</span>.<span class="ident">drain</span>().<span class="ident">count</span>());
-        <span class="macro">assert!</span>(<span class="ident">bad</span>.<span class="ident">pop</span>().<span class="ident">is_none</span>());
-        <span class="macro">assert!</span>(<span class="ident">bad</span>.<span class="ident">remove</span>(<span class="number">0</span>).<span class="ident">is_none</span>());
-        <span class="macro">assert!</span>(<span class="ident">bad</span>.<span class="ident">split_off</span>(<span class="number">0</span>).<span class="ident">is_full</span>());
-        <span class="ident">bad</span>.<span class="ident">clear</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>bad: InlineArray&lt;BigAlign, [usize; <span class="number">256</span>]&gt; = InlineArray::new();
+        <span class="macro">assert_eq!</span>(<span class="number">0</span>, InlineArray::&lt;BigAlign, [usize; <span class="number">256</span>]&gt;::CAPACITY);
+        <span class="macro">assert_eq!</span>(<span class="number">0</span>, bad.len());
+        <span class="macro">assert_eq!</span>(<span class="number">0</span>, bad[..].len());
+        <span class="macro">assert_eq!</span>(<span class="bool-val">true</span>, bad.is_full());
+        <span class="macro">assert_eq!</span>(<span class="number">0</span>, bad.drain().count());
+        <span class="macro">assert!</span>(bad.pop().is_none());
+        <span class="macro">assert!</span>(bad.remove(<span class="number">0</span>).is_none());
+        <span class="macro">assert!</span>(bad.split_off(<span class="number">0</span>).is_full());
+        bad.clear();
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sufficient_alignment1</span>() {
-        <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">align</span>(<span class="number">256</span>))]</span>
-        <span class="kw">struct</span> <span class="ident">BigAlign</span>(<span class="ident">u8</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>sufficient_alignment1() {
+        <span class="attribute">#[repr(align(<span class="number">256</span>))]
+        </span><span class="kw">struct </span>BigAlign(u8);
 
-        <span class="macro">assert_eq!</span>(<span class="number">13</span>, <span class="ident">InlineArray</span>::<span class="op">&lt;</span><span class="ident">BigAlign</span>, [<span class="ident">BigAlign</span>; <span class="number">14</span>]<span class="op">&gt;</span><span class="ident">::CAPACITY</span>);
-        <span class="macro">assert_eq!</span>(<span class="number">1</span>, <span class="ident">InlineArray</span>::<span class="op">&lt;</span><span class="ident">BigAlign</span>, [<span class="ident">BigAlign</span>; <span class="number">2</span>]<span class="op">&gt;</span><span class="ident">::CAPACITY</span>);
-        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="ident">InlineArray</span>::<span class="op">&lt;</span><span class="ident">BigAlign</span>, [<span class="ident">BigAlign</span>; <span class="number">1</span>]<span class="op">&gt;</span><span class="ident">::CAPACITY</span>);
+        <span class="macro">assert_eq!</span>(<span class="number">13</span>, InlineArray::&lt;BigAlign, [BigAlign; <span class="number">14</span>]&gt;::CAPACITY);
+        <span class="macro">assert_eq!</span>(<span class="number">1</span>, InlineArray::&lt;BigAlign, [BigAlign; <span class="number">2</span>]&gt;::CAPACITY);
+        <span class="macro">assert_eq!</span>(<span class="number">0</span>, InlineArray::&lt;BigAlign, [BigAlign; <span class="number">1</span>]&gt;::CAPACITY);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chunk</span>: <span class="ident">InlineArray</span><span class="op">&lt;</span><span class="ident">BigAlign</span>, [<span class="ident">BigAlign</span>; <span class="number">2</span>]<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">InlineArray::new</span>();
-        <span class="ident">chunk</span>.<span class="ident">push</span>(<span class="ident">BigAlign</span>(<span class="number">42</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>chunk: InlineArray&lt;BigAlign, [BigAlign; <span class="number">2</span>]&gt; = InlineArray::new();
+        chunk.push(BigAlign(<span class="number">42</span>));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">chunk</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">unwrap</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">%</span> <span class="ident">mem::align_of</span>::<span class="op">&lt;</span><span class="ident">BigAlign</span><span class="op">&gt;</span>(),
-            <span class="number">0</span>
-        );
+            chunk.get(<span class="number">0</span>).unwrap() <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span>usize % mem::align_of::&lt;BigAlign&gt;(),
+            <span class="number">0
+        </span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sufficient_alignment2</span>() {
-        <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">align</span>(<span class="number">128</span>))]</span>
-        <span class="kw">struct</span> <span class="ident">BigAlign</span>([<span class="ident">u8</span>; <span class="number">64</span>]);
-        <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">align</span>(<span class="number">256</span>))]</span>
-        <span class="kw">struct</span> <span class="ident">BiggerAlign</span>(<span class="ident">u8</span>);
-        <span class="macro">assert_eq!</span>(<span class="number">128</span>, <span class="ident">mem::align_of</span>::<span class="op">&lt;</span><span class="ident">BigAlign</span><span class="op">&gt;</span>());
-        <span class="macro">assert_eq!</span>(<span class="number">256</span>, <span class="ident">mem::align_of</span>::<span class="op">&lt;</span><span class="ident">BiggerAlign</span><span class="op">&gt;</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>sufficient_alignment2() {
+        <span class="attribute">#[repr(align(<span class="number">128</span>))]
+        </span><span class="kw">struct </span>BigAlign([u8; <span class="number">64</span>]);
+        <span class="attribute">#[repr(align(<span class="number">256</span>))]
+        </span><span class="kw">struct </span>BiggerAlign(u8);
+        <span class="macro">assert_eq!</span>(<span class="number">128</span>, mem::align_of::&lt;BigAlign&gt;());
+        <span class="macro">assert_eq!</span>(<span class="number">256</span>, mem::align_of::&lt;BiggerAlign&gt;());
 
-        <span class="macro">assert_eq!</span>(<span class="number">199</span>, <span class="ident">InlineArray</span>::<span class="op">&lt;</span><span class="ident">BigAlign</span>, [<span class="ident">BiggerAlign</span>; <span class="number">100</span>]<span class="op">&gt;</span><span class="ident">::CAPACITY</span>);
-        <span class="macro">assert_eq!</span>(<span class="number">3</span>, <span class="ident">InlineArray</span>::<span class="op">&lt;</span><span class="ident">BigAlign</span>, [<span class="ident">BiggerAlign</span>; <span class="number">2</span>]<span class="op">&gt;</span><span class="ident">::CAPACITY</span>);
-        <span class="macro">assert_eq!</span>(<span class="number">1</span>, <span class="ident">InlineArray</span>::<span class="op">&lt;</span><span class="ident">BigAlign</span>, [<span class="ident">BiggerAlign</span>; <span class="number">1</span>]<span class="op">&gt;</span><span class="ident">::CAPACITY</span>);
-        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="ident">InlineArray</span>::<span class="op">&lt;</span><span class="ident">BigAlign</span>, [<span class="ident">BiggerAlign</span>; <span class="number">0</span>]<span class="op">&gt;</span><span class="ident">::CAPACITY</span>);
+        <span class="macro">assert_eq!</span>(<span class="number">199</span>, InlineArray::&lt;BigAlign, [BiggerAlign; <span class="number">100</span>]&gt;::CAPACITY);
+        <span class="macro">assert_eq!</span>(<span class="number">3</span>, InlineArray::&lt;BigAlign, [BiggerAlign; <span class="number">2</span>]&gt;::CAPACITY);
+        <span class="macro">assert_eq!</span>(<span class="number">1</span>, InlineArray::&lt;BigAlign, [BiggerAlign; <span class="number">1</span>]&gt;::CAPACITY);
+        <span class="macro">assert_eq!</span>(<span class="number">0</span>, InlineArray::&lt;BigAlign, [BiggerAlign; <span class="number">0</span>]&gt;::CAPACITY);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chunk</span>: <span class="ident">InlineArray</span><span class="op">&lt;</span><span class="ident">BigAlign</span>, [<span class="ident">BiggerAlign</span>; <span class="number">1</span>]<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">InlineArray::new</span>();
-        <span class="ident">chunk</span>.<span class="ident">push</span>(<span class="ident">BigAlign</span>([<span class="number">0</span>; <span class="number">64</span>]));
+        <span class="kw">let </span><span class="kw-2">mut </span>chunk: InlineArray&lt;BigAlign, [BiggerAlign; <span class="number">1</span>]&gt; = InlineArray::new();
+        chunk.push(BigAlign([<span class="number">0</span>; <span class="number">64</span>]));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">chunk</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">unwrap</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">%</span> <span class="ident">mem::align_of</span>::<span class="op">&lt;</span><span class="ident">BigAlign</span><span class="op">&gt;</span>(),
-            <span class="number">0</span>
-        );
+            chunk.get(<span class="number">0</span>).unwrap() <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span>usize % mem::align_of::&lt;BigAlign&gt;(),
+            <span class="number">0
+        </span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sized_chunks" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sized_chunks" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

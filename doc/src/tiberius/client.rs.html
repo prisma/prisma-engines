@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tiberius-0.11.2/src/client.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>client.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tiberius/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tiberius-0.11.2/src/client.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>client.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tiberius/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -403,410 +403,410 @@
 <span id="403">403</span>
 <span id="404">404</span>
 <span id="405">405</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">auth</span>;
-<span class="kw">mod</span> <span class="ident">config</span>;
-<span class="kw">mod</span> <span class="ident">connection</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>auth;
+<span class="kw">mod </span>config;
+<span class="kw">mod </span>connection;
 
-<span class="kw">mod</span> <span class="ident">tls</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls&quot;</span>,
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native-tls&quot;</span>,
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vendored-openssl&quot;</span>
-))]</span>
-<span class="kw">mod</span> <span class="ident">tls_stream</span>;
+<span class="kw">mod </span>tls;
+<span class="attribute">#[cfg(any(
+    feature = <span class="string">&quot;rustls&quot;</span>,
+    feature = <span class="string">&quot;native-tls&quot;</span>,
+    feature = <span class="string">&quot;vendored-openssl&quot;
+</span>))]
+</span><span class="kw">mod </span>tls_stream;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">auth</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">config</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">connection</span>::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>auth::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>config::<span class="kw-2">*</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>connection::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tds::stream::ReceivedToken</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">result::ExecuteResult</span>,
-    <span class="ident">tds</span>::{
-        <span class="ident">codec</span>::{<span class="self">self</span>, <span class="ident">IteratorJoin</span>},
-        <span class="ident">stream</span>::{<span class="ident">QueryStream</span>, <span class="ident">TokenStream</span>},
+<span class="kw">use </span><span class="kw">crate</span>::tds::stream::ReceivedToken;
+<span class="kw">use crate</span>::{
+    result::ExecuteResult,
+    tds::{
+        codec::{<span class="self">self</span>, IteratorJoin},
+        stream::{QueryStream, TokenStream},
     },
-    <span class="ident">BulkLoadRequest</span>, <span class="ident">ColumnFlag</span>, <span class="ident">SqlReadBytes</span>, <span class="ident">ToSql</span>,
+    BulkLoadRequest, ColumnFlag, SqlReadBytes, ToSql,
 };
-<span class="kw">use</span> <span class="ident">codec</span>::{<span class="ident">BatchRequest</span>, <span class="ident">ColumnData</span>, <span class="ident">PacketHeader</span>, <span class="ident">RpcParam</span>, <span class="ident">RpcProcId</span>, <span class="ident">TokenRpcRequest</span>};
-<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
-<span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>};
-<span class="kw">use</span> <span class="ident">futures_util::TryStreamExt</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">fmt::Debug</span>};
+<span class="kw">use </span>codec::{BatchRequest, ColumnData, PacketHeader, RpcParam, RpcProcId, TokenRpcRequest};
+<span class="kw">use </span>enumflags2::BitFlags;
+<span class="kw">use </span>futures::{AsyncRead, AsyncWrite};
+<span class="kw">use </span>futures_util::TryStreamExt;
+<span class="kw">use </span>std::{borrow::Cow, fmt::Debug};
 
-<span class="doccomment">/// `Client` is the main entry point to the SQL Server, providing query</span>
-<span class="doccomment">/// execution capabilities.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A `Client` is created using the [`Config`], defining the needed</span>
-<span class="doccomment">/// connection options and capabilities.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```no_run</span>
-<span class="doccomment">/// # use tiberius::{Config, AuthMethod};</span>
-<span class="doccomment">/// use tokio_util::compat::TokioAsyncWriteCompatExt;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # #[tokio::main]</span>
-<span class="doccomment">/// # async fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-<span class="doccomment">/// let mut config = Config::new();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// config.host(&quot;0.0.0.0&quot;);</span>
-<span class="doccomment">/// config.port(1433);</span>
-<span class="doccomment">/// config.authentication(AuthMethod::sql_server(&quot;SA&quot;, &quot;&lt;Mys3cureP4ssW0rD&gt;&quot;));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let tcp = tokio::net::TcpStream::connect(config.get_addr()).await?;</span>
-<span class="doccomment">/// tcp.set_nodelay(true)?;</span>
-<span class="doccomment">/// // Client is ready to use.</span>
-<span class="doccomment">/// let client = tiberius::Client::connect(config, tcp.compat_write()).await?;</span>
-<span class="doccomment">/// # Ok(())</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Config`]: struct.Config.html</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Client</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">connection</span>: <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+<span class="doccomment">/// `Client` is the main entry point to the SQL Server, providing query
+/// execution capabilities.
+///
+/// A `Client` is created using the [`Config`], defining the needed
+/// connection options and capabilities.
+///
+/// # Example
+///
+/// ```no_run
+/// # use tiberius::{Config, AuthMethod};
+/// use tokio_util::compat::TokioAsyncWriteCompatExt;
+///
+/// # #[tokio::main]
+/// # async fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+/// let mut config = Config::new();
+///
+/// config.host(&quot;0.0.0.0&quot;);
+/// config.port(1433);
+/// config.authentication(AuthMethod::sql_server(&quot;SA&quot;, &quot;&lt;Mys3cureP4ssW0rD&gt;&quot;));
+///
+/// let tcp = tokio::net::TcpStream::connect(config.get_addr()).await?;
+/// tcp.set_nodelay(true)?;
+/// // Client is ready to use.
+/// let client = tiberius::Client::connect(config, tcp.compat_write()).await?;
+/// # Ok(())
+/// # }
+/// ```
+///
+/// [`Config`]: struct.Config.html
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Client&lt;S: AsyncRead + AsyncWrite + Unpin + Send&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) connection: Connection&lt;S&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Client</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Uses an instance of [`Config`] to specify the connection</span>
-    <span class="doccomment">/// options required to connect to the database using an established</span>
-    <span class="doccomment">/// tcp connection</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Config`]: struct.Config.html</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span>(<span class="ident">config</span>: <span class="ident">Config</span>, <span class="ident">tcp_stream</span>: <span class="ident">S</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Client</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">Client</span> {
-            <span class="ident">connection</span>: <span class="ident">Connection::connect</span>(<span class="ident">config</span>, <span class="ident">tcp_stream</span>).<span class="kw">await</span><span class="question-mark">?</span>,
+<span class="kw">impl</span>&lt;S: AsyncRead + AsyncWrite + Unpin + Send&gt; Client&lt;S&gt; {
+    <span class="doccomment">/// Uses an instance of [`Config`] to specify the connection
+    /// options required to connect to the database using an established
+    /// tcp connection
+    ///
+    /// [`Config`]: struct.Config.html
+    </span><span class="kw">pub async fn </span>connect(config: Config, tcp_stream: S) -&gt; <span class="kw">crate</span>::Result&lt;Client&lt;S&gt;&gt; {
+        <span class="prelude-val">Ok</span>(Client {
+            connection: Connection::connect(config, tcp_stream).<span class="kw">await</span><span class="question-mark">?</span>,
         })
     }
 
-    <span class="doccomment">/// Executes SQL statements in the SQL Server, returning the number rows</span>
-    <span class="doccomment">/// affected. Useful for `INSERT`, `UPDATE` and `DELETE` statements. The</span>
-    <span class="doccomment">/// `query` can define the parameter placement by annotating them with</span>
-    <span class="doccomment">/// `@PN`, where N is the index of the parameter, starting from `1`. If</span>
-    <span class="doccomment">/// executing multiple queries at a time, delimit them with `;` and refer to</span>
-    <span class="doccomment">/// [`ExecuteResult`] how to get results for the separate queries.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For mapping of Rust types when writing, see the documentation for</span>
-    <span class="doccomment">/// [`ToSql`]. For reading data from the database, see the documentation for</span>
-    <span class="doccomment">/// [`FromSql`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This API is not quite suitable for dynamic query parameters. In these</span>
-    <span class="doccomment">/// cases using a [`Query`] object might be easier.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # use tiberius::Config;</span>
-    <span class="doccomment">/// # use tokio_util::compat::TokioAsyncWriteCompatExt;</span>
-    <span class="doccomment">/// # use std::env;</span>
-    <span class="doccomment">/// # #[tokio::main]</span>
-    <span class="doccomment">/// # async fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// # let c_str = env::var(&quot;TIBERIUS_TEST_CONNECTION_STRING&quot;).unwrap_or(</span>
-    <span class="doccomment">/// #     &quot;server=tcp:localhost,1433;integratedSecurity=true;TrustServerCertificate=true&quot;.to_owned(),</span>
-    <span class="doccomment">/// # );</span>
-    <span class="doccomment">/// # let config = Config::from_ado_string(&amp;c_str)?;</span>
-    <span class="doccomment">/// # let tcp = tokio::net::TcpStream::connect(config.get_addr()).await?;</span>
-    <span class="doccomment">/// # tcp.set_nodelay(true)?;</span>
-    <span class="doccomment">/// # let mut client = tiberius::Client::connect(config, tcp.compat_write()).await?;</span>
-    <span class="doccomment">/// let results = client</span>
-    <span class="doccomment">///     .execute(</span>
-    <span class="doccomment">///         &quot;INSERT INTO ##Test (id) VALUES (@P1), (@P2), (@P3)&quot;,</span>
-    <span class="doccomment">///         &amp;[&amp;1i32, &amp;2i32, &amp;3i32],</span>
-    <span class="doccomment">///     )</span>
-    <span class="doccomment">///     .await?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ExecuteResult`]: struct.ExecuteResult.html</span>
-    <span class="doccomment">/// [`ToSql`]: trait.ToSql.html</span>
-    <span class="doccomment">/// [`FromSql`]: trait.FromSql.html</span>
-    <span class="doccomment">/// [`Query`]: struct.Query.html</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">query</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">ToSql</span>],
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ExecuteResult</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">connection</span>.<span class="ident">flush_stream</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">rpc_params</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::rpc_params</span>(<span class="ident">query</span>);
+    <span class="doccomment">/// Executes SQL statements in the SQL Server, returning the number rows
+    /// affected. Useful for `INSERT`, `UPDATE` and `DELETE` statements. The
+    /// `query` can define the parameter placement by annotating them with
+    /// `@PN`, where N is the index of the parameter, starting from `1`. If
+    /// executing multiple queries at a time, delimit them with `;` and refer to
+    /// [`ExecuteResult`] how to get results for the separate queries.
+    ///
+    /// For mapping of Rust types when writing, see the documentation for
+    /// [`ToSql`]. For reading data from the database, see the documentation for
+    /// [`FromSql`].
+    ///
+    /// This API is not quite suitable for dynamic query parameters. In these
+    /// cases using a [`Query`] object might be easier.
+    ///
+    /// # Example
+    ///
+    /// ```no_run
+    /// # use tiberius::Config;
+    /// # use tokio_util::compat::TokioAsyncWriteCompatExt;
+    /// # use std::env;
+    /// # #[tokio::main]
+    /// # async fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// # let c_str = env::var(&quot;TIBERIUS_TEST_CONNECTION_STRING&quot;).unwrap_or(
+    /// #     &quot;server=tcp:localhost,1433;integratedSecurity=true;TrustServerCertificate=true&quot;.to_owned(),
+    /// # );
+    /// # let config = Config::from_ado_string(&amp;c_str)?;
+    /// # let tcp = tokio::net::TcpStream::connect(config.get_addr()).await?;
+    /// # tcp.set_nodelay(true)?;
+    /// # let mut client = tiberius::Client::connect(config, tcp.compat_write()).await?;
+    /// let results = client
+    ///     .execute(
+    ///         &quot;INSERT INTO ##Test (id) VALUES (@P1), (@P2), (@P3)&quot;,
+    ///         &amp;[&amp;1i32, &amp;2i32, &amp;3i32],
+    ///     )
+    ///     .await?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// [`ExecuteResult`]: struct.ExecuteResult.html
+    /// [`ToSql`]: trait.ToSql.html
+    /// [`FromSql`]: trait.FromSql.html
+    /// [`Query`]: struct.Query.html
+    </span><span class="kw">pub async fn </span>execute&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        query: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
+        params: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="kw">dyn </span>ToSql],
+    ) -&gt; <span class="kw">crate</span>::Result&lt;ExecuteResult&gt; {
+        <span class="self">self</span>.connection.flush_stream().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>rpc_params = <span class="self">Self</span>::rpc_params(query);
 
-        <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">to_sql</span>());
-        <span class="self">self</span>.<span class="ident">rpc_perform_query</span>(<span class="ident">RpcProcId::ExecuteSQL</span>, <span class="ident">rpc_params</span>, <span class="ident">params</span>)
+        <span class="kw">let </span>params = params.iter().map(|s| s.to_sql());
+        <span class="self">self</span>.rpc_perform_query(RpcProcId::ExecuteSQL, rpc_params, params)
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="ident">ExecuteResult::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">connection</span>).<span class="kw">await</span>
-    }
+        ExecuteResult::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.connection).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Executes SQL statements in the SQL Server, returning resulting rows.</span>
-    <span class="doccomment">/// Useful for `SELECT` statements. The `query` can define the parameter</span>
-    <span class="doccomment">/// placement by annotating them with `@PN`, where N is the index of the</span>
-    <span class="doccomment">/// parameter, starting from `1`. If executing multiple queries at a time,</span>
-    <span class="doccomment">/// delimit them with `;` and refer to [`QueryStream`] on proper stream</span>
-    <span class="doccomment">/// handling.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For mapping of Rust types when writing, see the documentation for</span>
-    <span class="doccomment">/// [`ToSql`]. For reading data from the database, see the documentation for</span>
-    <span class="doccomment">/// [`FromSql`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This API can be cumbersome for dynamic query parameters. In these cases,</span>
-    <span class="doccomment">/// if fighting too much with the compiler, using a [`Query`] object might be</span>
-    <span class="doccomment">/// easier.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tiberius::Config;</span>
-    <span class="doccomment">/// # use tokio_util::compat::TokioAsyncWriteCompatExt;</span>
-    <span class="doccomment">/// # use std::env;</span>
-    <span class="doccomment">/// # #[tokio::main]</span>
-    <span class="doccomment">/// # async fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// # let c_str = env::var(&quot;TIBERIUS_TEST_CONNECTION_STRING&quot;).unwrap_or(</span>
-    <span class="doccomment">/// #     &quot;server=tcp:localhost,1433;integratedSecurity=true;TrustServerCertificate=true&quot;.to_owned(),</span>
-    <span class="doccomment">/// # );</span>
-    <span class="doccomment">/// # let config = Config::from_ado_string(&amp;c_str)?;</span>
-    <span class="doccomment">/// # let tcp = tokio::net::TcpStream::connect(config.get_addr()).await?;</span>
-    <span class="doccomment">/// # tcp.set_nodelay(true)?;</span>
-    <span class="doccomment">/// # let mut client = tiberius::Client::connect(config, tcp.compat_write()).await?;</span>
-    <span class="doccomment">/// let stream = client</span>
-    <span class="doccomment">///     .query(</span>
-    <span class="doccomment">///         &quot;SELECT @P1, @P2, @P3&quot;,</span>
-    <span class="doccomment">///         &amp;[&amp;1i32, &amp;2i32, &amp;3i32],</span>
-    <span class="doccomment">///     )</span>
-    <span class="doccomment">///     .await?;</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`QueryStream`]: struct.QueryStream.html</span>
-    <span class="doccomment">/// [`Query`]: struct.Query.html</span>
-    <span class="doccomment">/// [`ToSql`]: trait.ToSql.html</span>
-    <span class="doccomment">/// [`FromSql`]: trait.FromSql.html</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">query</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw">dyn</span> <span class="ident">ToSql</span>],
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">QueryStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>,
+    <span class="doccomment">/// Executes SQL statements in the SQL Server, returning resulting rows.
+    /// Useful for `SELECT` statements. The `query` can define the parameter
+    /// placement by annotating them with `@PN`, where N is the index of the
+    /// parameter, starting from `1`. If executing multiple queries at a time,
+    /// delimit them with `;` and refer to [`QueryStream`] on proper stream
+    /// handling.
+    ///
+    /// For mapping of Rust types when writing, see the documentation for
+    /// [`ToSql`]. For reading data from the database, see the documentation for
+    /// [`FromSql`].
+    ///
+    /// This API can be cumbersome for dynamic query parameters. In these cases,
+    /// if fighting too much with the compiler, using a [`Query`] object might be
+    /// easier.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use tiberius::Config;
+    /// # use tokio_util::compat::TokioAsyncWriteCompatExt;
+    /// # use std::env;
+    /// # #[tokio::main]
+    /// # async fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// # let c_str = env::var(&quot;TIBERIUS_TEST_CONNECTION_STRING&quot;).unwrap_or(
+    /// #     &quot;server=tcp:localhost,1433;integratedSecurity=true;TrustServerCertificate=true&quot;.to_owned(),
+    /// # );
+    /// # let config = Config::from_ado_string(&amp;c_str)?;
+    /// # let tcp = tokio::net::TcpStream::connect(config.get_addr()).await?;
+    /// # tcp.set_nodelay(true)?;
+    /// # let mut client = tiberius::Client::connect(config, tcp.compat_write()).await?;
+    /// let stream = client
+    ///     .query(
+    ///         &quot;SELECT @P1, @P2, @P3&quot;,
+    ///         &amp;[&amp;1i32, &amp;2i32, &amp;3i32],
+    ///     )
+    ///     .await?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// [`QueryStream`]: struct.QueryStream.html
+    /// [`Query`]: struct.Query.html
+    /// [`ToSql`]: trait.ToSql.html
+    /// [`FromSql`]: trait.FromSql.html
+    </span><span class="kw">pub async fn </span>query&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+        query: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;b</span>, str&gt;&gt;,
+        params: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="kw">dyn </span>ToSql],
+    ) -&gt; <span class="kw">crate</span>::Result&lt;QueryStream&lt;<span class="lifetime">&#39;a</span>&gt;&gt;
+    <span class="kw">where
+        </span><span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>,
     {
-        <span class="self">self</span>.<span class="ident">connection</span>.<span class="ident">flush_stream</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">rpc_params</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::rpc_params</span>(<span class="ident">query</span>);
+        <span class="self">self</span>.connection.flush_stream().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>rpc_params = <span class="self">Self</span>::rpc_params(query);
 
-        <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">to_sql</span>());
-        <span class="self">self</span>.<span class="ident">rpc_perform_query</span>(<span class="ident">RpcProcId::ExecuteSQL</span>, <span class="ident">rpc_params</span>, <span class="ident">params</span>)
+        <span class="kw">let </span>params = params.iter().map(|p| p.to_sql());
+        <span class="self">self</span>.rpc_perform_query(RpcProcId::ExecuteSQL, rpc_params, params)
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">ts</span> <span class="op">=</span> <span class="ident">TokenStream::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">connection</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">QueryStream::new</span>(<span class="ident">ts</span>.<span class="ident">try_unfold</span>());
-        <span class="ident">result</span>.<span class="ident">forward_to_metadata</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>ts = TokenStream::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.connection);
+        <span class="kw">let </span><span class="kw-2">mut </span>result = QueryStream::new(ts.try_unfold());
+        result.forward_to_metadata().<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">result</span>)
+        <span class="prelude-val">Ok</span>(result)
     }
 
-    <span class="doccomment">/// Execute multiple queries, delimited with `;` and return multiple result</span>
-    <span class="doccomment">/// sets; one for each query.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tiberius::Config;</span>
-    <span class="doccomment">/// # use tokio_util::compat::TokioAsyncWriteCompatExt;</span>
-    <span class="doccomment">/// # use std::env;</span>
-    <span class="doccomment">/// # #[tokio::main]</span>
-    <span class="doccomment">/// # async fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// # let c_str = env::var(&quot;TIBERIUS_TEST_CONNECTION_STRING&quot;).unwrap_or(</span>
-    <span class="doccomment">/// #     &quot;server=tcp:localhost,1433;integratedSecurity=true;TrustServerCertificate=true&quot;.to_owned(),</span>
-    <span class="doccomment">/// # );</span>
-    <span class="doccomment">/// # let config = Config::from_ado_string(&amp;c_str)?;</span>
-    <span class="doccomment">/// # let tcp = tokio::net::TcpStream::connect(config.get_addr()).await?;</span>
-    <span class="doccomment">/// # tcp.set_nodelay(true)?;</span>
-    <span class="doccomment">/// # let mut client = tiberius::Client::connect(config, tcp.compat_write()).await?;</span>
-    <span class="doccomment">/// let row = client.simple_query(&quot;SELECT 1 AS col&quot;).await?.into_row().await?.unwrap();</span>
-    <span class="doccomment">/// assert_eq!(Some(1i32), row.get(&quot;col&quot;));</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Warning</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Do not use this with any user specified input. Please resort to prepared</span>
-    <span class="doccomment">/// statements using the [`query`] method.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`query`]: #method.query</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">simple_query</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">query</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">QueryStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>,
+    <span class="doccomment">/// Execute multiple queries, delimited with `;` and return multiple result
+    /// sets; one for each query.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use tiberius::Config;
+    /// # use tokio_util::compat::TokioAsyncWriteCompatExt;
+    /// # use std::env;
+    /// # #[tokio::main]
+    /// # async fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// # let c_str = env::var(&quot;TIBERIUS_TEST_CONNECTION_STRING&quot;).unwrap_or(
+    /// #     &quot;server=tcp:localhost,1433;integratedSecurity=true;TrustServerCertificate=true&quot;.to_owned(),
+    /// # );
+    /// # let config = Config::from_ado_string(&amp;c_str)?;
+    /// # let tcp = tokio::net::TcpStream::connect(config.get_addr()).await?;
+    /// # tcp.set_nodelay(true)?;
+    /// # let mut client = tiberius::Client::connect(config, tcp.compat_write()).await?;
+    /// let row = client.simple_query(&quot;SELECT 1 AS col&quot;).await?.into_row().await?.unwrap();
+    /// assert_eq!(Some(1i32), row.get(&quot;col&quot;));
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// # Warning
+    ///
+    /// Do not use this with any user specified input. Please resort to prepared
+    /// statements using the [`query`] method.
+    ///
+    /// [`query`]: #method.query
+    </span><span class="kw">pub async fn </span>simple_query&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+        query: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;b</span>, str&gt;&gt;,
+    ) -&gt; <span class="kw">crate</span>::Result&lt;QueryStream&lt;<span class="lifetime">&#39;a</span>&gt;&gt;
+    <span class="kw">where
+        </span><span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>,
     {
-        <span class="self">self</span>.<span class="ident">connection</span>.<span class="ident">flush_stream</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.connection.flush_stream().<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">BatchRequest::new</span>(<span class="ident">query</span>, <span class="self">self</span>.<span class="ident">connection</span>.<span class="ident">context</span>().<span class="ident">transaction_descriptor</span>());
+        <span class="kw">let </span>req = BatchRequest::new(query, <span class="self">self</span>.connection.context().transaction_descriptor());
 
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">connection</span>.<span class="ident">context_mut</span>().<span class="ident">next_packet_id</span>();
-        <span class="self">self</span>.<span class="ident">connection</span>.<span class="ident">send</span>(<span class="ident">PacketHeader::batch</span>(<span class="ident">id</span>), <span class="ident">req</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>id = <span class="self">self</span>.connection.context_mut().next_packet_id();
+        <span class="self">self</span>.connection.send(PacketHeader::batch(id), req).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">ts</span> <span class="op">=</span> <span class="ident">TokenStream::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">connection</span>);
+        <span class="kw">let </span>ts = TokenStream::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.connection);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">QueryStream::new</span>(<span class="ident">ts</span>.<span class="ident">try_unfold</span>());
-        <span class="ident">result</span>.<span class="ident">forward_to_metadata</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>result = QueryStream::new(ts.try_unfold());
+        result.forward_to_metadata().<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">result</span>)
+        <span class="prelude-val">Ok</span>(result)
     }
 
-    <span class="doccomment">/// Execute a `BULK INSERT` statement, efficiantly storing a large number of</span>
-    <span class="doccomment">/// rows to a specified table. Note: make sure the input row follows the same</span>
-    <span class="doccomment">/// schema as the table, otherwise calling `send()` will return an error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use tiberius::{Config, IntoRow};</span>
-    <span class="doccomment">/// # use tokio_util::compat::TokioAsyncWriteCompatExt;</span>
-    <span class="doccomment">/// # use std::env;</span>
-    <span class="doccomment">/// # #[tokio::main]</span>
-    <span class="doccomment">/// # async fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-    <span class="doccomment">/// # let c_str = env::var(&quot;TIBERIUS_TEST_CONNECTION_STRING&quot;).unwrap_or(</span>
-    <span class="doccomment">/// #     &quot;server=tcp:localhost,1433;integratedSecurity=true;TrustServerCertificate=true&quot;.to_owned(),</span>
-    <span class="doccomment">/// # );</span>
-    <span class="doccomment">/// # let config = Config::from_ado_string(&amp;c_str)?;</span>
-    <span class="doccomment">/// # let tcp = tokio::net::TcpStream::connect(config.get_addr()).await?;</span>
-    <span class="doccomment">/// # tcp.set_nodelay(true)?;</span>
-    <span class="doccomment">/// # let mut client = tiberius::Client::connect(config, tcp.compat_write()).await?;</span>
-    <span class="doccomment">/// let create_table = r#&quot;</span>
-    <span class="doccomment">///     CREATE TABLE ##bulk_test (</span>
-    <span class="doccomment">///         id INT IDENTITY PRIMARY KEY,</span>
-    <span class="doccomment">///         val INT NOT NULL</span>
-    <span class="doccomment">///     )</span>
-    <span class="doccomment">/// &quot;#;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// client.simple_query(create_table).await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Start the bulk insert with the client.</span>
-    <span class="doccomment">/// let mut req = client.bulk_insert(&quot;##bulk_test&quot;).await?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// for i in [0i32, 1i32, 2i32] {</span>
-    <span class="doccomment">///     let row = (i).into_row();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     // The request will handle flushing to the wire in an optimal way,</span>
-    <span class="doccomment">///     // balancing between memory usage and IO performance.</span>
-    <span class="doccomment">///     req.send(row).await?;</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // The request must be finalized.</span>
-    <span class="doccomment">/// let res = req.finalize().await?;</span>
-    <span class="doccomment">/// assert_eq!(3, res.total());</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">bulk_insert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">table</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">BulkLoadRequest</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="comment">// Start the bulk request</span>
-        <span class="self">self</span>.<span class="ident">connection</span>.<span class="ident">flush_stream</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="doccomment">/// Execute a `BULK INSERT` statement, efficiantly storing a large number of
+    /// rows to a specified table. Note: make sure the input row follows the same
+    /// schema as the table, otherwise calling `send()` will return an error.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use tiberius::{Config, IntoRow};
+    /// # use tokio_util::compat::TokioAsyncWriteCompatExt;
+    /// # use std::env;
+    /// # #[tokio::main]
+    /// # async fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+    /// # let c_str = env::var(&quot;TIBERIUS_TEST_CONNECTION_STRING&quot;).unwrap_or(
+    /// #     &quot;server=tcp:localhost,1433;integratedSecurity=true;TrustServerCertificate=true&quot;.to_owned(),
+    /// # );
+    /// # let config = Config::from_ado_string(&amp;c_str)?;
+    /// # let tcp = tokio::net::TcpStream::connect(config.get_addr()).await?;
+    /// # tcp.set_nodelay(true)?;
+    /// # let mut client = tiberius::Client::connect(config, tcp.compat_write()).await?;
+    /// let create_table = r#&quot;
+    ///     CREATE TABLE ##bulk_test (
+    ///         id INT IDENTITY PRIMARY KEY,
+    ///         val INT NOT NULL
+    ///     )
+    /// &quot;#;
+    ///
+    /// client.simple_query(create_table).await?;
+    ///
+    /// // Start the bulk insert with the client.
+    /// let mut req = client.bulk_insert(&quot;##bulk_test&quot;).await?;
+    ///
+    /// for i in [0i32, 1i32, 2i32] {
+    ///     let row = (i).into_row();
+    ///
+    ///     // The request will handle flushing to the wire in an optimal way,
+    ///     // balancing between memory usage and IO performance.
+    ///     req.send(row).await?;
+    /// }
+    ///
+    /// // The request must be finalized.
+    /// let res = req.finalize().await?;
+    /// assert_eq!(3, res.total());
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub async fn </span>bulk_insert&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+        table: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    ) -&gt; <span class="kw">crate</span>::Result&lt;BulkLoadRequest&lt;<span class="lifetime">&#39;a</span>, S&gt;&gt; {
+        <span class="comment">// Start the bulk request
+        </span><span class="self">self</span>.connection.flush_stream().<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="comment">// retrieve column metadata from server</span>
-        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;SELECT TOP 0 * FROM {}&quot;</span>, <span class="ident">table</span>);
+        <span class="comment">// retrieve column metadata from server
+        </span><span class="kw">let </span>query = <span class="macro">format!</span>(<span class="string">&quot;SELECT TOP 0 * FROM {}&quot;</span>, table);
 
-        <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">BatchRequest::new</span>(<span class="ident">query</span>, <span class="self">self</span>.<span class="ident">connection</span>.<span class="ident">context</span>().<span class="ident">transaction_descriptor</span>());
+        <span class="kw">let </span>req = BatchRequest::new(query, <span class="self">self</span>.connection.context().transaction_descriptor());
 
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">connection</span>.<span class="ident">context_mut</span>().<span class="ident">next_packet_id</span>();
-        <span class="self">self</span>.<span class="ident">connection</span>.<span class="ident">send</span>(<span class="ident">PacketHeader::batch</span>(<span class="ident">id</span>), <span class="ident">req</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>id = <span class="self">self</span>.connection.context_mut().next_packet_id();
+        <span class="self">self</span>.connection.send(PacketHeader::batch(id), req).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">token_stream</span> <span class="op">=</span> <span class="ident">TokenStream::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">connection</span>).<span class="ident">try_unfold</span>();
+        <span class="kw">let </span>token_stream = TokenStream::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.connection).try_unfold();
 
-        <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">token_stream</span>
-            .<span class="ident">try_fold</span>(<span class="prelude-val">None</span>, <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">columns</span>, <span class="ident">token</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ReceivedToken::NewResultset</span>(<span class="ident">metadata</span>) <span class="op">=</span> <span class="ident">token</span> {
-                    <span class="ident">columns</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">metadata</span>.<span class="ident">columns</span>.<span class="ident">clone</span>());
+        <span class="kw">let </span>columns = token_stream
+            .try_fold(<span class="prelude-val">None</span>, |<span class="kw-2">mut </span>columns, token| <span class="kw">async move </span>{
+                <span class="kw">if let </span>ReceivedToken::NewResultset(metadata) = token {
+                    columns = <span class="prelude-val">Some</span>(metadata.columns.clone());
                 };
 
-                <span class="prelude-val">Ok</span>(<span class="ident">columns</span>)
+                <span class="prelude-val">Ok</span>(columns)
             })
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="comment">// now start bulk upload</span>
-        <span class="kw">let</span> <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">columns</span>
-            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                <span class="ident"><span class="kw">crate</span>::Error::Protocol</span>(<span class="string">&quot;expecting column metadata from query but not found&quot;</span>.<span class="ident">into</span>())
-            })<span class="question-mark">?</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">column</span><span class="op">|</span> <span class="ident">column</span>.<span class="ident">base</span>.<span class="ident">flags</span>.<span class="ident">contains</span>(<span class="ident">ColumnFlag::Updateable</span>))
-            .<span class="ident">collect</span>();
+        <span class="comment">// now start bulk upload
+        </span><span class="kw">let </span>columns: Vec&lt;<span class="kw">_</span>&gt; = columns
+            .ok_or_else(|| {
+                <span class="kw">crate</span>::Error::Protocol(<span class="string">&quot;expecting column metadata from query but not found&quot;</span>.into())
+            })<span class="question-mark">?
+            </span>.into_iter()
+            .filter(|column| column.base.flags.contains(ColumnFlag::Updateable))
+            .collect();
 
-        <span class="self">self</span>.<span class="ident">connection</span>.<span class="ident">flush_stream</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">col_data</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">c</span>)).<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>);
-        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;INSERT BULK {} ({})&quot;</span>, <span class="ident">table</span>, <span class="ident">col_data</span>);
+        <span class="self">self</span>.connection.flush_stream().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>col_data = columns.iter().map(|c| <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, c)).join(<span class="string">&quot;, &quot;</span>);
+        <span class="kw">let </span>query = <span class="macro">format!</span>(<span class="string">&quot;INSERT BULK {} ({})&quot;</span>, table, col_data);
 
-        <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">BatchRequest::new</span>(<span class="ident">query</span>, <span class="self">self</span>.<span class="ident">connection</span>.<span class="ident">context</span>().<span class="ident">transaction_descriptor</span>());
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">connection</span>.<span class="ident">context_mut</span>().<span class="ident">next_packet_id</span>();
+        <span class="kw">let </span>req = BatchRequest::new(query, <span class="self">self</span>.connection.context().transaction_descriptor());
+        <span class="kw">let </span>id = <span class="self">self</span>.connection.context_mut().next_packet_id();
 
-        <span class="self">self</span>.<span class="ident">connection</span>.<span class="ident">send</span>(<span class="ident">PacketHeader::batch</span>(<span class="ident">id</span>), <span class="ident">req</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.connection.send(PacketHeader::batch(id), req).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">ts</span> <span class="op">=</span> <span class="ident">TokenStream::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">connection</span>);
-        <span class="ident">ts</span>.<span class="ident">flush_done</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>ts = TokenStream::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.connection);
+        ts.flush_done().<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="ident">BulkLoadRequest::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">connection</span>, <span class="ident">columns</span>)
+        BulkLoadRequest::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.connection, columns)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">rpc_params</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">query</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RpcParam</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>rpc_params&lt;<span class="lifetime">&#39;a</span>&gt;(query: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) -&gt; Vec&lt;RpcParam&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
         <span class="macro">vec!</span>[
-            <span class="ident">RpcParam</span> {
-                <span class="ident">name</span>: <span class="ident">Cow::Borrowed</span>(<span class="string">&quot;stmt&quot;</span>),
-                <span class="ident">flags</span>: <span class="ident">BitFlags::empty</span>(),
-                <span class="ident">value</span>: <span class="ident">ColumnData::String</span>(<span class="prelude-val">Some</span>(<span class="ident">query</span>.<span class="ident">into</span>())),
+            RpcParam {
+                name: Cow::Borrowed(<span class="string">&quot;stmt&quot;</span>),
+                flags: BitFlags::empty(),
+                value: ColumnData::String(<span class="prelude-val">Some</span>(query.into())),
             },
-            <span class="ident">RpcParam</span> {
-                <span class="ident">name</span>: <span class="ident">Cow::Borrowed</span>(<span class="string">&quot;params&quot;</span>),
-                <span class="ident">flags</span>: <span class="ident">BitFlags::empty</span>(),
-                <span class="ident">value</span>: <span class="ident">ColumnData::I32</span>(<span class="prelude-val">Some</span>(<span class="number">0</span>)),
+            RpcParam {
+                name: Cow::Borrowed(<span class="string">&quot;params&quot;</span>),
+                flags: BitFlags::empty(),
+                value: ColumnData::I32(<span class="prelude-val">Some</span>(<span class="number">0</span>)),
             },
         ]
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">rpc_perform_query</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">proc_id</span>: <span class="ident">RpcProcId</span>,
-        <span class="kw-2">mut</span> <span class="ident">rpc_params</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RpcParam</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">params</span>: <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ColumnData</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>rpc_perform_query&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+        proc_id: RpcProcId,
+        <span class="kw-2">mut </span>rpc_params: Vec&lt;RpcParam&lt;<span class="lifetime">&#39;b</span>&gt;&gt;,
+        params: <span class="kw">impl </span>Iterator&lt;Item = ColumnData&lt;<span class="lifetime">&#39;b</span>&gt;&gt;,
+    ) -&gt; <span class="kw">crate</span>::Result&lt;()&gt;
+    <span class="kw">where
+        </span><span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">param_str</span> <span class="op">=</span> <span class="ident">String::new</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>param_str = String::new();
 
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">param</span>) <span class="kw">in</span> <span class="ident">params</span>.<span class="ident">enumerate</span>() {
-            <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                <span class="ident">param_str</span>.<span class="ident">push</span>(<span class="string">&#39;,&#39;</span>)
+        <span class="kw">for </span>(i, param) <span class="kw">in </span>params.enumerate() {
+            <span class="kw">if </span>i &gt; <span class="number">0 </span>{
+                param_str.push(<span class="string">&#39;,&#39;</span>)
             }
-            <span class="ident">param_str</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;@P{} &quot;</span>, <span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>));
-            <span class="ident">param_str</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">param</span>.<span class="ident">type_name</span>());
+            param_str.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;@P{} &quot;</span>, i + <span class="number">1</span>));
+            param_str.push_str(<span class="kw-2">&amp;</span>param.type_name());
 
-            <span class="ident">rpc_params</span>.<span class="ident">push</span>(<span class="ident">RpcParam</span> {
-                <span class="ident">name</span>: <span class="ident">Cow::Owned</span>(<span class="macro">format!</span>(<span class="string">&quot;@P{}&quot;</span>, <span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>)),
-                <span class="ident">flags</span>: <span class="ident">BitFlags::empty</span>(),
-                <span class="ident">value</span>: <span class="ident">param</span>,
+            rpc_params.push(RpcParam {
+                name: Cow::Owned(<span class="macro">format!</span>(<span class="string">&quot;@P{}&quot;</span>, i + <span class="number">1</span>)),
+                flags: BitFlags::empty(),
+                value: param,
             });
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">params</span>) <span class="op">=</span> <span class="ident">rpc_params</span>.<span class="ident">iter_mut</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;params&quot;</span>) {
-            <span class="ident">params</span>.<span class="ident">value</span> <span class="op">=</span> <span class="ident">ColumnData::String</span>(<span class="prelude-val">Some</span>(<span class="ident">param_str</span>.<span class="ident">into</span>()));
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(params) = rpc_params.iter_mut().find(|x| x.name == <span class="string">&quot;params&quot;</span>) {
+            params.value = ColumnData::String(<span class="prelude-val">Some</span>(param_str.into()));
         }
 
-        <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">TokenRpcRequest::new</span>(
-            <span class="ident">proc_id</span>,
-            <span class="ident">rpc_params</span>,
-            <span class="self">self</span>.<span class="ident">connection</span>.<span class="ident">context</span>().<span class="ident">transaction_descriptor</span>(),
+        <span class="kw">let </span>req = TokenRpcRequest::new(
+            proc_id,
+            rpc_params,
+            <span class="self">self</span>.connection.context().transaction_descriptor(),
         );
 
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">connection</span>.<span class="ident">context_mut</span>().<span class="ident">next_packet_id</span>();
-        <span class="self">self</span>.<span class="ident">connection</span>.<span class="ident">send</span>(<span class="ident">PacketHeader::rpc</span>(<span class="ident">id</span>), <span class="ident">req</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>id = <span class="self">self</span>.connection.context_mut().next_packet_id();
+        <span class="self">self</span>.connection.send(PacketHeader::rpc(id), req).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tiberius" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tiberius" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

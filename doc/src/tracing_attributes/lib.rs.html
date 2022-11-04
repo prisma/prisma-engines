@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-attributes-0.1.22/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tracing_attributes/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tracing_attributes/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-attributes-0.1.22/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tracing_attributes/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tracing_attributes/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tracing_attributes/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -659,664 +659,664 @@
 <span id="657">657</span>
 <span id="658">658</span>
 <span id="659">659</span>
-</pre><pre class="rust"><code><span class="doccomment">//! A procedural macro attribute for instrumenting functions with [`tracing`].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`tracing`] is a framework for instrumenting Rust programs to collect</span>
-<span class="doccomment">//! structured, event-based diagnostic information. This crate provides the</span>
-<span class="doccomment">//! [`#[instrument]`][instrument] procedural macro attribute.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Note that this macro is also re-exported by the main `tracing` crate.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! *Compiler support: [requires `rustc` 1.49+][msrv]*</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [msrv]: #supported-rust-versions</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Usage</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! First, add this to your `Cargo.toml`:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! [dependencies]</span>
-<span class="doccomment">//! tracing-attributes = &quot;0.1.22&quot;</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The [`#[instrument]`][instrument] attribute can now be added to a function</span>
-<span class="doccomment">//! to automatically create and enter `tracing` [span] when that function is</span>
-<span class="doccomment">//! called. For example:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! use tracing_attributes::instrument;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[instrument]</span>
-<span class="doccomment">//! pub fn my_function(my_arg: usize) {</span>
-<span class="doccomment">//!     // ...</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # fn main() {}</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`tracing`]: https://crates.io/crates/tracing</span>
-<span class="doccomment">//! [span]: https://docs.rs/tracing/latest/tracing/span/index.html</span>
-<span class="doccomment">//! [instrument]: macro@self::instrument</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Supported Rust Versions</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Tracing is built against the latest stable release. The minimum supported</span>
-<span class="doccomment">//! version is 1.49. The current Tracing version is not guaranteed to build on</span>
-<span class="doccomment">//! Rust versions earlier than the minimum supported version.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Tracing follows the same compiler support policies as the rest of the Tokio</span>
-<span class="doccomment">//! project. The current stable Rust compiler and the three most recent minor</span>
-<span class="doccomment">//! versions before it will always be supported. For example, if the current</span>
-<span class="doccomment">//! stable compiler version is 1.45, the minimum supported version will not be</span>
-<span class="doccomment">//! increased past 1.42, three minor versions prior. Increasing the minimum</span>
-<span class="doccomment">//! supported compiler version is not considered a semver breaking change as</span>
-<span class="doccomment">//! long as doing so complies with this policy.</span>
-<span class="doccomment">//!</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/tracing-attributes/0.1.22&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">doc</span>(
-    <span class="ident">html_logo_url</span> <span class="op">=</span> <span class="string">&quot;https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png&quot;</span>,
-    <span class="ident">issue_tracker_base_url</span> <span class="op">=</span> <span class="string">&quot;https://github.com/tokio-rs/tracing/issues/&quot;</span>
-)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">deny</span>(<span class="ident">rustdoc::broken_intra_doc_links</span>))]</span>
-<span class="attribute">#![<span class="ident">warn</span>(
-    <span class="ident">missing_debug_implementations</span>,
-    <span class="ident">missing_docs</span>,
-    <span class="ident">rust_2018_idioms</span>,
-    <span class="ident">unreachable_pub</span>,
-    <span class="ident">bad_style</span>,
-    <span class="ident">const_err</span>,
-    <span class="ident">dead_code</span>,
-    <span class="ident">improper_ctypes</span>,
-    <span class="ident">non_shorthand_field_patterns</span>,
-    <span class="ident">no_mangle_generic_items</span>,
-    <span class="ident">overflowing_literals</span>,
-    <span class="ident">path_statements</span>,
-    <span class="ident">patterns_in_fns_without_body</span>,
-    <span class="ident">private_in_public</span>,
-    <span class="ident">unconditional_recursion</span>,
-    <span class="ident">unused_allocation</span>,
-    <span class="ident">unused_comparisons</span>,
-    <span class="ident">unused_parens</span>,
-    <span class="ident">while_true</span>
-)]</span>
-<span class="comment">// TODO: once `tracing` bumps its MSRV to 1.42, remove this allow.</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
+</pre><pre class="rust"><code><span class="doccomment">//! A procedural macro attribute for instrumenting functions with [`tracing`].
+//!
+//! [`tracing`] is a framework for instrumenting Rust programs to collect
+//! structured, event-based diagnostic information. This crate provides the
+//! [`#[instrument]`][instrument] procedural macro attribute.
+//!
+//! Note that this macro is also re-exported by the main `tracing` crate.
+//!
+//! *Compiler support: [requires `rustc` 1.49+][msrv]*
+//!
+//! [msrv]: #supported-rust-versions
+//!
+//! ## Usage
+//!
+//! First, add this to your `Cargo.toml`:
+//!
+//! ```toml
+//! [dependencies]
+//! tracing-attributes = &quot;0.1.22&quot;
+//! ```
+//!
+//! The [`#[instrument]`][instrument] attribute can now be added to a function
+//! to automatically create and enter `tracing` [span] when that function is
+//! called. For example:
+//!
+//! ```
+//! use tracing_attributes::instrument;
+//!
+//! #[instrument]
+//! pub fn my_function(my_arg: usize) {
+//!     // ...
+//! }
+//!
+//! # fn main() {}
+//! ```
+//!
+//! [`tracing`]: https://crates.io/crates/tracing
+//! [span]: https://docs.rs/tracing/latest/tracing/span/index.html
+//! [instrument]: macro@self::instrument
+//!
+//! ## Supported Rust Versions
+//!
+//! Tracing is built against the latest stable release. The minimum supported
+//! version is 1.49. The current Tracing version is not guaranteed to build on
+//! Rust versions earlier than the minimum supported version.
+//!
+//! Tracing follows the same compiler support policies as the rest of the Tokio
+//! project. The current stable Rust compiler and the three most recent minor
+//! versions before it will always be supported. For example, if the current
+//! stable compiler version is 1.45, the minimum supported version will not be
+//! increased past 1.42, three minor versions prior. Increasing the minimum
+//! supported compiler version is not considered a semver breaking change as
+//! long as doing so complies with this policy.
+//!
+</span><span class="attribute">#![doc(html_root_url = <span class="string">&quot;https://docs.rs/tracing-attributes/0.1.22&quot;</span>)]
+#![doc(
+    html_logo_url = <span class="string">&quot;https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png&quot;</span>,
+    issue_tracker_base_url = <span class="string">&quot;https://github.com/tokio-rs/tracing/issues/&quot;
+</span>)]
+#![cfg_attr(docsrs, deny(rustdoc::broken_intra_doc_links))]
+#![warn(
+    missing_debug_implementations,
+    missing_docs,
+    rust_2018_idioms,
+    unreachable_pub,
+    bad_style,
+    const_err,
+    dead_code,
+    improper_ctypes,
+    non_shorthand_field_patterns,
+    no_mangle_generic_items,
+    overflowing_literals,
+    path_statements,
+    patterns_in_fns_without_body,
+    private_in_public,
+    unconditional_recursion,
+    unused_allocation,
+    unused_comparisons,
+    unused_parens,
+    while_true
+)]
+</span><span class="comment">// TODO: once `tracing` bumps its MSRV to 1.42, remove this allow.
+</span><span class="attribute">#![allow(unused)]
+</span><span class="kw">extern crate </span>proc_macro;
 
-<span class="kw">use</span> <span class="ident">proc_macro2::TokenStream</span>;
-<span class="kw">use</span> <span class="ident">quote::ToTokens</span>;
-<span class="kw">use</span> <span class="ident">syn::parse</span>::{<span class="ident">Parse</span>, <span class="ident">ParseStream</span>};
-<span class="kw">use</span> <span class="ident">syn</span>::{<span class="ident">Attribute</span>, <span class="ident">Block</span>, <span class="ident">ItemFn</span>, <span class="ident">Signature</span>, <span class="ident">Visibility</span>};
+<span class="kw">use </span>proc_macro2::TokenStream;
+<span class="kw">use </span>quote::ToTokens;
+<span class="kw">use </span>syn::parse::{Parse, ParseStream};
+<span class="kw">use </span>syn::{Attribute, Block, ItemFn, Signature, Visibility};
 
-<span class="kw">mod</span> <span class="ident">attr</span>;
-<span class="kw">mod</span> <span class="ident">expand</span>;
-<span class="doccomment">/// Instruments a function to create and enter a `tracing` [span] every time</span>
-<span class="doccomment">/// the function is called.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Unless overriden, a span with the [`INFO`] [level] will be generated.</span>
-<span class="doccomment">/// The generated span&#39;s name will be the name of the function.</span>
-<span class="doccomment">/// By default, all arguments to the function are included as fields on the</span>
-<span class="doccomment">/// span. Arguments that are `tracing` [primitive types] implementing the</span>
-<span class="doccomment">/// [`Value` trait] will be recorded as fields of that type. Types which do</span>
-<span class="doccomment">/// not implement `Value` will be recorded using [`std::fmt::Debug`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [primitive types]: https://docs.rs/tracing/latest/tracing/field/trait.Value.html#foreign-impls</span>
-<span class="doccomment">/// [`Value` trait]: https://docs.rs/tracing/latest/tracing/field/trait.Value.html.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Overriding Span Attributes</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// To change the [name] of the generated span, add a `name` argument to the</span>
-<span class="doccomment">/// `#[instrument]` macro, followed by an equals sign and a string literal. For</span>
-<span class="doccomment">/// example:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use tracing_attributes::instrument;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // The generated span&#39;s name will be &quot;my_span&quot; rather than &quot;my_function&quot;.</span>
-<span class="doccomment">/// #[instrument(name = &quot;my_span&quot;)]</span>
-<span class="doccomment">/// pub fn my_function() {</span>
-<span class="doccomment">///     // ... do something incredibly interesting and important ...</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// To override the [target] of the generated span, add a `target` argument to</span>
-<span class="doccomment">/// the `#[instrument]` macro, followed by an equals sign and a string literal</span>
-<span class="doccomment">/// for the new target. The [module path] is still recorded separately. For</span>
-<span class="doccomment">/// example:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// pub mod my_module {</span>
-<span class="doccomment">///     # use tracing_attributes::instrument;</span>
-<span class="doccomment">///     // The generated span&#39;s target will be &quot;my_crate::some_special_target&quot;,</span>
-<span class="doccomment">///     // rather than &quot;my_crate::my_module&quot;.</span>
-<span class="doccomment">///     #[instrument(target = &quot;my_crate::some_special_target&quot;)]</span>
-<span class="doccomment">///     pub fn my_function() {</span>
-<span class="doccomment">///         // ... all kinds of neat code in here ...</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Finally, to override the [level] of the generated span, add a `level`</span>
-<span class="doccomment">/// argument, followed by an equals sign and a string literal with the name of</span>
-<span class="doccomment">/// the desired level. Level names are not case sensitive. For example:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use tracing_attributes::instrument;</span>
-<span class="doccomment">/// // The span&#39;s level will be TRACE rather than INFO.</span>
-<span class="doccomment">/// #[instrument(level = &quot;trace&quot;)]</span>
-<span class="doccomment">/// pub fn my_function() {</span>
-<span class="doccomment">///     // ... I have written a truly marvelous implementation of this function,</span>
-<span class="doccomment">///     // which this example is too narrow to contain ...</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Skipping Fields</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// To skip recording one or more arguments to a function or method, pass</span>
-<span class="doccomment">/// the argument&#39;s name inside the `skip()` argument on the `#[instrument]`</span>
-<span class="doccomment">/// macro. This can be used when an argument to an instrumented function does</span>
-<span class="doccomment">/// not implement [`fmt::Debug`], or to exclude an argument with a verbose or</span>
-<span class="doccomment">/// costly `Debug` implementation. Note that:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - multiple argument names can be passed to `skip`.</span>
-<span class="doccomment">/// - arguments passed to `skip` do _not_ need to implement `fmt::Debug`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You can also use `skip_all` to skip all arguments.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use tracing_attributes::instrument;</span>
-<span class="doccomment">/// # use std::collections::HashMap;</span>
-<span class="doccomment">/// // This type doesn&#39;t implement `fmt::Debug`!</span>
-<span class="doccomment">/// struct NonDebug;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // `arg` will be recorded, while `non_debug` will not.</span>
-<span class="doccomment">/// #[instrument(skip(non_debug))]</span>
-<span class="doccomment">/// fn my_function(arg: usize, non_debug: NonDebug) {</span>
-<span class="doccomment">///     // ...</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // These arguments are huge</span>
-<span class="doccomment">/// #[instrument(skip_all)]</span>
-<span class="doccomment">/// fn my_big_data_function(large: Vec&lt;u8&gt;, also_large: HashMap&lt;String, String&gt;) {</span>
-<span class="doccomment">///     // ...</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Skipping the `self` parameter:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use tracing_attributes::instrument;</span>
-<span class="doccomment">/// #[derive(Debug)]</span>
-<span class="doccomment">/// struct MyType {</span>
-<span class="doccomment">///    data: Vec&lt;u8&gt;, // Suppose this buffer is often quite long...</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// impl MyType {</span>
-<span class="doccomment">///     // Suppose we don&#39;t want to print an entire kilobyte of `data`</span>
-<span class="doccomment">///     // every time this is called...</span>
-<span class="doccomment">///     #[instrument(skip(self))]</span>
-<span class="doccomment">///     pub fn my_method(&amp;mut self, an_interesting_argument: usize) {</span>
-<span class="doccomment">///          // ... do something (hopefully, using all that `data`!)</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Adding Fields</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Additional fields (key-value pairs with arbitrary data) may be added to the</span>
-<span class="doccomment">/// generated span using the `fields` argument on the `#[instrument]` macro. Any</span>
-<span class="doccomment">/// Rust expression can be used as a field value in this manner. These</span>
-<span class="doccomment">/// expressions will be evaluated at the beginning of the function&#39;s body, so</span>
-<span class="doccomment">/// arguments to the function may be used in these expressions. Field names may</span>
-<span class="doccomment">/// also be specified *without* values. Doing so will result in an [empty field]</span>
-<span class="doccomment">/// whose value may be recorded later within the function body.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This supports the same [field syntax] as the `span!` and `event!` macros.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note that overlap between the names of fields and (non-skipped) arguments</span>
-<span class="doccomment">/// will result in a compile error.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Adding a new field based on the value of an argument:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use tracing_attributes::instrument;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // This will record a field named &quot;i&quot; with the value of `i` *and* a field</span>
-<span class="doccomment">/// // named &quot;next&quot; with the value of `i` + 1.</span>
-<span class="doccomment">/// #[instrument(fields(next = i + 1))]</span>
-<span class="doccomment">/// pub fn my_function(i: usize) {</span>
-<span class="doccomment">///     // ...</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Recording specific properties of a struct as their own fields:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # mod http {</span>
-<span class="doccomment">/// #   pub struct Error;</span>
-<span class="doccomment">/// #   pub struct Response&lt;B&gt; { pub(super) _b: std::marker::PhantomData&lt;B&gt; }</span>
-<span class="doccomment">/// #   pub struct Request&lt;B&gt; { _b: B }</span>
-<span class="doccomment">/// #   impl&lt;B&gt; std::fmt::Debug for Request&lt;B&gt; {</span>
-<span class="doccomment">/// #       fn fmt(&amp;self, f: &amp;mut std::fmt::Formatter&lt;&#39;_&gt;) -&gt; std::fmt::Result {</span>
-<span class="doccomment">/// #           f.pad(&quot;request&quot;)</span>
-<span class="doccomment">/// #       }</span>
-<span class="doccomment">/// #   }</span>
-<span class="doccomment">/// #   impl&lt;B&gt; Request&lt;B&gt; {</span>
-<span class="doccomment">/// #       pub fn uri(&amp;self) -&gt; &amp;str { &quot;fake&quot; }</span>
-<span class="doccomment">/// #       pub fn method(&amp;self) -&gt; &amp;str { &quot;GET&quot; }</span>
-<span class="doccomment">/// #   }</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// # use tracing_attributes::instrument;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // This will record the request&#39;s URI and HTTP method as their own separate</span>
-<span class="doccomment">/// // fields.</span>
-<span class="doccomment">/// #[instrument(fields(http.uri = req.uri(), http.method = req.method()))]</span>
-<span class="doccomment">/// pub fn handle_request&lt;B&gt;(req: http::Request&lt;B&gt;) -&gt; http::Response&lt;B&gt; {</span>
-<span class="doccomment">///     // ... handle the request ...</span>
-<span class="doccomment">///     # http::Response { _b: std::marker::PhantomData }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This can be used in conjunction with `skip` or `skip_all` to record only</span>
-<span class="doccomment">/// some fields of a struct:</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use tracing_attributes::instrument;</span>
-<span class="doccomment">/// // Remember the struct with the very large `data` field from the earlier</span>
-<span class="doccomment">/// // example? Now it also has a `name`, which we might want to include in</span>
-<span class="doccomment">/// // our span.</span>
-<span class="doccomment">/// #[derive(Debug)]</span>
-<span class="doccomment">/// struct MyType {</span>
-<span class="doccomment">///    name: &amp;&#39;static str,</span>
-<span class="doccomment">///    data: Vec&lt;u8&gt;,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// impl MyType {</span>
-<span class="doccomment">///     // This will skip the `data` field, but will include `self.name`,</span>
-<span class="doccomment">///     // formatted using `fmt::Display`.</span>
-<span class="doccomment">///     #[instrument(skip(self), fields(self.name = %self.name))]</span>
-<span class="doccomment">///     pub fn my_method(&amp;mut self, an_interesting_argument: usize) {</span>
-<span class="doccomment">///          // ... do something (hopefully, using all that `data`!)</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Adding an empty field to be recorded later:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use tracing_attributes::instrument;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // This function does a very interesting and important mathematical calculation.</span>
-<span class="doccomment">/// // Suppose we want to record both the inputs to the calculation *and* its result...</span>
-<span class="doccomment">/// #[instrument(fields(result))]</span>
-<span class="doccomment">/// pub fn do_calculation(input_1: usize, input_2: usize) -&gt; usize {</span>
-<span class="doccomment">///     // Rerform the calculation.</span>
-<span class="doccomment">///     let result = input_1 + input_2;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     // Record the result as part of the current span.</span>
-<span class="doccomment">///     tracing::Span::current().record(&quot;result&quot;, &amp;result);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     // Now, the result will also be included on this event!</span>
-<span class="doccomment">///     tracing::info!(&quot;calculation complete!&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     // ... etc ...</span>
-<span class="doccomment">///     # 0</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Instrumenting a function:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use tracing_attributes::instrument;</span>
-<span class="doccomment">/// #[instrument]</span>
-<span class="doccomment">/// pub fn my_function(my_arg: usize) {</span>
-<span class="doccomment">///     // This event will be recorded inside a span named `my_function` with the</span>
-<span class="doccomment">///     // field `my_arg`.</span>
-<span class="doccomment">///     tracing::info!(&quot;inside my_function!&quot;);</span>
-<span class="doccomment">///     // ...</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// Setting the level for the generated span:</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use tracing_attributes::instrument;</span>
-<span class="doccomment">/// #[instrument(level = &quot;debug&quot;)]</span>
-<span class="doccomment">/// pub fn my_function() {</span>
-<span class="doccomment">///     // ...</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// Overriding the generated span&#39;s name:</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use tracing_attributes::instrument;</span>
-<span class="doccomment">/// #[instrument(name = &quot;my_name&quot;)]</span>
-<span class="doccomment">/// pub fn my_function() {</span>
-<span class="doccomment">///     // ...</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// Overriding the generated span&#39;s target:</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use tracing_attributes::instrument;</span>
-<span class="doccomment">/// #[instrument(target = &quot;my_target&quot;)]</span>
-<span class="doccomment">/// pub fn my_function() {</span>
-<span class="doccomment">///     // ...</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// Overriding the generated span&#39;s parent:</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use tracing_attributes::instrument;</span>
-<span class="doccomment">/// #[instrument(parent = None)]</span>
-<span class="doccomment">/// pub fn my_function() {</span>
-<span class="doccomment">///     // ...</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use tracing_attributes::instrument;</span>
-<span class="doccomment">/// // A struct which owns a span handle.</span>
-<span class="doccomment">/// struct MyStruct</span>
-<span class="doccomment">/// {</span>
-<span class="doccomment">///     span: tracing::Span</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// impl MyStruct</span>
-<span class="doccomment">/// {</span>
-<span class="doccomment">///     // Use the struct&#39;s `span` field as the parent span</span>
-<span class="doccomment">///     #[instrument(parent = &amp;self.span, skip(self))]</span>
-<span class="doccomment">///     fn my_method(&amp;self) {}</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// Specifying [`follows_from`] relationships:</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use tracing_attributes::instrument;</span>
-<span class="doccomment">/// #[instrument(follows_from = causes)]</span>
-<span class="doccomment">/// pub fn my_function(causes: &amp;[tracing::Id]) {</span>
-<span class="doccomment">///     // ...</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// Any expression of type `impl IntoIterator&lt;Item = impl Into&lt;Option&lt;Id&gt;&gt;&gt;`</span>
-<span class="doccomment">/// may be provided to `follows_from`; e.g.:</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use tracing_attributes::instrument;</span>
-<span class="doccomment">/// #[instrument(follows_from = [cause])]</span>
-<span class="doccomment">/// pub fn my_function(cause: &amp;tracing::span::EnteredSpan) {</span>
-<span class="doccomment">///     // ...</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// To skip recording an argument, pass the argument&#39;s name to the `skip`:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use tracing_attributes::instrument;</span>
-<span class="doccomment">/// struct NonDebug;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[instrument(skip(non_debug))]</span>
-<span class="doccomment">/// fn my_function(arg: usize, non_debug: NonDebug) {</span>
-<span class="doccomment">///     // ...</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// To add an additional context to the span, pass key-value pairs to `fields`:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use tracing_attributes::instrument;</span>
-<span class="doccomment">/// #[instrument(fields(foo=&quot;bar&quot;, id=1, show=true))]</span>
-<span class="doccomment">/// fn my_function(arg: usize) {</span>
-<span class="doccomment">///     // ...</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Adding the `ret` argument to `#[instrument]` will emit an event with the function&#39;s</span>
-<span class="doccomment">/// return value when the function returns:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use tracing_attributes::instrument;</span>
-<span class="doccomment">/// #[instrument(ret)]</span>
-<span class="doccomment">/// fn my_function() -&gt; i32 {</span>
-<span class="doccomment">///     42</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// The return value event will have the same level as the span generated by `#[instrument]`.</span>
-<span class="doccomment">/// By default, this will be [`INFO`], but if the level is overridden, the event will be at the same</span>
-<span class="doccomment">/// level.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// **Note**:  if the function returns a `Result&lt;T, E&gt;`, `ret` will record returned values if and</span>
-<span class="doccomment">/// only if the function returns [`Result::Ok`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// By default, returned values will be recorded using their [`std::fmt::Debug`] implementations.</span>
-<span class="doccomment">/// If a returned value implements [`std::fmt::Display`], it can be recorded using its `Display`</span>
-<span class="doccomment">/// implementation instead, by writing `ret(Display)`:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use tracing_attributes::instrument;</span>
-<span class="doccomment">/// #[instrument(ret(Display))]</span>
-<span class="doccomment">/// fn my_function() -&gt; i32 {</span>
-<span class="doccomment">///     42</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If the function returns a `Result&lt;T, E&gt;` and `E` implements `std::fmt::Display`, you can add</span>
-<span class="doccomment">/// `err` or `err(Display)` to emit error events when the function returns `Err`:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use tracing_attributes::instrument;</span>
-<span class="doccomment">/// #[instrument(err)]</span>
-<span class="doccomment">/// fn my_function(arg: usize) -&gt; Result&lt;(), std::io::Error&gt; {</span>
-<span class="doccomment">///     Ok(())</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// By default, error values will be recorded using their `std::fmt::Display` implementations.</span>
-<span class="doccomment">/// If an error implements `std::fmt::Debug`, it can be recorded using its `Debug` implementation</span>
-<span class="doccomment">/// instead, by writing `err(Debug)`:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use tracing_attributes::instrument;</span>
-<span class="doccomment">/// #[instrument(err(Debug))]</span>
-<span class="doccomment">/// fn my_function(arg: usize) -&gt; Result&lt;(), std::io::Error&gt; {</span>
-<span class="doccomment">///     Ok(())</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If a `target` is specified, both the `ret` and `err` arguments will emit outputs to</span>
-<span class="doccomment">/// the declared target (or the default channel if `target` is not specified).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The `ret` and `err` arguments can be combined in order to record an event if a</span>
-<span class="doccomment">/// function returns [`Result::Ok`] or [`Result::Err`]:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use tracing_attributes::instrument;</span>
-<span class="doccomment">/// #[instrument(err, ret)]</span>
-<span class="doccomment">/// fn my_function(arg: usize) -&gt; Result&lt;(), std::io::Error&gt; {</span>
-<span class="doccomment">///     Ok(())</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `async fn`s may also be instrumented:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use tracing_attributes::instrument;</span>
-<span class="doccomment">/// #[instrument]</span>
-<span class="doccomment">/// pub async fn my_function() -&gt; Result&lt;(), ()&gt; {</span>
-<span class="doccomment">///     // ...</span>
-<span class="doccomment">///     # Ok(())</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It also works with [async-trait](https://crates.io/crates/async-trait)</span>
-<span class="doccomment">/// (a crate that allows defining async functions in traits,</span>
-<span class="doccomment">/// something not currently possible in Rust),</span>
-<span class="doccomment">/// and hopefully most libraries that exhibit similar behaviors:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use tracing::instrument;</span>
-<span class="doccomment">/// use async_trait::async_trait;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[async_trait]</span>
-<span class="doccomment">/// pub trait Foo {</span>
-<span class="doccomment">///     async fn foo(&amp;self, arg: usize);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[derive(Debug)]</span>
-<span class="doccomment">/// struct FooImpl(usize);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[async_trait]</span>
-<span class="doccomment">/// impl Foo for FooImpl {</span>
-<span class="doccomment">///     #[instrument(fields(value = self.0, tmp = std::any::type_name::&lt;Self&gt;()))]</span>
-<span class="doccomment">///     async fn foo(&amp;self, arg: usize) {}</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note than on `async-trait` &lt;= 0.1.43, references to the `Self`</span>
-<span class="doccomment">/// type inside the `fields` argument were only allowed when the instrumented</span>
-<span class="doccomment">/// function is a method (i.e., the function receives `self` as an argument).</span>
-<span class="doccomment">/// For example, this *used to not work* because the instrument function</span>
-<span class="doccomment">/// didn&#39;t receive `self`:</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use tracing::instrument;</span>
-<span class="doccomment">/// use async_trait::async_trait;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[async_trait]</span>
-<span class="doccomment">/// pub trait Bar {</span>
-<span class="doccomment">///     async fn bar();</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[derive(Debug)]</span>
-<span class="doccomment">/// struct BarImpl(usize);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[async_trait]</span>
-<span class="doccomment">/// impl Bar for BarImpl {</span>
-<span class="doccomment">///     #[instrument(fields(tmp = std::any::type_name::&lt;Self&gt;()))]</span>
-<span class="doccomment">///     async fn bar() {}</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// Instead, you should manually rewrite any `Self` types as the type for</span>
-<span class="doccomment">/// which you implement the trait: `#[instrument(fields(tmp = std::any::type_name::&lt;Bar&gt;()))]`</span>
-<span class="doccomment">/// (or maybe you can just bump `async-trait`).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [span]: https://docs.rs/tracing/latest/tracing/span/index.html</span>
-<span class="doccomment">/// [name]: https://docs.rs/tracing/latest/tracing/struct.Metadata.html#method.name</span>
-<span class="doccomment">/// [target]: https://docs.rs/tracing/latest/tracing/struct.Metadata.html#method.target</span>
-<span class="doccomment">/// [level]: https://docs.rs/tracing/latest/tracing/struct.Level.html</span>
-<span class="doccomment">/// [module path]: https://docs.rs/tracing/latest/tracing/struct.Metadata.html#method.module_path</span>
-<span class="doccomment">/// [`INFO`]: https://docs.rs/tracing/latest/tracing/struct.Level.html#associatedconstant.INFO</span>
-<span class="doccomment">/// [empty field]: https://docs.rs/tracing/latest/tracing/field/struct.Empty.html</span>
-<span class="doccomment">/// [field syntax]: https://docs.rs/tracing/latest/tracing/#recording-fields</span>
-<span class="doccomment">/// [`follows_from`]: https://docs.rs/tracing/latest/tracing/struct.Span.html#method.follows_from</span>
-<span class="doccomment">/// [`tracing`]: https://github.com/tokio-rs/tracing</span>
-<span class="doccomment">/// [`fmt::Debug`]: std::fmt::Debug</span>
-<span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">instrument</span>(
-    <span class="ident">args</span>: <span class="ident">proc_macro::TokenStream</span>,
-    <span class="ident">item</span>: <span class="ident">proc_macro::TokenStream</span>,
-) -&gt; <span class="ident">proc_macro::TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="macro">syn::parse_macro_input!</span>(<span class="ident">args</span> <span class="kw">as</span> <span class="ident">attr::InstrumentArgs</span>);
-    <span class="comment">// Cloning a `TokenStream` is cheap since it&#39;s reference counted internally.</span>
-    <span class="ident">instrument_precise</span>(<span class="ident">args</span>.<span class="ident">clone</span>(), <span class="ident">item</span>.<span class="ident">clone</span>())
-        .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">_err</span><span class="op">|</span> <span class="ident">instrument_speculative</span>(<span class="ident">args</span>, <span class="ident">item</span>))
+<span class="kw">mod </span>attr;
+<span class="kw">mod </span>expand;
+<span class="doccomment">/// Instruments a function to create and enter a `tracing` [span] every time
+/// the function is called.
+///
+/// Unless overriden, a span with the [`INFO`] [level] will be generated.
+/// The generated span&#39;s name will be the name of the function.
+/// By default, all arguments to the function are included as fields on the
+/// span. Arguments that are `tracing` [primitive types] implementing the
+/// [`Value` trait] will be recorded as fields of that type. Types which do
+/// not implement `Value` will be recorded using [`std::fmt::Debug`].
+///
+/// [primitive types]: https://docs.rs/tracing/latest/tracing/field/trait.Value.html#foreign-impls
+/// [`Value` trait]: https://docs.rs/tracing/latest/tracing/field/trait.Value.html.
+///
+/// # Overriding Span Attributes
+///
+/// To change the [name] of the generated span, add a `name` argument to the
+/// `#[instrument]` macro, followed by an equals sign and a string literal. For
+/// example:
+///
+/// ```
+/// # use tracing_attributes::instrument;
+///
+/// // The generated span&#39;s name will be &quot;my_span&quot; rather than &quot;my_function&quot;.
+/// #[instrument(name = &quot;my_span&quot;)]
+/// pub fn my_function() {
+///     // ... do something incredibly interesting and important ...
+/// }
+/// ```
+///
+/// To override the [target] of the generated span, add a `target` argument to
+/// the `#[instrument]` macro, followed by an equals sign and a string literal
+/// for the new target. The [module path] is still recorded separately. For
+/// example:
+///
+/// ```
+/// pub mod my_module {
+///     # use tracing_attributes::instrument;
+///     // The generated span&#39;s target will be &quot;my_crate::some_special_target&quot;,
+///     // rather than &quot;my_crate::my_module&quot;.
+///     #[instrument(target = &quot;my_crate::some_special_target&quot;)]
+///     pub fn my_function() {
+///         // ... all kinds of neat code in here ...
+///     }
+/// }
+/// ```
+///
+/// Finally, to override the [level] of the generated span, add a `level`
+/// argument, followed by an equals sign and a string literal with the name of
+/// the desired level. Level names are not case sensitive. For example:
+///
+/// ```
+/// # use tracing_attributes::instrument;
+/// // The span&#39;s level will be TRACE rather than INFO.
+/// #[instrument(level = &quot;trace&quot;)]
+/// pub fn my_function() {
+///     // ... I have written a truly marvelous implementation of this function,
+///     // which this example is too narrow to contain ...
+/// }
+/// ```
+///
+/// # Skipping Fields
+///
+/// To skip recording one or more arguments to a function or method, pass
+/// the argument&#39;s name inside the `skip()` argument on the `#[instrument]`
+/// macro. This can be used when an argument to an instrumented function does
+/// not implement [`fmt::Debug`], or to exclude an argument with a verbose or
+/// costly `Debug` implementation. Note that:
+///
+/// - multiple argument names can be passed to `skip`.
+/// - arguments passed to `skip` do _not_ need to implement `fmt::Debug`.
+///
+/// You can also use `skip_all` to skip all arguments.
+///
+/// ## Examples
+///
+/// ```
+/// # use tracing_attributes::instrument;
+/// # use std::collections::HashMap;
+/// // This type doesn&#39;t implement `fmt::Debug`!
+/// struct NonDebug;
+///
+/// // `arg` will be recorded, while `non_debug` will not.
+/// #[instrument(skip(non_debug))]
+/// fn my_function(arg: usize, non_debug: NonDebug) {
+///     // ...
+/// }
+///
+/// // These arguments are huge
+/// #[instrument(skip_all)]
+/// fn my_big_data_function(large: Vec&lt;u8&gt;, also_large: HashMap&lt;String, String&gt;) {
+///     // ...
+/// }
+/// ```
+///
+/// Skipping the `self` parameter:
+///
+/// ```
+/// # use tracing_attributes::instrument;
+/// #[derive(Debug)]
+/// struct MyType {
+///    data: Vec&lt;u8&gt;, // Suppose this buffer is often quite long...
+/// }
+///
+/// impl MyType {
+///     // Suppose we don&#39;t want to print an entire kilobyte of `data`
+///     // every time this is called...
+///     #[instrument(skip(self))]
+///     pub fn my_method(&amp;mut self, an_interesting_argument: usize) {
+///          // ... do something (hopefully, using all that `data`!)
+///     }
+/// }
+/// ```
+///
+/// # Adding Fields
+///
+/// Additional fields (key-value pairs with arbitrary data) may be added to the
+/// generated span using the `fields` argument on the `#[instrument]` macro. Any
+/// Rust expression can be used as a field value in this manner. These
+/// expressions will be evaluated at the beginning of the function&#39;s body, so
+/// arguments to the function may be used in these expressions. Field names may
+/// also be specified *without* values. Doing so will result in an [empty field]
+/// whose value may be recorded later within the function body.
+///
+/// This supports the same [field syntax] as the `span!` and `event!` macros.
+///
+/// Note that overlap between the names of fields and (non-skipped) arguments
+/// will result in a compile error.
+///
+/// ## Examples
+///
+/// Adding a new field based on the value of an argument:
+///
+/// ```
+/// # use tracing_attributes::instrument;
+///
+/// // This will record a field named &quot;i&quot; with the value of `i` *and* a field
+/// // named &quot;next&quot; with the value of `i` + 1.
+/// #[instrument(fields(next = i + 1))]
+/// pub fn my_function(i: usize) {
+///     // ...
+/// }
+/// ```
+///
+/// Recording specific properties of a struct as their own fields:
+///
+/// ```
+/// # mod http {
+/// #   pub struct Error;
+/// #   pub struct Response&lt;B&gt; { pub(super) _b: std::marker::PhantomData&lt;B&gt; }
+/// #   pub struct Request&lt;B&gt; { _b: B }
+/// #   impl&lt;B&gt; std::fmt::Debug for Request&lt;B&gt; {
+/// #       fn fmt(&amp;self, f: &amp;mut std::fmt::Formatter&lt;&#39;_&gt;) -&gt; std::fmt::Result {
+/// #           f.pad(&quot;request&quot;)
+/// #       }
+/// #   }
+/// #   impl&lt;B&gt; Request&lt;B&gt; {
+/// #       pub fn uri(&amp;self) -&gt; &amp;str { &quot;fake&quot; }
+/// #       pub fn method(&amp;self) -&gt; &amp;str { &quot;GET&quot; }
+/// #   }
+/// # }
+/// # use tracing_attributes::instrument;
+///
+/// // This will record the request&#39;s URI and HTTP method as their own separate
+/// // fields.
+/// #[instrument(fields(http.uri = req.uri(), http.method = req.method()))]
+/// pub fn handle_request&lt;B&gt;(req: http::Request&lt;B&gt;) -&gt; http::Response&lt;B&gt; {
+///     // ... handle the request ...
+///     # http::Response { _b: std::marker::PhantomData }
+/// }
+/// ```
+///
+/// This can be used in conjunction with `skip` or `skip_all` to record only
+/// some fields of a struct:
+/// ```
+/// # use tracing_attributes::instrument;
+/// // Remember the struct with the very large `data` field from the earlier
+/// // example? Now it also has a `name`, which we might want to include in
+/// // our span.
+/// #[derive(Debug)]
+/// struct MyType {
+///    name: &amp;&#39;static str,
+///    data: Vec&lt;u8&gt;,
+/// }
+///
+/// impl MyType {
+///     // This will skip the `data` field, but will include `self.name`,
+///     // formatted using `fmt::Display`.
+///     #[instrument(skip(self), fields(self.name = %self.name))]
+///     pub fn my_method(&amp;mut self, an_interesting_argument: usize) {
+///          // ... do something (hopefully, using all that `data`!)
+///     }
+/// }
+/// ```
+///
+/// Adding an empty field to be recorded later:
+///
+/// ```
+/// # use tracing_attributes::instrument;
+///
+/// // This function does a very interesting and important mathematical calculation.
+/// // Suppose we want to record both the inputs to the calculation *and* its result...
+/// #[instrument(fields(result))]
+/// pub fn do_calculation(input_1: usize, input_2: usize) -&gt; usize {
+///     // Rerform the calculation.
+///     let result = input_1 + input_2;
+///
+///     // Record the result as part of the current span.
+///     tracing::Span::current().record(&quot;result&quot;, &amp;result);
+///
+///     // Now, the result will also be included on this event!
+///     tracing::info!(&quot;calculation complete!&quot;);
+///
+///     // ... etc ...
+///     # 0
+/// }
+/// ```
+///
+/// # Examples
+///
+/// Instrumenting a function:
+///
+/// ```
+/// # use tracing_attributes::instrument;
+/// #[instrument]
+/// pub fn my_function(my_arg: usize) {
+///     // This event will be recorded inside a span named `my_function` with the
+///     // field `my_arg`.
+///     tracing::info!(&quot;inside my_function!&quot;);
+///     // ...
+/// }
+/// ```
+/// Setting the level for the generated span:
+/// ```
+/// # use tracing_attributes::instrument;
+/// #[instrument(level = &quot;debug&quot;)]
+/// pub fn my_function() {
+///     // ...
+/// }
+/// ```
+/// Overriding the generated span&#39;s name:
+/// ```
+/// # use tracing_attributes::instrument;
+/// #[instrument(name = &quot;my_name&quot;)]
+/// pub fn my_function() {
+///     // ...
+/// }
+/// ```
+/// Overriding the generated span&#39;s target:
+/// ```
+/// # use tracing_attributes::instrument;
+/// #[instrument(target = &quot;my_target&quot;)]
+/// pub fn my_function() {
+///     // ...
+/// }
+/// ```
+/// Overriding the generated span&#39;s parent:
+/// ```
+/// # use tracing_attributes::instrument;
+/// #[instrument(parent = None)]
+/// pub fn my_function() {
+///     // ...
+/// }
+/// ```
+/// ```
+/// # use tracing_attributes::instrument;
+/// // A struct which owns a span handle.
+/// struct MyStruct
+/// {
+///     span: tracing::Span
+/// }
+///
+/// impl MyStruct
+/// {
+///     // Use the struct&#39;s `span` field as the parent span
+///     #[instrument(parent = &amp;self.span, skip(self))]
+///     fn my_method(&amp;self) {}
+/// }
+/// ```
+/// Specifying [`follows_from`] relationships:
+/// ```
+/// # use tracing_attributes::instrument;
+/// #[instrument(follows_from = causes)]
+/// pub fn my_function(causes: &amp;[tracing::Id]) {
+///     // ...
+/// }
+/// ```
+/// Any expression of type `impl IntoIterator&lt;Item = impl Into&lt;Option&lt;Id&gt;&gt;&gt;`
+/// may be provided to `follows_from`; e.g.:
+/// ```
+/// # use tracing_attributes::instrument;
+/// #[instrument(follows_from = [cause])]
+/// pub fn my_function(cause: &amp;tracing::span::EnteredSpan) {
+///     // ...
+/// }
+/// ```
+///
+///
+/// To skip recording an argument, pass the argument&#39;s name to the `skip`:
+///
+/// ```
+/// # use tracing_attributes::instrument;
+/// struct NonDebug;
+///
+/// #[instrument(skip(non_debug))]
+/// fn my_function(arg: usize, non_debug: NonDebug) {
+///     // ...
+/// }
+/// ```
+///
+/// To add an additional context to the span, pass key-value pairs to `fields`:
+///
+/// ```
+/// # use tracing_attributes::instrument;
+/// #[instrument(fields(foo=&quot;bar&quot;, id=1, show=true))]
+/// fn my_function(arg: usize) {
+///     // ...
+/// }
+/// ```
+///
+/// Adding the `ret` argument to `#[instrument]` will emit an event with the function&#39;s
+/// return value when the function returns:
+///
+/// ```
+/// # use tracing_attributes::instrument;
+/// #[instrument(ret)]
+/// fn my_function() -&gt; i32 {
+///     42
+/// }
+/// ```
+/// The return value event will have the same level as the span generated by `#[instrument]`.
+/// By default, this will be [`INFO`], but if the level is overridden, the event will be at the same
+/// level.
+///
+/// **Note**:  if the function returns a `Result&lt;T, E&gt;`, `ret` will record returned values if and
+/// only if the function returns [`Result::Ok`].
+///
+/// By default, returned values will be recorded using their [`std::fmt::Debug`] implementations.
+/// If a returned value implements [`std::fmt::Display`], it can be recorded using its `Display`
+/// implementation instead, by writing `ret(Display)`:
+///
+/// ```
+/// # use tracing_attributes::instrument;
+/// #[instrument(ret(Display))]
+/// fn my_function() -&gt; i32 {
+///     42
+/// }
+/// ```
+///
+/// If the function returns a `Result&lt;T, E&gt;` and `E` implements `std::fmt::Display`, you can add
+/// `err` or `err(Display)` to emit error events when the function returns `Err`:
+///
+/// ```
+/// # use tracing_attributes::instrument;
+/// #[instrument(err)]
+/// fn my_function(arg: usize) -&gt; Result&lt;(), std::io::Error&gt; {
+///     Ok(())
+/// }
+/// ```
+///
+/// By default, error values will be recorded using their `std::fmt::Display` implementations.
+/// If an error implements `std::fmt::Debug`, it can be recorded using its `Debug` implementation
+/// instead, by writing `err(Debug)`:
+///
+/// ```
+/// # use tracing_attributes::instrument;
+/// #[instrument(err(Debug))]
+/// fn my_function(arg: usize) -&gt; Result&lt;(), std::io::Error&gt; {
+///     Ok(())
+/// }
+/// ```
+///
+/// If a `target` is specified, both the `ret` and `err` arguments will emit outputs to
+/// the declared target (or the default channel if `target` is not specified).
+///
+/// The `ret` and `err` arguments can be combined in order to record an event if a
+/// function returns [`Result::Ok`] or [`Result::Err`]:
+///
+/// ```
+/// # use tracing_attributes::instrument;
+/// #[instrument(err, ret)]
+/// fn my_function(arg: usize) -&gt; Result&lt;(), std::io::Error&gt; {
+///     Ok(())
+/// }
+/// ```
+///
+/// `async fn`s may also be instrumented:
+///
+/// ```
+/// # use tracing_attributes::instrument;
+/// #[instrument]
+/// pub async fn my_function() -&gt; Result&lt;(), ()&gt; {
+///     // ...
+///     # Ok(())
+/// }
+/// ```
+///
+/// It also works with [async-trait](https://crates.io/crates/async-trait)
+/// (a crate that allows defining async functions in traits,
+/// something not currently possible in Rust),
+/// and hopefully most libraries that exhibit similar behaviors:
+///
+/// ```
+/// # use tracing::instrument;
+/// use async_trait::async_trait;
+///
+/// #[async_trait]
+/// pub trait Foo {
+///     async fn foo(&amp;self, arg: usize);
+/// }
+///
+/// #[derive(Debug)]
+/// struct FooImpl(usize);
+///
+/// #[async_trait]
+/// impl Foo for FooImpl {
+///     #[instrument(fields(value = self.0, tmp = std::any::type_name::&lt;Self&gt;()))]
+///     async fn foo(&amp;self, arg: usize) {}
+/// }
+/// ```
+///
+/// Note than on `async-trait` &lt;= 0.1.43, references to the `Self`
+/// type inside the `fields` argument were only allowed when the instrumented
+/// function is a method (i.e., the function receives `self` as an argument).
+/// For example, this *used to not work* because the instrument function
+/// didn&#39;t receive `self`:
+/// ```
+/// # use tracing::instrument;
+/// use async_trait::async_trait;
+///
+/// #[async_trait]
+/// pub trait Bar {
+///     async fn bar();
+/// }
+///
+/// #[derive(Debug)]
+/// struct BarImpl(usize);
+///
+/// #[async_trait]
+/// impl Bar for BarImpl {
+///     #[instrument(fields(tmp = std::any::type_name::&lt;Self&gt;()))]
+///     async fn bar() {}
+/// }
+/// ```
+/// Instead, you should manually rewrite any `Self` types as the type for
+/// which you implement the trait: `#[instrument(fields(tmp = std::any::type_name::&lt;Bar&gt;()))]`
+/// (or maybe you can just bump `async-trait`).
+///
+/// [span]: https://docs.rs/tracing/latest/tracing/span/index.html
+/// [name]: https://docs.rs/tracing/latest/tracing/struct.Metadata.html#method.name
+/// [target]: https://docs.rs/tracing/latest/tracing/struct.Metadata.html#method.target
+/// [level]: https://docs.rs/tracing/latest/tracing/struct.Level.html
+/// [module path]: https://docs.rs/tracing/latest/tracing/struct.Metadata.html#method.module_path
+/// [`INFO`]: https://docs.rs/tracing/latest/tracing/struct.Level.html#associatedconstant.INFO
+/// [empty field]: https://docs.rs/tracing/latest/tracing/field/struct.Empty.html
+/// [field syntax]: https://docs.rs/tracing/latest/tracing/#recording-fields
+/// [`follows_from`]: https://docs.rs/tracing/latest/tracing/struct.Span.html#method.follows_from
+/// [`tracing`]: https://github.com/tokio-rs/tracing
+/// [`fmt::Debug`]: std::fmt::Debug
+</span><span class="attribute">#[proc_macro_attribute]
+</span><span class="kw">pub fn </span>instrument(
+    args: proc_macro::TokenStream,
+    item: proc_macro::TokenStream,
+) -&gt; proc_macro::TokenStream {
+    <span class="kw">let </span>args = <span class="macro">syn::parse_macro_input!</span>(args <span class="kw">as </span>attr::InstrumentArgs);
+    <span class="comment">// Cloning a `TokenStream` is cheap since it&#39;s reference counted internally.
+    </span>instrument_precise(args.clone(), item.clone())
+        .unwrap_or_else(|_err| instrument_speculative(args, item))
 }
 
-<span class="doccomment">/// Instrument the function, without parsing the function body (instead using the raw tokens).</span>
-<span class="kw">fn</span> <span class="ident">instrument_speculative</span>(
-    <span class="ident">args</span>: <span class="ident">attr::InstrumentArgs</span>,
-    <span class="ident">item</span>: <span class="ident">proc_macro::TokenStream</span>,
-) -&gt; <span class="ident">proc_macro::TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="macro">syn::parse_macro_input!</span>(<span class="ident">item</span> <span class="kw">as</span> <span class="ident">MaybeItemFn</span>);
-    <span class="kw">let</span> <span class="ident">instrumented_function_name</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">ident</span>.<span class="ident">to_string</span>();
-    <span class="ident">expand::gen_function</span>(
-        <span class="ident">input</span>.<span class="ident">as_ref</span>(),
-        <span class="ident">args</span>,
-        <span class="ident">instrumented_function_name</span>.<span class="ident">as_str</span>(),
+<span class="doccomment">/// Instrument the function, without parsing the function body (instead using the raw tokens).
+</span><span class="kw">fn </span>instrument_speculative(
+    args: attr::InstrumentArgs,
+    item: proc_macro::TokenStream,
+) -&gt; proc_macro::TokenStream {
+    <span class="kw">let </span>input = <span class="macro">syn::parse_macro_input!</span>(item <span class="kw">as </span>MaybeItemFn);
+    <span class="kw">let </span>instrumented_function_name = input.sig.ident.to_string();
+    expand::gen_function(
+        input.as_ref(),
+        args,
+        instrumented_function_name.as_str(),
         <span class="prelude-val">None</span>,
     )
-    .<span class="ident">into</span>()
+    .into()
 }
 
-<span class="doccomment">/// Instrument the function, by fully parsing the function body,</span>
-<span class="doccomment">/// which allows us to rewrite some statements related to async-like patterns.</span>
-<span class="kw">fn</span> <span class="ident">instrument_precise</span>(
-    <span class="ident">args</span>: <span class="ident">attr::InstrumentArgs</span>,
-    <span class="ident">item</span>: <span class="ident">proc_macro::TokenStream</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">proc_macro::TokenStream</span>, <span class="ident">syn::Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">syn::parse</span>::<span class="op">&lt;</span><span class="ident">ItemFn</span><span class="op">&gt;</span>(<span class="ident">item</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">instrumented_function_name</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">ident</span>.<span class="ident">to_string</span>();
+<span class="doccomment">/// Instrument the function, by fully parsing the function body,
+/// which allows us to rewrite some statements related to async-like patterns.
+</span><span class="kw">fn </span>instrument_precise(
+    args: attr::InstrumentArgs,
+    item: proc_macro::TokenStream,
+) -&gt; <span class="prelude-ty">Result</span>&lt;proc_macro::TokenStream, syn::Error&gt; {
+    <span class="kw">let </span>input = syn::parse::&lt;ItemFn&gt;(item)<span class="question-mark">?</span>;
+    <span class="kw">let </span>instrumented_function_name = input.sig.ident.to_string();
 
-    <span class="comment">// check for async_trait-like patterns in the block, and instrument</span>
-    <span class="comment">// the future instead of the wrapper</span>
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">async_like</span>) <span class="op">=</span> <span class="ident">expand::AsyncInfo::from_fn</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>) {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">async_like</span>.<span class="ident">gen_async</span>(<span class="ident">args</span>, <span class="ident">instrumented_function_name</span>.<span class="ident">as_str</span>()));
+    <span class="comment">// check for async_trait-like patterns in the block, and instrument
+    // the future instead of the wrapper
+    </span><span class="kw">if let </span><span class="prelude-val">Some</span>(async_like) = expand::AsyncInfo::from_fn(<span class="kw-2">&amp;</span>input) {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(async_like.gen_async(args, instrumented_function_name.as_str()));
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">expand::gen_function</span>(
-        (<span class="kw-2">&amp;</span><span class="ident">input</span>).<span class="ident">into</span>(),
-        <span class="ident">args</span>,
-        <span class="ident">instrumented_function_name</span>.<span class="ident">as_str</span>(),
+    <span class="prelude-val">Ok</span>(expand::gen_function(
+        (<span class="kw-2">&amp;</span>input).into(),
+        args,
+        instrumented_function_name.as_str(),
         <span class="prelude-val">None</span>,
     )
-    .<span class="ident">into</span>())
+    .into())
 }
 
-<span class="doccomment">/// This is a more flexible/imprecise `ItemFn` type,</span>
-<span class="doccomment">/// which&#39;s block is just a `TokenStream` (it may contain invalid code).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">struct</span> <span class="ident">MaybeItemFn</span> {
-    <span class="ident">attrs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Attribute</span><span class="op">&gt;</span>,
-    <span class="ident">vis</span>: <span class="ident">Visibility</span>,
-    <span class="ident">sig</span>: <span class="ident">Signature</span>,
-    <span class="ident">block</span>: <span class="ident">TokenStream</span>,
+<span class="doccomment">/// This is a more flexible/imprecise `ItemFn` type,
+/// which&#39;s block is just a `TokenStream` (it may contain invalid code).
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">struct </span>MaybeItemFn {
+    attrs: Vec&lt;Attribute&gt;,
+    vis: Visibility,
+    sig: Signature,
+    block: TokenStream,
 }
 
-<span class="kw">impl</span> <span class="ident">MaybeItemFn</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">MaybeItemFnRef</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">TokenStream</span><span class="op">&gt;</span> {
-        <span class="ident">MaybeItemFnRef</span> {
-            <span class="ident">attrs</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">attrs</span>,
-            <span class="ident">vis</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">vis</span>,
-            <span class="ident">sig</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">sig</span>,
-            <span class="ident">block</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">block</span>,
+<span class="kw">impl </span>MaybeItemFn {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; MaybeItemFnRef&lt;<span class="lifetime">&#39;_</span>, TokenStream&gt; {
+        MaybeItemFnRef {
+            attrs: <span class="kw-2">&amp;</span><span class="self">self</span>.attrs,
+            vis: <span class="kw-2">&amp;</span><span class="self">self</span>.vis,
+            sig: <span class="kw-2">&amp;</span><span class="self">self</span>.sig,
+            block: <span class="kw-2">&amp;</span><span class="self">self</span>.block,
         }
     }
 }
 
-<span class="doccomment">/// This parses a `TokenStream` into a `MaybeItemFn`</span>
-<span class="doccomment">/// (just like `ItemFn`, but skips parsing the body).</span>
-<span class="kw">impl</span> <span class="ident">Parse</span> <span class="kw">for</span> <span class="ident">MaybeItemFn</span> {
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">input</span>: <span class="ident">ParseStream</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">syn::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">attrs</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">call</span>(<span class="ident">syn::Attribute::parse_outer</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">vis</span>: <span class="ident">Visibility</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">sig</span>: <span class="ident">Signature</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">block</span>: <span class="ident">TokenStream</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">attrs</span>,
-            <span class="ident">vis</span>,
-            <span class="ident">sig</span>,
-            <span class="ident">block</span>,
+<span class="doccomment">/// This parses a `TokenStream` into a `MaybeItemFn`
+/// (just like `ItemFn`, but skips parsing the body).
+</span><span class="kw">impl </span>Parse <span class="kw">for </span>MaybeItemFn {
+    <span class="kw">fn </span>parse(input: ParseStream&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; syn::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>attrs = input.call(syn::Attribute::parse_outer)<span class="question-mark">?</span>;
+        <span class="kw">let </span>vis: Visibility = input.parse()<span class="question-mark">?</span>;
+        <span class="kw">let </span>sig: Signature = input.parse()<span class="question-mark">?</span>;
+        <span class="kw">let </span>block: TokenStream = input.parse()<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            attrs,
+            vis,
+            sig,
+            block,
         })
     }
 }
 
-<span class="doccomment">/// A generic reference type for `MaybeItemFn`,</span>
-<span class="doccomment">/// that takes a generic block type `B` that implements `ToTokens` (eg. `TokenStream`, `Block`).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">struct</span> <span class="ident">MaybeItemFnRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">B</span>: <span class="ident">ToTokens</span><span class="op">&gt;</span> {
-    <span class="ident">attrs</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Attribute</span><span class="op">&gt;</span>,
-    <span class="ident">vis</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Visibility</span>,
-    <span class="ident">sig</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Signature</span>,
-    <span class="ident">block</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">B</span>,
+<span class="doccomment">/// A generic reference type for `MaybeItemFn`,
+/// that takes a generic block type `B` that implements `ToTokens` (eg. `TokenStream`, `Block`).
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">struct </span>MaybeItemFnRef&lt;<span class="lifetime">&#39;a</span>, B: ToTokens&gt; {
+    attrs: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Vec&lt;Attribute&gt;,
+    vis: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Visibility,
+    sig: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Signature,
+    block: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>B,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ItemFn</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MaybeItemFnRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ItemFn</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">MaybeItemFnRef</span> {
-            <span class="ident">attrs</span>: <span class="kw-2">&amp;</span><span class="ident">val</span>.<span class="ident">attrs</span>,
-            <span class="ident">vis</span>: <span class="kw-2">&amp;</span><span class="ident">val</span>.<span class="ident">vis</span>,
-            <span class="ident">sig</span>: <span class="kw-2">&amp;</span><span class="ident">val</span>.<span class="ident">sig</span>,
-            <span class="ident">block</span>: <span class="kw-2">&amp;</span><span class="ident">val</span>.<span class="ident">block</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ItemFn&gt; <span class="kw">for </span>MaybeItemFnRef&lt;<span class="lifetime">&#39;a</span>, Box&lt;Block&gt;&gt; {
+    <span class="kw">fn </span>from(val: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ItemFn) -&gt; <span class="self">Self </span>{
+        MaybeItemFnRef {
+            attrs: <span class="kw-2">&amp;</span>val.attrs,
+            vis: <span class="kw-2">&amp;</span>val.vis,
+            sig: <span class="kw-2">&amp;</span>val.sig,
+            block: <span class="kw-2">&amp;</span>val.block,
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing_attributes" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing_attributes" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

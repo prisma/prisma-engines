@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/server/handy.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>handy.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/server/handy.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>handy.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -276,283 +276,283 @@
 <span id="276">276</span>
 <span id="277">277</span>
 <span id="278">278</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::Error</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::key</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::limited_cache</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::server</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::server::ClientHello</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sign</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::error::Error;
+<span class="kw">use </span><span class="kw">crate</span>::key;
+<span class="kw">use </span><span class="kw">crate</span>::limited_cache;
+<span class="kw">use </span><span class="kw">crate</span>::server;
+<span class="kw">use </span><span class="kw">crate</span>::server::ClientHello;
+<span class="kw">use </span><span class="kw">crate</span>::sign;
 
-<span class="kw">use</span> <span class="ident">std::collections</span>;
-<span class="kw">use</span> <span class="ident">std::sync</span>::{<span class="ident">Arc</span>, <span class="ident">Mutex</span>};
+<span class="kw">use </span>std::collections;
+<span class="kw">use </span>std::sync::{Arc, Mutex};
 
-<span class="doccomment">/// Something which never stores sessions.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NoServerSessionStorage</span> {}
+<span class="doccomment">/// Something which never stores sessions.
+</span><span class="kw">pub struct </span>NoServerSessionStorage {}
 
-<span class="kw">impl</span> <span class="ident">server::StoresServerSessions</span> <span class="kw">for</span> <span class="ident">NoServerSessionStorage</span> {
-    <span class="kw">fn</span> <span class="ident">put</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_id</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">_sec</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
-    }
-    <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_id</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="prelude-val">None</span>
-    }
-    <span class="kw">fn</span> <span class="ident">take</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_id</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="prelude-val">None</span>
-    }
-    <span class="kw">fn</span> <span class="ident">can_cache</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
-    }
+<span class="kw">impl </span>server::StoresServerSessions <span class="kw">for </span>NoServerSessionStorage {
+    <span class="kw">fn </span>put(<span class="kw-2">&amp;</span><span class="self">self</span>, _id: Vec&lt;u8&gt;, _sec: Vec&lt;u8&gt;) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
+    <span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, _id: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt; {
+        <span class="prelude-val">None
+    </span>}
+    <span class="kw">fn </span>take(<span class="kw-2">&amp;</span><span class="self">self</span>, _id: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt; {
+        <span class="prelude-val">None
+    </span>}
+    <span class="kw">fn </span>can_cache(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
 }
 
-<span class="doccomment">/// An implementer of `StoresServerSessions` that stores everything</span>
-<span class="doccomment">/// in memory.  If enforces a limit on the number of stored sessions</span>
-<span class="doccomment">/// to bound memory usage.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ServerSessionMemoryCache</span> {
-    <span class="ident">cache</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">limited_cache::LimitedCache</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// An implementer of `StoresServerSessions` that stores everything
+/// in memory.  If enforces a limit on the number of stored sessions
+/// to bound memory usage.
+</span><span class="kw">pub struct </span>ServerSessionMemoryCache {
+    cache: Mutex&lt;limited_cache::LimitedCache&lt;Vec&lt;u8&gt;, Vec&lt;u8&gt;&gt;&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">ServerSessionMemoryCache</span> {
-    <span class="doccomment">/// Make a new ServerSessionMemoryCache.  `size` is the maximum</span>
-    <span class="doccomment">/// number of stored sessions, and may be rounded-up for</span>
-    <span class="doccomment">/// efficiency.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">size</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Arc</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">Arc::new</span>(<span class="self">Self</span> {
-            <span class="ident">cache</span>: <span class="ident">Mutex::new</span>(<span class="ident">limited_cache::LimitedCache::new</span>(<span class="ident">size</span>)),
+<span class="kw">impl </span>ServerSessionMemoryCache {
+    <span class="doccomment">/// Make a new ServerSessionMemoryCache.  `size` is the maximum
+    /// number of stored sessions, and may be rounded-up for
+    /// efficiency.
+    </span><span class="kw">pub fn </span>new(size: usize) -&gt; Arc&lt;<span class="self">Self</span>&gt; {
+        Arc::new(<span class="self">Self </span>{
+            cache: Mutex::new(limited_cache::LimitedCache::new(size)),
         })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">server::StoresServerSessions</span> <span class="kw">for</span> <span class="ident">ServerSessionMemoryCache</span> {
-    <span class="kw">fn</span> <span class="ident">put</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">value</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">cache</span>
-            .<span class="ident">lock</span>()
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">insert</span>(<span class="ident">key</span>, <span class="ident">value</span>);
-        <span class="bool-val">true</span>
+<span class="kw">impl </span>server::StoresServerSessions <span class="kw">for </span>ServerSessionMemoryCache {
+    <span class="kw">fn </span>put(<span class="kw-2">&amp;</span><span class="self">self</span>, key: Vec&lt;u8&gt;, value: Vec&lt;u8&gt;) -&gt; bool {
+        <span class="self">self</span>.cache
+            .lock()
+            .unwrap()
+            .insert(key, value);
+        <span class="bool-val">true
+    </span>}
+
+    <span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt; {
+        <span class="self">self</span>.cache
+            .lock()
+            .unwrap()
+            .get(key)
+            .cloned()
     }
 
-    <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">cache</span>
-            .<span class="ident">lock</span>()
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">get</span>(<span class="ident">key</span>)
-            .<span class="ident">cloned</span>()
+    <span class="kw">fn </span>take(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt; {
+        <span class="self">self</span>.cache.lock().unwrap().remove(key)
     }
 
-    <span class="kw">fn</span> <span class="ident">take</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">cache</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">remove</span>(<span class="ident">key</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">can_cache</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">true</span>
-    }
+    <span class="kw">fn </span>can_cache(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">true
+    </span>}
 }
 
-<span class="doccomment">/// Something which never produces tickets.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">NeverProducesTickets</span> {}
+<span class="doccomment">/// Something which never produces tickets.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>NeverProducesTickets {}
 
-<span class="kw">impl</span> <span class="ident">server::ProducesTickets</span> <span class="kw">for</span> <span class="ident">NeverProducesTickets</span> {
-    <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
-    }
-    <span class="kw">fn</span> <span class="ident">lifetime</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="number">0</span>
-    }
-    <span class="kw">fn</span> <span class="ident">encrypt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="prelude-val">None</span>
-    }
-    <span class="kw">fn</span> <span class="ident">decrypt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="prelude-val">None</span>
-    }
+<span class="kw">impl </span>server::ProducesTickets <span class="kw">for </span>NeverProducesTickets {
+    <span class="kw">fn </span>enabled(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
+    <span class="kw">fn </span>lifetime(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="number">0
+    </span>}
+    <span class="kw">fn </span>encrypt(<span class="kw-2">&amp;</span><span class="self">self</span>, _bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt; {
+        <span class="prelude-val">None
+    </span>}
+    <span class="kw">fn </span>decrypt(<span class="kw-2">&amp;</span><span class="self">self</span>, _bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt; {
+        <span class="prelude-val">None
+    </span>}
 }
 
-<span class="doccomment">/// Something which always resolves to the same cert chain.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">AlwaysResolvesChain</span>(<span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">sign::CertifiedKey</span><span class="op">&gt;</span>);
+<span class="doccomment">/// Something which always resolves to the same cert chain.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>AlwaysResolvesChain(Arc&lt;sign::CertifiedKey&gt;);
 
-<span class="kw">impl</span> <span class="ident">AlwaysResolvesChain</span> {
-    <span class="doccomment">/// Creates an `AlwaysResolvesChain`, auto-detecting the underlying private</span>
-    <span class="doccomment">/// key type and encoding.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">chain</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">key::Certificate</span><span class="op">&gt;</span>,
-        <span class="ident">priv_key</span>: <span class="kw-2">&amp;</span><span class="ident">key::PrivateKey</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">sign::any_supported_type</span>(<span class="ident">priv_key</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::General</span>(<span class="string">&quot;invalid private key&quot;</span>.<span class="ident">into</span>()))<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(<span class="ident">Arc::new</span>(<span class="ident">sign::CertifiedKey::new</span>(<span class="ident">chain</span>, <span class="ident">key</span>))))
+<span class="kw">impl </span>AlwaysResolvesChain {
+    <span class="doccomment">/// Creates an `AlwaysResolvesChain`, auto-detecting the underlying private
+    /// key type and encoding.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new(
+        chain: Vec&lt;key::Certificate&gt;,
+        priv_key: <span class="kw-2">&amp;</span>key::PrivateKey,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">let </span>key = sign::any_supported_type(priv_key)
+            .map_err(|<span class="kw">_</span>| Error::General(<span class="string">&quot;invalid private key&quot;</span>.into()))<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(Arc::new(sign::CertifiedKey::new(chain, key))))
     }
 
-    <span class="doccomment">/// Creates an `AlwaysResolvesChain`, auto-detecting the underlying private</span>
-    <span class="doccomment">/// key type and encoding.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If non-empty, the given OCSP response and SCTs are attached.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new_with_extras</span>(
-        <span class="ident">chain</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">key::Certificate</span><span class="op">&gt;</span>,
-        <span class="ident">priv_key</span>: <span class="kw-2">&amp;</span><span class="ident">key::PrivateKey</span>,
-        <span class="ident">ocsp</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-        <span class="ident">scts</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">chain</span>, <span class="ident">priv_key</span>)<span class="question-mark">?</span>;
+    <span class="doccomment">/// Creates an `AlwaysResolvesChain`, auto-detecting the underlying private
+    /// key type and encoding.
+    ///
+    /// If non-empty, the given OCSP response and SCTs are attached.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new_with_extras(
+        chain: Vec&lt;key::Certificate&gt;,
+        priv_key: <span class="kw-2">&amp;</span>key::PrivateKey,
+        ocsp: Vec&lt;u8&gt;,
+        scts: Vec&lt;u8&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, Error&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>r = <span class="self">Self</span>::new(chain, priv_key)<span class="question-mark">?</span>;
 
         {
-            <span class="kw">let</span> <span class="ident">cert</span> <span class="op">=</span> <span class="ident">Arc::make_mut</span>(<span class="kw-2">&amp;mut</span> <span class="ident">r</span>.<span class="number">0</span>);
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">ocsp</span>.<span class="ident">is_empty</span>() {
-                <span class="ident">cert</span>.<span class="ident">ocsp</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ocsp</span>);
+            <span class="kw">let </span>cert = Arc::make_mut(<span class="kw-2">&amp;mut </span>r.<span class="number">0</span>);
+            <span class="kw">if </span>!ocsp.is_empty() {
+                cert.ocsp = <span class="prelude-val">Some</span>(ocsp);
             }
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">scts</span>.<span class="ident">is_empty</span>() {
-                <span class="ident">cert</span>.<span class="ident">sct_list</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">scts</span>);
+            <span class="kw">if </span>!scts.is_empty() {
+                cert.sct_list = <span class="prelude-val">Some</span>(scts);
             }
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">r</span>)
+        <span class="prelude-val">Ok</span>(r)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">server::ResolvesServerCert</span> <span class="kw">for</span> <span class="ident">AlwaysResolvesChain</span> {
-    <span class="kw">fn</span> <span class="ident">resolve</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_client_hello</span>: <span class="ident">ClientHello</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">sign::CertifiedKey</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>))
+<span class="kw">impl </span>server::ResolvesServerCert <span class="kw">for </span>AlwaysResolvesChain {
+    <span class="kw">fn </span>resolve(<span class="kw-2">&amp;</span><span class="self">self</span>, _client_hello: ClientHello) -&gt; <span class="prelude-ty">Option</span>&lt;Arc&lt;sign::CertifiedKey&gt;&gt; {
+        <span class="prelude-val">Some</span>(Arc::clone(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>))
     }
 }
 
-<span class="doccomment">/// Something that resolves do different cert chains/keys based</span>
-<span class="doccomment">/// on client-supplied server name (via SNI).</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ResolvesServerCertUsingSni</span> {
-    <span class="ident">by_name</span>: <span class="ident">collections::HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">sign::CertifiedKey</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Something that resolves do different cert chains/keys based
+/// on client-supplied server name (via SNI).
+</span><span class="kw">pub struct </span>ResolvesServerCertUsingSni {
+    by_name: collections::HashMap&lt;String, Arc&lt;sign::CertifiedKey&gt;&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">ResolvesServerCertUsingSni</span> {
-    <span class="doccomment">/// Create a new and empty (i.e., knows no certificates) resolver.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">by_name</span>: <span class="ident">collections::HashMap::new</span>(),
+<span class="kw">impl </span>ResolvesServerCertUsingSni {
+    <span class="doccomment">/// Create a new and empty (i.e., knows no certificates) resolver.
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            by_name: collections::HashMap::new(),
         }
     }
 
-    <span class="doccomment">/// Add a new `sign::CertifiedKey` to be used for the given SNI `name`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function fails if `name` is not a valid DNS name, or if</span>
-    <span class="doccomment">/// it&#39;s not valid for the supplied certificate, or if the certificate</span>
-    <span class="doccomment">/// chain is syntactically faulty.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">ck</span>: <span class="ident">sign::CertifiedKey</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">checked_name</span> <span class="op">=</span> <span class="ident">webpki::DnsNameRef::try_from_ascii_str</span>(<span class="ident">name</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::General</span>(<span class="string">&quot;Bad DNS name&quot;</span>.<span class="ident">into</span>()))<span class="question-mark">?</span>
-            .<span class="ident">to_owned</span>();
+    <span class="doccomment">/// Add a new `sign::CertifiedKey` to be used for the given SNI `name`.
+    ///
+    /// This function fails if `name` is not a valid DNS name, or if
+    /// it&#39;s not valid for the supplied certificate, or if the certificate
+    /// chain is syntactically faulty.
+    </span><span class="kw">pub fn </span>add(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str, ck: sign::CertifiedKey) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="kw">let </span>checked_name = webpki::DnsNameRef::try_from_ascii_str(name)
+            .map_err(|<span class="kw">_</span>| Error::General(<span class="string">&quot;Bad DNS name&quot;</span>.into()))<span class="question-mark">?
+            </span>.to_owned();
 
-        <span class="ident">ck</span>.<span class="ident">cross_check_end_entity_cert</span>(<span class="prelude-val">Some</span>(<span class="ident">checked_name</span>.<span class="ident">as_ref</span>()))<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">as_str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="ident">checked_name</span>.<span class="ident">as_ref</span>().<span class="ident">into</span>();
-        <span class="self">self</span>.<span class="ident">by_name</span>
-            .<span class="ident">insert</span>(<span class="ident">as_str</span>.<span class="ident">to_string</span>(), <span class="ident">Arc::new</span>(<span class="ident">ck</span>));
+        ck.cross_check_end_entity_cert(<span class="prelude-val">Some</span>(checked_name.as_ref()))<span class="question-mark">?</span>;
+        <span class="kw">let </span>as_str: <span class="kw-2">&amp;</span>str = checked_name.as_ref().into();
+        <span class="self">self</span>.by_name
+            .insert(as_str.to_string(), Arc::new(ck));
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">server::ResolvesServerCert</span> <span class="kw">for</span> <span class="ident">ResolvesServerCertUsingSni</span> {
-    <span class="kw">fn</span> <span class="ident">resolve</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">client_hello</span>: <span class="ident">ClientHello</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">sign::CertifiedKey</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">client_hello</span>.<span class="ident">server_name</span>() {
-            <span class="self">self</span>.<span class="ident">by_name</span>.<span class="ident">get</span>(<span class="ident">name</span>).<span class="ident">map</span>(<span class="ident">Arc::clone</span>)
-        } <span class="kw">else</span> {
-            <span class="comment">// This kind of resolver requires SNI</span>
-            <span class="prelude-val">None</span>
-        }
+<span class="kw">impl </span>server::ResolvesServerCert <span class="kw">for </span>ResolvesServerCertUsingSni {
+    <span class="kw">fn </span>resolve(<span class="kw-2">&amp;</span><span class="self">self</span>, client_hello: ClientHello) -&gt; <span class="prelude-ty">Option</span>&lt;Arc&lt;sign::CertifiedKey&gt;&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(name) = client_hello.server_name() {
+            <span class="self">self</span>.by_name.get(name).map(Arc::clone)
+        } <span class="kw">else </span>{
+            <span class="comment">// This kind of resolver requires SNI
+            </span><span class="prelude-val">None
+        </span>}
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::server::ProducesTickets</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::server::ResolvesServerCert</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::server::StoresServerSessions</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::server::ProducesTickets;
+    <span class="kw">use </span><span class="kw">crate</span>::server::ResolvesServerCert;
+    <span class="kw">use </span><span class="kw">crate</span>::server::StoresServerSessions;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_noserversessionstorage_drops_put</span>() {
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">NoServerSessionStorage</span> {};
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">c</span>.<span class="ident">put</span>(<span class="macro">vec!</span>[<span class="number">0x01</span>], <span class="macro">vec!</span>[<span class="number">0x02</span>]));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_noserversessionstorage_drops_put() {
+        <span class="kw">let </span>c = NoServerSessionStorage {};
+        <span class="macro">assert!</span>(!c.put(<span class="macro">vec!</span>[<span class="number">0x01</span>], <span class="macro">vec!</span>[<span class="number">0x02</span>]));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_noserversessionstorage_denies_gets</span>() {
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">NoServerSessionStorage</span> {};
-        <span class="ident">c</span>.<span class="ident">put</span>(<span class="macro">vec!</span>[<span class="number">0x01</span>], <span class="macro">vec!</span>[<span class="number">0x02</span>]);
-        <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span>[]), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span>[<span class="number">0x01</span>]), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span>[<span class="number">0x02</span>]), <span class="prelude-val">None</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_noserversessionstorage_denies_gets() {
+        <span class="kw">let </span>c = NoServerSessionStorage {};
+        c.put(<span class="macro">vec!</span>[<span class="number">0x01</span>], <span class="macro">vec!</span>[<span class="number">0x02</span>]);
+        <span class="macro">assert_eq!</span>(c.get(<span class="kw-2">&amp;</span>[]), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(c.get(<span class="kw-2">&amp;</span>[<span class="number">0x01</span>]), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(c.get(<span class="kw-2">&amp;</span>[<span class="number">0x02</span>]), <span class="prelude-val">None</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_noserversessionstorage_denies_takes</span>() {
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">NoServerSessionStorage</span> {};
-        <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">take</span>(<span class="kw-2">&amp;</span>[]), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">take</span>(<span class="kw-2">&amp;</span>[<span class="number">0x01</span>]), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">take</span>(<span class="kw-2">&amp;</span>[<span class="number">0x02</span>]), <span class="prelude-val">None</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_noserversessionstorage_denies_takes() {
+        <span class="kw">let </span>c = NoServerSessionStorage {};
+        <span class="macro">assert_eq!</span>(c.take(<span class="kw-2">&amp;</span>[]), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(c.take(<span class="kw-2">&amp;</span>[<span class="number">0x01</span>]), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(c.take(<span class="kw-2">&amp;</span>[<span class="number">0x02</span>]), <span class="prelude-val">None</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_serversessionmemorycache_accepts_put</span>() {
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">ServerSessionMemoryCache::new</span>(<span class="number">4</span>);
-        <span class="macro">assert!</span>(<span class="ident">c</span>.<span class="ident">put</span>(<span class="macro">vec!</span>[<span class="number">0x01</span>], <span class="macro">vec!</span>[<span class="number">0x02</span>]));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_serversessionmemorycache_accepts_put() {
+        <span class="kw">let </span>c = ServerSessionMemoryCache::new(<span class="number">4</span>);
+        <span class="macro">assert!</span>(c.put(<span class="macro">vec!</span>[<span class="number">0x01</span>], <span class="macro">vec!</span>[<span class="number">0x02</span>]));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_serversessionmemorycache_persists_put</span>() {
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">ServerSessionMemoryCache::new</span>(<span class="number">4</span>);
-        <span class="macro">assert!</span>(<span class="ident">c</span>.<span class="ident">put</span>(<span class="macro">vec!</span>[<span class="number">0x01</span>], <span class="macro">vec!</span>[<span class="number">0x02</span>]));
-        <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span>[<span class="number">0x01</span>]), <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="number">0x02</span>]));
-        <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span>[<span class="number">0x01</span>]), <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="number">0x02</span>]));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_serversessionmemorycache_persists_put() {
+        <span class="kw">let </span>c = ServerSessionMemoryCache::new(<span class="number">4</span>);
+        <span class="macro">assert!</span>(c.put(<span class="macro">vec!</span>[<span class="number">0x01</span>], <span class="macro">vec!</span>[<span class="number">0x02</span>]));
+        <span class="macro">assert_eq!</span>(c.get(<span class="kw-2">&amp;</span>[<span class="number">0x01</span>]), <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="number">0x02</span>]));
+        <span class="macro">assert_eq!</span>(c.get(<span class="kw-2">&amp;</span>[<span class="number">0x01</span>]), <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="number">0x02</span>]));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_serversessionmemorycache_overwrites_put</span>() {
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">ServerSessionMemoryCache::new</span>(<span class="number">4</span>);
-        <span class="macro">assert!</span>(<span class="ident">c</span>.<span class="ident">put</span>(<span class="macro">vec!</span>[<span class="number">0x01</span>], <span class="macro">vec!</span>[<span class="number">0x02</span>]));
-        <span class="macro">assert!</span>(<span class="ident">c</span>.<span class="ident">put</span>(<span class="macro">vec!</span>[<span class="number">0x01</span>], <span class="macro">vec!</span>[<span class="number">0x04</span>]));
-        <span class="macro">assert_eq!</span>(<span class="ident">c</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span>[<span class="number">0x01</span>]), <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="number">0x04</span>]));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_serversessionmemorycache_overwrites_put() {
+        <span class="kw">let </span>c = ServerSessionMemoryCache::new(<span class="number">4</span>);
+        <span class="macro">assert!</span>(c.put(<span class="macro">vec!</span>[<span class="number">0x01</span>], <span class="macro">vec!</span>[<span class="number">0x02</span>]));
+        <span class="macro">assert!</span>(c.put(<span class="macro">vec!</span>[<span class="number">0x01</span>], <span class="macro">vec!</span>[<span class="number">0x04</span>]));
+        <span class="macro">assert_eq!</span>(c.get(<span class="kw-2">&amp;</span>[<span class="number">0x01</span>]), <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="number">0x04</span>]));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_serversessionmemorycache_drops_to_maintain_size_invariant</span>() {
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">ServerSessionMemoryCache::new</span>(<span class="number">2</span>);
-        <span class="macro">assert!</span>(<span class="ident">c</span>.<span class="ident">put</span>(<span class="macro">vec!</span>[<span class="number">0x01</span>], <span class="macro">vec!</span>[<span class="number">0x02</span>]));
-        <span class="macro">assert!</span>(<span class="ident">c</span>.<span class="ident">put</span>(<span class="macro">vec!</span>[<span class="number">0x03</span>], <span class="macro">vec!</span>[<span class="number">0x04</span>]));
-        <span class="macro">assert!</span>(<span class="ident">c</span>.<span class="ident">put</span>(<span class="macro">vec!</span>[<span class="number">0x05</span>], <span class="macro">vec!</span>[<span class="number">0x06</span>]));
-        <span class="macro">assert!</span>(<span class="ident">c</span>.<span class="ident">put</span>(<span class="macro">vec!</span>[<span class="number">0x07</span>], <span class="macro">vec!</span>[<span class="number">0x08</span>]));
-        <span class="macro">assert!</span>(<span class="ident">c</span>.<span class="ident">put</span>(<span class="macro">vec!</span>[<span class="number">0x09</span>], <span class="macro">vec!</span>[<span class="number">0x0a</span>]));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_serversessionmemorycache_drops_to_maintain_size_invariant() {
+        <span class="kw">let </span>c = ServerSessionMemoryCache::new(<span class="number">2</span>);
+        <span class="macro">assert!</span>(c.put(<span class="macro">vec!</span>[<span class="number">0x01</span>], <span class="macro">vec!</span>[<span class="number">0x02</span>]));
+        <span class="macro">assert!</span>(c.put(<span class="macro">vec!</span>[<span class="number">0x03</span>], <span class="macro">vec!</span>[<span class="number">0x04</span>]));
+        <span class="macro">assert!</span>(c.put(<span class="macro">vec!</span>[<span class="number">0x05</span>], <span class="macro">vec!</span>[<span class="number">0x06</span>]));
+        <span class="macro">assert!</span>(c.put(<span class="macro">vec!</span>[<span class="number">0x07</span>], <span class="macro">vec!</span>[<span class="number">0x08</span>]));
+        <span class="macro">assert!</span>(c.put(<span class="macro">vec!</span>[<span class="number">0x09</span>], <span class="macro">vec!</span>[<span class="number">0x0a</span>]));
 
-        <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span>[<span class="number">0x01</span>]).<span class="ident">iter</span>().<span class="ident">count</span>()
-            <span class="op">+</span> <span class="ident">c</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span>[<span class="number">0x03</span>]).<span class="ident">iter</span>().<span class="ident">count</span>()
-            <span class="op">+</span> <span class="ident">c</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span>[<span class="number">0x05</span>]).<span class="ident">iter</span>().<span class="ident">count</span>()
-            <span class="op">+</span> <span class="ident">c</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span>[<span class="number">0x07</span>]).<span class="ident">iter</span>().<span class="ident">count</span>()
-            <span class="op">+</span> <span class="ident">c</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span>[<span class="number">0x09</span>]).<span class="ident">iter</span>().<span class="ident">count</span>();
+        <span class="kw">let </span>count = c.get(<span class="kw-2">&amp;</span>[<span class="number">0x01</span>]).iter().count()
+            + c.get(<span class="kw-2">&amp;</span>[<span class="number">0x03</span>]).iter().count()
+            + c.get(<span class="kw-2">&amp;</span>[<span class="number">0x05</span>]).iter().count()
+            + c.get(<span class="kw-2">&amp;</span>[<span class="number">0x07</span>]).iter().count()
+            + c.get(<span class="kw-2">&amp;</span>[<span class="number">0x09</span>]).iter().count();
 
-        <span class="macro">assert!</span>(<span class="ident">count</span> <span class="op">&lt;</span> <span class="number">5</span>);
+        <span class="macro">assert!</span>(count &lt; <span class="number">5</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_neverproducestickets_does_nothing</span>() {
-        <span class="kw">let</span> <span class="ident">npt</span> <span class="op">=</span> <span class="ident">NeverProducesTickets</span> {};
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">npt</span>.<span class="ident">enabled</span>());
-        <span class="macro">assert_eq!</span>(<span class="number">0</span>, <span class="ident">npt</span>.<span class="ident">lifetime</span>());
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, <span class="ident">npt</span>.<span class="ident">encrypt</span>(<span class="kw-2">&amp;</span>[]));
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, <span class="ident">npt</span>.<span class="ident">decrypt</span>(<span class="kw-2">&amp;</span>[]));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_neverproducestickets_does_nothing() {
+        <span class="kw">let </span>npt = NeverProducesTickets {};
+        <span class="macro">assert!</span>(!npt.enabled());
+        <span class="macro">assert_eq!</span>(<span class="number">0</span>, npt.lifetime());
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, npt.encrypt(<span class="kw-2">&amp;</span>[]));
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, npt.decrypt(<span class="kw-2">&amp;</span>[]));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_resolvesservercertusingsni_requires_sni</span>() {
-        <span class="kw">let</span> <span class="ident">rscsni</span> <span class="op">=</span> <span class="ident">ResolvesServerCertUsingSni::new</span>();
-        <span class="macro">assert!</span>(<span class="ident">rscsni</span>
-            .<span class="ident">resolve</span>(<span class="ident">ClientHello::new</span>(<span class="kw-2">&amp;</span><span class="prelude-val">None</span>, <span class="kw-2">&amp;</span>[], <span class="prelude-val">None</span>, <span class="kw-2">&amp;</span>[]))
-            .<span class="ident">is_none</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_resolvesservercertusingsni_requires_sni() {
+        <span class="kw">let </span>rscsni = ResolvesServerCertUsingSni::new();
+        <span class="macro">assert!</span>(rscsni
+            .resolve(ClientHello::new(<span class="kw-2">&amp;</span><span class="prelude-val">None</span>, <span class="kw-2">&amp;</span>[], <span class="prelude-val">None</span>, <span class="kw-2">&amp;</span>[]))
+            .is_none());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_resolvesservercertusingsni_handles_unknown_name</span>() {
-        <span class="kw">let</span> <span class="ident">rscsni</span> <span class="op">=</span> <span class="ident">ResolvesServerCertUsingSni::new</span>();
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">webpki::DnsNameRef::try_from_ascii_str</span>(<span class="string">&quot;hello.com&quot;</span>)
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">to_owned</span>();
-        <span class="macro">assert!</span>(<span class="ident">rscsni</span>
-            .<span class="ident">resolve</span>(<span class="ident">ClientHello::new</span>(<span class="kw-2">&amp;</span><span class="prelude-val">Some</span>(<span class="ident">name</span>), <span class="kw-2">&amp;</span>[], <span class="prelude-val">None</span>, <span class="kw-2">&amp;</span>[]))
-            .<span class="ident">is_none</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_resolvesservercertusingsni_handles_unknown_name() {
+        <span class="kw">let </span>rscsni = ResolvesServerCertUsingSni::new();
+        <span class="kw">let </span>name = webpki::DnsNameRef::try_from_ascii_str(<span class="string">&quot;hello.com&quot;</span>)
+            .unwrap()
+            .to_owned();
+        <span class="macro">assert!</span>(rscsni
+            .resolve(ClientHello::new(<span class="kw-2">&amp;</span><span class="prelude-val">Some</span>(name), <span class="kw-2">&amp;</span>[], <span class="prelude-val">None</span>, <span class="kw-2">&amp;</span>[]))
+            .is_none());
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

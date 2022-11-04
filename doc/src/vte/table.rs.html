@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/vte-0.10.1/src/table.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>table.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../vte/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../vte/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../vte/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/vte-0.10.1/src/table.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>table.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../vte/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../vte/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../vte/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -169,176 +169,176 @@
 <span id="169">169</span>
 <span id="170">170</span>
 <span id="171">171</span>
-</pre><pre class="rust"><code><span class="doccomment">/// This is the state change table. It&#39;s indexed first by current state and then by the next</span>
-<span class="doccomment">/// character in the pty stream.</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::definitions</span>::{<span class="ident">pack</span>, <span class="ident">Action</span>, <span class="ident">State</span>};
+</pre><pre class="rust"><code><span class="doccomment">/// This is the state change table. It&#39;s indexed first by current state and then by the next
+/// character in the pty stream.
+</span><span class="kw">use </span><span class="kw">crate</span>::definitions::{pack, Action, State};
 
-<span class="kw">use</span> <span class="ident">vte_generate_state_changes::generate_state_changes</span>;
+<span class="kw">use </span>vte_generate_state_changes::generate_state_changes;
 
-<span class="comment">// Generate state changes at compile-time</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">STATE_CHANGES</span>: [[<span class="ident">u8</span>; <span class="number">256</span>]; <span class="number">16</span>] <span class="op">=</span> <span class="ident">state_changes</span>();
-<span class="macro">generate_state_changes!</span>(<span class="ident">state_changes</span>, {
-    <span class="ident">Anywhere</span> {
-        <span class="number">0x18</span> =&gt; (<span class="ident">Ground</span>, <span class="ident">Execute</span>),
-        <span class="number">0x1a</span> =&gt; (<span class="ident">Ground</span>, <span class="ident">Execute</span>),
-        <span class="number">0x1b</span> =&gt; (<span class="ident">Escape</span>, <span class="prelude-val">None</span>),
+<span class="comment">// Generate state changes at compile-time
+</span><span class="kw">pub static </span>STATE_CHANGES: [[u8; <span class="number">256</span>]; <span class="number">16</span>] = state_changes();
+<span class="macro">generate_state_changes!</span>(state_changes, {
+    Anywhere {
+        <span class="number">0x18 </span>=&gt; (Ground, Execute),
+        <span class="number">0x1a </span>=&gt; (Ground, Execute),
+        <span class="number">0x1b </span>=&gt; (Escape, <span class="prelude-val">None</span>),
     },
 
-    <span class="ident">Ground</span> {
-        <span class="number">0x00</span>..<span class="op">=</span><span class="number">0x17</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Execute</span>),
-        <span class="number">0x19</span>        =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Execute</span>),
-        <span class="number">0x1c</span>..<span class="op">=</span><span class="number">0x1f</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Execute</span>),
-        <span class="number">0x20</span>..<span class="op">=</span><span class="number">0x7f</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Print</span>),
-        <span class="number">0x80</span>..<span class="op">=</span><span class="number">0x8f</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Execute</span>),
-        <span class="number">0x91</span>..<span class="op">=</span><span class="number">0x9a</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Execute</span>),
-        <span class="number">0x9c</span>        =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Execute</span>),
-        <span class="comment">// Beginning of UTF-8 2 byte sequence</span>
-        <span class="number">0xc2</span>..<span class="op">=</span><span class="number">0xdf</span> =&gt; (<span class="ident">Utf8</span>, <span class="ident">BeginUtf8</span>),
-        <span class="comment">// Beginning of UTF-8 3 byte sequence</span>
-        <span class="number">0xe0</span>..<span class="op">=</span><span class="number">0xef</span> =&gt; (<span class="ident">Utf8</span>, <span class="ident">BeginUtf8</span>),
-        <span class="comment">// Beginning of UTF-8 4 byte sequence</span>
-        <span class="number">0xf0</span>..<span class="op">=</span><span class="number">0xf4</span> =&gt; (<span class="ident">Utf8</span>, <span class="ident">BeginUtf8</span>),
+    Ground {
+        <span class="number">0x00</span>..=<span class="number">0x17 </span>=&gt; (Anywhere, Execute),
+        <span class="number">0x19        </span>=&gt; (Anywhere, Execute),
+        <span class="number">0x1c</span>..=<span class="number">0x1f </span>=&gt; (Anywhere, Execute),
+        <span class="number">0x20</span>..=<span class="number">0x7f </span>=&gt; (Anywhere, Print),
+        <span class="number">0x80</span>..=<span class="number">0x8f </span>=&gt; (Anywhere, Execute),
+        <span class="number">0x91</span>..=<span class="number">0x9a </span>=&gt; (Anywhere, Execute),
+        <span class="number">0x9c        </span>=&gt; (Anywhere, Execute),
+        <span class="comment">// Beginning of UTF-8 2 byte sequence
+        </span><span class="number">0xc2</span>..=<span class="number">0xdf </span>=&gt; (Utf8, BeginUtf8),
+        <span class="comment">// Beginning of UTF-8 3 byte sequence
+        </span><span class="number">0xe0</span>..=<span class="number">0xef </span>=&gt; (Utf8, BeginUtf8),
+        <span class="comment">// Beginning of UTF-8 4 byte sequence
+        </span><span class="number">0xf0</span>..=<span class="number">0xf4 </span>=&gt; (Utf8, BeginUtf8),
     },
 
-    <span class="ident">Escape</span> {
-        <span class="number">0x00</span>..<span class="op">=</span><span class="number">0x17</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Execute</span>),
-        <span class="number">0x19</span>        =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Execute</span>),
-        <span class="number">0x1c</span>..<span class="op">=</span><span class="number">0x1f</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Execute</span>),
-        <span class="number">0x7f</span>        =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Ignore</span>),
-        <span class="number">0x20</span>..<span class="op">=</span><span class="number">0x2f</span> =&gt; (<span class="ident">EscapeIntermediate</span>, <span class="ident">Collect</span>),
-        <span class="number">0x30</span>..<span class="op">=</span><span class="number">0x4f</span> =&gt; (<span class="ident">Ground</span>, <span class="ident">EscDispatch</span>),
-        <span class="number">0x51</span>..<span class="op">=</span><span class="number">0x57</span> =&gt; (<span class="ident">Ground</span>, <span class="ident">EscDispatch</span>),
-        <span class="number">0x59</span>        =&gt; (<span class="ident">Ground</span>, <span class="ident">EscDispatch</span>),
-        <span class="number">0x5a</span>        =&gt; (<span class="ident">Ground</span>, <span class="ident">EscDispatch</span>),
-        <span class="number">0x5c</span>        =&gt; (<span class="ident">Ground</span>, <span class="ident">EscDispatch</span>),
-        <span class="number">0x60</span>..<span class="op">=</span><span class="number">0x7e</span> =&gt; (<span class="ident">Ground</span>, <span class="ident">EscDispatch</span>),
-        <span class="number">0x5b</span>        =&gt; (<span class="ident">CsiEntry</span>, <span class="prelude-val">None</span>),
-        <span class="number">0x5d</span>        =&gt; (<span class="ident">OscString</span>, <span class="prelude-val">None</span>),
-        <span class="number">0x50</span>        =&gt; (<span class="ident">DcsEntry</span>, <span class="prelude-val">None</span>),
-        <span class="number">0x58</span>        =&gt; (<span class="ident">SosPmApcString</span>, <span class="prelude-val">None</span>),
-        <span class="number">0x5e</span>        =&gt; (<span class="ident">SosPmApcString</span>, <span class="prelude-val">None</span>),
-        <span class="number">0x5f</span>        =&gt; (<span class="ident">SosPmApcString</span>, <span class="prelude-val">None</span>),
+    Escape {
+        <span class="number">0x00</span>..=<span class="number">0x17 </span>=&gt; (Anywhere, Execute),
+        <span class="number">0x19        </span>=&gt; (Anywhere, Execute),
+        <span class="number">0x1c</span>..=<span class="number">0x1f </span>=&gt; (Anywhere, Execute),
+        <span class="number">0x7f        </span>=&gt; (Anywhere, Ignore),
+        <span class="number">0x20</span>..=<span class="number">0x2f </span>=&gt; (EscapeIntermediate, Collect),
+        <span class="number">0x30</span>..=<span class="number">0x4f </span>=&gt; (Ground, EscDispatch),
+        <span class="number">0x51</span>..=<span class="number">0x57 </span>=&gt; (Ground, EscDispatch),
+        <span class="number">0x59        </span>=&gt; (Ground, EscDispatch),
+        <span class="number">0x5a        </span>=&gt; (Ground, EscDispatch),
+        <span class="number">0x5c        </span>=&gt; (Ground, EscDispatch),
+        <span class="number">0x60</span>..=<span class="number">0x7e </span>=&gt; (Ground, EscDispatch),
+        <span class="number">0x5b        </span>=&gt; (CsiEntry, <span class="prelude-val">None</span>),
+        <span class="number">0x5d        </span>=&gt; (OscString, <span class="prelude-val">None</span>),
+        <span class="number">0x50        </span>=&gt; (DcsEntry, <span class="prelude-val">None</span>),
+        <span class="number">0x58        </span>=&gt; (SosPmApcString, <span class="prelude-val">None</span>),
+        <span class="number">0x5e        </span>=&gt; (SosPmApcString, <span class="prelude-val">None</span>),
+        <span class="number">0x5f        </span>=&gt; (SosPmApcString, <span class="prelude-val">None</span>),
     },
 
-    <span class="ident">EscapeIntermediate</span> {
-        <span class="number">0x00</span>..<span class="op">=</span><span class="number">0x17</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Execute</span>),
-        <span class="number">0x19</span>        =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Execute</span>),
-        <span class="number">0x1c</span>..<span class="op">=</span><span class="number">0x1f</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Execute</span>),
-        <span class="number">0x20</span>..<span class="op">=</span><span class="number">0x2f</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Collect</span>),
-        <span class="number">0x7f</span>        =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Ignore</span>),
-        <span class="number">0x30</span>..<span class="op">=</span><span class="number">0x7e</span> =&gt; (<span class="ident">Ground</span>, <span class="ident">EscDispatch</span>),
+    EscapeIntermediate {
+        <span class="number">0x00</span>..=<span class="number">0x17 </span>=&gt; (Anywhere, Execute),
+        <span class="number">0x19        </span>=&gt; (Anywhere, Execute),
+        <span class="number">0x1c</span>..=<span class="number">0x1f </span>=&gt; (Anywhere, Execute),
+        <span class="number">0x20</span>..=<span class="number">0x2f </span>=&gt; (Anywhere, Collect),
+        <span class="number">0x7f        </span>=&gt; (Anywhere, Ignore),
+        <span class="number">0x30</span>..=<span class="number">0x7e </span>=&gt; (Ground, EscDispatch),
     },
 
-    <span class="ident">CsiEntry</span> {
-        <span class="number">0x00</span>..<span class="op">=</span><span class="number">0x17</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Execute</span>),
-        <span class="number">0x19</span>        =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Execute</span>),
-        <span class="number">0x1c</span>..<span class="op">=</span><span class="number">0x1f</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Execute</span>),
-        <span class="number">0x7f</span>        =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Ignore</span>),
-        <span class="number">0x20</span>..<span class="op">=</span><span class="number">0x2f</span> =&gt; (<span class="ident">CsiIntermediate</span>, <span class="ident">Collect</span>),
-        <span class="number">0x30</span>..<span class="op">=</span><span class="number">0x39</span> =&gt; (<span class="ident">CsiParam</span>, <span class="ident">Param</span>),
-        <span class="number">0x3a</span>..<span class="op">=</span><span class="number">0x3b</span> =&gt; (<span class="ident">CsiParam</span>, <span class="ident">Param</span>),
-        <span class="number">0x3c</span>..<span class="op">=</span><span class="number">0x3f</span> =&gt; (<span class="ident">CsiParam</span>, <span class="ident">Collect</span>),
-        <span class="number">0x40</span>..<span class="op">=</span><span class="number">0x7e</span> =&gt; (<span class="ident">Ground</span>, <span class="ident">CsiDispatch</span>),
+    CsiEntry {
+        <span class="number">0x00</span>..=<span class="number">0x17 </span>=&gt; (Anywhere, Execute),
+        <span class="number">0x19        </span>=&gt; (Anywhere, Execute),
+        <span class="number">0x1c</span>..=<span class="number">0x1f </span>=&gt; (Anywhere, Execute),
+        <span class="number">0x7f        </span>=&gt; (Anywhere, Ignore),
+        <span class="number">0x20</span>..=<span class="number">0x2f </span>=&gt; (CsiIntermediate, Collect),
+        <span class="number">0x30</span>..=<span class="number">0x39 </span>=&gt; (CsiParam, Param),
+        <span class="number">0x3a</span>..=<span class="number">0x3b </span>=&gt; (CsiParam, Param),
+        <span class="number">0x3c</span>..=<span class="number">0x3f </span>=&gt; (CsiParam, Collect),
+        <span class="number">0x40</span>..=<span class="number">0x7e </span>=&gt; (Ground, CsiDispatch),
     },
 
-    <span class="ident">CsiIgnore</span> {
-        <span class="number">0x00</span>..<span class="op">=</span><span class="number">0x17</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Execute</span>),
-        <span class="number">0x19</span>        =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Execute</span>),
-        <span class="number">0x1c</span>..<span class="op">=</span><span class="number">0x1f</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Execute</span>),
-        <span class="number">0x20</span>..<span class="op">=</span><span class="number">0x3f</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Ignore</span>),
-        <span class="number">0x7f</span>        =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Ignore</span>),
-        <span class="number">0x40</span>..<span class="op">=</span><span class="number">0x7e</span> =&gt; (<span class="ident">Ground</span>, <span class="prelude-val">None</span>),
+    CsiIgnore {
+        <span class="number">0x00</span>..=<span class="number">0x17 </span>=&gt; (Anywhere, Execute),
+        <span class="number">0x19        </span>=&gt; (Anywhere, Execute),
+        <span class="number">0x1c</span>..=<span class="number">0x1f </span>=&gt; (Anywhere, Execute),
+        <span class="number">0x20</span>..=<span class="number">0x3f </span>=&gt; (Anywhere, Ignore),
+        <span class="number">0x7f        </span>=&gt; (Anywhere, Ignore),
+        <span class="number">0x40</span>..=<span class="number">0x7e </span>=&gt; (Ground, <span class="prelude-val">None</span>),
     },
 
-    <span class="ident">CsiParam</span> {
-        <span class="number">0x00</span>..<span class="op">=</span><span class="number">0x17</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Execute</span>),
-        <span class="number">0x19</span>        =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Execute</span>),
-        <span class="number">0x1c</span>..<span class="op">=</span><span class="number">0x1f</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Execute</span>),
-        <span class="number">0x30</span>..<span class="op">=</span><span class="number">0x39</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Param</span>),
-        <span class="number">0x3a</span>..<span class="op">=</span><span class="number">0x3b</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Param</span>),
-        <span class="number">0x7f</span>        =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Ignore</span>),
-        <span class="number">0x3c</span>..<span class="op">=</span><span class="number">0x3f</span> =&gt; (<span class="ident">CsiIgnore</span>, <span class="prelude-val">None</span>),
-        <span class="number">0x20</span>..<span class="op">=</span><span class="number">0x2f</span> =&gt; (<span class="ident">CsiIntermediate</span>, <span class="ident">Collect</span>),
-        <span class="number">0x40</span>..<span class="op">=</span><span class="number">0x7e</span> =&gt; (<span class="ident">Ground</span>, <span class="ident">CsiDispatch</span>),
+    CsiParam {
+        <span class="number">0x00</span>..=<span class="number">0x17 </span>=&gt; (Anywhere, Execute),
+        <span class="number">0x19        </span>=&gt; (Anywhere, Execute),
+        <span class="number">0x1c</span>..=<span class="number">0x1f </span>=&gt; (Anywhere, Execute),
+        <span class="number">0x30</span>..=<span class="number">0x39 </span>=&gt; (Anywhere, Param),
+        <span class="number">0x3a</span>..=<span class="number">0x3b </span>=&gt; (Anywhere, Param),
+        <span class="number">0x7f        </span>=&gt; (Anywhere, Ignore),
+        <span class="number">0x3c</span>..=<span class="number">0x3f </span>=&gt; (CsiIgnore, <span class="prelude-val">None</span>),
+        <span class="number">0x20</span>..=<span class="number">0x2f </span>=&gt; (CsiIntermediate, Collect),
+        <span class="number">0x40</span>..=<span class="number">0x7e </span>=&gt; (Ground, CsiDispatch),
     },
 
-    <span class="ident">CsiIntermediate</span> {
-        <span class="number">0x00</span>..<span class="op">=</span><span class="number">0x17</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Execute</span>),
-        <span class="number">0x19</span>        =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Execute</span>),
-        <span class="number">0x1c</span>..<span class="op">=</span><span class="number">0x1f</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Execute</span>),
-        <span class="number">0x20</span>..<span class="op">=</span><span class="number">0x2f</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Collect</span>),
-        <span class="number">0x7f</span>        =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Ignore</span>),
-        <span class="number">0x30</span>..<span class="op">=</span><span class="number">0x3f</span> =&gt; (<span class="ident">CsiIgnore</span>, <span class="prelude-val">None</span>),
-        <span class="number">0x40</span>..<span class="op">=</span><span class="number">0x7e</span> =&gt; (<span class="ident">Ground</span>, <span class="ident">CsiDispatch</span>),
+    CsiIntermediate {
+        <span class="number">0x00</span>..=<span class="number">0x17 </span>=&gt; (Anywhere, Execute),
+        <span class="number">0x19        </span>=&gt; (Anywhere, Execute),
+        <span class="number">0x1c</span>..=<span class="number">0x1f </span>=&gt; (Anywhere, Execute),
+        <span class="number">0x20</span>..=<span class="number">0x2f </span>=&gt; (Anywhere, Collect),
+        <span class="number">0x7f        </span>=&gt; (Anywhere, Ignore),
+        <span class="number">0x30</span>..=<span class="number">0x3f </span>=&gt; (CsiIgnore, <span class="prelude-val">None</span>),
+        <span class="number">0x40</span>..=<span class="number">0x7e </span>=&gt; (Ground, CsiDispatch),
     },
 
-    <span class="ident">DcsEntry</span> {
-        <span class="number">0x00</span>..<span class="op">=</span><span class="number">0x17</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Ignore</span>),
-        <span class="number">0x19</span>        =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Ignore</span>),
-        <span class="number">0x1c</span>..<span class="op">=</span><span class="number">0x1f</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Ignore</span>),
-        <span class="number">0x7f</span>        =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Ignore</span>),
-        <span class="number">0x20</span>..<span class="op">=</span><span class="number">0x2f</span> =&gt; (<span class="ident">DcsIntermediate</span>, <span class="ident">Collect</span>),
-        <span class="number">0x30</span>..<span class="op">=</span><span class="number">0x39</span> =&gt; (<span class="ident">DcsParam</span>, <span class="ident">Param</span>),
-        <span class="number">0x3a</span>..<span class="op">=</span><span class="number">0x3b</span> =&gt; (<span class="ident">DcsParam</span>, <span class="ident">Param</span>),
-        <span class="number">0x3c</span>..<span class="op">=</span><span class="number">0x3f</span> =&gt; (<span class="ident">DcsParam</span>, <span class="ident">Collect</span>),
-        <span class="number">0x40</span>..<span class="op">=</span><span class="number">0x7e</span> =&gt; (<span class="ident">DcsPassthrough</span>, <span class="prelude-val">None</span>),
+    DcsEntry {
+        <span class="number">0x00</span>..=<span class="number">0x17 </span>=&gt; (Anywhere, Ignore),
+        <span class="number">0x19        </span>=&gt; (Anywhere, Ignore),
+        <span class="number">0x1c</span>..=<span class="number">0x1f </span>=&gt; (Anywhere, Ignore),
+        <span class="number">0x7f        </span>=&gt; (Anywhere, Ignore),
+        <span class="number">0x20</span>..=<span class="number">0x2f </span>=&gt; (DcsIntermediate, Collect),
+        <span class="number">0x30</span>..=<span class="number">0x39 </span>=&gt; (DcsParam, Param),
+        <span class="number">0x3a</span>..=<span class="number">0x3b </span>=&gt; (DcsParam, Param),
+        <span class="number">0x3c</span>..=<span class="number">0x3f </span>=&gt; (DcsParam, Collect),
+        <span class="number">0x40</span>..=<span class="number">0x7e </span>=&gt; (DcsPassthrough, <span class="prelude-val">None</span>),
     },
 
-    <span class="ident">DcsIntermediate</span> {
-        <span class="number">0x00</span>..<span class="op">=</span><span class="number">0x17</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Ignore</span>),
-        <span class="number">0x19</span>        =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Ignore</span>),
-        <span class="number">0x1c</span>..<span class="op">=</span><span class="number">0x1f</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Ignore</span>),
-        <span class="number">0x20</span>..<span class="op">=</span><span class="number">0x2f</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Collect</span>),
-        <span class="number">0x7f</span>        =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Ignore</span>),
-        <span class="number">0x30</span>..<span class="op">=</span><span class="number">0x3f</span> =&gt; (<span class="ident">DcsIgnore</span>, <span class="prelude-val">None</span>),
-        <span class="number">0x40</span>..<span class="op">=</span><span class="number">0x7e</span> =&gt; (<span class="ident">DcsPassthrough</span>, <span class="prelude-val">None</span>),
+    DcsIntermediate {
+        <span class="number">0x00</span>..=<span class="number">0x17 </span>=&gt; (Anywhere, Ignore),
+        <span class="number">0x19        </span>=&gt; (Anywhere, Ignore),
+        <span class="number">0x1c</span>..=<span class="number">0x1f </span>=&gt; (Anywhere, Ignore),
+        <span class="number">0x20</span>..=<span class="number">0x2f </span>=&gt; (Anywhere, Collect),
+        <span class="number">0x7f        </span>=&gt; (Anywhere, Ignore),
+        <span class="number">0x30</span>..=<span class="number">0x3f </span>=&gt; (DcsIgnore, <span class="prelude-val">None</span>),
+        <span class="number">0x40</span>..=<span class="number">0x7e </span>=&gt; (DcsPassthrough, <span class="prelude-val">None</span>),
     },
 
-    <span class="ident">DcsIgnore</span> {
-        <span class="number">0x00</span>..<span class="op">=</span><span class="number">0x17</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Ignore</span>),
-        <span class="number">0x19</span>        =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Ignore</span>),
-        <span class="number">0x1c</span>..<span class="op">=</span><span class="number">0x1f</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Ignore</span>),
-        <span class="number">0x20</span>..<span class="op">=</span><span class="number">0x7f</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Ignore</span>),
-        <span class="number">0x9c</span>        =&gt; (<span class="ident">Ground</span>, <span class="prelude-val">None</span>),
+    DcsIgnore {
+        <span class="number">0x00</span>..=<span class="number">0x17 </span>=&gt; (Anywhere, Ignore),
+        <span class="number">0x19        </span>=&gt; (Anywhere, Ignore),
+        <span class="number">0x1c</span>..=<span class="number">0x1f </span>=&gt; (Anywhere, Ignore),
+        <span class="number">0x20</span>..=<span class="number">0x7f </span>=&gt; (Anywhere, Ignore),
+        <span class="number">0x9c        </span>=&gt; (Ground, <span class="prelude-val">None</span>),
     },
 
-    <span class="ident">DcsParam</span> {
-        <span class="number">0x00</span>..<span class="op">=</span><span class="number">0x17</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Ignore</span>),
-        <span class="number">0x19</span>        =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Ignore</span>),
-        <span class="number">0x1c</span>..<span class="op">=</span><span class="number">0x1f</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Ignore</span>),
-        <span class="number">0x30</span>..<span class="op">=</span><span class="number">0x39</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Param</span>),
-        <span class="number">0x3a</span>..<span class="op">=</span><span class="number">0x3b</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Param</span>),
-        <span class="number">0x7f</span>        =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Ignore</span>),
-        <span class="number">0x3c</span>..<span class="op">=</span><span class="number">0x3f</span> =&gt; (<span class="ident">DcsIgnore</span>, <span class="prelude-val">None</span>),
-        <span class="number">0x20</span>..<span class="op">=</span><span class="number">0x2f</span> =&gt; (<span class="ident">DcsIntermediate</span>, <span class="ident">Collect</span>),
-        <span class="number">0x40</span>..<span class="op">=</span><span class="number">0x7e</span> =&gt; (<span class="ident">DcsPassthrough</span>, <span class="prelude-val">None</span>),
+    DcsParam {
+        <span class="number">0x00</span>..=<span class="number">0x17 </span>=&gt; (Anywhere, Ignore),
+        <span class="number">0x19        </span>=&gt; (Anywhere, Ignore),
+        <span class="number">0x1c</span>..=<span class="number">0x1f </span>=&gt; (Anywhere, Ignore),
+        <span class="number">0x30</span>..=<span class="number">0x39 </span>=&gt; (Anywhere, Param),
+        <span class="number">0x3a</span>..=<span class="number">0x3b </span>=&gt; (Anywhere, Param),
+        <span class="number">0x7f        </span>=&gt; (Anywhere, Ignore),
+        <span class="number">0x3c</span>..=<span class="number">0x3f </span>=&gt; (DcsIgnore, <span class="prelude-val">None</span>),
+        <span class="number">0x20</span>..=<span class="number">0x2f </span>=&gt; (DcsIntermediate, Collect),
+        <span class="number">0x40</span>..=<span class="number">0x7e </span>=&gt; (DcsPassthrough, <span class="prelude-val">None</span>),
     },
 
-    <span class="ident">DcsPassthrough</span> {
-        <span class="number">0x00</span>..<span class="op">=</span><span class="number">0x17</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Put</span>),
-        <span class="number">0x19</span>        =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Put</span>),
-        <span class="number">0x1c</span>..<span class="op">=</span><span class="number">0x1f</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Put</span>),
-        <span class="number">0x20</span>..<span class="op">=</span><span class="number">0x7e</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Put</span>),
-        <span class="number">0x7f</span>        =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Ignore</span>),
-        <span class="number">0x9c</span>        =&gt; (<span class="ident">Ground</span>, <span class="prelude-val">None</span>),
+    DcsPassthrough {
+        <span class="number">0x00</span>..=<span class="number">0x17 </span>=&gt; (Anywhere, Put),
+        <span class="number">0x19        </span>=&gt; (Anywhere, Put),
+        <span class="number">0x1c</span>..=<span class="number">0x1f </span>=&gt; (Anywhere, Put),
+        <span class="number">0x20</span>..=<span class="number">0x7e </span>=&gt; (Anywhere, Put),
+        <span class="number">0x7f        </span>=&gt; (Anywhere, Ignore),
+        <span class="number">0x9c        </span>=&gt; (Ground, <span class="prelude-val">None</span>),
     },
 
-    <span class="ident">SosPmApcString</span> {
-        <span class="number">0x00</span>..<span class="op">=</span><span class="number">0x17</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Ignore</span>),
-        <span class="number">0x19</span>        =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Ignore</span>),
-        <span class="number">0x1c</span>..<span class="op">=</span><span class="number">0x1f</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Ignore</span>),
-        <span class="number">0x20</span>..<span class="op">=</span><span class="number">0x7f</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Ignore</span>),
-        <span class="number">0x9c</span>        =&gt; (<span class="ident">Ground</span>, <span class="prelude-val">None</span>),
+    SosPmApcString {
+        <span class="number">0x00</span>..=<span class="number">0x17 </span>=&gt; (Anywhere, Ignore),
+        <span class="number">0x19        </span>=&gt; (Anywhere, Ignore),
+        <span class="number">0x1c</span>..=<span class="number">0x1f </span>=&gt; (Anywhere, Ignore),
+        <span class="number">0x20</span>..=<span class="number">0x7f </span>=&gt; (Anywhere, Ignore),
+        <span class="number">0x9c        </span>=&gt; (Ground, <span class="prelude-val">None</span>),
     },
 
-    <span class="ident">OscString</span> {
-        <span class="number">0x00</span>..<span class="op">=</span><span class="number">0x06</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Ignore</span>),
-        <span class="number">0x07</span>        =&gt; (<span class="ident">Ground</span>, <span class="prelude-val">None</span>),
-        <span class="number">0x08</span>..<span class="op">=</span><span class="number">0x17</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Ignore</span>),
-        <span class="number">0x19</span>        =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Ignore</span>),
-        <span class="number">0x1c</span>..<span class="op">=</span><span class="number">0x1f</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">Ignore</span>),
-        <span class="number">0x20</span>..<span class="op">=</span><span class="number">0xff</span> =&gt; (<span class="ident">Anywhere</span>, <span class="ident">OscPut</span>),
+    OscString {
+        <span class="number">0x00</span>..=<span class="number">0x06 </span>=&gt; (Anywhere, Ignore),
+        <span class="number">0x07        </span>=&gt; (Ground, <span class="prelude-val">None</span>),
+        <span class="number">0x08</span>..=<span class="number">0x17 </span>=&gt; (Anywhere, Ignore),
+        <span class="number">0x19        </span>=&gt; (Anywhere, Ignore),
+        <span class="number">0x1c</span>..=<span class="number">0x1f </span>=&gt; (Anywhere, Ignore),
+        <span class="number">0x20</span>..=<span class="number">0xff </span>=&gt; (Anywhere, OscPut),
     }
 });
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="vte" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="vte" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

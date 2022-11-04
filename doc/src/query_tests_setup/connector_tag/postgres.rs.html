@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connector-test-kit-rs/query-tests-setup/src/connector_tag/postgres.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>postgres.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_tests_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_tests_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_tests_setup/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connector-test-kit-rs/query-tests-setup/src/connector_tag/postgres.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>postgres.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_tests_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_tests_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_tests_setup/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -202,209 +202,209 @@
 <span id="202">202</span>
 <span id="203">203</span>
 <span id="204">204</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">datamodel_rendering::SqlDatamodelRenderer</span>, <span class="ident">TestError</span>, <span class="ident">TestResult</span>};
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use crate</span>::{datamodel_rendering::SqlDatamodelRenderer, TestError, TestResult};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PostgresConnectorTag</span> {
-    <span class="ident">version</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PostgresVersion</span><span class="op">&gt;</span>,
-    <span class="ident">capabilities</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorCapability</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Default, Clone)]
+</span><span class="kw">pub struct </span>PostgresConnectorTag {
+    version: <span class="prelude-ty">Option</span>&lt;PostgresVersion&gt;,
+    capabilities: Vec&lt;ConnectorCapability&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">ConnectorTagInterface</span> <span class="kw">for</span> <span class="ident">PostgresConnectorTag</span> {
-    <span class="kw">fn</span> <span class="ident">datamodel_provider</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="string">&quot;postgres&quot;</span>
+<span class="kw">impl </span>ConnectorTagInterface <span class="kw">for </span>PostgresConnectorTag {
+    <span class="kw">fn </span>datamodel_provider(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="string">&quot;postgres&quot;
+    </span>}
+
+    <span class="kw">fn </span>datamodel_renderer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Box&lt;<span class="kw">dyn </span>DatamodelRenderer&gt; {
+        Box::new(SqlDatamodelRenderer::new())
     }
 
-    <span class="kw">fn</span> <span class="ident">datamodel_renderer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">DatamodelRenderer</span><span class="op">&gt;</span> {
-        <span class="ident">Box::new</span>(<span class="ident">SqlDatamodelRenderer::new</span>())
-    }
-
-    <span class="kw">fn</span> <span class="ident">connection_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">database</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">is_ci</span>: <span class="ident">bool</span>, <span class="ident">is_multi_schema</span>: <span class="ident">bool</span>, <span class="kw">_</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="ident">database</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">is_multi_schema</span> {
-            <span class="ident">database</span>.<span class="ident">to_string</span>()
-        } <span class="kw">else</span> {
-            <span class="macro">format!</span>(<span class="string">&quot;db?schema={}&quot;</span>, <span class="ident">database</span>)
+    <span class="kw">fn </span>connection_string(<span class="kw-2">&amp;</span><span class="self">self</span>, database: <span class="kw-2">&amp;</span>str, is_ci: bool, is_multi_schema: bool, <span class="kw">_</span>: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;) -&gt; String {
+        <span class="kw">let </span>database = <span class="kw">if </span>is_multi_schema {
+            database.to_string()
+        } <span class="kw">else </span>{
+            <span class="macro">format!</span>(<span class="string">&quot;db?schema={}&quot;</span>, database)
         };
 
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">version</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::V9</span>) <span class="kw">if</span> <span class="ident">is_ci</span> =&gt; {
-                <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@test-db-postgres-9:5432/{}&quot;</span>, <span class="ident">database</span>)
+        <span class="kw">match </span><span class="self">self</span>.version {
+            <span class="prelude-val">Some</span>(PostgresVersion::V9) <span class="kw">if </span>is_ci =&gt; {
+                <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@test-db-postgres-9:5432/{}&quot;</span>, database)
             }
-            <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::V10</span>) <span class="kw">if</span> <span class="ident">is_ci</span> =&gt; {
-                <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@test-db-postgres-10:5432/{}&quot;</span>, <span class="ident">database</span>)
+            <span class="prelude-val">Some</span>(PostgresVersion::V10) <span class="kw">if </span>is_ci =&gt; {
+                <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@test-db-postgres-10:5432/{}&quot;</span>, database)
             }
-            <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::V11</span>) <span class="kw">if</span> <span class="ident">is_ci</span> =&gt; {
-                <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@test-db-postgres-11:5432/{}&quot;</span>, <span class="ident">database</span>)
+            <span class="prelude-val">Some</span>(PostgresVersion::V11) <span class="kw">if </span>is_ci =&gt; {
+                <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@test-db-postgres-11:5432/{}&quot;</span>, database)
             }
-            <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::V12</span>) <span class="kw">if</span> <span class="ident">is_ci</span> =&gt; {
-                <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@test-db-postgres-12:5432/{}&quot;</span>, <span class="ident">database</span>)
+            <span class="prelude-val">Some</span>(PostgresVersion::V12) <span class="kw">if </span>is_ci =&gt; {
+                <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@test-db-postgres-12:5432/{}&quot;</span>, database)
             }
-            <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::V13</span>) <span class="kw">if</span> <span class="ident">is_ci</span> =&gt; {
-                <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@test-db-postgres-13:5432/{}&quot;</span>, <span class="ident">database</span>)
+            <span class="prelude-val">Some</span>(PostgresVersion::V13) <span class="kw">if </span>is_ci =&gt; {
+                <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@test-db-postgres-13:5432/{}&quot;</span>, database)
             }
-            <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::V14</span>) <span class="kw">if</span> <span class="ident">is_ci</span> =&gt; {
-                <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@test-db-postgres-14:5432/{}&quot;</span>, <span class="ident">database</span>)
+            <span class="prelude-val">Some</span>(PostgresVersion::V14) <span class="kw">if </span>is_ci =&gt; {
+                <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@test-db-postgres-14:5432/{}&quot;</span>, database)
             }
-            <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::V15</span>) <span class="kw">if</span> <span class="ident">is_ci</span> =&gt; {
-                <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@test-db-postgres-15:5432/{}&quot;</span>, <span class="ident">database</span>)
+            <span class="prelude-val">Some</span>(PostgresVersion::V15) <span class="kw">if </span>is_ci =&gt; {
+                <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@test-db-postgres-15:5432/{}&quot;</span>, database)
             }
-            <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::PgBouncer</span>) <span class="kw">if</span> <span class="ident">is_ci</span> =&gt; <span class="macro">format!</span>(
+            <span class="prelude-val">Some</span>(PostgresVersion::PgBouncer) <span class="kw">if </span>is_ci =&gt; <span class="macro">format!</span>(
                 <span class="string">&quot;postgresql://postgres:prisma@test-db-pgbouncer:6432/{}&amp;pgbouncer=true&quot;</span>,
-                <span class="ident">database</span>
+                database
             ),
 
-            <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::V9</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:5431/{}&quot;</span>, <span class="ident">database</span>),
-            <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::V10</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:5432/{}&quot;</span>, <span class="ident">database</span>),
-            <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::V11</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:5433/{}&quot;</span>, <span class="ident">database</span>),
-            <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::V12</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:5434/{}&quot;</span>, <span class="ident">database</span>),
-            <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::V13</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:5435/{}&quot;</span>, <span class="ident">database</span>),
-            <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::V14</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:5437/{}&quot;</span>, <span class="ident">database</span>),
-            <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::V15</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:5438/{}&quot;</span>, <span class="ident">database</span>),
-            <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::PgBouncer</span>) =&gt; <span class="macro">format!</span>(
+            <span class="prelude-val">Some</span>(PostgresVersion::V9) =&gt; <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:5431/{}&quot;</span>, database),
+            <span class="prelude-val">Some</span>(PostgresVersion::V10) =&gt; <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:5432/{}&quot;</span>, database),
+            <span class="prelude-val">Some</span>(PostgresVersion::V11) =&gt; <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:5433/{}&quot;</span>, database),
+            <span class="prelude-val">Some</span>(PostgresVersion::V12) =&gt; <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:5434/{}&quot;</span>, database),
+            <span class="prelude-val">Some</span>(PostgresVersion::V13) =&gt; <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:5435/{}&quot;</span>, database),
+            <span class="prelude-val">Some</span>(PostgresVersion::V14) =&gt; <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:5437/{}&quot;</span>, database),
+            <span class="prelude-val">Some</span>(PostgresVersion::V15) =&gt; <span class="macro">format!</span>(<span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:5438/{}&quot;</span>, database),
+            <span class="prelude-val">Some</span>(PostgresVersion::PgBouncer) =&gt; <span class="macro">format!</span>(
                 <span class="string">&quot;postgresql://postgres:prisma@127.0.0.1:6432/db?{}&amp;pgbouncer=true&quot;</span>,
-                <span class="ident">database</span>
+                database
             ),
 
-            <span class="prelude-val">None</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;A versioned connector must have a concrete version to run.&quot;</span>),
+            <span class="prelude-val">None </span>=&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;A versioned connector must have a concrete version to run.&quot;</span>),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">capabilities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">ConnectorCapability</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">capabilities</span>
+    <span class="kw">fn </span>capabilities(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[ConnectorCapability] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.capabilities
     }
 
-    <span class="kw">fn</span> <span class="ident">as_parse_pair</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">String</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">version</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">ToString::to_string</span>);
-        (<span class="string">&quot;postgres&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">version</span>)
+    <span class="kw">fn </span>as_parse_pair(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (String, <span class="prelude-ty">Option</span>&lt;String&gt;) {
+        <span class="kw">let </span>version = <span class="self">self</span>.version.as_ref().map(ToString::to_string);
+        (<span class="string">&quot;postgres&quot;</span>.to_owned(), version)
     }
 
-    <span class="kw">fn</span> <span class="ident">is_versioned</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">true</span>
-    }
+    <span class="kw">fn </span>is_versioned(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">true
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">requires_teardown</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
-    }
+    <span class="kw">fn </span>requires_teardown(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">PostgresVersion</span> {
-    <span class="ident">V9</span>,
-    <span class="ident">V10</span>,
-    <span class="ident">V11</span>,
-    <span class="ident">V12</span>,
-    <span class="ident">V13</span>,
-    <span class="ident">V14</span>,
-    <span class="ident">V15</span>,
-    <span class="ident">PgBouncer</span>,
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq)]
+</span><span class="kw">pub enum </span>PostgresVersion {
+    V9,
+    V10,
+    V11,
+    V12,
+    V13,
+    V14,
+    V15,
+    PgBouncer,
 }
 
-<span class="kw">impl</span> <span class="ident">PostgresConnectorTag</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">version</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">version</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::try_from</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+<span class="kw">impl </span>PostgresConnectorTag {
+    <span class="kw">pub fn </span>new(version: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; TestResult&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>version = <span class="kw">match </span>version {
+            <span class="prelude-val">Some</span>(v) =&gt; <span class="prelude-val">Some</span>(PostgresVersion::try_from(v)<span class="question-mark">?</span>),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
         };
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">version</span>,
-            <span class="ident">capabilities</span>: <span class="ident">postgres_capabilities</span>(),
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            version,
+            capabilities: postgres_capabilities(),
         })
     }
 
-    <span class="doccomment">/// Returns all versions of this connector.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">all</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">capabilities</span> <span class="op">=</span> <span class="ident">postgres_capabilities</span>();
+    <span class="doccomment">/// Returns all versions of this connector.
+    </span><span class="kw">pub fn </span>all() -&gt; Vec&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>capabilities = postgres_capabilities();
         <span class="macro">vec!</span>[
-            <span class="self">Self</span> {
-                <span class="ident">version</span>: <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::V9</span>),
-                <span class="ident">capabilities</span>: <span class="ident">capabilities</span>.<span class="ident">clone</span>(),
+            <span class="self">Self </span>{
+                version: <span class="prelude-val">Some</span>(PostgresVersion::V9),
+                capabilities: capabilities.clone(),
             },
-            <span class="self">Self</span> {
-                <span class="ident">version</span>: <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::V10</span>),
-                <span class="ident">capabilities</span>: <span class="ident">capabilities</span>.<span class="ident">clone</span>(),
+            <span class="self">Self </span>{
+                version: <span class="prelude-val">Some</span>(PostgresVersion::V10),
+                capabilities: capabilities.clone(),
             },
-            <span class="self">Self</span> {
-                <span class="ident">version</span>: <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::V11</span>),
-                <span class="ident">capabilities</span>: <span class="ident">capabilities</span>.<span class="ident">clone</span>(),
+            <span class="self">Self </span>{
+                version: <span class="prelude-val">Some</span>(PostgresVersion::V11),
+                capabilities: capabilities.clone(),
             },
-            <span class="self">Self</span> {
-                <span class="ident">version</span>: <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::V12</span>),
-                <span class="ident">capabilities</span>: <span class="ident">capabilities</span>.<span class="ident">clone</span>(),
+            <span class="self">Self </span>{
+                version: <span class="prelude-val">Some</span>(PostgresVersion::V12),
+                capabilities: capabilities.clone(),
             },
-            <span class="self">Self</span> {
-                <span class="ident">version</span>: <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::V13</span>),
-                <span class="ident">capabilities</span>: <span class="ident">capabilities</span>.<span class="ident">clone</span>(),
+            <span class="self">Self </span>{
+                version: <span class="prelude-val">Some</span>(PostgresVersion::V13),
+                capabilities: capabilities.clone(),
             },
-            <span class="self">Self</span> {
-                <span class="ident">version</span>: <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::V14</span>),
-                <span class="ident">capabilities</span>: <span class="ident">capabilities</span>.<span class="ident">clone</span>(),
+            <span class="self">Self </span>{
+                version: <span class="prelude-val">Some</span>(PostgresVersion::V14),
+                capabilities: capabilities.clone(),
             },
-            <span class="self">Self</span> {
-                <span class="ident">version</span>: <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::V15</span>),
-                <span class="ident">capabilities</span>: <span class="ident">capabilities</span>.<span class="ident">clone</span>(),
+            <span class="self">Self </span>{
+                version: <span class="prelude-val">Some</span>(PostgresVersion::V15),
+                capabilities: capabilities.clone(),
             },
-            <span class="self">Self</span> {
-                <span class="ident">version</span>: <span class="prelude-val">Some</span>(<span class="ident">PostgresVersion::PgBouncer</span>),
-                <span class="ident">capabilities</span>,
+            <span class="self">Self </span>{
+                version: <span class="prelude-val">Some</span>(PostgresVersion::PgBouncer),
+                capabilities,
             },
         ]
     }
 
-    <span class="doccomment">/// Get a reference to the postgres connector tag&#39;s version.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PostgresVersion</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">version</span>
+    <span class="doccomment">/// Get a reference to the postgres connector tag&#39;s version.
+    </span><span class="kw">pub fn </span>version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;PostgresVersion&gt; {
+        <span class="self">self</span>.version
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">PostgresConnectorTag</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">version</span>, <span class="ident">other</span>.<span class="ident">version</span>) {
-            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="op">|</span> (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) <span class="op">|</span> (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; <span class="bool-val">true</span>,
-            (<span class="prelude-val">Some</span>(<span class="ident">v1</span>), <span class="prelude-val">Some</span>(<span class="ident">v2</span>)) =&gt; <span class="ident">v1</span> <span class="op">==</span> <span class="ident">v2</span>,
+<span class="kw">impl </span>PartialEq <span class="kw">for </span>PostgresConnectorTag {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="kw">match </span>(<span class="self">self</span>.version, other.version) {
+            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) | (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) | (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; <span class="bool-val">true</span>,
+            (<span class="prelude-val">Some</span>(v1), <span class="prelude-val">Some</span>(v2)) =&gt; v1 == v2,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PostgresVersion</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">TestError</span>;
+<span class="kw">impl </span>TryFrom&lt;<span class="kw-2">&amp;</span>str&gt; <span class="kw">for </span>PostgresVersion {
+    <span class="kw">type </span>Error = TestError;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">s</span> {
-            <span class="string">&quot;9&quot;</span> =&gt; <span class="ident"><span class="self">Self</span>::V9</span>,
-            <span class="string">&quot;10&quot;</span> =&gt; <span class="ident"><span class="self">Self</span>::V10</span>,
-            <span class="string">&quot;11&quot;</span> =&gt; <span class="ident"><span class="self">Self</span>::V11</span>,
-            <span class="string">&quot;12&quot;</span> =&gt; <span class="ident"><span class="self">Self</span>::V12</span>,
-            <span class="string">&quot;13&quot;</span> =&gt; <span class="ident"><span class="self">Self</span>::V13</span>,
-            <span class="string">&quot;14&quot;</span> =&gt; <span class="ident"><span class="self">Self</span>::V14</span>,
-            <span class="string">&quot;15&quot;</span> =&gt; <span class="ident"><span class="self">Self</span>::V15</span>,
-            <span class="string">&quot;pgbouncer&quot;</span> =&gt; <span class="ident"><span class="self">Self</span>::PgBouncer</span>,
-            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">TestError::parse_error</span>(<span class="macro">format!</span>(<span class="string">&quot;Unknown Postgres version `{}`&quot;</span>, <span class="ident">s</span>))),
+    <span class="kw">fn </span>try_from(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">let </span>version = <span class="kw">match </span>s {
+            <span class="string">&quot;9&quot; </span>=&gt; <span class="self">Self</span>::V9,
+            <span class="string">&quot;10&quot; </span>=&gt; <span class="self">Self</span>::V10,
+            <span class="string">&quot;11&quot; </span>=&gt; <span class="self">Self</span>::V11,
+            <span class="string">&quot;12&quot; </span>=&gt; <span class="self">Self</span>::V12,
+            <span class="string">&quot;13&quot; </span>=&gt; <span class="self">Self</span>::V13,
+            <span class="string">&quot;14&quot; </span>=&gt; <span class="self">Self</span>::V14,
+            <span class="string">&quot;15&quot; </span>=&gt; <span class="self">Self</span>::V15,
+            <span class="string">&quot;pgbouncer&quot; </span>=&gt; <span class="self">Self</span>::PgBouncer,
+            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(TestError::parse_error(<span class="macro">format!</span>(<span class="string">&quot;Unknown Postgres version `{}`&quot;</span>, s))),
         };
 
-        <span class="prelude-val">Ok</span>(<span class="ident">version</span>)
+        <span class="prelude-val">Ok</span>(version)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ToString</span> <span class="kw">for</span> <span class="ident">PostgresVersion</span> {
-    <span class="kw">fn</span> <span class="ident">to_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">PostgresVersion::V9</span> =&gt; <span class="string">&quot;9&quot;</span>,
-            <span class="ident">PostgresVersion::V10</span> =&gt; <span class="string">&quot;10&quot;</span>,
-            <span class="ident">PostgresVersion::V11</span> =&gt; <span class="string">&quot;11&quot;</span>,
-            <span class="ident">PostgresVersion::V12</span> =&gt; <span class="string">&quot;12&quot;</span>,
-            <span class="ident">PostgresVersion::V13</span> =&gt; <span class="string">&quot;13&quot;</span>,
-            <span class="ident">PostgresVersion::V14</span> =&gt; <span class="string">&quot;14&quot;</span>,
-            <span class="ident">PostgresVersion::V15</span> =&gt; <span class="string">&quot;15&quot;</span>,
-            <span class="ident">PostgresVersion::PgBouncer</span> =&gt; <span class="string">&quot;pgbouncer&quot;</span>,
+<span class="kw">impl </span>ToString <span class="kw">for </span>PostgresVersion {
+    <span class="kw">fn </span>to_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="kw">match </span><span class="self">self </span>{
+            PostgresVersion::V9 =&gt; <span class="string">&quot;9&quot;</span>,
+            PostgresVersion::V10 =&gt; <span class="string">&quot;10&quot;</span>,
+            PostgresVersion::V11 =&gt; <span class="string">&quot;11&quot;</span>,
+            PostgresVersion::V12 =&gt; <span class="string">&quot;12&quot;</span>,
+            PostgresVersion::V13 =&gt; <span class="string">&quot;13&quot;</span>,
+            PostgresVersion::V14 =&gt; <span class="string">&quot;14&quot;</span>,
+            PostgresVersion::V15 =&gt; <span class="string">&quot;15&quot;</span>,
+            PostgresVersion::PgBouncer =&gt; <span class="string">&quot;pgbouncer&quot;</span>,
         }
-        .<span class="ident">to_owned</span>()
+        .to_owned()
     }
 }
 
-<span class="kw">fn</span> <span class="ident">postgres_capabilities</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorCapability</span><span class="op">&gt;</span> {
-    <span class="ident">psl::builtin_connectors::POSTGRES</span>.<span class="ident">capabilities</span>().<span class="ident">to_owned</span>()
+<span class="kw">fn </span>postgres_capabilities() -&gt; Vec&lt;ConnectorCapability&gt; {
+    psl::builtin_connectors::POSTGRES.capabilities().to_owned()
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_tests_setup" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_tests_setup" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

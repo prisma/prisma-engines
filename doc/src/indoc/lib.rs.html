@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/indoc-1.0.7/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../indoc/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../indoc/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../indoc/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/indoc-1.0.7/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../indoc/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../indoc/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../indoc/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -402,409 +402,409 @@
 <span id="402">402</span>
 <span id="403">403</span>
 <span id="404">404</span>
-</pre><pre class="rust"><code><span class="doccomment">//! [![github]](https://github.com/dtolnay/indoc)&amp;ensp;[![crates-io]](https://crates.io/crates/indoc)&amp;ensp;[![docs-rs]](https://docs.rs/indoc)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [github]: https://img.shields.io/badge/github-8da0cb?style=for-the-badge&amp;labelColor=555555&amp;logo=github</span>
-<span class="doccomment">//! [crates-io]: https://img.shields.io/badge/crates.io-fc8d62?style=for-the-badge&amp;labelColor=555555&amp;logo=rust</span>
-<span class="doccomment">//! [docs-rs]: https://img.shields.io/badge/docs.rs-66c2a5?style=for-the-badge&amp;labelColor=555555&amp;logo=docs.rs</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! &lt;br&gt;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This crate provides a procedural macro for indented string literals. The</span>
-<span class="doccomment">//! `indoc!()` macro takes a multiline string literal and un-indents it at</span>
-<span class="doccomment">//! compile time so the leftmost non-space character is in the first column.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! [dependencies]</span>
-<span class="doccomment">//! indoc = &quot;1.0&quot;</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! &lt;br&gt;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Using indoc</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! use indoc::indoc;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! fn main() {</span>
-<span class="doccomment">//!     let testing = indoc! {&quot;</span>
-<span class="doccomment">//!         def hello():</span>
-<span class="doccomment">//!             print(&#39;Hello, world!&#39;)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!         hello()</span>
-<span class="doccomment">//!     &quot;};</span>
-<span class="doccomment">//!     let expected = &quot;def hello():\n    print(&#39;Hello, world!&#39;)\n\nhello()\n&quot;;</span>
-<span class="doccomment">//!     assert_eq!(testing, expected);</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Indoc also works with raw string literals:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! use indoc::indoc;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! fn main() {</span>
-<span class="doccomment">//!     let testing = indoc! {r#&quot;</span>
-<span class="doccomment">//!         def hello():</span>
-<span class="doccomment">//!             print(&quot;Hello, world!&quot;)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!         hello()</span>
-<span class="doccomment">//!     &quot;#};</span>
-<span class="doccomment">//!     let expected = &quot;def hello():\n    print(\&quot;Hello, world!\&quot;)\n\nhello()\n&quot;;</span>
-<span class="doccomment">//!     assert_eq!(testing, expected);</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! And byte string literals:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! use indoc::indoc;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! fn main() {</span>
-<span class="doccomment">//!     let testing = indoc! {b&quot;</span>
-<span class="doccomment">//!         def hello():</span>
-<span class="doccomment">//!             print(&#39;Hello, world!&#39;)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!         hello()</span>
-<span class="doccomment">//!     &quot;};</span>
-<span class="doccomment">//!     let expected = b&quot;def hello():\n    print(&#39;Hello, world!&#39;)\n\nhello()\n&quot;;</span>
-<span class="doccomment">//!     assert_eq!(testing[..], expected[..]);</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! &lt;br&gt;&lt;br&gt;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Formatting macros</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The indoc crate exports four additional macros to substitute conveniently</span>
-<span class="doccomment">//! for the standard library&#39;s formatting macros:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - `formatdoc!($fmt, ...)`&amp;ensp;&amp;mdash;&amp;ensp;equivalent to `format!(indoc!($fmt), ...)`</span>
-<span class="doccomment">//! - `printdoc!($fmt, ...)`&amp;ensp;&amp;mdash;&amp;ensp;equivalent to `print!(indoc!($fmt), ...)`</span>
-<span class="doccomment">//! - `eprintdoc!($fmt, ...)`&amp;ensp;&amp;mdash;&amp;ensp;equivalent to `eprint!(indoc!($fmt), ...)`</span>
-<span class="doccomment">//! - `writedoc!($dest, $fmt, ...)`&amp;ensp;&amp;mdash;&amp;ensp;equivalent to `write!($dest, indoc!($fmt), ...)`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! use indoc::printdoc;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! fn main() {</span>
-<span class="doccomment">//!     printdoc! {&quot;</span>
-<span class="doccomment">//!         GET {url}</span>
-<span class="doccomment">//!         Accept: {mime}</span>
-<span class="doccomment">//!         &quot;,</span>
-<span class="doccomment">//!         url = &quot;http://localhost:8080&quot;,</span>
-<span class="doccomment">//!         mime = &quot;application/json&quot;,</span>
-<span class="doccomment">//!     }</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! &lt;br&gt;&lt;br&gt;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Explanation</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The following rules characterize the behavior of the `indoc!()` macro:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! 1. Count the leading spaces of each line, ignoring the first line and any</span>
-<span class="doccomment">//!    lines that are empty or contain spaces only.</span>
-<span class="doccomment">//! 2. Take the minimum.</span>
-<span class="doccomment">//! 3. If the first line is empty i.e. the string begins with a newline, remove</span>
-<span class="doccomment">//!    the first line.</span>
-<span class="doccomment">//! 4. Remove the computed number of spaces from the beginning of each line.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! [![github]](https://github.com/dtolnay/indoc)&amp;ensp;[![crates-io]](https://crates.io/crates/indoc)&amp;ensp;[![docs-rs]](https://docs.rs/indoc)
+//!
+//! [github]: https://img.shields.io/badge/github-8da0cb?style=for-the-badge&amp;labelColor=555555&amp;logo=github
+//! [crates-io]: https://img.shields.io/badge/crates.io-fc8d62?style=for-the-badge&amp;labelColor=555555&amp;logo=rust
+//! [docs-rs]: https://img.shields.io/badge/docs.rs-66c2a5?style=for-the-badge&amp;labelColor=555555&amp;logo=docs.rs
+//!
+//! &lt;br&gt;
+//!
+//! This crate provides a procedural macro for indented string literals. The
+//! `indoc!()` macro takes a multiline string literal and un-indents it at
+//! compile time so the leftmost non-space character is in the first column.
+//!
+//! ```toml
+//! [dependencies]
+//! indoc = &quot;1.0&quot;
+//! ```
+//!
+//! &lt;br&gt;
+//!
+//! # Using indoc
+//!
+//! ```
+//! use indoc::indoc;
+//!
+//! fn main() {
+//!     let testing = indoc! {&quot;
+//!         def hello():
+//!             print(&#39;Hello, world!&#39;)
+//!
+//!         hello()
+//!     &quot;};
+//!     let expected = &quot;def hello():\n    print(&#39;Hello, world!&#39;)\n\nhello()\n&quot;;
+//!     assert_eq!(testing, expected);
+//! }
+//! ```
+//!
+//! Indoc also works with raw string literals:
+//!
+//! ```
+//! use indoc::indoc;
+//!
+//! fn main() {
+//!     let testing = indoc! {r#&quot;
+//!         def hello():
+//!             print(&quot;Hello, world!&quot;)
+//!
+//!         hello()
+//!     &quot;#};
+//!     let expected = &quot;def hello():\n    print(\&quot;Hello, world!\&quot;)\n\nhello()\n&quot;;
+//!     assert_eq!(testing, expected);
+//! }
+//! ```
+//!
+//! And byte string literals:
+//!
+//! ```
+//! use indoc::indoc;
+//!
+//! fn main() {
+//!     let testing = indoc! {b&quot;
+//!         def hello():
+//!             print(&#39;Hello, world!&#39;)
+//!
+//!         hello()
+//!     &quot;};
+//!     let expected = b&quot;def hello():\n    print(&#39;Hello, world!&#39;)\n\nhello()\n&quot;;
+//!     assert_eq!(testing[..], expected[..]);
+//! }
+//! ```
+//!
+//! &lt;br&gt;&lt;br&gt;
+//!
+//! # Formatting macros
+//!
+//! The indoc crate exports four additional macros to substitute conveniently
+//! for the standard library&#39;s formatting macros:
+//!
+//! - `formatdoc!($fmt, ...)`&amp;ensp;&amp;mdash;&amp;ensp;equivalent to `format!(indoc!($fmt), ...)`
+//! - `printdoc!($fmt, ...)`&amp;ensp;&amp;mdash;&amp;ensp;equivalent to `print!(indoc!($fmt), ...)`
+//! - `eprintdoc!($fmt, ...)`&amp;ensp;&amp;mdash;&amp;ensp;equivalent to `eprint!(indoc!($fmt), ...)`
+//! - `writedoc!($dest, $fmt, ...)`&amp;ensp;&amp;mdash;&amp;ensp;equivalent to `write!($dest, indoc!($fmt), ...)`
+//!
+//! ```
+//! use indoc::printdoc;
+//!
+//! fn main() {
+//!     printdoc! {&quot;
+//!         GET {url}
+//!         Accept: {mime}
+//!         &quot;,
+//!         url = &quot;http://localhost:8080&quot;,
+//!         mime = &quot;application/json&quot;,
+//!     }
+//! }
+//! ```
+//!
+//! &lt;br&gt;&lt;br&gt;
+//!
+//! # Explanation
+//!
+//! The following rules characterize the behavior of the `indoc!()` macro:
+//!
+//! 1. Count the leading spaces of each line, ignoring the first line and any
+//!    lines that are empty or contain spaces only.
+//! 2. Take the minimum.
+//! 3. If the first line is empty i.e. the string begins with a newline, remove
+//!    the first line.
+//! 4. Remove the computed number of spaces from the beginning of each line.
 
-<span class="attribute">#![<span class="ident">allow</span>(
-    <span class="ident">clippy::derive_partial_eq_without_eq</span>,
-    <span class="ident">clippy::module_name_repetitions</span>,
-    <span class="ident">clippy::needless_doctest_main</span>,
-    <span class="ident">clippy::needless_pass_by_value</span>,
-    <span class="ident">clippy::trivially_copy_pass_by_ref</span>,
-    <span class="ident">clippy::type_complexity</span>
-)]</span>
+</span><span class="attribute">#![allow(
+    clippy::derive_partial_eq_without_eq,
+    clippy::module_name_repetitions,
+    clippy::needless_doctest_main,
+    clippy::needless_pass_by_value,
+    clippy::trivially_copy_pass_by_ref,
+    clippy::type_complexity
+)]
 
-<span class="kw">mod</span> <span class="ident">error</span>;
-<span class="kw">mod</span> <span class="ident">expr</span>;
-<span class="kw">mod</span> <span class="ident">unindent</span>;
+</span><span class="kw">mod </span>error;
+<span class="kw">mod </span>expr;
+<span class="kw">mod </span>unindent;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::{<span class="ident">Error</span>, <span class="prelude-ty">Result</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::expr::Expr</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::unindent::unindent</span>;
-<span class="kw">use</span> <span class="ident">proc_macro::token_stream::IntoIter</span> <span class="kw">as</span> <span class="ident">TokenIter</span>;
-<span class="kw">use</span> <span class="ident">proc_macro</span>::{<span class="ident">Delimiter</span>, <span class="ident">Group</span>, <span class="ident">Ident</span>, <span class="ident">Literal</span>, <span class="ident">Punct</span>, <span class="ident">Spacing</span>, <span class="ident">Span</span>, <span class="ident">TokenStream</span>, <span class="ident">TokenTree</span>};
-<span class="kw">use</span> <span class="ident">std::iter</span>::{<span class="self">self</span>, <span class="ident">FromIterator</span>};
-<span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
+<span class="kw">use </span><span class="kw">crate</span>::error::{Error, <span class="prelude-ty">Result</span>};
+<span class="kw">use </span><span class="kw">crate</span>::expr::Expr;
+<span class="kw">use </span><span class="kw">crate</span>::unindent::unindent;
+<span class="kw">use </span>proc_macro::token_stream::IntoIter <span class="kw">as </span>TokenIter;
+<span class="kw">use </span>proc_macro::{Delimiter, Group, Ident, Literal, Punct, Spacing, Span, TokenStream, TokenTree};
+<span class="kw">use </span>std::iter::{<span class="self">self</span>, FromIterator};
+<span class="kw">use </span>std::str::FromStr;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">enum</span> <span class="ident">Macro</span> {
-    <span class="ident">Indoc</span>,
-    <span class="ident">Format</span>,
-    <span class="ident">Print</span>,
-    <span class="ident">Eprint</span>,
-    <span class="ident">Write</span>,
+<span class="attribute">#[derive(Copy, Clone, PartialEq)]
+</span><span class="kw">enum </span>Macro {
+    Indoc,
+    Format,
+    Print,
+    Eprint,
+    Write,
 }
 
-<span class="doccomment">/// Unindent and produce `&amp;&#39;static str`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use indoc::indoc;</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// // The type of `program` is &amp;&#39;static str</span>
-<span class="doccomment">/// let program = indoc! {&quot;</span>
-<span class="doccomment">///     def hello():</span>
-<span class="doccomment">///         print(&#39;Hello, world!&#39;)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     hello()</span>
-<span class="doccomment">/// &quot;};</span>
-<span class="doccomment">/// print!(&quot;{}&quot;, program);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// def hello():</span>
-<span class="doccomment">///     print(&#39;Hello, world!&#39;)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// hello()</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">proc_macro</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">indoc</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="ident">expand</span>(<span class="ident">input</span>, <span class="ident">Macro::Indoc</span>)
+<span class="doccomment">/// Unindent and produce `&amp;&#39;static str`.
+///
+/// # Example
+///
+/// ```
+/// # use indoc::indoc;
+/// #
+/// // The type of `program` is &amp;&#39;static str
+/// let program = indoc! {&quot;
+///     def hello():
+///         print(&#39;Hello, world!&#39;)
+///
+///     hello()
+/// &quot;};
+/// print!(&quot;{}&quot;, program);
+/// ```
+///
+/// ```text
+/// def hello():
+///     print(&#39;Hello, world!&#39;)
+///
+/// hello()
+/// ```
+</span><span class="attribute">#[proc_macro]
+</span><span class="kw">pub fn </span>indoc(input: TokenStream) -&gt; TokenStream {
+    expand(input, Macro::Indoc)
 }
 
-<span class="doccomment">/// Unindent and call `format!`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Argument syntax is the same as for [`std::format!`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use indoc::formatdoc;</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// let request = formatdoc! {&quot;</span>
-<span class="doccomment">///     GET {url}</span>
-<span class="doccomment">///     Accept: {mime}</span>
-<span class="doccomment">///     &quot;,</span>
-<span class="doccomment">///     url = &quot;http://localhost:8080&quot;,</span>
-<span class="doccomment">///     mime = &quot;application/json&quot;,</span>
-<span class="doccomment">/// };</span>
-<span class="doccomment">/// println!(&quot;{}&quot;, request);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// GET http://localhost:8080</span>
-<span class="doccomment">/// Accept: application/json</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">proc_macro</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">formatdoc</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="ident">expand</span>(<span class="ident">input</span>, <span class="ident">Macro::Format</span>)
+<span class="doccomment">/// Unindent and call `format!`.
+///
+/// Argument syntax is the same as for [`std::format!`].
+///
+/// # Example
+///
+/// ```
+/// # use indoc::formatdoc;
+/// #
+/// let request = formatdoc! {&quot;
+///     GET {url}
+///     Accept: {mime}
+///     &quot;,
+///     url = &quot;http://localhost:8080&quot;,
+///     mime = &quot;application/json&quot;,
+/// };
+/// println!(&quot;{}&quot;, request);
+/// ```
+///
+/// ```text
+/// GET http://localhost:8080
+/// Accept: application/json
+/// ```
+</span><span class="attribute">#[proc_macro]
+</span><span class="kw">pub fn </span>formatdoc(input: TokenStream) -&gt; TokenStream {
+    expand(input, Macro::Format)
 }
 
-<span class="doccomment">/// Unindent and call `print!`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Argument syntax is the same as for [`std::print!`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use indoc::printdoc;</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// printdoc! {&quot;</span>
-<span class="doccomment">///     GET {url}</span>
-<span class="doccomment">///     Accept: {mime}</span>
-<span class="doccomment">///     &quot;,</span>
-<span class="doccomment">///     url = &quot;http://localhost:8080&quot;,</span>
-<span class="doccomment">///     mime = &quot;application/json&quot;,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// GET http://localhost:8080</span>
-<span class="doccomment">/// Accept: application/json</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">proc_macro</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">printdoc</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="ident">expand</span>(<span class="ident">input</span>, <span class="ident">Macro::Print</span>)
+<span class="doccomment">/// Unindent and call `print!`.
+///
+/// Argument syntax is the same as for [`std::print!`].
+///
+/// # Example
+///
+/// ```
+/// # use indoc::printdoc;
+/// #
+/// printdoc! {&quot;
+///     GET {url}
+///     Accept: {mime}
+///     &quot;,
+///     url = &quot;http://localhost:8080&quot;,
+///     mime = &quot;application/json&quot;,
+/// }
+/// ```
+///
+/// ```text
+/// GET http://localhost:8080
+/// Accept: application/json
+/// ```
+</span><span class="attribute">#[proc_macro]
+</span><span class="kw">pub fn </span>printdoc(input: TokenStream) -&gt; TokenStream {
+    expand(input, Macro::Print)
 }
 
-<span class="doccomment">/// Unindent and call `eprint!`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Argument syntax is the same as for [`std::eprint!`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use indoc::eprintdoc;</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// eprintdoc! {&quot;</span>
-<span class="doccomment">///     GET {url}</span>
-<span class="doccomment">///     Accept: {mime}</span>
-<span class="doccomment">///     &quot;,</span>
-<span class="doccomment">///     url = &quot;http://localhost:8080&quot;,</span>
-<span class="doccomment">///     mime = &quot;application/json&quot;,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// GET http://localhost:8080</span>
-<span class="doccomment">/// Accept: application/json</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">proc_macro</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">eprintdoc</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="ident">expand</span>(<span class="ident">input</span>, <span class="ident">Macro::Eprint</span>)
+<span class="doccomment">/// Unindent and call `eprint!`.
+///
+/// Argument syntax is the same as for [`std::eprint!`].
+///
+/// # Example
+///
+/// ```
+/// # use indoc::eprintdoc;
+/// #
+/// eprintdoc! {&quot;
+///     GET {url}
+///     Accept: {mime}
+///     &quot;,
+///     url = &quot;http://localhost:8080&quot;,
+///     mime = &quot;application/json&quot;,
+/// }
+/// ```
+///
+/// ```text
+/// GET http://localhost:8080
+/// Accept: application/json
+/// ```
+</span><span class="attribute">#[proc_macro]
+</span><span class="kw">pub fn </span>eprintdoc(input: TokenStream) -&gt; TokenStream {
+    expand(input, Macro::Eprint)
 }
 
-<span class="doccomment">/// Unindent and call `write!`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Argument syntax is the same as for [`std::write!`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use indoc::writedoc;</span>
-<span class="doccomment">/// # use std::io::Write;</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// let _ = writedoc!(</span>
-<span class="doccomment">///     std::io::stdout(),</span>
-<span class="doccomment">///     &quot;</span>
-<span class="doccomment">///         GET {url}</span>
-<span class="doccomment">///         Accept: {mime}</span>
-<span class="doccomment">///     &quot;,</span>
-<span class="doccomment">///     url = &quot;http://localhost:8080&quot;,</span>
-<span class="doccomment">///     mime = &quot;application/json&quot;,</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// GET http://localhost:8080</span>
-<span class="doccomment">/// Accept: application/json</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">proc_macro</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">writedoc</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="ident">expand</span>(<span class="ident">input</span>, <span class="ident">Macro::Write</span>)
+<span class="doccomment">/// Unindent and call `write!`.
+///
+/// Argument syntax is the same as for [`std::write!`].
+///
+/// # Example
+///
+/// ```
+/// # use indoc::writedoc;
+/// # use std::io::Write;
+/// #
+/// let _ = writedoc!(
+///     std::io::stdout(),
+///     &quot;
+///         GET {url}
+///         Accept: {mime}
+///     &quot;,
+///     url = &quot;http://localhost:8080&quot;,
+///     mime = &quot;application/json&quot;,
+/// );
+/// ```
+///
+/// ```text
+/// GET http://localhost:8080
+/// Accept: application/json
+/// ```
+</span><span class="attribute">#[proc_macro]
+</span><span class="kw">pub fn </span>writedoc(input: TokenStream) -&gt; TokenStream {
+    expand(input, Macro::Write)
 }
 
-<span class="kw">fn</span> <span class="ident">expand</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>, <span class="ident">mode</span>: <span class="ident">Macro</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="kw">match</span> <span class="ident">try_expand</span>(<span class="ident">input</span>, <span class="ident">mode</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">tokens</span>) =&gt; <span class="ident">tokens</span>,
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="ident">err</span>.<span class="ident">to_compile_error</span>(),
+<span class="kw">fn </span>expand(input: TokenStream, mode: Macro) -&gt; TokenStream {
+    <span class="kw">match </span>try_expand(input, mode) {
+        <span class="prelude-val">Ok</span>(tokens) =&gt; tokens,
+        <span class="prelude-val">Err</span>(err) =&gt; err.to_compile_error(),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">try_expand</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>, <span class="ident">mode</span>: <span class="ident">Macro</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TokenStream</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">into_iter</span>();
+<span class="kw">fn </span>try_expand(input: TokenStream, mode: Macro) -&gt; <span class="prelude-ty">Result</span>&lt;TokenStream&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>input = input.into_iter();
 
-    <span class="kw">let</span> <span class="ident">prefix</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">mode</span> <span class="op">==</span> <span class="ident">Macro::Write</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">expr::parse</span>(<span class="kw-2">&amp;mut</span> <span class="ident">input</span>)<span class="question-mark">?</span>)
-    } <span class="kw">else</span> {
-        <span class="prelude-val">None</span>
-    };
+    <span class="kw">let </span>prefix = <span class="kw">if </span>mode == Macro::Write {
+        <span class="prelude-val">Some</span>(expr::parse(<span class="kw-2">&amp;mut </span>input)<span class="question-mark">?</span>)
+    } <span class="kw">else </span>{
+        <span class="prelude-val">None
+    </span>};
 
-    <span class="kw">let</span> <span class="ident">first</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">next</span>().<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-        <span class="ident">Error::new</span>(
-            <span class="ident">Span::call_site</span>(),
+    <span class="kw">let </span>first = input.next().ok_or_else(|| {
+        Error::new(
+            Span::call_site(),
             <span class="string">&quot;unexpected end of macro invocation, expected format string&quot;</span>,
         )
     })<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">unindented_lit</span> <span class="op">=</span> <span class="ident">lit_indoc</span>(<span class="ident">first</span>, <span class="ident">mode</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>unindented_lit = lit_indoc(first, mode)<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">macro_name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">mode</span> {
-        <span class="ident">Macro::Indoc</span> =&gt; {
-            <span class="ident">require_empty_or_trailing_comma</span>(<span class="kw-2">&amp;mut</span> <span class="ident">input</span>)<span class="question-mark">?</span>;
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">TokenStream::from</span>(<span class="ident">TokenTree::Literal</span>(<span class="ident">unindented_lit</span>)));
+    <span class="kw">let </span>macro_name = <span class="kw">match </span>mode {
+        Macro::Indoc =&gt; {
+            require_empty_or_trailing_comma(<span class="kw-2">&amp;mut </span>input)<span class="question-mark">?</span>;
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(TokenStream::from(TokenTree::Literal(unindented_lit)));
         }
-        <span class="ident">Macro::Format</span> =&gt; <span class="string">&quot;format&quot;</span>,
-        <span class="ident">Macro::Print</span> =&gt; <span class="string">&quot;print&quot;</span>,
-        <span class="ident">Macro::Eprint</span> =&gt; <span class="string">&quot;eprint&quot;</span>,
-        <span class="ident">Macro::Write</span> =&gt; <span class="string">&quot;write&quot;</span>,
+        Macro::Format =&gt; <span class="string">&quot;format&quot;</span>,
+        Macro::Print =&gt; <span class="string">&quot;print&quot;</span>,
+        Macro::Eprint =&gt; <span class="string">&quot;eprint&quot;</span>,
+        Macro::Write =&gt; <span class="string">&quot;write&quot;</span>,
     };
 
-    <span class="comment">// #macro_name! { #unindented_lit #args }</span>
-    <span class="prelude-val">Ok</span>(<span class="ident">TokenStream::from_iter</span>(<span class="macro">vec!</span>[
-        <span class="ident">TokenTree::Ident</span>(<span class="ident">Ident::new</span>(<span class="ident">macro_name</span>, <span class="ident">Span::call_site</span>())),
-        <span class="ident">TokenTree::Punct</span>(<span class="ident">Punct::new</span>(<span class="string">&#39;!&#39;</span>, <span class="ident">Spacing::Alone</span>)),
-        <span class="ident">TokenTree::Group</span>(<span class="ident">Group::new</span>(
-            <span class="ident">Delimiter::Brace</span>,
-            <span class="ident">prefix</span>
-                .<span class="ident">map_or_else</span>(<span class="ident">TokenStream::new</span>, <span class="ident">Expr::into_tokens</span>)
-                .<span class="ident">into_iter</span>()
-                .<span class="ident">chain</span>(<span class="ident">iter::once</span>(<span class="ident">TokenTree::Literal</span>(<span class="ident">unindented_lit</span>)))
-                .<span class="ident">chain</span>(<span class="ident">input</span>)
-                .<span class="ident">collect</span>(),
+    <span class="comment">// #macro_name! { #unindented_lit #args }
+    </span><span class="prelude-val">Ok</span>(TokenStream::from_iter(<span class="macro">vec!</span>[
+        TokenTree::Ident(Ident::new(macro_name, Span::call_site())),
+        TokenTree::Punct(Punct::new(<span class="string">&#39;!&#39;</span>, Spacing::Alone)),
+        TokenTree::Group(Group::new(
+            Delimiter::Brace,
+            prefix
+                .map_or_else(TokenStream::new, Expr::into_tokens)
+                .into_iter()
+                .chain(iter::once(TokenTree::Literal(unindented_lit)))
+                .chain(input)
+                .collect(),
         )),
     ]))
 }
 
-<span class="kw">fn</span> <span class="ident">lit_indoc</span>(<span class="ident">token</span>: <span class="ident">TokenTree</span>, <span class="ident">mode</span>: <span class="ident">Macro</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Literal</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">token</span>.<span class="ident">span</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">single_token</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">token</span>);
+<span class="kw">fn </span>lit_indoc(token: TokenTree, mode: Macro) -&gt; <span class="prelude-ty">Result</span>&lt;Literal&gt; {
+    <span class="kw">let </span>span = token.span();
+    <span class="kw">let </span><span class="kw-2">mut </span>single_token = <span class="prelude-val">Some</span>(token);
 
-    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">TokenTree::Group</span>(<span class="ident">group</span>)) <span class="op">=</span> <span class="ident">single_token</span> {
-        <span class="ident">single_token</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">group</span>.<span class="ident">delimiter</span>() <span class="op">==</span> <span class="ident">Delimiter::None</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">token_iter</span> <span class="op">=</span> <span class="ident">group</span>.<span class="ident">stream</span>().<span class="ident">into_iter</span>();
-            <span class="ident">token_iter</span>.<span class="ident">next</span>().<span class="ident">xor</span>(<span class="ident">token_iter</span>.<span class="ident">next</span>())
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        };
+    <span class="kw">while let </span><span class="prelude-val">Some</span>(TokenTree::Group(group)) = single_token {
+        single_token = <span class="kw">if </span>group.delimiter() == Delimiter::None {
+            <span class="kw">let </span><span class="kw-2">mut </span>token_iter = group.stream().into_iter();
+            token_iter.next().xor(token_iter.next())
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>};
     }
 
-    <span class="kw">let</span> <span class="ident">single_token</span> <span class="op">=</span>
-        <span class="ident">single_token</span>.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Error::new</span>(<span class="ident">span</span>, <span class="string">&quot;argument must be a single string literal&quot;</span>))<span class="question-mark">?</span>;
+    <span class="kw">let </span>single_token =
+        single_token.ok_or_else(|| Error::new(span, <span class="string">&quot;argument must be a single string literal&quot;</span>))<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">repr</span> <span class="op">=</span> <span class="ident">single_token</span>.<span class="ident">to_string</span>();
-    <span class="kw">let</span> <span class="ident">is_string</span> <span class="op">=</span> <span class="ident">repr</span>.<span class="ident">starts_with</span>(<span class="string">&#39;&quot;&#39;</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">repr</span>.<span class="ident">starts_with</span>(<span class="string">&#39;r&#39;</span>);
-    <span class="kw">let</span> <span class="ident">is_byte_string</span> <span class="op">=</span> <span class="ident">repr</span>.<span class="ident">starts_with</span>(<span class="string">&quot;b\&quot;&quot;</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">repr</span>.<span class="ident">starts_with</span>(<span class="string">&quot;br&quot;</span>);
+    <span class="kw">let </span>repr = single_token.to_string();
+    <span class="kw">let </span>is_string = repr.starts_with(<span class="string">&#39;&quot;&#39;</span>) || repr.starts_with(<span class="string">&#39;r&#39;</span>);
+    <span class="kw">let </span>is_byte_string = repr.starts_with(<span class="string">&quot;b\&quot;&quot;</span>) || repr.starts_with(<span class="string">&quot;br&quot;</span>);
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">is_string</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">is_byte_string</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(<span class="ident">span</span>, <span class="string">&quot;argument must be a single string literal&quot;</span>));
+    <span class="kw">if </span>!is_string &amp;&amp; !is_byte_string {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new(span, <span class="string">&quot;argument must be a single string literal&quot;</span>));
     }
 
-    <span class="kw">if</span> <span class="ident">is_byte_string</span> <span class="op">&amp;&amp;</span> <span class="ident">mode</span> <span class="op">!</span><span class="op">=</span> <span class="ident">Macro::Indoc</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(
-            <span class="ident">span</span>,
+    <span class="kw">if </span>is_byte_string &amp;&amp; mode != Macro::Indoc {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new(
+            span,
             <span class="string">&quot;byte strings are not supported in formatting macros&quot;</span>,
         ));
     }
 
-    <span class="kw">let</span> <span class="ident">begin</span> <span class="op">=</span> <span class="ident">repr</span>.<span class="ident">find</span>(<span class="string">&#39;&quot;&#39;</span>).<span class="ident">unwrap</span>() <span class="op">+</span> <span class="number">1</span>;
-    <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">repr</span>.<span class="ident">rfind</span>(<span class="string">&#39;&quot;&#39;</span>).<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">repr</span> <span class="op">=</span> <span class="macro">format!</span>(
+    <span class="kw">let </span>begin = repr.find(<span class="string">&#39;&quot;&#39;</span>).unwrap() + <span class="number">1</span>;
+    <span class="kw">let </span>end = repr.rfind(<span class="string">&#39;&quot;&#39;</span>).unwrap();
+    <span class="kw">let </span>repr = <span class="macro">format!</span>(
         <span class="string">&quot;{open}{content}{close}&quot;</span>,
-        <span class="ident">open</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">repr</span>[..<span class="ident">begin</span>],
-        <span class="ident">content</span> <span class="op">=</span> <span class="ident">unindent</span>(<span class="kw-2">&amp;</span><span class="ident">repr</span>[<span class="ident">begin</span>..<span class="ident">end</span>]),
-        <span class="ident">close</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">repr</span>[<span class="ident">end</span>..],
+        open = <span class="kw-2">&amp;</span>repr[..begin],
+        content = unindent(<span class="kw-2">&amp;</span>repr[begin..end]),
+        close = <span class="kw-2">&amp;</span>repr[end..],
     );
 
-    <span class="kw">match</span> <span class="ident">TokenStream::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">repr</span>)
-        .<span class="ident">unwrap</span>()
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">next</span>()
-        .<span class="ident">unwrap</span>()
+    <span class="kw">match </span>TokenStream::from_str(<span class="kw-2">&amp;</span>repr)
+        .unwrap()
+        .into_iter()
+        .next()
+        .unwrap()
     {
-        <span class="ident">TokenTree::Literal</span>(<span class="kw-2">mut</span> <span class="ident">lit</span>) =&gt; {
-            <span class="ident">lit</span>.<span class="ident">set_span</span>(<span class="ident">span</span>);
-            <span class="prelude-val">Ok</span>(<span class="ident">lit</span>)
+        TokenTree::Literal(<span class="kw-2">mut </span>lit) =&gt; {
+            lit.set_span(span);
+            <span class="prelude-val">Ok</span>(lit)
         }
-        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">require_empty_or_trailing_comma</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TokenIter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">first</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">next</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">TokenTree::Punct</span>(<span class="ident">punct</span>)) <span class="kw">if</span> <span class="ident">punct</span>.<span class="ident">as_char</span>() <span class="op">==</span> <span class="string">&#39;,&#39;</span> =&gt; <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">next</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">second</span>) =&gt; <span class="ident">second</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(()),
+<span class="kw">fn </span>require_empty_or_trailing_comma(input: <span class="kw-2">&amp;mut </span>TokenIter) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    <span class="kw">let </span>first = <span class="kw">match </span>input.next() {
+        <span class="prelude-val">Some</span>(TokenTree::Punct(punct)) <span class="kw">if </span>punct.as_char() == <span class="string">&#39;,&#39; </span>=&gt; <span class="kw">match </span>input.next() {
+            <span class="prelude-val">Some</span>(second) =&gt; second,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(()),
         },
-        <span class="prelude-val">Some</span>(<span class="ident">first</span>) =&gt; <span class="ident">first</span>,
-        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(()),
+        <span class="prelude-val">Some</span>(first) =&gt; first,
+        <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(()),
     };
-    <span class="kw">let</span> <span class="ident">last</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">last</span>();
+    <span class="kw">let </span>last = input.last();
 
-    <span class="kw">let</span> <span class="ident">begin_span</span> <span class="op">=</span> <span class="ident">first</span>.<span class="ident">span</span>();
-    <span class="kw">let</span> <span class="ident">end_span</span> <span class="op">=</span> <span class="ident">last</span>.<span class="ident">as_ref</span>().<span class="ident">map_or</span>(<span class="ident">begin_span</span>, <span class="ident">TokenTree::span</span>);
-    <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(
+    <span class="kw">let </span>begin_span = first.span();
+    <span class="kw">let </span>end_span = last.as_ref().map_or(begin_span, TokenTree::span);
+    <span class="kw">let </span>msg = <span class="macro">format!</span>(
         <span class="string">&quot;unexpected {token} in macro invocation; indoc argument must be a single string literal&quot;</span>,
-        <span class="ident">token</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">last</span>.<span class="ident">is_some</span>() { <span class="string">&quot;tokens&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;token&quot;</span> }
+        token = <span class="kw">if </span>last.is_some() { <span class="string">&quot;tokens&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;token&quot; </span>}
     );
-    <span class="prelude-val">Err</span>(<span class="ident">Error::new2</span>(<span class="ident">begin_span</span>, <span class="ident">end_span</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>))
+    <span class="prelude-val">Err</span>(Error::new2(begin_span, end_span, <span class="kw-2">&amp;</span>msg))
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="indoc" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="indoc" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

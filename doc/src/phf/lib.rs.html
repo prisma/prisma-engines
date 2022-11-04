@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/phf-0.11.1/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../phf/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../phf/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../phf/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/phf-0.11.1/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../phf/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../phf/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../phf/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -151,158 +151,158 @@
 <span id="151">151</span>
 <span id="152">152</span>
 <span id="153">153</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Rust-PHF is a library to generate efficient lookup tables at compile time using</span>
-<span class="doccomment">//! [perfect hash functions](http://en.wikipedia.org/wiki/Perfect_hash_function).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! It currently uses the</span>
-<span class="doccomment">//! [CHD algorithm](http://cmph.sourceforge.net/papers/esa09.pdf) and can generate</span>
-<span class="doccomment">//! a 100,000 entry map in roughly .4 seconds. By default statistics are not</span>
-<span class="doccomment">//! produced, but if you set the environment variable `PHF_STATS` it will issue</span>
-<span class="doccomment">//! a compiler note about how long it took.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! MSRV (minimum supported rust version) is Rust 1.60.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Usage</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! PHF data structures can be constructed via either the procedural</span>
-<span class="doccomment">//! macros in the `phf_macros` crate or code generation supported by the</span>
-<span class="doccomment">//! `phf_codegen` crate. If you prefer macros, you can easily use them by</span>
-<span class="doccomment">//! enabling the `macros` feature of the `phf` crate, like:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!```toml</span>
-<span class="doccomment">//! [dependencies]</span>
-<span class="doccomment">//! phf = { version = &quot;0.11&quot;, features = [&quot;macros&quot;] }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! To compile the `phf` crate with a dependency on</span>
-<span class="doccomment">//! libcore instead of libstd, enabling use in environments where libstd</span>
-<span class="doccomment">//! will not work, set `default-features = false` for the dependency:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! [dependencies]</span>
-<span class="doccomment">//! # to use `phf` in `no_std` environments</span>
-<span class="doccomment">//! phf = { version = &quot;0.11&quot;, default-features = false }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Example (with the `macros` feature enabled)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! use phf::phf_map;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[derive(Clone)]</span>
-<span class="doccomment">//! pub enum Keyword {</span>
-<span class="doccomment">//!     Loop,</span>
-<span class="doccomment">//!     Continue,</span>
-<span class="doccomment">//!     Break,</span>
-<span class="doccomment">//!     Fn,</span>
-<span class="doccomment">//!     Extern,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! static KEYWORDS: phf::Map&lt;&amp;&#39;static str, Keyword&gt; = phf_map! {</span>
-<span class="doccomment">//!     &quot;loop&quot; =&gt; Keyword::Loop,</span>
-<span class="doccomment">//!     &quot;continue&quot; =&gt; Keyword::Continue,</span>
-<span class="doccomment">//!     &quot;break&quot; =&gt; Keyword::Break,</span>
-<span class="doccomment">//!     &quot;fn&quot; =&gt; Keyword::Fn,</span>
-<span class="doccomment">//!     &quot;extern&quot; =&gt; Keyword::Extern,</span>
-<span class="doccomment">//! };</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! pub fn parse_keyword(keyword: &amp;str) -&gt; Option&lt;Keyword&gt; {</span>
-<span class="doccomment">//!     KEYWORDS.get(keyword).cloned()</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Alternatively, you can use the [`phf_codegen`] crate to generate PHF datatypes</span>
-<span class="doccomment">//! in a build script.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`phf_codegen`]: https://docs.rs/phf_codegen</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Note</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Currently, the macro syntax has some limitations and may not</span>
-<span class="doccomment">//! work as you want. See [#183] or [#196] for example.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [#183]: https://github.com/rust-phf/rust-phf/issues/183</span>
-<span class="doccomment">//! [#196]: https://github.com/rust-phf/rust-phf/issues/196</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Rust-PHF is a library to generate efficient lookup tables at compile time using
+//! [perfect hash functions](http://en.wikipedia.org/wiki/Perfect_hash_function).
+//!
+//! It currently uses the
+//! [CHD algorithm](http://cmph.sourceforge.net/papers/esa09.pdf) and can generate
+//! a 100,000 entry map in roughly .4 seconds. By default statistics are not
+//! produced, but if you set the environment variable `PHF_STATS` it will issue
+//! a compiler note about how long it took.
+//!
+//! MSRV (minimum supported rust version) is Rust 1.60.
+//!
+//! ## Usage
+//!
+//! PHF data structures can be constructed via either the procedural
+//! macros in the `phf_macros` crate or code generation supported by the
+//! `phf_codegen` crate. If you prefer macros, you can easily use them by
+//! enabling the `macros` feature of the `phf` crate, like:
+//!
+//!```toml
+//! [dependencies]
+//! phf = { version = &quot;0.11&quot;, features = [&quot;macros&quot;] }
+//! ```
+//!
+//! To compile the `phf` crate with a dependency on
+//! libcore instead of libstd, enabling use in environments where libstd
+//! will not work, set `default-features = false` for the dependency:
+//!
+//! ```toml
+//! [dependencies]
+//! # to use `phf` in `no_std` environments
+//! phf = { version = &quot;0.11&quot;, default-features = false }
+//! ```
+//!
+//! ## Example (with the `macros` feature enabled)
+//!
+//! ```rust
+//! use phf::phf_map;
+//!
+//! #[derive(Clone)]
+//! pub enum Keyword {
+//!     Loop,
+//!     Continue,
+//!     Break,
+//!     Fn,
+//!     Extern,
+//! }
+//!
+//! static KEYWORDS: phf::Map&lt;&amp;&#39;static str, Keyword&gt; = phf_map! {
+//!     &quot;loop&quot; =&gt; Keyword::Loop,
+//!     &quot;continue&quot; =&gt; Keyword::Continue,
+//!     &quot;break&quot; =&gt; Keyword::Break,
+//!     &quot;fn&quot; =&gt; Keyword::Fn,
+//!     &quot;extern&quot; =&gt; Keyword::Extern,
+//! };
+//!
+//! pub fn parse_keyword(keyword: &amp;str) -&gt; Option&lt;Keyword&gt; {
+//!     KEYWORDS.get(keyword).cloned()
+//! }
+//! ```
+//!
+//! Alternatively, you can use the [`phf_codegen`] crate to generate PHF datatypes
+//! in a build script.
+//!
+//! [`phf_codegen`]: https://docs.rs/phf_codegen
+//!
+//! ## Note
+//!
+//! Currently, the macro syntax has some limitations and may not
+//! work as you want. See [#183] or [#196] for example.
+//!
+//! [#183]: https://github.com/rust-phf/rust-phf/issues/183
+//! [#196]: https://github.com/rust-phf/rust-phf/issues/196
 
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/phf/0.11&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>), <span class="ident">no_std</span>)]</span>
+</span><span class="attribute">#![doc(html_root_url = <span class="string">&quot;https://docs.rs/phf/0.11&quot;</span>)]
+#![warn(missing_docs)]
+#![cfg_attr(not(feature = <span class="string">&quot;std&quot;</span>), no_std)]
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">std</span> <span class="kw">as</span> <span class="ident">core</span>;
+#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">extern crate </span>std <span class="kw">as </span>core;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;macros&quot;</span>)]</span>
-<span class="doccomment">/// Macro to create a `static` (compile-time) [`Map`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Requires the `macros` feature.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Supported key expressions are:</span>
-<span class="doccomment">/// - literals: bools, (byte) strings, bytes, chars, and integers (these must have a type suffix)</span>
-<span class="doccomment">/// - arrays of `u8` integers</span>
-<span class="doccomment">/// - `UniCase::unicode(string)` or `UniCase::ascii(string)` if the `unicase` feature is enabled</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use phf::{phf_map, Map};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// static MY_MAP: Map&lt;&amp;&#39;static str, u32&gt; = phf_map! {</span>
-<span class="doccomment">///     &quot;hello&quot; =&gt; 1,</span>
-<span class="doccomment">///     &quot;world&quot; =&gt; 2,</span>
-<span class="doccomment">/// };</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// fn main () {</span>
-<span class="doccomment">///     assert_eq!(MY_MAP[&quot;hello&quot;], 1);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">phf_macros::phf_map</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;macros&quot;</span>)]
+</span><span class="doccomment">/// Macro to create a `static` (compile-time) [`Map`].
+///
+/// Requires the `macros` feature.
+///
+/// Supported key expressions are:
+/// - literals: bools, (byte) strings, bytes, chars, and integers (these must have a type suffix)
+/// - arrays of `u8` integers
+/// - `UniCase::unicode(string)` or `UniCase::ascii(string)` if the `unicase` feature is enabled
+///
+/// # Example
+///
+/// ```
+/// use phf::{phf_map, Map};
+///
+/// static MY_MAP: Map&lt;&amp;&#39;static str, u32&gt; = phf_map! {
+///     &quot;hello&quot; =&gt; 1,
+///     &quot;world&quot; =&gt; 2,
+/// };
+///
+/// fn main () {
+///     assert_eq!(MY_MAP[&quot;hello&quot;], 1);
+/// }
+/// ```
+</span><span class="kw">pub use </span>phf_macros::phf_map;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;macros&quot;</span>)]</span>
-<span class="doccomment">/// Macro to create a `static` (compile-time) [`OrderedMap`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Requires the `macros` feature. Same usage as [`phf_map`].</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">phf_macros::phf_ordered_map</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;macros&quot;</span>)]
+</span><span class="doccomment">/// Macro to create a `static` (compile-time) [`OrderedMap`].
+///
+/// Requires the `macros` feature. Same usage as [`phf_map`].
+</span><span class="kw">pub use </span>phf_macros::phf_ordered_map;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;macros&quot;</span>)]</span>
-<span class="doccomment">/// Macro to create a `static` (compile-time) [`Set`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Requires the `macros` feature.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use phf::{phf_set, Set};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// static MY_SET: Set&lt;&amp;&#39;static str&gt; = phf_set! {</span>
-<span class="doccomment">///     &quot;hello world&quot;,</span>
-<span class="doccomment">///     &quot;hola mundo&quot;,</span>
-<span class="doccomment">/// };</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// fn main () {</span>
-<span class="doccomment">///     assert!(MY_SET.contains(&quot;hello world&quot;));</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">phf_macros::phf_set</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;macros&quot;</span>)]
+</span><span class="doccomment">/// Macro to create a `static` (compile-time) [`Set`].
+///
+/// Requires the `macros` feature.
+///
+/// # Example
+///
+/// ```
+/// use phf::{phf_set, Set};
+///
+/// static MY_SET: Set&lt;&amp;&#39;static str&gt; = phf_set! {
+///     &quot;hello world&quot;,
+///     &quot;hola mundo&quot;,
+/// };
+///
+/// fn main () {
+///     assert!(MY_SET.contains(&quot;hello world&quot;));
+/// }
+/// ```
+</span><span class="kw">pub use </span>phf_macros::phf_set;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;macros&quot;</span>)]</span>
-<span class="doccomment">/// Macro to create a `static` (compile-time) [`OrderedSet`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Requires the `macros` feature. Same usage as [`phf_set`].</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">phf_macros::phf_ordered_set</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;macros&quot;</span>)]
+</span><span class="doccomment">/// Macro to create a `static` (compile-time) [`OrderedSet`].
+///
+/// Requires the `macros` feature. Same usage as [`phf_set`].
+</span><span class="kw">pub use </span>phf_macros::phf_ordered_set;
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::map::Map</span>;
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::ordered_map::OrderedMap</span>;
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::ordered_set::OrderedSet</span>;
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::set::Set</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">phf_shared::PhfHash</span>;
+<span class="attribute">#[doc(inline)]
+</span><span class="kw">pub use </span><span class="self">self</span>::map::Map;
+<span class="attribute">#[doc(inline)]
+</span><span class="kw">pub use </span><span class="self">self</span>::ordered_map::OrderedMap;
+<span class="attribute">#[doc(inline)]
+</span><span class="kw">pub use </span><span class="self">self</span>::ordered_set::OrderedSet;
+<span class="attribute">#[doc(inline)]
+</span><span class="kw">pub use </span><span class="self">self</span>::set::Set;
+<span class="kw">pub use </span>phf_shared::PhfHash;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">map</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">ordered_map</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">ordered_set</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">set</span>;
+<span class="kw">pub mod </span>map;
+<span class="kw">pub mod </span>ordered_map;
+<span class="kw">pub mod </span>ordered_set;
+<span class="kw">pub mod </span>set;
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="phf" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="phf" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

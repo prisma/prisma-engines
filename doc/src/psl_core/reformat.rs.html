@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/psl-core/src/reformat.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>reformat.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../psl_core/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/psl-core/src/reformat.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>reformat.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../psl_core/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -337,344 +337,344 @@
 <span id="337">337</span>
 <span id="338">338</span>
 <span id="339">339</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ParserDatabase</span>;
-<span class="kw">use</span> <span class="ident">parser_database</span>::{<span class="ident">ast::WithSpan</span>, <span class="ident">walkers</span>};
-<span class="kw">use</span> <span class="ident">schema_ast</span>::{<span class="ident">ast</span>, <span class="ident">SourceFile</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">sync::Arc</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ParserDatabase;
+<span class="kw">use </span>parser_database::{ast::WithSpan, walkers};
+<span class="kw">use </span>schema_ast::{ast, SourceFile};
+<span class="kw">use </span>std::{borrow::Cow, sync::Arc};
 
-<span class="doccomment">/// Returns either the reformatted schema, or the original input if we can&#39;t reformat. This happens</span>
-<span class="doccomment">/// if and only if the source does not parse to a well formed AST.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reformat</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">indent_width</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">SourceFile::new_allocated</span>(<span class="ident">Arc::from</span>(<span class="ident">source</span>.<span class="ident">to_owned</span>().<span class="ident">into_boxed_str</span>()));
+<span class="doccomment">/// Returns either the reformatted schema, or the original input if we can&#39;t reformat. This happens
+/// if and only if the source does not parse to a well formed AST.
+</span><span class="kw">pub fn </span>reformat(source: <span class="kw-2">&amp;</span>str, indent_width: usize) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+    <span class="kw">let </span>file = SourceFile::new_allocated(Arc::from(source.to_owned().into_boxed_str()));
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">diagnostics</span> <span class="op">=</span> <span class="ident">diagnostics::Diagnostics::new</span>();
-    <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">parser_database::ParserDatabase::new</span>(<span class="ident">file</span>, <span class="kw-2">&amp;mut</span> <span class="ident">diagnostics</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>diagnostics = diagnostics::Diagnostics::new();
+    <span class="kw">let </span>db = parser_database::ParserDatabase::new(file, <span class="kw-2">&amp;mut </span>diagnostics);
 
-    <span class="kw">let</span> <span class="ident">source_to_reformat</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">diagnostics</span>.<span class="ident">has_errors</span>() {
-        <span class="ident">Cow::Borrowed</span>(<span class="ident">source</span>)
-    } <span class="kw">else</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">missing_bits</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">MagicReformatCtx</span> {
-            <span class="ident">original_schema</span>: <span class="ident">source</span>,
-            <span class="ident">missing_bits</span>: <span class="kw-2">&amp;mut</span> <span class="ident">missing_bits</span>,
-            <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="ident">db</span>,
+    <span class="kw">let </span>source_to_reformat = <span class="kw">if </span>diagnostics.has_errors() {
+        Cow::Borrowed(source)
+    } <span class="kw">else </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>missing_bits = Vec::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>ctx = MagicReformatCtx {
+            original_schema: source,
+            missing_bits: <span class="kw-2">&amp;mut </span>missing_bits,
+            db: <span class="kw-2">&amp;</span>db,
         };
-        <span class="ident">push_missing_fields</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>);
-        <span class="ident">push_missing_attributes</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>);
-        <span class="ident">push_missing_relation_attribute_args</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>);
-        <span class="ident">missing_bits</span>.<span class="ident">sort_by_key</span>(<span class="op">|</span><span class="ident">bit</span><span class="op">|</span> <span class="ident">bit</span>.<span class="ident">position</span>);
+        push_missing_fields(<span class="kw-2">&amp;mut </span>ctx);
+        push_missing_attributes(<span class="kw-2">&amp;mut </span>ctx);
+        push_missing_relation_attribute_args(<span class="kw-2">&amp;mut </span>ctx);
+        missing_bits.sort_by_key(|bit| bit.position);
 
-        <span class="kw">if</span> <span class="ident">missing_bits</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">Cow::Borrowed</span>(<span class="ident">source</span>)
-        } <span class="kw">else</span> {
-            <span class="ident">Cow::Owned</span>(<span class="ident">enrich</span>(<span class="ident">source</span>, <span class="kw-2">&amp;</span><span class="ident">missing_bits</span>))
+        <span class="kw">if </span>missing_bits.is_empty() {
+            Cow::Borrowed(source)
+        } <span class="kw">else </span>{
+            Cow::Owned(enrich(source, <span class="kw-2">&amp;</span>missing_bits))
         }
     };
 
-    <span class="ident">schema_ast::reformat</span>(<span class="kw-2">&amp;</span><span class="ident">source_to_reformat</span>, <span class="ident">indent_width</span>)
+    schema_ast::reformat(<span class="kw-2">&amp;</span>source_to_reformat, indent_width)
 }
 
-<span class="kw">struct</span> <span class="ident">MagicReformatCtx</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">original_schema</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-    <span class="ident">missing_bits</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MissingBit</span><span class="op">&gt;</span>,
-    <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ParserDatabase</span>,
+<span class="kw">struct </span>MagicReformatCtx&lt;<span class="lifetime">&#39;a</span>&gt; {
+    original_schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    missing_bits: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Vec&lt;MissingBit&gt;,
+    db: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ParserDatabase,
 }
 
-<span class="kw">fn</span> <span class="ident">enrich</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">missing_bits</span>: <span class="kw-2">&amp;</span>[<span class="ident">MissingBit</span>]) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="ident">missing_bits</span>.<span class="ident">iter</span>().<span class="ident">scan</span>(<span class="number">0usize</span>, <span class="op">|</span><span class="ident">last_insert_position</span>, <span class="ident">missing_bit</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">start</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">last_insert_position</span>;
-        <span class="kw-2">*</span><span class="ident">last_insert_position</span> <span class="op">=</span> <span class="ident">missing_bit</span>.<span class="ident">position</span>;
+<span class="kw">fn </span>enrich(input: <span class="kw-2">&amp;</span>str, missing_bits: <span class="kw-2">&amp;</span>[MissingBit]) -&gt; String {
+    <span class="kw">let </span>bits = missing_bits.iter().scan(<span class="number">0usize</span>, |last_insert_position, missing_bit| {
+        <span class="kw">let </span>start: usize = <span class="kw-2">*</span>last_insert_position;
+        <span class="kw-2">*</span>last_insert_position = missing_bit.position;
 
-        <span class="prelude-val">Some</span>((<span class="ident">start</span>, <span class="ident">missing_bit</span>.<span class="ident">position</span>, <span class="kw-2">&amp;</span><span class="ident">missing_bit</span>.<span class="ident">content</span>))
+        <span class="prelude-val">Some</span>((start, missing_bit.position, <span class="kw-2">&amp;</span>missing_bit.content))
     });
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="ident">input</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">missing_bits</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">mb</span><span class="op">|</span> <span class="ident">mb</span>.<span class="ident">content</span>.<span class="ident">len</span>()).<span class="ident">sum</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>());
+    <span class="kw">let </span><span class="kw-2">mut </span>out = String::with_capacity(input.len() + missing_bits.iter().map(|mb| mb.content.len()).sum::&lt;usize&gt;());
 
-    <span class="kw">for</span> (<span class="ident">start</span>, <span class="ident">end</span>, <span class="ident">insert_content</span>) <span class="kw">in</span> <span class="ident">bits</span> {
-        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>[<span class="ident">start</span>..<span class="ident">end</span>]);
-        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="ident">insert_content</span>);
+    <span class="kw">for </span>(start, end, insert_content) <span class="kw">in </span>bits {
+        out.push_str(<span class="kw-2">&amp;</span>input[start..end]);
+        out.push_str(insert_content);
     }
 
-    <span class="kw">let</span> <span class="ident">last_span_start</span> <span class="op">=</span> <span class="ident">missing_bits</span>.<span class="ident">last</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span>.<span class="ident">position</span>).<span class="ident">unwrap_or</span>(<span class="number">0</span>);
-    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>[<span class="ident">last_span_start</span>..]);
+    <span class="kw">let </span>last_span_start = missing_bits.last().map(|b| b.position).unwrap_or(<span class="number">0</span>);
+    out.push_str(<span class="kw-2">&amp;</span>input[last_span_start..]);
 
-    <span class="ident">out</span>
+    out
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">MissingBit</span> {
-    <span class="ident">position</span>: <span class="ident">usize</span>,
-    <span class="ident">content</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">struct </span>MissingBit {
+    position: usize,
+    content: String,
 }
 
-<span class="kw">fn</span> <span class="ident">push_missing_relation_attribute_args</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MagicReformatCtx</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">for</span> <span class="ident">relation</span> <span class="kw">in</span> <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">walk_relations</span>() {
-        <span class="kw">match</span> <span class="ident">relation</span>.<span class="ident">refine</span>() {
-            <span class="ident">walkers::RefinedRelationWalker::Inline</span>(<span class="ident">inline_relation</span>) =&gt; {
-                <span class="ident">push_inline_relation_missing_arguments</span>(<span class="ident">inline_relation</span>, <span class="ident">ctx</span>)
+<span class="kw">fn </span>push_missing_relation_attribute_args(ctx: <span class="kw-2">&amp;mut </span>MagicReformatCtx&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">for </span>relation <span class="kw">in </span>ctx.db.walk_relations() {
+        <span class="kw">match </span>relation.refine() {
+            walkers::RefinedRelationWalker::Inline(inline_relation) =&gt; {
+                push_inline_relation_missing_arguments(inline_relation, ctx)
             }
-            <span class="ident">walkers::RefinedRelationWalker::ImplicitManyToMany</span>(<span class="kw">_</span>) =&gt; (),
-            <span class="ident">walkers::RefinedRelationWalker::TwoWayEmbeddedManyToMany</span>(<span class="kw">_</span>) =&gt; (),
+            walkers::RefinedRelationWalker::ImplicitManyToMany(<span class="kw">_</span>) =&gt; (),
+            walkers::RefinedRelationWalker::TwoWayEmbeddedManyToMany(<span class="kw">_</span>) =&gt; (),
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">push_inline_relation_missing_arguments</span>(
-    <span class="ident">inline_relation</span>: <span class="ident">walkers::InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MagicReformatCtx</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+<span class="kw">fn </span>push_inline_relation_missing_arguments(
+    inline_relation: walkers::InlineRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ctx: <span class="kw-2">&amp;mut </span>MagicReformatCtx&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) {
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">forward</span>) <span class="op">=</span> <span class="ident">inline_relation</span>.<span class="ident">forward_relation_field</span>() {
-        <span class="kw">let</span> <span class="ident">relation_attribute</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">attr</span>) <span class="op">=</span> <span class="ident">forward</span>.<span class="ident">relation_attribute</span>() {
-            <span class="ident">attr</span>
-        } <span class="kw">else</span> {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(forward) = inline_relation.forward_relation_field() {
+        <span class="kw">let </span>relation_attribute = <span class="kw">if let </span><span class="prelude-val">Some</span>(attr) = forward.relation_attribute() {
+            attr
+        } <span class="kw">else </span>{
             <span class="kw">return</span>;
         };
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">extra_args</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>extra_args = Vec::new();
 
-        <span class="kw">if</span> <span class="ident">inline_relation</span>.<span class="ident">referencing_fields</span>().<span class="ident">is_none</span>() {
-            <span class="ident">extra_args</span>.<span class="ident">push</span>(<span class="ident">fields_argument</span>(<span class="ident">inline_relation</span>));
+        <span class="kw">if </span>inline_relation.referencing_fields().is_none() {
+            extra_args.push(fields_argument(inline_relation));
         }
 
-        <span class="kw">if</span> <span class="ident">forward</span>.<span class="ident">referenced_fields</span>().<span class="ident">is_none</span>() {
-            <span class="ident">extra_args</span>.<span class="ident">push</span>(<span class="ident">references_argument</span>(<span class="ident">inline_relation</span>));
+        <span class="kw">if </span>forward.referenced_fields().is_none() {
+            extra_args.push(references_argument(inline_relation));
         }
 
-        <span class="kw">let</span> <span class="ident">extra_args</span> <span class="op">=</span> <span class="ident">extra_args</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>);
+        <span class="kw">let </span>extra_args = extra_args.join(<span class="string">&quot;, &quot;</span>);
 
-        <span class="kw">let</span> (<span class="ident">prefix</span>, <span class="ident">suffix</span>, <span class="ident">position</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">relation_attribute</span>.<span class="ident">arguments</span>.<span class="ident">arguments</span>.<span class="ident">is_empty</span>() {
-            (<span class="string">&quot;(&quot;</span>, <span class="string">&quot;)&quot;</span>, <span class="ident">relation_attribute</span>.<span class="ident">span</span>.<span class="ident">end</span>)
-        } <span class="kw">else</span> {
-            (<span class="string">&quot;, &quot;</span>, <span class="string">&quot;&quot;</span>, <span class="ident">relation_attribute</span>.<span class="ident">span</span>.<span class="ident">end</span> <span class="op">-</span> <span class="number">1</span>)
+        <span class="kw">let </span>(prefix, suffix, position) = <span class="kw">if </span>relation_attribute.arguments.arguments.is_empty() {
+            (<span class="string">&quot;(&quot;</span>, <span class="string">&quot;)&quot;</span>, relation_attribute.span.end)
+        } <span class="kw">else </span>{
+            (<span class="string">&quot;, &quot;</span>, <span class="string">&quot;&quot;</span>, relation_attribute.span.end - <span class="number">1</span>)
         };
 
-        <span class="ident">ctx</span>.<span class="ident">missing_bits</span>.<span class="ident">push</span>(<span class="ident">MissingBit</span> {
-            <span class="ident">position</span>,
-            <span class="ident">content</span>: <span class="macro">format!</span>(<span class="string">&quot;{prefix}{extra_args}{suffix}&quot;</span>),
+        ctx.missing_bits.push(MissingBit {
+            position,
+            content: <span class="macro">format!</span>(<span class="string">&quot;{prefix}{extra_args}{suffix}&quot;</span>),
         });
     }
 }
 
-<span class="kw">fn</span> <span class="ident">push_missing_attributes</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MagicReformatCtx</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">for</span> <span class="ident">relation</span> <span class="kw">in</span> <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">walk_relations</span>() {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">walkers::RefinedRelationWalker::Inline</span>(<span class="ident">inline_relation</span>) <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">refine</span>() {
-            <span class="ident">push_missing_relation_attribute</span>(<span class="ident">inline_relation</span>, <span class="ident">ctx</span>);
+<span class="kw">fn </span>push_missing_attributes(ctx: <span class="kw-2">&amp;mut </span>MagicReformatCtx&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">for </span>relation <span class="kw">in </span>ctx.db.walk_relations() {
+        <span class="kw">if let </span>walkers::RefinedRelationWalker::Inline(inline_relation) = relation.refine() {
+            push_missing_relation_attribute(inline_relation, ctx);
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">push_missing_relation_attribute</span>(<span class="ident">inline_relation</span>: <span class="ident">walkers::InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MagicReformatCtx</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">forward</span>) <span class="op">=</span> <span class="ident">inline_relation</span>.<span class="ident">forward_relation_field</span>() {
-        <span class="kw">if</span> <span class="ident">forward</span>.<span class="ident">relation_attribute</span>().<span class="ident">is_some</span>() {
+<span class="kw">fn </span>push_missing_relation_attribute(inline_relation: walkers::InlineRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>MagicReformatCtx&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(forward) = inline_relation.forward_relation_field() {
+        <span class="kw">if </span>forward.relation_attribute().is_some() {
             <span class="kw">return</span>;
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">String::from</span>(<span class="string">&quot; @relation(&quot;</span>);
-        <span class="ident">content</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">fields_argument</span>(<span class="ident">inline_relation</span>));
-        <span class="ident">content</span>.<span class="ident">push_str</span>(<span class="string">&quot;, &quot;</span>);
-        <span class="ident">content</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">references_argument</span>(<span class="ident">inline_relation</span>));
-        <span class="ident">content</span>.<span class="ident">push</span>(<span class="string">&#39;)&#39;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>content = String::from(<span class="string">&quot; @relation(&quot;</span>);
+        content.push_str(<span class="kw-2">&amp;</span>fields_argument(inline_relation));
+        content.push_str(<span class="string">&quot;, &quot;</span>);
+        content.push_str(<span class="kw-2">&amp;</span>references_argument(inline_relation));
+        content.push(<span class="string">&#39;)&#39;</span>);
 
-        <span class="ident">ctx</span>.<span class="ident">missing_bits</span>.<span class="ident">push</span>(<span class="ident">MissingBit</span> {
-            <span class="ident">position</span>: <span class="ident">before_newline</span>(<span class="ident">forward</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>().<span class="ident">end</span>, <span class="ident">ctx</span>.<span class="ident">original_schema</span>),
-            <span class="ident">content</span>,
+        ctx.missing_bits.push(MissingBit {
+            position: before_newline(forward.ast_field().span().end, ctx.original_schema),
+            content,
         })
     }
 }
 
-<span class="comment">// this finds all auto generated fields, that are added during auto generation AND are missing from the original input.</span>
-<span class="kw">fn</span> <span class="ident">push_missing_fields</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MagicReformatCtx</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">for</span> <span class="ident">relation</span> <span class="kw">in</span> <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">walk_relations</span>() {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">inline</span>) <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">refine</span>().<span class="ident">as_inline</span>() {
-            <span class="ident">push_missing_fields_for_relation</span>(<span class="ident">inline</span>, <span class="ident">ctx</span>);
+<span class="comment">// this finds all auto generated fields, that are added during auto generation AND are missing from the original input.
+</span><span class="kw">fn </span>push_missing_fields(ctx: <span class="kw-2">&amp;mut </span>MagicReformatCtx&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">for </span>relation <span class="kw">in </span>ctx.db.walk_relations() {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(inline) = relation.refine().as_inline() {
+            push_missing_fields_for_relation(inline, ctx);
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">push_missing_fields_for_relation</span>(<span class="ident">relation</span>: <span class="ident">walkers::InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MagicReformatCtx</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="ident">push_missing_relation_fields</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
-    <span class="ident">push_missing_scalar_fields</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
+<span class="kw">fn </span>push_missing_fields_for_relation(relation: walkers::InlineRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>MagicReformatCtx&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    push_missing_relation_fields(relation, ctx);
+    push_missing_scalar_fields(relation, ctx);
 }
 
-<span class="kw">fn</span> <span class="ident">push_missing_relation_fields</span>(<span class="ident">inline</span>: <span class="ident">walkers::InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MagicReformatCtx</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="ident">inline</span>.<span class="ident">back_relation_field</span>().<span class="ident">is_none</span>() {
-        <span class="kw">let</span> <span class="ident">referencing_model_name</span> <span class="op">=</span> <span class="ident">inline</span>.<span class="ident">referencing_model</span>().<span class="ident">name</span>();
-        <span class="kw">let</span> <span class="ident">ignore</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">inline</span>.<span class="ident">referencing_model</span>().<span class="ident">is_ignored</span>() {
-            <span class="string">&quot;@ignore&quot;</span>
-        } <span class="kw">else</span> {
-            <span class="string">&quot;&quot;</span>
-        };
-        <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">inline</span>.<span class="ident">is_one_to_one</span>() { <span class="string">&quot;?&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;[]&quot;</span> };
+<span class="kw">fn </span>push_missing_relation_fields(inline: walkers::InlineRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>MagicReformatCtx&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">if </span>inline.back_relation_field().is_none() {
+        <span class="kw">let </span>referencing_model_name = inline.referencing_model().name();
+        <span class="kw">let </span>ignore = <span class="kw">if </span>inline.referencing_model().is_ignored() {
+            <span class="string">&quot;@ignore&quot;
+        </span>} <span class="kw">else </span>{
+            <span class="string">&quot;&quot;
+        </span>};
+        <span class="kw">let </span>arity = <span class="kw">if </span>inline.is_one_to_one() { <span class="string">&quot;?&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;[]&quot; </span>};
 
-        <span class="ident">ctx</span>.<span class="ident">missing_bits</span>.<span class="ident">push</span>(<span class="ident">MissingBit</span> {
-            <span class="ident">position</span>: <span class="ident">inline</span>.<span class="ident">referenced_model</span>().<span class="ident">ast_model</span>().<span class="ident">span</span>().<span class="ident">end</span> <span class="op">-</span> <span class="number">1</span>,
-            <span class="ident">content</span>: <span class="macro">format!</span>(<span class="string">&quot;{referencing_model_name} {referencing_model_name}{arity} {ignore}\n&quot;</span>),
+        ctx.missing_bits.push(MissingBit {
+            position: inline.referenced_model().ast_model().span().end - <span class="number">1</span>,
+            content: <span class="macro">format!</span>(<span class="string">&quot;{referencing_model_name} {referencing_model_name}{arity} {ignore}\n&quot;</span>),
         });
     }
 
-    <span class="kw">if</span> <span class="ident">inline</span>.<span class="ident">forward_relation_field</span>().<span class="ident">is_none</span>() {
-        <span class="kw">let</span> <span class="ident">field_name</span> <span class="op">=</span> <span class="ident">inline</span>.<span class="ident">referenced_model</span>().<span class="ident">name</span>();
-        <span class="kw">let</span> <span class="ident">field_type</span> <span class="op">=</span> <span class="ident">field_name</span>;
-        <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="ident">render_arity</span>(<span class="ident">forward_relation_field_arity</span>(<span class="ident">inline</span>));
-        <span class="kw">let</span> <span class="ident">fields_arg</span> <span class="op">=</span> <span class="ident">fields_argument</span>(<span class="ident">inline</span>);
-        <span class="kw">let</span> <span class="ident">references_arg</span> <span class="op">=</span> <span class="ident">references_argument</span>(<span class="ident">inline</span>);
-        <span class="ident">ctx</span>.<span class="ident">missing_bits</span>.<span class="ident">push</span>(<span class="ident">MissingBit</span> {
-            <span class="ident">position</span>: <span class="ident">inline</span>.<span class="ident">referencing_model</span>().<span class="ident">ast_model</span>().<span class="ident">span</span>().<span class="ident">end</span> <span class="op">-</span> <span class="number">1</span>,
-            <span class="ident">content</span>: <span class="macro">format!</span>(<span class="string">&quot;{field_name} {field_type}{arity} @relation({fields_arg}, {references_arg})\n&quot;</span>),
+    <span class="kw">if </span>inline.forward_relation_field().is_none() {
+        <span class="kw">let </span>field_name = inline.referenced_model().name();
+        <span class="kw">let </span>field_type = field_name;
+        <span class="kw">let </span>arity = render_arity(forward_relation_field_arity(inline));
+        <span class="kw">let </span>fields_arg = fields_argument(inline);
+        <span class="kw">let </span>references_arg = references_argument(inline);
+        ctx.missing_bits.push(MissingBit {
+            position: inline.referencing_model().ast_model().span().end - <span class="number">1</span>,
+            content: <span class="macro">format!</span>(<span class="string">&quot;{field_name} {field_type}{arity} @relation({fields_arg}, {references_arg})\n&quot;</span>),
         })
     }
 }
 
-<span class="kw">fn</span> <span class="ident">push_missing_scalar_fields</span>(<span class="ident">inline</span>: <span class="ident">walkers::InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">MagicReformatCtx</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="ident">missing_scalar_fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InferredScalarField</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">inline</span>.<span class="ident">referencing_fields</span>() {
+<span class="kw">fn </span>push_missing_scalar_fields(inline: walkers::InlineRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>MagicReformatCtx&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">let </span>missing_scalar_fields: Vec&lt;InferredScalarField&lt;<span class="lifetime">&#39;_</span>&gt;&gt; = <span class="kw">match </span>inline.referencing_fields() {
         <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span>,
-        <span class="prelude-val">None</span> =&gt; <span class="ident">infer_missing_referencing_scalar_fields</span>(<span class="ident">inline</span>),
+        <span class="prelude-val">None </span>=&gt; infer_missing_referencing_scalar_fields(inline),
     };
 
-    <span class="comment">// Filter out duplicate fields</span>
-    <span class="kw">let</span> <span class="ident">missing_scalar_fields</span> <span class="op">=</span> <span class="ident">missing_scalar_fields</span>.<span class="ident">iter</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">missing</span><span class="op">|</span> {
-        <span class="op">!</span><span class="ident">inline</span>
-            .<span class="ident">referencing_model</span>()
-            .<span class="ident">scalar_fields</span>()
-            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">sf</span><span class="op">|</span> <span class="ident">sf</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">missing</span>.<span class="ident">name</span>)
+    <span class="comment">// Filter out duplicate fields
+    </span><span class="kw">let </span>missing_scalar_fields = missing_scalar_fields.iter().filter(|missing| {
+        !inline
+            .referencing_model()
+            .scalar_fields()
+            .any(|sf| sf.name() == missing.name)
     });
 
-    <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">missing_scalar_fields</span> {
-        <span class="kw">let</span> <span class="ident">field_name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">name</span>;
-        <span class="kw">let</span> <span class="ident">field_type</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ft</span>) <span class="op">=</span> <span class="ident">field</span>.<span class="ident">tpe</span>.<span class="ident">as_builtin_scalar</span>() {
-            <span class="ident">ft</span>.<span class="ident">as_str</span>()
-        } <span class="kw">else</span> {
+    <span class="kw">for </span>field <span class="kw">in </span>missing_scalar_fields {
+        <span class="kw">let </span>field_name = <span class="kw-2">&amp;</span>field.name;
+        <span class="kw">let </span>field_type = <span class="kw">if let </span><span class="prelude-val">Some</span>(ft) = field.tpe.as_builtin_scalar() {
+            ft.as_str()
+        } <span class="kw">else </span>{
             <span class="kw">return</span>;
         };
-        <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="ident">render_arity</span>(<span class="ident">field</span>.<span class="ident">arity</span>);
+        <span class="kw">let </span>arity = render_arity(field.arity);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">attributes</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">String::new</span>();
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">_datasource_name</span>, <span class="ident">_type_name</span>, <span class="ident">_args</span>, <span class="ident">span</span>)) <span class="op">=</span> <span class="ident">field</span>.<span class="ident">blueprint</span>.<span class="ident">raw_native_type</span>() {
-            <span class="ident">attributes</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">original_schema</span>[<span class="ident">span</span>.<span class="ident">start</span>..<span class="ident">span</span>.<span class="ident">end</span>]);
+        <span class="kw">let </span><span class="kw-2">mut </span>attributes: String = String::new();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>((_datasource_name, _type_name, _args, span)) = field.blueprint.raw_native_type() {
+            attributes.push_str(<span class="kw-2">&amp;</span>ctx.original_schema[span.start..span.end]);
         }
 
-        <span class="ident">ctx</span>.<span class="ident">missing_bits</span>.<span class="ident">push</span>(<span class="ident">MissingBit</span> {
-            <span class="ident">position</span>: <span class="ident">inline</span>.<span class="ident">referencing_model</span>().<span class="ident">ast_model</span>().<span class="ident">span</span>().<span class="ident">end</span> <span class="op">-</span> <span class="number">1</span>,
-            <span class="ident">content</span>: <span class="macro">format!</span>(<span class="string">&quot;{field_name} {field_type}{arity} {attributes}\n&quot;</span>),
+        ctx.missing_bits.push(MissingBit {
+            position: inline.referencing_model().ast_model().span().end - <span class="number">1</span>,
+            content: <span class="macro">format!</span>(<span class="string">&quot;{field_name} {field_type}{arity} {attributes}\n&quot;</span>),
         });
     }
 }
 
-<span class="doccomment">/// A scalar inferred by magic reformatting.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">InferredScalarField</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="ident">arity</span>: <span class="ident">ast::FieldArity</span>,
-    <span class="ident">tpe</span>: <span class="ident">parser_database::ScalarFieldType</span>,
-    <span class="ident">blueprint</span>: <span class="ident">walkers::ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A scalar inferred by magic reformatting.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">struct </span>InferredScalarField&lt;<span class="lifetime">&#39;db</span>&gt; {
+    name: String,
+    arity: ast::FieldArity,
+    tpe: parser_database::ScalarFieldType,
+    blueprint: walkers::ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;,
 }
 
-<span class="kw">fn</span> <span class="ident">infer_missing_referencing_scalar_fields</span>(<span class="ident">inline</span>: <span class="ident">walkers::InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InferredScalarField</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">inline</span>.<span class="ident">referenced_model</span>().<span class="ident">unique_criterias</span>().<span class="ident">next</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">first_unique_criteria</span>) =&gt; {
-            <span class="ident">first_unique_criteria</span>
-                .<span class="ident">fields</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> {
-                    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="macro">format!</span>(
+<span class="kw">fn </span>infer_missing_referencing_scalar_fields(inline: walkers::InlineRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Vec&lt;InferredScalarField&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+    <span class="kw">match </span>inline.referenced_model().unique_criterias().next() {
+        <span class="prelude-val">Some</span>(first_unique_criteria) =&gt; {
+            first_unique_criteria
+                .fields()
+                .map(|field| {
+                    <span class="kw">let </span>name = <span class="macro">format!</span>(
                         <span class="string">&quot;{}{}&quot;</span>,
-                        <span class="ident">camel_case</span>(<span class="ident">inline</span>.<span class="ident">referenced_model</span>().<span class="ident">name</span>()),
-                        <span class="ident">pascal_case</span>(<span class="ident">field</span>.<span class="ident">name</span>())
+                        camel_case(inline.referenced_model().name()),
+                        pascal_case(field.name())
                     );
 
-                    <span class="comment">// we cannot have composite fields in a relation for now.</span>
-                    <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">as_scalar_field</span>().<span class="ident">unwrap</span>();
+                    <span class="comment">// we cannot have composite fields in a relation for now.
+                    </span><span class="kw">let </span>field = field.as_scalar_field().unwrap();
 
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">existing_field</span>) <span class="op">=</span>
-                        <span class="ident">inline</span>.<span class="ident">referencing_model</span>().<span class="ident">scalar_fields</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">sf</span><span class="op">|</span> <span class="ident">sf</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">name</span>)
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(existing_field) =
+                        inline.referencing_model().scalar_fields().find(|sf| sf.name() == name)
                     {
-                        <span class="ident">InferredScalarField</span> {
-                            <span class="ident">name</span>,
-                            <span class="ident">arity</span>: <span class="ident">existing_field</span>.<span class="ident">ast_field</span>().<span class="ident">arity</span>,
-                            <span class="ident">tpe</span>: <span class="ident">existing_field</span>.<span class="ident">scalar_field_type</span>(),
-                            <span class="ident">blueprint</span>: <span class="ident">field</span>,
+                        InferredScalarField {
+                            name,
+                            arity: existing_field.ast_field().arity,
+                            tpe: existing_field.scalar_field_type(),
+                            blueprint: field,
                         }
-                    } <span class="kw">else</span> {
-                        <span class="ident">InferredScalarField</span> {
-                            <span class="ident">name</span>,
-                            <span class="ident">arity</span>: <span class="ident">inline</span>
-                                .<span class="ident">forward_relation_field</span>()
-                                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">ast_field</span>().<span class="ident">arity</span>)
-                                .<span class="ident">unwrap_or</span>(<span class="ident">ast::FieldArity::Optional</span>),
-                            <span class="ident">tpe</span>: <span class="ident">field</span>.<span class="ident">scalar_field_type</span>(),
-                            <span class="ident">blueprint</span>: <span class="ident">field</span>,
+                    } <span class="kw">else </span>{
+                        InferredScalarField {
+                            name,
+                            arity: inline
+                                .forward_relation_field()
+                                .map(|f| f.ast_field().arity)
+                                .unwrap_or(ast::FieldArity::Optional),
+                            tpe: field.scalar_field_type(),
+                            blueprint: field,
                         }
                     }
                 })
-                .<span class="ident">collect</span>()
+                .collect()
         }
-        <span class="prelude-val">None</span> =&gt; <span class="ident">Vec::new</span>(),
+        <span class="prelude-val">None </span>=&gt; Vec::new(),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">pascal_case</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">chars</span>();
-    <span class="kw">match</span> <span class="ident">c</span>.<span class="ident">next</span>() {
-        <span class="prelude-val">None</span> =&gt; <span class="ident">String::new</span>(),
-        <span class="prelude-val">Some</span>(<span class="ident">f</span>) =&gt; <span class="ident">f</span>.<span class="ident">to_uppercase</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>() <span class="op">+</span> <span class="ident">c</span>.<span class="ident">as_str</span>(),
+<span class="kw">fn </span>pascal_case(input: <span class="kw-2">&amp;</span>str) -&gt; String {
+    <span class="kw">let </span><span class="kw-2">mut </span>c = input.chars();
+    <span class="kw">match </span>c.next() {
+        <span class="prelude-val">None </span>=&gt; String::new(),
+        <span class="prelude-val">Some</span>(f) =&gt; f.to_uppercase().collect::&lt;String&gt;() + c.as_str(),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">camel_case</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">chars</span>();
-    <span class="kw">match</span> <span class="ident">c</span>.<span class="ident">next</span>() {
-        <span class="prelude-val">None</span> =&gt; <span class="ident">String::new</span>(),
-        <span class="prelude-val">Some</span>(<span class="ident">f</span>) =&gt; <span class="ident">f</span>.<span class="ident">to_lowercase</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>() <span class="op">+</span> <span class="ident">c</span>.<span class="ident">as_str</span>(),
+<span class="kw">fn </span>camel_case(input: <span class="kw-2">&amp;</span>str) -&gt; String {
+    <span class="kw">let </span><span class="kw-2">mut </span>c = input.chars();
+    <span class="kw">match </span>c.next() {
+        <span class="prelude-val">None </span>=&gt; String::new(),
+        <span class="prelude-val">Some</span>(f) =&gt; f.to_lowercase().collect::&lt;String&gt;() + c.as_str(),
     }
 }
 
-<span class="doccomment">/// The arity of the forward relation field. Works even without forward relation field.</span>
-<span class="kw">fn</span> <span class="ident">forward_relation_field_arity</span>(<span class="ident">inline</span>: <span class="ident">walkers::InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ast::FieldArity</span> {
-    <span class="ident">inline</span>
-        <span class="comment">// First use the relation field itself if it exists.</span>
-        .<span class="ident">forward_relation_field</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">rf</span><span class="op">|</span> <span class="ident">rf</span>.<span class="ident">ast_field</span>().<span class="ident">arity</span>)
-        <span class="comment">// Otherwise, if we have fields that look right on the model, use these.</span>
-        .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="ident">infer_missing_referencing_scalar_fields</span>(<span class="ident">inline</span>)
-                .<span class="ident">into_iter</span>()
-                .<span class="ident">any</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">arity</span>.<span class="ident">is_optional</span>())
+<span class="doccomment">/// The arity of the forward relation field. Works even without forward relation field.
+</span><span class="kw">fn </span>forward_relation_field_arity(inline: walkers::InlineRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; ast::FieldArity {
+    inline
+        <span class="comment">// First use the relation field itself if it exists.
+        </span>.forward_relation_field()
+        .map(|rf| rf.ast_field().arity)
+        <span class="comment">// Otherwise, if we have fields that look right on the model, use these.
+        </span>.unwrap_or_else(|| {
+            <span class="kw">if </span>infer_missing_referencing_scalar_fields(inline)
+                .into_iter()
+                .any(|f| f.arity.is_optional())
             {
-                <span class="ident">ast::FieldArity::Optional</span>
-            } <span class="kw">else</span> {
-                <span class="ident">ast::FieldArity::Required</span>
+                ast::FieldArity::Optional
+            } <span class="kw">else </span>{
+                ast::FieldArity::Required
             }
         })
 }
 
-<span class="kw">fn</span> <span class="ident">render_arity</span>(<span class="ident">arity</span>: <span class="ident">ast::FieldArity</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-    <span class="kw">match</span> <span class="ident">arity</span> {
-        <span class="ident">ast::FieldArity::Required</span> =&gt; <span class="string">&quot;&quot;</span>,
-        <span class="ident">ast::FieldArity::Optional</span> =&gt; <span class="string">&quot;?&quot;</span>,
-        <span class="ident">ast::FieldArity::List</span> =&gt; <span class="string">&quot;[]&quot;</span>,
+<span class="kw">fn </span>render_arity(arity: ast::FieldArity) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+    <span class="kw">match </span>arity {
+        ast::FieldArity::Required =&gt; <span class="string">&quot;&quot;</span>,
+        ast::FieldArity::Optional =&gt; <span class="string">&quot;?&quot;</span>,
+        ast::FieldArity::List =&gt; <span class="string">&quot;[]&quot;</span>,
     }
 }
 
-<span class="comment">// the `fields: [...]` argument.</span>
-<span class="kw">fn</span> <span class="ident">fields_argument</span>(<span class="ident">inline</span>: <span class="ident">walkers::InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InferredScalarField</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">infer_missing_referencing_scalar_fields</span>(<span class="ident">inline</span>);
-    <span class="kw">let</span> <span class="ident">field_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()).<span class="ident">collect</span>();
-    <span class="macro">format!</span>(<span class="string">&quot;fields: [{}]&quot;</span>, <span class="ident">field_names</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>))
+<span class="comment">// the `fields: [...]` argument.
+</span><span class="kw">fn </span>fields_argument(inline: walkers::InlineRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String {
+    <span class="kw">let </span>fields: Vec&lt;InferredScalarField&lt;<span class="lifetime">&#39;_</span>&gt;&gt; = infer_missing_referencing_scalar_fields(inline);
+    <span class="kw">let </span>field_names: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = fields.iter().map(|f| f.name.as_str()).collect();
+    <span class="macro">format!</span>(<span class="string">&quot;fields: [{}]&quot;</span>, field_names.join(<span class="string">&quot;, &quot;</span>))
 }
 
-<span class="comment">// the `references: [...]` argument.</span>
-<span class="kw">fn</span> <span class="ident">references_argument</span>(<span class="ident">inline</span>: <span class="ident">walkers::InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="ident">field_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">inline</span>.<span class="ident">referenced_fields</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>()).<span class="ident">collect</span>();
-    <span class="macro">format!</span>(<span class="string">&quot;references: [{}]&quot;</span>, <span class="ident">field_names</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>))
+<span class="comment">// the `references: [...]` argument.
+</span><span class="kw">fn </span>references_argument(inline: walkers::InlineRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; String {
+    <span class="kw">let </span>field_names: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = inline.referenced_fields().map(|f| f.name()).collect();
+    <span class="macro">format!</span>(<span class="string">&quot;references: [{}]&quot;</span>, field_names.join(<span class="string">&quot;, &quot;</span>))
 }
 
-<span class="doccomment">/// Assuming the last characters before span_end are newlines. We can fix this more thoroughly by</span>
-<span class="doccomment">/// not including the newline in field spans.</span>
-<span class="kw">fn</span> <span class="ident">before_newline</span>(<span class="ident">span_end</span>: <span class="ident">usize</span>, <span class="ident">original_schema</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">usize</span> {
-    <span class="macro">assert!</span>(<span class="kw-2">&amp;</span><span class="ident">original_schema</span>[<span class="ident">span_end</span> <span class="op">-</span> <span class="number">1</span>..<span class="ident">span_end</span>] <span class="op">==</span> <span class="string">&quot;\n&quot;</span>);
-    <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">original_schema</span>[<span class="ident">span_end</span> <span class="op">-</span> <span class="number">2</span>..<span class="ident">span_end</span> <span class="op">-</span> <span class="number">1</span>] {
-        <span class="string">&quot;\r&quot;</span> =&gt; <span class="ident">span_end</span> <span class="op">-</span> <span class="number">2</span>,
-        <span class="kw">_</span> =&gt; <span class="ident">span_end</span> <span class="op">-</span> <span class="number">1</span>,
+<span class="doccomment">/// Assuming the last characters before span_end are newlines. We can fix this more thoroughly by
+/// not including the newline in field spans.
+</span><span class="kw">fn </span>before_newline(span_end: usize, original_schema: <span class="kw-2">&amp;</span>str) -&gt; usize {
+    <span class="macro">assert!</span>(<span class="kw-2">&amp;</span>original_schema[span_end - <span class="number">1</span>..span_end] == <span class="string">&quot;\n&quot;</span>);
+    <span class="kw">match </span><span class="kw-2">&amp;</span>original_schema[span_end - <span class="number">2</span>..span_end - <span class="number">1</span>] {
+        <span class="string">&quot;\r&quot; </span>=&gt; span_end - <span class="number">2</span>,
+        <span class="kw">_ </span>=&gt; span_end - <span class="number">1</span>,
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="psl_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="psl_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

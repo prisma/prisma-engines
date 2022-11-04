@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/rust-postgres-dc0fca9be721a90f/064a6a5/tokio-postgres/src/config.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>config.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tokio_postgres/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/rust-postgres-dc0fca9be721a90f/064a6a5/tokio-postgres/src/config.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>config.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tokio_postgres/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -992,555 +992,555 @@
 <span id="992">992</span>
 <span id="993">993</span>
 <span id="994">994</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Connection configuration.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Connection configuration.
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::connect::connect</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::connect_raw::connect_raw</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::keepalive::KeepaliveConfig</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tls::MakeTlsConnect</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tls::TlsConnect</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Socket</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Client</span>, <span class="ident">Connection</span>, <span class="ident">Error</span>};
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::ffi::OsStr</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::os::unix::ffi::OsStrExt</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::path</span>::{<span class="ident">Path</span>, <span class="ident">PathBuf</span>};
-<span class="kw">use</span> <span class="ident">std::str</span>;
-<span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
-<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">error</span>, <span class="ident">fmt</span>, <span class="ident">iter</span>, <span class="ident">mem</span>};
-<span class="kw">use</span> <span class="ident">tokio::io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>};
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::connect::connect;
+<span class="kw">use </span><span class="kw">crate</span>::connect_raw::connect_raw;
+<span class="kw">use </span><span class="kw">crate</span>::keepalive::KeepaliveConfig;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::tls::MakeTlsConnect;
+<span class="kw">use </span><span class="kw">crate</span>::tls::TlsConnect;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::Socket;
+<span class="kw">use crate</span>::{Client, Connection, Error};
+<span class="kw">use </span>std::borrow::Cow;
+<span class="attribute">#[cfg(unix)]
+</span><span class="kw">use </span>std::ffi::OsStr;
+<span class="attribute">#[cfg(unix)]
+</span><span class="kw">use </span>std::os::unix::ffi::OsStrExt;
+<span class="attribute">#[cfg(unix)]
+</span><span class="kw">use </span>std::path::{Path, PathBuf};
+<span class="kw">use </span>std::str;
+<span class="kw">use </span>std::str::FromStr;
+<span class="kw">use </span>std::time::Duration;
+<span class="kw">use </span>std::{error, fmt, iter, mem};
+<span class="kw">use </span>tokio::io::{AsyncRead, AsyncWrite};
 
-<span class="doccomment">/// Properties required of a session.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TargetSessionAttrs</span> {
-    <span class="doccomment">/// No special properties are required.</span>
-    <span class="ident">Any</span>,
-    <span class="doccomment">/// The session must allow writes.</span>
-    <span class="ident">ReadWrite</span>,
+<span class="doccomment">/// Properties required of a session.
+</span><span class="attribute">#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>TargetSessionAttrs {
+    <span class="doccomment">/// No special properties are required.
+    </span>Any,
+    <span class="doccomment">/// The session must allow writes.
+    </span>ReadWrite,
 }
 
-<span class="doccomment">/// TLS configuration.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SslMode</span> {
-    <span class="doccomment">/// Do not use TLS.</span>
-    <span class="ident">Disable</span>,
-    <span class="doccomment">/// Attempt to connect with TLS but allow sessions without.</span>
-    <span class="ident">Prefer</span>,
-    <span class="doccomment">/// Require the use of TLS.</span>
-    <span class="ident">Require</span>,
+<span class="doccomment">/// TLS configuration.
+</span><span class="attribute">#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>SslMode {
+    <span class="doccomment">/// Do not use TLS.
+    </span>Disable,
+    <span class="doccomment">/// Attempt to connect with TLS but allow sessions without.
+    </span>Prefer,
+    <span class="doccomment">/// Require the use of TLS.
+    </span>Require,
 }
 
-<span class="doccomment">/// Channel binding configuration.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ChannelBinding</span> {
-    <span class="doccomment">/// Do not use channel binding.</span>
-    <span class="ident">Disable</span>,
-    <span class="doccomment">/// Attempt to use channel binding but allow sessions without.</span>
-    <span class="ident">Prefer</span>,
-    <span class="doccomment">/// Require the use of channel binding.</span>
-    <span class="ident">Require</span>,
+<span class="doccomment">/// Channel binding configuration.
+</span><span class="attribute">#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>ChannelBinding {
+    <span class="doccomment">/// Do not use channel binding.
+    </span>Disable,
+    <span class="doccomment">/// Attempt to use channel binding but allow sessions without.
+    </span>Prefer,
+    <span class="doccomment">/// Require the use of channel binding.
+    </span>Require,
 }
 
-<span class="doccomment">/// A host specification.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Host</span> {
-    <span class="doccomment">/// A TCP hostname.</span>
-    <span class="ident">Tcp</span>(<span class="ident">String</span>),
-    <span class="doccomment">/// A path to a directory containing the server&#39;s Unix socket.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This variant is only available on Unix platforms.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-    <span class="ident">Unix</span>(<span class="ident">PathBuf</span>),
+<span class="doccomment">/// A host specification.
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq, Eq)]
+</span><span class="kw">pub enum </span>Host {
+    <span class="doccomment">/// A TCP hostname.
+    </span>Tcp(String),
+    <span class="doccomment">/// A path to a directory containing the server&#39;s Unix socket.
+    ///
+    /// This variant is only available on Unix platforms.
+    </span><span class="attribute">#[cfg(unix)]
+    </span>Unix(PathBuf),
 }
 
-<span class="doccomment">/// Connection configuration.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Configuration can be parsed from libpq-style connection strings. These strings come in two formats:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Key-Value</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This format consists of space-separated key-value pairs. Values which are either the empty string or contain</span>
-<span class="doccomment">/// whitespace should be wrapped in `&#39;`. `&#39;` and `\` characters should be backslash-escaped.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Keys</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * `user` - The username to authenticate with. Required.</span>
-<span class="doccomment">/// * `password` - The password to authenticate with.</span>
-<span class="doccomment">/// * `dbname` - The name of the database to connect to. Defaults to the username.</span>
-<span class="doccomment">/// * `options` - Command line options used to configure the server.</span>
-<span class="doccomment">/// * `application_name` - Sets the `application_name` parameter on the server.</span>
-<span class="doccomment">/// * `sslmode` - Controls usage of TLS. If set to `disable`, TLS will not be used. If set to `prefer`, TLS will be used</span>
-<span class="doccomment">///     if available, but not used otherwise. If set to `require`, TLS will be forced to be used. Defaults to `prefer`.</span>
-<span class="doccomment">/// * `host` - The host to connect to. On Unix platforms, if the host starts with a `/` character it is treated as the</span>
-<span class="doccomment">///     path to the directory containing Unix domain sockets. Otherwise, it is treated as a hostname. Multiple hosts</span>
-<span class="doccomment">///     can be specified, separated by commas. Each host will be tried in turn when connecting. Required if connecting</span>
-<span class="doccomment">///     with the `connect` method.</span>
-<span class="doccomment">/// * `port` - The port to connect to. Multiple ports can be specified, separated by commas. The number of ports must be</span>
-<span class="doccomment">///     either 1, in which case it will be used for all hosts, or the same as the number of hosts. Defaults to 5432 if</span>
-<span class="doccomment">///     omitted or the empty string.</span>
-<span class="doccomment">/// * `connect_timeout` - The time limit in seconds applied to each socket-level connection attempt. Note that hostnames</span>
-<span class="doccomment">///     can resolve to multiple IP addresses, and this limit is applied to each address. Defaults to no timeout.</span>
-<span class="doccomment">/// * `keepalives` - Controls the use of TCP keepalive. A value of 0 disables keepalive and nonzero integers enable it.</span>
-<span class="doccomment">///     This option is ignored when connecting with Unix sockets. Defaults to on.</span>
-<span class="doccomment">/// * `keepalives_idle` - The number of seconds of inactivity after which a keepalive message is sent to the server.</span>
-<span class="doccomment">///     This option is ignored when connecting with Unix sockets. Defaults to 2 hours.</span>
-<span class="doccomment">/// * `keepalives_interval` - The time interval between TCP keepalive probes.</span>
-<span class="doccomment">///     This option is ignored when connecting with Unix sockets.</span>
-<span class="doccomment">/// * `keepalives_retries` - The maximum number of TCP keepalive probes that will be sent before dropping a connection.</span>
-<span class="doccomment">///     This option is ignored when connecting with Unix sockets.</span>
-<span class="doccomment">/// * `target_session_attrs` - Specifies requirements of the session. If set to `read-write`, the client will check that</span>
-<span class="doccomment">///     the `transaction_read_write` session parameter is set to `on`. This can be used to connect to the primary server</span>
-<span class="doccomment">///     in a database cluster as opposed to the secondary read-only mirrors. Defaults to `all`.</span>
-<span class="doccomment">/// * `channel_binding` - Controls usage of channel binding in the authentication process. If set to `disable`, channel</span>
-<span class="doccomment">///     binding will not be used. If set to `prefer`, channel binding will be used if available, but not used otherwise.</span>
-<span class="doccomment">///     If set to `require`, the authentication process will fail if channel binding is not used. Defaults to `prefer`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```not_rust</span>
-<span class="doccomment">/// host=localhost user=postgres connect_timeout=10 keepalives=0</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```not_rust</span>
-<span class="doccomment">/// host=/var/lib/postgresql,localhost port=1234 user=postgres password=&#39;password with spaces&#39;</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```not_rust</span>
-<span class="doccomment">/// host=host1,host2,host3 port=1234,,5678 user=postgres target_session_attrs=read-write</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Url</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This format resembles a URL with a scheme of either `postgres://` or `postgresql://`. All components are optional,</span>
-<span class="doccomment">/// and the format accepts query parameters for all of the key-value pairs described in the section above. Multiple</span>
-<span class="doccomment">/// host/port pairs can be comma-separated. Unix socket paths in the host section of the URL should be percent-encoded,</span>
-<span class="doccomment">/// as the path component of the URL specifies the database name.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```not_rust</span>
-<span class="doccomment">/// postgresql://user@localhost</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```not_rust</span>
-<span class="doccomment">/// postgresql://user:password@%2Fvar%2Flib%2Fpostgresql/mydb?connect_timeout=10</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```not_rust</span>
-<span class="doccomment">/// postgresql://user@host1:1234,host2,host3:5678?target_session_attrs=read-write</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```not_rust</span>
-<span class="doccomment">/// postgresql:///mydb?user=user&amp;host=/var/lib/postgresql</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Config</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">user</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">password</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">dbname</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">application_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">ssl_mode</span>: <span class="ident">SslMode</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">host</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Host</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">port</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">connect_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">keepalives</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">keepalive_config</span>: <span class="ident">KeepaliveConfig</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">target_session_attrs</span>: <span class="ident">TargetSessionAttrs</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">channel_binding</span>: <span class="ident">ChannelBinding</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">pgbouncer_mode</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// Connection configuration.
+///
+/// Configuration can be parsed from libpq-style connection strings. These strings come in two formats:
+///
+/// # Key-Value
+///
+/// This format consists of space-separated key-value pairs. Values which are either the empty string or contain
+/// whitespace should be wrapped in `&#39;`. `&#39;` and `\` characters should be backslash-escaped.
+///
+/// ## Keys
+///
+/// * `user` - The username to authenticate with. Required.
+/// * `password` - The password to authenticate with.
+/// * `dbname` - The name of the database to connect to. Defaults to the username.
+/// * `options` - Command line options used to configure the server.
+/// * `application_name` - Sets the `application_name` parameter on the server.
+/// * `sslmode` - Controls usage of TLS. If set to `disable`, TLS will not be used. If set to `prefer`, TLS will be used
+///     if available, but not used otherwise. If set to `require`, TLS will be forced to be used. Defaults to `prefer`.
+/// * `host` - The host to connect to. On Unix platforms, if the host starts with a `/` character it is treated as the
+///     path to the directory containing Unix domain sockets. Otherwise, it is treated as a hostname. Multiple hosts
+///     can be specified, separated by commas. Each host will be tried in turn when connecting. Required if connecting
+///     with the `connect` method.
+/// * `port` - The port to connect to. Multiple ports can be specified, separated by commas. The number of ports must be
+///     either 1, in which case it will be used for all hosts, or the same as the number of hosts. Defaults to 5432 if
+///     omitted or the empty string.
+/// * `connect_timeout` - The time limit in seconds applied to each socket-level connection attempt. Note that hostnames
+///     can resolve to multiple IP addresses, and this limit is applied to each address. Defaults to no timeout.
+/// * `keepalives` - Controls the use of TCP keepalive. A value of 0 disables keepalive and nonzero integers enable it.
+///     This option is ignored when connecting with Unix sockets. Defaults to on.
+/// * `keepalives_idle` - The number of seconds of inactivity after which a keepalive message is sent to the server.
+///     This option is ignored when connecting with Unix sockets. Defaults to 2 hours.
+/// * `keepalives_interval` - The time interval between TCP keepalive probes.
+///     This option is ignored when connecting with Unix sockets.
+/// * `keepalives_retries` - The maximum number of TCP keepalive probes that will be sent before dropping a connection.
+///     This option is ignored when connecting with Unix sockets.
+/// * `target_session_attrs` - Specifies requirements of the session. If set to `read-write`, the client will check that
+///     the `transaction_read_write` session parameter is set to `on`. This can be used to connect to the primary server
+///     in a database cluster as opposed to the secondary read-only mirrors. Defaults to `all`.
+/// * `channel_binding` - Controls usage of channel binding in the authentication process. If set to `disable`, channel
+///     binding will not be used. If set to `prefer`, channel binding will be used if available, but not used otherwise.
+///     If set to `require`, the authentication process will fail if channel binding is not used. Defaults to `prefer`.
+///
+/// ## Examples
+///
+/// ```not_rust
+/// host=localhost user=postgres connect_timeout=10 keepalives=0
+/// ```
+///
+/// ```not_rust
+/// host=/var/lib/postgresql,localhost port=1234 user=postgres password=&#39;password with spaces&#39;
+/// ```
+///
+/// ```not_rust
+/// host=host1,host2,host3 port=1234,,5678 user=postgres target_session_attrs=read-write
+/// ```
+///
+/// # Url
+///
+/// This format resembles a URL with a scheme of either `postgres://` or `postgresql://`. All components are optional,
+/// and the format accepts query parameters for all of the key-value pairs described in the section above. Multiple
+/// host/port pairs can be comma-separated. Unix socket paths in the host section of the URL should be percent-encoded,
+/// as the path component of the URL specifies the database name.
+///
+/// ## Examples
+///
+/// ```not_rust
+/// postgresql://user@localhost
+/// ```
+///
+/// ```not_rust
+/// postgresql://user:password@%2Fvar%2Flib%2Fpostgresql/mydb?connect_timeout=10
+/// ```
+///
+/// ```not_rust
+/// postgresql://user@host1:1234,host2,host3:5678?target_session_attrs=read-write
+/// ```
+///
+/// ```not_rust
+/// postgresql:///mydb?user=user&amp;host=/var/lib/postgresql
+/// ```
+</span><span class="attribute">#[derive(Clone, PartialEq, Eq)]
+</span><span class="kw">pub struct </span>Config {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) user: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) password: <span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) dbname: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) options: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) application_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) ssl_mode: SslMode,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) host: Vec&lt;Host&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) port: Vec&lt;u16&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) connect_timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) keepalives: bool,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) keepalive_config: KeepaliveConfig,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) target_session_attrs: TargetSessionAttrs,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) channel_binding: ChannelBinding,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) pgbouncer_mode: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Config</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">Config</span> {
-        <span class="ident">Config::new</span>()
+<span class="kw">impl </span>Default <span class="kw">for </span>Config {
+    <span class="kw">fn </span>default() -&gt; Config {
+        Config::new()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Config</span> {
-    <span class="doccomment">/// Creates a new configuration.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Config</span> {
-        <span class="kw">let</span> <span class="ident">keepalive_config</span> <span class="op">=</span> <span class="ident">KeepaliveConfig</span> {
-            <span class="ident">idle</span>: <span class="ident">Duration::from_secs</span>(<span class="number">2</span> <span class="op">*</span> <span class="number">60</span> <span class="op">*</span> <span class="number">60</span>),
-            <span class="ident">interval</span>: <span class="prelude-val">None</span>,
-            <span class="ident">retries</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl </span>Config {
+    <span class="doccomment">/// Creates a new configuration.
+    </span><span class="kw">pub fn </span>new() -&gt; Config {
+        <span class="kw">let </span>keepalive_config = KeepaliveConfig {
+            idle: Duration::from_secs(<span class="number">2 </span>* <span class="number">60 </span>* <span class="number">60</span>),
+            interval: <span class="prelude-val">None</span>,
+            retries: <span class="prelude-val">None</span>,
         };
-        <span class="ident">Config</span> {
-            <span class="ident">user</span>: <span class="prelude-val">None</span>,
-            <span class="ident">password</span>: <span class="prelude-val">None</span>,
-            <span class="ident">dbname</span>: <span class="prelude-val">None</span>,
-            <span class="ident">options</span>: <span class="prelude-val">None</span>,
-            <span class="ident">application_name</span>: <span class="prelude-val">None</span>,
-            <span class="ident">ssl_mode</span>: <span class="ident">SslMode::Prefer</span>,
-            <span class="ident">host</span>: <span class="macro">vec!</span>[],
-            <span class="ident">port</span>: <span class="macro">vec!</span>[],
-            <span class="ident">connect_timeout</span>: <span class="prelude-val">None</span>,
-            <span class="ident">keepalives</span>: <span class="bool-val">true</span>,
-            <span class="ident">keepalive_config</span>,
-            <span class="ident">target_session_attrs</span>: <span class="ident">TargetSessionAttrs::Any</span>,
-            <span class="ident">channel_binding</span>: <span class="ident">ChannelBinding::Prefer</span>,
-            <span class="ident">pgbouncer_mode</span>: <span class="bool-val">false</span>,
+        Config {
+            user: <span class="prelude-val">None</span>,
+            password: <span class="prelude-val">None</span>,
+            dbname: <span class="prelude-val">None</span>,
+            options: <span class="prelude-val">None</span>,
+            application_name: <span class="prelude-val">None</span>,
+            ssl_mode: SslMode::Prefer,
+            host: <span class="macro">vec!</span>[],
+            port: <span class="macro">vec!</span>[],
+            connect_timeout: <span class="prelude-val">None</span>,
+            keepalives: <span class="bool-val">true</span>,
+            keepalive_config,
+            target_session_attrs: TargetSessionAttrs::Any,
+            channel_binding: ChannelBinding::Prefer,
+            pgbouncer_mode: <span class="bool-val">false</span>,
         }
     }
 
-    <span class="doccomment">/// Sets the user to authenticate with.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Required.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">user</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Config</span> {
-        <span class="self">self</span>.<span class="ident">user</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">user</span>.<span class="ident">to_string</span>());
-        <span class="self">self</span>
+    <span class="doccomment">/// Sets the user to authenticate with.
+    ///
+    /// Required.
+    </span><span class="kw">pub fn </span>user(<span class="kw-2">&amp;mut </span><span class="self">self</span>, user: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw-2">&amp;mut </span>Config {
+        <span class="self">self</span>.user = <span class="prelude-val">Some</span>(user.to_string());
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Gets the user to authenticate with, if one has been configured with
+    /// the `user` method.
+    </span><span class="kw">pub fn </span>get_user(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.user.as_deref()
     }
 
-    <span class="doccomment">/// Gets the user to authenticate with, if one has been configured with</span>
-    <span class="doccomment">/// the `user` method.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">user</span>.<span class="ident">as_deref</span>()
-    }
-
-    <span class="doccomment">/// Sets the password to authenticate with.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">password</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">password</span>: <span class="ident">T</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Config</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
+    <span class="doccomment">/// Sets the password to authenticate with.
+    </span><span class="kw">pub fn </span>password&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, password: T) -&gt; <span class="kw-2">&amp;mut </span>Config
+    <span class="kw">where
+        </span>T: AsRef&lt;[u8]&gt;,
     {
-        <span class="self">self</span>.<span class="ident">password</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">password</span>.<span class="ident">as_ref</span>().<span class="ident">to_vec</span>());
-        <span class="self">self</span>
+        <span class="self">self</span>.password = <span class="prelude-val">Some</span>(password.as_ref().to_vec());
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Gets the password to authenticate with, if one has been configured with
+    /// the `password` method.
+    </span><span class="kw">pub fn </span>get_password(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[u8]&gt; {
+        <span class="self">self</span>.password.as_deref()
     }
 
-    <span class="doccomment">/// Gets the password to authenticate with, if one has been configured with</span>
-    <span class="doccomment">/// the `password` method.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_password</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">password</span>.<span class="ident">as_deref</span>()
+    <span class="doccomment">/// Sets the name of the database to connect to.
+    ///
+    /// Defaults to the user.
+    </span><span class="kw">pub fn </span>dbname(<span class="kw-2">&amp;mut </span><span class="self">self</span>, dbname: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw-2">&amp;mut </span>Config {
+        <span class="self">self</span>.dbname = <span class="prelude-val">Some</span>(dbname.to_string());
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Gets the name of the database to connect to, if one has been configured
+    /// with the `dbname` method.
+    </span><span class="kw">pub fn </span>get_dbname(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.dbname.as_deref()
     }
 
-    <span class="doccomment">/// Sets the name of the database to connect to.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Defaults to the user.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dbname</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">dbname</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Config</span> {
-        <span class="self">self</span>.<span class="ident">dbname</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">dbname</span>.<span class="ident">to_string</span>());
-        <span class="self">self</span>
+    <span class="doccomment">/// Sets command line options used to configure the server.
+    </span><span class="kw">pub fn </span>options(<span class="kw-2">&amp;mut </span><span class="self">self</span>, options: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw-2">&amp;mut </span>Config {
+        <span class="self">self</span>.options = <span class="prelude-val">Some</span>(options.to_string());
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Gets the command line options used to configure the server, if the
+    /// options have been set with the `options` method.
+    </span><span class="kw">pub fn </span>get_options(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.options.as_deref()
     }
 
-    <span class="doccomment">/// Gets the name of the database to connect to, if one has been configured</span>
-    <span class="doccomment">/// with the `dbname` method.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_dbname</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">dbname</span>.<span class="ident">as_deref</span>()
+    <span class="doccomment">/// Sets the value of the `application_name` runtime parameter.
+    </span><span class="kw">pub fn </span>application_name(<span class="kw-2">&amp;mut </span><span class="self">self</span>, application_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw-2">&amp;mut </span>Config {
+        <span class="self">self</span>.application_name = <span class="prelude-val">Some</span>(application_name.to_string());
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Gets the value of the `application_name` runtime parameter, if it has
+    /// been set with the `application_name` method.
+    </span><span class="kw">pub fn </span>get_application_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.application_name.as_deref()
     }
 
-    <span class="doccomment">/// Sets command line options used to configure the server.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">options</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Config</span> {
-        <span class="self">self</span>.<span class="ident">options</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">options</span>.<span class="ident">to_string</span>());
-        <span class="self">self</span>
+    <span class="doccomment">/// Sets the SSL configuration.
+    ///
+    /// Defaults to `prefer`.
+    </span><span class="kw">pub fn </span>ssl_mode(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ssl_mode: SslMode) -&gt; <span class="kw-2">&amp;mut </span>Config {
+        <span class="self">self</span>.ssl_mode = ssl_mode;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Gets the SSL configuration.
+    </span><span class="kw">pub fn </span>get_ssl_mode(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SslMode {
+        <span class="self">self</span>.ssl_mode
     }
 
-    <span class="doccomment">/// Gets the command line options used to configure the server, if the</span>
-    <span class="doccomment">/// options have been set with the `options` method.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_options</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">as_deref</span>()
-    }
-
-    <span class="doccomment">/// Sets the value of the `application_name` runtime parameter.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">application_name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">application_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Config</span> {
-        <span class="self">self</span>.<span class="ident">application_name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">application_name</span>.<span class="ident">to_string</span>());
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Gets the value of the `application_name` runtime parameter, if it has</span>
-    <span class="doccomment">/// been set with the `application_name` method.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_application_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">application_name</span>.<span class="ident">as_deref</span>()
-    }
-
-    <span class="doccomment">/// Sets the SSL configuration.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Defaults to `prefer`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ssl_mode</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ssl_mode</span>: <span class="ident">SslMode</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Config</span> {
-        <span class="self">self</span>.<span class="ident">ssl_mode</span> <span class="op">=</span> <span class="ident">ssl_mode</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Gets the SSL configuration.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_ssl_mode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SslMode</span> {
-        <span class="self">self</span>.<span class="ident">ssl_mode</span>
-    }
-
-    <span class="doccomment">/// Adds a host to the configuration.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Multiple hosts can be specified by calling this method multiple times, and each will be tried in order. On Unix</span>
-    <span class="doccomment">/// systems, a host starting with a `/` is interpreted as a path to a directory containing Unix domain sockets.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">host</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">host</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Config</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-        {
-            <span class="kw">if</span> <span class="ident">host</span>.<span class="ident">starts_with</span>(<span class="string">&#39;/&#39;</span>) {
-                <span class="kw">return</span> <span class="self">self</span>.<span class="ident">host_path</span>(<span class="ident">host</span>);
+    <span class="doccomment">/// Adds a host to the configuration.
+    ///
+    /// Multiple hosts can be specified by calling this method multiple times, and each will be tried in order. On Unix
+    /// systems, a host starting with a `/` is interpreted as a path to a directory containing Unix domain sockets.
+    </span><span class="kw">pub fn </span>host(<span class="kw-2">&amp;mut </span><span class="self">self</span>, host: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw-2">&amp;mut </span>Config {
+        <span class="attribute">#[cfg(unix)]
+        </span>{
+            <span class="kw">if </span>host.starts_with(<span class="string">&#39;/&#39;</span>) {
+                <span class="kw">return </span><span class="self">self</span>.host_path(host);
             }
         }
 
-        <span class="self">self</span>.<span class="ident">host</span>.<span class="ident">push</span>(<span class="ident">Host::Tcp</span>(<span class="ident">host</span>.<span class="ident">to_string</span>()));
-        <span class="self">self</span>
+        <span class="self">self</span>.host.push(Host::Tcp(host.to_string()));
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Gets the hosts that have been added to the configuration with `host`.
+    </span><span class="kw">pub fn </span>get_hosts(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[Host] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.host
     }
 
-    <span class="doccomment">/// Gets the hosts that have been added to the configuration with `host`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_hosts</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">Host</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">host</span>
-    }
-
-    <span class="doccomment">/// Adds a Unix socket host to the configuration.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Unlike `host`, this method allows non-UTF8 paths.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">host_path</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">host</span>: <span class="ident">T</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Config</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Adds a Unix socket host to the configuration.
+    ///
+    /// Unlike `host`, this method allows non-UTF8 paths.
+    </span><span class="attribute">#[cfg(unix)]
+    </span><span class="kw">pub fn </span>host_path&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, host: T) -&gt; <span class="kw-2">&amp;mut </span>Config
+    <span class="kw">where
+        </span>T: AsRef&lt;Path&gt;,
     {
-        <span class="self">self</span>.<span class="ident">host</span>.<span class="ident">push</span>(<span class="ident">Host::Unix</span>(<span class="ident">host</span>.<span class="ident">as_ref</span>().<span class="ident">to_path_buf</span>()));
-        <span class="self">self</span>
+        <span class="self">self</span>.host.push(Host::Unix(host.as_ref().to_path_buf()));
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Adds a port to the configuration.
+    ///
+    /// Multiple ports can be specified by calling this method multiple times. There must either be no ports, in which
+    /// case the default of 5432 is used, a single port, in which it is used for all hosts, or the same number of ports
+    /// as hosts.
+    </span><span class="kw">pub fn </span>port(<span class="kw-2">&amp;mut </span><span class="self">self</span>, port: u16) -&gt; <span class="kw-2">&amp;mut </span>Config {
+        <span class="self">self</span>.port.push(port);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Gets the ports that have been added to the configuration with `port`.
+    </span><span class="kw">pub fn </span>get_ports(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u16] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.port
     }
 
-    <span class="doccomment">/// Adds a port to the configuration.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Multiple ports can be specified by calling this method multiple times. There must either be no ports, in which</span>
-    <span class="doccomment">/// case the default of 5432 is used, a single port, in which it is used for all hosts, or the same number of ports</span>
-    <span class="doccomment">/// as hosts.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">port</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">port</span>: <span class="ident">u16</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Config</span> {
-        <span class="self">self</span>.<span class="ident">port</span>.<span class="ident">push</span>(<span class="ident">port</span>);
-        <span class="self">self</span>
+    <span class="doccomment">/// Sets the timeout applied to socket-level connection attempts.
+    ///
+    /// Note that hostnames can resolve to multiple IP addresses, and this timeout will apply to each address of each
+    /// host separately. Defaults to no limit.
+    </span><span class="kw">pub fn </span>connect_timeout(<span class="kw-2">&amp;mut </span><span class="self">self</span>, connect_timeout: Duration) -&gt; <span class="kw-2">&amp;mut </span>Config {
+        <span class="self">self</span>.connect_timeout = <span class="prelude-val">Some</span>(connect_timeout);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Gets the connection timeout, if one has been set with the
+    /// `connect_timeout` method.
+    </span><span class="kw">pub fn </span>get_connect_timeout(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Duration&gt; {
+        <span class="self">self</span>.connect_timeout.as_ref()
     }
 
-    <span class="doccomment">/// Gets the ports that have been added to the configuration with `port`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_ports</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u16</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">port</span>
+    <span class="doccomment">/// Controls the use of TCP keepalive.
+    ///
+    /// This is ignored for Unix domain socket connections. Defaults to `true`.
+    </span><span class="kw">pub fn </span>keepalives(<span class="kw-2">&amp;mut </span><span class="self">self</span>, keepalives: bool) -&gt; <span class="kw-2">&amp;mut </span>Config {
+        <span class="self">self</span>.keepalives = keepalives;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Reports whether TCP keepalives will be used.
+    </span><span class="kw">pub fn </span>get_keepalives(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.keepalives
     }
 
-    <span class="doccomment">/// Sets the timeout applied to socket-level connection attempts.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that hostnames can resolve to multiple IP addresses, and this timeout will apply to each address of each</span>
-    <span class="doccomment">/// host separately. Defaults to no limit.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connect_timeout</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">connect_timeout</span>: <span class="ident">Duration</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Config</span> {
-        <span class="self">self</span>.<span class="ident">connect_timeout</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">connect_timeout</span>);
-        <span class="self">self</span>
+    <span class="doccomment">/// Sets the amount of idle time before a keepalive packet is sent on the connection.
+    ///
+    /// This is ignored for Unix domain sockets, or if the `keepalives` option is disabled. Defaults to 2 hours.
+    </span><span class="kw">pub fn </span>keepalives_idle(<span class="kw-2">&amp;mut </span><span class="self">self</span>, keepalives_idle: Duration) -&gt; <span class="kw-2">&amp;mut </span>Config {
+        <span class="self">self</span>.keepalive_config.idle = keepalives_idle;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Gets the configured amount of idle time before a keepalive packet will
+    /// be sent on the connection.
+    </span><span class="kw">pub fn </span>get_keepalives_idle(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Duration {
+        <span class="self">self</span>.keepalive_config.idle
     }
 
-    <span class="doccomment">/// Gets the connection timeout, if one has been set with the</span>
-    <span class="doccomment">/// `connect_timeout` method.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_connect_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">connect_timeout</span>.<span class="ident">as_ref</span>()
+    <span class="doccomment">/// Sets the time interval between TCP keepalive probes.
+    /// On Windows, this sets the value of the tcp_keepalive struct’s keepaliveinterval field.
+    ///
+    /// This is ignored for Unix domain sockets, or if the `keepalives` option is disabled.
+    </span><span class="kw">pub fn </span>keepalives_interval(<span class="kw-2">&amp;mut </span><span class="self">self</span>, keepalives_interval: Duration) -&gt; <span class="kw-2">&amp;mut </span>Config {
+        <span class="self">self</span>.keepalive_config.interval = <span class="prelude-val">Some</span>(keepalives_interval);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Gets the time interval between TCP keepalive probes.
+    </span><span class="kw">pub fn </span>get_keepalives_interval(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Duration&gt; {
+        <span class="self">self</span>.keepalive_config.interval
     }
 
-    <span class="doccomment">/// Controls the use of TCP keepalive.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is ignored for Unix domain socket connections. Defaults to `true`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keepalives</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">keepalives</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Config</span> {
-        <span class="self">self</span>.<span class="ident">keepalives</span> <span class="op">=</span> <span class="ident">keepalives</span>;
-        <span class="self">self</span>
+    <span class="doccomment">/// Sets the maximum number of TCP keepalive probes that will be sent before dropping a connection.
+    ///
+    /// This is ignored for Unix domain sockets, or if the `keepalives` option is disabled.
+    </span><span class="kw">pub fn </span>keepalives_retries(<span class="kw-2">&amp;mut </span><span class="self">self</span>, keepalives_retries: u32) -&gt; <span class="kw-2">&amp;mut </span>Config {
+        <span class="self">self</span>.keepalive_config.retries = <span class="prelude-val">Some</span>(keepalives_retries);
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Gets the maximum number of TCP keepalive probes that will be sent before dropping a connection.
+    </span><span class="kw">pub fn </span>get_keepalives_retries(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u32&gt; {
+        <span class="self">self</span>.keepalive_config.retries
     }
 
-    <span class="doccomment">/// Reports whether TCP keepalives will be used.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_keepalives</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">keepalives</span>
+    <span class="doccomment">/// Sets the requirements of the session.
+    ///
+    /// This can be used to connect to the primary server in a clustered database rather than one of the read-only
+    /// secondary servers. Defaults to `Any`.
+    </span><span class="kw">pub fn </span>target_session_attrs(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        target_session_attrs: TargetSessionAttrs,
+    ) -&gt; <span class="kw-2">&amp;mut </span>Config {
+        <span class="self">self</span>.target_session_attrs = target_session_attrs;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Gets the requirements of the session.
+    </span><span class="kw">pub fn </span>get_target_session_attrs(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TargetSessionAttrs {
+        <span class="self">self</span>.target_session_attrs
     }
 
-    <span class="doccomment">/// Sets the amount of idle time before a keepalive packet is sent on the connection.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is ignored for Unix domain sockets, or if the `keepalives` option is disabled. Defaults to 2 hours.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keepalives_idle</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">keepalives_idle</span>: <span class="ident">Duration</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Config</span> {
-        <span class="self">self</span>.<span class="ident">keepalive_config</span>.<span class="ident">idle</span> <span class="op">=</span> <span class="ident">keepalives_idle</span>;
-        <span class="self">self</span>
+    <span class="doccomment">/// Sets the channel binding behavior.
+    ///
+    /// Defaults to `prefer`.
+    </span><span class="kw">pub fn </span>channel_binding(<span class="kw-2">&amp;mut </span><span class="self">self</span>, channel_binding: ChannelBinding) -&gt; <span class="kw-2">&amp;mut </span>Config {
+        <span class="self">self</span>.channel_binding = channel_binding;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Gets the channel binding behavior.
+    </span><span class="kw">pub fn </span>get_channel_binding(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ChannelBinding {
+        <span class="self">self</span>.channel_binding
     }
 
-    <span class="doccomment">/// Gets the configured amount of idle time before a keepalive packet will</span>
-    <span class="doccomment">/// be sent on the connection.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_keepalives_idle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Duration</span> {
-        <span class="self">self</span>.<span class="ident">keepalive_config</span>.<span class="ident">idle</span>
+    <span class="doccomment">/// When enabled, the client skips all internal caching for statements,
+    /// allowing usage with pgBouncer&#39;s transaction mode and clearing of
+    /// statements in the session with `DEALLOCATE ALL`.
+    ///
+    /// Defaults to `false`.
+    </span><span class="kw">pub fn </span>pgbouncer_mode(<span class="kw-2">&amp;mut </span><span class="self">self</span>, enable: bool) -&gt; <span class="kw-2">&amp;mut </span>Config {
+        <span class="self">self</span>.pgbouncer_mode = enable;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Gets the pgBouncer mode status.
+    </span><span class="kw">pub fn </span>get_pgbouncer_mode(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.pgbouncer_mode
     }
 
-    <span class="doccomment">/// Sets the time interval between TCP keepalive probes.</span>
-    <span class="doccomment">/// On Windows, this sets the value of the tcp_keepalive struct’s keepaliveinterval field.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is ignored for Unix domain sockets, or if the `keepalives` option is disabled.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keepalives_interval</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">keepalives_interval</span>: <span class="ident">Duration</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Config</span> {
-        <span class="self">self</span>.<span class="ident">keepalive_config</span>.<span class="ident">interval</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">keepalives_interval</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Gets the time interval between TCP keepalive probes.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_keepalives_interval</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">keepalive_config</span>.<span class="ident">interval</span>
-    }
-
-    <span class="doccomment">/// Sets the maximum number of TCP keepalive probes that will be sent before dropping a connection.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is ignored for Unix domain sockets, or if the `keepalives` option is disabled.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keepalives_retries</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">keepalives_retries</span>: <span class="ident">u32</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Config</span> {
-        <span class="self">self</span>.<span class="ident">keepalive_config</span>.<span class="ident">retries</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">keepalives_retries</span>);
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Gets the maximum number of TCP keepalive probes that will be sent before dropping a connection.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_keepalives_retries</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">keepalive_config</span>.<span class="ident">retries</span>
-    }
-
-    <span class="doccomment">/// Sets the requirements of the session.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This can be used to connect to the primary server in a clustered database rather than one of the read-only</span>
-    <span class="doccomment">/// secondary servers. Defaults to `Any`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">target_session_attrs</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">target_session_attrs</span>: <span class="ident">TargetSessionAttrs</span>,
-    ) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Config</span> {
-        <span class="self">self</span>.<span class="ident">target_session_attrs</span> <span class="op">=</span> <span class="ident">target_session_attrs</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Gets the requirements of the session.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_target_session_attrs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TargetSessionAttrs</span> {
-        <span class="self">self</span>.<span class="ident">target_session_attrs</span>
-    }
-
-    <span class="doccomment">/// Sets the channel binding behavior.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Defaults to `prefer`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_binding</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">channel_binding</span>: <span class="ident">ChannelBinding</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Config</span> {
-        <span class="self">self</span>.<span class="ident">channel_binding</span> <span class="op">=</span> <span class="ident">channel_binding</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Gets the channel binding behavior.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_channel_binding</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ChannelBinding</span> {
-        <span class="self">self</span>.<span class="ident">channel_binding</span>
-    }
-
-    <span class="doccomment">/// When enabled, the client skips all internal caching for statements,</span>
-    <span class="doccomment">/// allowing usage with pgBouncer&#39;s transaction mode and clearing of</span>
-    <span class="doccomment">/// statements in the session with `DEALLOCATE ALL`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Defaults to `false`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pgbouncer_mode</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">enable</span>: <span class="ident">bool</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Config</span> {
-        <span class="self">self</span>.<span class="ident">pgbouncer_mode</span> <span class="op">=</span> <span class="ident">enable</span>;
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Gets the pgBouncer mode status.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_pgbouncer_mode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">pgbouncer_mode</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">param</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">key</span> {
-            <span class="string">&quot;user&quot;</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">user</span>(<span class="ident">value</span>);
+    <span class="kw">fn </span>param(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str, value: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="kw">match </span>key {
+            <span class="string">&quot;user&quot; </span>=&gt; {
+                <span class="self">self</span>.user(value);
             }
-            <span class="string">&quot;password&quot;</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">password</span>(<span class="ident">value</span>);
+            <span class="string">&quot;password&quot; </span>=&gt; {
+                <span class="self">self</span>.password(value);
             }
-            <span class="string">&quot;dbname&quot;</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">dbname</span>(<span class="ident">value</span>);
+            <span class="string">&quot;dbname&quot; </span>=&gt; {
+                <span class="self">self</span>.dbname(value);
             }
-            <span class="string">&quot;options&quot;</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">options</span>(<span class="ident">value</span>);
+            <span class="string">&quot;options&quot; </span>=&gt; {
+                <span class="self">self</span>.options(value);
             }
-            <span class="string">&quot;application_name&quot;</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">application_name</span>(<span class="ident">value</span>);
+            <span class="string">&quot;application_name&quot; </span>=&gt; {
+                <span class="self">self</span>.application_name(value);
             }
-            <span class="string">&quot;sslmode&quot;</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">mode</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">value</span> {
-                    <span class="string">&quot;disable&quot;</span> =&gt; <span class="ident">SslMode::Disable</span>,
-                    <span class="string">&quot;prefer&quot;</span> =&gt; <span class="ident">SslMode::Prefer</span>,
-                    <span class="string">&quot;require&quot;</span> =&gt; <span class="ident">SslMode::Require</span>,
-                    <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::config_parse</span>(<span class="ident">Box::new</span>(<span class="ident">InvalidValue</span>(<span class="string">&quot;sslmode&quot;</span>)))),
+            <span class="string">&quot;sslmode&quot; </span>=&gt; {
+                <span class="kw">let </span>mode = <span class="kw">match </span>value {
+                    <span class="string">&quot;disable&quot; </span>=&gt; SslMode::Disable,
+                    <span class="string">&quot;prefer&quot; </span>=&gt; SslMode::Prefer,
+                    <span class="string">&quot;require&quot; </span>=&gt; SslMode::Require,
+                    <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::config_parse(Box::new(InvalidValue(<span class="string">&quot;sslmode&quot;</span>)))),
                 };
-                <span class="self">self</span>.<span class="ident">ssl_mode</span>(<span class="ident">mode</span>);
+                <span class="self">self</span>.ssl_mode(mode);
             }
-            <span class="string">&quot;host&quot;</span> =&gt; {
-                <span class="kw">for</span> <span class="ident">host</span> <span class="kw">in</span> <span class="ident">value</span>.<span class="ident">split</span>(<span class="string">&#39;,&#39;</span>) {
-                    <span class="self">self</span>.<span class="ident">host</span>(<span class="ident">host</span>);
+            <span class="string">&quot;host&quot; </span>=&gt; {
+                <span class="kw">for </span>host <span class="kw">in </span>value.split(<span class="string">&#39;,&#39;</span>) {
+                    <span class="self">self</span>.host(host);
                 }
             }
-            <span class="string">&quot;port&quot;</span> =&gt; {
-                <span class="kw">for</span> <span class="ident">port</span> <span class="kw">in</span> <span class="ident">value</span>.<span class="ident">split</span>(<span class="string">&#39;,&#39;</span>) {
-                    <span class="kw">let</span> <span class="ident">port</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">port</span>.<span class="ident">is_empty</span>() {
-                        <span class="number">5432</span>
-                    } <span class="kw">else</span> {
-                        <span class="ident">port</span>.<span class="ident">parse</span>()
-                            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::config_parse</span>(<span class="ident">Box::new</span>(<span class="ident">InvalidValue</span>(<span class="string">&quot;port&quot;</span>))))<span class="question-mark">?</span>
-                    };
-                    <span class="self">self</span>.<span class="ident">port</span>(<span class="ident">port</span>);
+            <span class="string">&quot;port&quot; </span>=&gt; {
+                <span class="kw">for </span>port <span class="kw">in </span>value.split(<span class="string">&#39;,&#39;</span>) {
+                    <span class="kw">let </span>port = <span class="kw">if </span>port.is_empty() {
+                        <span class="number">5432
+                    </span>} <span class="kw">else </span>{
+                        port.parse()
+                            .map_err(|<span class="kw">_</span>| Error::config_parse(Box::new(InvalidValue(<span class="string">&quot;port&quot;</span>))))<span class="question-mark">?
+                    </span>};
+                    <span class="self">self</span>.port(port);
                 }
             }
-            <span class="string">&quot;connect_timeout&quot;</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">timeout</span> <span class="op">=</span> <span class="ident">value</span>
-                    .<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>()
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::config_parse</span>(<span class="ident">Box::new</span>(<span class="ident">InvalidValue</span>(<span class="string">&quot;connect_timeout&quot;</span>))))<span class="question-mark">?</span>;
-                <span class="kw">if</span> <span class="ident">timeout</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                    <span class="self">self</span>.<span class="ident">connect_timeout</span>(<span class="ident">Duration::from_secs</span>(<span class="ident">timeout</span> <span class="kw">as</span> <span class="ident">u64</span>));
+            <span class="string">&quot;connect_timeout&quot; </span>=&gt; {
+                <span class="kw">let </span>timeout = value
+                    .parse::&lt;i64&gt;()
+                    .map_err(|<span class="kw">_</span>| Error::config_parse(Box::new(InvalidValue(<span class="string">&quot;connect_timeout&quot;</span>))))<span class="question-mark">?</span>;
+                <span class="kw">if </span>timeout &gt; <span class="number">0 </span>{
+                    <span class="self">self</span>.connect_timeout(Duration::from_secs(timeout <span class="kw">as </span>u64));
                 }
             }
-            <span class="string">&quot;keepalives&quot;</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">keepalives</span> <span class="op">=</span> <span class="ident">value</span>
-                    .<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>()
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::config_parse</span>(<span class="ident">Box::new</span>(<span class="ident">InvalidValue</span>(<span class="string">&quot;keepalives&quot;</span>))))<span class="question-mark">?</span>;
-                <span class="self">self</span>.<span class="ident">keepalives</span>(<span class="ident">keepalives</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>);
+            <span class="string">&quot;keepalives&quot; </span>=&gt; {
+                <span class="kw">let </span>keepalives = value
+                    .parse::&lt;u64&gt;()
+                    .map_err(|<span class="kw">_</span>| Error::config_parse(Box::new(InvalidValue(<span class="string">&quot;keepalives&quot;</span>))))<span class="question-mark">?</span>;
+                <span class="self">self</span>.keepalives(keepalives != <span class="number">0</span>);
             }
-            <span class="string">&quot;keepalives_idle&quot;</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">keepalives_idle</span> <span class="op">=</span> <span class="ident">value</span>
-                    .<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>()
-                    .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::config_parse</span>(<span class="ident">Box::new</span>(<span class="ident">InvalidValue</span>(<span class="string">&quot;keepalives_idle&quot;</span>))))<span class="question-mark">?</span>;
-                <span class="kw">if</span> <span class="ident">keepalives_idle</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                    <span class="self">self</span>.<span class="ident">keepalives_idle</span>(<span class="ident">Duration::from_secs</span>(<span class="ident">keepalives_idle</span> <span class="kw">as</span> <span class="ident">u64</span>));
+            <span class="string">&quot;keepalives_idle&quot; </span>=&gt; {
+                <span class="kw">let </span>keepalives_idle = value
+                    .parse::&lt;i64&gt;()
+                    .map_err(|<span class="kw">_</span>| Error::config_parse(Box::new(InvalidValue(<span class="string">&quot;keepalives_idle&quot;</span>))))<span class="question-mark">?</span>;
+                <span class="kw">if </span>keepalives_idle &gt; <span class="number">0 </span>{
+                    <span class="self">self</span>.keepalives_idle(Duration::from_secs(keepalives_idle <span class="kw">as </span>u64));
                 }
             }
-            <span class="string">&quot;keepalives_interval&quot;</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">keepalives_interval</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                    <span class="ident">Error::config_parse</span>(<span class="ident">Box::new</span>(<span class="ident">InvalidValue</span>(<span class="string">&quot;keepalives_interval&quot;</span>)))
+            <span class="string">&quot;keepalives_interval&quot; </span>=&gt; {
+                <span class="kw">let </span>keepalives_interval = value.parse::&lt;i64&gt;().map_err(|<span class="kw">_</span>| {
+                    Error::config_parse(Box::new(InvalidValue(<span class="string">&quot;keepalives_interval&quot;</span>)))
                 })<span class="question-mark">?</span>;
-                <span class="kw">if</span> <span class="ident">keepalives_interval</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                    <span class="self">self</span>.<span class="ident">keepalives_interval</span>(<span class="ident">Duration::from_secs</span>(<span class="ident">keepalives_interval</span> <span class="kw">as</span> <span class="ident">u64</span>));
+                <span class="kw">if </span>keepalives_interval &gt; <span class="number">0 </span>{
+                    <span class="self">self</span>.keepalives_interval(Duration::from_secs(keepalives_interval <span class="kw">as </span>u64));
                 }
             }
-            <span class="string">&quot;keepalives_retries&quot;</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">keepalives_retries</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                    <span class="ident">Error::config_parse</span>(<span class="ident">Box::new</span>(<span class="ident">InvalidValue</span>(<span class="string">&quot;keepalives_retries&quot;</span>)))
+            <span class="string">&quot;keepalives_retries&quot; </span>=&gt; {
+                <span class="kw">let </span>keepalives_retries = value.parse::&lt;u32&gt;().map_err(|<span class="kw">_</span>| {
+                    Error::config_parse(Box::new(InvalidValue(<span class="string">&quot;keepalives_retries&quot;</span>)))
                 })<span class="question-mark">?</span>;
-                <span class="self">self</span>.<span class="ident">keepalives_retries</span>(<span class="ident">keepalives_retries</span>);
+                <span class="self">self</span>.keepalives_retries(keepalives_retries);
             }
-            <span class="string">&quot;target_session_attrs&quot;</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">target_session_attrs</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">value</span> {
-                    <span class="string">&quot;any&quot;</span> =&gt; <span class="ident">TargetSessionAttrs::Any</span>,
-                    <span class="string">&quot;read-write&quot;</span> =&gt; <span class="ident">TargetSessionAttrs::ReadWrite</span>,
-                    <span class="kw">_</span> =&gt; {
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::config_parse</span>(<span class="ident">Box::new</span>(<span class="ident">InvalidValue</span>(
+            <span class="string">&quot;target_session_attrs&quot; </span>=&gt; {
+                <span class="kw">let </span>target_session_attrs = <span class="kw">match </span>value {
+                    <span class="string">&quot;any&quot; </span>=&gt; TargetSessionAttrs::Any,
+                    <span class="string">&quot;read-write&quot; </span>=&gt; TargetSessionAttrs::ReadWrite,
+                    <span class="kw">_ </span>=&gt; {
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::config_parse(Box::new(InvalidValue(
                             <span class="string">&quot;target_session_attrs&quot;</span>,
                         ))));
                     }
                 };
-                <span class="self">self</span>.<span class="ident">target_session_attrs</span>(<span class="ident">target_session_attrs</span>);
+                <span class="self">self</span>.target_session_attrs(target_session_attrs);
             }
-            <span class="string">&quot;channel_binding&quot;</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">channel_binding</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">value</span> {
-                    <span class="string">&quot;disable&quot;</span> =&gt; <span class="ident">ChannelBinding::Disable</span>,
-                    <span class="string">&quot;prefer&quot;</span> =&gt; <span class="ident">ChannelBinding::Prefer</span>,
-                    <span class="string">&quot;require&quot;</span> =&gt; <span class="ident">ChannelBinding::Require</span>,
-                    <span class="kw">_</span> =&gt; {
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::config_parse</span>(<span class="ident">Box::new</span>(<span class="ident">InvalidValue</span>(
+            <span class="string">&quot;channel_binding&quot; </span>=&gt; {
+                <span class="kw">let </span>channel_binding = <span class="kw">match </span>value {
+                    <span class="string">&quot;disable&quot; </span>=&gt; ChannelBinding::Disable,
+                    <span class="string">&quot;prefer&quot; </span>=&gt; ChannelBinding::Prefer,
+                    <span class="string">&quot;require&quot; </span>=&gt; ChannelBinding::Require,
+                    <span class="kw">_ </span>=&gt; {
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::config_parse(Box::new(InvalidValue(
                             <span class="string">&quot;channel_binding&quot;</span>,
                         ))))
                     }
                 };
-                <span class="self">self</span>.<span class="ident">channel_binding</span>(<span class="ident">channel_binding</span>);
+                <span class="self">self</span>.channel_binding(channel_binding);
             }
-            <span class="ident">key</span> =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::config_parse</span>(<span class="ident">Box::new</span>(<span class="ident">UnknownOption</span>(
-                    <span class="ident">key</span>.<span class="ident">to_string</span>(),
+            key =&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::config_parse(Box::new(UnknownOption(
+                    key.to_string(),
                 ))));
             }
         }
@@ -1548,443 +1548,443 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Opens a connection to a PostgreSQL database.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires the `runtime` Cargo feature (enabled by default).</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">tls</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Client</span>, <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">Socket</span>, <span class="ident">T::Stream</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">MakeTlsConnect</span><span class="op">&lt;</span><span class="ident">Socket</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Opens a connection to a PostgreSQL database.
+    ///
+    /// Requires the `runtime` Cargo feature (enabled by default).
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+    </span><span class="kw">pub async fn </span>connect&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, tls: T) -&gt; <span class="prelude-ty">Result</span>&lt;(Client, Connection&lt;Socket, T::Stream&gt;), Error&gt;
+    <span class="kw">where
+        </span>T: MakeTlsConnect&lt;Socket&gt;,
     {
-        <span class="ident">connect</span>(<span class="ident">tls</span>, <span class="self">self</span>).<span class="kw">await</span>
-    }
+        connect(tls, <span class="self">self</span>).<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Connects to a PostgreSQL database over an arbitrary stream.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// All of the settings other than `user`, `password`, `dbname`, `options`, and `application_name` name are ignored.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect_raw</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Connects to a PostgreSQL database over an arbitrary stream.
+    ///
+    /// All of the settings other than `user`, `password`, `dbname`, `options`, and `application_name` name are ignored.
+    </span><span class="kw">pub async fn </span>connect_raw&lt;S, T&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">stream</span>: <span class="ident">S</span>,
-        <span class="ident">tls</span>: <span class="ident">T</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Client</span>, <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T::Stream</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-        <span class="ident">T</span>: <span class="ident">TlsConnect</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+        stream: S,
+        tls: T,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(Client, Connection&lt;S, T::Stream&gt;), Error&gt;
+    <span class="kw">where
+        </span>S: AsyncRead + AsyncWrite + Unpin,
+        T: TlsConnect&lt;S&gt;,
     {
-        <span class="ident">connect_raw</span>(<span class="ident">stream</span>, <span class="ident">tls</span>, <span class="self">self</span>).<span class="kw">await</span>
-    }
+        connect_raw(stream, tls, <span class="self">self</span>).<span class="kw">await
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">Config</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">Error</span>;
+<span class="kw">impl </span>FromStr <span class="kw">for </span>Config {
+    <span class="kw">type </span><span class="prelude-val">Err </span>= Error;
 
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Config</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">UrlParser::parse</span>(<span class="ident">s</span>)<span class="question-mark">?</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">config</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">config</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="ident">Parser::parse</span>(<span class="ident">s</span>),
+    <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Config, Error&gt; {
+        <span class="kw">match </span>UrlParser::parse(s)<span class="question-mark">? </span>{
+            <span class="prelude-val">Some</span>(config) =&gt; <span class="prelude-val">Ok</span>(config),
+            <span class="prelude-val">None </span>=&gt; Parser::parse(s),
         }
     }
 }
 
-<span class="comment">// Omit password from debug output</span>
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Config</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">struct</span> <span class="ident">Redaction</span> {}
-        <span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Redaction</span> {
-            <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;_&quot;</span>)
+<span class="comment">// Omit password from debug output
+</span><span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Config {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">struct </span>Redaction {}
+        <span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Redaction {
+            <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+                <span class="macro">write!</span>(f, <span class="string">&quot;_&quot;</span>)
             }
         }
 
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Config&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;user&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">user</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;password&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">password</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Redaction</span> {}))
-            .<span class="ident">field</span>(<span class="string">&quot;dbname&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">dbname</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;options&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">options</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;application_name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">application_name</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;ssl_mode&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ssl_mode</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;host&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">host</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;port&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">port</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;connect_timeout&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">connect_timeout</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;keepalives&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">keepalives</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;keepalives_idle&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">keepalive_config</span>.<span class="ident">idle</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;keepalives_interval&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">keepalive_config</span>.<span class="ident">interval</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;keepalives_retries&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">keepalive_config</span>.<span class="ident">retries</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;target_session_attrs&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">target_session_attrs</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;channel_binding&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">channel_binding</span>)
-            .<span class="ident">finish</span>()
+        f.debug_struct(<span class="string">&quot;Config&quot;</span>)
+            .field(<span class="string">&quot;user&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.user)
+            .field(<span class="string">&quot;password&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.password.as_ref().map(|<span class="kw">_</span>| Redaction {}))
+            .field(<span class="string">&quot;dbname&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.dbname)
+            .field(<span class="string">&quot;options&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.options)
+            .field(<span class="string">&quot;application_name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.application_name)
+            .field(<span class="string">&quot;ssl_mode&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.ssl_mode)
+            .field(<span class="string">&quot;host&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.host)
+            .field(<span class="string">&quot;port&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.port)
+            .field(<span class="string">&quot;connect_timeout&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.connect_timeout)
+            .field(<span class="string">&quot;keepalives&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.keepalives)
+            .field(<span class="string">&quot;keepalives_idle&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.keepalive_config.idle)
+            .field(<span class="string">&quot;keepalives_interval&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.keepalive_config.interval)
+            .field(<span class="string">&quot;keepalives_retries&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.keepalive_config.retries)
+            .field(<span class="string">&quot;target_session_attrs&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.target_session_attrs)
+            .field(<span class="string">&quot;channel_binding&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.channel_binding)
+            .finish()
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">UnknownOption</span>(<span class="ident">String</span>);
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">struct </span>UnknownOption(String);
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">UnknownOption</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;unknown option `{}`&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>UnknownOption {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">write!</span>(fmt, <span class="string">&quot;unknown option `{}`&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">error::Error</span> <span class="kw">for</span> <span class="ident">UnknownOption</span> {}
+<span class="kw">impl </span>error::Error <span class="kw">for </span>UnknownOption {}
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">InvalidValue</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>);
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">struct </span>InvalidValue(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str);
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">InvalidValue</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;invalid value for option `{}`&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>InvalidValue {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">write!</span>(fmt, <span class="string">&quot;invalid value for option `{}`&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">error::Error</span> <span class="kw">for</span> <span class="ident">InvalidValue</span> {}
+<span class="kw">impl </span>error::Error <span class="kw">for </span>InvalidValue {}
 
-<span class="kw">struct</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-    <span class="ident">it</span>: <span class="ident">iter::Peekable</span><span class="op">&lt;</span><span class="ident">str::CharIndices</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">struct </span>Parser&lt;<span class="lifetime">&#39;a</span>&gt; {
+    s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    it: iter::Peekable&lt;str::CharIndices&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Config</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parser</span> <span class="op">=</span> <span class="ident">Parser</span> {
-            <span class="ident">s</span>,
-            <span class="ident">it</span>: <span class="ident">s</span>.<span class="ident">char_indices</span>().<span class="ident">peekable</span>(),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Parser&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>parse(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Config, Error&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>parser = Parser {
+            s,
+            it: s.char_indices().peekable(),
         };
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">Config::new</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>config = Config::new();
 
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">key</span>, <span class="ident">value</span>)) <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parameter</span>()<span class="question-mark">?</span> {
-            <span class="ident">config</span>.<span class="ident">param</span>(<span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="ident">value</span>)<span class="question-mark">?</span>;
+        <span class="kw">while let </span><span class="prelude-val">Some</span>((key, value)) = parser.parameter()<span class="question-mark">? </span>{
+            config.param(key, <span class="kw-2">&amp;</span>value)<span class="question-mark">?</span>;
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">config</span>)
+        <span class="prelude-val">Ok</span>(config)
     }
 
-    <span class="kw">fn</span> <span class="ident">skip_ws</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">take_while</span>(<span class="ident">char::is_whitespace</span>);
+    <span class="kw">fn </span>skip_ws(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.take_while(char::is_whitespace);
     }
 
-    <span class="kw">fn</span> <span class="ident">take_while</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="ident">char</span>) -&gt; <span class="ident">bool</span>,
+    <span class="kw">fn </span>take_while&lt;F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, f: F) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str
+    <span class="kw">where
+        </span>F: Fn(char) -&gt; bool,
     {
-        <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">it</span>.<span class="ident">peek</span>() {
-            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(<span class="ident">i</span>, <span class="kw">_</span>)) =&gt; <span class="ident">i</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="string">&quot;&quot;</span>,
+        <span class="kw">let </span>start = <span class="kw">match </span><span class="self">self</span>.it.peek() {
+            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(i, <span class="kw">_</span>)) =&gt; i,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="string">&quot;&quot;</span>,
         };
 
-        <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">it</span>.<span class="ident">peek</span>() {
-                <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="ident">c</span>)) <span class="kw">if</span> <span class="ident">f</span>(<span class="ident">c</span>) =&gt; {
-                    <span class="self">self</span>.<span class="ident">it</span>.<span class="ident">next</span>();
+        <span class="kw">loop </span>{
+            <span class="kw">match </span><span class="self">self</span>.it.peek() {
+                <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(<span class="kw">_</span>, c)) <span class="kw">if </span>f(c) =&gt; {
+                    <span class="self">self</span>.it.next();
                 }
-                <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(<span class="ident">i</span>, <span class="kw">_</span>)) =&gt; <span class="kw">return</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">s</span>[<span class="ident">start</span>..<span class="ident">i</span>],
-                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">s</span>[<span class="ident">start</span>..],
+                <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(i, <span class="kw">_</span>)) =&gt; <span class="kw">return </span><span class="kw-2">&amp;</span><span class="self">self</span>.s[start..i],
+                <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="kw-2">&amp;</span><span class="self">self</span>.s[start..],
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">eat</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">target</span>: <span class="ident">char</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">it</span>.<span class="ident">next</span>() {
-            <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">c</span>)) <span class="kw">if</span> <span class="ident">c</span> <span class="op">==</span> <span class="ident">target</span> =&gt; <span class="prelude-val">Ok</span>(()),
-            <span class="prelude-val">Some</span>((<span class="ident">i</span>, <span class="ident">c</span>)) =&gt; {
-                <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="macro">format!</span>(
+    <span class="kw">fn </span>eat(<span class="kw-2">&amp;mut </span><span class="self">self</span>, target: char) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="kw">match </span><span class="self">self</span>.it.next() {
+            <span class="prelude-val">Some</span>((<span class="kw">_</span>, c)) <span class="kw">if </span>c == target =&gt; <span class="prelude-val">Ok</span>(()),
+            <span class="prelude-val">Some</span>((i, c)) =&gt; {
+                <span class="kw">let </span>m = <span class="macro">format!</span>(
                     <span class="string">&quot;unexpected character at byte {}: expected `{}` but got `{}`&quot;</span>,
-                    <span class="ident">i</span>, <span class="ident">target</span>, <span class="ident">c</span>
+                    i, target, c
                 );
-                <span class="prelude-val">Err</span>(<span class="ident">Error::config_parse</span>(<span class="ident">m</span>.<span class="ident">into</span>()))
+                <span class="prelude-val">Err</span>(Error::config_parse(m.into()))
             }
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::config_parse</span>(<span class="string">&quot;unexpected EOF&quot;</span>.<span class="ident">into</span>())),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(Error::config_parse(<span class="string">&quot;unexpected EOF&quot;</span>.into())),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">eat_if</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">target</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">it</span>.<span class="ident">peek</span>() {
-            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="ident">c</span>)) <span class="kw">if</span> <span class="ident">c</span> <span class="op">==</span> <span class="ident">target</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">it</span>.<span class="ident">next</span>();
-                <span class="bool-val">true</span>
-            }
-            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+    <span class="kw">fn </span>eat_if(<span class="kw-2">&amp;mut </span><span class="self">self</span>, target: char) -&gt; bool {
+        <span class="kw">match </span><span class="self">self</span>.it.peek() {
+            <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(<span class="kw">_</span>, c)) <span class="kw">if </span>c == target =&gt; {
+                <span class="self">self</span>.it.next();
+                <span class="bool-val">true
+            </span>}
+            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">keyword</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">take_while</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">c</span> {
-            <span class="ident">c</span> <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_whitespace</span>() =&gt; <span class="bool-val">false</span>,
-            <span class="string">&#39;=&#39;</span> =&gt; <span class="bool-val">false</span>,
-            <span class="kw">_</span> =&gt; <span class="bool-val">true</span>,
+    <span class="kw">fn </span>keyword(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
+        <span class="kw">let </span>s = <span class="self">self</span>.take_while(|c| <span class="kw">match </span>c {
+            c <span class="kw">if </span>c.is_whitespace() =&gt; <span class="bool-val">false</span>,
+            <span class="string">&#39;=&#39; </span>=&gt; <span class="bool-val">false</span>,
+            <span class="kw">_ </span>=&gt; <span class="bool-val">true</span>,
         });
 
-        <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">is_empty</span>() {
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">s</span>)
+        <span class="kw">if </span>s.is_empty() {
+            <span class="prelude-val">None
+        </span>} <span class="kw">else </span>{
+            <span class="prelude-val">Some</span>(s)
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">eat_if</span>(<span class="string">&#39;\&#39;&#39;</span>) {
-            <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">quoted_value</span>()<span class="question-mark">?</span>;
-            <span class="self">self</span>.<span class="ident">eat</span>(<span class="string">&#39;\&#39;&#39;</span>)<span class="question-mark">?</span>;
-            <span class="ident">value</span>
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">simple_value</span>()<span class="question-mark">?</span>
-        };
+    <span class="kw">fn </span>value(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;String, Error&gt; {
+        <span class="kw">let </span>value = <span class="kw">if </span><span class="self">self</span>.eat_if(<span class="string">&#39;\&#39;&#39;</span>) {
+            <span class="kw">let </span>value = <span class="self">self</span>.quoted_value()<span class="question-mark">?</span>;
+            <span class="self">self</span>.eat(<span class="string">&#39;\&#39;&#39;</span>)<span class="question-mark">?</span>;
+            value
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.simple_value()<span class="question-mark">?
+        </span>};
 
-        <span class="prelude-val">Ok</span>(<span class="ident">value</span>)
+        <span class="prelude-val">Ok</span>(value)
     }
 
-    <span class="kw">fn</span> <span class="ident">simple_value</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">String::new</span>();
+    <span class="kw">fn </span>simple_value(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;String, Error&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>value = String::new();
 
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="ident">c</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">it</span>.<span class="ident">peek</span>() {
-            <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_whitespace</span>() {
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(<span class="kw">_</span>, c)) = <span class="self">self</span>.it.peek() {
+            <span class="kw">if </span>c.is_whitespace() {
                 <span class="kw">break</span>;
             }
 
-            <span class="self">self</span>.<span class="ident">it</span>.<span class="ident">next</span>();
-            <span class="kw">if</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;\\&#39;</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">c2</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">it</span>.<span class="ident">next</span>() {
-                    <span class="ident">value</span>.<span class="ident">push</span>(<span class="ident">c2</span>);
+            <span class="self">self</span>.it.next();
+            <span class="kw">if </span>c == <span class="string">&#39;\\&#39; </span>{
+                <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="kw">_</span>, c2)) = <span class="self">self</span>.it.next() {
+                    value.push(c2);
                 }
-            } <span class="kw">else</span> {
-                <span class="ident">value</span>.<span class="ident">push</span>(<span class="ident">c</span>);
+            } <span class="kw">else </span>{
+                value.push(c);
             }
         }
 
-        <span class="kw">if</span> <span class="ident">value</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::config_parse</span>(<span class="string">&quot;unexpected EOF&quot;</span>.<span class="ident">into</span>()));
+        <span class="kw">if </span>value.is_empty() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::config_parse(<span class="string">&quot;unexpected EOF&quot;</span>.into()));
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">value</span>)
+        <span class="prelude-val">Ok</span>(value)
     }
 
-    <span class="kw">fn</span> <span class="ident">quoted_value</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">String::new</span>();
+    <span class="kw">fn </span>quoted_value(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;String, Error&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>value = String::new();
 
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="ident">c</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">it</span>.<span class="ident">peek</span>() {
-            <span class="kw">if</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;\&#39;&#39;</span> {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">value</span>);
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>(<span class="kw">_</span>, c)) = <span class="self">self</span>.it.peek() {
+            <span class="kw">if </span>c == <span class="string">&#39;\&#39;&#39; </span>{
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(value);
             }
 
-            <span class="self">self</span>.<span class="ident">it</span>.<span class="ident">next</span>();
-            <span class="kw">if</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;\\&#39;</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">c2</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">it</span>.<span class="ident">next</span>() {
-                    <span class="ident">value</span>.<span class="ident">push</span>(<span class="ident">c2</span>);
+            <span class="self">self</span>.it.next();
+            <span class="kw">if </span>c == <span class="string">&#39;\\&#39; </span>{
+                <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="kw">_</span>, c2)) = <span class="self">self</span>.it.next() {
+                    value.push(c2);
                 }
-            } <span class="kw">else</span> {
-                <span class="ident">value</span>.<span class="ident">push</span>(<span class="ident">c</span>);
+            } <span class="kw">else </span>{
+                value.push(c);
             }
         }
 
-        <span class="prelude-val">Err</span>(<span class="ident">Error::config_parse</span>(
-            <span class="string">&quot;unterminated quoted connection parameter value&quot;</span>.<span class="ident">into</span>(),
+        <span class="prelude-val">Err</span>(Error::config_parse(
+            <span class="string">&quot;unterminated quoted connection parameter value&quot;</span>.into(),
         ))
     }
 
-    <span class="kw">fn</span> <span class="ident">parameter</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">String</span>)<span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">skip_ws</span>();
-        <span class="kw">let</span> <span class="ident">keyword</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">keyword</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">keyword</span>) =&gt; <span class="ident">keyword</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+    <span class="kw">fn </span>parameter(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, String)&gt;, Error&gt; {
+        <span class="self">self</span>.skip_ws();
+        <span class="kw">let </span>keyword = <span class="kw">match </span><span class="self">self</span>.keyword() {
+            <span class="prelude-val">Some</span>(keyword) =&gt; keyword,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
         };
-        <span class="self">self</span>.<span class="ident">skip_ws</span>();
-        <span class="self">self</span>.<span class="ident">eat</span>(<span class="string">&#39;=&#39;</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">skip_ws</span>();
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">value</span>()<span class="question-mark">?</span>;
+        <span class="self">self</span>.skip_ws();
+        <span class="self">self</span>.eat(<span class="string">&#39;=&#39;</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.skip_ws();
+        <span class="kw">let </span>value = <span class="self">self</span>.value()<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>((<span class="ident">keyword</span>, <span class="ident">value</span>)))
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>((keyword, value)))
     }
 }
 
-<span class="comment">// This is a pretty sloppy &quot;URL&quot; parser, but it matches the behavior of libpq, where things really aren&#39;t very strict</span>
-<span class="kw">struct</span> <span class="ident">UrlParser</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-    <span class="ident">config</span>: <span class="ident">Config</span>,
+<span class="comment">// This is a pretty sloppy &quot;URL&quot; parser, but it matches the behavior of libpq, where things really aren&#39;t very strict
+</span><span class="kw">struct </span>UrlParser&lt;<span class="lifetime">&#39;a</span>&gt; {
+    s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    config: Config,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">UrlParser</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Config</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident"><span class="self">Self</span>::remove_url_prefix</span>(<span class="ident">s</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; UrlParser&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>parse(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Config&gt;, Error&gt; {
+        <span class="kw">let </span>s = <span class="kw">match </span><span class="self">Self</span>::remove_url_prefix(s) {
+            <span class="prelude-val">Some</span>(s) =&gt; s,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
         };
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parser</span> <span class="op">=</span> <span class="ident">UrlParser</span> {
-            <span class="ident">s</span>,
-            <span class="ident">config</span>: <span class="ident">Config::new</span>(),
+        <span class="kw">let </span><span class="kw-2">mut </span>parser = UrlParser {
+            s,
+            config: Config::new(),
         };
 
-        <span class="ident">parser</span>.<span class="ident">parse_credentials</span>()<span class="question-mark">?</span>;
-        <span class="ident">parser</span>.<span class="ident">parse_host</span>()<span class="question-mark">?</span>;
-        <span class="ident">parser</span>.<span class="ident">parse_path</span>()<span class="question-mark">?</span>;
-        <span class="ident">parser</span>.<span class="ident">parse_params</span>()<span class="question-mark">?</span>;
+        parser.parse_credentials()<span class="question-mark">?</span>;
+        parser.parse_host()<span class="question-mark">?</span>;
+        parser.parse_path()<span class="question-mark">?</span>;
+        parser.parse_params()<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">parser</span>.<span class="ident">config</span>))
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(parser.config))
     }
 
-    <span class="kw">fn</span> <span class="ident">remove_url_prefix</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">for</span> <span class="ident">prefix</span> <span class="kw">in</span> <span class="kw-2">&amp;</span>[<span class="string">&quot;postgres://&quot;</span>, <span class="string">&quot;postgresql://&quot;</span>] {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">stripped</span>) <span class="op">=</span> <span class="ident">s</span>.<span class="ident">strip_prefix</span>(<span class="ident">prefix</span>) {
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">stripped</span>);
+    <span class="kw">fn </span>remove_url_prefix(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="kw">for </span>prefix <span class="kw">in </span><span class="kw-2">&amp;</span>[<span class="string">&quot;postgres://&quot;</span>, <span class="string">&quot;postgresql://&quot;</span>] {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(stripped) = s.strip_prefix(prefix) {
+                <span class="kw">return </span><span class="prelude-val">Some</span>(stripped);
             }
         }
 
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">None
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">take_until</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">end</span>: <span class="kw-2">&amp;</span>[<span class="ident">char</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">s</span>.<span class="ident">find</span>(<span class="ident">end</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">pos</span>) =&gt; {
-                <span class="kw">let</span> (<span class="ident">head</span>, <span class="ident">tail</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">s</span>.<span class="ident">split_at</span>(<span class="ident">pos</span>);
-                <span class="self">self</span>.<span class="ident">s</span> <span class="op">=</span> <span class="ident">tail</span>;
-                <span class="prelude-val">Some</span>(<span class="ident">head</span>)
+    <span class="kw">fn </span>take_until(<span class="kw-2">&amp;mut </span><span class="self">self</span>, end: <span class="kw-2">&amp;</span>[char]) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
+        <span class="kw">match </span><span class="self">self</span>.s.find(end) {
+            <span class="prelude-val">Some</span>(pos) =&gt; {
+                <span class="kw">let </span>(head, tail) = <span class="self">self</span>.s.split_at(pos);
+                <span class="self">self</span>.s = tail;
+                <span class="prelude-val">Some</span>(head)
             }
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">take_all</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
-        <span class="ident">mem::take</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">s</span>)
+    <span class="kw">fn </span>take_all(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
+        mem::take(<span class="kw-2">&amp;mut </span><span class="self">self</span>.s)
     }
 
-    <span class="kw">fn</span> <span class="ident">eat_byte</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">s</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">s</span>[<span class="number">1</span>..];
+    <span class="kw">fn </span>eat_byte(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.s = <span class="kw-2">&amp;</span><span class="self">self</span>.s[<span class="number">1</span>..];
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_credentials</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">creds</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">take_until</span>(<span class="kw-2">&amp;</span>[<span class="string">&#39;@&#39;</span>]) {
-            <span class="prelude-val">Some</span>(<span class="ident">creds</span>) =&gt; <span class="ident">creds</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(()),
+    <span class="kw">fn </span>parse_credentials(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="kw">let </span>creds = <span class="kw">match </span><span class="self">self</span>.take_until(<span class="kw-2">&amp;</span>[<span class="string">&#39;@&#39;</span>]) {
+            <span class="prelude-val">Some</span>(creds) =&gt; creds,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(()),
         };
-        <span class="self">self</span>.<span class="ident">eat_byte</span>();
+        <span class="self">self</span>.eat_byte();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">it</span> <span class="op">=</span> <span class="ident">creds</span>.<span class="ident">splitn</span>(<span class="number">2</span>, <span class="string">&#39;:&#39;</span>);
-        <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">decode</span>(<span class="ident">it</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>())<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">user</span>(<span class="kw-2">&amp;</span><span class="ident">user</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>it = creds.splitn(<span class="number">2</span>, <span class="string">&#39;:&#39;</span>);
+        <span class="kw">let </span>user = <span class="self">self</span>.decode(it.next().unwrap())<span class="question-mark">?</span>;
+        <span class="self">self</span>.config.user(<span class="kw-2">&amp;</span>user);
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">password</span>) <span class="op">=</span> <span class="ident">it</span>.<span class="ident">next</span>() {
-            <span class="kw">let</span> <span class="ident">password</span> <span class="op">=</span> <span class="ident">Cow::from</span>(<span class="ident">percent_encoding::percent_decode</span>(<span class="ident">password</span>.<span class="ident">as_bytes</span>()));
-            <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">password</span>(<span class="ident">password</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(password) = it.next() {
+            <span class="kw">let </span>password = Cow::from(percent_encoding::percent_decode(password.as_bytes()));
+            <span class="self">self</span>.config.password(password);
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_host</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">host</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">take_until</span>(<span class="kw-2">&amp;</span>[<span class="string">&#39;/&#39;</span>, <span class="string">&#39;?&#39;</span>]) {
-            <span class="prelude-val">Some</span>(<span class="ident">host</span>) =&gt; <span class="ident">host</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="self">self</span>.<span class="ident">take_all</span>(),
+    <span class="kw">fn </span>parse_host(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="kw">let </span>host = <span class="kw">match </span><span class="self">self</span>.take_until(<span class="kw-2">&amp;</span>[<span class="string">&#39;/&#39;</span>, <span class="string">&#39;?&#39;</span>]) {
+            <span class="prelude-val">Some</span>(host) =&gt; host,
+            <span class="prelude-val">None </span>=&gt; <span class="self">self</span>.take_all(),
         };
 
-        <span class="kw">if</span> <span class="ident">host</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+        <span class="kw">if </span>host.is_empty() {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(());
         }
 
-        <span class="kw">for</span> <span class="ident">chunk</span> <span class="kw">in</span> <span class="ident">host</span>.<span class="ident">split</span>(<span class="string">&#39;,&#39;</span>) {
-            <span class="kw">let</span> (<span class="ident">host</span>, <span class="ident">port</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">chunk</span>.<span class="ident">starts_with</span>(<span class="string">&#39;[&#39;</span>) {
-                <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">chunk</span>.<span class="ident">find</span>(<span class="string">&#39;]&#39;</span>) {
-                    <span class="prelude-val">Some</span>(<span class="ident">idx</span>) =&gt; <span class="ident">idx</span>,
-                    <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::config_parse</span>(<span class="ident">InvalidValue</span>(<span class="string">&quot;host&quot;</span>).<span class="ident">into</span>())),
+        <span class="kw">for </span>chunk <span class="kw">in </span>host.split(<span class="string">&#39;,&#39;</span>) {
+            <span class="kw">let </span>(host, port) = <span class="kw">if </span>chunk.starts_with(<span class="string">&#39;[&#39;</span>) {
+                <span class="kw">let </span>idx = <span class="kw">match </span>chunk.find(<span class="string">&#39;]&#39;</span>) {
+                    <span class="prelude-val">Some</span>(idx) =&gt; idx,
+                    <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::config_parse(InvalidValue(<span class="string">&quot;host&quot;</span>).into())),
                 };
 
-                <span class="kw">let</span> <span class="ident">host</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">chunk</span>[<span class="number">1</span>..<span class="ident">idx</span>];
-                <span class="kw">let</span> <span class="ident">remaining</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">chunk</span>[<span class="ident">idx</span> <span class="op">+</span> <span class="number">1</span>..];
-                <span class="kw">let</span> <span class="ident">port</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">port</span>) <span class="op">=</span> <span class="ident">remaining</span>.<span class="ident">strip_prefix</span>(<span class="string">&#39;:&#39;</span>) {
-                    <span class="prelude-val">Some</span>(<span class="ident">port</span>)
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">remaining</span>.<span class="ident">is_empty</span>() {
-                    <span class="prelude-val">None</span>
-                } <span class="kw">else</span> {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::config_parse</span>(<span class="ident">InvalidValue</span>(<span class="string">&quot;host&quot;</span>).<span class="ident">into</span>()));
+                <span class="kw">let </span>host = <span class="kw-2">&amp;</span>chunk[<span class="number">1</span>..idx];
+                <span class="kw">let </span>remaining = <span class="kw-2">&amp;</span>chunk[idx + <span class="number">1</span>..];
+                <span class="kw">let </span>port = <span class="kw">if let </span><span class="prelude-val">Some</span>(port) = remaining.strip_prefix(<span class="string">&#39;:&#39;</span>) {
+                    <span class="prelude-val">Some</span>(port)
+                } <span class="kw">else if </span>remaining.is_empty() {
+                    <span class="prelude-val">None
+                </span>} <span class="kw">else </span>{
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(Error::config_parse(InvalidValue(<span class="string">&quot;host&quot;</span>).into()));
                 };
 
-                (<span class="ident">host</span>, <span class="ident">port</span>)
-            } <span class="kw">else</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">it</span> <span class="op">=</span> <span class="ident">chunk</span>.<span class="ident">splitn</span>(<span class="number">2</span>, <span class="string">&#39;:&#39;</span>);
-                (<span class="ident">it</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>(), <span class="ident">it</span>.<span class="ident">next</span>())
+                (host, port)
+            } <span class="kw">else </span>{
+                <span class="kw">let </span><span class="kw-2">mut </span>it = chunk.splitn(<span class="number">2</span>, <span class="string">&#39;:&#39;</span>);
+                (it.next().unwrap(), it.next())
             };
 
-            <span class="self">self</span>.<span class="ident">host_param</span>(<span class="ident">host</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">port</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">decode</span>(<span class="ident">port</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;5432&quot;</span>))<span class="question-mark">?</span>;
-            <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">param</span>(<span class="string">&quot;port&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">port</span>)<span class="question-mark">?</span>;
+            <span class="self">self</span>.host_param(host)<span class="question-mark">?</span>;
+            <span class="kw">let </span>port = <span class="self">self</span>.decode(port.unwrap_or(<span class="string">&quot;5432&quot;</span>))<span class="question-mark">?</span>;
+            <span class="self">self</span>.config.param(<span class="string">&quot;port&quot;</span>, <span class="kw-2">&amp;</span>port)<span class="question-mark">?</span>;
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_path</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">s</span>.<span class="ident">starts_with</span>(<span class="string">&#39;/&#39;</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+    <span class="kw">fn </span>parse_path(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="kw">if </span>!<span class="self">self</span>.s.starts_with(<span class="string">&#39;/&#39;</span>) {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(());
         }
-        <span class="self">self</span>.<span class="ident">eat_byte</span>();
+        <span class="self">self</span>.eat_byte();
 
-        <span class="kw">let</span> <span class="ident">dbname</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">take_until</span>(<span class="kw-2">&amp;</span>[<span class="string">&#39;?&#39;</span>]) {
-            <span class="prelude-val">Some</span>(<span class="ident">dbname</span>) =&gt; <span class="ident">dbname</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="self">self</span>.<span class="ident">take_all</span>(),
+        <span class="kw">let </span>dbname = <span class="kw">match </span><span class="self">self</span>.take_until(<span class="kw-2">&amp;</span>[<span class="string">&#39;?&#39;</span>]) {
+            <span class="prelude-val">Some</span>(dbname) =&gt; dbname,
+            <span class="prelude-val">None </span>=&gt; <span class="self">self</span>.take_all(),
         };
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">dbname</span>.<span class="ident">is_empty</span>() {
-            <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">dbname</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">decode</span>(<span class="ident">dbname</span>)<span class="question-mark">?</span>);
+        <span class="kw">if </span>!dbname.is_empty() {
+            <span class="self">self</span>.config.dbname(<span class="kw-2">&amp;</span><span class="self">self</span>.decode(dbname)<span class="question-mark">?</span>);
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_params</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">s</span>.<span class="ident">starts_with</span>(<span class="string">&#39;?&#39;</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+    <span class="kw">fn </span>parse_params(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="kw">if </span>!<span class="self">self</span>.s.starts_with(<span class="string">&#39;?&#39;</span>) {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(());
         }
-        <span class="self">self</span>.<span class="ident">eat_byte</span>();
+        <span class="self">self</span>.eat_byte();
 
-        <span class="kw">while</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">s</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">take_until</span>(<span class="kw-2">&amp;</span>[<span class="string">&#39;=&#39;</span>]) {
-                <span class="prelude-val">Some</span>(<span class="ident">key</span>) =&gt; <span class="self">self</span>.<span class="ident">decode</span>(<span class="ident">key</span>)<span class="question-mark">?</span>,
-                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::config_parse</span>(<span class="string">&quot;unterminated parameter&quot;</span>.<span class="ident">into</span>())),
+        <span class="kw">while </span>!<span class="self">self</span>.s.is_empty() {
+            <span class="kw">let </span>key = <span class="kw">match </span><span class="self">self</span>.take_until(<span class="kw-2">&amp;</span>[<span class="string">&#39;=&#39;</span>]) {
+                <span class="prelude-val">Some</span>(key) =&gt; <span class="self">self</span>.decode(key)<span class="question-mark">?</span>,
+                <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::config_parse(<span class="string">&quot;unterminated parameter&quot;</span>.into())),
             };
-            <span class="self">self</span>.<span class="ident">eat_byte</span>();
+            <span class="self">self</span>.eat_byte();
 
-            <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">take_until</span>(<span class="kw-2">&amp;</span>[<span class="string">&#39;&amp;&#39;</span>]) {
-                <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; {
-                    <span class="self">self</span>.<span class="ident">eat_byte</span>();
-                    <span class="ident">value</span>
+            <span class="kw">let </span>value = <span class="kw">match </span><span class="self">self</span>.take_until(<span class="kw-2">&amp;</span>[<span class="string">&#39;&amp;&#39;</span>]) {
+                <span class="prelude-val">Some</span>(value) =&gt; {
+                    <span class="self">self</span>.eat_byte();
+                    value
                 }
-                <span class="prelude-val">None</span> =&gt; <span class="self">self</span>.<span class="ident">take_all</span>(),
+                <span class="prelude-val">None </span>=&gt; <span class="self">self</span>.take_all(),
             };
 
-            <span class="kw">if</span> <span class="ident">key</span> <span class="op">==</span> <span class="string">&quot;host&quot;</span> {
-                <span class="self">self</span>.<span class="ident">host_param</span>(<span class="ident">value</span>)<span class="question-mark">?</span>;
-            } <span class="kw">else</span> {
-                <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">decode</span>(<span class="ident">value</span>)<span class="question-mark">?</span>;
-                <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">param</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="ident">value</span>)<span class="question-mark">?</span>;
+            <span class="kw">if </span>key == <span class="string">&quot;host&quot; </span>{
+                <span class="self">self</span>.host_param(value)<span class="question-mark">?</span>;
+            } <span class="kw">else </span>{
+                <span class="kw">let </span>value = <span class="self">self</span>.decode(value)<span class="question-mark">?</span>;
+                <span class="self">self</span>.config.param(<span class="kw-2">&amp;</span>key, <span class="kw-2">&amp;</span>value)<span class="question-mark">?</span>;
             }
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">host_param</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">decoded</span> <span class="op">=</span> <span class="ident">Cow::from</span>(<span class="ident">percent_encoding::percent_decode</span>(<span class="ident">s</span>.<span class="ident">as_bytes</span>()));
-        <span class="kw">if</span> <span class="ident">decoded</span>.<span class="ident">first</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;/&#39;</span>) {
-            <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">host_path</span>(<span class="ident">OsStr::from_bytes</span>(<span class="kw-2">&amp;</span><span class="ident">decoded</span>));
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">decoded</span> <span class="op">=</span> <span class="ident">str::from_utf8</span>(<span class="kw-2">&amp;</span><span class="ident">decoded</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">Error::config_parse</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))<span class="question-mark">?</span>;
-            <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">host</span>(<span class="ident">decoded</span>);
+    <span class="attribute">#[cfg(unix)]
+    </span><span class="kw">fn </span>host_param(<span class="kw-2">&amp;mut </span><span class="self">self</span>, s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="kw">let </span>decoded = Cow::from(percent_encoding::percent_decode(s.as_bytes()));
+        <span class="kw">if </span>decoded.first() == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="string">b&#39;/&#39;</span>) {
+            <span class="self">self</span>.config.host_path(OsStr::from_bytes(<span class="kw-2">&amp;</span>decoded));
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>decoded = str::from_utf8(<span class="kw-2">&amp;</span>decoded).map_err(|e| Error::config_parse(Box::new(e)))<span class="question-mark">?</span>;
+            <span class="self">self</span>.config.host(decoded);
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">unix</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">host_param</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">decode</span>(<span class="ident">s</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">param</span>(<span class="string">&quot;host&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">s</span>)
+    <span class="attribute">#[cfg(not(unix))]
+    </span><span class="kw">fn </span>host_param(<span class="kw-2">&amp;mut </span><span class="self">self</span>, s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="kw">let </span>s = <span class="self">self</span>.decode(s)<span class="question-mark">?</span>;
+        <span class="self">self</span>.config.param(<span class="string">&quot;host&quot;</span>, <span class="kw-2">&amp;</span>s)
     }
 
-    <span class="kw">fn</span> <span class="ident">decode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="ident">percent_encoding::percent_decode</span>(<span class="ident">s</span>.<span class="ident">as_bytes</span>())
-            .<span class="ident">decode_utf8</span>()
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">Error::config_parse</span>(<span class="ident">e</span>.<span class="ident">into</span>()))
+    <span class="kw">fn </span>decode(<span class="kw-2">&amp;</span><span class="self">self</span>, s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, Error&gt; {
+        percent_encoding::percent_decode(s.as_bytes())
+            .decode_utf8()
+            .map_err(|e| Error::config_parse(e.into()))
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio_postgres" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio_postgres" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

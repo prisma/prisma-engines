@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/httparse-1.8.0/src/simd/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../httparse/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../httparse/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../httparse/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/httparse-1.8.0/src/simd/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../httparse/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../httparse/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../httparse/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -289,296 +289,296 @@
 <span id="289">289</span>
 <span id="290">290</span>
 <span id="291">291</span>
-</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">all</span>(
-    <span class="ident">httparse_simd</span>,
-    <span class="ident">any</span>(
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>,
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>,
+</pre><pre class="rust"><code><span class="attribute">#[cfg(not(all(
+    httparse_simd,
+    any(
+        target_arch = <span class="string">&quot;x86&quot;</span>,
+        target_arch = <span class="string">&quot;x86_64&quot;</span>,
     ),
-)))]</span>
-<span class="kw">mod</span> <span class="ident">fallback</span>;
+)))]
+</span><span class="kw">mod </span>fallback;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">all</span>(
-    <span class="ident">httparse_simd</span>,
-    <span class="ident">any</span>(
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>,
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>,
+<span class="attribute">#[cfg(not(all(
+    httparse_simd,
+    any(
+        target_arch = <span class="string">&quot;x86&quot;</span>,
+        target_arch = <span class="string">&quot;x86_64&quot;</span>,
     ),
-)))]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::fallback</span>::<span class="kw-2">*</span>;
+)))]
+</span><span class="kw">pub use </span><span class="self">self</span>::fallback::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(
-    <span class="ident">httparse_simd</span>,
-    <span class="ident">any</span>(
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>,
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>,
+<span class="attribute">#[cfg(all(
+    httparse_simd,
+    any(
+        target_arch = <span class="string">&quot;x86&quot;</span>,
+        target_arch = <span class="string">&quot;x86_64&quot;</span>,
     ),
-))]</span>
-<span class="kw">mod</span> <span class="ident">sse42</span>;
+))]
+</span><span class="kw">mod </span>sse42;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(
-    <span class="ident">httparse_simd</span>,
-    <span class="ident">any</span>(
-        <span class="ident">httparse_simd_target_feature_avx2</span>,
-        <span class="ident">not</span>(<span class="ident">httparse_simd_target_feature_sse42</span>),
+<span class="attribute">#[cfg(all(
+    httparse_simd,
+    any(
+        httparse_simd_target_feature_avx2,
+        not(httparse_simd_target_feature_sse42),
     ),
-    <span class="ident">any</span>(
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>,
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>,
+    any(
+        target_arch = <span class="string">&quot;x86&quot;</span>,
+        target_arch = <span class="string">&quot;x86_64&quot;</span>,
     ),
-))]</span>
-<span class="kw">mod</span> <span class="ident">avx2</span>;
+))]
+</span><span class="kw">mod </span>avx2;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(
-    <span class="ident">httparse_simd</span>,
-    <span class="ident">any</span>(
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>,
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>,
+<span class="attribute">#[cfg(all(
+    httparse_simd,
+    any(
+        target_arch = <span class="string">&quot;x86&quot;</span>,
+        target_arch = <span class="string">&quot;x86_64&quot;</span>,
     ),
-))]</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SSE_42</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(
-    <span class="ident">httparse_simd</span>,
-    <span class="ident">any</span>(<span class="ident">not</span>(<span class="ident">httparse_simd_target_feature_sse42</span>), <span class="ident">httparse_simd_target_feature_avx2</span>),
-    <span class="ident">any</span>(
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>,
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>,
+))]
+</span><span class="kw">pub const </span>SSE_42: usize = <span class="number">1</span>;
+<span class="attribute">#[cfg(all(
+    httparse_simd,
+    any(not(httparse_simd_target_feature_sse42), httparse_simd_target_feature_avx2),
+    any(
+        target_arch = <span class="string">&quot;x86&quot;</span>,
+        target_arch = <span class="string">&quot;x86_64&quot;</span>,
     ),
-))]</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">AVX_2</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">2</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(
-    <span class="ident">httparse_simd</span>,
-    <span class="ident">any</span>(
-        <span class="ident">not</span>(<span class="ident">httparse_simd_target_feature_sse42</span>),
-        <span class="ident">httparse_simd_target_feature_avx2</span>,
-        <span class="ident">test</span>,
+))]
+</span><span class="kw">pub const </span>AVX_2: usize = <span class="number">2</span>;
+<span class="attribute">#[cfg(all(
+    httparse_simd,
+    any(
+        not(httparse_simd_target_feature_sse42),
+        httparse_simd_target_feature_avx2,
+        test,
     ),
-    <span class="ident">any</span>(
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>,
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>,
+    any(
+        target_arch = <span class="string">&quot;x86&quot;</span>,
+        target_arch = <span class="string">&quot;x86_64&quot;</span>,
     ),
-))]</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">AVX_2_AND_SSE_42</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">3</span>;
+))]
+</span><span class="kw">pub const </span>AVX_2_AND_SSE_42: usize = <span class="number">3</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(
-    <span class="ident">httparse_simd</span>,
-    <span class="ident">any</span>(
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>,
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>,
+<span class="attribute">#[cfg(all(
+    httparse_simd,
+    any(
+        target_arch = <span class="string">&quot;x86&quot;</span>,
+        target_arch = <span class="string">&quot;x86_64&quot;</span>,
     ),
-))]</span>
-<span class="kw">const</span> <span class="ident">NONE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">std::usize::MAX</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(
-    <span class="ident">httparse_simd</span>,
-    <span class="ident">not</span>(<span class="ident">any</span>(
-        <span class="ident">httparse_simd_target_feature_sse42</span>,
-        <span class="ident">httparse_simd_target_feature_avx2</span>,
+))]
+</span><span class="kw">const </span>NONE: usize = std::usize::MAX;
+<span class="attribute">#[cfg(all(
+    httparse_simd,
+    not(any(
+        httparse_simd_target_feature_sse42,
+        httparse_simd_target_feature_avx2,
     )),
-    <span class="ident">any</span>(
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>,
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>,
+    any(
+        target_arch = <span class="string">&quot;x86&quot;</span>,
+        target_arch = <span class="string">&quot;x86_64&quot;</span>,
     ),
-))]</span>
-<span class="kw">mod</span> <span class="ident">runtime</span> {
-    <span class="doccomment">//! Runtime detection of simd features. Used when the build script</span>
-    <span class="doccomment">//! doesn&#39;t notice any target features at build time.</span>
-    <span class="doccomment">//!</span>
-    <span class="doccomment">//! While `is_x86_feature_detected!` has it&#39;s own caching built-in,</span>
-    <span class="doccomment">//! at least in 1.27.0, the functions don&#39;t inline, leaving using it</span>
-    <span class="doccomment">//! actually *slower* than just using the scalar fallback.</span>
+))]
+</span><span class="kw">mod </span>runtime {
+    <span class="doccomment">//! Runtime detection of simd features. Used when the build script
+    //! doesn&#39;t notice any target features at build time.
+    //!
+    //! While `is_x86_feature_detected!` has it&#39;s own caching built-in,
+    //! at least in 1.27.0, the functions don&#39;t inline, leaving using it
+    //! actually *slower* than just using the scalar fallback.
 
-    <span class="kw">use</span> <span class="ident">core::sync::atomic</span>::{<span class="ident">AtomicUsize</span>, <span class="ident">Ordering</span>};
+    </span><span class="kw">use </span>core::sync::atomic::{AtomicUsize, Ordering};
 
-    <span class="kw">static</span> <span class="ident">FEATURE</span>: <span class="ident">AtomicUsize</span> <span class="op">=</span> <span class="ident">AtomicUsize::new</span>(<span class="number">0</span>);
+    <span class="kw">static </span>FEATURE: AtomicUsize = AtomicUsize::new(<span class="number">0</span>);
 
-    <span class="kw">const</span> <span class="ident">INIT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
+    <span class="kw">const </span>INIT: usize = <span class="number">0</span>;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">detect</span>() -&gt; <span class="ident">usize</span> {
-        <span class="kw">let</span> <span class="ident">feat</span> <span class="op">=</span> <span class="ident">FEATURE</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
-        <span class="kw">if</span> <span class="ident">feat</span> <span class="op">==</span> <span class="ident">INIT</span> {
-            <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>) <span class="op">&amp;&amp;</span> <span class="macro">is_x86_feature_detected!</span>(<span class="string">&quot;avx2&quot;</span>) {
-                <span class="kw">if</span> <span class="macro">is_x86_feature_detected!</span>(<span class="string">&quot;sse4.2&quot;</span>) {
-                    <span class="ident">FEATURE</span>.<span class="ident">store</span>(<span class="ident"><span class="kw">super</span>::AVX_2_AND_SSE_42</span>, <span class="ident">Ordering::Relaxed</span>);
-                    <span class="kw">return</span> <span class="ident"><span class="kw">super</span>::AVX_2_AND_SSE_42</span>;
-                } <span class="kw">else</span> {
-                    <span class="ident">FEATURE</span>.<span class="ident">store</span>(<span class="ident"><span class="kw">super</span>::AVX_2</span>, <span class="ident">Ordering::Relaxed</span>);
-                    <span class="kw">return</span> <span class="ident"><span class="kw">super</span>::AVX_2</span>;
+    <span class="kw">pub fn </span>detect() -&gt; usize {
+        <span class="kw">let </span>feat = FEATURE.load(Ordering::Relaxed);
+        <span class="kw">if </span>feat == INIT {
+            <span class="kw">if </span><span class="macro">cfg!</span>(target_arch = <span class="string">&quot;x86_64&quot;</span>) &amp;&amp; <span class="macro">is_x86_feature_detected!</span>(<span class="string">&quot;avx2&quot;</span>) {
+                <span class="kw">if </span><span class="macro">is_x86_feature_detected!</span>(<span class="string">&quot;sse4.2&quot;</span>) {
+                    FEATURE.store(<span class="kw">super</span>::AVX_2_AND_SSE_42, Ordering::Relaxed);
+                    <span class="kw">return </span><span class="kw">super</span>::AVX_2_AND_SSE_42;
+                } <span class="kw">else </span>{
+                    FEATURE.store(<span class="kw">super</span>::AVX_2, Ordering::Relaxed);
+                    <span class="kw">return </span><span class="kw">super</span>::AVX_2;
                 }
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="macro">is_x86_feature_detected!</span>(<span class="string">&quot;sse4.2&quot;</span>) {
-                <span class="ident">FEATURE</span>.<span class="ident">store</span>(<span class="ident"><span class="kw">super</span>::SSE_42</span>, <span class="ident">Ordering::Relaxed</span>);
-                <span class="kw">return</span> <span class="ident"><span class="kw">super</span>::SSE_42</span>;
-            } <span class="kw">else</span> {
-                <span class="ident">FEATURE</span>.<span class="ident">store</span>(<span class="ident"><span class="kw">super</span>::NONE</span>, <span class="ident">Ordering::Relaxed</span>);
+            } <span class="kw">else if </span><span class="macro">is_x86_feature_detected!</span>(<span class="string">&quot;sse4.2&quot;</span>) {
+                FEATURE.store(<span class="kw">super</span>::SSE_42, Ordering::Relaxed);
+                <span class="kw">return </span><span class="kw">super</span>::SSE_42;
+            } <span class="kw">else </span>{
+                FEATURE.store(<span class="kw">super</span>::NONE, Ordering::Relaxed);
             }
         }
-        <span class="ident">feat</span>
+        feat
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">match_uri_vectored</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">crate</span>::iter::Bytes</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="kw">match</span> <span class="ident">detect</span>() {
-                <span class="ident"><span class="kw">super</span>::SSE_42</span> =&gt; <span class="ident"><span class="kw">super</span>::sse42::parse_uri_batch_16</span>(<span class="ident">bytes</span>),
-                <span class="ident"><span class="kw">super</span>::AVX_2</span> =&gt; { <span class="ident"><span class="kw">super</span>::avx2::parse_uri_batch_32</span>(<span class="ident">bytes</span>); },
-                <span class="ident"><span class="kw">super</span>::AVX_2_AND_SSE_42</span> =&gt; {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="kw">super</span>::avx2::Scan::Found</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::avx2::parse_uri_batch_32</span>(<span class="ident">bytes</span>) {
+    <span class="kw">pub fn </span>match_uri_vectored(bytes: <span class="kw-2">&amp;mut </span><span class="kw">crate</span>::iter::Bytes) {
+        <span class="kw">unsafe </span>{
+            <span class="kw">match </span>detect() {
+                <span class="kw">super</span>::SSE_42 =&gt; <span class="kw">super</span>::sse42::parse_uri_batch_16(bytes),
+                <span class="kw">super</span>::AVX_2 =&gt; { <span class="kw">super</span>::avx2::parse_uri_batch_32(bytes); },
+                <span class="kw">super</span>::AVX_2_AND_SSE_42 =&gt; {
+                    <span class="kw">if let </span><span class="kw">super</span>::avx2::Scan::Found = <span class="kw">super</span>::avx2::parse_uri_batch_32(bytes) {
                         <span class="kw">return</span>;
                     }
-                    <span class="ident"><span class="kw">super</span>::sse42::parse_uri_batch_16</span>(<span class="ident">bytes</span>)
+                    <span class="kw">super</span>::sse42::parse_uri_batch_16(bytes)
                 },
-                <span class="kw">_</span> =&gt; ()
+                <span class="kw">_ </span>=&gt; ()
             }
         }
 
-        <span class="comment">// else do nothing</span>
-    }
+        <span class="comment">// else do nothing
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">match_header_value_vectored</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">crate</span>::iter::Bytes</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="kw">match</span> <span class="ident">detect</span>() {
-                <span class="ident"><span class="kw">super</span>::SSE_42</span> =&gt; <span class="ident"><span class="kw">super</span>::sse42::match_header_value_batch_16</span>(<span class="ident">bytes</span>),
-                <span class="ident"><span class="kw">super</span>::AVX_2</span> =&gt; { <span class="ident"><span class="kw">super</span>::avx2::match_header_value_batch_32</span>(<span class="ident">bytes</span>); },
-                <span class="ident"><span class="kw">super</span>::AVX_2_AND_SSE_42</span> =&gt; {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="kw">super</span>::avx2::Scan::Found</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::avx2::match_header_value_batch_32</span>(<span class="ident">bytes</span>) {
+    <span class="kw">pub fn </span>match_header_value_vectored(bytes: <span class="kw-2">&amp;mut </span><span class="kw">crate</span>::iter::Bytes) {
+        <span class="kw">unsafe </span>{
+            <span class="kw">match </span>detect() {
+                <span class="kw">super</span>::SSE_42 =&gt; <span class="kw">super</span>::sse42::match_header_value_batch_16(bytes),
+                <span class="kw">super</span>::AVX_2 =&gt; { <span class="kw">super</span>::avx2::match_header_value_batch_32(bytes); },
+                <span class="kw">super</span>::AVX_2_AND_SSE_42 =&gt; {
+                    <span class="kw">if let </span><span class="kw">super</span>::avx2::Scan::Found = <span class="kw">super</span>::avx2::match_header_value_batch_32(bytes) {
                         <span class="kw">return</span>;
                     }
-                    <span class="ident"><span class="kw">super</span>::sse42::match_header_value_batch_16</span>(<span class="ident">bytes</span>)
+                    <span class="kw">super</span>::sse42::match_header_value_batch_16(bytes)
                 },
-                <span class="kw">_</span> =&gt; ()
+                <span class="kw">_ </span>=&gt; ()
             }
         }
 
-        <span class="comment">// else do nothing</span>
-    }
+        <span class="comment">// else do nothing
+    </span>}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(
-    <span class="ident">httparse_simd</span>,
-    <span class="ident">not</span>(<span class="ident">any</span>(
-        <span class="ident">httparse_simd_target_feature_sse42</span>,
-        <span class="ident">httparse_simd_target_feature_avx2</span>,
+<span class="attribute">#[cfg(all(
+    httparse_simd,
+    not(any(
+        httparse_simd_target_feature_sse42,
+        httparse_simd_target_feature_avx2,
     )),
-    <span class="ident">any</span>(
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>,
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>,
+    any(
+        target_arch = <span class="string">&quot;x86&quot;</span>,
+        target_arch = <span class="string">&quot;x86_64&quot;</span>,
     ),
-))]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::runtime</span>::<span class="kw-2">*</span>;
+))]
+</span><span class="kw">pub use </span><span class="self">self</span>::runtime::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(
-    <span class="ident">httparse_simd</span>,
-    <span class="ident">httparse_simd_target_feature_sse42</span>,
-    <span class="ident">not</span>(<span class="ident">httparse_simd_target_feature_avx2</span>),
-    <span class="ident">any</span>(
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>,
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>,
+<span class="attribute">#[cfg(all(
+    httparse_simd,
+    httparse_simd_target_feature_sse42,
+    not(httparse_simd_target_feature_avx2),
+    any(
+        target_arch = <span class="string">&quot;x86&quot;</span>,
+        target_arch = <span class="string">&quot;x86_64&quot;</span>,
     ),
-))]</span>
-<span class="kw">mod</span> <span class="ident">sse42_compile_time</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">match_uri_vectored</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">crate</span>::iter::Bytes</span>) {
-        <span class="kw">if</span> <span class="ident">detect</span>() <span class="op">==</span> <span class="ident"><span class="kw">super</span>::SSE_42</span> {
-            <span class="kw">unsafe</span> {
-                <span class="ident"><span class="kw">super</span>::sse42::parse_uri_batch_16</span>(<span class="ident">bytes</span>);
+))]
+</span><span class="kw">mod </span>sse42_compile_time {
+    <span class="kw">pub fn </span>match_uri_vectored(bytes: <span class="kw-2">&amp;mut </span><span class="kw">crate</span>::iter::Bytes) {
+        <span class="kw">if </span>detect() == <span class="kw">super</span>::SSE_42 {
+            <span class="kw">unsafe </span>{
+                <span class="kw">super</span>::sse42::parse_uri_batch_16(bytes);
             }
         }
 
-        <span class="comment">// else do nothing</span>
-    }
+        <span class="comment">// else do nothing
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">match_header_value_vectored</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">crate</span>::iter::Bytes</span>) {
-        <span class="kw">if</span> <span class="ident">detect</span>() <span class="op">==</span> <span class="ident"><span class="kw">super</span>::SSE_42</span> {
-            <span class="kw">unsafe</span> {
-                <span class="ident"><span class="kw">super</span>::sse42::match_header_value_batch_16</span>(<span class="ident">bytes</span>);
+    <span class="kw">pub fn </span>match_header_value_vectored(bytes: <span class="kw-2">&amp;mut </span><span class="kw">crate</span>::iter::Bytes) {
+        <span class="kw">if </span>detect() == <span class="kw">super</span>::SSE_42 {
+            <span class="kw">unsafe </span>{
+                <span class="kw">super</span>::sse42::match_header_value_batch_16(bytes);
             }
         }
 
-        <span class="comment">// else do nothing</span>
-    }
+        <span class="comment">// else do nothing
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">detect</span>() -&gt; <span class="ident">usize</span> {
-        <span class="kw">if</span> <span class="macro">is_x86_feature_detected!</span>(<span class="string">&quot;sse4.2&quot;</span>) {
-            <span class="ident"><span class="kw">super</span>::SSE_42</span>
-        } <span class="kw">else</span> {
-            <span class="ident"><span class="kw">super</span>::NONE</span>
+    <span class="kw">pub fn </span>detect() -&gt; usize {
+        <span class="kw">if </span><span class="macro">is_x86_feature_detected!</span>(<span class="string">&quot;sse4.2&quot;</span>) {
+            <span class="kw">super</span>::SSE_42
+        } <span class="kw">else </span>{
+            <span class="kw">super</span>::NONE
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(
-    <span class="ident">httparse_simd</span>,
-    <span class="ident">httparse_simd_target_feature_sse42</span>,
-    <span class="ident">not</span>(<span class="ident">httparse_simd_target_feature_avx2</span>),
-    <span class="ident">any</span>(
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>,
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>,
+<span class="attribute">#[cfg(all(
+    httparse_simd,
+    httparse_simd_target_feature_sse42,
+    not(httparse_simd_target_feature_avx2),
+    any(
+        target_arch = <span class="string">&quot;x86&quot;</span>,
+        target_arch = <span class="string">&quot;x86_64&quot;</span>,
     ),
-))]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::sse42_compile_time</span>::<span class="kw-2">*</span>;
+))]
+</span><span class="kw">pub use </span><span class="self">self</span>::sse42_compile_time::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(
-    <span class="ident">httparse_simd</span>,
-    <span class="ident">httparse_simd_target_feature_avx2</span>,
-    <span class="ident">any</span>(
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>,
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>,
+<span class="attribute">#[cfg(all(
+    httparse_simd,
+    httparse_simd_target_feature_avx2,
+    any(
+        target_arch = <span class="string">&quot;x86&quot;</span>,
+        target_arch = <span class="string">&quot;x86_64&quot;</span>,
     ),
-))]</span>
-<span class="kw">mod</span> <span class="ident">avx2_compile_time</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">match_uri_vectored</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">crate</span>::iter::Bytes</span>) {
-        <span class="comment">// do both, since avx2 only works when bytes.len() &gt;= 32</span>
-        <span class="kw">if</span> <span class="ident">detect</span>() <span class="op">==</span> <span class="ident"><span class="kw">super</span>::AVX_2_AND_SSE_42</span> {
-            <span class="kw">unsafe</span> {
-                <span class="ident"><span class="kw">super</span>::avx2::parse_uri_batch_32</span>(<span class="ident">bytes</span>);
+))]
+</span><span class="kw">mod </span>avx2_compile_time {
+    <span class="kw">pub fn </span>match_uri_vectored(bytes: <span class="kw-2">&amp;mut </span><span class="kw">crate</span>::iter::Bytes) {
+        <span class="comment">// do both, since avx2 only works when bytes.len() &gt;= 32
+        </span><span class="kw">if </span>detect() == <span class="kw">super</span>::AVX_2_AND_SSE_42 {
+            <span class="kw">unsafe </span>{
+                <span class="kw">super</span>::avx2::parse_uri_batch_32(bytes);
             }
 
         } 
-        <span class="kw">if</span> <span class="ident">detect</span>() <span class="op">==</span> <span class="ident"><span class="kw">super</span>::SSE_42</span> {
-            <span class="kw">unsafe</span> {
-                <span class="ident"><span class="kw">super</span>::sse42::parse_uri_batch_16</span>(<span class="ident">bytes</span>);
+        <span class="kw">if </span>detect() == <span class="kw">super</span>::SSE_42 {
+            <span class="kw">unsafe </span>{
+                <span class="kw">super</span>::sse42::parse_uri_batch_16(bytes);
             }
         }
 
-        <span class="comment">// else do nothing</span>
-    }
+        <span class="comment">// else do nothing
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">match_header_value_vectored</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">crate</span>::iter::Bytes</span>) {
-        <span class="comment">// do both, since avx2 only works when bytes.len() &gt;= 32</span>
-        <span class="kw">if</span> <span class="ident">detect</span>() <span class="op">==</span> <span class="ident"><span class="kw">super</span>::AVX_2_AND_SSE_42</span> {
-            <span class="kw">let</span> <span class="ident">scanned</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-                <span class="ident"><span class="kw">super</span>::avx2::match_header_value_batch_32</span>(<span class="ident">bytes</span>)
+    <span class="kw">pub fn </span>match_header_value_vectored(bytes: <span class="kw-2">&amp;mut </span><span class="kw">crate</span>::iter::Bytes) {
+        <span class="comment">// do both, since avx2 only works when bytes.len() &gt;= 32
+        </span><span class="kw">if </span>detect() == <span class="kw">super</span>::AVX_2_AND_SSE_42 {
+            <span class="kw">let </span>scanned = <span class="kw">unsafe </span>{
+                <span class="kw">super</span>::avx2::match_header_value_batch_32(bytes)
             };
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="kw">super</span>::avx2::Scan::Found</span> <span class="op">=</span> <span class="ident">scanned</span> {
+            <span class="kw">if let </span><span class="kw">super</span>::avx2::Scan::Found = scanned {
                 <span class="kw">return</span>;
             }
         }
-        <span class="kw">if</span> <span class="ident">detect</span>() <span class="op">==</span> <span class="ident"><span class="kw">super</span>::SSE_42</span> {
-            <span class="kw">unsafe</span> {
-                <span class="ident"><span class="kw">super</span>::sse42::match_header_value_batch_16</span>(<span class="ident">bytes</span>);
+        <span class="kw">if </span>detect() == <span class="kw">super</span>::SSE_42 {
+            <span class="kw">unsafe </span>{
+                <span class="kw">super</span>::sse42::match_header_value_batch_16(bytes);
             }
         }
 
-        <span class="comment">// else do nothing</span>
-    }
+        <span class="comment">// else do nothing
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">detect</span>() -&gt; <span class="ident">usize</span> {
-        <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>) <span class="op">&amp;&amp;</span> <span class="macro">is_x86_feature_detected!</span>(<span class="string">&quot;avx2&quot;</span>) {
-            <span class="ident"><span class="kw">super</span>::AVX_2_AND_SSE_42</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="macro">is_x86_feature_detected!</span>(<span class="string">&quot;sse4.2&quot;</span>) {
-            <span class="ident"><span class="kw">super</span>::SSE_42</span>
-        } <span class="kw">else</span> {
-            <span class="ident"><span class="kw">super</span>::NONE</span>
+    <span class="kw">pub fn </span>detect() -&gt; usize {
+        <span class="kw">if </span><span class="macro">cfg!</span>(target_arch = <span class="string">&quot;x86_64&quot;</span>) &amp;&amp; <span class="macro">is_x86_feature_detected!</span>(<span class="string">&quot;avx2&quot;</span>) {
+            <span class="kw">super</span>::AVX_2_AND_SSE_42
+        } <span class="kw">else if </span><span class="macro">is_x86_feature_detected!</span>(<span class="string">&quot;sse4.2&quot;</span>) {
+            <span class="kw">super</span>::SSE_42
+        } <span class="kw">else </span>{
+            <span class="kw">super</span>::NONE
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(
-    <span class="ident">httparse_simd</span>,
-    <span class="ident">httparse_simd_target_feature_avx2</span>,
-    <span class="ident">any</span>(
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>,
-        <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>,
+<span class="attribute">#[cfg(all(
+    httparse_simd,
+    httparse_simd_target_feature_avx2,
+    any(
+        target_arch = <span class="string">&quot;x86&quot;</span>,
+        target_arch = <span class="string">&quot;x86_64&quot;</span>,
     ),
-))]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::avx2_compile_time</span>::<span class="kw-2">*</span>;
+))]
+</span><span class="kw">pub use </span><span class="self">self</span>::avx2_compile_time::<span class="kw-2">*</span>;
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="httparse" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="httparse" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

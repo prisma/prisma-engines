@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_graph_builder/write/nested/disconnect_nested.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>disconnect_nested.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../query_core/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_graph_builder/write/nested/disconnect_nested.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>disconnect_nested.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../query_core/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -213,215 +213,215 @@
 <span id="213">213</span>
 <span id="214">214</span>
 <span id="215">215</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">query_graph</span>::{<span class="ident">Node</span>, <span class="ident">NodeRef</span>, <span class="ident">QueryGraph</span>, <span class="ident">QueryGraphDependency</span>},
-    <span class="ident">ParsedInputMap</span>, <span class="ident">ParsedInputValue</span>, <span class="ident">Query</span>, <span class="ident">WriteQuery</span>,
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use crate</span>::{
+    query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
+    ParsedInputMap, ParsedInputValue, Query, WriteQuery,
 };
-<span class="kw">use</span> <span class="ident">connector::Filter</span>;
-<span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">ModelRef</span>, <span class="ident">PrismaValue</span>, <span class="ident">RelationFieldRef</span>, <span class="ident">SelectionResult</span>};
-<span class="kw">use</span> <span class="ident">std::convert::TryInto</span>;
+<span class="kw">use </span>connector::Filter;
+<span class="kw">use </span>itertools::Itertools;
+<span class="kw">use </span>prisma_models::{ModelRef, PrismaValue, RelationFieldRef, SelectionResult};
+<span class="kw">use </span>std::convert::TryInto;
 
-<span class="doccomment">/// Handles nested disconnect cases.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The resulting graph can take multiple forms, based on the relation type to the parent model.</span>
-<span class="doccomment">/// Information on the graph shapes can be found on the individual handlers.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nested_disconnect</span>(
-    <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-    <span class="ident">parent_node</span>: <span class="ident">NodeRef</span>,
-    <span class="ident">parent_relation_field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-    <span class="ident">value</span>: <span class="ident">ParsedInputValue</span>,
-    <span class="ident">child_model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">relation</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">relation</span>();
+<span class="doccomment">/// Handles nested disconnect cases.
+///
+/// The resulting graph can take multiple forms, based on the relation type to the parent model.
+/// Information on the graph shapes can be found on the individual handlers.
+</span><span class="kw">pub fn </span>nested_disconnect(
+    graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+    parent_node: NodeRef,
+    parent_relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
+    value: ParsedInputValue,
+    child_model: <span class="kw-2">&amp;</span>ModelRef,
+) -&gt; QueryGraphBuilderResult&lt;()&gt; {
+    <span class="kw">let </span>relation = parent_relation_field.relation();
 
-    <span class="kw">if</span> <span class="ident">relation</span>.<span class="ident">is_many_to_many</span>() {
-        <span class="comment">// Build all filters upfront.</span>
-        <span class="kw">let</span> <span class="ident">filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">utils::coerce_vec</span>(<span class="ident">value</span>)
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span>: <span class="ident">ParsedInputValue</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
-                <span class="ident">extract_unique_filter</span>(<span class="ident">value</span>, <span class="kw-2">&amp;</span><span class="ident">child_model</span>)
+    <span class="kw">if </span>relation.is_many_to_many() {
+        <span class="comment">// Build all filters upfront.
+        </span><span class="kw">let </span>filters: Vec&lt;Filter&gt; = utils::coerce_vec(value)
+            .into_iter()
+            .map(|value: ParsedInputValue| {
+                <span class="kw">let </span>value: ParsedInputMap = value.try_into()<span class="question-mark">?</span>;
+                extract_unique_filter(value, <span class="kw-2">&amp;</span>child_model)
             })
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">unique</span>()
-            .<span class="ident">collect</span>();
+            .collect::&lt;QueryGraphBuilderResult&lt;Vec&lt;Filter&gt;&gt;&gt;()<span class="question-mark">?
+            </span>.into_iter()
+            .unique()
+            .collect();
 
-        <span class="ident">handle_many_to_many</span>(<span class="ident">graph</span>, <span class="kw-2">&amp;</span><span class="ident">parent_node</span>, <span class="ident">parent_relation_field</span>, <span class="ident">Filter::or</span>(<span class="ident">filters</span>))
-    } <span class="kw">else</span> {
-        <span class="kw">let</span> <span class="ident">filter</span>: <span class="ident">Filter</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">relation</span>.<span class="ident">is_one_to_one</span>() {
-            <span class="comment">// One-to-one relations can simply specify if they want to disconnect the child or not as a bool.</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ParsedInputValue::Single</span>(<span class="ident">PrismaValue::Boolean</span>(<span class="ident">should_delete</span>)) <span class="op">=</span> <span class="ident">value</span> {
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">should_delete</span> {
-                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+        handle_many_to_many(graph, <span class="kw-2">&amp;</span>parent_node, parent_relation_field, Filter::or(filters))
+    } <span class="kw">else </span>{
+        <span class="kw">let </span>filter: Filter = <span class="kw">if </span>relation.is_one_to_one() {
+            <span class="comment">// One-to-one relations can simply specify if they want to disconnect the child or not as a bool.
+            </span><span class="kw">if let </span>ParsedInputValue::Single(PrismaValue::Boolean(should_delete)) = value {
+                <span class="kw">if </span>!should_delete {
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>(());
                 }
 
-                <span class="ident">Filter::empty</span>()
-            } <span class="kw">else</span> {
-                <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
+                Filter::empty()
+            } <span class="kw">else </span>{
+                <span class="kw">let </span>value: ParsedInputMap = value.try_into()<span class="question-mark">?</span>;
 
-                <span class="ident">extract_filter</span>(<span class="ident">value</span>, <span class="ident">child_model</span>)<span class="question-mark">?</span>
-            }
-        } <span class="kw">else</span> {
-            <span class="comment">// One-to-many specify a number of finders if the parent side is the to-one.</span>
-            <span class="comment">// todo check if this if else is really still required.</span>
-            <span class="kw">if</span> <span class="ident">parent_relation_field</span>.<span class="ident">is_list</span>() {
-                <span class="kw">let</span> <span class="ident">filters</span> <span class="op">=</span> <span class="ident">utils::coerce_vec</span>(<span class="ident">value</span>)
-                    .<span class="ident">into_iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span>: <span class="ident">ParsedInputValue</span><span class="op">|</span> {
-                        <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
-                        <span class="ident">extract_unique_filter</span>(<span class="ident">value</span>, <span class="kw-2">&amp;</span><span class="ident">child_model</span>)
+                extract_filter(value, child_model)<span class="question-mark">?
+            </span>}
+        } <span class="kw">else </span>{
+            <span class="comment">// One-to-many specify a number of finders if the parent side is the to-one.
+            // todo check if this if else is really still required.
+            </span><span class="kw">if </span>parent_relation_field.is_list() {
+                <span class="kw">let </span>filters = utils::coerce_vec(value)
+                    .into_iter()
+                    .map(|value: ParsedInputValue| {
+                        <span class="kw">let </span>value: ParsedInputMap = value.try_into()<span class="question-mark">?</span>;
+                        extract_unique_filter(value, <span class="kw-2">&amp;</span>child_model)
                     })
-                    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>
-                    .<span class="ident">into_iter</span>()
-                    .<span class="ident">unique</span>()
-                    .<span class="ident">collect</span>();
+                    .collect::&lt;QueryGraphBuilderResult&lt;Vec&lt;Filter&gt;&gt;&gt;()<span class="question-mark">?
+                    </span>.into_iter()
+                    .unique()
+                    .collect();
 
-                <span class="ident">Filter::or</span>(<span class="ident">filters</span>)
-            } <span class="kw">else</span> {
-                <span class="ident">Filter::empty</span>()
+                Filter::or(filters)
+            } <span class="kw">else </span>{
+                Filter::empty()
             }
         };
 
-        <span class="ident">handle_one_to_x</span>(<span class="ident">graph</span>, <span class="kw-2">&amp;</span><span class="ident">parent_node</span>, <span class="ident">parent_relation_field</span>, <span class="ident">filter</span>)
+        handle_one_to_x(graph, <span class="kw-2">&amp;</span>parent_node, parent_relation_field, filter)
     }
 }
 
-<span class="doccomment">/// Handles a nested many-to-many disconnect.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Creates a disconnect node in the graph and creates edges to `parent_node` and `child_node`.</span>
-<span class="doccomment">/// The disconnect edges assume that both the parent and the child node results</span>
-<span class="doccomment">/// are convertible to IDs, as the edges perform a transformation on the disconnect node to</span>
-<span class="doccomment">/// inject the required IDs after the parents executed.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The resulting graph:</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐</span>
-<span class="doccomment">/// ┌──      Parent       ─ ─ ─ ─ ─</span>
-<span class="doccomment">/// │  └ ─ ─ ─ ─ ─ ─ ─ ─ ┘         │</span>
-<span class="doccomment">/// │           │</span>
-<span class="doccomment">/// │                              │</span>
-<span class="doccomment">/// │           │</span>
-<span class="doccomment">/// │           ▼                  ▼</span>
-<span class="doccomment">/// │  ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐  ┌ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">/// │         Child             Result   │</span>
-<span class="doccomment">/// │  └ ─ ─ ─ ─ ─ ─ ─ ─ ┘  └ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">/// │           │</span>
-<span class="doccomment">/// │           │</span>
-<span class="doccomment">/// │           │</span>
-<span class="doccomment">/// │           ▼</span>
-<span class="doccomment">/// │  ┌─────────────────┐</span>
-<span class="doccomment">/// └─▶│   Disconnect    │</span>
-<span class="doccomment">///    └─────────────────┘</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">fn</span> <span class="ident">handle_many_to_many</span>(
-    <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-    <span class="ident">parent_node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
-    <span class="ident">parent_relation_field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-    <span class="ident">filter</span>: <span class="ident">Filter</span>,
-) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">filter</span>.<span class="ident">size</span>() <span class="op">==</span> <span class="number">0</span> {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+<span class="doccomment">/// Handles a nested many-to-many disconnect.
+///
+/// Creates a disconnect node in the graph and creates edges to `parent_node` and `child_node`.
+/// The disconnect edges assume that both the parent and the child node results
+/// are convertible to IDs, as the edges perform a transformation on the disconnect node to
+/// inject the required IDs after the parents executed.
+///
+/// The resulting graph:
+/// ```text
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐
+/// ┌──      Parent       ─ ─ ─ ─ ─
+/// │  └ ─ ─ ─ ─ ─ ─ ─ ─ ┘         │
+/// │           │
+/// │                              │
+/// │           │
+/// │           ▼                  ▼
+/// │  ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐  ┌ ─ ─ ─ ─ ─ ─
+/// │         Child             Result   │
+/// │  └ ─ ─ ─ ─ ─ ─ ─ ─ ┘  └ ─ ─ ─ ─ ─ ─
+/// │           │
+/// │           │
+/// │           │
+/// │           ▼
+/// │  ┌─────────────────┐
+/// └─▶│   Disconnect    │
+///    └─────────────────┘
+/// ```
+</span><span class="kw">fn </span>handle_many_to_many(
+    graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+    parent_node: <span class="kw-2">&amp;</span>NodeRef,
+    parent_relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
+    filter: Filter,
+) -&gt; QueryGraphBuilderResult&lt;()&gt; {
+    <span class="kw">if </span>filter.size() == <span class="number">0 </span>{
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(());
     }
 
-    <span class="kw">let</span> <span class="ident">find_child_records_node</span> <span class="op">=</span>
-        <span class="ident">utils::insert_find_children_by_parent_node</span>(<span class="ident">graph</span>, <span class="ident">parent_node</span>, <span class="ident">parent_relation_field</span>, <span class="ident">filter</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>find_child_records_node =
+        utils::insert_find_children_by_parent_node(graph, parent_node, parent_relation_field, filter)<span class="question-mark">?</span>;
 
-    <span class="ident">disconnect::disconnect_records_node</span>(<span class="ident">graph</span>, <span class="ident">parent_node</span>, <span class="kw-2">&amp;</span><span class="ident">find_child_records_node</span>, <span class="kw-2">&amp;</span><span class="ident">parent_relation_field</span>)<span class="question-mark">?</span>;
+    disconnect::disconnect_records_node(graph, parent_node, <span class="kw-2">&amp;</span>find_child_records_node, <span class="kw-2">&amp;</span>parent_relation_field)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="doccomment">/// Handles a nested one to many or one to one disconnect.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Depending on where the relation is inlined, an update node will be inserted:</span>
-<span class="doccomment">/// (dashed indicates that those nodes and edges are not created in this function)</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// Inlined on parent:             Inlined on child:</span>
-<span class="doccomment">///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐            ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐</span>
-<span class="doccomment">/// ┌──      Parent                ┌──      Parent</span>
-<span class="doccomment">/// │  └ ─ ─ ─ ─ ─ ─ ─ ─ ┘         │  └ ─ ─ ─ ─ ─ ─ ─ ─ ┘</span>
-<span class="doccomment">/// │           │                  │           │</span>
-<span class="doccomment">/// │           │                  │           │</span>
-<span class="doccomment">/// │           │                  │           │</span>
-<span class="doccomment">/// │           ▼                  │           ▼</span>
-<span class="doccomment">/// │  ┌─────────────────┐         │  ┌─────────────────┐</span>
-<span class="doccomment">/// │  │  Find Children  │         │  │  Find Children  │</span>
-<span class="doccomment">/// │  └─────────────────┘         │  └─────────────────┘</span>
-<span class="doccomment">/// │           │                  │           │</span>
-<span class="doccomment">/// │           │                  │           │</span>
-<span class="doccomment">/// │           │                  │           │</span>
-<span class="doccomment">/// │           ▼                  │           ▼</span>
-<span class="doccomment">/// │  ┌─────────────────┐         │  ┌─────────────────┐</span>
-<span class="doccomment">/// └─▶│  Update Parent  │         └─▶│ Update Children │</span>
-<span class="doccomment">///    └─────────────────┘            └─────────────────┘</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Assumes that both `Parent` and `Child` return the necessary IDs.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Todo pretty sure it&#39;s better do redo this code with separate handlers.</span>
-<span class="kw">fn</span> <span class="ident">handle_one_to_x</span>(
-    <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-    <span class="ident">parent_node</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
-    <span class="ident">parent_relation_field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-    <span class="ident">filter</span>: <span class="ident">Filter</span>,
-) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="comment">// Fetches the children to be disconnected.</span>
-    <span class="kw">let</span> <span class="ident">find_child_records_node</span> <span class="op">=</span>
-        <span class="ident">utils::insert_find_children_by_parent_node</span>(<span class="ident">graph</span>, <span class="kw-2">&amp;</span><span class="ident">parent_node</span>, <span class="ident">parent_relation_field</span>, <span class="ident">filter</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>;
+<span class="doccomment">/// Handles a nested one to many or one to one disconnect.
+///
+/// Depending on where the relation is inlined, an update node will be inserted:
+/// (dashed indicates that those nodes and edges are not created in this function)
+/// ```text
+/// Inlined on parent:             Inlined on child:
+///    ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐            ┌ ─ ─ ─ ─ ─ ─ ─ ─ ┐
+/// ┌──      Parent                ┌──      Parent
+/// │  └ ─ ─ ─ ─ ─ ─ ─ ─ ┘         │  └ ─ ─ ─ ─ ─ ─ ─ ─ ┘
+/// │           │                  │           │
+/// │           │                  │           │
+/// │           │                  │           │
+/// │           ▼                  │           ▼
+/// │  ┌─────────────────┐         │  ┌─────────────────┐
+/// │  │  Find Children  │         │  │  Find Children  │
+/// │  └─────────────────┘         │  └─────────────────┘
+/// │           │                  │           │
+/// │           │                  │           │
+/// │           │                  │           │
+/// │           ▼                  │           ▼
+/// │  ┌─────────────────┐         │  ┌─────────────────┐
+/// └─▶│  Update Parent  │         └─▶│ Update Children │
+///    └─────────────────┘            └─────────────────┘
+/// ```
+///
+/// Assumes that both `Parent` and `Child` return the necessary IDs.
+///
+/// Todo pretty sure it&#39;s better do redo this code with separate handlers.
+</span><span class="kw">fn </span>handle_one_to_x(
+    graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+    parent_node: <span class="kw-2">&amp;</span>NodeRef,
+    parent_relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
+    filter: Filter,
+) -&gt; QueryGraphBuilderResult&lt;()&gt; {
+    <span class="comment">// Fetches the children to be disconnected.
+    </span><span class="kw">let </span>find_child_records_node =
+        utils::insert_find_children_by_parent_node(graph, <span class="kw-2">&amp;</span>parent_node, parent_relation_field, filter.clone())<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">child_relation_field</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">related_field</span>();
+    <span class="kw">let </span>child_relation_field = parent_relation_field.related_field();
 
-    <span class="comment">// If we&#39;re in a 1:m scenario and either relation side is required, a disconnect is impossible, as some</span>
-    <span class="comment">// relation requirement would be violated with the disconnect.</span>
-    <span class="kw">if</span> <span class="ident">parent_relation_field</span>.<span class="ident">is_required</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">child_relation_field</span>.<span class="ident">is_required</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::RelationViolation</span>(<span class="ident">parent_relation_field</span>.<span class="ident">into</span>()));
+    <span class="comment">// If we&#39;re in a 1:m scenario and either relation side is required, a disconnect is impossible, as some
+    // relation requirement would be violated with the disconnect.
+    </span><span class="kw">if </span>parent_relation_field.is_required() || child_relation_field.is_required() {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(QueryGraphBuilderError::RelationViolation(parent_relation_field.into()));
     }
 
-    <span class="comment">// Depending on where the relation is inlined, we update the parent or the child nodes.</span>
-    <span class="kw">let</span> (<span class="ident">node_to_attach</span>, <span class="ident">model_to_update</span>, <span class="ident">extractor_model_id</span>, <span class="ident">null_record_id</span>) <span class="op">=</span>
-        <span class="kw">if</span> <span class="ident">parent_relation_field</span>.<span class="ident">is_inlined_on_enclosing_model</span>() {
-            <span class="comment">// Inlined on parent</span>
-            <span class="kw">let</span> <span class="ident">parent_model</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">model</span>();
-            <span class="kw">let</span> <span class="ident">extractor_model_id</span> <span class="op">=</span> <span class="ident">parent_model</span>.<span class="ident">primary_identifier</span>();
-            <span class="kw">let</span> <span class="ident">null_record_id</span> <span class="op">=</span> <span class="ident">SelectionResult::from</span>(<span class="kw-2">&amp;</span><span class="ident">parent_relation_field</span>.<span class="ident">linking_fields</span>());
+    <span class="comment">// Depending on where the relation is inlined, we update the parent or the child nodes.
+    </span><span class="kw">let </span>(node_to_attach, model_to_update, extractor_model_id, null_record_id) =
+        <span class="kw">if </span>parent_relation_field.is_inlined_on_enclosing_model() {
+            <span class="comment">// Inlined on parent
+            </span><span class="kw">let </span>parent_model = parent_relation_field.model();
+            <span class="kw">let </span>extractor_model_id = parent_model.primary_identifier();
+            <span class="kw">let </span>null_record_id = SelectionResult::from(<span class="kw-2">&amp;</span>parent_relation_field.linking_fields());
 
-            (<span class="ident">parent_node</span>, <span class="ident">parent_model</span>, <span class="ident">extractor_model_id</span>, <span class="ident">null_record_id</span>)
-        } <span class="kw">else</span> {
-            <span class="comment">// Inlined on child</span>
-            <span class="kw">let</span> <span class="ident">child_model</span> <span class="op">=</span> <span class="ident">child_relation_field</span>.<span class="ident">model</span>();
-            <span class="kw">let</span> <span class="ident">extractor_model_id</span> <span class="op">=</span> <span class="ident">child_model</span>.<span class="ident">primary_identifier</span>();
-            <span class="kw">let</span> <span class="ident">null_record_id</span> <span class="op">=</span> <span class="ident">SelectionResult::from</span>(<span class="kw-2">&amp;</span><span class="ident">child_relation_field</span>.<span class="ident">linking_fields</span>());
+            (parent_node, parent_model, extractor_model_id, null_record_id)
+        } <span class="kw">else </span>{
+            <span class="comment">// Inlined on child
+            </span><span class="kw">let </span>child_model = child_relation_field.model();
+            <span class="kw">let </span>extractor_model_id = child_model.primary_identifier();
+            <span class="kw">let </span>null_record_id = SelectionResult::from(<span class="kw-2">&amp;</span>child_relation_field.linking_fields());
 
             (
-                <span class="kw-2">&amp;</span><span class="ident">find_child_records_node</span>,
-                <span class="ident">child_model</span>,
-                <span class="ident">extractor_model_id</span>,
-                <span class="ident">null_record_id</span>,
+                <span class="kw-2">&amp;</span>find_child_records_node,
+                child_model,
+                extractor_model_id,
+                null_record_id,
             )
         };
 
-    <span class="kw">let</span> <span class="ident">update_node</span> <span class="op">=</span> <span class="ident">utils::update_records_node_placeholder</span>(<span class="ident">graph</span>, <span class="ident">filter</span>.<span class="ident">clone</span>(), <span class="ident">model_to_update</span>);
+    <span class="kw">let </span>update_node = utils::update_records_node_placeholder(graph, filter.clone(), model_to_update);
 
-    <span class="comment">// Edge to inject the correct data into the update (either from the parent or child).</span>
-    <span class="ident">graph</span>.<span class="ident">create_edge</span>(
-        <span class="ident">node_to_attach</span>,
-        <span class="kw-2">&amp;</span><span class="ident">update_node</span>,
-        <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
-            <span class="ident">extractor_model_id</span>,
-            <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">update_node</span>, <span class="ident">links</span><span class="op">|</span> {
-                <span class="kw">if</span> <span class="ident">links</span>.<span class="ident">is_empty</span>() {
-                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">update_node</span>);
+    <span class="comment">// Edge to inject the correct data into the update (either from the parent or child).
+    </span>graph.create_edge(
+        node_to_attach,
+        <span class="kw-2">&amp;</span>update_node,
+        QueryGraphDependency::ProjectedDataDependency(
+            extractor_model_id,
+            Box::new(<span class="kw">move </span>|<span class="kw-2">mut </span>update_node, links| {
+                <span class="kw">if </span>links.is_empty() {
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>(update_node);
                 }
 
-                <span class="comment">// Handle filter &amp; arg injection</span>
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Write</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">wq</span> @ <span class="ident">WriteQuery::UpdateManyRecords</span>(<span class="kw">_</span>))) <span class="op">=</span> <span class="ident">update_node</span> {
-                    <span class="ident">wq</span>.<span class="ident">set_selectors</span>(<span class="ident">links</span>);
-                    <span class="ident">wq</span>.<span class="ident">inject_result_into_args</span>(<span class="ident">null_record_id</span>);
+                <span class="comment">// Handle filter &amp; arg injection
+                </span><span class="kw">if let </span>Node::Query(Query::Write(<span class="kw-2">ref mut </span>wq @ WriteQuery::UpdateManyRecords(<span class="kw">_</span>))) = update_node {
+                    wq.set_selectors(links);
+                    wq.inject_result_into_args(null_record_id);
                 };
 
-                <span class="prelude-val">Ok</span>(<span class="ident">update_node</span>)
+                <span class="prelude-val">Ok</span>(update_node)
             }),
         ),
     )<span class="question-mark">?</span>;
@@ -429,4 +429,4 @@
     <span class="prelude-val">Ok</span>(())
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

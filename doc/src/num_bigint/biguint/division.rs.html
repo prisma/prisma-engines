@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/num-bigint-0.4.3/src/biguint/division.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>division.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../num_bigint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../num_bigint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../num_bigint/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/num-bigint-0.4.3/src/biguint/division.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>division.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../num_bigint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../num_bigint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../num_bigint/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -618,625 +618,625 @@
 <span id="618">618</span>
 <span id="619">619</span>
 <span id="620">620</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::addition::__add2</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">u64_digit</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::u32_to_u128</span>;
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">cmp_slice</span>, <span class="ident">BigUint</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::addition::__add2;
+<span class="attribute">#[cfg(not(u64_digit))]
+</span><span class="kw">use </span><span class="kw">super</span>::u32_to_u128;
+<span class="kw">use super</span>::{cmp_slice, BigUint};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::big_digit</span>::{<span class="self">self</span>, <span class="ident">BigDigit</span>, <span class="ident">DoubleBigDigit</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::UsizePromotion</span>;
+<span class="kw">use </span><span class="kw">crate</span>::big_digit::{<span class="self">self</span>, BigDigit, DoubleBigDigit};
+<span class="kw">use </span><span class="kw">crate</span>::UsizePromotion;
 
-<span class="kw">use</span> <span class="ident">core::cmp::Ordering</span>::{<span class="ident">Equal</span>, <span class="ident">Greater</span>, <span class="ident">Less</span>};
-<span class="kw">use</span> <span class="ident">core::mem</span>;
-<span class="kw">use</span> <span class="ident">core::ops</span>::{<span class="ident">Div</span>, <span class="ident">DivAssign</span>, <span class="ident">Rem</span>, <span class="ident">RemAssign</span>};
-<span class="kw">use</span> <span class="ident">num_integer::Integer</span>;
-<span class="kw">use</span> <span class="ident">num_traits</span>::{<span class="ident">CheckedDiv</span>, <span class="ident">One</span>, <span class="ident">ToPrimitive</span>, <span class="ident">Zero</span>};
+<span class="kw">use </span>core::cmp::Ordering::{Equal, Greater, Less};
+<span class="kw">use </span>core::mem;
+<span class="kw">use </span>core::ops::{Div, DivAssign, Rem, RemAssign};
+<span class="kw">use </span>num_integer::Integer;
+<span class="kw">use </span>num_traits::{CheckedDiv, One, ToPrimitive, Zero};
 
-<span class="doccomment">/// Divide a two digit numerator by a one digit divisor, returns quotient and remainder:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note: the caller must ensure that both the quotient and remainder will fit into a single digit.</span>
-<span class="doccomment">/// This is _not_ true for an arbitrary numerator/denominator.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// (This function also matches what the x86 divide instruction does).</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">div_wide</span>(<span class="ident">hi</span>: <span class="ident">BigDigit</span>, <span class="ident">lo</span>: <span class="ident">BigDigit</span>, <span class="ident">divisor</span>: <span class="ident">BigDigit</span>) -&gt; (<span class="ident">BigDigit</span>, <span class="ident">BigDigit</span>) {
-    <span class="macro">debug_assert!</span>(<span class="ident">hi</span> <span class="op">&lt;</span> <span class="ident">divisor</span>);
+<span class="doccomment">/// Divide a two digit numerator by a one digit divisor, returns quotient and remainder:
+///
+/// Note: the caller must ensure that both the quotient and remainder will fit into a single digit.
+/// This is _not_ true for an arbitrary numerator/denominator.
+///
+/// (This function also matches what the x86 divide instruction does).
+</span><span class="attribute">#[inline]
+</span><span class="kw">fn </span>div_wide(hi: BigDigit, lo: BigDigit, divisor: BigDigit) -&gt; (BigDigit, BigDigit) {
+    <span class="macro">debug_assert!</span>(hi &lt; divisor);
 
-    <span class="kw">let</span> <span class="ident">lhs</span> <span class="op">=</span> <span class="ident">big_digit::to_doublebigdigit</span>(<span class="ident">hi</span>, <span class="ident">lo</span>);
-    <span class="kw">let</span> <span class="ident">rhs</span> <span class="op">=</span> <span class="ident">DoubleBigDigit::from</span>(<span class="ident">divisor</span>);
-    ((<span class="ident">lhs</span> <span class="op">/</span> <span class="ident">rhs</span>) <span class="kw">as</span> <span class="ident">BigDigit</span>, (<span class="ident">lhs</span> <span class="op">%</span> <span class="ident">rhs</span>) <span class="kw">as</span> <span class="ident">BigDigit</span>)
+    <span class="kw">let </span>lhs = big_digit::to_doublebigdigit(hi, lo);
+    <span class="kw">let </span>rhs = DoubleBigDigit::from(divisor);
+    ((lhs / rhs) <span class="kw">as </span>BigDigit, (lhs % rhs) <span class="kw">as </span>BigDigit)
 }
 
-<span class="doccomment">/// For small divisors, we can divide without promoting to `DoubleBigDigit` by</span>
-<span class="doccomment">/// using half-size pieces of digit, like long-division.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">div_half</span>(<span class="ident">rem</span>: <span class="ident">BigDigit</span>, <span class="ident">digit</span>: <span class="ident">BigDigit</span>, <span class="ident">divisor</span>: <span class="ident">BigDigit</span>) -&gt; (<span class="ident">BigDigit</span>, <span class="ident">BigDigit</span>) {
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::big_digit</span>::{<span class="ident">HALF</span>, <span class="ident">HALF_BITS</span>};
+<span class="doccomment">/// For small divisors, we can divide without promoting to `DoubleBigDigit` by
+/// using half-size pieces of digit, like long-division.
+</span><span class="attribute">#[inline]
+</span><span class="kw">fn </span>div_half(rem: BigDigit, digit: BigDigit, divisor: BigDigit) -&gt; (BigDigit, BigDigit) {
+    <span class="kw">use </span><span class="kw">crate</span>::big_digit::{HALF, HALF_BITS};
 
-    <span class="macro">debug_assert!</span>(<span class="ident">rem</span> <span class="op">&lt;</span> <span class="ident">divisor</span> <span class="op">&amp;&amp;</span> <span class="ident">divisor</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">HALF</span>);
-    <span class="kw">let</span> (<span class="ident">hi</span>, <span class="ident">rem</span>) <span class="op">=</span> ((<span class="ident">rem</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">HALF_BITS</span>) <span class="op">|</span> (<span class="ident">digit</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">HALF_BITS</span>)).<span class="ident">div_rem</span>(<span class="kw-2">&amp;</span><span class="ident">divisor</span>);
-    <span class="kw">let</span> (<span class="ident">lo</span>, <span class="ident">rem</span>) <span class="op">=</span> ((<span class="ident">rem</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">HALF_BITS</span>) <span class="op">|</span> (<span class="ident">digit</span> <span class="op">&amp;</span> <span class="ident">HALF</span>)).<span class="ident">div_rem</span>(<span class="kw-2">&amp;</span><span class="ident">divisor</span>);
-    ((<span class="ident">hi</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">HALF_BITS</span>) <span class="op">|</span> <span class="ident">lo</span>, <span class="ident">rem</span>)
+    <span class="macro">debug_assert!</span>(rem &lt; divisor &amp;&amp; divisor &lt;= HALF);
+    <span class="kw">let </span>(hi, rem) = ((rem &lt;&lt; HALF_BITS) | (digit &gt;&gt; HALF_BITS)).div_rem(<span class="kw-2">&amp;</span>divisor);
+    <span class="kw">let </span>(lo, rem) = ((rem &lt;&lt; HALF_BITS) | (digit &amp; HALF)).div_rem(<span class="kw-2">&amp;</span>divisor);
+    ((hi &lt;&lt; HALF_BITS) | lo, rem)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">div_rem_digit</span>(<span class="kw-2">mut</span> <span class="ident">a</span>: <span class="ident">BigUint</span>, <span class="ident">b</span>: <span class="ident">BigDigit</span>) -&gt; (<span class="ident">BigUint</span>, <span class="ident">BigDigit</span>) {
-    <span class="kw">if</span> <span class="ident">b</span> <span class="op">==</span> <span class="number">0</span> {
+<span class="attribute">#[inline]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>div_rem_digit(<span class="kw-2">mut </span>a: BigUint, b: BigDigit) -&gt; (BigUint, BigDigit) {
+    <span class="kw">if </span>b == <span class="number">0 </span>{
         <span class="macro">panic!</span>(<span class="string">&quot;attempt to divide by zero&quot;</span>)
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rem</span> <span class="op">=</span> <span class="number">0</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>rem = <span class="number">0</span>;
 
-    <span class="kw">if</span> <span class="ident">b</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">big_digit::HALF</span> {
-        <span class="kw">for</span> <span class="ident">d</span> <span class="kw">in</span> <span class="ident">a</span>.<span class="ident">data</span>.<span class="ident">iter_mut</span>().<span class="ident">rev</span>() {
-            <span class="kw">let</span> (<span class="ident">q</span>, <span class="ident">r</span>) <span class="op">=</span> <span class="ident">div_half</span>(<span class="ident">rem</span>, <span class="kw-2">*</span><span class="ident">d</span>, <span class="ident">b</span>);
-            <span class="kw-2">*</span><span class="ident">d</span> <span class="op">=</span> <span class="ident">q</span>;
-            <span class="ident">rem</span> <span class="op">=</span> <span class="ident">r</span>;
+    <span class="kw">if </span>b &lt;= big_digit::HALF {
+        <span class="kw">for </span>d <span class="kw">in </span>a.data.iter_mut().rev() {
+            <span class="kw">let </span>(q, r) = div_half(rem, <span class="kw-2">*</span>d, b);
+            <span class="kw-2">*</span>d = q;
+            rem = r;
         }
-    } <span class="kw">else</span> {
-        <span class="kw">for</span> <span class="ident">d</span> <span class="kw">in</span> <span class="ident">a</span>.<span class="ident">data</span>.<span class="ident">iter_mut</span>().<span class="ident">rev</span>() {
-            <span class="kw">let</span> (<span class="ident">q</span>, <span class="ident">r</span>) <span class="op">=</span> <span class="ident">div_wide</span>(<span class="ident">rem</span>, <span class="kw-2">*</span><span class="ident">d</span>, <span class="ident">b</span>);
-            <span class="kw-2">*</span><span class="ident">d</span> <span class="op">=</span> <span class="ident">q</span>;
-            <span class="ident">rem</span> <span class="op">=</span> <span class="ident">r</span>;
+    } <span class="kw">else </span>{
+        <span class="kw">for </span>d <span class="kw">in </span>a.data.iter_mut().rev() {
+            <span class="kw">let </span>(q, r) = div_wide(rem, <span class="kw-2">*</span>d, b);
+            <span class="kw-2">*</span>d = q;
+            rem = r;
         }
     }
 
-    (<span class="ident">a</span>.<span class="ident">normalized</span>(), <span class="ident">rem</span>)
+    (a.normalized(), rem)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">rem_digit</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">BigUint</span>, <span class="ident">b</span>: <span class="ident">BigDigit</span>) -&gt; <span class="ident">BigDigit</span> {
-    <span class="kw">if</span> <span class="ident">b</span> <span class="op">==</span> <span class="number">0</span> {
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>rem_digit(a: <span class="kw-2">&amp;</span>BigUint, b: BigDigit) -&gt; BigDigit {
+    <span class="kw">if </span>b == <span class="number">0 </span>{
         <span class="macro">panic!</span>(<span class="string">&quot;attempt to divide by zero&quot;</span>)
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rem</span> <span class="op">=</span> <span class="number">0</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>rem = <span class="number">0</span>;
 
-    <span class="kw">if</span> <span class="ident">b</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">big_digit::HALF</span> {
-        <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">digit</span> <span class="kw">in</span> <span class="ident">a</span>.<span class="ident">data</span>.<span class="ident">iter</span>().<span class="ident">rev</span>() {
-            <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">r</span>) <span class="op">=</span> <span class="ident">div_half</span>(<span class="ident">rem</span>, <span class="ident">digit</span>, <span class="ident">b</span>);
-            <span class="ident">rem</span> <span class="op">=</span> <span class="ident">r</span>;
+    <span class="kw">if </span>b &lt;= big_digit::HALF {
+        <span class="kw">for </span><span class="kw-2">&amp;</span>digit <span class="kw">in </span>a.data.iter().rev() {
+            <span class="kw">let </span>(<span class="kw">_</span>, r) = div_half(rem, digit, b);
+            rem = r;
         }
-    } <span class="kw">else</span> {
-        <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">digit</span> <span class="kw">in</span> <span class="ident">a</span>.<span class="ident">data</span>.<span class="ident">iter</span>().<span class="ident">rev</span>() {
-            <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">r</span>) <span class="op">=</span> <span class="ident">div_wide</span>(<span class="ident">rem</span>, <span class="ident">digit</span>, <span class="ident">b</span>);
-            <span class="ident">rem</span> <span class="op">=</span> <span class="ident">r</span>;
+    } <span class="kw">else </span>{
+        <span class="kw">for </span><span class="kw-2">&amp;</span>digit <span class="kw">in </span>a.data.iter().rev() {
+            <span class="kw">let </span>(<span class="kw">_</span>, r) = div_wide(rem, digit, b);
+            rem = r;
         }
     }
 
-    <span class="ident">rem</span>
+    rem
 }
 
-<span class="doccomment">/// Subtract a multiple.</span>
-<span class="doccomment">/// a -= b * c</span>
-<span class="doccomment">/// Returns a borrow (if a &lt; b then borrow &gt; 0).</span>
-<span class="kw">fn</span> <span class="ident">sub_mul_digit_same_len</span>(<span class="ident">a</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">BigDigit</span>], <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">BigDigit</span>], <span class="ident">c</span>: <span class="ident">BigDigit</span>) -&gt; <span class="ident">BigDigit</span> {
-    <span class="macro">debug_assert!</span>(<span class="ident">a</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">b</span>.<span class="ident">len</span>());
+<span class="doccomment">/// Subtract a multiple.
+/// a -= b * c
+/// Returns a borrow (if a &lt; b then borrow &gt; 0).
+</span><span class="kw">fn </span>sub_mul_digit_same_len(a: <span class="kw-2">&amp;mut </span>[BigDigit], b: <span class="kw-2">&amp;</span>[BigDigit], c: BigDigit) -&gt; BigDigit {
+    <span class="macro">debug_assert!</span>(a.len() == b.len());
 
-    <span class="comment">// carry is between -big_digit::MAX and 0, so to avoid overflow we store</span>
-    <span class="comment">// offset_carry = carry + big_digit::MAX</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">offset_carry</span> <span class="op">=</span> <span class="ident">big_digit::MAX</span>;
+    <span class="comment">// carry is between -big_digit::MAX and 0, so to avoid overflow we store
+    // offset_carry = carry + big_digit::MAX
+    </span><span class="kw">let </span><span class="kw-2">mut </span>offset_carry = big_digit::MAX;
 
-    <span class="kw">for</span> (<span class="ident">x</span>, <span class="ident">y</span>) <span class="kw">in</span> <span class="ident">a</span>.<span class="ident">iter_mut</span>().<span class="ident">zip</span>(<span class="ident">b</span>) {
-        <span class="comment">// We want to calculate sum = x - y * c + carry.</span>
-        <span class="comment">// sum &gt;= -(big_digit::MAX * big_digit::MAX) - big_digit::MAX</span>
-        <span class="comment">// sum &lt;= big_digit::MAX</span>
-        <span class="comment">// Offsetting sum by (big_digit::MAX &lt;&lt; big_digit::BITS) puts it in DoubleBigDigit range.</span>
-        <span class="kw">let</span> <span class="ident">offset_sum</span> <span class="op">=</span> <span class="ident">big_digit::to_doublebigdigit</span>(<span class="ident">big_digit::MAX</span>, <span class="kw-2">*</span><span class="ident">x</span>)
-            <span class="op">-</span> <span class="ident">big_digit::MAX</span> <span class="kw">as</span> <span class="ident">DoubleBigDigit</span>
-            <span class="op">+</span> <span class="ident">offset_carry</span> <span class="kw">as</span> <span class="ident">DoubleBigDigit</span>
-            <span class="op">-</span> <span class="kw-2">*</span><span class="ident">y</span> <span class="kw">as</span> <span class="ident">DoubleBigDigit</span> <span class="op">*</span> <span class="ident">c</span> <span class="kw">as</span> <span class="ident">DoubleBigDigit</span>;
+    <span class="kw">for </span>(x, y) <span class="kw">in </span>a.iter_mut().zip(b) {
+        <span class="comment">// We want to calculate sum = x - y * c + carry.
+        // sum &gt;= -(big_digit::MAX * big_digit::MAX) - big_digit::MAX
+        // sum &lt;= big_digit::MAX
+        // Offsetting sum by (big_digit::MAX &lt;&lt; big_digit::BITS) puts it in DoubleBigDigit range.
+        </span><span class="kw">let </span>offset_sum = big_digit::to_doublebigdigit(big_digit::MAX, <span class="kw-2">*</span>x)
+            - big_digit::MAX <span class="kw">as </span>DoubleBigDigit
+            + offset_carry <span class="kw">as </span>DoubleBigDigit
+            - <span class="kw-2">*</span>y <span class="kw">as </span>DoubleBigDigit * c <span class="kw">as </span>DoubleBigDigit;
 
-        <span class="kw">let</span> (<span class="ident">new_offset_carry</span>, <span class="ident">new_x</span>) <span class="op">=</span> <span class="ident">big_digit::from_doublebigdigit</span>(<span class="ident">offset_sum</span>);
-        <span class="ident">offset_carry</span> <span class="op">=</span> <span class="ident">new_offset_carry</span>;
-        <span class="kw-2">*</span><span class="ident">x</span> <span class="op">=</span> <span class="ident">new_x</span>;
+        <span class="kw">let </span>(new_offset_carry, new_x) = big_digit::from_doublebigdigit(offset_sum);
+        offset_carry = new_offset_carry;
+        <span class="kw-2">*</span>x = new_x;
     }
 
-    <span class="comment">// Return the borrow.</span>
-    <span class="ident">big_digit::MAX</span> <span class="op">-</span> <span class="ident">offset_carry</span>
+    <span class="comment">// Return the borrow.
+    </span>big_digit::MAX - offset_carry
 }
 
-<span class="kw">fn</span> <span class="ident">div_rem</span>(<span class="kw-2">mut</span> <span class="ident">u</span>: <span class="ident">BigUint</span>, <span class="kw-2">mut</span> <span class="ident">d</span>: <span class="ident">BigUint</span>) -&gt; (<span class="ident">BigUint</span>, <span class="ident">BigUint</span>) {
-    <span class="kw">if</span> <span class="ident">d</span>.<span class="ident">is_zero</span>() {
+<span class="kw">fn </span>div_rem(<span class="kw-2">mut </span>u: BigUint, <span class="kw-2">mut </span>d: BigUint) -&gt; (BigUint, BigUint) {
+    <span class="kw">if </span>d.is_zero() {
         <span class="macro">panic!</span>(<span class="string">&quot;attempt to divide by zero&quot;</span>)
     }
-    <span class="kw">if</span> <span class="ident">u</span>.<span class="ident">is_zero</span>() {
-        <span class="kw">return</span> (<span class="ident">Zero::zero</span>(), <span class="ident">Zero::zero</span>());
+    <span class="kw">if </span>u.is_zero() {
+        <span class="kw">return </span>(Zero::zero(), Zero::zero());
     }
 
-    <span class="kw">if</span> <span class="ident">d</span>.<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
-        <span class="kw">if</span> <span class="ident">d</span>.<span class="ident">data</span> <span class="op">==</span> [<span class="number">1</span>] {
-            <span class="kw">return</span> (<span class="ident">u</span>, <span class="ident">Zero::zero</span>());
+    <span class="kw">if </span>d.data.len() == <span class="number">1 </span>{
+        <span class="kw">if </span>d.data == [<span class="number">1</span>] {
+            <span class="kw">return </span>(u, Zero::zero());
         }
-        <span class="kw">let</span> (<span class="ident">div</span>, <span class="ident">rem</span>) <span class="op">=</span> <span class="ident">div_rem_digit</span>(<span class="ident">u</span>, <span class="ident">d</span>.<span class="ident">data</span>[<span class="number">0</span>]);
-        <span class="comment">// reuse d</span>
-        <span class="ident">d</span>.<span class="ident">data</span>.<span class="ident">clear</span>();
-        <span class="ident">d</span> <span class="op">+</span><span class="op">=</span> <span class="ident">rem</span>;
-        <span class="kw">return</span> (<span class="ident">div</span>, <span class="ident">d</span>);
+        <span class="kw">let </span>(div, rem) = div_rem_digit(u, d.data[<span class="number">0</span>]);
+        <span class="comment">// reuse d
+        </span>d.data.clear();
+        d += rem;
+        <span class="kw">return </span>(div, d);
     }
 
-    <span class="comment">// Required or the q_len calculation below can underflow:</span>
-    <span class="kw">match</span> <span class="ident">u</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">d</span>) {
-        <span class="ident">Less</span> =&gt; <span class="kw">return</span> (<span class="ident">Zero::zero</span>(), <span class="ident">u</span>),
-        <span class="ident">Equal</span> =&gt; {
-            <span class="ident">u</span>.<span class="ident">set_one</span>();
-            <span class="kw">return</span> (<span class="ident">u</span>, <span class="ident">Zero::zero</span>());
+    <span class="comment">// Required or the q_len calculation below can underflow:
+    </span><span class="kw">match </span>u.cmp(<span class="kw-2">&amp;</span>d) {
+        Less =&gt; <span class="kw">return </span>(Zero::zero(), u),
+        Equal =&gt; {
+            u.set_one();
+            <span class="kw">return </span>(u, Zero::zero());
         }
-        <span class="ident">Greater</span> =&gt; {} <span class="comment">// Do nothing</span>
-    }
+        Greater =&gt; {} <span class="comment">// Do nothing
+    </span>}
 
-    <span class="comment">// This algorithm is from Knuth, TAOCP vol 2 section 4.3, algorithm D:</span>
-    <span class="comment">//</span>
-    <span class="comment">// First, normalize the arguments so the highest bit in the highest digit of the divisor is</span>
-    <span class="comment">// set: the main loop uses the highest digit of the divisor for generating guesses, so we</span>
-    <span class="comment">// want it to be the largest number we can efficiently divide by.</span>
-    <span class="comment">//</span>
-    <span class="kw">let</span> <span class="ident">shift</span> <span class="op">=</span> <span class="ident">d</span>.<span class="ident">data</span>.<span class="ident">last</span>().<span class="ident">unwrap</span>().<span class="ident">leading_zeros</span>() <span class="kw">as</span> <span class="ident">usize</span>;
+    <span class="comment">// This algorithm is from Knuth, TAOCP vol 2 section 4.3, algorithm D:
+    //
+    // First, normalize the arguments so the highest bit in the highest digit of the divisor is
+    // set: the main loop uses the highest digit of the divisor for generating guesses, so we
+    // want it to be the largest number we can efficiently divide by.
+    //
+    </span><span class="kw">let </span>shift = d.data.last().unwrap().leading_zeros() <span class="kw">as </span>usize;
 
-    <span class="kw">if</span> <span class="ident">shift</span> <span class="op">==</span> <span class="number">0</span> {
-        <span class="comment">// no need to clone d</span>
-        <span class="ident">div_rem_core</span>(<span class="ident">u</span>, <span class="kw-2">&amp;</span><span class="ident">d</span>.<span class="ident">data</span>)
-    } <span class="kw">else</span> {
-        <span class="kw">let</span> (<span class="ident">q</span>, <span class="ident">r</span>) <span class="op">=</span> <span class="ident">div_rem_core</span>(<span class="ident">u</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">shift</span>, <span class="kw-2">&amp;</span>(<span class="ident">d</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">shift</span>).<span class="ident">data</span>);
-        <span class="comment">// renormalize the remainder</span>
-        (<span class="ident">q</span>, <span class="ident">r</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">shift</span>)
+    <span class="kw">if </span>shift == <span class="number">0 </span>{
+        <span class="comment">// no need to clone d
+        </span>div_rem_core(u, <span class="kw-2">&amp;</span>d.data)
+    } <span class="kw">else </span>{
+        <span class="kw">let </span>(q, r) = div_rem_core(u &lt;&lt; shift, <span class="kw-2">&amp;</span>(d &lt;&lt; shift).data);
+        <span class="comment">// renormalize the remainder
+        </span>(q, r &gt;&gt; shift)
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">div_rem_ref</span>(<span class="ident">u</span>: <span class="kw-2">&amp;</span><span class="ident">BigUint</span>, <span class="ident">d</span>: <span class="kw-2">&amp;</span><span class="ident">BigUint</span>) -&gt; (<span class="ident">BigUint</span>, <span class="ident">BigUint</span>) {
-    <span class="kw">if</span> <span class="ident">d</span>.<span class="ident">is_zero</span>() {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>div_rem_ref(u: <span class="kw-2">&amp;</span>BigUint, d: <span class="kw-2">&amp;</span>BigUint) -&gt; (BigUint, BigUint) {
+    <span class="kw">if </span>d.is_zero() {
         <span class="macro">panic!</span>(<span class="string">&quot;attempt to divide by zero&quot;</span>)
     }
-    <span class="kw">if</span> <span class="ident">u</span>.<span class="ident">is_zero</span>() {
-        <span class="kw">return</span> (<span class="ident">Zero::zero</span>(), <span class="ident">Zero::zero</span>());
+    <span class="kw">if </span>u.is_zero() {
+        <span class="kw">return </span>(Zero::zero(), Zero::zero());
     }
 
-    <span class="kw">if</span> <span class="ident">d</span>.<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
-        <span class="kw">if</span> <span class="ident">d</span>.<span class="ident">data</span> <span class="op">==</span> [<span class="number">1</span>] {
-            <span class="kw">return</span> (<span class="ident">u</span>.<span class="ident">clone</span>(), <span class="ident">Zero::zero</span>());
+    <span class="kw">if </span>d.data.len() == <span class="number">1 </span>{
+        <span class="kw">if </span>d.data == [<span class="number">1</span>] {
+            <span class="kw">return </span>(u.clone(), Zero::zero());
         }
 
-        <span class="kw">let</span> (<span class="ident">div</span>, <span class="ident">rem</span>) <span class="op">=</span> <span class="ident">div_rem_digit</span>(<span class="ident">u</span>.<span class="ident">clone</span>(), <span class="ident">d</span>.<span class="ident">data</span>[<span class="number">0</span>]);
-        <span class="kw">return</span> (<span class="ident">div</span>, <span class="ident">rem</span>.<span class="ident">into</span>());
+        <span class="kw">let </span>(div, rem) = div_rem_digit(u.clone(), d.data[<span class="number">0</span>]);
+        <span class="kw">return </span>(div, rem.into());
     }
 
-    <span class="comment">// Required or the q_len calculation below can underflow:</span>
-    <span class="kw">match</span> <span class="ident">u</span>.<span class="ident">cmp</span>(<span class="ident">d</span>) {
-        <span class="ident">Less</span> =&gt; <span class="kw">return</span> (<span class="ident">Zero::zero</span>(), <span class="ident">u</span>.<span class="ident">clone</span>()),
-        <span class="ident">Equal</span> =&gt; <span class="kw">return</span> (<span class="ident">One::one</span>(), <span class="ident">Zero::zero</span>()),
-        <span class="ident">Greater</span> =&gt; {} <span class="comment">// Do nothing</span>
-    }
+    <span class="comment">// Required or the q_len calculation below can underflow:
+    </span><span class="kw">match </span>u.cmp(d) {
+        Less =&gt; <span class="kw">return </span>(Zero::zero(), u.clone()),
+        Equal =&gt; <span class="kw">return </span>(One::one(), Zero::zero()),
+        Greater =&gt; {} <span class="comment">// Do nothing
+    </span>}
 
-    <span class="comment">// This algorithm is from Knuth, TAOCP vol 2 section 4.3, algorithm D:</span>
-    <span class="comment">//</span>
-    <span class="comment">// First, normalize the arguments so the highest bit in the highest digit of the divisor is</span>
-    <span class="comment">// set: the main loop uses the highest digit of the divisor for generating guesses, so we</span>
-    <span class="comment">// want it to be the largest number we can efficiently divide by.</span>
-    <span class="comment">//</span>
-    <span class="kw">let</span> <span class="ident">shift</span> <span class="op">=</span> <span class="ident">d</span>.<span class="ident">data</span>.<span class="ident">last</span>().<span class="ident">unwrap</span>().<span class="ident">leading_zeros</span>() <span class="kw">as</span> <span class="ident">usize</span>;
+    <span class="comment">// This algorithm is from Knuth, TAOCP vol 2 section 4.3, algorithm D:
+    //
+    // First, normalize the arguments so the highest bit in the highest digit of the divisor is
+    // set: the main loop uses the highest digit of the divisor for generating guesses, so we
+    // want it to be the largest number we can efficiently divide by.
+    //
+    </span><span class="kw">let </span>shift = d.data.last().unwrap().leading_zeros() <span class="kw">as </span>usize;
 
-    <span class="kw">if</span> <span class="ident">shift</span> <span class="op">==</span> <span class="number">0</span> {
-        <span class="comment">// no need to clone d</span>
-        <span class="ident">div_rem_core</span>(<span class="ident">u</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="ident">d</span>.<span class="ident">data</span>)
-    } <span class="kw">else</span> {
-        <span class="kw">let</span> (<span class="ident">q</span>, <span class="ident">r</span>) <span class="op">=</span> <span class="ident">div_rem_core</span>(<span class="ident">u</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">shift</span>, <span class="kw-2">&amp;</span>(<span class="ident">d</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">shift</span>).<span class="ident">data</span>);
-        <span class="comment">// renormalize the remainder</span>
-        (<span class="ident">q</span>, <span class="ident">r</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">shift</span>)
+    <span class="kw">if </span>shift == <span class="number">0 </span>{
+        <span class="comment">// no need to clone d
+        </span>div_rem_core(u.clone(), <span class="kw-2">&amp;</span>d.data)
+    } <span class="kw">else </span>{
+        <span class="kw">let </span>(q, r) = div_rem_core(u &lt;&lt; shift, <span class="kw-2">&amp;</span>(d &lt;&lt; shift).data);
+        <span class="comment">// renormalize the remainder
+        </span>(q, r &gt;&gt; shift)
     }
 }
 
-<span class="doccomment">/// An implementation of the base division algorithm.</span>
-<span class="doccomment">/// Knuth, TAOCP vol 2 section 4.3.1, algorithm D, with an improvement from exercises 19-21.</span>
-<span class="kw">fn</span> <span class="ident">div_rem_core</span>(<span class="kw-2">mut</span> <span class="ident">a</span>: <span class="ident">BigUint</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">BigDigit</span>]) -&gt; (<span class="ident">BigUint</span>, <span class="ident">BigUint</span>) {
-    <span class="macro">debug_assert!</span>(<span class="ident">a</span>.<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">b</span>.<span class="ident">len</span>() <span class="op">&amp;&amp;</span> <span class="ident">b</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">1</span>);
-    <span class="macro">debug_assert!</span>(<span class="ident">b</span>.<span class="ident">last</span>().<span class="ident">unwrap</span>().<span class="ident">leading_zeros</span>() <span class="op">==</span> <span class="number">0</span>);
+<span class="doccomment">/// An implementation of the base division algorithm.
+/// Knuth, TAOCP vol 2 section 4.3.1, algorithm D, with an improvement from exercises 19-21.
+</span><span class="kw">fn </span>div_rem_core(<span class="kw-2">mut </span>a: BigUint, b: <span class="kw-2">&amp;</span>[BigDigit]) -&gt; (BigUint, BigUint) {
+    <span class="macro">debug_assert!</span>(a.data.len() &gt;= b.len() &amp;&amp; b.len() &gt; <span class="number">1</span>);
+    <span class="macro">debug_assert!</span>(b.last().unwrap().leading_zeros() == <span class="number">0</span>);
 
-    <span class="comment">// The algorithm works by incrementally calculating &quot;guesses&quot;, q0, for the next digit of the</span>
-    <span class="comment">// quotient. Once we have any number q0 such that (q0 &lt;&lt; j) * b &lt;= a, we can set</span>
-    <span class="comment">//</span>
-    <span class="comment">//     q += q0 &lt;&lt; j</span>
-    <span class="comment">//     a -= (q0 &lt;&lt; j) * b</span>
-    <span class="comment">//</span>
-    <span class="comment">// and then iterate until a &lt; b. Then, (q, a) will be our desired quotient and remainder.</span>
-    <span class="comment">//</span>
-    <span class="comment">// q0, our guess, is calculated by dividing the last three digits of a by the last two digits of</span>
-    <span class="comment">// b - this will give us a guess that is close to the actual quotient, but is possibly greater.</span>
-    <span class="comment">// It can only be greater by 1 and only in rare cases, with probability at most</span>
-    <span class="comment">// 2^-(big_digit::BITS-1) for random a, see TAOCP 4.3.1 exercise 21.</span>
-    <span class="comment">//</span>
-    <span class="comment">// If the quotient turns out to be too large, we adjust it by 1:</span>
-    <span class="comment">// q -= 1 &lt;&lt; j</span>
-    <span class="comment">// a += b &lt;&lt; j</span>
+    <span class="comment">// The algorithm works by incrementally calculating &quot;guesses&quot;, q0, for the next digit of the
+    // quotient. Once we have any number q0 such that (q0 &lt;&lt; j) * b &lt;= a, we can set
+    //
+    //     q += q0 &lt;&lt; j
+    //     a -= (q0 &lt;&lt; j) * b
+    //
+    // and then iterate until a &lt; b. Then, (q, a) will be our desired quotient and remainder.
+    //
+    // q0, our guess, is calculated by dividing the last three digits of a by the last two digits of
+    // b - this will give us a guess that is close to the actual quotient, but is possibly greater.
+    // It can only be greater by 1 and only in rare cases, with probability at most
+    // 2^-(big_digit::BITS-1) for random a, see TAOCP 4.3.1 exercise 21.
+    //
+    // If the quotient turns out to be too large, we adjust it by 1:
+    // q -= 1 &lt;&lt; j
+    // a += b &lt;&lt; j
 
-    <span class="comment">// a0 stores an additional extra most significant digit of the dividend, not stored in a.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">a0</span> <span class="op">=</span> <span class="number">0</span>;
+    // a0 stores an additional extra most significant digit of the dividend, not stored in a.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>a0 = <span class="number">0</span>;
 
-    <span class="comment">// [b1, b0] are the two most significant digits of the divisor. They never change.</span>
-    <span class="kw">let</span> <span class="ident">b0</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">b</span>.<span class="ident">last</span>().<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">b1</span> <span class="op">=</span> <span class="ident">b</span>[<span class="ident">b</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">2</span>];
+    <span class="comment">// [b1, b0] are the two most significant digits of the divisor. They never change.
+    </span><span class="kw">let </span>b0 = <span class="kw-2">*</span>b.last().unwrap();
+    <span class="kw">let </span>b1 = b[b.len() - <span class="number">2</span>];
 
-    <span class="kw">let</span> <span class="ident">q_len</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">b</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">q</span> <span class="op">=</span> <span class="ident">BigUint</span> {
-        <span class="ident">data</span>: <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">q_len</span>],
+    <span class="kw">let </span>q_len = a.data.len() - b.len() + <span class="number">1</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>q = BigUint {
+        data: <span class="macro">vec!</span>[<span class="number">0</span>; q_len],
     };
 
-    <span class="kw">for</span> <span class="ident">j</span> <span class="kw">in</span> (<span class="number">0</span>..<span class="ident">q_len</span>).<span class="ident">rev</span>() {
-        <span class="macro">debug_assert!</span>(<span class="ident">a</span>.<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">b</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">j</span>);
+    <span class="kw">for </span>j <span class="kw">in </span>(<span class="number">0</span>..q_len).rev() {
+        <span class="macro">debug_assert!</span>(a.data.len() == b.len() + j);
 
-        <span class="kw">let</span> <span class="ident">a1</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">a</span>.<span class="ident">data</span>.<span class="ident">last</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">a2</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">data</span>[<span class="ident">a</span>.<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">2</span>];
+        <span class="kw">let </span>a1 = <span class="kw-2">*</span>a.data.last().unwrap();
+        <span class="kw">let </span>a2 = a.data[a.data.len() - <span class="number">2</span>];
 
-        <span class="comment">// The first q0 estimate is [a1,a0] / b0. It will never be too small, it may be too large</span>
-        <span class="comment">// by at most 2.</span>
-        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">q0</span>, <span class="kw-2">mut</span> <span class="ident">r</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">a0</span> <span class="op">&lt;</span> <span class="ident">b0</span> {
-            <span class="kw">let</span> (<span class="ident">q0</span>, <span class="ident">r</span>) <span class="op">=</span> <span class="ident">div_wide</span>(<span class="ident">a0</span>, <span class="ident">a1</span>, <span class="ident">b0</span>);
-            (<span class="ident">q0</span>, <span class="ident">r</span> <span class="kw">as</span> <span class="ident">DoubleBigDigit</span>)
-        } <span class="kw">else</span> {
-            <span class="macro">debug_assert!</span>(<span class="ident">a0</span> <span class="op">==</span> <span class="ident">b0</span>);
-            <span class="comment">// Avoid overflowing q0, we know the quotient fits in BigDigit.</span>
-            <span class="comment">// [a1,a0] = b0 * (1&lt;&lt;BITS - 1) + (a0 + a1)</span>
-            (<span class="ident">big_digit::MAX</span>, <span class="ident">a0</span> <span class="kw">as</span> <span class="ident">DoubleBigDigit</span> <span class="op">+</span> <span class="ident">a1</span> <span class="kw">as</span> <span class="ident">DoubleBigDigit</span>)
+        <span class="comment">// The first q0 estimate is [a1,a0] / b0. It will never be too small, it may be too large
+        // by at most 2.
+        </span><span class="kw">let </span>(<span class="kw-2">mut </span>q0, <span class="kw-2">mut </span>r) = <span class="kw">if </span>a0 &lt; b0 {
+            <span class="kw">let </span>(q0, r) = div_wide(a0, a1, b0);
+            (q0, r <span class="kw">as </span>DoubleBigDigit)
+        } <span class="kw">else </span>{
+            <span class="macro">debug_assert!</span>(a0 == b0);
+            <span class="comment">// Avoid overflowing q0, we know the quotient fits in BigDigit.
+            // [a1,a0] = b0 * (1&lt;&lt;BITS - 1) + (a0 + a1)
+            </span>(big_digit::MAX, a0 <span class="kw">as </span>DoubleBigDigit + a1 <span class="kw">as </span>DoubleBigDigit)
         };
 
-        <span class="comment">// r = [a1,a0] - q0 * b0</span>
-        <span class="comment">//</span>
-        <span class="comment">// Now we want to compute a more precise estimate [a2,a1,a0] / [b1,b0] which can only be</span>
-        <span class="comment">// less or equal to the current q0.</span>
-        <span class="comment">//</span>
-        <span class="comment">// q0 is too large if:</span>
-        <span class="comment">// [a2,a1,a0] &lt; q0 * [b1,b0]</span>
-        <span class="comment">// (r &lt;&lt; BITS) + a2 &lt; q0 * b1</span>
-        <span class="kw">while</span> <span class="ident">r</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">big_digit::MAX</span> <span class="kw">as</span> <span class="ident">DoubleBigDigit</span>
-            <span class="op">&amp;&amp;</span> <span class="ident">big_digit::to_doublebigdigit</span>(<span class="ident">r</span> <span class="kw">as</span> <span class="ident">BigDigit</span>, <span class="ident">a2</span>)
-                <span class="op">&lt;</span> <span class="ident">q0</span> <span class="kw">as</span> <span class="ident">DoubleBigDigit</span> <span class="op">*</span> <span class="ident">b1</span> <span class="kw">as</span> <span class="ident">DoubleBigDigit</span>
+        <span class="comment">// r = [a1,a0] - q0 * b0
+        //
+        // Now we want to compute a more precise estimate [a2,a1,a0] / [b1,b0] which can only be
+        // less or equal to the current q0.
+        //
+        // q0 is too large if:
+        // [a2,a1,a0] &lt; q0 * [b1,b0]
+        // (r &lt;&lt; BITS) + a2 &lt; q0 * b1
+        </span><span class="kw">while </span>r &lt;= big_digit::MAX <span class="kw">as </span>DoubleBigDigit
+            &amp;&amp; big_digit::to_doublebigdigit(r <span class="kw">as </span>BigDigit, a2)
+                &lt; q0 <span class="kw">as </span>DoubleBigDigit * b1 <span class="kw">as </span>DoubleBigDigit
         {
-            <span class="ident">q0</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="ident">r</span> <span class="op">+</span><span class="op">=</span> <span class="ident">b0</span> <span class="kw">as</span> <span class="ident">DoubleBigDigit</span>;
+            q0 -= <span class="number">1</span>;
+            r += b0 <span class="kw">as </span>DoubleBigDigit;
         }
 
-        <span class="comment">// q0 is now either the correct quotient digit, or in rare cases 1 too large.</span>
-        <span class="comment">// Subtract (q0 &lt;&lt; j) from a. This may overflow, in which case we will have to correct.</span>
+        <span class="comment">// q0 is now either the correct quotient digit, or in rare cases 1 too large.
+        // Subtract (q0 &lt;&lt; j) from a. This may overflow, in which case we will have to correct.
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">borrow</span> <span class="op">=</span> <span class="ident">sub_mul_digit_same_len</span>(<span class="kw-2">&amp;mut</span> <span class="ident">a</span>.<span class="ident">data</span>[<span class="ident">j</span>..], <span class="ident">b</span>, <span class="ident">q0</span>);
-        <span class="kw">if</span> <span class="ident">borrow</span> <span class="op">&gt;</span> <span class="ident">a0</span> {
-            <span class="comment">// q0 is too large. We need to add back one multiple of b.</span>
-            <span class="ident">q0</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="ident">borrow</span> <span class="op">-</span><span class="op">=</span> <span class="ident">__add2</span>(<span class="kw-2">&amp;mut</span> <span class="ident">a</span>.<span class="ident">data</span>[<span class="ident">j</span>..], <span class="ident">b</span>);
+        </span><span class="kw">let </span><span class="kw-2">mut </span>borrow = sub_mul_digit_same_len(<span class="kw-2">&amp;mut </span>a.data[j..], b, q0);
+        <span class="kw">if </span>borrow &gt; a0 {
+            <span class="comment">// q0 is too large. We need to add back one multiple of b.
+            </span>q0 -= <span class="number">1</span>;
+            borrow -= __add2(<span class="kw-2">&amp;mut </span>a.data[j..], b);
         }
-        <span class="comment">// The top digit of a, stored in a0, has now been zeroed.</span>
-        <span class="macro">debug_assert!</span>(<span class="ident">borrow</span> <span class="op">==</span> <span class="ident">a0</span>);
+        <span class="comment">// The top digit of a, stored in a0, has now been zeroed.
+        </span><span class="macro">debug_assert!</span>(borrow == a0);
 
-        <span class="ident">q</span>.<span class="ident">data</span>[<span class="ident">j</span>] <span class="op">=</span> <span class="ident">q0</span>;
+        q.data[j] = q0;
 
-        <span class="comment">// Pop off the next top digit of a.</span>
-        <span class="ident">a0</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">data</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>();
+        <span class="comment">// Pop off the next top digit of a.
+        </span>a0 = a.data.pop().unwrap();
     }
 
-    <span class="ident">a</span>.<span class="ident">data</span>.<span class="ident">push</span>(<span class="ident">a0</span>);
-    <span class="ident">a</span>.<span class="ident">normalize</span>();
+    a.data.push(a0);
+    a.normalize();
 
-    <span class="macro">debug_assert_eq!</span>(<span class="ident">cmp_slice</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="ident">data</span>, <span class="ident">b</span>), <span class="ident">Less</span>);
+    <span class="macro">debug_assert_eq!</span>(cmp_slice(<span class="kw-2">&amp;</span>a.data, b), Less);
 
-    (<span class="ident">q</span>.<span class="ident">normalized</span>(), <span class="ident">a</span>)
+    (q.normalized(), a)
 }
 
-<span class="macro">forward_val_ref_binop!</span>(<span class="kw">impl</span> <span class="ident">Div</span> <span class="kw">for</span> <span class="ident">BigUint</span>, <span class="ident">div</span>);
-<span class="macro">forward_ref_val_binop!</span>(<span class="kw">impl</span> <span class="ident">Div</span> <span class="kw">for</span> <span class="ident">BigUint</span>, <span class="ident">div</span>);
-<span class="macro">forward_val_assign!</span>(<span class="kw">impl</span> <span class="ident">DivAssign</span> <span class="kw">for</span> <span class="ident">BigUint</span>, <span class="ident">div_assign</span>);
+<span class="macro">forward_val_ref_binop!</span>(<span class="kw">impl </span>Div <span class="kw">for </span>BigUint, div);
+<span class="macro">forward_ref_val_binop!</span>(<span class="kw">impl </span>Div <span class="kw">for </span>BigUint, div);
+<span class="macro">forward_val_assign!</span>(<span class="kw">impl </span>DivAssign <span class="kw">for </span>BigUint, div_assign);
 
-<span class="kw">impl</span> <span class="ident">Div</span><span class="op">&lt;</span><span class="ident">BigUint</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigUint</span>;
+<span class="kw">impl </span>Div&lt;BigUint&gt; <span class="kw">for </span>BigUint {
+    <span class="kw">type </span>Output = BigUint;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">BigUint</span>) -&gt; <span class="ident">BigUint</span> {
-        <span class="kw">let</span> (<span class="ident">q</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">div_rem</span>(<span class="self">self</span>, <span class="ident">other</span>);
-        <span class="ident">q</span>
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">Div</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">BigUint</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigUint</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigUint</span>;
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">BigUint</span>) -&gt; <span class="ident">BigUint</span> {
-        <span class="kw">let</span> (<span class="ident">q</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">div_rem</span>(<span class="ident">other</span>);
-        <span class="ident">q</span>
-    }
-}
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">DivAssign</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigUint</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">div_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigUint</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span> <span class="op">/</span> <span class="ident">other</span>;
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>div(<span class="self">self</span>, other: BigUint) -&gt; BigUint {
+        <span class="kw">let </span>(q, <span class="kw">_</span>) = div_rem(<span class="self">self</span>, other);
+        q
     }
 }
 
-<span class="macro">promote_unsigned_scalars!</span>(<span class="kw">impl</span> <span class="ident">Div</span> <span class="kw">for</span> <span class="ident">BigUint</span>, <span class="ident">div</span>);
-<span class="macro">promote_unsigned_scalars_assign!</span>(<span class="kw">impl</span> <span class="ident">DivAssign</span> <span class="kw">for</span> <span class="ident">BigUint</span>, <span class="ident">div_assign</span>);
-<span class="macro">forward_all_scalar_binop_to_val_val!</span>(<span class="kw">impl</span> <span class="ident">Div</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span>, <span class="ident">div</span>);
-<span class="macro">forward_all_scalar_binop_to_val_val!</span>(<span class="kw">impl</span> <span class="ident">Div</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span>, <span class="ident">div</span>);
-<span class="macro">forward_all_scalar_binop_to_val_val!</span>(<span class="kw">impl</span> <span class="ident">Div</span><span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span>, <span class="ident">div</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; Div&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>BigUint&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigUint {
+    <span class="kw">type </span>Output = BigUint;
 
-<span class="kw">impl</span> <span class="ident">Div</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigUint</span>;
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">u32</span>) -&gt; <span class="ident">BigUint</span> {
-        <span class="kw">let</span> (<span class="ident">q</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">div_rem_digit</span>(<span class="self">self</span>, <span class="ident">other</span> <span class="kw">as</span> <span class="ident">BigDigit</span>);
-        <span class="ident">q</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>div(<span class="self">self</span>, other: <span class="kw-2">&amp;</span>BigUint) -&gt; BigUint {
+        <span class="kw">let </span>(q, <span class="kw">_</span>) = <span class="self">self</span>.div_rem(other);
+        q
     }
 }
-<span class="kw">impl</span> <span class="ident">DivAssign</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">div_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">u32</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span> <span class="op">/</span> <span class="ident">other</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; DivAssign&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigUint&gt; <span class="kw">for </span>BigUint {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>div_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigUint) {
+        <span class="kw-2">*</span><span class="self">self </span>= <span class="kw-2">&amp;*</span><span class="self">self </span>/ other;
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Div</span><span class="op">&lt;</span><span class="ident">BigUint</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u32</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigUint</span>;
+<span class="macro">promote_unsigned_scalars!</span>(<span class="kw">impl </span>Div <span class="kw">for </span>BigUint, div);
+<span class="macro">promote_unsigned_scalars_assign!</span>(<span class="kw">impl </span>DivAssign <span class="kw">for </span>BigUint, div_assign);
+<span class="macro">forward_all_scalar_binop_to_val_val!</span>(<span class="kw">impl </span>Div&lt;u32&gt; <span class="kw">for </span>BigUint, div);
+<span class="macro">forward_all_scalar_binop_to_val_val!</span>(<span class="kw">impl </span>Div&lt;u64&gt; <span class="kw">for </span>BigUint, div);
+<span class="macro">forward_all_scalar_binop_to_val_val!</span>(<span class="kw">impl </span>Div&lt;u128&gt; <span class="kw">for </span>BigUint, div);
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">BigUint</span>) -&gt; <span class="ident">BigUint</span> {
-        <span class="kw">match</span> <span class="ident">other</span>.<span class="ident">data</span>.<span class="ident">len</span>() {
-            <span class="number">0</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;attempt to divide by zero&quot;</span>),
-            <span class="number">1</span> =&gt; <span class="ident">From::from</span>(<span class="self">self</span> <span class="kw">as</span> <span class="ident">BigDigit</span> <span class="op">/</span> <span class="ident">other</span>.<span class="ident">data</span>[<span class="number">0</span>]),
-            <span class="kw">_</span> =&gt; <span class="ident">Zero::zero</span>(),
-        }
+<span class="kw">impl </span>Div&lt;u32&gt; <span class="kw">for </span>BigUint {
+    <span class="kw">type </span>Output = BigUint;
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>div(<span class="self">self</span>, other: u32) -&gt; BigUint {
+        <span class="kw">let </span>(q, <span class="kw">_</span>) = div_rem_digit(<span class="self">self</span>, other <span class="kw">as </span>BigDigit);
+        q
+    }
+}
+<span class="kw">impl </span>DivAssign&lt;u32&gt; <span class="kw">for </span>BigUint {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>div_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: u32) {
+        <span class="kw-2">*</span><span class="self">self </span>= <span class="kw-2">&amp;*</span><span class="self">self </span>/ other;
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Div</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigUint</span>;
+<span class="kw">impl </span>Div&lt;BigUint&gt; <span class="kw">for </span>u32 {
+    <span class="kw">type </span>Output = BigUint;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">u64</span>) -&gt; <span class="ident">BigUint</span> {
-        <span class="kw">let</span> (<span class="ident">q</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">div_rem</span>(<span class="self">self</span>, <span class="ident">From::from</span>(<span class="ident">other</span>));
-        <span class="ident">q</span>
-    }
-}
-<span class="kw">impl</span> <span class="ident">DivAssign</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">div_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">u64</span>) {
-        <span class="comment">// a vec of size 0 does not allocate, so this is fairly cheap</span>
-        <span class="kw">let</span> <span class="ident">temp</span> <span class="op">=</span> <span class="ident">mem::replace</span>(<span class="self">self</span>, <span class="ident">Zero::zero</span>());
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">temp</span> <span class="op">/</span> <span class="ident">other</span>;
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Div</span><span class="op">&lt;</span><span class="ident">BigUint</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u64</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigUint</span>;
-
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">u64_digit</span>))]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">BigUint</span>) -&gt; <span class="ident">BigUint</span> {
-        <span class="kw">match</span> <span class="ident">other</span>.<span class="ident">data</span>.<span class="ident">len</span>() {
-            <span class="number">0</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;attempt to divide by zero&quot;</span>),
-            <span class="number">1</span> =&gt; <span class="ident">From::from</span>(<span class="self">self</span> <span class="op">/</span> <span class="ident">u64::from</span>(<span class="ident">other</span>.<span class="ident">data</span>[<span class="number">0</span>])),
-            <span class="number">2</span> =&gt; <span class="ident">From::from</span>(<span class="self">self</span> <span class="op">/</span> <span class="ident">big_digit::to_doublebigdigit</span>(<span class="ident">other</span>.<span class="ident">data</span>[<span class="number">1</span>], <span class="ident">other</span>.<span class="ident">data</span>[<span class="number">0</span>])),
-            <span class="kw">_</span> =&gt; <span class="ident">Zero::zero</span>(),
-        }
-    }
-
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">u64_digit</span>)]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">BigUint</span>) -&gt; <span class="ident">BigUint</span> {
-        <span class="kw">match</span> <span class="ident">other</span>.<span class="ident">data</span>.<span class="ident">len</span>() {
-            <span class="number">0</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;attempt to divide by zero&quot;</span>),
-            <span class="number">1</span> =&gt; <span class="ident">From::from</span>(<span class="self">self</span> <span class="op">/</span> <span class="ident">other</span>.<span class="ident">data</span>[<span class="number">0</span>]),
-            <span class="kw">_</span> =&gt; <span class="ident">Zero::zero</span>(),
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>div(<span class="self">self</span>, other: BigUint) -&gt; BigUint {
+        <span class="kw">match </span>other.data.len() {
+            <span class="number">0 </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;attempt to divide by zero&quot;</span>),
+            <span class="number">1 </span>=&gt; From::from(<span class="self">self </span><span class="kw">as </span>BigDigit / other.data[<span class="number">0</span>]),
+            <span class="kw">_ </span>=&gt; Zero::zero(),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Div</span><span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigUint</span>;
+<span class="kw">impl </span>Div&lt;u64&gt; <span class="kw">for </span>BigUint {
+    <span class="kw">type </span>Output = BigUint;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">u128</span>) -&gt; <span class="ident">BigUint</span> {
-        <span class="kw">let</span> (<span class="ident">q</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">div_rem</span>(<span class="self">self</span>, <span class="ident">From::from</span>(<span class="ident">other</span>));
-        <span class="ident">q</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>div(<span class="self">self</span>, other: u64) -&gt; BigUint {
+        <span class="kw">let </span>(q, <span class="kw">_</span>) = div_rem(<span class="self">self</span>, From::from(other));
+        q
+    }
+}
+<span class="kw">impl </span>DivAssign&lt;u64&gt; <span class="kw">for </span>BigUint {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>div_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: u64) {
+        <span class="comment">// a vec of size 0 does not allocate, so this is fairly cheap
+        </span><span class="kw">let </span>temp = mem::replace(<span class="self">self</span>, Zero::zero());
+        <span class="kw-2">*</span><span class="self">self </span>= temp / other;
     }
 }
 
-<span class="kw">impl</span> <span class="ident">DivAssign</span><span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">div_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">u128</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span> <span class="op">/</span> <span class="ident">other</span>;
+<span class="kw">impl </span>Div&lt;BigUint&gt; <span class="kw">for </span>u64 {
+    <span class="kw">type </span>Output = BigUint;
+
+    <span class="attribute">#[cfg(not(u64_digit))]
+    #[inline]
+    </span><span class="kw">fn </span>div(<span class="self">self</span>, other: BigUint) -&gt; BigUint {
+        <span class="kw">match </span>other.data.len() {
+            <span class="number">0 </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;attempt to divide by zero&quot;</span>),
+            <span class="number">1 </span>=&gt; From::from(<span class="self">self </span>/ u64::from(other.data[<span class="number">0</span>])),
+            <span class="number">2 </span>=&gt; From::from(<span class="self">self </span>/ big_digit::to_doublebigdigit(other.data[<span class="number">1</span>], other.data[<span class="number">0</span>])),
+            <span class="kw">_ </span>=&gt; Zero::zero(),
+        }
+    }
+
+    <span class="attribute">#[cfg(u64_digit)]
+    #[inline]
+    </span><span class="kw">fn </span>div(<span class="self">self</span>, other: BigUint) -&gt; BigUint {
+        <span class="kw">match </span>other.data.len() {
+            <span class="number">0 </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;attempt to divide by zero&quot;</span>),
+            <span class="number">1 </span>=&gt; From::from(<span class="self">self </span>/ other.data[<span class="number">0</span>]),
+            <span class="kw">_ </span>=&gt; Zero::zero(),
+        }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Div</span><span class="op">&lt;</span><span class="ident">BigUint</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u128</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigUint</span>;
+<span class="kw">impl </span>Div&lt;u128&gt; <span class="kw">for </span>BigUint {
+    <span class="kw">type </span>Output = BigUint;
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">u64_digit</span>))]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">BigUint</span>) -&gt; <span class="ident">BigUint</span> {
-        <span class="kw">match</span> <span class="ident">other</span>.<span class="ident">data</span>.<span class="ident">len</span>() {
-            <span class="number">0</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;attempt to divide by zero&quot;</span>),
-            <span class="number">1</span> =&gt; <span class="ident">From::from</span>(<span class="self">self</span> <span class="op">/</span> <span class="ident">u128::from</span>(<span class="ident">other</span>.<span class="ident">data</span>[<span class="number">0</span>])),
-            <span class="number">2</span> =&gt; <span class="ident">From::from</span>(
-                <span class="self">self</span> <span class="op">/</span> <span class="ident">u128::from</span>(<span class="ident">big_digit::to_doublebigdigit</span>(<span class="ident">other</span>.<span class="ident">data</span>[<span class="number">1</span>], <span class="ident">other</span>.<span class="ident">data</span>[<span class="number">0</span>])),
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>div(<span class="self">self</span>, other: u128) -&gt; BigUint {
+        <span class="kw">let </span>(q, <span class="kw">_</span>) = div_rem(<span class="self">self</span>, From::from(other));
+        q
+    }
+}
+
+<span class="kw">impl </span>DivAssign&lt;u128&gt; <span class="kw">for </span>BigUint {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>div_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: u128) {
+        <span class="kw-2">*</span><span class="self">self </span>= <span class="kw-2">&amp;*</span><span class="self">self </span>/ other;
+    }
+}
+
+<span class="kw">impl </span>Div&lt;BigUint&gt; <span class="kw">for </span>u128 {
+    <span class="kw">type </span>Output = BigUint;
+
+    <span class="attribute">#[cfg(not(u64_digit))]
+    #[inline]
+    </span><span class="kw">fn </span>div(<span class="self">self</span>, other: BigUint) -&gt; BigUint {
+        <span class="kw">match </span>other.data.len() {
+            <span class="number">0 </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;attempt to divide by zero&quot;</span>),
+            <span class="number">1 </span>=&gt; From::from(<span class="self">self </span>/ u128::from(other.data[<span class="number">0</span>])),
+            <span class="number">2 </span>=&gt; From::from(
+                <span class="self">self </span>/ u128::from(big_digit::to_doublebigdigit(other.data[<span class="number">1</span>], other.data[<span class="number">0</span>])),
             ),
-            <span class="number">3</span> =&gt; <span class="ident">From::from</span>(<span class="self">self</span> <span class="op">/</span> <span class="ident">u32_to_u128</span>(<span class="number">0</span>, <span class="ident">other</span>.<span class="ident">data</span>[<span class="number">2</span>], <span class="ident">other</span>.<span class="ident">data</span>[<span class="number">1</span>], <span class="ident">other</span>.<span class="ident">data</span>[<span class="number">0</span>])),
-            <span class="number">4</span> =&gt; <span class="ident">From::from</span>(
-                <span class="self">self</span> <span class="op">/</span> <span class="ident">u32_to_u128</span>(<span class="ident">other</span>.<span class="ident">data</span>[<span class="number">3</span>], <span class="ident">other</span>.<span class="ident">data</span>[<span class="number">2</span>], <span class="ident">other</span>.<span class="ident">data</span>[<span class="number">1</span>], <span class="ident">other</span>.<span class="ident">data</span>[<span class="number">0</span>]),
+            <span class="number">3 </span>=&gt; From::from(<span class="self">self </span>/ u32_to_u128(<span class="number">0</span>, other.data[<span class="number">2</span>], other.data[<span class="number">1</span>], other.data[<span class="number">0</span>])),
+            <span class="number">4 </span>=&gt; From::from(
+                <span class="self">self </span>/ u32_to_u128(other.data[<span class="number">3</span>], other.data[<span class="number">2</span>], other.data[<span class="number">1</span>], other.data[<span class="number">0</span>]),
             ),
-            <span class="kw">_</span> =&gt; <span class="ident">Zero::zero</span>(),
+            <span class="kw">_ </span>=&gt; Zero::zero(),
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">u64_digit</span>)]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">BigUint</span>) -&gt; <span class="ident">BigUint</span> {
-        <span class="kw">match</span> <span class="ident">other</span>.<span class="ident">data</span>.<span class="ident">len</span>() {
-            <span class="number">0</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;attempt to divide by zero&quot;</span>),
-            <span class="number">1</span> =&gt; <span class="ident">From::from</span>(<span class="self">self</span> <span class="op">/</span> <span class="ident">other</span>.<span class="ident">data</span>[<span class="number">0</span>] <span class="kw">as</span> <span class="ident">u128</span>),
-            <span class="number">2</span> =&gt; <span class="ident">From::from</span>(<span class="self">self</span> <span class="op">/</span> <span class="ident">big_digit::to_doublebigdigit</span>(<span class="ident">other</span>.<span class="ident">data</span>[<span class="number">1</span>], <span class="ident">other</span>.<span class="ident">data</span>[<span class="number">0</span>])),
-            <span class="kw">_</span> =&gt; <span class="ident">Zero::zero</span>(),
-        }
-    }
-}
-
-<span class="macro">forward_val_ref_binop!</span>(<span class="kw">impl</span> <span class="ident">Rem</span> <span class="kw">for</span> <span class="ident">BigUint</span>, <span class="ident">rem</span>);
-<span class="macro">forward_ref_val_binop!</span>(<span class="kw">impl</span> <span class="ident">Rem</span> <span class="kw">for</span> <span class="ident">BigUint</span>, <span class="ident">rem</span>);
-<span class="macro">forward_val_assign!</span>(<span class="kw">impl</span> <span class="ident">RemAssign</span> <span class="kw">for</span> <span class="ident">BigUint</span>, <span class="ident">rem_assign</span>);
-
-<span class="kw">impl</span> <span class="ident">Rem</span><span class="op">&lt;</span><span class="ident">BigUint</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigUint</span>;
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">rem</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">BigUint</span>) -&gt; <span class="ident">BigUint</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">other</span>) <span class="op">=</span> <span class="ident">other</span>.<span class="ident">to_u32</span>() {
-            <span class="kw-2">&amp;</span><span class="self">self</span> <span class="op">%</span> <span class="ident">other</span>
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">r</span>) <span class="op">=</span> <span class="ident">div_rem</span>(<span class="self">self</span>, <span class="ident">other</span>);
-            <span class="ident">r</span>
+    <span class="attribute">#[cfg(u64_digit)]
+    #[inline]
+    </span><span class="kw">fn </span>div(<span class="self">self</span>, other: BigUint) -&gt; BigUint {
+        <span class="kw">match </span>other.data.len() {
+            <span class="number">0 </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;attempt to divide by zero&quot;</span>),
+            <span class="number">1 </span>=&gt; From::from(<span class="self">self </span>/ other.data[<span class="number">0</span>] <span class="kw">as </span>u128),
+            <span class="number">2 </span>=&gt; From::from(<span class="self">self </span>/ big_digit::to_doublebigdigit(other.data[<span class="number">1</span>], other.data[<span class="number">0</span>])),
+            <span class="kw">_ </span>=&gt; Zero::zero(),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">Rem</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">BigUint</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigUint</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigUint</span>;
+<span class="macro">forward_val_ref_binop!</span>(<span class="kw">impl </span>Rem <span class="kw">for </span>BigUint, rem);
+<span class="macro">forward_ref_val_binop!</span>(<span class="kw">impl </span>Rem <span class="kw">for </span>BigUint, rem);
+<span class="macro">forward_val_assign!</span>(<span class="kw">impl </span>RemAssign <span class="kw">for </span>BigUint, rem_assign);
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">rem</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">BigUint</span>) -&gt; <span class="ident">BigUint</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">other</span>) <span class="op">=</span> <span class="ident">other</span>.<span class="ident">to_u32</span>() {
-            <span class="self">self</span> <span class="op">%</span> <span class="ident">other</span>
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">r</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">div_rem</span>(<span class="ident">other</span>);
-            <span class="ident">r</span>
+<span class="kw">impl </span>Rem&lt;BigUint&gt; <span class="kw">for </span>BigUint {
+    <span class="kw">type </span>Output = BigUint;
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>rem(<span class="self">self</span>, other: BigUint) -&gt; BigUint {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(other) = other.to_u32() {
+            <span class="kw-2">&amp;</span><span class="self">self </span>% other
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>(<span class="kw">_</span>, r) = div_rem(<span class="self">self</span>, other);
+            r
         }
     }
 }
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">RemAssign</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigUint</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">rem_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">BigUint</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span> <span class="op">%</span> <span class="ident">other</span>;
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; Rem&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>BigUint&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigUint {
+    <span class="kw">type </span>Output = BigUint;
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>rem(<span class="self">self</span>, other: <span class="kw-2">&amp;</span>BigUint) -&gt; BigUint {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(other) = other.to_u32() {
+            <span class="self">self </span>% other
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>(<span class="kw">_</span>, r) = <span class="self">self</span>.div_rem(other);
+            r
+        }
+    }
+}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; RemAssign&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigUint&gt; <span class="kw">for </span>BigUint {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>rem_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>BigUint) {
+        <span class="kw-2">*</span><span class="self">self </span>= <span class="kw-2">&amp;*</span><span class="self">self </span>% other;
     }
 }
 
-<span class="macro">promote_unsigned_scalars!</span>(<span class="kw">impl</span> <span class="ident">Rem</span> <span class="kw">for</span> <span class="ident">BigUint</span>, <span class="ident">rem</span>);
-<span class="macro">promote_unsigned_scalars_assign!</span>(<span class="kw">impl</span> <span class="ident">RemAssign</span> <span class="kw">for</span> <span class="ident">BigUint</span>, <span class="ident">rem_assign</span>);
-<span class="macro">forward_all_scalar_binop_to_ref_val!</span>(<span class="kw">impl</span> <span class="ident">Rem</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span>, <span class="ident">rem</span>);
-<span class="macro">forward_all_scalar_binop_to_val_val!</span>(<span class="kw">impl</span> <span class="ident">Rem</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span>, <span class="ident">rem</span>);
-<span class="macro">forward_all_scalar_binop_to_val_val!</span>(<span class="kw">impl</span> <span class="ident">Rem</span><span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span>, <span class="ident">rem</span>);
+<span class="macro">promote_unsigned_scalars!</span>(<span class="kw">impl </span>Rem <span class="kw">for </span>BigUint, rem);
+<span class="macro">promote_unsigned_scalars_assign!</span>(<span class="kw">impl </span>RemAssign <span class="kw">for </span>BigUint, rem_assign);
+<span class="macro">forward_all_scalar_binop_to_ref_val!</span>(<span class="kw">impl </span>Rem&lt;u32&gt; <span class="kw">for </span>BigUint, rem);
+<span class="macro">forward_all_scalar_binop_to_val_val!</span>(<span class="kw">impl </span>Rem&lt;u64&gt; <span class="kw">for </span>BigUint, rem);
+<span class="macro">forward_all_scalar_binop_to_val_val!</span>(<span class="kw">impl </span>Rem&lt;u128&gt; <span class="kw">for </span>BigUint, rem);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Rem</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigUint</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigUint</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Rem&lt;u32&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigUint {
+    <span class="kw">type </span>Output = BigUint;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">rem</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">u32</span>) -&gt; <span class="ident">BigUint</span> {
-        <span class="ident">rem_digit</span>(<span class="self">self</span>, <span class="ident">other</span> <span class="kw">as</span> <span class="ident">BigDigit</span>).<span class="ident">into</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>rem(<span class="self">self</span>, other: u32) -&gt; BigUint {
+        rem_digit(<span class="self">self</span>, other <span class="kw">as </span>BigDigit).into()
     }
 }
-<span class="kw">impl</span> <span class="ident">RemAssign</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">rem_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">u32</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span> <span class="op">%</span> <span class="ident">other</span>;
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Rem</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigUint</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u32</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigUint</span>;
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">rem</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigUint</span>) -&gt; <span class="ident">BigUint</span> {
-        <span class="self">self</span> <span class="op">%</span><span class="op">=</span> <span class="ident">other</span>;
-        <span class="ident">From::from</span>(<span class="self">self</span>)
+<span class="kw">impl </span>RemAssign&lt;u32&gt; <span class="kw">for </span>BigUint {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>rem_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: u32) {
+        <span class="kw-2">*</span><span class="self">self </span>= <span class="kw-2">&amp;*</span><span class="self">self </span>% other;
     }
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">impl_rem_assign_scalar</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">to_scalar</span>:<span class="ident">ident</span>) =&gt; {
-        <span class="macro">forward_val_assign_scalar!</span>(<span class="kw">impl</span> <span class="ident">RemAssign</span> <span class="kw">for</span> <span class="ident">BigUint</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>, <span class="ident">rem_assign</span>);
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">RemAssign</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigUint</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span> {
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">rem_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">BigUint</span>) {
-                <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">other</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">to_scalar</span>() {
-                    <span class="prelude-val">None</span> =&gt; <span class="kw-2">*</span><span class="self">self</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Rem&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigUint&gt; <span class="kw">for </span>u32 {
+    <span class="kw">type </span>Output = BigUint;
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>rem(<span class="kw-2">mut </span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigUint) -&gt; BigUint {
+        <span class="self">self </span>%= other;
+        From::from(<span class="self">self</span>)
+    }
+}
+
+<span class="macro">macro_rules! </span>impl_rem_assign_scalar {
+    (<span class="macro-nonterminal">$scalar</span>:ty, <span class="macro-nonterminal">$to_scalar</span>:ident) =&gt; {
+        <span class="macro">forward_val_assign_scalar!</span>(<span class="kw">impl </span>RemAssign <span class="kw">for </span>BigUint, <span class="macro-nonterminal">$scalar</span>, rem_assign);
+        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; RemAssign&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigUint&gt; <span class="kw">for </span><span class="macro-nonterminal">$scalar </span>{
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>rem_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>BigUint) {
+                <span class="kw-2">*</span><span class="self">self </span>= <span class="kw">match </span>other.<span class="macro-nonterminal">$to_scalar</span>() {
+                    <span class="prelude-val">None </span>=&gt; <span class="kw-2">*</span><span class="self">self</span>,
                     <span class="prelude-val">Some</span>(<span class="number">0</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;attempt to divide by zero&quot;</span>),
-                    <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="kw-2">*</span><span class="self">self</span> <span class="op">%</span> <span class="ident">v</span>
+                    <span class="prelude-val">Some</span>(v) =&gt; <span class="kw-2">*</span><span class="self">self </span>% v
                 };
             }
         }
     }
 }
 
-<span class="comment">// we can scalar %= BigUint for any scalar, including signed types</span>
-<span class="macro">impl_rem_assign_scalar!</span>(<span class="ident">u128</span>, <span class="ident">to_u128</span>);
-<span class="macro">impl_rem_assign_scalar!</span>(<span class="ident">usize</span>, <span class="ident">to_usize</span>);
-<span class="macro">impl_rem_assign_scalar!</span>(<span class="ident">u64</span>, <span class="ident">to_u64</span>);
-<span class="macro">impl_rem_assign_scalar!</span>(<span class="ident">u32</span>, <span class="ident">to_u32</span>);
-<span class="macro">impl_rem_assign_scalar!</span>(<span class="ident">u16</span>, <span class="ident">to_u16</span>);
-<span class="macro">impl_rem_assign_scalar!</span>(<span class="ident">u8</span>, <span class="ident">to_u8</span>);
-<span class="macro">impl_rem_assign_scalar!</span>(<span class="ident">i128</span>, <span class="ident">to_i128</span>);
-<span class="macro">impl_rem_assign_scalar!</span>(<span class="ident">isize</span>, <span class="ident">to_isize</span>);
-<span class="macro">impl_rem_assign_scalar!</span>(<span class="ident">i64</span>, <span class="ident">to_i64</span>);
-<span class="macro">impl_rem_assign_scalar!</span>(<span class="ident">i32</span>, <span class="ident">to_i32</span>);
-<span class="macro">impl_rem_assign_scalar!</span>(<span class="ident">i16</span>, <span class="ident">to_i16</span>);
-<span class="macro">impl_rem_assign_scalar!</span>(<span class="ident">i8</span>, <span class="ident">to_i8</span>);
+<span class="comment">// we can scalar %= BigUint for any scalar, including signed types
+</span><span class="macro">impl_rem_assign_scalar!</span>(u128, to_u128);
+<span class="macro">impl_rem_assign_scalar!</span>(usize, to_usize);
+<span class="macro">impl_rem_assign_scalar!</span>(u64, to_u64);
+<span class="macro">impl_rem_assign_scalar!</span>(u32, to_u32);
+<span class="macro">impl_rem_assign_scalar!</span>(u16, to_u16);
+<span class="macro">impl_rem_assign_scalar!</span>(u8, to_u8);
+<span class="macro">impl_rem_assign_scalar!</span>(i128, to_i128);
+<span class="macro">impl_rem_assign_scalar!</span>(isize, to_isize);
+<span class="macro">impl_rem_assign_scalar!</span>(i64, to_i64);
+<span class="macro">impl_rem_assign_scalar!</span>(i32, to_i32);
+<span class="macro">impl_rem_assign_scalar!</span>(i16, to_i16);
+<span class="macro">impl_rem_assign_scalar!</span>(i8, to_i8);
 
-<span class="kw">impl</span> <span class="ident">Rem</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigUint</span>;
+<span class="kw">impl </span>Rem&lt;u64&gt; <span class="kw">for </span>BigUint {
+    <span class="kw">type </span>Output = BigUint;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">rem</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">u64</span>) -&gt; <span class="ident">BigUint</span> {
-        <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">r</span>) <span class="op">=</span> <span class="ident">div_rem</span>(<span class="self">self</span>, <span class="ident">From::from</span>(<span class="ident">other</span>));
-        <span class="ident">r</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>rem(<span class="self">self</span>, other: u64) -&gt; BigUint {
+        <span class="kw">let </span>(<span class="kw">_</span>, r) = div_rem(<span class="self">self</span>, From::from(other));
+        r
     }
 }
-<span class="kw">impl</span> <span class="ident">RemAssign</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">rem_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">u64</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span> <span class="op">%</span> <span class="ident">other</span>;
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Rem</span><span class="op">&lt;</span><span class="ident">BigUint</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u64</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigUint</span>;
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">rem</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">BigUint</span>) -&gt; <span class="ident">BigUint</span> {
-        <span class="self">self</span> <span class="op">%</span><span class="op">=</span> <span class="ident">other</span>;
-        <span class="ident">From::from</span>(<span class="self">self</span>)
+<span class="kw">impl </span>RemAssign&lt;u64&gt; <span class="kw">for </span>BigUint {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>rem_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: u64) {
+        <span class="kw-2">*</span><span class="self">self </span>= <span class="kw-2">&amp;*</span><span class="self">self </span>% other;
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Rem</span><span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigUint</span>;
+<span class="kw">impl </span>Rem&lt;BigUint&gt; <span class="kw">for </span>u64 {
+    <span class="kw">type </span>Output = BigUint;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">rem</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">u128</span>) -&gt; <span class="ident">BigUint</span> {
-        <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">r</span>) <span class="op">=</span> <span class="ident">div_rem</span>(<span class="self">self</span>, <span class="ident">From::from</span>(<span class="ident">other</span>));
-        <span class="ident">r</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>rem(<span class="kw-2">mut </span><span class="self">self</span>, other: BigUint) -&gt; BigUint {
+        <span class="self">self </span>%= other;
+        From::from(<span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">RemAssign</span><span class="op">&lt;</span><span class="ident">u128</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">rem_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">u128</span>) {
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span> <span class="op">%</span> <span class="ident">other</span>;
+<span class="kw">impl </span>Rem&lt;u128&gt; <span class="kw">for </span>BigUint {
+    <span class="kw">type </span>Output = BigUint;
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>rem(<span class="self">self</span>, other: u128) -&gt; BigUint {
+        <span class="kw">let </span>(<span class="kw">_</span>, r) = div_rem(<span class="self">self</span>, From::from(other));
+        r
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Rem</span><span class="op">&lt;</span><span class="ident">BigUint</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u128</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigUint</span>;
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">rem</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">BigUint</span>) -&gt; <span class="ident">BigUint</span> {
-        <span class="self">self</span> <span class="op">%</span><span class="op">=</span> <span class="ident">other</span>;
-        <span class="ident">From::from</span>(<span class="self">self</span>)
+<span class="kw">impl </span>RemAssign&lt;u128&gt; <span class="kw">for </span>BigUint {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>rem_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: u128) {
+        <span class="kw-2">*</span><span class="self">self </span>= <span class="kw-2">&amp;*</span><span class="self">self </span>% other;
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CheckedDiv</span> <span class="kw">for</span> <span class="ident">BigUint</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">checked_div</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">BigUint</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BigUint</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">v</span>.<span class="ident">is_zero</span>() {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+<span class="kw">impl </span>Rem&lt;BigUint&gt; <span class="kw">for </span>u128 {
+    <span class="kw">type </span>Output = BigUint;
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>rem(<span class="kw-2">mut </span><span class="self">self</span>, other: BigUint) -&gt; BigUint {
+        <span class="self">self </span>%= other;
+        From::from(<span class="self">self</span>)
+    }
+}
+
+<span class="kw">impl </span>CheckedDiv <span class="kw">for </span>BigUint {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>checked_div(<span class="kw-2">&amp;</span><span class="self">self</span>, v: <span class="kw-2">&amp;</span>BigUint) -&gt; <span class="prelude-ty">Option</span>&lt;BigUint&gt; {
+        <span class="kw">if </span>v.is_zero() {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
-        <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">div</span>(<span class="ident">v</span>))
+        <span class="prelude-val">Some</span>(<span class="self">self</span>.div(v))
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="num_bigint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="num_bigint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

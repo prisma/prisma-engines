@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/crypto/rsa.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>rsa.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mysql_common/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/crypto/rsa.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>rsa.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mysql_common/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -386,221 +386,221 @@
 <span id="386">386</span>
 <span id="387">387</span>
 <span id="388">388</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2021 Anatoly Ikorsky</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2021 Anatoly Ikorsky
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::der</span>;
-<span class="kw">use</span> <span class="ident">byteorder</span>::{<span class="ident">BigEndian</span>, <span class="ident">ByteOrder</span>};
-<span class="kw">use</span> <span class="ident">num_bigint::BigUint</span>;
-<span class="kw">use</span> <span class="ident">rand::Rng</span>;
-<span class="kw">use</span> <span class="ident">sha1</span>::{<span class="ident">Digest</span>, <span class="ident">Sha1</span>};
+</span><span class="kw">use </span><span class="kw">super</span>::der;
+<span class="kw">use </span>byteorder::{BigEndian, ByteOrder};
+<span class="kw">use </span>num_bigint::BigUint;
+<span class="kw">use </span>rand::Rng;
+<span class="kw">use </span>sha1::{Digest, Sha1};
 
-<span class="doccomment">/// Padding operation trait.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Padding</span> {
-    <span class="doccomment">/// Padding operation for `input` bytes, where `k` is the length of modulus in octets.</span>
-    <span class="kw">fn</span> <span class="ident">pub_pad</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>, <span class="ident">k</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Padding operation trait.
+</span><span class="kw">pub trait </span>Padding {
+    <span class="doccomment">/// Padding operation for `input` bytes, where `k` is the length of modulus in octets.
+    </span><span class="kw">fn </span>pub_pad(<span class="kw-2">&amp;mut </span><span class="self">self</span>, input: <span class="kw">impl </span>AsRef&lt;[u8]&gt;, k: usize) -&gt; Vec&lt;u8&gt;;
 }
 
-<span class="doccomment">/// Padding, as described in PKCS #1: RSA Encryption Version 1.5 (rfc2313).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Pkcs1Padding</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">rng</span>: <span class="ident">T</span>,
+<span class="doccomment">/// Padding, as described in PKCS #1: RSA Encryption Version 1.5 (rfc2313).
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Pkcs1Padding&lt;T&gt; {
+    rng: T,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Pkcs1Padding</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">rng</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">rng</span> }
+<span class="kw">impl</span>&lt;T&gt; Pkcs1Padding&lt;T&gt; {
+    <span class="kw">pub fn </span>new(rng: T) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ rng }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Rng</span><span class="op">&gt;</span> <span class="ident">Padding</span> <span class="kw">for</span> <span class="ident">Pkcs1Padding</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">pub_pad</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>, <span class="ident">k</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">as_ref</span>();
-        <span class="kw">let</span> <span class="ident">input_len</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">len</span>();
+<span class="kw">impl</span>&lt;T: Rng&gt; Padding <span class="kw">for </span>Pkcs1Padding&lt;T&gt; {
+    <span class="kw">fn </span>pub_pad(<span class="kw-2">&amp;mut </span><span class="self">self</span>, input: <span class="kw">impl </span>AsRef&lt;[u8]&gt;, k: usize) -&gt; Vec&lt;u8&gt; {
+        <span class="kw">let </span>input = input.as_ref();
+        <span class="kw">let </span>input_len = input.len();
         <span class="macro">assert!</span>(
-            <span class="ident">input_len</span> <span class="op">&lt;</span> <span class="ident">k</span> <span class="op">-</span> <span class="number">11</span>,
-            <span class="string">&quot;The length of the data D shall not be more than k-11 octets&quot;</span>
-        );
+            input_len &lt; k - <span class="number">11</span>,
+            <span class="string">&quot;The length of the data D shall not be more than k-11 octets&quot;
+        </span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="ident">k</span>];
+        <span class="kw">let </span><span class="kw-2">mut </span>output = <span class="macro">vec!</span>[<span class="number">0u8</span>; k];
 
-        <span class="ident">output</span>[<span class="number">0</span>] <span class="op">=</span> <span class="number">0x00</span>;
-        <span class="ident">output</span>[<span class="number">1</span>] <span class="op">=</span> <span class="number">0x02</span>;
-        <span class="kw">let</span> <span class="ident">ps_len</span> <span class="op">=</span> <span class="ident">k</span> <span class="op">-</span> <span class="number">3</span> <span class="op">-</span> <span class="ident">input_len</span>;
+        output[<span class="number">0</span>] = <span class="number">0x00</span>;
+        output[<span class="number">1</span>] = <span class="number">0x02</span>;
+        <span class="kw">let </span>ps_len = k - <span class="number">3 </span>- input_len;
 
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">ps_len</span> {
-            <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="kw">loop</span> {
-                <span class="kw">match</span> <span class="self">self</span>.<span class="ident">rng</span>.<span class="ident">gen</span>::<span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>() {
-                    <span class="number">0x00</span> =&gt; <span class="kw">continue</span>,
-                    <span class="ident">x</span> =&gt; <span class="kw">break</span> <span class="ident">x</span>,
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..ps_len {
+            <span class="kw">let </span>x = <span class="kw">loop </span>{
+                <span class="kw">match </span><span class="self">self</span>.rng.gen::&lt;u8&gt;() {
+                    <span class="number">0x00 </span>=&gt; <span class="kw">continue</span>,
+                    x =&gt; <span class="kw">break </span>x,
                 }
             };
-            <span class="ident">output</span>[<span class="ident">i</span> <span class="op">+</span> <span class="number">2</span>] <span class="op">=</span> <span class="ident">x</span>;
+            output[i + <span class="number">2</span>] = x;
         }
 
-        <span class="ident">output</span>[<span class="number">2</span> <span class="op">+</span> <span class="ident">ps_len</span>] <span class="op">=</span> <span class="number">0x00</span>;
-        (<span class="kw-2">&amp;mut</span> <span class="ident">output</span>[<span class="number">2</span> <span class="op">+</span> <span class="ident">ps_len</span> <span class="op">+</span> <span class="number">1</span>..]).<span class="ident">copy_from_slice</span>(<span class="ident">input</span>);
-        <span class="ident">output</span>
+        output[<span class="number">2 </span>+ ps_len] = <span class="number">0x00</span>;
+        (<span class="kw-2">&amp;mut </span>output[<span class="number">2 </span>+ ps_len + <span class="number">1</span>..]).copy_from_slice(input);
+        output
     }
 }
 
-<span class="doccomment">/// Padding, as described in PKCS #1: RSA Cryptography Specifications Version 2.0 (rfc2437).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Pkcs1OaepPadding</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">rng</span>: <span class="ident">T</span>,
+<span class="doccomment">/// Padding, as described in PKCS #1: RSA Cryptography Specifications Version 2.0 (rfc2437).
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Pkcs1OaepPadding&lt;T&gt; {
+    rng: T,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Pkcs1OaepPadding</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Length of a SHA-1 hash digest.</span>
-    <span class="kw">const</span> <span class="ident">HASH_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">20</span>;
+<span class="kw">impl</span>&lt;T&gt; Pkcs1OaepPadding&lt;T&gt; {
+    <span class="doccomment">/// Length of a SHA-1 hash digest.
+    </span><span class="kw">const </span>HASH_LEN: usize = <span class="number">20</span>;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">rng</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">rng</span> }
+    <span class="kw">pub fn </span>new(rng: T) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ rng }
     }
 
-    <span class="doccomment">/// Mask Generation Function as defined in rfc2437.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// It will use SHA-1 as a hash function.</span>
-    <span class="kw">fn</span> <span class="ident">mgf1</span>(<span class="ident">seed</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span> <span class="number">2usize</span>.<span class="ident">pow</span>(<span class="number">32</span>) <span class="op">*</span> <span class="ident"><span class="self">Self</span>::HASH_LEN</span> {
+    <span class="doccomment">/// Mask Generation Function as defined in rfc2437.
+    ///
+    /// It will use SHA-1 as a hash function.
+    </span><span class="kw">fn </span>mgf1(seed: <span class="kw-2">&amp;</span>[u8], len: usize) -&gt; Vec&lt;u8&gt; {
+        <span class="kw">if </span>len &gt; <span class="number">2usize</span>.pow(<span class="number">32</span>) * <span class="self">Self</span>::HASH_LEN {
             <span class="macro">panic!</span>(<span class="string">&quot;mask too long&quot;</span>);
         }
 
-        <span class="kw">fn</span> <span class="ident">ceil_div</span>(<span class="ident">dividend</span>: <span class="ident">usize</span>, <span class="ident">divisor</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">quotient</span> <span class="op">=</span> <span class="ident">dividend</span> <span class="op">/</span> <span class="ident">divisor</span>;
-            <span class="kw">if</span> <span class="ident">dividend</span> <span class="op">%</span> <span class="ident">divisor</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                <span class="ident">quotient</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="kw">fn </span>ceil_div(dividend: usize, divisor: usize) -&gt; usize {
+            <span class="kw">let </span><span class="kw-2">mut </span>quotient = dividend / divisor;
+            <span class="kw">if </span>dividend % divisor &gt; <span class="number">0 </span>{
+                quotient += <span class="number">1</span>;
             }
-            <span class="ident">quotient</span>
+            quotient
         }
 
-        <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> (<span class="number">0</span>..<span class="ident">ceil_div</span>(<span class="ident">len</span>, <span class="ident"><span class="self">Self</span>::HASH_LEN</span>))
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">cs</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> [<span class="number">0u8</span>; <span class="number">4</span>];
-                <span class="ident">BigEndian::write_u32</span>(<span class="ident">cs</span>, <span class="ident">c</span> <span class="kw">as</span> <span class="ident">u32</span>);
-                <span class="ident">Sha1::digest</span>(<span class="kw-2">&amp;</span>[<span class="ident">seed</span>, <span class="ident">cs</span>].<span class="ident">concat</span>()).<span class="ident">to_vec</span>()
+        <span class="kw">let </span>output = (<span class="number">0</span>..ceil_div(len, <span class="self">Self</span>::HASH_LEN))
+            .map(|c| {
+                <span class="kw">let </span>cs = <span class="kw-2">&amp;mut </span>[<span class="number">0u8</span>; <span class="number">4</span>];
+                BigEndian::write_u32(cs, c <span class="kw">as </span>u32);
+                Sha1::digest(<span class="kw-2">&amp;</span>[seed, cs].concat()).to_vec()
             })
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-            .<span class="ident">concat</span>();
+            .collect::&lt;Vec&lt;Vec&lt;u8&gt;&gt;&gt;()
+            .concat();
 
-        <span class="ident">output</span>[..<span class="ident">len</span>].<span class="ident">into</span>()
+        output[..len].into()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Rng</span><span class="op">&gt;</span> <span class="ident">Padding</span> <span class="kw">for</span> <span class="ident">Pkcs1OaepPadding</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Will pad input according to PKCS #1 v2 with encoding parameters equal to `[]`.</span>
-    <span class="kw">fn</span> <span class="ident">pub_pad</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>, <span class="ident">k</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">as_ref</span>();
-        <span class="comment">// 1. Skip because encoding parameters == []</span>
-        <span class="comment">// 2. If ||M|| &gt; emLen-2hLen-1 then output &quot;message too long&quot; and stop.</span>
-        <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">k</span> <span class="op">-</span> <span class="number">2</span> <span class="op">*</span> <span class="ident"><span class="self">Self</span>::HASH_LEN</span> <span class="op">-</span> <span class="number">1</span> {
+<span class="kw">impl</span>&lt;T: Rng&gt; Padding <span class="kw">for </span>Pkcs1OaepPadding&lt;T&gt; {
+    <span class="doccomment">/// Will pad input according to PKCS #1 v2 with encoding parameters equal to `[]`.
+    </span><span class="kw">fn </span>pub_pad(<span class="kw-2">&amp;mut </span><span class="self">self</span>, input: <span class="kw">impl </span>AsRef&lt;[u8]&gt;, k: usize) -&gt; Vec&lt;u8&gt; {
+        <span class="kw">let </span>input = input.as_ref();
+        <span class="comment">// 1. Skip because encoding parameters == []
+        // 2. If ||M|| &gt; emLen-2hLen-1 then output &quot;message too long&quot; and stop.
+        </span><span class="kw">if </span>input.len() &gt; k - <span class="number">2 </span>* <span class="self">Self</span>::HASH_LEN - <span class="number">1 </span>{
             <span class="macro">panic!</span>(<span class="string">&quot;message too long&quot;</span>);
         }
-        <span class="comment">// 3. Generate an octet string PS consisting of emLen-||M||-2hLen-1 zero</span>
-        <span class="comment">//    octets. The length of PS may be 0.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ps</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">k</span> <span class="op">-</span> <span class="ident">input</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">2</span> <span class="op">*</span> <span class="ident"><span class="self">Self</span>::HASH_LEN</span> <span class="op">-</span> <span class="number">2</span>];
-        <span class="ident">ps</span>.<span class="ident">push</span>(<span class="number">0x01</span>);
-        <span class="comment">// 4. Let pHash = Hash(P), an octet string of length hLen.</span>
-        <span class="kw">let</span> <span class="ident">p_hash</span> <span class="op">=</span> <span class="ident">Sha1::digest</span>(<span class="kw-2">&amp;</span>[]).<span class="ident">to_vec</span>();
-        <span class="comment">// 5. Concatenate pHash, PS, the message M, and other padding to form a</span>
-        <span class="comment">//    data block DB as: DB = pHash || PS || 01 || M</span>
-        <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> [<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">p_hash</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">ps</span>, <span class="ident">input</span>].<span class="ident">concat</span>();
-        <span class="comment">// 6. Generate a random octet string seed of length hLen.</span>
-        <span class="kw">let</span> <span class="ident">seed</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> (<span class="number">0</span>..<span class="ident"><span class="self">Self</span>::HASH_LEN</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">rng</span>.<span class="ident">gen</span>()).<span class="ident">collect</span>();
-        <span class="comment">// 7. Let dbMask = MGF(seed, emLen-hLen).</span>
-        <span class="kw">let</span> <span class="ident">db_mask</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::mgf1</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">seed</span>, <span class="ident">k</span> <span class="op">-</span> <span class="ident"><span class="self">Self</span>::HASH_LEN</span>);
-        <span class="comment">// 8. Let maskedDB = DB \xor dbMask.</span>
-        <span class="kw">let</span> <span class="ident">masked_db</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">db</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">zip</span>(<span class="ident">db_mask</span>.<span class="ident">into_iter</span>())
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">a</span>, <span class="ident">b</span>)<span class="op">|</span> <span class="ident">a</span> <span class="op">^</span> <span class="ident">b</span>)
-            .<span class="ident">collect</span>();
-        <span class="comment">// 9. Let seedMask = MGF(maskedDB, hLen).</span>
-        <span class="kw">let</span> <span class="ident">seed_mask</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::mgf1</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">masked_db</span>, <span class="ident"><span class="self">Self</span>::HASH_LEN</span>);
-        <span class="comment">// 10. Let maskedSeed = seed \xor seedMask.</span>
-        <span class="kw">let</span> <span class="ident">masked_seed</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">seed</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">zip</span>(<span class="ident">seed_mask</span>.<span class="ident">into_iter</span>())
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">a</span>, <span class="ident">b</span>)<span class="op">|</span> <span class="ident">a</span> <span class="op">^</span> <span class="ident">b</span>)
-            .<span class="ident">collect</span>();
-        <span class="comment">// 11. Let EM = maskedSeed || maskedDB.</span>
-        [<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">masked_seed</span>, <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">masked_db</span>].<span class="ident">concat</span>()
+        <span class="comment">// 3. Generate an octet string PS consisting of emLen-||M||-2hLen-1 zero
+        //    octets. The length of PS may be 0.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>ps = <span class="macro">vec!</span>[<span class="number">0</span>; k - input.len() - <span class="number">2 </span>* <span class="self">Self</span>::HASH_LEN - <span class="number">2</span>];
+        ps.push(<span class="number">0x01</span>);
+        <span class="comment">// 4. Let pHash = Hash(P), an octet string of length hLen.
+        </span><span class="kw">let </span>p_hash = Sha1::digest(<span class="kw-2">&amp;</span>[]).to_vec();
+        <span class="comment">// 5. Concatenate pHash, PS, the message M, and other padding to form a
+        //    data block DB as: DB = pHash || PS || 01 || M
+        </span><span class="kw">let </span>db = [<span class="kw-2">&amp;*</span>p_hash, <span class="kw-2">&amp;*</span>ps, input].concat();
+        <span class="comment">// 6. Generate a random octet string seed of length hLen.
+        </span><span class="kw">let </span>seed: Vec&lt;<span class="kw">_</span>&gt; = (<span class="number">0</span>..<span class="self">Self</span>::HASH_LEN).map(|<span class="kw">_</span>| <span class="self">self</span>.rng.gen()).collect();
+        <span class="comment">// 7. Let dbMask = MGF(seed, emLen-hLen).
+        </span><span class="kw">let </span>db_mask = <span class="self">Self</span>::mgf1(<span class="kw-2">&amp;*</span>seed, k - <span class="self">Self</span>::HASH_LEN);
+        <span class="comment">// 8. Let maskedDB = DB \xor dbMask.
+        </span><span class="kw">let </span>masked_db: Vec&lt;<span class="kw">_</span>&gt; = db
+            .into_iter()
+            .zip(db_mask.into_iter())
+            .map(|(a, b)| a ^ b)
+            .collect();
+        <span class="comment">// 9. Let seedMask = MGF(maskedDB, hLen).
+        </span><span class="kw">let </span>seed_mask = <span class="self">Self</span>::mgf1(<span class="kw-2">&amp;*</span>masked_db, <span class="self">Self</span>::HASH_LEN);
+        <span class="comment">// 10. Let maskedSeed = seed \xor seedMask.
+        </span><span class="kw">let </span>masked_seed: Vec&lt;<span class="kw">_</span>&gt; = seed
+            .into_iter()
+            .zip(seed_mask.into_iter())
+            .map(|(a, b)| a ^ b)
+            .collect();
+        <span class="comment">// 11. Let EM = maskedSeed || maskedDB.
+        </span>[<span class="kw-2">&amp;*</span>masked_seed, <span class="kw-2">&amp;*</span>masked_db].concat()
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PublicKey</span> {
-    <span class="ident">modulus</span>: <span class="ident">BigUint</span>,
-    <span class="ident">exponent</span>: <span class="ident">BigUint</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>PublicKey {
+    modulus: BigUint,
+    exponent: BigUint,
 }
 
-<span class="kw">impl</span> <span class="ident">PublicKey</span> {
-    <span class="doccomment">/// Basic constructor.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">modulus</span>: <span class="ident">BigUint</span>, <span class="ident">exponent</span>: <span class="ident">BigUint</span>) -&gt; <span class="ident">PublicKey</span> {
-        <span class="ident">PublicKey</span> { <span class="ident">modulus</span>, <span class="ident">exponent</span> }
+<span class="kw">impl </span>PublicKey {
+    <span class="doccomment">/// Basic constructor.
+    </span><span class="kw">pub fn </span>new(modulus: BigUint, exponent: BigUint) -&gt; PublicKey {
+        PublicKey { modulus, exponent }
     }
 
-    <span class="doccomment">/// Will parse public key from pem representation.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panic</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Will panic in case of bad pem data.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_pem</span>(<span class="ident">pem_data</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) -&gt; <span class="ident">PublicKey</span> {
-        <span class="kw">let</span> (<span class="ident">der</span>, <span class="ident">file_type</span>) <span class="op">=</span> <span class="ident">der::pem_to_der</span>(<span class="ident">pem_data</span>);
-        <span class="kw">let</span> (<span class="ident">modulus</span>, <span class="ident">exponent</span>) <span class="op">=</span> <span class="ident">der::parse_pub_key</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">der</span>, <span class="ident">file_type</span>);
-        <span class="ident">PublicKey::new</span>(<span class="ident">modulus</span>, <span class="ident">exponent</span>)
+    <span class="doccomment">/// Will parse public key from pem representation.
+    ///
+    /// # Panic
+    ///
+    /// Will panic in case of bad pem data.
+    </span><span class="kw">pub fn </span>from_pem(pem_data: <span class="kw">impl </span>AsRef&lt;[u8]&gt;) -&gt; PublicKey {
+        <span class="kw">let </span>(der, file_type) = der::pem_to_der(pem_data);
+        <span class="kw">let </span>(modulus, exponent) = der::parse_pub_key(<span class="kw-2">&amp;*</span>der, file_type);
+        PublicKey::new(modulus, exponent)
     }
 
-    <span class="doccomment">/// Returns number of octets in the modulus.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num_octets</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        (<span class="self">self</span>.<span class="ident">modulus</span>.<span class="ident">bits</span>() <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="number">6</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">3</span>
+    <span class="doccomment">/// Returns number of octets in the modulus.
+    </span><span class="kw">pub fn </span>num_octets(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        (<span class="self">self</span>.modulus.bits() <span class="kw">as </span>usize + <span class="number">6</span>) &gt;&gt; <span class="number">3
+    </span>}
+
+    <span class="doccomment">/// Returns modulus of the public key.
+    </span><span class="kw">pub fn </span>modulus(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>BigUint {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.modulus
     }
 
-    <span class="doccomment">/// Returns modulus of the public key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">modulus</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">BigUint</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">modulus</span>
+    <span class="doccomment">/// Returns exponent of the public key.
+    </span><span class="kw">pub fn </span>exponent(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>BigUint {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.exponent
     }
 
-    <span class="doccomment">/// Returns exponent of the public key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exponent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">BigUint</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">exponent</span>
-    }
-
-    <span class="doccomment">/// Will encrypt block with public key.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panic</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Will panic if block is too long for key or padding.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encrypt_block</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">block</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>, <span class="kw-2">mut</span> <span class="ident">pad</span>: <span class="kw">impl</span> <span class="ident">Padding</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">enc_block</span> <span class="op">=</span> <span class="ident">pad</span>.<span class="ident">pub_pad</span>(<span class="ident">block</span>, <span class="self">self</span>.<span class="ident">num_octets</span>());
-        <span class="kw">let</span> <span class="ident">enc_int</span> <span class="op">=</span> <span class="ident">BigUint::from_bytes_be</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">enc_block</span>);
-        <span class="kw">let</span> <span class="ident">rsa</span> <span class="op">=</span> <span class="ident">enc_int</span>.<span class="ident">modpow</span>(<span class="self">self</span>.<span class="ident">exponent</span>(), <span class="self">self</span>.<span class="ident">modulus</span>());
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rsa_bytes</span> <span class="op">=</span> <span class="ident">rsa</span>.<span class="ident">to_bytes_be</span>();
-        <span class="comment">// is this needed?</span>
-        <span class="kw">while</span> <span class="ident">rsa_bytes</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">num_octets</span>() {
-            <span class="ident">rsa_bytes</span>.<span class="ident">insert</span>(<span class="number">0</span>, <span class="number">0</span>);
+    <span class="doccomment">/// Will encrypt block with public key.
+    ///
+    /// # Panic
+    ///
+    /// Will panic if block is too long for key or padding.
+    </span><span class="kw">pub fn </span>encrypt_block(<span class="kw-2">&amp;</span><span class="self">self</span>, block: <span class="kw">impl </span>AsRef&lt;[u8]&gt;, <span class="kw-2">mut </span>pad: <span class="kw">impl </span>Padding) -&gt; Vec&lt;u8&gt; {
+        <span class="kw">let </span>enc_block = pad.pub_pad(block, <span class="self">self</span>.num_octets());
+        <span class="kw">let </span>enc_int = BigUint::from_bytes_be(<span class="kw-2">&amp;*</span>enc_block);
+        <span class="kw">let </span>rsa = enc_int.modpow(<span class="self">self</span>.exponent(), <span class="self">self</span>.modulus());
+        <span class="kw">let </span><span class="kw-2">mut </span>rsa_bytes = rsa.to_bytes_be();
+        <span class="comment">// is this needed?
+        </span><span class="kw">while </span>rsa_bytes.len() &lt; <span class="self">self</span>.num_octets() {
+            rsa_bytes.insert(<span class="number">0</span>, <span class="number">0</span>);
         }
-        <span class="ident">rsa_bytes</span>
+        rsa_bytes
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident">std::io::Read</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span>std::io::Read;
 
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">rand::RngCore</span>;
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>rand::RngCore;
 
-    <span class="kw">const</span> <span class="ident">SEED</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">64</span>] <span class="op">=</span> <span class="string">b&quot;\x03\x2e\x45\x32\x6f\xa8\x59\xa7\x2e\xc2\x35\xac\xff\x92\x9b\x15\xd1\
+    <span class="kw">const </span>SEED: <span class="kw-2">&amp;</span>[u8; <span class="number">64</span>] = <span class="string">b&quot;\x03\x2e\x45\x32\x6f\xa8\x59\xa7\x2e\xc2\x35\xac\xff\x92\x9b\x15\xd1\
     \x37\x2e\x30\xb2\x07\x25\x5f\x06\x11\xb8\xf7\x85\xd7\x64\x37\x41\x52\xe0\xac\x00\x9e\x50\x9e\
     \x7b\xa3\x0c\xd2\xf1\x77\x8e\x11\x3b\x64\xe1\x35\xcf\x4e\x22\x92\xc7\x5e\xfe\x52\x88\xed\xfd\
     \xa4&quot;</span>;
-    <span class="kw">const</span> <span class="ident">MASK</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">128</span>] <span class="op">=</span>
+    <span class="kw">const </span>MASK: <span class="kw-2">&amp;</span>[u8; <span class="number">128</span>] =
         <span class="string">b&quot;\x5f\x8d\xe1\x05\xb5\xe9\x6b\x2e\x49\x0d\xde\xcb\xd1\x47\xdd\x1d\xef\
     \x7e\x3b\x8e\x0e\x6a\x26\xeb\x7b\x95\x6c\xcb\x8b\x3b\xdc\x1c\xa9\x75\xbc\x57\xc3\x98\x9e\x8f\
     \xba\xd3\x1a\x22\x46\x55\xd8\x00\xc4\x69\x54\x84\x0f\xf3\x20\x52\xcd\xf0\xd6\x40\x56\x2b\xdf\
@@ -608,48 +608,48 @@
     \x7a\x25\x19\x29\x85\xa8\x42\xdb\xff\x8e\x13\xef\xee\x5b\x7e\x7e\x55\xbb\xe4\xd3\x89\x64\x7c\
     \x68\x6a\x9a\x9a\xb3\xfb\x88\x9b\x2d\x77\x67\xd3\x83\x7e\xea\x4e\x0a\x2f\x04&quot;</span>;
 
-    <span class="doccomment">/// Replacement for the deprecated `rand::ReadRng`.</span>
-    <span class="kw">struct</span> <span class="ident">Seed</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]);
+    <span class="doccomment">/// Replacement for the deprecated `rand::ReadRng`.
+    </span><span class="kw">struct </span>Seed&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]);
 
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">RngCore</span> <span class="kw">for</span> <span class="ident">Seed</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">next_u32</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">4</span>];
-            <span class="self">self</span>.<span class="ident">fill_bytes</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>);
-            <span class="ident">u32::from_le_bytes</span>(<span class="ident">buf</span>)
+    <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; RngCore <span class="kw">for </span>Seed&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="kw">fn </span>next_u32(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; u32 {
+            <span class="kw">let </span><span class="kw-2">mut </span>buf = [<span class="number">0</span>; <span class="number">4</span>];
+            <span class="self">self</span>.fill_bytes(<span class="kw-2">&amp;mut </span>buf);
+            u32::from_le_bytes(buf)
         }
 
-        <span class="kw">fn</span> <span class="ident">next_u64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">8</span>];
-            <span class="self">self</span>.<span class="ident">fill_bytes</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>);
-            <span class="ident">u64::from_le_bytes</span>(<span class="ident">buf</span>)
+        <span class="kw">fn </span>next_u64(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; u64 {
+            <span class="kw">let </span><span class="kw-2">mut </span>buf = [<span class="number">0</span>; <span class="number">8</span>];
+            <span class="self">self</span>.fill_bytes(<span class="kw-2">&amp;mut </span>buf);
+            u64::from_le_bytes(buf)
         }
 
-        <span class="kw">fn</span> <span class="ident">fill_bytes</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">dest</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) {
-            <span class="self">self</span>.<span class="ident">try_fill_bytes</span>(<span class="ident">dest</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> {
+        <span class="kw">fn </span>fill_bytes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, dest: <span class="kw-2">&amp;mut </span>[u8]) {
+            <span class="self">self</span>.try_fill_bytes(dest).unwrap_or_else(|err| {
                 <span class="macro">panic!</span>(
                     <span class="string">&quot;reading random bytes from Read implementation failed; error: {}&quot;</span>,
-                    <span class="ident">err</span>
+                    err
                 )
             });
         }
 
-        <span class="kw">fn</span> <span class="ident">try_fill_bytes</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">dest</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">rand::Error</span><span class="op">&gt;</span> {
-            <span class="kw">if</span> <span class="ident">dest</span>.<span class="ident">is_empty</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+        <span class="kw">fn </span>try_fill_bytes(<span class="kw-2">&amp;mut </span><span class="self">self</span>, dest: <span class="kw-2">&amp;mut </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;(), rand::Error&gt; {
+            <span class="kw">if </span>dest.is_empty() {
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(());
             }
-            <span class="self">self</span>.<span class="number">0</span>.<span class="ident">read_exact</span>(<span class="ident">dest</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">rand::Error::new</span>(<span class="ident">e</span>))
+            <span class="self">self</span>.<span class="number">0</span>.read_exact(dest).map_err(|e| rand::Error::new(e))
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">mgf1</span>() {
-        <span class="kw">let</span> <span class="ident">mask</span> <span class="op">=</span> <span class="ident">Pkcs1OaepPadding</span>::<span class="op">&lt;</span>()<span class="op">&gt;</span><span class="ident">::mgf1</span>(<span class="kw-2">&amp;</span><span class="ident">SEED</span>[..], <span class="number">128</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">mask</span>, <span class="kw-2">&amp;</span><span class="ident">MASK</span>[..]);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>mgf1() {
+        <span class="kw">let </span>mask = Pkcs1OaepPadding::&lt;()&gt;::mgf1(<span class="kw-2">&amp;</span>SEED[..], <span class="number">128</span>);
+        <span class="macro">assert_eq!</span>(mask, <span class="kw-2">&amp;</span>MASK[..]);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">rsa_pkcs</span>() {
-        <span class="kw">let</span> <span class="ident">modulus</span> <span class="op">=</span> <span class="macro">vec!</span>[
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>rsa_pkcs() {
+        <span class="kw">let </span>modulus = <span class="macro">vec!</span>[
             <span class="number">0xa8</span>, <span class="number">0xb3</span>, <span class="number">0xb2</span>, <span class="number">0x84</span>, <span class="number">0xaf</span>, <span class="number">0x8e</span>, <span class="number">0xb5</span>, <span class="number">0x0b</span>, <span class="number">0x38</span>, <span class="number">0x70</span>, <span class="number">0x34</span>, <span class="number">0xa8</span>, <span class="number">0x60</span>, <span class="number">0xf1</span>,
             <span class="number">0x46</span>, <span class="number">0xc4</span>, <span class="number">0x91</span>, <span class="number">0x9f</span>, <span class="number">0x31</span>, <span class="number">0x87</span>, <span class="number">0x63</span>, <span class="number">0xcd</span>, <span class="number">0x6c</span>, <span class="number">0x55</span>, <span class="number">0x98</span>, <span class="number">0xc8</span>, <span class="number">0xae</span>, <span class="number">0x48</span>,
             <span class="number">0x11</span>, <span class="number">0xa1</span>, <span class="number">0xe0</span>, <span class="number">0xab</span>, <span class="number">0xc4</span>, <span class="number">0xc7</span>, <span class="number">0xe0</span>, <span class="number">0xb0</span>, <span class="number">0x82</span>, <span class="number">0xd6</span>, <span class="number">0x93</span>, <span class="number">0xa5</span>, <span class="number">0xe7</span>, <span class="number">0xfc</span>,
@@ -661,13 +661,13 @@
             <span class="number">0x76</span>, <span class="number">0x16</span>, <span class="number">0xd4</span>, <span class="number">0xf5</span>, <span class="number">0xba</span>, <span class="number">0x10</span>, <span class="number">0xd4</span>, <span class="number">0xcf</span>, <span class="number">0xd2</span>, <span class="number">0x26</span>, <span class="number">0xde</span>, <span class="number">0x88</span>, <span class="number">0xd3</span>, <span class="number">0x9f</span>,
             <span class="number">0x16</span>, <span class="number">0xfb</span>,
         ];
-        <span class="kw">let</span> <span class="ident">exponent</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0x01</span>, <span class="number">0x00</span>, <span class="number">0x01</span>];
+        <span class="kw">let </span>exponent = <span class="macro">vec!</span>[<span class="number">0x01</span>, <span class="number">0x00</span>, <span class="number">0x01</span>];
 
-        <span class="kw">let</span> <span class="ident">msg1</span> <span class="op">=</span> <span class="macro">vec!</span>[
+        <span class="kw">let </span>msg1 = <span class="macro">vec!</span>[
             <span class="number">0x66</span>, <span class="number">0x28</span>, <span class="number">0x19</span>, <span class="number">0x4e</span>, <span class="number">0x12</span>, <span class="number">0x07</span>, <span class="number">0x3d</span>, <span class="number">0xb0</span>, <span class="number">0x3b</span>, <span class="number">0xa9</span>, <span class="number">0x4c</span>, <span class="number">0xda</span>, <span class="number">0x9e</span>, <span class="number">0xf9</span>,
             <span class="number">0x53</span>, <span class="number">0x23</span>, <span class="number">0x97</span>, <span class="number">0xd5</span>, <span class="number">0x0d</span>, <span class="number">0xba</span>, <span class="number">0x79</span>, <span class="number">0xb9</span>, <span class="number">0x87</span>, <span class="number">0x00</span>, <span class="number">0x4a</span>, <span class="number">0xfe</span>, <span class="number">0xfe</span>, <span class="number">0x34</span>,
         ];
-        <span class="kw">let</span> <span class="ident">seed1</span> <span class="op">=</span> <span class="macro">vec!</span>[
+        <span class="kw">let </span>seed1 = <span class="macro">vec!</span>[
             <span class="number">0x01</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x73</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x41</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0xae</span>, <span class="number">0x00</span>,
             <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x38</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x75</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0xd5</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>,
             <span class="number">0xf8</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x71</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x01</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0xf8</span>, <span class="number">0x00</span>,
@@ -697,7 +697,7 @@
             <span class="number">0x84</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0xa9</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x54</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0xab</span>, <span class="number">0x00</span>,
             <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x3c</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x6f</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>,
         ];
-        <span class="kw">let</span> <span class="ident">cipher_text1</span> <span class="op">=</span> <span class="macro">vec!</span>[
+        <span class="kw">let </span>cipher_text1 = <span class="macro">vec!</span>[
             <span class="number">0x50</span>, <span class="number">0xb4</span>, <span class="number">0xc1</span>, <span class="number">0x41</span>, <span class="number">0x36</span>, <span class="number">0xbd</span>, <span class="number">0x19</span>, <span class="number">0x8c</span>, <span class="number">0x2f</span>, <span class="number">0x3c</span>, <span class="number">0x3e</span>, <span class="number">0xd2</span>, <span class="number">0x43</span>, <span class="number">0xfc</span>,
             <span class="number">0xe0</span>, <span class="number">0x36</span>, <span class="number">0xe1</span>, <span class="number">0x68</span>, <span class="number">0xd5</span>, <span class="number">0x65</span>, <span class="number">0x17</span>, <span class="number">0x98</span>, <span class="number">0x4a</span>, <span class="number">0x26</span>, <span class="number">0x3c</span>, <span class="number">0xd6</span>, <span class="number">0x64</span>, <span class="number">0x92</span>,
             <span class="number">0xb8</span>, <span class="number">0x08</span>, <span class="number">0x04</span>, <span class="number">0xf1</span>, <span class="number">0x69</span>, <span class="number">0xd2</span>, <span class="number">0x10</span>, <span class="number">0xf2</span>, <span class="number">0xb9</span>, <span class="number">0xbd</span>, <span class="number">0xfb</span>, <span class="number">0x48</span>, <span class="number">0xb1</span>, <span class="number">0x2f</span>,
@@ -710,21 +710,21 @@
             <span class="number">0x3c</span>, <span class="number">0x31</span>,
         ];
 
-        <span class="kw">let</span> <span class="ident">public_key</span> <span class="op">=</span> <span class="ident">PublicKey::new</span>(
-            <span class="ident">BigUint::from_bytes_be</span>(<span class="kw-2">&amp;</span><span class="ident">modulus</span>),
-            <span class="ident">BigUint::from_bytes_be</span>(<span class="kw-2">&amp;</span><span class="ident">exponent</span>),
+        <span class="kw">let </span>public_key = PublicKey::new(
+            BigUint::from_bytes_be(<span class="kw-2">&amp;</span>modulus),
+            BigUint::from_bytes_be(<span class="kw-2">&amp;</span>exponent),
         );
 
-        <span class="kw">let</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">Seed</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">seed1</span>);
-        <span class="kw">let</span> <span class="ident">pad</span> <span class="op">=</span> <span class="ident">Pkcs1Padding::new</span>(<span class="ident">rng</span>);
+        <span class="kw">let </span>rng = Seed(<span class="kw-2">&amp;*</span>seed1);
+        <span class="kw">let </span>pad = Pkcs1Padding::new(rng);
 
-        <span class="kw">let</span> <span class="ident">cipher_text</span> <span class="op">=</span> <span class="ident">public_key</span>.<span class="ident">encrypt_block</span>(<span class="ident">msg1</span>, <span class="ident">pad</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">cipher_text</span>, <span class="ident">cipher_text1</span>);
+        <span class="kw">let </span>cipher_text = public_key.encrypt_block(msg1, pad);
+        <span class="macro">assert_eq!</span>(cipher_text, cipher_text1);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">rsa_oaep</span>() {
-        <span class="kw">let</span> <span class="ident">modulus</span> <span class="op">=</span> <span class="macro">vec!</span>[
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>rsa_oaep() {
+        <span class="kw">let </span>modulus = <span class="macro">vec!</span>[
             <span class="number">0xbb</span>, <span class="number">0xf8</span>, <span class="number">0x2f</span>, <span class="number">0x09</span>, <span class="number">0x06</span>, <span class="number">0x82</span>, <span class="number">0xce</span>, <span class="number">0x9c</span>, <span class="number">0x23</span>, <span class="number">0x38</span>, <span class="number">0xac</span>, <span class="number">0x2b</span>, <span class="number">0x9d</span>, <span class="number">0xa8</span>,
             <span class="number">0x71</span>, <span class="number">0xf7</span>, <span class="number">0x36</span>, <span class="number">0x8d</span>, <span class="number">0x07</span>, <span class="number">0xee</span>, <span class="number">0xd4</span>, <span class="number">0x10</span>, <span class="number">0x43</span>, <span class="number">0xa4</span>, <span class="number">0x40</span>, <span class="number">0xd6</span>, <span class="number">0xb6</span>, <span class="number">0xf0</span>,
             <span class="number">0x74</span>, <span class="number">0x54</span>, <span class="number">0xf5</span>, <span class="number">0x1f</span>, <span class="number">0xb8</span>, <span class="number">0xdf</span>, <span class="number">0xba</span>, <span class="number">0xaf</span>, <span class="number">0x03</span>, <span class="number">0x5c</span>, <span class="number">0x02</span>, <span class="number">0xab</span>, <span class="number">0x61</span>, <span class="number">0xea</span>,
@@ -736,12 +736,12 @@
             <span class="number">0xe2</span>, <span class="number">0x53</span>, <span class="number">0x72</span>, <span class="number">0x98</span>, <span class="number">0xca</span>, <span class="number">0x2a</span>, <span class="number">0x8f</span>, <span class="number">0x59</span>, <span class="number">0x46</span>, <span class="number">0xf8</span>, <span class="number">0xe5</span>, <span class="number">0xfd</span>, <span class="number">0x09</span>, <span class="number">0x1d</span>,
             <span class="number">0xbd</span>, <span class="number">0xcb</span>,
         ];
-        <span class="kw">let</span> <span class="ident">exponent</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0x11</span>];
-        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">vec!</span>[
+        <span class="kw">let </span>exponent = <span class="macro">vec!</span>[<span class="number">0x11</span>];
+        <span class="kw">let </span>msg = <span class="macro">vec!</span>[
             <span class="number">0xd4</span>, <span class="number">0x36</span>, <span class="number">0xe9</span>, <span class="number">0x95</span>, <span class="number">0x69</span>, <span class="number">0xfd</span>, <span class="number">0x32</span>, <span class="number">0xa7</span>, <span class="number">0xc8</span>, <span class="number">0xa0</span>, <span class="number">0x5b</span>, <span class="number">0xbc</span>, <span class="number">0x90</span>, <span class="number">0xd3</span>,
             <span class="number">0x2c</span>, <span class="number">0x49</span>,
         ];
-        <span class="kw">let</span> <span class="ident">seed</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[
+        <span class="kw">let </span>seed: Vec&lt;u8&gt; = <span class="macro">vec!</span>[
             <span class="number">0xaa</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0xfd</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x12</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0xf6</span>, <span class="number">0x00</span>,
             <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x59</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0xca</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0xe6</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>,
             <span class="number">0x34</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x89</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0xb4</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x79</span>, <span class="number">0x00</span>,
@@ -749,7 +749,7 @@
             <span class="number">0xde</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0xc2</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0xf0</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x6c</span>, <span class="number">0x00</span>,
             <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0xb5</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x8f</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>,
         ];
-        <span class="kw">let</span> <span class="ident">correct_cipher_text</span> <span class="op">=</span> <span class="macro">vec!</span>[
+        <span class="kw">let </span>correct_cipher_text = <span class="macro">vec!</span>[
             <span class="number">0x12</span>, <span class="number">0x53</span>, <span class="number">0xe0</span>, <span class="number">0x4d</span>, <span class="number">0xc0</span>, <span class="number">0xa5</span>, <span class="number">0x39</span>, <span class="number">0x7b</span>, <span class="number">0xb4</span>, <span class="number">0x4a</span>, <span class="number">0x7a</span>, <span class="number">0xb8</span>, <span class="number">0x7e</span>, <span class="number">0x9b</span>,
             <span class="number">0xf2</span>, <span class="number">0xa0</span>, <span class="number">0x39</span>, <span class="number">0xa3</span>, <span class="number">0x3d</span>, <span class="number">0x1e</span>, <span class="number">0x99</span>, <span class="number">0x6f</span>, <span class="number">0xc8</span>, <span class="number">0x2a</span>, <span class="number">0x94</span>, <span class="number">0xcc</span>, <span class="number">0xd3</span>, <span class="number">0x00</span>,
             <span class="number">0x74</span>, <span class="number">0xc9</span>, <span class="number">0x5d</span>, <span class="number">0xf7</span>, <span class="number">0x63</span>, <span class="number">0x72</span>, <span class="number">0x20</span>, <span class="number">0x17</span>, <span class="number">0x06</span>, <span class="number">0x9e</span>, <span class="number">0x52</span>, <span class="number">0x68</span>, <span class="number">0xda</span>, <span class="number">0x5d</span>,
@@ -762,17 +762,17 @@
             <span class="number">0x09</span>, <span class="number">0x55</span>,
         ];
 
-        <span class="kw">let</span> <span class="ident">public_key</span> <span class="op">=</span> <span class="ident">PublicKey::new</span>(
-            <span class="ident">BigUint::from_bytes_be</span>(<span class="kw-2">&amp;</span><span class="ident">modulus</span>),
-            <span class="ident">BigUint::from_bytes_be</span>(<span class="kw-2">&amp;</span><span class="ident">exponent</span>),
+        <span class="kw">let </span>public_key = PublicKey::new(
+            BigUint::from_bytes_be(<span class="kw-2">&amp;</span>modulus),
+            BigUint::from_bytes_be(<span class="kw-2">&amp;</span>exponent),
         );
 
-        <span class="kw">let</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">Seed</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">seed</span>);
-        <span class="kw">let</span> <span class="ident">pad</span> <span class="op">=</span> <span class="ident">Pkcs1OaepPadding::new</span>(<span class="ident">rng</span>);
+        <span class="kw">let </span>rng = Seed(<span class="kw-2">&amp;*</span>seed);
+        <span class="kw">let </span>pad = Pkcs1OaepPadding::new(rng);
 
-        <span class="kw">let</span> <span class="ident">cipher_text</span> <span class="op">=</span> <span class="ident">public_key</span>.<span class="ident">encrypt_block</span>(<span class="ident">msg</span>, <span class="ident">pad</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">cipher_text</span>, <span class="ident">correct_cipher_text</span>);
+        <span class="kw">let </span>cipher_text = public_key.encrypt_block(msg, pad);
+        <span class="macro">assert_eq!</span>(cipher_text, correct_cipher_text);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

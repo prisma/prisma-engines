@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tiberius-0.11.2/src/tds/codec/token/token_row.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>token_row.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../tiberius/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tiberius-0.11.2/src/tds/codec/token/token_row.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>token_row.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../tiberius/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -196,203 +196,203 @@
 <span id="196">196</span>
 <span id="197">197</span>
 <span id="198">198</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">bytes_mut_with_data_columns</span>;
-<span class="kw">mod</span> <span class="ident">into_row</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tds::codec::encode::Encode</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">tds::codec::ColumnData</span>, <span class="ident">BytesMutWithTypeInfo</span>, <span class="ident">SqlReadBytes</span>, <span class="ident">TokenType</span>};
-<span class="kw">use</span> <span class="ident">bytes::BufMut</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">bytes_mut_with_data_columns::BytesMutWithDataColumns</span>;
-<span class="kw">use</span> <span class="ident">futures::io::AsyncReadExt</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">into_row::IntoRow</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>bytes_mut_with_data_columns;
+<span class="kw">mod </span>into_row;
+<span class="kw">use </span><span class="kw">crate</span>::tds::codec::encode::Encode;
+<span class="kw">use crate</span>::{tds::codec::ColumnData, BytesMutWithTypeInfo, SqlReadBytes, TokenType};
+<span class="kw">use </span>bytes::BufMut;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>bytes_mut_with_data_columns::BytesMutWithDataColumns;
+<span class="kw">use </span>futures::io::AsyncReadExt;
+<span class="kw">pub use </span>into_row::IntoRow;
 
-<span class="doccomment">/// A row of data.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TokenRow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ColumnData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A row of data.
+</span><span class="attribute">#[derive(Debug, Default, Clone)]
+</span><span class="kw">pub struct </span>TokenRow&lt;<span class="lifetime">&#39;a</span>&gt; {
+    data: Vec&lt;ColumnData&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="ident">TokenRow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">ColumnData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">std::vec::IntoIter</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IntoIterator <span class="kw">for </span>TokenRow&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Item = ColumnData&lt;<span class="lifetime">&#39;a</span>&gt;;
+    <span class="kw">type </span>IntoIter = std::vec::IntoIter&lt;<span class="self">Self</span>::Item&gt;;
 
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">into_iter</span>()
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+        <span class="self">self</span>.data.into_iter()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Encode</span><span class="op">&lt;</span><span class="ident">BytesMutWithDataColumns</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TokenRow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMutWithDataColumns</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">dst</span>.<span class="ident">put_u8</span>(<span class="ident">TokenType::Row</span> <span class="kw">as</span> <span class="ident">u8</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Encode&lt;BytesMutWithDataColumns&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>TokenRow&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>encode(<span class="self">self</span>, dst: <span class="kw-2">&amp;mut </span>BytesMutWithDataColumns&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+        dst.put_u8(TokenType::Row <span class="kw">as </span>u8);
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">dst</span>.<span class="ident">data_columns</span>().<span class="ident">len</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::BulkInput</span>(
+        <span class="kw">if </span><span class="self">self</span>.data.len() != dst.data_columns().len() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="kw">crate</span>::Error::BulkInput(
                 <span class="macro">format!</span>(
                     <span class="string">&quot;Expecting {} columns but {} were given&quot;</span>,
-                    <span class="ident">dst</span>.<span class="ident">data_columns</span>().<span class="ident">len</span>(),
-                    <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>()
+                    dst.data_columns().len(),
+                    <span class="self">self</span>.data.len()
                 )
-                .<span class="ident">into</span>(),
+                .into(),
             ));
         }
 
-        <span class="kw">for</span> (<span class="ident">value</span>, <span class="ident">column</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">into_iter</span>().<span class="ident">zip</span>(<span class="ident">dst</span>.<span class="ident">data_columns</span>()) {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dst_ti</span> <span class="op">=</span> <span class="ident">BytesMutWithTypeInfo::new</span>(<span class="ident">dst</span>).<span class="ident">with_type_info</span>(<span class="kw-2">&amp;</span><span class="ident">column</span>.<span class="ident">base</span>.<span class="ident">ty</span>);
-            <span class="ident">value</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">dst_ti</span>)<span class="question-mark">?</span>
-        }
+        <span class="kw">for </span>(value, column) <span class="kw">in </span><span class="self">self</span>.data.into_iter().zip(dst.data_columns()) {
+            <span class="kw">let </span><span class="kw-2">mut </span>dst_ti = BytesMutWithTypeInfo::new(dst).with_type_info(<span class="kw-2">&amp;</span>column.base.ty);
+            value.encode(<span class="kw-2">&amp;mut </span>dst_ti)<span class="question-mark">?
+        </span>}
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">TokenRow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Creates a new empty row.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">data</span>: <span class="ident">Vec::new</span>() }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TokenRow&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Creates a new empty row.
+    </span><span class="kw">pub const fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ data: Vec::new() }
     }
 
-    <span class="doccomment">/// Creates a new empty row with allocated capacity.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">capacity</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">data</span>: <span class="ident">Vec::with_capacity</span>(<span class="ident">capacity</span>),
+    <span class="doccomment">/// Creates a new empty row with allocated capacity.
+    </span><span class="kw">pub fn </span>with_capacity(<span class="kw-2">&amp;</span><span class="self">self</span>, capacity: usize) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            data: Vec::with_capacity(capacity),
         }
     }
 
-    <span class="doccomment">/// The number of columns.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>()
+    <span class="doccomment">/// The number of columns.
+    </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.data.len()
     }
 
-    <span class="doccomment">/// True if row has no columns.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">is_empty</span>()
+    <span class="doccomment">/// True if row has no columns.
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.data.is_empty()
     }
 
-    <span class="doccomment">/// Gets the columnar data with the given index. `None` if index out of</span>
-    <span class="doccomment">/// bounds.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ColumnData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">get</span>(<span class="ident">index</span>)
+    <span class="doccomment">/// Gets the columnar data with the given index. `None` if index out of
+    /// bounds.
+    </span><span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, index: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ColumnData&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="self">self</span>.data.get(index)
     }
 
-    <span class="doccomment">/// Adds a new value to the row.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">ColumnData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">push</span>(<span class="ident">value</span>);
+    <span class="doccomment">/// Adds a new value to the row.
+    </span><span class="kw">pub fn </span>push(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: ColumnData&lt;<span class="lifetime">&#39;a</span>&gt;) {
+        <span class="self">self</span>.data.push(value);
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TokenRow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Normal row. We&#39;ll read the metadata what we&#39;ve cached and parse columns</span>
-    <span class="doccomment">/// based on that.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decode</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">src</span>: <span class="kw-2">&amp;mut</span> <span class="ident">R</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">R</span>: <span class="ident">SqlReadBytes</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+<span class="kw">impl </span>TokenRow&lt;<span class="lifetime">&#39;static</span>&gt; {
+    <span class="doccomment">/// Normal row. We&#39;ll read the metadata what we&#39;ve cached and parse columns
+    /// based on that.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>decode&lt;R&gt;(src: <span class="kw-2">&amp;mut </span>R) -&gt; <span class="kw">crate</span>::Result&lt;<span class="self">Self</span>&gt;
+    <span class="kw">where
+        </span>R: SqlReadBytes + Unpin,
     {
-        <span class="kw">let</span> <span class="ident">col_meta</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">context</span>().<span class="ident">last_meta</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let </span>col_meta = src.context().last_meta().unwrap();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">row</span> <span class="op">=</span> <span class="self">Self</span> {
-            <span class="ident">data</span>: <span class="ident">Vec::with_capacity</span>(<span class="ident">col_meta</span>.<span class="ident">columns</span>.<span class="ident">len</span>()),
+        <span class="kw">let </span><span class="kw-2">mut </span>row = <span class="self">Self </span>{
+            data: Vec::with_capacity(col_meta.columns.len()),
         };
 
-        <span class="kw">for</span> <span class="ident">column</span> <span class="kw">in</span> <span class="ident">col_meta</span>.<span class="ident">columns</span>.<span class="ident">iter</span>() {
-            <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">ColumnData::decode</span>(<span class="ident">src</span>, <span class="kw-2">&amp;</span><span class="ident">column</span>.<span class="ident">base</span>.<span class="ident">ty</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="ident">row</span>.<span class="ident">data</span>.<span class="ident">push</span>(<span class="ident">data</span>);
+        <span class="kw">for </span>column <span class="kw">in </span>col_meta.columns.iter() {
+            <span class="kw">let </span>data = ColumnData::decode(src, <span class="kw-2">&amp;</span>column.base.ty).<span class="kw">await</span><span class="question-mark">?</span>;
+            row.data.push(data);
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">row</span>)
+        <span class="prelude-val">Ok</span>(row)
     }
 
-    <span class="doccomment">/// SQL Server has packed nulls on this row type. We&#39;ll read what columns</span>
-    <span class="doccomment">/// are null from the bitmap.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decode_nbc</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">src</span>: <span class="kw-2">&amp;mut</span> <span class="ident">R</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">R</span>: <span class="ident">SqlReadBytes</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+    <span class="doccomment">/// SQL Server has packed nulls on this row type. We&#39;ll read what columns
+    /// are null from the bitmap.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>decode_nbc&lt;R&gt;(src: <span class="kw-2">&amp;mut </span>R) -&gt; <span class="kw">crate</span>::Result&lt;<span class="self">Self</span>&gt;
+    <span class="kw">where
+        </span>R: SqlReadBytes + Unpin,
     {
-        <span class="kw">let</span> <span class="ident">col_meta</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">context</span>().<span class="ident">last_meta</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">row_bitmap</span> <span class="op">=</span> <span class="ident">RowBitmap::decode</span>(<span class="ident">src</span>, <span class="ident">col_meta</span>.<span class="ident">columns</span>.<span class="ident">len</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>col_meta = src.context().last_meta().unwrap();
+        <span class="kw">let </span>row_bitmap = RowBitmap::decode(src, col_meta.columns.len()).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">row</span> <span class="op">=</span> <span class="self">Self</span> {
-            <span class="ident">data</span>: <span class="ident">Vec::with_capacity</span>(<span class="ident">col_meta</span>.<span class="ident">columns</span>.<span class="ident">len</span>()),
+        <span class="kw">let </span><span class="kw-2">mut </span>row = <span class="self">Self </span>{
+            data: Vec::with_capacity(col_meta.columns.len()),
         };
 
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">column</span>) <span class="kw">in</span> <span class="ident">col_meta</span>.<span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">row_bitmap</span>.<span class="ident">is_null</span>(<span class="ident">i</span>) {
-                <span class="ident">column</span>.<span class="ident">base</span>.<span class="ident">null_value</span>()
-            } <span class="kw">else</span> {
-                <span class="ident">ColumnData::decode</span>(<span class="ident">src</span>, <span class="kw-2">&amp;</span><span class="ident">column</span>.<span class="ident">base</span>.<span class="ident">ty</span>).<span class="kw">await</span><span class="question-mark">?</span>
-            };
+        <span class="kw">for </span>(i, column) <span class="kw">in </span>col_meta.columns.iter().enumerate() {
+            <span class="kw">let </span>data = <span class="kw">if </span>row_bitmap.is_null(i) {
+                column.base.null_value()
+            } <span class="kw">else </span>{
+                ColumnData::decode(src, <span class="kw-2">&amp;</span>column.base.ty).<span class="kw">await</span><span class="question-mark">?
+            </span>};
 
-            <span class="ident">row</span>.<span class="ident">data</span>.<span class="ident">push</span>(<span class="ident">data</span>);
+            row.data.push(data);
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">row</span>)
+        <span class="prelude-val">Ok</span>(row)
     }
 }
 
-<span class="doccomment">/// A bitmap of null values in the row. Sometimes SQL Server decides to pack the</span>
-<span class="doccomment">/// null values in the row, calling it the NBCROW. In this kind of tokens the row</span>
-<span class="doccomment">/// itself skips the null columns completely, but they can be found from the bitmap</span>
-<span class="doccomment">/// stored in the beginning of the token.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// One byte can store eight bits of information. Bits with value of one being null.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If our row has eight columns, and our byte in bits is:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```ignore</span>
-<span class="doccomment">/// 1 0 0 1 0 1 0 0</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This would mean columns 0, 3 and 5 are null and should not be parsed at all.</span>
-<span class="doccomment">/// For more than eight columns, more bits need to be reserved for the bitmap</span>
-<span class="doccomment">/// (see the size calculation).</span>
-<span class="kw">struct</span> <span class="ident">RowBitmap</span> {
-    <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A bitmap of null values in the row. Sometimes SQL Server decides to pack the
+/// null values in the row, calling it the NBCROW. In this kind of tokens the row
+/// itself skips the null columns completely, but they can be found from the bitmap
+/// stored in the beginning of the token.
+///
+/// One byte can store eight bits of information. Bits with value of one being null.
+///
+/// If our row has eight columns, and our byte in bits is:
+///
+/// ```ignore
+/// 1 0 0 1 0 1 0 0
+/// ```
+///
+/// This would mean columns 0, 3 and 5 are null and should not be parsed at all.
+/// For more than eight columns, more bits need to be reserved for the bitmap
+/// (see the size calculation).
+</span><span class="kw">struct </span>RowBitmap {
+    data: Vec&lt;u8&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">RowBitmap</span> {
-    <span class="doccomment">/// Is the given column index null or not.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_null</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">i</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">i</span> <span class="op">/</span> <span class="number">8</span>;
-        <span class="kw">let</span> <span class="ident">bit</span> <span class="op">=</span> <span class="ident">i</span> <span class="op">%</span> <span class="number">8</span>;
+<span class="kw">impl </span>RowBitmap {
+    <span class="doccomment">/// Is the given column index null or not.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_null(<span class="kw-2">&amp;</span><span class="self">self</span>, i: usize) -&gt; bool {
+        <span class="kw">let </span>index = i / <span class="number">8</span>;
+        <span class="kw">let </span>bit = i % <span class="number">8</span>;
 
-        <span class="self">self</span>.<span class="ident">data</span>[<span class="ident">index</span>] <span class="op">&amp;</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">bit</span>) <span class="op">&gt;</span> <span class="number">0</span>
-    }
+        <span class="self">self</span>.data[index] &amp; (<span class="number">1 </span>&lt;&lt; bit) &gt; <span class="number">0
+    </span>}
 
-    <span class="doccomment">/// Decode the bitmap data from the beginning of the row. Only doable if the</span>
-    <span class="doccomment">/// type is `NbcRowToken`.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decode</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">src</span>: <span class="kw-2">&amp;mut</span> <span class="ident">R</span>, <span class="ident">columns</span>: <span class="ident">usize</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">R</span>: <span class="ident">SqlReadBytes</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+    <span class="doccomment">/// Decode the bitmap data from the beginning of the row. Only doable if the
+    /// type is `NbcRowToken`.
+    </span><span class="kw">async fn </span>decode&lt;R&gt;(src: <span class="kw-2">&amp;mut </span>R, columns: usize) -&gt; <span class="kw">crate</span>::Result&lt;<span class="self">Self</span>&gt;
+    <span class="kw">where
+        </span>R: SqlReadBytes + Unpin,
     {
-        <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> (<span class="ident">columns</span> <span class="op">+</span> <span class="number">8</span> <span class="op">-</span> <span class="number">1</span>) <span class="op">/</span> <span class="number">8</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">size</span>];
-        <span class="ident">src</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">data</span>[<span class="number">0</span>..<span class="ident">size</span>]).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>size = (columns + <span class="number">8 </span>- <span class="number">1</span>) / <span class="number">8</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>data = <span class="macro">vec!</span>[<span class="number">0</span>; size];
+        src.read_exact(<span class="kw-2">&amp;mut </span>data[<span class="number">0</span>..size]).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> { <span class="ident">data</span> })
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{ data })
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">BaseMetaDataColumn</span>, <span class="ident">ColumnFlag</span>, <span class="ident">FixedLenType</span>, <span class="ident">MetaDataColumn</span>, <span class="ident">TypeInfo</span>};
-    <span class="kw">use</span> <span class="ident">bytes::BytesMut</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use crate</span>::{BaseMetaDataColumn, ColumnFlag, FixedLenType, MetaDataColumn, TypeInfo};
+    <span class="kw">use </span>bytes::BytesMut;
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">wrong_number_of_columns_will_fail</span>() {
-        <span class="kw">let</span> <span class="ident">row</span> <span class="op">=</span> (<span class="bool-val">true</span>, <span class="number">5</span>).<span class="ident">into_row</span>();
-        <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">MetaDataColumn</span> {
-            <span class="ident">base</span>: <span class="ident">BaseMetaDataColumn</span> {
-                <span class="ident">flags</span>: <span class="ident">ColumnFlag::Nullable</span>.<span class="ident">into</span>(),
-                <span class="ident">ty</span>: <span class="ident">TypeInfo::FixedLen</span>(<span class="ident">FixedLenType::Bit</span>),
+    <span class="attribute">#[tokio::test]
+    </span><span class="kw">async fn </span>wrong_number_of_columns_will_fail() {
+        <span class="kw">let </span>row = (<span class="bool-val">true</span>, <span class="number">5</span>).into_row();
+        <span class="kw">let </span>columns = <span class="macro">vec!</span>[MetaDataColumn {
+            base: BaseMetaDataColumn {
+                flags: ColumnFlag::Nullable.into(),
+                ty: TypeInfo::FixedLen(FixedLenType::Bit),
             },
-            <span class="ident">col_name</span>: <span class="ident">Default::default</span>(),
+            col_name: Default::default(),
         }];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">BytesMut::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf_with_columns</span> <span class="op">=</span> <span class="ident">BytesMutWithDataColumns::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>, <span class="kw-2">&amp;</span><span class="ident">columns</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>buf = BytesMut::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>buf_with_columns = BytesMutWithDataColumns::new(<span class="kw-2">&amp;mut </span>buf, <span class="kw-2">&amp;</span>columns);
 
-        <span class="ident">row</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf_with_columns</span>)
-            .<span class="ident">expect_err</span>(<span class="string">&quot;wrong number of columns&quot;</span>);
+        row.encode(<span class="kw-2">&amp;mut </span>buf_with_columns)
+            .expect_err(<span class="string">&quot;wrong number of columns&quot;</span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="tiberius" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="tiberius" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

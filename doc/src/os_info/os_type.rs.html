@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/os_info-3.5.0/src/os_type.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>os_type.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../os_info/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../os_info/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../os_info/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/os_info-3.5.0/src/os_type.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>os_type.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../os_info/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../os_info/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../os_info/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -160,167 +160,167 @@
 <span id="160">160</span>
 <span id="161">161</span>
 <span id="162">162</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="self">self</span>, <span class="ident">Display</span>, <span class="ident">Formatter</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>std::fmt::{<span class="self">self</span>, Display, Formatter};
 
-<span class="doccomment">/// A list of supported operating system types.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">serde::Serialize</span>, <span class="ident">serde::Deserialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>, <span class="ident">clippy::upper_case_acronyms</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Type</span> {
-    <span class="doccomment">/// Alpine Linux (&lt;https://en.wikipedia.org/wiki/Alpine_Linux&gt;).</span>
-    <span class="ident">Alpine</span>,
-    <span class="doccomment">/// Amazon Linux AMI (&lt;https://en.wikipedia.org/wiki/Amazon_Machine_Image#Amazon_Linux_AMI&gt;).</span>
-    <span class="ident">Amazon</span>,
-    <span class="doccomment">/// Android (&lt;https://en.wikipedia.org/wiki/Android_(operating_system)&gt;).</span>
-    <span class="ident">Android</span>,
-    <span class="doccomment">/// Arch Linux (&lt;https://en.wikipedia.org/wiki/Arch_Linux&gt;).</span>
-    <span class="ident">Arch</span>,
-    <span class="doccomment">/// CentOS (&lt;https://en.wikipedia.org/wiki/CentOS&gt;).</span>
-    <span class="ident">CentOS</span>,
-    <span class="doccomment">/// Debian (&lt;https://en.wikipedia.org/wiki/Debian&gt;).</span>
-    <span class="ident">Debian</span>,
-    <span class="doccomment">/// DragonFly BSD (&lt;https://en.wikipedia.org/wiki/DragonFly_BSD&gt;).</span>
-    <span class="ident">DragonFly</span>,
-    <span class="doccomment">/// Emscripten (&lt;https://en.wikipedia.org/wiki/Emscripten&gt;).</span>
-    <span class="ident">Emscripten</span>,
-    <span class="doccomment">/// EndeavourOS (&lt;https://en.wikipedia.org/wiki/EndeavourOS&gt;).</span>
-    <span class="ident">EndeavourOS</span>,
-    <span class="doccomment">/// Fedora (&lt;https://en.wikipedia.org/wiki/Fedora_(operating_system)&gt;).</span>
-    <span class="ident">Fedora</span>,
-    <span class="doccomment">/// FreeBSD (&lt;https://en.wikipedia.org/wiki/FreeBSD&gt;).</span>
-    <span class="ident">FreeBSD</span>,
-    <span class="doccomment">/// Garuda Linux (&lt;https://en.wikipedia.org/wiki/Garuda_Linux&gt;)</span>
-    <span class="ident">Garuda</span>,
-    <span class="doccomment">/// Gentoo Linux (&lt;https://en.wikipedia.org/wiki/Gentoo_Linux&gt;).</span>
-    <span class="ident">Gentoo</span>,
-    <span class="doccomment">/// HardenedBSD (https://hardenedbsd.org/).</span>
-    <span class="ident">HardenedBSD</span>,
-    <span class="doccomment">/// Illumos (https://en.wikipedia.org/wiki/Illumos).</span>
-    <span class="ident">Illumos</span>,
-    <span class="doccomment">/// Linux based operating system (&lt;https://en.wikipedia.org/wiki/Linux&gt;).</span>
-    <span class="ident">Linux</span>,
-    <span class="doccomment">/// Mac OS X/OS X/macOS (&lt;https://en.wikipedia.org/wiki/MacOS&gt;).</span>
-    <span class="ident">Macos</span>,
-    <span class="doccomment">/// Manjaro (&lt;https://en.wikipedia.org/wiki/Manjaro&gt;).</span>
-    <span class="ident">Manjaro</span>,
-    <span class="doccomment">/// Mariner (&lt;https://en.wikipedia.org/wiki/CBL-Mariner&gt;).</span>
-    <span class="ident">Mariner</span>,
-    <span class="doccomment">/// MidnightBSD (&lt;https://en.wikipedia.org/wiki/MidnightBSD&gt;).</span>
-    <span class="ident">MidnightBSD</span>,
-    <span class="doccomment">/// Mint (&lt;https://en.wikipedia.org/wiki/Linux_Mint&gt;).</span>
-    <span class="ident">Mint</span>,
-    <span class="doccomment">/// NetBSD (&lt;https://en.wikipedia.org/wiki/NetBSD&gt;).</span>
-    <span class="ident">NetBSD</span>,
-    <span class="doccomment">/// NixOS (&lt;https://en.wikipedia.org/wiki/NixOS&gt;).</span>
-    <span class="ident">NixOS</span>,
-    <span class="doccomment">/// OpenBSD (&lt;https://en.wikipedia.org/wiki/OpenBSD&gt;).</span>
-    <span class="ident">OpenBSD</span>,
-    <span class="doccomment">/// openSUSE (&lt;https://en.wikipedia.org/wiki/OpenSUSE&gt;).</span>
-    <span class="ident">openSUSE</span>,
-    <span class="doccomment">/// Oracle Linux (&lt;https://en.wikipedia.org/wiki/Oracle_Linux&gt;).</span>
-    <span class="ident">OracleLinux</span>,
-    <span class="doccomment">/// Pop!_OS (&lt;https://en.wikipedia.org/wiki/Pop!_OS&gt;)</span>
-    <span class="ident">Pop</span>,
-    <span class="doccomment">/// Raspberry Pi OS (&lt;https://en.wikipedia.org/wiki/Raspberry_Pi_OS&gt;).</span>
-    <span class="ident">Raspbian</span>,
-    <span class="doccomment">/// Red Hat Linux (&lt;https://en.wikipedia.org/wiki/Red_Hat_Linux&gt;).</span>
-    <span class="ident">Redhat</span>,
-    <span class="doccomment">/// Red Hat Enterprise Linux (&lt;https://en.wikipedia.org/wiki/Red_Hat_Enterprise_Linux&gt;).</span>
-    <span class="ident">RedHatEnterprise</span>,
-    <span class="doccomment">/// Redox (&lt;https://en.wikipedia.org/wiki/Redox_(operating_system)&gt;).</span>
-    <span class="ident">Redox</span>,
-    <span class="doccomment">/// Solus (&lt;https://en.wikipedia.org/wiki/Solus_(operating_system)&gt;).</span>
-    <span class="ident">Solus</span>,
-    <span class="doccomment">/// SUSE Linux Enterprise Server (&lt;https://en.wikipedia.org/wiki/SUSE_Linux_Enterprise&gt;).</span>
-    <span class="ident">SUSE</span>,
-    <span class="doccomment">/// Ubuntu (&lt;https://en.wikipedia.org/wiki/Ubuntu_(operating_system)&gt;).</span>
-    <span class="ident">Ubuntu</span>,
-    <span class="doccomment">/// Unknown operating system.</span>
-    <span class="ident">Unknown</span>,
-    <span class="doccomment">/// Windows (&lt;https://en.wikipedia.org/wiki/Microsoft_Windows&gt;).</span>
-    <span class="ident">Windows</span>,
+<span class="doccomment">/// A list of supported operating system types.
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serde&quot;</span>, derive(serde::Serialize, serde::Deserialize))]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[allow(non_camel_case_types, clippy::upper_case_acronyms)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>Type {
+    <span class="doccomment">/// Alpine Linux (&lt;https://en.wikipedia.org/wiki/Alpine_Linux&gt;).
+    </span>Alpine,
+    <span class="doccomment">/// Amazon Linux AMI (&lt;https://en.wikipedia.org/wiki/Amazon_Machine_Image#Amazon_Linux_AMI&gt;).
+    </span>Amazon,
+    <span class="doccomment">/// Android (&lt;https://en.wikipedia.org/wiki/Android_(operating_system)&gt;).
+    </span>Android,
+    <span class="doccomment">/// Arch Linux (&lt;https://en.wikipedia.org/wiki/Arch_Linux&gt;).
+    </span>Arch,
+    <span class="doccomment">/// CentOS (&lt;https://en.wikipedia.org/wiki/CentOS&gt;).
+    </span>CentOS,
+    <span class="doccomment">/// Debian (&lt;https://en.wikipedia.org/wiki/Debian&gt;).
+    </span>Debian,
+    <span class="doccomment">/// DragonFly BSD (&lt;https://en.wikipedia.org/wiki/DragonFly_BSD&gt;).
+    </span>DragonFly,
+    <span class="doccomment">/// Emscripten (&lt;https://en.wikipedia.org/wiki/Emscripten&gt;).
+    </span>Emscripten,
+    <span class="doccomment">/// EndeavourOS (&lt;https://en.wikipedia.org/wiki/EndeavourOS&gt;).
+    </span>EndeavourOS,
+    <span class="doccomment">/// Fedora (&lt;https://en.wikipedia.org/wiki/Fedora_(operating_system)&gt;).
+    </span>Fedora,
+    <span class="doccomment">/// FreeBSD (&lt;https://en.wikipedia.org/wiki/FreeBSD&gt;).
+    </span>FreeBSD,
+    <span class="doccomment">/// Garuda Linux (&lt;https://en.wikipedia.org/wiki/Garuda_Linux&gt;)
+    </span>Garuda,
+    <span class="doccomment">/// Gentoo Linux (&lt;https://en.wikipedia.org/wiki/Gentoo_Linux&gt;).
+    </span>Gentoo,
+    <span class="doccomment">/// HardenedBSD (https://hardenedbsd.org/).
+    </span>HardenedBSD,
+    <span class="doccomment">/// Illumos (https://en.wikipedia.org/wiki/Illumos).
+    </span>Illumos,
+    <span class="doccomment">/// Linux based operating system (&lt;https://en.wikipedia.org/wiki/Linux&gt;).
+    </span>Linux,
+    <span class="doccomment">/// Mac OS X/OS X/macOS (&lt;https://en.wikipedia.org/wiki/MacOS&gt;).
+    </span>Macos,
+    <span class="doccomment">/// Manjaro (&lt;https://en.wikipedia.org/wiki/Manjaro&gt;).
+    </span>Manjaro,
+    <span class="doccomment">/// Mariner (&lt;https://en.wikipedia.org/wiki/CBL-Mariner&gt;).
+    </span>Mariner,
+    <span class="doccomment">/// MidnightBSD (&lt;https://en.wikipedia.org/wiki/MidnightBSD&gt;).
+    </span>MidnightBSD,
+    <span class="doccomment">/// Mint (&lt;https://en.wikipedia.org/wiki/Linux_Mint&gt;).
+    </span>Mint,
+    <span class="doccomment">/// NetBSD (&lt;https://en.wikipedia.org/wiki/NetBSD&gt;).
+    </span>NetBSD,
+    <span class="doccomment">/// NixOS (&lt;https://en.wikipedia.org/wiki/NixOS&gt;).
+    </span>NixOS,
+    <span class="doccomment">/// OpenBSD (&lt;https://en.wikipedia.org/wiki/OpenBSD&gt;).
+    </span>OpenBSD,
+    <span class="doccomment">/// openSUSE (&lt;https://en.wikipedia.org/wiki/OpenSUSE&gt;).
+    </span>openSUSE,
+    <span class="doccomment">/// Oracle Linux (&lt;https://en.wikipedia.org/wiki/Oracle_Linux&gt;).
+    </span>OracleLinux,
+    <span class="doccomment">/// Pop!_OS (&lt;https://en.wikipedia.org/wiki/Pop!_OS&gt;)
+    </span>Pop,
+    <span class="doccomment">/// Raspberry Pi OS (&lt;https://en.wikipedia.org/wiki/Raspberry_Pi_OS&gt;).
+    </span>Raspbian,
+    <span class="doccomment">/// Red Hat Linux (&lt;https://en.wikipedia.org/wiki/Red_Hat_Linux&gt;).
+    </span>Redhat,
+    <span class="doccomment">/// Red Hat Enterprise Linux (&lt;https://en.wikipedia.org/wiki/Red_Hat_Enterprise_Linux&gt;).
+    </span>RedHatEnterprise,
+    <span class="doccomment">/// Redox (&lt;https://en.wikipedia.org/wiki/Redox_(operating_system)&gt;).
+    </span>Redox,
+    <span class="doccomment">/// Solus (&lt;https://en.wikipedia.org/wiki/Solus_(operating_system)&gt;).
+    </span>Solus,
+    <span class="doccomment">/// SUSE Linux Enterprise Server (&lt;https://en.wikipedia.org/wiki/SUSE_Linux_Enterprise&gt;).
+    </span>SUSE,
+    <span class="doccomment">/// Ubuntu (&lt;https://en.wikipedia.org/wiki/Ubuntu_(operating_system)&gt;).
+    </span>Ubuntu,
+    <span class="doccomment">/// Unknown operating system.
+    </span>Unknown,
+    <span class="doccomment">/// Windows (&lt;https://en.wikipedia.org/wiki/Microsoft_Windows&gt;).
+    </span>Windows,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Type</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">Type::Unknown</span>
+<span class="kw">impl </span>Default <span class="kw">for </span>Type {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        Type::Unknown
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Type</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Type::Alpine</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Alpine Linux&quot;</span>),
-            <span class="ident">Type::Amazon</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Amazon Linux AMI&quot;</span>),
-            <span class="ident">Type::Arch</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Arch Linux&quot;</span>),
-            <span class="ident">Type::DragonFly</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;DragonFly BSD&quot;</span>),
-            <span class="ident">Type::Garuda</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Garuda Linux&quot;</span>),
-            <span class="ident">Type::Gentoo</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Gentoo Linux&quot;</span>),
-            <span class="ident">Type::Illumos</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;illumos&quot;</span>),
-            <span class="ident">Type::Macos</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Mac OS&quot;</span>),
-            <span class="ident">Type::MidnightBSD</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Midnight BSD&quot;</span>),
-            <span class="ident">Type::Mint</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Linux Mint&quot;</span>),
-            <span class="ident">Type::Pop</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Pop!_OS&quot;</span>),
-            <span class="ident">Type::Raspbian</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Raspberry Pi OS&quot;</span>),
-            <span class="ident">Type::Redhat</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Red Hat Linux&quot;</span>),
-            <span class="ident">Type::RedHatEnterprise</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Red Hat Enterprise Linux&quot;</span>),
-            <span class="ident">Type::SUSE</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;SUSE Linux Enterprise Server&quot;</span>),
-            <span class="kw">_</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{:?}&quot;</span>, <span class="self">self</span>),
+<span class="kw">impl </span>Display <span class="kw">for </span>Type {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Type::Alpine =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Alpine Linux&quot;</span>),
+            Type::Amazon =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Amazon Linux AMI&quot;</span>),
+            Type::Arch =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Arch Linux&quot;</span>),
+            Type::DragonFly =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;DragonFly BSD&quot;</span>),
+            Type::Garuda =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Garuda Linux&quot;</span>),
+            Type::Gentoo =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Gentoo Linux&quot;</span>),
+            Type::Illumos =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;illumos&quot;</span>),
+            Type::Macos =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Mac OS&quot;</span>),
+            Type::MidnightBSD =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Midnight BSD&quot;</span>),
+            Type::Mint =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Linux Mint&quot;</span>),
+            Type::Pop =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Pop!_OS&quot;</span>),
+            Type::Raspbian =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Raspberry Pi OS&quot;</span>),
+            Type::Redhat =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Red Hat Linux&quot;</span>),
+            Type::RedHatEnterprise =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Red Hat Enterprise Linux&quot;</span>),
+            Type::SUSE =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;SUSE Linux Enterprise Server&quot;</span>),
+            <span class="kw">_ </span>=&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{:?}&quot;</span>, <span class="self">self</span>),
         }
     }
 }
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">pretty_assertions::assert_eq</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>pretty_assertions::assert_eq;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">Type::Unknown</span>, <span class="ident">Type::default</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>default() {
+        <span class="macro">assert_eq!</span>(Type::Unknown, Type::default());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">display</span>() {
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> [
-            (<span class="ident">Type::Alpine</span>, <span class="string">&quot;Alpine Linux&quot;</span>),
-            (<span class="ident">Type::Amazon</span>, <span class="string">&quot;Amazon Linux AMI&quot;</span>),
-            (<span class="ident">Type::Android</span>, <span class="string">&quot;Android&quot;</span>),
-            (<span class="ident">Type::Arch</span>, <span class="string">&quot;Arch Linux&quot;</span>),
-            (<span class="ident">Type::CentOS</span>, <span class="string">&quot;CentOS&quot;</span>),
-            (<span class="ident">Type::Debian</span>, <span class="string">&quot;Debian&quot;</span>),
-            (<span class="ident">Type::DragonFly</span>, <span class="string">&quot;DragonFly BSD&quot;</span>),
-            (<span class="ident">Type::Emscripten</span>, <span class="string">&quot;Emscripten&quot;</span>),
-            (<span class="ident">Type::EndeavourOS</span>, <span class="string">&quot;EndeavourOS&quot;</span>),
-            (<span class="ident">Type::Fedora</span>, <span class="string">&quot;Fedora&quot;</span>),
-            (<span class="ident">Type::Garuda</span>, <span class="string">&quot;Garuda Linux&quot;</span>),
-            (<span class="ident">Type::Gentoo</span>, <span class="string">&quot;Gentoo Linux&quot;</span>),
-            (<span class="ident">Type::FreeBSD</span>, <span class="string">&quot;FreeBSD&quot;</span>),
-            (<span class="ident">Type::Linux</span>, <span class="string">&quot;Linux&quot;</span>),
-            (<span class="ident">Type::Macos</span>, <span class="string">&quot;Mac OS&quot;</span>),
-            (<span class="ident">Type::Manjaro</span>, <span class="string">&quot;Manjaro&quot;</span>),
-            (<span class="ident">Type::Mint</span>, <span class="string">&quot;Linux Mint&quot;</span>),
-            (<span class="ident">Type::NetBSD</span>, <span class="string">&quot;NetBSD&quot;</span>),
-            (<span class="ident">Type::NixOS</span>, <span class="string">&quot;NixOS&quot;</span>),
-            (<span class="ident">Type::OpenBSD</span>, <span class="string">&quot;OpenBSD&quot;</span>),
-            (<span class="ident">Type::openSUSE</span>, <span class="string">&quot;openSUSE&quot;</span>),
-            (<span class="ident">Type::OracleLinux</span>, <span class="string">&quot;OracleLinux&quot;</span>),
-            (<span class="ident">Type::Pop</span>, <span class="string">&quot;Pop!_OS&quot;</span>),
-            (<span class="ident">Type::Raspbian</span>, <span class="string">&quot;Raspberry Pi OS&quot;</span>),
-            (<span class="ident">Type::Redhat</span>, <span class="string">&quot;Red Hat Linux&quot;</span>),
-            (<span class="ident">Type::RedHatEnterprise</span>, <span class="string">&quot;Red Hat Enterprise Linux&quot;</span>),
-            (<span class="ident">Type::Redox</span>, <span class="string">&quot;Redox&quot;</span>),
-            (<span class="ident">Type::Solus</span>, <span class="string">&quot;Solus&quot;</span>),
-            (<span class="ident">Type::SUSE</span>, <span class="string">&quot;SUSE Linux Enterprise Server&quot;</span>),
-            (<span class="ident">Type::Ubuntu</span>, <span class="string">&quot;Ubuntu&quot;</span>),
-            (<span class="ident">Type::Unknown</span>, <span class="string">&quot;Unknown&quot;</span>),
-            (<span class="ident">Type::Windows</span>, <span class="string">&quot;Windows&quot;</span>),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>display() {
+        <span class="kw">let </span>data = [
+            (Type::Alpine, <span class="string">&quot;Alpine Linux&quot;</span>),
+            (Type::Amazon, <span class="string">&quot;Amazon Linux AMI&quot;</span>),
+            (Type::Android, <span class="string">&quot;Android&quot;</span>),
+            (Type::Arch, <span class="string">&quot;Arch Linux&quot;</span>),
+            (Type::CentOS, <span class="string">&quot;CentOS&quot;</span>),
+            (Type::Debian, <span class="string">&quot;Debian&quot;</span>),
+            (Type::DragonFly, <span class="string">&quot;DragonFly BSD&quot;</span>),
+            (Type::Emscripten, <span class="string">&quot;Emscripten&quot;</span>),
+            (Type::EndeavourOS, <span class="string">&quot;EndeavourOS&quot;</span>),
+            (Type::Fedora, <span class="string">&quot;Fedora&quot;</span>),
+            (Type::Garuda, <span class="string">&quot;Garuda Linux&quot;</span>),
+            (Type::Gentoo, <span class="string">&quot;Gentoo Linux&quot;</span>),
+            (Type::FreeBSD, <span class="string">&quot;FreeBSD&quot;</span>),
+            (Type::Linux, <span class="string">&quot;Linux&quot;</span>),
+            (Type::Macos, <span class="string">&quot;Mac OS&quot;</span>),
+            (Type::Manjaro, <span class="string">&quot;Manjaro&quot;</span>),
+            (Type::Mint, <span class="string">&quot;Linux Mint&quot;</span>),
+            (Type::NetBSD, <span class="string">&quot;NetBSD&quot;</span>),
+            (Type::NixOS, <span class="string">&quot;NixOS&quot;</span>),
+            (Type::OpenBSD, <span class="string">&quot;OpenBSD&quot;</span>),
+            (Type::openSUSE, <span class="string">&quot;openSUSE&quot;</span>),
+            (Type::OracleLinux, <span class="string">&quot;OracleLinux&quot;</span>),
+            (Type::Pop, <span class="string">&quot;Pop!_OS&quot;</span>),
+            (Type::Raspbian, <span class="string">&quot;Raspberry Pi OS&quot;</span>),
+            (Type::Redhat, <span class="string">&quot;Red Hat Linux&quot;</span>),
+            (Type::RedHatEnterprise, <span class="string">&quot;Red Hat Enterprise Linux&quot;</span>),
+            (Type::Redox, <span class="string">&quot;Redox&quot;</span>),
+            (Type::Solus, <span class="string">&quot;Solus&quot;</span>),
+            (Type::SUSE, <span class="string">&quot;SUSE Linux Enterprise Server&quot;</span>),
+            (Type::Ubuntu, <span class="string">&quot;Ubuntu&quot;</span>),
+            (Type::Unknown, <span class="string">&quot;Unknown&quot;</span>),
+            (Type::Windows, <span class="string">&quot;Windows&quot;</span>),
         ];
 
-        <span class="kw">for</span> (<span class="ident">t</span>, <span class="ident">expected</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">data</span> {
-            <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">t</span>.<span class="ident">to_string</span>(), <span class="ident">expected</span>);
+        <span class="kw">for </span>(t, expected) <span class="kw">in </span><span class="kw-2">&amp;</span>data {
+            <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>t.to_string(), expected);
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="os_info" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="os_info" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

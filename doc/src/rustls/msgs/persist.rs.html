@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/msgs/persist.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>persist.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/msgs/persist.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>persist.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -538,545 +538,545 @@
 <span id="538">538</span>
 <span id="539">539</span>
 <span id="540">540</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::ServerName</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::key</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::base</span>::{<span class="ident">PayloadU16</span>, <span class="ident">PayloadU8</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::codec</span>::{<span class="ident">Codec</span>, <span class="ident">Reader</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::enums</span>::{<span class="ident">CipherSuite</span>, <span class="ident">ProtocolVersion</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::handshake::CertificatePayload</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::handshake::SessionID</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::suites::SupportedCipherSuite</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ticketer::TimeBase</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tls12::Tls12CipherSuite</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tls13::Tls13CipherSuite</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::client::ServerName;
+<span class="kw">use </span><span class="kw">crate</span>::key;
+<span class="kw">use </span><span class="kw">crate</span>::msgs::base::{PayloadU16, PayloadU8};
+<span class="kw">use </span><span class="kw">crate</span>::msgs::codec::{Codec, Reader};
+<span class="kw">use </span><span class="kw">crate</span>::msgs::enums::{CipherSuite, ProtocolVersion};
+<span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::CertificatePayload;
+<span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::SessionID;
+<span class="kw">use </span><span class="kw">crate</span>::suites::SupportedCipherSuite;
+<span class="kw">use </span><span class="kw">crate</span>::ticketer::TimeBase;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::tls12::Tls12CipherSuite;
+<span class="kw">use </span><span class="kw">crate</span>::tls13::Tls13CipherSuite;
 
-<span class="kw">use</span> <span class="ident">std::cmp</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::mem</span>;
+<span class="kw">use </span>std::cmp;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+</span><span class="kw">use </span>std::mem;
 
-<span class="comment">// These are the keys and values we store in session storage.</span>
+<span class="comment">// These are the keys and values we store in session storage.
 
-<span class="comment">// --- Client types ---</span>
-<span class="doccomment">/// Keys for session resumption and tickets.</span>
-<span class="doccomment">/// Matching value is a `ClientSessionValue`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ClientSessionKey</span> {
-    <span class="ident">kind</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>],
-    <span class="ident">name</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+// --- Client types ---
+</span><span class="doccomment">/// Keys for session resumption and tickets.
+/// Matching value is a `ClientSessionValue`.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>ClientSessionKey {
+    kind: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[u8],
+    name: Vec&lt;u8&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">ClientSessionKey</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-        <span class="ident">bytes</span>.<span class="ident">extend_from_slice</span>(<span class="self">self</span>.<span class="ident">kind</span>);
-        <span class="ident">bytes</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>);
+<span class="kw">impl </span>Codec <span class="kw">for </span>ClientSessionKey {
+    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+        bytes.extend_from_slice(<span class="self">self</span>.kind);
+        bytes.extend_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.name);
     }
 
-    <span class="comment">// Don&#39;t need to read these.</span>
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">_r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="prelude-val">None</span>
-    }
+    <span class="comment">// Don&#39;t need to read these.
+    </span><span class="kw">fn </span>read(_r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="prelude-val">None
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">ClientSessionKey</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">session_for_server_name</span>(<span class="ident">server_name</span>: <span class="kw-2">&amp;</span><span class="ident">ServerName</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">kind</span>: <span class="string">b&quot;session&quot;</span>,
-            <span class="ident">name</span>: <span class="ident">server_name</span>.<span class="ident">encode</span>(),
+<span class="kw">impl </span>ClientSessionKey {
+    <span class="kw">pub fn </span>session_for_server_name(server_name: <span class="kw-2">&amp;</span>ServerName) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            kind: <span class="string">b&quot;session&quot;</span>,
+            name: server_name.encode(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hint_for_server_name</span>(<span class="ident">server_name</span>: <span class="kw-2">&amp;</span><span class="ident">ServerName</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">kind</span>: <span class="string">b&quot;kx-hint&quot;</span>,
-            <span class="ident">name</span>: <span class="ident">server_name</span>.<span class="ident">encode</span>(),
+    <span class="kw">pub fn </span>hint_for_server_name(server_name: <span class="kw-2">&amp;</span>ServerName) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            kind: <span class="string">b&quot;kx-hint&quot;</span>,
+            name: server_name.encode(),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ClientSessionValue</span> {
-    <span class="ident">Tls13</span>(<span class="ident">Tls13ClientSessionValue</span>),
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-    <span class="ident">Tls12</span>(<span class="ident">Tls12ClientSessionValue</span>),
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>ClientSessionValue {
+    Tls13(Tls13ClientSessionValue),
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+    </span>Tls12(Tls12ClientSessionValue),
 }
 
-<span class="kw">impl</span> <span class="ident">ClientSessionValue</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(
-        <span class="ident">reader</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">suite</span>: <span class="ident">CipherSuite</span>,
-        <span class="ident">supported</span>: <span class="kw-2">&amp;</span>[<span class="ident">SupportedCipherSuite</span>],
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">supported</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">suite</span>() <span class="op">==</span> <span class="ident">suite</span>)<span class="question-mark">?</span>
-        {
-            <span class="ident">SupportedCipherSuite::Tls13</span>(<span class="ident">inner</span>) =&gt; {
-                <span class="ident">Tls13ClientSessionValue::read</span>(<span class="ident">inner</span>, <span class="ident">reader</span>).<span class="ident">map</span>(<span class="ident">ClientSessionValue::Tls13</span>)
+<span class="kw">impl </span>ClientSessionValue {
+    <span class="kw">pub fn </span>read(
+        reader: <span class="kw-2">&amp;mut </span>Reader&lt;<span class="lifetime">&#39;_</span>&gt;,
+        suite: CipherSuite,
+        supported: <span class="kw-2">&amp;</span>[SupportedCipherSuite],
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">match </span>supported
+            .iter()
+            .find(|s| s.suite() == suite)<span class="question-mark">?
+        </span>{
+            SupportedCipherSuite::Tls13(inner) =&gt; {
+                Tls13ClientSessionValue::read(inner, reader).map(ClientSessionValue::Tls13)
             }
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-            <span class="ident">SupportedCipherSuite::Tls12</span>(<span class="ident">inner</span>) =&gt; {
-                <span class="ident">Tls12ClientSessionValue::read</span>(<span class="ident">inner</span>, <span class="ident">reader</span>).<span class="ident">map</span>(<span class="ident">ClientSessionValue::Tls12</span>)
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+            </span>SupportedCipherSuite::Tls12(inner) =&gt; {
+                Tls12ClientSessionValue::read(inner, reader).map(ClientSessionValue::Tls12)
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">common</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">ClientSessionCommon</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ClientSessionValue::Tls13</span>(<span class="ident">inner</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">common</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-            <span class="ident">ClientSessionValue::Tls12</span>(<span class="ident">inner</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">inner</span>.<span class="ident">common</span>,
+    <span class="kw">fn </span>common(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ClientSessionCommon {
+        <span class="kw">match </span><span class="self">self </span>{
+            ClientSessionValue::Tls13(inner) =&gt; <span class="kw-2">&amp;</span>inner.common,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+            </span>ClientSessionValue::Tls12(inner) =&gt; <span class="kw-2">&amp;</span>inner.common,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Tls13ClientSessionValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ClientSessionValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">Tls13ClientSessionValue</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Tls13</span>(<span class="ident">v</span>)
+<span class="kw">impl </span>From&lt;Tls13ClientSessionValue&gt; <span class="kw">for </span>ClientSessionValue {
+    <span class="kw">fn </span>from(v: Tls13ClientSessionValue) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Tls13(v)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Tls12ClientSessionValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ClientSessionValue</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">Tls12ClientSessionValue</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Tls12</span>(<span class="ident">v</span>)
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+</span><span class="kw">impl </span>From&lt;Tls12ClientSessionValue&gt; <span class="kw">for </span>ClientSessionValue {
+    <span class="kw">fn </span>from(v: Tls12ClientSessionValue) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Tls12(v)
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Retrieved</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">value</span>: <span class="ident">T</span>,
-    <span class="ident">retrieved_at</span>: <span class="ident">TimeBase</span>,
+<span class="kw">pub struct </span>Retrieved&lt;T&gt; {
+    <span class="kw">pub </span>value: T,
+    retrieved_at: TimeBase,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Retrieved</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">value</span>: <span class="ident">T</span>, <span class="ident">retrieved_at</span>: <span class="ident">TimeBase</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">value</span>,
-            <span class="ident">retrieved_at</span>,
+<span class="kw">impl</span>&lt;T&gt; Retrieved&lt;T&gt; {
+    <span class="kw">pub fn </span>new(value: T, retrieved_at: TimeBase) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            value,
+            retrieved_at,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Retrieved</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Tls13ClientSessionValue</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">obfuscated_ticket_age</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="kw">let</span> <span class="ident">age_secs</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">retrieved_at</span>
-            .<span class="ident">as_secs</span>()
-            .<span class="ident">saturating_sub</span>(<span class="self">self</span>.<span class="ident">value</span>.<span class="ident">common</span>.<span class="ident">epoch</span>);
-        <span class="kw">let</span> <span class="ident">age_millis</span> <span class="op">=</span> <span class="ident">age_secs</span> <span class="kw">as</span> <span class="ident">u32</span> <span class="op">*</span> <span class="number">1000</span>;
-        <span class="ident">age_millis</span>.<span class="ident">wrapping_add</span>(<span class="self">self</span>.<span class="ident">value</span>.<span class="ident">age_add</span>)
+<span class="kw">impl </span>Retrieved&lt;<span class="kw-2">&amp;</span>Tls13ClientSessionValue&gt; {
+    <span class="kw">pub fn </span>obfuscated_ticket_age(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="kw">let </span>age_secs = <span class="self">self
+            </span>.retrieved_at
+            .as_secs()
+            .saturating_sub(<span class="self">self</span>.value.common.epoch);
+        <span class="kw">let </span>age_millis = age_secs <span class="kw">as </span>u32 * <span class="number">1000</span>;
+        age_millis.wrapping_add(<span class="self">self</span>.value.age_add)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Retrieved</span><span class="op">&lt;</span><span class="ident">ClientSessionValue</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tls13</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Retrieved</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Tls13ClientSessionValue</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">value</span> {
-            <span class="ident">ClientSessionValue::Tls13</span>(<span class="ident">value</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">Retrieved::new</span>(<span class="ident">value</span>, <span class="self">self</span>.<span class="ident">retrieved_at</span>)),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-            <span class="ident">ClientSessionValue::Tls12</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+<span class="kw">impl </span>Retrieved&lt;ClientSessionValue&gt; {
+    <span class="kw">pub fn </span>tls13(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Retrieved&lt;<span class="kw-2">&amp;</span>Tls13ClientSessionValue&gt;&gt; {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.value {
+            ClientSessionValue::Tls13(value) =&gt; <span class="prelude-val">Some</span>(Retrieved::new(value, <span class="self">self</span>.retrieved_at)),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+            </span>ClientSessionValue::Tls12(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_expired</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">common</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">value</span>.<span class="ident">common</span>();
-        <span class="ident">common</span>.<span class="ident">lifetime_secs</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
-            <span class="op">&amp;&amp;</span> <span class="ident">common</span>.<span class="ident">epoch</span> <span class="op">+</span> <span class="ident">u64::from</span>(<span class="ident">common</span>.<span class="ident">lifetime_secs</span>) <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">retrieved_at</span>.<span class="ident">as_secs</span>()
+    <span class="kw">pub fn </span>has_expired(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span>common = <span class="self">self</span>.value.common();
+        common.lifetime_secs != <span class="number">0
+            </span>&amp;&amp; common.epoch + u64::from(common.lifetime_secs) &lt; <span class="self">self</span>.retrieved_at.as_secs()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">std::ops::Deref</span> <span class="kw">for</span> <span class="ident">Retrieved</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">T</span>;
+<span class="kw">impl</span>&lt;T&gt; std::ops::Deref <span class="kw">for </span>Retrieved&lt;T&gt; {
+    <span class="kw">type </span>Target = T;
 
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">value</span>
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.value
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Tls13ClientSessionValue</span> {
-    <span class="ident">suite</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Tls13CipherSuite</span>,
-    <span class="ident">age_add</span>: <span class="ident">u32</span>,
-    <span class="ident">max_early_data_size</span>: <span class="ident">u32</span>,
-    <span class="kw">pub</span> <span class="ident">common</span>: <span class="ident">ClientSessionCommon</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Tls13ClientSessionValue {
+    suite: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls13CipherSuite,
+    age_add: u32,
+    max_early_data_size: u32,
+    <span class="kw">pub </span>common: ClientSessionCommon,
 }
 
-<span class="kw">impl</span> <span class="ident">Tls13ClientSessionValue</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">suite</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Tls13CipherSuite</span>,
-        <span class="ident">ticket</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-        <span class="ident">secret</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-        <span class="ident">server_cert_chain</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">key::Certificate</span><span class="op">&gt;</span>,
-        <span class="ident">time_now</span>: <span class="ident">TimeBase</span>,
-        <span class="ident">lifetime_secs</span>: <span class="ident">u32</span>,
-        <span class="ident">age_add</span>: <span class="ident">u32</span>,
-        <span class="ident">max_early_data_size</span>: <span class="ident">u32</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">suite</span>,
-            <span class="ident">age_add</span>,
-            <span class="ident">max_early_data_size</span>,
-            <span class="ident">common</span>: <span class="ident">ClientSessionCommon::new</span>(
-                <span class="ident">ticket</span>,
-                <span class="ident">secret</span>,
-                <span class="ident">time_now</span>,
-                <span class="ident">lifetime_secs</span>,
-                <span class="ident">server_cert_chain</span>,
+<span class="kw">impl </span>Tls13ClientSessionValue {
+    <span class="kw">pub fn </span>new(
+        suite: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls13CipherSuite,
+        ticket: Vec&lt;u8&gt;,
+        secret: Vec&lt;u8&gt;,
+        server_cert_chain: Vec&lt;key::Certificate&gt;,
+        time_now: TimeBase,
+        lifetime_secs: u32,
+        age_add: u32,
+        max_early_data_size: u32,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            suite,
+            age_add,
+            max_early_data_size,
+            common: ClientSessionCommon::new(
+                ticket,
+                secret,
+                time_now,
+                lifetime_secs,
+                server_cert_chain,
             ),
         }
     }
 
-    <span class="doccomment">/// [`Codec::read()`] with an extra `suite` argument.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// We decode the `suite` argument separately because it allows us to</span>
-    <span class="doccomment">/// decide whether we&#39;re decoding an 1.2 or 1.3 session value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">suite</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Tls13CipherSuite</span>, <span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="self">Self</span> {
-            <span class="ident">suite</span>,
-            <span class="ident">age_add</span>: <span class="ident">u32::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>,
-            <span class="ident">max_early_data_size</span>: <span class="ident">u32::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>,
-            <span class="ident">common</span>: <span class="ident">ClientSessionCommon::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>,
+    <span class="doccomment">/// [`Codec::read()`] with an extra `suite` argument.
+    ///
+    /// We decode the `suite` argument separately because it allows us to
+    /// decide whether we&#39;re decoding an 1.2 or 1.3 session value.
+    </span><span class="kw">pub fn </span>read(suite: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls13CipherSuite, r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="prelude-val">Some</span>(<span class="self">Self </span>{
+            suite,
+            age_add: u32::read(r)<span class="question-mark">?</span>,
+            max_early_data_size: u32::read(r)<span class="question-mark">?</span>,
+            common: ClientSessionCommon::read(r)<span class="question-mark">?</span>,
         })
     }
 
-    <span class="doccomment">/// Inherent implementation of the [`Codec::get_encoding()`] method.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// (See `read()` for why this is inherent here.)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_encoding</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="number">16</span>);
-        <span class="self">self</span>.<span class="ident">suite</span>
-            .<span class="ident">common</span>
-            .<span class="ident">suite</span>
-            .<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>);
-        <span class="self">self</span>.<span class="ident">age_add</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>);
-        <span class="self">self</span>.<span class="ident">max_early_data_size</span>
-            .<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>);
-        <span class="self">self</span>.<span class="ident">common</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>);
-        <span class="ident">bytes</span>
+    <span class="doccomment">/// Inherent implementation of the [`Codec::get_encoding()`] method.
+    ///
+    /// (See `read()` for why this is inherent here.)
+    </span><span class="kw">pub fn </span>get_encoding(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>bytes = Vec::with_capacity(<span class="number">16</span>);
+        <span class="self">self</span>.suite
+            .common
+            .suite
+            .encode(<span class="kw-2">&amp;mut </span>bytes);
+        <span class="self">self</span>.age_add.encode(<span class="kw-2">&amp;mut </span>bytes);
+        <span class="self">self</span>.max_early_data_size
+            .encode(<span class="kw-2">&amp;mut </span>bytes);
+        <span class="self">self</span>.common.encode(<span class="kw-2">&amp;mut </span>bytes);
+        bytes
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_early_data_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">max_early_data_size</span>
+    <span class="kw">pub fn </span>max_early_data_size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.max_early_data_size
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">suite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Tls13CipherSuite</span> {
-        <span class="self">self</span>.<span class="ident">suite</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">std::ops::Deref</span> <span class="kw">for</span> <span class="ident">Tls13ClientSessionValue</span> {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">ClientSessionCommon</span>;
-
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">common</span>
+    <span class="kw">pub fn </span>suite(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls13CipherSuite {
+        <span class="self">self</span>.suite
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Tls12ClientSessionValue</span> {
-    <span class="ident">suite</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Tls12CipherSuite</span>,
-    <span class="kw">pub</span> <span class="ident">session_id</span>: <span class="ident">SessionID</span>,
-    <span class="ident">extended_ms</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span> <span class="ident">common</span>: <span class="ident">ClientSessionCommon</span>,
+<span class="kw">impl </span>std::ops::Deref <span class="kw">for </span>Tls13ClientSessionValue {
+    <span class="kw">type </span>Target = ClientSessionCommon;
+
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.common
+    }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">Tls12ClientSessionValue</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">suite</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Tls12CipherSuite</span>,
-        <span class="ident">session_id</span>: <span class="ident">SessionID</span>,
-        <span class="ident">ticket</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-        <span class="ident">master_secret</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-        <span class="ident">server_cert_chain</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">key::Certificate</span><span class="op">&gt;</span>,
-        <span class="ident">time_now</span>: <span class="ident">TimeBase</span>,
-        <span class="ident">lifetime_secs</span>: <span class="ident">u32</span>,
-        <span class="ident">extended_ms</span>: <span class="ident">bool</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">suite</span>,
-            <span class="ident">session_id</span>,
-            <span class="ident">extended_ms</span>,
-            <span class="ident">common</span>: <span class="ident">ClientSessionCommon::new</span>(
-                <span class="ident">ticket</span>,
-                <span class="ident">master_secret</span>,
-                <span class="ident">time_now</span>,
-                <span class="ident">lifetime_secs</span>,
-                <span class="ident">server_cert_chain</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+#[derive(Debug)]
+</span><span class="kw">pub struct </span>Tls12ClientSessionValue {
+    suite: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls12CipherSuite,
+    <span class="kw">pub </span>session_id: SessionID,
+    extended_ms: bool,
+    <span class="kw">pub </span>common: ClientSessionCommon,
+}
+
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+</span><span class="kw">impl </span>Tls12ClientSessionValue {
+    <span class="kw">pub fn </span>new(
+        suite: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls12CipherSuite,
+        session_id: SessionID,
+        ticket: Vec&lt;u8&gt;,
+        master_secret: Vec&lt;u8&gt;,
+        server_cert_chain: Vec&lt;key::Certificate&gt;,
+        time_now: TimeBase,
+        lifetime_secs: u32,
+        extended_ms: bool,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            suite,
+            session_id,
+            extended_ms,
+            common: ClientSessionCommon::new(
+                ticket,
+                master_secret,
+                time_now,
+                lifetime_secs,
+                server_cert_chain,
             ),
         }
     }
 
-    <span class="doccomment">/// [`Codec::read()`] with an extra `suite` argument.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// We decode the `suite` argument separately because it allows us to</span>
-    <span class="doccomment">/// decide whether we&#39;re decoding an 1.2 or 1.3 session value.</span>
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">suite</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Tls12CipherSuite</span>, <span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="self">Self</span> {
-            <span class="ident">suite</span>,
-            <span class="ident">session_id</span>: <span class="ident">SessionID::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>,
-            <span class="ident">extended_ms</span>: <span class="ident">u8::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span> <span class="op">==</span> <span class="number">1</span>,
-            <span class="ident">common</span>: <span class="ident">ClientSessionCommon::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>,
+    <span class="doccomment">/// [`Codec::read()`] with an extra `suite` argument.
+    ///
+    /// We decode the `suite` argument separately because it allows us to
+    /// decide whether we&#39;re decoding an 1.2 or 1.3 session value.
+    </span><span class="kw">fn </span>read(suite: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls12CipherSuite, r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="prelude-val">Some</span>(<span class="self">Self </span>{
+            suite,
+            session_id: SessionID::read(r)<span class="question-mark">?</span>,
+            extended_ms: u8::read(r)<span class="question-mark">? </span>== <span class="number">1</span>,
+            common: ClientSessionCommon::read(r)<span class="question-mark">?</span>,
         })
     }
 
-    <span class="doccomment">/// Inherent implementation of the [`Codec::get_encoding()`] method.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// (See `read()` for why this is inherent here.)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_encoding</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="number">16</span>);
-        <span class="self">self</span>.<span class="ident">suite</span>
-            .<span class="ident">common</span>
-            .<span class="ident">suite</span>
-            .<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>);
-        <span class="self">self</span>.<span class="ident">session_id</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>);
-        (<span class="kw">if</span> <span class="self">self</span>.<span class="ident">extended_ms</span> { <span class="number">1u8</span> } <span class="kw">else</span> { <span class="number">0u8</span> }).<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>);
-        <span class="self">self</span>.<span class="ident">common</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>);
-        <span class="ident">bytes</span>
+    <span class="doccomment">/// Inherent implementation of the [`Codec::get_encoding()`] method.
+    ///
+    /// (See `read()` for why this is inherent here.)
+    </span><span class="kw">pub fn </span>get_encoding(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>bytes = Vec::with_capacity(<span class="number">16</span>);
+        <span class="self">self</span>.suite
+            .common
+            .suite
+            .encode(<span class="kw-2">&amp;mut </span>bytes);
+        <span class="self">self</span>.session_id.encode(<span class="kw-2">&amp;mut </span>bytes);
+        (<span class="kw">if </span><span class="self">self</span>.extended_ms { <span class="number">1u8 </span>} <span class="kw">else </span>{ <span class="number">0u8 </span>}).encode(<span class="kw-2">&amp;mut </span>bytes);
+        <span class="self">self</span>.common.encode(<span class="kw-2">&amp;mut </span>bytes);
+        bytes
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_ticket</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="ident">mem::take</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">common</span>.<span class="ident">ticket</span>.<span class="number">0</span>)
+    <span class="kw">pub fn </span>take_ticket(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
+        mem::take(<span class="kw-2">&amp;mut </span><span class="self">self</span>.common.ticket.<span class="number">0</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extended_ms</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">extended_ms</span>
+    <span class="kw">pub fn </span>extended_ms(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.extended_ms
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">suite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Tls12CipherSuite</span> {
-        <span class="self">self</span>.<span class="ident">suite</span>
-    }
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">std::ops::Deref</span> <span class="kw">for</span> <span class="ident">Tls12ClientSessionValue</span> {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">ClientSessionCommon</span>;
-
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">common</span>
+    <span class="kw">pub fn </span>suite(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls12CipherSuite {
+        <span class="self">self</span>.suite
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ClientSessionCommon</span> {
-    <span class="ident">ticket</span>: <span class="ident">PayloadU16</span>,
-    <span class="ident">secret</span>: <span class="ident">PayloadU8</span>,
-    <span class="ident">epoch</span>: <span class="ident">u64</span>,
-    <span class="ident">lifetime_secs</span>: <span class="ident">u32</span>,
-    <span class="ident">server_cert_chain</span>: <span class="ident">CertificatePayload</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+</span><span class="kw">impl </span>std::ops::Deref <span class="kw">for </span>Tls12ClientSessionValue {
+    <span class="kw">type </span>Target = ClientSessionCommon;
+
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.common
+    }
 }
 
-<span class="kw">impl</span> <span class="ident">ClientSessionCommon</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">ticket</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-        <span class="ident">secret</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-        <span class="ident">time_now</span>: <span class="ident">TimeBase</span>,
-        <span class="ident">lifetime_secs</span>: <span class="ident">u32</span>,
-        <span class="ident">server_cert_chain</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">key::Certificate</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">ticket</span>: <span class="ident">PayloadU16</span>(<span class="ident">ticket</span>),
-            <span class="ident">secret</span>: <span class="ident">PayloadU8</span>(<span class="ident">secret</span>),
-            <span class="ident">epoch</span>: <span class="ident">time_now</span>.<span class="ident">as_secs</span>(),
-            <span class="ident">lifetime_secs</span>: <span class="ident">cmp::min</span>(<span class="ident">lifetime_secs</span>, <span class="ident">MAX_TICKET_LIFETIME</span>),
-            <span class="ident">server_cert_chain</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>ClientSessionCommon {
+    ticket: PayloadU16,
+    secret: PayloadU8,
+    epoch: u64,
+    lifetime_secs: u32,
+    server_cert_chain: CertificatePayload,
+}
+
+<span class="kw">impl </span>ClientSessionCommon {
+    <span class="kw">fn </span>new(
+        ticket: Vec&lt;u8&gt;,
+        secret: Vec&lt;u8&gt;,
+        time_now: TimeBase,
+        lifetime_secs: u32,
+        server_cert_chain: Vec&lt;key::Certificate&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            ticket: PayloadU16(ticket),
+            secret: PayloadU8(secret),
+            epoch: time_now.as_secs(),
+            lifetime_secs: cmp::min(lifetime_secs, MAX_TICKET_LIFETIME),
+            server_cert_chain,
         }
     }
 
-    <span class="doccomment">/// [`Codec::read()`] is inherent here to avoid leaking the [`Codec`]</span>
-    <span class="doccomment">/// implementation through [`Deref`] implementations on</span>
-    <span class="doccomment">/// [`Tls12ClientSessionValue`] and [`Tls13ClientSessionValue`].</span>
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="self">Self</span> {
-            <span class="ident">ticket</span>: <span class="ident">PayloadU16::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>,
-            <span class="ident">secret</span>: <span class="ident">PayloadU8::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>,
-            <span class="ident">epoch</span>: <span class="ident">u64::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>,
-            <span class="ident">lifetime_secs</span>: <span class="ident">u32::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>,
-            <span class="ident">server_cert_chain</span>: <span class="ident">CertificatePayload::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>,
+    <span class="doccomment">/// [`Codec::read()`] is inherent here to avoid leaking the [`Codec`]
+    /// implementation through [`Deref`] implementations on
+    /// [`Tls12ClientSessionValue`] and [`Tls13ClientSessionValue`].
+    </span><span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="prelude-val">Some</span>(<span class="self">Self </span>{
+            ticket: PayloadU16::read(r)<span class="question-mark">?</span>,
+            secret: PayloadU8::read(r)<span class="question-mark">?</span>,
+            epoch: u64::read(r)<span class="question-mark">?</span>,
+            lifetime_secs: u32::read(r)<span class="question-mark">?</span>,
+            server_cert_chain: CertificatePayload::read(r)<span class="question-mark">?</span>,
         })
     }
 
-    <span class="doccomment">/// [`Codec::encode()`] is inherent here to avoid leaking the [`Codec`]</span>
-    <span class="doccomment">/// implementation through [`Deref`] implementations on</span>
-    <span class="doccomment">/// [`Tls12ClientSessionValue`] and [`Tls13ClientSessionValue`].</span>
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">ticket</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
-        <span class="self">self</span>.<span class="ident">secret</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
-        <span class="self">self</span>.<span class="ident">epoch</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
-        <span class="self">self</span>.<span class="ident">lifetime_secs</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
-        <span class="self">self</span>.<span class="ident">server_cert_chain</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
+    <span class="doccomment">/// [`Codec::encode()`] is inherent here to avoid leaking the [`Codec`]
+    /// implementation through [`Deref`] implementations on
+    /// [`Tls12ClientSessionValue`] and [`Tls13ClientSessionValue`].
+    </span><span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+        <span class="self">self</span>.ticket.encode(bytes);
+        <span class="self">self</span>.secret.encode(bytes);
+        <span class="self">self</span>.epoch.encode(bytes);
+        <span class="self">self</span>.lifetime_secs.encode(bytes);
+        <span class="self">self</span>.server_cert_chain.encode(bytes);
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">server_cert_chain</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">key::Certificate</span>] {
-        <span class="self">self</span>.<span class="ident">server_cert_chain</span>.<span class="ident">as_ref</span>()
+    <span class="kw">pub fn </span>server_cert_chain(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[key::Certificate] {
+        <span class="self">self</span>.server_cert_chain.as_ref()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="ident">secret</span>.<span class="number">0</span>.<span class="ident">as_ref</span>()
+    <span class="kw">pub fn </span>secret(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="self">self</span>.secret.<span class="number">0</span>.as_ref()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ticket</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="ident">ticket</span>.<span class="number">0</span>.<span class="ident">as_ref</span>()
+    <span class="kw">pub fn </span>ticket(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="self">self</span>.ticket.<span class="number">0</span>.as_ref()
     }
 
-    <span class="doccomment">/// Test only: wind back epoch by delta seconds.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rewind_epoch</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">delta</span>: <span class="ident">u32</span>) {
-        <span class="self">self</span>.<span class="ident">epoch</span> <span class="op">-</span><span class="op">=</span> <span class="ident">delta</span> <span class="kw">as</span> <span class="ident">u64</span>;
+    <span class="doccomment">/// Test only: wind back epoch by delta seconds.
+    </span><span class="kw">pub fn </span>rewind_epoch(<span class="kw-2">&amp;mut </span><span class="self">self</span>, delta: u32) {
+        <span class="self">self</span>.epoch -= delta <span class="kw">as </span>u64;
     }
 }
 
-<span class="kw">static</span> <span class="ident">MAX_TICKET_LIFETIME</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">7</span> <span class="op">*</span> <span class="number">24</span> <span class="op">*</span> <span class="number">60</span> <span class="op">*</span> <span class="number">60</span>;
+<span class="kw">static </span>MAX_TICKET_LIFETIME: u32 = <span class="number">7 </span>* <span class="number">24 </span>* <span class="number">60 </span>* <span class="number">60</span>;
 
-<span class="doccomment">/// This is the maximum allowed skew between server and client clocks, over</span>
-<span class="doccomment">/// the maximum ticket lifetime period.  This encompasses TCP retransmission</span>
-<span class="doccomment">/// times in case packet loss occurs when the client sends the ClientHello</span>
-<span class="doccomment">/// or receives the NewSessionTicket, _and_ actual clock skew over this period.</span>
-<span class="kw">static</span> <span class="ident">MAX_FRESHNESS_SKEW_MS</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">60</span> <span class="op">*</span> <span class="number">1000</span>;
+<span class="doccomment">/// This is the maximum allowed skew between server and client clocks, over
+/// the maximum ticket lifetime period.  This encompasses TCP retransmission
+/// times in case packet loss occurs when the client sends the ClientHello
+/// or receives the NewSessionTicket, _and_ actual clock skew over this period.
+</span><span class="kw">static </span>MAX_FRESHNESS_SKEW_MS: u32 = <span class="number">60 </span>* <span class="number">1000</span>;
 
-<span class="comment">// --- Server types ---</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ServerSessionKey</span> <span class="op">=</span> <span class="ident">SessionID</span>;
+<span class="comment">// --- Server types ---
+</span><span class="kw">pub type </span>ServerSessionKey = SessionID;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ServerSessionValue</span> {
-    <span class="kw">pub</span> <span class="ident">sni</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">webpki::DnsName</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">version</span>: <span class="ident">ProtocolVersion</span>,
-    <span class="kw">pub</span> <span class="ident">cipher_suite</span>: <span class="ident">CipherSuite</span>,
-    <span class="kw">pub</span> <span class="ident">master_secret</span>: <span class="ident">PayloadU8</span>,
-    <span class="kw">pub</span> <span class="ident">extended_ms</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span> <span class="ident">client_cert_chain</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CertificatePayload</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">alpn</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PayloadU8</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">application_data</span>: <span class="ident">PayloadU16</span>,
-    <span class="kw">pub</span> <span class="ident">creation_time_sec</span>: <span class="ident">u64</span>,
-    <span class="kw">pub</span> <span class="ident">age_obfuscation_offset</span>: <span class="ident">u32</span>,
-    <span class="ident">freshness</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>ServerSessionValue {
+    <span class="kw">pub </span>sni: <span class="prelude-ty">Option</span>&lt;webpki::DnsName&gt;,
+    <span class="kw">pub </span>version: ProtocolVersion,
+    <span class="kw">pub </span>cipher_suite: CipherSuite,
+    <span class="kw">pub </span>master_secret: PayloadU8,
+    <span class="kw">pub </span>extended_ms: bool,
+    <span class="kw">pub </span>client_cert_chain: <span class="prelude-ty">Option</span>&lt;CertificatePayload&gt;,
+    <span class="kw">pub </span>alpn: <span class="prelude-ty">Option</span>&lt;PayloadU8&gt;,
+    <span class="kw">pub </span>application_data: PayloadU16,
+    <span class="kw">pub </span>creation_time_sec: u64,
+    <span class="kw">pub </span>age_obfuscation_offset: u32,
+    freshness: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Codec</span> <span class="kw">for</span> <span class="ident">ServerSessionValue</span> {
-    <span class="kw">fn</span> <span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">sni</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">sni</span> {
-            <span class="number">1u8</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
-            <span class="kw">let</span> <span class="ident">sni_bytes</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="ident">sni</span>.<span class="ident">as_ref</span>().<span class="ident">into</span>();
-            <span class="ident">PayloadU8::new</span>(<span class="ident">Vec::from</span>(<span class="ident">sni_bytes</span>)).<span class="ident">encode</span>(<span class="ident">bytes</span>);
-        } <span class="kw">else</span> {
-            <span class="number">0u8</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
+<span class="kw">impl </span>Codec <span class="kw">for </span>ServerSessionValue {
+    <span class="kw">fn </span>encode(<span class="kw-2">&amp;</span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>sni) = <span class="self">self</span>.sni {
+            <span class="number">1u8</span>.encode(bytes);
+            <span class="kw">let </span>sni_bytes: <span class="kw-2">&amp;</span>str = sni.as_ref().into();
+            PayloadU8::new(Vec::from(sni_bytes)).encode(bytes);
+        } <span class="kw">else </span>{
+            <span class="number">0u8</span>.encode(bytes);
         }
-        <span class="self">self</span>.<span class="ident">version</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
-        <span class="self">self</span>.<span class="ident">cipher_suite</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
-        <span class="self">self</span>.<span class="ident">master_secret</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
-        (<span class="kw">if</span> <span class="self">self</span>.<span class="ident">extended_ms</span> { <span class="number">1u8</span> } <span class="kw">else</span> { <span class="number">0u8</span> }).<span class="ident">encode</span>(<span class="ident">bytes</span>);
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">chain</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">client_cert_chain</span> {
-            <span class="number">1u8</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
-            <span class="ident">chain</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
-        } <span class="kw">else</span> {
-            <span class="number">0u8</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
+        <span class="self">self</span>.version.encode(bytes);
+        <span class="self">self</span>.cipher_suite.encode(bytes);
+        <span class="self">self</span>.master_secret.encode(bytes);
+        (<span class="kw">if </span><span class="self">self</span>.extended_ms { <span class="number">1u8 </span>} <span class="kw">else </span>{ <span class="number">0u8 </span>}).encode(bytes);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>chain) = <span class="self">self</span>.client_cert_chain {
+            <span class="number">1u8</span>.encode(bytes);
+            chain.encode(bytes);
+        } <span class="kw">else </span>{
+            <span class="number">0u8</span>.encode(bytes);
         }
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">alpn</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">alpn</span> {
-            <span class="number">1u8</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
-            <span class="ident">alpn</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
-        } <span class="kw">else</span> {
-            <span class="number">0u8</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>alpn) = <span class="self">self</span>.alpn {
+            <span class="number">1u8</span>.encode(bytes);
+            alpn.encode(bytes);
+        } <span class="kw">else </span>{
+            <span class="number">0u8</span>.encode(bytes);
         }
-        <span class="self">self</span>.<span class="ident">application_data</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
-        <span class="self">self</span>.<span class="ident">creation_time_sec</span>.<span class="ident">encode</span>(<span class="ident">bytes</span>);
-        <span class="self">self</span>.<span class="ident">age_obfuscation_offset</span>
-            .<span class="ident">encode</span>(<span class="ident">bytes</span>);
+        <span class="self">self</span>.application_data.encode(bytes);
+        <span class="self">self</span>.creation_time_sec.encode(bytes);
+        <span class="self">self</span>.age_obfuscation_offset
+            .encode(bytes);
     }
 
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">r</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Reader</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">has_sni</span> <span class="op">=</span> <span class="ident">u8::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">sni</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">has_sni</span> <span class="op">==</span> <span class="number">1</span> {
-            <span class="kw">let</span> <span class="ident">dns_name</span> <span class="op">=</span> <span class="ident">PayloadU8::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">dns_name</span> <span class="op">=</span> <span class="ident">webpki::DnsNameRef::try_from_ascii</span>(<span class="kw-2">&amp;</span><span class="ident">dns_name</span>.<span class="number">0</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
-            <span class="prelude-val">Some</span>(<span class="ident">dns_name</span>.<span class="ident">into</span>())
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        };
-        <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">ProtocolVersion::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">cs</span> <span class="op">=</span> <span class="ident">CipherSuite::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">ms</span> <span class="op">=</span> <span class="ident">PayloadU8::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">ems</span> <span class="op">=</span> <span class="ident">u8::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">has_ccert</span> <span class="op">=</span> <span class="ident">u8::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span> <span class="op">==</span> <span class="number">1</span>;
-        <span class="kw">let</span> <span class="ident">ccert</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">has_ccert</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">CertificatePayload::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        };
-        <span class="kw">let</span> <span class="ident">has_alpn</span> <span class="op">=</span> <span class="ident">u8::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span> <span class="op">==</span> <span class="number">1</span>;
-        <span class="kw">let</span> <span class="ident">alpn</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">has_alpn</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">PayloadU8::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        };
-        <span class="kw">let</span> <span class="ident">application_data</span> <span class="op">=</span> <span class="ident">PayloadU16::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">creation_time_sec</span> <span class="op">=</span> <span class="ident">u64::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">age_obfuscation_offset</span> <span class="op">=</span> <span class="ident">u32::read</span>(<span class="ident">r</span>)<span class="question-mark">?</span>;
+    <span class="kw">fn </span>read(r: <span class="kw-2">&amp;mut </span>Reader) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>has_sni = u8::read(r)<span class="question-mark">?</span>;
+        <span class="kw">let </span>sni = <span class="kw">if </span>has_sni == <span class="number">1 </span>{
+            <span class="kw">let </span>dns_name = PayloadU8::read(r)<span class="question-mark">?</span>;
+            <span class="kw">let </span>dns_name = webpki::DnsNameRef::try_from_ascii(<span class="kw-2">&amp;</span>dns_name.<span class="number">0</span>).ok()<span class="question-mark">?</span>;
+            <span class="prelude-val">Some</span>(dns_name.into())
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>};
+        <span class="kw">let </span>v = ProtocolVersion::read(r)<span class="question-mark">?</span>;
+        <span class="kw">let </span>cs = CipherSuite::read(r)<span class="question-mark">?</span>;
+        <span class="kw">let </span>ms = PayloadU8::read(r)<span class="question-mark">?</span>;
+        <span class="kw">let </span>ems = u8::read(r)<span class="question-mark">?</span>;
+        <span class="kw">let </span>has_ccert = u8::read(r)<span class="question-mark">? </span>== <span class="number">1</span>;
+        <span class="kw">let </span>ccert = <span class="kw">if </span>has_ccert {
+            <span class="prelude-val">Some</span>(CertificatePayload::read(r)<span class="question-mark">?</span>)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>};
+        <span class="kw">let </span>has_alpn = u8::read(r)<span class="question-mark">? </span>== <span class="number">1</span>;
+        <span class="kw">let </span>alpn = <span class="kw">if </span>has_alpn {
+            <span class="prelude-val">Some</span>(PayloadU8::read(r)<span class="question-mark">?</span>)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>};
+        <span class="kw">let </span>application_data = PayloadU16::read(r)<span class="question-mark">?</span>;
+        <span class="kw">let </span>creation_time_sec = u64::read(r)<span class="question-mark">?</span>;
+        <span class="kw">let </span>age_obfuscation_offset = u32::read(r)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Some</span>(<span class="self">Self</span> {
-            <span class="ident">sni</span>,
-            <span class="ident">version</span>: <span class="ident">v</span>,
-            <span class="ident">cipher_suite</span>: <span class="ident">cs</span>,
-            <span class="ident">master_secret</span>: <span class="ident">ms</span>,
-            <span class="ident">extended_ms</span>: <span class="ident">ems</span> <span class="op">==</span> <span class="number">1u8</span>,
-            <span class="ident">client_cert_chain</span>: <span class="ident">ccert</span>,
-            <span class="ident">alpn</span>,
-            <span class="ident">application_data</span>,
-            <span class="ident">creation_time_sec</span>,
-            <span class="ident">age_obfuscation_offset</span>,
-            <span class="ident">freshness</span>: <span class="prelude-val">None</span>,
+        <span class="prelude-val">Some</span>(<span class="self">Self </span>{
+            sni,
+            version: v,
+            cipher_suite: cs,
+            master_secret: ms,
+            extended_ms: ems == <span class="number">1u8</span>,
+            client_cert_chain: ccert,
+            alpn,
+            application_data,
+            creation_time_sec,
+            age_obfuscation_offset,
+            freshness: <span class="prelude-val">None</span>,
         })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ServerSessionValue</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">sni</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">webpki::DnsName</span><span class="op">&gt;</span>,
-        <span class="ident">v</span>: <span class="ident">ProtocolVersion</span>,
-        <span class="ident">cs</span>: <span class="ident">CipherSuite</span>,
-        <span class="ident">ms</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-        <span class="ident">client_cert_chain</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">CertificatePayload</span><span class="op">&gt;</span>,
-        <span class="ident">alpn</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">application_data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-        <span class="ident">creation_time</span>: <span class="ident">TimeBase</span>,
-        <span class="ident">age_obfuscation_offset</span>: <span class="ident">u32</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">sni</span>: <span class="ident">sni</span>.<span class="ident">cloned</span>(),
-            <span class="ident">version</span>: <span class="ident">v</span>,
-            <span class="ident">cipher_suite</span>: <span class="ident">cs</span>,
-            <span class="ident">master_secret</span>: <span class="ident">PayloadU8::new</span>(<span class="ident">ms</span>),
-            <span class="ident">extended_ms</span>: <span class="bool-val">false</span>,
-            <span class="ident">client_cert_chain</span>,
-            <span class="ident">alpn</span>: <span class="ident">alpn</span>.<span class="ident">map</span>(<span class="ident">PayloadU8::new</span>),
-            <span class="ident">application_data</span>: <span class="ident">PayloadU16::new</span>(<span class="ident">application_data</span>),
-            <span class="ident">creation_time_sec</span>: <span class="ident">creation_time</span>.<span class="ident">as_secs</span>(),
-            <span class="ident">age_obfuscation_offset</span>,
-            <span class="ident">freshness</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl </span>ServerSessionValue {
+    <span class="kw">pub fn </span>new(
+        sni: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>webpki::DnsName&gt;,
+        v: ProtocolVersion,
+        cs: CipherSuite,
+        ms: Vec&lt;u8&gt;,
+        client_cert_chain: <span class="prelude-ty">Option</span>&lt;CertificatePayload&gt;,
+        alpn: <span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;,
+        application_data: Vec&lt;u8&gt;,
+        creation_time: TimeBase,
+        age_obfuscation_offset: u32,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            sni: sni.cloned(),
+            version: v,
+            cipher_suite: cs,
+            master_secret: PayloadU8::new(ms),
+            extended_ms: <span class="bool-val">false</span>,
+            client_cert_chain,
+            alpn: alpn.map(PayloadU8::new),
+            application_data: PayloadU16::new(application_data),
+            creation_time_sec: creation_time.as_secs(),
+            age_obfuscation_offset,
+            freshness: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_extended_ms_used</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">extended_ms</span> <span class="op">=</span> <span class="bool-val">true</span>;
+    <span class="kw">pub fn </span>set_extended_ms_used(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.extended_ms = <span class="bool-val">true</span>;
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_freshness</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">obfuscated_client_age_ms</span>: <span class="ident">u32</span>, <span class="ident">time_now</span>: <span class="ident">TimeBase</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">client_age_ms</span> <span class="op">=</span> <span class="ident">obfuscated_client_age_ms</span>.<span class="ident">wrapping_sub</span>(<span class="self">self</span>.<span class="ident">age_obfuscation_offset</span>);
-        <span class="kw">let</span> <span class="ident">server_age_ms</span> <span class="op">=</span> (<span class="ident">time_now</span>
-            .<span class="ident">as_secs</span>()
-            .<span class="ident">saturating_sub</span>(<span class="self">self</span>.<span class="ident">creation_time_sec</span>) <span class="kw">as</span> <span class="ident">u32</span>)
-            .<span class="ident">saturating_mul</span>(<span class="number">1000</span>);
+    <span class="kw">pub fn </span>set_freshness(<span class="kw-2">mut </span><span class="self">self</span>, obfuscated_client_age_ms: u32, time_now: TimeBase) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>client_age_ms = obfuscated_client_age_ms.wrapping_sub(<span class="self">self</span>.age_obfuscation_offset);
+        <span class="kw">let </span>server_age_ms = (time_now
+            .as_secs()
+            .saturating_sub(<span class="self">self</span>.creation_time_sec) <span class="kw">as </span>u32)
+            .saturating_mul(<span class="number">1000</span>);
 
-        <span class="kw">let</span> <span class="ident">age_difference</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">client_age_ms</span> <span class="op">&lt;</span> <span class="ident">server_age_ms</span> {
-            <span class="ident">server_age_ms</span> <span class="op">-</span> <span class="ident">client_age_ms</span>
-        } <span class="kw">else</span> {
-            <span class="ident">client_age_ms</span> <span class="op">-</span> <span class="ident">server_age_ms</span>
+        <span class="kw">let </span>age_difference = <span class="kw">if </span>client_age_ms &lt; server_age_ms {
+            server_age_ms - client_age_ms
+        } <span class="kw">else </span>{
+            client_age_ms - server_age_ms
         };
 
-        <span class="self">self</span>.<span class="ident">freshness</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">age_difference</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">MAX_FRESHNESS_SKEW_MS</span>);
-        <span class="self">self</span>
-    }
+        <span class="self">self</span>.freshness = <span class="prelude-val">Some</span>(age_difference &lt;= MAX_FRESHNESS_SKEW_MS);
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_fresh</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">freshness</span>.<span class="ident">unwrap_or_default</span>()
+    <span class="kw">pub fn </span>is_fresh(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.freshness.unwrap_or_default()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

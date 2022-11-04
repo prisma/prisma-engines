@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rust_decimal-1.26.1/src/ops/common.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>common.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rust_decimal/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rust_decimal/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rust_decimal/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rust_decimal-1.26.1/src/ops/common.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>common.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rust_decimal/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rust_decimal/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rust_decimal/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -453,451 +453,451 @@
 <span id="453">453</span>
 <span id="454">454</span>
 <span id="455">455</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants</span>::{<span class="ident">MAX_I32_SCALE</span>, <span class="ident">MAX_PRECISION_I32</span>, <span class="ident">POWERS_10</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Decimal</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::constants::{MAX_I32_SCALE, MAX_PRECISION_I32, POWERS_10};
+<span class="kw">use </span><span class="kw">crate</span>::Decimal;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Buf12</span> {
-    <span class="kw">pub</span> <span class="ident">data</span>: [<span class="ident">u32</span>; <span class="number">3</span>],
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Buf12 {
+    <span class="kw">pub </span>data: [u32; <span class="number">3</span>],
 }
 
-<span class="kw">impl</span> <span class="ident">Buf12</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_dec64</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">Dec64</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Buf12</span> {
-            <span class="ident">data</span>: [<span class="ident">value</span>.<span class="ident">low64</span> <span class="kw">as</span> <span class="ident">u32</span>, (<span class="ident">value</span>.<span class="ident">low64</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>) <span class="kw">as</span> <span class="ident">u32</span>, <span class="ident">value</span>.<span class="ident">hi</span>],
+<span class="kw">impl </span>Buf12 {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">const fn </span>from_dec64(value: <span class="kw-2">&amp;</span>Dec64) -&gt; <span class="self">Self </span>{
+        Buf12 {
+            data: [value.low64 <span class="kw">as </span>u32, (value.low64 &gt;&gt; <span class="number">32</span>) <span class="kw">as </span>u32, value.hi],
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_decimal</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">Decimal</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Buf12</span> {
-            <span class="ident">data</span>: <span class="ident">value</span>.<span class="ident">mantissa_array3</span>(),
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">const fn </span>from_decimal(value: <span class="kw-2">&amp;</span>Decimal) -&gt; <span class="self">Self </span>{
+        Buf12 {
+            data: value.mantissa_array3(),
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">lo</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">data</span>[<span class="number">0</span>]
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>lo(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.data[<span class="number">0</span>]
     }
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">mid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">data</span>[<span class="number">1</span>]
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>mid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.data[<span class="number">1</span>]
     }
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">hi</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">data</span>[<span class="number">2</span>]
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>hi(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.data[<span class="number">2</span>]
     }
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_lo</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u32</span>) {
-        <span class="self">self</span>.<span class="ident">data</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">value</span>;
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">pub fn </span>set_lo(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: u32) {
+        <span class="self">self</span>.data[<span class="number">0</span>] = value;
     }
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_mid</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u32</span>) {
-        <span class="self">self</span>.<span class="ident">data</span>[<span class="number">1</span>] <span class="op">=</span> <span class="ident">value</span>;
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">pub fn </span>set_mid(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: u32) {
+        <span class="self">self</span>.data[<span class="number">1</span>] = value;
     }
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_hi</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u32</span>) {
-        <span class="self">self</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="op">=</span> <span class="ident">value</span>;
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">low64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        ((<span class="self">self</span>.<span class="ident">data</span>[<span class="number">1</span>] <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>) <span class="op">|</span> (<span class="self">self</span>.<span class="ident">data</span>[<span class="number">0</span>] <span class="kw">as</span> <span class="ident">u64</span>)
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">pub fn </span>set_hi(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: u32) {
+        <span class="self">self</span>.data[<span class="number">2</span>] = value;
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_low64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u64</span>) {
-        <span class="self">self</span>.<span class="ident">data</span>[<span class="number">1</span>] <span class="op">=</span> (<span class="ident">value</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>) <span class="kw">as</span> <span class="ident">u32</span>;
-        <span class="self">self</span>.<span class="ident">data</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">value</span> <span class="kw">as</span> <span class="ident">u32</span>;
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>low64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        ((<span class="self">self</span>.data[<span class="number">1</span>] <span class="kw">as </span>u64) &lt;&lt; <span class="number">32</span>) | (<span class="self">self</span>.data[<span class="number">0</span>] <span class="kw">as </span>u64)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">high64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        ((<span class="self">self</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>) <span class="op">|</span> (<span class="self">self</span>.<span class="ident">data</span>[<span class="number">1</span>] <span class="kw">as</span> <span class="ident">u64</span>)
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">pub fn </span>set_low64(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: u64) {
+        <span class="self">self</span>.data[<span class="number">1</span>] = (value &gt;&gt; <span class="number">32</span>) <span class="kw">as </span>u32;
+        <span class="self">self</span>.data[<span class="number">0</span>] = value <span class="kw">as </span>u32;
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_high64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u64</span>) {
-        <span class="self">self</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="op">=</span> (<span class="ident">value</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>) <span class="kw">as</span> <span class="ident">u32</span>;
-        <span class="self">self</span>.<span class="ident">data</span>[<span class="number">1</span>] <span class="op">=</span> <span class="ident">value</span> <span class="kw">as</span> <span class="ident">u32</span>;
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">pub const fn </span>high64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        ((<span class="self">self</span>.data[<span class="number">2</span>] <span class="kw">as </span>u64) &lt;&lt; <span class="number">32</span>) | (<span class="self">self</span>.data[<span class="number">1</span>] <span class="kw">as </span>u64)
     }
 
-    <span class="comment">// Determine the maximum value of x that ensures that the quotient when scaled up by 10^x</span>
-    <span class="comment">// still fits in 96 bits. Ultimately, we want to make scale positive - if we can&#39;t then</span>
-    <span class="comment">// we&#39;re going to overflow. Because x is ultimately used to lookup inside the POWERS array, it</span>
-    <span class="comment">// must be a valid value 0 &lt;= x &lt;= 9</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_scale</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">scale</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="kw">const</span> <span class="ident">OVERFLOW_MAX_9_HI</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">4</span>;
-        <span class="kw">const</span> <span class="ident">OVERFLOW_MAX_8_HI</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">42</span>;
-        <span class="kw">const</span> <span class="ident">OVERFLOW_MAX_7_HI</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">429</span>;
-        <span class="kw">const</span> <span class="ident">OVERFLOW_MAX_6_HI</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">4294</span>;
-        <span class="kw">const</span> <span class="ident">OVERFLOW_MAX_5_HI</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">42949</span>;
-        <span class="kw">const</span> <span class="ident">OVERFLOW_MAX_4_HI</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">429496</span>;
-        <span class="kw">const</span> <span class="ident">OVERFLOW_MAX_3_HI</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">4294967</span>;
-        <span class="kw">const</span> <span class="ident">OVERFLOW_MAX_2_HI</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">42949672</span>;
-        <span class="kw">const</span> <span class="ident">OVERFLOW_MAX_1_HI</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">429496729</span>;
-        <span class="kw">const</span> <span class="ident">OVERFLOW_MAX_9_LOW64</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">5441186219426131129</span>;
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">pub fn </span>set_high64(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: u64) {
+        <span class="self">self</span>.data[<span class="number">2</span>] = (value &gt;&gt; <span class="number">32</span>) <span class="kw">as </span>u32;
+        <span class="self">self</span>.data[<span class="number">1</span>] = value <span class="kw">as </span>u32;
+    }
 
-        <span class="kw">let</span> <span class="ident">hi</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>[<span class="number">2</span>];
-        <span class="kw">let</span> <span class="ident">low64</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">low64</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">x</span> <span class="op">=</span> <span class="number">0usize</span>;
+    <span class="comment">// Determine the maximum value of x that ensures that the quotient when scaled up by 10^x
+    // still fits in 96 bits. Ultimately, we want to make scale positive - if we can&#39;t then
+    // we&#39;re going to overflow. Because x is ultimately used to lookup inside the POWERS array, it
+    // must be a valid value 0 &lt;= x &lt;= 9
+    </span><span class="kw">pub fn </span>find_scale(<span class="kw-2">&amp;</span><span class="self">self</span>, scale: i32) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+        <span class="kw">const </span>OVERFLOW_MAX_9_HI: u32 = <span class="number">4</span>;
+        <span class="kw">const </span>OVERFLOW_MAX_8_HI: u32 = <span class="number">42</span>;
+        <span class="kw">const </span>OVERFLOW_MAX_7_HI: u32 = <span class="number">429</span>;
+        <span class="kw">const </span>OVERFLOW_MAX_6_HI: u32 = <span class="number">4294</span>;
+        <span class="kw">const </span>OVERFLOW_MAX_5_HI: u32 = <span class="number">42949</span>;
+        <span class="kw">const </span>OVERFLOW_MAX_4_HI: u32 = <span class="number">429496</span>;
+        <span class="kw">const </span>OVERFLOW_MAX_3_HI: u32 = <span class="number">4294967</span>;
+        <span class="kw">const </span>OVERFLOW_MAX_2_HI: u32 = <span class="number">42949672</span>;
+        <span class="kw">const </span>OVERFLOW_MAX_1_HI: u32 = <span class="number">429496729</span>;
+        <span class="kw">const </span>OVERFLOW_MAX_9_LOW64: u64 = <span class="number">5441186219426131129</span>;
 
-        <span class="comment">// Quick check to stop us from trying to scale any more.</span>
-        <span class="comment">//</span>
-        <span class="kw">if</span> <span class="ident">hi</span> <span class="op">&gt;</span> <span class="ident">OVERFLOW_MAX_1_HI</span> {
-            <span class="comment">// If it&#39;s less than 0, which it probably is - overflow. We can&#39;t do anything.</span>
-            <span class="kw">if</span> <span class="ident">scale</span> <span class="op">&lt;</span> <span class="number">0</span> {
-                <span class="kw">return</span> <span class="prelude-val">None</span>;
+        <span class="kw">let </span>hi = <span class="self">self</span>.data[<span class="number">2</span>];
+        <span class="kw">let </span>low64 = <span class="self">self</span>.low64();
+        <span class="kw">let </span><span class="kw-2">mut </span>x = <span class="number">0usize</span>;
+
+        <span class="comment">// Quick check to stop us from trying to scale any more.
+        //
+        </span><span class="kw">if </span>hi &gt; OVERFLOW_MAX_1_HI {
+            <span class="comment">// If it&#39;s less than 0, which it probably is - overflow. We can&#39;t do anything.
+            </span><span class="kw">if </span>scale &lt; <span class="number">0 </span>{
+                <span class="kw">return </span><span class="prelude-val">None</span>;
             }
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">x</span>);
+            <span class="kw">return </span><span class="prelude-val">Some</span>(x);
         }
 
-        <span class="kw">if</span> <span class="ident">scale</span> <span class="op">&gt;</span> <span class="ident">MAX_PRECISION_I32</span> <span class="op">-</span> <span class="number">9</span> {
-            <span class="comment">// We can&#39;t scale by 10^9 without exceeding the max scale factor.</span>
-            <span class="comment">// Instead, we&#39;ll try to scale by the most that we can and see if that works.</span>
-            <span class="comment">// This is safe to do due to the check above. e.g. scale &gt; 19 in the above, so it will</span>
-            <span class="comment">// evaluate to 9 or less below.</span>
-            <span class="ident">x</span> <span class="op">=</span> (<span class="ident">MAX_PRECISION_I32</span> <span class="op">-</span> <span class="ident">scale</span>) <span class="kw">as</span> <span class="ident">usize</span>;
-            <span class="kw">if</span> <span class="ident">hi</span> <span class="op">&lt;</span> <span class="ident">POWER_OVERFLOW_VALUES</span>[<span class="ident">x</span> <span class="op">-</span> <span class="number">1</span>].<span class="ident">data</span>[<span class="number">2</span>] {
-                <span class="kw">if</span> <span class="ident">x</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">+</span> <span class="ident">scale</span> <span class="op">&lt;</span> <span class="number">0</span> {
-                    <span class="comment">// We still overflow</span>
-                    <span class="kw">return</span> <span class="prelude-val">None</span>;
+        <span class="kw">if </span>scale &gt; MAX_PRECISION_I32 - <span class="number">9 </span>{
+            <span class="comment">// We can&#39;t scale by 10^9 without exceeding the max scale factor.
+            // Instead, we&#39;ll try to scale by the most that we can and see if that works.
+            // This is safe to do due to the check above. e.g. scale &gt; 19 in the above, so it will
+            // evaluate to 9 or less below.
+            </span>x = (MAX_PRECISION_I32 - scale) <span class="kw">as </span>usize;
+            <span class="kw">if </span>hi &lt; POWER_OVERFLOW_VALUES[x - <span class="number">1</span>].data[<span class="number">2</span>] {
+                <span class="kw">if </span>x <span class="kw">as </span>i32 + scale &lt; <span class="number">0 </span>{
+                    <span class="comment">// We still overflow
+                    </span><span class="kw">return </span><span class="prelude-val">None</span>;
                 }
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">x</span>);
+                <span class="kw">return </span><span class="prelude-val">Some</span>(x);
             }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">hi</span> <span class="op">&lt;</span> <span class="ident">OVERFLOW_MAX_9_HI</span> <span class="op">|</span><span class="op">|</span> <span class="ident">hi</span> <span class="op">==</span> <span class="ident">OVERFLOW_MAX_9_HI</span> <span class="op">&amp;&amp;</span> <span class="ident">low64</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">OVERFLOW_MAX_9_LOW64</span> {
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="number">9</span>);
+        } <span class="kw">else if </span>hi &lt; OVERFLOW_MAX_9_HI || hi == OVERFLOW_MAX_9_HI &amp;&amp; low64 &lt;= OVERFLOW_MAX_9_LOW64 {
+            <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="number">9</span>);
         }
 
-        <span class="comment">// Do a binary search to find a power to scale by that is less than 9</span>
-        <span class="ident">x</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">hi</span> <span class="op">&gt;</span> <span class="ident">OVERFLOW_MAX_5_HI</span> {
-            <span class="kw">if</span> <span class="ident">hi</span> <span class="op">&gt;</span> <span class="ident">OVERFLOW_MAX_3_HI</span> {
-                <span class="kw">if</span> <span class="ident">hi</span> <span class="op">&gt;</span> <span class="ident">OVERFLOW_MAX_2_HI</span> {
-                    <span class="number">1</span>
-                } <span class="kw">else</span> {
-                    <span class="number">2</span>
-                }
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">hi</span> <span class="op">&gt;</span> <span class="ident">OVERFLOW_MAX_4_HI</span> {
-                <span class="number">3</span>
-            } <span class="kw">else</span> {
-                <span class="number">4</span>
-            }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">hi</span> <span class="op">&gt;</span> <span class="ident">OVERFLOW_MAX_7_HI</span> {
-            <span class="kw">if</span> <span class="ident">hi</span> <span class="op">&gt;</span> <span class="ident">OVERFLOW_MAX_6_HI</span> {
-                <span class="number">5</span>
-            } <span class="kw">else</span> {
-                <span class="number">6</span>
-            }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">hi</span> <span class="op">&gt;</span> <span class="ident">OVERFLOW_MAX_8_HI</span> {
-            <span class="number">7</span>
-        } <span class="kw">else</span> {
-            <span class="number">8</span>
-        };
+        <span class="comment">// Do a binary search to find a power to scale by that is less than 9
+        </span>x = <span class="kw">if </span>hi &gt; OVERFLOW_MAX_5_HI {
+            <span class="kw">if </span>hi &gt; OVERFLOW_MAX_3_HI {
+                <span class="kw">if </span>hi &gt; OVERFLOW_MAX_2_HI {
+                    <span class="number">1
+                </span>} <span class="kw">else </span>{
+                    <span class="number">2
+                </span>}
+            } <span class="kw">else if </span>hi &gt; OVERFLOW_MAX_4_HI {
+                <span class="number">3
+            </span>} <span class="kw">else </span>{
+                <span class="number">4
+            </span>}
+        } <span class="kw">else if </span>hi &gt; OVERFLOW_MAX_7_HI {
+            <span class="kw">if </span>hi &gt; OVERFLOW_MAX_6_HI {
+                <span class="number">5
+            </span>} <span class="kw">else </span>{
+                <span class="number">6
+            </span>}
+        } <span class="kw">else if </span>hi &gt; OVERFLOW_MAX_8_HI {
+            <span class="number">7
+        </span>} <span class="kw">else </span>{
+            <span class="number">8
+        </span>};
 
-        <span class="comment">// Double check what we&#39;ve found won&#39;t overflow. Otherwise, we go one below.</span>
-        <span class="kw">if</span> <span class="ident">hi</span> <span class="op">==</span> <span class="ident">POWER_OVERFLOW_VALUES</span>[<span class="ident">x</span> <span class="op">-</span> <span class="number">1</span>].<span class="ident">data</span>[<span class="number">2</span>] <span class="op">&amp;&amp;</span> <span class="ident">low64</span> <span class="op">&gt;</span> <span class="ident">POWER_OVERFLOW_VALUES</span>[<span class="ident">x</span> <span class="op">-</span> <span class="number">1</span>].<span class="ident">low64</span>() {
-            <span class="ident">x</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="comment">// Double check what we&#39;ve found won&#39;t overflow. Otherwise, we go one below.
+        </span><span class="kw">if </span>hi == POWER_OVERFLOW_VALUES[x - <span class="number">1</span>].data[<span class="number">2</span>] &amp;&amp; low64 &gt; POWER_OVERFLOW_VALUES[x - <span class="number">1</span>].low64() {
+            x -= <span class="number">1</span>;
         }
 
-        <span class="comment">// Confirm we&#39;ve actually resolved things</span>
-        <span class="kw">if</span> <span class="ident">x</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">+</span> <span class="ident">scale</span> <span class="op">&lt;</span> <span class="number">0</span> {
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">x</span>)
+        <span class="comment">// Confirm we&#39;ve actually resolved things
+        </span><span class="kw">if </span>x <span class="kw">as </span>i32 + scale &lt; <span class="number">0 </span>{
+            <span class="prelude-val">None
+        </span>} <span class="kw">else </span>{
+            <span class="prelude-val">Some</span>(x)
         }
     }
 }
 
-<span class="comment">// This is a table of the largest values that will not overflow when multiplied</span>
-<span class="comment">// by a given power as represented by the index.</span>
-<span class="kw">static</span> <span class="ident">POWER_OVERFLOW_VALUES</span>: [<span class="ident">Buf12</span>; <span class="number">8</span>] <span class="op">=</span> [
-    <span class="ident">Buf12</span> {
-        <span class="ident">data</span>: [<span class="number">2576980377</span>, <span class="number">2576980377</span>, <span class="number">429496729</span>],
+<span class="comment">// This is a table of the largest values that will not overflow when multiplied
+// by a given power as represented by the index.
+</span><span class="kw">static </span>POWER_OVERFLOW_VALUES: [Buf12; <span class="number">8</span>] = [
+    Buf12 {
+        data: [<span class="number">2576980377</span>, <span class="number">2576980377</span>, <span class="number">429496729</span>],
     },
-    <span class="ident">Buf12</span> {
-        <span class="ident">data</span>: [<span class="number">687194767</span>, <span class="number">4123168604</span>, <span class="number">42949672</span>],
+    Buf12 {
+        data: [<span class="number">687194767</span>, <span class="number">4123168604</span>, <span class="number">42949672</span>],
     },
-    <span class="ident">Buf12</span> {
-        <span class="ident">data</span>: [<span class="number">2645699854</span>, <span class="number">1271310319</span>, <span class="number">4294967</span>],
+    Buf12 {
+        data: [<span class="number">2645699854</span>, <span class="number">1271310319</span>, <span class="number">4294967</span>],
     },
-    <span class="ident">Buf12</span> {
-        <span class="ident">data</span>: [<span class="number">694066715</span>, <span class="number">3133608139</span>, <span class="number">429496</span>],
+    Buf12 {
+        data: [<span class="number">694066715</span>, <span class="number">3133608139</span>, <span class="number">429496</span>],
     },
-    <span class="ident">Buf12</span> {
-        <span class="ident">data</span>: [<span class="number">2216890319</span>, <span class="number">2890341191</span>, <span class="number">42949</span>],
+    Buf12 {
+        data: [<span class="number">2216890319</span>, <span class="number">2890341191</span>, <span class="number">42949</span>],
     },
-    <span class="ident">Buf12</span> {
-        <span class="ident">data</span>: [<span class="number">2369172679</span>, <span class="number">4154504685</span>, <span class="number">4294</span>],
+    Buf12 {
+        data: [<span class="number">2369172679</span>, <span class="number">4154504685</span>, <span class="number">4294</span>],
     },
-    <span class="ident">Buf12</span> {
-        <span class="ident">data</span>: [<span class="number">4102387834</span>, <span class="number">2133437386</span>, <span class="number">429</span>],
+    Buf12 {
+        data: [<span class="number">4102387834</span>, <span class="number">2133437386</span>, <span class="number">429</span>],
     },
-    <span class="ident">Buf12</span> {
-        <span class="ident">data</span>: [<span class="number">410238783</span>, <span class="number">4078814305</span>, <span class="number">42</span>],
+    Buf12 {
+        data: [<span class="number">410238783</span>, <span class="number">4078814305</span>, <span class="number">42</span>],
     },
 ];
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">Dec64</span> {
-    <span class="kw">pub</span> <span class="ident">negative</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span> <span class="ident">scale</span>: <span class="ident">u32</span>,
-    <span class="kw">pub</span> <span class="ident">hi</span>: <span class="ident">u32</span>,
-    <span class="kw">pub</span> <span class="ident">low64</span>: <span class="ident">u64</span>,
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>Dec64 {
+    <span class="kw">pub </span>negative: bool,
+    <span class="kw">pub </span>scale: u32,
+    <span class="kw">pub </span>hi: u32,
+    <span class="kw">pub </span>low64: u64,
 }
 
-<span class="kw">impl</span> <span class="ident">Dec64</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">d</span>: <span class="kw-2">&amp;</span><span class="ident">Decimal</span>) -&gt; <span class="ident">Dec64</span> {
-        <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">d</span>.<span class="ident">mantissa_array3</span>();
-        <span class="kw">if</span> <span class="ident">m</span>[<span class="number">1</span>] <span class="op">==</span> <span class="number">0</span> {
-            <span class="ident">Dec64</span> {
-                <span class="ident">negative</span>: <span class="ident">d</span>.<span class="ident">is_sign_negative</span>(),
-                <span class="ident">scale</span>: <span class="ident">d</span>.<span class="ident">scale</span>(),
-                <span class="ident">hi</span>: <span class="ident">m</span>[<span class="number">2</span>],
-                <span class="ident">low64</span>: <span class="ident">m</span>[<span class="number">0</span>] <span class="kw">as</span> <span class="ident">u64</span>,
+<span class="kw">impl </span>Dec64 {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">const fn </span>new(d: <span class="kw-2">&amp;</span>Decimal) -&gt; Dec64 {
+        <span class="kw">let </span>m = d.mantissa_array3();
+        <span class="kw">if </span>m[<span class="number">1</span>] == <span class="number">0 </span>{
+            Dec64 {
+                negative: d.is_sign_negative(),
+                scale: d.scale(),
+                hi: m[<span class="number">2</span>],
+                low64: m[<span class="number">0</span>] <span class="kw">as </span>u64,
             }
-        } <span class="kw">else</span> {
-            <span class="ident">Dec64</span> {
-                <span class="ident">negative</span>: <span class="ident">d</span>.<span class="ident">is_sign_negative</span>(),
-                <span class="ident">scale</span>: <span class="ident">d</span>.<span class="ident">scale</span>(),
-                <span class="ident">hi</span>: <span class="ident">m</span>[<span class="number">2</span>],
-                <span class="ident">low64</span>: ((<span class="ident">m</span>[<span class="number">1</span>] <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>) <span class="op">|</span> (<span class="ident">m</span>[<span class="number">0</span>] <span class="kw">as</span> <span class="ident">u64</span>),
+        } <span class="kw">else </span>{
+            Dec64 {
+                negative: d.is_sign_negative(),
+                scale: d.scale(),
+                hi: m[<span class="number">2</span>],
+                low64: ((m[<span class="number">1</span>] <span class="kw">as </span>u64) &lt;&lt; <span class="number">32</span>) | (m[<span class="number">0</span>] <span class="kw">as </span>u64),
             }
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">lo</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">low64</span> <span class="kw">as</span> <span class="ident">u32</span>
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">const fn </span>lo(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.low64 <span class="kw">as </span>u32
     }
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">mid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        (<span class="self">self</span>.<span class="ident">low64</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>) <span class="kw">as</span> <span class="ident">u32</span>
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">high64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        (<span class="self">self</span>.<span class="ident">low64</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>) <span class="op">|</span> ((<span class="self">self</span>.<span class="ident">hi</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>)
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">const fn </span>mid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        (<span class="self">self</span>.low64 &gt;&gt; <span class="number">32</span>) <span class="kw">as </span>u32
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">to_decimal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Decimal</span> {
-        <span class="ident">Decimal::from_parts</span>(
-            <span class="self">self</span>.<span class="ident">low64</span> <span class="kw">as</span> <span class="ident">u32</span>,
-            (<span class="self">self</span>.<span class="ident">low64</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>) <span class="kw">as</span> <span class="ident">u32</span>,
-            <span class="self">self</span>.<span class="ident">hi</span>,
-            <span class="self">self</span>.<span class="ident">negative</span>,
-            <span class="self">self</span>.<span class="ident">scale</span>,
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">const fn </span>high64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        (<span class="self">self</span>.low64 &gt;&gt; <span class="number">32</span>) | ((<span class="self">self</span>.hi <span class="kw">as </span>u64) &lt;&lt; <span class="number">32</span>)
+    }
+
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">const fn </span>to_decimal(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Decimal {
+        Decimal::from_parts(
+            <span class="self">self</span>.low64 <span class="kw">as </span>u32,
+            (<span class="self">self</span>.low64 &gt;&gt; <span class="number">32</span>) <span class="kw">as </span>u32,
+            <span class="self">self</span>.hi,
+            <span class="self">self</span>.negative,
+            <span class="self">self</span>.scale,
         )
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Buf16</span> {
-    <span class="kw">pub</span> <span class="ident">data</span>: [<span class="ident">u32</span>; <span class="number">4</span>],
+<span class="kw">pub struct </span>Buf16 {
+    <span class="kw">pub </span>data: [u32; <span class="number">4</span>],
 }
 
-<span class="kw">impl</span> <span class="ident">Buf16</span> {
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">zero</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">Buf16</span> { <span class="ident">data</span>: [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>] }
+<span class="kw">impl </span>Buf16 {
+    <span class="kw">pub const fn </span>zero() -&gt; <span class="self">Self </span>{
+        Buf16 { data: [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>] }
     }
 
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">low64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        ((<span class="self">self</span>.<span class="ident">data</span>[<span class="number">1</span>] <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>) <span class="op">|</span> (<span class="self">self</span>.<span class="ident">data</span>[<span class="number">0</span>] <span class="kw">as</span> <span class="ident">u64</span>)
+    <span class="kw">pub const fn </span>low64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        ((<span class="self">self</span>.data[<span class="number">1</span>] <span class="kw">as </span>u64) &lt;&lt; <span class="number">32</span>) | (<span class="self">self</span>.data[<span class="number">0</span>] <span class="kw">as </span>u64)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_low64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u64</span>) {
-        <span class="self">self</span>.<span class="ident">data</span>[<span class="number">1</span>] <span class="op">=</span> (<span class="ident">value</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>) <span class="kw">as</span> <span class="ident">u32</span>;
-        <span class="self">self</span>.<span class="ident">data</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">value</span> <span class="kw">as</span> <span class="ident">u32</span>;
+    <span class="kw">pub fn </span>set_low64(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: u64) {
+        <span class="self">self</span>.data[<span class="number">1</span>] = (value &gt;&gt; <span class="number">32</span>) <span class="kw">as </span>u32;
+        <span class="self">self</span>.data[<span class="number">0</span>] = value <span class="kw">as </span>u32;
     }
 
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">mid64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        ((<span class="self">self</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>) <span class="op">|</span> (<span class="self">self</span>.<span class="ident">data</span>[<span class="number">1</span>] <span class="kw">as</span> <span class="ident">u64</span>)
+    <span class="kw">pub const fn </span>mid64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        ((<span class="self">self</span>.data[<span class="number">2</span>] <span class="kw">as </span>u64) &lt;&lt; <span class="number">32</span>) | (<span class="self">self</span>.data[<span class="number">1</span>] <span class="kw">as </span>u64)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_mid64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u64</span>) {
-        <span class="self">self</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="op">=</span> (<span class="ident">value</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>) <span class="kw">as</span> <span class="ident">u32</span>;
-        <span class="self">self</span>.<span class="ident">data</span>[<span class="number">1</span>] <span class="op">=</span> <span class="ident">value</span> <span class="kw">as</span> <span class="ident">u32</span>;
+    <span class="kw">pub fn </span>set_mid64(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: u64) {
+        <span class="self">self</span>.data[<span class="number">2</span>] = (value &gt;&gt; <span class="number">32</span>) <span class="kw">as </span>u32;
+        <span class="self">self</span>.data[<span class="number">1</span>] = value <span class="kw">as </span>u32;
     }
 
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">high64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        ((<span class="self">self</span>.<span class="ident">data</span>[<span class="number">3</span>] <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>) <span class="op">|</span> (<span class="self">self</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="kw">as</span> <span class="ident">u64</span>)
+    <span class="kw">pub const fn </span>high64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        ((<span class="self">self</span>.data[<span class="number">3</span>] <span class="kw">as </span>u64) &lt;&lt; <span class="number">32</span>) | (<span class="self">self</span>.data[<span class="number">2</span>] <span class="kw">as </span>u64)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_high64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u64</span>) {
-        <span class="self">self</span>.<span class="ident">data</span>[<span class="number">3</span>] <span class="op">=</span> (<span class="ident">value</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>) <span class="kw">as</span> <span class="ident">u32</span>;
-        <span class="self">self</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="op">=</span> <span class="ident">value</span> <span class="kw">as</span> <span class="ident">u32</span>;
+    <span class="kw">pub fn </span>set_high64(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: u64) {
+        <span class="self">self</span>.data[<span class="number">3</span>] = (value &gt;&gt; <span class="number">32</span>) <span class="kw">as </span>u32;
+        <span class="self">self</span>.data[<span class="number">2</span>] = value <span class="kw">as </span>u32;
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Buf24</span> {
-    <span class="kw">pub</span> <span class="ident">data</span>: [<span class="ident">u32</span>; <span class="number">6</span>],
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Buf24 {
+    <span class="kw">pub </span>data: [u32; <span class="number">6</span>],
 }
 
-<span class="kw">impl</span> <span class="ident">Buf24</span> {
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">zero</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">Buf24</span> {
-            <span class="ident">data</span>: [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>],
+<span class="kw">impl </span>Buf24 {
+    <span class="kw">pub const fn </span>zero() -&gt; <span class="self">Self </span>{
+        Buf24 {
+            data: [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>],
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">low64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        ((<span class="self">self</span>.<span class="ident">data</span>[<span class="number">1</span>] <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>) <span class="op">|</span> (<span class="self">self</span>.<span class="ident">data</span>[<span class="number">0</span>] <span class="kw">as</span> <span class="ident">u64</span>)
+    <span class="kw">pub const fn </span>low64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        ((<span class="self">self</span>.data[<span class="number">1</span>] <span class="kw">as </span>u64) &lt;&lt; <span class="number">32</span>) | (<span class="self">self</span>.data[<span class="number">0</span>] <span class="kw">as </span>u64)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_low64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u64</span>) {
-        <span class="self">self</span>.<span class="ident">data</span>[<span class="number">1</span>] <span class="op">=</span> (<span class="ident">value</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>) <span class="kw">as</span> <span class="ident">u32</span>;
-        <span class="self">self</span>.<span class="ident">data</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">value</span> <span class="kw">as</span> <span class="ident">u32</span>;
+    <span class="kw">pub fn </span>set_low64(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: u64) {
+        <span class="self">self</span>.data[<span class="number">1</span>] = (value &gt;&gt; <span class="number">32</span>) <span class="kw">as </span>u32;
+        <span class="self">self</span>.data[<span class="number">0</span>] = value <span class="kw">as </span>u32;
     }
 
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">mid64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        ((<span class="self">self</span>.<span class="ident">data</span>[<span class="number">3</span>] <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>) <span class="op">|</span> (<span class="self">self</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="kw">as</span> <span class="ident">u64</span>)
+    <span class="attribute">#[allow(dead_code)]
+    </span><span class="kw">pub const fn </span>mid64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        ((<span class="self">self</span>.data[<span class="number">3</span>] <span class="kw">as </span>u64) &lt;&lt; <span class="number">32</span>) | (<span class="self">self</span>.data[<span class="number">2</span>] <span class="kw">as </span>u64)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_mid64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u64</span>) {
-        <span class="self">self</span>.<span class="ident">data</span>[<span class="number">3</span>] <span class="op">=</span> (<span class="ident">value</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>) <span class="kw">as</span> <span class="ident">u32</span>;
-        <span class="self">self</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="op">=</span> <span class="ident">value</span> <span class="kw">as</span> <span class="ident">u32</span>;
+    <span class="kw">pub fn </span>set_mid64(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: u64) {
+        <span class="self">self</span>.data[<span class="number">3</span>] = (value &gt;&gt; <span class="number">32</span>) <span class="kw">as </span>u32;
+        <span class="self">self</span>.data[<span class="number">2</span>] = value <span class="kw">as </span>u32;
     }
 
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">high64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        ((<span class="self">self</span>.<span class="ident">data</span>[<span class="number">5</span>] <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>) <span class="op">|</span> (<span class="self">self</span>.<span class="ident">data</span>[<span class="number">4</span>] <span class="kw">as</span> <span class="ident">u64</span>)
+    <span class="attribute">#[allow(dead_code)]
+    </span><span class="kw">pub const fn </span>high64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        ((<span class="self">self</span>.data[<span class="number">5</span>] <span class="kw">as </span>u64) &lt;&lt; <span class="number">32</span>) | (<span class="self">self</span>.data[<span class="number">4</span>] <span class="kw">as </span>u64)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_high64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u64</span>) {
-        <span class="self">self</span>.<span class="ident">data</span>[<span class="number">5</span>] <span class="op">=</span> (<span class="ident">value</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>) <span class="kw">as</span> <span class="ident">u32</span>;
-        <span class="self">self</span>.<span class="ident">data</span>[<span class="number">4</span>] <span class="op">=</span> <span class="ident">value</span> <span class="kw">as</span> <span class="ident">u32</span>;
+    <span class="kw">pub fn </span>set_high64(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: u64) {
+        <span class="self">self</span>.data[<span class="number">5</span>] = (value &gt;&gt; <span class="number">32</span>) <span class="kw">as </span>u32;
+        <span class="self">self</span>.data[<span class="number">4</span>] = value <span class="kw">as </span>u32;
     }
 
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">upper_word</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">data</span>[<span class="number">5</span>] <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="number">5</span>;
+    <span class="kw">pub const fn </span>upper_word(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="kw">if </span><span class="self">self</span>.data[<span class="number">5</span>] &gt; <span class="number">0 </span>{
+            <span class="kw">return </span><span class="number">5</span>;
         }
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">data</span>[<span class="number">4</span>] <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="number">4</span>;
+        <span class="kw">if </span><span class="self">self</span>.data[<span class="number">4</span>] &gt; <span class="number">0 </span>{
+            <span class="kw">return </span><span class="number">4</span>;
         }
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">data</span>[<span class="number">3</span>] <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="number">3</span>;
+        <span class="kw">if </span><span class="self">self</span>.data[<span class="number">3</span>] &gt; <span class="number">0 </span>{
+            <span class="kw">return </span><span class="number">3</span>;
         }
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">data</span>[<span class="number">2</span>] <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="number">2</span>;
+        <span class="kw">if </span><span class="self">self</span>.data[<span class="number">2</span>] &gt; <span class="number">0 </span>{
+            <span class="kw">return </span><span class="number">2</span>;
         }
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">data</span>[<span class="number">1</span>] <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="number">1</span>;
+        <span class="kw">if </span><span class="self">self</span>.data[<span class="number">1</span>] &gt; <span class="number">0 </span>{
+            <span class="kw">return </span><span class="number">1</span>;
         }
-        <span class="number">0</span>
-    }
+        <span class="number">0
+    </span>}
 
-    <span class="comment">// Attempt to rescale the number into 96 bits. If successful, the scale is returned wrapped</span>
-    <span class="comment">// in an Option. If it failed due to overflow, we return None.</span>
-    <span class="comment">// * `upper` - Index of last non-zero value in self.</span>
-    <span class="comment">// * `scale` - Current scale factor for this value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rescale</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">upper</span>: <span class="ident">usize</span>, <span class="ident">scale</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">scale</span> <span class="op">=</span> <span class="ident">scale</span> <span class="kw">as</span> <span class="ident">i32</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">upper</span> <span class="op">=</span> <span class="ident">upper</span>;
+    <span class="comment">// Attempt to rescale the number into 96 bits. If successful, the scale is returned wrapped
+    // in an Option. If it failed due to overflow, we return None.
+    // * `upper` - Index of last non-zero value in self.
+    // * `scale` - Current scale factor for this value.
+    </span><span class="kw">pub fn </span>rescale(<span class="kw-2">&amp;mut </span><span class="self">self</span>, upper: usize, scale: u32) -&gt; <span class="prelude-ty">Option</span>&lt;u32&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>scale = scale <span class="kw">as </span>i32;
+        <span class="kw">let </span><span class="kw-2">mut </span>upper = upper;
 
-        <span class="comment">// Determine a rescale target to start with</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rescale_target</span> <span class="op">=</span> <span class="number">0i32</span>;
-        <span class="kw">if</span> <span class="ident">upper</span> <span class="op">&gt;</span> <span class="number">2</span> {
-            <span class="ident">rescale_target</span> <span class="op">=</span> <span class="ident">upper</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">*</span> <span class="number">32</span> <span class="op">-</span> <span class="number">64</span> <span class="op">-</span> <span class="number">1</span>;
-            <span class="ident">rescale_target</span> <span class="op">-</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>[<span class="ident">upper</span>].<span class="ident">leading_zeros</span>() <span class="kw">as</span> <span class="ident">i32</span>;
-            <span class="ident">rescale_target</span> <span class="op">=</span> ((<span class="ident">rescale_target</span> <span class="op">*</span> <span class="number">77</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">8</span>) <span class="op">+</span> <span class="number">1</span>;
-            <span class="kw">if</span> <span class="ident">rescale_target</span> <span class="op">&gt;</span> <span class="ident">scale</span> {
-                <span class="kw">return</span> <span class="prelude-val">None</span>;
+        <span class="comment">// Determine a rescale target to start with
+        </span><span class="kw">let </span><span class="kw-2">mut </span>rescale_target = <span class="number">0i32</span>;
+        <span class="kw">if </span>upper &gt; <span class="number">2 </span>{
+            rescale_target = upper <span class="kw">as </span>i32 * <span class="number">32 </span>- <span class="number">64 </span>- <span class="number">1</span>;
+            rescale_target -= <span class="self">self</span>.data[upper].leading_zeros() <span class="kw">as </span>i32;
+            rescale_target = ((rescale_target * <span class="number">77</span>) &gt;&gt; <span class="number">8</span>) + <span class="number">1</span>;
+            <span class="kw">if </span>rescale_target &gt; scale {
+                <span class="kw">return </span><span class="prelude-val">None</span>;
             }
         }
 
-        <span class="comment">// Make sure we scale enough to bring it into a valid range</span>
-        <span class="kw">if</span> <span class="ident">rescale_target</span> <span class="op">&lt;</span> <span class="ident">scale</span> <span class="op">-</span> <span class="ident">MAX_PRECISION_I32</span> {
-            <span class="ident">rescale_target</span> <span class="op">=</span> <span class="ident">scale</span> <span class="op">-</span> <span class="ident">MAX_PRECISION_I32</span>;
+        <span class="comment">// Make sure we scale enough to bring it into a valid range
+        </span><span class="kw">if </span>rescale_target &lt; scale - MAX_PRECISION_I32 {
+            rescale_target = scale - MAX_PRECISION_I32;
         }
 
-        <span class="kw">if</span> <span class="ident">rescale_target</span> <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="comment">// We&#39;re going to keep reducing by powers of 10. So, start by reducing the scale by</span>
-            <span class="comment">// that amount.</span>
-            <span class="ident">scale</span> <span class="op">-</span><span class="op">=</span> <span class="ident">rescale_target</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sticky</span> <span class="op">=</span> <span class="number">0</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">remainder</span> <span class="op">=</span> <span class="number">0</span>;
-            <span class="kw">loop</span> {
-                <span class="ident">sticky</span> <span class="op">|</span><span class="op">=</span> <span class="ident">remainder</span>;
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">power</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">rescale_target</span> <span class="op">&gt;</span> <span class="number">8</span> {
-                    <span class="ident">POWERS_10</span>[<span class="number">9</span>]
-                } <span class="kw">else</span> {
-                    <span class="ident">POWERS_10</span>[<span class="ident">rescale_target</span> <span class="kw">as</span> <span class="ident">usize</span>]
+        <span class="kw">if </span>rescale_target &gt; <span class="number">0 </span>{
+            <span class="comment">// We&#39;re going to keep reducing by powers of 10. So, start by reducing the scale by
+            // that amount.
+            </span>scale -= rescale_target;
+            <span class="kw">let </span><span class="kw-2">mut </span>sticky = <span class="number">0</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>remainder = <span class="number">0</span>;
+            <span class="kw">loop </span>{
+                sticky |= remainder;
+                <span class="kw">let </span><span class="kw-2">mut </span>power = <span class="kw">if </span>rescale_target &gt; <span class="number">8 </span>{
+                    POWERS_10[<span class="number">9</span>]
+                } <span class="kw">else </span>{
+                    POWERS_10[rescale_target <span class="kw">as </span>usize]
                 };
 
-                <span class="kw">let</span> <span class="ident">high</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>[<span class="ident">upper</span>];
-                <span class="kw">let</span> <span class="ident">high_quotient</span> <span class="op">=</span> <span class="ident">high</span> <span class="op">/</span> <span class="ident">power</span>;
-                <span class="ident">remainder</span> <span class="op">=</span> <span class="ident">high</span> <span class="op">-</span> <span class="ident">high_quotient</span> <span class="op">*</span> <span class="ident">power</span>;
+                <span class="kw">let </span>high = <span class="self">self</span>.data[upper];
+                <span class="kw">let </span>high_quotient = high / power;
+                remainder = high - high_quotient * power;
 
-                <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">iter_mut</span>().<span class="ident">rev</span>().<span class="ident">skip</span>(<span class="number">6</span> <span class="op">-</span> <span class="ident">upper</span>) {
-                    <span class="kw">let</span> <span class="ident">num</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">item</span> <span class="kw">as</span> <span class="ident">u64</span>).<span class="ident">wrapping_add</span>((<span class="ident">remainder</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>);
-                    <span class="kw-2">*</span><span class="ident">item</span> <span class="op">=</span> (<span class="ident">num</span> <span class="op">/</span> <span class="ident">power</span> <span class="kw">as</span> <span class="ident">u64</span>) <span class="kw">as</span> <span class="ident">u32</span>;
-                    <span class="ident">remainder</span> <span class="op">=</span> (<span class="ident">num</span> <span class="kw">as</span> <span class="ident">u32</span>).<span class="ident">wrapping_sub</span>(<span class="ident">item</span>.<span class="ident">wrapping_mul</span>(<span class="ident">power</span>));
+                <span class="kw">for </span>item <span class="kw">in </span><span class="self">self</span>.data.iter_mut().rev().skip(<span class="number">6 </span>- upper) {
+                    <span class="kw">let </span>num = (<span class="kw-2">*</span>item <span class="kw">as </span>u64).wrapping_add((remainder <span class="kw">as </span>u64) &lt;&lt; <span class="number">32</span>);
+                    <span class="kw-2">*</span>item = (num / power <span class="kw">as </span>u64) <span class="kw">as </span>u32;
+                    remainder = (num <span class="kw">as </span>u32).wrapping_sub(item.wrapping_mul(power));
                 }
 
-                <span class="self">self</span>.<span class="ident">data</span>[<span class="ident">upper</span>] <span class="op">=</span> <span class="ident">high_quotient</span>;
+                <span class="self">self</span>.data[upper] = high_quotient;
 
-                <span class="comment">// If the high quotient was zero then decrease the upper bound</span>
-                <span class="kw">if</span> <span class="ident">high_quotient</span> <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">upper</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                    <span class="ident">upper</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+                <span class="comment">// If the high quotient was zero then decrease the upper bound
+                </span><span class="kw">if </span>high_quotient == <span class="number">0 </span>&amp;&amp; upper &gt; <span class="number">0 </span>{
+                    upper -= <span class="number">1</span>;
                 }
-                <span class="kw">if</span> <span class="ident">rescale_target</span> <span class="op">&gt;</span> <span class="ident">MAX_I32_SCALE</span> {
-                    <span class="comment">// Scale some more</span>
-                    <span class="ident">rescale_target</span> <span class="op">-</span><span class="op">=</span> <span class="ident">MAX_I32_SCALE</span>;
+                <span class="kw">if </span>rescale_target &gt; MAX_I32_SCALE {
+                    <span class="comment">// Scale some more
+                    </span>rescale_target -= MAX_I32_SCALE;
                     <span class="kw">continue</span>;
                 }
 
-                <span class="comment">// If we fit into 96 bits then we&#39;ve scaled enough. Otherwise, scale once more.</span>
-                <span class="kw">if</span> <span class="ident">upper</span> <span class="op">&gt;</span> <span class="number">2</span> {
-                    <span class="kw">if</span> <span class="ident">scale</span> <span class="op">==</span> <span class="number">0</span> {
-                        <span class="kw">return</span> <span class="prelude-val">None</span>;
+                <span class="comment">// If we fit into 96 bits then we&#39;ve scaled enough. Otherwise, scale once more.
+                </span><span class="kw">if </span>upper &gt; <span class="number">2 </span>{
+                    <span class="kw">if </span>scale == <span class="number">0 </span>{
+                        <span class="kw">return </span><span class="prelude-val">None</span>;
                     }
-                    <span class="comment">// Equivalent to scaling down by 10</span>
-                    <span class="ident">rescale_target</span> <span class="op">=</span> <span class="number">1</span>;
-                    <span class="ident">scale</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+                    <span class="comment">// Equivalent to scaling down by 10
+                    </span>rescale_target = <span class="number">1</span>;
+                    scale -= <span class="number">1</span>;
                     <span class="kw">continue</span>;
                 }
 
-                <span class="comment">// Round the final result.</span>
-                <span class="ident">power</span> <span class="op">&gt;</span><span class="op">&gt;</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="kw">let</span> <span class="ident">carried</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">power</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">remainder</span> {
-                    <span class="comment">// If we&#39;re less than half then we&#39;re fine. Otherwise, we round if odd or if the</span>
-                    <span class="comment">// sticky bit is set.</span>
-                    <span class="kw">if</span> <span class="ident">power</span> <span class="op">&lt;</span> <span class="ident">remainder</span> <span class="op">|</span><span class="op">|</span> ((<span class="self">self</span>.<span class="ident">data</span>[<span class="number">0</span>] <span class="op">&amp;</span> <span class="number">1</span>) <span class="op">|</span> <span class="ident">sticky</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                        <span class="comment">// Round up</span>
-                        <span class="self">self</span>.<span class="ident">data</span>[<span class="number">0</span>] <span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>[<span class="number">0</span>].<span class="ident">wrapping_add</span>(<span class="number">1</span>);
-                        <span class="comment">// Check if we carried</span>
-                        <span class="self">self</span>.<span class="ident">data</span>[<span class="number">0</span>] <span class="op">==</span> <span class="number">0</span>
-                    } <span class="kw">else</span> {
-                        <span class="bool-val">false</span>
-                    }
-                } <span class="kw">else</span> {
-                    <span class="bool-val">false</span>
-                };
+                <span class="comment">// Round the final result.
+                </span>power &gt;&gt;= <span class="number">1</span>;
+                <span class="kw">let </span>carried = <span class="kw">if </span>power &lt;= remainder {
+                    <span class="comment">// If we&#39;re less than half then we&#39;re fine. Otherwise, we round if odd or if the
+                    // sticky bit is set.
+                    </span><span class="kw">if </span>power &lt; remainder || ((<span class="self">self</span>.data[<span class="number">0</span>] &amp; <span class="number">1</span>) | sticky) != <span class="number">0 </span>{
+                        <span class="comment">// Round up
+                        </span><span class="self">self</span>.data[<span class="number">0</span>] = <span class="self">self</span>.data[<span class="number">0</span>].wrapping_add(<span class="number">1</span>);
+                        <span class="comment">// Check if we carried
+                        </span><span class="self">self</span>.data[<span class="number">0</span>] == <span class="number">0
+                    </span>} <span class="kw">else </span>{
+                        <span class="bool-val">false
+                    </span>}
+                } <span class="kw">else </span>{
+                    <span class="bool-val">false
+                </span>};
 
-                <span class="comment">// If we carried then propagate through the portions</span>
-                <span class="kw">if</span> <span class="ident">carried</span> {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pos</span> <span class="op">=</span> <span class="number">0</span>;
-                    <span class="kw">for</span> (<span class="ident">index</span>, <span class="ident">value</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">iter_mut</span>().<span class="ident">enumerate</span>().<span class="ident">skip</span>(<span class="number">1</span>) {
-                        <span class="ident">pos</span> <span class="op">=</span> <span class="ident">index</span>;
-                        <span class="kw-2">*</span><span class="ident">value</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">wrapping_add</span>(<span class="number">1</span>);
-                        <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">value</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
+                <span class="comment">// If we carried then propagate through the portions
+                </span><span class="kw">if </span>carried {
+                    <span class="kw">let </span><span class="kw-2">mut </span>pos = <span class="number">0</span>;
+                    <span class="kw">for </span>(index, value) <span class="kw">in </span><span class="self">self</span>.data.iter_mut().enumerate().skip(<span class="number">1</span>) {
+                        pos = index;
+                        <span class="kw-2">*</span>value = value.wrapping_add(<span class="number">1</span>);
+                        <span class="kw">if </span><span class="kw-2">*</span>value != <span class="number">0 </span>{
                             <span class="kw">break</span>;
                         }
                     }
 
-                    <span class="comment">// If we ended up rounding over the 96 bits then we&#39;ll try to rescale down (again)</span>
-                    <span class="kw">if</span> <span class="ident">pos</span> <span class="op">&gt;</span> <span class="number">2</span> {
-                        <span class="comment">// Nothing to scale down from will cause overflow</span>
-                        <span class="kw">if</span> <span class="ident">scale</span> <span class="op">==</span> <span class="number">0</span> {
-                            <span class="kw">return</span> <span class="prelude-val">None</span>;
+                    <span class="comment">// If we ended up rounding over the 96 bits then we&#39;ll try to rescale down (again)
+                    </span><span class="kw">if </span>pos &gt; <span class="number">2 </span>{
+                        <span class="comment">// Nothing to scale down from will cause overflow
+                        </span><span class="kw">if </span>scale == <span class="number">0 </span>{
+                            <span class="kw">return </span><span class="prelude-val">None</span>;
                         }
 
-                        <span class="comment">// Loop back around using scale of 10.</span>
-                        <span class="comment">// Reset the sticky bit and remainder before looping.</span>
-                        <span class="ident">upper</span> <span class="op">=</span> <span class="ident">pos</span>;
-                        <span class="ident">sticky</span> <span class="op">=</span> <span class="number">0</span>;
-                        <span class="ident">remainder</span> <span class="op">=</span> <span class="number">0</span>;
-                        <span class="ident">rescale_target</span> <span class="op">=</span> <span class="number">1</span>;
-                        <span class="ident">scale</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+                        <span class="comment">// Loop back around using scale of 10.
+                        // Reset the sticky bit and remainder before looping.
+                        </span>upper = pos;
+                        sticky = <span class="number">0</span>;
+                        remainder = <span class="number">0</span>;
+                        rescale_target = <span class="number">1</span>;
+                        scale -= <span class="number">1</span>;
                         <span class="kw">continue</span>;
                     }
                 }
@@ -905,8 +905,8 @@
             }
         }
 
-        <span class="prelude-val">Some</span>(<span class="ident">scale</span> <span class="kw">as</span> <span class="ident">u32</span>)
+        <span class="prelude-val">Some</span>(scale <span class="kw">as </span>u32)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rust_decimal" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rust_decimal" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

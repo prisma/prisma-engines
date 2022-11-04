@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/barrel-67fdc3e05321612f/4e84cf3/src/types/defaults.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>defaults.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../barrel/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../barrel/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../barrel/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/barrel-67fdc3e05321612f/4e84cf3/src/types/defaults.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>defaults.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../barrel/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../barrel/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../barrel/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -104,111 +104,111 @@
 <span id="104">104</span>
 <span id="105">105</span>
 <span id="106">106</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="self">self</span>, <span class="ident">Display</span>, <span class="ident">Formatter</span>};
-<span class="kw">use</span> <span class="ident">std::time::SystemTime</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::fmt::{<span class="self">self</span>, Display, Formatter};
+<span class="kw">use </span>std::time::SystemTime;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Type</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::functions::AutogenFunction</span>;
+<span class="kw">use </span><span class="kw">super</span>::Type;
+<span class="kw">use </span><span class="kw">crate</span>::functions::AutogenFunction;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">WrappedDefault</span><span class="op">&lt;</span><span class="lifetime">&#39;outer</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Any text information</span>
-    <span class="ident">AnyText</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;outer</span> <span class="ident">str</span>),
-    <span class="doccomment">/// Simple integer</span>
-    <span class="ident">Integer</span>(<span class="ident">i64</span>),
-    <span class="doccomment">/// Floating point number</span>
-    <span class="ident">Float</span>(<span class="ident">f32</span>),
-    <span class="doccomment">/// Like Float but `~ ~ d o u b l e    p r e c i s i o n ~ ~`</span>
-    <span class="ident">Double</span>(<span class="ident">f64</span>),
-    <span class="doccomment">/// A unique identifier type</span>
-    <span class="ident">UUID</span>(<span class="ident">String</span>), <span class="comment">// TODO: Change to UUID type</span>
-    <span class="doccomment">/// True or False</span>
-    <span class="ident">Boolean</span>(<span class="ident">bool</span>),
-    <span class="doccomment">/// Date And Time</span>
-    <span class="ident">Date</span>(<span class="ident">SystemTime</span>),
-    <span class="doccomment">/// &lt;inconceivable jibberish&gt;</span>
-    <span class="ident">Binary</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;outer</span> [<span class="ident">u8</span>]),
-    <span class="doccomment">/// Foreign key to other table</span>
-    <span class="ident">Foreign</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Type</span><span class="op">&gt;</span>),
-    <span class="comment">// I have no idea what you are – but I *like* it</span>
-    <span class="ident">Custom</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>),
-    <span class="doccomment">/// Any of the above, but **many** of them</span>
-    <span class="ident">Array</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Type</span><span class="op">&gt;</span>),
-    <span class="doccomment">/// A function to call</span>
-    <span class="ident">Function</span>(<span class="ident">AutogenFunction</span>),
-    <span class="doccomment">/// Nothing</span>
-    <span class="ident">Null</span>,
+<span class="attribute">#[derive(PartialEq, Debug, Clone)]
+</span><span class="kw">pub enum </span>WrappedDefault&lt;<span class="lifetime">&#39;outer</span>&gt; {
+    <span class="doccomment">/// Any text information
+    </span>AnyText(<span class="kw-2">&amp;</span><span class="lifetime">&#39;outer </span>str),
+    <span class="doccomment">/// Simple integer
+    </span>Integer(i64),
+    <span class="doccomment">/// Floating point number
+    </span>Float(f32),
+    <span class="doccomment">/// Like Float but `~ ~ d o u b l e    p r e c i s i o n ~ ~`
+    </span>Double(f64),
+    <span class="doccomment">/// A unique identifier type
+    </span>UUID(String), <span class="comment">// TODO: Change to UUID type
+    </span><span class="doccomment">/// True or False
+    </span>Boolean(bool),
+    <span class="doccomment">/// Date And Time
+    </span>Date(SystemTime),
+    <span class="doccomment">/// &lt;inconceivable jibberish&gt;
+    </span>Binary(<span class="kw-2">&amp;</span><span class="lifetime">&#39;outer </span>[u8]),
+    <span class="doccomment">/// Foreign key to other table
+    </span>Foreign(Box&lt;Type&gt;),
+    <span class="comment">// I have no idea what you are – but I *like* it
+    </span>Custom(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str),
+    <span class="doccomment">/// Any of the above, but **many** of them
+    </span>Array(Vec&lt;Type&gt;),
+    <span class="doccomment">/// A function to call
+    </span>Function(AutogenFunction),
+    <span class="doccomment">/// Nothing
+    </span>Null,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;outer</span><span class="op">&gt;</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">WrappedDefault</span><span class="op">&lt;</span><span class="lifetime">&#39;outer</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::WrappedDefault</span>::<span class="kw-2">*</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;outer</span>&gt; Display <span class="kw">for </span>WrappedDefault&lt;<span class="lifetime">&#39;outer</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter) -&gt; fmt::Result {
+        <span class="kw">use </span><span class="self">self</span>::WrappedDefault::<span class="kw-2">*</span>;
         <span class="macro">write!</span>(
-            <span class="ident">f</span>,
+            f,
             <span class="string">&quot;{}&quot;</span>,
-            <span class="kw-2">&amp;</span><span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-                <span class="ident">AnyText</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">val</span>),
-                <span class="ident">Integer</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">val</span>),
-                <span class="ident">Float</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">val</span>),
-                <span class="ident">Double</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">val</span>),
-                <span class="ident">UUID</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">val</span>),
-                <span class="ident">Boolean</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">val</span>),
-                <span class="ident">Date</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">val</span>),
-                <span class="ident">Binary</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">val</span>),
-                <span class="ident">Foreign</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">val</span>),
-                <span class="ident">Custom</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">val</span>),
-                <span class="ident">Array</span>(<span class="kw-2">ref</span> <span class="ident">val</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">val</span>),
-                <span class="ident">Function</span>(<span class="kw-2">ref</span> <span class="ident">fun</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">fun</span>),
-                <span class="ident">Null</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;NULL&quot;</span>),
+            <span class="kw-2">&amp;</span><span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+                AnyText(<span class="kw-2">ref </span>val) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, val),
+                Integer(<span class="kw-2">ref </span>val) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, val),
+                Float(<span class="kw-2">ref </span>val) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, val),
+                Double(<span class="kw-2">ref </span>val) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, val),
+                UUID(<span class="kw-2">ref </span>val) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, val),
+                Boolean(<span class="kw-2">ref </span>val) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, val),
+                Date(<span class="kw-2">ref </span>val) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, val),
+                Binary(<span class="kw-2">ref </span>val) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, val),
+                Foreign(<span class="kw-2">ref </span>val) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, val),
+                Custom(<span class="kw-2">ref </span>val) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, val),
+                Array(<span class="kw-2">ref </span>val) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, val),
+                Function(<span class="kw-2">ref </span>fun) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, fun),
+                Null =&gt; <span class="macro">format!</span>(<span class="string">&quot;NULL&quot;</span>),
             }
         )
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">AutogenFunction</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">WrappedDefault</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">fun</span>: <span class="ident">AutogenFunction</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">WrappedDefault::Function</span>(<span class="ident">fun</span>)
+<span class="kw">impl </span>From&lt;AutogenFunction&gt; <span class="kw">for </span>WrappedDefault&lt;<span class="lifetime">&#39;static</span>&gt; {
+    <span class="kw">fn </span>from(fun: AutogenFunction) -&gt; <span class="self">Self </span>{
+        WrappedDefault::Function(fun)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">WrappedDefault</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">WrappedDefault::AnyText</span>(<span class="ident">s</span>)
+<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; <span class="kw">for </span>WrappedDefault&lt;<span class="lifetime">&#39;static</span>&gt; {
+    <span class="kw">fn </span>from(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="self">Self </span>{
+        WrappedDefault::AnyText(s)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">WrappedDefault</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">i64</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">WrappedDefault::Integer</span>(<span class="ident">s</span>)
+<span class="kw">impl </span>From&lt;i64&gt; <span class="kw">for </span>WrappedDefault&lt;<span class="lifetime">&#39;static</span>&gt; {
+    <span class="kw">fn </span>from(s: i64) -&gt; <span class="self">Self </span>{
+        WrappedDefault::Integer(s)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">f32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">WrappedDefault</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">f32</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">WrappedDefault::Float</span>(<span class="ident">s</span>)
+<span class="kw">impl </span>From&lt;f32&gt; <span class="kw">for </span>WrappedDefault&lt;<span class="lifetime">&#39;static</span>&gt; {
+    <span class="kw">fn </span>from(s: f32) -&gt; <span class="self">Self </span>{
+        WrappedDefault::Float(s)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">WrappedDefault</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">f64</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">WrappedDefault::Double</span>(<span class="ident">s</span>)
+<span class="kw">impl </span>From&lt;f64&gt; <span class="kw">for </span>WrappedDefault&lt;<span class="lifetime">&#39;static</span>&gt; {
+    <span class="kw">fn </span>from(s: f64) -&gt; <span class="self">Self </span>{
+        WrappedDefault::Double(s)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">WrappedDefault</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">WrappedDefault::Boolean</span>(<span class="ident">s</span>)
+<span class="kw">impl </span>From&lt;bool&gt; <span class="kw">for </span>WrappedDefault&lt;<span class="lifetime">&#39;static</span>&gt; {
+    <span class="kw">fn </span>from(s: bool) -&gt; <span class="self">Self </span>{
+        WrappedDefault::Boolean(s)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SystemTime</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">WrappedDefault</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">SystemTime</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">WrappedDefault::Date</span>(<span class="ident">s</span>)
+<span class="kw">impl </span>From&lt;SystemTime&gt; <span class="kw">for </span>WrappedDefault&lt;<span class="lifetime">&#39;static</span>&gt; {
+    <span class="kw">fn </span>from(s: SystemTime) -&gt; <span class="self">Self </span>{
+        WrappedDefault::Date(s)
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">null</span>() -&gt; <span class="ident">WrappedDefault</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-    <span class="ident">WrappedDefault::Null</span>
+<span class="kw">pub fn </span>null() -&gt; WrappedDefault&lt;<span class="lifetime">&#39;static</span>&gt; {
+    WrappedDefault::Null
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="barrel" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="barrel" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

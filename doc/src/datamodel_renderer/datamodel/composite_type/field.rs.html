@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/datamodel-renderer/src/datamodel/composite_type/field.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>field.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../datamodel_renderer/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../datamodel_renderer/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../datamodel_renderer/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/datamodel-renderer/src/datamodel/composite_type/field.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>field.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../datamodel_renderer/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../datamodel_renderer/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../datamodel_renderer/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -285,292 +285,292 @@
 <span id="285">285</span>
 <span id="286">286</span>
 <span id="287">287</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::datamodel::attributes::FieldAttribute</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::datamodel::FieldType</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">datamodel::DefaultValue</span>,
-    <span class="ident">value</span>::{<span class="ident">Constant</span>, <span class="ident">ConstantNameValidationError</span>, <span class="ident">Documentation</span>, <span class="ident">Function</span>},
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::datamodel::attributes::FieldAttribute;
+<span class="kw">use </span><span class="kw">crate</span>::datamodel::FieldType;
+<span class="kw">use crate</span>::{
+    datamodel::DefaultValue,
+    value::{Constant, ConstantNameValidationError, Documentation, Function},
 };
-<span class="kw">use</span> <span class="ident">psl::dml</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">fmt</span>};
+<span class="kw">use </span>psl::dml;
+<span class="kw">use </span>std::{borrow::Cow, fmt};
 
-<span class="doccomment">/// A field in a composite type block.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CompositeTypeField</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">name</span>: <span class="ident">Constant</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">r#type</span>: <span class="ident">FieldType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="ident">documentation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Documentation</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">map</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FieldAttribute</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">default</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DefaultValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">native_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FieldAttribute</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">commented_out</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// A field in a composite type block.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>CompositeTypeField&lt;<span class="lifetime">&#39;a</span>&gt; {
+    name: Constant&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
+    r#type: FieldType&lt;<span class="lifetime">&#39;a</span>&gt;,
+    documentation: <span class="prelude-ty">Option</span>&lt;Documentation&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    map: <span class="prelude-ty">Option</span>&lt;FieldAttribute&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    default: <span class="prelude-ty">Option</span>&lt;DefaultValue&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    native_type: <span class="prelude-ty">Option</span>&lt;FieldAttribute&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    commented_out: bool,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">CompositeTypeField</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Create a new required composite field declaration.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// type Address {</span>
-    <span class="doccomment">///   street String</span>
-    <span class="doccomment">/// //       ^^^^^^ type_name</span>
-    <span class="doccomment">/// //^^^^^^ name</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_required</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">type_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">name</span>, <span class="ident">FieldType::required</span>(<span class="ident">type_name</span>))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; CompositeTypeField&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Create a new required composite field declaration.
+    ///
+    /// ```ignore
+    /// type Address {
+    ///   street String
+    /// //       ^^^^^^ type_name
+    /// //^^^^^^ name
+    /// }
+    /// ```
+    </span><span class="kw">pub fn </span>new_required(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, type_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new(name, FieldType::required(type_name))
     }
 
-    <span class="doccomment">/// Create a new optional composite field declaration.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// type Address {</span>
-    <span class="doccomment">///   street String?</span>
-    <span class="doccomment">/// //       ^^^^^^ type_name</span>
-    <span class="doccomment">/// //^^^^^^ name</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_optional</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">type_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">name</span>, <span class="ident">FieldType::optional</span>(<span class="ident">type_name</span>))
+    <span class="doccomment">/// Create a new optional composite field declaration.
+    ///
+    /// ```ignore
+    /// type Address {
+    ///   street String?
+    /// //       ^^^^^^ type_name
+    /// //^^^^^^ name
+    /// }
+    /// ```
+    </span><span class="kw">pub fn </span>new_optional(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, type_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new(name, FieldType::optional(type_name))
     }
 
-    <span class="doccomment">/// Create a new array composite field declaration.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// type Address {</span>
-    <span class="doccomment">///   street String[]</span>
-    <span class="doccomment">/// //       ^^^^^^ type_name</span>
-    <span class="doccomment">/// //^^^^^^ name</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_array</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">type_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">name</span>, <span class="ident">FieldType::array</span>(<span class="ident">type_name</span>))
+    <span class="doccomment">/// Create a new array composite field declaration.
+    ///
+    /// ```ignore
+    /// type Address {
+    ///   street String[]
+    /// //       ^^^^^^ type_name
+    /// //^^^^^^ name
+    /// }
+    /// ```
+    </span><span class="kw">pub fn </span>new_array(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, type_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new(name, FieldType::array(type_name))
     }
 
-    <span class="doccomment">/// Create a new required unsupported composite field declaration.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// type Address {</span>
-    <span class="doccomment">///   street Unsupported(&quot;foo&quot;)</span>
-    <span class="doccomment">/// //                    ^^^ type_name</span>
-    <span class="doccomment">/// //^^^^^^ name</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_required_unsupported</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">type_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">name</span>, <span class="ident">FieldType::required_unsupported</span>(<span class="ident">type_name</span>))
+    <span class="doccomment">/// Create a new required unsupported composite field declaration.
+    ///
+    /// ```ignore
+    /// type Address {
+    ///   street Unsupported(&quot;foo&quot;)
+    /// //                    ^^^ type_name
+    /// //^^^^^^ name
+    /// }
+    /// ```
+    </span><span class="kw">pub fn </span>new_required_unsupported(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, type_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new(name, FieldType::required_unsupported(type_name))
     }
 
-    <span class="doccomment">/// Create a new optional unsupported composite field declaration.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// type Address {</span>
-    <span class="doccomment">///   street Unsupported(&quot;foo&quot;)?</span>
-    <span class="doccomment">/// //                    ^^^ type_name</span>
-    <span class="doccomment">/// //^^^^^^ name</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_optional_unsupported</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">type_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">name</span>, <span class="ident">FieldType::optional_unsupported</span>(<span class="ident">type_name</span>))
+    <span class="doccomment">/// Create a new optional unsupported composite field declaration.
+    ///
+    /// ```ignore
+    /// type Address {
+    ///   street Unsupported(&quot;foo&quot;)?
+    /// //                    ^^^ type_name
+    /// //^^^^^^ name
+    /// }
+    /// ```
+    </span><span class="kw">pub fn </span>new_optional_unsupported(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, type_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new(name, FieldType::optional_unsupported(type_name))
     }
 
-    <span class="doccomment">/// Create a new array unsupported composite field declaration.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// type Address {</span>
-    <span class="doccomment">///   street Unsupported(&quot;foo&quot;)[]</span>
-    <span class="doccomment">/// //                    ^^^ type_name</span>
-    <span class="doccomment">/// //^^^^^^ name</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_array_unsupported</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">type_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">name</span>, <span class="ident">FieldType::array_unsupported</span>(<span class="ident">type_name</span>))
+    <span class="doccomment">/// Create a new array unsupported composite field declaration.
+    ///
+    /// ```ignore
+    /// type Address {
+    ///   street Unsupported(&quot;foo&quot;)[]
+    /// //                    ^^^ type_name
+    /// //^^^^^^ name
+    /// }
+    /// ```
+    </span><span class="kw">pub fn </span>new_array_unsupported(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, type_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new(name, FieldType::array_unsupported(type_name))
     }
 
-    <span class="doccomment">/// Sets the field map attribute.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// type Address {</span>
-    <span class="doccomment">///   street String @map(&quot;Straße&quot;)</span>
-    <span class="doccomment">///                       ^^^^^^ value</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">Function::new</span>(<span class="string">&quot;map&quot;</span>);
-        <span class="ident">map</span>.<span class="ident">push_param</span>(<span class="ident">value</span>);
+    <span class="doccomment">/// Sets the field map attribute.
+    ///
+    /// ```ignore
+    /// type Address {
+    ///   street String @map(&quot;Straße&quot;)
+    ///                       ^^^^^^ value
+    /// }
+    /// ```
+    </span><span class="kw">pub fn </span>map(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) {
+        <span class="kw">let </span><span class="kw-2">mut </span>map = Function::new(<span class="string">&quot;map&quot;</span>);
+        map.push_param(value);
 
-        <span class="self">self</span>.<span class="ident">map</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">FieldAttribute::new</span>(<span class="ident">map</span>));
+        <span class="self">self</span>.map = <span class="prelude-val">Some</span>(FieldAttribute::new(map));
     }
 
-    <span class="doccomment">/// Documentation of the field.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// type Foo {</span>
-    <span class="doccomment">///   /// This is the documentation.</span>
-    <span class="doccomment">///   bar Int</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">documentation</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">documentation</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) {
-        <span class="self">self</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Documentation</span>(<span class="ident">documentation</span>));
+    <span class="doccomment">/// Documentation of the field.
+    ///
+    /// ```ignore
+    /// type Foo {
+    ///   /// This is the documentation.
+    ///   bar Int
+    /// }
+    /// ```
+    </span><span class="kw">pub fn </span>documentation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, documentation: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) {
+        <span class="self">self</span>.documentation = <span class="prelude-val">Some</span>(Documentation(documentation));
     }
 
-    <span class="doccomment">/// Sets the field default attribute.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// type Address {</span>
-    <span class="doccomment">///   street String @default(&quot;Prenzlauer Allee&quot;)</span>
-    <span class="doccomment">///                           ^^^^^^^^^^^^^^^^ value</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">DefaultValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">default</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>);
+    <span class="doccomment">/// Sets the field default attribute.
+    ///
+    /// ```ignore
+    /// type Address {
+    ///   street String @default(&quot;Prenzlauer Allee&quot;)
+    ///                           ^^^^^^^^^^^^^^^^ value
+    /// }
+    /// ```
+    </span><span class="kw">pub fn </span>default(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: DefaultValue&lt;<span class="lifetime">&#39;a</span>&gt;) {
+        <span class="self">self</span>.default = <span class="prelude-val">Some</span>(value);
     }
 
-    <span class="doccomment">/// Sets the native type of the field.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// type Address {</span>
-    <span class="doccomment">///   street String @db.VarChar(255)</span>
-    <span class="doccomment">/// //                          ^^^ param</span>
-    <span class="doccomment">/// //                  ^^^^^^^ type_name</span>
-    <span class="doccomment">/// //               ^^ prefix</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// TODO: `params` as `&amp;[&amp;str]` when we get rid of the DML.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">native_type</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">prefix</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">r#type</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">params</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">native_type</span> <span class="op">=</span> <span class="ident">FieldAttribute::new</span>(<span class="ident">Function::new</span>(<span class="ident">r#type</span>));
+    <span class="doccomment">/// Sets the native type of the field.
+    ///
+    /// ```ignore
+    /// type Address {
+    ///   street String @db.VarChar(255)
+    /// //                          ^^^ param
+    /// //                  ^^^^^^^ type_name
+    /// //               ^^ prefix
+    /// }
+    /// ```
+    ///
+    /// TODO: `params` as `&amp;[&amp;str]` when we get rid of the DML.
+    </span><span class="kw">pub fn </span>native_type(<span class="kw-2">&amp;mut </span><span class="self">self</span>, prefix: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, r#type: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, params: Vec&lt;String&gt;) {
+        <span class="kw">let </span><span class="kw-2">mut </span>native_type = FieldAttribute::new(Function::new(r#type));
 
-        <span class="kw">for</span> <span class="ident">param</span> <span class="kw">in</span> <span class="ident">params</span> {
-            <span class="ident">native_type</span>.<span class="ident">push_param</span>(<span class="ident">Constant::new_no_validate</span>(<span class="ident">param</span>));
+        <span class="kw">for </span>param <span class="kw">in </span>params {
+            native_type.push_param(Constant::new_no_validate(param));
         }
 
-        <span class="ident">native_type</span>.<span class="ident">prefix</span>(<span class="ident">prefix</span>);
+        native_type.prefix(prefix);
 
-        <span class="self">self</span>.<span class="ident">native_type</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">native_type</span>);
+        <span class="self">self</span>.native_type = <span class="prelude-val">Some</span>(native_type);
     }
 
-    <span class="doccomment">/// Comments the field out.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">commented_out</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">commented_out</span> <span class="op">=</span> <span class="bool-val">true</span>;
+    <span class="doccomment">/// Comments the field out.
+    </span><span class="kw">pub fn </span>commented_out(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.commented_out = <span class="bool-val">true</span>;
     }
 
-    <span class="doccomment">/// Generate a composite type rendering from the deprecated DML structure.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Remove when destroying the DML.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_dml</span>(<span class="ident">datasource</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">psl::Datasource</span>, <span class="ident">dml_field</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">dml::CompositeTypeField</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> (<span class="ident">r#type</span>, <span class="ident">native_type</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">dml_field</span>.<span class="ident">r#type</span> {
-            <span class="ident">dml::CompositeTypeFieldType::CompositeType</span>(<span class="kw-2">ref</span> <span class="ident">ct</span>) =&gt; (<span class="ident">ct</span>.<span class="ident">as_str</span>(), <span class="prelude-val">None</span>),
-            <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(<span class="kw-2">ref</span> <span class="ident">st</span>, <span class="kw-2">ref</span> <span class="ident">nt</span>) =&gt; {
-                (<span class="ident">st</span>.<span class="ident">as_ref</span>(), <span class="ident">nt</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">nt</span><span class="op">|</span> (<span class="ident">nt</span>.<span class="ident">name</span>(), <span class="ident">nt</span>.<span class="ident">args</span>())))
+    <span class="doccomment">/// Generate a composite type rendering from the deprecated DML structure.
+    ///
+    /// Remove when destroying the DML.
+    </span><span class="kw">pub fn </span>from_dml(datasource: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>psl::Datasource, dml_field: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>dml::CompositeTypeField) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>(r#type, native_type) = <span class="kw">match </span>dml_field.r#type {
+            dml::CompositeTypeFieldType::CompositeType(<span class="kw-2">ref </span>ct) =&gt; (ct.as_str(), <span class="prelude-val">None</span>),
+            dml::CompositeTypeFieldType::Scalar(<span class="kw-2">ref </span>st, <span class="kw-2">ref </span>nt) =&gt; {
+                (st.as_ref(), nt.as_ref().map(|nt| (nt.name(), nt.args())))
             }
-            <span class="ident">dml::CompositeTypeFieldType::Enum</span>(<span class="kw-2">ref</span> <span class="ident">s</span>) =&gt; (<span class="ident">s</span>.<span class="ident">as_str</span>(), <span class="prelude-val">None</span>),
-            <span class="ident">dml::CompositeTypeFieldType::Unsupported</span>(<span class="kw-2">ref</span> <span class="ident">s</span>) =&gt; (<span class="ident">s</span>.<span class="ident">as_str</span>(), <span class="prelude-val">None</span>),
+            dml::CompositeTypeFieldType::Enum(<span class="kw-2">ref </span>s) =&gt; (s.as_str(), <span class="prelude-val">None</span>),
+            dml::CompositeTypeFieldType::Unsupported(<span class="kw-2">ref </span>s) =&gt; (s.as_str(), <span class="prelude-val">None</span>),
         };
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">dml_field</span>.<span class="ident">arity</span> {
-            <span class="ident">dml::FieldArity::Required</span> <span class="kw">if</span> <span class="ident">dml_field</span>.<span class="ident">r#type</span>.<span class="ident">is_unsupported</span>() =&gt; {
-                <span class="ident">CompositeTypeField::new_required_unsupported</span>(<span class="kw-2">&amp;</span><span class="ident">dml_field</span>.<span class="ident">name</span>, <span class="ident">r#type</span>)
+        <span class="kw">let </span><span class="kw-2">mut </span>field = <span class="kw">match </span>dml_field.arity {
+            dml::FieldArity::Required <span class="kw">if </span>dml_field.r#type.is_unsupported() =&gt; {
+                CompositeTypeField::new_required_unsupported(<span class="kw-2">&amp;</span>dml_field.name, r#type)
             }
-            <span class="ident">dml::FieldArity::Optional</span> <span class="kw">if</span> <span class="ident">dml_field</span>.<span class="ident">r#type</span>.<span class="ident">is_unsupported</span>() =&gt; {
-                <span class="ident">CompositeTypeField::new_optional_unsupported</span>(<span class="kw-2">&amp;</span><span class="ident">dml_field</span>.<span class="ident">name</span>, <span class="ident">r#type</span>)
+            dml::FieldArity::Optional <span class="kw">if </span>dml_field.r#type.is_unsupported() =&gt; {
+                CompositeTypeField::new_optional_unsupported(<span class="kw-2">&amp;</span>dml_field.name, r#type)
             }
-            <span class="ident">dml::FieldArity::List</span> <span class="kw">if</span> <span class="ident">dml_field</span>.<span class="ident">r#type</span>.<span class="ident">is_unsupported</span>() =&gt; {
-                <span class="ident">CompositeTypeField::new_array_unsupported</span>(<span class="kw-2">&amp;</span><span class="ident">dml_field</span>.<span class="ident">name</span>, <span class="ident">r#type</span>)
+            dml::FieldArity::List <span class="kw">if </span>dml_field.r#type.is_unsupported() =&gt; {
+                CompositeTypeField::new_array_unsupported(<span class="kw-2">&amp;</span>dml_field.name, r#type)
             }
-            <span class="ident">dml::FieldArity::Required</span> =&gt; <span class="ident">CompositeTypeField::new_required</span>(<span class="kw-2">&amp;</span><span class="ident">dml_field</span>.<span class="ident">name</span>, <span class="ident">r#type</span>),
-            <span class="ident">dml::FieldArity::Optional</span> =&gt; <span class="ident">CompositeTypeField::new_optional</span>(<span class="kw-2">&amp;</span><span class="ident">dml_field</span>.<span class="ident">name</span>, <span class="ident">r#type</span>),
-            <span class="ident">dml::FieldArity::List</span> =&gt; <span class="ident">CompositeTypeField::new_array</span>(<span class="kw-2">&amp;</span><span class="ident">dml_field</span>.<span class="ident">name</span>, <span class="ident">r#type</span>),
+            dml::FieldArity::Required =&gt; CompositeTypeField::new_required(<span class="kw-2">&amp;</span>dml_field.name, r#type),
+            dml::FieldArity::Optional =&gt; CompositeTypeField::new_optional(<span class="kw-2">&amp;</span>dml_field.name, r#type),
+            dml::FieldArity::List =&gt; CompositeTypeField::new_array(<span class="kw-2">&amp;</span>dml_field.name, r#type),
         };
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">docs</span>) <span class="op">=</span> <span class="ident">dml_field</span>.<span class="ident">documentation</span> {
-            <span class="ident">field</span>.<span class="ident">documentation</span>(<span class="ident">docs</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>docs) = dml_field.documentation {
+            field.documentation(docs);
         }
 
-        <span class="kw">if</span> <span class="ident">dml_field</span>.<span class="ident">is_commented_out</span> {
-            <span class="ident">field</span>.<span class="ident">commented_out</span>();
+        <span class="kw">if </span>dml_field.is_commented_out {
+            field.commented_out();
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">map</span>) <span class="op">=</span> <span class="ident">dml_field</span>.<span class="ident">database_name</span> {
-            <span class="ident">field</span>.<span class="ident">map</span>(<span class="ident">map</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>map) = dml_field.database_name {
+            field.map(map);
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">dml_def</span>) <span class="op">=</span> <span class="ident">dml_field</span>.<span class="ident">default_value</span> {
-            <span class="ident">field</span>.<span class="ident">default</span>(<span class="ident">DefaultValue::from_dml</span>(<span class="ident">dml_def</span>));
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>dml_def) = dml_field.default_value {
+            field.default(DefaultValue::from_dml(dml_def));
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">native_type_name</span>, <span class="ident">native_type_args</span>)) <span class="op">=</span> <span class="ident">native_type</span> {
-            <span class="ident">field</span>.<span class="ident">native_type</span>(<span class="kw-2">&amp;</span><span class="ident">datasource</span>.<span class="ident">name</span>, <span class="ident">native_type_name</span>, <span class="ident">native_type_args</span>)
+        <span class="kw">if let </span><span class="prelude-val">Some</span>((native_type_name, native_type_args)) = native_type {
+            field.native_type(<span class="kw-2">&amp;</span>datasource.name, native_type_name, native_type_args)
         }
 
-        <span class="ident">field</span>
+        field
     }
 
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">r#type</span>: <span class="ident">FieldType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> (<span class="ident">name</span>, <span class="ident">map</span>, <span class="ident">commented_out</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">Constant::new</span>(<span class="ident">name</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">name</span>) =&gt; (<span class="ident">name</span>, <span class="prelude-val">None</span>, <span class="bool-val">false</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">ConstantNameValidationError::WasSanitized</span> { <span class="ident">sanitized</span> }) =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">Function::new</span>(<span class="string">&quot;map&quot;</span>);
-                <span class="ident">map</span>.<span class="ident">push_param</span>(<span class="ident">name</span>);
+    <span class="kw">fn </span>new(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, r#type: FieldType&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>(name, map, commented_out) = <span class="kw">match </span>Constant::new(name) {
+            <span class="prelude-val">Ok</span>(name) =&gt; (name, <span class="prelude-val">None</span>, <span class="bool-val">false</span>),
+            <span class="prelude-val">Err</span>(ConstantNameValidationError::WasSanitized { sanitized }) =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>map = Function::new(<span class="string">&quot;map&quot;</span>);
+                map.push_param(name);
 
-                <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">FieldAttribute::new</span>(<span class="ident">map</span>);
+                <span class="kw">let </span>map = FieldAttribute::new(map);
 
-                (<span class="ident">sanitized</span>, <span class="prelude-val">Some</span>(<span class="ident">map</span>), <span class="bool-val">false</span>)
+                (sanitized, <span class="prelude-val">Some</span>(map), <span class="bool-val">false</span>)
             }
-            <span class="prelude-val">Err</span>(<span class="ident">ConstantNameValidationError::SanitizedEmpty</span>) =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">Function::new</span>(<span class="string">&quot;map&quot;</span>);
-                <span class="ident">map</span>.<span class="ident">push_param</span>(<span class="ident">name</span>);
+            <span class="prelude-val">Err</span>(ConstantNameValidationError::SanitizedEmpty) =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>map = Function::new(<span class="string">&quot;map&quot;</span>);
+                map.push_param(name);
 
-                <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">FieldAttribute::new</span>(<span class="ident">map</span>);
+                <span class="kw">let </span>map = FieldAttribute::new(map);
 
-                (<span class="ident">Constant::new_no_validate</span>(<span class="ident">Cow::Borrowed</span>(<span class="ident">name</span>)), <span class="prelude-val">Some</span>(<span class="ident">map</span>), <span class="bool-val">true</span>)
+                (Constant::new_no_validate(Cow::Borrowed(name)), <span class="prelude-val">Some</span>(map), <span class="bool-val">true</span>)
             }
-            <span class="prelude-val">Err</span>(<span class="ident">ConstantNameValidationError::OriginalEmpty</span>) =&gt; {
+            <span class="prelude-val">Err</span>(ConstantNameValidationError::OriginalEmpty) =&gt; {
                 <span class="macro">unreachable!</span>(<span class="string">&quot;The name is a mixture of a collection and field names. It should never be empty&quot;</span>);
             }
         };
 
-        <span class="self">Self</span> {
-            <span class="ident">name</span>,
-            <span class="ident">r#type</span>,
-            <span class="ident">map</span>,
-            <span class="ident">default</span>: <span class="prelude-val">None</span>,
-            <span class="ident">native_type</span>: <span class="prelude-val">None</span>,
-            <span class="ident">documentation</span>: <span class="prelude-val">None</span>,
-            <span class="ident">commented_out</span>,
+        <span class="self">Self </span>{
+            name,
+            r#type,
+            map,
+            default: <span class="prelude-val">None</span>,
+            native_type: <span class="prelude-val">None</span>,
+            documentation: <span class="prelude-val">None</span>,
+            commented_out,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">CompositeTypeField</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">documentation</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">documentation</span> {
-            <span class="ident">documentation</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)<span class="question-mark">?</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; fmt::Display <span class="kw">for </span>CompositeTypeField&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(documentation) = <span class="kw-2">&amp;</span><span class="self">self</span>.documentation {
+            documentation.fmt(f)<span class="question-mark">?</span>;
         }
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">commented_out</span> {
-            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;// &quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">if </span><span class="self">self</span>.commented_out {
+            f.write_str(<span class="string">&quot;// &quot;</span>)<span class="question-mark">?</span>;
         }
 
-        <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)<span class="question-mark">?</span>;
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot; &quot;</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">r#type</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.name.fmt(f)<span class="question-mark">?</span>;
+        f.write_str(<span class="string">&quot; &quot;</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.r#type.fmt(f)<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">map</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">map</span> {
-            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot; &quot;</span>)<span class="question-mark">?</span>;
-            <span class="ident">map</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>map) = <span class="self">self</span>.map {
+            f.write_str(<span class="string">&quot; &quot;</span>)<span class="question-mark">?</span>;
+            map.fmt(f)<span class="question-mark">?</span>;
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">def</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">default</span> {
-            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot; &quot;</span>)<span class="question-mark">?</span>;
-            <span class="ident">def</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>def) = <span class="self">self</span>.default {
+            f.write_str(<span class="string">&quot; &quot;</span>)<span class="question-mark">?</span>;
+            def.fmt(f)<span class="question-mark">?</span>;
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">nt</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">native_type</span> {
-            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot; &quot;</span>)<span class="question-mark">?</span>;
-            <span class="ident">nt</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>nt) = <span class="self">self</span>.native_type {
+            f.write_str(<span class="string">&quot; &quot;</span>)<span class="question-mark">?</span>;
+            nt.fmt(f)<span class="question-mark">?</span>;
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="datamodel_renderer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="datamodel_renderer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

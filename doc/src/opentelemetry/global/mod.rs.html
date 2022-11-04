@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/global/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/global/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../opentelemetry/index.html">
                         <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -165,170 +165,170 @@
 <span id="163">163</span>
 <span id="164">164</span>
 <span id="165">165</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Utilities for working with global telemetry primitives</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Global Trace API</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The global trace API **provides applications access to their configured</span>
-<span class="doccomment">//! [`TracerProvider`] instance from anywhere in the codebase**. This allows</span>
-<span class="doccomment">//! applications to be less coupled to the specific Open Telemetry SDK while not</span>
-<span class="doccomment">//! manually passing references to each part of the code that needs to create</span>
-<span class="doccomment">//! [`Span`]s. Additionally, **3rd party middleware** or **library code** can be</span>
-<span class="doccomment">//! written against this generic API and not constrain users to a specific</span>
-<span class="doccomment">//! implementation choice.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Usage in Applications</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Applications configure their tracer either by [installing a trace pipeline],</span>
-<span class="doccomment">//! or calling [`set_tracer_provider`].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # #[cfg(feature=&quot;trace&quot;)]</span>
-<span class="doccomment">//! # {</span>
-<span class="doccomment">//! use opentelemetry::trace::{Tracer, noop::NoopTracerProvider};</span>
-<span class="doccomment">//! use opentelemetry::global;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! fn init_tracer() {</span>
-<span class="doccomment">//!     let provider = NoopTracerProvider::new();</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     // Configure the global `TracerProvider` singleton when your app starts</span>
-<span class="doccomment">//!     // (there is a no-op default if this is not set by your application)</span>
-<span class="doccomment">//!     let _ = global::set_tracer_provider(provider);</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! fn do_something_tracked() {</span>
-<span class="doccomment">//!     // Then you can get a named tracer instance anywhere in your codebase.</span>
-<span class="doccomment">//!     let tracer = global::tracer(&quot;my-component&quot;);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     tracer.in_span(&quot;doing_work&quot;, |cx| {</span>
-<span class="doccomment">//!         // Traced app logic here...</span>
-<span class="doccomment">//!     });</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // in main or other app start</span>
-<span class="doccomment">//! let _ = init_tracer();</span>
-<span class="doccomment">//! do_something_tracked();</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Usage in Libraries</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # #[cfg(feature=&quot;trace&quot;)]</span>
-<span class="doccomment">//! # {</span>
-<span class="doccomment">//! use opentelemetry::trace::{Tracer, TracerProvider};</span>
-<span class="doccomment">//! use opentelemetry::global;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! pub fn my_traced_library_function() {</span>
-<span class="doccomment">//!     // End users of your library will configure their global tracer provider</span>
-<span class="doccomment">//!     // so you can use the global tracer without any setup</span>
-<span class="doccomment">//!     let tracer = global::tracer_provider().versioned_tracer(</span>
-<span class="doccomment">//!         &quot;my-library-name&quot;,</span>
-<span class="doccomment">//!         Some(env!(&quot;CARGO_PKG_VERSION&quot;)),</span>
-<span class="doccomment">//!         None,</span>
-<span class="doccomment">//!     );</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     tracer.in_span(&quot;doing_library_work&quot;, |cx| {</span>
-<span class="doccomment">//!         // Traced library logic here...</span>
-<span class="doccomment">//!     });</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [installing a trace pipeline]: crate::sdk::export::trace::stdout::PipelineBuilder::install_simple</span>
-<span class="doccomment">//! [`TracerProvider`]: crate::trace::TracerProvider</span>
-<span class="doccomment">//! [`Span`]: crate::trace::Span</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Global Metrics API</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The global metrics API **provides applications access to their configured</span>
-<span class="doccomment">//! [`MeterProvider`] instance from anywhere in the codebase**. This allows</span>
-<span class="doccomment">//! applications to be less coupled to the specific Open Telemetry SDK while not</span>
-<span class="doccomment">//! manually passing references to each part of the code that needs to create</span>
-<span class="doccomment">//! metric instruments. Additionally, **3rd party middleware** or **library code** can be</span>
-<span class="doccomment">//! written against this generic API and not constrain users to a specific</span>
-<span class="doccomment">//! implementation choice.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Usage in Applications</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Applications configure their meter either by [installing a metrics pipeline],</span>
-<span class="doccomment">//! or calling [`set_meter_provider`].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # #[cfg(feature=&quot;metrics&quot;)]</span>
-<span class="doccomment">//! # {</span>
-<span class="doccomment">//! use opentelemetry::metrics::{Meter, noop::NoopMeterProvider};</span>
-<span class="doccomment">//! use opentelemetry::{global, KeyValue};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! fn init_meter() {</span>
-<span class="doccomment">//!     let provider = NoopMeterProvider::new();</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     // Configure the global `MeterProvider` singleton when your app starts</span>
-<span class="doccomment">//!     // (there is a no-op default if this is not set by your application)</span>
-<span class="doccomment">//!     global::set_meter_provider(provider)</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! fn do_something_instrumented() {</span>
-<span class="doccomment">//!     // Then you can get a named tracer instance anywhere in your codebase.</span>
-<span class="doccomment">//!     let meter = global::meter(&quot;my-component&quot;);</span>
-<span class="doccomment">//!     let counter = meter.u64_counter(&quot;my_counter&quot;).init();</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     // record metrics</span>
-<span class="doccomment">//!     counter.add(1, &amp;[KeyValue::new(&quot;mykey&quot;, &quot;myvalue&quot;)]);</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // in main or other app start</span>
-<span class="doccomment">//! init_meter();</span>
-<span class="doccomment">//! do_something_instrumented();</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Usage in Libraries</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # #[cfg(feature=&quot;metrics&quot;)]</span>
-<span class="doccomment">//! # {</span>
-<span class="doccomment">//! use opentelemetry::{global, KeyValue};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! pub fn my_traced_library_function() {</span>
-<span class="doccomment">//!     // End users of your library will configure their global meter provider</span>
-<span class="doccomment">//!     // so you can use the global meter without any setup</span>
-<span class="doccomment">//!     let tracer = global::meter(&quot;my-library-name&quot;);</span>
-<span class="doccomment">//!     let counter = tracer.u64_counter(&quot;my_counter&quot;).init();</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     // record metrics</span>
-<span class="doccomment">//!     counter.add(1, &amp;[KeyValue::new(&quot;mykey&quot;, &quot;myvalue&quot;)]);</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [installing a metrics pipeline]: crate::sdk::export::metrics::stdout::StdoutExporterBuilder::init</span>
-<span class="doccomment">//! [`MeterProvider`]: crate::metrics::MeterProvider</span>
-<span class="doccomment">//! [`set_meter_provider`]: crate::global::set_meter_provider</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Utilities for working with global telemetry primitives
+//!
+//! ## Global Trace API
+//!
+//! The global trace API **provides applications access to their configured
+//! [`TracerProvider`] instance from anywhere in the codebase**. This allows
+//! applications to be less coupled to the specific Open Telemetry SDK while not
+//! manually passing references to each part of the code that needs to create
+//! [`Span`]s. Additionally, **3rd party middleware** or **library code** can be
+//! written against this generic API and not constrain users to a specific
+//! implementation choice.
+//!
+//! ### Usage in Applications
+//!
+//! Applications configure their tracer either by [installing a trace pipeline],
+//! or calling [`set_tracer_provider`].
+//!
+//! ```
+//! # #[cfg(feature=&quot;trace&quot;)]
+//! # {
+//! use opentelemetry::trace::{Tracer, noop::NoopTracerProvider};
+//! use opentelemetry::global;
+//!
+//! fn init_tracer() {
+//!     let provider = NoopTracerProvider::new();
+//!
+//!     // Configure the global `TracerProvider` singleton when your app starts
+//!     // (there is a no-op default if this is not set by your application)
+//!     let _ = global::set_tracer_provider(provider);
+//! }
+//!
+//! fn do_something_tracked() {
+//!     // Then you can get a named tracer instance anywhere in your codebase.
+//!     let tracer = global::tracer(&quot;my-component&quot;);
+//!
+//!     tracer.in_span(&quot;doing_work&quot;, |cx| {
+//!         // Traced app logic here...
+//!     });
+//! }
+//!
+//! // in main or other app start
+//! let _ = init_tracer();
+//! do_something_tracked();
+//! # }
+//! ```
+//!
+//! ### Usage in Libraries
+//!
+//! ```
+//! # #[cfg(feature=&quot;trace&quot;)]
+//! # {
+//! use opentelemetry::trace::{Tracer, TracerProvider};
+//! use opentelemetry::global;
+//!
+//! pub fn my_traced_library_function() {
+//!     // End users of your library will configure their global tracer provider
+//!     // so you can use the global tracer without any setup
+//!     let tracer = global::tracer_provider().versioned_tracer(
+//!         &quot;my-library-name&quot;,
+//!         Some(env!(&quot;CARGO_PKG_VERSION&quot;)),
+//!         None,
+//!     );
+//!
+//!     tracer.in_span(&quot;doing_library_work&quot;, |cx| {
+//!         // Traced library logic here...
+//!     });
+//! }
+//! # }
+//! ```
+//!
+//! [installing a trace pipeline]: crate::sdk::export::trace::stdout::PipelineBuilder::install_simple
+//! [`TracerProvider`]: crate::trace::TracerProvider
+//! [`Span`]: crate::trace::Span
+//!
+//! ## Global Metrics API
+//!
+//! The global metrics API **provides applications access to their configured
+//! [`MeterProvider`] instance from anywhere in the codebase**. This allows
+//! applications to be less coupled to the specific Open Telemetry SDK while not
+//! manually passing references to each part of the code that needs to create
+//! metric instruments. Additionally, **3rd party middleware** or **library code** can be
+//! written against this generic API and not constrain users to a specific
+//! implementation choice.
+//!
+//! ### Usage in Applications
+//!
+//! Applications configure their meter either by [installing a metrics pipeline],
+//! or calling [`set_meter_provider`].
+//!
+//! ```
+//! # #[cfg(feature=&quot;metrics&quot;)]
+//! # {
+//! use opentelemetry::metrics::{Meter, noop::NoopMeterProvider};
+//! use opentelemetry::{global, KeyValue};
+//!
+//! fn init_meter() {
+//!     let provider = NoopMeterProvider::new();
+//!
+//!     // Configure the global `MeterProvider` singleton when your app starts
+//!     // (there is a no-op default if this is not set by your application)
+//!     global::set_meter_provider(provider)
+//! }
+//!
+//! fn do_something_instrumented() {
+//!     // Then you can get a named tracer instance anywhere in your codebase.
+//!     let meter = global::meter(&quot;my-component&quot;);
+//!     let counter = meter.u64_counter(&quot;my_counter&quot;).init();
+//!
+//!     // record metrics
+//!     counter.add(1, &amp;[KeyValue::new(&quot;mykey&quot;, &quot;myvalue&quot;)]);
+//! }
+//!
+//! // in main or other app start
+//! init_meter();
+//! do_something_instrumented();
+//! # }
+//! ```
+//!
+//! ### Usage in Libraries
+//!
+//! ```
+//! # #[cfg(feature=&quot;metrics&quot;)]
+//! # {
+//! use opentelemetry::{global, KeyValue};
+//!
+//! pub fn my_traced_library_function() {
+//!     // End users of your library will configure their global meter provider
+//!     // so you can use the global meter without any setup
+//!     let tracer = global::meter(&quot;my-library-name&quot;);
+//!     let counter = tracer.u64_counter(&quot;my_counter&quot;).init();
+//!
+//!     // record metrics
+//!     counter.add(1, &amp;[KeyValue::new(&quot;mykey&quot;, &quot;myvalue&quot;)]);
+//! }
+//! # }
+//! ```
+//!
+//! [installing a metrics pipeline]: crate::sdk::export::metrics::stdout::StdoutExporterBuilder::init
+//! [`MeterProvider`]: crate::metrics::MeterProvider
+//! [`set_meter_provider`]: crate::global::set_meter_provider
 
-<span class="kw">mod</span> <span class="ident">error_handler</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;metrics&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">metrics</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;trace&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">propagation</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;trace&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">trace</span>;
+</span><span class="kw">mod </span>error_handler;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;metrics&quot;</span>)]
+</span><span class="kw">mod </span>metrics;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;trace&quot;</span>)]
+</span><span class="kw">mod </span>propagation;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;trace&quot;</span>)]
+</span><span class="kw">mod </span>trace;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">error_handler</span>::{<span class="ident">handle_error</span>, <span class="ident">set_error_handler</span>, <span class="ident">Error</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;metrics&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;metrics&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">metrics</span>::{
-    <span class="ident">meter</span>, <span class="ident">meter_provider</span>, <span class="ident">meter_with_version</span>, <span class="ident">set_meter_provider</span>, <span class="ident">GlobalMeterProvider</span>,
+<span class="kw">pub use </span>error_handler::{handle_error, set_error_handler, Error};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;metrics&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;metrics&quot;</span>)))]
+</span><span class="kw">pub use </span>metrics::{
+    meter, meter_provider, meter_with_version, set_meter_provider, GlobalMeterProvider,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;trace&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;trace&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">propagation</span>::{<span class="ident">get_text_map_propagator</span>, <span class="ident">set_text_map_propagator</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;trace&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;trace&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">trace</span>::{
-    <span class="ident">force_flush_tracer_provider</span>, <span class="ident">set_tracer_provider</span>, <span class="ident">shutdown_tracer_provider</span>, <span class="ident">tracer</span>,
-    <span class="ident">tracer_provider</span>, <span class="ident">BoxedSpan</span>, <span class="ident">BoxedTracer</span>, <span class="ident">GlobalTracerProvider</span>, <span class="ident">ObjectSafeTracer</span>,
-    <span class="ident">ObjectSafeTracerProvider</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;trace&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;trace&quot;</span>)))]
+</span><span class="kw">pub use </span>propagation::{get_text_map_propagator, set_text_map_propagator};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;trace&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;trace&quot;</span>)))]
+</span><span class="kw">pub use </span>trace::{
+    force_flush_tracer_provider, set_tracer_provider, shutdown_tracer_provider, tracer,
+    tracer_provider, BoxedSpan, BoxedTracer, GlobalTracerProvider, ObjectSafeTracer,
+    ObjectSafeTracerProvider,
 };
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

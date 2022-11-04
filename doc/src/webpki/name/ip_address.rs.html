@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/webpki-0.22.0/src/name/ip_address.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ip_address.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../webpki/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../webpki/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../webpki/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/webpki-0.22.0/src/name/ip_address.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ip_address.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../webpki/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../webpki/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../webpki/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -62,64 +62,64 @@
 <span id="62">62</span>
 <span id="63">63</span>
 <span id="64">64</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2020 Brian Smith.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
-<span class="comment">// purpose with or without fee is hereby granted, provided that the above</span>
-<span class="comment">// copyright notice and this permission notice appear in all copies.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES</span>
-<span class="comment">// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR</span>
-<span class="comment">// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span>
-<span class="comment">// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN</span>
-<span class="comment">// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF</span>
-<span class="comment">// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2020 Brian Smith.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR
+// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Error</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::Error;
 
-<span class="comment">// https://tools.ietf.org/html/rfc5280#section-4.2.1.10 says:</span>
-<span class="comment">//</span>
-<span class="comment">//     For IPv4 addresses, the iPAddress field of GeneralName MUST contain</span>
-<span class="comment">//     eight (8) octets, encoded in the style of RFC 4632 (CIDR) to represent</span>
-<span class="comment">//     an address range [RFC4632].  For IPv6 addresses, the iPAddress field</span>
-<span class="comment">//     MUST contain 32 octets similarly encoded.  For example, a name</span>
-<span class="comment">//     constraint for &quot;class C&quot; subnet 192.0.2.0 is represented as the</span>
-<span class="comment">//     octets C0 00 02 00 FF FF FF 00, representing the CIDR notation</span>
-<span class="comment">//     192.0.2.0/24 (mask 255.255.255.0).</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">presented_id_matches_constraint</span>(
-    <span class="ident">name</span>: <span class="ident">untrusted::Input</span>,
-    <span class="ident">constraint</span>: <span class="ident">untrusted::Input</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">4</span> <span class="op">&amp;&amp;</span> <span class="ident">name</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">16</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::BadDer</span>);
+<span class="comment">// https://tools.ietf.org/html/rfc5280#section-4.2.1.10 says:
+//
+//     For IPv4 addresses, the iPAddress field of GeneralName MUST contain
+//     eight (8) octets, encoded in the style of RFC 4632 (CIDR) to represent
+//     an address range [RFC4632].  For IPv6 addresses, the iPAddress field
+//     MUST contain 32 octets similarly encoded.  For example, a name
+//     constraint for &quot;class C&quot; subnet 192.0.2.0 is represented as the
+//     octets C0 00 02 00 FF FF FF 00, representing the CIDR notation
+//     192.0.2.0/24 (mask 255.255.255.0).
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>presented_id_matches_constraint(
+    name: untrusted::Input,
+    constraint: untrusted::Input,
+) -&gt; <span class="prelude-ty">Result</span>&lt;bool, Error&gt; {
+    <span class="kw">if </span>name.len() != <span class="number">4 </span>&amp;&amp; name.len() != <span class="number">16 </span>{
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::BadDer);
     }
-    <span class="kw">if</span> <span class="ident">constraint</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">8</span> <span class="op">&amp;&amp;</span> <span class="ident">constraint</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">32</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::BadDer</span>);
-    }
-
-    <span class="comment">// an IPv4 address never matches an IPv6 constraint, and vice versa.</span>
-    <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span> <span class="op">!</span><span class="op">=</span> <span class="ident">constraint</span>.<span class="ident">len</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>);
+    <span class="kw">if </span>constraint.len() != <span class="number">8 </span>&amp;&amp; constraint.len() != <span class="number">32 </span>{
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::BadDer);
     }
 
-    <span class="kw">let</span> (<span class="ident">constraint_address</span>, <span class="ident">constraint_mask</span>) <span class="op">=</span> <span class="ident">constraint</span>.<span class="ident">read_all</span>(<span class="ident">Error::BadDer</span>, <span class="op">|</span><span class="ident">value</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">address</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">read_bytes</span>(<span class="ident">constraint</span>.<span class="ident">len</span>() <span class="op">/</span> <span class="number">2</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">mask</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">read_bytes</span>(<span class="ident">constraint</span>.<span class="ident">len</span>() <span class="op">/</span> <span class="number">2</span>).<span class="ident">unwrap</span>();
-        <span class="prelude-val">Ok</span>((<span class="ident">address</span>, <span class="ident">mask</span>))
+    <span class="comment">// an IPv4 address never matches an IPv6 constraint, and vice versa.
+    </span><span class="kw">if </span>name.len() * <span class="number">2 </span>!= constraint.len() {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="bool-val">false</span>);
+    }
+
+    <span class="kw">let </span>(constraint_address, constraint_mask) = constraint.read_all(Error::BadDer, |value| {
+        <span class="kw">let </span>address = value.read_bytes(constraint.len() / <span class="number">2</span>).unwrap();
+        <span class="kw">let </span>mask = value.read_bytes(constraint.len() / <span class="number">2</span>).unwrap();
+        <span class="prelude-val">Ok</span>((address, mask))
     })<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">untrusted::Reader::new</span>(<span class="ident">name</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">constraint_address</span> <span class="op">=</span> <span class="ident">untrusted::Reader::new</span>(<span class="ident">constraint_address</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">constraint_mask</span> <span class="op">=</span> <span class="ident">untrusted::Reader::new</span>(<span class="ident">constraint_mask</span>);
-    <span class="kw">loop</span> {
-        <span class="kw">let</span> <span class="ident">name_byte</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">read_byte</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">constraint_address_byte</span> <span class="op">=</span> <span class="ident">constraint_address</span>.<span class="ident">read_byte</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">constraint_mask_byte</span> <span class="op">=</span> <span class="ident">constraint_mask</span>.<span class="ident">read_byte</span>().<span class="ident">unwrap</span>();
-        <span class="kw">if</span> ((<span class="ident">name_byte</span> <span class="op">^</span> <span class="ident">constraint_address_byte</span>) <span class="op">&amp;</span> <span class="ident">constraint_mask_byte</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>name = untrusted::Reader::new(name);
+    <span class="kw">let </span><span class="kw-2">mut </span>constraint_address = untrusted::Reader::new(constraint_address);
+    <span class="kw">let </span><span class="kw-2">mut </span>constraint_mask = untrusted::Reader::new(constraint_mask);
+    <span class="kw">loop </span>{
+        <span class="kw">let </span>name_byte = name.read_byte().unwrap();
+        <span class="kw">let </span>constraint_address_byte = constraint_address.read_byte().unwrap();
+        <span class="kw">let </span>constraint_mask_byte = constraint_mask.read_byte().unwrap();
+        <span class="kw">if </span>((name_byte ^ constraint_address_byte) &amp; constraint_mask_byte) != <span class="number">0 </span>{
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="bool-val">false</span>);
         }
-        <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">at_end</span>() {
+        <span class="kw">if </span>name.at_end() {
             <span class="kw">break</span>;
         }
     }
@@ -127,4 +127,4 @@
     <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>)
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="webpki" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="webpki" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

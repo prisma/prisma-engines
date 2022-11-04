@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/rust-postgres-dc0fca9be721a90f/064a6a5/tokio-postgres/src/connection.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>connection.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tokio_postgres/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/rust-postgres-dc0fca9be721a90f/064a6a5/tokio-postgres/src/connection.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>connection.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tokio_postgres/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -338,345 +338,345 @@
 <span id="338">338</span>
 <span id="339">339</span>
 <span id="340">340</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::codec</span>::{<span class="ident">BackendMessage</span>, <span class="ident">BackendMessages</span>, <span class="ident">FrontendMessage</span>, <span class="ident">PostgresCodec</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::copy_in::CopyInReceiver</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::DbError</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::maybe_tls_stream::MaybeTlsStream</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">AsyncMessage</span>, <span class="ident">Error</span>, <span class="ident">Notification</span>};
-<span class="kw">use</span> <span class="ident">bytes::BytesMut</span>;
-<span class="kw">use</span> <span class="ident">fallible_iterator::FallibleIterator</span>;
-<span class="kw">use</span> <span class="ident">futures_channel::mpsc</span>;
-<span class="kw">use</span> <span class="ident">futures_util</span>::{<span class="ident">ready</span>, <span class="ident">stream::FusedStream</span>, <span class="ident">Sink</span>, <span class="ident">Stream</span>, <span class="ident">StreamExt</span>};
-<span class="kw">use</span> <span class="ident">log</span>::{<span class="ident">info</span>, <span class="ident">trace</span>};
-<span class="kw">use</span> <span class="ident">postgres_protocol::message::backend::Message</span>;
-<span class="kw">use</span> <span class="ident">postgres_protocol::message::frontend</span>;
-<span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="ident">HashMap</span>, <span class="ident">VecDeque</span>};
-<span class="kw">use</span> <span class="ident">std::future::Future</span>;
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
-<span class="kw">use</span> <span class="ident">tokio::io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>};
-<span class="kw">use</span> <span class="ident">tokio_util::codec::Framed</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::codec::{BackendMessage, BackendMessages, FrontendMessage, PostgresCodec};
+<span class="kw">use </span><span class="kw">crate</span>::copy_in::CopyInReceiver;
+<span class="kw">use </span><span class="kw">crate</span>::error::DbError;
+<span class="kw">use </span><span class="kw">crate</span>::maybe_tls_stream::MaybeTlsStream;
+<span class="kw">use crate</span>::{AsyncMessage, Error, Notification};
+<span class="kw">use </span>bytes::BytesMut;
+<span class="kw">use </span>fallible_iterator::FallibleIterator;
+<span class="kw">use </span>futures_channel::mpsc;
+<span class="kw">use </span>futures_util::{ready, stream::FusedStream, Sink, Stream, StreamExt};
+<span class="kw">use </span>log::{info, trace};
+<span class="kw">use </span>postgres_protocol::message::backend::Message;
+<span class="kw">use </span>postgres_protocol::message::frontend;
+<span class="kw">use </span>std::collections::{HashMap, VecDeque};
+<span class="kw">use </span>std::future::Future;
+<span class="kw">use </span>std::pin::Pin;
+<span class="kw">use </span>std::task::{Context, Poll};
+<span class="kw">use </span>tokio::io::{AsyncRead, AsyncWrite};
+<span class="kw">use </span>tokio_util::codec::Framed;
 
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RequestMessages</span> {
-    <span class="ident">Single</span>(<span class="ident">FrontendMessage</span>),
-    <span class="ident">CopyIn</span>(<span class="ident">CopyInReceiver</span>),
+<span class="kw">pub enum </span>RequestMessages {
+    Single(FrontendMessage),
+    CopyIn(CopyInReceiver),
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Request</span> {
-    <span class="kw">pub</span> <span class="ident">messages</span>: <span class="ident">RequestMessages</span>,
-    <span class="kw">pub</span> <span class="ident">sender</span>: <span class="ident">mpsc::Sender</span><span class="op">&lt;</span><span class="ident">BackendMessages</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>Request {
+    <span class="kw">pub </span>messages: RequestMessages,
+    <span class="kw">pub </span>sender: mpsc::Sender&lt;BackendMessages&gt;,
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Response</span> {
-    <span class="ident">sender</span>: <span class="ident">mpsc::Sender</span><span class="op">&lt;</span><span class="ident">BackendMessages</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>Response {
+    sender: mpsc::Sender&lt;BackendMessages&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">enum</span> <span class="ident">State</span> {
-    <span class="ident">Active</span>,
-    <span class="ident">Terminating</span>,
-    <span class="ident">Closing</span>,
+<span class="attribute">#[derive(PartialEq, Debug)]
+</span><span class="kw">enum </span>State {
+    Active,
+    Terminating,
+    Closing,
 }
 
-<span class="doccomment">/// A connection to a PostgreSQL database.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is one half of what is returned when a new connection is established. It performs the actual IO with the</span>
-<span class="doccomment">/// server, and should generally be spawned off onto an executor to run in the background.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `Connection` implements `Future`, and only resolves when the connection is closed, either because a fatal error has</span>
-<span class="doccomment">/// occurred, or because its associated `Client` has dropped and all outstanding work has completed.</span>
-<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;futures do nothing unless polled&quot;</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">stream</span>: <span class="ident">Framed</span><span class="op">&lt;</span><span class="ident">MaybeTlsStream</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">PostgresCodec</span><span class="op">&gt;</span>,
-    <span class="ident">parameters</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">receiver</span>: <span class="ident">mpsc::UnboundedReceiver</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>,
-    <span class="ident">pending_request</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RequestMessages</span><span class="op">&gt;</span>,
-    <span class="ident">pending_responses</span>: <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">BackendMessage</span><span class="op">&gt;</span>,
-    <span class="ident">responses</span>: <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">Response</span><span class="op">&gt;</span>,
-    <span class="ident">state</span>: <span class="ident">State</span>,
+<span class="doccomment">/// A connection to a PostgreSQL database.
+///
+/// This is one half of what is returned when a new connection is established. It performs the actual IO with the
+/// server, and should generally be spawned off onto an executor to run in the background.
+///
+/// `Connection` implements `Future`, and only resolves when the connection is closed, either because a fatal error has
+/// occurred, or because its associated `Client` has dropped and all outstanding work has completed.
+</span><span class="attribute">#[must_use = <span class="string">&quot;futures do nothing unless polled&quot;</span>]
+</span><span class="kw">pub struct </span>Connection&lt;S, T&gt; {
+    stream: Framed&lt;MaybeTlsStream&lt;S, T&gt;, PostgresCodec&gt;,
+    parameters: HashMap&lt;String, String&gt;,
+    receiver: mpsc::UnboundedReceiver&lt;Request&gt;,
+    pending_request: <span class="prelude-ty">Option</span>&lt;RequestMessages&gt;,
+    pending_responses: VecDeque&lt;BackendMessage&gt;,
+    responses: VecDeque&lt;Response&gt;,
+    state: State,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-    <span class="ident">T</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+<span class="kw">impl</span>&lt;S, T&gt; Connection&lt;S, T&gt;
+<span class="kw">where
+    </span>S: AsyncRead + AsyncWrite + Unpin,
+    T: AsyncRead + AsyncWrite + Unpin,
 {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">stream</span>: <span class="ident">Framed</span><span class="op">&lt;</span><span class="ident">MaybeTlsStream</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">PostgresCodec</span><span class="op">&gt;</span>,
-        <span class="ident">pending_responses</span>: <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">BackendMessage</span><span class="op">&gt;</span>,
-        <span class="ident">parameters</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="ident">receiver</span>: <span class="ident">mpsc::UnboundedReceiver</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">Connection</span> {
-            <span class="ident">stream</span>,
-            <span class="ident">parameters</span>,
-            <span class="ident">receiver</span>,
-            <span class="ident">pending_request</span>: <span class="prelude-val">None</span>,
-            <span class="ident">pending_responses</span>,
-            <span class="ident">responses</span>: <span class="ident">VecDeque::new</span>(),
-            <span class="ident">state</span>: <span class="ident">State::Active</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(
+        stream: Framed&lt;MaybeTlsStream&lt;S, T&gt;, PostgresCodec&gt;,
+        pending_responses: VecDeque&lt;BackendMessage&gt;,
+        parameters: HashMap&lt;String, String&gt;,
+        receiver: mpsc::UnboundedReceiver&lt;Request&gt;,
+    ) -&gt; Connection&lt;S, T&gt; {
+        Connection {
+            stream,
+            parameters,
+            receiver,
+            pending_request: <span class="prelude-val">None</span>,
+            pending_responses,
+            responses: VecDeque::new(),
+            state: State::Active,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_response</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BackendMessage</span>, <span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">message</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">pending_responses</span>.<span class="ident">pop_front</span>() {
+    <span class="kw">fn </span>poll_response(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Result</span>&lt;BackendMessage, Error&gt;&gt;&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(message) = <span class="self">self</span>.pending_responses.pop_front() {
             <span class="macro">trace!</span>(<span class="string">&quot;retrying pending response&quot;</span>);
-            <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">message</span>)));
+            <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(message)));
         }
 
-        <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">stream</span>)
-            .<span class="ident">poll_next</span>(<span class="ident">cx</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="ident">o</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">map_err</span>(<span class="ident">Error::io</span>)))
+        Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.stream)
+            .poll_next(cx)
+            .map(|o| o.map(|r| r.map_err(Error::io)))
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_read</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AsyncMessage</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">state</span> <span class="op">!</span><span class="op">=</span> <span class="ident">State::Active</span> {
+    <span class="kw">fn </span>poll_read(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;AsyncMessage&gt;, Error&gt; {
+        <span class="kw">if </span><span class="self">self</span>.state != State::Active {
             <span class="macro">trace!</span>(<span class="string">&quot;poll_read: done&quot;</span>);
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
         }
 
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">poll_response</span>(<span class="ident">cx</span>)<span class="question-mark">?</span> {
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">message</span>)) =&gt; <span class="ident">message</span>,
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::closed</span>()),
-                <span class="ident">Poll::Pending</span> =&gt; {
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>message = <span class="kw">match </span><span class="self">self</span>.poll_response(cx)<span class="question-mark">? </span>{
+                Poll::Ready(<span class="prelude-val">Some</span>(message)) =&gt; message,
+                Poll::Ready(<span class="prelude-val">None</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::closed()),
+                Poll::Pending =&gt; {
                     <span class="macro">trace!</span>(<span class="string">&quot;poll_read: waiting on response&quot;</span>);
-                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
                 }
             };
 
-            <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">messages</span>, <span class="ident">request_complete</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">message</span> {
-                <span class="ident">BackendMessage::Async</span>(<span class="ident">Message::NoticeResponse</span>(<span class="ident">body</span>)) =&gt; {
-                    <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">DbError::parse</span>(<span class="kw-2">&amp;mut</span> <span class="ident">body</span>.<span class="ident">fields</span>()).<span class="ident">map_err</span>(<span class="ident">Error::parse</span>)<span class="question-mark">?</span>;
-                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">AsyncMessage::Notice</span>(<span class="ident">error</span>)));
+            <span class="kw">let </span>(<span class="kw-2">mut </span>messages, request_complete) = <span class="kw">match </span>message {
+                BackendMessage::Async(Message::NoticeResponse(body)) =&gt; {
+                    <span class="kw">let </span>error = DbError::parse(<span class="kw-2">&amp;mut </span>body.fields()).map_err(Error::parse)<span class="question-mark">?</span>;
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(AsyncMessage::Notice(error)));
                 }
-                <span class="ident">BackendMessage::Async</span>(<span class="ident">Message::NotificationResponse</span>(<span class="ident">body</span>)) =&gt; {
-                    <span class="kw">let</span> <span class="ident">notification</span> <span class="op">=</span> <span class="ident">Notification</span> {
-                        <span class="ident">process_id</span>: <span class="ident">body</span>.<span class="ident">process_id</span>(),
-                        <span class="ident">channel</span>: <span class="ident">body</span>.<span class="ident">channel</span>().<span class="ident">map_err</span>(<span class="ident">Error::parse</span>)<span class="question-mark">?</span>.<span class="ident">to_string</span>(),
-                        <span class="ident">payload</span>: <span class="ident">body</span>.<span class="ident">message</span>().<span class="ident">map_err</span>(<span class="ident">Error::parse</span>)<span class="question-mark">?</span>.<span class="ident">to_string</span>(),
+                BackendMessage::Async(Message::NotificationResponse(body)) =&gt; {
+                    <span class="kw">let </span>notification = Notification {
+                        process_id: body.process_id(),
+                        channel: body.channel().map_err(Error::parse)<span class="question-mark">?</span>.to_string(),
+                        payload: body.message().map_err(Error::parse)<span class="question-mark">?</span>.to_string(),
                     };
-                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">AsyncMessage::Notification</span>(<span class="ident">notification</span>)));
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(AsyncMessage::Notification(notification)));
                 }
-                <span class="ident">BackendMessage::Async</span>(<span class="ident">Message::ParameterStatus</span>(<span class="ident">body</span>)) =&gt; {
-                    <span class="self">self</span>.<span class="ident">parameters</span>.<span class="ident">insert</span>(
-                        <span class="ident">body</span>.<span class="ident">name</span>().<span class="ident">map_err</span>(<span class="ident">Error::parse</span>)<span class="question-mark">?</span>.<span class="ident">to_string</span>(),
-                        <span class="ident">body</span>.<span class="ident">value</span>().<span class="ident">map_err</span>(<span class="ident">Error::parse</span>)<span class="question-mark">?</span>.<span class="ident">to_string</span>(),
+                BackendMessage::Async(Message::ParameterStatus(body)) =&gt; {
+                    <span class="self">self</span>.parameters.insert(
+                        body.name().map_err(Error::parse)<span class="question-mark">?</span>.to_string(),
+                        body.value().map_err(Error::parse)<span class="question-mark">?</span>.to_string(),
                     );
                     <span class="kw">continue</span>;
                 }
-                <span class="ident">BackendMessage::Async</span>(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
-                <span class="ident">BackendMessage::Normal</span> {
-                    <span class="ident">messages</span>,
-                    <span class="ident">request_complete</span>,
-                } =&gt; (<span class="ident">messages</span>, <span class="ident">request_complete</span>),
+                BackendMessage::Async(<span class="kw">_</span>) =&gt; <span class="macro">unreachable!</span>(),
+                BackendMessage::Normal {
+                    messages,
+                    request_complete,
+                } =&gt; (messages, request_complete),
             };
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">response</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">responses</span>.<span class="ident">pop_front</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">response</span>) =&gt; <span class="ident">response</span>,
-                <span class="prelude-val">None</span> =&gt; <span class="kw">match</span> <span class="ident">messages</span>.<span class="ident">next</span>().<span class="ident">map_err</span>(<span class="ident">Error::parse</span>)<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">Message::ErrorResponse</span>(<span class="ident">error</span>)) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::db</span>(<span class="ident">error</span>)),
-                    <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::unexpected_message</span>()),
+            <span class="kw">let </span><span class="kw-2">mut </span>response = <span class="kw">match </span><span class="self">self</span>.responses.pop_front() {
+                <span class="prelude-val">Some</span>(response) =&gt; response,
+                <span class="prelude-val">None </span>=&gt; <span class="kw">match </span>messages.next().map_err(Error::parse)<span class="question-mark">? </span>{
+                    <span class="prelude-val">Some</span>(Message::ErrorResponse(error)) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::db(error)),
+                    <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::unexpected_message()),
                 },
             };
 
-            <span class="kw">match</span> <span class="ident">response</span>.<span class="ident">sender</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>) {
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(())) =&gt; {
-                    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">sender</span>.<span class="ident">start_send</span>(<span class="ident">messages</span>);
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">request_complete</span> {
-                        <span class="self">self</span>.<span class="ident">responses</span>.<span class="ident">push_front</span>(<span class="ident">response</span>);
+            <span class="kw">match </span>response.sender.poll_ready(cx) {
+                Poll::Ready(<span class="prelude-val">Ok</span>(())) =&gt; {
+                    <span class="kw">let _ </span>= response.sender.start_send(messages);
+                    <span class="kw">if </span>!request_complete {
+                        <span class="self">self</span>.responses.push_front(response);
                     }
                 }
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="kw">_</span>)) =&gt; {
-                    <span class="comment">// we need to keep paging through the rest of the messages even if the receiver&#39;s hung up</span>
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">request_complete</span> {
-                        <span class="self">self</span>.<span class="ident">responses</span>.<span class="ident">push_front</span>(<span class="ident">response</span>);
+                Poll::Ready(<span class="prelude-val">Err</span>(<span class="kw">_</span>)) =&gt; {
+                    <span class="comment">// we need to keep paging through the rest of the messages even if the receiver&#39;s hung up
+                    </span><span class="kw">if </span>!request_complete {
+                        <span class="self">self</span>.responses.push_front(response);
                     }
                 }
-                <span class="ident">Poll::Pending</span> =&gt; {
-                    <span class="self">self</span>.<span class="ident">responses</span>.<span class="ident">push_front</span>(<span class="ident">response</span>);
-                    <span class="self">self</span>.<span class="ident">pending_responses</span>.<span class="ident">push_back</span>(<span class="ident">BackendMessage::Normal</span> {
-                        <span class="ident">messages</span>,
-                        <span class="ident">request_complete</span>,
+                Poll::Pending =&gt; {
+                    <span class="self">self</span>.responses.push_front(response);
+                    <span class="self">self</span>.pending_responses.push_back(BackendMessage::Normal {
+                        messages,
+                        request_complete,
                     });
                     <span class="macro">trace!</span>(<span class="string">&quot;poll_read: waiting on sender&quot;</span>);
-                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
                 }
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_request</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RequestMessages</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">messages</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">pending_request</span>.<span class="ident">take</span>() {
+    <span class="kw">fn </span>poll_request(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;RequestMessages&gt;&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(messages) = <span class="self">self</span>.pending_request.take() {
             <span class="macro">trace!</span>(<span class="string">&quot;retrying pending request&quot;</span>);
-            <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">messages</span>));
+            <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>(messages));
         }
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">receiver</span>.<span class="ident">is_terminated</span>() {
-            <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>);
+        <span class="kw">if </span><span class="self">self</span>.receiver.is_terminated() {
+            <span class="kw">return </span>Poll::Ready(<span class="prelude-val">None</span>);
         }
 
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">receiver</span>.<span class="ident">poll_next_unpin</span>(<span class="ident">cx</span>) {
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">request</span>)) =&gt; {
+        <span class="kw">match </span><span class="self">self</span>.receiver.poll_next_unpin(cx) {
+            Poll::Ready(<span class="prelude-val">Some</span>(request)) =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;polled new request&quot;</span>);
-                <span class="self">self</span>.<span class="ident">responses</span>.<span class="ident">push_back</span>(<span class="ident">Response</span> {
-                    <span class="ident">sender</span>: <span class="ident">request</span>.<span class="ident">sender</span>,
+                <span class="self">self</span>.responses.push_back(Response {
+                    sender: request.sender,
                 });
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">request</span>.<span class="ident">messages</span>))
+                Poll::Ready(<span class="prelude-val">Some</span>(request.messages))
             }
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>) =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>),
-            <span class="ident">Poll::Pending</span> =&gt; <span class="ident">Poll::Pending</span>,
+            Poll::Ready(<span class="prelude-val">None</span>) =&gt; Poll::Ready(<span class="prelude-val">None</span>),
+            Poll::Pending =&gt; Poll::Pending,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_write</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">loop</span> {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">state</span> <span class="op">==</span> <span class="ident">State::Closing</span> {
+    <span class="kw">fn </span>poll_write(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;bool, Error&gt; {
+        <span class="kw">loop </span>{
+            <span class="kw">if </span><span class="self">self</span>.state == State::Closing {
                 <span class="macro">trace!</span>(<span class="string">&quot;poll_write: done&quot;</span>);
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>);
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="bool-val">false</span>);
             }
 
-            <span class="kw">if</span> <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">stream</span>)
-                .<span class="ident">poll_ready</span>(<span class="ident">cx</span>)
-                .<span class="ident">map_err</span>(<span class="ident">Error::io</span>)<span class="question-mark">?</span>
-                .<span class="ident">is_pending</span>()
+            <span class="kw">if </span>Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.stream)
+                .poll_ready(cx)
+                .map_err(Error::io)<span class="question-mark">?
+                </span>.is_pending()
             {
                 <span class="macro">trace!</span>(<span class="string">&quot;poll_write: waiting on socket&quot;</span>);
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>);
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="bool-val">false</span>);
             }
 
-            <span class="kw">let</span> <span class="ident">request</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">poll_request</span>(<span class="ident">cx</span>) {
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">request</span>)) =&gt; <span class="ident">request</span>,
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>) <span class="kw">if</span> <span class="self">self</span>.<span class="ident">responses</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">state</span> <span class="op">==</span> <span class="ident">State::Active</span> =&gt; {
+            <span class="kw">let </span>request = <span class="kw">match </span><span class="self">self</span>.poll_request(cx) {
+                Poll::Ready(<span class="prelude-val">Some</span>(request)) =&gt; request,
+                Poll::Ready(<span class="prelude-val">None</span>) <span class="kw">if </span><span class="self">self</span>.responses.is_empty() &amp;&amp; <span class="self">self</span>.state == State::Active =&gt; {
                     <span class="macro">trace!</span>(<span class="string">&quot;poll_write: at eof, terminating&quot;</span>);
-                    <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::Terminating</span>;
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">request</span> <span class="op">=</span> <span class="ident">BytesMut::new</span>();
-                    <span class="ident">frontend::terminate</span>(<span class="kw-2">&amp;mut</span> <span class="ident">request</span>);
-                    <span class="ident">RequestMessages::Single</span>(<span class="ident">FrontendMessage::Raw</span>(<span class="ident">request</span>.<span class="ident">freeze</span>()))
+                    <span class="self">self</span>.state = State::Terminating;
+                    <span class="kw">let </span><span class="kw-2">mut </span>request = BytesMut::new();
+                    frontend::terminate(<span class="kw-2">&amp;mut </span>request);
+                    RequestMessages::Single(FrontendMessage::Raw(request.freeze()))
                 }
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>) =&gt; {
+                Poll::Ready(<span class="prelude-val">None</span>) =&gt; {
                     <span class="macro">trace!</span>(
                         <span class="string">&quot;poll_write: at eof, pending responses {}&quot;</span>,
-                        <span class="self">self</span>.<span class="ident">responses</span>.<span class="ident">len</span>()
+                        <span class="self">self</span>.responses.len()
                     );
-                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>);
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="bool-val">true</span>);
                 }
-                <span class="ident">Poll::Pending</span> =&gt; {
+                Poll::Pending =&gt; {
                     <span class="macro">trace!</span>(<span class="string">&quot;poll_write: waiting on request&quot;</span>);
-                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>);
+                    <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="bool-val">true</span>);
                 }
             };
 
-            <span class="kw">match</span> <span class="ident">request</span> {
-                <span class="ident">RequestMessages::Single</span>(<span class="ident">request</span>) =&gt; {
-                    <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">stream</span>)
-                        .<span class="ident">start_send</span>(<span class="ident">request</span>)
-                        .<span class="ident">map_err</span>(<span class="ident">Error::io</span>)<span class="question-mark">?</span>;
-                    <span class="kw">if</span> <span class="self">self</span>.<span class="ident">state</span> <span class="op">==</span> <span class="ident">State::Terminating</span> {
+            <span class="kw">match </span>request {
+                RequestMessages::Single(request) =&gt; {
+                    Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.stream)
+                        .start_send(request)
+                        .map_err(Error::io)<span class="question-mark">?</span>;
+                    <span class="kw">if </span><span class="self">self</span>.state == State::Terminating {
                         <span class="macro">trace!</span>(<span class="string">&quot;poll_write: sent eof, closing&quot;</span>);
-                        <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State::Closing</span>;
+                        <span class="self">self</span>.state = State::Closing;
                     }
                 }
-                <span class="ident">RequestMessages::CopyIn</span>(<span class="kw-2">mut</span> <span class="ident">receiver</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">receiver</span>.<span class="ident">poll_next_unpin</span>(<span class="ident">cx</span>) {
-                        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">message</span>)) =&gt; <span class="ident">message</span>,
-                        <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>) =&gt; {
+                RequestMessages::CopyIn(<span class="kw-2">mut </span>receiver) =&gt; {
+                    <span class="kw">let </span>message = <span class="kw">match </span>receiver.poll_next_unpin(cx) {
+                        Poll::Ready(<span class="prelude-val">Some</span>(message)) =&gt; message,
+                        Poll::Ready(<span class="prelude-val">None</span>) =&gt; {
                             <span class="macro">trace!</span>(<span class="string">&quot;poll_write: finished copy_in request&quot;</span>);
                             <span class="kw">continue</span>;
                         }
-                        <span class="ident">Poll::Pending</span> =&gt; {
+                        Poll::Pending =&gt; {
                             <span class="macro">trace!</span>(<span class="string">&quot;poll_write: waiting on copy_in stream&quot;</span>);
-                            <span class="self">self</span>.<span class="ident">pending_request</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">RequestMessages::CopyIn</span>(<span class="ident">receiver</span>));
-                            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>);
+                            <span class="self">self</span>.pending_request = <span class="prelude-val">Some</span>(RequestMessages::CopyIn(receiver));
+                            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="bool-val">true</span>);
                         }
                     };
-                    <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">stream</span>)
-                        .<span class="ident">start_send</span>(<span class="ident">message</span>)
-                        .<span class="ident">map_err</span>(<span class="ident">Error::io</span>)<span class="question-mark">?</span>;
-                    <span class="self">self</span>.<span class="ident">pending_request</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">RequestMessages::CopyIn</span>(<span class="ident">receiver</span>));
+                    Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.stream)
+                        .start_send(message)
+                        .map_err(Error::io)<span class="question-mark">?</span>;
+                    <span class="self">self</span>.pending_request = <span class="prelude-val">Some</span>(RequestMessages::CopyIn(receiver));
                 }
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">stream</span>)
-            .<span class="ident">poll_flush</span>(<span class="ident">cx</span>)
-            .<span class="ident">map_err</span>(<span class="ident">Error::io</span>)<span class="question-mark">?</span>
-        {
-            <span class="ident">Poll::Ready</span>(()) =&gt; <span class="macro">trace!</span>(<span class="string">&quot;poll_flush: flushed&quot;</span>),
-            <span class="ident">Poll::Pending</span> =&gt; <span class="macro">trace!</span>(<span class="string">&quot;poll_flush: waiting on socket&quot;</span>),
+    <span class="kw">fn </span>poll_flush(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="kw">match </span>Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.stream)
+            .poll_flush(cx)
+            .map_err(Error::io)<span class="question-mark">?
+        </span>{
+            Poll::Ready(()) =&gt; <span class="macro">trace!</span>(<span class="string">&quot;poll_flush: flushed&quot;</span>),
+            Poll::Pending =&gt; <span class="macro">trace!</span>(<span class="string">&quot;poll_flush: waiting on socket&quot;</span>),
         }
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_shutdown</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">state</span> <span class="op">!</span><span class="op">=</span> <span class="ident">State::Closing</span> {
-            <span class="kw">return</span> <span class="ident">Poll::Pending</span>;
+    <span class="kw">fn </span>poll_shutdown(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), Error&gt;&gt; {
+        <span class="kw">if </span><span class="self">self</span>.state != State::Closing {
+            <span class="kw">return </span>Poll::Pending;
         }
 
-        <span class="kw">match</span> <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">stream</span>)
-            .<span class="ident">poll_close</span>(<span class="ident">cx</span>)
-            .<span class="ident">map_err</span>(<span class="ident">Error::io</span>)<span class="question-mark">?</span>
-        {
-            <span class="ident">Poll::Ready</span>(()) =&gt; {
+        <span class="kw">match </span>Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.stream)
+            .poll_close(cx)
+            .map_err(Error::io)<span class="question-mark">?
+        </span>{
+            Poll::Ready(()) =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;poll_shutdown: complete&quot;</span>);
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
+                Poll::Ready(<span class="prelude-val">Ok</span>(()))
             }
-            <span class="ident">Poll::Pending</span> =&gt; {
+            Poll::Pending =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;poll_shutdown: waiting on socket&quot;</span>);
-                <span class="ident">Poll::Pending</span>
+                Poll::Pending
             }
         }
     }
 
-    <span class="doccomment">/// Returns the value of a runtime parameter for this connection.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parameter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">parameters</span>.<span class="ident">get</span>(<span class="ident">name</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">s</span>)
+    <span class="doccomment">/// Returns the value of a runtime parameter for this connection.
+    </span><span class="kw">pub fn </span>parameter(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.parameters.get(name).map(|s| <span class="kw-2">&amp;**</span>s)
     }
 
-    <span class="doccomment">/// Polls for asynchronous messages from the server.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The server can send notices as well as notifications asynchronously to the client. Applications that wish to</span>
-    <span class="doccomment">/// examine those messages should use this method to drive the connection rather than its `Future` implementation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_message</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">AsyncMessage</span>, <span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">poll_read</span>(<span class="ident">cx</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">want_flush</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">poll_write</span>(<span class="ident">cx</span>)<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">want_flush</span> {
-            <span class="self">self</span>.<span class="ident">poll_flush</span>(<span class="ident">cx</span>)<span class="question-mark">?</span>;
+    <span class="doccomment">/// Polls for asynchronous messages from the server.
+    ///
+    /// The server can send notices as well as notifications asynchronously to the client. Applications that wish to
+    /// examine those messages should use this method to drive the connection rather than its `Future` implementation.
+    </span><span class="kw">pub fn </span>poll_message(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Result</span>&lt;AsyncMessage, Error&gt;&gt;&gt; {
+        <span class="kw">let </span>message = <span class="self">self</span>.poll_read(cx)<span class="question-mark">?</span>;
+        <span class="kw">let </span>want_flush = <span class="self">self</span>.poll_write(cx)<span class="question-mark">?</span>;
+        <span class="kw">if </span>want_flush {
+            <span class="self">self</span>.poll_flush(cx)<span class="question-mark">?</span>;
         }
-        <span class="kw">match</span> <span class="ident">message</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">message</span>) =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">message</span>))),
-            <span class="prelude-val">None</span> =&gt; <span class="kw">match</span> <span class="self">self</span>.<span class="ident">poll_shutdown</span>(<span class="ident">cx</span>) {
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(())) =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>),
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>))),
-                <span class="ident">Poll::Pending</span> =&gt; <span class="ident">Poll::Pending</span>,
+        <span class="kw">match </span>message {
+            <span class="prelude-val">Some</span>(message) =&gt; Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(message))),
+            <span class="prelude-val">None </span>=&gt; <span class="kw">match </span><span class="self">self</span>.poll_shutdown(cx) {
+                Poll::Ready(<span class="prelude-val">Ok</span>(())) =&gt; Poll::Ready(<span class="prelude-val">None</span>),
+                Poll::Ready(<span class="prelude-val">Err</span>(e)) =&gt; Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(e))),
+                Poll::Pending =&gt; Poll::Pending,
             },
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-    <span class="ident">T</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+<span class="kw">impl</span>&lt;S, T&gt; Future <span class="kw">for </span>Connection&lt;S, T&gt;
+<span class="kw">where
+    </span>S: AsyncRead + AsyncWrite + Unpin,
+    T: AsyncRead + AsyncWrite + Unpin,
 {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Output = <span class="prelude-ty">Result</span>&lt;(), Error&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">message</span>) <span class="op">=</span> <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">poll_message</span>(<span class="ident">cx</span>)<span class="question-mark">?</span>) {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">AsyncMessage::Notice</span>(<span class="ident">notice</span>) <span class="op">=</span> <span class="ident">message</span> {
-                <span class="macro">info!</span>(<span class="string">&quot;{}: {}&quot;</span>, <span class="ident">notice</span>.<span class="ident">severity</span>(), <span class="ident">notice</span>.<span class="ident">message</span>());
+    <span class="kw">fn </span>poll(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), Error&gt;&gt; {
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(message) = <span class="macro">ready!</span>(<span class="self">self</span>.poll_message(cx)<span class="question-mark">?</span>) {
+            <span class="kw">if let </span>AsyncMessage::Notice(notice) = message {
+                <span class="macro">info!</span>(<span class="string">&quot;{}: {}&quot;</span>, notice.severity(), notice.message());
             }
         }
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
+        Poll::Ready(<span class="prelude-val">Ok</span>(()))
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio_postgres" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio_postgres" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

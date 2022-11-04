@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/psl-core/src/validate/validation_pipeline/validations/names.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>names.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../psl_core/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/psl-core/src/validate/validation_pipeline/validations/names.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>names.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../psl_core/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -131,138 +131,138 @@
 <span id="131">131</span>
 <span id="132">132</span>
 <span id="133">133</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::constraint_namespace::ConstraintNamespace</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast</span>::{<span class="ident">FieldId</span>, <span class="ident">ModelId</span>};
-<span class="kw">use</span> <span class="ident">parser_database::walkers::RelationName</span>;
-<span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="ident">HashMap</span>, <span class="ident">HashSet</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::constraint_namespace::ConstraintNamespace;
+<span class="kw">use </span><span class="kw">crate</span>::ast::{FieldId, ModelId};
+<span class="kw">use </span>parser_database::walkers::RelationName;
+<span class="kw">use </span>std::collections::{HashMap, HashSet};
 
-<span class="kw">type</span> <span class="ident">RelationIdentifier</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="op">=</span> (<span class="ident">ModelId</span>, <span class="ident">ModelId</span>, <span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>);
+<span class="kw">type </span>RelationIdentifier&lt;<span class="lifetime">&#39;db</span>&gt; = (ModelId, ModelId, RelationName&lt;<span class="lifetime">&#39;db</span>&gt;);
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum</span> <span class="ident">NameTaken</span> {
-    <span class="ident">Index</span>,
-    <span class="ident">Unique</span>,
-    <span class="ident">PrimaryKey</span>,
+<span class="attribute">#[derive(Clone, Copy)]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum </span>NameTaken {
+    Index,
+    Unique,
+    PrimaryKey,
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">Names</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">relation_names</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">RelationIdentifier</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FieldId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">index_names</span>: <span class="ident">HashSet</span><span class="op">&lt;</span>(<span class="ident">ModelId</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span>)<span class="op">&gt;</span>,
-    <span class="ident">unique_names</span>: <span class="ident">HashSet</span><span class="op">&lt;</span>(<span class="ident">ModelId</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span>)<span class="op">&gt;</span>,
-    <span class="ident">primary_key_names</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ModelId</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">constraint_namespace</span>: <span class="ident">ConstraintNamespace</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>Names&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">super</span>) relation_names: HashMap&lt;RelationIdentifier&lt;<span class="lifetime">&#39;db</span>&gt;, Vec&lt;FieldId&gt;&gt;,
+    index_names: HashSet&lt;(ModelId, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str)&gt;,
+    unique_names: HashSet&lt;(ModelId, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str)&gt;,
+    primary_key_names: HashMap&lt;ModelId, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str&gt;,
+    <span class="kw">pub</span>(<span class="kw">super</span>) constraint_namespace: ConstraintNamespace&lt;<span class="lifetime">&#39;db</span>&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">Names</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="kw">super</span>::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">relation_names</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">RelationIdentifier</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FieldId</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">index_names</span>: <span class="ident">HashSet</span><span class="op">&lt;</span>(<span class="ident">ModelId</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashSet::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">unique_names</span>: <span class="ident">HashSet</span><span class="op">&lt;</span>(<span class="ident">ModelId</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashSet::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">primary_key_names</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ModelId</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; Names&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new(ctx: <span class="kw-2">&amp;</span><span class="kw">super</span>::Context&lt;<span class="lifetime">&#39;db</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>relation_names: HashMap&lt;RelationIdentifier&lt;<span class="lifetime">&#39;db</span>&gt;, Vec&lt;FieldId&gt;&gt; = HashMap::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>index_names: HashSet&lt;(ModelId, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str)&gt; = HashSet::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>unique_names: HashSet&lt;(ModelId, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str)&gt; = HashSet::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>primary_key_names: HashMap&lt;ModelId, <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str&gt; = HashMap::new();
 
-        <span class="kw">for</span> <span class="ident">model</span> <span class="kw">in</span> <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">walk_models</span>() {
-            <span class="kw">let</span> <span class="ident">model_id</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">model_id</span>();
+        <span class="kw">for </span>model <span class="kw">in </span>ctx.db.walk_models() {
+            <span class="kw">let </span>model_id = model.model_id();
 
-            <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">relation_fields</span>() {
-                <span class="kw">let</span> <span class="ident">model_id</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">model_id</span>();
-                <span class="kw">let</span> <span class="ident">related_model_id</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">related_model</span>().<span class="ident">model_id</span>();
+            <span class="kw">for </span>field <span class="kw">in </span>model.relation_fields() {
+                <span class="kw">let </span>model_id = field.model().model_id();
+                <span class="kw">let </span>related_model_id = field.related_model().model_id();
 
-                <span class="kw">let</span> <span class="ident">identifier</span> <span class="op">=</span> (<span class="ident">model_id</span>, <span class="ident">related_model_id</span>, <span class="ident">field</span>.<span class="ident">relation_name</span>());
-                <span class="kw">let</span> <span class="ident">field_ids</span> <span class="op">=</span> <span class="ident">relation_names</span>.<span class="ident">entry</span>(<span class="ident">identifier</span>).<span class="ident">or_default</span>();
+                <span class="kw">let </span>identifier = (model_id, related_model_id, field.relation_name());
+                <span class="kw">let </span>field_ids = relation_names.entry(identifier).or_default();
 
-                <span class="ident">field_ids</span>.<span class="ident">push</span>(<span class="ident">field</span>.<span class="ident">field_id</span>());
+                field_ids.push(field.field_id());
             }
 
-            <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">indexes</span>() {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">index</span>.<span class="ident">name</span>() {
-                    <span class="kw">if</span> <span class="ident">index</span>.<span class="ident">is_unique</span>() {
-                        <span class="ident">unique_names</span>.<span class="ident">insert</span>((<span class="ident">model_id</span>, <span class="ident">name</span>));
-                    } <span class="kw">else</span> {
-                        <span class="ident">index_names</span>.<span class="ident">insert</span>((<span class="ident">model_id</span>, <span class="ident">name</span>));
+            <span class="kw">for </span>index <span class="kw">in </span>model.indexes() {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(name) = index.name() {
+                    <span class="kw">if </span>index.is_unique() {
+                        unique_names.insert((model_id, name));
+                    } <span class="kw">else </span>{
+                        index_names.insert((model_id, name));
                     }
                 }
             }
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pk</span>) <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_key</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">name</span>()) {
-                <span class="ident">primary_key_names</span>.<span class="ident">insert</span>(<span class="ident">model</span>.<span class="ident">model_id</span>(), <span class="ident">pk</span>);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(pk) = model.primary_key().and_then(|pk| pk.name()) {
+                primary_key_names.insert(model.model_id(), pk);
             }
         }
 
-        <span class="self">Self</span> {
-            <span class="ident">relation_names</span>,
-            <span class="ident">index_names</span>,
-            <span class="ident">unique_names</span>,
-            <span class="ident">primary_key_names</span>,
-            <span class="ident">constraint_namespace</span>: <span class="ident">infer_namespaces</span>(<span class="ident">ctx</span>),
+        <span class="self">Self </span>{
+            relation_names,
+            index_names,
+            unique_names,
+            primary_key_names,
+            constraint_namespace: infer_namespaces(ctx),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">name_taken</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model_id</span>: <span class="ident">ModelId</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">NameTaken</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>name_taken(<span class="kw-2">&amp;</span><span class="self">self</span>, model_id: ModelId, name: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;NameTaken&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>result = Vec::new();
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">index_names</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span>(<span class="ident">model_id</span>, <span class="ident">name</span>)) {
-            <span class="ident">result</span>.<span class="ident">push</span>(<span class="ident">NameTaken::Index</span>);
+        <span class="kw">if </span><span class="self">self</span>.index_names.contains(<span class="kw-2">&amp;</span>(model_id, name)) {
+            result.push(NameTaken::Index);
         }
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">unique_names</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span>(<span class="ident">model_id</span>, <span class="ident">name</span>)) {
-            <span class="ident">result</span>.<span class="ident">push</span>(<span class="ident">NameTaken::Unique</span>);
+        <span class="kw">if </span><span class="self">self</span>.unique_names.contains(<span class="kw-2">&amp;</span>(model_id, name)) {
+            result.push(NameTaken::Unique);
         }
 
-        <span class="kw">if</span> <span class="self">self</span>
-            .<span class="ident">primary_key_names</span>
-            .<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">model_id</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">pk</span> <span class="op">==</span> <span class="ident">name</span>)
-            .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+        <span class="kw">if </span><span class="self">self
+            </span>.primary_key_names
+            .get(<span class="kw-2">&amp;</span>model_id)
+            .map(|pk| <span class="kw-2">*</span>pk == name)
+            .unwrap_or(<span class="bool-val">false</span>)
         {
-            <span class="ident">result</span>.<span class="ident">push</span>(<span class="ident">NameTaken::PrimaryKey</span>);
+            result.push(NameTaken::PrimaryKey);
         }
 
-        <span class="ident">result</span>
+        result
     }
 }
 
-<span class="doccomment">/// Generate namespaces per database requirements, and add the names to it from the constraints</span>
-<span class="doccomment">/// part of the namespace.</span>
-<span class="kw">fn</span> <span class="ident">infer_namespaces</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="kw">super</span>::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">ConstraintNamespace</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::datamodel_connector::ConstraintScope</span>;
+<span class="doccomment">/// Generate namespaces per database requirements, and add the names to it from the constraints
+/// part of the namespace.
+</span><span class="kw">fn </span>infer_namespaces&lt;<span class="lifetime">&#39;a</span>&gt;(ctx: <span class="kw-2">&amp;</span><span class="kw">super</span>::Context&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; ConstraintNamespace&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">use </span><span class="kw">crate</span>::datamodel_connector::ConstraintScope;
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">namespaces</span> <span class="op">=</span> <span class="ident">ConstraintNamespace::default</span>();
+    <span class="kw">let </span><span class="kw-2">mut </span>namespaces = ConstraintNamespace::default();
 
-    <span class="kw">for</span> <span class="ident">scope</span> <span class="kw">in</span> <span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">constraint_violation_scopes</span>() {
-        <span class="kw">match</span> <span class="ident">scope</span> {
-            <span class="ident">ConstraintScope::GlobalKeyIndex</span> =&gt; {
-                <span class="ident">namespaces</span>.<span class="ident">add_global_indexes</span>(<span class="kw-2">*</span><span class="ident">scope</span>, <span class="ident">ctx</span>);
+    <span class="kw">for </span>scope <span class="kw">in </span>ctx.connector.constraint_violation_scopes() {
+        <span class="kw">match </span>scope {
+            ConstraintScope::GlobalKeyIndex =&gt; {
+                namespaces.add_global_indexes(<span class="kw-2">*</span>scope, ctx);
             }
-            <span class="ident">ConstraintScope::GlobalForeignKey</span> =&gt; {
-                <span class="ident">namespaces</span>.<span class="ident">add_global_relations</span>(<span class="kw-2">*</span><span class="ident">scope</span>, <span class="ident">ctx</span>);
+            ConstraintScope::GlobalForeignKey =&gt; {
+                namespaces.add_global_relations(<span class="kw-2">*</span>scope, ctx);
             }
-            <span class="ident">ConstraintScope::GlobalPrimaryKeyKeyIndex</span> =&gt; {
-                <span class="ident">namespaces</span>.<span class="ident">add_global_primary_keys</span>(<span class="kw-2">*</span><span class="ident">scope</span>, <span class="ident">ctx</span>);
-                <span class="ident">namespaces</span>.<span class="ident">add_global_indexes</span>(<span class="kw-2">*</span><span class="ident">scope</span>, <span class="ident">ctx</span>);
+            ConstraintScope::GlobalPrimaryKeyKeyIndex =&gt; {
+                namespaces.add_global_primary_keys(<span class="kw-2">*</span>scope, ctx);
+                namespaces.add_global_indexes(<span class="kw-2">*</span>scope, ctx);
             }
-            <span class="ident">ConstraintScope::GlobalPrimaryKeyForeignKeyDefault</span> =&gt; {
-                <span class="ident">namespaces</span>.<span class="ident">add_global_primary_keys</span>(<span class="kw-2">*</span><span class="ident">scope</span>, <span class="ident">ctx</span>);
-                <span class="ident">namespaces</span>.<span class="ident">add_global_relations</span>(<span class="kw-2">*</span><span class="ident">scope</span>, <span class="ident">ctx</span>);
-                <span class="ident">namespaces</span>.<span class="ident">add_global_default_constraints</span>(<span class="kw-2">*</span><span class="ident">scope</span>, <span class="ident">ctx</span>);
+            ConstraintScope::GlobalPrimaryKeyForeignKeyDefault =&gt; {
+                namespaces.add_global_primary_keys(<span class="kw-2">*</span>scope, ctx);
+                namespaces.add_global_relations(<span class="kw-2">*</span>scope, ctx);
+                namespaces.add_global_default_constraints(<span class="kw-2">*</span>scope, ctx);
             }
-            <span class="ident">ConstraintScope::ModelKeyIndex</span> =&gt; {
-                <span class="ident">namespaces</span>.<span class="ident">add_local_indexes</span>(<span class="kw-2">*</span><span class="ident">scope</span>, <span class="ident">ctx</span>);
+            ConstraintScope::ModelKeyIndex =&gt; {
+                namespaces.add_local_indexes(<span class="kw-2">*</span>scope, ctx);
             }
-            <span class="ident">ConstraintScope::ModelPrimaryKeyKeyIndex</span> =&gt; {
-                <span class="ident">namespaces</span>.<span class="ident">add_local_primary_keys</span>(<span class="kw-2">*</span><span class="ident">scope</span>, <span class="ident">ctx</span>);
-                <span class="ident">namespaces</span>.<span class="ident">add_local_indexes</span>(<span class="kw-2">*</span><span class="ident">scope</span>, <span class="ident">ctx</span>);
+            ConstraintScope::ModelPrimaryKeyKeyIndex =&gt; {
+                namespaces.add_local_primary_keys(<span class="kw-2">*</span>scope, ctx);
+                namespaces.add_local_indexes(<span class="kw-2">*</span>scope, ctx);
             }
-            <span class="ident">ConstraintScope::ModelPrimaryKeyKeyIndexForeignKey</span> =&gt; {
-                <span class="ident">namespaces</span>.<span class="ident">add_local_primary_keys</span>(<span class="kw-2">*</span><span class="ident">scope</span>, <span class="ident">ctx</span>);
-                <span class="ident">namespaces</span>.<span class="ident">add_local_indexes</span>(<span class="kw-2">*</span><span class="ident">scope</span>, <span class="ident">ctx</span>);
-                <span class="ident">namespaces</span>.<span class="ident">add_local_relations</span>(<span class="kw-2">*</span><span class="ident">scope</span>, <span class="ident">ctx</span>);
+            ConstraintScope::ModelPrimaryKeyKeyIndexForeignKey =&gt; {
+                namespaces.add_local_primary_keys(<span class="kw-2">*</span>scope, ctx);
+                namespaces.add_local_indexes(<span class="kw-2">*</span>scope, ctx);
+                namespaces.add_local_relations(<span class="kw-2">*</span>scope, ctx);
             }
         }
     }
 
-    <span class="ident">namespaces</span>.<span class="ident">add_local_custom_names_for_primary_keys_and_uniques</span>(<span class="ident">ctx</span>);
+    namespaces.add_local_custom_names_for_primary_keys_and_uniques(ctx);
 
-    <span class="ident">namespaces</span>
+    namespaces
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="psl_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="psl_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

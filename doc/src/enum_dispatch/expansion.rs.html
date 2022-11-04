@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/enum_dispatch-0.3.8/src/expansion.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>expansion.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://gitlab.com/antonok/enum_dispatch/raw/master/enum_dispatch.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../enum_dispatch/index.html"><div class="logo-container"><img src="https://gitlab.com/antonok/enum_dispatch/raw/master/enum_dispatch.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../enum_dispatch/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/enum_dispatch-0.3.8/src/expansion.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>expansion.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://gitlab.com/antonok/enum_dispatch/raw/master/enum_dispatch.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../enum_dispatch/index.html"><div class="logo-container"><img src="https://gitlab.com/antonok/enum_dispatch/raw/master/enum_dispatch.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../enum_dispatch/index.html"><div class="logo-container">
                     <img src="https://gitlab.com/antonok/enum_dispatch/raw/master/enum_dispatch.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../enum_dispatch/index.html">
                         <img src="https://gitlab.com/antonok/enum_dispatch/raw/master/enum_dispatch.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -423,428 +423,428 @@
 <span id="421">421</span>
 <span id="422">422</span>
 <span id="423">423</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Provides a utility for generating `enum_dispatch` impl blocks given `EnumDispatchItem` and</span>
-<span class="doccomment">//! `syn::ItemTrait` definitions.</span>
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">cache</span>, <span class="ident">proc_macro</span>};
-<span class="kw">use</span> <span class="ident">quote</span>::{<span class="ident">quote</span>, <span class="ident">ToTokens</span>};
-<span class="kw">use</span> <span class="ident">syn::spanned::Spanned</span>;
+</pre><pre class="rust"><code><span class="doccomment">//! Provides a utility for generating `enum_dispatch` impl blocks given `EnumDispatchItem` and
+//! `syn::ItemTrait` definitions.
+</span><span class="kw">use crate</span>::{cache, proc_macro};
+<span class="kw">use </span>quote::{quote, ToTokens};
+<span class="kw">use </span>syn::spanned::Spanned;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::enum_dispatch_item::EnumDispatchItem</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::enum_dispatch_variant::EnumDispatchVariant</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::syn_utils::plain_identifier_expr</span>;
+<span class="kw">use </span><span class="kw">crate</span>::enum_dispatch_item::EnumDispatchItem;
+<span class="kw">use </span><span class="kw">crate</span>::enum_dispatch_variant::EnumDispatchVariant;
+<span class="kw">use </span><span class="kw">crate</span>::syn_utils::plain_identifier_expr;
 
-<span class="doccomment">/// Name bound to the single enum field in generated match statements. It doesn&#39;t really matter</span>
-<span class="doccomment">/// what this is, as long as it&#39;s consistent across the left and right sides of generated match</span>
-<span class="doccomment">/// arms. For simplicity&#39;s sake, the field is bound to this name everywhere it&#39;s generated.</span>
-<span class="kw">const</span> <span class="ident">FIELDNAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;inner&quot;</span>;
+<span class="doccomment">/// Name bound to the single enum field in generated match statements. It doesn&#39;t really matter
+/// what this is, as long as it&#39;s consistent across the left and right sides of generated match
+/// arms. For simplicity&#39;s sake, the field is bound to this name everywhere it&#39;s generated.
+</span><span class="kw">const </span>FIELDNAME: <span class="kw-2">&amp;</span>str = <span class="string">&quot;inner&quot;</span>;
 
-<span class="doccomment">/// Implements the specified trait for the given enum definition, assuming the trait definition is</span>
-<span class="doccomment">/// already present in local storage.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_enum_impls</span>(
-    <span class="ident">enum_def</span>: <span class="ident">EnumDispatchItem</span>,
-    <span class="ident">traitdef</span>: <span class="ident">syn::ItemTrait</span>,
-) -&gt; <span class="ident">proc_macro2::TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">traitname</span> <span class="op">=</span> <span class="ident">traitdef</span>.<span class="ident">ident</span>;
-    <span class="kw">let</span> <span class="ident">traitfns</span> <span class="op">=</span> <span class="ident">traitdef</span>.<span class="ident">items</span>;
+<span class="doccomment">/// Implements the specified trait for the given enum definition, assuming the trait definition is
+/// already present in local storage.
+</span><span class="kw">pub fn </span>add_enum_impls(
+    enum_def: EnumDispatchItem,
+    traitdef: syn::ItemTrait,
+) -&gt; proc_macro2::TokenStream {
+    <span class="kw">let </span>traitname = traitdef.ident;
+    <span class="kw">let </span>traitfns = traitdef.items;
 
-    <span class="kw">let</span> (<span class="ident">generic_impl_constraints</span>, <span class="ident">enum_type_generics</span>, <span class="ident">where_clause</span>) <span class="op">=</span>
-        <span class="ident">enum_def</span>.<span class="ident">generics</span>.<span class="ident">split_for_impl</span>();
-    <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">trait_type_generics</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">traitdef</span>.<span class="ident">generics</span>.<span class="ident">split_for_impl</span>();
+    <span class="kw">let </span>(generic_impl_constraints, enum_type_generics, where_clause) =
+        enum_def.generics.split_for_impl();
+    <span class="kw">let </span>(<span class="kw">_</span>, trait_type_generics, <span class="kw">_</span>) = traitdef.generics.split_for_impl();
 
-    <span class="kw">let</span> <span class="ident">enumname</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">enum_def</span>.<span class="ident">ident</span>.<span class="ident">to_owned</span>();
-    <span class="kw">let</span> <span class="ident">trait_impl</span> <span class="op">=</span> <span class="macro">quote!</span> {
-        <span class="kw">impl</span> #<span class="ident">generic_impl_constraints</span> #<span class="ident">traitname</span> #<span class="ident">trait_type_generics</span> <span class="kw">for</span> #<span class="ident">enumname</span> #<span class="ident">enum_type_generics</span> #<span class="ident">where_clause</span> {
+    <span class="kw">let </span>enumname = <span class="kw-2">&amp;</span>enum_def.ident.to_owned();
+    <span class="kw">let </span>trait_impl = <span class="macro">quote! </span>{
+        <span class="kw">impl </span>#generic_impl_constraints #traitname #trait_type_generics <span class="kw">for </span>#enumname #enum_type_generics #where_clause {
 
         }
     };
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">trait_impl</span>: <span class="ident">syn::ItemImpl</span> <span class="op">=</span> <span class="ident">syn::parse</span>(<span class="ident">trait_impl</span>.<span class="ident">into</span>()).<span class="ident">unwrap</span>();
+    <span class="kw">let </span><span class="kw-2">mut </span>trait_impl: syn::ItemImpl = syn::parse(trait_impl.into()).unwrap();
 
-    <span class="ident">trait_impl</span>.<span class="ident">unsafety</span> <span class="op">=</span> <span class="ident">traitdef</span>.<span class="ident">unsafety</span>;
+    trait_impl.unsafety = traitdef.unsafety;
 
-    <span class="kw">let</span> <span class="ident">variants</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">EnumDispatchVariant</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">enum_def</span>.<span class="ident">variants</span>.<span class="ident">iter</span>().<span class="ident">collect</span>();
+    <span class="kw">let </span>variants: Vec&lt;<span class="kw-2">&amp;</span>EnumDispatchVariant&gt; = enum_def.variants.iter().collect();
 
-    <span class="kw">for</span> <span class="ident">trait_fn</span> <span class="kw">in</span> <span class="ident">traitfns</span> {
-        <span class="ident">trait_impl</span>.<span class="ident">items</span>.<span class="ident">push</span>(<span class="ident">create_trait_match</span>(
-            <span class="ident">trait_fn</span>,
-            <span class="kw-2">&amp;</span><span class="ident">trait_type_generics</span>,
-            <span class="kw-2">&amp;</span><span class="ident">traitname</span>,
-            <span class="kw-2">&amp;</span><span class="ident">enum_def</span>.<span class="ident">ident</span>,
-            <span class="kw-2">&amp;</span><span class="ident">variants</span>,
+    <span class="kw">for </span>trait_fn <span class="kw">in </span>traitfns {
+        trait_impl.items.push(create_trait_match(
+            trait_fn,
+            <span class="kw-2">&amp;</span>trait_type_generics,
+            <span class="kw-2">&amp;</span>traitname,
+            <span class="kw-2">&amp;</span>enum_def.ident,
+            <span class="kw-2">&amp;</span>variants,
         ));
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">impls</span> <span class="op">=</span> <span class="ident">proc_macro2::TokenStream::new</span>();
+    <span class="kw">let </span><span class="kw-2">mut </span>impls = proc_macro2::TokenStream::new();
 
-    <span class="comment">// Only generate From impls once per enum_def</span>
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">cache::conversion_impls_def_by_enum</span>(
-        <span class="kw-2">&amp;</span><span class="ident">enum_def</span>.<span class="ident">ident</span>,
-        <span class="ident">enum_def</span>.<span class="ident">generics</span>.<span class="ident">type_params</span>().<span class="ident">count</span>(),
+    <span class="comment">// Only generate From impls once per enum_def
+    </span><span class="kw">if </span>!cache::conversion_impls_def_by_enum(
+        <span class="kw-2">&amp;</span>enum_def.ident,
+        enum_def.generics.type_params().count(),
     ) {
-        <span class="kw">let</span> <span class="ident">from_impls</span> <span class="op">=</span> <span class="ident">generate_from_impls</span>(<span class="kw-2">&amp;</span><span class="ident">enum_def</span>.<span class="ident">ident</span>, <span class="kw-2">&amp;</span><span class="ident">variants</span>, <span class="kw-2">&amp;</span><span class="ident">enum_def</span>.<span class="ident">generics</span>);
-        <span class="kw">for</span> <span class="ident">from_impl</span> <span class="kw">in</span> <span class="ident">from_impls</span>.<span class="ident">iter</span>() {
-            <span class="ident">from_impl</span>.<span class="ident">to_tokens</span>(<span class="kw-2">&amp;mut</span> <span class="ident">impls</span>);
+        <span class="kw">let </span>from_impls = generate_from_impls(<span class="kw-2">&amp;</span>enum_def.ident, <span class="kw-2">&amp;</span>variants, <span class="kw-2">&amp;</span>enum_def.generics);
+        <span class="kw">for </span>from_impl <span class="kw">in </span>from_impls.iter() {
+            from_impl.to_tokens(<span class="kw-2">&amp;mut </span>impls);
         }
 
-        <span class="kw">let</span> <span class="ident">try_into_impls</span> <span class="op">=</span>
-            <span class="ident">generate_try_into_impls</span>(<span class="kw-2">&amp;</span><span class="ident">enum_def</span>.<span class="ident">ident</span>, <span class="kw-2">&amp;</span><span class="ident">variants</span>, <span class="kw-2">&amp;</span><span class="ident">trait_impl</span>.<span class="ident">generics</span>);
-        <span class="kw">for</span> <span class="ident">try_into_impl</span> <span class="kw">in</span> <span class="ident">try_into_impls</span>.<span class="ident">iter</span>() {
-            <span class="ident">try_into_impl</span>.<span class="ident">to_tokens</span>(<span class="kw-2">&amp;mut</span> <span class="ident">impls</span>);
+        <span class="kw">let </span>try_into_impls =
+            generate_try_into_impls(<span class="kw-2">&amp;</span>enum_def.ident, <span class="kw-2">&amp;</span>variants, <span class="kw-2">&amp;</span>trait_impl.generics);
+        <span class="kw">for </span>try_into_impl <span class="kw">in </span>try_into_impls.iter() {
+            try_into_impl.to_tokens(<span class="kw-2">&amp;mut </span>impls);
         }
-        <span class="ident">cache::cache_enum_conversion_impls_defined</span>(
-            <span class="ident">enum_def</span>.<span class="ident">ident</span>.<span class="ident">clone</span>(),
-            <span class="ident">enum_def</span>.<span class="ident">generics</span>.<span class="ident">type_params</span>().<span class="ident">count</span>(),
+        cache::cache_enum_conversion_impls_defined(
+            enum_def.ident.clone(),
+            enum_def.generics.type_params().count(),
         );
     }
 
-    <span class="ident">trait_impl</span>.<span class="ident">to_tokens</span>(<span class="kw-2">&amp;mut</span> <span class="ident">impls</span>);
-    <span class="ident">impls</span>
+    trait_impl.to_tokens(<span class="kw-2">&amp;mut </span>impls);
+    impls
 }
 
-<span class="doccomment">/// Returns whether or not an attribute from an enum variant should be applied to other usages of</span>
-<span class="doccomment">/// that variant&#39;s identifier.</span>
-<span class="kw">fn</span> <span class="ident">use_attribute</span>(<span class="ident">attr</span>: <span class="op">&amp;&amp;</span><span class="ident">syn::Attribute</span>) -&gt; <span class="ident">bool</span> {
-    <span class="ident">attr</span>.<span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="string">&quot;cfg&quot;</span>)
+<span class="doccomment">/// Returns whether or not an attribute from an enum variant should be applied to other usages of
+/// that variant&#39;s identifier.
+</span><span class="kw">fn </span>use_attribute(attr: &amp;&amp;syn::Attribute) -&gt; bool {
+    attr.path.is_ident(<span class="string">&quot;cfg&quot;</span>)
 }
 
-<span class="doccomment">/// Generates impls of core::convert::From for each enum variant.</span>
-<span class="kw">fn</span> <span class="ident">generate_from_impls</span>(
-    <span class="ident">enumname</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Ident</span>,
-    <span class="ident">enumvariants</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">EnumDispatchVariant</span>],
-    <span class="ident">generics</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Generics</span>,
-) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">syn::ItemImpl</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">impl_generics</span>, <span class="ident">ty_generics</span>, <span class="ident">where_clause</span>) <span class="op">=</span> <span class="ident">generics</span>.<span class="ident">split_for_impl</span>();
-    <span class="ident">enumvariants</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">variant</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">variant_name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">variant</span>.<span class="ident">ident</span>;
-            <span class="kw">let</span> <span class="ident">variant_type</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">variant</span>.<span class="ident">ty</span>;
-            <span class="kw">let</span> <span class="ident">attributes</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">variant</span>.<span class="ident">attrs</span>.<span class="ident">iter</span>().<span class="ident">filter</span>(<span class="ident">use_attribute</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-            <span class="kw">let</span> <span class="ident">impl_block</span> <span class="op">=</span> <span class="macro">quote!</span> {
-                #(#<span class="ident">attributes</span>)<span class="op">*</span>
-                <span class="kw">impl</span> #<span class="ident">impl_generics</span> <span class="ident">::core::convert::From</span><span class="op">&lt;</span>#<span class="ident">variant_type</span><span class="op">&gt;</span> <span class="kw">for</span> #<span class="ident">enumname</span> #<span class="ident">ty_generics</span> #<span class="ident">where_clause</span> {
-                    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: #<span class="ident">variant_type</span>) -&gt; #<span class="ident">enumname</span> #<span class="ident">ty_generics</span> {
-                        #<span class="ident">enumname</span>::#<span class="ident">variant_name</span>(<span class="ident">v</span>)
+<span class="doccomment">/// Generates impls of core::convert::From for each enum variant.
+</span><span class="kw">fn </span>generate_from_impls(
+    enumname: <span class="kw-2">&amp;</span>syn::Ident,
+    enumvariants: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>EnumDispatchVariant],
+    generics: <span class="kw-2">&amp;</span>syn::Generics,
+) -&gt; Vec&lt;syn::ItemImpl&gt; {
+    <span class="kw">let </span>(impl_generics, ty_generics, where_clause) = generics.split_for_impl();
+    enumvariants
+        .iter()
+        .map(|variant| {
+            <span class="kw">let </span>variant_name = <span class="kw-2">&amp;</span>variant.ident;
+            <span class="kw">let </span>variant_type = <span class="kw-2">&amp;</span>variant.ty;
+            <span class="kw">let </span>attributes = <span class="kw-2">&amp;</span>variant.attrs.iter().filter(use_attribute).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+            <span class="kw">let </span>impl_block = <span class="macro">quote! </span>{
+                #(#attributes)*
+                <span class="kw">impl </span>#impl_generics ::core::convert::From&lt;#variant_type&gt; <span class="kw">for </span>#enumname #ty_generics #where_clause {
+                    <span class="kw">fn </span>from(v: #variant_type) -&gt; #enumname #ty_generics {
+                        #enumname::#variant_name(v)
                     }
                 }
             };
-            <span class="ident">syn::parse</span>(<span class="ident">impl_block</span>.<span class="ident">into</span>()).<span class="ident">unwrap</span>()
-        }).<span class="ident">collect</span>()
+            syn::parse(impl_block.into()).unwrap()
+        }).collect()
 }
 
-<span class="doccomment">/// Generates impls of core::convert::TryInto for each enum variant.</span>
-<span class="kw">fn</span> <span class="ident">generate_try_into_impls</span>(
-    <span class="ident">enumname</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Ident</span>,
-    <span class="ident">enumvariants</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">EnumDispatchVariant</span>],
-    <span class="ident">generics</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Generics</span>,
-) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">syn::ItemImpl</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">impl_generics</span>, <span class="ident">ty_generics</span>, <span class="ident">where_clause</span>) <span class="op">=</span> <span class="ident">generics</span>.<span class="ident">split_for_impl</span>();
-    <span class="ident">enumvariants</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">enumerate</span>()
-        .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">i</span>, <span class="ident">variant</span>)<span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">variant_name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">variant</span>.<span class="ident">ident</span>;
-            <span class="kw">let</span> <span class="ident">variant_type</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">variant</span>.<span class="ident">ty</span>;
-            <span class="kw">let</span> <span class="ident">attributes</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">variant</span>.<span class="ident">attrs</span>.<span class="ident">iter</span>().<span class="ident">filter</span>(<span class="ident">use_attribute</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+<span class="doccomment">/// Generates impls of core::convert::TryInto for each enum variant.
+</span><span class="kw">fn </span>generate_try_into_impls(
+    enumname: <span class="kw-2">&amp;</span>syn::Ident,
+    enumvariants: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>EnumDispatchVariant],
+    generics: <span class="kw-2">&amp;</span>syn::Generics,
+) -&gt; Vec&lt;syn::ItemImpl&gt; {
+    <span class="kw">let </span>(impl_generics, ty_generics, where_clause) = generics.split_for_impl();
+    enumvariants
+        .iter()
+        .enumerate()
+        .map(|(i, variant)| {
+            <span class="kw">let </span>variant_name = <span class="kw-2">&amp;</span>variant.ident;
+            <span class="kw">let </span>variant_type = <span class="kw-2">&amp;</span>variant.ty;
+            <span class="kw">let </span>attributes = <span class="kw-2">&amp;</span>variant.attrs.iter().filter(use_attribute).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-            <span class="comment">// Instead of making a specific match arm for each of the other variants we could just</span>
-            <span class="comment">// use a catch-all wildcard, but doing it this way means we get nicer error messages</span>
-            <span class="comment">// that say what the wrong variant is. It also degrades nicely in the case of a single</span>
-            <span class="comment">// variant enum so we don&#39;t get an unsightly &quot;unreachable pattern&quot; warning.</span>
-            <span class="kw">let</span> <span class="ident">other</span> <span class="op">=</span> <span class="ident">enumvariants</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">enumerate</span>()
-                .<span class="ident">filter_map</span>(
-                    <span class="op">|</span>(<span class="ident">j</span>, <span class="ident">other</span>)<span class="op">|</span> <span class="kw">if</span> <span class="ident">i</span> <span class="op">!</span><span class="op">=</span> <span class="ident">j</span> { <span class="prelude-val">Some</span>(<span class="ident">other</span>) } <span class="kw">else</span> { <span class="prelude-val">None</span> });
-            <span class="kw">let</span> <span class="ident">other_attributes</span> <span class="op">=</span> <span class="ident">other</span>
-                .<span class="ident">clone</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">other</span><span class="op">|</span> {
-                    <span class="kw">let</span> <span class="ident">attrs</span> <span class="op">=</span> <span class="ident">other</span>.<span class="ident">attrs</span>.<span class="ident">iter</span>().<span class="ident">filter</span>(<span class="ident">use_attribute</span>);
-                    <span class="macro">quote!</span> { #(#<span class="ident">attrs</span>)<span class="op">*</span> }
+            <span class="comment">// Instead of making a specific match arm for each of the other variants we could just
+            // use a catch-all wildcard, but doing it this way means we get nicer error messages
+            // that say what the wrong variant is. It also degrades nicely in the case of a single
+            // variant enum so we don&#39;t get an unsightly &quot;unreachable pattern&quot; warning.
+            </span><span class="kw">let </span>other = enumvariants
+                .iter()
+                .enumerate()
+                .filter_map(
+                    |(j, other)| <span class="kw">if </span>i != j { <span class="prelude-val">Some</span>(other) } <span class="kw">else </span>{ <span class="prelude-val">None </span>});
+            <span class="kw">let </span>other_attributes = other
+                .clone()
+                .map(|other| {
+                    <span class="kw">let </span>attrs = other.attrs.iter().filter(use_attribute);
+                    <span class="macro">quote! </span>{ #(#attrs)* }
                 });
-            <span class="kw">let</span> <span class="ident">other_idents</span> <span class="op">=</span> <span class="ident">other</span>
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">other</span><span class="op">|</span> <span class="ident">other</span>.<span class="ident">ident</span>.<span class="ident">clone</span>());
-            <span class="kw">let</span> <span class="ident">from_str</span> <span class="op">=</span> <span class="ident">other_idents</span>.<span class="ident">clone</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">ident</span><span class="op">|</span> <span class="ident">ident</span>.<span class="ident">to_string</span>());
-            <span class="kw">let</span> <span class="ident">to_str</span> <span class="op">=</span> <span class="ident">core::iter::repeat</span>(<span class="ident">variant_name</span>.<span class="ident">to_string</span>());
-            <span class="kw">let</span> <span class="ident">repeated</span> <span class="op">=</span> <span class="ident">core::iter::repeat</span>(<span class="kw-2">&amp;</span><span class="ident">enumname</span>);
+            <span class="kw">let </span>other_idents = other
+                .map(|other| other.ident.clone());
+            <span class="kw">let </span>from_str = other_idents.clone().map(|ident| ident.to_string());
+            <span class="kw">let </span>to_str = core::iter::repeat(variant_name.to_string());
+            <span class="kw">let </span>repeated = core::iter::repeat(<span class="kw-2">&amp;</span>enumname);
 
-            <span class="kw">let</span> <span class="ident">impl_block</span> <span class="op">=</span> <span class="macro">quote!</span> {
-                #(#<span class="ident">attributes</span>)<span class="op">*</span>
-                <span class="kw">impl</span> #<span class="ident">impl_generics</span> <span class="ident">core::convert::TryInto</span><span class="op">&lt;</span>#<span class="ident">variant_type</span><span class="op">&gt;</span> <span class="kw">for</span> #<span class="ident">enumname</span> #<span class="ident">ty_generics</span> #<span class="ident">where_clause</span> {
-                    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>;
-                    <span class="kw">fn</span> <span class="ident">try_into</span>(<span class="self">self</span>) -&gt; <span class="ident">::core::result::Result</span><span class="op">&lt;</span>#<span class="ident">variant_type</span>, <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">core::convert::TryInto</span><span class="op">&lt;</span>#<span class="ident">variant_type</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span> {
-                        <span class="kw">match</span> <span class="self">self</span> {
-                            #<span class="ident">enumname</span>::#<span class="ident">variant_name</span>(<span class="ident">v</span>) =&gt; {<span class="prelude-val">Ok</span>(<span class="ident">v</span>)},
-                            #(  #<span class="ident">other_attributes</span>
-                                #<span class="ident">repeated</span>::#<span class="ident">other_idents</span>(<span class="ident">v</span>) =&gt; {
+            <span class="kw">let </span>impl_block = <span class="macro">quote! </span>{
+                #(#attributes)*
+                <span class="kw">impl </span>#impl_generics core::convert::TryInto&lt;#variant_type&gt; <span class="kw">for </span>#enumname #ty_generics #where_clause {
+                    <span class="kw">type </span>Error = <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str;
+                    <span class="kw">fn </span>try_into(<span class="self">self</span>) -&gt; ::core::result::Result&lt;#variant_type, &lt;<span class="self">Self </span><span class="kw">as </span>core::convert::TryInto&lt;#variant_type&gt;&gt;::Error&gt; {
+                        <span class="kw">match </span><span class="self">self </span>{
+                            #enumname::#variant_name(v) =&gt; {<span class="prelude-val">Ok</span>(v)},
+                            #(  #other_attributes
+                                #repeated::#other_idents(v) =&gt; {
                                 <span class="prelude-val">Err</span>(<span class="macro">concat!</span>(<span class="string">&quot;Tried to convert variant &quot;</span>,
-                                            #<span class="ident">from_str</span>, <span class="string">&quot; to &quot;</span>, #<span class="ident">to_str</span>))}    ),<span class="op">*</span>
+                                            #from_str, <span class="string">&quot; to &quot;</span>, #to_str))}    ),*
                         }
                     }
                 }
             };
-            <span class="ident">syn::parse</span>(<span class="ident">impl_block</span>.<span class="ident">into</span>()).<span class="ident">unwrap</span>()
-        }).<span class="ident">collect</span>()
+            syn::parse(impl_block.into()).unwrap()
+        }).collect()
 }
 
-<span class="doccomment">/// Used to keep track of the &#39;self&#39; arguments in a trait&#39;s function signature.</span>
-<span class="doccomment">/// Static -&gt; no &#39;self&#39; arguments</span>
-<span class="doccomment">/// ByReference -&gt; &amp;self, &amp;mut self</span>
-<span class="doccomment">/// ByValue -&gt; self, mut self</span>
-<span class="kw">enum</span> <span class="ident">MethodType</span> {
-    <span class="ident">Static</span>,
-    <span class="ident">ByReference</span>,
-    <span class="ident">ByValue</span>,
+<span class="doccomment">/// Used to keep track of the &#39;self&#39; arguments in a trait&#39;s function signature.
+/// Static -&gt; no &#39;self&#39; arguments
+/// ByReference -&gt; &amp;self, &amp;mut self
+/// ByValue -&gt; self, mut self
+</span><span class="kw">enum </span>MethodType {
+    Static,
+    ByReference,
+    ByValue,
 }
 
-<span class="doccomment">/// Parses the arguments of a trait method&#39;s signature, returning all non-self arguments as well as</span>
-<span class="doccomment">/// a MethodType enum describing the self argument, if present.</span>
-<span class="kw">fn</span> <span class="ident">extract_fn_args</span>(
-    <span class="ident">trait_args</span>: <span class="ident">syn::punctuated::Punctuated</span><span class="op">&lt;</span><span class="ident">syn::FnArg</span>, <span class="ident">syn::token::Comma</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Parses the arguments of a trait method&#39;s signature, returning all non-self arguments as well as
+/// a MethodType enum describing the self argument, if present.
+</span><span class="kw">fn </span>extract_fn_args(
+    trait_args: syn::punctuated::Punctuated&lt;syn::FnArg, syn::token::Comma&gt;,
 ) -&gt; (
-    <span class="ident">MethodType</span>,
-    <span class="ident">syn::punctuated::Punctuated</span><span class="op">&lt;</span><span class="ident">syn::Expr</span>, <span class="ident">syn::token::Comma</span><span class="op">&gt;</span>,
+    MethodType,
+    syn::punctuated::Punctuated&lt;syn::Expr, syn::token::Comma&gt;,
 ) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">method_type</span> <span class="op">=</span> <span class="ident">MethodType::Static</span>;
-    <span class="kw">let</span> <span class="ident">new_args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">syn::Ident</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">trait_args</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">arg</span> {
-            <span class="ident">syn::FnArg::Receiver</span>(<span class="ident">syn::Receiver</span> {
-                <span class="ident">reference</span>: <span class="prelude-val">Some</span>(<span class="kw">_</span>), ..
+    <span class="kw">let </span><span class="kw-2">mut </span>method_type = MethodType::Static;
+    <span class="kw">let </span>new_args: Vec&lt;syn::Ident&gt; = trait_args
+        .iter()
+        .filter_map(|arg| <span class="kw">match </span>arg {
+            syn::FnArg::Receiver(syn::Receiver {
+                reference: <span class="prelude-val">Some</span>(<span class="kw">_</span>), ..
             }) =&gt; {
-                <span class="ident">method_type</span> <span class="op">=</span> <span class="ident">MethodType::ByReference</span>;
-                <span class="prelude-val">None</span>
-            }
-            <span class="ident">syn::FnArg::Receiver</span>(<span class="ident">syn::Receiver</span> {
-                <span class="ident">reference</span>: <span class="prelude-val">None</span>, ..
+                method_type = MethodType::ByReference;
+                <span class="prelude-val">None
+            </span>}
+            syn::FnArg::Receiver(syn::Receiver {
+                reference: <span class="prelude-val">None</span>, ..
             }) =&gt; {
-                <span class="ident">method_type</span> <span class="op">=</span> <span class="ident">MethodType::ByValue</span>;
-                <span class="prelude-val">None</span>
-            }
-            <span class="ident">syn::FnArg::Typed</span>(<span class="ident">syn::PatType</span> { <span class="ident">pat</span>, .. }) =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">syn::Pat::Ident</span>(<span class="ident">syn::PatIdent</span> { <span class="ident">ident</span>, .. }) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">pat</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">ident</span>.<span class="ident">to_owned</span>())
-                } <span class="kw">else</span> {
-                    <span class="comment">// All non-ident fn args are replaced in `identify_signature_arguments`.</span>
-                    <span class="macro">unreachable!</span>()
+                method_type = MethodType::ByValue;
+                <span class="prelude-val">None
+            </span>}
+            syn::FnArg::Typed(syn::PatType { pat, .. }) =&gt; {
+                <span class="kw">if let </span>syn::Pat::Ident(syn::PatIdent { ident, .. }) = <span class="kw-2">&amp;**</span>pat {
+                    <span class="prelude-val">Some</span>(ident.to_owned())
+                } <span class="kw">else </span>{
+                    <span class="comment">// All non-ident fn args are replaced in `identify_signature_arguments`.
+                    </span><span class="macro">unreachable!</span>()
                 }
             }
         })
-        .<span class="ident">collect</span>();
-    <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">syn::punctuated::Punctuated::new</span>();
-        <span class="ident">new_args</span>.<span class="ident">iter</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> {
-            <span class="ident">args</span>.<span class="ident">push</span>(<span class="ident">syn::parse_str</span>(<span class="ident">arg</span>.<span class="ident">to_string</span>().<span class="ident">as_str</span>()).<span class="ident">unwrap</span>());
+        .collect();
+    <span class="kw">let </span>args = {
+        <span class="kw">let </span><span class="kw-2">mut </span>args = syn::punctuated::Punctuated::new();
+        new_args.iter().for_each(|arg| {
+            args.push(syn::parse_str(arg.to_string().as_str()).unwrap());
         });
-        <span class="ident">args</span>
+        args
     };
-    (<span class="ident">method_type</span>, <span class="ident">args</span>)
+    (method_type, args)
 }
 
-<span class="doccomment">/// Creates a method call that can be used in the match arms of all non-static method</span>
-<span class="doccomment">/// implementations.</span>
-<span class="kw">fn</span> <span class="ident">create_trait_fn_call</span>(
-    <span class="ident">trait_method</span>: <span class="kw-2">&amp;</span><span class="ident">syn::TraitItemMethod</span>,
-    <span class="ident">trait_generics</span>: <span class="kw-2">&amp;</span><span class="ident">syn::TypeGenerics</span>,
-    <span class="ident">trait_name</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Ident</span>,
-) -&gt; <span class="ident">syn::ExprCall</span> {
-    <span class="kw">let</span> <span class="ident">trait_args</span> <span class="op">=</span> <span class="ident">trait_method</span>.<span class="ident">to_owned</span>().<span class="ident">sig</span>.<span class="ident">inputs</span>;
-    <span class="kw">let</span> (<span class="ident">method_type</span>, <span class="kw-2">mut</span> <span class="ident">args</span>) <span class="op">=</span> <span class="ident">extract_fn_args</span>(<span class="ident">trait_args</span>);
+<span class="doccomment">/// Creates a method call that can be used in the match arms of all non-static method
+/// implementations.
+</span><span class="kw">fn </span>create_trait_fn_call(
+    trait_method: <span class="kw-2">&amp;</span>syn::TraitItemMethod,
+    trait_generics: <span class="kw-2">&amp;</span>syn::TypeGenerics,
+    trait_name: <span class="kw-2">&amp;</span>syn::Ident,
+) -&gt; syn::ExprCall {
+    <span class="kw">let </span>trait_args = trait_method.to_owned().sig.inputs;
+    <span class="kw">let </span>(method_type, <span class="kw-2">mut </span>args) = extract_fn_args(trait_args);
 
-    <span class="comment">// Insert FIELDNAME at the beginning of the argument list for UCFS-style method calling</span>
-    <span class="kw">let</span> <span class="ident">explicit_self_arg</span> <span class="op">=</span> <span class="ident">syn::Ident::new</span>(<span class="ident">FIELDNAME</span>, <span class="ident">trait_method</span>.<span class="ident">span</span>());
-    <span class="ident">args</span>.<span class="ident">insert</span>(<span class="number">0</span>, <span class="ident">plain_identifier_expr</span>(<span class="ident">explicit_self_arg</span>));
+    <span class="comment">// Insert FIELDNAME at the beginning of the argument list for UCFS-style method calling
+    </span><span class="kw">let </span>explicit_self_arg = syn::Ident::new(FIELDNAME, trait_method.span());
+    args.insert(<span class="number">0</span>, plain_identifier_expr(explicit_self_arg));
 
-    <span class="ident">syn::ExprCall</span> {
-        <span class="ident">attrs</span>: <span class="macro">vec!</span>[],
-        <span class="ident">func</span>: {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">MethodType::Static</span> <span class="op">=</span> <span class="ident">method_type</span> {
-                <span class="comment">// Trait calls can be created when the inner type is known, like this:</span>
-                <span class="comment">//</span>
-                <span class="comment">// syn::parse_quote! { #type::#trait_method_name }</span>
-                <span class="comment">//</span>
-                <span class="comment">// However, without a concrete enum to match on, it&#39;s impossible to tell</span>
-                <span class="comment">// which variant to call.</span>
-                <span class="macro">unimplemented!</span>(
-                    <span class="string">&quot;Static methods cannot be enum_dispatched (no self argument to match on)&quot;</span>
-                );
-            } <span class="kw">else</span> {
-                <span class="kw">let</span> <span class="ident">method_name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">trait_method</span>.<span class="ident">sig</span>.<span class="ident">ident</span>;
-                <span class="kw">let</span> <span class="ident">trait_turbofish</span> <span class="op">=</span> <span class="ident">trait_generics</span>.<span class="ident">as_turbofish</span>();
+    syn::ExprCall {
+        attrs: <span class="macro">vec!</span>[],
+        func: {
+            <span class="kw">if let </span>MethodType::Static = method_type {
+                <span class="comment">// Trait calls can be created when the inner type is known, like this:
+                //
+                // syn::parse_quote! { #type::#trait_method_name }
+                //
+                // However, without a concrete enum to match on, it&#39;s impossible to tell
+                // which variant to call.
+                </span><span class="macro">unimplemented!</span>(
+                    <span class="string">&quot;Static methods cannot be enum_dispatched (no self argument to match on)&quot;
+                </span>);
+            } <span class="kw">else </span>{
+                <span class="kw">let </span>method_name = <span class="kw-2">&amp;</span>trait_method.sig.ident;
+                <span class="kw">let </span>trait_turbofish = trait_generics.as_turbofish();
 
-                <span class="comment">// It&#39;s not allowed to specify late bound lifetime arguments for a function call.</span>
-                <span class="comment">// Theoretically, it should be possible to determine from a function signature</span>
-                <span class="comment">// whether or not it has late bound lifetime arguments. In practice, it&#39;s very</span>
-                <span class="comment">// difficult, requiring recursive visitors over all the types in the signature and</span>
-                <span class="comment">// inference for elided lifetimes.</span>
-                <span class="comment">//</span>
-                <span class="comment">// Instead, it appears to be safe to strip out any lifetime arguments altogether.</span>
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">generics_without_lifetimes</span> <span class="op">=</span> <span class="ident">trait_method</span>.<span class="ident">sig</span>.<span class="ident">generics</span>.<span class="ident">clone</span>();
-                <span class="ident">generics_without_lifetimes</span>.<span class="ident">params</span> <span class="op">=</span> <span class="ident">generics_without_lifetimes</span>
-                    .<span class="ident">params</span>
-                    .<span class="ident">into_iter</span>()
-                    .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">param</span><span class="op">|</span> <span class="op">!</span><span class="macro">matches!</span>(<span class="ident">param</span>, <span class="ident">syn::GenericParam::Lifetime</span>(..)))
-                    .<span class="ident">collect</span>();
-                <span class="kw">let</span> <span class="ident">method_type_generics</span> <span class="op">=</span> <span class="ident">generics_without_lifetimes</span>.<span class="ident">split_for_impl</span>().<span class="number">1</span>;
-                <span class="kw">let</span> <span class="ident">method_turbofish</span> <span class="op">=</span> <span class="ident">method_type_generics</span>.<span class="ident">as_turbofish</span>();
+                <span class="comment">// It&#39;s not allowed to specify late bound lifetime arguments for a function call.
+                // Theoretically, it should be possible to determine from a function signature
+                // whether or not it has late bound lifetime arguments. In practice, it&#39;s very
+                // difficult, requiring recursive visitors over all the types in the signature and
+                // inference for elided lifetimes.
+                //
+                // Instead, it appears to be safe to strip out any lifetime arguments altogether.
+                </span><span class="kw">let </span><span class="kw-2">mut </span>generics_without_lifetimes = trait_method.sig.generics.clone();
+                generics_without_lifetimes.params = generics_without_lifetimes
+                    .params
+                    .into_iter()
+                    .filter(|param| !<span class="macro">matches!</span>(param, syn::GenericParam::Lifetime(..)))
+                    .collect();
+                <span class="kw">let </span>method_type_generics = generics_without_lifetimes.split_for_impl().<span class="number">1</span>;
+                <span class="kw">let </span>method_turbofish = method_type_generics.as_turbofish();
 
-                <span class="ident">Box::new</span>(
-                    <span class="macro">syn::parse_quote!</span> { #<span class="ident">trait_name</span>#<span class="ident">trait_turbofish</span>::#<span class="ident">method_name</span>#<span class="ident">method_turbofish</span> },
+                Box::new(
+                    <span class="macro">syn::parse_quote! </span>{ #trait_name#trait_turbofish::#method_name#method_turbofish },
                 )
             }
         },
-        <span class="ident">paren_token</span>: <span class="ident">Default::default</span>(),
-        <span class="ident">args</span>,
+        paren_token: Default::default(),
+        args,
     }
 }
 
-<span class="doccomment">/// Constructs a match expression that matches on all variants of the specified enum, creating a</span>
-<span class="doccomment">/// binding to their single field and calling the provided trait method on each.</span>
-<span class="kw">fn</span> <span class="ident">create_match_expr</span>(
-    <span class="ident">trait_method</span>: <span class="kw-2">&amp;</span><span class="ident">syn::TraitItemMethod</span>,
-    <span class="ident">trait_generics</span>: <span class="kw-2">&amp;</span><span class="ident">syn::TypeGenerics</span>,
-    <span class="ident">trait_name</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Ident</span>,
-    <span class="ident">enum_name</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Ident</span>,
-    <span class="ident">enumvariants</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">EnumDispatchVariant</span>],
-) -&gt; <span class="ident">syn::Expr</span> {
-    <span class="kw">let</span> <span class="ident">trait_fn_call</span> <span class="op">=</span> <span class="ident">create_trait_fn_call</span>(<span class="ident">trait_method</span>, <span class="ident">trait_generics</span>, <span class="ident">trait_name</span>);
+<span class="doccomment">/// Constructs a match expression that matches on all variants of the specified enum, creating a
+/// binding to their single field and calling the provided trait method on each.
+</span><span class="kw">fn </span>create_match_expr(
+    trait_method: <span class="kw-2">&amp;</span>syn::TraitItemMethod,
+    trait_generics: <span class="kw-2">&amp;</span>syn::TypeGenerics,
+    trait_name: <span class="kw-2">&amp;</span>syn::Ident,
+    enum_name: <span class="kw-2">&amp;</span>syn::Ident,
+    enumvariants: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>EnumDispatchVariant],
+) -&gt; syn::Expr {
+    <span class="kw">let </span>trait_fn_call = create_trait_fn_call(trait_method, trait_generics, trait_name);
 
-    <span class="comment">// Creates a Vec containing a match arm for every enum variant</span>
-    <span class="kw">let</span> <span class="ident">match_arms</span> <span class="op">=</span> <span class="ident">enumvariants</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">variant</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">variant_name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">variant</span>.<span class="ident">ident</span>;
-            <span class="kw">let</span> <span class="ident">attrs</span> <span class="op">=</span> <span class="ident">variant</span>
-                .<span class="ident">attrs</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">filter</span>(<span class="ident">use_attribute</span>)
-                .<span class="ident">cloned</span>()
-                .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-            <span class="ident">syn::Arm</span> {
-                <span class="ident">attrs</span>,
-                <span class="ident">pat</span>: {
-                    <span class="kw">let</span> <span class="ident">fieldname</span> <span class="op">=</span> <span class="ident">syn::Ident::new</span>(<span class="ident">FIELDNAME</span>, <span class="ident">variant</span>.<span class="ident">span</span>());
-                    <span class="macro">syn::parse_quote!</span> {#<span class="ident">enum_name</span>::#<span class="ident">variant_name</span>(#<span class="ident">fieldname</span>)}
+    <span class="comment">// Creates a Vec containing a match arm for every enum variant
+    </span><span class="kw">let </span>match_arms = enumvariants
+        .iter()
+        .map(|variant| {
+            <span class="kw">let </span>variant_name = <span class="kw-2">&amp;</span>variant.ident;
+            <span class="kw">let </span>attrs = variant
+                .attrs
+                .iter()
+                .filter(use_attribute)
+                .cloned()
+                .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+            syn::Arm {
+                attrs,
+                pat: {
+                    <span class="kw">let </span>fieldname = syn::Ident::new(FIELDNAME, variant.span());
+                    <span class="macro">syn::parse_quote! </span>{#enum_name::#variant_name(#fieldname)}
                 },
-                <span class="ident">guard</span>: <span class="prelude-val">None</span>,
-                <span class="ident">fat_arrow_token</span>: <span class="ident">Default::default</span>(),
-                <span class="ident">body</span>: <span class="ident">Box::new</span>(<span class="ident">syn::Expr::from</span>(<span class="ident">trait_fn_call</span>.<span class="ident">to_owned</span>())),
-                <span class="ident">comma</span>: <span class="prelude-val">Some</span>(<span class="ident">Default::default</span>()),
+                guard: <span class="prelude-val">None</span>,
+                fat_arrow_token: Default::default(),
+                body: Box::new(syn::Expr::from(trait_fn_call.to_owned())),
+                comma: <span class="prelude-val">Some</span>(Default::default()),
             }
         })
-        .<span class="ident">collect</span>();
+        .collect();
 
-    <span class="comment">// Creates the match expression</span>
-    <span class="ident">syn::Expr::from</span>(<span class="ident">syn::ExprMatch</span> {
-        <span class="ident">attrs</span>: <span class="macro">vec!</span>[],
-        <span class="ident">match_token</span>: <span class="ident">Default::default</span>(),
-        <span class="ident">expr</span>: <span class="ident">Box::new</span>(<span class="ident">plain_identifier_expr</span>(<span class="ident">syn::Ident::new</span>(
+    <span class="comment">// Creates the match expression
+    </span>syn::Expr::from(syn::ExprMatch {
+        attrs: <span class="macro">vec!</span>[],
+        match_token: Default::default(),
+        expr: Box::new(plain_identifier_expr(syn::Ident::new(
             <span class="string">&quot;self&quot;</span>,
-            <span class="ident">proc_macro2::Span::call_site</span>(),
+            proc_macro2::Span::call_site(),
         ))),
-        <span class="ident">brace_token</span>: <span class="ident">Default::default</span>(),
-        <span class="ident">arms</span>: <span class="ident">match_arms</span>,
+        brace_token: Default::default(),
+        arms: match_arms,
     })
 }
 
-<span class="doccomment">/// Builds an implementation of the given trait function for the given enum type.</span>
-<span class="kw">fn</span> <span class="ident">create_trait_match</span>(
-    <span class="ident">trait_item</span>: <span class="ident">syn::TraitItem</span>,
-    <span class="ident">trait_generics</span>: <span class="kw-2">&amp;</span><span class="ident">syn::TypeGenerics</span>,
-    <span class="ident">trait_name</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Ident</span>,
-    <span class="ident">enum_name</span>: <span class="kw-2">&amp;</span><span class="ident">syn::Ident</span>,
-    <span class="ident">enumvariants</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">EnumDispatchVariant</span>],
-) -&gt; <span class="ident">syn::ImplItem</span> {
-    <span class="kw">match</span> <span class="ident">trait_item</span> {
-        <span class="ident">syn::TraitItem::Method</span>(<span class="kw-2">mut</span> <span class="ident">trait_method</span>) =&gt; {
-            <span class="ident">identify_signature_arguments</span>(<span class="kw-2">&amp;mut</span> <span class="ident">trait_method</span>.<span class="ident">sig</span>);
+<span class="doccomment">/// Builds an implementation of the given trait function for the given enum type.
+</span><span class="kw">fn </span>create_trait_match(
+    trait_item: syn::TraitItem,
+    trait_generics: <span class="kw-2">&amp;</span>syn::TypeGenerics,
+    trait_name: <span class="kw-2">&amp;</span>syn::Ident,
+    enum_name: <span class="kw-2">&amp;</span>syn::Ident,
+    enumvariants: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>EnumDispatchVariant],
+) -&gt; syn::ImplItem {
+    <span class="kw">match </span>trait_item {
+        syn::TraitItem::Method(<span class="kw-2">mut </span>trait_method) =&gt; {
+            identify_signature_arguments(<span class="kw-2">&amp;mut </span>trait_method.sig);
 
-            <span class="kw">let</span> <span class="ident">match_expr</span> <span class="op">=</span> <span class="ident">create_match_expr</span>(
-                <span class="kw-2">&amp;</span><span class="ident">trait_method</span>,
-                <span class="ident">trait_generics</span>,
-                <span class="ident">trait_name</span>,
-                <span class="ident">enum_name</span>,
-                <span class="ident">enumvariants</span>,
+            <span class="kw">let </span>match_expr = create_match_expr(
+                <span class="kw-2">&amp;</span>trait_method,
+                trait_generics,
+                trait_name,
+                enum_name,
+                enumvariants,
             );
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">impl_attrs</span> <span class="op">=</span> <span class="ident">trait_method</span>.<span class="ident">attrs</span>.<span class="ident">clone</span>();
-            <span class="comment">// Inline impls - #[inline] is never already specified in a trait method signature</span>
-            <span class="ident">impl_attrs</span>.<span class="ident">push</span>(<span class="ident">syn::Attribute</span> {
-                <span class="ident">pound_token</span>: <span class="ident">Default::default</span>(),
-                <span class="ident">style</span>: <span class="ident">syn::AttrStyle::Outer</span>,
-                <span class="ident">bracket_token</span>: <span class="ident">Default::default</span>(),
-                <span class="ident">path</span>: <span class="ident">syn::parse_str</span>(<span class="string">&quot;inline&quot;</span>).<span class="ident">unwrap</span>(),
-                <span class="ident">tokens</span>: <span class="ident">proc_macro::TokenStream::new</span>().<span class="ident">into</span>(),
+            <span class="kw">let </span><span class="kw-2">mut </span>impl_attrs = trait_method.attrs.clone();
+            <span class="comment">// Inline impls - #[inline] is never already specified in a trait method signature
+            </span>impl_attrs.push(syn::Attribute {
+                pound_token: Default::default(),
+                style: syn::AttrStyle::Outer,
+                bracket_token: Default::default(),
+                path: syn::parse_str(<span class="string">&quot;inline&quot;</span>).unwrap(),
+                tokens: proc_macro::TokenStream::new().into(),
             });
 
-            <span class="ident">syn::ImplItem::Method</span>(<span class="ident">syn::ImplItemMethod</span> {
-                <span class="ident">attrs</span>: <span class="ident">impl_attrs</span>,
-                <span class="ident">vis</span>: <span class="ident">syn::Visibility::Inherited</span>,
-                <span class="ident">defaultness</span>: <span class="prelude-val">None</span>,
-                <span class="ident">sig</span>: <span class="ident">trait_method</span>.<span class="ident">sig</span>,
-                <span class="ident">block</span>: <span class="ident">syn::Block</span> {
-                    <span class="ident">brace_token</span>: <span class="ident">Default::default</span>(),
-                    <span class="ident">stmts</span>: <span class="macro">vec!</span>[<span class="ident">syn::Stmt::Expr</span>(<span class="ident">match_expr</span>)],
+            syn::ImplItem::Method(syn::ImplItemMethod {
+                attrs: impl_attrs,
+                vis: syn::Visibility::Inherited,
+                defaultness: <span class="prelude-val">None</span>,
+                sig: trait_method.sig,
+                block: syn::Block {
+                    brace_token: Default::default(),
+                    stmts: <span class="macro">vec!</span>[syn::Stmt::Expr(match_expr)],
                 },
             })
         }
-        <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unsupported trait item&quot;</span>),
+        <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unsupported trait item&quot;</span>),
     }
 }
 
-<span class="doccomment">/// All method arguments that appear in trait method signatures must be passed through to the</span>
-<span class="doccomment">/// underlying dispatched method calls, so they must have unique identifiers. That means we need to</span>
-<span class="doccomment">/// give names to wildcard arguments (`_`), tuple-style arguments, and a bunch of other argument</span>
-<span class="doccomment">/// types you never knew were valid Rust syntax.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Since there is no way to generate hygienic identifiers, we just use a special underscored</span>
-<span class="doccomment">/// string followed by an incrementing counter. We do this for *every* argument, including ones</span>
-<span class="doccomment">/// that are already named, in case somebody clever decides to name their arguments similarly.</span>
-<span class="kw">fn</span> <span class="ident">identify_signature_arguments</span>(<span class="ident">sig</span>: <span class="kw-2">&amp;mut</span> <span class="ident">syn::Signature</span>) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">arg_counter</span> <span class="op">=</span> <span class="number">0</span>;
+<span class="doccomment">/// All method arguments that appear in trait method signatures must be passed through to the
+/// underlying dispatched method calls, so they must have unique identifiers. That means we need to
+/// give names to wildcard arguments (`_`), tuple-style arguments, and a bunch of other argument
+/// types you never knew were valid Rust syntax.
+///
+/// Since there is no way to generate hygienic identifiers, we just use a special underscored
+/// string followed by an incrementing counter. We do this for *every* argument, including ones
+/// that are already named, in case somebody clever decides to name their arguments similarly.
+</span><span class="kw">fn </span>identify_signature_arguments(sig: <span class="kw-2">&amp;mut </span>syn::Signature) {
+    <span class="kw">let </span><span class="kw-2">mut </span>arg_counter = <span class="number">0</span>;
 
-    <span class="doccomment">/// Generates a new argument identifier named `__enum_dispatch_arg_` followed by an</span>
-    <span class="doccomment">/// incrementing counter.</span>
-    <span class="kw">fn</span> <span class="ident">new_arg_ident</span>(<span class="ident">span</span>: <span class="ident">proc_macro2::Span</span>, <span class="ident">arg_counter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">usize</span>) -&gt; <span class="ident">syn::Ident</span> {
-        <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">proc_macro2::Ident::new</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;__enum_dispatch_arg_{}&quot;</span>, <span class="ident">arg_counter</span>), <span class="ident">span</span>);
-        <span class="kw-2">*</span><span class="ident">arg_counter</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="ident">ident</span>
+    <span class="doccomment">/// Generates a new argument identifier named `__enum_dispatch_arg_` followed by an
+    /// incrementing counter.
+    </span><span class="kw">fn </span>new_arg_ident(span: proc_macro2::Span, arg_counter: <span class="kw-2">&amp;mut </span>usize) -&gt; syn::Ident {
+        <span class="kw">let </span>ident = proc_macro2::Ident::new(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;__enum_dispatch_arg_{}&quot;</span>, arg_counter), span);
+        <span class="kw-2">*</span>arg_counter += <span class="number">1</span>;
+        ident
     }
 
-    <span class="ident">sig</span>.<span class="ident">inputs</span>.<span class="ident">iter_mut</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">arg</span> {
-        <span class="ident">syn::FnArg::Typed</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">pat_type</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">pat_type</span>.<span class="ident">span</span>();
-            <span class="kw-2">*</span><span class="ident">pat_type</span>.<span class="ident">pat</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">pat_type</span>.<span class="ident">pat</span> {
-                <span class="ident">syn::Pat::Ident</span>(<span class="kw-2">ref</span> <span class="ident">pat_ident</span>) =&gt; <span class="ident">syn::Pat::Ident</span>(<span class="ident">syn::PatIdent</span> {
-                    <span class="ident">ident</span>: <span class="ident">new_arg_ident</span>(<span class="ident">pat_ident</span>.<span class="ident">span</span>(), <span class="kw-2">&amp;mut</span> <span class="ident">arg_counter</span>),
-                    ..<span class="ident">pat_ident</span>.<span class="ident">clone</span>()
+    sig.inputs.iter_mut().for_each(|arg| <span class="kw">match </span>arg {
+        syn::FnArg::Typed(<span class="kw-2">ref mut </span>pat_type) =&gt; {
+            <span class="kw">let </span>span = pat_type.span();
+            <span class="kw-2">*</span>pat_type.pat = <span class="kw">match </span><span class="kw-2">&amp;*</span>pat_type.pat {
+                syn::Pat::Ident(<span class="kw-2">ref </span>pat_ident) =&gt; syn::Pat::Ident(syn::PatIdent {
+                    ident: new_arg_ident(pat_ident.span(), <span class="kw-2">&amp;mut </span>arg_counter),
+                    ..pat_ident.clone()
                 }),
-                <span class="comment">// Some of these aren&#39;t valid Rust syntax, but why not support all of them anyways!</span>
-                <span class="ident">syn::Pat::Box</span>(<span class="ident">syn::PatBox</span> { <span class="ident">attrs</span>, .. })
-                <span class="op">|</span> <span class="ident">syn::Pat::Lit</span>(<span class="ident">syn::PatLit</span> { <span class="ident">attrs</span>, .. })
-                <span class="op">|</span> <span class="ident">syn::Pat::Macro</span>(<span class="ident">syn::PatMacro</span> { <span class="ident">attrs</span>, .. })
-                <span class="op">|</span> <span class="ident">syn::Pat::Or</span>(<span class="ident">syn::PatOr</span> { <span class="ident">attrs</span>, .. })
-                <span class="op">|</span> <span class="ident">syn::Pat::Path</span>(<span class="ident">syn::PatPath</span> { <span class="ident">attrs</span>, .. })
-                <span class="op">|</span> <span class="ident">syn::Pat::Range</span>(<span class="ident">syn::PatRange</span> { <span class="ident">attrs</span>, .. })
-                <span class="op">|</span> <span class="ident">syn::Pat::Reference</span>(<span class="ident">syn::PatReference</span> { <span class="ident">attrs</span>, .. })
-                <span class="op">|</span> <span class="ident">syn::Pat::Rest</span>(<span class="ident">syn::PatRest</span> { <span class="ident">attrs</span>, .. })
-                <span class="op">|</span> <span class="ident">syn::Pat::Slice</span>(<span class="ident">syn::PatSlice</span> { <span class="ident">attrs</span>, .. })
-                <span class="op">|</span> <span class="ident">syn::Pat::Struct</span>(<span class="ident">syn::PatStruct</span> { <span class="ident">attrs</span>, .. })
-                <span class="op">|</span> <span class="ident">syn::Pat::Tuple</span>(<span class="ident">syn::PatTuple</span> { <span class="ident">attrs</span>, .. })
-                <span class="op">|</span> <span class="ident">syn::Pat::TupleStruct</span>(<span class="ident">syn::PatTupleStruct</span> { <span class="ident">attrs</span>, .. })
-                <span class="op">|</span> <span class="ident">syn::Pat::Type</span>(<span class="ident">syn::PatType</span> { <span class="ident">attrs</span>, .. })
-                <span class="op">|</span> <span class="ident">syn::Pat::Wild</span>(<span class="ident">syn::PatWild</span> { <span class="ident">attrs</span>, .. }) =&gt; <span class="ident">syn::Pat::Ident</span>(<span class="ident">syn::PatIdent</span> {
-                    <span class="ident">attrs</span>: <span class="ident">attrs</span>.<span class="ident">to_owned</span>(),
-                    <span class="ident">by_ref</span>: <span class="prelude-val">None</span>,
-                    <span class="ident">mutability</span>: <span class="prelude-val">None</span>,
-                    <span class="ident">ident</span>: <span class="ident">new_arg_ident</span>(<span class="ident">span</span>, <span class="kw-2">&amp;mut</span> <span class="ident">arg_counter</span>),
-                    <span class="ident">subpat</span>: <span class="prelude-val">None</span>,
+                <span class="comment">// Some of these aren&#39;t valid Rust syntax, but why not support all of them anyways!
+                </span>syn::Pat::Box(syn::PatBox { attrs, .. })
+                | syn::Pat::Lit(syn::PatLit { attrs, .. })
+                | syn::Pat::Macro(syn::PatMacro { attrs, .. })
+                | syn::Pat::Or(syn::PatOr { attrs, .. })
+                | syn::Pat::Path(syn::PatPath { attrs, .. })
+                | syn::Pat::Range(syn::PatRange { attrs, .. })
+                | syn::Pat::Reference(syn::PatReference { attrs, .. })
+                | syn::Pat::Rest(syn::PatRest { attrs, .. })
+                | syn::Pat::Slice(syn::PatSlice { attrs, .. })
+                | syn::Pat::Struct(syn::PatStruct { attrs, .. })
+                | syn::Pat::Tuple(syn::PatTuple { attrs, .. })
+                | syn::Pat::TupleStruct(syn::PatTupleStruct { attrs, .. })
+                | syn::Pat::Type(syn::PatType { attrs, .. })
+                | syn::Pat::Wild(syn::PatWild { attrs, .. }) =&gt; syn::Pat::Ident(syn::PatIdent {
+                    attrs: attrs.to_owned(),
+                    by_ref: <span class="prelude-val">None</span>,
+                    mutability: <span class="prelude-val">None</span>,
+                    ident: new_arg_ident(span, <span class="kw-2">&amp;mut </span>arg_counter),
+                    subpat: <span class="prelude-val">None</span>,
                 }),
-                <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unsupported argument type&quot;</span>),
+                <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unsupported argument type&quot;</span>),
             }
         }
-        <span class="comment">// `self` arguments will never need to be renamed.</span>
-        <span class="ident">syn::FnArg::Receiver</span>(..) =&gt; (),
+        <span class="comment">// `self` arguments will never need to be renamed.
+        </span>syn::FnArg::Receiver(..) =&gt; (),
     });
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="enum_dispatch" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="enum_dispatch" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

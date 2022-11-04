@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connector-test-kit-rs/query-tests-setup/src/connector_tag/vitess.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>vitess.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_tests_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_tests_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_tests_setup/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connector-test-kit-rs/query-tests-setup/src/connector_tag/vitess.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>vitess.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_tests_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_tests_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_tests_setup/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -125,132 +125,132 @@
 <span id="125">125</span>
 <span id="126">126</span>
 <span id="127">127</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">SqlDatamodelRenderer</span>, <span class="ident">TestResult</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt::Display</span>, <span class="ident">str::FromStr</span>};
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use crate</span>::{SqlDatamodelRenderer, TestResult};
+<span class="kw">use </span>std::{fmt::Display, str::FromStr};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">VitessConnectorTag</span> {
-    <span class="ident">capabilities</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorCapability</span><span class="op">&gt;</span>,
-    <span class="ident">version</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">VitessVersion</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Default, Clone)]
+</span><span class="kw">pub struct </span>VitessConnectorTag {
+    capabilities: Vec&lt;ConnectorCapability&gt;,
+    version: <span class="prelude-ty">Option</span>&lt;VitessVersion&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">ConnectorTagInterface</span> <span class="kw">for</span> <span class="ident">VitessConnectorTag</span> {
-    <span class="kw">fn</span> <span class="ident">datamodel_provider</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="string">&quot;mysql&quot;</span>
+<span class="kw">impl </span>ConnectorTagInterface <span class="kw">for </span>VitessConnectorTag {
+    <span class="kw">fn </span>datamodel_provider(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="string">&quot;mysql&quot;
+    </span>}
+
+    <span class="kw">fn </span>datamodel_renderer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Box&lt;<span class="kw">dyn </span>DatamodelRenderer&gt; {
+        Box::new(SqlDatamodelRenderer::new())
     }
 
-    <span class="kw">fn</span> <span class="ident">datamodel_renderer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">DatamodelRenderer</span><span class="op">&gt;</span> {
-        <span class="ident">Box::new</span>(<span class="ident">SqlDatamodelRenderer::new</span>())
-    }
-
-    <span class="kw">fn</span> <span class="ident">connection_string</span>(
+    <span class="kw">fn </span>connection_string(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">_database</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">_is_ci</span>: <span class="ident">bool</span>,
-        <span class="ident">_is_multi_schema</span>: <span class="ident">bool</span>,
-        <span class="kw">_</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">String</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">version</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">VitessVersion::V5_7</span>) =&gt; <span class="string">&quot;mysql://root@localhost:33577/test&quot;</span>.<span class="ident">into</span>(),
-            <span class="prelude-val">Some</span>(<span class="ident">VitessVersion::V8_0</span>) =&gt; <span class="string">&quot;mysql://root@localhost:33807/test&quot;</span>.<span class="ident">into</span>(),
-            <span class="prelude-val">None</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;A versioned connector must have a concrete version to run.&quot;</span>),
+        _database: <span class="kw-2">&amp;</span>str,
+        _is_ci: bool,
+        _is_multi_schema: bool,
+        <span class="kw">_</span>: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;,
+    ) -&gt; String {
+        <span class="kw">match </span><span class="self">self</span>.version {
+            <span class="prelude-val">Some</span>(VitessVersion::V5_7) =&gt; <span class="string">&quot;mysql://root@localhost:33577/test&quot;</span>.into(),
+            <span class="prelude-val">Some</span>(VitessVersion::V8_0) =&gt; <span class="string">&quot;mysql://root@localhost:33807/test&quot;</span>.into(),
+            <span class="prelude-val">None </span>=&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;A versioned connector must have a concrete version to run.&quot;</span>),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">capabilities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">ConnectorCapability</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">capabilities</span>
+    <span class="kw">fn </span>capabilities(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[ConnectorCapability] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.capabilities
     }
 
-    <span class="kw">fn</span> <span class="ident">as_parse_pair</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">String</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">version</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">ToString::to_string</span>);
-        (<span class="string">&quot;vitess&quot;</span>.<span class="ident">to_owned</span>(), <span class="ident">version</span>)
+    <span class="kw">fn </span>as_parse_pair(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (String, <span class="prelude-ty">Option</span>&lt;String&gt;) {
+        <span class="kw">let </span>version = <span class="self">self</span>.version.as_ref().map(ToString::to_string);
+        (<span class="string">&quot;vitess&quot;</span>.to_owned(), version)
     }
 
-    <span class="kw">fn</span> <span class="ident">is_versioned</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">true</span>
-    }
+    <span class="kw">fn </span>is_versioned(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">true
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">relation_mode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="string">&quot;prisma&quot;</span>
-    }
+    <span class="kw">fn </span>relation_mode(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="string">&quot;prisma&quot;
+    </span>}
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">VitessVersion</span> {
-    <span class="ident">V5_7</span>,
-    <span class="ident">V8_0</span>,
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq)]
+</span><span class="kw">pub enum </span>VitessVersion {
+    V5_7,
+    V8_0,
 }
 
-<span class="kw">impl</span> <span class="ident">VitessConnectorTag</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">version</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">version</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">v</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+<span class="kw">impl </span>VitessConnectorTag {
+    <span class="kw">pub fn </span>new(version: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; TestResult&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>version = <span class="kw">match </span>version {
+            <span class="prelude-val">Some</span>(v) =&gt; <span class="prelude-val">Some</span>(v.parse()<span class="question-mark">?</span>),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
         };
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">version</span>,
-            <span class="ident">capabilities</span>: <span class="ident">vitess_capabilities</span>(),
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            version,
+            capabilities: vitess_capabilities(),
         })
     }
 
-    <span class="doccomment">/// Returns all versions of this connector.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">all</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">capabilities</span> <span class="op">=</span> <span class="ident">vitess_capabilities</span>();
+    <span class="doccomment">/// Returns all versions of this connector.
+    </span><span class="kw">pub fn </span>all() -&gt; Vec&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>capabilities = vitess_capabilities();
 
         <span class="macro">vec!</span>[
-            <span class="self">Self</span> {
-                <span class="ident">version</span>: <span class="prelude-val">Some</span>(<span class="ident">VitessVersion::V5_7</span>),
-                <span class="ident">capabilities</span>: <span class="ident">capabilities</span>.<span class="ident">clone</span>(),
+            <span class="self">Self </span>{
+                version: <span class="prelude-val">Some</span>(VitessVersion::V5_7),
+                capabilities: capabilities.clone(),
             },
-            <span class="self">Self</span> {
-                <span class="ident">version</span>: <span class="prelude-val">Some</span>(<span class="ident">VitessVersion::V8_0</span>),
-                <span class="ident">capabilities</span>,
+            <span class="self">Self </span>{
+                version: <span class="prelude-val">Some</span>(VitessVersion::V8_0),
+                capabilities,
             },
         ]
     }
 
-    <span class="doccomment">/// Get a reference to the vitess connector tag&#39;s version.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">VitessVersion</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">version</span>
+    <span class="doccomment">/// Get a reference to the vitess connector tag&#39;s version.
+    </span><span class="kw">pub fn </span>version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;VitessVersion&gt; {
+        <span class="self">self</span>.version
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">VitessConnectorTag</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">version</span>, <span class="ident">other</span>.<span class="ident">version</span>) {
-            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="op">|</span> (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) <span class="op">|</span> (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; <span class="bool-val">true</span>,
-            (<span class="prelude-val">Some</span>(<span class="ident">v1</span>), <span class="prelude-val">Some</span>(<span class="ident">v2</span>)) =&gt; <span class="ident">v1</span> <span class="op">==</span> <span class="ident">v2</span>,
+<span class="kw">impl </span>PartialEq <span class="kw">for </span>VitessConnectorTag {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="kw">match </span>(<span class="self">self</span>.version, other.version) {
+            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) | (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) | (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; <span class="bool-val">true</span>,
+            (<span class="prelude-val">Some</span>(v1), <span class="prelude-val">Some</span>(v2)) =&gt; v1 == v2,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">VitessVersion</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">TestError</span>;
+<span class="kw">impl </span>FromStr <span class="kw">for </span>VitessVersion {
+    <span class="kw">type </span><span class="prelude-val">Err </span>= TestError;
 
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">s</span> {
-            <span class="string">&quot;5.7&quot;</span> =&gt; <span class="ident"><span class="self">Self</span>::V5_7</span>,
-            <span class="string">&quot;8.0&quot;</span> =&gt; <span class="ident"><span class="self">Self</span>::V8_0</span>,
-            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">TestError::parse_error</span>(<span class="macro">format!</span>(<span class="string">&quot;Unknown Vitess version `{}`&quot;</span>, <span class="ident">s</span>))),
+    <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
+        <span class="kw">let </span>version = <span class="kw">match </span>s {
+            <span class="string">&quot;5.7&quot; </span>=&gt; <span class="self">Self</span>::V5_7,
+            <span class="string">&quot;8.0&quot; </span>=&gt; <span class="self">Self</span>::V8_0,
+            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(TestError::parse_error(<span class="macro">format!</span>(<span class="string">&quot;Unknown Vitess version `{}`&quot;</span>, s))),
         };
 
-        <span class="prelude-val">Ok</span>(<span class="ident">version</span>)
+        <span class="prelude-val">Ok</span>(version)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">VitessVersion</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::V5_7</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;5.7&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::V8_0</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;8.0&quot;</span>),
+<span class="kw">impl </span>Display <span class="kw">for </span>VitessVersion {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::V5_7 =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;5.7&quot;</span>),
+            <span class="self">Self</span>::V8_0 =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;8.0&quot;</span>),
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">vitess_capabilities</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ConnectorCapability</span><span class="op">&gt;</span> {
-    <span class="ident">psl::builtin_connectors::MYSQL</span>.<span class="ident">capabilities</span>().<span class="ident">to_owned</span>()
+<span class="kw">fn </span>vitess_capabilities() -&gt; Vec&lt;ConnectorCapability&gt; {
+    psl::builtin_connectors::MYSQL.capabilities().to_owned()
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_tests_setup" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_tests_setup" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

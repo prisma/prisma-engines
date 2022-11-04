@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/regex-automata-0.1.10/src/nfa/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../regex_automata/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../regex_automata/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../regex_automata/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/regex-automata-0.1.10/src/nfa/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../regex_automata/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../regex_automata/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../regex_automata/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -250,257 +250,257 @@
 <span id="250">250</span>
 <span id="251">251</span>
 <span id="252">252</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::fmt;
 
-<span class="kw">use</span> <span class="ident">classes::ByteClasses</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">nfa::compiler::Builder</span>;
+<span class="kw">use </span>classes::ByteClasses;
+<span class="kw">pub use </span>nfa::compiler::Builder;
 
-<span class="kw">mod</span> <span class="ident">compiler</span>;
-<span class="kw">mod</span> <span class="ident">map</span>;
-<span class="kw">mod</span> <span class="ident">range_trie</span>;
+<span class="kw">mod </span>compiler;
+<span class="kw">mod </span>map;
+<span class="kw">mod </span>range_trie;
 
-<span class="doccomment">/// The representation for an NFA state identifier.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">StateID</span> <span class="op">=</span> <span class="ident">usize</span>;
+<span class="doccomment">/// The representation for an NFA state identifier.
+</span><span class="kw">pub type </span>StateID = usize;
 
-<span class="doccomment">/// A final compiled NFA.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The states of the NFA are indexed by state IDs, which are how transitions</span>
-<span class="doccomment">/// are expressed.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NFA</span> {
-    <span class="doccomment">/// Whether this NFA can only match at the beginning of input or not.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When true, a match should only be reported if it begins at the 0th</span>
-    <span class="doccomment">/// index of the haystack.</span>
-    <span class="ident">anchored</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// The starting state of this NFA.</span>
-    <span class="ident">start</span>: <span class="ident">StateID</span>,
-    <span class="doccomment">/// The state list. This list is guaranteed to be indexable by the starting</span>
-    <span class="doccomment">/// state ID, and it is also guaranteed to contain exactly one `Match`</span>
-    <span class="doccomment">/// state.</span>
-    <span class="ident">states</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">State</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// A mapping from any byte value to its corresponding equivalence class</span>
-    <span class="doccomment">/// identifier. Two bytes in the same equivalence class cannot discriminate</span>
-    <span class="doccomment">/// between a match or a non-match. This map can be used to shrink the</span>
-    <span class="doccomment">/// total size of a DFA&#39;s transition table with a small match-time cost.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that the NFA&#39;s transitions are *not* defined in terms of these</span>
-    <span class="doccomment">/// equivalence classes. The NFA&#39;s transitions are defined on the original</span>
-    <span class="doccomment">/// byte values. For the most part, this is because they wouldn&#39;t really</span>
-    <span class="doccomment">/// help the NFA much since the NFA already uses a sparse representation</span>
-    <span class="doccomment">/// to represent transitions. Byte classes are most effective in a dense</span>
-    <span class="doccomment">/// representation.</span>
-    <span class="ident">byte_classes</span>: <span class="ident">ByteClasses</span>,
+<span class="doccomment">/// A final compiled NFA.
+///
+/// The states of the NFA are indexed by state IDs, which are how transitions
+/// are expressed.
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>NFA {
+    <span class="doccomment">/// Whether this NFA can only match at the beginning of input or not.
+    ///
+    /// When true, a match should only be reported if it begins at the 0th
+    /// index of the haystack.
+    </span>anchored: bool,
+    <span class="doccomment">/// The starting state of this NFA.
+    </span>start: StateID,
+    <span class="doccomment">/// The state list. This list is guaranteed to be indexable by the starting
+    /// state ID, and it is also guaranteed to contain exactly one `Match`
+    /// state.
+    </span>states: Vec&lt;State&gt;,
+    <span class="doccomment">/// A mapping from any byte value to its corresponding equivalence class
+    /// identifier. Two bytes in the same equivalence class cannot discriminate
+    /// between a match or a non-match. This map can be used to shrink the
+    /// total size of a DFA&#39;s transition table with a small match-time cost.
+    ///
+    /// Note that the NFA&#39;s transitions are *not* defined in terms of these
+    /// equivalence classes. The NFA&#39;s transitions are defined on the original
+    /// byte values. For the most part, this is because they wouldn&#39;t really
+    /// help the NFA much since the NFA already uses a sparse representation
+    /// to represent transitions. Byte classes are most effective in a dense
+    /// representation.
+    </span>byte_classes: ByteClasses,
 }
 
-<span class="kw">impl</span> <span class="ident">NFA</span> {
-    <span class="doccomment">/// Returns an NFA that always matches at every position.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">always_match</span>() -&gt; <span class="ident">NFA</span> {
-        <span class="ident">NFA</span> {
-            <span class="ident">anchored</span>: <span class="bool-val">false</span>,
-            <span class="ident">start</span>: <span class="number">0</span>,
-            <span class="ident">states</span>: <span class="macro">vec!</span>[<span class="ident">State::Match</span>],
-            <span class="ident">byte_classes</span>: <span class="ident">ByteClasses::empty</span>(),
+<span class="kw">impl </span>NFA {
+    <span class="doccomment">/// Returns an NFA that always matches at every position.
+    </span><span class="kw">pub fn </span>always_match() -&gt; NFA {
+        NFA {
+            anchored: <span class="bool-val">false</span>,
+            start: <span class="number">0</span>,
+            states: <span class="macro">vec!</span>[State::Match],
+            byte_classes: ByteClasses::empty(),
         }
     }
 
-    <span class="doccomment">/// Returns an NFA that never matches at any position.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">never_match</span>() -&gt; <span class="ident">NFA</span> {
-        <span class="ident">NFA</span> {
-            <span class="ident">anchored</span>: <span class="bool-val">false</span>,
-            <span class="ident">start</span>: <span class="number">0</span>,
-            <span class="ident">states</span>: <span class="macro">vec!</span>[<span class="ident">State::Fail</span>],
-            <span class="ident">byte_classes</span>: <span class="ident">ByteClasses::empty</span>(),
+    <span class="doccomment">/// Returns an NFA that never matches at any position.
+    </span><span class="kw">pub fn </span>never_match() -&gt; NFA {
+        NFA {
+            anchored: <span class="bool-val">false</span>,
+            start: <span class="number">0</span>,
+            states: <span class="macro">vec!</span>[State::Fail],
+            byte_classes: ByteClasses::empty(),
         }
     }
 
-    <span class="doccomment">/// Returns true if and only if this NFA is anchored.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_anchored</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">anchored</span>
+    <span class="doccomment">/// Returns true if and only if this NFA is anchored.
+    </span><span class="kw">pub fn </span>is_anchored(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.anchored
     }
 
-    <span class="doccomment">/// Return the number of states in this NFA.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">states</span>.<span class="ident">len</span>()
+    <span class="doccomment">/// Return the number of states in this NFA.
+    </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.states.len()
     }
 
-    <span class="doccomment">/// Return the ID of the initial state of this NFA.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">StateID</span> {
-        <span class="self">self</span>.<span class="ident">start</span>
+    <span class="doccomment">/// Return the ID of the initial state of this NFA.
+    </span><span class="kw">pub fn </span>start(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; StateID {
+        <span class="self">self</span>.start
     }
 
-    <span class="doccomment">/// Return the NFA state corresponding to the given ID.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">state</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">StateID</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">State</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">states</span>[<span class="ident">id</span>]
+    <span class="doccomment">/// Return the NFA state corresponding to the given ID.
+    </span><span class="kw">pub fn </span>state(<span class="kw-2">&amp;</span><span class="self">self</span>, id: StateID) -&gt; <span class="kw-2">&amp;</span>State {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.states[id]
     }
 
-    <span class="doccomment">/// Return the set of equivalence classes for this NFA. The slice returned</span>
-    <span class="doccomment">/// always has length 256 and maps each possible byte value to its</span>
-    <span class="doccomment">/// corresponding equivalence class ID (which is never more than 255).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">byte_classes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">ByteClasses</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">byte_classes</span>
+    <span class="doccomment">/// Return the set of equivalence classes for this NFA. The slice returned
+    /// always has length 256 and maps each possible byte value to its
+    /// corresponding equivalence class ID (which is never more than 255).
+    </span><span class="kw">pub fn </span>byte_classes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ByteClasses {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.byte_classes
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">NFA</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">state</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">states</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">i</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">start</span> { <span class="string">&#39;&gt;&#39;</span> } <span class="kw">else</span> { <span class="string">&#39; &#39;</span> };
-            <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;{}{:06}: {:?}&quot;</span>, <span class="ident">status</span>, <span class="ident">i</span>, <span class="ident">state</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>NFA {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">for </span>(i, state) <span class="kw">in </span><span class="self">self</span>.states.iter().enumerate() {
+            <span class="kw">let </span>status = <span class="kw">if </span>i == <span class="self">self</span>.start { <span class="string">&#39;&gt;&#39; </span>} <span class="kw">else </span>{ <span class="string">&#39; &#39; </span>};
+            <span class="macro">writeln!</span>(f, <span class="string">&quot;{}{:06}: {:?}&quot;</span>, status, i, state)<span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="doccomment">/// A state in a final compiled NFA.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">State</span> {
-    <span class="doccomment">/// A state that transitions to `next` if and only if the current input</span>
-    <span class="doccomment">/// byte is in the range `[start, end]` (inclusive).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is a special case of Sparse in that it encodes only one transition</span>
-    <span class="doccomment">/// (and therefore avoids the allocation).</span>
-    <span class="ident">Range</span> { <span class="ident">range</span>: <span class="ident">Transition</span> },
-    <span class="doccomment">/// A state with possibly many transitions, represented in a sparse</span>
-    <span class="doccomment">/// fashion. Transitions are ordered lexicographically by input range.</span>
-    <span class="doccomment">/// As such, this may only be used when every transition has equal</span>
-    <span class="doccomment">/// priority. (In practice, this is only used for encoding large UTF-8</span>
-    <span class="doccomment">/// automata.)</span>
-    <span class="ident">Sparse</span> { <span class="ident">ranges</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">Transition</span>]<span class="op">&gt;</span> },
-    <span class="doccomment">/// An alternation such that there exists an epsilon transition to all</span>
-    <span class="doccomment">/// states in `alternates`, where matches found via earlier transitions</span>
-    <span class="doccomment">/// are preferred over later transitions.</span>
-    <span class="ident">Union</span> { <span class="ident">alternates</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">StateID</span>]<span class="op">&gt;</span> },
-    <span class="doccomment">/// A fail state. When encountered, the automaton is guaranteed to never</span>
-    <span class="doccomment">/// reach a match state.</span>
-    <span class="ident">Fail</span>,
-    <span class="doccomment">/// A match state. There is exactly one such occurrence of this state in</span>
-    <span class="doccomment">/// an NFA.</span>
-    <span class="ident">Match</span>,
+<span class="doccomment">/// A state in a final compiled NFA.
+</span><span class="attribute">#[derive(Clone, Eq, PartialEq)]
+</span><span class="kw">pub enum </span>State {
+    <span class="doccomment">/// A state that transitions to `next` if and only if the current input
+    /// byte is in the range `[start, end]` (inclusive).
+    ///
+    /// This is a special case of Sparse in that it encodes only one transition
+    /// (and therefore avoids the allocation).
+    </span>Range { range: Transition },
+    <span class="doccomment">/// A state with possibly many transitions, represented in a sparse
+    /// fashion. Transitions are ordered lexicographically by input range.
+    /// As such, this may only be used when every transition has equal
+    /// priority. (In practice, this is only used for encoding large UTF-8
+    /// automata.)
+    </span>Sparse { ranges: Box&lt;[Transition]&gt; },
+    <span class="doccomment">/// An alternation such that there exists an epsilon transition to all
+    /// states in `alternates`, where matches found via earlier transitions
+    /// are preferred over later transitions.
+    </span>Union { alternates: Box&lt;[StateID]&gt; },
+    <span class="doccomment">/// A fail state. When encountered, the automaton is guaranteed to never
+    /// reach a match state.
+    </span>Fail,
+    <span class="doccomment">/// A match state. There is exactly one such occurrence of this state in
+    /// an NFA.
+    </span>Match,
 }
 
-<span class="doccomment">/// A transition to another state, only if the given byte falls in the</span>
-<span class="doccomment">/// inclusive range specified.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Transition</span> {
-    <span class="kw">pub</span> <span class="ident">start</span>: <span class="ident">u8</span>,
-    <span class="kw">pub</span> <span class="ident">end</span>: <span class="ident">u8</span>,
-    <span class="kw">pub</span> <span class="ident">next</span>: <span class="ident">StateID</span>,
+<span class="doccomment">/// A transition to another state, only if the given byte falls in the
+/// inclusive range specified.
+</span><span class="attribute">#[derive(Clone, Copy, Eq, Hash, PartialEq)]
+</span><span class="kw">pub struct </span>Transition {
+    <span class="kw">pub </span>start: u8,
+    <span class="kw">pub </span>end: u8,
+    <span class="kw">pub </span>next: StateID,
 }
 
-<span class="kw">impl</span> <span class="ident">State</span> {
-    <span class="doccomment">/// Returns true if and only if this state contains one or more epsilon</span>
-    <span class="doccomment">/// transitions.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_epsilon</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">State::Range</span> { .. }
-            <span class="op">|</span> <span class="ident">State::Sparse</span> { .. }
-            <span class="op">|</span> <span class="ident">State::Fail</span>
-            <span class="op">|</span> <span class="ident">State::Match</span> =&gt; <span class="bool-val">false</span>,
-            <span class="ident">State::Union</span> { .. } =&gt; <span class="bool-val">true</span>,
+<span class="kw">impl </span>State {
+    <span class="doccomment">/// Returns true if and only if this state contains one or more epsilon
+    /// transitions.
+    </span><span class="kw">pub fn </span>is_epsilon(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            State::Range { .. }
+            | State::Sparse { .. }
+            | State::Fail
+            | State::Match =&gt; <span class="bool-val">false</span>,
+            State::Union { .. } =&gt; <span class="bool-val">true</span>,
         }
     }
 
-    <span class="doccomment">/// Remap the transitions in this state using the given map. Namely, the</span>
-    <span class="doccomment">/// given map should be indexed according to the transitions currently</span>
-    <span class="doccomment">/// in this state.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is used during the final phase of the NFA compiler, which turns</span>
-    <span class="doccomment">/// its intermediate NFA into the final NFA.</span>
-    <span class="kw">fn</span> <span class="ident">remap</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">remap</span>: <span class="kw-2">&amp;</span>[<span class="ident">StateID</span>]) {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">State::Range</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">range</span> } =&gt; <span class="ident">range</span>.<span class="ident">next</span> <span class="op">=</span> <span class="ident">remap</span>[<span class="ident">range</span>.<span class="ident">next</span>],
-            <span class="ident">State::Sparse</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">ranges</span> } =&gt; {
-                <span class="kw">for</span> <span class="ident">r</span> <span class="kw">in</span> <span class="ident">ranges</span>.<span class="ident">iter_mut</span>() {
-                    <span class="ident">r</span>.<span class="ident">next</span> <span class="op">=</span> <span class="ident">remap</span>[<span class="ident">r</span>.<span class="ident">next</span>];
+    <span class="doccomment">/// Remap the transitions in this state using the given map. Namely, the
+    /// given map should be indexed according to the transitions currently
+    /// in this state.
+    ///
+    /// This is used during the final phase of the NFA compiler, which turns
+    /// its intermediate NFA into the final NFA.
+    </span><span class="kw">fn </span>remap(<span class="kw-2">&amp;mut </span><span class="self">self</span>, remap: <span class="kw-2">&amp;</span>[StateID]) {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            State::Range { <span class="kw-2">ref mut </span>range } =&gt; range.next = remap[range.next],
+            State::Sparse { <span class="kw-2">ref mut </span>ranges } =&gt; {
+                <span class="kw">for </span>r <span class="kw">in </span>ranges.iter_mut() {
+                    r.next = remap[r.next];
                 }
             }
-            <span class="ident">State::Union</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">alternates</span> } =&gt; {
-                <span class="kw">for</span> <span class="ident">alt</span> <span class="kw">in</span> <span class="ident">alternates</span>.<span class="ident">iter_mut</span>() {
-                    <span class="kw-2">*</span><span class="ident">alt</span> <span class="op">=</span> <span class="ident">remap</span>[<span class="kw-2">*</span><span class="ident">alt</span>];
+            State::Union { <span class="kw-2">ref mut </span>alternates } =&gt; {
+                <span class="kw">for </span>alt <span class="kw">in </span>alternates.iter_mut() {
+                    <span class="kw-2">*</span>alt = remap[<span class="kw-2">*</span>alt];
                 }
             }
-            <span class="ident">State::Fail</span> =&gt; {}
-            <span class="ident">State::Match</span> =&gt; {}
+            State::Fail =&gt; {}
+            State::Match =&gt; {}
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">State</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">State::Range</span> { <span class="kw-2">ref</span> <span class="ident">range</span> } =&gt; <span class="ident">range</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
-            <span class="ident">State::Sparse</span> { <span class="kw-2">ref</span> <span class="ident">ranges</span> } =&gt; {
-                <span class="kw">let</span> <span class="ident">rs</span> <span class="op">=</span> <span class="ident">ranges</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">t</span>))
-                    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-                    .<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>);
-                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;sparse({})&quot;</span>, <span class="ident">rs</span>)
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>State {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            State::Range { <span class="kw-2">ref </span>range } =&gt; range.fmt(f),
+            State::Sparse { <span class="kw-2">ref </span>ranges } =&gt; {
+                <span class="kw">let </span>rs = ranges
+                    .iter()
+                    .map(|t| <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, t))
+                    .collect::&lt;Vec&lt;String&gt;&gt;()
+                    .join(<span class="string">&quot;, &quot;</span>);
+                <span class="macro">write!</span>(f, <span class="string">&quot;sparse({})&quot;</span>, rs)
             }
-            <span class="ident">State::Union</span> { <span class="kw-2">ref</span> <span class="ident">alternates</span> } =&gt; {
-                <span class="kw">let</span> <span class="ident">alts</span> <span class="op">=</span> <span class="ident">alternates</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">id</span>))
-                    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-                    .<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>);
-                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;alt({})&quot;</span>, <span class="ident">alts</span>)
+            State::Union { <span class="kw-2">ref </span>alternates } =&gt; {
+                <span class="kw">let </span>alts = alternates
+                    .iter()
+                    .map(|id| <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, id))
+                    .collect::&lt;Vec&lt;String&gt;&gt;()
+                    .join(<span class="string">&quot;, &quot;</span>);
+                <span class="macro">write!</span>(f, <span class="string">&quot;alt({})&quot;</span>, alts)
             }
-            <span class="ident">State::Fail</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;FAIL&quot;</span>),
-            <span class="ident">State::Match</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;MATCH&quot;</span>),
+            State::Fail =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;FAIL&quot;</span>),
+            State::Match =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;MATCH&quot;</span>),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Transition</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="ident">Transition</span> { <span class="ident">start</span>, <span class="ident">end</span>, <span class="ident">next</span> } <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>;
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">start</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">end</span> {
-            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{} =&gt; {}&quot;</span>, <span class="ident">escape</span>(<span class="ident">start</span>), <span class="ident">next</span>)
-        } <span class="kw">else</span> {
-            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}-{} =&gt; {}&quot;</span>, <span class="ident">escape</span>(<span class="ident">start</span>), <span class="ident">escape</span>(<span class="ident">end</span>), <span class="ident">next</span>)
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Transition {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">let </span>Transition { start, end, next } = <span class="kw-2">*</span><span class="self">self</span>;
+        <span class="kw">if </span><span class="self">self</span>.start == <span class="self">self</span>.end {
+            <span class="macro">write!</span>(f, <span class="string">&quot;{} =&gt; {}&quot;</span>, escape(start), next)
+        } <span class="kw">else </span>{
+            <span class="macro">write!</span>(f, <span class="string">&quot;{}-{} =&gt; {}&quot;</span>, escape(start), escape(end), next)
         }
     }
 }
 
-<span class="doccomment">/// Return the given byte as its escaped string form.</span>
-<span class="kw">fn</span> <span class="ident">escape</span>(<span class="ident">b</span>: <span class="ident">u8</span>) -&gt; <span class="ident">String</span> {
-    <span class="kw">use</span> <span class="ident">std::ascii</span>;
+<span class="doccomment">/// Return the given byte as its escaped string form.
+</span><span class="kw">fn </span>escape(b: u8) -&gt; String {
+    <span class="kw">use </span>std::ascii;
 
-    <span class="ident">String::from_utf8</span>(<span class="ident">ascii::escape_default</span>(<span class="ident">b</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()).<span class="ident">unwrap</span>()
+    String::from_utf8(ascii::escape_default(b).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()).unwrap()
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">dense</span>;
-    <span class="kw">use</span> <span class="ident">dfa::DFA</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>dense;
+    <span class="kw">use </span>dfa::DFA;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">always_match</span>() {
-        <span class="kw">let</span> <span class="ident">nfa</span> <span class="op">=</span> <span class="ident">NFA::always_match</span>();
-        <span class="kw">let</span> <span class="ident">dfa</span> <span class="op">=</span> <span class="ident">dense::Builder::new</span>().<span class="ident">build_from_nfa</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">nfa</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>always_match() {
+        <span class="kw">let </span>nfa = NFA::always_match();
+        <span class="kw">let </span>dfa = dense::Builder::new().build_from_nfa::&lt;usize&gt;(<span class="kw-2">&amp;</span>nfa).unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="ident">dfa</span>.<span class="ident">find_at</span>(<span class="string">b&quot;&quot;</span>, <span class="number">0</span>));
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="ident">dfa</span>.<span class="ident">find_at</span>(<span class="string">b&quot;a&quot;</span>, <span class="number">0</span>));
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="number">1</span>), <span class="ident">dfa</span>.<span class="ident">find_at</span>(<span class="string">b&quot;a&quot;</span>, <span class="number">1</span>));
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="ident">dfa</span>.<span class="ident">find_at</span>(<span class="string">b&quot;ab&quot;</span>, <span class="number">0</span>));
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="number">1</span>), <span class="ident">dfa</span>.<span class="ident">find_at</span>(<span class="string">b&quot;ab&quot;</span>, <span class="number">1</span>));
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="number">2</span>), <span class="ident">dfa</span>.<span class="ident">find_at</span>(<span class="string">b&quot;ab&quot;</span>, <span class="number">2</span>));
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="number">0</span>), dfa.find_at(<span class="string">b&quot;&quot;</span>, <span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="number">0</span>), dfa.find_at(<span class="string">b&quot;a&quot;</span>, <span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="number">1</span>), dfa.find_at(<span class="string">b&quot;a&quot;</span>, <span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="number">0</span>), dfa.find_at(<span class="string">b&quot;ab&quot;</span>, <span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="number">1</span>), dfa.find_at(<span class="string">b&quot;ab&quot;</span>, <span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="number">2</span>), dfa.find_at(<span class="string">b&quot;ab&quot;</span>, <span class="number">2</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">never_match</span>() {
-        <span class="kw">let</span> <span class="ident">nfa</span> <span class="op">=</span> <span class="ident">NFA::never_match</span>();
-        <span class="kw">let</span> <span class="ident">dfa</span> <span class="op">=</span> <span class="ident">dense::Builder::new</span>().<span class="ident">build_from_nfa</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">nfa</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>never_match() {
+        <span class="kw">let </span>nfa = NFA::never_match();
+        <span class="kw">let </span>dfa = dense::Builder::new().build_from_nfa::&lt;usize&gt;(<span class="kw-2">&amp;</span>nfa).unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, <span class="ident">dfa</span>.<span class="ident">find_at</span>(<span class="string">b&quot;&quot;</span>, <span class="number">0</span>));
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, <span class="ident">dfa</span>.<span class="ident">find_at</span>(<span class="string">b&quot;a&quot;</span>, <span class="number">0</span>));
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, <span class="ident">dfa</span>.<span class="ident">find_at</span>(<span class="string">b&quot;a&quot;</span>, <span class="number">1</span>));
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, <span class="ident">dfa</span>.<span class="ident">find_at</span>(<span class="string">b&quot;ab&quot;</span>, <span class="number">0</span>));
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, <span class="ident">dfa</span>.<span class="ident">find_at</span>(<span class="string">b&quot;ab&quot;</span>, <span class="number">1</span>));
-        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, <span class="ident">dfa</span>.<span class="ident">find_at</span>(<span class="string">b&quot;ab&quot;</span>, <span class="number">2</span>));
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, dfa.find_at(<span class="string">b&quot;&quot;</span>, <span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, dfa.find_at(<span class="string">b&quot;a&quot;</span>, <span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, dfa.find_at(<span class="string">b&quot;a&quot;</span>, <span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, dfa.find_at(<span class="string">b&quot;ab&quot;</span>, <span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, dfa.find_at(<span class="string">b&quot;ab&quot;</span>, <span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, dfa.find_at(<span class="string">b&quot;ab&quot;</span>, <span class="number">2</span>));
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="regex_automata" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="regex_automata" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

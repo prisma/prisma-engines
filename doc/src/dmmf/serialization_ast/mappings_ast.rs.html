@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/dmmf/src/serialization_ast/mappings_ast.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mappings_ast.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../dmmf/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../dmmf/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../dmmf/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/dmmf/src/serialization_ast/mappings_ast.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mappings_ast.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../dmmf/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../dmmf/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../dmmf/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -74,81 +74,81 @@
 <span id="74">74</span>
 <span id="75">75</span>
 <span id="76">76</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">ser::SerializeMap</span>, <span class="ident">Serialize</span>, <span class="ident">Serializer</span>};
-<span class="kw">use</span> <span class="ident">std::cmp::Ordering</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">cell::RefCell</span>, <span class="ident">collections::HashMap</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>serde::{ser::SerializeMap, Serialize, Serializer};
+<span class="kw">use </span>std::cmp::Ordering;
+<span class="kw">use </span>std::{cell::RefCell, collections::HashMap};
 
-<span class="doccomment">/// Model operations are serialized as an array of objects, each one</span>
-<span class="doccomment">/// corresponding to a model. All other operations are simply an object</span>
-<span class="doccomment">/// of read and write operation names that can be called on the engine.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">Default</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DmmfOperationMappings</span> {
-    <span class="kw">pub</span> <span class="ident">model_operations</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DmmfModelOperations</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">other_operations</span>: <span class="ident">DmmfNonModelOperations</span>,
+<span class="doccomment">/// Model operations are serialized as an array of objects, each one
+/// corresponding to a model. All other operations are simply an object
+/// of read and write operation names that can be called on the engine.
+</span><span class="attribute">#[derive(Debug, Serialize, Default)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>DmmfOperationMappings {
+    <span class="kw">pub </span>model_operations: Vec&lt;DmmfModelOperations&gt;,
+    <span class="kw">pub </span>other_operations: DmmfNonModelOperations,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">Default</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DmmfNonModelOperations</span> {
-    <span class="kw">pub</span> <span class="ident">read</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">write</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Serialize, Default)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>DmmfNonModelOperations {
+    <span class="kw">pub </span>read: Vec&lt;String&gt;,
+    <span class="kw">pub </span>write: Vec&lt;String&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DmmfModelOperations</span> {
-    <span class="kw">pub</span> <span class="ident">model_name</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">operations</span>: <span class="ident">RefCell</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Default)]
+</span><span class="kw">pub struct </span>DmmfModelOperations {
+    <span class="kw">pub </span>model_name: String,
+    <span class="kw">pub </span>operations: RefCell&lt;HashMap&lt;String, String&gt;&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">DmmfModelOperations</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">model_name</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">model_name</span>,
-            <span class="ident">operations</span>: <span class="ident">RefCell::new</span>(<span class="ident">HashMap::new</span>()),
+<span class="kw">impl </span>DmmfModelOperations {
+    <span class="kw">pub fn </span>new(model_name: String) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            model_name,
+            operations: RefCell::new(HashMap::new()),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_operation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="ident">String</span>, <span class="ident">value</span>: <span class="ident">String</span>) {
-        <span class="self">self</span>.<span class="ident">operations</span>.<span class="ident">borrow_mut</span>().<span class="ident">insert</span>(<span class="ident">key</span>, <span class="ident">value</span>);
+    <span class="kw">pub fn </span>add_operation(<span class="kw-2">&amp;</span><span class="self">self</span>, key: String, value: String) {
+        <span class="self">self</span>.operations.borrow_mut().insert(key, value);
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finalize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="comment">// Cloning required to make the custom serializer work.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">operations</span>.<span class="ident">borrow</span>().<span class="ident">clone</span>();
+    <span class="kw">pub fn </span>finalize(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HashMap&lt;String, String&gt; {
+        <span class="comment">// Cloning required to make the custom serializer work.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>map = <span class="self">self</span>.operations.borrow().clone();
 
-        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;model&quot;</span>.<span class="ident">into</span>(), <span class="self">self</span>.<span class="ident">model_name</span>.<span class="ident">clone</span>());
-        <span class="ident">map</span>
+        map.insert(<span class="string">&quot;model&quot;</span>.into(), <span class="self">self</span>.model_name.clone());
+        map
     }
 }
 
-<span class="doccomment">/// Serializes a DmmfMapping into a single map.</span>
-<span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">DmmfModelOperations</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+<span class="doccomment">/// Serializes a DmmfMapping into a single map.
+</span><span class="kw">impl </span>Serialize <span class="kw">for </span>DmmfModelOperations {
+    <span class="kw">fn </span>serialize&lt;S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="kw">let</span> <span class="ident">finalized</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">finalize</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">finalized</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">String</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">finalized</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>();
+        <span class="kw">let </span>finalized = <span class="self">self</span>.finalize();
+        <span class="kw">let </span><span class="kw-2">mut </span>finalized: Vec&lt;(String, String)&gt; = finalized.into_iter().collect();
 
-        <span class="comment">// Sugar only: model is the first field in the JSON.</span>
-        <span class="ident">finalized</span>.<span class="ident">sort_unstable_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="ident">a</span>.<span class="number">0</span> <span class="op">==</span> <span class="string">&quot;model&quot;</span> {
-                <span class="ident">Ordering::Less</span>
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">b</span>.<span class="number">0</span> <span class="op">==</span> <span class="string">&quot;model&quot;</span> {
-                <span class="ident">Ordering::Greater</span>
-            } <span class="kw">else</span> {
-                <span class="ident">a</span>.<span class="number">0</span>.<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="number">0</span>).<span class="ident">unwrap</span>()
+        <span class="comment">// Sugar only: model is the first field in the JSON.
+        </span>finalized.sort_unstable_by(|a, b| {
+            <span class="kw">if </span>a.<span class="number">0 </span>== <span class="string">&quot;model&quot; </span>{
+                Ordering::Less
+            } <span class="kw">else if </span>b.<span class="number">0 </span>== <span class="string">&quot;model&quot; </span>{
+                Ordering::Greater
+            } <span class="kw">else </span>{
+                a.<span class="number">0</span>.partial_cmp(<span class="kw-2">&amp;</span>b.<span class="number">0</span>).unwrap()
             }
         });
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">serializer</span>.<span class="ident">serialize_map</span>(<span class="prelude-val">Some</span>(<span class="ident">finalized</span>.<span class="ident">len</span>()))<span class="question-mark">?</span>;
-        <span class="kw">for</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="kw">in</span> <span class="ident">finalized</span> {
-            <span class="ident">map</span>.<span class="ident">serialize_entry</span>(<span class="kw-2">&amp;</span><span class="ident">k</span>, <span class="kw-2">&amp;</span><span class="ident">v</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>map = serializer.serialize_map(<span class="prelude-val">Some</span>(finalized.len()))<span class="question-mark">?</span>;
+        <span class="kw">for </span>(k, v) <span class="kw">in </span>finalized {
+            map.serialize_entry(<span class="kw-2">&amp;</span>k, <span class="kw-2">&amp;</span>v)<span class="question-mark">?</span>;
         }
 
-        <span class="ident">map</span>.<span class="ident">end</span>()
+        map.end()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="dmmf" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="dmmf" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

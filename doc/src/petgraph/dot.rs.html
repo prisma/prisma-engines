@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/petgraph-0.4.13/src/dot.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>dot.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../petgraph/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/petgraph-0.4.13/src/dot.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>dot.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../petgraph/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../petgraph/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -205,212 +205,212 @@
 <span id="205">205</span>
 <span id="206">206</span>
 <span id="207">207</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Simple graphviz dot file format output.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Simple graphviz dot file format output.
 
-<span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="self">self</span>, <span class="ident">Display</span>, <span class="ident">Write</span>};
+</span><span class="kw">use </span>std::fmt::{<span class="self">self</span>, Display, Write};
 
-<span class="kw">use</span> <span class="ident">visit</span>::{<span class="ident">GraphRef</span>};
+<span class="kw">use </span>visit::{GraphRef};
 
-<span class="doccomment">/// `Dot` implements output to graphviz .dot format for a graph.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Formatting and options are rather simple, this is mostly intended</span>
-<span class="doccomment">/// for debugging. Exact output may change.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use petgraph::Graph;</span>
-<span class="doccomment">/// use petgraph::dot::{Dot, Config};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut graph = Graph::&lt;_, ()&gt;::new();</span>
-<span class="doccomment">/// graph.add_node(&quot;A&quot;);</span>
-<span class="doccomment">/// graph.add_node(&quot;B&quot;);</span>
-<span class="doccomment">/// graph.add_node(&quot;C&quot;);</span>
-<span class="doccomment">/// graph.add_node(&quot;D&quot;);</span>
-<span class="doccomment">/// graph.extend_with_edges(&amp;[</span>
-<span class="doccomment">///     (0, 1), (0, 2), (0, 3),</span>
-<span class="doccomment">///     (1, 2), (1, 3),</span>
-<span class="doccomment">///     (2, 3),</span>
-<span class="doccomment">/// ]);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// println!(&quot;{:?}&quot;, Dot::with_config(&amp;graph, &amp;[Config::EdgeNoLabel]));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // In this case the output looks like this:</span>
-<span class="doccomment">/// // </span>
-<span class="doccomment">/// // digraph {</span>
-<span class="doccomment">/// //     0 [label=&quot;\&quot;A\&quot;&quot;]</span>
-<span class="doccomment">/// //     1 [label=&quot;\&quot;B\&quot;&quot;]</span>
-<span class="doccomment">/// //     2 [label=&quot;\&quot;C\&quot;&quot;]</span>
-<span class="doccomment">/// //     3 [label=&quot;\&quot;D\&quot;&quot;]</span>
-<span class="doccomment">/// //     0 -&gt; 1</span>
-<span class="doccomment">/// //     0 -&gt; 2</span>
-<span class="doccomment">/// //     0 -&gt; 3</span>
-<span class="doccomment">/// //     1 -&gt; 2</span>
-<span class="doccomment">/// //     1 -&gt; 3</span>
-<span class="doccomment">/// //     2 -&gt; 3</span>
-<span class="doccomment">/// // }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // If you need multiple config options, just list them all in the slice.</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Dot</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">G</span><span class="op">&gt;</span> {
-    <span class="ident">graph</span>: <span class="ident">G</span>,
-    <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">Config</span>],
+<span class="doccomment">/// `Dot` implements output to graphviz .dot format for a graph.
+///
+/// Formatting and options are rather simple, this is mostly intended
+/// for debugging. Exact output may change.
+///
+/// # Examples
+///
+/// ```
+/// use petgraph::Graph;
+/// use petgraph::dot::{Dot, Config};
+///
+/// let mut graph = Graph::&lt;_, ()&gt;::new();
+/// graph.add_node(&quot;A&quot;);
+/// graph.add_node(&quot;B&quot;);
+/// graph.add_node(&quot;C&quot;);
+/// graph.add_node(&quot;D&quot;);
+/// graph.extend_with_edges(&amp;[
+///     (0, 1), (0, 2), (0, 3),
+///     (1, 2), (1, 3),
+///     (2, 3),
+/// ]);
+///
+/// println!(&quot;{:?}&quot;, Dot::with_config(&amp;graph, &amp;[Config::EdgeNoLabel]));
+///
+/// // In this case the output looks like this:
+/// // 
+/// // digraph {
+/// //     0 [label=&quot;\&quot;A\&quot;&quot;]
+/// //     1 [label=&quot;\&quot;B\&quot;&quot;]
+/// //     2 [label=&quot;\&quot;C\&quot;&quot;]
+/// //     3 [label=&quot;\&quot;D\&quot;&quot;]
+/// //     0 -&gt; 1
+/// //     0 -&gt; 2
+/// //     0 -&gt; 3
+/// //     1 -&gt; 2
+/// //     1 -&gt; 3
+/// //     2 -&gt; 3
+/// // }
+///
+/// // If you need multiple config options, just list them all in the slice.
+/// ```
+</span><span class="kw">pub struct </span>Dot&lt;<span class="lifetime">&#39;a</span>, G&gt; {
+    graph: G,
+    config: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[Config],
 }
 
-<span class="kw">static</span> <span class="ident">TYPE</span>: [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>; <span class="number">2</span>] <span class="op">=</span> [<span class="string">&quot;graph&quot;</span>, <span class="string">&quot;digraph&quot;</span>];
-<span class="kw">static</span> <span class="ident">EDGE</span>: [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>; <span class="number">2</span>] <span class="op">=</span> [<span class="string">&quot;--&quot;</span>, <span class="string">&quot;-&gt;&quot;</span>];
-<span class="kw">static</span> <span class="ident">INDENT</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;    &quot;</span>;
+<span class="kw">static </span>TYPE: [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str; <span class="number">2</span>] = [<span class="string">&quot;graph&quot;</span>, <span class="string">&quot;digraph&quot;</span>];
+<span class="kw">static </span>EDGE: [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str; <span class="number">2</span>] = [<span class="string">&quot;--&quot;</span>, <span class="string">&quot;-&gt;&quot;</span>];
+<span class="kw">static </span>INDENT: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;    &quot;</span>;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">G</span><span class="op">&gt;</span> <span class="ident">Dot</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">G</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">G</span>: <span class="ident">GraphRef</span> {
-    <span class="doccomment">/// Create a `Dot` formatting wrapper with default configuration.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">graph</span>: <span class="ident">G</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::with_config</span>(<span class="ident">graph</span>, <span class="kw-2">&amp;</span>[])
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, G&gt; Dot&lt;<span class="lifetime">&#39;a</span>, G&gt; <span class="kw">where </span>G: GraphRef {
+    <span class="doccomment">/// Create a `Dot` formatting wrapper with default configuration.
+    </span><span class="kw">pub fn </span>new(graph: G) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::with_config(graph, <span class="kw-2">&amp;</span>[])
     }
 
-    <span class="doccomment">/// Create a `Dot` formatting wrapper with custom configuration.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_config</span>(<span class="ident">graph</span>: <span class="ident">G</span>, <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">Config</span>]) -&gt; <span class="self">Self</span> {
-        <span class="ident">Dot</span> {
-            <span class="ident">graph</span>: <span class="ident">graph</span>,
-            <span class="ident">config</span>: <span class="ident">config</span>,
+    <span class="doccomment">/// Create a `Dot` formatting wrapper with custom configuration.
+    </span><span class="kw">pub fn </span>with_config(graph: G, config: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[Config]) -&gt; <span class="self">Self </span>{
+        Dot {
+            graph: graph,
+            config: config,
         }
     }
 }
 
-<span class="doccomment">/// `Dot` configuration.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This enum does not have an exhaustive definition (will be expanded)</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Config</span> {
-    <span class="doccomment">/// Use indices for node labels.</span>
-    <span class="ident">NodeIndexLabel</span>,
-    <span class="doccomment">/// Use indices for edge labels.</span>
-    <span class="ident">EdgeIndexLabel</span>,
-    <span class="doccomment">/// Use no edge labels.</span>
-    <span class="ident">EdgeNoLabel</span>,
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="ident">_Incomplete</span>(()),
+<span class="doccomment">/// `Dot` configuration.
+///
+/// This enum does not have an exhaustive definition (will be expanded)
+</span><span class="attribute">#[derive(Debug, PartialEq, Eq)]
+</span><span class="kw">pub enum </span>Config {
+    <span class="doccomment">/// Use indices for node labels.
+    </span>NodeIndexLabel,
+    <span class="doccomment">/// Use indices for edge labels.
+    </span>EdgeIndexLabel,
+    <span class="doccomment">/// Use no edge labels.
+    </span>EdgeNoLabel,
+    <span class="attribute">#[doc(hidden)]
+    </span>_Incomplete(()),
 }
 
-<span class="kw">use</span> <span class="ident">visit</span>::{ <span class="ident">IntoNodeReferences</span>, <span class="ident">NodeIndexable</span>, <span class="ident">IntoEdgeReferences</span>, <span class="ident">EdgeRef</span>};
-<span class="kw">use</span> <span class="ident">visit</span>::{ <span class="ident">Data</span>, <span class="ident">NodeRef</span>, <span class="ident">GraphProp</span>, };
+<span class="kw">use </span>visit::{ IntoNodeReferences, NodeIndexable, IntoEdgeReferences, EdgeRef};
+<span class="kw">use </span>visit::{ Data, NodeRef, GraphProp, };
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">G</span><span class="op">&gt;</span> <span class="ident">Dot</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">G</span><span class="op">&gt;</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, G&gt; Dot&lt;<span class="lifetime">&#39;a</span>, G&gt;
 {
-    <span class="kw">fn</span> <span class="ident">graph_fmt</span><span class="op">&lt;</span><span class="ident">NF</span>, <span class="ident">EF</span>, <span class="ident">NW</span>, <span class="ident">EW</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">g</span>: <span class="ident">G</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>,
-                    <span class="kw-2">mut</span> <span class="ident">node_fmt</span>: <span class="ident">NF</span>, <span class="kw-2">mut</span> <span class="ident">edge_fmt</span>: <span class="ident">EF</span>) -&gt; <span class="ident">fmt::Result</span>
-        <span class="kw">where</span> <span class="ident">G</span>: <span class="ident">NodeIndexable</span> <span class="op">+</span> <span class="ident">IntoNodeReferences</span> <span class="op">+</span> <span class="ident">IntoEdgeReferences</span>,
-              <span class="ident">G</span>: <span class="ident">GraphProp</span>,
-              <span class="ident">G</span>: <span class="ident">Data</span><span class="op">&lt;</span><span class="ident">NodeWeight</span><span class="op">=</span><span class="ident">NW</span>, <span class="ident">EdgeWeight</span><span class="op">=</span><span class="ident">EW</span><span class="op">&gt;</span>,
-              <span class="ident">NF</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">NW</span>, <span class="kw-2">&amp;mut</span> <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">Display</span>) -&gt; <span class="ident">fmt::Result</span>) -&gt; <span class="ident">fmt::Result</span>,
-              <span class="ident">EF</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">EW</span>, <span class="kw-2">&amp;mut</span> <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">Display</span>) -&gt; <span class="ident">fmt::Result</span>) -&gt; <span class="ident">fmt::Result</span>,
+    <span class="kw">fn </span>graph_fmt&lt;NF, EF, NW, EW&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, g: G, f: <span class="kw-2">&amp;mut </span>fmt::Formatter,
+                    <span class="kw-2">mut </span>node_fmt: NF, <span class="kw-2">mut </span>edge_fmt: EF) -&gt; fmt::Result
+        <span class="kw">where </span>G: NodeIndexable + IntoNodeReferences + IntoEdgeReferences,
+              G: GraphProp,
+              G: Data&lt;NodeWeight=NW, EdgeWeight=EW&gt;,
+              NF: FnMut(<span class="kw-2">&amp;</span>NW, <span class="kw-2">&amp;mut </span>FnMut(<span class="kw-2">&amp;</span>Display) -&gt; fmt::Result) -&gt; fmt::Result,
+              EF: FnMut(<span class="kw-2">&amp;</span>EW, <span class="kw-2">&amp;mut </span>FnMut(<span class="kw-2">&amp;</span>Display) -&gt; fmt::Result) -&gt; fmt::Result,
     {
-        <span class="macro">try!</span>(<span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;{} {{&quot;</span>, <span class="ident">TYPE</span>[<span class="ident">g</span>.<span class="ident">is_directed</span>() <span class="kw">as</span> <span class="ident">usize</span>]));
+        <span class="macro">try!</span>(<span class="macro">writeln!</span>(f, <span class="string">&quot;{} {{&quot;</span>, TYPE[g.is_directed() <span class="kw">as </span>usize]));
 
-        <span class="comment">// output all labels</span>
-        <span class="kw">for</span> <span class="ident">node</span> <span class="kw">in</span> <span class="ident">g</span>.<span class="ident">node_references</span>() {
-            <span class="macro">try!</span>(<span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}{}&quot;</span>, <span class="ident">INDENT</span>, <span class="ident">g</span>.<span class="ident">to_index</span>(<span class="ident">node</span>.<span class="ident">id</span>())));
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">Config::NodeIndexLabel</span>) {
-                <span class="macro">try!</span>(<span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;&quot;</span>));
-            } <span class="kw">else</span> {
-                <span class="macro">try!</span>(<span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot; [label=\&quot;&quot;</span>));
-                <span class="macro">try!</span>(<span class="ident">node_fmt</span>(<span class="ident">node</span>.<span class="ident">weight</span>(), <span class="kw-2">&amp;mut</span> <span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">Escaped</span>(<span class="ident">d</span>).<span class="ident">fmt</span>(<span class="ident">f</span>)));
-                <span class="macro">try!</span>(<span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;\&quot;]&quot;</span>));
+        <span class="comment">// output all labels
+        </span><span class="kw">for </span>node <span class="kw">in </span>g.node_references() {
+            <span class="macro">try!</span>(<span class="macro">write!</span>(f, <span class="string">&quot;{}{}&quot;</span>, INDENT, g.to_index(node.id())));
+            <span class="kw">if </span><span class="self">self</span>.config.contains(<span class="kw-2">&amp;</span>Config::NodeIndexLabel) {
+                <span class="macro">try!</span>(<span class="macro">writeln!</span>(f, <span class="string">&quot;&quot;</span>));
+            } <span class="kw">else </span>{
+                <span class="macro">try!</span>(<span class="macro">write!</span>(f, <span class="string">&quot; [label=\&quot;&quot;</span>));
+                <span class="macro">try!</span>(node_fmt(node.weight(), <span class="kw-2">&amp;mut </span>|d| Escaped(d).fmt(f)));
+                <span class="macro">try!</span>(<span class="macro">writeln!</span>(f, <span class="string">&quot;\&quot;]&quot;</span>));
             }
 
         }
-        <span class="comment">// output all edges</span>
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">edge</span>) <span class="kw">in</span> <span class="ident">g</span>.<span class="ident">edge_references</span>().<span class="ident">enumerate</span>() {
-            <span class="macro">try!</span>(<span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}{} {} {}&quot;</span>,
-                        <span class="ident">INDENT</span>,
-                        <span class="ident">g</span>.<span class="ident">to_index</span>(<span class="ident">edge</span>.<span class="ident">source</span>()),
-                        <span class="ident">EDGE</span>[<span class="ident">g</span>.<span class="ident">is_directed</span>() <span class="kw">as</span> <span class="ident">usize</span>],
-                        <span class="ident">g</span>.<span class="ident">to_index</span>(<span class="ident">edge</span>.<span class="ident">target</span>())));
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">Config::EdgeNoLabel</span>) {
-                <span class="macro">try!</span>(<span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;&quot;</span>));
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">Config::EdgeIndexLabel</span>) {
-                <span class="macro">try!</span>(<span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot; [label=\&quot;{}\&quot;]&quot;</span>, <span class="ident">i</span>));
-            } <span class="kw">else</span> {
-                <span class="macro">try!</span>(<span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot; [label=\&quot;&quot;</span>));
-                <span class="macro">try!</span>(<span class="ident">edge_fmt</span>(<span class="ident">edge</span>.<span class="ident">weight</span>(), <span class="kw-2">&amp;mut</span> <span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">Escaped</span>(<span class="ident">d</span>).<span class="ident">fmt</span>(<span class="ident">f</span>)));
-                <span class="macro">try!</span>(<span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;\&quot;]&quot;</span>));
+        <span class="comment">// output all edges
+        </span><span class="kw">for </span>(i, edge) <span class="kw">in </span>g.edge_references().enumerate() {
+            <span class="macro">try!</span>(<span class="macro">write!</span>(f, <span class="string">&quot;{}{} {} {}&quot;</span>,
+                        INDENT,
+                        g.to_index(edge.source()),
+                        EDGE[g.is_directed() <span class="kw">as </span>usize],
+                        g.to_index(edge.target())));
+            <span class="kw">if </span><span class="self">self</span>.config.contains(<span class="kw-2">&amp;</span>Config::EdgeNoLabel) {
+                <span class="macro">try!</span>(<span class="macro">writeln!</span>(f, <span class="string">&quot;&quot;</span>));
+            } <span class="kw">else if </span><span class="self">self</span>.config.contains(<span class="kw-2">&amp;</span>Config::EdgeIndexLabel) {
+                <span class="macro">try!</span>(<span class="macro">writeln!</span>(f, <span class="string">&quot; [label=\&quot;{}\&quot;]&quot;</span>, i));
+            } <span class="kw">else </span>{
+                <span class="macro">try!</span>(<span class="macro">write!</span>(f, <span class="string">&quot; [label=\&quot;&quot;</span>));
+                <span class="macro">try!</span>(edge_fmt(edge.weight(), <span class="kw-2">&amp;mut </span>|d| Escaped(d).fmt(f)));
+                <span class="macro">try!</span>(<span class="macro">writeln!</span>(f, <span class="string">&quot;\&quot;]&quot;</span>));
             }
         }
 
-        <span class="macro">try!</span>(<span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;}}&quot;</span>));
+        <span class="macro">try!</span>(<span class="macro">writeln!</span>(f, <span class="string">&quot;}}&quot;</span>));
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">G</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Dot</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">G</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">G</span>: <span class="ident">IntoEdgeReferences</span> <span class="op">+</span> <span class="ident">IntoNodeReferences</span> <span class="op">+</span> <span class="ident">NodeIndexable</span> <span class="op">+</span> <span class="ident">GraphProp</span>,
-          <span class="ident">G::EdgeWeight</span>: <span class="ident">fmt::Display</span>,
-          <span class="ident">G::NodeWeight</span>: <span class="ident">fmt::Display</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, G&gt; fmt::Display <span class="kw">for </span>Dot&lt;<span class="lifetime">&#39;a</span>, G&gt;
+    <span class="kw">where </span>G: IntoEdgeReferences + IntoNodeReferences + NodeIndexable + GraphProp,
+          G::EdgeWeight: fmt::Display,
+          G::NodeWeight: fmt::Display,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="self">self</span>.<span class="ident">graph_fmt</span>(<span class="self">self</span>.<span class="ident">graph</span>, <span class="ident">f</span>, <span class="op">|</span><span class="ident">n</span>, <span class="ident">cb</span><span class="op">|</span> <span class="ident">cb</span>(<span class="ident">n</span>), <span class="op">|</span><span class="ident">e</span>, <span class="ident">cb</span><span class="op">|</span> <span class="ident">cb</span>(<span class="ident">e</span>))
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="self">self</span>.graph_fmt(<span class="self">self</span>.graph, f, |n, cb| cb(n), |e, cb| cb(e))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">G</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Dot</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">G</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">G</span>: <span class="ident">IntoEdgeReferences</span> <span class="op">+</span> <span class="ident">IntoNodeReferences</span> <span class="op">+</span> <span class="ident">NodeIndexable</span> <span class="op">+</span> <span class="ident">GraphProp</span>,
-          <span class="ident">G::EdgeWeight</span>: <span class="ident">fmt::Debug</span>,
-          <span class="ident">G::NodeWeight</span>: <span class="ident">fmt::Debug</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, G&gt; fmt::Debug <span class="kw">for </span>Dot&lt;<span class="lifetime">&#39;a</span>, G&gt;
+    <span class="kw">where </span>G: IntoEdgeReferences + IntoNodeReferences + NodeIndexable + GraphProp,
+          G::EdgeWeight: fmt::Debug,
+          G::NodeWeight: fmt::Debug,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="self">self</span>.<span class="ident">graph_fmt</span>(<span class="self">self</span>.<span class="ident">graph</span>, <span class="ident">f</span>,
-                       <span class="op">|</span><span class="ident">n</span>, <span class="ident">cb</span><span class="op">|</span> <span class="ident">cb</span>(<span class="kw-2">&amp;</span><span class="ident">DebugFmt</span>(<span class="ident">n</span>)),
-                       <span class="op">|</span><span class="ident">e</span>, <span class="ident">cb</span><span class="op">|</span> <span class="ident">cb</span>(<span class="kw-2">&amp;</span><span class="ident">DebugFmt</span>(<span class="ident">e</span>)))
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="self">self</span>.graph_fmt(<span class="self">self</span>.graph, f,
+                       |n, cb| cb(<span class="kw-2">&amp;</span>DebugFmt(n)),
+                       |e, cb| cb(<span class="kw-2">&amp;</span>DebugFmt(e)))
     }
 }
 
-<span class="doccomment">/// Escape for Graphviz</span>
-<span class="kw">struct</span> <span class="ident">Escaper</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span>(<span class="ident">W</span>);
+<span class="doccomment">/// Escape for Graphviz
+</span><span class="kw">struct </span>Escaper&lt;W&gt;(W);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span> <span class="ident">fmt::Write</span> <span class="kw">for</span> <span class="ident">Escaper</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">W</span>: <span class="ident">fmt::Write</span>
+<span class="kw">impl</span>&lt;W&gt; fmt::Write <span class="kw">for </span>Escaper&lt;W&gt;
+    <span class="kw">where </span>W: fmt::Write
 {
-    <span class="kw">fn</span> <span class="ident">write_str</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">for</span> <span class="ident">c</span> <span class="kw">in</span> <span class="ident">s</span>.<span class="ident">chars</span>() {
-            <span class="macro">try!</span>(<span class="self">self</span>.<span class="ident">write_char</span>(<span class="ident">c</span>));
+    <span class="kw">fn </span>write_str(<span class="kw-2">&amp;mut </span><span class="self">self</span>, s: <span class="kw-2">&amp;</span>str) -&gt; fmt::Result {
+        <span class="kw">for </span>c <span class="kw">in </span>s.chars() {
+            <span class="macro">try!</span>(<span class="self">self</span>.write_char(c));
         }
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">write_char</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">c</span>: <span class="ident">char</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="ident">c</span> {
-            <span class="string">&#39;&quot;&#39;</span> =&gt; <span class="macro">try!</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">write_char</span>(<span class="string">&#39;\\&#39;</span>)),
-            <span class="comment">// \l is for left justified linebreak</span>
-            <span class="string">&#39;\n&#39;</span> =&gt; <span class="kw">return</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">write_str</span>(<span class="string">r#&quot;\l&quot;#</span>),
-            <span class="kw">_</span>   =&gt; { }
+    <span class="kw">fn </span>write_char(<span class="kw-2">&amp;mut </span><span class="self">self</span>, c: char) -&gt; fmt::Result {
+        <span class="kw">match </span>c {
+            <span class="string">&#39;&quot;&#39; </span>=&gt; <span class="macro">try!</span>(<span class="self">self</span>.<span class="number">0</span>.write_char(<span class="string">&#39;\\&#39;</span>)),
+            <span class="comment">// \l is for left justified linebreak
+            </span><span class="string">&#39;\n&#39; </span>=&gt; <span class="kw">return </span><span class="self">self</span>.<span class="number">0</span>.write_str(<span class="string">r#&quot;\l&quot;#</span>),
+            <span class="kw">_   </span>=&gt; { }
         }
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">write_char</span>(<span class="ident">c</span>)
+        <span class="self">self</span>.<span class="number">0</span>.write_char(c)
     }
 }
 
-<span class="doccomment">/// Pass Display formatting through a simple escaping filter</span>
-<span class="kw">struct</span> <span class="ident">Escaped</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">T</span>);
+<span class="doccomment">/// Pass Display formatting through a simple escaping filter
+</span><span class="kw">struct </span>Escaped&lt;T&gt;(T);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Escaped</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">fmt::Display</span>
+<span class="kw">impl</span>&lt;T&gt; fmt::Display <span class="kw">for </span>Escaped&lt;T&gt;
+    <span class="kw">where </span>T: fmt::Display
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">if</span> <span class="ident">f</span>.<span class="ident">alternate</span>() {
-            <span class="macro">write!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Escaper</span>(<span class="ident">f</span>), <span class="string">&quot;{:#}\\l&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>)
-        } <span class="kw">else</span> {
-            <span class="macro">write!</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Escaper</span>(<span class="ident">f</span>), <span class="string">&quot;{}&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>)
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">if </span>f.alternate() {
+            <span class="macro">write!</span>(<span class="kw-2">&amp;mut </span>Escaper(f), <span class="string">&quot;{:#}\\l&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>)
+        } <span class="kw">else </span>{
+            <span class="macro">write!</span>(<span class="kw-2">&amp;mut </span>Escaper(f), <span class="string">&quot;{}&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>)
         }
     }
 }
 
-<span class="doccomment">/// Pass Debug formatting to Display</span>
-<span class="kw">struct</span> <span class="ident">DebugFmt</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">T</span>);
+<span class="doccomment">/// Pass Debug formatting to Display
+</span><span class="kw">struct </span>DebugFmt&lt;T&gt;(T);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">DebugFmt</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">fmt::Debug</span>
+<span class="kw">impl</span>&lt;T&gt; fmt::Display <span class="kw">for </span>DebugFmt&lt;T&gt;
+    <span class="kw">where </span>T: fmt::Debug
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="self">self</span>.<span class="number">0</span>.fmt(f)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="petgraph" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="petgraph" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

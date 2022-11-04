@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/trace/span.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>span.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/trace/span.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>span.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../opentelemetry/index.html">
                         <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -285,290 +285,290 @@
 <span id="283">283</span>
 <span id="284">284</span>
 <span id="285">285</span>
-</pre><pre class="rust"><code><span class="doccomment">//! # OpenTelemetry Span interface</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! A `Span` represents a single operation within a trace. `Span`s can be nested to form a trace</span>
-<span class="doccomment">//! tree. Each trace contains a root span, which typically describes the end-to-end latency and,</span>
-<span class="doccomment">//! optionally, one or more sub-spans for its sub-operations.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The `Span`&#39;s start and end timestamps reflect the elapsed real time of the operation. A `Span`&#39;s</span>
-<span class="doccomment">//! start time SHOULD be set to the current time on span creation. After the `Span` is created, it</span>
-<span class="doccomment">//! SHOULD be possible to change its name, set its `Attributes`, and add `Links` and `Events`.</span>
-<span class="doccomment">//! These MUST NOT be changed after the `Span`&#39;s end time has been set.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `Spans` are not meant to be used to propagate information within a process. To prevent misuse,</span>
-<span class="doccomment">//! implementations SHOULD NOT provide access to a `Span`&#39;s attributes besides its `SpanContext`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Vendors may implement the `Span` interface to effect vendor-specific logic. However, alternative</span>
-<span class="doccomment">//! implementations MUST NOT allow callers to create Spans directly. All `Span`s MUST be created</span>
-<span class="doccomment">//! via a Tracer.</span>
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">trace::SpanContext</span>, <span class="ident">KeyValue</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
-<span class="kw">use</span> <span class="ident">std::error::Error</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::time::SystemTime</span>;
+</pre><pre class="rust"><code><span class="doccomment">//! # OpenTelemetry Span interface
+//!
+//! A `Span` represents a single operation within a trace. `Span`s can be nested to form a trace
+//! tree. Each trace contains a root span, which typically describes the end-to-end latency and,
+//! optionally, one or more sub-spans for its sub-operations.
+//!
+//! The `Span`&#39;s start and end timestamps reflect the elapsed real time of the operation. A `Span`&#39;s
+//! start time SHOULD be set to the current time on span creation. After the `Span` is created, it
+//! SHOULD be possible to change its name, set its `Attributes`, and add `Links` and `Events`.
+//! These MUST NOT be changed after the `Span`&#39;s end time has been set.
+//!
+//! `Spans` are not meant to be used to propagate information within a process. To prevent misuse,
+//! implementations SHOULD NOT provide access to a `Span`&#39;s attributes besides its `SpanContext`.
+//!
+//! Vendors may implement the `Span` interface to effect vendor-specific logic. However, alternative
+//! implementations MUST NOT allow callers to create Spans directly. All `Span`s MUST be created
+//! via a Tracer.
+</span><span class="kw">use crate</span>::{trace::SpanContext, KeyValue};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serialize&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
+<span class="kw">use </span>std::borrow::Cow;
+<span class="kw">use </span>std::error::Error;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::time::SystemTime;
 
-<span class="doccomment">/// Interface for a single operation within a trace.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Span</span> {
-    <span class="doccomment">/// An API to record events in the context of a given `Span`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Events have a time associated with the moment when they are</span>
-    <span class="doccomment">/// added to the `Span`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Events SHOULD preserve the order in which they&#39;re set. This will typically match</span>
-    <span class="doccomment">/// the ordering of the events&#39; timestamps.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that the OpenTelemetry project documents certain [&quot;standard event names and</span>
-    <span class="doccomment">/// keys&quot;](https://github.com/open-telemetry/opentelemetry-specification/tree/v0.5.0/specification/trace/semantic_conventions/README.md)</span>
-    <span class="doccomment">/// which have prescribed semantic meanings.</span>
-    <span class="kw">fn</span> <span class="ident">add_event</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="ident">T</span>, <span class="ident">attributes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span>)
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Interface for a single operation within a trace.
+</span><span class="kw">pub trait </span>Span {
+    <span class="doccomment">/// An API to record events in the context of a given `Span`.
+    ///
+    /// Events have a time associated with the moment when they are
+    /// added to the `Span`.
+    ///
+    /// Events SHOULD preserve the order in which they&#39;re set. This will typically match
+    /// the ordering of the events&#39; timestamps.
+    ///
+    /// Note that the OpenTelemetry project documents certain [&quot;standard event names and
+    /// keys&quot;](https://github.com/open-telemetry/opentelemetry-specification/tree/v0.5.0/specification/trace/semantic_conventions/README.md)
+    /// which have prescribed semantic meanings.
+    </span><span class="kw">fn </span>add_event&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: T, attributes: Vec&lt;KeyValue&gt;)
+    <span class="kw">where
+        </span>T: Into&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;,
     {
-        <span class="self">self</span>.<span class="ident">add_event_with_timestamp</span>(<span class="ident">name</span>, <span class="ident"><span class="kw">crate</span>::time::now</span>(), <span class="ident">attributes</span>)
+        <span class="self">self</span>.add_event_with_timestamp(name, <span class="kw">crate</span>::time::now(), attributes)
     }
 
-    <span class="doccomment">/// Convenience method to record an exception/error as an `Event`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// An exception SHOULD be recorded as an Event on the span during which it occurred.</span>
-    <span class="doccomment">/// The name of the event MUST be &quot;exception&quot;.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The semantic conventions for Errors are described in [&quot;Semantic Conventions for Exceptions&quot;](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/exceptions.md)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For now we will not set `exception.stacktrace` attribute since the `Error::backtrace`</span>
-    <span class="doccomment">/// method is still in nightly. Users can provide a stacktrace by using the</span>
-    <span class="doccomment">/// `record_exception_with_stacktrace` method.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Users can custom the exception message by overriding the `fmt::Display` trait&#39;s `fmt` method</span>
-    <span class="doccomment">/// for the error.</span>
-    <span class="kw">fn</span> <span class="ident">record_exception</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">err</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Error</span>) {
-        <span class="kw">let</span> <span class="ident">attributes</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">KeyValue::new</span>(<span class="string">&quot;exception.message&quot;</span>, <span class="ident">err</span>.<span class="ident">to_string</span>())];
+    <span class="doccomment">/// Convenience method to record an exception/error as an `Event`
+    ///
+    /// An exception SHOULD be recorded as an Event on the span during which it occurred.
+    /// The name of the event MUST be &quot;exception&quot;.
+    ///
+    /// The semantic conventions for Errors are described in [&quot;Semantic Conventions for Exceptions&quot;](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/exceptions.md)
+    ///
+    /// For now we will not set `exception.stacktrace` attribute since the `Error::backtrace`
+    /// method is still in nightly. Users can provide a stacktrace by using the
+    /// `record_exception_with_stacktrace` method.
+    ///
+    /// Users can custom the exception message by overriding the `fmt::Display` trait&#39;s `fmt` method
+    /// for the error.
+    </span><span class="kw">fn </span>record_exception(<span class="kw-2">&amp;mut </span><span class="self">self</span>, err: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Error) {
+        <span class="kw">let </span>attributes = <span class="macro">vec!</span>[KeyValue::new(<span class="string">&quot;exception.message&quot;</span>, err.to_string())];
 
-        <span class="self">self</span>.<span class="ident">add_event</span>(<span class="string">&quot;exception&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">attributes</span>);
+        <span class="self">self</span>.add_event(<span class="string">&quot;exception&quot;</span>.to_string(), attributes);
     }
 
-    <span class="doccomment">/// Convenience method to record a exception/error as an `Event` with custom stacktrace</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See `Span:record_exception` method for more details.</span>
-    <span class="kw">fn</span> <span class="ident">record_exception_with_stacktrace</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">err</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Error</span>, <span class="ident">stacktrace</span>: <span class="ident">T</span>)
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Convenience method to record a exception/error as an `Event` with custom stacktrace
+    ///
+    /// See `Span:record_exception` method for more details.
+    </span><span class="kw">fn </span>record_exception_with_stacktrace&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, err: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Error, stacktrace: T)
+    <span class="kw">where
+        </span>T: Into&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;,
     {
-        <span class="kw">let</span> <span class="ident">attributes</span> <span class="op">=</span> <span class="macro">vec!</span>[
-            <span class="ident">KeyValue::new</span>(<span class="string">&quot;exception.message&quot;</span>, <span class="ident">err</span>.<span class="ident">to_string</span>()),
-            <span class="ident">KeyValue::new</span>(<span class="string">&quot;exception.stacktrace&quot;</span>, <span class="ident">stacktrace</span>.<span class="ident">into</span>()),
+        <span class="kw">let </span>attributes = <span class="macro">vec!</span>[
+            KeyValue::new(<span class="string">&quot;exception.message&quot;</span>, err.to_string()),
+            KeyValue::new(<span class="string">&quot;exception.stacktrace&quot;</span>, stacktrace.into()),
         ];
 
-        <span class="self">self</span>.<span class="ident">add_event</span>(<span class="string">&quot;exception&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">attributes</span>);
+        <span class="self">self</span>.add_event(<span class="string">&quot;exception&quot;</span>.to_string(), attributes);
     }
 
-    <span class="doccomment">/// An API to record events at a specific time in the context of a given `Span`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Events SHOULD preserve the order in which they&#39;re set. This will typically match</span>
-    <span class="doccomment">/// the ordering of the events&#39; timestamps.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that the OpenTelemetry project documents certain [&quot;standard event names and</span>
-    <span class="doccomment">/// keys&quot;](https://github.com/open-telemetry/opentelemetry-specification/tree/v0.5.0/specification/trace/semantic_conventions/README.md)</span>
-    <span class="doccomment">/// which have prescribed semantic meanings.</span>
-    <span class="kw">fn</span> <span class="ident">add_event_with_timestamp</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">name</span>: <span class="ident">T</span>,
-        <span class="ident">timestamp</span>: <span class="ident">SystemTime</span>,
-        <span class="ident">attributes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span>,
-    ) <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// An API to record events at a specific time in the context of a given `Span`.
+    ///
+    /// Events SHOULD preserve the order in which they&#39;re set. This will typically match
+    /// the ordering of the events&#39; timestamps.
+    ///
+    /// Note that the OpenTelemetry project documents certain [&quot;standard event names and
+    /// keys&quot;](https://github.com/open-telemetry/opentelemetry-specification/tree/v0.5.0/specification/trace/semantic_conventions/README.md)
+    /// which have prescribed semantic meanings.
+    </span><span class="kw">fn </span>add_event_with_timestamp&lt;T&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        name: T,
+        timestamp: SystemTime,
+        attributes: Vec&lt;KeyValue&gt;,
+    ) <span class="kw">where
+        </span>T: Into&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;;
 
-    <span class="doccomment">/// Returns the `SpanContext` for the given `Span`. The returned value may be used even after</span>
-    <span class="doccomment">/// the `Span is finished. The returned value MUST be the same for the entire `Span` lifetime.</span>
-    <span class="kw">fn</span> <span class="ident">span_context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">SpanContext</span>;
+    <span class="doccomment">/// Returns the `SpanContext` for the given `Span`. The returned value may be used even after
+    /// the `Span is finished. The returned value MUST be the same for the entire `Span` lifetime.
+    </span><span class="kw">fn </span>span_context(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>SpanContext;
 
-    <span class="doccomment">/// Returns true if this `Span` is recording information like events with the `add_event`</span>
-    <span class="doccomment">/// operation, attributes using `set_attributes`, status with `set_status`, etc.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This flag SHOULD be used to avoid expensive computations of a `Span` attributes or events in</span>
-    <span class="doccomment">/// case when a `Span` is definitely not recorded. Note that any child span&#39;s recording is</span>
-    <span class="doccomment">/// determined independently from the value of this flag (typically based on the sampled flag of</span>
-    <span class="doccomment">/// a `TraceFlag` on `SpanContext`).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This flag may be true despite the entire trace being sampled out. This allows to record and</span>
-    <span class="doccomment">/// process information about the individual Span without sending it to the backend. An example</span>
-    <span class="doccomment">/// of this scenario may be recording and processing of all incoming requests for the processing</span>
-    <span class="doccomment">/// and building of SLA/SLO latency charts while sending only a subset - sampled spans - to the</span>
-    <span class="doccomment">/// backend. See also the sampling section of SDK design.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Users of the API should only access the `is_recording` property when instrumenting code and</span>
-    <span class="doccomment">/// never access `SampledFlag` unless used in context propagators.</span>
-    <span class="kw">fn</span> <span class="ident">is_recording</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// Returns true if this `Span` is recording information like events with the `add_event`
+    /// operation, attributes using `set_attributes`, status with `set_status`, etc.
+    ///
+    /// This flag SHOULD be used to avoid expensive computations of a `Span` attributes or events in
+    /// case when a `Span` is definitely not recorded. Note that any child span&#39;s recording is
+    /// determined independently from the value of this flag (typically based on the sampled flag of
+    /// a `TraceFlag` on `SpanContext`).
+    ///
+    /// This flag may be true despite the entire trace being sampled out. This allows to record and
+    /// process information about the individual Span without sending it to the backend. An example
+    /// of this scenario may be recording and processing of all incoming requests for the processing
+    /// and building of SLA/SLO latency charts while sending only a subset - sampled spans - to the
+    /// backend. See also the sampling section of SDK design.
+    ///
+    /// Users of the API should only access the `is_recording` property when instrumenting code and
+    /// never access `SampledFlag` unless used in context propagators.
+    </span><span class="kw">fn </span>is_recording(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// An API to set a single `Attribute` where the attribute properties are passed</span>
-    <span class="doccomment">/// as arguments. To avoid extra allocations some implementations may offer a separate API for</span>
-    <span class="doccomment">/// each of the possible value types.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// An `Attribute` is defined as a `KeyValue` pair.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Attributes SHOULD preserve the order in which they&#39;re set. Setting an attribute</span>
-    <span class="doccomment">/// with the same key as an existing attribute SHOULD overwrite the existing</span>
-    <span class="doccomment">/// attribute&#39;s value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that the OpenTelemetry project documents certain [&quot;standard</span>
-    <span class="doccomment">/// attributes&quot;](https://github.com/open-telemetry/opentelemetry-specification/tree/v0.5.0/specification/trace/semantic_conventions/README.md)</span>
-    <span class="doccomment">/// that have prescribed semantic meanings.</span>
-    <span class="kw">fn</span> <span class="ident">set_attribute</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">attribute</span>: <span class="ident">KeyValue</span>);
+    <span class="doccomment">/// An API to set a single `Attribute` where the attribute properties are passed
+    /// as arguments. To avoid extra allocations some implementations may offer a separate API for
+    /// each of the possible value types.
+    ///
+    /// An `Attribute` is defined as a `KeyValue` pair.
+    ///
+    /// Attributes SHOULD preserve the order in which they&#39;re set. Setting an attribute
+    /// with the same key as an existing attribute SHOULD overwrite the existing
+    /// attribute&#39;s value.
+    ///
+    /// Note that the OpenTelemetry project documents certain [&quot;standard
+    /// attributes&quot;](https://github.com/open-telemetry/opentelemetry-specification/tree/v0.5.0/specification/trace/semantic_conventions/README.md)
+    /// that have prescribed semantic meanings.
+    </span><span class="kw">fn </span>set_attribute(<span class="kw-2">&amp;mut </span><span class="self">self</span>, attribute: KeyValue);
 
-    <span class="doccomment">/// Sets the status of the `Span`. `message` MUST be ignored when the status is `OK` or</span>
-    <span class="doccomment">/// `Unset`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The order of status is `Ok` &gt; `Error` &gt; `Unset`. That&#39;s means set the status</span>
-    <span class="doccomment">/// to `Unset` will always be ignore, set the status to `Error` only works when current</span>
-    <span class="doccomment">/// status is `Unset`, set the status to `Ok` will be consider final and any further call</span>
-    <span class="doccomment">/// to this function will be ignore.</span>
-    <span class="kw">fn</span> <span class="ident">set_status</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">code</span>: <span class="ident">StatusCode</span>, <span class="ident">message</span>: <span class="ident">String</span>);
+    <span class="doccomment">/// Sets the status of the `Span`. `message` MUST be ignored when the status is `OK` or
+    /// `Unset`.
+    ///
+    /// The order of status is `Ok` &gt; `Error` &gt; `Unset`. That&#39;s means set the status
+    /// to `Unset` will always be ignore, set the status to `Error` only works when current
+    /// status is `Unset`, set the status to `Ok` will be consider final and any further call
+    /// to this function will be ignore.
+    </span><span class="kw">fn </span>set_status(<span class="kw-2">&amp;mut </span><span class="self">self</span>, code: StatusCode, message: String);
 
-    <span class="doccomment">/// Updates the `Span`&#39;s name. After this update, any sampling behavior based on the</span>
-    <span class="doccomment">/// name will depend on the implementation.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// It is highly discouraged to update the name of a `Span` after its creation.</span>
-    <span class="doccomment">/// `Span` name is often used to group, filter and identify the logical groups of</span>
-    <span class="doccomment">/// spans. Often, filtering logic will be implemented before the `Span` creation</span>
-    <span class="doccomment">/// for performance reasons, and the name update may interfere with this logic.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The method name is called `update_name` to differentiate this method from the</span>
-    <span class="doccomment">/// regular property. It emphasizes that this operation signifies a</span>
-    <span class="doccomment">/// major change for a `Span` and may lead to re-calculation of sampling or</span>
-    <span class="doccomment">/// filtering decisions made previously depending on the implementation.</span>
-    <span class="kw">fn</span> <span class="ident">update_name</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">new_name</span>: <span class="ident">T</span>)
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Updates the `Span`&#39;s name. After this update, any sampling behavior based on the
+    /// name will depend on the implementation.
+    ///
+    /// It is highly discouraged to update the name of a `Span` after its creation.
+    /// `Span` name is often used to group, filter and identify the logical groups of
+    /// spans. Often, filtering logic will be implemented before the `Span` creation
+    /// for performance reasons, and the name update may interfere with this logic.
+    ///
+    /// The method name is called `update_name` to differentiate this method from the
+    /// regular property. It emphasizes that this operation signifies a
+    /// major change for a `Span` and may lead to re-calculation of sampling or
+    /// filtering decisions made previously depending on the implementation.
+    </span><span class="kw">fn </span>update_name&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, new_name: T)
+    <span class="kw">where
+        </span>T: Into&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;;
 
-    <span class="doccomment">/// Finishes the `Span`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Implementations MUST ignore all subsequent calls to `end` (there might be</span>
-    <span class="doccomment">/// exceptions when the tracer is streaming events and has no mutable state</span>
-    <span class="doccomment">/// associated with the Span).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Calls to `end` a Span MUST not have any effects on child `Span`s as they may</span>
-    <span class="doccomment">/// still be running and can be ended later.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This API MUST be non-blocking.</span>
-    <span class="kw">fn</span> <span class="ident">end</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">end_with_timestamp</span>(<span class="ident"><span class="kw">crate</span>::time::now</span>());
+    <span class="doccomment">/// Finishes the `Span`.
+    ///
+    /// Implementations MUST ignore all subsequent calls to `end` (there might be
+    /// exceptions when the tracer is streaming events and has no mutable state
+    /// associated with the Span).
+    ///
+    /// Calls to `end` a Span MUST not have any effects on child `Span`s as they may
+    /// still be running and can be ended later.
+    ///
+    /// This API MUST be non-blocking.
+    </span><span class="kw">fn </span>end(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.end_with_timestamp(<span class="kw">crate</span>::time::now());
     }
 
-    <span class="doccomment">/// Finishes the `Span` with given timestamp</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For more details, refer to [`Span::end`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Span::end`]: Span::end()</span>
-    <span class="kw">fn</span> <span class="ident">end_with_timestamp</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="ident">SystemTime</span>);
+    <span class="doccomment">/// Finishes the `Span` with given timestamp
+    ///
+    /// For more details, refer to [`Span::end`]
+    ///
+    /// [`Span::end`]: Span::end()
+    </span><span class="kw">fn </span>end_with_timestamp(<span class="kw-2">&amp;mut </span><span class="self">self</span>, timestamp: SystemTime);
 }
 
-<span class="doccomment">/// `SpanKind` describes the relationship between the Span, its parents,</span>
-<span class="doccomment">/// and its children in a `Trace`. `SpanKind` describes two independent</span>
-<span class="doccomment">/// properties that benefit tracing systems during analysis.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The first property described by `SpanKind` reflects whether the `Span`</span>
-<span class="doccomment">/// is a remote child or parent. `Span`s with a remote parent are</span>
-<span class="doccomment">/// interesting because they are sources of external load. `Span`s with a</span>
-<span class="doccomment">/// remote child are interesting because they reflect a non-local system</span>
-<span class="doccomment">/// dependency.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The second property described by `SpanKind` reflects whether a child</span>
-<span class="doccomment">/// `Span` represents a synchronous call.  When a child span is synchronous,</span>
-<span class="doccomment">/// the parent is expected to wait for it to complete under ordinary</span>
-<span class="doccomment">/// circumstances.  It can be useful for tracing systems to know this</span>
-<span class="doccomment">/// property, since synchronous `Span`s may contribute to the overall trace</span>
-<span class="doccomment">/// latency. Asynchronous scenarios can be remote or local.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// In order for `SpanKind` to be meaningful, callers should arrange that</span>
-<span class="doccomment">/// a single `Span` does not serve more than one purpose.  For example, a</span>
-<span class="doccomment">/// server-side span should not be used directly as the parent of another</span>
-<span class="doccomment">/// remote span.  As a simple guideline, instrumentation should create a</span>
-<span class="doccomment">/// new `Span` prior to extracting and serializing the span context for a</span>
-<span class="doccomment">/// remote call.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// To summarize the interpretation of these kinds:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// | `SpanKind` | Synchronous | Asynchronous | Remote Incoming | Remote Outgoing |</span>
-<span class="doccomment">/// |------------|-----|-----|-----|-----|</span>
-<span class="doccomment">/// | `Client`   | yes |     |     | yes |</span>
-<span class="doccomment">/// | `Server`   | yes |     | yes |     |</span>
-<span class="doccomment">/// | `Producer` |     | yes |     | yes |</span>
-<span class="doccomment">/// | `Consumer` |     | yes | yes |     |</span>
-<span class="doccomment">/// | `Internal` |     |     |     |     |</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SpanKind</span> {
-    <span class="doccomment">/// Indicates that the span describes a synchronous request to</span>
-    <span class="doccomment">/// some remote service.  This span is the parent of a remote `Server`</span>
-    <span class="doccomment">/// span and waits for its response.</span>
-    <span class="ident">Client</span>,
-    <span class="doccomment">/// Indicates that the span covers server-side handling of a</span>
-    <span class="doccomment">/// synchronous RPC or other remote request.  This span is the child of</span>
-    <span class="doccomment">/// a remote `Client` span that was expected to wait for a response.</span>
-    <span class="ident">Server</span>,
-    <span class="doccomment">/// Indicates that the span describes the parent of an</span>
-    <span class="doccomment">/// asynchronous request.  This parent span is expected to end before</span>
-    <span class="doccomment">/// the corresponding child `Consumer` span, possibly even before the</span>
-    <span class="doccomment">/// child span starts. In messaging scenarios with batching, tracing</span>
-    <span class="doccomment">/// individual messages requires a new `Producer` span per message to</span>
-    <span class="doccomment">/// be created.</span>
-    <span class="ident">Producer</span>,
-    <span class="doccomment">/// Indicates that the span describes the child of an</span>
-    <span class="doccomment">/// asynchronous `Producer` request.</span>
-    <span class="ident">Consumer</span>,
-    <span class="doccomment">/// Default value. Indicates that the span represents an</span>
-    <span class="doccomment">/// internal operation within an application, as opposed to an</span>
-    <span class="doccomment">/// operations with remote parents or children.</span>
-    <span class="ident">Internal</span>,
+<span class="doccomment">/// `SpanKind` describes the relationship between the Span, its parents,
+/// and its children in a `Trace`. `SpanKind` describes two independent
+/// properties that benefit tracing systems during analysis.
+///
+/// The first property described by `SpanKind` reflects whether the `Span`
+/// is a remote child or parent. `Span`s with a remote parent are
+/// interesting because they are sources of external load. `Span`s with a
+/// remote child are interesting because they reflect a non-local system
+/// dependency.
+///
+/// The second property described by `SpanKind` reflects whether a child
+/// `Span` represents a synchronous call.  When a child span is synchronous,
+/// the parent is expected to wait for it to complete under ordinary
+/// circumstances.  It can be useful for tracing systems to know this
+/// property, since synchronous `Span`s may contribute to the overall trace
+/// latency. Asynchronous scenarios can be remote or local.
+///
+/// In order for `SpanKind` to be meaningful, callers should arrange that
+/// a single `Span` does not serve more than one purpose.  For example, a
+/// server-side span should not be used directly as the parent of another
+/// remote span.  As a simple guideline, instrumentation should create a
+/// new `Span` prior to extracting and serializing the span context for a
+/// remote call.
+///
+/// To summarize the interpretation of these kinds:
+///
+/// | `SpanKind` | Synchronous | Asynchronous | Remote Incoming | Remote Outgoing |
+/// |------------|-----|-----|-----|-----|
+/// | `Client`   | yes |     |     | yes |
+/// | `Server`   | yes |     | yes |     |
+/// | `Producer` |     | yes |     | yes |
+/// | `Consumer` |     | yes | yes |     |
+/// | `Internal` |     |     |     |     |
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serialize&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Clone, Debug, PartialEq)]
+</span><span class="kw">pub enum </span>SpanKind {
+    <span class="doccomment">/// Indicates that the span describes a synchronous request to
+    /// some remote service.  This span is the parent of a remote `Server`
+    /// span and waits for its response.
+    </span>Client,
+    <span class="doccomment">/// Indicates that the span covers server-side handling of a
+    /// synchronous RPC or other remote request.  This span is the child of
+    /// a remote `Client` span that was expected to wait for a response.
+    </span>Server,
+    <span class="doccomment">/// Indicates that the span describes the parent of an
+    /// asynchronous request.  This parent span is expected to end before
+    /// the corresponding child `Consumer` span, possibly even before the
+    /// child span starts. In messaging scenarios with batching, tracing
+    /// individual messages requires a new `Producer` span per message to
+    /// be created.
+    </span>Producer,
+    <span class="doccomment">/// Indicates that the span describes the child of an
+    /// asynchronous `Producer` request.
+    </span>Consumer,
+    <span class="doccomment">/// Default value. Indicates that the span represents an
+    /// internal operation within an application, as opposed to an
+    /// operations with remote parents or children.
+    </span>Internal,
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">SpanKind</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">SpanKind::Client</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;client&quot;</span>),
-            <span class="ident">SpanKind::Server</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;server&quot;</span>),
-            <span class="ident">SpanKind::Producer</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;producer&quot;</span>),
-            <span class="ident">SpanKind::Consumer</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;consumer&quot;</span>),
-            <span class="ident">SpanKind::Internal</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;internal&quot;</span>),
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>SpanKind {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            SpanKind::Client =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;client&quot;</span>),
+            SpanKind::Server =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;server&quot;</span>),
+            SpanKind::Producer =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;producer&quot;</span>),
+            SpanKind::Consumer =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;consumer&quot;</span>),
+            SpanKind::Internal =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;internal&quot;</span>),
         }
     }
 }
 
-<span class="doccomment">/// The `StatusCode` interface represents the status of a finished `Span`.</span>
-<span class="doccomment">/// It&#39;s composed of a canonical code in conjunction with an optional</span>
-<span class="doccomment">/// descriptive message.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">StatusCode</span> {
-    <span class="doccomment">/// The default status.</span>
-    <span class="ident">Unset</span>,
-    <span class="doccomment">/// OK is returned on success.</span>
-    <span class="prelude-val">Ok</span>,
-    <span class="doccomment">/// The operation contains an error.</span>
-    <span class="ident">Error</span>,
+<span class="doccomment">/// The `StatusCode` interface represents the status of a finished `Span`.
+/// It&#39;s composed of a canonical code in conjunction with an optional
+/// descriptive message.
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serialize&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Clone, Debug, PartialEq, Copy)]
+</span><span class="kw">pub enum </span>StatusCode {
+    <span class="doccomment">/// The default status.
+    </span>Unset,
+    <span class="doccomment">/// OK is returned on success.
+    </span><span class="prelude-val">Ok</span>,
+    <span class="doccomment">/// The operation contains an error.
+    </span>Error,
 }
 
-<span class="kw">impl</span> <span class="ident">StatusCode</span> {
-    <span class="doccomment">/// Return a static str that represent the status code</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">StatusCode::Unset</span> =&gt; <span class="string">&quot;&quot;</span>,
-            <span class="ident">StatusCode::Ok</span> =&gt; <span class="string">&quot;OK&quot;</span>,
-            <span class="ident">StatusCode::Error</span> =&gt; <span class="string">&quot;ERROR&quot;</span>,
+<span class="kw">impl </span>StatusCode {
+    <span class="doccomment">/// Return a static str that represent the status code
+    </span><span class="kw">pub fn </span>as_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="kw">match </span><span class="self">self </span>{
+            StatusCode::Unset =&gt; <span class="string">&quot;&quot;</span>,
+            StatusCode::Ok =&gt; <span class="string">&quot;OK&quot;</span>,
+            StatusCode::Error =&gt; <span class="string">&quot;ERROR&quot;</span>,
         }
     }
 
-    <span class="doccomment">/// Return the priority of the status code.</span>
-    <span class="doccomment">/// Status code with higher priority can override the lower priority one.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">priority</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i32</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">StatusCode::Unset</span> =&gt; <span class="number">0</span>,
-            <span class="ident">StatusCode::Error</span> =&gt; <span class="number">1</span>,
-            <span class="ident">StatusCode::Ok</span> =&gt; <span class="number">2</span>,
+    <span class="doccomment">/// Return the priority of the status code.
+    /// Status code with higher priority can override the lower priority one.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>priority(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32 {
+        <span class="kw">match </span><span class="self">self </span>{
+            StatusCode::Unset =&gt; <span class="number">0</span>,
+            StatusCode::Error =&gt; <span class="number">1</span>,
+            StatusCode::Ok =&gt; <span class="number">2</span>,
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

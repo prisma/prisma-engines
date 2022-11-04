@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/08831df/src/ast/insert.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>insert.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../quaint/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/08831df/src/ast/insert.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>insert.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../quaint/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -336,343 +336,343 @@
 <span id="336">336</span>
 <span id="337">337</span>
 <span id="338">338</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::<span class="kw-2">*</span>;
+<span class="kw">use </span>std::borrow::Cow;
 
-<span class="doccomment">/// A builder for an `INSERT` statement.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Insert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">table</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">values</span>: <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">on_conflict</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OnConflict</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">returning</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">comment</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A builder for an `INSERT` statement.
+</span><span class="attribute">#[derive(Clone, Debug, PartialEq)]
+</span><span class="kw">pub struct </span>Insert&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) table: <span class="prelude-ty">Option</span>&lt;Table&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) columns: Vec&lt;Column&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) values: Expression&lt;<span class="lifetime">&#39;a</span>&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) on_conflict: <span class="prelude-ty">Option</span>&lt;OnConflict&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) returning: <span class="prelude-ty">Option</span>&lt;Vec&lt;Column&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) comment: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
 }
 
-<span class="doccomment">/// A builder for an `INSERT` statement for a single row.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SingleRowInsert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">table</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">values</span>: <span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A builder for an `INSERT` statement for a single row.
+</span><span class="attribute">#[derive(Clone, Debug, PartialEq)]
+</span><span class="kw">pub struct </span>SingleRowInsert&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) table: <span class="prelude-ty">Option</span>&lt;Table&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) columns: Vec&lt;Column&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) values: Row&lt;<span class="lifetime">&#39;a</span>&gt;,
 }
 
-<span class="doccomment">/// A builder for an `INSERT` statement for multiple rows.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MultiRowInsert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">table</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A builder for an `INSERT` statement for multiple rows.
+</span><span class="attribute">#[derive(Clone, Debug, PartialEq)]
+</span><span class="kw">pub struct </span>MultiRowInsert&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) table: <span class="prelude-ty">Option</span>&lt;Table&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) columns: Vec&lt;Column&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) values: Vec&lt;Row&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 }
 
-<span class="doccomment">/// `INSERT` conflict resolution strategies.</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::large_enum_variant</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">OnConflict</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// When a row already exists, do nothing. Works with PostgreSQL, MySQL or</span>
-    <span class="doccomment">/// SQLite without schema information.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {</span>
-    <span class="doccomment">/// let query: Insert = Insert::single_into(&quot;users&quot;).into();</span>
-    <span class="doccomment">/// let (sql, _) = Sqlite::build(query.on_conflict(OnConflict::DoNothing))?;</span>
-    <span class="doccomment">/// assert_eq!(&quot;INSERT OR IGNORE INTO `users` DEFAULT VALUES&quot;, sql);</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// With Microsoft SQL server not supporting `IGNORE` in the `INSERT`</span>
-    <span class="doccomment">/// statement, the `INSERT` is converted to a `MERGE` statement. For it to work</span>
-    <span class="doccomment">/// in a correct way, the table should know all unique indices of the actual table.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// In this example our `users` table holds one unique index for the `id` column.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use quaint::{ast::*, visitor::{Visitor, Mssql}};</span>
-    <span class="doccomment">/// # use indoc::indoc;</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {</span>
-    <span class="doccomment">/// let id = Column::from(&quot;id&quot;).table(&quot;users&quot;);</span>
-    <span class="doccomment">/// let table = Table::from(&quot;users&quot;).add_unique_index(id.clone());</span>
-    <span class="doccomment">/// let query: Insert = Insert::single_into(table).value(id, 1).into();</span>
-    <span class="doccomment">/// let (sql, _) = Mssql::build(query.on_conflict(OnConflict::DoNothing))?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let expected_sql = indoc!(</span>
-    <span class="doccomment">///     &quot;</span>
-    <span class="doccomment">///     MERGE INTO [users]</span>
-    <span class="doccomment">///     USING (SELECT @P1 AS [id]) AS [dual] ([id])</span>
-    <span class="doccomment">///     ON [dual].[id] = [users].[id]</span>
-    <span class="doccomment">///     WHEN NOT MATCHED THEN</span>
-    <span class="doccomment">///     INSERT ([id]) VALUES ([dual].[id]);</span>
-    <span class="doccomment">/// &quot;</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(expected_sql.replace(&#39;\n&#39;, &quot; &quot;).trim(), sql);</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the `INSERT` statement misses a value for a unique column that does</span>
-    <span class="doccomment">/// not have default value set, the visitor will raise a panic. For compound</span>
-    <span class="doccomment">/// unique indices, the `add_unique_index` takes a vector as a parameter.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the [column has a default value], it should be added to the `Column`</span>
-    <span class="doccomment">/// definition to allow inserting missing unique values with the `Insert`</span>
-    <span class="doccomment">/// statement. If default is set to [`DefaultValue::Generated`], the value</span>
-    <span class="doccomment">/// is considered to be always unique and not added to the join.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`DefaultValue::Generated`]: enum.DefaultValue.html#variant.Generated</span>
-    <span class="doccomment">/// [column has a default value]: struct.Column.html#method.default</span>
-    <span class="ident">DoNothing</span>,
-    <span class="doccomment">/// ON CONFLICT UPDATE is supported for Sqlite and Postgres</span>
-    <span class="ident">Update</span>(<span class="ident">Update</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>),
+<span class="doccomment">/// `INSERT` conflict resolution strategies.
+</span><span class="attribute">#[allow(clippy::large_enum_variant)]
+#[derive(Clone, Debug, PartialEq)]
+</span><span class="kw">pub enum </span>OnConflict&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// When a row already exists, do nothing. Works with PostgreSQL, MySQL or
+    /// SQLite without schema information.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {
+    /// let query: Insert = Insert::single_into(&quot;users&quot;).into();
+    /// let (sql, _) = Sqlite::build(query.on_conflict(OnConflict::DoNothing))?;
+    /// assert_eq!(&quot;INSERT OR IGNORE INTO `users` DEFAULT VALUES&quot;, sql);
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// With Microsoft SQL server not supporting `IGNORE` in the `INSERT`
+    /// statement, the `INSERT` is converted to a `MERGE` statement. For it to work
+    /// in a correct way, the table should know all unique indices of the actual table.
+    ///
+    /// In this example our `users` table holds one unique index for the `id` column.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Mssql}};
+    /// # use indoc::indoc;
+    /// # fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {
+    /// let id = Column::from(&quot;id&quot;).table(&quot;users&quot;);
+    /// let table = Table::from(&quot;users&quot;).add_unique_index(id.clone());
+    /// let query: Insert = Insert::single_into(table).value(id, 1).into();
+    /// let (sql, _) = Mssql::build(query.on_conflict(OnConflict::DoNothing))?;
+    ///
+    /// let expected_sql = indoc!(
+    ///     &quot;
+    ///     MERGE INTO [users]
+    ///     USING (SELECT @P1 AS [id]) AS [dual] ([id])
+    ///     ON [dual].[id] = [users].[id]
+    ///     WHEN NOT MATCHED THEN
+    ///     INSERT ([id]) VALUES ([dual].[id]);
+    /// &quot;
+    /// );
+    ///
+    /// assert_eq!(expected_sql.replace(&#39;\n&#39;, &quot; &quot;).trim(), sql);
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// If the `INSERT` statement misses a value for a unique column that does
+    /// not have default value set, the visitor will raise a panic. For compound
+    /// unique indices, the `add_unique_index` takes a vector as a parameter.
+    ///
+    /// If the [column has a default value], it should be added to the `Column`
+    /// definition to allow inserting missing unique values with the `Insert`
+    /// statement. If default is set to [`DefaultValue::Generated`], the value
+    /// is considered to be always unique and not added to the join.
+    ///
+    /// [`DefaultValue::Generated`]: enum.DefaultValue.html#variant.Generated
+    /// [column has a default value]: struct.Column.html#method.default
+    </span>DoNothing,
+    <span class="doccomment">/// ON CONFLICT UPDATE is supported for Sqlite and Postgres
+    </span>Update(Update&lt;<span class="lifetime">&#39;a</span>&gt;, Vec&lt;Column&lt;<span class="lifetime">&#39;a</span>&gt;&gt;),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Insert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">insert</span>: <span class="ident">Insert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Query::Insert</span>(<span class="ident">Box::new</span>(<span class="ident">insert</span>))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;Insert&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>Query&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>from(insert: Insert&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="self">Self </span>{
+        Query::Insert(Box::new(insert))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SingleRowInsert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Insert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">insert</span>: <span class="ident">SingleRowInsert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">values</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">insert</span>.<span class="ident">values</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">Expression::from</span>(<span class="ident">Row::new</span>())
-        } <span class="kw">else</span> {
-            <span class="ident">Expression::from</span>(<span class="ident">insert</span>.<span class="ident">values</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;SingleRowInsert&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>Insert&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>from(insert: SingleRowInsert&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>values = <span class="kw">if </span>insert.values.is_empty() {
+            Expression::from(Row::new())
+        } <span class="kw">else </span>{
+            Expression::from(insert.values)
         };
 
-        <span class="ident">Insert</span> {
-            <span class="ident">table</span>: <span class="ident">insert</span>.<span class="ident">table</span>,
-            <span class="ident">columns</span>: <span class="ident">insert</span>.<span class="ident">columns</span>,
-            <span class="ident">values</span>,
-            <span class="ident">on_conflict</span>: <span class="prelude-val">None</span>,
-            <span class="ident">returning</span>: <span class="prelude-val">None</span>,
-            <span class="ident">comment</span>: <span class="prelude-val">None</span>,
+        Insert {
+            table: insert.table,
+            columns: insert.columns,
+            values,
+            on_conflict: <span class="prelude-val">None</span>,
+            returning: <span class="prelude-val">None</span>,
+            comment: <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">MultiRowInsert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Insert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">insert</span>: <span class="ident">MultiRowInsert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">values</span> <span class="op">=</span> <span class="ident">Expression::from</span>(<span class="ident">Values::new</span>(<span class="ident">insert</span>.<span class="ident">values</span>));
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;MultiRowInsert&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>Insert&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>from(insert: MultiRowInsert&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>values = Expression::from(Values::new(insert.values));
 
-        <span class="ident">Insert</span> {
-            <span class="ident">table</span>: <span class="ident">insert</span>.<span class="ident">table</span>,
-            <span class="ident">columns</span>: <span class="ident">insert</span>.<span class="ident">columns</span>,
-            <span class="ident">values</span>,
-            <span class="ident">on_conflict</span>: <span class="prelude-val">None</span>,
-            <span class="ident">returning</span>: <span class="prelude-val">None</span>,
-            <span class="ident">comment</span>: <span class="prelude-val">None</span>,
+        Insert {
+            table: insert.table,
+            columns: insert.columns,
+            values,
+            on_conflict: <span class="prelude-val">None</span>,
+            returning: <span class="prelude-val">None</span>,
+            comment: <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">SingleRowInsert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">insert</span>: <span class="ident">SingleRowInsert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">Query::from</span>(<span class="ident">Insert::from</span>(<span class="ident">insert</span>))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;SingleRowInsert&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>Query&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>from(insert: SingleRowInsert&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; Query&lt;<span class="lifetime">&#39;a</span>&gt; {
+        Query::from(Insert::from(insert))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">MultiRowInsert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">insert</span>: <span class="ident">MultiRowInsert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">Query::from</span>(<span class="ident">Insert::from</span>(<span class="ident">insert</span>))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;MultiRowInsert&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>Query&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>from(insert: MultiRowInsert&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; Query&lt;<span class="lifetime">&#39;a</span>&gt; {
+        Query::from(Insert::from(insert))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Insert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Creates a new single row `INSERT` statement for the given table.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {</span>
-    <span class="doccomment">/// let query = Insert::single_into(&quot;users&quot;);</span>
-    <span class="doccomment">/// let (sql, _) = Sqlite::build(query)?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(&quot;INSERT INTO `users` DEFAULT VALUES&quot;, sql);</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">single_into</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">table</span>: <span class="ident">T</span>) -&gt; <span class="ident">SingleRowInsert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Insert&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Creates a new single row `INSERT` statement for the given table.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {
+    /// let query = Insert::single_into(&quot;users&quot;);
+    /// let (sql, _) = Sqlite::build(query)?;
+    ///
+    /// assert_eq!(&quot;INSERT INTO `users` DEFAULT VALUES&quot;, sql);
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>single_into&lt;T&gt;(table: T) -&gt; SingleRowInsert&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span>T: Into&lt;Table&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="ident">SingleRowInsert</span> {
-            <span class="ident">table</span>: <span class="prelude-val">Some</span>(<span class="ident">table</span>.<span class="ident">into</span>()),
-            <span class="ident">columns</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">values</span>: <span class="ident">Row::new</span>(),
+        SingleRowInsert {
+            table: <span class="prelude-val">Some</span>(table.into()),
+            columns: Vec::new(),
+            values: Row::new(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">single</span>() -&gt; <span class="ident">SingleRowInsert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">SingleRowInsert</span> {
-            <span class="ident">table</span>: <span class="prelude-val">None</span>,
-            <span class="ident">columns</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">values</span>: <span class="ident">Row::new</span>(),
+    <span class="kw">pub fn </span>single() -&gt; SingleRowInsert&lt;<span class="lifetime">&#39;a</span>&gt; {
+        SingleRowInsert {
+            table: <span class="prelude-val">None</span>,
+            columns: Vec::new(),
+            values: Row::new(),
         }
     }
 
-    <span class="doccomment">/// Creates a new multi row `INSERT` statement for the given table.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">multi_into</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">K</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">table</span>: <span class="ident">T</span>, <span class="ident">columns</span>: <span class="ident">I</span>) -&gt; <span class="ident">MultiRowInsert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">K</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">K</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Creates a new multi row `INSERT` statement for the given table.
+    </span><span class="kw">pub fn </span>multi_into&lt;T, K, I&gt;(table: T, columns: I) -&gt; MultiRowInsert&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span>T: Into&lt;Table&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+        K: Into&lt;Column&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+        I: IntoIterator&lt;Item = K&gt;,
     {
-        <span class="ident">MultiRowInsert</span> {
-            <span class="ident">table</span>: <span class="prelude-val">Some</span>(<span class="ident">table</span>.<span class="ident">into</span>()),
-            <span class="ident">columns</span>: <span class="ident">columns</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">into</span>()).<span class="ident">collect</span>(),
-            <span class="ident">values</span>: <span class="ident">Vec::new</span>(),
+        MultiRowInsert {
+            table: <span class="prelude-val">Some</span>(table.into()),
+            columns: columns.into_iter().map(|c| c.into()).collect(),
+            values: Vec::new(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">multi</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">columns</span>: <span class="ident">I</span>) -&gt; <span class="ident">MultiRowInsert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">K</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">K</span><span class="op">&gt;</span>,
+    <span class="kw">pub fn </span>multi&lt;K, I&gt;(columns: I) -&gt; MultiRowInsert&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span>K: Into&lt;Column&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+        I: IntoIterator&lt;Item = K&gt;,
     {
-        <span class="ident">MultiRowInsert</span> {
-            <span class="ident">table</span>: <span class="prelude-val">None</span>,
-            <span class="ident">columns</span>: <span class="ident">columns</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">into</span>()).<span class="ident">collect</span>(),
-            <span class="ident">values</span>: <span class="ident">Vec::new</span>(),
+        MultiRowInsert {
+            table: <span class="prelude-val">None</span>,
+            columns: columns.into_iter().map(|c| c.into()).collect(),
+            values: Vec::new(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expression_into</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">I</span>, <span class="ident">K</span>, <span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">table</span>: <span class="ident">T</span>, <span class="ident">columns</span>: <span class="ident">I</span>, <span class="ident">expression</span>: <span class="ident">E</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">K</span><span class="op">&gt;</span>,
-        <span class="ident">K</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub fn </span>expression_into&lt;T, I, K, E&gt;(table: T, columns: I, expression: E) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>T: Into&lt;Table&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+        I: IntoIterator&lt;Item = K&gt;,
+        K: Into&lt;Column&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+        E: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="ident">Insert</span> {
-            <span class="ident">table</span>: <span class="prelude-val">Some</span>(<span class="ident">table</span>.<span class="ident">into</span>()),
-            <span class="ident">columns</span>: <span class="ident">columns</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">into</span>()).<span class="ident">collect</span>(),
-            <span class="ident">values</span>: <span class="ident">expression</span>.<span class="ident">into</span>(),
-            <span class="ident">on_conflict</span>: <span class="prelude-val">None</span>,
-            <span class="ident">returning</span>: <span class="prelude-val">None</span>,
-            <span class="ident">comment</span>: <span class="prelude-val">None</span>,
+        Insert {
+            table: <span class="prelude-val">Some</span>(table.into()),
+            columns: columns.into_iter().map(|c| c.into()).collect(),
+            values: expression.into(),
+            on_conflict: <span class="prelude-val">None</span>,
+            returning: <span class="prelude-val">None</span>,
+            comment: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Sets the conflict resolution strategy.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_conflict</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">on_conflict</span>: <span class="ident">OnConflict</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">on_conflict</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">on_conflict</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the conflict resolution strategy.
+    </span><span class="kw">pub fn </span>on_conflict(<span class="kw-2">mut </span><span class="self">self</span>, on_conflict: OnConflict&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.on_conflict = <span class="prelude-val">Some</span>(on_conflict);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Adds a comment to the insert.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {</span>
-    <span class="doccomment">/// let query = Insert::single_into(&quot;users&quot;);</span>
-    <span class="doccomment">/// let insert = Insert::from(query).comment(&quot;trace_id=&#39;5bd66ef5095369c7b0d1f8f4bd33716a&#39;, parent_id=&#39;c532cb4098ac3dd2&#39;&quot;);</span>
-    <span class="doccomment">/// let (sql, _) = Sqlite::build(insert)?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(&quot;INSERT INTO `users` DEFAULT VALUES; /* trace_id=&#39;5bd66ef5095369c7b0d1f8f4bd33716a&#39;, parent_id=&#39;c532cb4098ac3dd2&#39; */&quot;, sql);</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">comment</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">comment</span>: <span class="ident">C</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">comment</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">comment</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Adds a comment to the insert.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {
+    /// let query = Insert::single_into(&quot;users&quot;);
+    /// let insert = Insert::from(query).comment(&quot;trace_id=&#39;5bd66ef5095369c7b0d1f8f4bd33716a&#39;, parent_id=&#39;c532cb4098ac3dd2&#39;&quot;);
+    /// let (sql, _) = Sqlite::build(insert)?;
+    ///
+    /// assert_eq!(&quot;INSERT INTO `users` DEFAULT VALUES; /* trace_id=&#39;5bd66ef5095369c7b0d1f8f4bd33716a&#39;, parent_id=&#39;c532cb4098ac3dd2&#39; */&quot;, sql);
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>comment&lt;C: Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, comment: C) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.comment = <span class="prelude-val">Some</span>(comment.into());
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the returned columns.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use quaint::{ast::*, visitor::{Visitor, Postgres}};</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {</span>
-    <span class="doccomment">/// let query = Insert::single_into(&quot;users&quot;);</span>
-    <span class="doccomment">/// let insert = Insert::from(query).returning(vec![&quot;id&quot;]);</span>
-    <span class="doccomment">/// let (sql, _) = Postgres::build(insert)?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(&quot;INSERT INTO \&quot;users\&quot; DEFAULT VALUES RETURNING \&quot;id\&quot;&quot;, sql);</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mssql&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sqlite&quot;</span>))]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(
-        <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>,
-        <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;postgresql&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mssql&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sqlite&quot;</span>)))
-    )]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">returning</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">columns</span>: <span class="ident">I</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">K</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">K</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Sets the returned columns.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Postgres}};
+    /// # fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {
+    /// let query = Insert::single_into(&quot;users&quot;);
+    /// let insert = Insert::from(query).returning(vec![&quot;id&quot;]);
+    /// let (sql, _) = Postgres::build(insert)?;
+    ///
+    /// assert_eq!(&quot;INSERT INTO \&quot;users\&quot; DEFAULT VALUES RETURNING \&quot;id\&quot;&quot;, sql);
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="attribute">#[cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mssql&quot;</span>, feature = <span class="string">&quot;sqlite&quot;</span>))]
+    #[cfg_attr(
+        feature = <span class="string">&quot;docs&quot;</span>,
+        doc(cfg(any(feature = <span class="string">&quot;postgresql&quot;</span>, feature = <span class="string">&quot;mssql&quot;</span>, feature = <span class="string">&quot;sqlite&quot;</span>)))
+    )]
+    </span><span class="kw">pub fn </span>returning&lt;K, I&gt;(<span class="kw-2">mut </span><span class="self">self</span>, columns: I) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>K: Into&lt;Column&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+        I: IntoIterator&lt;Item = K&gt;,
     {
-        <span class="self">self</span>.<span class="ident">returning</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">columns</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">k</span><span class="op">|</span> <span class="ident">k</span>.<span class="ident">into</span>()).<span class="ident">collect</span>());
-        <span class="self">self</span>
+        <span class="self">self</span>.returning = <span class="prelude-val">Some</span>(columns.into_iter().map(|k| k.into()).collect());
+        <span class="self">self
+    </span>}
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; SingleRowInsert&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Adds a new value to the `INSERT` statement
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {
+    /// let query = Insert::single_into(&quot;users&quot;).value(&quot;foo&quot;, 10);
+    /// let (sql, params) = Sqlite::build(query)?;
+    ///
+    /// assert_eq!(&quot;INSERT INTO `users` (`foo`) VALUES (?)&quot;, sql);
+    /// assert_eq!(vec![Value::from(10)], params);
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>value&lt;K, V&gt;(<span class="kw-2">mut </span><span class="self">self</span>, key: K, val: V) -&gt; SingleRowInsert&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span>K: Into&lt;Column&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+        V: Into&lt;Expression&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    {
+        <span class="self">self</span>.columns.push(key.into());
+        <span class="self">self</span>.values.push(val.into());
+
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Convert into a common `Insert` statement.
+    </span><span class="kw">pub fn </span>build(<span class="self">self</span>) -&gt; Insert&lt;<span class="lifetime">&#39;a</span>&gt; {
+        Insert::from(<span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">SingleRowInsert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Adds a new value to the `INSERT` statement</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {</span>
-    <span class="doccomment">/// let query = Insert::single_into(&quot;users&quot;).value(&quot;foo&quot;, 10);</span>
-    <span class="doccomment">/// let (sql, params) = Sqlite::build(query)?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(&quot;INSERT INTO `users` (`foo`) VALUES (?)&quot;, sql);</span>
-    <span class="doccomment">/// assert_eq!(vec![Value::from(10)], params);</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>, <span class="ident">val</span>: <span class="ident">V</span>) -&gt; <span class="ident">SingleRowInsert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">K</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">V</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; MultiRowInsert&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Adds a new row to be inserted.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {
+    /// let query = Insert::multi_into(&quot;users&quot;, vec![&quot;foo&quot;])
+    ///     .values(vec![1])
+    ///     .values(vec![2]);
+    ///
+    /// let (sql, params) = Sqlite::build(query)?;
+    ///
+    /// assert_eq!(&quot;INSERT INTO `users` (`foo`) VALUES (?), (?)&quot;, sql);
+    ///
+    /// assert_eq!(
+    ///     vec![
+    ///         Value::from(1),
+    ///         Value::from(2),
+    ///     ], params);
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>values&lt;V&gt;(<span class="kw-2">mut </span><span class="self">self</span>, values: V) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>V: Into&lt;Row&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="self">self</span>.<span class="ident">columns</span>.<span class="ident">push</span>(<span class="ident">key</span>.<span class="ident">into</span>());
-        <span class="self">self</span>.<span class="ident">values</span>.<span class="ident">push</span>(<span class="ident">val</span>.<span class="ident">into</span>());
+        <span class="self">self</span>.values.push(values.into());
+        <span class="self">self
+    </span>}
 
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Convert into a common `Insert` statement.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>) -&gt; <span class="ident">Insert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">Insert::from</span>(<span class="self">self</span>)
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">MultiRowInsert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Adds a new row to be inserted.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {</span>
-    <span class="doccomment">/// let query = Insert::multi_into(&quot;users&quot;, vec![&quot;foo&quot;])</span>
-    <span class="doccomment">///     .values(vec![1])</span>
-    <span class="doccomment">///     .values(vec![2]);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let (sql, params) = Sqlite::build(query)?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(&quot;INSERT INTO `users` (`foo`) VALUES (?), (?)&quot;, sql);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     vec![</span>
-    <span class="doccomment">///         Value::from(1),</span>
-    <span class="doccomment">///         Value::from(2),</span>
-    <span class="doccomment">///     ], params);</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">values</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">values</span>: <span class="ident">V</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">V</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    {
-        <span class="self">self</span>.<span class="ident">values</span>.<span class="ident">push</span>(<span class="ident">values</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
-
-    <span class="doccomment">/// Convert into a common `Insert` statement.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>) -&gt; <span class="ident">Insert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">Insert::from</span>(<span class="self">self</span>)
+    <span class="doccomment">/// Convert into a common `Insert` statement.
+    </span><span class="kw">pub fn </span>build(<span class="self">self</span>) -&gt; Insert&lt;<span class="lifetime">&#39;a</span>&gt; {
+        Insert::from(<span class="self">self</span>)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="quaint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="quaint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

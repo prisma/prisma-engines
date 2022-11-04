@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/binlog/jsonb.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>jsonb.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mysql_common/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/binlog/jsonb.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>jsonb.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mysql_common/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -797,804 +797,804 @@
 <span id="797">797</span>
 <span id="798">798</span>
 <span id="799">799</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2021 Anatoly Ikorsky</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2021 Anatoly Ikorsky
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="doccomment">//! MySql internal binary JSON representation.</span>
+</span><span class="doccomment">//! MySql internal binary JSON representation.
 
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">borrow::Cow</span>,
-    <span class="ident">convert</span>::{<span class="ident">TryFrom</span>, <span class="ident">TryInto</span>},
-    <span class="ident">fmt</span>, <span class="ident">io</span>,
-    <span class="ident">marker::PhantomData</span>,
-    <span class="ident">str</span>::{<span class="ident">from_utf8</span>, <span class="ident">Utf8Error</span>},
+</span><span class="kw">use </span>std::{
+    borrow::Cow,
+    convert::{TryFrom, TryInto},
+    fmt, io,
+    marker::PhantomData,
+    str::{from_utf8, Utf8Error},
 };
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">constants::ColumnType</span>,
-    <span class="ident">io::ParseBuf</span>,
-    <span class="ident">misc</span>::{
-        <span class="ident">raw</span>::{<span class="ident">bytes::BareU16Bytes</span>, <span class="ident">int</span>::<span class="kw-2">*</span>, <span class="ident">Const</span>, <span class="ident">RawBytes</span>},
-        <span class="ident">unexpected_buf_eof</span>,
+<span class="kw">use crate</span>::{
+    constants::ColumnType,
+    io::ParseBuf,
+    misc::{
+        raw::{bytes::BareU16Bytes, int::<span class="kw-2">*</span>, Const, RawBytes},
+        unexpected_buf_eof,
     },
-    <span class="ident">proto</span>::{<span class="ident">MyDeserialize</span>, <span class="ident">MySerialize</span>},
+    proto::{MyDeserialize, MySerialize},
 };
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Value::Null</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;null&quot;</span>),
-            <span class="ident">Value::Bool</span>(<span class="ident">x</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">x</span>),
-            <span class="ident">Value::I16</span>(<span class="ident">x</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">x</span>),
-            <span class="ident">Value::U16</span>(<span class="ident">x</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">x</span>),
-            <span class="ident">Value::I32</span>(<span class="ident">x</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">x</span>),
-            <span class="ident">Value::U32</span>(<span class="ident">x</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">x</span>),
-            <span class="ident">Value::I64</span>(<span class="ident">x</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">x</span>),
-            <span class="ident">Value::U64</span>(<span class="ident">x</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">x</span>),
-            <span class="ident">Value::F64</span>(<span class="ident">x</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">x</span>),
-            <span class="ident">Value::String</span>(<span class="ident">x</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{:?}&quot;</span>, <span class="ident">x</span>),
-            <span class="ident">Value::SmallArray</span>(<span class="ident">a</span>) =&gt; <span class="ident">f</span>.<span class="ident">debug_list</span>().<span class="ident">entries</span>(<span class="ident">a</span>.<span class="ident">iter</span>()).<span class="ident">finish</span>(),
-            <span class="ident">Value::LargeArray</span>(<span class="ident">a</span>) =&gt; <span class="ident">f</span>.<span class="ident">debug_list</span>().<span class="ident">entries</span>(<span class="ident">a</span>.<span class="ident">iter</span>()).<span class="ident">finish</span>(),
-            <span class="ident">Value::SmallObject</span>(<span class="ident">o</span>) =&gt; <span class="ident">f</span>
-                .<span class="ident">debug_map</span>()
-                .<span class="ident">entries</span>(<span class="ident">o</span>.<span class="ident">iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">ok</span>()))
-                .<span class="ident">finish</span>(),
-            <span class="ident">Value::LargeObject</span>(<span class="ident">o</span>) =&gt; <span class="ident">f</span>
-                .<span class="ident">debug_map</span>()
-                .<span class="ident">entries</span>(<span class="ident">o</span>.<span class="ident">iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">ok</span>()))
-                .<span class="ident">finish</span>(),
-            <span class="ident">Value::Opaque</span>(<span class="ident">x</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;&lt;{:?}&gt;&quot;</span>, <span class="ident">x</span>),
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Value&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            Value::Null =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;null&quot;</span>),
+            Value::Bool(x) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, x),
+            Value::I16(x) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, x),
+            Value::U16(x) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, x),
+            Value::I32(x) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, x),
+            Value::U32(x) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, x),
+            Value::I64(x) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, x),
+            Value::U64(x) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, x),
+            Value::F64(x) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, x),
+            Value::String(x) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{:?}&quot;</span>, x),
+            Value::SmallArray(a) =&gt; f.debug_list().entries(a.iter()).finish(),
+            Value::LargeArray(a) =&gt; f.debug_list().entries(a.iter()).finish(),
+            Value::SmallObject(o) =&gt; f
+                .debug_map()
+                .entries(o.iter().filter_map(|x| x.ok()))
+                .finish(),
+            Value::LargeObject(o) =&gt; f
+                .debug_map()
+                .entries(o.iter().filter_map(|x| x.ok()))
+                .finish(),
+            Value::Opaque(x) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;&lt;{:?}&gt;&quot;</span>, x),
         }
     }
 }
 
-<span class="doccomment">/// An iterator over keys of an object.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ArrayIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">cur</span>: <span class="ident">u32</span>,
-    <span class="ident">arr</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ComplexValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">Array</span><span class="op">&gt;</span>,
+<span class="doccomment">/// An iterator over keys of an object.
+</span><span class="attribute">#[derive(Copy, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>ArrayIter&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+    cur: u32,
+    arr: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ComplexValue&lt;<span class="lifetime">&#39;a</span>, T, Array&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">StorageFormat</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">ArrayIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: StorageFormat&gt; Iterator <span class="kw">for </span>ArrayIter&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+    <span class="kw">type </span>Item = io::Result&lt;Value&lt;<span class="lifetime">&#39;a</span>&gt;&gt;;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">arr</span>.<span class="ident">elem_at</span>(<span class="self">self</span>.<span class="ident">cur</span>).<span class="ident">transpose</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">x</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">cur</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="prelude-val">Some</span>(<span class="ident">x</span>)
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">match </span><span class="self">self</span>.arr.elem_at(<span class="self">self</span>.cur).transpose() {
+            <span class="prelude-val">Some</span>(x) =&gt; {
+                <span class="self">self</span>.cur += <span class="number">1</span>;
+                <span class="prelude-val">Some</span>(x)
             }
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="doccomment">/// A key of a JSONB object.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ObjectKey</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">RawBytes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">BareU16Bytes</span><span class="op">&gt;</span>);
+<span class="doccomment">/// A key of a JSONB object.
+</span><span class="attribute">#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+#[repr(transparent)]
+</span><span class="kw">pub struct </span>ObjectKey&lt;<span class="lifetime">&#39;a</span>&gt;(RawBytes&lt;<span class="lifetime">&#39;a</span>, BareU16Bytes&gt;);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ObjectKey</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">RawBytes::new</span>(<span class="ident">key</span>))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ObjectKey&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub fn </span>new(key: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(RawBytes::new(key))
     }
 
-    <span class="doccomment">/// Returns the raw value of a key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value_raw</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_bytes</span>()
+    <span class="doccomment">/// Returns the raw value of a key.
+    </span><span class="kw">pub fn </span>value_raw(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
+        <span class="self">self</span>.<span class="number">0</span>.as_bytes()
     }
 
-    <span class="doccomment">/// Returns the value of a key as a string (lossy converted).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_str</span>()
-    }
-}
-
-<span class="doccomment">/// A key of a JSONB object.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">JsonbString</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">RawBytes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">VarLen</span><span class="op">&gt;</span>);
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">JsonbString</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">string</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">RawBytes::new</span>(<span class="ident">string</span>))
-    }
-
-    <span class="doccomment">/// Returns the raw string value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">str_raw</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_bytes</span>()
-    }
-
-    <span class="doccomment">/// Returns the string value as UTF-8 string (lossy converted).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">str</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_str</span>()
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) -&gt; <span class="ident">JsonbString</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-        <span class="ident">JsonbString</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">into_owned</span>())
+    <span class="doccomment">/// Returns the value of a key as a string (lossy converted).
+    </span><span class="kw">pub fn </span>value(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;a</span>, str&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.as_str()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">JsonbString</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">str</span>())
+<span class="doccomment">/// A key of a JSONB object.
+</span><span class="attribute">#[derive(Clone, Eq, PartialEq, Hash)]
+#[repr(transparent)]
+</span><span class="kw">pub struct </span>JsonbString&lt;<span class="lifetime">&#39;a</span>&gt;(RawBytes&lt;<span class="lifetime">&#39;a</span>, VarLen&gt;);
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; JsonbString&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub fn </span>new(string: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(RawBytes::new(string))
+    }
+
+    <span class="doccomment">/// Returns the raw string value.
+    </span><span class="kw">pub fn </span>str_raw(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
+        <span class="self">self</span>.<span class="number">0</span>.as_bytes()
+    }
+
+    <span class="doccomment">/// Returns the string value as UTF-8 string (lossy converted).
+    </span><span class="kw">pub fn </span>str(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;a</span>, str&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.as_str()
+    }
+
+    <span class="kw">pub fn </span>into_owned(<span class="self">self</span>) -&gt; JsonbString&lt;<span class="lifetime">&#39;static</span>&gt; {
+        JsonbString(<span class="self">self</span>.<span class="number">0</span>.into_owned())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">MyDeserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">JsonbString</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> {
-    <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-    <span class="kw">type</span> <span class="ident">Ctx</span> <span class="op">=</span> ();
-
-    <span class="kw">fn</span> <span class="ident">deserialize</span>((): <span class="ident"><span class="self">Self</span>::Ctx</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(<span class="ident">buf</span>.<span class="ident">parse</span>(())<span class="question-mark">?</span>))
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>JsonbString&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.str())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">MySerialize</span> <span class="kw">for</span> <span class="ident">JsonbString</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">serialize</span>(<span class="ident">buf</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; MyDeserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>JsonbString&lt;<span class="lifetime">&#39;de</span>&gt; {
+    <span class="kw">const </span>SIZE: <span class="prelude-ty">Option</span>&lt;usize&gt; = <span class="prelude-val">None</span>;
+    <span class="kw">type </span>Ctx = ();
+
+    <span class="kw">fn </span>deserialize((): <span class="self">Self</span>::Ctx, buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;de</span>&gt;) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(buf.parse(())<span class="question-mark">?</span>))
     }
 }
 
-<span class="doccomment">/// An iterator over entries of an object.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ObjectIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">cur</span>: <span class="ident">u32</span>,
-    <span class="ident">obj</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ComplexValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">Object</span><span class="op">&gt;</span>,
+<span class="kw">impl </span>MySerialize <span class="kw">for </span>JsonbString&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>serialize(<span class="kw-2">&amp;</span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+        <span class="self">self</span>.<span class="number">0</span>.serialize(buf);
+    }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">StorageFormat</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">ObjectIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">io::Result</span><span class="op">&lt;</span>(<span class="ident">ObjectKey</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>)<span class="op">&gt;</span>;
+<span class="doccomment">/// An iterator over entries of an object.
+</span><span class="attribute">#[derive(Copy, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>ObjectIter&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+    cur: u32,
+    obj: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ComplexValue&lt;<span class="lifetime">&#39;a</span>, T, Object&gt;,
+}
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">obj</span>.<span class="ident">key_at</span>(<span class="self">self</span>.<span class="ident">cur</span>).<span class="ident">transpose</span>();
-        <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">obj</span>.<span class="ident">elem_at</span>(<span class="self">self</span>.<span class="ident">cur</span>).<span class="ident">transpose</span>();
-        <span class="kw">match</span> <span class="ident">key</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">key</span>) =&gt; <span class="kw">match</span> <span class="ident">val</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">val</span>) =&gt; {
-                    <span class="self">self</span>.<span class="ident">cur</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                    <span class="prelude-val">Some</span>(<span class="ident">key</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">key</span><span class="op">|</span> <span class="ident">val</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> (<span class="ident">key</span>, <span class="ident">val</span>))))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: StorageFormat&gt; Iterator <span class="kw">for </span>ObjectIter&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+    <span class="kw">type </span>Item = io::Result&lt;(ObjectKey&lt;<span class="lifetime">&#39;a</span>&gt;, Value&lt;<span class="lifetime">&#39;a</span>&gt;)&gt;;
+
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">let </span>key = <span class="self">self</span>.obj.key_at(<span class="self">self</span>.cur).transpose();
+        <span class="kw">let </span>val = <span class="self">self</span>.obj.elem_at(<span class="self">self</span>.cur).transpose();
+        <span class="kw">match </span>key {
+            <span class="prelude-val">Some</span>(key) =&gt; <span class="kw">match </span>val {
+                <span class="prelude-val">Some</span>(val) =&gt; {
+                    <span class="self">self</span>.cur += <span class="number">1</span>;
+                    <span class="prelude-val">Some</span>(key.and_then(|key| val.map(|val| (key, val))))
                 }
-                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+                <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
             },
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="doccomment">/// An iterator over keys of an object.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ObjectKeys</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">cur</span>: <span class="ident">u32</span>,
-    <span class="ident">obj</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ComplexValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">Object</span><span class="op">&gt;</span>,
+<span class="doccomment">/// An iterator over keys of an object.
+</span><span class="attribute">#[derive(Copy, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>ObjectKeys&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+    cur: u32,
+    obj: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ComplexValue&lt;<span class="lifetime">&#39;a</span>, T, Object&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">StorageFormat</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">ObjectKeys</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">ObjectKey</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: StorageFormat&gt; Iterator <span class="kw">for </span>ObjectKeys&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+    <span class="kw">type </span>Item = io::Result&lt;ObjectKey&lt;<span class="lifetime">&#39;a</span>&gt;&gt;;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">obj</span>.<span class="ident">key_at</span>(<span class="self">self</span>.<span class="ident">cur</span>).<span class="ident">transpose</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">x</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">cur</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="prelude-val">Some</span>(<span class="ident">x</span>)
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">match </span><span class="self">self</span>.obj.key_at(<span class="self">self</span>.cur).transpose() {
+            <span class="prelude-val">Some</span>(x) =&gt; {
+                <span class="self">self</span>.cur += <span class="number">1</span>;
+                <span class="prelude-val">Some</span>(x)
             }
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="doccomment">/// JSONB array or object.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ComplexValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> {
-    <span class="ident">element_count</span>: <span class="ident">u32</span>,
-    <span class="ident">data</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span>,
-    <span class="ident">__phantom</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span>(<span class="ident">T</span>, <span class="ident">U</span>)<span class="op">&gt;</span>,
+<span class="doccomment">/// JSONB array or object.
+</span><span class="attribute">#[derive(Clone, PartialEq)]
+</span><span class="kw">pub struct </span>ComplexValue&lt;<span class="lifetime">&#39;a</span>, T, U&gt; {
+    element_count: u32,
+    data: Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;,
+    __phantom: PhantomData&lt;(T, U)&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> <span class="ident">ComplexValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns a `&#39;static` version of `self`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) -&gt; <span class="ident">ComplexValue</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> {
-        <span class="ident">ComplexValue</span> {
-            <span class="ident">element_count</span>: <span class="self">self</span>.<span class="ident">element_count</span>,
-            <span class="ident">data</span>: <span class="ident">Cow::Owned</span>(<span class="self">self</span>.<span class="ident">data</span>.<span class="ident">into_owned</span>()),
-            <span class="ident">__phantom</span>: <span class="ident">PhantomData</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T, U&gt; ComplexValue&lt;<span class="lifetime">&#39;a</span>, T, U&gt; {
+    <span class="doccomment">/// Returns a `&#39;static` version of `self`.
+    </span><span class="kw">pub fn </span>into_owned(<span class="self">self</span>) -&gt; ComplexValue&lt;<span class="lifetime">&#39;static</span>, T, U&gt; {
+        ComplexValue {
+            element_count: <span class="self">self</span>.element_count,
+            data: Cow::Owned(<span class="self">self</span>.data.into_owned()),
+            __phantom: PhantomData,
         }
     }
 
-    <span class="doccomment">/// Returns the number of lements.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">element_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">element_count</span>
+    <span class="doccomment">/// Returns the number of lements.
+    </span><span class="kw">pub fn </span>element_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.element_count
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">thiserror::Error</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">JsonbError</span> {
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Malformed jsonb: invalid key offset pointer.&quot;</span>)]</span>
-    <span class="ident">InvalidKeyOffsetPointer</span>,
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Malformed jsonb: invalid value offset pointer.&quot;</span>)]</span>
-    <span class="ident">InvalidValueOffsetPointer</span>,
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Malformed jsonb: jsonb array/object size is larger than the whole array/object.&quot;</span>)]</span>
-    <span class="ident">SizeOverflow</span>,
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, thiserror::Error)]
+</span><span class="kw">pub enum </span>JsonbError {
+    <span class="attribute">#[error(<span class="string">&quot;Malformed jsonb: invalid key offset pointer.&quot;</span>)]
+    </span>InvalidKeyOffsetPointer,
+    <span class="attribute">#[error(<span class="string">&quot;Malformed jsonb: invalid value offset pointer.&quot;</span>)]
+    </span>InvalidValueOffsetPointer,
+    <span class="attribute">#[error(<span class="string">&quot;Malformed jsonb: jsonb array/object size is larger than the whole array/object.&quot;</span>)]
+    </span>SizeOverflow,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">StorageFormat</span><span class="op">&gt;</span> <span class="ident">ComplexValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">Object</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns a key with the given index.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `None` if `pos &gt;= self.element_count()`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key_at</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">pos</span>: <span class="ident">u32</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ObjectKey</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">pos</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">element_count</span> {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: StorageFormat&gt; ComplexValue&lt;<span class="lifetime">&#39;a</span>, T, Object&gt; {
+    <span class="doccomment">/// Returns a key with the given index.
+    ///
+    /// Returns `None` if `pos &gt;= self.element_count()`.
+    </span><span class="kw">pub fn </span>key_at(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, pos: u32) -&gt; io::Result&lt;<span class="prelude-ty">Option</span>&lt;ObjectKey&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt; {
+        <span class="kw">if </span>pos &gt;= <span class="self">self</span>.element_count {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
         }
 
-        <span class="kw">let</span> <span class="ident">entry_offset</span> <span class="op">=</span> <span class="number">2</span> <span class="op">*</span> <span class="ident">T::OFFSET_SIZE</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="ident">T::KEY_ENTRY_SIZE</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">*</span> <span class="ident">pos</span> <span class="kw">as</span> <span class="ident">usize</span>;
+        <span class="kw">let </span>entry_offset = <span class="number">2 </span>* T::OFFSET_SIZE <span class="kw">as </span>usize + T::KEY_ENTRY_SIZE <span class="kw">as </span>usize * pos <span class="kw">as </span>usize;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">entry_buf</span> <span class="op">=</span> <span class="ident">ParseBuf</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>[<span class="ident">entry_offset</span>..]);
-        <span class="kw">let</span> <span class="ident">key_offset</span> <span class="op">=</span> <span class="ident">T::eat_offset</span>(<span class="kw-2">&amp;mut</span> <span class="ident">entry_buf</span>) <span class="kw">as</span> <span class="ident">usize</span>;
-        <span class="kw">let</span> <span class="ident">key_length</span> <span class="op">=</span> <span class="ident">entry_buf</span>.<span class="ident">eat_u16_le</span>() <span class="kw">as</span> <span class="ident">usize</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>entry_buf = ParseBuf(<span class="kw-2">&amp;</span><span class="self">self</span>.data[entry_offset..]);
+        <span class="kw">let </span>key_offset = T::eat_offset(<span class="kw-2">&amp;mut </span>entry_buf) <span class="kw">as </span>usize;
+        <span class="kw">let </span>key_length = entry_buf.eat_u16_le() <span class="kw">as </span>usize;
 
-        <span class="kw">if</span> (<span class="ident">key_offset</span>
-            <span class="op">&lt;</span> <span class="ident">entry_offset</span>
-                <span class="op">+</span> ((<span class="self">self</span>.<span class="ident">element_count</span> <span class="op">-</span> <span class="ident">pos</span>) <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">*</span> <span class="ident">T::KEY_ENTRY_SIZE</span> <span class="kw">as</span> <span class="ident">usize</span>
-                <span class="op">+</span> (<span class="self">self</span>.<span class="ident">element_count</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">*</span> <span class="ident">T::VALUE_ENTRY_SIZE</span> <span class="kw">as</span> <span class="ident">usize</span>)
-            <span class="op">|</span><span class="op">|</span> (<span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="ident">key_offset</span> <span class="op">+</span> <span class="ident">key_length</span>)
+        <span class="kw">if </span>(key_offset
+            &lt; entry_offset
+                + ((<span class="self">self</span>.element_count - pos) <span class="kw">as </span>usize) * T::KEY_ENTRY_SIZE <span class="kw">as </span>usize
+                + (<span class="self">self</span>.element_count <span class="kw">as </span>usize) * T::VALUE_ENTRY_SIZE <span class="kw">as </span>usize)
+            || (<span class="self">self</span>.data.len() &lt; key_offset + key_length)
         {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
-                <span class="ident">io::ErrorKind::InvalidData</span>,
-                <span class="ident">JsonbError::InvalidKeyOffsetPointer</span>,
+            <span class="kw">return </span><span class="prelude-val">Err</span>(io::Error::new(
+                io::ErrorKind::InvalidData,
+                JsonbError::InvalidKeyOffsetPointer,
             ));
         }
 
-        <span class="kw">let</span> <span class="ident">key_val</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>[<span class="ident">key_offset</span>..(<span class="ident">key_offset</span> <span class="op">+</span> <span class="ident">key_length</span>)];
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ObjectKey::new</span>(<span class="ident">key_val</span>)))
+        <span class="kw">let </span>key_val = <span class="kw-2">&amp;</span><span class="self">self</span>.data[key_offset..(key_offset + key_length)];
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(ObjectKey::new(key_val)))
     }
 
-    <span class="doccomment">/// Returns an iterator over keys of an object.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keys</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="ident">ObjectKeys</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">ObjectKeys</span> { <span class="ident">cur</span>: <span class="number">0</span>, <span class="ident">obj</span>: <span class="self">self</span> }
+    <span class="doccomment">/// Returns an iterator over keys of an object.
+    </span><span class="kw">pub fn </span>keys(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; ObjectKeys&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+        ObjectKeys { cur: <span class="number">0</span>, obj: <span class="self">self </span>}
     }
 
-    <span class="doccomment">/// Returns an iterator over entries of an object.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="ident">ObjectIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">ObjectIter</span> { <span class="ident">cur</span>: <span class="number">0</span>, <span class="ident">obj</span>: <span class="self">self</span> }
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">StorageFormat</span><span class="op">&gt;</span> <span class="ident">ComplexValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">Array</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns an iterator over entries of an array.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="ident">ArrayIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">ArrayIter</span> { <span class="ident">cur</span>: <span class="number">0</span>, <span class="ident">arr</span>: <span class="self">self</span> }
+    <span class="doccomment">/// Returns an iterator over entries of an object.
+    </span><span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; ObjectIter&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+        ObjectIter { cur: <span class="number">0</span>, obj: <span class="self">self </span>}
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">StorageFormat</span>, <span class="ident">U</span>: <span class="ident">ComplexType</span><span class="op">&gt;</span> <span class="ident">ComplexValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns an element at the given position.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * for arrays returns an element at the given position in an arrary,</span>
-    <span class="doccomment">/// * for objects returns an element with the given key index.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `None` if `pos &gt;= self.element_count()`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">elem_at</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">pos</span>: <span class="ident">u32</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">pos</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">element_count</span> {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: StorageFormat&gt; ComplexValue&lt;<span class="lifetime">&#39;a</span>, T, Array&gt; {
+    <span class="doccomment">/// Returns an iterator over entries of an array.
+    </span><span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; ArrayIter&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+        ArrayIter { cur: <span class="number">0</span>, arr: <span class="self">self </span>}
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: StorageFormat, U: ComplexType&gt; ComplexValue&lt;<span class="lifetime">&#39;a</span>, T, U&gt; {
+    <span class="doccomment">/// Returns an element at the given position.
+    ///
+    /// * for arrays returns an element at the given position in an arrary,
+    /// * for objects returns an element with the given key index.
+    ///
+    /// Returns `None` if `pos &gt;= self.element_count()`.
+    </span><span class="kw">pub fn </span>elem_at(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, pos: u32) -&gt; io::Result&lt;<span class="prelude-ty">Option</span>&lt;Value&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt; {
+        <span class="kw">if </span>pos &gt;= <span class="self">self</span>.element_count {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
         }
 
-        <span class="kw">let</span> <span class="ident">entry_size</span> <span class="op">=</span> <span class="ident">T::VALUE_ENTRY_SIZE</span> <span class="kw">as</span> <span class="ident">usize</span>;
-        <span class="kw">let</span> <span class="ident">entry_offset</span> <span class="op">=</span> <span class="ident">U::value_entry_offset</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>.<span class="ident">element_count</span>, <span class="ident">pos</span>);
+        <span class="kw">let </span>entry_size = T::VALUE_ENTRY_SIZE <span class="kw">as </span>usize;
+        <span class="kw">let </span>entry_offset = U::value_entry_offset::&lt;T&gt;(<span class="self">self</span>.element_count, pos);
 
-        <span class="kw">let</span> <span class="ident">value_type</span> <span class="op">=</span> <span class="ident">JsonbType::try_from</span>(<span class="self">self</span>.<span class="ident">data</span>[<span class="ident">entry_offset</span>])
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::InvalidData</span>, <span class="ident">e</span>))<span class="question-mark">?</span>;
+        <span class="kw">let </span>value_type = JsonbType::try_from(<span class="self">self</span>.data[entry_offset])
+            .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="ident">value_type</span>.<span class="ident">is_inlined</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() {
-            <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">entry_offset</span> <span class="op">+</span> <span class="number">1</span>;
-            <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">start</span> <span class="op">+</span> <span class="ident">entry_size</span> <span class="op">-</span> <span class="number">1</span>;
-            <span class="kw">return</span> <span class="ident">Value::deserialize_simple</span>(<span class="ident">value_type</span>, <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>[<span class="ident">start</span>..<span class="ident">end</span>]))
-                .<span class="ident">map</span>(<span class="prelude-val">Some</span>);
+        <span class="kw">if </span>value_type.is_inlined::&lt;T&gt;() {
+            <span class="kw">let </span>start = entry_offset + <span class="number">1</span>;
+            <span class="kw">let </span>end = start + entry_size - <span class="number">1</span>;
+            <span class="kw">return </span>Value::deserialize_simple(value_type, <span class="kw-2">&amp;mut </span>ParseBuf(<span class="kw-2">&amp;</span><span class="self">self</span>.data[start..end]))
+                .map(<span class="prelude-val">Some</span>);
         }
 
-        <span class="kw">let</span> <span class="ident">value_offset</span> <span class="op">=</span> <span class="ident">T::eat_offset</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>[(<span class="ident">entry_offset</span> <span class="op">+</span> <span class="number">1</span>)..])) <span class="kw">as</span> <span class="ident">usize</span>;
+        <span class="kw">let </span>value_offset = T::eat_offset(<span class="kw-2">&amp;mut </span>ParseBuf(<span class="kw-2">&amp;</span><span class="self">self</span>.data[(entry_offset + <span class="number">1</span>)..])) <span class="kw">as </span>usize;
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="ident">value_offset</span> <span class="op">|</span><span class="op">|</span> <span class="ident">value_offset</span> <span class="op">&lt;</span> <span class="ident">entry_offset</span> <span class="op">+</span> <span class="ident">entry_size</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
-                <span class="ident">io::ErrorKind::InvalidData</span>,
-                <span class="ident">JsonbError::InvalidValueOffsetPointer</span>,
+        <span class="kw">if </span><span class="self">self</span>.data.len() &lt; value_offset || value_offset &lt; entry_offset + entry_size {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(io::Error::new(
+                io::ErrorKind::InvalidData,
+                JsonbError::InvalidValueOffsetPointer,
             ));
         }
 
-        <span class="ident">Value::deserialize_value</span>(<span class="ident">value_type</span>, <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>[<span class="ident">value_offset</span>..])).<span class="ident">map</span>(<span class="prelude-val">Some</span>)
+        Value::deserialize_value(value_type, <span class="kw-2">&amp;mut </span>ParseBuf(<span class="kw-2">&amp;</span><span class="self">self</span>.data[value_offset..])).map(<span class="prelude-val">Some</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">StorageFormat</span><span class="op">&gt;</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">ComplexValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">Array</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">serde_json::Value</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">JsonbToJsonError</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: StorageFormat&gt; TryFrom&lt;ComplexValue&lt;<span class="lifetime">&#39;a</span>, T, Array&gt;&gt; <span class="kw">for </span>serde_json::Value {
+    <span class="kw">type </span>Error = JsonbToJsonError;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">ComplexValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">Array</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">values</span> <span class="op">=</span> <span class="ident">value</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> {
-                <span class="ident">x</span>.<span class="ident">map_err</span>(<span class="ident"><span class="self">Self</span>::Error::InvalidJsonb</span>)
-                    .<span class="ident">and_then</span>(<span class="ident">TryFrom::try_from</span>)
+    <span class="kw">fn </span>try_from(value: ComplexValue&lt;<span class="lifetime">&#39;a</span>, T, Array&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">let </span>values = value
+            .iter()
+            .map(|x| {
+                x.map_err(<span class="self">Self</span>::Error::InvalidJsonb)
+                    .and_then(TryFrom::try_from)
             })
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">serde_json::Value::Array</span>(<span class="ident">values</span>))
+            .collect::&lt;<span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="kw">_</span>&gt;, <span class="kw">_</span>&gt;&gt;()<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(serde_json::Value::Array(values))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">StorageFormat</span><span class="op">&gt;</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">ComplexValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">Object</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">serde_json::Value</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">JsonbToJsonError</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: StorageFormat&gt; TryFrom&lt;ComplexValue&lt;<span class="lifetime">&#39;a</span>, T, Object&gt;&gt; <span class="kw">for </span>serde_json::Value {
+    <span class="kw">type </span>Error = JsonbToJsonError;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">ComplexValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">Object</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">k_vs</span> <span class="op">=</span> <span class="ident">value</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> {
-                <span class="ident">x</span>.<span class="ident">map_err</span>(<span class="ident"><span class="self">Self</span>::Error::InvalidJsonb</span>)
-                    .<span class="ident">and_then</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> <span class="prelude-val">Ok</span>((<span class="ident">from_utf8</span>(<span class="ident">k</span>.<span class="ident">value_raw</span>())<span class="question-mark">?</span>.<span class="ident">to_owned</span>(), <span class="ident">v</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>)))
+    <span class="kw">fn </span>try_from(value: ComplexValue&lt;<span class="lifetime">&#39;a</span>, T, Object&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">let </span>k_vs = value
+            .iter()
+            .map(|x| {
+                x.map_err(<span class="self">Self</span>::Error::InvalidJsonb)
+                    .and_then(|(k, v)| <span class="prelude-val">Ok</span>((from_utf8(k.value_raw())<span class="question-mark">?</span>.to_owned(), v.try_into()<span class="question-mark">?</span>)))
             })
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">serde_json::Map</span><span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>, <span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">serde_json::Value::Object</span>(<span class="ident">k_vs</span>))
+            .collect::&lt;<span class="prelude-ty">Result</span>&lt;serde_json::Map&lt;<span class="kw">_</span>, <span class="kw">_</span>&gt;, <span class="kw">_</span>&gt;&gt;()<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(serde_json::Value::Object(k_vs))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">T</span>: <span class="ident">StorageFormat</span>, <span class="ident">U</span>: <span class="ident">ComplexType</span><span class="op">&gt;</span> <span class="ident">MyDeserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ComplexValue</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> {
-    <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-    <span class="kw">type</span> <span class="ident">Ctx</span> <span class="op">=</span> ();
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, T: StorageFormat, U: ComplexType&gt; MyDeserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>ComplexValue&lt;<span class="lifetime">&#39;de</span>, T, U&gt; {
+    <span class="kw">const </span>SIZE: <span class="prelude-ty">Option</span>&lt;usize&gt; = <span class="prelude-val">None</span>;
+    <span class="kw">type </span>Ctx = ();
 
-    <span class="kw">fn</span> <span class="ident">deserialize</span>((): <span class="ident"><span class="self">Self</span>::Ctx</span>, <span class="ident">whole_buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sbuf</span> <span class="op">=</span> <span class="ident">ParseBuf</span>(<span class="ident">whole_buf</span>.<span class="number">0</span>)
-            .<span class="ident">checked_eat_buf</span>((<span class="ident">T::OFFSET_SIZE</span> <span class="op">*</span> <span class="number">2</span>) <span class="kw">as</span> <span class="ident">usize</span>)
-            .<span class="ident">ok_or_else</span>(<span class="ident">unexpected_buf_eof</span>)<span class="question-mark">?</span>;
+    <span class="kw">fn </span>deserialize((): <span class="self">Self</span>::Ctx, whole_buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;de</span>&gt;) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>sbuf = ParseBuf(whole_buf.<span class="number">0</span>)
+            .checked_eat_buf((T::OFFSET_SIZE * <span class="number">2</span>) <span class="kw">as </span>usize)
+            .ok_or_else(unexpected_buf_eof)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">element_count</span> <span class="op">=</span> <span class="ident">T::eat_offset</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sbuf</span>);
-        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">T::eat_offset</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sbuf</span>);
+        <span class="kw">let </span>element_count = T::eat_offset(<span class="kw-2">&amp;mut </span>sbuf);
+        <span class="kw">let </span>bytes = T::eat_offset(<span class="kw-2">&amp;mut </span>sbuf);
 
-        <span class="kw">if</span> <span class="ident">bytes</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">&gt;</span> <span class="ident">whole_buf</span>.<span class="ident">len</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
-                <span class="ident">io::ErrorKind::InvalidData</span>,
-                <span class="ident">JsonbError::SizeOverflow</span>,
+        <span class="kw">if </span>bytes <span class="kw">as </span>usize &gt; whole_buf.len() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(io::Error::new(
+                io::ErrorKind::InvalidData,
+                JsonbError::SizeOverflow,
             ));
         }
 
-        <span class="kw">let</span> <span class="ident">header_size</span> <span class="op">=</span> <span class="ident">U::header_size</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">element_count</span>);
+        <span class="kw">let </span>header_size = U::header_size::&lt;T&gt;(element_count);
 
-        <span class="kw">if</span> <span class="ident">header_size</span> <span class="op">&gt;</span> <span class="ident">bytes</span> <span class="kw">as</span> <span class="ident">usize</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
-                <span class="ident">io::ErrorKind::InvalidData</span>,
-                <span class="ident">JsonbError::SizeOverflow</span>,
+        <span class="kw">if </span>header_size &gt; bytes <span class="kw">as </span>usize {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(io::Error::new(
+                io::ErrorKind::InvalidData,
+                JsonbError::SizeOverflow,
             ));
         }
 
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">whole_buf</span>
-            .<span class="ident">checked_eat</span>(<span class="ident">bytes</span> <span class="kw">as</span> <span class="ident">usize</span>)
-            .<span class="ident">ok_or_else</span>(<span class="ident">unexpected_buf_eof</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>data = whole_buf
+            .checked_eat(bytes <span class="kw">as </span>usize)
+            .ok_or_else(unexpected_buf_eof)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">element_count</span>,
-            <span class="ident">data</span>: <span class="ident">Cow::Borrowed</span>(<span class="ident">data</span>),
-            <span class="ident">__phantom</span>: <span class="ident">PhantomData</span>,
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            element_count,
+            data: Cow::Borrowed(data),
+            __phantom: PhantomData,
         })
     }
 }
 
-<span class="doccomment">/// JSONB opaque value</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OpaqueValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">value_type</span>: <span class="ident">Const</span><span class="op">&lt;</span><span class="ident">ColumnType</span>, <span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="ident">data</span>: <span class="ident">RawBytes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">VarLen</span><span class="op">&gt;</span>,
+<span class="doccomment">/// JSONB opaque value
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>OpaqueValue&lt;<span class="lifetime">&#39;a</span>&gt; {
+    value_type: Const&lt;ColumnType, u8&gt;,
+    data: RawBytes&lt;<span class="lifetime">&#39;a</span>, VarLen&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">OpaqueValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">value_type</span>: <span class="ident">ColumnType</span>, <span class="ident">data</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">value_type</span>: <span class="ident">Const::new</span>(<span class="ident">value_type</span>),
-            <span class="ident">data</span>: <span class="ident">RawBytes::new</span>(<span class="ident">data</span>),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; OpaqueValue&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub fn </span>new(value_type: ColumnType, data: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            value_type: Const::new(value_type),
+            data: RawBytes::new(data),
         }
     }
 
-    <span class="doccomment">/// Returns the value type.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ColumnType</span> {
-        <span class="self">self</span>.<span class="ident">value_type</span>.<span class="number">0</span>
+    <span class="doccomment">/// Returns the value type.
+    </span><span class="kw">pub fn </span>value_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ColumnType {
+        <span class="self">self</span>.value_type.<span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Returns the raw value data.
+    </span><span class="kw">pub fn </span>data_raw(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
+        <span class="self">self</span>.data.as_bytes()
     }
 
-    <span class="doccomment">/// Returns the raw value data.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data_raw</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">as_bytes</span>()
+    <span class="doccomment">/// Returns the value data as a string (lossy converted).
+    </span><span class="kw">pub fn </span>data(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;a</span>, str&gt; {
+        <span class="self">self</span>.data.as_str()
     }
 
-    <span class="doccomment">/// Returns the value data as a string (lossy converted).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">as_str</span>()
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) -&gt; <span class="ident">OpaqueValue</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-        <span class="ident">OpaqueValue</span> {
-            <span class="ident">value_type</span>: <span class="self">self</span>.<span class="ident">value_type</span>,
-            <span class="ident">data</span>: <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">into_owned</span>(),
+    <span class="kw">pub fn </span>into_owned(<span class="self">self</span>) -&gt; OpaqueValue&lt;<span class="lifetime">&#39;static</span>&gt; {
+        OpaqueValue {
+            value_type: <span class="self">self</span>.value_type,
+            data: <span class="self">self</span>.data.into_owned(),
         }
     }
 }
 
-<span class="doccomment">/// Jsonb Value.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">Null</span>,
-    <span class="ident">Bool</span>(<span class="ident">bool</span>),
-    <span class="ident">I16</span>(<span class="ident">i16</span>),
-    <span class="ident">U16</span>(<span class="ident">u16</span>),
-    <span class="ident">I32</span>(<span class="ident">i32</span>),
-    <span class="ident">U32</span>(<span class="ident">u32</span>),
-    <span class="ident">I64</span>(<span class="ident">i64</span>),
-    <span class="ident">U64</span>(<span class="ident">u64</span>),
-    <span class="ident">F64</span>(<span class="ident">f64</span>),
-    <span class="ident">String</span>(<span class="ident">JsonbString</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
-    <span class="ident">SmallArray</span>(<span class="ident">ComplexValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Small</span>, <span class="ident">Array</span><span class="op">&gt;</span>),
-    <span class="ident">LargeArray</span>(<span class="ident">ComplexValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Large</span>, <span class="ident">Array</span><span class="op">&gt;</span>),
-    <span class="ident">SmallObject</span>(<span class="ident">ComplexValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Small</span>, <span class="ident">Object</span><span class="op">&gt;</span>),
-    <span class="ident">LargeObject</span>(<span class="ident">ComplexValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Large</span>, <span class="ident">Object</span><span class="op">&gt;</span>),
-    <span class="ident">Opaque</span>(<span class="ident">OpaqueValue</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
+<span class="doccomment">/// Jsonb Value.
+</span><span class="attribute">#[derive(Clone, PartialEq)]
+</span><span class="kw">pub enum </span>Value&lt;<span class="lifetime">&#39;a</span>&gt; {
+    Null,
+    Bool(bool),
+    I16(i16),
+    U16(u16),
+    I32(i32),
+    U32(u32),
+    I64(i64),
+    U64(u64),
+    F64(f64),
+    String(JsonbString&lt;<span class="lifetime">&#39;a</span>&gt;),
+    SmallArray(ComplexValue&lt;<span class="lifetime">&#39;a</span>, Small, Array&gt;),
+    LargeArray(ComplexValue&lt;<span class="lifetime">&#39;a</span>, Large, Array&gt;),
+    SmallObject(ComplexValue&lt;<span class="lifetime">&#39;a</span>, Small, Object&gt;),
+    LargeObject(ComplexValue&lt;<span class="lifetime">&#39;a</span>, Large, Object&gt;),
+    Opaque(OpaqueValue&lt;<span class="lifetime">&#39;a</span>&gt;),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns a `&#39;static` version of `self`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) -&gt; <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Value::Null</span> =&gt; <span class="ident">Value::Null</span>,
-            <span class="ident">Value::Bool</span>(<span class="ident">x</span>) =&gt; <span class="ident">Value::Bool</span>(<span class="ident">x</span>),
-            <span class="ident">Value::I16</span>(<span class="ident">x</span>) =&gt; <span class="ident">Value::I16</span>(<span class="ident">x</span>),
-            <span class="ident">Value::U16</span>(<span class="ident">x</span>) =&gt; <span class="ident">Value::U16</span>(<span class="ident">x</span>),
-            <span class="ident">Value::I32</span>(<span class="ident">x</span>) =&gt; <span class="ident">Value::I32</span>(<span class="ident">x</span>),
-            <span class="ident">Value::U32</span>(<span class="ident">x</span>) =&gt; <span class="ident">Value::U32</span>(<span class="ident">x</span>),
-            <span class="ident">Value::I64</span>(<span class="ident">x</span>) =&gt; <span class="ident">Value::I64</span>(<span class="ident">x</span>),
-            <span class="ident">Value::U64</span>(<span class="ident">x</span>) =&gt; <span class="ident">Value::U64</span>(<span class="ident">x</span>),
-            <span class="ident">Value::F64</span>(<span class="ident">x</span>) =&gt; <span class="ident">Value::F64</span>(<span class="ident">x</span>),
-            <span class="ident">Value::String</span>(<span class="ident">x</span>) =&gt; <span class="ident">Value::String</span>(<span class="ident">x</span>.<span class="ident">into_owned</span>()),
-            <span class="ident">Value::SmallArray</span>(<span class="ident">x</span>) =&gt; <span class="ident">Value::SmallArray</span>(<span class="ident">x</span>.<span class="ident">into_owned</span>()),
-            <span class="ident">Value::LargeArray</span>(<span class="ident">x</span>) =&gt; <span class="ident">Value::LargeArray</span>(<span class="ident">x</span>.<span class="ident">into_owned</span>()),
-            <span class="ident">Value::SmallObject</span>(<span class="ident">x</span>) =&gt; <span class="ident">Value::SmallObject</span>(<span class="ident">x</span>.<span class="ident">into_owned</span>()),
-            <span class="ident">Value::LargeObject</span>(<span class="ident">x</span>) =&gt; <span class="ident">Value::LargeObject</span>(<span class="ident">x</span>.<span class="ident">into_owned</span>()),
-            <span class="ident">Value::Opaque</span>(<span class="ident">x</span>) =&gt; <span class="ident">Value::Opaque</span>(<span class="ident">x</span>.<span class="ident">into_owned</span>()),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Value&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Returns a `&#39;static` version of `self`.
+    </span><span class="kw">pub fn </span>into_owned(<span class="self">self</span>) -&gt; Value&lt;<span class="lifetime">&#39;static</span>&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            Value::Null =&gt; Value::Null,
+            Value::Bool(x) =&gt; Value::Bool(x),
+            Value::I16(x) =&gt; Value::I16(x),
+            Value::U16(x) =&gt; Value::U16(x),
+            Value::I32(x) =&gt; Value::I32(x),
+            Value::U32(x) =&gt; Value::U32(x),
+            Value::I64(x) =&gt; Value::I64(x),
+            Value::U64(x) =&gt; Value::U64(x),
+            Value::F64(x) =&gt; Value::F64(x),
+            Value::String(x) =&gt; Value::String(x.into_owned()),
+            Value::SmallArray(x) =&gt; Value::SmallArray(x.into_owned()),
+            Value::LargeArray(x) =&gt; Value::LargeArray(x.into_owned()),
+            Value::SmallObject(x) =&gt; Value::SmallObject(x.into_owned()),
+            Value::LargeObject(x) =&gt; Value::LargeObject(x.into_owned()),
+            Value::Opaque(x) =&gt; Value::Opaque(x.into_owned()),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">deserialize_value</span>(<span class="ident">value_type</span>: <span class="ident">JsonbType</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">value_type</span> {
-            <span class="ident">JsonbType::JSONB_TYPE_SMALL_OBJECT</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Value::SmallObject</span>(<span class="ident">buf</span>.<span class="ident">parse</span>(())<span class="question-mark">?</span>)),
-            <span class="ident">JsonbType::JSONB_TYPE_LARGE_OBJECT</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Value::LargeObject</span>(<span class="ident">buf</span>.<span class="ident">parse</span>(())<span class="question-mark">?</span>)),
-            <span class="ident">JsonbType::JSONB_TYPE_SMALL_ARRAY</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Value::SmallArray</span>(<span class="ident">buf</span>.<span class="ident">parse</span>(())<span class="question-mark">?</span>)),
-            <span class="ident">JsonbType::JSONB_TYPE_LARGE_ARRAY</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Value::LargeArray</span>(<span class="ident">buf</span>.<span class="ident">parse</span>(())<span class="question-mark">?</span>)),
-            <span class="kw">_</span> =&gt; <span class="ident">Value::deserialize_simple</span>(<span class="ident">value_type</span>, <span class="ident">buf</span>),
+    <span class="kw">fn </span>deserialize_value(value_type: JsonbType, buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">match </span>value_type {
+            JsonbType::JSONB_TYPE_SMALL_OBJECT =&gt; <span class="prelude-val">Ok</span>(Value::SmallObject(buf.parse(())<span class="question-mark">?</span>)),
+            JsonbType::JSONB_TYPE_LARGE_OBJECT =&gt; <span class="prelude-val">Ok</span>(Value::LargeObject(buf.parse(())<span class="question-mark">?</span>)),
+            JsonbType::JSONB_TYPE_SMALL_ARRAY =&gt; <span class="prelude-val">Ok</span>(Value::SmallArray(buf.parse(())<span class="question-mark">?</span>)),
+            JsonbType::JSONB_TYPE_LARGE_ARRAY =&gt; <span class="prelude-val">Ok</span>(Value::LargeArray(buf.parse(())<span class="question-mark">?</span>)),
+            <span class="kw">_ </span>=&gt; Value::deserialize_simple(value_type, buf),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">deserialize_simple</span>(<span class="ident">value_type</span>: <span class="ident">JsonbType</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">value_type</span> {
-            <span class="ident">JsonbType::JSONB_TYPE_LITERAL</span> =&gt; <span class="ident">Value::deserialize_literal</span>(<span class="ident">buf</span>),
-            <span class="ident">JsonbType::JSONB_TYPE_INT16</span> =&gt; <span class="ident">buf</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LeI16</span><span class="op">&gt;</span><span class="op">&gt;</span>(()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value::I16</span>(<span class="kw-2">*</span><span class="ident">x</span>)),
-            <span class="ident">JsonbType::JSONB_TYPE_UINT16</span> =&gt; <span class="ident">buf</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LeU16</span><span class="op">&gt;</span><span class="op">&gt;</span>(()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value::U16</span>(<span class="kw-2">*</span><span class="ident">x</span>)),
-            <span class="ident">JsonbType::JSONB_TYPE_INT32</span> =&gt; <span class="ident">buf</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LeI32</span><span class="op">&gt;</span><span class="op">&gt;</span>(()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value::I32</span>(<span class="kw-2">*</span><span class="ident">x</span>)),
-            <span class="ident">JsonbType::JSONB_TYPE_UINT32</span> =&gt; <span class="ident">buf</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LeU32</span><span class="op">&gt;</span><span class="op">&gt;</span>(()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value::U32</span>(<span class="kw-2">*</span><span class="ident">x</span>)),
-            <span class="ident">JsonbType::JSONB_TYPE_INT64</span> =&gt; <span class="ident">buf</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LeI64</span><span class="op">&gt;</span><span class="op">&gt;</span>(()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value::I64</span>(<span class="kw-2">*</span><span class="ident">x</span>)),
-            <span class="ident">JsonbType::JSONB_TYPE_UINT64</span> =&gt; <span class="ident">buf</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LeU64</span><span class="op">&gt;</span><span class="op">&gt;</span>(()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value::U64</span>(<span class="kw-2">*</span><span class="ident">x</span>)),
-            <span class="ident">JsonbType::JSONB_TYPE_DOUBLE</span> =&gt; <span class="ident">buf</span>.<span class="ident">parse</span>(()).<span class="ident">map</span>(<span class="ident">Value::F64</span>),
-            <span class="ident">JsonbType::JSONB_TYPE_STRING</span> =&gt; <span class="ident">Value::deserialize_string</span>(<span class="ident">buf</span>),
-            <span class="ident">JsonbType::JSONB_TYPE_OPAQUE</span> =&gt; <span class="ident">Value::deserialize_opaque</span>(<span class="ident">buf</span>),
-            <span class="ident">JsonbType::JSONB_TYPE_SMALL_OBJECT</span>
-            <span class="op">|</span> <span class="ident">JsonbType::JSONB_TYPE_LARGE_OBJECT</span>
-            <span class="op">|</span> <span class="ident">JsonbType::JSONB_TYPE_SMALL_ARRAY</span>
-            <span class="op">|</span> <span class="ident">JsonbType::JSONB_TYPE_LARGE_ARRAY</span> =&gt; <span class="macro">unreachable!</span>(),
+    <span class="kw">fn </span>deserialize_simple(value_type: JsonbType, buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">match </span>value_type {
+            JsonbType::JSONB_TYPE_LITERAL =&gt; Value::deserialize_literal(buf),
+            JsonbType::JSONB_TYPE_INT16 =&gt; buf.parse::&lt;RawInt&lt;LeI16&gt;&gt;(()).map(|x| Value::I16(<span class="kw-2">*</span>x)),
+            JsonbType::JSONB_TYPE_UINT16 =&gt; buf.parse::&lt;RawInt&lt;LeU16&gt;&gt;(()).map(|x| Value::U16(<span class="kw-2">*</span>x)),
+            JsonbType::JSONB_TYPE_INT32 =&gt; buf.parse::&lt;RawInt&lt;LeI32&gt;&gt;(()).map(|x| Value::I32(<span class="kw-2">*</span>x)),
+            JsonbType::JSONB_TYPE_UINT32 =&gt; buf.parse::&lt;RawInt&lt;LeU32&gt;&gt;(()).map(|x| Value::U32(<span class="kw-2">*</span>x)),
+            JsonbType::JSONB_TYPE_INT64 =&gt; buf.parse::&lt;RawInt&lt;LeI64&gt;&gt;(()).map(|x| Value::I64(<span class="kw-2">*</span>x)),
+            JsonbType::JSONB_TYPE_UINT64 =&gt; buf.parse::&lt;RawInt&lt;LeU64&gt;&gt;(()).map(|x| Value::U64(<span class="kw-2">*</span>x)),
+            JsonbType::JSONB_TYPE_DOUBLE =&gt; buf.parse(()).map(Value::F64),
+            JsonbType::JSONB_TYPE_STRING =&gt; Value::deserialize_string(buf),
+            JsonbType::JSONB_TYPE_OPAQUE =&gt; Value::deserialize_opaque(buf),
+            JsonbType::JSONB_TYPE_SMALL_OBJECT
+            | JsonbType::JSONB_TYPE_LARGE_OBJECT
+            | JsonbType::JSONB_TYPE_SMALL_ARRAY
+            | JsonbType::JSONB_TYPE_LARGE_ARRAY =&gt; <span class="macro">unreachable!</span>(),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">deserialize_literal</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">literal_type</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">checked_eat_u8</span>().<span class="ident">ok_or_else</span>(<span class="ident">unexpected_buf_eof</span>)<span class="question-mark">?</span>;
+    <span class="kw">fn </span>deserialize_literal(buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>literal_type = buf.checked_eat_u8().ok_or_else(unexpected_buf_eof)<span class="question-mark">?</span>;
 
-        <span class="kw">match</span> <span class="ident">LiteralType::try_from</span>(<span class="ident">literal_type</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::InvalidData</span>, <span class="ident">e</span>))<span class="question-mark">?</span>
-        {
-            <span class="ident">LiteralType::JSONB_NULL_LITERAL</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Value::Null</span>),
-            <span class="ident">LiteralType::JSONB_TRUE_LITERAL</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Value::Bool</span>(<span class="bool-val">true</span>)),
-            <span class="ident">LiteralType::JSONB_FALSE_LITERAL</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Value::Bool</span>(<span class="bool-val">false</span>)),
+        <span class="kw">match </span>LiteralType::try_from(literal_type)
+            .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))<span class="question-mark">?
+        </span>{
+            LiteralType::JSONB_NULL_LITERAL =&gt; <span class="prelude-val">Ok</span>(Value::Null),
+            LiteralType::JSONB_TRUE_LITERAL =&gt; <span class="prelude-val">Ok</span>(Value::Bool(<span class="bool-val">true</span>)),
+            LiteralType::JSONB_FALSE_LITERAL =&gt; <span class="prelude-val">Ok</span>(Value::Bool(<span class="bool-val">false</span>)),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">deserialize_string</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">buf</span>.<span class="ident">parse</span>(()).<span class="ident">map</span>(<span class="ident">Value::String</span>)
+    <span class="kw">fn </span>deserialize_string(buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        buf.parse(()).map(Value::String)
     }
 
-    <span class="kw">fn</span> <span class="ident">deserialize_opaque</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">Value::Opaque</span>(<span class="ident">OpaqueValue</span> {
-            <span class="ident">value_type</span>: <span class="ident">buf</span>.<span class="ident">parse</span>(())<span class="question-mark">?</span>,
-            <span class="ident">data</span>: <span class="ident">buf</span>.<span class="ident">parse</span>(())<span class="question-mark">?</span>,
+    <span class="kw">fn </span>deserialize_opaque(buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="prelude-val">Ok</span>(Value::Opaque(OpaqueValue {
+            value_type: buf.parse(())<span class="question-mark">?</span>,
+            data: buf.parse(())<span class="question-mark">?</span>,
         }))
     }
 
-    <span class="doccomment">/// Returns true if this value is an array.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_array</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">Value::SmallArray</span> { .. } <span class="op">|</span> <span class="ident">Value::LargeArray</span> { .. })
+    <span class="doccomment">/// Returns true if this value is an array.
+    </span><span class="kw">pub fn </span>is_array(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, Value::SmallArray { .. } | Value::LargeArray { .. })
     }
 
-    <span class="doccomment">/// Returns true if this value is an object.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_object</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">Value::SmallObject</span> { .. } <span class="op">|</span> <span class="ident">Value::LargeObject</span> { .. })
+    <span class="doccomment">/// Returns true if this value is an object.
+    </span><span class="kw">pub fn </span>is_object(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, Value::SmallObject { .. } | Value::LargeObject { .. })
     }
 
-    <span class="doccomment">/// Returns true if this value is an int (i16, i32 or i64).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_int</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">Value::I16</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">Value::I32</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">Value::I64</span>(<span class="kw">_</span>))
+    <span class="doccomment">/// Returns true if this value is an int (i16, i32 or i64).
+    </span><span class="kw">pub fn </span>is_int(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, Value::I16(<span class="kw">_</span>) | Value::I32(<span class="kw">_</span>) | Value::I64(<span class="kw">_</span>))
     }
 
-    <span class="doccomment">/// Returns true if this value is an int (u16, u32 or u64).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_uint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">Value::U16</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">Value::U32</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">Value::U64</span>(<span class="kw">_</span>))
+    <span class="doccomment">/// Returns true if this value is an int (u16, u32 or u64).
+    </span><span class="kw">pub fn </span>is_uint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, Value::U16(<span class="kw">_</span>) | Value::U32(<span class="kw">_</span>) | Value::U64(<span class="kw">_</span>))
     }
 
-    <span class="doccomment">/// Returns true if this value is f64.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_double</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">Value::F64</span>(<span class="kw">_</span>))
+    <span class="doccomment">/// Returns true if this value is f64.
+    </span><span class="kw">pub fn </span>is_double(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, Value::F64(<span class="kw">_</span>))
     }
 
-    <span class="doccomment">/// Returns the number of lements in array or buffer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">element_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Value::SmallArray</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">x</span>.<span class="ident">element_count</span>()),
-            <span class="ident">Value::LargeArray</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">x</span>.<span class="ident">element_count</span>()),
-            <span class="ident">Value::SmallObject</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">x</span>.<span class="ident">element_count</span>()),
-            <span class="ident">Value::LargeObject</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">x</span>.<span class="ident">element_count</span>()),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Returns the number of lements in array or buffer.
+    </span><span class="kw">pub fn </span>element_count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u32&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            Value::SmallArray(x) =&gt; <span class="prelude-val">Some</span>(x.element_count()),
+            Value::LargeArray(x) =&gt; <span class="prelude-val">Some</span>(x.element_count()),
+            Value::SmallObject(x) =&gt; <span class="prelude-val">Some</span>(x.element_count()),
+            Value::LargeObject(x) =&gt; <span class="prelude-val">Some</span>(x.element_count()),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Returns the field type of an opaque value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ColumnType</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Value::Opaque</span>(<span class="ident">OpaqueValue</span> { <span class="ident">value_type</span>, .. }) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">value_type</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
-        }
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">serde_json::Value</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">JsonbToJsonError</span>;
-
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="ident">Value::Null</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">serde_json::Value::Null</span>),
-            <span class="ident">Value::Bool</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">serde_json::Value::Bool</span>(<span class="ident">x</span>)),
-            <span class="ident">Value::I16</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">x</span>.<span class="ident">into</span>()),
-            <span class="ident">Value::U16</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">x</span>.<span class="ident">into</span>()),
-            <span class="ident">Value::I32</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">x</span>.<span class="ident">into</span>()),
-            <span class="ident">Value::U32</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">x</span>.<span class="ident">into</span>()),
-            <span class="ident">Value::I64</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">x</span>.<span class="ident">into</span>()),
-            <span class="ident">Value::U64</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">x</span>.<span class="ident">into</span>()),
-            <span class="ident">Value::F64</span>(<span class="ident">x</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">x</span>.<span class="ident">into</span>()),
-            <span class="ident">Value::String</span>(<span class="ident">s</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">from_utf8</span>(<span class="ident">s</span>.<span class="ident">str_raw</span>())<span class="question-mark">?</span>.<span class="ident">into</span>()),
-            <span class="ident">Value::SmallArray</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">try_into</span>(),
-            <span class="ident">Value::LargeArray</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">try_into</span>(),
-            <span class="ident">Value::SmallObject</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">try_into</span>(),
-            <span class="ident">Value::LargeObject</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>.<span class="ident">try_into</span>(),
-            <span class="ident">Value::Opaque</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident"><span class="self">Self</span>::Error::Opaque</span>),
+    <span class="doccomment">/// Returns the field type of an opaque value.
+    </span><span class="kw">pub fn </span>field_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ColumnType&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            Value::Opaque(OpaqueValue { value_type, .. }) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">**</span>value_type),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">thiserror::Error</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">JsonbToJsonError</span> {
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;JSONB value is invalid: {}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">InvalidJsonb</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">io::Error</span>),
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;JSONB contains an opaque value&quot;</span>)]</span>
-    <span class="ident">Opaque</span>,
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;JSONB contains invalid UTF-8 char sequences: {}&quot;</span>, <span class="ident">_0</span>)]</span>
-    <span class="ident">InvalidUtf8</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">Utf8Error</span>),
-}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TryFrom&lt;Value&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>serde_json::Value {
+    <span class="kw">type </span>Error = JsonbToJsonError;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">MyDeserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> {
-    <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-    <span class="kw">type</span> <span class="ident">Ctx</span> <span class="op">=</span> ();
-
-    <span class="kw">fn</span> <span class="ident">deserialize</span>((): <span class="ident"><span class="self">Self</span>::Ctx</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">buf</span>.<span class="ident">is_empty</span>() {
-            <span class="comment">// We&#39;ll interpret an empty jsonb value as null (MySql does so)</span>
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Value::Null</span>);
-        }
-
-        <span class="kw">let</span> <span class="ident">value_type</span> <span class="op">=</span> <span class="ident">JsonbType::try_from</span>(<span class="ident">buf</span>.<span class="ident">eat_u8</span>())
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::InvalidData</span>, <span class="ident">e</span>))<span class="question-mark">?</span>;
-
-        <span class="ident">Value::deserialize_value</span>(<span class="ident">value_type</span>, <span class="ident">buf</span>)
-    }
-}
-
-<span class="doccomment">/// Type of a complex jsonb value (array or object).</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ComplexType</span> {
-    <span class="kw">const</span> <span class="ident">IS_ARRAY</span>: <span class="ident">bool</span>;
-
-    <span class="doccomment">/// Calculates header size for this type.</span>
-    <span class="kw">fn</span> <span class="ident">header_size</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">StorageFormat</span><span class="op">&gt;</span>(<span class="ident">element_count</span>: <span class="ident">u32</span>) -&gt; <span class="ident">usize</span>;
-
-    <span class="doccomment">/// Calculates an offset to the given value entry.</span>
-    <span class="kw">fn</span> <span class="ident">value_entry_offset</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">StorageFormat</span><span class="op">&gt;</span>(<span class="ident">element_count</span>: <span class="ident">u32</span>, <span class="ident">pos</span>: <span class="ident">u32</span>) -&gt; <span class="ident">usize</span>;
-}
-
-<span class="doccomment">/// An Object (see [`ComplexType`]).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Object</span>;
-
-<span class="kw">impl</span> <span class="ident">ComplexType</span> <span class="kw">for</span> <span class="ident">Object</span> {
-    <span class="kw">const</span> <span class="ident">IS_ARRAY</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="bool-val">false</span>;
-
-    <span class="kw">fn</span> <span class="ident">header_size</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">StorageFormat</span><span class="op">&gt;</span>(<span class="ident">element_count</span>: <span class="ident">u32</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">header_size</span> <span class="op">=</span> <span class="number">2</span> <span class="op">*</span> <span class="ident">T::OFFSET_SIZE</span> <span class="kw">as</span> <span class="ident">usize</span>;
-        <span class="ident">header_size</span> <span class="op">+</span><span class="op">=</span> <span class="ident">element_count</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">*</span> <span class="ident">T::KEY_ENTRY_SIZE</span> <span class="kw">as</span> <span class="ident">usize</span>;
-        <span class="ident">header_size</span> <span class="op">+</span><span class="op">=</span> <span class="ident">element_count</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">*</span> <span class="ident">T::VALUE_ENTRY_SIZE</span> <span class="kw">as</span> <span class="ident">usize</span>;
-        <span class="ident">header_size</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">value_entry_offset</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">StorageFormat</span><span class="op">&gt;</span>(<span class="ident">element_count</span>: <span class="ident">u32</span>, <span class="ident">pos</span>: <span class="ident">u32</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">first_entry_offset</span> <span class="op">=</span> <span class="number">2</span> <span class="op">*</span> <span class="ident">T::OFFSET_SIZE</span> <span class="kw">as</span> <span class="ident">usize</span>;
-        <span class="ident">first_entry_offset</span> <span class="op">+</span><span class="op">=</span> <span class="ident">element_count</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">*</span> <span class="ident">T::KEY_ENTRY_SIZE</span> <span class="kw">as</span> <span class="ident">usize</span>;
-        <span class="ident">first_entry_offset</span> <span class="op">+</span> <span class="ident">T::VALUE_ENTRY_SIZE</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">*</span> <span class="ident">pos</span> <span class="kw">as</span> <span class="ident">usize</span>
-    }
-}
-
-<span class="doccomment">/// An Array (see [`ComplexType`]).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Array</span>;
-
-<span class="kw">impl</span> <span class="ident">ComplexType</span> <span class="kw">for</span> <span class="ident">Array</span> {
-    <span class="kw">const</span> <span class="ident">IS_ARRAY</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="bool-val">true</span>;
-
-    <span class="kw">fn</span> <span class="ident">header_size</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">StorageFormat</span><span class="op">&gt;</span>(<span class="ident">element_count</span>: <span class="ident">u32</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">header_size</span> <span class="op">=</span> <span class="number">2</span> <span class="op">*</span> <span class="ident">T::OFFSET_SIZE</span> <span class="kw">as</span> <span class="ident">usize</span>;
-        <span class="ident">header_size</span> <span class="op">+</span><span class="op">=</span> <span class="ident">element_count</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">*</span> <span class="ident">T::VALUE_ENTRY_SIZE</span> <span class="kw">as</span> <span class="ident">usize</span>;
-        <span class="ident">header_size</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">value_entry_offset</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">StorageFormat</span><span class="op">&gt;</span>(<span class="ident">_element_count</span>: <span class="ident">u32</span>, <span class="ident">pos</span>: <span class="ident">u32</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">let</span> <span class="ident">first_entry_offset</span> <span class="op">=</span> <span class="number">2</span> <span class="op">*</span> <span class="ident">T::OFFSET_SIZE</span> <span class="kw">as</span> <span class="ident">usize</span>;
-        <span class="ident">first_entry_offset</span> <span class="op">+</span> <span class="ident">T::VALUE_ENTRY_SIZE</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">*</span> <span class="ident">pos</span> <span class="kw">as</span> <span class="ident">usize</span>
-    }
-}
-
-<span class="doccomment">/// JSONB storage format for objects and arrays. See [`ComplexType`].</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">StorageFormat</span> {
-    <span class="kw">const</span> <span class="ident">IS_LARGE</span>: <span class="ident">bool</span>;
-    <span class="doccomment">/// The size of offset or size fields.</span>
-    <span class="kw">const</span> <span class="ident">OFFSET_SIZE</span>: <span class="ident">u8</span>;
-    <span class="kw">const</span> <span class="ident">KEY_ENTRY_SIZE</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::OFFSET_SIZE</span> <span class="op">+</span> <span class="number">2</span>;
-    <span class="kw">const</span> <span class="ident">VALUE_ENTRY_SIZE</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::OFFSET_SIZE</span> <span class="op">+</span> <span class="number">1</span>;
-
-    <span class="kw">fn</span> <span class="ident">eat_offset</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">u32</span>;
-}
-
-<span class="doccomment">/// Small array/object storage format. See [`StorageFormat`].</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Small</span>;
-
-<span class="kw">impl</span> <span class="ident">StorageFormat</span> <span class="kw">for</span> <span class="ident">Small</span> {
-    <span class="kw">const</span> <span class="ident">IS_LARGE</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="bool-val">false</span>;
-    <span class="kw">const</span> <span class="ident">OFFSET_SIZE</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">2</span>;
-
-    <span class="kw">fn</span> <span class="ident">eat_offset</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">u32</span> {
-        <span class="ident">buf</span>.<span class="ident">eat_u16_le</span>() <span class="kw">as</span> <span class="ident">u32</span>
-    }
-}
-
-<span class="doccomment">/// Large array/object storage format. See [`StorageFormat`].</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Large</span>;
-
-<span class="kw">impl</span> <span class="ident">StorageFormat</span> <span class="kw">for</span> <span class="ident">Large</span> {
-    <span class="kw">const</span> <span class="ident">IS_LARGE</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="bool-val">true</span>;
-    <span class="kw">const</span> <span class="ident">OFFSET_SIZE</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">4</span>;
-
-    <span class="kw">fn</span> <span class="ident">eat_offset</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">u32</span> {
-        <span class="ident">buf</span>.<span class="ident">eat_u32_le</span>()
-    }
-}
-
-<span class="doccomment">/// 1-byte JSONB type marker</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">JsonbType</span> {
-    <span class="ident">JSONB_TYPE_SMALL_OBJECT</span> <span class="op">=</span> <span class="number">0x0</span>,
-    <span class="ident">JSONB_TYPE_LARGE_OBJECT</span> <span class="op">=</span> <span class="number">0x1</span>,
-    <span class="ident">JSONB_TYPE_SMALL_ARRAY</span> <span class="op">=</span> <span class="number">0x2</span>,
-    <span class="ident">JSONB_TYPE_LARGE_ARRAY</span> <span class="op">=</span> <span class="number">0x3</span>,
-    <span class="ident">JSONB_TYPE_LITERAL</span> <span class="op">=</span> <span class="number">0x4</span>,
-    <span class="ident">JSONB_TYPE_INT16</span> <span class="op">=</span> <span class="number">0x5</span>,
-    <span class="ident">JSONB_TYPE_UINT16</span> <span class="op">=</span> <span class="number">0x6</span>,
-    <span class="ident">JSONB_TYPE_INT32</span> <span class="op">=</span> <span class="number">0x7</span>,
-    <span class="ident">JSONB_TYPE_UINT32</span> <span class="op">=</span> <span class="number">0x8</span>,
-    <span class="ident">JSONB_TYPE_INT64</span> <span class="op">=</span> <span class="number">0x9</span>,
-    <span class="ident">JSONB_TYPE_UINT64</span> <span class="op">=</span> <span class="number">0xA</span>,
-    <span class="ident">JSONB_TYPE_DOUBLE</span> <span class="op">=</span> <span class="number">0xB</span>,
-    <span class="ident">JSONB_TYPE_STRING</span> <span class="op">=</span> <span class="number">0xC</span>,
-    <span class="ident">JSONB_TYPE_OPAQUE</span> <span class="op">=</span> <span class="number">0xF</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">JsonbType</span> {
-    <span class="kw">fn</span> <span class="ident">is_inlined</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">StorageFormat</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">JsonbType::JSONB_TYPE_LITERAL</span>
-            <span class="op">|</span> <span class="ident">JsonbType::JSONB_TYPE_INT16</span>
-            <span class="op">|</span> <span class="ident">JsonbType::JSONB_TYPE_UINT16</span> =&gt; <span class="bool-val">true</span>,
-            <span class="ident">JsonbType::JSONB_TYPE_INT32</span> <span class="op">|</span> <span class="ident">JsonbType::JSONB_TYPE_UINT32</span> =&gt; <span class="ident">T::IS_LARGE</span>,
-            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+    <span class="kw">fn </span>try_from(value: Value&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">match </span>value {
+            Value::Null =&gt; <span class="prelude-val">Ok</span>(serde_json::Value::Null),
+            Value::Bool(x) =&gt; <span class="prelude-val">Ok</span>(serde_json::Value::Bool(x)),
+            Value::I16(x) =&gt; <span class="prelude-val">Ok</span>(x.into()),
+            Value::U16(x) =&gt; <span class="prelude-val">Ok</span>(x.into()),
+            Value::I32(x) =&gt; <span class="prelude-val">Ok</span>(x.into()),
+            Value::U32(x) =&gt; <span class="prelude-val">Ok</span>(x.into()),
+            Value::I64(x) =&gt; <span class="prelude-val">Ok</span>(x.into()),
+            Value::U64(x) =&gt; <span class="prelude-val">Ok</span>(x.into()),
+            Value::F64(x) =&gt; <span class="prelude-val">Ok</span>(x.into()),
+            Value::String(s) =&gt; <span class="prelude-val">Ok</span>(from_utf8(s.str_raw())<span class="question-mark">?</span>.into()),
+            Value::SmallArray(x) =&gt; x.try_into(),
+            Value::LargeArray(x) =&gt; x.try_into(),
+            Value::SmallObject(x) =&gt; x.try_into(),
+            Value::LargeObject(x) =&gt; x.try_into(),
+            Value::Opaque(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="self">Self</span>::Error::Opaque),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">thiserror::Error</span>)]</span>
-<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Unknown JSONB type {}&quot;</span>, <span class="ident">_0</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UnknownJsonbType</span>(<span class="kw">pub</span> <span class="ident">u8</span>);
+<span class="attribute">#[derive(Debug, thiserror::Error)]
+</span><span class="kw">pub enum </span>JsonbToJsonError {
+    <span class="attribute">#[error(<span class="string">&quot;JSONB value is invalid: {}&quot;</span>, _0)]
+    </span>InvalidJsonb(<span class="attribute">#[from] </span>io::Error),
+    <span class="attribute">#[error(<span class="string">&quot;JSONB contains an opaque value&quot;</span>)]
+    </span>Opaque,
+    <span class="attribute">#[error(<span class="string">&quot;JSONB contains invalid UTF-8 char sequences: {}&quot;</span>, _0)]
+    </span>InvalidUtf8(<span class="attribute">#[from] </span>Utf8Error),
+}
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">UnknownJsonbType</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u8</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">UnknownJsonbType</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">x</span>.<span class="number">0</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>&gt; MyDeserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>Value&lt;<span class="lifetime">&#39;de</span>&gt; {
+    <span class="kw">const </span>SIZE: <span class="prelude-ty">Option</span>&lt;usize&gt; = <span class="prelude-val">None</span>;
+    <span class="kw">type </span>Ctx = ();
+
+    <span class="kw">fn </span>deserialize((): <span class="self">Self</span>::Ctx, buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;de</span>&gt;) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">if </span>buf.is_empty() {
+            <span class="comment">// We&#39;ll interpret an empty jsonb value as null (MySql does so)
+            </span><span class="kw">return </span><span class="prelude-val">Ok</span>(Value::Null);
+        }
+
+        <span class="kw">let </span>value_type = JsonbType::try_from(buf.eat_u8())
+            .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))<span class="question-mark">?</span>;
+
+        Value::deserialize_value(value_type, buf)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">JsonbType</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">UnknownJsonbType</span>;
+<span class="doccomment">/// Type of a complex jsonb value (array or object).
+</span><span class="kw">pub trait </span>ComplexType {
+    <span class="kw">const </span>IS_ARRAY: bool;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="number">0x0</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::JSONB_TYPE_SMALL_OBJECT</span>),
-            <span class="number">0x1</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::JSONB_TYPE_LARGE_OBJECT</span>),
-            <span class="number">0x2</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::JSONB_TYPE_SMALL_ARRAY</span>),
-            <span class="number">0x3</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::JSONB_TYPE_LARGE_ARRAY</span>),
-            <span class="number">0x4</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::JSONB_TYPE_LITERAL</span>),
-            <span class="number">0x5</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::JSONB_TYPE_INT16</span>),
-            <span class="number">0x6</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::JSONB_TYPE_UINT16</span>),
-            <span class="number">0x7</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::JSONB_TYPE_INT32</span>),
-            <span class="number">0x8</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::JSONB_TYPE_UINT32</span>),
-            <span class="number">0x9</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::JSONB_TYPE_INT64</span>),
-            <span class="number">0xA</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::JSONB_TYPE_UINT64</span>),
-            <span class="number">0xB</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::JSONB_TYPE_DOUBLE</span>),
-            <span class="number">0xC</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::JSONB_TYPE_STRING</span>),
-            <span class="number">0xF</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::JSONB_TYPE_OPAQUE</span>),
-            <span class="ident">x</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">UnknownJsonbType</span>(<span class="ident">x</span>)),
+    <span class="doccomment">/// Calculates header size for this type.
+    </span><span class="kw">fn </span>header_size&lt;T: StorageFormat&gt;(element_count: u32) -&gt; usize;
+
+    <span class="doccomment">/// Calculates an offset to the given value entry.
+    </span><span class="kw">fn </span>value_entry_offset&lt;T: StorageFormat&gt;(element_count: u32, pos: u32) -&gt; usize;
+}
+
+<span class="doccomment">/// An Object (see [`ComplexType`]).
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+</span><span class="kw">pub struct </span>Object;
+
+<span class="kw">impl </span>ComplexType <span class="kw">for </span>Object {
+    <span class="kw">const </span>IS_ARRAY: bool = <span class="bool-val">false</span>;
+
+    <span class="kw">fn </span>header_size&lt;T: StorageFormat&gt;(element_count: u32) -&gt; usize {
+        <span class="kw">let </span><span class="kw-2">mut </span>header_size = <span class="number">2 </span>* T::OFFSET_SIZE <span class="kw">as </span>usize;
+        header_size += element_count <span class="kw">as </span>usize * T::KEY_ENTRY_SIZE <span class="kw">as </span>usize;
+        header_size += element_count <span class="kw">as </span>usize * T::VALUE_ENTRY_SIZE <span class="kw">as </span>usize;
+        header_size
+    }
+
+    <span class="kw">fn </span>value_entry_offset&lt;T: StorageFormat&gt;(element_count: u32, pos: u32) -&gt; usize {
+        <span class="kw">let </span><span class="kw-2">mut </span>first_entry_offset = <span class="number">2 </span>* T::OFFSET_SIZE <span class="kw">as </span>usize;
+        first_entry_offset += element_count <span class="kw">as </span>usize * T::KEY_ENTRY_SIZE <span class="kw">as </span>usize;
+        first_entry_offset + T::VALUE_ENTRY_SIZE <span class="kw">as </span>usize * pos <span class="kw">as </span>usize
+    }
+}
+
+<span class="doccomment">/// An Array (see [`ComplexType`]).
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+</span><span class="kw">pub struct </span>Array;
+
+<span class="kw">impl </span>ComplexType <span class="kw">for </span>Array {
+    <span class="kw">const </span>IS_ARRAY: bool = <span class="bool-val">true</span>;
+
+    <span class="kw">fn </span>header_size&lt;T: StorageFormat&gt;(element_count: u32) -&gt; usize {
+        <span class="kw">let </span><span class="kw-2">mut </span>header_size = <span class="number">2 </span>* T::OFFSET_SIZE <span class="kw">as </span>usize;
+        header_size += element_count <span class="kw">as </span>usize * T::VALUE_ENTRY_SIZE <span class="kw">as </span>usize;
+        header_size
+    }
+
+    <span class="kw">fn </span>value_entry_offset&lt;T: StorageFormat&gt;(_element_count: u32, pos: u32) -&gt; usize {
+        <span class="kw">let </span>first_entry_offset = <span class="number">2 </span>* T::OFFSET_SIZE <span class="kw">as </span>usize;
+        first_entry_offset + T::VALUE_ENTRY_SIZE <span class="kw">as </span>usize * pos <span class="kw">as </span>usize
+    }
+}
+
+<span class="doccomment">/// JSONB storage format for objects and arrays. See [`ComplexType`].
+</span><span class="kw">pub trait </span>StorageFormat {
+    <span class="kw">const </span>IS_LARGE: bool;
+    <span class="doccomment">/// The size of offset or size fields.
+    </span><span class="kw">const </span>OFFSET_SIZE: u8;
+    <span class="kw">const </span>KEY_ENTRY_SIZE: u8 = <span class="self">Self</span>::OFFSET_SIZE + <span class="number">2</span>;
+    <span class="kw">const </span>VALUE_ENTRY_SIZE: u8 = <span class="self">Self</span>::OFFSET_SIZE + <span class="number">1</span>;
+
+    <span class="kw">fn </span>eat_offset(buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; u32;
+}
+
+<span class="doccomment">/// Small array/object storage format. See [`StorageFormat`].
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+</span><span class="kw">pub struct </span>Small;
+
+<span class="kw">impl </span>StorageFormat <span class="kw">for </span>Small {
+    <span class="kw">const </span>IS_LARGE: bool = <span class="bool-val">false</span>;
+    <span class="kw">const </span>OFFSET_SIZE: u8 = <span class="number">2</span>;
+
+    <span class="kw">fn </span>eat_offset(buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; u32 {
+        buf.eat_u16_le() <span class="kw">as </span>u32
+    }
+}
+
+<span class="doccomment">/// Large array/object storage format. See [`StorageFormat`].
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+</span><span class="kw">pub struct </span>Large;
+
+<span class="kw">impl </span>StorageFormat <span class="kw">for </span>Large {
+    <span class="kw">const </span>IS_LARGE: bool = <span class="bool-val">true</span>;
+    <span class="kw">const </span>OFFSET_SIZE: u8 = <span class="number">4</span>;
+
+    <span class="kw">fn </span>eat_offset(buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; u32 {
+        buf.eat_u32_le()
+    }
+}
+
+<span class="doccomment">/// 1-byte JSONB type marker
+</span><span class="attribute">#[allow(non_camel_case_types)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[repr(u8)]
+</span><span class="kw">pub enum </span>JsonbType {
+    JSONB_TYPE_SMALL_OBJECT = <span class="number">0x0</span>,
+    JSONB_TYPE_LARGE_OBJECT = <span class="number">0x1</span>,
+    JSONB_TYPE_SMALL_ARRAY = <span class="number">0x2</span>,
+    JSONB_TYPE_LARGE_ARRAY = <span class="number">0x3</span>,
+    JSONB_TYPE_LITERAL = <span class="number">0x4</span>,
+    JSONB_TYPE_INT16 = <span class="number">0x5</span>,
+    JSONB_TYPE_UINT16 = <span class="number">0x6</span>,
+    JSONB_TYPE_INT32 = <span class="number">0x7</span>,
+    JSONB_TYPE_UINT32 = <span class="number">0x8</span>,
+    JSONB_TYPE_INT64 = <span class="number">0x9</span>,
+    JSONB_TYPE_UINT64 = <span class="number">0xA</span>,
+    JSONB_TYPE_DOUBLE = <span class="number">0xB</span>,
+    JSONB_TYPE_STRING = <span class="number">0xC</span>,
+    JSONB_TYPE_OPAQUE = <span class="number">0xF</span>,
+}
+
+<span class="kw">impl </span>JsonbType {
+    <span class="kw">fn </span>is_inlined&lt;T: StorageFormat&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="self">self </span>{
+            JsonbType::JSONB_TYPE_LITERAL
+            | JsonbType::JSONB_TYPE_INT16
+            | JsonbType::JSONB_TYPE_UINT16 =&gt; <span class="bool-val">true</span>,
+            JsonbType::JSONB_TYPE_INT32 | JsonbType::JSONB_TYPE_UINT32 =&gt; T::IS_LARGE,
+            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         }
     }
 }
 
-<span class="doccomment">/// 1-byte JSONB literal type</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_camel_case_types</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">LiteralType</span> {
-    <span class="ident">JSONB_NULL_LITERAL</span> <span class="op">=</span> <span class="number">0x0</span>,
-    <span class="ident">JSONB_TRUE_LITERAL</span> <span class="op">=</span> <span class="number">0x1</span>,
-    <span class="ident">JSONB_FALSE_LITERAL</span> <span class="op">=</span> <span class="number">0x2</span>,
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, thiserror::Error)]
+#[error(<span class="string">&quot;Unknown JSONB type {}&quot;</span>, _0)]
+#[repr(transparent)]
+</span><span class="kw">pub struct </span>UnknownJsonbType(<span class="kw">pub </span>u8);
+
+<span class="kw">impl </span>From&lt;UnknownJsonbType&gt; <span class="kw">for </span>u8 {
+    <span class="kw">fn </span>from(x: UnknownJsonbType) -&gt; <span class="self">Self </span>{
+        x.<span class="number">0
+    </span>}
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">thiserror::Error</span>)]</span>
-<span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;Unknown JSONB literal type {}&quot;</span>, <span class="ident">_0</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UnknownLiteralType</span>(<span class="kw">pub</span> <span class="ident">u8</span>);
+<span class="kw">impl </span>TryFrom&lt;u8&gt; <span class="kw">for </span>JsonbType {
+    <span class="kw">type </span>Error = UnknownJsonbType;
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">UnknownLiteralType</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">u8</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">x</span>: <span class="ident">UnknownLiteralType</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">x</span>.<span class="number">0</span>
+    <span class="kw">fn </span>try_from(value: u8) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">match </span>value {
+            <span class="number">0x0 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::JSONB_TYPE_SMALL_OBJECT),
+            <span class="number">0x1 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::JSONB_TYPE_LARGE_OBJECT),
+            <span class="number">0x2 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::JSONB_TYPE_SMALL_ARRAY),
+            <span class="number">0x3 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::JSONB_TYPE_LARGE_ARRAY),
+            <span class="number">0x4 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::JSONB_TYPE_LITERAL),
+            <span class="number">0x5 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::JSONB_TYPE_INT16),
+            <span class="number">0x6 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::JSONB_TYPE_UINT16),
+            <span class="number">0x7 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::JSONB_TYPE_INT32),
+            <span class="number">0x8 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::JSONB_TYPE_UINT32),
+            <span class="number">0x9 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::JSONB_TYPE_INT64),
+            <span class="number">0xA </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::JSONB_TYPE_UINT64),
+            <span class="number">0xB </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::JSONB_TYPE_DOUBLE),
+            <span class="number">0xC </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::JSONB_TYPE_STRING),
+            <span class="number">0xF </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::JSONB_TYPE_OPAQUE),
+            x =&gt; <span class="prelude-val">Err</span>(UnknownJsonbType(x)),
+        }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">LiteralType</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">UnknownLiteralType</span>;
+<span class="doccomment">/// 1-byte JSONB literal type
+</span><span class="attribute">#[allow(non_camel_case_types)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[repr(u8)]
+</span><span class="kw">pub enum </span>LiteralType {
+    JSONB_NULL_LITERAL = <span class="number">0x0</span>,
+    JSONB_TRUE_LITERAL = <span class="number">0x1</span>,
+    JSONB_FALSE_LITERAL = <span class="number">0x2</span>,
+}
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">u8</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">value</span> {
-            <span class="number">0x0</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::JSONB_NULL_LITERAL</span>),
-            <span class="number">0x1</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::JSONB_TRUE_LITERAL</span>),
-            <span class="number">0x2</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::JSONB_FALSE_LITERAL</span>),
-            <span class="ident">x</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">UnknownLiteralType</span>(<span class="ident">x</span>)),
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, thiserror::Error)]
+#[error(<span class="string">&quot;Unknown JSONB literal type {}&quot;</span>, _0)]
+#[repr(transparent)]
+</span><span class="kw">pub struct </span>UnknownLiteralType(<span class="kw">pub </span>u8);
+
+<span class="kw">impl </span>From&lt;UnknownLiteralType&gt; <span class="kw">for </span>u8 {
+    <span class="kw">fn </span>from(x: UnknownLiteralType) -&gt; <span class="self">Self </span>{
+        x.<span class="number">0
+    </span>}
+}
+
+<span class="kw">impl </span>TryFrom&lt;u8&gt; <span class="kw">for </span>LiteralType {
+    <span class="kw">type </span>Error = UnknownLiteralType;
+
+    <span class="kw">fn </span>try_from(value: u8) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+        <span class="kw">match </span>value {
+            <span class="number">0x0 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::JSONB_NULL_LITERAL),
+            <span class="number">0x1 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::JSONB_TRUE_LITERAL),
+            <span class="number">0x2 </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">Self</span>::JSONB_FALSE_LITERAL),
+            x =&gt; <span class="prelude-val">Err</span>(UnknownLiteralType(x)),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

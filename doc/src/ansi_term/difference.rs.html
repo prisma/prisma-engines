@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ansi_term-0.12.1/src/difference.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>difference.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../ansi_term/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../ansi_term/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../ansi_term/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ansi_term-0.12.1/src/difference.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>difference.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../ansi_term/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../ansi_term/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../ansi_term/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -177,184 +177,184 @@
 <span id="177">177</span>
 <span id="178">178</span>
 <span id="179">179</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Style</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::Style;
 
 
-<span class="doccomment">/// When printing out one coloured string followed by another, use one of</span>
-<span class="doccomment">/// these rules to figure out which *extra* control codes need to be sent.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Difference</span> {
+<span class="doccomment">/// When printing out one coloured string followed by another, use one of
+/// these rules to figure out which *extra* control codes need to be sent.
+</span><span class="attribute">#[derive(PartialEq, Clone, Copy, Debug)]
+</span><span class="kw">pub enum </span>Difference {
 
-    <span class="doccomment">/// Print out the control codes specified by this style to end up looking</span>
-    <span class="doccomment">/// like the second string&#39;s styles.</span>
-    <span class="ident">ExtraStyles</span>(<span class="ident">Style</span>),
+    <span class="doccomment">/// Print out the control codes specified by this style to end up looking
+    /// like the second string&#39;s styles.
+    </span>ExtraStyles(Style),
 
-    <span class="doccomment">/// Converting between these two is impossible, so just send a reset</span>
-    <span class="doccomment">/// command and then the second string&#39;s styles.</span>
-    <span class="ident">Reset</span>,
+    <span class="doccomment">/// Converting between these two is impossible, so just send a reset
+    /// command and then the second string&#39;s styles.
+    </span>Reset,
 
-    <span class="doccomment">/// The before style is exactly the same as the after style, so no further</span>
-    <span class="doccomment">/// control codes need to be printed.</span>
-    <span class="ident">NoDifference</span>,
+    <span class="doccomment">/// The before style is exactly the same as the after style, so no further
+    /// control codes need to be printed.
+    </span>NoDifference,
 }
 
 
-<span class="kw">impl</span> <span class="ident">Difference</span> {
+<span class="kw">impl </span>Difference {
 
-    <span class="doccomment">/// Compute the &#39;style difference&#39; required to turn an existing style into</span>
-    <span class="doccomment">/// the given, second style.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For example, to turn green text into green bold text, it&#39;s redundant</span>
-    <span class="doccomment">/// to write a reset command then a second green+bold command, instead of</span>
-    <span class="doccomment">/// just writing one bold command. This method should see that both styles</span>
-    <span class="doccomment">/// use the foreground colour green, and reduce it to a single command.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method returns an enum value because it&#39;s not actually always</span>
-    <span class="doccomment">/// possible to turn one style into another: for example, text could be</span>
-    <span class="doccomment">/// made bold and underlined, but you can&#39;t remove the bold property</span>
-    <span class="doccomment">/// without also removing the underline property. So when this has to</span>
-    <span class="doccomment">/// happen, this function returns None, meaning that the entire set of</span>
-    <span class="doccomment">/// styles should be reset and begun again.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">between</span>(<span class="ident">first</span>: <span class="kw-2">&amp;</span><span class="ident">Style</span>, <span class="ident">next</span>: <span class="kw-2">&amp;</span><span class="ident">Style</span>) -&gt; <span class="ident">Difference</span> {
-        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::Difference</span>::<span class="kw-2">*</span>;
+    <span class="doccomment">/// Compute the &#39;style difference&#39; required to turn an existing style into
+    /// the given, second style.
+    ///
+    /// For example, to turn green text into green bold text, it&#39;s redundant
+    /// to write a reset command then a second green+bold command, instead of
+    /// just writing one bold command. This method should see that both styles
+    /// use the foreground colour green, and reduce it to a single command.
+    ///
+    /// This method returns an enum value because it&#39;s not actually always
+    /// possible to turn one style into another: for example, text could be
+    /// made bold and underlined, but you can&#39;t remove the bold property
+    /// without also removing the underline property. So when this has to
+    /// happen, this function returns None, meaning that the entire set of
+    /// styles should be reset and begun again.
+    </span><span class="kw">pub fn </span>between(first: <span class="kw-2">&amp;</span>Style, next: <span class="kw-2">&amp;</span>Style) -&gt; Difference {
+        <span class="kw">use </span><span class="self">self</span>::Difference::<span class="kw-2">*</span>;
 
-        <span class="comment">// XXX(Havvy): This algorithm is kind of hard to replicate without</span>
-        <span class="comment">// having the Plain/Foreground enum variants, so I&#39;m just leaving</span>
-        <span class="comment">// it commented out for now, and defaulting to Reset.</span>
+        <span class="comment">// XXX(Havvy): This algorithm is kind of hard to replicate without
+        // having the Plain/Foreground enum variants, so I&#39;m just leaving
+        // it commented out for now, and defaulting to Reset.
 
-        <span class="kw">if</span> <span class="ident">first</span> <span class="op">==</span> <span class="ident">next</span> {
-            <span class="kw">return</span> <span class="ident">NoDifference</span>;
+        </span><span class="kw">if </span>first == next {
+            <span class="kw">return </span>NoDifference;
         }
 
-        <span class="comment">// Cannot un-bold, so must Reset.</span>
-        <span class="kw">if</span> <span class="ident">first</span>.<span class="ident">is_bold</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">next</span>.<span class="ident">is_bold</span> {
-            <span class="kw">return</span> <span class="ident">Reset</span>;
+        <span class="comment">// Cannot un-bold, so must Reset.
+        </span><span class="kw">if </span>first.is_bold &amp;&amp; !next.is_bold {
+            <span class="kw">return </span>Reset;
         }
 
-        <span class="kw">if</span> <span class="ident">first</span>.<span class="ident">is_dimmed</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">next</span>.<span class="ident">is_dimmed</span> {
-            <span class="kw">return</span> <span class="ident">Reset</span>;
+        <span class="kw">if </span>first.is_dimmed &amp;&amp; !next.is_dimmed {
+            <span class="kw">return </span>Reset;
         }
 
-        <span class="kw">if</span> <span class="ident">first</span>.<span class="ident">is_italic</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">next</span>.<span class="ident">is_italic</span> {
-            <span class="kw">return</span> <span class="ident">Reset</span>;
+        <span class="kw">if </span>first.is_italic &amp;&amp; !next.is_italic {
+            <span class="kw">return </span>Reset;
         }
 
-        <span class="comment">// Cannot un-underline, so must Reset.</span>
-        <span class="kw">if</span> <span class="ident">first</span>.<span class="ident">is_underline</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">next</span>.<span class="ident">is_underline</span> {
-            <span class="kw">return</span> <span class="ident">Reset</span>;
+        <span class="comment">// Cannot un-underline, so must Reset.
+        </span><span class="kw">if </span>first.is_underline &amp;&amp; !next.is_underline {
+            <span class="kw">return </span>Reset;
         }
 
-        <span class="kw">if</span> <span class="ident">first</span>.<span class="ident">is_blink</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">next</span>.<span class="ident">is_blink</span> {
-            <span class="kw">return</span> <span class="ident">Reset</span>;
+        <span class="kw">if </span>first.is_blink &amp;&amp; !next.is_blink {
+            <span class="kw">return </span>Reset;
         }
 
-        <span class="kw">if</span> <span class="ident">first</span>.<span class="ident">is_reverse</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">next</span>.<span class="ident">is_reverse</span> {
-            <span class="kw">return</span> <span class="ident">Reset</span>;
+        <span class="kw">if </span>first.is_reverse &amp;&amp; !next.is_reverse {
+            <span class="kw">return </span>Reset;
         }
 
-        <span class="kw">if</span> <span class="ident">first</span>.<span class="ident">is_hidden</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">next</span>.<span class="ident">is_hidden</span> {
-            <span class="kw">return</span> <span class="ident">Reset</span>;
+        <span class="kw">if </span>first.is_hidden &amp;&amp; !next.is_hidden {
+            <span class="kw">return </span>Reset;
         }
 
-        <span class="kw">if</span> <span class="ident">first</span>.<span class="ident">is_strikethrough</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">next</span>.<span class="ident">is_strikethrough</span> {
-            <span class="kw">return</span> <span class="ident">Reset</span>;
+        <span class="kw">if </span>first.is_strikethrough &amp;&amp; !next.is_strikethrough {
+            <span class="kw">return </span>Reset;
         }
 
-        <span class="comment">// Cannot go from foreground to no foreground, so must Reset.</span>
-        <span class="kw">if</span> <span class="ident">first</span>.<span class="ident">foreground</span>.<span class="ident">is_some</span>() <span class="op">&amp;&amp;</span> <span class="ident">next</span>.<span class="ident">foreground</span>.<span class="ident">is_none</span>() {
-            <span class="kw">return</span> <span class="ident">Reset</span>;
+        <span class="comment">// Cannot go from foreground to no foreground, so must Reset.
+        </span><span class="kw">if </span>first.foreground.is_some() &amp;&amp; next.foreground.is_none() {
+            <span class="kw">return </span>Reset;
         }
 
-        <span class="comment">// Cannot go from background to no background, so must Reset.</span>
-        <span class="kw">if</span> <span class="ident">first</span>.<span class="ident">background</span>.<span class="ident">is_some</span>() <span class="op">&amp;&amp;</span> <span class="ident">next</span>.<span class="ident">background</span>.<span class="ident">is_none</span>() {
-            <span class="kw">return</span> <span class="ident">Reset</span>;
+        <span class="comment">// Cannot go from background to no background, so must Reset.
+        </span><span class="kw">if </span>first.background.is_some() &amp;&amp; next.background.is_none() {
+            <span class="kw">return </span>Reset;
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">extra_styles</span> <span class="op">=</span> <span class="ident">Style::default</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>extra_styles = Style::default();
 
-        <span class="kw">if</span> <span class="ident">first</span>.<span class="ident">is_bold</span> <span class="op">!</span><span class="op">=</span> <span class="ident">next</span>.<span class="ident">is_bold</span> {
-            <span class="ident">extra_styles</span>.<span class="ident">is_bold</span> <span class="op">=</span> <span class="bool-val">true</span>;
+        <span class="kw">if </span>first.is_bold != next.is_bold {
+            extra_styles.is_bold = <span class="bool-val">true</span>;
         }
 
-        <span class="kw">if</span> <span class="ident">first</span>.<span class="ident">is_dimmed</span> <span class="op">!</span><span class="op">=</span> <span class="ident">next</span>.<span class="ident">is_dimmed</span> {
-            <span class="ident">extra_styles</span>.<span class="ident">is_dimmed</span> <span class="op">=</span> <span class="bool-val">true</span>;
+        <span class="kw">if </span>first.is_dimmed != next.is_dimmed {
+            extra_styles.is_dimmed = <span class="bool-val">true</span>;
         }
 
-        <span class="kw">if</span> <span class="ident">first</span>.<span class="ident">is_italic</span> <span class="op">!</span><span class="op">=</span> <span class="ident">next</span>.<span class="ident">is_italic</span> {
-            <span class="ident">extra_styles</span>.<span class="ident">is_italic</span> <span class="op">=</span> <span class="bool-val">true</span>;
+        <span class="kw">if </span>first.is_italic != next.is_italic {
+            extra_styles.is_italic = <span class="bool-val">true</span>;
         }
 
-        <span class="kw">if</span> <span class="ident">first</span>.<span class="ident">is_underline</span> <span class="op">!</span><span class="op">=</span> <span class="ident">next</span>.<span class="ident">is_underline</span> {
-            <span class="ident">extra_styles</span>.<span class="ident">is_underline</span> <span class="op">=</span> <span class="bool-val">true</span>;
+        <span class="kw">if </span>first.is_underline != next.is_underline {
+            extra_styles.is_underline = <span class="bool-val">true</span>;
         }
 
-        <span class="kw">if</span> <span class="ident">first</span>.<span class="ident">is_blink</span> <span class="op">!</span><span class="op">=</span> <span class="ident">next</span>.<span class="ident">is_blink</span> {
-            <span class="ident">extra_styles</span>.<span class="ident">is_blink</span> <span class="op">=</span> <span class="bool-val">true</span>;
+        <span class="kw">if </span>first.is_blink != next.is_blink {
+            extra_styles.is_blink = <span class="bool-val">true</span>;
         }
 
-        <span class="kw">if</span> <span class="ident">first</span>.<span class="ident">is_reverse</span> <span class="op">!</span><span class="op">=</span> <span class="ident">next</span>.<span class="ident">is_reverse</span> {
-            <span class="ident">extra_styles</span>.<span class="ident">is_reverse</span> <span class="op">=</span> <span class="bool-val">true</span>;
+        <span class="kw">if </span>first.is_reverse != next.is_reverse {
+            extra_styles.is_reverse = <span class="bool-val">true</span>;
         }
 
-        <span class="kw">if</span> <span class="ident">first</span>.<span class="ident">is_hidden</span> <span class="op">!</span><span class="op">=</span> <span class="ident">next</span>.<span class="ident">is_hidden</span> {
-            <span class="ident">extra_styles</span>.<span class="ident">is_hidden</span> <span class="op">=</span> <span class="bool-val">true</span>;
+        <span class="kw">if </span>first.is_hidden != next.is_hidden {
+            extra_styles.is_hidden = <span class="bool-val">true</span>;
         }
 
-        <span class="kw">if</span> <span class="ident">first</span>.<span class="ident">is_strikethrough</span> <span class="op">!</span><span class="op">=</span> <span class="ident">next</span>.<span class="ident">is_strikethrough</span> {
-            <span class="ident">extra_styles</span>.<span class="ident">is_strikethrough</span> <span class="op">=</span> <span class="bool-val">true</span>;
+        <span class="kw">if </span>first.is_strikethrough != next.is_strikethrough {
+            extra_styles.is_strikethrough = <span class="bool-val">true</span>;
         }
 
-        <span class="kw">if</span> <span class="ident">first</span>.<span class="ident">foreground</span> <span class="op">!</span><span class="op">=</span> <span class="ident">next</span>.<span class="ident">foreground</span> {
-            <span class="ident">extra_styles</span>.<span class="ident">foreground</span> <span class="op">=</span> <span class="ident">next</span>.<span class="ident">foreground</span>;
+        <span class="kw">if </span>first.foreground != next.foreground {
+            extra_styles.foreground = next.foreground;
         }
 
-        <span class="kw">if</span> <span class="ident">first</span>.<span class="ident">background</span> <span class="op">!</span><span class="op">=</span> <span class="ident">next</span>.<span class="ident">background</span> {
-            <span class="ident">extra_styles</span>.<span class="ident">background</span> <span class="op">=</span> <span class="ident">next</span>.<span class="ident">background</span>;
+        <span class="kw">if </span>first.background != next.background {
+            extra_styles.background = next.background;
         }
 
-        <span class="ident">ExtraStyles</span>(<span class="ident">extra_styles</span>)
+        ExtraStyles(extra_styles)
     }
 }
 
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Difference</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">style::Colour</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">style::Style</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">super</span>::Difference::<span class="kw-2">*</span>;
+    <span class="kw">use </span>style::Colour::<span class="kw-2">*</span>;
+    <span class="kw">use </span>style::Style;
 
-    <span class="kw">fn</span> <span class="ident">style</span>() -&gt; <span class="ident">Style</span> {
-        <span class="ident">Style::new</span>()
+    <span class="kw">fn </span>style() -&gt; Style {
+        Style::new()
     }
 
-    <span class="macro">macro_rules!</span> <span class="ident">test</span> {
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">first</span>: <span class="ident">expr</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">next</span>: <span class="ident">expr</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>: <span class="ident">expr</span>) =&gt; {
-            <span class="attribute">#[<span class="ident">test</span>]</span>
-            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>() {
-                <span class="macro">assert_eq!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>, <span class="ident">Difference::between</span>(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">first</span>, <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">next</span>));
+    <span class="macro">macro_rules! </span>test {
+        (<span class="macro-nonterminal">$name</span>: ident: <span class="macro-nonterminal">$first</span>: expr; <span class="macro-nonterminal">$next</span>: expr =&gt; <span class="macro-nonterminal">$result</span>: expr) =&gt; {
+            <span class="attribute">#[test]
+            </span><span class="kw">fn </span><span class="macro-nonterminal">$name</span>() {
+                <span class="macro">assert_eq!</span>(<span class="macro-nonterminal">$result</span>, Difference::between(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$first</span>, <span class="kw-2">&amp;</span><span class="macro-nonterminal">$next</span>));
             }
         };
     }
 
-    <span class="macro">test!</span>(<span class="ident">nothing</span>:    <span class="ident">Green</span>.<span class="ident">normal</span>(); <span class="ident">Green</span>.<span class="ident">normal</span>()  =&gt; <span class="ident">NoDifference</span>);
-    <span class="macro">test!</span>(<span class="ident">uppercase</span>:  <span class="ident">Green</span>.<span class="ident">normal</span>(); <span class="ident">Green</span>.<span class="ident">bold</span>()    =&gt; <span class="ident">ExtraStyles</span>(<span class="ident">style</span>().<span class="ident">bold</span>()));
-    <span class="macro">test!</span>(<span class="ident">lowercase</span>:  <span class="ident">Green</span>.<span class="ident">bold</span>();   <span class="ident">Green</span>.<span class="ident">normal</span>()  =&gt; <span class="ident">Reset</span>);
-    <span class="macro">test!</span>(<span class="ident">nothing2</span>:   <span class="ident">Green</span>.<span class="ident">bold</span>();   <span class="ident">Green</span>.<span class="ident">bold</span>()    =&gt; <span class="ident">NoDifference</span>);
+    <span class="macro">test!</span>(nothing:    Green.normal(); Green.normal()  =&gt; NoDifference);
+    <span class="macro">test!</span>(uppercase:  Green.normal(); Green.bold()    =&gt; ExtraStyles(style().bold()));
+    <span class="macro">test!</span>(lowercase:  Green.bold();   Green.normal()  =&gt; Reset);
+    <span class="macro">test!</span>(nothing2:   Green.bold();   Green.bold()    =&gt; NoDifference);
 
-    <span class="macro">test!</span>(<span class="ident">colour_change</span>: <span class="ident">Red</span>.<span class="ident">normal</span>(); <span class="ident">Blue</span>.<span class="ident">normal</span>() =&gt; <span class="ident">ExtraStyles</span>(<span class="ident">Blue</span>.<span class="ident">normal</span>()));
+    <span class="macro">test!</span>(colour_change: Red.normal(); Blue.normal() =&gt; ExtraStyles(Blue.normal()));
 
-    <span class="macro">test!</span>(<span class="ident">addition_of_blink</span>:          <span class="ident">style</span>(); <span class="ident">style</span>().<span class="ident">blink</span>()          =&gt; <span class="ident">ExtraStyles</span>(<span class="ident">style</span>().<span class="ident">blink</span>()));
-    <span class="macro">test!</span>(<span class="ident">addition_of_dimmed</span>:         <span class="ident">style</span>(); <span class="ident">style</span>().<span class="ident">dimmed</span>()         =&gt; <span class="ident">ExtraStyles</span>(<span class="ident">style</span>().<span class="ident">dimmed</span>()));
-    <span class="macro">test!</span>(<span class="ident">addition_of_hidden</span>:         <span class="ident">style</span>(); <span class="ident">style</span>().<span class="ident">hidden</span>()         =&gt; <span class="ident">ExtraStyles</span>(<span class="ident">style</span>().<span class="ident">hidden</span>()));
-    <span class="macro">test!</span>(<span class="ident">addition_of_reverse</span>:        <span class="ident">style</span>(); <span class="ident">style</span>().<span class="ident">reverse</span>()        =&gt; <span class="ident">ExtraStyles</span>(<span class="ident">style</span>().<span class="ident">reverse</span>()));
-    <span class="macro">test!</span>(<span class="ident">addition_of_strikethrough</span>:  <span class="ident">style</span>(); <span class="ident">style</span>().<span class="ident">strikethrough</span>()  =&gt; <span class="ident">ExtraStyles</span>(<span class="ident">style</span>().<span class="ident">strikethrough</span>()));
+    <span class="macro">test!</span>(addition_of_blink:          style(); style().blink()          =&gt; ExtraStyles(style().blink()));
+    <span class="macro">test!</span>(addition_of_dimmed:         style(); style().dimmed()         =&gt; ExtraStyles(style().dimmed()));
+    <span class="macro">test!</span>(addition_of_hidden:         style(); style().hidden()         =&gt; ExtraStyles(style().hidden()));
+    <span class="macro">test!</span>(addition_of_reverse:        style(); style().reverse()        =&gt; ExtraStyles(style().reverse()));
+    <span class="macro">test!</span>(addition_of_strikethrough:  style(); style().strikethrough()  =&gt; ExtraStyles(style().strikethrough()));
 
-    <span class="macro">test!</span>(<span class="ident">removal_of_strikethrough</span>:   <span class="ident">style</span>().<span class="ident">strikethrough</span>(); <span class="ident">style</span>()  =&gt; <span class="ident">Reset</span>);
-    <span class="macro">test!</span>(<span class="ident">removal_of_reverse</span>:         <span class="ident">style</span>().<span class="ident">reverse</span>();       <span class="ident">style</span>()  =&gt; <span class="ident">Reset</span>);
-    <span class="macro">test!</span>(<span class="ident">removal_of_hidden</span>:          <span class="ident">style</span>().<span class="ident">hidden</span>();        <span class="ident">style</span>()  =&gt; <span class="ident">Reset</span>);
-    <span class="macro">test!</span>(<span class="ident">removal_of_dimmed</span>:          <span class="ident">style</span>().<span class="ident">dimmed</span>();        <span class="ident">style</span>()  =&gt; <span class="ident">Reset</span>);
-    <span class="macro">test!</span>(<span class="ident">removal_of_blink</span>:           <span class="ident">style</span>().<span class="ident">blink</span>();         <span class="ident">style</span>()  =&gt; <span class="ident">Reset</span>);
+    <span class="macro">test!</span>(removal_of_strikethrough:   style().strikethrough(); style()  =&gt; Reset);
+    <span class="macro">test!</span>(removal_of_reverse:         style().reverse();       style()  =&gt; Reset);
+    <span class="macro">test!</span>(removal_of_hidden:          style().hidden();        style()  =&gt; Reset);
+    <span class="macro">test!</span>(removal_of_dimmed:          style().dimmed();        style()  =&gt; Reset);
+    <span class="macro">test!</span>(removal_of_blink:           style().blink();         style()  =&gt; Reset);
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ansi_term" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ansi_term" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

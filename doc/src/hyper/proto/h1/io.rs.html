@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.14.20/src/proto/h1/io.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>io.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../hyper/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.14.20/src/proto/h1/io.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>io.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../hyper/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../hyper/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1000,691 +1000,691 @@
 <span id="1000">1000</span>
 <span id="1001">1001</span>
 <span id="1002">1002</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::cmp</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">std::future::Future</span>;
-<span class="kw">use</span> <span class="ident">std::io</span>::{<span class="self">self</span>, <span class="ident">IoSlice</span>};
-<span class="kw">use</span> <span class="ident">std::marker::Unpin</span>;
-<span class="kw">use</span> <span class="ident">std::mem::MaybeUninit</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::cmp;
+<span class="kw">use </span>std::fmt;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;server&quot;</span>, feature = <span class="string">&quot;runtime&quot;</span>))]
+</span><span class="kw">use </span>std::future::Future;
+<span class="kw">use </span>std::io::{<span class="self">self</span>, IoSlice};
+<span class="kw">use </span>std::marker::Unpin;
+<span class="kw">use </span>std::mem::MaybeUninit;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;server&quot;</span>, feature = <span class="string">&quot;runtime&quot;</span>))]
+</span><span class="kw">use </span>std::time::Duration;
 
-<span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">Buf</span>, <span class="ident">BufMut</span>, <span class="ident">Bytes</span>, <span class="ident">BytesMut</span>};
-<span class="kw">use</span> <span class="ident">tokio::io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>, <span class="ident">ReadBuf</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">tokio::time::Instant</span>;
-<span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">trace</span>};
+<span class="kw">use </span>bytes::{Buf, BufMut, Bytes, BytesMut};
+<span class="kw">use </span>tokio::io::{AsyncRead, AsyncWrite, ReadBuf};
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;server&quot;</span>, feature = <span class="string">&quot;runtime&quot;</span>))]
+</span><span class="kw">use </span>tokio::time::Instant;
+<span class="kw">use </span>tracing::{debug, trace};
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Http1Transaction</span>, <span class="ident">ParseContext</span>, <span class="ident">ParsedMessage</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common::buf::BufList</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::common</span>::{<span class="ident">task</span>, <span class="ident">Pin</span>, <span class="ident">Poll</span>};
+<span class="kw">use super</span>::{Http1Transaction, ParseContext, ParsedMessage};
+<span class="kw">use </span><span class="kw">crate</span>::common::buf::BufList;
+<span class="kw">use </span><span class="kw">crate</span>::common::{task, Pin, Poll};
 
-<span class="doccomment">/// The initial buffer size allocated before trying to read from IO.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">INIT_BUFFER_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">8192</span>;
+<span class="doccomment">/// The initial buffer size allocated before trying to read from IO.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>INIT_BUFFER_SIZE: usize = <span class="number">8192</span>;
 
-<span class="doccomment">/// The minimum value that can be set to max buffer size.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">MINIMUM_MAX_BUFFER_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">INIT_BUFFER_SIZE</span>;
+<span class="doccomment">/// The minimum value that can be set to max buffer size.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>MINIMUM_MAX_BUFFER_SIZE: usize = INIT_BUFFER_SIZE;
 
-<span class="doccomment">/// The default maximum read buffer size. If the buffer gets this big and</span>
-<span class="doccomment">/// a message is still not complete, a `TooLarge` error is triggered.</span>
-<span class="comment">// Note: if this changes, update server::conn::Http::max_buf_size docs.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">DEFAULT_MAX_BUFFER_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">8192</span> <span class="op">+</span> <span class="number">4096</span> <span class="op">*</span> <span class="number">100</span>;
+<span class="doccomment">/// The default maximum read buffer size. If the buffer gets this big and
+/// a message is still not complete, a `TooLarge` error is triggered.
+</span><span class="comment">// Note: if this changes, update server::conn::Http::max_buf_size docs.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>DEFAULT_MAX_BUFFER_SIZE: usize = <span class="number">8192 </span>+ <span class="number">4096 </span>* <span class="number">100</span>;
 
-<span class="doccomment">/// The maximum number of distinct `Buf`s to hold in a list before requiring</span>
-<span class="doccomment">/// a flush. Only affects when the buffer strategy is to queue buffers.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note that a flush can happen before reaching the maximum. This simply</span>
-<span class="doccomment">/// forces a flush if the queue gets this big.</span>
-<span class="kw">const</span> <span class="ident">MAX_BUF_LIST_BUFFERS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">16</span>;
+<span class="doccomment">/// The maximum number of distinct `Buf`s to hold in a list before requiring
+/// a flush. Only affects when the buffer strategy is to queue buffers.
+///
+/// Note that a flush can happen before reaching the maximum. This simply
+/// forces a flush if the queue gets this big.
+</span><span class="kw">const </span>MAX_BUF_LIST_BUFFERS: usize = <span class="number">16</span>;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Buffered</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="ident">flush_pipeline</span>: <span class="ident">bool</span>,
-    <span class="ident">io</span>: <span class="ident">T</span>,
-    <span class="ident">read_blocked</span>: <span class="ident">bool</span>,
-    <span class="ident">read_buf</span>: <span class="ident">BytesMut</span>,
-    <span class="ident">read_buf_strategy</span>: <span class="ident">ReadStrategy</span>,
-    <span class="ident">write_buf</span>: <span class="ident">WriteBuf</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Buffered&lt;T, B&gt; {
+    flush_pipeline: bool,
+    io: T,
+    read_blocked: bool,
+    read_buf: BytesMut,
+    read_buf_strategy: ReadStrategy,
+    write_buf: WriteBuf&lt;B&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Buffered</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">B</span>: <span class="ident">Buf</span>,
+<span class="kw">impl</span>&lt;T, B&gt; fmt::Debug <span class="kw">for </span>Buffered&lt;T, B&gt;
+<span class="kw">where
+    </span>B: Buf,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Buffered&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;read_buf&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">read_buf</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;write_buf&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">write_buf</span>)
-            .<span class="ident">finish</span>()
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;Buffered&quot;</span>)
+            .field(<span class="string">&quot;read_buf&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.read_buf)
+            .field(<span class="string">&quot;write_buf&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.write_buf)
+            .finish()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span> <span class="ident">Buffered</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-    <span class="ident">B</span>: <span class="ident">Buf</span>,
+<span class="kw">impl</span>&lt;T, B&gt; Buffered&lt;T, B&gt;
+<span class="kw">where
+    </span>T: AsyncRead + AsyncWrite + Unpin,
+    B: Buf,
 {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">io</span>: <span class="ident">T</span>) -&gt; <span class="ident">Buffered</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">strategy</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">io</span>.<span class="ident">is_write_vectored</span>() {
-            <span class="ident">WriteStrategy::Queue</span>
-        } <span class="kw">else</span> {
-            <span class="ident">WriteStrategy::Flatten</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(io: T) -&gt; Buffered&lt;T, B&gt; {
+        <span class="kw">let </span>strategy = <span class="kw">if </span>io.is_write_vectored() {
+            WriteStrategy::Queue
+        } <span class="kw">else </span>{
+            WriteStrategy::Flatten
         };
-        <span class="kw">let</span> <span class="ident">write_buf</span> <span class="op">=</span> <span class="ident">WriteBuf::new</span>(<span class="ident">strategy</span>);
-        <span class="ident">Buffered</span> {
-            <span class="ident">flush_pipeline</span>: <span class="bool-val">false</span>,
-            <span class="ident">io</span>,
-            <span class="ident">read_blocked</span>: <span class="bool-val">false</span>,
-            <span class="ident">read_buf</span>: <span class="ident">BytesMut::with_capacity</span>(<span class="number">0</span>),
-            <span class="ident">read_buf_strategy</span>: <span class="ident">ReadStrategy::default</span>(),
-            <span class="ident">write_buf</span>,
+        <span class="kw">let </span>write_buf = WriteBuf::new(strategy);
+        Buffered {
+            flush_pipeline: <span class="bool-val">false</span>,
+            io,
+            read_blocked: <span class="bool-val">false</span>,
+            read_buf: BytesMut::with_capacity(<span class="number">0</span>),
+            read_buf_strategy: ReadStrategy::default(),
+            write_buf,
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_flush_pipeline</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) {
-        <span class="macro">debug_assert!</span>(<span class="op">!</span><span class="self">self</span>.<span class="ident">write_buf</span>.<span class="ident">has_remaining</span>());
-        <span class="self">self</span>.<span class="ident">flush_pipeline</span> <span class="op">=</span> <span class="ident">enabled</span>;
-        <span class="kw">if</span> <span class="ident">enabled</span> {
-            <span class="self">self</span>.<span class="ident">set_write_strategy_flatten</span>();
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;server&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set_flush_pipeline(<span class="kw-2">&amp;mut </span><span class="self">self</span>, enabled: bool) {
+        <span class="macro">debug_assert!</span>(!<span class="self">self</span>.write_buf.has_remaining());
+        <span class="self">self</span>.flush_pipeline = enabled;
+        <span class="kw">if </span>enabled {
+            <span class="self">self</span>.set_write_strategy_flatten();
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_max_buf_size</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">max</span>: <span class="ident">usize</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set_max_buf_size(<span class="kw-2">&amp;mut </span><span class="self">self</span>, max: usize) {
         <span class="macro">assert!</span>(
-            <span class="ident">max</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">MINIMUM_MAX_BUFFER_SIZE</span>,
+            max &gt;= MINIMUM_MAX_BUFFER_SIZE,
             <span class="string">&quot;The max_buf_size cannot be smaller than {}.&quot;</span>,
-            <span class="ident">MINIMUM_MAX_BUFFER_SIZE</span>,
+            MINIMUM_MAX_BUFFER_SIZE,
         );
-        <span class="self">self</span>.<span class="ident">read_buf_strategy</span> <span class="op">=</span> <span class="ident">ReadStrategy::with_max</span>(<span class="ident">max</span>);
-        <span class="self">self</span>.<span class="ident">write_buf</span>.<span class="ident">max_buf_size</span> <span class="op">=</span> <span class="ident">max</span>;
+        <span class="self">self</span>.read_buf_strategy = ReadStrategy::with_max(max);
+        <span class="self">self</span>.write_buf.max_buf_size = max;
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_read_buf_exact_size</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">sz</span>: <span class="ident">usize</span>) {
-        <span class="self">self</span>.<span class="ident">read_buf_strategy</span> <span class="op">=</span> <span class="ident">ReadStrategy::Exact</span>(<span class="ident">sz</span>);
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set_read_buf_exact_size(<span class="kw-2">&amp;mut </span><span class="self">self</span>, sz: usize) {
+        <span class="self">self</span>.read_buf_strategy = ReadStrategy::Exact(sz);
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_write_strategy_flatten</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="comment">// this should always be called only at construction time,</span>
-        <span class="comment">// so this assert is here to catch myself</span>
-        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">write_buf</span>.<span class="ident">queue</span>.<span class="ident">bufs_cnt</span>() <span class="op">==</span> <span class="number">0</span>);
-        <span class="self">self</span>.<span class="ident">write_buf</span>.<span class="ident">set_strategy</span>(<span class="ident">WriteStrategy::Flatten</span>);
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set_write_strategy_flatten(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="comment">// this should always be called only at construction time,
+        // so this assert is here to catch myself
+        </span><span class="macro">debug_assert!</span>(<span class="self">self</span>.write_buf.queue.bufs_cnt() == <span class="number">0</span>);
+        <span class="self">self</span>.write_buf.set_strategy(WriteStrategy::Flatten);
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_write_strategy_queue</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="comment">// this should always be called only at construction time,</span>
-        <span class="comment">// so this assert is here to catch myself</span>
-        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">write_buf</span>.<span class="ident">queue</span>.<span class="ident">bufs_cnt</span>() <span class="op">==</span> <span class="number">0</span>);
-        <span class="self">self</span>.<span class="ident">write_buf</span>.<span class="ident">set_strategy</span>(<span class="ident">WriteStrategy::Queue</span>);
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set_write_strategy_queue(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="comment">// this should always be called only at construction time,
+        // so this assert is here to catch myself
+        </span><span class="macro">debug_assert!</span>(<span class="self">self</span>.write_buf.queue.bufs_cnt() == <span class="number">0</span>);
+        <span class="self">self</span>.write_buf.set_strategy(WriteStrategy::Queue);
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">read_buf</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="ident">read_buf</span>.<span class="ident">as_ref</span>()
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>read_buf(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="self">self</span>.read_buf.as_ref()
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">read_buf_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span> {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">read_buf</span>
+    <span class="attribute">#[cfg(test)]
+    #[cfg(feature = <span class="string">&quot;nightly&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>read_buf_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>BytesMut {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.read_buf
     }
 
-    <span class="doccomment">/// Return the &quot;allocated&quot; available space, not the potential space</span>
-    <span class="doccomment">/// that could be allocated in the future.</span>
-    <span class="kw">fn</span> <span class="ident">read_buf_remaining_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">read_buf</span>.<span class="ident">capacity</span>() <span class="op">-</span> <span class="self">self</span>.<span class="ident">read_buf</span>.<span class="ident">len</span>()
+    <span class="doccomment">/// Return the &quot;allocated&quot; available space, not the potential space
+    /// that could be allocated in the future.
+    </span><span class="kw">fn </span>read_buf_remaining_mut(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.read_buf.capacity() - <span class="self">self</span>.read_buf.len()
     }
 
-    <span class="doccomment">/// Return whether we can append to the headers buffer.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Reasons we can&#39;t:</span>
-    <span class="doccomment">/// - The write buf is in queue mode, and some of the past body is still</span>
-    <span class="doccomment">///   needing to be flushed.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">can_headers_buf</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="op">!</span><span class="self">self</span>.<span class="ident">write_buf</span>.<span class="ident">queue</span>.<span class="ident">has_remaining</span>()
+    <span class="doccomment">/// Return whether we can append to the headers buffer.
+    ///
+    /// Reasons we can&#39;t:
+    /// - The write buf is in queue mode, and some of the past body is still
+    ///   needing to be flushed.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>can_headers_buf(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        !<span class="self">self</span>.write_buf.queue.has_remaining()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">headers_buf</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">write_buf</span>.<span class="ident">headers_mut</span>();
-        <span class="kw-2">&amp;mut</span> <span class="ident">buf</span>.<span class="ident">bytes</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>headers_buf(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt; {
+        <span class="kw">let </span>buf = <span class="self">self</span>.write_buf.headers_mut();
+        <span class="kw-2">&amp;mut </span>buf.bytes
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">write_buf</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">WriteBuf</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">write_buf</span>
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>write_buf(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>WriteBuf&lt;B&gt; {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.write_buf
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">buffer</span><span class="op">&lt;</span><span class="ident">BB</span>: <span class="ident">Buf</span> <span class="op">+</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="ident">BB</span>) {
-        <span class="self">self</span>.<span class="ident">write_buf</span>.<span class="ident">buffer</span>(<span class="ident">buf</span>)
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>buffer&lt;BB: Buf + Into&lt;B&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, buf: BB) {
+        <span class="self">self</span>.write_buf.buffer(buf)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">can_buffer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">flush_pipeline</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">write_buf</span>.<span class="ident">can_buffer</span>()
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>can_buffer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.flush_pipeline || <span class="self">self</span>.write_buf.can_buffer()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">consume_leading_lines</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">read_buf</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="number">0</span>;
-            <span class="kw">while</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">read_buf</span>.<span class="ident">len</span>() {
-                <span class="kw">match</span> <span class="self">self</span>.<span class="ident">read_buf</span>[<span class="ident">i</span>] {
-                    <span class="string">b&#39;\r&#39;</span> <span class="op">|</span> <span class="string">b&#39;\n&#39;</span> =&gt; <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>,
-                    <span class="kw">_</span> =&gt; <span class="kw">break</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>consume_leading_lines(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">if </span>!<span class="self">self</span>.read_buf.is_empty() {
+            <span class="kw">let </span><span class="kw-2">mut </span>i = <span class="number">0</span>;
+            <span class="kw">while </span>i &lt; <span class="self">self</span>.read_buf.len() {
+                <span class="kw">match </span><span class="self">self</span>.read_buf[i] {
+                    <span class="string">b&#39;\r&#39; </span>| <span class="string">b&#39;\n&#39; </span>=&gt; i += <span class="number">1</span>,
+                    <span class="kw">_ </span>=&gt; <span class="kw">break</span>,
                 }
             }
-            <span class="self">self</span>.<span class="ident">read_buf</span>.<span class="ident">advance</span>(<span class="ident">i</span>);
+            <span class="self">self</span>.read_buf.advance(i);
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">parse</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">parse_ctx</span>: <span class="ident">ParseContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ParsedMessage</span><span class="op">&lt;</span><span class="ident">S::Incoming</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Http1Transaction</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>parse&lt;S&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        parse_ctx: ParseContext&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;<span class="kw">crate</span>::Result&lt;ParsedMessage&lt;S::Incoming&gt;&gt;&gt;
+    <span class="kw">where
+        </span>S: Http1Transaction,
     {
-        <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="ident"><span class="kw">super</span>::role::parse_headers</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(
-                <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">read_buf</span>,
-                <span class="ident">ParseContext</span> {
-                    <span class="ident">cached_headers</span>: <span class="ident">parse_ctx</span>.<span class="ident">cached_headers</span>,
-                    <span class="ident">req_method</span>: <span class="ident">parse_ctx</span>.<span class="ident">req_method</span>,
-                    <span class="ident">h1_parser_config</span>: <span class="ident">parse_ctx</span>.<span class="ident">h1_parser_config</span>.<span class="ident">clone</span>(),
-                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>))]</span>
-                    <span class="ident">h1_header_read_timeout</span>: <span class="ident">parse_ctx</span>.<span class="ident">h1_header_read_timeout</span>,
-                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>))]</span>
-                    <span class="ident">h1_header_read_timeout_fut</span>: <span class="ident">parse_ctx</span>.<span class="ident">h1_header_read_timeout_fut</span>,
-                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>))]</span>
-                    <span class="ident">h1_header_read_timeout_running</span>: <span class="ident">parse_ctx</span>.<span class="ident">h1_header_read_timeout_running</span>,
-                    <span class="ident">preserve_header_case</span>: <span class="ident">parse_ctx</span>.<span class="ident">preserve_header_case</span>,
-                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>)]</span>
-                    <span class="ident">preserve_header_order</span>: <span class="ident">parse_ctx</span>.<span class="ident">preserve_header_order</span>,
-                    <span class="ident">h09_responses</span>: <span class="ident">parse_ctx</span>.<span class="ident">h09_responses</span>,
-                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>)]</span>
-                    <span class="ident">on_informational</span>: <span class="ident">parse_ctx</span>.<span class="ident">on_informational</span>,
-                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>)]</span>
-                    <span class="ident">raw_headers</span>: <span class="ident">parse_ctx</span>.<span class="ident">raw_headers</span>,
+        <span class="kw">loop </span>{
+            <span class="kw">match </span><span class="kw">super</span>::role::parse_headers::&lt;S&gt;(
+                <span class="kw-2">&amp;mut </span><span class="self">self</span>.read_buf,
+                ParseContext {
+                    cached_headers: parse_ctx.cached_headers,
+                    req_method: parse_ctx.req_method,
+                    h1_parser_config: parse_ctx.h1_parser_config.clone(),
+                    <span class="attribute">#[cfg(all(feature = <span class="string">&quot;server&quot;</span>, feature = <span class="string">&quot;runtime&quot;</span>))]
+                    </span>h1_header_read_timeout: parse_ctx.h1_header_read_timeout,
+                    <span class="attribute">#[cfg(all(feature = <span class="string">&quot;server&quot;</span>, feature = <span class="string">&quot;runtime&quot;</span>))]
+                    </span>h1_header_read_timeout_fut: parse_ctx.h1_header_read_timeout_fut,
+                    <span class="attribute">#[cfg(all(feature = <span class="string">&quot;server&quot;</span>, feature = <span class="string">&quot;runtime&quot;</span>))]
+                    </span>h1_header_read_timeout_running: parse_ctx.h1_header_read_timeout_running,
+                    preserve_header_case: parse_ctx.preserve_header_case,
+                    <span class="attribute">#[cfg(feature = <span class="string">&quot;ffi&quot;</span>)]
+                    </span>preserve_header_order: parse_ctx.preserve_header_order,
+                    h09_responses: parse_ctx.h09_responses,
+                    <span class="attribute">#[cfg(feature = <span class="string">&quot;ffi&quot;</span>)]
+                    </span>on_informational: parse_ctx.on_informational,
+                    <span class="attribute">#[cfg(feature = <span class="string">&quot;ffi&quot;</span>)]
+                    </span>raw_headers: parse_ctx.raw_headers,
                 },
-            )<span class="question-mark">?</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">msg</span>) =&gt; {
-                    <span class="macro">debug!</span>(<span class="string">&quot;parsed {} headers&quot;</span>, <span class="ident">msg</span>.<span class="ident">head</span>.<span class="ident">headers</span>.<span class="ident">len</span>());
+            )<span class="question-mark">? </span>{
+                <span class="prelude-val">Some</span>(msg) =&gt; {
+                    <span class="macro">debug!</span>(<span class="string">&quot;parsed {} headers&quot;</span>, msg.head.headers.len());
 
-                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>))]</span>
-                    {
-                        <span class="kw-2">*</span><span class="ident">parse_ctx</span>.<span class="ident">h1_header_read_timeout_running</span> <span class="op">=</span> <span class="bool-val">false</span>;
+                    <span class="attribute">#[cfg(all(feature = <span class="string">&quot;server&quot;</span>, feature = <span class="string">&quot;runtime&quot;</span>))]
+                    </span>{
+                        <span class="kw-2">*</span>parse_ctx.h1_header_read_timeout_running = <span class="bool-val">false</span>;
 
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">h1_header_read_timeout_fut</span>) <span class="op">=</span>
-                            <span class="ident">parse_ctx</span>.<span class="ident">h1_header_read_timeout_fut</span>
+                        <span class="kw">if let </span><span class="prelude-val">Some</span>(h1_header_read_timeout_fut) =
+                            parse_ctx.h1_header_read_timeout_fut
                         {
-                            <span class="comment">// Reset the timer in order to avoid woken up when the timeout finishes</span>
-                            <span class="ident">h1_header_read_timeout_fut</span>
-                                .<span class="ident">as_mut</span>()
-                                .<span class="ident">reset</span>(<span class="ident">Instant::now</span>() <span class="op">+</span> <span class="ident">Duration::from_secs</span>(<span class="number">30</span> <span class="op">*</span> <span class="number">24</span> <span class="op">*</span> <span class="number">60</span> <span class="op">*</span> <span class="number">60</span>));
+                            <span class="comment">// Reset the timer in order to avoid woken up when the timeout finishes
+                            </span>h1_header_read_timeout_fut
+                                .as_mut()
+                                .reset(Instant::now() + Duration::from_secs(<span class="number">30 </span>* <span class="number">24 </span>* <span class="number">60 </span>* <span class="number">60</span>));
                         }
                     }
-                    <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">msg</span>));
+                    <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Ok</span>(msg));
                 }
-                <span class="prelude-val">None</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">max</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">read_buf_strategy</span>.<span class="ident">max</span>();
-                    <span class="kw">if</span> <span class="self">self</span>.<span class="ident">read_buf</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">max</span> {
-                        <span class="macro">debug!</span>(<span class="string">&quot;max_buf_size ({}) reached, closing&quot;</span>, <span class="ident">max</span>);
-                        <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::new_too_large</span>()));
+                <span class="prelude-val">None </span>=&gt; {
+                    <span class="kw">let </span>max = <span class="self">self</span>.read_buf_strategy.max();
+                    <span class="kw">if </span><span class="self">self</span>.read_buf.len() &gt;= max {
+                        <span class="macro">debug!</span>(<span class="string">&quot;max_buf_size ({}) reached, closing&quot;</span>, max);
+                        <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Err</span>(<span class="kw">crate</span>::Error::new_too_large()));
                     }
 
-                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;server&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>))]</span>
-                    <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">parse_ctx</span>.<span class="ident">h1_header_read_timeout_running</span> {
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">h1_header_read_timeout_fut</span>) <span class="op">=</span>
-                            <span class="ident">parse_ctx</span>.<span class="ident">h1_header_read_timeout_fut</span>
+                    <span class="attribute">#[cfg(all(feature = <span class="string">&quot;server&quot;</span>, feature = <span class="string">&quot;runtime&quot;</span>))]
+                    </span><span class="kw">if </span><span class="kw-2">*</span>parse_ctx.h1_header_read_timeout_running {
+                        <span class="kw">if let </span><span class="prelude-val">Some</span>(h1_header_read_timeout_fut) =
+                            parse_ctx.h1_header_read_timeout_fut
                         {
-                            <span class="kw">if</span> <span class="ident">Pin::new</span>(<span class="ident">h1_header_read_timeout_fut</span>).<span class="ident">poll</span>(<span class="ident">cx</span>).<span class="ident">is_ready</span>() {
-                                <span class="kw-2">*</span><span class="ident">parse_ctx</span>.<span class="ident">h1_header_read_timeout_running</span> <span class="op">=</span> <span class="bool-val">false</span>;
+                            <span class="kw">if </span>Pin::new(h1_header_read_timeout_fut).poll(cx).is_ready() {
+                                <span class="kw-2">*</span>parse_ctx.h1_header_read_timeout_running = <span class="bool-val">false</span>;
 
                                 <span class="macro">tracing::warn!</span>(<span class="string">&quot;read header from client timeout&quot;</span>);
-                                <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::new_header_timeout</span>()));
+                                <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Err</span>(<span class="kw">crate</span>::Error::new_header_timeout()));
                             }
                         }
                     }
                 }
             }
-            <span class="kw">if</span> <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">poll_read_from_io</span>(<span class="ident">cx</span>)).<span class="ident">map_err</span>(<span class="ident"><span class="kw">crate</span>::Error::new_io</span>)<span class="question-mark">?</span> <span class="op">==</span> <span class="number">0</span> {
+            <span class="kw">if </span><span class="macro">ready!</span>(<span class="self">self</span>.poll_read_from_io(cx)).map_err(<span class="kw">crate</span>::Error::new_io)<span class="question-mark">? </span>== <span class="number">0 </span>{
                 <span class="macro">trace!</span>(<span class="string">&quot;parse eof&quot;</span>);
-                <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::new_incomplete</span>()));
+                <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Err</span>(<span class="kw">crate</span>::Error::new_incomplete()));
             }
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">poll_read_from_io</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">read_blocked</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">read_buf_strategy</span>.<span class="ident">next</span>();
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">read_buf_remaining_mut</span>() <span class="op">&lt;</span> <span class="ident">next</span> {
-            <span class="self">self</span>.<span class="ident">read_buf</span>.<span class="ident">reserve</span>(<span class="ident">next</span>);
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>poll_read_from_io(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;io::Result&lt;usize&gt;&gt; {
+        <span class="self">self</span>.read_blocked = <span class="bool-val">false</span>;
+        <span class="kw">let </span>next = <span class="self">self</span>.read_buf_strategy.next();
+        <span class="kw">if </span><span class="self">self</span>.read_buf_remaining_mut() &lt; next {
+            <span class="self">self</span>.read_buf.reserve(next);
         }
 
-        <span class="kw">let</span> <span class="ident">dst</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">read_buf</span>.<span class="ident">chunk_mut</span>();
-        <span class="kw">let</span> <span class="ident">dst</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span>(<span class="ident">dst</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*mut</span> [<span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>]) };
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">ReadBuf::uninit</span>(<span class="ident">dst</span>);
-        <span class="kw">match</span> <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">io</span>).<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="kw-2">&amp;mut</span> <span class="ident">buf</span>) {
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="kw">_</span>)) =&gt; {
-                <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">filled</span>().<span class="ident">len</span>();
-                <span class="macro">trace!</span>(<span class="string">&quot;received {} bytes&quot;</span>, <span class="ident">n</span>);
-                <span class="kw">unsafe</span> {
-                    <span class="comment">// Safety: we just read that many bytes into the</span>
-                    <span class="comment">// uninitialized part of the buffer, so this is okay.</span>
-                    <span class="comment">// @tokio pls give me back `poll_read_buf` thanks</span>
-                    <span class="self">self</span>.<span class="ident">read_buf</span>.<span class="ident">advance_mut</span>(<span class="ident">n</span>);
+        <span class="kw">let </span>dst = <span class="self">self</span>.read_buf.chunk_mut();
+        <span class="kw">let </span>dst = <span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span>(dst <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_ as </span><span class="kw-2">*mut </span>[MaybeUninit&lt;u8&gt;]) };
+        <span class="kw">let </span><span class="kw-2">mut </span>buf = ReadBuf::uninit(dst);
+        <span class="kw">match </span>Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.io).poll_read(cx, <span class="kw-2">&amp;mut </span>buf) {
+            Poll::Ready(<span class="prelude-val">Ok</span>(<span class="kw">_</span>)) =&gt; {
+                <span class="kw">let </span>n = buf.filled().len();
+                <span class="macro">trace!</span>(<span class="string">&quot;received {} bytes&quot;</span>, n);
+                <span class="kw">unsafe </span>{
+                    <span class="comment">// Safety: we just read that many bytes into the
+                    // uninitialized part of the buffer, so this is okay.
+                    // @tokio pls give me back `poll_read_buf` thanks
+                    </span><span class="self">self</span>.read_buf.advance_mut(n);
                 }
-                <span class="self">self</span>.<span class="ident">read_buf_strategy</span>.<span class="ident">record</span>(<span class="ident">n</span>);
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">n</span>))
+                <span class="self">self</span>.read_buf_strategy.record(n);
+                Poll::Ready(<span class="prelude-val">Ok</span>(n))
             }
-            <span class="ident">Poll::Pending</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">read_blocked</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                <span class="ident">Poll::Pending</span>
+            Poll::Pending =&gt; {
+                <span class="self">self</span>.read_blocked = <span class="bool-val">true</span>;
+                Poll::Pending
             }
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)),
+            Poll::Ready(<span class="prelude-val">Err</span>(e)) =&gt; Poll::Ready(<span class="prelude-val">Err</span>(e)),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; (<span class="ident">T</span>, <span class="ident">Bytes</span>) {
-        (<span class="self">self</span>.<span class="ident">io</span>, <span class="self">self</span>.<span class="ident">read_buf</span>.<span class="ident">freeze</span>())
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>into_inner(<span class="self">self</span>) -&gt; (T, Bytes) {
+        (<span class="self">self</span>.io, <span class="self">self</span>.read_buf.freeze())
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">io_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">T</span> {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">io</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>io_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>T {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.io
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_read_blocked</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">read_blocked</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_read_blocked(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.read_blocked
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">flush_pipeline</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">read_buf</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">write_buf</span>.<span class="ident">remaining</span>() <span class="op">==</span> <span class="number">0</span> {
-            <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">io</span>).<span class="ident">poll_flush</span>(<span class="ident">cx</span>)
-        } <span class="kw">else</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">WriteStrategy::Flatten</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">write_buf</span>.<span class="ident">strategy</span> {
-                <span class="kw">return</span> <span class="self">self</span>.<span class="ident">poll_flush_flattened</span>(<span class="ident">cx</span>);
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>poll_flush(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+        <span class="kw">if </span><span class="self">self</span>.flush_pipeline &amp;&amp; !<span class="self">self</span>.read_buf.is_empty() {
+            Poll::Ready(<span class="prelude-val">Ok</span>(()))
+        } <span class="kw">else if </span><span class="self">self</span>.write_buf.remaining() == <span class="number">0 </span>{
+            Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.io).poll_flush(cx)
+        } <span class="kw">else </span>{
+            <span class="kw">if let </span>WriteStrategy::Flatten = <span class="self">self</span>.write_buf.strategy {
+                <span class="kw">return </span><span class="self">self</span>.poll_flush_flattened(cx);
             }
 
-            <span class="kw">const</span> <span class="ident">MAX_WRITEV_BUFS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">64</span>;
-            <span class="kw">loop</span> {
-                <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iovs</span> <span class="op">=</span> [<span class="ident">IoSlice::new</span>(<span class="kw-2">&amp;</span>[]); <span class="ident">MAX_WRITEV_BUFS</span>];
-                    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">write_buf</span>.<span class="ident">chunks_vectored</span>(<span class="kw-2">&amp;mut</span> <span class="ident">iovs</span>);
-                    <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">io</span>).<span class="ident">poll_write_vectored</span>(<span class="ident">cx</span>, <span class="kw-2">&amp;</span><span class="ident">iovs</span>[..<span class="ident">len</span>]))<span class="question-mark">?</span>
-                };
-                <span class="comment">// TODO(eliza): we have to do this manually because</span>
-                <span class="comment">// `poll_write_buf` doesn&#39;t exist in Tokio 0.3 yet...when</span>
-                <span class="comment">// `poll_write_buf` comes back, the manual advance will need to leave!</span>
-                <span class="self">self</span>.<span class="ident">write_buf</span>.<span class="ident">advance</span>(<span class="ident">n</span>);
-                <span class="macro">debug!</span>(<span class="string">&quot;flushed {} bytes&quot;</span>, <span class="ident">n</span>);
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">write_buf</span>.<span class="ident">remaining</span>() <span class="op">==</span> <span class="number">0</span> {
+            <span class="kw">const </span>MAX_WRITEV_BUFS: usize = <span class="number">64</span>;
+            <span class="kw">loop </span>{
+                <span class="kw">let </span>n = {
+                    <span class="kw">let </span><span class="kw-2">mut </span>iovs = [IoSlice::new(<span class="kw-2">&amp;</span>[]); MAX_WRITEV_BUFS];
+                    <span class="kw">let </span>len = <span class="self">self</span>.write_buf.chunks_vectored(<span class="kw-2">&amp;mut </span>iovs);
+                    <span class="macro">ready!</span>(Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.io).poll_write_vectored(cx, <span class="kw-2">&amp;</span>iovs[..len]))<span class="question-mark">?
+                </span>};
+                <span class="comment">// TODO(eliza): we have to do this manually because
+                // `poll_write_buf` doesn&#39;t exist in Tokio 0.3 yet...when
+                // `poll_write_buf` comes back, the manual advance will need to leave!
+                </span><span class="self">self</span>.write_buf.advance(n);
+                <span class="macro">debug!</span>(<span class="string">&quot;flushed {} bytes&quot;</span>, n);
+                <span class="kw">if </span><span class="self">self</span>.write_buf.remaining() == <span class="number">0 </span>{
                     <span class="kw">break</span>;
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="number">0</span> {
+                } <span class="kw">else if </span>n == <span class="number">0 </span>{
                     <span class="macro">trace!</span>(
                         <span class="string">&quot;write returned zero, but {} bytes remaining&quot;</span>,
-                        <span class="self">self</span>.<span class="ident">write_buf</span>.<span class="ident">remaining</span>()
+                        <span class="self">self</span>.write_buf.remaining()
                     );
-                    <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">io::ErrorKind::WriteZero</span>.<span class="ident">into</span>()));
+                    <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Err</span>(io::ErrorKind::WriteZero.into()));
                 }
             }
-            <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">io</span>).<span class="ident">poll_flush</span>(<span class="ident">cx</span>)
+            Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.io).poll_flush(cx)
         }
     }
 
-    <span class="doccomment">/// Specialized version of `flush` when strategy is Flatten.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Since all buffered bytes are flattened into the single headers buffer,</span>
-    <span class="doccomment">/// that skips some bookkeeping around using multiple buffers.</span>
-    <span class="kw">fn</span> <span class="ident">poll_flush_flattened</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">io</span>).<span class="ident">poll_write</span>(<span class="ident">cx</span>, <span class="self">self</span>.<span class="ident">write_buf</span>.<span class="ident">headers</span>.<span class="ident">chunk</span>()))<span class="question-mark">?</span>;
-            <span class="macro">debug!</span>(<span class="string">&quot;flushed {} bytes&quot;</span>, <span class="ident">n</span>);
-            <span class="self">self</span>.<span class="ident">write_buf</span>.<span class="ident">headers</span>.<span class="ident">advance</span>(<span class="ident">n</span>);
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">write_buf</span>.<span class="ident">headers</span>.<span class="ident">remaining</span>() <span class="op">==</span> <span class="number">0</span> {
-                <span class="self">self</span>.<span class="ident">write_buf</span>.<span class="ident">headers</span>.<span class="ident">reset</span>();
+    <span class="doccomment">/// Specialized version of `flush` when strategy is Flatten.
+    ///
+    /// Since all buffered bytes are flattened into the single headers buffer,
+    /// that skips some bookkeeping around using multiple buffers.
+    </span><span class="kw">fn </span>poll_flush_flattened(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>n = <span class="macro">ready!</span>(Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.io).poll_write(cx, <span class="self">self</span>.write_buf.headers.chunk()))<span class="question-mark">?</span>;
+            <span class="macro">debug!</span>(<span class="string">&quot;flushed {} bytes&quot;</span>, n);
+            <span class="self">self</span>.write_buf.headers.advance(n);
+            <span class="kw">if </span><span class="self">self</span>.write_buf.headers.remaining() == <span class="number">0 </span>{
+                <span class="self">self</span>.write_buf.headers.reset();
                 <span class="kw">break</span>;
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="number">0</span> {
+            } <span class="kw">else if </span>n == <span class="number">0 </span>{
                 <span class="macro">trace!</span>(
                     <span class="string">&quot;write returned zero, but {} bytes remaining&quot;</span>,
-                    <span class="self">self</span>.<span class="ident">write_buf</span>.<span class="ident">remaining</span>()
+                    <span class="self">self</span>.write_buf.remaining()
                 );
-                <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">io::ErrorKind::WriteZero</span>.<span class="ident">into</span>()));
+                <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Err</span>(io::ErrorKind::WriteZero.into()));
             }
         }
-        <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">io</span>).<span class="ident">poll_flush</span>(<span class="ident">cx</span>)
+        Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.io).poll_flush(cx)
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">flush</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">std::future::Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
-        <span class="ident">futures_util::future::poll_fn</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">cx</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">poll_flush</span>(<span class="ident">cx</span>))
+    <span class="attribute">#[cfg(test)]
+    </span><span class="kw">fn </span>flush&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>std::future::Future&lt;Output = io::Result&lt;()&gt;&gt; + <span class="lifetime">&#39;a </span>{
+        futures_util::future::poll_fn(<span class="kw">move </span>|cx| <span class="self">self</span>.poll_flush(cx))
     }
 }
 
-<span class="comment">// The `B` is a `Buf`, we never project a pin to it</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Unpin</span>, <span class="ident">B</span><span class="op">&gt;</span> <span class="ident">Unpin</span> <span class="kw">for</span> <span class="ident">Buffered</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span> {}
+<span class="comment">// The `B` is a `Buf`, we never project a pin to it
+</span><span class="kw">impl</span>&lt;T: Unpin, B&gt; Unpin <span class="kw">for </span>Buffered&lt;T, B&gt; {}
 
-<span class="comment">// TODO: This trait is old... at least rename to PollBytes or something...</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">MemRead</span> {
-    <span class="kw">fn</span> <span class="ident">read_mem</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="comment">// TODO: This trait is old... at least rename to PollBytes or something...
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>MemRead {
+    <span class="kw">fn </span>read_mem(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;, len: usize) -&gt; Poll&lt;io::Result&lt;Bytes&gt;&gt;;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span> <span class="ident">MemRead</span> <span class="kw">for</span> <span class="ident">Buffered</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-    <span class="ident">B</span>: <span class="ident">Buf</span>,
+<span class="kw">impl</span>&lt;T, B&gt; MemRead <span class="kw">for </span>Buffered&lt;T, B&gt;
+<span class="kw">where
+    </span>T: AsyncRead + AsyncWrite + Unpin,
+    B: Buf,
 {
-    <span class="kw">fn</span> <span class="ident">read_mem</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">read_buf</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">std::cmp::min</span>(<span class="ident">len</span>, <span class="self">self</span>.<span class="ident">read_buf</span>.<span class="ident">len</span>());
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">read_buf</span>.<span class="ident">split_to</span>(<span class="ident">n</span>).<span class="ident">freeze</span>()))
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">poll_read_from_io</span>(<span class="ident">cx</span>))<span class="question-mark">?</span>;
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">read_buf</span>.<span class="ident">split_to</span>(<span class="ident">::std::cmp::min</span>(<span class="ident">len</span>, <span class="ident">n</span>)).<span class="ident">freeze</span>()))
+    <span class="kw">fn </span>read_mem(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;, len: usize) -&gt; Poll&lt;io::Result&lt;Bytes&gt;&gt; {
+        <span class="kw">if </span>!<span class="self">self</span>.read_buf.is_empty() {
+            <span class="kw">let </span>n = std::cmp::min(len, <span class="self">self</span>.read_buf.len());
+            Poll::Ready(<span class="prelude-val">Ok</span>(<span class="self">self</span>.read_buf.split_to(n).freeze()))
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>n = <span class="macro">ready!</span>(<span class="self">self</span>.poll_read_from_io(cx))<span class="question-mark">?</span>;
+            Poll::Ready(<span class="prelude-val">Ok</span>(<span class="self">self</span>.read_buf.split_to(::std::cmp::min(len, n)).freeze()))
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">enum</span> <span class="ident">ReadStrategy</span> {
-    <span class="ident">Adaptive</span> {
-        <span class="ident">decrease_now</span>: <span class="ident">bool</span>,
-        <span class="ident">next</span>: <span class="ident">usize</span>,
-        <span class="ident">max</span>: <span class="ident">usize</span>,
+<span class="attribute">#[derive(Clone, Copy, Debug)]
+</span><span class="kw">enum </span>ReadStrategy {
+    Adaptive {
+        decrease_now: bool,
+        next: usize,
+        max: usize,
     },
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
-    <span class="ident">Exact</span>(<span class="ident">usize</span>),
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+    </span>Exact(usize),
 }
 
-<span class="kw">impl</span> <span class="ident">ReadStrategy</span> {
-    <span class="kw">fn</span> <span class="ident">with_max</span>(<span class="ident">max</span>: <span class="ident">usize</span>) -&gt; <span class="ident">ReadStrategy</span> {
-        <span class="ident">ReadStrategy::Adaptive</span> {
-            <span class="ident">decrease_now</span>: <span class="bool-val">false</span>,
-            <span class="ident">next</span>: <span class="ident">INIT_BUFFER_SIZE</span>,
-            <span class="ident">max</span>,
+<span class="kw">impl </span>ReadStrategy {
+    <span class="kw">fn </span>with_max(max: usize) -&gt; ReadStrategy {
+        ReadStrategy::Adaptive {
+            decrease_now: <span class="bool-val">false</span>,
+            next: INIT_BUFFER_SIZE,
+            max,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ReadStrategy::Adaptive</span> { <span class="ident">next</span>, .. } =&gt; <span class="ident">next</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
-            <span class="ident">ReadStrategy::Exact</span>(<span class="ident">exact</span>) =&gt; <span class="ident">exact</span>,
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            ReadStrategy::Adaptive { next, .. } =&gt; next,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+            </span>ReadStrategy::Exact(exact) =&gt; exact,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">max</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ReadStrategy::Adaptive</span> { <span class="ident">max</span>, .. } =&gt; <span class="ident">max</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
-            <span class="ident">ReadStrategy::Exact</span>(<span class="ident">exact</span>) =&gt; <span class="ident">exact</span>,
+    <span class="kw">fn </span>max(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            ReadStrategy::Adaptive { max, .. } =&gt; max,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+            </span>ReadStrategy::Exact(exact) =&gt; exact,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">record</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">bytes_read</span>: <span class="ident">usize</span>) {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ReadStrategy::Adaptive</span> {
-                <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">decrease_now</span>,
-                <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">next</span>,
-                <span class="ident">max</span>,
+    <span class="kw">fn </span>record(<span class="kw-2">&amp;mut </span><span class="self">self</span>, bytes_read: usize) {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            ReadStrategy::Adaptive {
+                <span class="kw-2">ref mut </span>decrease_now,
+                <span class="kw-2">ref mut </span>next,
+                max,
                 ..
             } =&gt; {
-                <span class="kw">if</span> <span class="ident">bytes_read</span> <span class="op">&gt;</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">next</span> {
-                    <span class="kw-2">*</span><span class="ident">next</span> <span class="op">=</span> <span class="ident">cmp::min</span>(<span class="ident">incr_power_of_two</span>(<span class="kw-2">*</span><span class="ident">next</span>), <span class="ident">max</span>);
-                    <span class="kw-2">*</span><span class="ident">decrease_now</span> <span class="op">=</span> <span class="bool-val">false</span>;
-                } <span class="kw">else</span> {
-                    <span class="kw">let</span> <span class="ident">decr_to</span> <span class="op">=</span> <span class="ident">prev_power_of_two</span>(<span class="kw-2">*</span><span class="ident">next</span>);
-                    <span class="kw">if</span> <span class="ident">bytes_read</span> <span class="op">&lt;</span> <span class="ident">decr_to</span> {
-                        <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">decrease_now</span> {
-                            <span class="kw-2">*</span><span class="ident">next</span> <span class="op">=</span> <span class="ident">cmp::max</span>(<span class="ident">decr_to</span>, <span class="ident">INIT_BUFFER_SIZE</span>);
-                            <span class="kw-2">*</span><span class="ident">decrease_now</span> <span class="op">=</span> <span class="bool-val">false</span>;
-                        } <span class="kw">else</span> {
-                            <span class="comment">// Decreasing is a two &quot;record&quot; process.</span>
-                            <span class="kw-2">*</span><span class="ident">decrease_now</span> <span class="op">=</span> <span class="bool-val">true</span>;
+                <span class="kw">if </span>bytes_read &gt;= <span class="kw-2">*</span>next {
+                    <span class="kw-2">*</span>next = cmp::min(incr_power_of_two(<span class="kw-2">*</span>next), max);
+                    <span class="kw-2">*</span>decrease_now = <span class="bool-val">false</span>;
+                } <span class="kw">else </span>{
+                    <span class="kw">let </span>decr_to = prev_power_of_two(<span class="kw-2">*</span>next);
+                    <span class="kw">if </span>bytes_read &lt; decr_to {
+                        <span class="kw">if </span><span class="kw-2">*</span>decrease_now {
+                            <span class="kw-2">*</span>next = cmp::max(decr_to, INIT_BUFFER_SIZE);
+                            <span class="kw-2">*</span>decrease_now = <span class="bool-val">false</span>;
+                        } <span class="kw">else </span>{
+                            <span class="comment">// Decreasing is a two &quot;record&quot; process.
+                            </span><span class="kw-2">*</span>decrease_now = <span class="bool-val">true</span>;
                         }
-                    } <span class="kw">else</span> {
-                        <span class="comment">// A read within the current range should cancel</span>
-                        <span class="comment">// a potential decrease, since we just saw proof</span>
-                        <span class="comment">// that we still need this size.</span>
-                        <span class="kw-2">*</span><span class="ident">decrease_now</span> <span class="op">=</span> <span class="bool-val">false</span>;
+                    } <span class="kw">else </span>{
+                        <span class="comment">// A read within the current range should cancel
+                        // a potential decrease, since we just saw proof
+                        // that we still need this size.
+                        </span><span class="kw-2">*</span>decrease_now = <span class="bool-val">false</span>;
                     }
                 }
             }
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
-            <span class="ident">ReadStrategy::Exact</span>(<span class="kw">_</span>) =&gt; (),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;client&quot;</span>)]
+            </span>ReadStrategy::Exact(<span class="kw">_</span>) =&gt; (),
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">incr_power_of_two</span>(<span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
-    <span class="ident">n</span>.<span class="ident">saturating_mul</span>(<span class="number">2</span>)
+<span class="kw">fn </span>incr_power_of_two(n: usize) -&gt; usize {
+    n.saturating_mul(<span class="number">2</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">prev_power_of_two</span>(<span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
-    <span class="comment">// Only way this shift can underflow is if n is less than 4.</span>
-    <span class="comment">// (Which would means `usize::MAX &gt;&gt; 64` and underflowed!)</span>
-    <span class="macro">debug_assert!</span>(<span class="ident">n</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">4</span>);
-    (<span class="ident">::std::usize::MAX</span> <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="ident">n</span>.<span class="ident">leading_zeros</span>() <span class="op">+</span> <span class="number">2</span>)) <span class="op">+</span> <span class="number">1</span>
-}
+<span class="kw">fn </span>prev_power_of_two(n: usize) -&gt; usize {
+    <span class="comment">// Only way this shift can underflow is if n is less than 4.
+    // (Which would means `usize::MAX &gt;&gt; 64` and underflowed!)
+    </span><span class="macro">debug_assert!</span>(n &gt;= <span class="number">4</span>);
+    (::std::usize::MAX &gt;&gt; (n.leading_zeros() + <span class="number">2</span>)) + <span class="number">1
+</span>}
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ReadStrategy</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">ReadStrategy</span> {
-        <span class="ident">ReadStrategy::with_max</span>(<span class="ident">DEFAULT_MAX_BUFFER_SIZE</span>)
+<span class="kw">impl </span>Default <span class="kw">for </span>ReadStrategy {
+    <span class="kw">fn </span>default() -&gt; ReadStrategy {
+        ReadStrategy::with_max(DEFAULT_MAX_BUFFER_SIZE)
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">bytes</span>: <span class="ident">T</span>,
-    <span class="ident">pos</span>: <span class="ident">usize</span>,
+<span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Cursor&lt;T&gt; {
+    bytes: T,
+    pos: usize,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">bytes</span>: <span class="ident">T</span>) -&gt; <span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">Cursor</span> { <span class="ident">bytes</span>, <span class="ident">pos</span>: <span class="number">0</span> }
+<span class="kw">impl</span>&lt;T: AsRef&lt;[u8]&gt;&gt; Cursor&lt;T&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(bytes: T) -&gt; Cursor&lt;T&gt; {
+        Cursor { bytes, pos: <span class="number">0 </span>}
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// If we&#39;ve advanced the position a bit in this cursor, and wish to</span>
-    <span class="doccomment">/// extend the underlying vector, we may wish to unshift the &quot;read&quot; bytes</span>
-    <span class="doccomment">/// off, and move everything else over.</span>
-    <span class="kw">fn</span> <span class="ident">maybe_unshift</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">additional</span>: <span class="ident">usize</span>) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">pos</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="comment">// nothing to do</span>
-            <span class="kw">return</span>;
+<span class="kw">impl </span>Cursor&lt;Vec&lt;u8&gt;&gt; {
+    <span class="doccomment">/// If we&#39;ve advanced the position a bit in this cursor, and wish to
+    /// extend the underlying vector, we may wish to unshift the &quot;read&quot; bytes
+    /// off, and move everything else over.
+    </span><span class="kw">fn </span>maybe_unshift(<span class="kw-2">&amp;mut </span><span class="self">self</span>, additional: usize) {
+        <span class="kw">if </span><span class="self">self</span>.pos == <span class="number">0 </span>{
+            <span class="comment">// nothing to do
+            </span><span class="kw">return</span>;
         }
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">capacity</span>() <span class="op">-</span> <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">additional</span> {
-            <span class="comment">// there&#39;s room!</span>
-            <span class="kw">return</span>;
+        <span class="kw">if </span><span class="self">self</span>.bytes.capacity() - <span class="self">self</span>.bytes.len() &gt;= additional {
+            <span class="comment">// there&#39;s room!
+            </span><span class="kw">return</span>;
         }
 
-        <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">drain</span>(<span class="number">0</span>..<span class="self">self</span>.<span class="ident">pos</span>);
-        <span class="self">self</span>.<span class="ident">pos</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="self">self</span>.bytes.drain(<span class="number">0</span>..<span class="self">self</span>.pos);
+        <span class="self">self</span>.pos = <span class="number">0</span>;
     }
 
-    <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">pos</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">clear</span>();
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Cursor&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;pos&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pos</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;len&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">as_ref</span>().<span class="ident">len</span>())
-            .<span class="ident">finish</span>()
+    <span class="kw">fn </span>reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.pos = <span class="number">0</span>;
+        <span class="self">self</span>.bytes.clear();
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Buf</span> <span class="kw">for</span> <span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">remaining</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">as_ref</span>().<span class="ident">len</span>() <span class="op">-</span> <span class="self">self</span>.<span class="ident">pos</span>
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">chunk</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">as_ref</span>()[<span class="self">self</span>.<span class="ident">pos</span>..]
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cnt</span>: <span class="ident">usize</span>) {
-        <span class="macro">debug_assert!</span>(<span class="self">self</span>.<span class="ident">pos</span> <span class="op">+</span> <span class="ident">cnt</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">as_ref</span>().<span class="ident">len</span>());
-        <span class="self">self</span>.<span class="ident">pos</span> <span class="op">+</span><span class="op">=</span> <span class="ident">cnt</span>;
+<span class="kw">impl</span>&lt;T: AsRef&lt;[u8]&gt;&gt; fmt::Debug <span class="kw">for </span>Cursor&lt;T&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;Cursor&quot;</span>)
+            .field(<span class="string">&quot;pos&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.pos)
+            .field(<span class="string">&quot;len&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.bytes.as_ref().len())
+            .finish()
     }
 }
 
-<span class="comment">// an internal buffer to collect writes before flushes</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">WriteBuf</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Re-usable buffer that holds message headers</span>
-    <span class="ident">headers</span>: <span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">max_buf_size</span>: <span class="ident">usize</span>,
-    <span class="doccomment">/// Deque of user buffers if strategy is Queue</span>
-    <span class="ident">queue</span>: <span class="ident">BufList</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
-    <span class="ident">strategy</span>: <span class="ident">WriteStrategy</span>,
+<span class="kw">impl</span>&lt;T: AsRef&lt;[u8]&gt;&gt; Buf <span class="kw">for </span>Cursor&lt;T&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>remaining(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.bytes.as_ref().len() - <span class="self">self</span>.pos
+    }
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>chunk(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.bytes.as_ref()[<span class="self">self</span>.pos..]
+    }
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>advance(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cnt: usize) {
+        <span class="macro">debug_assert!</span>(<span class="self">self</span>.pos + cnt &lt;= <span class="self">self</span>.bytes.as_ref().len());
+        <span class="self">self</span>.pos += cnt;
+    }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Buf</span><span class="op">&gt;</span> <span class="ident">WriteBuf</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">strategy</span>: <span class="ident">WriteStrategy</span>) -&gt; <span class="ident">WriteBuf</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-        <span class="ident">WriteBuf</span> {
-            <span class="ident">headers</span>: <span class="ident">Cursor::new</span>(<span class="ident">Vec::with_capacity</span>(<span class="ident">INIT_BUFFER_SIZE</span>)),
-            <span class="ident">max_buf_size</span>: <span class="ident">DEFAULT_MAX_BUFFER_SIZE</span>,
-            <span class="ident">queue</span>: <span class="ident">BufList::new</span>(),
-            <span class="ident">strategy</span>,
+<span class="comment">// an internal buffer to collect writes before flushes
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>WriteBuf&lt;B&gt; {
+    <span class="doccomment">/// Re-usable buffer that holds message headers
+    </span>headers: Cursor&lt;Vec&lt;u8&gt;&gt;,
+    max_buf_size: usize,
+    <span class="doccomment">/// Deque of user buffers if strategy is Queue
+    </span>queue: BufList&lt;B&gt;,
+    strategy: WriteStrategy,
+}
+
+<span class="kw">impl</span>&lt;B: Buf&gt; WriteBuf&lt;B&gt; {
+    <span class="kw">fn </span>new(strategy: WriteStrategy) -&gt; WriteBuf&lt;B&gt; {
+        WriteBuf {
+            headers: Cursor::new(Vec::with_capacity(INIT_BUFFER_SIZE)),
+            max_buf_size: DEFAULT_MAX_BUFFER_SIZE,
+            queue: BufList::new(),
+            strategy,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> <span class="ident">WriteBuf</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">B</span>: <span class="ident">Buf</span>,
+<span class="kw">impl</span>&lt;B&gt; WriteBuf&lt;B&gt;
+<span class="kw">where
+    </span>B: Buf,
 {
-    <span class="kw">fn</span> <span class="ident">set_strategy</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">strategy</span>: <span class="ident">WriteStrategy</span>) {
-        <span class="self">self</span>.<span class="ident">strategy</span> <span class="op">=</span> <span class="ident">strategy</span>;
+    <span class="kw">fn </span>set_strategy(<span class="kw-2">&amp;mut </span><span class="self">self</span>, strategy: WriteStrategy) {
+        <span class="self">self</span>.strategy = strategy;
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">buffer</span><span class="op">&lt;</span><span class="ident">BB</span>: <span class="ident">Buf</span> <span class="op">+</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">buf</span>: <span class="ident">BB</span>) {
-        <span class="macro">debug_assert!</span>(<span class="ident">buf</span>.<span class="ident">has_remaining</span>());
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">strategy</span> {
-            <span class="ident">WriteStrategy::Flatten</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">head</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">headers_mut</span>();
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>buffer&lt;BB: Buf + Into&lt;B&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>buf: BB) {
+        <span class="macro">debug_assert!</span>(buf.has_remaining());
+        <span class="kw">match </span><span class="self">self</span>.strategy {
+            WriteStrategy::Flatten =&gt; {
+                <span class="kw">let </span>head = <span class="self">self</span>.headers_mut();
 
-                <span class="ident">head</span>.<span class="ident">maybe_unshift</span>(<span class="ident">buf</span>.<span class="ident">remaining</span>());
+                head.maybe_unshift(buf.remaining());
                 <span class="macro">trace!</span>(
-                    <span class="self">self</span>.<span class="ident">len</span> <span class="op">=</span> <span class="ident">head</span>.<span class="ident">remaining</span>(),
-                    <span class="ident">buf</span>.<span class="ident">len</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">remaining</span>(),
-                    <span class="string">&quot;buffer.flatten&quot;</span>
-                );
-                <span class="comment">//perf: This is a little faster than &lt;Vec as BufMut&gt;&gt;::put,</span>
-                <span class="comment">//but accomplishes the same result.</span>
-                <span class="kw">loop</span> {
-                    <span class="kw">let</span> <span class="ident">adv</span> <span class="op">=</span> {
-                        <span class="kw">let</span> <span class="ident">slice</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">chunk</span>();
-                        <span class="kw">if</span> <span class="ident">slice</span>.<span class="ident">is_empty</span>() {
+                    <span class="self">self</span>.len = head.remaining(),
+                    buf.len = buf.remaining(),
+                    <span class="string">&quot;buffer.flatten&quot;
+                </span>);
+                <span class="comment">//perf: This is a little faster than &lt;Vec as BufMut&gt;&gt;::put,
+                //but accomplishes the same result.
+                </span><span class="kw">loop </span>{
+                    <span class="kw">let </span>adv = {
+                        <span class="kw">let </span>slice = buf.chunk();
+                        <span class="kw">if </span>slice.is_empty() {
                             <span class="kw">return</span>;
                         }
-                        <span class="ident">head</span>.<span class="ident">bytes</span>.<span class="ident">extend_from_slice</span>(<span class="ident">slice</span>);
-                        <span class="ident">slice</span>.<span class="ident">len</span>()
+                        head.bytes.extend_from_slice(slice);
+                        slice.len()
                     };
-                    <span class="ident">buf</span>.<span class="ident">advance</span>(<span class="ident">adv</span>);
+                    buf.advance(adv);
                 }
             }
-            <span class="ident">WriteStrategy::Queue</span> =&gt; {
+            WriteStrategy::Queue =&gt; {
                 <span class="macro">trace!</span>(
-                    <span class="self">self</span>.<span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">remaining</span>(),
-                    <span class="ident">buf</span>.<span class="ident">len</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">remaining</span>(),
-                    <span class="string">&quot;buffer.queue&quot;</span>
-                );
-                <span class="self">self</span>.<span class="ident">queue</span>.<span class="ident">push</span>(<span class="ident">buf</span>.<span class="ident">into</span>());
+                    <span class="self">self</span>.len = <span class="self">self</span>.remaining(),
+                    buf.len = buf.remaining(),
+                    <span class="string">&quot;buffer.queue&quot;
+                </span>);
+                <span class="self">self</span>.queue.push(buf.into());
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">can_buffer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">strategy</span> {
-            <span class="ident">WriteStrategy::Flatten</span> =&gt; <span class="self">self</span>.<span class="ident">remaining</span>() <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">max_buf_size</span>,
-            <span class="ident">WriteStrategy::Queue</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">queue</span>.<span class="ident">bufs_cnt</span>() <span class="op">&lt;</span> <span class="ident">MAX_BUF_LIST_BUFFERS</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">remaining</span>() <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">max_buf_size</span>
+    <span class="kw">fn </span>can_buffer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="self">self</span>.strategy {
+            WriteStrategy::Flatten =&gt; <span class="self">self</span>.remaining() &lt; <span class="self">self</span>.max_buf_size,
+            WriteStrategy::Queue =&gt; {
+                <span class="self">self</span>.queue.bufs_cnt() &lt; MAX_BUF_LIST_BUFFERS &amp;&amp; <span class="self">self</span>.remaining() &lt; <span class="self">self</span>.max_buf_size
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">headers_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="macro">debug_assert!</span>(<span class="op">!</span><span class="self">self</span>.<span class="ident">queue</span>.<span class="ident">has_remaining</span>());
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">headers</span>
+    <span class="kw">fn </span>headers_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>Cursor&lt;Vec&lt;u8&gt;&gt; {
+        <span class="macro">debug_assert!</span>(!<span class="self">self</span>.queue.has_remaining());
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.headers
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Buf</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">WriteBuf</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;WriteBuf&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;remaining&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">remaining</span>())
-            .<span class="ident">field</span>(<span class="string">&quot;strategy&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">strategy</span>)
-            .<span class="ident">finish</span>()
+<span class="kw">impl</span>&lt;B: Buf&gt; fmt::Debug <span class="kw">for </span>WriteBuf&lt;B&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;WriteBuf&quot;</span>)
+            .field(<span class="string">&quot;remaining&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.remaining())
+            .field(<span class="string">&quot;strategy&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.strategy)
+            .finish()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span>: <span class="ident">Buf</span><span class="op">&gt;</span> <span class="ident">Buf</span> <span class="kw">for</span> <span class="ident">WriteBuf</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">remaining</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">headers</span>.<span class="ident">remaining</span>() <span class="op">+</span> <span class="self">self</span>.<span class="ident">queue</span>.<span class="ident">remaining</span>()
+<span class="kw">impl</span>&lt;B: Buf&gt; Buf <span class="kw">for </span>WriteBuf&lt;B&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>remaining(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.headers.remaining() + <span class="self">self</span>.queue.remaining()
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">chunk</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="kw">let</span> <span class="ident">headers</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">headers</span>.<span class="ident">chunk</span>();
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">headers</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">headers</span>
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">queue</span>.<span class="ident">chunk</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>chunk(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="kw">let </span>headers = <span class="self">self</span>.headers.chunk();
+        <span class="kw">if </span>!headers.is_empty() {
+            headers
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.queue.chunk()
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cnt</span>: <span class="ident">usize</span>) {
-        <span class="kw">let</span> <span class="ident">hrem</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">headers</span>.<span class="ident">remaining</span>();
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>advance(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cnt: usize) {
+        <span class="kw">let </span>hrem = <span class="self">self</span>.headers.remaining();
 
-        <span class="kw">match</span> <span class="ident">hrem</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">cnt</span>) {
-            <span class="ident">cmp::Ordering::Equal</span> =&gt; <span class="self">self</span>.<span class="ident">headers</span>.<span class="ident">reset</span>(),
-            <span class="ident">cmp::Ordering::Greater</span> =&gt; <span class="self">self</span>.<span class="ident">headers</span>.<span class="ident">advance</span>(<span class="ident">cnt</span>),
-            <span class="ident">cmp::Ordering::Less</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">qcnt</span> <span class="op">=</span> <span class="ident">cnt</span> <span class="op">-</span> <span class="ident">hrem</span>;
-                <span class="self">self</span>.<span class="ident">headers</span>.<span class="ident">reset</span>();
-                <span class="self">self</span>.<span class="ident">queue</span>.<span class="ident">advance</span>(<span class="ident">qcnt</span>);
+        <span class="kw">match </span>hrem.cmp(<span class="kw-2">&amp;</span>cnt) {
+            cmp::Ordering::Equal =&gt; <span class="self">self</span>.headers.reset(),
+            cmp::Ordering::Greater =&gt; <span class="self">self</span>.headers.advance(cnt),
+            cmp::Ordering::Less =&gt; {
+                <span class="kw">let </span>qcnt = cnt - hrem;
+                <span class="self">self</span>.headers.reset();
+                <span class="self">self</span>.queue.advance(qcnt);
             }
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">chunks_vectored</span><span class="op">&lt;</span><span class="lifetime">&#39;t</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;t</span> <span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">IoSlice</span><span class="op">&lt;</span><span class="lifetime">&#39;t</span><span class="op">&gt;</span>]) -&gt; <span class="ident">usize</span> {
-        <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">headers</span>.<span class="ident">chunks_vectored</span>(<span class="ident">dst</span>);
-        <span class="self">self</span>.<span class="ident">queue</span>.<span class="ident">chunks_vectored</span>(<span class="kw-2">&amp;mut</span> <span class="ident">dst</span>[<span class="ident">n</span>..]) <span class="op">+</span> <span class="ident">n</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>chunks_vectored&lt;<span class="lifetime">&#39;t</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;t </span><span class="self">self</span>, dst: <span class="kw-2">&amp;mut </span>[IoSlice&lt;<span class="lifetime">&#39;t</span>&gt;]) -&gt; usize {
+        <span class="kw">let </span>n = <span class="self">self</span>.headers.chunks_vectored(dst);
+        <span class="self">self</span>.queue.chunks_vectored(<span class="kw-2">&amp;mut </span>dst[n..]) + n
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">enum</span> <span class="ident">WriteStrategy</span> {
-    <span class="ident">Flatten</span>,
-    <span class="ident">Queue</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">enum </span>WriteStrategy {
+    Flatten,
+    Queue,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">std::time::Duration</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>std::time::Duration;
 
-    <span class="kw">use</span> <span class="ident">tokio_test::io::Builder</span> <span class="kw">as</span> <span class="ident">Mock</span>;
+    <span class="kw">use </span>tokio_test::io::Builder <span class="kw">as </span>Mock;
 
-    <span class="comment">// #[cfg(feature = &quot;nightly&quot;)]</span>
-    <span class="comment">// use test::Bencher;</span>
+    <span class="comment">// #[cfg(feature = &quot;nightly&quot;)]
+    // use test::Bencher;
 
-    <span class="comment">/*
+    /*
     impl&lt;T: Read&gt; MemRead for AsyncIo&lt;T&gt; {
         fn read_mem(&amp;mut self, len: usize) -&gt; Poll&lt;Bytes, io::Error&gt; {
             let mut v = vec![0; len];
@@ -1692,194 +1692,194 @@
             Ok(Async::Ready(BytesMut::from(&amp;v[..n]).freeze()))
         }
     }
-    */</span>
+    */
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="attribute">#[<span class="ident">ignore</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">iobuf_write_empty_slice</span>() {
-        <span class="comment">// TODO(eliza): can i have writev back pls T_T</span>
-        <span class="comment">// // First, let&#39;s just check that the Mock would normally return an</span>
-        <span class="comment">// // error on an unexpected write, even if the buffer is empty...</span>
-        <span class="comment">// let mut mock = Mock::new().build();</span>
-        <span class="comment">// futures_util::future::poll_fn(|cx| {</span>
-        <span class="comment">//     Pin::new(&amp;mut mock).poll_write_buf(cx, &amp;mut Cursor::new(&amp;[]))</span>
-        <span class="comment">// })</span>
-        <span class="comment">// .await</span>
-        <span class="comment">// .expect_err(&quot;should be a broken pipe&quot;);</span>
+    </span><span class="attribute">#[tokio::test]
+    #[ignore]
+    </span><span class="kw">async fn </span>iobuf_write_empty_slice() {
+        <span class="comment">// TODO(eliza): can i have writev back pls T_T
+        // // First, let&#39;s just check that the Mock would normally return an
+        // // error on an unexpected write, even if the buffer is empty...
+        // let mut mock = Mock::new().build();
+        // futures_util::future::poll_fn(|cx| {
+        //     Pin::new(&amp;mut mock).poll_write_buf(cx, &amp;mut Cursor::new(&amp;[]))
+        // })
+        // .await
+        // .expect_err(&quot;should be a broken pipe&quot;);
 
-        <span class="comment">// // underlying io will return the logic error upon write,</span>
-        <span class="comment">// // so we are testing that the io_buf does not trigger a write</span>
-        <span class="comment">// // when there is nothing to flush</span>
-        <span class="comment">// let mock = Mock::new().build();</span>
-        <span class="comment">// let mut io_buf = Buffered::&lt;_, Cursor&lt;Vec&lt;u8&gt;&gt;&gt;::new(mock);</span>
-        <span class="comment">// io_buf.flush().await.expect(&quot;should short-circuit flush&quot;);</span>
-    }
+        // // underlying io will return the logic error upon write,
+        // // so we are testing that the io_buf does not trigger a write
+        // // when there is nothing to flush
+        // let mock = Mock::new().build();
+        // let mut io_buf = Buffered::&lt;_, Cursor&lt;Vec&lt;u8&gt;&gt;&gt;::new(mock);
+        // io_buf.flush().await.expect(&quot;should short-circuit flush&quot;);
+    </span>}
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">parse_reads_until_blocked</span>() {
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proto::h1::ClientTransaction</span>;
+    <span class="attribute">#[tokio::test]
+    </span><span class="kw">async fn </span>parse_reads_until_blocked() {
+        <span class="kw">use </span><span class="kw">crate</span>::proto::h1::ClientTransaction;
 
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">pretty_env_logger::try_init</span>();
-        <span class="kw">let</span> <span class="ident">mock</span> <span class="op">=</span> <span class="ident">Mock::new</span>()
-            <span class="comment">// Split over multiple reads will read all of it</span>
-            .<span class="ident">read</span>(<span class="string">b&quot;HTTP/1.1 200 OK\r\n&quot;</span>)
-            .<span class="ident">read</span>(<span class="string">b&quot;Server: hyper\r\n&quot;</span>)
-            <span class="comment">// missing last line ending</span>
-            .<span class="ident">wait</span>(<span class="ident">Duration::from_secs</span>(<span class="number">1</span>))
-            .<span class="ident">build</span>();
+        <span class="kw">let _ </span>= pretty_env_logger::try_init();
+        <span class="kw">let </span>mock = Mock::new()
+            <span class="comment">// Split over multiple reads will read all of it
+            </span>.read(<span class="string">b&quot;HTTP/1.1 200 OK\r\n&quot;</span>)
+            .read(<span class="string">b&quot;Server: hyper\r\n&quot;</span>)
+            <span class="comment">// missing last line ending
+            </span>.wait(Duration::from_secs(<span class="number">1</span>))
+            .build();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffered</span> <span class="op">=</span> <span class="ident">Buffered</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">mock</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>buffered = Buffered::&lt;<span class="kw">_</span>, Cursor&lt;Vec&lt;u8&gt;&gt;&gt;::new(mock);
 
-        <span class="comment">// We expect a `parse` to be not ready, and so can&#39;t await it directly.</span>
-        <span class="comment">// Rather, this `poll_fn` will wrap the `Poll` result.</span>
-        <span class="ident">futures_util::future::poll_fn</span>(<span class="op">|</span><span class="ident">cx</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">parse_ctx</span> <span class="op">=</span> <span class="ident">ParseContext</span> {
-                <span class="ident">cached_headers</span>: <span class="kw-2">&amp;mut</span> <span class="prelude-val">None</span>,
-                <span class="ident">req_method</span>: <span class="kw-2">&amp;mut</span> <span class="prelude-val">None</span>,
-                <span class="ident">h1_parser_config</span>: <span class="ident">Default::default</span>(),
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-                <span class="ident">h1_header_read_timeout</span>: <span class="prelude-val">None</span>,
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-                <span class="ident">h1_header_read_timeout_fut</span>: <span class="kw-2">&amp;mut</span> <span class="prelude-val">None</span>,
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-                <span class="ident">h1_header_read_timeout_running</span>: <span class="kw-2">&amp;mut</span> <span class="bool-val">false</span>,
-                <span class="ident">preserve_header_case</span>: <span class="bool-val">false</span>,
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>)]</span>
-                <span class="ident">preserve_header_order</span>: <span class="bool-val">false</span>,
-                <span class="ident">h09_responses</span>: <span class="bool-val">false</span>,
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>)]</span>
-                <span class="ident">on_informational</span>: <span class="kw-2">&amp;mut</span> <span class="prelude-val">None</span>,
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ffi&quot;</span>)]</span>
-                <span class="ident">raw_headers</span>: <span class="bool-val">false</span>,
+        <span class="comment">// We expect a `parse` to be not ready, and so can&#39;t await it directly.
+        // Rather, this `poll_fn` will wrap the `Poll` result.
+        </span>futures_util::future::poll_fn(|cx| {
+            <span class="kw">let </span>parse_ctx = ParseContext {
+                cached_headers: <span class="kw-2">&amp;mut </span><span class="prelude-val">None</span>,
+                req_method: <span class="kw-2">&amp;mut </span><span class="prelude-val">None</span>,
+                h1_parser_config: Default::default(),
+                <span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+                </span>h1_header_read_timeout: <span class="prelude-val">None</span>,
+                <span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+                </span>h1_header_read_timeout_fut: <span class="kw-2">&amp;mut </span><span class="prelude-val">None</span>,
+                <span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+                </span>h1_header_read_timeout_running: <span class="kw-2">&amp;mut </span><span class="bool-val">false</span>,
+                preserve_header_case: <span class="bool-val">false</span>,
+                <span class="attribute">#[cfg(feature = <span class="string">&quot;ffi&quot;</span>)]
+                </span>preserve_header_order: <span class="bool-val">false</span>,
+                h09_responses: <span class="bool-val">false</span>,
+                <span class="attribute">#[cfg(feature = <span class="string">&quot;ffi&quot;</span>)]
+                </span>on_informational: <span class="kw-2">&amp;mut </span><span class="prelude-val">None</span>,
+                <span class="attribute">#[cfg(feature = <span class="string">&quot;ffi&quot;</span>)]
+                </span>raw_headers: <span class="bool-val">false</span>,
             };
-            <span class="macro">assert!</span>(<span class="ident">buffered</span>
-                .<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">ClientTransaction</span><span class="op">&gt;</span>(<span class="ident">cx</span>, <span class="ident">parse_ctx</span>)
-                .<span class="ident">is_pending</span>());
-            <span class="ident">Poll::Ready</span>(())
+            <span class="macro">assert!</span>(buffered
+                .parse::&lt;ClientTransaction&gt;(cx, parse_ctx)
+                .is_pending());
+            Poll::Ready(())
         })
         .<span class="kw">await</span>;
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">buffered</span>.<span class="ident">read_buf</span>,
+            buffered.read_buf,
             <span class="string">b&quot;HTTP/1.1 200 OK\r\nServer: hyper\r\n&quot;</span>[..]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">read_strategy_adaptive_increments</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">strategy</span> <span class="op">=</span> <span class="ident">ReadStrategy::default</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">strategy</span>.<span class="ident">next</span>(), <span class="number">8192</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>read_strategy_adaptive_increments() {
+        <span class="kw">let </span><span class="kw-2">mut </span>strategy = ReadStrategy::default();
+        <span class="macro">assert_eq!</span>(strategy.next(), <span class="number">8192</span>);
 
-        <span class="comment">// Grows if record == next</span>
-        <span class="ident">strategy</span>.<span class="ident">record</span>(<span class="number">8192</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">strategy</span>.<span class="ident">next</span>(), <span class="number">16384</span>);
+        <span class="comment">// Grows if record == next
+        </span>strategy.record(<span class="number">8192</span>);
+        <span class="macro">assert_eq!</span>(strategy.next(), <span class="number">16384</span>);
 
-        <span class="ident">strategy</span>.<span class="ident">record</span>(<span class="number">16384</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">strategy</span>.<span class="ident">next</span>(), <span class="number">32768</span>);
+        strategy.record(<span class="number">16384</span>);
+        <span class="macro">assert_eq!</span>(strategy.next(), <span class="number">32768</span>);
 
-        <span class="comment">// Enormous records still increment at same rate</span>
-        <span class="ident">strategy</span>.<span class="ident">record</span>(<span class="ident">::std::usize::MAX</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">strategy</span>.<span class="ident">next</span>(), <span class="number">65536</span>);
+        <span class="comment">// Enormous records still increment at same rate
+        </span>strategy.record(::std::usize::MAX);
+        <span class="macro">assert_eq!</span>(strategy.next(), <span class="number">65536</span>);
 
-        <span class="kw">let</span> <span class="ident">max</span> <span class="op">=</span> <span class="ident">strategy</span>.<span class="ident">max</span>();
-        <span class="kw">while</span> <span class="ident">strategy</span>.<span class="ident">next</span>() <span class="op">&lt;</span> <span class="ident">max</span> {
-            <span class="ident">strategy</span>.<span class="ident">record</span>(<span class="ident">max</span>);
+        <span class="kw">let </span>max = strategy.max();
+        <span class="kw">while </span>strategy.next() &lt; max {
+            strategy.record(max);
         }
 
-        <span class="macro">assert_eq!</span>(<span class="ident">strategy</span>.<span class="ident">next</span>(), <span class="ident">max</span>, <span class="string">&quot;never goes over max&quot;</span>);
-        <span class="ident">strategy</span>.<span class="ident">record</span>(<span class="ident">max</span> <span class="op">+</span> <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">strategy</span>.<span class="ident">next</span>(), <span class="ident">max</span>, <span class="string">&quot;never goes over max&quot;</span>);
+        <span class="macro">assert_eq!</span>(strategy.next(), max, <span class="string">&quot;never goes over max&quot;</span>);
+        strategy.record(max + <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(strategy.next(), max, <span class="string">&quot;never goes over max&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">read_strategy_adaptive_decrements</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">strategy</span> <span class="op">=</span> <span class="ident">ReadStrategy::default</span>();
-        <span class="ident">strategy</span>.<span class="ident">record</span>(<span class="number">8192</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">strategy</span>.<span class="ident">next</span>(), <span class="number">16384</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>read_strategy_adaptive_decrements() {
+        <span class="kw">let </span><span class="kw-2">mut </span>strategy = ReadStrategy::default();
+        strategy.record(<span class="number">8192</span>);
+        <span class="macro">assert_eq!</span>(strategy.next(), <span class="number">16384</span>);
 
-        <span class="ident">strategy</span>.<span class="ident">record</span>(<span class="number">1</span>);
+        strategy.record(<span class="number">1</span>);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">strategy</span>.<span class="ident">next</span>(),
+            strategy.next(),
             <span class="number">16384</span>,
-            <span class="string">&quot;first smaller record doesn&#39;t decrement yet&quot;</span>
-        );
-        <span class="ident">strategy</span>.<span class="ident">record</span>(<span class="number">8192</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">strategy</span>.<span class="ident">next</span>(), <span class="number">16384</span>, <span class="string">&quot;record was with range&quot;</span>);
+            <span class="string">&quot;first smaller record doesn&#39;t decrement yet&quot;
+        </span>);
+        strategy.record(<span class="number">8192</span>);
+        <span class="macro">assert_eq!</span>(strategy.next(), <span class="number">16384</span>, <span class="string">&quot;record was with range&quot;</span>);
 
-        <span class="ident">strategy</span>.<span class="ident">record</span>(<span class="number">1</span>);
+        strategy.record(<span class="number">1</span>);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">strategy</span>.<span class="ident">next</span>(),
+            strategy.next(),
             <span class="number">16384</span>,
-            <span class="string">&quot;in-range record should make this the &#39;first&#39; again&quot;</span>
-        );
+            <span class="string">&quot;in-range record should make this the &#39;first&#39; again&quot;
+        </span>);
 
-        <span class="ident">strategy</span>.<span class="ident">record</span>(<span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">strategy</span>.<span class="ident">next</span>(), <span class="number">8192</span>, <span class="string">&quot;second smaller record decrements&quot;</span>);
+        strategy.record(<span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(strategy.next(), <span class="number">8192</span>, <span class="string">&quot;second smaller record decrements&quot;</span>);
 
-        <span class="ident">strategy</span>.<span class="ident">record</span>(<span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">strategy</span>.<span class="ident">next</span>(), <span class="number">8192</span>, <span class="string">&quot;first doesn&#39;t decrement&quot;</span>);
-        <span class="ident">strategy</span>.<span class="ident">record</span>(<span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">strategy</span>.<span class="ident">next</span>(), <span class="number">8192</span>, <span class="string">&quot;doesn&#39;t decrement under minimum&quot;</span>);
+        strategy.record(<span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(strategy.next(), <span class="number">8192</span>, <span class="string">&quot;first doesn&#39;t decrement&quot;</span>);
+        strategy.record(<span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(strategy.next(), <span class="number">8192</span>, <span class="string">&quot;doesn&#39;t decrement under minimum&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">read_strategy_adaptive_stays_the_same</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">strategy</span> <span class="op">=</span> <span class="ident">ReadStrategy::default</span>();
-        <span class="ident">strategy</span>.<span class="ident">record</span>(<span class="number">8192</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">strategy</span>.<span class="ident">next</span>(), <span class="number">16384</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>read_strategy_adaptive_stays_the_same() {
+        <span class="kw">let </span><span class="kw-2">mut </span>strategy = ReadStrategy::default();
+        strategy.record(<span class="number">8192</span>);
+        <span class="macro">assert_eq!</span>(strategy.next(), <span class="number">16384</span>);
 
-        <span class="ident">strategy</span>.<span class="ident">record</span>(<span class="number">8193</span>);
+        strategy.record(<span class="number">8193</span>);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">strategy</span>.<span class="ident">next</span>(),
+            strategy.next(),
             <span class="number">16384</span>,
-            <span class="string">&quot;first smaller record doesn&#39;t decrement yet&quot;</span>
-        );
+            <span class="string">&quot;first smaller record doesn&#39;t decrement yet&quot;
+        </span>);
 
-        <span class="ident">strategy</span>.<span class="ident">record</span>(<span class="number">8193</span>);
+        strategy.record(<span class="number">8193</span>);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">strategy</span>.<span class="ident">next</span>(),
+            strategy.next(),
             <span class="number">16384</span>,
-            <span class="string">&quot;with current step does not decrement&quot;</span>
-        );
+            <span class="string">&quot;with current step does not decrement&quot;
+        </span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">read_strategy_adaptive_max_fuzz</span>() {
-        <span class="kw">fn</span> <span class="ident">fuzz</span>(<span class="ident">max</span>: <span class="ident">usize</span>) {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">strategy</span> <span class="op">=</span> <span class="ident">ReadStrategy::with_max</span>(<span class="ident">max</span>);
-            <span class="kw">while</span> <span class="ident">strategy</span>.<span class="ident">next</span>() <span class="op">&lt;</span> <span class="ident">max</span> {
-                <span class="ident">strategy</span>.<span class="ident">record</span>(<span class="ident">::std::usize::MAX</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>read_strategy_adaptive_max_fuzz() {
+        <span class="kw">fn </span>fuzz(max: usize) {
+            <span class="kw">let </span><span class="kw-2">mut </span>strategy = ReadStrategy::with_max(max);
+            <span class="kw">while </span>strategy.next() &lt; max {
+                strategy.record(::std::usize::MAX);
             }
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">next</span> <span class="op">=</span> <span class="ident">strategy</span>.<span class="ident">next</span>();
-            <span class="kw">while</span> <span class="ident">next</span> <span class="op">&gt;</span> <span class="number">8192</span> {
-                <span class="ident">strategy</span>.<span class="ident">record</span>(<span class="number">1</span>);
-                <span class="ident">strategy</span>.<span class="ident">record</span>(<span class="number">1</span>);
-                <span class="ident">next</span> <span class="op">=</span> <span class="ident">strategy</span>.<span class="ident">next</span>();
+            <span class="kw">let </span><span class="kw-2">mut </span>next = strategy.next();
+            <span class="kw">while </span>next &gt; <span class="number">8192 </span>{
+                strategy.record(<span class="number">1</span>);
+                strategy.record(<span class="number">1</span>);
+                next = strategy.next();
                 <span class="macro">assert!</span>(
-                    <span class="ident">next</span>.<span class="ident">is_power_of_two</span>(),
+                    next.is_power_of_two(),
                     <span class="string">&quot;decrement should be powers of two: {} (max = {})&quot;</span>,
-                    <span class="ident">next</span>,
-                    <span class="ident">max</span>,
+                    next,
+                    max,
                 );
             }
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">max</span> <span class="op">=</span> <span class="number">8192</span>;
-        <span class="kw">while</span> <span class="ident">max</span> <span class="op">&lt;</span> <span class="ident">std::usize::MAX</span> {
-            <span class="ident">fuzz</span>(<span class="ident">max</span>);
-            <span class="ident">max</span> <span class="op">=</span> (<span class="ident">max</span> <span class="op">/</span> <span class="number">2</span>).<span class="ident">saturating_mul</span>(<span class="number">3</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>max = <span class="number">8192</span>;
+        <span class="kw">while </span>max &lt; std::usize::MAX {
+            fuzz(max);
+            max = (max / <span class="number">2</span>).saturating_mul(<span class="number">3</span>);
         }
-        <span class="ident">fuzz</span>(<span class="ident">::std::usize::MAX</span>);
+        fuzz(::std::usize::MAX);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span> <span class="comment">// needs to trigger a debug_assert</span>
-    <span class="kw">fn</span> <span class="ident">write_buf_requires_non_empty_bufs</span>() {
-        <span class="kw">let</span> <span class="ident">mock</span> <span class="op">=</span> <span class="ident">Mock::new</span>().<span class="ident">build</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffered</span> <span class="op">=</span> <span class="ident">Buffered</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">mock</span>);
+    <span class="attribute">#[test]
+    #[should_panic]
+    #[cfg(debug_assertions)] </span><span class="comment">// needs to trigger a debug_assert
+    </span><span class="kw">fn </span>write_buf_requires_non_empty_bufs() {
+        <span class="kw">let </span>mock = Mock::new().build();
+        <span class="kw">let </span><span class="kw-2">mut </span>buffered = Buffered::&lt;<span class="kw">_</span>, Cursor&lt;Vec&lt;u8&gt;&gt;&gt;::new(mock);
 
-        <span class="ident">buffered</span>.<span class="ident">buffer</span>(<span class="ident">Cursor::new</span>(<span class="ident">Vec::new</span>()));
+        buffered.buffer(Cursor::new(Vec::new()));
     }
 
     <span class="comment">/*
@@ -1903,104 +1903,104 @@
         assert_eq!(buffered.io.num_writes(), 1);
         assert_eq!(buffered.write_buf.queue.bufs_cnt(), 0);
     }
-    */</span>
+    */
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">write_buf_flatten</span>() {
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">pretty_env_logger::try_init</span>();
+    </span><span class="attribute">#[tokio::test]
+    </span><span class="kw">async fn </span>write_buf_flatten() {
+        <span class="kw">let _ </span>= pretty_env_logger::try_init();
 
-        <span class="kw">let</span> <span class="ident">mock</span> <span class="op">=</span> <span class="ident">Mock::new</span>().<span class="ident">write</span>(<span class="string">b&quot;hello world, it&#39;s hyper!&quot;</span>).<span class="ident">build</span>();
+        <span class="kw">let </span>mock = Mock::new().write(<span class="string">b&quot;hello world, it&#39;s hyper!&quot;</span>).build();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffered</span> <span class="op">=</span> <span class="ident">Buffered</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">mock</span>);
-        <span class="ident">buffered</span>.<span class="ident">write_buf</span>.<span class="ident">set_strategy</span>(<span class="ident">WriteStrategy::Flatten</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>buffered = Buffered::&lt;<span class="kw">_</span>, Cursor&lt;Vec&lt;u8&gt;&gt;&gt;::new(mock);
+        buffered.write_buf.set_strategy(WriteStrategy::Flatten);
 
-        <span class="ident">buffered</span>.<span class="ident">headers_buf</span>().<span class="ident">extend</span>(<span class="string">b&quot;hello &quot;</span>);
-        <span class="ident">buffered</span>.<span class="ident">buffer</span>(<span class="ident">Cursor::new</span>(<span class="string">b&quot;world, &quot;</span>.<span class="ident">to_vec</span>()));
-        <span class="ident">buffered</span>.<span class="ident">buffer</span>(<span class="ident">Cursor::new</span>(<span class="string">b&quot;it&#39;s &quot;</span>.<span class="ident">to_vec</span>()));
-        <span class="ident">buffered</span>.<span class="ident">buffer</span>(<span class="ident">Cursor::new</span>(<span class="string">b&quot;hyper!&quot;</span>.<span class="ident">to_vec</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">buffered</span>.<span class="ident">write_buf</span>.<span class="ident">queue</span>.<span class="ident">bufs_cnt</span>(), <span class="number">0</span>);
+        buffered.headers_buf().extend(<span class="string">b&quot;hello &quot;</span>);
+        buffered.buffer(Cursor::new(<span class="string">b&quot;world, &quot;</span>.to_vec()));
+        buffered.buffer(Cursor::new(<span class="string">b&quot;it&#39;s &quot;</span>.to_vec()));
+        buffered.buffer(Cursor::new(<span class="string">b&quot;hyper!&quot;</span>.to_vec()));
+        <span class="macro">assert_eq!</span>(buffered.write_buf.queue.bufs_cnt(), <span class="number">0</span>);
 
-        <span class="ident">buffered</span>.<span class="ident">flush</span>().<span class="kw">await</span>.<span class="ident">expect</span>(<span class="string">&quot;flush&quot;</span>);
+        buffered.flush().<span class="kw">await</span>.expect(<span class="string">&quot;flush&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">write_buf_flatten_partially_flushed</span>() {
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">pretty_env_logger::try_init</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>write_buf_flatten_partially_flushed() {
+        <span class="kw">let _ </span>= pretty_env_logger::try_init();
 
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="op">|</span><span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> <span class="ident">Cursor::new</span>(<span class="ident">s</span>.<span class="ident">as_bytes</span>().<span class="ident">to_vec</span>());
+        <span class="kw">let </span>b = |s: <span class="kw-2">&amp;</span>str| Cursor::new(s.as_bytes().to_vec());
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">write_buf</span> <span class="op">=</span> <span class="ident">WriteBuf</span>::<span class="op">&lt;</span><span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">WriteStrategy::Flatten</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>write_buf = WriteBuf::&lt;Cursor&lt;Vec&lt;u8&gt;&gt;&gt;::new(WriteStrategy::Flatten);
 
-        <span class="ident">write_buf</span>.<span class="ident">buffer</span>(<span class="ident">b</span>(<span class="string">&quot;hello &quot;</span>));
-        <span class="ident">write_buf</span>.<span class="ident">buffer</span>(<span class="ident">b</span>(<span class="string">&quot;world, &quot;</span>));
+        write_buf.buffer(b(<span class="string">&quot;hello &quot;</span>));
+        write_buf.buffer(b(<span class="string">&quot;world, &quot;</span>));
 
-        <span class="macro">assert_eq!</span>(<span class="ident">write_buf</span>.<span class="ident">chunk</span>(), <span class="string">b&quot;hello world, &quot;</span>);
+        <span class="macro">assert_eq!</span>(write_buf.chunk(), <span class="string">b&quot;hello world, &quot;</span>);
 
-        <span class="comment">// advance most of the way, but not all</span>
-        <span class="ident">write_buf</span>.<span class="ident">advance</span>(<span class="number">11</span>);
+        <span class="comment">// advance most of the way, but not all
+        </span>write_buf.advance(<span class="number">11</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">write_buf</span>.<span class="ident">chunk</span>(), <span class="string">b&quot;, &quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">write_buf</span>.<span class="ident">headers</span>.<span class="ident">pos</span>, <span class="number">11</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">write_buf</span>.<span class="ident">headers</span>.<span class="ident">bytes</span>.<span class="ident">capacity</span>(), <span class="ident">INIT_BUFFER_SIZE</span>);
+        <span class="macro">assert_eq!</span>(write_buf.chunk(), <span class="string">b&quot;, &quot;</span>);
+        <span class="macro">assert_eq!</span>(write_buf.headers.pos, <span class="number">11</span>);
+        <span class="macro">assert_eq!</span>(write_buf.headers.bytes.capacity(), INIT_BUFFER_SIZE);
 
-        <span class="comment">// there&#39;s still room in the headers buffer, so just push on the end</span>
-        <span class="ident">write_buf</span>.<span class="ident">buffer</span>(<span class="ident">b</span>(<span class="string">&quot;it&#39;s hyper!&quot;</span>));
+        <span class="comment">// there&#39;s still room in the headers buffer, so just push on the end
+        </span>write_buf.buffer(b(<span class="string">&quot;it&#39;s hyper!&quot;</span>));
 
-        <span class="macro">assert_eq!</span>(<span class="ident">write_buf</span>.<span class="ident">chunk</span>(), <span class="string">b&quot;, it&#39;s hyper!&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">write_buf</span>.<span class="ident">headers</span>.<span class="ident">pos</span>, <span class="number">11</span>);
+        <span class="macro">assert_eq!</span>(write_buf.chunk(), <span class="string">b&quot;, it&#39;s hyper!&quot;</span>);
+        <span class="macro">assert_eq!</span>(write_buf.headers.pos, <span class="number">11</span>);
 
-        <span class="kw">let</span> <span class="ident">rem1</span> <span class="op">=</span> <span class="ident">write_buf</span>.<span class="ident">remaining</span>();
-        <span class="kw">let</span> <span class="ident">cap</span> <span class="op">=</span> <span class="ident">write_buf</span>.<span class="ident">headers</span>.<span class="ident">bytes</span>.<span class="ident">capacity</span>();
+        <span class="kw">let </span>rem1 = write_buf.remaining();
+        <span class="kw">let </span>cap = write_buf.headers.bytes.capacity();
 
-        <span class="comment">// but when this would go over capacity, don&#39;t copy the old bytes</span>
-        <span class="ident">write_buf</span>.<span class="ident">buffer</span>(<span class="ident">Cursor::new</span>(<span class="macro">vec!</span>[<span class="string">b&#39;X&#39;</span>; <span class="ident">cap</span>]));
-        <span class="macro">assert_eq!</span>(<span class="ident">write_buf</span>.<span class="ident">remaining</span>(), <span class="ident">cap</span> <span class="op">+</span> <span class="ident">rem1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">write_buf</span>.<span class="ident">headers</span>.<span class="ident">pos</span>, <span class="number">0</span>);
+        <span class="comment">// but when this would go over capacity, don&#39;t copy the old bytes
+        </span>write_buf.buffer(Cursor::new(<span class="macro">vec!</span>[<span class="string">b&#39;X&#39;</span>; cap]));
+        <span class="macro">assert_eq!</span>(write_buf.remaining(), cap + rem1);
+        <span class="macro">assert_eq!</span>(write_buf.headers.pos, <span class="number">0</span>);
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">write_buf_queue_disable_auto</span>() {
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">pretty_env_logger::try_init</span>();
+    <span class="attribute">#[tokio::test]
+    </span><span class="kw">async fn </span>write_buf_queue_disable_auto() {
+        <span class="kw">let _ </span>= pretty_env_logger::try_init();
 
-        <span class="kw">let</span> <span class="ident">mock</span> <span class="op">=</span> <span class="ident">Mock::new</span>()
-            .<span class="ident">write</span>(<span class="string">b&quot;hello &quot;</span>)
-            .<span class="ident">write</span>(<span class="string">b&quot;world, &quot;</span>)
-            .<span class="ident">write</span>(<span class="string">b&quot;it&#39;s &quot;</span>)
-            .<span class="ident">write</span>(<span class="string">b&quot;hyper!&quot;</span>)
-            .<span class="ident">build</span>();
+        <span class="kw">let </span>mock = Mock::new()
+            .write(<span class="string">b&quot;hello &quot;</span>)
+            .write(<span class="string">b&quot;world, &quot;</span>)
+            .write(<span class="string">b&quot;it&#39;s &quot;</span>)
+            .write(<span class="string">b&quot;hyper!&quot;</span>)
+            .build();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffered</span> <span class="op">=</span> <span class="ident">Buffered</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">Cursor</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="ident">mock</span>);
-        <span class="ident">buffered</span>.<span class="ident">write_buf</span>.<span class="ident">set_strategy</span>(<span class="ident">WriteStrategy::Queue</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>buffered = Buffered::&lt;<span class="kw">_</span>, Cursor&lt;Vec&lt;u8&gt;&gt;&gt;::new(mock);
+        buffered.write_buf.set_strategy(WriteStrategy::Queue);
 
-        <span class="comment">// we have 4 buffers, and vec IO disabled, but explicitly said</span>
-        <span class="comment">// don&#39;t try to auto detect (via setting strategy above)</span>
+        <span class="comment">// we have 4 buffers, and vec IO disabled, but explicitly said
+        // don&#39;t try to auto detect (via setting strategy above)
 
-        <span class="ident">buffered</span>.<span class="ident">headers_buf</span>().<span class="ident">extend</span>(<span class="string">b&quot;hello &quot;</span>);
-        <span class="ident">buffered</span>.<span class="ident">buffer</span>(<span class="ident">Cursor::new</span>(<span class="string">b&quot;world, &quot;</span>.<span class="ident">to_vec</span>()));
-        <span class="ident">buffered</span>.<span class="ident">buffer</span>(<span class="ident">Cursor::new</span>(<span class="string">b&quot;it&#39;s &quot;</span>.<span class="ident">to_vec</span>()));
-        <span class="ident">buffered</span>.<span class="ident">buffer</span>(<span class="ident">Cursor::new</span>(<span class="string">b&quot;hyper!&quot;</span>.<span class="ident">to_vec</span>()));
-        <span class="macro">assert_eq!</span>(<span class="ident">buffered</span>.<span class="ident">write_buf</span>.<span class="ident">queue</span>.<span class="ident">bufs_cnt</span>(), <span class="number">3</span>);
+        </span>buffered.headers_buf().extend(<span class="string">b&quot;hello &quot;</span>);
+        buffered.buffer(Cursor::new(<span class="string">b&quot;world, &quot;</span>.to_vec()));
+        buffered.buffer(Cursor::new(<span class="string">b&quot;it&#39;s &quot;</span>.to_vec()));
+        buffered.buffer(Cursor::new(<span class="string">b&quot;hyper!&quot;</span>.to_vec()));
+        <span class="macro">assert_eq!</span>(buffered.write_buf.queue.bufs_cnt(), <span class="number">3</span>);
 
-        <span class="ident">buffered</span>.<span class="ident">flush</span>().<span class="kw">await</span>.<span class="ident">expect</span>(<span class="string">&quot;flush&quot;</span>);
+        buffered.flush().<span class="kw">await</span>.expect(<span class="string">&quot;flush&quot;</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">buffered</span>.<span class="ident">write_buf</span>.<span class="ident">queue</span>.<span class="ident">bufs_cnt</span>(), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(buffered.write_buf.queue.bufs_cnt(), <span class="number">0</span>);
     }
 
-    <span class="comment">// #[cfg(feature = &quot;nightly&quot;)]</span>
-    <span class="comment">// #[bench]</span>
-    <span class="comment">// fn bench_write_buf_flatten_buffer_chunk(b: &amp;mut Bencher) {</span>
-    <span class="comment">//     let s = &quot;Hello, World!&quot;;</span>
-    <span class="comment">//     b.bytes = s.len() as u64;</span>
+    <span class="comment">// #[cfg(feature = &quot;nightly&quot;)]
+    // #[bench]
+    // fn bench_write_buf_flatten_buffer_chunk(b: &amp;mut Bencher) {
+    //     let s = &quot;Hello, World!&quot;;
+    //     b.bytes = s.len() as u64;
 
-    <span class="comment">//     let mut write_buf = WriteBuf::&lt;bytes::Bytes&gt;::new();</span>
-    <span class="comment">//     write_buf.set_strategy(WriteStrategy::Flatten);</span>
-    <span class="comment">//     b.iter(|| {</span>
-    <span class="comment">//         let chunk = bytes::Bytes::from(s);</span>
-    <span class="comment">//         write_buf.buffer(chunk);</span>
-    <span class="comment">//         ::test::black_box(&amp;write_buf);</span>
-    <span class="comment">//         write_buf.headers.bytes.clear();</span>
-    <span class="comment">//     })</span>
-    <span class="comment">// }</span>
-}
+    //     let mut write_buf = WriteBuf::&lt;bytes::Bytes&gt;::new();
+    //     write_buf.set_strategy(WriteStrategy::Flatten);
+    //     b.iter(|| {
+    //         let chunk = bytes::Bytes::from(s);
+    //         write_buf.buffer(chunk);
+    //         ::test::black_box(&amp;write_buf);
+    //         write_buf.headers.bytes.clear();
+    //     })
+    // }
+</span>}
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="hyper" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="hyper" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

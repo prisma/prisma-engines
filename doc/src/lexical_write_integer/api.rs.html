@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-write-integer-0.8.5/src/api.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>api.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_write_integer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_write_integer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_write_integer/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-write-integer-0.8.5/src/api.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>api.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_write_integer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_write_integer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_write_integer/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -237,244 +237,244 @@
 <span id="237">237</span>
 <span id="238">238</span>
 <span id="239">239</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Implements the algorithm in terms of the lexical API.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Implements the algorithm in terms of the lexical API.
 
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+</span><span class="attribute">#![doc(hidden)]
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::options::Options</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::write::WriteInteger</span>;
-<span class="kw">use</span> <span class="ident">lexical_util::assert</span>::{<span class="ident">assert_buffer</span>, <span class="ident">debug_assert_buffer</span>};
-<span class="kw">use</span> <span class="ident">lexical_util::format</span>::{<span class="ident">NumberFormat</span>, <span class="ident">STANDARD</span>};
-<span class="kw">use</span> <span class="ident">lexical_util::num::SignedInteger</span>;
-<span class="kw">use</span> <span class="ident">lexical_util</span>::{<span class="ident">to_lexical</span>, <span class="ident">to_lexical_with_options</span>};
+</span><span class="kw">use </span><span class="kw">crate</span>::options::Options;
+<span class="kw">use </span><span class="kw">crate</span>::write::WriteInteger;
+<span class="kw">use </span>lexical_util::assert::{assert_buffer, debug_assert_buffer};
+<span class="kw">use </span>lexical_util::format::{NumberFormat, STANDARD};
+<span class="kw">use </span>lexical_util::num::SignedInteger;
+<span class="kw">use </span>lexical_util::{to_lexical, to_lexical_with_options};
 
-<span class="comment">// UNSIGNED</span>
+<span class="comment">// UNSIGNED
 
-<span class="doccomment">/// Callback for unsigned integer formatter.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Safe as long as the buffer can hold `FORMATTED_SIZE` elements</span>
-<span class="doccomment">/// (or `FORMATTED_SIZE_DECIMAL` for decimal).</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">unsigned</span><span class="op">&lt;</span><span class="ident">Narrow</span>, <span class="ident">Wide</span>, <span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="ident">Narrow</span>, <span class="ident">buffer</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">usize</span>
-<span class="kw">where</span>
-    <span class="ident">Narrow</span>: <span class="ident">WriteInteger</span>,
-    <span class="ident">Wide</span>: <span class="ident">WriteInteger</span>,
+</span><span class="doccomment">/// Callback for unsigned integer formatter.
+///
+/// # Safety
+///
+/// Safe as long as the buffer can hold `FORMATTED_SIZE` elements
+/// (or `FORMATTED_SIZE_DECIMAL` for decimal).
+</span><span class="attribute">#[inline]
+</span><span class="kw">unsafe fn </span>unsigned&lt;Narrow, Wide, <span class="kw">const </span>FORMAT: u128&gt;(value: Narrow, buffer: <span class="kw-2">&amp;mut </span>[u8]) -&gt; usize
+<span class="kw">where
+    </span>Narrow: WriteInteger,
+    Wide: WriteInteger,
 {
-    <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">NumberFormat</span>::<span class="op">&lt;</span><span class="ident">FORMAT</span><span class="op">&gt;</span> {};
-    <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>) <span class="op">&amp;&amp;</span> <span class="ident">format</span>.<span class="ident">required_mantissa_sign</span>() {
-        <span class="comment">// SAFETY: safe as long as there is at least `FORMATTED_SIZE` elements.</span>
-        <span class="kw">unsafe</span> {
-            <span class="macro">index_unchecked_mut!</span>(<span class="ident">buffer</span>[<span class="number">0</span>]) <span class="op">=</span> <span class="string">b&#39;+&#39;</span>;
-            <span class="kw">let</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="macro">index_unchecked_mut!</span>(<span class="ident">buffer</span>[<span class="number">1</span>..]);
-            <span class="ident">value</span>.<span class="ident">write_mantissa</span>::<span class="op">&lt;</span><span class="ident">Wide</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">buffer</span>) <span class="op">+</span> <span class="number">1</span>
-        }
-    } <span class="kw">else</span> {
-        <span class="comment">// SAFETY: safe as long as there is at least `FORMATTED_SIZE` elements.</span>
-        <span class="kw">unsafe</span> { <span class="ident">value</span>.<span class="ident">write_mantissa</span>::<span class="op">&lt;</span><span class="ident">Wide</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">buffer</span>) }
+    <span class="kw">let </span>format = NumberFormat::&lt;FORMAT&gt; {};
+    <span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;format&quot;</span>) &amp;&amp; format.required_mantissa_sign() {
+        <span class="comment">// SAFETY: safe as long as there is at least `FORMATTED_SIZE` elements.
+        </span><span class="kw">unsafe </span>{
+            <span class="macro">index_unchecked_mut!</span>(buffer[<span class="number">0</span>]) = <span class="string">b&#39;+&#39;</span>;
+            <span class="kw">let </span>buffer = <span class="kw-2">&amp;mut </span><span class="macro">index_unchecked_mut!</span>(buffer[<span class="number">1</span>..]);
+            value.write_mantissa::&lt;Wide, FORMAT&gt;(buffer) + <span class="number">1
+        </span>}
+    } <span class="kw">else </span>{
+        <span class="comment">// SAFETY: safe as long as there is at least `FORMATTED_SIZE` elements.
+        </span><span class="kw">unsafe </span>{ value.write_mantissa::&lt;Wide, FORMAT&gt;(buffer) }
     }
 }
 
-<span class="comment">// SIGNED</span>
+<span class="comment">// SIGNED
 
-<span class="doccomment">/// Callback for signed integer formatter.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Safe as long as the buffer can hold `FORMATTED_SIZE` elements</span>
-<span class="doccomment">/// (or `FORMATTED_SIZE_DECIMAL` for decimal).</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">signed</span><span class="op">&lt;</span><span class="ident">Narrow</span>, <span class="ident">Wide</span>, <span class="ident">Unsigned</span>, <span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
-    <span class="ident">value</span>: <span class="ident">Narrow</span>,
-    <span class="ident">buffer</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-) -&gt; <span class="ident">usize</span>
-<span class="kw">where</span>
-    <span class="ident">Narrow</span>: <span class="ident">SignedInteger</span>,
-    <span class="ident">Wide</span>: <span class="ident">SignedInteger</span>,
-    <span class="ident">Unsigned</span>: <span class="ident">WriteInteger</span>,
+</span><span class="doccomment">/// Callback for signed integer formatter.
+///
+/// # Safety
+///
+/// Safe as long as the buffer can hold `FORMATTED_SIZE` elements
+/// (or `FORMATTED_SIZE_DECIMAL` for decimal).
+</span><span class="attribute">#[inline]
+</span><span class="kw">unsafe fn </span>signed&lt;Narrow, Wide, Unsigned, <span class="kw">const </span>FORMAT: u128&gt;(
+    value: Narrow,
+    buffer: <span class="kw-2">&amp;mut </span>[u8],
+) -&gt; usize
+<span class="kw">where
+    </span>Narrow: SignedInteger,
+    Wide: SignedInteger,
+    Unsigned: WriteInteger,
 {
-    <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">NumberFormat</span>::<span class="op">&lt;</span><span class="ident">FORMAT</span><span class="op">&gt;</span> {};
-    <span class="kw">if</span> <span class="ident">value</span> <span class="op">&lt;</span> <span class="ident">Narrow::ZERO</span> {
-        <span class="comment">// Need to cast the value to the same size as unsigned type, since if</span>
-        <span class="comment">// the value is **exactly** `Narrow::MIN`, and it it is then cast</span>
-        <span class="comment">// as the wrapping negative as the unsigned value, a wider type</span>
-        <span class="comment">// will have a very different value.</span>
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">Wide::as_cast</span>(<span class="ident">value</span>);
-        <span class="kw">let</span> <span class="ident">unsigned</span> <span class="op">=</span> <span class="ident">Unsigned::as_cast</span>(<span class="ident">value</span>.<span class="ident">wrapping_neg</span>());
-        <span class="comment">// SAFETY: safe as long as there is at least `FORMATTED_SIZE` elements.</span>
-        <span class="kw">unsafe</span> {
-            <span class="macro">index_unchecked_mut!</span>(<span class="ident">buffer</span>[<span class="number">0</span>]) <span class="op">=</span> <span class="string">b&#39;-&#39;</span>;
-            <span class="kw">let</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="macro">index_unchecked_mut!</span>(<span class="ident">buffer</span>[<span class="number">1</span>..]);
-            <span class="ident">unsigned</span>.<span class="ident">write_mantissa</span>::<span class="op">&lt;</span><span class="ident">Unsigned</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">buffer</span>) <span class="op">+</span> <span class="number">1</span>
-        }
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>) <span class="op">&amp;&amp;</span> <span class="ident">format</span>.<span class="ident">required_mantissa_sign</span>() {
-        <span class="kw">let</span> <span class="ident">unsigned</span> <span class="op">=</span> <span class="ident">Unsigned::as_cast</span>(<span class="ident">value</span>);
-        <span class="comment">// SAFETY: safe as long as there is at least `FORMATTED_SIZE` elements.</span>
-        <span class="kw">unsafe</span> {
-            <span class="macro">index_unchecked_mut!</span>(<span class="ident">buffer</span>[<span class="number">0</span>]) <span class="op">=</span> <span class="string">b&#39;+&#39;</span>;
-            <span class="kw">let</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="macro">index_unchecked_mut!</span>(<span class="ident">buffer</span>[<span class="number">1</span>..]);
-            <span class="ident">unsigned</span>.<span class="ident">write_mantissa</span>::<span class="op">&lt;</span><span class="ident">Unsigned</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">buffer</span>) <span class="op">+</span> <span class="number">1</span>
-        }
-    } <span class="kw">else</span> {
-        <span class="kw">let</span> <span class="ident">unsigned</span> <span class="op">=</span> <span class="ident">Unsigned::as_cast</span>(<span class="ident">value</span>);
-        <span class="comment">// SAFETY: safe as long as there is at least `FORMATTED_SIZE` elements.</span>
-        <span class="kw">unsafe</span> { <span class="ident">unsigned</span>.<span class="ident">write_mantissa</span>::<span class="op">&lt;</span><span class="ident">Unsigned</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">buffer</span>) }
+    <span class="kw">let </span>format = NumberFormat::&lt;FORMAT&gt; {};
+    <span class="kw">if </span>value &lt; Narrow::ZERO {
+        <span class="comment">// Need to cast the value to the same size as unsigned type, since if
+        // the value is **exactly** `Narrow::MIN`, and it it is then cast
+        // as the wrapping negative as the unsigned value, a wider type
+        // will have a very different value.
+        </span><span class="kw">let </span>value = Wide::as_cast(value);
+        <span class="kw">let </span>unsigned = Unsigned::as_cast(value.wrapping_neg());
+        <span class="comment">// SAFETY: safe as long as there is at least `FORMATTED_SIZE` elements.
+        </span><span class="kw">unsafe </span>{
+            <span class="macro">index_unchecked_mut!</span>(buffer[<span class="number">0</span>]) = <span class="string">b&#39;-&#39;</span>;
+            <span class="kw">let </span>buffer = <span class="kw-2">&amp;mut </span><span class="macro">index_unchecked_mut!</span>(buffer[<span class="number">1</span>..]);
+            unsigned.write_mantissa::&lt;Unsigned, FORMAT&gt;(buffer) + <span class="number">1
+        </span>}
+    } <span class="kw">else if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;format&quot;</span>) &amp;&amp; format.required_mantissa_sign() {
+        <span class="kw">let </span>unsigned = Unsigned::as_cast(value);
+        <span class="comment">// SAFETY: safe as long as there is at least `FORMATTED_SIZE` elements.
+        </span><span class="kw">unsafe </span>{
+            <span class="macro">index_unchecked_mut!</span>(buffer[<span class="number">0</span>]) = <span class="string">b&#39;+&#39;</span>;
+            <span class="kw">let </span>buffer = <span class="kw-2">&amp;mut </span><span class="macro">index_unchecked_mut!</span>(buffer[<span class="number">1</span>..]);
+            unsigned.write_mantissa::&lt;Unsigned, FORMAT&gt;(buffer) + <span class="number">1
+        </span>}
+    } <span class="kw">else </span>{
+        <span class="kw">let </span>unsigned = Unsigned::as_cast(value);
+        <span class="comment">// SAFETY: safe as long as there is at least `FORMATTED_SIZE` elements.
+        </span><span class="kw">unsafe </span>{ unsigned.write_mantissa::&lt;Unsigned, FORMAT&gt;(buffer) }
     }
 }
 
-<span class="comment">// API</span>
+<span class="comment">// API
 
-<span class="comment">// Implement ToLexical for numeric type.</span>
-<span class="macro">macro_rules!</span> <span class="ident">unsigned_to_lexical</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">narrow</span>:<span class="ident">tt</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">wide</span>:<span class="ident">tt</span> $(, <span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">meta</span>:<span class="ident">meta</span>]</span>)<span class="question-mark">?</span> ; )<span class="kw-2">*</span>) =&gt; ($(
-        <span class="kw">impl</span> <span class="ident">ToLexical</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">narrow</span> {
-            $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">meta</span>:<span class="ident">meta</span>]</span>)<span class="question-mark">?</span>
-            <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">to_lexical_unchecked</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>])
-                -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>]
+// Implement ToLexical for numeric type.
+</span><span class="macro">macro_rules! </span>unsigned_to_lexical {
+    ($(<span class="macro-nonterminal">$narrow</span>:tt <span class="macro-nonterminal">$wide</span>:tt $(, <span class="attribute">#[<span class="macro-nonterminal">$meta</span>:meta]</span>)<span class="question-mark">? </span>; )<span class="kw-2">*</span>) =&gt; ($(
+        <span class="kw">impl </span>ToLexical <span class="kw">for </span><span class="macro-nonterminal">$narrow </span>{
+            $(<span class="attribute">#[<span class="macro-nonterminal">$meta</span>:meta]</span>)<span class="question-mark">?
+            </span><span class="kw">unsafe fn </span>to_lexical_unchecked&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>, bytes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8])
+                -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8]
             {
-                <span class="ident">debug_assert_buffer</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">narrow</span><span class="op">&gt;</span>(<span class="number">10</span>, <span class="ident">bytes</span>.<span class="ident">len</span>());
-                <span class="comment">// SAFETY: safe if `bytes.len() &gt; Self::FORMATTED_SIZE_DECIMAL`.</span>
-                <span class="kw">unsafe</span> {
-                    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">unsigned</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">narrow</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">wide</span>, { <span class="ident">STANDARD</span> }<span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">bytes</span>);
-                    <span class="kw-2">&amp;mut</span> <span class="macro">index_unchecked_mut!</span>(<span class="ident">bytes</span>[..<span class="ident">len</span>])
+                debug_assert_buffer::&lt;<span class="macro-nonterminal">$narrow</span>&gt;(<span class="number">10</span>, bytes.len());
+                <span class="comment">// SAFETY: safe if `bytes.len() &gt; Self::FORMATTED_SIZE_DECIMAL`.
+                </span><span class="kw">unsafe </span>{
+                    <span class="kw">let </span>len = unsigned::&lt;<span class="macro-nonterminal">$narrow</span>, <span class="macro-nonterminal">$wide</span>, { STANDARD }&gt;(<span class="self">self</span>, bytes);
+                    <span class="kw-2">&amp;mut </span><span class="macro">index_unchecked_mut!</span>(bytes[..len])
                 }
             }
 
-            $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">meta</span>:<span class="ident">meta</span>]</span>)<span class="question-mark">?</span>
-            <span class="kw">fn</span> <span class="ident">to_lexical</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>])
-                -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>]
+            $(<span class="attribute">#[<span class="macro-nonterminal">$meta</span>:meta]</span>)<span class="question-mark">?
+            </span><span class="kw">fn </span>to_lexical&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>, bytes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8])
+                -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8]
             {
-                <span class="ident">assert_buffer</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">narrow</span><span class="op">&gt;</span>(<span class="number">10</span>, <span class="ident">bytes</span>.<span class="ident">len</span>());
-                <span class="comment">// SAFETY: safe since `bytes.len() &gt; Self::FORMATTED_SIZE_DECIMAL`.</span>
-                <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">to_lexical_unchecked</span>(<span class="ident">bytes</span>) }
+                assert_buffer::&lt;<span class="macro-nonterminal">$narrow</span>&gt;(<span class="number">10</span>, bytes.len());
+                <span class="comment">// SAFETY: safe since `bytes.len() &gt; Self::FORMATTED_SIZE_DECIMAL`.
+                </span><span class="kw">unsafe </span>{ <span class="self">self</span>.to_lexical_unchecked(bytes) }
             }
         }
 
-        <span class="kw">impl</span> <span class="ident">ToLexicalWithOptions</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">narrow</span> {
-            <span class="kw">type</span> <span class="ident">Options</span> <span class="op">=</span> <span class="ident">Options</span>;
+        <span class="kw">impl </span>ToLexicalWithOptions <span class="kw">for </span><span class="macro-nonterminal">$narrow </span>{
+            <span class="kw">type </span>Options = Options;
 
-            $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">meta</span>:<span class="ident">meta</span>]</span>)<span class="question-mark">?</span>
-            <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">to_lexical_with_options_unchecked</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
+            $(<span class="attribute">#[<span class="macro-nonterminal">$meta</span>:meta]</span>)<span class="question-mark">?
+            </span><span class="kw">unsafe fn </span>to_lexical_with_options_unchecked&lt;<span class="lifetime">&#39;a</span>, <span class="kw">const </span>FORMAT: u128&gt;(
                 <span class="self">self</span>,
-                <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>],
-                <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Options</span>,
-            ) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>]
+                bytes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8],
+                <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>::Options,
+            ) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8]
             {
-                <span class="ident">debug_assert_buffer</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">narrow</span><span class="op">&gt;</span>(<span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span><span class="ident">::RADIX</span>, <span class="ident">bytes</span>.<span class="ident">len</span>());
-                <span class="macro">assert!</span>(<span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span> {}.<span class="ident">is_valid</span>());
-                <span class="comment">// SAFETY: safe if `bytes.len() &gt; Self::FORMATTED_SIZE`.</span>
-                <span class="kw">unsafe</span> {
-                    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">unsigned</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">narrow</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">wide</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">bytes</span>);
-                    <span class="kw-2">&amp;mut</span> <span class="macro">index_unchecked_mut!</span>(<span class="ident">bytes</span>[..<span class="ident">len</span>])
+                debug_assert_buffer::&lt;<span class="macro-nonterminal">$narrow</span>&gt;(NumberFormat::&lt;{ FORMAT }&gt;::RADIX, bytes.len());
+                <span class="macro">assert!</span>(NumberFormat::&lt;{ FORMAT }&gt; {}.is_valid());
+                <span class="comment">// SAFETY: safe if `bytes.len() &gt; Self::FORMATTED_SIZE`.
+                </span><span class="kw">unsafe </span>{
+                    <span class="kw">let </span>len = unsigned::&lt;<span class="macro-nonterminal">$narrow</span>, <span class="macro-nonterminal">$wide</span>, FORMAT&gt;(<span class="self">self</span>, bytes);
+                    <span class="kw-2">&amp;mut </span><span class="macro">index_unchecked_mut!</span>(bytes[..len])
                 }
             }
 
-            $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">meta</span>:<span class="ident">meta</span>]</span>)<span class="question-mark">?</span>
-            <span class="kw">fn</span> <span class="ident">to_lexical_with_options</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
+            $(<span class="attribute">#[<span class="macro-nonterminal">$meta</span>:meta]</span>)<span class="question-mark">?
+            </span><span class="kw">fn </span>to_lexical_with_options&lt;<span class="lifetime">&#39;a</span>, <span class="kw">const </span>FORMAT: u128&gt;(
                 <span class="self">self</span>,
-                <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>],
-                <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Options</span>,
-            ) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>]
+                bytes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8],
+                options: <span class="kw-2">&amp;</span><span class="self">Self</span>::Options,
+            ) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8]
             {
-                <span class="ident">assert_buffer</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">narrow</span><span class="op">&gt;</span>(<span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span><span class="ident">::RADIX</span>, <span class="ident">bytes</span>.<span class="ident">len</span>());
-                <span class="macro">assert!</span>(<span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span> {}.<span class="ident">is_valid</span>());
-                <span class="comment">// SAFETY: safe since `bytes.len() &gt; Self::FORMATTED_SIZE`.</span>
-                <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">to_lexical_with_options_unchecked</span>::<span class="op">&lt;</span><span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">bytes</span>, <span class="ident">options</span>) }
+                assert_buffer::&lt;<span class="macro-nonterminal">$narrow</span>&gt;(NumberFormat::&lt;{ FORMAT }&gt;::RADIX, bytes.len());
+                <span class="macro">assert!</span>(NumberFormat::&lt;{ FORMAT }&gt; {}.is_valid());
+                <span class="comment">// SAFETY: safe since `bytes.len() &gt; Self::FORMATTED_SIZE`.
+                </span><span class="kw">unsafe </span>{ <span class="self">self</span>.to_lexical_with_options_unchecked::&lt;FORMAT&gt;(bytes, options) }
             }
         }
     )<span class="kw-2">*</span>)
 }
 
-<span class="macro">to_lexical!</span> {}
-<span class="macro">to_lexical_with_options!</span> {}
-<span class="macro">unsigned_to_lexical!</span> {
-    <span class="ident">u8</span> <span class="ident">u32</span> ;
-    <span class="ident">u16</span> <span class="ident">u32</span> ;
-    <span class="ident">u32</span> <span class="ident">u32</span> ;
-    <span class="ident">u64</span> <span class="ident">u64</span> ;
-    <span class="ident">u128</span> <span class="ident">u128</span> ;
+<span class="macro">to_lexical! </span>{}
+<span class="macro">to_lexical_with_options! </span>{}
+<span class="macro">unsigned_to_lexical! </span>{
+    u8 u32 ;
+    u16 u32 ;
+    u32 u32 ;
+    u64 u64 ;
+    u128 u128 ;
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;16&quot;</span>, <span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;32&quot;</span>))]</span>
-<span class="macro">unsigned_to_lexical!</span> { <span class="ident">usize</span> <span class="ident">u32</span> ; }
+<span class="attribute">#[cfg(any(target_pointer_width = <span class="string">&quot;16&quot;</span>, target_pointer_width = <span class="string">&quot;32&quot;</span>))]
+</span><span class="macro">unsigned_to_lexical! </span>{ usize u32 ; }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;64&quot;</span>)]</span>
-<span class="macro">unsigned_to_lexical!</span> { <span class="ident">usize</span> <span class="ident">u64</span> ; }
+<span class="attribute">#[cfg(target_pointer_width = <span class="string">&quot;64&quot;</span>)]
+</span><span class="macro">unsigned_to_lexical! </span>{ usize u64 ; }
 
-<span class="comment">// Implement ToLexical for numeric type.</span>
-<span class="macro">macro_rules!</span> <span class="ident">signed_to_lexical</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">narrow</span>:<span class="ident">tt</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">wide</span>:<span class="ident">tt</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">unsigned</span>:<span class="ident">tt</span> $(, <span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">meta</span>:<span class="ident">meta</span>]</span>)<span class="question-mark">?</span> ; )<span class="kw-2">*</span>) =&gt; ($(
-        <span class="kw">impl</span> <span class="ident">ToLexical</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">narrow</span> {
-            $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">meta</span>:<span class="ident">meta</span>]</span>)<span class="question-mark">?</span>
-            <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">to_lexical_unchecked</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>])
-                -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>]
+<span class="comment">// Implement ToLexical for numeric type.
+</span><span class="macro">macro_rules! </span>signed_to_lexical {
+    ($(<span class="macro-nonterminal">$narrow</span>:tt <span class="macro-nonterminal">$wide</span>:tt <span class="macro-nonterminal">$unsigned</span>:tt $(, <span class="attribute">#[<span class="macro-nonterminal">$meta</span>:meta]</span>)<span class="question-mark">? </span>; )<span class="kw-2">*</span>) =&gt; ($(
+        <span class="kw">impl </span>ToLexical <span class="kw">for </span><span class="macro-nonterminal">$narrow </span>{
+            $(<span class="attribute">#[<span class="macro-nonterminal">$meta</span>:meta]</span>)<span class="question-mark">?
+            </span><span class="kw">unsafe fn </span>to_lexical_unchecked&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>, bytes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8])
+                -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8]
             {
-                <span class="ident">debug_assert_buffer</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">narrow</span><span class="op">&gt;</span>(<span class="number">10</span>, <span class="ident">bytes</span>.<span class="ident">len</span>());
-                <span class="comment">// SAFETY: safe if `bytes.len() &gt; Self::FORMATTED_SIZE_DECIMAL`.</span>
-                <span class="kw">unsafe</span> {
-                    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">signed</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">narrow</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">wide</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">unsigned</span>, { <span class="ident">STANDARD</span> }<span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">bytes</span>);
-                    <span class="kw-2">&amp;mut</span> <span class="macro">index_unchecked_mut!</span>(<span class="ident">bytes</span>[..<span class="ident">len</span>])
+                debug_assert_buffer::&lt;<span class="macro-nonterminal">$narrow</span>&gt;(<span class="number">10</span>, bytes.len());
+                <span class="comment">// SAFETY: safe if `bytes.len() &gt; Self::FORMATTED_SIZE_DECIMAL`.
+                </span><span class="kw">unsafe </span>{
+                    <span class="kw">let </span>len = signed::&lt;<span class="macro-nonterminal">$narrow</span>, <span class="macro-nonterminal">$wide</span>, <span class="macro-nonterminal">$unsigned</span>, { STANDARD }&gt;(<span class="self">self</span>, bytes);
+                    <span class="kw-2">&amp;mut </span><span class="macro">index_unchecked_mut!</span>(bytes[..len])
                 }
             }
 
-            $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">meta</span>:<span class="ident">meta</span>]</span>)<span class="question-mark">?</span>
-            <span class="kw">fn</span> <span class="ident">to_lexical</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>])
-                -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>]
+            $(<span class="attribute">#[<span class="macro-nonterminal">$meta</span>:meta]</span>)<span class="question-mark">?
+            </span><span class="kw">fn </span>to_lexical&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>, bytes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8])
+                -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8]
             {
-                <span class="ident">assert_buffer</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">narrow</span><span class="op">&gt;</span>(<span class="number">10</span>, <span class="ident">bytes</span>.<span class="ident">len</span>());
-                <span class="comment">// SAFETY: safe since `bytes.len() &gt; Self::FORMATTED_SIZE_DECIMAL`.</span>
-                <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">to_lexical_unchecked</span>(<span class="ident">bytes</span>) }
+                assert_buffer::&lt;<span class="macro-nonterminal">$narrow</span>&gt;(<span class="number">10</span>, bytes.len());
+                <span class="comment">// SAFETY: safe since `bytes.len() &gt; Self::FORMATTED_SIZE_DECIMAL`.
+                </span><span class="kw">unsafe </span>{ <span class="self">self</span>.to_lexical_unchecked(bytes) }
             }
         }
 
-        <span class="kw">impl</span> <span class="ident">ToLexicalWithOptions</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">narrow</span> {
-            <span class="kw">type</span> <span class="ident">Options</span> <span class="op">=</span> <span class="ident">Options</span>;
+        <span class="kw">impl </span>ToLexicalWithOptions <span class="kw">for </span><span class="macro-nonterminal">$narrow </span>{
+            <span class="kw">type </span>Options = Options;
 
-            $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">meta</span>:<span class="ident">meta</span>]</span>)<span class="question-mark">?</span>
-            <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">to_lexical_with_options_unchecked</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
+            $(<span class="attribute">#[<span class="macro-nonterminal">$meta</span>:meta]</span>)<span class="question-mark">?
+            </span><span class="kw">unsafe fn </span>to_lexical_with_options_unchecked&lt;<span class="lifetime">&#39;a</span>, <span class="kw">const </span>FORMAT: u128&gt;(
                 <span class="self">self</span>,
-                <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>],
-                <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Options</span>,
-            ) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>]
+                bytes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8],
+                <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>::Options,
+            ) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8]
             {
-                <span class="ident">debug_assert_buffer</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">narrow</span><span class="op">&gt;</span>(<span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span><span class="ident">::RADIX</span>, <span class="ident">bytes</span>.<span class="ident">len</span>());
-                <span class="macro">assert!</span>(<span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span> {}.<span class="ident">is_valid</span>());
-                <span class="comment">// SAFETY: safe if `bytes.len() &gt; Self::FORMATTED_SIZE`.</span>
-                <span class="kw">unsafe</span> {
-                    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">signed</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">narrow</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">wide</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">unsigned</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">bytes</span>);
-                    <span class="kw-2">&amp;mut</span> <span class="macro">index_unchecked_mut!</span>(<span class="ident">bytes</span>[..<span class="ident">len</span>])
+                debug_assert_buffer::&lt;<span class="macro-nonterminal">$narrow</span>&gt;(NumberFormat::&lt;{ FORMAT }&gt;::RADIX, bytes.len());
+                <span class="macro">assert!</span>(NumberFormat::&lt;{ FORMAT }&gt; {}.is_valid());
+                <span class="comment">// SAFETY: safe if `bytes.len() &gt; Self::FORMATTED_SIZE`.
+                </span><span class="kw">unsafe </span>{
+                    <span class="kw">let </span>len = signed::&lt;<span class="macro-nonterminal">$narrow</span>, <span class="macro-nonterminal">$wide</span>, <span class="macro-nonterminal">$unsigned</span>, FORMAT&gt;(<span class="self">self</span>, bytes);
+                    <span class="kw-2">&amp;mut </span><span class="macro">index_unchecked_mut!</span>(bytes[..len])
                 }
             }
 
-            $(<span class="attribute">#[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">meta</span>:<span class="ident">meta</span>]</span>)<span class="question-mark">?</span>
-            <span class="kw">fn</span> <span class="ident">to_lexical_with_options</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
+            $(<span class="attribute">#[<span class="macro-nonterminal">$meta</span>:meta]</span>)<span class="question-mark">?
+            </span><span class="kw">fn </span>to_lexical_with_options&lt;<span class="lifetime">&#39;a</span>, <span class="kw">const </span>FORMAT: u128&gt;(
                 <span class="self">self</span>,
-                <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>],
-                <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Options</span>,
-            ) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>]
+                bytes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8],
+                options: <span class="kw-2">&amp;</span><span class="self">Self</span>::Options,
+            ) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8]
             {
-                <span class="ident">assert_buffer</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">narrow</span><span class="op">&gt;</span>(<span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span><span class="ident">::RADIX</span>, <span class="ident">bytes</span>.<span class="ident">len</span>());
-                <span class="macro">assert!</span>(<span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span> {}.<span class="ident">is_valid</span>());
-                <span class="comment">// SAFETY: safe since `bytes.len() &gt; Self::FORMATTED_SIZE`.</span>
-                <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">to_lexical_with_options_unchecked</span>::<span class="op">&lt;</span><span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">bytes</span>, <span class="ident">options</span>) }
+                assert_buffer::&lt;<span class="macro-nonterminal">$narrow</span>&gt;(NumberFormat::&lt;{ FORMAT }&gt;::RADIX, bytes.len());
+                <span class="macro">assert!</span>(NumberFormat::&lt;{ FORMAT }&gt; {}.is_valid());
+                <span class="comment">// SAFETY: safe since `bytes.len() &gt; Self::FORMATTED_SIZE`.
+                </span><span class="kw">unsafe </span>{ <span class="self">self</span>.to_lexical_with_options_unchecked::&lt;FORMAT&gt;(bytes, options) }
             }
         }
     )<span class="kw-2">*</span>)
 }
 
-<span class="macro">signed_to_lexical!</span> {
-    <span class="ident">i8</span> <span class="ident">i32</span> <span class="ident">u32</span> ;
-    <span class="ident">i16</span> <span class="ident">i32</span> <span class="ident">u32</span> ;
-    <span class="ident">i32</span> <span class="ident">i32</span> <span class="ident">u32</span> ;
-    <span class="ident">i64</span> <span class="ident">i64</span> <span class="ident">u64</span> ;
-    <span class="ident">i128</span> <span class="ident">i128</span> <span class="ident">u128</span> ;
+<span class="macro">signed_to_lexical! </span>{
+    i8 i32 u32 ;
+    i16 i32 u32 ;
+    i32 i32 u32 ;
+    i64 i64 u64 ;
+    i128 i128 u128 ;
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;16&quot;</span>, <span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;32&quot;</span>))]</span>
-<span class="macro">signed_to_lexical!</span> { <span class="ident">isize</span> <span class="ident">i32</span> <span class="ident">u32</span> ; }
+<span class="attribute">#[cfg(any(target_pointer_width = <span class="string">&quot;16&quot;</span>, target_pointer_width = <span class="string">&quot;32&quot;</span>))]
+</span><span class="macro">signed_to_lexical! </span>{ isize i32 u32 ; }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;64&quot;</span>)]</span>
-<span class="macro">signed_to_lexical!</span> { <span class="ident">isize</span> <span class="ident">i64</span> <span class="ident">u64</span> ; }
+<span class="attribute">#[cfg(target_pointer_width = <span class="string">&quot;64&quot;</span>)]
+</span><span class="macro">signed_to_lexical! </span>{ isize i64 u64 ; }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_write_integer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_write_integer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

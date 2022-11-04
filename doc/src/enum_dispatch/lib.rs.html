@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/enum_dispatch-0.3.8/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://gitlab.com/antonok/enum_dispatch/raw/master/enum_dispatch.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../enum_dispatch/index.html"><div class="logo-container"><img src="https://gitlab.com/antonok/enum_dispatch/raw/master/enum_dispatch.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../enum_dispatch/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/enum_dispatch-0.3.8/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://gitlab.com/antonok/enum_dispatch/raw/master/enum_dispatch.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../enum_dispatch/index.html"><div class="logo-container"><img src="https://gitlab.com/antonok/enum_dispatch/raw/master/enum_dispatch.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../enum_dispatch/index.html"><div class="logo-container">
                     <img src="https://gitlab.com/antonok/enum_dispatch/raw/master/enum_dispatch.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../enum_dispatch/index.html">
                         <img src="https://gitlab.com/antonok/enum_dispatch/raw/master/enum_dispatch.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -450,455 +450,455 @@
 <span id="448">448</span>
 <span id="449">449</span>
 <span id="450">450</span>
-</pre><pre class="rust"><code><span class="doccomment">//! `enum_dispatch` provides a set of macros that can be used to easily refactor dynamically</span>
-<span class="doccomment">//! dispatched trait accesses to improve their performance by up to 10x.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Accessing structures through dynamic dispatch is known to have a high runtime cost. Dynamic</span>
-<span class="doccomment">//! dispatch is traditionally used to hide unnecessary type information, improving encapsulation</span>
-<span class="doccomment">//! and making it trivial to add new implementations. However, this hiding of information means</span>
-<span class="doccomment">//! that each time a structure is dynamically accessed, the program must perform a lookup of the</span>
-<span class="doccomment">//! type&#39;s information in a virtual table. The extra round-trips to the vtable quickly add up.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! In Rust, dynamic dispatch is done using traits. Rust 2018 adds the `impl` and `dyn` keywords to</span>
-<span class="doccomment">//! make it easier to keep track of instances of dynamic dispatch, but it&#39;s not always easy to</span>
-<span class="doccomment">//! avoid it entirely.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Feature documentation</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! For full documentation of features like generic support, custom variant names, and more, please</span>
-<span class="doccomment">//! check the repository&#39;s</span>
-<span class="doccomment">//! [README](https://gitlab.com/antonok/enum_dispatch/-/blob/master/README.md).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # How it works</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Observe the following example of code describing a user interface with knobs. Each knob can</span>
-<span class="doccomment">//! hold a value between 0.0 and 1.0. Some knobs provide a *linear* range, whereas other knobs</span>
-<span class="doccomment">//! provide a *logarithmic* range.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! trait KnobControl {</span>
-<span class="doccomment">//!     fn set_position(&amp;mut self, value: f64);</span>
-<span class="doccomment">//!     fn get_value(&amp;self) -&gt; f64;</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! struct LinearKnob {</span>
-<span class="doccomment">//!     position: f64,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! struct LogarithmicKnob {</span>
-<span class="doccomment">//!     position: f64,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! impl KnobControl for LinearKnob {</span>
-<span class="doccomment">//!     fn set_position(&amp;mut self, value: f64) {</span>
-<span class="doccomment">//!         self.position = value;</span>
-<span class="doccomment">//!     }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     fn get_value(&amp;self) -&gt; f64 {</span>
-<span class="doccomment">//!         self.position</span>
-<span class="doccomment">//!     }</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! impl KnobControl for LogarithmicKnob {</span>
-<span class="doccomment">//!     fn set_position(&amp;mut self, value: f64) {</span>
-<span class="doccomment">//!         self.position = value;</span>
-<span class="doccomment">//!     }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     fn get_value(&amp;self) -&gt; f64 {</span>
-<span class="doccomment">//!         (self.position + 1.).log2()</span>
-<span class="doccomment">//!     }</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! fn main() {</span>
-<span class="doccomment">//!     let v: Vec&lt;Box&lt;dyn KnobControl&gt;&gt; = vec![</span>
-<span class="doccomment">//!         //set the knobs</span>
-<span class="doccomment">//!     ];</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     //use the knobs</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! There are other ways to keep an arbitrarily ordered list of different knob types, but none of</span>
-<span class="doccomment">//! them are quite as simple or easy to maintain. Unfortunately, this implementation uses both heap</span>
-<span class="doccomment">//! allocated `Box`es and dynamic dispatch, which will have performance implications.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! One alternative is to use introduce a new enum type that can hold either a `LinearKnob` or a</span>
-<span class="doccomment">//! `LogarithmicKnob` as a variant, and also implements `KnobControl` by matching on itself and</span>
-<span class="doccomment">//! delegating calls to its variants. This would look like the following:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # trait KnobControl {</span>
-<span class="doccomment">//! #     fn set_position(&amp;mut self, value: f64);</span>
-<span class="doccomment">//! #     fn get_value(&amp;self) -&gt; f64;</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # struct LinearKnob {</span>
-<span class="doccomment">//! #     position: f64,</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # struct LogarithmicKnob {</span>
-<span class="doccomment">//! #     position: f64,</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # impl KnobControl for LinearKnob {</span>
-<span class="doccomment">//! #     fn set_position(&amp;mut self, value: f64) {</span>
-<span class="doccomment">//! #         self.position = value;</span>
-<span class="doccomment">//! #     }</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! #     fn get_value(&amp;self) -&gt; f64 {</span>
-<span class="doccomment">//! #         self.position</span>
-<span class="doccomment">//! #     }</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # impl KnobControl for LogarithmicKnob {</span>
-<span class="doccomment">//! #     fn set_position(&amp;mut self, value: f64) {</span>
-<span class="doccomment">//! #         self.position = value;</span>
-<span class="doccomment">//! #     }</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! #     fn get_value(&amp;self) -&gt; f64 {</span>
-<span class="doccomment">//! #         (self.position + 1.).log2()</span>
-<span class="doccomment">//! #     }</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! enum Knob {</span>
-<span class="doccomment">//!     Linear(LinearKnob),</span>
-<span class="doccomment">//!     Logarithmic(LogarithmicKnob),</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! impl KnobControl for Knob {</span>
-<span class="doccomment">//!     fn set_position(&amp;mut self, value: f64) {</span>
-<span class="doccomment">//!         match self {</span>
-<span class="doccomment">//!             Knob::Linear(inner_knob) =&gt; inner_knob.set_position(value),</span>
-<span class="doccomment">//!             Knob::Logarithmic(inner_knob) =&gt; inner_knob.set_position(value),</span>
-<span class="doccomment">//!         }</span>
-<span class="doccomment">//!     }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     fn get_value(&amp;self) -&gt; f64 {</span>
-<span class="doccomment">//!         match self {</span>
-<span class="doccomment">//!             Knob::Linear(inner_knob) =&gt; inner_knob.get_value(),</span>
-<span class="doccomment">//!             Knob::Logarithmic(inner_knob) =&gt; inner_knob.get_value(),</span>
-<span class="doccomment">//!         }</span>
-<span class="doccomment">//!     }</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Performance with this implementation is significantly improved, since all the information the</span>
-<span class="doccomment">//! program could possibly need to know about each knob can be deduced at compile time. Besides</span>
-<span class="doccomment">//! avoiding heap allocations and vtable lookups, this allows the compiler to squeeze out even more</span>
-<span class="doccomment">//! optimization through function inlining.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! However, it&#39;s easy to see that the cost of maintaining the source code for this extra structure</span>
-<span class="doccomment">//! is quite high. What happens when we add more knob types? What happens when we add more trait</span>
-<span class="doccomment">//! methods? Even worse, what happens when we do both!</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The resulting code is very repetitive, but that makes it a great target for automatic</span>
-<span class="doccomment">//! generation. The `enum_dispatch` macro can do the automatic generation for you. Examine the code</span>
-<span class="doccomment">//! to generate the same implementation when using `enum_dispatch`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # use enum_dispatch::enum_dispatch;</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! #[enum_dispatch]</span>
-<span class="doccomment">//! trait KnobControl {</span>
-<span class="doccomment">//!     //...</span>
-<span class="doccomment">//! #     fn set_position(&amp;mut self, value: f64);</span>
-<span class="doccomment">//! #     fn get_value(&amp;self) -&gt; f64;</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # struct LinearKnob {</span>
-<span class="doccomment">//! #     position: f64,</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # struct LogarithmicKnob {</span>
-<span class="doccomment">//! #     position: f64,</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # impl KnobControl for LinearKnob {</span>
-<span class="doccomment">//! #     fn set_position(&amp;mut self, value: f64) {</span>
-<span class="doccomment">//! #         self.position = value;</span>
-<span class="doccomment">//! #     }</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! #     fn get_value(&amp;self) -&gt; f64 {</span>
-<span class="doccomment">//! #         self.position</span>
-<span class="doccomment">//! #     }</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # impl KnobControl for LogarithmicKnob {</span>
-<span class="doccomment">//! #     fn set_position(&amp;mut self, value: f64) {</span>
-<span class="doccomment">//! #         self.position = value;</span>
-<span class="doccomment">//! #     }</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! #     fn get_value(&amp;self) -&gt; f64 {</span>
-<span class="doccomment">//! #         (self.position + 1.).log2()</span>
-<span class="doccomment">//! #     }</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[enum_dispatch(KnobControl)]</span>
-<span class="doccomment">//! enum Knob {</span>
-<span class="doccomment">//!     LinearKnob,</span>
-<span class="doccomment">//!     LogarithmicKnob,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! That&#39;s it. `enum_dispatch` will also automatically generate implementations of</span>
-<span class="doccomment">//! `std::convert::From` for each enum variant, so that new `Knob`s can be created without concern</span>
-<span class="doccomment">//! for the names of each enum variant.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # use enum_dispatch::enum_dispatch;</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # #[enum_dispatch]</span>
-<span class="doccomment">//! # trait KnobControl {</span>
-<span class="doccomment">//! #     fn set_position(&amp;mut self, value: f64);</span>
-<span class="doccomment">//! #     fn get_value(&amp;self) -&gt; f64;</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # struct LinearKnob {</span>
-<span class="doccomment">//! #     position: f64,</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # struct LogarithmicKnob {</span>
-<span class="doccomment">//! #     position: f64,</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # impl KnobControl for LinearKnob {</span>
-<span class="doccomment">//! #     fn set_position(&amp;mut self, value: f64) {</span>
-<span class="doccomment">//! #         self.position = value;</span>
-<span class="doccomment">//! #     }</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! #     fn get_value(&amp;self) -&gt; f64 {</span>
-<span class="doccomment">//! #         self.position</span>
-<span class="doccomment">//! #     }</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # impl KnobControl for LogarithmicKnob {</span>
-<span class="doccomment">//! #     fn set_position(&amp;mut self, value: f64) {</span>
-<span class="doccomment">//! #         self.position = value;</span>
-<span class="doccomment">//! #     }</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! #     fn get_value(&amp;self) -&gt; f64 {</span>
-<span class="doccomment">//! #         (self.position + 1.).log2()</span>
-<span class="doccomment">//! #     }</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # #[enum_dispatch(KnobControl)]</span>
-<span class="doccomment">//! # enum Knob {</span>
-<span class="doccomment">//! #     LinearKnob,</span>
-<span class="doccomment">//! #     LogarithmicKnob,</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! # fn some_existing_knobs() -&gt; (LinearKnob, LogarithmicKnob) {</span>
-<span class="doccomment">//! #     (LinearKnob { position: 0.5 }, LogarithmicKnob { position: 0.5 })</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! #</span>
-<span class="doccomment">//! let (a_linear_knob, a_logarithmic_knob) = some_existing_knobs();</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let knob = Knob::from(a_linear_knob);</span>
-<span class="doccomment">//! let knob = Knob::from(a_logarithmic_knob);</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Performance</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The `benches` directory contains three benchmarks of different natures, each comparing four</span>
-<span class="doccomment">//! different methods of accessing a traited struct of an arbitrary type. The four methods are as</span>
-<span class="doccomment">//! follows:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! | test name    | explanation                                                                             |</span>
-<span class="doccomment">//! |--------------|-----------------------------------------------------------------------------------------|</span>
-<span class="doccomment">//! | boxdyn       | The easiest way to access a struct, using a heap allocation and dynamic dispatch.       |</span>
-<span class="doccomment">//! | refdyn       | Accesses the struct by reference, but still using dynamic dispatch. No heap allocation. |</span>
-<span class="doccomment">//! | customderive | Uses a similar macro approach from the external [`enum_derive`](https://github.com/DanielKeep/rust-custom-derive) crate, which implements a method that returns an inner type as a dynamic trait object. |</span>
-<span class="doccomment">//! | enumdispatch | Implemented using this crate.                                                           |</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## The benchmarks</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The following benchmark results were measured on a Ryzen 7 2700x CPU.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### compiler_optimized</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The first set of benchmarks creates trait objects and measures the speed of accessing a method</span>
-<span class="doccomment">//! on them.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```text</span>
-<span class="doccomment">//! test benches::boxdyn_compiler_optimized       ... bench:   2,135,418 ns/iter (+/- 12,575)</span>
-<span class="doccomment">//! test benches::customderive_compiler_optimized ... bench:   2,611,860 ns/iter (+/- 18,644)</span>
-<span class="doccomment">//! test benches::enumdispatch_compiler_optimized ... bench:           0 ns/iter (+/- 0)</span>
-<span class="doccomment">//! test benches::refdyn_compiler_optimized       ... bench:   2,132,591 ns/iter (+/- 22,114)</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! It&#39;s easy to see that `enum_dispatch` is the clear winner here!</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Ok, fine. This wasn&#39;t a fair test. The compiler is able to &quot;look through&quot; the trait method call</span>
-<span class="doccomment">//! in the enum_dispatch case, notices that the result is unused, and removes it as an</span>
-<span class="doccomment">//! optimization. However, this still highlights an important property of `enum_dispatch`ed types:</span>
-<span class="doccomment">//! the compiler is able to infer much better optimizations when possible.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### blackbox</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The next set of benchmarks uses the `test::black_box` method to hide the fact that the result</span>
-<span class="doccomment">//! of the method is unused.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```text</span>
-<span class="doccomment">//! test benches::boxdyn_blackbox       ... bench:   2,131,736 ns/iter (+/- 24,937)</span>
-<span class="doccomment">//! test benches::customderive_blackbox ... bench:   2,611,721 ns/iter (+/- 23,502)</span>
-<span class="doccomment">//! test benches::enumdispatch_blackbox ... bench:     471,740 ns/iter (+/- 1,439)</span>
-<span class="doccomment">//! test benches::refdyn_blackbox       ... bench:   2,131,978 ns/iter (+/- 21,547)</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The competitors faced virtually no impact, whereas `enum_dispatch` takes the full force of the</span>
-<span class="doccomment">//! `black_box` call. This test shows the power that avoiding dynamic dispatch gives to the</span>
-<span class="doccomment">//! compiler in the context of the previous test, but also demonstrates how much faster</span>
-<span class="doccomment">//! `enum_dispatch` is in real code: almost 5 times faster than the closest alternative.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### homogenous_vec</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The final set of benchmarks puts 1024 traited structs of arbitrary types at random into a `Vec`</span>
-<span class="doccomment">//! and measures the time it takes to successively iterate over the entire `Vec`, calling</span>
-<span class="doccomment">//! `black_box`ed methods on each element.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```text</span>
-<span class="doccomment">//! test benches::boxdyn_homogeneous_vec       ... bench:   5,900,191 ns/iter (+/- 95,169)</span>
-<span class="doccomment">//! test benches::customderive_homogeneous_vec ... bench:   4,831,808 ns/iter (+/- 140,437)</span>
-<span class="doccomment">//! test benches::enumdispatch_homogeneous_vec ... bench:     479,630 ns/iter (+/- 3,531)</span>
-<span class="doccomment">//! test benches::refdyn_homogeneous_vec       ... bench:   5,658,461 ns/iter (+/- 137,128)</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This might be one of the most likely use cases for traited structs of arbitrary types, and it&#39;s</span>
-<span class="doccomment">//! where `enum_dispatch` really shines. Since a `Vec` of `enum_dispatch` objects is actually a</span>
-<span class="doccomment">//! `Vec` of enums rather than addresses, accessing an element takes half the indirection of the</span>
-<span class="doccomment">//! other techniques. Add that to the lack of vtable accesses, and we have a result that is 10</span>
-<span class="doccomment">//! times faster than the closest alternative, and almost 12 times faster than the best technique</span>
-<span class="doccomment">//! from the standard library.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! `enum_dispatch` provides a set of macros that can be used to easily refactor dynamically
+//! dispatched trait accesses to improve their performance by up to 10x.
+//!
+//! Accessing structures through dynamic dispatch is known to have a high runtime cost. Dynamic
+//! dispatch is traditionally used to hide unnecessary type information, improving encapsulation
+//! and making it trivial to add new implementations. However, this hiding of information means
+//! that each time a structure is dynamically accessed, the program must perform a lookup of the
+//! type&#39;s information in a virtual table. The extra round-trips to the vtable quickly add up.
+//!
+//! In Rust, dynamic dispatch is done using traits. Rust 2018 adds the `impl` and `dyn` keywords to
+//! make it easier to keep track of instances of dynamic dispatch, but it&#39;s not always easy to
+//! avoid it entirely.
+//!
+//! # Feature documentation
+//!
+//! For full documentation of features like generic support, custom variant names, and more, please
+//! check the repository&#39;s
+//! [README](https://gitlab.com/antonok/enum_dispatch/-/blob/master/README.md).
+//!
+//! # How it works
+//!
+//! Observe the following example of code describing a user interface with knobs. Each knob can
+//! hold a value between 0.0 and 1.0. Some knobs provide a *linear* range, whereas other knobs
+//! provide a *logarithmic* range.
+//!
+//! ```
+//! trait KnobControl {
+//!     fn set_position(&amp;mut self, value: f64);
+//!     fn get_value(&amp;self) -&gt; f64;
+//! }
+//!
+//! struct LinearKnob {
+//!     position: f64,
+//! }
+//!
+//! struct LogarithmicKnob {
+//!     position: f64,
+//! }
+//!
+//! impl KnobControl for LinearKnob {
+//!     fn set_position(&amp;mut self, value: f64) {
+//!         self.position = value;
+//!     }
+//!
+//!     fn get_value(&amp;self) -&gt; f64 {
+//!         self.position
+//!     }
+//! }
+//!
+//! impl KnobControl for LogarithmicKnob {
+//!     fn set_position(&amp;mut self, value: f64) {
+//!         self.position = value;
+//!     }
+//!
+//!     fn get_value(&amp;self) -&gt; f64 {
+//!         (self.position + 1.).log2()
+//!     }
+//! }
+//!
+//! fn main() {
+//!     let v: Vec&lt;Box&lt;dyn KnobControl&gt;&gt; = vec![
+//!         //set the knobs
+//!     ];
+//!
+//!     //use the knobs
+//! }
+//! ```
+//!
+//! There are other ways to keep an arbitrarily ordered list of different knob types, but none of
+//! them are quite as simple or easy to maintain. Unfortunately, this implementation uses both heap
+//! allocated `Box`es and dynamic dispatch, which will have performance implications.
+//!
+//! One alternative is to use introduce a new enum type that can hold either a `LinearKnob` or a
+//! `LogarithmicKnob` as a variant, and also implements `KnobControl` by matching on itself and
+//! delegating calls to its variants. This would look like the following:
+//!
+//! ```
+//! # trait KnobControl {
+//! #     fn set_position(&amp;mut self, value: f64);
+//! #     fn get_value(&amp;self) -&gt; f64;
+//! # }
+//! #
+//! # struct LinearKnob {
+//! #     position: f64,
+//! # }
+//! #
+//! # struct LogarithmicKnob {
+//! #     position: f64,
+//! # }
+//! #
+//! # impl KnobControl for LinearKnob {
+//! #     fn set_position(&amp;mut self, value: f64) {
+//! #         self.position = value;
+//! #     }
+//! #
+//! #     fn get_value(&amp;self) -&gt; f64 {
+//! #         self.position
+//! #     }
+//! # }
+//! #
+//! # impl KnobControl for LogarithmicKnob {
+//! #     fn set_position(&amp;mut self, value: f64) {
+//! #         self.position = value;
+//! #     }
+//! #
+//! #     fn get_value(&amp;self) -&gt; f64 {
+//! #         (self.position + 1.).log2()
+//! #     }
+//! # }
+//! #
+//! enum Knob {
+//!     Linear(LinearKnob),
+//!     Logarithmic(LogarithmicKnob),
+//! }
+//!
+//! impl KnobControl for Knob {
+//!     fn set_position(&amp;mut self, value: f64) {
+//!         match self {
+//!             Knob::Linear(inner_knob) =&gt; inner_knob.set_position(value),
+//!             Knob::Logarithmic(inner_knob) =&gt; inner_knob.set_position(value),
+//!         }
+//!     }
+//!
+//!     fn get_value(&amp;self) -&gt; f64 {
+//!         match self {
+//!             Knob::Linear(inner_knob) =&gt; inner_knob.get_value(),
+//!             Knob::Logarithmic(inner_knob) =&gt; inner_knob.get_value(),
+//!         }
+//!     }
+//! }
+//! ```
+//!
+//! Performance with this implementation is significantly improved, since all the information the
+//! program could possibly need to know about each knob can be deduced at compile time. Besides
+//! avoiding heap allocations and vtable lookups, this allows the compiler to squeeze out even more
+//! optimization through function inlining.
+//!
+//! However, it&#39;s easy to see that the cost of maintaining the source code for this extra structure
+//! is quite high. What happens when we add more knob types? What happens when we add more trait
+//! methods? Even worse, what happens when we do both!
+//!
+//! The resulting code is very repetitive, but that makes it a great target for automatic
+//! generation. The `enum_dispatch` macro can do the automatic generation for you. Examine the code
+//! to generate the same implementation when using `enum_dispatch`.
+//!
+//! ```
+//! # use enum_dispatch::enum_dispatch;
+//! #
+//! #[enum_dispatch]
+//! trait KnobControl {
+//!     //...
+//! #     fn set_position(&amp;mut self, value: f64);
+//! #     fn get_value(&amp;self) -&gt; f64;
+//! }
+//! #
+//! # struct LinearKnob {
+//! #     position: f64,
+//! # }
+//! #
+//! # struct LogarithmicKnob {
+//! #     position: f64,
+//! # }
+//! #
+//! # impl KnobControl for LinearKnob {
+//! #     fn set_position(&amp;mut self, value: f64) {
+//! #         self.position = value;
+//! #     }
+//! #
+//! #     fn get_value(&amp;self) -&gt; f64 {
+//! #         self.position
+//! #     }
+//! # }
+//! #
+//! # impl KnobControl for LogarithmicKnob {
+//! #     fn set_position(&amp;mut self, value: f64) {
+//! #         self.position = value;
+//! #     }
+//! #
+//! #     fn get_value(&amp;self) -&gt; f64 {
+//! #         (self.position + 1.).log2()
+//! #     }
+//! # }
+//!
+//! #[enum_dispatch(KnobControl)]
+//! enum Knob {
+//!     LinearKnob,
+//!     LogarithmicKnob,
+//! }
+//! ```
+//!
+//! That&#39;s it. `enum_dispatch` will also automatically generate implementations of
+//! `std::convert::From` for each enum variant, so that new `Knob`s can be created without concern
+//! for the names of each enum variant.
+//!
+//! ```
+//! # use enum_dispatch::enum_dispatch;
+//! #
+//! # #[enum_dispatch]
+//! # trait KnobControl {
+//! #     fn set_position(&amp;mut self, value: f64);
+//! #     fn get_value(&amp;self) -&gt; f64;
+//! # }
+//! #
+//! # struct LinearKnob {
+//! #     position: f64,
+//! # }
+//! #
+//! # struct LogarithmicKnob {
+//! #     position: f64,
+//! # }
+//! #
+//! # impl KnobControl for LinearKnob {
+//! #     fn set_position(&amp;mut self, value: f64) {
+//! #         self.position = value;
+//! #     }
+//! #
+//! #     fn get_value(&amp;self) -&gt; f64 {
+//! #         self.position
+//! #     }
+//! # }
+//! #
+//! # impl KnobControl for LogarithmicKnob {
+//! #     fn set_position(&amp;mut self, value: f64) {
+//! #         self.position = value;
+//! #     }
+//! #
+//! #     fn get_value(&amp;self) -&gt; f64 {
+//! #         (self.position + 1.).log2()
+//! #     }
+//! # }
+//! #
+//! # #[enum_dispatch(KnobControl)]
+//! # enum Knob {
+//! #     LinearKnob,
+//! #     LogarithmicKnob,
+//! # }
+//! #
+//! # fn some_existing_knobs() -&gt; (LinearKnob, LogarithmicKnob) {
+//! #     (LinearKnob { position: 0.5 }, LogarithmicKnob { position: 0.5 })
+//! # }
+//! #
+//! let (a_linear_knob, a_logarithmic_knob) = some_existing_knobs();
+//!
+//! let knob = Knob::from(a_linear_knob);
+//! let knob = Knob::from(a_logarithmic_knob);
+//! ```
+//!
+//! # Performance
+//!
+//! The `benches` directory contains three benchmarks of different natures, each comparing four
+//! different methods of accessing a traited struct of an arbitrary type. The four methods are as
+//! follows:
+//!
+//! | test name    | explanation                                                                             |
+//! |--------------|-----------------------------------------------------------------------------------------|
+//! | boxdyn       | The easiest way to access a struct, using a heap allocation and dynamic dispatch.       |
+//! | refdyn       | Accesses the struct by reference, but still using dynamic dispatch. No heap allocation. |
+//! | customderive | Uses a similar macro approach from the external [`enum_derive`](https://github.com/DanielKeep/rust-custom-derive) crate, which implements a method that returns an inner type as a dynamic trait object. |
+//! | enumdispatch | Implemented using this crate.                                                           |
+//!
+//! ## The benchmarks
+//!
+//! The following benchmark results were measured on a Ryzen 7 2700x CPU.
+//!
+//! ### compiler_optimized
+//!
+//! The first set of benchmarks creates trait objects and measures the speed of accessing a method
+//! on them.
+//!
+//! ```text
+//! test benches::boxdyn_compiler_optimized       ... bench:   2,135,418 ns/iter (+/- 12,575)
+//! test benches::customderive_compiler_optimized ... bench:   2,611,860 ns/iter (+/- 18,644)
+//! test benches::enumdispatch_compiler_optimized ... bench:           0 ns/iter (+/- 0)
+//! test benches::refdyn_compiler_optimized       ... bench:   2,132,591 ns/iter (+/- 22,114)
+//! ```
+//!
+//! It&#39;s easy to see that `enum_dispatch` is the clear winner here!
+//!
+//! Ok, fine. This wasn&#39;t a fair test. The compiler is able to &quot;look through&quot; the trait method call
+//! in the enum_dispatch case, notices that the result is unused, and removes it as an
+//! optimization. However, this still highlights an important property of `enum_dispatch`ed types:
+//! the compiler is able to infer much better optimizations when possible.
+//!
+//! ### blackbox
+//!
+//! The next set of benchmarks uses the `test::black_box` method to hide the fact that the result
+//! of the method is unused.
+//!
+//! ```text
+//! test benches::boxdyn_blackbox       ... bench:   2,131,736 ns/iter (+/- 24,937)
+//! test benches::customderive_blackbox ... bench:   2,611,721 ns/iter (+/- 23,502)
+//! test benches::enumdispatch_blackbox ... bench:     471,740 ns/iter (+/- 1,439)
+//! test benches::refdyn_blackbox       ... bench:   2,131,978 ns/iter (+/- 21,547)
+//! ```
+//!
+//! The competitors faced virtually no impact, whereas `enum_dispatch` takes the full force of the
+//! `black_box` call. This test shows the power that avoiding dynamic dispatch gives to the
+//! compiler in the context of the previous test, but also demonstrates how much faster
+//! `enum_dispatch` is in real code: almost 5 times faster than the closest alternative.
+//!
+//! ### homogenous_vec
+//!
+//! The final set of benchmarks puts 1024 traited structs of arbitrary types at random into a `Vec`
+//! and measures the time it takes to successively iterate over the entire `Vec`, calling
+//! `black_box`ed methods on each element.
+//!
+//! ```text
+//! test benches::boxdyn_homogeneous_vec       ... bench:   5,900,191 ns/iter (+/- 95,169)
+//! test benches::customderive_homogeneous_vec ... bench:   4,831,808 ns/iter (+/- 140,437)
+//! test benches::enumdispatch_homogeneous_vec ... bench:     479,630 ns/iter (+/- 3,531)
+//! test benches::refdyn_homogeneous_vec       ... bench:   5,658,461 ns/iter (+/- 137,128)
+//! ```
+//!
+//! This might be one of the most likely use cases for traited structs of arbitrary types, and it&#39;s
+//! where `enum_dispatch` really shines. Since a `Vec` of `enum_dispatch` objects is actually a
+//! `Vec` of enums rather than addresses, accessing an element takes half the indirection of the
+//! other techniques. Add that to the lack of vtable accesses, and we have a result that is 10
+//! times faster than the closest alternative, and almost 12 times faster than the best technique
+//! from the standard library.
 
-<span class="attribute">#![<span class="ident">doc</span>(
-    <span class="ident">html_logo_url</span> <span class="op">=</span> <span class="string">&quot;https://gitlab.com/antonok/enum_dispatch/raw/master/enum_dispatch.svg&quot;</span>,
-    <span class="ident">html_favicon_url</span> <span class="op">=</span> <span class="string">&quot;https://gitlab.com/antonok/enum_dispatch/raw/master/enum_dispatch.svg&quot;</span>
-)]</span>
+</span><span class="attribute">#![doc(
+    html_logo_url = <span class="string">&quot;https://gitlab.com/antonok/enum_dispatch/raw/master/enum_dispatch.svg&quot;</span>,
+    html_favicon_url = <span class="string">&quot;https://gitlab.com/antonok/enum_dispatch/raw/master/enum_dispatch.svg&quot;
+</span>)]
 
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
+</span><span class="kw">extern crate </span>proc_macro;
 
-<span class="kw">use</span> <span class="ident">proc_macro2::TokenStream</span>;
-<span class="kw">use</span> <span class="ident">quote</span>::{<span class="ident">ToTokens</span>, <span class="ident">TokenStreamExt</span>};
+<span class="kw">use </span>proc_macro2::TokenStream;
+<span class="kw">use </span>quote::{ToTokens, TokenStreamExt};
 
-<span class="doccomment">/// Used for converting a macro input into an ItemTrait or an EnumDispatchItem.</span>
-<span class="kw">mod</span> <span class="ident">attributed_parser</span>;
-<span class="doccomment">/// Provides local storage for enum and trait definitions so that they can be accessed later.</span>
-<span class="kw">mod</span> <span class="ident">cache</span>;
-<span class="doccomment">/// Provides a custom syntax specification for the arguments to an `#[enum_dispatch(...)]` attribute.</span>
-<span class="kw">mod</span> <span class="ident">enum_dispatch_arg_list</span>;
-<span class="doccomment">/// Provides a custom syntax specification for enum dispatch syntax blocks.</span>
-<span class="kw">mod</span> <span class="ident">enum_dispatch_item</span>;
-<span class="doccomment">/// Provides a custom syntax specification for the variants of enum dispatch syntax blocks.</span>
-<span class="kw">mod</span> <span class="ident">enum_dispatch_variant</span>;
-<span class="doccomment">/// Provides utilities for building enum dispatch implementations.</span>
-<span class="kw">mod</span> <span class="ident">expansion</span>;
-<span class="doccomment">/// Convenience trait for token parsing.</span>
-<span class="kw">mod</span> <span class="ident">filter_attrs</span>;
-<span class="doccomment">/// Convenience methods for constructing `syn` types.</span>
-<span class="kw">mod</span> <span class="ident">syn_utils</span>;
+<span class="doccomment">/// Used for converting a macro input into an ItemTrait or an EnumDispatchItem.
+</span><span class="kw">mod </span>attributed_parser;
+<span class="doccomment">/// Provides local storage for enum and trait definitions so that they can be accessed later.
+</span><span class="kw">mod </span>cache;
+<span class="doccomment">/// Provides a custom syntax specification for the arguments to an `#[enum_dispatch(...)]` attribute.
+</span><span class="kw">mod </span>enum_dispatch_arg_list;
+<span class="doccomment">/// Provides a custom syntax specification for enum dispatch syntax blocks.
+</span><span class="kw">mod </span>enum_dispatch_item;
+<span class="doccomment">/// Provides a custom syntax specification for the variants of enum dispatch syntax blocks.
+</span><span class="kw">mod </span>enum_dispatch_variant;
+<span class="doccomment">/// Provides utilities for building enum dispatch implementations.
+</span><span class="kw">mod </span>expansion;
+<span class="doccomment">/// Convenience trait for token parsing.
+</span><span class="kw">mod </span>filter_attrs;
+<span class="doccomment">/// Convenience methods for constructing `syn` types.
+</span><span class="kw">mod </span>syn_utils;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::expansion::add_enum_impls</span>;
+<span class="kw">use </span><span class="kw">crate</span>::expansion::add_enum_impls;
 
-<span class="doccomment">/// Annotating a trait or enum definition with an `#[enum_dispatch]` attribute will register it</span>
-<span class="doccomment">/// with the enum_dispatch library, allowing it to be used to generate impl blocks elsewhere.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Annotating a trait or enum definition with an `#[enum_dispatch(BlockName)]` attribute will</span>
-<span class="doccomment">/// generate an enum dispatch implementation for the specified trait/enum pair, as well as adding</span>
-<span class="doccomment">/// an impl of std::convert::From for each variant. When annotating a trait, BlockName should be the</span>
-<span class="doccomment">/// name of a registered enum. When annotating an enum, BlockName should be the name of a registered</span>
-<span class="doccomment">/// trait.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// An annotated enum should have variants that are simply the names of types imported to the</span>
-<span class="doccomment">/// current scope. To force individual variants to use a custom name when expanded, each variant</span>
-<span class="doccomment">/// can also take the form of a normal tuple-style enum variant with a single field.</span>
-<span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enum_dispatch</span>(<span class="ident">attr</span>: <span class="ident">proc_macro::TokenStream</span>, <span class="ident">item</span>: <span class="ident">proc_macro::TokenStream</span>) -&gt; <span class="ident">proc_macro::TokenStream</span> {
-    <span class="ident">enum_dispatch2</span>(<span class="ident">attr</span>.<span class="ident">into</span>(), <span class="ident">item</span>.<span class="ident">into</span>()).<span class="ident">into</span>()
+<span class="doccomment">/// Annotating a trait or enum definition with an `#[enum_dispatch]` attribute will register it
+/// with the enum_dispatch library, allowing it to be used to generate impl blocks elsewhere.
+///
+/// Annotating a trait or enum definition with an `#[enum_dispatch(BlockName)]` attribute will
+/// generate an enum dispatch implementation for the specified trait/enum pair, as well as adding
+/// an impl of std::convert::From for each variant. When annotating a trait, BlockName should be the
+/// name of a registered enum. When annotating an enum, BlockName should be the name of a registered
+/// trait.
+///
+/// An annotated enum should have variants that are simply the names of types imported to the
+/// current scope. To force individual variants to use a custom name when expanded, each variant
+/// can also take the form of a normal tuple-style enum variant with a single field.
+</span><span class="attribute">#[proc_macro_attribute]
+</span><span class="kw">pub fn </span>enum_dispatch(attr: proc_macro::TokenStream, item: proc_macro::TokenStream) -&gt; proc_macro::TokenStream {
+    enum_dispatch2(attr.into(), item.into()).into()
 }
 
-<span class="doccomment">/// `proc_macro2::TokenStream` compatible version of the `enum_dispatch` function.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Using only `proc_macro2::TokenStream` inside the entire crate makes methods unit-testable and</span>
-<span class="doccomment">/// removes the need for conversions everywhere.</span>
-<span class="kw">fn</span> <span class="ident">enum_dispatch2</span>(<span class="ident">attr</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">new_block</span> <span class="op">=</span> <span class="ident">attributed_parser::parse_attributed</span>(<span class="ident">item</span>.<span class="ident">clone</span>()).<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">expanded</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">new_block</span> {
-        <span class="ident">attributed_parser::ParsedItem::Trait</span>(<span class="ident">traitdef</span>) =&gt; {
-            <span class="ident">cache::cache_trait</span>(<span class="ident">traitdef</span>.<span class="ident">to_owned</span>());
-            <span class="ident">item</span>
+<span class="doccomment">/// `proc_macro2::TokenStream` compatible version of the `enum_dispatch` function.
+///
+/// Using only `proc_macro2::TokenStream` inside the entire crate makes methods unit-testable and
+/// removes the need for conversions everywhere.
+</span><span class="kw">fn </span>enum_dispatch2(attr: TokenStream, item: TokenStream) -&gt; TokenStream {
+    <span class="kw">let </span>new_block = attributed_parser::parse_attributed(item.clone()).unwrap();
+    <span class="kw">let </span><span class="kw-2">mut </span>expanded = <span class="kw">match </span><span class="kw-2">&amp;</span>new_block {
+        attributed_parser::ParsedItem::Trait(traitdef) =&gt; {
+            cache::cache_trait(traitdef.to_owned());
+            item
         }
-        <span class="ident">attributed_parser::ParsedItem::EnumDispatch</span>(<span class="ident">enumdef</span>) =&gt; {
-            <span class="ident">cache::cache_enum_dispatch</span>(<span class="ident">enumdef</span>.<span class="ident">clone</span>());
-            <span class="ident">syn::ItemEnum::from</span>(<span class="ident">enumdef</span>.<span class="ident">to_owned</span>())
-                .<span class="ident">into_token_stream</span>()
+        attributed_parser::ParsedItem::EnumDispatch(enumdef) =&gt; {
+            cache::cache_enum_dispatch(enumdef.clone());
+            syn::ItemEnum::from(enumdef.to_owned())
+                .into_token_stream()
         }
     };
-    <span class="comment">// If the attributes are non-empty, the new block should be &quot;linked&quot; to the listed definitions.</span>
-    <span class="comment">// Those definitions may or may not have been cached yet.</span>
-    <span class="comment">// If one is not cached yet, the link will be pushed into the cache, and impl generation will</span>
-    <span class="comment">// be deferred until the missing definition is encountered.</span>
-    <span class="comment">// For now, we assume it is already cached.</span>
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">attr</span>.<span class="ident">is_empty</span>() {
-        <span class="ident">syn::parse2</span>::<span class="op">&lt;</span><span class="ident">enum_dispatch_arg_list::EnumDispatchArgList</span><span class="op">&gt;</span>(<span class="ident">attr</span>)
-            .<span class="ident">expect</span>(<span class="string">&quot;Could not parse arguments to `#[enum_dispatch(...)]`.&quot;</span>)
-            .<span class="ident">arg_list</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
-                <span class="kw">if</span> <span class="ident">p</span>.<span class="ident">leading_colon</span>.<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">segments</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">1</span> {
+    <span class="comment">// If the attributes are non-empty, the new block should be &quot;linked&quot; to the listed definitions.
+    // Those definitions may or may not have been cached yet.
+    // If one is not cached yet, the link will be pushed into the cache, and impl generation will
+    // be deferred until the missing definition is encountered.
+    // For now, we assume it is already cached.
+    </span><span class="kw">if </span>!attr.is_empty() {
+        syn::parse2::&lt;enum_dispatch_arg_list::EnumDispatchArgList&gt;(attr)
+            .expect(<span class="string">&quot;Could not parse arguments to `#[enum_dispatch(...)]`.&quot;</span>)
+            .arg_list
+            .into_iter()
+            .for_each(|p| {
+                <span class="kw">if </span>p.leading_colon.is_some() || p.segments.len() != <span class="number">1 </span>{
                     <span class="macro">panic!</span>(<span class="string">&quot;Paths in `#[enum_dispatch(...)]` are not supported.&quot;</span>);
                 }
-                <span class="kw">let</span> <span class="ident">syn::PathSegment</span> {
-                    <span class="ident">ident</span>: <span class="ident">attr_name</span>,
-                    <span class="ident">arguments</span>: <span class="ident">attr_generics</span>
-                } <span class="op">=</span> <span class="ident">p</span>.<span class="ident">segments</span>.<span class="ident">last</span>().<span class="ident">unwrap</span>();
-                <span class="kw">let</span> <span class="ident">attr_generics</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">attr_generics</span>.<span class="ident">clone</span>() {
-                    <span class="ident">syn::PathArguments::None</span> =&gt; <span class="macro">vec!</span>[],
-                    <span class="ident">syn::PathArguments::AngleBracketed</span>(<span class="ident">args</span>) =&gt; {
-                        <span class="macro">assert!</span>(<span class="ident">args</span>.<span class="ident">colon2_token</span>.<span class="ident">is_none</span>());
-                        <span class="ident">args</span>.<span class="ident">args</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">generic_arg</span><span class="op">|</span> {
-                            <span class="kw">match</span> <span class="ident">generic_arg</span> {
-                                <span class="ident">syn::GenericArgument::Type</span>(<span class="ident">syn::Type::Path</span>(<span class="ident">t</span>)) <span class="kw">if</span> <span class="ident">t</span>.<span class="ident">qself</span>.<span class="ident">is_none</span>() =&gt; <span class="prelude-val">Some</span>(<span class="ident">t</span>.<span class="ident">path</span>.<span class="ident">get_ident</span>().<span class="ident">expect</span>(<span class="string">&quot;Generic binding paths in #[enum_dispatch(...)] are not supported&quot;</span>).<span class="ident">clone</span>()),
-                                <span class="ident">syn::GenericArgument::Type</span>(<span class="ident">syn::Type::Infer</span>(<span class="kw">_</span>)) =&gt; <span class="prelude-val">None</span>,
-                                <span class="ident">syn::GenericArgument::Type</span>(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Generics in #[enum_dispatch(...)] must be identifiers&quot;</span>),
-                                <span class="ident">syn::GenericArgument::Lifetime</span>(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Lifetime generics in #[enum_dispatch(...)] are not supported&quot;</span>),
-                                <span class="ident">syn::GenericArgument::Binding</span>(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Generic equality constraints in #[enum_dispatch(...)] are not supported&quot;</span>),
-                                <span class="ident">syn::GenericArgument::Constraint</span>(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Generic trait constraints in #[enum_dispatch(...)] are not supported&quot;</span>),
-                                <span class="ident">syn::GenericArgument::Const</span>(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Const expression generics in #[enum_dispatch(...)] are not supported&quot;</span>),
+                <span class="kw">let </span>syn::PathSegment {
+                    ident: attr_name,
+                    arguments: attr_generics
+                } = p.segments.last().unwrap();
+                <span class="kw">let </span>attr_generics = <span class="kw">match </span>attr_generics.clone() {
+                    syn::PathArguments::None =&gt; <span class="macro">vec!</span>[],
+                    syn::PathArguments::AngleBracketed(args) =&gt; {
+                        <span class="macro">assert!</span>(args.colon2_token.is_none());
+                        args.args.iter().map(|generic_arg| {
+                            <span class="kw">match </span>generic_arg {
+                                syn::GenericArgument::Type(syn::Type::Path(t)) <span class="kw">if </span>t.qself.is_none() =&gt; <span class="prelude-val">Some</span>(t.path.get_ident().expect(<span class="string">&quot;Generic binding paths in #[enum_dispatch(...)] are not supported&quot;</span>).clone()),
+                                syn::GenericArgument::Type(syn::Type::Infer(<span class="kw">_</span>)) =&gt; <span class="prelude-val">None</span>,
+                                syn::GenericArgument::Type(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Generics in #[enum_dispatch(...)] must be identifiers&quot;</span>),
+                                syn::GenericArgument::Lifetime(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Lifetime generics in #[enum_dispatch(...)] are not supported&quot;</span>),
+                                syn::GenericArgument::Binding(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Generic equality constraints in #[enum_dispatch(...)] are not supported&quot;</span>),
+                                syn::GenericArgument::Constraint(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Generic trait constraints in #[enum_dispatch(...)] are not supported&quot;</span>),
+                                syn::GenericArgument::Const(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Const expression generics in #[enum_dispatch(...)] are not supported&quot;</span>),
                             }
-                        }).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
+                        }).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
                     }
-                    <span class="ident">syn::PathArguments::Parenthesized</span>(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected angle bracketed generic arguments, found parenthesized arguments&quot;</span>),
+                    syn::PathArguments::Parenthesized(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected angle bracketed generic arguments, found parenthesized arguments&quot;</span>),
                 };
-                <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">new_block</span> {
-                    <span class="ident">attributed_parser::ParsedItem::Trait</span>(<span class="ident">traitdef</span>) =&gt; {
-                        <span class="ident">cache::defer_link</span>((<span class="ident">attr_name</span>, <span class="ident">attr_generics</span>.<span class="ident">len</span>()), (<span class="kw-2">&amp;</span><span class="ident">traitdef</span>.<span class="ident">ident</span>, <span class="ident">traitdef</span>.<span class="ident">generics</span>.<span class="ident">type_params</span>().<span class="ident">count</span>()))
+                <span class="kw">match </span><span class="kw-2">&amp;</span>new_block {
+                    attributed_parser::ParsedItem::Trait(traitdef) =&gt; {
+                        cache::defer_link((attr_name, attr_generics.len()), (<span class="kw-2">&amp;</span>traitdef.ident, traitdef.generics.type_params().count()))
                     }
-                    <span class="ident">attributed_parser::ParsedItem::EnumDispatch</span>(<span class="ident">enumdef</span>) =&gt; {
-                        <span class="ident">cache::defer_link</span>((<span class="ident">attr_name</span>, <span class="ident">attr_generics</span>.<span class="ident">len</span>()), (<span class="kw-2">&amp;</span><span class="ident">enumdef</span>.<span class="ident">ident</span>, <span class="ident">enumdef</span>.<span class="ident">generics</span>.<span class="ident">type_params</span>().<span class="ident">count</span>()))
+                    attributed_parser::ParsedItem::EnumDispatch(enumdef) =&gt; {
+                        cache::defer_link((attr_name, attr_generics.len()), (<span class="kw-2">&amp;</span>enumdef.ident, enumdef.generics.type_params().count()))
                     }
                 }
             });
     };
-    <span class="comment">// It would be much simpler to just always retrieve all definitions from the cache. However,</span>
-    <span class="comment">// span information is not stored in the cache. Saving the newly retrieved definition prevents</span>
-    <span class="comment">// *all* of the span information from being lost.</span>
-    <span class="kw">match</span> <span class="ident">new_block</span> {
-        <span class="ident">attributed_parser::ParsedItem::Trait</span>(<span class="ident">traitdef</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">additional_enums</span> <span class="op">=</span>
-                <span class="ident">cache::fulfilled_by_trait</span>(<span class="kw-2">&amp;</span><span class="ident">traitdef</span>.<span class="ident">ident</span>, <span class="ident">traitdef</span>.<span class="ident">generics</span>.<span class="ident">type_params</span>().<span class="ident">count</span>());
-            <span class="kw">for</span> <span class="ident">enumdef</span> <span class="kw">in</span> <span class="ident">additional_enums</span> {
-                <span class="ident">expanded</span>.<span class="ident">append_all</span>(<span class="ident">add_enum_impls</span>(<span class="ident">enumdef</span>, <span class="ident">traitdef</span>.<span class="ident">clone</span>()));
+    <span class="comment">// It would be much simpler to just always retrieve all definitions from the cache. However,
+    // span information is not stored in the cache. Saving the newly retrieved definition prevents
+    // *all* of the span information from being lost.
+    </span><span class="kw">match </span>new_block {
+        attributed_parser::ParsedItem::Trait(traitdef) =&gt; {
+            <span class="kw">let </span>additional_enums =
+                cache::fulfilled_by_trait(<span class="kw-2">&amp;</span>traitdef.ident, traitdef.generics.type_params().count());
+            <span class="kw">for </span>enumdef <span class="kw">in </span>additional_enums {
+                expanded.append_all(add_enum_impls(enumdef, traitdef.clone()));
             }
         }
-        <span class="ident">attributed_parser::ParsedItem::EnumDispatch</span>(<span class="ident">enumdef</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">additional_traits</span> <span class="op">=</span>
-                <span class="ident">cache::fulfilled_by_enum</span>(<span class="kw-2">&amp;</span><span class="ident">enumdef</span>.<span class="ident">ident</span>, <span class="ident">enumdef</span>.<span class="ident">generics</span>.<span class="ident">type_params</span>().<span class="ident">count</span>());
-            <span class="kw">for</span> <span class="ident">traitdef</span> <span class="kw">in</span> <span class="ident">additional_traits</span> {
-                <span class="ident">expanded</span>.<span class="ident">append_all</span>(<span class="ident">add_enum_impls</span>(<span class="ident">enumdef</span>.<span class="ident">clone</span>(), <span class="ident">traitdef</span>));
+        attributed_parser::ParsedItem::EnumDispatch(enumdef) =&gt; {
+            <span class="kw">let </span>additional_traits =
+                cache::fulfilled_by_enum(<span class="kw-2">&amp;</span>enumdef.ident, enumdef.generics.type_params().count());
+            <span class="kw">for </span>traitdef <span class="kw">in </span>additional_traits {
+                expanded.append_all(add_enum_impls(enumdef.clone(), traitdef));
             }
         }
     }
-    <span class="ident">expanded</span>
+    expanded
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="enum_dispatch" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="enum_dispatch" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

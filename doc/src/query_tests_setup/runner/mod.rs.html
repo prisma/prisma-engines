@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connector-test-kit-rs/query-tests-setup/src/runner/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_tests_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_tests_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_tests_setup/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connector-test-kit-rs/query-tests-setup/src/runner/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_tests_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_tests_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_tests_setup/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -215,222 +215,222 @@
 <span id="215">215</span>
 <span id="216">216</span>
 <span id="217">217</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">binary</span>;
-<span class="kw">mod</span> <span class="ident">direct</span>;
-<span class="kw">mod</span> <span class="ident">node_api</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>binary;
+<span class="kw">mod </span>direct;
+<span class="kw">mod </span>node_api;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">binary</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">direct</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">node_api</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">query_core::TxId</span>;
-<span class="kw">use</span> <span class="ident">query_engine_metrics::MetricRegistry</span>;
+<span class="kw">pub use </span>binary::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>direct::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>node_api::<span class="kw-2">*</span>;
+<span class="kw">use </span>query_core::TxId;
+<span class="kw">use </span>query_engine_metrics::MetricRegistry;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ConnectorTag</span>, <span class="ident">ConnectorVersion</span>, <span class="ident">QueryResult</span>, <span class="ident">TestError</span>, <span class="ident">TestLogCapture</span>, <span class="ident">TestResult</span>};
-<span class="kw">use</span> <span class="ident">colored</span>::<span class="kw-2">*</span>;
+<span class="kw">use crate</span>::{ConnectorTag, ConnectorVersion, QueryResult, TestError, TestLogCapture, TestResult};
+<span class="kw">use </span>colored::<span class="kw-2">*</span>;
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">TxResult</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">user_facing_errors::Error</span><span class="op">&gt;</span>;
+<span class="kw">pub type </span>TxResult = <span class="prelude-ty">Result</span>&lt;(), user_facing_errors::Error&gt;;
 
-<span class="attribute">#[<span class="ident">async_trait::async_trait</span>]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">RunnerInterface</span>: <span class="ident">Sized</span> {
-    <span class="doccomment">/// Initializes the runner.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">load</span>(<span class="ident">datamodel</span>: <span class="ident">String</span>, <span class="ident">connector_tag</span>: <span class="ident">ConnectorTag</span>, <span class="ident">metrics</span>: <span class="ident">MetricRegistry</span>) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+<span class="attribute">#[async_trait::async_trait]
+</span><span class="kw">pub trait </span>RunnerInterface: Sized {
+    <span class="doccomment">/// Initializes the runner.
+    </span><span class="kw">async fn </span>load(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -&gt; TestResult&lt;<span class="self">Self</span>&gt;;
 
-    <span class="doccomment">/// Queries the engine.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">query</span>: <span class="ident">String</span>) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span><span class="ident">QueryResult</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Queries the engine.
+    </span><span class="kw">async fn </span>query(<span class="kw-2">&amp;</span><span class="self">self</span>, query: String) -&gt; TestResult&lt;QueryResult&gt;;
 
-    <span class="doccomment">/// Queries the engine with a batch.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">batch</span>(
+    <span class="doccomment">/// Queries the engine with a batch.
+    </span><span class="kw">async fn </span>batch(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">queries</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="ident">transaction</span>: <span class="ident">bool</span>,
-        <span class="ident">isolation_level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span><span class="ident">QueryResult</span><span class="op">&gt;</span>;
+        queries: Vec&lt;String&gt;,
+        transaction: bool,
+        isolation_level: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; TestResult&lt;QueryResult&gt;;
 
-    <span class="doccomment">/// start a transaction for a batch run</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_tx</span>(
+    <span class="doccomment">/// start a transaction for a batch run
+    </span><span class="kw">async fn </span>start_tx(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">max_acquisition_millis</span>: <span class="ident">u64</span>,
-        <span class="ident">valid_for_millis</span>: <span class="ident">u64</span>,
-        <span class="ident">isolation_level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span><span class="ident">TxId</span><span class="op">&gt;</span>;
+        max_acquisition_millis: u64,
+        valid_for_millis: u64,
+        isolation_level: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; TestResult&lt;TxId&gt;;
 
-    <span class="doccomment">/// commit transaction</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">commit_tx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">tx_id</span>: <span class="ident">TxId</span>) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span><span class="ident">TxResult</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// commit transaction
+    </span><span class="kw">async fn </span>commit_tx(<span class="kw-2">&amp;</span><span class="self">self</span>, tx_id: TxId) -&gt; TestResult&lt;TxResult&gt;;
 
-    <span class="doccomment">/// rollback transaction</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">rollback_tx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">tx_id</span>: <span class="ident">TxId</span>) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span><span class="ident">TxResult</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// rollback transaction
+    </span><span class="kw">async fn </span>rollback_tx(<span class="kw-2">&amp;</span><span class="self">self</span>, tx_id: TxId) -&gt; TestResult&lt;TxResult&gt;;
 
-    <span class="doccomment">/// The connector tag used to load this runner.</span>
-    <span class="kw">fn</span> <span class="ident">connector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">ConnectorTag</span>;
+    <span class="doccomment">/// The connector tag used to load this runner.
+    </span><span class="kw">fn </span>connector(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ConnectorTag;
 
-    <span class="doccomment">/// Instructs this runner to use a specific ITX ID for queries.</span>
-    <span class="kw">fn</span> <span class="ident">set_active_tx</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">tx_id</span>: <span class="ident">TxId</span>);
+    <span class="doccomment">/// Instructs this runner to use a specific ITX ID for queries.
+    </span><span class="kw">fn </span>set_active_tx(<span class="kw-2">&amp;mut </span><span class="self">self</span>, tx_id: TxId);
 
-    <span class="doccomment">/// Clears ITX ID for queries.</span>
-    <span class="kw">fn</span> <span class="ident">clear_active_tx</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>);
+    <span class="doccomment">/// Clears ITX ID for queries.
+    </span><span class="kw">fn </span>clear_active_tx(<span class="kw-2">&amp;mut </span><span class="self">self</span>);
 
-    <span class="kw">fn</span> <span class="ident">get_metrics</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">MetricRegistry</span>;
+    <span class="kw">fn </span>get_metrics(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; MetricRegistry;
 }
 
-<span class="kw">enum</span> <span class="ident">RunnerType</span> {
-    <span class="doccomment">/// Using the QE crate directly for queries.</span>
-    <span class="ident">Direct</span>(<span class="ident">DirectRunner</span>),
+<span class="kw">enum </span>RunnerType {
+    <span class="doccomment">/// Using the QE crate directly for queries.
+    </span>Direct(DirectRunner),
 
-    <span class="doccomment">/// Using a NodeJS runner.</span>
-    <span class="ident">NodeApi</span>(<span class="ident">NodeApiRunner</span>),
+    <span class="doccomment">/// Using a NodeJS runner.
+    </span>NodeApi(NodeApiRunner),
 
-    <span class="doccomment">/// Using the HTTP bridge</span>
-    <span class="ident">Binary</span>(<span class="ident">BinaryRunner</span>),
+    <span class="doccomment">/// Using the HTTP bridge
+    </span>Binary(BinaryRunner),
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Runner</span> {
-    <span class="ident">log_capture</span>: <span class="ident">TestLogCapture</span>,
-    <span class="ident">inner</span>: <span class="ident">RunnerType</span>,
+<span class="kw">pub struct </span>Runner {
+    log_capture: TestLogCapture,
+    inner: RunnerType,
 }
 
-<span class="kw">impl</span> <span class="ident">Runner</span> {
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">load</span>(
-        <span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">datamodel</span>: <span class="ident">String</span>,
-        <span class="ident">connector_tag</span>: <span class="ident">ConnectorTag</span>,
-        <span class="ident">metrics</span>: <span class="ident">MetricRegistry</span>,
-        <span class="ident">log_capture</span>: <span class="ident">TestLogCapture</span>,
-    ) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ident</span> {
-            <span class="string">&quot;direct&quot;</span> =&gt; <span class="ident"><span class="self">Self</span>::direct</span>(<span class="ident">datamodel</span>, <span class="ident">connector_tag</span>, <span class="ident">metrics</span>).<span class="kw">await</span>,
-            <span class="string">&quot;node-api&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">RunnerType::NodeApi</span>(<span class="ident">NodeApiRunner</span> {})),
-            <span class="string">&quot;binary&quot;</span> =&gt; <span class="ident"><span class="self">Self</span>::binary</span>(<span class="ident">datamodel</span>, <span class="ident">connector_tag</span>, <span class="ident">metrics</span>).<span class="kw">await</span>,
-            <span class="ident">unknown</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">TestError::parse_error</span>(<span class="macro">format!</span>(<span class="string">&quot;Unknown test runner &#39;{}&#39;&quot;</span>, <span class="ident">unknown</span>))),
+<span class="kw">impl </span>Runner {
+    <span class="kw">pub async fn </span>load(
+        ident: <span class="kw-2">&amp;</span>str,
+        datamodel: String,
+        connector_tag: ConnectorTag,
+        metrics: MetricRegistry,
+        log_capture: TestLogCapture,
+    ) -&gt; TestResult&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>inner = <span class="kw">match </span>ident {
+            <span class="string">&quot;direct&quot; </span>=&gt; <span class="self">Self</span>::direct(datamodel, connector_tag, metrics).<span class="kw">await</span>,
+            <span class="string">&quot;node-api&quot; </span>=&gt; <span class="prelude-val">Ok</span>(RunnerType::NodeApi(NodeApiRunner {})),
+            <span class="string">&quot;binary&quot; </span>=&gt; <span class="self">Self</span>::binary(datamodel, connector_tag, metrics).<span class="kw">await</span>,
+            unknown =&gt; <span class="prelude-val">Err</span>(TestError::parse_error(<span class="macro">format!</span>(<span class="string">&quot;Unknown test runner &#39;{}&#39;&quot;</span>, unknown))),
         }<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> { <span class="ident">log_capture</span>, <span class="ident">inner</span> })
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{ log_capture, inner })
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">gql_query</span>: <span class="ident">T</span>) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span><span class="ident">QueryResult</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="kw">pub async fn </span>query&lt;T&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, gql_query: T) -&gt; TestResult&lt;QueryResult&gt;
+    <span class="kw">where
+        </span>T: Into&lt;String&gt;,
     {
-        <span class="kw">let</span> <span class="ident">gql_query</span> <span class="op">=</span> <span class="ident">gql_query</span>.<span class="ident">into</span>();
-        <span class="macro">tracing::debug!</span>(<span class="string">&quot;Querying: {}&quot;</span>, <span class="ident">gql_query</span>.<span class="ident">clone</span>().<span class="ident">green</span>());
+        <span class="kw">let </span>gql_query = gql_query.into();
+        <span class="macro">tracing::debug!</span>(<span class="string">&quot;Querying: {}&quot;</span>, gql_query.clone().green());
 
-        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">RunnerType::Direct</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">query</span>(<span class="ident">gql_query</span>).<span class="kw">await</span>,
-            <span class="ident">RunnerType::NodeApi</span>(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(),
-            <span class="ident">RunnerType::Binary</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">query</span>(<span class="ident">gql_query</span>).<span class="kw">await</span>,
+        <span class="kw">let </span>response = <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.inner {
+            RunnerType::Direct(r) =&gt; r.query(gql_query).<span class="kw">await</span>,
+            RunnerType::NodeApi(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(),
+            RunnerType::Binary(r) =&gt; r.query(gql_query).<span class="kw">await</span>,
         }<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="ident">response</span>.<span class="ident">failed</span>() {
-            <span class="macro">tracing::debug!</span>(<span class="string">&quot;Response: {}&quot;</span>, <span class="ident">response</span>.<span class="ident">to_string</span>().<span class="ident">red</span>());
-        } <span class="kw">else</span> {
-            <span class="macro">tracing::debug!</span>(<span class="string">&quot;Response: {}&quot;</span>, <span class="ident">response</span>.<span class="ident">to_string</span>().<span class="ident">green</span>());
+        <span class="kw">if </span>response.failed() {
+            <span class="macro">tracing::debug!</span>(<span class="string">&quot;Response: {}&quot;</span>, response.to_string().red());
+        } <span class="kw">else </span>{
+            <span class="macro">tracing::debug!</span>(<span class="string">&quot;Response: {}&quot;</span>, response.to_string().green());
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">response</span>)
+        <span class="prelude-val">Ok</span>(response)
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_tx</span>(
+    <span class="kw">pub async fn </span>start_tx(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">max_acquisition_millis</span>: <span class="ident">u64</span>,
-        <span class="ident">valid_for_millis</span>: <span class="ident">u64</span>,
-        <span class="ident">isolation_level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span><span class="ident">TxId</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">RunnerType::Direct</span>(<span class="ident">r</span>) =&gt; {
-                <span class="ident">r</span>.<span class="ident">start_tx</span>(<span class="ident">max_acquisition_millis</span>, <span class="ident">valid_for_millis</span>, <span class="ident">isolation_level</span>)
-                    .<span class="kw">await</span>
-            }
-            <span class="ident">RunnerType::Binary</span>(<span class="ident">r</span>) =&gt; {
-                <span class="ident">r</span>.<span class="ident">start_tx</span>(<span class="ident">max_acquisition_millis</span>, <span class="ident">valid_for_millis</span>, <span class="ident">isolation_level</span>)
-                    .<span class="kw">await</span>
-            }
-            <span class="ident">RunnerType::NodeApi</span>(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(),
+        max_acquisition_millis: u64,
+        valid_for_millis: u64,
+        isolation_level: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; TestResult&lt;TxId&gt; {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.inner {
+            RunnerType::Direct(r) =&gt; {
+                r.start_tx(max_acquisition_millis, valid_for_millis, isolation_level)
+                    .<span class="kw">await
+            </span>}
+            RunnerType::Binary(r) =&gt; {
+                r.start_tx(max_acquisition_millis, valid_for_millis, isolation_level)
+                    .<span class="kw">await
+            </span>}
+            RunnerType::NodeApi(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">commit_tx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">tx_id</span>: <span class="ident">TxId</span>) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span><span class="ident">TxResult</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">RunnerType::Direct</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">commit_tx</span>(<span class="ident">tx_id</span>).<span class="kw">await</span>,
-            <span class="ident">RunnerType::NodeApi</span>(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(),
-            <span class="ident">RunnerType::Binary</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">commit_tx</span>(<span class="ident">tx_id</span>).<span class="kw">await</span>,
+    <span class="kw">pub async fn </span>commit_tx(<span class="kw-2">&amp;</span><span class="self">self</span>, tx_id: TxId) -&gt; TestResult&lt;TxResult&gt; {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.inner {
+            RunnerType::Direct(r) =&gt; r.commit_tx(tx_id).<span class="kw">await</span>,
+            RunnerType::NodeApi(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(),
+            RunnerType::Binary(r) =&gt; r.commit_tx(tx_id).<span class="kw">await</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">rollback_tx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">tx_id</span>: <span class="ident">TxId</span>) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span><span class="ident">TxResult</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">RunnerType::Direct</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">rollback_tx</span>(<span class="ident">tx_id</span>).<span class="kw">await</span>,
-            <span class="ident">RunnerType::NodeApi</span>(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(),
-            <span class="ident">RunnerType::Binary</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">rollback_tx</span>(<span class="ident">tx_id</span>).<span class="kw">await</span>,
+    <span class="kw">pub async fn </span>rollback_tx(<span class="kw-2">&amp;</span><span class="self">self</span>, tx_id: TxId) -&gt; TestResult&lt;TxResult&gt; {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.inner {
+            RunnerType::Direct(r) =&gt; r.rollback_tx(tx_id).<span class="kw">await</span>,
+            RunnerType::NodeApi(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(),
+            RunnerType::Binary(r) =&gt; r.rollback_tx(tx_id).<span class="kw">await</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">batch</span>(
+    <span class="kw">pub async fn </span>batch(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">queries</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="ident">transaction</span>: <span class="ident">bool</span>,
-        <span class="ident">isolation_level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span><span class="ident">QueryResult</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">RunnerType::Direct</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">batch</span>(<span class="ident">queries</span>, <span class="ident">transaction</span>, <span class="ident">isolation_level</span>).<span class="kw">await</span>,
-            <span class="ident">RunnerType::NodeApi</span>(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(),
-            <span class="ident">RunnerType::Binary</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">batch</span>(<span class="ident">queries</span>, <span class="ident">transaction</span>, <span class="ident">isolation_level</span>).<span class="kw">await</span>,
+        queries: Vec&lt;String&gt;,
+        transaction: bool,
+        isolation_level: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; TestResult&lt;QueryResult&gt; {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.inner {
+            RunnerType::Direct(r) =&gt; r.batch(queries, transaction, isolation_level).<span class="kw">await</span>,
+            RunnerType::NodeApi(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(),
+            RunnerType::Binary(r) =&gt; r.batch(queries, transaction, isolation_level).<span class="kw">await</span>,
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">direct</span>(<span class="ident">datamodel</span>: <span class="ident">String</span>, <span class="ident">connector_tag</span>: <span class="ident">ConnectorTag</span>, <span class="ident">metrics</span>: <span class="ident">MetricRegistry</span>) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span><span class="ident">RunnerType</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">runner</span> <span class="op">=</span> <span class="ident">DirectRunner::load</span>(<span class="ident">datamodel</span>, <span class="ident">connector_tag</span>, <span class="ident">metrics</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">async fn </span>direct(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -&gt; TestResult&lt;RunnerType&gt; {
+        <span class="kw">let </span>runner = DirectRunner::load(datamodel, connector_tag, metrics).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">RunnerType::Direct</span>(<span class="ident">runner</span>))
+        <span class="prelude-val">Ok</span>(RunnerType::Direct(runner))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">binary</span>(<span class="ident">datamodel</span>: <span class="ident">String</span>, <span class="ident">connector_tag</span>: <span class="ident">ConnectorTag</span>, <span class="ident">metrics</span>: <span class="ident">MetricRegistry</span>) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span><span class="ident">RunnerType</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">runner</span> <span class="op">=</span> <span class="ident">BinaryRunner::load</span>(<span class="ident">datamodel</span>, <span class="ident">connector_tag</span>, <span class="ident">metrics</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">async fn </span>binary(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -&gt; TestResult&lt;RunnerType&gt; {
+        <span class="kw">let </span>runner = BinaryRunner::load(datamodel, connector_tag, metrics).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">RunnerType::Binary</span>(<span class="ident">runner</span>))
+        <span class="prelude-val">Ok</span>(RunnerType::Binary(runner))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">ConnectorTag</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">RunnerType::Direct</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">connector</span>(),
-            <span class="ident">RunnerType::NodeApi</span>(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(),
-            <span class="ident">RunnerType::Binary</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">connector</span>(),
+    <span class="kw">pub fn </span>connector(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>ConnectorTag {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.inner {
+            RunnerType::Direct(r) =&gt; r.connector(),
+            RunnerType::NodeApi(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(),
+            RunnerType::Binary(r) =&gt; r.connector(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connector_version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectorVersion</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">RunnerType::Direct</span>(<span class="ident">r</span>) =&gt; <span class="ident">ConnectorVersion::from</span>(<span class="ident">r</span>.<span class="ident">connector</span>()),
-            <span class="ident">RunnerType::NodeApi</span>(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(),
-            <span class="ident">RunnerType::Binary</span>(<span class="ident">r</span>) =&gt; <span class="ident">ConnectorVersion::from</span>(<span class="ident">r</span>.<span class="ident">connector</span>()),
+    <span class="kw">pub fn </span>connector_version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ConnectorVersion {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.inner {
+            RunnerType::Direct(r) =&gt; ConnectorVersion::from(r.connector()),
+            RunnerType::NodeApi(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(),
+            RunnerType::Binary(r) =&gt; ConnectorVersion::from(r.connector()),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_active_tx</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">tx_id</span>: <span class="ident">TxId</span>) {
-        <span class="kw">match</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">RunnerType::Direct</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">set_active_tx</span>(<span class="ident">tx_id</span>),
-            <span class="ident">RunnerType::NodeApi</span>(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(),
-            <span class="ident">RunnerType::Binary</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">set_active_tx</span>(<span class="ident">tx_id</span>),
+    <span class="kw">pub fn </span>set_active_tx(<span class="kw-2">&amp;mut </span><span class="self">self</span>, tx_id: TxId) {
+        <span class="kw">match </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.inner {
+            RunnerType::Direct(r) =&gt; r.set_active_tx(tx_id),
+            RunnerType::NodeApi(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(),
+            RunnerType::Binary(r) =&gt; r.set_active_tx(tx_id),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear_active_tx</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">match</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">RunnerType::Direct</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">clear_active_tx</span>(),
-            <span class="ident">RunnerType::NodeApi</span>(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(),
-            <span class="ident">RunnerType::Binary</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">clear_active_tx</span>(),
+    <span class="kw">pub fn </span>clear_active_tx(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">match </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.inner {
+            RunnerType::Direct(r) =&gt; r.clear_active_tx(),
+            RunnerType::NodeApi(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(),
+            RunnerType::Binary(r) =&gt; r.clear_active_tx(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_metrics</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">MetricRegistry</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span> {
-            <span class="ident">RunnerType::Direct</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">get_metrics</span>(),
-            <span class="ident">RunnerType::NodeApi</span>(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(),
-            <span class="ident">RunnerType::Binary</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>.<span class="ident">get_metrics</span>(),
+    <span class="kw">pub fn </span>get_metrics(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; MetricRegistry {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.inner {
+            RunnerType::Direct(r) =&gt; r.get_metrics(),
+            RunnerType::NodeApi(<span class="kw">_</span>) =&gt; <span class="macro">todo!</span>(),
+            RunnerType::Binary(r) =&gt; r.get_metrics(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_logs</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">log_capture</span>.<span class="ident">get_logs</span>().<span class="kw">await</span>
-    }
+    <span class="kw">pub async fn </span>get_logs(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Vec&lt;String&gt; {
+        <span class="self">self</span>.log_capture.get_logs().<span class="kw">await
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_tests_setup" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_tests_setup" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

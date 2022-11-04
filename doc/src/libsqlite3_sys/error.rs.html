@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/libsqlite3-sys-0.22.2/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../libsqlite3_sys/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../libsqlite3_sys/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../libsqlite3_sys/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/libsqlite3-sys-0.22.2/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../libsqlite3_sys/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../libsqlite3_sys/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../libsqlite3_sys/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -310,317 +310,317 @@
 <span id="310">310</span>
 <span id="311">311</span>
 <span id="312">312</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::error</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::os::raw::c_int</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::error;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::os::raw::c_int;
 
-<span class="doccomment">/// Error Codes</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ErrorCode</span> {
-    <span class="doccomment">/// Internal logic error in SQLite</span>
-    <span class="ident">InternalMalfunction</span>,
-    <span class="doccomment">/// Access permission denied</span>
-    <span class="ident">PermissionDenied</span>,
-    <span class="doccomment">/// Callback routine requested an abort</span>
-    <span class="ident">OperationAborted</span>,
-    <span class="doccomment">/// The database file is locked</span>
-    <span class="ident">DatabaseBusy</span>,
-    <span class="doccomment">/// A table in the database is locked</span>
-    <span class="ident">DatabaseLocked</span>,
-    <span class="doccomment">/// A malloc() failed</span>
-    <span class="ident">OutOfMemory</span>,
-    <span class="doccomment">/// Attempt to write a readonly database</span>
-    <span class="ident">ReadOnly</span>,
-    <span class="doccomment">/// Operation terminated by sqlite3_interrupt()</span>
-    <span class="ident">OperationInterrupted</span>,
-    <span class="doccomment">/// Some kind of disk I/O error occurred</span>
-    <span class="ident">SystemIoFailure</span>,
-    <span class="doccomment">/// The database disk image is malformed</span>
-    <span class="ident">DatabaseCorrupt</span>,
-    <span class="doccomment">/// Unknown opcode in sqlite3_file_control()</span>
-    <span class="ident">NotFound</span>,
-    <span class="doccomment">/// Insertion failed because database is full</span>
-    <span class="ident">DiskFull</span>,
-    <span class="doccomment">/// Unable to open the database file</span>
-    <span class="ident">CannotOpen</span>,
-    <span class="doccomment">/// Database lock protocol error</span>
-    <span class="ident">FileLockingProtocolFailed</span>,
-    <span class="doccomment">/// The database schema changed</span>
-    <span class="ident">SchemaChanged</span>,
-    <span class="doccomment">/// String or BLOB exceeds size limit</span>
-    <span class="ident">TooBig</span>,
-    <span class="doccomment">/// Abort due to constraint violation</span>
-    <span class="ident">ConstraintViolation</span>,
-    <span class="doccomment">/// Data type mismatch</span>
-    <span class="ident">TypeMismatch</span>,
-    <span class="doccomment">/// Library used incorrectly</span>
-    <span class="ident">ApiMisuse</span>,
-    <span class="doccomment">/// Uses OS features not supported on host</span>
-    <span class="ident">NoLargeFileSupport</span>,
-    <span class="doccomment">/// Authorization denied</span>
-    <span class="ident">AuthorizationForStatementDenied</span>,
-    <span class="doccomment">/// 2nd parameter to sqlite3_bind out of range</span>
-    <span class="ident">ParameterOutOfRange</span>,
-    <span class="doccomment">/// File opened that is not a database file</span>
-    <span class="ident">NotADatabase</span>,
-    <span class="doccomment">/// SQL error or missing database</span>
-    <span class="ident">Unknown</span>,
+<span class="doccomment">/// Error Codes
+</span><span class="attribute">#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>ErrorCode {
+    <span class="doccomment">/// Internal logic error in SQLite
+    </span>InternalMalfunction,
+    <span class="doccomment">/// Access permission denied
+    </span>PermissionDenied,
+    <span class="doccomment">/// Callback routine requested an abort
+    </span>OperationAborted,
+    <span class="doccomment">/// The database file is locked
+    </span>DatabaseBusy,
+    <span class="doccomment">/// A table in the database is locked
+    </span>DatabaseLocked,
+    <span class="doccomment">/// A malloc() failed
+    </span>OutOfMemory,
+    <span class="doccomment">/// Attempt to write a readonly database
+    </span>ReadOnly,
+    <span class="doccomment">/// Operation terminated by sqlite3_interrupt()
+    </span>OperationInterrupted,
+    <span class="doccomment">/// Some kind of disk I/O error occurred
+    </span>SystemIoFailure,
+    <span class="doccomment">/// The database disk image is malformed
+    </span>DatabaseCorrupt,
+    <span class="doccomment">/// Unknown opcode in sqlite3_file_control()
+    </span>NotFound,
+    <span class="doccomment">/// Insertion failed because database is full
+    </span>DiskFull,
+    <span class="doccomment">/// Unable to open the database file
+    </span>CannotOpen,
+    <span class="doccomment">/// Database lock protocol error
+    </span>FileLockingProtocolFailed,
+    <span class="doccomment">/// The database schema changed
+    </span>SchemaChanged,
+    <span class="doccomment">/// String or BLOB exceeds size limit
+    </span>TooBig,
+    <span class="doccomment">/// Abort due to constraint violation
+    </span>ConstraintViolation,
+    <span class="doccomment">/// Data type mismatch
+    </span>TypeMismatch,
+    <span class="doccomment">/// Library used incorrectly
+    </span>ApiMisuse,
+    <span class="doccomment">/// Uses OS features not supported on host
+    </span>NoLargeFileSupport,
+    <span class="doccomment">/// Authorization denied
+    </span>AuthorizationForStatementDenied,
+    <span class="doccomment">/// 2nd parameter to sqlite3_bind out of range
+    </span>ParameterOutOfRange,
+    <span class="doccomment">/// File opened that is not a database file
+    </span>NotADatabase,
+    <span class="doccomment">/// SQL error or missing database
+    </span>Unknown,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Error</span> {
-    <span class="kw">pub</span> <span class="ident">code</span>: <span class="ident">ErrorCode</span>,
-    <span class="kw">pub</span> <span class="ident">extended_code</span>: <span class="ident">c_int</span>,
+<span class="attribute">#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+</span><span class="kw">pub struct </span>Error {
+    <span class="kw">pub </span>code: ErrorCode,
+    <span class="kw">pub </span>extended_code: c_int,
 }
 
-<span class="kw">impl</span> <span class="ident">Error</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">result_code</span>: <span class="ident">c_int</span>) -&gt; <span class="ident">Error</span> {
-        <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">result_code</span> <span class="op">&amp;</span> <span class="number">0xff</span> {
-            <span class="ident"><span class="kw">super</span>::SQLITE_INTERNAL</span> =&gt; <span class="ident">ErrorCode::InternalMalfunction</span>,
-            <span class="ident"><span class="kw">super</span>::SQLITE_PERM</span> =&gt; <span class="ident">ErrorCode::PermissionDenied</span>,
-            <span class="ident"><span class="kw">super</span>::SQLITE_ABORT</span> =&gt; <span class="ident">ErrorCode::OperationAborted</span>,
-            <span class="ident"><span class="kw">super</span>::SQLITE_BUSY</span> =&gt; <span class="ident">ErrorCode::DatabaseBusy</span>,
-            <span class="ident"><span class="kw">super</span>::SQLITE_LOCKED</span> =&gt; <span class="ident">ErrorCode::DatabaseLocked</span>,
-            <span class="ident"><span class="kw">super</span>::SQLITE_NOMEM</span> =&gt; <span class="ident">ErrorCode::OutOfMemory</span>,
-            <span class="ident"><span class="kw">super</span>::SQLITE_READONLY</span> =&gt; <span class="ident">ErrorCode::ReadOnly</span>,
-            <span class="ident"><span class="kw">super</span>::SQLITE_INTERRUPT</span> =&gt; <span class="ident">ErrorCode::OperationInterrupted</span>,
-            <span class="ident"><span class="kw">super</span>::SQLITE_IOERR</span> =&gt; <span class="ident">ErrorCode::SystemIoFailure</span>,
-            <span class="ident"><span class="kw">super</span>::SQLITE_CORRUPT</span> =&gt; <span class="ident">ErrorCode::DatabaseCorrupt</span>,
-            <span class="ident"><span class="kw">super</span>::SQLITE_NOTFOUND</span> =&gt; <span class="ident">ErrorCode::NotFound</span>,
-            <span class="ident"><span class="kw">super</span>::SQLITE_FULL</span> =&gt; <span class="ident">ErrorCode::DiskFull</span>,
-            <span class="ident"><span class="kw">super</span>::SQLITE_CANTOPEN</span> =&gt; <span class="ident">ErrorCode::CannotOpen</span>,
-            <span class="ident"><span class="kw">super</span>::SQLITE_PROTOCOL</span> =&gt; <span class="ident">ErrorCode::FileLockingProtocolFailed</span>,
-            <span class="ident"><span class="kw">super</span>::SQLITE_SCHEMA</span> =&gt; <span class="ident">ErrorCode::SchemaChanged</span>,
-            <span class="ident"><span class="kw">super</span>::SQLITE_TOOBIG</span> =&gt; <span class="ident">ErrorCode::TooBig</span>,
-            <span class="ident"><span class="kw">super</span>::SQLITE_CONSTRAINT</span> =&gt; <span class="ident">ErrorCode::ConstraintViolation</span>,
-            <span class="ident"><span class="kw">super</span>::SQLITE_MISMATCH</span> =&gt; <span class="ident">ErrorCode::TypeMismatch</span>,
-            <span class="ident"><span class="kw">super</span>::SQLITE_MISUSE</span> =&gt; <span class="ident">ErrorCode::ApiMisuse</span>,
-            <span class="ident"><span class="kw">super</span>::SQLITE_NOLFS</span> =&gt; <span class="ident">ErrorCode::NoLargeFileSupport</span>,
-            <span class="ident"><span class="kw">super</span>::SQLITE_AUTH</span> =&gt; <span class="ident">ErrorCode::AuthorizationForStatementDenied</span>,
-            <span class="ident"><span class="kw">super</span>::SQLITE_RANGE</span> =&gt; <span class="ident">ErrorCode::ParameterOutOfRange</span>,
-            <span class="ident"><span class="kw">super</span>::SQLITE_NOTADB</span> =&gt; <span class="ident">ErrorCode::NotADatabase</span>,
-            <span class="kw">_</span> =&gt; <span class="ident">ErrorCode::Unknown</span>,
+<span class="kw">impl </span>Error {
+    <span class="kw">pub fn </span>new(result_code: c_int) -&gt; Error {
+        <span class="kw">let </span>code = <span class="kw">match </span>result_code &amp; <span class="number">0xff </span>{
+            <span class="kw">super</span>::SQLITE_INTERNAL =&gt; ErrorCode::InternalMalfunction,
+            <span class="kw">super</span>::SQLITE_PERM =&gt; ErrorCode::PermissionDenied,
+            <span class="kw">super</span>::SQLITE_ABORT =&gt; ErrorCode::OperationAborted,
+            <span class="kw">super</span>::SQLITE_BUSY =&gt; ErrorCode::DatabaseBusy,
+            <span class="kw">super</span>::SQLITE_LOCKED =&gt; ErrorCode::DatabaseLocked,
+            <span class="kw">super</span>::SQLITE_NOMEM =&gt; ErrorCode::OutOfMemory,
+            <span class="kw">super</span>::SQLITE_READONLY =&gt; ErrorCode::ReadOnly,
+            <span class="kw">super</span>::SQLITE_INTERRUPT =&gt; ErrorCode::OperationInterrupted,
+            <span class="kw">super</span>::SQLITE_IOERR =&gt; ErrorCode::SystemIoFailure,
+            <span class="kw">super</span>::SQLITE_CORRUPT =&gt; ErrorCode::DatabaseCorrupt,
+            <span class="kw">super</span>::SQLITE_NOTFOUND =&gt; ErrorCode::NotFound,
+            <span class="kw">super</span>::SQLITE_FULL =&gt; ErrorCode::DiskFull,
+            <span class="kw">super</span>::SQLITE_CANTOPEN =&gt; ErrorCode::CannotOpen,
+            <span class="kw">super</span>::SQLITE_PROTOCOL =&gt; ErrorCode::FileLockingProtocolFailed,
+            <span class="kw">super</span>::SQLITE_SCHEMA =&gt; ErrorCode::SchemaChanged,
+            <span class="kw">super</span>::SQLITE_TOOBIG =&gt; ErrorCode::TooBig,
+            <span class="kw">super</span>::SQLITE_CONSTRAINT =&gt; ErrorCode::ConstraintViolation,
+            <span class="kw">super</span>::SQLITE_MISMATCH =&gt; ErrorCode::TypeMismatch,
+            <span class="kw">super</span>::SQLITE_MISUSE =&gt; ErrorCode::ApiMisuse,
+            <span class="kw">super</span>::SQLITE_NOLFS =&gt; ErrorCode::NoLargeFileSupport,
+            <span class="kw">super</span>::SQLITE_AUTH =&gt; ErrorCode::AuthorizationForStatementDenied,
+            <span class="kw">super</span>::SQLITE_RANGE =&gt; ErrorCode::ParameterOutOfRange,
+            <span class="kw">super</span>::SQLITE_NOTADB =&gt; ErrorCode::NotADatabase,
+            <span class="kw">_ </span>=&gt; ErrorCode::Unknown,
         };
 
-        <span class="ident">Error</span> {
-            <span class="ident">code</span>,
-            <span class="ident">extended_code</span>: <span class="ident">result_code</span>,
+        Error {
+            code,
+            extended_code: result_code,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Error {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
         <span class="macro">write!</span>(
-            <span class="ident">f</span>,
+            f,
             <span class="string">&quot;Error code {}: {}&quot;</span>,
-            <span class="self">self</span>.<span class="ident">extended_code</span>,
-            <span class="ident">code_to_str</span>(<span class="self">self</span>.<span class="ident">extended_code</span>)
+            <span class="self">self</span>.extended_code,
+            code_to_str(<span class="self">self</span>.extended_code)
         )
     }
 }
 
-<span class="kw">impl</span> <span class="ident">error::Error</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="ident">code_to_str</span>(<span class="self">self</span>.<span class="ident">extended_code</span>)
+<span class="kw">impl </span>error::Error <span class="kw">for </span>Error {
+    <span class="kw">fn </span>description(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        code_to_str(<span class="self">self</span>.extended_code)
     }
 }
 
-<span class="comment">// Result codes.</span>
-<span class="comment">// Note: These are not public because our bindgen bindings export whichever</span>
-<span class="comment">// constants are present in the current version of SQLite. We repeat them here</span>
-<span class="comment">// so we don&#39;t have to worry about which version of SQLite added which</span>
-<span class="comment">// constants, and we only use them to implement code_to_str below.</span>
+<span class="comment">// Result codes.
+// Note: These are not public because our bindgen bindings export whichever
+// constants are present in the current version of SQLite. We repeat them here
+// so we don&#39;t have to worry about which version of SQLite added which
+// constants, and we only use them to implement code_to_str below.
 
-<span class="kw">const</span> <span class="ident">SQLITE_NOTICE</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="number">27</span>;
-<span class="kw">const</span> <span class="ident">SQLITE_WARNING</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="number">28</span>;
+</span><span class="kw">const </span>SQLITE_NOTICE: c_int = <span class="number">27</span>;
+<span class="kw">const </span>SQLITE_WARNING: c_int = <span class="number">28</span>;
 
-<span class="comment">// Extended result codes.</span>
+<span class="comment">// Extended result codes.
 
-<span class="kw">const</span> <span class="ident">SQLITE_ERROR_MISSING_COLLSEQ</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_ERROR</span> <span class="op">|</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_ERROR_RETRY</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_ERROR</span> <span class="op">|</span> (<span class="number">2</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_ERROR_SNAPSHOT</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_ERROR</span> <span class="op">|</span> (<span class="number">3</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
+</span><span class="kw">const </span>SQLITE_ERROR_MISSING_COLLSEQ: c_int = <span class="kw">super</span>::SQLITE_ERROR | (<span class="number">1 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_ERROR_RETRY: c_int = <span class="kw">super</span>::SQLITE_ERROR | (<span class="number">2 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_ERROR_SNAPSHOT: c_int = <span class="kw">super</span>::SQLITE_ERROR | (<span class="number">3 </span>&lt;&lt; <span class="number">8</span>);
 
-<span class="kw">const</span> <span class="ident">SQLITE_IOERR_SHMOPEN</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_IOERR</span> <span class="op">|</span> (<span class="number">18</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_IOERR_SHMSIZE</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_IOERR</span> <span class="op">|</span> (<span class="number">19</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_IOERR_SHMLOCK</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_IOERR</span> <span class="op">|</span> (<span class="number">20</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_IOERR_SHMMAP</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_IOERR</span> <span class="op">|</span> (<span class="number">21</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_IOERR_SEEK</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_IOERR</span> <span class="op">|</span> (<span class="number">22</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_IOERR_DELETE_NOENT</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_IOERR</span> <span class="op">|</span> (<span class="number">23</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_IOERR_MMAP</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_IOERR</span> <span class="op">|</span> (<span class="number">24</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_IOERR_GETTEMPPATH</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_IOERR</span> <span class="op">|</span> (<span class="number">25</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_IOERR_CONVPATH</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_IOERR</span> <span class="op">|</span> (<span class="number">26</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_IOERR_VNODE</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_IOERR</span> <span class="op">|</span> (<span class="number">27</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_IOERR_AUTH</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_IOERR</span> <span class="op">|</span> (<span class="number">28</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_IOERR_BEGIN_ATOMIC</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_IOERR</span> <span class="op">|</span> (<span class="number">29</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_IOERR_COMMIT_ATOMIC</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_IOERR</span> <span class="op">|</span> (<span class="number">30</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_IOERR_ROLLBACK_ATOMIC</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_IOERR</span> <span class="op">|</span> (<span class="number">31</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_IOERR_DATA</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_IOERR</span> <span class="op">|</span> (<span class="number">32</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_IOERR_SHMOPEN: c_int = <span class="kw">super</span>::SQLITE_IOERR | (<span class="number">18 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_IOERR_SHMSIZE: c_int = <span class="kw">super</span>::SQLITE_IOERR | (<span class="number">19 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_IOERR_SHMLOCK: c_int = <span class="kw">super</span>::SQLITE_IOERR | (<span class="number">20 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_IOERR_SHMMAP: c_int = <span class="kw">super</span>::SQLITE_IOERR | (<span class="number">21 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_IOERR_SEEK: c_int = <span class="kw">super</span>::SQLITE_IOERR | (<span class="number">22 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_IOERR_DELETE_NOENT: c_int = <span class="kw">super</span>::SQLITE_IOERR | (<span class="number">23 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_IOERR_MMAP: c_int = <span class="kw">super</span>::SQLITE_IOERR | (<span class="number">24 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_IOERR_GETTEMPPATH: c_int = <span class="kw">super</span>::SQLITE_IOERR | (<span class="number">25 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_IOERR_CONVPATH: c_int = <span class="kw">super</span>::SQLITE_IOERR | (<span class="number">26 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_IOERR_VNODE: c_int = <span class="kw">super</span>::SQLITE_IOERR | (<span class="number">27 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_IOERR_AUTH: c_int = <span class="kw">super</span>::SQLITE_IOERR | (<span class="number">28 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_IOERR_BEGIN_ATOMIC: c_int = <span class="kw">super</span>::SQLITE_IOERR | (<span class="number">29 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_IOERR_COMMIT_ATOMIC: c_int = <span class="kw">super</span>::SQLITE_IOERR | (<span class="number">30 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_IOERR_ROLLBACK_ATOMIC: c_int = <span class="kw">super</span>::SQLITE_IOERR | (<span class="number">31 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_IOERR_DATA: c_int = <span class="kw">super</span>::SQLITE_IOERR | (<span class="number">32 </span>&lt;&lt; <span class="number">8</span>);
 
-<span class="kw">const</span> <span class="ident">SQLITE_LOCKED_SHAREDCACHE</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_LOCKED</span> <span class="op">|</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_LOCKED_VTAB</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_LOCKED</span> <span class="op">|</span> (<span class="number">2</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_LOCKED_SHAREDCACHE: c_int = <span class="kw">super</span>::SQLITE_LOCKED | (<span class="number">1 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_LOCKED_VTAB: c_int = <span class="kw">super</span>::SQLITE_LOCKED | (<span class="number">2 </span>&lt;&lt; <span class="number">8</span>);
 
-<span class="kw">const</span> <span class="ident">SQLITE_BUSY_RECOVERY</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_BUSY</span> <span class="op">|</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_BUSY_SNAPSHOT</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_BUSY</span> <span class="op">|</span> (<span class="number">2</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_BUSY_TIMEOUT</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_BUSY</span> <span class="op">|</span> (<span class="number">3</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_BUSY_RECOVERY: c_int = <span class="kw">super</span>::SQLITE_BUSY | (<span class="number">1 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_BUSY_SNAPSHOT: c_int = <span class="kw">super</span>::SQLITE_BUSY | (<span class="number">2 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_BUSY_TIMEOUT: c_int = <span class="kw">super</span>::SQLITE_BUSY | (<span class="number">3 </span>&lt;&lt; <span class="number">8</span>);
 
-<span class="kw">const</span> <span class="ident">SQLITE_CANTOPEN_NOTEMPDIR</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_CANTOPEN</span> <span class="op">|</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_CANTOPEN_ISDIR</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_CANTOPEN</span> <span class="op">|</span> (<span class="number">2</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_CANTOPEN_FULLPATH</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_CANTOPEN</span> <span class="op">|</span> (<span class="number">3</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_CANTOPEN_CONVPATH</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_CANTOPEN</span> <span class="op">|</span> (<span class="number">4</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_CANTOPEN_SYMLINK</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_CANTOPEN</span> <span class="op">|</span> (<span class="number">6</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_CANTOPEN_NOTEMPDIR: c_int = <span class="kw">super</span>::SQLITE_CANTOPEN | (<span class="number">1 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_CANTOPEN_ISDIR: c_int = <span class="kw">super</span>::SQLITE_CANTOPEN | (<span class="number">2 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_CANTOPEN_FULLPATH: c_int = <span class="kw">super</span>::SQLITE_CANTOPEN | (<span class="number">3 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_CANTOPEN_CONVPATH: c_int = <span class="kw">super</span>::SQLITE_CANTOPEN | (<span class="number">4 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_CANTOPEN_SYMLINK: c_int = <span class="kw">super</span>::SQLITE_CANTOPEN | (<span class="number">6 </span>&lt;&lt; <span class="number">8</span>);
 
-<span class="kw">const</span> <span class="ident">SQLITE_CORRUPT_VTAB</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_CORRUPT</span> <span class="op">|</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_CORRUPT_SEQUENCE</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_CORRUPT</span> <span class="op">|</span> (<span class="number">2</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_CORRUPT_INDEX</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_CORRUPT</span> <span class="op">|</span> (<span class="number">3</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_CORRUPT_VTAB: c_int = <span class="kw">super</span>::SQLITE_CORRUPT | (<span class="number">1 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_CORRUPT_SEQUENCE: c_int = <span class="kw">super</span>::SQLITE_CORRUPT | (<span class="number">2 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_CORRUPT_INDEX: c_int = <span class="kw">super</span>::SQLITE_CORRUPT | (<span class="number">3 </span>&lt;&lt; <span class="number">8</span>);
 
-<span class="kw">const</span> <span class="ident">SQLITE_READONLY_RECOVERY</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_READONLY</span> <span class="op">|</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_READONLY_CANTLOCK</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_READONLY</span> <span class="op">|</span> (<span class="number">2</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_READONLY_ROLLBACK</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_READONLY</span> <span class="op">|</span> (<span class="number">3</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_READONLY_DBMOVED</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_READONLY</span> <span class="op">|</span> (<span class="number">4</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_READONLY_CANTINIT</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_READONLY</span> <span class="op">|</span> (<span class="number">5</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_READONLY_DIRECTORY</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_READONLY</span> <span class="op">|</span> (<span class="number">6</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_READONLY_RECOVERY: c_int = <span class="kw">super</span>::SQLITE_READONLY | (<span class="number">1 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_READONLY_CANTLOCK: c_int = <span class="kw">super</span>::SQLITE_READONLY | (<span class="number">2 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_READONLY_ROLLBACK: c_int = <span class="kw">super</span>::SQLITE_READONLY | (<span class="number">3 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_READONLY_DBMOVED: c_int = <span class="kw">super</span>::SQLITE_READONLY | (<span class="number">4 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_READONLY_CANTINIT: c_int = <span class="kw">super</span>::SQLITE_READONLY | (<span class="number">5 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_READONLY_DIRECTORY: c_int = <span class="kw">super</span>::SQLITE_READONLY | (<span class="number">6 </span>&lt;&lt; <span class="number">8</span>);
 
-<span class="kw">const</span> <span class="ident">SQLITE_ABORT_ROLLBACK</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_ABORT</span> <span class="op">|</span> (<span class="number">2</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_ABORT_ROLLBACK: c_int = <span class="kw">super</span>::SQLITE_ABORT | (<span class="number">2 </span>&lt;&lt; <span class="number">8</span>);
 
-<span class="kw">const</span> <span class="ident">SQLITE_CONSTRAINT_CHECK</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_CONSTRAINT</span> <span class="op">|</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_CONSTRAINT_COMMITHOOK</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_CONSTRAINT</span> <span class="op">|</span> (<span class="number">2</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_CONSTRAINT_FOREIGNKEY</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_CONSTRAINT</span> <span class="op">|</span> (<span class="number">3</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_CONSTRAINT_FUNCTION</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_CONSTRAINT</span> <span class="op">|</span> (<span class="number">4</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_CONSTRAINT_NOTNULL</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_CONSTRAINT</span> <span class="op">|</span> (<span class="number">5</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_CONSTRAINT_PRIMARYKEY</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_CONSTRAINT</span> <span class="op">|</span> (<span class="number">6</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_CONSTRAINT_TRIGGER</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_CONSTRAINT</span> <span class="op">|</span> (<span class="number">7</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_CONSTRAINT_UNIQUE</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_CONSTRAINT</span> <span class="op">|</span> (<span class="number">8</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_CONSTRAINT_VTAB</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_CONSTRAINT</span> <span class="op">|</span> (<span class="number">9</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_CONSTRAINT_ROWID</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_CONSTRAINT</span> <span class="op">|</span> (<span class="number">10</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_CONSTRAINT_PINNED</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_CONSTRAINT</span> <span class="op">|</span> (<span class="number">11</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_CONSTRAINT_CHECK: c_int = <span class="kw">super</span>::SQLITE_CONSTRAINT | (<span class="number">1 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_CONSTRAINT_COMMITHOOK: c_int = <span class="kw">super</span>::SQLITE_CONSTRAINT | (<span class="number">2 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_CONSTRAINT_FOREIGNKEY: c_int = <span class="kw">super</span>::SQLITE_CONSTRAINT | (<span class="number">3 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_CONSTRAINT_FUNCTION: c_int = <span class="kw">super</span>::SQLITE_CONSTRAINT | (<span class="number">4 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_CONSTRAINT_NOTNULL: c_int = <span class="kw">super</span>::SQLITE_CONSTRAINT | (<span class="number">5 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_CONSTRAINT_PRIMARYKEY: c_int = <span class="kw">super</span>::SQLITE_CONSTRAINT | (<span class="number">6 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_CONSTRAINT_TRIGGER: c_int = <span class="kw">super</span>::SQLITE_CONSTRAINT | (<span class="number">7 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_CONSTRAINT_UNIQUE: c_int = <span class="kw">super</span>::SQLITE_CONSTRAINT | (<span class="number">8 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_CONSTRAINT_VTAB: c_int = <span class="kw">super</span>::SQLITE_CONSTRAINT | (<span class="number">9 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_CONSTRAINT_ROWID: c_int = <span class="kw">super</span>::SQLITE_CONSTRAINT | (<span class="number">10 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_CONSTRAINT_PINNED: c_int = <span class="kw">super</span>::SQLITE_CONSTRAINT | (<span class="number">11 </span>&lt;&lt; <span class="number">8</span>);
 
-<span class="kw">const</span> <span class="ident">SQLITE_NOTICE_RECOVER_WAL</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident">SQLITE_NOTICE</span> <span class="op">|</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
-<span class="kw">const</span> <span class="ident">SQLITE_NOTICE_RECOVER_ROLLBACK</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident">SQLITE_NOTICE</span> <span class="op">|</span> (<span class="number">2</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_NOTICE_RECOVER_WAL: c_int = SQLITE_NOTICE | (<span class="number">1 </span>&lt;&lt; <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_NOTICE_RECOVER_ROLLBACK: c_int = SQLITE_NOTICE | (<span class="number">2 </span>&lt;&lt; <span class="number">8</span>);
 
-<span class="kw">const</span> <span class="ident">SQLITE_WARNING_AUTOINDEX</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident">SQLITE_WARNING</span> <span class="op">|</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_WARNING_AUTOINDEX: c_int = SQLITE_WARNING | (<span class="number">1 </span>&lt;&lt; <span class="number">8</span>);
 
-<span class="kw">const</span> <span class="ident">SQLITE_AUTH_USER</span>: <span class="ident">c_int</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::SQLITE_AUTH</span> <span class="op">|</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>);
+<span class="kw">const </span>SQLITE_AUTH_USER: c_int = <span class="kw">super</span>::SQLITE_AUTH | (<span class="number">1 </span>&lt;&lt; <span class="number">8</span>);
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">code_to_str</span>(<span class="ident">code</span>: <span class="ident">c_int</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-    <span class="kw">match</span> <span class="ident">code</span> {
-        <span class="ident"><span class="kw">super</span>::SQLITE_OK</span>        =&gt; <span class="string">&quot;Successful result&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_ERROR</span>     =&gt; <span class="string">&quot;SQL error or missing database&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_INTERNAL</span>  =&gt; <span class="string">&quot;Internal logic error in SQLite&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_PERM</span>      =&gt; <span class="string">&quot;Access permission denied&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_ABORT</span>     =&gt; <span class="string">&quot;Callback routine requested an abort&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_BUSY</span>      =&gt; <span class="string">&quot;The database file is locked&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_LOCKED</span>    =&gt; <span class="string">&quot;A table in the database is locked&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_NOMEM</span>     =&gt; <span class="string">&quot;A malloc() failed&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_READONLY</span>  =&gt; <span class="string">&quot;Attempt to write a readonly database&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_INTERRUPT</span> =&gt; <span class="string">&quot;Operation terminated by sqlite3_interrupt()&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_IOERR</span>     =&gt; <span class="string">&quot;Some kind of disk I/O error occurred&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_CORRUPT</span>   =&gt; <span class="string">&quot;The database disk image is malformed&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_NOTFOUND</span>  =&gt; <span class="string">&quot;Unknown opcode in sqlite3_file_control()&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_FULL</span>      =&gt; <span class="string">&quot;Insertion failed because database is full&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_CANTOPEN</span>  =&gt; <span class="string">&quot;Unable to open the database file&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_PROTOCOL</span>  =&gt; <span class="string">&quot;Database lock protocol error&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_EMPTY</span>     =&gt; <span class="string">&quot;Database is empty&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_SCHEMA</span>    =&gt; <span class="string">&quot;The database schema changed&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_TOOBIG</span>    =&gt; <span class="string">&quot;String or BLOB exceeds size limit&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_CONSTRAINT</span>=&gt; <span class="string">&quot;Abort due to constraint violation&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_MISMATCH</span>  =&gt; <span class="string">&quot;Data type mismatch&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_MISUSE</span>    =&gt; <span class="string">&quot;Library used incorrectly&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_NOLFS</span>     =&gt; <span class="string">&quot;Uses OS features not supported on host&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_AUTH</span>      =&gt; <span class="string">&quot;Authorization denied&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_FORMAT</span>    =&gt; <span class="string">&quot;Auxiliary database format error&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_RANGE</span>     =&gt; <span class="string">&quot;2nd parameter to sqlite3_bind out of range&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_NOTADB</span>    =&gt; <span class="string">&quot;File opened that is not a database file&quot;</span>,
-        <span class="ident">SQLITE_NOTICE</span>    =&gt; <span class="string">&quot;Notifications from sqlite3_log()&quot;</span>,
-        <span class="ident">SQLITE_WARNING</span>   =&gt; <span class="string">&quot;Warnings from sqlite3_log()&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_ROW</span>       =&gt; <span class="string">&quot;sqlite3_step() has another row ready&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_DONE</span>      =&gt; <span class="string">&quot;sqlite3_step() has finished executing&quot;</span>,
+<span class="kw">pub fn </span>code_to_str(code: c_int) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+    <span class="kw">match </span>code {
+        <span class="kw">super</span>::SQLITE_OK        =&gt; <span class="string">&quot;Successful result&quot;</span>,
+        <span class="kw">super</span>::SQLITE_ERROR     =&gt; <span class="string">&quot;SQL error or missing database&quot;</span>,
+        <span class="kw">super</span>::SQLITE_INTERNAL  =&gt; <span class="string">&quot;Internal logic error in SQLite&quot;</span>,
+        <span class="kw">super</span>::SQLITE_PERM      =&gt; <span class="string">&quot;Access permission denied&quot;</span>,
+        <span class="kw">super</span>::SQLITE_ABORT     =&gt; <span class="string">&quot;Callback routine requested an abort&quot;</span>,
+        <span class="kw">super</span>::SQLITE_BUSY      =&gt; <span class="string">&quot;The database file is locked&quot;</span>,
+        <span class="kw">super</span>::SQLITE_LOCKED    =&gt; <span class="string">&quot;A table in the database is locked&quot;</span>,
+        <span class="kw">super</span>::SQLITE_NOMEM     =&gt; <span class="string">&quot;A malloc() failed&quot;</span>,
+        <span class="kw">super</span>::SQLITE_READONLY  =&gt; <span class="string">&quot;Attempt to write a readonly database&quot;</span>,
+        <span class="kw">super</span>::SQLITE_INTERRUPT =&gt; <span class="string">&quot;Operation terminated by sqlite3_interrupt()&quot;</span>,
+        <span class="kw">super</span>::SQLITE_IOERR     =&gt; <span class="string">&quot;Some kind of disk I/O error occurred&quot;</span>,
+        <span class="kw">super</span>::SQLITE_CORRUPT   =&gt; <span class="string">&quot;The database disk image is malformed&quot;</span>,
+        <span class="kw">super</span>::SQLITE_NOTFOUND  =&gt; <span class="string">&quot;Unknown opcode in sqlite3_file_control()&quot;</span>,
+        <span class="kw">super</span>::SQLITE_FULL      =&gt; <span class="string">&quot;Insertion failed because database is full&quot;</span>,
+        <span class="kw">super</span>::SQLITE_CANTOPEN  =&gt; <span class="string">&quot;Unable to open the database file&quot;</span>,
+        <span class="kw">super</span>::SQLITE_PROTOCOL  =&gt; <span class="string">&quot;Database lock protocol error&quot;</span>,
+        <span class="kw">super</span>::SQLITE_EMPTY     =&gt; <span class="string">&quot;Database is empty&quot;</span>,
+        <span class="kw">super</span>::SQLITE_SCHEMA    =&gt; <span class="string">&quot;The database schema changed&quot;</span>,
+        <span class="kw">super</span>::SQLITE_TOOBIG    =&gt; <span class="string">&quot;String or BLOB exceeds size limit&quot;</span>,
+        <span class="kw">super</span>::SQLITE_CONSTRAINT=&gt; <span class="string">&quot;Abort due to constraint violation&quot;</span>,
+        <span class="kw">super</span>::SQLITE_MISMATCH  =&gt; <span class="string">&quot;Data type mismatch&quot;</span>,
+        <span class="kw">super</span>::SQLITE_MISUSE    =&gt; <span class="string">&quot;Library used incorrectly&quot;</span>,
+        <span class="kw">super</span>::SQLITE_NOLFS     =&gt; <span class="string">&quot;Uses OS features not supported on host&quot;</span>,
+        <span class="kw">super</span>::SQLITE_AUTH      =&gt; <span class="string">&quot;Authorization denied&quot;</span>,
+        <span class="kw">super</span>::SQLITE_FORMAT    =&gt; <span class="string">&quot;Auxiliary database format error&quot;</span>,
+        <span class="kw">super</span>::SQLITE_RANGE     =&gt; <span class="string">&quot;2nd parameter to sqlite3_bind out of range&quot;</span>,
+        <span class="kw">super</span>::SQLITE_NOTADB    =&gt; <span class="string">&quot;File opened that is not a database file&quot;</span>,
+        SQLITE_NOTICE    =&gt; <span class="string">&quot;Notifications from sqlite3_log()&quot;</span>,
+        SQLITE_WARNING   =&gt; <span class="string">&quot;Warnings from sqlite3_log()&quot;</span>,
+        <span class="kw">super</span>::SQLITE_ROW       =&gt; <span class="string">&quot;sqlite3_step() has another row ready&quot;</span>,
+        <span class="kw">super</span>::SQLITE_DONE      =&gt; <span class="string">&quot;sqlite3_step() has finished executing&quot;</span>,
 
-        <span class="ident">SQLITE_ERROR_MISSING_COLLSEQ</span>   =&gt; <span class="string">&quot;SQLITE_ERROR_MISSING_COLLSEQ&quot;</span>,
-        <span class="ident">SQLITE_ERROR_RETRY</span>   =&gt; <span class="string">&quot;SQLITE_ERROR_RETRY&quot;</span>,
-        <span class="ident">SQLITE_ERROR_SNAPSHOT</span>   =&gt; <span class="string">&quot;SQLITE_ERROR_SNAPSHOT&quot;</span>,
+        SQLITE_ERROR_MISSING_COLLSEQ   =&gt; <span class="string">&quot;SQLITE_ERROR_MISSING_COLLSEQ&quot;</span>,
+        SQLITE_ERROR_RETRY   =&gt; <span class="string">&quot;SQLITE_ERROR_RETRY&quot;</span>,
+        SQLITE_ERROR_SNAPSHOT   =&gt; <span class="string">&quot;SQLITE_ERROR_SNAPSHOT&quot;</span>,
 
-        <span class="ident"><span class="kw">super</span>::SQLITE_IOERR_READ</span>              =&gt; <span class="string">&quot;Error reading from disk&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_IOERR_SHORT_READ</span>        =&gt; <span class="string">&quot;Unable to obtain number of requested bytes (file truncated?)&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_IOERR_WRITE</span>             =&gt; <span class="string">&quot;Error writing to disk&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_IOERR_FSYNC</span>             =&gt; <span class="string">&quot;Error flushing data to persistent storage (fsync)&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_IOERR_DIR_FSYNC</span>         =&gt; <span class="string">&quot;Error calling fsync on a directory&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_IOERR_TRUNCATE</span>          =&gt; <span class="string">&quot;Error attempting to truncate file&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_IOERR_FSTAT</span>             =&gt; <span class="string">&quot;Error invoking fstat to get file metadata&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_IOERR_UNLOCK</span>            =&gt; <span class="string">&quot;I/O error within xUnlock of a VFS object&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_IOERR_RDLOCK</span>            =&gt; <span class="string">&quot;I/O error within xLock of a VFS object (trying to obtain a read lock)&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_IOERR_DELETE</span>            =&gt; <span class="string">&quot;I/O error within xDelete of a VFS object&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_IOERR_BLOCKED</span>           =&gt; <span class="string">&quot;SQLITE_IOERR_BLOCKED&quot;</span>, <span class="comment">// no longer used</span>
-        <span class="ident"><span class="kw">super</span>::SQLITE_IOERR_NOMEM</span>             =&gt; <span class="string">&quot;Out of memory in I/O layer&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_IOERR_ACCESS</span>            =&gt; <span class="string">&quot;I/O error within xAccess of a VFS object&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_IOERR_CHECKRESERVEDLOCK</span> =&gt; <span class="string">&quot;I/O error within then xCheckReservedLock method&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_IOERR_LOCK</span>              =&gt; <span class="string">&quot;I/O error in the advisory file locking layer&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_IOERR_CLOSE</span>             =&gt; <span class="string">&quot;I/O error within the xClose method&quot;</span>,
-        <span class="ident"><span class="kw">super</span>::SQLITE_IOERR_DIR_CLOSE</span>         =&gt; <span class="string">&quot;SQLITE_IOERR_DIR_CLOSE&quot;</span>, <span class="comment">// no longer used</span>
-        <span class="ident">SQLITE_IOERR_SHMOPEN</span>           =&gt; <span class="string">&quot;I/O error within the xShmMap method (trying to open a new shared-memory segment)&quot;</span>,
-        <span class="ident">SQLITE_IOERR_SHMSIZE</span>           =&gt; <span class="string">&quot;I/O error within the xShmMap method (trying to resize an existing shared-memory segment)&quot;</span>,
-        <span class="ident">SQLITE_IOERR_SHMLOCK</span>           =&gt; <span class="string">&quot;SQLITE_IOERR_SHMLOCK&quot;</span>, <span class="comment">// no longer used</span>
-        <span class="ident">SQLITE_IOERR_SHMMAP</span>            =&gt; <span class="string">&quot;I/O error within the xShmMap method (trying to map a shared-memory segment into process address space)&quot;</span>,
-        <span class="ident">SQLITE_IOERR_SEEK</span>              =&gt; <span class="string">&quot;I/O error within the xRead or xWrite (trying to seek within a file)&quot;</span>,
-        <span class="ident">SQLITE_IOERR_DELETE_NOENT</span>      =&gt; <span class="string">&quot;File being deleted does not exist&quot;</span>,
-        <span class="ident">SQLITE_IOERR_MMAP</span>              =&gt; <span class="string">&quot;I/O error while trying to map or unmap part of the database file into process address space&quot;</span>,
-        <span class="ident">SQLITE_IOERR_GETTEMPPATH</span>       =&gt; <span class="string">&quot;VFS is unable to determine a suitable directory for temporary files&quot;</span>,
-        <span class="ident">SQLITE_IOERR_CONVPATH</span>          =&gt; <span class="string">&quot;cygwin_conv_path() system call failed&quot;</span>,
-        <span class="ident">SQLITE_IOERR_VNODE</span>             =&gt; <span class="string">&quot;SQLITE_IOERR_VNODE&quot;</span>, <span class="comment">// not documented?</span>
-        <span class="ident">SQLITE_IOERR_AUTH</span>              =&gt; <span class="string">&quot;SQLITE_IOERR_AUTH&quot;</span>,
-        <span class="ident">SQLITE_IOERR_BEGIN_ATOMIC</span>      =&gt; <span class="string">&quot;SQLITE_IOERR_BEGIN_ATOMIC&quot;</span>,
-        <span class="ident">SQLITE_IOERR_COMMIT_ATOMIC</span>     =&gt; <span class="string">&quot;SQLITE_IOERR_COMMIT_ATOMIC&quot;</span>,
-        <span class="ident">SQLITE_IOERR_ROLLBACK_ATOMIC</span>   =&gt; <span class="string">&quot;SQLITE_IOERR_ROLLBACK_ATOMIC&quot;</span>,
-        <span class="ident">SQLITE_IOERR_DATA</span>   =&gt; <span class="string">&quot;SQLITE_IOERR_DATA&quot;</span>,
+        <span class="kw">super</span>::SQLITE_IOERR_READ              =&gt; <span class="string">&quot;Error reading from disk&quot;</span>,
+        <span class="kw">super</span>::SQLITE_IOERR_SHORT_READ        =&gt; <span class="string">&quot;Unable to obtain number of requested bytes (file truncated?)&quot;</span>,
+        <span class="kw">super</span>::SQLITE_IOERR_WRITE             =&gt; <span class="string">&quot;Error writing to disk&quot;</span>,
+        <span class="kw">super</span>::SQLITE_IOERR_FSYNC             =&gt; <span class="string">&quot;Error flushing data to persistent storage (fsync)&quot;</span>,
+        <span class="kw">super</span>::SQLITE_IOERR_DIR_FSYNC         =&gt; <span class="string">&quot;Error calling fsync on a directory&quot;</span>,
+        <span class="kw">super</span>::SQLITE_IOERR_TRUNCATE          =&gt; <span class="string">&quot;Error attempting to truncate file&quot;</span>,
+        <span class="kw">super</span>::SQLITE_IOERR_FSTAT             =&gt; <span class="string">&quot;Error invoking fstat to get file metadata&quot;</span>,
+        <span class="kw">super</span>::SQLITE_IOERR_UNLOCK            =&gt; <span class="string">&quot;I/O error within xUnlock of a VFS object&quot;</span>,
+        <span class="kw">super</span>::SQLITE_IOERR_RDLOCK            =&gt; <span class="string">&quot;I/O error within xLock of a VFS object (trying to obtain a read lock)&quot;</span>,
+        <span class="kw">super</span>::SQLITE_IOERR_DELETE            =&gt; <span class="string">&quot;I/O error within xDelete of a VFS object&quot;</span>,
+        <span class="kw">super</span>::SQLITE_IOERR_BLOCKED           =&gt; <span class="string">&quot;SQLITE_IOERR_BLOCKED&quot;</span>, <span class="comment">// no longer used
+        </span><span class="kw">super</span>::SQLITE_IOERR_NOMEM             =&gt; <span class="string">&quot;Out of memory in I/O layer&quot;</span>,
+        <span class="kw">super</span>::SQLITE_IOERR_ACCESS            =&gt; <span class="string">&quot;I/O error within xAccess of a VFS object&quot;</span>,
+        <span class="kw">super</span>::SQLITE_IOERR_CHECKRESERVEDLOCK =&gt; <span class="string">&quot;I/O error within then xCheckReservedLock method&quot;</span>,
+        <span class="kw">super</span>::SQLITE_IOERR_LOCK              =&gt; <span class="string">&quot;I/O error in the advisory file locking layer&quot;</span>,
+        <span class="kw">super</span>::SQLITE_IOERR_CLOSE             =&gt; <span class="string">&quot;I/O error within the xClose method&quot;</span>,
+        <span class="kw">super</span>::SQLITE_IOERR_DIR_CLOSE         =&gt; <span class="string">&quot;SQLITE_IOERR_DIR_CLOSE&quot;</span>, <span class="comment">// no longer used
+        </span>SQLITE_IOERR_SHMOPEN           =&gt; <span class="string">&quot;I/O error within the xShmMap method (trying to open a new shared-memory segment)&quot;</span>,
+        SQLITE_IOERR_SHMSIZE           =&gt; <span class="string">&quot;I/O error within the xShmMap method (trying to resize an existing shared-memory segment)&quot;</span>,
+        SQLITE_IOERR_SHMLOCK           =&gt; <span class="string">&quot;SQLITE_IOERR_SHMLOCK&quot;</span>, <span class="comment">// no longer used
+        </span>SQLITE_IOERR_SHMMAP            =&gt; <span class="string">&quot;I/O error within the xShmMap method (trying to map a shared-memory segment into process address space)&quot;</span>,
+        SQLITE_IOERR_SEEK              =&gt; <span class="string">&quot;I/O error within the xRead or xWrite (trying to seek within a file)&quot;</span>,
+        SQLITE_IOERR_DELETE_NOENT      =&gt; <span class="string">&quot;File being deleted does not exist&quot;</span>,
+        SQLITE_IOERR_MMAP              =&gt; <span class="string">&quot;I/O error while trying to map or unmap part of the database file into process address space&quot;</span>,
+        SQLITE_IOERR_GETTEMPPATH       =&gt; <span class="string">&quot;VFS is unable to determine a suitable directory for temporary files&quot;</span>,
+        SQLITE_IOERR_CONVPATH          =&gt; <span class="string">&quot;cygwin_conv_path() system call failed&quot;</span>,
+        SQLITE_IOERR_VNODE             =&gt; <span class="string">&quot;SQLITE_IOERR_VNODE&quot;</span>, <span class="comment">// not documented?
+        </span>SQLITE_IOERR_AUTH              =&gt; <span class="string">&quot;SQLITE_IOERR_AUTH&quot;</span>,
+        SQLITE_IOERR_BEGIN_ATOMIC      =&gt; <span class="string">&quot;SQLITE_IOERR_BEGIN_ATOMIC&quot;</span>,
+        SQLITE_IOERR_COMMIT_ATOMIC     =&gt; <span class="string">&quot;SQLITE_IOERR_COMMIT_ATOMIC&quot;</span>,
+        SQLITE_IOERR_ROLLBACK_ATOMIC   =&gt; <span class="string">&quot;SQLITE_IOERR_ROLLBACK_ATOMIC&quot;</span>,
+        SQLITE_IOERR_DATA   =&gt; <span class="string">&quot;SQLITE_IOERR_DATA&quot;</span>,
 
-        <span class="ident">SQLITE_LOCKED_SHAREDCACHE</span>      =&gt; <span class="string">&quot;Locking conflict due to another connection with a shared cache&quot;</span>,
-        <span class="ident">SQLITE_LOCKED_VTAB</span>             =&gt; <span class="string">&quot;SQLITE_LOCKED_VTAB&quot;</span>,
+        SQLITE_LOCKED_SHAREDCACHE      =&gt; <span class="string">&quot;Locking conflict due to another connection with a shared cache&quot;</span>,
+        SQLITE_LOCKED_VTAB             =&gt; <span class="string">&quot;SQLITE_LOCKED_VTAB&quot;</span>,
 
-        <span class="ident">SQLITE_BUSY_RECOVERY</span>           =&gt; <span class="string">&quot;Another process is recovering a WAL mode database file&quot;</span>,
-        <span class="ident">SQLITE_BUSY_SNAPSHOT</span>           =&gt; <span class="string">&quot;Cannot promote read transaction to write transaction because of writes by another connection&quot;</span>,
-        <span class="ident">SQLITE_BUSY_TIMEOUT</span>           =&gt; <span class="string">&quot;SQLITE_BUSY_TIMEOUT&quot;</span>,
+        SQLITE_BUSY_RECOVERY           =&gt; <span class="string">&quot;Another process is recovering a WAL mode database file&quot;</span>,
+        SQLITE_BUSY_SNAPSHOT           =&gt; <span class="string">&quot;Cannot promote read transaction to write transaction because of writes by another connection&quot;</span>,
+        SQLITE_BUSY_TIMEOUT           =&gt; <span class="string">&quot;SQLITE_BUSY_TIMEOUT&quot;</span>,
 
-        <span class="ident">SQLITE_CANTOPEN_NOTEMPDIR</span>      =&gt; <span class="string">&quot;SQLITE_CANTOPEN_NOTEMPDIR&quot;</span>, <span class="comment">// no longer used</span>
-        <span class="ident">SQLITE_CANTOPEN_ISDIR</span>          =&gt; <span class="string">&quot;Attempted to open directory as file&quot;</span>,
-        <span class="ident">SQLITE_CANTOPEN_FULLPATH</span>       =&gt; <span class="string">&quot;Unable to convert filename into full pathname&quot;</span>,
-        <span class="ident">SQLITE_CANTOPEN_CONVPATH</span>       =&gt; <span class="string">&quot;cygwin_conv_path() system call failed&quot;</span>,
-        <span class="ident">SQLITE_CANTOPEN_SYMLINK</span>       =&gt; <span class="string">&quot;SQLITE_CANTOPEN_SYMLINK&quot;</span>,
+        SQLITE_CANTOPEN_NOTEMPDIR      =&gt; <span class="string">&quot;SQLITE_CANTOPEN_NOTEMPDIR&quot;</span>, <span class="comment">// no longer used
+        </span>SQLITE_CANTOPEN_ISDIR          =&gt; <span class="string">&quot;Attempted to open directory as file&quot;</span>,
+        SQLITE_CANTOPEN_FULLPATH       =&gt; <span class="string">&quot;Unable to convert filename into full pathname&quot;</span>,
+        SQLITE_CANTOPEN_CONVPATH       =&gt; <span class="string">&quot;cygwin_conv_path() system call failed&quot;</span>,
+        SQLITE_CANTOPEN_SYMLINK       =&gt; <span class="string">&quot;SQLITE_CANTOPEN_SYMLINK&quot;</span>,
 
-        <span class="ident">SQLITE_CORRUPT_VTAB</span>            =&gt; <span class="string">&quot;Content in the virtual table is corrupt&quot;</span>,
-        <span class="ident">SQLITE_CORRUPT_SEQUENCE</span>        =&gt; <span class="string">&quot;SQLITE_CORRUPT_SEQUENCE&quot;</span>,
-        <span class="ident">SQLITE_CORRUPT_INDEX</span>        =&gt; <span class="string">&quot;SQLITE_CORRUPT_INDEX&quot;</span>,
+        SQLITE_CORRUPT_VTAB            =&gt; <span class="string">&quot;Content in the virtual table is corrupt&quot;</span>,
+        SQLITE_CORRUPT_SEQUENCE        =&gt; <span class="string">&quot;SQLITE_CORRUPT_SEQUENCE&quot;</span>,
+        SQLITE_CORRUPT_INDEX        =&gt; <span class="string">&quot;SQLITE_CORRUPT_INDEX&quot;</span>,
 
-        <span class="ident">SQLITE_READONLY_RECOVERY</span>       =&gt; <span class="string">&quot;WAL mode database file needs recovery (requires write access)&quot;</span>,
-        <span class="ident">SQLITE_READONLY_CANTLOCK</span>       =&gt; <span class="string">&quot;Shared-memory file associated with WAL mode database is read-only&quot;</span>,
-        <span class="ident">SQLITE_READONLY_ROLLBACK</span>       =&gt; <span class="string">&quot;Database has hot journal that must be rolled back (requires write access)&quot;</span>,
-        <span class="ident">SQLITE_READONLY_DBMOVED</span>        =&gt; <span class="string">&quot;Database cannot be modified because database file has moved&quot;</span>,
-        <span class="ident">SQLITE_READONLY_CANTINIT</span>       =&gt; <span class="string">&quot;SQLITE_READONLY_CANTINIT&quot;</span>,
-        <span class="ident">SQLITE_READONLY_DIRECTORY</span>      =&gt; <span class="string">&quot;SQLITE_READONLY_DIRECTORY&quot;</span>,
+        SQLITE_READONLY_RECOVERY       =&gt; <span class="string">&quot;WAL mode database file needs recovery (requires write access)&quot;</span>,
+        SQLITE_READONLY_CANTLOCK       =&gt; <span class="string">&quot;Shared-memory file associated with WAL mode database is read-only&quot;</span>,
+        SQLITE_READONLY_ROLLBACK       =&gt; <span class="string">&quot;Database has hot journal that must be rolled back (requires write access)&quot;</span>,
+        SQLITE_READONLY_DBMOVED        =&gt; <span class="string">&quot;Database cannot be modified because database file has moved&quot;</span>,
+        SQLITE_READONLY_CANTINIT       =&gt; <span class="string">&quot;SQLITE_READONLY_CANTINIT&quot;</span>,
+        SQLITE_READONLY_DIRECTORY      =&gt; <span class="string">&quot;SQLITE_READONLY_DIRECTORY&quot;</span>,
 
-        <span class="ident">SQLITE_ABORT_ROLLBACK</span>          =&gt; <span class="string">&quot;Transaction was rolled back&quot;</span>,
+        SQLITE_ABORT_ROLLBACK          =&gt; <span class="string">&quot;Transaction was rolled back&quot;</span>,
 
-        <span class="ident">SQLITE_CONSTRAINT_CHECK</span>        =&gt; <span class="string">&quot;A CHECK constraint failed&quot;</span>,
-        <span class="ident">SQLITE_CONSTRAINT_COMMITHOOK</span>   =&gt; <span class="string">&quot;Commit hook caused rollback&quot;</span>,
-        <span class="ident">SQLITE_CONSTRAINT_FOREIGNKEY</span>   =&gt; <span class="string">&quot;Foreign key constraint failed&quot;</span>,
-        <span class="ident">SQLITE_CONSTRAINT_FUNCTION</span>     =&gt; <span class="string">&quot;Error returned from extension function&quot;</span>,
-        <span class="ident">SQLITE_CONSTRAINT_NOTNULL</span>      =&gt; <span class="string">&quot;A NOT NULL constraint failed&quot;</span>,
-        <span class="ident">SQLITE_CONSTRAINT_PRIMARYKEY</span>   =&gt; <span class="string">&quot;A PRIMARY KEY constraint failed&quot;</span>,
-        <span class="ident">SQLITE_CONSTRAINT_TRIGGER</span>      =&gt; <span class="string">&quot;A RAISE function within a trigger fired&quot;</span>,
-        <span class="ident">SQLITE_CONSTRAINT_UNIQUE</span>       =&gt; <span class="string">&quot;A UNIQUE constraint failed&quot;</span>,
-        <span class="ident">SQLITE_CONSTRAINT_VTAB</span>         =&gt; <span class="string">&quot;An application-defined virtual table error occurred&quot;</span>,
-        <span class="ident">SQLITE_CONSTRAINT_ROWID</span>        =&gt; <span class="string">&quot;A non-unique rowid occurred&quot;</span>,
-        <span class="ident">SQLITE_CONSTRAINT_PINNED</span>        =&gt; <span class="string">&quot;SQLITE_CONSTRAINT_PINNED&quot;</span>,
+        SQLITE_CONSTRAINT_CHECK        =&gt; <span class="string">&quot;A CHECK constraint failed&quot;</span>,
+        SQLITE_CONSTRAINT_COMMITHOOK   =&gt; <span class="string">&quot;Commit hook caused rollback&quot;</span>,
+        SQLITE_CONSTRAINT_FOREIGNKEY   =&gt; <span class="string">&quot;Foreign key constraint failed&quot;</span>,
+        SQLITE_CONSTRAINT_FUNCTION     =&gt; <span class="string">&quot;Error returned from extension function&quot;</span>,
+        SQLITE_CONSTRAINT_NOTNULL      =&gt; <span class="string">&quot;A NOT NULL constraint failed&quot;</span>,
+        SQLITE_CONSTRAINT_PRIMARYKEY   =&gt; <span class="string">&quot;A PRIMARY KEY constraint failed&quot;</span>,
+        SQLITE_CONSTRAINT_TRIGGER      =&gt; <span class="string">&quot;A RAISE function within a trigger fired&quot;</span>,
+        SQLITE_CONSTRAINT_UNIQUE       =&gt; <span class="string">&quot;A UNIQUE constraint failed&quot;</span>,
+        SQLITE_CONSTRAINT_VTAB         =&gt; <span class="string">&quot;An application-defined virtual table error occurred&quot;</span>,
+        SQLITE_CONSTRAINT_ROWID        =&gt; <span class="string">&quot;A non-unique rowid occurred&quot;</span>,
+        SQLITE_CONSTRAINT_PINNED        =&gt; <span class="string">&quot;SQLITE_CONSTRAINT_PINNED&quot;</span>,
 
-        <span class="ident">SQLITE_NOTICE_RECOVER_WAL</span>      =&gt; <span class="string">&quot;A WAL mode database file was recovered&quot;</span>,
-        <span class="ident">SQLITE_NOTICE_RECOVER_ROLLBACK</span> =&gt; <span class="string">&quot;Hot journal was rolled back&quot;</span>,
+        SQLITE_NOTICE_RECOVER_WAL      =&gt; <span class="string">&quot;A WAL mode database file was recovered&quot;</span>,
+        SQLITE_NOTICE_RECOVER_ROLLBACK =&gt; <span class="string">&quot;Hot journal was rolled back&quot;</span>,
 
-        <span class="ident">SQLITE_WARNING_AUTOINDEX</span>       =&gt; <span class="string">&quot;Automatic indexing used - database might benefit from additional indexes&quot;</span>,
+        SQLITE_WARNING_AUTOINDEX       =&gt; <span class="string">&quot;Automatic indexing used - database might benefit from additional indexes&quot;</span>,
 
-        <span class="ident">SQLITE_AUTH_USER</span>               =&gt; <span class="string">&quot;SQLITE_AUTH_USER&quot;</span>, <span class="comment">// not documented?</span>
+        SQLITE_AUTH_USER               =&gt; <span class="string">&quot;SQLITE_AUTH_USER&quot;</span>, <span class="comment">// not documented?
 
-        <span class="kw">_</span> =&gt; <span class="string">&quot;Unknown error code&quot;</span>,
+        </span><span class="kw">_ </span>=&gt; <span class="string">&quot;Unknown error code&quot;</span>,
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="libsqlite3_sys" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="libsqlite3_sys" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

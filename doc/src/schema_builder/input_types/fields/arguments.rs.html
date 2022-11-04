@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/schema-builder/src/input_types/fields/arguments.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>arguments.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../schema_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../schema_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../schema_builder/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/schema-builder/src/input_types/fields/arguments.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>arguments.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../schema_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../schema_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../schema_builder/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -166,173 +166,173 @@
 <span id="166">166</span>
 <span id="167">167</span>
 <span id="168">168</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::input_types::objects::order_by_objects::OrderByOptions</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::mutations::create_one</span>;
-<span class="kw">use</span> <span class="ident">constants::args</span>;
-<span class="kw">use</span> <span class="ident">objects</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">prelude::ParentContainer</span>, <span class="ident">CompositeFieldRef</span>};
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::input_types::objects::order_by_objects::OrderByOptions;
+<span class="kw">use </span><span class="kw">crate</span>::mutations::create_one;
+<span class="kw">use </span>constants::args;
+<span class="kw">use </span>objects::<span class="kw-2">*</span>;
+<span class="kw">use </span>prisma_models::{prelude::ParentContainer, CompositeFieldRef};
 
-<span class="doccomment">/// Builds &quot;where&quot; argument.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">where_argument</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="ident">InputField</span> {
-    <span class="kw">let</span> <span class="ident">where_object</span> <span class="op">=</span> <span class="ident">filter_objects::where_object_type</span>(<span class="ident">ctx</span>, <span class="ident">model</span>);
+<span class="doccomment">/// Builds &quot;where&quot; argument.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>where_argument(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; InputField {
+    <span class="kw">let </span>where_object = filter_objects::where_object_type(ctx, model);
 
-    <span class="ident">input_field</span>(<span class="ident">args::WHERE</span>, <span class="ident">InputType::object</span>(<span class="ident">where_object</span>), <span class="prelude-val">None</span>).<span class="ident">optional</span>()
+    input_field(args::WHERE, InputType::object(where_object), <span class="prelude-val">None</span>).optional()
 }
 
-<span class="doccomment">/// Builds &quot;where&quot; argument which input type is the where unique type of the input builder.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">where_unique_argument</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">input_object_type</span> <span class="op">=</span> <span class="ident">filter_objects::where_unique_object_type</span>(<span class="ident">ctx</span>, <span class="ident">model</span>);
+<span class="doccomment">/// Builds &quot;where&quot; argument which input type is the where unique type of the input builder.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>where_unique_argument(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; <span class="prelude-ty">Option</span>&lt;InputField&gt; {
+    <span class="kw">let </span>input_object_type = filter_objects::where_unique_object_type(ctx, model);
 
-    <span class="kw">if</span> <span class="ident">input_object_type</span>.<span class="ident">into_arc</span>().<span class="ident">is_empty</span>() {
-        <span class="prelude-val">None</span>
-    } <span class="kw">else</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">input_field</span>(<span class="ident">args::WHERE</span>, <span class="ident">InputType::object</span>(<span class="ident">input_object_type</span>), <span class="prelude-val">None</span>))
+    <span class="kw">if </span>input_object_type.into_arc().is_empty() {
+        <span class="prelude-val">None
+    </span>} <span class="kw">else </span>{
+        <span class="prelude-val">Some</span>(input_field(args::WHERE, InputType::object(input_object_type), <span class="prelude-val">None</span>))
     }
 }
 
-<span class="doccomment">/// Builds &quot;where&quot; (unique) argument intended for the delete field.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">delete_one_arguments</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">where_unique_argument</span>(<span class="ident">ctx</span>, <span class="ident">model</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="macro">vec!</span>[<span class="ident">arg</span>])
+<span class="doccomment">/// Builds &quot;where&quot; (unique) argument intended for the delete field.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>delete_one_arguments(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;InputField&gt;&gt; {
+    where_unique_argument(ctx, model).map(|arg| <span class="macro">vec!</span>[arg])
 }
 
-<span class="doccomment">/// Builds &quot;where&quot; (unique) and &quot;data&quot; arguments intended for the update field.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">update_one_arguments</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">where_unique_argument</span>(<span class="ident">ctx</span>, <span class="ident">model</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">unique_arg</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">update_types</span> <span class="op">=</span> <span class="ident">update_one_objects::update_one_input_types</span>(<span class="ident">ctx</span>, <span class="ident">model</span>, <span class="prelude-val">None</span>);
+<span class="doccomment">/// Builds &quot;where&quot; (unique) and &quot;data&quot; arguments intended for the update field.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>update_one_arguments(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;InputField&gt;&gt; {
+    where_unique_argument(ctx, model).map(|unique_arg| {
+        <span class="kw">let </span>update_types = update_one_objects::update_one_input_types(ctx, model, <span class="prelude-val">None</span>);
 
-        <span class="macro">vec!</span>[<span class="ident">input_field</span>(<span class="ident">args::DATA</span>, <span class="ident">update_types</span>, <span class="prelude-val">None</span>), <span class="ident">unique_arg</span>]
+        <span class="macro">vec!</span>[input_field(args::DATA, update_types, <span class="prelude-val">None</span>), unique_arg]
     })
 }
 
-<span class="doccomment">/// Builds &quot;where&quot; (unique), &quot;create&quot;, and &quot;update&quot; arguments intended for the upsert field.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">upsert_arguments</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">where_unique_argument</span>(<span class="ident">ctx</span>, <span class="ident">model</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">where_unique_arg</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">update_types</span> <span class="op">=</span> <span class="ident">update_one_objects::update_one_input_types</span>(<span class="ident">ctx</span>, <span class="ident">model</span>, <span class="prelude-val">None</span>);
-        <span class="kw">let</span> <span class="ident">create_types</span> <span class="op">=</span> <span class="ident">create_one::create_one_input_types</span>(<span class="ident">ctx</span>, <span class="ident">model</span>, <span class="prelude-val">None</span>);
+<span class="doccomment">/// Builds &quot;where&quot; (unique), &quot;create&quot;, and &quot;update&quot; arguments intended for the upsert field.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>upsert_arguments(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;InputField&gt;&gt; {
+    where_unique_argument(ctx, model).and_then(|where_unique_arg| {
+        <span class="kw">let </span>update_types = update_one_objects::update_one_input_types(ctx, model, <span class="prelude-val">None</span>);
+        <span class="kw">let </span>create_types = create_one::create_one_input_types(ctx, model, <span class="prelude-val">None</span>);
 
-        <span class="kw">if</span> <span class="ident">update_types</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">typ</span><span class="op">|</span> <span class="ident">typ</span>.<span class="ident">is_empty</span>()) <span class="op">|</span><span class="op">|</span> <span class="ident">create_types</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">typ</span><span class="op">|</span> <span class="ident">typ</span>.<span class="ident">is_empty</span>()) {
-            <span class="prelude-val">None</span>
-        } <span class="kw">else</span> {
+        <span class="kw">if </span>update_types.iter().all(|typ| typ.is_empty()) || create_types.iter().all(|typ| typ.is_empty()) {
+            <span class="prelude-val">None
+        </span>} <span class="kw">else </span>{
             <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[
-                <span class="ident">where_unique_arg</span>,
-                <span class="ident">input_field</span>(<span class="ident">args::CREATE</span>, <span class="ident">create_types</span>, <span class="prelude-val">None</span>),
-                <span class="ident">input_field</span>(<span class="ident">args::UPDATE</span>, <span class="ident">update_types</span>, <span class="prelude-val">None</span>),
+                where_unique_arg,
+                input_field(args::CREATE, create_types, <span class="prelude-val">None</span>),
+                input_field(args::UPDATE, update_types, <span class="prelude-val">None</span>),
             ])
         }
     })
 }
 
-<span class="doccomment">/// Builds &quot;where&quot; and &quot;data&quot; arguments intended for the update many field.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">update_many_arguments</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">update_many_types</span> <span class="op">=</span> <span class="ident">update_many_objects::update_many_input_types</span>(<span class="ident">ctx</span>, <span class="ident">model</span>, <span class="prelude-val">None</span>);
-    <span class="kw">let</span> <span class="ident">where_arg</span> <span class="op">=</span> <span class="ident">where_argument</span>(<span class="ident">ctx</span>, <span class="ident">model</span>);
+<span class="doccomment">/// Builds &quot;where&quot; and &quot;data&quot; arguments intended for the update many field.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>update_many_arguments(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; Vec&lt;InputField&gt; {
+    <span class="kw">let </span>update_many_types = update_many_objects::update_many_input_types(ctx, model, <span class="prelude-val">None</span>);
+    <span class="kw">let </span>where_arg = where_argument(ctx, model);
 
-    <span class="macro">vec!</span>[<span class="ident">input_field</span>(<span class="ident">args::DATA</span>, <span class="ident">update_many_types</span>, <span class="prelude-val">None</span>), <span class="ident">where_arg</span>]
+    <span class="macro">vec!</span>[input_field(args::DATA, update_many_types, <span class="prelude-val">None</span>), where_arg]
 }
 
-<span class="doccomment">/// Builds &quot;where&quot; argument intended for the delete many field.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">delete_many_arguments</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">where_arg</span> <span class="op">=</span> <span class="ident">where_argument</span>(<span class="ident">ctx</span>, <span class="ident">model</span>);
+<span class="doccomment">/// Builds &quot;where&quot; argument intended for the delete many field.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>delete_many_arguments(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; Vec&lt;InputField&gt; {
+    <span class="kw">let </span>where_arg = where_argument(ctx, model);
 
-    <span class="macro">vec!</span>[<span class="ident">where_arg</span>]
+    <span class="macro">vec!</span>[where_arg]
 }
 
-<span class="doccomment">/// Builds &quot;many records where&quot; arguments based on the given model and field.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">many_records_output_field_arguments</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">ModelField</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">field</span> {
-        <span class="ident">ModelField::Scalar</span>(<span class="kw">_</span>) =&gt; <span class="macro">vec!</span>[],
+<span class="doccomment">/// Builds &quot;many records where&quot; arguments based on the given model and field.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>many_records_output_field_arguments(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, field: <span class="kw-2">&amp;</span>ModelField) -&gt; Vec&lt;InputField&gt; {
+    <span class="kw">match </span>field {
+        ModelField::Scalar(<span class="kw">_</span>) =&gt; <span class="macro">vec!</span>[],
 
-        <span class="comment">// To-many relation.</span>
-        <span class="ident">ModelField::Relation</span>(<span class="ident">rf</span>) <span class="kw">if</span> <span class="ident">rf</span>.<span class="ident">is_list</span>() =&gt; <span class="ident">relation_selection_arguments</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">rf</span>.<span class="ident">related_model</span>(), <span class="bool-val">true</span>),
+        <span class="comment">// To-many relation.
+        </span>ModelField::Relation(rf) <span class="kw">if </span>rf.is_list() =&gt; relation_selection_arguments(ctx, <span class="kw-2">&amp;</span>rf.related_model(), <span class="bool-val">true</span>),
 
-        <span class="comment">// To-one relation.</span>
-        <span class="ident">ModelField::Relation</span>(<span class="kw">_</span>) =&gt; <span class="macro">vec!</span>[],
+        <span class="comment">// To-one relation.
+        </span>ModelField::Relation(<span class="kw">_</span>) =&gt; <span class="macro">vec!</span>[],
 
-        <span class="comment">// To-many composite.</span>
-        <span class="ident">ModelField::Composite</span>(<span class="ident">cf</span>) <span class="kw">if</span> <span class="ident">cf</span>.<span class="ident">is_list</span>() =&gt; <span class="ident">composite_selection_arguments</span>(<span class="ident">ctx</span>, <span class="ident">cf</span>),
+        <span class="comment">// To-many composite.
+        </span>ModelField::Composite(cf) <span class="kw">if </span>cf.is_list() =&gt; composite_selection_arguments(ctx, cf),
 
-        <span class="comment">// To-one composite.</span>
-        <span class="ident">ModelField::Composite</span>(<span class="kw">_</span>) =&gt; <span class="macro">vec!</span>[],
+        <span class="comment">// To-one composite.
+        </span>ModelField::Composite(<span class="kw">_</span>) =&gt; <span class="macro">vec!</span>[],
     }
 }
 
-<span class="doccomment">/// Builds &quot;many records where&quot; arguments for to-many relation selection sets.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">relation_selection_arguments</span>(
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>,
-    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="ident">include_distinct</span>: <span class="ident">bool</span>,
-) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">unique_input_type</span> <span class="op">=</span> <span class="ident">InputType::object</span>(<span class="ident">filter_objects::where_unique_object_type</span>(<span class="ident">ctx</span>, <span class="ident">model</span>));
-    <span class="kw">let</span> <span class="ident">order_by_options</span> <span class="op">=</span> <span class="ident">OrderByOptions</span> {
-        <span class="ident">include_relations</span>: <span class="bool-val">true</span>,
-        <span class="ident">include_scalar_aggregations</span>: <span class="bool-val">false</span>,
-        <span class="ident">include_full_text_search</span>: <span class="ident">ctx</span>.<span class="ident">can_full_text_search</span>(),
+<span class="doccomment">/// Builds &quot;many records where&quot; arguments for to-many relation selection sets.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>relation_selection_arguments(
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    model: <span class="kw-2">&amp;</span>ModelRef,
+    include_distinct: bool,
+) -&gt; Vec&lt;InputField&gt; {
+    <span class="kw">let </span>unique_input_type = InputType::object(filter_objects::where_unique_object_type(ctx, model));
+    <span class="kw">let </span>order_by_options = OrderByOptions {
+        include_relations: <span class="bool-val">true</span>,
+        include_scalar_aggregations: <span class="bool-val">false</span>,
+        include_full_text_search: ctx.can_full_text_search(),
     };
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="macro">vec!</span>[
-        <span class="ident">where_argument</span>(<span class="ident">ctx</span>, <span class="ident">model</span>),
-        <span class="ident">order_by_argument</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="ident">order_by_options</span>),
-        <span class="ident">input_field</span>(<span class="ident">args::CURSOR</span>, <span class="ident">unique_input_type</span>, <span class="prelude-val">None</span>).<span class="ident">optional</span>(),
-        <span class="ident">input_field</span>(<span class="ident">args::TAKE</span>, <span class="ident">InputType::int</span>(), <span class="prelude-val">None</span>).<span class="ident">optional</span>(),
-        <span class="ident">input_field</span>(<span class="ident">args::SKIP</span>, <span class="ident">InputType::int</span>(), <span class="prelude-val">None</span>).<span class="ident">optional</span>(),
+    <span class="kw">let </span><span class="kw-2">mut </span>args = <span class="macro">vec!</span>[
+        where_argument(ctx, model),
+        order_by_argument(ctx, <span class="kw-2">&amp;</span>model.into(), <span class="kw-2">&amp;</span>order_by_options),
+        input_field(args::CURSOR, unique_input_type, <span class="prelude-val">None</span>).optional(),
+        input_field(args::TAKE, InputType::int(), <span class="prelude-val">None</span>).optional(),
+        input_field(args::SKIP, InputType::int(), <span class="prelude-val">None</span>).optional(),
     ];
 
-    <span class="kw">if</span> <span class="ident">include_distinct</span> {
-        <span class="ident">args</span>.<span class="ident">push</span>(
-            <span class="ident">input_field</span>(
-                <span class="ident">args::DISTINCT</span>,
-                <span class="ident">InputType::list</span>(<span class="ident">InputType::Enum</span>(<span class="ident">model_field_enum</span>(<span class="ident">ctx</span>, <span class="ident">model</span>))),
+    <span class="kw">if </span>include_distinct {
+        args.push(
+            input_field(
+                args::DISTINCT,
+                InputType::list(InputType::Enum(model_field_enum(ctx, model))),
                 <span class="prelude-val">None</span>,
             )
-            .<span class="ident">optional</span>(),
+            .optional(),
         );
     }
 
-    <span class="ident">args</span>
+    args
 }
 
-<span class="doccomment">/// Builds &quot;many composite where&quot; arguments for to-many composite selection sets.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">composite_selection_arguments</span>(<span class="ident">_ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">_cf</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span> {
+<span class="doccomment">/// Builds &quot;many composite where&quot; arguments for to-many composite selection sets.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>composite_selection_arguments(_ctx: <span class="kw-2">&amp;mut </span>BuilderContext, _cf: <span class="kw-2">&amp;</span>CompositeFieldRef) -&gt; Vec&lt;InputField&gt; {
     <span class="macro">vec!</span>[]
 }
 
-<span class="comment">// Builds &quot;orderBy&quot; argument.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">order_by_argument</span>(
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>,
-    <span class="ident">container</span>: <span class="kw-2">&amp;</span><span class="ident">ParentContainer</span>,
-    <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">OrderByOptions</span>,
-) -&gt; <span class="ident">InputField</span> {
-    <span class="kw">let</span> <span class="ident">order_object_type</span> <span class="op">=</span> <span class="ident">InputType::object</span>(<span class="ident">order_by_objects::order_by_object_type</span>(<span class="ident">ctx</span>, <span class="ident">container</span>, <span class="ident">options</span>));
+<span class="comment">// Builds &quot;orderBy&quot; argument.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>order_by_argument(
+    ctx: <span class="kw-2">&amp;mut </span>BuilderContext,
+    container: <span class="kw-2">&amp;</span>ParentContainer,
+    options: <span class="kw-2">&amp;</span>OrderByOptions,
+) -&gt; InputField {
+    <span class="kw">let </span>order_object_type = InputType::object(order_by_objects::order_by_object_type(ctx, container, options));
 
-    <span class="ident">input_field</span>(
-        <span class="ident">args::ORDER_BY</span>,
-        <span class="macro">vec!</span>[<span class="ident">InputType::list</span>(<span class="ident">order_object_type</span>.<span class="ident">clone</span>()), <span class="ident">order_object_type</span>],
+    input_field(
+        args::ORDER_BY,
+        <span class="macro">vec!</span>[InputType::list(order_object_type.clone()), order_object_type],
         <span class="prelude-val">None</span>,
     )
-    .<span class="ident">optional</span>()
+    .optional()
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">group_by_arguments</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InputField</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">field_enum_type</span> <span class="op">=</span> <span class="ident">InputType::Enum</span>(<span class="ident">model_field_enum</span>(<span class="ident">ctx</span>, <span class="ident">model</span>));
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>group_by_arguments(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; Vec&lt;InputField&gt; {
+    <span class="kw">let </span>field_enum_type = InputType::Enum(model_field_enum(ctx, model));
 
     <span class="macro">vec!</span>[
-        <span class="ident">where_argument</span>(<span class="ident">ctx</span>, <span class="ident">model</span>),
-        <span class="ident">order_by_argument</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="ident">OrderByOptions::new</span>().<span class="ident">with_aggregates</span>()),
-        <span class="ident">input_field</span>(
-            <span class="ident">args::BY</span>,
-            <span class="macro">vec!</span>[<span class="ident">InputType::list</span>(<span class="ident">field_enum_type</span>.<span class="ident">clone</span>()), <span class="ident">field_enum_type</span>],
+        where_argument(ctx, model),
+        order_by_argument(ctx, <span class="kw-2">&amp;</span>model.into(), <span class="kw-2">&amp;</span>OrderByOptions::new().with_aggregates()),
+        input_field(
+            args::BY,
+            <span class="macro">vec!</span>[InputType::list(field_enum_type.clone()), field_enum_type],
             <span class="prelude-val">None</span>,
         ),
-        <span class="ident">input_field</span>(
-            <span class="ident">args::HAVING</span>,
-            <span class="ident">InputType::object</span>(<span class="ident">filter_objects::scalar_filter_object_type</span>(<span class="ident">ctx</span>, <span class="ident">model</span>, <span class="bool-val">true</span>)),
+        input_field(
+            args::HAVING,
+            InputType::object(filter_objects::scalar_filter_object_type(ctx, model, <span class="bool-val">true</span>)),
             <span class="prelude-val">None</span>,
         )
-        .<span class="ident">optional</span>(),
-        <span class="ident">input_field</span>(<span class="ident">args::TAKE</span>, <span class="ident">InputType::int</span>(), <span class="prelude-val">None</span>).<span class="ident">optional</span>(),
-        <span class="ident">input_field</span>(<span class="ident">args::SKIP</span>, <span class="ident">InputType::int</span>(), <span class="prelude-val">None</span>).<span class="ident">optional</span>(),
+        .optional(),
+        input_field(args::TAKE, InputType::int(), <span class="prelude-val">None</span>).optional(),
+        input_field(args::SKIP, InputType::int(), <span class="prelude-val">None</span>).optional(),
     ]
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="schema_builder" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="schema_builder" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

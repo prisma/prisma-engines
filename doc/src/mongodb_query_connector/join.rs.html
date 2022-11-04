@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/mongodb-query-connector/src/join.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>join.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mongodb_query_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/mongodb-query-connector/src/join.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>join.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mongodb_query_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -184,191 +184,191 @@
 <span id="184">184</span>
 <span id="185">185</span>
 <span id="186">186</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::filter::MongoFilter</span>;
-<span class="kw">use</span> <span class="ident">mongodb::bson</span>::{<span class="ident">doc</span>, <span class="ident">Document</span>};
-<span class="kw">use</span> <span class="ident">prisma_models::RelationFieldRef</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::filter::MongoFilter;
+<span class="kw">use </span>mongodb::bson::{doc, Document};
+<span class="kw">use </span>prisma_models::RelationFieldRef;
 
-<span class="doccomment">/// A join stage describes a tree of joins and nested joins to be performed on a collection.</span>
-<span class="doccomment">/// Every document of the `source` side will be joined with the collection documents</span>
-<span class="doccomment">/// as described by the relation field. All of the newly joined documents</span>
-<span class="doccomment">/// can be joined again with relations originating from their collection.</span>
-<span class="doccomment">/// Example:</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// A -&gt; B -&gt; C</span>
-<span class="doccomment">///        -&gt; D</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// Translates to: `JoinStage(A, nested: Vec&lt;JoinStage(B), JoinStage(C)&gt;)`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">JoinStage</span> {
-    <span class="doccomment">/// The starting point of the traversal (left model of the join).</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">source</span>: <span class="ident">RelationFieldRef</span>,
+<span class="doccomment">/// A join stage describes a tree of joins and nested joins to be performed on a collection.
+/// Every document of the `source` side will be joined with the collection documents
+/// as described by the relation field. All of the newly joined documents
+/// can be joined again with relations originating from their collection.
+/// Example:
+/// ```text
+/// A -&gt; B -&gt; C
+///        -&gt; D
+/// ```
+/// Translates to: `JoinStage(A, nested: Vec&lt;JoinStage(B), JoinStage(C)&gt;)`.
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>JoinStage {
+    <span class="doccomment">/// The starting point of the traversal (left model of the join).
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) source: RelationFieldRef,
 
-    <span class="doccomment">/// By default, the name of the relation is used as join field name.</span>
-    <span class="doccomment">/// Can be overwritten with an alias here.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// By default, the name of the relation is used as join field name.
+    /// Can be overwritten with an alias here.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) alias: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-    <span class="doccomment">/// Nested joins</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">nested</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">JoinStage</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Nested joins
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) nested: Vec&lt;JoinStage&gt;,
 
-    <span class="doccomment">/// Filter on the join itself, used for aggregations on relations.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">filter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MongoFilter</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Filter on the join itself, used for aggregations on relations.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) filter: <span class="prelude-ty">Option</span>&lt;MongoFilter&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">JoinStage</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">source</span>: <span class="ident">RelationFieldRef</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">source</span>,
-            <span class="ident">alias</span>: <span class="prelude-val">None</span>,
-            <span class="ident">nested</span>: <span class="macro">vec!</span>[],
-            <span class="ident">filter</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl </span>JoinStage {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(source: RelationFieldRef) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            source,
+            alias: <span class="prelude-val">None</span>,
+            nested: <span class="macro">vec!</span>[],
+            filter: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">set_alias</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">alias</span>: <span class="ident">String</span>) {
-        <span class="self">self</span>.<span class="ident">alias</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">alias</span>);
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>set_alias(<span class="kw-2">&amp;mut </span><span class="self">self</span>, alias: String) {
+        <span class="self">self</span>.alias = <span class="prelude-val">Some</span>(alias);
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">push_nested</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">stage</span>: <span class="ident">JoinStage</span>) {
-        <span class="self">self</span>.<span class="ident">nested</span>.<span class="ident">push</span>(<span class="ident">stage</span>);
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>push_nested(<span class="kw-2">&amp;mut </span><span class="self">self</span>, stage: JoinStage) {
+        <span class="self">self</span>.nested.push(stage);
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">extend_nested</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">stages</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">JoinStage</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">nested</span>.<span class="ident">extend</span>(<span class="ident">stages</span>);
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>extend_nested(<span class="kw-2">&amp;mut </span><span class="self">self</span>, stages: Vec&lt;JoinStage&gt;) {
+        <span class="self">self</span>.nested.extend(stages);
     }
 
-    <span class="doccomment">/// Returns a join stage for the join between the source collection of `from_field` (the model it&#39;s defined on)</span>
-    <span class="doccomment">/// and the target collection (the model that is related over the relation), as well as an optional unwind stage.</span>
-    <span class="doccomment">/// The joined documents will reside on the source document side as a field **named after the relation name** if</span>
-    <span class="doccomment">/// there&#39;s no `alias` defined. Else the alias is the name.</span>
-    <span class="doccomment">/// Example: If you have a document `{ _id: 1, field: &quot;a&quot; }` and join relation &quot;aToB&quot;, the resulting document</span>
-    <span class="doccomment">/// will have the shape: `{ _id: 1, field: &quot;a&quot;, aToB: [{...}, {...}, ...] }` without alias and</span>
-    <span class="doccomment">/// `{ _id: 1, field: &quot;a&quot;, aliasHere: [{...}, {...}, ...] }` with alias `&quot;aliasHere&quot;`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns: `(Join document, Unwind document)`</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>) -&gt; (<span class="ident">Document</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> (<span class="ident">filter_doc</span>, <span class="ident">filter_joins</span>) <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">filter</span>
-            .<span class="ident">map</span>(<span class="ident">MongoFilter::render</span>)
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">doc</span>, <span class="ident">joins</span>)<span class="op">|</span> (<span class="prelude-val">Some</span>(<span class="ident">doc</span>), <span class="ident">joins</span>))
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> (<span class="prelude-val">None</span>, <span class="macro">vec!</span>[]));
+    <span class="doccomment">/// Returns a join stage for the join between the source collection of `from_field` (the model it&#39;s defined on)
+    /// and the target collection (the model that is related over the relation), as well as an optional unwind stage.
+    /// The joined documents will reside on the source document side as a field **named after the relation name** if
+    /// there&#39;s no `alias` defined. Else the alias is the name.
+    /// Example: If you have a document `{ _id: 1, field: &quot;a&quot; }` and join relation &quot;aToB&quot;, the resulting document
+    /// will have the shape: `{ _id: 1, field: &quot;a&quot;, aToB: [{...}, {...}, ...] }` without alias and
+    /// `{ _id: 1, field: &quot;a&quot;, aliasHere: [{...}, {...}, ...] }` with alias `&quot;aliasHere&quot;`.
+    ///
+    /// Returns: `(Join document, Unwind document)`
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>build(<span class="self">self</span>) -&gt; (Document, <span class="prelude-ty">Option</span>&lt;Document&gt;) {
+        <span class="kw">let </span>(filter_doc, filter_joins) = <span class="self">self
+            </span>.filter
+            .map(MongoFilter::render)
+            .map(|(doc, joins)| (<span class="prelude-val">Some</span>(doc), joins))
+            .unwrap_or_else(|| (<span class="prelude-val">None</span>, <span class="macro">vec!</span>[]));
 
-        <span class="kw">let</span> <span class="ident">nested_stages</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">nested</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">chain</span>(<span class="ident">filter_joins</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">nested_stage</span><span class="op">|</span> {
-                <span class="kw">let</span> (<span class="ident">join</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">nested_stage</span>.<span class="ident">build</span>();
+        <span class="kw">let </span>nested_stages: Vec&lt;Document&gt; = <span class="self">self
+            </span>.nested
+            .into_iter()
+            .chain(filter_joins)
+            .map(|nested_stage| {
+                <span class="kw">let </span>(join, <span class="kw">_</span>) = nested_stage.build();
 
-                <span class="ident">join</span>
+                join
             })
-            .<span class="ident">collect</span>();
+            .collect();
 
-        <span class="kw">let</span> <span class="ident">from_field</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">source</span>;
-        <span class="kw">let</span> <span class="ident">relation</span> <span class="op">=</span> <span class="ident">from_field</span>.<span class="ident">relation</span>();
-        <span class="kw">let</span> <span class="ident">as_name</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">alias</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">alias</span> {
-            <span class="ident">alias</span>
-        } <span class="kw">else</span> {
-            <span class="ident">relation</span>.<span class="ident">name</span>.<span class="ident">clone</span>()
+        <span class="kw">let </span>from_field = <span class="self">self</span>.source;
+        <span class="kw">let </span>relation = from_field.relation();
+        <span class="kw">let </span>as_name = <span class="kw">if let </span><span class="prelude-val">Some</span>(alias) = <span class="self">self</span>.alias {
+            alias
+        } <span class="kw">else </span>{
+            relation.name.clone()
         };
 
-        <span class="kw">let</span> <span class="ident">right_model</span> <span class="op">=</span> <span class="ident">from_field</span>.<span class="ident">related_model</span>();
-        <span class="kw">let</span> <span class="ident">right_coll_name</span> <span class="op">=</span> <span class="ident">right_model</span>.<span class="ident">db_name</span>();
+        <span class="kw">let </span>right_model = from_field.related_model();
+        <span class="kw">let </span>right_coll_name = right_model.db_name();
 
-        <span class="comment">// +1 for the required match stage, the rest is from the joins.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pipeline</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="number">1</span> <span class="op">+</span> <span class="ident">nested_stages</span>.<span class="ident">len</span>());
+        <span class="comment">// +1 for the required match stage, the rest is from the joins.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>pipeline = Vec::with_capacity(<span class="number">1 </span>+ nested_stages.len());
 
-        <span class="comment">// First we start with the right side of the equation</span>
-        <span class="kw">let</span> <span class="ident">right_scalars</span> <span class="op">=</span> <span class="ident">from_field</span>.<span class="ident">right_scalars</span>();
+        <span class="comment">// First we start with the right side of the equation
+        </span><span class="kw">let </span>right_scalars = from_field.right_scalars();
 
-        <span class="comment">// What $expr operators we will need to express this lookup? (depends on right fields)</span>
-        <span class="kw">let</span> <span class="ident">ops</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">right_scalars</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">enumerate</span>()
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">idx</span>, <span class="ident">right_field</span>)<span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">right_ref</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="ident">right_field</span>.<span class="ident">db_name</span>());
-                <span class="kw">let</span> <span class="ident">left_var</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;$$left_{}&quot;</span>, <span class="ident">idx</span>);
+        <span class="comment">// What $expr operators we will need to express this lookup? (depends on right fields)
+        </span><span class="kw">let </span>ops: Vec&lt;Document&gt; = right_scalars
+            .iter()
+            .enumerate()
+            .map(|(idx, right_field)| {
+                <span class="kw">let </span>right_ref = <span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, right_field.db_name());
+                <span class="kw">let </span>left_var = <span class="macro">format!</span>(<span class="string">&quot;$$left_{}&quot;</span>, idx);
 
-                <span class="kw">match</span> <span class="ident">relation</span>.<span class="ident">is_many_to_many</span>() {
-                    <span class="bool-val">true</span> <span class="kw">if</span> <span class="ident">right_field</span>.<span class="ident">is_list</span>() =&gt; <span class="macro">doc!</span> { <span class="string">&quot;$in&quot;</span>: [<span class="ident">left_var</span>, <span class="ident">right_ref</span>] },
-                    <span class="bool-val">true</span> =&gt; <span class="macro">doc!</span> { <span class="string">&quot;$in&quot;</span>: [<span class="ident">right_ref</span>, <span class="ident">left_var</span>] },
-                    <span class="kw">_</span> =&gt; <span class="macro">doc!</span> { <span class="string">&quot;$eq&quot;</span>: [<span class="ident">right_ref</span>, <span class="ident">left_var</span>] },
+                <span class="kw">match </span>relation.is_many_to_many() {
+                    <span class="bool-val">true </span><span class="kw">if </span>right_field.is_list() =&gt; <span class="macro">doc! </span>{ <span class="string">&quot;$in&quot;</span>: [left_var, right_ref] },
+                    <span class="bool-val">true </span>=&gt; <span class="macro">doc! </span>{ <span class="string">&quot;$in&quot;</span>: [right_ref, left_var] },
+                    <span class="kw">_ </span>=&gt; <span class="macro">doc! </span>{ <span class="string">&quot;$eq&quot;</span>: [right_ref, left_var] },
                 }
             })
-            .<span class="ident">collect</span>();
+            .collect();
 
-        <span class="comment">// For m-n join stages: Add an `$addFields` stage that adds an empty array if not present (required to make joins work).</span>
-        <span class="kw">if</span> <span class="ident">relation</span>.<span class="ident">is_many_to_many</span>() {
-            <span class="comment">// addFields is the list of fields and conditions</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">add_fields</span> <span class="op">=</span> <span class="ident">Document::new</span>();
+        <span class="comment">// For m-n join stages: Add an `$addFields` stage that adds an empty array if not present (required to make joins work).
+        </span><span class="kw">if </span>relation.is_many_to_many() {
+            <span class="comment">// addFields is the list of fields and conditions
+            </span><span class="kw">let </span><span class="kw-2">mut </span>add_fields = Document::new();
 
-            <span class="comment">// Go through every right field to place in the $addFields operator</span>
-            <span class="kw">for</span> <span class="ident">right_field</span> <span class="kw">in</span> <span class="ident">right_scalars</span>.<span class="ident">iter</span>() {
-                <span class="kw">let</span> <span class="ident">right_name</span> <span class="op">=</span> <span class="ident">right_field</span>.<span class="ident">db_name</span>();
-                <span class="kw">let</span> <span class="ident">right_ref</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="ident">right_name</span>);
+            <span class="comment">// Go through every right field to place in the $addFields operator
+            </span><span class="kw">for </span>right_field <span class="kw">in </span>right_scalars.iter() {
+                <span class="kw">let </span>right_name = right_field.db_name();
+                <span class="kw">let </span>right_ref = <span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, right_name);
 
-                <span class="ident">add_fields</span>.<span class="ident">insert</span>(
-                    <span class="ident">right_name</span>,
-                    <span class="macro">doc!</span> {
+                add_fields.insert(
+                    right_name,
+                    <span class="macro">doc! </span>{
                        <span class="string">&quot;$cond&quot;</span>: {
                             <span class="string">&quot;if&quot;</span>: {
-                                <span class="string">&quot;$ne&quot;</span>: [ { <span class="string">&quot;$type&quot;</span>: <span class="ident">right_ref</span>.<span class="ident">clone</span>() }, <span class="string">&quot;array&quot;</span>]
+                                <span class="string">&quot;$ne&quot;</span>: [ { <span class="string">&quot;$type&quot;</span>: right_ref.clone() }, <span class="string">&quot;array&quot;</span>]
                             },
                             <span class="string">&quot;then&quot;</span>: [],
-                            <span class="string">&quot;else&quot;</span>: <span class="ident">right_ref</span>.<span class="ident">clone</span>()
+                            <span class="string">&quot;else&quot;</span>: right_ref.clone()
                         }
                     },
                 );
             }
 
-            <span class="comment">// Push addFields to pipeline</span>
-            <span class="ident">pipeline</span>.<span class="ident">push</span>(<span class="macro">doc!</span> {
-                <span class="string">&quot;$addFields&quot;</span>: <span class="ident">add_fields</span>
+            <span class="comment">// Push addFields to pipeline
+            </span>pipeline.push(<span class="macro">doc! </span>{
+                <span class="string">&quot;$addFields&quot;</span>: add_fields
             });
         }
 
-        <span class="comment">// We can now express the match from the operators</span>
-        <span class="ident">pipeline</span>.<span class="ident">push</span>(<span class="macro">doc!</span> { <span class="string">&quot;$match&quot;</span>: { <span class="string">&quot;$expr&quot;</span>: { <span class="string">&quot;$and&quot;</span>: <span class="ident">ops</span> } }});
+        <span class="comment">// We can now express the match from the operators
+        </span>pipeline.push(<span class="macro">doc! </span>{ <span class="string">&quot;$match&quot;</span>: { <span class="string">&quot;$expr&quot;</span>: { <span class="string">&quot;$and&quot;</span>: ops } }});
 
-        <span class="ident">pipeline</span>.<span class="ident">extend</span>(<span class="ident">nested_stages</span>);
+        pipeline.extend(nested_stages);
 
-        <span class="comment">// Add inner join filters if there are any (used for relational aggregations)</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">doc</span>) <span class="op">=</span> <span class="ident">filter_doc</span> {
-            <span class="ident">pipeline</span>.<span class="ident">push</span>(<span class="macro">doc!</span> { <span class="string">&quot;$match&quot;</span>: { <span class="string">&quot;$expr&quot;</span>: <span class="ident">doc</span> } });
+        <span class="comment">// Add inner join filters if there are any (used for relational aggregations)
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(doc) = filter_doc {
+            pipeline.push(<span class="macro">doc! </span>{ <span class="string">&quot;$match&quot;</span>: { <span class="string">&quot;$expr&quot;</span>: doc } });
         }
 
-        <span class="comment">// If the field is a to-one, add an unwind stage.</span>
-        <span class="kw">let</span> <span class="ident">unwind_stage</span> <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">from_field</span>.<span class="ident">is_list</span>() {
-            <span class="prelude-val">Some</span>(<span class="macro">doc!</span> {
-                <span class="string">&quot;$unwind&quot;</span>: { <span class="string">&quot;path&quot;</span>: <span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="ident">as_name</span>), <span class="string">&quot;preserveNullAndEmptyArrays&quot;</span>: <span class="bool-val">true</span> }
+        <span class="comment">// If the field is a to-one, add an unwind stage.
+        </span><span class="kw">let </span>unwind_stage = <span class="kw">if </span>!from_field.is_list() {
+            <span class="prelude-val">Some</span>(<span class="macro">doc! </span>{
+                <span class="string">&quot;$unwind&quot;</span>: { <span class="string">&quot;path&quot;</span>: <span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, as_name), <span class="string">&quot;preserveNullAndEmptyArrays&quot;</span>: <span class="bool-val">true </span>}
             })
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        };
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>};
 
-        <span class="comment">// Time to deal with the left side of the equation</span>
-        <span class="kw">let</span> <span class="ident">left_scalars</span> <span class="op">=</span> <span class="ident">from_field</span>.<span class="ident">left_scalars</span>();
+        <span class="comment">// Time to deal with the left side of the equation
+        </span><span class="kw">let </span>left_scalars = from_field.left_scalars();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">let_vars</span> <span class="op">=</span> <span class="ident">Document::new</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>let_vars = Document::new();
 
-        <span class="comment">// With the left side, we need to introduce the variable `left_x` pointing to the correct field</span>
-        <span class="kw">for</span> (<span class="ident">idx</span>, <span class="ident">left_field</span>) <span class="kw">in</span> <span class="ident">left_scalars</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">let</span> <span class="ident">left_var</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;left_{}&quot;</span>, <span class="ident">idx</span>);
+        <span class="comment">// With the left side, we need to introduce the variable `left_x` pointing to the correct field
+        </span><span class="kw">for </span>(idx, left_field) <span class="kw">in </span>left_scalars.iter().enumerate() {
+            <span class="kw">let </span>left_var = <span class="macro">format!</span>(<span class="string">&quot;left_{}&quot;</span>, idx);
 
-            <span class="ident">let_vars</span>.<span class="ident">insert</span>(<span class="ident">left_var</span>, <span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="ident">left_field</span>.<span class="ident">db_name</span>()));
+            let_vars.insert(left_var, <span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, left_field.db_name()));
         }
 
-        <span class="comment">// We can now generate the full $lookup query with all its parts</span>
-        <span class="kw">let</span> <span class="ident">join_stage</span> <span class="op">=</span> <span class="macro">doc!</span> {
+        <span class="comment">// We can now generate the full $lookup query with all its parts
+        </span><span class="kw">let </span>join_stage = <span class="macro">doc! </span>{
             <span class="string">&quot;$lookup&quot;</span>: {
-                <span class="string">&quot;from&quot;</span>: <span class="ident">right_coll_name</span>,
-                <span class="string">&quot;let&quot;</span>: <span class="ident">let_vars</span>,
-                <span class="string">&quot;pipeline&quot;</span>: <span class="ident">pipeline</span>,
-                <span class="string">&quot;as&quot;</span>: <span class="ident">as_name</span>,
+                <span class="string">&quot;from&quot;</span>: right_coll_name,
+                <span class="string">&quot;let&quot;</span>: let_vars,
+                <span class="string">&quot;pipeline&quot;</span>: pipeline,
+                <span class="string">&quot;as&quot;</span>: as_name,
             }
         };
 
-        (<span class="ident">join_stage</span>, <span class="ident">unwind_stage</span>)
+        (join_stage, unwind_stage)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mongodb_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mongodb_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

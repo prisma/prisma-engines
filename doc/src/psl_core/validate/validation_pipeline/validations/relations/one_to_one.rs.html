@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/psl-core/src/validate/validation_pipeline/validations/relations/one_to_one.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>one_to_one.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../../storage.js"></script><script defer src="../../../../../../source-script.js"></script><script defer src="../../../../../../source-files.js"></script><script defer src="../../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../../psl_core/index.html"><img class="rust-logo" src="../../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/psl-core/src/validate/validation_pipeline/validations/relations/one_to_one.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>one_to_one.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../../normalize.css"><link rel="stylesheet" href="../../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../../storage.js"></script><script defer src="../../../../../../source-script.js"></script><script defer src="../../../../../../source-files.js"></script><script defer src="../../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../../psl_core/index.html"><img class="rust-logo" src="../../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -308,315 +308,315 @@
 <span id="308">308</span>
 <span id="309">309</span>
 <span id="310">310</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">diagnostics::DatamodelError</span>, <span class="ident">validate::validation_pipeline::context::Context</span>};
-<span class="kw">use</span> <span class="ident">parser_database::ast::WithSpan</span>;
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use crate</span>::{diagnostics::DatamodelError, validate::validation_pipeline::context::Context};
+<span class="kw">use </span>parser_database::ast::WithSpan;
 
-<span class="doccomment">/// A relation should have the explicit and back-relation side defined.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">both_sides_are_defined</span>(<span class="ident">relation</span>: <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="ident">relation</span>.<span class="ident">back_relation_field</span>().<span class="ident">is_some</span>() {
+<span class="doccomment">/// A relation should have the explicit and back-relation side defined.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>both_sides_are_defined(relation: InlineRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">if </span>relation.back_relation_field().is_some() {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">forward_relation_field</span>().<span class="ident">expect</span>(<span class="ident">STATE_ERROR</span>);
+    <span class="kw">let </span>field = relation.forward_relation_field().expect(STATE_ERROR);
 
-    <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
+    <span class="kw">let </span>message = <span class="macro">format!</span>(
         <span class="string">&quot;The relation field `{}` on Model `{}` is missing an opposite relation field on the model `{}`. Either run `prisma format` or add it manually.&quot;</span>,
-        <span class="ident">field</span>.<span class="ident">name</span>(),
-        <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
-        <span class="ident">field</span>.<span class="ident">related_model</span>().<span class="ident">name</span>(),
+        field.name(),
+        field.model().name(),
+        field.related_model().name(),
     );
 
-    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_field_validation_error</span>(
-        <span class="kw-2">&amp;</span><span class="ident">message</span>,
-        <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
-        <span class="ident">field</span>.<span class="ident">name</span>(),
-        <span class="ident">field</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
+    ctx.push_error(DatamodelError::new_field_validation_error(
+        <span class="kw-2">&amp;</span>message,
+        field.model().name(),
+        field.name(),
+        field.ast_field().span(),
     ));
 }
 
-<span class="doccomment">/// The forward side must define `fields` and `references` in the `@relation` attribute.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">fields_and_references_are_defined</span>(<span class="ident">relation</span>: <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> (<span class="ident">forward</span>, <span class="ident">back</span>) <span class="op">=</span> <span class="kw">match</span> (<span class="ident">relation</span>.<span class="ident">forward_relation_field</span>(), <span class="ident">relation</span>.<span class="ident">back_relation_field</span>()) {
-        (<span class="prelude-val">Some</span>(<span class="ident">forward</span>), <span class="prelude-val">Some</span>(<span class="ident">back</span>)) =&gt; (<span class="ident">forward</span>, <span class="ident">back</span>),
-        <span class="kw">_</span> =&gt; <span class="kw">return</span>,
+<span class="doccomment">/// The forward side must define `fields` and `references` in the `@relation` attribute.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>fields_and_references_are_defined(relation: InlineRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">let </span>(forward, back) = <span class="kw">match </span>(relation.forward_relation_field(), relation.back_relation_field()) {
+        (<span class="prelude-val">Some</span>(forward), <span class="prelude-val">Some</span>(back)) =&gt; (forward, back),
+        <span class="kw">_ </span>=&gt; <span class="kw">return</span>,
     };
 
-    <span class="kw">if</span> <span class="ident">is_empty_fields</span>(<span class="ident">forward</span>.<span class="ident">referencing_fields</span>()) <span class="op">&amp;&amp;</span> <span class="ident">is_empty_fields</span>(<span class="ident">back</span>.<span class="ident">referencing_fields</span>()) {
-        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
+    <span class="kw">if </span>is_empty_fields(forward.referencing_fields()) &amp;&amp; is_empty_fields(back.referencing_fields()) {
+        <span class="kw">let </span>message = <span class="macro">format!</span>(
             <span class="string">&quot;The relation fields `{}` on Model `{}` and `{}` on Model `{}` do not provide the `fields` argument in the {} attribute. You have to provide it on one of the two fields.&quot;</span>,
-            <span class="ident">forward</span>.<span class="ident">name</span>(), <span class="ident">forward</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">back</span>.<span class="ident">name</span>(), <span class="kw-2">&amp;</span><span class="ident">back</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">RELATION_ATTRIBUTE_NAME</span>
+            forward.name(), forward.model().name(), back.name(), <span class="kw-2">&amp;</span>back.model().name(), RELATION_ATTRIBUTE_NAME
         );
 
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-            <span class="kw-2">&amp;</span><span class="ident">message</span>,
-            <span class="ident">RELATION_ATTRIBUTE_NAME</span>,
-            <span class="ident">forward</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            <span class="kw-2">&amp;</span>message,
+            RELATION_ATTRIBUTE_NAME,
+            forward.ast_field().span(),
         ));
 
-        <span class="comment">// Do the same on the other field.</span>
+        <span class="comment">// Do the same on the other field.
 
-        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
+        </span><span class="kw">let </span>message = <span class="macro">format!</span>(
                 <span class="string">&quot;The relation fields `{}` on Model `{}` and `{}` on Model `{}` do not provide the `fields` argument in the {} attribute. You have to provide it on one of the two fields.&quot;</span>,
-                <span class="ident">back</span>.<span class="ident">name</span>(), <span class="ident">back</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">forward</span>.<span class="ident">name</span>(), <span class="ident">forward</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">RELATION_ATTRIBUTE_NAME</span>
+                back.name(), back.model().name(), forward.name(), forward.model().name(), RELATION_ATTRIBUTE_NAME
             );
 
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-            <span class="kw-2">&amp;</span><span class="ident">message</span>,
-            <span class="ident">RELATION_ATTRIBUTE_NAME</span>,
-            <span class="ident">back</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            <span class="kw-2">&amp;</span>message,
+            RELATION_ATTRIBUTE_NAME,
+            back.ast_field().span(),
         ));
     }
 
-    <span class="kw">if</span> <span class="ident">is_empty_fields</span>(<span class="ident">forward</span>.<span class="ident">referenced_fields</span>()) <span class="op">&amp;&amp;</span> <span class="ident">is_empty_fields</span>(<span class="ident">back</span>.<span class="ident">referenced_fields</span>()) {
-        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
+    <span class="kw">if </span>is_empty_fields(forward.referenced_fields()) &amp;&amp; is_empty_fields(back.referenced_fields()) {
+        <span class="kw">let </span>message = <span class="macro">format!</span>(
             <span class="string">&quot;The relation fields `{}` on Model `{}` and `{}` on Model `{}` do not provide the `references` argument in the {} attribute. You have to provide it on one of the two fields.&quot;</span>,
-            <span class="ident">forward</span>.<span class="ident">name</span>(), <span class="ident">forward</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">back</span>.<span class="ident">name</span>(), <span class="ident">back</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">RELATION_ATTRIBUTE_NAME</span>
+            forward.name(), forward.model().name(), back.name(), back.model().name(), RELATION_ATTRIBUTE_NAME
         );
 
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-            <span class="kw-2">&amp;</span><span class="ident">message</span>,
-            <span class="ident">RELATION_ATTRIBUTE_NAME</span>,
-            <span class="ident">forward</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            <span class="kw-2">&amp;</span>message,
+            RELATION_ATTRIBUTE_NAME,
+            forward.ast_field().span(),
         ));
 
-        <span class="comment">// Same message on the other field.</span>
+        <span class="comment">// Same message on the other field.
 
-        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
+        </span><span class="kw">let </span>message = <span class="macro">format!</span>(
             <span class="string">&quot;The relation fields `{}` on Model `{}` and `{}` on Model `{}` do not provide the `references` argument in the {} attribute. You have to provide it on one of the two fields.&quot;</span>,
-            <span class="ident">back</span>.<span class="ident">name</span>(), <span class="ident">back</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">forward</span>.<span class="ident">name</span>(), <span class="ident">forward</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">RELATION_ATTRIBUTE_NAME</span>
+            back.name(), back.model().name(), forward.name(), forward.model().name(), RELATION_ATTRIBUTE_NAME
         );
 
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-            <span class="kw-2">&amp;</span><span class="ident">message</span>,
-            <span class="ident">RELATION_ATTRIBUTE_NAME</span>,
-            <span class="ident">back</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            <span class="kw-2">&amp;</span>message,
+            RELATION_ATTRIBUTE_NAME,
+            back.ast_field().span(),
         ));
     }
 }
 
-<span class="doccomment">/// `fields` and `references` should only be defined in the forward side of the relation.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">fields_and_references_defined_on_one_side_only</span>(
-    <span class="ident">relation</span>: <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+<span class="doccomment">/// `fields` and `references` should only be defined in the forward side of the relation.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>fields_and_references_defined_on_one_side_only(
+    relation: InlineRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) {
-    <span class="kw">let</span> (<span class="ident">forward</span>, <span class="ident">back</span>) <span class="op">=</span> <span class="kw">match</span> (<span class="ident">relation</span>.<span class="ident">forward_relation_field</span>(), <span class="ident">relation</span>.<span class="ident">back_relation_field</span>()) {
-        (<span class="prelude-val">Some</span>(<span class="ident">forward</span>), <span class="prelude-val">Some</span>(<span class="ident">back</span>)) =&gt; (<span class="ident">forward</span>, <span class="ident">back</span>),
-        <span class="kw">_</span> =&gt; <span class="kw">return</span>,
+    <span class="kw">let </span>(forward, back) = <span class="kw">match </span>(relation.forward_relation_field(), relation.back_relation_field()) {
+        (<span class="prelude-val">Some</span>(forward), <span class="prelude-val">Some</span>(back)) =&gt; (forward, back),
+        <span class="kw">_ </span>=&gt; <span class="kw">return</span>,
     };
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">is_empty_fields</span>(<span class="ident">forward</span>.<span class="ident">referenced_fields</span>()) <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">is_empty_fields</span>(<span class="ident">back</span>.<span class="ident">referenced_fields</span>()) {
-        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
+    <span class="kw">if </span>!is_empty_fields(forward.referenced_fields()) &amp;&amp; !is_empty_fields(back.referenced_fields()) {
+        <span class="kw">let </span>message = <span class="macro">format!</span>(
             <span class="string">&quot;The relation fields `{}` on Model `{}` and `{}` on Model `{}` both provide the `references` argument in the {} attribute. You have to provide it only on one of the two fields.&quot;</span>,
-            <span class="ident">forward</span>.<span class="ident">name</span>(), <span class="ident">forward</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">back</span>.<span class="ident">name</span>(), <span class="ident">back</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">RELATION_ATTRIBUTE_NAME</span>
+            forward.name(), forward.model().name(), back.name(), back.model().name(), RELATION_ATTRIBUTE_NAME
         );
 
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-            <span class="kw-2">&amp;</span><span class="ident">message</span>,
-            <span class="ident">RELATION_ATTRIBUTE_NAME</span>,
-            <span class="ident">forward</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            <span class="kw-2">&amp;</span>message,
+            RELATION_ATTRIBUTE_NAME,
+            forward.ast_field().span(),
         ));
 
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-            <span class="kw-2">&amp;</span><span class="ident">message</span>,
-            <span class="ident">RELATION_ATTRIBUTE_NAME</span>,
-            <span class="ident">back</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            <span class="kw-2">&amp;</span>message,
+            RELATION_ATTRIBUTE_NAME,
+            back.ast_field().span(),
         ));
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">is_empty_fields</span>(<span class="ident">forward</span>.<span class="ident">referencing_fields</span>()) <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">is_empty_fields</span>(<span class="ident">back</span>.<span class="ident">referencing_fields</span>()) {
-        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
+    <span class="kw">if </span>!is_empty_fields(forward.referencing_fields()) &amp;&amp; !is_empty_fields(back.referencing_fields()) {
+        <span class="kw">let </span>message = <span class="macro">format!</span>(
             <span class="string">&quot;The relation fields `{}` on Model `{}` and `{}` on Model `{}` both provide the `fields` argument in the {} attribute. You have to provide it only on one of the two fields.&quot;</span>,
-            <span class="ident">forward</span>.<span class="ident">name</span>(), <span class="ident">forward</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">back</span>.<span class="ident">name</span>(), <span class="ident">back</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">RELATION_ATTRIBUTE_NAME</span>
+            forward.name(), forward.model().name(), back.name(), back.model().name(), RELATION_ATTRIBUTE_NAME
         );
 
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-            <span class="kw-2">&amp;</span><span class="ident">message</span>,
-            <span class="ident">RELATION_ATTRIBUTE_NAME</span>,
-            <span class="ident">forward</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            <span class="kw-2">&amp;</span>message,
+            RELATION_ATTRIBUTE_NAME,
+            forward.ast_field().span(),
         ));
 
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-            <span class="kw-2">&amp;</span><span class="ident">message</span>,
-            <span class="ident">RELATION_ATTRIBUTE_NAME</span>,
-            <span class="ident">back</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            <span class="kw-2">&amp;</span>message,
+            RELATION_ATTRIBUTE_NAME,
+            back.ast_field().span(),
         ));
     }
 }
 
-<span class="doccomment">/// Referential actions must be defined in the forward side.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">referential_actions</span>(<span class="ident">relation</span>: <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> (<span class="ident">forward</span>, <span class="ident">back</span>) <span class="op">=</span> <span class="kw">match</span> (<span class="ident">relation</span>.<span class="ident">forward_relation_field</span>(), <span class="ident">relation</span>.<span class="ident">back_relation_field</span>()) {
-        (<span class="prelude-val">Some</span>(<span class="ident">forward</span>), <span class="prelude-val">Some</span>(<span class="ident">back</span>)) =&gt; (<span class="ident">forward</span>, <span class="ident">back</span>),
-        <span class="kw">_</span> =&gt; <span class="kw">return</span>,
+<span class="doccomment">/// Referential actions must be defined in the forward side.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>referential_actions(relation: InlineRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">let </span>(forward, back) = <span class="kw">match </span>(relation.forward_relation_field(), relation.back_relation_field()) {
+        (<span class="prelude-val">Some</span>(forward), <span class="prelude-val">Some</span>(back)) =&gt; (forward, back),
+        <span class="kw">_ </span>=&gt; <span class="kw">return</span>,
     };
 
-    <span class="kw">if</span> (<span class="ident">forward</span>.<span class="ident">explicit_on_delete</span>().<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">forward</span>.<span class="ident">explicit_on_update</span>().<span class="ident">is_some</span>())
-        <span class="op">&amp;&amp;</span> (<span class="ident">back</span>.<span class="ident">explicit_on_delete</span>().<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">back</span>.<span class="ident">explicit_on_update</span>().<span class="ident">is_some</span>())
+    <span class="kw">if </span>(forward.explicit_on_delete().is_some() || forward.explicit_on_update().is_some())
+        &amp;&amp; (back.explicit_on_delete().is_some() || back.explicit_on_update().is_some())
     {
-        <span class="comment">// We show the error on both fields</span>
-        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
+        <span class="comment">// We show the error on both fields
+        </span><span class="kw">let </span>message = <span class="macro">format!</span>(
             <span class="string">&quot;The relation fields `{}` on Model `{}` and `{}` on Model `{}` both provide the `onDelete` or `onUpdate` argument in the {} attribute. You have to provide it only on one of the two fields.&quot;</span>,
-            <span class="ident">back</span>.<span class="ident">name</span>(), <span class="ident">back</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">forward</span>.<span class="ident">name</span>(), <span class="ident">forward</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">RELATION_ATTRIBUTE_NAME</span>
+            back.name(), back.model().name(), forward.name(), forward.model().name(), RELATION_ATTRIBUTE_NAME
         );
 
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-            <span class="kw-2">&amp;</span><span class="ident">message</span>,
-            <span class="ident">RELATION_ATTRIBUTE_NAME</span>,
-            <span class="ident">back</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            <span class="kw-2">&amp;</span>message,
+            RELATION_ATTRIBUTE_NAME,
+            back.ast_field().span(),
         ));
 
-        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
+        <span class="kw">let </span>message = <span class="macro">format!</span>(
             <span class="string">&quot;The relation fields `{}` on Model `{}` and `{}` on Model `{}` both provide the `onDelete` or `onUpdate` argument in the {} attribute. You have to provide it only on one of the two fields.&quot;</span>,
-            <span class="ident">forward</span>.<span class="ident">name</span>(), <span class="ident">forward</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">back</span>.<span class="ident">name</span>(), <span class="ident">back</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">RELATION_ATTRIBUTE_NAME</span>
+            forward.name(), forward.model().name(), back.name(), back.model().name(), RELATION_ATTRIBUTE_NAME
         );
 
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-            <span class="kw-2">&amp;</span><span class="ident">message</span>,
-            <span class="ident">RELATION_ATTRIBUTE_NAME</span>,
-            <span class="ident">forward</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            <span class="kw-2">&amp;</span>message,
+            RELATION_ATTRIBUTE_NAME,
+            forward.ast_field().span(),
         ));
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">back</span>.<span class="ident">explicit_on_delete</span>().<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">back</span>.<span class="ident">explicit_on_update</span>().<span class="ident">is_some</span>() {
-        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">format!</span>(
+    } <span class="kw">else if </span>back.explicit_on_delete().is_some() || back.explicit_on_update().is_some() {
+        <span class="kw">let </span>message = <span class="kw-2">&amp;</span><span class="macro">format!</span>(
             <span class="string">&quot;The relation field `{}` on Model `{}` must not specify the `onDelete` or `onUpdate` argument in the {} attribute. You must only specify it on the opposite field `{}` on model `{}`.&quot;</span>,
-            <span class="ident">back</span>.<span class="ident">name</span>(), <span class="ident">back</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">RELATION_ATTRIBUTE_NAME</span>, <span class="ident">forward</span>.<span class="ident">name</span>(), <span class="ident">forward</span>.<span class="ident">model</span>().<span class="ident">name</span>()
+            back.name(), back.model().name(), RELATION_ATTRIBUTE_NAME, forward.name(), forward.model().name()
         );
 
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-            <span class="ident">message</span>,
-            <span class="ident">RELATION_ATTRIBUTE_NAME</span>,
-            <span class="ident">back</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            message,
+            RELATION_ATTRIBUTE_NAME,
+            back.ast_field().span(),
         ));
     }
 }
 
-<span class="doccomment">/// Validation of some crazy things, such as definining `fields` and `references` on different</span>
-<span class="doccomment">/// sides in the relation.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">fields_references_mixups</span>(<span class="ident">relation</span>: <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> (<span class="ident">forward</span>, <span class="ident">back</span>) <span class="op">=</span> <span class="kw">match</span> (<span class="ident">relation</span>.<span class="ident">forward_relation_field</span>(), <span class="ident">relation</span>.<span class="ident">back_relation_field</span>()) {
-        (<span class="prelude-val">Some</span>(<span class="ident">forward</span>), <span class="prelude-val">Some</span>(<span class="ident">back</span>)) <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">diagnostics</span>.<span class="ident">errors</span>().<span class="ident">is_empty</span>() =&gt; (<span class="ident">forward</span>, <span class="ident">back</span>),
-        <span class="kw">_</span> =&gt; <span class="kw">return</span>,
+<span class="doccomment">/// Validation of some crazy things, such as definining `fields` and `references` on different
+/// sides in the relation.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>fields_references_mixups(relation: InlineRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">let </span>(forward, back) = <span class="kw">match </span>(relation.forward_relation_field(), relation.back_relation_field()) {
+        (<span class="prelude-val">Some</span>(forward), <span class="prelude-val">Some</span>(back)) <span class="kw">if </span>ctx.diagnostics.errors().is_empty() =&gt; (forward, back),
+        <span class="kw">_ </span>=&gt; <span class="kw">return</span>,
     };
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">is_empty_fields</span>(<span class="ident">forward</span>.<span class="ident">referencing_fields</span>()) <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">is_empty_fields</span>(<span class="ident">back</span>.<span class="ident">referenced_fields</span>()) {
-        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
+    <span class="kw">if </span>!is_empty_fields(forward.referencing_fields()) &amp;&amp; !is_empty_fields(back.referenced_fields()) {
+        <span class="kw">let </span>message = <span class="macro">format!</span>(
             <span class="string">&quot;The relation field `{}` on Model `{}` provides the `fields` argument in the {} attribute. And the related field `{}` on Model `{}` provides the `references` argument. You must provide both arguments on the same side.&quot;</span>,
-            <span class="ident">forward</span>.<span class="ident">name</span>(), <span class="ident">forward</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">RELATION_ATTRIBUTE_NAME</span>, <span class="ident">back</span>.<span class="ident">name</span>(), <span class="ident">back</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
+            forward.name(), forward.model().name(), RELATION_ATTRIBUTE_NAME, back.name(), back.model().name(),
         );
 
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-            <span class="kw-2">&amp;</span><span class="ident">message</span>,
-            <span class="ident">RELATION_ATTRIBUTE_NAME</span>,
-            <span class="ident">forward</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            <span class="kw-2">&amp;</span>message,
+            RELATION_ATTRIBUTE_NAME,
+            forward.ast_field().span(),
         ));
 
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-            <span class="kw-2">&amp;</span><span class="ident">message</span>,
-            <span class="ident">RELATION_ATTRIBUTE_NAME</span>,
-            <span class="ident">back</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            <span class="kw-2">&amp;</span>message,
+            RELATION_ATTRIBUTE_NAME,
+            back.ast_field().span(),
         ));
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">is_empty_fields</span>(<span class="ident">forward</span>.<span class="ident">referenced_fields</span>()) <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">is_empty_fields</span>(<span class="ident">back</span>.<span class="ident">referencing_fields</span>()) {
-        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
+    <span class="kw">if </span>!is_empty_fields(forward.referenced_fields()) &amp;&amp; !is_empty_fields(back.referencing_fields()) {
+        <span class="kw">let </span>message = <span class="macro">format!</span>(
             <span class="string">&quot;The relation field `{}` on Model `{}` provides the `references` argument in the {} attribute. And the related field `{}` on Model `{}` provides the `fields` argument. You must provide both arguments on the same side.&quot;</span>,
-            <span class="ident">forward</span>.<span class="ident">name</span>(), <span class="ident">forward</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">RELATION_ATTRIBUTE_NAME</span>, <span class="ident">back</span>.<span class="ident">name</span>(), <span class="ident">back</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
+            forward.name(), forward.model().name(), RELATION_ATTRIBUTE_NAME, back.name(), back.model().name(),
         );
 
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-            <span class="kw-2">&amp;</span><span class="ident">message</span>,
-            <span class="ident">RELATION_ATTRIBUTE_NAME</span>,
-            <span class="ident">forward</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            <span class="kw-2">&amp;</span>message,
+            RELATION_ATTRIBUTE_NAME,
+            forward.ast_field().span(),
         ));
     }
 }
 
-<span class="doccomment">/// The back-relation side cannot be required.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">back_relation_arity_is_optional</span>(<span class="ident">relation</span>: <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> (<span class="ident">forward</span>, <span class="ident">back</span>) <span class="op">=</span> <span class="kw">match</span> (<span class="ident">relation</span>.<span class="ident">forward_relation_field</span>(), <span class="ident">relation</span>.<span class="ident">back_relation_field</span>()) {
-        (<span class="prelude-val">Some</span>(<span class="ident">forward</span>), <span class="prelude-val">Some</span>(<span class="ident">back</span>)) <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">diagnostics</span>.<span class="ident">errors</span>().<span class="ident">is_empty</span>() =&gt; (<span class="ident">forward</span>, <span class="ident">back</span>),
-        <span class="kw">_</span> =&gt; <span class="kw">return</span>,
+<span class="doccomment">/// The back-relation side cannot be required.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>back_relation_arity_is_optional(relation: InlineRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">let </span>(forward, back) = <span class="kw">match </span>(relation.forward_relation_field(), relation.back_relation_field()) {
+        (<span class="prelude-val">Some</span>(forward), <span class="prelude-val">Some</span>(back)) <span class="kw">if </span>ctx.diagnostics.errors().is_empty() =&gt; (forward, back),
+        <span class="kw">_ </span>=&gt; <span class="kw">return</span>,
     };
 
-    <span class="kw">if</span> <span class="ident">back</span>.<span class="ident">ast_field</span>().<span class="ident">arity</span>.<span class="ident">is_required</span>() {
-        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
+    <span class="kw">if </span>back.ast_field().arity.is_required() {
+        <span class="kw">let </span>message = <span class="macro">format!</span>(
             <span class="string">&quot;The relation field `{}` on Model `{}` is required. This is no longer valid because it&#39;s not possible to enforce this constraint on the database level. Please change the field type from `{}` to `{}?` to fix this.&quot;</span>,
-            <span class="ident">back</span>.<span class="ident">name</span>(), <span class="ident">back</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">forward</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="ident">forward</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
+            back.name(), back.model().name(), forward.model().name(), forward.model().name(),
         );
 
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-            <span class="kw-2">&amp;</span><span class="ident">message</span>,
-            <span class="ident">RELATION_ATTRIBUTE_NAME</span>,
-            <span class="ident">back</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            <span class="kw-2">&amp;</span>message,
+            RELATION_ATTRIBUTE_NAME,
+            back.ast_field().span(),
         ));
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">fields_and_references_on_wrong_side</span>(<span class="ident">relation</span>: <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> (<span class="ident">forward</span>, <span class="ident">back</span>) <span class="op">=</span> <span class="kw">match</span> (<span class="ident">relation</span>.<span class="ident">forward_relation_field</span>(), <span class="ident">relation</span>.<span class="ident">back_relation_field</span>()) {
-        (<span class="prelude-val">Some</span>(<span class="ident">forward</span>), <span class="prelude-val">Some</span>(<span class="ident">back</span>)) <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">diagnostics</span>.<span class="ident">errors</span>().<span class="ident">is_empty</span>() =&gt; (<span class="ident">forward</span>, <span class="ident">back</span>),
-        <span class="kw">_</span> =&gt; <span class="kw">return</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>fields_and_references_on_wrong_side(relation: InlineRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">let </span>(forward, back) = <span class="kw">match </span>(relation.forward_relation_field(), relation.back_relation_field()) {
+        (<span class="prelude-val">Some</span>(forward), <span class="prelude-val">Some</span>(back)) <span class="kw">if </span>ctx.diagnostics.errors().is_empty() =&gt; (forward, back),
+        <span class="kw">_ </span>=&gt; <span class="kw">return</span>,
     };
 
-    <span class="kw">if</span> <span class="ident">forward</span>.<span class="ident">is_required</span>() <span class="op">&amp;&amp;</span> (<span class="ident">back</span>.<span class="ident">referencing_fields</span>().<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">back</span>.<span class="ident">referenced_fields</span>().<span class="ident">is_some</span>()) {
-        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="macro">format!</span>(
+    <span class="kw">if </span>forward.is_required() &amp;&amp; (back.referencing_fields().is_some() || back.referenced_fields().is_some()) {
+        <span class="kw">let </span>message = <span class="macro">format!</span>(
             <span class="string">&quot;The relation field `{back_model}.{back_field}` defines the `fields` and/or `references` argument. You must set them on the required side of the relation (`{forward_model}.{forward_field}`) in order for the constraints to be enforced. Alternatively, you can change this field to be required and the opposite optional, or make both sides of the relation optional.&quot;</span>,
-            <span class="ident">back_model</span> <span class="op">=</span> <span class="ident">back</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
-            <span class="ident">back_field</span> <span class="op">=</span> <span class="ident">back</span>.<span class="ident">name</span>(),
-            <span class="ident">forward_model</span> <span class="op">=</span> <span class="ident">forward</span>.<span class="ident">model</span>().<span class="ident">name</span>(),
-            <span class="ident">forward_field</span> <span class="op">=</span> <span class="ident">forward</span>.<span class="ident">name</span>(),
+            back_model = back.model().name(),
+            back_field = back.name(),
+            forward_model = forward.model().name(),
+            forward_field = forward.name(),
         );
 
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-            <span class="kw-2">&amp;</span><span class="ident">message</span>,
-            <span class="ident">RELATION_ATTRIBUTE_NAME</span>,
-            <span class="ident">back</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            <span class="kw-2">&amp;</span>message,
+            RELATION_ATTRIBUTE_NAME,
+            back.ast_field().span(),
         ));
     }
 }
 
-<span class="doccomment">/// A 1:1 relation is enforced with a unique constraint. The</span>
-<span class="doccomment">/// referencing side must use a unique constraint to enforce the</span>
-<span class="doccomment">/// relation.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">fields_must_be_a_unique_constraint</span>(<span class="ident">relation</span>: <span class="ident">InlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="ident">forward</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">relation</span>.<span class="ident">forward_relation_field</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">field</span>) =&gt; <span class="ident">field</span>,
-        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
+<span class="doccomment">/// A 1:1 relation is enforced with a unique constraint. The
+/// referencing side must use a unique constraint to enforce the
+/// relation.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>fields_must_be_a_unique_constraint(relation: InlineRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">let </span>forward = <span class="kw">match </span>relation.forward_relation_field() {
+        <span class="prelude-val">Some</span>(field) =&gt; field,
+        <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
     };
 
-    <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">referencing_model</span>();
+    <span class="kw">let </span>model = relation.referencing_model();
 
-    <span class="kw">let</span> <span class="ident">is_unique</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">unique_criterias</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">fields</span>) <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">referencing_fields</span>() {
-            <span class="ident">fields</span>
-        } <span class="kw">else</span> {
-            <span class="kw">return</span> <span class="bool-val">true</span>;
+    <span class="kw">let </span>is_unique = model.unique_criterias().any(|c| {
+        <span class="kw">let </span>fields = <span class="kw">if let </span><span class="prelude-val">Some</span>(fields) = relation.referencing_fields() {
+            fields
+        } <span class="kw">else </span>{
+            <span class="kw">return </span><span class="bool-val">true</span>;
         };
 
-        <span class="ident">c</span>.<span class="ident">contains_exactly_fields</span>(<span class="ident">fields</span>)
+        c.contains_exactly_fields(fields)
     });
 
-    <span class="kw">if</span> <span class="ident">is_unique</span> {
+    <span class="kw">if </span>is_unique {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">fields</span>) <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">referencing_fields</span>() {
-        <span class="ident">fields</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>()).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-    } <span class="kw">else</span> {
+    <span class="kw">let </span>fields = <span class="kw">if let </span><span class="prelude-val">Some</span>(fields) = relation.referencing_fields() {
+        fields.map(|f| f.name()).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
+    } <span class="kw">else </span>{
         <span class="kw">return</span>;
     };
 
-    <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
-        <span class="macro">format!</span>(<span class="string">&quot;A one-to-one relation must use unique fields on the defining side. Either add an `@unique` attribute to the field `{}`, or change the relation to one-to-many.&quot;</span>, <span class="ident">fields</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>))
-    } <span class="kw">else</span> {
-        <span class="macro">format!</span>(<span class="string">&quot;A one-to-one relation must use unique fields on the defining side. Either add an `@@unique([{}])` attribute to the model, or change the relation to one-to-many.&quot;</span>, <span class="ident">fields</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>))
+    <span class="kw">let </span>message = <span class="kw">if </span>fields.len() == <span class="number">1 </span>{
+        <span class="macro">format!</span>(<span class="string">&quot;A one-to-one relation must use unique fields on the defining side. Either add an `@unique` attribute to the field `{}`, or change the relation to one-to-many.&quot;</span>, fields.join(<span class="string">&quot;, &quot;</span>))
+    } <span class="kw">else </span>{
+        <span class="macro">format!</span>(<span class="string">&quot;A one-to-one relation must use unique fields on the defining side. Either add an `@@unique([{}])` attribute to the model, or change the relation to one-to-many.&quot;</span>, fields.join(<span class="string">&quot;, &quot;</span>))
     };
 
-    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-        <span class="kw-2">&amp;</span><span class="ident">message</span>,
-        <span class="ident">RELATION_ATTRIBUTE_NAME</span>,
-        <span class="ident">forward</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>(),
+    ctx.push_error(DatamodelError::new_attribute_validation_error(
+        <span class="kw-2">&amp;</span>message,
+        RELATION_ATTRIBUTE_NAME,
+        forward.ast_field().span(),
     ));
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../../" data-current-crate="psl_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../../" data-current-crate="psl_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

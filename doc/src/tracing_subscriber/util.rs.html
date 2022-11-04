@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/util.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>util.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tracing_subscriber/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/util.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>util.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tracing_subscriber/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tracing_subscriber/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -153,158 +153,158 @@
 <span id="151">151</span>
 <span id="152">152</span>
 <span id="153">153</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Extension traits and other utilities to make working with subscribers more</span>
-<span class="doccomment">//! ergonomic.</span>
-<span class="kw">use</span> <span class="ident">core::fmt</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::error::Error</span>;
-<span class="kw">use</span> <span class="ident">tracing_core::dispatcher</span>::{<span class="self">self</span>, <span class="ident">Dispatch</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tracing-log&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">tracing_log::AsLog</span>;
+</pre><pre class="rust"><code><span class="doccomment">//! Extension traits and other utilities to make working with subscribers more
+//! ergonomic.
+</span><span class="kw">use </span>core::fmt;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">use </span>std::error::Error;
+<span class="kw">use </span>tracing_core::dispatcher::{<span class="self">self</span>, Dispatch};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tracing-log&quot;</span>)]
+</span><span class="kw">use </span>tracing_log::AsLog;
 
-<span class="doccomment">/// Extension trait adding utility methods for subscriber initialization.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This trait provides extension methods to make configuring and setting a</span>
-<span class="doccomment">/// [default subscriber] more ergonomic. It is automatically implemented for all</span>
-<span class="doccomment">/// types that can be converted into a [trace dispatcher]. Since `Dispatch`</span>
-<span class="doccomment">/// implements `From&lt;T&gt;` for all `T: Subscriber`, all `Subscriber`</span>
-<span class="doccomment">/// implementations will implement this extension trait as well. Types which</span>
-<span class="doccomment">/// can be converted into `Subscriber`s, such as builders that construct a</span>
-<span class="doccomment">/// `Subscriber`, may implement `Into&lt;Dispatch&gt;`, and will also receive an</span>
-<span class="doccomment">/// implementation of this trait.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [default subscriber]: https://docs.rs/tracing/0.1.21/tracing/dispatcher/index.html#setting-the-default-subscriber</span>
-<span class="doccomment">/// [trace dispatcher]: https://docs.rs/tracing/0.1.21/tracing/dispatcher/index.html</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">SubscriberInitExt</span>
-<span class="kw">where</span>
-    <span class="self">Self</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Dispatch</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Extension trait adding utility methods for subscriber initialization.
+///
+/// This trait provides extension methods to make configuring and setting a
+/// [default subscriber] more ergonomic. It is automatically implemented for all
+/// types that can be converted into a [trace dispatcher]. Since `Dispatch`
+/// implements `From&lt;T&gt;` for all `T: Subscriber`, all `Subscriber`
+/// implementations will implement this extension trait as well. Types which
+/// can be converted into `Subscriber`s, such as builders that construct a
+/// `Subscriber`, may implement `Into&lt;Dispatch&gt;`, and will also receive an
+/// implementation of this trait.
+///
+/// [default subscriber]: https://docs.rs/tracing/0.1.21/tracing/dispatcher/index.html#setting-the-default-subscriber
+/// [trace dispatcher]: https://docs.rs/tracing/0.1.21/tracing/dispatcher/index.html
+</span><span class="kw">pub trait </span>SubscriberInitExt
+<span class="kw">where
+    </span><span class="self">Self</span>: Into&lt;Dispatch&gt;,
 {
-    <span class="doccomment">/// Sets `self` as the [default subscriber] in the current scope, returning a</span>
-    <span class="doccomment">/// guard that will unset it when dropped.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the &quot;tracing-log&quot; feature flag is enabled, this will also initialize</span>
-    <span class="doccomment">/// a [`log`] compatibility layer. This allows the subscriber to consume</span>
-    <span class="doccomment">/// `log::Record`s as though they were `tracing` `Event`s.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [default subscriber]: https://docs.rs/tracing/0.1.21/tracing/dispatcher/index.html#setting-the-default-subscriber</span>
-    <span class="doccomment">/// [`log`]: https://crates.io/log</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)))]</span>
-    <span class="kw">fn</span> <span class="ident">set_default</span>(<span class="self">self</span>) -&gt; <span class="ident">dispatcher::DefaultGuard</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tracing-log&quot;</span>)]</span>
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">tracing_log::LogTracer::init</span>();
+    <span class="doccomment">/// Sets `self` as the [default subscriber] in the current scope, returning a
+    /// guard that will unset it when dropped.
+    ///
+    /// If the &quot;tracing-log&quot; feature flag is enabled, this will also initialize
+    /// a [`log`] compatibility layer. This allows the subscriber to consume
+    /// `log::Record`s as though they were `tracing` `Event`s.
+    ///
+    /// [default subscriber]: https://docs.rs/tracing/0.1.21/tracing/dispatcher/index.html#setting-the-default-subscriber
+    /// [`log`]: https://crates.io/log
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;std&quot;</span>)))]
+    </span><span class="kw">fn </span>set_default(<span class="self">self</span>) -&gt; dispatcher::DefaultGuard {
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;tracing-log&quot;</span>)]
+        </span><span class="kw">let _ </span>= tracing_log::LogTracer::init();
 
-        <span class="ident">dispatcher::set_default</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">into</span>())
+        dispatcher::set_default(<span class="kw-2">&amp;</span><span class="self">self</span>.into())
     }
 
-    <span class="doccomment">/// Attempts to set `self` as the [global default subscriber] in the current</span>
-    <span class="doccomment">/// scope, returning an error if one is already set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the &quot;tracing-log&quot; feature flag is enabled, this will also attempt to</span>
-    <span class="doccomment">/// initialize a [`log`] compatibility layer. This allows the subscriber to</span>
-    <span class="doccomment">/// consume `log::Record`s as though they were `tracing` `Event`s.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method returns an error if a global default subscriber has already</span>
-    <span class="doccomment">/// been set, or if a `log` logger has already been set (when the</span>
-    <span class="doccomment">/// &quot;tracing-log&quot; feature is enabled).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [global default subscriber]: https://docs.rs/tracing/0.1.21/tracing/dispatcher/index.html#setting-the-default-subscriber</span>
-    <span class="doccomment">/// [`log`]: https://crates.io/log</span>
-    <span class="kw">fn</span> <span class="ident">try_init</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TryInitError</span><span class="op">&gt;</span> {
-        <span class="ident">dispatcher::set_global_default</span>(<span class="self">self</span>.<span class="ident">into</span>()).<span class="ident">map_err</span>(<span class="ident">TryInitError::new</span>)<span class="question-mark">?</span>;
+    <span class="doccomment">/// Attempts to set `self` as the [global default subscriber] in the current
+    /// scope, returning an error if one is already set.
+    ///
+    /// If the &quot;tracing-log&quot; feature flag is enabled, this will also attempt to
+    /// initialize a [`log`] compatibility layer. This allows the subscriber to
+    /// consume `log::Record`s as though they were `tracing` `Event`s.
+    ///
+    /// This method returns an error if a global default subscriber has already
+    /// been set, or if a `log` logger has already been set (when the
+    /// &quot;tracing-log&quot; feature is enabled).
+    ///
+    /// [global default subscriber]: https://docs.rs/tracing/0.1.21/tracing/dispatcher/index.html#setting-the-default-subscriber
+    /// [`log`]: https://crates.io/log
+    </span><span class="kw">fn </span>try_init(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), TryInitError&gt; {
+        dispatcher::set_global_default(<span class="self">self</span>.into()).map_err(TryInitError::new)<span class="question-mark">?</span>;
 
-        <span class="comment">// Since we are setting the global default subscriber, we can</span>
-        <span class="comment">// opportunistically go ahead and set its global max level hint as</span>
-        <span class="comment">// the max level for the `log` crate as well. This should make</span>
-        <span class="comment">// skipping `log` diagnostics much faster.</span>
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tracing-log&quot;</span>)]</span>
-        <span class="ident">tracing_log::LogTracer::builder</span>()
-            <span class="comment">// Note that we must call this *after* setting the global default</span>
-            <span class="comment">// subscriber, so that we get its max level hint.</span>
-            .<span class="ident">with_max_level</span>(<span class="ident">tracing_core::LevelFilter::current</span>().<span class="ident">as_log</span>())
-            .<span class="ident">init</span>()
-            .<span class="ident">map_err</span>(<span class="ident">TryInitError::new</span>)<span class="question-mark">?</span>;
+        <span class="comment">// Since we are setting the global default subscriber, we can
+        // opportunistically go ahead and set its global max level hint as
+        // the max level for the `log` crate as well. This should make
+        // skipping `log` diagnostics much faster.
+        </span><span class="attribute">#[cfg(feature = <span class="string">&quot;tracing-log&quot;</span>)]
+        </span>tracing_log::LogTracer::builder()
+            <span class="comment">// Note that we must call this *after* setting the global default
+            // subscriber, so that we get its max level hint.
+            </span>.with_max_level(tracing_core::LevelFilter::current().as_log())
+            .init()
+            .map_err(TryInitError::new)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Attempts to set `self` as the [global default subscriber] in the current</span>
-    <span class="doccomment">/// scope, panicking if this fails.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the &quot;tracing-log&quot; feature flag is enabled, this will also attempt to</span>
-    <span class="doccomment">/// initialize a [`log`] compatibility layer. This allows the subscriber to</span>
-    <span class="doccomment">/// consume `log::Record`s as though they were `tracing` `Event`s.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method panics if a global default subscriber has already been set,</span>
-    <span class="doccomment">/// or if a `log` logger has already been set (when the &quot;tracing-log&quot;</span>
-    <span class="doccomment">/// feature is enabled).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [global default subscriber]: https://docs.rs/tracing/0.1.21/tracing/dispatcher/index.html#setting-the-default-subscriber</span>
-    <span class="doccomment">/// [`log`]: https://crates.io/log</span>
-    <span class="kw">fn</span> <span class="ident">init</span>(<span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">try_init</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;failed to set global default subscriber&quot;</span>)
+    <span class="doccomment">/// Attempts to set `self` as the [global default subscriber] in the current
+    /// scope, panicking if this fails.
+    ///
+    /// If the &quot;tracing-log&quot; feature flag is enabled, this will also attempt to
+    /// initialize a [`log`] compatibility layer. This allows the subscriber to
+    /// consume `log::Record`s as though they were `tracing` `Event`s.
+    ///
+    /// This method panics if a global default subscriber has already been set,
+    /// or if a `log` logger has already been set (when the &quot;tracing-log&quot;
+    /// feature is enabled).
+    ///
+    /// [global default subscriber]: https://docs.rs/tracing/0.1.21/tracing/dispatcher/index.html#setting-the-default-subscriber
+    /// [`log`]: https://crates.io/log
+    </span><span class="kw">fn </span>init(<span class="self">self</span>) {
+        <span class="self">self</span>.try_init()
+            .expect(<span class="string">&quot;failed to set global default subscriber&quot;</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">SubscriberInitExt</span> <span class="kw">for</span> <span class="ident">T</span> <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Dispatch</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span>&lt;T&gt; SubscriberInitExt <span class="kw">for </span>T <span class="kw">where </span>T: Into&lt;Dispatch&gt; {}
 
-<span class="doccomment">/// Error returned by [`try_init`](SubscriberInitExt::try_init) if a global default subscriber could not be initialized.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TryInitError</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="ident">inner</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Error returned by [`try_init`](SubscriberInitExt::try_init) if a global default subscriber could not be initialized.
+</span><span class="kw">pub struct </span>TryInitError {
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+    </span>inner: Box&lt;<span class="kw">dyn </span>Error + Send + Sync + <span class="lifetime">&#39;static</span>&gt;,
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-    <span class="ident">_p</span>: (),
+    <span class="attribute">#[cfg(not(feature = <span class="string">&quot;std&quot;</span>))]
+    </span>_p: (),
 }
 
-<span class="comment">// ==== impl TryInitError ====</span>
+<span class="comment">// ==== impl TryInitError ====
 
-<span class="kw">impl</span> <span class="ident">TryInitError</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">e</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">inner</span>: <span class="ident">e</span>.<span class="ident">into</span>() }
+</span><span class="kw">impl </span>TryInitError {
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+    </span><span class="kw">fn </span>new(e: <span class="kw">impl </span>Into&lt;Box&lt;<span class="kw">dyn </span>Error + Send + Sync + <span class="lifetime">&#39;static</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ inner: e.into() }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw">_</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">_p</span>: () }
+    <span class="attribute">#[cfg(not(feature = <span class="string">&quot;std&quot;</span>))]
+    </span><span class="kw">fn </span>new&lt;T&gt;(<span class="kw">_</span>: T) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ _p: () }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">TryInitError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-        {
-            <span class="ident">fmt::Debug::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>, <span class="ident">f</span>)
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>TryInitError {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+        </span>{
+            fmt::Debug::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, f)
         }
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-        {
-            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;TryInitError(())&quot;</span>)
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">TryInitError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-        {
-            <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>, <span class="ident">f</span>)
-        }
-
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-        {
-            <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;failed to set global default subscriber&quot;</span>)
+        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;std&quot;</span>))]
+        </span>{
+            f.write_str(<span class="string">&quot;TryInitError(())&quot;</span>)
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">Error</span> <span class="kw">for</span> <span class="ident">TryInitError</span> {
-    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">source</span>()
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>TryInitError {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+        </span>{
+            fmt::Display::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, f)
+        }
+
+        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;std&quot;</span>))]
+        </span>{
+            f.write_str(<span class="string">&quot;failed to set global default subscriber&quot;</span>)
+        }
+    }
+}
+
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">impl </span>Error <span class="kw">for </span>TryInitError {
+    <span class="kw">fn </span>source(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>(<span class="kw">dyn </span>Error + <span class="lifetime">&#39;static</span>)&gt; {
+        <span class="self">self</span>.inner.source()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

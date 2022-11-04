@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/vte-0.10.1/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../vte/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../vte/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../vte/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/vte-0.10.1/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../vte/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../vte/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../vte/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -971,978 +971,978 @@
 <span id="971">971</span>
 <span id="972">972</span>
 <span id="973">973</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Parser for implementing virtual terminal emulators</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`Parser`] is implemented according to [Paul Williams&#39; ANSI parser</span>
-<span class="doccomment">//! state machine]. The state machine doesn&#39;t assign meaning to the parsed data</span>
-<span class="doccomment">//! and is thus not itself sufficient for writing a terminal emulator. Instead,</span>
-<span class="doccomment">//! it is expected that an implementation of [`Perform`] is provided which does</span>
-<span class="doccomment">//! something useful with the parsed data. The [`Parser`] handles the book</span>
-<span class="doccomment">//! keeping, and the [`Perform`] gets to simply handle actions.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Examples</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! For an example of using the [`Parser`] please see the examples folder. The example included</span>
-<span class="doccomment">//! there simply logs all the actions [`Perform`] does. One quick thing to see it in action is to</span>
-<span class="doccomment">//! pipe `vim` into it</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```sh</span>
-<span class="doccomment">//! cargo build --release --example parselog</span>
-<span class="doccomment">//! vim | target/release/examples/parselog</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Just type `:q` to exit.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Differences from original state machine description</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! * UTF-8 Support for Input</span>
-<span class="doccomment">//! * OSC Strings can be terminated by 0x07</span>
-<span class="doccomment">//! * Only supports 7-bit codes. Some 8-bit codes are still supported, but they no longer work in</span>
-<span class="doccomment">//!   all states.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`Parser`]: struct.Parser.html</span>
-<span class="doccomment">//! [`Perform`]: trait.Perform.html</span>
-<span class="doccomment">//! [Paul Williams&#39; ANSI parser state machine]: https://vt100.net/emu/dec_ansi_parser</span>
-<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">clippy::all</span>, <span class="ident">clippy::if_not_else</span>, <span class="ident">clippy::enum_glob_use</span>, <span class="ident">clippy::wrong_pub_self_convention</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>, <span class="ident">test</span>), <span class="ident">feature</span>(<span class="ident">test</span>))]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;no_std&quot;</span>, <span class="ident">no_std</span>)]</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Parser for implementing virtual terminal emulators
+//!
+//! [`Parser`] is implemented according to [Paul Williams&#39; ANSI parser
+//! state machine]. The state machine doesn&#39;t assign meaning to the parsed data
+//! and is thus not itself sufficient for writing a terminal emulator. Instead,
+//! it is expected that an implementation of [`Perform`] is provided which does
+//! something useful with the parsed data. The [`Parser`] handles the book
+//! keeping, and the [`Perform`] gets to simply handle actions.
+//!
+//! # Examples
+//!
+//! For an example of using the [`Parser`] please see the examples folder. The example included
+//! there simply logs all the actions [`Perform`] does. One quick thing to see it in action is to
+//! pipe `vim` into it
+//!
+//! ```sh
+//! cargo build --release --example parselog
+//! vim | target/release/examples/parselog
+//! ```
+//!
+//! Just type `:q` to exit.
+//!
+//! # Differences from original state machine description
+//!
+//! * UTF-8 Support for Input
+//! * OSC Strings can be terminated by 0x07
+//! * Only supports 7-bit codes. Some 8-bit codes are still supported, but they no longer work in
+//!   all states.
+//!
+//! [`Parser`]: struct.Parser.html
+//! [`Perform`]: trait.Perform.html
+//! [Paul Williams&#39; ANSI parser state machine]: https://vt100.net/emu/dec_ansi_parser
+</span><span class="attribute">#![deny(clippy::all, clippy::if_not_else, clippy::enum_glob_use, clippy::wrong_pub_self_convention)]
+#![cfg_attr(all(feature = <span class="string">&quot;nightly&quot;</span>, test), feature(test))]
+#![cfg_attr(feature = <span class="string">&quot;no_std&quot;</span>, no_std)]
 
-<span class="kw">use</span> <span class="ident">core::mem::MaybeUninit</span>;
+</span><span class="kw">use </span>core::mem::MaybeUninit;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;no_std&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">arrayvec::ArrayVec</span>;
-<span class="kw">use</span> <span class="ident">utf8parse</span> <span class="kw">as</span> <span class="ident">utf8</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;no_std&quot;</span>)]
+</span><span class="kw">use </span>arrayvec::ArrayVec;
+<span class="kw">use </span>utf8parse <span class="kw">as </span>utf8;
 
-<span class="kw">mod</span> <span class="ident">definitions</span>;
-<span class="kw">mod</span> <span class="ident">params</span>;
-<span class="kw">mod</span> <span class="ident">table</span>;
+<span class="kw">mod </span>definitions;
+<span class="kw">mod </span>params;
+<span class="kw">mod </span>table;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">params</span>::{<span class="ident">Params</span>, <span class="ident">ParamsIter</span>};
+<span class="kw">pub use </span>params::{Params, ParamsIter};
 
-<span class="kw">use</span> <span class="ident">definitions</span>::{<span class="ident">unpack</span>, <span class="ident">Action</span>, <span class="ident">State</span>};
+<span class="kw">use </span>definitions::{unpack, Action, State};
 
-<span class="kw">const</span> <span class="ident">MAX_INTERMEDIATES</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">2</span>;
-<span class="kw">const</span> <span class="ident">MAX_OSC_PARAMS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">16</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;no_std&quot;</span>, <span class="ident">test</span>))]</span>
-<span class="kw">const</span> <span class="ident">MAX_OSC_RAW</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1024</span>;
+<span class="kw">const </span>MAX_INTERMEDIATES: usize = <span class="number">2</span>;
+<span class="kw">const </span>MAX_OSC_PARAMS: usize = <span class="number">16</span>;
+<span class="attribute">#[cfg(any(feature = <span class="string">&quot;no_std&quot;</span>, test))]
+</span><span class="kw">const </span>MAX_OSC_RAW: usize = <span class="number">1024</span>;
 
-<span class="kw">struct</span> <span class="ident">VtUtf8Receiver</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">P</span>: <span class="ident">Perform</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">P</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">State</span>);
+<span class="kw">struct </span>VtUtf8Receiver&lt;<span class="lifetime">&#39;a</span>, P: Perform&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>P, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>State);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">P</span>: <span class="ident">Perform</span><span class="op">&gt;</span> <span class="ident">utf8::Receiver</span> <span class="kw">for</span> <span class="ident">VtUtf8Receiver</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">P</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">codepoint</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">c</span>: <span class="ident">char</span>) {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">print</span>(<span class="ident">c</span>);
-        <span class="kw-2">*</span><span class="self">self</span>.<span class="number">1</span> <span class="op">=</span> <span class="ident">State::Ground</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, P: Perform&gt; utf8::Receiver <span class="kw">for </span>VtUtf8Receiver&lt;<span class="lifetime">&#39;a</span>, P&gt; {
+    <span class="kw">fn </span>codepoint(<span class="kw-2">&amp;mut </span><span class="self">self</span>, c: char) {
+        <span class="self">self</span>.<span class="number">0</span>.print(c);
+        <span class="kw-2">*</span><span class="self">self</span>.<span class="number">1 </span>= State::Ground;
     }
 
-    <span class="kw">fn</span> <span class="ident">invalid_sequence</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">print</span>(<span class="string">&#39;�&#39;</span>);
-        <span class="kw-2">*</span><span class="self">self</span>.<span class="number">1</span> <span class="op">=</span> <span class="ident">State::Ground</span>;
+    <span class="kw">fn </span>invalid_sequence(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.<span class="number">0</span>.print(<span class="string">&#39;�&#39;</span>);
+        <span class="kw-2">*</span><span class="self">self</span>.<span class="number">1 </span>= State::Ground;
     }
 }
 
-<span class="doccomment">/// Parser for raw _VTE_ protocol which delegates actions to a [`Perform`]</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Perform`]: trait.Perform.html</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Parser</span> {
-    <span class="ident">state</span>: <span class="ident">State</span>,
-    <span class="ident">intermediates</span>: [<span class="ident">u8</span>; <span class="ident">MAX_INTERMEDIATES</span>],
-    <span class="ident">intermediate_idx</span>: <span class="ident">usize</span>,
-    <span class="ident">params</span>: <span class="ident">Params</span>,
-    <span class="ident">param</span>: <span class="ident">u16</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;no_std&quot;</span>)]</span>
-    <span class="ident">osc_raw</span>: <span class="ident">ArrayVec</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="ident">MAX_OSC_RAW</span>]<span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;no_std&quot;</span>))]</span>
-    <span class="ident">osc_raw</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="ident">osc_params</span>: [(<span class="ident">usize</span>, <span class="ident">usize</span>); <span class="ident">MAX_OSC_PARAMS</span>],
-    <span class="ident">osc_num_params</span>: <span class="ident">usize</span>,
-    <span class="ident">ignoring</span>: <span class="ident">bool</span>,
-    <span class="ident">utf8_parser</span>: <span class="ident">utf8::Parser</span>,
+<span class="doccomment">/// Parser for raw _VTE_ protocol which delegates actions to a [`Perform`]
+///
+/// [`Perform`]: trait.Perform.html
+</span><span class="attribute">#[derive(Default)]
+</span><span class="kw">pub struct </span>Parser {
+    state: State,
+    intermediates: [u8; MAX_INTERMEDIATES],
+    intermediate_idx: usize,
+    params: Params,
+    param: u16,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;no_std&quot;</span>)]
+    </span>osc_raw: ArrayVec&lt;[u8; MAX_OSC_RAW]&gt;,
+    <span class="attribute">#[cfg(not(feature = <span class="string">&quot;no_std&quot;</span>))]
+    </span>osc_raw: Vec&lt;u8&gt;,
+    osc_params: [(usize, usize); MAX_OSC_PARAMS],
+    osc_num_params: usize,
+    ignoring: bool,
+    utf8_parser: utf8::Parser,
 }
 
-<span class="kw">impl</span> <span class="ident">Parser</span> {
-    <span class="doccomment">/// Create a new Parser</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Parser</span> {
-        <span class="ident">Parser::default</span>()
+<span class="kw">impl </span>Parser {
+    <span class="doccomment">/// Create a new Parser
+    </span><span class="kw">pub fn </span>new() -&gt; Parser {
+        Parser::default()
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">params</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Params</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">params</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>params(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Params {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.params
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">intermediates</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">intermediates</span>[..<span class="self">self</span>.<span class="ident">intermediate_idx</span>]
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>intermediates(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.intermediates[..<span class="self">self</span>.intermediate_idx]
     }
 
-    <span class="doccomment">/// Advance the parser state</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Requires a [`Perform`] in case `byte` triggers an action</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Perform`]: trait.Perform.html</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">advance</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">Perform</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">performer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">P</span>, <span class="ident">byte</span>: <span class="ident">u8</span>) {
-        <span class="comment">// Utf8 characters are handled out-of-band.</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">State::Utf8</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span> {
-            <span class="self">self</span>.<span class="ident">process_utf8</span>(<span class="ident">performer</span>, <span class="ident">byte</span>);
+    <span class="doccomment">/// Advance the parser state
+    ///
+    /// Requires a [`Perform`] in case `byte` triggers an action
+    ///
+    /// [`Perform`]: trait.Perform.html
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>advance&lt;P: Perform&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, performer: <span class="kw-2">&amp;mut </span>P, byte: u8) {
+        <span class="comment">// Utf8 characters are handled out-of-band.
+        </span><span class="kw">if let </span>State::Utf8 = <span class="self">self</span>.state {
+            <span class="self">self</span>.process_utf8(performer, byte);
             <span class="kw">return</span>;
         }
 
-        <span class="comment">// Handle state changes in the anywhere state before evaluating changes</span>
-        <span class="comment">// for current state.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">change</span> <span class="op">=</span> <span class="ident">table::STATE_CHANGES</span>[<span class="ident">State::Anywhere</span> <span class="kw">as</span> <span class="ident">usize</span>][<span class="ident">byte</span> <span class="kw">as</span> <span class="ident">usize</span>];
+        <span class="comment">// Handle state changes in the anywhere state before evaluating changes
+        // for current state.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>change = table::STATE_CHANGES[State::Anywhere <span class="kw">as </span>usize][byte <span class="kw">as </span>usize];
 
-        <span class="kw">if</span> <span class="ident">change</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="ident">change</span> <span class="op">=</span> <span class="ident">table::STATE_CHANGES</span>[<span class="self">self</span>.<span class="ident">state</span> <span class="kw">as</span> <span class="ident">usize</span>][<span class="ident">byte</span> <span class="kw">as</span> <span class="ident">usize</span>];
+        <span class="kw">if </span>change == <span class="number">0 </span>{
+            change = table::STATE_CHANGES[<span class="self">self</span>.state <span class="kw">as </span>usize][byte <span class="kw">as </span>usize];
         }
 
-        <span class="comment">// Unpack into a state and action</span>
-        <span class="kw">let</span> (<span class="ident">state</span>, <span class="ident">action</span>) <span class="op">=</span> <span class="ident">unpack</span>(<span class="ident">change</span>);
+        <span class="comment">// Unpack into a state and action
+        </span><span class="kw">let </span>(state, action) = unpack(change);
 
-        <span class="self">self</span>.<span class="ident">perform_state_change</span>(<span class="ident">performer</span>, <span class="ident">state</span>, <span class="ident">action</span>, <span class="ident">byte</span>);
+        <span class="self">self</span>.perform_state_change(performer, state, action, byte);
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">process_utf8</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">performer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">P</span>, <span class="ident">byte</span>: <span class="ident">u8</span>)
-    <span class="kw">where</span>
-        <span class="ident">P</span>: <span class="ident">Perform</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>process_utf8&lt;P&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, performer: <span class="kw-2">&amp;mut </span>P, byte: u8)
+    <span class="kw">where
+        </span>P: Perform,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">receiver</span> <span class="op">=</span> <span class="ident">VtUtf8Receiver</span>(<span class="ident">performer</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">state</span>);
-        <span class="kw">let</span> <span class="ident">utf8_parser</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">utf8_parser</span>;
-        <span class="ident">utf8_parser</span>.<span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="ident">receiver</span>, <span class="ident">byte</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>receiver = VtUtf8Receiver(performer, <span class="kw-2">&amp;mut </span><span class="self">self</span>.state);
+        <span class="kw">let </span>utf8_parser = <span class="kw-2">&amp;mut </span><span class="self">self</span>.utf8_parser;
+        utf8_parser.advance(<span class="kw-2">&amp;mut </span>receiver, byte);
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">perform_state_change</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">performer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">P</span>, <span class="ident">state</span>: <span class="ident">State</span>, <span class="ident">action</span>: <span class="ident">Action</span>, <span class="ident">byte</span>: <span class="ident">u8</span>)
-    <span class="kw">where</span>
-        <span class="ident">P</span>: <span class="ident">Perform</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>perform_state_change&lt;P&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, performer: <span class="kw-2">&amp;mut </span>P, state: State, action: Action, byte: u8)
+    <span class="kw">where
+        </span>P: Perform,
     {
-        <span class="macro">macro_rules!</span> <span class="ident">maybe_action</span> {
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">action</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>:<span class="ident">expr</span>) =&gt; {
-                <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">action</span> {
-                    <span class="ident">Action::None</span> =&gt; (),
-                    <span class="ident">action</span> =&gt; {
-                        <span class="self">self</span>.<span class="ident">perform_action</span>(<span class="ident">performer</span>, <span class="ident">action</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>);
+        <span class="macro">macro_rules! </span>maybe_action {
+            (<span class="macro-nonterminal">$action</span>:expr, <span class="macro-nonterminal">$arg</span>:expr) =&gt; {
+                <span class="kw">match </span><span class="macro-nonterminal">$action </span>{
+                    Action::None =&gt; (),
+                    action =&gt; {
+                        <span class="self">self</span>.perform_action(performer, action, <span class="macro-nonterminal">$arg</span>);
                     },
                 }
             };
         }
 
-        <span class="kw">match</span> <span class="ident">state</span> {
-            <span class="ident">State::Anywhere</span> =&gt; {
-                <span class="comment">// Just run the action</span>
-                <span class="self">self</span>.<span class="ident">perform_action</span>(<span class="ident">performer</span>, <span class="ident">action</span>, <span class="ident">byte</span>);
+        <span class="kw">match </span>state {
+            State::Anywhere =&gt; {
+                <span class="comment">// Just run the action
+                </span><span class="self">self</span>.perform_action(performer, action, byte);
             },
-            <span class="ident">state</span> =&gt; {
-                <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span> {
-                    <span class="ident">State::DcsPassthrough</span> =&gt; {
-                        <span class="self">self</span>.<span class="ident">perform_action</span>(<span class="ident">performer</span>, <span class="ident">Action::Unhook</span>, <span class="ident">byte</span>);
+            state =&gt; {
+                <span class="kw">match </span><span class="self">self</span>.state {
+                    State::DcsPassthrough =&gt; {
+                        <span class="self">self</span>.perform_action(performer, Action::Unhook, byte);
                     },
-                    <span class="ident">State::OscString</span> =&gt; {
-                        <span class="self">self</span>.<span class="ident">perform_action</span>(<span class="ident">performer</span>, <span class="ident">Action::OscEnd</span>, <span class="ident">byte</span>);
+                    State::OscString =&gt; {
+                        <span class="self">self</span>.perform_action(performer, Action::OscEnd, byte);
                     },
-                    <span class="kw">_</span> =&gt; (),
+                    <span class="kw">_ </span>=&gt; (),
                 }
 
-                <span class="macro">maybe_action!</span>(<span class="ident">action</span>, <span class="ident">byte</span>);
+                <span class="macro">maybe_action!</span>(action, byte);
 
-                <span class="kw">match</span> <span class="ident">state</span> {
-                    <span class="ident">State::CsiEntry</span> <span class="op">|</span> <span class="ident">State::DcsEntry</span> <span class="op">|</span> <span class="ident">State::Escape</span> =&gt; {
-                        <span class="self">self</span>.<span class="ident">perform_action</span>(<span class="ident">performer</span>, <span class="ident">Action::Clear</span>, <span class="ident">byte</span>);
+                <span class="kw">match </span>state {
+                    State::CsiEntry | State::DcsEntry | State::Escape =&gt; {
+                        <span class="self">self</span>.perform_action(performer, Action::Clear, byte);
                     },
-                    <span class="ident">State::DcsPassthrough</span> =&gt; {
-                        <span class="self">self</span>.<span class="ident">perform_action</span>(<span class="ident">performer</span>, <span class="ident">Action::Hook</span>, <span class="ident">byte</span>);
+                    State::DcsPassthrough =&gt; {
+                        <span class="self">self</span>.perform_action(performer, Action::Hook, byte);
                     },
-                    <span class="ident">State::OscString</span> =&gt; {
-                        <span class="self">self</span>.<span class="ident">perform_action</span>(<span class="ident">performer</span>, <span class="ident">Action::OscStart</span>, <span class="ident">byte</span>);
+                    State::OscString =&gt; {
+                        <span class="self">self</span>.perform_action(performer, Action::OscStart, byte);
                     },
-                    <span class="kw">_</span> =&gt; (),
+                    <span class="kw">_ </span>=&gt; (),
                 }
 
-                <span class="comment">// Assume the new state</span>
-                <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">state</span>;
+                <span class="comment">// Assume the new state
+                </span><span class="self">self</span>.state = state;
             },
         }
     }
 
-    <span class="doccomment">/// Separate method for osc_dispatch that borrows self as read-only</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The aliasing is needed here for multiple slices into self.osc_raw</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">osc_dispatch</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">Perform</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">performer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">P</span>, <span class="ident">byte</span>: <span class="ident">u8</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">slices</span>: [<span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>; <span class="ident">MAX_OSC_PARAMS</span>] <span class="op">=</span>
-            <span class="kw">unsafe</span> { <span class="ident">MaybeUninit::uninit</span>().<span class="ident">assume_init</span>() };
+    <span class="doccomment">/// Separate method for osc_dispatch that borrows self as read-only
+    ///
+    /// The aliasing is needed here for multiple slices into self.osc_raw
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>osc_dispatch&lt;P: Perform&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, performer: <span class="kw-2">&amp;mut </span>P, byte: u8) {
+        <span class="kw">let </span><span class="kw-2">mut </span>slices: [MaybeUninit&lt;<span class="kw-2">&amp;</span>[u8]&gt;; MAX_OSC_PARAMS] =
+            <span class="kw">unsafe </span>{ MaybeUninit::uninit().assume_init() };
 
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">slice</span>) <span class="kw">in</span> <span class="ident">slices</span>.<span class="ident">iter_mut</span>().<span class="ident">enumerate</span>().<span class="ident">take</span>(<span class="self">self</span>.<span class="ident">osc_num_params</span>) {
-            <span class="kw">let</span> <span class="ident">indices</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">osc_params</span>[<span class="ident">i</span>];
-            <span class="kw-2">*</span><span class="ident">slice</span> <span class="op">=</span> <span class="ident">MaybeUninit::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">osc_raw</span>[<span class="ident">indices</span>.<span class="number">0</span>..<span class="ident">indices</span>.<span class="number">1</span>]);
+        <span class="kw">for </span>(i, slice) <span class="kw">in </span>slices.iter_mut().enumerate().take(<span class="self">self</span>.osc_num_params) {
+            <span class="kw">let </span>indices = <span class="self">self</span>.osc_params[i];
+            <span class="kw-2">*</span>slice = MaybeUninit::new(<span class="kw-2">&amp;</span><span class="self">self</span>.osc_raw[indices.<span class="number">0</span>..indices.<span class="number">1</span>]);
         }
 
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">num_params</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">osc_num_params</span>;
-            <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">slices</span>[..<span class="ident">num_params</span>] <span class="kw">as</span> <span class="kw-2">*const</span> [<span class="ident">MaybeUninit</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>] <span class="kw">as</span> <span class="kw-2">*const</span> [<span class="kw-2">&amp;</span>[<span class="ident">u8</span>]];
-            <span class="ident">performer</span>.<span class="ident">osc_dispatch</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">params</span>, <span class="ident">byte</span> <span class="op">==</span> <span class="number">0x07</span>);
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span>num_params = <span class="self">self</span>.osc_num_params;
+            <span class="kw">let </span>params = <span class="kw-2">&amp;</span>slices[..num_params] <span class="kw">as </span><span class="kw-2">*const </span>[MaybeUninit&lt;<span class="kw-2">&amp;</span>[u8]&gt;] <span class="kw">as </span><span class="kw-2">*const </span>[<span class="kw-2">&amp;</span>[u8]];
+            performer.osc_dispatch(<span class="kw-2">&amp;*</span>params, byte == <span class="number">0x07</span>);
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">perform_action</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">Perform</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">performer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">P</span>, <span class="ident">action</span>: <span class="ident">Action</span>, <span class="ident">byte</span>: <span class="ident">u8</span>) {
-        <span class="kw">match</span> <span class="ident">action</span> {
-            <span class="ident">Action::Print</span> =&gt; <span class="ident">performer</span>.<span class="ident">print</span>(<span class="ident">byte</span> <span class="kw">as</span> <span class="ident">char</span>),
-            <span class="ident">Action::Execute</span> =&gt; <span class="ident">performer</span>.<span class="ident">execute</span>(<span class="ident">byte</span>),
-            <span class="ident">Action::Hook</span> =&gt; {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">params</span>.<span class="ident">is_full</span>() {
-                    <span class="self">self</span>.<span class="ident">ignoring</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                } <span class="kw">else</span> {
-                    <span class="self">self</span>.<span class="ident">params</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">param</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>perform_action&lt;P: Perform&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, performer: <span class="kw-2">&amp;mut </span>P, action: Action, byte: u8) {
+        <span class="kw">match </span>action {
+            Action::Print =&gt; performer.print(byte <span class="kw">as </span>char),
+            Action::Execute =&gt; performer.execute(byte),
+            Action::Hook =&gt; {
+                <span class="kw">if </span><span class="self">self</span>.params.is_full() {
+                    <span class="self">self</span>.ignoring = <span class="bool-val">true</span>;
+                } <span class="kw">else </span>{
+                    <span class="self">self</span>.params.push(<span class="self">self</span>.param);
                 }
 
-                <span class="ident">performer</span>.<span class="ident">hook</span>(<span class="self">self</span>.<span class="ident">params</span>(), <span class="self">self</span>.<span class="ident">intermediates</span>(), <span class="self">self</span>.<span class="ident">ignoring</span>, <span class="ident">byte</span> <span class="kw">as</span> <span class="ident">char</span>);
+                performer.hook(<span class="self">self</span>.params(), <span class="self">self</span>.intermediates(), <span class="self">self</span>.ignoring, byte <span class="kw">as </span>char);
             },
-            <span class="ident">Action::Put</span> =&gt; <span class="ident">performer</span>.<span class="ident">put</span>(<span class="ident">byte</span>),
-            <span class="ident">Action::OscStart</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">osc_raw</span>.<span class="ident">clear</span>();
-                <span class="self">self</span>.<span class="ident">osc_num_params</span> <span class="op">=</span> <span class="number">0</span>;
+            Action::Put =&gt; performer.put(byte),
+            Action::OscStart =&gt; {
+                <span class="self">self</span>.osc_raw.clear();
+                <span class="self">self</span>.osc_num_params = <span class="number">0</span>;
             },
-            <span class="ident">Action::OscPut</span> =&gt; {
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;no_std&quot;</span>)]</span>
-                {
-                    <span class="kw">if</span> <span class="self">self</span>.<span class="ident">osc_raw</span>.<span class="ident">is_full</span>() {
+            Action::OscPut =&gt; {
+                <span class="attribute">#[cfg(feature = <span class="string">&quot;no_std&quot;</span>)]
+                </span>{
+                    <span class="kw">if </span><span class="self">self</span>.osc_raw.is_full() {
                         <span class="kw">return</span>;
                     }
                 }
 
-                <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">osc_raw</span>.<span class="ident">len</span>();
+                <span class="kw">let </span>idx = <span class="self">self</span>.osc_raw.len();
 
-                <span class="comment">// Param separator</span>
-                <span class="kw">if</span> <span class="ident">byte</span> <span class="op">==</span> <span class="string">b&#39;;&#39;</span> {
-                    <span class="kw">let</span> <span class="ident">param_idx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">osc_num_params</span>;
-                    <span class="kw">match</span> <span class="ident">param_idx</span> {
-                        <span class="comment">// Only process up to MAX_OSC_PARAMS</span>
-                        <span class="ident">MAX_OSC_PARAMS</span> =&gt; <span class="kw">return</span>,
+                <span class="comment">// Param separator
+                </span><span class="kw">if </span>byte == <span class="string">b&#39;;&#39; </span>{
+                    <span class="kw">let </span>param_idx = <span class="self">self</span>.osc_num_params;
+                    <span class="kw">match </span>param_idx {
+                        <span class="comment">// Only process up to MAX_OSC_PARAMS
+                        </span>MAX_OSC_PARAMS =&gt; <span class="kw">return</span>,
 
-                        <span class="comment">// First param is special - 0 to current byte index</span>
-                        <span class="number">0</span> =&gt; {
-                            <span class="self">self</span>.<span class="ident">osc_params</span>[<span class="ident">param_idx</span>] <span class="op">=</span> (<span class="number">0</span>, <span class="ident">idx</span>);
+                        <span class="comment">// First param is special - 0 to current byte index
+                        </span><span class="number">0 </span>=&gt; {
+                            <span class="self">self</span>.osc_params[param_idx] = (<span class="number">0</span>, idx);
                         },
 
-                        <span class="comment">// All other params depend on previous indexing</span>
-                        <span class="kw">_</span> =&gt; {
-                            <span class="kw">let</span> <span class="ident">prev</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">osc_params</span>[<span class="ident">param_idx</span> <span class="op">-</span> <span class="number">1</span>];
-                            <span class="kw">let</span> <span class="ident">begin</span> <span class="op">=</span> <span class="ident">prev</span>.<span class="number">1</span>;
-                            <span class="self">self</span>.<span class="ident">osc_params</span>[<span class="ident">param_idx</span>] <span class="op">=</span> (<span class="ident">begin</span>, <span class="ident">idx</span>);
+                        <span class="comment">// All other params depend on previous indexing
+                        </span><span class="kw">_ </span>=&gt; {
+                            <span class="kw">let </span>prev = <span class="self">self</span>.osc_params[param_idx - <span class="number">1</span>];
+                            <span class="kw">let </span>begin = prev.<span class="number">1</span>;
+                            <span class="self">self</span>.osc_params[param_idx] = (begin, idx);
                         },
                     }
 
-                    <span class="self">self</span>.<span class="ident">osc_num_params</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                } <span class="kw">else</span> {
-                    <span class="self">self</span>.<span class="ident">osc_raw</span>.<span class="ident">push</span>(<span class="ident">byte</span>);
+                    <span class="self">self</span>.osc_num_params += <span class="number">1</span>;
+                } <span class="kw">else </span>{
+                    <span class="self">self</span>.osc_raw.push(byte);
                 }
             },
-            <span class="ident">Action::OscEnd</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">param_idx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">osc_num_params</span>;
-                <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">osc_raw</span>.<span class="ident">len</span>();
+            Action::OscEnd =&gt; {
+                <span class="kw">let </span>param_idx = <span class="self">self</span>.osc_num_params;
+                <span class="kw">let </span>idx = <span class="self">self</span>.osc_raw.len();
 
-                <span class="kw">match</span> <span class="ident">param_idx</span> {
-                    <span class="comment">// Finish last parameter if not already maxed</span>
-                    <span class="ident">MAX_OSC_PARAMS</span> =&gt; (),
+                <span class="kw">match </span>param_idx {
+                    <span class="comment">// Finish last parameter if not already maxed
+                    </span>MAX_OSC_PARAMS =&gt; (),
 
-                    <span class="comment">// First param is special - 0 to current byte index</span>
-                    <span class="number">0</span> =&gt; {
-                        <span class="self">self</span>.<span class="ident">osc_params</span>[<span class="ident">param_idx</span>] <span class="op">=</span> (<span class="number">0</span>, <span class="ident">idx</span>);
-                        <span class="self">self</span>.<span class="ident">osc_num_params</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                    <span class="comment">// First param is special - 0 to current byte index
+                    </span><span class="number">0 </span>=&gt; {
+                        <span class="self">self</span>.osc_params[param_idx] = (<span class="number">0</span>, idx);
+                        <span class="self">self</span>.osc_num_params += <span class="number">1</span>;
                     },
 
-                    <span class="comment">// All other params depend on previous indexing</span>
-                    <span class="kw">_</span> =&gt; {
-                        <span class="kw">let</span> <span class="ident">prev</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">osc_params</span>[<span class="ident">param_idx</span> <span class="op">-</span> <span class="number">1</span>];
-                        <span class="kw">let</span> <span class="ident">begin</span> <span class="op">=</span> <span class="ident">prev</span>.<span class="number">1</span>;
-                        <span class="self">self</span>.<span class="ident">osc_params</span>[<span class="ident">param_idx</span>] <span class="op">=</span> (<span class="ident">begin</span>, <span class="ident">idx</span>);
-                        <span class="self">self</span>.<span class="ident">osc_num_params</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                    <span class="comment">// All other params depend on previous indexing
+                    </span><span class="kw">_ </span>=&gt; {
+                        <span class="kw">let </span>prev = <span class="self">self</span>.osc_params[param_idx - <span class="number">1</span>];
+                        <span class="kw">let </span>begin = prev.<span class="number">1</span>;
+                        <span class="self">self</span>.osc_params[param_idx] = (begin, idx);
+                        <span class="self">self</span>.osc_num_params += <span class="number">1</span>;
                     },
                 }
-                <span class="self">self</span>.<span class="ident">osc_dispatch</span>(<span class="ident">performer</span>, <span class="ident">byte</span>);
+                <span class="self">self</span>.osc_dispatch(performer, byte);
             },
-            <span class="ident">Action::Unhook</span> =&gt; <span class="ident">performer</span>.<span class="ident">unhook</span>(),
-            <span class="ident">Action::CsiDispatch</span> =&gt; {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">params</span>.<span class="ident">is_full</span>() {
-                    <span class="self">self</span>.<span class="ident">ignoring</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                } <span class="kw">else</span> {
-                    <span class="self">self</span>.<span class="ident">params</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">param</span>);
+            Action::Unhook =&gt; performer.unhook(),
+            Action::CsiDispatch =&gt; {
+                <span class="kw">if </span><span class="self">self</span>.params.is_full() {
+                    <span class="self">self</span>.ignoring = <span class="bool-val">true</span>;
+                } <span class="kw">else </span>{
+                    <span class="self">self</span>.params.push(<span class="self">self</span>.param);
                 }
 
-                <span class="ident">performer</span>.<span class="ident">csi_dispatch</span>(
-                    <span class="self">self</span>.<span class="ident">params</span>(),
-                    <span class="self">self</span>.<span class="ident">intermediates</span>(),
-                    <span class="self">self</span>.<span class="ident">ignoring</span>,
-                    <span class="ident">byte</span> <span class="kw">as</span> <span class="ident">char</span>,
+                performer.csi_dispatch(
+                    <span class="self">self</span>.params(),
+                    <span class="self">self</span>.intermediates(),
+                    <span class="self">self</span>.ignoring,
+                    byte <span class="kw">as </span>char,
                 );
             },
-            <span class="ident">Action::EscDispatch</span> =&gt; {
-                <span class="ident">performer</span>.<span class="ident">esc_dispatch</span>(<span class="self">self</span>.<span class="ident">intermediates</span>(), <span class="self">self</span>.<span class="ident">ignoring</span>, <span class="ident">byte</span>)
+            Action::EscDispatch =&gt; {
+                performer.esc_dispatch(<span class="self">self</span>.intermediates(), <span class="self">self</span>.ignoring, byte)
             },
-            <span class="ident">Action::Collect</span> =&gt; {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">intermediate_idx</span> <span class="op">==</span> <span class="ident">MAX_INTERMEDIATES</span> {
-                    <span class="self">self</span>.<span class="ident">ignoring</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                } <span class="kw">else</span> {
-                    <span class="self">self</span>.<span class="ident">intermediates</span>[<span class="self">self</span>.<span class="ident">intermediate_idx</span>] <span class="op">=</span> <span class="ident">byte</span>;
-                    <span class="self">self</span>.<span class="ident">intermediate_idx</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            Action::Collect =&gt; {
+                <span class="kw">if </span><span class="self">self</span>.intermediate_idx == MAX_INTERMEDIATES {
+                    <span class="self">self</span>.ignoring = <span class="bool-val">true</span>;
+                } <span class="kw">else </span>{
+                    <span class="self">self</span>.intermediates[<span class="self">self</span>.intermediate_idx] = byte;
+                    <span class="self">self</span>.intermediate_idx += <span class="number">1</span>;
                 }
             },
-            <span class="ident">Action::Param</span> =&gt; {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">params</span>.<span class="ident">is_full</span>() {
-                    <span class="self">self</span>.<span class="ident">ignoring</span> <span class="op">=</span> <span class="bool-val">true</span>;
+            Action::Param =&gt; {
+                <span class="kw">if </span><span class="self">self</span>.params.is_full() {
+                    <span class="self">self</span>.ignoring = <span class="bool-val">true</span>;
                     <span class="kw">return</span>;
                 }
 
-                <span class="kw">if</span> <span class="ident">byte</span> <span class="op">==</span> <span class="string">b&#39;;&#39;</span> {
-                    <span class="self">self</span>.<span class="ident">params</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">param</span>);
-                    <span class="self">self</span>.<span class="ident">param</span> <span class="op">=</span> <span class="number">0</span>;
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">byte</span> <span class="op">==</span> <span class="string">b&#39;:&#39;</span> {
-                    <span class="self">self</span>.<span class="ident">params</span>.<span class="ident">extend</span>(<span class="self">self</span>.<span class="ident">param</span>);
-                    <span class="self">self</span>.<span class="ident">param</span> <span class="op">=</span> <span class="number">0</span>;
-                } <span class="kw">else</span> {
-                    <span class="comment">// Continue collecting bytes into param</span>
-                    <span class="self">self</span>.<span class="ident">param</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">param</span>.<span class="ident">saturating_mul</span>(<span class="number">10</span>);
-                    <span class="self">self</span>.<span class="ident">param</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">param</span>.<span class="ident">saturating_add</span>((<span class="ident">byte</span> <span class="op">-</span> <span class="string">b&#39;0&#39;</span>) <span class="kw">as</span> <span class="ident">u16</span>);
+                <span class="kw">if </span>byte == <span class="string">b&#39;;&#39; </span>{
+                    <span class="self">self</span>.params.push(<span class="self">self</span>.param);
+                    <span class="self">self</span>.param = <span class="number">0</span>;
+                } <span class="kw">else if </span>byte == <span class="string">b&#39;:&#39; </span>{
+                    <span class="self">self</span>.params.extend(<span class="self">self</span>.param);
+                    <span class="self">self</span>.param = <span class="number">0</span>;
+                } <span class="kw">else </span>{
+                    <span class="comment">// Continue collecting bytes into param
+                    </span><span class="self">self</span>.param = <span class="self">self</span>.param.saturating_mul(<span class="number">10</span>);
+                    <span class="self">self</span>.param = <span class="self">self</span>.param.saturating_add((byte - <span class="string">b&#39;0&#39;</span>) <span class="kw">as </span>u16);
                 }
             },
-            <span class="ident">Action::Clear</span> =&gt; {
-                <span class="comment">// Reset everything on ESC/CSI/DCS entry</span>
-                <span class="self">self</span>.<span class="ident">intermediate_idx</span> <span class="op">=</span> <span class="number">0</span>;
-                <span class="self">self</span>.<span class="ident">ignoring</span> <span class="op">=</span> <span class="bool-val">false</span>;
-                <span class="self">self</span>.<span class="ident">param</span> <span class="op">=</span> <span class="number">0</span>;
+            Action::Clear =&gt; {
+                <span class="comment">// Reset everything on ESC/CSI/DCS entry
+                </span><span class="self">self</span>.intermediate_idx = <span class="number">0</span>;
+                <span class="self">self</span>.ignoring = <span class="bool-val">false</span>;
+                <span class="self">self</span>.param = <span class="number">0</span>;
 
-                <span class="self">self</span>.<span class="ident">params</span>.<span class="ident">clear</span>();
+                <span class="self">self</span>.params.clear();
             },
-            <span class="ident">Action::BeginUtf8</span> =&gt; <span class="self">self</span>.<span class="ident">process_utf8</span>(<span class="ident">performer</span>, <span class="ident">byte</span>),
-            <span class="ident">Action::Ignore</span> =&gt; (),
-            <span class="ident">Action::None</span> =&gt; (),
+            Action::BeginUtf8 =&gt; <span class="self">self</span>.process_utf8(performer, byte),
+            Action::Ignore =&gt; (),
+            Action::None =&gt; (),
         }
     }
 }
 
-<span class="doccomment">/// Performs actions requested by the Parser</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Actions in this case mean, for example, handling a CSI escape sequence describing cursor</span>
-<span class="doccomment">/// movement, or simply printing characters to the screen.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The methods on this type correspond to actions described in</span>
-<span class="doccomment">/// http://vt100.net/emu/dec_ansi_parser. I&#39;ve done my best to describe them in</span>
-<span class="doccomment">/// a useful way in my own words for completeness, but the site should be</span>
-<span class="doccomment">/// referenced if something isn&#39;t clear. If the site disappears at some point in</span>
-<span class="doccomment">/// the future, consider checking archive.org.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Perform</span> {
-    <span class="doccomment">/// Draw a character to the screen and update states.</span>
-    <span class="kw">fn</span> <span class="ident">print</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_c</span>: <span class="ident">char</span>) {}
+<span class="doccomment">/// Performs actions requested by the Parser
+///
+/// Actions in this case mean, for example, handling a CSI escape sequence describing cursor
+/// movement, or simply printing characters to the screen.
+///
+/// The methods on this type correspond to actions described in
+/// http://vt100.net/emu/dec_ansi_parser. I&#39;ve done my best to describe them in
+/// a useful way in my own words for completeness, but the site should be
+/// referenced if something isn&#39;t clear. If the site disappears at some point in
+/// the future, consider checking archive.org.
+</span><span class="kw">pub trait </span>Perform {
+    <span class="doccomment">/// Draw a character to the screen and update states.
+    </span><span class="kw">fn </span>print(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _c: char) {}
 
-    <span class="doccomment">/// Execute a C0 or C1 control function.</span>
-    <span class="kw">fn</span> <span class="ident">execute</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_byte</span>: <span class="ident">u8</span>) {}
+    <span class="doccomment">/// Execute a C0 or C1 control function.
+    </span><span class="kw">fn </span>execute(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _byte: u8) {}
 
-    <span class="doccomment">/// Invoked when a final character arrives in first part of device control string.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The control function should be determined from the private marker, final character, and</span>
-    <span class="doccomment">/// execute with a parameter list. A handler should be selected for remaining characters in the</span>
-    <span class="doccomment">/// string; the handler function should subsequently be called by `put` for every character in</span>
-    <span class="doccomment">/// the control string.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The `ignore` flag indicates that more than two intermediates arrived and</span>
-    <span class="doccomment">/// subsequent characters were ignored.</span>
-    <span class="kw">fn</span> <span class="ident">hook</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_params</span>: <span class="kw-2">&amp;</span><span class="ident">Params</span>, <span class="ident">_intermediates</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">_ignore</span>: <span class="ident">bool</span>, <span class="ident">_action</span>: <span class="ident">char</span>) {}
+    <span class="doccomment">/// Invoked when a final character arrives in first part of device control string.
+    ///
+    /// The control function should be determined from the private marker, final character, and
+    /// execute with a parameter list. A handler should be selected for remaining characters in the
+    /// string; the handler function should subsequently be called by `put` for every character in
+    /// the control string.
+    ///
+    /// The `ignore` flag indicates that more than two intermediates arrived and
+    /// subsequent characters were ignored.
+    </span><span class="kw">fn </span>hook(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _params: <span class="kw-2">&amp;</span>Params, _intermediates: <span class="kw-2">&amp;</span>[u8], _ignore: bool, _action: char) {}
 
-    <span class="doccomment">/// Pass bytes as part of a device control string to the handle chosen in `hook`. C0 controls</span>
-    <span class="doccomment">/// will also be passed to the handler.</span>
-    <span class="kw">fn</span> <span class="ident">put</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_byte</span>: <span class="ident">u8</span>) {}
+    <span class="doccomment">/// Pass bytes as part of a device control string to the handle chosen in `hook`. C0 controls
+    /// will also be passed to the handler.
+    </span><span class="kw">fn </span>put(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _byte: u8) {}
 
-    <span class="doccomment">/// Called when a device control string is terminated.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The previously selected handler should be notified that the DCS has</span>
-    <span class="doccomment">/// terminated.</span>
-    <span class="kw">fn</span> <span class="ident">unhook</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {}
+    <span class="doccomment">/// Called when a device control string is terminated.
+    ///
+    /// The previously selected handler should be notified that the DCS has
+    /// terminated.
+    </span><span class="kw">fn </span>unhook(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {}
 
-    <span class="doccomment">/// Dispatch an operating system command.</span>
-    <span class="kw">fn</span> <span class="ident">osc_dispatch</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_params</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>[<span class="ident">u8</span>]], <span class="ident">_bell_terminated</span>: <span class="ident">bool</span>) {}
+    <span class="doccomment">/// Dispatch an operating system command.
+    </span><span class="kw">fn </span>osc_dispatch(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _params: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>[u8]], _bell_terminated: bool) {}
 
-    <span class="doccomment">/// A final character has arrived for a CSI sequence</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The `ignore` flag indicates that either more than two intermediates arrived</span>
-    <span class="doccomment">/// or the number of parameters exceeded the maximum supported length,</span>
-    <span class="doccomment">/// and subsequent characters were ignored.</span>
-    <span class="kw">fn</span> <span class="ident">csi_dispatch</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">_params</span>: <span class="kw-2">&amp;</span><span class="ident">Params</span>,
-        <span class="ident">_intermediates</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-        <span class="ident">_ignore</span>: <span class="ident">bool</span>,
-        <span class="ident">_action</span>: <span class="ident">char</span>,
+    <span class="doccomment">/// A final character has arrived for a CSI sequence
+    ///
+    /// The `ignore` flag indicates that either more than two intermediates arrived
+    /// or the number of parameters exceeded the maximum supported length,
+    /// and subsequent characters were ignored.
+    </span><span class="kw">fn </span>csi_dispatch(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        _params: <span class="kw-2">&amp;</span>Params,
+        _intermediates: <span class="kw-2">&amp;</span>[u8],
+        _ignore: bool,
+        _action: char,
     ) {
     }
 
-    <span class="doccomment">/// The final character of an escape sequence has arrived.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The `ignore` flag indicates that more than two intermediates arrived and</span>
-    <span class="doccomment">/// subsequent characters were ignored.</span>
-    <span class="kw">fn</span> <span class="ident">esc_dispatch</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_intermediates</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">_ignore</span>: <span class="ident">bool</span>, <span class="ident">_byte</span>: <span class="ident">u8</span>) {}
+    <span class="doccomment">/// The final character of an escape sequence has arrived.
+    ///
+    /// The `ignore` flag indicates that more than two intermediates arrived and
+    /// subsequent characters were ignored.
+    </span><span class="kw">fn </span>esc_dispatch(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _intermediates: <span class="kw-2">&amp;</span>[u8], _ignore: bool, _byte: u8) {}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;no_std&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">std</span>;
+<span class="attribute">#[cfg(all(test, feature = <span class="string">&quot;no_std&quot;</span>))]
+#[macro_use]
+</span><span class="kw">extern crate </span>std;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="kw">use</span> <span class="ident">std::string::String</span>;
-    <span class="kw">use</span> <span class="ident">std::vec::Vec</span>;
+    <span class="kw">use </span>std::string::String;
+    <span class="kw">use </span>std::vec::Vec;
 
-    <span class="kw">static</span> <span class="ident">OSC_BYTES</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
-        <span class="number">0x1b</span>, <span class="number">0x5d</span>, <span class="comment">// Begin OSC</span>
-        <span class="string">b&#39;2&#39;</span>, <span class="string">b&#39;;&#39;</span>, <span class="string">b&#39;j&#39;</span>, <span class="string">b&#39;w&#39;</span>, <span class="string">b&#39;i&#39;</span>, <span class="string">b&#39;l&#39;</span>, <span class="string">b&#39;m&#39;</span>, <span class="string">b&#39;@&#39;</span>, <span class="string">b&#39;j&#39;</span>, <span class="string">b&#39;w&#39;</span>, <span class="string">b&#39;i&#39;</span>, <span class="string">b&#39;l&#39;</span>, <span class="string">b&#39;m&#39;</span>, <span class="string">b&#39;-&#39;</span>, <span class="string">b&#39;d&#39;</span>,
+    <span class="kw">static </span>OSC_BYTES: <span class="kw-2">&amp;</span>[u8] = <span class="kw-2">&amp;</span>[
+        <span class="number">0x1b</span>, <span class="number">0x5d</span>, <span class="comment">// Begin OSC
+        </span><span class="string">b&#39;2&#39;</span>, <span class="string">b&#39;;&#39;</span>, <span class="string">b&#39;j&#39;</span>, <span class="string">b&#39;w&#39;</span>, <span class="string">b&#39;i&#39;</span>, <span class="string">b&#39;l&#39;</span>, <span class="string">b&#39;m&#39;</span>, <span class="string">b&#39;@&#39;</span>, <span class="string">b&#39;j&#39;</span>, <span class="string">b&#39;w&#39;</span>, <span class="string">b&#39;i&#39;</span>, <span class="string">b&#39;l&#39;</span>, <span class="string">b&#39;m&#39;</span>, <span class="string">b&#39;-&#39;</span>, <span class="string">b&#39;d&#39;</span>,
         <span class="string">b&#39;e&#39;</span>, <span class="string">b&#39;s&#39;</span>, <span class="string">b&#39;k&#39;</span>, <span class="string">b&#39;:&#39;</span>, <span class="string">b&#39; &#39;</span>, <span class="string">b&#39;~&#39;</span>, <span class="string">b&#39;/&#39;</span>, <span class="string">b&#39;c&#39;</span>, <span class="string">b&#39;o&#39;</span>, <span class="string">b&#39;d&#39;</span>, <span class="string">b&#39;e&#39;</span>, <span class="string">b&#39;/&#39;</span>, <span class="string">b&#39;a&#39;</span>, <span class="string">b&#39;l&#39;</span>, <span class="string">b&#39;a&#39;</span>,
-        <span class="string">b&#39;c&#39;</span>, <span class="string">b&#39;r&#39;</span>, <span class="string">b&#39;i&#39;</span>, <span class="string">b&#39;t&#39;</span>, <span class="string">b&#39;t&#39;</span>, <span class="string">b&#39;y&#39;</span>, <span class="number">0x07</span>, <span class="comment">// End OSC</span>
-    ];
+        <span class="string">b&#39;c&#39;</span>, <span class="string">b&#39;r&#39;</span>, <span class="string">b&#39;i&#39;</span>, <span class="string">b&#39;t&#39;</span>, <span class="string">b&#39;t&#39;</span>, <span class="string">b&#39;y&#39;</span>, <span class="number">0x07</span>, <span class="comment">// End OSC
+    </span>];
 
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-    <span class="kw">struct</span> <span class="ident">Dispatcher</span> {
-        <span class="ident">dispatched</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Sequence</span><span class="op">&gt;</span>,
+    <span class="attribute">#[derive(Default)]
+    </span><span class="kw">struct </span>Dispatcher {
+        dispatched: Vec&lt;Sequence&gt;,
     }
 
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-    <span class="kw">enum</span> <span class="ident">Sequence</span> {
-        <span class="ident">Osc</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">bool</span>),
-        <span class="ident">Csi</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">bool</span>, <span class="ident">char</span>),
-        <span class="ident">Esc</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">bool</span>, <span class="ident">u8</span>),
-        <span class="ident">DcsHook</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">bool</span>, <span class="ident">char</span>),
-        <span class="ident">DcsPut</span>(<span class="ident">u8</span>),
-        <span class="ident">DcsUnhook</span>,
+    <span class="attribute">#[derive(Debug, PartialEq, Eq)]
+    </span><span class="kw">enum </span>Sequence {
+        Osc(Vec&lt;Vec&lt;u8&gt;&gt;, bool),
+        Csi(Vec&lt;Vec&lt;u16&gt;&gt;, Vec&lt;u8&gt;, bool, char),
+        Esc(Vec&lt;u8&gt;, bool, u8),
+        DcsHook(Vec&lt;Vec&lt;u16&gt;&gt;, Vec&lt;u8&gt;, bool, char),
+        DcsPut(u8),
+        DcsUnhook,
     }
 
-    <span class="kw">impl</span> <span class="ident">Perform</span> <span class="kw">for</span> <span class="ident">Dispatcher</span> {
-        <span class="kw">fn</span> <span class="ident">osc_dispatch</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>[<span class="ident">u8</span>]], <span class="ident">bell_terminated</span>: <span class="ident">bool</span>) {
-            <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">to_vec</span>()).<span class="ident">collect</span>();
-            <span class="self">self</span>.<span class="ident">dispatched</span>.<span class="ident">push</span>(<span class="ident">Sequence::Osc</span>(<span class="ident">params</span>, <span class="ident">bell_terminated</span>));
+    <span class="kw">impl </span>Perform <span class="kw">for </span>Dispatcher {
+        <span class="kw">fn </span>osc_dispatch(<span class="kw-2">&amp;mut </span><span class="self">self</span>, params: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>[u8]], bell_terminated: bool) {
+            <span class="kw">let </span>params = params.iter().map(|p| p.to_vec()).collect();
+            <span class="self">self</span>.dispatched.push(Sequence::Osc(params, bell_terminated));
         }
 
-        <span class="kw">fn</span> <span class="ident">csi_dispatch</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="ident">Params</span>, <span class="ident">intermediates</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">ignore</span>: <span class="ident">bool</span>, <span class="ident">c</span>: <span class="ident">char</span>) {
-            <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">subparam</span><span class="op">|</span> <span class="ident">subparam</span>.<span class="ident">to_vec</span>()).<span class="ident">collect</span>();
-            <span class="kw">let</span> <span class="ident">intermediates</span> <span class="op">=</span> <span class="ident">intermediates</span>.<span class="ident">to_vec</span>();
-            <span class="self">self</span>.<span class="ident">dispatched</span>.<span class="ident">push</span>(<span class="ident">Sequence::Csi</span>(<span class="ident">params</span>, <span class="ident">intermediates</span>, <span class="ident">ignore</span>, <span class="ident">c</span>));
+        <span class="kw">fn </span>csi_dispatch(<span class="kw-2">&amp;mut </span><span class="self">self</span>, params: <span class="kw-2">&amp;</span>Params, intermediates: <span class="kw-2">&amp;</span>[u8], ignore: bool, c: char) {
+            <span class="kw">let </span>params = params.iter().map(|subparam| subparam.to_vec()).collect();
+            <span class="kw">let </span>intermediates = intermediates.to_vec();
+            <span class="self">self</span>.dispatched.push(Sequence::Csi(params, intermediates, ignore, c));
         }
 
-        <span class="kw">fn</span> <span class="ident">esc_dispatch</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">intermediates</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">ignore</span>: <span class="ident">bool</span>, <span class="ident">byte</span>: <span class="ident">u8</span>) {
-            <span class="kw">let</span> <span class="ident">intermediates</span> <span class="op">=</span> <span class="ident">intermediates</span>.<span class="ident">to_vec</span>();
-            <span class="self">self</span>.<span class="ident">dispatched</span>.<span class="ident">push</span>(<span class="ident">Sequence::Esc</span>(<span class="ident">intermediates</span>, <span class="ident">ignore</span>, <span class="ident">byte</span>));
+        <span class="kw">fn </span>esc_dispatch(<span class="kw-2">&amp;mut </span><span class="self">self</span>, intermediates: <span class="kw-2">&amp;</span>[u8], ignore: bool, byte: u8) {
+            <span class="kw">let </span>intermediates = intermediates.to_vec();
+            <span class="self">self</span>.dispatched.push(Sequence::Esc(intermediates, ignore, byte));
         }
 
-        <span class="kw">fn</span> <span class="ident">hook</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="ident">Params</span>, <span class="ident">intermediates</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">ignore</span>: <span class="ident">bool</span>, <span class="ident">c</span>: <span class="ident">char</span>) {
-            <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">subparam</span><span class="op">|</span> <span class="ident">subparam</span>.<span class="ident">to_vec</span>()).<span class="ident">collect</span>();
-            <span class="kw">let</span> <span class="ident">intermediates</span> <span class="op">=</span> <span class="ident">intermediates</span>.<span class="ident">to_vec</span>();
-            <span class="self">self</span>.<span class="ident">dispatched</span>.<span class="ident">push</span>(<span class="ident">Sequence::DcsHook</span>(<span class="ident">params</span>, <span class="ident">intermediates</span>, <span class="ident">ignore</span>, <span class="ident">c</span>));
+        <span class="kw">fn </span>hook(<span class="kw-2">&amp;mut </span><span class="self">self</span>, params: <span class="kw-2">&amp;</span>Params, intermediates: <span class="kw-2">&amp;</span>[u8], ignore: bool, c: char) {
+            <span class="kw">let </span>params = params.iter().map(|subparam| subparam.to_vec()).collect();
+            <span class="kw">let </span>intermediates = intermediates.to_vec();
+            <span class="self">self</span>.dispatched.push(Sequence::DcsHook(params, intermediates, ignore, c));
         }
 
-        <span class="kw">fn</span> <span class="ident">put</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">byte</span>: <span class="ident">u8</span>) {
-            <span class="self">self</span>.<span class="ident">dispatched</span>.<span class="ident">push</span>(<span class="ident">Sequence::DcsPut</span>(<span class="ident">byte</span>));
+        <span class="kw">fn </span>put(<span class="kw-2">&amp;mut </span><span class="self">self</span>, byte: u8) {
+            <span class="self">self</span>.dispatched.push(Sequence::DcsPut(byte));
         }
 
-        <span class="kw">fn</span> <span class="ident">unhook</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-            <span class="self">self</span>.<span class="ident">dispatched</span>.<span class="ident">push</span>(<span class="ident">Sequence::DcsUnhook</span>);
+        <span class="kw">fn </span>unhook(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+            <span class="self">self</span>.dispatched.push(Sequence::DcsUnhook);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_osc</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dispatcher</span> <span class="op">=</span> <span class="ident">Dispatcher::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parser</span> <span class="op">=</span> <span class="ident">Parser::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_osc() {
+        <span class="kw">let </span><span class="kw-2">mut </span>dispatcher = Dispatcher::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>parser = Parser::new();
 
-        <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="ident">OSC_BYTES</span> {
-            <span class="ident">parser</span>.<span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="ident">dispatcher</span>, <span class="kw-2">*</span><span class="ident">byte</span>);
+        <span class="kw">for </span>byte <span class="kw">in </span>OSC_BYTES {
+            parser.advance(<span class="kw-2">&amp;mut </span>dispatcher, <span class="kw-2">*</span>byte);
         }
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dispatcher</span>.<span class="ident">dispatched</span>.<span class="ident">len</span>(), <span class="number">1</span>);
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">dispatcher</span>.<span class="ident">dispatched</span>[<span class="number">0</span>] {
-            <span class="ident">Sequence::Osc</span>(<span class="ident">params</span>, <span class="kw">_</span>) =&gt; {
-                <span class="macro">assert_eq!</span>(<span class="ident">params</span>.<span class="ident">len</span>(), <span class="number">2</span>);
-                <span class="macro">assert_eq!</span>(<span class="ident">params</span>[<span class="number">0</span>], <span class="kw-2">&amp;</span><span class="ident">OSC_BYTES</span>[<span class="number">2</span>..<span class="number">3</span>]);
-                <span class="macro">assert_eq!</span>(<span class="ident">params</span>[<span class="number">1</span>], <span class="kw-2">&amp;</span><span class="ident">OSC_BYTES</span>[<span class="number">4</span>..(<span class="ident">OSC_BYTES</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>)]);
+        <span class="macro">assert_eq!</span>(dispatcher.dispatched.len(), <span class="number">1</span>);
+        <span class="kw">match </span><span class="kw-2">&amp;</span>dispatcher.dispatched[<span class="number">0</span>] {
+            Sequence::Osc(params, <span class="kw">_</span>) =&gt; {
+                <span class="macro">assert_eq!</span>(params.len(), <span class="number">2</span>);
+                <span class="macro">assert_eq!</span>(params[<span class="number">0</span>], <span class="kw-2">&amp;</span>OSC_BYTES[<span class="number">2</span>..<span class="number">3</span>]);
+                <span class="macro">assert_eq!</span>(params[<span class="number">1</span>], <span class="kw-2">&amp;</span>OSC_BYTES[<span class="number">4</span>..(OSC_BYTES.len() - <span class="number">1</span>)]);
             },
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected osc sequence&quot;</span>),
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected osc sequence&quot;</span>),
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_empty_osc</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dispatcher</span> <span class="op">=</span> <span class="ident">Dispatcher::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parser</span> <span class="op">=</span> <span class="ident">Parser::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_empty_osc() {
+        <span class="kw">let </span><span class="kw-2">mut </span>dispatcher = Dispatcher::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>parser = Parser::new();
 
-        <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="kw-2">&amp;</span>[<span class="number">0x1b</span>, <span class="number">0x5d</span>, <span class="number">0x07</span>] {
-            <span class="ident">parser</span>.<span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="ident">dispatcher</span>, <span class="kw-2">*</span><span class="ident">byte</span>);
+        <span class="kw">for </span>byte <span class="kw">in </span><span class="kw-2">&amp;</span>[<span class="number">0x1b</span>, <span class="number">0x5d</span>, <span class="number">0x07</span>] {
+            parser.advance(<span class="kw-2">&amp;mut </span>dispatcher, <span class="kw-2">*</span>byte);
         }
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dispatcher</span>.<span class="ident">dispatched</span>.<span class="ident">len</span>(), <span class="number">1</span>);
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">dispatcher</span>.<span class="ident">dispatched</span>[<span class="number">0</span>] {
-            <span class="ident">Sequence::Osc</span>(..) =&gt; (),
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected osc sequence&quot;</span>),
+        <span class="macro">assert_eq!</span>(dispatcher.dispatched.len(), <span class="number">1</span>);
+        <span class="kw">match </span><span class="kw-2">&amp;</span>dispatcher.dispatched[<span class="number">0</span>] {
+            Sequence::Osc(..) =&gt; (),
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected osc sequence&quot;</span>),
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_osc_max_params</span>() {
-        <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">std::iter::repeat</span>(<span class="string">&quot;;&quot;</span>).<span class="ident">take</span>(<span class="ident">params::MAX_PARAMS</span> <span class="op">+</span> <span class="number">1</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>();
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;\x1b]{}\x1b&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>[..]).<span class="ident">into_bytes</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dispatcher</span> <span class="op">=</span> <span class="ident">Dispatcher::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parser</span> <span class="op">=</span> <span class="ident">Parser::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_osc_max_params() {
+        <span class="kw">let </span>params = std::iter::repeat(<span class="string">&quot;;&quot;</span>).take(params::MAX_PARAMS + <span class="number">1</span>).collect::&lt;String&gt;();
+        <span class="kw">let </span>input = <span class="macro">format!</span>(<span class="string">&quot;\x1b]{}\x1b&quot;</span>, <span class="kw-2">&amp;</span>params[..]).into_bytes();
+        <span class="kw">let </span><span class="kw-2">mut </span>dispatcher = Dispatcher::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>parser = Parser::new();
 
-        <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="ident">input</span> {
-            <span class="ident">parser</span>.<span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="ident">dispatcher</span>, <span class="ident">byte</span>);
+        <span class="kw">for </span>byte <span class="kw">in </span>input {
+            parser.advance(<span class="kw-2">&amp;mut </span>dispatcher, byte);
         }
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dispatcher</span>.<span class="ident">dispatched</span>.<span class="ident">len</span>(), <span class="number">1</span>);
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">dispatcher</span>.<span class="ident">dispatched</span>[<span class="number">0</span>] {
-            <span class="ident">Sequence::Osc</span>(<span class="ident">params</span>, <span class="kw">_</span>) =&gt; {
-                <span class="macro">assert_eq!</span>(<span class="ident">params</span>.<span class="ident">len</span>(), <span class="ident">MAX_OSC_PARAMS</span>);
-                <span class="macro">assert!</span>(<span class="ident">params</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="ident">Vec::is_empty</span>));
+        <span class="macro">assert_eq!</span>(dispatcher.dispatched.len(), <span class="number">1</span>);
+        <span class="kw">match </span><span class="kw-2">&amp;</span>dispatcher.dispatched[<span class="number">0</span>] {
+            Sequence::Osc(params, <span class="kw">_</span>) =&gt; {
+                <span class="macro">assert_eq!</span>(params.len(), MAX_OSC_PARAMS);
+                <span class="macro">assert!</span>(params.iter().all(Vec::is_empty));
             },
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected osc sequence&quot;</span>),
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected osc sequence&quot;</span>),
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">osc_bell_terminated</span>() {
-        <span class="kw">static</span> <span class="ident">INPUT</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="string">b&quot;\x1b]11;ff/00/ff\x07&quot;</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dispatcher</span> <span class="op">=</span> <span class="ident">Dispatcher::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parser</span> <span class="op">=</span> <span class="ident">Parser::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>osc_bell_terminated() {
+        <span class="kw">static </span>INPUT: <span class="kw-2">&amp;</span>[u8] = <span class="string">b&quot;\x1b]11;ff/00/ff\x07&quot;</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>dispatcher = Dispatcher::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>parser = Parser::new();
 
-        <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="ident">INPUT</span> {
-            <span class="ident">parser</span>.<span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="ident">dispatcher</span>, <span class="kw-2">*</span><span class="ident">byte</span>);
+        <span class="kw">for </span>byte <span class="kw">in </span>INPUT {
+            parser.advance(<span class="kw-2">&amp;mut </span>dispatcher, <span class="kw-2">*</span>byte);
         }
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dispatcher</span>.<span class="ident">dispatched</span>.<span class="ident">len</span>(), <span class="number">1</span>);
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">dispatcher</span>.<span class="ident">dispatched</span>[<span class="number">0</span>] {
-            <span class="ident">Sequence::Osc</span>(<span class="kw">_</span>, <span class="bool-val">true</span>) =&gt; (),
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected osc with bell terminator&quot;</span>),
-        }
-    }
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">osc_c0_st_terminated</span>() {
-        <span class="kw">static</span> <span class="ident">INPUT</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="string">b&quot;\x1b]11;ff/00/ff\x1b\\&quot;</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dispatcher</span> <span class="op">=</span> <span class="ident">Dispatcher::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parser</span> <span class="op">=</span> <span class="ident">Parser::new</span>();
-
-        <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="ident">INPUT</span> {
-            <span class="ident">parser</span>.<span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="ident">dispatcher</span>, <span class="kw-2">*</span><span class="ident">byte</span>);
-        }
-
-        <span class="macro">assert_eq!</span>(<span class="ident">dispatcher</span>.<span class="ident">dispatched</span>.<span class="ident">len</span>(), <span class="number">2</span>);
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">dispatcher</span>.<span class="ident">dispatched</span>[<span class="number">0</span>] {
-            <span class="ident">Sequence::Osc</span>(<span class="kw">_</span>, <span class="bool-val">false</span>) =&gt; (),
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected osc with ST terminator&quot;</span>),
+        <span class="macro">assert_eq!</span>(dispatcher.dispatched.len(), <span class="number">1</span>);
+        <span class="kw">match </span><span class="kw-2">&amp;</span>dispatcher.dispatched[<span class="number">0</span>] {
+            Sequence::Osc(<span class="kw">_</span>, <span class="bool-val">true</span>) =&gt; (),
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected osc with bell terminator&quot;</span>),
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_osc_with_utf8_arguments</span>() {
-        <span class="kw">static</span> <span class="ident">INPUT</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>osc_c0_st_terminated() {
+        <span class="kw">static </span>INPUT: <span class="kw-2">&amp;</span>[u8] = <span class="string">b&quot;\x1b]11;ff/00/ff\x1b\\&quot;</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>dispatcher = Dispatcher::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>parser = Parser::new();
+
+        <span class="kw">for </span>byte <span class="kw">in </span>INPUT {
+            parser.advance(<span class="kw-2">&amp;mut </span>dispatcher, <span class="kw-2">*</span>byte);
+        }
+
+        <span class="macro">assert_eq!</span>(dispatcher.dispatched.len(), <span class="number">2</span>);
+        <span class="kw">match </span><span class="kw-2">&amp;</span>dispatcher.dispatched[<span class="number">0</span>] {
+            Sequence::Osc(<span class="kw">_</span>, <span class="bool-val">false</span>) =&gt; (),
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected osc with ST terminator&quot;</span>),
+        }
+    }
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_osc_with_utf8_arguments() {
+        <span class="kw">static </span>INPUT: <span class="kw-2">&amp;</span>[u8] = <span class="kw-2">&amp;</span>[
             <span class="number">0x0d</span>, <span class="number">0x1b</span>, <span class="number">0x5d</span>, <span class="number">0x32</span>, <span class="number">0x3b</span>, <span class="number">0x65</span>, <span class="number">0x63</span>, <span class="number">0x68</span>, <span class="number">0x6f</span>, <span class="number">0x20</span>, <span class="number">0x27</span>, <span class="number">0xc2</span>, <span class="number">0xaf</span>, <span class="number">0x5c</span>,
             <span class="number">0x5f</span>, <span class="number">0x28</span>, <span class="number">0xe3</span>, <span class="number">0x83</span>, <span class="number">0x84</span>, <span class="number">0x29</span>, <span class="number">0x5f</span>, <span class="number">0x2f</span>, <span class="number">0xc2</span>, <span class="number">0xaf</span>, <span class="number">0x27</span>, <span class="number">0x20</span>, <span class="number">0x26</span>, <span class="number">0x26</span>,
             <span class="number">0x20</span>, <span class="number">0x73</span>, <span class="number">0x6c</span>, <span class="number">0x65</span>, <span class="number">0x65</span>, <span class="number">0x70</span>, <span class="number">0x20</span>, <span class="number">0x31</span>, <span class="number">0x07</span>,
         ];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dispatcher</span> <span class="op">=</span> <span class="ident">Dispatcher::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parser</span> <span class="op">=</span> <span class="ident">Parser::new</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>dispatcher = Dispatcher::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>parser = Parser::new();
 
-        <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="ident">INPUT</span> {
-            <span class="ident">parser</span>.<span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="ident">dispatcher</span>, <span class="kw-2">*</span><span class="ident">byte</span>);
+        <span class="kw">for </span>byte <span class="kw">in </span>INPUT {
+            parser.advance(<span class="kw-2">&amp;mut </span>dispatcher, <span class="kw-2">*</span>byte);
         }
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dispatcher</span>.<span class="ident">dispatched</span>.<span class="ident">len</span>(), <span class="number">1</span>);
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">dispatcher</span>.<span class="ident">dispatched</span>[<span class="number">0</span>] {
-            <span class="ident">Sequence::Osc</span>(<span class="ident">params</span>, <span class="kw">_</span>) =&gt; {
-                <span class="macro">assert_eq!</span>(<span class="ident">params</span>[<span class="number">0</span>], <span class="kw-2">&amp;</span>[<span class="string">b&#39;2&#39;</span>]);
-                <span class="macro">assert_eq!</span>(<span class="ident">params</span>[<span class="number">1</span>], <span class="kw-2">&amp;</span><span class="ident">INPUT</span>[<span class="number">5</span>..(<span class="ident">INPUT</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>)]);
+        <span class="macro">assert_eq!</span>(dispatcher.dispatched.len(), <span class="number">1</span>);
+        <span class="kw">match </span><span class="kw-2">&amp;</span>dispatcher.dispatched[<span class="number">0</span>] {
+            Sequence::Osc(params, <span class="kw">_</span>) =&gt; {
+                <span class="macro">assert_eq!</span>(params[<span class="number">0</span>], <span class="kw-2">&amp;</span>[<span class="string">b&#39;2&#39;</span>]);
+                <span class="macro">assert_eq!</span>(params[<span class="number">1</span>], <span class="kw-2">&amp;</span>INPUT[<span class="number">5</span>..(INPUT.len() - <span class="number">1</span>)]);
             },
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected osc sequence&quot;</span>),
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected osc sequence&quot;</span>),
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">osc_containing_string_terminator</span>() {
-        <span class="kw">static</span> <span class="ident">INPUT</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="string">b&quot;\x1b]2;\xe6\x9c\xab\x1b\\&quot;</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dispatcher</span> <span class="op">=</span> <span class="ident">Dispatcher::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parser</span> <span class="op">=</span> <span class="ident">Parser::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>osc_containing_string_terminator() {
+        <span class="kw">static </span>INPUT: <span class="kw-2">&amp;</span>[u8] = <span class="string">b&quot;\x1b]2;\xe6\x9c\xab\x1b\\&quot;</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>dispatcher = Dispatcher::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>parser = Parser::new();
 
-        <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="ident">INPUT</span> {
-            <span class="ident">parser</span>.<span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="ident">dispatcher</span>, <span class="kw-2">*</span><span class="ident">byte</span>);
+        <span class="kw">for </span>byte <span class="kw">in </span>INPUT {
+            parser.advance(<span class="kw-2">&amp;mut </span>dispatcher, <span class="kw-2">*</span>byte);
         }
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dispatcher</span>.<span class="ident">dispatched</span>.<span class="ident">len</span>(), <span class="number">2</span>);
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">dispatcher</span>.<span class="ident">dispatched</span>[<span class="number">0</span>] {
-            <span class="ident">Sequence::Osc</span>(<span class="ident">params</span>, <span class="kw">_</span>) =&gt; {
-                <span class="macro">assert_eq!</span>(<span class="ident">params</span>[<span class="number">1</span>], <span class="kw-2">&amp;</span><span class="ident">INPUT</span>[<span class="number">4</span>..(<span class="ident">INPUT</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">2</span>)]);
+        <span class="macro">assert_eq!</span>(dispatcher.dispatched.len(), <span class="number">2</span>);
+        <span class="kw">match </span><span class="kw-2">&amp;</span>dispatcher.dispatched[<span class="number">0</span>] {
+            Sequence::Osc(params, <span class="kw">_</span>) =&gt; {
+                <span class="macro">assert_eq!</span>(params[<span class="number">1</span>], <span class="kw-2">&amp;</span>INPUT[<span class="number">4</span>..(INPUT.len() - <span class="number">2</span>)]);
             },
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected osc sequence&quot;</span>),
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected osc sequence&quot;</span>),
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">exceed_max_buffer_size</span>() {
-        <span class="kw">static</span> <span class="ident">NUM_BYTES</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">MAX_OSC_RAW</span> <span class="op">+</span> <span class="number">100</span>;
-        <span class="kw">static</span> <span class="ident">INPUT_START</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="number">0x1b</span>, <span class="string">b&#39;]&#39;</span>, <span class="string">b&#39;5&#39;</span>, <span class="string">b&#39;2&#39;</span>, <span class="string">b&#39;;&#39;</span>, <span class="string">b&#39;s&#39;</span>];
-        <span class="kw">static</span> <span class="ident">INPUT_END</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="string">b&#39;\x07&#39;</span>];
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>exceed_max_buffer_size() {
+        <span class="kw">static </span>NUM_BYTES: usize = MAX_OSC_RAW + <span class="number">100</span>;
+        <span class="kw">static </span>INPUT_START: <span class="kw-2">&amp;</span>[u8] = <span class="kw-2">&amp;</span>[<span class="number">0x1b</span>, <span class="string">b&#39;]&#39;</span>, <span class="string">b&#39;5&#39;</span>, <span class="string">b&#39;2&#39;</span>, <span class="string">b&#39;;&#39;</span>, <span class="string">b&#39;s&#39;</span>];
+        <span class="kw">static </span>INPUT_END: <span class="kw-2">&amp;</span>[u8] = <span class="kw-2">&amp;</span>[<span class="string">b&#39;\x07&#39;</span>];
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dispatcher</span> <span class="op">=</span> <span class="ident">Dispatcher::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parser</span> <span class="op">=</span> <span class="ident">Parser::new</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>dispatcher = Dispatcher::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>parser = Parser::new();
 
-        <span class="comment">// Create valid OSC escape</span>
-        <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="ident">INPUT_START</span> {
-            <span class="ident">parser</span>.<span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="ident">dispatcher</span>, <span class="kw-2">*</span><span class="ident">byte</span>);
+        <span class="comment">// Create valid OSC escape
+        </span><span class="kw">for </span>byte <span class="kw">in </span>INPUT_START {
+            parser.advance(<span class="kw-2">&amp;mut </span>dispatcher, <span class="kw-2">*</span>byte);
         }
 
-        <span class="comment">// Exceed max buffer size</span>
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">NUM_BYTES</span> {
-            <span class="ident">parser</span>.<span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="ident">dispatcher</span>, <span class="string">b&#39;a&#39;</span>);
+        <span class="comment">// Exceed max buffer size
+        </span><span class="kw">for _ in </span><span class="number">0</span>..NUM_BYTES {
+            parser.advance(<span class="kw-2">&amp;mut </span>dispatcher, <span class="string">b&#39;a&#39;</span>);
         }
 
-        <span class="comment">// Terminate escape for dispatch</span>
-        <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="ident">INPUT_END</span> {
-            <span class="ident">parser</span>.<span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="ident">dispatcher</span>, <span class="kw-2">*</span><span class="ident">byte</span>);
+        <span class="comment">// Terminate escape for dispatch
+        </span><span class="kw">for </span>byte <span class="kw">in </span>INPUT_END {
+            parser.advance(<span class="kw-2">&amp;mut </span>dispatcher, <span class="kw-2">*</span>byte);
         }
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dispatcher</span>.<span class="ident">dispatched</span>.<span class="ident">len</span>(), <span class="number">1</span>);
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">dispatcher</span>.<span class="ident">dispatched</span>[<span class="number">0</span>] {
-            <span class="ident">Sequence::Osc</span>(<span class="ident">params</span>, <span class="kw">_</span>) =&gt; {
-                <span class="macro">assert_eq!</span>(<span class="ident">params</span>.<span class="ident">len</span>(), <span class="number">2</span>);
-                <span class="macro">assert_eq!</span>(<span class="ident">params</span>[<span class="number">0</span>], <span class="string">b&quot;52&quot;</span>);
+        <span class="macro">assert_eq!</span>(dispatcher.dispatched.len(), <span class="number">1</span>);
+        <span class="kw">match </span><span class="kw-2">&amp;</span>dispatcher.dispatched[<span class="number">0</span>] {
+            Sequence::Osc(params, <span class="kw">_</span>) =&gt; {
+                <span class="macro">assert_eq!</span>(params.len(), <span class="number">2</span>);
+                <span class="macro">assert_eq!</span>(params[<span class="number">0</span>], <span class="string">b&quot;52&quot;</span>);
 
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;no_std&quot;</span>))]</span>
-                <span class="macro">assert_eq!</span>(<span class="ident">params</span>[<span class="number">1</span>].<span class="ident">len</span>(), <span class="ident">NUM_BYTES</span> <span class="op">+</span> <span class="ident">INPUT_END</span>.<span class="ident">len</span>());
+                <span class="attribute">#[cfg(not(feature = <span class="string">&quot;no_std&quot;</span>))]
+                </span><span class="macro">assert_eq!</span>(params[<span class="number">1</span>].len(), NUM_BYTES + INPUT_END.len());
 
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;no_std&quot;</span>)]</span>
-                <span class="macro">assert_eq!</span>(<span class="ident">params</span>[<span class="number">1</span>].<span class="ident">len</span>(), <span class="ident">MAX_OSC_RAW</span> <span class="op">-</span> <span class="ident">params</span>[<span class="number">0</span>].<span class="ident">len</span>());
+                <span class="attribute">#[cfg(feature = <span class="string">&quot;no_std&quot;</span>)]
+                </span><span class="macro">assert_eq!</span>(params[<span class="number">1</span>].len(), MAX_OSC_RAW - params[<span class="number">0</span>].len());
             },
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected osc sequence&quot;</span>),
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected osc sequence&quot;</span>),
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_csi_max_params</span>() {
-        <span class="comment">// This will build a list of repeating &#39;1;&#39;s</span>
-        <span class="comment">// The length is MAX_PARAMS - 1 because the last semicolon is interpreted</span>
-        <span class="comment">// as an implicit zero, making the total number of parameters MAX_PARAMS</span>
-        <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">std::iter::repeat</span>(<span class="string">&quot;1;&quot;</span>).<span class="ident">take</span>(<span class="ident">params::MAX_PARAMS</span> <span class="op">-</span> <span class="number">1</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>();
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;\x1b[{}p&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>[..]).<span class="ident">into_bytes</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_csi_max_params() {
+        <span class="comment">// This will build a list of repeating &#39;1;&#39;s
+        // The length is MAX_PARAMS - 1 because the last semicolon is interpreted
+        // as an implicit zero, making the total number of parameters MAX_PARAMS
+        </span><span class="kw">let </span>params = std::iter::repeat(<span class="string">&quot;1;&quot;</span>).take(params::MAX_PARAMS - <span class="number">1</span>).collect::&lt;String&gt;();
+        <span class="kw">let </span>input = <span class="macro">format!</span>(<span class="string">&quot;\x1b[{}p&quot;</span>, <span class="kw-2">&amp;</span>params[..]).into_bytes();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dispatcher</span> <span class="op">=</span> <span class="ident">Dispatcher::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parser</span> <span class="op">=</span> <span class="ident">Parser::new</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>dispatcher = Dispatcher::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>parser = Parser::new();
 
-        <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="ident">input</span> {
-            <span class="ident">parser</span>.<span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="ident">dispatcher</span>, <span class="ident">byte</span>);
+        <span class="kw">for </span>byte <span class="kw">in </span>input {
+            parser.advance(<span class="kw-2">&amp;mut </span>dispatcher, byte);
         }
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dispatcher</span>.<span class="ident">dispatched</span>.<span class="ident">len</span>(), <span class="number">1</span>);
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">dispatcher</span>.<span class="ident">dispatched</span>[<span class="number">0</span>] {
-            <span class="ident">Sequence::Csi</span>(<span class="ident">params</span>, <span class="kw">_</span>, <span class="ident">ignore</span>, <span class="kw">_</span>) =&gt; {
-                <span class="macro">assert_eq!</span>(<span class="ident">params</span>.<span class="ident">len</span>(), <span class="ident">params::MAX_PARAMS</span>);
-                <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">ignore</span>);
+        <span class="macro">assert_eq!</span>(dispatcher.dispatched.len(), <span class="number">1</span>);
+        <span class="kw">match </span><span class="kw-2">&amp;</span>dispatcher.dispatched[<span class="number">0</span>] {
+            Sequence::Csi(params, <span class="kw">_</span>, ignore, <span class="kw">_</span>) =&gt; {
+                <span class="macro">assert_eq!</span>(params.len(), params::MAX_PARAMS);
+                <span class="macro">assert!</span>(!ignore);
             },
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected csi sequence&quot;</span>),
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected csi sequence&quot;</span>),
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_csi_params_ignore_long_params</span>() {
-        <span class="comment">// This will build a list of repeating &#39;1;&#39;s</span>
-        <span class="comment">// The length is MAX_PARAMS because the last semicolon is interpreted</span>
-        <span class="comment">// as an implicit zero, making the total number of parameters MAX_PARAMS + 1</span>
-        <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">std::iter::repeat</span>(<span class="string">&quot;1;&quot;</span>).<span class="ident">take</span>(<span class="ident">params::MAX_PARAMS</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>();
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;\x1b[{}p&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>[..]).<span class="ident">into_bytes</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_csi_params_ignore_long_params() {
+        <span class="comment">// This will build a list of repeating &#39;1;&#39;s
+        // The length is MAX_PARAMS because the last semicolon is interpreted
+        // as an implicit zero, making the total number of parameters MAX_PARAMS + 1
+        </span><span class="kw">let </span>params = std::iter::repeat(<span class="string">&quot;1;&quot;</span>).take(params::MAX_PARAMS).collect::&lt;String&gt;();
+        <span class="kw">let </span>input = <span class="macro">format!</span>(<span class="string">&quot;\x1b[{}p&quot;</span>, <span class="kw-2">&amp;</span>params[..]).into_bytes();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dispatcher</span> <span class="op">=</span> <span class="ident">Dispatcher::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parser</span> <span class="op">=</span> <span class="ident">Parser::new</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>dispatcher = Dispatcher::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>parser = Parser::new();
 
-        <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="ident">input</span> {
-            <span class="ident">parser</span>.<span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="ident">dispatcher</span>, <span class="ident">byte</span>);
+        <span class="kw">for </span>byte <span class="kw">in </span>input {
+            parser.advance(<span class="kw-2">&amp;mut </span>dispatcher, byte);
         }
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dispatcher</span>.<span class="ident">dispatched</span>.<span class="ident">len</span>(), <span class="number">1</span>);
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">dispatcher</span>.<span class="ident">dispatched</span>[<span class="number">0</span>] {
-            <span class="ident">Sequence::Csi</span>(<span class="ident">params</span>, <span class="kw">_</span>, <span class="ident">ignore</span>, <span class="kw">_</span>) =&gt; {
-                <span class="macro">assert_eq!</span>(<span class="ident">params</span>.<span class="ident">len</span>(), <span class="ident">params::MAX_PARAMS</span>);
-                <span class="macro">assert!</span>(<span class="ident">ignore</span>);
+        <span class="macro">assert_eq!</span>(dispatcher.dispatched.len(), <span class="number">1</span>);
+        <span class="kw">match </span><span class="kw-2">&amp;</span>dispatcher.dispatched[<span class="number">0</span>] {
+            Sequence::Csi(params, <span class="kw">_</span>, ignore, <span class="kw">_</span>) =&gt; {
+                <span class="macro">assert_eq!</span>(params.len(), params::MAX_PARAMS);
+                <span class="macro">assert!</span>(ignore);
             },
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected csi sequence&quot;</span>),
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected csi sequence&quot;</span>),
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_csi_params_trailing_semicolon</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dispatcher</span> <span class="op">=</span> <span class="ident">Dispatcher::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parser</span> <span class="op">=</span> <span class="ident">Parser::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_csi_params_trailing_semicolon() {
+        <span class="kw">let </span><span class="kw-2">mut </span>dispatcher = Dispatcher::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>parser = Parser::new();
 
-        <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="string">b&quot;\x1b[4;m&quot;</span> {
-            <span class="ident">parser</span>.<span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="ident">dispatcher</span>, <span class="kw-2">*</span><span class="ident">byte</span>);
+        <span class="kw">for </span>byte <span class="kw">in </span><span class="string">b&quot;\x1b[4;m&quot; </span>{
+            parser.advance(<span class="kw-2">&amp;mut </span>dispatcher, <span class="kw-2">*</span>byte);
         }
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dispatcher</span>.<span class="ident">dispatched</span>.<span class="ident">len</span>(), <span class="number">1</span>);
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">dispatcher</span>.<span class="ident">dispatched</span>[<span class="number">0</span>] {
-            <span class="ident">Sequence::Csi</span>(<span class="ident">params</span>, ..) =&gt; <span class="macro">assert_eq!</span>(<span class="ident">params</span>, <span class="kw-2">&amp;</span>[[<span class="number">4</span>], [<span class="number">0</span>]]),
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected csi sequence&quot;</span>),
-        }
-    }
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_csi_params_leading_semicolon</span>() {
-        <span class="comment">// Create dispatcher and check state</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dispatcher</span> <span class="op">=</span> <span class="ident">Dispatcher::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parser</span> <span class="op">=</span> <span class="ident">Parser::new</span>();
-
-        <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="string">b&quot;\x1b[;4m&quot;</span> {
-            <span class="ident">parser</span>.<span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="ident">dispatcher</span>, <span class="kw-2">*</span><span class="ident">byte</span>);
-        }
-
-        <span class="macro">assert_eq!</span>(<span class="ident">dispatcher</span>.<span class="ident">dispatched</span>.<span class="ident">len</span>(), <span class="number">1</span>);
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">dispatcher</span>.<span class="ident">dispatched</span>[<span class="number">0</span>] {
-            <span class="ident">Sequence::Csi</span>(<span class="ident">params</span>, ..) =&gt; <span class="macro">assert_eq!</span>(<span class="ident">params</span>, <span class="kw-2">&amp;</span>[[<span class="number">0</span>], [<span class="number">4</span>]]),
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected csi sequence&quot;</span>),
+        <span class="macro">assert_eq!</span>(dispatcher.dispatched.len(), <span class="number">1</span>);
+        <span class="kw">match </span><span class="kw-2">&amp;</span>dispatcher.dispatched[<span class="number">0</span>] {
+            Sequence::Csi(params, ..) =&gt; <span class="macro">assert_eq!</span>(params, <span class="kw-2">&amp;</span>[[<span class="number">4</span>], [<span class="number">0</span>]]),
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected csi sequence&quot;</span>),
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_long_csi_param</span>() {
-        <span class="comment">// The important part is the parameter, which is (i64::MAX + 1)</span>
-        <span class="kw">static</span> <span class="ident">INPUT</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="string">b&quot;\x1b[9223372036854775808m&quot;</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dispatcher</span> <span class="op">=</span> <span class="ident">Dispatcher::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parser</span> <span class="op">=</span> <span class="ident">Parser::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_csi_params_leading_semicolon() {
+        <span class="comment">// Create dispatcher and check state
+        </span><span class="kw">let </span><span class="kw-2">mut </span>dispatcher = Dispatcher::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>parser = Parser::new();
 
-        <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="ident">INPUT</span> {
-            <span class="ident">parser</span>.<span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="ident">dispatcher</span>, <span class="kw-2">*</span><span class="ident">byte</span>);
+        <span class="kw">for </span>byte <span class="kw">in </span><span class="string">b&quot;\x1b[;4m&quot; </span>{
+            parser.advance(<span class="kw-2">&amp;mut </span>dispatcher, <span class="kw-2">*</span>byte);
         }
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dispatcher</span>.<span class="ident">dispatched</span>.<span class="ident">len</span>(), <span class="number">1</span>);
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">dispatcher</span>.<span class="ident">dispatched</span>[<span class="number">0</span>] {
-            <span class="ident">Sequence::Csi</span>(<span class="ident">params</span>, ..) =&gt; <span class="macro">assert_eq!</span>(<span class="ident">params</span>, <span class="kw-2">&amp;</span>[[<span class="ident">std::u16::MAX</span> <span class="kw">as</span> <span class="ident">u16</span>]]),
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected csi sequence&quot;</span>),
+        <span class="macro">assert_eq!</span>(dispatcher.dispatched.len(), <span class="number">1</span>);
+        <span class="kw">match </span><span class="kw-2">&amp;</span>dispatcher.dispatched[<span class="number">0</span>] {
+            Sequence::Csi(params, ..) =&gt; <span class="macro">assert_eq!</span>(params, <span class="kw-2">&amp;</span>[[<span class="number">0</span>], [<span class="number">4</span>]]),
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected csi sequence&quot;</span>),
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">csi_reset</span>() {
-        <span class="kw">static</span> <span class="ident">INPUT</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="string">b&quot;\x1b[3;1\x1b[?1049h&quot;</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dispatcher</span> <span class="op">=</span> <span class="ident">Dispatcher::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parser</span> <span class="op">=</span> <span class="ident">Parser::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_long_csi_param() {
+        <span class="comment">// The important part is the parameter, which is (i64::MAX + 1)
+        </span><span class="kw">static </span>INPUT: <span class="kw-2">&amp;</span>[u8] = <span class="string">b&quot;\x1b[9223372036854775808m&quot;</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>dispatcher = Dispatcher::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>parser = Parser::new();
 
-        <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="ident">INPUT</span> {
-            <span class="ident">parser</span>.<span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="ident">dispatcher</span>, <span class="kw-2">*</span><span class="ident">byte</span>);
+        <span class="kw">for </span>byte <span class="kw">in </span>INPUT {
+            parser.advance(<span class="kw-2">&amp;mut </span>dispatcher, <span class="kw-2">*</span>byte);
         }
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dispatcher</span>.<span class="ident">dispatched</span>.<span class="ident">len</span>(), <span class="number">1</span>);
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">dispatcher</span>.<span class="ident">dispatched</span>[<span class="number">0</span>] {
-            <span class="ident">Sequence::Csi</span>(<span class="ident">params</span>, <span class="ident">intermediates</span>, <span class="ident">ignore</span>, <span class="kw">_</span>) =&gt; {
-                <span class="macro">assert_eq!</span>(<span class="ident">intermediates</span>, <span class="kw-2">&amp;</span>[<span class="string">b&#39;?&#39;</span>]);
-                <span class="macro">assert_eq!</span>(<span class="ident">params</span>, <span class="kw-2">&amp;</span>[[<span class="number">1049</span>]]);
-                <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">ignore</span>);
+        <span class="macro">assert_eq!</span>(dispatcher.dispatched.len(), <span class="number">1</span>);
+        <span class="kw">match </span><span class="kw-2">&amp;</span>dispatcher.dispatched[<span class="number">0</span>] {
+            Sequence::Csi(params, ..) =&gt; <span class="macro">assert_eq!</span>(params, <span class="kw-2">&amp;</span>[[std::u16::MAX <span class="kw">as </span>u16]]),
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected csi sequence&quot;</span>),
+        }
+    }
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>csi_reset() {
+        <span class="kw">static </span>INPUT: <span class="kw-2">&amp;</span>[u8] = <span class="string">b&quot;\x1b[3;1\x1b[?1049h&quot;</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>dispatcher = Dispatcher::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>parser = Parser::new();
+
+        <span class="kw">for </span>byte <span class="kw">in </span>INPUT {
+            parser.advance(<span class="kw-2">&amp;mut </span>dispatcher, <span class="kw-2">*</span>byte);
+        }
+
+        <span class="macro">assert_eq!</span>(dispatcher.dispatched.len(), <span class="number">1</span>);
+        <span class="kw">match </span><span class="kw-2">&amp;</span>dispatcher.dispatched[<span class="number">0</span>] {
+            Sequence::Csi(params, intermediates, ignore, <span class="kw">_</span>) =&gt; {
+                <span class="macro">assert_eq!</span>(intermediates, <span class="kw-2">&amp;</span>[<span class="string">b&#39;?&#39;</span>]);
+                <span class="macro">assert_eq!</span>(params, <span class="kw-2">&amp;</span>[[<span class="number">1049</span>]]);
+                <span class="macro">assert!</span>(!ignore);
             },
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected csi sequence&quot;</span>),
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected csi sequence&quot;</span>),
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">csi_subparameters</span>() {
-        <span class="kw">static</span> <span class="ident">INPUT</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="string">b&quot;\x1b[38:2:255:0:255;1m&quot;</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dispatcher</span> <span class="op">=</span> <span class="ident">Dispatcher::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parser</span> <span class="op">=</span> <span class="ident">Parser::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>csi_subparameters() {
+        <span class="kw">static </span>INPUT: <span class="kw-2">&amp;</span>[u8] = <span class="string">b&quot;\x1b[38:2:255:0:255;1m&quot;</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>dispatcher = Dispatcher::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>parser = Parser::new();
 
-        <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="ident">INPUT</span> {
-            <span class="ident">parser</span>.<span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="ident">dispatcher</span>, <span class="kw-2">*</span><span class="ident">byte</span>);
+        <span class="kw">for </span>byte <span class="kw">in </span>INPUT {
+            parser.advance(<span class="kw-2">&amp;mut </span>dispatcher, <span class="kw-2">*</span>byte);
         }
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dispatcher</span>.<span class="ident">dispatched</span>.<span class="ident">len</span>(), <span class="number">1</span>);
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">dispatcher</span>.<span class="ident">dispatched</span>[<span class="number">0</span>] {
-            <span class="ident">Sequence::Csi</span>(<span class="ident">params</span>, <span class="ident">intermediates</span>, <span class="ident">ignore</span>, <span class="kw">_</span>) =&gt; {
-                <span class="macro">assert_eq!</span>(<span class="ident">params</span>, <span class="kw-2">&amp;</span>[<span class="macro">vec!</span>[<span class="number">38</span>, <span class="number">2</span>, <span class="number">255</span>, <span class="number">0</span>, <span class="number">255</span>], <span class="macro">vec!</span>[<span class="number">1</span>]]);
-                <span class="macro">assert_eq!</span>(<span class="ident">intermediates</span>, <span class="kw-2">&amp;</span>[]);
-                <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">ignore</span>);
+        <span class="macro">assert_eq!</span>(dispatcher.dispatched.len(), <span class="number">1</span>);
+        <span class="kw">match </span><span class="kw-2">&amp;</span>dispatcher.dispatched[<span class="number">0</span>] {
+            Sequence::Csi(params, intermediates, ignore, <span class="kw">_</span>) =&gt; {
+                <span class="macro">assert_eq!</span>(params, <span class="kw-2">&amp;</span>[<span class="macro">vec!</span>[<span class="number">38</span>, <span class="number">2</span>, <span class="number">255</span>, <span class="number">0</span>, <span class="number">255</span>], <span class="macro">vec!</span>[<span class="number">1</span>]]);
+                <span class="macro">assert_eq!</span>(intermediates, <span class="kw-2">&amp;</span>[]);
+                <span class="macro">assert!</span>(!ignore);
             },
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected csi sequence&quot;</span>),
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected csi sequence&quot;</span>),
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_dcs_max_params</span>() {
-        <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">std::iter::repeat</span>(<span class="string">&quot;1;&quot;</span>).<span class="ident">take</span>(<span class="ident">params::MAX_PARAMS</span> <span class="op">+</span> <span class="number">1</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>();
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;\x1bP{}p&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>[..]).<span class="ident">into_bytes</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dispatcher</span> <span class="op">=</span> <span class="ident">Dispatcher::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parser</span> <span class="op">=</span> <span class="ident">Parser::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_dcs_max_params() {
+        <span class="kw">let </span>params = std::iter::repeat(<span class="string">&quot;1;&quot;</span>).take(params::MAX_PARAMS + <span class="number">1</span>).collect::&lt;String&gt;();
+        <span class="kw">let </span>input = <span class="macro">format!</span>(<span class="string">&quot;\x1bP{}p&quot;</span>, <span class="kw-2">&amp;</span>params[..]).into_bytes();
+        <span class="kw">let </span><span class="kw-2">mut </span>dispatcher = Dispatcher::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>parser = Parser::new();
 
-        <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="ident">input</span> {
-            <span class="ident">parser</span>.<span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="ident">dispatcher</span>, <span class="ident">byte</span>);
+        <span class="kw">for </span>byte <span class="kw">in </span>input {
+            parser.advance(<span class="kw-2">&amp;mut </span>dispatcher, byte);
         }
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dispatcher</span>.<span class="ident">dispatched</span>.<span class="ident">len</span>(), <span class="number">1</span>);
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">dispatcher</span>.<span class="ident">dispatched</span>[<span class="number">0</span>] {
-            <span class="ident">Sequence::DcsHook</span>(<span class="ident">params</span>, <span class="kw">_</span>, <span class="ident">ignore</span>, <span class="kw">_</span>) =&gt; {
-                <span class="macro">assert_eq!</span>(<span class="ident">params</span>.<span class="ident">len</span>(), <span class="ident">params::MAX_PARAMS</span>);
-                <span class="macro">assert!</span>(<span class="ident">params</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">param</span><span class="op">|</span> <span class="ident">param</span> <span class="op">==</span> <span class="kw-2">&amp;</span>[<span class="number">1</span>]));
-                <span class="macro">assert!</span>(<span class="ident">ignore</span>);
+        <span class="macro">assert_eq!</span>(dispatcher.dispatched.len(), <span class="number">1</span>);
+        <span class="kw">match </span><span class="kw-2">&amp;</span>dispatcher.dispatched[<span class="number">0</span>] {
+            Sequence::DcsHook(params, <span class="kw">_</span>, ignore, <span class="kw">_</span>) =&gt; {
+                <span class="macro">assert_eq!</span>(params.len(), params::MAX_PARAMS);
+                <span class="macro">assert!</span>(params.iter().all(|param| param == <span class="kw-2">&amp;</span>[<span class="number">1</span>]));
+                <span class="macro">assert!</span>(ignore);
             },
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected dcs sequence&quot;</span>),
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected dcs sequence&quot;</span>),
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">dcs_reset</span>() {
-        <span class="kw">static</span> <span class="ident">INPUT</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="string">b&quot;\x1b[3;1\x1bP1$tx\x9c&quot;</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dispatcher</span> <span class="op">=</span> <span class="ident">Dispatcher::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parser</span> <span class="op">=</span> <span class="ident">Parser::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>dcs_reset() {
+        <span class="kw">static </span>INPUT: <span class="kw-2">&amp;</span>[u8] = <span class="string">b&quot;\x1b[3;1\x1bP1$tx\x9c&quot;</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>dispatcher = Dispatcher::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>parser = Parser::new();
 
-        <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="ident">INPUT</span> {
-            <span class="ident">parser</span>.<span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="ident">dispatcher</span>, <span class="kw-2">*</span><span class="ident">byte</span>);
+        <span class="kw">for </span>byte <span class="kw">in </span>INPUT {
+            parser.advance(<span class="kw-2">&amp;mut </span>dispatcher, <span class="kw-2">*</span>byte);
         }
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dispatcher</span>.<span class="ident">dispatched</span>.<span class="ident">len</span>(), <span class="number">3</span>);
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">dispatcher</span>.<span class="ident">dispatched</span>[<span class="number">0</span>] {
-            <span class="ident">Sequence::DcsHook</span>(<span class="ident">params</span>, <span class="ident">intermediates</span>, <span class="ident">ignore</span>, <span class="kw">_</span>) =&gt; {
-                <span class="macro">assert_eq!</span>(<span class="ident">intermediates</span>, <span class="kw-2">&amp;</span>[<span class="string">b&#39;$&#39;</span>]);
-                <span class="macro">assert_eq!</span>(<span class="ident">params</span>, <span class="kw-2">&amp;</span>[[<span class="number">1</span>]]);
-                <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">ignore</span>);
+        <span class="macro">assert_eq!</span>(dispatcher.dispatched.len(), <span class="number">3</span>);
+        <span class="kw">match </span><span class="kw-2">&amp;</span>dispatcher.dispatched[<span class="number">0</span>] {
+            Sequence::DcsHook(params, intermediates, ignore, <span class="kw">_</span>) =&gt; {
+                <span class="macro">assert_eq!</span>(intermediates, <span class="kw-2">&amp;</span>[<span class="string">b&#39;$&#39;</span>]);
+                <span class="macro">assert_eq!</span>(params, <span class="kw-2">&amp;</span>[[<span class="number">1</span>]]);
+                <span class="macro">assert!</span>(!ignore);
             },
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected dcs sequence&quot;</span>),
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected dcs sequence&quot;</span>),
         }
-        <span class="macro">assert_eq!</span>(<span class="ident">dispatcher</span>.<span class="ident">dispatched</span>[<span class="number">1</span>], <span class="ident">Sequence::DcsPut</span>(<span class="string">b&#39;x&#39;</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">dispatcher</span>.<span class="ident">dispatched</span>[<span class="number">2</span>], <span class="ident">Sequence::DcsUnhook</span>);
+        <span class="macro">assert_eq!</span>(dispatcher.dispatched[<span class="number">1</span>], Sequence::DcsPut(<span class="string">b&#39;x&#39;</span>));
+        <span class="macro">assert_eq!</span>(dispatcher.dispatched[<span class="number">2</span>], Sequence::DcsUnhook);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_dcs</span>() {
-        <span class="kw">static</span> <span class="ident">INPUT</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="string">b&quot;\x1bP0;1|17/ab\x9c&quot;</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dispatcher</span> <span class="op">=</span> <span class="ident">Dispatcher::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parser</span> <span class="op">=</span> <span class="ident">Parser::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_dcs() {
+        <span class="kw">static </span>INPUT: <span class="kw-2">&amp;</span>[u8] = <span class="string">b&quot;\x1bP0;1|17/ab\x9c&quot;</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>dispatcher = Dispatcher::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>parser = Parser::new();
 
-        <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="ident">INPUT</span> {
-            <span class="ident">parser</span>.<span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="ident">dispatcher</span>, <span class="kw-2">*</span><span class="ident">byte</span>);
+        <span class="kw">for </span>byte <span class="kw">in </span>INPUT {
+            parser.advance(<span class="kw-2">&amp;mut </span>dispatcher, <span class="kw-2">*</span>byte);
         }
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dispatcher</span>.<span class="ident">dispatched</span>.<span class="ident">len</span>(), <span class="number">7</span>);
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">dispatcher</span>.<span class="ident">dispatched</span>[<span class="number">0</span>] {
-            <span class="ident">Sequence::DcsHook</span>(<span class="ident">params</span>, <span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">c</span>) =&gt; {
-                <span class="macro">assert_eq!</span>(<span class="ident">params</span>, <span class="kw-2">&amp;</span>[[<span class="number">0</span>], [<span class="number">1</span>]]);
-                <span class="macro">assert_eq!</span>(<span class="ident">c</span>, <span class="kw-2">&amp;</span><span class="string">&#39;|&#39;</span>);
+        <span class="macro">assert_eq!</span>(dispatcher.dispatched.len(), <span class="number">7</span>);
+        <span class="kw">match </span><span class="kw-2">&amp;</span>dispatcher.dispatched[<span class="number">0</span>] {
+            Sequence::DcsHook(params, <span class="kw">_</span>, <span class="kw">_</span>, c) =&gt; {
+                <span class="macro">assert_eq!</span>(params, <span class="kw-2">&amp;</span>[[<span class="number">0</span>], [<span class="number">1</span>]]);
+                <span class="macro">assert_eq!</span>(c, <span class="kw-2">&amp;</span><span class="string">&#39;|&#39;</span>);
             },
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected dcs sequence&quot;</span>),
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected dcs sequence&quot;</span>),
         }
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">byte</span>) <span class="kw">in</span> <span class="string">b&quot;17/ab&quot;</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="macro">assert_eq!</span>(<span class="ident">dispatcher</span>.<span class="ident">dispatched</span>[<span class="number">1</span> <span class="op">+</span> <span class="ident">i</span>], <span class="ident">Sequence::DcsPut</span>(<span class="kw-2">*</span><span class="ident">byte</span>));
+        <span class="kw">for </span>(i, byte) <span class="kw">in </span><span class="string">b&quot;17/ab&quot;</span>.iter().enumerate() {
+            <span class="macro">assert_eq!</span>(dispatcher.dispatched[<span class="number">1 </span>+ i], Sequence::DcsPut(<span class="kw-2">*</span>byte));
         }
-        <span class="macro">assert_eq!</span>(<span class="ident">dispatcher</span>.<span class="ident">dispatched</span>[<span class="number">6</span>], <span class="ident">Sequence::DcsUnhook</span>);
+        <span class="macro">assert_eq!</span>(dispatcher.dispatched[<span class="number">6</span>], Sequence::DcsUnhook);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">intermediate_reset_on_dcs_exit</span>() {
-        <span class="kw">static</span> <span class="ident">INPUT</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="string">b&quot;\x1bP=1sZZZ\x1b+\x5c&quot;</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dispatcher</span> <span class="op">=</span> <span class="ident">Dispatcher::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parser</span> <span class="op">=</span> <span class="ident">Parser::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>intermediate_reset_on_dcs_exit() {
+        <span class="kw">static </span>INPUT: <span class="kw-2">&amp;</span>[u8] = <span class="string">b&quot;\x1bP=1sZZZ\x1b+\x5c&quot;</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>dispatcher = Dispatcher::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>parser = Parser::new();
 
-        <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="ident">INPUT</span> {
-            <span class="ident">parser</span>.<span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="ident">dispatcher</span>, <span class="kw-2">*</span><span class="ident">byte</span>);
+        <span class="kw">for </span>byte <span class="kw">in </span>INPUT {
+            parser.advance(<span class="kw-2">&amp;mut </span>dispatcher, <span class="kw-2">*</span>byte);
         }
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dispatcher</span>.<span class="ident">dispatched</span>.<span class="ident">len</span>(), <span class="number">6</span>);
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">dispatcher</span>.<span class="ident">dispatched</span>[<span class="number">5</span>] {
-            <span class="ident">Sequence::Esc</span>(<span class="ident">intermediates</span>, ..) =&gt; <span class="macro">assert_eq!</span>(<span class="ident">intermediates</span>, <span class="kw-2">&amp;</span>[<span class="string">b&#39;+&#39;</span>]),
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected esc sequence&quot;</span>),
+        <span class="macro">assert_eq!</span>(dispatcher.dispatched.len(), <span class="number">6</span>);
+        <span class="kw">match </span><span class="kw-2">&amp;</span>dispatcher.dispatched[<span class="number">5</span>] {
+            Sequence::Esc(intermediates, ..) =&gt; <span class="macro">assert_eq!</span>(intermediates, <span class="kw-2">&amp;</span>[<span class="string">b&#39;+&#39;</span>]),
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected esc sequence&quot;</span>),
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">esc_reset</span>() {
-        <span class="kw">static</span> <span class="ident">INPUT</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="string">b&quot;\x1b[3;1\x1b(A&quot;</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dispatcher</span> <span class="op">=</span> <span class="ident">Dispatcher::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parser</span> <span class="op">=</span> <span class="ident">Parser::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>esc_reset() {
+        <span class="kw">static </span>INPUT: <span class="kw-2">&amp;</span>[u8] = <span class="string">b&quot;\x1b[3;1\x1b(A&quot;</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>dispatcher = Dispatcher::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>parser = Parser::new();
 
-        <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="ident">INPUT</span> {
-            <span class="ident">parser</span>.<span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="ident">dispatcher</span>, <span class="kw-2">*</span><span class="ident">byte</span>);
+        <span class="kw">for </span>byte <span class="kw">in </span>INPUT {
+            parser.advance(<span class="kw-2">&amp;mut </span>dispatcher, <span class="kw-2">*</span>byte);
         }
 
-        <span class="macro">assert_eq!</span>(<span class="ident">dispatcher</span>.<span class="ident">dispatched</span>.<span class="ident">len</span>(), <span class="number">1</span>);
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">dispatcher</span>.<span class="ident">dispatched</span>[<span class="number">0</span>] {
-            <span class="ident">Sequence::Esc</span>(<span class="ident">intermediates</span>, <span class="ident">ignore</span>, <span class="ident">byte</span>) =&gt; {
-                <span class="macro">assert_eq!</span>(<span class="ident">intermediates</span>, <span class="kw-2">&amp;</span>[<span class="string">b&#39;(&#39;</span>]);
-                <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">byte</span>, <span class="string">b&#39;A&#39;</span>);
-                <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">ignore</span>);
+        <span class="macro">assert_eq!</span>(dispatcher.dispatched.len(), <span class="number">1</span>);
+        <span class="kw">match </span><span class="kw-2">&amp;</span>dispatcher.dispatched[<span class="number">0</span>] {
+            Sequence::Esc(intermediates, ignore, byte) =&gt; {
+                <span class="macro">assert_eq!</span>(intermediates, <span class="kw-2">&amp;</span>[<span class="string">b&#39;(&#39;</span>]);
+                <span class="macro">assert_eq!</span>(<span class="kw-2">*</span>byte, <span class="string">b&#39;A&#39;</span>);
+                <span class="macro">assert!</span>(!ignore);
             },
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected esc sequence&quot;</span>),
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;expected esc sequence&quot;</span>),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>, <span class="ident">test</span>))]</span>
-<span class="kw">mod</span> <span class="ident">bench</span> {
-    <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">std</span>;
-    <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">test</span>;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;nightly&quot;</span>, test))]
+</span><span class="kw">mod </span>bench {
+    <span class="kw">extern crate </span>std;
+    <span class="kw">extern crate </span>test;
 
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="kw">use</span> <span class="ident">test</span>::{<span class="ident">black_box</span>, <span class="ident">Bencher</span>};
+    <span class="kw">use </span>test::{black_box, Bencher};
 
-    <span class="kw">static</span> <span class="ident">VTE_DEMO</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="macro">include_bytes!</span>(<span class="string">&quot;../tests/demo.vte&quot;</span>);
+    <span class="kw">static </span>VTE_DEMO: <span class="kw-2">&amp;</span>[u8] = <span class="macro">include_bytes!</span>(<span class="string">&quot;../tests/demo.vte&quot;</span>);
 
-    <span class="kw">struct</span> <span class="ident">BenchDispatcher</span>;
-    <span class="kw">impl</span> <span class="ident">Perform</span> <span class="kw">for</span> <span class="ident">BenchDispatcher</span> {
-        <span class="kw">fn</span> <span class="ident">print</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">c</span>: <span class="ident">char</span>) {
-            <span class="ident">black_box</span>(<span class="ident">c</span>);
+    <span class="kw">struct </span>BenchDispatcher;
+    <span class="kw">impl </span>Perform <span class="kw">for </span>BenchDispatcher {
+        <span class="kw">fn </span>print(<span class="kw-2">&amp;mut </span><span class="self">self</span>, c: char) {
+            black_box(c);
         }
 
-        <span class="kw">fn</span> <span class="ident">execute</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">byte</span>: <span class="ident">u8</span>) {
-            <span class="ident">black_box</span>(<span class="ident">byte</span>);
+        <span class="kw">fn </span>execute(<span class="kw-2">&amp;mut </span><span class="self">self</span>, byte: u8) {
+            black_box(byte);
         }
 
-        <span class="kw">fn</span> <span class="ident">hook</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="ident">Params</span>, <span class="ident">intermediates</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">ignore</span>: <span class="ident">bool</span>, <span class="ident">c</span>: <span class="ident">char</span>) {
-            <span class="ident">black_box</span>((<span class="ident">params</span>, <span class="ident">intermediates</span>, <span class="ident">ignore</span>, <span class="ident">c</span>));
+        <span class="kw">fn </span>hook(<span class="kw-2">&amp;mut </span><span class="self">self</span>, params: <span class="kw-2">&amp;</span>Params, intermediates: <span class="kw-2">&amp;</span>[u8], ignore: bool, c: char) {
+            black_box((params, intermediates, ignore, c));
         }
 
-        <span class="kw">fn</span> <span class="ident">put</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">byte</span>: <span class="ident">u8</span>) {
-            <span class="ident">black_box</span>(<span class="ident">byte</span>);
+        <span class="kw">fn </span>put(<span class="kw-2">&amp;mut </span><span class="self">self</span>, byte: u8) {
+            black_box(byte);
         }
 
-        <span class="kw">fn</span> <span class="ident">osc_dispatch</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>[<span class="ident">u8</span>]], <span class="ident">bell_terminated</span>: <span class="ident">bool</span>) {
-            <span class="ident">black_box</span>((<span class="ident">params</span>, <span class="ident">bell_terminated</span>));
+        <span class="kw">fn </span>osc_dispatch(<span class="kw-2">&amp;mut </span><span class="self">self</span>, params: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>[u8]], bell_terminated: bool) {
+            black_box((params, bell_terminated));
         }
 
-        <span class="kw">fn</span> <span class="ident">csi_dispatch</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span><span class="ident">Params</span>, <span class="ident">intermediates</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">ignore</span>: <span class="ident">bool</span>, <span class="ident">c</span>: <span class="ident">char</span>) {
-            <span class="ident">black_box</span>((<span class="ident">params</span>, <span class="ident">intermediates</span>, <span class="ident">ignore</span>, <span class="ident">c</span>));
+        <span class="kw">fn </span>csi_dispatch(<span class="kw-2">&amp;mut </span><span class="self">self</span>, params: <span class="kw-2">&amp;</span>Params, intermediates: <span class="kw-2">&amp;</span>[u8], ignore: bool, c: char) {
+            black_box((params, intermediates, ignore, c));
         }
 
-        <span class="kw">fn</span> <span class="ident">esc_dispatch</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">intermediates</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">ignore</span>: <span class="ident">bool</span>, <span class="ident">byte</span>: <span class="ident">u8</span>) {
-            <span class="ident">black_box</span>((<span class="ident">intermediates</span>, <span class="ident">ignore</span>, <span class="ident">byte</span>));
+        <span class="kw">fn </span>esc_dispatch(<span class="kw-2">&amp;mut </span><span class="self">self</span>, intermediates: <span class="kw-2">&amp;</span>[u8], ignore: bool, byte: u8) {
+            black_box((intermediates, ignore, byte));
         }
     }
 
-    <span class="attribute">#[<span class="ident">bench</span>]</span>
-    <span class="kw">fn</span> <span class="ident">testfile</span>(<span class="ident">b</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Bencher</span>) {
-        <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dispatcher</span> <span class="op">=</span> <span class="ident">BenchDispatcher</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parser</span> <span class="op">=</span> <span class="ident">Parser::new</span>();
+    <span class="attribute">#[bench]
+    </span><span class="kw">fn </span>testfile(b: <span class="kw-2">&amp;mut </span>Bencher) {
+        b.iter(|| {
+            <span class="kw">let </span><span class="kw-2">mut </span>dispatcher = BenchDispatcher;
+            <span class="kw">let </span><span class="kw-2">mut </span>parser = Parser::new();
 
-            <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="ident">VTE_DEMO</span> {
-                <span class="ident">parser</span>.<span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="ident">dispatcher</span>, <span class="kw-2">*</span><span class="ident">byte</span>);
+            <span class="kw">for </span>byte <span class="kw">in </span>VTE_DEMO {
+                parser.advance(<span class="kw-2">&amp;mut </span>dispatcher, <span class="kw-2">*</span>byte);
             }
         });
     }
 
-    <span class="attribute">#[<span class="ident">bench</span>]</span>
-    <span class="kw">fn</span> <span class="ident">state_changes</span>(<span class="ident">b</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Bencher</span>) {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="string">b&quot;\x1b]2;X\x1b\\ \x1b[0m \x1bP0@\x1b\\&quot;</span>;
-        <span class="ident">b</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dispatcher</span> <span class="op">=</span> <span class="ident">BenchDispatcher</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parser</span> <span class="op">=</span> <span class="ident">Parser::new</span>();
+    <span class="attribute">#[bench]
+    </span><span class="kw">fn </span>state_changes(b: <span class="kw-2">&amp;mut </span>Bencher) {
+        <span class="kw">let </span>input = <span class="string">b&quot;\x1b]2;X\x1b\\ \x1b[0m \x1bP0@\x1b\\&quot;</span>;
+        b.iter(|| {
+            <span class="kw">let </span><span class="kw-2">mut </span>dispatcher = BenchDispatcher;
+            <span class="kw">let </span><span class="kw-2">mut </span>parser = Parser::new();
 
-            <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">1_000</span> {
-                <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="ident">input</span> {
-                    <span class="ident">parser</span>.<span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="ident">dispatcher</span>, <span class="kw-2">*</span><span class="ident">byte</span>);
+            <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">1_000 </span>{
+                <span class="kw">for </span>byte <span class="kw">in </span>input {
+                    parser.advance(<span class="kw-2">&amp;mut </span>dispatcher, <span class="kw-2">*</span>byte);
                 }
             }
         });
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="vte" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="vte" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

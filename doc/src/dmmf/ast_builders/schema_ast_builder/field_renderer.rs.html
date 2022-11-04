@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/dmmf/src/ast_builders/schema_ast_builder/field_renderer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>field_renderer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../dmmf/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../dmmf/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../dmmf/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/dmmf/src/ast_builders/schema_ast_builder/field_renderer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>field_renderer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../dmmf/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../dmmf/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../dmmf/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -38,45 +38,45 @@
 <span id="38">38</span>
 <span id="39">39</span>
 <span id="40">40</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">type_renderer</span>::{<span class="ident">render_input_types</span>, <span class="ident">render_output_type</span>},
-    <span class="ident">DmmfInputField</span>, <span class="ident">DmmfOutputField</span>, <span class="ident">RenderContext</span>,
+</pre><pre class="rust"><code><span class="kw">use super</span>::{
+    type_renderer::{render_input_types, render_output_type},
+    DmmfInputField, DmmfOutputField, RenderContext,
 };
-<span class="kw">use</span> <span class="ident">schema</span>::{<span class="ident">InputFieldRef</span>, <span class="ident">InputType</span>, <span class="ident">OutputFieldRef</span>, <span class="ident">ScalarType</span>};
+<span class="kw">use </span>schema::{InputFieldRef, InputType, OutputFieldRef, ScalarType};
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">render_input_field</span>(<span class="ident">input_field</span>: <span class="kw-2">&amp;</span><span class="ident">InputFieldRef</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">RenderContext</span>) -&gt; <span class="ident">DmmfInputField</span> {
-    <span class="kw">let</span> <span class="ident">type_references</span> <span class="op">=</span> <span class="ident">render_input_types</span>(<span class="kw-2">&amp;</span><span class="ident">input_field</span>.<span class="ident">field_types</span>, <span class="ident">ctx</span>);
-    <span class="kw">let</span> <span class="ident">nullable</span> <span class="op">=</span> <span class="ident">input_field</span>
-        .<span class="ident">field_types</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">any</span>(<span class="op">|</span><span class="ident">typ</span><span class="op">|</span> <span class="macro">matches!</span>(<span class="ident">typ</span>, <span class="ident">InputType::Scalar</span>(<span class="ident">ScalarType::Null</span>)));
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>render_input_field(input_field: <span class="kw-2">&amp;</span>InputFieldRef, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; DmmfInputField {
+    <span class="kw">let </span>type_references = render_input_types(<span class="kw-2">&amp;</span>input_field.field_types, ctx);
+    <span class="kw">let </span>nullable = input_field
+        .field_types
+        .iter()
+        .any(|typ| <span class="macro">matches!</span>(typ, InputType::Scalar(ScalarType::Null)));
 
-    <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">DmmfInputField</span> {
-        <span class="ident">name</span>: <span class="ident">input_field</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-        <span class="ident">input_types</span>: <span class="ident">type_references</span>,
-        <span class="ident">is_required</span>: <span class="ident">input_field</span>.<span class="ident">is_required</span>,
-        <span class="ident">is_nullable</span>: <span class="ident">nullable</span>,
-        <span class="ident">deprecation</span>: <span class="ident">input_field</span>.<span class="ident">deprecation</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>),
+    <span class="kw">let </span>field = DmmfInputField {
+        name: input_field.name.clone(),
+        input_types: type_references,
+        is_required: input_field.is_required,
+        is_nullable: nullable,
+        deprecation: input_field.deprecation.as_ref().map(Into::into),
     };
 
-    <span class="ident">field</span>
+    field
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">render_output_field</span>(<span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">OutputFieldRef</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">RenderContext</span>) -&gt; <span class="ident">DmmfOutputField</span> {
-    <span class="kw">let</span> <span class="ident">rendered_inputs</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">arguments</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">render_input_field</span>(<span class="ident">arg</span>, <span class="ident">ctx</span>)).<span class="ident">collect</span>();
-    <span class="kw">let</span> <span class="ident">output_type</span> <span class="op">=</span> <span class="ident">render_output_type</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">field_type</span>, <span class="ident">ctx</span>);
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>render_output_field(field: <span class="kw-2">&amp;</span>OutputFieldRef, ctx: <span class="kw-2">&amp;mut </span>RenderContext) -&gt; DmmfOutputField {
+    <span class="kw">let </span>rendered_inputs = field.arguments.iter().map(|arg| render_input_field(arg, ctx)).collect();
+    <span class="kw">let </span>output_type = render_output_type(<span class="kw-2">&amp;</span>field.field_type, ctx);
 
-    <span class="kw">let</span> <span class="ident">output_field</span> <span class="op">=</span> <span class="ident">DmmfOutputField</span> {
-        <span class="ident">name</span>: <span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-        <span class="ident">args</span>: <span class="ident">rendered_inputs</span>,
-        <span class="ident">output_type</span>,
-        <span class="ident">is_nullable</span>: <span class="ident">field</span>.<span class="ident">is_nullable</span>,
-        <span class="ident">deprecation</span>: <span class="ident">field</span>.<span class="ident">deprecation</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>),
+    <span class="kw">let </span>output_field = DmmfOutputField {
+        name: field.name.clone(),
+        args: rendered_inputs,
+        output_type,
+        is_nullable: field.is_nullable,
+        deprecation: field.deprecation.as_ref().map(Into::into),
     };
 
-    <span class="ident">ctx</span>.<span class="ident">add_mapping</span>(<span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">field</span>.<span class="ident">query_info</span>.<span class="ident">as_ref</span>());
+    ctx.add_mapping(field.name.clone(), field.query_info.as_ref());
 
-    <span class="ident">output_field</span>
+    output_field
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="dmmf" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="dmmf" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

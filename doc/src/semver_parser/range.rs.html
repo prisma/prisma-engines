@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/semver-parser-0.7.0/src/range.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>range.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../semver_parser/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../semver_parser/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../semver_parser/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/semver-parser-0.7.0/src/range.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>range.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../semver_parser/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../semver_parser/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../semver_parser/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -694,701 +694,701 @@
 <span id="694">694</span>
 <span id="695">695</span>
 <span id="696">696</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">common</span>::{<span class="self">self</span>, <span class="ident">numeric_identifier</span>, <span class="ident">letters_numbers_dash_dot</span>};
-<span class="kw">use</span> <span class="ident">version::Identifier</span>;
-<span class="kw">use</span> <span class="ident">std::str</span>::{<span class="ident">FromStr</span>, <span class="ident">from_utf8</span>};
-<span class="kw">use</span> <span class="ident">recognize</span>::<span class="kw-2">*</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>common::{<span class="self">self</span>, numeric_identifier, letters_numbers_dash_dot};
+<span class="kw">use </span>version::Identifier;
+<span class="kw">use </span>std::str::{FromStr, from_utf8};
+<span class="kw">use </span>recognize::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">VersionReq</span> {
-    <span class="kw">pub</span> <span class="ident">predicates</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Predicate</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>VersionReq {
+    <span class="kw">pub </span>predicates: Vec&lt;Predicate&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>,<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">WildcardVersion</span> {
-    <span class="ident">Major</span>,
-    <span class="ident">Minor</span>,
-    <span class="ident">Patch</span>,
+<span class="attribute">#[derive(PartialEq,Debug)]
+</span><span class="kw">pub enum </span>WildcardVersion {
+    Major,
+    Minor,
+    Patch,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>,<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Op</span> {
-    <span class="ident">Ex</span>, <span class="comment">// Exact</span>
-    <span class="ident">Gt</span>, <span class="comment">// Greater than</span>
-    <span class="ident">GtEq</span>, <span class="comment">// Greater than or equal to</span>
-    <span class="ident">Lt</span>, <span class="comment">// Less than</span>
-    <span class="ident">LtEq</span>, <span class="comment">// Less than or equal to</span>
-    <span class="ident">Tilde</span>, <span class="comment">// e.g. ~1.0.0</span>
-    <span class="ident">Compatible</span>, <span class="comment">// compatible by definition of semver, indicated by ^</span>
-    <span class="ident">Wildcard</span>(<span class="ident">WildcardVersion</span>), <span class="comment">// x.y.*, x.*, *</span>
-}
+<span class="attribute">#[derive(PartialEq,Debug)]
+</span><span class="kw">pub enum </span>Op {
+    Ex, <span class="comment">// Exact
+    </span>Gt, <span class="comment">// Greater than
+    </span>GtEq, <span class="comment">// Greater than or equal to
+    </span>Lt, <span class="comment">// Less than
+    </span>LtEq, <span class="comment">// Less than or equal to
+    </span>Tilde, <span class="comment">// e.g. ~1.0.0
+    </span>Compatible, <span class="comment">// compatible by definition of semver, indicated by ^
+    </span>Wildcard(WildcardVersion), <span class="comment">// x.y.*, x.*, *
+</span>}
 
-<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">Op</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">String</span>;
+<span class="kw">impl </span>FromStr <span class="kw">for </span>Op {
+    <span class="kw">type </span><span class="prelude-val">Err </span>= String;
 
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Op</span>, <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">s</span> {
-            <span class="string">&quot;=&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Op::Ex</span>),
-            <span class="string">&quot;&gt;&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Op::Gt</span>),
-            <span class="string">&quot;&gt;=&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Op::GtEq</span>),
-            <span class="string">&quot;&lt;&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Op::Lt</span>),
-            <span class="string">&quot;&lt;=&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Op::LtEq</span>),
-            <span class="string">&quot;~&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Op::Tilde</span>),
-            <span class="string">&quot;^&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Op::Compatible</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">String::from</span>(<span class="string">&quot;Could not parse Op&quot;</span>)),
+    <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Op, String&gt; {
+        <span class="kw">match </span>s {
+            <span class="string">&quot;=&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Op::Ex),
+            <span class="string">&quot;&gt;&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Op::Gt),
+            <span class="string">&quot;&gt;=&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Op::GtEq),
+            <span class="string">&quot;&lt;&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Op::Lt),
+            <span class="string">&quot;&lt;=&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Op::LtEq),
+            <span class="string">&quot;~&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Op::Tilde),
+            <span class="string">&quot;^&quot; </span>=&gt; <span class="prelude-val">Ok</span>(Op::Compatible),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(String::from(<span class="string">&quot;Could not parse Op&quot;</span>)),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>,<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Predicate</span> {
-    <span class="kw">pub</span> <span class="ident">op</span>: <span class="ident">Op</span>,
-    <span class="kw">pub</span> <span class="ident">major</span>: <span class="ident">u64</span>,
-    <span class="kw">pub</span> <span class="ident">minor</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">patch</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">pre</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Identifier</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(PartialEq,Debug)]
+</span><span class="kw">pub struct </span>Predicate {
+    <span class="kw">pub </span>op: Op,
+    <span class="kw">pub </span>major: u64,
+    <span class="kw">pub </span>minor: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    <span class="kw">pub </span>patch: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    <span class="kw">pub </span>pre: Vec&lt;Identifier&gt;,
 }
 
-<span class="kw">fn</span> <span class="ident">numeric_or_wild</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">val</span>, <span class="ident">len</span>)) <span class="op">=</span> <span class="ident">numeric_identifier</span>(<span class="ident">s</span>) {
-        <span class="prelude-val">Some</span>((<span class="prelude-val">Some</span>(<span class="ident">val</span>), <span class="ident">len</span>))
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="op">=</span> <span class="ident">OneOf</span>(<span class="string">b&quot;*xX&quot;</span>).<span class="ident">p</span>(<span class="ident">s</span>) {
-        <span class="prelude-val">Some</span>((<span class="prelude-val">None</span>, <span class="ident">len</span>))
-    } <span class="kw">else</span> {
-        <span class="prelude-val">None</span>
-    }
+<span class="kw">fn </span>numeric_or_wild(s: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="prelude-ty">Option</span>&lt;u64&gt;, usize)&gt; {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>((val, len)) = numeric_identifier(s) {
+        <span class="prelude-val">Some</span>((<span class="prelude-val">Some</span>(val), len))
+    } <span class="kw">else if let </span><span class="prelude-val">Some</span>(len) = OneOf(<span class="string">b&quot;*xX&quot;</span>).p(s) {
+        <span class="prelude-val">Some</span>((<span class="prelude-val">None</span>, len))
+    } <span class="kw">else </span>{
+        <span class="prelude-val">None
+    </span>}
 }
 
-<span class="kw">fn</span> <span class="ident">dot_numeric_or_wild</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
-    <span class="string">b&#39;.&#39;</span>.<span class="ident">p</span>(<span class="ident">s</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">len</span><span class="op">|</span>
-        <span class="ident">numeric_or_wild</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="ident">len</span>..]).<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">val</span>, <span class="ident">len2</span>)<span class="op">|</span> (<span class="ident">val</span>, <span class="ident">len</span> <span class="op">+</span> <span class="ident">len2</span>))
+<span class="kw">fn </span>dot_numeric_or_wild(s: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="prelude-ty">Option</span>&lt;u64&gt;, usize)&gt; {
+    <span class="string">b&#39;.&#39;</span>.p(s).and_then(|len|
+        numeric_or_wild(<span class="kw-2">&amp;</span>s[len..]).map(|(val, len2)| (val, len + len2))
     )
 }
 
-<span class="kw">fn</span> <span class="ident">operation</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">Op</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="op">=</span> <span class="string">&quot;=&quot;</span>.<span class="ident">p</span>(<span class="ident">s</span>) {
-        <span class="prelude-val">Some</span>((<span class="ident">Op::Ex</span>, <span class="ident">len</span>))
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="op">=</span> <span class="string">&quot;&gt;=&quot;</span>.<span class="ident">p</span>(<span class="ident">s</span>) {
-        <span class="prelude-val">Some</span>((<span class="ident">Op::GtEq</span>, <span class="ident">len</span>))
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="op">=</span> <span class="string">&quot;&gt;&quot;</span>.<span class="ident">p</span>(<span class="ident">s</span>) {
-        <span class="prelude-val">Some</span>((<span class="ident">Op::Gt</span>, <span class="ident">len</span>))
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="op">=</span> <span class="string">&quot;&lt;=&quot;</span>.<span class="ident">p</span>(<span class="ident">s</span>) {
-        <span class="prelude-val">Some</span>((<span class="ident">Op::LtEq</span>, <span class="ident">len</span>))
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="op">=</span> <span class="string">&quot;&lt;&quot;</span>.<span class="ident">p</span>(<span class="ident">s</span>) {
-        <span class="prelude-val">Some</span>((<span class="ident">Op::Lt</span>, <span class="ident">len</span>))
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="op">=</span> <span class="string">&quot;~&quot;</span>.<span class="ident">p</span>(<span class="ident">s</span>) {
-        <span class="prelude-val">Some</span>((<span class="ident">Op::Tilde</span>, <span class="ident">len</span>))
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="op">=</span> <span class="string">&quot;^&quot;</span>.<span class="ident">p</span>(<span class="ident">s</span>) {
-        <span class="prelude-val">Some</span>((<span class="ident">Op::Compatible</span>, <span class="ident">len</span>))
-    } <span class="kw">else</span> {
-        <span class="prelude-val">None</span>
-    }
+<span class="kw">fn </span>operation(s: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;(Op, usize)&gt; {
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(len) = <span class="string">&quot;=&quot;</span>.p(s) {
+        <span class="prelude-val">Some</span>((Op::Ex, len))
+    } <span class="kw">else if let </span><span class="prelude-val">Some</span>(len) = <span class="string">&quot;&gt;=&quot;</span>.p(s) {
+        <span class="prelude-val">Some</span>((Op::GtEq, len))
+    } <span class="kw">else if let </span><span class="prelude-val">Some</span>(len) = <span class="string">&quot;&gt;&quot;</span>.p(s) {
+        <span class="prelude-val">Some</span>((Op::Gt, len))
+    } <span class="kw">else if let </span><span class="prelude-val">Some</span>(len) = <span class="string">&quot;&lt;=&quot;</span>.p(s) {
+        <span class="prelude-val">Some</span>((Op::LtEq, len))
+    } <span class="kw">else if let </span><span class="prelude-val">Some</span>(len) = <span class="string">&quot;&lt;&quot;</span>.p(s) {
+        <span class="prelude-val">Some</span>((Op::Lt, len))
+    } <span class="kw">else if let </span><span class="prelude-val">Some</span>(len) = <span class="string">&quot;~&quot;</span>.p(s) {
+        <span class="prelude-val">Some</span>((Op::Tilde, len))
+    } <span class="kw">else if let </span><span class="prelude-val">Some</span>(len) = <span class="string">&quot;^&quot;</span>.p(s) {
+        <span class="prelude-val">Some</span>((Op::Compatible, len))
+    } <span class="kw">else </span>{
+        <span class="prelude-val">None
+    </span>}
 }
 
-<span class="kw">fn</span> <span class="ident">whitespace</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-    <span class="ident">ZeroOrMore</span>(<span class="ident">OneOf</span>(<span class="string">b&quot;\t\r\n &quot;</span>)).<span class="ident">p</span>(<span class="ident">s</span>)
+<span class="kw">fn </span>whitespace(s: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+    ZeroOrMore(OneOf(<span class="string">b&quot;\t\r\n &quot;</span>)).p(s)
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_predicate</span>(<span class="ident">range</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Predicate</span>, <span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">range</span>.<span class="ident">trim</span>().<span class="ident">as_bytes</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">operation</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">op</span>, <span class="ident">len</span>)) <span class="op">=</span> <span class="ident">operation</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="ident">i</span>..]) {
-        <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="ident">len</span>;
-        <span class="ident">op</span>
-    } <span class="kw">else</span> {
-        <span class="comment">// operations default to Compatible</span>
-        <span class="ident">Op::Compatible</span>
+<span class="kw">pub fn </span>parse_predicate(range: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;Predicate, String&gt; {
+    <span class="kw">let </span>s = range.trim().as_bytes();
+    <span class="kw">let </span><span class="kw-2">mut </span>i = <span class="number">0</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>operation = <span class="kw">if let </span><span class="prelude-val">Some</span>((op, len)) = operation(<span class="kw-2">&amp;</span>s[i..]) {
+        i += len;
+        op
+    } <span class="kw">else </span>{
+        <span class="comment">// operations default to Compatible
+        </span>Op::Compatible
     };
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="op">=</span> <span class="ident">whitespace</span>.<span class="ident">p</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="ident">i</span>..]) {
-        <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="ident">len</span>;
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(len) = whitespace.p(<span class="kw-2">&amp;</span>s[i..]) {
+        i += len;
     }
-    <span class="kw">let</span> <span class="ident">major</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">major</span>, <span class="ident">len</span>)) <span class="op">=</span> <span class="ident">numeric_identifier</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="ident">i</span>..]) {
-        <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="ident">len</span>;
-        <span class="ident">major</span>
-    } <span class="kw">else</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Error parsing major version number: &quot;</span>.<span class="ident">to_string</span>());
+    <span class="kw">let </span>major = <span class="kw">if let </span><span class="prelude-val">Some</span>((major, len)) = numeric_identifier(<span class="kw-2">&amp;</span>s[i..]) {
+        i += len;
+        major
+    } <span class="kw">else </span>{
+        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;Error parsing major version number: &quot;</span>.to_string());
     };
-    <span class="kw">let</span> <span class="ident">minor</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">minor</span>, <span class="ident">len</span>)) <span class="op">=</span> <span class="ident">dot_numeric_or_wild</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="ident">i</span>..]) {
-        <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="ident">len</span>;
-        <span class="kw">if</span> <span class="ident">minor</span>.<span class="ident">is_none</span>() {
-            <span class="ident">operation</span> <span class="op">=</span> <span class="ident">Op::Wildcard</span>(<span class="ident">WildcardVersion::Minor</span>);
+    <span class="kw">let </span>minor = <span class="kw">if let </span><span class="prelude-val">Some</span>((minor, len)) = dot_numeric_or_wild(<span class="kw-2">&amp;</span>s[i..]) {
+        i += len;
+        <span class="kw">if </span>minor.is_none() {
+            operation = Op::Wildcard(WildcardVersion::Minor);
         }
-        <span class="ident">minor</span>
-    } <span class="kw">else</span> {
-        <span class="prelude-val">None</span>
-    };
-    <span class="kw">let</span> <span class="ident">patch</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">patch</span>, <span class="ident">len</span>)) <span class="op">=</span> <span class="ident">dot_numeric_or_wild</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="ident">i</span>..]) {
-        <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="ident">len</span>;
-        <span class="kw">if</span> <span class="ident">patch</span>.<span class="ident">is_none</span>() {
-            <span class="ident">operation</span> <span class="op">=</span> <span class="ident">Op::Wildcard</span>(<span class="ident">WildcardVersion::Patch</span>);
+        minor
+    } <span class="kw">else </span>{
+        <span class="prelude-val">None
+    </span>};
+    <span class="kw">let </span>patch = <span class="kw">if let </span><span class="prelude-val">Some</span>((patch, len)) = dot_numeric_or_wild(<span class="kw-2">&amp;</span>s[i..]) {
+        i += len;
+        <span class="kw">if </span>patch.is_none() {
+            operation = Op::Wildcard(WildcardVersion::Patch);
         }
-        <span class="ident">patch</span>
-    } <span class="kw">else</span> {
-        <span class="prelude-val">None</span>
-    };
-    <span class="kw">let</span> (<span class="ident">pre</span>, <span class="ident">pre_len</span>) <span class="op">=</span> <span class="ident">common::parse_optional_meta</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="ident">i</span>..], <span class="string">b&#39;-&#39;</span>)<span class="question-mark">?</span>;
-    <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="ident">pre_len</span>;
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="op">=</span> (<span class="string">b&#39;+&#39;</span>, <span class="ident">letters_numbers_dash_dot</span>).<span class="ident">p</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="ident">i</span>..]) {
-        <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="ident">len</span>;
+        patch
+    } <span class="kw">else </span>{
+        <span class="prelude-val">None
+    </span>};
+    <span class="kw">let </span>(pre, pre_len) = common::parse_optional_meta(<span class="kw-2">&amp;</span>s[i..], <span class="string">b&#39;-&#39;</span>)<span class="question-mark">?</span>;
+    i += pre_len;
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(len) = (<span class="string">b&#39;+&#39;</span>, letters_numbers_dash_dot).p(<span class="kw-2">&amp;</span>s[i..]) {
+        i += len;
     }
-    <span class="kw">if</span> <span class="ident">i</span> <span class="op">!</span><span class="op">=</span> <span class="ident">s</span>.<span class="ident">len</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Extra junk after valid predicate: &quot;</span>.<span class="ident">to_string</span>() <span class="op">+</span>
-            <span class="ident">from_utf8</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="ident">i</span>..]).<span class="ident">unwrap</span>());
+    <span class="kw">if </span>i != s.len() {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;Extra junk after valid predicate: &quot;</span>.to_string() +
+            from_utf8(<span class="kw-2">&amp;</span>s[i..]).unwrap());
     }
-    <span class="prelude-val">Ok</span>(<span class="ident">Predicate</span> {
-        <span class="ident">op</span>: <span class="ident">operation</span>,
-        <span class="ident">major</span>: <span class="ident">major</span>,
-        <span class="ident">minor</span>: <span class="ident">minor</span>,
-        <span class="ident">patch</span>: <span class="ident">patch</span>,
-        <span class="ident">pre</span>: <span class="ident">pre</span>,
+    <span class="prelude-val">Ok</span>(Predicate {
+        op: operation,
+        major: major,
+        minor: minor,
+        patch: patch,
+        pre: pre,
     })
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">ranges</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">VersionReq</span>, <span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="comment">// null is an error</span>
-    <span class="kw">if</span> <span class="ident">ranges</span> <span class="op">==</span> <span class="string">&quot;\0&quot;</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">String::from</span>(<span class="string">&quot;Null is not a valid VersionReq&quot;</span>));
+<span class="kw">pub fn </span>parse(ranges: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;VersionReq, String&gt; {
+    <span class="comment">// null is an error
+    </span><span class="kw">if </span>ranges == <span class="string">&quot;\0&quot; </span>{
+        <span class="kw">return </span><span class="prelude-val">Err</span>(String::from(<span class="string">&quot;Null is not a valid VersionReq&quot;</span>));
     }
 
-    <span class="comment">// an empty range is a major version wildcard</span>
-    <span class="comment">// so is a lone * or x of either capitalization</span>
-    <span class="kw">if</span> (<span class="ident">ranges</span> <span class="op">==</span> <span class="string">&quot;&quot;</span>)
-    <span class="op">|</span><span class="op">|</span> (<span class="ident">ranges</span> <span class="op">==</span> <span class="string">&quot;*&quot;</span>)
-    <span class="op">|</span><span class="op">|</span> (<span class="ident">ranges</span> <span class="op">==</span> <span class="string">&quot;x&quot;</span>)
-    <span class="op">|</span><span class="op">|</span> (<span class="ident">ranges</span> <span class="op">==</span> <span class="string">&quot;X&quot;</span>) {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">VersionReq</span> {
-            <span class="ident">predicates</span>: <span class="macro">vec!</span>[<span class="ident">Predicate</span> {
-                <span class="ident">op</span>: <span class="ident">Op::Wildcard</span>(<span class="ident">WildcardVersion::Major</span>),
-                <span class="ident">major</span>: <span class="number">0</span>,
-                <span class="ident">minor</span>: <span class="prelude-val">None</span>,
-                <span class="ident">patch</span>: <span class="prelude-val">None</span>,
-                <span class="ident">pre</span>: <span class="ident">Vec::new</span>(),
+    <span class="comment">// an empty range is a major version wildcard
+    // so is a lone * or x of either capitalization
+    </span><span class="kw">if </span>(ranges == <span class="string">&quot;&quot;</span>)
+    || (ranges == <span class="string">&quot;*&quot;</span>)
+    || (ranges == <span class="string">&quot;x&quot;</span>)
+    || (ranges == <span class="string">&quot;X&quot;</span>) {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(VersionReq {
+            predicates: <span class="macro">vec!</span>[Predicate {
+                op: Op::Wildcard(WildcardVersion::Major),
+                major: <span class="number">0</span>,
+                minor: <span class="prelude-val">None</span>,
+                patch: <span class="prelude-val">None</span>,
+                pre: Vec::new(),
             }],
         });
     }
 
 
-    <span class="kw">let</span> <span class="ident">ranges</span> <span class="op">=</span> <span class="ident">ranges</span>.<span class="ident">trim</span>();
+    <span class="kw">let </span>ranges = ranges.trim();
 
-    <span class="kw">let</span> <span class="ident">predicates</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>, <span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ranges</span>
-        .<span class="ident">split</span>(<span class="string">&quot;,&quot;</span>)
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">range</span><span class="op">|</span> {
-            <span class="ident">parse_predicate</span>(<span class="ident">range</span>)
+    <span class="kw">let </span>predicates: <span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="kw">_</span>&gt;, String&gt; = ranges
+        .split(<span class="string">&quot;,&quot;</span>)
+        .map(|range| {
+            parse_predicate(range)
         })
-        .<span class="ident">collect</span>();
+        .collect();
 
-    <span class="kw">let</span> <span class="ident">predicates</span> <span class="op">=</span> <span class="macro">try!</span>(<span class="ident">predicates</span>);
+    <span class="kw">let </span>predicates = <span class="macro">try!</span>(predicates);
 
-    <span class="kw">if</span> <span class="ident">predicates</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">String::from</span>(<span class="string">&quot;VersionReq did not parse properly&quot;</span>));
+    <span class="kw">if </span>predicates.len() == <span class="number">0 </span>{
+        <span class="kw">return </span><span class="prelude-val">Err</span>(String::from(<span class="string">&quot;VersionReq did not parse properly&quot;</span>));
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">VersionReq</span> {
-        <span class="ident">predicates</span>: <span class="ident">predicates</span>,
+    <span class="prelude-val">Ok</span>(VersionReq {
+        predicates: predicates,
     })
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">range</span>;
-    <span class="kw">use</span> <span class="ident">version::Identifier</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>range;
+    <span class="kw">use </span>version::Identifier;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_parsing_default</span>() {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">range::parse</span>(<span class="string">&quot;1.0.0&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_parsing_default() {
+        <span class="kw">let </span>r = range::parse(<span class="string">&quot;1.0.0&quot;</span>).unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">Predicate</span> {
-                <span class="ident">op</span>: <span class="ident">Op::Compatible</span>,
-                <span class="ident">major</span>: <span class="number">1</span>,
-                <span class="ident">minor</span>: <span class="prelude-val">Some</span>(<span class="number">0</span>),
-                <span class="ident">patch</span>: <span class="prelude-val">Some</span>(<span class="number">0</span>),
-                <span class="ident">pre</span>: <span class="ident">Vec::new</span>(),
+        <span class="macro">assert_eq!</span>(Predicate {
+                op: Op::Compatible,
+                major: <span class="number">1</span>,
+                minor: <span class="prelude-val">Some</span>(<span class="number">0</span>),
+                patch: <span class="prelude-val">Some</span>(<span class="number">0</span>),
+                pre: Vec::new(),
             },
-            <span class="ident">r</span>.<span class="ident">predicates</span>[<span class="number">0</span>]
+            r.predicates[<span class="number">0</span>]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_parsing_exact_01</span>() {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">range::parse</span>(<span class="string">&quot;=1.0.0&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_parsing_exact_01() {
+        <span class="kw">let </span>r = range::parse(<span class="string">&quot;=1.0.0&quot;</span>).unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">Predicate</span> {
-                <span class="ident">op</span>: <span class="ident">Op::Ex</span>,
-                <span class="ident">major</span>: <span class="number">1</span>,
-                <span class="ident">minor</span>: <span class="prelude-val">Some</span>(<span class="number">0</span>),
-                <span class="ident">patch</span>: <span class="prelude-val">Some</span>(<span class="number">0</span>),
-                <span class="ident">pre</span>: <span class="ident">Vec::new</span>(),
+        <span class="macro">assert_eq!</span>(Predicate {
+                op: Op::Ex,
+                major: <span class="number">1</span>,
+                minor: <span class="prelude-val">Some</span>(<span class="number">0</span>),
+                patch: <span class="prelude-val">Some</span>(<span class="number">0</span>),
+                pre: Vec::new(),
             },
-            <span class="ident">r</span>.<span class="ident">predicates</span>[<span class="number">0</span>]
+            r.predicates[<span class="number">0</span>]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_parsing_exact_02</span>() {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">range::parse</span>(<span class="string">&quot;=0.9.0&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_parsing_exact_02() {
+        <span class="kw">let </span>r = range::parse(<span class="string">&quot;=0.9.0&quot;</span>).unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">Predicate</span> {
-                <span class="ident">op</span>: <span class="ident">Op::Ex</span>,
-                <span class="ident">major</span>: <span class="number">0</span>,
-                <span class="ident">minor</span>: <span class="prelude-val">Some</span>(<span class="number">9</span>),
-                <span class="ident">patch</span>: <span class="prelude-val">Some</span>(<span class="number">0</span>),
-                <span class="ident">pre</span>: <span class="ident">Vec::new</span>(),
+        <span class="macro">assert_eq!</span>(Predicate {
+                op: Op::Ex,
+                major: <span class="number">0</span>,
+                minor: <span class="prelude-val">Some</span>(<span class="number">9</span>),
+                patch: <span class="prelude-val">Some</span>(<span class="number">0</span>),
+                pre: Vec::new(),
             },
-            <span class="ident">r</span>.<span class="ident">predicates</span>[<span class="number">0</span>]
+            r.predicates[<span class="number">0</span>]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_parsing_exact_03</span>() {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">range::parse</span>(<span class="string">&quot;=0.1.0-beta2.a&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_parsing_exact_03() {
+        <span class="kw">let </span>r = range::parse(<span class="string">&quot;=0.1.0-beta2.a&quot;</span>).unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">Predicate</span> {
-                <span class="ident">op</span>: <span class="ident">Op::Ex</span>,
-                <span class="ident">major</span>: <span class="number">0</span>,
-                <span class="ident">minor</span>: <span class="prelude-val">Some</span>(<span class="number">1</span>),
-                <span class="ident">patch</span>: <span class="prelude-val">Some</span>(<span class="number">0</span>),
-                <span class="ident">pre</span>: <span class="macro">vec!</span>[<span class="ident">Identifier::AlphaNumeric</span>(<span class="ident">String::from</span>(<span class="string">&quot;beta2&quot;</span>)),
-                          <span class="ident">Identifier::AlphaNumeric</span>(<span class="ident">String::from</span>(<span class="string">&quot;a&quot;</span>))],
+        <span class="macro">assert_eq!</span>(Predicate {
+                op: Op::Ex,
+                major: <span class="number">0</span>,
+                minor: <span class="prelude-val">Some</span>(<span class="number">1</span>),
+                patch: <span class="prelude-val">Some</span>(<span class="number">0</span>),
+                pre: <span class="macro">vec!</span>[Identifier::AlphaNumeric(String::from(<span class="string">&quot;beta2&quot;</span>)),
+                          Identifier::AlphaNumeric(String::from(<span class="string">&quot;a&quot;</span>))],
             },
-            <span class="ident">r</span>.<span class="ident">predicates</span>[<span class="number">0</span>]
+            r.predicates[<span class="number">0</span>]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_parsing_greater_than</span>() {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">range::parse</span>(<span class="string">&quot;&gt; 1.0.0&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">pub fn </span>test_parsing_greater_than() {
+        <span class="kw">let </span>r = range::parse(<span class="string">&quot;&gt; 1.0.0&quot;</span>).unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">Predicate</span> {
-                <span class="ident">op</span>: <span class="ident">Op::Gt</span>,
-                <span class="ident">major</span>: <span class="number">1</span>,
-                <span class="ident">minor</span>: <span class="prelude-val">Some</span>(<span class="number">0</span>),
-                <span class="ident">patch</span>: <span class="prelude-val">Some</span>(<span class="number">0</span>),
-                <span class="ident">pre</span>: <span class="ident">Vec::new</span>(),
+        <span class="macro">assert_eq!</span>(Predicate {
+                op: Op::Gt,
+                major: <span class="number">1</span>,
+                minor: <span class="prelude-val">Some</span>(<span class="number">0</span>),
+                patch: <span class="prelude-val">Some</span>(<span class="number">0</span>),
+                pre: Vec::new(),
             },
-            <span class="ident">r</span>.<span class="ident">predicates</span>[<span class="number">0</span>]
+            r.predicates[<span class="number">0</span>]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_parsing_greater_than_01</span>() {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">range::parse</span>(<span class="string">&quot;&gt;= 1.0.0&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">pub fn </span>test_parsing_greater_than_01() {
+        <span class="kw">let </span>r = range::parse(<span class="string">&quot;&gt;= 1.0.0&quot;</span>).unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">Predicate</span> {
-                <span class="ident">op</span>: <span class="ident">Op::GtEq</span>,
-                <span class="ident">major</span>: <span class="number">1</span>,
-                <span class="ident">minor</span>: <span class="prelude-val">Some</span>(<span class="number">0</span>),
-                <span class="ident">patch</span>: <span class="prelude-val">Some</span>(<span class="number">0</span>),
-                <span class="ident">pre</span>: <span class="ident">Vec::new</span>(),
+        <span class="macro">assert_eq!</span>(Predicate {
+                op: Op::GtEq,
+                major: <span class="number">1</span>,
+                minor: <span class="prelude-val">Some</span>(<span class="number">0</span>),
+                patch: <span class="prelude-val">Some</span>(<span class="number">0</span>),
+                pre: Vec::new(),
             },
-            <span class="ident">r</span>.<span class="ident">predicates</span>[<span class="number">0</span>]
+            r.predicates[<span class="number">0</span>]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_parsing_greater_than_02</span>() {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">range::parse</span>(<span class="string">&quot;&gt;= 2.1.0-alpha2&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">pub fn </span>test_parsing_greater_than_02() {
+        <span class="kw">let </span>r = range::parse(<span class="string">&quot;&gt;= 2.1.0-alpha2&quot;</span>).unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">Predicate</span> {
-                <span class="ident">op</span>: <span class="ident">Op::GtEq</span>,
-                <span class="ident">major</span>: <span class="number">2</span>,
-                <span class="ident">minor</span>: <span class="prelude-val">Some</span>(<span class="number">1</span>),
-                <span class="ident">patch</span>: <span class="prelude-val">Some</span>(<span class="number">0</span>),
-                <span class="ident">pre</span>: <span class="macro">vec!</span>[<span class="ident">Identifier::AlphaNumeric</span>(<span class="ident">String::from</span>(<span class="string">&quot;alpha2&quot;</span>))],
+        <span class="macro">assert_eq!</span>(Predicate {
+                op: Op::GtEq,
+                major: <span class="number">2</span>,
+                minor: <span class="prelude-val">Some</span>(<span class="number">1</span>),
+                patch: <span class="prelude-val">Some</span>(<span class="number">0</span>),
+                pre: <span class="macro">vec!</span>[Identifier::AlphaNumeric(String::from(<span class="string">&quot;alpha2&quot;</span>))],
             },
-            <span class="ident">r</span>.<span class="ident">predicates</span>[<span class="number">0</span>]
+            r.predicates[<span class="number">0</span>]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_parsing_less_than</span>() {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">range::parse</span>(<span class="string">&quot;&lt; 1.0.0&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">pub fn </span>test_parsing_less_than() {
+        <span class="kw">let </span>r = range::parse(<span class="string">&quot;&lt; 1.0.0&quot;</span>).unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">Predicate</span> {
-                <span class="ident">op</span>: <span class="ident">Op::Lt</span>,
-                <span class="ident">major</span>: <span class="number">1</span>,
-                <span class="ident">minor</span>: <span class="prelude-val">Some</span>(<span class="number">0</span>),
-                <span class="ident">patch</span>: <span class="prelude-val">Some</span>(<span class="number">0</span>),
-                <span class="ident">pre</span>: <span class="ident">Vec::new</span>(),
+        <span class="macro">assert_eq!</span>(Predicate {
+                op: Op::Lt,
+                major: <span class="number">1</span>,
+                minor: <span class="prelude-val">Some</span>(<span class="number">0</span>),
+                patch: <span class="prelude-val">Some</span>(<span class="number">0</span>),
+                pre: Vec::new(),
             },
-            <span class="ident">r</span>.<span class="ident">predicates</span>[<span class="number">0</span>]
+            r.predicates[<span class="number">0</span>]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_parsing_less_than_eq</span>() {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">range::parse</span>(<span class="string">&quot;&lt;= 2.1.0-alpha2&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">pub fn </span>test_parsing_less_than_eq() {
+        <span class="kw">let </span>r = range::parse(<span class="string">&quot;&lt;= 2.1.0-alpha2&quot;</span>).unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">Predicate</span> {
-                <span class="ident">op</span>: <span class="ident">Op::LtEq</span>,
-                <span class="ident">major</span>: <span class="number">2</span>,
-                <span class="ident">minor</span>: <span class="prelude-val">Some</span>(<span class="number">1</span>),
-                <span class="ident">patch</span>: <span class="prelude-val">Some</span>(<span class="number">0</span>),
-                <span class="ident">pre</span>: <span class="macro">vec!</span>[<span class="ident">Identifier::AlphaNumeric</span>(<span class="ident">String::from</span>(<span class="string">&quot;alpha2&quot;</span>))],
+        <span class="macro">assert_eq!</span>(Predicate {
+                op: Op::LtEq,
+                major: <span class="number">2</span>,
+                minor: <span class="prelude-val">Some</span>(<span class="number">1</span>),
+                patch: <span class="prelude-val">Some</span>(<span class="number">0</span>),
+                pre: <span class="macro">vec!</span>[Identifier::AlphaNumeric(String::from(<span class="string">&quot;alpha2&quot;</span>))],
             },
-            <span class="ident">r</span>.<span class="ident">predicates</span>[<span class="number">0</span>]
+            r.predicates[<span class="number">0</span>]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_parsing_tilde</span>() {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">range::parse</span>(<span class="string">&quot;~1&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">pub fn </span>test_parsing_tilde() {
+        <span class="kw">let </span>r = range::parse(<span class="string">&quot;~1&quot;</span>).unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">Predicate</span> {
-                <span class="ident">op</span>: <span class="ident">Op::Tilde</span>,
-                <span class="ident">major</span>: <span class="number">1</span>,
-                <span class="ident">minor</span>: <span class="prelude-val">None</span>,
-                <span class="ident">patch</span>: <span class="prelude-val">None</span>,
-                <span class="ident">pre</span>: <span class="ident">Vec::new</span>(),
+        <span class="macro">assert_eq!</span>(Predicate {
+                op: Op::Tilde,
+                major: <span class="number">1</span>,
+                minor: <span class="prelude-val">None</span>,
+                patch: <span class="prelude-val">None</span>,
+                pre: Vec::new(),
             },
-            <span class="ident">r</span>.<span class="ident">predicates</span>[<span class="number">0</span>]
+            r.predicates[<span class="number">0</span>]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_parsing_compatible</span>() {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">range::parse</span>(<span class="string">&quot;^0&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">pub fn </span>test_parsing_compatible() {
+        <span class="kw">let </span>r = range::parse(<span class="string">&quot;^0&quot;</span>).unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">Predicate</span> {
-                <span class="ident">op</span>: <span class="ident">Op::Compatible</span>,
-                <span class="ident">major</span>: <span class="number">0</span>,
-                <span class="ident">minor</span>: <span class="prelude-val">None</span>,
-                <span class="ident">patch</span>: <span class="prelude-val">None</span>,
-                <span class="ident">pre</span>: <span class="ident">Vec::new</span>(),
+        <span class="macro">assert_eq!</span>(Predicate {
+                op: Op::Compatible,
+                major: <span class="number">0</span>,
+                minor: <span class="prelude-val">None</span>,
+                patch: <span class="prelude-val">None</span>,
+                pre: Vec::new(),
             },
-            <span class="ident">r</span>.<span class="ident">predicates</span>[<span class="number">0</span>]
+            r.predicates[<span class="number">0</span>]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_parsing_blank</span>() {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">range::parse</span>(<span class="string">&quot;&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_parsing_blank() {
+        <span class="kw">let </span>r = range::parse(<span class="string">&quot;&quot;</span>).unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">Predicate</span> {
-                <span class="ident">op</span>: <span class="ident">Op::Wildcard</span>(<span class="ident">WildcardVersion::Major</span>),
-                <span class="ident">major</span>: <span class="number">0</span>,
-                <span class="ident">minor</span>: <span class="prelude-val">None</span>,
-                <span class="ident">patch</span>: <span class="prelude-val">None</span>,
-                <span class="ident">pre</span>: <span class="ident">Vec::new</span>(),
+        <span class="macro">assert_eq!</span>(Predicate {
+                op: Op::Wildcard(WildcardVersion::Major),
+                major: <span class="number">0</span>,
+                minor: <span class="prelude-val">None</span>,
+                patch: <span class="prelude-val">None</span>,
+                pre: Vec::new(),
             },
-            <span class="ident">r</span>.<span class="ident">predicates</span>[<span class="number">0</span>]
+            r.predicates[<span class="number">0</span>]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_parsing_wildcard</span>() {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">range::parse</span>(<span class="string">&quot;*&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_parsing_wildcard() {
+        <span class="kw">let </span>r = range::parse(<span class="string">&quot;*&quot;</span>).unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">Predicate</span> {
-                <span class="ident">op</span>: <span class="ident">Op::Wildcard</span>(<span class="ident">WildcardVersion::Major</span>),
-                <span class="ident">major</span>: <span class="number">0</span>,
-                <span class="ident">minor</span>: <span class="prelude-val">None</span>,
-                <span class="ident">patch</span>: <span class="prelude-val">None</span>,
-                <span class="ident">pre</span>: <span class="ident">Vec::new</span>(),
+        <span class="macro">assert_eq!</span>(Predicate {
+                op: Op::Wildcard(WildcardVersion::Major),
+                major: <span class="number">0</span>,
+                minor: <span class="prelude-val">None</span>,
+                patch: <span class="prelude-val">None</span>,
+                pre: Vec::new(),
             },
-            <span class="ident">r</span>.<span class="ident">predicates</span>[<span class="number">0</span>]
+            r.predicates[<span class="number">0</span>]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_parsing_x</span>() {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">range::parse</span>(<span class="string">&quot;x&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_parsing_x() {
+        <span class="kw">let </span>r = range::parse(<span class="string">&quot;x&quot;</span>).unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">Predicate</span> {
-                <span class="ident">op</span>: <span class="ident">Op::Wildcard</span>(<span class="ident">WildcardVersion::Major</span>),
-                <span class="ident">major</span>: <span class="number">0</span>,
-                <span class="ident">minor</span>: <span class="prelude-val">None</span>,
-                <span class="ident">patch</span>: <span class="prelude-val">None</span>,
-                <span class="ident">pre</span>: <span class="ident">Vec::new</span>(),
+        <span class="macro">assert_eq!</span>(Predicate {
+                op: Op::Wildcard(WildcardVersion::Major),
+                major: <span class="number">0</span>,
+                minor: <span class="prelude-val">None</span>,
+                patch: <span class="prelude-val">None</span>,
+                pre: Vec::new(),
             },
-            <span class="ident">r</span>.<span class="ident">predicates</span>[<span class="number">0</span>]
+            r.predicates[<span class="number">0</span>]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_parsing_capital_x</span>() {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">range::parse</span>(<span class="string">&quot;X&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_parsing_capital_x() {
+        <span class="kw">let </span>r = range::parse(<span class="string">&quot;X&quot;</span>).unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">Predicate</span> {
-                <span class="ident">op</span>: <span class="ident">Op::Wildcard</span>(<span class="ident">WildcardVersion::Major</span>),
-                <span class="ident">major</span>: <span class="number">0</span>,
-                <span class="ident">minor</span>: <span class="prelude-val">None</span>,
-                <span class="ident">patch</span>: <span class="prelude-val">None</span>,
-                <span class="ident">pre</span>: <span class="ident">Vec::new</span>(),
+        <span class="macro">assert_eq!</span>(Predicate {
+                op: Op::Wildcard(WildcardVersion::Major),
+                major: <span class="number">0</span>,
+                minor: <span class="prelude-val">None</span>,
+                patch: <span class="prelude-val">None</span>,
+                pre: Vec::new(),
             },
-            <span class="ident">r</span>.<span class="ident">predicates</span>[<span class="number">0</span>]
+            r.predicates[<span class="number">0</span>]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_parsing_minor_wildcard_star</span>() {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">range::parse</span>(<span class="string">&quot;1.*&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_parsing_minor_wildcard_star() {
+        <span class="kw">let </span>r = range::parse(<span class="string">&quot;1.*&quot;</span>).unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">Predicate</span> {
-                <span class="ident">op</span>: <span class="ident">Op::Wildcard</span>(<span class="ident">WildcardVersion::Minor</span>),
-                <span class="ident">major</span>: <span class="number">1</span>,
-                <span class="ident">minor</span>: <span class="prelude-val">None</span>,
-                <span class="ident">patch</span>: <span class="prelude-val">None</span>,
-                <span class="ident">pre</span>: <span class="ident">Vec::new</span>(),
+        <span class="macro">assert_eq!</span>(Predicate {
+                op: Op::Wildcard(WildcardVersion::Minor),
+                major: <span class="number">1</span>,
+                minor: <span class="prelude-val">None</span>,
+                patch: <span class="prelude-val">None</span>,
+                pre: Vec::new(),
             },
-            <span class="ident">r</span>.<span class="ident">predicates</span>[<span class="number">0</span>]
+            r.predicates[<span class="number">0</span>]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_parsing_minor_wildcard_x</span>() {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">range::parse</span>(<span class="string">&quot;1.x&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_parsing_minor_wildcard_x() {
+        <span class="kw">let </span>r = range::parse(<span class="string">&quot;1.x&quot;</span>).unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">Predicate</span> {
-                <span class="ident">op</span>: <span class="ident">Op::Wildcard</span>(<span class="ident">WildcardVersion::Minor</span>),
-                <span class="ident">major</span>: <span class="number">1</span>,
-                <span class="ident">minor</span>: <span class="prelude-val">None</span>,
-                <span class="ident">patch</span>: <span class="prelude-val">None</span>,
-                <span class="ident">pre</span>: <span class="ident">Vec::new</span>(),
+        <span class="macro">assert_eq!</span>(Predicate {
+                op: Op::Wildcard(WildcardVersion::Minor),
+                major: <span class="number">1</span>,
+                minor: <span class="prelude-val">None</span>,
+                patch: <span class="prelude-val">None</span>,
+                pre: Vec::new(),
             },
-            <span class="ident">r</span>.<span class="ident">predicates</span>[<span class="number">0</span>]
+            r.predicates[<span class="number">0</span>]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_parsing_minor_wildcard_capital_x</span>() {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">range::parse</span>(<span class="string">&quot;1.X&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_parsing_minor_wildcard_capital_x() {
+        <span class="kw">let </span>r = range::parse(<span class="string">&quot;1.X&quot;</span>).unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">Predicate</span> {
-                <span class="ident">op</span>: <span class="ident">Op::Wildcard</span>(<span class="ident">WildcardVersion::Minor</span>),
-                <span class="ident">major</span>: <span class="number">1</span>,
-                <span class="ident">minor</span>: <span class="prelude-val">None</span>,
-                <span class="ident">patch</span>: <span class="prelude-val">None</span>,
-                <span class="ident">pre</span>: <span class="ident">Vec::new</span>(),
+        <span class="macro">assert_eq!</span>(Predicate {
+                op: Op::Wildcard(WildcardVersion::Minor),
+                major: <span class="number">1</span>,
+                minor: <span class="prelude-val">None</span>,
+                patch: <span class="prelude-val">None</span>,
+                pre: Vec::new(),
             },
-            <span class="ident">r</span>.<span class="ident">predicates</span>[<span class="number">0</span>]
+            r.predicates[<span class="number">0</span>]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_parsing_patch_wildcard_star</span>() {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">range::parse</span>(<span class="string">&quot;1.2.*&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_parsing_patch_wildcard_star() {
+        <span class="kw">let </span>r = range::parse(<span class="string">&quot;1.2.*&quot;</span>).unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">Predicate</span> {
-                <span class="ident">op</span>: <span class="ident">Op::Wildcard</span>(<span class="ident">WildcardVersion::Patch</span>),
-                <span class="ident">major</span>: <span class="number">1</span>,
-                <span class="ident">minor</span>: <span class="prelude-val">Some</span>(<span class="number">2</span>),
-                <span class="ident">patch</span>: <span class="prelude-val">None</span>,
-                <span class="ident">pre</span>: <span class="ident">Vec::new</span>(),
+        <span class="macro">assert_eq!</span>(Predicate {
+                op: Op::Wildcard(WildcardVersion::Patch),
+                major: <span class="number">1</span>,
+                minor: <span class="prelude-val">Some</span>(<span class="number">2</span>),
+                patch: <span class="prelude-val">None</span>,
+                pre: Vec::new(),
             },
-            <span class="ident">r</span>.<span class="ident">predicates</span>[<span class="number">0</span>]
+            r.predicates[<span class="number">0</span>]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_parsing_patch_wildcard_x</span>() {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">range::parse</span>(<span class="string">&quot;1.2.x&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_parsing_patch_wildcard_x() {
+        <span class="kw">let </span>r = range::parse(<span class="string">&quot;1.2.x&quot;</span>).unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">Predicate</span> {
-                <span class="ident">op</span>: <span class="ident">Op::Wildcard</span>(<span class="ident">WildcardVersion::Patch</span>),
-                <span class="ident">major</span>: <span class="number">1</span>,
-                <span class="ident">minor</span>: <span class="prelude-val">Some</span>(<span class="number">2</span>),
-                <span class="ident">patch</span>: <span class="prelude-val">None</span>,
-                <span class="ident">pre</span>: <span class="ident">Vec::new</span>(),
+        <span class="macro">assert_eq!</span>(Predicate {
+                op: Op::Wildcard(WildcardVersion::Patch),
+                major: <span class="number">1</span>,
+                minor: <span class="prelude-val">Some</span>(<span class="number">2</span>),
+                patch: <span class="prelude-val">None</span>,
+                pre: Vec::new(),
             },
-            <span class="ident">r</span>.<span class="ident">predicates</span>[<span class="number">0</span>]
+            r.predicates[<span class="number">0</span>]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_parsing_patch_wildcard_capital_x</span>() {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">range::parse</span>(<span class="string">&quot;1.2.X&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_parsing_patch_wildcard_capital_x() {
+        <span class="kw">let </span>r = range::parse(<span class="string">&quot;1.2.X&quot;</span>).unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">Predicate</span> {
-                <span class="ident">op</span>: <span class="ident">Op::Wildcard</span>(<span class="ident">WildcardVersion::Patch</span>),
-                <span class="ident">major</span>: <span class="number">1</span>,
-                <span class="ident">minor</span>: <span class="prelude-val">Some</span>(<span class="number">2</span>),
-                <span class="ident">patch</span>: <span class="prelude-val">None</span>,
-                <span class="ident">pre</span>: <span class="ident">Vec::new</span>(),
+        <span class="macro">assert_eq!</span>(Predicate {
+                op: Op::Wildcard(WildcardVersion::Patch),
+                major: <span class="number">1</span>,
+                minor: <span class="prelude-val">Some</span>(<span class="number">2</span>),
+                patch: <span class="prelude-val">None</span>,
+                pre: Vec::new(),
             },
-            <span class="ident">r</span>.<span class="ident">predicates</span>[<span class="number">0</span>]
+            r.predicates[<span class="number">0</span>]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_multiple_01</span>() {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">range::parse</span>(<span class="string">&quot;&gt; 0.0.9, &lt;= 2.5.3&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">pub fn </span>test_multiple_01() {
+        <span class="kw">let </span>r = range::parse(<span class="string">&quot;&gt; 0.0.9, &lt;= 2.5.3&quot;</span>).unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">Predicate</span> {
-                <span class="ident">op</span>: <span class="ident">Op::Gt</span>,
-                <span class="ident">major</span>: <span class="number">0</span>,
-                <span class="ident">minor</span>: <span class="prelude-val">Some</span>(<span class="number">0</span>),
-                <span class="ident">patch</span>: <span class="prelude-val">Some</span>(<span class="number">9</span>),
-                <span class="ident">pre</span>: <span class="ident">Vec::new</span>(),
+        <span class="macro">assert_eq!</span>(Predicate {
+                op: Op::Gt,
+                major: <span class="number">0</span>,
+                minor: <span class="prelude-val">Some</span>(<span class="number">0</span>),
+                patch: <span class="prelude-val">Some</span>(<span class="number">9</span>),
+                pre: Vec::new(),
             },
-            <span class="ident">r</span>.<span class="ident">predicates</span>[<span class="number">0</span>]
+            r.predicates[<span class="number">0</span>]
         );
 
-        <span class="macro">assert_eq!</span>(<span class="ident">Predicate</span> {
-                <span class="ident">op</span>: <span class="ident">Op::LtEq</span>,
-                <span class="ident">major</span>: <span class="number">2</span>,
-                <span class="ident">minor</span>: <span class="prelude-val">Some</span>(<span class="number">5</span>),
-                <span class="ident">patch</span>: <span class="prelude-val">Some</span>(<span class="number">3</span>),
-                <span class="ident">pre</span>: <span class="ident">Vec::new</span>(),
+        <span class="macro">assert_eq!</span>(Predicate {
+                op: Op::LtEq,
+                major: <span class="number">2</span>,
+                minor: <span class="prelude-val">Some</span>(<span class="number">5</span>),
+                patch: <span class="prelude-val">Some</span>(<span class="number">3</span>),
+                pre: Vec::new(),
             },
-            <span class="ident">r</span>.<span class="ident">predicates</span>[<span class="number">1</span>]
-        );
-    }
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_multiple_02</span>() {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">range::parse</span>(<span class="string">&quot;0.3.0, 0.4.0&quot;</span>).<span class="ident">unwrap</span>();
-
-        <span class="macro">assert_eq!</span>(<span class="ident">Predicate</span> {
-                <span class="ident">op</span>: <span class="ident">Op::Compatible</span>,
-                <span class="ident">major</span>: <span class="number">0</span>,
-                <span class="ident">minor</span>: <span class="prelude-val">Some</span>(<span class="number">3</span>),
-                <span class="ident">patch</span>: <span class="prelude-val">Some</span>(<span class="number">0</span>),
-                <span class="ident">pre</span>: <span class="ident">Vec::new</span>(),
-            },
-            <span class="ident">r</span>.<span class="ident">predicates</span>[<span class="number">0</span>]
-        );
-
-        <span class="macro">assert_eq!</span>(<span class="ident">Predicate</span> {
-                <span class="ident">op</span>: <span class="ident">Op::Compatible</span>,
-                <span class="ident">major</span>: <span class="number">0</span>,
-                <span class="ident">minor</span>: <span class="prelude-val">Some</span>(<span class="number">4</span>),
-                <span class="ident">patch</span>: <span class="prelude-val">Some</span>(<span class="number">0</span>),
-                <span class="ident">pre</span>: <span class="ident">Vec::new</span>(),
-            },
-            <span class="ident">r</span>.<span class="ident">predicates</span>[<span class="number">1</span>]
+            r.predicates[<span class="number">1</span>]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_multiple_03</span>() {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">range::parse</span>(<span class="string">&quot;&lt;= 0.2.0, &gt;= 0.5.0&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">pub fn </span>test_multiple_02() {
+        <span class="kw">let </span>r = range::parse(<span class="string">&quot;0.3.0, 0.4.0&quot;</span>).unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">Predicate</span> {
-                <span class="ident">op</span>: <span class="ident">Op::LtEq</span>,
-                <span class="ident">major</span>: <span class="number">0</span>,
-                <span class="ident">minor</span>: <span class="prelude-val">Some</span>(<span class="number">2</span>),
-                <span class="ident">patch</span>: <span class="prelude-val">Some</span>(<span class="number">0</span>),
-                <span class="ident">pre</span>: <span class="ident">Vec::new</span>(),
+        <span class="macro">assert_eq!</span>(Predicate {
+                op: Op::Compatible,
+                major: <span class="number">0</span>,
+                minor: <span class="prelude-val">Some</span>(<span class="number">3</span>),
+                patch: <span class="prelude-val">Some</span>(<span class="number">0</span>),
+                pre: Vec::new(),
             },
-            <span class="ident">r</span>.<span class="ident">predicates</span>[<span class="number">0</span>]
+            r.predicates[<span class="number">0</span>]
         );
 
-        <span class="macro">assert_eq!</span>(<span class="ident">Predicate</span> {
-                <span class="ident">op</span>: <span class="ident">Op::GtEq</span>,
-                <span class="ident">major</span>: <span class="number">0</span>,
-                <span class="ident">minor</span>: <span class="prelude-val">Some</span>(<span class="number">5</span>),
-                <span class="ident">patch</span>: <span class="prelude-val">Some</span>(<span class="number">0</span>),
-                <span class="ident">pre</span>: <span class="ident">Vec::new</span>(),
+        <span class="macro">assert_eq!</span>(Predicate {
+                op: Op::Compatible,
+                major: <span class="number">0</span>,
+                minor: <span class="prelude-val">Some</span>(<span class="number">4</span>),
+                patch: <span class="prelude-val">Some</span>(<span class="number">0</span>),
+                pre: Vec::new(),
             },
-            <span class="ident">r</span>.<span class="ident">predicates</span>[<span class="number">1</span>]
-        );
-    }
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_multiple_04</span>() {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">range::parse</span>(<span class="string">&quot;0.1.0, 0.1.4, 0.1.6&quot;</span>).<span class="ident">unwrap</span>();
-
-        <span class="macro">assert_eq!</span>(<span class="ident">Predicate</span> {
-                <span class="ident">op</span>: <span class="ident">Op::Compatible</span>,
-                <span class="ident">major</span>: <span class="number">0</span>,
-                <span class="ident">minor</span>: <span class="prelude-val">Some</span>(<span class="number">1</span>),
-                <span class="ident">patch</span>: <span class="prelude-val">Some</span>(<span class="number">0</span>),
-                <span class="ident">pre</span>: <span class="ident">Vec::new</span>(),
-            },
-            <span class="ident">r</span>.<span class="ident">predicates</span>[<span class="number">0</span>]
-        );
-
-        <span class="macro">assert_eq!</span>(<span class="ident">Predicate</span> {
-                <span class="ident">op</span>: <span class="ident">Op::Compatible</span>,
-                <span class="ident">major</span>: <span class="number">0</span>,
-                <span class="ident">minor</span>: <span class="prelude-val">Some</span>(<span class="number">1</span>),
-                <span class="ident">patch</span>: <span class="prelude-val">Some</span>(<span class="number">4</span>),
-                <span class="ident">pre</span>: <span class="ident">Vec::new</span>(),
-            },
-            <span class="ident">r</span>.<span class="ident">predicates</span>[<span class="number">1</span>]
-        );
-
-        <span class="macro">assert_eq!</span>(<span class="ident">Predicate</span> {
-                <span class="ident">op</span>: <span class="ident">Op::Compatible</span>,
-                <span class="ident">major</span>: <span class="number">0</span>,
-                <span class="ident">minor</span>: <span class="prelude-val">Some</span>(<span class="number">1</span>),
-                <span class="ident">patch</span>: <span class="prelude-val">Some</span>(<span class="number">6</span>),
-                <span class="ident">pre</span>: <span class="ident">Vec::new</span>(),
-            },
-            <span class="ident">r</span>.<span class="ident">predicates</span>[<span class="number">2</span>]
+            r.predicates[<span class="number">1</span>]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_multiple_05</span>() {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">range::parse</span>(<span class="string">&quot;&gt;=0.5.1-alpha3, &lt;0.6&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">pub fn </span>test_multiple_03() {
+        <span class="kw">let </span>r = range::parse(<span class="string">&quot;&lt;= 0.2.0, &gt;= 0.5.0&quot;</span>).unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">Predicate</span> {
-                <span class="ident">op</span>: <span class="ident">Op::GtEq</span>,
-                <span class="ident">major</span>: <span class="number">0</span>,
-                <span class="ident">minor</span>: <span class="prelude-val">Some</span>(<span class="number">5</span>),
-                <span class="ident">patch</span>: <span class="prelude-val">Some</span>(<span class="number">1</span>),
-                <span class="ident">pre</span>: <span class="macro">vec!</span>[<span class="ident">Identifier::AlphaNumeric</span>(<span class="ident">String::from</span>(<span class="string">&quot;alpha3&quot;</span>))],
+        <span class="macro">assert_eq!</span>(Predicate {
+                op: Op::LtEq,
+                major: <span class="number">0</span>,
+                minor: <span class="prelude-val">Some</span>(<span class="number">2</span>),
+                patch: <span class="prelude-val">Some</span>(<span class="number">0</span>),
+                pre: Vec::new(),
             },
-            <span class="ident">r</span>.<span class="ident">predicates</span>[<span class="number">0</span>]
+            r.predicates[<span class="number">0</span>]
         );
 
-        <span class="macro">assert_eq!</span>(<span class="ident">Predicate</span> {
-                <span class="ident">op</span>: <span class="ident">Op::Lt</span>,
-                <span class="ident">major</span>: <span class="number">0</span>,
-                <span class="ident">minor</span>: <span class="prelude-val">Some</span>(<span class="number">6</span>),
-                <span class="ident">patch</span>: <span class="prelude-val">None</span>,
-                <span class="ident">pre</span>: <span class="ident">Vec::new</span>(),
+        <span class="macro">assert_eq!</span>(Predicate {
+                op: Op::GtEq,
+                major: <span class="number">0</span>,
+                minor: <span class="prelude-val">Some</span>(<span class="number">5</span>),
+                patch: <span class="prelude-val">Some</span>(<span class="number">0</span>),
+                pre: Vec::new(),
             },
-            <span class="ident">r</span>.<span class="ident">predicates</span>[<span class="number">1</span>]
+            r.predicates[<span class="number">1</span>]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_parse_build_metadata_with_predicate</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">range::parse</span>(<span class="string">&quot;^1.2.3+meta&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">predicates</span>[<span class="number">0</span>].<span class="ident">op</span>,
-                   <span class="ident">Op::Compatible</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">range::parse</span>(<span class="string">&quot;~1.2.3+meta&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">predicates</span>[<span class="number">0</span>].<span class="ident">op</span>,
-                   <span class="ident">Op::Tilde</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">range::parse</span>(<span class="string">&quot;=1.2.3+meta&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">predicates</span>[<span class="number">0</span>].<span class="ident">op</span>,
-                   <span class="ident">Op::Ex</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">range::parse</span>(<span class="string">&quot;&lt;=1.2.3+meta&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">predicates</span>[<span class="number">0</span>].<span class="ident">op</span>,
-                   <span class="ident">Op::LtEq</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">range::parse</span>(<span class="string">&quot;&gt;=1.2.3+meta&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">predicates</span>[<span class="number">0</span>].<span class="ident">op</span>,
-                   <span class="ident">Op::GtEq</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">range::parse</span>(<span class="string">&quot;&lt;1.2.3+meta&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">predicates</span>[<span class="number">0</span>].<span class="ident">op</span>,
-                   <span class="ident">Op::Lt</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">range::parse</span>(<span class="string">&quot;&gt;1.2.3+meta&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">predicates</span>[<span class="number">0</span>].<span class="ident">op</span>,
-                   <span class="ident">Op::Gt</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">pub fn </span>test_multiple_04() {
+        <span class="kw">let </span>r = range::parse(<span class="string">&quot;0.1.0, 0.1.4, 0.1.6&quot;</span>).unwrap();
+
+        <span class="macro">assert_eq!</span>(Predicate {
+                op: Op::Compatible,
+                major: <span class="number">0</span>,
+                minor: <span class="prelude-val">Some</span>(<span class="number">1</span>),
+                patch: <span class="prelude-val">Some</span>(<span class="number">0</span>),
+                pre: Vec::new(),
+            },
+            r.predicates[<span class="number">0</span>]
+        );
+
+        <span class="macro">assert_eq!</span>(Predicate {
+                op: Op::Compatible,
+                major: <span class="number">0</span>,
+                minor: <span class="prelude-val">Some</span>(<span class="number">1</span>),
+                patch: <span class="prelude-val">Some</span>(<span class="number">4</span>),
+                pre: Vec::new(),
+            },
+            r.predicates[<span class="number">1</span>]
+        );
+
+        <span class="macro">assert_eq!</span>(Predicate {
+                op: Op::Compatible,
+                major: <span class="number">0</span>,
+                minor: <span class="prelude-val">Some</span>(<span class="number">1</span>),
+                patch: <span class="prelude-val">Some</span>(<span class="number">6</span>),
+                pre: Vec::new(),
+            },
+            r.predicates[<span class="number">2</span>]
+        );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_parse_errors</span>() {
-        <span class="macro">assert!</span>(<span class="ident">range::parse</span>(<span class="string">&quot;\0&quot;</span>).<span class="ident">is_err</span>());
-        <span class="macro">assert!</span>(<span class="ident">range::parse</span>(<span class="string">&quot;&gt;= &gt;= 0.0.2&quot;</span>).<span class="ident">is_err</span>());
-        <span class="macro">assert!</span>(<span class="ident">range::parse</span>(<span class="string">&quot;&gt;== 0.0.2&quot;</span>).<span class="ident">is_err</span>());
-        <span class="macro">assert!</span>(<span class="ident">range::parse</span>(<span class="string">&quot;a.0.0&quot;</span>).<span class="ident">is_err</span>());
-        <span class="macro">assert!</span>(<span class="ident">range::parse</span>(<span class="string">&quot;1.0.0-&quot;</span>).<span class="ident">is_err</span>());
-        <span class="macro">assert!</span>(<span class="ident">range::parse</span>(<span class="string">&quot;&gt;=&quot;</span>).<span class="ident">is_err</span>());
-        <span class="macro">assert!</span>(<span class="ident">range::parse</span>(<span class="string">&quot;&gt; 0.1.0,&quot;</span>).<span class="ident">is_err</span>());
-        <span class="macro">assert!</span>(<span class="ident">range::parse</span>(<span class="string">&quot;&gt; 0.3.0, ,&quot;</span>).<span class="ident">is_err</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">pub fn </span>test_multiple_05() {
+        <span class="kw">let </span>r = range::parse(<span class="string">&quot;&gt;=0.5.1-alpha3, &lt;0.6&quot;</span>).unwrap();
+
+        <span class="macro">assert_eq!</span>(Predicate {
+                op: Op::GtEq,
+                major: <span class="number">0</span>,
+                minor: <span class="prelude-val">Some</span>(<span class="number">5</span>),
+                patch: <span class="prelude-val">Some</span>(<span class="number">1</span>),
+                pre: <span class="macro">vec!</span>[Identifier::AlphaNumeric(String::from(<span class="string">&quot;alpha3&quot;</span>))],
+            },
+            r.predicates[<span class="number">0</span>]
+        );
+
+        <span class="macro">assert_eq!</span>(Predicate {
+                op: Op::Lt,
+                major: <span class="number">0</span>,
+                minor: <span class="prelude-val">Some</span>(<span class="number">6</span>),
+                patch: <span class="prelude-val">None</span>,
+                pre: Vec::new(),
+            },
+            r.predicates[<span class="number">1</span>]
+        );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_large_major_version</span>() {
-        <span class="macro">assert!</span>(<span class="ident">range::parse</span>(<span class="string">&quot;18446744073709551617.0.0&quot;</span>).<span class="ident">is_err</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_parse_build_metadata_with_predicate() {
+        <span class="macro">assert_eq!</span>(range::parse(<span class="string">&quot;^1.2.3+meta&quot;</span>).unwrap().predicates[<span class="number">0</span>].op,
+                   Op::Compatible);
+        <span class="macro">assert_eq!</span>(range::parse(<span class="string">&quot;~1.2.3+meta&quot;</span>).unwrap().predicates[<span class="number">0</span>].op,
+                   Op::Tilde);
+        <span class="macro">assert_eq!</span>(range::parse(<span class="string">&quot;=1.2.3+meta&quot;</span>).unwrap().predicates[<span class="number">0</span>].op,
+                   Op::Ex);
+        <span class="macro">assert_eq!</span>(range::parse(<span class="string">&quot;&lt;=1.2.3+meta&quot;</span>).unwrap().predicates[<span class="number">0</span>].op,
+                   Op::LtEq);
+        <span class="macro">assert_eq!</span>(range::parse(<span class="string">&quot;&gt;=1.2.3+meta&quot;</span>).unwrap().predicates[<span class="number">0</span>].op,
+                   Op::GtEq);
+        <span class="macro">assert_eq!</span>(range::parse(<span class="string">&quot;&lt;1.2.3+meta&quot;</span>).unwrap().predicates[<span class="number">0</span>].op,
+                   Op::Lt);
+        <span class="macro">assert_eq!</span>(range::parse(<span class="string">&quot;&gt;1.2.3+meta&quot;</span>).unwrap().predicates[<span class="number">0</span>].op,
+                   Op::Gt);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_large_minor_version</span>() {
-        <span class="macro">assert!</span>(<span class="ident">range::parse</span>(<span class="string">&quot;0.18446744073709551617.0&quot;</span>).<span class="ident">is_err</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">pub fn </span>test_parse_errors() {
+        <span class="macro">assert!</span>(range::parse(<span class="string">&quot;\0&quot;</span>).is_err());
+        <span class="macro">assert!</span>(range::parse(<span class="string">&quot;&gt;= &gt;= 0.0.2&quot;</span>).is_err());
+        <span class="macro">assert!</span>(range::parse(<span class="string">&quot;&gt;== 0.0.2&quot;</span>).is_err());
+        <span class="macro">assert!</span>(range::parse(<span class="string">&quot;a.0.0&quot;</span>).is_err());
+        <span class="macro">assert!</span>(range::parse(<span class="string">&quot;1.0.0-&quot;</span>).is_err());
+        <span class="macro">assert!</span>(range::parse(<span class="string">&quot;&gt;=&quot;</span>).is_err());
+        <span class="macro">assert!</span>(range::parse(<span class="string">&quot;&gt; 0.1.0,&quot;</span>).is_err());
+        <span class="macro">assert!</span>(range::parse(<span class="string">&quot;&gt; 0.3.0, ,&quot;</span>).is_err());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_large_patch_version</span>() {
-        <span class="macro">assert!</span>(<span class="ident">range::parse</span>(<span class="string">&quot;0.0.18446744073709551617&quot;</span>).<span class="ident">is_err</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">pub fn </span>test_large_major_version() {
+        <span class="macro">assert!</span>(range::parse(<span class="string">&quot;18446744073709551617.0.0&quot;</span>).is_err());
+    }
+
+    <span class="attribute">#[test]
+    </span><span class="kw">pub fn </span>test_large_minor_version() {
+        <span class="macro">assert!</span>(range::parse(<span class="string">&quot;0.18446744073709551617.0&quot;</span>).is_err());
+    }
+
+    <span class="attribute">#[test]
+    </span><span class="kw">pub fn </span>test_large_patch_version() {
+        <span class="macro">assert!</span>(range::parse(<span class="string">&quot;0.0.18446744073709551617&quot;</span>).is_err());
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="semver_parser" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="semver_parser" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

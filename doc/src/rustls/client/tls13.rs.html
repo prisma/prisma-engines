@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/client/tls13.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tls13.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/client/tls13.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tls13.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1180,199 +1180,199 @@
 <span id="1180">1180</span>
 <span id="1181">1181</span>
 <span id="1182">1182</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::check::inappropriate_handshake_message</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::conn</span>::{<span class="ident">CommonState</span>, <span class="ident">ConnectionRandoms</span>, <span class="ident">State</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::Error</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::hash_hs</span>::{<span class="ident">HandshakeHash</span>, <span class="ident">HandshakeHashBuffer</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::kx</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;logging&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::log</span>::{<span class="ident">debug</span>, <span class="ident">trace</span>, <span class="ident">warn</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::base</span>::{<span class="ident">Payload</span>, <span class="ident">PayloadU8</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::ccs::ChangeCipherSpecPayload</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::codec::Codec</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::enums::KeyUpdateRequest</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::enums</span>::{<span class="ident">AlertDescription</span>, <span class="ident">NamedGroup</span>, <span class="ident">ProtocolVersion</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::enums</span>::{<span class="ident">ContentType</span>, <span class="ident">ExtensionType</span>, <span class="ident">HandshakeType</span>, <span class="ident">SignatureScheme</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::handshake::ClientExtension</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::handshake::DigitallySignedStruct</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::handshake::EncryptedExtensions</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::handshake::NewSessionTicketPayloadTLS13</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::handshake</span>::{<span class="ident">CertificateEntry</span>, <span class="ident">CertificatePayloadTLS13</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::handshake</span>::{<span class="ident">HandshakeMessagePayload</span>, <span class="ident">HandshakePayload</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::handshake</span>::{<span class="ident">HasServerExtensions</span>, <span class="ident">ServerHelloPayload</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::handshake</span>::{<span class="ident">PresharedKeyIdentity</span>, <span class="ident">PresharedKeyOffer</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::message</span>::{<span class="ident">Message</span>, <span class="ident">MessagePayload</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::persist</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tls13::key_schedule</span>::{
-    <span class="ident">KeyScheduleEarly</span>, <span class="ident">KeyScheduleHandshake</span>, <span class="ident">KeySchedulePreHandshake</span>, <span class="ident">KeyScheduleTraffic</span>,
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::check::inappropriate_handshake_message;
+<span class="kw">use </span><span class="kw">crate</span>::conn::{CommonState, ConnectionRandoms, State};
+<span class="kw">use </span><span class="kw">crate</span>::error::Error;
+<span class="kw">use </span><span class="kw">crate</span>::hash_hs::{HandshakeHash, HandshakeHashBuffer};
+<span class="kw">use </span><span class="kw">crate</span>::kx;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;logging&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::log::{debug, trace, warn};
+<span class="kw">use </span><span class="kw">crate</span>::msgs::base::{Payload, PayloadU8};
+<span class="kw">use </span><span class="kw">crate</span>::msgs::ccs::ChangeCipherSpecPayload;
+<span class="kw">use </span><span class="kw">crate</span>::msgs::codec::Codec;
+<span class="kw">use </span><span class="kw">crate</span>::msgs::enums::KeyUpdateRequest;
+<span class="kw">use </span><span class="kw">crate</span>::msgs::enums::{AlertDescription, NamedGroup, ProtocolVersion};
+<span class="kw">use </span><span class="kw">crate</span>::msgs::enums::{ContentType, ExtensionType, HandshakeType, SignatureScheme};
+<span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::ClientExtension;
+<span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::DigitallySignedStruct;
+<span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::EncryptedExtensions;
+<span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::NewSessionTicketPayloadTLS13;
+<span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::{CertificateEntry, CertificatePayloadTLS13};
+<span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::{HandshakeMessagePayload, HandshakePayload};
+<span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::{HasServerExtensions, ServerHelloPayload};
+<span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::{PresharedKeyIdentity, PresharedKeyOffer};
+<span class="kw">use </span><span class="kw">crate</span>::msgs::message::{Message, MessagePayload};
+<span class="kw">use </span><span class="kw">crate</span>::msgs::persist;
+<span class="kw">use </span><span class="kw">crate</span>::tls13::key_schedule::{
+    KeyScheduleEarly, KeyScheduleHandshake, KeySchedulePreHandshake, KeyScheduleTraffic,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tls13::Tls13CipherSuite</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::verify</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quic&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">conn::Protocol</span>, <span class="ident">msgs::base::PayloadU16</span>, <span class="ident">quic</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">sign</span>, <span class="ident">KeyLog</span>};
+<span class="kw">use </span><span class="kw">crate</span>::tls13::Tls13CipherSuite;
+<span class="kw">use </span><span class="kw">crate</span>::verify;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;quic&quot;</span>)]
+</span><span class="kw">use crate</span>::{conn::Protocol, msgs::base::PayloadU16, quic};
+<span class="kw">use crate</span>::{sign, KeyLog};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::client_conn::ClientConnectionData</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::hs::ClientContext</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::common::ServerCertDetails</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::common</span>::{<span class="ident">ClientAuthDetails</span>, <span class="ident">ClientHelloDetails</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client</span>::{<span class="ident">hs</span>, <span class="ident">ClientConfig</span>, <span class="ident">ServerName</span>, <span class="ident">StoresClientSessions</span>};
+<span class="kw">use </span><span class="kw">super</span>::client_conn::ClientConnectionData;
+<span class="kw">use </span><span class="kw">super</span>::hs::ClientContext;
+<span class="kw">use </span><span class="kw">crate</span>::client::common::ServerCertDetails;
+<span class="kw">use </span><span class="kw">crate</span>::client::common::{ClientAuthDetails, ClientHelloDetails};
+<span class="kw">use </span><span class="kw">crate</span>::client::{hs, ClientConfig, ServerName, StoresClientSessions};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ticketer::TimeBase</span>;
-<span class="kw">use</span> <span class="ident">ring::constant_time</span>;
+<span class="kw">use </span><span class="kw">crate</span>::ticketer::TimeBase;
+<span class="kw">use </span>ring::constant_time;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sign</span>::{<span class="ident">CertifiedKey</span>, <span class="ident">Signer</span>};
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<span class="kw">use </span><span class="kw">crate</span>::sign::{CertifiedKey, Signer};
+<span class="kw">use </span>std::sync::Arc;
 
-<span class="comment">// Extensions we expect in plaintext in the ServerHello.</span>
-<span class="kw">static</span> <span class="ident">ALLOWED_PLAINTEXT_EXTS</span>: <span class="kw-2">&amp;</span>[<span class="ident">ExtensionType</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
-    <span class="ident">ExtensionType::KeyShare</span>,
-    <span class="ident">ExtensionType::PreSharedKey</span>,
-    <span class="ident">ExtensionType::SupportedVersions</span>,
+<span class="comment">// Extensions we expect in plaintext in the ServerHello.
+</span><span class="kw">static </span>ALLOWED_PLAINTEXT_EXTS: <span class="kw-2">&amp;</span>[ExtensionType] = <span class="kw-2">&amp;</span>[
+    ExtensionType::KeyShare,
+    ExtensionType::PreSharedKey,
+    ExtensionType::SupportedVersions,
 ];
 
-<span class="comment">// Only the intersection of things we offer, and those disallowed</span>
-<span class="comment">// in TLS1.3</span>
-<span class="kw">static</span> <span class="ident">DISALLOWED_TLS13_EXTS</span>: <span class="kw-2">&amp;</span>[<span class="ident">ExtensionType</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
-    <span class="ident">ExtensionType::ECPointFormats</span>,
-    <span class="ident">ExtensionType::SessionTicket</span>,
-    <span class="ident">ExtensionType::RenegotiationInfo</span>,
-    <span class="ident">ExtensionType::ExtendedMasterSecret</span>,
+<span class="comment">// Only the intersection of things we offer, and those disallowed
+// in TLS1.3
+</span><span class="kw">static </span>DISALLOWED_TLS13_EXTS: <span class="kw-2">&amp;</span>[ExtensionType] = <span class="kw-2">&amp;</span>[
+    ExtensionType::ECPointFormats,
+    ExtensionType::SessionTicket,
+    ExtensionType::RenegotiationInfo,
+    ExtensionType::ExtendedMasterSecret,
 ];
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">handle_server_hello</span>(
-    <span class="ident">config</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ClientConfig</span><span class="op">&gt;</span>,
-    <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientContext</span>,
-    <span class="ident">server_hello</span>: <span class="kw-2">&amp;</span><span class="ident">ServerHelloPayload</span>,
-    <span class="kw-2">mut</span> <span class="ident">resuming_session</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">persist::Tls13ClientSessionValue</span><span class="op">&gt;</span>,
-    <span class="ident">server_name</span>: <span class="ident">ServerName</span>,
-    <span class="ident">randoms</span>: <span class="ident">ConnectionRandoms</span>,
-    <span class="ident">suite</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Tls13CipherSuite</span>,
-    <span class="ident">transcript</span>: <span class="ident">HandshakeHash</span>,
-    <span class="ident">early_key_schedule</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">KeyScheduleEarly</span><span class="op">&gt;</span>,
-    <span class="ident">hello</span>: <span class="ident">ClientHelloDetails</span>,
-    <span class="ident">our_key_share</span>: <span class="ident">kx::KeyExchange</span>,
-    <span class="kw-2">mut</span> <span class="ident">sent_tls13_fake_ccs</span>: <span class="ident">bool</span>,
-) -&gt; <span class="ident">hs::NextStateOrError</span> {
-    <span class="ident">validate_server_hello</span>(<span class="ident">cx</span>.<span class="ident">common</span>, <span class="ident">server_hello</span>)<span class="question-mark">?</span>;
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>handle_server_hello(
+    config: Arc&lt;ClientConfig&gt;,
+    cx: <span class="kw-2">&amp;mut </span>ClientContext,
+    server_hello: <span class="kw-2">&amp;</span>ServerHelloPayload,
+    <span class="kw-2">mut </span>resuming_session: <span class="prelude-ty">Option</span>&lt;persist::Tls13ClientSessionValue&gt;,
+    server_name: ServerName,
+    randoms: ConnectionRandoms,
+    suite: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls13CipherSuite,
+    transcript: HandshakeHash,
+    early_key_schedule: <span class="prelude-ty">Option</span>&lt;KeyScheduleEarly&gt;,
+    hello: ClientHelloDetails,
+    our_key_share: kx::KeyExchange,
+    <span class="kw-2">mut </span>sent_tls13_fake_ccs: bool,
+) -&gt; hs::NextStateOrError {
+    validate_server_hello(cx.common, server_hello)<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">their_key_share</span> <span class="op">=</span> <span class="ident">server_hello</span>
-        .<span class="ident">get_key_share</span>()
-        .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">cx</span>.<span class="ident">common</span>
-                .<span class="ident">send_fatal_alert</span>(<span class="ident">AlertDescription::MissingExtension</span>);
-            <span class="ident">Error::PeerMisbehavedError</span>(<span class="string">&quot;missing key share&quot;</span>.<span class="ident">to_string</span>())
+    <span class="kw">let </span>their_key_share = server_hello
+        .get_key_share()
+        .ok_or_else(|| {
+            cx.common
+                .send_fatal_alert(AlertDescription::MissingExtension);
+            Error::PeerMisbehavedError(<span class="string">&quot;missing key share&quot;</span>.to_string())
         })<span class="question-mark">?</span>;
 
-    <span class="kw">if</span> <span class="ident">our_key_share</span>.<span class="ident">group</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">their_key_share</span>.<span class="ident">group</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">cx</span>
-            .<span class="ident">common</span>
-            .<span class="ident">illegal_param</span>(<span class="string">&quot;wrong group for key share&quot;</span>));
+    <span class="kw">if </span>our_key_share.group() != their_key_share.group {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(cx
+            .common
+            .illegal_param(<span class="string">&quot;wrong group for key share&quot;</span>));
     }
 
-    <span class="kw">let</span> <span class="ident">key_schedule_pre_handshake</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> (<span class="prelude-val">Some</span>(<span class="ident">selected_psk</span>), <span class="prelude-val">Some</span>(<span class="ident">early_key_schedule</span>)) <span class="op">=</span>
-        (<span class="ident">server_hello</span>.<span class="ident">get_psk_index</span>(), <span class="ident">early_key_schedule</span>)
+    <span class="kw">let </span>key_schedule_pre_handshake = <span class="kw">if let </span>(<span class="prelude-val">Some</span>(selected_psk), <span class="prelude-val">Some</span>(early_key_schedule)) =
+        (server_hello.get_psk_index(), early_key_schedule)
     {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">resuming</span>) <span class="op">=</span> <span class="ident">resuming_session</span> {
-            <span class="kw">let</span> <span class="ident">resuming_suite</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">suite</span>.<span class="ident">can_resume_from</span>(<span class="ident">resuming</span>.<span class="ident">suite</span>()) {
-                <span class="prelude-val">Some</span>(<span class="ident">resuming</span>) =&gt; <span class="ident">resuming</span>,
-                <span class="prelude-val">None</span> =&gt; {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">cx</span>
-                        .<span class="ident">common</span>
-                        .<span class="ident">illegal_param</span>(<span class="string">&quot;server resuming incompatible suite&quot;</span>));
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>resuming) = resuming_session {
+            <span class="kw">let </span>resuming_suite = <span class="kw">match </span>suite.can_resume_from(resuming.suite()) {
+                <span class="prelude-val">Some</span>(resuming) =&gt; resuming,
+                <span class="prelude-val">None </span>=&gt; {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(cx
+                        .common
+                        .illegal_param(<span class="string">&quot;server resuming incompatible suite&quot;</span>));
                 }
             };
 
-            <span class="comment">// If the server varies the suite here, we will have encrypted early data with</span>
-            <span class="comment">// the wrong suite.</span>
-            <span class="kw">if</span> <span class="ident">cx</span>.<span class="ident">data</span>.<span class="ident">early_data</span>.<span class="ident">is_enabled</span>() <span class="op">&amp;&amp;</span> <span class="ident">resuming_suite</span> <span class="op">!</span><span class="op">=</span> <span class="ident">suite</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">cx</span>
-                    .<span class="ident">common</span>
-                    .<span class="ident">illegal_param</span>(<span class="string">&quot;server varied suite with early data&quot;</span>));
+            <span class="comment">// If the server varies the suite here, we will have encrypted early data with
+            // the wrong suite.
+            </span><span class="kw">if </span>cx.data.early_data.is_enabled() &amp;&amp; resuming_suite != suite {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(cx
+                    .common
+                    .illegal_param(<span class="string">&quot;server varied suite with early data&quot;</span>));
             }
 
-            <span class="kw">if</span> <span class="ident">selected_psk</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">cx</span>
-                    .<span class="ident">common</span>
-                    .<span class="ident">illegal_param</span>(<span class="string">&quot;server selected invalid psk&quot;</span>));
+            <span class="kw">if </span>selected_psk != <span class="number">0 </span>{
+                <span class="kw">return </span><span class="prelude-val">Err</span>(cx
+                    .common
+                    .illegal_param(<span class="string">&quot;server selected invalid psk&quot;</span>));
             }
 
             <span class="macro">debug!</span>(<span class="string">&quot;Resuming using PSK&quot;</span>);
-            <span class="comment">// The key schedule has been initialized and set in fill_in_psk_binder()</span>
-        } <span class="kw">else</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::PeerMisbehavedError</span>(
-                <span class="string">&quot;server selected unoffered psk&quot;</span>.<span class="ident">to_string</span>(),
+            <span class="comment">// The key schedule has been initialized and set in fill_in_psk_binder()
+        </span>} <span class="kw">else </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::PeerMisbehavedError(
+                <span class="string">&quot;server selected unoffered psk&quot;</span>.to_string(),
             ));
         }
-        <span class="ident">KeySchedulePreHandshake::from</span>(<span class="ident">early_key_schedule</span>)
-    } <span class="kw">else</span> {
+        KeySchedulePreHandshake::from(early_key_schedule)
+    } <span class="kw">else </span>{
         <span class="macro">debug!</span>(<span class="string">&quot;Not resuming&quot;</span>);
-        <span class="comment">// Discard the early data key schedule.</span>
-        <span class="ident">cx</span>.<span class="ident">data</span>.<span class="ident">early_data</span>.<span class="ident">rejected</span>();
-        <span class="ident">cx</span>.<span class="ident">common</span>.<span class="ident">early_traffic</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        <span class="ident">resuming_session</span>.<span class="ident">take</span>();
-        <span class="ident">KeySchedulePreHandshake::new</span>(<span class="ident">suite</span>.<span class="ident">hkdf_algorithm</span>)
+        <span class="comment">// Discard the early data key schedule.
+        </span>cx.data.early_data.rejected();
+        cx.common.early_traffic = <span class="bool-val">false</span>;
+        resuming_session.take();
+        KeySchedulePreHandshake::new(suite.hkdf_algorithm)
     };
 
-    <span class="kw">let</span> <span class="ident">key_schedule</span> <span class="op">=</span> <span class="ident">our_key_share</span>.<span class="ident">complete</span>(<span class="kw-2">&amp;</span><span class="ident">their_key_share</span>.<span class="ident">payload</span>.<span class="number">0</span>, <span class="op">|</span><span class="ident">secret</span><span class="op">|</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">key_schedule_pre_handshake</span>.<span class="ident">into_handshake</span>(<span class="ident">secret</span>))
+    <span class="kw">let </span>key_schedule = our_key_share.complete(<span class="kw-2">&amp;</span>their_key_share.payload.<span class="number">0</span>, |secret| {
+        <span class="prelude-val">Ok</span>(key_schedule_pre_handshake.into_handshake(secret))
     })<span class="question-mark">?</span>;
 
-    <span class="comment">// Remember what KX group the server liked for next time.</span>
-    <span class="ident">save_kx_hint</span>(<span class="kw-2">&amp;</span><span class="ident">config</span>, <span class="kw-2">&amp;</span><span class="ident">server_name</span>, <span class="ident">their_key_share</span>.<span class="ident">group</span>);
+    <span class="comment">// Remember what KX group the server liked for next time.
+    </span>save_kx_hint(<span class="kw-2">&amp;</span>config, <span class="kw-2">&amp;</span>server_name, their_key_share.group);
 
-    <span class="comment">// If we change keying when a subsequent handshake message is being joined,</span>
-    <span class="comment">// the two halves will have different record layer protections.  Disallow this.</span>
-    <span class="ident">cx</span>.<span class="ident">common</span>.<span class="ident">check_aligned_handshake</span>()<span class="question-mark">?</span>;
+    <span class="comment">// If we change keying when a subsequent handshake message is being joined,
+    // the two halves will have different record layer protections.  Disallow this.
+    </span>cx.common.check_aligned_handshake()<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">hash_at_client_recvd_server_hello</span> <span class="op">=</span> <span class="ident">transcript</span>.<span class="ident">get_current_hash</span>();
+    <span class="kw">let </span>hash_at_client_recvd_server_hello = transcript.get_current_hash();
 
-    <span class="kw">let</span> (<span class="ident">key_schedule</span>, <span class="ident">client_key</span>, <span class="ident">server_key</span>) <span class="op">=</span> <span class="ident">key_schedule</span>.<span class="ident">derive_handshake_secrets</span>(
-        <span class="ident">hash_at_client_recvd_server_hello</span>,
-        <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">config</span>.<span class="ident">key_log</span>,
-        <span class="kw-2">&amp;</span><span class="ident">randoms</span>.<span class="ident">client</span>,
+    <span class="kw">let </span>(key_schedule, client_key, server_key) = key_schedule.derive_handshake_secrets(
+        hash_at_client_recvd_server_hello,
+        <span class="kw-2">&amp;*</span>config.key_log,
+        <span class="kw-2">&amp;</span>randoms.client,
     );
 
-    <span class="comment">// Decrypt with the peer&#39;s key, encrypt with our own key</span>
-    <span class="ident">cx</span>.<span class="ident">common</span>
-        .<span class="ident">record_layer</span>
-        .<span class="ident">set_message_decrypter</span>(<span class="ident">suite</span>.<span class="ident">derive_decrypter</span>(<span class="kw-2">&amp;</span><span class="ident">server_key</span>));
+    <span class="comment">// Decrypt with the peer&#39;s key, encrypt with our own key
+    </span>cx.common
+        .record_layer
+        .set_message_decrypter(suite.derive_decrypter(<span class="kw-2">&amp;</span>server_key));
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">cx</span>.<span class="ident">data</span>.<span class="ident">early_data</span>.<span class="ident">is_enabled</span>() {
-        <span class="comment">// Set the client encryption key for handshakes if early data is not used</span>
-        <span class="ident">cx</span>.<span class="ident">common</span>
-            .<span class="ident">record_layer</span>
-            .<span class="ident">set_message_encrypter</span>(<span class="ident">suite</span>.<span class="ident">derive_encrypter</span>(<span class="kw-2">&amp;</span><span class="ident">client_key</span>));
+    <span class="kw">if </span>!cx.data.early_data.is_enabled() {
+        <span class="comment">// Set the client encryption key for handshakes if early data is not used
+        </span>cx.common
+            .record_layer
+            .set_message_encrypter(suite.derive_encrypter(<span class="kw-2">&amp;</span>client_key));
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quic&quot;</span>)]</span>
-    <span class="kw">if</span> <span class="ident">cx</span>.<span class="ident">common</span>.<span class="ident">is_quic</span>() {
-        <span class="ident">cx</span>.<span class="ident">common</span>.<span class="ident">quic</span>.<span class="ident">hs_secrets</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">quic::Secrets::new</span>(<span class="ident">client_key</span>, <span class="ident">server_key</span>, <span class="ident">suite</span>, <span class="bool-val">true</span>));
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;quic&quot;</span>)]
+    </span><span class="kw">if </span>cx.common.is_quic() {
+        cx.common.quic.hs_secrets = <span class="prelude-val">Some</span>(quic::Secrets::new(client_key, server_key, suite, <span class="bool-val">true</span>));
     }
 
-    <span class="ident">emit_fake_ccs</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sent_tls13_fake_ccs</span>, <span class="ident">cx</span>.<span class="ident">common</span>);
+    emit_fake_ccs(<span class="kw-2">&amp;mut </span>sent_tls13_fake_ccs, cx.common);
 
-    <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">ExpectEncryptedExtensions</span> {
-        <span class="ident">config</span>,
-        <span class="ident">resuming_session</span>,
-        <span class="ident">server_name</span>,
-        <span class="ident">randoms</span>,
-        <span class="ident">suite</span>,
-        <span class="ident">transcript</span>,
-        <span class="ident">key_schedule</span>,
-        <span class="ident">hello</span>,
+    <span class="prelude-val">Ok</span>(Box::new(ExpectEncryptedExtensions {
+        config,
+        resuming_session,
+        server_name,
+        randoms,
+        suite,
+        transcript,
+        key_schedule,
+        hello,
     }))
 }
 
-<span class="kw">fn</span> <span class="ident">validate_server_hello</span>(
-    <span class="ident">common</span>: <span class="kw-2">&amp;mut</span> <span class="ident">CommonState</span>,
-    <span class="ident">server_hello</span>: <span class="kw-2">&amp;</span><span class="ident">ServerHelloPayload</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">for</span> <span class="ident">ext</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">server_hello</span>.<span class="ident">extensions</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">ALLOWED_PLAINTEXT_EXTS</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">ext</span>.<span class="ident">get_type</span>()) {
-            <span class="ident">common</span>.<span class="ident">send_fatal_alert</span>(<span class="ident">AlertDescription::UnsupportedExtension</span>);
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::PeerMisbehavedError</span>(
-                <span class="string">&quot;server sent unexpected cleartext ext&quot;</span>.<span class="ident">to_string</span>(),
+<span class="kw">fn </span>validate_server_hello(
+    common: <span class="kw-2">&amp;mut </span>CommonState,
+    server_hello: <span class="kw-2">&amp;</span>ServerHelloPayload,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+    <span class="kw">for </span>ext <span class="kw">in </span><span class="kw-2">&amp;</span>server_hello.extensions {
+        <span class="kw">if </span>!ALLOWED_PLAINTEXT_EXTS.contains(<span class="kw-2">&amp;</span>ext.get_type()) {
+            common.send_fatal_alert(AlertDescription::UnsupportedExtension);
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::PeerMisbehavedError(
+                <span class="string">&quot;server sent unexpected cleartext ext&quot;</span>.to_string(),
             ));
         }
     }
@@ -1380,930 +1380,930 @@
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">initial_key_share</span>(
-    <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">ClientConfig</span>,
-    <span class="ident">server_name</span>: <span class="kw-2">&amp;</span><span class="ident">ServerName</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">kx::KeyExchange</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">persist::ClientSessionKey::hint_for_server_name</span>(<span class="ident">server_name</span>);
-    <span class="kw">let</span> <span class="ident">key_buf</span> <span class="op">=</span> <span class="ident">key</span>.<span class="ident">get_encoding</span>();
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>initial_key_share(
+    config: <span class="kw-2">&amp;</span>ClientConfig,
+    server_name: <span class="kw-2">&amp;</span>ServerName,
+) -&gt; <span class="prelude-ty">Result</span>&lt;kx::KeyExchange, Error&gt; {
+    <span class="kw">let </span>key = persist::ClientSessionKey::hint_for_server_name(server_name);
+    <span class="kw">let </span>key_buf = key.get_encoding();
 
-    <span class="kw">let</span> <span class="ident">maybe_value</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">session_storage</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">key_buf</span>);
+    <span class="kw">let </span>maybe_value = config.session_storage.get(<span class="kw-2">&amp;</span>key_buf);
 
-    <span class="kw">let</span> <span class="ident">group</span> <span class="op">=</span> <span class="ident">maybe_value</span>
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">enc</span><span class="op">|</span> <span class="ident">NamedGroup::read_bytes</span>(<span class="kw-2">&amp;</span><span class="ident">enc</span>))
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">group</span><span class="op">|</span> <span class="ident">kx::KeyExchange::choose</span>(<span class="ident">group</span>, <span class="kw-2">&amp;</span><span class="ident">config</span>.<span class="ident">kx_groups</span>))
-        .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">config</span>
-                .<span class="ident">kx_groups</span>
-                .<span class="ident">first</span>()
-                .<span class="ident">expect</span>(<span class="string">&quot;No kx groups configured&quot;</span>)
+    <span class="kw">let </span>group = maybe_value
+        .and_then(|enc| NamedGroup::read_bytes(<span class="kw-2">&amp;</span>enc))
+        .and_then(|group| kx::KeyExchange::choose(group, <span class="kw-2">&amp;</span>config.kx_groups))
+        .unwrap_or_else(|| {
+            config
+                .kx_groups
+                .first()
+                .expect(<span class="string">&quot;No kx groups configured&quot;</span>)
         });
 
-    <span class="ident">kx::KeyExchange::start</span>(<span class="ident">group</span>).<span class="ident">ok_or</span>(<span class="ident">Error::FailedToGetRandomBytes</span>)
+    kx::KeyExchange::start(group).ok_or(Error::FailedToGetRandomBytes)
 }
 
-<span class="kw">fn</span> <span class="ident">save_kx_hint</span>(<span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">ClientConfig</span>, <span class="ident">server_name</span>: <span class="kw-2">&amp;</span><span class="ident">ServerName</span>, <span class="ident">group</span>: <span class="ident">NamedGroup</span>) {
-    <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">persist::ClientSessionKey::hint_for_server_name</span>(<span class="ident">server_name</span>);
+<span class="kw">fn </span>save_kx_hint(config: <span class="kw-2">&amp;</span>ClientConfig, server_name: <span class="kw-2">&amp;</span>ServerName, group: NamedGroup) {
+    <span class="kw">let </span>key = persist::ClientSessionKey::hint_for_server_name(server_name);
 
-    <span class="ident">config</span>
-        .<span class="ident">session_storage</span>
-        .<span class="ident">put</span>(<span class="ident">key</span>.<span class="ident">get_encoding</span>(), <span class="ident">group</span>.<span class="ident">get_encoding</span>());
+    config
+        .session_storage
+        .put(key.get_encoding(), group.get_encoding());
 }
 
-<span class="doccomment">/// This implements the horrifying TLS1.3 hack where PSK binders have a</span>
-<span class="doccomment">/// data dependency on the message they are contained within.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">fill_in_psk_binder</span>(
-    <span class="ident">resuming</span>: <span class="kw-2">&amp;</span><span class="ident">persist::Tls13ClientSessionValue</span>,
-    <span class="ident">transcript</span>: <span class="kw-2">&amp;</span><span class="ident">HandshakeHashBuffer</span>,
-    <span class="ident">hmp</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HandshakeMessagePayload</span>,
-) -&gt; <span class="ident">KeyScheduleEarly</span> {
-    <span class="comment">// We need to know the hash function of the suite we&#39;re trying to resume into.</span>
-    <span class="kw">let</span> <span class="ident">hkdf_alg</span> <span class="op">=</span> <span class="ident">resuming</span>.<span class="ident">suite</span>().<span class="ident">hkdf_algorithm</span>;
-    <span class="kw">let</span> <span class="ident">suite_hash</span> <span class="op">=</span> <span class="ident">resuming</span>.<span class="ident">suite</span>().<span class="ident">hash_algorithm</span>();
+<span class="doccomment">/// This implements the horrifying TLS1.3 hack where PSK binders have a
+/// data dependency on the message they are contained within.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>fill_in_psk_binder(
+    resuming: <span class="kw-2">&amp;</span>persist::Tls13ClientSessionValue,
+    transcript: <span class="kw-2">&amp;</span>HandshakeHashBuffer,
+    hmp: <span class="kw-2">&amp;mut </span>HandshakeMessagePayload,
+) -&gt; KeyScheduleEarly {
+    <span class="comment">// We need to know the hash function of the suite we&#39;re trying to resume into.
+    </span><span class="kw">let </span>hkdf_alg = resuming.suite().hkdf_algorithm;
+    <span class="kw">let </span>suite_hash = resuming.suite().hash_algorithm();
 
-    <span class="comment">// The binder is calculated over the clienthello, but doesn&#39;t include itself or its</span>
-    <span class="comment">// length, or the length of its container.</span>
-    <span class="kw">let</span> <span class="ident">binder_plaintext</span> <span class="op">=</span> <span class="ident">hmp</span>.<span class="ident">get_encoding_for_binder_signing</span>();
-    <span class="kw">let</span> <span class="ident">handshake_hash</span> <span class="op">=</span> <span class="ident">transcript</span>.<span class="ident">get_hash_given</span>(<span class="ident">suite_hash</span>, <span class="kw-2">&amp;</span><span class="ident">binder_plaintext</span>);
+    <span class="comment">// The binder is calculated over the clienthello, but doesn&#39;t include itself or its
+    // length, or the length of its container.
+    </span><span class="kw">let </span>binder_plaintext = hmp.get_encoding_for_binder_signing();
+    <span class="kw">let </span>handshake_hash = transcript.get_hash_given(suite_hash, <span class="kw-2">&amp;</span>binder_plaintext);
 
-    <span class="comment">// Run a fake key_schedule to simulate what the server will do if it chooses</span>
-    <span class="comment">// to resume.</span>
-    <span class="kw">let</span> <span class="ident">key_schedule</span> <span class="op">=</span> <span class="ident">KeyScheduleEarly::new</span>(<span class="ident">hkdf_alg</span>, <span class="ident">resuming</span>.<span class="ident">secret</span>());
-    <span class="kw">let</span> <span class="ident">real_binder</span> <span class="op">=</span> <span class="ident">key_schedule</span>.<span class="ident">resumption_psk_binder_key_and_sign_verify_data</span>(<span class="kw-2">&amp;</span><span class="ident">handshake_hash</span>);
+    <span class="comment">// Run a fake key_schedule to simulate what the server will do if it chooses
+    // to resume.
+    </span><span class="kw">let </span>key_schedule = KeyScheduleEarly::new(hkdf_alg, resuming.secret());
+    <span class="kw">let </span>real_binder = key_schedule.resumption_psk_binder_key_and_sign_verify_data(<span class="kw-2">&amp;</span>handshake_hash);
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">HandshakePayload::ClientHello</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">ch</span>) <span class="op">=</span> <span class="ident">hmp</span>.<span class="ident">payload</span> {
-        <span class="ident">ch</span>.<span class="ident">set_psk_binder</span>(<span class="ident">real_binder</span>.<span class="ident">as_ref</span>());
+    <span class="kw">if let </span>HandshakePayload::ClientHello(<span class="kw-2">ref mut </span>ch) = hmp.payload {
+        ch.set_psk_binder(real_binder.as_ref());
     };
 
-    <span class="ident">key_schedule</span>
+    key_schedule
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">prepare_resumption</span>(
-    <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">ClientConfig</span>,
-    <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">ticket</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="ident">resuming_session</span>: <span class="kw-2">&amp;</span><span class="ident">persist::Retrieved</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">persist::Tls13ClientSessionValue</span><span class="op">&gt;</span>,
-    <span class="ident">exts</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ClientExtension</span><span class="op">&gt;</span>,
-    <span class="ident">doing_retry</span>: <span class="ident">bool</span>,
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>prepare_resumption(
+    config: <span class="kw-2">&amp;</span>ClientConfig,
+    cx: <span class="kw-2">&amp;mut </span>ClientContext&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ticket: Vec&lt;u8&gt;,
+    resuming_session: <span class="kw-2">&amp;</span>persist::Retrieved&lt;<span class="kw-2">&amp;</span>persist::Tls13ClientSessionValue&gt;,
+    exts: <span class="kw-2">&amp;mut </span>Vec&lt;ClientExtension&gt;,
+    doing_retry: bool,
 ) {
-    <span class="kw">let</span> <span class="ident">resuming_suite</span> <span class="op">=</span> <span class="ident">resuming_session</span>.<span class="ident">suite</span>();
-    <span class="ident">cx</span>.<span class="ident">common</span>.<span class="ident">suite</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">resuming_suite</span>.<span class="ident">into</span>());
-    <span class="ident">cx</span>.<span class="ident">data</span>.<span class="ident">resumption_ciphersuite</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">resuming_suite</span>.<span class="ident">into</span>());
-    <span class="comment">// The EarlyData extension MUST be supplied together with the</span>
-    <span class="comment">// PreSharedKey extension.</span>
-    <span class="kw">let</span> <span class="ident">max_early_data_size</span> <span class="op">=</span> <span class="ident">resuming_session</span>.<span class="ident">max_early_data_size</span>();
-    <span class="kw">if</span> <span class="ident">config</span>.<span class="ident">enable_early_data</span> <span class="op">&amp;&amp;</span> <span class="ident">max_early_data_size</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">doing_retry</span> {
-        <span class="ident">cx</span>.<span class="ident">data</span>
-            .<span class="ident">early_data</span>
-            .<span class="ident">enable</span>(<span class="ident">max_early_data_size</span> <span class="kw">as</span> <span class="ident">usize</span>);
-        <span class="ident">exts</span>.<span class="ident">push</span>(<span class="ident">ClientExtension::EarlyData</span>);
+    <span class="kw">let </span>resuming_suite = resuming_session.suite();
+    cx.common.suite = <span class="prelude-val">Some</span>(resuming_suite.into());
+    cx.data.resumption_ciphersuite = <span class="prelude-val">Some</span>(resuming_suite.into());
+    <span class="comment">// The EarlyData extension MUST be supplied together with the
+    // PreSharedKey extension.
+    </span><span class="kw">let </span>max_early_data_size = resuming_session.max_early_data_size();
+    <span class="kw">if </span>config.enable_early_data &amp;&amp; max_early_data_size &gt; <span class="number">0 </span>&amp;&amp; !doing_retry {
+        cx.data
+            .early_data
+            .enable(max_early_data_size <span class="kw">as </span>usize);
+        exts.push(ClientExtension::EarlyData);
     }
 
-    <span class="comment">// Finally, and only for TLS1.3 with a ticket resumption, include a binder</span>
-    <span class="comment">// for our ticket.  This must go last.</span>
-    <span class="comment">//</span>
-    <span class="comment">// Include an empty binder. It gets filled in below because it depends on</span>
-    <span class="comment">// the message it&#39;s contained in (!!!).</span>
-    <span class="kw">let</span> <span class="ident">obfuscated_ticket_age</span> <span class="op">=</span> <span class="ident">resuming_session</span>.<span class="ident">obfuscated_ticket_age</span>();
+    <span class="comment">// Finally, and only for TLS1.3 with a ticket resumption, include a binder
+    // for our ticket.  This must go last.
+    //
+    // Include an empty binder. It gets filled in below because it depends on
+    // the message it&#39;s contained in (!!!).
+    </span><span class="kw">let </span>obfuscated_ticket_age = resuming_session.obfuscated_ticket_age();
 
-    <span class="kw">let</span> <span class="ident">binder_len</span> <span class="op">=</span> <span class="ident">resuming_suite</span>
-        .<span class="ident">hash_algorithm</span>()
-        .<span class="ident">output_len</span>;
-    <span class="kw">let</span> <span class="ident">binder</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="ident">binder_len</span>];
+    <span class="kw">let </span>binder_len = resuming_suite
+        .hash_algorithm()
+        .output_len;
+    <span class="kw">let </span>binder = <span class="macro">vec!</span>[<span class="number">0u8</span>; binder_len];
 
-    <span class="kw">let</span> <span class="ident">psk_identity</span> <span class="op">=</span> <span class="ident">PresharedKeyIdentity::new</span>(<span class="ident">ticket</span>, <span class="ident">obfuscated_ticket_age</span>);
-    <span class="kw">let</span> <span class="ident">psk_ext</span> <span class="op">=</span> <span class="ident">PresharedKeyOffer::new</span>(<span class="ident">psk_identity</span>, <span class="ident">binder</span>);
-    <span class="ident">exts</span>.<span class="ident">push</span>(<span class="ident">ClientExtension::PresharedKey</span>(<span class="ident">psk_ext</span>));
+    <span class="kw">let </span>psk_identity = PresharedKeyIdentity::new(ticket, obfuscated_ticket_age);
+    <span class="kw">let </span>psk_ext = PresharedKeyOffer::new(psk_identity, binder);
+    exts.push(ClientExtension::PresharedKey(psk_ext));
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">derive_early_traffic_secret</span>(
-    <span class="ident">key_log</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">KeyLog</span>,
-    <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">resuming_suite</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Tls13CipherSuite</span>,
-    <span class="ident">early_key_schedule</span>: <span class="kw-2">&amp;</span><span class="ident">KeyScheduleEarly</span>,
-    <span class="ident">sent_tls13_fake_ccs</span>: <span class="kw-2">&amp;mut</span> <span class="ident">bool</span>,
-    <span class="ident">transcript_buffer</span>: <span class="kw-2">&amp;</span><span class="ident">HandshakeHashBuffer</span>,
-    <span class="ident">client_random</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">32</span>],
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>derive_early_traffic_secret(
+    key_log: <span class="kw-2">&amp;</span><span class="kw">dyn </span>KeyLog,
+    cx: <span class="kw-2">&amp;mut </span>ClientContext&lt;<span class="lifetime">&#39;_</span>&gt;,
+    resuming_suite: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls13CipherSuite,
+    early_key_schedule: <span class="kw-2">&amp;</span>KeyScheduleEarly,
+    sent_tls13_fake_ccs: <span class="kw-2">&amp;mut </span>bool,
+    transcript_buffer: <span class="kw-2">&amp;</span>HandshakeHashBuffer,
+    client_random: <span class="kw-2">&amp;</span>[u8; <span class="number">32</span>],
 ) {
-    <span class="comment">// For middlebox compatibility</span>
-    <span class="ident">emit_fake_ccs</span>(<span class="ident">sent_tls13_fake_ccs</span>, <span class="ident">cx</span>.<span class="ident">common</span>);
+    <span class="comment">// For middlebox compatibility
+    </span>emit_fake_ccs(sent_tls13_fake_ccs, cx.common);
 
-    <span class="kw">let</span> <span class="ident">client_hello_hash</span> <span class="op">=</span> <span class="ident">transcript_buffer</span>.<span class="ident">get_hash_given</span>(<span class="ident">resuming_suite</span>.<span class="ident">hash_algorithm</span>(), <span class="kw-2">&amp;</span>[]);
-    <span class="kw">let</span> <span class="ident">client_early_traffic_secret</span> <span class="op">=</span>
-        <span class="ident">early_key_schedule</span>.<span class="ident">client_early_traffic_secret</span>(<span class="kw-2">&amp;</span><span class="ident">client_hello_hash</span>, <span class="ident">key_log</span>, <span class="ident">client_random</span>);
-    <span class="comment">// Set early data encryption key</span>
-    <span class="ident">cx</span>.<span class="ident">common</span>
-        .<span class="ident">record_layer</span>
-        .<span class="ident">set_message_encrypter</span>(<span class="ident">resuming_suite</span>.<span class="ident">derive_encrypter</span>(<span class="kw-2">&amp;</span><span class="ident">client_early_traffic_secret</span>));
+    <span class="kw">let </span>client_hello_hash = transcript_buffer.get_hash_given(resuming_suite.hash_algorithm(), <span class="kw-2">&amp;</span>[]);
+    <span class="kw">let </span>client_early_traffic_secret =
+        early_key_schedule.client_early_traffic_secret(<span class="kw-2">&amp;</span>client_hello_hash, key_log, client_random);
+    <span class="comment">// Set early data encryption key
+    </span>cx.common
+        .record_layer
+        .set_message_encrypter(resuming_suite.derive_encrypter(<span class="kw-2">&amp;</span>client_early_traffic_secret));
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quic&quot;</span>)]</span>
-    <span class="kw">if</span> <span class="ident">cx</span>.<span class="ident">common</span>.<span class="ident">is_quic</span>() {
-        <span class="ident">cx</span>.<span class="ident">common</span>.<span class="ident">quic</span>.<span class="ident">early_secret</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">client_early_traffic_secret</span>);
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;quic&quot;</span>)]
+    </span><span class="kw">if </span>cx.common.is_quic() {
+        cx.common.quic.early_secret = <span class="prelude-val">Some</span>(client_early_traffic_secret);
     }
 
-    <span class="comment">// Now the client can send encrypted early data</span>
-    <span class="ident">cx</span>.<span class="ident">common</span>.<span class="ident">early_traffic</span> <span class="op">=</span> <span class="bool-val">true</span>;
+    <span class="comment">// Now the client can send encrypted early data
+    </span>cx.common.early_traffic = <span class="bool-val">true</span>;
     <span class="macro">trace!</span>(<span class="string">&quot;Starting early data traffic&quot;</span>);
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">emit_fake_ccs</span>(<span class="ident">sent_tls13_fake_ccs</span>: <span class="kw-2">&amp;mut</span> <span class="ident">bool</span>, <span class="ident">common</span>: <span class="kw-2">&amp;mut</span> <span class="ident">CommonState</span>) {
-    <span class="kw">if</span> <span class="ident">common</span>.<span class="ident">is_quic</span>() {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>emit_fake_ccs(sent_tls13_fake_ccs: <span class="kw-2">&amp;mut </span>bool, common: <span class="kw-2">&amp;mut </span>CommonState) {
+    <span class="kw">if </span>common.is_quic() {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">if</span> <span class="ident">std::mem::replace</span>(<span class="ident">sent_tls13_fake_ccs</span>, <span class="bool-val">true</span>) {
+    <span class="kw">if </span>std::mem::replace(sent_tls13_fake_ccs, <span class="bool-val">true</span>) {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">Message</span> {
-        <span class="ident">version</span>: <span class="ident">ProtocolVersion::TLSv1_2</span>,
-        <span class="ident">payload</span>: <span class="ident">MessagePayload::ChangeCipherSpec</span>(<span class="ident">ChangeCipherSpecPayload</span> {}),
+    <span class="kw">let </span>m = Message {
+        version: ProtocolVersion::TLSv1_2,
+        payload: MessagePayload::ChangeCipherSpec(ChangeCipherSpecPayload {}),
     };
-    <span class="ident">common</span>.<span class="ident">send_msg</span>(<span class="ident">m</span>, <span class="bool-val">false</span>);
+    common.send_msg(m, <span class="bool-val">false</span>);
 }
 
-<span class="kw">fn</span> <span class="ident">validate_encrypted_extensions</span>(
-    <span class="ident">common</span>: <span class="kw-2">&amp;mut</span> <span class="ident">CommonState</span>,
-    <span class="ident">hello</span>: <span class="kw-2">&amp;</span><span class="ident">ClientHelloDetails</span>,
-    <span class="ident">exts</span>: <span class="kw-2">&amp;</span><span class="ident">EncryptedExtensions</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">exts</span>.<span class="ident">has_duplicate_extension</span>() {
-        <span class="ident">common</span>.<span class="ident">send_fatal_alert</span>(<span class="ident">AlertDescription::DecodeError</span>);
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::PeerMisbehavedError</span>(
-            <span class="string">&quot;server sent duplicate encrypted extensions&quot;</span>.<span class="ident">to_string</span>(),
+<span class="kw">fn </span>validate_encrypted_extensions(
+    common: <span class="kw-2">&amp;mut </span>CommonState,
+    hello: <span class="kw-2">&amp;</span>ClientHelloDetails,
+    exts: <span class="kw-2">&amp;</span>EncryptedExtensions,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+    <span class="kw">if </span>exts.has_duplicate_extension() {
+        common.send_fatal_alert(AlertDescription::DecodeError);
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::PeerMisbehavedError(
+            <span class="string">&quot;server sent duplicate encrypted extensions&quot;</span>.to_string(),
         ));
     }
 
-    <span class="kw">if</span> <span class="ident">hello</span>.<span class="ident">server_sent_unsolicited_extensions</span>(<span class="ident">exts</span>, <span class="kw-2">&amp;</span>[]) {
-        <span class="ident">common</span>.<span class="ident">send_fatal_alert</span>(<span class="ident">AlertDescription::UnsupportedExtension</span>);
-        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;server sent unsolicited encrypted extension&quot;</span>.<span class="ident">to_string</span>();
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::PeerMisbehavedError</span>(<span class="ident">msg</span>));
+    <span class="kw">if </span>hello.server_sent_unsolicited_extensions(exts, <span class="kw-2">&amp;</span>[]) {
+        common.send_fatal_alert(AlertDescription::UnsupportedExtension);
+        <span class="kw">let </span>msg = <span class="string">&quot;server sent unsolicited encrypted extension&quot;</span>.to_string();
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::PeerMisbehavedError(msg));
     }
 
-    <span class="kw">for</span> <span class="ident">ext</span> <span class="kw">in</span> <span class="ident">exts</span> {
-        <span class="kw">if</span> <span class="ident">ALLOWED_PLAINTEXT_EXTS</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">ext</span>.<span class="ident">get_type</span>())
-            <span class="op">|</span><span class="op">|</span> <span class="ident">DISALLOWED_TLS13_EXTS</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">ext</span>.<span class="ident">get_type</span>())
+    <span class="kw">for </span>ext <span class="kw">in </span>exts {
+        <span class="kw">if </span>ALLOWED_PLAINTEXT_EXTS.contains(<span class="kw-2">&amp;</span>ext.get_type())
+            || DISALLOWED_TLS13_EXTS.contains(<span class="kw-2">&amp;</span>ext.get_type())
         {
-            <span class="ident">common</span>.<span class="ident">send_fatal_alert</span>(<span class="ident">AlertDescription::UnsupportedExtension</span>);
-            <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;server sent inappropriate encrypted extension&quot;</span>.<span class="ident">to_string</span>();
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::PeerMisbehavedError</span>(<span class="ident">msg</span>));
+            common.send_fatal_alert(AlertDescription::UnsupportedExtension);
+            <span class="kw">let </span>msg = <span class="string">&quot;server sent inappropriate encrypted extension&quot;</span>.to_string();
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::PeerMisbehavedError(msg));
         }
     }
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">struct</span> <span class="ident">ExpectEncryptedExtensions</span> {
-    <span class="ident">config</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ClientConfig</span><span class="op">&gt;</span>,
-    <span class="ident">resuming_session</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">persist::Tls13ClientSessionValue</span><span class="op">&gt;</span>,
-    <span class="ident">server_name</span>: <span class="ident">ServerName</span>,
-    <span class="ident">randoms</span>: <span class="ident">ConnectionRandoms</span>,
-    <span class="ident">suite</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Tls13CipherSuite</span>,
-    <span class="ident">transcript</span>: <span class="ident">HandshakeHash</span>,
-    <span class="ident">key_schedule</span>: <span class="ident">KeyScheduleHandshake</span>,
-    <span class="ident">hello</span>: <span class="ident">ClientHelloDetails</span>,
+<span class="kw">struct </span>ExpectEncryptedExtensions {
+    config: Arc&lt;ClientConfig&gt;,
+    resuming_session: <span class="prelude-ty">Option</span>&lt;persist::Tls13ClientSessionValue&gt;,
+    server_name: ServerName,
+    randoms: ConnectionRandoms,
+    suite: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls13CipherSuite,
+    transcript: HandshakeHash,
+    key_schedule: KeyScheduleHandshake,
+    hello: ClientHelloDetails,
 }
 
-<span class="kw">impl</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">ClientConnectionData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ExpectEncryptedExtensions</span> {
-    <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">m</span>: <span class="ident">Message</span>) -&gt; <span class="ident">hs::NextStateOrError</span> {
-        <span class="kw">let</span> <span class="ident">exts</span> <span class="op">=</span> <span class="macro">require_handshake_msg!</span>(
-            <span class="ident">m</span>,
-            <span class="ident">HandshakeType::EncryptedExtensions</span>,
-            <span class="ident">HandshakePayload::EncryptedExtensions</span>
+<span class="kw">impl </span>State&lt;ClientConnectionData&gt; <span class="kw">for </span>ExpectEncryptedExtensions {
+    <span class="kw">fn </span>handle(<span class="kw-2">mut </span><span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>ClientContext&lt;<span class="lifetime">&#39;_</span>&gt;, m: Message) -&gt; hs::NextStateOrError {
+        <span class="kw">let </span>exts = <span class="macro">require_handshake_msg!</span>(
+            m,
+            HandshakeType::EncryptedExtensions,
+            HandshakePayload::EncryptedExtensions
         )<span class="question-mark">?</span>;
-        <span class="macro">debug!</span>(<span class="string">&quot;TLS1.3 encrypted extensions: {:?}&quot;</span>, <span class="ident">exts</span>);
-        <span class="self">self</span>.<span class="ident">transcript</span>.<span class="ident">add_message</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>);
+        <span class="macro">debug!</span>(<span class="string">&quot;TLS1.3 encrypted extensions: {:?}&quot;</span>, exts);
+        <span class="self">self</span>.transcript.add_message(<span class="kw-2">&amp;</span>m);
 
-        <span class="ident">validate_encrypted_extensions</span>(<span class="ident">cx</span>.<span class="ident">common</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">hello</span>, <span class="ident">exts</span>)<span class="question-mark">?</span>;
-        <span class="ident">hs::process_alpn_protocol</span>(<span class="ident">cx</span>.<span class="ident">common</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">config</span>, <span class="ident">exts</span>.<span class="ident">get_alpn_protocol</span>())<span class="question-mark">?</span>;
+        validate_encrypted_extensions(cx.common, <span class="kw-2">&amp;</span><span class="self">self</span>.hello, exts)<span class="question-mark">?</span>;
+        hs::process_alpn_protocol(cx.common, <span class="kw-2">&amp;</span><span class="self">self</span>.config, exts.get_alpn_protocol())<span class="question-mark">?</span>;
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quic&quot;</span>)]</span>
-        {
-            <span class="comment">// QUIC transport parameters</span>
-            <span class="kw">if</span> <span class="ident">cx</span>.<span class="ident">common</span>.<span class="ident">is_quic</span>() {
-                <span class="kw">match</span> <span class="ident">exts</span>.<span class="ident">get_quic_params_extension</span>() {
-                    <span class="prelude-val">Some</span>(<span class="ident">params</span>) =&gt; <span class="ident">cx</span>.<span class="ident">common</span>.<span class="ident">quic</span>.<span class="ident">params</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">params</span>),
-                    <span class="prelude-val">None</span> =&gt; {
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">cx</span>
-                            .<span class="ident">common</span>
-                            .<span class="ident">missing_extension</span>(<span class="string">&quot;QUIC transport parameters not found&quot;</span>));
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;quic&quot;</span>)]
+        </span>{
+            <span class="comment">// QUIC transport parameters
+            </span><span class="kw">if </span>cx.common.is_quic() {
+                <span class="kw">match </span>exts.get_quic_params_extension() {
+                    <span class="prelude-val">Some</span>(params) =&gt; cx.common.quic.params = <span class="prelude-val">Some</span>(params),
+                    <span class="prelude-val">None </span>=&gt; {
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(cx
+                            .common
+                            .missing_extension(<span class="string">&quot;QUIC transport parameters not found&quot;</span>));
                     }
                 }
             }
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">resuming_session</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">resuming_session</span> {
-            <span class="kw">let</span> <span class="ident">was_early_traffic</span> <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">common</span>.<span class="ident">early_traffic</span>;
-            <span class="kw">if</span> <span class="ident">was_early_traffic</span> {
-                <span class="kw">if</span> <span class="ident">exts</span>.<span class="ident">early_data_extension_offered</span>() {
-                    <span class="ident">cx</span>.<span class="ident">data</span>.<span class="ident">early_data</span>.<span class="ident">accepted</span>();
-                } <span class="kw">else</span> {
-                    <span class="ident">cx</span>.<span class="ident">data</span>.<span class="ident">early_data</span>.<span class="ident">rejected</span>();
-                    <span class="ident">cx</span>.<span class="ident">common</span>.<span class="ident">early_traffic</span> <span class="op">=</span> <span class="bool-val">false</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(resuming_session) = <span class="self">self</span>.resuming_session {
+            <span class="kw">let </span>was_early_traffic = cx.common.early_traffic;
+            <span class="kw">if </span>was_early_traffic {
+                <span class="kw">if </span>exts.early_data_extension_offered() {
+                    cx.data.early_data.accepted();
+                } <span class="kw">else </span>{
+                    cx.data.early_data.rejected();
+                    cx.common.early_traffic = <span class="bool-val">false</span>;
                 }
             }
 
-            <span class="kw">if</span> <span class="ident">was_early_traffic</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">cx</span>.<span class="ident">common</span>.<span class="ident">early_traffic</span> {
-                <span class="comment">// If no early traffic, set the encryption key for handshakes</span>
-                <span class="ident">cx</span>.<span class="ident">common</span>
-                    .<span class="ident">record_layer</span>
-                    .<span class="ident">set_message_encrypter</span>(
-                        <span class="self">self</span>.<span class="ident">suite</span>
-                            .<span class="ident">derive_encrypter</span>(<span class="self">self</span>.<span class="ident">key_schedule</span>.<span class="ident">client_key</span>()),
+            <span class="kw">if </span>was_early_traffic &amp;&amp; !cx.common.early_traffic {
+                <span class="comment">// If no early traffic, set the encryption key for handshakes
+                </span>cx.common
+                    .record_layer
+                    .set_message_encrypter(
+                        <span class="self">self</span>.suite
+                            .derive_encrypter(<span class="self">self</span>.key_schedule.client_key()),
                     );
             }
 
-            <span class="ident">cx</span>.<span class="ident">common</span>.<span class="ident">peer_certificates</span> <span class="op">=</span> <span class="prelude-val">Some</span>(
-                <span class="ident">resuming_session</span>
-                    .<span class="ident">server_cert_chain</span>()
-                    .<span class="ident">to_vec</span>(),
+            cx.common.peer_certificates = <span class="prelude-val">Some</span>(
+                resuming_session
+                    .server_cert_chain()
+                    .to_vec(),
             );
 
-            <span class="comment">// We *don&#39;t* reverify the certificate chain here: resumption is a</span>
-            <span class="comment">// continuation of the previous session in terms of security policy.</span>
-            <span class="kw">let</span> <span class="ident">cert_verified</span> <span class="op">=</span> <span class="ident">verify::ServerCertVerified::assertion</span>();
-            <span class="kw">let</span> <span class="ident">sig_verified</span> <span class="op">=</span> <span class="ident">verify::HandshakeSignatureValid::assertion</span>();
-            <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">ExpectFinished</span> {
-                <span class="ident">config</span>: <span class="self">self</span>.<span class="ident">config</span>,
-                <span class="ident">server_name</span>: <span class="self">self</span>.<span class="ident">server_name</span>,
-                <span class="ident">randoms</span>: <span class="self">self</span>.<span class="ident">randoms</span>,
-                <span class="ident">suite</span>: <span class="self">self</span>.<span class="ident">suite</span>,
-                <span class="ident">transcript</span>: <span class="self">self</span>.<span class="ident">transcript</span>,
-                <span class="ident">key_schedule</span>: <span class="self">self</span>.<span class="ident">key_schedule</span>,
-                <span class="ident">client_auth</span>: <span class="prelude-val">None</span>,
-                <span class="ident">cert_verified</span>,
-                <span class="ident">sig_verified</span>,
+            <span class="comment">// We *don&#39;t* reverify the certificate chain here: resumption is a
+            // continuation of the previous session in terms of security policy.
+            </span><span class="kw">let </span>cert_verified = verify::ServerCertVerified::assertion();
+            <span class="kw">let </span>sig_verified = verify::HandshakeSignatureValid::assertion();
+            <span class="prelude-val">Ok</span>(Box::new(ExpectFinished {
+                config: <span class="self">self</span>.config,
+                server_name: <span class="self">self</span>.server_name,
+                randoms: <span class="self">self</span>.randoms,
+                suite: <span class="self">self</span>.suite,
+                transcript: <span class="self">self</span>.transcript,
+                key_schedule: <span class="self">self</span>.key_schedule,
+                client_auth: <span class="prelude-val">None</span>,
+                cert_verified,
+                sig_verified,
             }))
-        } <span class="kw">else</span> {
-            <span class="kw">if</span> <span class="ident">exts</span>.<span class="ident">early_data_extension_offered</span>() {
-                <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;server sent early data extension without resumption&quot;</span>.<span class="ident">to_string</span>();
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::PeerMisbehavedError</span>(<span class="ident">msg</span>));
+        } <span class="kw">else </span>{
+            <span class="kw">if </span>exts.early_data_extension_offered() {
+                <span class="kw">let </span>msg = <span class="string">&quot;server sent early data extension without resumption&quot;</span>.to_string();
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::PeerMisbehavedError(msg));
             }
-            <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">ExpectCertificateOrCertReq</span> {
-                <span class="ident">config</span>: <span class="self">self</span>.<span class="ident">config</span>,
-                <span class="ident">server_name</span>: <span class="self">self</span>.<span class="ident">server_name</span>,
-                <span class="ident">randoms</span>: <span class="self">self</span>.<span class="ident">randoms</span>,
-                <span class="ident">suite</span>: <span class="self">self</span>.<span class="ident">suite</span>,
-                <span class="ident">transcript</span>: <span class="self">self</span>.<span class="ident">transcript</span>,
-                <span class="ident">key_schedule</span>: <span class="self">self</span>.<span class="ident">key_schedule</span>,
-                <span class="ident">may_send_sct_list</span>: <span class="self">self</span>.<span class="ident">hello</span>.<span class="ident">server_may_send_sct_list</span>(),
+            <span class="prelude-val">Ok</span>(Box::new(ExpectCertificateOrCertReq {
+                config: <span class="self">self</span>.config,
+                server_name: <span class="self">self</span>.server_name,
+                randoms: <span class="self">self</span>.randoms,
+                suite: <span class="self">self</span>.suite,
+                transcript: <span class="self">self</span>.transcript,
+                key_schedule: <span class="self">self</span>.key_schedule,
+                may_send_sct_list: <span class="self">self</span>.hello.server_may_send_sct_list(),
             }))
         }
     }
 }
 
-<span class="kw">struct</span> <span class="ident">ExpectCertificateOrCertReq</span> {
-    <span class="ident">config</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ClientConfig</span><span class="op">&gt;</span>,
-    <span class="ident">server_name</span>: <span class="ident">ServerName</span>,
-    <span class="ident">randoms</span>: <span class="ident">ConnectionRandoms</span>,
-    <span class="ident">suite</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Tls13CipherSuite</span>,
-    <span class="ident">transcript</span>: <span class="ident">HandshakeHash</span>,
-    <span class="ident">key_schedule</span>: <span class="ident">KeyScheduleHandshake</span>,
-    <span class="ident">may_send_sct_list</span>: <span class="ident">bool</span>,
+<span class="kw">struct </span>ExpectCertificateOrCertReq {
+    config: Arc&lt;ClientConfig&gt;,
+    server_name: ServerName,
+    randoms: ConnectionRandoms,
+    suite: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls13CipherSuite,
+    transcript: HandshakeHash,
+    key_schedule: KeyScheduleHandshake,
+    may_send_sct_list: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">ClientConnectionData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ExpectCertificateOrCertReq</span> {
-    <span class="kw">fn</span> <span class="ident">handle</span>(<span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">m</span>: <span class="ident">Message</span>) -&gt; <span class="ident">hs::NextStateOrError</span> {
-        <span class="kw">match</span> <span class="ident">m</span>.<span class="ident">payload</span> {
-            <span class="ident">MessagePayload::Handshake</span> {
-                <span class="ident">parsed</span>:
-                    <span class="ident">HandshakeMessagePayload</span> {
-                        <span class="ident">payload</span>: <span class="ident">HandshakePayload::CertificateTLS13</span>(..),
+<span class="kw">impl </span>State&lt;ClientConnectionData&gt; <span class="kw">for </span>ExpectCertificateOrCertReq {
+    <span class="kw">fn </span>handle(<span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>ClientContext&lt;<span class="lifetime">&#39;_</span>&gt;, m: Message) -&gt; hs::NextStateOrError {
+        <span class="kw">match </span>m.payload {
+            MessagePayload::Handshake {
+                parsed:
+                    HandshakeMessagePayload {
+                        payload: HandshakePayload::CertificateTLS13(..),
                         ..
                     },
                 ..
-            } =&gt; <span class="ident">Box::new</span>(<span class="ident">ExpectCertificate</span> {
-                <span class="ident">config</span>: <span class="self">self</span>.<span class="ident">config</span>,
-                <span class="ident">server_name</span>: <span class="self">self</span>.<span class="ident">server_name</span>,
-                <span class="ident">randoms</span>: <span class="self">self</span>.<span class="ident">randoms</span>,
-                <span class="ident">suite</span>: <span class="self">self</span>.<span class="ident">suite</span>,
-                <span class="ident">transcript</span>: <span class="self">self</span>.<span class="ident">transcript</span>,
-                <span class="ident">key_schedule</span>: <span class="self">self</span>.<span class="ident">key_schedule</span>,
-                <span class="ident">may_send_sct_list</span>: <span class="self">self</span>.<span class="ident">may_send_sct_list</span>,
-                <span class="ident">client_auth</span>: <span class="prelude-val">None</span>,
+            } =&gt; Box::new(ExpectCertificate {
+                config: <span class="self">self</span>.config,
+                server_name: <span class="self">self</span>.server_name,
+                randoms: <span class="self">self</span>.randoms,
+                suite: <span class="self">self</span>.suite,
+                transcript: <span class="self">self</span>.transcript,
+                key_schedule: <span class="self">self</span>.key_schedule,
+                may_send_sct_list: <span class="self">self</span>.may_send_sct_list,
+                client_auth: <span class="prelude-val">None</span>,
             })
-            .<span class="ident">handle</span>(<span class="ident">cx</span>, <span class="ident">m</span>),
-            <span class="ident">MessagePayload::Handshake</span> {
-                <span class="ident">parsed</span>:
-                    <span class="ident">HandshakeMessagePayload</span> {
-                        <span class="ident">payload</span>: <span class="ident">HandshakePayload::CertificateRequestTLS13</span>(..),
+            .handle(cx, m),
+            MessagePayload::Handshake {
+                parsed:
+                    HandshakeMessagePayload {
+                        payload: HandshakePayload::CertificateRequestTLS13(..),
                         ..
                     },
                 ..
-            } =&gt; <span class="ident">Box::new</span>(<span class="ident">ExpectCertificateRequest</span> {
-                <span class="ident">config</span>: <span class="self">self</span>.<span class="ident">config</span>,
-                <span class="ident">server_name</span>: <span class="self">self</span>.<span class="ident">server_name</span>,
-                <span class="ident">randoms</span>: <span class="self">self</span>.<span class="ident">randoms</span>,
-                <span class="ident">suite</span>: <span class="self">self</span>.<span class="ident">suite</span>,
-                <span class="ident">transcript</span>: <span class="self">self</span>.<span class="ident">transcript</span>,
-                <span class="ident">key_schedule</span>: <span class="self">self</span>.<span class="ident">key_schedule</span>,
-                <span class="ident">may_send_sct_list</span>: <span class="self">self</span>.<span class="ident">may_send_sct_list</span>,
+            } =&gt; Box::new(ExpectCertificateRequest {
+                config: <span class="self">self</span>.config,
+                server_name: <span class="self">self</span>.server_name,
+                randoms: <span class="self">self</span>.randoms,
+                suite: <span class="self">self</span>.suite,
+                transcript: <span class="self">self</span>.transcript,
+                key_schedule: <span class="self">self</span>.key_schedule,
+                may_send_sct_list: <span class="self">self</span>.may_send_sct_list,
             })
-            .<span class="ident">handle</span>(<span class="ident">cx</span>, <span class="ident">m</span>),
-            <span class="ident">payload</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">inappropriate_handshake_message</span>(
-                <span class="kw-2">&amp;</span><span class="ident">payload</span>,
-                <span class="kw-2">&amp;</span>[<span class="ident">ContentType::Handshake</span>],
+            .handle(cx, m),
+            payload =&gt; <span class="prelude-val">Err</span>(inappropriate_handshake_message(
+                <span class="kw-2">&amp;</span>payload,
+                <span class="kw-2">&amp;</span>[ContentType::Handshake],
                 <span class="kw-2">&amp;</span>[
-                    <span class="ident">HandshakeType::Certificate</span>,
-                    <span class="ident">HandshakeType::CertificateRequest</span>,
+                    HandshakeType::Certificate,
+                    HandshakeType::CertificateRequest,
                 ],
             )),
         }
     }
 }
 
-<span class="comment">// TLS1.3 version of CertificateRequest handling.  We then move to expecting the server</span>
-<span class="comment">// Certificate. Unfortunately the CertificateRequest type changed in an annoying way</span>
-<span class="comment">// in TLS1.3.</span>
-<span class="kw">struct</span> <span class="ident">ExpectCertificateRequest</span> {
-    <span class="ident">config</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ClientConfig</span><span class="op">&gt;</span>,
-    <span class="ident">server_name</span>: <span class="ident">ServerName</span>,
-    <span class="ident">randoms</span>: <span class="ident">ConnectionRandoms</span>,
-    <span class="ident">suite</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Tls13CipherSuite</span>,
-    <span class="ident">transcript</span>: <span class="ident">HandshakeHash</span>,
-    <span class="ident">key_schedule</span>: <span class="ident">KeyScheduleHandshake</span>,
-    <span class="ident">may_send_sct_list</span>: <span class="ident">bool</span>,
+<span class="comment">// TLS1.3 version of CertificateRequest handling.  We then move to expecting the server
+// Certificate. Unfortunately the CertificateRequest type changed in an annoying way
+// in TLS1.3.
+</span><span class="kw">struct </span>ExpectCertificateRequest {
+    config: Arc&lt;ClientConfig&gt;,
+    server_name: ServerName,
+    randoms: ConnectionRandoms,
+    suite: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls13CipherSuite,
+    transcript: HandshakeHash,
+    key_schedule: KeyScheduleHandshake,
+    may_send_sct_list: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">ClientConnectionData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ExpectCertificateRequest</span> {
-    <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">m</span>: <span class="ident">Message</span>) -&gt; <span class="ident">hs::NextStateOrError</span> {
-        <span class="kw">let</span> <span class="ident">certreq</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">require_handshake_msg!</span>(
-            <span class="ident">m</span>,
-            <span class="ident">HandshakeType::CertificateRequest</span>,
-            <span class="ident">HandshakePayload::CertificateRequestTLS13</span>
+<span class="kw">impl </span>State&lt;ClientConnectionData&gt; <span class="kw">for </span>ExpectCertificateRequest {
+    <span class="kw">fn </span>handle(<span class="kw-2">mut </span><span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>ClientContext&lt;<span class="lifetime">&#39;_</span>&gt;, m: Message) -&gt; hs::NextStateOrError {
+        <span class="kw">let </span>certreq = <span class="kw-2">&amp;</span><span class="macro">require_handshake_msg!</span>(
+            m,
+            HandshakeType::CertificateRequest,
+            HandshakePayload::CertificateRequestTLS13
         )<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">transcript</span>.<span class="ident">add_message</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>);
-        <span class="macro">debug!</span>(<span class="string">&quot;Got CertificateRequest {:?}&quot;</span>, <span class="ident">certreq</span>);
+        <span class="self">self</span>.transcript.add_message(<span class="kw-2">&amp;</span>m);
+        <span class="macro">debug!</span>(<span class="string">&quot;Got CertificateRequest {:?}&quot;</span>, certreq);
 
-        <span class="comment">// Fortunately the problems here in TLS1.2 and prior are corrected in</span>
-        <span class="comment">// TLS1.3.</span>
+        <span class="comment">// Fortunately the problems here in TLS1.2 and prior are corrected in
+        // TLS1.3.
 
-        <span class="comment">// Must be empty during handshake.</span>
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">certreq</span>.<span class="ident">context</span>.<span class="number">0</span>.<span class="ident">is_empty</span>() {
+        // Must be empty during handshake.
+        </span><span class="kw">if </span>!certreq.context.<span class="number">0</span>.is_empty() {
             <span class="macro">warn!</span>(<span class="string">&quot;Server sent non-empty certreq context&quot;</span>);
-            <span class="ident">cx</span>.<span class="ident">common</span>
-                .<span class="ident">send_fatal_alert</span>(<span class="ident">AlertDescription::DecodeError</span>);
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::CorruptMessagePayload</span>(<span class="ident">ContentType::Handshake</span>));
+            cx.common
+                .send_fatal_alert(AlertDescription::DecodeError);
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::CorruptMessagePayload(ContentType::Handshake));
         }
 
-        <span class="kw">let</span> <span class="ident">tls13_sign_schemes</span> <span class="op">=</span> <span class="ident">sign::supported_sign_tls13</span>();
-        <span class="kw">let</span> <span class="ident">no_sigschemes</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="kw">let</span> <span class="ident">compat_sigschemes</span> <span class="op">=</span> <span class="ident">certreq</span>
-            .<span class="ident">get_sigalgs_extension</span>()
-            .<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span><span class="ident">no_sigschemes</span>)
-            .<span class="ident">iter</span>()
-            .<span class="ident">cloned</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">scheme</span><span class="op">|</span> <span class="ident">tls13_sign_schemes</span>.<span class="ident">contains</span>(<span class="ident">scheme</span>))
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SignatureScheme</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+        <span class="kw">let </span>tls13_sign_schemes = sign::supported_sign_tls13();
+        <span class="kw">let </span>no_sigschemes = Vec::new();
+        <span class="kw">let </span>compat_sigschemes = certreq
+            .get_sigalgs_extension()
+            .unwrap_or(<span class="kw-2">&amp;</span>no_sigschemes)
+            .iter()
+            .cloned()
+            .filter(|scheme| tls13_sign_schemes.contains(scheme))
+            .collect::&lt;Vec&lt;SignatureScheme&gt;&gt;();
 
-        <span class="kw">if</span> <span class="ident">compat_sigschemes</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">cx</span>.<span class="ident">common</span>
-                .<span class="ident">send_fatal_alert</span>(<span class="ident">AlertDescription::HandshakeFailure</span>);
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::PeerIncompatibleError</span>(
-                <span class="string">&quot;server sent bad certreq schemes&quot;</span>.<span class="ident">to_string</span>(),
+        <span class="kw">if </span>compat_sigschemes.is_empty() {
+            cx.common
+                .send_fatal_alert(AlertDescription::HandshakeFailure);
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::PeerIncompatibleError(
+                <span class="string">&quot;server sent bad certreq schemes&quot;</span>.to_string(),
             ));
         }
 
-        <span class="kw">let</span> <span class="ident">client_auth</span> <span class="op">=</span> <span class="ident">ClientAuthDetails::resolve</span>(
-            <span class="self">self</span>.<span class="ident">config</span>
-                .<span class="ident">client_auth_cert_resolver</span>
-                .<span class="ident">as_ref</span>(),
-            <span class="ident">certreq</span>.<span class="ident">get_authorities_extension</span>(),
-            <span class="kw-2">&amp;</span><span class="ident">compat_sigschemes</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">certreq</span>.<span class="ident">context</span>.<span class="number">0</span>.<span class="ident">clone</span>()),
+        <span class="kw">let </span>client_auth = ClientAuthDetails::resolve(
+            <span class="self">self</span>.config
+                .client_auth_cert_resolver
+                .as_ref(),
+            certreq.get_authorities_extension(),
+            <span class="kw-2">&amp;</span>compat_sigschemes,
+            <span class="prelude-val">Some</span>(certreq.context.<span class="number">0</span>.clone()),
         );
 
-        <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">ExpectCertificate</span> {
-            <span class="ident">config</span>: <span class="self">self</span>.<span class="ident">config</span>,
-            <span class="ident">server_name</span>: <span class="self">self</span>.<span class="ident">server_name</span>,
-            <span class="ident">randoms</span>: <span class="self">self</span>.<span class="ident">randoms</span>,
-            <span class="ident">suite</span>: <span class="self">self</span>.<span class="ident">suite</span>,
-            <span class="ident">transcript</span>: <span class="self">self</span>.<span class="ident">transcript</span>,
-            <span class="ident">key_schedule</span>: <span class="self">self</span>.<span class="ident">key_schedule</span>,
-            <span class="ident">may_send_sct_list</span>: <span class="self">self</span>.<span class="ident">may_send_sct_list</span>,
-            <span class="ident">client_auth</span>: <span class="prelude-val">Some</span>(<span class="ident">client_auth</span>),
+        <span class="prelude-val">Ok</span>(Box::new(ExpectCertificate {
+            config: <span class="self">self</span>.config,
+            server_name: <span class="self">self</span>.server_name,
+            randoms: <span class="self">self</span>.randoms,
+            suite: <span class="self">self</span>.suite,
+            transcript: <span class="self">self</span>.transcript,
+            key_schedule: <span class="self">self</span>.key_schedule,
+            may_send_sct_list: <span class="self">self</span>.may_send_sct_list,
+            client_auth: <span class="prelude-val">Some</span>(client_auth),
         }))
     }
 }
 
-<span class="kw">struct</span> <span class="ident">ExpectCertificate</span> {
-    <span class="ident">config</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ClientConfig</span><span class="op">&gt;</span>,
-    <span class="ident">server_name</span>: <span class="ident">ServerName</span>,
-    <span class="ident">randoms</span>: <span class="ident">ConnectionRandoms</span>,
-    <span class="ident">suite</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Tls13CipherSuite</span>,
-    <span class="ident">transcript</span>: <span class="ident">HandshakeHash</span>,
-    <span class="ident">key_schedule</span>: <span class="ident">KeyScheduleHandshake</span>,
-    <span class="ident">may_send_sct_list</span>: <span class="ident">bool</span>,
-    <span class="ident">client_auth</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClientAuthDetails</span><span class="op">&gt;</span>,
+<span class="kw">struct </span>ExpectCertificate {
+    config: Arc&lt;ClientConfig&gt;,
+    server_name: ServerName,
+    randoms: ConnectionRandoms,
+    suite: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls13CipherSuite,
+    transcript: HandshakeHash,
+    key_schedule: KeyScheduleHandshake,
+    may_send_sct_list: bool,
+    client_auth: <span class="prelude-ty">Option</span>&lt;ClientAuthDetails&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">ClientConnectionData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ExpectCertificate</span> {
-    <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">m</span>: <span class="ident">Message</span>) -&gt; <span class="ident">hs::NextStateOrError</span> {
-        <span class="kw">let</span> <span class="ident">cert_chain</span> <span class="op">=</span> <span class="macro">require_handshake_msg!</span>(
-            <span class="ident">m</span>,
-            <span class="ident">HandshakeType::Certificate</span>,
-            <span class="ident">HandshakePayload::CertificateTLS13</span>
+<span class="kw">impl </span>State&lt;ClientConnectionData&gt; <span class="kw">for </span>ExpectCertificate {
+    <span class="kw">fn </span>handle(<span class="kw-2">mut </span><span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>ClientContext&lt;<span class="lifetime">&#39;_</span>&gt;, m: Message) -&gt; hs::NextStateOrError {
+        <span class="kw">let </span>cert_chain = <span class="macro">require_handshake_msg!</span>(
+            m,
+            HandshakeType::Certificate,
+            HandshakePayload::CertificateTLS13
         )<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">transcript</span>.<span class="ident">add_message</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>);
+        <span class="self">self</span>.transcript.add_message(<span class="kw-2">&amp;</span>m);
 
-        <span class="comment">// This is only non-empty for client auth.</span>
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">cert_chain</span>.<span class="ident">context</span>.<span class="number">0</span>.<span class="ident">is_empty</span>() {
+        <span class="comment">// This is only non-empty for client auth.
+        </span><span class="kw">if </span>!cert_chain.context.<span class="number">0</span>.is_empty() {
             <span class="macro">warn!</span>(<span class="string">&quot;certificate with non-empty context during handshake&quot;</span>);
-            <span class="ident">cx</span>.<span class="ident">common</span>
-                .<span class="ident">send_fatal_alert</span>(<span class="ident">AlertDescription::DecodeError</span>);
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::CorruptMessagePayload</span>(<span class="ident">ContentType::Handshake</span>));
+            cx.common
+                .send_fatal_alert(AlertDescription::DecodeError);
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::CorruptMessagePayload(ContentType::Handshake));
         }
 
-        <span class="kw">if</span> <span class="ident">cert_chain</span>.<span class="ident">any_entry_has_duplicate_extension</span>()
-            <span class="op">|</span><span class="op">|</span> <span class="ident">cert_chain</span>.<span class="ident">any_entry_has_unknown_extension</span>()
+        <span class="kw">if </span>cert_chain.any_entry_has_duplicate_extension()
+            || cert_chain.any_entry_has_unknown_extension()
         {
             <span class="macro">warn!</span>(<span class="string">&quot;certificate chain contains unsolicited/unknown extension&quot;</span>);
-            <span class="ident">cx</span>.<span class="ident">common</span>
-                .<span class="ident">send_fatal_alert</span>(<span class="ident">AlertDescription::UnsupportedExtension</span>);
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::PeerMisbehavedError</span>(
-                <span class="string">&quot;bad cert chain extensions&quot;</span>.<span class="ident">to_string</span>(),
+            cx.common
+                .send_fatal_alert(AlertDescription::UnsupportedExtension);
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::PeerMisbehavedError(
+                <span class="string">&quot;bad cert chain extensions&quot;</span>.to_string(),
             ));
         }
 
-        <span class="kw">let</span> <span class="ident">server_cert</span> <span class="op">=</span> <span class="ident">ServerCertDetails::new</span>(
-            <span class="ident">cert_chain</span>.<span class="ident">convert</span>(),
-            <span class="ident">cert_chain</span>.<span class="ident">get_end_entity_ocsp</span>(),
-            <span class="ident">cert_chain</span>.<span class="ident">get_end_entity_scts</span>(),
+        <span class="kw">let </span>server_cert = ServerCertDetails::new(
+            cert_chain.convert(),
+            cert_chain.get_end_entity_ocsp(),
+            cert_chain.get_end_entity_scts(),
         );
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">sct_list</span>) <span class="op">=</span> <span class="ident">server_cert</span>.<span class="ident">scts</span>.<span class="ident">as_ref</span>() {
-            <span class="kw">if</span> <span class="ident">hs::sct_list_is_invalid</span>(<span class="ident">sct_list</span>) {
-                <span class="kw">let</span> <span class="ident">error_msg</span> <span class="op">=</span> <span class="string">&quot;server sent invalid SCT list&quot;</span>.<span class="ident">to_string</span>();
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::PeerMisbehavedError</span>(<span class="ident">error_msg</span>));
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(sct_list) = server_cert.scts.as_ref() {
+            <span class="kw">if </span>hs::sct_list_is_invalid(sct_list) {
+                <span class="kw">let </span>error_msg = <span class="string">&quot;server sent invalid SCT list&quot;</span>.to_string();
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::PeerMisbehavedError(error_msg));
             }
 
-            <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">may_send_sct_list</span> {
-                <span class="kw">let</span> <span class="ident">error_msg</span> <span class="op">=</span> <span class="string">&quot;server sent unsolicited SCT list&quot;</span>.<span class="ident">to_string</span>();
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::PeerMisbehavedError</span>(<span class="ident">error_msg</span>));
+            <span class="kw">if </span>!<span class="self">self</span>.may_send_sct_list {
+                <span class="kw">let </span>error_msg = <span class="string">&quot;server sent unsolicited SCT list&quot;</span>.to_string();
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::PeerMisbehavedError(error_msg));
             }
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">ExpectCertificateVerify</span> {
-            <span class="ident">config</span>: <span class="self">self</span>.<span class="ident">config</span>,
-            <span class="ident">server_name</span>: <span class="self">self</span>.<span class="ident">server_name</span>,
-            <span class="ident">randoms</span>: <span class="self">self</span>.<span class="ident">randoms</span>,
-            <span class="ident">suite</span>: <span class="self">self</span>.<span class="ident">suite</span>,
-            <span class="ident">transcript</span>: <span class="self">self</span>.<span class="ident">transcript</span>,
-            <span class="ident">key_schedule</span>: <span class="self">self</span>.<span class="ident">key_schedule</span>,
-            <span class="ident">server_cert</span>,
-            <span class="ident">client_auth</span>: <span class="self">self</span>.<span class="ident">client_auth</span>,
+        <span class="prelude-val">Ok</span>(Box::new(ExpectCertificateVerify {
+            config: <span class="self">self</span>.config,
+            server_name: <span class="self">self</span>.server_name,
+            randoms: <span class="self">self</span>.randoms,
+            suite: <span class="self">self</span>.suite,
+            transcript: <span class="self">self</span>.transcript,
+            key_schedule: <span class="self">self</span>.key_schedule,
+            server_cert,
+            client_auth: <span class="self">self</span>.client_auth,
         }))
     }
 }
 
-<span class="comment">// --- TLS1.3 CertificateVerify ---</span>
-<span class="kw">struct</span> <span class="ident">ExpectCertificateVerify</span> {
-    <span class="ident">config</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ClientConfig</span><span class="op">&gt;</span>,
-    <span class="ident">server_name</span>: <span class="ident">ServerName</span>,
-    <span class="ident">randoms</span>: <span class="ident">ConnectionRandoms</span>,
-    <span class="ident">suite</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Tls13CipherSuite</span>,
-    <span class="ident">transcript</span>: <span class="ident">HandshakeHash</span>,
-    <span class="ident">key_schedule</span>: <span class="ident">KeyScheduleHandshake</span>,
-    <span class="ident">server_cert</span>: <span class="ident">ServerCertDetails</span>,
-    <span class="ident">client_auth</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClientAuthDetails</span><span class="op">&gt;</span>,
+<span class="comment">// --- TLS1.3 CertificateVerify ---
+</span><span class="kw">struct </span>ExpectCertificateVerify {
+    config: Arc&lt;ClientConfig&gt;,
+    server_name: ServerName,
+    randoms: ConnectionRandoms,
+    suite: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls13CipherSuite,
+    transcript: HandshakeHash,
+    key_schedule: KeyScheduleHandshake,
+    server_cert: ServerCertDetails,
+    client_auth: <span class="prelude-ty">Option</span>&lt;ClientAuthDetails&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">ClientConnectionData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ExpectCertificateVerify</span> {
-    <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">m</span>: <span class="ident">Message</span>) -&gt; <span class="ident">hs::NextStateOrError</span> {
-        <span class="kw">let</span> <span class="ident">cert_verify</span> <span class="op">=</span> <span class="macro">require_handshake_msg!</span>(
-            <span class="ident">m</span>,
-            <span class="ident">HandshakeType::CertificateVerify</span>,
-            <span class="ident">HandshakePayload::CertificateVerify</span>
+<span class="kw">impl </span>State&lt;ClientConnectionData&gt; <span class="kw">for </span>ExpectCertificateVerify {
+    <span class="kw">fn </span>handle(<span class="kw-2">mut </span><span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>ClientContext&lt;<span class="lifetime">&#39;_</span>&gt;, m: Message) -&gt; hs::NextStateOrError {
+        <span class="kw">let </span>cert_verify = <span class="macro">require_handshake_msg!</span>(
+            m,
+            HandshakeType::CertificateVerify,
+            HandshakePayload::CertificateVerify
         )<span class="question-mark">?</span>;
 
-        <span class="macro">trace!</span>(<span class="string">&quot;Server cert is {:?}&quot;</span>, <span class="self">self</span>.<span class="ident">server_cert</span>.<span class="ident">cert_chain</span>);
+        <span class="macro">trace!</span>(<span class="string">&quot;Server cert is {:?}&quot;</span>, <span class="self">self</span>.server_cert.cert_chain);
 
-        <span class="comment">// 1. Verify the certificate chain.</span>
-        <span class="kw">let</span> (<span class="ident">end_entity</span>, <span class="ident">intermediates</span>) <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">server_cert</span>
-            .<span class="ident">cert_chain</span>
-            .<span class="ident">split_first</span>()
-            .<span class="ident">ok_or</span>(<span class="ident">Error::NoCertificatesPresented</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">now</span> <span class="op">=</span> <span class="ident">std::time::SystemTime::now</span>();
-        <span class="kw">let</span> <span class="ident">cert_verified</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">config</span>
-            .<span class="ident">verifier</span>
-            .<span class="ident">verify_server_cert</span>(
-                <span class="ident">end_entity</span>,
-                <span class="ident">intermediates</span>,
-                <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">server_name</span>,
-                <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">server_cert</span>.<span class="ident">scts</span>(),
-                <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">server_cert</span>.<span class="ident">ocsp_response</span>,
-                <span class="ident">now</span>,
+        <span class="comment">// 1. Verify the certificate chain.
+        </span><span class="kw">let </span>(end_entity, intermediates) = <span class="self">self
+            </span>.server_cert
+            .cert_chain
+            .split_first()
+            .ok_or(Error::NoCertificatesPresented)<span class="question-mark">?</span>;
+        <span class="kw">let </span>now = std::time::SystemTime::now();
+        <span class="kw">let </span>cert_verified = <span class="self">self
+            </span>.config
+            .verifier
+            .verify_server_cert(
+                end_entity,
+                intermediates,
+                <span class="kw-2">&amp;</span><span class="self">self</span>.server_name,
+                <span class="kw-2">&amp;mut </span><span class="self">self</span>.server_cert.scts(),
+                <span class="kw-2">&amp;</span><span class="self">self</span>.server_cert.ocsp_response,
+                now,
             )
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">hs::send_cert_error_alert</span>(<span class="ident">cx</span>.<span class="ident">common</span>, <span class="ident">err</span>))<span class="question-mark">?</span>;
+            .map_err(|err| hs::send_cert_error_alert(cx.common, err))<span class="question-mark">?</span>;
 
-        <span class="comment">// 2. Verify their signature on the handshake.</span>
-        <span class="kw">let</span> <span class="ident">handshake_hash</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">transcript</span>.<span class="ident">get_current_hash</span>();
-        <span class="kw">let</span> <span class="ident">sig_verified</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">config</span>
-            .<span class="ident">verifier</span>
-            .<span class="ident">verify_tls13_signature</span>(
-                <span class="kw-2">&amp;</span><span class="ident">verify::construct_tls13_server_verify_message</span>(<span class="kw-2">&amp;</span><span class="ident">handshake_hash</span>),
-                <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">server_cert</span>.<span class="ident">cert_chain</span>[<span class="number">0</span>],
-                <span class="ident">cert_verify</span>,
+        <span class="comment">// 2. Verify their signature on the handshake.
+        </span><span class="kw">let </span>handshake_hash = <span class="self">self</span>.transcript.get_current_hash();
+        <span class="kw">let </span>sig_verified = <span class="self">self
+            </span>.config
+            .verifier
+            .verify_tls13_signature(
+                <span class="kw-2">&amp;</span>verify::construct_tls13_server_verify_message(<span class="kw-2">&amp;</span>handshake_hash),
+                <span class="kw-2">&amp;</span><span class="self">self</span>.server_cert.cert_chain[<span class="number">0</span>],
+                cert_verify,
             )
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="ident">hs::send_cert_error_alert</span>(<span class="ident">cx</span>.<span class="ident">common</span>, <span class="ident">err</span>))<span class="question-mark">?</span>;
+            .map_err(|err| hs::send_cert_error_alert(cx.common, err))<span class="question-mark">?</span>;
 
-        <span class="ident">cx</span>.<span class="ident">common</span>.<span class="ident">peer_certificates</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">server_cert</span>.<span class="ident">cert_chain</span>);
-        <span class="self">self</span>.<span class="ident">transcript</span>.<span class="ident">add_message</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>);
+        cx.common.peer_certificates = <span class="prelude-val">Some</span>(<span class="self">self</span>.server_cert.cert_chain);
+        <span class="self">self</span>.transcript.add_message(<span class="kw-2">&amp;</span>m);
 
-        <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">ExpectFinished</span> {
-            <span class="ident">config</span>: <span class="self">self</span>.<span class="ident">config</span>,
-            <span class="ident">server_name</span>: <span class="self">self</span>.<span class="ident">server_name</span>,
-            <span class="ident">randoms</span>: <span class="self">self</span>.<span class="ident">randoms</span>,
-            <span class="ident">suite</span>: <span class="self">self</span>.<span class="ident">suite</span>,
-            <span class="ident">transcript</span>: <span class="self">self</span>.<span class="ident">transcript</span>,
-            <span class="ident">key_schedule</span>: <span class="self">self</span>.<span class="ident">key_schedule</span>,
-            <span class="ident">client_auth</span>: <span class="self">self</span>.<span class="ident">client_auth</span>,
-            <span class="ident">cert_verified</span>,
-            <span class="ident">sig_verified</span>,
+        <span class="prelude-val">Ok</span>(Box::new(ExpectFinished {
+            config: <span class="self">self</span>.config,
+            server_name: <span class="self">self</span>.server_name,
+            randoms: <span class="self">self</span>.randoms,
+            suite: <span class="self">self</span>.suite,
+            transcript: <span class="self">self</span>.transcript,
+            key_schedule: <span class="self">self</span>.key_schedule,
+            client_auth: <span class="self">self</span>.client_auth,
+            cert_verified,
+            sig_verified,
         }))
     }
 }
 
-<span class="kw">fn</span> <span class="ident">emit_certificate_tls13</span>(
-    <span class="ident">transcript</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HandshakeHash</span>,
-    <span class="ident">certkey</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">CertifiedKey</span><span class="op">&gt;</span>,
-    <span class="ident">auth_context</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">common</span>: <span class="kw-2">&amp;mut</span> <span class="ident">CommonState</span>,
+<span class="kw">fn </span>emit_certificate_tls13(
+    transcript: <span class="kw-2">&amp;mut </span>HandshakeHash,
+    certkey: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>CertifiedKey&gt;,
+    auth_context: <span class="prelude-ty">Option</span>&lt;Vec&lt;u8&gt;&gt;,
+    common: <span class="kw-2">&amp;mut </span>CommonState,
 ) {
-    <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">auth_context</span>.<span class="ident">unwrap_or_default</span>();
+    <span class="kw">let </span>context = auth_context.unwrap_or_default();
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cert_payload</span> <span class="op">=</span> <span class="ident">CertificatePayloadTLS13</span> {
-        <span class="ident">context</span>: <span class="ident">PayloadU8::new</span>(<span class="ident">context</span>),
-        <span class="ident">entries</span>: <span class="ident">Vec::new</span>(),
+    <span class="kw">let </span><span class="kw-2">mut </span>cert_payload = CertificatePayloadTLS13 {
+        context: PayloadU8::new(context),
+        entries: Vec::new(),
     };
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">certkey</span>) <span class="op">=</span> <span class="ident">certkey</span> {
-        <span class="kw">for</span> <span class="ident">cert</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">certkey</span>.<span class="ident">cert</span> {
-            <span class="ident">cert_payload</span>
-                .<span class="ident">entries</span>
-                .<span class="ident">push</span>(<span class="ident">CertificateEntry::new</span>(<span class="ident">cert</span>.<span class="ident">clone</span>()));
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(certkey) = certkey {
+        <span class="kw">for </span>cert <span class="kw">in </span><span class="kw-2">&amp;</span>certkey.cert {
+            cert_payload
+                .entries
+                .push(CertificateEntry::new(cert.clone()));
         }
     }
 
-    <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">Message</span> {
-        <span class="ident">version</span>: <span class="ident">ProtocolVersion::TLSv1_3</span>,
-        <span class="ident">payload</span>: <span class="ident">MessagePayload::handshake</span>(<span class="ident">HandshakeMessagePayload</span> {
-            <span class="ident">typ</span>: <span class="ident">HandshakeType::Certificate</span>,
-            <span class="ident">payload</span>: <span class="ident">HandshakePayload::CertificateTLS13</span>(<span class="ident">cert_payload</span>),
+    <span class="kw">let </span>m = Message {
+        version: ProtocolVersion::TLSv1_3,
+        payload: MessagePayload::handshake(HandshakeMessagePayload {
+            typ: HandshakeType::Certificate,
+            payload: HandshakePayload::CertificateTLS13(cert_payload),
         }),
     };
-    <span class="ident">transcript</span>.<span class="ident">add_message</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>);
-    <span class="ident">common</span>.<span class="ident">send_msg</span>(<span class="ident">m</span>, <span class="bool-val">true</span>);
+    transcript.add_message(<span class="kw-2">&amp;</span>m);
+    common.send_msg(m, <span class="bool-val">true</span>);
 }
 
-<span class="kw">fn</span> <span class="ident">emit_certverify_tls13</span>(
-    <span class="ident">transcript</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HandshakeHash</span>,
-    <span class="ident">signer</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Signer</span>,
-    <span class="ident">common</span>: <span class="kw-2">&amp;mut</span> <span class="ident">CommonState</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">verify::construct_tls13_client_verify_message</span>(<span class="kw-2">&amp;</span><span class="ident">transcript</span>.<span class="ident">get_current_hash</span>());
+<span class="kw">fn </span>emit_certverify_tls13(
+    transcript: <span class="kw-2">&amp;mut </span>HandshakeHash,
+    signer: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Signer,
+    common: <span class="kw-2">&amp;mut </span>CommonState,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+    <span class="kw">let </span>message = verify::construct_tls13_client_verify_message(<span class="kw-2">&amp;</span>transcript.get_current_hash());
 
-    <span class="kw">let</span> <span class="ident">scheme</span> <span class="op">=</span> <span class="ident">signer</span>.<span class="ident">scheme</span>();
-    <span class="kw">let</span> <span class="ident">sig</span> <span class="op">=</span> <span class="ident">signer</span>.<span class="ident">sign</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">dss</span> <span class="op">=</span> <span class="ident">DigitallySignedStruct::new</span>(<span class="ident">scheme</span>, <span class="ident">sig</span>);
+    <span class="kw">let </span>scheme = signer.scheme();
+    <span class="kw">let </span>sig = signer.sign(<span class="kw-2">&amp;</span>message)<span class="question-mark">?</span>;
+    <span class="kw">let </span>dss = DigitallySignedStruct::new(scheme, sig);
 
-    <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">Message</span> {
-        <span class="ident">version</span>: <span class="ident">ProtocolVersion::TLSv1_3</span>,
-        <span class="ident">payload</span>: <span class="ident">MessagePayload::handshake</span>(<span class="ident">HandshakeMessagePayload</span> {
-            <span class="ident">typ</span>: <span class="ident">HandshakeType::CertificateVerify</span>,
-            <span class="ident">payload</span>: <span class="ident">HandshakePayload::CertificateVerify</span>(<span class="ident">dss</span>),
+    <span class="kw">let </span>m = Message {
+        version: ProtocolVersion::TLSv1_3,
+        payload: MessagePayload::handshake(HandshakeMessagePayload {
+            typ: HandshakeType::CertificateVerify,
+            payload: HandshakePayload::CertificateVerify(dss),
         }),
     };
 
-    <span class="ident">transcript</span>.<span class="ident">add_message</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>);
-    <span class="ident">common</span>.<span class="ident">send_msg</span>(<span class="ident">m</span>, <span class="bool-val">true</span>);
+    transcript.add_message(<span class="kw-2">&amp;</span>m);
+    common.send_msg(m, <span class="bool-val">true</span>);
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">fn</span> <span class="ident">emit_finished_tls13</span>(
-    <span class="ident">transcript</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HandshakeHash</span>,
-    <span class="ident">verify_data</span>: <span class="ident">ring::hmac::Tag</span>,
-    <span class="ident">common</span>: <span class="kw-2">&amp;mut</span> <span class="ident">CommonState</span>,
+<span class="kw">fn </span>emit_finished_tls13(
+    transcript: <span class="kw-2">&amp;mut </span>HandshakeHash,
+    verify_data: ring::hmac::Tag,
+    common: <span class="kw-2">&amp;mut </span>CommonState,
 ) {
-    <span class="kw">let</span> <span class="ident">verify_data_payload</span> <span class="op">=</span> <span class="ident">Payload::new</span>(<span class="ident">verify_data</span>.<span class="ident">as_ref</span>());
+    <span class="kw">let </span>verify_data_payload = Payload::new(verify_data.as_ref());
 
-    <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">Message</span> {
-        <span class="ident">version</span>: <span class="ident">ProtocolVersion::TLSv1_3</span>,
-        <span class="ident">payload</span>: <span class="ident">MessagePayload::handshake</span>(<span class="ident">HandshakeMessagePayload</span> {
-            <span class="ident">typ</span>: <span class="ident">HandshakeType::Finished</span>,
-            <span class="ident">payload</span>: <span class="ident">HandshakePayload::Finished</span>(<span class="ident">verify_data_payload</span>),
+    <span class="kw">let </span>m = Message {
+        version: ProtocolVersion::TLSv1_3,
+        payload: MessagePayload::handshake(HandshakeMessagePayload {
+            typ: HandshakeType::Finished,
+            payload: HandshakePayload::Finished(verify_data_payload),
         }),
     };
 
-    <span class="ident">transcript</span>.<span class="ident">add_message</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>);
-    <span class="ident">common</span>.<span class="ident">send_msg</span>(<span class="ident">m</span>, <span class="bool-val">true</span>);
+    transcript.add_message(<span class="kw-2">&amp;</span>m);
+    common.send_msg(m, <span class="bool-val">true</span>);
 }
 
-<span class="kw">fn</span> <span class="ident">emit_end_of_early_data_tls13</span>(<span class="ident">transcript</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HandshakeHash</span>, <span class="ident">common</span>: <span class="kw-2">&amp;mut</span> <span class="ident">CommonState</span>) {
-    <span class="kw">if</span> <span class="ident">common</span>.<span class="ident">is_quic</span>() {
+<span class="kw">fn </span>emit_end_of_early_data_tls13(transcript: <span class="kw-2">&amp;mut </span>HandshakeHash, common: <span class="kw-2">&amp;mut </span>CommonState) {
+    <span class="kw">if </span>common.is_quic() {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">Message</span> {
-        <span class="ident">version</span>: <span class="ident">ProtocolVersion::TLSv1_3</span>,
-        <span class="ident">payload</span>: <span class="ident">MessagePayload::handshake</span>(<span class="ident">HandshakeMessagePayload</span> {
-            <span class="ident">typ</span>: <span class="ident">HandshakeType::EndOfEarlyData</span>,
-            <span class="ident">payload</span>: <span class="ident">HandshakePayload::EndOfEarlyData</span>,
+    <span class="kw">let </span>m = Message {
+        version: ProtocolVersion::TLSv1_3,
+        payload: MessagePayload::handshake(HandshakeMessagePayload {
+            typ: HandshakeType::EndOfEarlyData,
+            payload: HandshakePayload::EndOfEarlyData,
         }),
     };
 
-    <span class="ident">transcript</span>.<span class="ident">add_message</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>);
-    <span class="ident">common</span>.<span class="ident">send_msg</span>(<span class="ident">m</span>, <span class="bool-val">true</span>);
+    transcript.add_message(<span class="kw-2">&amp;</span>m);
+    common.send_msg(m, <span class="bool-val">true</span>);
 }
 
-<span class="kw">struct</span> <span class="ident">ExpectFinished</span> {
-    <span class="ident">config</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ClientConfig</span><span class="op">&gt;</span>,
-    <span class="ident">server_name</span>: <span class="ident">ServerName</span>,
-    <span class="ident">randoms</span>: <span class="ident">ConnectionRandoms</span>,
-    <span class="ident">suite</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Tls13CipherSuite</span>,
-    <span class="ident">transcript</span>: <span class="ident">HandshakeHash</span>,
-    <span class="ident">key_schedule</span>: <span class="ident">KeyScheduleHandshake</span>,
-    <span class="ident">client_auth</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClientAuthDetails</span><span class="op">&gt;</span>,
-    <span class="ident">cert_verified</span>: <span class="ident">verify::ServerCertVerified</span>,
-    <span class="ident">sig_verified</span>: <span class="ident">verify::HandshakeSignatureValid</span>,
+<span class="kw">struct </span>ExpectFinished {
+    config: Arc&lt;ClientConfig&gt;,
+    server_name: ServerName,
+    randoms: ConnectionRandoms,
+    suite: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls13CipherSuite,
+    transcript: HandshakeHash,
+    key_schedule: KeyScheduleHandshake,
+    client_auth: <span class="prelude-ty">Option</span>&lt;ClientAuthDetails&gt;,
+    cert_verified: verify::ServerCertVerified,
+    sig_verified: verify::HandshakeSignatureValid,
 }
 
-<span class="kw">impl</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">ClientConnectionData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ExpectFinished</span> {
-    <span class="kw">fn</span> <span class="ident">handle</span>(<span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">m</span>: <span class="ident">Message</span>) -&gt; <span class="ident">hs::NextStateOrError</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">st</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>;
-        <span class="kw">let</span> <span class="ident">finished</span> <span class="op">=</span>
-            <span class="macro">require_handshake_msg!</span>(<span class="ident">m</span>, <span class="ident">HandshakeType::Finished</span>, <span class="ident">HandshakePayload::Finished</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>State&lt;ClientConnectionData&gt; <span class="kw">for </span>ExpectFinished {
+    <span class="kw">fn </span>handle(<span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>ClientContext&lt;<span class="lifetime">&#39;_</span>&gt;, m: Message) -&gt; hs::NextStateOrError {
+        <span class="kw">let </span><span class="kw-2">mut </span>st = <span class="kw-2">*</span><span class="self">self</span>;
+        <span class="kw">let </span>finished =
+            <span class="macro">require_handshake_msg!</span>(m, HandshakeType::Finished, HandshakePayload::Finished)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">handshake_hash</span> <span class="op">=</span> <span class="ident">st</span>.<span class="ident">transcript</span>.<span class="ident">get_current_hash</span>();
-        <span class="kw">let</span> <span class="ident">expect_verify_data</span> <span class="op">=</span> <span class="ident">st</span>
-            .<span class="ident">key_schedule</span>
-            .<span class="ident">sign_server_finish</span>(<span class="kw-2">&amp;</span><span class="ident">handshake_hash</span>);
+        <span class="kw">let </span>handshake_hash = st.transcript.get_current_hash();
+        <span class="kw">let </span>expect_verify_data = st
+            .key_schedule
+            .sign_server_finish(<span class="kw-2">&amp;</span>handshake_hash);
 
-        <span class="kw">let</span> <span class="ident">fin</span> <span class="op">=</span> <span class="ident">constant_time::verify_slices_are_equal</span>(<span class="ident">expect_verify_data</span>.<span class="ident">as_ref</span>(), <span class="kw-2">&amp;</span><span class="ident">finished</span>.<span class="number">0</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                <span class="ident">cx</span>.<span class="ident">common</span>
-                    .<span class="ident">send_fatal_alert</span>(<span class="ident">AlertDescription::DecryptError</span>);
-                <span class="ident">Error::DecryptError</span>
+        <span class="kw">let </span>fin = constant_time::verify_slices_are_equal(expect_verify_data.as_ref(), <span class="kw-2">&amp;</span>finished.<span class="number">0</span>)
+            .map_err(|<span class="kw">_</span>| {
+                cx.common
+                    .send_fatal_alert(AlertDescription::DecryptError);
+                Error::DecryptError
             })
-            .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">verify::FinishedMessageVerified::assertion</span>())<span class="question-mark">?</span>;
+            .map(|<span class="kw">_</span>| verify::FinishedMessageVerified::assertion())<span class="question-mark">?</span>;
 
-        <span class="ident">st</span>.<span class="ident">transcript</span>.<span class="ident">add_message</span>(<span class="kw-2">&amp;</span><span class="ident">m</span>);
+        st.transcript.add_message(<span class="kw-2">&amp;</span>m);
 
-        <span class="kw">let</span> <span class="ident">hash_after_handshake</span> <span class="op">=</span> <span class="ident">st</span>.<span class="ident">transcript</span>.<span class="ident">get_current_hash</span>();
+        <span class="kw">let </span>hash_after_handshake = st.transcript.get_current_hash();
         <span class="comment">/* The EndOfEarlyData message to server is still encrypted with early data keys,
-         * but appears in the transcript after the server Finished. */</span>
-        <span class="kw">if</span> <span class="ident">cx</span>.<span class="ident">common</span>.<span class="ident">early_traffic</span> {
-            <span class="ident">emit_end_of_early_data_tls13</span>(<span class="kw-2">&amp;mut</span> <span class="ident">st</span>.<span class="ident">transcript</span>, <span class="ident">cx</span>.<span class="ident">common</span>);
-            <span class="ident">cx</span>.<span class="ident">common</span>.<span class="ident">early_traffic</span> <span class="op">=</span> <span class="bool-val">false</span>;
-            <span class="ident">cx</span>.<span class="ident">data</span>.<span class="ident">early_data</span>.<span class="ident">finished</span>();
-            <span class="ident">cx</span>.<span class="ident">common</span>
-                .<span class="ident">record_layer</span>
-                .<span class="ident">set_message_encrypter</span>(
-                    <span class="ident">st</span>.<span class="ident">suite</span>
-                        .<span class="ident">derive_encrypter</span>(<span class="ident">st</span>.<span class="ident">key_schedule</span>.<span class="ident">client_key</span>()),
+         * but appears in the transcript after the server Finished. */
+        </span><span class="kw">if </span>cx.common.early_traffic {
+            emit_end_of_early_data_tls13(<span class="kw-2">&amp;mut </span>st.transcript, cx.common);
+            cx.common.early_traffic = <span class="bool-val">false</span>;
+            cx.data.early_data.finished();
+            cx.common
+                .record_layer
+                .set_message_encrypter(
+                    st.suite
+                        .derive_encrypter(st.key_schedule.client_key()),
                 );
         }
 
         <span class="comment">/* Send our authentication/finished messages.  These are still encrypted
-         * with our handshake keys. */</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">client_auth</span>) <span class="op">=</span> <span class="ident">st</span>.<span class="ident">client_auth</span> {
-            <span class="kw">match</span> <span class="ident">client_auth</span> {
-                <span class="ident">ClientAuthDetails::Empty</span> {
-                    <span class="ident">auth_context_tls13</span>: <span class="ident">auth_context</span>,
+         * with our handshake keys. */
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(client_auth) = st.client_auth {
+            <span class="kw">match </span>client_auth {
+                ClientAuthDetails::Empty {
+                    auth_context_tls13: auth_context,
                 } =&gt; {
-                    <span class="ident">emit_certificate_tls13</span>(<span class="kw-2">&amp;mut</span> <span class="ident">st</span>.<span class="ident">transcript</span>, <span class="prelude-val">None</span>, <span class="ident">auth_context</span>, <span class="ident">cx</span>.<span class="ident">common</span>);
+                    emit_certificate_tls13(<span class="kw-2">&amp;mut </span>st.transcript, <span class="prelude-val">None</span>, auth_context, cx.common);
                 }
-                <span class="ident">ClientAuthDetails::Verify</span> {
-                    <span class="ident">certkey</span>,
-                    <span class="ident">signer</span>,
-                    <span class="ident">auth_context_tls13</span>: <span class="ident">auth_context</span>,
+                ClientAuthDetails::Verify {
+                    certkey,
+                    signer,
+                    auth_context_tls13: auth_context,
                 } =&gt; {
-                    <span class="ident">emit_certificate_tls13</span>(
-                        <span class="kw-2">&amp;mut</span> <span class="ident">st</span>.<span class="ident">transcript</span>,
-                        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">certkey</span>),
-                        <span class="ident">auth_context</span>,
-                        <span class="ident">cx</span>.<span class="ident">common</span>,
+                    emit_certificate_tls13(
+                        <span class="kw-2">&amp;mut </span>st.transcript,
+                        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>certkey),
+                        auth_context,
+                        cx.common,
                     );
-                    <span class="ident">emit_certverify_tls13</span>(<span class="kw-2">&amp;mut</span> <span class="ident">st</span>.<span class="ident">transcript</span>, <span class="ident">signer</span>.<span class="ident">as_ref</span>(), <span class="ident">cx</span>.<span class="ident">common</span>)<span class="question-mark">?</span>;
+                    emit_certverify_tls13(<span class="kw-2">&amp;mut </span>st.transcript, signer.as_ref(), cx.common)<span class="question-mark">?</span>;
                 }
             }
         }
 
-        <span class="kw">let</span> (<span class="ident">key_schedule_finished</span>, <span class="ident">client_key</span>, <span class="ident">server_key</span>) <span class="op">=</span> <span class="ident">st</span>
-            .<span class="ident">key_schedule</span>
-            .<span class="ident">into_traffic_with_client_finished_pending</span>(
-                <span class="ident">hash_after_handshake</span>,
-                <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">st</span>.<span class="ident">config</span>.<span class="ident">key_log</span>,
-                <span class="kw-2">&amp;</span><span class="ident">st</span>.<span class="ident">randoms</span>.<span class="ident">client</span>,
+        <span class="kw">let </span>(key_schedule_finished, client_key, server_key) = st
+            .key_schedule
+            .into_traffic_with_client_finished_pending(
+                hash_after_handshake,
+                <span class="kw-2">&amp;*</span>st.config.key_log,
+                <span class="kw-2">&amp;</span>st.randoms.client,
             );
-        <span class="kw">let</span> <span class="ident">handshake_hash</span> <span class="op">=</span> <span class="ident">st</span>.<span class="ident">transcript</span>.<span class="ident">get_current_hash</span>();
-        <span class="kw">let</span> (<span class="ident">key_schedule_traffic</span>, <span class="ident">verify_data</span>, <span class="kw">_</span>) <span class="op">=</span>
-            <span class="ident">key_schedule_finished</span>.<span class="ident">sign_client_finish</span>(<span class="kw-2">&amp;</span><span class="ident">handshake_hash</span>);
-        <span class="ident">emit_finished_tls13</span>(<span class="kw-2">&amp;mut</span> <span class="ident">st</span>.<span class="ident">transcript</span>, <span class="ident">verify_data</span>, <span class="ident">cx</span>.<span class="ident">common</span>);
+        <span class="kw">let </span>handshake_hash = st.transcript.get_current_hash();
+        <span class="kw">let </span>(key_schedule_traffic, verify_data, <span class="kw">_</span>) =
+            key_schedule_finished.sign_client_finish(<span class="kw-2">&amp;</span>handshake_hash);
+        emit_finished_tls13(<span class="kw-2">&amp;mut </span>st.transcript, verify_data, cx.common);
 
-        <span class="comment">/* Now move to our application traffic keys. */</span>
-        <span class="ident">cx</span>.<span class="ident">common</span>.<span class="ident">check_aligned_handshake</span>()<span class="question-mark">?</span>;
+        <span class="comment">/* Now move to our application traffic keys. */
+        </span>cx.common.check_aligned_handshake()<span class="question-mark">?</span>;
 
-        <span class="ident">cx</span>.<span class="ident">common</span>
-            .<span class="ident">record_layer</span>
-            .<span class="ident">set_message_decrypter</span>(<span class="ident">st</span>.<span class="ident">suite</span>.<span class="ident">derive_decrypter</span>(<span class="kw-2">&amp;</span><span class="ident">server_key</span>));
+        cx.common
+            .record_layer
+            .set_message_decrypter(st.suite.derive_decrypter(<span class="kw-2">&amp;</span>server_key));
 
-        <span class="ident">cx</span>.<span class="ident">common</span>
-            .<span class="ident">record_layer</span>
-            .<span class="ident">set_message_encrypter</span>(<span class="ident">st</span>.<span class="ident">suite</span>.<span class="ident">derive_encrypter</span>(<span class="kw-2">&amp;</span><span class="ident">client_key</span>));
+        cx.common
+            .record_layer
+            .set_message_encrypter(st.suite.derive_encrypter(<span class="kw-2">&amp;</span>client_key));
 
-        <span class="ident">cx</span>.<span class="ident">common</span>.<span class="ident">start_traffic</span>();
+        cx.common.start_traffic();
 
-        <span class="kw">let</span> <span class="ident">st</span> <span class="op">=</span> <span class="ident">ExpectTraffic</span> {
-            <span class="ident">session_storage</span>: <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">st</span>.<span class="ident">config</span>.<span class="ident">session_storage</span>),
-            <span class="ident">server_name</span>: <span class="ident">st</span>.<span class="ident">server_name</span>,
-            <span class="ident">suite</span>: <span class="ident">st</span>.<span class="ident">suite</span>,
-            <span class="ident">transcript</span>: <span class="ident">st</span>.<span class="ident">transcript</span>,
-            <span class="ident">key_schedule</span>: <span class="ident">key_schedule_traffic</span>,
-            <span class="ident">want_write_key_update</span>: <span class="bool-val">false</span>,
-            <span class="ident">_cert_verified</span>: <span class="ident">st</span>.<span class="ident">cert_verified</span>,
-            <span class="ident">_sig_verified</span>: <span class="ident">st</span>.<span class="ident">sig_verified</span>,
-            <span class="ident">_fin_verified</span>: <span class="ident">fin</span>,
+        <span class="kw">let </span>st = ExpectTraffic {
+            session_storage: Arc::clone(<span class="kw-2">&amp;</span>st.config.session_storage),
+            server_name: st.server_name,
+            suite: st.suite,
+            transcript: st.transcript,
+            key_schedule: key_schedule_traffic,
+            want_write_key_update: <span class="bool-val">false</span>,
+            _cert_verified: st.cert_verified,
+            _sig_verified: st.sig_verified,
+            _fin_verified: fin,
         };
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quic&quot;</span>)]</span>
-        {
-            <span class="kw">if</span> <span class="ident">cx</span>.<span class="ident">common</span>.<span class="ident">protocol</span> <span class="op">==</span> <span class="ident">Protocol::Quic</span> {
-                <span class="ident">cx</span>.<span class="ident">common</span>.<span class="ident">quic</span>.<span class="ident">traffic_secrets</span> <span class="op">=</span>
-                    <span class="prelude-val">Some</span>(<span class="ident">quic::Secrets::new</span>(<span class="ident">client_key</span>, <span class="ident">server_key</span>, <span class="ident">st</span>.<span class="ident">suite</span>, <span class="bool-val">true</span>));
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">ExpectQuicTraffic</span>(<span class="ident">st</span>)));
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;quic&quot;</span>)]
+        </span>{
+            <span class="kw">if </span>cx.common.protocol == Protocol::Quic {
+                cx.common.quic.traffic_secrets =
+                    <span class="prelude-val">Some</span>(quic::Secrets::new(client_key, server_key, st.suite, <span class="bool-val">true</span>));
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(Box::new(ExpectQuicTraffic(st)));
             }
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">st</span>))
+        <span class="prelude-val">Ok</span>(Box::new(st))
     }
 }
 
-<span class="comment">// -- Traffic transit state (TLS1.3) --</span>
-<span class="comment">// In this state we can be sent tickets, key updates,</span>
-<span class="comment">// and application data.</span>
-<span class="kw">struct</span> <span class="ident">ExpectTraffic</span> {
-    <span class="ident">session_storage</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StoresClientSessions</span><span class="op">&gt;</span>,
-    <span class="ident">server_name</span>: <span class="ident">ServerName</span>,
-    <span class="ident">suite</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Tls13CipherSuite</span>,
-    <span class="ident">transcript</span>: <span class="ident">HandshakeHash</span>,
-    <span class="ident">key_schedule</span>: <span class="ident">KeyScheduleTraffic</span>,
-    <span class="ident">want_write_key_update</span>: <span class="ident">bool</span>,
-    <span class="ident">_cert_verified</span>: <span class="ident">verify::ServerCertVerified</span>,
-    <span class="ident">_sig_verified</span>: <span class="ident">verify::HandshakeSignatureValid</span>,
-    <span class="ident">_fin_verified</span>: <span class="ident">verify::FinishedMessageVerified</span>,
+<span class="comment">// -- Traffic transit state (TLS1.3) --
+// In this state we can be sent tickets, key updates,
+// and application data.
+</span><span class="kw">struct </span>ExpectTraffic {
+    session_storage: Arc&lt;<span class="kw">dyn </span>StoresClientSessions&gt;,
+    server_name: ServerName,
+    suite: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Tls13CipherSuite,
+    transcript: HandshakeHash,
+    key_schedule: KeyScheduleTraffic,
+    want_write_key_update: bool,
+    _cert_verified: verify::ServerCertVerified,
+    _sig_verified: verify::HandshakeSignatureValid,
+    _fin_verified: verify::FinishedMessageVerified,
 }
 
-<span class="kw">impl</span> <span class="ident">ExpectTraffic</span> {
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unnecessary_wraps</span>)]</span> <span class="comment">// returns Err for #[cfg(feature = &quot;quic&quot;)]</span>
-    <span class="kw">fn</span> <span class="ident">handle_new_ticket_tls13</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">nst</span>: <span class="kw-2">&amp;</span><span class="ident">NewSessionTicketPayloadTLS13</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">nst</span>.<span class="ident">has_duplicate_extension</span>() {
-            <span class="ident">cx</span>.<span class="ident">common</span>
-                .<span class="ident">send_fatal_alert</span>(<span class="ident">AlertDescription::IllegalParameter</span>);
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::PeerMisbehavedError</span>(
-                <span class="string">&quot;peer sent duplicate NewSessionTicket extensions&quot;</span>.<span class="ident">into</span>(),
+<span class="kw">impl </span>ExpectTraffic {
+    <span class="attribute">#[allow(clippy::unnecessary_wraps)] </span><span class="comment">// returns Err for #[cfg(feature = &quot;quic&quot;)]
+    </span><span class="kw">fn </span>handle_new_ticket_tls13(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        cx: <span class="kw-2">&amp;mut </span>ClientContext&lt;<span class="lifetime">&#39;_</span>&gt;,
+        nst: <span class="kw-2">&amp;</span>NewSessionTicketPayloadTLS13,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="kw">if </span>nst.has_duplicate_extension() {
+            cx.common
+                .send_fatal_alert(AlertDescription::IllegalParameter);
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::PeerMisbehavedError(
+                <span class="string">&quot;peer sent duplicate NewSessionTicket extensions&quot;</span>.into(),
             ));
         }
 
-        <span class="kw">let</span> <span class="ident">handshake_hash</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">transcript</span>.<span class="ident">get_current_hash</span>();
-        <span class="kw">let</span> <span class="ident">secret</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">key_schedule</span>
-            .<span class="ident">resumption_master_secret_and_derive_ticket_psk</span>(<span class="kw-2">&amp;</span><span class="ident">handshake_hash</span>, <span class="kw-2">&amp;</span><span class="ident">nst</span>.<span class="ident">nonce</span>.<span class="number">0</span>);
+        <span class="kw">let </span>handshake_hash = <span class="self">self</span>.transcript.get_current_hash();
+        <span class="kw">let </span>secret = <span class="self">self
+            </span>.key_schedule
+            .resumption_master_secret_and_derive_ticket_psk(<span class="kw-2">&amp;</span>handshake_hash, <span class="kw-2">&amp;</span>nst.nonce.<span class="number">0</span>);
 
-        <span class="kw">let</span> <span class="ident">time_now</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">TimeBase::now</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>,
-            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span>
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-                <span class="macro">debug!</span>(<span class="string">&quot;Session not saved: {}&quot;</span>, <span class="ident">e</span>);
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+        <span class="kw">let </span>time_now = <span class="kw">match </span>TimeBase::now() {
+            <span class="prelude-val">Ok</span>(t) =&gt; t,
+            <span class="attribute">#[allow(unused_variables)]
+            </span><span class="prelude-val">Err</span>(e) =&gt; {
+                <span class="macro">debug!</span>(<span class="string">&quot;Session not saved: {}&quot;</span>, e);
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(());
             }
         };
 
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">persist::Tls13ClientSessionValue::new</span>(
-            <span class="self">self</span>.<span class="ident">suite</span>,
-            <span class="ident">nst</span>.<span class="ident">ticket</span>.<span class="number">0</span>.<span class="ident">clone</span>(),
-            <span class="ident">secret</span>,
-            <span class="ident">cx</span>.<span class="ident">common</span>
-                .<span class="ident">peer_certificates</span>
-                .<span class="ident">clone</span>()
-                .<span class="ident">unwrap_or_default</span>(),
-            <span class="ident">time_now</span>,
-            <span class="ident">nst</span>.<span class="ident">lifetime</span>,
-            <span class="ident">nst</span>.<span class="ident">age_add</span>,
-            <span class="ident">nst</span>.<span class="ident">get_max_early_data_size</span>()
-                .<span class="ident">unwrap_or_default</span>(),
+        <span class="kw">let </span>value = persist::Tls13ClientSessionValue::new(
+            <span class="self">self</span>.suite,
+            nst.ticket.<span class="number">0</span>.clone(),
+            secret,
+            cx.common
+                .peer_certificates
+                .clone()
+                .unwrap_or_default(),
+            time_now,
+            nst.lifetime,
+            nst.age_add,
+            nst.get_max_early_data_size()
+                .unwrap_or_default(),
         );
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quic&quot;</span>)]</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">sz</span>) <span class="op">=</span> <span class="ident">nst</span>.<span class="ident">get_max_early_data_size</span>() {
-            <span class="kw">if</span> <span class="ident">cx</span>.<span class="ident">common</span>.<span class="ident">protocol</span> <span class="op">==</span> <span class="ident">Protocol::Quic</span> <span class="op">&amp;&amp;</span> <span class="ident">sz</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">sz</span> <span class="op">!</span><span class="op">=</span> <span class="number">0xffff_ffff</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::PeerMisbehavedError</span>(
-                    <span class="string">&quot;invalid max_early_data_size&quot;</span>.<span class="ident">into</span>(),
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;quic&quot;</span>)]
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(sz) = nst.get_max_early_data_size() {
+            <span class="kw">if </span>cx.common.protocol == Protocol::Quic &amp;&amp; sz != <span class="number">0 </span>&amp;&amp; sz != <span class="number">0xffff_ffff </span>{
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::PeerMisbehavedError(
+                    <span class="string">&quot;invalid max_early_data_size&quot;</span>.into(),
                 ));
             }
         }
 
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">persist::ClientSessionKey::session_for_server_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">server_name</span>);
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_mut</span>)]</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ticket</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">get_encoding</span>();
+        <span class="kw">let </span>key = persist::ClientSessionKey::session_for_server_name(<span class="kw-2">&amp;</span><span class="self">self</span>.server_name);
+        <span class="attribute">#[allow(unused_mut)]
+        </span><span class="kw">let </span><span class="kw-2">mut </span>ticket = value.get_encoding();
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quic&quot;</span>)]</span>
-        <span class="kw">if</span> <span class="kw">let</span> (<span class="ident">Protocol::Quic</span>, <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">quic_params</span>)) <span class="op">=</span>
-            (<span class="ident">cx</span>.<span class="ident">common</span>.<span class="ident">protocol</span>, <span class="kw-2">&amp;</span><span class="ident">cx</span>.<span class="ident">common</span>.<span class="ident">quic</span>.<span class="ident">params</span>)
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;quic&quot;</span>)]
+        </span><span class="kw">if let </span>(Protocol::Quic, <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>quic_params)) =
+            (cx.common.protocol, <span class="kw-2">&amp;</span>cx.common.quic.params)
         {
-            <span class="ident">PayloadU16::encode_slice</span>(<span class="ident">quic_params</span>, <span class="kw-2">&amp;mut</span> <span class="ident">ticket</span>);
+            PayloadU16::encode_slice(quic_params, <span class="kw-2">&amp;mut </span>ticket);
         }
 
-        <span class="kw">let</span> <span class="ident">worked</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">session_storage</span>
-            .<span class="ident">put</span>(<span class="ident">key</span>.<span class="ident">get_encoding</span>(), <span class="ident">ticket</span>);
+        <span class="kw">let </span>worked = <span class="self">self
+            </span>.session_storage
+            .put(key.get_encoding(), ticket);
 
-        <span class="kw">if</span> <span class="ident">worked</span> {
+        <span class="kw">if </span>worked {
             <span class="macro">debug!</span>(<span class="string">&quot;Ticket saved&quot;</span>);
-        } <span class="kw">else</span> {
+        } <span class="kw">else </span>{
             <span class="macro">debug!</span>(<span class="string">&quot;Ticket not saved&quot;</span>);
         }
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">handle_key_update</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">common</span>: <span class="kw-2">&amp;mut</span> <span class="ident">CommonState</span>,
-        <span class="ident">kur</span>: <span class="kw-2">&amp;</span><span class="ident">KeyUpdateRequest</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quic&quot;</span>)]</span>
-        {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Protocol::Quic</span> <span class="op">=</span> <span class="ident">common</span>.<span class="ident">protocol</span> {
-                <span class="ident">common</span>.<span class="ident">send_fatal_alert</span>(<span class="ident">AlertDescription::UnexpectedMessage</span>);
-                <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;KeyUpdate received in QUIC connection&quot;</span>.<span class="ident">to_string</span>();
-                <span class="macro">warn!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">msg</span>);
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::PeerMisbehavedError</span>(<span class="ident">msg</span>));
+    <span class="kw">fn </span>handle_key_update(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        common: <span class="kw-2">&amp;mut </span>CommonState,
+        kur: <span class="kw-2">&amp;</span>KeyUpdateRequest,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;quic&quot;</span>)]
+        </span>{
+            <span class="kw">if let </span>Protocol::Quic = common.protocol {
+                common.send_fatal_alert(AlertDescription::UnexpectedMessage);
+                <span class="kw">let </span>msg = <span class="string">&quot;KeyUpdate received in QUIC connection&quot;</span>.to_string();
+                <span class="macro">warn!</span>(<span class="string">&quot;{}&quot;</span>, msg);
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::PeerMisbehavedError(msg));
             }
         }
 
-        <span class="comment">// Mustn&#39;t be interleaved with other handshake messages.</span>
-        <span class="ident">common</span>.<span class="ident">check_aligned_handshake</span>()<span class="question-mark">?</span>;
+        <span class="comment">// Mustn&#39;t be interleaved with other handshake messages.
+        </span>common.check_aligned_handshake()<span class="question-mark">?</span>;
 
-        <span class="kw">match</span> <span class="ident">kur</span> {
-            <span class="ident">KeyUpdateRequest::UpdateNotRequested</span> =&gt; {}
-            <span class="ident">KeyUpdateRequest::UpdateRequested</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">want_write_key_update</span> <span class="op">=</span> <span class="bool-val">true</span>;
+        <span class="kw">match </span>kur {
+            KeyUpdateRequest::UpdateNotRequested =&gt; {}
+            KeyUpdateRequest::UpdateRequested =&gt; {
+                <span class="self">self</span>.want_write_key_update = <span class="bool-val">true</span>;
             }
-            <span class="kw">_</span> =&gt; {
-                <span class="ident">common</span>.<span class="ident">send_fatal_alert</span>(<span class="ident">AlertDescription::IllegalParameter</span>);
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::CorruptMessagePayload</span>(<span class="ident">ContentType::Handshake</span>));
+            <span class="kw">_ </span>=&gt; {
+                common.send_fatal_alert(AlertDescription::IllegalParameter);
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::CorruptMessagePayload(ContentType::Handshake));
             }
         }
 
-        <span class="comment">// Update our read-side keys.</span>
-        <span class="kw">let</span> <span class="ident">new_read_key</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">key_schedule</span>
-            .<span class="ident">next_server_application_traffic_secret</span>();
-        <span class="ident">common</span>
-            .<span class="ident">record_layer</span>
-            .<span class="ident">set_message_decrypter</span>(
-                <span class="self">self</span>.<span class="ident">suite</span>
-                    .<span class="ident">derive_decrypter</span>(<span class="kw-2">&amp;</span><span class="ident">new_read_key</span>),
+        <span class="comment">// Update our read-side keys.
+        </span><span class="kw">let </span>new_read_key = <span class="self">self
+            </span>.key_schedule
+            .next_server_application_traffic_secret();
+        common
+            .record_layer
+            .set_message_decrypter(
+                <span class="self">self</span>.suite
+                    .derive_decrypter(<span class="kw-2">&amp;</span>new_read_key),
             );
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">ClientConnectionData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ExpectTraffic</span> {
-    <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">m</span>: <span class="ident">Message</span>) -&gt; <span class="ident">hs::NextStateOrError</span> {
-        <span class="kw">match</span> <span class="ident">m</span>.<span class="ident">payload</span> {
-            <span class="ident">MessagePayload::ApplicationData</span>(<span class="ident">payload</span>) =&gt; <span class="ident">cx</span>
-                .<span class="ident">common</span>
-                .<span class="ident">take_received_plaintext</span>(<span class="ident">payload</span>),
-            <span class="ident">MessagePayload::Handshake</span> {
-                <span class="ident">parsed</span>:
-                    <span class="ident">HandshakeMessagePayload</span> {
-                        <span class="ident">payload</span>: <span class="ident">HandshakePayload::NewSessionTicketTLS13</span>(<span class="kw-2">ref</span> <span class="ident">new_ticket</span>),
+<span class="kw">impl </span>State&lt;ClientConnectionData&gt; <span class="kw">for </span>ExpectTraffic {
+    <span class="kw">fn </span>handle(<span class="kw-2">mut </span><span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>ClientContext&lt;<span class="lifetime">&#39;_</span>&gt;, m: Message) -&gt; hs::NextStateOrError {
+        <span class="kw">match </span>m.payload {
+            MessagePayload::ApplicationData(payload) =&gt; cx
+                .common
+                .take_received_plaintext(payload),
+            MessagePayload::Handshake {
+                parsed:
+                    HandshakeMessagePayload {
+                        payload: HandshakePayload::NewSessionTicketTLS13(<span class="kw-2">ref </span>new_ticket),
                         ..
                     },
                 ..
-            } =&gt; <span class="self">self</span>.<span class="ident">handle_new_ticket_tls13</span>(<span class="ident">cx</span>, <span class="ident">new_ticket</span>)<span class="question-mark">?</span>,
-            <span class="ident">MessagePayload::Handshake</span> {
-                <span class="ident">parsed</span>:
-                    <span class="ident">HandshakeMessagePayload</span> {
-                        <span class="ident">payload</span>: <span class="ident">HandshakePayload::KeyUpdate</span>(<span class="kw-2">ref</span> <span class="ident">key_update</span>),
+            } =&gt; <span class="self">self</span>.handle_new_ticket_tls13(cx, new_ticket)<span class="question-mark">?</span>,
+            MessagePayload::Handshake {
+                parsed:
+                    HandshakeMessagePayload {
+                        payload: HandshakePayload::KeyUpdate(<span class="kw-2">ref </span>key_update),
                         ..
                     },
                 ..
-            } =&gt; <span class="self">self</span>.<span class="ident">handle_key_update</span>(<span class="ident">cx</span>.<span class="ident">common</span>, <span class="ident">key_update</span>)<span class="question-mark">?</span>,
-            <span class="ident">payload</span> =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">inappropriate_handshake_message</span>(
-                    <span class="kw-2">&amp;</span><span class="ident">payload</span>,
-                    <span class="kw-2">&amp;</span>[<span class="ident">ContentType::ApplicationData</span>, <span class="ident">ContentType::Handshake</span>],
-                    <span class="kw-2">&amp;</span>[<span class="ident">HandshakeType::NewSessionTicket</span>, <span class="ident">HandshakeType::KeyUpdate</span>],
+            } =&gt; <span class="self">self</span>.handle_key_update(cx.common, key_update)<span class="question-mark">?</span>,
+            payload =&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(inappropriate_handshake_message(
+                    <span class="kw-2">&amp;</span>payload,
+                    <span class="kw-2">&amp;</span>[ContentType::ApplicationData, ContentType::Handshake],
+                    <span class="kw-2">&amp;</span>[HandshakeType::NewSessionTicket, HandshakeType::KeyUpdate],
                 ));
             }
         }
@@ -2311,56 +2311,56 @@
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">export_keying_material</span>(
+    <span class="kw">fn </span>export_keying_material(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">output</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-        <span class="ident">label</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-        <span class="ident">context</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">key_schedule</span>
-            .<span class="ident">export_keying_material</span>(<span class="ident">output</span>, <span class="ident">label</span>, <span class="ident">context</span>)
+        output: <span class="kw-2">&amp;mut </span>[u8],
+        label: <span class="kw-2">&amp;</span>[u8],
+        context: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[u8]&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="self">self</span>.key_schedule
+            .export_keying_material(output, label, context)
     }
 
-    <span class="kw">fn</span> <span class="ident">perhaps_write_key_update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">common</span>: <span class="kw-2">&amp;mut</span> <span class="ident">CommonState</span>) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">want_write_key_update</span> {
-            <span class="self">self</span>.<span class="ident">want_write_key_update</span> <span class="op">=</span> <span class="bool-val">false</span>;
-            <span class="ident">common</span>.<span class="ident">send_msg_encrypt</span>(<span class="ident">Message::build_key_update_notify</span>().<span class="ident">into</span>());
+    <span class="kw">fn </span>perhaps_write_key_update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, common: <span class="kw-2">&amp;mut </span>CommonState) {
+        <span class="kw">if </span><span class="self">self</span>.want_write_key_update {
+            <span class="self">self</span>.want_write_key_update = <span class="bool-val">false</span>;
+            common.send_msg_encrypt(Message::build_key_update_notify().into());
 
-            <span class="kw">let</span> <span class="ident">write_key</span> <span class="op">=</span> <span class="self">self</span>
-                .<span class="ident">key_schedule</span>
-                .<span class="ident">next_client_application_traffic_secret</span>();
-            <span class="ident">common</span>
-                .<span class="ident">record_layer</span>
-                .<span class="ident">set_message_encrypter</span>(<span class="self">self</span>.<span class="ident">suite</span>.<span class="ident">derive_encrypter</span>(<span class="kw-2">&amp;</span><span class="ident">write_key</span>));
+            <span class="kw">let </span>write_key = <span class="self">self
+                </span>.key_schedule
+                .next_client_application_traffic_secret();
+            common
+                .record_layer
+                .set_message_encrypter(<span class="self">self</span>.suite.derive_encrypter(<span class="kw-2">&amp;</span>write_key));
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quic&quot;</span>)]</span>
-<span class="kw">struct</span> <span class="ident">ExpectQuicTraffic</span>(<span class="ident">ExpectTraffic</span>);
+<span class="attribute">#[cfg(feature = <span class="string">&quot;quic&quot;</span>)]
+</span><span class="kw">struct </span>ExpectQuicTraffic(ExpectTraffic);
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quic&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">ClientConnectionData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ExpectQuicTraffic</span> {
-    <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">m</span>: <span class="ident">Message</span>) -&gt; <span class="ident">hs::NextStateOrError</span> {
-        <span class="kw">let</span> <span class="ident">nst</span> <span class="op">=</span> <span class="macro">require_handshake_msg!</span>(
-            <span class="ident">m</span>,
-            <span class="ident">HandshakeType::NewSessionTicket</span>,
-            <span class="ident">HandshakePayload::NewSessionTicketTLS13</span>
+<span class="attribute">#[cfg(feature = <span class="string">&quot;quic&quot;</span>)]
+</span><span class="kw">impl </span>State&lt;ClientConnectionData&gt; <span class="kw">for </span>ExpectQuicTraffic {
+    <span class="kw">fn </span>handle(<span class="kw-2">mut </span><span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>ClientContext&lt;<span class="lifetime">&#39;_</span>&gt;, m: Message) -&gt; hs::NextStateOrError {
+        <span class="kw">let </span>nst = <span class="macro">require_handshake_msg!</span>(
+            m,
+            HandshakeType::NewSessionTicket,
+            HandshakePayload::NewSessionTicketTLS13
         )<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="number">0</span>
-            .<span class="ident">handle_new_ticket_tls13</span>(<span class="ident">cx</span>, <span class="ident">nst</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="number">0
+            </span>.handle_new_ticket_tls13(cx, nst)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">export_keying_material</span>(
+    <span class="kw">fn </span>export_keying_material(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">output</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-        <span class="ident">label</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-        <span class="ident">context</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>
-            .<span class="ident">export_keying_material</span>(<span class="ident">output</span>, <span class="ident">label</span>, <span class="ident">context</span>)
+        output: <span class="kw-2">&amp;mut </span>[u8],
+        label: <span class="kw-2">&amp;</span>[u8],
+        context: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[u8]&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="self">self</span>.<span class="number">0
+            </span>.export_keying_material(output, label, context)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

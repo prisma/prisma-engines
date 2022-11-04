@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/schema-ast/src/ast/find_at_position.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>find_at_position.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../schema_ast/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../schema_ast/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../schema_ast/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/schema-ast/src/ast/find_at_position.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>find_at_position.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../schema_ast/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../schema_ast/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../schema_ast/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -238,245 +238,245 @@
 <span id="238">238</span>
 <span id="239">239</span>
 <span id="240">240</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast</span>::{<span class="self">self</span>, <span class="ident">top_idx_to_top_id</span>, <span class="ident">traits</span>::<span class="kw-2">*</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::{<span class="self">self</span>, top_idx_to_top_id, traits::<span class="kw-2">*</span>};
 
-<span class="kw">impl</span> <span class="ident">ast::SchemaAst</span> {
-    <span class="doccomment">/// Find the AST node at the given position (byte offset).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_at_position</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">position</span>: <span class="ident">usize</span>) -&gt; <span class="ident">SchemaPosition</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">find_top_at_position</span>(<span class="ident">position</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">top_id</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">top_id</span> {
-                <span class="ident">ast::TopId::Model</span>(<span class="ident">model_id</span>) =&gt; {
-                    <span class="ident">SchemaPosition::Model</span>(<span class="ident">model_id</span>, <span class="ident">ModelPosition::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>[<span class="ident">model_id</span>], <span class="ident">position</span>))
+<span class="kw">impl </span>ast::SchemaAst {
+    <span class="doccomment">/// Find the AST node at the given position (byte offset).
+    </span><span class="kw">pub fn </span>find_at_position(<span class="kw-2">&amp;</span><span class="self">self</span>, position: usize) -&gt; SchemaPosition&lt;<span class="lifetime">&#39;_</span>&gt; {
+        <span class="self">self</span>.find_top_at_position(position)
+            .map(|top_id| <span class="kw">match </span>top_id {
+                ast::TopId::Model(model_id) =&gt; {
+                    SchemaPosition::Model(model_id, ModelPosition::new(<span class="kw-2">&amp;</span><span class="self">self</span>[model_id], position))
                 }
-                <span class="comment">// Falling back to TopLevel as &quot;not implemented&quot;</span>
-                <span class="kw">_</span> =&gt; <span class="ident">SchemaPosition::TopLevel</span>,
+                <span class="comment">// Falling back to TopLevel as &quot;not implemented&quot;
+                </span><span class="kw">_ </span>=&gt; SchemaPosition::TopLevel,
             })
-            <span class="comment">// If no top matched, we&#39;re in between top-level items. This is normal and expected.</span>
-            .<span class="ident">unwrap_or</span>(<span class="ident">SchemaPosition::TopLevel</span>)
+            <span class="comment">// If no top matched, we&#39;re in between top-level items. This is normal and expected.
+            </span>.unwrap_or(SchemaPosition::TopLevel)
     }
 
-    <span class="doccomment">/// Do a binary search for the `Top` at the given byte offset.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_top_at_position</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">position</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ast::TopId</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">std::cmp::Ordering</span>;
+    <span class="doccomment">/// Do a binary search for the `Top` at the given byte offset.
+    </span><span class="kw">pub fn </span>find_top_at_position(<span class="kw-2">&amp;</span><span class="self">self</span>, position: usize) -&gt; <span class="prelude-ty">Option</span>&lt;ast::TopId&gt; {
+        <span class="kw">use </span>std::cmp::Ordering;
 
-        <span class="kw">let</span> <span class="ident">top_idx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tops</span>.<span class="ident">binary_search_by</span>(<span class="op">|</span><span class="ident">top</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">top</span>.<span class="ident">span</span>();
+        <span class="kw">let </span>top_idx = <span class="self">self</span>.tops.binary_search_by(|top| {
+            <span class="kw">let </span>span = top.span();
 
-            <span class="kw">if</span> <span class="ident">span</span>.<span class="ident">start</span> <span class="op">&gt;</span> <span class="ident">position</span> {
-                <span class="ident">Ordering::Greater</span>
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">span</span>.<span class="ident">end</span> <span class="op">&lt;</span> <span class="ident">position</span> {
-                <span class="ident">Ordering::Less</span>
-            } <span class="kw">else</span> {
-                <span class="ident">Ordering::Equal</span>
+            <span class="kw">if </span>span.start &gt; position {
+                Ordering::Greater
+            } <span class="kw">else if </span>span.end &lt; position {
+                Ordering::Less
+            } <span class="kw">else </span>{
+                Ordering::Equal
             }
         });
 
-        <span class="ident">top_idx</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">top_idx_to_top_id</span>(<span class="ident">idx</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">tops</span>[<span class="ident">idx</span>])).<span class="ident">ok</span>()
+        top_idx.map(|idx| top_idx_to_top_id(idx, <span class="kw-2">&amp;</span><span class="self">self</span>.tops[idx])).ok()
     }
 }
 
-<span class="doccomment">/// A cursor position in a schema.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SchemaPosition</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// In-between top-level items</span>
-    <span class="ident">TopLevel</span>,
-    <span class="doccomment">/// In a model</span>
-    <span class="ident">Model</span>(<span class="ident">ast::ModelId</span>, <span class="ident">ModelPosition</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>),
+<span class="doccomment">/// A cursor position in a schema.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>SchemaPosition&lt;<span class="lifetime">&#39;ast</span>&gt; {
+    <span class="doccomment">/// In-between top-level items
+    </span>TopLevel,
+    <span class="doccomment">/// In a model
+    </span>Model(ast::ModelId, ModelPosition&lt;<span class="lifetime">&#39;ast</span>&gt;),
 }
 
-<span class="doccomment">/// A cursor position in a context.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ModelPosition</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// In the model, but not somewhere more specific.</span>
-    <span class="ident">Model</span>,
-    <span class="doccomment">/// In an attribute (attr name, attr index, position).</span>
-    <span class="ident">ModelAttribute</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span>, <span class="ident">usize</span>, <span class="ident">AttributePosition</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>),
-    <span class="doccomment">/// In a field.</span>
-    <span class="ident">Field</span>(<span class="ident">ast::FieldId</span>, <span class="ident">FieldPosition</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span>),
+<span class="doccomment">/// A cursor position in a context.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>ModelPosition&lt;<span class="lifetime">&#39;ast</span>&gt; {
+    <span class="doccomment">/// In the model, but not somewhere more specific.
+    </span>Model,
+    <span class="doccomment">/// In an attribute (attr name, attr index, position).
+    </span>ModelAttribute(<span class="kw-2">&amp;</span><span class="lifetime">&#39;ast </span>str, usize, AttributePosition&lt;<span class="lifetime">&#39;ast</span>&gt;),
+    <span class="doccomment">/// In a field.
+    </span>Field(ast::FieldId, FieldPosition&lt;<span class="lifetime">&#39;ast</span>&gt;),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> <span class="ident">ModelPosition</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Model</span>, <span class="ident">position</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">for</span> (<span class="ident">field_id</span>, <span class="ident">field</span>) <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">iter_fields</span>() {
-            <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">span</span>().<span class="ident">contains</span>(<span class="ident">position</span>) {
-                <span class="kw">return</span> <span class="ident">ModelPosition::Field</span>(<span class="ident">field_id</span>, <span class="ident">FieldPosition::new</span>(<span class="ident">field</span>, <span class="ident">position</span>));
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;ast</span>&gt; ModelPosition&lt;<span class="lifetime">&#39;ast</span>&gt; {
+    <span class="kw">fn </span>new(model: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast </span>ast::Model, position: usize) -&gt; <span class="self">Self </span>{
+        <span class="kw">for </span>(field_id, field) <span class="kw">in </span>model.iter_fields() {
+            <span class="kw">if </span>field.span().contains(position) {
+                <span class="kw">return </span>ModelPosition::Field(field_id, FieldPosition::new(field, position));
             }
         }
 
-        <span class="kw">for</span> (<span class="ident">attr_id</span>, <span class="ident">attr</span>) <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">attributes</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">if</span> <span class="ident">attr</span>.<span class="ident">span</span>().<span class="ident">contains</span>(<span class="ident">position</span>) {
-                <span class="kw">return</span> <span class="ident">ModelPosition::ModelAttribute</span>(<span class="kw-2">&amp;</span><span class="ident">attr</span>.<span class="ident">name</span>.<span class="ident">name</span>, <span class="ident">attr_id</span>, <span class="ident">AttributePosition::new</span>(<span class="ident">attr</span>, <span class="ident">position</span>));
+        <span class="kw">for </span>(attr_id, attr) <span class="kw">in </span>model.attributes.iter().enumerate() {
+            <span class="kw">if </span>attr.span().contains(position) {
+                <span class="kw">return </span>ModelPosition::ModelAttribute(<span class="kw-2">&amp;</span>attr.name.name, attr_id, AttributePosition::new(attr, position));
             }
         }
 
-        <span class="ident">ModelPosition::Model</span>
+        ModelPosition::Model
     }
 }
 
-<span class="doccomment">/// In a scalar field.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">FieldPosition</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Nowhere specific inside the field</span>
-    <span class="ident">Field</span>,
-    <span class="doccomment">/// In an attribute. (name, idx, optional arg)</span>
-    <span class="ident">Attribute</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span>, <span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span><span class="op">&gt;</span>),
+<span class="doccomment">/// In a scalar field.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>FieldPosition&lt;<span class="lifetime">&#39;ast</span>&gt; {
+    <span class="doccomment">/// Nowhere specific inside the field
+    </span>Field,
+    <span class="doccomment">/// In an attribute. (name, idx, optional arg)
+    </span>Attribute(<span class="kw-2">&amp;</span><span class="lifetime">&#39;ast </span>str, usize, <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;ast </span>str&gt;),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> <span class="ident">FieldPosition</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Field</span>, <span class="ident">position</span>: <span class="ident">usize</span>) -&gt; <span class="ident">FieldPosition</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
-        <span class="kw">for</span> (<span class="ident">attr_idx</span>, <span class="ident">attr</span>) <span class="kw">in</span> <span class="ident">field</span>.<span class="ident">attributes</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">if</span> <span class="ident">attr</span>.<span class="ident">span</span>().<span class="ident">contains</span>(<span class="ident">position</span>) {
-                <span class="comment">// We can&#39;t go by Span::contains() because we also care about the empty space</span>
-                <span class="comment">// between arguments and that&#39;s hard to capture in the pest grammar.</span>
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">spans</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">ast::Span</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">attr</span>
-                    .<span class="ident">arguments</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> (<span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()), <span class="ident">arg</span>.<span class="ident">span</span>()))
-                    .<span class="ident">chain</span>(
-                        <span class="ident">attr</span>.<span class="ident">arguments</span>
-                            .<span class="ident">empty_arguments</span>
-                            .<span class="ident">iter</span>()
-                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> (<span class="prelude-val">Some</span>(<span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()), <span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">span</span>())),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;ast</span>&gt; FieldPosition&lt;<span class="lifetime">&#39;ast</span>&gt; {
+    <span class="kw">fn </span>new(field: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast </span>ast::Field, position: usize) -&gt; FieldPosition&lt;<span class="lifetime">&#39;ast</span>&gt; {
+        <span class="kw">for </span>(attr_idx, attr) <span class="kw">in </span>field.attributes.iter().enumerate() {
+            <span class="kw">if </span>attr.span().contains(position) {
+                <span class="comment">// We can&#39;t go by Span::contains() because we also care about the empty space
+                // between arguments and that&#39;s hard to capture in the pest grammar.
+                </span><span class="kw">let </span><span class="kw-2">mut </span>spans: Vec&lt;(<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;, ast::Span)&gt; = attr
+                    .arguments
+                    .iter()
+                    .map(|arg| (arg.name.as_ref().map(|n| n.name.as_str()), arg.span()))
+                    .chain(
+                        attr.arguments
+                            .empty_arguments
+                            .iter()
+                            .map(|arg| (<span class="prelude-val">Some</span>(arg.name.name.as_str()), arg.name.span())),
                     )
-                    .<span class="ident">collect</span>();
-                <span class="ident">spans</span>.<span class="ident">sort_by_key</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">span</span>)<span class="op">|</span> <span class="ident">span</span>.<span class="ident">start</span>);
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">arg_name</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+                    .collect();
+                spans.sort_by_key(|(<span class="kw">_</span>, span)| span.start);
+                <span class="kw">let </span><span class="kw-2">mut </span>arg_name = <span class="prelude-val">None</span>;
 
-                <span class="kw">for</span> (<span class="ident">name</span>, <span class="kw">_</span>) <span class="kw">in</span> <span class="ident">spans</span>.<span class="ident">iter</span>().<span class="ident">take_while</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">span</span>)<span class="op">|</span> <span class="ident">span</span>.<span class="ident">start</span> <span class="op">&lt;</span> <span class="ident">position</span>) {
-                    <span class="ident">arg_name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">name</span>);
+                <span class="kw">for </span>(name, <span class="kw">_</span>) <span class="kw">in </span>spans.iter().take_while(|(<span class="kw">_</span>, span)| span.start &lt; position) {
+                    arg_name = <span class="prelude-val">Some</span>(<span class="kw-2">*</span>name);
                 }
 
-                <span class="comment">// If the cursor is after a trailing comma, we&#39;re not in an argument.</span>
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">span</span>) <span class="op">=</span> <span class="ident">attr</span>.<span class="ident">arguments</span>.<span class="ident">trailing_comma</span> {
-                    <span class="kw">if</span> <span class="ident">position</span> <span class="op">&gt;</span> <span class="ident">span</span>.<span class="ident">start</span> {
-                        <span class="ident">arg_name</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+                <span class="comment">// If the cursor is after a trailing comma, we&#39;re not in an argument.
+                </span><span class="kw">if let </span><span class="prelude-val">Some</span>(span) = attr.arguments.trailing_comma {
+                    <span class="kw">if </span>position &gt; span.start {
+                        arg_name = <span class="prelude-val">None</span>;
                     }
                 }
 
-                <span class="kw">return</span> <span class="ident">FieldPosition::Attribute</span>(<span class="ident">attr</span>.<span class="ident">name</span>(), <span class="ident">attr_idx</span>, <span class="ident">arg_name</span>.<span class="ident">flatten</span>());
+                <span class="kw">return </span>FieldPosition::Attribute(attr.name(), attr_idx, arg_name.flatten());
             }
         }
 
-        <span class="ident">FieldPosition::Field</span>
+        FieldPosition::Field
     }
 }
 
-<span class="doccomment">/// In an model attribute definition</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">AttributePosition</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Nowhere specific inside the attribute (attribute name)</span>
-    <span class="ident">Attribute</span>,
-    <span class="doccomment">/// In an argument. (argument name)</span>
-    <span class="ident">Argument</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span>),
-    <span class="doccomment">/// In an function argument. (function name, argument name)</span>
-    <span class="ident">FunctionArgument</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span>),
+<span class="doccomment">/// In an model attribute definition
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>AttributePosition&lt;<span class="lifetime">&#39;ast</span>&gt; {
+    <span class="doccomment">/// Nowhere specific inside the attribute (attribute name)
+    </span>Attribute,
+    <span class="doccomment">/// In an argument. (argument name)
+    </span>Argument(<span class="kw-2">&amp;</span><span class="lifetime">&#39;ast </span>str),
+    <span class="doccomment">/// In an function argument. (function name, argument name)
+    </span>FunctionArgument(<span class="kw-2">&amp;</span><span class="lifetime">&#39;ast </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast </span>str),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> <span class="ident">AttributePosition</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">attr</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Attribute</span>, <span class="ident">position</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="ident">attr</span>.<span class="ident">span</span>().<span class="ident">contains</span>(<span class="ident">position</span>) {
-            <span class="comment">// We can&#39;t go by Span::contains() because we also care about the empty space</span>
-            <span class="comment">// between arguments and that&#39;s hard to capture in the pest grammar.</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">spans</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">ast::Span</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">attr</span>
-                .<span class="ident">arguments</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> (<span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()), <span class="ident">arg</span>.<span class="ident">span</span>()))
-                .<span class="ident">chain</span>(
-                    <span class="ident">attr</span>.<span class="ident">arguments</span>
-                        .<span class="ident">empty_arguments</span>
-                        .<span class="ident">iter</span>()
-                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> (<span class="prelude-val">Some</span>(<span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()), <span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">span</span>())),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;ast</span>&gt; AttributePosition&lt;<span class="lifetime">&#39;ast</span>&gt; {
+    <span class="kw">fn </span>new(attr: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast </span>ast::Attribute, position: usize) -&gt; <span class="self">Self </span>{
+        <span class="kw">if </span>attr.span().contains(position) {
+            <span class="comment">// We can&#39;t go by Span::contains() because we also care about the empty space
+            // between arguments and that&#39;s hard to capture in the pest grammar.
+            </span><span class="kw">let </span><span class="kw-2">mut </span>spans: Vec&lt;(<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;, ast::Span)&gt; = attr
+                .arguments
+                .iter()
+                .map(|arg| (arg.name.as_ref().map(|n| n.name.as_str()), arg.span()))
+                .chain(
+                    attr.arguments
+                        .empty_arguments
+                        .iter()
+                        .map(|arg| (<span class="prelude-val">Some</span>(arg.name.name.as_str()), arg.name.span())),
                 )
-                .<span class="ident">collect</span>();
+                .collect();
 
-            <span class="ident">spans</span>.<span class="ident">sort_by_key</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">span</span>)<span class="op">|</span> <span class="ident">span</span>.<span class="ident">start</span>);
+            spans.sort_by_key(|(<span class="kw">_</span>, span)| span.start);
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">arg_name</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-            <span class="kw">for</span> (<span class="ident">name</span>, <span class="kw">_</span>) <span class="kw">in</span> <span class="ident">spans</span>.<span class="ident">iter</span>().<span class="ident">take_while</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">span</span>)<span class="op">|</span> <span class="ident">span</span>.<span class="ident">start</span> <span class="op">&lt;</span> <span class="ident">position</span>) {
-                <span class="ident">arg_name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">name</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>arg_name = <span class="prelude-val">None</span>;
+            <span class="kw">for </span>(name, <span class="kw">_</span>) <span class="kw">in </span>spans.iter().take_while(|(<span class="kw">_</span>, span)| span.start &lt; position) {
+                arg_name = <span class="prelude-val">Some</span>(<span class="kw-2">*</span>name);
             }
 
-            <span class="comment">// If the cursor is after a trailing comma, we&#39;re not in an argument.</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">span</span>) <span class="op">=</span> <span class="ident">attr</span>.<span class="ident">arguments</span>.<span class="ident">trailing_comma</span> {
-                <span class="kw">if</span> <span class="ident">position</span> <span class="op">&gt;</span> <span class="ident">span</span>.<span class="ident">start</span> {
-                    <span class="ident">arg_name</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+            <span class="comment">// If the cursor is after a trailing comma, we&#39;re not in an argument.
+            </span><span class="kw">if let </span><span class="prelude-val">Some</span>(span) = attr.arguments.trailing_comma {
+                <span class="kw">if </span>position &gt; span.start {
+                    arg_name = <span class="prelude-val">None</span>;
                 }
             }
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">arg_name</span>) <span class="op">=</span> <span class="ident">arg_name</span>.<span class="ident">flatten</span>() {
-                <span class="kw">return</span> <span class="ident"><span class="self">Self</span>::Argument</span>(<span class="ident">arg_name</span>);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(arg_name) = arg_name.flatten() {
+                <span class="kw">return </span><span class="self">Self</span>::Argument(arg_name);
             }
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">arg</span>) <span class="op">=</span> <span class="ident">attr</span>.<span class="ident">arguments</span>.<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">arg</span>.<span class="ident">span</span>().<span class="ident">contains</span>(<span class="ident">position</span>)) {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ExpressionPosition::FunctionArgument</span>(<span class="ident">fun</span>, <span class="ident">name</span>) <span class="op">=</span> <span class="ident">ExpressionPosition::new</span>(<span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">value</span>, <span class="ident">position</span>) {
-                    <span class="kw">return</span> <span class="ident"><span class="self">Self</span>::FunctionArgument</span>(<span class="ident">fun</span>, <span class="ident">name</span>);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(arg) = attr.arguments.iter().find(|arg| arg.span().contains(position)) {
+                <span class="kw">if let </span>ExpressionPosition::FunctionArgument(fun, name) = ExpressionPosition::new(<span class="kw-2">&amp;</span>arg.value, position) {
+                    <span class="kw">return </span><span class="self">Self</span>::FunctionArgument(fun, name);
                 }
             }
         }
 
-        <span class="ident"><span class="self">Self</span>::Attribute</span>
+        <span class="self">Self</span>::Attribute
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ExpressionPosition</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
-    <span class="ident">Expression</span>,
-    <span class="ident">Value</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span>),
-    <span class="ident">Function</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span>),
-    <span class="ident">FunctionArgument</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span>),
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>ExpressionPosition&lt;<span class="lifetime">&#39;ast</span>&gt; {
+    Expression,
+    Value(<span class="kw-2">&amp;</span><span class="lifetime">&#39;ast </span>str),
+    Function(<span class="kw-2">&amp;</span><span class="lifetime">&#39;ast </span>str),
+    FunctionArgument(<span class="kw-2">&amp;</span><span class="lifetime">&#39;ast </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast </span>str),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> <span class="ident">ExpressionPosition</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">expr</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Expression</span>, <span class="ident">position</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">expr</span> {
-            <span class="ident">ast::Expression::NumericValue</span>(<span class="ident">val</span>, <span class="ident">span</span>) <span class="kw">if</span> <span class="ident">span</span>.<span class="ident">contains</span>(<span class="ident">position</span>) =&gt; <span class="ident"><span class="self">Self</span>::Value</span>(<span class="ident">val</span>),
-            <span class="ident">ast::Expression::StringValue</span>(<span class="ident">val</span>, <span class="ident">span</span>) <span class="kw">if</span> <span class="ident">span</span>.<span class="ident">contains</span>(<span class="ident">position</span>) =&gt; <span class="ident"><span class="self">Self</span>::Value</span>(<span class="ident">val</span>),
-            <span class="ident">ast::Expression::ConstantValue</span>(<span class="ident">val</span>, <span class="ident">span</span>) <span class="kw">if</span> <span class="ident">span</span>.<span class="ident">contains</span>(<span class="ident">position</span>) =&gt; <span class="ident"><span class="self">Self</span>::Value</span>(<span class="ident">val</span>),
-            <span class="ident">ast::Expression::Function</span>(<span class="ident">name</span>, <span class="ident">args</span>, <span class="ident">span</span>) <span class="kw">if</span> <span class="ident">span</span>.<span class="ident">contains</span>(<span class="ident">position</span>) =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">spans</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">ast::Span</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">args</span>
-                    .<span class="ident">arguments</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> (<span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()), <span class="ident">arg</span>.<span class="ident">span</span>()))
-                    .<span class="ident">chain</span>(
-                        <span class="ident">args</span>.<span class="ident">empty_arguments</span>
-                            .<span class="ident">iter</span>()
-                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> (<span class="prelude-val">Some</span>(<span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">name</span>.<span class="ident">as_str</span>()), <span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">span</span>())),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;ast</span>&gt; ExpressionPosition&lt;<span class="lifetime">&#39;ast</span>&gt; {
+    <span class="kw">fn </span>new(expr: <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast </span>ast::Expression, position: usize) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>expr {
+            ast::Expression::NumericValue(val, span) <span class="kw">if </span>span.contains(position) =&gt; <span class="self">Self</span>::Value(val),
+            ast::Expression::StringValue(val, span) <span class="kw">if </span>span.contains(position) =&gt; <span class="self">Self</span>::Value(val),
+            ast::Expression::ConstantValue(val, span) <span class="kw">if </span>span.contains(position) =&gt; <span class="self">Self</span>::Value(val),
+            ast::Expression::Function(name, args, span) <span class="kw">if </span>span.contains(position) =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>spans: Vec&lt;(<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;, ast::Span)&gt; = args
+                    .arguments
+                    .iter()
+                    .map(|arg| (arg.name.as_ref().map(|n| n.name.as_str()), arg.span()))
+                    .chain(
+                        args.empty_arguments
+                            .iter()
+                            .map(|arg| (<span class="prelude-val">Some</span>(arg.name.name.as_str()), arg.name.span())),
                     )
-                    .<span class="ident">collect</span>();
+                    .collect();
 
-                <span class="ident">spans</span>.<span class="ident">sort_by_key</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">span</span>)<span class="op">|</span> <span class="ident">span</span>.<span class="ident">start</span>);
+                spans.sort_by_key(|(<span class="kw">_</span>, span)| span.start);
 
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">arg_name</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-                <span class="kw">for</span> (<span class="ident">name</span>, <span class="kw">_</span>) <span class="kw">in</span> <span class="ident">spans</span>.<span class="ident">iter</span>().<span class="ident">take_while</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">span</span>)<span class="op">|</span> <span class="ident">span</span>.<span class="ident">start</span> <span class="op">&lt;</span> <span class="ident">position</span>) {
-                    <span class="ident">arg_name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="kw-2">*</span><span class="ident">name</span>);
+                <span class="kw">let </span><span class="kw-2">mut </span>arg_name = <span class="prelude-val">None</span>;
+                <span class="kw">for </span>(name, <span class="kw">_</span>) <span class="kw">in </span>spans.iter().take_while(|(<span class="kw">_</span>, span)| span.start &lt; position) {
+                    arg_name = <span class="prelude-val">Some</span>(<span class="kw-2">*</span>name);
                 }
 
-                <span class="comment">// If the cursor is after a trailing comma, we&#39;re not in an argument.</span>
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">span</span>) <span class="op">=</span> <span class="ident">args</span>.<span class="ident">trailing_comma</span> {
-                    <span class="kw">if</span> <span class="ident">position</span> <span class="op">&gt;</span> <span class="ident">span</span>.<span class="ident">start</span> {
-                        <span class="ident">arg_name</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+                <span class="comment">// If the cursor is after a trailing comma, we&#39;re not in an argument.
+                </span><span class="kw">if let </span><span class="prelude-val">Some</span>(span) = args.trailing_comma {
+                    <span class="kw">if </span>position &gt; span.start {
+                        arg_name = <span class="prelude-val">None</span>;
                     }
                 }
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">arg_name</span>) <span class="op">=</span> <span class="ident">arg_name</span>.<span class="ident">flatten</span>() {
-                    <span class="ident"><span class="self">Self</span>::FunctionArgument</span>(<span class="ident">name</span>, <span class="ident">arg_name</span>)
-                } <span class="kw">else</span> {
-                    <span class="ident"><span class="self">Self</span>::Function</span>(<span class="ident">name</span>)
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(arg_name) = arg_name.flatten() {
+                    <span class="self">Self</span>::FunctionArgument(name, arg_name)
+                } <span class="kw">else </span>{
+                    <span class="self">Self</span>::Function(name)
                 }
             }
-            <span class="ident">ast::Expression::Array</span>(<span class="ident">exprs</span>, <span class="ident">span</span>) <span class="kw">if</span> <span class="ident">span</span>.<span class="ident">contains</span>(<span class="ident">position</span>) =&gt; {
-                <span class="kw">for</span> <span class="ident">expr</span> <span class="kw">in</span> <span class="ident">exprs</span>.<span class="ident">iter</span>() {
-                    <span class="kw">match</span> <span class="ident">ExpressionPosition::new</span>(<span class="ident">expr</span>, <span class="ident">position</span>) {
-                        <span class="ident">ExpressionPosition::Expression</span> =&gt; (),
-                        <span class="ident">e</span> =&gt; <span class="kw">return</span> <span class="ident">e</span>,
+            ast::Expression::Array(exprs, span) <span class="kw">if </span>span.contains(position) =&gt; {
+                <span class="kw">for </span>expr <span class="kw">in </span>exprs.iter() {
+                    <span class="kw">match </span>ExpressionPosition::new(expr, position) {
+                        ExpressionPosition::Expression =&gt; (),
+                        e =&gt; <span class="kw">return </span>e,
                     }
                 }
 
-                <span class="ident"><span class="self">Self</span>::Expression</span>
+                <span class="self">Self</span>::Expression
             }
-            <span class="kw">_</span> =&gt; <span class="ident"><span class="self">Self</span>::Expression</span>,
+            <span class="kw">_ </span>=&gt; <span class="self">Self</span>::Expression,
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="schema_ast" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="schema_ast" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

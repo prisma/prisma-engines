@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/chrono-0.4.20/src/offset/fixed.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>fixed.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../chrono/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../chrono/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../chrono/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/chrono-0.4.20/src/offset/fixed.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>fixed.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../chrono/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../chrono/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../chrono/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -246,253 +246,253 @@
 <span id="246">246</span>
 <span id="247">247</span>
 <span id="248">248</span>
-</pre><pre class="rust"><code><span class="comment">// This is a part of Chrono.</span>
-<span class="comment">// See README.md and LICENSE.txt for details.</span>
+</pre><pre class="rust"><code><span class="comment">// This is a part of Chrono.
+// See README.md and LICENSE.txt for details.
 
-<span class="doccomment">//! The time zone which has a fixed offset from UTC.</span>
+</span><span class="doccomment">//! The time zone which has a fixed offset from UTC.
 
-<span class="kw">use</span> <span class="ident">core::fmt</span>;
-<span class="kw">use</span> <span class="ident">core::ops</span>::{<span class="ident">Add</span>, <span class="ident">Sub</span>};
+</span><span class="kw">use </span>core::fmt;
+<span class="kw">use </span>core::ops::{Add, Sub};
 
-<span class="kw">use</span> <span class="ident">num_integer::div_mod_floor</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rkyv&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">rkyv</span>::{<span class="ident">Archive</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="kw">use </span>num_integer::div_mod_floor;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;rkyv&quot;</span>)]
+</span><span class="kw">use </span>rkyv::{Archive, Deserialize, Serialize};
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">LocalResult</span>, <span class="ident">Offset</span>, <span class="ident">TimeZone</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::naive</span>::{<span class="ident">NaiveDate</span>, <span class="ident">NaiveDateTime</span>, <span class="ident">NaiveTime</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::oldtime::Duration</span> <span class="kw">as</span> <span class="ident">OldDuration</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::DateTime</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Timelike</span>;
+<span class="kw">use super</span>::{LocalResult, Offset, TimeZone};
+<span class="kw">use </span><span class="kw">crate</span>::naive::{NaiveDate, NaiveDateTime, NaiveTime};
+<span class="kw">use </span><span class="kw">crate</span>::oldtime::Duration <span class="kw">as </span>OldDuration;
+<span class="kw">use </span><span class="kw">crate</span>::DateTime;
+<span class="kw">use </span><span class="kw">crate</span>::Timelike;
 
-<span class="doccomment">/// The time zone with fixed offset, from UTC-23:59:59 to UTC+23:59:59.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Using the [`TimeZone`](./trait.TimeZone.html) methods</span>
-<span class="doccomment">/// on a `FixedOffset` struct is the preferred way to construct</span>
-<span class="doccomment">/// `DateTime&lt;FixedOffset&gt;` instances. See the [`east`](#method.east) and</span>
-<span class="doccomment">/// [`west`](#method.west) methods for examples.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rkyv&quot;</span>, <span class="ident">derive</span>(<span class="ident">Archive</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FixedOffset</span> {
-    <span class="ident">local_minus_utc</span>: <span class="ident">i32</span>,
+<span class="doccomment">/// The time zone with fixed offset, from UTC-23:59:59 to UTC+23:59:59.
+///
+/// Using the [`TimeZone`](./trait.TimeZone.html) methods
+/// on a `FixedOffset` struct is the preferred way to construct
+/// `DateTime&lt;FixedOffset&gt;` instances. See the [`east`](#method.east) and
+/// [`west`](#method.west) methods for examples.
+</span><span class="attribute">#[derive(PartialEq, Eq, Hash, Copy, Clone)]
+#[cfg_attr(feature = <span class="string">&quot;rkyv&quot;</span>, derive(Archive, Deserialize, Serialize))]
+</span><span class="kw">pub struct </span>FixedOffset {
+    local_minus_utc: i32,
 }
 
-<span class="kw">impl</span> <span class="ident">FixedOffset</span> {
-    <span class="doccomment">/// Makes a new `FixedOffset` for the Eastern Hemisphere with given timezone difference.</span>
-    <span class="doccomment">/// The negative `secs` means the Western Hemisphere.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics on the out-of-bound `secs`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use chrono::{FixedOffset, TimeZone};</span>
-    <span class="doccomment">/// let hour = 3600;</span>
-    <span class="doccomment">/// let datetime = FixedOffset::east(5 * hour).ymd(2016, 11, 08)</span>
-    <span class="doccomment">///                                           .and_hms(0, 0, 0);</span>
-    <span class="doccomment">/// assert_eq!(&amp;datetime.to_rfc3339(), &quot;2016-11-08T00:00:00+05:00&quot;)</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">east</span>(<span class="ident">secs</span>: <span class="ident">i32</span>) -&gt; <span class="ident">FixedOffset</span> {
-        <span class="ident">FixedOffset::east_opt</span>(<span class="ident">secs</span>).<span class="ident">expect</span>(<span class="string">&quot;FixedOffset::east out of bounds&quot;</span>)
+<span class="kw">impl </span>FixedOffset {
+    <span class="doccomment">/// Makes a new `FixedOffset` for the Eastern Hemisphere with given timezone difference.
+    /// The negative `secs` means the Western Hemisphere.
+    ///
+    /// Panics on the out-of-bound `secs`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use chrono::{FixedOffset, TimeZone};
+    /// let hour = 3600;
+    /// let datetime = FixedOffset::east(5 * hour).ymd(2016, 11, 08)
+    ///                                           .and_hms(0, 0, 0);
+    /// assert_eq!(&amp;datetime.to_rfc3339(), &quot;2016-11-08T00:00:00+05:00&quot;)
+    /// ```
+    </span><span class="kw">pub fn </span>east(secs: i32) -&gt; FixedOffset {
+        FixedOffset::east_opt(secs).expect(<span class="string">&quot;FixedOffset::east out of bounds&quot;</span>)
     }
 
-    <span class="doccomment">/// Makes a new `FixedOffset` for the Eastern Hemisphere with given timezone difference.</span>
-    <span class="doccomment">/// The negative `secs` means the Western Hemisphere.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `None` on the out-of-bound `secs`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">east_opt</span>(<span class="ident">secs</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="op">-</span><span class="number">86_400</span> <span class="op">&lt;</span> <span class="ident">secs</span> <span class="op">&amp;&amp;</span> <span class="ident">secs</span> <span class="op">&lt;</span> <span class="number">86_400</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">FixedOffset</span> { <span class="ident">local_minus_utc</span>: <span class="ident">secs</span> })
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
+    <span class="doccomment">/// Makes a new `FixedOffset` for the Eastern Hemisphere with given timezone difference.
+    /// The negative `secs` means the Western Hemisphere.
+    ///
+    /// Returns `None` on the out-of-bound `secs`.
+    </span><span class="kw">pub fn </span>east_opt(secs: i32) -&gt; <span class="prelude-ty">Option</span>&lt;FixedOffset&gt; {
+        <span class="kw">if </span>-<span class="number">86_400 </span>&lt; secs &amp;&amp; secs &lt; <span class="number">86_400 </span>{
+            <span class="prelude-val">Some</span>(FixedOffset { local_minus_utc: secs })
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
+    }
+
+    <span class="doccomment">/// Makes a new `FixedOffset` for the Western Hemisphere with given timezone difference.
+    /// The negative `secs` means the Eastern Hemisphere.
+    ///
+    /// Panics on the out-of-bound `secs`.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use chrono::{FixedOffset, TimeZone};
+    /// let hour = 3600;
+    /// let datetime = FixedOffset::west(5 * hour).ymd(2016, 11, 08)
+    ///                                           .and_hms(0, 0, 0);
+    /// assert_eq!(&amp;datetime.to_rfc3339(), &quot;2016-11-08T00:00:00-05:00&quot;)
+    /// ```
+    </span><span class="kw">pub fn </span>west(secs: i32) -&gt; FixedOffset {
+        FixedOffset::west_opt(secs).expect(<span class="string">&quot;FixedOffset::west out of bounds&quot;</span>)
+    }
+
+    <span class="doccomment">/// Makes a new `FixedOffset` for the Western Hemisphere with given timezone difference.
+    /// The negative `secs` means the Eastern Hemisphere.
+    ///
+    /// Returns `None` on the out-of-bound `secs`.
+    </span><span class="kw">pub fn </span>west_opt(secs: i32) -&gt; <span class="prelude-ty">Option</span>&lt;FixedOffset&gt; {
+        <span class="kw">if </span>-<span class="number">86_400 </span>&lt; secs &amp;&amp; secs &lt; <span class="number">86_400 </span>{
+            <span class="prelude-val">Some</span>(FixedOffset { local_minus_utc: -secs })
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
+    }
+
+    <span class="doccomment">/// Returns the number of seconds to add to convert from UTC to the local time.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>local_minus_utc(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32 {
+        <span class="self">self</span>.local_minus_utc
+    }
+
+    <span class="doccomment">/// Returns the number of seconds to add to convert from the local time to UTC.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>utc_minus_local(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32 {
+        -<span class="self">self</span>.local_minus_utc
+    }
+}
+
+<span class="kw">impl </span>TimeZone <span class="kw">for </span>FixedOffset {
+    <span class="kw">type </span>Offset = FixedOffset;
+
+    <span class="kw">fn </span>from_offset(offset: <span class="kw-2">&amp;</span>FixedOffset) -&gt; FixedOffset {
+        <span class="kw-2">*</span>offset
+    }
+
+    <span class="kw">fn </span>offset_from_local_date(<span class="kw-2">&amp;</span><span class="self">self</span>, _local: <span class="kw-2">&amp;</span>NaiveDate) -&gt; LocalResult&lt;FixedOffset&gt; {
+        LocalResult::Single(<span class="kw-2">*</span><span class="self">self</span>)
+    }
+    <span class="kw">fn </span>offset_from_local_datetime(<span class="kw-2">&amp;</span><span class="self">self</span>, _local: <span class="kw-2">&amp;</span>NaiveDateTime) -&gt; LocalResult&lt;FixedOffset&gt; {
+        LocalResult::Single(<span class="kw-2">*</span><span class="self">self</span>)
+    }
+
+    <span class="kw">fn </span>offset_from_utc_date(<span class="kw-2">&amp;</span><span class="self">self</span>, _utc: <span class="kw-2">&amp;</span>NaiveDate) -&gt; FixedOffset {
+        <span class="kw-2">*</span><span class="self">self
+    </span>}
+    <span class="kw">fn </span>offset_from_utc_datetime(<span class="kw-2">&amp;</span><span class="self">self</span>, _utc: <span class="kw-2">&amp;</span>NaiveDateTime) -&gt; FixedOffset {
+        <span class="kw-2">*</span><span class="self">self
+    </span>}
+}
+
+<span class="kw">impl </span>Offset <span class="kw">for </span>FixedOffset {
+    <span class="kw">fn </span>fix(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; FixedOffset {
+        <span class="kw-2">*</span><span class="self">self
+    </span>}
+}
+
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>FixedOffset {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">let </span>offset = <span class="self">self</span>.local_minus_utc;
+        <span class="kw">let </span>(sign, offset) = <span class="kw">if </span>offset &lt; <span class="number">0 </span>{ (<span class="string">&#39;-&#39;</span>, -offset) } <span class="kw">else </span>{ (<span class="string">&#39;+&#39;</span>, offset) };
+        <span class="kw">let </span>(mins, sec) = div_mod_floor(offset, <span class="number">60</span>);
+        <span class="kw">let </span>(hour, min) = div_mod_floor(mins, <span class="number">60</span>);
+        <span class="kw">if </span>sec == <span class="number">0 </span>{
+            <span class="macro">write!</span>(f, <span class="string">&quot;{}{:02}:{:02}&quot;</span>, sign, hour, min)
+        } <span class="kw">else </span>{
+            <span class="macro">write!</span>(f, <span class="string">&quot;{}{:02}:{:02}:{:02}&quot;</span>, sign, hour, min, sec)
         }
     }
+}
 
-    <span class="doccomment">/// Makes a new `FixedOffset` for the Western Hemisphere with given timezone difference.</span>
-    <span class="doccomment">/// The negative `secs` means the Eastern Hemisphere.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics on the out-of-bound `secs`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use chrono::{FixedOffset, TimeZone};</span>
-    <span class="doccomment">/// let hour = 3600;</span>
-    <span class="doccomment">/// let datetime = FixedOffset::west(5 * hour).ymd(2016, 11, 08)</span>
-    <span class="doccomment">///                                           .and_hms(0, 0, 0);</span>
-    <span class="doccomment">/// assert_eq!(&amp;datetime.to_rfc3339(), &quot;2016-11-08T00:00:00-05:00&quot;)</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">west</span>(<span class="ident">secs</span>: <span class="ident">i32</span>) -&gt; <span class="ident">FixedOffset</span> {
-        <span class="ident">FixedOffset::west_opt</span>(<span class="ident">secs</span>).<span class="ident">expect</span>(<span class="string">&quot;FixedOffset::west out of bounds&quot;</span>)
-    }
-
-    <span class="doccomment">/// Makes a new `FixedOffset` for the Western Hemisphere with given timezone difference.</span>
-    <span class="doccomment">/// The negative `secs` means the Eastern Hemisphere.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `None` on the out-of-bound `secs`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">west_opt</span>(<span class="ident">secs</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="op">-</span><span class="number">86_400</span> <span class="op">&lt;</span> <span class="ident">secs</span> <span class="op">&amp;&amp;</span> <span class="ident">secs</span> <span class="op">&lt;</span> <span class="number">86_400</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">FixedOffset</span> { <span class="ident">local_minus_utc</span>: <span class="op">-</span><span class="ident">secs</span> })
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
-    }
-
-    <span class="doccomment">/// Returns the number of seconds to add to convert from UTC to the local time.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">local_minus_utc</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i32</span> {
-        <span class="self">self</span>.<span class="ident">local_minus_utc</span>
-    }
-
-    <span class="doccomment">/// Returns the number of seconds to add to convert from the local time to UTC.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">utc_minus_local</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i32</span> {
-        <span class="op">-</span><span class="self">self</span>.<span class="ident">local_minus_utc</span>
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>FixedOffset {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        fmt::Debug::fmt(<span class="self">self</span>, f)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TimeZone</span> <span class="kw">for</span> <span class="ident">FixedOffset</span> {
-    <span class="kw">type</span> <span class="ident">Offset</span> <span class="op">=</span> <span class="ident">FixedOffset</span>;
+<span class="comment">// addition or subtraction of FixedOffset to/from Timelike values is the same as
+// adding or subtracting the offset&#39;s local_minus_utc value
+// but keep keeps the leap second information.
+// this should be implemented more efficiently, but for the time being, this is generic right now.
 
-    <span class="kw">fn</span> <span class="ident">from_offset</span>(<span class="ident">offset</span>: <span class="kw-2">&amp;</span><span class="ident">FixedOffset</span>) -&gt; <span class="ident">FixedOffset</span> {
-        <span class="kw-2">*</span><span class="ident">offset</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">offset_from_local_date</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_local</span>: <span class="kw-2">&amp;</span><span class="ident">NaiveDate</span>) -&gt; <span class="ident">LocalResult</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span> {
-        <span class="ident">LocalResult::Single</span>(<span class="kw-2">*</span><span class="self">self</span>)
-    }
-    <span class="kw">fn</span> <span class="ident">offset_from_local_datetime</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_local</span>: <span class="kw-2">&amp;</span><span class="ident">NaiveDateTime</span>) -&gt; <span class="ident">LocalResult</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span> {
-        <span class="ident">LocalResult::Single</span>(<span class="kw-2">*</span><span class="self">self</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">offset_from_utc_date</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_utc</span>: <span class="kw-2">&amp;</span><span class="ident">NaiveDate</span>) -&gt; <span class="ident">FixedOffset</span> {
-        <span class="kw-2">*</span><span class="self">self</span>
-    }
-    <span class="kw">fn</span> <span class="ident">offset_from_utc_datetime</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_utc</span>: <span class="kw-2">&amp;</span><span class="ident">NaiveDateTime</span>) -&gt; <span class="ident">FixedOffset</span> {
-        <span class="kw-2">*</span><span class="self">self</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Offset</span> <span class="kw">for</span> <span class="ident">FixedOffset</span> {
-    <span class="kw">fn</span> <span class="ident">fix</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">FixedOffset</span> {
-        <span class="kw-2">*</span><span class="self">self</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">FixedOffset</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">local_minus_utc</span>;
-        <span class="kw">let</span> (<span class="ident">sign</span>, <span class="ident">offset</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">offset</span> <span class="op">&lt;</span> <span class="number">0</span> { (<span class="string">&#39;-&#39;</span>, <span class="op">-</span><span class="ident">offset</span>) } <span class="kw">else</span> { (<span class="string">&#39;+&#39;</span>, <span class="ident">offset</span>) };
-        <span class="kw">let</span> (<span class="ident">mins</span>, <span class="ident">sec</span>) <span class="op">=</span> <span class="ident">div_mod_floor</span>(<span class="ident">offset</span>, <span class="number">60</span>);
-        <span class="kw">let</span> (<span class="ident">hour</span>, <span class="ident">min</span>) <span class="op">=</span> <span class="ident">div_mod_floor</span>(<span class="ident">mins</span>, <span class="number">60</span>);
-        <span class="kw">if</span> <span class="ident">sec</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}{:02}:{:02}&quot;</span>, <span class="ident">sign</span>, <span class="ident">hour</span>, <span class="ident">min</span>)
-        } <span class="kw">else</span> {
-            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}{:02}:{:02}:{:02}&quot;</span>, <span class="ident">sign</span>, <span class="ident">hour</span>, <span class="ident">min</span>, <span class="ident">sec</span>)
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">FixedOffset</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">fmt::Debug::fmt</span>(<span class="self">self</span>, <span class="ident">f</span>)
-    }
-}
-
-<span class="comment">// addition or subtraction of FixedOffset to/from Timelike values is the same as</span>
-<span class="comment">// adding or subtracting the offset&#39;s local_minus_utc value</span>
-<span class="comment">// but keep keeps the leap second information.</span>
-<span class="comment">// this should be implemented more efficiently, but for the time being, this is generic right now.</span>
-
-<span class="kw">fn</span> <span class="ident">add_with_leapsecond</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">lhs</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">rhs</span>: <span class="ident">i32</span>) -&gt; <span class="ident">T</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Timelike</span> <span class="op">+</span> <span class="ident">Add</span><span class="op">&lt;</span><span class="ident">OldDuration</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span>,
+</span><span class="kw">fn </span>add_with_leapsecond&lt;T&gt;(lhs: <span class="kw-2">&amp;</span>T, rhs: i32) -&gt; T
+<span class="kw">where
+    </span>T: Timelike + Add&lt;OldDuration, Output = T&gt;,
 {
-    <span class="comment">// extract and temporarily remove the fractional part and later recover it</span>
-    <span class="kw">let</span> <span class="ident">nanos</span> <span class="op">=</span> <span class="ident">lhs</span>.<span class="ident">nanosecond</span>();
-    <span class="kw">let</span> <span class="ident">lhs</span> <span class="op">=</span> <span class="ident">lhs</span>.<span class="ident">with_nanosecond</span>(<span class="number">0</span>).<span class="ident">unwrap</span>();
-    (<span class="ident">lhs</span> <span class="op">+</span> <span class="ident">OldDuration::seconds</span>(<span class="ident">i64::from</span>(<span class="ident">rhs</span>))).<span class="ident">with_nanosecond</span>(<span class="ident">nanos</span>).<span class="ident">unwrap</span>()
+    <span class="comment">// extract and temporarily remove the fractional part and later recover it
+    </span><span class="kw">let </span>nanos = lhs.nanosecond();
+    <span class="kw">let </span>lhs = lhs.with_nanosecond(<span class="number">0</span>).unwrap();
+    (lhs + OldDuration::seconds(i64::from(rhs))).with_nanosecond(nanos).unwrap()
 }
 
-<span class="kw">impl</span> <span class="ident">Add</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">NaiveTime</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">NaiveTime</span>;
+<span class="kw">impl </span>Add&lt;FixedOffset&gt; <span class="kw">for </span>NaiveTime {
+    <span class="kw">type </span>Output = NaiveTime;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">add</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">FixedOffset</span>) -&gt; <span class="ident">NaiveTime</span> {
-        <span class="ident">add_with_leapsecond</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>.<span class="ident">local_minus_utc</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>add(<span class="self">self</span>, rhs: FixedOffset) -&gt; NaiveTime {
+        add_with_leapsecond(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs.local_minus_utc)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">NaiveTime</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">NaiveTime</span>;
+<span class="kw">impl </span>Sub&lt;FixedOffset&gt; <span class="kw">for </span>NaiveTime {
+    <span class="kw">type </span>Output = NaiveTime;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">FixedOffset</span>) -&gt; <span class="ident">NaiveTime</span> {
-        <span class="ident">add_with_leapsecond</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="op">-</span><span class="ident">rhs</span>.<span class="ident">local_minus_utc</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>sub(<span class="self">self</span>, rhs: FixedOffset) -&gt; NaiveTime {
+        add_with_leapsecond(<span class="kw-2">&amp;</span><span class="self">self</span>, -rhs.local_minus_utc)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Add</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">NaiveDateTime</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">NaiveDateTime</span>;
+<span class="kw">impl </span>Add&lt;FixedOffset&gt; <span class="kw">for </span>NaiveDateTime {
+    <span class="kw">type </span>Output = NaiveDateTime;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">add</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">FixedOffset</span>) -&gt; <span class="ident">NaiveDateTime</span> {
-        <span class="ident">add_with_leapsecond</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>.<span class="ident">local_minus_utc</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>add(<span class="self">self</span>, rhs: FixedOffset) -&gt; NaiveDateTime {
+        add_with_leapsecond(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs.local_minus_utc)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">NaiveDateTime</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">NaiveDateTime</span>;
+<span class="kw">impl </span>Sub&lt;FixedOffset&gt; <span class="kw">for </span>NaiveDateTime {
+    <span class="kw">type </span>Output = NaiveDateTime;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">FixedOffset</span>) -&gt; <span class="ident">NaiveDateTime</span> {
-        <span class="ident">add_with_leapsecond</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="op">-</span><span class="ident">rhs</span>.<span class="ident">local_minus_utc</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>sub(<span class="self">self</span>, rhs: FixedOffset) -&gt; NaiveDateTime {
+        add_with_leapsecond(<span class="kw-2">&amp;</span><span class="self">self</span>, -rhs.local_minus_utc)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Tz</span>: <span class="ident">TimeZone</span><span class="op">&gt;</span> <span class="ident">Add</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;Tz: TimeZone&gt; Add&lt;FixedOffset&gt; <span class="kw">for </span>DateTime&lt;Tz&gt; {
+    <span class="kw">type </span>Output = DateTime&lt;Tz&gt;;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">add</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">FixedOffset</span>) -&gt; <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span> {
-        <span class="ident">add_with_leapsecond</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>.<span class="ident">local_minus_utc</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>add(<span class="self">self</span>, rhs: FixedOffset) -&gt; DateTime&lt;Tz&gt; {
+        add_with_leapsecond(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs.local_minus_utc)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Tz</span>: <span class="ident">TimeZone</span><span class="op">&gt;</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">FixedOffset</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;Tz: TimeZone&gt; Sub&lt;FixedOffset&gt; <span class="kw">for </span>DateTime&lt;Tz&gt; {
+    <span class="kw">type </span>Output = DateTime&lt;Tz&gt;;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="ident">FixedOffset</span>) -&gt; <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Tz</span><span class="op">&gt;</span> {
-        <span class="ident">add_with_leapsecond</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="op">-</span><span class="ident">rhs</span>.<span class="ident">local_minus_utc</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>sub(<span class="self">self</span>, rhs: FixedOffset) -&gt; DateTime&lt;Tz&gt; {
+        add_with_leapsecond(<span class="kw-2">&amp;</span><span class="self">self</span>, -rhs.local_minus_utc)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::FixedOffset</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::offset::TimeZone</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">super</span>::FixedOffset;
+    <span class="kw">use </span><span class="kw">crate</span>::offset::TimeZone;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_date_extreme_offset</span>() {
-        <span class="comment">// starting from 0.3 we don&#39;t have an offset exceeding one day.</span>
-        <span class="comment">// this makes everything easier!</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">FixedOffset::east</span>(<span class="number">86399</span>).<span class="ident">ymd</span>(<span class="number">2012</span>, <span class="number">2</span>, <span class="number">29</span>)),
-            <span class="string">&quot;2012-02-29+23:59:59&quot;</span>.<span class="ident">to_string</span>()
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_date_extreme_offset() {
+        <span class="comment">// starting from 0.3 we don&#39;t have an offset exceeding one day.
+        // this makes everything easier!
+        </span><span class="macro">assert_eq!</span>(
+            <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, FixedOffset::east(<span class="number">86399</span>).ymd(<span class="number">2012</span>, <span class="number">2</span>, <span class="number">29</span>)),
+            <span class="string">&quot;2012-02-29+23:59:59&quot;</span>.to_string()
         );
         <span class="macro">assert_eq!</span>(
-            <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">FixedOffset::east</span>(<span class="number">86399</span>).<span class="ident">ymd</span>(<span class="number">2012</span>, <span class="number">2</span>, <span class="number">29</span>).<span class="ident">and_hms</span>(<span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>)),
-            <span class="string">&quot;2012-02-29T05:06:07+23:59:59&quot;</span>.<span class="ident">to_string</span>()
+            <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, FixedOffset::east(<span class="number">86399</span>).ymd(<span class="number">2012</span>, <span class="number">2</span>, <span class="number">29</span>).and_hms(<span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>)),
+            <span class="string">&quot;2012-02-29T05:06:07+23:59:59&quot;</span>.to_string()
         );
         <span class="macro">assert_eq!</span>(
-            <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">FixedOffset::west</span>(<span class="number">86399</span>).<span class="ident">ymd</span>(<span class="number">2012</span>, <span class="number">3</span>, <span class="number">4</span>)),
-            <span class="string">&quot;2012-03-04-23:59:59&quot;</span>.<span class="ident">to_string</span>()
+            <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, FixedOffset::west(<span class="number">86399</span>).ymd(<span class="number">2012</span>, <span class="number">3</span>, <span class="number">4</span>)),
+            <span class="string">&quot;2012-03-04-23:59:59&quot;</span>.to_string()
         );
         <span class="macro">assert_eq!</span>(
-            <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">FixedOffset::west</span>(<span class="number">86399</span>).<span class="ident">ymd</span>(<span class="number">2012</span>, <span class="number">3</span>, <span class="number">4</span>).<span class="ident">and_hms</span>(<span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>)),
-            <span class="string">&quot;2012-03-04T05:06:07-23:59:59&quot;</span>.<span class="ident">to_string</span>()
+            <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, FixedOffset::west(<span class="number">86399</span>).ymd(<span class="number">2012</span>, <span class="number">3</span>, <span class="number">4</span>).and_hms(<span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>)),
+            <span class="string">&quot;2012-03-04T05:06:07-23:59:59&quot;</span>.to_string()
         );
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="chrono" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="chrono" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

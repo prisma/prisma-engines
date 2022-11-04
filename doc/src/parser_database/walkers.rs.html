@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/parser-database/src/walkers.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>walkers.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../parser_database/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/parser-database/src/walkers.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>walkers.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../parser_database/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -113,120 +113,120 @@
 <span id="113">113</span>
 <span id="114">114</span>
 <span id="115">115</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Convenient access to a datamodel as understood by ParserDatabase.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The walkers:</span>
-<span class="doccomment">//! - Know about specific types and what kind they are (models, enums, etc.)</span>
-<span class="doccomment">//! - Know about attributes and which ones are defined and allowed in a Prisma schema.</span>
-<span class="doccomment">//! - Know about relations.</span>
-<span class="doccomment">//! - Do not know anything about connectors, they are generic.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Convenient access to a datamodel as understood by ParserDatabase.
+//!
+//! The walkers:
+//! - Know about specific types and what kind they are (models, enums, etc.)
+//! - Know about attributes and which ones are defined and allowed in a Prisma schema.
+//! - Know about relations.
+//! - Do not know anything about connectors, they are generic.
 
-<span class="kw">mod</span> <span class="ident">composite_type</span>;
-<span class="kw">mod</span> <span class="ident">r#enum</span>;
-<span class="kw">mod</span> <span class="ident">field</span>;
-<span class="kw">mod</span> <span class="ident">index</span>;
-<span class="kw">mod</span> <span class="ident">model</span>;
-<span class="kw">mod</span> <span class="ident">relation</span>;
-<span class="kw">mod</span> <span class="ident">relation_field</span>;
-<span class="kw">mod</span> <span class="ident">scalar_field</span>;
+</span><span class="kw">mod </span>composite_type;
+<span class="kw">mod </span>r#enum;
+<span class="kw">mod </span>field;
+<span class="kw">mod </span>index;
+<span class="kw">mod </span>model;
+<span class="kw">mod </span>relation;
+<span class="kw">mod </span>relation_field;
+<span class="kw">mod </span>scalar_field;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">composite_type</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">field</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">index</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">model</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">r#enum</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">relation</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">relation_field</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">scalar_field</span>::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>composite_type::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>field::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>index::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>model::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>r#enum::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>relation::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>relation_field::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>scalar_field::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ast</span>, <span class="ident">ParserDatabase</span>};
+<span class="kw">use crate</span>::{ast, ParserDatabase};
 
-<span class="doccomment">/// A generic walker. Only walkers intantiated with a concrete ID type (`I`) are useful.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Walker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span>, <span class="ident">I</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The parser database being traversed.</span>
-    <span class="kw">pub</span> <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident"><span class="kw">crate</span>::ParserDatabase</span>,
-    <span class="doccomment">/// The identifier of the focused element.</span>
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">I</span>,
+<span class="doccomment">/// A generic walker. Only walkers intantiated with a concrete ID type (`I`) are useful.
+</span><span class="attribute">#[derive(Clone, Copy)]
+</span><span class="kw">pub struct </span>Walker&lt;<span class="lifetime">&#39;db</span>, I&gt; {
+    <span class="doccomment">/// The parser database being traversed.
+    </span><span class="kw">pub </span>db: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span><span class="kw">crate</span>::ParserDatabase,
+    <span class="doccomment">/// The identifier of the focused element.
+    </span><span class="kw">pub </span>id: I,
 }
 
-<span class="kw">impl</span> <span class="ident">ParserDatabase</span> {
-    <span class="doccomment">/// Traverse a schema element by id.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">walk</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">I</span>) -&gt; <span class="ident">Walker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">I</span><span class="op">&gt;</span> {
-        <span class="ident">Walker</span> { <span class="ident">db</span>: <span class="self">self</span>, <span class="ident">id</span> }
+<span class="kw">impl </span>ParserDatabase {
+    <span class="doccomment">/// Traverse a schema element by id.
+    </span><span class="kw">pub fn </span>walk&lt;I&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, id: I) -&gt; Walker&lt;<span class="lifetime">&#39;_</span>, I&gt; {
+        Walker { db: <span class="self">self</span>, id }
     }
 
-    <span class="doccomment">/// Walk all enums in the schema.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">walk_enums</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">ast</span>()
-            .<span class="ident">iter_tops</span>()
-            .<span class="ident">filter_map</span>(<span class="op">|</span>(<span class="ident">top_id</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">top_id</span>.<span class="ident">as_enum_id</span>())
-            .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">enum_id</span><span class="op">|</span> <span class="ident">Walker</span> { <span class="ident">db</span>: <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">enum_id</span> })
+    <span class="doccomment">/// Walk all enums in the schema.
+    </span><span class="kw">pub fn </span>walk_enums(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = EnumWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="self">self</span>.ast()
+            .iter_tops()
+            .filter_map(|(top_id, <span class="kw">_</span>)| top_id.as_enum_id())
+            .map(<span class="kw">move </span>|enum_id| Walker { db: <span class="self">self</span>, id: enum_id })
     }
 
-    <span class="doccomment">/// Walk all the models in the schema.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">walk_models</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
-        <span class="self">self</span>.<span class="ident">ast</span>()
-            .<span class="ident">iter_tops</span>()
-            .<span class="ident">filter_map</span>(<span class="op">|</span>(<span class="ident">top_id</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">top_id</span>.<span class="ident">as_model_id</span>())
-            .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">model_id</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">walk</span>(<span class="ident">model_id</span>))
+    <span class="doccomment">/// Walk all the models in the schema.
+    </span><span class="kw">pub fn </span>walk_models(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = ModelWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt; + <span class="lifetime">&#39;_ </span>{
+        <span class="self">self</span>.ast()
+            .iter_tops()
+            .filter_map(|(top_id, <span class="kw">_</span>)| top_id.as_model_id())
+            .map(<span class="kw">move </span>|model_id| <span class="self">self</span>.walk(model_id))
     }
 
-    <span class="doccomment">/// Walk a specific composite type by ID.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">walk_composite_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ctid</span>: <span class="ident">ast::CompositeTypeId</span>) -&gt; <span class="ident">CompositeTypeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">CompositeTypeWalker</span> { <span class="ident">ctid</span>, <span class="ident">db</span>: <span class="self">self</span> }
+    <span class="doccomment">/// Walk a specific composite type by ID.
+    </span><span class="kw">pub fn </span>walk_composite_type(<span class="kw-2">&amp;</span><span class="self">self</span>, ctid: ast::CompositeTypeId) -&gt; CompositeTypeWalker&lt;<span class="lifetime">&#39;_</span>&gt; {
+        CompositeTypeWalker { ctid, db: <span class="self">self </span>}
     }
 
-    <span class="doccomment">/// Walk all the composite types in the schema.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">walk_composite_types</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">CompositeTypeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
-        <span class="self">self</span>.<span class="ident">ast</span>()
-            .<span class="ident">iter_tops</span>()
-            .<span class="ident">filter_map</span>(<span class="op">|</span>(<span class="ident">top_id</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">top_id</span>.<span class="ident">as_composite_type_id</span>())
-            .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">ctid</span><span class="op">|</span> <span class="ident">CompositeTypeWalker</span> { <span class="ident">ctid</span>, <span class="ident">db</span>: <span class="self">self</span> })
+    <span class="doccomment">/// Walk all the composite types in the schema.
+    </span><span class="kw">pub fn </span>walk_composite_types(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = CompositeTypeWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt; + <span class="lifetime">&#39;_ </span>{
+        <span class="self">self</span>.ast()
+            .iter_tops()
+            .filter_map(|(top_id, <span class="kw">_</span>)| top_id.as_composite_type_id())
+            .map(<span class="kw">move </span>|ctid| CompositeTypeWalker { ctid, db: <span class="self">self </span>})
     }
 
-    <span class="doccomment">/// Walk all scalar field defaults with a function not part of the common ones.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">walk_scalar_field_defaults_with_unknown_function</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">DefaultValueWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">types</span>
-            .<span class="ident">unknown_function_defaults</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">model_id</span>, <span class="ident">field_id</span>)<span class="op">|</span> <span class="ident">DefaultValueWalker</span> {
-                <span class="ident">model_id</span>: <span class="kw-2">*</span><span class="ident">model_id</span>,
-                <span class="ident">field_id</span>: <span class="kw-2">*</span><span class="ident">field_id</span>,
-                <span class="ident">db</span>: <span class="self">self</span>,
-                <span class="ident">default</span>: <span class="self">self</span>.<span class="ident">types</span>.<span class="ident">scalar_fields</span>[<span class="kw-2">&amp;</span>(<span class="kw-2">*</span><span class="ident">model_id</span>, <span class="kw-2">*</span><span class="ident">field_id</span>)]
-                    .<span class="ident">default</span>
-                    .<span class="ident">as_ref</span>()
-                    .<span class="ident">unwrap</span>(),
+    <span class="doccomment">/// Walk all scalar field defaults with a function not part of the common ones.
+    </span><span class="kw">pub fn </span>walk_scalar_field_defaults_with_unknown_function(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = DefaultValueWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt; {
+        <span class="self">self</span>.types
+            .unknown_function_defaults
+            .iter()
+            .map(|(model_id, field_id)| DefaultValueWalker {
+                model_id: <span class="kw-2">*</span>model_id,
+                field_id: <span class="kw-2">*</span>field_id,
+                db: <span class="self">self</span>,
+                default: <span class="self">self</span>.types.scalar_fields[<span class="kw-2">&amp;</span>(<span class="kw-2">*</span>model_id, <span class="kw-2">*</span>field_id)]
+                    .default
+                    .as_ref()
+                    .unwrap(),
             })
     }
 
-    <span class="doccomment">/// Walk all the relations in the schema. A relation may be defined by one or two fields; in</span>
-    <span class="doccomment">/// both cases, it is still a single relation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">walk_relations</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">RelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
-        <span class="self">self</span>.<span class="ident">relations</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">relation_id</span><span class="op">|</span> <span class="ident">Walker</span> {
-            <span class="ident">db</span>: <span class="self">self</span>,
-            <span class="ident">id</span>: <span class="ident">relation_id</span>,
+    <span class="doccomment">/// Walk all the relations in the schema. A relation may be defined by one or two fields; in
+    /// both cases, it is still a single relation.
+    </span><span class="kw">pub fn </span>walk_relations(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = RelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt; + <span class="lifetime">&#39;_ </span>{
+        <span class="self">self</span>.relations.iter().map(<span class="kw">move </span>|relation_id| Walker {
+            db: <span class="self">self</span>,
+            id: relation_id,
         })
     }
 
-    <span class="doccomment">/// Iterate all complete relations that are not many to many and are</span>
-    <span class="doccomment">/// correctly defined from both sides.</span>
-    <span class="attribute">#[<span class="ident">track_caller</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">walk_complete_inline_relations</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">CompleteInlineRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
-        <span class="self">self</span>.<span class="ident">relations</span>
-            .<span class="ident">iter_relations</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">relation</span>)<span class="op">|</span> <span class="op">!</span><span class="ident">relation</span>.<span class="ident">is_implicit_many_to_many</span>())
-            .<span class="ident">filter_map</span>(<span class="kw">move</span> <span class="op">|</span>(<span class="ident">model_a</span>, <span class="ident">model_b</span>, <span class="ident">relation</span>)<span class="op">|</span> {
-                <span class="ident">relation</span>
-                    .<span class="ident">as_complete_fields</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">field_a</span>, <span class="ident">field_b</span>)<span class="op">|</span> <span class="ident">CompleteInlineRelationWalker</span> {
-                        <span class="ident">side_a</span>: (<span class="ident">model_a</span>, <span class="ident">field_a</span>),
-                        <span class="ident">side_b</span>: (<span class="ident">model_b</span>, <span class="ident">field_b</span>),
-                        <span class="ident">db</span>: <span class="self">self</span>,
+    <span class="doccomment">/// Iterate all complete relations that are not many to many and are
+    /// correctly defined from both sides.
+    </span><span class="attribute">#[track_caller]
+    </span><span class="kw">pub fn </span>walk_complete_inline_relations(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = CompleteInlineRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt; + <span class="lifetime">&#39;_ </span>{
+        <span class="self">self</span>.relations
+            .iter_relations()
+            .filter(|(<span class="kw">_</span>, <span class="kw">_</span>, relation)| !relation.is_implicit_many_to_many())
+            .filter_map(<span class="kw">move </span>|(model_a, model_b, relation)| {
+                relation
+                    .as_complete_fields()
+                    .map(|(field_a, field_b)| CompleteInlineRelationWalker {
+                        side_a: (model_a, field_a),
+                        side_b: (model_b, field_b),
+                        db: <span class="self">self</span>,
                     })
             })
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="parser_database" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="parser_database" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

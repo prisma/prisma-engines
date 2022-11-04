@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/openssl-sys-0.9.75/src/handwritten/ec.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ec.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../openssl_sys/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../openssl_sys/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../openssl_sys/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/openssl-sys-0.9.75/src/handwritten/ec.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ec.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../openssl_sys/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../openssl_sys/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../openssl_sys/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -253,260 +253,260 @@
 <span id="253">253</span>
 <span id="254">254</span>
 <span id="255">255</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">libc</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw-2">*</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>libc::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">point_conversion_form_t</span> {
-    <span class="ident">POINT_CONVERSION_COMPRESSED</span> <span class="op">=</span> <span class="number">2</span>,
-    <span class="ident">POINT_CONVERSION_UNCOMPRESSED</span> <span class="op">=</span> <span class="number">4</span>,
-    <span class="ident">POINT_CONVERSION_HYBRID</span> <span class="op">=</span> <span class="number">6</span>,
+<span class="attribute">#[repr(C)]
+#[derive(Copy, Clone)]
+</span><span class="kw">pub enum </span>point_conversion_form_t {
+    POINT_CONVERSION_COMPRESSED = <span class="number">2</span>,
+    POINT_CONVERSION_UNCOMPRESSED = <span class="number">4</span>,
+    POINT_CONVERSION_HYBRID = <span class="number">6</span>,
 }
 
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">EC_METHOD</span> {}
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">EC_GROUP</span> {}
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">EC_POINT</span> {}
+<span class="kw">pub enum </span>EC_METHOD {}
+<span class="kw">pub enum </span>EC_GROUP {}
+<span class="kw">pub enum </span>EC_POINT {}
 
-<span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">osslconf</span> <span class="op">=</span> <span class="string">&quot;OPENSSL_NO_EC2M&quot;</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_GF2m_simple_method</span>() -&gt; <span class="kw-2">*const</span> <span class="ident">EC_METHOD</span>;
+<span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+    <span class="attribute">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_EC2M&quot;</span>))]
+    </span><span class="kw">pub fn </span>EC_GF2m_simple_method() -&gt; <span class="kw-2">*const </span>EC_METHOD;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_GROUP_new</span>(<span class="ident">meth</span>: <span class="kw-2">*const</span> <span class="ident">EC_METHOD</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">EC_GROUP</span>;
+    <span class="kw">pub fn </span>EC_GROUP_new(meth: <span class="kw-2">*const </span>EC_METHOD) -&gt; <span class="kw-2">*mut </span>EC_GROUP;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_GROUP_free</span>(<span class="ident">group</span>: <span class="kw-2">*mut</span> <span class="ident">EC_GROUP</span>);
+    <span class="kw">pub fn </span>EC_GROUP_free(group: <span class="kw-2">*mut </span>EC_GROUP);
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_GROUP_get_order</span>(
-        <span class="ident">group</span>: <span class="kw-2">*const</span> <span class="ident">EC_GROUP</span>,
-        <span class="ident">order</span>: <span class="kw-2">*mut</span> <span class="ident">BIGNUM</span>,
-        <span class="ident">ctx</span>: <span class="kw-2">*mut</span> <span class="ident">BN_CTX</span>,
-    ) -&gt; <span class="ident">c_int</span>;
+    <span class="kw">pub fn </span>EC_GROUP_get_order(
+        group: <span class="kw-2">*const </span>EC_GROUP,
+        order: <span class="kw-2">*mut </span>BIGNUM,
+        ctx: <span class="kw-2">*mut </span>BN_CTX,
+    ) -&gt; c_int;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_GROUP_get_cofactor</span>(
-        <span class="ident">group</span>: <span class="kw-2">*const</span> <span class="ident">EC_GROUP</span>,
-        <span class="ident">cofactor</span>: <span class="kw-2">*mut</span> <span class="ident">BIGNUM</span>,
-        <span class="ident">ctx</span>: <span class="kw-2">*mut</span> <span class="ident">BN_CTX</span>,
-    ) -&gt; <span class="ident">c_int</span>;
+    <span class="kw">pub fn </span>EC_GROUP_get_cofactor(
+        group: <span class="kw-2">*const </span>EC_GROUP,
+        cofactor: <span class="kw-2">*mut </span>BIGNUM,
+        ctx: <span class="kw-2">*mut </span>BN_CTX,
+    ) -&gt; c_int;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_GROUP_get0_generator</span>(<span class="ident">group</span>: <span class="kw-2">*const</span> <span class="ident">EC_GROUP</span>) -&gt; <span class="kw-2">*const</span> <span class="ident">EC_POINT</span>;
+    <span class="kw">pub fn </span>EC_GROUP_get0_generator(group: <span class="kw-2">*const </span>EC_GROUP) -&gt; <span class="kw-2">*const </span>EC_POINT;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_GROUP_set_generator</span>(
-        <span class="ident">group</span>: <span class="kw-2">*mut</span> <span class="ident">EC_GROUP</span>,
-        <span class="ident">generator</span>: <span class="kw-2">*const</span> <span class="ident">EC_POINT</span>,
-        <span class="ident">order</span>: <span class="kw-2">*const</span> <span class="ident">BIGNUM</span>,
-        <span class="ident">cofactor</span>: <span class="kw-2">*const</span> <span class="ident">BIGNUM</span>,
-    ) -&gt; <span class="ident">c_int</span>;
+    <span class="kw">pub fn </span>EC_GROUP_set_generator(
+        group: <span class="kw-2">*mut </span>EC_GROUP,
+        generator: <span class="kw-2">*const </span>EC_POINT,
+        order: <span class="kw-2">*const </span>BIGNUM,
+        cofactor: <span class="kw-2">*const </span>BIGNUM,
+    ) -&gt; c_int;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_GROUP_get_curve_name</span>(<span class="ident">group</span>: <span class="kw-2">*const</span> <span class="ident">EC_GROUP</span>) -&gt; <span class="ident">c_int</span>;
+    <span class="kw">pub fn </span>EC_GROUP_get_curve_name(group: <span class="kw-2">*const </span>EC_GROUP) -&gt; c_int;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_GROUP_set_asn1_flag</span>(<span class="ident">key</span>: <span class="kw-2">*mut</span> <span class="ident">EC_GROUP</span>, <span class="ident">flag</span>: <span class="ident">c_int</span>);
+    <span class="kw">pub fn </span>EC_GROUP_set_asn1_flag(key: <span class="kw-2">*mut </span>EC_GROUP, flag: c_int);
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_GROUP_get_curve_GFp</span>(
-        <span class="ident">group</span>: <span class="kw-2">*const</span> <span class="ident">EC_GROUP</span>,
-        <span class="ident">p</span>: <span class="kw-2">*mut</span> <span class="ident">BIGNUM</span>,
-        <span class="ident">a</span>: <span class="kw-2">*mut</span> <span class="ident">BIGNUM</span>,
-        <span class="ident">b</span>: <span class="kw-2">*mut</span> <span class="ident">BIGNUM</span>,
-        <span class="ident">ctx</span>: <span class="kw-2">*mut</span> <span class="ident">BN_CTX</span>,
-    ) -&gt; <span class="ident">c_int</span>;
+    <span class="kw">pub fn </span>EC_GROUP_get_curve_GFp(
+        group: <span class="kw-2">*const </span>EC_GROUP,
+        p: <span class="kw-2">*mut </span>BIGNUM,
+        a: <span class="kw-2">*mut </span>BIGNUM,
+        b: <span class="kw-2">*mut </span>BIGNUM,
+        ctx: <span class="kw-2">*mut </span>BN_CTX,
+    ) -&gt; c_int;
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">osslconf</span> <span class="op">=</span> <span class="string">&quot;OPENSSL_NO_EC2M&quot;</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_GROUP_get_curve_GF2m</span>(
-        <span class="ident">group</span>: <span class="kw-2">*const</span> <span class="ident">EC_GROUP</span>,
-        <span class="ident">p</span>: <span class="kw-2">*mut</span> <span class="ident">BIGNUM</span>,
-        <span class="ident">a</span>: <span class="kw-2">*mut</span> <span class="ident">BIGNUM</span>,
-        <span class="ident">b</span>: <span class="kw-2">*mut</span> <span class="ident">BIGNUM</span>,
-        <span class="ident">ctx</span>: <span class="kw-2">*mut</span> <span class="ident">BN_CTX</span>,
-    ) -&gt; <span class="ident">c_int</span>;
+    <span class="attribute">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_EC2M&quot;</span>))]
+    </span><span class="kw">pub fn </span>EC_GROUP_get_curve_GF2m(
+        group: <span class="kw-2">*const </span>EC_GROUP,
+        p: <span class="kw-2">*mut </span>BIGNUM,
+        a: <span class="kw-2">*mut </span>BIGNUM,
+        b: <span class="kw-2">*mut </span>BIGNUM,
+        ctx: <span class="kw-2">*mut </span>BN_CTX,
+    ) -&gt; c_int;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_GROUP_get_degree</span>(<span class="ident">group</span>: <span class="kw-2">*const</span> <span class="ident">EC_GROUP</span>) -&gt; <span class="ident">c_int</span>;
+    <span class="kw">pub fn </span>EC_GROUP_get_degree(group: <span class="kw-2">*const </span>EC_GROUP) -&gt; c_int;
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">ossl110</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_GROUP_order_bits</span>(<span class="ident">group</span>: <span class="kw-2">*const</span> <span class="ident">EC_GROUP</span>) -&gt; <span class="ident">c_int</span>;
+    <span class="attribute">#[cfg(ossl110)]
+    </span><span class="kw">pub fn </span>EC_GROUP_order_bits(group: <span class="kw-2">*const </span>EC_GROUP) -&gt; c_int;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_GROUP_new_curve_GFp</span>(
-        <span class="ident">p</span>: <span class="kw-2">*const</span> <span class="ident">BIGNUM</span>,
-        <span class="ident">a</span>: <span class="kw-2">*const</span> <span class="ident">BIGNUM</span>,
-        <span class="ident">b</span>: <span class="kw-2">*const</span> <span class="ident">BIGNUM</span>,
-        <span class="ident">ctx</span>: <span class="kw-2">*mut</span> <span class="ident">BN_CTX</span>,
-    ) -&gt; <span class="kw-2">*mut</span> <span class="ident">EC_GROUP</span>;
+    <span class="kw">pub fn </span>EC_GROUP_new_curve_GFp(
+        p: <span class="kw-2">*const </span>BIGNUM,
+        a: <span class="kw-2">*const </span>BIGNUM,
+        b: <span class="kw-2">*const </span>BIGNUM,
+        ctx: <span class="kw-2">*mut </span>BN_CTX,
+    ) -&gt; <span class="kw-2">*mut </span>EC_GROUP;
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">osslconf</span> <span class="op">=</span> <span class="string">&quot;OPENSSL_NO_EC2M&quot;</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_GROUP_new_curve_GF2m</span>(
-        <span class="ident">p</span>: <span class="kw-2">*const</span> <span class="ident">BIGNUM</span>,
-        <span class="ident">a</span>: <span class="kw-2">*const</span> <span class="ident">BIGNUM</span>,
-        <span class="ident">b</span>: <span class="kw-2">*const</span> <span class="ident">BIGNUM</span>,
-        <span class="ident">ctx</span>: <span class="kw-2">*mut</span> <span class="ident">BN_CTX</span>,
-    ) -&gt; <span class="kw-2">*mut</span> <span class="ident">EC_GROUP</span>;
+    <span class="attribute">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_EC2M&quot;</span>))]
+    </span><span class="kw">pub fn </span>EC_GROUP_new_curve_GF2m(
+        p: <span class="kw-2">*const </span>BIGNUM,
+        a: <span class="kw-2">*const </span>BIGNUM,
+        b: <span class="kw-2">*const </span>BIGNUM,
+        ctx: <span class="kw-2">*mut </span>BN_CTX,
+    ) -&gt; <span class="kw-2">*mut </span>EC_GROUP;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_GROUP_new_by_curve_name</span>(<span class="ident">nid</span>: <span class="ident">c_int</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">EC_GROUP</span>;
+    <span class="kw">pub fn </span>EC_GROUP_new_by_curve_name(nid: c_int) -&gt; <span class="kw-2">*mut </span>EC_GROUP;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_POINT_is_at_infinity</span>(<span class="ident">group</span>: <span class="kw-2">*const</span> <span class="ident">EC_GROUP</span>, <span class="ident">point</span>: <span class="kw-2">*const</span> <span class="ident">EC_POINT</span>) -&gt; <span class="ident">c_int</span>;
+    <span class="kw">pub fn </span>EC_POINT_is_at_infinity(group: <span class="kw-2">*const </span>EC_GROUP, point: <span class="kw-2">*const </span>EC_POINT) -&gt; c_int;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_POINT_is_on_curve</span>(
-        <span class="ident">group</span>: <span class="kw-2">*const</span> <span class="ident">EC_GROUP</span>,
-        <span class="ident">point</span>: <span class="kw-2">*const</span> <span class="ident">EC_POINT</span>,
-        <span class="ident">ctx</span>: <span class="kw-2">*mut</span> <span class="ident">BN_CTX</span>,
-    ) -&gt; <span class="ident">c_int</span>;
+    <span class="kw">pub fn </span>EC_POINT_is_on_curve(
+        group: <span class="kw-2">*const </span>EC_GROUP,
+        point: <span class="kw-2">*const </span>EC_POINT,
+        ctx: <span class="kw-2">*mut </span>BN_CTX,
+    ) -&gt; c_int;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_POINT_new</span>(<span class="ident">group</span>: <span class="kw-2">*const</span> <span class="ident">EC_GROUP</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">EC_POINT</span>;
+    <span class="kw">pub fn </span>EC_POINT_new(group: <span class="kw-2">*const </span>EC_GROUP) -&gt; <span class="kw-2">*mut </span>EC_POINT;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_POINT_free</span>(<span class="ident">point</span>: <span class="kw-2">*mut</span> <span class="ident">EC_POINT</span>);
+    <span class="kw">pub fn </span>EC_POINT_free(point: <span class="kw-2">*mut </span>EC_POINT);
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_POINT_dup</span>(<span class="ident">p</span>: <span class="kw-2">*const</span> <span class="ident">EC_POINT</span>, <span class="ident">group</span>: <span class="kw-2">*const</span> <span class="ident">EC_GROUP</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">EC_POINT</span>;
+    <span class="kw">pub fn </span>EC_POINT_dup(p: <span class="kw-2">*const </span>EC_POINT, group: <span class="kw-2">*const </span>EC_GROUP) -&gt; <span class="kw-2">*mut </span>EC_POINT;
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">ossl111</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_POINT_get_affine_coordinates</span>(
-        <span class="ident">group</span>: <span class="kw-2">*const</span> <span class="ident">EC_GROUP</span>,
-        <span class="ident">p</span>: <span class="kw-2">*const</span> <span class="ident">EC_POINT</span>,
-        <span class="ident">x</span>: <span class="kw-2">*mut</span> <span class="ident">BIGNUM</span>,
-        <span class="ident">y</span>: <span class="kw-2">*mut</span> <span class="ident">BIGNUM</span>,
-        <span class="ident">ctx</span>: <span class="kw-2">*mut</span> <span class="ident">BN_CTX</span>,
-    ) -&gt; <span class="ident">c_int</span>;
+    <span class="attribute">#[cfg(ossl111)]
+    </span><span class="kw">pub fn </span>EC_POINT_get_affine_coordinates(
+        group: <span class="kw-2">*const </span>EC_GROUP,
+        p: <span class="kw-2">*const </span>EC_POINT,
+        x: <span class="kw-2">*mut </span>BIGNUM,
+        y: <span class="kw-2">*mut </span>BIGNUM,
+        ctx: <span class="kw-2">*mut </span>BN_CTX,
+    ) -&gt; c_int;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_POINT_get_affine_coordinates_GFp</span>(
-        <span class="ident">group</span>: <span class="kw-2">*const</span> <span class="ident">EC_GROUP</span>,
-        <span class="ident">p</span>: <span class="kw-2">*const</span> <span class="ident">EC_POINT</span>,
-        <span class="ident">x</span>: <span class="kw-2">*mut</span> <span class="ident">BIGNUM</span>,
-        <span class="ident">y</span>: <span class="kw-2">*mut</span> <span class="ident">BIGNUM</span>,
-        <span class="ident">ctx</span>: <span class="kw-2">*mut</span> <span class="ident">BN_CTX</span>,
-    ) -&gt; <span class="ident">c_int</span>;
+    <span class="kw">pub fn </span>EC_POINT_get_affine_coordinates_GFp(
+        group: <span class="kw-2">*const </span>EC_GROUP,
+        p: <span class="kw-2">*const </span>EC_POINT,
+        x: <span class="kw-2">*mut </span>BIGNUM,
+        y: <span class="kw-2">*mut </span>BIGNUM,
+        ctx: <span class="kw-2">*mut </span>BN_CTX,
+    ) -&gt; c_int;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_POINT_set_affine_coordinates_GFp</span>(
-        <span class="ident">group</span>: <span class="kw-2">*const</span> <span class="ident">EC_GROUP</span>,
-        <span class="ident">p</span>: <span class="kw-2">*mut</span> <span class="ident">EC_POINT</span>,
-        <span class="ident">x</span>: <span class="kw-2">*const</span> <span class="ident">BIGNUM</span>,
-        <span class="ident">y</span>: <span class="kw-2">*const</span> <span class="ident">BIGNUM</span>,
-        <span class="ident">ctx</span>: <span class="kw-2">*mut</span> <span class="ident">BN_CTX</span>,
-    ) -&gt; <span class="ident">c_int</span>;
+    <span class="kw">pub fn </span>EC_POINT_set_affine_coordinates_GFp(
+        group: <span class="kw-2">*const </span>EC_GROUP,
+        p: <span class="kw-2">*mut </span>EC_POINT,
+        x: <span class="kw-2">*const </span>BIGNUM,
+        y: <span class="kw-2">*const </span>BIGNUM,
+        ctx: <span class="kw-2">*mut </span>BN_CTX,
+    ) -&gt; c_int;
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">osslconf</span> <span class="op">=</span> <span class="string">&quot;OPENSSL_NO_EC2M&quot;</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_POINT_get_affine_coordinates_GF2m</span>(
-        <span class="ident">group</span>: <span class="kw-2">*const</span> <span class="ident">EC_GROUP</span>,
-        <span class="ident">p</span>: <span class="kw-2">*const</span> <span class="ident">EC_POINT</span>,
-        <span class="ident">x</span>: <span class="kw-2">*mut</span> <span class="ident">BIGNUM</span>,
-        <span class="ident">y</span>: <span class="kw-2">*mut</span> <span class="ident">BIGNUM</span>,
-        <span class="ident">ctx</span>: <span class="kw-2">*mut</span> <span class="ident">BN_CTX</span>,
-    ) -&gt; <span class="ident">c_int</span>;
+    <span class="attribute">#[cfg(not(osslconf = <span class="string">&quot;OPENSSL_NO_EC2M&quot;</span>))]
+    </span><span class="kw">pub fn </span>EC_POINT_get_affine_coordinates_GF2m(
+        group: <span class="kw-2">*const </span>EC_GROUP,
+        p: <span class="kw-2">*const </span>EC_POINT,
+        x: <span class="kw-2">*mut </span>BIGNUM,
+        y: <span class="kw-2">*mut </span>BIGNUM,
+        ctx: <span class="kw-2">*mut </span>BN_CTX,
+    ) -&gt; c_int;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_POINT_point2oct</span>(
-        <span class="ident">group</span>: <span class="kw-2">*const</span> <span class="ident">EC_GROUP</span>,
-        <span class="ident">p</span>: <span class="kw-2">*const</span> <span class="ident">EC_POINT</span>,
-        <span class="ident">form</span>: <span class="ident">point_conversion_form_t</span>,
-        <span class="ident">buf</span>: <span class="kw-2">*mut</span> <span class="ident">c_uchar</span>,
-        <span class="ident">len</span>: <span class="ident">size_t</span>,
-        <span class="ident">ctx</span>: <span class="kw-2">*mut</span> <span class="ident">BN_CTX</span>,
-    ) -&gt; <span class="ident">size_t</span>;
+    <span class="kw">pub fn </span>EC_POINT_point2oct(
+        group: <span class="kw-2">*const </span>EC_GROUP,
+        p: <span class="kw-2">*const </span>EC_POINT,
+        form: point_conversion_form_t,
+        buf: <span class="kw-2">*mut </span>c_uchar,
+        len: size_t,
+        ctx: <span class="kw-2">*mut </span>BN_CTX,
+    ) -&gt; size_t;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_POINT_oct2point</span>(
-        <span class="ident">group</span>: <span class="kw-2">*const</span> <span class="ident">EC_GROUP</span>,
-        <span class="ident">p</span>: <span class="kw-2">*mut</span> <span class="ident">EC_POINT</span>,
-        <span class="ident">buf</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
-        <span class="ident">len</span>: <span class="ident">size_t</span>,
-        <span class="ident">ctx</span>: <span class="kw-2">*mut</span> <span class="ident">BN_CTX</span>,
-    ) -&gt; <span class="ident">c_int</span>;
+    <span class="kw">pub fn </span>EC_POINT_oct2point(
+        group: <span class="kw-2">*const </span>EC_GROUP,
+        p: <span class="kw-2">*mut </span>EC_POINT,
+        buf: <span class="kw-2">*const </span>c_uchar,
+        len: size_t,
+        ctx: <span class="kw-2">*mut </span>BN_CTX,
+    ) -&gt; c_int;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_POINT_add</span>(
-        <span class="ident">group</span>: <span class="kw-2">*const</span> <span class="ident">EC_GROUP</span>,
-        <span class="ident">r</span>: <span class="kw-2">*mut</span> <span class="ident">EC_POINT</span>,
-        <span class="ident">a</span>: <span class="kw-2">*const</span> <span class="ident">EC_POINT</span>,
-        <span class="ident">b</span>: <span class="kw-2">*const</span> <span class="ident">EC_POINT</span>,
-        <span class="ident">ctx</span>: <span class="kw-2">*mut</span> <span class="ident">BN_CTX</span>,
-    ) -&gt; <span class="ident">c_int</span>;
+    <span class="kw">pub fn </span>EC_POINT_add(
+        group: <span class="kw-2">*const </span>EC_GROUP,
+        r: <span class="kw-2">*mut </span>EC_POINT,
+        a: <span class="kw-2">*const </span>EC_POINT,
+        b: <span class="kw-2">*const </span>EC_POINT,
+        ctx: <span class="kw-2">*mut </span>BN_CTX,
+    ) -&gt; c_int;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_POINT_invert</span>(<span class="ident">group</span>: <span class="kw-2">*const</span> <span class="ident">EC_GROUP</span>, <span class="ident">r</span>: <span class="kw-2">*mut</span> <span class="ident">EC_POINT</span>, <span class="ident">ctx</span>: <span class="kw-2">*mut</span> <span class="ident">BN_CTX</span>) -&gt; <span class="ident">c_int</span>;
+    <span class="kw">pub fn </span>EC_POINT_invert(group: <span class="kw-2">*const </span>EC_GROUP, r: <span class="kw-2">*mut </span>EC_POINT, ctx: <span class="kw-2">*mut </span>BN_CTX) -&gt; c_int;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_POINT_cmp</span>(
-        <span class="ident">group</span>: <span class="kw-2">*const</span> <span class="ident">EC_GROUP</span>,
-        <span class="ident">a</span>: <span class="kw-2">*const</span> <span class="ident">EC_POINT</span>,
-        <span class="ident">b</span>: <span class="kw-2">*const</span> <span class="ident">EC_POINT</span>,
-        <span class="ident">ctx</span>: <span class="kw-2">*mut</span> <span class="ident">BN_CTX</span>,
-    ) -&gt; <span class="ident">c_int</span>;
+    <span class="kw">pub fn </span>EC_POINT_cmp(
+        group: <span class="kw-2">*const </span>EC_GROUP,
+        a: <span class="kw-2">*const </span>EC_POINT,
+        b: <span class="kw-2">*const </span>EC_POINT,
+        ctx: <span class="kw-2">*mut </span>BN_CTX,
+    ) -&gt; c_int;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_POINT_mul</span>(
-        <span class="ident">group</span>: <span class="kw-2">*const</span> <span class="ident">EC_GROUP</span>,
-        <span class="ident">r</span>: <span class="kw-2">*mut</span> <span class="ident">EC_POINT</span>,
-        <span class="ident">n</span>: <span class="kw-2">*const</span> <span class="ident">BIGNUM</span>,
-        <span class="ident">q</span>: <span class="kw-2">*const</span> <span class="ident">EC_POINT</span>,
-        <span class="ident">m</span>: <span class="kw-2">*const</span> <span class="ident">BIGNUM</span>,
-        <span class="ident">ctx</span>: <span class="kw-2">*mut</span> <span class="ident">BN_CTX</span>,
-    ) -&gt; <span class="ident">c_int</span>;
+    <span class="kw">pub fn </span>EC_POINT_mul(
+        group: <span class="kw-2">*const </span>EC_GROUP,
+        r: <span class="kw-2">*mut </span>EC_POINT,
+        n: <span class="kw-2">*const </span>BIGNUM,
+        q: <span class="kw-2">*const </span>EC_POINT,
+        m: <span class="kw-2">*const </span>BIGNUM,
+        ctx: <span class="kw-2">*mut </span>BN_CTX,
+    ) -&gt; c_int;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_KEY_new</span>() -&gt; <span class="kw-2">*mut</span> <span class="ident">EC_KEY</span>;
+    <span class="kw">pub fn </span>EC_KEY_new() -&gt; <span class="kw-2">*mut </span>EC_KEY;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_KEY_new_by_curve_name</span>(<span class="ident">nid</span>: <span class="ident">c_int</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">EC_KEY</span>;
+    <span class="kw">pub fn </span>EC_KEY_new_by_curve_name(nid: c_int) -&gt; <span class="kw-2">*mut </span>EC_KEY;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_KEY_free</span>(<span class="ident">key</span>: <span class="kw-2">*mut</span> <span class="ident">EC_KEY</span>);
+    <span class="kw">pub fn </span>EC_KEY_free(key: <span class="kw-2">*mut </span>EC_KEY);
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_KEY_dup</span>(<span class="ident">key</span>: <span class="kw-2">*const</span> <span class="ident">EC_KEY</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">EC_KEY</span>;
+    <span class="kw">pub fn </span>EC_KEY_dup(key: <span class="kw-2">*const </span>EC_KEY) -&gt; <span class="kw-2">*mut </span>EC_KEY;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_KEY_up_ref</span>(<span class="ident">key</span>: <span class="kw-2">*mut</span> <span class="ident">EC_KEY</span>) -&gt; <span class="ident">c_int</span>;
+    <span class="kw">pub fn </span>EC_KEY_up_ref(key: <span class="kw-2">*mut </span>EC_KEY) -&gt; c_int;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_KEY_get0_group</span>(<span class="ident">key</span>: <span class="kw-2">*const</span> <span class="ident">EC_KEY</span>) -&gt; <span class="kw-2">*const</span> <span class="ident">EC_GROUP</span>;
+    <span class="kw">pub fn </span>EC_KEY_get0_group(key: <span class="kw-2">*const </span>EC_KEY) -&gt; <span class="kw-2">*const </span>EC_GROUP;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_KEY_set_group</span>(<span class="ident">key</span>: <span class="kw-2">*mut</span> <span class="ident">EC_KEY</span>, <span class="ident">group</span>: <span class="kw-2">*const</span> <span class="ident">EC_GROUP</span>) -&gt; <span class="ident">c_int</span>;
+    <span class="kw">pub fn </span>EC_KEY_set_group(key: <span class="kw-2">*mut </span>EC_KEY, group: <span class="kw-2">*const </span>EC_GROUP) -&gt; c_int;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_KEY_get0_private_key</span>(<span class="ident">key</span>: <span class="kw-2">*const</span> <span class="ident">EC_KEY</span>) -&gt; <span class="kw-2">*const</span> <span class="ident">BIGNUM</span>;
+    <span class="kw">pub fn </span>EC_KEY_get0_private_key(key: <span class="kw-2">*const </span>EC_KEY) -&gt; <span class="kw-2">*const </span>BIGNUM;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_KEY_set_private_key</span>(<span class="ident">key</span>: <span class="kw-2">*mut</span> <span class="ident">EC_KEY</span>, <span class="ident">key</span>: <span class="kw-2">*const</span> <span class="ident">BIGNUM</span>) -&gt; <span class="ident">c_int</span>;
+    <span class="kw">pub fn </span>EC_KEY_set_private_key(key: <span class="kw-2">*mut </span>EC_KEY, key: <span class="kw-2">*const </span>BIGNUM) -&gt; c_int;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_KEY_get0_public_key</span>(<span class="ident">key</span>: <span class="kw-2">*const</span> <span class="ident">EC_KEY</span>) -&gt; <span class="kw-2">*const</span> <span class="ident">EC_POINT</span>;
+    <span class="kw">pub fn </span>EC_KEY_get0_public_key(key: <span class="kw-2">*const </span>EC_KEY) -&gt; <span class="kw-2">*const </span>EC_POINT;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_KEY_set_public_key</span>(<span class="ident">key</span>: <span class="kw-2">*mut</span> <span class="ident">EC_KEY</span>, <span class="ident">key</span>: <span class="kw-2">*const</span> <span class="ident">EC_POINT</span>) -&gt; <span class="ident">c_int</span>;
+    <span class="kw">pub fn </span>EC_KEY_set_public_key(key: <span class="kw-2">*mut </span>EC_KEY, key: <span class="kw-2">*const </span>EC_POINT) -&gt; c_int;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_KEY_generate_key</span>(<span class="ident">key</span>: <span class="kw-2">*mut</span> <span class="ident">EC_KEY</span>) -&gt; <span class="ident">c_int</span>;
+    <span class="kw">pub fn </span>EC_KEY_generate_key(key: <span class="kw-2">*mut </span>EC_KEY) -&gt; c_int;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_KEY_check_key</span>(<span class="ident">key</span>: <span class="kw-2">*const</span> <span class="ident">EC_KEY</span>) -&gt; <span class="ident">c_int</span>;
+    <span class="kw">pub fn </span>EC_KEY_check_key(key: <span class="kw-2">*const </span>EC_KEY) -&gt; c_int;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">EC_KEY_set_public_key_affine_coordinates</span>(
-        <span class="ident">key</span>: <span class="kw-2">*mut</span> <span class="ident">EC_KEY</span>,
-        <span class="ident">x</span>: <span class="kw-2">*mut</span> <span class="ident">BIGNUM</span>,
-        <span class="ident">y</span>: <span class="kw-2">*mut</span> <span class="ident">BIGNUM</span>,
-    ) -&gt; <span class="ident">c_int</span>;
+    <span class="kw">pub fn </span>EC_KEY_set_public_key_affine_coordinates(
+        key: <span class="kw-2">*mut </span>EC_KEY,
+        x: <span class="kw-2">*mut </span>BIGNUM,
+        y: <span class="kw-2">*mut </span>BIGNUM,
+    ) -&gt; c_int;
 }
 
-<span class="macro">cfg_if!</span> {
-    <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl110</span>, <span class="ident">libressl280</span>))]</span> {
-        <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ECDSA_SIG</span> {}
-    } <span class="kw">else</span> {
-        <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ECDSA_SIG</span> {
-            <span class="kw">pub</span> <span class="ident">r</span>: <span class="kw-2">*mut</span> <span class="ident">BIGNUM</span>,
-            <span class="kw">pub</span> <span class="ident">s</span>: <span class="kw-2">*mut</span> <span class="ident">BIGNUM</span>,
+<span class="macro">cfg_if! </span>{
+    <span class="kw">if </span><span class="attribute">#[cfg(any(ossl110, libressl280))] </span>{
+        <span class="kw">pub enum </span>ECDSA_SIG {}
+    } <span class="kw">else </span>{
+        <span class="attribute">#[repr(C)]
+        </span><span class="kw">pub struct </span>ECDSA_SIG {
+            <span class="kw">pub </span>r: <span class="kw-2">*mut </span>BIGNUM,
+            <span class="kw">pub </span>s: <span class="kw-2">*mut </span>BIGNUM,
         }
     }
 }
 
-<span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ECDSA_SIG_new</span>() -&gt; <span class="kw-2">*mut</span> <span class="ident">ECDSA_SIG</span>;
+<span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+    <span class="kw">pub fn </span>ECDSA_SIG_new() -&gt; <span class="kw-2">*mut </span>ECDSA_SIG;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ECDSA_SIG_free</span>(<span class="ident">sig</span>: <span class="kw-2">*mut</span> <span class="ident">ECDSA_SIG</span>);
+    <span class="kw">pub fn </span>ECDSA_SIG_free(sig: <span class="kw-2">*mut </span>ECDSA_SIG);
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl110</span>, <span class="ident">libressl273</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ECDSA_SIG_get0</span>(<span class="ident">sig</span>: <span class="kw-2">*const</span> <span class="ident">ECDSA_SIG</span>, <span class="ident">pr</span>: <span class="kw-2">*mut</span> <span class="kw-2">*const</span> <span class="ident">BIGNUM</span>, <span class="ident">ps</span>: <span class="kw-2">*mut</span> <span class="kw-2">*const</span> <span class="ident">BIGNUM</span>);
+    <span class="attribute">#[cfg(any(ossl110, libressl273))]
+    </span><span class="kw">pub fn </span>ECDSA_SIG_get0(sig: <span class="kw-2">*const </span>ECDSA_SIG, pr: <span class="kw-2">*mut *const </span>BIGNUM, ps: <span class="kw-2">*mut *const </span>BIGNUM);
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl110</span>, <span class="ident">libressl273</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ECDSA_SIG_set0</span>(<span class="ident">sig</span>: <span class="kw-2">*mut</span> <span class="ident">ECDSA_SIG</span>, <span class="ident">pr</span>: <span class="kw-2">*mut</span> <span class="ident">BIGNUM</span>, <span class="ident">ps</span>: <span class="kw-2">*mut</span> <span class="ident">BIGNUM</span>) -&gt; <span class="ident">c_int</span>;
+    <span class="attribute">#[cfg(any(ossl110, libressl273))]
+    </span><span class="kw">pub fn </span>ECDSA_SIG_set0(sig: <span class="kw-2">*mut </span>ECDSA_SIG, pr: <span class="kw-2">*mut </span>BIGNUM, ps: <span class="kw-2">*mut </span>BIGNUM) -&gt; c_int;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ECDSA_do_sign</span>(
-        <span class="ident">dgst</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
-        <span class="ident">dgst_len</span>: <span class="ident">c_int</span>,
-        <span class="ident">eckey</span>: <span class="kw-2">*mut</span> <span class="ident">EC_KEY</span>,
-    ) -&gt; <span class="kw-2">*mut</span> <span class="ident">ECDSA_SIG</span>;
+    <span class="kw">pub fn </span>ECDSA_do_sign(
+        dgst: <span class="kw-2">*const </span>c_uchar,
+        dgst_len: c_int,
+        eckey: <span class="kw-2">*mut </span>EC_KEY,
+    ) -&gt; <span class="kw-2">*mut </span>ECDSA_SIG;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ECDSA_do_verify</span>(
-        <span class="ident">dgst</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
-        <span class="ident">dgst_len</span>: <span class="ident">c_int</span>,
-        <span class="ident">sig</span>: <span class="kw-2">*const</span> <span class="ident">ECDSA_SIG</span>,
-        <span class="ident">eckey</span>: <span class="kw-2">*mut</span> <span class="ident">EC_KEY</span>,
-    ) -&gt; <span class="ident">c_int</span>;
+    <span class="kw">pub fn </span>ECDSA_do_verify(
+        dgst: <span class="kw-2">*const </span>c_uchar,
+        dgst_len: c_int,
+        sig: <span class="kw-2">*const </span>ECDSA_SIG,
+        eckey: <span class="kw-2">*mut </span>EC_KEY,
+    ) -&gt; c_int;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">d2i_ECDSA_SIG</span>(
-        <span class="ident">sig</span>: <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">ECDSA_SIG</span>,
-        <span class="ident">inp</span>: <span class="kw-2">*mut</span> <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
-        <span class="ident">length</span>: <span class="ident">c_long</span>,
-    ) -&gt; <span class="kw-2">*mut</span> <span class="ident">ECDSA_SIG</span>;
+    <span class="kw">pub fn </span>d2i_ECDSA_SIG(
+        sig: <span class="kw-2">*mut *mut </span>ECDSA_SIG,
+        inp: <span class="kw-2">*mut *const </span>c_uchar,
+        length: c_long,
+    ) -&gt; <span class="kw-2">*mut </span>ECDSA_SIG;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">i2d_ECDSA_SIG</span>(<span class="ident">sig</span>: <span class="kw-2">*const</span> <span class="ident">ECDSA_SIG</span>, <span class="ident">out</span>: <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">c_uchar</span>) -&gt; <span class="ident">c_int</span>;
+    <span class="kw">pub fn </span>i2d_ECDSA_SIG(sig: <span class="kw-2">*const </span>ECDSA_SIG, out: <span class="kw-2">*mut *mut </span>c_uchar) -&gt; c_int;
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="openssl_sys" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="openssl_sys" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/dml/src/scalars.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>scalars.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../dml/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../dml/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../dml/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/dml/src/scalars.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>scalars.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../dml/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../dml/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../dml/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -77,84 +77,84 @@
 <span id="77">77</span>
 <span id="78">78</span>
 <span id="79">79</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">str::FromStr</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>serde::{Deserialize, Serialize};
+<span class="kw">use </span>std::{fmt, str::FromStr};
 
-<span class="doccomment">/// Prisma&#39;s builtin scalar types.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ScalarType</span> {
-    <span class="ident">Int</span>,
-    <span class="ident">BigInt</span>,
-    <span class="ident">Float</span>,
-    <span class="ident">Boolean</span>,
-    <span class="ident">String</span>,
-    <span class="ident">DateTime</span>,
-    <span class="ident">Json</span>,
-    <span class="ident">Bytes</span>,
-    <span class="ident">Decimal</span>,
+<span class="doccomment">/// Prisma&#39;s builtin scalar types.
+</span><span class="attribute">#[derive(Debug, Copy, PartialEq, Clone, Serialize, Deserialize, Eq, Hash)]
+</span><span class="kw">pub enum </span>ScalarType {
+    Int,
+    BigInt,
+    Float,
+    Boolean,
+    String,
+    DateTime,
+    Json,
+    Bytes,
+    Decimal,
 }
 
-<span class="kw">impl</span> <span class="ident">ScalarType</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_boolean</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">ScalarType::Boolean</span>)
+<span class="kw">impl </span>ScalarType {
+    <span class="kw">pub fn </span>is_boolean(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, ScalarType::Boolean)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_datetime</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">ScalarType::DateTime</span>)
+    <span class="kw">pub fn </span>is_datetime(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, ScalarType::DateTime)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_float</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">ScalarType::Float</span>)
+    <span class="kw">pub fn </span>is_float(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, ScalarType::Float)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_json</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">ScalarType::Json</span>)
+    <span class="kw">pub fn </span>is_json(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, ScalarType::Json)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident">ScalarType::String</span>)
+    <span class="kw">pub fn </span>is_string(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, ScalarType::String)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">ScalarType</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">String</span>;
+<span class="kw">impl </span>FromStr <span class="kw">for </span>ScalarType {
+    <span class="kw">type </span><span class="prelude-val">Err </span>= String;
 
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">s</span> {
-            <span class="string">&quot;Int&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ScalarType::Int</span>),
-            <span class="string">&quot;BigInt&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ScalarType::BigInt</span>),
-            <span class="string">&quot;Float&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ScalarType::Float</span>),
-            <span class="string">&quot;Boolean&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ScalarType::Boolean</span>),
-            <span class="string">&quot;String&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ScalarType::String</span>),
-            <span class="string">&quot;DateTime&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ScalarType::DateTime</span>),
-            <span class="string">&quot;Json&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ScalarType::Json</span>),
-            <span class="string">&quot;Bytes&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ScalarType::Bytes</span>),
-            <span class="string">&quot;Decimal&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">ScalarType::Decimal</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;type {} is not a known scalar type.&quot;</span>, <span class="ident">s</span>)),
+    <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
+        <span class="kw">match </span>s {
+            <span class="string">&quot;Int&quot; </span>=&gt; <span class="prelude-val">Ok</span>(ScalarType::Int),
+            <span class="string">&quot;BigInt&quot; </span>=&gt; <span class="prelude-val">Ok</span>(ScalarType::BigInt),
+            <span class="string">&quot;Float&quot; </span>=&gt; <span class="prelude-val">Ok</span>(ScalarType::Float),
+            <span class="string">&quot;Boolean&quot; </span>=&gt; <span class="prelude-val">Ok</span>(ScalarType::Boolean),
+            <span class="string">&quot;String&quot; </span>=&gt; <span class="prelude-val">Ok</span>(ScalarType::String),
+            <span class="string">&quot;DateTime&quot; </span>=&gt; <span class="prelude-val">Ok</span>(ScalarType::DateTime),
+            <span class="string">&quot;Json&quot; </span>=&gt; <span class="prelude-val">Ok</span>(ScalarType::Json),
+            <span class="string">&quot;Bytes&quot; </span>=&gt; <span class="prelude-val">Ok</span>(ScalarType::Bytes),
+            <span class="string">&quot;Decimal&quot; </span>=&gt; <span class="prelude-val">Ok</span>(ScalarType::Decimal),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;type {} is not a known scalar type.&quot;</span>, s)),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ScalarType</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ScalarType::Int</span> =&gt; <span class="string">&quot;Int&quot;</span>,
-            <span class="ident">ScalarType::BigInt</span> =&gt; <span class="string">&quot;BigInt&quot;</span>,
-            <span class="ident">ScalarType::Float</span> =&gt; <span class="string">&quot;Float&quot;</span>,
-            <span class="ident">ScalarType::Boolean</span> =&gt; <span class="string">&quot;Boolean&quot;</span>,
-            <span class="ident">ScalarType::String</span> =&gt; <span class="string">&quot;String&quot;</span>,
-            <span class="ident">ScalarType::DateTime</span> =&gt; <span class="string">&quot;DateTime&quot;</span>,
-            <span class="ident">ScalarType::Json</span> =&gt; <span class="string">&quot;Json&quot;</span>,
-            <span class="ident">ScalarType::Bytes</span> =&gt; <span class="string">&quot;Bytes&quot;</span>,
-            <span class="ident">ScalarType::Decimal</span> =&gt; <span class="string">&quot;Decimal&quot;</span>,
+<span class="kw">impl </span>AsRef&lt;str&gt; <span class="kw">for </span>ScalarType {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw">match </span><span class="self">self </span>{
+            ScalarType::Int =&gt; <span class="string">&quot;Int&quot;</span>,
+            ScalarType::BigInt =&gt; <span class="string">&quot;BigInt&quot;</span>,
+            ScalarType::Float =&gt; <span class="string">&quot;Float&quot;</span>,
+            ScalarType::Boolean =&gt; <span class="string">&quot;Boolean&quot;</span>,
+            ScalarType::String =&gt; <span class="string">&quot;String&quot;</span>,
+            ScalarType::DateTime =&gt; <span class="string">&quot;DateTime&quot;</span>,
+            ScalarType::Json =&gt; <span class="string">&quot;Json&quot;</span>,
+            ScalarType::Bytes =&gt; <span class="string">&quot;Bytes&quot;</span>,
+            ScalarType::Decimal =&gt; <span class="string">&quot;Decimal&quot;</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ScalarType</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="self">self</span>.<span class="ident">as_ref</span>().<span class="ident">fmt</span>(<span class="ident">f</span>)
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>ScalarType {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="self">self</span>.as_ref().fmt(f)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="dml" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="dml" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

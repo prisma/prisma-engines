@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bitvec-1.0.1/src/field.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>field.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../bitvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../bitvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../bitvec/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bitvec-1.0.1/src/field.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>field.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../bitvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../bitvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../bitvec/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -636,511 +636,511 @@
 <span id="636">636</span>
 <span id="637">637</span>
 <span id="638">638</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field.md&quot;</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![doc = <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field.md&quot;</span>)]
 
-<span class="kw">use</span> <span class="ident">core</span>::{
-	<span class="ident">mem</span>,
-	<span class="ident">ptr</span>,
+</span><span class="kw">use </span>core::{
+	mem,
+	ptr,
 };
 
-<span class="kw">use</span> <span class="ident">funty::Integral</span>;
-<span class="kw">use</span> <span class="ident">tap::Pipe</span>;
-<span class="kw">use</span> <span class="ident">wyz::comu</span>::{
-	<span class="ident">Const</span>,
-	<span class="ident">Mut</span>,
+<span class="kw">use </span>funty::Integral;
+<span class="kw">use </span>tap::Pipe;
+<span class="kw">use </span>wyz::comu::{
+	Const,
+	Mut,
 };
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-	<span class="ident">array::BitArray</span>,
-	<span class="ident">devel</span> <span class="kw">as</span> <span class="ident">dvl</span>,
-	<span class="ident">domain</span>::{
-		<span class="ident">Domain</span>,
-		<span class="ident">PartialElement</span>,
+<span class="kw">use crate</span>::{
+	array::BitArray,
+	devel <span class="kw">as </span>dvl,
+	domain::{
+		Domain,
+		PartialElement,
 	},
-	<span class="ident">mem::bits_of</span>,
-	<span class="ident">order</span>::{
-		<span class="ident">BitOrder</span>,
-		<span class="ident">Lsb0</span>,
-		<span class="ident">Msb0</span>,
+	mem::bits_of,
+	order::{
+		BitOrder,
+		Lsb0,
+		Msb0,
 	},
-	<span class="ident">slice::BitSlice</span>,
-	<span class="ident">store::BitStore</span>,
-	<span class="ident">view::BitViewSized</span>,
+	slice::BitSlice,
+	store::BitStore,
+	view::BitViewSized,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::{
-	<span class="ident">boxed::BitBox</span>,
-	<span class="ident">vec::BitVec</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">use crate</span>::{
+	boxed::BitBox,
+	vec::BitVec,
 };
 
-<span class="kw">mod</span> <span class="ident">io</span>;
-<span class="kw">mod</span> <span class="ident">tests</span>;
+<span class="kw">mod </span>io;
+<span class="kw">mod </span>tests;
 
-<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/BitField.md&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">BitField</span> {
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-	<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/BitField_load.md&quot;</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">load</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">I</span>
-	<span class="kw">where</span> <span class="ident">I</span>: <span class="ident">Integral</span> {
-		<span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">target_endian</span> <span class="op">=</span> <span class="string">&quot;little&quot;</span>) {
-			<span class="self">self</span>.<span class="ident">load_le</span>::<span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>()
+<span class="attribute">#[doc = <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/BitField.md&quot;</span>)]
+</span><span class="kw">pub trait </span>BitField {
+	<span class="attribute">#[inline]
+	#[cfg(not(tarpaulin_include))]
+	#[doc = <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/BitField_load.md&quot;</span>)]
+	</span><span class="kw">fn </span>load&lt;I&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; I
+	<span class="kw">where </span>I: Integral {
+		<span class="kw">if </span><span class="macro">cfg!</span>(target_endian = <span class="string">&quot;little&quot;</span>) {
+			<span class="self">self</span>.load_le::&lt;I&gt;()
 		}
-		<span class="kw">else</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">target_endian</span> <span class="op">=</span> <span class="string">&quot;big&quot;</span>) {
-			<span class="self">self</span>.<span class="ident">load_be</span>::<span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>()
+		<span class="kw">else if </span><span class="macro">cfg!</span>(target_endian = <span class="string">&quot;big&quot;</span>) {
+			<span class="self">self</span>.load_be::&lt;I&gt;()
 		}
-		<span class="kw">else</span> {
-			<span class="kw">match</span> <span class="macro">option_env!</span>(<span class="string">&quot;CARGO_PKG_REPOSITORY&quot;</span>) {
-				<span class="prelude-val">Some</span>(<span class="ident">env</span>) =&gt; <span class="macro">unreachable!</span>(
+		<span class="kw">else </span>{
+			<span class="kw">match </span><span class="macro">option_env!</span>(<span class="string">&quot;CARGO_PKG_REPOSITORY&quot;</span>) {
+				<span class="prelude-val">Some</span>(env) =&gt; <span class="macro">unreachable!</span>(
 					<span class="string">&quot;This architecture is not supported! Please consider \
 					 filing an issue at {}&quot;</span>,
-					<span class="ident">env</span>
+					env
 				),
-				<span class="prelude-val">None</span> =&gt; <span class="macro">unreachable!</span>(
+				<span class="prelude-val">None </span>=&gt; <span class="macro">unreachable!</span>(
 					<span class="string">&quot;This architecture is not supported! Please consider \
-					 filing an issue&quot;</span>
-				),
+					 filing an issue&quot;
+				</span>),
 			}
 		}
 	}
 
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-	<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/BitField_store.md&quot;</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">store</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">I</span>)
-	<span class="kw">where</span> <span class="ident">I</span>: <span class="ident">Integral</span> {
-		<span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">target_endian</span> <span class="op">=</span> <span class="string">&quot;little&quot;</span>) {
-			<span class="self">self</span>.<span class="ident">store_le</span>::<span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">value</span>);
+	<span class="attribute">#[inline]
+	#[cfg(not(tarpaulin_include))]
+	#[doc = <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/BitField_store.md&quot;</span>)]
+	</span><span class="kw">fn </span>store&lt;I&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: I)
+	<span class="kw">where </span>I: Integral {
+		<span class="kw">if </span><span class="macro">cfg!</span>(target_endian = <span class="string">&quot;little&quot;</span>) {
+			<span class="self">self</span>.store_le::&lt;I&gt;(value);
 		}
-		<span class="kw">else</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">target_endian</span> <span class="op">=</span> <span class="string">&quot;big&quot;</span>) {
-			<span class="self">self</span>.<span class="ident">store_be</span>::<span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">value</span>);
+		<span class="kw">else if </span><span class="macro">cfg!</span>(target_endian = <span class="string">&quot;big&quot;</span>) {
+			<span class="self">self</span>.store_be::&lt;I&gt;(value);
 		}
-		<span class="kw">else</span> {
-			<span class="kw">match</span> <span class="macro">option_env!</span>(<span class="string">&quot;CARGO_PKG_REPOSITORY&quot;</span>) {
-				<span class="prelude-val">Some</span>(<span class="ident">env</span>) =&gt; <span class="macro">unreachable!</span>(
+		<span class="kw">else </span>{
+			<span class="kw">match </span><span class="macro">option_env!</span>(<span class="string">&quot;CARGO_PKG_REPOSITORY&quot;</span>) {
+				<span class="prelude-val">Some</span>(env) =&gt; <span class="macro">unreachable!</span>(
 					<span class="string">&quot;This architecture is not supported! Please consider \
 					 filing an issue at {}&quot;</span>,
-					<span class="ident">env</span>
+					env
 				),
-				<span class="prelude-val">None</span> =&gt; <span class="macro">unreachable!</span>(
+				<span class="prelude-val">None </span>=&gt; <span class="macro">unreachable!</span>(
 					<span class="string">&quot;This architecture is not supported! Please consider \
-					 filing an issue&quot;</span>
-				),
+					 filing an issue&quot;
+				</span>),
 			}
 		}
 	}
 
-	<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/BitField_load_le.md&quot;</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">load_le</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">I</span>
-	<span class="kw">where</span> <span class="ident">I</span>: <span class="ident">Integral</span>;
+	<span class="attribute">#[doc = <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/BitField_load_le.md&quot;</span>)]
+	</span><span class="kw">fn </span>load_le&lt;I&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; I
+	<span class="kw">where </span>I: Integral;
 
-	<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/BitField_load_be.md&quot;</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">load_be</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">I</span>
-	<span class="kw">where</span> <span class="ident">I</span>: <span class="ident">Integral</span>;
+	<span class="attribute">#[doc = <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/BitField_load_be.md&quot;</span>)]
+	</span><span class="kw">fn </span>load_be&lt;I&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; I
+	<span class="kw">where </span>I: Integral;
 
-	<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/BitField_store_le.md&quot;</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">store_le</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">I</span>)
-	<span class="kw">where</span> <span class="ident">I</span>: <span class="ident">Integral</span>;
+	<span class="attribute">#[doc = <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/BitField_store_le.md&quot;</span>)]
+	</span><span class="kw">fn </span>store_le&lt;I&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: I)
+	<span class="kw">where </span>I: Integral;
 
-	<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/BitField_store_be.md&quot;</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">store_be</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">I</span>)
-	<span class="kw">where</span> <span class="ident">I</span>: <span class="ident">Integral</span>;
+	<span class="attribute">#[doc = <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/BitField_store_be.md&quot;</span>)]
+	</span><span class="kw">fn </span>store_be&lt;I&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: I)
+	<span class="kw">where </span>I: Integral;
 }
 
-<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/BitField_Lsb0.md&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">BitField</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Lsb0</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">T</span>: <span class="ident">BitStore</span>
+<span class="attribute">#[doc = <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/BitField_Lsb0.md&quot;</span>)]
+</span><span class="kw">impl</span>&lt;T&gt; BitField <span class="kw">for </span>BitSlice&lt;T, Lsb0&gt;
+<span class="kw">where </span>T: BitStore
 {
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/BitField_Lsb0_load_le.md&quot;</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">load_le</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">I</span>
-	<span class="kw">where</span> <span class="ident">I</span>: <span class="ident">Integral</span> {
-		<span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
-		<span class="ident">check</span>::<span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="string">&quot;load&quot;</span>, <span class="ident">len</span>);
+	<span class="attribute">#[inline]
+	#[doc = <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/BitField_Lsb0_load_le.md&quot;</span>)]
+	</span><span class="kw">fn </span>load_le&lt;I&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; I
+	<span class="kw">where </span>I: Integral {
+		<span class="kw">let </span>len = <span class="self">self</span>.len();
+		check::&lt;I&gt;(<span class="string">&quot;load&quot;</span>, len);
 
-		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">domain</span>() {
-			<span class="comment">//  In Lsb0, the head counts distance from LSedge to first live bit.</span>
-			<span class="ident">Domain::Enclave</span>(<span class="ident">elem</span>) =&gt; <span class="ident">get</span>(<span class="ident">elem</span>, <span class="ident">elem</span>.<span class="ident">head</span>().<span class="ident">into_inner</span>()),
-			<span class="ident">Domain::Region</span> { <span class="ident">head</span>, <span class="ident">body</span>, <span class="ident">tail</span> } =&gt; {
-				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">accum</span> <span class="op">=</span> <span class="ident">I::ZERO</span>;
+		<span class="kw">match </span><span class="self">self</span>.domain() {
+			<span class="comment">//  In Lsb0, the head counts distance from LSedge to first live bit.
+			</span>Domain::Enclave(elem) =&gt; get(elem, elem.head().into_inner()),
+			Domain::Region { head, body, tail } =&gt; {
+				<span class="kw">let </span><span class="kw-2">mut </span>accum = I::ZERO;
 
-				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">elem</span>) <span class="op">=</span> <span class="ident">tail</span> {
-					<span class="ident">accum</span> <span class="op">=</span> <span class="ident">get</span>(<span class="ident">elem</span>, <span class="number">0</span>);
+				<span class="kw">if let </span><span class="prelude-val">Some</span>(elem) = tail {
+					accum = get(elem, <span class="number">0</span>);
 				}
 
-				<span class="kw">for</span> <span class="ident">elem</span> <span class="kw">in</span> <span class="ident">body</span>.<span class="ident">iter</span>().<span class="ident">rev</span>().<span class="ident">map</span>(<span class="ident">BitStore::load_value</span>) {
-					<span class="ident">maybe_shift_left</span>(<span class="kw-2">&amp;mut</span> <span class="ident">accum</span>, <span class="ident">bits_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>());
-					<span class="ident">accum</span> <span class="op">|</span><span class="op">=</span> <span class="ident">resize</span>::<span class="op">&lt;</span><span class="ident">T::Mem</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">elem</span>);
+				<span class="kw">for </span>elem <span class="kw">in </span>body.iter().rev().map(BitStore::load_value) {
+					maybe_shift_left(<span class="kw-2">&amp;mut </span>accum, bits_of::&lt;T&gt;());
+					accum |= resize::&lt;T::Mem, I&gt;(elem);
 				}
 
-				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">elem</span>) <span class="op">=</span> <span class="ident">head</span> {
-					<span class="kw">let</span> <span class="ident">shamt</span> <span class="op">=</span> <span class="ident">elem</span>.<span class="ident">head</span>().<span class="ident">into_inner</span>();
-					<span class="ident">maybe_shift_left</span>(
-						<span class="kw-2">&amp;mut</span> <span class="ident">accum</span>,
-						<span class="ident">bits_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="op">-</span> <span class="ident">shamt</span> <span class="kw">as</span> <span class="ident">usize</span>,
+				<span class="kw">if let </span><span class="prelude-val">Some</span>(elem) = head {
+					<span class="kw">let </span>shamt = elem.head().into_inner();
+					maybe_shift_left(
+						<span class="kw-2">&amp;mut </span>accum,
+						bits_of::&lt;T&gt;() - shamt <span class="kw">as </span>usize,
 					);
-					<span class="ident">accum</span> <span class="op">|</span><span class="op">=</span> <span class="ident">get</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">elem</span>, <span class="ident">shamt</span>);
+					accum |= get::&lt;<span class="kw">_</span>, <span class="kw">_</span>, I&gt;(elem, shamt);
 				}
 
-				<span class="ident">accum</span>
+				accum
 			},
 		}
-		.<span class="ident">pipe</span>(<span class="op">|</span><span class="ident">elem</span><span class="op">|</span> <span class="ident">sign</span>(<span class="ident">elem</span>, <span class="ident">len</span>))
+		.pipe(|elem| sign(elem, len))
 	}
 
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/BitField_Lsb0_load_be.md&quot;</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">load_be</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">I</span>
-	<span class="kw">where</span> <span class="ident">I</span>: <span class="ident">Integral</span> {
-		<span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
-		<span class="ident">check</span>::<span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="string">&quot;load&quot;</span>, <span class="ident">len</span>);
+	<span class="attribute">#[inline]
+	#[doc = <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/BitField_Lsb0_load_be.md&quot;</span>)]
+	</span><span class="kw">fn </span>load_be&lt;I&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; I
+	<span class="kw">where </span>I: Integral {
+		<span class="kw">let </span>len = <span class="self">self</span>.len();
+		check::&lt;I&gt;(<span class="string">&quot;load&quot;</span>, len);
 
-		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">domain</span>() {
-			<span class="ident">Domain::Enclave</span>(<span class="ident">elem</span>) =&gt; <span class="ident">get</span>(<span class="ident">elem</span>, <span class="ident">elem</span>.<span class="ident">head</span>().<span class="ident">into_inner</span>()),
-			<span class="ident">Domain::Region</span> { <span class="ident">head</span>, <span class="ident">body</span>, <span class="ident">tail</span> } =&gt; {
-				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">accum</span> <span class="op">=</span> <span class="ident">I::ZERO</span>;
+		<span class="kw">match </span><span class="self">self</span>.domain() {
+			Domain::Enclave(elem) =&gt; get(elem, elem.head().into_inner()),
+			Domain::Region { head, body, tail } =&gt; {
+				<span class="kw">let </span><span class="kw-2">mut </span>accum = I::ZERO;
 
-				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">elem</span>) <span class="op">=</span> <span class="ident">head</span> {
-					<span class="ident">accum</span> <span class="op">=</span> <span class="ident">get</span>(<span class="ident">elem</span>, <span class="ident">elem</span>.<span class="ident">head</span>().<span class="ident">into_inner</span>());
+				<span class="kw">if let </span><span class="prelude-val">Some</span>(elem) = head {
+					accum = get(elem, elem.head().into_inner());
 				}
 
-				<span class="kw">for</span> <span class="ident">elem</span> <span class="kw">in</span> <span class="ident">body</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">BitStore::load_value</span>) {
-					<span class="ident">maybe_shift_left</span>(<span class="kw-2">&amp;mut</span> <span class="ident">accum</span>, <span class="ident">bits_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>());
-					<span class="ident">accum</span> <span class="op">|</span><span class="op">=</span> <span class="ident">resize</span>::<span class="op">&lt;</span><span class="ident">T::Mem</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">elem</span>);
+				<span class="kw">for </span>elem <span class="kw">in </span>body.iter().map(BitStore::load_value) {
+					maybe_shift_left(<span class="kw-2">&amp;mut </span>accum, bits_of::&lt;T&gt;());
+					accum |= resize::&lt;T::Mem, I&gt;(elem);
 				}
 
-				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">elem</span>) <span class="op">=</span> <span class="ident">tail</span> {
-					<span class="kw">let</span> <span class="ident">shamt</span> <span class="op">=</span> <span class="ident">elem</span>.<span class="ident">tail</span>().<span class="ident">into_inner</span>() <span class="kw">as</span> <span class="ident">usize</span>;
-					<span class="ident">maybe_shift_left</span>(<span class="kw-2">&amp;mut</span> <span class="ident">accum</span>, <span class="ident">shamt</span>);
-					<span class="ident">accum</span> <span class="op">|</span><span class="op">=</span> <span class="ident">get</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">elem</span>, <span class="number">0</span>);
+				<span class="kw">if let </span><span class="prelude-val">Some</span>(elem) = tail {
+					<span class="kw">let </span>shamt = elem.tail().into_inner() <span class="kw">as </span>usize;
+					maybe_shift_left(<span class="kw-2">&amp;mut </span>accum, shamt);
+					accum |= get::&lt;<span class="kw">_</span>, <span class="kw">_</span>, I&gt;(elem, <span class="number">0</span>);
 				}
 
-				<span class="ident">accum</span>
+				accum
 			},
 		}
-		.<span class="ident">pipe</span>(<span class="op">|</span><span class="ident">elem</span><span class="op">|</span> <span class="ident">sign</span>(<span class="ident">elem</span>, <span class="ident">len</span>))
+		.pipe(|elem| sign(elem, len))
 	}
 
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/BitField_Lsb0_store_le.md&quot;</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">store_le</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">value</span>: <span class="ident">I</span>)
-	<span class="kw">where</span> <span class="ident">I</span>: <span class="ident">Integral</span> {
-		<span class="ident">check</span>::<span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="string">&quot;store&quot;</span>, <span class="self">self</span>.<span class="ident">len</span>());
+	<span class="attribute">#[inline]
+	#[doc = <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/BitField_Lsb0_store_le.md&quot;</span>)]
+	</span><span class="kw">fn </span>store_le&lt;I&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>value: I)
+	<span class="kw">where </span>I: Integral {
+		check::&lt;I&gt;(<span class="string">&quot;store&quot;</span>, <span class="self">self</span>.len());
 
-		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">domain_mut</span>() {
-			<span class="ident">Domain::Enclave</span>(<span class="ident">elem</span>) =&gt; {
-				<span class="kw">let</span> <span class="ident">shamt</span> <span class="op">=</span> <span class="ident">elem</span>.<span class="ident">head</span>().<span class="ident">into_inner</span>();
-				<span class="ident">set</span>(<span class="ident">elem</span>, <span class="ident">value</span>, <span class="ident">shamt</span>);
+		<span class="kw">match </span><span class="self">self</span>.domain_mut() {
+			Domain::Enclave(elem) =&gt; {
+				<span class="kw">let </span>shamt = elem.head().into_inner();
+				set(elem, value, shamt);
 			},
-			<span class="ident">Domain::Region</span> { <span class="ident">head</span>, <span class="ident">body</span>, <span class="ident">tail</span> } =&gt; {
-				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">elem</span>) <span class="op">=</span> <span class="ident">head</span> {
-					<span class="kw">let</span> <span class="ident">shamt</span> <span class="op">=</span> <span class="ident">elem</span>.<span class="ident">head</span>().<span class="ident">into_inner</span>();
-					<span class="ident">set</span>(<span class="ident">elem</span>, <span class="ident">value</span>, <span class="ident">shamt</span>);
-					<span class="kw">let</span> <span class="ident">rshamt</span> <span class="op">=</span> <span class="ident">bits_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="op">-</span> <span class="ident">shamt</span> <span class="kw">as</span> <span class="ident">usize</span>;
-					<span class="ident">maybe_shift_right</span>(<span class="kw-2">&amp;mut</span> <span class="ident">value</span>, <span class="ident">rshamt</span>);
+			Domain::Region { head, body, tail } =&gt; {
+				<span class="kw">if let </span><span class="prelude-val">Some</span>(elem) = head {
+					<span class="kw">let </span>shamt = elem.head().into_inner();
+					set(elem, value, shamt);
+					<span class="kw">let </span>rshamt = bits_of::&lt;T&gt;() - shamt <span class="kw">as </span>usize;
+					maybe_shift_right(<span class="kw-2">&amp;mut </span>value, rshamt);
 				}
 
-				<span class="kw">for</span> <span class="ident">elem</span> <span class="kw">in</span> <span class="ident">body</span>.<span class="ident">iter_mut</span>() {
-					<span class="ident">elem</span>.<span class="ident">store_value</span>(<span class="ident">resize</span>(<span class="ident">value</span>));
-					<span class="ident">maybe_shift_right</span>(<span class="kw-2">&amp;mut</span> <span class="ident">value</span>, <span class="ident">bits_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>());
+				<span class="kw">for </span>elem <span class="kw">in </span>body.iter_mut() {
+					elem.store_value(resize(value));
+					maybe_shift_right(<span class="kw-2">&amp;mut </span>value, bits_of::&lt;T&gt;());
 				}
 
-				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">elem</span>) <span class="op">=</span> <span class="ident">tail</span> {
-					<span class="ident">set</span>(<span class="ident">elem</span>, <span class="ident">value</span>, <span class="number">0</span>);
-				}
-			},
-		}
-	}
-
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/BitField_Lsb0_store_be.md&quot;</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">store_be</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">value</span>: <span class="ident">I</span>)
-	<span class="kw">where</span> <span class="ident">I</span>: <span class="ident">Integral</span> {
-		<span class="ident">check</span>::<span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="string">&quot;store&quot;</span>, <span class="self">self</span>.<span class="ident">len</span>());
-
-		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">domain_mut</span>() {
-			<span class="ident">Domain::Enclave</span>(<span class="ident">elem</span>) =&gt; {
-				<span class="kw">let</span> <span class="ident">shamt</span> <span class="op">=</span> <span class="ident">elem</span>.<span class="ident">head</span>().<span class="ident">into_inner</span>();
-				<span class="ident">set</span>(<span class="ident">elem</span>, <span class="ident">value</span>, <span class="ident">shamt</span>);
-			},
-			<span class="ident">Domain::Region</span> { <span class="ident">head</span>, <span class="ident">body</span>, <span class="ident">tail</span> } =&gt; {
-				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">elem</span>) <span class="op">=</span> <span class="ident">tail</span> {
-					<span class="kw">let</span> <span class="ident">shamt</span> <span class="op">=</span> <span class="ident">elem</span>.<span class="ident">tail</span>().<span class="ident">into_inner</span>() <span class="kw">as</span> <span class="ident">usize</span>;
-					<span class="ident">set</span>(<span class="ident">elem</span>, <span class="ident">value</span>, <span class="number">0</span>);
-					<span class="ident">maybe_shift_right</span>(<span class="kw-2">&amp;mut</span> <span class="ident">value</span>, <span class="ident">shamt</span>);
-				}
-
-				<span class="kw">for</span> <span class="ident">elem</span> <span class="kw">in</span> <span class="ident">body</span>.<span class="ident">iter_mut</span>().<span class="ident">rev</span>() {
-					<span class="ident">elem</span>.<span class="ident">store_value</span>(<span class="ident">resize</span>(<span class="ident">value</span>));
-					<span class="ident">maybe_shift_right</span>(<span class="kw-2">&amp;mut</span> <span class="ident">value</span>, <span class="ident">bits_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>());
-				}
-
-				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">elem</span>) <span class="op">=</span> <span class="ident">head</span> {
-					<span class="kw">let</span> <span class="ident">shamt</span> <span class="op">=</span> <span class="ident">elem</span>.<span class="ident">head</span>().<span class="ident">into_inner</span>();
-					<span class="ident">set</span>(<span class="ident">elem</span>, <span class="ident">value</span>, <span class="ident">shamt</span>);
-				}
-			},
-		}
-	}
-}
-
-<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/BitField_Msb0.md&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">BitField</span> <span class="kw">for</span> <span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Msb0</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">T</span>: <span class="ident">BitStore</span>
-{
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/BitField_Msb0_load_le.md&quot;</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">load_le</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">I</span>
-	<span class="kw">where</span> <span class="ident">I</span>: <span class="ident">Integral</span> {
-		<span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
-		<span class="ident">check</span>::<span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="string">&quot;load&quot;</span>, <span class="ident">len</span>);
-
-		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">domain</span>() {
-			<span class="ident">Domain::Enclave</span>(<span class="ident">elem</span>) =&gt; {
-				<span class="kw">let</span> <span class="ident">shamt</span> <span class="op">=</span> <span class="ident">bits_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="ident">u8</span> <span class="op">-</span> <span class="ident">elem</span>.<span class="ident">tail</span>().<span class="ident">into_inner</span>();
-				<span class="ident">get</span>(<span class="ident">elem</span>, <span class="ident">shamt</span>)
-			},
-			<span class="ident">Domain::Region</span> { <span class="ident">head</span>, <span class="ident">body</span>, <span class="ident">tail</span> } =&gt; {
-				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">accum</span> <span class="op">=</span> <span class="ident">I::ZERO</span>;
-
-				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">elem</span>) <span class="op">=</span> <span class="ident">tail</span> {
-					<span class="kw">let</span> <span class="ident">shamt</span> <span class="op">=</span> <span class="ident">bits_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="ident">u8</span> <span class="op">-</span> <span class="ident">elem</span>.<span class="ident">tail</span>().<span class="ident">into_inner</span>();
-					<span class="ident">accum</span> <span class="op">=</span> <span class="ident">get</span>(<span class="ident">elem</span>, <span class="ident">shamt</span>);
-				}
-
-				<span class="kw">for</span> <span class="ident">elem</span> <span class="kw">in</span> <span class="ident">body</span>.<span class="ident">iter</span>().<span class="ident">rev</span>().<span class="ident">map</span>(<span class="ident">BitStore::load_value</span>) {
-					<span class="ident">maybe_shift_left</span>(<span class="kw-2">&amp;mut</span> <span class="ident">accum</span>, <span class="ident">bits_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>());
-					<span class="ident">accum</span> <span class="op">|</span><span class="op">=</span> <span class="ident">resize</span>::<span class="op">&lt;</span><span class="ident">T::Mem</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">elem</span>);
-				}
-
-				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">elem</span>) <span class="op">=</span> <span class="ident">head</span> {
-					<span class="kw">let</span> <span class="ident">shamt</span> <span class="op">=</span>
-						<span class="ident">bits_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="op">-</span> <span class="ident">elem</span>.<span class="ident">head</span>().<span class="ident">into_inner</span>() <span class="kw">as</span> <span class="ident">usize</span>;
-					<span class="ident">maybe_shift_left</span>(<span class="kw-2">&amp;mut</span> <span class="ident">accum</span>, <span class="ident">shamt</span>);
-					<span class="ident">accum</span> <span class="op">|</span><span class="op">=</span> <span class="ident">get</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">elem</span>, <span class="number">0</span>);
-				}
-
-				<span class="ident">accum</span>
-			},
-		}
-		.<span class="ident">pipe</span>(<span class="op">|</span><span class="ident">elem</span><span class="op">|</span> <span class="ident">sign</span>(<span class="ident">elem</span>, <span class="ident">len</span>))
-	}
-
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/BitField_Msb0_load_be.md&quot;</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">load_be</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">I</span>
-	<span class="kw">where</span> <span class="ident">I</span>: <span class="ident">Integral</span> {
-		<span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
-		<span class="ident">check</span>::<span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="string">&quot;load&quot;</span>, <span class="ident">len</span>);
-
-		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">domain</span>() {
-			<span class="ident">Domain::Enclave</span>(<span class="ident">elem</span>) =&gt; {
-				<span class="kw">let</span> <span class="ident">shamt</span> <span class="op">=</span> <span class="ident">bits_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="ident">u8</span> <span class="op">-</span> <span class="ident">elem</span>.<span class="ident">tail</span>().<span class="ident">into_inner</span>();
-				<span class="ident">get</span>(<span class="ident">elem</span>, <span class="ident">shamt</span>)
-			},
-			<span class="ident">Domain::Region</span> { <span class="ident">head</span>, <span class="ident">body</span>, <span class="ident">tail</span> } =&gt; {
-				<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">accum</span> <span class="op">=</span> <span class="ident">I::ZERO</span>;
-
-				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">elem</span>) <span class="op">=</span> <span class="ident">head</span> {
-					<span class="ident">accum</span> <span class="op">=</span> <span class="ident">get</span>(<span class="ident">elem</span>, <span class="number">0</span>);
-				}
-
-				<span class="kw">for</span> <span class="ident">elem</span> <span class="kw">in</span> <span class="ident">body</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">BitStore::load_value</span>) {
-					<span class="ident">maybe_shift_left</span>(<span class="kw-2">&amp;mut</span> <span class="ident">accum</span>, <span class="ident">bits_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>());
-					<span class="ident">accum</span> <span class="op">|</span><span class="op">=</span> <span class="ident">resize</span>::<span class="op">&lt;</span><span class="ident">T::Mem</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">elem</span>);
-				}
-
-				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">elem</span>) <span class="op">=</span> <span class="ident">tail</span> {
-					<span class="kw">let</span> <span class="ident">shamt</span> <span class="op">=</span> <span class="ident">elem</span>.<span class="ident">tail</span>().<span class="ident">into_inner</span>();
-					<span class="ident">maybe_shift_left</span>(<span class="kw-2">&amp;mut</span> <span class="ident">accum</span>, <span class="ident">shamt</span> <span class="kw">as</span> <span class="ident">usize</span>);
-					<span class="ident">accum</span> <span class="op">|</span><span class="op">=</span> <span class="ident">get</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">elem</span>, <span class="ident">bits_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="ident">u8</span> <span class="op">-</span> <span class="ident">shamt</span>);
-				}
-
-				<span class="ident">accum</span>
-			},
-		}
-		.<span class="ident">pipe</span>(<span class="op">|</span><span class="ident">elem</span><span class="op">|</span> <span class="ident">sign</span>(<span class="ident">elem</span>, <span class="ident">len</span>))
-	}
-
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/BitField_Msb0_store_le.md&quot;</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">store_le</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">value</span>: <span class="ident">I</span>)
-	<span class="kw">where</span> <span class="ident">I</span>: <span class="ident">Integral</span> {
-		<span class="ident">check</span>::<span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="string">&quot;store&quot;</span>, <span class="self">self</span>.<span class="ident">len</span>());
-
-		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">domain_mut</span>() {
-			<span class="ident">Domain::Enclave</span>(<span class="ident">elem</span>) =&gt; {
-				<span class="kw">let</span> <span class="ident">shamt</span> <span class="op">=</span> <span class="ident">bits_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="ident">u8</span> <span class="op">-</span> <span class="ident">elem</span>.<span class="ident">tail</span>().<span class="ident">into_inner</span>();
-				<span class="ident">set</span>(<span class="ident">elem</span>, <span class="ident">value</span>, <span class="ident">shamt</span>);
-			},
-			<span class="ident">Domain::Region</span> { <span class="ident">head</span>, <span class="ident">body</span>, <span class="ident">tail</span> } =&gt; {
-				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">elem</span>) <span class="op">=</span> <span class="ident">head</span> {
-					<span class="kw">let</span> <span class="ident">shamt</span> <span class="op">=</span>
-						<span class="ident">bits_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="op">-</span> <span class="ident">elem</span>.<span class="ident">head</span>().<span class="ident">into_inner</span>() <span class="kw">as</span> <span class="ident">usize</span>;
-					<span class="ident">set</span>(<span class="ident">elem</span>, <span class="ident">value</span>, <span class="number">0</span>);
-					<span class="ident">maybe_shift_right</span>(<span class="kw-2">&amp;mut</span> <span class="ident">value</span>, <span class="ident">shamt</span>);
-				}
-
-				<span class="kw">for</span> <span class="ident">elem</span> <span class="kw">in</span> <span class="ident">body</span>.<span class="ident">iter_mut</span>() {
-					<span class="ident">elem</span>.<span class="ident">store_value</span>(<span class="ident">resize</span>(<span class="ident">value</span>));
-					<span class="ident">maybe_shift_right</span>(<span class="kw-2">&amp;mut</span> <span class="ident">value</span>, <span class="ident">bits_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>());
-				}
-
-				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">elem</span>) <span class="op">=</span> <span class="ident">tail</span> {
-					<span class="kw">let</span> <span class="ident">shamt</span> <span class="op">=</span> <span class="ident">bits_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="ident">u8</span> <span class="op">-</span> <span class="ident">elem</span>.<span class="ident">tail</span>().<span class="ident">into_inner</span>();
-					<span class="ident">set</span>(<span class="ident">elem</span>, <span class="ident">value</span>, <span class="ident">shamt</span>);
+				<span class="kw">if let </span><span class="prelude-val">Some</span>(elem) = tail {
+					set(elem, value, <span class="number">0</span>);
 				}
 			},
 		}
 	}
 
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/BitField_Msb0_store_be.md&quot;</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">store_be</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">value</span>: <span class="ident">I</span>)
-	<span class="kw">where</span> <span class="ident">I</span>: <span class="ident">Integral</span> {
-		<span class="ident">check</span>::<span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="string">&quot;store&quot;</span>, <span class="self">self</span>.<span class="ident">len</span>());
+	<span class="attribute">#[inline]
+	#[doc = <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/BitField_Lsb0_store_be.md&quot;</span>)]
+	</span><span class="kw">fn </span>store_be&lt;I&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>value: I)
+	<span class="kw">where </span>I: Integral {
+		check::&lt;I&gt;(<span class="string">&quot;store&quot;</span>, <span class="self">self</span>.len());
 
-		<span class="kw">match</span> <span class="self">self</span>.<span class="ident">domain_mut</span>() {
-			<span class="ident">Domain::Enclave</span>(<span class="ident">elem</span>) =&gt; {
-				<span class="kw">let</span> <span class="ident">shamt</span> <span class="op">=</span> <span class="ident">bits_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="ident">u8</span> <span class="op">-</span> <span class="ident">elem</span>.<span class="ident">tail</span>().<span class="ident">into_inner</span>();
-				<span class="ident">set</span>(<span class="ident">elem</span>, <span class="ident">value</span>, <span class="ident">shamt</span>);
+		<span class="kw">match </span><span class="self">self</span>.domain_mut() {
+			Domain::Enclave(elem) =&gt; {
+				<span class="kw">let </span>shamt = elem.head().into_inner();
+				set(elem, value, shamt);
 			},
-			<span class="ident">Domain::Region</span> { <span class="ident">head</span>, <span class="ident">body</span>, <span class="ident">tail</span> } =&gt; {
-				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">elem</span>) <span class="op">=</span> <span class="ident">tail</span> {
-					<span class="kw">let</span> <span class="ident">tail</span> <span class="op">=</span> <span class="ident">elem</span>.<span class="ident">tail</span>().<span class="ident">into_inner</span>() <span class="kw">as</span> <span class="ident">usize</span>;
-					<span class="kw">let</span> <span class="ident">shamt</span> <span class="op">=</span> <span class="ident">bits_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="op">-</span> <span class="ident">tail</span>;
-					<span class="ident">set</span>(<span class="ident">elem</span>, <span class="ident">value</span>, <span class="ident">shamt</span> <span class="kw">as</span> <span class="ident">u8</span>);
-					<span class="ident">maybe_shift_right</span>(<span class="kw-2">&amp;mut</span> <span class="ident">value</span>, <span class="ident">tail</span>);
+			Domain::Region { head, body, tail } =&gt; {
+				<span class="kw">if let </span><span class="prelude-val">Some</span>(elem) = tail {
+					<span class="kw">let </span>shamt = elem.tail().into_inner() <span class="kw">as </span>usize;
+					set(elem, value, <span class="number">0</span>);
+					maybe_shift_right(<span class="kw-2">&amp;mut </span>value, shamt);
 				}
 
-				<span class="kw">for</span> <span class="ident">elem</span> <span class="kw">in</span> <span class="ident">body</span>.<span class="ident">iter_mut</span>().<span class="ident">rev</span>() {
-					<span class="ident">elem</span>.<span class="ident">store_value</span>(<span class="ident">resize</span>(<span class="ident">value</span>));
-					<span class="ident">maybe_shift_right</span>(<span class="kw-2">&amp;mut</span> <span class="ident">value</span>, <span class="ident">bits_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>());
+				<span class="kw">for </span>elem <span class="kw">in </span>body.iter_mut().rev() {
+					elem.store_value(resize(value));
+					maybe_shift_right(<span class="kw-2">&amp;mut </span>value, bits_of::&lt;T&gt;());
 				}
 
-				<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">elem</span>) <span class="op">=</span> <span class="ident">head</span> {
-					<span class="ident">set</span>(<span class="ident">elem</span>, <span class="ident">value</span>, <span class="number">0</span>);
+				<span class="kw">if let </span><span class="prelude-val">Some</span>(elem) = head {
+					<span class="kw">let </span>shamt = elem.head().into_inner();
+					set(elem, value, shamt);
 				}
 			},
 		}
 	}
 }
 
-<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/impl_BitArray.md&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">BitField</span> <span class="kw">for</span> <span class="ident">BitArray</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">A</span>: <span class="ident">BitViewSized</span>,
-	<span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">A::Store</span>, <span class="ident">O</span><span class="op">&gt;</span>: <span class="ident">BitField</span>,
+<span class="attribute">#[doc = <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/BitField_Msb0.md&quot;</span>)]
+</span><span class="kw">impl</span>&lt;T&gt; BitField <span class="kw">for </span>BitSlice&lt;T, Msb0&gt;
+<span class="kw">where </span>T: BitStore
 {
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">load_le</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">I</span>
-	<span class="kw">where</span> <span class="ident">I</span>: <span class="ident">Integral</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">accum</span> <span class="op">=</span> <span class="ident">I::ZERO</span>;
+	<span class="attribute">#[inline]
+	#[doc = <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/BitField_Msb0_load_le.md&quot;</span>)]
+	</span><span class="kw">fn </span>load_le&lt;I&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; I
+	<span class="kw">where </span>I: Integral {
+		<span class="kw">let </span>len = <span class="self">self</span>.len();
+		check::&lt;I&gt;(<span class="string">&quot;load&quot;</span>, len);
 
-		<span class="kw">for</span> <span class="ident">elem</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">as_raw_slice</span>().<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">BitStore::load_value</span>).<span class="ident">rev</span>() {
-			<span class="ident">maybe_shift_left</span>(<span class="kw-2">&amp;mut</span> <span class="ident">accum</span>, <span class="ident">bits_of</span>::<span class="op">&lt;</span><span class="ident">A::Store</span><span class="op">&gt;</span>());
-			<span class="ident">accum</span> <span class="op">|</span><span class="op">=</span> <span class="ident">resize</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">elem</span>);
+		<span class="kw">match </span><span class="self">self</span>.domain() {
+			Domain::Enclave(elem) =&gt; {
+				<span class="kw">let </span>shamt = bits_of::&lt;T&gt;() <span class="kw">as </span>u8 - elem.tail().into_inner();
+				get(elem, shamt)
+			},
+			Domain::Region { head, body, tail } =&gt; {
+				<span class="kw">let </span><span class="kw-2">mut </span>accum = I::ZERO;
+
+				<span class="kw">if let </span><span class="prelude-val">Some</span>(elem) = tail {
+					<span class="kw">let </span>shamt = bits_of::&lt;T&gt;() <span class="kw">as </span>u8 - elem.tail().into_inner();
+					accum = get(elem, shamt);
+				}
+
+				<span class="kw">for </span>elem <span class="kw">in </span>body.iter().rev().map(BitStore::load_value) {
+					maybe_shift_left(<span class="kw-2">&amp;mut </span>accum, bits_of::&lt;T&gt;());
+					accum |= resize::&lt;T::Mem, I&gt;(elem);
+				}
+
+				<span class="kw">if let </span><span class="prelude-val">Some</span>(elem) = head {
+					<span class="kw">let </span>shamt =
+						bits_of::&lt;T&gt;() - elem.head().into_inner() <span class="kw">as </span>usize;
+					maybe_shift_left(<span class="kw-2">&amp;mut </span>accum, shamt);
+					accum |= get::&lt;<span class="kw">_</span>, <span class="kw">_</span>, I&gt;(elem, <span class="number">0</span>);
+				}
+
+				accum
+			},
 		}
-
-		<span class="ident">sign</span>(<span class="ident">accum</span>, <span class="self">self</span>.<span class="ident">len</span>())
+		.pipe(|elem| sign(elem, len))
 	}
 
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">load_be</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">I</span>
-	<span class="kw">where</span> <span class="ident">I</span>: <span class="ident">Integral</span> {
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">accum</span> <span class="op">=</span> <span class="ident">I::ZERO</span>;
+	<span class="attribute">#[inline]
+	#[doc = <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/BitField_Msb0_load_be.md&quot;</span>)]
+	</span><span class="kw">fn </span>load_be&lt;I&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; I
+	<span class="kw">where </span>I: Integral {
+		<span class="kw">let </span>len = <span class="self">self</span>.len();
+		check::&lt;I&gt;(<span class="string">&quot;load&quot;</span>, len);
 
-		<span class="kw">for</span> <span class="ident">elem</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">as_raw_slice</span>().<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">BitStore::load_value</span>) {
-			<span class="ident">maybe_shift_left</span>(<span class="kw-2">&amp;mut</span> <span class="ident">accum</span>, <span class="ident">bits_of</span>::<span class="op">&lt;</span><span class="ident">A::Store</span><span class="op">&gt;</span>());
-			<span class="ident">accum</span> <span class="op">|</span><span class="op">=</span> <span class="ident">resize</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">elem</span>);
+		<span class="kw">match </span><span class="self">self</span>.domain() {
+			Domain::Enclave(elem) =&gt; {
+				<span class="kw">let </span>shamt = bits_of::&lt;T&gt;() <span class="kw">as </span>u8 - elem.tail().into_inner();
+				get(elem, shamt)
+			},
+			Domain::Region { head, body, tail } =&gt; {
+				<span class="kw">let </span><span class="kw-2">mut </span>accum = I::ZERO;
+
+				<span class="kw">if let </span><span class="prelude-val">Some</span>(elem) = head {
+					accum = get(elem, <span class="number">0</span>);
+				}
+
+				<span class="kw">for </span>elem <span class="kw">in </span>body.iter().map(BitStore::load_value) {
+					maybe_shift_left(<span class="kw-2">&amp;mut </span>accum, bits_of::&lt;T&gt;());
+					accum |= resize::&lt;T::Mem, I&gt;(elem);
+				}
+
+				<span class="kw">if let </span><span class="prelude-val">Some</span>(elem) = tail {
+					<span class="kw">let </span>shamt = elem.tail().into_inner();
+					maybe_shift_left(<span class="kw-2">&amp;mut </span>accum, shamt <span class="kw">as </span>usize);
+					accum |= get::&lt;<span class="kw">_</span>, <span class="kw">_</span>, I&gt;(elem, bits_of::&lt;T&gt;() <span class="kw">as </span>u8 - shamt);
+				}
+
+				accum
+			},
 		}
-
-		<span class="ident">sign</span>(<span class="ident">accum</span>, <span class="self">self</span>.<span class="ident">len</span>())
+		.pipe(|elem| sign(elem, len))
 	}
 
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">store_le</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">value</span>: <span class="ident">I</span>)
-	<span class="kw">where</span> <span class="ident">I</span>: <span class="ident">Integral</span> {
-		<span class="kw">for</span> <span class="ident">slot</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">as_raw_mut_slice</span>() {
-			<span class="ident">slot</span>.<span class="ident">store_value</span>(<span class="ident">resize</span>(<span class="ident">value</span>));
-			<span class="ident">maybe_shift_right</span>(<span class="kw-2">&amp;mut</span> <span class="ident">value</span>, <span class="ident">bits_of</span>::<span class="op">&lt;</span><span class="ident">A::Store</span><span class="op">&gt;</span>());
+	<span class="attribute">#[inline]
+	#[doc = <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/BitField_Msb0_store_le.md&quot;</span>)]
+	</span><span class="kw">fn </span>store_le&lt;I&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>value: I)
+	<span class="kw">where </span>I: Integral {
+		check::&lt;I&gt;(<span class="string">&quot;store&quot;</span>, <span class="self">self</span>.len());
+
+		<span class="kw">match </span><span class="self">self</span>.domain_mut() {
+			Domain::Enclave(elem) =&gt; {
+				<span class="kw">let </span>shamt = bits_of::&lt;T&gt;() <span class="kw">as </span>u8 - elem.tail().into_inner();
+				set(elem, value, shamt);
+			},
+			Domain::Region { head, body, tail } =&gt; {
+				<span class="kw">if let </span><span class="prelude-val">Some</span>(elem) = head {
+					<span class="kw">let </span>shamt =
+						bits_of::&lt;T&gt;() - elem.head().into_inner() <span class="kw">as </span>usize;
+					set(elem, value, <span class="number">0</span>);
+					maybe_shift_right(<span class="kw-2">&amp;mut </span>value, shamt);
+				}
+
+				<span class="kw">for </span>elem <span class="kw">in </span>body.iter_mut() {
+					elem.store_value(resize(value));
+					maybe_shift_right(<span class="kw-2">&amp;mut </span>value, bits_of::&lt;T&gt;());
+				}
+
+				<span class="kw">if let </span><span class="prelude-val">Some</span>(elem) = tail {
+					<span class="kw">let </span>shamt = bits_of::&lt;T&gt;() <span class="kw">as </span>u8 - elem.tail().into_inner();
+					set(elem, value, shamt);
+				}
+			},
 		}
 	}
 
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">store_be</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">value</span>: <span class="ident">I</span>)
-	<span class="kw">where</span> <span class="ident">I</span>: <span class="ident">Integral</span> {
-		<span class="kw">for</span> <span class="ident">slot</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">as_raw_mut_slice</span>().<span class="ident">iter_mut</span>().<span class="ident">rev</span>() {
-			<span class="ident">slot</span>.<span class="ident">store_value</span>(<span class="ident">resize</span>(<span class="ident">value</span>));
-			<span class="ident">maybe_shift_right</span>(<span class="kw-2">&amp;mut</span> <span class="ident">value</span>, <span class="ident">bits_of</span>::<span class="op">&lt;</span><span class="ident">A::Store</span><span class="op">&gt;</span>());
+	<span class="attribute">#[inline]
+	#[doc = <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/BitField_Msb0_store_be.md&quot;</span>)]
+	</span><span class="kw">fn </span>store_be&lt;I&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>value: I)
+	<span class="kw">where </span>I: Integral {
+		check::&lt;I&gt;(<span class="string">&quot;store&quot;</span>, <span class="self">self</span>.len());
+
+		<span class="kw">match </span><span class="self">self</span>.domain_mut() {
+			Domain::Enclave(elem) =&gt; {
+				<span class="kw">let </span>shamt = bits_of::&lt;T&gt;() <span class="kw">as </span>u8 - elem.tail().into_inner();
+				set(elem, value, shamt);
+			},
+			Domain::Region { head, body, tail } =&gt; {
+				<span class="kw">if let </span><span class="prelude-val">Some</span>(elem) = tail {
+					<span class="kw">let </span>tail = elem.tail().into_inner() <span class="kw">as </span>usize;
+					<span class="kw">let </span>shamt = bits_of::&lt;T&gt;() - tail;
+					set(elem, value, shamt <span class="kw">as </span>u8);
+					maybe_shift_right(<span class="kw-2">&amp;mut </span>value, tail);
+				}
+
+				<span class="kw">for </span>elem <span class="kw">in </span>body.iter_mut().rev() {
+					elem.store_value(resize(value));
+					maybe_shift_right(<span class="kw-2">&amp;mut </span>value, bits_of::&lt;T&gt;());
+				}
+
+				<span class="kw">if let </span><span class="prelude-val">Some</span>(elem) = head {
+					set(elem, value, <span class="number">0</span>);
+				}
+			},
 		}
 	}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">BitField</span> <span class="kw">for</span> <span class="ident">BitBox</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>: <span class="ident">BitField</span>,
+<span class="attribute">#[doc = <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/impl_BitArray.md&quot;</span>)]
+</span><span class="kw">impl</span>&lt;A, O&gt; BitField <span class="kw">for </span>BitArray&lt;A, O&gt;
+<span class="kw">where
+	</span>O: BitOrder,
+	A: BitViewSized,
+	BitSlice&lt;A::Store, O&gt;: BitField,
 {
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">load_le</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">I</span>
-	<span class="kw">where</span> <span class="ident">I</span>: <span class="ident">Integral</span> {
-		<span class="self">self</span>.<span class="ident">as_bitslice</span>().<span class="ident">load_le</span>()
+	<span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>load_le&lt;I&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; I
+	<span class="kw">where </span>I: Integral {
+		<span class="kw">let </span><span class="kw-2">mut </span>accum = I::ZERO;
+
+		<span class="kw">for </span>elem <span class="kw">in </span><span class="self">self</span>.as_raw_slice().iter().map(BitStore::load_value).rev() {
+			maybe_shift_left(<span class="kw-2">&amp;mut </span>accum, bits_of::&lt;A::Store&gt;());
+			accum |= resize::&lt;<span class="kw">_</span>, I&gt;(elem);
+		}
+
+		sign(accum, <span class="self">self</span>.len())
 	}
 
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">load_be</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">I</span>
-	<span class="kw">where</span> <span class="ident">I</span>: <span class="ident">Integral</span> {
-		<span class="self">self</span>.<span class="ident">as_bitslice</span>().<span class="ident">load_be</span>()
+	<span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>load_be&lt;I&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; I
+	<span class="kw">where </span>I: Integral {
+		<span class="kw">let </span><span class="kw-2">mut </span>accum = I::ZERO;
+
+		<span class="kw">for </span>elem <span class="kw">in </span><span class="self">self</span>.as_raw_slice().iter().map(BitStore::load_value) {
+			maybe_shift_left(<span class="kw-2">&amp;mut </span>accum, bits_of::&lt;A::Store&gt;());
+			accum |= resize::&lt;<span class="kw">_</span>, I&gt;(elem);
+		}
+
+		sign(accum, <span class="self">self</span>.len())
 	}
 
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">store_le</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">I</span>)
-	<span class="kw">where</span> <span class="ident">I</span>: <span class="ident">Integral</span> {
-		<span class="self">self</span>.<span class="ident">as_mut_bitslice</span>().<span class="ident">store_le</span>(<span class="ident">value</span>)
+	<span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>store_le&lt;I&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>value: I)
+	<span class="kw">where </span>I: Integral {
+		<span class="kw">for </span>slot <span class="kw">in </span><span class="self">self</span>.as_raw_mut_slice() {
+			slot.store_value(resize(value));
+			maybe_shift_right(<span class="kw-2">&amp;mut </span>value, bits_of::&lt;A::Store&gt;());
+		}
 	}
 
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">store_be</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">I</span>)
-	<span class="kw">where</span> <span class="ident">I</span>: <span class="ident">Integral</span> {
-		<span class="self">self</span>.<span class="ident">as_mut_bitslice</span>().<span class="ident">store_be</span>(<span class="ident">value</span>)
+	<span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>store_be&lt;I&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>value: I)
+	<span class="kw">where </span>I: Integral {
+		<span class="kw">for </span>slot <span class="kw">in </span><span class="self">self</span>.as_raw_mut_slice().iter_mut().rev() {
+			slot.store_value(resize(value));
+			maybe_shift_right(<span class="kw-2">&amp;mut </span>value, bits_of::&lt;A::Store&gt;());
+		}
 	}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span> <span class="ident">BitField</span> <span class="kw">for</span> <span class="ident">BitVec</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">BitSlice</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>: <span class="ident">BitField</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+#[cfg(not(tarpaulin_include))]
+</span><span class="kw">impl</span>&lt;T, O&gt; BitField <span class="kw">for </span>BitBox&lt;T, O&gt;
+<span class="kw">where
+	</span>T: BitStore,
+	O: BitOrder,
+	BitSlice&lt;T, O&gt;: BitField,
 {
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">load_le</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">I</span>
-	<span class="kw">where</span> <span class="ident">I</span>: <span class="ident">Integral</span> {
-		<span class="self">self</span>.<span class="ident">as_bitslice</span>().<span class="ident">load_le</span>()
+	<span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>load_le&lt;I&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; I
+	<span class="kw">where </span>I: Integral {
+		<span class="self">self</span>.as_bitslice().load_le()
 	}
 
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">load_be</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">I</span>
-	<span class="kw">where</span> <span class="ident">I</span>: <span class="ident">Integral</span> {
-		<span class="self">self</span>.<span class="ident">as_bitslice</span>().<span class="ident">load_be</span>()
+	<span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>load_be&lt;I&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; I
+	<span class="kw">where </span>I: Integral {
+		<span class="self">self</span>.as_bitslice().load_be()
 	}
 
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">store_le</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">I</span>)
-	<span class="kw">where</span> <span class="ident">I</span>: <span class="ident">Integral</span> {
-		<span class="self">self</span>.<span class="ident">as_mut_bitslice</span>().<span class="ident">store_le</span>(<span class="ident">value</span>)
+	<span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>store_le&lt;I&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: I)
+	<span class="kw">where </span>I: Integral {
+		<span class="self">self</span>.as_mut_bitslice().store_le(value)
 	}
 
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">store_be</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">I</span>)
-	<span class="kw">where</span> <span class="ident">I</span>: <span class="ident">Integral</span> {
-		<span class="self">self</span>.<span class="ident">as_mut_bitslice</span>().<span class="ident">store_be</span>(<span class="ident">value</span>)
+	<span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>store_be&lt;I&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: I)
+	<span class="kw">where </span>I: Integral {
+		<span class="self">self</span>.as_mut_bitslice().store_be(value)
+	}
+}
+
+<span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+#[cfg(not(tarpaulin_include))]
+</span><span class="kw">impl</span>&lt;T, O&gt; BitField <span class="kw">for </span>BitVec&lt;T, O&gt;
+<span class="kw">where
+	</span>T: BitStore,
+	O: BitOrder,
+	BitSlice&lt;T, O&gt;: BitField,
+{
+	<span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>load_le&lt;I&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; I
+	<span class="kw">where </span>I: Integral {
+		<span class="self">self</span>.as_bitslice().load_le()
+	}
+
+	<span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>load_be&lt;I&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; I
+	<span class="kw">where </span>I: Integral {
+		<span class="self">self</span>.as_bitslice().load_be()
+	}
+
+	<span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>store_le&lt;I&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: I)
+	<span class="kw">where </span>I: Integral {
+		<span class="self">self</span>.as_mut_bitslice().store_le(value)
+	}
+
+	<span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>store_be&lt;I&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: I)
+	<span class="kw">where </span>I: Integral {
+		<span class="self">self</span>.as_mut_bitslice().store_be(value)
 	}
 }
 
@@ -1158,121 +1158,121 @@
 ## Panics
 
 This panics if `len` is not in `1 ..= U::BITS`.
-**/</span>
-<span class="kw">fn</span> <span class="ident">check</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">action</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">len</span>: <span class="ident">usize</span>)
-<span class="kw">where</span> <span class="ident">I</span>: <span class="ident">Integral</span> {
+**/
+</span><span class="kw">fn </span>check&lt;I&gt;(action: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, len: usize)
+<span class="kw">where </span>I: Integral {
 	<span class="macro">assert!</span>(
-		(<span class="number">1</span> ..<span class="op">=</span> <span class="ident">bits_of</span>::<span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>()).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">len</span>),
+		(<span class="number">1 </span>..= bits_of::&lt;I&gt;()).contains(<span class="kw-2">&amp;</span>len),
 		<span class="string">&quot;cannot {} {} bits from a {}-bit region&quot;</span>,
-		<span class="ident">action</span>,
-		<span class="ident">bits_of</span>::<span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(),
-		<span class="ident">len</span>,
+		action,
+		bits_of::&lt;I&gt;(),
+		len,
 	);
 }
 
-<span class="doccomment">/// Shifts a value to the left, if it can support the shift amount.</span>
-<span class="kw">fn</span> <span class="ident">maybe_shift_left</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Integral</span><span class="op">&gt;</span>(<span class="ident">elem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>, <span class="ident">shamt</span>: <span class="ident">usize</span>) {
-	<span class="kw">if</span> <span class="ident">bits_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="op">&gt;</span> <span class="ident">shamt</span> {
-		<span class="kw-2">*</span><span class="ident">elem</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="op">=</span> <span class="ident">shamt</span>;
+<span class="doccomment">/// Shifts a value to the left, if it can support the shift amount.
+</span><span class="kw">fn </span>maybe_shift_left&lt;T: Integral&gt;(elem: <span class="kw-2">&amp;mut </span>T, shamt: usize) {
+	<span class="kw">if </span>bits_of::&lt;T&gt;() &gt; shamt {
+		<span class="kw-2">*</span>elem &lt;&lt;= shamt;
 	}
 }
 
-<span class="doccomment">/// Shifts a value to the right, if it can support the shift amount.</span>
-<span class="kw">fn</span> <span class="ident">maybe_shift_right</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Integral</span><span class="op">&gt;</span>(<span class="ident">elem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>, <span class="ident">shamt</span>: <span class="ident">usize</span>) {
-	<span class="kw">if</span> <span class="ident">bits_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>() <span class="op">&gt;</span> <span class="ident">shamt</span> {
-		<span class="kw-2">*</span><span class="ident">elem</span> <span class="op">&gt;</span><span class="op">&gt;</span><span class="op">=</span> <span class="ident">shamt</span>;
+<span class="doccomment">/// Shifts a value to the right, if it can support the shift amount.
+</span><span class="kw">fn </span>maybe_shift_right&lt;T: Integral&gt;(elem: <span class="kw-2">&amp;mut </span>T, shamt: usize) {
+	<span class="kw">if </span>bits_of::&lt;T&gt;() &gt; shamt {
+		<span class="kw-2">*</span>elem &gt;&gt;= shamt;
 	}
 }
 
-<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/get.md&quot;</span>)]</span>
-<span class="kw">fn</span> <span class="ident">get</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">elem</span>: <span class="ident">PartialElement</span><span class="op">&lt;</span><span class="ident">Const</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>, <span class="ident">shamt</span>: <span class="ident">u8</span>) -&gt; <span class="ident">I</span>
-<span class="kw">where</span>
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">I</span>: <span class="ident">Integral</span>,
+<span class="attribute">#[doc = <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/get.md&quot;</span>)]
+</span><span class="kw">fn </span>get&lt;T, O, I&gt;(elem: PartialElement&lt;Const, T, O&gt;, shamt: u8) -&gt; I
+<span class="kw">where
+	</span>T: BitStore,
+	O: BitOrder,
+	I: Integral,
 {
-	<span class="ident">resize</span>::<span class="op">&lt;</span><span class="ident">T::Mem</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">elem</span>.<span class="ident">load_value</span>() <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">shamt</span>)
+	resize::&lt;T::Mem, I&gt;(elem.load_value() &gt;&gt; shamt)
 }
 
-<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/set.md&quot;</span>)]</span>
-<span class="kw">fn</span> <span class="ident">set</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">O</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">elem</span>: <span class="ident">PartialElement</span><span class="op">&lt;</span><span class="ident">Mut</span>, <span class="ident">T</span>, <span class="ident">O</span><span class="op">&gt;</span>, <span class="ident">value</span>: <span class="ident">I</span>, <span class="ident">shamt</span>: <span class="ident">u8</span>)
-<span class="kw">where</span>
-	<span class="ident">T</span>: <span class="ident">BitStore</span>,
-	<span class="ident">O</span>: <span class="ident">BitOrder</span>,
-	<span class="ident">I</span>: <span class="ident">Integral</span>,
+<span class="attribute">#[doc = <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/set.md&quot;</span>)]
+</span><span class="kw">fn </span>set&lt;T, O, I&gt;(<span class="kw-2">mut </span>elem: PartialElement&lt;Mut, T, O&gt;, value: I, shamt: u8)
+<span class="kw">where
+	</span>T: BitStore,
+	O: BitOrder,
+	I: Integral,
 {
-	<span class="ident">elem</span>.<span class="ident">store_value</span>(<span class="ident">resize</span>::<span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">T::Mem</span><span class="op">&gt;</span>(<span class="ident">value</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">shamt</span>);
+	elem.store_value(resize::&lt;I, T::Mem&gt;(value) &lt;&lt; shamt);
 }
 
-<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/sign.md&quot;</span>)]</span>
-<span class="kw">fn</span> <span class="ident">sign</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">elem</span>: <span class="ident">I</span>, <span class="ident">width</span>: <span class="ident">usize</span>) -&gt; <span class="ident">I</span>
-<span class="kw">where</span> <span class="ident">I</span>: <span class="ident">Integral</span> {
-	<span class="kw">if</span> <span class="ident">dvl::is_unsigned</span>::<span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() {
-		<span class="kw">return</span> <span class="ident">elem</span>;
+<span class="attribute">#[doc = <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/sign.md&quot;</span>)]
+</span><span class="kw">fn </span>sign&lt;I&gt;(elem: I, width: usize) -&gt; I
+<span class="kw">where </span>I: Integral {
+	<span class="kw">if </span>dvl::is_unsigned::&lt;I&gt;() {
+		<span class="kw">return </span>elem;
 	}
-	<span class="comment">//  Find the number of high bits that are not loaded.</span>
-	<span class="kw">let</span> <span class="ident">shamt</span> <span class="op">=</span> <span class="ident">bits_of</span>::<span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>() <span class="op">-</span> <span class="ident">width</span>;
-	<span class="comment">//  Shift left, so that the highest loaded bit is now in the sign position.</span>
-	<span class="kw">let</span> <span class="ident">shl</span>: <span class="ident">I</span> <span class="op">=</span> <span class="ident">elem</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">shamt</span>;
-	<span class="comment">//  Shift right with sign extension back to the original place.</span>
-	<span class="ident">shl</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">shamt</span>
+	<span class="comment">//  Find the number of high bits that are not loaded.
+	</span><span class="kw">let </span>shamt = bits_of::&lt;I&gt;() - width;
+	<span class="comment">//  Shift left, so that the highest loaded bit is now in the sign position.
+	</span><span class="kw">let </span>shl: I = elem &lt;&lt; shamt;
+	<span class="comment">//  Shift right with sign extension back to the original place.
+	</span>shl &gt;&gt; shamt
 }
 
-<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/resize.md&quot;</span>)]</span>
-<span class="kw">fn</span> <span class="ident">resize</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="ident">T</span>) -&gt; <span class="ident">U</span>
-<span class="kw">where</span>
-	<span class="ident">T</span>: <span class="ident">Integral</span>,
-	<span class="ident">U</span>: <span class="ident">Integral</span>,
+<span class="attribute">#[doc = <span class="macro">include_str!</span>(<span class="string">&quot;../doc/field/resize.md&quot;</span>)]
+</span><span class="kw">fn </span>resize&lt;T, U&gt;(value: T) -&gt; U
+<span class="kw">where
+	</span>T: Integral,
+	U: Integral,
 {
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">U::ZERO</span>;
-	<span class="kw">let</span> <span class="ident">size_t</span> <span class="op">=</span> <span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>();
-	<span class="kw">let</span> <span class="ident">size_u</span> <span class="op">=</span> <span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>();
+	<span class="kw">let </span><span class="kw-2">mut </span>out = U::ZERO;
+	<span class="kw">let </span>size_t = mem::size_of::&lt;T&gt;();
+	<span class="kw">let </span>size_u = mem::size_of::&lt;U&gt;();
 
-	<span class="kw">unsafe</span> {
-		<span class="ident">resize_inner</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>, <span class="kw-2">&amp;mut</span> <span class="ident">out</span>, <span class="ident">size_t</span>, <span class="ident">size_u</span>);
+	<span class="kw">unsafe </span>{
+		resize_inner::&lt;T, U&gt;(<span class="kw-2">&amp;</span>value, <span class="kw-2">&amp;mut </span>out, size_t, size_u);
 	}
 
-	<span class="ident">out</span>
+	out
 }
 
-<span class="doccomment">/// Performs little-endian byte-order register resizing.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_endian</span> <span class="op">=</span> <span class="string">&quot;little&quot;</span>)]</span>
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">resize_inner</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span>(
-	<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
-	<span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">U</span>,
-	<span class="ident">size_t</span>: <span class="ident">usize</span>,
-	<span class="ident">size_u</span>: <span class="ident">usize</span>,
+<span class="doccomment">/// Performs little-endian byte-order register resizing.
+</span><span class="attribute">#[cfg(target_endian = <span class="string">&quot;little&quot;</span>)]
+</span><span class="kw">unsafe fn </span>resize_inner&lt;T, U&gt;(
+	src: <span class="kw-2">&amp;</span>T,
+	dst: <span class="kw-2">&amp;mut </span>U,
+	size_t: usize,
+	size_u: usize,
 ) {
-	<span class="comment">//  In LE, the least-significant byte is the base address, so resizing is</span>
-	<span class="comment">//  just a `memmove` into a zeroed slot, taking only the lesser width.</span>
-	<span class="ident">ptr::copy_nonoverlapping</span>(
-		<span class="ident">src</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">T</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u8</span>,
-		<span class="ident">dst</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">U</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">u8</span>,
-		<span class="ident">size_t</span>.<span class="ident">min</span>(<span class="ident">size_u</span>),
+	<span class="comment">//  In LE, the least-significant byte is the base address, so resizing is
+	//  just a `memmove` into a zeroed slot, taking only the lesser width.
+	</span>ptr::copy_nonoverlapping(
+		src <span class="kw">as </span><span class="kw-2">*const </span>T <span class="kw">as </span><span class="kw-2">*const </span>u8,
+		dst <span class="kw">as </span><span class="kw-2">*mut </span>U <span class="kw">as </span><span class="kw-2">*mut </span>u8,
+		size_t.min(size_u),
 	);
 }
 
-<span class="doccomment">/// Performs big-endian byte-order register resizing.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_endian</span> <span class="op">=</span> <span class="string">&quot;big&quot;</span>)]</span>
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">resize_inner</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span>(
-	<span class="ident">src</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>,
-	<span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">U</span>,
-	<span class="ident">size_t</span>: <span class="ident">usize</span>,
-	<span class="ident">size_u</span>: <span class="ident">usize</span>,
+<span class="doccomment">/// Performs big-endian byte-order register resizing.
+</span><span class="attribute">#[cfg(target_endian = <span class="string">&quot;big&quot;</span>)]
+</span><span class="kw">unsafe fn </span>resize_inner&lt;T, U&gt;(
+	src: <span class="kw-2">&amp;</span>T,
+	dst: <span class="kw-2">&amp;mut </span>U,
+	size_t: usize,
+	size_u: usize,
 ) {
-	<span class="kw">let</span> <span class="ident">src</span> <span class="op">=</span> <span class="ident">src</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">T</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u8</span>;
-	<span class="kw">let</span> <span class="ident">dst</span> <span class="op">=</span> <span class="ident">dst</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">U</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">u8</span>;
+	<span class="kw">let </span>src = src <span class="kw">as </span><span class="kw-2">*const </span>T <span class="kw">as </span><span class="kw-2">*const </span>u8;
+	<span class="kw">let </span>dst = dst <span class="kw">as </span><span class="kw-2">*mut </span>U <span class="kw">as </span><span class="kw-2">*mut </span>u8;
 
-	<span class="comment">//  In BE, shrinking a value requires moving the source base-pointer up in</span>
-	<span class="comment">//  memory (to a higher address, lower significance),</span>
-	<span class="kw">if</span> <span class="ident">size_t</span> <span class="op">&gt;</span> <span class="ident">size_u</span> {
-		<span class="ident">ptr::copy_nonoverlapping</span>(<span class="ident">src</span>.<span class="ident">add</span>(<span class="ident">size_t</span> <span class="op">-</span> <span class="ident">size_u</span>), <span class="ident">dst</span>, <span class="ident">size_u</span>);
+	<span class="comment">//  In BE, shrinking a value requires moving the source base-pointer up in
+	//  memory (to a higher address, lower significance),
+	</span><span class="kw">if </span>size_t &gt; size_u {
+		ptr::copy_nonoverlapping(src.add(size_t - size_u), dst, size_u);
 	}
-	<span class="comment">//  While expanding a value requires moving the *destination* base-pointer</span>
-	<span class="comment">//  up (and leaving the lower address, higher significance bytes zeroed).</span>
-	<span class="kw">else</span> {
-		<span class="ident">ptr::copy_nonoverlapping</span>(<span class="ident">src</span>, <span class="ident">dst</span>.<span class="ident">add</span>(<span class="ident">size_u</span> <span class="op">-</span> <span class="ident">size_t</span>), <span class="ident">size_t</span>);
+	<span class="comment">//  While expanding a value requires moving the *destination* base-pointer
+	//  up (and leaving the lower address, higher significance bytes zeroed).
+	</span><span class="kw">else </span>{
+		ptr::copy_nonoverlapping(src, dst.add(size_u - size_t), size_t);
 	}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="bitvec" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="bitvec" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/binlog/decimal/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mysql_common/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/binlog/decimal/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mysql_common/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -386,307 +386,307 @@
 <span id="386">386</span>
 <span id="387">387</span>
 <span id="388">388</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2020 Anatoly Ikorsky</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2020 Anatoly Ikorsky
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="doccomment">//! Functions and types related to the mysql decimal type.</span>
+</span><span class="doccomment">//! Functions and types related to the mysql decimal type.
 
-<span class="kw">use</span> <span class="ident">byteorder</span>::{<span class="ident">BigEndian</span> <span class="kw">as</span> <span class="ident">BE</span>, <span class="ident">ReadBytesExt</span>, <span class="ident">WriteBytesExt</span>};
+</span><span class="kw">use </span>byteorder::{BigEndian <span class="kw">as </span>BE, ReadBytesExt, WriteBytesExt};
 
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">cmp</span>::{<span class="ident">Ord</span>, <span class="ident">Ordering</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>},
-    <span class="ident">fmt</span>,
-    <span class="ident">io</span>::{<span class="self">self</span>, <span class="ident">Read</span>, <span class="ident">Write</span>},
-    <span class="ident">mem::size_of</span>,
-    <span class="ident">str::FromStr</span>,
+<span class="kw">use </span>std::{
+    cmp::{Ord, Ordering, PartialEq, PartialOrd},
+    fmt,
+    io::{<span class="self">self</span>, Read, Write},
+    mem::size_of,
+    str::FromStr,
 };
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ParseDecimalError</span>;
+<span class="attribute">#[derive(Debug, Clone, Copy)]
+</span><span class="kw">pub struct </span>ParseDecimalError;
 
-<span class="doccomment">/// Type of a base 9 digit.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Digit</span> <span class="op">=</span> <span class="ident">i32</span>;
+<span class="doccomment">/// Type of a base 9 digit.
+</span><span class="kw">pub type </span>Digit = i32;
 
-<span class="doccomment">/// Number of decimal digits per `Digit`.</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DIG_PER_DEC</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">9</span>;
+<span class="doccomment">/// Number of decimal digits per `Digit`.
+</span><span class="kw">pub const </span>DIG_PER_DEC: usize = <span class="number">9</span>;
 
-<span class="doccomment">/// Base of the `Digit`.</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DIG_BASE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1_000_000_000</span>;
+<span class="doccomment">/// Base of the `Digit`.
+</span><span class="kw">pub const </span>DIG_BASE: usize = <span class="number">1_000_000_000</span>;
 
-<span class="doccomment">/// Number of bytes required to store given number of decimal digits.</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DIG_TO_BYTES</span>: [<span class="ident">u8</span>; <span class="ident">DIG_PER_DEC</span> <span class="op">+</span> <span class="number">1</span>] <span class="op">=</span> [<span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">4</span>, <span class="number">4</span>];
+<span class="doccomment">/// Number of bytes required to store given number of decimal digits.
+</span><span class="kw">pub const </span>DIG_TO_BYTES: [u8; DIG_PER_DEC + <span class="number">1</span>] = [<span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">4</span>, <span class="number">4</span>];
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">POWERS_10</span>: [<span class="ident">i32</span>; <span class="ident">DIG_PER_DEC</span> <span class="op">+</span> <span class="number">1</span>] <span class="op">=</span> [
+<span class="kw">pub const </span>POWERS_10: [i32; DIG_PER_DEC + <span class="number">1</span>] = [
     <span class="number">1</span>, <span class="number">10</span>, <span class="number">100</span>, <span class="number">1000</span>, <span class="number">10000</span>, <span class="number">100000</span>, <span class="number">1000000</span>, <span class="number">10000000</span>, <span class="number">100000000</span>, <span class="number">1000000000</span>,
 ];
 
-<span class="doccomment">/// MySql decimal.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The only purpose of this type is to parse binary decimal from binlogs,</span>
-<span class="doccomment">/// so it isn&#39;t meant to be an alternative to `decimal_t`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This type supports:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// *   serialization/deserialization to/from binary format</span>
-<span class="doccomment">///     (see `read_bin` and `write_bin` functions);</span>
-<span class="doccomment">/// *   parsing from decimal string/buffer (see `Decimal::parse_bytes`, `FromStr` impl);</span>
-<span class="doccomment">/// *   conversion to decimal string (using `Display`).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Notes</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// *   `Ord` and `Eq` impls are relied on the binary representation,</span>
-<span class="doccomment">///     i.e. both `rhs` and `lhs` will be serialized into temporary buffers;</span>
-<span class="doccomment">/// *   even though MySql&#39;s `string2decimal` function allows scientific notation,</span>
-<span class="doccomment">///     this implementation denies it.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Decimal</span> {
-    <span class="doccomment">/// The number of *decimal* digits (NOT number of `Digit`s!) before the point.</span>
-    <span class="ident">intg</span>: <span class="ident">usize</span>,
-    <span class="doccomment">/// The number of decimal digits after the point.</span>
-    <span class="ident">frac</span>: <span class="ident">usize</span>,
-    <span class="doccomment">/// `false` means positive, `true` means negative.</span>
-    <span class="ident">sign</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Array of `Digit`s.</span>
-    <span class="ident">buf</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Digit</span><span class="op">&gt;</span>,
+<span class="doccomment">/// MySql decimal.
+///
+/// The only purpose of this type is to parse binary decimal from binlogs,
+/// so it isn&#39;t meant to be an alternative to `decimal_t`.
+///
+/// This type supports:
+///
+/// *   serialization/deserialization to/from binary format
+///     (see `read_bin` and `write_bin` functions);
+/// *   parsing from decimal string/buffer (see `Decimal::parse_bytes`, `FromStr` impl);
+/// *   conversion to decimal string (using `Display`).
+///
+/// # Notes
+///
+/// *   `Ord` and `Eq` impls are relied on the binary representation,
+///     i.e. both `rhs` and `lhs` will be serialized into temporary buffers;
+/// *   even though MySql&#39;s `string2decimal` function allows scientific notation,
+///     this implementation denies it.
+</span><span class="attribute">#[derive(Default, Debug, Eq)]
+</span><span class="kw">pub struct </span>Decimal {
+    <span class="doccomment">/// The number of *decimal* digits (NOT number of `Digit`s!) before the point.
+    </span>intg: usize,
+    <span class="doccomment">/// The number of decimal digits after the point.
+    </span>frac: usize,
+    <span class="doccomment">/// `false` means positive, `true` means negative.
+    </span>sign: bool,
+    <span class="doccomment">/// Array of `Digit`s.
+    </span>buf: Vec&lt;Digit&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Decimal</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bin_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="ident">decimal_bin_size</span>(<span class="self">self</span>.<span class="ident">intg</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">frac</span>, <span class="self">self</span>.<span class="ident">frac</span>)
+<span class="kw">impl </span>Decimal {
+    <span class="kw">pub fn </span>bin_size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        decimal_bin_size(<span class="self">self</span>.intg + <span class="self">self</span>.frac, <span class="self">self</span>.frac)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_bytes</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">ParseDecimalError</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">std::str::from_utf8</span>(<span class="ident">bytes</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">string</span>) =&gt; <span class="ident">Decimal::from_str</span>(<span class="ident">string</span>),
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">ParseDecimalError</span>),
+    <span class="kw">pub fn </span>parse_bytes(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, ParseDecimalError&gt; {
+        <span class="kw">match </span>std::str::from_utf8(bytes) {
+            <span class="prelude-val">Ok</span>(string) =&gt; Decimal::from_str(string),
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(ParseDecimalError),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_bin</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Write</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">output</span>: <span class="ident">T</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="comment">// result bits must be inverted if the sign is negative,</span>
-        <span class="comment">// we&#39;ll XOR it with `mask` to achieve this.</span>
-        <span class="kw">let</span> <span class="ident">mask</span>: <span class="ident">Digit</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">sign</span> {
-            <span class="comment">// XOR with this mask will invert bits</span>
-            <span class="op">-</span><span class="number">1</span>
-        } <span class="kw">else</span> {
-            <span class="comment">// XOR with this mask will do nothing</span>
-            <span class="number">0</span>
-        };
+    <span class="kw">pub fn </span>write_bin&lt;T: Write&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>output: T) -&gt; io::Result&lt;()&gt; {
+        <span class="comment">// result bits must be inverted if the sign is negative,
+        // we&#39;ll XOR it with `mask` to achieve this.
+        </span><span class="kw">let </span>mask: Digit = <span class="kw">if </span><span class="self">self</span>.sign {
+            <span class="comment">// XOR with this mask will invert bits
+            </span>-<span class="number">1
+        </span>} <span class="kw">else </span>{
+            <span class="comment">// XOR with this mask will do nothing
+            </span><span class="number">0
+        </span>};
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out_buf</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">Digit</span><span class="op">&gt;</span>());
+        <span class="kw">let </span><span class="kw-2">mut </span>out_buf = Vec::with_capacity(<span class="self">self</span>.buf.len() * size_of::&lt;Digit&gt;());
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">digits</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">iter</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>digits = <span class="self">self</span>.buf.iter();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">intg</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">intg</span>;
-        <span class="kw">let</span> <span class="ident">num_prefix_digits</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">intg</span> <span class="op">%</span> <span class="ident">DIG_PER_DEC</span>;
-        <span class="kw">if</span> <span class="ident">num_prefix_digits</span> <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="kw">let</span> <span class="ident">digit</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">digits</span>.<span class="ident">next</span>().<span class="ident">expect</span>(<span class="string">&quot;decimal is ill-formed&quot;</span>);
-            <span class="kw">match</span> <span class="ident">DIG_TO_BYTES</span>[<span class="ident">num_prefix_digits</span>] {
-                <span class="number">1</span> =&gt; <span class="ident">out_buf</span>.<span class="ident">write_i8</span>((<span class="ident">digit</span> <span class="op">^</span> <span class="ident">mask</span>) <span class="kw">as</span> <span class="ident">i8</span>)<span class="question-mark">?</span>,
-                <span class="number">2</span> =&gt; <span class="ident">out_buf</span>.<span class="ident">write_i16</span>::<span class="op">&lt;</span><span class="ident">BE</span><span class="op">&gt;</span>((<span class="ident">digit</span> <span class="op">^</span> <span class="ident">mask</span>) <span class="kw">as</span> <span class="ident">i16</span>)<span class="question-mark">?</span>,
-                <span class="number">3</span> =&gt; <span class="ident">out_buf</span>.<span class="ident">write_i24</span>::<span class="op">&lt;</span><span class="ident">BE</span><span class="op">&gt;</span>((<span class="ident">digit</span> <span class="op">^</span> <span class="ident">mask</span>) <span class="kw">as</span> <span class="ident">i32</span>)<span class="question-mark">?</span>,
-                <span class="number">4</span> =&gt; <span class="ident">out_buf</span>.<span class="ident">write_i32</span>::<span class="op">&lt;</span><span class="ident">BE</span><span class="op">&gt;</span>((<span class="ident">digit</span> <span class="op">^</span> <span class="ident">mask</span>) <span class="kw">as</span> <span class="ident">i32</span>)<span class="question-mark">?</span>,
-                <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+        <span class="kw">let </span><span class="kw-2">mut </span>intg = <span class="self">self</span>.intg;
+        <span class="kw">let </span>num_prefix_digits = <span class="self">self</span>.intg % DIG_PER_DEC;
+        <span class="kw">if </span>num_prefix_digits &gt; <span class="number">0 </span>{
+            <span class="kw">let </span>digit = <span class="kw-2">*</span>digits.next().expect(<span class="string">&quot;decimal is ill-formed&quot;</span>);
+            <span class="kw">match </span>DIG_TO_BYTES[num_prefix_digits] {
+                <span class="number">1 </span>=&gt; out_buf.write_i8((digit ^ mask) <span class="kw">as </span>i8)<span class="question-mark">?</span>,
+                <span class="number">2 </span>=&gt; out_buf.write_i16::&lt;BE&gt;((digit ^ mask) <span class="kw">as </span>i16)<span class="question-mark">?</span>,
+                <span class="number">3 </span>=&gt; out_buf.write_i24::&lt;BE&gt;((digit ^ mask) <span class="kw">as </span>i32)<span class="question-mark">?</span>,
+                <span class="number">4 </span>=&gt; out_buf.write_i32::&lt;BE&gt;((digit ^ mask) <span class="kw">as </span>i32)<span class="question-mark">?</span>,
+                <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
             }
-            <span class="ident">intg</span> <span class="op">-</span><span class="op">=</span> <span class="ident">num_prefix_digits</span>;
+            intg -= num_prefix_digits;
         }
-        <span class="kw">while</span> <span class="ident">intg</span> <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="kw">let</span> <span class="ident">digit</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">digits</span>.<span class="ident">next</span>().<span class="ident">expect</span>(<span class="string">&quot;decimal is ill-formed&quot;</span>);
-            <span class="ident">out_buf</span>.<span class="ident">write_i32</span>::<span class="op">&lt;</span><span class="ident">BE</span><span class="op">&gt;</span>((<span class="ident">digit</span> <span class="op">^</span> <span class="ident">mask</span>) <span class="kw">as</span> <span class="ident">i32</span>)<span class="question-mark">?</span>;
-            <span class="ident">intg</span> <span class="op">-</span><span class="op">=</span> <span class="ident">DIG_PER_DEC</span>;
+        <span class="kw">while </span>intg &gt; <span class="number">0 </span>{
+            <span class="kw">let </span>digit = <span class="kw-2">*</span>digits.next().expect(<span class="string">&quot;decimal is ill-formed&quot;</span>);
+            out_buf.write_i32::&lt;BE&gt;((digit ^ mask) <span class="kw">as </span>i32)<span class="question-mark">?</span>;
+            intg -= DIG_PER_DEC;
         }
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">frac</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">frac</span>;
-        <span class="kw">while</span> <span class="ident">frac</span> <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">std::cmp::min</span>(<span class="ident">DIG_PER_DEC</span>, <span class="ident">frac</span>);
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">digit</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">digits</span>.<span class="ident">next</span>().<span class="ident">expect</span>(<span class="string">&quot;decimal is ill-formed&quot;</span>);
-            <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span> <span class="ident">DIG_PER_DEC</span> {
-                <span class="ident">digit</span> <span class="op">/</span><span class="op">=</span> <span class="ident">POWERS_10</span>[<span class="ident">DIG_PER_DEC</span> <span class="op">-</span> <span class="ident">len</span>];
-                <span class="kw">match</span> <span class="ident">DIG_TO_BYTES</span>[<span class="ident">len</span>] {
-                    <span class="number">1</span> =&gt; <span class="ident">out_buf</span>.<span class="ident">write_i8</span>((<span class="ident">digit</span> <span class="op">^</span> <span class="ident">mask</span>) <span class="kw">as</span> <span class="ident">i8</span>)<span class="question-mark">?</span>,
-                    <span class="number">2</span> =&gt; <span class="ident">out_buf</span>.<span class="ident">write_i16</span>::<span class="op">&lt;</span><span class="ident">BE</span><span class="op">&gt;</span>((<span class="ident">digit</span> <span class="op">^</span> <span class="ident">mask</span>) <span class="kw">as</span> <span class="ident">i16</span>)<span class="question-mark">?</span>,
-                    <span class="number">3</span> =&gt; <span class="ident">out_buf</span>.<span class="ident">write_i24</span>::<span class="op">&lt;</span><span class="ident">BE</span><span class="op">&gt;</span>((<span class="ident">digit</span> <span class="op">^</span> <span class="ident">mask</span>) <span class="kw">as</span> <span class="ident">i32</span>)<span class="question-mark">?</span>,
-                    <span class="number">4</span> =&gt; <span class="ident">out_buf</span>.<span class="ident">write_i32</span>::<span class="op">&lt;</span><span class="ident">BE</span><span class="op">&gt;</span>((<span class="ident">digit</span> <span class="op">^</span> <span class="ident">mask</span>) <span class="kw">as</span> <span class="ident">i32</span>)<span class="question-mark">?</span>,
-                    <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+        <span class="kw">let </span><span class="kw-2">mut </span>frac = <span class="self">self</span>.frac;
+        <span class="kw">while </span>frac &gt; <span class="number">0 </span>{
+            <span class="kw">let </span>len = std::cmp::min(DIG_PER_DEC, frac);
+            <span class="kw">let </span><span class="kw-2">mut </span>digit = <span class="kw-2">*</span>digits.next().expect(<span class="string">&quot;decimal is ill-formed&quot;</span>);
+            <span class="kw">if </span>len &lt; DIG_PER_DEC {
+                digit /= POWERS_10[DIG_PER_DEC - len];
+                <span class="kw">match </span>DIG_TO_BYTES[len] {
+                    <span class="number">1 </span>=&gt; out_buf.write_i8((digit ^ mask) <span class="kw">as </span>i8)<span class="question-mark">?</span>,
+                    <span class="number">2 </span>=&gt; out_buf.write_i16::&lt;BE&gt;((digit ^ mask) <span class="kw">as </span>i16)<span class="question-mark">?</span>,
+                    <span class="number">3 </span>=&gt; out_buf.write_i24::&lt;BE&gt;((digit ^ mask) <span class="kw">as </span>i32)<span class="question-mark">?</span>,
+                    <span class="number">4 </span>=&gt; out_buf.write_i32::&lt;BE&gt;((digit ^ mask) <span class="kw">as </span>i32)<span class="question-mark">?</span>,
+                    <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
                 }
-            } <span class="kw">else</span> {
-                <span class="ident">out_buf</span>.<span class="ident">write_i32</span>::<span class="op">&lt;</span><span class="ident">BE</span><span class="op">&gt;</span>((<span class="ident">digit</span> <span class="op">^</span> <span class="ident">mask</span>) <span class="kw">as</span> <span class="ident">i32</span>)<span class="question-mark">?</span>;
+            } <span class="kw">else </span>{
+                out_buf.write_i32::&lt;BE&gt;((digit ^ mask) <span class="kw">as </span>i32)<span class="question-mark">?</span>;
             }
-            <span class="ident">frac</span> <span class="op">-</span><span class="op">=</span> <span class="ident">len</span>
+            frac -= len
         }
 
-        <span class="ident">out_buf</span>[<span class="number">0</span>] <span class="op">^</span><span class="op">=</span> <span class="number">0x80</span>;
+        out_buf[<span class="number">0</span>] ^= <span class="number">0x80</span>;
 
-        <span class="ident">output</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="ident">out_buf</span>)
+        output.write_all(<span class="kw-2">&amp;</span>out_buf)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_bin</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Read</span><span class="op">&gt;</span>(
-        <span class="kw-2">mut</span> <span class="ident">input</span>: <span class="ident">T</span>,
-        <span class="ident">precision</span>: <span class="ident">usize</span>,
-        <span class="ident">scale</span>: <span class="ident">usize</span>,
-        <span class="ident">keep_prec</span>: <span class="ident">bool</span>,
-    ) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::default</span>();
+    <span class="kw">pub fn </span>read_bin&lt;T: Read&gt;(
+        <span class="kw-2">mut </span>input: T,
+        precision: usize,
+        scale: usize,
+        keep_prec: bool,
+    ) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>out = <span class="self">Self</span>::default();
 
-        <span class="kw">let</span> <span class="ident">bin_size</span> <span class="op">=</span> <span class="ident">decimal_bin_size</span>(<span class="ident">precision</span>, <span class="ident">scale</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0_u8</span>; <span class="ident">bin_size</span>];
-        <span class="ident">input</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buffer</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>bin_size = decimal_bin_size(precision, scale);
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = <span class="macro">vec!</span>[<span class="number">0_u8</span>; bin_size];
+        input.read_exact(<span class="kw-2">&amp;mut </span>buffer)<span class="question-mark">?</span>;
 
-        <span class="comment">// we should invert back the very first bit of a binary representation</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">x</span>) <span class="op">=</span> <span class="ident">buffer</span>.<span class="ident">get_mut</span>(<span class="number">0</span>) {
-            <span class="kw-2">*</span><span class="ident">x</span> <span class="op">^</span><span class="op">=</span> <span class="number">0x80</span>
-        }
+        <span class="comment">// we should invert back the very first bit of a binary representation
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(x) = buffer.get_mut(<span class="number">0</span>) {
+            <span class="kw-2">*</span>x ^= <span class="number">0x80
+        </span>}
 
-        <span class="comment">// is it negative or not</span>
-        <span class="kw">let</span> <span class="ident">mask</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">buffer</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">copied</span>().<span class="ident">unwrap_or</span>(<span class="number">0</span>) <span class="op">&amp;</span> <span class="number">0x80</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="comment">// positive, so mask should do noghing</span>
-            <span class="number">0</span>
-        } <span class="kw">else</span> {
-            <span class="comment">// negative, so mask snould invert bits</span>
-            <span class="op">-</span><span class="number">1</span>
-        };
+        <span class="comment">// is it negative or not
+        </span><span class="kw">let </span>mask = <span class="kw">if </span>buffer.get(<span class="number">0</span>).copied().unwrap_or(<span class="number">0</span>) &amp; <span class="number">0x80 </span>== <span class="number">0 </span>{
+            <span class="comment">// positive, so mask should do noghing
+            </span><span class="number">0
+        </span>} <span class="kw">else </span>{
+            <span class="comment">// negative, so mask snould invert bits
+            </span>-<span class="number">1
+        </span>};
 
-        <span class="kw">let</span> <span class="ident">intg</span> <span class="op">=</span> <span class="ident">precision</span> <span class="op">-</span> <span class="ident">scale</span>;
-        <span class="kw">let</span> <span class="ident">prefix_len</span> <span class="op">=</span> <span class="ident">intg</span> <span class="op">%</span> <span class="ident">DIG_PER_DEC</span>;
-        <span class="kw">let</span> <span class="ident">intg_full</span> <span class="op">=</span> <span class="ident">intg</span> <span class="op">/</span> <span class="ident">DIG_PER_DEC</span>;
+        <span class="kw">let </span>intg = precision - scale;
+        <span class="kw">let </span>prefix_len = intg % DIG_PER_DEC;
+        <span class="kw">let </span>intg_full = intg / DIG_PER_DEC;
 
-        <span class="kw">let</span> <span class="ident">frac</span> <span class="op">=</span> <span class="ident">scale</span>;
-        <span class="kw">let</span> <span class="ident">suffix_len</span> <span class="op">=</span> <span class="ident">frac</span> <span class="op">%</span> <span class="ident">DIG_PER_DEC</span>;
-        <span class="kw">let</span> <span class="ident">frac_full</span> <span class="op">=</span> <span class="ident">frac</span> <span class="op">/</span> <span class="ident">DIG_PER_DEC</span>;
+        <span class="kw">let </span>frac = scale;
+        <span class="kw">let </span>suffix_len = frac % DIG_PER_DEC;
+        <span class="kw">let </span>frac_full = frac / DIG_PER_DEC;
 
-        <span class="ident">out</span>.<span class="ident">sign</span> <span class="op">=</span> <span class="ident">mask</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>;
-        <span class="ident">out</span>.<span class="ident">intg</span> <span class="op">=</span> <span class="ident">intg</span>;
-        <span class="ident">out</span>.<span class="ident">frac</span> <span class="op">=</span> <span class="ident">frac</span>;
+        out.sign = mask != <span class="number">0</span>;
+        out.intg = intg;
+        out.frac = frac;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">buffer</span>[..];
+        <span class="kw">let </span><span class="kw-2">mut </span>input = <span class="kw-2">&amp;</span>buffer[..];
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">trimmed</span> <span class="op">=</span> <span class="ident">keep_prec</span>;
-        <span class="kw">if</span> <span class="ident">prefix_len</span> <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">DIG_TO_BYTES</span>[<span class="ident">prefix_len</span>];
-            <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">len</span> {
-                <span class="number">1</span> =&gt; <span class="ident">input</span>.<span class="ident">read_i8</span>()<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">i32</span>,
-                <span class="number">2</span> =&gt; <span class="ident">input</span>.<span class="ident">read_i16</span>::<span class="op">&lt;</span><span class="ident">BE</span><span class="op">&gt;</span>()<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">i32</span>,
-                <span class="number">3</span> =&gt; <span class="ident">input</span>.<span class="ident">read_i24</span>::<span class="op">&lt;</span><span class="ident">BE</span><span class="op">&gt;</span>()<span class="question-mark">?</span>,
-                <span class="number">4</span> =&gt; <span class="ident">input</span>.<span class="ident">read_i32</span>::<span class="op">&lt;</span><span class="ident">BE</span><span class="op">&gt;</span>()<span class="question-mark">?</span>,
-                <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
-            } <span class="op">^</span> <span class="ident">mask</span>;
-            <span class="kw">if</span> <span class="ident">x</span> <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">trimmed</span> {
-                <span class="ident">out</span>.<span class="ident">intg</span> <span class="op">-</span><span class="op">=</span> <span class="ident">prefix_len</span>;
-            } <span class="kw">else</span> {
-                <span class="ident">trimmed</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                <span class="ident">out</span>.<span class="ident">buf</span>.<span class="ident">push</span>(<span class="ident">x</span>);
-            }
-        }
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">intg_full</span> {
-            <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_i32</span>::<span class="op">&lt;</span><span class="ident">BE</span><span class="op">&gt;</span>()<span class="question-mark">?</span> <span class="op">^</span> <span class="ident">mask</span>;
-            <span class="kw">if</span> <span class="ident">x</span> <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">trimmed</span> {
-                <span class="ident">out</span>.<span class="ident">intg</span> <span class="op">-</span><span class="op">=</span> <span class="ident">DIG_PER_DEC</span>;
-            } <span class="kw">else</span> {
-                <span class="ident">trimmed</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                <span class="ident">out</span>.<span class="ident">buf</span>.<span class="ident">push</span>(<span class="ident">x</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>trimmed = keep_prec;
+        <span class="kw">if </span>prefix_len &gt; <span class="number">0 </span>{
+            <span class="kw">let </span>len = DIG_TO_BYTES[prefix_len];
+            <span class="kw">let </span>x = <span class="kw">match </span>len {
+                <span class="number">1 </span>=&gt; input.read_i8()<span class="question-mark">? </span><span class="kw">as </span>i32,
+                <span class="number">2 </span>=&gt; input.read_i16::&lt;BE&gt;()<span class="question-mark">? </span><span class="kw">as </span>i32,
+                <span class="number">3 </span>=&gt; input.read_i24::&lt;BE&gt;()<span class="question-mark">?</span>,
+                <span class="number">4 </span>=&gt; input.read_i32::&lt;BE&gt;()<span class="question-mark">?</span>,
+                <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
+            } ^ mask;
+            <span class="kw">if </span>x == <span class="number">0 </span>&amp;&amp; !trimmed {
+                out.intg -= prefix_len;
+            } <span class="kw">else </span>{
+                trimmed = <span class="bool-val">true</span>;
+                out.buf.push(x);
             }
         }
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">frac_full</span> {
-            <span class="ident">out</span>.<span class="ident">buf</span>.<span class="ident">push</span>(<span class="ident">input</span>.<span class="ident">read_i32</span>::<span class="op">&lt;</span><span class="ident">BE</span><span class="op">&gt;</span>()<span class="question-mark">?</span> <span class="op">^</span> <span class="ident">mask</span>);
+        <span class="kw">for _ in </span><span class="number">0</span>..intg_full {
+            <span class="kw">let </span>x = input.read_i32::&lt;BE&gt;()<span class="question-mark">? </span>^ mask;
+            <span class="kw">if </span>x == <span class="number">0 </span>&amp;&amp; !trimmed {
+                out.intg -= DIG_PER_DEC;
+            } <span class="kw">else </span>{
+                trimmed = <span class="bool-val">true</span>;
+                out.buf.push(x);
+            }
         }
-        <span class="kw">if</span> <span class="ident">suffix_len</span> <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">DIG_TO_BYTES</span>[<span class="ident">suffix_len</span>];
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">x</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">len</span> {
-                <span class="number">1</span> =&gt; <span class="ident">input</span>.<span class="ident">read_i8</span>()<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">i32</span>,
-                <span class="number">2</span> =&gt; <span class="ident">input</span>.<span class="ident">read_i16</span>::<span class="op">&lt;</span><span class="ident">BE</span><span class="op">&gt;</span>()<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">i32</span>,
-                <span class="number">3</span> =&gt; <span class="ident">input</span>.<span class="ident">read_i24</span>::<span class="op">&lt;</span><span class="ident">BE</span><span class="op">&gt;</span>()<span class="question-mark">?</span>,
-                <span class="number">4</span> =&gt; <span class="ident">input</span>.<span class="ident">read_i32</span>::<span class="op">&lt;</span><span class="ident">BE</span><span class="op">&gt;</span>()<span class="question-mark">?</span>,
-                <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
-            } <span class="op">^</span> <span class="ident">mask</span>;
-            <span class="ident">x</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">POWERS_10</span>[<span class="ident">DIG_PER_DEC</span> <span class="op">-</span> <span class="ident">suffix_len</span>];
-            <span class="ident">out</span>.<span class="ident">buf</span>.<span class="ident">push</span>(<span class="ident">x</span>);
+        <span class="kw">for _ in </span><span class="number">0</span>..frac_full {
+            out.buf.push(input.read_i32::&lt;BE&gt;()<span class="question-mark">? </span>^ mask);
+        }
+        <span class="kw">if </span>suffix_len &gt; <span class="number">0 </span>{
+            <span class="kw">let </span>len = DIG_TO_BYTES[suffix_len];
+            <span class="kw">let </span><span class="kw-2">mut </span>x = <span class="kw">match </span>len {
+                <span class="number">1 </span>=&gt; input.read_i8()<span class="question-mark">? </span><span class="kw">as </span>i32,
+                <span class="number">2 </span>=&gt; input.read_i16::&lt;BE&gt;()<span class="question-mark">? </span><span class="kw">as </span>i32,
+                <span class="number">3 </span>=&gt; input.read_i24::&lt;BE&gt;()<span class="question-mark">?</span>,
+                <span class="number">4 </span>=&gt; input.read_i32::&lt;BE&gt;()<span class="question-mark">?</span>,
+                <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
+            } ^ mask;
+            x <span class="kw-2">*</span>= POWERS_10[DIG_PER_DEC - suffix_len];
+            out.buf.push(x);
         }
 
-        <span class="kw">if</span> <span class="ident">out</span>.<span class="ident">intg</span> <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">out</span>.<span class="ident">frac</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="ident">out</span>.<span class="ident">intg</span> <span class="op">=</span> <span class="number">1</span>;
-            <span class="ident">out</span>.<span class="ident">frac</span> <span class="op">=</span> <span class="number">0</span>;
-            <span class="ident">out</span>.<span class="ident">sign</span> <span class="op">=</span> <span class="bool-val">false</span>;
-            <span class="ident">out</span>.<span class="ident">buf</span>.<span class="ident">resize</span>(<span class="number">1</span>, <span class="number">0</span>);
-            <span class="ident">out</span>.<span class="ident">buf</span>[<span class="number">0</span>] <span class="op">=</span> <span class="number">0</span>;
+        <span class="kw">if </span>out.intg == <span class="number">0 </span>&amp;&amp; out.frac == <span class="number">0 </span>{
+            out.intg = <span class="number">1</span>;
+            out.frac = <span class="number">0</span>;
+            out.sign = <span class="bool-val">false</span>;
+            out.buf.resize(<span class="number">1</span>, <span class="number">0</span>);
+            out.buf[<span class="number">0</span>] = <span class="number">0</span>;
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">out</span>)
+        <span class="prelude-val">Ok</span>(out)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">Decimal</span> {
-    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">Ordering</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">left</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="self">self</span>.<span class="ident">bin_size</span>());
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">right</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="self">self</span>.<span class="ident">bin_size</span>());
-        <span class="self">self</span>.<span class="ident">write_bin</span>(<span class="kw-2">&amp;mut</span> <span class="ident">left</span>).<span class="ident">expect</span>(<span class="string">&quot;OOM&quot;</span>);
-        <span class="ident">other</span>.<span class="ident">write_bin</span>(<span class="kw-2">&amp;mut</span> <span class="ident">right</span>).<span class="ident">expect</span>(<span class="string">&quot;OOM&quot;</span>);
-        <span class="ident">left</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">right</span>)
+<span class="kw">impl </span>Ord <span class="kw">for </span>Decimal {
+    <span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; Ordering {
+        <span class="kw">let </span><span class="kw-2">mut </span>left = Vec::with_capacity(<span class="self">self</span>.bin_size());
+        <span class="kw">let </span><span class="kw-2">mut </span>right = Vec::with_capacity(<span class="self">self</span>.bin_size());
+        <span class="self">self</span>.write_bin(<span class="kw-2">&amp;mut </span>left).expect(<span class="string">&quot;OOM&quot;</span>);
+        other.write_bin(<span class="kw-2">&amp;mut </span>right).expect(<span class="string">&quot;OOM&quot;</span>);
+        left.cmp(<span class="kw-2">&amp;</span>right)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">Decimal</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">cmp</span>(<span class="ident">other</span>))
+<span class="kw">impl </span>PartialOrd <span class="kw">for </span>Decimal {
+    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Ordering&gt; {
+        <span class="prelude-val">Some</span>(<span class="self">self</span>.cmp(other))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">Decimal</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">cmp</span>(<span class="ident">other</span>) <span class="op">==</span> <span class="ident">Ordering::Equal</span>
+<span class="kw">impl </span>PartialEq <span class="kw">for </span>Decimal {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="self">self</span>.cmp(other) == Ordering::Equal
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Decimal</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="ident">prefix_len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">intg</span> <span class="op">%</span> <span class="ident">DIG_PER_DEC</span>;
-        <span class="kw">let</span> <span class="ident">suffix_len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">frac</span> <span class="op">%</span> <span class="ident">DIG_PER_DEC</span>;
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Decimal {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">let </span>prefix_len = <span class="self">self</span>.intg % DIG_PER_DEC;
+        <span class="kw">let </span>suffix_len = <span class="self">self</span>.frac % DIG_PER_DEC;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">intg</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">intg</span>;
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">sign</span> {
-            <span class="string">&#39;-&#39;</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>intg = <span class="self">self</span>.intg;
+        <span class="kw">if </span><span class="self">self</span>.sign {
+            <span class="string">&#39;-&#39;</span>.fmt(f)<span class="question-mark">?</span>;
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>i = <span class="number">0</span>;
 
-        <span class="kw">while</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&amp;&amp;</span> <span class="ident">intg</span> <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buf</span>[<span class="ident">i</span>];
-            <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="kw">if</span> <span class="ident">prefix_len</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">i</span> <span class="op">==</span> <span class="number">1</span> {
-                <span class="ident">x</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)<span class="question-mark">?</span>;
-                <span class="ident">intg</span> <span class="op">-</span><span class="op">=</span> <span class="ident">prefix_len</span>;
-            } <span class="kw">else</span> {
-                <span class="kw">if</span> <span class="ident">i</span> <span class="op">==</span> <span class="number">1</span> {
-                    <span class="ident">x</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)<span class="question-mark">?</span>;
-                } <span class="kw">else</span> {
-                    <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{:09}&quot;</span>, <span class="ident">x</span>)<span class="question-mark">?</span>;
+        <span class="kw">while </span>i &lt; <span class="self">self</span>.buf.len() &amp;&amp; intg &gt; <span class="number">0 </span>{
+            <span class="kw">let </span>x = <span class="self">self</span>.buf[i];
+            i += <span class="number">1</span>;
+            <span class="kw">if </span>prefix_len &gt; <span class="number">0 </span>&amp;&amp; i == <span class="number">1 </span>{
+                x.fmt(f)<span class="question-mark">?</span>;
+                intg -= prefix_len;
+            } <span class="kw">else </span>{
+                <span class="kw">if </span>i == <span class="number">1 </span>{
+                    x.fmt(f)<span class="question-mark">?</span>;
+                } <span class="kw">else </span>{
+                    <span class="macro">write!</span>(f, <span class="string">&quot;{:09}&quot;</span>, x)<span class="question-mark">?</span>;
                 }
-                <span class="ident">intg</span> <span class="op">-</span><span class="op">=</span> <span class="ident">DIG_PER_DEC</span>;
+                intg -= DIG_PER_DEC;
             }
         }
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">intg</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="string">&#39;0&#39;</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)<span class="question-mark">?</span>;
+        <span class="kw">if </span><span class="self">self</span>.intg == <span class="number">0 </span>{
+            <span class="string">&#39;0&#39;</span>.fmt(f)<span class="question-mark">?</span>;
         }
 
-        <span class="kw">if</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">len</span>() {
-            <span class="string">&#39;.&#39;</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)<span class="question-mark">?</span>;
+        <span class="kw">if </span>i &lt; <span class="self">self</span>.buf.len() {
+            <span class="string">&#39;.&#39;</span>.fmt(f)<span class="question-mark">?</span>;
         }
 
-        <span class="kw">while</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">len</span>() {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">x</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buf</span>[<span class="ident">i</span>];
-            <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="kw">if</span> <span class="ident">i</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&amp;&amp;</span> <span class="ident">suffix_len</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                <span class="ident">x</span> <span class="op">/</span><span class="op">=</span> <span class="ident">POWERS_10</span>[<span class="ident">DIG_PER_DEC</span> <span class="op">-</span> <span class="ident">suffix_len</span>];
-                <span class="macro">write!</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">f</span>, <span class="string">&quot;{:0width$}&quot;</span>, <span class="ident">x</span>, <span class="ident">width</span> <span class="op">=</span> <span class="ident">suffix_len</span>)<span class="question-mark">?</span>;
-            } <span class="kw">else</span> {
-                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{:09}&quot;</span>, <span class="ident">x</span>)<span class="question-mark">?</span>;
+        <span class="kw">while </span>i &lt; <span class="self">self</span>.buf.len() {
+            <span class="kw">let </span><span class="kw-2">mut </span>x = <span class="self">self</span>.buf[i];
+            i += <span class="number">1</span>;
+            <span class="kw">if </span>i == <span class="self">self</span>.buf.len() &amp;&amp; suffix_len &gt; <span class="number">0 </span>{
+                x /= POWERS_10[DIG_PER_DEC - suffix_len];
+                <span class="macro">write!</span>(<span class="kw-2">&amp;mut *</span>f, <span class="string">&quot;{:0width$}&quot;</span>, x, width = suffix_len)<span class="question-mark">?</span>;
+            } <span class="kw">else </span>{
+                <span class="macro">write!</span>(f, <span class="string">&quot;{:09}&quot;</span>, x)<span class="question-mark">?</span>;
             }
         }
 
@@ -694,85 +694,85 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">Decimal</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">ParseDecimalError</span>;
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="kw-2">mut</span> <span class="ident">from</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">Decimal::default</span>();
+<span class="kw">impl </span>FromStr <span class="kw">for </span>Decimal {
+    <span class="kw">type </span><span class="prelude-val">Err </span>= ParseDecimalError;
+    <span class="kw">fn </span>from_str(<span class="kw-2">mut </span>from: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>out = Decimal::default();
 
-        <span class="ident">from</span> <span class="op">=</span> <span class="ident">from</span>.<span class="ident">trim</span>();
+        from = from.trim();
 
-        <span class="kw">if</span> <span class="ident">from</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ParseDecimalError</span>);
+        <span class="kw">if </span>from.is_empty() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(ParseDecimalError);
         }
 
-        <span class="kw">if</span> <span class="ident">from</span>.<span class="ident">starts_with</span>(<span class="string">&#39;-&#39;</span>) {
-            <span class="ident">out</span>.<span class="ident">sign</span> <span class="op">=</span> <span class="bool-val">true</span>;
-            <span class="ident">from</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">from</span>[<span class="number">1</span>..];
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">from</span>.<span class="ident">starts_with</span>(<span class="string">&#39;+&#39;</span>) {
-            <span class="ident">from</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">from</span>[<span class="number">1</span>..];
+        <span class="kw">if </span>from.starts_with(<span class="string">&#39;-&#39;</span>) {
+            out.sign = <span class="bool-val">true</span>;
+            from = <span class="kw-2">&amp;</span>from[<span class="number">1</span>..];
+        } <span class="kw">else if </span>from.starts_with(<span class="string">&#39;+&#39;</span>) {
+            from = <span class="kw-2">&amp;</span>from[<span class="number">1</span>..];
         }
 
-        <span class="kw">let</span> <span class="ident">point_idx</span> <span class="op">=</span> <span class="ident">from</span>.<span class="ident">find</span>(<span class="string">&#39;.&#39;</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">from</span>.<span class="ident">len</span>());
-        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">integral</span>, <span class="kw-2">mut</span> <span class="ident">fractional</span>) <span class="op">=</span> <span class="ident">from</span>.<span class="ident">split_at</span>(<span class="ident">point_idx</span>);
-        <span class="ident">fractional</span> <span class="op">=</span> <span class="ident">fractional</span>.<span class="ident">get</span>(<span class="number">1</span>..).<span class="ident">unwrap_or</span>(<span class="ident">fractional</span>);
+        <span class="kw">let </span>point_idx = from.find(<span class="string">&#39;.&#39;</span>).unwrap_or_else(|| from.len());
+        <span class="kw">let </span>(<span class="kw-2">mut </span>integral, <span class="kw-2">mut </span>fractional) = from.split_at(point_idx);
+        fractional = fractional.get(<span class="number">1</span>..).unwrap_or(fractional);
 
-        <span class="ident">out</span>.<span class="ident">intg</span> <span class="op">=</span> <span class="ident">integral</span>.<span class="ident">len</span>();
-        <span class="ident">out</span>.<span class="ident">frac</span> <span class="op">=</span> <span class="ident">fractional</span>.<span class="ident">len</span>();
+        out.intg = integral.len();
+        out.frac = fractional.len();
 
-        <span class="kw">if</span> <span class="ident">out</span>.<span class="ident">intg</span> <span class="op">+</span> <span class="ident">out</span>.<span class="ident">frac</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ParseDecimalError</span>);
+        <span class="kw">if </span>out.intg + out.frac == <span class="number">0 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(ParseDecimalError);
         }
 
-        <span class="kw">if</span> <span class="ident">integral</span>.<span class="ident">bytes</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="op">!</span><span class="ident">x</span>.<span class="ident">is_ascii_digit</span>())
-            <span class="op">|</span><span class="op">|</span> <span class="ident">fractional</span>.<span class="ident">bytes</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="op">!</span><span class="ident">x</span>.<span class="ident">is_ascii_digit</span>())
+        <span class="kw">if </span>integral.bytes().any(|x| !x.is_ascii_digit())
+            || fractional.bytes().any(|x| !x.is_ascii_digit())
         {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ParseDecimalError</span>);
+            <span class="kw">return </span><span class="prelude-val">Err</span>(ParseDecimalError);
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">prefix_len</span> <span class="op">=</span> <span class="ident">integral</span>.<span class="ident">len</span>() <span class="op">%</span> <span class="ident">DIG_PER_DEC</span>;
-        <span class="kw">if</span> <span class="ident">prefix_len</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="ident">prefix_len</span> <span class="op">=</span> <span class="ident">DIG_PER_DEC</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>prefix_len = integral.len() % DIG_PER_DEC;
+        <span class="kw">if </span>prefix_len == <span class="number">0 </span>{
+            prefix_len = DIG_PER_DEC;
         }
-        <span class="kw">while</span> <span class="op">!</span><span class="ident">integral</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">let</span> <span class="ident">prefix</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">integral</span>[..<span class="ident">prefix_len</span>];
-            <span class="kw">let</span> <span class="ident">x</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="ident">prefix</span>.<span class="ident">parse</span>().<span class="ident">expect</span>(<span class="string">&quot;should not fail&quot;</span>);
-            <span class="ident">out</span>.<span class="ident">buf</span>.<span class="ident">push</span>(<span class="ident">x</span>);
-            <span class="ident">integral</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">integral</span>[<span class="ident">prefix_len</span>..];
-            <span class="ident">prefix_len</span> <span class="op">=</span> <span class="ident">DIG_PER_DEC</span>;
+        <span class="kw">while </span>!integral.is_empty() {
+            <span class="kw">let </span>prefix = <span class="kw-2">&amp;</span>integral[..prefix_len];
+            <span class="kw">let </span>x: i32 = prefix.parse().expect(<span class="string">&quot;should not fail&quot;</span>);
+            out.buf.push(x);
+            integral = <span class="kw-2">&amp;</span>integral[prefix_len..];
+            prefix_len = DIG_PER_DEC;
         }
 
-        <span class="kw">while</span> <span class="op">!</span><span class="ident">fractional</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">std::cmp::min</span>(<span class="ident">DIG_PER_DEC</span>, <span class="ident">fractional</span>.<span class="ident">len</span>());
-            <span class="kw">let</span> <span class="ident">prefix</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">fractional</span>[..<span class="ident">len</span>];
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">x</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="ident">prefix</span>.<span class="ident">parse</span>().<span class="ident">expect</span>(<span class="string">&quot;should not fail&quot;</span>);
-            <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span> <span class="ident">DIG_PER_DEC</span> {
-                <span class="ident">x</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">POWERS_10</span>[<span class="ident">DIG_PER_DEC</span> <span class="op">-</span> <span class="ident">len</span>];
+        <span class="kw">while </span>!fractional.is_empty() {
+            <span class="kw">let </span>len = std::cmp::min(DIG_PER_DEC, fractional.len());
+            <span class="kw">let </span>prefix = <span class="kw-2">&amp;</span>fractional[..len];
+            <span class="kw">let </span><span class="kw-2">mut </span>x: i32 = prefix.parse().expect(<span class="string">&quot;should not fail&quot;</span>);
+            <span class="kw">if </span>len &lt; DIG_PER_DEC {
+                x <span class="kw-2">*</span>= POWERS_10[DIG_PER_DEC - len];
             }
-            <span class="ident">out</span>.<span class="ident">buf</span>.<span class="ident">push</span>(<span class="ident">x</span>);
-            <span class="ident">fractional</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">fractional</span>[<span class="ident">len</span>..];
+            out.buf.push(x);
+            fractional = <span class="kw-2">&amp;</span>fractional[len..];
         }
 
-        <span class="kw">if</span> <span class="ident">out</span>.<span class="ident">buf</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">x</span> <span class="op">==</span> <span class="number">0</span>) {
-            <span class="ident">out</span>.<span class="ident">sign</span> <span class="op">=</span> <span class="bool-val">false</span>;
+        <span class="kw">if </span>out.buf.iter().all(|x| <span class="kw-2">*</span>x == <span class="number">0</span>) {
+            out.sign = <span class="bool-val">false</span>;
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">out</span>)
+        <span class="prelude-val">Ok</span>(out)
     }
 }
 
-<span class="doccomment">/// Returns binary representation size (in bytes) for given precision and scale.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decimal_bin_size</span>(<span class="ident">precision</span>: <span class="ident">usize</span>, <span class="ident">scale</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
-    <span class="kw">let</span> <span class="ident">intg</span> <span class="op">=</span> <span class="ident">precision</span> <span class="op">-</span> <span class="ident">scale</span>;
-    <span class="kw">let</span> <span class="ident">intg0</span> <span class="op">=</span> <span class="ident">intg</span> <span class="op">/</span> <span class="ident">DIG_PER_DEC</span>;
-    <span class="kw">let</span> <span class="ident">frac0</span> <span class="op">=</span> <span class="ident">scale</span> <span class="op">/</span> <span class="ident">DIG_PER_DEC</span>;
-    <span class="kw">let</span> <span class="ident">intg0x</span> <span class="op">=</span> <span class="ident">intg</span> <span class="op">-</span> <span class="ident">intg0</span> <span class="op">*</span> <span class="ident">DIG_PER_DEC</span>;
-    <span class="kw">let</span> <span class="ident">frac0x</span> <span class="op">=</span> <span class="ident">scale</span> <span class="op">-</span> <span class="ident">frac0</span> <span class="op">*</span> <span class="ident">DIG_PER_DEC</span>;
+<span class="doccomment">/// Returns binary representation size (in bytes) for given precision and scale.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>decimal_bin_size(precision: usize, scale: usize) -&gt; usize {
+    <span class="kw">let </span>intg = precision - scale;
+    <span class="kw">let </span>intg0 = intg / DIG_PER_DEC;
+    <span class="kw">let </span>frac0 = scale / DIG_PER_DEC;
+    <span class="kw">let </span>intg0x = intg - intg0 * DIG_PER_DEC;
+    <span class="kw">let </span>frac0x = scale - frac0 * DIG_PER_DEC;
 
-    <span class="ident">intg0</span> <span class="op">*</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">Digit</span><span class="op">&gt;</span>()
-        <span class="op">+</span> <span class="ident">DIG_TO_BYTES</span>[<span class="ident">intg0x</span>] <span class="kw">as</span> <span class="ident">usize</span>
-        <span class="op">+</span> <span class="ident">frac0</span> <span class="op">*</span> <span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">Digit</span><span class="op">&gt;</span>()
-        <span class="op">+</span> <span class="ident">DIG_TO_BYTES</span>[<span class="ident">frac0x</span>] <span class="kw">as</span> <span class="ident">usize</span>
+    intg0 * size_of::&lt;Digit&gt;()
+        + DIG_TO_BYTES[intg0x] <span class="kw">as </span>usize
+        + frac0 * size_of::&lt;Digit&gt;()
+        + DIG_TO_BYTES[frac0x] <span class="kw">as </span>usize
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

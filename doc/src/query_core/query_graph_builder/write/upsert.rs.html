@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_graph_builder/write/upsert.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>upsert.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../query_core/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_graph_builder/write/upsert.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>upsert.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../query_core/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -251,194 +251,194 @@
 <span id="251">251</span>
 <span id="252">252</span>
 <span id="253">253</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">write_args_parser::WriteArgsParser</span>, <span class="kw-2">*</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">query_ast</span>::<span class="kw-2">*</span>,
-    <span class="ident">query_graph</span>::{<span class="ident">Flow</span>, <span class="ident">Node</span>, <span class="ident">QueryGraph</span>, <span class="ident">QueryGraphDependency</span>},
-    <span class="ident">ParsedField</span>, <span class="ident">ParsedInputMap</span>, <span class="ident">ParsedInputValue</span>,
+</pre><pre class="rust"><code><span class="kw">use super</span>::{write_args_parser::WriteArgsParser, <span class="kw-2">*</span>};
+<span class="kw">use crate</span>::{
+    query_ast::<span class="kw-2">*</span>,
+    query_graph::{Flow, Node, QueryGraph, QueryGraphDependency},
+    ParsedField, ParsedInputMap, ParsedInputValue,
 };
-<span class="kw">use</span> <span class="ident">connector::IntoFilter</span>;
-<span class="kw">use</span> <span class="ident">prisma_models::ModelRef</span>;
-<span class="kw">use</span> <span class="ident">schema::ConnectorContext</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<span class="kw">use </span>connector::IntoFilter;
+<span class="kw">use </span>prisma_models::ModelRef;
+<span class="kw">use </span>schema::ConnectorContext;
+<span class="kw">use </span>std::sync::Arc;
 
-<span class="doccomment">/// Handles a top-level upsert</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">///                         ┌─────────────────┐           ┌ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">///                         │   Read Parent   │─ ─ ─ ─ ─ ▶    Result   │</span>
-<span class="doccomment">///                         └─────────────────┘           └ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">///                                  │</span>
-<span class="doccomment">///                                  │</span>
-<span class="doccomment">///                                  │</span>
-<span class="doccomment">///                                  │</span>
-<span class="doccomment">///                                  ▼</span>
-<span class="doccomment">///                         ┌─────────────────┐</span>
-<span class="doccomment">///           ┌───Then──────│   If (exists)   │──Else─────┐</span>
-<span class="doccomment">///           │             └─────────────────┘           │</span>
-<span class="doccomment">///           │                                           │</span>
-<span class="doccomment">/// ┌ ─ ─ ─ ─ ▼ ─ ─ ─ ─ ┐                                 │</span>
-<span class="doccomment">///  ┌─────────────────┐                                  │</span>
-<span class="doccomment">/// ││    Join Node    ││                                 │</span>
-<span class="doccomment">///  └─────────────────┘                                  ▼</span>
-<span class="doccomment">/// │         │         │                        ┌─────────────────┐</span>
-<span class="doccomment">///           │                                  │  Create Parent  │</span>
-<span class="doccomment">/// │         ▼         │                        └─────────────────┘</span>
-<span class="doccomment">///  ┌─────────────────┐                                  │</span>
-<span class="doccomment">/// ││ Insert onUpdate ││                                 │</span>
-<span class="doccomment">///  │emulation subtree│                                  │</span>
-<span class="doccomment">/// ││for all relations││                                 │</span>
-<span class="doccomment">///  │ pointing to the │                                  ▼</span>
-<span class="doccomment">/// ││  Parent model   ││                        ┌─────────────────┐</span>
-<span class="doccomment">///  └─────────────────┘                         │   Read Parent   │</span>
-<span class="doccomment">/// └ ─ ─ ─ ─ ┬ ─ ─ ─ ─ ┘                        └─────────────────┘</span>
-<span class="doccomment">///           │</span>
-<span class="doccomment">///           │</span>
-<span class="doccomment">///           ▼</span>
-<span class="doccomment">///  ┌─────────────────┐</span>
-<span class="doccomment">///  │  Update Parent  │</span>
-<span class="doccomment">///  └─────────────────┘</span>
-<span class="doccomment">///           │</span>
-<span class="doccomment">///           ▼</span>
-<span class="doccomment">///  ┌─────────────────┐</span>
-<span class="doccomment">///  │   Read Parent   │</span>
-<span class="doccomment">///  └─────────────────┘</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">upsert_record</span>(
-    <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-    <span class="ident">connector_ctx</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectorContext</span>,
-    <span class="ident">model</span>: <span class="ident">ModelRef</span>,
-    <span class="kw-2">mut</span> <span class="ident">field</span>: <span class="ident">ParsedField</span>,
-) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">where_argument</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">where_arg</span>()<span class="question-mark">?</span>.<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">create_argument</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">create_arg</span>()<span class="question-mark">?</span>.<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">update_argument</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">update_arg</span>()<span class="question-mark">?</span>.<span class="ident">unwrap</span>();
+<span class="doccomment">/// Handles a top-level upsert
+///
+/// ```text
+///                         ┌─────────────────┐           ┌ ─ ─ ─ ─ ─ ─
+///                         │   Read Parent   │─ ─ ─ ─ ─ ▶    Result   │
+///                         └─────────────────┘           └ ─ ─ ─ ─ ─ ─
+///                                  │
+///                                  │
+///                                  │
+///                                  │
+///                                  ▼
+///                         ┌─────────────────┐
+///           ┌───Then──────│   If (exists)   │──Else─────┐
+///           │             └─────────────────┘           │
+///           │                                           │
+/// ┌ ─ ─ ─ ─ ▼ ─ ─ ─ ─ ┐                                 │
+///  ┌─────────────────┐                                  │
+/// ││    Join Node    ││                                 │
+///  └─────────────────┘                                  ▼
+/// │         │         │                        ┌─────────────────┐
+///           │                                  │  Create Parent  │
+/// │         ▼         │                        └─────────────────┘
+///  ┌─────────────────┐                                  │
+/// ││ Insert onUpdate ││                                 │
+///  │emulation subtree│                                  │
+/// ││for all relations││                                 │
+///  │ pointing to the │                                  ▼
+/// ││  Parent model   ││                        ┌─────────────────┐
+///  └─────────────────┘                         │   Read Parent   │
+/// └ ─ ─ ─ ─ ┬ ─ ─ ─ ─ ┘                        └─────────────────┘
+///           │
+///           │
+///           ▼
+///  ┌─────────────────┐
+///  │  Update Parent  │
+///  └─────────────────┘
+///           │
+///           ▼
+///  ┌─────────────────┐
+///  │   Read Parent   │
+///  └─────────────────┘
+/// ```
+</span><span class="kw">pub fn </span>upsert_record(
+    graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+    model: ModelRef,
+    <span class="kw-2">mut </span>field: ParsedField,
+) -&gt; QueryGraphBuilderResult&lt;()&gt; {
+    <span class="kw">let </span>where_argument = field.where_arg()<span class="question-mark">?</span>.unwrap();
+    <span class="kw">let </span>create_argument = field.create_arg()<span class="question-mark">?</span>.unwrap();
+    <span class="kw">let </span>update_argument = field.update_arg()<span class="question-mark">?</span>.unwrap();
 
-    <span class="kw">let</span> <span class="ident">can_use_native_upsert</span> <span class="op">=</span> <span class="ident">can_use_connector_native_upsert</span>(
-        <span class="kw-2">&amp;</span><span class="ident">model</span>,
-        <span class="kw-2">&amp;</span><span class="ident">where_argument</span>,
-        <span class="kw-2">&amp;</span><span class="ident">create_argument</span>,
-        <span class="kw-2">&amp;</span><span class="ident">update_argument</span>,
-        <span class="ident">connector_ctx</span>,
+    <span class="kw">let </span>can_use_native_upsert = can_use_connector_native_upsert(
+        <span class="kw-2">&amp;</span>model,
+        <span class="kw-2">&amp;</span>where_argument,
+        <span class="kw-2">&amp;</span>create_argument,
+        <span class="kw-2">&amp;</span>update_argument,
+        connector_ctx,
     );
 
-    <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">extract_unique_filter</span>(<span class="ident">where_argument</span>, <span class="kw-2">&amp;</span><span class="ident">model</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">read_query</span> <span class="op">=</span> <span class="ident">read::find_unique</span>(<span class="ident">field</span>.<span class="ident">clone</span>(), <span class="ident">model</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>;
+    <span class="kw">let </span>filter = extract_unique_filter(where_argument, <span class="kw-2">&amp;</span>model)<span class="question-mark">?</span>;
+    <span class="kw">let </span>read_query = read::find_unique(field.clone(), model.clone())<span class="question-mark">?</span>;
 
-    <span class="kw">if</span> <span class="ident">can_use_native_upsert</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ReadQuery::RecordQuery</span>(<span class="ident">read</span>) <span class="op">=</span> <span class="ident">read_query</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">create_write_args</span> <span class="op">=</span> <span class="ident">WriteArgsParser::from</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>, <span class="ident">create_argument</span>)<span class="question-mark">?</span>.<span class="ident">args</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">update_write_args</span> <span class="op">=</span> <span class="ident">WriteArgsParser::from</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>, <span class="ident">update_argument</span>)<span class="question-mark">?</span>.<span class="ident">args</span>;
+    <span class="kw">if </span>can_use_native_upsert {
+        <span class="kw">if let </span>ReadQuery::RecordQuery(read) = read_query {
+            <span class="kw">let </span><span class="kw-2">mut </span>create_write_args = WriteArgsParser::from(<span class="kw-2">&amp;</span>model, create_argument)<span class="question-mark">?</span>.args;
+            <span class="kw">let </span><span class="kw-2">mut </span>update_write_args = WriteArgsParser::from(<span class="kw-2">&amp;</span>model, update_argument)<span class="question-mark">?</span>.args;
 
-            <span class="ident">create_write_args</span>.<span class="ident">add_datetimes</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>);
-            <span class="ident">update_write_args</span>.<span class="ident">add_datetimes</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>);
-            <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">WriteQuery::native_upsert</span>(
-                <span class="ident">field</span>.<span class="ident">name</span>,
-                <span class="ident">model</span>,
-                <span class="ident">filter</span>.<span class="ident">into</span>(),
-                <span class="ident">create_write_args</span>,
-                <span class="ident">update_write_args</span>,
-                <span class="ident">read</span>,
+            create_write_args.add_datetimes(<span class="kw-2">&amp;</span>model);
+            update_write_args.add_datetimes(<span class="kw-2">&amp;</span>model);
+            graph.create_node(WriteQuery::native_upsert(
+                field.name,
+                model,
+                filter.into(),
+                create_write_args,
+                update_write_args,
+                read,
             ));
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(());
         }
     }
 
-    <span class="ident">graph</span>.<span class="ident">flag_transactional</span>();
+    graph.flag_transactional();
 
-    <span class="kw">let</span> <span class="ident">model_id</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_identifier</span>();
+    <span class="kw">let </span>model_id = model.primary_identifier();
 
-    <span class="kw">let</span> <span class="ident">read_parent_records</span> <span class="op">=</span> <span class="ident">utils::read_ids_infallible</span>(<span class="ident">model</span>.<span class="ident">clone</span>(), <span class="ident">model_id</span>.<span class="ident">clone</span>(), <span class="ident">filter</span>.<span class="ident">clone</span>());
-    <span class="kw">let</span> <span class="ident">read_parent_records_node</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">read_parent_records</span>);
+    <span class="kw">let </span>read_parent_records = utils::read_ids_infallible(model.clone(), model_id.clone(), filter.clone());
+    <span class="kw">let </span>read_parent_records_node = graph.create_node(read_parent_records);
 
-    <span class="kw">let</span> <span class="ident">create_node</span> <span class="op">=</span> <span class="ident">create::create_record_node</span>(<span class="ident">graph</span>, <span class="ident">connector_ctx</span>, <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>), <span class="ident">create_argument</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>create_node = create::create_record_node(graph, connector_ctx, Arc::clone(<span class="kw-2">&amp;</span>model), create_argument)<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">update_node</span> <span class="op">=</span> <span class="ident">update::update_record_node</span>(<span class="ident">graph</span>, <span class="ident">connector_ctx</span>, <span class="ident">filter</span>, <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>), <span class="ident">update_argument</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>update_node = update::update_record_node(graph, connector_ctx, filter, Arc::clone(<span class="kw-2">&amp;</span>model), update_argument)<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">read_node_create</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">Query::Read</span>(<span class="ident">read_query</span>.<span class="ident">clone</span>()));
-    <span class="kw">let</span> <span class="ident">read_node_update</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">Query::Read</span>(<span class="ident">read_query</span>));
+    <span class="kw">let </span>read_node_create = graph.create_node(Query::Read(read_query.clone()));
+    <span class="kw">let </span>read_node_update = graph.create_node(Query::Read(read_query));
 
-    <span class="ident">graph</span>.<span class="ident">add_result_node</span>(<span class="kw-2">&amp;</span><span class="ident">read_node_create</span>);
-    <span class="ident">graph</span>.<span class="ident">add_result_node</span>(<span class="kw-2">&amp;</span><span class="ident">read_node_update</span>);
+    graph.add_result_node(<span class="kw-2">&amp;</span>read_node_create);
+    graph.add_result_node(<span class="kw-2">&amp;</span>read_node_update);
 
-    <span class="kw">let</span> <span class="ident">if_node</span> <span class="op">=</span> <span class="ident">graph</span>.<span class="ident">create_node</span>(<span class="ident">Flow::default_if</span>());
+    <span class="kw">let </span>if_node = graph.create_node(Flow::default_if());
 
-    <span class="ident">graph</span>.<span class="ident">create_edge</span>(
-        <span class="kw-2">&amp;</span><span class="ident">read_parent_records_node</span>,
-        <span class="kw-2">&amp;</span><span class="ident">if_node</span>,
-        <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
-            <span class="ident">model_id</span>.<span class="ident">clone</span>(),
-            <span class="ident">Box::new</span>(<span class="op">|</span><span class="ident">if_node</span>, <span class="ident">parent_ids</span><span class="op">|</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Flow</span>(<span class="ident">Flow::If</span>(<span class="kw">_</span>)) <span class="op">=</span> <span class="ident">if_node</span> {
-                    <span class="comment">// Todo: This looks super unnecessary</span>
-                    <span class="prelude-val">Ok</span>(<span class="ident">Node::Flow</span>(<span class="ident">Flow::If</span>(<span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">parent_ids</span>.<span class="ident">is_empty</span>()))))
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">Ok</span>(<span class="ident">if_node</span>)
+    graph.create_edge(
+        <span class="kw-2">&amp;</span>read_parent_records_node,
+        <span class="kw-2">&amp;</span>if_node,
+        QueryGraphDependency::ProjectedDataDependency(
+            model_id.clone(),
+            Box::new(|if_node, parent_ids| {
+                <span class="kw">if let </span>Node::Flow(Flow::If(<span class="kw">_</span>)) = if_node {
+                    <span class="comment">// Todo: This looks super unnecessary
+                    </span><span class="prelude-val">Ok</span>(Node::Flow(Flow::If(Box::new(<span class="kw">move </span>|| !parent_ids.is_empty()))))
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">Ok</span>(if_node)
                 }
             }),
         ),
     )<span class="question-mark">?</span>;
 
-    <span class="comment">// In case the connector doesn&#39;t support referential integrity, we add a subtree to the graph that emulates the ON_UPDATE referential action.</span>
-    <span class="comment">// When that&#39;s the case, we create an intermediary node to which we connect all the nodes reponsible for emulating the referential action</span>
-    <span class="comment">// Then, we connect the if node to that intermediary emulation node. This enables performing the emulation only in case the graph traverses</span>
-    <span class="comment">// the update path (if the children already exists and goes to the THEN node).</span>
-    <span class="comment">// It&#39;s only after we&#39;ve executed the emulation that it&#39;ll traverse the update node, hence the ExecutionOrder between</span>
-    <span class="comment">// the emulation node and the update node.</span>
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">emulation_node</span>) <span class="op">=</span> <span class="ident">utils::insert_emulated_on_update_with_intermediary_node</span>(
-        <span class="ident">graph</span>,
-        <span class="ident">connector_ctx</span>,
-        <span class="kw-2">&amp;</span><span class="ident">model</span>,
-        <span class="kw-2">&amp;</span><span class="ident">read_parent_records_node</span>,
-        <span class="kw-2">&amp;</span><span class="ident">update_node</span>,
-    )<span class="question-mark">?</span> {
-        <span class="ident">graph</span>.<span class="ident">create_edge</span>(<span class="kw-2">&amp;</span><span class="ident">if_node</span>, <span class="kw-2">&amp;</span><span class="ident">emulation_node</span>, <span class="ident">QueryGraphDependency::Then</span>)<span class="question-mark">?</span>;
-        <span class="ident">graph</span>.<span class="ident">create_edge</span>(<span class="kw-2">&amp;</span><span class="ident">emulation_node</span>, <span class="kw-2">&amp;</span><span class="ident">update_node</span>, <span class="ident">QueryGraphDependency::ExecutionOrder</span>)<span class="question-mark">?</span>;
-    } <span class="kw">else</span> {
-        <span class="ident">graph</span>.<span class="ident">create_edge</span>(<span class="kw-2">&amp;</span><span class="ident">if_node</span>, <span class="kw-2">&amp;</span><span class="ident">update_node</span>, <span class="ident">QueryGraphDependency::Then</span>)<span class="question-mark">?</span>;
+    <span class="comment">// In case the connector doesn&#39;t support referential integrity, we add a subtree to the graph that emulates the ON_UPDATE referential action.
+    // When that&#39;s the case, we create an intermediary node to which we connect all the nodes reponsible for emulating the referential action
+    // Then, we connect the if node to that intermediary emulation node. This enables performing the emulation only in case the graph traverses
+    // the update path (if the children already exists and goes to the THEN node).
+    // It&#39;s only after we&#39;ve executed the emulation that it&#39;ll traverse the update node, hence the ExecutionOrder between
+    // the emulation node and the update node.
+    </span><span class="kw">if let </span><span class="prelude-val">Some</span>(emulation_node) = utils::insert_emulated_on_update_with_intermediary_node(
+        graph,
+        connector_ctx,
+        <span class="kw-2">&amp;</span>model,
+        <span class="kw-2">&amp;</span>read_parent_records_node,
+        <span class="kw-2">&amp;</span>update_node,
+    )<span class="question-mark">? </span>{
+        graph.create_edge(<span class="kw-2">&amp;</span>if_node, <span class="kw-2">&amp;</span>emulation_node, QueryGraphDependency::Then)<span class="question-mark">?</span>;
+        graph.create_edge(<span class="kw-2">&amp;</span>emulation_node, <span class="kw-2">&amp;</span>update_node, QueryGraphDependency::ExecutionOrder)<span class="question-mark">?</span>;
+    } <span class="kw">else </span>{
+        graph.create_edge(<span class="kw-2">&amp;</span>if_node, <span class="kw-2">&amp;</span>update_node, QueryGraphDependency::Then)<span class="question-mark">?</span>;
     }
 
-    <span class="ident">graph</span>.<span class="ident">create_edge</span>(<span class="kw-2">&amp;</span><span class="ident">if_node</span>, <span class="kw-2">&amp;</span><span class="ident">create_node</span>, <span class="ident">QueryGraphDependency::Else</span>)<span class="question-mark">?</span>;
-    <span class="ident">graph</span>.<span class="ident">create_edge</span>(
-        <span class="kw-2">&amp;</span><span class="ident">update_node</span>,
-        <span class="kw-2">&amp;</span><span class="ident">read_node_update</span>,
-        <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
-            <span class="ident">model_id</span>.<span class="ident">clone</span>(),
-            <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">read_node_update</span>, <span class="kw-2">mut</span> <span class="ident">parent_ids</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">parent_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">parent_ids</span>.<span class="ident">pop</span>() {
-                    <span class="prelude-val">Some</span>(<span class="ident">pid</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">pid</span>),
-                    <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::AssertionError</span>(
-                        <span class="string">&quot;Expected a valid parent ID to be present for create follow-up for upsert query.&quot;</span>.<span class="ident">to_string</span>(),
+    graph.create_edge(<span class="kw-2">&amp;</span>if_node, <span class="kw-2">&amp;</span>create_node, QueryGraphDependency::Else)<span class="question-mark">?</span>;
+    graph.create_edge(
+        <span class="kw-2">&amp;</span>update_node,
+        <span class="kw-2">&amp;</span>read_node_update,
+        QueryGraphDependency::ProjectedDataDependency(
+            model_id.clone(),
+            Box::new(<span class="kw">move </span>|<span class="kw-2">mut </span>read_node_update, <span class="kw-2">mut </span>parent_ids| {
+                <span class="kw">let </span>parent_id = <span class="kw">match </span>parent_ids.pop() {
+                    <span class="prelude-val">Some</span>(pid) =&gt; <span class="prelude-val">Ok</span>(pid),
+                    <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(QueryGraphBuilderError::AssertionError(
+                        <span class="string">&quot;Expected a valid parent ID to be present for create follow-up for upsert query.&quot;</span>.to_string(),
                     )),
                 }<span class="question-mark">?</span>;
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Read</span>(<span class="ident">ReadQuery::RecordQuery</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">rq</span>))) <span class="op">=</span> <span class="ident">read_node_update</span> {
-                    <span class="ident">rq</span>.<span class="ident">add_filter</span>(<span class="ident">parent_id</span>.<span class="ident">filter</span>());
+                <span class="kw">if let </span>Node::Query(Query::Read(ReadQuery::RecordQuery(<span class="kw-2">ref mut </span>rq))) = read_node_update {
+                    rq.add_filter(parent_id.filter());
                 };
 
-                <span class="prelude-val">Ok</span>(<span class="ident">read_node_update</span>)
+                <span class="prelude-val">Ok</span>(read_node_update)
             }),
         ),
     )<span class="question-mark">?</span>;
 
-    <span class="ident">graph</span>.<span class="ident">create_edge</span>(
-        <span class="kw-2">&amp;</span><span class="ident">create_node</span>,
-        <span class="kw-2">&amp;</span><span class="ident">read_node_create</span>,
-        <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
-            <span class="ident">model_id</span>,
-            <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">read_node_create</span>, <span class="kw-2">mut</span> <span class="ident">parent_ids</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">parent_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">parent_ids</span>.<span class="ident">pop</span>() {
-                    <span class="prelude-val">Some</span>(<span class="ident">pid</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">pid</span>),
-                    <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::AssertionError</span>(
-                        <span class="string">&quot;Expected a valid parent ID to be present for update follow-up for upsert query.&quot;</span>.<span class="ident">to_string</span>(),
+    graph.create_edge(
+        <span class="kw-2">&amp;</span>create_node,
+        <span class="kw-2">&amp;</span>read_node_create,
+        QueryGraphDependency::ProjectedDataDependency(
+            model_id,
+            Box::new(<span class="kw">move </span>|<span class="kw-2">mut </span>read_node_create, <span class="kw-2">mut </span>parent_ids| {
+                <span class="kw">let </span>parent_id = <span class="kw">match </span>parent_ids.pop() {
+                    <span class="prelude-val">Some</span>(pid) =&gt; <span class="prelude-val">Ok</span>(pid),
+                    <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(QueryGraphBuilderError::AssertionError(
+                        <span class="string">&quot;Expected a valid parent ID to be present for update follow-up for upsert query.&quot;</span>.to_string(),
                     )),
                 }<span class="question-mark">?</span>;
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Read</span>(<span class="ident">ReadQuery::RecordQuery</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">rq</span>))) <span class="op">=</span> <span class="ident">read_node_create</span> {
-                    <span class="ident">rq</span>.<span class="ident">add_filter</span>(<span class="ident">parent_id</span>.<span class="ident">filter</span>());
+                <span class="kw">if let </span>Node::Query(Query::Read(ReadQuery::RecordQuery(<span class="kw-2">ref mut </span>rq))) = read_node_create {
+                    rq.add_filter(parent_id.filter());
                 };
 
-                <span class="prelude-val">Ok</span>(<span class="ident">read_node_create</span>)
+                <span class="prelude-val">Ok</span>(read_node_create)
             }),
         ),
     )<span class="question-mark">?</span>;
@@ -446,63 +446,63 @@
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="comment">// This optimisation on our upserts allows us to use the `INSERT ... ON CONFLICT SET ..`</span>
-<span class="comment">// when the query matches the following conditions:</span>
-<span class="comment">// 1. The data connector supports it</span>
-<span class="comment">// 2. The create and update arguments do not have any nested queries</span>
-<span class="comment">// 3. There is only 1 unique field in the where clause</span>
-<span class="comment">// 4. The unique field defined in where clause has the same value as defined in the create arguments</span>
-<span class="kw">fn</span> <span class="ident">can_use_connector_native_upsert</span>(
-    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="ident">where_field</span>: <span class="kw-2">&amp;</span><span class="ident">ParsedInputMap</span>,
-    <span class="ident">create_argument</span>: <span class="kw-2">&amp;</span><span class="ident">ParsedInputMap</span>,
-    <span class="ident">update_argument</span>: <span class="kw-2">&amp;</span><span class="ident">ParsedInputMap</span>,
-    <span class="ident">connector_ctx</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectorContext</span>,
-) -&gt; <span class="ident">bool</span> {
-    <span class="kw">let</span> <span class="ident">has_nested_create</span> <span class="op">=</span> <span class="ident">create_argument</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">any</span>(<span class="op">|</span>(<span class="ident">field_name</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">find_from_relation_fields</span>(<span class="kw-2">&amp;</span><span class="ident">field_name</span>).<span class="ident">is_ok</span>());
+<span class="comment">// This optimisation on our upserts allows us to use the `INSERT ... ON CONFLICT SET ..`
+// when the query matches the following conditions:
+// 1. The data connector supports it
+// 2. The create and update arguments do not have any nested queries
+// 3. There is only 1 unique field in the where clause
+// 4. The unique field defined in where clause has the same value as defined in the create arguments
+</span><span class="kw">fn </span>can_use_connector_native_upsert(
+    model: <span class="kw-2">&amp;</span>ModelRef,
+    where_field: <span class="kw-2">&amp;</span>ParsedInputMap,
+    create_argument: <span class="kw-2">&amp;</span>ParsedInputMap,
+    update_argument: <span class="kw-2">&amp;</span>ParsedInputMap,
+    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+) -&gt; bool {
+    <span class="kw">let </span>has_nested_create = create_argument
+        .iter()
+        .any(|(field_name, <span class="kw">_</span>)| model.fields().find_from_relation_fields(<span class="kw-2">&amp;</span>field_name).is_ok());
 
-    <span class="kw">let</span> <span class="ident">has_nested_update</span> <span class="op">=</span> <span class="ident">update_argument</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">any</span>(<span class="op">|</span>(<span class="ident">field_name</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">find_from_relation_fields</span>(<span class="kw-2">&amp;</span><span class="ident">field_name</span>).<span class="ident">is_ok</span>());
+    <span class="kw">let </span>has_nested_update = update_argument
+        .iter()
+        .any(|(field_name, <span class="kw">_</span>)| model.fields().find_from_relation_fields(<span class="kw-2">&amp;</span>field_name).is_ok());
 
-    <span class="kw">let</span> <span class="ident">empty_update</span> <span class="op">=</span> <span class="ident">update_argument</span>.<span class="ident">iter</span>().<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>;
+    <span class="kw">let </span>empty_update = update_argument.iter().len() == <span class="number">0</span>;
 
-    <span class="kw">let</span> <span class="ident">has_one_unique</span> <span class="op">=</span> <span class="ident">where_field</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">filter</span>(<span class="op">|</span>(<span class="ident">field_name</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">is_unique_field</span>(<span class="ident">field_name</span>, <span class="ident">model</span>))
-        .<span class="ident">count</span>()
-        <span class="op">==</span> <span class="number">1</span>;
+    <span class="kw">let </span>has_one_unique = where_field
+        .iter()
+        .filter(|(field_name, <span class="kw">_</span>)| is_unique_field(field_name, model))
+        .count()
+        == <span class="number">1</span>;
 
-    <span class="kw">let</span> <span class="ident">where_values_same_as_create</span> <span class="op">=</span> <span class="ident">where_field</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">all</span>(<span class="op">|</span>(<span class="ident">field_name</span>, <span class="ident">input</span>)<span class="op">|</span> <span class="ident">where_and_create_equal</span>(<span class="kw-2">&amp;</span><span class="ident">field_name</span>, <span class="kw-2">&amp;</span><span class="ident">input</span>, <span class="kw-2">&amp;</span><span class="ident">create_argument</span>));
+    <span class="kw">let </span>where_values_same_as_create = where_field
+        .iter()
+        .all(|(field_name, input)| where_and_create_equal(<span class="kw-2">&amp;</span>field_name, <span class="kw-2">&amp;</span>input, <span class="kw-2">&amp;</span>create_argument));
 
-    <span class="ident">connector_ctx</span>.<span class="ident">can_native_upsert</span>()
-        <span class="op">&amp;&amp;</span> <span class="ident">has_one_unique</span>
-        <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">has_nested_create</span>
-        <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">has_nested_update</span>
-        <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">empty_update</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">where_values_same_as_create</span>
+    connector_ctx.can_native_upsert()
+        &amp;&amp; has_one_unique
+        &amp;&amp; !has_nested_create
+        &amp;&amp; !has_nested_update
+        &amp;&amp; !empty_update
+        &amp;&amp; where_values_same_as_create
 }
 
-<span class="kw">fn</span> <span class="ident">is_unique_field</span>(<span class="ident">field_name</span>: <span class="kw-2">&amp;</span><span class="ident">String</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">match</span> <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">find_from_scalar</span>(<span class="kw-2">&amp;</span><span class="ident">field_name</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">field</span>) =&gt; <span class="ident">field</span>.<span class="ident">unique</span>(),
-        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="ident">resolve_compound_field</span>(<span class="ident">field_name</span>, <span class="ident">model</span>).<span class="ident">is_some</span>(),
+<span class="kw">fn </span>is_unique_field(field_name: <span class="kw-2">&amp;</span>String, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; bool {
+    <span class="kw">match </span>model.fields().find_from_scalar(<span class="kw-2">&amp;</span>field_name) {
+        <span class="prelude-val">Ok</span>(field) =&gt; field.unique(),
+        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; resolve_compound_field(field_name, model).is_some(),
     }
 }
 
-<span class="doccomment">/// Make sure the unique fields defined in the where clause have the same values</span>
-<span class="doccomment">/// as in the create of the upsert.</span>
-<span class="kw">fn</span> <span class="ident">where_and_create_equal</span>(<span class="ident">field_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">where_value</span>: <span class="kw-2">&amp;</span><span class="ident">ParsedInputValue</span>, <span class="ident">create_map</span>: <span class="kw-2">&amp;</span><span class="ident">ParsedInputMap</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">match</span> <span class="ident">where_value</span> {
-        <span class="ident">ParsedInputValue::Map</span>(<span class="ident">inner_map</span>) =&gt; <span class="ident">inner_map</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">all</span>(<span class="op">|</span>(<span class="ident">inner_field</span>, <span class="ident">inner_value</span>)<span class="op">|</span> <span class="ident">where_and_create_equal</span>(<span class="ident">inner_field</span>, <span class="ident">inner_value</span>, <span class="ident">create_map</span>)),
-        <span class="kw">_</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">where_value</span>) <span class="op">==</span> <span class="ident">create_map</span>.<span class="ident">get</span>(<span class="ident">field_name</span>),
+<span class="doccomment">/// Make sure the unique fields defined in the where clause have the same values
+/// as in the create of the upsert.
+</span><span class="kw">fn </span>where_and_create_equal(field_name: <span class="kw-2">&amp;</span>str, where_value: <span class="kw-2">&amp;</span>ParsedInputValue, create_map: <span class="kw-2">&amp;</span>ParsedInputMap) -&gt; bool {
+    <span class="kw">match </span>where_value {
+        ParsedInputValue::Map(inner_map) =&gt; inner_map
+            .iter()
+            .all(|(inner_field, inner_value)| where_and_create_equal(inner_field, inner_value, create_map)),
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">Some</span>(where_value) == create_map.get(field_name),
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

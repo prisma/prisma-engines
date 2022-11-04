@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/prisma-models/src/relation.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>relation.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../prisma_models/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/prisma-models/src/relation.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>relation.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../prisma_models/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -190,197 +190,197 @@
 <span id="190">190</span>
 <span id="191">191</span>
 <span id="192">192</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">dml::ReferentialAction</span>;
-<span class="kw">use</span> <span class="ident">once_cell::sync::OnceCell</span>;
-<span class="kw">use</span> <span class="ident">psl::datamodel_connector::RelationMode</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">fmt::Debug</span>,
-    <span class="ident">sync</span>::{<span class="ident">Arc</span>, <span class="ident">Weak</span>},
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span>dml::ReferentialAction;
+<span class="kw">use </span>once_cell::sync::OnceCell;
+<span class="kw">use </span>psl::datamodel_connector::RelationMode;
+<span class="kw">use </span>std::{
+    fmt::Debug,
+    sync::{Arc, Weak},
 };
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">RelationRef</span> <span class="op">=</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Relation</span><span class="op">&gt;</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">RelationWeakRef</span> <span class="op">=</span> <span class="ident">Weak</span><span class="op">&lt;</span><span class="ident">Relation</span><span class="op">&gt;</span>;
+<span class="kw">pub type </span>RelationRef = Arc&lt;Relation&gt;;
+<span class="kw">pub type </span>RelationWeakRef = Weak&lt;Relation&gt;;
 
-<span class="doccomment">/// A relation between two models. Can be either using a `RelationTable` or</span>
-<span class="doccomment">/// model a direct link between two `RelationField`s.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Relation</span> {
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
+<span class="doccomment">/// A relation between two models. Can be either using a `RelationTable` or
+/// model a direct link between two `RelationField`s.
+</span><span class="kw">pub struct </span>Relation {
+    <span class="kw">pub </span>name: String,
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">model_a_name</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">model_b_name</span>: <span class="ident">String</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) model_a_name: String,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) model_b_name: String,
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">model_a</span>: <span class="ident">OnceCell</span><span class="op">&lt;</span><span class="ident">ModelWeakRef</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">model_b</span>: <span class="ident">OnceCell</span><span class="op">&lt;</span><span class="ident">ModelWeakRef</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) model_a: OnceCell&lt;ModelWeakRef&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) model_b: OnceCell&lt;ModelWeakRef&gt;,
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">field_a</span>: <span class="ident">OnceCell</span><span class="op">&lt;</span><span class="ident">Weak</span><span class="op">&lt;</span><span class="ident">RelationField</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">field_b</span>: <span class="ident">OnceCell</span><span class="op">&lt;</span><span class="ident">Weak</span><span class="op">&lt;</span><span class="ident">RelationField</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) field_a: OnceCell&lt;Weak&lt;RelationField&gt;&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) field_b: OnceCell&lt;Weak&lt;RelationField&gt;&gt;,
 
-    <span class="kw">pub</span> <span class="ident">manifestation</span>: <span class="ident">RelationLinkManifestation</span>,
-    <span class="kw">pub</span> <span class="ident">internal_data_model</span>: <span class="ident">InternalDataModelWeakRef</span>,
-    <span class="kw">pub</span> <span class="ident">relation_mode</span>: <span class="ident">RelationMode</span>,
+    <span class="kw">pub </span>manifestation: RelationLinkManifestation,
+    <span class="kw">pub </span>internal_data_model: InternalDataModelWeakRef,
+    <span class="kw">pub </span>relation_mode: RelationMode,
 }
 
-<span class="kw">impl</span> <span class="ident">Relation</span> {
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MODEL_A_DEFAULT_COLUMN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;A&quot;</span>;
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MODEL_B_DEFAULT_COLUMN</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;B&quot;</span>;
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">TABLE_ALIAS</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;RelationTable&quot;</span>;
+<span class="kw">impl </span>Relation {
+    <span class="kw">pub const </span>MODEL_A_DEFAULT_COLUMN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;A&quot;</span>;
+    <span class="kw">pub const </span>MODEL_B_DEFAULT_COLUMN: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;B&quot;</span>;
+    <span class="kw">pub const </span>TABLE_ALIAS: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;RelationTable&quot;</span>;
 
-    <span class="doccomment">/// Returns `true` only if the `Relation` is just a link between two</span>
-    <span class="doccomment">/// `RelationField`s.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_inline_relation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">manifestation</span>, <span class="ident">RelationLinkManifestation::Inline</span>(<span class="kw">_</span>))
+    <span class="doccomment">/// Returns `true` only if the `Relation` is just a link between two
+    /// `RelationField`s.
+    </span><span class="kw">pub fn </span>is_inline_relation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>.manifestation, RelationLinkManifestation::Inline(<span class="kw">_</span>))
     }
 
-    <span class="doccomment">/// Returns `true` if the `Relation` is a table linking two models.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_relation_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="op">!</span><span class="self">self</span>.<span class="ident">is_inline_relation</span>()
+    <span class="doccomment">/// Returns `true` if the `Relation` is a table linking two models.
+    </span><span class="kw">pub fn </span>is_relation_table(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        !<span class="self">self</span>.is_inline_relation()
     }
 
-    <span class="doccomment">/// A model that relates to itself. For example a `Person` that is a parent</span>
-    <span class="doccomment">/// can relate to people that are children.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_self_relation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">model_a_name</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">model_b_name</span>
+    <span class="doccomment">/// A model that relates to itself. For example a `Person` that is a parent
+    /// can relate to people that are children.
+    </span><span class="kw">pub fn </span>is_self_relation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.model_a_name == <span class="self">self</span>.model_b_name
     }
 
-    <span class="doccomment">/// A pointer to the first `Model` in the `Relation`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model_a</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ModelRef</span> {
-        <span class="self">self</span>.<span class="ident">model_a</span>
-            .<span class="ident">get_or_init</span>(<span class="op">|</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">internal_data_model</span>().<span class="ident">find_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">model_a_name</span>).<span class="ident">unwrap</span>();
-                <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>)
+    <span class="doccomment">/// A pointer to the first `Model` in the `Relation`.
+    </span><span class="kw">pub fn </span>model_a(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ModelRef {
+        <span class="self">self</span>.model_a
+            .get_or_init(|| {
+                <span class="kw">let </span>model = <span class="self">self</span>.internal_data_model().find_model(<span class="kw-2">&amp;</span><span class="self">self</span>.model_a_name).unwrap();
+                Arc::downgrade(<span class="kw-2">&amp;</span>model)
             })
-            .<span class="ident">upgrade</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;Model A deleted without deleting the relations in internal_data_model.&quot;</span>)
+            .upgrade()
+            .expect(<span class="string">&quot;Model A deleted without deleting the relations in internal_data_model.&quot;</span>)
     }
 
-    <span class="doccomment">/// A pointer to the second `Model` in the `Relation`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model_b</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ModelRef</span> {
-        <span class="self">self</span>.<span class="ident">model_b</span>
-            .<span class="ident">get_or_init</span>(<span class="op">|</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">internal_data_model</span>().<span class="ident">find_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">model_b_name</span>).<span class="ident">unwrap</span>();
-                <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>)
+    <span class="doccomment">/// A pointer to the second `Model` in the `Relation`.
+    </span><span class="kw">pub fn </span>model_b(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ModelRef {
+        <span class="self">self</span>.model_b
+            .get_or_init(|| {
+                <span class="kw">let </span>model = <span class="self">self</span>.internal_data_model().find_model(<span class="kw-2">&amp;</span><span class="self">self</span>.model_b_name).unwrap();
+                Arc::downgrade(<span class="kw-2">&amp;</span>model)
             })
-            .<span class="ident">upgrade</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;Model B deleted without deleting the relations in internal_data_model.&quot;</span>)
+            .upgrade()
+            .expect(<span class="string">&quot;Model B deleted without deleting the relations in internal_data_model.&quot;</span>)
     }
 
-    <span class="doccomment">/// A pointer to the `RelationField` in the first `Model` in the `Relation`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field_a</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RelationFieldRef</span> {
-        <span class="self">self</span>.<span class="ident">field_a</span>
-            .<span class="ident">get_or_init</span>(<span class="op">|</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="self">self</span>
-                    .<span class="ident">model_a</span>()
-                    .<span class="ident">fields</span>()
-                    .<span class="ident">find_from_relation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>, <span class="ident">RelationSide::A</span>)
-                    .<span class="ident">unwrap</span>();
+    <span class="doccomment">/// A pointer to the `RelationField` in the first `Model` in the `Relation`.
+    </span><span class="kw">pub fn </span>field_a(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RelationFieldRef {
+        <span class="self">self</span>.field_a
+            .get_or_init(|| {
+                <span class="kw">let </span>field = <span class="self">self
+                    </span>.model_a()
+                    .fields()
+                    .find_from_relation(<span class="kw-2">&amp;</span><span class="self">self</span>.name, RelationSide::A)
+                    .unwrap();
 
-                <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>)
+                Arc::downgrade(<span class="kw-2">&amp;</span>field)
             })
-            .<span class="ident">upgrade</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;Field A deleted without deleting the relations in internal_data_model.&quot;</span>)
+            .upgrade()
+            .expect(<span class="string">&quot;Field A deleted without deleting the relations in internal_data_model.&quot;</span>)
     }
 
-    <span class="doccomment">/// A pointer to the `RelationField` in the second `Model` in the `Relation`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field_b</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RelationFieldRef</span> {
-        <span class="self">self</span>.<span class="ident">field_b</span>
-            .<span class="ident">get_or_init</span>(<span class="op">|</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="self">self</span>
-                    .<span class="ident">model_b</span>()
-                    .<span class="ident">fields</span>()
-                    .<span class="ident">find_from_relation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>, <span class="ident">RelationSide::B</span>)
-                    .<span class="ident">unwrap</span>();
+    <span class="doccomment">/// A pointer to the `RelationField` in the second `Model` in the `Relation`.
+    </span><span class="kw">pub fn </span>field_b(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RelationFieldRef {
+        <span class="self">self</span>.field_b
+            .get_or_init(|| {
+                <span class="kw">let </span>field = <span class="self">self
+                    </span>.model_b()
+                    .fields()
+                    .find_from_relation(<span class="kw-2">&amp;</span><span class="self">self</span>.name, RelationSide::B)
+                    .unwrap();
 
-                <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>)
+                Arc::downgrade(<span class="kw-2">&amp;</span>field)
             })
-            .<span class="ident">upgrade</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;Field B deleted without deleting the relations in internal_data_model.&quot;</span>)
+            .upgrade()
+            .expect(<span class="string">&quot;Field B deleted without deleting the relations in internal_data_model.&quot;</span>)
     }
 
-    <span class="doccomment">/// Practically deprecated with Prisma 2.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_many_to_many</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">field_a</span>().<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">field_b</span>().<span class="ident">is_list</span>()
+    <span class="doccomment">/// Practically deprecated with Prisma 2.
+    </span><span class="kw">pub fn </span>is_many_to_many(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.field_a().is_list() &amp;&amp; <span class="self">self</span>.field_b().is_list()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_one_to_one</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="op">!</span><span class="self">self</span>.<span class="ident">field_a</span>().<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">field_b</span>().<span class="ident">is_list</span>()
+    <span class="kw">pub fn </span>is_one_to_one(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        !<span class="self">self</span>.field_a().is_list() &amp;&amp; !<span class="self">self</span>.field_b().is_list()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_one_to_many</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="op">!</span><span class="self">self</span>.<span class="ident">is_many_to_many</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_one_to_one</span>()
+    <span class="kw">pub fn </span>is_one_to_many(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        !<span class="self">self</span>.is_many_to_many() &amp;&amp; !<span class="self">self</span>.is_one_to_one()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">internal_data_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">InternalDataModelRef</span> {
-        <span class="self">self</span>.<span class="ident">internal_data_model</span>
-            .<span class="ident">upgrade</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;InternalDataModel does not exist anymore. Parent internal_data_model is deleted without deleting the child internal_data_model.&quot;</span>)
+    <span class="kw">pub fn </span>internal_data_model(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; InternalDataModelRef {
+        <span class="self">self</span>.internal_data_model
+            .upgrade()
+            .expect(<span class="string">&quot;InternalDataModel does not exist anymore. Parent internal_data_model is deleted without deleting the child internal_data_model.&quot;</span>)
     }
 
-    <span class="doccomment">/// Retrieves the onDelete policy for this relation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ReferentialAction</span> {
-        <span class="kw">let</span> <span class="ident">action</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">field_a</span>()
-            .<span class="ident">on_delete</span>()
-            .<span class="ident">cloned</span>()
-            .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">field_b</span>().<span class="ident">on_delete</span>().<span class="ident">cloned</span>())
-            .<span class="ident">unwrap_or</span>(<span class="self">self</span>.<span class="ident">field_a</span>().<span class="ident">on_delete_default</span>);
+    <span class="doccomment">/// Retrieves the onDelete policy for this relation.
+    </span><span class="kw">pub fn </span>on_delete(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ReferentialAction {
+        <span class="kw">let </span>action = <span class="self">self
+            </span>.field_a()
+            .on_delete()
+            .cloned()
+            .or_else(|| <span class="self">self</span>.field_b().on_delete().cloned())
+            .unwrap_or(<span class="self">self</span>.field_a().on_delete_default);
 
-        <span class="kw">match</span> (<span class="ident">action</span>, <span class="self">self</span>.<span class="ident">relation_mode</span>) {
-            <span class="comment">// NoAction is an alias for Restrict when relationMode = &quot;prisma&quot;</span>
-            (<span class="ident">ReferentialAction::NoAction</span>, <span class="ident">RelationMode::Prisma</span>) =&gt; <span class="ident">ReferentialAction::Restrict</span>,
-            (<span class="ident">action</span>, <span class="kw">_</span>) =&gt; <span class="ident">action</span>,
+        <span class="kw">match </span>(action, <span class="self">self</span>.relation_mode) {
+            <span class="comment">// NoAction is an alias for Restrict when relationMode = &quot;prisma&quot;
+            </span>(ReferentialAction::NoAction, RelationMode::Prisma) =&gt; ReferentialAction::Restrict,
+            (action, <span class="kw">_</span>) =&gt; action,
         }
     }
 
-    <span class="doccomment">/// Retrieves the onUpdate policy for this relation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ReferentialAction</span> {
-        <span class="kw">let</span> <span class="ident">action</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">field_a</span>()
-            .<span class="ident">on_update</span>()
-            .<span class="ident">cloned</span>()
-            .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">field_b</span>().<span class="ident">on_update</span>().<span class="ident">cloned</span>())
-            .<span class="ident">unwrap_or</span>(<span class="self">self</span>.<span class="ident">field_a</span>().<span class="ident">on_update_default</span>);
+    <span class="doccomment">/// Retrieves the onUpdate policy for this relation.
+    </span><span class="kw">pub fn </span>on_update(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ReferentialAction {
+        <span class="kw">let </span>action = <span class="self">self
+            </span>.field_a()
+            .on_update()
+            .cloned()
+            .or_else(|| <span class="self">self</span>.field_b().on_update().cloned())
+            .unwrap_or(<span class="self">self</span>.field_a().on_update_default);
 
-        <span class="kw">match</span> (<span class="ident">action</span>, <span class="self">self</span>.<span class="ident">relation_mode</span>) {
-            <span class="comment">// NoAction is an alias for Restrict when relationMode = &quot;prisma&quot;</span>
-            (<span class="ident">ReferentialAction::NoAction</span>, <span class="ident">RelationMode::Prisma</span>) =&gt; <span class="ident">ReferentialAction::Restrict</span>,
-            (<span class="ident">action</span>, <span class="kw">_</span>) =&gt; <span class="ident">action</span>,
+        <span class="kw">match </span>(action, <span class="self">self</span>.relation_mode) {
+            <span class="comment">// NoAction is an alias for Restrict when relationMode = &quot;prisma&quot;
+            </span>(ReferentialAction::NoAction, RelationMode::Prisma) =&gt; ReferentialAction::Restrict,
+            (action, <span class="kw">_</span>) =&gt; action,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Relation</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Relation&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;model_a_name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">model_a_name</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;model_b_name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">model_b_name</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;model_a&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">model_a</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;model_b&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">model_b</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;field_a&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">field_a</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;field_b&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">field_b</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;manifestation&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">manifestation</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;internal_data_model&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;#InternalDataModelWeakRef#&quot;</span>)
-            .<span class="ident">finish</span>()
+<span class="kw">impl </span>Debug <span class="kw">for </span>Relation {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        f.debug_struct(<span class="string">&quot;Relation&quot;</span>)
+            .field(<span class="string">&quot;name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.name)
+            .field(<span class="string">&quot;model_a_name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.model_a_name)
+            .field(<span class="string">&quot;model_b_name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.model_b_name)
+            .field(<span class="string">&quot;model_a&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.model_a)
+            .field(<span class="string">&quot;model_b&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.model_b)
+            .field(<span class="string">&quot;field_a&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.field_a)
+            .field(<span class="string">&quot;field_b&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.field_b)
+            .field(<span class="string">&quot;manifestation&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.manifestation)
+            .field(<span class="string">&quot;internal_data_model&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;#InternalDataModelWeakRef#&quot;</span>)
+            .finish()
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RelationLinkManifestation</span> {
-    <span class="ident">Inline</span>(<span class="ident">InlineRelation</span>),
-    <span class="ident">RelationTable</span>(<span class="ident">RelationTable</span>),
+<span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub enum </span>RelationLinkManifestation {
+    Inline(InlineRelation),
+    RelationTable(RelationTable),
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InlineRelation</span> {
-    <span class="kw">pub</span> <span class="ident">in_table_of_model_name</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>InlineRelation {
+    <span class="kw">pub </span>in_table_of_model_name: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RelationTable</span> {
-    <span class="kw">pub</span> <span class="ident">table</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">model_a_column</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">model_b_column</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>RelationTable {
+    <span class="kw">pub </span>table: String,
+    <span class="kw">pub </span>model_a_column: String,
+    <span class="kw">pub </span>model_b_column: String,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="prisma_models" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="prisma_models" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

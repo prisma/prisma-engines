@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/openssl-sys-0.9.75/src/handwritten/x509_vfy.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>x509_vfy.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../openssl_sys/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../openssl_sys/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../openssl_sys/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/openssl-sys-0.9.75/src/handwritten/x509_vfy.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>x509_vfy.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../openssl_sys/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../openssl_sys/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../openssl_sys/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -104,111 +104,111 @@
 <span id="104">104</span>
 <span id="105">105</span>
 <span id="106">106</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">libc</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw-2">*</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>libc::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">libressl</span>, <span class="ident">all</span>(<span class="ident">ossl102</span>, <span class="ident">not</span>(<span class="ident">ossl110</span>))))]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">X509_VERIFY_PARAM_ID</span> {}
+<span class="attribute">#[cfg(any(libressl, all(ossl102, not(ossl110))))]
+</span><span class="kw">pub enum </span>X509_VERIFY_PARAM_ID {}
 
-<span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">ossl110</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">X509_LOOKUP_meth_free</span>(<span class="ident">method</span>: <span class="kw-2">*mut</span> <span class="ident">X509_LOOKUP_METHOD</span>);
+<span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+    <span class="attribute">#[cfg(ossl110)]
+    </span><span class="kw">pub fn </span>X509_LOOKUP_meth_free(method: <span class="kw-2">*mut </span>X509_LOOKUP_METHOD);
 }
 
-<span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">X509_LOOKUP_free</span>(<span class="ident">ctx</span>: <span class="kw-2">*mut</span> <span class="ident">X509_LOOKUP</span>);
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">X509_LOOKUP_hash_dir</span>() -&gt; <span class="kw-2">*mut</span> <span class="ident">X509_LOOKUP_METHOD</span>;
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">X509_LOOKUP_ctrl</span>(
-        <span class="ident">ctx</span>: <span class="kw-2">*mut</span> <span class="ident">X509_LOOKUP</span>,
-        <span class="ident">cmd</span>: <span class="ident">c_int</span>,
-        <span class="ident">argc</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>,
-        <span class="ident">argl</span>: <span class="ident">c_long</span>,
-        <span class="ident">ret</span>: <span class="kw-2">*mut</span> <span class="kw-2">*mut</span> <span class="ident">c_char</span>,
-    ) -&gt; <span class="ident">c_int</span>;
+<span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+    <span class="kw">pub fn </span>X509_LOOKUP_free(ctx: <span class="kw-2">*mut </span>X509_LOOKUP);
+    <span class="kw">pub fn </span>X509_LOOKUP_hash_dir() -&gt; <span class="kw-2">*mut </span>X509_LOOKUP_METHOD;
+    <span class="kw">pub fn </span>X509_LOOKUP_ctrl(
+        ctx: <span class="kw-2">*mut </span>X509_LOOKUP,
+        cmd: c_int,
+        argc: <span class="kw-2">*const </span>c_char,
+        argl: c_long,
+        ret: <span class="kw-2">*mut *mut </span>c_char,
+    ) -&gt; c_int;
 }
 
-<span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">X509_STORE_new</span>() -&gt; <span class="kw-2">*mut</span> <span class="ident">X509_STORE</span>;
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">X509_STORE_free</span>(<span class="ident">store</span>: <span class="kw-2">*mut</span> <span class="ident">X509_STORE</span>);
+<span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+    <span class="kw">pub fn </span>X509_STORE_new() -&gt; <span class="kw-2">*mut </span>X509_STORE;
+    <span class="kw">pub fn </span>X509_STORE_free(store: <span class="kw-2">*mut </span>X509_STORE);
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">X509_STORE_CTX_new</span>() -&gt; <span class="kw-2">*mut</span> <span class="ident">X509_STORE_CTX</span>;
+    <span class="kw">pub fn </span>X509_STORE_CTX_new() -&gt; <span class="kw-2">*mut </span>X509_STORE_CTX;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">X509_STORE_CTX_free</span>(<span class="ident">ctx</span>: <span class="kw-2">*mut</span> <span class="ident">X509_STORE_CTX</span>);
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">X509_STORE_CTX_init</span>(
-        <span class="ident">ctx</span>: <span class="kw-2">*mut</span> <span class="ident">X509_STORE_CTX</span>,
-        <span class="ident">store</span>: <span class="kw-2">*mut</span> <span class="ident">X509_STORE</span>,
-        <span class="ident">x509</span>: <span class="kw-2">*mut</span> <span class="ident">X509</span>,
-        <span class="ident">chain</span>: <span class="kw-2">*mut</span> <span class="ident">stack_st_X509</span>,
-    ) -&gt; <span class="ident">c_int</span>;
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">X509_STORE_CTX_cleanup</span>(<span class="ident">ctx</span>: <span class="kw-2">*mut</span> <span class="ident">X509_STORE_CTX</span>);
+    <span class="kw">pub fn </span>X509_STORE_CTX_free(ctx: <span class="kw-2">*mut </span>X509_STORE_CTX);
+    <span class="kw">pub fn </span>X509_STORE_CTX_init(
+        ctx: <span class="kw-2">*mut </span>X509_STORE_CTX,
+        store: <span class="kw-2">*mut </span>X509_STORE,
+        x509: <span class="kw-2">*mut </span>X509,
+        chain: <span class="kw-2">*mut </span>stack_st_X509,
+    ) -&gt; c_int;
+    <span class="kw">pub fn </span>X509_STORE_CTX_cleanup(ctx: <span class="kw-2">*mut </span>X509_STORE_CTX);
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">X509_STORE_add_cert</span>(<span class="ident">store</span>: <span class="kw-2">*mut</span> <span class="ident">X509_STORE</span>, <span class="ident">x</span>: <span class="kw-2">*mut</span> <span class="ident">X509</span>) -&gt; <span class="ident">c_int</span>;
+    <span class="kw">pub fn </span>X509_STORE_add_cert(store: <span class="kw-2">*mut </span>X509_STORE, x: <span class="kw-2">*mut </span>X509) -&gt; c_int;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">X509_STORE_add_lookup</span>(
-        <span class="ident">store</span>: <span class="kw-2">*mut</span> <span class="ident">X509_STORE</span>,
-        <span class="ident">meth</span>: <span class="kw-2">*mut</span> <span class="ident">X509_LOOKUP_METHOD</span>,
-    ) -&gt; <span class="kw-2">*mut</span> <span class="ident">X509_LOOKUP</span>;
+    <span class="kw">pub fn </span>X509_STORE_add_lookup(
+        store: <span class="kw-2">*mut </span>X509_STORE,
+        meth: <span class="kw-2">*mut </span>X509_LOOKUP_METHOD,
+    ) -&gt; <span class="kw-2">*mut </span>X509_LOOKUP;
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">X509_STORE_set_default_paths</span>(<span class="ident">store</span>: <span class="kw-2">*mut</span> <span class="ident">X509_STORE</span>) -&gt; <span class="ident">c_int</span>;
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">X509_STORE_set_flags</span>(<span class="ident">store</span>: <span class="kw-2">*mut</span> <span class="ident">X509_STORE</span>, <span class="ident">flags</span>: <span class="ident">c_ulong</span>) -&gt; <span class="ident">c_int</span>;
+    <span class="kw">pub fn </span>X509_STORE_set_default_paths(store: <span class="kw-2">*mut </span>X509_STORE) -&gt; c_int;
+    <span class="kw">pub fn </span>X509_STORE_set_flags(store: <span class="kw-2">*mut </span>X509_STORE, flags: c_ulong) -&gt; c_int;
 }
 
-<span class="macro">const_ptr_api!</span> {
-    <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">X509_STORE_CTX_get_ex_data</span>(<span class="ident">ctx</span>: <span class="attribute">#[<span class="ident">const_ptr_if</span>(<span class="ident">ossl300</span>)]</span> <span class="ident">X509_STORE_CTX</span>, <span class="ident">idx</span>: <span class="ident">c_int</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">c_void</span>;
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">X509_STORE_CTX_get_error</span>(<span class="ident">ctx</span>: <span class="attribute">#[<span class="ident">const_ptr_if</span>(<span class="ident">ossl300</span>)]</span> <span class="ident">X509_STORE_CTX</span>) -&gt; <span class="ident">c_int</span>;
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">X509_STORE_CTX_get_error_depth</span>(<span class="ident">ctx</span>: <span class="attribute">#[<span class="ident">const_ptr_if</span>(<span class="ident">ossl300</span>)]</span> <span class="ident">X509_STORE_CTX</span>) -&gt; <span class="ident">c_int</span>;
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">X509_STORE_CTX_get_current_cert</span>(<span class="ident">ctx</span>: <span class="attribute">#[<span class="ident">const_ptr_if</span>(<span class="ident">ossl300</span>)]</span> <span class="ident">X509_STORE_CTX</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">X509</span>;
+<span class="macro">const_ptr_api! </span>{
+    <span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+        <span class="kw">pub fn </span>X509_STORE_CTX_get_ex_data(ctx: <span class="attribute">#[const_ptr_if(ossl300)] </span>X509_STORE_CTX, idx: c_int) -&gt; <span class="kw-2">*mut </span>c_void;
+        <span class="kw">pub fn </span>X509_STORE_CTX_get_error(ctx: <span class="attribute">#[const_ptr_if(ossl300)] </span>X509_STORE_CTX) -&gt; c_int;
+        <span class="kw">pub fn </span>X509_STORE_CTX_get_error_depth(ctx: <span class="attribute">#[const_ptr_if(ossl300)] </span>X509_STORE_CTX) -&gt; c_int;
+        <span class="kw">pub fn </span>X509_STORE_CTX_get_current_cert(ctx: <span class="attribute">#[const_ptr_if(ossl300)] </span>X509_STORE_CTX) -&gt; <span class="kw-2">*mut </span>X509;
     }
 }
-<span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">X509_STORE_CTX_set_error</span>(<span class="ident">ctx</span>: <span class="kw-2">*mut</span> <span class="ident">X509_STORE_CTX</span>, <span class="ident">error</span>: <span class="ident">c_int</span>);
+<span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+    <span class="kw">pub fn </span>X509_STORE_CTX_set_error(ctx: <span class="kw-2">*mut </span>X509_STORE_CTX, error: c_int);
 }
-<span class="macro">cfg_if!</span> {
-    <span class="kw">if</span> <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl110</span>, <span class="ident">libressl350</span>))]</span> {
-        <span class="macro">const_ptr_api!</span> {
-            <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-                <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">X509_STORE_CTX_get0_chain</span>(<span class="ident">ctx</span>: <span class="attribute">#[<span class="ident">const_ptr_if</span>(<span class="ident">ossl300</span>)]</span> <span class="ident">X509_STORE_CTX</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">stack_st_X509</span>;
+<span class="macro">cfg_if! </span>{
+    <span class="kw">if </span><span class="attribute">#[cfg(any(ossl110, libressl350))] </span>{
+        <span class="macro">const_ptr_api! </span>{
+            <span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+                <span class="kw">pub fn </span>X509_STORE_CTX_get0_chain(ctx: <span class="attribute">#[const_ptr_if(ossl300)] </span>X509_STORE_CTX) -&gt; <span class="kw-2">*mut </span>stack_st_X509;
             }
         }
-    } <span class="kw">else</span> {
-        <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">X509_STORE_CTX_get_chain</span>(<span class="ident">ctx</span>: <span class="kw-2">*mut</span> <span class="ident">X509_STORE_CTX</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">stack_st_X509</span>;
+    } <span class="kw">else </span>{
+        <span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+            <span class="kw">pub fn </span>X509_STORE_CTX_get_chain(ctx: <span class="kw-2">*mut </span>X509_STORE_CTX) -&gt; <span class="kw-2">*mut </span>stack_st_X509;
         }
     }
 }
 
-<span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl102</span>, <span class="ident">libressl261</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">X509_VERIFY_PARAM_free</span>(<span class="ident">param</span>: <span class="kw-2">*mut</span> <span class="ident">X509_VERIFY_PARAM</span>);
+<span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+    <span class="attribute">#[cfg(any(ossl102, libressl261))]
+    </span><span class="kw">pub fn </span>X509_VERIFY_PARAM_free(param: <span class="kw-2">*mut </span>X509_VERIFY_PARAM);
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl102</span>, <span class="ident">libressl261</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">X509_VERIFY_PARAM_set_flags</span>(<span class="ident">param</span>: <span class="kw-2">*mut</span> <span class="ident">X509_VERIFY_PARAM</span>, <span class="ident">flags</span>: <span class="ident">c_ulong</span>) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl102</span>, <span class="ident">libressl261</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">X509_VERIFY_PARAM_clear_flags</span>(<span class="ident">param</span>: <span class="kw-2">*mut</span> <span class="ident">X509_VERIFY_PARAM</span>, <span class="ident">flags</span>: <span class="ident">c_ulong</span>) -&gt; <span class="ident">c_int</span>;
+    <span class="attribute">#[cfg(any(ossl102, libressl261))]
+    </span><span class="kw">pub fn </span>X509_VERIFY_PARAM_set_flags(param: <span class="kw-2">*mut </span>X509_VERIFY_PARAM, flags: c_ulong) -&gt; c_int;
+    <span class="attribute">#[cfg(any(ossl102, libressl261))]
+    </span><span class="kw">pub fn </span>X509_VERIFY_PARAM_clear_flags(param: <span class="kw-2">*mut </span>X509_VERIFY_PARAM, flags: c_ulong) -&gt; c_int;
 }
-<span class="macro">const_ptr_api!</span> {
-    <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl102</span>, <span class="ident">libressl261</span>))]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">X509_VERIFY_PARAM_get_flags</span>(<span class="ident">param</span>: <span class="attribute">#[<span class="ident">const_ptr_if</span>(<span class="ident">ossl300</span>)]</span> <span class="ident">X509_VERIFY_PARAM</span>) -&gt; <span class="ident">c_ulong</span>;
+<span class="macro">const_ptr_api! </span>{
+    <span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+        <span class="attribute">#[cfg(any(ossl102, libressl261))]
+        </span><span class="kw">pub fn </span>X509_VERIFY_PARAM_get_flags(param: <span class="attribute">#[const_ptr_if(ossl300)] </span>X509_VERIFY_PARAM) -&gt; c_ulong;
     }
 }
 
-<span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl102</span>, <span class="ident">libressl261</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">X509_VERIFY_PARAM_set1_host</span>(
-        <span class="ident">param</span>: <span class="kw-2">*mut</span> <span class="ident">X509_VERIFY_PARAM</span>,
-        <span class="ident">name</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>,
-        <span class="ident">namelen</span>: <span class="ident">size_t</span>,
-    ) -&gt; <span class="ident">c_int</span>;
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl102</span>, <span class="ident">libressl261</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">X509_VERIFY_PARAM_set_hostflags</span>(<span class="ident">param</span>: <span class="kw-2">*mut</span> <span class="ident">X509_VERIFY_PARAM</span>, <span class="ident">flags</span>: <span class="ident">c_uint</span>);
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">ossl102</span>, <span class="ident">libressl261</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">X509_VERIFY_PARAM_set1_ip</span>(
-        <span class="ident">param</span>: <span class="kw-2">*mut</span> <span class="ident">X509_VERIFY_PARAM</span>,
-        <span class="ident">ip</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
-        <span class="ident">iplen</span>: <span class="ident">size_t</span>,
-    ) -&gt; <span class="ident">c_int</span>;
+<span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+    <span class="attribute">#[cfg(any(ossl102, libressl261))]
+    </span><span class="kw">pub fn </span>X509_VERIFY_PARAM_set1_host(
+        param: <span class="kw-2">*mut </span>X509_VERIFY_PARAM,
+        name: <span class="kw-2">*const </span>c_char,
+        namelen: size_t,
+    ) -&gt; c_int;
+    <span class="attribute">#[cfg(any(ossl102, libressl261))]
+    </span><span class="kw">pub fn </span>X509_VERIFY_PARAM_set_hostflags(param: <span class="kw-2">*mut </span>X509_VERIFY_PARAM, flags: c_uint);
+    <span class="attribute">#[cfg(any(ossl102, libressl261))]
+    </span><span class="kw">pub fn </span>X509_VERIFY_PARAM_set1_ip(
+        param: <span class="kw-2">*mut </span>X509_VERIFY_PARAM,
+        ip: <span class="kw-2">*const </span>c_uchar,
+        iplen: size_t,
+    ) -&gt; c_int;
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="openssl_sys" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="openssl_sys" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

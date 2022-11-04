@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sqlformat-0.2.0/src/indentation.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>indentation.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sqlformat/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sqlformat/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sqlformat/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sqlformat-0.2.0/src/indentation.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>indentation.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sqlformat/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sqlformat/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sqlformat/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -55,62 +55,62 @@
 <span id="55">55</span>
 <span id="56">56</span>
 <span id="57">57</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">FormatOptions</span>, <span class="ident">Indent</span>};
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{FormatOptions, Indent};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Indentation</span> {
-    <span class="ident">options</span>: <span class="ident">FormatOptions</span>,
-    <span class="ident">indent_types</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IndentType</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Indentation {
+    options: FormatOptions,
+    indent_types: Vec&lt;IndentType&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">enum</span> <span class="ident">IndentType</span> {
-    <span class="ident">TopLevel</span>,
-    <span class="ident">BlockLevel</span>,
+<span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+</span><span class="kw">enum </span>IndentType {
+    TopLevel,
+    BlockLevel,
 }
 
-<span class="kw">impl</span> <span class="ident">Indentation</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">options</span>: <span class="ident">FormatOptions</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Indentation</span> {
-            <span class="ident">options</span>,
-            <span class="ident">indent_types</span>: <span class="ident">Vec::new</span>(),
+<span class="kw">impl </span>Indentation {
+    <span class="kw">pub fn </span>new(options: FormatOptions) -&gt; <span class="self">Self </span>{
+        Indentation {
+            options,
+            indent_types: Vec::new(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_indent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">options</span>.<span class="ident">indent</span> {
-            <span class="ident">Indent::Spaces</span>(<span class="ident">num_spaces</span>) =&gt; <span class="string">&quot; &quot;</span>
-                .<span class="ident">repeat</span>(<span class="ident">num_spaces</span> <span class="kw">as</span> <span class="ident">usize</span>)
-                .<span class="ident">repeat</span>(<span class="self">self</span>.<span class="ident">indent_types</span>.<span class="ident">len</span>()),
-            <span class="ident">Indent::Tabs</span> =&gt; <span class="string">&quot;\t&quot;</span>.<span class="ident">repeat</span>(<span class="self">self</span>.<span class="ident">indent_types</span>.<span class="ident">len</span>()),
+    <span class="kw">pub fn </span>get_indent(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="kw">match </span><span class="self">self</span>.options.indent {
+            Indent::Spaces(num_spaces) =&gt; <span class="string">&quot; &quot;
+                </span>.repeat(num_spaces <span class="kw">as </span>usize)
+                .repeat(<span class="self">self</span>.indent_types.len()),
+            Indent::Tabs =&gt; <span class="string">&quot;\t&quot;</span>.repeat(<span class="self">self</span>.indent_types.len()),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">increase_top_level</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">indent_types</span>.<span class="ident">push</span>(<span class="ident">IndentType::TopLevel</span>);
+    <span class="kw">pub fn </span>increase_top_level(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.indent_types.push(IndentType::TopLevel);
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">increase_block_level</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">indent_types</span>.<span class="ident">push</span>(<span class="ident">IndentType::BlockLevel</span>);
+    <span class="kw">pub fn </span>increase_block_level(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.indent_types.push(IndentType::BlockLevel);
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decrease_top_level</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">indent_types</span>.<span class="ident">last</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">IndentType::TopLevel</span>) {
-            <span class="self">self</span>.<span class="ident">indent_types</span>.<span class="ident">pop</span>();
+    <span class="kw">pub fn </span>decrease_top_level(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">if </span><span class="self">self</span>.indent_types.last() == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>IndentType::TopLevel) {
+            <span class="self">self</span>.indent_types.pop();
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decrease_block_level</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">while</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">indent_types</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">indent_types</span>.<span class="ident">pop</span>();
-            <span class="kw">if</span> <span class="ident">kind</span> <span class="op">!</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">IndentType::TopLevel</span>) {
+    <span class="kw">pub fn </span>decrease_block_level(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">while </span>!<span class="self">self</span>.indent_types.is_empty() {
+            <span class="kw">let </span>kind = <span class="self">self</span>.indent_types.pop();
+            <span class="kw">if </span>kind != <span class="prelude-val">Some</span>(IndentType::TopLevel) {
                 <span class="kw">break</span>;
             }
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reset_indentation</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">indent_types</span>.<span class="ident">clear</span>();
+    <span class="kw">pub fn </span>reset_indentation(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.indent_types.clear();
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sqlformat" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sqlformat" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

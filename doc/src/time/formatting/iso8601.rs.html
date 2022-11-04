@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-0.3.14/src/formatting/iso8601.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>iso8601.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" href="https://avatars0.githubusercontent.com/u/55999857"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../time/index.html"><div class="logo-container"><img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../time/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-0.3.14/src/formatting/iso8601.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>iso8601.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" href="https://avatars0.githubusercontent.com/u/55999857"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../time/index.html"><div class="logo-container"><img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../time/index.html"><div class="logo-container">
                     <img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../time/index.html">
                         <img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -139,144 +139,144 @@
 <span id="137">137</span>
 <span id="138">138</span>
 <span id="139">139</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Helpers for implementing formatting for ISO 8601.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Helpers for implementing formatting for ISO 8601.
 
-<span class="kw">use</span> <span class="ident">std::io</span>;
+</span><span class="kw">use </span>std::io;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::format_description::well_known::iso8601</span>::{
-    <span class="ident">DateKind</span>, <span class="ident">EncodedConfig</span>, <span class="ident">OffsetPrecision</span>, <span class="ident">TimePrecision</span>,
+<span class="kw">use </span><span class="kw">crate</span>::format_description::well_known::iso8601::{
+    DateKind, EncodedConfig, OffsetPrecision, TimePrecision,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::format_description::well_known::Iso8601</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::formatting</span>::{<span class="ident">format_float</span>, <span class="ident">format_number_pad_zero</span>, <span class="ident">write</span>, <span class="ident">write_if</span>, <span class="ident">write_if_else</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error</span>, <span class="ident">Date</span>, <span class="ident">Time</span>, <span class="ident">UtcOffset</span>};
+<span class="kw">use </span><span class="kw">crate</span>::format_description::well_known::Iso8601;
+<span class="kw">use </span><span class="kw">crate</span>::formatting::{format_float, format_number_pad_zero, write, write_if, write_if_else};
+<span class="kw">use crate</span>::{error, Date, Time, UtcOffset};
 
-<span class="doccomment">/// Format the date portion of ISO 8601.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">format_date</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">io::Write</span>, <span class="kw">const</span> <span class="ident">CONFIG</span>: <span class="ident">EncodedConfig</span><span class="op">&gt;</span>(
-    <span class="ident">output</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>,
-    <span class="ident">date</span>: <span class="ident">Date</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">error::Format</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="number">0</span>;
+<span class="doccomment">/// Format the date portion of ISO 8601.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>format_date&lt;W: io::Write, <span class="kw">const </span>CONFIG: EncodedConfig&gt;(
+    output: <span class="kw-2">&amp;mut </span>W,
+    date: Date,
+) -&gt; <span class="prelude-ty">Result</span>&lt;usize, error::Format&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>bytes = <span class="number">0</span>;
 
-    <span class="kw">match</span> <span class="ident">Iso8601</span>::<span class="op">&lt;</span><span class="ident">CONFIG</span><span class="op">&gt;</span><span class="ident">::DATE_KIND</span> {
-        <span class="ident">DateKind::Calendar</span> =&gt; {
-            <span class="kw">let</span> (<span class="ident">year</span>, <span class="ident">month</span>, <span class="ident">day</span>) <span class="op">=</span> <span class="ident">date</span>.<span class="ident">to_calendar_date</span>();
-            <span class="kw">if</span> <span class="ident">Iso8601</span>::<span class="op">&lt;</span><span class="ident">CONFIG</span><span class="op">&gt;</span><span class="ident">::YEAR_IS_SIX_DIGITS</span> {
-                <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">write_if_else</span>(<span class="ident">output</span>, <span class="ident">year</span> <span class="op">&lt;</span> <span class="number">0</span>, <span class="string">b&quot;-&quot;</span>, <span class="string">b&quot;+&quot;</span>)<span class="question-mark">?</span>;
-                <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">format_number_pad_zero</span>::<span class="op">&lt;</span><span class="number">6</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">year</span>.<span class="ident">unsigned_abs</span>())<span class="question-mark">?</span>;
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="op">!</span>(<span class="number">0</span>..<span class="op">=</span><span class="number">9999</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">year</span>) {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Format::InvalidComponent</span>(<span class="string">&quot;year&quot;</span>));
-            } <span class="kw">else</span> {
-                <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">format_number_pad_zero</span>::<span class="op">&lt;</span><span class="number">4</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">year</span> <span class="kw">as</span> <span class="ident">u32</span>)<span class="question-mark">?</span>;
+    <span class="kw">match </span>Iso8601::&lt;CONFIG&gt;::DATE_KIND {
+        DateKind::Calendar =&gt; {
+            <span class="kw">let </span>(year, month, day) = date.to_calendar_date();
+            <span class="kw">if </span>Iso8601::&lt;CONFIG&gt;::YEAR_IS_SIX_DIGITS {
+                bytes += write_if_else(output, year &lt; <span class="number">0</span>, <span class="string">b&quot;-&quot;</span>, <span class="string">b&quot;+&quot;</span>)<span class="question-mark">?</span>;
+                bytes += format_number_pad_zero::&lt;<span class="number">6</span>, <span class="kw">_</span>, <span class="kw">_</span>&gt;(output, year.unsigned_abs())<span class="question-mark">?</span>;
+            } <span class="kw">else if </span>!(<span class="number">0</span>..=<span class="number">9999</span>).contains(<span class="kw-2">&amp;</span>year) {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(error::Format::InvalidComponent(<span class="string">&quot;year&quot;</span>));
+            } <span class="kw">else </span>{
+                bytes += format_number_pad_zero::&lt;<span class="number">4</span>, <span class="kw">_</span>, <span class="kw">_</span>&gt;(output, year <span class="kw">as </span>u32)<span class="question-mark">?</span>;
             }
-            <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">write_if</span>(<span class="ident">output</span>, <span class="ident">Iso8601</span>::<span class="op">&lt;</span><span class="ident">CONFIG</span><span class="op">&gt;</span><span class="ident">::USE_SEPARATORS</span>, <span class="string">b&quot;-&quot;</span>)<span class="question-mark">?</span>;
-            <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">format_number_pad_zero</span>::<span class="op">&lt;</span><span class="number">2</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">month</span> <span class="kw">as</span> <span class="ident">u8</span>)<span class="question-mark">?</span>;
-            <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">write_if</span>(<span class="ident">output</span>, <span class="ident">Iso8601</span>::<span class="op">&lt;</span><span class="ident">CONFIG</span><span class="op">&gt;</span><span class="ident">::USE_SEPARATORS</span>, <span class="string">b&quot;-&quot;</span>)<span class="question-mark">?</span>;
-            <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">format_number_pad_zero</span>::<span class="op">&lt;</span><span class="number">2</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">day</span>)<span class="question-mark">?</span>;
+            bytes += write_if(output, Iso8601::&lt;CONFIG&gt;::USE_SEPARATORS, <span class="string">b&quot;-&quot;</span>)<span class="question-mark">?</span>;
+            bytes += format_number_pad_zero::&lt;<span class="number">2</span>, <span class="kw">_</span>, <span class="kw">_</span>&gt;(output, month <span class="kw">as </span>u8)<span class="question-mark">?</span>;
+            bytes += write_if(output, Iso8601::&lt;CONFIG&gt;::USE_SEPARATORS, <span class="string">b&quot;-&quot;</span>)<span class="question-mark">?</span>;
+            bytes += format_number_pad_zero::&lt;<span class="number">2</span>, <span class="kw">_</span>, <span class="kw">_</span>&gt;(output, day)<span class="question-mark">?</span>;
         }
-        <span class="ident">DateKind::Week</span> =&gt; {
-            <span class="kw">let</span> (<span class="ident">year</span>, <span class="ident">week</span>, <span class="ident">day</span>) <span class="op">=</span> <span class="ident">date</span>.<span class="ident">to_iso_week_date</span>();
-            <span class="kw">if</span> <span class="ident">Iso8601</span>::<span class="op">&lt;</span><span class="ident">CONFIG</span><span class="op">&gt;</span><span class="ident">::YEAR_IS_SIX_DIGITS</span> {
-                <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">write_if_else</span>(<span class="ident">output</span>, <span class="ident">year</span> <span class="op">&lt;</span> <span class="number">0</span>, <span class="string">b&quot;-&quot;</span>, <span class="string">b&quot;+&quot;</span>)<span class="question-mark">?</span>;
-                <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">format_number_pad_zero</span>::<span class="op">&lt;</span><span class="number">6</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">year</span>.<span class="ident">unsigned_abs</span>())<span class="question-mark">?</span>;
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="op">!</span>(<span class="number">0</span>..<span class="op">=</span><span class="number">9999</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">year</span>) {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Format::InvalidComponent</span>(<span class="string">&quot;year&quot;</span>));
-            } <span class="kw">else</span> {
-                <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">format_number_pad_zero</span>::<span class="op">&lt;</span><span class="number">4</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">year</span> <span class="kw">as</span> <span class="ident">u32</span>)<span class="question-mark">?</span>;
+        DateKind::Week =&gt; {
+            <span class="kw">let </span>(year, week, day) = date.to_iso_week_date();
+            <span class="kw">if </span>Iso8601::&lt;CONFIG&gt;::YEAR_IS_SIX_DIGITS {
+                bytes += write_if_else(output, year &lt; <span class="number">0</span>, <span class="string">b&quot;-&quot;</span>, <span class="string">b&quot;+&quot;</span>)<span class="question-mark">?</span>;
+                bytes += format_number_pad_zero::&lt;<span class="number">6</span>, <span class="kw">_</span>, <span class="kw">_</span>&gt;(output, year.unsigned_abs())<span class="question-mark">?</span>;
+            } <span class="kw">else if </span>!(<span class="number">0</span>..=<span class="number">9999</span>).contains(<span class="kw-2">&amp;</span>year) {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(error::Format::InvalidComponent(<span class="string">&quot;year&quot;</span>));
+            } <span class="kw">else </span>{
+                bytes += format_number_pad_zero::&lt;<span class="number">4</span>, <span class="kw">_</span>, <span class="kw">_</span>&gt;(output, year <span class="kw">as </span>u32)<span class="question-mark">?</span>;
             }
-            <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">write_if_else</span>(<span class="ident">output</span>, <span class="ident">Iso8601</span>::<span class="op">&lt;</span><span class="ident">CONFIG</span><span class="op">&gt;</span><span class="ident">::USE_SEPARATORS</span>, <span class="string">b&quot;-W&quot;</span>, <span class="string">b&quot;W&quot;</span>)<span class="question-mark">?</span>;
-            <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">format_number_pad_zero</span>::<span class="op">&lt;</span><span class="number">2</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">week</span>)<span class="question-mark">?</span>;
-            <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">write_if</span>(<span class="ident">output</span>, <span class="ident">Iso8601</span>::<span class="op">&lt;</span><span class="ident">CONFIG</span><span class="op">&gt;</span><span class="ident">::USE_SEPARATORS</span>, <span class="string">b&quot;-&quot;</span>)<span class="question-mark">?</span>;
-            <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">format_number_pad_zero</span>::<span class="op">&lt;</span><span class="number">1</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">day</span>.<span class="ident">number_from_monday</span>())<span class="question-mark">?</span>;
+            bytes += write_if_else(output, Iso8601::&lt;CONFIG&gt;::USE_SEPARATORS, <span class="string">b&quot;-W&quot;</span>, <span class="string">b&quot;W&quot;</span>)<span class="question-mark">?</span>;
+            bytes += format_number_pad_zero::&lt;<span class="number">2</span>, <span class="kw">_</span>, <span class="kw">_</span>&gt;(output, week)<span class="question-mark">?</span>;
+            bytes += write_if(output, Iso8601::&lt;CONFIG&gt;::USE_SEPARATORS, <span class="string">b&quot;-&quot;</span>)<span class="question-mark">?</span>;
+            bytes += format_number_pad_zero::&lt;<span class="number">1</span>, <span class="kw">_</span>, <span class="kw">_</span>&gt;(output, day.number_from_monday())<span class="question-mark">?</span>;
         }
-        <span class="ident">DateKind::Ordinal</span> =&gt; {
-            <span class="kw">let</span> (<span class="ident">year</span>, <span class="ident">day</span>) <span class="op">=</span> <span class="ident">date</span>.<span class="ident">to_ordinal_date</span>();
-            <span class="kw">if</span> <span class="ident">Iso8601</span>::<span class="op">&lt;</span><span class="ident">CONFIG</span><span class="op">&gt;</span><span class="ident">::YEAR_IS_SIX_DIGITS</span> {
-                <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">write_if_else</span>(<span class="ident">output</span>, <span class="ident">year</span> <span class="op">&lt;</span> <span class="number">0</span>, <span class="string">b&quot;-&quot;</span>, <span class="string">b&quot;+&quot;</span>)<span class="question-mark">?</span>;
-                <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">format_number_pad_zero</span>::<span class="op">&lt;</span><span class="number">6</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">year</span>.<span class="ident">unsigned_abs</span>())<span class="question-mark">?</span>;
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="op">!</span>(<span class="number">0</span>..<span class="op">=</span><span class="number">9999</span>).<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">year</span>) {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Format::InvalidComponent</span>(<span class="string">&quot;year&quot;</span>));
-            } <span class="kw">else</span> {
-                <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">format_number_pad_zero</span>::<span class="op">&lt;</span><span class="number">4</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">year</span> <span class="kw">as</span> <span class="ident">u32</span>)<span class="question-mark">?</span>;
+        DateKind::Ordinal =&gt; {
+            <span class="kw">let </span>(year, day) = date.to_ordinal_date();
+            <span class="kw">if </span>Iso8601::&lt;CONFIG&gt;::YEAR_IS_SIX_DIGITS {
+                bytes += write_if_else(output, year &lt; <span class="number">0</span>, <span class="string">b&quot;-&quot;</span>, <span class="string">b&quot;+&quot;</span>)<span class="question-mark">?</span>;
+                bytes += format_number_pad_zero::&lt;<span class="number">6</span>, <span class="kw">_</span>, <span class="kw">_</span>&gt;(output, year.unsigned_abs())<span class="question-mark">?</span>;
+            } <span class="kw">else if </span>!(<span class="number">0</span>..=<span class="number">9999</span>).contains(<span class="kw-2">&amp;</span>year) {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(error::Format::InvalidComponent(<span class="string">&quot;year&quot;</span>));
+            } <span class="kw">else </span>{
+                bytes += format_number_pad_zero::&lt;<span class="number">4</span>, <span class="kw">_</span>, <span class="kw">_</span>&gt;(output, year <span class="kw">as </span>u32)<span class="question-mark">?</span>;
             }
-            <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">write_if</span>(<span class="ident">output</span>, <span class="ident">Iso8601</span>::<span class="op">&lt;</span><span class="ident">CONFIG</span><span class="op">&gt;</span><span class="ident">::USE_SEPARATORS</span>, <span class="string">b&quot;-&quot;</span>)<span class="question-mark">?</span>;
-            <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">format_number_pad_zero</span>::<span class="op">&lt;</span><span class="number">3</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">day</span>)<span class="question-mark">?</span>;
+            bytes += write_if(output, Iso8601::&lt;CONFIG&gt;::USE_SEPARATORS, <span class="string">b&quot;-&quot;</span>)<span class="question-mark">?</span>;
+            bytes += format_number_pad_zero::&lt;<span class="number">3</span>, <span class="kw">_</span>, <span class="kw">_</span>&gt;(output, day)<span class="question-mark">?</span>;
         }
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">bytes</span>)
+    <span class="prelude-val">Ok</span>(bytes)
 }
 
-<span class="doccomment">/// Format the time portion of ISO 8601.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">format_time</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">io::Write</span>, <span class="kw">const</span> <span class="ident">CONFIG</span>: <span class="ident">EncodedConfig</span><span class="op">&gt;</span>(
-    <span class="ident">output</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>,
-    <span class="ident">time</span>: <span class="ident">Time</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">error::Format</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="number">0</span>;
+<span class="doccomment">/// Format the time portion of ISO 8601.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>format_time&lt;W: io::Write, <span class="kw">const </span>CONFIG: EncodedConfig&gt;(
+    output: <span class="kw-2">&amp;mut </span>W,
+    time: Time,
+) -&gt; <span class="prelude-ty">Result</span>&lt;usize, error::Format&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>bytes = <span class="number">0</span>;
 
-    <span class="comment">// The &quot;T&quot; can only be omitted in extended format where there is no date being formatted.</span>
-    <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">write_if</span>(
-        <span class="ident">output</span>,
-        <span class="ident">Iso8601</span>::<span class="op">&lt;</span><span class="ident">CONFIG</span><span class="op">&gt;</span><span class="ident">::USE_SEPARATORS</span> <span class="op">|</span><span class="op">|</span> <span class="ident">Iso8601</span>::<span class="op">&lt;</span><span class="ident">CONFIG</span><span class="op">&gt;</span><span class="ident">::FORMAT_DATE</span>,
+    <span class="comment">// The &quot;T&quot; can only be omitted in extended format where there is no date being formatted.
+    </span>bytes += write_if(
+        output,
+        Iso8601::&lt;CONFIG&gt;::USE_SEPARATORS || Iso8601::&lt;CONFIG&gt;::FORMAT_DATE,
         <span class="string">b&quot;T&quot;</span>,
     )<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> (<span class="ident">hours</span>, <span class="ident">minutes</span>, <span class="ident">seconds</span>, <span class="ident">nanoseconds</span>) <span class="op">=</span> <span class="ident">time</span>.<span class="ident">as_hms_nano</span>();
+    <span class="kw">let </span>(hours, minutes, seconds, nanoseconds) = time.as_hms_nano();
 
-    <span class="kw">match</span> <span class="ident">Iso8601</span>::<span class="op">&lt;</span><span class="ident">CONFIG</span><span class="op">&gt;</span><span class="ident">::TIME_PRECISION</span> {
-        <span class="ident">TimePrecision::Hour</span> { <span class="ident">decimal_digits</span> } =&gt; {
-            <span class="kw">let</span> <span class="ident">hours</span> <span class="op">=</span> (<span class="ident">hours</span> <span class="kw">as</span> <span class="ident">f64</span>)
-                <span class="op">+</span> (<span class="ident">minutes</span> <span class="kw">as</span> <span class="ident">f64</span>) <span class="op">/</span> <span class="number">60.</span>
-                <span class="op">+</span> (<span class="ident">seconds</span> <span class="kw">as</span> <span class="ident">f64</span>) <span class="op">/</span> <span class="number">3_600.</span>
-                <span class="op">+</span> (<span class="ident">nanoseconds</span> <span class="kw">as</span> <span class="ident">f64</span>) <span class="op">/</span> <span class="number">3_600.</span> <span class="op">/</span> <span class="number">1_000_000_000.</span>;
-            <span class="ident">format_float</span>(<span class="ident">output</span>, <span class="ident">hours</span>, <span class="number">2</span>, <span class="ident">decimal_digits</span>)<span class="question-mark">?</span>;
+    <span class="kw">match </span>Iso8601::&lt;CONFIG&gt;::TIME_PRECISION {
+        TimePrecision::Hour { decimal_digits } =&gt; {
+            <span class="kw">let </span>hours = (hours <span class="kw">as </span>f64)
+                + (minutes <span class="kw">as </span>f64) / <span class="number">60.
+                </span>+ (seconds <span class="kw">as </span>f64) / <span class="number">3_600.
+                </span>+ (nanoseconds <span class="kw">as </span>f64) / <span class="number">3_600. </span>/ <span class="number">1_000_000_000.</span>;
+            format_float(output, hours, <span class="number">2</span>, decimal_digits)<span class="question-mark">?</span>;
         }
-        <span class="ident">TimePrecision::Minute</span> { <span class="ident">decimal_digits</span> } =&gt; {
-            <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">format_number_pad_zero</span>::<span class="op">&lt;</span><span class="number">2</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">hours</span>)<span class="question-mark">?</span>;
-            <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">write_if</span>(<span class="ident">output</span>, <span class="ident">Iso8601</span>::<span class="op">&lt;</span><span class="ident">CONFIG</span><span class="op">&gt;</span><span class="ident">::USE_SEPARATORS</span>, <span class="string">b&quot;:&quot;</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">minutes</span> <span class="op">=</span> (<span class="ident">minutes</span> <span class="kw">as</span> <span class="ident">f64</span>)
-                <span class="op">+</span> (<span class="ident">seconds</span> <span class="kw">as</span> <span class="ident">f64</span>) <span class="op">/</span> <span class="number">60.</span>
-                <span class="op">+</span> (<span class="ident">nanoseconds</span> <span class="kw">as</span> <span class="ident">f64</span>) <span class="op">/</span> <span class="number">60.</span> <span class="op">/</span> <span class="number">1_000_000_000.</span>;
-            <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">format_float</span>(<span class="ident">output</span>, <span class="ident">minutes</span>, <span class="number">2</span>, <span class="ident">decimal_digits</span>)<span class="question-mark">?</span>;
+        TimePrecision::Minute { decimal_digits } =&gt; {
+            bytes += format_number_pad_zero::&lt;<span class="number">2</span>, <span class="kw">_</span>, <span class="kw">_</span>&gt;(output, hours)<span class="question-mark">?</span>;
+            bytes += write_if(output, Iso8601::&lt;CONFIG&gt;::USE_SEPARATORS, <span class="string">b&quot;:&quot;</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>minutes = (minutes <span class="kw">as </span>f64)
+                + (seconds <span class="kw">as </span>f64) / <span class="number">60.
+                </span>+ (nanoseconds <span class="kw">as </span>f64) / <span class="number">60. </span>/ <span class="number">1_000_000_000.</span>;
+            bytes += format_float(output, minutes, <span class="number">2</span>, decimal_digits)<span class="question-mark">?</span>;
         }
-        <span class="ident">TimePrecision::Second</span> { <span class="ident">decimal_digits</span> } =&gt; {
-            <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">format_number_pad_zero</span>::<span class="op">&lt;</span><span class="number">2</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">hours</span>)<span class="question-mark">?</span>;
-            <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">write_if</span>(<span class="ident">output</span>, <span class="ident">Iso8601</span>::<span class="op">&lt;</span><span class="ident">CONFIG</span><span class="op">&gt;</span><span class="ident">::USE_SEPARATORS</span>, <span class="string">b&quot;:&quot;</span>)<span class="question-mark">?</span>;
-            <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">format_number_pad_zero</span>::<span class="op">&lt;</span><span class="number">2</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">minutes</span>)<span class="question-mark">?</span>;
-            <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">write_if</span>(<span class="ident">output</span>, <span class="ident">Iso8601</span>::<span class="op">&lt;</span><span class="ident">CONFIG</span><span class="op">&gt;</span><span class="ident">::USE_SEPARATORS</span>, <span class="string">b&quot;:&quot;</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">seconds</span> <span class="op">=</span> (<span class="ident">seconds</span> <span class="kw">as</span> <span class="ident">f64</span>) <span class="op">+</span> (<span class="ident">nanoseconds</span> <span class="kw">as</span> <span class="ident">f64</span>) <span class="op">/</span> <span class="number">1_000_000_000.</span>;
-            <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">format_float</span>(<span class="ident">output</span>, <span class="ident">seconds</span>, <span class="number">2</span>, <span class="ident">decimal_digits</span>)<span class="question-mark">?</span>;
+        TimePrecision::Second { decimal_digits } =&gt; {
+            bytes += format_number_pad_zero::&lt;<span class="number">2</span>, <span class="kw">_</span>, <span class="kw">_</span>&gt;(output, hours)<span class="question-mark">?</span>;
+            bytes += write_if(output, Iso8601::&lt;CONFIG&gt;::USE_SEPARATORS, <span class="string">b&quot;:&quot;</span>)<span class="question-mark">?</span>;
+            bytes += format_number_pad_zero::&lt;<span class="number">2</span>, <span class="kw">_</span>, <span class="kw">_</span>&gt;(output, minutes)<span class="question-mark">?</span>;
+            bytes += write_if(output, Iso8601::&lt;CONFIG&gt;::USE_SEPARATORS, <span class="string">b&quot;:&quot;</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>seconds = (seconds <span class="kw">as </span>f64) + (nanoseconds <span class="kw">as </span>f64) / <span class="number">1_000_000_000.</span>;
+            bytes += format_float(output, seconds, <span class="number">2</span>, decimal_digits)<span class="question-mark">?</span>;
         }
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">bytes</span>)
+    <span class="prelude-val">Ok</span>(bytes)
 }
 
-<span class="doccomment">/// Format the UTC offset portion of ISO 8601.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">format_offset</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">io::Write</span>, <span class="kw">const</span> <span class="ident">CONFIG</span>: <span class="ident">EncodedConfig</span><span class="op">&gt;</span>(
-    <span class="ident">output</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>,
-    <span class="ident">offset</span>: <span class="ident">UtcOffset</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">error::Format</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">Iso8601</span>::<span class="op">&lt;</span><span class="ident">CONFIG</span><span class="op">&gt;</span><span class="ident">::FORMAT_TIME</span> <span class="op">&amp;&amp;</span> <span class="ident">offset</span>.<span class="ident">is_utc</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">write</span>(<span class="ident">output</span>, <span class="string">b&quot;Z&quot;</span>)<span class="question-mark">?</span>);
+<span class="doccomment">/// Format the UTC offset portion of ISO 8601.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>format_offset&lt;W: io::Write, <span class="kw">const </span>CONFIG: EncodedConfig&gt;(
+    output: <span class="kw-2">&amp;mut </span>W,
+    offset: UtcOffset,
+) -&gt; <span class="prelude-ty">Result</span>&lt;usize, error::Format&gt; {
+    <span class="kw">if </span>Iso8601::&lt;CONFIG&gt;::FORMAT_TIME &amp;&amp; offset.is_utc() {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(write(output, <span class="string">b&quot;Z&quot;</span>)<span class="question-mark">?</span>);
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="number">0</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>bytes = <span class="number">0</span>;
 
-    <span class="kw">let</span> (<span class="ident">hours</span>, <span class="ident">minutes</span>, <span class="ident">seconds</span>) <span class="op">=</span> <span class="ident">offset</span>.<span class="ident">as_hms</span>();
-    <span class="kw">if</span> <span class="ident">seconds</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Format::InvalidComponent</span>(<span class="string">&quot;offset_second&quot;</span>));
+    <span class="kw">let </span>(hours, minutes, seconds) = offset.as_hms();
+    <span class="kw">if </span>seconds != <span class="number">0 </span>{
+        <span class="kw">return </span><span class="prelude-val">Err</span>(error::Format::InvalidComponent(<span class="string">&quot;offset_second&quot;</span>));
     }
-    <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">write_if_else</span>(<span class="ident">output</span>, <span class="ident">offset</span>.<span class="ident">is_negative</span>(), <span class="string">b&quot;-&quot;</span>, <span class="string">b&quot;+&quot;</span>)<span class="question-mark">?</span>;
-    <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">format_number_pad_zero</span>::<span class="op">&lt;</span><span class="number">2</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">hours</span>.<span class="ident">unsigned_abs</span>())<span class="question-mark">?</span>;
+    bytes += write_if_else(output, offset.is_negative(), <span class="string">b&quot;-&quot;</span>, <span class="string">b&quot;+&quot;</span>)<span class="question-mark">?</span>;
+    bytes += format_number_pad_zero::&lt;<span class="number">2</span>, <span class="kw">_</span>, <span class="kw">_</span>&gt;(output, hours.unsigned_abs())<span class="question-mark">?</span>;
 
-    <span class="kw">if</span> <span class="ident">Iso8601</span>::<span class="op">&lt;</span><span class="ident">CONFIG</span><span class="op">&gt;</span><span class="ident">::OFFSET_PRECISION</span> <span class="op">==</span> <span class="ident">OffsetPrecision::Hour</span> <span class="op">&amp;&amp;</span> <span class="ident">minutes</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Format::InvalidComponent</span>(<span class="string">&quot;offset_minute&quot;</span>));
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">Iso8601</span>::<span class="op">&lt;</span><span class="ident">CONFIG</span><span class="op">&gt;</span><span class="ident">::OFFSET_PRECISION</span> <span class="op">==</span> <span class="ident">OffsetPrecision::Minute</span> {
-        <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">write_if</span>(<span class="ident">output</span>, <span class="ident">Iso8601</span>::<span class="op">&lt;</span><span class="ident">CONFIG</span><span class="op">&gt;</span><span class="ident">::USE_SEPARATORS</span>, <span class="string">b&quot;:&quot;</span>)<span class="question-mark">?</span>;
-        <span class="ident">bytes</span> <span class="op">+</span><span class="op">=</span> <span class="ident">format_number_pad_zero</span>::<span class="op">&lt;</span><span class="number">2</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="ident">output</span>, <span class="ident">minutes</span>.<span class="ident">unsigned_abs</span>())<span class="question-mark">?</span>;
+    <span class="kw">if </span>Iso8601::&lt;CONFIG&gt;::OFFSET_PRECISION == OffsetPrecision::Hour &amp;&amp; minutes != <span class="number">0 </span>{
+        <span class="kw">return </span><span class="prelude-val">Err</span>(error::Format::InvalidComponent(<span class="string">&quot;offset_minute&quot;</span>));
+    } <span class="kw">else if </span>Iso8601::&lt;CONFIG&gt;::OFFSET_PRECISION == OffsetPrecision::Minute {
+        bytes += write_if(output, Iso8601::&lt;CONFIG&gt;::USE_SEPARATORS, <span class="string">b&quot;:&quot;</span>)<span class="question-mark">?</span>;
+        bytes += format_number_pad_zero::&lt;<span class="number">2</span>, <span class="kw">_</span>, <span class="kw">_</span>&gt;(output, minutes.unsigned_abs())<span class="question-mark">?</span>;
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">bytes</span>)
+    <span class="prelude-val">Ok</span>(bytes)
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="time" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="time" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

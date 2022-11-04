@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_with-1.14.0/src/ser/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serde_with/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/serde_with-1.14.0/src/ser/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../serde_with/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../serde_with/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -156,163 +156,163 @@
 <span id="156">156</span>
 <span id="157">157</span>
 <span id="158">158</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Module for [`SerializeAs`][] implementations</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The module contains the [`SerializeAs`][] trait and helper code.</span>
-<span class="doccomment">//! Additionally, it contains implementations of [`SerializeAs`][] for types defined in the Rust Standard Library or this crate.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! You can find more details on how to implement this trait for your types in the documentation of the [`SerializeAs`][] trait and details about the usage in the [user guide][].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [user guide]: crate::guide</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Module for [`SerializeAs`][] implementations
+//!
+//! The module contains the [`SerializeAs`][] trait and helper code.
+//! Additionally, it contains implementations of [`SerializeAs`][] for types defined in the Rust Standard Library or this crate.
+//!
+//! You can find more details on how to implement this trait for your types in the documentation of the [`SerializeAs`][] trait and details about the usage in the [user guide][].
+//!
+//! [user guide]: crate::guide
 
-<span class="kw">mod</span> <span class="ident">const_arrays</span>;
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">mod</span> <span class="ident">impls</span>;
+</span><span class="kw">mod </span>const_arrays;
+<span class="attribute">#[macro_use]
+</span><span class="kw">mod </span>impls;
 
-<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// A **data structure** that can be serialized into any data format supported by Serde, analogue to [`Serialize`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The trait is analogue to the [`serde::Serialize`][`Serialize`] trait, with the same meaning of input and output arguments.</span>
-<span class="doccomment">/// It can and should the implemented using the same code structure as the [`Serialize`] trait.</span>
-<span class="doccomment">/// As such, the same advice for [implementing `Serialize`][impl-serialize] applies here.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Differences to [`Serialize`]</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The trait is only required for container-like types or types implementing specific conversion functions.</span>
-<span class="doccomment">/// Container-like types are [`Vec`], [`BTreeMap`], but also [`Option`] and [`Box`].</span>
-<span class="doccomment">/// Conversion types serialize into a different serde data type.</span>
-<span class="doccomment">/// For example, [`DisplayFromStr`] uses the [`Display`] trait to serialize a String and [`DurationSeconds`] converts a [`Duration`] into either String or integer values.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This code shows how to implement [`Serialize`] for [`Box`]:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,ignore</span>
-<span class="doccomment">/// impl&lt;T&gt; Serialize for Box&lt;T&gt;</span>
-<span class="doccomment">/// where</span>
-<span class="doccomment">///     T: Serialize,</span>
-<span class="doccomment">/// {</span>
-<span class="doccomment">///     #[inline]</span>
-<span class="doccomment">///     fn serialize&lt;S&gt;(&amp;self, serializer: S) -&gt; Result&lt;S::Ok, S::Error&gt;</span>
-<span class="doccomment">///     where</span>
-<span class="doccomment">///         S: Serializer,</span>
-<span class="doccomment">///     {</span>
-<span class="doccomment">///         (**self).serialize(serializer)</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// and this code shows how to do the same using [`SerializeAs`][]:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,ignore</span>
-<span class="doccomment">/// impl&lt;T, U&gt; SerializeAs&lt;Box&lt;T&gt;&gt; for Box&lt;U&gt;</span>
-<span class="doccomment">/// where</span>
-<span class="doccomment">///     U: SerializeAs&lt;T&gt;,</span>
-<span class="doccomment">/// {</span>
-<span class="doccomment">///     fn serialize_as&lt;S&gt;(source: &amp;Box&lt;T&gt;, serializer: S) -&gt; Result&lt;S::Ok, S::Error&gt;</span>
-<span class="doccomment">///     where</span>
-<span class="doccomment">///         S: Serializer,</span>
-<span class="doccomment">///     {</span>
-<span class="doccomment">///         SerializeAsWrap::&lt;T, U&gt;::new(source).serialize(serializer)</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It uses two type parameters, `T` and `U` instead of only one and performs the serialization step using the `SerializeAsWrap` type.</span>
-<span class="doccomment">/// The `T` type is the on the Rust side before serialization, whereas the `U` type determines how the value will be serialized.</span>
-<span class="doccomment">/// These two changes are usually enough to make a container type implement [`SerializeAs`][].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`SerializeAsWrap`] is a piece of glue code which turns [`SerializeAs`] into a serde compatible datatype, by converting all calls to `serialize` into `serialize_as`.</span>
-<span class="doccomment">/// This allows us to implement [`SerializeAs`] such that it can be applied recursively throughout the whole data structure.</span>
-<span class="doccomment">/// This is mostly important for container types, such as `Vec` or `BTreeMap`.</span>
-<span class="doccomment">/// In a `BTreeMap` this allows us to specify two different serialization behaviors, one for key and one for value, using the [`SerializeAs`] trait.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Implementing a converter Type</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This shows a simplified implementation for [`DisplayFromStr`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # #[cfg(all(feature = &quot;macros&quot;))] {</span>
-<span class="doccomment">/// # use serde_with::SerializeAs;</span>
-<span class="doccomment">/// # use std::fmt::Display;</span>
-<span class="doccomment">/// struct DisplayFromStr;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// impl&lt;T&gt; SerializeAs&lt;T&gt; for DisplayFromStr</span>
-<span class="doccomment">/// where</span>
-<span class="doccomment">///     T: Display,</span>
-<span class="doccomment">/// {</span>
-<span class="doccomment">///     fn serialize_as&lt;S&gt;(source: &amp;T, serializer: S) -&gt; Result&lt;S::Ok, S::Error&gt;</span>
-<span class="doccomment">///     where</span>
-<span class="doccomment">///         S: serde::Serializer,</span>
-<span class="doccomment">///     {</span>
-<span class="doccomment">///         serializer.collect_str(&amp;source)</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # #[serde_with::serde_as]</span>
-<span class="doccomment">/// # #[derive(serde::Serialize)]</span>
-<span class="doccomment">/// # struct S (#[serde_as(as = &quot;DisplayFromStr&quot;)] bool);</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # assert_eq!(r#&quot;&quot;false&quot;&quot;#, serde_json::to_string(&amp;S(false)).unwrap());</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Box`]: std::boxed::Box</span>
-<span class="doccomment">/// [`BTreeMap`]: std::collections::BTreeMap</span>
-<span class="doccomment">/// [`Display`]: std::fmt::Display</span>
-<span class="doccomment">/// [`Duration`]: std::time::Duration</span>
-<span class="doccomment">/// [`Vec`]: std::vec::Vec</span>
-<span class="doccomment">/// [impl-serialize]: https://serde.rs/impl-serialize.html</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Serialize this value into the given Serde serializer.</span>
-    <span class="kw">fn</span> <span class="ident">serialize_as</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>;
+<span class="doccomment">/// A **data structure** that can be serialized into any data format supported by Serde, analogue to [`Serialize`].
+///
+/// The trait is analogue to the [`serde::Serialize`][`Serialize`] trait, with the same meaning of input and output arguments.
+/// It can and should the implemented using the same code structure as the [`Serialize`] trait.
+/// As such, the same advice for [implementing `Serialize`][impl-serialize] applies here.
+///
+/// # Differences to [`Serialize`]
+///
+/// The trait is only required for container-like types or types implementing specific conversion functions.
+/// Container-like types are [`Vec`], [`BTreeMap`], but also [`Option`] and [`Box`].
+/// Conversion types serialize into a different serde data type.
+/// For example, [`DisplayFromStr`] uses the [`Display`] trait to serialize a String and [`DurationSeconds`] converts a [`Duration`] into either String or integer values.
+///
+/// This code shows how to implement [`Serialize`] for [`Box`]:
+///
+/// ```rust,ignore
+/// impl&lt;T&gt; Serialize for Box&lt;T&gt;
+/// where
+///     T: Serialize,
+/// {
+///     #[inline]
+///     fn serialize&lt;S&gt;(&amp;self, serializer: S) -&gt; Result&lt;S::Ok, S::Error&gt;
+///     where
+///         S: Serializer,
+///     {
+///         (**self).serialize(serializer)
+///     }
+/// }
+/// ```
+///
+/// and this code shows how to do the same using [`SerializeAs`][]:
+///
+/// ```rust,ignore
+/// impl&lt;T, U&gt; SerializeAs&lt;Box&lt;T&gt;&gt; for Box&lt;U&gt;
+/// where
+///     U: SerializeAs&lt;T&gt;,
+/// {
+///     fn serialize_as&lt;S&gt;(source: &amp;Box&lt;T&gt;, serializer: S) -&gt; Result&lt;S::Ok, S::Error&gt;
+///     where
+///         S: Serializer,
+///     {
+///         SerializeAsWrap::&lt;T, U&gt;::new(source).serialize(serializer)
+///     }
+/// }
+/// ```
+///
+/// It uses two type parameters, `T` and `U` instead of only one and performs the serialization step using the `SerializeAsWrap` type.
+/// The `T` type is the on the Rust side before serialization, whereas the `U` type determines how the value will be serialized.
+/// These two changes are usually enough to make a container type implement [`SerializeAs`][].
+///
+/// [`SerializeAsWrap`] is a piece of glue code which turns [`SerializeAs`] into a serde compatible datatype, by converting all calls to `serialize` into `serialize_as`.
+/// This allows us to implement [`SerializeAs`] such that it can be applied recursively throughout the whole data structure.
+/// This is mostly important for container types, such as `Vec` or `BTreeMap`.
+/// In a `BTreeMap` this allows us to specify two different serialization behaviors, one for key and one for value, using the [`SerializeAs`] trait.
+///
+/// ## Implementing a converter Type
+///
+/// This shows a simplified implementation for [`DisplayFromStr`].
+///
+/// ```rust
+/// # #[cfg(all(feature = &quot;macros&quot;))] {
+/// # use serde_with::SerializeAs;
+/// # use std::fmt::Display;
+/// struct DisplayFromStr;
+///
+/// impl&lt;T&gt; SerializeAs&lt;T&gt; for DisplayFromStr
+/// where
+///     T: Display,
+/// {
+///     fn serialize_as&lt;S&gt;(source: &amp;T, serializer: S) -&gt; Result&lt;S::Ok, S::Error&gt;
+///     where
+///         S: serde::Serializer,
+///     {
+///         serializer.collect_str(&amp;source)
+///     }
+/// }
+/// #
+/// # #[serde_with::serde_as]
+/// # #[derive(serde::Serialize)]
+/// # struct S (#[serde_as(as = &quot;DisplayFromStr&quot;)] bool);
+/// #
+/// # assert_eq!(r#&quot;&quot;false&quot;&quot;#, serde_json::to_string(&amp;S(false)).unwrap());
+/// # }
+/// ```
+///
+/// [`Box`]: std::boxed::Box
+/// [`BTreeMap`]: std::collections::BTreeMap
+/// [`Display`]: std::fmt::Display
+/// [`Duration`]: std::time::Duration
+/// [`Vec`]: std::vec::Vec
+/// [impl-serialize]: https://serde.rs/impl-serialize.html
+</span><span class="kw">pub trait </span>SerializeAs&lt;T: <span class="question-mark">?</span>Sized&gt; {
+    <span class="doccomment">/// Serialize this value into the given Serde serializer.
+    </span><span class="kw">fn </span>serialize_as&lt;S&gt;(source: <span class="kw-2">&amp;</span>T, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer;
 }
 
-<span class="doccomment">/// Helper type to implement [`SerializeAs`] for container-like types.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SerializeAsWrap</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span>, <span class="ident">U</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> {
-    <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>,
-    <span class="ident">marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Helper type to implement [`SerializeAs`] for container-like types.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>SerializeAsWrap&lt;<span class="lifetime">&#39;a</span>, T: <span class="question-mark">?</span>Sized, U: <span class="question-mark">?</span>Sized&gt; {
+    value: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T,
+    marker: PhantomData&lt;U&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> <span class="ident">SerializeAsWrap</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
-    <span class="ident">U</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T, U&gt; SerializeAsWrap&lt;<span class="lifetime">&#39;a</span>, T, U&gt;
+<span class="kw">where
+    </span>T: <span class="question-mark">?</span>Sized,
+    U: <span class="question-mark">?</span>Sized,
 {
-    <span class="doccomment">/// Create new instance with provided value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">value</span>,
-            <span class="ident">marker</span>: <span class="ident">PhantomData</span>,
+    <span class="doccomment">/// Create new instance with provided value.
+    </span><span class="kw">pub fn </span>new(value: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            value,
+            marker: PhantomData,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">SerializeAsWrap</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
-    <span class="ident">U</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
-    <span class="ident">U</span>: <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T, U&gt; Serialize <span class="kw">for </span>SerializeAsWrap&lt;<span class="lifetime">&#39;a</span>, T, U&gt;
+<span class="kw">where
+    </span>T: <span class="question-mark">?</span>Sized,
+    U: <span class="question-mark">?</span>Sized,
+    U: SerializeAs&lt;T&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    <span class="kw">fn </span>serialize&lt;S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: Serializer,
     {
-        <span class="ident">U::serialize_as</span>(<span class="self">self</span>.<span class="ident">value</span>, <span class="ident">serializer</span>)
+        U::serialize_as(<span class="self">self</span>.value, serializer)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SerializeAsWrap</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
-    <span class="ident">U</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
-    <span class="ident">U</span>: <span class="ident">SerializeAs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T, U&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T&gt; <span class="kw">for </span>SerializeAsWrap&lt;<span class="lifetime">&#39;a</span>, T, U&gt;
+<span class="kw">where
+    </span>T: <span class="question-mark">?</span>Sized,
+    U: <span class="question-mark">?</span>Sized,
+    U: SerializeAs&lt;T&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">value</span>)
+    <span class="kw">fn </span>from(value: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new(value)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serde_with" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="serde_with" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

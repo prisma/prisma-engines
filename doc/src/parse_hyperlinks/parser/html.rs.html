@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/parse-hyperlinks-0.23.4/src/parser/html.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>html.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../parse_hyperlinks/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../parse_hyperlinks/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../parse_hyperlinks/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/parse-hyperlinks-0.23.4/src/parser/html.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>html.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../parse_hyperlinks/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../parse_hyperlinks/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../parse_hyperlinks/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -333,340 +333,340 @@
 <span id="333">333</span>
 <span id="334">334</span>
 <span id="335">335</span>
-</pre><pre class="rust"><code><span class="doccomment">//! This module implements parsers for HTML hyperlinks.</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::type_complexity</span>)]</span>
+</pre><pre class="rust"><code><span class="doccomment">//! This module implements parsers for HTML hyperlinks.
+</span><span class="attribute">#![allow(dead_code)]
+#![allow(clippy::type_complexity)]
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parser::Link</span>;
-<span class="kw">use</span> <span class="ident">html_escape::decode_html_entities</span>;
-<span class="kw">use</span> <span class="ident">nom::branch::alt</span>;
-<span class="kw">use</span> <span class="ident">nom::bytes::complete::is_not</span>;
-<span class="kw">use</span> <span class="ident">nom::bytes::complete::tag</span>;
-<span class="kw">use</span> <span class="ident">nom::character::complete::alphanumeric1</span>;
-<span class="kw">use</span> <span class="ident">nom::error::Error</span>;
-<span class="kw">use</span> <span class="ident">nom::error::ErrorKind</span>;
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::parser::Link;
+<span class="kw">use </span>html_escape::decode_html_entities;
+<span class="kw">use </span>nom::branch::alt;
+<span class="kw">use </span>nom::bytes::complete::is_not;
+<span class="kw">use </span>nom::bytes::complete::tag;
+<span class="kw">use </span>nom::character::complete::alphanumeric1;
+<span class="kw">use </span>nom::error::Error;
+<span class="kw">use </span>nom::error::ErrorKind;
+<span class="kw">use </span>std::borrow::Cow;
 
-<span class="doccomment">/// Wrapper around `html_text2dest()` that packs the result in</span>
-<span class="doccomment">/// `Link::Text2Dest`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">html_text2dest_link</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Link</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">i</span>, (<span class="ident">te</span>, <span class="ident">de</span>, <span class="ident">ti</span>)) <span class="op">=</span> <span class="ident">html_text2dest</span>(<span class="ident">i</span>)<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>((<span class="ident">i</span>, <span class="ident">Link::Text2Dest</span>(<span class="ident">te</span>, <span class="ident">de</span>, <span class="ident">ti</span>)))
+<span class="doccomment">/// Wrapper around `html_text2dest()` that packs the result in
+/// `Link::Text2Dest`.
+</span><span class="kw">pub fn </span>html_text2dest_link(i: <span class="kw-2">&amp;</span>str) -&gt; nom::IResult&lt;<span class="kw-2">&amp;</span>str, Link&gt; {
+    <span class="kw">let </span>(i, (te, de, ti)) = html_text2dest(i)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>((i, Link::Text2Dest(te, de, ti)))
 }
 
-<span class="doccomment">/// Parse an HTML _inline hyperlink_.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It returns either `Ok((i, (link_text, link_destination, link_title)))` or some error.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The parser expects to start at the link start (`&lt;`) to succeed.</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use parse_hyperlinks::parser::Link;</span>
-<span class="doccomment">/// use parse_hyperlinks::parser::html::html_text2dest;</span>
-<span class="doccomment">/// use std::borrow::Cow;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///   html_text2dest(r#&quot;&lt;a href=&quot;destination&quot; title=&quot;title&quot;&gt;name&lt;/a&gt;abc&quot;#),</span>
-<span class="doccomment">///   Ok((&quot;abc&quot;, (Cow::from(&quot;name&quot;), Cow::from(&quot;destination&quot;), Cow::from(&quot;title&quot;))))</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">html_text2dest</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">i</span>, ((<span class="ident">link_destination</span>, <span class="ident">link_title</span>), <span class="ident">link_text</span>)) <span class="op">=</span> <span class="ident">nom::sequence::terminated</span>(
-        <span class="ident">nom::sequence::pair</span>(
-            <span class="ident">tag_a_opening</span>,
-            <span class="ident">alt</span>((
-                <span class="ident">nom::bytes::complete::take_until</span>(<span class="string">&quot;&lt;/a&gt;&quot;</span>),
-                <span class="ident">nom::bytes::complete::take_until</span>(<span class="string">&quot;&lt;/A&gt;&quot;</span>),
+<span class="doccomment">/// Parse an HTML _inline hyperlink_.
+///
+/// It returns either `Ok((i, (link_text, link_destination, link_title)))` or some error.
+///
+/// The parser expects to start at the link start (`&lt;`) to succeed.
+/// ```
+/// use parse_hyperlinks::parser::Link;
+/// use parse_hyperlinks::parser::html::html_text2dest;
+/// use std::borrow::Cow;
+///
+/// assert_eq!(
+///   html_text2dest(r#&quot;&lt;a href=&quot;destination&quot; title=&quot;title&quot;&gt;name&lt;/a&gt;abc&quot;#),
+///   Ok((&quot;abc&quot;, (Cow::from(&quot;name&quot;), Cow::from(&quot;destination&quot;), Cow::from(&quot;title&quot;))))
+/// );
+/// ```
+</span><span class="kw">pub fn </span>html_text2dest(i: <span class="kw-2">&amp;</span>str) -&gt; nom::IResult&lt;<span class="kw-2">&amp;</span>str, (Cow&lt;str&gt;, Cow&lt;str&gt;, Cow&lt;str&gt;)&gt; {
+    <span class="kw">let </span>(i, ((link_destination, link_title), link_text)) = nom::sequence::terminated(
+        nom::sequence::pair(
+            tag_a_opening,
+            alt((
+                nom::bytes::complete::take_until(<span class="string">&quot;&lt;/a&gt;&quot;</span>),
+                nom::bytes::complete::take_until(<span class="string">&quot;&lt;/A&gt;&quot;</span>),
             )),
         ),
-        <span class="comment">// HTML is case insensitive. XHTML, that is being XML is case sensitive.</span>
-        <span class="comment">// Here we deal with HTML.</span>
-        <span class="ident">alt</span>((<span class="ident">tag</span>(<span class="string">&quot;&lt;/a&gt;&quot;</span>), <span class="ident">tag</span>(<span class="string">&quot;&lt;/A&gt;&quot;</span>))),
-    )(<span class="ident">i</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">link_text</span> <span class="op">=</span> <span class="ident">decode_html_entities</span>(<span class="ident">link_text</span>);
-    <span class="prelude-val">Ok</span>((<span class="ident">i</span>, (<span class="ident">link_text</span>, <span class="ident">link_destination</span>, <span class="ident">link_title</span>)))
+        <span class="comment">// HTML is case insensitive. XHTML, that is being XML is case sensitive.
+        // Here we deal with HTML.
+        </span>alt((tag(<span class="string">&quot;&lt;/a&gt;&quot;</span>), tag(<span class="string">&quot;&lt;/A&gt;&quot;</span>))),
+    )(i)<span class="question-mark">?</span>;
+    <span class="kw">let </span>link_text = decode_html_entities(link_text);
+    <span class="prelude-val">Ok</span>((i, (link_text, link_destination, link_title)))
 }
 
-<span class="doccomment">/// Parses a `&lt;a ...&gt;` opening tag and returns</span>
-<span class="doccomment">/// either `Ok((i, (link_destination, link_title)))` or some error.</span>
-<span class="kw">fn</span> <span class="ident">tag_a_opening</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-    <span class="ident">nom::sequence::delimited</span>(
-        <span class="comment">// HTML is case insensitive. XHTML, that is being XML is case sensitive.</span>
-        <span class="comment">// Here we deal with HTML.</span>
-        <span class="ident">alt</span>((<span class="ident">tag</span>(<span class="string">&quot;&lt;a &quot;</span>), <span class="ident">tag</span>(<span class="string">&quot;&lt;A &quot;</span>))),
-        <span class="ident">nom::combinator::map_parser</span>(<span class="ident">is_not</span>(<span class="string">&quot;&gt;&quot;</span>), <span class="ident">parse_attributes</span>),
-        <span class="ident">tag</span>(<span class="string">&quot;&gt;&quot;</span>),
-    )(<span class="ident">i</span>)
+<span class="doccomment">/// Parses a `&lt;a ...&gt;` opening tag and returns
+/// either `Ok((i, (link_destination, link_title)))` or some error.
+</span><span class="kw">fn </span>tag_a_opening(i: <span class="kw-2">&amp;</span>str) -&gt; nom::IResult&lt;<span class="kw-2">&amp;</span>str, (Cow&lt;str&gt;, Cow&lt;str&gt;)&gt; {
+    nom::sequence::delimited(
+        <span class="comment">// HTML is case insensitive. XHTML, that is being XML is case sensitive.
+        // Here we deal with HTML.
+        </span>alt((tag(<span class="string">&quot;&lt;a &quot;</span>), tag(<span class="string">&quot;&lt;A &quot;</span>))),
+        nom::combinator::map_parser(is_not(<span class="string">&quot;&gt;&quot;</span>), parse_attributes),
+        tag(<span class="string">&quot;&gt;&quot;</span>),
+    )(i)
 }
 
-<span class="doccomment">/// Parses attributes and returns `Ok((name, value))`.</span>
-<span class="doccomment">/// Boolean attributes are ignored, but silently consumed.</span>
-<span class="kw">fn</span> <span class="ident">attribute</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-    <span class="ident">alt</span>((
-        <span class="ident">nom::sequence::pair</span>(
-            <span class="ident">nom::combinator::verify</span>(<span class="ident">alphanumeric1</span>, <span class="op">|</span><span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> {
-                <span class="ident">nom::character::is_alphabetic</span>(<span class="ident">s</span>.<span class="ident">as_bytes</span>()[<span class="number">0</span>])
+<span class="doccomment">/// Parses attributes and returns `Ok((name, value))`.
+/// Boolean attributes are ignored, but silently consumed.
+</span><span class="kw">fn </span>attribute(i: <span class="kw-2">&amp;</span>str) -&gt; nom::IResult&lt;<span class="kw-2">&amp;</span>str, (<span class="kw-2">&amp;</span>str, Cow&lt;str&gt;)&gt; {
+    alt((
+        nom::sequence::pair(
+            nom::combinator::verify(alphanumeric1, |s: <span class="kw-2">&amp;</span>str| {
+                nom::character::is_alphabetic(s.as_bytes()[<span class="number">0</span>])
             }),
-            <span class="ident">alt</span>((
-                <span class="ident">nom::combinator::value</span>(<span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>), <span class="ident">tag</span>(<span class="string">r#&quot;=&quot;&quot;&quot;#</span>)),
-                <span class="ident">nom::combinator::value</span>(<span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>), <span class="ident">tag</span>(<span class="string">r#&quot;=&#39;&#39;&quot;#</span>)),
-                <span class="ident">nom::combinator::map</span>(
-                    <span class="ident">nom::sequence::delimited</span>(<span class="ident">tag</span>(<span class="string">&quot;=\&quot;&quot;</span>), <span class="ident">is_not</span>(<span class="string">&quot;\&quot;&quot;</span>), <span class="ident">tag</span>(<span class="string">&quot;\&quot;&quot;</span>)),
-                    <span class="op">|</span><span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> <span class="ident">decode_html_entities</span>(<span class="ident">s</span>),
+            alt((
+                nom::combinator::value(Cow::from(<span class="string">&quot;&quot;</span>), tag(<span class="string">r#&quot;=&quot;&quot;&quot;#</span>)),
+                nom::combinator::value(Cow::from(<span class="string">&quot;&quot;</span>), tag(<span class="string">r#&quot;=&#39;&#39;&quot;#</span>)),
+                nom::combinator::map(
+                    nom::sequence::delimited(tag(<span class="string">&quot;=\&quot;&quot;</span>), is_not(<span class="string">&quot;\&quot;&quot;</span>), tag(<span class="string">&quot;\&quot;&quot;</span>)),
+                    |s: <span class="kw-2">&amp;</span>str| decode_html_entities(s),
                 ),
-                <span class="ident">nom::combinator::map</span>(
-                    <span class="ident">nom::sequence::delimited</span>(<span class="ident">tag</span>(<span class="string">&quot;=&#39;&quot;</span>), <span class="ident">is_not</span>(<span class="string">&quot;&#39;&quot;</span>), <span class="ident">tag</span>(<span class="string">&quot;&#39;&quot;</span>)),
-                    <span class="op">|</span><span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> <span class="ident">decode_html_entities</span>(<span class="ident">s</span>),
+                nom::combinator::map(
+                    nom::sequence::delimited(tag(<span class="string">&quot;=&#39;&quot;</span>), is_not(<span class="string">&quot;&#39;&quot;</span>), tag(<span class="string">&quot;&#39;&quot;</span>)),
+                    |s: <span class="kw-2">&amp;</span>str| decode_html_entities(s),
                 ),
-                <span class="ident">nom::combinator::map</span>(<span class="ident">nom::sequence::preceded</span>(<span class="ident">tag</span>(<span class="string">&quot;=&quot;</span>), <span class="ident">is_not</span>(<span class="string">&quot; &quot;</span>)), <span class="op">|</span><span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> {
-                    <span class="ident">decode_html_entities</span>(<span class="ident">s</span>)
+                nom::combinator::map(nom::sequence::preceded(tag(<span class="string">&quot;=&quot;</span>), is_not(<span class="string">&quot; &quot;</span>)), |s: <span class="kw-2">&amp;</span>str| {
+                    decode_html_entities(s)
                 }),
             )),
         ),
-        <span class="comment">// Consume boolean attributes.</span>
-        <span class="ident">nom::combinator::value</span>(
-            (<span class="string">&quot;&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>)),
-            <span class="ident">nom::combinator::verify</span>(<span class="ident">alphanumeric1</span>, <span class="op">|</span><span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> {
-                <span class="ident">nom::character::is_alphabetic</span>(<span class="ident">s</span>.<span class="ident">as_bytes</span>()[<span class="number">0</span>])
+        <span class="comment">// Consume boolean attributes.
+        </span>nom::combinator::value(
+            (<span class="string">&quot;&quot;</span>, Cow::from(<span class="string">&quot;&quot;</span>)),
+            nom::combinator::verify(alphanumeric1, |s: <span class="kw-2">&amp;</span>str| {
+                nom::character::is_alphabetic(s.as_bytes()[<span class="number">0</span>])
             }),
         ),
-    ))(<span class="ident">i</span>)
+    ))(i)
 }
 
-<span class="doccomment">/// Parses a whitespace separated list of attributes and returns a vector of (name, value).</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">attribute_list</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="ident">i</span>.<span class="ident">trim</span>();
-    <span class="ident">nom::multi::separated_list1</span>(<span class="ident">nom::character::complete::multispace1</span>, <span class="ident">attribute</span>)(<span class="ident">i</span>)
+<span class="doccomment">/// Parses a whitespace separated list of attributes and returns a vector of (name, value).
+</span><span class="kw">pub fn </span>attribute_list&lt;<span class="lifetime">&#39;a</span>&gt;(i: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; nom::IResult&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, Cow&lt;str&gt;)&gt;&gt; {
+    <span class="kw">let </span>i = i.trim();
+    nom::multi::separated_list1(nom::character::complete::multispace1, attribute)(i)
 }
 
-<span class="doccomment">/// Extracts the `href` and `title` attributes and returns</span>
-<span class="doccomment">/// `Ok((link_destination, link_title))`. `link_title` can be empty,</span>
-<span class="doccomment">/// `link_destination` not.</span>
-<span class="kw">fn</span> <span class="ident">parse_attributes</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">i</span>, <span class="ident">attributes</span>) <span class="op">=</span> <span class="ident">attribute_list</span>(<span class="ident">i</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">href</span> <span class="op">=</span> <span class="ident">Cow::Borrowed</span>(<span class="string">&quot;&quot;</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">title</span> <span class="op">=</span> <span class="ident">Cow::Borrowed</span>(<span class="string">&quot;&quot;</span>);
+<span class="doccomment">/// Extracts the `href` and `title` attributes and returns
+/// `Ok((link_destination, link_title))`. `link_title` can be empty,
+/// `link_destination` not.
+</span><span class="kw">fn </span>parse_attributes(i: <span class="kw-2">&amp;</span>str) -&gt; nom::IResult&lt;<span class="kw-2">&amp;</span>str, (Cow&lt;str&gt;, Cow&lt;str&gt;)&gt; {
+    <span class="kw">let </span>(i, attributes) = attribute_list(i)<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>href = Cow::Borrowed(<span class="string">&quot;&quot;</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>title = Cow::Borrowed(<span class="string">&quot;&quot;</span>);
 
-    <span class="kw">for</span> (<span class="ident">name</span>, <span class="ident">value</span>) <span class="kw">in</span> <span class="ident">attributes</span> {
-        <span class="kw">if</span> <span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;href&quot;</span> {
-            <span class="comment">// Make sure `href` is empty, it can appear only</span>
-            <span class="comment">// once.</span>
-            <span class="kw">if</span> <span class="op">!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">href</span>).<span class="ident">is_empty</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">nom::Err::Error</span>(<span class="ident">Error::new</span>(<span class="ident">name</span>, <span class="ident">ErrorKind::ManyMN</span>)));
+    <span class="kw">for </span>(name, value) <span class="kw">in </span>attributes {
+        <span class="kw">if </span>name == <span class="string">&quot;href&quot; </span>{
+            <span class="comment">// Make sure `href` is empty, it can appear only
+            // once.
+            </span><span class="kw">if </span>!(<span class="kw-2">&amp;*</span>href).is_empty() {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(nom::Err::Error(Error::new(name, ErrorKind::ManyMN)));
             }
-            <span class="ident">href</span> <span class="op">=</span> <span class="ident">value</span>;
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">name</span> <span class="op">==</span> <span class="string">&quot;title&quot;</span> {
-            <span class="comment">// Make sure `title` is empty, it can appear only</span>
-            <span class="comment">// once.</span>
-            <span class="kw">if</span> <span class="op">!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">title</span>).<span class="ident">is_empty</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">nom::Err::Error</span>(<span class="ident">Error::new</span>(<span class="ident">name</span>, <span class="ident">ErrorKind::ManyMN</span>)));
+            href = value;
+        } <span class="kw">else if </span>name == <span class="string">&quot;title&quot; </span>{
+            <span class="comment">// Make sure `title` is empty, it can appear only
+            // once.
+            </span><span class="kw">if </span>!(<span class="kw-2">&amp;*</span>title).is_empty() {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(nom::Err::Error(Error::new(name, ErrorKind::ManyMN)));
             }
-            <span class="ident">title</span> <span class="op">=</span> <span class="ident">value</span>;
+            title = value;
         }
     }
 
-    <span class="comment">// Assure that `href` is not empty.</span>
-    <span class="kw">if</span> (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">href</span>).<span class="ident">is_empty</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">nom::Err::Error</span>(<span class="ident">Error::new</span>(<span class="ident">i</span>, <span class="ident">ErrorKind::Eof</span>)));
+    <span class="comment">// Assure that `href` is not empty.
+    </span><span class="kw">if </span>(<span class="kw-2">&amp;*</span>href).is_empty() {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(nom::Err::Error(Error::new(i, ErrorKind::Eof)));
     };
 
-    <span class="prelude-val">Ok</span>((<span class="ident">i</span>, (<span class="ident">href</span>, <span class="ident">title</span>)))
+    <span class="prelude-val">Ok</span>((i, (href, title)))
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_html_text2dest</span>() {
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_html_text2dest() {
+        <span class="kw">let </span>expected = (
             <span class="string">&quot;abc&quot;</span>,
             (
-                <span class="ident">Cow::from</span>(<span class="string">&quot;W3Schools&quot;</span>),
-                <span class="ident">Cow::from</span>(<span class="string">&quot;https://www.w3schools.com/&quot;</span>),
-                <span class="ident">Cow::from</span>(<span class="string">&quot;W3S&quot;</span>),
+                Cow::from(<span class="string">&quot;W3Schools&quot;</span>),
+                Cow::from(<span class="string">&quot;https://www.w3schools.com/&quot;</span>),
+                Cow::from(<span class="string">&quot;W3S&quot;</span>),
             ),
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">html_text2dest</span>(<span class="string">r#&quot;&lt;a title=&quot;W3S&quot; href=&quot;https://www.w3schools.com/&quot;&gt;W3Schools&lt;/a&gt;abc&quot;#</span>)
-                .<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            html_text2dest(<span class="string">r#&quot;&lt;a title=&quot;W3S&quot; href=&quot;https://www.w3schools.com/&quot;&gt;W3Schools&lt;/a&gt;abc&quot;#</span>)
+                .unwrap(),
+            expected
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">html_text2dest</span>(<span class="string">r#&quot;&lt;A title=&quot;W3S&quot; href=&quot;https://www.w3schools.com/&quot;&gt;W3Schools&lt;/A&gt;abc&quot;#</span>)
-                .<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            html_text2dest(<span class="string">r#&quot;&lt;A title=&quot;W3S&quot; href=&quot;https://www.w3schools.com/&quot;&gt;W3Schools&lt;/A&gt;abc&quot;#</span>)
+                .unwrap(),
+            expected
         );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (<span class="string">&quot;abc&quot;</span>, (<span class="ident">Cow::from</span>(<span class="string">&quot;&lt;n&gt;&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;h&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;t&quot;</span>)));
+        <span class="kw">let </span>expected = (<span class="string">&quot;abc&quot;</span>, (Cow::from(<span class="string">&quot;&lt;n&gt;&quot;</span>), Cow::from(<span class="string">&quot;h&quot;</span>), Cow::from(<span class="string">&quot;t&quot;</span>)));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">html_text2dest</span>(<span class="string">r#&quot;&lt;a title=&quot;t&quot; href=&quot;h&quot;&gt;&amp;lt;n&amp;gt;&lt;/a&gt;abc&quot;#</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            html_text2dest(<span class="string">r#&quot;&lt;a title=&quot;t&quot; href=&quot;h&quot;&gt;&amp;lt;n&amp;gt;&lt;/a&gt;abc&quot;#</span>).unwrap(),
+            expected
         );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (<span class="string">&quot;abc&quot;</span>, (<span class="ident">Cow::from</span>(<span class="string">&quot;name&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;url&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>)));
+        <span class="kw">let </span>expected = (<span class="string">&quot;abc&quot;</span>, (Cow::from(<span class="string">&quot;name&quot;</span>), Cow::from(<span class="string">&quot;url&quot;</span>), Cow::from(<span class="string">&quot;&quot;</span>)));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">html_text2dest</span>(<span class="string">r#&quot;&lt;a href=&quot;url&quot; title=&quot;&quot; &gt;name&lt;/a&gt;abc&quot;#</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            html_text2dest(<span class="string">r#&quot;&lt;a href=&quot;url&quot; title=&quot;&quot; &gt;name&lt;/a&gt;abc&quot;#</span>).unwrap(),
+            expected
         );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (
+        <span class="kw">let </span>expected = (
             <span class="string">&quot;abc&quot;</span>,
-            (<span class="ident">Cow::from</span>(<span class="string">&quot;na&lt;/me&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;url&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>)),
+            (Cow::from(<span class="string">&quot;na&lt;/me&quot;</span>), Cow::from(<span class="string">&quot;url&quot;</span>), Cow::from(<span class="string">&quot;&quot;</span>)),
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">html_text2dest</span>(<span class="string">r#&quot;&lt;a href=&quot;url&quot; title=&quot;&quot; &gt;na&lt;/me&lt;/A&gt;abc&quot;#</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            html_text2dest(<span class="string">r#&quot;&lt;a href=&quot;url&quot; title=&quot;&quot; &gt;na&lt;/me&lt;/A&gt;abc&quot;#</span>).unwrap(),
+            expected
         );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(
+        <span class="kw">let </span>expected = nom::Err::Error(nom::error::Error::new(
             <span class="string">r#&quot;&lt;a href=&quot;url&quot; title=&quot;&quot; &gt;name&lt;/a abc&quot;#</span>,
-            <span class="ident">nom::error::ErrorKind::AlphaNumeric</span>,
+            nom::error::ErrorKind::AlphaNumeric,
         ));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">parse_attributes</span>(<span class="string">r#&quot;&lt;a href=&quot;url&quot; title=&quot;&quot; &gt;name&lt;/a abc&quot;#</span>).<span class="ident">unwrap_err</span>(),
-            <span class="ident">expected</span>
+            parse_attributes(<span class="string">r#&quot;&lt;a href=&quot;url&quot; title=&quot;&quot; &gt;name&lt;/a abc&quot;#</span>).unwrap_err(),
+            expected
         );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (
+        <span class="kw">let </span>expected = (
             <span class="string">&quot;abc&quot;</span>,
             (
-                <span class="ident">Cow::from</span>(
+                Cow::from(
                     <span class="string">&quot;&lt;img src=\&quot;w3html.gif\&quot; alt=\&quot;W3Schools.com \&quot;width=\&quot;100\&quot; height=\&quot;132\&quot;&gt;&quot;</span>,
                 ),
-                <span class="ident">Cow::from</span>(<span class="string">&quot;https://blog.getreu.net&quot;</span>),
-                <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>),
+                Cow::from(<span class="string">&quot;https://blog.getreu.net&quot;</span>),
+                Cow::from(<span class="string">&quot;&quot;</span>),
             ),
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">html_text2dest</span>(
+            html_text2dest(
                 <span class="string">&quot;&lt;a href=\&quot;https://blog.getreu.net\&quot;&gt;\
                               &lt;img src=\&quot;w3html.gif\&quot; alt=\&quot;W3Schools.com \&quot;\
                               width=\&quot;100\&quot; height=\&quot;132\&quot;&gt;\
-                              &lt;/a&gt;abc&quot;</span>
-            )
-            .<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+                              &lt;/a&gt;abc&quot;
+            </span>)
+            .unwrap(),
+            expected
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_tag_a_opening</span>() {
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_tag_a_opening() {
+        <span class="kw">let </span>expected = (
             <span class="string">&quot;abc&quot;</span>,
-            (<span class="ident">Cow::from</span>(<span class="string">&quot;http://getreu.net&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;My blog&quot;</span>)),
+            (Cow::from(<span class="string">&quot;http://getreu.net&quot;</span>), Cow::from(<span class="string">&quot;My blog&quot;</span>)),
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">tag_a_opening</span>(<span class="string">r#&quot;&lt;a href=&quot;http://getreu.net&quot; title=&quot;My blog&quot;&gt;abc&quot;#</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            tag_a_opening(<span class="string">r#&quot;&lt;a href=&quot;http://getreu.net&quot; title=&quot;My blog&quot;&gt;abc&quot;#</span>).unwrap(),
+            expected
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">tag_a_opening</span>(<span class="string">r#&quot;&lt;A href=&quot;http://getreu.net&quot; title=&quot;My blog&quot;&gt;abc&quot;#</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            tag_a_opening(<span class="string">r#&quot;&lt;A href=&quot;http://getreu.net&quot; title=&quot;My blog&quot;&gt;abc&quot;#</span>).unwrap(),
+            expected
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_parse_attributes</span>() {
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (<span class="string">&quot;&quot;</span>, (<span class="ident">Cow::from</span>(<span class="string">&quot;http://getreu.net&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;My blog&quot;</span>)));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_parse_attributes() {
+        <span class="kw">let </span>expected = (<span class="string">&quot;&quot;</span>, (Cow::from(<span class="string">&quot;http://getreu.net&quot;</span>), Cow::from(<span class="string">&quot;My blog&quot;</span>)));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">parse_attributes</span>(<span class="string">r#&quot;abc href=&quot;http://getreu.net&quot; abc title=&quot;My blog&quot; abc&quot;#</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            parse_attributes(<span class="string">r#&quot;abc href=&quot;http://getreu.net&quot; abc title=&quot;My blog&quot; abc&quot;#</span>).unwrap(),
+            expected
         );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(
+        <span class="kw">let </span>expected = nom::Err::Error(nom::error::Error::new(
             <span class="string">&quot;href&quot;</span>,
-            <span class="ident">nom::error::ErrorKind::ManyMN</span>,
+            nom::error::ErrorKind::ManyMN,
         ));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">parse_attributes</span>(<span class="string">r#&quot; href=&quot;http://getreu.net&quot; href=&quot;http://blog.getreu.net&quot; &quot;#</span>)
-                .<span class="ident">unwrap_err</span>(),
-            <span class="ident">expected</span>
+            parse_attributes(<span class="string">r#&quot; href=&quot;http://getreu.net&quot; href=&quot;http://blog.getreu.net&quot; &quot;#</span>)
+                .unwrap_err(),
+            expected
         );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(
+        <span class="kw">let </span>expected = nom::Err::Error(nom::error::Error::new(
             <span class="string">&quot;title&quot;</span>,
-            <span class="ident">nom::error::ErrorKind::ManyMN</span>,
+            nom::error::ErrorKind::ManyMN,
         ));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">parse_attributes</span>(<span class="string">r#&quot; href=&quot;http://getreu.net&quot; title=&quot;a&quot; title=&quot;b&quot; &quot;#</span>).<span class="ident">unwrap_err</span>(),
-            <span class="ident">expected</span>
+            parse_attributes(<span class="string">r#&quot; href=&quot;http://getreu.net&quot; title=&quot;a&quot; title=&quot;b&quot; &quot;#</span>).unwrap_err(),
+            expected
         );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(<span class="string">&quot;&quot;</span>, <span class="ident">nom::error::ErrorKind::Eof</span>));
+        <span class="kw">let </span>expected = nom::Err::Error(nom::error::Error::new(<span class="string">&quot;&quot;</span>, nom::error::ErrorKind::Eof));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">parse_attributes</span>(<span class="string">r#&quot; title=&quot;title&quot; &quot;#</span>).<span class="ident">unwrap_err</span>(),
-            <span class="ident">expected</span>
+            parse_attributes(<span class="string">r#&quot; title=&quot;title&quot; &quot;#</span>).unwrap_err(),
+            expected
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_attribute_list</span>() {
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_attribute_list() {
+        <span class="kw">let </span>expected = (
             <span class="string">&quot;&quot;</span>,
             <span class="macro">vec!</span>[
-                (<span class="string">&quot;&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>)),
-                (<span class="string">&quot;href&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;http://getreu.net&quot;</span>)),
-                (<span class="string">&quot;&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>)),
-                (<span class="string">&quot;title&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;My blog&quot;</span>)),
-                (<span class="string">&quot;&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>)),
+                (<span class="string">&quot;&quot;</span>, Cow::from(<span class="string">&quot;&quot;</span>)),
+                (<span class="string">&quot;href&quot;</span>, Cow::from(<span class="string">&quot;http://getreu.net&quot;</span>)),
+                (<span class="string">&quot;&quot;</span>, Cow::from(<span class="string">&quot;&quot;</span>)),
+                (<span class="string">&quot;title&quot;</span>, Cow::from(<span class="string">&quot;My blog&quot;</span>)),
+                (<span class="string">&quot;&quot;</span>, Cow::from(<span class="string">&quot;&quot;</span>)),
             ],
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">attribute_list</span>(<span class="string">r#&quot;abc href=&quot;http://getreu.net&quot; abc title=&quot;My blog&quot; abc&quot;#</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            attribute_list(<span class="string">r#&quot;abc href=&quot;http://getreu.net&quot; abc title=&quot;My blog&quot; abc&quot;#</span>).unwrap(),
+            expected
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_attribute</span>() {
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (<span class="string">&quot; abc&quot;</span>, (<span class="string">&quot;href&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;http://getreu.net&quot;</span>)));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_attribute() {
+        <span class="kw">let </span>expected = (<span class="string">&quot; abc&quot;</span>, (<span class="string">&quot;href&quot;</span>, Cow::from(<span class="string">&quot;http://getreu.net&quot;</span>)));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">attribute</span>(<span class="string">r#&quot;href=&quot;http://getreu.net&quot; abc&quot;#</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            attribute(<span class="string">r#&quot;href=&quot;http://getreu.net&quot; abc&quot;#</span>).unwrap(),
+            expected
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">attribute</span>(<span class="string">r#&quot;href=&#39;http://getreu.net&#39; abc&quot;#</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+            attribute(<span class="string">r#&quot;href=&#39;http://getreu.net&#39; abc&quot;#</span>).unwrap(),
+            expected
         );
-        <span class="comment">// Only allowed when no space in value.</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">attribute</span>(<span class="string">r#&quot;href=http://getreu.net abc&quot;#</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
-        );
-
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (<span class="string">&quot; abc&quot;</span>, (<span class="string">&quot;href&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;http://getreu.net/&lt;&gt;&quot;</span>)));
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">attribute</span>(<span class="string">r#&quot;href=&quot;http://getreu.net/&amp;lt;&amp;gt;&quot; abc&quot;#</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
-        );
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">attribute</span>(<span class="string">r#&quot;href=&#39;http://getreu.net/&amp;lt;&amp;gt;&#39; abc&quot;#</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
-        );
-        <span class="comment">// Only allowed when no space in value.</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">attribute</span>(<span class="string">r#&quot;href=http://getreu.net/&amp;lt;&amp;gt; abc&quot;#</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">expected</span>
+        <span class="comment">// Only allowed when no space in value.
+        </span><span class="macro">assert_eq!</span>(
+            attribute(<span class="string">r#&quot;href=http://getreu.net abc&quot;#</span>).unwrap(),
+            expected
         );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> (<span class="string">&quot; abc&quot;</span>, (<span class="string">&quot;&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>)));
-        <span class="macro">assert_eq!</span>(<span class="ident">attribute</span>(<span class="string">&quot;bool abc&quot;</span>).<span class="ident">unwrap</span>(), <span class="ident">expected</span>);
+        <span class="kw">let </span>expected = (<span class="string">&quot; abc&quot;</span>, (<span class="string">&quot;href&quot;</span>, Cow::from(<span class="string">&quot;http://getreu.net/&lt;&gt;&quot;</span>)));
+        <span class="macro">assert_eq!</span>(
+            attribute(<span class="string">r#&quot;href=&quot;http://getreu.net/&amp;lt;&amp;gt;&quot; abc&quot;#</span>).unwrap(),
+            expected
+        );
+        <span class="macro">assert_eq!</span>(
+            attribute(<span class="string">r#&quot;href=&#39;http://getreu.net/&amp;lt;&amp;gt;&#39; abc&quot;#</span>).unwrap(),
+            expected
+        );
+        <span class="comment">// Only allowed when no space in value.
+        </span><span class="macro">assert_eq!</span>(
+            attribute(<span class="string">r#&quot;href=http://getreu.net/&amp;lt;&amp;gt; abc&quot;#</span>).unwrap(),
+            expected
+        );
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(
+        <span class="kw">let </span>expected = (<span class="string">&quot; abc&quot;</span>, (<span class="string">&quot;&quot;</span>, Cow::from(<span class="string">&quot;&quot;</span>)));
+        <span class="macro">assert_eq!</span>(attribute(<span class="string">&quot;bool abc&quot;</span>).unwrap(), expected);
+
+        <span class="kw">let </span>expected = nom::Err::Error(nom::error::Error::new(
             <span class="string">&quot;1name&quot;</span>,
-            <span class="ident">nom::error::ErrorKind::Verify</span>,
+            nom::error::ErrorKind::Verify,
         ));
-        <span class="macro">assert_eq!</span>(<span class="ident">attribute</span>(<span class="string">&quot;1name&quot;</span>).<span class="ident">unwrap_err</span>(), <span class="ident">expected</span>);
+        <span class="macro">assert_eq!</span>(attribute(<span class="string">&quot;1name&quot;</span>).unwrap_err(), expected);
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(
+        <span class="kw">let </span>expected = nom::Err::Error(nom::error::Error::new(
             <span class="string">r#&quot;1name=&quot;http://getreu.net&quot;#</span>,
-            <span class="ident">nom::error::ErrorKind::Verify</span>,
+            nom::error::ErrorKind::Verify,
         ));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">attribute</span>(<span class="string">r#&quot;1name=&quot;http://getreu.net&quot;#</span>).<span class="ident">unwrap_err</span>(),
-            <span class="ident">expected</span>
+            attribute(<span class="string">r#&quot;1name=&quot;http://getreu.net&quot;#</span>).unwrap_err(),
+            expected
         );
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="parse_hyperlinks" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="parse_hyperlinks" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

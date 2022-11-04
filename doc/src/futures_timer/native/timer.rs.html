@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-timer-3.0.2/src/native/timer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>timer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../futures_timer/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../futures_timer/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../futures_timer/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-timer-3.0.2/src/native/timer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>timer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../futures_timer/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../futures_timer/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../futures_timer/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -318,325 +318,325 @@
 <span id="318">318</span>
 <span id="319">319</span>
 <span id="320">320</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::mem</span>;
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
-<span class="kw">use</span> <span class="ident">std::sync::atomic::AtomicUsize</span>;
-<span class="kw">use</span> <span class="ident">std::sync::atomic::Ordering::SeqCst</span>;
-<span class="kw">use</span> <span class="ident">std::sync</span>::{<span class="ident">Arc</span>, <span class="ident">Mutex</span>, <span class="ident">Weak</span>};
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
-<span class="kw">use</span> <span class="ident">std::time::Instant</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::mem;
+<span class="kw">use </span>std::pin::Pin;
+<span class="kw">use </span>std::sync::atomic::AtomicUsize;
+<span class="kw">use </span>std::sync::atomic::Ordering::SeqCst;
+<span class="kw">use </span>std::sync::{Arc, Mutex, Weak};
+<span class="kw">use </span>std::task::{Context, Poll};
+<span class="kw">use </span>std::time::Instant;
 
-<span class="kw">use</span> <span class="ident">std::future::Future</span>;
+<span class="kw">use </span>std::future::Future;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::AtomicWaker</span>;
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">global</span>, <span class="ident">ArcList</span>, <span class="ident">Heap</span>, <span class="ident">HeapTimer</span>, <span class="ident">Node</span>, <span class="ident">Slot</span>};
+<span class="kw">use </span><span class="kw">super</span>::AtomicWaker;
+<span class="kw">use super</span>::{global, ArcList, Heap, HeapTimer, Node, Slot};
 
-<span class="doccomment">/// A &quot;timer heap&quot; used to power separately owned instances of `Delay`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This timer is implemented as a priority queued-based heap. Each `Timer`</span>
-<span class="doccomment">/// contains a few primary methods which which to drive it:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * `next_wake` indicates how long the ambient system needs to sleep until it</span>
-<span class="doccomment">///   invokes further processing on a `Timer`</span>
-<span class="doccomment">/// * `advance_to` is what actually fires timers on the `Timer`, and should be</span>
-<span class="doccomment">///   called essentially every iteration of the event loop, or when the time</span>
-<span class="doccomment">///   specified by `next_wake` has elapsed.</span>
-<span class="doccomment">/// * The `Future` implementation for `Timer` is used to process incoming timer</span>
-<span class="doccomment">///   updates and requests. This is used to schedule new timeouts, update</span>
-<span class="doccomment">///   existing ones, or delete existing timeouts. The `Future` implementation</span>
-<span class="doccomment">///   will never resolve, but it&#39;ll schedule notifications of when to wake up</span>
-<span class="doccomment">///   and process more messages.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note that if you&#39;re using this crate you probably don&#39;t need to use a</span>
-<span class="doccomment">/// `Timer` as there is a global one already available for you run on a helper</span>
-<span class="doccomment">/// thread. If this isn&#39;t desirable, though, then the</span>
-<span class="doccomment">/// `TimerHandle::set_fallback` method can be used instead!</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Timer</span> {
-    <span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Inner</span><span class="op">&gt;</span>,
-    <span class="ident">timer_heap</span>: <span class="ident">Heap</span><span class="op">&lt;</span><span class="ident">HeapTimer</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A &quot;timer heap&quot; used to power separately owned instances of `Delay`.
+///
+/// This timer is implemented as a priority queued-based heap. Each `Timer`
+/// contains a few primary methods which which to drive it:
+///
+/// * `next_wake` indicates how long the ambient system needs to sleep until it
+///   invokes further processing on a `Timer`
+/// * `advance_to` is what actually fires timers on the `Timer`, and should be
+///   called essentially every iteration of the event loop, or when the time
+///   specified by `next_wake` has elapsed.
+/// * The `Future` implementation for `Timer` is used to process incoming timer
+///   updates and requests. This is used to schedule new timeouts, update
+///   existing ones, or delete existing timeouts. The `Future` implementation
+///   will never resolve, but it&#39;ll schedule notifications of when to wake up
+///   and process more messages.
+///
+/// Note that if you&#39;re using this crate you probably don&#39;t need to use a
+/// `Timer` as there is a global one already available for you run on a helper
+/// thread. If this isn&#39;t desirable, though, then the
+/// `TimerHandle::set_fallback` method can be used instead!
+</span><span class="kw">pub struct </span>Timer {
+    inner: Arc&lt;Inner&gt;,
+    timer_heap: Heap&lt;HeapTimer&gt;,
 }
 
-<span class="doccomment">/// A handle to a `Timer` which is used to create instances of a `Delay`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TimerHandle</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">inner</span>: <span class="ident">Weak</span><span class="op">&lt;</span><span class="ident">Inner</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A handle to a `Timer` which is used to create instances of a `Delay`.
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>TimerHandle {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) inner: Weak&lt;Inner&gt;,
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Inner</span> {
-    <span class="doccomment">/// List of updates the `Timer` needs to process</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">list</span>: <span class="ident">ArcList</span><span class="op">&lt;</span><span class="ident">ScheduledTimer</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Inner {
+    <span class="doccomment">/// List of updates the `Timer` needs to process
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) list: ArcList&lt;ScheduledTimer&gt;,
 
-    <span class="doccomment">/// The blocked `Timer` task to receive notifications to the `list` above.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">waker</span>: <span class="ident">AtomicWaker</span>,
+    <span class="doccomment">/// The blocked `Timer` task to receive notifications to the `list` above.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) waker: AtomicWaker,
 }
 
-<span class="doccomment">/// Shared state between the `Timer` and a `Delay`.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ScheduledTimer</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">waker</span>: <span class="ident">AtomicWaker</span>,
+<span class="doccomment">/// Shared state between the `Timer` and a `Delay`.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ScheduledTimer {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) waker: AtomicWaker,
 
-    <span class="comment">// The lowest bit here is whether the timer has fired or not, the second</span>
-    <span class="comment">// lowest bit is whether the timer has been invalidated, and all the other</span>
-    <span class="comment">// bits are the &quot;generation&quot; of the timer which is reset during the `reset`</span>
-    <span class="comment">// function. Only timers for a matching generation are fired.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">state</span>: <span class="ident">AtomicUsize</span>,
+    <span class="comment">// The lowest bit here is whether the timer has fired or not, the second
+    // lowest bit is whether the timer has been invalidated, and all the other
+    // bits are the &quot;generation&quot; of the timer which is reset during the `reset`
+    // function. Only timers for a matching generation are fired.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) state: AtomicUsize,
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">inner</span>: <span class="ident">Weak</span><span class="op">&lt;</span><span class="ident">Inner</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">at</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) inner: Weak&lt;Inner&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) at: Mutex&lt;<span class="prelude-ty">Option</span>&lt;Instant&gt;&gt;,
 
-    <span class="comment">// TODO: this is only accessed by the timer thread, should have a more</span>
-    <span class="comment">// lightweight protection than a `Mutex`</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">slot</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Slot</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="comment">// TODO: this is only accessed by the timer thread, should have a more
+    // lightweight protection than a `Mutex`
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) slot: Mutex&lt;<span class="prelude-ty">Option</span>&lt;Slot&gt;&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Timer</span> {
-    <span class="doccomment">/// Creates a new timer heap ready to create new timers.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Timer</span> {
-        <span class="ident">Timer</span> {
-            <span class="ident">inner</span>: <span class="ident">Arc::new</span>(<span class="ident">Inner</span> {
-                <span class="ident">list</span>: <span class="ident">ArcList::new</span>(),
-                <span class="ident">waker</span>: <span class="ident">AtomicWaker::new</span>(),
+<span class="kw">impl </span>Timer {
+    <span class="doccomment">/// Creates a new timer heap ready to create new timers.
+    </span><span class="kw">pub fn </span>new() -&gt; Timer {
+        Timer {
+            inner: Arc::new(Inner {
+                list: ArcList::new(),
+                waker: AtomicWaker::new(),
             }),
-            <span class="ident">timer_heap</span>: <span class="ident">Heap::new</span>(),
+            timer_heap: Heap::new(),
         }
     }
 
-    <span class="doccomment">/// Returns a handle to this timer heap, used to create new timeouts.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TimerHandle</span> {
-        <span class="ident">TimerHandle</span> {
-            <span class="ident">inner</span>: <span class="ident">Arc::downgrade</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>),
+    <span class="doccomment">/// Returns a handle to this timer heap, used to create new timeouts.
+    </span><span class="kw">pub fn </span>handle(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TimerHandle {
+        TimerHandle {
+            inner: Arc::downgrade(<span class="kw-2">&amp;</span><span class="self">self</span>.inner),
         }
     }
 
-    <span class="doccomment">/// Returns the time at which this timer next needs to be invoked with</span>
-    <span class="doccomment">/// `advance_to`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Event loops or threads typically want to sleep until the specified</span>
-    <span class="doccomment">/// instant.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">timer_heap</span>.<span class="ident">peek</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">at</span>)
+    <span class="doccomment">/// Returns the time at which this timer next needs to be invoked with
+    /// `advance_to`.
+    ///
+    /// Event loops or threads typically want to sleep until the specified
+    /// instant.
+    </span><span class="kw">pub fn </span>next_event(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Instant&gt; {
+        <span class="self">self</span>.timer_heap.peek().map(|t| t.at)
     }
 
-    <span class="doccomment">/// Proces any timers which are supposed to fire at or before the current</span>
-    <span class="doccomment">/// instant.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method is equivalent to `self.advance_to(Instant::now())`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">advance_to</span>(<span class="ident">Instant::now</span>())
+    <span class="doccomment">/// Proces any timers which are supposed to fire at or before the current
+    /// instant.
+    ///
+    /// This method is equivalent to `self.advance_to(Instant::now())`.
+    </span><span class="kw">pub fn </span>advance(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.advance_to(Instant::now())
     }
 
-    <span class="doccomment">/// Proces any timers which are supposed to fire before `now` specified.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method should be called on `Timer` periodically to advance the</span>
-    <span class="doccomment">/// internal state and process any pending timers which need to fire.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">advance_to</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">now</span>: <span class="ident">Instant</span>) {
-        <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">timer_heap</span>.<span class="ident">peek</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">head</span>) <span class="kw">if</span> <span class="ident">head</span>.<span class="ident">at</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">now</span> =&gt; {}
+    <span class="doccomment">/// Proces any timers which are supposed to fire before `now` specified.
+    ///
+    /// This method should be called on `Timer` periodically to advance the
+    /// internal state and process any pending timers which need to fire.
+    </span><span class="kw">pub fn </span>advance_to(<span class="kw-2">&amp;mut </span><span class="self">self</span>, now: Instant) {
+        <span class="kw">loop </span>{
+            <span class="kw">match </span><span class="self">self</span>.timer_heap.peek() {
+                <span class="prelude-val">Some</span>(head) <span class="kw">if </span>head.at &lt;= now =&gt; {}
                 <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="kw">break</span>,
-                <span class="prelude-val">None</span> =&gt; <span class="kw">break</span>,
+                <span class="prelude-val">None </span>=&gt; <span class="kw">break</span>,
             };
 
-            <span class="comment">// Flag the timer as fired and then notify its task, if any, that&#39;s</span>
-            <span class="comment">// blocked.</span>
-            <span class="kw">let</span> <span class="ident">heap_timer</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">timer_heap</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>();
-            <span class="kw-2">*</span><span class="ident">heap_timer</span>.<span class="ident">node</span>.<span class="ident">slot</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>() <span class="op">=</span> <span class="prelude-val">None</span>;
-            <span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="ident">heap_timer</span>.<span class="ident">gen</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>;
-            <span class="kw">match</span> <span class="ident">heap_timer</span>
-                .<span class="ident">node</span>
-                .<span class="ident">state</span>
-                .<span class="ident">compare_exchange</span>(<span class="ident">bits</span>, <span class="ident">bits</span> <span class="op">|</span> <span class="number">0b01</span>, <span class="ident">SeqCst</span>, <span class="ident">SeqCst</span>)
+            <span class="comment">// Flag the timer as fired and then notify its task, if any, that&#39;s
+            // blocked.
+            </span><span class="kw">let </span>heap_timer = <span class="self">self</span>.timer_heap.pop().unwrap();
+            <span class="kw-2">*</span>heap_timer.node.slot.lock().unwrap() = <span class="prelude-val">None</span>;
+            <span class="kw">let </span>bits = heap_timer.gen &lt;&lt; <span class="number">2</span>;
+            <span class="kw">match </span>heap_timer
+                .node
+                .state
+                .compare_exchange(bits, bits | <span class="number">0b01</span>, SeqCst, SeqCst)
             {
-                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="ident">heap_timer</span>.<span class="ident">node</span>.<span class="ident">waker</span>.<span class="ident">wake</span>(),
-                <span class="prelude-val">Err</span>(<span class="ident">_b</span>) =&gt; {}
+                <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; heap_timer.node.waker.wake(),
+                <span class="prelude-val">Err</span>(_b) =&gt; {}
             }
         }
     }
 
-    <span class="doccomment">/// Either updates the timer at slot `idx` to fire at `at`, or adds a new</span>
-    <span class="doccomment">/// timer at `idx` and sets it to fire at `at`.</span>
-    <span class="kw">fn</span> <span class="ident">update_or_add</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">at</span>: <span class="ident">Instant</span>, <span class="ident">node</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Node</span><span class="op">&lt;</span><span class="ident">ScheduledTimer</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
-        <span class="comment">// TODO: avoid remove + push and instead just do one sift of the heap?</span>
-        <span class="comment">// In theory we could update it in place and then do the percolation</span>
-        <span class="comment">// as necessary</span>
-        <span class="kw">let</span> <span class="ident">gen</span> <span class="op">=</span> <span class="ident">node</span>.<span class="ident">state</span>.<span class="ident">load</span>(<span class="ident">SeqCst</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">2</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">slot</span> <span class="op">=</span> <span class="ident">node</span>.<span class="ident">slot</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">heap_slot</span>) <span class="op">=</span> <span class="ident">slot</span>.<span class="ident">take</span>() {
-            <span class="self">self</span>.<span class="ident">timer_heap</span>.<span class="ident">remove</span>(<span class="ident">heap_slot</span>);
+    <span class="doccomment">/// Either updates the timer at slot `idx` to fire at `at`, or adds a new
+    /// timer at `idx` and sets it to fire at `at`.
+    </span><span class="kw">fn </span>update_or_add(<span class="kw-2">&amp;mut </span><span class="self">self</span>, at: Instant, node: Arc&lt;Node&lt;ScheduledTimer&gt;&gt;) {
+        <span class="comment">// TODO: avoid remove + push and instead just do one sift of the heap?
+        // In theory we could update it in place and then do the percolation
+        // as necessary
+        </span><span class="kw">let </span>gen = node.state.load(SeqCst) &gt;&gt; <span class="number">2</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>slot = node.slot.lock().unwrap();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(heap_slot) = slot.take() {
+            <span class="self">self</span>.timer_heap.remove(heap_slot);
         }
-        <span class="kw-2">*</span><span class="ident">slot</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">timer_heap</span>.<span class="ident">push</span>(<span class="ident">HeapTimer</span> {
-            <span class="ident">at</span>,
-            <span class="ident">gen</span>,
-            <span class="ident">node</span>: <span class="ident">node</span>.<span class="ident">clone</span>(),
+        <span class="kw-2">*</span>slot = <span class="prelude-val">Some</span>(<span class="self">self</span>.timer_heap.push(HeapTimer {
+            at,
+            gen,
+            node: node.clone(),
         }));
     }
 
-    <span class="kw">fn</span> <span class="ident">remove</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">node</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Node</span><span class="op">&lt;</span><span class="ident">ScheduledTimer</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
-        <span class="comment">// If this `idx` is still around and it&#39;s still got a registered timer,</span>
-        <span class="comment">// then we jettison it form the timer heap.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">slot</span> <span class="op">=</span> <span class="ident">node</span>.<span class="ident">slot</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">heap_slot</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">slot</span>.<span class="ident">take</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">slot</span>) =&gt; <span class="ident">slot</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
+    <span class="kw">fn </span>remove(<span class="kw-2">&amp;mut </span><span class="self">self</span>, node: Arc&lt;Node&lt;ScheduledTimer&gt;&gt;) {
+        <span class="comment">// If this `idx` is still around and it&#39;s still got a registered timer,
+        // then we jettison it form the timer heap.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>slot = node.slot.lock().unwrap();
+        <span class="kw">let </span>heap_slot = <span class="kw">match </span>slot.take() {
+            <span class="prelude-val">Some</span>(slot) =&gt; slot,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
         };
-        <span class="self">self</span>.<span class="ident">timer_heap</span>.<span class="ident">remove</span>(<span class="ident">heap_slot</span>);
+        <span class="self">self</span>.timer_heap.remove(heap_slot);
     }
 
-    <span class="kw">fn</span> <span class="ident">invalidate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">node</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Node</span><span class="op">&lt;</span><span class="ident">ScheduledTimer</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
-        <span class="ident">node</span>.<span class="ident">state</span>.<span class="ident">fetch_or</span>(<span class="number">0b10</span>, <span class="ident">SeqCst</span>);
-        <span class="ident">node</span>.<span class="ident">waker</span>.<span class="ident">wake</span>();
+    <span class="kw">fn </span>invalidate(<span class="kw-2">&amp;mut </span><span class="self">self</span>, node: Arc&lt;Node&lt;ScheduledTimer&gt;&gt;) {
+        node.state.fetch_or(<span class="number">0b10</span>, SeqCst);
+        node.waker.wake();
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">Timer</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
+<span class="kw">impl </span>Future <span class="kw">for </span>Timer {
+    <span class="kw">type </span>Output = ();
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>).<span class="ident">waker</span>.<span class="ident">register</span>(<span class="ident">cx</span>.<span class="ident">waker</span>());
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">list</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">list</span>.<span class="ident">take</span>();
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">node</span>) <span class="op">=</span> <span class="ident">list</span>.<span class="ident">pop</span>() {
-            <span class="kw">let</span> <span class="ident">at</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">node</span>.<span class="ident">at</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
-            <span class="kw">match</span> <span class="ident">at</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">at</span>) =&gt; <span class="self">self</span>.<span class="ident">update_or_add</span>(<span class="ident">at</span>, <span class="ident">node</span>),
-                <span class="prelude-val">None</span> =&gt; <span class="self">self</span>.<span class="ident">remove</span>(<span class="ident">node</span>),
+    <span class="kw">fn </span>poll(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
+        Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.inner).waker.register(cx.waker());
+        <span class="kw">let </span><span class="kw-2">mut </span>list = <span class="self">self</span>.inner.list.take();
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(node) = list.pop() {
+            <span class="kw">let </span>at = <span class="kw-2">*</span>node.at.lock().unwrap();
+            <span class="kw">match </span>at {
+                <span class="prelude-val">Some</span>(at) =&gt; <span class="self">self</span>.update_or_add(at, node),
+                <span class="prelude-val">None </span>=&gt; <span class="self">self</span>.remove(node),
             }
         }
-        <span class="ident">Poll::Pending</span>
+        Poll::Pending
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Timer</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="comment">// Seal off our list to prevent any more updates from getting pushed on.</span>
-        <span class="comment">// Any timer which sees an error from the push will immediately become</span>
-        <span class="comment">// inert.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">list</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">list</span>.<span class="ident">take_and_seal</span>();
+<span class="kw">impl </span>Drop <span class="kw">for </span>Timer {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="comment">// Seal off our list to prevent any more updates from getting pushed on.
+        // Any timer which sees an error from the push will immediately become
+        // inert.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>list = <span class="self">self</span>.inner.list.take_and_seal();
 
-        <span class="comment">// Now that we&#39;ll never receive another timer, drain the list of all</span>
-        <span class="comment">// updates and also drain our heap of all active timers, invalidating</span>
-        <span class="comment">// everything.</span>
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">t</span>) <span class="op">=</span> <span class="ident">list</span>.<span class="ident">pop</span>() {
-            <span class="self">self</span>.<span class="ident">invalidate</span>(<span class="ident">t</span>);
+        <span class="comment">// Now that we&#39;ll never receive another timer, drain the list of all
+        // updates and also drain our heap of all active timers, invalidating
+        // everything.
+        </span><span class="kw">while let </span><span class="prelude-val">Some</span>(t) = list.pop() {
+            <span class="self">self</span>.invalidate(t);
         }
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">t</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">timer_heap</span>.<span class="ident">pop</span>() {
-            <span class="self">self</span>.<span class="ident">invalidate</span>(<span class="ident">t</span>.<span class="ident">node</span>);
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(t) = <span class="self">self</span>.timer_heap.pop() {
+            <span class="self">self</span>.invalidate(t.node);
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Timer</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Timer&quot;</span>).<span class="ident">field</span>(<span class="string">&quot;heap&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;...&quot;</span>).<span class="ident">finish</span>()
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Timer {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), fmt::Error&gt; {
+        f.debug_struct(<span class="string">&quot;Timer&quot;</span>).field(<span class="string">&quot;heap&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;...&quot;</span>).finish()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Timer</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>()
+<span class="kw">impl </span>Default <span class="kw">for </span>Timer {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new()
     }
 }
 
-<span class="kw">static</span> <span class="ident">HANDLE_FALLBACK</span>: <span class="ident">AtomicUsize</span> <span class="op">=</span> <span class="ident">AtomicUsize::new</span>(<span class="number">0</span>);
+<span class="kw">static </span>HANDLE_FALLBACK: AtomicUsize = AtomicUsize::new(<span class="number">0</span>);
 
-<span class="doccomment">/// Error returned from `TimerHandle::set_fallback`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">SetDefaultError</span>(());
+<span class="doccomment">/// Error returned from `TimerHandle::set_fallback`.
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">struct </span>SetDefaultError(());
 
-<span class="kw">impl</span> <span class="ident">TimerHandle</span> {
-    <span class="doccomment">/// Configures this timer handle to be the one returned by</span>
-    <span class="doccomment">/// `TimerHandle::default`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// By default a global thread is initialized on the first call to</span>
-    <span class="doccomment">/// `TimerHandle::default`. This first call can happen transitively through</span>
-    <span class="doccomment">/// `Delay::new`. If, however, that hasn&#39;t happened yet then the global</span>
-    <span class="doccomment">/// default timer handle can be configured through this method.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method can be used to prevent the global helper thread from</span>
-    <span class="doccomment">/// spawning. If this method is successful then the global helper thread</span>
-    <span class="doccomment">/// will never get spun up.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// On success this timer handle will have installed itself globally to be</span>
-    <span class="doccomment">/// used as the return value for `TimerHandle::default` unless otherwise</span>
-    <span class="doccomment">/// specified.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If another thread has already called `set_as_global_fallback` or this</span>
-    <span class="doccomment">/// thread otherwise loses a race to call this method then it will fail</span>
-    <span class="doccomment">/// returning an error. Once a call to `set_as_global_fallback` is</span>
-    <span class="doccomment">/// successful then no future calls may succeed.</span>
-    <span class="kw">fn</span> <span class="ident">set_as_global_fallback</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SetDefaultError</span><span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into_usize</span>();
-            <span class="kw">match</span> <span class="ident">HANDLE_FALLBACK</span>.<span class="ident">compare_exchange</span>(<span class="number">0</span>, <span class="ident">val</span>, <span class="ident">SeqCst</span>, <span class="ident">SeqCst</span>) {
+<span class="kw">impl </span>TimerHandle {
+    <span class="doccomment">/// Configures this timer handle to be the one returned by
+    /// `TimerHandle::default`.
+    ///
+    /// By default a global thread is initialized on the first call to
+    /// `TimerHandle::default`. This first call can happen transitively through
+    /// `Delay::new`. If, however, that hasn&#39;t happened yet then the global
+    /// default timer handle can be configured through this method.
+    ///
+    /// This method can be used to prevent the global helper thread from
+    /// spawning. If this method is successful then the global helper thread
+    /// will never get spun up.
+    ///
+    /// On success this timer handle will have installed itself globally to be
+    /// used as the return value for `TimerHandle::default` unless otherwise
+    /// specified.
+    ///
+    /// # Errors
+    ///
+    /// If another thread has already called `set_as_global_fallback` or this
+    /// thread otherwise loses a race to call this method then it will fail
+    /// returning an error. Once a call to `set_as_global_fallback` is
+    /// successful then no future calls may succeed.
+    </span><span class="kw">fn </span>set_as_global_fallback(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), SetDefaultError&gt; {
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span>val = <span class="self">self</span>.into_usize();
+            <span class="kw">match </span>HANDLE_FALLBACK.compare_exchange(<span class="number">0</span>, val, SeqCst, SeqCst) {
                 <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(()),
                 <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-                    <span class="ident">drop</span>(<span class="ident">TimerHandle::from_usize</span>(<span class="ident">val</span>));
-                    <span class="prelude-val">Err</span>(<span class="ident">SetDefaultError</span>(()))
+                    drop(TimerHandle::from_usize(val));
+                    <span class="prelude-val">Err</span>(SetDefaultError(()))
                 }
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">into_usize</span>(<span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">unsafe</span> { <span class="ident">mem::transmute</span>::<span class="op">&lt;</span><span class="ident">Weak</span><span class="op">&lt;</span><span class="ident">Inner</span><span class="op">&gt;</span>, <span class="ident">usize</span><span class="op">&gt;</span>(<span class="self">self</span>.<span class="ident">inner</span>) }
+    <span class="kw">fn </span>into_usize(<span class="self">self</span>) -&gt; usize {
+        <span class="kw">unsafe </span>{ mem::transmute::&lt;Weak&lt;Inner&gt;, usize&gt;(<span class="self">self</span>.inner) }
     }
 
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_usize</span>(<span class="ident">val</span>: <span class="ident">usize</span>) -&gt; <span class="ident">TimerHandle</span> {
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">mem::transmute</span>::<span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">Weak</span><span class="op">&lt;</span><span class="ident">Inner</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">val</span>);
-        <span class="ident">TimerHandle</span> { <span class="ident">inner</span> }
+    <span class="kw">unsafe fn </span>from_usize(val: usize) -&gt; TimerHandle {
+        <span class="kw">let </span>inner = mem::transmute::&lt;usize, Weak&lt;Inner&gt;&gt;(val);
+        TimerHandle { inner }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">TimerHandle</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">TimerHandle</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fallback</span> <span class="op">=</span> <span class="ident">HANDLE_FALLBACK</span>.<span class="ident">load</span>(<span class="ident">SeqCst</span>);
+<span class="kw">impl </span>Default <span class="kw">for </span>TimerHandle {
+    <span class="kw">fn </span>default() -&gt; TimerHandle {
+        <span class="kw">let </span><span class="kw-2">mut </span>fallback = HANDLE_FALLBACK.load(SeqCst);
 
-        <span class="comment">// If the fallback hasn&#39;t been previously initialized then let&#39;s spin</span>
-        <span class="comment">// up a helper thread and try to initialize with that. If we can&#39;t</span>
-        <span class="comment">// actually create a helper thread then we&#39;ll just return a &quot;defunkt&quot;</span>
-        <span class="comment">// handle which will return errors when timer objects are attempted to</span>
-        <span class="comment">// be associated.</span>
-        <span class="kw">if</span> <span class="ident">fallback</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">let</span> <span class="ident">helper</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">global::HelperThread::new</span>() {
-                <span class="prelude-val">Ok</span>(<span class="ident">helper</span>) =&gt; <span class="ident">helper</span>,
-                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="ident">TimerHandle</span> { <span class="ident">inner</span>: <span class="ident">Weak::new</span>() },
+        <span class="comment">// If the fallback hasn&#39;t been previously initialized then let&#39;s spin
+        // up a helper thread and try to initialize with that. If we can&#39;t
+        // actually create a helper thread then we&#39;ll just return a &quot;defunkt&quot;
+        // handle which will return errors when timer objects are attempted to
+        // be associated.
+        </span><span class="kw">if </span>fallback == <span class="number">0 </span>{
+            <span class="kw">let </span>helper = <span class="kw">match </span>global::HelperThread::new() {
+                <span class="prelude-val">Ok</span>(helper) =&gt; helper,
+                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return </span>TimerHandle { inner: Weak::new() },
             };
 
-            <span class="comment">// If we successfully set ourselves as the actual fallback then we</span>
-            <span class="comment">// want to `forget` the helper thread to ensure that it persists</span>
-            <span class="comment">// globally. If we fail to set ourselves as the fallback that means</span>
-            <span class="comment">// that someone was racing with this call to</span>
-            <span class="comment">// `TimerHandle::default`.  They ended up winning so we&#39;ll destroy</span>
-            <span class="comment">// our helper thread (which shuts down the thread) and reload the</span>
-            <span class="comment">// fallback.</span>
-            <span class="kw">if</span> <span class="ident">helper</span>.<span class="ident">handle</span>().<span class="ident">set_as_global_fallback</span>().<span class="ident">is_ok</span>() {
-                <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">helper</span>.<span class="ident">handle</span>();
-                <span class="ident">helper</span>.<span class="ident">forget</span>();
-                <span class="kw">return</span> <span class="ident">ret</span>;
+            <span class="comment">// If we successfully set ourselves as the actual fallback then we
+            // want to `forget` the helper thread to ensure that it persists
+            // globally. If we fail to set ourselves as the fallback that means
+            // that someone was racing with this call to
+            // `TimerHandle::default`.  They ended up winning so we&#39;ll destroy
+            // our helper thread (which shuts down the thread) and reload the
+            // fallback.
+            </span><span class="kw">if </span>helper.handle().set_as_global_fallback().is_ok() {
+                <span class="kw">let </span>ret = helper.handle();
+                helper.forget();
+                <span class="kw">return </span>ret;
             }
-            <span class="ident">fallback</span> <span class="op">=</span> <span class="ident">HANDLE_FALLBACK</span>.<span class="ident">load</span>(<span class="ident">SeqCst</span>);
+            fallback = HANDLE_FALLBACK.load(SeqCst);
         }
 
-        <span class="comment">// At this point our fallback handle global was configured so we use</span>
-        <span class="comment">// its value to reify a handle, clone it, and then forget our reified</span>
-        <span class="comment">// handle as we don&#39;t actually have an owning reference to it.</span>
-        <span class="macro">assert!</span>(<span class="ident">fallback</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>);
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">TimerHandle::from_usize</span>(<span class="ident">fallback</span>);
-            <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">clone</span>();
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">handle</span>.<span class="ident">into_usize</span>();
-            <span class="ident">ret</span>
+        <span class="comment">// At this point our fallback handle global was configured so we use
+        // its value to reify a handle, clone it, and then forget our reified
+        // handle as we don&#39;t actually have an owning reference to it.
+        </span><span class="macro">assert!</span>(fallback != <span class="number">0</span>);
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span>handle = TimerHandle::from_usize(fallback);
+            <span class="kw">let </span>ret = handle.clone();
+            <span class="kw">let _ </span>= handle.into_usize();
+            ret
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">TimerHandle</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;TimerHandle&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;inner&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;...&quot;</span>)
-            .<span class="ident">finish</span>()
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>TimerHandle {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), fmt::Error&gt; {
+        f.debug_struct(<span class="string">&quot;TimerHandle&quot;</span>)
+            .field(<span class="string">&quot;inner&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;...&quot;</span>)
+            .finish()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="futures_timer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="futures_timer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/cmap/conn/wire/message.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>message.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../mongodb/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/cmap/conn/wire/message.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>message.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../mongodb/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -404,405 +404,405 @@
 <span id="404">404</span>
 <span id="405">405</span>
 <span id="406">406</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::io::Read</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::io::Read;
 
-<span class="kw">use</span> <span class="ident">bitflags::bitflags</span>;
-<span class="kw">use</span> <span class="ident">tokio::io</span>::{<span class="ident">AsyncReadExt</span>, <span class="ident">AsyncWrite</span>, <span class="ident">AsyncWriteExt</span>, <span class="ident">BufReader</span>, <span class="ident">BufWriter</span>};
+<span class="kw">use </span>bitflags::bitflags;
+<span class="kw">use </span>tokio::io::{AsyncReadExt, AsyncWrite, AsyncWriteExt, BufReader, BufWriter};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::header</span>::{<span class="ident">Header</span>, <span class="ident">OpCode</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">bson_util</span>,
-    <span class="ident">cmap</span>::{
-        <span class="ident">conn</span>::{<span class="ident">command::RawCommand</span>, <span class="ident">wire::util::SyncCountReader</span>},
-        <span class="ident">Command</span>,
+<span class="kw">use </span><span class="kw">super</span>::header::{Header, OpCode};
+<span class="kw">use crate</span>::{
+    bson_util,
+    cmap::{
+        conn::{command::RawCommand, wire::util::SyncCountReader},
+        Command,
     },
-    <span class="ident">error</span>::{<span class="ident">Error</span>, <span class="ident">ErrorKind</span>, <span class="prelude-ty">Result</span>},
-    <span class="ident">runtime</span>::{<span class="ident">AsyncStream</span>, <span class="ident">SyncLittleEndianRead</span>},
+    error::{Error, ErrorKind, <span class="prelude-ty">Result</span>},
+    runtime::{AsyncStream, SyncLittleEndianRead},
 };
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::compression</span>::{<span class="ident">Compressor</span>, <span class="ident">Decoder</span>};
+<span class="kw">use </span><span class="kw">crate</span>::compression::{Compressor, Decoder};
 
-<span class="doccomment">/// Represents an OP_MSG wire protocol operation.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Message</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">response_to</span>: <span class="ident">i32</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">flags</span>: <span class="ident">MessageFlags</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">sections</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MessageSection</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">checksum</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">request_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Represents an OP_MSG wire protocol operation.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Message {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) response_to: i32,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) flags: MessageFlags,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) sections: Vec&lt;MessageSection&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) checksum: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) request_id: <span class="prelude-ty">Option</span>&lt;i32&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Message</span> {
-    <span class="doccomment">/// Creates a `Message` from a given `Command`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that `response_to` will need to be set manually.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">with_command</span>(<span class="ident">command</span>: <span class="ident">Command</span>, <span class="ident">request_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">bson::to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">command</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::with_raw_command</span>(
-            <span class="ident">RawCommand</span> {
-                <span class="ident">bytes</span>,
-                <span class="ident">target_db</span>: <span class="ident">command</span>.<span class="ident">target_db</span>,
-                <span class="ident">name</span>: <span class="ident">command</span>.<span class="ident">name</span>,
+<span class="kw">impl </span>Message {
+    <span class="doccomment">/// Creates a `Message` from a given `Command`.
+    ///
+    /// Note that `response_to` will need to be set manually.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>with_command(command: Command, request_id: <span class="prelude-ty">Option</span>&lt;i32&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>bytes = bson::to_vec(<span class="kw-2">&amp;</span>command)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>::with_raw_command(
+            RawCommand {
+                bytes,
+                target_db: command.target_db,
+                name: command.name,
             },
-            <span class="ident">request_id</span>,
+            request_id,
         ))
     }
 
-    <span class="doccomment">/// Creates a `Message` from a given `Command`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that `response_to` will need to be set manually.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">with_raw_command</span>(<span class="ident">command</span>: <span class="ident">RawCommand</span>, <span class="ident">request_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">response_to</span>: <span class="number">0</span>,
-            <span class="ident">flags</span>: <span class="ident">MessageFlags::empty</span>(),
-            <span class="ident">sections</span>: <span class="macro">vec!</span>[<span class="ident">MessageSection::Document</span>(<span class="ident">command</span>.<span class="ident">bytes</span>)],
-            <span class="ident">checksum</span>: <span class="prelude-val">None</span>,
-            <span class="ident">request_id</span>,
+    <span class="doccomment">/// Creates a `Message` from a given `Command`.
+    ///
+    /// Note that `response_to` will need to be set manually.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>with_raw_command(command: RawCommand, request_id: <span class="prelude-ty">Option</span>&lt;i32&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            response_to: <span class="number">0</span>,
+            flags: MessageFlags::empty(),
+            sections: <span class="macro">vec!</span>[MessageSection::Document(command.bytes)],
+            checksum: <span class="prelude-val">None</span>,
+            request_id,
         }
     }
 
-    <span class="doccomment">/// Gets the first document contained in this Message.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">single_document_response</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">section</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sections</span>.<span class="ident">into_iter</span>().<span class="ident">next</span>().<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">Error::new</span>(
-                <span class="ident">ErrorKind::InvalidResponse</span> {
-                    <span class="ident">message</span>: <span class="string">&quot;no response received from server&quot;</span>.<span class="ident">into</span>(),
+    <span class="doccomment">/// Gets the first document contained in this Message.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>single_document_response(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;&gt; {
+        <span class="kw">let </span>section = <span class="self">self</span>.sections.into_iter().next().ok_or_else(|| {
+            Error::new(
+                ErrorKind::InvalidResponse {
+                    message: <span class="string">&quot;no response received from server&quot;</span>.into(),
                 },
-                <span class="prelude-ty">Option</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::None</span>,
+                <span class="prelude-ty">Option</span>::&lt;Vec&lt;String&gt;&gt;::None,
             )
         })<span class="question-mark">?</span>;
-        <span class="kw">match</span> <span class="ident">section</span> {
-            <span class="ident">MessageSection::Document</span>(<span class="ident">doc</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">doc</span>),
-            <span class="ident">MessageSection::Sequence</span> { <span class="ident">documents</span>, .. } =&gt; <span class="ident">documents</span>.<span class="ident">into_iter</span>().<span class="ident">next</span>(),
+        <span class="kw">match </span>section {
+            MessageSection::Document(doc) =&gt; <span class="prelude-val">Some</span>(doc),
+            MessageSection::Sequence { documents, .. } =&gt; documents.into_iter().next(),
         }
-        .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">Error::from</span>(<span class="ident">ErrorKind::InvalidResponse</span> {
-                <span class="ident">message</span>: <span class="string">&quot;no message received from the server&quot;</span>.<span class="ident">to_string</span>(),
+        .ok_or_else(|| {
+            Error::from(ErrorKind::InvalidResponse {
+                message: <span class="string">&quot;no message received from the server&quot;</span>.to_string(),
             })
         })
     }
 
-    <span class="doccomment">/// Reads bytes from `reader` and deserializes them into a Message.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_from</span>(
-        <span class="ident">reader</span>: <span class="kw-2">&amp;mut</span> <span class="ident">AsyncStream</span>,
-        <span class="ident">max_message_size_bytes</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reader</span> <span class="op">=</span> <span class="ident">BufReader::new</span>(<span class="ident">reader</span>);
-        <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">Header::read_from</span>(<span class="kw-2">&amp;mut</span> <span class="ident">reader</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">max_len</span> <span class="op">=</span> <span class="ident">max_message_size_bytes</span>.<span class="ident">unwrap_or</span>(<span class="ident">DEFAULT_MAX_MESSAGE_SIZE_BYTES</span>);
-        <span class="kw">if</span> <span class="ident">header</span>.<span class="ident">length</span> <span class="op">&gt;</span> <span class="ident">max_len</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidResponse</span> {
-                <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;Message length {} over maximum {}&quot;</span>, <span class="ident">header</span>.<span class="ident">length</span>, <span class="ident">max_len</span>),
+    <span class="doccomment">/// Reads bytes from `reader` and deserializes them into a Message.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>read_from(
+        reader: <span class="kw-2">&amp;mut </span>AsyncStream,
+        max_message_size_bytes: <span class="prelude-ty">Option</span>&lt;i32&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>reader = BufReader::new(reader);
+        <span class="kw">let </span>header = Header::read_from(<span class="kw-2">&amp;mut </span>reader).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>max_len = max_message_size_bytes.unwrap_or(DEFAULT_MAX_MESSAGE_SIZE_BYTES);
+        <span class="kw">if </span>header.length &gt; max_len {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(ErrorKind::InvalidResponse {
+                message: <span class="macro">format!</span>(<span class="string">&quot;Message length {} over maximum {}&quot;</span>, header.length, max_len),
             }
-            .<span class="ident">into</span>());
+            .into());
         }
 
-        <span class="kw">if</span> <span class="ident">header</span>.<span class="ident">op_code</span> <span class="op">==</span> <span class="ident">OpCode::Message</span> {
-            <span class="kw">return</span> <span class="ident"><span class="self">Self</span>::read_from_op_msg</span>(<span class="ident">reader</span>, <span class="kw-2">&amp;</span><span class="ident">header</span>).<span class="kw">await</span>;
+        <span class="kw">if </span>header.op_code == OpCode::Message {
+            <span class="kw">return </span><span class="self">Self</span>::read_from_op_msg(reader, <span class="kw-2">&amp;</span>header).<span class="kw">await</span>;
         }
-        <span class="kw">if</span> <span class="ident">header</span>.<span class="ident">op_code</span> <span class="op">==</span> <span class="ident">OpCode::Compressed</span> {
-            <span class="kw">return</span> <span class="ident"><span class="self">Self</span>::read_from_op_compressed</span>(<span class="ident">reader</span>, <span class="kw-2">&amp;</span><span class="ident">header</span>).<span class="kw">await</span>;
+        <span class="kw">if </span>header.op_code == OpCode::Compressed {
+            <span class="kw">return </span><span class="self">Self</span>::read_from_op_compressed(reader, <span class="kw-2">&amp;</span>header).<span class="kw">await</span>;
         }
 
-        <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(
-            <span class="ident">ErrorKind::InvalidResponse</span> {
-                <span class="ident">message</span>: <span class="macro">format!</span>(
+        <span class="prelude-val">Err</span>(Error::new(
+            ErrorKind::InvalidResponse {
+                message: <span class="macro">format!</span>(
                     <span class="string">&quot;Invalid op code, expected {} or {} and got {}&quot;</span>,
-                    <span class="ident">OpCode::Message</span> <span class="kw">as</span> <span class="ident">u32</span>,
-                    <span class="ident">OpCode::Compressed</span> <span class="kw">as</span> <span class="ident">u32</span>,
-                    <span class="ident">header</span>.<span class="ident">op_code</span> <span class="kw">as</span> <span class="ident">u32</span>
+                    OpCode::Message <span class="kw">as </span>u32,
+                    OpCode::Compressed <span class="kw">as </span>u32,
+                    header.op_code <span class="kw">as </span>u32
                 ),
             },
-            <span class="prelude-ty">Option</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::None</span>,
+            <span class="prelude-ty">Option</span>::&lt;Vec&lt;String&gt;&gt;::None,
         ))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_from_op_msg</span>(
-        <span class="kw-2">mut</span> <span class="ident">reader</span>: <span class="ident">BufReader</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">AsyncStream</span><span class="op">&gt;</span>,
-        <span class="ident">header</span>: <span class="kw-2">&amp;</span><span class="ident">Header</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="comment">// TODO: RUST-616 ensure length is &lt; maxMessageSizeBytes</span>
-        <span class="kw">let</span> <span class="ident">length_remaining</span> <span class="op">=</span> <span class="ident">header</span>.<span class="ident">length</span> <span class="op">-</span> <span class="ident">Header::LENGTH</span> <span class="kw">as</span> <span class="ident">i32</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="ident">length_remaining</span> <span class="kw">as</span> <span class="ident">usize</span>];
-        <span class="ident">reader</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">reader</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">as_slice</span>();
+    <span class="kw">async fn </span>read_from_op_msg(
+        <span class="kw-2">mut </span>reader: BufReader&lt;<span class="kw-2">&amp;mut </span>AsyncStream&gt;,
+        header: <span class="kw-2">&amp;</span>Header,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="comment">// TODO: RUST-616 ensure length is &lt; maxMessageSizeBytes
+        </span><span class="kw">let </span>length_remaining = header.length - Header::LENGTH <span class="kw">as </span>i32;
+        <span class="kw">let </span><span class="kw-2">mut </span>buf = <span class="macro">vec!</span>[<span class="number">0u8</span>; length_remaining <span class="kw">as </span>usize];
+        reader.read_exact(<span class="kw-2">&amp;mut </span>buf).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>reader = buf.as_slice();
 
-        <span class="ident"><span class="self">Self</span>::read_op_common</span>(<span class="ident">reader</span>, <span class="ident">length_remaining</span>, <span class="ident">header</span>)
+        <span class="self">Self</span>::read_op_common(reader, length_remaining, header)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_from_op_compressed</span>(
-        <span class="kw-2">mut</span> <span class="ident">reader</span>: <span class="ident">BufReader</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">AsyncStream</span><span class="op">&gt;</span>,
-        <span class="ident">header</span>: <span class="kw-2">&amp;</span><span class="ident">Header</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">length_remaining</span> <span class="op">=</span> <span class="ident">header</span>.<span class="ident">length</span> <span class="op">-</span> <span class="ident">Header::LENGTH</span> <span class="kw">as</span> <span class="ident">i32</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="ident">length_remaining</span> <span class="kw">as</span> <span class="ident">usize</span>];
-        <span class="ident">reader</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reader</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">as_slice</span>();
+    <span class="kw">async fn </span>read_from_op_compressed(
+        <span class="kw-2">mut </span>reader: BufReader&lt;<span class="kw-2">&amp;mut </span>AsyncStream&gt;,
+        header: <span class="kw-2">&amp;</span>Header,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>length_remaining = header.length - Header::LENGTH <span class="kw">as </span>i32;
+        <span class="kw">let </span><span class="kw-2">mut </span>buf = <span class="macro">vec!</span>[<span class="number">0u8</span>; length_remaining <span class="kw">as </span>usize];
+        reader.read_exact(<span class="kw-2">&amp;mut </span>buf).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>reader = buf.as_slice();
 
-        <span class="comment">// Read original opcode (should be OP_MSG)</span>
-        <span class="kw">let</span> <span class="ident">original_opcode</span> <span class="op">=</span> <span class="ident">reader</span>.<span class="ident">read_i32_sync</span>()<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">original_opcode</span> <span class="op">!</span><span class="op">=</span> <span class="ident">OpCode::Message</span> <span class="kw">as</span> <span class="ident">i32</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidResponse</span> {
-                <span class="ident">message</span>: <span class="macro">format!</span>(
+        <span class="comment">// Read original opcode (should be OP_MSG)
+        </span><span class="kw">let </span>original_opcode = reader.read_i32_sync()<span class="question-mark">?</span>;
+        <span class="kw">if </span>original_opcode != OpCode::Message <span class="kw">as </span>i32 {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(ErrorKind::InvalidResponse {
+                message: <span class="macro">format!</span>(
                     <span class="string">&quot;The original opcode of the compressed message must be {}, but was {}.&quot;</span>,
-                    <span class="ident">OpCode::Message</span> <span class="kw">as</span> <span class="ident">i32</span>,
-                    <span class="ident">original_opcode</span>,
+                    OpCode::Message <span class="kw">as </span>i32,
+                    original_opcode,
                 ),
             }
-            .<span class="ident">into</span>());
+            .into());
         }
 
-        <span class="comment">// Read uncompressed size</span>
-        <span class="kw">let</span> <span class="ident">uncompressed_size</span> <span class="op">=</span> <span class="ident">reader</span>.<span class="ident">read_i32_sync</span>()<span class="question-mark">?</span>;
+        <span class="comment">// Read uncompressed size
+        </span><span class="kw">let </span>uncompressed_size = reader.read_i32_sync()<span class="question-mark">?</span>;
 
-        <span class="comment">// Read compressor id</span>
-        <span class="kw">let</span> <span class="ident">compressor_id</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="ident">reader</span>.<span class="ident">read_u8_sync</span>()<span class="question-mark">?</span>;
+        <span class="comment">// Read compressor id
+        </span><span class="kw">let </span>compressor_id: u8 = reader.read_u8_sync()<span class="question-mark">?</span>;
 
-        <span class="comment">// Get decoder</span>
-        <span class="kw">let</span> <span class="ident">decoder</span> <span class="op">=</span> <span class="ident">Decoder::from_u8</span>(<span class="ident">compressor_id</span>)<span class="question-mark">?</span>;
+        <span class="comment">// Get decoder
+        </span><span class="kw">let </span>decoder = Decoder::from_u8(compressor_id)<span class="question-mark">?</span>;
 
-        <span class="comment">// Decode message</span>
-        <span class="kw">let</span> <span class="ident">decoded_message</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">decode</span>(<span class="ident">reader</span>)<span class="question-mark">?</span>;
+        <span class="comment">// Decode message
+        </span><span class="kw">let </span>decoded_message = decoder.decode(reader)<span class="question-mark">?</span>;
 
-        <span class="comment">// Check that claimed length matches original length</span>
-        <span class="kw">if</span> <span class="ident">decoded_message</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">i32</span> <span class="op">!</span><span class="op">=</span> <span class="ident">uncompressed_size</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidResponse</span> {
-                <span class="ident">message</span>: <span class="macro">format!</span>(
+        <span class="comment">// Check that claimed length matches original length
+        </span><span class="kw">if </span>decoded_message.len() <span class="kw">as </span>i32 != uncompressed_size {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(ErrorKind::InvalidResponse {
+                message: <span class="macro">format!</span>(
                     <span class="string">&quot;The server&#39;s message claims that the uncompressed length is {}, but was \
                      computed to be {}.&quot;</span>,
-                    <span class="ident">uncompressed_size</span>,
-                    <span class="ident">decoded_message</span>.<span class="ident">len</span>(),
+                    uncompressed_size,
+                    decoded_message.len(),
                 ),
             }
-            .<span class="ident">into</span>());
+            .into());
         }
 
-        <span class="comment">// Read decompressed message as a standard OP_MSG</span>
-        <span class="kw">let</span> <span class="ident">reader</span> <span class="op">=</span> <span class="ident">decoded_message</span>.<span class="ident">as_slice</span>();
-        <span class="kw">let</span> <span class="ident">length_remaining</span> <span class="op">=</span> <span class="ident">decoded_message</span>.<span class="ident">len</span>();
+        <span class="comment">// Read decompressed message as a standard OP_MSG
+        </span><span class="kw">let </span>reader = decoded_message.as_slice();
+        <span class="kw">let </span>length_remaining = decoded_message.len();
 
-        <span class="ident"><span class="self">Self</span>::read_op_common</span>(<span class="ident">reader</span>, <span class="ident">length_remaining</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="ident">header</span>)
+        <span class="self">Self</span>::read_op_common(reader, length_remaining <span class="kw">as </span>i32, header)
     }
 
-    <span class="kw">fn</span> <span class="ident">read_op_common</span>(
-        <span class="kw-2">mut</span> <span class="ident">reader</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-        <span class="kw-2">mut</span> <span class="ident">length_remaining</span>: <span class="ident">i32</span>,
-        <span class="ident">header</span>: <span class="kw-2">&amp;</span><span class="ident">Header</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">flags</span> <span class="op">=</span> <span class="ident">MessageFlags::from_bits_truncate</span>(<span class="ident">reader</span>.<span class="ident">read_u32_sync</span>()<span class="question-mark">?</span>);
-        <span class="ident">length_remaining</span> <span class="op">-</span><span class="op">=</span> <span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="ident">i32</span>;
+    <span class="kw">fn </span>read_op_common(
+        <span class="kw-2">mut </span>reader: <span class="kw-2">&amp;</span>[u8],
+        <span class="kw-2">mut </span>length_remaining: i32,
+        header: <span class="kw-2">&amp;</span>Header,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>flags = MessageFlags::from_bits_truncate(reader.read_u32_sync()<span class="question-mark">?</span>);
+        length_remaining -= std::mem::size_of::&lt;u32&gt;() <span class="kw">as </span>i32;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">count_reader</span> <span class="op">=</span> <span class="ident">SyncCountReader::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">reader</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sections</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>count_reader = SyncCountReader::new(<span class="kw-2">&amp;mut </span>reader);
+        <span class="kw">let </span><span class="kw-2">mut </span>sections = Vec::new();
 
-        <span class="kw">while</span> <span class="ident">length_remaining</span> <span class="op">-</span> <span class="ident">count_reader</span>.<span class="ident">bytes_read</span>() <span class="kw">as</span> <span class="ident">i32</span> <span class="op">&gt;</span> <span class="number">4</span> {
-            <span class="ident">sections</span>.<span class="ident">push</span>(<span class="ident">MessageSection::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">count_reader</span>)<span class="question-mark">?</span>);
+        <span class="kw">while </span>length_remaining - count_reader.bytes_read() <span class="kw">as </span>i32 &gt; <span class="number">4 </span>{
+            sections.push(MessageSection::read(<span class="kw-2">&amp;mut </span>count_reader)<span class="question-mark">?</span>);
         }
 
-        <span class="ident">length_remaining</span> <span class="op">-</span><span class="op">=</span> <span class="ident">count_reader</span>.<span class="ident">bytes_read</span>() <span class="kw">as</span> <span class="ident">i32</span>;
+        length_remaining -= count_reader.bytes_read() <span class="kw">as </span>i32;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">checksum</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>checksum = <span class="prelude-val">None</span>;
 
-        <span class="kw">if</span> <span class="ident">length_remaining</span> <span class="op">==</span> <span class="number">4</span> <span class="op">&amp;&amp;</span> <span class="ident">flags</span>.<span class="ident">contains</span>(<span class="ident">MessageFlags::CHECKSUM_PRESENT</span>) {
-            <span class="ident">checksum</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">reader</span>.<span class="ident">read_u32_sync</span>()<span class="question-mark">?</span>);
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">length_remaining</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidResponse</span> {
-                <span class="ident">message</span>: <span class="macro">format!</span>(
+        <span class="kw">if </span>length_remaining == <span class="number">4 </span>&amp;&amp; flags.contains(MessageFlags::CHECKSUM_PRESENT) {
+            checksum = <span class="prelude-val">Some</span>(reader.read_u32_sync()<span class="question-mark">?</span>);
+        } <span class="kw">else if </span>length_remaining != <span class="number">0 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(ErrorKind::InvalidResponse {
+                message: <span class="macro">format!</span>(
                     <span class="string">&quot;The server indicated that the reply would be {} bytes long, but it instead \
                      was {}&quot;</span>,
-                    <span class="ident">header</span>.<span class="ident">length</span>,
-                    <span class="ident">header</span>.<span class="ident">length</span> <span class="op">-</span> <span class="ident">length_remaining</span> <span class="op">+</span> <span class="ident">count_reader</span>.<span class="ident">bytes_read</span>() <span class="kw">as</span> <span class="ident">i32</span>,
+                    header.length,
+                    header.length - length_remaining + count_reader.bytes_read() <span class="kw">as </span>i32,
                 ),
             }
-            .<span class="ident">into</span>());
+            .into());
         }
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">response_to</span>: <span class="ident">header</span>.<span class="ident">response_to</span>,
-            <span class="ident">flags</span>,
-            <span class="ident">sections</span>,
-            <span class="ident">checksum</span>,
-            <span class="ident">request_id</span>: <span class="prelude-val">None</span>,
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            response_to: header.response_to,
+            flags,
+            sections,
+            checksum,
+            request_id: <span class="prelude-val">None</span>,
         })
     }
 
-    <span class="doccomment">/// Serializes the Message to bytes and writes them to `writer`.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">write_to</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">AsyncStream</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writer</span> <span class="op">=</span> <span class="ident">BufWriter::new</span>(<span class="ident">stream</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sections_bytes</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+    <span class="doccomment">/// Serializes the Message to bytes and writes them to `writer`.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>write_to(<span class="kw-2">&amp;</span><span class="self">self</span>, stream: <span class="kw-2">&amp;mut </span>AsyncStream) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>writer = BufWriter::new(stream);
+        <span class="kw">let </span><span class="kw-2">mut </span>sections_bytes = Vec::new();
 
-        <span class="kw">for</span> <span class="ident">section</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">sections</span> {
-            <span class="ident">section</span>.<span class="ident">write</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sections_bytes</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">for </span>section <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.sections {
+            section.write(<span class="kw-2">&amp;mut </span>sections_bytes).<span class="kw">await</span><span class="question-mark">?</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">total_length</span> <span class="op">=</span> <span class="ident">Header::LENGTH</span>
-            <span class="op">+</span> <span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>()
-            <span class="op">+</span> <span class="ident">sections_bytes</span>.<span class="ident">len</span>()
-            <span class="op">+</span> <span class="self">self</span>
-                .<span class="ident">checksum</span>
-                .<span class="ident">as_ref</span>()
-                .<span class="ident">map</span>(<span class="ident">std::mem::size_of_val</span>)
-                .<span class="ident">unwrap_or</span>(<span class="number">0</span>);
+        <span class="kw">let </span>total_length = Header::LENGTH
+            + std::mem::size_of::&lt;u32&gt;()
+            + sections_bytes.len()
+            + <span class="self">self
+                </span>.checksum
+                .as_ref()
+                .map(std::mem::size_of_val)
+                .unwrap_or(<span class="number">0</span>);
 
-        <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">Header</span> {
-            <span class="ident">length</span>: <span class="ident">total_length</span> <span class="kw">as</span> <span class="ident">i32</span>,
-            <span class="ident">request_id</span>: <span class="self">self</span>.<span class="ident">request_id</span>.<span class="ident">unwrap_or_else</span>(<span class="ident"><span class="kw">super</span>::util::next_request_id</span>),
-            <span class="ident">response_to</span>: <span class="self">self</span>.<span class="ident">response_to</span>,
-            <span class="ident">op_code</span>: <span class="ident">OpCode::Message</span>,
+        <span class="kw">let </span>header = Header {
+            length: total_length <span class="kw">as </span>i32,
+            request_id: <span class="self">self</span>.request_id.unwrap_or_else(<span class="kw">super</span>::util::next_request_id),
+            response_to: <span class="self">self</span>.response_to,
+            op_code: OpCode::Message,
         };
 
-        <span class="ident">header</span>.<span class="ident">write_to</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writer</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="ident">writer</span>.<span class="ident">write_u32_le</span>(<span class="self">self</span>.<span class="ident">flags</span>.<span class="ident">bits</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="ident">writer</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="ident">sections_bytes</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        header.write_to(<span class="kw-2">&amp;mut </span>writer).<span class="kw">await</span><span class="question-mark">?</span>;
+        writer.write_u32_le(<span class="self">self</span>.flags.bits()).<span class="kw">await</span><span class="question-mark">?</span>;
+        writer.write_all(<span class="kw-2">&amp;</span>sections_bytes).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">checksum</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">checksum</span> {
-            <span class="ident">writer</span>.<span class="ident">write_u32_le</span>(<span class="ident">checksum</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(checksum) = <span class="self">self</span>.checksum {
+            writer.write_u32_le(checksum).<span class="kw">await</span><span class="question-mark">?</span>;
         }
 
-        <span class="ident">writer</span>.<span class="ident">flush</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+        writer.flush().<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Serializes message to bytes, compresses those bytes, and writes the bytes.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">write_compressed_to</span>(
+    <span class="doccomment">/// Serializes message to bytes, compresses those bytes, and writes the bytes.
+    </span><span class="kw">pub async fn </span>write_compressed_to(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">stream</span>: <span class="kw-2">&amp;mut</span> <span class="ident">AsyncStream</span>,
-        <span class="ident">compressor</span>: <span class="kw-2">&amp;</span><span class="ident">Compressor</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span> <span class="op">=</span> <span class="ident">compressor</span>.<span class="ident">to_encoder</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">compressor_id</span> <span class="op">=</span> <span class="ident">compressor</span>.<span class="ident">id</span>() <span class="kw">as</span> <span class="ident">u8</span>;
+        stream: <span class="kw-2">&amp;mut </span>AsyncStream,
+        compressor: <span class="kw-2">&amp;</span>Compressor,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>encoder = compressor.to_encoder()<span class="question-mark">?</span>;
+        <span class="kw">let </span>compressor_id = compressor.id() <span class="kw">as </span>u8;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writer</span> <span class="op">=</span> <span class="ident">BufWriter::new</span>(<span class="ident">stream</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sections_bytes</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>writer = BufWriter::new(stream);
+        <span class="kw">let </span><span class="kw-2">mut </span>sections_bytes = Vec::new();
 
-        <span class="kw">for</span> <span class="ident">section</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">sections</span> {
-            <span class="ident">section</span>.<span class="ident">write</span>(<span class="kw-2">&amp;mut</span> <span class="ident">sections_bytes</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">for </span>section <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.sections {
+            section.write(<span class="kw-2">&amp;mut </span>sections_bytes).<span class="kw">await</span><span class="question-mark">?</span>;
         }
-        <span class="kw">let</span> <span class="ident">flag_bytes</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">flags</span>.<span class="ident">bits</span>().<span class="ident">to_le_bytes</span>();
-        <span class="kw">let</span> <span class="ident">uncompressed_len</span> <span class="op">=</span> <span class="ident">sections_bytes</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">flag_bytes</span>.<span class="ident">len</span>();
-        <span class="comment">// Compress the flags and sections.  Depending on the handshake</span>
-        <span class="comment">// this could use zlib, zstd or snappy</span>
-        <span class="ident">encoder</span>.<span class="ident">write_all</span>(<span class="ident">flag_bytes</span>)<span class="question-mark">?</span>;
-        <span class="ident">encoder</span>.<span class="ident">write_all</span>(<span class="ident">sections_bytes</span>.<span class="ident">as_slice</span>())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">compressed_bytes</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">finish</span>()<span class="question-mark">?</span>;
+        <span class="kw">let </span>flag_bytes = <span class="kw-2">&amp;</span><span class="self">self</span>.flags.bits().to_le_bytes();
+        <span class="kw">let </span>uncompressed_len = sections_bytes.len() + flag_bytes.len();
+        <span class="comment">// Compress the flags and sections.  Depending on the handshake
+        // this could use zlib, zstd or snappy
+        </span>encoder.write_all(flag_bytes)<span class="question-mark">?</span>;
+        encoder.write_all(sections_bytes.as_slice())<span class="question-mark">?</span>;
+        <span class="kw">let </span>compressed_bytes = encoder.finish()<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">total_length</span> <span class="op">=</span> <span class="ident">Header::LENGTH</span>
-            <span class="op">+</span> <span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>()
-            <span class="op">+</span> <span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>()
-            <span class="op">+</span> <span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>()
-            <span class="op">+</span> <span class="ident">compressed_bytes</span>.<span class="ident">len</span>();
+        <span class="kw">let </span>total_length = Header::LENGTH
+            + std::mem::size_of::&lt;i32&gt;()
+            + std::mem::size_of::&lt;i32&gt;()
+            + std::mem::size_of::&lt;u8&gt;()
+            + compressed_bytes.len();
 
-        <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">Header</span> {
-            <span class="ident">length</span>: <span class="ident">total_length</span> <span class="kw">as</span> <span class="ident">i32</span>,
-            <span class="ident">request_id</span>: <span class="self">self</span>.<span class="ident">request_id</span>.<span class="ident">unwrap_or_else</span>(<span class="ident"><span class="kw">super</span>::util::next_request_id</span>),
-            <span class="ident">response_to</span>: <span class="self">self</span>.<span class="ident">response_to</span>,
-            <span class="ident">op_code</span>: <span class="ident">OpCode::Compressed</span>,
+        <span class="kw">let </span>header = Header {
+            length: total_length <span class="kw">as </span>i32,
+            request_id: <span class="self">self</span>.request_id.unwrap_or_else(<span class="kw">super</span>::util::next_request_id),
+            response_to: <span class="self">self</span>.response_to,
+            op_code: OpCode::Compressed,
         };
 
-        <span class="comment">// Write header</span>
-        <span class="ident">header</span>.<span class="ident">write_to</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writer</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="comment">// Write original (pre-compressed) opcode (always OP_MSG)</span>
-        <span class="ident">writer</span>.<span class="ident">write_i32_le</span>(<span class="ident">OpCode::Message</span> <span class="kw">as</span> <span class="ident">i32</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="comment">// Write uncompressed size</span>
-        <span class="ident">writer</span>.<span class="ident">write_i32_le</span>(<span class="ident">uncompressed_len</span> <span class="kw">as</span> <span class="ident">i32</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="comment">// Write compressor id</span>
-        <span class="ident">writer</span>.<span class="ident">write_u8</span>(<span class="ident">compressor_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="comment">// Write compressed message</span>
-        <span class="ident">writer</span>.<span class="ident">write_all</span>(<span class="ident">compressed_bytes</span>.<span class="ident">as_slice</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="comment">// Write header
+        </span>header.write_to(<span class="kw-2">&amp;mut </span>writer).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="comment">// Write original (pre-compressed) opcode (always OP_MSG)
+        </span>writer.write_i32_le(OpCode::Message <span class="kw">as </span>i32).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="comment">// Write uncompressed size
+        </span>writer.write_i32_le(uncompressed_len <span class="kw">as </span>i32).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="comment">// Write compressor id
+        </span>writer.write_u8(compressor_id).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="comment">// Write compressed message
+        </span>writer.write_all(compressed_bytes.as_slice()).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="ident">writer</span>.<span class="ident">flush</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+        writer.flush().<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">const</span> <span class="ident">DEFAULT_MAX_MESSAGE_SIZE_BYTES</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">48</span> <span class="op">*</span> <span class="number">1024</span> <span class="op">*</span> <span class="number">1024</span>;
+<span class="kw">const </span>DEFAULT_MAX_MESSAGE_SIZE_BYTES: i32 = <span class="number">48 </span>* <span class="number">1024 </span>* <span class="number">1024</span>;
 
-<span class="macro">bitflags!</span> {
-    <span class="doccomment">/// Represents the bitwise flags for an OP_MSG as defined in the spec.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">MessageFlags</span>: <span class="ident">u32</span> {
-        <span class="kw">const</span> <span class="ident">CHECKSUM_PRESENT</span> <span class="op">=</span> <span class="number">0b_0000_0000_0000_0000_0000_0000_0000_0001</span>;
-        <span class="kw">const</span> <span class="ident">MORE_TO_COME</span>     <span class="op">=</span> <span class="number">0b_0000_0000_0000_0000_0000_0000_0000_0010</span>;
-        <span class="kw">const</span> <span class="ident">EXHAUST_ALLOWED</span>  <span class="op">=</span> <span class="number">0b_0000_0000_0000_0001_0000_0000_0000_0000</span>;
+<span class="macro">bitflags! </span>{
+    <span class="doccomment">/// Represents the bitwise flags for an OP_MSG as defined in the spec.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>MessageFlags: u32 {
+        <span class="kw">const </span>CHECKSUM_PRESENT = <span class="number">0b_0000_0000_0000_0000_0000_0000_0000_0001</span>;
+        <span class="kw">const </span>MORE_TO_COME     = <span class="number">0b_0000_0000_0000_0000_0000_0000_0000_0010</span>;
+        <span class="kw">const </span>EXHAUST_ALLOWED  = <span class="number">0b_0000_0000_0000_0001_0000_0000_0000_0000</span>;
     }
 }
 
-<span class="doccomment">/// Represents a section as defined by the OP_MSG spec.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">MessageSection</span> {
-    <span class="ident">Document</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>),
-    <span class="ident">Sequence</span> {
-        <span class="ident">size</span>: <span class="ident">i32</span>,
-        <span class="ident">identifier</span>: <span class="ident">String</span>,
-        <span class="ident">documents</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Represents a section as defined by the OP_MSG spec.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>MessageSection {
+    Document(Vec&lt;u8&gt;),
+    Sequence {
+        size: i32,
+        identifier: String,
+        documents: Vec&lt;Vec&lt;u8&gt;&gt;,
     },
 }
 
-<span class="kw">impl</span> <span class="ident">MessageSection</span> {
-    <span class="doccomment">/// Reads bytes from `reader` and deserializes them into a MessageSection.</span>
-    <span class="kw">fn</span> <span class="ident">read</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;mut</span> <span class="ident">R</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">payload_type</span> <span class="op">=</span> <span class="ident">reader</span>.<span class="ident">read_u8_sync</span>()<span class="question-mark">?</span>;
+<span class="kw">impl </span>MessageSection {
+    <span class="doccomment">/// Reads bytes from `reader` and deserializes them into a MessageSection.
+    </span><span class="kw">fn </span>read&lt;R: Read&gt;(reader: <span class="kw-2">&amp;mut </span>R) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>payload_type = reader.read_u8_sync()<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="ident">payload_type</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">MessageSection::Document</span>(<span class="ident">bson_util::read_document_bytes</span>(
-                <span class="ident">reader</span>,
+        <span class="kw">if </span>payload_type == <span class="number">0 </span>{
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(MessageSection::Document(bson_util::read_document_bytes(
+                reader,
             )<span class="question-mark">?</span>));
         }
 
-        <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">reader</span>.<span class="ident">read_i32_sync</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">length_remaining</span> <span class="op">=</span> <span class="ident">size</span> <span class="op">-</span> <span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="ident">i32</span>;
+        <span class="kw">let </span>size = reader.read_i32_sync()<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>length_remaining = size - std::mem::size_of::&lt;i32&gt;() <span class="kw">as </span>i32;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">identifier</span> <span class="op">=</span> <span class="ident">String::new</span>();
-        <span class="ident">length_remaining</span> <span class="op">-</span><span class="op">=</span> <span class="ident">reader</span>.<span class="ident">read_to_string</span>(<span class="kw-2">&amp;mut</span> <span class="ident">identifier</span>)<span class="question-mark">?</span> <span class="kw">as</span> <span class="ident">i32</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>identifier = String::new();
+        length_remaining -= reader.read_to_string(<span class="kw-2">&amp;mut </span>identifier)<span class="question-mark">? </span><span class="kw">as </span>i32;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">documents</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">count_reader</span> <span class="op">=</span> <span class="ident">SyncCountReader::new</span>(<span class="ident">reader</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>documents = Vec::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>count_reader = SyncCountReader::new(reader);
 
-        <span class="kw">while</span> <span class="ident">length_remaining</span> <span class="op">&gt;</span> <span class="ident">count_reader</span>.<span class="ident">bytes_read</span>() <span class="kw">as</span> <span class="ident">i32</span> {
-            <span class="ident">documents</span>.<span class="ident">push</span>(<span class="ident">bson_util::read_document_bytes</span>(<span class="kw-2">&amp;mut</span> <span class="ident">count_reader</span>)<span class="question-mark">?</span>);
+        <span class="kw">while </span>length_remaining &gt; count_reader.bytes_read() <span class="kw">as </span>i32 {
+            documents.push(bson_util::read_document_bytes(<span class="kw-2">&amp;mut </span>count_reader)<span class="question-mark">?</span>);
         }
 
-        <span class="kw">if</span> <span class="ident">length_remaining</span> <span class="op">!</span><span class="op">=</span> <span class="ident">count_reader</span>.<span class="ident">bytes_read</span>() <span class="kw">as</span> <span class="ident">i32</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::InvalidResponse</span> {
-                <span class="ident">message</span>: <span class="macro">format!</span>(
+        <span class="kw">if </span>length_remaining != count_reader.bytes_read() <span class="kw">as </span>i32 {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(ErrorKind::InvalidResponse {
+                message: <span class="macro">format!</span>(
                     <span class="string">&quot;The server indicated that the reply would be {} bytes long, but it instead \
                      was {}&quot;</span>,
-                    <span class="ident">size</span>,
-                    <span class="ident">length_remaining</span> <span class="op">+</span> <span class="ident">count_reader</span>.<span class="ident">bytes_read</span>() <span class="kw">as</span> <span class="ident">i32</span>,
+                    size,
+                    length_remaining + count_reader.bytes_read() <span class="kw">as </span>i32,
                 ),
             }
-            .<span class="ident">into</span>());
+            .into());
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">MessageSection::Sequence</span> {
-            <span class="ident">size</span>,
-            <span class="ident">identifier</span>,
-            <span class="ident">documents</span>,
+        <span class="prelude-val">Ok</span>(MessageSection::Sequence {
+            size,
+            identifier,
+            documents,
         })
     }
 
-    <span class="doccomment">/// Serializes the MessageSection to bytes and writes them to `writer`.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">write</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">writer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Document</span>(<span class="ident">doc</span>) =&gt; {
-                <span class="comment">// Write payload type.</span>
-                <span class="ident">writer</span>.<span class="ident">write_u8</span>(<span class="number">0</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="ident">writer</span>.<span class="ident">write_all</span>(<span class="ident">doc</span>.<span class="ident">as_slice</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="doccomment">/// Serializes the MessageSection to bytes and writes them to `writer`.
+    </span><span class="kw">async fn </span>write&lt;W: AsyncWrite + Unpin + Send&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, writer: <span class="kw-2">&amp;mut </span>W) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Document(doc) =&gt; {
+                <span class="comment">// Write payload type.
+                </span>writer.write_u8(<span class="number">0</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                writer.write_all(doc.as_slice()).<span class="kw">await</span><span class="question-mark">?</span>;
             }
-            <span class="ident"><span class="self">Self</span>::Sequence</span> {
-                <span class="ident">size</span>,
-                <span class="ident">identifier</span>,
-                <span class="ident">documents</span>,
+            <span class="self">Self</span>::Sequence {
+                size,
+                identifier,
+                documents,
             } =&gt; {
-                <span class="comment">// Write payload type.</span>
-                <span class="ident">writer</span>.<span class="ident">write_u8</span>(<span class="number">1</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="comment">// Write payload type.
+                </span>writer.write_u8(<span class="number">1</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-                <span class="ident">writer</span>.<span class="ident">write_i32_le</span>(<span class="kw-2">*</span><span class="ident">size</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="ident"><span class="kw">super</span>::util::write_cstring</span>(<span class="ident">writer</span>, <span class="ident">identifier</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                writer.write_i32_le(<span class="kw-2">*</span>size).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">super</span>::util::write_cstring(writer, identifier).<span class="kw">await</span><span class="question-mark">?</span>;
 
-                <span class="kw">for</span> <span class="ident">doc</span> <span class="kw">in</span> <span class="ident">documents</span> {
-                    <span class="ident">writer</span>.<span class="ident">write_all</span>(<span class="ident">doc</span>.<span class="ident">as_slice</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">for </span>doc <span class="kw">in </span>documents {
+                    writer.write_all(doc.as_slice()).<span class="kw">await</span><span class="question-mark">?</span>;
                 }
             }
         }
@@ -811,4 +811,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

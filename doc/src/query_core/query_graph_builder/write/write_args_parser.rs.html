@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_graph_builder/write/write_args_parser.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>write_args_parser.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../query_core/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_graph_builder/write/write_args_parser.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>write_args_parser.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../query_core/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -237,244 +237,244 @@
 <span id="237">237</span>
 <span id="238">238</span>
 <span id="239">239</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::query_document</span>::{<span class="ident">ParsedInputMap</span>, <span class="ident">ParsedInputValue</span>};
-<span class="kw">use</span> <span class="ident">connector</span>::{<span class="ident">DatasourceFieldName</span>, <span class="ident">WriteArgs</span>, <span class="ident">WriteOperation</span>};
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{
-    <span class="ident">CompositeFieldRef</span>, <span class="ident">Field</span>, <span class="ident">ModelRef</span>, <span class="ident">PrismaValue</span>, <span class="ident">RelationFieldRef</span>, <span class="ident">ScalarFieldRef</span>, <span class="ident">TypeIdentifier</span>,
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::query_document::{ParsedInputMap, ParsedInputValue};
+<span class="kw">use </span>connector::{DatasourceFieldName, WriteArgs, WriteOperation};
+<span class="kw">use </span>prisma_models::{
+    CompositeFieldRef, Field, ModelRef, PrismaValue, RelationFieldRef, ScalarFieldRef, TypeIdentifier,
 };
-<span class="kw">use</span> <span class="ident">schema_builder::constants</span>::{<span class="ident">args</span>, <span class="ident">json_null</span>, <span class="ident">operations</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::TryInto</span>, <span class="ident">sync::Arc</span>};
+<span class="kw">use </span>schema_builder::constants::{args, json_null, operations};
+<span class="kw">use </span>std::{convert::TryInto, sync::Arc};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WriteArgsParser</span> {
-    <span class="kw">pub</span> <span class="ident">args</span>: <span class="ident">WriteArgs</span>,
-    <span class="kw">pub</span> <span class="ident">nested</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">RelationFieldRef</span>, <span class="ident">ParsedInputMap</span>)<span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>WriteArgsParser {
+    <span class="kw">pub </span>args: WriteArgs,
+    <span class="kw">pub </span>nested: Vec&lt;(RelationFieldRef, ParsedInputMap)&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">WriteArgsParser</span> {
-    <span class="doccomment">/// Creates a new set of WriteArgsParser. Expects the parsed input map from the respective data key, not the enclosing map.</span>
-    <span class="doccomment">/// E.g.: { data: { THIS MAP } } from the `data` argument of a write query.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>, <span class="ident">data_map</span>: <span class="ident">ParsedInputMap</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">data_map</span>.<span class="ident">into_iter</span>().<span class="ident">try_fold</span>(
-            <span class="ident">WriteArgsParser</span> {
-                <span class="ident">args</span>: <span class="ident">WriteArgs::new_empty</span>(<span class="ident"><span class="kw">crate</span>::executor::get_request_now</span>()),
-                <span class="ident">nested</span>: <span class="ident">Default::default</span>(),
+<span class="kw">impl </span>WriteArgsParser {
+    <span class="doccomment">/// Creates a new set of WriteArgsParser. Expects the parsed input map from the respective data key, not the enclosing map.
+    /// E.g.: { data: { THIS MAP } } from the `data` argument of a write query.
+    </span><span class="kw">pub fn </span>from(model: <span class="kw-2">&amp;</span>ModelRef, data_map: ParsedInputMap) -&gt; QueryGraphBuilderResult&lt;<span class="self">Self</span>&gt; {
+        data_map.into_iter().try_fold(
+            WriteArgsParser {
+                args: WriteArgs::new_empty(<span class="kw">crate</span>::executor::get_request_now()),
+                nested: Default::default(),
             },
-            <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">args</span>, (<span class="ident">k</span>, <span class="ident">v</span>): (<span class="ident">String</span>, <span class="ident">ParsedInputValue</span>)<span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">find_from_all</span>(<span class="kw-2">&amp;</span><span class="ident">k</span>).<span class="ident">unwrap</span>();
+            |<span class="kw-2">mut </span>args, (k, v): (String, ParsedInputValue)| {
+                <span class="kw">let </span>field = model.fields().find_from_all(<span class="kw-2">&amp;</span>k).unwrap();
 
-                <span class="kw">match</span> <span class="ident">field</span> {
-                    <span class="ident">Field::Scalar</span>(<span class="ident">sf</span>) <span class="kw">if</span> <span class="ident">sf</span>.<span class="ident">is_list</span>() =&gt; {
-                        <span class="kw">let</span> <span class="ident">write_op</span> <span class="op">=</span> <span class="ident">parse_scalar_list</span>(<span class="ident">v</span>)<span class="question-mark">?</span>;
+                <span class="kw">match </span>field {
+                    Field::Scalar(sf) <span class="kw">if </span>sf.is_list() =&gt; {
+                        <span class="kw">let </span>write_op = parse_scalar_list(v)<span class="question-mark">?</span>;
 
-                        <span class="ident">args</span>.<span class="ident">args</span>.<span class="ident">insert</span>(<span class="ident">sf</span>, <span class="ident">write_op</span>);
+                        args.args.insert(sf, write_op);
                     }
-                    <span class="ident">Field::Scalar</span>(<span class="ident">sf</span>) =&gt; {
-                        <span class="kw">let</span> <span class="ident">write_op</span>: <span class="ident">WriteOperation</span> <span class="op">=</span> <span class="ident">parse_scalar</span>(<span class="ident">sf</span>, <span class="ident">v</span>)<span class="question-mark">?</span>;
+                    Field::Scalar(sf) =&gt; {
+                        <span class="kw">let </span>write_op: WriteOperation = parse_scalar(sf, v)<span class="question-mark">?</span>;
 
-                        <span class="ident">args</span>.<span class="ident">args</span>.<span class="ident">insert</span>(<span class="ident">sf</span>, <span class="ident">write_op</span>)
+                        args.args.insert(sf, write_op)
                     }
 
-                    <span class="ident">Field::Relation</span>(<span class="kw-2">ref</span> <span class="ident">rf</span>) =&gt; <span class="kw">match</span> <span class="ident">v</span> {
-                        <span class="ident">ParsedInputValue::Single</span>(<span class="ident">PrismaValue::Null</span>) =&gt; (),
-                        <span class="kw">_</span> =&gt; <span class="ident">args</span>.<span class="ident">nested</span>.<span class="ident">push</span>((<span class="ident">Arc::clone</span>(<span class="ident">rf</span>), <span class="ident">v</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>)),
+                    Field::Relation(<span class="kw-2">ref </span>rf) =&gt; <span class="kw">match </span>v {
+                        ParsedInputValue::Single(PrismaValue::Null) =&gt; (),
+                        <span class="kw">_ </span>=&gt; args.nested.push((Arc::clone(rf), v.try_into()<span class="question-mark">?</span>)),
                     },
 
-                    <span class="ident">Field::Composite</span>(<span class="ident">cf</span>) =&gt; {
-                        <span class="kw">let</span> <span class="ident">write_op</span> <span class="op">=</span> <span class="ident">parse_composite_writes</span>(<span class="ident">cf</span>, <span class="ident">v</span>, <span class="kw-2">&amp;mut</span> <span class="macro">vec!</span>[])<span class="question-mark">?</span>;
+                    Field::Composite(cf) =&gt; {
+                        <span class="kw">let </span>write_op = parse_composite_writes(cf, v, <span class="kw-2">&amp;mut </span><span class="macro">vec!</span>[])<span class="question-mark">?</span>;
 
-                        <span class="ident">args</span>.<span class="ident">args</span>.<span class="ident">insert</span>(<span class="ident">cf</span>, <span class="ident">write_op</span>)
+                        args.args.insert(cf, write_op)
                     }
                 };
 
-                <span class="prelude-val">Ok</span>(<span class="ident">args</span>)
+                <span class="prelude-val">Ok</span>(args)
             },
         )
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parse_scalar</span>(<span class="ident">sf</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>, <span class="ident">v</span>: <span class="ident">ParsedInputValue</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">WriteOperation</span>, <span class="ident">QueryGraphBuilderError</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">v</span> {
-        <span class="ident">ParsedInputValue::Single</span>(<span class="ident">PrismaValue::Enum</span>(<span class="ident">e</span>)) <span class="kw">if</span> <span class="ident">sf</span>.<span class="ident">type_identifier</span> <span class="op">==</span> <span class="ident">TypeIdentifier::Json</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">e</span>.<span class="ident">as_str</span>() {
-                <span class="ident">json_null::DB_NULL</span> =&gt; <span class="ident">PrismaValue::Null</span>,
-                <span class="ident">json_null::JSON_NULL</span> =&gt; <span class="ident">PrismaValue::Json</span>(<span class="string">&quot;null&quot;</span>.<span class="ident">to_owned</span>()),
-                <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(), <span class="comment">// Validation guarantees correct enum values.</span>
+<span class="kw">fn </span>parse_scalar(sf: <span class="kw-2">&amp;</span>ScalarFieldRef, v: ParsedInputValue) -&gt; <span class="prelude-ty">Result</span>&lt;WriteOperation, QueryGraphBuilderError&gt; {
+    <span class="kw">match </span>v {
+        ParsedInputValue::Single(PrismaValue::Enum(e)) <span class="kw">if </span>sf.type_identifier == TypeIdentifier::Json =&gt; {
+            <span class="kw">let </span>val = <span class="kw">match </span>e.as_str() {
+                json_null::DB_NULL =&gt; PrismaValue::Null,
+                json_null::JSON_NULL =&gt; PrismaValue::Json(<span class="string">&quot;null&quot;</span>.to_owned()),
+                <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(), <span class="comment">// Validation guarantees correct enum values.
+            </span>};
+
+            <span class="prelude-val">Ok</span>(WriteOperation::scalar_set(val))
+        }
+        ParsedInputValue::Single(v) =&gt; <span class="prelude-val">Ok</span>(WriteOperation::scalar_set(v)),
+        ParsedInputValue::Map(map) =&gt; {
+            <span class="kw">let </span>(operation, value) = map.into_iter().next().unwrap();
+            <span class="kw">let </span>value: PrismaValue = value.try_into()<span class="question-mark">?</span>;
+
+            <span class="kw">let </span>write_op = <span class="kw">match </span>operation.as_str() {
+                operations::SET =&gt; WriteOperation::scalar_set(value),
+                operations::UNSET =&gt; WriteOperation::scalar_unset(<span class="kw-2">*</span>value.as_boolean().unwrap()),
+                operations::INCREMENT =&gt; WriteOperation::scalar_add(value),
+                operations::DECREMENT =&gt; WriteOperation::scalar_substract(value),
+                operations::MULTIPLY =&gt; WriteOperation::scalar_multiply(value),
+                operations::DIVIDE =&gt; WriteOperation::scalar_divide(value),
+                <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Invalid update operation&quot;</span>),
             };
 
-            <span class="prelude-val">Ok</span>(<span class="ident">WriteOperation::scalar_set</span>(<span class="ident">val</span>))
+            <span class="prelude-val">Ok</span>(write_op)
         }
-        <span class="ident">ParsedInputValue::Single</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">WriteOperation::scalar_set</span>(<span class="ident">v</span>)),
-        <span class="ident">ParsedInputValue::Map</span>(<span class="ident">map</span>) =&gt; {
-            <span class="kw">let</span> (<span class="ident">operation</span>, <span class="ident">value</span>) <span class="op">=</span> <span class="ident">map</span>.<span class="ident">into_iter</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">value</span>: <span class="ident">PrismaValue</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
-
-            <span class="kw">let</span> <span class="ident">write_op</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">operation</span>.<span class="ident">as_str</span>() {
-                <span class="ident">operations::SET</span> =&gt; <span class="ident">WriteOperation::scalar_set</span>(<span class="ident">value</span>),
-                <span class="ident">operations::UNSET</span> =&gt; <span class="ident">WriteOperation::scalar_unset</span>(<span class="kw-2">*</span><span class="ident">value</span>.<span class="ident">as_boolean</span>().<span class="ident">unwrap</span>()),
-                <span class="ident">operations::INCREMENT</span> =&gt; <span class="ident">WriteOperation::scalar_add</span>(<span class="ident">value</span>),
-                <span class="ident">operations::DECREMENT</span> =&gt; <span class="ident">WriteOperation::scalar_substract</span>(<span class="ident">value</span>),
-                <span class="ident">operations::MULTIPLY</span> =&gt; <span class="ident">WriteOperation::scalar_multiply</span>(<span class="ident">value</span>),
-                <span class="ident">operations::DIVIDE</span> =&gt; <span class="ident">WriteOperation::scalar_divide</span>(<span class="ident">value</span>),
-                <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Invalid update operation&quot;</span>),
-            };
-
-            <span class="prelude-val">Ok</span>(<span class="ident">write_op</span>)
-        }
-        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parse_scalar_list</span>(<span class="ident">v</span>: <span class="ident">ParsedInputValue</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">WriteOperation</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">v</span> {
-        <span class="ident">ParsedInputValue::List</span>(<span class="kw">_</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">set_value</span>: <span class="ident">PrismaValue</span> <span class="op">=</span> <span class="ident">v</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
+<span class="kw">fn </span>parse_scalar_list(v: ParsedInputValue) -&gt; QueryGraphBuilderResult&lt;WriteOperation&gt; {
+    <span class="kw">match </span>v {
+        ParsedInputValue::List(<span class="kw">_</span>) =&gt; {
+            <span class="kw">let </span>set_value: PrismaValue = v.try_into()<span class="question-mark">?</span>;
 
-            <span class="prelude-val">Ok</span>(<span class="ident">WriteOperation::scalar_set</span>(<span class="ident">set_value</span>))
+            <span class="prelude-val">Ok</span>(WriteOperation::scalar_set(set_value))
         }
-        <span class="ident">ParsedInputValue::Map</span>(<span class="ident">map</span>) =&gt; <span class="ident">extract_scalar_list_ops</span>(<span class="ident">map</span>),
-        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+        ParsedInputValue::Map(map) =&gt; extract_scalar_list_ops(map),
+        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parse_composite_writes</span>(
-    <span class="ident">cf</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>,
-    <span class="ident">v</span>: <span class="ident">ParsedInputValue</span>,
-    <span class="ident">path</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DatasourceFieldName</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">WriteOperation</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">v</span> {
-        <span class="comment">// Null-set operation.</span>
-        <span class="ident">ParsedInputValue::Single</span>(<span class="ident">PrismaValue::Null</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">WriteOperation::composite_set</span>(<span class="ident">PrismaValue::Null</span>)),
+<span class="kw">fn </span>parse_composite_writes(
+    cf: <span class="kw-2">&amp;</span>CompositeFieldRef,
+    v: ParsedInputValue,
+    path: <span class="kw-2">&amp;mut </span>Vec&lt;DatasourceFieldName&gt;,
+) -&gt; QueryGraphBuilderResult&lt;WriteOperation&gt; {
+    <span class="kw">match </span>v {
+        <span class="comment">// Null-set operation.
+        </span>ParsedInputValue::Single(PrismaValue::Null) =&gt; <span class="prelude-val">Ok</span>(WriteOperation::composite_set(PrismaValue::Null)),
 
-        <span class="comment">// Set list shorthand operation (can only be objects).</span>
-        <span class="ident">ParsedInputValue::List</span>(<span class="kw">_</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">list</span>: <span class="ident">PrismaValue</span> <span class="op">=</span> <span class="ident">v</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
+        <span class="comment">// Set list shorthand operation (can only be objects).
+        </span>ParsedInputValue::List(<span class="kw">_</span>) =&gt; {
+            <span class="kw">let </span>list: PrismaValue = v.try_into()<span class="question-mark">?</span>;
 
-            <span class="prelude-val">Ok</span>(<span class="ident">WriteOperation::composite_set</span>(<span class="ident">list</span>))
+            <span class="prelude-val">Ok</span>(WriteOperation::composite_set(list))
         }
 
-        <span class="comment">// One of:</span>
-        <span class="comment">// - Operation envelope with further actions nested.</span>
-        <span class="comment">// - Single object set shorthand.</span>
-        <span class="ident">ParsedInputValue::Map</span>(<span class="ident">map</span>) =&gt; {
-            <span class="kw">if</span> <span class="ident">map</span>.<span class="ident">is_composite_envelope</span>() {
-                <span class="ident">parse_composite_envelope</span>(<span class="ident">cf</span>, <span class="ident">map</span>, <span class="ident">path</span>)
-            } <span class="kw">else</span> {
-                <span class="kw">let</span> <span class="ident">pv</span>: <span class="ident">PrismaValue</span> <span class="op">=</span> <span class="ident">ParsedInputValue::Map</span>(<span class="ident">map</span>).<span class="ident">try_into</span>()<span class="question-mark">?</span>;
+        <span class="comment">// One of:
+        // - Operation envelope with further actions nested.
+        // - Single object set shorthand.
+        </span>ParsedInputValue::Map(map) =&gt; {
+            <span class="kw">if </span>map.is_composite_envelope() {
+                parse_composite_envelope(cf, map, path)
+            } <span class="kw">else </span>{
+                <span class="kw">let </span>pv: PrismaValue = ParsedInputValue::Map(map).try_into()<span class="question-mark">?</span>;
 
-                <span class="prelude-val">Ok</span>(<span class="ident">WriteOperation::composite_set</span>(<span class="ident">pv</span>))
+                <span class="prelude-val">Ok</span>(WriteOperation::composite_set(pv))
             }
         }
-        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parse_composite_envelope</span>(
-    <span class="ident">cf</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>,
-    <span class="ident">envelope</span>: <span class="ident">ParsedInputMap</span>,
-    <span class="ident">path</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DatasourceFieldName</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">WriteOperation</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">op</span>, <span class="ident">value</span>) <span class="op">=</span> <span class="ident">envelope</span>.<span class="ident">into_iter</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>();
+<span class="kw">fn </span>parse_composite_envelope(
+    cf: <span class="kw-2">&amp;</span>CompositeFieldRef,
+    envelope: ParsedInputMap,
+    path: <span class="kw-2">&amp;mut </span>Vec&lt;DatasourceFieldName&gt;,
+) -&gt; QueryGraphBuilderResult&lt;WriteOperation&gt; {
+    <span class="kw">let </span>(op, value) = envelope.into_iter().next().unwrap();
 
-    <span class="kw">let</span> <span class="ident">write_op</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">op</span>.<span class="ident">as_str</span>() {
-        <span class="comment">// Everything in a set operation can only be plain values, no more nested operations.</span>
-        <span class="ident">operations::SET</span> =&gt; <span class="ident">WriteOperation::composite_set</span>(<span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>),
-        <span class="ident">operations::PUSH</span> =&gt; <span class="ident">WriteOperation::composite_push</span>(<span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>),
-        <span class="ident">operations::UNSET</span> =&gt; <span class="ident">parse_composite_unset</span>(<span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>),
-        <span class="ident">operations::UPDATE</span> =&gt; <span class="ident">parse_composite_updates</span>(<span class="ident">cf</span>, <span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>, <span class="ident">path</span>)<span class="question-mark">?</span>,
-        <span class="ident">operations::UPSERT</span> =&gt; <span class="ident">parse_composite_upsert</span>(<span class="ident">cf</span>, <span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>, <span class="ident">path</span>)<span class="question-mark">?</span>,
-        <span class="ident">operations::UPDATE_MANY</span> =&gt; <span class="ident">parse_composite_update_many</span>(<span class="ident">cf</span>, <span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>, <span class="ident">path</span>)<span class="question-mark">?</span>,
-        <span class="ident">operations::DELETE_MANY</span> =&gt; <span class="ident">parse_composite_delete_many</span>(<span class="ident">cf</span>, <span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>)<span class="question-mark">?</span>,
-        <span class="kw">_</span> =&gt; <span class="macro">unimplemented!</span>(),
+    <span class="kw">let </span>write_op = <span class="kw">match </span>op.as_str() {
+        <span class="comment">// Everything in a set operation can only be plain values, no more nested operations.
+        </span>operations::SET =&gt; WriteOperation::composite_set(value.try_into()<span class="question-mark">?</span>),
+        operations::PUSH =&gt; WriteOperation::composite_push(value.try_into()<span class="question-mark">?</span>),
+        operations::UNSET =&gt; parse_composite_unset(value.try_into()<span class="question-mark">?</span>),
+        operations::UPDATE =&gt; parse_composite_updates(cf, value.try_into()<span class="question-mark">?</span>, path)<span class="question-mark">?</span>,
+        operations::UPSERT =&gt; parse_composite_upsert(cf, value.try_into()<span class="question-mark">?</span>, path)<span class="question-mark">?</span>,
+        operations::UPDATE_MANY =&gt; parse_composite_update_many(cf, value.try_into()<span class="question-mark">?</span>, path)<span class="question-mark">?</span>,
+        operations::DELETE_MANY =&gt; parse_composite_delete_many(cf, value.try_into()<span class="question-mark">?</span>)<span class="question-mark">?</span>,
+        <span class="kw">_ </span>=&gt; <span class="macro">unimplemented!</span>(),
     };
 
-    <span class="prelude-val">Ok</span>(<span class="ident">write_op</span>)
+    <span class="prelude-val">Ok</span>(write_op)
 }
 
-<span class="kw">fn</span> <span class="ident">parse_composite_update_many</span>(
-    <span class="ident">cf</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>,
-    <span class="kw-2">mut</span> <span class="ident">value</span>: <span class="ident">ParsedInputMap</span>,
-    <span class="ident">path</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DatasourceFieldName</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">WriteOperation</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">where_map</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">remove</span>(<span class="ident">args::WHERE</span>).<span class="ident">unwrap</span>().<span class="ident">try_into</span>()<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">extract_filter</span>(<span class="ident">where_map</span>, <span class="kw-2">&amp;</span><span class="ident">cf</span>.<span class="ident">typ</span>)<span class="question-mark">?</span>;
+<span class="kw">fn </span>parse_composite_update_many(
+    cf: <span class="kw-2">&amp;</span>CompositeFieldRef,
+    <span class="kw-2">mut </span>value: ParsedInputMap,
+    path: <span class="kw-2">&amp;mut </span>Vec&lt;DatasourceFieldName&gt;,
+) -&gt; QueryGraphBuilderResult&lt;WriteOperation&gt; {
+    <span class="kw">let </span>where_map: ParsedInputMap = value.remove(args::WHERE).unwrap().try_into()<span class="question-mark">?</span>;
+    <span class="kw">let </span>filter = extract_filter(where_map, <span class="kw-2">&amp;</span>cf.typ)<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">update_map</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">remove</span>(<span class="ident">args::DATA</span>).<span class="ident">unwrap</span>().<span class="ident">try_into</span>()<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">update</span> <span class="op">=</span> <span class="ident">parse_composite_updates</span>(<span class="ident">cf</span>, <span class="ident">update_map</span>, <span class="ident">path</span>)<span class="question-mark">?</span>
-        .<span class="ident">try_into_composite</span>()
-        .<span class="ident">unwrap</span>();
+    <span class="kw">let </span>update_map: ParsedInputMap = value.remove(args::DATA).unwrap().try_into()<span class="question-mark">?</span>;
+    <span class="kw">let </span>update = parse_composite_updates(cf, update_map, path)<span class="question-mark">?
+        </span>.try_into_composite()
+        .unwrap();
 
-    <span class="prelude-val">Ok</span>(<span class="ident">WriteOperation::composite_update_many</span>(<span class="ident">filter</span>, <span class="ident">update</span>))
+    <span class="prelude-val">Ok</span>(WriteOperation::composite_update_many(filter, update))
 }
 
-<span class="kw">fn</span> <span class="ident">parse_composite_delete_many</span>(
-    <span class="ident">cf</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>,
-    <span class="kw-2">mut</span> <span class="ident">value</span>: <span class="ident">ParsedInputMap</span>,
-) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">WriteOperation</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">where_map</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">remove</span>(<span class="ident">args::WHERE</span>).<span class="ident">unwrap</span>().<span class="ident">try_into</span>()<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">extract_filter</span>(<span class="ident">where_map</span>, <span class="kw-2">&amp;</span><span class="ident">cf</span>.<span class="ident">typ</span>)<span class="question-mark">?</span>;
+<span class="kw">fn </span>parse_composite_delete_many(
+    cf: <span class="kw-2">&amp;</span>CompositeFieldRef,
+    <span class="kw-2">mut </span>value: ParsedInputMap,
+) -&gt; QueryGraphBuilderResult&lt;WriteOperation&gt; {
+    <span class="kw">let </span>where_map: ParsedInputMap = value.remove(args::WHERE).unwrap().try_into()<span class="question-mark">?</span>;
+    <span class="kw">let </span>filter = extract_filter(where_map, <span class="kw-2">&amp;</span>cf.typ)<span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>(<span class="ident">WriteOperation::composite_delete_many</span>(<span class="ident">filter</span>))
+    <span class="prelude-val">Ok</span>(WriteOperation::composite_delete_many(filter))
 }
 
-<span class="kw">fn</span> <span class="ident">parse_composite_upsert</span>(
-    <span class="ident">cf</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>,
-    <span class="kw-2">mut</span> <span class="ident">value</span>: <span class="ident">ParsedInputMap</span>,
-    <span class="ident">path</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DatasourceFieldName</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">WriteOperation</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">set</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">remove</span>(<span class="ident">operations::SET</span>).<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">set</span> <span class="op">=</span> <span class="ident">parse_composite_writes</span>(<span class="ident">cf</span>, <span class="ident">set</span>, <span class="ident">path</span>)<span class="question-mark">?</span>.<span class="ident">try_into_composite</span>().<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">update</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">remove</span>(<span class="ident">operations::UPDATE</span>).<span class="ident">unwrap</span>().<span class="ident">try_into</span>()<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">update</span> <span class="op">=</span> <span class="ident">parse_composite_updates</span>(<span class="ident">cf</span>, <span class="ident">update</span>, <span class="ident">path</span>)<span class="question-mark">?</span>.<span class="ident">try_into_composite</span>().<span class="ident">unwrap</span>();
+<span class="kw">fn </span>parse_composite_upsert(
+    cf: <span class="kw-2">&amp;</span>CompositeFieldRef,
+    <span class="kw-2">mut </span>value: ParsedInputMap,
+    path: <span class="kw-2">&amp;mut </span>Vec&lt;DatasourceFieldName&gt;,
+) -&gt; QueryGraphBuilderResult&lt;WriteOperation&gt; {
+    <span class="kw">let </span>set = value.remove(operations::SET).unwrap();
+    <span class="kw">let </span>set = parse_composite_writes(cf, set, path)<span class="question-mark">?</span>.try_into_composite().unwrap();
+    <span class="kw">let </span>update: ParsedInputMap = value.remove(operations::UPDATE).unwrap().try_into()<span class="question-mark">?</span>;
+    <span class="kw">let </span>update = parse_composite_updates(cf, update, path)<span class="question-mark">?</span>.try_into_composite().unwrap();
 
-    <span class="prelude-val">Ok</span>(<span class="ident">WriteOperation::composite_upsert</span>(<span class="ident">set</span>, <span class="ident">update</span>))
+    <span class="prelude-val">Ok</span>(WriteOperation::composite_upsert(set, update))
 }
 
-<span class="kw">fn</span> <span class="ident">parse_composite_unset</span>(<span class="ident">pv</span>: <span class="ident">PrismaValue</span>) -&gt; <span class="ident">WriteOperation</span> {
-    <span class="kw">let</span> <span class="ident">should_unset</span> <span class="op">=</span> <span class="ident">pv</span>.<span class="ident">as_boolean</span>().<span class="ident">unwrap</span>();
+<span class="kw">fn </span>parse_composite_unset(pv: PrismaValue) -&gt; WriteOperation {
+    <span class="kw">let </span>should_unset = pv.as_boolean().unwrap();
 
-    <span class="ident">WriteOperation::composite_unset</span>(<span class="kw-2">*</span><span class="ident">should_unset</span>)
+    WriteOperation::composite_unset(<span class="kw-2">*</span>should_unset)
 }
 
-<span class="kw">fn</span> <span class="ident">parse_composite_updates</span>(
-    <span class="ident">cf</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeFieldRef</span>,
-    <span class="ident">map</span>: <span class="ident">ParsedInputMap</span>,
-    <span class="ident">path</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">DatasourceFieldName</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">WriteOperation</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writes</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+<span class="kw">fn </span>parse_composite_updates(
+    cf: <span class="kw-2">&amp;</span>CompositeFieldRef,
+    map: ParsedInputMap,
+    path: <span class="kw-2">&amp;mut </span>Vec&lt;DatasourceFieldName&gt;,
+) -&gt; QueryGraphBuilderResult&lt;WriteOperation&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>writes = <span class="macro">vec!</span>[];
 
-    <span class="kw">for</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="kw">in</span> <span class="ident">map</span> {
-        <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">cf</span>.<span class="ident">typ</span>.<span class="ident">find_field</span>(<span class="kw-2">&amp;</span><span class="ident">k</span>).<span class="ident">unwrap</span>();
+    <span class="kw">for </span>(k, v) <span class="kw">in </span>map {
+        <span class="kw">let </span>field = cf.typ.find_field(<span class="kw-2">&amp;</span>k).unwrap();
 
-        <span class="kw">let</span> <span class="ident">field_name</span>: <span class="ident">DatasourceFieldName</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">field</span> {
-            <span class="ident">Field::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="ident">sf</span>.<span class="ident">into</span>(),
-            <span class="ident">Field::Composite</span>(<span class="ident">cf</span>) =&gt; <span class="ident">cf</span>.<span class="ident">into</span>(),
-            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+        <span class="kw">let </span>field_name: DatasourceFieldName = <span class="kw">match </span>field {
+            Field::Scalar(sf) =&gt; sf.into(),
+            Field::Composite(cf) =&gt; cf.into(),
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
         };
 
-        <span class="kw">let</span> <span class="ident">write_op</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">field</span> {
-            <span class="ident">Field::Scalar</span>(<span class="ident">sf</span>) <span class="kw">if</span> <span class="ident">sf</span>.<span class="ident">is_list</span>() =&gt; <span class="ident">parse_scalar_list</span>(<span class="ident">v</span>),
-            <span class="ident">Field::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="ident">parse_scalar</span>(<span class="kw-2">&amp;</span><span class="ident">sf</span>, <span class="ident">v</span>),
-            <span class="ident">Field::Composite</span>(<span class="ident">cf</span>) =&gt; <span class="ident">parse_composite_writes</span>(<span class="kw-2">&amp;</span><span class="ident">cf</span>, <span class="ident">v</span>, <span class="kw-2">&amp;mut</span> <span class="ident">path</span>.<span class="ident">clone</span>()),
-            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+        <span class="kw">let </span>write_op = <span class="kw">match </span>field {
+            Field::Scalar(sf) <span class="kw">if </span>sf.is_list() =&gt; parse_scalar_list(v),
+            Field::Scalar(sf) =&gt; parse_scalar(<span class="kw-2">&amp;</span>sf, v),
+            Field::Composite(cf) =&gt; parse_composite_writes(<span class="kw-2">&amp;</span>cf, v, <span class="kw-2">&amp;mut </span>path.clone()),
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
         }<span class="question-mark">?</span>;
 
-        <span class="ident">writes</span>.<span class="ident">push</span>((<span class="ident">field_name</span>, <span class="ident">write_op</span>));
+        writes.push((field_name, write_op));
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">WriteOperation::composite_update</span>(<span class="ident">writes</span>))
+    <span class="prelude-val">Ok</span>(WriteOperation::composite_update(writes))
 }
 
-<span class="kw">fn</span> <span class="ident">extract_scalar_list_ops</span>(<span class="ident">map</span>: <span class="ident">ParsedInputMap</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">WriteOperation</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">operation</span>, <span class="ident">value</span>) <span class="op">=</span> <span class="ident">map</span>.<span class="ident">into_iter</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">pv</span>: <span class="ident">PrismaValue</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
+<span class="kw">fn </span>extract_scalar_list_ops(map: ParsedInputMap) -&gt; QueryGraphBuilderResult&lt;WriteOperation&gt; {
+    <span class="kw">let </span>(operation, value) = map.into_iter().next().unwrap();
+    <span class="kw">let </span>pv: PrismaValue = value.try_into()<span class="question-mark">?</span>;
 
-    <span class="kw">match</span> <span class="ident">operation</span>.<span class="ident">as_str</span>() {
-        <span class="ident">operations::SET</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">WriteOperation::scalar_set</span>(<span class="ident">pv</span>)),
-        <span class="ident">operations::PUSH</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">WriteOperation::scalar_add</span>(<span class="ident">pv</span>)),
-        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Invalid scalar list operation&quot;</span>),
+    <span class="kw">match </span>operation.as_str() {
+        operations::SET =&gt; <span class="prelude-val">Ok</span>(WriteOperation::scalar_set(pv)),
+        operations::PUSH =&gt; <span class="prelude-val">Ok</span>(WriteOperation::scalar_add(pv)),
+        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Invalid scalar list operation&quot;</span>),
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

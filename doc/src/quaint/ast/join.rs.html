@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/08831df/src/ast/join.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>join.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../quaint/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/08831df/src/ast/join.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>join.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../quaint/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -93,100 +93,100 @@
 <span id="93">93</span>
 <span id="94">94</span>
 <span id="95">95</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ast</span>::{<span class="ident">ConditionTree</span>, <span class="ident">Table</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::{ConditionTree, Table};
 
-<span class="doccomment">/// The `JOIN` table and conditions.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">JoinData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">table</span>: <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">conditions</span>: <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="doccomment">/// The `JOIN` table and conditions.
+</span><span class="attribute">#[derive(Debug, PartialEq, Clone)]
+</span><span class="kw">pub struct </span>JoinData&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) table: Table&lt;<span class="lifetime">&#39;a</span>&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) conditions: ConditionTree&lt;<span class="lifetime">&#39;a</span>&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">JoinData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Implement a join with no conditions.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">all_from</span>(<span class="ident">table</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">table</span>: <span class="ident">table</span>.<span class="ident">into</span>(),
-            <span class="ident">conditions</span>: <span class="ident">ConditionTree::NoCondition</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; JoinData&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Implement a join with no conditions.
+    </span><span class="kw">pub fn </span>all_from(table: <span class="kw">impl </span>Into&lt;Table&lt;<span class="lifetime">&#39;a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            table: table.into(),
+            conditions: ConditionTree::NoCondition,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">JoinData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; From&lt;T&gt; <span class="kw">for </span>JoinData&lt;<span class="lifetime">&#39;a</span>&gt;
+<span class="kw">where
+    </span>T: Into&lt;Table&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">table</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::all_from</span>(<span class="ident">table</span>)
+    <span class="kw">fn </span>from(table: T) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::all_from(table)
     }
 }
 
-<span class="doccomment">/// A representation of a `JOIN` statement.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Join</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Implements an `INNER JOIN` with given `JoinData`.</span>
-    <span class="ident">Inner</span>(<span class="ident">JoinData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
-    <span class="doccomment">/// Implements an `LEFT JOIN` with given `JoinData`.</span>
-    <span class="ident">Left</span>(<span class="ident">JoinData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
-    <span class="doccomment">/// Implements an `RIGHT JOIN` with given `JoinData`.</span>
-    <span class="ident">Right</span>(<span class="ident">JoinData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
-    <span class="doccomment">/// Implements an `FULL JOIN` with given `JoinData`.</span>
-    <span class="ident">Full</span>(<span class="ident">JoinData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
+<span class="doccomment">/// A representation of a `JOIN` statement.
+</span><span class="attribute">#[derive(Debug, PartialEq, Clone)]
+</span><span class="kw">pub enum </span>Join&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Implements an `INNER JOIN` with given `JoinData`.
+    </span>Inner(JoinData&lt;<span class="lifetime">&#39;a</span>&gt;),
+    <span class="doccomment">/// Implements an `LEFT JOIN` with given `JoinData`.
+    </span>Left(JoinData&lt;<span class="lifetime">&#39;a</span>&gt;),
+    <span class="doccomment">/// Implements an `RIGHT JOIN` with given `JoinData`.
+    </span>Right(JoinData&lt;<span class="lifetime">&#39;a</span>&gt;),
+    <span class="doccomment">/// Implements an `FULL JOIN` with given `JoinData`.
+    </span>Full(JoinData&lt;<span class="lifetime">&#39;a</span>&gt;),
 }
 
-<span class="doccomment">/// An item that can be joined.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Joinable</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Add the `JOIN` conditions.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {</span>
-    <span class="doccomment">/// let join_data = &quot;b&quot;.on((&quot;b&quot;, &quot;id&quot;).equals(Column::from((&quot;a&quot;, &quot;id&quot;))));</span>
-    <span class="doccomment">/// let query = Select::from_table(&quot;a&quot;).inner_join(join_data);</span>
-    <span class="doccomment">/// let (sql, _) = Sqlite::build(query)?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     &quot;SELECT `a`.* FROM `a` INNER JOIN `b` ON `b`.`id` = `a`.`id`&quot;,</span>
-    <span class="doccomment">///     sql,</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">on</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">conditions</span>: <span class="ident">T</span>) -&gt; <span class="ident">JoinData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="doccomment">/// An item that can be joined.
+</span><span class="kw">pub trait </span>Joinable&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Add the `JOIN` conditions.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {
+    /// let join_data = &quot;b&quot;.on((&quot;b&quot;, &quot;id&quot;).equals(Column::from((&quot;a&quot;, &quot;id&quot;))));
+    /// let query = Select::from_table(&quot;a&quot;).inner_join(join_data);
+    /// let (sql, _) = Sqlite::build(query)?;
+    ///
+    /// assert_eq!(
+    ///     &quot;SELECT `a`.* FROM `a` INNER JOIN `b` ON `b`.`id` = `a`.`id`&quot;,
+    ///     sql,
+    /// );
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">fn </span>on&lt;T&gt;(<span class="self">self</span>, conditions: T) -&gt; JoinData&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span>T: Into&lt;ConditionTree&lt;<span class="lifetime">&#39;a</span>&gt;&gt;;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">U</span><span class="op">&gt;</span> <span class="ident">Joinable</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">U</span>
-<span class="kw">where</span>
-    <span class="ident">U</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, U&gt; Joinable&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>U
+<span class="kw">where
+    </span>U: Into&lt;Table&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">on</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">conditions</span>: <span class="ident">T</span>) -&gt; <span class="ident">JoinData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>on&lt;T&gt;(<span class="self">self</span>, conditions: T) -&gt; JoinData&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span>T: Into&lt;ConditionTree&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="ident">JoinData</span> {
-            <span class="ident">table</span>: <span class="self">self</span>.<span class="ident">into</span>(),
-            <span class="ident">conditions</span>: <span class="ident">conditions</span>.<span class="ident">into</span>(),
+        JoinData {
+            table: <span class="self">self</span>.into(),
+            conditions: conditions.into(),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Joinable</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">JoinData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">on</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">conditions</span>: <span class="ident">T</span>) -&gt; <span class="ident">JoinData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Joinable&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>JoinData&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>on&lt;T&gt;(<span class="self">self</span>, conditions: T) -&gt; JoinData&lt;<span class="lifetime">&#39;a</span>&gt;
+    <span class="kw">where
+        </span>T: Into&lt;ConditionTree&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="kw">let</span> <span class="ident">conditions</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">conditions</span> {
-            <span class="ident">ConditionTree::NoCondition</span> =&gt; <span class="ident">conditions</span>.<span class="ident">into</span>(),
-            <span class="ident">cond</span> =&gt; <span class="ident">cond</span>.<span class="ident">and</span>(<span class="ident">conditions</span>.<span class="ident">into</span>()),
+        <span class="kw">let </span>conditions = <span class="kw">match </span><span class="self">self</span>.conditions {
+            ConditionTree::NoCondition =&gt; conditions.into(),
+            cond =&gt; cond.and(conditions.into()),
         };
 
-        <span class="ident">JoinData</span> {
-            <span class="ident">table</span>: <span class="self">self</span>.<span class="ident">table</span>,
-            <span class="ident">conditions</span>,
+        JoinData {
+            table: <span class="self">self</span>.table,
+            conditions,
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="quaint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="quaint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

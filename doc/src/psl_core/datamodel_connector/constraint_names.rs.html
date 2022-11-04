@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/psl-core/src/datamodel_connector/constraint_names.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>constraint_names.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../psl_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/psl-core/src/datamodel_connector/constraint_names.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>constraint_names.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../psl_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -153,160 +153,160 @@
 <span id="153">153</span>
 <span id="154">154</span>
 <span id="155">155</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::datamodel_connector::Connector</span>;
-<span class="kw">use</span> <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Span</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::datamodel_connector::Connector;
+<span class="kw">use </span>diagnostics::{DatamodelError, Span};
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConstraintNames</span>;
+<span class="kw">pub struct </span>ConstraintNames;
 
-<span class="kw">impl</span> <span class="ident">ConstraintNames</span> {
-    <span class="doccomment">/// Aligned with PG, to maximize the amount of times where we do not need</span>
-    <span class="doccomment">/// to render names because they already align with our convention.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// We always take the database names of entities. So if a model is remapped to</span>
-    <span class="doccomment">/// a different name in the datamodel, the default name generation will still take</span>
-    <span class="doccomment">/// the name of the table in the db as input. Same goes for fields / columns.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Postgres Naming conventions</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Without column names {tablename}_{suffix}</span>
-    <span class="doccomment">/// pkey for a Primary Key constraint</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Including column names: {tablename}_{columnname(s)}_{suffix}</span>
-    <span class="doccomment">/// column names are joined with an _ if there are multiple</span>
-    <span class="doccomment">/// key for a Unique constraint</span>
-    <span class="doccomment">/// idx for any other kind of index</span>
-    <span class="doccomment">/// fkey for a Foreign key</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// additional for SQLServer:</span>
-    <span class="doccomment">/// dflt for Default Constraint</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// not used for now:</span>
-    <span class="doccomment">/// check for a Check constraint</span>
-    <span class="doccomment">/// excl for an Exclusion constraint</span>
-    <span class="doccomment">/// seq for sequences</span>
-    <span class="doccomment">///</span>
+<span class="kw">impl </span>ConstraintNames {
+    <span class="doccomment">/// Aligned with PG, to maximize the amount of times where we do not need
+    /// to render names because they already align with our convention.
+    ///
+    /// We always take the database names of entities. So if a model is remapped to
+    /// a different name in the datamodel, the default name generation will still take
+    /// the name of the table in the db as input. Same goes for fields / columns.
+    ///
+    /// Postgres Naming conventions
+    ///
+    /// Without column names {tablename}_{suffix}
+    /// pkey for a Primary Key constraint
+    ///
+    /// Including column names: {tablename}_{columnname(s)}_{suffix}
+    /// column names are joined with an _ if there are multiple
+    /// key for a Unique constraint
+    /// idx for any other kind of index
+    /// fkey for a Foreign key
+    ///
+    /// additional for SQLServer:
+    /// dflt for Default Constraint
+    ///
+    /// not used for now:
+    /// check for a Check constraint
+    /// excl for an Exclusion constraint
+    /// seq for sequences
+    ///
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">primary_key_name</span>(<span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="ident">suffix</span> <span class="op">=</span> <span class="string">&quot;_pkey&quot;</span>;
-        <span class="kw">let</span> <span class="ident">limit</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">max_identifier_length</span>();
+    </span><span class="kw">pub fn </span>primary_key_name(table_name: <span class="kw-2">&amp;</span>str, connector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Connector) -&gt; String {
+        <span class="kw">let </span>suffix = <span class="string">&quot;_pkey&quot;</span>;
+        <span class="kw">let </span>limit = connector.max_identifier_length();
 
-        <span class="kw">let</span> <span class="ident">table_name</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">table_name</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">limit</span> <span class="op">-</span> <span class="number">5</span> {
-            <span class="kw">let</span> <span class="ident">split</span> <span class="op">=</span> <span class="ident">floor_char_boundary</span>(<span class="ident">table_name</span>, <span class="ident">limit</span> <span class="op">-</span> <span class="number">5</span>);
+        <span class="kw">let </span>table_name = <span class="kw">if </span>table_name.len() &gt;= limit - <span class="number">5 </span>{
+            <span class="kw">let </span>split = floor_char_boundary(table_name, limit - <span class="number">5</span>);
 
-            <span class="ident">table_name</span>.<span class="ident">split_at</span>(<span class="ident">split</span>).<span class="number">0</span>
-        } <span class="kw">else</span> {
-            <span class="ident">table_name</span>
+            table_name.split_at(split).<span class="number">0
+        </span>} <span class="kw">else </span>{
+            table_name
         };
 
-        <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="ident">table_name</span>, <span class="ident">suffix</span>)
+        <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, table_name, suffix)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unique_index_name</span>(<span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">column_names</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>], <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">const</span> <span class="ident">UNIQUE_SUFFIX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;_key&quot;</span>;
+    <span class="kw">pub fn </span>unique_index_name(table_name: <span class="kw-2">&amp;</span>str, column_names: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str], connector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Connector) -&gt; String {
+        <span class="kw">const </span>UNIQUE_SUFFIX: <span class="kw-2">&amp;</span>str = <span class="string">&quot;_key&quot;</span>;
 
-        <span class="ident"><span class="self">Self</span>::index_name_impl</span>(<span class="ident">table_name</span>, <span class="ident">column_names</span>, <span class="ident">UNIQUE_SUFFIX</span>, <span class="ident">connector</span>)
+        <span class="self">Self</span>::index_name_impl(table_name, column_names, UNIQUE_SUFFIX, connector)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">non_unique_index_name</span>(<span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">column_names</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>], <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">const</span> <span class="ident">INDEX_SUFFIX</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;_idx&quot;</span>;
+    <span class="kw">pub fn </span>non_unique_index_name(table_name: <span class="kw-2">&amp;</span>str, column_names: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str], connector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Connector) -&gt; String {
+        <span class="kw">const </span>INDEX_SUFFIX: <span class="kw-2">&amp;</span>str = <span class="string">&quot;_idx&quot;</span>;
 
-        <span class="ident"><span class="self">Self</span>::index_name_impl</span>(<span class="ident">table_name</span>, <span class="ident">column_names</span>, <span class="ident">INDEX_SUFFIX</span>, <span class="ident">connector</span>)
+        <span class="self">Self</span>::index_name_impl(table_name, column_names, INDEX_SUFFIX, connector)
     }
 
-    <span class="kw">fn</span> <span class="ident">index_name_impl</span>(
-        <span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">column_names</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>],
-        <span class="ident">suffix</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-        <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>,
-    ) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="ident">limit</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">max_identifier_length</span>();
+    <span class="kw">fn </span>index_name_impl(
+        table_name: <span class="kw-2">&amp;</span>str,
+        column_names: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str],
+        suffix: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+        connector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Connector,
+    ) -&gt; String {
+        <span class="kw">let </span>limit = connector.max_identifier_length();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="ident">table_name</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">column_names</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">suffix</span>.<span class="ident">len</span>());
+        <span class="kw">let </span><span class="kw-2">mut </span>out = String::with_capacity(table_name.len() + column_names.len() + suffix.len());
 
-        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="ident">table_name</span>);
-        <span class="ident">out</span>.<span class="ident">push</span>(<span class="string">&#39;_&#39;</span>);
-        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">column_names</span>.<span class="ident">join</span>(<span class="string">&quot;_&quot;</span>));
+        out.push_str(table_name);
+        out.push(<span class="string">&#39;_&#39;</span>);
+        out.push_str(<span class="kw-2">&amp;</span>column_names.join(<span class="string">&quot;_&quot;</span>));
 
-        <span class="kw">if</span> <span class="ident">out</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">limit</span> <span class="op">-</span> <span class="ident">suffix</span>.<span class="ident">len</span>() {
-            <span class="kw">let</span> <span class="ident">split</span> <span class="op">=</span> <span class="ident">floor_char_boundary</span>(<span class="kw-2">&amp;</span><span class="ident">out</span>, <span class="ident">limit</span> <span class="op">-</span> <span class="ident">suffix</span>.<span class="ident">len</span>());
-            <span class="ident">out</span>.<span class="ident">truncate</span>(<span class="ident">split</span>);
+        <span class="kw">if </span>out.len() &gt;= limit - suffix.len() {
+            <span class="kw">let </span>split = floor_char_boundary(<span class="kw-2">&amp;</span>out, limit - suffix.len());
+            out.truncate(split);
         };
 
-        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="ident">suffix</span>);
+        out.push_str(suffix);
 
-        <span class="ident">out</span>
+        out
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_name</span>(<span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">column_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="ident">limit</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">max_identifier_length</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">joined</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, <span class="ident">table_name</span>, <span class="ident">column_name</span>);
+    <span class="kw">pub fn </span>default_name(table_name: <span class="kw-2">&amp;</span>str, column_name: <span class="kw-2">&amp;</span>str, connector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Connector) -&gt; String {
+        <span class="kw">let </span>limit = connector.max_identifier_length();
+        <span class="kw">let </span><span class="kw-2">mut </span>joined = <span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, table_name, column_name);
 
-        <span class="kw">if</span> <span class="ident">joined</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">limit</span> <span class="op">-</span> <span class="number">3</span> {
-            <span class="kw">let</span> <span class="ident">split</span> <span class="op">=</span> <span class="ident">floor_char_boundary</span>(<span class="kw-2">&amp;</span><span class="ident">joined</span>, <span class="ident">limit</span> <span class="op">-</span> <span class="number">3</span>);
-            <span class="ident">joined</span>.<span class="ident">truncate</span>(<span class="ident">split</span>);
+        <span class="kw">if </span>joined.len() &gt;= limit - <span class="number">3 </span>{
+            <span class="kw">let </span>split = floor_char_boundary(<span class="kw-2">&amp;</span>joined, limit - <span class="number">3</span>);
+            joined.truncate(split);
         }
 
-        <span class="macro">format!</span>(<span class="string">&quot;{}_df&quot;</span>, <span class="ident">joined</span>)
+        <span class="macro">format!</span>(<span class="string">&quot;{}_df&quot;</span>, joined)
     }
 
-    <span class="doccomment">/// Params:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - table_name: the name of the _constrained_/_referencing_ table, not the referenced one.</span>
-    <span class="doccomment">/// - column names: the _constrained_ column names</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">foreign_key_constraint_name</span>(<span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">column_names</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>], <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="ident">fk_suffix</span> <span class="op">=</span> <span class="string">&quot;_fkey&quot;</span>;
-        <span class="kw">let</span> <span class="ident">limit</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">max_identifier_length</span>();
+    <span class="doccomment">/// Params:
+    ///
+    /// - table_name: the name of the _constrained_/_referencing_ table, not the referenced one.
+    /// - column names: the _constrained_ column names
+    </span><span class="kw">pub fn </span>foreign_key_constraint_name(table_name: <span class="kw-2">&amp;</span>str, column_names: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str], connector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Connector) -&gt; String {
+        <span class="kw">let </span>fk_suffix = <span class="string">&quot;_fkey&quot;</span>;
+        <span class="kw">let </span>limit = connector.max_identifier_length();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">joined</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, <span class="ident">table_name</span>, <span class="ident">column_names</span>.<span class="ident">join</span>(<span class="string">&quot;_&quot;</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>joined = <span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, table_name, column_names.join(<span class="string">&quot;_&quot;</span>));
 
-        <span class="kw">if</span> <span class="ident">joined</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">limit</span> <span class="op">-</span> <span class="number">5</span> {
-            <span class="kw">let</span> <span class="ident">split</span> <span class="op">=</span> <span class="ident">floor_char_boundary</span>(<span class="kw-2">&amp;</span><span class="ident">joined</span>, <span class="ident">limit</span> <span class="op">-</span> <span class="number">5</span>);
-            <span class="ident">joined</span>.<span class="ident">truncate</span>(<span class="ident">split</span>);
+        <span class="kw">if </span>joined.len() &gt;= limit - <span class="number">5 </span>{
+            <span class="kw">let </span>split = floor_char_boundary(<span class="kw-2">&amp;</span>joined, limit - <span class="number">5</span>);
+            joined.truncate(split);
         }
 
-        <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="ident">joined</span>, <span class="ident">fk_suffix</span>)
+        <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, joined, fk_suffix)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_db_name_too_long</span>(
-        <span class="ident">span</span>: <span class="ident">Span</span>,
-        <span class="ident">object_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
-        <span class="ident">attribute</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>,
-        <span class="ident">double_at</span>: <span class="ident">bool</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DatamodelError</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">name</span> {
-            <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">connector</span>.<span class="ident">max_identifier_length</span>() {
-                <span class="kw">let</span> <span class="ident">ats</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">double_at</span> { <span class="string">&quot;@@&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;@&quot;</span> };
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">DatamodelError::new_model_validation_error</span>(
-                    <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;The constraint name &#39;{}&#39; specified in the `map` argument for the `{}{}` constraint is too long for your chosen provider. The maximum allowed length is {} bytes.&quot;</span>, <span class="ident">name</span>, <span class="ident">ats</span>, <span class="ident">attribute</span>, <span class="ident">connector</span>.<span class="ident">max_identifier_length</span>()),
-                    <span class="ident">object_name</span>,
-                    <span class="ident">span</span>,
+    <span class="kw">pub fn </span>is_db_name_too_long(
+        span: Span,
+        object_name: <span class="kw-2">&amp;</span>str,
+        name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+        attribute: <span class="kw-2">&amp;</span>str,
+        connector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Connector,
+        double_at: bool,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;DatamodelError&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(name) = name {
+            <span class="kw">if </span>name.len() &gt; connector.max_identifier_length() {
+                <span class="kw">let </span>ats = <span class="kw">if </span>double_at { <span class="string">&quot;@@&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;@&quot; </span>};
+                <span class="kw">return </span><span class="prelude-val">Some</span>(DatamodelError::new_model_validation_error(
+                    <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;The constraint name &#39;{}&#39; specified in the `map` argument for the `{}{}` constraint is too long for your chosen provider. The maximum allowed length is {} bytes.&quot;</span>, name, ats, attribute, connector.max_identifier_length()),
+                    object_name,
+                    span,
                 ));
             }
         }
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">None
+    </span>}
 }
 
-<span class="doccomment">/// Finds the closest `x` not exceeding `index` where</span>
-<span class="doccomment">/// `is_char_boundary(x) is `true.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This method can help you to truncate a string so that it&#39;s still</span>
-<span class="doccomment">/// valid UTF-8, but doesn&#39;t exceed a given number of bytes.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// To be replaced with `std::str::floor_char_boundary` when it&#39;s</span>
-<span class="doccomment">/// stabilized.</span>
-<span class="kw">fn</span> <span class="ident">floor_char_boundary</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">mut</span> <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
-    <span class="kw">if</span> <span class="ident">index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">s</span>.<span class="ident">len</span>() {
-        <span class="ident">s</span>.<span class="ident">len</span>()
-    } <span class="kw">else</span> {
-        <span class="kw">while</span> <span class="op">!</span><span class="ident">s</span>.<span class="ident">is_char_boundary</span>(<span class="ident">index</span>) {
-            <span class="ident">index</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+<span class="doccomment">/// Finds the closest `x` not exceeding `index` where
+/// `is_char_boundary(x) is `true.
+///
+/// This method can help you to truncate a string so that it&#39;s still
+/// valid UTF-8, but doesn&#39;t exceed a given number of bytes.
+///
+/// To be replaced with `std::str::floor_char_boundary` when it&#39;s
+/// stabilized.
+</span><span class="kw">fn </span>floor_char_boundary(s: <span class="kw-2">&amp;</span>str, <span class="kw-2">mut </span>index: usize) -&gt; usize {
+    <span class="kw">if </span>index &gt;= s.len() {
+        s.len()
+    } <span class="kw">else </span>{
+        <span class="kw">while </span>!s.is_char_boundary(index) {
+            index -= <span class="number">1</span>;
         }
 
-        <span class="ident">index</span>
+        index
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="psl_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="psl_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

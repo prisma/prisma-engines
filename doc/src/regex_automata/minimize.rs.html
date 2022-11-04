@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/regex-automata-0.1.10/src/minimize.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>minimize.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../regex_automata/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../regex_automata/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../regex_automata/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/regex-automata-0.1.10/src/minimize.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>minimize.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../regex_automata/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../regex_automata/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../regex_automata/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -371,378 +371,378 @@
 <span id="371">371</span>
 <span id="372">372</span>
 <span id="373">373</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::cell::RefCell</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::mem</span>;
-<span class="kw">use</span> <span class="ident">std::rc::Rc</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::cell::RefCell;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::mem;
+<span class="kw">use </span>std::rc::Rc;
 
-<span class="kw">use</span> <span class="ident">dense</span>;
-<span class="kw">use</span> <span class="ident">state_id</span>::{<span class="ident">dead_id</span>, <span class="ident">StateID</span>};
+<span class="kw">use </span>dense;
+<span class="kw">use </span>state_id::{dead_id, StateID};
 
-<span class="kw">type</span> <span class="ident">DFARepr</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">dense::Repr</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">S</span><span class="op">&gt;</span>;
+<span class="kw">type </span>DFARepr&lt;S&gt; = dense::Repr&lt;Vec&lt;S&gt;, S&gt;;
 
-<span class="doccomment">/// An implementation of Hopcroft&#39;s algorithm for minimizing DFAs.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The algorithm implemented here is mostly taken from Wikipedia:</span>
-<span class="doccomment">/// https://en.wikipedia.org/wiki/DFA_minimization#Hopcroft&#39;s_algorithm</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This code has had some light optimization attention paid to it,</span>
-<span class="doccomment">/// particularly in the form of reducing allocation as much as possible.</span>
-<span class="doccomment">/// However, it is still generally slow. Future optimization work should</span>
-<span class="doccomment">/// probably focus on the bigger picture rather than micro-optimizations. For</span>
-<span class="doccomment">/// example:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// 1. Figure out how to more intelligently create initial partitions. That is,</span>
-<span class="doccomment">///    Hopcroft&#39;s algorithm starts by creating two partitions of DFA states</span>
-<span class="doccomment">///    that are known to NOT be equivalent: match states and non-match states.</span>
-<span class="doccomment">///    The algorithm proceeds by progressively refining these partitions into</span>
-<span class="doccomment">///    smaller partitions. If we could start with more partitions, then we</span>
-<span class="doccomment">///    could reduce the amount of work that Hopcroft&#39;s algorithm needs to do.</span>
-<span class="doccomment">/// 2. For every partition that we visit, we find all incoming transitions to</span>
-<span class="doccomment">///    every state in the partition for *every* element in the alphabet. (This</span>
-<span class="doccomment">///    is why using byte classes can significantly decrease minimization times,</span>
-<span class="doccomment">///    since byte classes shrink the alphabet.) This is quite costly and there</span>
-<span class="doccomment">///    is perhaps some redundant work being performed depending on the specific</span>
-<span class="doccomment">///    states in the set. For example, we might be able to only visit some</span>
-<span class="doccomment">///    elements of the alphabet based on the transitions.</span>
-<span class="doccomment">/// 3. Move parts of minimization into determinization. If minimization has</span>
-<span class="doccomment">///    fewer states to deal with, then it should run faster. A prime example</span>
-<span class="doccomment">///    of this might be large Unicode classes, which are generated in way that</span>
-<span class="doccomment">///    can create a lot of redundant states. (Some work has been done on this</span>
-<span class="doccomment">///    point during NFA compilation via the algorithm described in the</span>
-<span class="doccomment">///    &quot;Incremental Construction of MinimalAcyclic Finite-State Automata&quot;</span>
-<span class="doccomment">///    paper.)</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Minimizer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span>: <span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">dfa</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">DFARepr</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
-    <span class="ident">in_transitions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">partitions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">StateSet</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">waiting</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">StateSet</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// An implementation of Hopcroft&#39;s algorithm for minimizing DFAs.
+///
+/// The algorithm implemented here is mostly taken from Wikipedia:
+/// https://en.wikipedia.org/wiki/DFA_minimization#Hopcroft&#39;s_algorithm
+///
+/// This code has had some light optimization attention paid to it,
+/// particularly in the form of reducing allocation as much as possible.
+/// However, it is still generally slow. Future optimization work should
+/// probably focus on the bigger picture rather than micro-optimizations. For
+/// example:
+///
+/// 1. Figure out how to more intelligently create initial partitions. That is,
+///    Hopcroft&#39;s algorithm starts by creating two partitions of DFA states
+///    that are known to NOT be equivalent: match states and non-match states.
+///    The algorithm proceeds by progressively refining these partitions into
+///    smaller partitions. If we could start with more partitions, then we
+///    could reduce the amount of work that Hopcroft&#39;s algorithm needs to do.
+/// 2. For every partition that we visit, we find all incoming transitions to
+///    every state in the partition for *every* element in the alphabet. (This
+///    is why using byte classes can significantly decrease minimization times,
+///    since byte classes shrink the alphabet.) This is quite costly and there
+///    is perhaps some redundant work being performed depending on the specific
+///    states in the set. For example, we might be able to only visit some
+///    elements of the alphabet based on the transitions.
+/// 3. Move parts of minimization into determinization. If minimization has
+///    fewer states to deal with, then it should run faster. A prime example
+///    of this might be large Unicode classes, which are generated in way that
+///    can create a lot of redundant states. (Some work has been done on this
+///    point during NFA compilation via the algorithm described in the
+///    &quot;Incremental Construction of MinimalAcyclic Finite-State Automata&quot;
+///    paper.)
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Minimizer&lt;<span class="lifetime">&#39;a</span>, S: <span class="lifetime">&#39;a</span>&gt; {
+    dfa: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>DFARepr&lt;S&gt;,
+    in_transitions: Vec&lt;Vec&lt;Vec&lt;S&gt;&gt;&gt;,
+    partitions: Vec&lt;StateSet&lt;S&gt;&gt;,
+    waiting: Vec&lt;StateSet&lt;S&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span>: <span class="ident">StateID</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Minimizer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Minimizer&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;dfa&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">dfa</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;in_transitions&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">in_transitions</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;partitions&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">partitions</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;waiting&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">waiting</span>)
-            .<span class="ident">finish</span>()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, S: StateID&gt; fmt::Debug <span class="kw">for </span>Minimizer&lt;<span class="lifetime">&#39;a</span>, S&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;Minimizer&quot;</span>)
+            .field(<span class="string">&quot;dfa&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.dfa)
+            .field(<span class="string">&quot;in_transitions&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.in_transitions)
+            .field(<span class="string">&quot;partitions&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.partitions)
+            .field(<span class="string">&quot;waiting&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.waiting)
+            .finish()
     }
 }
 
-<span class="doccomment">/// A set of states. A state set makes up a single partition in Hopcroft&#39;s</span>
-<span class="doccomment">/// algorithm.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It is represented by an ordered set of state identifiers. We use shared</span>
-<span class="doccomment">/// ownership so that a single state set can be in both the set of partitions</span>
-<span class="doccomment">/// and in the set of waiting sets simultaneously without an additional</span>
-<span class="doccomment">/// allocation. Generally, once a state set is built, it becomes immutable.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// We use this representation because it avoids the overhead of more</span>
-<span class="doccomment">/// traditional set data structures (HashSet/BTreeSet), and also because</span>
-<span class="doccomment">/// computing intersection/subtraction on this representation is especially</span>
-<span class="doccomment">/// fast.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
-<span class="kw">struct</span> <span class="ident">StateSet</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">RefCell</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>);
+<span class="doccomment">/// A set of states. A state set makes up a single partition in Hopcroft&#39;s
+/// algorithm.
+///
+/// It is represented by an ordered set of state identifiers. We use shared
+/// ownership so that a single state set can be in both the set of partitions
+/// and in the set of waiting sets simultaneously without an additional
+/// allocation. Generally, once a state set is built, it becomes immutable.
+///
+/// We use this representation because it avoids the overhead of more
+/// traditional set data structures (HashSet/BTreeSet), and also because
+/// computing intersection/subtraction on this representation is especially
+/// fast.
+</span><span class="attribute">#[derive(Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
+</span><span class="kw">struct </span>StateSet&lt;S&gt;(Rc&lt;RefCell&lt;Vec&lt;S&gt;&gt;&gt;);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span>: <span class="ident">StateID</span><span class="op">&gt;</span> <span class="ident">Minimizer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">dfa</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">DFARepr</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">Minimizer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">in_transitions</span> <span class="op">=</span> <span class="ident">Minimizer::incoming_transitions</span>(<span class="ident">dfa</span>);
-        <span class="kw">let</span> <span class="ident">partitions</span> <span class="op">=</span> <span class="ident">Minimizer::initial_partitions</span>(<span class="ident">dfa</span>);
-        <span class="kw">let</span> <span class="ident">waiting</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">partitions</span>[<span class="number">0</span>].<span class="ident">clone</span>()];
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, S: StateID&gt; Minimizer&lt;<span class="lifetime">&#39;a</span>, S&gt; {
+    <span class="kw">pub fn </span>new(dfa: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>DFARepr&lt;S&gt;) -&gt; Minimizer&lt;<span class="lifetime">&#39;a</span>, S&gt; {
+        <span class="kw">let </span>in_transitions = Minimizer::incoming_transitions(dfa);
+        <span class="kw">let </span>partitions = Minimizer::initial_partitions(dfa);
+        <span class="kw">let </span>waiting = <span class="macro">vec!</span>[partitions[<span class="number">0</span>].clone()];
 
-        <span class="ident">Minimizer</span> { <span class="ident">dfa</span>, <span class="ident">in_transitions</span>, <span class="ident">partitions</span>, <span class="ident">waiting</span> }
+        Minimizer { dfa, in_transitions, partitions, waiting }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run</span>(<span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">incoming</span> <span class="op">=</span> <span class="ident">StateSet::empty</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">scratch1</span> <span class="op">=</span> <span class="ident">StateSet::empty</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">scratch2</span> <span class="op">=</span> <span class="ident">StateSet::empty</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">newparts</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+    <span class="kw">pub fn </span>run(<span class="kw-2">mut </span><span class="self">self</span>) {
+        <span class="kw">let </span><span class="kw-2">mut </span>incoming = StateSet::empty();
+        <span class="kw">let </span><span class="kw-2">mut </span>scratch1 = StateSet::empty();
+        <span class="kw">let </span><span class="kw-2">mut </span>scratch2 = StateSet::empty();
+        <span class="kw">let </span><span class="kw-2">mut </span>newparts = <span class="macro">vec!</span>[];
 
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">set</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">waiting</span>.<span class="ident">pop</span>() {
-            <span class="kw">for</span> <span class="ident">b</span> <span class="kw">in</span> (<span class="number">0</span>..<span class="self">self</span>.<span class="ident">dfa</span>.<span class="ident">alphabet_len</span>()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span> <span class="kw">as</span> <span class="ident">u8</span>) {
-                <span class="self">self</span>.<span class="ident">find_incoming_to</span>(<span class="ident">b</span>, <span class="kw-2">&amp;</span><span class="ident">set</span>, <span class="kw-2">&amp;mut</span> <span class="ident">incoming</span>);
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(set) = <span class="self">self</span>.waiting.pop() {
+            <span class="kw">for </span>b <span class="kw">in </span>(<span class="number">0</span>..<span class="self">self</span>.dfa.alphabet_len()).map(|b| b <span class="kw">as </span>u8) {
+                <span class="self">self</span>.find_incoming_to(b, <span class="kw-2">&amp;</span>set, <span class="kw-2">&amp;mut </span>incoming);
 
-                <span class="kw">for</span> <span class="ident">p</span> <span class="kw">in</span> <span class="number">0</span>..<span class="self">self</span>.<span class="ident">partitions</span>.<span class="ident">len</span>() {
-                    <span class="self">self</span>.<span class="ident">partitions</span>[<span class="ident">p</span>].<span class="ident">intersection</span>(<span class="kw-2">&amp;</span><span class="ident">incoming</span>, <span class="kw-2">&amp;mut</span> <span class="ident">scratch1</span>);
-                    <span class="kw">if</span> <span class="ident">scratch1</span>.<span class="ident">is_empty</span>() {
-                        <span class="ident">newparts</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">partitions</span>[<span class="ident">p</span>].<span class="ident">clone</span>());
+                <span class="kw">for </span>p <span class="kw">in </span><span class="number">0</span>..<span class="self">self</span>.partitions.len() {
+                    <span class="self">self</span>.partitions[p].intersection(<span class="kw-2">&amp;</span>incoming, <span class="kw-2">&amp;mut </span>scratch1);
+                    <span class="kw">if </span>scratch1.is_empty() {
+                        newparts.push(<span class="self">self</span>.partitions[p].clone());
                         <span class="kw">continue</span>;
                     }
 
-                    <span class="self">self</span>.<span class="ident">partitions</span>[<span class="ident">p</span>].<span class="ident">subtract</span>(<span class="kw-2">&amp;</span><span class="ident">incoming</span>, <span class="kw-2">&amp;mut</span> <span class="ident">scratch2</span>);
-                    <span class="kw">if</span> <span class="ident">scratch2</span>.<span class="ident">is_empty</span>() {
-                        <span class="ident">newparts</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">partitions</span>[<span class="ident">p</span>].<span class="ident">clone</span>());
+                    <span class="self">self</span>.partitions[p].subtract(<span class="kw-2">&amp;</span>incoming, <span class="kw-2">&amp;mut </span>scratch2);
+                    <span class="kw">if </span>scratch2.is_empty() {
+                        newparts.push(<span class="self">self</span>.partitions[p].clone());
                         <span class="kw">continue</span>;
                     }
 
-                    <span class="kw">let</span> (<span class="ident">x</span>, <span class="ident">y</span>) <span class="op">=</span>
-                        (<span class="ident">scratch1</span>.<span class="ident">deep_clone</span>(), <span class="ident">scratch2</span>.<span class="ident">deep_clone</span>());
-                    <span class="ident">newparts</span>.<span class="ident">push</span>(<span class="ident">x</span>.<span class="ident">clone</span>());
-                    <span class="ident">newparts</span>.<span class="ident">push</span>(<span class="ident">y</span>.<span class="ident">clone</span>());
-                    <span class="kw">match</span> <span class="self">self</span>.<span class="ident">find_waiting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">partitions</span>[<span class="ident">p</span>]) {
-                        <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; {
-                            <span class="self">self</span>.<span class="ident">waiting</span>[<span class="ident">i</span>] <span class="op">=</span> <span class="ident">x</span>;
-                            <span class="self">self</span>.<span class="ident">waiting</span>.<span class="ident">push</span>(<span class="ident">y</span>);
+                    <span class="kw">let </span>(x, y) =
+                        (scratch1.deep_clone(), scratch2.deep_clone());
+                    newparts.push(x.clone());
+                    newparts.push(y.clone());
+                    <span class="kw">match </span><span class="self">self</span>.find_waiting(<span class="kw-2">&amp;</span><span class="self">self</span>.partitions[p]) {
+                        <span class="prelude-val">Some</span>(i) =&gt; {
+                            <span class="self">self</span>.waiting[i] = x;
+                            <span class="self">self</span>.waiting.push(y);
                         }
-                        <span class="prelude-val">None</span> =&gt; {
-                            <span class="kw">if</span> <span class="ident">x</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">y</span>.<span class="ident">len</span>() {
-                                <span class="self">self</span>.<span class="ident">waiting</span>.<span class="ident">push</span>(<span class="ident">x</span>);
-                            } <span class="kw">else</span> {
-                                <span class="self">self</span>.<span class="ident">waiting</span>.<span class="ident">push</span>(<span class="ident">y</span>);
+                        <span class="prelude-val">None </span>=&gt; {
+                            <span class="kw">if </span>x.len() &lt;= y.len() {
+                                <span class="self">self</span>.waiting.push(x);
+                            } <span class="kw">else </span>{
+                                <span class="self">self</span>.waiting.push(y);
                             }
                         }
                     }
                 }
-                <span class="ident">newparts</span> <span class="op">=</span> <span class="ident">mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">partitions</span>, <span class="ident">newparts</span>);
-                <span class="ident">newparts</span>.<span class="ident">clear</span>();
+                newparts = mem::replace(<span class="kw-2">&amp;mut </span><span class="self">self</span>.partitions, newparts);
+                newparts.clear();
             }
         }
 
-        <span class="comment">// At this point, we now have a minimal partitioning of states, where</span>
-        <span class="comment">// each partition is an equivalence class of DFA states. Now we need to</span>
-        <span class="comment">// use this partioning to update the DFA to only contain one state for</span>
-        <span class="comment">// each partition.</span>
+        <span class="comment">// At this point, we now have a minimal partitioning of states, where
+        // each partition is an equivalence class of DFA states. Now we need to
+        // use this partioning to update the DFA to only contain one state for
+        // each partition.
 
-        <span class="comment">// Create a map from DFA state ID to the representative ID of the</span>
-        <span class="comment">// equivalence class to which it belongs. The representative ID of an</span>
-        <span class="comment">// equivalence class of states is the minimum ID in that class.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state_to_part</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">dead_id</span>(); <span class="self">self</span>.<span class="ident">dfa</span>.<span class="ident">state_count</span>()];
-        <span class="kw">for</span> <span class="ident">p</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">partitions</span> {
-            <span class="ident">p</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="ident">state_to_part</span>[<span class="ident">id</span>.<span class="ident">to_usize</span>()] <span class="op">=</span> <span class="ident">p</span>.<span class="ident">min</span>());
+        // Create a map from DFA state ID to the representative ID of the
+        // equivalence class to which it belongs. The representative ID of an
+        // equivalence class of states is the minimum ID in that class.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>state_to_part = <span class="macro">vec!</span>[dead_id(); <span class="self">self</span>.dfa.state_count()];
+        <span class="kw">for </span>p <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.partitions {
+            p.iter(|id| state_to_part[id.to_usize()] = p.min());
         }
 
-        <span class="comment">// Generate a new contiguous sequence of IDs for minimal states, and</span>
-        <span class="comment">// create a map from equivalence IDs to the new IDs. Thus, the new</span>
-        <span class="comment">// minimal ID of *any* state in the unminimized DFA can be obtained</span>
-        <span class="comment">// with minimals_ids[state_to_part[old_id]].</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">minimal_ids</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">dead_id</span>(); <span class="self">self</span>.<span class="ident">dfa</span>.<span class="ident">state_count</span>()];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_id</span> <span class="op">=</span> <span class="ident">S::from_usize</span>(<span class="number">0</span>);
-        <span class="kw">for</span> (<span class="ident">id</span>, <span class="kw">_</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">dfa</span>.<span class="ident">states</span>() {
-            <span class="kw">if</span> <span class="ident">state_to_part</span>[<span class="ident">id</span>.<span class="ident">to_usize</span>()] <span class="op">==</span> <span class="ident">id</span> {
-                <span class="ident">minimal_ids</span>[<span class="ident">id</span>.<span class="ident">to_usize</span>()] <span class="op">=</span> <span class="ident">new_id</span>;
-                <span class="ident">new_id</span> <span class="op">=</span> <span class="ident">S::from_usize</span>(<span class="ident">new_id</span>.<span class="ident">to_usize</span>() <span class="op">+</span> <span class="number">1</span>);
+        <span class="comment">// Generate a new contiguous sequence of IDs for minimal states, and
+        // create a map from equivalence IDs to the new IDs. Thus, the new
+        // minimal ID of *any* state in the unminimized DFA can be obtained
+        // with minimals_ids[state_to_part[old_id]].
+        </span><span class="kw">let </span><span class="kw-2">mut </span>minimal_ids = <span class="macro">vec!</span>[dead_id(); <span class="self">self</span>.dfa.state_count()];
+        <span class="kw">let </span><span class="kw-2">mut </span>new_id = S::from_usize(<span class="number">0</span>);
+        <span class="kw">for </span>(id, <span class="kw">_</span>) <span class="kw">in </span><span class="self">self</span>.dfa.states() {
+            <span class="kw">if </span>state_to_part[id.to_usize()] == id {
+                minimal_ids[id.to_usize()] = new_id;
+                new_id = S::from_usize(new_id.to_usize() + <span class="number">1</span>);
             }
         }
-        <span class="comment">// The total number of states in the minimal DFA.</span>
-        <span class="kw">let</span> <span class="ident">minimal_count</span> <span class="op">=</span> <span class="ident">new_id</span>.<span class="ident">to_usize</span>();
+        <span class="comment">// The total number of states in the minimal DFA.
+        </span><span class="kw">let </span>minimal_count = new_id.to_usize();
 
-        <span class="comment">// Re-map this DFA in place such that the only states remaining</span>
-        <span class="comment">// correspond to the representative states of every equivalence class.</span>
-        <span class="kw">for</span> <span class="ident">id</span> <span class="kw">in</span> (<span class="number">0</span>..<span class="self">self</span>.<span class="ident">dfa</span>.<span class="ident">state_count</span>()).<span class="ident">map</span>(<span class="ident">S::from_usize</span>) {
-            <span class="comment">// If this state isn&#39;t a representative for an equivalence class,</span>
-            <span class="comment">// then we skip it since it won&#39;t appear in the minimal DFA.</span>
-            <span class="kw">if</span> <span class="ident">state_to_part</span>[<span class="ident">id</span>.<span class="ident">to_usize</span>()] <span class="op">!</span><span class="op">=</span> <span class="ident">id</span> {
+        <span class="comment">// Re-map this DFA in place such that the only states remaining
+        // correspond to the representative states of every equivalence class.
+        </span><span class="kw">for </span>id <span class="kw">in </span>(<span class="number">0</span>..<span class="self">self</span>.dfa.state_count()).map(S::from_usize) {
+            <span class="comment">// If this state isn&#39;t a representative for an equivalence class,
+            // then we skip it since it won&#39;t appear in the minimal DFA.
+            </span><span class="kw">if </span>state_to_part[id.to_usize()] != id {
                 <span class="kw">continue</span>;
             }
-            <span class="kw">for</span> (<span class="kw">_</span>, <span class="ident">next</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">dfa</span>.<span class="ident">get_state_mut</span>(<span class="ident">id</span>).<span class="ident">iter_mut</span>() {
-                <span class="kw-2">*</span><span class="ident">next</span> <span class="op">=</span> <span class="ident">minimal_ids</span>[<span class="ident">state_to_part</span>[<span class="ident">next</span>.<span class="ident">to_usize</span>()].<span class="ident">to_usize</span>()];
+            <span class="kw">for </span>(<span class="kw">_</span>, next) <span class="kw">in </span><span class="self">self</span>.dfa.get_state_mut(id).iter_mut() {
+                <span class="kw-2">*</span>next = minimal_ids[state_to_part[next.to_usize()].to_usize()];
             }
-            <span class="self">self</span>.<span class="ident">dfa</span>.<span class="ident">swap_states</span>(<span class="ident">id</span>, <span class="ident">minimal_ids</span>[<span class="ident">id</span>.<span class="ident">to_usize</span>()]);
+            <span class="self">self</span>.dfa.swap_states(id, minimal_ids[id.to_usize()]);
         }
-        <span class="comment">// Trim off all unused states from the pre-minimized DFA. This</span>
-        <span class="comment">// represents all states that were merged into a non-singleton</span>
-        <span class="comment">// equivalence class of states, and appeared after the first state</span>
-        <span class="comment">// in each such class. (Because the state with the smallest ID in each</span>
-        <span class="comment">// equivalence class is its representative ID.)</span>
-        <span class="self">self</span>.<span class="ident">dfa</span>.<span class="ident">truncate_states</span>(<span class="ident">minimal_count</span>);
+        <span class="comment">// Trim off all unused states from the pre-minimized DFA. This
+        // represents all states that were merged into a non-singleton
+        // equivalence class of states, and appeared after the first state
+        // in each such class. (Because the state with the smallest ID in each
+        // equivalence class is its representative ID.)
+        </span><span class="self">self</span>.dfa.truncate_states(minimal_count);
 
-        <span class="comment">// Update the new start state, which is now just the minimal ID of</span>
-        <span class="comment">// whatever state the old start state was collapsed into.</span>
-        <span class="kw">let</span> <span class="ident">old_start</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">dfa</span>.<span class="ident">start_state</span>();
-        <span class="self">self</span>.<span class="ident">dfa</span>.<span class="ident">set_start_state</span>(
-            <span class="ident">minimal_ids</span>[<span class="ident">state_to_part</span>[<span class="ident">old_start</span>.<span class="ident">to_usize</span>()].<span class="ident">to_usize</span>()],
+        <span class="comment">// Update the new start state, which is now just the minimal ID of
+        // whatever state the old start state was collapsed into.
+        </span><span class="kw">let </span>old_start = <span class="self">self</span>.dfa.start_state();
+        <span class="self">self</span>.dfa.set_start_state(
+            minimal_ids[state_to_part[old_start.to_usize()].to_usize()],
         );
 
-        <span class="comment">// In order to update the ID of the maximum match state, we need to</span>
-        <span class="comment">// find the maximum ID among all of the match states in the minimized</span>
-        <span class="comment">// DFA. This is not necessarily the new ID of the unminimized maximum</span>
-        <span class="comment">// match state, since that could have been collapsed with a much</span>
-        <span class="comment">// earlier match state. Therefore, to find the new max match state,</span>
-        <span class="comment">// we iterate over all previous match states, find their corresponding</span>
-        <span class="comment">// new minimal ID, and take the maximum of those.</span>
-        <span class="kw">let</span> <span class="ident">old_max</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">dfa</span>.<span class="ident">max_match_state</span>();
-        <span class="self">self</span>.<span class="ident">dfa</span>.<span class="ident">set_max_match_state</span>(<span class="ident">dead_id</span>());
-        <span class="kw">for</span> <span class="ident">id</span> <span class="kw">in</span> (<span class="number">0</span>..(<span class="ident">old_max</span>.<span class="ident">to_usize</span>() <span class="op">+</span> <span class="number">1</span>)).<span class="ident">map</span>(<span class="ident">S::from_usize</span>) {
-            <span class="kw">let</span> <span class="ident">part</span> <span class="op">=</span> <span class="ident">state_to_part</span>[<span class="ident">id</span>.<span class="ident">to_usize</span>()];
-            <span class="kw">let</span> <span class="ident">new_id</span> <span class="op">=</span> <span class="ident">minimal_ids</span>[<span class="ident">part</span>.<span class="ident">to_usize</span>()];
-            <span class="kw">if</span> <span class="ident">new_id</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">dfa</span>.<span class="ident">max_match_state</span>() {
-                <span class="self">self</span>.<span class="ident">dfa</span>.<span class="ident">set_max_match_state</span>(<span class="ident">new_id</span>);
+        <span class="comment">// In order to update the ID of the maximum match state, we need to
+        // find the maximum ID among all of the match states in the minimized
+        // DFA. This is not necessarily the new ID of the unminimized maximum
+        // match state, since that could have been collapsed with a much
+        // earlier match state. Therefore, to find the new max match state,
+        // we iterate over all previous match states, find their corresponding
+        // new minimal ID, and take the maximum of those.
+        </span><span class="kw">let </span>old_max = <span class="self">self</span>.dfa.max_match_state();
+        <span class="self">self</span>.dfa.set_max_match_state(dead_id());
+        <span class="kw">for </span>id <span class="kw">in </span>(<span class="number">0</span>..(old_max.to_usize() + <span class="number">1</span>)).map(S::from_usize) {
+            <span class="kw">let </span>part = state_to_part[id.to_usize()];
+            <span class="kw">let </span>new_id = minimal_ids[part.to_usize()];
+            <span class="kw">if </span>new_id &gt; <span class="self">self</span>.dfa.max_match_state() {
+                <span class="self">self</span>.dfa.set_max_match_state(new_id);
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">find_waiting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">set</span>: <span class="kw-2">&amp;</span><span class="ident">StateSet</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">waiting</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span> <span class="op">==</span> <span class="ident">set</span>)
+    <span class="kw">fn </span>find_waiting(<span class="kw-2">&amp;</span><span class="self">self</span>, set: <span class="kw-2">&amp;</span>StateSet&lt;S&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+        <span class="self">self</span>.waiting.iter().position(|s| s == set)
     }
 
-    <span class="kw">fn</span> <span class="ident">find_incoming_to</span>(
+    <span class="kw">fn </span>find_incoming_to(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">b</span>: <span class="ident">u8</span>,
-        <span class="ident">set</span>: <span class="kw-2">&amp;</span><span class="ident">StateSet</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
-        <span class="ident">incoming</span>: <span class="kw-2">&amp;mut</span> <span class="ident">StateSet</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
+        b: u8,
+        set: <span class="kw-2">&amp;</span>StateSet&lt;S&gt;,
+        incoming: <span class="kw-2">&amp;mut </span>StateSet&lt;S&gt;,
     ) {
-        <span class="ident">incoming</span>.<span class="ident">clear</span>();
-        <span class="ident">set</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> {
-            <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">inid</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">in_transitions</span>[<span class="ident">id</span>.<span class="ident">to_usize</span>()][<span class="ident">b</span> <span class="kw">as</span> <span class="ident">usize</span>] {
-                <span class="ident">incoming</span>.<span class="ident">add</span>(<span class="ident">inid</span>);
+        incoming.clear();
+        set.iter(|id| {
+            <span class="kw">for </span><span class="kw-2">&amp;</span>inid <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.in_transitions[id.to_usize()][b <span class="kw">as </span>usize] {
+                incoming.add(inid);
             }
         });
-        <span class="ident">incoming</span>.<span class="ident">canonicalize</span>();
+        incoming.canonicalize();
     }
 
-    <span class="kw">fn</span> <span class="ident">initial_partitions</span>(<span class="ident">dfa</span>: <span class="kw-2">&amp;</span><span class="ident">DFARepr</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">StateSet</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">is_match</span> <span class="op">=</span> <span class="ident">StateSet::empty</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">no_match</span> <span class="op">=</span> <span class="ident">StateSet::empty</span>();
-        <span class="kw">for</span> (<span class="ident">id</span>, <span class="kw">_</span>) <span class="kw">in</span> <span class="ident">dfa</span>.<span class="ident">states</span>() {
-            <span class="kw">if</span> <span class="ident">dfa</span>.<span class="ident">is_match_state</span>(<span class="ident">id</span>) {
-                <span class="ident">is_match</span>.<span class="ident">add</span>(<span class="ident">id</span>);
-            } <span class="kw">else</span> {
-                <span class="ident">no_match</span>.<span class="ident">add</span>(<span class="ident">id</span>);
+    <span class="kw">fn </span>initial_partitions(dfa: <span class="kw-2">&amp;</span>DFARepr&lt;S&gt;) -&gt; Vec&lt;StateSet&lt;S&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>is_match = StateSet::empty();
+        <span class="kw">let </span><span class="kw-2">mut </span>no_match = StateSet::empty();
+        <span class="kw">for </span>(id, <span class="kw">_</span>) <span class="kw">in </span>dfa.states() {
+            <span class="kw">if </span>dfa.is_match_state(id) {
+                is_match.add(id);
+            } <span class="kw">else </span>{
+                no_match.add(id);
             }
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sets</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">is_match</span>];
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">no_match</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">sets</span>.<span class="ident">push</span>(<span class="ident">no_match</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>sets = <span class="macro">vec!</span>[is_match];
+        <span class="kw">if </span>!no_match.is_empty() {
+            sets.push(no_match);
         }
-        <span class="ident">sets</span>.<span class="ident">sort_by_key</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">len</span>());
-        <span class="ident">sets</span>
+        sets.sort_by_key(|s| s.len());
+        sets
     }
 
-    <span class="kw">fn</span> <span class="ident">incoming_transitions</span>(<span class="ident">dfa</span>: <span class="kw-2">&amp;</span><span class="ident">DFARepr</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">incoming</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="ident">dfa</span>.<span class="ident">states</span>() {
-            <span class="ident">incoming</span>.<span class="ident">push</span>(<span class="macro">vec!</span>[<span class="macro">vec!</span>[]; <span class="ident">dfa</span>.<span class="ident">alphabet_len</span>()]);
+    <span class="kw">fn </span>incoming_transitions(dfa: <span class="kw-2">&amp;</span>DFARepr&lt;S&gt;) -&gt; Vec&lt;Vec&lt;Vec&lt;S&gt;&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>incoming = <span class="macro">vec!</span>[];
+        <span class="kw">for _ in </span>dfa.states() {
+            incoming.push(<span class="macro">vec!</span>[<span class="macro">vec!</span>[]; dfa.alphabet_len()]);
         }
-        <span class="kw">for</span> (<span class="ident">id</span>, <span class="ident">state</span>) <span class="kw">in</span> <span class="ident">dfa</span>.<span class="ident">states</span>() {
-            <span class="kw">for</span> (<span class="ident">b</span>, <span class="ident">next</span>) <span class="kw">in</span> <span class="ident">state</span>.<span class="ident">transitions</span>() {
-                <span class="ident">incoming</span>[<span class="ident">next</span>.<span class="ident">to_usize</span>()][<span class="ident">b</span> <span class="kw">as</span> <span class="ident">usize</span>].<span class="ident">push</span>(<span class="ident">id</span>);
+        <span class="kw">for </span>(id, state) <span class="kw">in </span>dfa.states() {
+            <span class="kw">for </span>(b, next) <span class="kw">in </span>state.transitions() {
+                incoming[next.to_usize()][b <span class="kw">as </span>usize].push(id);
             }
         }
-        <span class="ident">incoming</span>
+        incoming
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">StateID</span><span class="op">&gt;</span> <span class="ident">StateSet</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">empty</span>() -&gt; <span class="ident">StateSet</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-        <span class="ident">StateSet</span>(<span class="ident">Rc::new</span>(<span class="ident">RefCell::new</span>(<span class="macro">vec!</span>[])))
+<span class="kw">impl</span>&lt;S: StateID&gt; StateSet&lt;S&gt; {
+    <span class="kw">fn </span>empty() -&gt; StateSet&lt;S&gt; {
+        StateSet(Rc::new(RefCell::new(<span class="macro">vec!</span>[])))
     }
 
-    <span class="kw">fn</span> <span class="ident">add</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">S</span>) {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">borrow_mut</span>().<span class="ident">push</span>(<span class="ident">id</span>);
+    <span class="kw">fn </span>add(<span class="kw-2">&amp;mut </span><span class="self">self</span>, id: S) {
+        <span class="self">self</span>.<span class="number">0</span>.borrow_mut().push(id);
     }
 
-    <span class="kw">fn</span> <span class="ident">min</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">S</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">borrow</span>()[<span class="number">0</span>]
+    <span class="kw">fn </span>min(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; S {
+        <span class="self">self</span>.<span class="number">0</span>.borrow()[<span class="number">0</span>]
     }
 
-    <span class="kw">fn</span> <span class="ident">canonicalize</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">borrow_mut</span>().<span class="ident">sort</span>();
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">borrow_mut</span>().<span class="ident">dedup</span>();
+    <span class="kw">fn </span>canonicalize(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.<span class="number">0</span>.borrow_mut().sort();
+        <span class="self">self</span>.<span class="number">0</span>.borrow_mut().dedup();
     }
 
-    <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">borrow_mut</span>().<span class="ident">clear</span>();
+    <span class="kw">fn </span>clear(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.<span class="number">0</span>.borrow_mut().clear();
     }
 
-    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">borrow</span>().<span class="ident">len</span>()
+    <span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.<span class="number">0</span>.borrow().len()
     }
 
-    <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>
+    <span class="kw">fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.len() == <span class="number">0
+    </span>}
+
+    <span class="kw">fn </span>deep_clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; StateSet&lt;S&gt; {
+        <span class="kw">let </span>ids = <span class="self">self</span>.<span class="number">0</span>.borrow().iter().cloned().collect();
+        StateSet(Rc::new(RefCell::new(ids)))
     }
 
-    <span class="kw">fn</span> <span class="ident">deep_clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">StateSet</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">ids</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">borrow</span>().<span class="ident">iter</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>();
-        <span class="ident">StateSet</span>(<span class="ident">Rc::new</span>(<span class="ident">RefCell::new</span>(<span class="ident">ids</span>)))
-    }
-
-    <span class="kw">fn</span> <span class="ident">iter</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">S</span>)<span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) {
-        <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">id</span> <span class="kw">in</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">borrow</span>().<span class="ident">iter</span>() {
-            <span class="ident">f</span>(<span class="ident">id</span>);
+    <span class="kw">fn </span>iter&lt;F: FnMut(S)&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>f: F) {
+        <span class="kw">for </span><span class="kw-2">&amp;</span>id <span class="kw">in </span><span class="self">self</span>.<span class="number">0</span>.borrow().iter() {
+            f(id);
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">intersection</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">StateSet</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">dest</span>: <span class="kw-2">&amp;mut</span> <span class="ident">StateSet</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="ident">dest</span>.<span class="ident">clear</span>();
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">other</span>.<span class="ident">is_empty</span>() {
+    <span class="kw">fn </span>intersection(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>StateSet&lt;S&gt;, dest: <span class="kw-2">&amp;mut </span>StateSet&lt;S&gt;) {
+        dest.clear();
+        <span class="kw">if </span><span class="self">self</span>.is_empty() || other.is_empty() {
             <span class="kw">return</span>;
         }
 
-        <span class="kw">let</span> (<span class="ident">seta</span>, <span class="ident">setb</span>) <span class="op">=</span> (<span class="self">self</span>.<span class="number">0</span>.<span class="ident">borrow</span>(), <span class="ident">other</span>.<span class="number">0</span>.<span class="ident">borrow</span>());
-        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">ita</span>, <span class="kw-2">mut</span> <span class="ident">itb</span>) <span class="op">=</span> (<span class="ident">seta</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>(), <span class="ident">setb</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>());
-        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">a</span>, <span class="kw-2">mut</span> <span class="ident">b</span>) <span class="op">=</span> (<span class="ident">ita</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>(), <span class="ident">itb</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>());
-        <span class="kw">loop</span> {
-            <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="ident">b</span> {
-                <span class="ident">dest</span>.<span class="ident">add</span>(<span class="ident">a</span>);
-                <span class="ident">a</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ita</span>.<span class="ident">next</span>() {
-                    <span class="prelude-val">None</span> =&gt; <span class="kw">break</span>,
-                    <span class="prelude-val">Some</span>(<span class="ident">a</span>) =&gt; <span class="ident">a</span>,
+        <span class="kw">let </span>(seta, setb) = (<span class="self">self</span>.<span class="number">0</span>.borrow(), other.<span class="number">0</span>.borrow());
+        <span class="kw">let </span>(<span class="kw-2">mut </span>ita, <span class="kw-2">mut </span>itb) = (seta.iter().cloned(), setb.iter().cloned());
+        <span class="kw">let </span>(<span class="kw-2">mut </span>a, <span class="kw-2">mut </span>b) = (ita.next().unwrap(), itb.next().unwrap());
+        <span class="kw">loop </span>{
+            <span class="kw">if </span>a == b {
+                dest.add(a);
+                a = <span class="kw">match </span>ita.next() {
+                    <span class="prelude-val">None </span>=&gt; <span class="kw">break</span>,
+                    <span class="prelude-val">Some</span>(a) =&gt; a,
                 };
-                <span class="ident">b</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">itb</span>.<span class="ident">next</span>() {
-                    <span class="prelude-val">None</span> =&gt; <span class="kw">break</span>,
-                    <span class="prelude-val">Some</span>(<span class="ident">b</span>) =&gt; <span class="ident">b</span>,
+                b = <span class="kw">match </span>itb.next() {
+                    <span class="prelude-val">None </span>=&gt; <span class="kw">break</span>,
+                    <span class="prelude-val">Some</span>(b) =&gt; b,
                 };
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">a</span> <span class="op">&lt;</span> <span class="ident">b</span> {
-                <span class="ident">a</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ita</span>.<span class="ident">next</span>() {
-                    <span class="prelude-val">None</span> =&gt; <span class="kw">break</span>,
-                    <span class="prelude-val">Some</span>(<span class="ident">a</span>) =&gt; <span class="ident">a</span>,
+            } <span class="kw">else if </span>a &lt; b {
+                a = <span class="kw">match </span>ita.next() {
+                    <span class="prelude-val">None </span>=&gt; <span class="kw">break</span>,
+                    <span class="prelude-val">Some</span>(a) =&gt; a,
                 };
-            } <span class="kw">else</span> {
-                <span class="ident">b</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">itb</span>.<span class="ident">next</span>() {
-                    <span class="prelude-val">None</span> =&gt; <span class="kw">break</span>,
-                    <span class="prelude-val">Some</span>(<span class="ident">b</span>) =&gt; <span class="ident">b</span>,
+            } <span class="kw">else </span>{
+                b = <span class="kw">match </span>itb.next() {
+                    <span class="prelude-val">None </span>=&gt; <span class="kw">break</span>,
+                    <span class="prelude-val">Some</span>(b) =&gt; b,
                 };
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">subtract</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">StateSet</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">dest</span>: <span class="kw-2">&amp;mut</span> <span class="ident">StateSet</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="ident">dest</span>.<span class="ident">clear</span>();
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">other</span>.<span class="ident">is_empty</span>() {
-            <span class="self">self</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">dest</span>.<span class="ident">add</span>(<span class="ident">s</span>));
+    <span class="kw">fn </span>subtract(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>StateSet&lt;S&gt;, dest: <span class="kw-2">&amp;mut </span>StateSet&lt;S&gt;) {
+        dest.clear();
+        <span class="kw">if </span><span class="self">self</span>.is_empty() || other.is_empty() {
+            <span class="self">self</span>.iter(|s| dest.add(s));
             <span class="kw">return</span>;
         }
 
-        <span class="kw">let</span> (<span class="ident">seta</span>, <span class="ident">setb</span>) <span class="op">=</span> (<span class="self">self</span>.<span class="number">0</span>.<span class="ident">borrow</span>(), <span class="ident">other</span>.<span class="number">0</span>.<span class="ident">borrow</span>());
-        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">ita</span>, <span class="kw-2">mut</span> <span class="ident">itb</span>) <span class="op">=</span> (<span class="ident">seta</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>(), <span class="ident">setb</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>());
-        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">a</span>, <span class="kw-2">mut</span> <span class="ident">b</span>) <span class="op">=</span> (<span class="ident">ita</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>(), <span class="ident">itb</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>());
-        <span class="kw">loop</span> {
-            <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="ident">b</span> {
-                <span class="ident">a</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ita</span>.<span class="ident">next</span>() {
-                    <span class="prelude-val">None</span> =&gt; <span class="kw">break</span>,
-                    <span class="prelude-val">Some</span>(<span class="ident">a</span>) =&gt; <span class="ident">a</span>,
+        <span class="kw">let </span>(seta, setb) = (<span class="self">self</span>.<span class="number">0</span>.borrow(), other.<span class="number">0</span>.borrow());
+        <span class="kw">let </span>(<span class="kw-2">mut </span>ita, <span class="kw-2">mut </span>itb) = (seta.iter().cloned(), setb.iter().cloned());
+        <span class="kw">let </span>(<span class="kw-2">mut </span>a, <span class="kw-2">mut </span>b) = (ita.next().unwrap(), itb.next().unwrap());
+        <span class="kw">loop </span>{
+            <span class="kw">if </span>a == b {
+                a = <span class="kw">match </span>ita.next() {
+                    <span class="prelude-val">None </span>=&gt; <span class="kw">break</span>,
+                    <span class="prelude-val">Some</span>(a) =&gt; a,
                 };
-                <span class="ident">b</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">itb</span>.<span class="ident">next</span>() {
-                    <span class="prelude-val">None</span> =&gt; {
-                        <span class="ident">dest</span>.<span class="ident">add</span>(<span class="ident">a</span>);
+                b = <span class="kw">match </span>itb.next() {
+                    <span class="prelude-val">None </span>=&gt; {
+                        dest.add(a);
                         <span class="kw">break</span>;
                     }
-                    <span class="prelude-val">Some</span>(<span class="ident">b</span>) =&gt; <span class="ident">b</span>,
+                    <span class="prelude-val">Some</span>(b) =&gt; b,
                 };
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">a</span> <span class="op">&lt;</span> <span class="ident">b</span> {
-                <span class="ident">dest</span>.<span class="ident">add</span>(<span class="ident">a</span>);
-                <span class="ident">a</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ita</span>.<span class="ident">next</span>() {
-                    <span class="prelude-val">None</span> =&gt; <span class="kw">break</span>,
-                    <span class="prelude-val">Some</span>(<span class="ident">a</span>) =&gt; <span class="ident">a</span>,
+            } <span class="kw">else if </span>a &lt; b {
+                dest.add(a);
+                a = <span class="kw">match </span>ita.next() {
+                    <span class="prelude-val">None </span>=&gt; <span class="kw">break</span>,
+                    <span class="prelude-val">Some</span>(a) =&gt; a,
                 };
-            } <span class="kw">else</span> {
-                <span class="ident">b</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">itb</span>.<span class="ident">next</span>() {
-                    <span class="prelude-val">None</span> =&gt; {
-                        <span class="ident">dest</span>.<span class="ident">add</span>(<span class="ident">a</span>);
+            } <span class="kw">else </span>{
+                b = <span class="kw">match </span>itb.next() {
+                    <span class="prelude-val">None </span>=&gt; {
+                        dest.add(a);
                         <span class="kw">break</span>;
                     }
-                    <span class="prelude-val">Some</span>(<span class="ident">b</span>) =&gt; <span class="ident">b</span>,
+                    <span class="prelude-val">Some</span>(b) =&gt; b,
                 };
             }
         }
-        <span class="kw">for</span> <span class="ident">a</span> <span class="kw">in</span> <span class="ident">ita</span> {
-            <span class="ident">dest</span>.<span class="ident">add</span>(<span class="ident">a</span>);
+        <span class="kw">for </span>a <span class="kw">in </span>ita {
+            dest.add(a);
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="regex_automata" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="regex_automata" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

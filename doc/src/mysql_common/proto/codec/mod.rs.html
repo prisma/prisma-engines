@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/proto/codec/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mysql_common/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/proto/codec/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mysql_common/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -818,221 +818,221 @@
 <span id="818">818</span>
 <span id="819">819</span>
 <span id="820">820</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2017 Anatoly Ikorsky</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2017 Anatoly Ikorsky
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="doccomment">//! MySql protocol codec implementation.</span>
+</span><span class="doccomment">//! MySql protocol codec implementation.
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">flate2::Compression</span>;
+</span><span class="kw">pub use </span>flate2::Compression;
 
-<span class="kw">use</span> <span class="ident">byteorder</span>::{<span class="ident">ByteOrder</span>, <span class="ident">LittleEndian</span>};
-<span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">Buf</span>, <span class="ident">BufMut</span>, <span class="ident">BytesMut</span>};
-<span class="kw">use</span> <span class="ident">flate2::read</span>::{<span class="ident">ZlibDecoder</span>, <span class="ident">ZlibEncoder</span>};
+<span class="kw">use </span>byteorder::{ByteOrder, LittleEndian};
+<span class="kw">use </span>bytes::{Buf, BufMut, BytesMut};
+<span class="kw">use </span>flate2::read::{ZlibDecoder, ZlibEncoder};
 
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">cmp</span>::{<span class="ident">max</span>, <span class="ident">min</span>},
-    <span class="ident">io::Read</span>,
-    <span class="ident">mem</span>,
-    <span class="ident">num::NonZeroUsize</span>,
-    <span class="ident">ptr::slice_from_raw_parts_mut</span>,
+<span class="kw">use </span>std::{
+    cmp::{max, min},
+    io::Read,
+    mem,
+    num::NonZeroUsize,
+    ptr::slice_from_raw_parts_mut,
 };
 
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::error::PacketCodecError</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants</span>::{<span class="ident">DEFAULT_MAX_ALLOWED_PACKET</span>, <span class="ident">MAX_PAYLOAD_LEN</span>, <span class="ident">MIN_COMPRESS_LENGTH</span>};
+<span class="kw">use </span><span class="self">self</span>::error::PacketCodecError;
+<span class="kw">use </span><span class="kw">crate</span>::constants::{DEFAULT_MAX_ALLOWED_PACKET, MAX_PAYLOAD_LEN, MIN_COMPRESS_LENGTH};
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">error</span>;
+<span class="kw">pub mod </span>error;
 
-<span class="doccomment">/// Will split given `packet` to MySql packet chunks and write into `dst`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Chunk ids will start with given `seq_id`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Resulting sequence id will be returned.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">packet_to_chunks</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Buf</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">seq_id</span>: <span class="ident">u8</span>, <span class="ident">packet</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="ident">u8</span> {
-    <span class="kw">let</span> <span class="ident">extra_packet</span> <span class="op">=</span> <span class="ident">packet</span>.<span class="ident">remaining</span>() <span class="op">%</span> <span class="ident">MAX_PAYLOAD_LEN</span> <span class="op">==</span> <span class="number">0</span>;
-    <span class="ident">dst</span>.<span class="ident">reserve</span>(<span class="ident">packet</span>.<span class="ident">remaining</span>() <span class="op">+</span> (<span class="ident">packet</span>.<span class="ident">remaining</span>() <span class="op">/</span> <span class="ident">MAX_PAYLOAD_LEN</span>) <span class="op">*</span> <span class="number">4</span> <span class="op">+</span> <span class="number">4</span>);
+<span class="doccomment">/// Will split given `packet` to MySql packet chunks and write into `dst`.
+///
+/// Chunk ids will start with given `seq_id`.
+///
+/// Resulting sequence id will be returned.
+</span><span class="kw">pub fn </span>packet_to_chunks&lt;T: Buf&gt;(<span class="kw-2">mut </span>seq_id: u8, packet: <span class="kw-2">&amp;mut </span>T, dst: <span class="kw-2">&amp;mut </span>BytesMut) -&gt; u8 {
+    <span class="kw">let </span>extra_packet = packet.remaining() % MAX_PAYLOAD_LEN == <span class="number">0</span>;
+    dst.reserve(packet.remaining() + (packet.remaining() / MAX_PAYLOAD_LEN) * <span class="number">4 </span>+ <span class="number">4</span>);
 
-    <span class="kw">while</span> <span class="ident">packet</span>.<span class="ident">has_remaining</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chunk_len</span> <span class="op">=</span> <span class="ident">min</span>(<span class="ident">packet</span>.<span class="ident">remaining</span>(), <span class="ident">MAX_PAYLOAD_LEN</span>);
-        <span class="ident">dst</span>.<span class="ident">put_u32_le</span>(<span class="ident">chunk_len</span> <span class="kw">as</span> <span class="ident">u32</span> <span class="op">|</span> (<span class="ident">u32::from</span>(<span class="ident">seq_id</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">24</span>));
-        <span class="kw">while</span> <span class="ident">chunk_len</span> <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="kw">let</span> <span class="ident">chunk</span> <span class="op">=</span> <span class="ident">packet</span>.<span class="ident">chunk</span>();
-            <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">min</span>(<span class="ident">chunk</span>.<span class="ident">len</span>(), <span class="ident">chunk_len</span>);
-            <span class="ident">dst</span>.<span class="ident">put</span>(<span class="kw-2">&amp;</span><span class="ident">chunk</span>[..<span class="ident">count</span>]);
-            <span class="ident">chunk_len</span> <span class="op">-</span><span class="op">=</span> <span class="ident">count</span>;
-            <span class="ident">packet</span>.<span class="ident">advance</span>(<span class="ident">count</span>);
+    <span class="kw">while </span>packet.has_remaining() {
+        <span class="kw">let </span><span class="kw-2">mut </span>chunk_len = min(packet.remaining(), MAX_PAYLOAD_LEN);
+        dst.put_u32_le(chunk_len <span class="kw">as </span>u32 | (u32::from(seq_id) &lt;&lt; <span class="number">24</span>));
+        <span class="kw">while </span>chunk_len &gt; <span class="number">0 </span>{
+            <span class="kw">let </span>chunk = packet.chunk();
+            <span class="kw">let </span>count = min(chunk.len(), chunk_len);
+            dst.put(<span class="kw-2">&amp;</span>chunk[..count]);
+            chunk_len -= count;
+            packet.advance(count);
         }
-        <span class="ident">seq_id</span> <span class="op">=</span> <span class="ident">seq_id</span>.<span class="ident">wrapping_add</span>(<span class="number">1</span>);
+        seq_id = seq_id.wrapping_add(<span class="number">1</span>);
     }
 
-    <span class="kw">if</span> <span class="ident">extra_packet</span> {
-        <span class="ident">dst</span>.<span class="ident">put_u32_le</span>(<span class="ident">u32::from</span>(<span class="ident">seq_id</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">24</span>);
-        <span class="ident">seq_id</span> <span class="op">=</span> <span class="ident">seq_id</span>.<span class="ident">wrapping_add</span>(<span class="number">1</span>);
+    <span class="kw">if </span>extra_packet {
+        dst.put_u32_le(u32::from(seq_id) &lt;&lt; <span class="number">24</span>);
+        seq_id = seq_id.wrapping_add(<span class="number">1</span>);
     }
 
-    <span class="ident">seq_id</span>
+    seq_id
 }
 
-<span class="doccomment">/// Will compress all data from `src` to `dst`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Compressed packets will start with given `seq_id`. Resulting sequence id will be returned.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compress</span>(
-    <span class="kw-2">mut</span> <span class="ident">seq_id</span>: <span class="ident">u8</span>,
-    <span class="ident">compression</span>: <span class="ident">Compression</span>,
-    <span class="ident">max_allowed_packet</span>: <span class="ident">usize</span>,
-    <span class="ident">src</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>,
-    <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u8</span>, <span class="ident">PacketCodecError</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">src</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="number">0</span>);
+<span class="doccomment">/// Will compress all data from `src` to `dst`.
+///
+/// Compressed packets will start with given `seq_id`. Resulting sequence id will be returned.
+</span><span class="kw">pub fn </span>compress(
+    <span class="kw-2">mut </span>seq_id: u8,
+    compression: Compression,
+    max_allowed_packet: usize,
+    src: <span class="kw-2">&amp;mut </span>BytesMut,
+    dst: <span class="kw-2">&amp;mut </span>BytesMut,
+) -&gt; <span class="prelude-ty">Result</span>&lt;u8, PacketCodecError&gt; {
+    <span class="kw">if </span>src.is_empty() {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="number">0</span>);
     }
 
-    <span class="kw">for</span> <span class="ident">chunk</span> <span class="kw">in</span> <span class="ident">src</span>.<span class="ident">chunks</span>(<span class="ident">min</span>(<span class="ident">MAX_PAYLOAD_LEN</span>, <span class="ident">max_allowed_packet</span>)) {
-        <span class="ident">dst</span>.<span class="ident">reserve</span>(<span class="number">7</span> <span class="op">+</span> <span class="ident">chunk</span>.<span class="ident">len</span>());
+    <span class="kw">for </span>chunk <span class="kw">in </span>src.chunks(min(MAX_PAYLOAD_LEN, max_allowed_packet)) {
+        dst.reserve(<span class="number">7 </span>+ chunk.len());
 
-        <span class="kw">if</span> <span class="ident">compression</span> <span class="op">!</span><span class="op">=</span> <span class="ident">Compression::none</span>() <span class="op">&amp;&amp;</span> <span class="ident">chunk</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">MIN_COMPRESS_LENGTH</span> {
-            <span class="kw">unsafe</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span> <span class="op">=</span> <span class="ident">ZlibEncoder::new</span>(<span class="ident">chunk</span>, <span class="ident">compression</span>);
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">read</span> <span class="op">=</span> <span class="number">0</span>;
-                <span class="kw">loop</span> {
-                    <span class="ident">dst</span>.<span class="ident">reserve</span>(<span class="ident">max</span>(<span class="ident">chunk</span>.<span class="ident">len</span>().<span class="ident">saturating_sub</span>(<span class="ident">read</span>), <span class="number">1</span>));
-                    <span class="kw">let</span> <span class="ident">dst_buf</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">dst</span>.<span class="ident">chunk_mut</span>()[<span class="number">7</span> <span class="op">+</span> <span class="ident">read</span>..];
-                    <span class="kw">match</span> <span class="ident">encoder</span>.<span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">slice_from_raw_parts_mut</span>(
-                        <span class="ident">dst_buf</span>.<span class="ident">as_mut_ptr</span>(),
-                        <span class="ident">dst_buf</span>.<span class="ident">len</span>(),
-                    ))<span class="question-mark">?</span> {
-                        <span class="number">0</span> =&gt; <span class="kw">break</span>,
-                        <span class="ident">count</span> =&gt; <span class="ident">read</span> <span class="op">+</span><span class="op">=</span> <span class="ident">count</span>,
+        <span class="kw">if </span>compression != Compression::none() &amp;&amp; chunk.len() &gt;= MIN_COMPRESS_LENGTH {
+            <span class="kw">unsafe </span>{
+                <span class="kw">let </span><span class="kw-2">mut </span>encoder = ZlibEncoder::new(chunk, compression);
+                <span class="kw">let </span><span class="kw-2">mut </span>read = <span class="number">0</span>;
+                <span class="kw">loop </span>{
+                    dst.reserve(max(chunk.len().saturating_sub(read), <span class="number">1</span>));
+                    <span class="kw">let </span>dst_buf = <span class="kw-2">&amp;mut </span>dst.chunk_mut()[<span class="number">7 </span>+ read..];
+                    <span class="kw">match </span>encoder.read(<span class="kw-2">&amp;mut *</span>slice_from_raw_parts_mut(
+                        dst_buf.as_mut_ptr(),
+                        dst_buf.len(),
+                    ))<span class="question-mark">? </span>{
+                        <span class="number">0 </span>=&gt; <span class="kw">break</span>,
+                        count =&gt; read += count,
                     }
                 }
 
-                <span class="ident">dst</span>.<span class="ident">put_uint_le</span>(<span class="ident">read</span> <span class="kw">as</span> <span class="ident">u64</span>, <span class="number">3</span>);
-                <span class="ident">dst</span>.<span class="ident">put_u8</span>(<span class="ident">seq_id</span>);
-                <span class="ident">dst</span>.<span class="ident">put_uint_le</span>(<span class="ident">chunk</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>, <span class="number">3</span>);
-                <span class="ident">dst</span>.<span class="ident">advance_mut</span>(<span class="ident">read</span>);
+                dst.put_uint_le(read <span class="kw">as </span>u64, <span class="number">3</span>);
+                dst.put_u8(seq_id);
+                dst.put_uint_le(chunk.len() <span class="kw">as </span>u64, <span class="number">3</span>);
+                dst.advance_mut(read);
             }
-        } <span class="kw">else</span> {
-            <span class="ident">dst</span>.<span class="ident">put_uint_le</span>(<span class="ident">chunk</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>, <span class="number">3</span>);
-            <span class="ident">dst</span>.<span class="ident">put_u8</span>(<span class="ident">seq_id</span>);
-            <span class="ident">dst</span>.<span class="ident">put_uint_le</span>(<span class="number">0</span>, <span class="number">3</span>);
-            <span class="ident">dst</span>.<span class="ident">put_slice</span>(<span class="ident">chunk</span>);
+        } <span class="kw">else </span>{
+            dst.put_uint_le(chunk.len() <span class="kw">as </span>u64, <span class="number">3</span>);
+            dst.put_u8(seq_id);
+            dst.put_uint_le(<span class="number">0</span>, <span class="number">3</span>);
+            dst.put_slice(chunk);
         }
 
-        <span class="ident">seq_id</span> <span class="op">=</span> <span class="ident">seq_id</span>.<span class="ident">wrapping_add</span>(<span class="number">1</span>);
+        seq_id = seq_id.wrapping_add(<span class="number">1</span>);
     }
 
-    <span class="ident">src</span>.<span class="ident">clear</span>();
+    src.clear();
 
-    <span class="prelude-val">Ok</span>(<span class="ident">seq_id</span>)
+    <span class="prelude-val">Ok</span>(seq_id)
 }
 
-<span class="doccomment">/// Chunk info.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ChunkInfo</span> {
-    <span class="doccomment">/// A packet chunk with given sequence id that isn&#39;t last in a packet.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Only makes sense for plain MySql protocol.</span>
-    <span class="ident">Middle</span>(<span class="ident">u8</span>),
-    <span class="doccomment">/// Last chunk in a packet. Stores chunk sequence id.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The only variant that `CompDecoder` will return.</span>
-    <span class="ident">Last</span>(<span class="ident">u8</span>),
+<span class="doccomment">/// Chunk info.
+</span><span class="attribute">#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+</span><span class="kw">pub enum </span>ChunkInfo {
+    <span class="doccomment">/// A packet chunk with given sequence id that isn&#39;t last in a packet.
+    ///
+    /// Only makes sense for plain MySql protocol.
+    </span>Middle(u8),
+    <span class="doccomment">/// Last chunk in a packet. Stores chunk sequence id.
+    ///
+    /// The only variant that `CompDecoder` will return.
+    </span>Last(u8),
 }
 
-<span class="kw">impl</span> <span class="ident">ChunkInfo</span> {
-    <span class="kw">fn</span> <span class="ident">seq_id</span>(<span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ChunkInfo::Middle</span>(<span class="ident">x</span>) <span class="op">|</span> <span class="ident">ChunkInfo::Last</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>,
+<span class="kw">impl </span>ChunkInfo {
+    <span class="kw">fn </span>seq_id(<span class="self">self</span>) -&gt; u8 {
+        <span class="kw">match </span><span class="self">self </span>{
+            ChunkInfo::Middle(x) | ChunkInfo::Last(x) =&gt; x,
         }
     }
 }
 
-<span class="doccomment">/// Decoder for MySql protocol chunk.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ChunkDecoder</span> {
-    <span class="doccomment">/// Decoder is waiting for the first or subsequent packet chunk.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// It&#39;ll need at least 4 bytes to start decoding a chunk.</span>
-    <span class="ident">Idle</span>,
-    <span class="doccomment">/// Chunk is being decoded.</span>
-    <span class="ident">Chunk</span> {
-        <span class="doccomment">/// Sequence id of chunk being decoded.</span>
-        <span class="ident">seq_id</span>: <span class="ident">u8</span>,
-        <span class="doccomment">/// Number of bytes needed to finish this chunk.</span>
-        <span class="ident">needed</span>: <span class="ident">NonZeroUsize</span>,
+<span class="doccomment">/// Decoder for MySql protocol chunk.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+</span><span class="kw">pub enum </span>ChunkDecoder {
+    <span class="doccomment">/// Decoder is waiting for the first or subsequent packet chunk.
+    ///
+    /// It&#39;ll need at least 4 bytes to start decoding a chunk.
+    </span>Idle,
+    <span class="doccomment">/// Chunk is being decoded.
+    </span>Chunk {
+        <span class="doccomment">/// Sequence id of chunk being decoded.
+        </span>seq_id: u8,
+        <span class="doccomment">/// Number of bytes needed to finish this chunk.
+        </span>needed: NonZeroUsize,
     },
 }
 
-<span class="kw">impl</span> <span class="ident">ChunkDecoder</span> {
-    <span class="doccomment">/// Will try to decode MySql packet chunk from `src` to `dst`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If chunk is decoded, then `ChunkInfo` is returned.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the `dst` buffer isn&#39;t empty then it is expected that it contains previous chunks</span>
-    <span class="doccomment">/// of the same packet, or this function may erroneously report</span>
-    <span class="doccomment">/// [`PacketCodecError::PacketTooLarge`] error.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">src</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>,
-        <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>,
-        <span class="ident">max_allowed_packet</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChunkInfo</span><span class="op">&gt;</span>, <span class="ident">PacketCodecError</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-        <span class="ident">T</span>: <span class="ident">BufMut</span>,
+<span class="kw">impl </span>ChunkDecoder {
+    <span class="doccomment">/// Will try to decode MySql packet chunk from `src` to `dst`.
+    ///
+    /// If chunk is decoded, then `ChunkInfo` is returned.
+    ///
+    /// If the `dst` buffer isn&#39;t empty then it is expected that it contains previous chunks
+    /// of the same packet, or this function may erroneously report
+    /// [`PacketCodecError::PacketTooLarge`] error.
+    </span><span class="kw">pub fn </span>decode&lt;T&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        src: <span class="kw-2">&amp;mut </span>BytesMut,
+        dst: <span class="kw-2">&amp;mut </span>T,
+        max_allowed_packet: usize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;ChunkInfo&gt;, PacketCodecError&gt;
+    <span class="kw">where
+        </span>T: AsRef&lt;[u8]&gt;,
+        T: BufMut,
     {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">ChunkDecoder::Idle</span> =&gt; {
-                <span class="kw">if</span> <span class="ident">src</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">4</span> {
-                    <span class="comment">// We need at least 4 bytes to read chunk length and sequence id.</span>
-                    <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
-                } <span class="kw">else</span> {
-                    <span class="kw">let</span> <span class="ident">raw_chunk_len</span> <span class="op">=</span> <span class="ident">LittleEndian::read_u24</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">src</span>) <span class="kw">as</span> <span class="ident">usize</span>;
-                    <span class="kw">let</span> <span class="ident">seq_id</span> <span class="op">=</span> <span class="ident">src</span>[<span class="number">3</span>];
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            ChunkDecoder::Idle =&gt; {
+                <span class="kw">if </span>src.len() &lt; <span class="number">4 </span>{
+                    <span class="comment">// We need at least 4 bytes to read chunk length and sequence id.
+                    </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
+                } <span class="kw">else </span>{
+                    <span class="kw">let </span>raw_chunk_len = LittleEndian::read_u24(<span class="kw-2">&amp;*</span>src) <span class="kw">as </span>usize;
+                    <span class="kw">let </span>seq_id = src[<span class="number">3</span>];
 
-                    <span class="kw">match</span> <span class="ident">NonZeroUsize::new</span>(<span class="ident">raw_chunk_len</span>) {
-                        <span class="prelude-val">Some</span>(<span class="ident">chunk_len</span>) =&gt; {
-                            <span class="kw">if</span> <span class="ident">dst</span>.<span class="ident">as_ref</span>().<span class="ident">len</span>() <span class="op">+</span> <span class="ident">chunk_len</span>.<span class="ident">get</span>() <span class="op">&gt;</span> <span class="ident">max_allowed_packet</span> {
-                                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">PacketCodecError::PacketTooLarge</span>);
+                    <span class="kw">match </span>NonZeroUsize::new(raw_chunk_len) {
+                        <span class="prelude-val">Some</span>(chunk_len) =&gt; {
+                            <span class="kw">if </span>dst.as_ref().len() + chunk_len.get() &gt; max_allowed_packet {
+                                <span class="kw">return </span><span class="prelude-val">Err</span>(PacketCodecError::PacketTooLarge);
                             }
 
-                            <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">ChunkDecoder::Chunk</span> {
-                                <span class="ident">seq_id</span>,
-                                <span class="ident">needed</span>: <span class="ident">chunk_len</span>,
+                            <span class="kw-2">*</span><span class="self">self </span>= ChunkDecoder::Chunk {
+                                seq_id,
+                                needed: chunk_len,
                             };
 
-                            <span class="kw">if</span> <span class="ident">src</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">4</span> {
-                                <span class="self">self</span>.<span class="ident">decode</span>(<span class="ident">src</span>, <span class="ident">dst</span>, <span class="ident">max_allowed_packet</span>)
-                            } <span class="kw">else</span> {
+                            <span class="kw">if </span>src.len() &gt; <span class="number">4 </span>{
+                                <span class="self">self</span>.decode(src, dst, max_allowed_packet)
+                            } <span class="kw">else </span>{
                                 <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
                             }
                         }
-                        <span class="prelude-val">None</span> =&gt; {
-                            <span class="ident">src</span>.<span class="ident">advance</span>(<span class="number">4</span>);
-                            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ChunkInfo::Last</span>(<span class="ident">seq_id</span>)))
+                        <span class="prelude-val">None </span>=&gt; {
+                            src.advance(<span class="number">4</span>);
+                            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(ChunkInfo::Last(seq_id)))
                         }
                     }
                 }
             }
-            <span class="ident">ChunkDecoder::Chunk</span> { <span class="ident">seq_id</span>, <span class="ident">needed</span> } =&gt; {
-                <span class="kw">if</span> <span class="ident">src</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">4</span> <span class="op">+</span> <span class="ident">needed</span>.<span class="ident">get</span>() {
-                    <span class="ident">src</span>.<span class="ident">advance</span>(<span class="number">4</span>);
+            ChunkDecoder::Chunk { seq_id, needed } =&gt; {
+                <span class="kw">if </span>src.len() &gt;= <span class="number">4 </span>+ needed.get() {
+                    src.advance(<span class="number">4</span>);
 
-                    <span class="ident">dst</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="ident">src</span>[..<span class="ident">needed</span>.<span class="ident">get</span>()]);
-                    <span class="ident">src</span>.<span class="ident">advance</span>(<span class="ident">needed</span>.<span class="ident">get</span>());
+                    dst.put_slice(<span class="kw-2">&amp;</span>src[..needed.get()]);
+                    src.advance(needed.get());
 
-                    <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">ChunkDecoder::Idle</span>;
+                    <span class="kw-2">*</span><span class="self">self </span>= ChunkDecoder::Idle;
 
-                    <span class="kw">if</span> <span class="ident">dst</span>.<span class="ident">as_ref</span>().<span class="ident">len</span>() <span class="op">%</span> <span class="ident">MAX_PAYLOAD_LEN</span> <span class="op">==</span> <span class="number">0</span> {
-                        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ChunkInfo::Middle</span>(<span class="ident">seq_id</span>)))
-                    } <span class="kw">else</span> {
-                        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ChunkInfo::Last</span>(<span class="ident">seq_id</span>)))
+                    <span class="kw">if </span>dst.as_ref().len() % MAX_PAYLOAD_LEN == <span class="number">0 </span>{
+                        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(ChunkInfo::Middle(seq_id)))
+                    } <span class="kw">else </span>{
+                        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(ChunkInfo::Last(seq_id)))
                     }
-                } <span class="kw">else</span> {
+                } <span class="kw">else </span>{
                     <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
                 }
             }
@@ -1040,126 +1040,126 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ChunkDecoder</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">ChunkDecoder::Idle</span>
+<span class="kw">impl </span>Default <span class="kw">for </span>ChunkDecoder {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        ChunkDecoder::Idle
     }
 }
 
-<span class="doccomment">/// Stores information about compressed packet being decoded.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CompData</span> {
-    <span class="doccomment">/// Compressed(&lt;needed&gt;, &lt;uncompressed len&gt;)</span>
-    <span class="ident">Compressed</span>(<span class="ident">NonZeroUsize</span>, <span class="ident">NonZeroUsize</span>),
-    <span class="doccomment">/// Uncompressed(&lt;needed&gt;)</span>
-    <span class="ident">Uncompressed</span>(<span class="ident">NonZeroUsize</span>),
+<span class="doccomment">/// Stores information about compressed packet being decoded.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+</span><span class="kw">pub enum </span>CompData {
+    <span class="doccomment">/// Compressed(&lt;needed&gt;, &lt;uncompressed len&gt;)
+    </span>Compressed(NonZeroUsize, NonZeroUsize),
+    <span class="doccomment">/// Uncompressed(&lt;needed&gt;)
+    </span>Uncompressed(NonZeroUsize),
 }
 
-<span class="kw">impl</span> <span class="ident">CompData</span> {
-    <span class="doccomment">/// Creates new `CompData` if given arguments are valid.</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">compressed_len</span>: <span class="ident">usize</span>,
-        <span class="ident">uncompressed_len</span>: <span class="ident">usize</span>,
-        <span class="ident">max_allowed_packet</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">PacketCodecError</span><span class="op">&gt;</span> {
-        <span class="comment">// max_allowed_packet will be an upper boundary</span>
-        <span class="kw">if</span> <span class="ident">max</span>(<span class="ident">compressed_len</span>, <span class="ident">uncompressed_len</span>) <span class="op">&gt;</span> <span class="ident">max_allowed_packet</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">PacketCodecError::PacketTooLarge</span>);
+<span class="kw">impl </span>CompData {
+    <span class="doccomment">/// Creates new `CompData` if given arguments are valid.
+    </span><span class="kw">fn </span>new(
+        compressed_len: usize,
+        uncompressed_len: usize,
+        max_allowed_packet: usize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt;, PacketCodecError&gt; {
+        <span class="comment">// max_allowed_packet will be an upper boundary
+        </span><span class="kw">if </span>max(compressed_len, uncompressed_len) &gt; max_allowed_packet {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(PacketCodecError::PacketTooLarge);
         }
 
-        <span class="kw">let</span> <span class="ident">compressed_len</span> <span class="op">=</span> <span class="ident">NonZeroUsize::new</span>(<span class="ident">compressed_len</span>);
-        <span class="kw">let</span> <span class="ident">uncompressed_len</span> <span class="op">=</span> <span class="ident">NonZeroUsize::new</span>(<span class="ident">uncompressed_len</span>);
+        <span class="kw">let </span>compressed_len = NonZeroUsize::new(compressed_len);
+        <span class="kw">let </span>uncompressed_len = NonZeroUsize::new(uncompressed_len);
 
-        <span class="kw">match</span> (<span class="ident">compressed_len</span>, <span class="ident">uncompressed_len</span>) {
-            (<span class="prelude-val">Some</span>(<span class="ident">needed</span>), <span class="prelude-val">Some</span>(<span class="ident">plain_len</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">CompData::Compressed</span>(<span class="ident">needed</span>, <span class="ident">plain_len</span>))),
-            (<span class="prelude-val">Some</span>(<span class="ident">needed</span>), <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">CompData::Uncompressed</span>(<span class="ident">needed</span>))),
+        <span class="kw">match </span>(compressed_len, uncompressed_len) {
+            (<span class="prelude-val">Some</span>(needed), <span class="prelude-val">Some</span>(plain_len)) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(CompData::Compressed(needed, plain_len))),
+            (<span class="prelude-val">Some</span>(needed), <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(CompData::Uncompressed(needed))),
             (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; {
-                <span class="comment">// Zero bytes of compressed data that stores</span>
-                <span class="comment">// non-zero bytes of plain data? Absurd.</span>
-                <span class="prelude-val">Err</span>(<span class="ident">PacketCodecError::BadCompressedPacketHeader</span>)
+                <span class="comment">// Zero bytes of compressed data that stores
+                // non-zero bytes of plain data? Absurd.
+                </span><span class="prelude-val">Err</span>(PacketCodecError::BadCompressedPacketHeader)
             }
             (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
         }
     }
 
-    <span class="doccomment">/// Returns number of bytes needed to decode packet.</span>
-    <span class="kw">fn</span> <span class="ident">needed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">CompData::Compressed</span>(<span class="ident">needed</span>, <span class="kw">_</span>) <span class="op">|</span> <span class="ident">CompData::Uncompressed</span>(<span class="ident">needed</span>) =&gt; <span class="ident">needed</span>.<span class="ident">get</span>(),
+    <span class="doccomment">/// Returns number of bytes needed to decode packet.
+    </span><span class="kw">fn </span>needed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            CompData::Compressed(needed, <span class="kw">_</span>) | CompData::Uncompressed(needed) =&gt; needed.get(),
         }
     }
 }
 
-<span class="doccomment">/// Decoder for MySql compressed packet.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CompDecoder</span> {
-    <span class="doccomment">/// Decoder is waiting for compressed packet header.</span>
-    <span class="ident">Idle</span>,
-    <span class="doccomment">/// Decoder is decoding a packet.</span>
-    <span class="ident">Packet</span> {
-        <span class="doccomment">/// Compressed packet sequence id.</span>
-        <span class="ident">seq_id</span>: <span class="ident">u8</span>,
-        <span class="doccomment">/// Compressed packet size information.</span>
-        <span class="ident">needed</span>: <span class="ident">CompData</span>,
+<span class="doccomment">/// Decoder for MySql compressed packet.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+</span><span class="kw">pub enum </span>CompDecoder {
+    <span class="doccomment">/// Decoder is waiting for compressed packet header.
+    </span>Idle,
+    <span class="doccomment">/// Decoder is decoding a packet.
+    </span>Packet {
+        <span class="doccomment">/// Compressed packet sequence id.
+        </span>seq_id: u8,
+        <span class="doccomment">/// Compressed packet size information.
+        </span>needed: CompData,
     },
 }
 
-<span class="kw">impl</span> <span class="ident">CompDecoder</span> {
-    <span class="doccomment">/// Will try to decode compressed packet from `src` into `dst`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If packet is decoded, then `ChunkInfo::Last` is returned.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">src</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>,
-        <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>,
-        <span class="ident">max_allowed_packet</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChunkInfo</span><span class="op">&gt;</span>, <span class="ident">PacketCodecError</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">CompDecoder::Idle</span> =&gt; {
-                <span class="kw">if</span> <span class="ident">src</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">7</span> {
-                    <span class="comment">// We need at least 7 bytes to read compressed packet header.</span>
-                    <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
-                } <span class="kw">else</span> {
-                    <span class="kw">let</span> <span class="ident">compressed_len</span> <span class="op">=</span> <span class="ident">LittleEndian::read_u24</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">src</span>) <span class="kw">as</span> <span class="ident">usize</span>;
-                    <span class="kw">let</span> <span class="ident">seq_id</span> <span class="op">=</span> <span class="ident">src</span>[<span class="number">3</span>];
-                    <span class="kw">let</span> <span class="ident">uncompressed_len</span> <span class="op">=</span> <span class="ident">LittleEndian::read_u24</span>(<span class="kw-2">&amp;</span><span class="ident">src</span>[<span class="number">4</span>..]) <span class="kw">as</span> <span class="ident">usize</span>;
+<span class="kw">impl </span>CompDecoder {
+    <span class="doccomment">/// Will try to decode compressed packet from `src` into `dst`.
+    ///
+    /// If packet is decoded, then `ChunkInfo::Last` is returned.
+    </span><span class="kw">pub fn </span>decode(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        src: <span class="kw-2">&amp;mut </span>BytesMut,
+        dst: <span class="kw-2">&amp;mut </span>BytesMut,
+        max_allowed_packet: usize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;ChunkInfo&gt;, PacketCodecError&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            CompDecoder::Idle =&gt; {
+                <span class="kw">if </span>src.len() &lt; <span class="number">7 </span>{
+                    <span class="comment">// We need at least 7 bytes to read compressed packet header.
+                    </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
+                } <span class="kw">else </span>{
+                    <span class="kw">let </span>compressed_len = LittleEndian::read_u24(<span class="kw-2">&amp;*</span>src) <span class="kw">as </span>usize;
+                    <span class="kw">let </span>seq_id = src[<span class="number">3</span>];
+                    <span class="kw">let </span>uncompressed_len = LittleEndian::read_u24(<span class="kw-2">&amp;</span>src[<span class="number">4</span>..]) <span class="kw">as </span>usize;
 
-                    <span class="kw">match</span> <span class="ident">CompData::new</span>(<span class="ident">compressed_len</span>, <span class="ident">uncompressed_len</span>, <span class="ident">max_allowed_packet</span>)<span class="question-mark">?</span> {
-                        <span class="prelude-val">Some</span>(<span class="ident">needed</span>) =&gt; {
-                            <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">CompDecoder::Packet</span> { <span class="ident">seq_id</span>, <span class="ident">needed</span> };
-                            <span class="self">self</span>.<span class="ident">decode</span>(<span class="ident">src</span>, <span class="ident">dst</span>, <span class="ident">max_allowed_packet</span>)
+                    <span class="kw">match </span>CompData::new(compressed_len, uncompressed_len, max_allowed_packet)<span class="question-mark">? </span>{
+                        <span class="prelude-val">Some</span>(needed) =&gt; {
+                            <span class="kw-2">*</span><span class="self">self </span>= CompDecoder::Packet { seq_id, needed };
+                            <span class="self">self</span>.decode(src, dst, max_allowed_packet)
                         }
-                        <span class="prelude-val">None</span> =&gt; {
-                            <span class="ident">src</span>.<span class="ident">advance</span>(<span class="number">7</span>);
-                            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ChunkInfo::Last</span>(<span class="ident">seq_id</span>)))
+                        <span class="prelude-val">None </span>=&gt; {
+                            src.advance(<span class="number">7</span>);
+                            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(ChunkInfo::Last(seq_id)))
                         }
                     }
                 }
             }
-            <span class="ident">CompDecoder::Packet</span> { <span class="ident">seq_id</span>, <span class="ident">needed</span> } =&gt; {
-                <span class="kw">if</span> <span class="ident">src</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">7</span> <span class="op">+</span> <span class="ident">needed</span>.<span class="ident">needed</span>() {
-                    <span class="ident">src</span>.<span class="ident">advance</span>(<span class="number">7</span>);
-                    <span class="kw">match</span> <span class="ident">needed</span> {
-                        <span class="ident">CompData::Uncompressed</span>(<span class="ident">needed</span>) =&gt; {
-                            <span class="ident">dst</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">src</span>[..<span class="ident">needed</span>.<span class="ident">get</span>()]);
+            CompDecoder::Packet { seq_id, needed } =&gt; {
+                <span class="kw">if </span>src.len() &gt;= <span class="number">7 </span>+ needed.needed() {
+                    src.advance(<span class="number">7</span>);
+                    <span class="kw">match </span>needed {
+                        CompData::Uncompressed(needed) =&gt; {
+                            dst.extend_from_slice(<span class="kw-2">&amp;</span>src[..needed.get()]);
                         }
-                        <span class="ident">CompData::Compressed</span>(<span class="ident">needed</span>, <span class="ident">plain_len</span>) =&gt; {
-                            <span class="ident">dst</span>.<span class="ident">reserve</span>(<span class="ident">plain_len</span>.<span class="ident">get</span>());
-                            <span class="kw">unsafe</span> {
-                                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span> <span class="op">=</span> <span class="ident">ZlibDecoder::new</span>(<span class="kw-2">&amp;</span><span class="ident">src</span>[..<span class="ident">needed</span>.<span class="ident">get</span>()]);
-                                <span class="kw">let</span> <span class="ident">dst_buf</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">dst</span>.<span class="ident">chunk_mut</span>()[..<span class="ident">plain_len</span>.<span class="ident">get</span>()];
-                                <span class="ident">decoder</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">slice_from_raw_parts_mut</span>(
-                                    <span class="ident">dst_buf</span>.<span class="ident">as_mut_ptr</span>(),
-                                    <span class="ident">dst_buf</span>.<span class="ident">len</span>(),
+                        CompData::Compressed(needed, plain_len) =&gt; {
+                            dst.reserve(plain_len.get());
+                            <span class="kw">unsafe </span>{
+                                <span class="kw">let </span><span class="kw-2">mut </span>decoder = ZlibDecoder::new(<span class="kw-2">&amp;</span>src[..needed.get()]);
+                                <span class="kw">let </span>dst_buf = <span class="kw-2">&amp;mut </span>dst.chunk_mut()[..plain_len.get()];
+                                decoder.read_exact(<span class="kw-2">&amp;mut *</span>slice_from_raw_parts_mut(
+                                    dst_buf.as_mut_ptr(),
+                                    dst_buf.len(),
                                 ))<span class="question-mark">?</span>;
-                                <span class="ident">dst</span>.<span class="ident">advance_mut</span>(<span class="ident">plain_len</span>.<span class="ident">get</span>());
+                                dst.advance_mut(plain_len.get());
                             }
                         }
                     }
-                    <span class="ident">src</span>.<span class="ident">advance</span>(<span class="ident">needed</span>.<span class="ident">needed</span>());
-                    <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">CompDecoder::Idle</span>;
-                    <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ChunkInfo::Last</span>(<span class="ident">seq_id</span>)))
-                } <span class="kw">else</span> {
+                    src.advance(needed.needed());
+                    <span class="kw-2">*</span><span class="self">self </span>= CompDecoder::Idle;
+                    <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(ChunkInfo::Last(seq_id)))
+                } <span class="kw">else </span>{
                     <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
                 }
             }
@@ -1167,476 +1167,476 @@
     }
 }
 
-<span class="doccomment">/// Codec for MySql protocol packets.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Codec supports both plain and compressed protocols.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PacketCodec</span> {
-    <span class="doccomment">/// Maximum size of a packet for this codec.</span>
-    <span class="kw">pub</span> <span class="ident">max_allowed_packet</span>: <span class="ident">usize</span>,
-    <span class="doccomment">/// Actual implementation.</span>
-    <span class="ident">inner</span>: <span class="ident">PacketCodecInner</span>,
+<span class="doccomment">/// Codec for MySql protocol packets.
+///
+/// Codec supports both plain and compressed protocols.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>PacketCodec {
+    <span class="doccomment">/// Maximum size of a packet for this codec.
+    </span><span class="kw">pub </span>max_allowed_packet: usize,
+    <span class="doccomment">/// Actual implementation.
+    </span>inner: PacketCodecInner,
 }
 
-<span class="kw">impl</span> <span class="ident">PacketCodec</span> {
-    <span class="doccomment">/// Sets sequence id to `0`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reset_seq_id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">reset_seq_id</span>();
+<span class="kw">impl </span>PacketCodec {
+    <span class="doccomment">/// Sets sequence id to `0`.
+    </span><span class="kw">pub fn </span>reset_seq_id(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.inner.reset_seq_id();
     }
 
-    <span class="doccomment">/// Overwrites plain sequence id with compressed sequence id.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sync_seq_id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">sync_seq_id</span>();
+    <span class="doccomment">/// Overwrites plain sequence id with compressed sequence id.
+    </span><span class="kw">pub fn </span>sync_seq_id(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.inner.sync_seq_id();
     }
 
-    <span class="doccomment">/// Turns compression on.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compress</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">level</span>: <span class="ident">Compression</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">compress</span>(<span class="ident">level</span>);
+    <span class="doccomment">/// Turns compression on.
+    </span><span class="kw">pub fn </span>compress(<span class="kw-2">&amp;mut </span><span class="self">self</span>, level: Compression) {
+        <span class="self">self</span>.inner.compress(level);
     }
 
-    <span class="doccomment">/// Will try to decode a packet from `src` into `dst`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `true` - decoded packet was written into the `dst`,</span>
-    <span class="doccomment">/// * `false` - `src` did not contain a full packet.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">src</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">PacketCodecError</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-        <span class="ident">T</span>: <span class="ident">BufMut</span>,
+    <span class="doccomment">/// Will try to decode a packet from `src` into `dst`.
+    ///
+    /// Returns
+    ///
+    /// * `true` - decoded packet was written into the `dst`,
+    /// * `false` - `src` did not contain a full packet.
+    </span><span class="kw">pub fn </span>decode&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, src: <span class="kw-2">&amp;mut </span>BytesMut, dst: <span class="kw-2">&amp;mut </span>T) -&gt; <span class="prelude-ty">Result</span>&lt;bool, PacketCodecError&gt;
+    <span class="kw">where
+        </span>T: AsRef&lt;[u8]&gt;,
+        T: BufMut,
     {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">decode</span>(<span class="ident">src</span>, <span class="ident">dst</span>, <span class="self">self</span>.<span class="ident">max_allowed_packet</span>)
+        <span class="self">self</span>.inner.decode(src, dst, <span class="self">self</span>.max_allowed_packet)
     }
 
-    <span class="doccomment">/// Will encode packets into `dst`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Buf</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">src</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>,
-        <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">PacketCodecError</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">encode</span>(<span class="ident">src</span>, <span class="ident">dst</span>, <span class="self">self</span>.<span class="ident">max_allowed_packet</span>)
+    <span class="doccomment">/// Will encode packets into `dst`.
+    </span><span class="kw">pub fn </span>encode&lt;T: Buf&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        src: <span class="kw-2">&amp;mut </span>T,
+        dst: <span class="kw-2">&amp;mut </span>BytesMut,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), PacketCodecError&gt; {
+        <span class="self">self</span>.inner.encode(src, dst, <span class="self">self</span>.max_allowed_packet)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">PacketCodec</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">max_allowed_packet</span>: <span class="ident">DEFAULT_MAX_ALLOWED_PACKET</span>,
-            <span class="ident">inner</span>: <span class="ident">Default::default</span>(),
+<span class="kw">impl </span>Default <span class="kw">for </span>PacketCodec {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            max_allowed_packet: DEFAULT_MAX_ALLOWED_PACKET,
+            inner: Default::default(),
         }
     }
 }
 
-<span class="doccomment">/// Packet codec implementation.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">enum</span> <span class="ident">PacketCodecInner</span> {
-    <span class="doccomment">/// Plain packet codec.</span>
-    <span class="ident">Plain</span>(<span class="ident">PlainPacketCodec</span>),
-    <span class="doccomment">/// Compressed packet codec.</span>
-    <span class="ident">Comp</span>(<span class="ident">CompPacketCodec</span>),
+<span class="doccomment">/// Packet codec implementation.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">enum </span>PacketCodecInner {
+    <span class="doccomment">/// Plain packet codec.
+    </span>Plain(PlainPacketCodec),
+    <span class="doccomment">/// Compressed packet codec.
+    </span>Comp(CompPacketCodec),
 }
 
-<span class="kw">impl</span> <span class="ident">PacketCodecInner</span> {
-    <span class="doccomment">/// Sets sequence id to `0`.</span>
-    <span class="kw">fn</span> <span class="ident">reset_seq_id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">PacketCodecInner::Plain</span>(<span class="ident">c</span>) =&gt; <span class="ident">c</span>.<span class="ident">reset_seq_id</span>(),
-            <span class="ident">PacketCodecInner::Comp</span>(<span class="ident">c</span>) =&gt; <span class="ident">c</span>.<span class="ident">reset_seq_id</span>(),
+<span class="kw">impl </span>PacketCodecInner {
+    <span class="doccomment">/// Sets sequence id to `0`.
+    </span><span class="kw">fn </span>reset_seq_id(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">match </span><span class="self">self </span>{
+            PacketCodecInner::Plain(c) =&gt; c.reset_seq_id(),
+            PacketCodecInner::Comp(c) =&gt; c.reset_seq_id(),
         }
     }
 
-    <span class="doccomment">/// Overwrites plain sequence id with compressed sequence id.</span>
-    <span class="kw">fn</span> <span class="ident">sync_seq_id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">PacketCodecInner::Plain</span>(<span class="kw">_</span>) =&gt; (),
-            <span class="ident">PacketCodecInner::Comp</span>(<span class="ident">c</span>) =&gt; <span class="ident">c</span>.<span class="ident">sync_seq_id</span>(),
+    <span class="doccomment">/// Overwrites plain sequence id with compressed sequence id.
+    </span><span class="kw">fn </span>sync_seq_id(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">match </span><span class="self">self </span>{
+            PacketCodecInner::Plain(<span class="kw">_</span>) =&gt; (),
+            PacketCodecInner::Comp(c) =&gt; c.sync_seq_id(),
         }
     }
 
-    <span class="doccomment">/// Turns compression on.</span>
-    <span class="kw">fn</span> <span class="ident">compress</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">level</span>: <span class="ident">Compression</span>) {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">PacketCodecInner::Plain</span>(<span class="ident">c</span>) =&gt; {
-                <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">PacketCodecInner::Comp</span>(<span class="ident">CompPacketCodec</span> {
-                    <span class="ident">level</span>,
-                    <span class="ident">comp_seq_id</span>: <span class="number">0</span>,
-                    <span class="ident">in_buf</span>: <span class="ident">BytesMut::with_capacity</span>(<span class="ident">DEFAULT_MAX_ALLOWED_PACKET</span>),
-                    <span class="ident">out_buf</span>: <span class="ident">BytesMut::with_capacity</span>(<span class="ident">DEFAULT_MAX_ALLOWED_PACKET</span>),
-                    <span class="ident">comp_decoder</span>: <span class="ident">CompDecoder::Idle</span>,
-                    <span class="ident">plain_codec</span>: <span class="ident">mem::take</span>(<span class="ident">c</span>),
+    <span class="doccomment">/// Turns compression on.
+    </span><span class="kw">fn </span>compress(<span class="kw-2">&amp;mut </span><span class="self">self</span>, level: Compression) {
+        <span class="kw">match </span><span class="self">self </span>{
+            PacketCodecInner::Plain(c) =&gt; {
+                <span class="kw-2">*</span><span class="self">self </span>= PacketCodecInner::Comp(CompPacketCodec {
+                    level,
+                    comp_seq_id: <span class="number">0</span>,
+                    in_buf: BytesMut::with_capacity(DEFAULT_MAX_ALLOWED_PACKET),
+                    out_buf: BytesMut::with_capacity(DEFAULT_MAX_ALLOWED_PACKET),
+                    comp_decoder: CompDecoder::Idle,
+                    plain_codec: mem::take(c),
                 })
             }
-            <span class="ident">PacketCodecInner::Comp</span>(<span class="ident">c</span>) =&gt; <span class="ident">c</span>.<span class="ident">level</span> <span class="op">=</span> <span class="ident">level</span>,
+            PacketCodecInner::Comp(c) =&gt; c.level = level,
         }
     }
 
-    <span class="doccomment">/// Will try to decode packet from `src` into `dst`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If `true` is returned then `dst` contains full packet.</span>
-    <span class="kw">fn</span> <span class="ident">decode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">src</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>,
-        <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>,
-        <span class="ident">max_allowed_packet</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">PacketCodecError</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-        <span class="ident">T</span>: <span class="ident">BufMut</span>,
+    <span class="doccomment">/// Will try to decode packet from `src` into `dst`.
+    ///
+    /// If `true` is returned then `dst` contains full packet.
+    </span><span class="kw">fn </span>decode&lt;T&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        src: <span class="kw-2">&amp;mut </span>BytesMut,
+        dst: <span class="kw-2">&amp;mut </span>T,
+        max_allowed_packet: usize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;bool, PacketCodecError&gt;
+    <span class="kw">where
+        </span>T: AsRef&lt;[u8]&gt;,
+        T: BufMut,
     {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">PacketCodecInner::Plain</span>(<span class="ident">codec</span>) =&gt; <span class="ident">codec</span>.<span class="ident">decode</span>(<span class="ident">src</span>, <span class="ident">dst</span>, <span class="ident">max_allowed_packet</span>, <span class="prelude-val">None</span>),
-            <span class="ident">PacketCodecInner::Comp</span>(<span class="ident">codec</span>) =&gt; <span class="ident">codec</span>.<span class="ident">decode</span>(<span class="ident">src</span>, <span class="ident">dst</span>, <span class="ident">max_allowed_packet</span>),
+        <span class="kw">match </span><span class="self">self </span>{
+            PacketCodecInner::Plain(codec) =&gt; codec.decode(src, dst, max_allowed_packet, <span class="prelude-val">None</span>),
+            PacketCodecInner::Comp(codec) =&gt; codec.decode(src, dst, max_allowed_packet),
         }
     }
 
-    <span class="doccomment">/// Will try to encode packets into `dst`.</span>
-    <span class="kw">fn</span> <span class="ident">encode</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Buf</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">packet</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>,
-        <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>,
-        <span class="ident">max_allowed_packet</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">PacketCodecError</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">PacketCodecInner::Plain</span>(<span class="ident">codec</span>) =&gt; <span class="ident">codec</span>.<span class="ident">encode</span>(<span class="ident">packet</span>, <span class="ident">dst</span>, <span class="ident">max_allowed_packet</span>),
-            <span class="ident">PacketCodecInner::Comp</span>(<span class="ident">codec</span>) =&gt; <span class="ident">codec</span>.<span class="ident">encode</span>(<span class="ident">packet</span>, <span class="ident">dst</span>, <span class="ident">max_allowed_packet</span>),
+    <span class="doccomment">/// Will try to encode packets into `dst`.
+    </span><span class="kw">fn </span>encode&lt;T: Buf&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        packet: <span class="kw-2">&amp;mut </span>T,
+        dst: <span class="kw-2">&amp;mut </span>BytesMut,
+        max_allowed_packet: usize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), PacketCodecError&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            PacketCodecInner::Plain(codec) =&gt; codec.encode(packet, dst, max_allowed_packet),
+            PacketCodecInner::Comp(codec) =&gt; codec.encode(packet, dst, max_allowed_packet),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">PacketCodecInner</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">PacketCodecInner::Plain</span>(<span class="ident">Default::default</span>())
+<span class="kw">impl </span>Default <span class="kw">for </span>PacketCodecInner {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        PacketCodecInner::Plain(Default::default())
     }
 }
 
-<span class="doccomment">/// Codec for plain MySql protocol.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">struct</span> <span class="ident">PlainPacketCodec</span> {
-    <span class="doccomment">/// Chunk sequence id.</span>
-    <span class="kw">pub</span> <span class="ident">seq_id</span>: <span class="ident">u8</span>,
-    <span class="doccomment">/// Chunk decoder.</span>
-    <span class="ident">chunk_decoder</span>: <span class="ident">ChunkDecoder</span>,
+<span class="doccomment">/// Codec for plain MySql protocol.
+</span><span class="attribute">#[derive(Debug, Clone, Eq, PartialEq, Default)]
+</span><span class="kw">struct </span>PlainPacketCodec {
+    <span class="doccomment">/// Chunk sequence id.
+    </span><span class="kw">pub </span>seq_id: u8,
+    <span class="doccomment">/// Chunk decoder.
+    </span>chunk_decoder: ChunkDecoder,
 }
 
-<span class="kw">impl</span> <span class="ident">PlainPacketCodec</span> {
-    <span class="doccomment">/// Sets sequence id to `0`.</span>
-    <span class="kw">fn</span> <span class="ident">reset_seq_id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">seq_id</span> <span class="op">=</span> <span class="number">0</span>;
+<span class="kw">impl </span>PlainPacketCodec {
+    <span class="doccomment">/// Sets sequence id to `0`.
+    </span><span class="kw">fn </span>reset_seq_id(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.seq_id = <span class="number">0</span>;
     }
 
-    <span class="doccomment">/// Will try to decode packet from `src` into `dst`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `comp_seq_id` - is the sequence id of the last compressed packet (if any).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If `true` is returned then `dst` contains full packet.</span>
-    <span class="kw">fn</span> <span class="ident">decode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">src</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>,
-        <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>,
-        <span class="ident">max_allowed_packet</span>: <span class="ident">usize</span>,
-        <span class="ident">comp_seq_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">PacketCodecError</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-        <span class="ident">T</span>: <span class="ident">BufMut</span>,
+    <span class="doccomment">/// Will try to decode packet from `src` into `dst`.
+    ///
+    /// * `comp_seq_id` - is the sequence id of the last compressed packet (if any).
+    ///
+    /// If `true` is returned then `dst` contains full packet.
+    </span><span class="kw">fn </span>decode&lt;T&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        src: <span class="kw-2">&amp;mut </span>BytesMut,
+        dst: <span class="kw-2">&amp;mut </span>T,
+        max_allowed_packet: usize,
+        comp_seq_id: <span class="prelude-ty">Option</span>&lt;u8&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;bool, PacketCodecError&gt;
+    <span class="kw">where
+        </span>T: AsRef&lt;[u8]&gt;,
+        T: BufMut,
     {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">chunk_decoder</span>.<span class="ident">decode</span>(<span class="ident">src</span>, <span class="ident">dst</span>, <span class="ident">max_allowed_packet</span>)<span class="question-mark">?</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">chunk_info</span>) =&gt; {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">seq_id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">chunk_info</span>.<span class="ident">seq_id</span>() {
-                    <span class="kw">match</span> <span class="ident">comp_seq_id</span> {
-                        <span class="prelude-val">Some</span>(<span class="ident">seq_id</span>) <span class="kw">if</span> <span class="ident">seq_id</span> <span class="op">==</span> <span class="ident">chunk_info</span>.<span class="ident">seq_id</span>() =&gt; {
-                            <span class="comment">// server syncronized pkt_nr (in `net_flush`)</span>
-                            <span class="self">self</span>.<span class="ident">seq_id</span> <span class="op">=</span> <span class="ident">seq_id</span>;
+        <span class="kw">match </span><span class="self">self</span>.chunk_decoder.decode(src, dst, max_allowed_packet)<span class="question-mark">? </span>{
+            <span class="prelude-val">Some</span>(chunk_info) =&gt; {
+                <span class="kw">if </span><span class="self">self</span>.seq_id != chunk_info.seq_id() {
+                    <span class="kw">match </span>comp_seq_id {
+                        <span class="prelude-val">Some</span>(seq_id) <span class="kw">if </span>seq_id == chunk_info.seq_id() =&gt; {
+                            <span class="comment">// server syncronized pkt_nr (in `net_flush`)
+                            </span><span class="self">self</span>.seq_id = seq_id;
                         }
-                        <span class="kw">_</span> =&gt; {
-                            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">PacketCodecError::PacketsOutOfSync</span>);
+                        <span class="kw">_ </span>=&gt; {
+                            <span class="kw">return </span><span class="prelude-val">Err</span>(PacketCodecError::PacketsOutOfSync);
                         }
                     }
                 }
 
-                <span class="self">self</span>.<span class="ident">seq_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">seq_id</span>.<span class="ident">wrapping_add</span>(<span class="number">1</span>);
+                <span class="self">self</span>.seq_id = <span class="self">self</span>.seq_id.wrapping_add(<span class="number">1</span>);
 
-                <span class="kw">match</span> <span class="ident">chunk_info</span> {
-                    <span class="ident">ChunkInfo::Middle</span>(<span class="kw">_</span>) =&gt; {
-                        <span class="kw">if</span> <span class="op">!</span><span class="ident">src</span>.<span class="ident">is_empty</span>() {
-                            <span class="self">self</span>.<span class="ident">decode</span>(<span class="ident">src</span>, <span class="ident">dst</span>, <span class="ident">max_allowed_packet</span>, <span class="ident">comp_seq_id</span>)
-                        } <span class="kw">else</span> {
+                <span class="kw">match </span>chunk_info {
+                    ChunkInfo::Middle(<span class="kw">_</span>) =&gt; {
+                        <span class="kw">if </span>!src.is_empty() {
+                            <span class="self">self</span>.decode(src, dst, max_allowed_packet, comp_seq_id)
+                        } <span class="kw">else </span>{
                             <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>)
                         }
                     }
-                    <span class="ident">ChunkInfo::Last</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
+                    ChunkInfo::Last(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
                 }
             }
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
         }
     }
 
-    <span class="doccomment">/// Will try to encode packets into `dst`.</span>
-    <span class="kw">fn</span> <span class="ident">encode</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Buf</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">packet</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>,
-        <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>,
-        <span class="ident">max_allowed_packet</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">PacketCodecError</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">packet</span>.<span class="ident">remaining</span>() <span class="op">&gt;</span> <span class="ident">max_allowed_packet</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">PacketCodecError::PacketTooLarge</span>);
+    <span class="doccomment">/// Will try to encode packets into `dst`.
+    </span><span class="kw">fn </span>encode&lt;T: Buf&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        packet: <span class="kw-2">&amp;mut </span>T,
+        dst: <span class="kw-2">&amp;mut </span>BytesMut,
+        max_allowed_packet: usize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), PacketCodecError&gt; {
+        <span class="kw">if </span>packet.remaining() &gt; max_allowed_packet {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(PacketCodecError::PacketTooLarge);
         }
 
-        <span class="self">self</span>.<span class="ident">seq_id</span> <span class="op">=</span> <span class="ident">packet_to_chunks</span>(<span class="self">self</span>.<span class="ident">seq_id</span>, <span class="ident">packet</span>, <span class="ident">dst</span>);
+        <span class="self">self</span>.seq_id = packet_to_chunks(<span class="self">self</span>.seq_id, packet, dst);
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="doccomment">/// Codec for compressed MySql protocol.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">CompPacketCodec</span> {
-    <span class="doccomment">/// Compression level for this codec.</span>
-    <span class="ident">level</span>: <span class="ident">Compression</span>,
-    <span class="doccomment">/// Compressed packet sequence id.</span>
-    <span class="ident">comp_seq_id</span>: <span class="ident">u8</span>,
-    <span class="doccomment">/// Buffer for decompressed input data.</span>
-    <span class="ident">in_buf</span>: <span class="ident">BytesMut</span>,
-    <span class="doccomment">/// Buffer for compressed output data.</span>
-    <span class="ident">out_buf</span>: <span class="ident">BytesMut</span>,
-    <span class="doccomment">/// Compressed packet decoder.</span>
-    <span class="ident">comp_decoder</span>: <span class="ident">CompDecoder</span>,
-    <span class="doccomment">/// Wrapped codec for plain MySql protocol.</span>
-    <span class="ident">plain_codec</span>: <span class="ident">PlainPacketCodec</span>,
+<span class="doccomment">/// Codec for compressed MySql protocol.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">struct </span>CompPacketCodec {
+    <span class="doccomment">/// Compression level for this codec.
+    </span>level: Compression,
+    <span class="doccomment">/// Compressed packet sequence id.
+    </span>comp_seq_id: u8,
+    <span class="doccomment">/// Buffer for decompressed input data.
+    </span>in_buf: BytesMut,
+    <span class="doccomment">/// Buffer for compressed output data.
+    </span>out_buf: BytesMut,
+    <span class="doccomment">/// Compressed packet decoder.
+    </span>comp_decoder: CompDecoder,
+    <span class="doccomment">/// Wrapped codec for plain MySql protocol.
+    </span>plain_codec: PlainPacketCodec,
 }
 
-<span class="kw">impl</span> <span class="ident">CompPacketCodec</span> {
-    <span class="doccomment">/// Sets sequence id to `0`.</span>
-    <span class="kw">fn</span> <span class="ident">reset_seq_id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">comp_seq_id</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="self">self</span>.<span class="ident">plain_codec</span>.<span class="ident">reset_seq_id</span>();
+<span class="kw">impl </span>CompPacketCodec {
+    <span class="doccomment">/// Sets sequence id to `0`.
+    </span><span class="kw">fn </span>reset_seq_id(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.comp_seq_id = <span class="number">0</span>;
+        <span class="self">self</span>.plain_codec.reset_seq_id();
     }
 
-    <span class="doccomment">/// Overwrites plain sequence id with compressed sequence id</span>
-    <span class="doccomment">/// if on compressed packet boundary.</span>
-    <span class="kw">fn</span> <span class="ident">sync_seq_id</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">in_buf</span>.<span class="ident">is_empty</span>() {
-            <span class="self">self</span>.<span class="ident">plain_codec</span>.<span class="ident">seq_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">comp_seq_id</span>;
+    <span class="doccomment">/// Overwrites plain sequence id with compressed sequence id
+    /// if on compressed packet boundary.
+    </span><span class="kw">fn </span>sync_seq_id(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">if </span><span class="self">self</span>.in_buf.is_empty() {
+            <span class="self">self</span>.plain_codec.seq_id = <span class="self">self</span>.comp_seq_id;
         }
     }
 
-    <span class="doccomment">/// Will try to decode packet from `src` into `dst`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If `true` is returned then `dst` contains full packet.</span>
-    <span class="kw">fn</span> <span class="ident">decode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">src</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>,
-        <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>,
-        <span class="ident">max_allowed_packet</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">PacketCodecError</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-        <span class="ident">T</span>: <span class="ident">BufMut</span>,
+    <span class="doccomment">/// Will try to decode packet from `src` into `dst`.
+    ///
+    /// If `true` is returned then `dst` contains full packet.
+    </span><span class="kw">fn </span>decode&lt;T&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        src: <span class="kw-2">&amp;mut </span>BytesMut,
+        dst: <span class="kw-2">&amp;mut </span>T,
+        max_allowed_packet: usize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;bool, PacketCodecError&gt;
+    <span class="kw">where
+        </span>T: AsRef&lt;[u8]&gt;,
+        T: BufMut,
     {
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">in_buf</span>.<span class="ident">is_empty</span>()
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">plain_codec</span>.<span class="ident">decode</span>(
-                <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">in_buf</span>,
-                <span class="ident">dst</span>,
-                <span class="ident">max_allowed_packet</span>,
-                <span class="comment">// the server could sync the sequence id of the plain packet</span>
-                <span class="comment">// with the id of the last compressed packet</span>
-                <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">comp_seq_id</span>.<span class="ident">wrapping_sub</span>(<span class="number">1</span>)),
-            )<span class="question-mark">?</span>
-        {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>);
+        <span class="kw">if </span>!<span class="self">self</span>.in_buf.is_empty()
+            &amp;&amp; <span class="self">self</span>.plain_codec.decode(
+                <span class="kw-2">&amp;mut </span><span class="self">self</span>.in_buf,
+                dst,
+                max_allowed_packet,
+                <span class="comment">// the server could sync the sequence id of the plain packet
+                // with the id of the last compressed packet
+                </span><span class="prelude-val">Some</span>(<span class="self">self</span>.comp_seq_id.wrapping_sub(<span class="number">1</span>)),
+            )<span class="question-mark">?
+        </span>{
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="bool-val">true</span>);
         }
 
-        <span class="kw">match</span> <span class="self">self</span>
-            .<span class="ident">comp_decoder</span>
-            .<span class="ident">decode</span>(<span class="ident">src</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">in_buf</span>, <span class="ident">max_allowed_packet</span>)<span class="question-mark">?</span>
-        {
-            <span class="prelude-val">Some</span>(<span class="ident">chunk_info</span>) =&gt; {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">comp_seq_id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">chunk_info</span>.<span class="ident">seq_id</span>() {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">PacketCodecError::PacketsOutOfSync</span>);
+        <span class="kw">match </span><span class="self">self
+            </span>.comp_decoder
+            .decode(src, <span class="kw-2">&amp;mut </span><span class="self">self</span>.in_buf, max_allowed_packet)<span class="question-mark">?
+        </span>{
+            <span class="prelude-val">Some</span>(chunk_info) =&gt; {
+                <span class="kw">if </span><span class="self">self</span>.comp_seq_id != chunk_info.seq_id() {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(PacketCodecError::PacketsOutOfSync);
                 }
 
-                <span class="self">self</span>.<span class="ident">comp_seq_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">comp_seq_id</span>.<span class="ident">wrapping_add</span>(<span class="number">1</span>);
+                <span class="self">self</span>.comp_seq_id = <span class="self">self</span>.comp_seq_id.wrapping_add(<span class="number">1</span>);
 
-                <span class="self">self</span>.<span class="ident">decode</span>(<span class="ident">src</span>, <span class="ident">dst</span>, <span class="ident">max_allowed_packet</span>)
+                <span class="self">self</span>.decode(src, dst, max_allowed_packet)
             }
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
         }
     }
 
-    <span class="doccomment">/// Will try to encode packets into `dst`.</span>
-    <span class="kw">fn</span> <span class="ident">encode</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Buf</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">packet</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>,
-        <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>,
-        <span class="ident">max_allowed_packet</span>: <span class="ident">usize</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">PacketCodecError</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">plain_codec</span>
-            .<span class="ident">encode</span>(<span class="ident">packet</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">out_buf</span>, <span class="ident">max_allowed_packet</span>)<span class="question-mark">?</span>;
+    <span class="doccomment">/// Will try to encode packets into `dst`.
+    </span><span class="kw">fn </span>encode&lt;T: Buf&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        packet: <span class="kw-2">&amp;mut </span>T,
+        dst: <span class="kw-2">&amp;mut </span>BytesMut,
+        max_allowed_packet: usize,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), PacketCodecError&gt; {
+        <span class="self">self</span>.plain_codec
+            .encode(packet, <span class="kw-2">&amp;mut </span><span class="self">self</span>.out_buf, max_allowed_packet)<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.<span class="ident">comp_seq_id</span> <span class="op">=</span> <span class="ident">compress</span>(
-            <span class="self">self</span>.<span class="ident">comp_seq_id</span>,
-            <span class="self">self</span>.<span class="ident">level</span>,
-            <span class="ident">max_allowed_packet</span>,
-            <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">out_buf</span>,
-            <span class="ident">dst</span>,
+        <span class="self">self</span>.comp_seq_id = compress(
+            <span class="self">self</span>.comp_seq_id,
+            <span class="self">self</span>.level,
+            max_allowed_packet,
+            <span class="kw-2">&amp;mut </span><span class="self">self</span>.out_buf,
+            dst,
         )<span class="question-mark">?</span>;
 
-        <span class="comment">/* Sync packet number if using compression (see net_serv.cc) */</span>
-        <span class="self">self</span>.<span class="ident">plain_codec</span>.<span class="ident">seq_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">comp_seq_id</span>;
+        <span class="comment">/* Sync packet number if using compression (see net_serv.cc) */
+        </span><span class="self">self</span>.plain_codec.seq_id = <span class="self">self</span>.comp_seq_id;
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="kw">const</span> <span class="ident">COMPRESSED</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+    <span class="kw">const </span>COMPRESSED: <span class="kw-2">&amp;</span>[u8] = <span class="kw-2">&amp;</span>[
         <span class="number">0x22</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x32</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x78</span>, <span class="number">0x9c</span>, <span class="number">0xd3</span>, <span class="number">0x63</span>, <span class="number">0x60</span>, <span class="number">0x60</span>, <span class="number">0x60</span>, <span class="number">0x2e</span>,
         <span class="number">0x4e</span>, <span class="number">0xcd</span>, <span class="number">0x49</span>, <span class="number">0x4d</span>, <span class="number">0x2e</span>, <span class="number">0x51</span>, <span class="number">0x50</span>, <span class="number">0x32</span>, <span class="number">0x30</span>, <span class="number">0x34</span>, <span class="number">0x32</span>, <span class="number">0x36</span>, <span class="number">0x31</span>, <span class="number">0x35</span>, <span class="number">0x33</span>,
         <span class="number">0xb7</span>, <span class="number">0xb0</span>, <span class="number">0xc4</span>, <span class="number">0xcd</span>, <span class="number">0x52</span>, <span class="number">0x02</span>, <span class="number">0x00</span>, <span class="number">0x0c</span>, <span class="number">0xd1</span>, <span class="number">0x0a</span>, <span class="number">0x6c</span>,
     ];
 
-    <span class="kw">const</span> <span class="ident">PLAIN</span>: [<span class="ident">u8</span>; <span class="number">46</span>] <span class="op">=</span> [
+    <span class="kw">const </span>PLAIN: [u8; <span class="number">46</span>] = [
         <span class="number">0x03</span>, <span class="number">0x73</span>, <span class="number">0x65</span>, <span class="number">0x6c</span>, <span class="number">0x65</span>, <span class="number">0x63</span>, <span class="number">0x74</span>, <span class="number">0x20</span>, <span class="number">0x22</span>, <span class="number">0x30</span>, <span class="number">0x31</span>, <span class="number">0x32</span>, <span class="number">0x33</span>, <span class="number">0x34</span>, <span class="number">0x35</span>,
         <span class="number">0x36</span>, <span class="number">0x37</span>, <span class="number">0x38</span>, <span class="number">0x39</span>, <span class="number">0x30</span>, <span class="number">0x31</span>, <span class="number">0x32</span>, <span class="number">0x33</span>, <span class="number">0x34</span>, <span class="number">0x35</span>, <span class="number">0x36</span>, <span class="number">0x37</span>, <span class="number">0x38</span>, <span class="number">0x39</span>, <span class="number">0x30</span>,
         <span class="number">0x31</span>, <span class="number">0x32</span>, <span class="number">0x33</span>, <span class="number">0x34</span>, <span class="number">0x35</span>, <span class="number">0x36</span>, <span class="number">0x37</span>, <span class="number">0x38</span>, <span class="number">0x39</span>, <span class="number">0x30</span>, <span class="number">0x31</span>, <span class="number">0x32</span>, <span class="number">0x33</span>, <span class="number">0x34</span>, <span class="number">0x35</span>,
         <span class="number">0x22</span>,
     ];
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">zero_len_packet</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::PacketCodecError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span> <span class="op">=</span> <span class="ident">PacketCodec::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">empty</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">src</span> <span class="op">=</span> <span class="ident">BytesMut::new</span>();
-        <span class="ident">encoder</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">empty</span>, <span class="kw-2">&amp;mut</span> <span class="ident">src</span>)<span class="question-mark">?</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>zero_len_packet() -&gt; <span class="prelude-ty">Result</span>&lt;(), error::PacketCodecError&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>encoder = PacketCodec::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>empty: <span class="kw-2">&amp;</span>[u8] = <span class="kw-2">&amp;</span>[];
+        <span class="kw">let </span><span class="kw-2">mut </span>src = BytesMut::new();
+        encoder.encode(<span class="kw-2">&amp;mut </span>empty, <span class="kw-2">&amp;mut </span>src)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dst</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span> <span class="op">=</span> <span class="ident">PacketCodec::default</span>();
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">decode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">src</span>, <span class="kw-2">&amp;mut</span> <span class="ident">dst</span>)<span class="question-mark">?</span>;
-        <span class="macro">assert!</span>(<span class="ident">result</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dst</span>, <span class="macro">vec!</span>[<span class="number">0_u8</span>; <span class="number">0</span>]);
-
-        <span class="prelude-val">Ok</span>(())
-    }
-
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">regular_packet</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::PacketCodecError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span> <span class="op">=</span> <span class="ident">PacketCodec::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">src</span> <span class="op">=</span> <span class="ident">BytesMut::new</span>();
-        <span class="ident">encoder</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">&amp;</span>[<span class="number">0x31_u8</span>, <span class="number">0x32</span>, <span class="number">0x33</span>][..], <span class="kw-2">&amp;mut</span> <span class="ident">src</span>)<span class="question-mark">?</span>;
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dst</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span> <span class="op">=</span> <span class="ident">PacketCodec::default</span>();
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">decode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">src</span>, <span class="kw-2">&amp;mut</span> <span class="ident">dst</span>)<span class="question-mark">?</span>;
-        <span class="macro">assert!</span>(<span class="ident">result</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">dst</span>, <span class="macro">vec!</span>[<span class="number">0x31</span>, <span class="number">0x32</span>, <span class="number">0x33</span>]);
+        <span class="kw">let </span><span class="kw-2">mut </span>dst = <span class="macro">vec!</span>[];
+        <span class="kw">let </span><span class="kw-2">mut </span>decoder = PacketCodec::default();
+        <span class="kw">let </span>result = decoder.decode(<span class="kw-2">&amp;mut </span>src, <span class="kw-2">&amp;mut </span>dst)<span class="question-mark">?</span>;
+        <span class="macro">assert!</span>(result);
+        <span class="macro">assert_eq!</span>(dst, <span class="macro">vec!</span>[<span class="number">0_u8</span>; <span class="number">0</span>]);
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">packet_sequence</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::PacketCodecError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span> <span class="op">=</span> <span class="ident">PacketCodec::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span> <span class="op">=</span> <span class="ident">PacketCodec::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">src</span> <span class="op">=</span> <span class="ident">BytesMut::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>regular_packet() -&gt; <span class="prelude-ty">Result</span>&lt;(), error::PacketCodecError&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>encoder = PacketCodec::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>src = BytesMut::new();
+        encoder.encode(<span class="kw-2">&amp;mut &amp;</span>[<span class="number">0x31_u8</span>, <span class="number">0x32</span>, <span class="number">0x33</span>][..], <span class="kw-2">&amp;mut </span>src)<span class="question-mark">?</span>;
 
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">1024_usize</span> {
-            <span class="ident">encoder</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">i</span>], <span class="kw-2">&amp;mut</span> <span class="ident">src</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dst</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">decode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">src</span>, <span class="kw-2">&amp;mut</span> <span class="ident">dst</span>)<span class="question-mark">?</span>;
-            <span class="macro">assert!</span>(<span class="ident">result</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">dst</span>, <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">i</span>]);
+        <span class="kw">let </span><span class="kw-2">mut </span>dst = <span class="macro">vec!</span>[];
+        <span class="kw">let </span><span class="kw-2">mut </span>decoder = PacketCodec::default();
+        <span class="kw">let </span>result = decoder.decode(<span class="kw-2">&amp;mut </span>src, <span class="kw-2">&amp;mut </span>dst)<span class="question-mark">?</span>;
+        <span class="macro">assert!</span>(result);
+        <span class="macro">assert_eq!</span>(dst, <span class="macro">vec!</span>[<span class="number">0x31</span>, <span class="number">0x32</span>, <span class="number">0x33</span>]);
+
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>packet_sequence() -&gt; <span class="prelude-ty">Result</span>&lt;(), error::PacketCodecError&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>encoder = PacketCodec::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>decoder = PacketCodec::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>src = BytesMut::new();
+
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">1024_usize </span>{
+            encoder.encode(<span class="kw-2">&amp;mut &amp;*</span><span class="macro">vec!</span>[<span class="number">0</span>; i], <span class="kw-2">&amp;mut </span>src)<span class="question-mark">?</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>dst = <span class="macro">vec!</span>[];
+            <span class="kw">let </span>result = decoder.decode(<span class="kw-2">&amp;mut </span>src, <span class="kw-2">&amp;mut </span>dst)<span class="question-mark">?</span>;
+            <span class="macro">assert!</span>(result);
+            <span class="macro">assert_eq!</span>(dst, <span class="macro">vec!</span>[<span class="number">0</span>; i]);
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">large_packets</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::PacketCodecError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">lengths</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">MAX_PAYLOAD_LEN</span>, <span class="ident">MAX_PAYLOAD_LEN</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">MAX_PAYLOAD_LEN</span> <span class="op">*</span> <span class="number">2</span>];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span> <span class="op">=</span> <span class="ident">PacketCodec::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span> <span class="op">=</span> <span class="ident">PacketCodec::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">src</span> <span class="op">=</span> <span class="ident">BytesMut::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>large_packets() -&gt; <span class="prelude-ty">Result</span>&lt;(), error::PacketCodecError&gt; {
+        <span class="kw">let </span>lengths = <span class="macro">vec!</span>[MAX_PAYLOAD_LEN, MAX_PAYLOAD_LEN + <span class="number">1</span>, MAX_PAYLOAD_LEN * <span class="number">2</span>];
+        <span class="kw">let </span><span class="kw-2">mut </span>encoder = PacketCodec::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>decoder = PacketCodec::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>src = BytesMut::new();
 
-        <span class="ident">decoder</span>.<span class="ident">max_allowed_packet</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">lengths</span>.<span class="ident">iter</span>().<span class="ident">max</span>().<span class="ident">unwrap</span>();
-        <span class="ident">encoder</span>.<span class="ident">max_allowed_packet</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">lengths</span>.<span class="ident">iter</span>().<span class="ident">max</span>().<span class="ident">unwrap</span>();
+        decoder.max_allowed_packet = <span class="kw-2">*</span>lengths.iter().max().unwrap();
+        encoder.max_allowed_packet = <span class="kw-2">*</span>lengths.iter().max().unwrap();
 
-        <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">len</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">lengths</span> {
-            <span class="ident">encoder</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="macro">vec!</span>[<span class="number">0x42_u8</span>; <span class="ident">len</span>], <span class="kw-2">&amp;mut</span> <span class="ident">src</span>)<span class="question-mark">?</span>;
+        <span class="kw">for </span><span class="kw-2">&amp;</span>len <span class="kw">in </span><span class="kw-2">&amp;</span>lengths {
+            encoder.encode(<span class="kw-2">&amp;mut &amp;*</span><span class="macro">vec!</span>[<span class="number">0x42_u8</span>; len], <span class="kw-2">&amp;mut </span>src)<span class="question-mark">?</span>;
         }
 
-        <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">len</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">lengths</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dst</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">decode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">src</span>, <span class="kw-2">&amp;mut</span> <span class="ident">dst</span>)<span class="question-mark">?</span>;
-            <span class="macro">assert!</span>(<span class="ident">result</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">dst</span>, <span class="macro">vec!</span>[<span class="number">0x42</span>; <span class="ident">len</span>]);
+        <span class="kw">for </span><span class="kw-2">&amp;</span>len <span class="kw">in </span><span class="kw-2">&amp;</span>lengths {
+            <span class="kw">let </span><span class="kw-2">mut </span>dst = <span class="macro">vec!</span>[];
+            <span class="kw">let </span>result = decoder.decode(<span class="kw-2">&amp;mut </span>src, <span class="kw-2">&amp;mut </span>dst)<span class="question-mark">?</span>;
+            <span class="macro">assert!</span>(result);
+            <span class="macro">assert_eq!</span>(dst, <span class="macro">vec!</span>[<span class="number">0x42</span>; len]);
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">compressed_roundtrip</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span> <span class="op">=</span> <span class="ident">PacketCodec::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span> <span class="op">=</span> <span class="ident">PacketCodec::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">src</span> <span class="op">=</span> <span class="ident">BytesMut::from</span>(<span class="ident">COMPRESSED</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>compressed_roundtrip() {
+        <span class="kw">let </span><span class="kw-2">mut </span>encoder = PacketCodec::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>decoder = PacketCodec::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>src = BytesMut::from(COMPRESSED);
 
-        <span class="ident">encoder</span>.<span class="ident">compress</span>(<span class="ident">Compression::best</span>());
-        <span class="ident">decoder</span>.<span class="ident">compress</span>(<span class="ident">Compression::best</span>());
+        encoder.compress(Compression::best());
+        decoder.compress(Compression::best());
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dst</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">decode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">src</span>, <span class="kw-2">&amp;mut</span> <span class="ident">dst</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert!</span>(<span class="ident">result</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">dst</span>, <span class="ident">PLAIN</span>);
-        <span class="ident">encoder</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">dst</span>, <span class="kw-2">&amp;mut</span> <span class="ident">src</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>dst = <span class="macro">vec!</span>[];
+        <span class="kw">let </span>result = decoder.decode(<span class="kw-2">&amp;mut </span>src, <span class="kw-2">&amp;mut </span>dst).unwrap();
+        <span class="macro">assert!</span>(result);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;*</span>dst, PLAIN);
+        encoder.encode(<span class="kw-2">&amp;mut &amp;*</span>dst, <span class="kw-2">&amp;mut </span>src).unwrap();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dst</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-        <span class="ident">decoder</span>.<span class="ident">reset_seq_id</span>();
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">decode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">src</span>, <span class="kw-2">&amp;mut</span> <span class="ident">dst</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert!</span>(<span class="ident">result</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">dst</span>, <span class="ident">PLAIN</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>dst = <span class="macro">vec!</span>[];
+        decoder.reset_seq_id();
+        <span class="kw">let </span>result = decoder.decode(<span class="kw-2">&amp;mut </span>src, <span class="kw-2">&amp;mut </span>dst).unwrap();
+        <span class="macro">assert!</span>(result);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;*</span>dst, PLAIN);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">compression_none</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span> <span class="op">=</span> <span class="ident">PacketCodec::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span> <span class="op">=</span> <span class="ident">PacketCodec::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">src</span> <span class="op">=</span> <span class="ident">BytesMut::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>compression_none() {
+        <span class="kw">let </span><span class="kw-2">mut </span>encoder = PacketCodec::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>decoder = PacketCodec::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>src = BytesMut::new();
 
-        <span class="ident">encoder</span>.<span class="ident">compress</span>(<span class="ident">Compression::none</span>());
-        <span class="ident">decoder</span>.<span class="ident">compress</span>(<span class="ident">Compression::none</span>());
+        encoder.compress(Compression::none());
+        decoder.compress(Compression::none());
 
-        <span class="ident">encoder</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> (<span class="kw-2">&amp;</span><span class="ident">PLAIN</span>[..]), <span class="kw-2">&amp;mut</span> <span class="ident">src</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dst</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">decode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">src</span>, <span class="kw-2">&amp;mut</span> <span class="ident">dst</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert!</span>(<span class="ident">result</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">dst</span>, <span class="ident">PLAIN</span>);
+        encoder.encode(<span class="kw-2">&amp;mut </span>(<span class="kw-2">&amp;</span>PLAIN[..]), <span class="kw-2">&amp;mut </span>src).unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>dst = <span class="macro">vec!</span>[];
+        <span class="kw">let </span>result = decoder.decode(<span class="kw-2">&amp;mut </span>src, <span class="kw-2">&amp;mut </span>dst).unwrap();
+        <span class="macro">assert!</span>(result);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;*</span>dst, PLAIN);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>(<span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;PacketsOutOfSync&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">out_of_sync</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">src</span> <span class="op">=</span> <span class="ident">BytesMut::from</span>(<span class="kw-2">&amp;</span><span class="string">b&quot;\x00\x00\x00\x01&quot;</span>[..]);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">codec</span> <span class="op">=</span> <span class="ident">PacketCodec::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dst</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-        <span class="ident">codec</span>.<span class="ident">decode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">src</span>, <span class="kw-2">&amp;mut</span> <span class="ident">dst</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    #[should_panic(expected = <span class="string">&quot;PacketsOutOfSync&quot;</span>)]
+    </span><span class="kw">fn </span>out_of_sync() {
+        <span class="kw">let </span><span class="kw-2">mut </span>src = BytesMut::from(<span class="kw-2">&amp;</span><span class="string">b&quot;\x00\x00\x00\x01&quot;</span>[..]);
+        <span class="kw">let </span><span class="kw-2">mut </span>codec = PacketCodec::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>dst = <span class="macro">vec!</span>[];
+        codec.decode(<span class="kw-2">&amp;mut </span>src, <span class="kw-2">&amp;mut </span>dst).unwrap();
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">should_panic</span>(<span class="ident">expected</span> <span class="op">=</span> <span class="string">&quot;PacketTooLarge&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">packet_too_large</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span> <span class="op">=</span> <span class="ident">PacketCodec::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span> <span class="op">=</span> <span class="ident">PacketCodec::default</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">src</span> <span class="op">=</span> <span class="ident">BytesMut::new</span>();
+    <span class="attribute">#[test]
+    #[should_panic(expected = <span class="string">&quot;PacketTooLarge&quot;</span>)]
+    </span><span class="kw">fn </span>packet_too_large() {
+        <span class="kw">let </span><span class="kw-2">mut </span>encoder = PacketCodec::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>decoder = PacketCodec::default();
+        <span class="kw">let </span><span class="kw-2">mut </span>src = BytesMut::new();
 
-        <span class="ident">encoder</span>
-            .<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">encoder</span>.<span class="ident">max_allowed_packet</span> <span class="op">+</span> <span class="number">1</span>], <span class="kw-2">&amp;mut</span> <span class="ident">src</span>)
-            .<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dst</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-        <span class="ident">decoder</span>.<span class="ident">decode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">src</span>, <span class="kw-2">&amp;mut</span> <span class="ident">dst</span>).<span class="ident">unwrap</span>();
+        encoder
+            .encode(<span class="kw-2">&amp;mut &amp;*</span><span class="macro">vec!</span>[<span class="number">0</span>; encoder.max_allowed_packet + <span class="number">1</span>], <span class="kw-2">&amp;mut </span>src)
+            .unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>dst = <span class="macro">vec!</span>[];
+        decoder.decode(<span class="kw-2">&amp;mut </span>src, <span class="kw-2">&amp;mut </span>dst).unwrap();
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

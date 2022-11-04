@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/sql-query-connector/src/database/operations/write.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>write.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../sql_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../sql_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../sql_query_connector/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/sql-query-connector/src/database/operations/write.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>write.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../sql_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../sql_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../sql_query_connector/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -480,487 +480,487 @@
 <span id="480">480</span>
 <span id="481">481</span>
 <span id="482">482</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::filter_conversion::AliasedCondition</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::query_builder::write</span>::{<span class="ident">build_update_and_set_query</span>, <span class="ident">chunk_update_with_ids</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sql_trace::SqlTraceComment</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error::SqlError</span>, <span class="ident">model_extensions</span>::<span class="kw-2">*</span>, <span class="ident">query_builder::write</span>, <span class="ident">sql_info::SqlInfo</span>, <span class="ident">QueryExt</span>};
-<span class="kw">use</span> <span class="ident">connector_interface</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
-<span class="kw">use</span> <span class="ident">prisma_models</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">psl::dml::prisma_value::PrismaValue</span>;
-<span class="kw">use</span> <span class="ident">psl::PreviewFeature</span>;
-<span class="kw">use</span> <span class="ident">quaint</span>::{
-    <span class="ident">error::ErrorKind</span>,
-    <span class="ident">prelude</span>::{<span class="ident">native_uuid</span>, <span class="ident">uuid_to_bin</span>, <span class="ident">uuid_to_bin_swapped</span>, <span class="ident">Aliasable</span>, <span class="ident">Select</span>, <span class="ident">SqlFamily</span>},
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::filter_conversion::AliasedCondition;
+<span class="kw">use </span><span class="kw">crate</span>::query_builder::write::{build_update_and_set_query, chunk_update_with_ids};
+<span class="kw">use </span><span class="kw">crate</span>::sql_trace::SqlTraceComment;
+<span class="kw">use crate</span>::{error::SqlError, model_extensions::<span class="kw-2">*</span>, query_builder::write, sql_info::SqlInfo, QueryExt};
+<span class="kw">use </span>connector_interface::<span class="kw-2">*</span>;
+<span class="kw">use </span>itertools::Itertools;
+<span class="kw">use </span>prisma_models::<span class="kw-2">*</span>;
+<span class="kw">use </span>psl::dml::prisma_value::PrismaValue;
+<span class="kw">use </span>psl::PreviewFeature;
+<span class="kw">use </span>quaint::{
+    error::ErrorKind,
+    prelude::{native_uuid, uuid_to_bin, uuid_to_bin_swapped, Aliasable, Select, SqlFamily},
 };
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">collections</span>::{<span class="ident">HashMap</span>, <span class="ident">HashSet</span>},
-    <span class="ident">ops::Deref</span>,
-    <span class="ident">usize</span>,
+<span class="kw">use </span>std::{
+    collections::{HashMap, HashSet},
+    ops::Deref,
+    usize,
 };
-<span class="kw">use</span> <span class="ident">tracing::log::trace</span>;
-<span class="kw">use</span> <span class="ident">user_facing_errors::query_engine::DatabaseConstraint</span>;
+<span class="kw">use </span>tracing::log::trace;
+<span class="kw">use </span>user_facing_errors::query_engine::DatabaseConstraint;
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">generate_id</span>(
-    <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
-    <span class="ident">primary_key</span>: <span class="kw-2">&amp;</span><span class="ident">FieldSelection</span>,
-    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">args</span>: <span class="kw-2">&amp;</span><span class="ident">WriteArgs</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="comment">// Go through all the values and generate a select statement with the correct MySQL function</span>
-    <span class="kw">let</span> (<span class="ident">pk_select</span>, <span class="ident">need_select</span>) <span class="op">=</span> <span class="ident">primary_key</span>
-        .<span class="ident">selections</span>()
-        .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">field</span> {
-            <span class="ident">SelectedField::Scalar</span>(<span class="ident">x</span>) <span class="kw">if</span> <span class="ident">x</span>.<span class="ident">default_value</span>.<span class="ident">is_some</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">args</span>.<span class="ident">has_arg_for</span>(<span class="ident">x</span>.<span class="ident">db_name</span>()) =&gt; <span class="ident">x</span>
-                .<span class="ident">default_value</span>
-                .<span class="ident">clone</span>()
-                .<span class="ident">unwrap</span>()
-                .<span class="ident">to_dbgenerated_func</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">func</span><span class="op">|</span> (<span class="ident">field</span>.<span class="ident">db_name</span>().<span class="ident">to_string</span>(), <span class="ident">func</span>)),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+<span class="kw">async fn </span>generate_id(
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    primary_key: <span class="kw-2">&amp;</span>FieldSelection,
+    trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    args: <span class="kw-2">&amp;</span>WriteArgs,
+) -&gt; <span class="kw">crate</span>::Result&lt;<span class="prelude-ty">Option</span>&lt;SelectionResult&gt;&gt; {
+    <span class="comment">// Go through all the values and generate a select statement with the correct MySQL function
+    </span><span class="kw">let </span>(pk_select, need_select) = primary_key
+        .selections()
+        .filter_map(|field| <span class="kw">match </span>field {
+            SelectedField::Scalar(x) <span class="kw">if </span>x.default_value.is_some() &amp;&amp; !args.has_arg_for(x.db_name()) =&gt; x
+                .default_value
+                .clone()
+                .unwrap()
+                .to_dbgenerated_func()
+                .map(|func| (field.db_name().to_string(), func)),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         })
-        .<span class="ident">fold</span>((<span class="ident">Select::default</span>(), <span class="bool-val">false</span>), <span class="op">|</span>(<span class="ident">query</span>, <span class="ident">generated</span>), <span class="ident">value</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">alias</span> <span class="op">=</span> <span class="ident">value</span>.<span class="number">0</span>;
-            <span class="kw">let</span> <span class="ident">func</span> <span class="op">=</span> <span class="ident">value</span>.<span class="number">1</span>.<span class="ident">to_lowercase</span>().<span class="ident">replace</span>(<span class="string">&#39; &#39;</span>, <span class="string">&quot;&quot;</span>);
+        .fold((Select::default(), <span class="bool-val">false</span>), |(query, generated), value| {
+            <span class="kw">let </span>alias = value.<span class="number">0</span>;
+            <span class="kw">let </span>func = value.<span class="number">1</span>.to_lowercase().replace(<span class="string">&#39; &#39;</span>, <span class="string">&quot;&quot;</span>);
 
-            <span class="kw">match</span> <span class="ident">func</span>.<span class="ident">as_str</span>() {
-                <span class="string">&quot;(uuid())&quot;</span> =&gt; (<span class="ident">query</span>.<span class="ident">value</span>(<span class="ident">native_uuid</span>().<span class="ident">alias</span>(<span class="ident">alias</span>)), <span class="bool-val">true</span>),
-                <span class="string">&quot;(uuid_to_bin(uuid()))&quot;</span> <span class="op">|</span> <span class="string">&quot;(uuid_to_bin(uuid(),0))&quot;</span> =&gt; (<span class="ident">query</span>.<span class="ident">value</span>(<span class="ident">uuid_to_bin</span>().<span class="ident">alias</span>(<span class="ident">alias</span>)), <span class="bool-val">true</span>),
-                <span class="string">&quot;(uuid_to_bin(uuid(),1))&quot;</span> =&gt; (<span class="ident">query</span>.<span class="ident">value</span>(<span class="ident">uuid_to_bin_swapped</span>().<span class="ident">alias</span>(<span class="ident">alias</span>)), <span class="bool-val">true</span>),
-                <span class="kw">_</span> =&gt; (<span class="ident">query</span>, <span class="ident">generated</span>),
+            <span class="kw">match </span>func.as_str() {
+                <span class="string">&quot;(uuid())&quot; </span>=&gt; (query.value(native_uuid().alias(alias)), <span class="bool-val">true</span>),
+                <span class="string">&quot;(uuid_to_bin(uuid()))&quot; </span>| <span class="string">&quot;(uuid_to_bin(uuid(),0))&quot; </span>=&gt; (query.value(uuid_to_bin().alias(alias)), <span class="bool-val">true</span>),
+                <span class="string">&quot;(uuid_to_bin(uuid(),1))&quot; </span>=&gt; (query.value(uuid_to_bin_swapped().alias(alias)), <span class="bool-val">true</span>),
+                <span class="kw">_ </span>=&gt; (query, generated),
             }
         });
 
-    <span class="comment">// db generate values only if needed</span>
-    <span class="kw">if</span> <span class="ident">need_select</span> {
-        <span class="kw">let</span> <span class="ident">pk_select</span> <span class="op">=</span> <span class="ident">pk_select</span>.<span class="ident">add_trace_id</span>(<span class="ident">trace_id</span>);
-        <span class="kw">let</span> <span class="ident">pk_result</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">query</span>(<span class="ident">pk_select</span>.<span class="ident">into</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">try_convert</span>(<span class="kw-2">&amp;</span>(<span class="ident">primary_key</span>.<span class="ident">into</span>()), <span class="ident">pk_result</span>)<span class="question-mark">?</span>;
+    <span class="comment">// db generate values only if needed
+    </span><span class="kw">if </span>need_select {
+        <span class="kw">let </span>pk_select = pk_select.add_trace_id(trace_id);
+        <span class="kw">let </span>pk_result = conn.query(pk_select.into()).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>result = try_convert(<span class="kw-2">&amp;</span>(primary_key.into()), pk_result)<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">result</span>))
-    } <span class="kw">else</span> {
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(result))
+    } <span class="kw">else </span>{
         <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
     }
 }
 
-<span class="doccomment">/// Create a single record to the database defined in `conn`, resulting into a</span>
-<span class="doccomment">/// `RecordProjection` as an identifier pointing to the just-created record.</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_record</span>(
-    <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
-    <span class="ident">sql_family</span>: <span class="kw-2">&amp;</span><span class="ident">SqlFamily</span>,
-    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="kw-2">mut</span> <span class="ident">args</span>: <span class="ident">WriteArgs</span>,
-    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">pk</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_identifier</span>();
+<span class="doccomment">/// Create a single record to the database defined in `conn`, resulting into a
+/// `RecordProjection` as an identifier pointing to the just-created record.
+</span><span class="kw">pub async fn </span>create_record(
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    sql_family: <span class="kw-2">&amp;</span>SqlFamily,
+    model: <span class="kw-2">&amp;</span>ModelRef,
+    <span class="kw-2">mut </span>args: WriteArgs,
+    trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+) -&gt; <span class="kw">crate</span>::Result&lt;SelectionResult&gt; {
+    <span class="kw">let </span>pk = model.primary_identifier();
 
-    <span class="kw">let</span> <span class="ident">returned_id</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">sql_family</span> <span class="op">==</span> <span class="ident">SqlFamily::Mysql</span> {
-        <span class="ident">generate_id</span>(<span class="ident">conn</span>, <span class="kw-2">&amp;</span><span class="ident">pk</span>, <span class="ident">trace_id</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="ident">args</span>).<span class="kw">await</span><span class="question-mark">?</span>
-    } <span class="kw">else</span> {
-        <span class="ident">args</span>.<span class="ident">as_record_projection</span>(<span class="ident">pk</span>.<span class="ident">clone</span>().<span class="ident">into</span>())
+    <span class="kw">let </span>returned_id = <span class="kw">if </span><span class="kw-2">*</span>sql_family == SqlFamily::Mysql {
+        generate_id(conn, <span class="kw-2">&amp;</span>pk, trace_id.clone(), <span class="kw-2">&amp;</span>args).<span class="kw">await</span><span class="question-mark">?
+    </span>} <span class="kw">else </span>{
+        args.as_record_projection(pk.clone().into())
     };
 
-    <span class="kw">let</span> <span class="ident">returned_id</span> <span class="op">=</span> <span class="ident">returned_id</span>.<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">args</span>.<span class="ident">as_record_projection</span>(<span class="ident">pk</span>.<span class="ident">clone</span>().<span class="ident">into</span>()));
+    <span class="kw">let </span>returned_id = returned_id.or_else(|| args.as_record_projection(pk.clone().into()));
 
-    <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">returned_id</span> {
-        <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">pk</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">sql_family</span> <span class="op">==</span> <span class="ident">SqlFamily::Mysql</span> =&gt; {
-            <span class="kw">for</span> (<span class="ident">field</span>, <span class="ident">value</span>) <span class="kw">in</span> <span class="ident">pk</span>.<span class="ident">pairs</span>.<span class="ident">iter</span>() {
-                <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">DatasourceFieldName</span>(<span class="ident">field</span>.<span class="ident">db_name</span>().<span class="ident">into</span>());
-                <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">WriteOperation::scalar_set</span>(<span class="ident">value</span>.<span class="ident">clone</span>());
-                <span class="ident">args</span>.<span class="ident">insert</span>(<span class="ident">field</span>, <span class="ident">value</span>)
+    <span class="kw">let </span>args = <span class="kw">match </span>returned_id {
+        <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>pk) <span class="kw">if </span><span class="kw-2">*</span>sql_family == SqlFamily::Mysql =&gt; {
+            <span class="kw">for </span>(field, value) <span class="kw">in </span>pk.pairs.iter() {
+                <span class="kw">let </span>field = DatasourceFieldName(field.db_name().into());
+                <span class="kw">let </span>value = WriteOperation::scalar_set(value.clone());
+                args.insert(field, value)
             }
-            <span class="ident">args</span>
+            args
         }
-        <span class="kw">_</span> =&gt; <span class="ident">args</span>,
+        <span class="kw">_ </span>=&gt; args,
     };
 
-    <span class="kw">let</span> <span class="ident">insert</span> <span class="op">=</span> <span class="ident">write::create_record</span>(<span class="ident">model</span>, <span class="ident">args</span>, <span class="ident">trace_id</span>);
+    <span class="kw">let </span>insert = write::create_record(model, args, trace_id);
 
-    <span class="kw">let</span> <span class="ident">result_set</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">conn</span>.<span class="ident">insert</span>(<span class="ident">insert</span>).<span class="kw">await</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">id</span>) =&gt; <span class="ident">id</span>,
-        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="kw">match</span> <span class="ident">e</span>.<span class="ident">kind</span>() {
-            <span class="ident">ErrorKind::UniqueConstraintViolation</span> { <span class="ident">constraint</span> } =&gt; <span class="kw">match</span> <span class="ident">constraint</span> {
-                <span class="ident">quaint::error::DatabaseConstraint::Index</span>(<span class="ident">name</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">DatabaseConstraint::Index</span>(<span class="ident">name</span>.<span class="ident">clone</span>());
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">SqlError::UniqueConstraintViolation</span> { <span class="ident">constraint</span> });
+    <span class="kw">let </span>result_set = <span class="kw">match </span>conn.insert(insert).<span class="kw">await </span>{
+        <span class="prelude-val">Ok</span>(id) =&gt; id,
+        <span class="prelude-val">Err</span>(e) =&gt; <span class="kw">match </span>e.kind() {
+            ErrorKind::UniqueConstraintViolation { constraint } =&gt; <span class="kw">match </span>constraint {
+                quaint::error::DatabaseConstraint::Index(name) =&gt; {
+                    <span class="kw">let </span>constraint = DatabaseConstraint::Index(name.clone());
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(SqlError::UniqueConstraintViolation { constraint });
                 }
-                <span class="ident">quaint::error::DatabaseConstraint::Fields</span>(<span class="ident">fields</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">DatabaseConstraint::Fields</span>(<span class="ident">fields</span>.<span class="ident">clone</span>());
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">SqlError::UniqueConstraintViolation</span> { <span class="ident">constraint</span> });
+                quaint::error::DatabaseConstraint::Fields(fields) =&gt; {
+                    <span class="kw">let </span>constraint = DatabaseConstraint::Fields(fields.clone());
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(SqlError::UniqueConstraintViolation { constraint });
                 }
-                <span class="ident">quaint::error::DatabaseConstraint::ForeignKey</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">DatabaseConstraint::ForeignKey</span>;
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">SqlError::UniqueConstraintViolation</span> { <span class="ident">constraint</span> });
+                quaint::error::DatabaseConstraint::ForeignKey =&gt; {
+                    <span class="kw">let </span>constraint = DatabaseConstraint::ForeignKey;
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(SqlError::UniqueConstraintViolation { constraint });
                 }
-                <span class="ident">quaint::error::DatabaseConstraint::CannotParse</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">DatabaseConstraint::CannotParse</span>;
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">SqlError::UniqueConstraintViolation</span> { <span class="ident">constraint</span> });
-                }
-            },
-            <span class="ident">ErrorKind::NullConstraintViolation</span> { <span class="ident">constraint</span> } =&gt; <span class="kw">match</span> <span class="ident">constraint</span> {
-                <span class="ident">quaint::error::DatabaseConstraint::Index</span>(<span class="ident">name</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">DatabaseConstraint::Index</span>(<span class="ident">name</span>.<span class="ident">clone</span>());
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">SqlError::NullConstraintViolation</span> { <span class="ident">constraint</span> });
-                }
-                <span class="ident">quaint::error::DatabaseConstraint::Fields</span>(<span class="ident">fields</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">DatabaseConstraint::Fields</span>(<span class="ident">fields</span>.<span class="ident">clone</span>());
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">SqlError::NullConstraintViolation</span> { <span class="ident">constraint</span> });
-                }
-                <span class="ident">quaint::error::DatabaseConstraint::ForeignKey</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">DatabaseConstraint::ForeignKey</span>;
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">SqlError::NullConstraintViolation</span> { <span class="ident">constraint</span> });
-                }
-                <span class="ident">quaint::error::DatabaseConstraint::CannotParse</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="ident">DatabaseConstraint::CannotParse</span>;
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">SqlError::NullConstraintViolation</span> { <span class="ident">constraint</span> });
+                quaint::error::DatabaseConstraint::CannotParse =&gt; {
+                    <span class="kw">let </span>constraint = DatabaseConstraint::CannotParse;
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(SqlError::UniqueConstraintViolation { constraint });
                 }
             },
-            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">SqlError::from</span>(<span class="ident">e</span>)),
+            ErrorKind::NullConstraintViolation { constraint } =&gt; <span class="kw">match </span>constraint {
+                quaint::error::DatabaseConstraint::Index(name) =&gt; {
+                    <span class="kw">let </span>constraint = DatabaseConstraint::Index(name.clone());
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(SqlError::NullConstraintViolation { constraint });
+                }
+                quaint::error::DatabaseConstraint::Fields(fields) =&gt; {
+                    <span class="kw">let </span>constraint = DatabaseConstraint::Fields(fields.clone());
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(SqlError::NullConstraintViolation { constraint });
+                }
+                quaint::error::DatabaseConstraint::ForeignKey =&gt; {
+                    <span class="kw">let </span>constraint = DatabaseConstraint::ForeignKey;
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(SqlError::NullConstraintViolation { constraint });
+                }
+                quaint::error::DatabaseConstraint::CannotParse =&gt; {
+                    <span class="kw">let </span>constraint = DatabaseConstraint::CannotParse;
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(SqlError::NullConstraintViolation { constraint });
+                }
+            },
+            <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(SqlError::from(e)),
         },
     };
 
-    <span class="kw">match</span> (<span class="ident">returned_id</span>, <span class="ident">result_set</span>.<span class="ident">len</span>(), <span class="ident">result_set</span>.<span class="ident">last_insert_id</span>()) {
-        <span class="comment">// All values provided in the write arrghs</span>
-        (<span class="prelude-val">Some</span>(<span class="ident">identifier</span>), <span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">identifier</span>.<span class="ident">misses_autogen_value</span>() =&gt; <span class="prelude-val">Ok</span>(<span class="ident">identifier</span>),
+    <span class="kw">match </span>(returned_id, result_set.len(), result_set.last_insert_id()) {
+        <span class="comment">// All values provided in the write arrghs
+        </span>(<span class="prelude-val">Some</span>(identifier), <span class="kw">_</span>, <span class="kw">_</span>) <span class="kw">if </span>!identifier.misses_autogen_value() =&gt; <span class="prelude-val">Ok</span>(identifier),
 
-        <span class="comment">// with a working RETURNING statement</span>
-        (<span class="kw">_</span>, <span class="ident">n</span>, <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">n</span> <span class="op">&gt;</span> <span class="number">0</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">try_convert</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">primary_identifier</span>().<span class="ident">into</span>(), <span class="ident">result_set</span>)<span class="question-mark">?</span>),
+        <span class="comment">// with a working RETURNING statement
+        </span>(<span class="kw">_</span>, n, <span class="kw">_</span>) <span class="kw">if </span>n &gt; <span class="number">0 </span>=&gt; <span class="prelude-val">Ok</span>(try_convert(<span class="kw-2">&amp;</span>model.primary_identifier().into(), result_set)<span class="question-mark">?</span>),
 
-        <span class="comment">// We have an auto-incremented id that we got from MySQL or SQLite</span>
-        (<span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">identifier</span>), <span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="ident">num</span>)) <span class="kw">if</span> <span class="ident">identifier</span>.<span class="ident">misses_autogen_value</span>() =&gt; {
-            <span class="ident">identifier</span>.<span class="ident">add_autogen_value</span>(<span class="ident">num</span> <span class="kw">as</span> <span class="ident">i64</span>);
-            <span class="prelude-val">Ok</span>(<span class="ident">identifier</span>)
+        <span class="comment">// We have an auto-incremented id that we got from MySQL or SQLite
+        </span>(<span class="prelude-val">Some</span>(<span class="kw-2">mut </span>identifier), <span class="kw">_</span>, <span class="prelude-val">Some</span>(num)) <span class="kw">if </span>identifier.misses_autogen_value() =&gt; {
+            identifier.add_autogen_value(num <span class="kw">as </span>i64);
+            <span class="prelude-val">Ok</span>(identifier)
         }
 
         (<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Could not figure out an ID in create&quot;</span>),
     }
 }
 
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_records</span>(
-    <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
-    <span class="ident">sql_info</span>: <span class="ident">SqlInfo</span>,
-    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">WriteArgs</span><span class="op">&gt;</span>,
-    <span class="ident">skip_duplicates</span>: <span class="ident">bool</span>,
-    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">args</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="number">0</span>);
+<span class="kw">pub async fn </span>create_records(
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    sql_info: SqlInfo,
+    model: <span class="kw-2">&amp;</span>ModelRef,
+    args: Vec&lt;WriteArgs&gt;,
+    skip_duplicates: bool,
+    trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+) -&gt; <span class="kw">crate</span>::Result&lt;usize&gt; {
+    <span class="kw">if </span>args.is_empty() {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="number">0</span>);
     }
 
-    <span class="comment">// Compute the set of fields affected by the createMany.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">HashSet::new</span>();
-    <span class="ident">args</span>.<span class="ident">iter</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">fields</span>.<span class="ident">extend</span>(<span class="ident">arg</span>.<span class="ident">keys</span>().<span class="ident">into_iter</span>()));
+    <span class="comment">// Compute the set of fields affected by the createMany.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>fields = HashSet::new();
+    args.iter().for_each(|arg| fields.extend(arg.keys().into_iter()));
 
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::mutable_key_type</span>)]</span>
-    <span class="kw">let</span> <span class="ident">affected_fields</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">fields</span>
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">dsfn</span><span class="op">|</span> {
-            <span class="ident">model</span>
-                .<span class="ident">fields</span>()
-                .<span class="ident">scalar</span>()
-                .<span class="ident">into_iter</span>()
-                .<span class="ident">find</span>(<span class="op">|</span><span class="ident">sf</span><span class="op">|</span> <span class="ident">sf</span>.<span class="ident">db_name</span>() <span class="op">==</span> <span class="ident">dsfn</span>.<span class="ident">deref</span>())
-                .<span class="ident">unwrap</span>()
+    <span class="attribute">#[allow(clippy::mutable_key_type)]
+    </span><span class="kw">let </span>affected_fields: HashSet&lt;ScalarFieldRef&gt; = fields
+        .into_iter()
+        .map(|dsfn| {
+            model
+                .fields()
+                .scalar()
+                .into_iter()
+                .find(|sf| sf.db_name() == dsfn.deref())
+                .unwrap()
         })
-        .<span class="ident">collect</span>();
+        .collect();
 
-    <span class="kw">if</span> <span class="ident">affected_fields</span>.<span class="ident">is_empty</span>() {
-        <span class="comment">// If no fields are to be inserted (everything is DEFAULT) we need to fall back to inserting default rows `args.len()` times.</span>
-        <span class="ident">create_many_empty</span>(<span class="ident">conn</span>, <span class="ident">model</span>, <span class="ident">args</span>.<span class="ident">len</span>(), <span class="ident">skip_duplicates</span>, <span class="ident">trace_id</span>).<span class="kw">await</span>
-    } <span class="kw">else</span> {
-        <span class="ident">create_many_nonempty</span>(<span class="ident">conn</span>, <span class="ident">sql_info</span>, <span class="ident">model</span>, <span class="ident">args</span>, <span class="ident">skip_duplicates</span>, <span class="ident">affected_fields</span>, <span class="ident">trace_id</span>).<span class="kw">await</span>
-    }
+    <span class="kw">if </span>affected_fields.is_empty() {
+        <span class="comment">// If no fields are to be inserted (everything is DEFAULT) we need to fall back to inserting default rows `args.len()` times.
+        </span>create_many_empty(conn, model, args.len(), skip_duplicates, trace_id).<span class="kw">await
+    </span>} <span class="kw">else </span>{
+        create_many_nonempty(conn, sql_info, model, args, skip_duplicates, affected_fields, trace_id).<span class="kw">await
+    </span>}
 }
 
-<span class="doccomment">/// Standard create many records, requires `affected_fields` to be non-empty.</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::mutable_key_type</span>)]</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_many_nonempty</span>(
-    <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
-    <span class="ident">sql_info</span>: <span class="ident">SqlInfo</span>,
-    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">WriteArgs</span><span class="op">&gt;</span>,
-    <span class="ident">skip_duplicates</span>: <span class="ident">bool</span>,
-    <span class="ident">affected_fields</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span>,
-    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">batches</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">max_params</span>) <span class="op">=</span> <span class="ident">sql_info</span>.<span class="ident">max_bind_values</span> {
-        <span class="comment">// We need to split inserts if they are above a parameter threshold, as well as split based on number of rows.</span>
-        <span class="comment">// -&gt; Horizontal partitioning by row number, vertical by number of args.</span>
-        <span class="ident">args</span>.<span class="ident">into_iter</span>()
-            .<span class="ident">peekable</span>()
-            .<span class="ident">batching</span>(<span class="op">|</span><span class="ident">iter</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">param_count</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">batch</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+<span class="doccomment">/// Standard create many records, requires `affected_fields` to be non-empty.
+</span><span class="attribute">#[allow(clippy::mutable_key_type)]
+</span><span class="kw">async fn </span>create_many_nonempty(
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    sql_info: SqlInfo,
+    model: <span class="kw-2">&amp;</span>ModelRef,
+    args: Vec&lt;WriteArgs&gt;,
+    skip_duplicates: bool,
+    affected_fields: HashSet&lt;ScalarFieldRef&gt;,
+    trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+) -&gt; <span class="kw">crate</span>::Result&lt;usize&gt; {
+    <span class="kw">let </span>batches = <span class="kw">if let </span><span class="prelude-val">Some</span>(max_params) = sql_info.max_bind_values {
+        <span class="comment">// We need to split inserts if they are above a parameter threshold, as well as split based on number of rows.
+        // -&gt; Horizontal partitioning by row number, vertical by number of args.
+        </span>args.into_iter()
+            .peekable()
+            .batching(|iter| {
+                <span class="kw">let </span><span class="kw-2">mut </span>param_count: usize = <span class="number">0</span>;
+                <span class="kw">let </span><span class="kw-2">mut </span>batch = <span class="macro">vec!</span>[];
 
-                <span class="kw">while</span> <span class="ident">param_count</span> <span class="op">&lt;</span> <span class="ident">max_params</span> {
-                    <span class="comment">// If the param count _including_ the next item doens&#39;t exceed the limit,</span>
-                    <span class="comment">// we continue filling up the current batch.</span>
-                    <span class="kw">let</span> <span class="ident">proceed</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">iter</span>.<span class="ident">peek</span>() {
-                        <span class="prelude-val">Some</span>(<span class="ident">next</span>) =&gt; (<span class="ident">param_count</span> <span class="op">+</span> <span class="ident">next</span>.<span class="ident">len</span>()) <span class="op">&lt;</span><span class="op">=</span> <span class="ident">max_params</span>,
-                        <span class="prelude-val">None</span> =&gt; <span class="kw">break</span>,
+                <span class="kw">while </span>param_count &lt; max_params {
+                    <span class="comment">// If the param count _including_ the next item doens&#39;t exceed the limit,
+                    // we continue filling up the current batch.
+                    </span><span class="kw">let </span>proceed = <span class="kw">match </span>iter.peek() {
+                        <span class="prelude-val">Some</span>(next) =&gt; (param_count + next.len()) &lt;= max_params,
+                        <span class="prelude-val">None </span>=&gt; <span class="kw">break</span>,
                     };
 
-                    <span class="kw">if</span> <span class="ident">proceed</span> {
-                        <span class="kw">match</span> <span class="ident">iter</span>.<span class="ident">next</span>() {
-                            <span class="prelude-val">Some</span>(<span class="ident">next</span>) =&gt; {
-                                <span class="ident">param_count</span> <span class="op">+</span><span class="op">=</span> <span class="ident">next</span>.<span class="ident">len</span>();
-                                <span class="ident">batch</span>.<span class="ident">push</span>(<span class="ident">next</span>)
+                    <span class="kw">if </span>proceed {
+                        <span class="kw">match </span>iter.next() {
+                            <span class="prelude-val">Some</span>(next) =&gt; {
+                                param_count += next.len();
+                                batch.push(next)
                             }
-                            <span class="prelude-val">None</span> =&gt; <span class="kw">break</span>,
+                            <span class="prelude-val">None </span>=&gt; <span class="kw">break</span>,
                         }
-                    } <span class="kw">else</span> {
+                    } <span class="kw">else </span>{
                         <span class="kw">break</span>;
                     }
                 }
 
-                <span class="kw">if</span> <span class="ident">batch</span>.<span class="ident">is_empty</span>() {
-                    <span class="prelude-val">None</span>
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">batch</span>)
+                <span class="kw">if </span>batch.is_empty() {
+                    <span class="prelude-val">None
+                </span>} <span class="kw">else </span>{
+                    <span class="prelude-val">Some</span>(batch)
                 }
             })
-            .<span class="ident">collect_vec</span>()
-    } <span class="kw">else</span> {
-        <span class="macro">vec!</span>[<span class="ident">args</span>]
+            .collect_vec()
+    } <span class="kw">else </span>{
+        <span class="macro">vec!</span>[args]
     };
 
-    <span class="kw">let</span> <span class="ident">partitioned_batches</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">max_rows</span>) <span class="op">=</span> <span class="ident">sql_info</span>.<span class="ident">max_rows</span> {
-        <span class="kw">let</span> <span class="ident">capacity</span> <span class="op">=</span> <span class="ident">batches</span>.<span class="ident">len</span>();
-        <span class="ident">batches</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">fold</span>(<span class="ident">Vec::with_capacity</span>(<span class="ident">capacity</span>), <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">batches</span>, <span class="ident">next_batch</span><span class="op">|</span> {
-                <span class="kw">if</span> <span class="ident">next_batch</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">max_rows</span> {
-                    <span class="ident">batches</span>.<span class="ident">extend</span>(
-                        <span class="ident">next_batch</span>
-                            .<span class="ident">into_iter</span>()
-                            .<span class="ident">chunks</span>(<span class="ident">max_rows</span>)
-                            .<span class="ident">into_iter</span>()
-                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">chunk</span><span class="op">|</span> <span class="ident">chunk</span>.<span class="ident">into_iter</span>().<span class="ident">collect_vec</span>()),
+    <span class="kw">let </span>partitioned_batches = <span class="kw">if let </span><span class="prelude-val">Some</span>(max_rows) = sql_info.max_rows {
+        <span class="kw">let </span>capacity = batches.len();
+        batches
+            .into_iter()
+            .fold(Vec::with_capacity(capacity), |<span class="kw-2">mut </span>batches, next_batch| {
+                <span class="kw">if </span>next_batch.len() &gt; max_rows {
+                    batches.extend(
+                        next_batch
+                            .into_iter()
+                            .chunks(max_rows)
+                            .into_iter()
+                            .map(|chunk| chunk.into_iter().collect_vec()),
                     );
-                } <span class="kw">else</span> {
-                    <span class="ident">batches</span>.<span class="ident">push</span>(<span class="ident">next_batch</span>);
+                } <span class="kw">else </span>{
+                    batches.push(next_batch);
                 }
 
-                <span class="ident">batches</span>
+                batches
             })
-    } <span class="kw">else</span> {
-        <span class="ident">batches</span>
+    } <span class="kw">else </span>{
+        batches
     };
 
-    <span class="macro">trace!</span>(<span class="string">&quot;Total of {} batches to be executed.&quot;</span>, <span class="ident">partitioned_batches</span>.<span class="ident">len</span>());
+    <span class="macro">trace!</span>(<span class="string">&quot;Total of {} batches to be executed.&quot;</span>, partitioned_batches.len());
     <span class="macro">trace!</span>(
         <span class="string">&quot;Batch sizes: {:?}&quot;</span>,
-        <span class="ident">partitioned_batches</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span>.<span class="ident">len</span>()).<span class="ident">collect_vec</span>()
+        partitioned_batches.iter().map(|b| b.len()).collect_vec()
     );
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">count</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">for</span> <span class="ident">batch</span> <span class="kw">in</span> <span class="ident">partitioned_batches</span> {
-        <span class="kw">let</span> <span class="ident">stmt</span> <span class="op">=</span> <span class="ident">write::create_records_nonempty</span>(<span class="ident">model</span>, <span class="ident">batch</span>, <span class="ident">skip_duplicates</span>, <span class="kw-2">&amp;</span><span class="ident">affected_fields</span>, <span class="ident">trace_id</span>.<span class="ident">clone</span>());
-        <span class="ident">count</span> <span class="op">+</span><span class="op">=</span> <span class="ident">conn</span>.<span class="ident">execute</span>(<span class="ident">stmt</span>.<span class="ident">into</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>count = <span class="number">0</span>;
+    <span class="kw">for </span>batch <span class="kw">in </span>partitioned_batches {
+        <span class="kw">let </span>stmt = write::create_records_nonempty(model, batch, skip_duplicates, <span class="kw-2">&amp;</span>affected_fields, trace_id.clone());
+        count += conn.execute(stmt.into()).<span class="kw">await</span><span class="question-mark">?</span>;
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">count</span> <span class="kw">as</span> <span class="ident">usize</span>)
+    <span class="prelude-val">Ok</span>(count <span class="kw">as </span>usize)
 }
 
-<span class="doccomment">/// Creates many empty (all default values) rows.</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_many_empty</span>(
-    <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
-    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="ident">num_records</span>: <span class="ident">usize</span>,
-    <span class="ident">skip_duplicates</span>: <span class="ident">bool</span>,
-    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">stmt</span> <span class="op">=</span> <span class="ident">write::create_records_empty</span>(<span class="ident">model</span>, <span class="ident">skip_duplicates</span>, <span class="ident">trace_id</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">count</span> <span class="op">=</span> <span class="number">0</span>;
+<span class="doccomment">/// Creates many empty (all default values) rows.
+</span><span class="kw">async fn </span>create_many_empty(
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    model: <span class="kw-2">&amp;</span>ModelRef,
+    num_records: usize,
+    skip_duplicates: bool,
+    trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+) -&gt; <span class="kw">crate</span>::Result&lt;usize&gt; {
+    <span class="kw">let </span>stmt = write::create_records_empty(model, skip_duplicates, trace_id);
+    <span class="kw">let </span><span class="kw-2">mut </span>count = <span class="number">0</span>;
 
-    <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">num_records</span> {
-        <span class="ident">count</span> <span class="op">+</span><span class="op">=</span> <span class="ident">conn</span>.<span class="ident">execute</span>(<span class="ident">stmt</span>.<span class="ident">clone</span>().<span class="ident">into</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">for _ in </span><span class="number">0</span>..num_records {
+        count += conn.execute(stmt.clone().into()).<span class="kw">await</span><span class="question-mark">?</span>;
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">count</span> <span class="kw">as</span> <span class="ident">usize</span>)
+    <span class="prelude-val">Ok</span>(count <span class="kw">as </span>usize)
 }
 
-<span class="doccomment">/// Update one record in a database defined in `conn` and the records</span>
-<span class="doccomment">/// defined in `args`, resulting the identifiers that were modified in the</span>
-<span class="doccomment">/// operation.</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update_record</span>(
-    <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
-    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="ident">record_filter</span>: <span class="ident">RecordFilter</span>,
-    <span class="ident">args</span>: <span class="ident">WriteArgs</span>,
-    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">id_args</span> <span class="op">=</span> <span class="ident">pick_args</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">primary_identifier</span>().<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="ident">args</span>);
+<span class="doccomment">/// Update one record in a database defined in `conn` and the records
+/// defined in `args`, resulting the identifiers that were modified in the
+/// operation.
+</span><span class="kw">pub async fn </span>update_record(
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    model: <span class="kw-2">&amp;</span>ModelRef,
+    record_filter: RecordFilter,
+    args: WriteArgs,
+    trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+) -&gt; <span class="kw">crate</span>::Result&lt;Vec&lt;SelectionResult&gt;&gt; {
+    <span class="kw">let </span>id_args = pick_args(<span class="kw-2">&amp;</span>model.primary_identifier().into(), <span class="kw-2">&amp;</span>args);
 
-    <span class="comment">// This is to match the behaviour expected but it seems a bit strange to me</span>
-    <span class="comment">// This comes across as if the update happened even if it didn&#39;t</span>
-    <span class="kw">if</span> <span class="ident">args</span>.<span class="ident">args</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">let</span> <span class="ident">ids</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">conn</span>
-            .<span class="ident">filter_selectors</span>(<span class="ident">model</span>, <span class="ident">record_filter</span>.<span class="ident">clone</span>(), <span class="ident">trace_id</span>.<span class="ident">clone</span>())
+    <span class="comment">// This is to match the behaviour expected but it seems a bit strange to me
+    // This comes across as if the update happened even if it didn&#39;t
+    </span><span class="kw">if </span>args.args.is_empty() {
+        <span class="kw">let </span>ids: Vec&lt;SelectionResult&gt; = conn
+            .filter_selectors(model, record_filter.clone(), trace_id.clone())
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">ids</span>);
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(ids);
     }
 
-    <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">ids</span>) <span class="op">=</span> <span class="ident">update_records_from_ids_and_filter</span>(<span class="ident">conn</span>, <span class="ident">model</span>, <span class="ident">record_filter</span>, <span class="ident">args</span>, <span class="ident">trace_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span>(<span class="kw">_</span>, ids) = update_records_from_ids_and_filter(conn, model, record_filter, args, trace_id).<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>(<span class="ident">merge_write_args</span>(<span class="ident">ids</span>, <span class="ident">id_args</span>))
+    <span class="prelude-val">Ok</span>(merge_write_args(ids, id_args))
 }
 
-<span class="comment">// Generates a query like this:</span>
-<span class="comment">//  UPDATE &quot;public&quot;.&quot;User&quot; SET &quot;name&quot; = $1 WHERE &quot;public&quot;.&quot;User&quot;.&quot;id&quot; IN ($2,$3,$4,$5,$6,$7,$8,$9,$10,$11) AND &quot;public&quot;.&quot;User&quot;.&quot;age&quot; &gt; $1</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update_records_from_ids_and_filter</span>(
-    <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
-    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="ident">record_filter</span>: <span class="ident">RecordFilter</span>,
-    <span class="ident">args</span>: <span class="ident">WriteArgs</span>,
-    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">filter_condition</span> <span class="op">=</span> <span class="ident">record_filter</span>.<span class="ident">clone</span>().<span class="ident">filter</span>.<span class="ident">aliased_condition_from</span>(<span class="prelude-val">None</span>, <span class="bool-val">false</span>);
-    <span class="kw">let</span> <span class="ident">ids</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">filter_selectors</span>(<span class="ident">model</span>, <span class="ident">record_filter</span>, <span class="ident">trace_id</span>.<span class="ident">clone</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+<span class="comment">// Generates a query like this:
+//  UPDATE &quot;public&quot;.&quot;User&quot; SET &quot;name&quot; = $1 WHERE &quot;public&quot;.&quot;User&quot;.&quot;id&quot; IN ($2,$3,$4,$5,$6,$7,$8,$9,$10,$11) AND &quot;public&quot;.&quot;User&quot;.&quot;age&quot; &gt; $1
+</span><span class="kw">async fn </span>update_records_from_ids_and_filter(
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    model: <span class="kw-2">&amp;</span>ModelRef,
+    record_filter: RecordFilter,
+    args: WriteArgs,
+    trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+) -&gt; <span class="kw">crate</span>::Result&lt;(usize, Vec&lt;SelectionResult&gt;)&gt; {
+    <span class="kw">let </span>filter_condition = record_filter.clone().filter.aliased_condition_from(<span class="prelude-val">None</span>, <span class="bool-val">false</span>);
+    <span class="kw">let </span>ids: Vec&lt;SelectionResult&gt; = conn.filter_selectors(model, record_filter, trace_id.clone()).<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="kw">if</span> <span class="ident">ids</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>((<span class="number">0</span>, <span class="ident">Vec::new</span>()));
+    <span class="kw">if </span>ids.is_empty() {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>((<span class="number">0</span>, Vec::new()));
     }
 
-    <span class="kw">let</span> <span class="ident">update</span> <span class="op">=</span> <span class="ident">build_update_and_set_query</span>(<span class="ident">model</span>, <span class="ident">args</span>, <span class="ident">trace_id</span>);
+    <span class="kw">let </span>update = build_update_and_set_query(model, args, trace_id);
 
-    <span class="kw">let</span> <span class="ident">updates</span> <span class="op">=</span> {
-        <span class="kw">let</span> <span class="ident">ids</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ids</span>.<span class="ident">iter</span>().<span class="ident">collect</span>();
-        <span class="ident">chunk_update_with_ids</span>(<span class="ident">update</span>, <span class="ident">model</span>, <span class="kw-2">&amp;</span><span class="ident">ids</span>, <span class="ident">filter_condition</span>)<span class="question-mark">?</span>
-    };
+    <span class="kw">let </span>updates = {
+        <span class="kw">let </span>ids: Vec&lt;<span class="kw-2">&amp;</span>SelectionResult&gt; = ids.iter().collect();
+        chunk_update_with_ids(update, model, <span class="kw-2">&amp;</span>ids, filter_condition)<span class="question-mark">?
+    </span>};
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">count</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">for</span> <span class="ident">update</span> <span class="kw">in</span> <span class="ident">updates</span> {
-        <span class="kw">let</span> <span class="ident">update_count</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">execute</span>(<span class="ident">update</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>count = <span class="number">0</span>;
+    <span class="kw">for </span>update <span class="kw">in </span>updates {
+        <span class="kw">let </span>update_count = conn.execute(update).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="ident">count</span> <span class="op">+</span><span class="op">=</span> <span class="ident">update_count</span>;
+        count += update_count;
     }
 
-    <span class="prelude-val">Ok</span>((<span class="ident">count</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">ids</span>))
+    <span class="prelude-val">Ok</span>((count <span class="kw">as </span>usize, ids))
 }
 
-<span class="comment">// Generates a query like this:</span>
-<span class="comment">//  UPDATE &quot;public&quot;.&quot;User&quot; SET &quot;name&quot; = $1 WHERE &quot;public&quot;.&quot;User&quot;.&quot;age&quot; &gt; $1</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update_records_from_filter</span>(
-    <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
-    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="ident">record_filter</span>: <span class="ident">RecordFilter</span>,
-    <span class="ident">args</span>: <span class="ident">WriteArgs</span>,
-    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">update</span> <span class="op">=</span> <span class="ident">build_update_and_set_query</span>(<span class="ident">model</span>, <span class="ident">args</span>, <span class="ident">trace_id</span>);
-    <span class="kw">let</span> <span class="ident">filter_condition</span> <span class="op">=</span> <span class="ident">record_filter</span>.<span class="ident">clone</span>().<span class="ident">filter</span>.<span class="ident">aliased_condition_from</span>(<span class="prelude-val">None</span>, <span class="bool-val">false</span>);
+<span class="comment">// Generates a query like this:
+//  UPDATE &quot;public&quot;.&quot;User&quot; SET &quot;name&quot; = $1 WHERE &quot;public&quot;.&quot;User&quot;.&quot;age&quot; &gt; $1
+</span><span class="kw">async fn </span>update_records_from_filter(
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    model: <span class="kw-2">&amp;</span>ModelRef,
+    record_filter: RecordFilter,
+    args: WriteArgs,
+    trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+) -&gt; <span class="kw">crate</span>::Result&lt;usize&gt; {
+    <span class="kw">let </span>update = build_update_and_set_query(model, args, trace_id);
+    <span class="kw">let </span>filter_condition = record_filter.clone().filter.aliased_condition_from(<span class="prelude-val">None</span>, <span class="bool-val">false</span>);
 
-    <span class="kw">let</span> <span class="ident">update</span> <span class="op">=</span> <span class="ident">update</span>.<span class="ident">so_that</span>(<span class="ident">filter_condition</span>);
-    <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">execute</span>(<span class="ident">update</span>.<span class="ident">into</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span>update = update.so_that(filter_condition);
+    <span class="kw">let </span>count = conn.execute(update.into()).<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>(<span class="ident">count</span> <span class="kw">as</span> <span class="ident">usize</span>)
+    <span class="prelude-val">Ok</span>(count <span class="kw">as </span>usize)
 }
 
-<span class="doccomment">/// Update multiple records in a database defined in `conn` and the records</span>
-<span class="doccomment">/// defined in `args`, and returning the number of updates</span>
-<span class="doccomment">/// This works via two ways, when there are ids in record_filter.selectors, it uses that to update</span>
-<span class="doccomment">/// Otherwise it used the passed down arguments to update.</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update_records</span>(
-    <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
-    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="ident">record_filter</span>: <span class="ident">RecordFilter</span>,
-    <span class="ident">args</span>: <span class="ident">WriteArgs</span>,
-    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">args</span>.<span class="ident">args</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="number">0</span>);
+<span class="doccomment">/// Update multiple records in a database defined in `conn` and the records
+/// defined in `args`, and returning the number of updates
+/// This works via two ways, when there are ids in record_filter.selectors, it uses that to update
+/// Otherwise it used the passed down arguments to update.
+</span><span class="kw">pub async fn </span>update_records(
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    model: <span class="kw-2">&amp;</span>ModelRef,
+    record_filter: RecordFilter,
+    args: WriteArgs,
+    trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+) -&gt; <span class="kw">crate</span>::Result&lt;usize&gt; {
+    <span class="kw">if </span>args.args.is_empty() {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="number">0</span>);
     }
 
-    <span class="kw">if</span> <span class="ident">record_filter</span>.<span class="ident">has_selectors</span>() {
-        <span class="kw">let</span> (<span class="ident">count</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">update_records_from_ids_and_filter</span>(<span class="ident">conn</span>, <span class="ident">model</span>, <span class="ident">record_filter</span>, <span class="ident">args</span>, <span class="ident">trace_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">count</span>)
-    } <span class="kw">else</span> {
-        <span class="ident">update_records_from_filter</span>(<span class="ident">conn</span>, <span class="ident">model</span>, <span class="ident">record_filter</span>, <span class="ident">args</span>, <span class="ident">trace_id</span>).<span class="kw">await</span>
+    <span class="kw">if </span>record_filter.has_selectors() {
+        <span class="kw">let </span>(count, <span class="kw">_</span>) = update_records_from_ids_and_filter(conn, model, record_filter, args, trace_id).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(count)
+    } <span class="kw">else </span>{
+        update_records_from_filter(conn, model, record_filter, args, trace_id).<span class="kw">await
+    </span>}
+}
+
+<span class="doccomment">/// Delete multiple records in `conn`, defined in the `Filter`. Result is the number of items deleted.
+</span><span class="kw">pub async fn </span>delete_records(
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    model: <span class="kw-2">&amp;</span>ModelRef,
+    record_filter: RecordFilter,
+    trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+) -&gt; <span class="kw">crate</span>::Result&lt;usize&gt; {
+    <span class="kw">let </span>filter_condition = record_filter.clone().filter.aliased_condition_from(<span class="prelude-val">None</span>, <span class="bool-val">false</span>);
+    <span class="kw">let </span>ids = conn.filter_selectors(model, record_filter, trace_id.clone()).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span>ids: Vec&lt;<span class="kw-2">&amp;</span>SelectionResult&gt; = ids.iter().collect();
+    <span class="kw">let </span>count = ids.len();
+
+    <span class="kw">if </span>count == <span class="number">0 </span>{
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(count);
+    }
+
+    <span class="kw">let </span><span class="kw-2">mut </span>row_count = <span class="number">0</span>;
+    <span class="kw">for </span>delete <span class="kw">in </span>write::delete_many(model, ids.as_slice(), filter_condition, trace_id) {
+        row_count += conn.execute(delete).<span class="kw">await</span><span class="question-mark">?</span>;
+    }
+
+    <span class="kw">match </span>usize::try_from(row_count) {
+        <span class="prelude-val">Ok</span>(row_count) =&gt; <span class="prelude-val">Ok</span>(row_count),
+        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(count),
     }
 }
 
-<span class="doccomment">/// Delete multiple records in `conn`, defined in the `Filter`. Result is the number of items deleted.</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_records</span>(
-    <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
-    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="ident">record_filter</span>: <span class="ident">RecordFilter</span>,
-    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">filter_condition</span> <span class="op">=</span> <span class="ident">record_filter</span>.<span class="ident">clone</span>().<span class="ident">filter</span>.<span class="ident">aliased_condition_from</span>(<span class="prelude-val">None</span>, <span class="bool-val">false</span>);
-    <span class="kw">let</span> <span class="ident">ids</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">filter_selectors</span>(<span class="ident">model</span>, <span class="ident">record_filter</span>, <span class="ident">trace_id</span>.<span class="ident">clone</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">ids</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ids</span>.<span class="ident">iter</span>().<span class="ident">collect</span>();
-    <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">ids</span>.<span class="ident">len</span>();
-
-    <span class="kw">if</span> <span class="ident">count</span> <span class="op">==</span> <span class="number">0</span> {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">count</span>);
-    }
-
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">row_count</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">for</span> <span class="ident">delete</span> <span class="kw">in</span> <span class="ident">write::delete_many</span>(<span class="ident">model</span>, <span class="ident">ids</span>.<span class="ident">as_slice</span>(), <span class="ident">filter_condition</span>, <span class="ident">trace_id</span>) {
-        <span class="ident">row_count</span> <span class="op">+</span><span class="op">=</span> <span class="ident">conn</span>.<span class="ident">execute</span>(<span class="ident">delete</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-    }
-
-    <span class="kw">match</span> <span class="ident">usize::try_from</span>(<span class="ident">row_count</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">row_count</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">row_count</span>),
-        <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">count</span>),
-    }
-}
-
-<span class="doccomment">/// Connect relations defined in `child_ids` to a parent defined in `parent_id`.</span>
-<span class="doccomment">/// The relation information is in the `RelationFieldRef`.</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">m2m_connect</span>(
-    <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
-    <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-    <span class="ident">parent_id</span>: <span class="kw-2">&amp;</span><span class="ident">SelectionResult</span>,
-    <span class="ident">child_ids</span>: <span class="kw-2">&amp;</span>[<span class="ident">SelectionResult</span>],
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">write::create_relation_table_records</span>(<span class="ident">field</span>, <span class="ident">parent_id</span>, <span class="ident">child_ids</span>);
-    <span class="ident">conn</span>.<span class="ident">query</span>(<span class="ident">query</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+<span class="doccomment">/// Connect relations defined in `child_ids` to a parent defined in `parent_id`.
+/// The relation information is in the `RelationFieldRef`.
+</span><span class="kw">pub async fn </span>m2m_connect(
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    field: <span class="kw-2">&amp;</span>RelationFieldRef,
+    parent_id: <span class="kw-2">&amp;</span>SelectionResult,
+    child_ids: <span class="kw-2">&amp;</span>[SelectionResult],
+) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+    <span class="kw">let </span>query = write::create_relation_table_records(field, parent_id, child_ids);
+    conn.query(query).<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="doccomment">/// Disconnect relations defined in `child_ids` to a parent defined in `parent_id`.</span>
-<span class="doccomment">/// The relation information is in the `RelationFieldRef`.</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">m2m_disconnect</span>(
-    <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
-    <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-    <span class="ident">parent_id</span>: <span class="kw-2">&amp;</span><span class="ident">SelectionResult</span>,
-    <span class="ident">child_ids</span>: <span class="kw-2">&amp;</span>[<span class="ident">SelectionResult</span>],
-    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">write::delete_relation_table_records</span>(<span class="ident">field</span>, <span class="ident">parent_id</span>, <span class="ident">child_ids</span>, <span class="ident">trace_id</span>);
-    <span class="ident">conn</span>.<span class="ident">delete</span>(<span class="ident">query</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+<span class="doccomment">/// Disconnect relations defined in `child_ids` to a parent defined in `parent_id`.
+/// The relation information is in the `RelationFieldRef`.
+</span><span class="kw">pub async fn </span>m2m_disconnect(
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    field: <span class="kw-2">&amp;</span>RelationFieldRef,
+    parent_id: <span class="kw-2">&amp;</span>SelectionResult,
+    child_ids: <span class="kw-2">&amp;</span>[SelectionResult],
+    trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+    <span class="kw">let </span>query = write::delete_relation_table_records(field, parent_id, child_ids, trace_id);
+    conn.delete(query).<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="doccomment">/// Execute a plain SQL query with the given parameters, returning the number of</span>
-<span class="doccomment">/// affected rows.</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_raw</span>(
-    <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
-    <span class="ident">features</span>: <span class="kw-2">&amp;</span>[<span class="ident">PreviewFeature</span>],
-    <span class="ident">inputs</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">PrismaValue</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">raw_count</span>(<span class="ident">inputs</span>, <span class="ident">features</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+<span class="doccomment">/// Execute a plain SQL query with the given parameters, returning the number of
+/// affected rows.
+</span><span class="kw">pub async fn </span>execute_raw(
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    features: <span class="kw-2">&amp;</span>[PreviewFeature],
+    inputs: HashMap&lt;String, PrismaValue&gt;,
+) -&gt; <span class="kw">crate</span>::Result&lt;usize&gt; {
+    <span class="kw">let </span>value = conn.raw_count(inputs, features).<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>(<span class="ident">value</span>)
+    <span class="prelude-val">Ok</span>(value)
 }
 
-<span class="doccomment">/// Execute a plain SQL query with the given parameters, returning the answer as</span>
-<span class="doccomment">/// a JSON `Value`.</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query_raw</span>(
-    <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
-    <span class="ident">sql_info</span>: <span class="ident">SqlInfo</span>,
-    <span class="ident">features</span>: <span class="kw-2">&amp;</span>[<span class="ident">PreviewFeature</span>],
-    <span class="ident">inputs</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">PrismaValue</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">serde_json::Value</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">raw_json</span>(<span class="ident">sql_info</span>, <span class="ident">features</span>, <span class="ident">inputs</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+<span class="doccomment">/// Execute a plain SQL query with the given parameters, returning the answer as
+/// a JSON `Value`.
+</span><span class="kw">pub async fn </span>query_raw(
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    sql_info: SqlInfo,
+    features: <span class="kw-2">&amp;</span>[PreviewFeature],
+    inputs: HashMap&lt;String, PrismaValue&gt;,
+) -&gt; <span class="kw">crate</span>::Result&lt;serde_json::Value&gt; {
+    <span class="kw">let </span>value = conn.raw_json(sql_info, features, inputs).<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>(<span class="ident">value</span>)
+    <span class="prelude-val">Ok</span>(value)
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="sql_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="sql_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

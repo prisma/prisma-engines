@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/metrics/src/registry.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>registry.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../query_engine_metrics/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../query_engine_metrics/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../query_engine_metrics/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/metrics/src/registry.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>registry.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../query_engine_metrics/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../query_engine_metrics/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../query_engine_metrics/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -306,313 +306,313 @@
 <span id="306">306</span>
 <span id="307">307</span>
 <span id="308">308</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::formatters::metrics_to_json</span>;
-<span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">common</span>::{<span class="ident">KeyLabels</span>, <span class="ident">Metric</span>, <span class="ident">MetricAction</span>, <span class="ident">MetricType</span>, <span class="ident">MetricValue</span>, <span class="ident">Snapshot</span>},
-    <span class="ident">formatters::metrics_to_prometheus</span>,
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::formatters::metrics_to_json;
+<span class="kw">use super</span>::{
+    common::{KeyLabels, Metric, MetricAction, MetricType, MetricValue, Snapshot},
+    formatters::metrics_to_prometheus,
 };
-<span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">ACCEPT_LIST</span>, <span class="ident">HISTOGRAM_BOUNDS</span>, <span class="ident">METRIC_COUNTER</span>, <span class="ident">METRIC_DESCRIPTION</span>, <span class="ident">METRIC_GAUGE</span>, <span class="ident">METRIC_HISTOGRAM</span>, <span class="ident">METRIC_TARGET</span>,
+<span class="kw">use super</span>::{
+    ACCEPT_LIST, HISTOGRAM_BOUNDS, METRIC_COUNTER, METRIC_DESCRIPTION, METRIC_GAUGE, METRIC_HISTOGRAM, METRIC_TARGET,
 };
-<span class="kw">use</span> <span class="ident">metrics</span>::{<span class="ident">CounterFn</span>, <span class="ident">GaugeFn</span>, <span class="ident">HistogramFn</span>, <span class="ident">Key</span>};
-<span class="kw">use</span> <span class="ident">metrics_util</span>::{
-    <span class="ident">registry</span>::{<span class="ident">GenerationalAtomicStorage</span>, <span class="ident">GenerationalStorage</span>, <span class="ident">Registry</span>},
-    <span class="ident">Histogram</span> <span class="kw">as</span> <span class="ident">HistogramUtil</span>,
+<span class="kw">use </span>metrics::{CounterFn, GaugeFn, HistogramFn, Key};
+<span class="kw">use </span>metrics_util::{
+    registry::{GenerationalAtomicStorage, GenerationalStorage, Registry},
+    Histogram <span class="kw">as </span>HistogramUtil,
 };
-<span class="kw">use</span> <span class="ident">parking_lot::RwLock</span>;
-<span class="kw">use</span> <span class="ident">serde_json::Value</span>;
-<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::sync::atomic::Ordering</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
-<span class="kw">use</span> <span class="ident">tracing</span>::{
-    <span class="ident">field</span>::{<span class="ident">Field</span>, <span class="ident">Visit</span>},
-    <span class="ident">Subscriber</span>,
+<span class="kw">use </span>parking_lot::RwLock;
+<span class="kw">use </span>serde_json::Value;
+<span class="kw">use </span>std::collections::HashMap;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::sync::atomic::Ordering;
+<span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>tracing::{
+    field::{Field, Visit},
+    Subscriber,
 };
-<span class="kw">use</span> <span class="ident">tracing_subscriber::Layer</span>;
+<span class="kw">use </span>tracing_subscriber::Layer;
 
-<span class="kw">struct</span> <span class="ident">Inner</span> {
-    <span class="ident">descriptions</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">register</span>: <span class="ident">Registry</span><span class="op">&lt;</span><span class="ident">Key</span>, <span class="ident">GenerationalAtomicStorage</span><span class="op">&gt;</span>,
-    <span class="ident">accept_list</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>,
+<span class="kw">struct </span>Inner {
+    descriptions: RwLock&lt;HashMap&lt;String, String&gt;&gt;,
+    register: Registry&lt;Key, GenerationalAtomicStorage&gt;,
+    accept_list: Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Inner</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">accept_list</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">descriptions</span>: <span class="ident">RwLock::new</span>(<span class="ident">HashMap::new</span>()),
-            <span class="ident">register</span>: <span class="ident">Registry::new</span>(<span class="ident">GenerationalStorage::atomic</span>()),
-            <span class="ident">accept_list</span>,
+<span class="kw">impl </span>Inner {
+    <span class="kw">fn </span>new(accept_list: Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            descriptions: RwLock::new(HashMap::new()),
+            register: Registry::new(GenerationalStorage::atomic()),
+            accept_list,
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MetricRegistry</span> {
-    <span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Inner</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>MetricRegistry {
+    inner: Arc&lt;Inner&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">MetricRegistry</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Metric Registry&quot;</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">MetricRegistry</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>()
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>MetricRegistry {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;Metric Registry&quot;</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">MetricRegistry</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new_with_accept_list</span>(<span class="ident">ACCEPT_LIST</span>.<span class="ident">to_vec</span>())
+<span class="kw">impl </span>Default <span class="kw">for </span>MetricRegistry {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new()
+    }
+}
+
+<span class="kw">impl </span>MetricRegistry {
+    <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new_with_accept_list(ACCEPT_LIST.to_vec())
     }
 
-    <span class="comment">// for internal and testing usage only</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_with_accept_list</span>(<span class="ident">accept_list</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">MetricRegistry</span> {
-            <span class="ident">inner</span>: <span class="ident">Arc::new</span>(<span class="ident">Inner::new</span>(<span class="ident">accept_list</span>)),
+    <span class="comment">// for internal and testing usage only
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new_with_accept_list(accept_list: Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;) -&gt; <span class="self">Self </span>{
+        MetricRegistry {
+            inner: Arc::new(Inner::new(accept_list)),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">record</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metric</span>: <span class="kw-2">&amp;</span><span class="ident">MetricVisitor</span>) {
-        <span class="kw">match</span> <span class="ident">metric</span>.<span class="ident">metric_type</span> {
-            <span class="ident">MetricType::Counter</span> =&gt; <span class="self">self</span>.<span class="ident">handle_counter</span>(<span class="ident">metric</span>),
-            <span class="ident">MetricType::Gauge</span> =&gt; <span class="self">self</span>.<span class="ident">handle_gauge</span>(<span class="ident">metric</span>),
-            <span class="ident">MetricType::Histogram</span> =&gt; <span class="self">self</span>.<span class="ident">handle_histogram</span>(<span class="ident">metric</span>),
-            <span class="ident">MetricType::Description</span> =&gt; <span class="self">self</span>.<span class="ident">handle_description</span>(<span class="ident">metric</span>),
+    <span class="kw">fn </span>record(<span class="kw-2">&amp;</span><span class="self">self</span>, metric: <span class="kw-2">&amp;</span>MetricVisitor) {
+        <span class="kw">match </span>metric.metric_type {
+            MetricType::Counter =&gt; <span class="self">self</span>.handle_counter(metric),
+            MetricType::Gauge =&gt; <span class="self">self</span>.handle_gauge(metric),
+            MetricType::Histogram =&gt; <span class="self">self</span>.handle_histogram(metric),
+            MetricType::Description =&gt; <span class="self">self</span>.handle_description(metric),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">handle_description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metric</span>: <span class="kw-2">&amp;</span><span class="ident">MetricVisitor</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">MetricAction::Description</span>(<span class="ident">description</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">metric</span>.<span class="ident">action</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">descriptions</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">descriptions</span>.<span class="ident">write</span>();
-            <span class="comment">//TODO: Sanitize string</span>
-            <span class="ident">descriptions</span>
-                .<span class="ident">entry</span>(<span class="ident">metric</span>.<span class="ident">name</span>.<span class="ident">name</span>().<span class="ident">to_string</span>())
-                .<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">description</span>.<span class="ident">to_string</span>());
+    <span class="kw">fn </span>handle_description(<span class="kw-2">&amp;</span><span class="self">self</span>, metric: <span class="kw-2">&amp;</span>MetricVisitor) {
+        <span class="kw">if let </span>MetricAction::Description(description) = <span class="kw-2">&amp;</span>metric.action {
+            <span class="kw">let </span><span class="kw-2">mut </span>descriptions = <span class="self">self</span>.inner.descriptions.write();
+            <span class="comment">//TODO: Sanitize string
+            </span>descriptions
+                .entry(metric.name.name().to_string())
+                .or_insert_with(|| description.to_string());
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">handle_counter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metric</span>: <span class="kw-2">&amp;</span><span class="ident">MetricVisitor</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>
-            .<span class="ident">register</span>
-            .<span class="ident">get_or_create_counter</span>(<span class="kw-2">&amp;</span><span class="ident">metric</span>.<span class="ident">name</span>, <span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">metric</span>.<span class="ident">action</span> {
-                <span class="ident">MetricAction::Increment</span>(<span class="ident">val</span>) =&gt; <span class="ident">CounterFn::increment</span>(<span class="ident">c</span>, <span class="ident">val</span>),
-                <span class="ident">MetricAction::Absolute</span>(<span class="ident">val</span>) =&gt; <span class="ident">CounterFn::absolute</span>(<span class="ident">c</span>, <span class="ident">val</span>),
-                <span class="kw">_</span> =&gt; (),
+    <span class="kw">fn </span>handle_counter(<span class="kw-2">&amp;</span><span class="self">self</span>, metric: <span class="kw-2">&amp;</span>MetricVisitor) {
+        <span class="self">self</span>.inner
+            .register
+            .get_or_create_counter(<span class="kw-2">&amp;</span>metric.name, |c| <span class="kw">match </span>metric.action {
+                MetricAction::Increment(val) =&gt; CounterFn::increment(c, val),
+                MetricAction::Absolute(val) =&gt; CounterFn::absolute(c, val),
+                <span class="kw">_ </span>=&gt; (),
             });
     }
 
-    <span class="kw">fn</span> <span class="ident">handle_gauge</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metric</span>: <span class="kw-2">&amp;</span><span class="ident">MetricVisitor</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>
-            .<span class="ident">register</span>
-            .<span class="ident">get_or_create_gauge</span>(<span class="kw-2">&amp;</span><span class="ident">metric</span>.<span class="ident">name</span>, <span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">metric</span>.<span class="ident">action</span> {
-                <span class="ident">MetricAction::GaugeInc</span>(<span class="ident">val</span>) =&gt; <span class="ident">GaugeFn::increment</span>(<span class="ident">c</span>, <span class="ident">val</span> <span class="kw">as</span> <span class="ident">f64</span>),
-                <span class="ident">MetricAction::GaugeSet</span>(<span class="ident">val</span>) =&gt; <span class="ident">GaugeFn::set</span>(<span class="ident">c</span>, <span class="ident">val</span> <span class="kw">as</span> <span class="ident">f64</span>),
-                <span class="ident">MetricAction::GaugeDec</span>(<span class="ident">val</span>) =&gt; <span class="ident">GaugeFn::decrement</span>(<span class="ident">c</span>, <span class="ident">val</span> <span class="kw">as</span> <span class="ident">f64</span>),
-                <span class="kw">_</span> =&gt; (),
+    <span class="kw">fn </span>handle_gauge(<span class="kw-2">&amp;</span><span class="self">self</span>, metric: <span class="kw-2">&amp;</span>MetricVisitor) {
+        <span class="self">self</span>.inner
+            .register
+            .get_or_create_gauge(<span class="kw-2">&amp;</span>metric.name, |c| <span class="kw">match </span>metric.action {
+                MetricAction::GaugeInc(val) =&gt; GaugeFn::increment(c, val <span class="kw">as </span>f64),
+                MetricAction::GaugeSet(val) =&gt; GaugeFn::set(c, val <span class="kw">as </span>f64),
+                MetricAction::GaugeDec(val) =&gt; GaugeFn::decrement(c, val <span class="kw">as </span>f64),
+                <span class="kw">_ </span>=&gt; (),
             });
     }
 
-    <span class="kw">fn</span> <span class="ident">handle_histogram</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metric</span>: <span class="kw-2">&amp;</span><span class="ident">MetricVisitor</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">register</span>.<span class="ident">get_or_create_histogram</span>(<span class="kw-2">&amp;</span><span class="ident">metric</span>.<span class="ident">name</span>, <span class="op">|</span><span class="ident">c</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">MetricAction::HistRecord</span>(<span class="ident">val</span>) <span class="op">=</span> <span class="ident">metric</span>.<span class="ident">action</span> {
-                <span class="comment">// We multiply by 1000 here because the value is converted into seconds when doing:</span>
-                <span class="comment">// histogram!(&quot;my_histogram&quot;, duration.elapsed());</span>
-                <span class="comment">// and we want it in ms</span>
-                <span class="ident">HistogramFn::record</span>(<span class="ident">c</span>, <span class="ident">val</span> <span class="op">*</span> <span class="number">1000.0</span>)
+    <span class="kw">fn </span>handle_histogram(<span class="kw-2">&amp;</span><span class="self">self</span>, metric: <span class="kw-2">&amp;</span>MetricVisitor) {
+        <span class="self">self</span>.inner.register.get_or_create_histogram(<span class="kw-2">&amp;</span>metric.name, |c| {
+            <span class="kw">if let </span>MetricAction::HistRecord(val) = metric.action {
+                <span class="comment">// We multiply by 1000 here because the value is converted into seconds when doing:
+                // histogram!(&quot;my_histogram&quot;, duration.elapsed());
+                // and we want it in ms
+                </span>HistogramFn::record(c, val * <span class="number">1000.0</span>)
             }
         });
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">counter_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Key::from_name</span>(<span class="ident">name</span>);
-        <span class="kw">let</span> <span class="ident">counters</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">register</span>.<span class="ident">get_counter_handles</span>();
-        <span class="kw">let</span> <span class="ident">counter</span> <span class="op">=</span> <span class="ident">counters</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Some</span>(<span class="ident">counter</span>.<span class="ident">get_inner</span>().<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>))
+    <span class="kw">pub fn </span>counter_value(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="prelude-ty">Option</span>&lt;u64&gt; {
+        <span class="kw">let </span>key = Key::from_name(name);
+        <span class="kw">let </span>counters = <span class="self">self</span>.inner.register.get_counter_handles();
+        <span class="kw">let </span>counter = counters.get(<span class="kw-2">&amp;</span>key)<span class="question-mark">?</span>;
+        <span class="prelude-val">Some</span>(counter.get_inner().load(Ordering::Acquire))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gauge_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Key::from_name</span>(<span class="ident">name</span>);
-        <span class="kw">let</span> <span class="ident">gauges</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">register</span>.<span class="ident">get_gauge_handles</span>();
-        <span class="kw">let</span> <span class="ident">gauge</span> <span class="op">=</span> <span class="ident">gauges</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">val</span> <span class="op">=</span> <span class="ident">f64::from_bits</span>(<span class="ident">gauge</span>.<span class="ident">get_inner</span>().<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>));
-        <span class="prelude-val">Some</span>(<span class="ident">val</span>)
+    <span class="kw">pub fn </span>gauge_value(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="prelude-ty">Option</span>&lt;f64&gt; {
+        <span class="kw">let </span>key = Key::from_name(name);
+        <span class="kw">let </span>gauges = <span class="self">self</span>.inner.register.get_gauge_handles();
+        <span class="kw">let </span>gauge = gauges.get(<span class="kw-2">&amp;</span>key)<span class="question-mark">?</span>;
+        <span class="kw">let </span>val = f64::from_bits(gauge.get_inner().load(Ordering::Acquire));
+        <span class="prelude-val">Some</span>(val)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">histogram_values</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HistogramUtil</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">histogram</span> <span class="op">=</span> <span class="ident">HistogramUtil::new</span>(<span class="kw-2">&amp;</span><span class="ident">HISTOGRAM_BOUNDS</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">Key::from_name</span>(<span class="ident">name</span>);
-        <span class="kw">let</span> <span class="ident">histograms</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">register</span>.<span class="ident">get_histogram_handles</span>();
-        <span class="kw">let</span> <span class="ident">samples</span> <span class="op">=</span> <span class="ident">histograms</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>)<span class="question-mark">?</span>;
+    <span class="kw">pub fn </span>histogram_values(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="prelude-ty">Option</span>&lt;HistogramUtil&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>histogram = HistogramUtil::new(<span class="kw-2">&amp;</span>HISTOGRAM_BOUNDS)<span class="question-mark">?</span>;
+        <span class="kw">let </span>key = Key::from_name(name);
+        <span class="kw">let </span>histograms = <span class="self">self</span>.inner.register.get_histogram_handles();
+        <span class="kw">let </span>samples = histograms.get(<span class="kw-2">&amp;</span>key)<span class="question-mark">?</span>;
 
-        <span class="ident">samples</span>.<span class="ident">get_inner</span>().<span class="ident">data_with</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
-            <span class="ident">histogram</span>.<span class="ident">record_many</span>(<span class="ident">s</span>);
+        samples.get_inner().data_with(|s| {
+            histogram.record_many(s);
         });
-        <span class="prelude-val">Some</span>(<span class="ident">histogram</span>)
+        <span class="prelude-val">Some</span>(histogram)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_descriptions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">descriptions</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">descriptions</span>.<span class="ident">read</span>();
-        <span class="ident">descriptions</span>.<span class="ident">clone</span>()
+    <span class="kw">pub fn </span>get_descriptions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HashMap&lt;String, String&gt; {
+        <span class="kw">let </span>descriptions = <span class="self">self</span>.inner.descriptions.read();
+        descriptions.clone()
     }
 
-    <span class="kw">fn</span> <span class="ident">get_snapshot</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">global_labels</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="ident">Snapshot</span> {
-        <span class="kw">let</span> <span class="ident">counter_handles</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">register</span>.<span class="ident">get_counter_handles</span>();
-        <span class="kw">let</span> <span class="ident">gauge_handles</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">register</span>.<span class="ident">get_gauge_handles</span>();
-        <span class="kw">let</span> <span class="ident">histogram_handles</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">register</span>.<span class="ident">get_histogram_handles</span>();
-        <span class="kw">let</span> <span class="ident">descriptions</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_descriptions</span>();
+    <span class="kw">fn </span>get_snapshot(<span class="kw-2">&amp;</span><span class="self">self</span>, global_labels: HashMap&lt;String, String&gt;) -&gt; Snapshot {
+        <span class="kw">let </span>counter_handles = <span class="self">self</span>.inner.register.get_counter_handles();
+        <span class="kw">let </span>gauge_handles = <span class="self">self</span>.inner.register.get_gauge_handles();
+        <span class="kw">let </span>histogram_handles = <span class="self">self</span>.inner.register.get_histogram_handles();
+        <span class="kw">let </span>descriptions = <span class="self">self</span>.get_descriptions();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">counters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Metric</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">counter_handles</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">key</span>, <span class="ident">counter</span>)<span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">key_name</span> <span class="op">=</span> <span class="ident">key</span>.<span class="ident">name</span>();
-                <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">counter</span>.<span class="ident">get_inner</span>().<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>);
-                <span class="kw">let</span> <span class="ident">description</span> <span class="op">=</span> <span class="ident">descriptions</span>.<span class="ident">get</span>(<span class="ident">key_name</span>).<span class="ident">cloned</span>().<span class="ident">unwrap_or_default</span>();
-                <span class="ident">Metric::new</span>(<span class="ident">key</span>, <span class="ident">description</span>, <span class="ident">MetricValue::Counter</span>(<span class="ident">value</span>), <span class="ident">global_labels</span>.<span class="ident">clone</span>())
+        <span class="kw">let </span><span class="kw-2">mut </span>counters: Vec&lt;Metric&gt; = counter_handles
+            .into_iter()
+            .map(|(key, counter)| {
+                <span class="kw">let </span>key_name = key.name();
+                <span class="kw">let </span>value = counter.get_inner().load(Ordering::Acquire);
+                <span class="kw">let </span>description = descriptions.get(key_name).cloned().unwrap_or_default();
+                Metric::new(key, description, MetricValue::Counter(value), global_labels.clone())
             })
-            .<span class="ident">collect</span>();
+            .collect();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gauges</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Metric</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">gauge_handles</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">key</span>, <span class="ident">gauge</span>)<span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">key_name</span> <span class="op">=</span> <span class="ident">key</span>.<span class="ident">name</span>();
-                <span class="kw">let</span> <span class="ident">description</span> <span class="op">=</span> <span class="ident">descriptions</span>.<span class="ident">get</span>(<span class="ident">key_name</span>).<span class="ident">cloned</span>().<span class="ident">unwrap_or_default</span>();
-                <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">f64::from_bits</span>(<span class="ident">gauge</span>.<span class="ident">get_inner</span>().<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>));
-                <span class="ident">Metric::new</span>(<span class="ident">key</span>, <span class="ident">description</span>, <span class="ident">MetricValue::Gauge</span>(<span class="ident">value</span>), <span class="ident">global_labels</span>.<span class="ident">clone</span>())
+        <span class="kw">let </span><span class="kw-2">mut </span>gauges: Vec&lt;Metric&gt; = gauge_handles
+            .into_iter()
+            .map(|(key, gauge)| {
+                <span class="kw">let </span>key_name = key.name();
+                <span class="kw">let </span>description = descriptions.get(key_name).cloned().unwrap_or_default();
+                <span class="kw">let </span>value = f64::from_bits(gauge.get_inner().load(Ordering::Acquire));
+                Metric::new(key, description, MetricValue::Gauge(value), global_labels.clone())
             })
-            .<span class="ident">collect</span>();
+            .collect();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">histograms</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Metric</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">histogram_handles</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">key</span>, <span class="ident">samples</span>)<span class="op">|</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">histogram</span> <span class="op">=</span> <span class="ident">HistogramUtil::new</span>(<span class="kw-2">&amp;</span><span class="ident">HISTOGRAM_BOUNDS</span>).<span class="ident">unwrap</span>();
-                <span class="ident">samples</span>.<span class="ident">get_inner</span>().<span class="ident">data_with</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
-                    <span class="ident">histogram</span>.<span class="ident">record_many</span>(<span class="ident">s</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>histograms: Vec&lt;Metric&gt; = histogram_handles
+            .into_iter()
+            .map(|(key, samples)| {
+                <span class="kw">let </span><span class="kw-2">mut </span>histogram = HistogramUtil::new(<span class="kw-2">&amp;</span>HISTOGRAM_BOUNDS).unwrap();
+                samples.get_inner().data_with(|s| {
+                    histogram.record_many(s);
                 });
 
-                <span class="kw">let</span> <span class="ident">key_name</span> <span class="op">=</span> <span class="ident">key</span>.<span class="ident">name</span>();
-                <span class="kw">let</span> <span class="ident">description</span> <span class="op">=</span> <span class="ident">descriptions</span>.<span class="ident">get</span>(<span class="ident">key_name</span>).<span class="ident">cloned</span>().<span class="ident">unwrap_or_default</span>();
-                <span class="ident">Metric::new</span>(
-                    <span class="ident">key</span>,
-                    <span class="ident">description</span>,
-                    <span class="ident">MetricValue::Histogram</span>(<span class="ident">histogram</span>.<span class="ident">into</span>()),
-                    <span class="ident">global_labels</span>.<span class="ident">clone</span>(),
+                <span class="kw">let </span>key_name = key.name();
+                <span class="kw">let </span>description = descriptions.get(key_name).cloned().unwrap_or_default();
+                Metric::new(
+                    key,
+                    description,
+                    MetricValue::Histogram(histogram.into()),
+                    global_labels.clone(),
                 )
             })
-            .<span class="ident">collect</span>();
+            .collect();
 
-        <span class="comment">// Sort them so that they are in ordered by key name</span>
-        <span class="ident">counters</span>.<span class="ident">sort_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">key</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="ident">key</span>));
-        <span class="ident">gauges</span>.<span class="ident">sort_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">key</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="ident">key</span>));
-        <span class="ident">histograms</span>.<span class="ident">sort_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">key</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="ident">key</span>));
+        <span class="comment">// Sort them so that they are in ordered by key name
+        </span>counters.sort_by(|a, b| a.key.cmp(<span class="kw-2">&amp;</span>b.key));
+        gauges.sort_by(|a, b| a.key.cmp(<span class="kw-2">&amp;</span>b.key));
+        histograms.sort_by(|a, b| a.key.cmp(<span class="kw-2">&amp;</span>b.key));
 
-        <span class="ident">Snapshot</span> {
-            <span class="ident">counters</span>,
-            <span class="ident">gauges</span>,
-            <span class="ident">histograms</span>,
+        Snapshot {
+            counters,
+            gauges,
+            histograms,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_json</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">global_labels</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="ident">Value</span> {
-        <span class="kw">let</span> <span class="ident">metrics</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_snapshot</span>(<span class="ident">global_labels</span>);
-        <span class="ident">metrics_to_json</span>(<span class="ident">metrics</span>)
+    <span class="kw">pub fn </span>to_json(<span class="kw-2">&amp;</span><span class="self">self</span>, global_labels: HashMap&lt;String, String&gt;) -&gt; Value {
+        <span class="kw">let </span>metrics = <span class="self">self</span>.get_snapshot(global_labels);
+        metrics_to_json(metrics)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_prometheus</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">global_labels</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="ident">metrics</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_snapshot</span>(<span class="ident">global_labels</span>);
-        <span class="ident">metrics_to_prometheus</span>(<span class="ident">metrics</span>)
+    <span class="kw">pub fn </span>to_prometheus(<span class="kw-2">&amp;</span><span class="self">self</span>, global_labels: HashMap&lt;String, String&gt;) -&gt; String {
+        <span class="kw">let </span>metrics = <span class="self">self</span>.get_snapshot(global_labels);
+        metrics_to_prometheus(metrics)
     }
 
-    <span class="kw">fn</span> <span class="ident">is_accepted_metric</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">visitor</span>: <span class="kw-2">&amp;</span><span class="ident">MetricVisitor</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">visitor</span>.<span class="ident">name</span>.<span class="ident">name</span>();
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">accept_list</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>) {
-            <span class="kw">return</span> <span class="bool-val">true</span>;
+    <span class="kw">fn </span>is_accepted_metric(<span class="kw-2">&amp;</span><span class="self">self</span>, visitor: <span class="kw-2">&amp;</span>MetricVisitor) -&gt; bool {
+        <span class="kw">let </span>name = visitor.name.name();
+        <span class="kw">if </span><span class="self">self</span>.inner.accept_list.contains(<span class="kw-2">&amp;</span>name) {
+            <span class="kw">return </span><span class="bool-val">true</span>;
         }
 
-        <span class="bool-val">false</span>
+        <span class="bool-val">false
+    </span>}
+}
+
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">struct </span>MetricVisitor {
+    metric_type: MetricType,
+    action: MetricAction,
+    name: Key,
+}
+
+<span class="kw">impl </span>MetricVisitor {
+    <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            metric_type: MetricType::Description,
+            action: MetricAction::Absolute(<span class="number">0</span>),
+            name: Key::from_name(<span class="string">&quot;&quot;</span>),
+        }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">MetricVisitor</span> {
-    <span class="ident">metric_type</span>: <span class="ident">MetricType</span>,
-    <span class="ident">action</span>: <span class="ident">MetricAction</span>,
-    <span class="ident">name</span>: <span class="ident">Key</span>,
-}
+<span class="kw">impl </span>Visit <span class="kw">for </span>MetricVisitor {
+    <span class="kw">fn </span>record_debug(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _field: <span class="kw-2">&amp;</span>Field, _value: <span class="kw-2">&amp;</span><span class="kw">dyn </span>std::fmt::Debug) {}
 
-<span class="kw">impl</span> <span class="ident">MetricVisitor</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">metric_type</span>: <span class="ident">MetricType::Description</span>,
-            <span class="ident">action</span>: <span class="ident">MetricAction::Absolute</span>(<span class="number">0</span>),
-            <span class="ident">name</span>: <span class="ident">Key::from_name</span>(<span class="string">&quot;&quot;</span>),
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Visit</span> <span class="kw">for</span> <span class="ident">MetricVisitor</span> {
-    <span class="kw">fn</span> <span class="ident">record_debug</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">_value</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">std::fmt::Debug</span>) {}
-
-    <span class="kw">fn</span> <span class="ident">record_f64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">value</span>: <span class="ident">f64</span>) {
-        <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">name</span>() {
-            <span class="string">&quot;gauge_inc&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">action</span> <span class="op">=</span> <span class="ident">MetricAction::GaugeInc</span>(<span class="ident">value</span>),
-            <span class="string">&quot;gauge_dec&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">action</span> <span class="op">=</span> <span class="ident">MetricAction::GaugeDec</span>(<span class="ident">value</span>),
-            <span class="string">&quot;gauge_set&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">action</span> <span class="op">=</span> <span class="ident">MetricAction::GaugeSet</span>(<span class="ident">value</span>),
-            <span class="string">&quot;hist_record&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">action</span> <span class="op">=</span> <span class="ident">MetricAction::HistRecord</span>(<span class="ident">value</span>),
-            <span class="kw">_</span> =&gt; (),
+    <span class="kw">fn </span>record_f64(<span class="kw-2">&amp;mut </span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>Field, value: f64) {
+        <span class="kw">match </span>field.name() {
+            <span class="string">&quot;gauge_inc&quot; </span>=&gt; <span class="self">self</span>.action = MetricAction::GaugeInc(value),
+            <span class="string">&quot;gauge_dec&quot; </span>=&gt; <span class="self">self</span>.action = MetricAction::GaugeDec(value),
+            <span class="string">&quot;gauge_set&quot; </span>=&gt; <span class="self">self</span>.action = MetricAction::GaugeSet(value),
+            <span class="string">&quot;hist_record&quot; </span>=&gt; <span class="self">self</span>.action = MetricAction::HistRecord(value),
+            <span class="kw">_ </span>=&gt; (),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">record_i64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">value</span>: <span class="ident">i64</span>) {
-        <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">name</span>() {
-            <span class="string">&quot;increment&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">action</span> <span class="op">=</span> <span class="ident">MetricAction::Increment</span>(<span class="ident">value</span> <span class="kw">as</span> <span class="ident">u64</span>),
-            <span class="string">&quot;absolute&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">action</span> <span class="op">=</span> <span class="ident">MetricAction::Absolute</span>(<span class="ident">value</span> <span class="kw">as</span> <span class="ident">u64</span>),
-            <span class="kw">_</span> =&gt; (),
+    <span class="kw">fn </span>record_i64(<span class="kw-2">&amp;mut </span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>Field, value: i64) {
+        <span class="kw">match </span>field.name() {
+            <span class="string">&quot;increment&quot; </span>=&gt; <span class="self">self</span>.action = MetricAction::Increment(value <span class="kw">as </span>u64),
+            <span class="string">&quot;absolute&quot; </span>=&gt; <span class="self">self</span>.action = MetricAction::Absolute(value <span class="kw">as </span>u64),
+            <span class="kw">_ </span>=&gt; (),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">record_u64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">value</span>: <span class="ident">u64</span>) {
-        <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">name</span>() {
-            <span class="string">&quot;increment&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">action</span> <span class="op">=</span> <span class="ident">MetricAction::Increment</span>(<span class="ident">value</span>),
-            <span class="string">&quot;absolute&quot;</span> =&gt; <span class="self">self</span>.<span class="ident">action</span> <span class="op">=</span> <span class="ident">MetricAction::Absolute</span>(<span class="ident">value</span>),
-            <span class="kw">_</span> =&gt; (),
+    <span class="kw">fn </span>record_u64(<span class="kw-2">&amp;mut </span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>Field, value: u64) {
+        <span class="kw">match </span>field.name() {
+            <span class="string">&quot;increment&quot; </span>=&gt; <span class="self">self</span>.action = MetricAction::Increment(value),
+            <span class="string">&quot;absolute&quot; </span>=&gt; <span class="self">self</span>.action = MetricAction::Absolute(value),
+            <span class="kw">_ </span>=&gt; (),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">record_str</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="kw">match</span> (<span class="ident">field</span>.<span class="ident">name</span>(), <span class="ident">value</span>) {
-            (<span class="string">&quot;metric_type&quot;</span>, <span class="ident">METRIC_COUNTER</span>) =&gt; <span class="self">self</span>.<span class="ident">metric_type</span> <span class="op">=</span> <span class="ident">MetricType::Counter</span>,
-            (<span class="string">&quot;metric_type&quot;</span>, <span class="ident">METRIC_GAUGE</span>) =&gt; <span class="self">self</span>.<span class="ident">metric_type</span> <span class="op">=</span> <span class="ident">MetricType::Gauge</span>,
-            (<span class="string">&quot;metric_type&quot;</span>, <span class="ident">METRIC_HISTOGRAM</span>) =&gt; <span class="self">self</span>.<span class="ident">metric_type</span> <span class="op">=</span> <span class="ident">MetricType::Histogram</span>,
-            (<span class="string">&quot;metric_type&quot;</span>, <span class="ident">METRIC_DESCRIPTION</span>) =&gt; <span class="self">self</span>.<span class="ident">metric_type</span> <span class="op">=</span> <span class="ident">MetricType::Description</span>,
-            (<span class="string">&quot;name&quot;</span>, <span class="kw">_</span>) =&gt; <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">Key::from_name</span>(<span class="ident">value</span>.<span class="ident">to_string</span>()),
+    <span class="kw">fn </span>record_str(<span class="kw-2">&amp;mut </span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>Field, value: <span class="kw-2">&amp;</span>str) {
+        <span class="kw">match </span>(field.name(), value) {
+            (<span class="string">&quot;metric_type&quot;</span>, METRIC_COUNTER) =&gt; <span class="self">self</span>.metric_type = MetricType::Counter,
+            (<span class="string">&quot;metric_type&quot;</span>, METRIC_GAUGE) =&gt; <span class="self">self</span>.metric_type = MetricType::Gauge,
+            (<span class="string">&quot;metric_type&quot;</span>, METRIC_HISTOGRAM) =&gt; <span class="self">self</span>.metric_type = MetricType::Histogram,
+            (<span class="string">&quot;metric_type&quot;</span>, METRIC_DESCRIPTION) =&gt; <span class="self">self</span>.metric_type = MetricType::Description,
+            (<span class="string">&quot;name&quot;</span>, <span class="kw">_</span>) =&gt; <span class="self">self</span>.name = Key::from_name(value.to_string()),
             (<span class="string">&quot;key_labels&quot;</span>, <span class="kw">_</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">key_labels</span>: <span class="ident">KeyLabels</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="ident">value</span>).<span class="ident">unwrap</span>();
-                <span class="self">self</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">key_labels</span>.<span class="ident">into</span>();
+                <span class="kw">let </span>key_labels: KeyLabels = serde_json::from_str(value).unwrap();
+                <span class="self">self</span>.name = key_labels.into();
             }
-            (<span class="ident">METRIC_DESCRIPTION</span>, <span class="kw">_</span>) =&gt; <span class="self">self</span>.<span class="ident">action</span> <span class="op">=</span> <span class="ident">MetricAction::Description</span>(<span class="ident">value</span>.<span class="ident">to_string</span>()),
-            <span class="kw">_</span> =&gt; (),
+            (METRIC_DESCRIPTION, <span class="kw">_</span>) =&gt; <span class="self">self</span>.action = MetricAction::Description(value.to_string()),
+            <span class="kw">_ </span>=&gt; (),
         }
     }
 }
 
-<span class="comment">// A tracing layer for receiving metric trace events and storing them in the registry.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Subscriber</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MetricRegistry</span> {
-    <span class="kw">fn</span> <span class="ident">on_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">tracing::Event</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">_ctx</span>: <span class="ident">tracing_subscriber::layer::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="kw">if</span> <span class="ident">event</span>.<span class="ident">metadata</span>().<span class="ident">target</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">METRIC_TARGET</span> {
+<span class="comment">// A tracing layer for receiving metric trace events and storing them in the registry.
+</span><span class="kw">impl</span>&lt;S: Subscriber&gt; Layer&lt;S&gt; <span class="kw">for </span>MetricRegistry {
+    <span class="kw">fn </span>on_event(<span class="kw-2">&amp;</span><span class="self">self</span>, event: <span class="kw-2">&amp;</span>tracing::Event&lt;<span class="lifetime">&#39;_</span>&gt;, _ctx: tracing_subscriber::layer::Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="kw">if </span>event.metadata().target() != METRIC_TARGET {
             <span class="kw">return</span>;
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">visitor</span> <span class="op">=</span> <span class="ident">MetricVisitor::new</span>();
-        <span class="ident">event</span>.<span class="ident">record</span>(<span class="kw-2">&amp;mut</span> <span class="ident">visitor</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>visitor = MetricVisitor::new();
+        event.record(<span class="kw-2">&amp;mut </span>visitor);
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_accepted_metric</span>(<span class="kw-2">&amp;</span><span class="ident">visitor</span>) {
-            <span class="self">self</span>.<span class="ident">record</span>(<span class="kw-2">&amp;</span><span class="ident">visitor</span>);
+        <span class="kw">if </span><span class="self">self</span>.is_accepted_metric(<span class="kw-2">&amp;</span>visitor) {
+            <span class="self">self</span>.record(<span class="kw-2">&amp;</span>visitor);
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="query_engine_metrics" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="query_engine_metrics" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

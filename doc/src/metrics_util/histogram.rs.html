@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/metrics-util-0.13.0/src/histogram.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>histogram.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../metrics_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../metrics_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../metrics_util/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/metrics-util-0.13.0/src/histogram.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>histogram.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../metrics_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../metrics_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../metrics_util/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -130,137 +130,137 @@
 <span id="130">130</span>
 <span id="131">131</span>
 <span id="132">132</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Helper functions and types related to histogram data.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Helper functions and types related to histogram data.
 
-<span class="doccomment">/// A bucketed histogram.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This histogram tracks the number of samples that fall into pre-defined buckets,</span>
-<span class="doccomment">/// rather than exposing any sort of quantiles.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This type is most useful with systems that prefer bucketed data, such as Prometheus&#39;</span>
-<span class="doccomment">/// histogram type, as opposed to its summary type, which deals with quantiles.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Histogram</span> {
-    <span class="ident">count</span>: <span class="ident">u64</span>,
-    <span class="ident">bounds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>,
-    <span class="ident">buckets</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="ident">sum</span>: <span class="ident">f64</span>,
+/// A bucketed histogram.
+///
+/// This histogram tracks the number of samples that fall into pre-defined buckets,
+/// rather than exposing any sort of quantiles.
+///
+/// This type is most useful with systems that prefer bucketed data, such as Prometheus&#39;
+/// histogram type, as opposed to its summary type, which deals with quantiles.
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>Histogram {
+    count: u64,
+    bounds: Vec&lt;f64&gt;,
+    buckets: Vec&lt;u64&gt;,
+    sum: f64,
 }
 
-<span class="kw">impl</span> <span class="ident">Histogram</span> {
-    <span class="doccomment">/// Creates a new `Histogram`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If `bounds` is empty, returns `None`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">bounds</span>: <span class="kw-2">&amp;</span>[<span class="ident">f64</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Histogram</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">bounds</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+<span class="kw">impl </span>Histogram {
+    <span class="doccomment">/// Creates a new `Histogram`.
+    ///
+    /// If `bounds` is empty, returns `None`.
+    </span><span class="kw">pub fn </span>new(bounds: <span class="kw-2">&amp;</span>[f64]) -&gt; <span class="prelude-ty">Option</span>&lt;Histogram&gt; {
+        <span class="kw">if </span>bounds.is_empty() {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">buckets</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0u64</span>; <span class="ident">bounds</span>.<span class="ident">len</span>()];
+        <span class="kw">let </span>buckets = <span class="macro">vec!</span>[<span class="number">0u64</span>; bounds.len()];
 
-        <span class="prelude-val">Some</span>(<span class="ident">Histogram</span> { <span class="ident">count</span>: <span class="number">0</span>, <span class="ident">bounds</span>: <span class="ident">Vec::from</span>(<span class="ident">bounds</span>), <span class="ident">buckets</span>, <span class="ident">sum</span>: <span class="number">0.0</span> })
+        <span class="prelude-val">Some</span>(Histogram { count: <span class="number">0</span>, bounds: Vec::from(bounds), buckets, sum: <span class="number">0.0 </span>})
     }
 
-    <span class="doccomment">/// Gets the sum of all samples.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sum</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">f64</span> {
-        <span class="self">self</span>.<span class="ident">sum</span>
+    <span class="doccomment">/// Gets the sum of all samples.
+    </span><span class="kw">pub fn </span>sum(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; f64 {
+        <span class="self">self</span>.sum
     }
 
-    <span class="doccomment">/// Gets the sample count.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span>.<span class="ident">count</span>
+    <span class="doccomment">/// Gets the sample count.
+    </span><span class="kw">pub fn </span>count(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="self">self</span>.count
     }
 
-    <span class="doccomment">/// Gets the buckets.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Buckets are tuples, where the first element is the bucket limit itself, and the second</span>
-    <span class="doccomment">/// element is the count of samples in that bucket.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">buckets</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">f64</span>, <span class="ident">u64</span>)<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">bounds</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>().<span class="ident">zip</span>(<span class="self">self</span>.<span class="ident">buckets</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>()).<span class="ident">collect</span>()
+    <span class="doccomment">/// Gets the buckets.
+    ///
+    /// Buckets are tuples, where the first element is the bucket limit itself, and the second
+    /// element is the count of samples in that bucket.
+    </span><span class="kw">pub fn </span>buckets(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;(f64, u64)&gt; {
+        <span class="self">self</span>.bounds.iter().cloned().zip(<span class="self">self</span>.buckets.iter().cloned()).collect()
     }
 
-    <span class="doccomment">/// Records a single sample.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">record</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">sample</span>: <span class="ident">f64</span>) {
-        <span class="self">self</span>.<span class="ident">sum</span> <span class="op">+</span><span class="op">=</span> <span class="ident">sample</span>;
-        <span class="self">self</span>.<span class="ident">count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+    <span class="doccomment">/// Records a single sample.
+    </span><span class="kw">pub fn </span>record(<span class="kw-2">&amp;mut </span><span class="self">self</span>, sample: f64) {
+        <span class="self">self</span>.sum += sample;
+        <span class="self">self</span>.count += <span class="number">1</span>;
 
-        <span class="comment">// Add the sample to every bucket where the value is less than the bound.</span>
-        <span class="kw">for</span> (<span class="ident">idx</span>, <span class="ident">bucket</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">bounds</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">if</span> <span class="ident">sample</span> <span class="op">&lt;</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">bucket</span> {
-                <span class="self">self</span>.<span class="ident">buckets</span>[<span class="ident">idx</span>] <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="comment">// Add the sample to every bucket where the value is less than the bound.
+        </span><span class="kw">for </span>(idx, bucket) <span class="kw">in </span><span class="self">self</span>.bounds.iter().enumerate() {
+            <span class="kw">if </span>sample &lt;= <span class="kw-2">*</span>bucket {
+                <span class="self">self</span>.buckets[idx] += <span class="number">1</span>;
             }
         }
     }
 
-    <span class="doccomment">/// Records multiple samples.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">record_many</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">samples</span>: <span class="ident">S</span>)
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">f64</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
+    <span class="doccomment">/// Records multiple samples.
+    </span><span class="kw">pub fn </span>record_many&lt;<span class="lifetime">&#39;a</span>, S&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, samples: S)
+    <span class="kw">where
+        </span>S: IntoIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>f64&gt; + <span class="lifetime">&#39;a</span>,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bucketed</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0u64</span>; <span class="self">self</span>.<span class="ident">buckets</span>.<span class="ident">len</span>()];
+        <span class="kw">let </span><span class="kw-2">mut </span>bucketed = <span class="macro">vec!</span>[<span class="number">0u64</span>; <span class="self">self</span>.buckets.len()];
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sum</span> <span class="op">=</span> <span class="number">0.0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">count</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">for</span> <span class="ident">sample</span> <span class="kw">in</span> <span class="ident">samples</span>.<span class="ident">into_iter</span>() {
-            <span class="ident">sum</span> <span class="op">+</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">sample</span>;
-            <span class="ident">count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>sum = <span class="number">0.0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>count = <span class="number">0</span>;
+        <span class="kw">for </span>sample <span class="kw">in </span>samples.into_iter() {
+            sum += <span class="kw-2">*</span>sample;
+            count += <span class="number">1</span>;
 
-            <span class="kw">for</span> (<span class="ident">idx</span>, <span class="ident">bucket</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">bounds</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-                <span class="kw">if</span> <span class="ident">sample</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">bucket</span> {
-                    <span class="ident">bucketed</span>[<span class="ident">idx</span>] <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            <span class="kw">for </span>(idx, bucket) <span class="kw">in </span><span class="self">self</span>.bounds.iter().enumerate() {
+                <span class="kw">if </span>sample &lt;= bucket {
+                    bucketed[idx] += <span class="number">1</span>;
                     <span class="kw">break</span>;
                 }
             }
         }
 
-        <span class="comment">// Add each bucket to the next bucket to satisfy the &quot;less than or equal to&quot;</span>
-        <span class="comment">// behavior of the buckets.</span>
-        <span class="kw">if</span> <span class="ident">bucketed</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">2</span> {
-            <span class="kw">for</span> <span class="ident">idx</span> <span class="kw">in</span> <span class="number">0</span>..(<span class="ident">bucketed</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>) {
-                <span class="ident">bucketed</span>[<span class="ident">idx</span> <span class="op">+</span> <span class="number">1</span>] <span class="op">+</span><span class="op">=</span> <span class="ident">bucketed</span>[<span class="ident">idx</span>];
+        <span class="comment">// Add each bucket to the next bucket to satisfy the &quot;less than or equal to&quot;
+        // behavior of the buckets.
+        </span><span class="kw">if </span>bucketed.len() &gt;= <span class="number">2 </span>{
+            <span class="kw">for </span>idx <span class="kw">in </span><span class="number">0</span>..(bucketed.len() - <span class="number">1</span>) {
+                bucketed[idx + <span class="number">1</span>] += bucketed[idx];
             }
         }
 
-        <span class="comment">// Merge our temporary buckets to our main buckets.</span>
-        <span class="kw">for</span> (<span class="ident">idx</span>, <span class="ident">local</span>) <span class="kw">in</span> <span class="ident">bucketed</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="self">self</span>.<span class="ident">buckets</span>[<span class="ident">idx</span>] <span class="op">+</span><span class="op">=</span> <span class="ident">local</span>;
+        <span class="comment">// Merge our temporary buckets to our main buckets.
+        </span><span class="kw">for </span>(idx, local) <span class="kw">in </span>bucketed.iter().enumerate() {
+            <span class="self">self</span>.buckets[idx] += local;
         }
-        <span class="self">self</span>.<span class="ident">sum</span> <span class="op">+</span><span class="op">=</span> <span class="ident">sum</span>;
-        <span class="self">self</span>.<span class="ident">count</span> <span class="op">+</span><span class="op">=</span> <span class="ident">count</span>;
+        <span class="self">self</span>.sum += sum;
+        <span class="self">self</span>.count += count;
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Histogram</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">super</span>::Histogram;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_histogram</span>() {
-        <span class="comment">// No buckets, can&#39;t do shit.</span>
-        <span class="kw">let</span> <span class="ident">histogram</span> <span class="op">=</span> <span class="ident">Histogram::new</span>(<span class="kw-2">&amp;</span>[]);
-        <span class="macro">assert!</span>(<span class="ident">histogram</span>.<span class="ident">is_none</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_histogram() {
+        <span class="comment">// No buckets, can&#39;t do shit.
+        </span><span class="kw">let </span>histogram = Histogram::new(<span class="kw-2">&amp;</span>[]);
+        <span class="macro">assert!</span>(histogram.is_none());
 
-        <span class="kw">let</span> <span class="ident">buckets</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="number">10.0</span>, <span class="number">25.0</span>, <span class="number">100.0</span>];
-        <span class="kw">let</span> <span class="ident">values</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">3.0</span>, <span class="number">2.0</span>, <span class="number">6.0</span>, <span class="number">12.0</span>, <span class="number">56.0</span>, <span class="number">82.0</span>, <span class="number">202.0</span>, <span class="number">100.0</span>, <span class="number">29.0</span>];
+        <span class="kw">let </span>buckets = <span class="kw-2">&amp;</span>[<span class="number">10.0</span>, <span class="number">25.0</span>, <span class="number">100.0</span>];
+        <span class="kw">let </span>values = <span class="macro">vec!</span>[<span class="number">3.0</span>, <span class="number">2.0</span>, <span class="number">6.0</span>, <span class="number">12.0</span>, <span class="number">56.0</span>, <span class="number">82.0</span>, <span class="number">202.0</span>, <span class="number">100.0</span>, <span class="number">29.0</span>];
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">histogram</span> <span class="op">=</span> <span class="ident">Histogram::new</span>(<span class="ident">buckets</span>).<span class="ident">expect</span>(<span class="string">&quot;histogram should have been created&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>histogram = Histogram::new(buckets).expect(<span class="string">&quot;histogram should have been created&quot;</span>);
 
-        <span class="ident">histogram</span>.<span class="ident">record_many</span>(<span class="kw-2">&amp;</span><span class="ident">values</span>);
-        <span class="ident">histogram</span>.<span class="ident">record</span>(<span class="number">89.0</span>);
+        histogram.record_many(<span class="kw-2">&amp;</span>values);
+        histogram.record(<span class="number">89.0</span>);
 
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">histogram</span>.<span class="ident">buckets</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">result</span>.<span class="ident">len</span>(), <span class="number">3</span>);
+        <span class="kw">let </span>result = histogram.buckets();
+        <span class="macro">assert_eq!</span>(result.len(), <span class="number">3</span>);
 
-        <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">first</span>) <span class="op">=</span> <span class="ident">result</span>[<span class="number">0</span>];
-        <span class="macro">assert_eq!</span>(<span class="ident">first</span>, <span class="number">3</span>);
-        <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">second</span>) <span class="op">=</span> <span class="ident">result</span>[<span class="number">1</span>];
-        <span class="macro">assert_eq!</span>(<span class="ident">second</span>, <span class="number">4</span>);
-        <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">third</span>) <span class="op">=</span> <span class="ident">result</span>[<span class="number">2</span>];
-        <span class="macro">assert_eq!</span>(<span class="ident">third</span>, <span class="number">9</span>);
+        <span class="kw">let </span>(<span class="kw">_</span>, first) = result[<span class="number">0</span>];
+        <span class="macro">assert_eq!</span>(first, <span class="number">3</span>);
+        <span class="kw">let </span>(<span class="kw">_</span>, second) = result[<span class="number">1</span>];
+        <span class="macro">assert_eq!</span>(second, <span class="number">4</span>);
+        <span class="kw">let </span>(<span class="kw">_</span>, third) = result[<span class="number">2</span>];
+        <span class="macro">assert_eq!</span>(third, <span class="number">9</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">histogram</span>.<span class="ident">count</span>(), <span class="ident">values</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span> <span class="op">+</span> <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">histogram</span>.<span class="ident">sum</span>(), <span class="number">581.0</span>);
+        <span class="macro">assert_eq!</span>(histogram.count(), values.len() <span class="kw">as </span>u64 + <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(histogram.sum(), <span class="number">581.0</span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="metrics_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="metrics_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

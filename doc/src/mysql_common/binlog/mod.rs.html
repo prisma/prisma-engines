@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/binlog/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mysql_common/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/binlog/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mysql_common/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -854,257 +854,257 @@
 <span id="854">854</span>
 <span id="855">855</span>
 <span id="856">856</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2020 Anatoly Ikorsky</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2020 Anatoly Ikorsky
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="doccomment">//! Binlog-related structures and functions. This implementation assumes</span>
-<span class="doccomment">//! binlog version &gt;= 4 (MySql &gt;= 5.0.0).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! All structures of this module contains raw data that may not necessarily be valid.</span>
-<span class="doccomment">//! Please consult the MySql documentation.</span>
+</span><span class="doccomment">//! Binlog-related structures and functions. This implementation assumes
+//! binlog version &gt;= 4 (MySql &gt;= 5.0.0).
+//!
+//! All structures of this module contains raw data that may not necessarily be valid.
+//! Please consult the MySql documentation.
 
-<span class="comment">// #![cfg(features = &quot;binlog&quot;)]</span>
+</span><span class="comment">// #![cfg(features = &quot;binlog&quot;)]
 
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">collections::HashMap</span>,
-    <span class="ident">convert::TryFrom</span>,
-    <span class="ident">hash::Hash</span>,
-    <span class="ident">io</span>::{
-        <span class="self">self</span>, <span class="ident">Error</span>,
-        <span class="ident">ErrorKind</span>::{<span class="ident">InvalidData</span>, <span class="ident">UnexpectedEof</span>},
-        <span class="ident">Read</span>, <span class="ident">Write</span>,
+</span><span class="kw">use </span>std::{
+    collections::HashMap,
+    convert::TryFrom,
+    hash::Hash,
+    io::{
+        <span class="self">self</span>, Error,
+        ErrorKind::{InvalidData, UnexpectedEof},
+        Read, Write,
     },
 };
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">constants::ColumnType</span>,
-    <span class="ident">proto</span>::{<span class="ident">MyDeserialize</span>, <span class="ident">MySerialize</span>},
+<span class="kw">use crate</span>::{
+    constants::ColumnType,
+    proto::{MyDeserialize, MySerialize},
 };
 
-<span class="kw">use</span> <span class="self">self</span>::{
-    <span class="ident">consts</span>::{<span class="ident">BinlogVersion</span>, <span class="ident">EventType</span>},
-    <span class="ident">events</span>::{<span class="ident">Event</span>, <span class="ident">FormatDescriptionEvent</span>, <span class="ident">TableMapEvent</span>},
+<span class="kw">use </span><span class="self">self</span>::{
+    consts::{BinlogVersion, EventType},
+    events::{Event, FormatDescriptionEvent, TableMapEvent},
 };
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">consts</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">decimal</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">events</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">jsonb</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">jsondiff</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">misc</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">row</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">value</span>;
+<span class="kw">pub mod </span>consts;
+<span class="kw">pub mod </span>decimal;
+<span class="kw">pub mod </span>events;
+<span class="kw">pub mod </span>jsonb;
+<span class="kw">pub mod </span>jsondiff;
+<span class="kw">pub mod </span>misc;
+<span class="kw">pub mod </span>row;
+<span class="kw">pub mod </span>value;
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BinlogCtx</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">event_size</span>: <span class="ident">usize</span>,
-    <span class="kw">pub</span> <span class="ident">fde</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">FormatDescriptionEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>BinlogCtx&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub </span>event_size: usize,
+    <span class="kw">pub </span>fde: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>FormatDescriptionEvent&lt;<span class="lifetime">&#39;a</span>&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">BinlogCtx</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">event_size</span>: <span class="ident">usize</span>, <span class="ident">fde</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">FormatDescriptionEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">event_size</span>, <span class="ident">fde</span> }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; BinlogCtx&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub fn </span>new(event_size: usize, fde: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>FormatDescriptionEvent&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ event_size, fde }
     }
 }
 
-<span class="doccomment">/// Binlog event.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">BinlogStruct</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>: <span class="ident">MySerialize</span> <span class="op">+</span> <span class="ident">MyDeserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Ctx</span> <span class="op">=</span> <span class="ident">BinlogCtx</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns serialized length of this struct in bytes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// *   implementation must truncate each field to its maximum length.</span>
-    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">version</span>: <span class="ident">BinlogVersion</span>) -&gt; <span class="ident">usize</span>;
+<span class="doccomment">/// Binlog event.
+</span><span class="kw">pub trait </span>BinlogStruct&lt;<span class="lifetime">&#39;a</span>&gt;: MySerialize + MyDeserialize&lt;<span class="lifetime">&#39;a</span>, Ctx = BinlogCtx&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+    <span class="doccomment">/// Returns serialized length of this struct in bytes.
+    ///
+    /// *   implementation must truncate each field to its maximum length.
+    </span><span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>, version: BinlogVersion) -&gt; usize;
 }
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">BinlogEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>: <span class="ident">BinlogStruct</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// An event type, associated with this struct (if any).</span>
-    <span class="kw">const</span> <span class="ident">EVENT_TYPE</span>: <span class="ident">EventType</span>;
+<span class="kw">pub trait </span>BinlogEvent&lt;<span class="lifetime">&#39;a</span>&gt;: BinlogStruct&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// An event type, associated with this struct (if any).
+    </span><span class="kw">const </span>EVENT_TYPE: EventType;
 }
 
-<span class="doccomment">/// A binlog file starts with a Binlog File Header `[ fe &#39;bin&#39; ]`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BinlogFileHeader</span>;
+<span class="doccomment">/// A binlog file starts with a Binlog File Header `[ fe &#39;bin&#39; ]`.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
+</span><span class="kw">pub struct </span>BinlogFileHeader;
 
-<span class="kw">impl</span> <span class="ident">BinlogFileHeader</span> {
-    <span class="doccomment">/// Length of a binlog file header.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4</span>;
-    <span class="doccomment">/// Value of a binlog file header.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">VALUE</span>: [<span class="ident">u8</span>; <span class="ident"><span class="self">Self</span>::LEN</span>] <span class="op">=</span> [<span class="number">0xfe</span>, <span class="string">b&#39;b&#39;</span>, <span class="string">b&#39;i&#39;</span>, <span class="string">b&#39;n&#39;</span>];
+<span class="kw">impl </span>BinlogFileHeader {
+    <span class="doccomment">/// Length of a binlog file header.
+    </span><span class="kw">pub const </span>LEN: usize = <span class="number">4</span>;
+    <span class="doccomment">/// Value of a binlog file header.
+    </span><span class="kw">pub const </span>VALUE: [u8; <span class="self">Self</span>::LEN] = [<span class="number">0xfe</span>, <span class="string">b&#39;b&#39;</span>, <span class="string">b&#39;i&#39;</span>, <span class="string">b&#39;n&#39;</span>];
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">input</span>: <span class="ident">T</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0_u8</span>; <span class="ident"><span class="self">Self</span>::LEN</span>];
-        <span class="ident">input</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>)<span class="question-mark">?</span>;
+    <span class="kw">pub fn </span>read&lt;T: Read&gt;(<span class="kw-2">mut </span>input: T) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>buf = [<span class="number">0_u8</span>; <span class="self">Self</span>::LEN];
+        input.read_exact(<span class="kw-2">&amp;mut </span>buf)<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="ident">buf</span> <span class="op">!</span><span class="op">=</span> <span class="ident"><span class="self">Self</span>::VALUE</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(<span class="ident">InvalidData</span>, <span class="string">&quot;invalid binlog file header&quot;</span>));
+        <span class="kw">if </span>buf != <span class="self">Self</span>::VALUE {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new(InvalidData, <span class="string">&quot;invalid binlog file header&quot;</span>));
         }
 
         <span class="prelude-val">Ok</span>(<span class="self">Self</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Write</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_version</span>: <span class="ident">BinlogVersion</span>, <span class="kw-2">mut</span> <span class="ident">output</span>: <span class="ident">T</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">output</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::VALUE</span>)
+    <span class="kw">pub fn </span>write&lt;T: Write&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, _version: BinlogVersion, <span class="kw-2">mut </span>output: T) -&gt; io::Result&lt;()&gt; {
+        output.write_all(<span class="kw-2">&amp;</span><span class="self">Self</span>::VALUE)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_version</span>: <span class="ident">BinlogVersion</span>) -&gt; <span class="ident">usize</span> {
-        <span class="ident"><span class="self">Self</span>::LEN</span>
+    <span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>, _version: BinlogVersion) -&gt; usize {
+        <span class="self">Self</span>::LEN
     }
 }
 
-<span class="doccomment">/// Reader for binlog events.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It&#39;ll maintain actual fde and table map, and can be used</span>
-<span class="doccomment">/// to read binlog files and binlog event streams from server.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EventStreamReader</span> {
-    <span class="ident">fde</span>: <span class="ident">FormatDescriptionEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>,
-    <span class="ident">table_map</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">TableMapEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Reader for binlog events.
+///
+/// It&#39;ll maintain actual fde and table map, and can be used
+/// to read binlog files and binlog event streams from server.
+</span><span class="attribute">#[derive(Debug, Clone, Eq, PartialEq)]
+</span><span class="kw">pub struct </span>EventStreamReader {
+    fde: FormatDescriptionEvent&lt;<span class="lifetime">&#39;static</span>&gt;,
+    table_map: HashMap&lt;u64, TableMapEvent&lt;<span class="lifetime">&#39;static</span>&gt;&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">EventStreamReader</span> {
-    <span class="doccomment">/// Creates a new instance.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">version</span>: <span class="ident">BinlogVersion</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">fde</span>: <span class="ident">FormatDescriptionEvent::new</span>(<span class="ident">version</span>),
-            <span class="ident">table_map</span>: <span class="ident">Default::default</span>(),
+<span class="kw">impl </span>EventStreamReader {
+    <span class="doccomment">/// Creates a new instance.
+    </span><span class="kw">pub fn </span>new(version: BinlogVersion) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            fde: FormatDescriptionEvent::new(version),
+            table_map: Default::default(),
         }
     }
 
-    <span class="doccomment">/// Returns the format description event.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns the default placeholder if there was no FDE yet.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_fde</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">FormatDescriptionEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">fde</span>
+    <span class="doccomment">/// Returns the format description event.
+    ///
+    /// Returns the default placeholder if there was no FDE yet.
+    </span><span class="kw">pub fn </span>get_fde(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>FormatDescriptionEvent&lt;<span class="lifetime">&#39;static</span>&gt; {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.fde
     }
 
-    <span class="doccomment">/// Returns the table map event for the given table id.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Should be availeble if rows event with this table id encountered in the stream.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_tme</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">table_id</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">TableMapEvent</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">table_map</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">table_id</span>)
+    <span class="doccomment">/// Returns the table map event for the given table id.
+    ///
+    /// Should be availeble if rows event with this table id encountered in the stream.
+    </span><span class="kw">pub fn </span>get_tme(<span class="kw-2">&amp;</span><span class="self">self</span>, table_id: u64) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>TableMapEvent&lt;<span class="lifetime">&#39;static</span>&gt;&gt; {
+        <span class="self">self</span>.table_map.get(<span class="kw-2">&amp;</span>table_id)
     }
 
-    <span class="doccomment">/// Will read next event from the given stream.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Read</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="ident">T</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Event</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">Event::read</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">fde</span>, <span class="ident">input</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">event_type</span> <span class="op">=</span> <span class="ident">event</span>.<span class="ident">header</span>().<span class="ident">event_type_raw</span>();
+    <span class="doccomment">/// Will read next event from the given stream.
+    </span><span class="kw">pub fn </span>read&lt;T: Read&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, input: T) -&gt; io::Result&lt;Event&gt; {
+        <span class="kw">let </span>event = Event::read(<span class="kw-2">&amp;</span><span class="self">self</span>.fde, input)<span class="question-mark">?</span>;
+        <span class="kw">let </span>event_type = event.header().event_type_raw();
 
-        <span class="kw">if</span> <span class="ident">event_type</span> <span class="op">==</span> <span class="ident">EventType::FORMAT_DESCRIPTION_EVENT</span> <span class="kw">as</span> <span class="ident">u8</span> {
-            <span class="comment">// we&#39;ll redefine fde with an actual one</span>
-            <span class="self">self</span>.<span class="ident">fde</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">event</span>.<span class="ident">read_event</span>::<span class="op">&lt;</span><span class="ident">FormatDescriptionEvent</span><span class="op">&gt;</span>() {
-                <span class="prelude-val">Ok</span>(<span class="ident">fde</span>) =&gt; <span class="ident">fde</span>.<span class="ident">into_owned</span>().<span class="ident">with_footer</span>(<span class="ident">event</span>.<span class="ident">footer</span>()),
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
+        <span class="kw">if </span>event_type == EventType::FORMAT_DESCRIPTION_EVENT <span class="kw">as </span>u8 {
+            <span class="comment">// we&#39;ll redefine fde with an actual one
+            </span><span class="self">self</span>.fde = <span class="kw">match </span>event.read_event::&lt;FormatDescriptionEvent&gt;() {
+                <span class="prelude-val">Ok</span>(fde) =&gt; fde.into_owned().with_footer(event.footer()),
+                <span class="prelude-val">Err</span>(err) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(err),
             };
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">event_type</span> <span class="op">==</span> <span class="ident">EventType::TABLE_MAP_EVENT</span> <span class="kw">as</span> <span class="ident">u8</span> {
-            <span class="comment">// we&#39;ll maintain known table maps</span>
-            <span class="kw">match</span> <span class="ident">event</span>.<span class="ident">read_event</span>::<span class="op">&lt;</span><span class="ident">TableMapEvent</span><span class="op">&gt;</span>() {
-                <span class="prelude-val">Ok</span>(<span class="ident">tme</span>) =&gt; {
-                    <span class="self">self</span>.<span class="ident">table_map</span>.<span class="ident">insert</span>(<span class="ident">tme</span>.<span class="ident">table_id</span>(), <span class="ident">tme</span>.<span class="ident">into_owned</span>());
+        } <span class="kw">else if </span>event_type == EventType::TABLE_MAP_EVENT <span class="kw">as </span>u8 {
+            <span class="comment">// we&#39;ll maintain known table maps
+            </span><span class="kw">match </span>event.read_event::&lt;TableMapEvent&gt;() {
+                <span class="prelude-val">Ok</span>(tme) =&gt; {
+                    <span class="self">self</span>.table_map.insert(tme.table_id(), tme.into_owned());
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>),
+                <span class="prelude-val">Err</span>(err) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(err),
             }
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">event</span>)
+        <span class="prelude-val">Ok</span>(event)
     }
 }
 
-<span class="doccomment">/// Binlog file.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It&#39;s an iterator over events in a binlog file.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BinlogFile</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">reader</span>: <span class="ident">EventStreamReader</span>,
-    <span class="ident">read</span>: <span class="ident">T</span>,
+<span class="doccomment">/// Binlog file.
+///
+/// It&#39;s an iterator over events in a binlog file.
+</span><span class="attribute">#[derive(Debug, Clone, Eq, PartialEq)]
+</span><span class="kw">pub struct </span>BinlogFile&lt;T&gt; {
+    reader: EventStreamReader,
+    read: T,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Read</span><span class="op">&gt;</span> <span class="ident">BinlogFile</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Creates a new instance.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// It&#39;ll try to read binlog file header.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">version</span>: <span class="ident">BinlogVersion</span>, <span class="kw-2">mut</span> <span class="ident">read</span>: <span class="ident">T</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">reader</span> <span class="op">=</span> <span class="ident">EventStreamReader::new</span>(<span class="ident">version</span>);
-        <span class="ident">BinlogFileHeader::read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">read</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> { <span class="ident">reader</span>, <span class="ident">read</span> })
+<span class="kw">impl</span>&lt;T: Read&gt; BinlogFile&lt;T&gt; {
+    <span class="doccomment">/// Creates a new instance.
+    ///
+    /// It&#39;ll try to read binlog file header.
+    </span><span class="kw">pub fn </span>new(version: BinlogVersion, <span class="kw-2">mut </span>read: T) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>reader = EventStreamReader::new(version);
+        BinlogFileHeader::read(<span class="kw-2">&amp;mut </span>read)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{ reader, read })
     }
 
-    <span class="doccomment">/// Returns a reference to the binlog stream reader.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reader</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">EventStreamReader</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">reader</span>
+    <span class="doccomment">/// Returns a reference to the binlog stream reader.
+    </span><span class="kw">pub fn </span>reader(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>EventStreamReader {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.reader
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Read</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">BinlogFile</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Event</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;T: Read&gt; Iterator <span class="kw">for </span>BinlogFile&lt;T&gt; {
+    <span class="kw">type </span>Item = io::Result&lt;Event&gt;;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">reader</span>.<span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">read</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">event</span>) =&gt; <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">event</span>)),
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">kind</span>() <span class="op">==</span> <span class="ident">UnexpectedEof</span> =&gt; <span class="prelude-val">None</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)),
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">match </span><span class="self">self</span>.reader.read(<span class="kw-2">&amp;mut </span><span class="self">self</span>.read) {
+            <span class="prelude-val">Ok</span>(event) =&gt; <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(event)),
+            <span class="prelude-val">Err</span>(err) <span class="kw">if </span>err.kind() == UnexpectedEof =&gt; <span class="prelude-val">None</span>,
+            <span class="prelude-val">Err</span>(err) =&gt; <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(err)),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ColumnType</span> {
-    <span class="doccomment">/// Returns type-specific metadata for this column type,</span>
-    <span class="doccomment">/// as well as the total number of occupied bytes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `is_array` must be true if `self` is from `MYSQL_TYPE_TYPED_ARRAY` metadata.</span>
-    <span class="kw">fn</span> <span class="ident">get_metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ptr</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="ident">is_array</span>: <span class="ident">bool</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="ident">usize</span>)<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::MYSQL_TYPE_TINY_BLOB</span>
-            <span class="op">|</span> <span class="ident"><span class="self">Self</span>::MYSQL_TYPE_BLOB</span>
-            <span class="op">|</span> <span class="ident"><span class="self">Self</span>::MYSQL_TYPE_MEDIUM_BLOB</span>
-            <span class="op">|</span> <span class="ident"><span class="self">Self</span>::MYSQL_TYPE_LONG_BLOB</span>
-            <span class="op">|</span> <span class="ident"><span class="self">Self</span>::MYSQL_TYPE_DOUBLE</span>
-            <span class="op">|</span> <span class="ident"><span class="self">Self</span>::MYSQL_TYPE_FLOAT</span>
-            <span class="op">|</span> <span class="ident"><span class="self">Self</span>::MYSQL_TYPE_GEOMETRY</span>
-            <span class="op">|</span> <span class="ident"><span class="self">Self</span>::MYSQL_TYPE_TIME2</span>
-            <span class="op">|</span> <span class="ident"><span class="self">Self</span>::MYSQL_TYPE_DATETIME2</span>
-            <span class="op">|</span> <span class="ident"><span class="self">Self</span>::MYSQL_TYPE_TIMESTAMP2</span>
-            <span class="op">|</span> <span class="ident"><span class="self">Self</span>::MYSQL_TYPE_JSON</span> =&gt; <span class="ident">ptr</span>.<span class="ident">get</span>(..<span class="number">1</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> (<span class="ident">x</span>, <span class="number">1</span>)),
-            <span class="ident"><span class="self">Self</span>::MYSQL_TYPE_VARCHAR</span> =&gt; {
-                <span class="kw">if</span> <span class="ident">is_array</span> {
-                    <span class="ident">ptr</span>.<span class="ident">get</span>(..<span class="number">3</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> (<span class="ident">x</span>, <span class="number">3</span>))
-                } <span class="kw">else</span> {
-                    <span class="ident">ptr</span>.<span class="ident">get</span>(..<span class="number">2</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> (<span class="ident">x</span>, <span class="number">2</span>))
+<span class="kw">impl </span>ColumnType {
+    <span class="doccomment">/// Returns type-specific metadata for this column type,
+    /// as well as the total number of occupied bytes.
+    ///
+    /// `is_array` must be true if `self` is from `MYSQL_TYPE_TYPED_ARRAY` metadata.
+    </span><span class="kw">fn </span>get_metadata&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, ptr: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8], is_array: bool) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8], usize)&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::MYSQL_TYPE_TINY_BLOB
+            | <span class="self">Self</span>::MYSQL_TYPE_BLOB
+            | <span class="self">Self</span>::MYSQL_TYPE_MEDIUM_BLOB
+            | <span class="self">Self</span>::MYSQL_TYPE_LONG_BLOB
+            | <span class="self">Self</span>::MYSQL_TYPE_DOUBLE
+            | <span class="self">Self</span>::MYSQL_TYPE_FLOAT
+            | <span class="self">Self</span>::MYSQL_TYPE_GEOMETRY
+            | <span class="self">Self</span>::MYSQL_TYPE_TIME2
+            | <span class="self">Self</span>::MYSQL_TYPE_DATETIME2
+            | <span class="self">Self</span>::MYSQL_TYPE_TIMESTAMP2
+            | <span class="self">Self</span>::MYSQL_TYPE_JSON =&gt; ptr.get(..<span class="number">1</span>).map(|x| (x, <span class="number">1</span>)),
+            <span class="self">Self</span>::MYSQL_TYPE_VARCHAR =&gt; {
+                <span class="kw">if </span>is_array {
+                    ptr.get(..<span class="number">3</span>).map(|x| (x, <span class="number">3</span>))
+                } <span class="kw">else </span>{
+                    ptr.get(..<span class="number">2</span>).map(|x| (x, <span class="number">2</span>))
                 }
             }
-            <span class="ident"><span class="self">Self</span>::MYSQL_TYPE_NEWDECIMAL</span>
-            <span class="op">|</span> <span class="ident"><span class="self">Self</span>::MYSQL_TYPE_SET</span>
-            <span class="op">|</span> <span class="ident"><span class="self">Self</span>::MYSQL_TYPE_ENUM</span>
-            <span class="op">|</span> <span class="ident"><span class="self">Self</span>::MYSQL_TYPE_STRING</span>
-            <span class="op">|</span> <span class="ident"><span class="self">Self</span>::MYSQL_TYPE_BIT</span> =&gt; <span class="ident">ptr</span>.<span class="ident">get</span>(..<span class="number">2</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> (<span class="ident">x</span>, <span class="number">2</span>)),
-            <span class="ident"><span class="self">Self</span>::MYSQL_TYPE_TYPED_ARRAY</span> =&gt; <span class="ident"><span class="self">Self</span>::try_from</span>(<span class="kw-2">*</span><span class="ident">ptr</span>.<span class="ident">get</span>(<span class="number">0</span>)<span class="question-mark">?</span>)
-                .<span class="ident">ok</span>()<span class="question-mark">?</span>
-                .<span class="ident">get_metadata</span>(<span class="kw-2">&amp;</span><span class="ident">ptr</span>.<span class="ident">get</span>(<span class="number">1</span>..)<span class="question-mark">?</span>, <span class="bool-val">true</span>)
-                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">x</span>, <span class="ident">n</span>)<span class="op">|</span> (<span class="ident">x</span>, <span class="ident">n</span> <span class="op">+</span> <span class="number">1</span>)),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Some</span>((<span class="kw-2">&amp;</span>[], <span class="number">0</span>)),
+            <span class="self">Self</span>::MYSQL_TYPE_NEWDECIMAL
+            | <span class="self">Self</span>::MYSQL_TYPE_SET
+            | <span class="self">Self</span>::MYSQL_TYPE_ENUM
+            | <span class="self">Self</span>::MYSQL_TYPE_STRING
+            | <span class="self">Self</span>::MYSQL_TYPE_BIT =&gt; ptr.get(..<span class="number">2</span>).map(|x| (x, <span class="number">2</span>)),
+            <span class="self">Self</span>::MYSQL_TYPE_TYPED_ARRAY =&gt; <span class="self">Self</span>::try_from(<span class="kw-2">*</span>ptr.get(<span class="number">0</span>)<span class="question-mark">?</span>)
+                .ok()<span class="question-mark">?
+                </span>.get_metadata(<span class="kw-2">&amp;</span>ptr.get(<span class="number">1</span>..)<span class="question-mark">?</span>, <span class="bool-val">true</span>)
+                .map(|(x, n)| (x, n + <span class="number">1</span>)),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Some</span>((<span class="kw-2">&amp;</span>[], <span class="number">0</span>)),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">io</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span>std::{collections::HashMap, io};
 
-    <span class="kw">use</span> <span class="kw">super</span>::{
-        <span class="ident">consts</span>::{<span class="ident">EventFlags</span>, <span class="ident">EventType</span>},
-        <span class="ident">events</span>::{<span class="ident">BinlogEventHeader</span>, <span class="ident">EventData</span>, <span class="ident">GtidEvent</span>},
-        <span class="ident">BinlogFile</span>, <span class="ident">BinlogFileHeader</span>, <span class="ident">BinlogVersion</span>,
+    <span class="kw">use super</span>::{
+        consts::{EventFlags, EventType},
+        events::{BinlogEventHeader, EventData, GtidEvent},
+        BinlogFile, BinlogFileHeader, BinlogVersion,
     };
 
-    <span class="kw">use</span> <span class="kw">crate</span>::{
-        <span class="ident">binlog</span>::{<span class="ident">events::RowsEventData</span>, <span class="ident">value::BinlogValue</span>},
-        <span class="ident">proto::MySerialize</span>,
-        <span class="ident">value::Value</span>,
+    <span class="kw">use crate</span>::{
+        binlog::{events::RowsEventData, value::BinlogValue},
+        proto::MySerialize,
+        value::Value,
     };
 
-    <span class="kw">const</span> <span class="ident">BINLOG_FILE</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+    <span class="kw">const </span>BINLOG_FILE: <span class="kw-2">&amp;</span>[u8] = <span class="kw-2">&amp;</span>[
         <span class="number">0xfe</span>, <span class="number">0x62</span>, <span class="number">0x69</span>, <span class="number">0x6e</span>, <span class="number">0xfc</span>, <span class="number">0x35</span>, <span class="number">0xbb</span>, <span class="number">0x4a</span>, <span class="number">0x0f</span>, <span class="number">0x01</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x5e</span>, <span class="number">0x00</span>,
         <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x62</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x04</span>, <span class="number">0x00</span>, <span class="number">0x35</span>, <span class="number">0x2e</span>, <span class="number">0x30</span>, <span class="number">0x2e</span>, <span class="number">0x38</span>,
         <span class="number">0x36</span>, <span class="number">0x2d</span>, <span class="number">0x64</span>, <span class="number">0x65</span>, <span class="number">0x62</span>, <span class="number">0x75</span>, <span class="number">0x67</span>, <span class="number">0x2d</span>, <span class="number">0x6c</span>, <span class="number">0x6f</span>, <span class="number">0x67</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>,
@@ -1219,491 +1219,491 @@
         <span class="number">0x30</span>, <span class="number">0x30</span>, <span class="number">0x30</span>, <span class="number">0x30</span>, <span class="number">0x32</span>,
     ];
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">binlog_file_header_roundtrip</span>() -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>binlog_file_header_roundtrip() -&gt; io::Result&lt;()&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>output = Vec::new();
 
-        <span class="kw">let</span> <span class="ident">binlog_file_header</span> <span class="op">=</span> <span class="ident">BinlogFileHeader::read</span>(<span class="ident">BINLOG_FILE</span>)<span class="question-mark">?</span>;
-        <span class="ident">binlog_file_header</span>.<span class="ident">write</span>(<span class="ident">BinlogVersion::Version4</span>, <span class="kw-2">&amp;mut</span> <span class="ident">output</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>binlog_file_header = BinlogFileHeader::read(BINLOG_FILE)<span class="question-mark">?</span>;
+        binlog_file_header.write(BinlogVersion::Version4, <span class="kw-2">&amp;mut </span>output)<span class="question-mark">?</span>;
 
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">output</span>[..], <span class="kw-2">&amp;</span><span class="ident">BINLOG_FILE</span>[..<span class="ident">BinlogFileHeader::LEN</span>]);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>output[..], <span class="kw-2">&amp;</span>BINLOG_FILE[..BinlogFileHeader::LEN]);
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">binlog_file_iterator</span>() -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">binlog_file</span> <span class="op">=</span> <span class="ident">BinlogFile::new</span>(<span class="ident">BinlogVersion::Version4</span>, <span class="ident">BINLOG_FILE</span>)<span class="question-mark">?</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>binlog_file_iterator() -&gt; io::Result&lt;()&gt; {
+        <span class="kw">let </span>binlog_file = BinlogFile::new(BinlogVersion::Version4, BINLOG_FILE)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">total</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ev_pos</span> <span class="op">=</span> <span class="number">4</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>total = <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>ev_pos = <span class="number">4</span>;
 
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">ev</span>) <span class="kw">in</span> <span class="ident">binlog_file</span>.<span class="ident">enumerate</span>() {
-            <span class="kw">let</span> <span class="ident">data_start</span> <span class="op">=</span> <span class="ident">ev_pos</span> <span class="op">+</span> <span class="ident">BinlogEventHeader::LEN</span>;
-            <span class="kw">let</span> <span class="ident">ev</span> <span class="op">=</span> <span class="ident">ev</span><span class="question-mark">?</span>;
-            <span class="kw">match</span> <span class="ident">i</span> {
-                <span class="number">0</span> =&gt; {
+        <span class="kw">for </span>(i, ev) <span class="kw">in </span>binlog_file.enumerate() {
+            <span class="kw">let </span>data_start = ev_pos + BinlogEventHeader::LEN;
+            <span class="kw">let </span>ev = ev<span class="question-mark">?</span>;
+            <span class="kw">match </span>i {
+                <span class="number">0 </span>=&gt; {
                     <span class="macro">assert_eq!</span>(
-                        <span class="ident">ev</span>.<span class="ident">header</span>(),
-                        <span class="ident">BinlogEventHeader::new</span>(
+                        ev.header(),
+                        BinlogEventHeader::new(
                             <span class="number">1253783036</span>,
-                            <span class="ident">EventType::FORMAT_DESCRIPTION_EVENT</span>,
+                            EventType::FORMAT_DESCRIPTION_EVENT,
                             <span class="number">1</span>,
                             <span class="number">94</span>,
                             <span class="number">98</span>,
-                            <span class="ident">EventFlags::empty</span>()
+                            EventFlags::empty()
                         )
                     )
                 }
-                <span class="number">1</span> =&gt; <span class="macro">assert_eq!</span>(
-                    <span class="ident">ev</span>.<span class="ident">header</span>(),
-                    <span class="ident">BinlogEventHeader::new</span>(
+                <span class="number">1 </span>=&gt; <span class="macro">assert_eq!</span>(
+                    ev.header(),
+                    BinlogEventHeader::new(
                         <span class="number">1253783037</span>,
-                        <span class="ident">EventType::QUERY_EVENT</span>,
+                        EventType::QUERY_EVENT,
                         <span class="number">1</span>,
                         <span class="number">100</span>,
                         <span class="number">198</span>,
-                        <span class="ident">EventFlags::empty</span>()
+                        EventFlags::empty()
                     )
                 ),
-                <span class="number">2</span> =&gt; <span class="macro">assert_eq!</span>(
-                    <span class="ident">ev</span>.<span class="ident">header</span>(),
-                    <span class="ident">BinlogEventHeader::new</span>(
+                <span class="number">2 </span>=&gt; <span class="macro">assert_eq!</span>(
+                    ev.header(),
+                    BinlogEventHeader::new(
                         <span class="number">1253783037</span>,
-                        <span class="ident">EventType::QUERY_EVENT</span>,
+                        EventType::QUERY_EVENT,
                         <span class="number">1</span>,
                         <span class="number">101</span>,
                         <span class="number">299</span>,
-                        <span class="ident">EventFlags::empty</span>()
+                        EventFlags::empty()
                     )
                 ),
-                <span class="number">3</span> =&gt; <span class="macro">assert_eq!</span>(
-                    <span class="ident">ev</span>.<span class="ident">header</span>(),
-                    <span class="ident">BinlogEventHeader::new</span>(
+                <span class="number">3 </span>=&gt; <span class="macro">assert_eq!</span>(
+                    ev.header(),
+                    BinlogEventHeader::new(
                         <span class="number">1253783037</span>,
-                        <span class="ident">EventType::QUERY_EVENT</span>,
+                        EventType::QUERY_EVENT,
                         <span class="number">1</span>,
                         <span class="number">69</span>,
                         <span class="number">368</span>,
-                        <span class="ident">EventFlags::LOG_EVENT_SUPPRESS_USE_F</span>
+                        EventFlags::LOG_EVENT_SUPPRESS_USE_F
                     )
                 ),
-                <span class="number">4</span> =&gt; <span class="macro">assert_eq!</span>(
-                    <span class="ident">ev</span>.<span class="ident">header</span>(),
-                    <span class="ident">BinlogEventHeader::new</span>(
+                <span class="number">4 </span>=&gt; <span class="macro">assert_eq!</span>(
+                    ev.header(),
+                    BinlogEventHeader::new(
                         <span class="number">1253783037</span>,
-                        <span class="ident">EventType::QUERY_EVENT</span>,
+                        EventType::QUERY_EVENT,
                         <span class="number">1</span>,
                         <span class="number">92</span>,
                         <span class="number">460</span>,
-                        <span class="ident">EventFlags::empty</span>()
+                        EventFlags::empty()
                     )
                 ),
-                <span class="number">5</span> =&gt; <span class="macro">assert_eq!</span>(
-                    <span class="ident">ev</span>.<span class="ident">header</span>(),
-                    <span class="ident">BinlogEventHeader::new</span>(
+                <span class="number">5 </span>=&gt; <span class="macro">assert_eq!</span>(
+                    ev.header(),
+                    BinlogEventHeader::new(
                         <span class="number">1253783037</span>,
-                        <span class="ident">EventType::QUERY_EVENT</span>,
+                        EventType::QUERY_EVENT,
                         <span class="number">1</span>,
                         <span class="number">93</span>,
                         <span class="number">553</span>,
-                        <span class="ident">EventFlags::empty</span>()
+                        EventFlags::empty()
                     )
                 ),
-                <span class="number">6</span> =&gt; <span class="macro">assert_eq!</span>(
-                    <span class="ident">ev</span>.<span class="ident">header</span>(),
-                    <span class="ident">BinlogEventHeader::new</span>(
+                <span class="number">6 </span>=&gt; <span class="macro">assert_eq!</span>(
+                    ev.header(),
+                    BinlogEventHeader::new(
                         <span class="number">1253783037</span>,
-                        <span class="ident">EventType::XID_EVENT</span>,
+                        EventType::XID_EVENT,
                         <span class="number">1</span>,
                         <span class="number">27</span>,
                         <span class="number">580</span>,
-                        <span class="ident">EventFlags::empty</span>()
+                        EventFlags::empty()
                     )
                 ),
-                <span class="number">7</span> =&gt; <span class="macro">assert_eq!</span>(
-                    <span class="ident">ev</span>.<span class="ident">header</span>(),
-                    <span class="ident">BinlogEventHeader::new</span>(
+                <span class="number">7 </span>=&gt; <span class="macro">assert_eq!</span>(
+                    ev.header(),
+                    BinlogEventHeader::new(
                         <span class="number">1253783037</span>,
-                        <span class="ident">EventType::QUERY_EVENT</span>,
+                        EventType::QUERY_EVENT,
                         <span class="number">1</span>,
                         <span class="number">100</span>,
                         <span class="number">680</span>,
-                        <span class="ident">EventFlags::empty</span>()
+                        EventFlags::empty()
                     )
                 ),
-                <span class="number">8</span> =&gt; <span class="macro">assert_eq!</span>(
-                    <span class="ident">ev</span>.<span class="ident">header</span>(),
-                    <span class="ident">BinlogEventHeader::new</span>(
+                <span class="number">8 </span>=&gt; <span class="macro">assert_eq!</span>(
+                    ev.header(),
+                    BinlogEventHeader::new(
                         <span class="number">1253783037</span>,
-                        <span class="ident">EventType::QUERY_EVENT</span>,
+                        EventType::QUERY_EVENT,
                         <span class="number">1</span>,
                         <span class="number">101</span>,
                         <span class="number">781</span>,
-                        <span class="ident">EventFlags::empty</span>()
+                        EventFlags::empty()
                     )
                 ),
-                <span class="number">9</span> =&gt; <span class="macro">assert_eq!</span>(
-                    <span class="ident">ev</span>.<span class="ident">header</span>(),
-                    <span class="ident">BinlogEventHeader::new</span>(
+                <span class="number">9 </span>=&gt; <span class="macro">assert_eq!</span>(
+                    ev.header(),
+                    BinlogEventHeader::new(
                         <span class="number">1253783037</span>,
-                        <span class="ident">EventType::QUERY_EVENT</span>,
+                        EventType::QUERY_EVENT,
                         <span class="number">1</span>,
                         <span class="number">69</span>,
                         <span class="number">850</span>,
-                        <span class="ident">EventFlags::LOG_EVENT_SUPPRESS_USE_F</span>
+                        EventFlags::LOG_EVENT_SUPPRESS_USE_F
                     )
                 ),
-                <span class="number">10</span> =&gt; <span class="macro">assert_eq!</span>(
-                    <span class="ident">ev</span>.<span class="ident">header</span>(),
-                    <span class="ident">BinlogEventHeader::new</span>(
+                <span class="number">10 </span>=&gt; <span class="macro">assert_eq!</span>(
+                    ev.header(),
+                    BinlogEventHeader::new(
                         <span class="number">1253783037</span>,
-                        <span class="ident">EventType::QUERY_EVENT</span>,
+                        EventType::QUERY_EVENT,
                         <span class="number">1</span>,
                         <span class="number">92</span>,
                         <span class="number">942</span>,
-                        <span class="ident">EventFlags::empty</span>()
+                        EventFlags::empty()
                     )
                 ),
-                <span class="number">11</span> =&gt; <span class="macro">assert_eq!</span>(
-                    <span class="ident">ev</span>.<span class="ident">header</span>(),
-                    <span class="ident">BinlogEventHeader::new</span>(
+                <span class="number">11 </span>=&gt; <span class="macro">assert_eq!</span>(
+                    ev.header(),
+                    BinlogEventHeader::new(
                         <span class="number">1253783037</span>,
-                        <span class="ident">EventType::QUERY_EVENT</span>,
+                        EventType::QUERY_EVENT,
                         <span class="number">1</span>,
                         <span class="number">93</span>,
                         <span class="number">1035</span>,
-                        <span class="ident">EventFlags::empty</span>()
+                        EventFlags::empty()
                     )
                 ),
-                <span class="number">12</span> =&gt; <span class="macro">assert_eq!</span>(
-                    <span class="ident">ev</span>.<span class="ident">header</span>(),
-                    <span class="ident">BinlogEventHeader::new</span>(
+                <span class="number">12 </span>=&gt; <span class="macro">assert_eq!</span>(
+                    ev.header(),
+                    BinlogEventHeader::new(
                         <span class="number">1253783037</span>,
-                        <span class="ident">EventType::QUERY_EVENT</span>,
+                        EventType::QUERY_EVENT,
                         <span class="number">1</span>,
                         <span class="number">72</span>,
                         <span class="number">1107</span>,
-                        <span class="ident">EventFlags::LOG_EVENT_SUPPRESS_USE_F</span>
+                        EventFlags::LOG_EVENT_SUPPRESS_USE_F
                     )
                 ),
-                <span class="number">13</span> =&gt; <span class="macro">assert_eq!</span>(
-                    <span class="ident">ev</span>.<span class="ident">header</span>(),
-                    <span class="ident">BinlogEventHeader::new</span>(
+                <span class="number">13 </span>=&gt; <span class="macro">assert_eq!</span>(
+                    ev.header(),
+                    BinlogEventHeader::new(
                         <span class="number">1253783037</span>,
-                        <span class="ident">EventType::QUERY_EVENT</span>,
+                        EventType::QUERY_EVENT,
                         <span class="number">1</span>,
                         <span class="number">97</span>,
                         <span class="number">1204</span>,
-                        <span class="ident">EventFlags::empty</span>()
+                        EventFlags::empty()
                     )
                 ),
-                <span class="number">14</span> =&gt; <span class="macro">assert_eq!</span>(
-                    <span class="ident">ev</span>.<span class="ident">header</span>(),
-                    <span class="ident">BinlogEventHeader::new</span>(
+                <span class="number">14 </span>=&gt; <span class="macro">assert_eq!</span>(
+                    ev.header(),
+                    BinlogEventHeader::new(
                         <span class="number">1253783037</span>,
-                        <span class="ident">EventType::QUERY_EVENT</span>,
+                        EventType::QUERY_EVENT,
                         <span class="number">1</span>,
                         <span class="number">98</span>,
                         <span class="number">1302</span>,
-                        <span class="ident">EventFlags::empty</span>()
+                        EventFlags::empty()
                     )
                 ),
-                <span class="number">15</span> =&gt; <span class="macro">assert_eq!</span>(
-                    <span class="ident">ev</span>.<span class="ident">header</span>(),
-                    <span class="ident">BinlogEventHeader::new</span>(
+                <span class="number">15 </span>=&gt; <span class="macro">assert_eq!</span>(
+                    ev.header(),
+                    BinlogEventHeader::new(
                         <span class="number">1253783037</span>,
-                        <span class="ident">EventType::QUERY_EVENT</span>,
+                        EventType::QUERY_EVENT,
                         <span class="number">1</span>,
                         <span class="number">69</span>,
                         <span class="number">1371</span>,
-                        <span class="ident">EventFlags::LOG_EVENT_SUPPRESS_USE_F</span>
+                        EventFlags::LOG_EVENT_SUPPRESS_USE_F
                     )
                 ),
-                <span class="number">16</span> =&gt; <span class="macro">assert_eq!</span>(
-                    <span class="ident">ev</span>.<span class="ident">header</span>(),
-                    <span class="ident">BinlogEventHeader::new</span>(
+                <span class="number">16 </span>=&gt; <span class="macro">assert_eq!</span>(
+                    ev.header(),
+                    BinlogEventHeader::new(
                         <span class="number">1253783037</span>,
-                        <span class="ident">EventType::QUERY_EVENT</span>,
+                        EventType::QUERY_EVENT,
                         <span class="number">1</span>,
                         <span class="number">92</span>,
                         <span class="number">1463</span>,
-                        <span class="ident">EventFlags::empty</span>()
+                        EventFlags::empty()
                     )
                 ),
-                <span class="number">17</span> =&gt; <span class="macro">assert_eq!</span>(
-                    <span class="ident">ev</span>.<span class="ident">header</span>(),
-                    <span class="ident">BinlogEventHeader::new</span>(
+                <span class="number">17 </span>=&gt; <span class="macro">assert_eq!</span>(
+                    ev.header(),
+                    BinlogEventHeader::new(
                         <span class="number">1253783037</span>,
-                        <span class="ident">EventType::QUERY_EVENT</span>,
+                        EventType::QUERY_EVENT,
                         <span class="number">1</span>,
                         <span class="number">93</span>,
                         <span class="number">1556</span>,
-                        <span class="ident">EventFlags::empty</span>()
+                        EventFlags::empty()
                     )
                 ),
-                <span class="number">18</span> =&gt; <span class="macro">assert_eq!</span>(
-                    <span class="ident">ev</span>.<span class="ident">header</span>(),
-                    <span class="ident">BinlogEventHeader::new</span>(
+                <span class="number">18 </span>=&gt; <span class="macro">assert_eq!</span>(
+                    ev.header(),
+                    BinlogEventHeader::new(
                         <span class="number">1253783037</span>,
-                        <span class="ident">EventType::QUERY_EVENT</span>,
+                        EventType::QUERY_EVENT,
                         <span class="number">1</span>,
                         <span class="number">70</span>,
                         <span class="number">1626</span>,
-                        <span class="ident">EventFlags::LOG_EVENT_SUPPRESS_USE_F</span>
+                        EventFlags::LOG_EVENT_SUPPRESS_USE_F
                     )
                 ),
-                <span class="number">19</span> =&gt; <span class="macro">assert_eq!</span>(
-                    <span class="ident">ev</span>.<span class="ident">header</span>(),
-                    <span class="ident">BinlogEventHeader::new</span>(
+                <span class="number">19 </span>=&gt; <span class="macro">assert_eq!</span>(
+                    ev.header(),
+                    BinlogEventHeader::new(
                         <span class="number">1253783037</span>,
-                        <span class="ident">EventType::ROTATE_EVENT</span>,
+                        EventType::ROTATE_EVENT,
                         <span class="number">1</span>,
                         <span class="number">44</span>,
                         <span class="number">1670</span>,
-                        <span class="ident">EventFlags::empty</span>()
+                        EventFlags::empty()
                     )
                 ),
-                <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;too many&quot;</span>),
+                <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;too many&quot;</span>),
             }
 
             <span class="macro">assert_eq!</span>(
-                <span class="ident">ev</span>.<span class="ident">data</span>(),
-                <span class="kw-2">&amp;</span><span class="ident">BINLOG_FILE</span>[<span class="ident">data_start</span>
-                    ..(<span class="ident">data_start</span> <span class="op">+</span> <span class="ident">ev</span>.<span class="ident">header</span>().<span class="ident">event_size</span>() <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="ident">BinlogEventHeader::LEN</span>)],
+                ev.data(),
+                <span class="kw-2">&amp;</span>BINLOG_FILE[data_start
+                    ..(data_start + ev.header().event_size() <span class="kw">as </span>usize - BinlogEventHeader::LEN)],
             );
 
-            <span class="ident">total</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="ident">ev_pos</span> <span class="op">=</span> <span class="ident">ev</span>.<span class="ident">header</span>().<span class="ident">log_pos</span>() <span class="kw">as</span> <span class="ident">usize</span>;
+            total += <span class="number">1</span>;
+            ev_pos = ev.header().log_pos() <span class="kw">as </span>usize;
         }
 
-        <span class="macro">assert_eq!</span>(<span class="ident">total</span>, <span class="number">20</span>);
+        <span class="macro">assert_eq!</span>(total, <span class="number">20</span>);
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">binlog_event_roundtrip</span>() -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">const</span> <span class="ident">PATH</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;./test-data/binlogs&quot;</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>binlog_event_roundtrip() -&gt; io::Result&lt;()&gt; {
+        <span class="kw">const </span>PATH: <span class="kw-2">&amp;</span>str = <span class="string">&quot;./test-data/binlogs&quot;</span>;
 
-        <span class="kw">let</span> <span class="ident">binlogs</span> <span class="op">=</span> <span class="ident">std::fs::read_dir</span>(<span class="ident">PATH</span>)<span class="question-mark">?</span>
-            .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">path</span><span class="op">|</span> <span class="ident">path</span>.<span class="ident">ok</span>())
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">entry</span><span class="op">|</span> <span class="ident">entry</span>.<span class="ident">path</span>())
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">path</span><span class="op">|</span> <span class="ident">path</span>.<span class="ident">file_name</span>().<span class="ident">is_some</span>());
+        <span class="kw">let </span>binlogs = std::fs::read_dir(PATH)<span class="question-mark">?
+            </span>.filter_map(|path| path.ok())
+            .map(|entry| entry.path())
+            .filter(|path| path.file_name().is_some());
 
-        <span class="lifetime">&#39;outer</span>: <span class="kw">for</span> <span class="ident">file_path</span> <span class="kw">in</span> <span class="ident">binlogs</span> {
-            <span class="kw">let</span> <span class="ident">file_data</span> <span class="op">=</span> <span class="ident">std::fs::read</span>(<span class="macro">dbg!</span>(<span class="kw-2">&amp;</span><span class="ident">file_path</span>))<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">binlog_file</span> <span class="op">=</span> <span class="ident">BinlogFile::new</span>(<span class="ident">BinlogVersion::Version4</span>, <span class="kw-2">&amp;</span><span class="ident">file_data</span>[..])<span class="question-mark">?</span>;
+        <span class="lifetime">&#39;outer</span>: <span class="kw">for </span>file_path <span class="kw">in </span>binlogs {
+            <span class="kw">let </span>file_data = std::fs::read(<span class="macro">dbg!</span>(<span class="kw-2">&amp;</span>file_path))<span class="question-mark">?</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>binlog_file = BinlogFile::new(BinlogVersion::Version4, <span class="kw-2">&amp;</span>file_data[..])<span class="question-mark">?</span>;
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ev_pos</span> <span class="op">=</span> <span class="number">4</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">table_map_events</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
+            <span class="kw">let </span><span class="kw-2">mut </span>ev_pos = <span class="number">4</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>table_map_events = HashMap::new();
 
-            <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ev</span>) <span class="op">=</span> <span class="ident">binlog_file</span>.<span class="ident">next</span>() {
-                <span class="kw">let</span> <span class="ident">ev</span> <span class="op">=</span> <span class="ident">ev</span><span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">dbg!</span>(<span class="ident">ev</span>.<span class="ident">header</span>().<span class="ident">event_type</span>());
-                <span class="kw">let</span> <span class="ident">ev_end</span> <span class="op">=</span> <span class="ident">ev_pos</span> <span class="op">+</span> <span class="ident">ev</span>.<span class="ident">header</span>().<span class="ident">event_size</span>() <span class="kw">as</span> <span class="ident">usize</span>;
-                <span class="kw">let</span> <span class="ident">binlog_version</span> <span class="op">=</span> <span class="ident">binlog_file</span>.<span class="ident">reader</span>.<span class="ident">fde</span>.<span class="ident">binlog_version</span>();
+            <span class="kw">while let </span><span class="prelude-val">Some</span>(ev) = binlog_file.next() {
+                <span class="kw">let </span>ev = ev<span class="question-mark">?</span>;
+                <span class="kw">let _ </span>= <span class="macro">dbg!</span>(ev.header().event_type());
+                <span class="kw">let </span>ev_end = ev_pos + ev.header().event_size() <span class="kw">as </span>usize;
+                <span class="kw">let </span>binlog_version = binlog_file.reader.fde.binlog_version();
 
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-                <span class="ident">ev</span>.<span class="ident">write</span>(<span class="ident">binlog_version</span>, <span class="kw-2">&amp;mut</span> <span class="ident">output</span>)<span class="question-mark">?</span>;
+                <span class="kw">let </span><span class="kw-2">mut </span>output = Vec::new();
+                ev.write(binlog_version, <span class="kw-2">&amp;mut </span>output)<span class="question-mark">?</span>;
 
-                <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ev</span>.<span class="ident">read_data</span>() {
-                    <span class="prelude-val">Ok</span>(<span class="ident">event</span>) =&gt; {
-                        <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">event</span> {
-                            <span class="prelude-val">Some</span>(<span class="ident">e</span>) =&gt; <span class="ident">e</span>,
-                            <span class="prelude-val">None</span> =&gt; {
-                                <span class="kw">if</span> <span class="ident">file_path</span>.<span class="ident">file_name</span>().<span class="ident">unwrap</span>() <span class="op">==</span> <span class="string">&quot;mariadb-bin.000001&quot;</span> {
+                <span class="kw">let </span>event = <span class="kw">match </span>ev.read_data() {
+                    <span class="prelude-val">Ok</span>(event) =&gt; {
+                        <span class="kw">let </span>event = <span class="kw">match </span>event {
+                            <span class="prelude-val">Some</span>(e) =&gt; e,
+                            <span class="prelude-val">None </span>=&gt; {
+                                <span class="kw">if </span>file_path.file_name().unwrap() == <span class="string">&quot;mariadb-bin.000001&quot; </span>{
                                     <span class="kw">continue</span>;
-                                } <span class="kw">else</span> {
-                                    <span class="macro">dbg!</span>(<span class="kw-2">&amp;</span><span class="ident">ev</span>);
+                                } <span class="kw">else </span>{
+                                    <span class="macro">dbg!</span>(<span class="kw-2">&amp;</span>ev);
                                     <span class="macro">panic!</span>();
                                 }
                             }
                         };
-                        <span class="kw">match</span> <span class="ident">event</span> {
-                            <span class="ident">EventData::TableMapEvent</span>(<span class="kw-2">ref</span> <span class="ident">ev</span>) =&gt; {
-                                <span class="comment">// store table maps for later use</span>
-                                <span class="ident">table_map_events</span>.<span class="ident">insert</span>(<span class="ident">ev</span>.<span class="ident">table_id</span>(), <span class="ident">ev</span>.<span class="ident">clone</span>().<span class="ident">into_owned</span>());
+                        <span class="kw">match </span>event {
+                            EventData::TableMapEvent(<span class="kw-2">ref </span>ev) =&gt; {
+                                <span class="comment">// store table maps for later use
+                                </span>table_map_events.insert(ev.table_id(), ev.clone().into_owned());
 
-                                <span class="ident">event</span>
+                                event
                             }
-                            <span class="ident">EventData::RowsEvent</span>(<span class="kw-2">ref</span> <span class="ident">rows_event</span>) =&gt; {
-                                <span class="comment">// iterate rows in a rows event</span>
-                                <span class="kw">let</span> <span class="ident">table_map_event</span> <span class="op">=</span>
-                                    <span class="ident">binlog_file</span>.<span class="ident">reader</span>().<span class="ident">get_tme</span>(<span class="ident">rows_event</span>.<span class="ident">table_id</span>()).<span class="ident">unwrap</span>();
-                                <span class="kw">for</span> <span class="ident">row</span> <span class="kw">in</span> <span class="ident">rows_event</span>.<span class="ident">rows</span>(<span class="ident">table_map_event</span>) {
-                                    <span class="ident">row</span>.<span class="ident">unwrap</span>();
+                            EventData::RowsEvent(<span class="kw-2">ref </span>rows_event) =&gt; {
+                                <span class="comment">// iterate rows in a rows event
+                                </span><span class="kw">let </span>table_map_event =
+                                    binlog_file.reader().get_tme(rows_event.table_id()).unwrap();
+                                <span class="kw">for </span>row <span class="kw">in </span>rows_event.rows(table_map_event) {
+                                    row.unwrap();
                                 }
 
-                                <span class="ident">event</span>
+                                event
                             }
-                            <span class="kw">_</span> =&gt; <span class="ident">event</span>,
+                            <span class="kw">_ </span>=&gt; event,
                         }
                     }
-                    <span class="prelude-val">Err</span>(<span class="ident">err</span>)
-                        <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">kind</span>() <span class="op">==</span> <span class="ident">std::io::ErrorKind::Other</span>
-                            <span class="op">&amp;&amp;</span> <span class="ident">ev</span>.<span class="ident">header</span>().<span class="ident">event_type</span>() <span class="op">==</span> <span class="prelude-val">Ok</span>(<span class="ident">EventType::XID_EVENT</span>)
-                            <span class="op">&amp;&amp;</span> <span class="ident">ev</span>.<span class="ident">header</span>().<span class="ident">event_size</span>() <span class="op">==</span> <span class="number">0x26</span>
-                            <span class="op">&amp;&amp;</span> <span class="ident">file_path</span>.<span class="ident">file_name</span>().<span class="ident">unwrap</span>() <span class="op">==</span> <span class="string">&quot;ver_5_1-wl2325_r.001&quot;</span> =&gt;
+                    <span class="prelude-val">Err</span>(err)
+                        <span class="kw">if </span>err.kind() == std::io::ErrorKind::Other
+                            &amp;&amp; ev.header().event_type() == <span class="prelude-val">Ok</span>(EventType::XID_EVENT)
+                            &amp;&amp; ev.header().event_size() == <span class="number">0x26
+                            </span>&amp;&amp; file_path.file_name().unwrap() == <span class="string">&quot;ver_5_1-wl2325_r.001&quot; </span>=&gt;
                     {
-                        <span class="comment">// ver_5_1-wl2325_r.001 testfile contains broken xid event.</span>
-                        <span class="kw">continue</span> <span class="lifetime">&#39;outer</span>;
+                        <span class="comment">// ver_5_1-wl2325_r.001 testfile contains broken xid event.
+                        </span><span class="kw">continue </span><span class="lifetime">&#39;outer</span>;
                     }
-                    <span class="prelude-val">Err</span>(<span class="ident">err</span>)
-                        <span class="kw">if</span> <span class="ident">err</span>.<span class="ident">kind</span>() <span class="op">==</span> <span class="ident">std::io::ErrorKind::UnexpectedEof</span>
-                            <span class="op">&amp;&amp;</span> <span class="ident">ev</span>.<span class="ident">header</span>().<span class="ident">event_type</span>() <span class="op">==</span> <span class="prelude-val">Ok</span>(<span class="ident">EventType::QUERY_EVENT</span>)
-                            <span class="op">&amp;&amp;</span> <span class="ident">ev</span>.<span class="ident">header</span>().<span class="ident">event_size</span>() <span class="op">==</span> <span class="number">171</span>
-                            <span class="op">&amp;&amp;</span> <span class="ident">file_path</span>.<span class="ident">file_name</span>().<span class="ident">unwrap</span>() <span class="op">==</span> <span class="string">&quot;corrupt-relay-bin.000624&quot;</span> =&gt;
+                    <span class="prelude-val">Err</span>(err)
+                        <span class="kw">if </span>err.kind() == std::io::ErrorKind::UnexpectedEof
+                            &amp;&amp; ev.header().event_type() == <span class="prelude-val">Ok</span>(EventType::QUERY_EVENT)
+                            &amp;&amp; ev.header().event_size() == <span class="number">171
+                            </span>&amp;&amp; file_path.file_name().unwrap() == <span class="string">&quot;corrupt-relay-bin.000624&quot; </span>=&gt;
                     {
-                        <span class="comment">// corrupt-relay-bin.000624 testfile contains broken query event.</span>
-                        <span class="kw">continue</span> <span class="lifetime">&#39;outer</span>;
+                        <span class="comment">// corrupt-relay-bin.000624 testfile contains broken query event.
+                        </span><span class="kw">continue </span><span class="lifetime">&#39;outer</span>;
                     }
-                    <span class="ident">other</span> =&gt; <span class="ident">other</span>.<span class="ident">transpose</span>().<span class="ident">unwrap</span>()<span class="question-mark">?</span>,
+                    other =&gt; other.transpose().unwrap()<span class="question-mark">?</span>,
                 };
 
-                <span class="kw">if</span> <span class="ident">file_path</span>.<span class="ident">file_name</span>().<span class="ident">unwrap</span>() <span class="op">==</span> <span class="string">&quot;binlog-invisible-columns.000001&quot;</span> {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">EventData::TableMapEvent</span>(<span class="ident">ev</span>)) <span class="op">=</span> <span class="ident">ev</span>.<span class="ident">read_data</span>().<span class="ident">unwrap</span>() {
-                        <span class="kw">let</span> <span class="ident">optional_meta</span> <span class="op">=</span> <span class="ident">ev</span>.<span class="ident">iter_optional_meta</span>();
-                        <span class="kw">for</span> <span class="ident">meta</span> <span class="kw">in</span> <span class="ident">optional_meta</span> {
-                            <span class="ident">meta</span>.<span class="ident">unwrap</span>();
+                <span class="kw">if </span>file_path.file_name().unwrap() == <span class="string">&quot;binlog-invisible-columns.000001&quot; </span>{
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(EventData::TableMapEvent(ev)) = ev.read_data().unwrap() {
+                        <span class="kw">let </span>optional_meta = ev.iter_optional_meta();
+                        <span class="kw">for </span>meta <span class="kw">in </span>optional_meta {
+                            meta.unwrap();
                         }
                     }
                 }
 
-                <span class="kw">if</span> <span class="ident">file_path</span>.<span class="ident">file_name</span>().<span class="ident">unwrap</span>() <span class="op">==</span> <span class="string">&quot;mysql-enum-string-set.000001&quot;</span> {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">EventData::RowsEvent</span>(<span class="ident">data</span>)) <span class="op">=</span> <span class="ident">ev</span>.<span class="ident">read_data</span>().<span class="ident">unwrap</span>() {
-                        <span class="kw">let</span> <span class="ident">table_map_event</span> <span class="op">=</span>
-                            <span class="ident">binlog_file</span>.<span class="ident">reader</span>().<span class="ident">get_tme</span>(<span class="ident">data</span>.<span class="ident">table_id</span>()).<span class="ident">unwrap</span>();
-                        <span class="kw">for</span> <span class="ident">row</span> <span class="kw">in</span> <span class="ident">data</span>.<span class="ident">rows</span>(<span class="ident">table_map_event</span>) {
-                            <span class="kw">let</span> (<span class="ident">before</span>, <span class="ident">after</span>) <span class="op">=</span> <span class="ident">row</span>.<span class="ident">unwrap</span>();
-                            <span class="kw">match</span> <span class="ident">data</span> {
-                                <span class="ident">RowsEventData::WriteRowsEvent</span>(<span class="kw">_</span>) =&gt; {
-                                    <span class="macro">assert!</span>(<span class="ident">before</span>.<span class="ident">is_none</span>());
-                                    <span class="kw">let</span> <span class="ident">after</span> <span class="op">=</span> <span class="ident">after</span>.<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
-                                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">j</span> <span class="op">=</span> <span class="number">0</span>;
-                                    <span class="kw">for</span> <span class="ident">v</span> <span class="kw">in</span> <span class="ident">after</span> {
-                                        <span class="ident">j</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                                        <span class="kw">match</span> <span class="ident">j</span> {
-                                            <span class="number">1</span> =&gt; <span class="macro">assert_eq!</span>(<span class="ident">v</span>, <span class="ident">BinlogValue::Value</span>(<span class="string">&quot;0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789&quot;</span>.<span class="ident">into</span>())),
-                                            <span class="number">2</span> =&gt; <span class="macro">assert_eq!</span>(<span class="ident">v</span>, <span class="ident">BinlogValue::Value</span>(<span class="string">&quot;0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456780123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456780123456789012345678901234567890123456789&quot;</span>.<span class="ident">into</span>())),
-                                            <span class="number">3</span> =&gt; <span class="macro">assert_eq!</span>(<span class="ident">v</span>, <span class="ident">BinlogValue::Value</span>(<span class="number">1_i8</span>.<span class="ident">into</span>())),
-                                            <span class="number">4</span> =&gt; <span class="macro">assert_eq!</span>(<span class="ident">v</span>, <span class="ident">BinlogValue::Value</span>([<span class="number">0b00000101_u8</span>].<span class="ident">into</span>())),
-                                            <span class="number">5</span> =&gt; <span class="macro">assert_eq!</span>(<span class="ident">v</span>, <span class="ident">BinlogValue::Value</span>(<span class="string">&quot;0123456789&quot;</span>.<span class="ident">into</span>())),
+                <span class="kw">if </span>file_path.file_name().unwrap() == <span class="string">&quot;mysql-enum-string-set.000001&quot; </span>{
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(EventData::RowsEvent(data)) = ev.read_data().unwrap() {
+                        <span class="kw">let </span>table_map_event =
+                            binlog_file.reader().get_tme(data.table_id()).unwrap();
+                        <span class="kw">for </span>row <span class="kw">in </span>data.rows(table_map_event) {
+                            <span class="kw">let </span>(before, after) = row.unwrap();
+                            <span class="kw">match </span>data {
+                                RowsEventData::WriteRowsEvent(<span class="kw">_</span>) =&gt; {
+                                    <span class="macro">assert!</span>(before.is_none());
+                                    <span class="kw">let </span>after = after.unwrap().unwrap();
+                                    <span class="kw">let </span><span class="kw-2">mut </span>j = <span class="number">0</span>;
+                                    <span class="kw">for </span>v <span class="kw">in </span>after {
+                                        j += <span class="number">1</span>;
+                                        <span class="kw">match </span>j {
+                                            <span class="number">1 </span>=&gt; <span class="macro">assert_eq!</span>(v, BinlogValue::Value(<span class="string">&quot;0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789&quot;</span>.into())),
+                                            <span class="number">2 </span>=&gt; <span class="macro">assert_eq!</span>(v, BinlogValue::Value(<span class="string">&quot;0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456780123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456780123456789012345678901234567890123456789&quot;</span>.into())),
+                                            <span class="number">3 </span>=&gt; <span class="macro">assert_eq!</span>(v, BinlogValue::Value(<span class="number">1_i8</span>.into())),
+                                            <span class="number">4 </span>=&gt; <span class="macro">assert_eq!</span>(v, BinlogValue::Value([<span class="number">0b00000101_u8</span>].into())),
+                                            <span class="number">5 </span>=&gt; <span class="macro">assert_eq!</span>(v, BinlogValue::Value(<span class="string">&quot;0123456789&quot;</span>.into())),
 
-                                            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(),
+                                            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(),
                                         }
                                     }
-                                    <span class="macro">assert_eq!</span>(<span class="ident">j</span>, <span class="number">5</span>);
+                                    <span class="macro">assert_eq!</span>(j, <span class="number">5</span>);
                                 }
-                                <span class="ident">RowsEventData::UpdateRowsEvent</span>(<span class="kw">_</span>) =&gt; {
-                                    <span class="kw">let</span> <span class="ident">before</span> <span class="op">=</span> <span class="ident">before</span>.<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
-                                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">j</span> <span class="op">=</span> <span class="number">0</span>;
-                                    <span class="kw">for</span> <span class="ident">v</span> <span class="kw">in</span> <span class="ident">before</span> {
-                                        <span class="ident">j</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                                        <span class="kw">match</span> <span class="ident">j</span> {
-                                            <span class="number">1</span> =&gt; <span class="macro">assert_eq!</span>(<span class="ident">v</span>, <span class="ident">BinlogValue::Value</span>(<span class="string">&quot;0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789&quot;</span>.<span class="ident">into</span>())),
-                                            <span class="number">2</span> =&gt; <span class="macro">assert_eq!</span>(<span class="ident">v</span>, <span class="ident">BinlogValue::Value</span>(<span class="string">&quot;0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456780123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456780123456789012345678901234567890123456789&quot;</span>.<span class="ident">into</span>())),
-                                            <span class="number">3</span> =&gt; <span class="macro">assert_eq!</span>(<span class="ident">v</span>, <span class="ident">BinlogValue::Value</span>(<span class="number">1_i8</span>.<span class="ident">into</span>())),
-                                            <span class="number">4</span> =&gt; <span class="macro">assert_eq!</span>(<span class="ident">v</span>, <span class="ident">BinlogValue::Value</span>([<span class="number">0b00000101_u8</span>].<span class="ident">into</span>())),
-                                            <span class="number">5</span> =&gt; <span class="macro">assert_eq!</span>(<span class="ident">v</span>, <span class="ident">BinlogValue::Value</span>(<span class="string">&quot;0123456789&quot;</span>.<span class="ident">into</span>())),
+                                RowsEventData::UpdateRowsEvent(<span class="kw">_</span>) =&gt; {
+                                    <span class="kw">let </span>before = before.unwrap().unwrap();
+                                    <span class="kw">let </span><span class="kw-2">mut </span>j = <span class="number">0</span>;
+                                    <span class="kw">for </span>v <span class="kw">in </span>before {
+                                        j += <span class="number">1</span>;
+                                        <span class="kw">match </span>j {
+                                            <span class="number">1 </span>=&gt; <span class="macro">assert_eq!</span>(v, BinlogValue::Value(<span class="string">&quot;0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789&quot;</span>.into())),
+                                            <span class="number">2 </span>=&gt; <span class="macro">assert_eq!</span>(v, BinlogValue::Value(<span class="string">&quot;0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456780123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456780123456789012345678901234567890123456789&quot;</span>.into())),
+                                            <span class="number">3 </span>=&gt; <span class="macro">assert_eq!</span>(v, BinlogValue::Value(<span class="number">1_i8</span>.into())),
+                                            <span class="number">4 </span>=&gt; <span class="macro">assert_eq!</span>(v, BinlogValue::Value([<span class="number">0b00000101_u8</span>].into())),
+                                            <span class="number">5 </span>=&gt; <span class="macro">assert_eq!</span>(v, BinlogValue::Value(<span class="string">&quot;0123456789&quot;</span>.into())),
 
-                                            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(),
+                                            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(),
                                         }
                                     }
-                                    <span class="macro">assert_eq!</span>(<span class="ident">j</span>, <span class="number">5</span>);
+                                    <span class="macro">assert_eq!</span>(j, <span class="number">5</span>);
 
-                                    <span class="kw">let</span> <span class="ident">after</span> <span class="op">=</span> <span class="ident">after</span>.<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
-                                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">j</span> <span class="op">=</span> <span class="number">0</span>;
-                                    <span class="kw">for</span> <span class="ident">v</span> <span class="kw">in</span> <span class="ident">after</span> {
-                                        <span class="ident">j</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                                        <span class="kw">match</span> <span class="ident">j</span> {
-                                            <span class="number">1</span> =&gt; <span class="macro">assert_eq!</span>(<span class="ident">v</span>, <span class="ident">BinlogValue::Value</span>(<span class="string">&quot;field1&quot;</span>.<span class="ident">into</span>())),
-                                            <span class="number">2</span> =&gt; <span class="macro">assert_eq!</span>(<span class="ident">v</span>, <span class="ident">BinlogValue::Value</span>(<span class="string">&quot;field_2&quot;</span>.<span class="ident">into</span>())),
-                                            <span class="number">3</span> =&gt; <span class="macro">assert_eq!</span>(<span class="ident">v</span>, <span class="ident">BinlogValue::Value</span>(<span class="number">2_i8</span>.<span class="ident">into</span>())),
-                                            <span class="number">4</span> =&gt; <span class="macro">assert_eq!</span>(<span class="ident">v</span>, <span class="ident">BinlogValue::Value</span>([<span class="number">0b00001010_u8</span>].<span class="ident">into</span>())),
-                                            <span class="number">5</span> =&gt; <span class="macro">assert_eq!</span>(<span class="ident">v</span>, <span class="ident">BinlogValue::Value</span>(<span class="string">&quot;0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456780123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456780123456789012345678901234567890123456789&quot;</span>.<span class="ident">into</span>())),
-                                            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(),
+                                    <span class="kw">let </span>after = after.unwrap().unwrap();
+                                    <span class="kw">let </span><span class="kw-2">mut </span>j = <span class="number">0</span>;
+                                    <span class="kw">for </span>v <span class="kw">in </span>after {
+                                        j += <span class="number">1</span>;
+                                        <span class="kw">match </span>j {
+                                            <span class="number">1 </span>=&gt; <span class="macro">assert_eq!</span>(v, BinlogValue::Value(<span class="string">&quot;field1&quot;</span>.into())),
+                                            <span class="number">2 </span>=&gt; <span class="macro">assert_eq!</span>(v, BinlogValue::Value(<span class="string">&quot;field_2&quot;</span>.into())),
+                                            <span class="number">3 </span>=&gt; <span class="macro">assert_eq!</span>(v, BinlogValue::Value(<span class="number">2_i8</span>.into())),
+                                            <span class="number">4 </span>=&gt; <span class="macro">assert_eq!</span>(v, BinlogValue::Value([<span class="number">0b00001010_u8</span>].into())),
+                                            <span class="number">5 </span>=&gt; <span class="macro">assert_eq!</span>(v, BinlogValue::Value(<span class="string">&quot;0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456780123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456780123456789012345678901234567890123456789&quot;</span>.into())),
+                                            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(),
                                         }
                                     }
-                                    <span class="macro">assert_eq!</span>(<span class="ident">j</span>, <span class="number">5</span>);
+                                    <span class="macro">assert_eq!</span>(j, <span class="number">5</span>);
                                 }
-                                <span class="ident">RowsEventData::DeleteRowsEvent</span>(<span class="kw">_</span>) =&gt; {
-                                    <span class="macro">assert!</span>(<span class="ident">after</span>.<span class="ident">is_none</span>());
+                                RowsEventData::DeleteRowsEvent(<span class="kw">_</span>) =&gt; {
+                                    <span class="macro">assert!</span>(after.is_none());
 
-                                    <span class="kw">let</span> <span class="ident">before</span> <span class="op">=</span> <span class="ident">before</span>.<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
-                                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">j</span> <span class="op">=</span> <span class="number">0</span>;
-                                    <span class="kw">for</span> <span class="ident">v</span> <span class="kw">in</span> <span class="ident">before</span> {
-                                        <span class="ident">j</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                                        <span class="kw">match</span> <span class="ident">j</span> {
-                                            <span class="number">1</span> =&gt; <span class="macro">assert_eq!</span>(<span class="ident">v</span>, <span class="ident">BinlogValue::Value</span>(<span class="string">&quot;field1&quot;</span>.<span class="ident">into</span>())),
-                                            <span class="number">2</span> =&gt; <span class="macro">assert_eq!</span>(<span class="ident">v</span>, <span class="ident">BinlogValue::Value</span>(<span class="string">&quot;field_2&quot;</span>.<span class="ident">into</span>())),
-                                            <span class="number">3</span> =&gt; <span class="macro">assert_eq!</span>(<span class="ident">v</span>, <span class="ident">BinlogValue::Value</span>(<span class="number">2_i8</span>.<span class="ident">into</span>())),
-                                            <span class="number">4</span> =&gt; <span class="macro">assert_eq!</span>(<span class="ident">v</span>, <span class="ident">BinlogValue::Value</span>([<span class="number">0b00001010_u8</span>].<span class="ident">into</span>())),
-                                            <span class="number">5</span> =&gt; <span class="macro">assert_eq!</span>(<span class="ident">v</span>, <span class="ident">BinlogValue::Value</span>(<span class="string">&quot;0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456780123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456780123456789012345678901234567890123456789&quot;</span>.<span class="ident">into</span>())),
-                                            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(),
+                                    <span class="kw">let </span>before = before.unwrap().unwrap();
+                                    <span class="kw">let </span><span class="kw-2">mut </span>j = <span class="number">0</span>;
+                                    <span class="kw">for </span>v <span class="kw">in </span>before {
+                                        j += <span class="number">1</span>;
+                                        <span class="kw">match </span>j {
+                                            <span class="number">1 </span>=&gt; <span class="macro">assert_eq!</span>(v, BinlogValue::Value(<span class="string">&quot;field1&quot;</span>.into())),
+                                            <span class="number">2 </span>=&gt; <span class="macro">assert_eq!</span>(v, BinlogValue::Value(<span class="string">&quot;field_2&quot;</span>.into())),
+                                            <span class="number">3 </span>=&gt; <span class="macro">assert_eq!</span>(v, BinlogValue::Value(<span class="number">2_i8</span>.into())),
+                                            <span class="number">4 </span>=&gt; <span class="macro">assert_eq!</span>(v, BinlogValue::Value([<span class="number">0b00001010_u8</span>].into())),
+                                            <span class="number">5 </span>=&gt; <span class="macro">assert_eq!</span>(v, BinlogValue::Value(<span class="string">&quot;0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456780123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456780123456789012345678901234567890123456789&quot;</span>.into())),
+                                            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(),
                                         }
                                     }
-                                    <span class="macro">assert_eq!</span>(<span class="ident">j</span>, <span class="number">5</span>);
+                                    <span class="macro">assert_eq!</span>(j, <span class="number">5</span>);
                                 }
-                                <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(),
+                                <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(),
                             }
                         }
                     }
                 }
 
-                <span class="kw">if</span> <span class="ident">file_path</span>.<span class="ident">file_name</span>().<span class="ident">unwrap</span>() <span class="op">==</span> <span class="string">&quot;mariadb-bin.000001&quot;</span> {
-                    <span class="comment">// Extraneous bytes in RotateEvent file name</span>
-                    <span class="comment">// https://github.com/blackbeam/mysql_async/issues/189</span>
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">EventData::RotateEvent</span>(<span class="ident">ev</span>)) <span class="op">=</span> <span class="ident">ev</span>.<span class="ident">read_data</span>().<span class="ident">unwrap</span>() {
-                        <span class="macro">assert_ne!</span>(<span class="ident">ev</span>.<span class="ident">name_raw</span>(), <span class="string">b&quot;mariadb-bin.000001&quot;</span>);
+                <span class="kw">if </span>file_path.file_name().unwrap() == <span class="string">&quot;mariadb-bin.000001&quot; </span>{
+                    <span class="comment">// Extraneous bytes in RotateEvent file name
+                    // https://github.com/blackbeam/mysql_async/issues/189
+                    </span><span class="kw">if let </span><span class="prelude-val">Some</span>(EventData::RotateEvent(ev)) = ev.read_data().unwrap() {
+                        <span class="macro">assert_ne!</span>(ev.name_raw(), <span class="string">b&quot;mariadb-bin.000001&quot;</span>);
                     }
                 }
 
-                <span class="kw">if</span> <span class="ident">file_path</span>.<span class="ident">file_name</span>().<span class="ident">unwrap</span>() <span class="op">==</span> <span class="string">&quot;mysql_type_bit.000001&quot;</span> {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">EventData::RowsEvent</span>(<span class="ident">ev</span>)) <span class="op">=</span> <span class="ident">ev</span>.<span class="ident">read_data</span>().<span class="ident">unwrap</span>() {
-                        <span class="kw">let</span> <span class="ident">table_map_event</span> <span class="op">=</span> <span class="ident">binlog_file</span>.<span class="ident">reader</span>().<span class="ident">get_tme</span>(<span class="ident">ev</span>.<span class="ident">table_id</span>()).<span class="ident">unwrap</span>();
-                        <span class="kw">for</span> <span class="ident">row</span> <span class="kw">in</span> <span class="ident">ev</span>.<span class="ident">rows</span>(<span class="ident">table_map_event</span>) {
-                            <span class="kw">let</span> (<span class="ident">before</span>, <span class="ident">after</span>) <span class="op">=</span> <span class="ident">row</span>.<span class="ident">unwrap</span>();
-                            <span class="macro">assert_eq!</span>(<span class="ident">before</span>, <span class="prelude-val">None</span>);
+                <span class="kw">if </span>file_path.file_name().unwrap() == <span class="string">&quot;mysql_type_bit.000001&quot; </span>{
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(EventData::RowsEvent(ev)) = ev.read_data().unwrap() {
+                        <span class="kw">let </span>table_map_event = binlog_file.reader().get_tme(ev.table_id()).unwrap();
+                        <span class="kw">for </span>row <span class="kw">in </span>ev.rows(table_map_event) {
+                            <span class="kw">let </span>(before, after) = row.unwrap();
+                            <span class="macro">assert_eq!</span>(before, <span class="prelude-val">None</span>);
                             <span class="macro">assert_eq!</span>(
-                                <span class="ident">after</span>.<span class="ident">unwrap</span>().<span class="ident">unwrap</span>(),
+                                after.unwrap().unwrap(),
                                 <span class="macro">vec!</span>[
-                                    <span class="ident">BinlogValue::Value</span>(<span class="ident">Value::Bytes</span>(<span class="macro">vec!</span>[<span class="number">0b100</span>])),
-                                    <span class="ident">BinlogValue::Value</span>(<span class="ident">Value::Bytes</span>(<span class="string">b&quot;foo&quot;</span>.<span class="ident">to_vec</span>())),
-                                    <span class="ident">BinlogValue::Value</span>(<span class="ident">Value::Bytes</span>(<span class="macro">vec!</span>[<span class="number">0b100000</span>])),
+                                    BinlogValue::Value(Value::Bytes(<span class="macro">vec!</span>[<span class="number">0b100</span>])),
+                                    BinlogValue::Value(Value::Bytes(<span class="string">b&quot;foo&quot;</span>.to_vec())),
+                                    BinlogValue::Value(Value::Bytes(<span class="macro">vec!</span>[<span class="number">0b100000</span>])),
                                 ],
                             );
                         }
                     }
                 }
 
-                <span class="kw">if</span> <span class="ident">file_path</span>.<span class="ident">file_name</span>().<span class="ident">unwrap</span>() <span class="op">!</span><span class="op">=</span> <span class="string">&quot;mariadb-bin.000001&quot;</span> {
-                    <span class="macro">assert_eq!</span>(<span class="ident">output</span>, <span class="kw-2">&amp;</span><span class="ident">file_data</span>[<span class="ident">ev_pos</span>..<span class="ident">ev_end</span>]);
+                <span class="kw">if </span>file_path.file_name().unwrap() != <span class="string">&quot;mariadb-bin.000001&quot; </span>{
+                    <span class="macro">assert_eq!</span>(output, <span class="kw-2">&amp;</span>file_data[ev_pos..ev_end]);
                 }
 
-                <span class="ident">output</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-                <span class="ident">event</span>.<span class="ident">serialize</span>(<span class="kw-2">&amp;mut</span> <span class="ident">output</span>);
+                output = Vec::new();
+                event.serialize(<span class="kw-2">&amp;mut </span>output);
 
-                <span class="kw">if</span> <span class="macro">matches!</span>(<span class="ident">event</span>, <span class="ident">EventData::UserVarEvent</span>(<span class="kw">_</span>)) {
-                    <span class="comment">// Server may or may not write the flags field, but we will always write it.</span>
-                    <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">output</span>[..<span class="ident">ev</span>.<span class="ident">data</span>().<span class="ident">len</span>()], <span class="ident">ev</span>.<span class="ident">data</span>());
-                    <span class="macro">assert!</span>(<span class="ident">output</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">ev</span>.<span class="ident">data</span>().<span class="ident">len</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">output</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">ev</span>.<span class="ident">data</span>().<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span>);
-                } <span class="kw">else</span> <span class="kw">if</span> (<span class="macro">matches!</span>(<span class="ident">event</span>, <span class="ident">EventData::GtidEvent</span>(<span class="kw">_</span>))
-                    <span class="op">|</span><span class="op">|</span> <span class="macro">matches!</span>(<span class="ident">event</span>, <span class="ident">EventData::AnonymousGtidEvent</span>(<span class="kw">_</span>)))
-                    <span class="op">&amp;&amp;</span> <span class="ident">ev</span>.<span class="ident">fde</span>().<span class="ident">split_version</span>() <span class="op">&lt;</span> (<span class="number">5</span>, <span class="number">7</span>, <span class="number">0</span>)
+                <span class="kw">if </span><span class="macro">matches!</span>(event, EventData::UserVarEvent(<span class="kw">_</span>)) {
+                    <span class="comment">// Server may or may not write the flags field, but we will always write it.
+                    </span><span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>output[..ev.data().len()], ev.data());
+                    <span class="macro">assert!</span>(output.len() == ev.data().len() || output.len() == ev.data().len() + <span class="number">1</span>);
+                } <span class="kw">else if </span>(<span class="macro">matches!</span>(event, EventData::GtidEvent(<span class="kw">_</span>))
+                    || <span class="macro">matches!</span>(event, EventData::AnonymousGtidEvent(<span class="kw">_</span>)))
+                    &amp;&amp; ev.fde().split_version() &lt; (<span class="number">5</span>, <span class="number">7</span>, <span class="number">0</span>)
                 {
-                    <span class="comment">// MySql 5.6 does not write TS_TYPE and following post-header fields</span>
-                    <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">output</span>[..<span class="ident">GtidEvent::POST_HEADER_LENGTH</span> <span class="op">-</span> <span class="number">1</span> <span class="op">-</span> <span class="number">16</span>], <span class="ident">ev</span>.<span class="ident">data</span>());
-                } <span class="kw">else</span> <span class="kw">if</span> (<span class="macro">matches!</span>(<span class="ident">event</span>, <span class="ident">EventData::GtidEvent</span>(<span class="kw">_</span>))
-                    <span class="op">|</span><span class="op">|</span> <span class="macro">matches!</span>(<span class="ident">event</span>, <span class="ident">EventData::AnonymousGtidEvent</span>(<span class="kw">_</span>)))
-                    <span class="op">&amp;&amp;</span> <span class="ident">ev</span>.<span class="ident">fde</span>().<span class="ident">split_version</span>() <span class="op">&lt;</span> (<span class="number">5</span>, <span class="number">8</span>, <span class="number">0</span>)
+                    <span class="comment">// MySql 5.6 does not write TS_TYPE and following post-header fields
+                    </span><span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>output[..GtidEvent::POST_HEADER_LENGTH - <span class="number">1 </span>- <span class="number">16</span>], ev.data());
+                } <span class="kw">else if </span>(<span class="macro">matches!</span>(event, EventData::GtidEvent(<span class="kw">_</span>))
+                    || <span class="macro">matches!</span>(event, EventData::AnonymousGtidEvent(<span class="kw">_</span>)))
+                    &amp;&amp; ev.fde().split_version() &lt; (<span class="number">5</span>, <span class="number">8</span>, <span class="number">0</span>)
                 {
-                    <span class="comment">// MySql 5.7 contains only post-header in this event</span>
-                    <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">output</span>[..<span class="ident">GtidEvent::POST_HEADER_LENGTH</span>], <span class="ident">ev</span>.<span class="ident">data</span>());
-                } <span class="kw">else</span> {
-                    <span class="macro">assert_eq!</span>(<span class="ident">output</span>, <span class="ident">ev</span>.<span class="ident">data</span>());
+                    <span class="comment">// MySql 5.7 contains only post-header in this event
+                    </span><span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>output[..GtidEvent::POST_HEADER_LENGTH], ev.data());
+                } <span class="kw">else </span>{
+                    <span class="macro">assert_eq!</span>(output, ev.data());
                 }
 
-                <span class="ident">ev_pos</span> <span class="op">=</span> <span class="ident">ev_end</span>;
+                ev_pos = ev_end;
             }
         }
 
@@ -1711,4 +1711,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

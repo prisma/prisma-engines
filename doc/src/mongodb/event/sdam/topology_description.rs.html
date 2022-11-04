@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/event/sdam/topology_description.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>topology_description.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mongodb/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/event/sdam/topology_description.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>topology_description.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mongodb/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -137,144 +137,144 @@
 <span id="137">137</span>
 <span id="138">138</span>
 <span id="139">139</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::HashMap</span>, <span class="ident">fmt</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>std::{collections::HashMap, fmt};
 
-<span class="kw">use</span> <span class="ident">serde::Serialize</span>;
+<span class="kw">use </span>serde::Serialize;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">bson::oid::ObjectId</span>,
-    <span class="ident">client::options::ServerAddress</span>,
-    <span class="ident">sdam</span>::{<span class="ident">ServerInfo</span>, <span class="ident">TopologyType</span>},
-    <span class="ident">selection_criteria</span>::{<span class="ident">ReadPreference</span>, <span class="ident">SelectionCriteria</span>},
+<span class="kw">use crate</span>::{
+    bson::oid::ObjectId,
+    client::options::ServerAddress,
+    sdam::{ServerInfo, TopologyType},
+    selection_criteria::{ReadPreference, SelectionCriteria},
 };
 
-<span class="doccomment">/// A description of the most up-to-date information known about a topology. Further details can</span>
-<span class="doccomment">/// be found in the [Server Discovery and Monitoring specification](https://github.com/mongodb/specifications/blob/master/source/server-discovery-and-monitoring/server-discovery-and-monitoring.rst).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TopologyDescription</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">description</span>: <span class="ident"><span class="kw">crate</span>::sdam::TopologyDescription</span>,
+<span class="doccomment">/// A description of the most up-to-date information known about a topology. Further details can
+/// be found in the [Server Discovery and Monitoring specification](https://github.com/mongodb/specifications/blob/master/source/server-discovery-and-monitoring/server-discovery-and-monitoring.rst).
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>TopologyDescription {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) description: <span class="kw">crate</span>::sdam::TopologyDescription,
 }
 
-<span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">TopologyDescription</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">serde::Serializer</span>,
+<span class="kw">impl </span>Serialize <span class="kw">for </span>TopologyDescription {
+    <span class="kw">fn </span>serialize&lt;S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: serde::Serializer,
     {
-        <span class="self">self</span>.<span class="ident">description</span>.<span class="ident">serialize</span>(<span class="ident">serializer</span>)
+        <span class="self">self</span>.description.serialize(serializer)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::sdam::TopologyDescription</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TopologyDescription</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">description</span>: <span class="ident"><span class="kw">crate</span>::sdam::TopologyDescription</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">description</span> }
+<span class="kw">impl </span>From&lt;<span class="kw">crate</span>::sdam::TopologyDescription&gt; <span class="kw">for </span>TopologyDescription {
+    <span class="kw">fn </span>from(description: <span class="kw">crate</span>::sdam::TopologyDescription) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ description }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TopologyDescription</span> {
-    <span class="doccomment">/// Whether this topology has a readable server available that satisfies the specified selection</span>
-    <span class="doccomment">/// criteria.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_readable_server</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">selection_criteria</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SelectionCriteria</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">description</span>.<span class="ident">suitable_servers_in_latency_window</span>(
-            <span class="kw-2">&amp;</span><span class="ident">selection_criteria</span>
-                .<span class="ident">unwrap_or</span>(<span class="ident">SelectionCriteria::ReadPreference</span>(<span class="ident">ReadPreference::Primary</span>)),
+<span class="kw">impl </span>TopologyDescription {
+    <span class="doccomment">/// Whether this topology has a readable server available that satisfies the specified selection
+    /// criteria.
+    </span><span class="kw">pub fn </span>has_readable_server(<span class="kw-2">&amp;</span><span class="self">self</span>, selection_criteria: <span class="prelude-ty">Option</span>&lt;SelectionCriteria&gt;) -&gt; bool {
+        <span class="kw">match </span><span class="self">self</span>.description.suitable_servers_in_latency_window(
+            <span class="kw-2">&amp;</span>selection_criteria
+                .unwrap_or(SelectionCriteria::ReadPreference(ReadPreference::Primary)),
         ) {
-            <span class="prelude-val">Ok</span>(<span class="ident">servers</span>) =&gt; <span class="op">!</span><span class="ident">servers</span>.<span class="ident">is_empty</span>(),
+            <span class="prelude-val">Ok</span>(servers) =&gt; !servers.is_empty(),
             <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="doccomment">/// Whether this topology has a writable server available.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has_writable_server</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">description</span>.<span class="ident">topology_type</span> {
-            <span class="ident">TopologyType::Unknown</span> <span class="op">|</span> <span class="ident">TopologyType::ReplicaSetNoPrimary</span> =&gt; <span class="bool-val">false</span>,
-            <span class="ident">TopologyType::Single</span> <span class="op">|</span> <span class="ident">TopologyType::Sharded</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">description</span>.<span class="ident">has_available_servers</span>()
+    <span class="doccomment">/// Whether this topology has a writable server available.
+    </span><span class="kw">pub fn </span>has_writable_server(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="self">self</span>.description.topology_type {
+            TopologyType::Unknown | TopologyType::ReplicaSetNoPrimary =&gt; <span class="bool-val">false</span>,
+            TopologyType::Single | TopologyType::Sharded =&gt; {
+                <span class="self">self</span>.description.has_available_servers()
             }
-            <span class="ident">TopologyType::ReplicaSetWithPrimary</span> <span class="op">|</span> <span class="ident">TopologyType::LoadBalanced</span> =&gt; <span class="bool-val">true</span>,
+            TopologyType::ReplicaSetWithPrimary | TopologyType::LoadBalanced =&gt; <span class="bool-val">true</span>,
         }
     }
 
-    <span class="doccomment">/// Gets the type of the topology.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">topology_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TopologyType</span> {
-        <span class="self">self</span>.<span class="ident">description</span>.<span class="ident">topology_type</span>
+    <span class="doccomment">/// Gets the type of the topology.
+    </span><span class="kw">pub fn </span>topology_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TopologyType {
+        <span class="self">self</span>.description.topology_type
     }
 
-    <span class="doccomment">/// Gets the set name of the topology.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">description</span>.<span class="ident">set_name</span>.<span class="ident">as_ref</span>()
+    <span class="doccomment">/// Gets the set name of the topology.
+    </span><span class="kw">pub fn </span>set_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>String&gt; {
+        <span class="self">self</span>.description.set_name.as_ref()
     }
 
-    <span class="doccomment">/// Gets the max set version of the topology.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_set_version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">description</span>.<span class="ident">max_set_version</span>
+    <span class="doccomment">/// Gets the max set version of the topology.
+    </span><span class="kw">pub fn </span>max_set_version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;i32&gt; {
+        <span class="self">self</span>.description.max_set_version
     }
 
-    <span class="doccomment">/// Gets the max election ID of the topology.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_election_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ObjectId</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">description</span>.<span class="ident">max_election_id</span>
+    <span class="doccomment">/// Gets the max election ID of the topology.
+    </span><span class="kw">pub fn </span>max_election_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ObjectId&gt; {
+        <span class="self">self</span>.description.max_election_id
     }
 
-    <span class="doccomment">/// Gets the compatibility error of the topology.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compatibility_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">description</span>.<span class="ident">compatibility_error</span>.<span class="ident">as_ref</span>()
+    <span class="doccomment">/// Gets the compatibility error of the topology.
+    </span><span class="kw">pub fn </span>compatibility_error(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>String&gt; {
+        <span class="self">self</span>.description.compatibility_error.as_ref()
     }
 
-    <span class="doccomment">/// Gets the servers in the topology.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">servers</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ServerAddress</span>, <span class="ident">ServerInfo</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">description</span>
-            .<span class="ident">servers</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">address</span>, <span class="ident">description</span>)<span class="op">|</span> (<span class="ident">address</span>, <span class="ident">ServerInfo::new_borrowed</span>(<span class="ident">description</span>)))
-            .<span class="ident">collect</span>()
+    <span class="doccomment">/// Gets the servers in the topology.
+    </span><span class="kw">pub fn </span>servers(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; HashMap&lt;<span class="kw-2">&amp;</span>ServerAddress, ServerInfo&gt; {
+        <span class="self">self</span>.description
+            .servers
+            .iter()
+            .map(|(address, description)| (address, ServerInfo::new_borrowed(description)))
+            .collect()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">TopologyDescription</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Topology Description&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;Type&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">topology_type</span>())
-            .<span class="ident">field</span>(<span class="string">&quot;Set Name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">set_name</span>())
-            .<span class="ident">field</span>(<span class="string">&quot;Max Set Version&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">max_set_version</span>())
-            .<span class="ident">field</span>(<span class="string">&quot;Max Election ID&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">max_election_id</span>())
-            .<span class="ident">field</span>(<span class="string">&quot;Compatibility Error&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">compatibility_error</span>())
-            .<span class="ident">field</span>(<span class="string">&quot;Servers&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">servers</span>().<span class="ident">values</span>())
-            .<span class="ident">finish</span>()
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>TopologyDescription {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; std::result::Result&lt;(), fmt::Error&gt; {
+        f.debug_struct(<span class="string">&quot;Topology Description&quot;</span>)
+            .field(<span class="string">&quot;Type&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.topology_type())
+            .field(<span class="string">&quot;Set Name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.set_name())
+            .field(<span class="string">&quot;Max Set Version&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.max_set_version())
+            .field(<span class="string">&quot;Max Election ID&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.max_election_id())
+            .field(<span class="string">&quot;Compatibility Error&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.compatibility_error())
+            .field(<span class="string">&quot;Servers&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.servers().values())
+            .finish()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">TopologyDescription</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{{ Type: {:?}&quot;</span>, <span class="self">self</span>.<span class="ident">description</span>.<span class="ident">topology_type</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>TopologyDescription {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; std::result::Result&lt;(), fmt::Error&gt; {
+        <span class="macro">write!</span>(f, <span class="string">&quot;{{ Type: {:?}&quot;</span>, <span class="self">self</span>.description.topology_type)<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">set_name</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">description</span>.<span class="ident">set_name</span> {
-            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;, Set Name: {}&quot;</span>, <span class="ident">set_name</span>)<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>set_name) = <span class="self">self</span>.description.set_name {
+            <span class="macro">write!</span>(f, <span class="string">&quot;, Set Name: {}&quot;</span>, set_name)<span class="question-mark">?</span>;
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">max_set_version</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">description</span>.<span class="ident">max_set_version</span> {
-            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;, Max Set Version: {}&quot;</span>, <span class="ident">max_set_version</span>)<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(max_set_version) = <span class="self">self</span>.description.max_set_version {
+            <span class="macro">write!</span>(f, <span class="string">&quot;, Max Set Version: {}&quot;</span>, max_set_version)<span class="question-mark">?</span>;
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">max_election_id</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">description</span>.<span class="ident">max_election_id</span> {
-            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;, Max Election ID: {}&quot;</span>, <span class="ident">max_election_id</span>)<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(max_election_id) = <span class="self">self</span>.description.max_election_id {
+            <span class="macro">write!</span>(f, <span class="string">&quot;, Max Election ID: {}&quot;</span>, max_election_id)<span class="question-mark">?</span>;
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">compatibility_error</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">description</span>.<span class="ident">compatibility_error</span> {
-            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;, Compatibility Error: {}&quot;</span>, <span class="ident">compatibility_error</span>)<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>compatibility_error) = <span class="self">self</span>.description.compatibility_error {
+            <span class="macro">write!</span>(f, <span class="string">&quot;, Compatibility Error: {}&quot;</span>, compatibility_error)<span class="question-mark">?</span>;
         }
 
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">description</span>.<span class="ident">servers</span>.<span class="ident">is_empty</span>() {
-            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;, Servers: &quot;</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">description</span>.<span class="ident">servers</span>.<span class="ident">values</span>();
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">server</span>) <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">next</span>() {
-                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">ServerInfo::new_borrowed</span>(<span class="ident">server</span>))<span class="question-mark">?</span>;
+        <span class="kw">if </span>!<span class="self">self</span>.description.servers.is_empty() {
+            <span class="macro">write!</span>(f, <span class="string">&quot;, Servers: &quot;</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>iter = <span class="self">self</span>.description.servers.values();
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(server) = iter.next() {
+                <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, ServerInfo::new_borrowed(server))<span class="question-mark">?</span>;
             }
-            <span class="kw">for</span> <span class="ident">server</span> <span class="kw">in</span> <span class="ident">iter</span> {
-                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;, {}&quot;</span>, <span class="ident">ServerInfo::new_borrowed</span>(<span class="ident">server</span>))<span class="question-mark">?</span>;
+            <span class="kw">for </span>server <span class="kw">in </span>iter {
+                <span class="macro">write!</span>(f, <span class="string">&quot;, {}&quot;</span>, ServerInfo::new_borrowed(server))<span class="question-mark">?</span>;
             }
         }
 
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot; }}&quot;</span>)
+        <span class="macro">write!</span>(f, <span class="string">&quot; }}&quot;</span>)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

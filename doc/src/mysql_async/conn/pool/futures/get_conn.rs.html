@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mysql_async-998d87ac262afe55/e3f8bdb/src/conn/pool/futures/get_conn.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>get_conn.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../mysql_async/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mysql_async-998d87ac262afe55/e3f8bdb/src/conn/pool/futures/get_conn.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>get_conn.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../mysql_async/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -164,152 +164,152 @@
 <span id="164">164</span>
 <span id="165">165</span>
 <span id="166">166</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2016 Anatoly Ikorsky</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2016 Anatoly Ikorsky
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">fmt</span>,
-    <span class="ident">future::Future</span>,
-    <span class="ident">pin::Pin</span>,
-    <span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>},
+</span><span class="kw">use </span>std::{
+    fmt,
+    future::Future,
+    pin::Pin,
+    task::{Context, Poll},
 };
 
-<span class="kw">use</span> <span class="ident">futures_core::ready</span>;
+<span class="kw">use </span>futures_core::ready;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">conn</span>::{<span class="ident">pool::Pool</span>, <span class="ident">Conn</span>},
-    <span class="ident">error</span>::<span class="kw-2">*</span>,
+<span class="kw">use crate</span>::{
+    conn::{pool::Pool, Conn},
+    error::<span class="kw-2">*</span>,
 };
 
-<span class="doccomment">/// States of the GetConn future.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">GetConnInner</span> {
-    <span class="ident">New</span>,
-    <span class="ident">Done</span>,
-    <span class="comment">// TODO: one day this should be an existential</span>
-    <span class="ident">Connecting</span>(<span class="ident"><span class="kw">crate</span>::BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">Conn</span><span class="op">&gt;</span>),
-    <span class="doccomment">/// This future will check, that idling connection is alive.</span>
-    <span class="ident">Checking</span>(<span class="ident"><span class="kw">crate</span>::BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">Conn</span><span class="op">&gt;</span>),
+<span class="doccomment">/// States of the GetConn future.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>GetConnInner {
+    New,
+    Done,
+    <span class="comment">// TODO: one day this should be an existential
+    </span>Connecting(<span class="kw">crate</span>::BoxFuture&lt;<span class="lifetime">&#39;static</span>, Conn&gt;),
+    <span class="doccomment">/// This future will check, that idling connection is alive.
+    </span>Checking(<span class="kw">crate</span>::BoxFuture&lt;<span class="lifetime">&#39;static</span>, Conn&gt;),
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">GetConnInner</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">GetConnInner::New</span> =&gt; <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;GetConnInner::New&quot;</span>).<span class="ident">finish</span>(),
-            <span class="ident">GetConnInner::Done</span> =&gt; <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;GetConnInner::Done&quot;</span>).<span class="ident">finish</span>(),
-            <span class="ident">GetConnInner::Connecting</span>(<span class="kw">_</span>) =&gt; <span class="ident">f</span>
-                .<span class="ident">debug_tuple</span>(<span class="string">&quot;GetConnInner::Connecting&quot;</span>)
-                .<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="string">&quot;&lt;future&gt;&quot;</span>)
-                .<span class="ident">finish</span>(),
-            <span class="ident">GetConnInner::Checking</span>(<span class="kw">_</span>) =&gt; <span class="ident">f</span>
-                .<span class="ident">debug_tuple</span>(<span class="string">&quot;GetConnInner::Checking&quot;</span>)
-                .<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="string">&quot;&lt;future&gt;&quot;</span>)
-                .<span class="ident">finish</span>(),
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>GetConnInner {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            GetConnInner::New =&gt; f.debug_tuple(<span class="string">&quot;GetConnInner::New&quot;</span>).finish(),
+            GetConnInner::Done =&gt; f.debug_tuple(<span class="string">&quot;GetConnInner::Done&quot;</span>).finish(),
+            GetConnInner::Connecting(<span class="kw">_</span>) =&gt; f
+                .debug_tuple(<span class="string">&quot;GetConnInner::Connecting&quot;</span>)
+                .field(<span class="kw-2">&amp;</span><span class="string">&quot;&lt;future&gt;&quot;</span>)
+                .finish(),
+            GetConnInner::Checking(<span class="kw">_</span>) =&gt; f
+                .debug_tuple(<span class="string">&quot;GetConnInner::Checking&quot;</span>)
+                .field(<span class="kw-2">&amp;</span><span class="string">&quot;&lt;future&gt;&quot;</span>)
+                .finish(),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">GetConnInner</span> {
-    <span class="doccomment">/// Take the value of the inner connection, resetting it to `New`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">GetConnInner</span> {
-        <span class="ident">std::mem::replace</span>(<span class="self">self</span>, <span class="ident">GetConnInner::New</span>)
+<span class="kw">impl </span>GetConnInner {
+    <span class="doccomment">/// Take the value of the inner connection, resetting it to `New`.
+    </span><span class="kw">pub fn </span>take(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; GetConnInner {
+        std::mem::replace(<span class="self">self</span>, GetConnInner::New)
     }
 }
 
-<span class="doccomment">/// This future will take connection from a pool and resolve to [`Conn`].</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;futures do nothing unless you `.await` or poll them&quot;</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GetConn</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">pool</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Pool</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">inner</span>: <span class="ident">GetConnInner</span>,
+<span class="doccomment">/// This future will take connection from a pool and resolve to [`Conn`].
+</span><span class="attribute">#[derive(Debug)]
+#[must_use = <span class="string">&quot;futures do nothing unless you `.await` or poll them&quot;</span>]
+</span><span class="kw">pub struct </span>GetConn {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) pool: <span class="prelude-ty">Option</span>&lt;Pool&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) inner: GetConnInner,
 }
 
-<span class="kw">impl</span> <span class="ident">GetConn</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">pool</span>: <span class="kw-2">&amp;</span><span class="ident">Pool</span>) -&gt; <span class="ident">GetConn</span> {
-        <span class="ident">GetConn</span> {
-            <span class="ident">pool</span>: <span class="prelude-val">Some</span>(<span class="ident">pool</span>.<span class="ident">clone</span>()),
-            <span class="ident">inner</span>: <span class="ident">GetConnInner::New</span>,
+<span class="kw">impl </span>GetConn {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(pool: <span class="kw-2">&amp;</span>Pool) -&gt; GetConn {
+        GetConn {
+            pool: <span class="prelude-val">Some</span>(pool.clone()),
+            inner: GetConnInner::New,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">pool_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Pool</span> {
-        <span class="self">self</span>.<span class="ident">pool</span>
-            .<span class="ident">as_mut</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;GetConn::poll polled after returning Async::Ready&quot;</span>)
+    <span class="kw">fn </span>pool_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>Pool {
+        <span class="self">self</span>.pool
+            .as_mut()
+            .expect(<span class="string">&quot;GetConn::poll polled after returning Async::Ready&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">pool_take</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Pool</span> {
-        <span class="self">self</span>.<span class="ident">pool</span>
-            .<span class="ident">take</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;GetConn::poll polled after returning Async::Ready&quot;</span>)
+    <span class="kw">fn </span>pool_take(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Pool {
+        <span class="self">self</span>.pool
+            .take()
+            .expect(<span class="string">&quot;GetConn::poll polled after returning Async::Ready&quot;</span>)
     }
 }
 
-<span class="comment">// this manual implementation of Future may seem stupid, but we sort</span>
-<span class="comment">// of need it to get the dropping behavior we want.</span>
-<span class="kw">impl</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">GetConn</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Conn</span><span class="op">&gt;</span>;
+<span class="comment">// this manual implementation of Future may seem stupid, but we sort
+// of need it to get the dropping behavior we want.
+</span><span class="kw">impl </span>Future <span class="kw">for </span>GetConn {
+    <span class="kw">type </span>Output = <span class="prelude-ty">Result</span>&lt;Conn&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">inner</span> {
-                <span class="ident">GetConnInner::New</span> =&gt; <span class="kw">match</span> <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="self">self</span>.<span class="ident">pool_mut</span>()).<span class="ident">poll_new_conn</span>(<span class="ident">cx</span>))<span class="question-mark">?</span>
-                    .<span class="ident">inner</span>
-                    .<span class="ident">take</span>()
+    <span class="kw">fn </span>poll(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="kw">loop </span>{
+            <span class="kw">match </span><span class="self">self</span>.inner {
+                GetConnInner::New =&gt; <span class="kw">match </span><span class="macro">ready!</span>(Pin::new(<span class="self">self</span>.pool_mut()).poll_new_conn(cx))<span class="question-mark">?
+                    </span>.inner
+                    .take()
                 {
-                    <span class="ident">GetConnInner::Connecting</span>(<span class="ident">conn_fut</span>) =&gt; {
-                        <span class="self">self</span>.<span class="ident">inner</span> <span class="op">=</span> <span class="ident">GetConnInner::Connecting</span>(<span class="ident">conn_fut</span>);
+                    GetConnInner::Connecting(conn_fut) =&gt; {
+                        <span class="self">self</span>.inner = GetConnInner::Connecting(conn_fut);
                     }
-                    <span class="ident">GetConnInner::Checking</span>(<span class="ident">conn_fut</span>) =&gt; {
-                        <span class="self">self</span>.<span class="ident">inner</span> <span class="op">=</span> <span class="ident">GetConnInner::Checking</span>(<span class="ident">conn_fut</span>);
+                    GetConnInner::Checking(conn_fut) =&gt; {
+                        <span class="self">self</span>.inner = GetConnInner::Checking(conn_fut);
                     }
-                    <span class="ident">GetConnInner::Done</span> =&gt; <span class="macro">unreachable!</span>(
-                        <span class="string">&quot;Pool::poll_new_conn never gives out already-consumed GetConns&quot;</span>
-                    ),
-                    <span class="ident">GetConnInner::New</span> =&gt; {
+                    GetConnInner::Done =&gt; <span class="macro">unreachable!</span>(
+                        <span class="string">&quot;Pool::poll_new_conn never gives out already-consumed GetConns&quot;
+                    </span>),
+                    GetConnInner::New =&gt; {
                         <span class="macro">unreachable!</span>(<span class="string">&quot;Pool::poll_new_conn never gives out GetConnInner::New&quot;</span>)
                     }
                 },
-                <span class="ident">GetConnInner::Done</span> =&gt; {
+                GetConnInner::Done =&gt; {
                     <span class="macro">unreachable!</span>(<span class="string">&quot;GetConn::poll polled after returning Async::Ready&quot;</span>);
                 }
-                <span class="ident">GetConnInner::Connecting</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">f</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="ident">f</span>).<span class="ident">poll</span>(<span class="ident">cx</span>));
-                    <span class="kw">let</span> <span class="ident">pool</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pool_take</span>();
+                GetConnInner::Connecting(<span class="kw-2">ref mut </span>f) =&gt; {
+                    <span class="kw">let </span>result = <span class="macro">ready!</span>(Pin::new(f).poll(cx));
+                    <span class="kw">let </span>pool = <span class="self">self</span>.pool_take();
 
-                    <span class="self">self</span>.<span class="ident">inner</span> <span class="op">=</span> <span class="ident">GetConnInner::Done</span>;
+                    <span class="self">self</span>.inner = GetConnInner::Done;
 
-                    <span class="kw">return</span> <span class="kw">match</span> <span class="ident">result</span> {
-                        <span class="prelude-val">Ok</span>(<span class="kw-2">mut</span> <span class="ident">c</span>) =&gt; {
-                            <span class="ident">c</span>.<span class="ident">inner</span>.<span class="ident">pool</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">pool</span>);
-                            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">c</span>))
+                    <span class="kw">return match </span>result {
+                        <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>c) =&gt; {
+                            c.inner.pool = <span class="prelude-val">Some</span>(pool);
+                            Poll::Ready(<span class="prelude-val">Ok</span>(c))
                         }
-                        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-                            <span class="ident">pool</span>.<span class="ident">cancel_connection</span>();
-                            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>))
+                        <span class="prelude-val">Err</span>(e) =&gt; {
+                            pool.cancel_connection();
+                            Poll::Ready(<span class="prelude-val">Err</span>(e))
                         }
                     };
                 }
-                <span class="ident">GetConnInner::Checking</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">f</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="ident">f</span>).<span class="ident">poll</span>(<span class="ident">cx</span>));
-                    <span class="kw">match</span> <span class="ident">result</span> {
-                        <span class="prelude-val">Ok</span>(<span class="kw-2">mut</span> <span class="ident">checked_conn</span>) =&gt; {
-                            <span class="self">self</span>.<span class="ident">inner</span> <span class="op">=</span> <span class="ident">GetConnInner::Done</span>;
+                GetConnInner::Checking(<span class="kw-2">ref mut </span>f) =&gt; {
+                    <span class="kw">let </span>result = <span class="macro">ready!</span>(Pin::new(f).poll(cx));
+                    <span class="kw">match </span>result {
+                        <span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>checked_conn) =&gt; {
+                            <span class="self">self</span>.inner = GetConnInner::Done;
 
-                            <span class="kw">let</span> <span class="ident">pool</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pool_take</span>();
-                            <span class="ident">checked_conn</span>.<span class="ident">inner</span>.<span class="ident">pool</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">pool</span>);
-                            <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">checked_conn</span>));
+                            <span class="kw">let </span>pool = <span class="self">self</span>.pool_take();
+                            checked_conn.inner.pool = <span class="prelude-val">Some</span>(pool);
+                            <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Ok</span>(checked_conn));
                         }
                         <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
-                            <span class="comment">// Idling connection is broken. We&#39;ll drop it and try again.</span>
-                            <span class="self">self</span>.<span class="ident">inner</span> <span class="op">=</span> <span class="ident">GetConnInner::New</span>;
+                            <span class="comment">// Idling connection is broken. We&#39;ll drop it and try again.
+                            </span><span class="self">self</span>.inner = GetConnInner::New;
 
-                            <span class="kw">let</span> <span class="ident">pool</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pool_mut</span>();
-                            <span class="ident">pool</span>.<span class="ident">cancel_connection</span>();
+                            <span class="kw">let </span>pool = <span class="self">self</span>.pool_mut();
+                            pool.cancel_connection();
                             <span class="kw">continue</span>;
                         }
                     }
@@ -319,16 +319,16 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">GetConn</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="comment">// We drop a connection before it can be resolved, a.k.a. cancelling it.</span>
-        <span class="comment">// Make sure we maintain the necessary invariants towards the pool.</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pool</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">pool</span>.<span class="ident">take</span>() {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">GetConnInner::Connecting</span>(..) <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">take</span>() {
-                <span class="ident">pool</span>.<span class="ident">cancel_connection</span>();
+<span class="kw">impl </span>Drop <span class="kw">for </span>GetConn {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="comment">// We drop a connection before it can be resolved, a.k.a. cancelling it.
+        // Make sure we maintain the necessary invariants towards the pool.
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(pool) = <span class="self">self</span>.pool.take() {
+            <span class="kw">if let </span>GetConnInner::Connecting(..) = <span class="self">self</span>.inner.take() {
+                pool.cancel_connection();
             }
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="mysql_async" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="mysql_async" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-0.4.13/src/util/call_all/common.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>common.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tower/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-0.4.13/src/util/call_all/common.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>common.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tower/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -116,123 +116,123 @@
 <span id="116">116</span>
 <span id="117">117</span>
 <span id="118">118</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">futures_core</span>::{<span class="ident">ready</span>, <span class="ident">Stream</span>};
-<span class="kw">use</span> <span class="ident">pin_project_lite::pin_project</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">future::Future</span>,
-    <span class="ident">pin::Pin</span>,
-    <span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>},
+</pre><pre class="rust"><code><span class="kw">use </span>futures_core::{ready, Stream};
+<span class="kw">use </span>pin_project_lite::pin_project;
+<span class="kw">use </span>std::{
+    future::Future,
+    pin::Pin,
+    task::{Context, Poll},
 };
-<span class="kw">use</span> <span class="ident">tower_service::Service</span>;
+<span class="kw">use </span>tower_service::Service;
 
-<span class="macro">pin_project!</span> {
-    <span class="doccomment">/// The [`Future`] returned by the [`ServiceExt::call_all`] combinator.</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">CallAll</span><span class="op">&lt;</span><span class="ident">Svc</span>, <span class="ident">S</span>, <span class="ident">Q</span><span class="op">&gt;</span> {
-        <span class="ident">service</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Svc</span><span class="op">&gt;</span>,
-        <span class="attribute">#[<span class="ident">pin</span>]</span>
-        <span class="ident">stream</span>: <span class="ident">S</span>,
-        <span class="ident">queue</span>: <span class="ident">Q</span>,
-        <span class="ident">eof</span>: <span class="ident">bool</span>,
+<span class="macro">pin_project! </span>{
+    <span class="doccomment">/// The [`Future`] returned by the [`ServiceExt::call_all`] combinator.
+    </span><span class="attribute">#[derive(Debug)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>CallAll&lt;Svc, S, Q&gt; {
+        service: <span class="prelude-ty">Option</span>&lt;Svc&gt;,
+        <span class="attribute">#[pin]
+        </span>stream: S,
+        queue: Q,
+        eof: bool,
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">Drive</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Future</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>Drive&lt;F: Future&gt; {
+    <span class="kw">fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool;
 
-    <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">future</span>: <span class="ident">F</span>);
+    <span class="kw">fn </span>push(<span class="kw-2">&amp;mut </span><span class="self">self</span>, future: F);
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">F::Output</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>poll(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;F::Output&gt;&gt;;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Svc</span>, <span class="ident">S</span>, <span class="ident">Q</span><span class="op">&gt;</span> <span class="ident">CallAll</span><span class="op">&lt;</span><span class="ident">Svc</span>, <span class="ident">S</span>, <span class="ident">Q</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">Svc</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">S::Item</span><span class="op">&gt;</span>,
-    <span class="ident">Svc::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::BoxError</span><span class="op">&gt;</span>,
-    <span class="ident">S</span>: <span class="ident">Stream</span>,
-    <span class="ident">Q</span>: <span class="ident">Drive</span><span class="op">&lt;</span><span class="ident">Svc::Future</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;Svc, S, Q&gt; CallAll&lt;Svc, S, Q&gt;
+<span class="kw">where
+    </span>Svc: Service&lt;S::Item&gt;,
+    Svc::Error: Into&lt;<span class="kw">crate</span>::BoxError&gt;,
+    S: Stream,
+    Q: Drive&lt;Svc::Future&gt;,
 {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">service</span>: <span class="ident">Svc</span>, <span class="ident">stream</span>: <span class="ident">S</span>, <span class="ident">queue</span>: <span class="ident">Q</span>) -&gt; <span class="ident">CallAll</span><span class="op">&lt;</span><span class="ident">Svc</span>, <span class="ident">S</span>, <span class="ident">Q</span><span class="op">&gt;</span> {
-        <span class="ident">CallAll</span> {
-            <span class="ident">service</span>: <span class="prelude-val">Some</span>(<span class="ident">service</span>),
-            <span class="ident">stream</span>,
-            <span class="ident">queue</span>,
-            <span class="ident">eof</span>: <span class="bool-val">false</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(service: Svc, stream: S, queue: Q) -&gt; CallAll&lt;Svc, S, Q&gt; {
+        CallAll {
+            service: <span class="prelude-val">Some</span>(service),
+            stream,
+            queue,
+            eof: <span class="bool-val">false</span>,
         }
     }
 
-    <span class="doccomment">/// Extract the wrapped [`Service`].</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Svc</span> {
-        <span class="self">self</span>.<span class="ident">service</span>.<span class="ident">take</span>().<span class="ident">expect</span>(<span class="string">&quot;Service already taken&quot;</span>)
+    <span class="doccomment">/// Extract the wrapped [`Service`].
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>into_inner(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; Svc {
+        <span class="self">self</span>.service.take().expect(<span class="string">&quot;Service already taken&quot;</span>)
     }
 
-    <span class="doccomment">/// Extract the wrapped [`Service`].</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">take_service</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">Svc</span> {
-        <span class="self">self</span>.<span class="ident">project</span>()
-            .<span class="ident">service</span>
-            .<span class="ident">take</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;Service already taken&quot;</span>)
+    <span class="doccomment">/// Extract the wrapped [`Service`].
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>take_service(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;) -&gt; Svc {
+        <span class="self">self</span>.project()
+            .service
+            .take()
+            .expect(<span class="string">&quot;Service already taken&quot;</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">unordered</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">super</span>::CallAllUnordered</span><span class="op">&lt;</span><span class="ident">Svc</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-        <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">queue</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">eof</span>);
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>unordered(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="kw">super</span>::CallAllUnordered&lt;Svc, S&gt; {
+        <span class="macro">assert!</span>(<span class="self">self</span>.queue.is_empty() &amp;&amp; !<span class="self">self</span>.eof);
 
-        <span class="ident"><span class="kw">super</span>::CallAllUnordered::new</span>(<span class="self">self</span>.<span class="ident">service</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>(), <span class="self">self</span>.<span class="ident">stream</span>)
+        <span class="kw">super</span>::CallAllUnordered::new(<span class="self">self</span>.service.take().unwrap(), <span class="self">self</span>.stream)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Svc</span>, <span class="ident">S</span>, <span class="ident">Q</span><span class="op">&gt;</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">CallAll</span><span class="op">&lt;</span><span class="ident">Svc</span>, <span class="ident">S</span>, <span class="ident">Q</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">Svc</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">S::Item</span><span class="op">&gt;</span>,
-    <span class="ident">Svc::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::BoxError</span><span class="op">&gt;</span>,
-    <span class="ident">S</span>: <span class="ident">Stream</span>,
-    <span class="ident">Q</span>: <span class="ident">Drive</span><span class="op">&lt;</span><span class="ident">Svc::Future</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;Svc, S, Q&gt; Stream <span class="kw">for </span>CallAll&lt;Svc, S, Q&gt;
+<span class="kw">where
+    </span>Svc: Service&lt;S::Item&gt;,
+    Svc::Error: Into&lt;<span class="kw">crate</span>::BoxError&gt;,
+    S: Stream,
+    Q: Drive&lt;Svc::Future&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Svc::Response</span>, <span class="ident"><span class="kw">crate</span>::BoxError</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Item = <span class="prelude-ty">Result</span>&lt;Svc::Response, <span class="kw">crate</span>::BoxError&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
+    <span class="kw">fn </span>poll_next(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>this = <span class="self">self</span>.project();
 
-        <span class="kw">loop</span> {
-            <span class="comment">// First, see if we have any responses to yield</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Poll::Ready</span>(<span class="ident">r</span>) <span class="op">=</span> <span class="ident">this</span>.<span class="ident">queue</span>.<span class="ident">poll</span>(<span class="ident">cx</span>) {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">rsp</span>) <span class="op">=</span> <span class="ident">r</span>.<span class="ident">transpose</span>().<span class="ident">map_err</span>(<span class="ident">Into::into</span>)<span class="question-mark">?</span> {
-                    <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">rsp</span>)));
+        <span class="kw">loop </span>{
+            <span class="comment">// First, see if we have any responses to yield
+            </span><span class="kw">if let </span>Poll::Ready(r) = this.queue.poll(cx) {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(rsp) = r.transpose().map_err(Into::into)<span class="question-mark">? </span>{
+                    <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(rsp)));
                 }
             }
 
-            <span class="comment">// If there are no more requests coming, check if we&#39;re done</span>
-            <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">eof</span> {
-                <span class="kw">if</span> <span class="ident">this</span>.<span class="ident">queue</span>.<span class="ident">is_empty</span>() {
-                    <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>);
-                } <span class="kw">else</span> {
-                    <span class="kw">return</span> <span class="ident">Poll::Pending</span>;
+            <span class="comment">// If there are no more requests coming, check if we&#39;re done
+            </span><span class="kw">if </span><span class="kw-2">*</span>this.eof {
+                <span class="kw">if </span>this.queue.is_empty() {
+                    <span class="kw">return </span>Poll::Ready(<span class="prelude-val">None</span>);
+                } <span class="kw">else </span>{
+                    <span class="kw">return </span>Poll::Pending;
                 }
             }
 
-            <span class="comment">// Then, see that the service is ready for another request</span>
-            <span class="kw">let</span> <span class="ident">svc</span> <span class="op">=</span> <span class="ident">this</span>
-                .<span class="ident">service</span>
-                .<span class="ident">as_mut</span>()
-                .<span class="ident">expect</span>(<span class="string">&quot;Using CallAll after extracing inner Service&quot;</span>);
-            <span class="macro">ready!</span>(<span class="ident">svc</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>)).<span class="ident">map_err</span>(<span class="ident">Into::into</span>)<span class="question-mark">?</span>;
+            <span class="comment">// Then, see that the service is ready for another request
+            </span><span class="kw">let </span>svc = this
+                .service
+                .as_mut()
+                .expect(<span class="string">&quot;Using CallAll after extracing inner Service&quot;</span>);
+            <span class="macro">ready!</span>(svc.poll_ready(cx)).map_err(Into::into)<span class="question-mark">?</span>;
 
-            <span class="comment">// If it is, gather the next request (if there is one), or return `Pending` if the</span>
-            <span class="comment">// stream is not ready.</span>
-            <span class="comment">// TODO: We probably want to &quot;release&quot; the slot we reserved in Svc if the</span>
-            <span class="comment">// stream returns `Pending`. It may be a while until we get around to actually</span>
-            <span class="comment">// using it.</span>
-            <span class="kw">match</span> <span class="macro">ready!</span>(<span class="ident">this</span>.<span class="ident">stream</span>.<span class="ident">as_mut</span>().<span class="ident">poll_next</span>(<span class="ident">cx</span>)) {
-                <span class="prelude-val">Some</span>(<span class="ident">req</span>) =&gt; {
-                    <span class="ident">this</span>.<span class="ident">queue</span>.<span class="ident">push</span>(<span class="ident">svc</span>.<span class="ident">call</span>(<span class="ident">req</span>));
+            <span class="comment">// If it is, gather the next request (if there is one), or return `Pending` if the
+            // stream is not ready.
+            // TODO: We probably want to &quot;release&quot; the slot we reserved in Svc if the
+            // stream returns `Pending`. It may be a while until we get around to actually
+            // using it.
+            </span><span class="kw">match </span><span class="macro">ready!</span>(this.stream.as_mut().poll_next(cx)) {
+                <span class="prelude-val">Some</span>(req) =&gt; {
+                    this.queue.push(svc.call(req));
                 }
-                <span class="prelude-val">None</span> =&gt; {
-                    <span class="comment">// We&#39;re all done once any outstanding requests have completed</span>
-                    <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">eof</span> <span class="op">=</span> <span class="bool-val">true</span>;
+                <span class="prelude-val">None </span>=&gt; {
+                    <span class="comment">// We&#39;re all done once any outstanding requests have completed
+                    </span><span class="kw-2">*</span>this.eof = <span class="bool-val">true</span>;
                 }
             }
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tower" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tower" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

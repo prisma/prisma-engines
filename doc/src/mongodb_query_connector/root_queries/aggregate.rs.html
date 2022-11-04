@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/mongodb-query-connector/src/root_queries/aggregate.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>aggregate.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb_query_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/mongodb-query-connector/src/root_queries/aggregate.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>aggregate.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb_query_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -158,165 +158,165 @@
 <span id="158">158</span>
 <span id="159">159</span>
 <span id="160">160</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">constants</span>::<span class="kw-2">*</span>, <span class="ident">output_meta</span>, <span class="ident">query_builder::MongoReadQueryBuilder</span>, <span class="ident">value::value_from_bson</span>};
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{constants::<span class="kw-2">*</span>, output_meta, query_builder::MongoReadQueryBuilder, value::value_from_bson};
 
-<span class="kw">use</span> <span class="ident">connector_interface</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">mongodb</span>::{<span class="ident">bson::Document</span>, <span class="ident">ClientSession</span>, <span class="ident">Database</span>};
-<span class="kw">use</span> <span class="ident">prisma_models::prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span>connector_interface::<span class="kw-2">*</span>;
+<span class="kw">use </span>mongodb::{bson::Document, ClientSession, Database};
+<span class="kw">use </span>prisma_models::prelude::<span class="kw-2">*</span>;
 
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">aggregate</span><span class="op">&lt;</span><span class="lifetime">&#39;conn</span><span class="op">&gt;</span>(
-    <span class="ident">database</span>: <span class="kw-2">&amp;</span><span class="ident">Database</span>,
-    <span class="ident">session</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ClientSession</span>,
-    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="ident">query_arguments</span>: <span class="ident">QueryArguments</span>,
-    <span class="ident">selections</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AggregationSelection</span><span class="op">&gt;</span>,
-    <span class="ident">group_by</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span>,
-    <span class="ident">having</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AggregationRow</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">is_group_by</span> <span class="op">=</span> <span class="op">!</span><span class="ident">group_by</span>.<span class="ident">is_empty</span>();
-    <span class="kw">let</span> <span class="ident">coll</span> <span class="op">=</span> <span class="ident">database</span>.<span class="ident">collection</span>(<span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">db_name</span>());
+<span class="kw">pub async fn </span>aggregate&lt;<span class="lifetime">&#39;conn</span>&gt;(
+    database: <span class="kw-2">&amp;</span>Database,
+    session: <span class="kw-2">&amp;mut </span>ClientSession,
+    model: <span class="kw-2">&amp;</span>ModelRef,
+    query_arguments: QueryArguments,
+    selections: Vec&lt;AggregationSelection&gt;,
+    group_by: Vec&lt;ScalarFieldRef&gt;,
+    having: <span class="prelude-ty">Option</span>&lt;Filter&gt;,
+) -&gt; <span class="kw">crate</span>::Result&lt;Vec&lt;AggregationRow&gt;&gt; {
+    <span class="kw">let </span>is_group_by = !group_by.is_empty();
+    <span class="kw">let </span>coll = database.collection(<span class="kw-2">&amp;</span>model.db_name());
 
-    <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">MongoReadQueryBuilder::from_args</span>(<span class="ident">query_arguments</span>)<span class="question-mark">?</span>
-        .<span class="ident">with_groupings</span>(<span class="ident">group_by</span>, <span class="kw-2">&amp;</span><span class="ident">selections</span>, <span class="ident">having</span>)<span class="question-mark">?</span>
-        .<span class="ident">build</span>()<span class="question-mark">?</span>;
+    <span class="kw">let </span>query = MongoReadQueryBuilder::from_args(query_arguments)<span class="question-mark">?
+        </span>.with_groupings(group_by, <span class="kw-2">&amp;</span>selections, having)<span class="question-mark">?
+        </span>.build()<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">docs</span> <span class="op">=</span> <span class="ident">query</span>.<span class="ident">execute</span>(<span class="ident">coll</span>, <span class="ident">session</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span>docs = query.execute(coll, session).<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="kw">if</span> <span class="ident">is_group_by</span> <span class="op">&amp;&amp;</span> <span class="ident">docs</span>.<span class="ident">is_empty</span>() {
+    <span class="kw">if </span>is_group_by &amp;&amp; docs.is_empty() {
         <span class="prelude-val">Ok</span>(<span class="macro">vec!</span>[])
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">docs</span>.<span class="ident">is_empty</span>() {
-        <span class="prelude-val">Ok</span>(<span class="ident">empty_aggregation</span>(<span class="ident">selections</span>))
-    } <span class="kw">else</span> {
-        <span class="ident">to_aggregation_rows</span>(<span class="ident">docs</span>, <span class="ident">selections</span>)
+    } <span class="kw">else if </span>docs.is_empty() {
+        <span class="prelude-val">Ok</span>(empty_aggregation(selections))
+    } <span class="kw">else </span>{
+        to_aggregation_rows(docs, selections)
     }
 }
 
-<span class="kw">fn</span> <span class="ident">empty_aggregation</span>(<span class="ident">selections</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AggregationSelection</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AggregationRow</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">row</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+<span class="kw">fn </span>empty_aggregation(selections: Vec&lt;AggregationSelection&gt;) -&gt; Vec&lt;AggregationRow&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>row = <span class="macro">vec!</span>[];
 
-    <span class="kw">for</span> <span class="ident">selection</span> <span class="kw">in</span> <span class="ident">selections</span>.<span class="ident">iter</span>() {
-        <span class="kw">match</span> <span class="ident">selection</span> {
-            <span class="ident">AggregationSelection::Field</span>(<span class="ident">f</span>) =&gt; {
-                <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">AggregationResult::Field</span>(<span class="ident">f</span>.<span class="ident">clone</span>(), <span class="ident">PrismaValue::Null</span>));
+    <span class="kw">for </span>selection <span class="kw">in </span>selections.iter() {
+        <span class="kw">match </span>selection {
+            AggregationSelection::Field(f) =&gt; {
+                row.push(AggregationResult::Field(f.clone(), PrismaValue::Null));
             }
-            <span class="ident">AggregationSelection::Count</span> { <span class="ident">all</span>, <span class="ident">fields</span> } =&gt; {
-                <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">all</span> {
-                    <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">AggregationResult::Count</span>(<span class="prelude-val">None</span>, <span class="ident">PrismaValue::Int</span>(<span class="number">0</span>)));
+            AggregationSelection::Count { all, fields } =&gt; {
+                <span class="kw">if </span><span class="kw-2">*</span>all {
+                    row.push(AggregationResult::Count(<span class="prelude-val">None</span>, PrismaValue::Int(<span class="number">0</span>)));
                 }
 
-                <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">fields</span> {
-                    <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">AggregationResult::Count</span>(<span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">clone</span>()), <span class="ident">PrismaValue::Int</span>(<span class="number">0</span>)));
+                <span class="kw">for </span>field <span class="kw">in </span>fields {
+                    row.push(AggregationResult::Count(<span class="prelude-val">Some</span>(field.clone()), PrismaValue::Int(<span class="number">0</span>)));
                 }
             }
-            <span class="ident">AggregationSelection::Average</span>(<span class="ident">fields</span>) =&gt; {
-                <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">fields</span> {
-                    <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">AggregationResult::Average</span>(<span class="ident">field</span>.<span class="ident">clone</span>(), <span class="ident">PrismaValue::Null</span>));
+            AggregationSelection::Average(fields) =&gt; {
+                <span class="kw">for </span>field <span class="kw">in </span>fields {
+                    row.push(AggregationResult::Average(field.clone(), PrismaValue::Null));
                 }
             }
-            <span class="ident">AggregationSelection::Sum</span>(<span class="ident">fields</span>) =&gt; {
-                <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">fields</span> {
-                    <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">AggregationResult::Sum</span>(<span class="ident">field</span>.<span class="ident">clone</span>(), <span class="ident">PrismaValue::Null</span>));
+            AggregationSelection::Sum(fields) =&gt; {
+                <span class="kw">for </span>field <span class="kw">in </span>fields {
+                    row.push(AggregationResult::Sum(field.clone(), PrismaValue::Null));
                 }
             }
-            <span class="ident">AggregationSelection::Min</span>(<span class="ident">fields</span>) =&gt; {
-                <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">fields</span> {
-                    <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">AggregationResult::Min</span>(<span class="ident">field</span>.<span class="ident">clone</span>(), <span class="ident">PrismaValue::Null</span>));
+            AggregationSelection::Min(fields) =&gt; {
+                <span class="kw">for </span>field <span class="kw">in </span>fields {
+                    row.push(AggregationResult::Min(field.clone(), PrismaValue::Null));
                 }
             }
-            <span class="ident">AggregationSelection::Max</span>(<span class="ident">fields</span>) =&gt; {
-                <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">fields</span> {
-                    <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">AggregationResult::Max</span>(<span class="ident">field</span>.<span class="ident">clone</span>(), <span class="ident">PrismaValue::Null</span>));
+            AggregationSelection::Max(fields) =&gt; {
+                <span class="kw">for </span>field <span class="kw">in </span>fields {
+                    row.push(AggregationResult::Max(field.clone(), PrismaValue::Null));
                 }
             }
         };
     }
 
-    <span class="macro">vec!</span>[<span class="ident">row</span>]
+    <span class="macro">vec!</span>[row]
 }
 
-<span class="kw">fn</span> <span class="ident">to_aggregation_rows</span>(
-    <span class="ident">docs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>,
-    <span class="ident">selections</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AggregationSelection</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AggregationRow</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rows</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+<span class="kw">fn </span>to_aggregation_rows(
+    docs: Vec&lt;Document&gt;,
+    selections: Vec&lt;AggregationSelection&gt;,
+) -&gt; <span class="kw">crate</span>::Result&lt;Vec&lt;AggregationRow&gt;&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>rows = <span class="macro">vec!</span>[];
 
-    <span class="kw">for</span> <span class="kw-2">mut</span> <span class="ident">doc</span> <span class="kw">in</span> <span class="ident">docs</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">row</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+    <span class="kw">for </span><span class="kw-2">mut </span>doc <span class="kw">in </span>docs {
+        <span class="kw">let </span><span class="kw-2">mut </span>row = <span class="macro">vec!</span>[];
 
-        <span class="comment">// The way we query guarantees that the _id key is always either Bson::Null or a document.</span>
-        <span class="comment">// If a field is selected, it can never be Null, hence the unwraps are safe.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">id_key_doc</span> <span class="op">=</span> <span class="ident">doc</span>.<span class="ident">remove</span>(<span class="ident">group_by::UNDERSCORE_ID</span>).<span class="ident">unwrap</span>();
+        <span class="comment">// The way we query guarantees that the _id key is always either Bson::Null or a document.
+        // If a field is selected, it can never be Null, hence the unwraps are safe.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>id_key_doc = doc.remove(group_by::UNDERSCORE_ID).unwrap();
 
-        <span class="kw">for</span> <span class="ident">selection</span> <span class="kw">in</span> <span class="ident">selections</span>.<span class="ident">iter</span>() {
-            <span class="kw">let</span> <span class="ident">selection_meta</span> <span class="op">=</span> <span class="ident">output_meta::from_aggregation_selection</span>(<span class="kw-2">&amp;</span><span class="ident">selection</span>);
+        <span class="kw">for </span>selection <span class="kw">in </span>selections.iter() {
+            <span class="kw">let </span>selection_meta = output_meta::from_aggregation_selection(<span class="kw-2">&amp;</span>selection);
 
-            <span class="kw">match</span> <span class="ident">selection</span> {
-                <span class="comment">// All flat selection can only be in the _id part of the result doc.</span>
-                <span class="ident">AggregationSelection::Field</span>(<span class="ident">f</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">field_val</span> <span class="op">=</span> <span class="ident">id_key_doc</span>.<span class="ident">as_document_mut</span>().<span class="ident">unwrap</span>().<span class="ident">remove</span>(<span class="ident">f</span>.<span class="ident">db_name</span>()).<span class="ident">unwrap</span>();
-                    <span class="kw">let</span> <span class="ident">meta</span> <span class="op">=</span> <span class="ident">selection_meta</span>.<span class="ident">get</span>(<span class="ident">f</span>.<span class="ident">db_name</span>()).<span class="ident">unwrap</span>();
+            <span class="kw">match </span>selection {
+                <span class="comment">// All flat selection can only be in the _id part of the result doc.
+                </span>AggregationSelection::Field(f) =&gt; {
+                    <span class="kw">let </span>field_val = id_key_doc.as_document_mut().unwrap().remove(f.db_name()).unwrap();
+                    <span class="kw">let </span>meta = selection_meta.get(f.db_name()).unwrap();
 
-                    <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">AggregationResult::Field</span>(<span class="ident">f</span>.<span class="ident">clone</span>(), <span class="ident">value_from_bson</span>(<span class="ident">field_val</span>, <span class="ident">meta</span>)<span class="question-mark">?</span>));
+                    row.push(AggregationResult::Field(f.clone(), value_from_bson(field_val, meta)<span class="question-mark">?</span>));
                 }
-                <span class="ident">AggregationSelection::Count</span> { <span class="ident">all</span>, <span class="ident">fields</span> } =&gt; {
-                    <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">all</span> {
-                        <span class="kw">let</span> <span class="ident">meta</span> <span class="op">=</span> <span class="ident">selection_meta</span>.<span class="ident">get</span>(<span class="string">&quot;all&quot;</span>).<span class="ident">unwrap</span>();
-                        <span class="kw">let</span> <span class="ident">field_val</span> <span class="op">=</span> <span class="ident">value_from_bson</span>(<span class="ident">doc</span>.<span class="ident">remove</span>(<span class="string">&quot;count_all&quot;</span>).<span class="ident">unwrap</span>(), <span class="kw-2">&amp;</span><span class="ident">meta</span>)<span class="question-mark">?</span>;
+                AggregationSelection::Count { all, fields } =&gt; {
+                    <span class="kw">if </span><span class="kw-2">*</span>all {
+                        <span class="kw">let </span>meta = selection_meta.get(<span class="string">&quot;all&quot;</span>).unwrap();
+                        <span class="kw">let </span>field_val = value_from_bson(doc.remove(<span class="string">&quot;count_all&quot;</span>).unwrap(), <span class="kw-2">&amp;</span>meta)<span class="question-mark">?</span>;
 
-                        <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">AggregationResult::Count</span>(<span class="prelude-val">None</span>, <span class="ident">field_val</span>));
+                        row.push(AggregationResult::Count(<span class="prelude-val">None</span>, field_val));
                     }
 
-                    <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">fields</span> {
-                        <span class="kw">let</span> <span class="ident">meta</span> <span class="op">=</span> <span class="ident">selection_meta</span>.<span class="ident">get</span>(<span class="ident">field</span>.<span class="ident">db_name</span>()).<span class="ident">unwrap</span>();
-                        <span class="kw">let</span> <span class="ident">bson</span> <span class="op">=</span> <span class="ident">doc</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;count_{}&quot;</span>, <span class="ident">field</span>.<span class="ident">db_name</span>())).<span class="ident">unwrap</span>();
-                        <span class="kw">let</span> <span class="ident">field_val</span> <span class="op">=</span> <span class="ident">value_from_bson</span>(<span class="ident">bson</span>, <span class="kw-2">&amp;</span><span class="ident">meta</span>)<span class="question-mark">?</span>;
+                    <span class="kw">for </span>field <span class="kw">in </span>fields {
+                        <span class="kw">let </span>meta = selection_meta.get(field.db_name()).unwrap();
+                        <span class="kw">let </span>bson = doc.remove(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;count_{}&quot;</span>, field.db_name())).unwrap();
+                        <span class="kw">let </span>field_val = value_from_bson(bson, <span class="kw-2">&amp;</span>meta)<span class="question-mark">?</span>;
 
-                        <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">AggregationResult::Count</span>(<span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">clone</span>()), <span class="ident">field_val</span>));
+                        row.push(AggregationResult::Count(<span class="prelude-val">Some</span>(field.clone()), field_val));
                     }
                 }
-                <span class="ident">AggregationSelection::Average</span>(<span class="ident">fields</span>) =&gt; {
-                    <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">fields</span> {
-                        <span class="kw">let</span> <span class="ident">meta</span> <span class="op">=</span> <span class="ident">selection_meta</span>.<span class="ident">get</span>(<span class="ident">field</span>.<span class="ident">db_name</span>()).<span class="ident">unwrap</span>();
-                        <span class="kw">let</span> <span class="ident">bson</span> <span class="op">=</span> <span class="ident">doc</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;avg_{}&quot;</span>, <span class="ident">field</span>.<span class="ident">db_name</span>())).<span class="ident">unwrap</span>();
-                        <span class="kw">let</span> <span class="ident">field_val</span> <span class="op">=</span> <span class="ident">value_from_bson</span>(<span class="ident">bson</span>, <span class="ident">meta</span>)<span class="question-mark">?</span>;
+                AggregationSelection::Average(fields) =&gt; {
+                    <span class="kw">for </span>field <span class="kw">in </span>fields {
+                        <span class="kw">let </span>meta = selection_meta.get(field.db_name()).unwrap();
+                        <span class="kw">let </span>bson = doc.remove(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;avg_{}&quot;</span>, field.db_name())).unwrap();
+                        <span class="kw">let </span>field_val = value_from_bson(bson, meta)<span class="question-mark">?</span>;
 
-                        <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">AggregationResult::Average</span>(<span class="ident">field</span>.<span class="ident">clone</span>(), <span class="ident">field_val</span>));
+                        row.push(AggregationResult::Average(field.clone(), field_val));
                     }
                 }
-                <span class="ident">AggregationSelection::Sum</span>(<span class="ident">fields</span>) =&gt; {
-                    <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">fields</span> {
-                        <span class="kw">let</span> <span class="ident">meta</span> <span class="op">=</span> <span class="ident">selection_meta</span>.<span class="ident">get</span>(<span class="ident">field</span>.<span class="ident">db_name</span>()).<span class="ident">unwrap</span>();
-                        <span class="kw">let</span> <span class="ident">bson</span> <span class="op">=</span> <span class="ident">doc</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;sum_{}&quot;</span>, <span class="ident">field</span>.<span class="ident">db_name</span>())).<span class="ident">unwrap</span>();
-                        <span class="kw">let</span> <span class="ident">field_val</span> <span class="op">=</span> <span class="ident">value_from_bson</span>(<span class="ident">bson</span>, <span class="ident">meta</span>)<span class="question-mark">?</span>;
+                AggregationSelection::Sum(fields) =&gt; {
+                    <span class="kw">for </span>field <span class="kw">in </span>fields {
+                        <span class="kw">let </span>meta = selection_meta.get(field.db_name()).unwrap();
+                        <span class="kw">let </span>bson = doc.remove(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;sum_{}&quot;</span>, field.db_name())).unwrap();
+                        <span class="kw">let </span>field_val = value_from_bson(bson, meta)<span class="question-mark">?</span>;
 
-                        <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">AggregationResult::Sum</span>(<span class="ident">field</span>.<span class="ident">clone</span>(), <span class="ident">field_val</span>));
+                        row.push(AggregationResult::Sum(field.clone(), field_val));
                     }
                 }
-                <span class="ident">AggregationSelection::Min</span>(<span class="ident">fields</span>) =&gt; {
-                    <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">fields</span> {
-                        <span class="kw">let</span> <span class="ident">meta</span> <span class="op">=</span> <span class="ident">selection_meta</span>.<span class="ident">get</span>(<span class="ident">field</span>.<span class="ident">db_name</span>()).<span class="ident">unwrap</span>();
-                        <span class="kw">let</span> <span class="ident">bson</span> <span class="op">=</span> <span class="ident">doc</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;min_{}&quot;</span>, <span class="ident">field</span>.<span class="ident">db_name</span>())).<span class="ident">unwrap</span>();
-                        <span class="kw">let</span> <span class="ident">field_val</span> <span class="op">=</span> <span class="ident">value_from_bson</span>(<span class="ident">bson</span>, <span class="ident">meta</span>)<span class="question-mark">?</span>;
+                AggregationSelection::Min(fields) =&gt; {
+                    <span class="kw">for </span>field <span class="kw">in </span>fields {
+                        <span class="kw">let </span>meta = selection_meta.get(field.db_name()).unwrap();
+                        <span class="kw">let </span>bson = doc.remove(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;min_{}&quot;</span>, field.db_name())).unwrap();
+                        <span class="kw">let </span>field_val = value_from_bson(bson, meta)<span class="question-mark">?</span>;
 
-                        <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">AggregationResult::Min</span>(<span class="ident">field</span>.<span class="ident">clone</span>(), <span class="ident">field_val</span>));
+                        row.push(AggregationResult::Min(field.clone(), field_val));
                     }
                 }
-                <span class="ident">AggregationSelection::Max</span>(<span class="ident">fields</span>) =&gt; {
-                    <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">fields</span> {
-                        <span class="kw">let</span> <span class="ident">meta</span> <span class="op">=</span> <span class="ident">selection_meta</span>.<span class="ident">get</span>(<span class="ident">field</span>.<span class="ident">db_name</span>()).<span class="ident">unwrap</span>();
-                        <span class="kw">let</span> <span class="ident">bson</span> <span class="op">=</span> <span class="ident">doc</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;max_{}&quot;</span>, <span class="ident">field</span>.<span class="ident">db_name</span>())).<span class="ident">unwrap</span>();
-                        <span class="kw">let</span> <span class="ident">field_val</span> <span class="op">=</span> <span class="ident">value_from_bson</span>(<span class="ident">bson</span>, <span class="ident">meta</span>)<span class="question-mark">?</span>;
+                AggregationSelection::Max(fields) =&gt; {
+                    <span class="kw">for </span>field <span class="kw">in </span>fields {
+                        <span class="kw">let </span>meta = selection_meta.get(field.db_name()).unwrap();
+                        <span class="kw">let </span>bson = doc.remove(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;max_{}&quot;</span>, field.db_name())).unwrap();
+                        <span class="kw">let </span>field_val = value_from_bson(bson, meta)<span class="question-mark">?</span>;
 
-                        <span class="ident">row</span>.<span class="ident">push</span>(<span class="ident">AggregationResult::Max</span>(<span class="ident">field</span>.<span class="ident">clone</span>(), <span class="ident">field_val</span>));
+                        row.push(AggregationResult::Max(field.clone(), field_val));
                     }
                 }
             };
         }
 
-        <span class="ident">rows</span>.<span class="ident">push</span>(<span class="ident">row</span>);
+        rows.push(row);
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">rows</span>)
+    <span class="prelude-val">Ok</span>(rows)
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

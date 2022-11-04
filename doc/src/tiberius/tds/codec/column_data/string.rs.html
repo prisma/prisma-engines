@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tiberius-0.11.2/src/tds/codec/column_data/string.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>string.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../tiberius/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tiberius-0.11.2/src/tds/codec/column_data/string.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>string.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../tiberius/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -42,49 +42,49 @@
 <span id="42">42</span>
 <span id="43">43</span>
 <span id="44">44</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
-<span class="kw">use</span> <span class="ident">byteorder</span>::{<span class="ident">ByteOrder</span>, <span class="ident">LittleEndian</span>};
-<span class="kw">use</span> <span class="ident">encoding::DecoderTrap</span>;
+<span class="kw">use </span>byteorder::{ByteOrder, LittleEndian};
+<span class="kw">use </span>encoding::DecoderTrap;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error::Error</span>, <span class="ident">sql_read_bytes::SqlReadBytes</span>, <span class="ident">tds::Collation</span>, <span class="ident">VarLenType</span>};
+<span class="kw">use crate</span>::{error::Error, sql_read_bytes::SqlReadBytes, tds::Collation, VarLenType};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">decode</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(
-    <span class="ident">src</span>: <span class="kw-2">&amp;mut</span> <span class="ident">R</span>,
-    <span class="ident">ty</span>: <span class="ident">VarLenType</span>,
-    <span class="ident">len</span>: <span class="ident">usize</span>,
-    <span class="ident">collation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Collation</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">R</span>: <span class="ident">SqlReadBytes</span> <span class="op">+</span> <span class="ident">Unpin</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>decode&lt;R&gt;(
+    src: <span class="kw-2">&amp;mut </span>R,
+    ty: VarLenType,
+    len: usize,
+    collation: <span class="prelude-ty">Option</span>&lt;Collation&gt;,
+) -&gt; <span class="kw">crate</span>::Result&lt;<span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;&gt;
+<span class="kw">where
+    </span>R: SqlReadBytes + Unpin,
 {
-    <span class="kw">use</span> <span class="ident">VarLenType</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>VarLenType::<span class="kw-2">*</span>;
 
-    <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::plp::decode</span>(<span class="ident">src</span>, <span class="ident">len</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span>data = <span class="kw">super</span>::plp::decode(src, len).<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="kw">match</span> (<span class="ident">data</span>, <span class="ident">ty</span>) {
-        <span class="comment">// Codepages other than UTF</span>
-        (<span class="prelude-val">Some</span>(<span class="ident">buf</span>), <span class="ident">BigChar</span>) <span class="op">|</span> (<span class="prelude-val">Some</span>(<span class="ident">buf</span>), <span class="ident">BigVarChar</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">collation</span> <span class="op">=</span> <span class="ident">collation</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">encoder</span> <span class="op">=</span> <span class="ident">collation</span>.<span class="ident">encoding</span>()<span class="question-mark">?</span>;
+    <span class="kw">match </span>(data, ty) {
+        <span class="comment">// Codepages other than UTF
+        </span>(<span class="prelude-val">Some</span>(buf), BigChar) | (<span class="prelude-val">Some</span>(buf), BigVarChar) =&gt; {
+            <span class="kw">let </span>collation = collation.as_ref().unwrap();
+            <span class="kw">let </span>encoder = collation.encoding()<span class="question-mark">?</span>;
 
-            <span class="kw">let</span> <span class="ident">s</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">encoder</span>
-                .<span class="ident">decode</span>(<span class="ident">buf</span>.<span class="ident">as_ref</span>(), <span class="ident">DecoderTrap::Strict</span>)
-                .<span class="ident">map_err</span>(<span class="ident">Error::Encoding</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>s: String = encoder
+                .decode(buf.as_ref(), DecoderTrap::Strict)
+                .map_err(Error::Encoding)<span class="question-mark">?</span>;
 
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">s</span>.<span class="ident">into</span>()))
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(s.into()))
         }
-        <span class="comment">// UTF-16</span>
-        (<span class="prelude-val">Some</span>(<span class="ident">buf</span>), <span class="kw">_</span>) =&gt; {
-            <span class="kw">if</span> <span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">%</span> <span class="number">2</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Protocol</span>(<span class="string">&quot;nvarchar: invalid plp length&quot;</span>.<span class="ident">into</span>()));
+        <span class="comment">// UTF-16
+        </span>(<span class="prelude-val">Some</span>(buf), <span class="kw">_</span>) =&gt; {
+            <span class="kw">if </span>buf.len() % <span class="number">2 </span>!= <span class="number">0 </span>{
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Protocol(<span class="string">&quot;nvarchar: invalid plp length&quot;</span>.into()));
             }
 
-            <span class="kw">let</span> <span class="ident">buf</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">chunks</span>(<span class="number">2</span>).<span class="ident">map</span>(<span class="ident">LittleEndian::read_u16</span>).<span class="ident">collect</span>();
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">String::from_utf16</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>)<span class="question-mark">?</span>.<span class="ident">into</span>()))
+            <span class="kw">let </span>buf: Vec&lt;<span class="kw">_</span>&gt; = buf.chunks(<span class="number">2</span>).map(LittleEndian::read_u16).collect();
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(String::from_utf16(<span class="kw-2">&amp;</span>buf)<span class="question-mark">?</span>.into()))
         }
-        <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="tiberius" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="tiberius" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

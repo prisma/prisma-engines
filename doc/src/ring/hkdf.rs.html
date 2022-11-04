@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/hkdf.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>hkdf.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../ring/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/hkdf.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>hkdf.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../ring/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -231,238 +231,238 @@
 <span id="231">231</span>
 <span id="232">232</span>
 <span id="233">233</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015 Brian Smith.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
-<span class="comment">// purpose with or without fee is hereby granted, provided that the above</span>
-<span class="comment">// copyright notice and this permission notice appear in all copies.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES</span>
-<span class="comment">// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY</span>
-<span class="comment">// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span>
-<span class="comment">// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION</span>
-<span class="comment">// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN</span>
-<span class="comment">// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015 Brian Smith.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY
+// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-<span class="doccomment">//! HMAC-based Extract-and-Expand Key Derivation Function.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! HKDF is specified in [RFC 5869].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [RFC 5869]: https://tools.ietf.org/html/rfc5869</span>
+</span><span class="doccomment">//! HMAC-based Extract-and-Expand Key Derivation Function.
+//!
+//! HKDF is specified in [RFC 5869].
+//!
+//! [RFC 5869]: https://tools.ietf.org/html/rfc5869
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error</span>, <span class="ident">hmac</span>};
+</span><span class="kw">use crate</span>::{error, hmac};
 
-<span class="doccomment">/// An HKDF algorithm.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Algorithm</span>(<span class="ident">hmac::Algorithm</span>);
+<span class="doccomment">/// An HKDF algorithm.
+</span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+</span><span class="kw">pub struct </span>Algorithm(hmac::Algorithm);
 
-<span class="kw">impl</span> <span class="ident">Algorithm</span> {
-    <span class="doccomment">/// The underlying HMAC algorithm.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hmac_algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">hmac::Algorithm</span> {
-        <span class="self">self</span>.<span class="number">0</span>
+<span class="kw">impl </span>Algorithm {
+    <span class="doccomment">/// The underlying HMAC algorithm.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>hmac_algorithm(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; hmac::Algorithm {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
+}
+
+<span class="doccomment">/// HKDF using HMAC-SHA-1. Obsolete.
+</span><span class="kw">pub static </span>HKDF_SHA1_FOR_LEGACY_USE_ONLY: Algorithm =
+    Algorithm(hmac::HMAC_SHA1_FOR_LEGACY_USE_ONLY);
+
+<span class="doccomment">/// HKDF using HMAC-SHA-256.
+</span><span class="kw">pub static </span>HKDF_SHA256: Algorithm = Algorithm(hmac::HMAC_SHA256);
+
+<span class="doccomment">/// HKDF using HMAC-SHA-384.
+</span><span class="kw">pub static </span>HKDF_SHA384: Algorithm = Algorithm(hmac::HMAC_SHA384);
+
+<span class="doccomment">/// HKDF using HMAC-SHA-512.
+</span><span class="kw">pub static </span>HKDF_SHA512: Algorithm = Algorithm(hmac::HMAC_SHA512);
+
+<span class="kw">impl </span>KeyType <span class="kw">for </span>Algorithm {
+    <span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.<span class="number">0</span>.digest_algorithm().output_len
     }
 }
 
-<span class="doccomment">/// HKDF using HMAC-SHA-1. Obsolete.</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">HKDF_SHA1_FOR_LEGACY_USE_ONLY</span>: <span class="ident">Algorithm</span> <span class="op">=</span>
-    <span class="ident">Algorithm</span>(<span class="ident">hmac::HMAC_SHA1_FOR_LEGACY_USE_ONLY</span>);
+<span class="doccomment">/// A salt for HKDF operations.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Salt(hmac::Key);
 
-<span class="doccomment">/// HKDF using HMAC-SHA-256.</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">HKDF_SHA256</span>: <span class="ident">Algorithm</span> <span class="op">=</span> <span class="ident">Algorithm</span>(<span class="ident">hmac::HMAC_SHA256</span>);
+<span class="kw">impl </span>Salt {
+    <span class="doccomment">/// Constructs a new `Salt` with the given value based on the given digest
+    /// algorithm.
+    ///
+    /// Constructing a `Salt` is relatively expensive so it is good to reuse a
+    /// `Salt` object instead of re-constructing `Salt`s with the same value.
+    </span><span class="kw">pub fn </span>new(algorithm: Algorithm, value: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="self">Self </span>{
+        Salt(hmac::Key::new(algorithm.<span class="number">0</span>, value))
+    }
 
-<span class="doccomment">/// HKDF using HMAC-SHA-384.</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">HKDF_SHA384</span>: <span class="ident">Algorithm</span> <span class="op">=</span> <span class="ident">Algorithm</span>(<span class="ident">hmac::HMAC_SHA384</span>);
+    <span class="doccomment">/// The [HKDF-Extract] operation.
+    ///
+    /// [HKDF-Extract]: https://tools.ietf.org/html/rfc5869#section-2.2
+    </span><span class="kw">pub fn </span>extract(<span class="kw-2">&amp;</span><span class="self">self</span>, secret: <span class="kw-2">&amp;</span>[u8]) -&gt; Prk {
+        <span class="comment">// The spec says that if no salt is provided then a key of
+        // `digest_alg.output_len` bytes of zeros is used. But, HMAC keys are
+        // already zero-padded to the block length, which is larger than the output
+        // length of the extract step (the length of the digest). Consequently the
+        // `Key` constructor will automatically do the right thing for a
+        // zero-length string.
+        </span><span class="kw">let </span>salt = <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>;
+        <span class="kw">let </span>prk = hmac::sign(salt, secret);
+        Prk(hmac::Key::new(salt.algorithm(), prk.as_ref()))
+    }
 
-<span class="doccomment">/// HKDF using HMAC-SHA-512.</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">HKDF_SHA512</span>: <span class="ident">Algorithm</span> <span class="op">=</span> <span class="ident">Algorithm</span>(<span class="ident">hmac::HMAC_SHA512</span>);
-
-<span class="kw">impl</span> <span class="ident">KeyType</span> <span class="kw">for</span> <span class="ident">Algorithm</span> {
-    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">digest_algorithm</span>().<span class="ident">output_len</span>
+    <span class="doccomment">/// The algorithm used to derive this salt.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>algorithm(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Algorithm {
+        Algorithm(<span class="self">self</span>.<span class="number">0</span>.algorithm())
     }
 }
 
-<span class="doccomment">/// A salt for HKDF operations.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Salt</span>(<span class="ident">hmac::Key</span>);
-
-<span class="kw">impl</span> <span class="ident">Salt</span> {
-    <span class="doccomment">/// Constructs a new `Salt` with the given value based on the given digest</span>
-    <span class="doccomment">/// algorithm.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Constructing a `Salt` is relatively expensive so it is good to reuse a</span>
-    <span class="doccomment">/// `Salt` object instead of re-constructing `Salt`s with the same value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">algorithm</span>: <span class="ident">Algorithm</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="self">Self</span> {
-        <span class="ident">Salt</span>(<span class="ident">hmac::Key::new</span>(<span class="ident">algorithm</span>.<span class="number">0</span>, <span class="ident">value</span>))
-    }
-
-    <span class="doccomment">/// The [HKDF-Extract] operation.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [HKDF-Extract]: https://tools.ietf.org/html/rfc5869#section-2.2</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extract</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">secret</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">Prk</span> {
-        <span class="comment">// The spec says that if no salt is provided then a key of</span>
-        <span class="comment">// `digest_alg.output_len` bytes of zeros is used. But, HMAC keys are</span>
-        <span class="comment">// already zero-padded to the block length, which is larger than the output</span>
-        <span class="comment">// length of the extract step (the length of the digest). Consequently the</span>
-        <span class="comment">// `Key` constructor will automatically do the right thing for a</span>
-        <span class="comment">// zero-length string.</span>
-        <span class="kw">let</span> <span class="ident">salt</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>;
-        <span class="kw">let</span> <span class="ident">prk</span> <span class="op">=</span> <span class="ident">hmac::sign</span>(<span class="ident">salt</span>, <span class="ident">secret</span>);
-        <span class="ident">Prk</span>(<span class="ident">hmac::Key::new</span>(<span class="ident">salt</span>.<span class="ident">algorithm</span>(), <span class="ident">prk</span>.<span class="ident">as_ref</span>()))
-    }
-
-    <span class="doccomment">/// The algorithm used to derive this salt.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Algorithm</span> {
-        <span class="ident">Algorithm</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">algorithm</span>())
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Okm</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Algorithm</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Salt</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">okm</span>: <span class="ident">Okm</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Algorithm</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">hmac::Key::from</span>(<span class="ident">Okm</span> {
-            <span class="ident">prk</span>: <span class="ident">okm</span>.<span class="ident">prk</span>,
-            <span class="ident">info</span>: <span class="ident">okm</span>.<span class="ident">info</span>,
-            <span class="ident">len</span>: <span class="ident">okm</span>.<span class="ident">len</span>().<span class="number">0</span>,
-            <span class="ident">len_cached</span>: <span class="ident">okm</span>.<span class="ident">len_cached</span>,
+<span class="kw">impl </span>From&lt;Okm&lt;<span class="lifetime">&#39;_</span>, Algorithm&gt;&gt; <span class="kw">for </span>Salt {
+    <span class="kw">fn </span>from(okm: Okm&lt;<span class="lifetime">&#39;_</span>, Algorithm&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(hmac::Key::from(Okm {
+            prk: okm.prk,
+            info: okm.info,
+            len: okm.len().<span class="number">0</span>,
+            len_cached: okm.len_cached,
         }))
     }
 }
 
-<span class="doccomment">/// The length of the OKM (Output Keying Material) for a `Prk::expand()` call.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">KeyType</span> {
-    <span class="doccomment">/// The length that `Prk::expand()` should expand its input to.</span>
-    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span>;
+<span class="doccomment">/// The length of the OKM (Output Keying Material) for a `Prk::expand()` call.
+</span><span class="kw">pub trait </span>KeyType {
+    <span class="doccomment">/// The length that `Prk::expand()` should expand its input to.
+    </span><span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize;
 }
 
-<span class="doccomment">/// A HKDF PRK (pseudorandom key).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Prk</span>(<span class="ident">hmac::Key</span>);
+<span class="doccomment">/// A HKDF PRK (pseudorandom key).
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub struct </span>Prk(hmac::Key);
 
-<span class="kw">impl</span> <span class="ident">Prk</span> {
-    <span class="doccomment">/// Construct a new `Prk` directly with the given value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Usually one can avoid using this. It is useful when the application</span>
-    <span class="doccomment">/// intentionally wants to leak the PRK secret, e.g. to implement</span>
-    <span class="doccomment">/// `SSLKEYLOGFILE` functionality.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_less_safe</span>(<span class="ident">algorithm</span>: <span class="ident">Algorithm</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">hmac::Key::new</span>(<span class="ident">algorithm</span>.<span class="ident">hmac_algorithm</span>(), <span class="ident">value</span>))
+<span class="kw">impl </span>Prk {
+    <span class="doccomment">/// Construct a new `Prk` directly with the given value.
+    ///
+    /// Usually one can avoid using this. It is useful when the application
+    /// intentionally wants to leak the PRK secret, e.g. to implement
+    /// `SSLKEYLOGFILE` functionality.
+    </span><span class="kw">pub fn </span>new_less_safe(algorithm: Algorithm, value: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(hmac::Key::new(algorithm.hmac_algorithm(), value))
     }
 
-    <span class="doccomment">/// The [HKDF-Expand] operation.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [HKDF-Expand]: https://tools.ietf.org/html/rfc5869#section-2.3</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Fails if (and only if) `len` is too large.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">expand</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">L</span>: <span class="ident">KeyType</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
-        <span class="ident">info</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]],
-        <span class="ident">len</span>: <span class="ident">L</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Okm</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">L</span><span class="op">&gt;</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">len_cached</span> <span class="op">=</span> <span class="ident">len</span>.<span class="ident">len</span>();
-        <span class="kw">if</span> <span class="ident">len_cached</span> <span class="op">&gt;</span> <span class="number">255</span> <span class="op">*</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">algorithm</span>().<span class="ident">digest_algorithm</span>().<span class="ident">output_len</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>);
+    <span class="doccomment">/// The [HKDF-Expand] operation.
+    ///
+    /// [HKDF-Expand]: https://tools.ietf.org/html/rfc5869#section-2.3
+    ///
+    /// Fails if (and only if) `len` is too large.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>expand&lt;<span class="lifetime">&#39;a</span>, L: KeyType&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>,
+        info: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]],
+        len: L,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Okm&lt;<span class="lifetime">&#39;a</span>, L&gt;, error::Unspecified&gt; {
+        <span class="kw">let </span>len_cached = len.len();
+        <span class="kw">if </span>len_cached &gt; <span class="number">255 </span>* <span class="self">self</span>.<span class="number">0</span>.algorithm().digest_algorithm().output_len {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(error::Unspecified);
         }
-        <span class="prelude-val">Ok</span>(<span class="ident">Okm</span> {
-            <span class="ident">prk</span>: <span class="self">self</span>,
-            <span class="ident">info</span>,
-            <span class="ident">len</span>,
-            <span class="ident">len_cached</span>,
+        <span class="prelude-val">Ok</span>(Okm {
+            prk: <span class="self">self</span>,
+            info,
+            len,
+            len_cached,
         })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Okm</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">Algorithm</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Prk</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">okm</span>: <span class="ident">Okm</span><span class="op">&lt;</span><span class="ident">Algorithm</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">hmac::Key::from</span>(<span class="ident">Okm</span> {
-            <span class="ident">prk</span>: <span class="ident">okm</span>.<span class="ident">prk</span>,
-            <span class="ident">info</span>: <span class="ident">okm</span>.<span class="ident">info</span>,
-            <span class="ident">len</span>: <span class="ident">okm</span>.<span class="ident">len</span>().<span class="number">0</span>,
-            <span class="ident">len_cached</span>: <span class="ident">okm</span>.<span class="ident">len_cached</span>,
+<span class="kw">impl </span>From&lt;Okm&lt;<span class="lifetime">&#39;_</span>, Algorithm&gt;&gt; <span class="kw">for </span>Prk {
+    <span class="kw">fn </span>from(okm: Okm&lt;Algorithm&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(hmac::Key::from(Okm {
+            prk: okm.prk,
+            info: okm.info,
+            len: okm.len().<span class="number">0</span>,
+            len_cached: okm.len_cached,
         }))
     }
 }
 
-<span class="doccomment">/// An HKDF OKM (Output Keying Material)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Intentionally not `Clone` or `Copy` as an OKM is generally only safe to</span>
-<span class="doccomment">/// use once.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Okm</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">L</span>: <span class="ident">KeyType</span><span class="op">&gt;</span> {
-    <span class="ident">prk</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Prk</span>,
-    <span class="ident">info</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]],
-    <span class="ident">len</span>: <span class="ident">L</span>,
-    <span class="ident">len_cached</span>: <span class="ident">usize</span>,
+<span class="doccomment">/// An HKDF OKM (Output Keying Material)
+///
+/// Intentionally not `Clone` or `Copy` as an OKM is generally only safe to
+/// use once.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Okm&lt;<span class="lifetime">&#39;a</span>, L: KeyType&gt; {
+    prk: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Prk,
+    info: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]],
+    len: L,
+    len_cached: usize,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">L</span>: <span class="ident">KeyType</span><span class="op">&gt;</span> <span class="ident">Okm</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">L</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The `OkmLength` given to `Prk::expand()`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">L</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">len</span>
+<span class="kw">impl</span>&lt;L: KeyType&gt; Okm&lt;<span class="lifetime">&#39;_</span>, L&gt; {
+    <span class="doccomment">/// The `OkmLength` given to `Prk::expand()`.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>L {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.len
     }
 
-    <span class="doccomment">/// Fills `out` with the output of the HKDF-Expand operation for the given</span>
-    <span class="doccomment">/// inputs.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Fails if (and only if) the requested output length is larger than 255</span>
-    <span class="doccomment">/// times the size of the digest algorithm&#39;s output. (This is the limit</span>
-    <span class="doccomment">/// imposed by the HKDF specification due to the way HKDF&#39;s counter is</span>
-    <span class="doccomment">/// constructed.)</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fill</span>(<span class="self">self</span>, <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-        <span class="ident">fill_okm</span>(<span class="self">self</span>.<span class="ident">prk</span>, <span class="self">self</span>.<span class="ident">info</span>, <span class="ident">out</span>, <span class="self">self</span>.<span class="ident">len_cached</span>)
+    <span class="doccomment">/// Fills `out` with the output of the HKDF-Expand operation for the given
+    /// inputs.
+    ///
+    /// Fails if (and only if) the requested output length is larger than 255
+    /// times the size of the digest algorithm&#39;s output. (This is the limit
+    /// imposed by the HKDF specification due to the way HKDF&#39;s counter is
+    /// constructed.)
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>fill(<span class="self">self</span>, out: <span class="kw-2">&amp;mut </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt; {
+        fill_okm(<span class="self">self</span>.prk, <span class="self">self</span>.info, out, <span class="self">self</span>.len_cached)
     }
 }
 
-<span class="kw">fn</span> <span class="ident">fill_okm</span>(
-    <span class="ident">prk</span>: <span class="kw-2">&amp;</span><span class="ident">Prk</span>,
-    <span class="ident">info</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>[<span class="ident">u8</span>]],
-    <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-    <span class="ident">len</span>: <span class="ident">usize</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">out</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">len</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>);
+<span class="kw">fn </span>fill_okm(
+    prk: <span class="kw-2">&amp;</span>Prk,
+    info: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>[u8]],
+    out: <span class="kw-2">&amp;mut </span>[u8],
+    len: usize,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt; {
+    <span class="kw">if </span>out.len() != len {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(error::Unspecified);
     }
 
-    <span class="kw">let</span> <span class="ident">digest_alg</span> <span class="op">=</span> <span class="ident">prk</span>.<span class="number">0</span>.<span class="ident">algorithm</span>().<span class="ident">digest_algorithm</span>();
-    <span class="macro">assert!</span>(<span class="ident">digest_alg</span>.<span class="ident">block_len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">digest_alg</span>.<span class="ident">output_len</span>);
+    <span class="kw">let </span>digest_alg = prk.<span class="number">0</span>.algorithm().digest_algorithm();
+    <span class="macro">assert!</span>(digest_alg.block_len &gt;= digest_alg.output_len);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">hmac::Context::with_key</span>(<span class="kw-2">&amp;</span><span class="ident">prk</span>.<span class="number">0</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>ctx = hmac::Context::with_key(<span class="kw-2">&amp;</span>prk.<span class="number">0</span>);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n</span> <span class="op">=</span> <span class="number">1u8</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">out</span>;
-    <span class="kw">loop</span> {
-        <span class="kw">for</span> <span class="ident">info</span> <span class="kw">in</span> <span class="ident">info</span> {
-            <span class="ident">ctx</span>.<span class="ident">update</span>(<span class="ident">info</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>n = <span class="number">1u8</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>out = out;
+    <span class="kw">loop </span>{
+        <span class="kw">for </span>info <span class="kw">in </span>info {
+            ctx.update(info);
         }
-        <span class="ident">ctx</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span>[<span class="ident">n</span>]);
+        ctx.update(<span class="kw-2">&amp;</span>[n]);
 
-        <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">sign</span>();
-        <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">t</span>.<span class="ident">as_ref</span>();
+        <span class="kw">let </span>t = ctx.sign();
+        <span class="kw">let </span>t = t.as_ref();
 
-        <span class="comment">// Append `t` to the output.</span>
-        <span class="ident">out</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">out</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="ident">digest_alg</span>.<span class="ident">output_len</span> {
-            <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">out</span>.<span class="ident">len</span>();
-            <span class="ident">out</span>.<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">t</span>[..<span class="ident">len</span>]);
-            <span class="kw-2">&amp;mut</span> []
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> (<span class="ident">this_chunk</span>, <span class="ident">rest</span>) <span class="op">=</span> <span class="ident">out</span>.<span class="ident">split_at_mut</span>(<span class="ident">digest_alg</span>.<span class="ident">output_len</span>);
-            <span class="ident">this_chunk</span>.<span class="ident">copy_from_slice</span>(<span class="ident">t</span>);
-            <span class="ident">rest</span>
+        <span class="comment">// Append `t` to the output.
+        </span>out = <span class="kw">if </span>out.len() &lt; digest_alg.output_len {
+            <span class="kw">let </span>len = out.len();
+            out.copy_from_slice(<span class="kw-2">&amp;</span>t[..len]);
+            <span class="kw-2">&amp;mut </span>[]
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>(this_chunk, rest) = out.split_at_mut(digest_alg.output_len);
+            this_chunk.copy_from_slice(t);
+            rest
         };
 
-        <span class="kw">if</span> <span class="ident">out</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+        <span class="kw">if </span>out.is_empty() {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(());
         }
 
-        <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">hmac::Context::with_key</span>(<span class="kw-2">&amp;</span><span class="ident">prk</span>.<span class="number">0</span>);
-        <span class="ident">ctx</span>.<span class="ident">update</span>(<span class="ident">t</span>);
-        <span class="ident">n</span> <span class="op">=</span> <span class="ident">n</span>.<span class="ident">checked_add</span>(<span class="number">1</span>).<span class="ident">unwrap</span>();
+        ctx = hmac::Context::with_key(<span class="kw-2">&amp;</span>prk.<span class="number">0</span>);
+        ctx.update(t);
+        n = n.checked_add(<span class="number">1</span>).unwrap();
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

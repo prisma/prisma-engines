@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/query-engine/src/tracer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tracer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../query_engine/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../query_engine/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../query_engine/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/query-engine/src/tracer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tracer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../query_engine/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../query_engine/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../query_engine/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -96,103 +96,103 @@
 <span id="96">96</span>
 <span id="97">97</span>
 <span id="98">98</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
-<span class="kw">use</span> <span class="ident">opentelemetry</span>::{
-    <span class="ident">global</span>,
-    <span class="ident">sdk</span>::{<span class="self">self</span>, <span class="ident">export::ExportError</span>},
-    <span class="ident">sdk</span>::{
-        <span class="ident">export::trace</span>::{<span class="ident">ExportResult</span>, <span class="ident">SpanData</span>, <span class="ident">SpanExporter</span>},
-        <span class="ident">propagation::TraceContextPropagator</span>,
+</pre><pre class="rust"><code><span class="kw">use </span>async_trait::async_trait;
+<span class="kw">use </span>opentelemetry::{
+    global,
+    sdk::{<span class="self">self</span>, export::ExportError},
+    sdk::{
+        export::trace::{ExportResult, SpanData, SpanExporter},
+        propagation::TraceContextPropagator,
     },
-    <span class="ident">trace::TracerProvider</span>,
+    trace::TracerProvider,
 };
-<span class="kw">use</span> <span class="ident">query_core::spans_to_json</span>;
-<span class="kw">use</span> <span class="ident">std::io</span>::{<span class="ident">stdout</span>, <span class="ident">Stdout</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt::Debug</span>, <span class="ident">io::Write</span>};
+<span class="kw">use </span>query_core::spans_to_json;
+<span class="kw">use </span>std::io::{stdout, Stdout};
+<span class="kw">use </span>std::{fmt::Debug, io::Write};
 
-<span class="doccomment">/// Pipeline builder</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PipelineBuilder</span> {
-    <span class="ident">trace_config</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">sdk::trace::Config</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Pipeline builder
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>PipelineBuilder {
+    trace_config: <span class="prelude-ty">Option</span>&lt;sdk::trace::Config&gt;,
 }
 
-<span class="doccomment">/// Create a new stdout exporter pipeline builder.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_pipeline</span>() -&gt; <span class="ident">PipelineBuilder</span> {
-    <span class="ident">PipelineBuilder::default</span>()
+<span class="doccomment">/// Create a new stdout exporter pipeline builder.
+</span><span class="kw">pub fn </span>new_pipeline() -&gt; PipelineBuilder {
+    PipelineBuilder::default()
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">PipelineBuilder</span> {
-    <span class="doccomment">/// Return the default pipeline builder.</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">trace_config</span>: <span class="prelude-val">None</span> }
+<span class="kw">impl </span>Default <span class="kw">for </span>PipelineBuilder {
+    <span class="doccomment">/// Return the default pipeline builder.
+    </span><span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ trace_config: <span class="prelude-val">None </span>}
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PipelineBuilder</span> {
-    <span class="doccomment">/// Assign the SDK trace configuration.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_trace_config</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">config</span>: <span class="ident">sdk::trace::Config</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">trace_config</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">config</span>);
-        <span class="self">self</span>
-    }
+<span class="kw">impl </span>PipelineBuilder {
+    <span class="doccomment">/// Assign the SDK trace configuration.
+    </span><span class="kw">pub fn </span>with_trace_config(<span class="kw-2">mut </span><span class="self">self</span>, config: sdk::trace::Config) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.trace_config = <span class="prelude-val">Some</span>(config);
+        <span class="self">self
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">PipelineBuilder</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">install_simple</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">sdk::trace::Tracer</span> {
-        <span class="ident">global::set_text_map_propagator</span>(<span class="ident">TraceContextPropagator::new</span>());
-        <span class="kw">let</span> <span class="ident">exporter</span> <span class="op">=</span> <span class="ident">ClientSpanExporter::new</span>();
+<span class="kw">impl </span>PipelineBuilder {
+    <span class="kw">pub fn </span>install_simple(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; sdk::trace::Tracer {
+        global::set_text_map_propagator(TraceContextPropagator::new());
+        <span class="kw">let </span>exporter = ClientSpanExporter::new();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">provider_builder</span> <span class="op">=</span> <span class="ident">sdk::trace::TracerProvider::builder</span>().<span class="ident">with_simple_exporter</span>(<span class="ident">exporter</span>);
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">config</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">trace_config</span>.<span class="ident">take</span>() {
-            <span class="ident">provider_builder</span> <span class="op">=</span> <span class="ident">provider_builder</span>.<span class="ident">with_config</span>(<span class="ident">config</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>provider_builder = sdk::trace::TracerProvider::builder().with_simple_exporter(exporter);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(config) = <span class="self">self</span>.trace_config.take() {
+            provider_builder = provider_builder.with_config(config);
         }
-        <span class="kw">let</span> <span class="ident">provider</span> <span class="op">=</span> <span class="ident">provider_builder</span>.<span class="ident">build</span>();
-        <span class="kw">let</span> <span class="ident">tracer</span> <span class="op">=</span> <span class="ident">provider</span>.<span class="ident">tracer</span>(<span class="string">&quot;opentelemetry&quot;</span>);
-        <span class="ident">global::set_tracer_provider</span>(<span class="ident">provider</span>);
+        <span class="kw">let </span>provider = provider_builder.build();
+        <span class="kw">let </span>tracer = provider.tracer(<span class="string">&quot;opentelemetry&quot;</span>);
+        global::set_tracer_provider(provider);
 
-        <span class="ident">tracer</span>
+        tracer
     }
 }
 
-<span class="doccomment">/// A [`ClientSpanExporter`] that sends spans to stdout.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ClientSpanExporter</span> {
-    <span class="ident">writer</span>: <span class="ident">Stdout</span>,
+<span class="doccomment">/// A [`ClientSpanExporter`] that sends spans to stdout.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>ClientSpanExporter {
+    writer: Stdout,
 }
 
-<span class="kw">impl</span> <span class="ident">ClientSpanExporter</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">writer</span>: <span class="ident">stdout</span>() }
+<span class="kw">impl </span>ClientSpanExporter {
+    <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ writer: stdout() }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ClientSpanExporter</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>()
+<span class="kw">impl </span>Default <span class="kw">for </span>ClientSpanExporter {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new()
     }
 }
 
-<span class="attribute">#[<span class="ident">async_trait</span>]</span>
-<span class="kw">impl</span> <span class="ident">SpanExporter</span> <span class="kw">for</span> <span class="ident">ClientSpanExporter</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">export</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">batch</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SpanData</span><span class="op">&gt;</span>) -&gt; <span class="ident">ExportResult</span> {
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">spans_to_json</span>(<span class="kw-2">&amp;</span><span class="ident">batch</span>);
+<span class="attribute">#[async_trait]
+</span><span class="kw">impl </span>SpanExporter <span class="kw">for </span>ClientSpanExporter {
+    <span class="kw">async fn </span>export(<span class="kw-2">&amp;mut </span><span class="self">self</span>, batch: Vec&lt;SpanData&gt;) -&gt; ExportResult {
+        <span class="kw">let </span>result = spans_to_json(<span class="kw-2">&amp;</span>batch);
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="macro">writeln!</span>(<span class="self">self</span>.<span class="ident">writer</span>, <span class="string">&quot;{result}&quot;</span>) {
-            <span class="prelude-val">Err</span>(<span class="ident">ClientSpanExporterError</span>(<span class="ident">err</span>).<span class="ident">into</span>())
-        } <span class="kw">else</span> {
+        <span class="kw">if let </span><span class="prelude-val">Err</span>(err) = <span class="macro">writeln!</span>(<span class="self">self</span>.writer, <span class="string">&quot;{result}&quot;</span>) {
+            <span class="prelude-val">Err</span>(ClientSpanExporterError(err).into())
+        } <span class="kw">else </span>{
             <span class="prelude-val">Ok</span>(())
         }
     }
 }
 
-<span class="comment">// ClientSpanExporter exporter&#39;s error</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">thiserror::Error</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">error</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">struct</span> <span class="ident">ClientSpanExporterError</span>(<span class="ident">std::io::Error</span>);
+<span class="comment">// ClientSpanExporter exporter&#39;s error
+</span><span class="attribute">#[derive(thiserror::Error, Debug)]
+#[error(transparent)]
+</span><span class="kw">struct </span>ClientSpanExporterError(std::io::Error);
 
-<span class="kw">impl</span> <span class="ident">ExportError</span> <span class="kw">for</span> <span class="ident">ClientSpanExporterError</span> {
-    <span class="kw">fn</span> <span class="ident">exporter_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="string">&quot;stdout&quot;</span>
-    }
+<span class="kw">impl </span>ExportError <span class="kw">for </span>ClientSpanExporterError {
+    <span class="kw">fn </span>exporter_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="string">&quot;stdout&quot;
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="query_engine" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="query_engine" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

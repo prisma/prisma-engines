@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/metrics-0.19.0/src/cow.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>cow.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../metrics/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../metrics/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../metrics/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/metrics-0.19.0/src/cow.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>cow.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../metrics/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../metrics/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../metrics/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -522,479 +522,479 @@
 <span id="522">522</span>
 <span id="523">523</span>
 <span id="524">524</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::label::Label</span>;
-<span class="kw">use</span> <span class="ident">alloc::borrow::Borrow</span>;
-<span class="kw">use</span> <span class="ident">alloc::string::String</span>;
-<span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
-<span class="kw">use</span> <span class="ident">core::cmp::Ordering</span>;
-<span class="kw">use</span> <span class="ident">core::fmt</span>;
-<span class="kw">use</span> <span class="ident">core::hash</span>::{<span class="ident">Hash</span>, <span class="ident">Hasher</span>};
-<span class="kw">use</span> <span class="ident">core::marker::PhantomData</span>;
-<span class="kw">use</span> <span class="ident">core::mem::ManuallyDrop</span>;
-<span class="kw">use</span> <span class="ident">core::ptr</span>::{<span class="ident">slice_from_raw_parts</span>, <span class="ident">NonNull</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::label::Label;
+<span class="kw">use </span>alloc::borrow::Borrow;
+<span class="kw">use </span>alloc::string::String;
+<span class="kw">use </span>alloc::vec::Vec;
+<span class="kw">use </span>core::cmp::Ordering;
+<span class="kw">use </span>core::fmt;
+<span class="kw">use </span>core::hash::{Hash, Hasher};
+<span class="kw">use </span>core::marker::PhantomData;
+<span class="kw">use </span>core::mem::ManuallyDrop;
+<span class="kw">use </span>core::ptr::{slice_from_raw_parts, NonNull};
 
-<span class="doccomment">/// A clone-on-write smart pointer with an optimized memory layout.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Cowable</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Pointer to data.</span>
-    <span class="ident">ptr</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">T::Pointer</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A clone-on-write smart pointer with an optimized memory layout.
+</span><span class="kw">pub struct </span>Cow&lt;<span class="lifetime">&#39;a</span>, T: Cowable + <span class="question-mark">?</span>Sized + <span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Pointer to data.
+    </span>ptr: NonNull&lt;T::Pointer&gt;,
 
-    <span class="doccomment">/// Pointer metadata: length and capacity.</span>
-    <span class="ident">meta</span>: <span class="ident">Metadata</span>,
+    <span class="doccomment">/// Pointer metadata: length and capacity.
+    </span>meta: Metadata,
 
-    <span class="doccomment">/// Lifetime marker.</span>
-    <span class="ident">marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Lifetime marker.
+    </span>marker: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Cowable</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
+<span class="kw">impl</span>&lt;T&gt; Cow&lt;<span class="lifetime">&#39;_</span>, T&gt;
+<span class="kw">where
+    </span>T: Cowable + <span class="question-mark">?</span>Sized,
 {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">owned</span>(<span class="ident">val</span>: <span class="ident">T::Owned</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> (<span class="ident">ptr</span>, <span class="ident">meta</span>) <span class="op">=</span> <span class="ident">T::owned_into_parts</span>(<span class="ident">val</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>owned(val: T::Owned) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>(ptr, meta) = T::owned_into_parts(val);
 
-        <span class="ident">Cow</span> { <span class="ident">ptr</span>, <span class="ident">meta</span>, <span class="ident">marker</span>: <span class="ident">PhantomData</span> }
+        Cow { ptr, meta, marker: PhantomData }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Cowable</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; Cow&lt;<span class="lifetime">&#39;a</span>, T&gt;
+<span class="kw">where
+    </span>T: Cowable + <span class="question-mark">?</span>Sized,
 {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">borrowed</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> (<span class="ident">ptr</span>, <span class="ident">meta</span>) <span class="op">=</span> <span class="ident">T::ref_into_parts</span>(<span class="ident">val</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>borrowed(val: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>(ptr, meta) = T::ref_into_parts(val);
 
-        <span class="ident">Cow</span> { <span class="ident">ptr</span>, <span class="ident">meta</span>, <span class="ident">marker</span>: <span class="ident">PhantomData</span> }
+        Cow { ptr, meta, marker: PhantomData }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) -&gt; <span class="ident">T::Owned</span> {
-        <span class="kw">let</span> <span class="ident">cow</span> <span class="op">=</span> <span class="ident">ManuallyDrop::new</span>(<span class="self">self</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>into_owned(<span class="self">self</span>) -&gt; T::Owned {
+        <span class="kw">let </span>cow = ManuallyDrop::new(<span class="self">self</span>);
 
-        <span class="kw">if</span> <span class="ident">cow</span>.<span class="ident">is_borrowed</span>() {
-            <span class="kw">unsafe</span> { <span class="ident">T::clone_from_parts</span>(<span class="ident">cow</span>.<span class="ident">ptr</span>, <span class="kw-2">&amp;</span><span class="ident">cow</span>.<span class="ident">meta</span>) }
-        } <span class="kw">else</span> {
-            <span class="kw">unsafe</span> { <span class="ident">T::owned_from_parts</span>(<span class="ident">cow</span>.<span class="ident">ptr</span>, <span class="kw-2">&amp;</span><span class="ident">cow</span>.<span class="ident">meta</span>) }
+        <span class="kw">if </span>cow.is_borrowed() {
+            <span class="kw">unsafe </span>{ T::clone_from_parts(cow.ptr, <span class="kw-2">&amp;</span>cow.meta) }
+        } <span class="kw">else </span>{
+            <span class="kw">unsafe </span>{ T::owned_from_parts(cow.ptr, <span class="kw-2">&amp;</span>cow.meta) }
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_borrowed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">meta</span>.<span class="ident">capacity</span>() <span class="op">==</span> <span class="number">0</span>
-    }
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_borrowed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.meta.capacity() == <span class="number">0
+    </span>}
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_owned</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">meta</span>.<span class="ident">capacity</span>() <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
-    }
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_owned(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.meta.capacity() != <span class="number">0
+    </span>}
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">borrow</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
-        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">T::ref_from_parts</span>(<span class="self">self</span>.<span class="ident">ptr</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">meta</span>) }
-    }
-}
-
-<span class="comment">// Implementations of constant functions for creating `Cow` via static strings, static string</span>
-<span class="comment">// slices, and static label slices.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">const_str</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Cow</span> {
-            <span class="comment">// We are casting *const T to *mut T, however for all borrowed values</span>
-            <span class="comment">// this raw pointer is only ever dereferenced back to &amp;T.</span>
-            <span class="ident">ptr</span>: <span class="kw">unsafe</span> { <span class="ident">NonNull::new_unchecked</span>(<span class="ident">val</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">u8</span>) },
-            <span class="ident">meta</span>: <span class="ident">Metadata::from_ref</span>(<span class="ident">val</span>.<span class="ident">len</span>()),
-            <span class="ident">marker</span>: <span class="ident">PhantomData</span>,
-        }
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>borrow(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
+        <span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>T::ref_from_parts(<span class="self">self</span>.ptr, <span class="kw-2">&amp;</span><span class="self">self</span>.meta) }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>]<span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">const_slice</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>]) -&gt; <span class="self">Self</span> {
-        <span class="ident">Cow</span> {
-            <span class="ident">ptr</span>: <span class="kw">unsafe</span> { <span class="ident">NonNull::new_unchecked</span>(<span class="ident">val</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>) },
-            <span class="ident">meta</span>: <span class="ident">Metadata::from_ref</span>(<span class="ident">val</span>.<span class="ident">len</span>()),
-            <span class="ident">marker</span>: <span class="ident">PhantomData</span>,
+<span class="comment">// Implementations of constant functions for creating `Cow` via static strings, static string
+// slices, and static label slices.
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Cow&lt;<span class="lifetime">&#39;a</span>, str&gt; {
+    <span class="kw">pub const fn </span>const_str(val: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
+        Cow {
+            <span class="comment">// We are casting *const T to *mut T, however for all borrowed values
+            // this raw pointer is only ever dereferenced back to &amp;T.
+            </span>ptr: <span class="kw">unsafe </span>{ NonNull::new_unchecked(val.as_ptr() <span class="kw">as </span><span class="kw-2">*mut </span>u8) },
+            meta: Metadata::from_ref(val.len()),
+            marker: PhantomData,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">Label</span>]<span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">const_slice</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">Label</span>]) -&gt; <span class="self">Self</span> {
-        <span class="ident">Cow</span> {
-            <span class="ident">ptr</span>: <span class="kw">unsafe</span> { <span class="ident">NonNull::new_unchecked</span>(<span class="ident">val</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">Label</span>) },
-            <span class="ident">meta</span>: <span class="ident">Metadata::from_ref</span>(<span class="ident">val</span>.<span class="ident">len</span>()),
-            <span class="ident">marker</span>: <span class="ident">PhantomData</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Cow&lt;<span class="lifetime">&#39;a</span>, [Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;]&gt; {
+    <span class="kw">pub const fn </span>const_slice(val: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;]) -&gt; <span class="self">Self </span>{
+        Cow {
+            ptr: <span class="kw">unsafe </span>{ NonNull::new_unchecked(val.as_ptr() <span class="kw">as </span><span class="kw-2">*mut </span>Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;) },
+            meta: Metadata::from_ref(val.len()),
+            marker: PhantomData,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Hash</span> <span class="kw">for</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Hash</span> <span class="op">+</span> <span class="ident">Cowable</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
-{
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">Hasher</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">H</span>) {
-        <span class="self">self</span>.<span class="ident">borrow</span>().<span class="ident">hash</span>(<span class="ident">state</span>)
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Cowable</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
-    <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>: <span class="ident">Default</span>,
-{
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">Cow::borrowed</span>(<span class="ident">Default::default</span>())
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Eq</span> <span class="op">+</span> <span class="ident">Cowable</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span> {}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">A</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Cowable</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
-    <span class="ident">B</span>: <span class="ident">Cowable</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
-{
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">B</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
-        <span class="ident">PartialOrd::partial_cmp</span>(<span class="self">self</span>.<span class="ident">borrow</span>(), <span class="ident">other</span>.<span class="ident">borrow</span>())
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Ord</span> <span class="op">+</span> <span class="ident">Cowable</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
-{
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">Ordering</span> {
-        <span class="ident">Ord::cmp</span>(<span class="self">self</span>.<span class="ident">borrow</span>(), <span class="ident">other</span>.<span class="ident">borrow</span>())
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Cowable</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
-{
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Cow::borrowed</span>(<span class="ident">val</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">std::borrow::Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">std::borrow::Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">s</span> {
-            <span class="ident">std::borrow::Cow::Borrowed</span>(<span class="ident">bs</span>) =&gt; <span class="ident">Cow::borrowed</span>(<span class="ident">bs</span>),
-            <span class="ident">std::borrow::Cow::Owned</span>(<span class="ident">os</span>) =&gt; <span class="ident">Cow::owned</span>(<span class="ident">os</span>),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Cow&lt;<span class="lifetime">&#39;a</span>, [Label]&gt; {
+    <span class="kw">pub const fn </span>const_slice(val: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[Label]) -&gt; <span class="self">Self </span>{
+        Cow {
+            ptr: <span class="kw">unsafe </span>{ NonNull::new_unchecked(val.as_ptr() <span class="kw">as </span><span class="kw-2">*mut </span>Label) },
+            meta: Metadata::from_ref(val.len()),
+            marker: PhantomData,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Cow::owned</span>(<span class="ident">s</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Label</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, [<span class="ident">Label</span>]<span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Label</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Cow::owned</span>(<span class="ident">v</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, [<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>]<span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Cow::owned</span>(<span class="ident">v</span>)
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Cowable</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
+<span class="kw">impl</span>&lt;T&gt; Hash <span class="kw">for </span>Cow&lt;<span class="lifetime">&#39;_</span>, T&gt;
+<span class="kw">where
+    </span>T: Hash + Cowable + <span class="question-mark">?</span>Sized,
 {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_owned</span>() {
-            <span class="kw">unsafe</span> { <span class="ident">T::owned_from_parts</span>(<span class="self">self</span>.<span class="ident">ptr</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">meta</span>) };
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>hash&lt;H: Hasher&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, state: <span class="kw-2">&amp;mut </span>H) {
+        <span class="self">self</span>.borrow().hash(state)
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; Default <span class="kw">for </span>Cow&lt;<span class="lifetime">&#39;a</span>, T&gt;
+<span class="kw">where
+    </span>T: Cowable + <span class="question-mark">?</span>Sized,
+    <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T: Default,
+{
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        Cow::borrowed(Default::default())
+    }
+}
+
+<span class="kw">impl</span>&lt;T&gt; Eq <span class="kw">for </span>Cow&lt;<span class="lifetime">&#39;_</span>, T&gt; <span class="kw">where </span>T: Eq + Cowable + <span class="question-mark">?</span>Sized {}
+
+<span class="kw">impl</span>&lt;A, B&gt; PartialOrd&lt;Cow&lt;<span class="lifetime">&#39;_</span>, B&gt;&gt; <span class="kw">for </span>Cow&lt;<span class="lifetime">&#39;_</span>, A&gt;
+<span class="kw">where
+    </span>A: Cowable + <span class="question-mark">?</span>Sized + PartialOrd&lt;B&gt;,
+    B: Cowable + <span class="question-mark">?</span>Sized,
+{
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Cow&lt;<span class="lifetime">&#39;_</span>, B&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;Ordering&gt; {
+        PartialOrd::partial_cmp(<span class="self">self</span>.borrow(), other.borrow())
+    }
+}
+
+<span class="kw">impl</span>&lt;T&gt; Ord <span class="kw">for </span>Cow&lt;<span class="lifetime">&#39;_</span>, T&gt;
+<span class="kw">where
+    </span>T: Ord + Cowable + <span class="question-mark">?</span>Sized,
+{
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; Ordering {
+        Ord::cmp(<span class="self">self</span>.borrow(), other.borrow())
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T&gt; <span class="kw">for </span>Cow&lt;<span class="lifetime">&#39;a</span>, T&gt;
+<span class="kw">where
+    </span>T: Cowable + <span class="question-mark">?</span>Sized,
+{
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from(val: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T) -&gt; <span class="self">Self </span>{
+        Cow::borrowed(val)
+    }
+}
+
+<span class="kw">impl </span>From&lt;std::borrow::Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt; <span class="kw">for </span>Cow&lt;<span class="lifetime">&#39;_</span>, str&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from(s: std::borrow::Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>s {
+            std::borrow::Cow::Borrowed(bs) =&gt; Cow::borrowed(bs),
+            std::borrow::Cow::Owned(os) =&gt; Cow::owned(os),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Cowable</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
+<span class="kw">impl </span>From&lt;String&gt; <span class="kw">for </span>Cow&lt;<span class="lifetime">&#39;_</span>, str&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from(s: String) -&gt; <span class="self">Self </span>{
+        Cow::owned(s)
+    }
+}
+
+<span class="kw">impl </span>From&lt;Vec&lt;Label&gt;&gt; <span class="kw">for </span>Cow&lt;<span class="lifetime">&#39;_</span>, [Label]&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from(v: Vec&lt;Label&gt;) -&gt; <span class="self">Self </span>{
+        Cow::owned(v)
+    }
+}
+
+<span class="kw">impl </span>From&lt;Vec&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;&gt; <span class="kw">for </span>Cow&lt;<span class="lifetime">&#39;_</span>, [Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;]&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>from(v: Vec&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;) -&gt; <span class="self">Self </span>{
+        Cow::owned(v)
+    }
+}
+
+<span class="kw">impl</span>&lt;T&gt; Drop <span class="kw">for </span>Cow&lt;<span class="lifetime">&#39;_</span>, T&gt;
+<span class="kw">where
+    </span>T: Cowable + <span class="question-mark">?</span>Sized,
 {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_owned</span>() {
-            <span class="comment">// Gotta clone the actual inner value.</span>
-            <span class="ident">Cow::owned</span>(<span class="kw">unsafe</span> { <span class="ident">T::clone_from_parts</span>(<span class="self">self</span>.<span class="ident">ptr</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">meta</span>) })
-        } <span class="kw">else</span> {
-            <span class="ident">Cow</span> { ..<span class="kw-2">*</span><span class="self">self</span> }
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">if </span><span class="self">self</span>.is_owned() {
+            <span class="kw">unsafe </span>{ T::owned_from_parts(<span class="self">self</span>.ptr, <span class="kw-2">&amp;</span><span class="self">self</span>.meta) };
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">core::ops::Deref</span> <span class="kw">for</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Cowable</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; Clone <span class="kw">for </span>Cow&lt;<span class="lifetime">&#39;a</span>, T&gt;
+<span class="kw">where
+    </span>T: Cowable + <span class="question-mark">?</span>Sized,
 {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">T</span>;
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
-        <span class="self">self</span>.<span class="ident">borrow</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">if </span><span class="self">self</span>.is_owned() {
+            <span class="comment">// Gotta clone the actual inner value.
+            </span>Cow::owned(<span class="kw">unsafe </span>{ T::clone_from_parts(<span class="self">self</span>.ptr, <span class="kw-2">&amp;</span><span class="self">self</span>.meta) })
+        } <span class="kw">else </span>{
+            Cow { ..<span class="kw-2">*</span><span class="self">self </span>}
+        }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Cowable</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
+<span class="kw">impl</span>&lt;T&gt; core::ops::Deref <span class="kw">for </span>Cow&lt;<span class="lifetime">&#39;_</span>, T&gt;
+<span class="kw">where
+    </span>T: Cowable + <span class="question-mark">?</span>Sized,
 {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
-        <span class="self">self</span>.<span class="ident">borrow</span>()
+    <span class="kw">type </span>Target = T;
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
+        <span class="self">self</span>.borrow()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Cowable</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
+<span class="kw">impl</span>&lt;T&gt; AsRef&lt;T&gt; <span class="kw">for </span>Cow&lt;<span class="lifetime">&#39;_</span>, T&gt;
+<span class="kw">where
+    </span>T: Cowable + <span class="question-mark">?</span>Sized,
 {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">borrow</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
-        <span class="self">self</span>.<span class="ident">borrow</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
+        <span class="self">self</span>.borrow()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">B</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">A</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Cowable</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
-    <span class="ident">B</span>: <span class="ident">Cowable</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
-    <span class="ident">A</span>: <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T&gt; Borrow&lt;T&gt; <span class="kw">for </span>Cow&lt;<span class="lifetime">&#39;_</span>, T&gt;
+<span class="kw">where
+    </span>T: Cowable + <span class="question-mark">?</span>Sized,
 {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">borrow</span>() <span class="op">==</span> <span class="ident">other</span>.<span class="ident">borrow</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>borrow(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
+        <span class="self">self</span>.borrow()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Cowable</span> <span class="op">+</span> <span class="ident">fmt::Debug</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
+<span class="kw">impl</span>&lt;A, B&gt; PartialEq&lt;Cow&lt;<span class="lifetime">&#39;_</span>, B&gt;&gt; <span class="kw">for </span>Cow&lt;<span class="lifetime">&#39;_</span>, A&gt;
+<span class="kw">where
+    </span>A: Cowable + <span class="question-mark">?</span>Sized,
+    B: Cowable + <span class="question-mark">?</span>Sized,
+    A: PartialEq&lt;B&gt;,
 {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="self">self</span>.<span class="ident">borrow</span>().<span class="ident">fmt</span>(<span class="ident">f</span>)
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Cow&lt;B&gt;) -&gt; bool {
+        <span class="self">self</span>.borrow() == other.borrow()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Cowable</span> <span class="op">+</span> <span class="ident">fmt::Display</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
+<span class="kw">impl</span>&lt;T&gt; fmt::Debug <span class="kw">for </span>Cow&lt;<span class="lifetime">&#39;_</span>, T&gt;
+<span class="kw">where
+    </span>T: Cowable + fmt::Debug + <span class="question-mark">?</span>Sized,
 {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="self">self</span>.<span class="ident">borrow</span>().<span class="ident">fmt</span>(<span class="ident">f</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="self">self</span>.borrow().fmt(f)
     }
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Cowable</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {}
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Cowable</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {}
-
-<span class="doccomment">/// Helper trait required by `Cow&lt;T&gt;` to extract capacity of owned variant of `T`, and manage</span>
-<span class="doccomment">/// conversions.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This can be only implemented on types that match requirements:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// + `T::Owned` has a `capacity`, which is an extra word that is absent in `T`.</span>
-<span class="doccomment">/// + `T::Owned` with `capacity` of `0` does not allocate memory.</span>
-<span class="doccomment">/// + `T::Owned` can be reconstructed from `*mut T` borrowed out of it, plus capacity.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - While mutable pointers are used, no mutable reference is ever taken against it, whether the</span>
-<span class="doccomment">///   string is borrowed or owned.</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">trait</span> <span class="ident">Cowable</span> {
-    <span class="kw">type</span> <span class="ident">Pointer</span>;
-    <span class="kw">type</span> <span class="ident">Owned</span>;
-
-    <span class="kw">fn</span> <span class="ident">ref_into_parts</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Pointer</span><span class="op">&gt;</span>, <span class="ident">Metadata</span>);
-    <span class="kw">fn</span> <span class="ident">owned_into_parts</span>(<span class="ident">owned</span>: <span class="ident"><span class="self">Self</span>::Owned</span>) -&gt; (<span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Pointer</span><span class="op">&gt;</span>, <span class="ident">Metadata</span>);
-
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">ref_from_parts</span>(<span class="ident">ptr</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Pointer</span><span class="op">&gt;</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span>) -&gt; <span class="kw-2">*const</span> <span class="self">Self</span>;
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">owned_from_parts</span>(<span class="ident">ptr</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Pointer</span><span class="op">&gt;</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span>) -&gt; <span class="ident"><span class="self">Self</span>::Owned</span>;
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">clone_from_parts</span>(<span class="ident">ptr</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Pointer</span><span class="op">&gt;</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span>) -&gt; <span class="ident"><span class="self">Self</span>::Owned</span>;
+<span class="kw">impl</span>&lt;T&gt; fmt::Display <span class="kw">for </span>Cow&lt;<span class="lifetime">&#39;_</span>, T&gt;
+<span class="kw">where
+    </span>T: Cowable + fmt::Display + <span class="question-mark">?</span>Sized,
+{
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="self">self</span>.borrow().fmt(f)
+    }
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">Cowable</span> <span class="kw">for</span> <span class="ident">str</span> {
-    <span class="kw">type</span> <span class="ident">Pointer</span> <span class="op">=</span> <span class="ident">u8</span>;
-    <span class="kw">type</span> <span class="ident">Owned</span> <span class="op">=</span> <span class="ident">String</span>;
+<span class="kw">unsafe impl</span>&lt;T: Cowable + Sync + <span class="question-mark">?</span>Sized&gt; Sync <span class="kw">for </span>Cow&lt;<span class="lifetime">&#39;_</span>, T&gt; {}
+<span class="kw">unsafe impl</span>&lt;T: Cowable + Send + <span class="question-mark">?</span>Sized&gt; Send <span class="kw">for </span>Cow&lt;<span class="lifetime">&#39;_</span>, T&gt; {}
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">ref_into_parts</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Metadata</span>) {
-        <span class="comment">// A note on soundness:</span>
-        <span class="comment">//</span>
-        <span class="comment">// We are casting *const T to *mut T, however for all borrowed values</span>
-        <span class="comment">// this raw pointer is only ever dereferenced back to &amp;T.</span>
-        <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">NonNull::new_unchecked</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>) };
-        <span class="kw">let</span> <span class="ident">metadata</span> <span class="op">=</span> <span class="ident">Metadata::from_ref</span>(<span class="self">self</span>.<span class="ident">len</span>());
-        (<span class="ident">ptr</span>, <span class="ident">metadata</span>)
+<span class="doccomment">/// Helper trait required by `Cow&lt;T&gt;` to extract capacity of owned variant of `T`, and manage
+/// conversions.
+///
+/// This can be only implemented on types that match requirements:
+///
+/// + `T::Owned` has a `capacity`, which is an extra word that is absent in `T`.
+/// + `T::Owned` with `capacity` of `0` does not allocate memory.
+/// + `T::Owned` can be reconstructed from `*mut T` borrowed out of it, plus capacity.
+///
+/// # Safety
+///
+/// - While mutable pointers are used, no mutable reference is ever taken against it, whether the
+///   string is borrowed or owned.
+</span><span class="kw">pub unsafe trait </span>Cowable {
+    <span class="kw">type </span>Pointer;
+    <span class="kw">type </span>Owned;
+
+    <span class="kw">fn </span>ref_into_parts(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (NonNull&lt;<span class="self">Self</span>::Pointer&gt;, Metadata);
+    <span class="kw">fn </span>owned_into_parts(owned: <span class="self">Self</span>::Owned) -&gt; (NonNull&lt;<span class="self">Self</span>::Pointer&gt;, Metadata);
+
+    <span class="kw">unsafe fn </span>ref_from_parts(ptr: NonNull&lt;<span class="self">Self</span>::Pointer&gt;, metadata: <span class="kw-2">&amp;</span>Metadata) -&gt; <span class="kw-2">*const </span><span class="self">Self</span>;
+    <span class="kw">unsafe fn </span>owned_from_parts(ptr: NonNull&lt;<span class="self">Self</span>::Pointer&gt;, metadata: <span class="kw-2">&amp;</span>Metadata) -&gt; <span class="self">Self</span>::Owned;
+    <span class="kw">unsafe fn </span>clone_from_parts(ptr: NonNull&lt;<span class="self">Self</span>::Pointer&gt;, metadata: <span class="kw-2">&amp;</span>Metadata) -&gt; <span class="self">Self</span>::Owned;
+}
+
+<span class="kw">unsafe impl </span>Cowable <span class="kw">for </span>str {
+    <span class="kw">type </span>Pointer = u8;
+    <span class="kw">type </span>Owned = String;
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>ref_into_parts(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (NonNull&lt;u8&gt;, Metadata) {
+        <span class="comment">// A note on soundness:
+        //
+        // We are casting *const T to *mut T, however for all borrowed values
+        // this raw pointer is only ever dereferenced back to &amp;T.
+        </span><span class="kw">let </span>ptr = <span class="kw">unsafe </span>{ NonNull::new_unchecked(<span class="self">self</span>.as_ptr() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) };
+        <span class="kw">let </span>metadata = Metadata::from_ref(<span class="self">self</span>.len());
+        (ptr, metadata)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">ref_from_parts</span>(<span class="ident">ptr</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span>) -&gt; <span class="kw-2">*const</span> <span class="ident">str</span> {
-        <span class="ident">slice_from_raw_parts</span>(<span class="ident">ptr</span>.<span class="ident">as_ptr</span>(), <span class="ident">metadata</span>.<span class="ident">length</span>()) <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">unsafe fn </span>ref_from_parts(ptr: NonNull&lt;u8&gt;, metadata: <span class="kw-2">&amp;</span>Metadata) -&gt; <span class="kw-2">*const </span>str {
+        slice_from_raw_parts(ptr.as_ptr(), metadata.length()) <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_
+    </span>}
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>owned_into_parts(owned: String) -&gt; (NonNull&lt;u8&gt;, Metadata) {
+        <span class="comment">// We need to go through Vec here to get provenance for the entire allocation
+        // instead of just the initialized parts.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>owned = ManuallyDrop::new(owned.into_bytes());
+        <span class="kw">let </span>ptr = <span class="kw">unsafe </span>{ NonNull::new_unchecked(owned.as_mut_ptr()) };
+        <span class="kw">let </span>metadata = Metadata::from_owned(owned.len(), owned.capacity());
+        (ptr, metadata)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">owned_into_parts</span>(<span class="ident">owned</span>: <span class="ident">String</span>) -&gt; (<span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Metadata</span>) {
-        <span class="comment">// We need to go through Vec here to get provenance for the entire allocation</span>
-        <span class="comment">// instead of just the initialized parts.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">owned</span> <span class="op">=</span> <span class="ident">ManuallyDrop::new</span>(<span class="ident">owned</span>.<span class="ident">into_bytes</span>());
-        <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">NonNull::new_unchecked</span>(<span class="ident">owned</span>.<span class="ident">as_mut_ptr</span>()) };
-        <span class="kw">let</span> <span class="ident">metadata</span> <span class="op">=</span> <span class="ident">Metadata::from_owned</span>(<span class="ident">owned</span>.<span class="ident">len</span>(), <span class="ident">owned</span>.<span class="ident">capacity</span>());
-        (<span class="ident">ptr</span>, <span class="ident">metadata</span>)
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">owned_from_parts</span>(<span class="ident">ptr</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span>) -&gt; <span class="ident">String</span> {
-        <span class="ident">String::from_utf8_unchecked</span>(<span class="ident">Vec::from_raw_parts</span>(
-            <span class="ident">ptr</span>.<span class="ident">as_ptr</span>(),
-            <span class="ident">metadata</span>.<span class="ident">length</span>(),
-            <span class="ident">metadata</span>.<span class="ident">capacity</span>(),
+    <span class="attribute">#[inline]
+    </span><span class="kw">unsafe fn </span>owned_from_parts(ptr: NonNull&lt;u8&gt;, metadata: <span class="kw-2">&amp;</span>Metadata) -&gt; String {
+        String::from_utf8_unchecked(Vec::from_raw_parts(
+            ptr.as_ptr(),
+            metadata.length(),
+            metadata.capacity(),
         ))
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">clone_from_parts</span>(<span class="ident">ptr</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span>) -&gt; <span class="ident"><span class="self">Self</span>::Owned</span> {
-        <span class="kw">let</span> <span class="ident">str</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::ref_from_parts</span>(<span class="ident">ptr</span>, <span class="ident">metadata</span>);
-        <span class="ident">str</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">to_string</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">unsafe fn </span>clone_from_parts(ptr: NonNull&lt;u8&gt;, metadata: <span class="kw-2">&amp;</span>Metadata) -&gt; <span class="self">Self</span>::Owned {
+        <span class="kw">let </span>str = <span class="self">Self</span>::ref_from_parts(ptr, metadata);
+        str.as_ref().unwrap().to_string()
     }
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Cowable</span> <span class="kw">for</span> [<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>] {
-    <span class="kw">type</span> <span class="ident">Pointer</span> <span class="op">=</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">Owned</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="kw">unsafe impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Cowable <span class="kw">for </span>[Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;] {
+    <span class="kw">type </span>Pointer = Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;;
+    <span class="kw">type </span>Owned = Vec&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">ref_into_parts</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Metadata</span>) {
-        <span class="comment">// A note on soundness:</span>
-        <span class="comment">//</span>
-        <span class="comment">// We are casting *const T to *mut T, however for all borrowed values</span>
-        <span class="comment">// this raw pointer is only ever dereferenced back to &amp;T.</span>
-        <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">NonNull::new_unchecked</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>) };
-        <span class="kw">let</span> <span class="ident">metadata</span> <span class="op">=</span> <span class="ident">Metadata::from_ref</span>(<span class="self">self</span>.<span class="ident">len</span>());
-        (<span class="ident">ptr</span>, <span class="ident">metadata</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>ref_into_parts(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (NonNull&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;, Metadata) {
+        <span class="comment">// A note on soundness:
+        //
+        // We are casting *const T to *mut T, however for all borrowed values
+        // this raw pointer is only ever dereferenced back to &amp;T.
+        </span><span class="kw">let </span>ptr = <span class="kw">unsafe </span>{ NonNull::new_unchecked(<span class="self">self</span>.as_ptr() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) };
+        <span class="kw">let </span>metadata = Metadata::from_ref(<span class="self">self</span>.len());
+        (ptr, metadata)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">ref_from_parts</span>(
-        <span class="ident">ptr</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span>,
-    ) -&gt; <span class="kw-2">*const</span> [<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>] {
-        <span class="ident">slice_from_raw_parts</span>(<span class="ident">ptr</span>.<span class="ident">as_ptr</span>(), <span class="ident">metadata</span>.<span class="ident">length</span>())
+    <span class="attribute">#[inline]
+    </span><span class="kw">unsafe fn </span>ref_from_parts(
+        ptr: NonNull&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
+        metadata: <span class="kw-2">&amp;</span>Metadata,
+    ) -&gt; <span class="kw-2">*const </span>[Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;] {
+        slice_from_raw_parts(ptr.as_ptr(), metadata.length())
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">owned_into_parts</span>(<span class="ident">owned</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; (<span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Metadata</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">owned</span> <span class="op">=</span> <span class="ident">ManuallyDrop::new</span>(<span class="ident">owned</span>);
-        <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">NonNull::new_unchecked</span>(<span class="ident">owned</span>.<span class="ident">as_mut_ptr</span>()) };
-        <span class="kw">let</span> <span class="ident">metadata</span> <span class="op">=</span> <span class="ident">Metadata::from_owned</span>(<span class="ident">owned</span>.<span class="ident">len</span>(), <span class="ident">owned</span>.<span class="ident">capacity</span>());
-        (<span class="ident">ptr</span>, <span class="ident">metadata</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>owned_into_parts(owned: Vec&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;) -&gt; (NonNull&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;, Metadata) {
+        <span class="kw">let </span><span class="kw-2">mut </span>owned = ManuallyDrop::new(owned);
+        <span class="kw">let </span>ptr = <span class="kw">unsafe </span>{ NonNull::new_unchecked(owned.as_mut_ptr()) };
+        <span class="kw">let </span>metadata = Metadata::from_owned(owned.len(), owned.capacity());
+        (ptr, metadata)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">owned_from_parts</span>(
-        <span class="ident">ptr</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span>,
-    ) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Vec::from_raw_parts</span>(<span class="ident">ptr</span>.<span class="ident">as_ptr</span>(), <span class="ident">metadata</span>.<span class="ident">length</span>(), <span class="ident">metadata</span>.<span class="ident">capacity</span>())
+    <span class="attribute">#[inline]
+    </span><span class="kw">unsafe fn </span>owned_from_parts(
+        ptr: NonNull&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
+        metadata: <span class="kw-2">&amp;</span>Metadata,
+    ) -&gt; Vec&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt; {
+        Vec::from_raw_parts(ptr.as_ptr(), metadata.length(), metadata.capacity())
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">clone_from_parts</span>(<span class="ident">ptr</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span>) -&gt; <span class="ident"><span class="self">Self</span>::Owned</span> {
-        <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::ref_from_parts</span>(<span class="ident">ptr</span>, <span class="ident">metadata</span>);
-        <span class="kw">let</span> <span class="ident">xs</span> <span class="op">=</span> <span class="ident">ptr</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">owned</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">xs</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span>);
-        <span class="ident">owned</span>.<span class="ident">extend_from_slice</span>(<span class="ident">xs</span>);
-        <span class="ident">owned</span>
-    }
-}
-
-<span class="kw">unsafe</span> <span class="kw">impl</span> <span class="ident">Cowable</span> <span class="kw">for</span> [<span class="ident">Label</span>] {
-    <span class="kw">type</span> <span class="ident">Pointer</span> <span class="op">=</span> <span class="ident">Label</span>;
-    <span class="kw">type</span> <span class="ident">Owned</span> <span class="op">=</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Label</span><span class="op">&gt;</span>;
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">ref_into_parts</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">Label</span><span class="op">&gt;</span>, <span class="ident">Metadata</span>) {
-        <span class="comment">// A note on soundness:</span>
-        <span class="comment">//</span>
-        <span class="comment">// We are casting *const T to *mut T, however for all borrowed values</span>
-        <span class="comment">// this raw pointer is only ever dereferenced back to &amp;T.</span>
-        <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">NonNull::new_unchecked</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">_</span>) };
-        <span class="kw">let</span> <span class="ident">metadata</span> <span class="op">=</span> <span class="ident">Metadata::from_ref</span>(<span class="self">self</span>.<span class="ident">len</span>());
-        (<span class="ident">ptr</span>, <span class="ident">metadata</span>)
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">ref_from_parts</span>(<span class="ident">ptr</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">Label</span><span class="op">&gt;</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span>) -&gt; <span class="kw-2">*const</span> [<span class="ident">Label</span>] {
-        <span class="ident">slice_from_raw_parts</span>(<span class="ident">ptr</span>.<span class="ident">as_ptr</span>(), <span class="ident">metadata</span>.<span class="ident">length</span>())
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">owned_into_parts</span>(<span class="ident">owned</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Label</span><span class="op">&gt;</span>) -&gt; (<span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">Label</span><span class="op">&gt;</span>, <span class="ident">Metadata</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">owned</span> <span class="op">=</span> <span class="ident">ManuallyDrop::new</span>(<span class="ident">owned</span>);
-        <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">NonNull::new_unchecked</span>(<span class="ident">owned</span>.<span class="ident">as_mut_ptr</span>()) };
-        <span class="kw">let</span> <span class="ident">metadata</span> <span class="op">=</span> <span class="ident">Metadata::from_owned</span>(<span class="ident">owned</span>.<span class="ident">len</span>(), <span class="ident">owned</span>.<span class="ident">capacity</span>());
-        (<span class="ident">ptr</span>, <span class="ident">metadata</span>)
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">owned_from_parts</span>(<span class="ident">ptr</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">Label</span><span class="op">&gt;</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Label</span><span class="op">&gt;</span> {
-        <span class="ident">Vec::from_raw_parts</span>(<span class="ident">ptr</span>.<span class="ident">as_ptr</span>(), <span class="ident">metadata</span>.<span class="ident">length</span>(), <span class="ident">metadata</span>.<span class="ident">capacity</span>())
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">clone_from_parts</span>(<span class="ident">ptr</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">Label</span><span class="op">&gt;</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span>) -&gt; <span class="ident"><span class="self">Self</span>::Owned</span> {
-        <span class="kw">let</span> <span class="ident">xs</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::ref_from_parts</span>(<span class="ident">ptr</span>, <span class="ident">metadata</span>);
-        <span class="ident">xs</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">to_vec</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">unsafe fn </span>clone_from_parts(ptr: NonNull&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;, metadata: <span class="kw-2">&amp;</span>Metadata) -&gt; <span class="self">Self</span>::Owned {
+        <span class="kw">let </span>ptr = <span class="self">Self</span>::ref_from_parts(ptr, metadata);
+        <span class="kw">let </span>xs = ptr.as_ref().unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>owned = Vec::with_capacity(xs.len() + <span class="number">1</span>);
+        owned.extend_from_slice(xs);
+        owned
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Metadata</span>(<span class="ident">usize</span>, <span class="ident">usize</span>);
+<span class="kw">unsafe impl </span>Cowable <span class="kw">for </span>[Label] {
+    <span class="kw">type </span>Pointer = Label;
+    <span class="kw">type </span>Owned = Vec&lt;Label&gt;;
 
-<span class="kw">impl</span> <span class="ident">Metadata</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="number">0</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>ref_into_parts(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (NonNull&lt;Label&gt;, Metadata) {
+        <span class="comment">// A note on soundness:
+        //
+        // We are casting *const T to *mut T, however for all borrowed values
+        // this raw pointer is only ever dereferenced back to &amp;T.
+        </span><span class="kw">let </span>ptr = <span class="kw">unsafe </span>{ NonNull::new_unchecked(<span class="self">self</span>.as_ptr() <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">_</span>) };
+        <span class="kw">let </span>metadata = Metadata::from_ref(<span class="self">self</span>.len());
+        (ptr, metadata)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">capacity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="number">1</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">unsafe fn </span>ref_from_parts(ptr: NonNull&lt;Label&gt;, metadata: <span class="kw-2">&amp;</span>Metadata) -&gt; <span class="kw-2">*const </span>[Label] {
+        slice_from_raw_parts(ptr.as_ptr(), metadata.length())
     }
 
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_ref</span>(<span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Metadata</span> {
-        <span class="ident">Metadata</span>(<span class="ident">len</span>, <span class="number">0</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>owned_into_parts(owned: Vec&lt;Label&gt;) -&gt; (NonNull&lt;Label&gt;, Metadata) {
+        <span class="kw">let </span><span class="kw-2">mut </span>owned = ManuallyDrop::new(owned);
+        <span class="kw">let </span>ptr = <span class="kw">unsafe </span>{ NonNull::new_unchecked(owned.as_mut_ptr()) };
+        <span class="kw">let </span>metadata = Metadata::from_owned(owned.len(), owned.capacity());
+        (ptr, metadata)
     }
 
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_owned</span>(<span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">capacity</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Metadata</span> {
-        <span class="ident">Metadata</span>(<span class="ident">len</span>, <span class="ident">capacity</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">unsafe fn </span>owned_from_parts(ptr: NonNull&lt;Label&gt;, metadata: <span class="kw-2">&amp;</span>Metadata) -&gt; Vec&lt;Label&gt; {
+        Vec::from_raw_parts(ptr.as_ptr(), metadata.length(), metadata.capacity())
     }
 
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">borrowed</span>() -&gt; <span class="ident">Metadata</span> {
-        <span class="ident">Metadata</span>(<span class="number">0</span>, <span class="number">0</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">unsafe fn </span>clone_from_parts(ptr: NonNull&lt;Label&gt;, metadata: <span class="kw-2">&amp;</span>Metadata) -&gt; <span class="self">Self</span>::Owned {
+        <span class="kw">let </span>xs = <span class="self">Self</span>::ref_from_parts(ptr, metadata);
+        xs.as_ref().unwrap().to_vec()
+    }
+}
+
+<span class="attribute">#[derive(Clone, Copy, PartialEq, Eq)]
+</span><span class="kw">pub struct </span>Metadata(usize, usize);
+
+<span class="kw">impl </span>Metadata {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>capacity(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.<span class="number">1
+    </span>}
+
+    <span class="kw">pub const fn </span>from_ref(len: usize) -&gt; Metadata {
+        Metadata(len, <span class="number">0</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">owned</span>() -&gt; <span class="ident">Metadata</span> {
-        <span class="ident">Metadata</span>(<span class="number">0</span>, <span class="number">1</span>)
+    <span class="kw">pub const fn </span>from_owned(len: usize, capacity: usize) -&gt; Metadata {
+        Metadata(len, capacity)
+    }
+
+    <span class="kw">pub const fn </span>borrowed() -&gt; Metadata {
+        Metadata(<span class="number">0</span>, <span class="number">0</span>)
+    }
+
+    <span class="kw">pub const fn </span>owned() -&gt; Metadata {
+        Metadata(<span class="number">0</span>, <span class="number">1</span>)
     }
 }
 
@@ -1045,6 +1045,6 @@ impl Metadata {
     pub const fn owned() -&gt; Metadata {
         Metadata(1 &lt;&lt; 32)
     }
-}*/</span>
-</code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="metrics" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+}*/
+</span></code></pre></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="metrics" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

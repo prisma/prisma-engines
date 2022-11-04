@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-0.3.14/src/format_description/well_known/iso8601.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>iso8601.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="icon" href="https://avatars0.githubusercontent.com/u/55999857"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../time/index.html"><div class="logo-container"><img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../time/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-0.3.14/src/format_description/well_known/iso8601.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>iso8601.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="icon" href="https://avatars0.githubusercontent.com/u/55999857"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../time/index.html"><div class="logo-container"><img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../time/index.html"><div class="logo-container">
                     <img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../time/index.html">
                         <img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -233,238 +233,238 @@
 <span id="231">231</span>
 <span id="232">232</span>
 <span id="233">233</span>
-</pre><pre class="rust"><code><span class="doccomment">//! The format described in ISO 8601.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! The format described in ISO 8601.
 
-<span class="kw">mod</span> <span class="ident">adt_hack</span>;
+</span><span class="kw">mod </span>adt_hack;
 
-<span class="kw">use</span> <span class="ident">core::num::NonZeroU8</span>;
+<span class="kw">use </span>core::num::NonZeroU8;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::adt_hack</span>::{<span class="ident">DoNotRelyOnWhatThisIs</span>, <span class="ident">EncodedConfig</span>};
+<span class="kw">pub use </span><span class="self">self</span>::adt_hack::{DoNotRelyOnWhatThisIs, EncodedConfig};
 
-<span class="doccomment">/// A configuration for [`Iso8601`] that only parses values.</span>
-<span class="kw">const</span> <span class="ident">PARSING_ONLY</span>: <span class="ident">EncodedConfig</span> <span class="op">=</span> <span class="ident">Config</span> {
-    <span class="ident">formatted_components</span>: <span class="ident">FormattedComponents::None</span>,
-    <span class="ident">use_separators</span>: <span class="bool-val">false</span>,
-    <span class="ident">year_is_six_digits</span>: <span class="bool-val">false</span>,
-    <span class="ident">date_kind</span>: <span class="ident">DateKind::Calendar</span>,
-    <span class="ident">time_precision</span>: <span class="ident">TimePrecision::Hour</span> {
-        <span class="ident">decimal_digits</span>: <span class="prelude-val">None</span>,
+<span class="doccomment">/// A configuration for [`Iso8601`] that only parses values.
+</span><span class="kw">const </span>PARSING_ONLY: EncodedConfig = Config {
+    formatted_components: FormattedComponents::None,
+    use_separators: <span class="bool-val">false</span>,
+    year_is_six_digits: <span class="bool-val">false</span>,
+    date_kind: DateKind::Calendar,
+    time_precision: TimePrecision::Hour {
+        decimal_digits: <span class="prelude-val">None</span>,
     },
-    <span class="ident">offset_precision</span>: <span class="ident">OffsetPrecision::Hour</span>,
+    offset_precision: OffsetPrecision::Hour,
 }
-.<span class="ident">encode</span>();
+.encode();
 
-<span class="doccomment">/// The default configuration for [`Iso8601`].</span>
-<span class="kw">const</span> <span class="ident">DEFAULT_CONFIG</span>: <span class="ident">EncodedConfig</span> <span class="op">=</span> <span class="ident">Config::DEFAULT</span>.<span class="ident">encode</span>();
+<span class="doccomment">/// The default configuration for [`Iso8601`].
+</span><span class="kw">const </span>DEFAULT_CONFIG: EncodedConfig = Config::DEFAULT.encode();
 
-<span class="doccomment">/// The format described in [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This implementation is of ISO 8601-1:2019. It may not be compatible with other versions.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The const parameter `CONFIG` **must** be a value that was returned by [`Config::encode`].</span>
-<span class="doccomment">/// Passing any other value is **unspecified behavior**.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Example: 1997-11-21T09:55:06.000000000-06:00</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use time::format_description::well_known::Iso8601;</span>
-<span class="doccomment">/// # use time::macros::datetime;</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///     datetime!(1997-11-12 9:55:06 -6:00).format(&amp;Iso8601::DEFAULT)?,</span>
-<span class="doccomment">///     &quot;1997-11-12T09:55:06.000000000-06:00&quot;</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// # Ok::&lt;_, time::Error&gt;(())</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Iso8601</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">CONFIG</span>: <span class="ident">EncodedConfig</span> <span class="op">=</span> <span class="ident">DEFAULT_CONFIG</span><span class="op">&gt;</span>;
+<span class="doccomment">/// The format described in [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html).
+///
+/// This implementation is of ISO 8601-1:2019. It may not be compatible with other versions.
+///
+/// The const parameter `CONFIG` **must** be a value that was returned by [`Config::encode`].
+/// Passing any other value is **unspecified behavior**.
+///
+/// Example: 1997-11-21T09:55:06.000000000-06:00
+///
+/// # Examples
+///
+/// ```rust
+/// # use time::format_description::well_known::Iso8601;
+/// # use time::macros::datetime;
+/// assert_eq!(
+///     datetime!(1997-11-12 9:55:06 -6:00).format(&amp;Iso8601::DEFAULT)?,
+///     &quot;1997-11-12T09:55:06.000000000-06:00&quot;
+/// );
+/// # Ok::&lt;_, time::Error&gt;(())
+/// ```
+</span><span class="attribute">#[derive(Clone, Copy, PartialEq, Eq)]
+</span><span class="kw">pub struct </span>Iso8601&lt;<span class="kw">const </span>CONFIG: EncodedConfig = DEFAULT_CONFIG&gt;;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">CONFIG</span>: <span class="ident">EncodedConfig</span><span class="op">&gt;</span> <span class="ident">core::fmt::Debug</span> <span class="kw">for</span> <span class="ident">Iso8601</span><span class="op">&lt;</span><span class="ident">CONFIG</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">core::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">core::fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Iso8601&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;config&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">Config::decode</span>(<span class="ident">CONFIG</span>))
-            .<span class="ident">finish</span>()
+<span class="kw">impl</span>&lt;<span class="kw">const </span>CONFIG: EncodedConfig&gt; core::fmt::Debug <span class="kw">for </span>Iso8601&lt;CONFIG&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; core::fmt::Result {
+        f.debug_struct(<span class="string">&quot;Iso8601&quot;</span>)
+            .field(<span class="string">&quot;config&quot;</span>, <span class="kw-2">&amp;</span>Config::decode(CONFIG))
+            .finish()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Iso8601</span><span class="op">&lt;</span><span class="ident">DEFAULT_CONFIG</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// An [`Iso8601`] with the default configuration.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The following is the default behavior:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - The configuration can be used for both formatting and parsing.</span>
-    <span class="doccomment">/// - The date, time, and UTC offset are all formatted.</span>
-    <span class="doccomment">/// - Separators (such as `-` and `:`) are included.</span>
-    <span class="doccomment">/// - The year contains four digits, such that the year must be between 0 and 9999.</span>
-    <span class="doccomment">/// - The date uses the calendar format.</span>
-    <span class="doccomment">/// - The time has precision to the second and nine decimal digits.</span>
-    <span class="doccomment">/// - The UTC offset has precision to the minute.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If you need different behavior, use [`Config::DEFAULT`] and [`Config`]&#39;s methods to create</span>
-    <span class="doccomment">/// a custom configuration.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DEFAULT</span>: <span class="self">Self</span> <span class="op">=</span> <span class="self">Self</span>;
+<span class="kw">impl </span>Iso8601&lt;DEFAULT_CONFIG&gt; {
+    <span class="doccomment">/// An [`Iso8601`] with the default configuration.
+    ///
+    /// The following is the default behavior:
+    ///
+    /// - The configuration can be used for both formatting and parsing.
+    /// - The date, time, and UTC offset are all formatted.
+    /// - Separators (such as `-` and `:`) are included.
+    /// - The year contains four digits, such that the year must be between 0 and 9999.
+    /// - The date uses the calendar format.
+    /// - The time has precision to the second and nine decimal digits.
+    /// - The UTC offset has precision to the minute.
+    ///
+    /// If you need different behavior, use [`Config::DEFAULT`] and [`Config`]&#39;s methods to create
+    /// a custom configuration.
+    </span><span class="kw">pub const </span>DEFAULT: <span class="self">Self </span>= <span class="self">Self</span>;
 }
 
-<span class="kw">impl</span> <span class="ident">Iso8601</span><span class="op">&lt;</span><span class="ident">PARSING_ONLY</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// An [`Iso8601`] that can only be used for parsing. Using this to format a value is</span>
-    <span class="doccomment">/// unspecified behavior.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PARSING</span>: <span class="self">Self</span> <span class="op">=</span> <span class="self">Self</span>;
+<span class="kw">impl </span>Iso8601&lt;PARSING_ONLY&gt; {
+    <span class="doccomment">/// An [`Iso8601`] that can only be used for parsing. Using this to format a value is
+    /// unspecified behavior.
+    </span><span class="kw">pub const </span>PARSING: <span class="self">Self </span>= <span class="self">Self</span>;
 }
 
-<span class="doccomment">/// Which components to format.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">FormattedComponents</span> {
-    <span class="doccomment">/// The configuration can only be used for parsing. Using this to format a value is</span>
-    <span class="doccomment">/// unspecified behavior.</span>
-    <span class="prelude-val">None</span>,
-    <span class="doccomment">/// Format only the date.</span>
-    <span class="ident">Date</span>,
-    <span class="doccomment">/// Format only the time.</span>
-    <span class="ident">Time</span>,
-    <span class="doccomment">/// Format only the UTC offset.</span>
-    <span class="ident">Offset</span>,
-    <span class="doccomment">/// Format the date and time.</span>
-    <span class="ident">DateTime</span>,
-    <span class="doccomment">/// Format the date, time, and UTC offset.</span>
-    <span class="ident">DateTimeOffset</span>,
-    <span class="doccomment">/// Format the time and UTC offset.</span>
-    <span class="ident">TimeOffset</span>,
+<span class="doccomment">/// Which components to format.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+</span><span class="kw">pub enum </span>FormattedComponents {
+    <span class="doccomment">/// The configuration can only be used for parsing. Using this to format a value is
+    /// unspecified behavior.
+    </span><span class="prelude-val">None</span>,
+    <span class="doccomment">/// Format only the date.
+    </span>Date,
+    <span class="doccomment">/// Format only the time.
+    </span>Time,
+    <span class="doccomment">/// Format only the UTC offset.
+    </span>Offset,
+    <span class="doccomment">/// Format the date and time.
+    </span>DateTime,
+    <span class="doccomment">/// Format the date, time, and UTC offset.
+    </span>DateTimeOffset,
+    <span class="doccomment">/// Format the time and UTC offset.
+    </span>TimeOffset,
 }
 
-<span class="doccomment">/// Which format to use for the date.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DateKind</span> {
-    <span class="doccomment">/// Use the year-month-day format.</span>
-    <span class="ident">Calendar</span>,
-    <span class="doccomment">/// Use the year-week-weekday format.</span>
-    <span class="ident">Week</span>,
-    <span class="doccomment">/// Use the week-ordinal format.</span>
-    <span class="ident">Ordinal</span>,
+<span class="doccomment">/// Which format to use for the date.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+</span><span class="kw">pub enum </span>DateKind {
+    <span class="doccomment">/// Use the year-month-day format.
+    </span>Calendar,
+    <span class="doccomment">/// Use the year-week-weekday format.
+    </span>Week,
+    <span class="doccomment">/// Use the week-ordinal format.
+    </span>Ordinal,
 }
 
-<span class="doccomment">/// The precision and number of decimal digits present for the time.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TimePrecision</span> {
-    <span class="doccomment">/// Format the hour only. Minutes, seconds, and nanoseconds will be represented with the</span>
-    <span class="doccomment">/// specified number of decimal digits, if any.</span>
-    <span class="ident">Hour</span> {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_docs_in_private_items</span>)]</span>
-        <span class="ident">decimal_digits</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonZeroU8</span><span class="op">&gt;</span>,
+<span class="doccomment">/// The precision and number of decimal digits present for the time.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+</span><span class="kw">pub enum </span>TimePrecision {
+    <span class="doccomment">/// Format the hour only. Minutes, seconds, and nanoseconds will be represented with the
+    /// specified number of decimal digits, if any.
+    </span>Hour {
+        <span class="attribute">#[allow(clippy::missing_docs_in_private_items)]
+        </span>decimal_digits: <span class="prelude-ty">Option</span>&lt;NonZeroU8&gt;,
     },
-    <span class="doccomment">/// Format the hour and minute. Seconds and nanoseconds will be represented with the specified</span>
-    <span class="doccomment">/// number of decimal digits, if any.</span>
-    <span class="ident">Minute</span> {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_docs_in_private_items</span>)]</span>
-        <span class="ident">decimal_digits</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonZeroU8</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Format the hour and minute. Seconds and nanoseconds will be represented with the specified
+    /// number of decimal digits, if any.
+    </span>Minute {
+        <span class="attribute">#[allow(clippy::missing_docs_in_private_items)]
+        </span>decimal_digits: <span class="prelude-ty">Option</span>&lt;NonZeroU8&gt;,
     },
-    <span class="doccomment">/// Format the hour, minute, and second. Nanoseconds will be represented with the specified</span>
-    <span class="doccomment">/// number of decimal digits, if any.</span>
-    <span class="ident">Second</span> {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_docs_in_private_items</span>)]</span>
-        <span class="ident">decimal_digits</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NonZeroU8</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Format the hour, minute, and second. Nanoseconds will be represented with the specified
+    /// number of decimal digits, if any.
+    </span>Second {
+        <span class="attribute">#[allow(clippy::missing_docs_in_private_items)]
+        </span>decimal_digits: <span class="prelude-ty">Option</span>&lt;NonZeroU8&gt;,
     },
 }
 
-<span class="doccomment">/// The precision for the UTC offset.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">OffsetPrecision</span> {
-    <span class="doccomment">/// Format only the offset hour. Requires the offset minute to be zero.</span>
-    <span class="ident">Hour</span>,
-    <span class="doccomment">/// Format both the offset hour and minute.</span>
-    <span class="ident">Minute</span>,
+<span class="doccomment">/// The precision for the UTC offset.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+</span><span class="kw">pub enum </span>OffsetPrecision {
+    <span class="doccomment">/// Format only the offset hour. Requires the offset minute to be zero.
+    </span>Hour,
+    <span class="doccomment">/// Format both the offset hour and minute.
+    </span>Minute,
 }
 
-<span class="doccomment">/// Configuration for [`Iso8601`].</span>
-<span class="comment">// This is only used as a const generic, so there&#39;s no need to have a number of implementations on</span>
-<span class="comment">// it.</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_copy_implementations</span>)]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">alias</span> <span class="op">=</span> <span class="string">&quot;EncodedConfig&quot;</span>)]</span> <span class="comment">// People will likely search for `EncodedConfig`, so show them this.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Config</span> {
-    <span class="doccomment">/// Which components, if any, will be formatted.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">formatted_components</span>: <span class="ident">FormattedComponents</span>,
-    <span class="doccomment">/// Whether the format contains separators (such as `-` or `:`).</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">use_separators</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Whether the year is six digits.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">year_is_six_digits</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// The format used for the date.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">date_kind</span>: <span class="ident">DateKind</span>,
-    <span class="doccomment">/// The precision and number of decimal digits present for the time.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">time_precision</span>: <span class="ident">TimePrecision</span>,
-    <span class="doccomment">/// The precision for the UTC offset.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">offset_precision</span>: <span class="ident">OffsetPrecision</span>,
+<span class="doccomment">/// Configuration for [`Iso8601`].
+</span><span class="comment">// This is only used as a const generic, so there&#39;s no need to have a number of implementations on
+// it.
+</span><span class="attribute">#[allow(missing_copy_implementations)]
+#[doc(alias = <span class="string">&quot;EncodedConfig&quot;</span>)] </span><span class="comment">// People will likely search for `EncodedConfig`, so show them this.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Config {
+    <span class="doccomment">/// Which components, if any, will be formatted.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) formatted_components: FormattedComponents,
+    <span class="doccomment">/// Whether the format contains separators (such as `-` or `:`).
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) use_separators: bool,
+    <span class="doccomment">/// Whether the year is six digits.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) year_is_six_digits: bool,
+    <span class="doccomment">/// The format used for the date.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) date_kind: DateKind,
+    <span class="doccomment">/// The precision and number of decimal digits present for the time.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) time_precision: TimePrecision,
+    <span class="doccomment">/// The precision for the UTC offset.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) offset_precision: OffsetPrecision,
 }
 
-<span class="kw">impl</span> <span class="ident">Config</span> {
-    <span class="doccomment">/// A configuration for the [`Iso8601`] format.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The following is the default behavior:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - The configuration can be used for both formatting and parsing.</span>
-    <span class="doccomment">/// - The date, time, and UTC offset are all formatted.</span>
-    <span class="doccomment">/// - Separators (such as `-` and `:`) are included.</span>
-    <span class="doccomment">/// - The year contains four digits, such that the year must be between 0 and 9999.</span>
-    <span class="doccomment">/// - The date uses the calendar format.</span>
-    <span class="doccomment">/// - The time has precision to the second and nine decimal digits.</span>
-    <span class="doccomment">/// - The UTC offset has precision to the minute.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If you need different behavior, use the setter methods on this struct.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DEFAULT</span>: <span class="self">Self</span> <span class="op">=</span> <span class="self">Self</span> {
-        <span class="ident">formatted_components</span>: <span class="ident">FormattedComponents::DateTimeOffset</span>,
-        <span class="ident">use_separators</span>: <span class="bool-val">true</span>,
-        <span class="ident">year_is_six_digits</span>: <span class="bool-val">false</span>,
-        <span class="ident">date_kind</span>: <span class="ident">DateKind::Calendar</span>,
-        <span class="ident">time_precision</span>: <span class="ident">TimePrecision::Second</span> {
-            <span class="ident">decimal_digits</span>: <span class="ident">NonZeroU8::new</span>(<span class="number">9</span>),
+<span class="kw">impl </span>Config {
+    <span class="doccomment">/// A configuration for the [`Iso8601`] format.
+    ///
+    /// The following is the default behavior:
+    ///
+    /// - The configuration can be used for both formatting and parsing.
+    /// - The date, time, and UTC offset are all formatted.
+    /// - Separators (such as `-` and `:`) are included.
+    /// - The year contains four digits, such that the year must be between 0 and 9999.
+    /// - The date uses the calendar format.
+    /// - The time has precision to the second and nine decimal digits.
+    /// - The UTC offset has precision to the minute.
+    ///
+    /// If you need different behavior, use the setter methods on this struct.
+    </span><span class="kw">pub const </span>DEFAULT: <span class="self">Self </span>= <span class="self">Self </span>{
+        formatted_components: FormattedComponents::DateTimeOffset,
+        use_separators: <span class="bool-val">true</span>,
+        year_is_six_digits: <span class="bool-val">false</span>,
+        date_kind: DateKind::Calendar,
+        time_precision: TimePrecision::Second {
+            decimal_digits: NonZeroU8::new(<span class="number">9</span>),
         },
-        <span class="ident">offset_precision</span>: <span class="ident">OffsetPrecision::Minute</span>,
+        offset_precision: OffsetPrecision::Minute,
     };
 
-    <span class="doccomment">/// Set whether the format the date, time, and/or UTC offset.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">set_formatted_components</span>(<span class="self">self</span>, <span class="ident">formatted_components</span>: <span class="ident">FormattedComponents</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">formatted_components</span>,
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Set whether the format the date, time, and/or UTC offset.
+    </span><span class="kw">pub const fn </span>set_formatted_components(<span class="self">self</span>, formatted_components: FormattedComponents) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            formatted_components,
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Set whether the format contains separators (such as `-` or `:`).</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">set_use_separators</span>(<span class="self">self</span>, <span class="ident">use_separators</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">use_separators</span>,
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Set whether the format contains separators (such as `-` or `:`).
+    </span><span class="kw">pub const fn </span>set_use_separators(<span class="self">self</span>, use_separators: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            use_separators,
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Set whether the year is six digits.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">set_year_is_six_digits</span>(<span class="self">self</span>, <span class="ident">year_is_six_digits</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">year_is_six_digits</span>,
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Set whether the year is six digits.
+    </span><span class="kw">pub const fn </span>set_year_is_six_digits(<span class="self">self</span>, year_is_six_digits: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            year_is_six_digits,
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Set the format used for the date.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">set_date_kind</span>(<span class="self">self</span>, <span class="ident">date_kind</span>: <span class="ident">DateKind</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">date_kind</span>, ..<span class="self">self</span> }
+    <span class="doccomment">/// Set the format used for the date.
+    </span><span class="kw">pub const fn </span>set_date_kind(<span class="self">self</span>, date_kind: DateKind) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ date_kind, ..<span class="self">self </span>}
     }
 
-    <span class="doccomment">/// Set the precision and number of decimal digits present for the time.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">set_time_precision</span>(<span class="self">self</span>, <span class="ident">time_precision</span>: <span class="ident">TimePrecision</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">time_precision</span>,
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Set the precision and number of decimal digits present for the time.
+    </span><span class="kw">pub const fn </span>set_time_precision(<span class="self">self</span>, time_precision: TimePrecision) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            time_precision,
+            ..<span class="self">self
+        </span>}
     }
 
-    <span class="doccomment">/// Set the precision for the UTC offset.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">set_offset_precision</span>(<span class="self">self</span>, <span class="ident">offset_precision</span>: <span class="ident">OffsetPrecision</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">offset_precision</span>,
-            ..<span class="self">self</span>
-        }
+    <span class="doccomment">/// Set the precision for the UTC offset.
+    </span><span class="kw">pub const fn </span>set_offset_precision(<span class="self">self</span>, offset_precision: OffsetPrecision) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            offset_precision,
+            ..<span class="self">self
+        </span>}
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="time" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="time" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

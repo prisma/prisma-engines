@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-0.4.13/src/discover/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tower/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-0.4.13/src/discover/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tower/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -105,112 +105,112 @@
 <span id="105">105</span>
 <span id="106">106</span>
 <span id="107">107</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Service discovery</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This module provides the [`Change`] enum, which indicates the arrival or departure of a service</span>
-<span class="doccomment">//! from a collection of similar services. Most implementations should use the [`Discover`] trait</span>
-<span class="doccomment">//! in their bounds to indicate that they can handle services coming and going. [`Discover`] itself</span>
-<span class="doccomment">//! is primarily a convenience wrapper around [`TryStream&lt;Ok = Change&gt;`][`TryStream`].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Every discovered service is assigned an identifier that is distinct among the currently active</span>
-<span class="doccomment">//! services. If that service later goes away, a [`Change::Remove`] is yielded with that service&#39;s</span>
-<span class="doccomment">//! identifier. From that point forward, the identifier may be re-used.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Examples</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! use futures_util::{future::poll_fn, pin_mut};</span>
-<span class="doccomment">//! use tower::discover::{Change, Discover};</span>
-<span class="doccomment">//! async fn services_monitor&lt;D: Discover&gt;(services: D) {</span>
-<span class="doccomment">//!     pin_mut!(services);</span>
-<span class="doccomment">//!     while let Some(Ok(change)) = poll_fn(|cx| services.as_mut().poll_discover(cx)).await {</span>
-<span class="doccomment">//!         match change {</span>
-<span class="doccomment">//!             Change::Insert(key, svc) =&gt; {</span>
-<span class="doccomment">//!                 // a new service with identifier `key` was discovered</span>
-<span class="doccomment">//!                 # let _ = (key, svc);</span>
-<span class="doccomment">//!             }</span>
-<span class="doccomment">//!             Change::Remove(key) =&gt; {</span>
-<span class="doccomment">//!                 // the service with identifier `key` has gone away</span>
-<span class="doccomment">//!                 # let _ = (key);</span>
-<span class="doccomment">//!             }</span>
-<span class="doccomment">//!         }</span>
-<span class="doccomment">//!     }</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`TryStream`]: https://docs.rs/futures/latest/futures/stream/trait.TryStream.html</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Service discovery
+//!
+//! This module provides the [`Change`] enum, which indicates the arrival or departure of a service
+//! from a collection of similar services. Most implementations should use the [`Discover`] trait
+//! in their bounds to indicate that they can handle services coming and going. [`Discover`] itself
+//! is primarily a convenience wrapper around [`TryStream&lt;Ok = Change&gt;`][`TryStream`].
+//!
+//! Every discovered service is assigned an identifier that is distinct among the currently active
+//! services. If that service later goes away, a [`Change::Remove`] is yielded with that service&#39;s
+//! identifier. From that point forward, the identifier may be re-used.
+//!
+//! # Examples
+//!
+//! ```rust
+//! use futures_util::{future::poll_fn, pin_mut};
+//! use tower::discover::{Change, Discover};
+//! async fn services_monitor&lt;D: Discover&gt;(services: D) {
+//!     pin_mut!(services);
+//!     while let Some(Ok(change)) = poll_fn(|cx| services.as_mut().poll_discover(cx)).await {
+//!         match change {
+//!             Change::Insert(key, svc) =&gt; {
+//!                 // a new service with identifier `key` was discovered
+//!                 # let _ = (key, svc);
+//!             }
+//!             Change::Remove(key) =&gt; {
+//!                 // the service with identifier `key` has gone away
+//!                 # let _ = (key);
+//!             }
+//!         }
+//!     }
+//! }
+//! ```
+//!
+//! [`TryStream`]: https://docs.rs/futures/latest/futures/stream/trait.TryStream.html
 
-<span class="kw">mod</span> <span class="ident">error</span>;
-<span class="kw">mod</span> <span class="ident">list</span>;
+</span><span class="kw">mod </span>error;
+<span class="kw">mod </span>list;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::list::ServiceList</span>;
+<span class="kw">pub use </span><span class="self">self</span>::list::ServiceList;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sealed::Sealed</span>;
-<span class="kw">use</span> <span class="ident">futures_core::TryStream</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">pin::Pin</span>,
-    <span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>},
+<span class="kw">use </span><span class="kw">crate</span>::sealed::Sealed;
+<span class="kw">use </span>futures_core::TryStream;
+<span class="kw">use </span>std::{
+    pin::Pin,
+    task::{Context, Poll},
 };
 
-<span class="doccomment">/// A dynamically changing set of related services.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// As new services arrive and old services are retired,</span>
-<span class="doccomment">/// [`Change`]s are returned which provide unique identifiers</span>
-<span class="doccomment">/// for the services.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See the module documentation for more details.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Discover</span>: <span class="ident">Sealed</span><span class="op">&lt;</span><span class="ident">Change</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// A unique identifier for each active service.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// An identifier can be re-used once a [`Change::Remove`] has been yielded for its service.</span>
-    <span class="kw">type</span> <span class="ident">Key</span>: <span class="ident">Eq</span>;
+<span class="doccomment">/// A dynamically changing set of related services.
+///
+/// As new services arrive and old services are retired,
+/// [`Change`]s are returned which provide unique identifiers
+/// for the services.
+///
+/// See the module documentation for more details.
+</span><span class="kw">pub trait </span>Discover: Sealed&lt;Change&lt;(), ()&gt;&gt; {
+    <span class="doccomment">/// A unique identifier for each active service.
+    ///
+    /// An identifier can be re-used once a [`Change::Remove`] has been yielded for its service.
+    </span><span class="kw">type </span>Key: Eq;
 
-    <span class="doccomment">/// The type of [`Service`] yielded by this [`Discover`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Service`]: crate::Service</span>
-    <span class="kw">type</span> <span class="ident">Service</span>;
+    <span class="doccomment">/// The type of [`Service`] yielded by this [`Discover`].
+    ///
+    /// [`Service`]: crate::Service
+    </span><span class="kw">type </span>Service;
 
-    <span class="doccomment">/// Error produced during discovery</span>
-    <span class="kw">type</span> <span class="ident">Error</span>;
+    <span class="doccomment">/// Error produced during discovery
+    </span><span class="kw">type </span>Error;
 
-    <span class="doccomment">/// Yields the next discovery change set.</span>
-    <span class="kw">fn</span> <span class="ident">poll_discover</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Change</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Key</span>, <span class="ident"><span class="self">Self</span>::Service</span><span class="op">&gt;</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Yields the next discovery change set.
+    </span><span class="kw">fn </span>poll_discover(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Result</span>&lt;Change&lt;<span class="self">Self</span>::Key, <span class="self">Self</span>::Service&gt;, <span class="self">Self</span>::Error&gt;&gt;&gt;;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S</span>, <span class="ident">E</span>, <span class="ident">D</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">Sealed</span><span class="op">&lt;</span><span class="ident">Change</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">D</span>
-<span class="kw">where</span>
-    <span class="ident">D</span>: <span class="ident">TryStream</span><span class="op">&lt;</span><span class="prelude-val">Ok</span> <span class="op">=</span> <span class="ident">Change</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">E</span><span class="op">&gt;</span>,
-    <span class="ident">K</span>: <span class="ident">Eq</span>,
+<span class="kw">impl</span>&lt;K, S, E, D: <span class="question-mark">?</span>Sized&gt; Sealed&lt;Change&lt;(), ()&gt;&gt; <span class="kw">for </span>D
+<span class="kw">where
+    </span>D: TryStream&lt;<span class="prelude-val">Ok </span>= Change&lt;K, S&gt;, Error = E&gt;,
+    K: Eq,
 {
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S</span>, <span class="ident">E</span>, <span class="ident">D</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">Discover</span> <span class="kw">for</span> <span class="ident">D</span>
-<span class="kw">where</span>
-    <span class="ident">D</span>: <span class="ident">TryStream</span><span class="op">&lt;</span><span class="prelude-val">Ok</span> <span class="op">=</span> <span class="ident">Change</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">Error</span> <span class="op">=</span> <span class="ident">E</span><span class="op">&gt;</span>,
-    <span class="ident">K</span>: <span class="ident">Eq</span>,
+<span class="kw">impl</span>&lt;K, S, E, D: <span class="question-mark">?</span>Sized&gt; Discover <span class="kw">for </span>D
+<span class="kw">where
+    </span>D: TryStream&lt;<span class="prelude-val">Ok </span>= Change&lt;K, S&gt;, Error = E&gt;,
+    K: Eq,
 {
-    <span class="kw">type</span> <span class="ident">Key</span> <span class="op">=</span> <span class="ident">K</span>;
-    <span class="kw">type</span> <span class="ident">Service</span> <span class="op">=</span> <span class="ident">S</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">E</span>;
+    <span class="kw">type </span>Key = K;
+    <span class="kw">type </span>Service = S;
+    <span class="kw">type </span>Error = E;
 
-    <span class="kw">fn</span> <span class="ident">poll_discover</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">D::Ok</span>, <span class="ident">D::Error</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">TryStream::try_poll_next</span>(<span class="self">self</span>, <span class="ident">cx</span>)
+    <span class="kw">fn </span>poll_discover(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Result</span>&lt;D::Ok, D::Error&gt;&gt;&gt; {
+        TryStream::try_poll_next(<span class="self">self</span>, cx)
     }
 }
 
-<span class="doccomment">/// A change in the service set.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Change</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// A new service identified by key `K` was identified.</span>
-    <span class="ident">Insert</span>(<span class="ident">K</span>, <span class="ident">V</span>),
-    <span class="doccomment">/// The service identified by key `K` disappeared.</span>
-    <span class="ident">Remove</span>(<span class="ident">K</span>),
+<span class="doccomment">/// A change in the service set.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub enum </span>Change&lt;K, V&gt; {
+    <span class="doccomment">/// A new service identified by key `K` was identified.
+    </span>Insert(K, V),
+    <span class="doccomment">/// The service identified by key `K` disappeared.
+    </span>Remove(K),
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tower" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tower" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

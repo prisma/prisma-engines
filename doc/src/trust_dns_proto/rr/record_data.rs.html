@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/rr/record_data.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>record_data.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/rr/record_data.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>record_data.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1281,1123 +1281,1123 @@
 <span id="1281">1281</span>
 <span id="1282">1282</span>
 <span id="1283">1283</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2021 Benjamin Fry &lt;benjaminfry@me.com&gt;</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2021 Benjamin Fry &lt;benjaminfry@me.com&gt;
+//
+// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="doccomment">//! record data enum variants</span>
+</span><span class="doccomment">//! record data enum variants
 
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span> <span class="comment">// allows us to deprecate RData types</span>
+</span><span class="attribute">#![allow(deprecated)] </span><span class="comment">// allows us to deprecate RData types
 
-<span class="kw">use</span> <span class="ident">std::cmp::Ordering</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::convert::From</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::net</span>::{<span class="ident">IpAddr</span>, <span class="ident">Ipv4Addr</span>, <span class="ident">Ipv6Addr</span>};
+</span><span class="kw">use </span>std::cmp::Ordering;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">use </span>std::convert::From;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde-config&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="kw">use</span> <span class="ident">enum_as_inner::EnumAsInner</span>;
-<span class="kw">use</span> <span class="ident">log</span>::{<span class="ident">trace</span>, <span class="ident">warn</span>};
+<span class="kw">use </span>enum_as_inner::EnumAsInner;
+<span class="kw">use </span>log::{trace, warn};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::domain::Name</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::rdata</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::rdata</span>::{
-    <span class="ident">CAA</span>, <span class="ident">CSYNC</span>, <span class="ident">HINFO</span>, <span class="ident">MX</span>, <span class="ident">NAPTR</span>, <span class="ident">NULL</span>, <span class="ident">OPENPGPKEY</span>, <span class="ident">OPT</span>, <span class="ident">SOA</span>, <span class="ident">SRV</span>, <span class="ident">SSHFP</span>, <span class="ident">SVCB</span>, <span class="ident">TLSA</span>, <span class="ident">TXT</span>,
+<span class="kw">use </span><span class="kw">super</span>::domain::Name;
+<span class="kw">use </span><span class="kw">super</span>::rdata;
+<span class="kw">use </span><span class="kw">super</span>::rdata::{
+    CAA, CSYNC, HINFO, MX, NAPTR, NULL, OPENPGPKEY, OPT, SOA, SRV, SSHFP, SVCB, TLSA, TXT,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::record_type::RecordType</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::serialize::binary</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">super</span>::record_type::RecordType;
+<span class="kw">use </span><span class="kw">crate</span>::error::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::serialize::binary::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::dnssec::rdata::DNSSECRData</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;dnssec&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">super</span>::dnssec::rdata::DNSSECRData;
 
-<span class="doccomment">/// Record data enum variants</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [RFC 1035](https://tools.ietf.org/html/rfc1035), DOMAIN NAMES - IMPLEMENTATION AND SPECIFICATION, November 1987</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// 3.3. Standard RRs</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The following RR definitions are expected to occur, at least</span>
-<span class="doccomment">/// potentially, in all classes.  In particular, NS, SOA, CNAME, and PTR</span>
-<span class="doccomment">/// will be used in all classes, and have the same format in all classes.</span>
-<span class="doccomment">/// Because their RDATA format is known, all domain names in the RDATA</span>
-<span class="doccomment">/// section of these RRs may be compressed.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// &lt;domain-name&gt; is a domain name represented as a series of labels, and</span>
-<span class="doccomment">/// terminated by a label with zero length.  &lt;character-string&gt; is a single</span>
-<span class="doccomment">/// length octet followed by that number of characters.  &lt;character-string&gt;</span>
-<span class="doccomment">/// is treated as binary information, and can be up to 256 characters in</span>
-<span class="doccomment">/// length (including the length octet).</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">EnumAsInner</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RData</span> {
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// -- RFC 1035 -- Domain Implementation and Specification    November 1987</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// 3.4. Internet specific RRs</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// 3.4.1. A RDATA format</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-    <span class="doccomment">///     |                    ADDRESS                    |</span>
-    <span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// where:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ADDRESS         A 32 bit Internet address.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Hosts that have multiple Internet addresses will have multiple A</span>
-    <span class="doccomment">/// records.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A records cause no additional section processing.  The RDATA section of</span>
-    <span class="doccomment">/// an A line in a Zone File is an Internet address expressed as four</span>
-    <span class="doccomment">/// decimal numbers separated by dots without any embedded spaces (e.g.,</span>
-    <span class="doccomment">/// &quot;10.2.0.52&quot; or &quot;192.0.5.6&quot;).</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">A</span>(<span class="ident">Ipv4Addr</span>),
+<span class="doccomment">/// Record data enum variants
+///
+/// [RFC 1035](https://tools.ietf.org/html/rfc1035), DOMAIN NAMES - IMPLEMENTATION AND SPECIFICATION, November 1987
+///
+/// ```text
+/// 3.3. Standard RRs
+///
+/// The following RR definitions are expected to occur, at least
+/// potentially, in all classes.  In particular, NS, SOA, CNAME, and PTR
+/// will be used in all classes, and have the same format in all classes.
+/// Because their RDATA format is known, all domain names in the RDATA
+/// section of these RRs may be compressed.
+///
+/// &lt;domain-name&gt; is a domain name represented as a series of labels, and
+/// terminated by a label with zero length.  &lt;character-string&gt; is a single
+/// length octet followed by that number of characters.  &lt;character-string&gt;
+/// is treated as binary information, and can be up to 256 characters in
+/// length (including the length octet).
+/// ```
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serde-config&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Debug, EnumAsInner, PartialEq, Clone, Eq)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>RData {
+    <span class="doccomment">/// ```text
+    /// -- RFC 1035 -- Domain Implementation and Specification    November 1987
+    ///
+    /// 3.4. Internet specific RRs
+    ///
+    /// 3.4.1. A RDATA format
+    ///
+    ///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    ///     |                    ADDRESS                    |
+    ///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    ///
+    /// where:
+    ///
+    /// ADDRESS         A 32 bit Internet address.
+    ///
+    /// Hosts that have multiple Internet addresses will have multiple A
+    /// records.
+    ///
+    /// A records cause no additional section processing.  The RDATA section of
+    /// an A line in a Zone File is an Internet address expressed as four
+    /// decimal numbers separated by dots without any embedded spaces (e.g.,
+    /// &quot;10.2.0.52&quot; or &quot;192.0.5.6&quot;).
+    /// ```
+    </span>A(Ipv4Addr),
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// -- RFC 1886 -- IPv6 DNS Extensions              December 1995</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// 2.2 AAAA data format</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///    A 128 bit IPv6 address is encoded in the data portion of an AAAA</span>
-    <span class="doccomment">///    resource record in network byte order (high-order byte first).</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">AAAA</span>(<span class="ident">Ipv6Addr</span>),
+    <span class="doccomment">/// ```text
+    /// -- RFC 1886 -- IPv6 DNS Extensions              December 1995
+    ///
+    /// 2.2 AAAA data format
+    ///
+    ///    A 128 bit IPv6 address is encoded in the data portion of an AAAA
+    ///    resource record in network byte order (high-order byte first).
+    /// ```
+    </span>AAAA(Ipv6Addr),
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// 2.  The ANAME resource record</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///   This document defines the &quot;ANAME&quot; DNS resource record type, with RR</span>
-    <span class="doccomment">///   TYPE value [TBD].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// 2.1.  Presentation and wire format</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///   The ANAME presentation format is identical to that of CNAME</span>
-    <span class="doccomment">///   [RFC1033]:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///       owner ttl class ANAME target</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">ANAME</span>(<span class="ident">Name</span>),
+    <span class="doccomment">/// ```text
+    /// 2.  The ANAME resource record
+    ///
+    ///   This document defines the &quot;ANAME&quot; DNS resource record type, with RR
+    ///   TYPE value [TBD].
+    ///
+    /// 2.1.  Presentation and wire format
+    ///
+    ///   The ANAME presentation format is identical to that of CNAME
+    ///   [RFC1033]:
+    ///
+    ///       owner ttl class ANAME target
+    /// ```
+    </span>ANAME(Name),
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// -- RFC 6844          Certification Authority Authorization     January 2013</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// 5.1.  Syntax</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A CAA RR contains a single property entry consisting of a tag-value</span>
-    <span class="doccomment">/// pair.  Each tag represents a property of the CAA record.  The value</span>
-    <span class="doccomment">/// of a CAA property is that specified in the corresponding value field.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A domain name MAY have multiple CAA RRs associated with it and a</span>
-    <span class="doccomment">/// given property MAY be specified more than once.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The CAA data field contains one property entry.  A property entry</span>
-    <span class="doccomment">/// consists of the following data fields:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// +0-1-2-3-4-5-6-7-|0-1-2-3-4-5-6-7-|</span>
-    <span class="doccomment">/// | Flags          | Tag Length = n |</span>
-    <span class="doccomment">/// +----------------+----------------+...+---------------+</span>
-    <span class="doccomment">/// | Tag char 0     | Tag char 1     |...| Tag char n-1  |</span>
-    <span class="doccomment">/// +----------------+----------------+...+---------------+</span>
-    <span class="doccomment">/// +----------------+----------------+.....+----------------+</span>
-    <span class="doccomment">/// | Value byte 0   | Value byte 1   |.....| Value byte m-1 |</span>
-    <span class="doccomment">/// +----------------+----------------+.....+----------------+</span>
+    <span class="doccomment">/// ```text
+    /// -- RFC 6844          Certification Authority Authorization     January 2013
+    ///
+    /// 5.1.  Syntax
+    ///
+    /// A CAA RR contains a single property entry consisting of a tag-value
+    /// pair.  Each tag represents a property of the CAA record.  The value
+    /// of a CAA property is that specified in the corresponding value field.
+    ///
+    /// A domain name MAY have multiple CAA RRs associated with it and a
+    /// given property MAY be specified more than once.
+    ///
+    /// The CAA data field contains one property entry.  A property entry
+    /// consists of the following data fields:
+    ///
+    /// +0-1-2-3-4-5-6-7-|0-1-2-3-4-5-6-7-|
+    /// | Flags          | Tag Length = n |
+    /// +----------------+----------------+...+---------------+
+    /// | Tag char 0     | Tag char 1     |...| Tag char n-1  |
+    /// +----------------+----------------+...+---------------+
+    /// +----------------+----------------+.....+----------------+
+    /// | Value byte 0   | Value byte 1   |.....| Value byte m-1 |
+    /// +----------------+----------------+.....+----------------+
 
-    <span class="doccomment">/// Where n is the length specified in the Tag length field and m is the</span>
-    <span class="doccomment">/// remaining octets in the Value field (m = d - n - 2) where d is the</span>
-    <span class="doccomment">/// length of the RDATA section.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">CAA</span>(<span class="ident">CAA</span>),
+    /// Where n is the length specified in the Tag length field and m is the
+    /// remaining octets in the Value field (m = d - n - 2) where d is the
+    /// length of the RDATA section.
+    /// ```
+    </span>CAA(CAA),
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">///   3.3. Standard RRs</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The following RR definitions are expected to occur, at least</span>
-    <span class="doccomment">/// potentially, in all classes.  In particular, NS, SOA, CNAME, and PTR</span>
-    <span class="doccomment">/// will be used in all classes, and have the same format in all classes.</span>
-    <span class="doccomment">/// Because their RDATA format is known, all domain names in the RDATA</span>
-    <span class="doccomment">/// section of these RRs may be compressed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// &lt;domain-name&gt; is a domain name represented as a series of labels, and</span>
-    <span class="doccomment">/// terminated by a label with zero length.  &lt;character-string&gt; is a single</span>
-    <span class="doccomment">/// length octet followed by that number of characters.  &lt;character-string&gt;</span>
-    <span class="doccomment">/// is treated as binary information, and can be up to 256 characters in</span>
-    <span class="doccomment">/// length (including the length octet).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// 3.3.1. CNAME RDATA format</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-    <span class="doccomment">///     /                     CNAME                     /</span>
-    <span class="doccomment">///     /                                               /</span>
-    <span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// where:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// CNAME           A &lt;domain-name&gt; which specifies the canonical or primary</span>
-    <span class="doccomment">///                 name for the owner.  The owner name is an alias.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// CNAME RRs cause no additional section processing, but name servers may</span>
-    <span class="doccomment">/// choose to restart the query at the canonical name in certain cases.  See</span>
-    <span class="doccomment">/// the description of name server logic in [RFC-1034] for details.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">CNAME</span>(<span class="ident">Name</span>),
+    <span class="doccomment">/// ```text
+    ///   3.3. Standard RRs
+    ///
+    /// The following RR definitions are expected to occur, at least
+    /// potentially, in all classes.  In particular, NS, SOA, CNAME, and PTR
+    /// will be used in all classes, and have the same format in all classes.
+    /// Because their RDATA format is known, all domain names in the RDATA
+    /// section of these RRs may be compressed.
+    ///
+    /// &lt;domain-name&gt; is a domain name represented as a series of labels, and
+    /// terminated by a label with zero length.  &lt;character-string&gt; is a single
+    /// length octet followed by that number of characters.  &lt;character-string&gt;
+    /// is treated as binary information, and can be up to 256 characters in
+    /// length (including the length octet).
+    ///
+    /// 3.3.1. CNAME RDATA format
+    ///
+    ///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    ///     /                     CNAME                     /
+    ///     /                                               /
+    ///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    ///
+    /// where:
+    ///
+    /// CNAME           A &lt;domain-name&gt; which specifies the canonical or primary
+    ///                 name for the owner.  The owner name is an alias.
+    ///
+    /// CNAME RRs cause no additional section processing, but name servers may
+    /// choose to restart the query at the canonical name in certain cases.  See
+    /// the description of name server logic in [RFC-1034] for details.
+    /// ```
+    </span>CNAME(Name),
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// 2.1.  The CSYNC Resource Record Format</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// 2.1.1.  The CSYNC Resource Record Wire Format</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The CSYNC RDATA consists of the following fields:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///                     1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3</span>
-    <span class="doccomment">/// 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1</span>
-    <span class="doccomment">/// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
-    <span class="doccomment">/// |                          SOA Serial                           |</span>
-    <span class="doccomment">/// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
-    <span class="doccomment">/// |       Flags                   |            Type Bit Map       /</span>
-    <span class="doccomment">/// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
-    <span class="doccomment">/// /                     Type Bit Map (continued)                  /</span>
-    <span class="doccomment">/// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">CSYNC</span>(<span class="ident">CSYNC</span>),
+    <span class="doccomment">/// ```text
+    /// 2.1.  The CSYNC Resource Record Format
+    ///
+    /// 2.1.1.  The CSYNC Resource Record Wire Format
+    ///
+    /// The CSYNC RDATA consists of the following fields:
+    ///
+    ///                     1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3
+    /// 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    /// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    /// |                          SOA Serial                           |
+    /// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    /// |       Flags                   |            Type Bit Map       /
+    /// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    /// /                     Type Bit Map (continued)                  /
+    /// +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    /// ```
+    </span>CSYNC(CSYNC),
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// 3.3.2. HINFO RDATA format</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-    <span class="doccomment">///     /                      CPU                      /</span>
-    <span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-    <span class="doccomment">///     /                       OS                      /</span>
-    <span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// where:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// CPU             A &lt;character-string&gt; which specifies the CPU type.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// OS              A &lt;character-string&gt; which specifies the operating</span>
-    <span class="doccomment">///                 system type.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Standard values for CPU and OS can be found in [RFC-1010].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// HINFO records are used to acquire general information about a host.  The</span>
-    <span class="doccomment">/// main use is for protocols such as FTP that can use special procedures</span>
-    <span class="doccomment">/// when talking between machines or operating systems of the same type.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `HINFO` is also used by [RFC 8482](https://tools.ietf.org/html/rfc8482)</span>
-    <span class="ident">HINFO</span>(<span class="ident">HINFO</span>),
+    <span class="doccomment">/// ```text
+    /// 3.3.2. HINFO RDATA format
+    ///
+    ///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    ///     /                      CPU                      /
+    ///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    ///     /                       OS                      /
+    ///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    ///
+    /// where:
+    ///
+    /// CPU             A &lt;character-string&gt; which specifies the CPU type.
+    ///
+    /// OS              A &lt;character-string&gt; which specifies the operating
+    ///                 system type.
+    ///
+    /// Standard values for CPU and OS can be found in [RFC-1010].
+    ///
+    /// HINFO records are used to acquire general information about a host.  The
+    /// main use is for protocols such as FTP that can use special procedures
+    /// when talking between machines or operating systems of the same type.
+    /// ```
+    ///
+    /// `HINFO` is also used by [RFC 8482](https://tools.ietf.org/html/rfc8482)
+    </span>HINFO(HINFO),
 
-    <span class="doccomment">/// [RFC draft-ietf-dnsop-svcb-https-03, DNS SVCB and HTTPS RRs](https://datatracker.ietf.org/doc/html/draft-ietf-dnsop-svcb-https-03#section-8)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">///    8.  Using SVCB with HTTPS and HTTP</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///    Use of any protocol with SVCB requires a protocol-specific mapping</span>
-    <span class="doccomment">///    specification.  This section specifies the mapping for HTTPS and</span>
-    <span class="doccomment">///    HTTP.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///    To enable special handling for the HTTPS and HTTP use-cases, the</span>
-    <span class="doccomment">///    HTTPS RR type is defined as a SVCB-compatible RR type, specific to</span>
-    <span class="doccomment">///    the https and http schemes.  Clients MUST NOT perform SVCB queries or</span>
-    <span class="doccomment">///    accept SVCB responses for &quot;https&quot; or &quot;http&quot; schemes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///    The HTTPS RR wire format and presentation format are identical to</span>
-    <span class="doccomment">///    SVCB, and both share the SvcParamKey registry.  SVCB semantics apply</span>
-    <span class="doccomment">///    equally to HTTPS RRs unless specified otherwise.  The presentation</span>
-    <span class="doccomment">///    format of the record is:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///    Name TTL IN HTTPS SvcPriority TargetName SvcParams</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">HTTPS</span>(<span class="ident">SVCB</span>),
+    <span class="doccomment">/// [RFC draft-ietf-dnsop-svcb-https-03, DNS SVCB and HTTPS RRs](https://datatracker.ietf.org/doc/html/draft-ietf-dnsop-svcb-https-03#section-8)
+    ///
+    /// ```text
+    ///    8.  Using SVCB with HTTPS and HTTP
+    ///
+    ///    Use of any protocol with SVCB requires a protocol-specific mapping
+    ///    specification.  This section specifies the mapping for HTTPS and
+    ///    HTTP.
+    ///
+    ///    To enable special handling for the HTTPS and HTTP use-cases, the
+    ///    HTTPS RR type is defined as a SVCB-compatible RR type, specific to
+    ///    the https and http schemes.  Clients MUST NOT perform SVCB queries or
+    ///    accept SVCB responses for &quot;https&quot; or &quot;http&quot; schemes.
+    ///
+    ///    The HTTPS RR wire format and presentation format are identical to
+    ///    SVCB, and both share the SvcParamKey registry.  SVCB semantics apply
+    ///    equally to HTTPS RRs unless specified otherwise.  The presentation
+    ///    format of the record is:
+    ///
+    ///    Name TTL IN HTTPS SvcPriority TargetName SvcParams
+    /// ```
+    </span>HTTPS(SVCB),
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// 3.3.9. MX RDATA format</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-    <span class="doccomment">///     |                  PREFERENCE                   |</span>
-    <span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-    <span class="doccomment">///     /                   EXCHANGE                    /</span>
-    <span class="doccomment">///     /                                               /</span>
-    <span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// where:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// PREFERENCE      A 16 bit integer which specifies the preference given to</span>
-    <span class="doccomment">///                 this RR among others at the same owner.  Lower values</span>
-    <span class="doccomment">///                 are preferred.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// EXCHANGE        A &lt;domain-name&gt; which specifies a host willing to act as</span>
-    <span class="doccomment">///                 a mail exchange for the owner name.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// MX records cause type A additional section processing for the host</span>
-    <span class="doccomment">/// specified by EXCHANGE.  The use of MX RRs is explained in detail in</span>
-    <span class="doccomment">/// [RFC-974].</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">MX</span>(<span class="ident">MX</span>),
+    <span class="doccomment">/// ```text
+    /// 3.3.9. MX RDATA format
+    ///
+    ///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    ///     |                  PREFERENCE                   |
+    ///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    ///     /                   EXCHANGE                    /
+    ///     /                                               /
+    ///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    ///
+    /// where:
+    ///
+    /// PREFERENCE      A 16 bit integer which specifies the preference given to
+    ///                 this RR among others at the same owner.  Lower values
+    ///                 are preferred.
+    ///
+    /// EXCHANGE        A &lt;domain-name&gt; which specifies a host willing to act as
+    ///                 a mail exchange for the owner name.
+    ///
+    /// MX records cause type A additional section processing for the host
+    /// specified by EXCHANGE.  The use of MX RRs is explained in detail in
+    /// [RFC-974].
+    /// ```
+    </span>MX(MX),
 
-    <span class="doccomment">/// [RFC 3403 DDDS DNS Database, October 2002](https://tools.ietf.org/html/rfc3403#section-4)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// 4.1 Packet Format</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///   The packet format of the NAPTR RR is given below.  The DNS type code</span>
-    <span class="doccomment">///   for NAPTR is 35.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///      The packet format for the NAPTR record is as follows</span>
-    <span class="doccomment">///                                       1  1  1  1  1  1</span>
-    <span class="doccomment">///         0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5</span>
-    <span class="doccomment">///       +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-    <span class="doccomment">///       |                     ORDER                     |</span>
-    <span class="doccomment">///       +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-    <span class="doccomment">///       |                   PREFERENCE                  |</span>
-    <span class="doccomment">///       +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-    <span class="doccomment">///       /                     FLAGS                     /</span>
-    <span class="doccomment">///       +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-    <span class="doccomment">///       /                   SERVICES                    /</span>
-    <span class="doccomment">///       +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-    <span class="doccomment">///       /                    REGEXP                     /</span>
-    <span class="doccomment">///       +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-    <span class="doccomment">///       /                  REPLACEMENT                  /</span>
-    <span class="doccomment">///       /                                               /</span>
-    <span class="doccomment">///       +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///   &lt;character-string&gt; and &lt;domain-name&gt; as used here are defined in RFC</span>
-    <span class="doccomment">///   1035 [7].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///   ORDER</span>
-    <span class="doccomment">///      A 16-bit unsigned integer specifying the order in which the NAPTR</span>
-    <span class="doccomment">///      records MUST be processed in order to accurately represent the</span>
-    <span class="doccomment">///      ordered list of Rules.  The ordering is from lowest to highest.</span>
-    <span class="doccomment">///      If two records have the same order value then they are considered</span>
-    <span class="doccomment">///      to be the same rule and should be selected based on the</span>
-    <span class="doccomment">///      combination of the Preference values and Services offered.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///   PREFERENCE</span>
-    <span class="doccomment">///      Although it is called &quot;preference&quot; in deference to DNS</span>
-    <span class="doccomment">///      terminology, this field is equivalent to the Priority value in the</span>
-    <span class="doccomment">///      DDDS Algorithm.  It is a 16-bit unsigned integer that specifies</span>
-    <span class="doccomment">///      the order in which NAPTR records with equal Order values SHOULD be</span>
-    <span class="doccomment">///      processed, low numbers being processed before high numbers.  This</span>
-    <span class="doccomment">///      is similar to the preference field in an MX record, and is used so</span>
-    <span class="doccomment">///      domain administrators can direct clients towards more capable</span>
-    <span class="doccomment">///      hosts or lighter weight protocols.  A client MAY look at records</span>
-    <span class="doccomment">///      with higher preference values if it has a good reason to do so</span>
-    <span class="doccomment">///      such as not supporting some protocol or service very well.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///      The important difference between Order and Preference is that once</span>
-    <span class="doccomment">///      a match is found the client MUST NOT consider records with a</span>
-    <span class="doccomment">///      different Order but they MAY process records with the same Order</span>
-    <span class="doccomment">///      but different Preferences.  The only exception to this is noted in</span>
-    <span class="doccomment">///      the second important Note in the DDDS algorithm specification</span>
-    <span class="doccomment">///      concerning allowing clients to use more complex Service</span>
-    <span class="doccomment">///      determination between steps 3 and 4 in the algorithm.  Preference</span>
-    <span class="doccomment">///      is used to give communicate a higher quality of service to rules</span>
-    <span class="doccomment">///      that are considered the same from an authority standpoint but not</span>
-    <span class="doccomment">///      from a simple load balancing standpoint.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///      It is important to note that DNS contains several load balancing</span>
-    <span class="doccomment">///      mechanisms and if load balancing among otherwise equal services</span>
-    <span class="doccomment">///      should be needed then methods such as SRV records or multiple A</span>
-    <span class="doccomment">///      records should be utilized to accomplish load balancing.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///   FLAGS</span>
-    <span class="doccomment">///      A &lt;character-string&gt; containing flags to control aspects of the</span>
-    <span class="doccomment">///      rewriting and interpretation of the fields in the record.  Flags</span>
-    <span class="doccomment">///      are single characters from the set A-Z and 0-9.  The case of the</span>
-    <span class="doccomment">///      alphabetic characters is not significant.  The field can be empty.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///      It is up to the Application specifying how it is using this</span>
-    <span class="doccomment">///      Database to define the Flags in this field.  It must define which</span>
-    <span class="doccomment">///      ones are terminal and which ones are not.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///   SERVICES</span>
-    <span class="doccomment">///      A &lt;character-string&gt; that specifies the Service Parameters</span>
-    <span class="doccomment">///      applicable to this this delegation path.  It is up to the</span>
-    <span class="doccomment">///      Application Specification to specify the values found in this</span>
-    <span class="doccomment">///      field.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///   REGEXP</span>
-    <span class="doccomment">///      A &lt;character-string&gt; containing a substitution expression that is</span>
-    <span class="doccomment">///      applied to the original string held by the client in order to</span>
-    <span class="doccomment">///      construct the next domain name to lookup.  See the DDDS Algorithm</span>
-    <span class="doccomment">///      specification for the syntax of this field.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///      As stated in the DDDS algorithm, The regular expressions MUST NOT</span>
-    <span class="doccomment">///      be used in a cumulative fashion, that is, they should only be</span>
-    <span class="doccomment">///      applied to the original string held by the client, never to the</span>
-    <span class="doccomment">///      domain name produced by a previous NAPTR rewrite.  The latter is</span>
-    <span class="doccomment">///      tempting in some applications but experience has shown such use to</span>
-    <span class="doccomment">///      be extremely fault sensitive, very error prone, and extremely</span>
-    <span class="doccomment">///      difficult to debug.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///   REPLACEMENT</span>
-    <span class="doccomment">///      A &lt;domain-name&gt; which is the next domain-name to query for</span>
-    <span class="doccomment">///      depending on the potential values found in the flags field.  This</span>
-    <span class="doccomment">///      field is used when the regular expression is a simple replacement</span>
-    <span class="doccomment">///      operation.  Any value in this field MUST be a fully qualified</span>
-    <span class="doccomment">///      domain-name.  Name compression is not to be used for this field.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///      This field and the REGEXP field together make up the Substitution</span>
-    <span class="doccomment">///      Expression in the DDDS Algorithm.  It is simply a historical</span>
-    <span class="doccomment">///      optimization specifically for DNS compression that this field</span>
-    <span class="doccomment">///      exists.  The fields are also mutually exclusive.  If a record is</span>
-    <span class="doccomment">///      returned that has values for both fields then it is considered to</span>
-    <span class="doccomment">///      be in error and SHOULD be either ignored or an error returned.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">NAPTR</span>(<span class="ident">NAPTR</span>),
+    <span class="doccomment">/// [RFC 3403 DDDS DNS Database, October 2002](https://tools.ietf.org/html/rfc3403#section-4)
+    ///
+    /// ```text
+    /// 4.1 Packet Format
+    ///
+    ///   The packet format of the NAPTR RR is given below.  The DNS type code
+    ///   for NAPTR is 35.
+    ///
+    ///      The packet format for the NAPTR record is as follows
+    ///                                       1  1  1  1  1  1
+    ///         0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5
+    ///       +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    ///       |                     ORDER                     |
+    ///       +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    ///       |                   PREFERENCE                  |
+    ///       +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    ///       /                     FLAGS                     /
+    ///       +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    ///       /                   SERVICES                    /
+    ///       +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    ///       /                    REGEXP                     /
+    ///       +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    ///       /                  REPLACEMENT                  /
+    ///       /                                               /
+    ///       +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    ///
+    ///   &lt;character-string&gt; and &lt;domain-name&gt; as used here are defined in RFC
+    ///   1035 [7].
+    ///
+    ///   ORDER
+    ///      A 16-bit unsigned integer specifying the order in which the NAPTR
+    ///      records MUST be processed in order to accurately represent the
+    ///      ordered list of Rules.  The ordering is from lowest to highest.
+    ///      If two records have the same order value then they are considered
+    ///      to be the same rule and should be selected based on the
+    ///      combination of the Preference values and Services offered.
+    ///
+    ///   PREFERENCE
+    ///      Although it is called &quot;preference&quot; in deference to DNS
+    ///      terminology, this field is equivalent to the Priority value in the
+    ///      DDDS Algorithm.  It is a 16-bit unsigned integer that specifies
+    ///      the order in which NAPTR records with equal Order values SHOULD be
+    ///      processed, low numbers being processed before high numbers.  This
+    ///      is similar to the preference field in an MX record, and is used so
+    ///      domain administrators can direct clients towards more capable
+    ///      hosts or lighter weight protocols.  A client MAY look at records
+    ///      with higher preference values if it has a good reason to do so
+    ///      such as not supporting some protocol or service very well.
+    ///
+    ///      The important difference between Order and Preference is that once
+    ///      a match is found the client MUST NOT consider records with a
+    ///      different Order but they MAY process records with the same Order
+    ///      but different Preferences.  The only exception to this is noted in
+    ///      the second important Note in the DDDS algorithm specification
+    ///      concerning allowing clients to use more complex Service
+    ///      determination between steps 3 and 4 in the algorithm.  Preference
+    ///      is used to give communicate a higher quality of service to rules
+    ///      that are considered the same from an authority standpoint but not
+    ///      from a simple load balancing standpoint.
+    ///
+    ///      It is important to note that DNS contains several load balancing
+    ///      mechanisms and if load balancing among otherwise equal services
+    ///      should be needed then methods such as SRV records or multiple A
+    ///      records should be utilized to accomplish load balancing.
+    ///
+    ///   FLAGS
+    ///      A &lt;character-string&gt; containing flags to control aspects of the
+    ///      rewriting and interpretation of the fields in the record.  Flags
+    ///      are single characters from the set A-Z and 0-9.  The case of the
+    ///      alphabetic characters is not significant.  The field can be empty.
+    ///
+    ///      It is up to the Application specifying how it is using this
+    ///      Database to define the Flags in this field.  It must define which
+    ///      ones are terminal and which ones are not.
+    ///
+    ///   SERVICES
+    ///      A &lt;character-string&gt; that specifies the Service Parameters
+    ///      applicable to this this delegation path.  It is up to the
+    ///      Application Specification to specify the values found in this
+    ///      field.
+    ///
+    ///   REGEXP
+    ///      A &lt;character-string&gt; containing a substitution expression that is
+    ///      applied to the original string held by the client in order to
+    ///      construct the next domain name to lookup.  See the DDDS Algorithm
+    ///      specification for the syntax of this field.
+    ///
+    ///      As stated in the DDDS algorithm, The regular expressions MUST NOT
+    ///      be used in a cumulative fashion, that is, they should only be
+    ///      applied to the original string held by the client, never to the
+    ///      domain name produced by a previous NAPTR rewrite.  The latter is
+    ///      tempting in some applications but experience has shown such use to
+    ///      be extremely fault sensitive, very error prone, and extremely
+    ///      difficult to debug.
+    ///
+    ///   REPLACEMENT
+    ///      A &lt;domain-name&gt; which is the next domain-name to query for
+    ///      depending on the potential values found in the flags field.  This
+    ///      field is used when the regular expression is a simple replacement
+    ///      operation.  Any value in this field MUST be a fully qualified
+    ///      domain-name.  Name compression is not to be used for this field.
+    ///
+    ///      This field and the REGEXP field together make up the Substitution
+    ///      Expression in the DDDS Algorithm.  It is simply a historical
+    ///      optimization specifically for DNS compression that this field
+    ///      exists.  The fields are also mutually exclusive.  If a record is
+    ///      returned that has values for both fields then it is considered to
+    ///      be in error and SHOULD be either ignored or an error returned.
+    /// ```
+    </span>NAPTR(NAPTR),
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// 3.3.10. NULL RDATA format (EXPERIMENTAL)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-    <span class="doccomment">///     /                  &lt;anything&gt;                   /</span>
-    <span class="doccomment">///     /                                               /</span>
-    <span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Anything at all may be in the RDATA field so long as it is 65535 octets</span>
-    <span class="doccomment">/// or less.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// NULL records cause no additional section processing.  NULL RRs are not</span>
-    <span class="doccomment">/// allowed in Zone Files.  NULLs are used as placeholders in some</span>
-    <span class="doccomment">/// experimental extensions of the DNS.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">NULL</span>(<span class="ident">NULL</span>),
+    <span class="doccomment">/// ```text
+    /// 3.3.10. NULL RDATA format (EXPERIMENTAL)
+    ///
+    ///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    ///     /                  &lt;anything&gt;                   /
+    ///     /                                               /
+    ///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    ///
+    /// Anything at all may be in the RDATA field so long as it is 65535 octets
+    /// or less.
+    ///
+    /// NULL records cause no additional section processing.  NULL RRs are not
+    /// allowed in Zone Files.  NULLs are used as placeholders in some
+    /// experimental extensions of the DNS.
+    /// ```
+    </span>NULL(NULL),
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// 3.3.11. NS RDATA format</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-    <span class="doccomment">///     /                   NSDNAME                     /</span>
-    <span class="doccomment">///     /                                               /</span>
-    <span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// where:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// NSDNAME         A &lt;domain-name&gt; which specifies a host which should be</span>
-    <span class="doccomment">///                 authoritative for the specified class and domain.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// NS records cause both the usual additional section processing to locate</span>
-    <span class="doccomment">/// a type A record, and, when used in a referral, a special search of the</span>
-    <span class="doccomment">/// zone in which they reside for glue information.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The NS RR states that the named host should be expected to have a zone</span>
-    <span class="doccomment">/// starting at owner name of the specified class.  Note that the class may</span>
-    <span class="doccomment">/// not indicate the protocol family which should be used to communicate</span>
-    <span class="doccomment">/// with the host, although it is typically a strong hint.  For example,</span>
-    <span class="doccomment">/// hosts which are name servers for either Internet (IN) or Hesiod (HS)</span>
-    <span class="doccomment">/// class information are normally queried using IN class protocols.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">NS</span>(<span class="ident">Name</span>),
+    <span class="doccomment">/// ```text
+    /// 3.3.11. NS RDATA format
+    ///
+    ///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    ///     /                   NSDNAME                     /
+    ///     /                                               /
+    ///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    ///
+    /// where:
+    ///
+    /// NSDNAME         A &lt;domain-name&gt; which specifies a host which should be
+    ///                 authoritative for the specified class and domain.
+    ///
+    /// NS records cause both the usual additional section processing to locate
+    /// a type A record, and, when used in a referral, a special search of the
+    /// zone in which they reside for glue information.
+    ///
+    /// The NS RR states that the named host should be expected to have a zone
+    /// starting at owner name of the specified class.  Note that the class may
+    /// not indicate the protocol family which should be used to communicate
+    /// with the host, although it is typically a strong hint.  For example,
+    /// hosts which are name servers for either Internet (IN) or Hesiod (HS)
+    /// class information are normally queried using IN class protocols.
+    /// ```
+    </span>NS(Name),
 
-    <span class="doccomment">/// [RFC 7929](https://tools.ietf.org/html/rfc7929#section-2.1)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// The RDATA portion of an OPENPGPKEY resource record contains a single</span>
-    <span class="doccomment">/// value consisting of a Transferable Public Key formatted as specified</span>
-    <span class="doccomment">/// in [RFC4880].</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">OPENPGPKEY</span>(<span class="ident">OPENPGPKEY</span>),
+    <span class="doccomment">/// [RFC 7929](https://tools.ietf.org/html/rfc7929#section-2.1)
+    ///
+    /// ```text
+    /// The RDATA portion of an OPENPGPKEY resource record contains a single
+    /// value consisting of a Transferable Public Key formatted as specified
+    /// in [RFC4880].
+    /// ```
+    </span>OPENPGPKEY(OPENPGPKEY),
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// RFC 6891                   EDNS(0) Extensions                 April 2013</span>
-    <span class="doccomment">/// 6.1.2.  Wire Format</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///        +------------+--------------+------------------------------+</span>
-    <span class="doccomment">///        | Field Name | Field Type   | Description                  |</span>
-    <span class="doccomment">///        +------------+--------------+------------------------------+</span>
-    <span class="doccomment">///        | NAME       | domain name  | MUST be 0 (root domain)      |</span>
-    <span class="doccomment">///        | TYPE       | u_int16_t    | OPT (41)                     |</span>
-    <span class="doccomment">///        | CLASS      | u_int16_t    | requestor&#39;s UDP payload size |</span>
-    <span class="doccomment">///        | TTL        | u_int32_t    | extended RCODE and flags     |</span>
-    <span class="doccomment">///        | RDLEN      | u_int16_t    | length of all RDATA          |</span>
-    <span class="doccomment">///        | RDATA      | octet stream | {attribute,value} pairs      |</span>
-    <span class="doccomment">///        +------------+--------------+------------------------------+</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The variable part of an OPT RR may contain zero or more options in</span>
-    <span class="doccomment">///    the RDATA.  Each option MUST be treated as a bit field.  Each option</span>
-    <span class="doccomment">///    is encoded as:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///                   +0 (MSB)                            +1 (LSB)</span>
-    <span class="doccomment">///        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+</span>
-    <span class="doccomment">///     0: |                          OPTION-CODE                          |</span>
-    <span class="doccomment">///        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+</span>
-    <span class="doccomment">///     2: |                         OPTION-LENGTH                         |</span>
-    <span class="doccomment">///        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+</span>
-    <span class="doccomment">///     4: |                                                               |</span>
-    <span class="doccomment">///        /                          OPTION-DATA                          /</span>
-    <span class="doccomment">///        /                                                               /</span>
-    <span class="doccomment">///        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">OPT</span>(<span class="ident">OPT</span>),
+    <span class="doccomment">/// ```text
+    /// RFC 6891                   EDNS(0) Extensions                 April 2013
+    /// 6.1.2.  Wire Format
+    ///
+    ///        +------------+--------------+------------------------------+
+    ///        | Field Name | Field Type   | Description                  |
+    ///        +------------+--------------+------------------------------+
+    ///        | NAME       | domain name  | MUST be 0 (root domain)      |
+    ///        | TYPE       | u_int16_t    | OPT (41)                     |
+    ///        | CLASS      | u_int16_t    | requestor&#39;s UDP payload size |
+    ///        | TTL        | u_int32_t    | extended RCODE and flags     |
+    ///        | RDLEN      | u_int16_t    | length of all RDATA          |
+    ///        | RDATA      | octet stream | {attribute,value} pairs      |
+    ///        +------------+--------------+------------------------------+
+    ///
+    /// The variable part of an OPT RR may contain zero or more options in
+    ///    the RDATA.  Each option MUST be treated as a bit field.  Each option
+    ///    is encoded as:
+    ///
+    ///                   +0 (MSB)                            +1 (LSB)
+    ///        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+    ///     0: |                          OPTION-CODE                          |
+    ///        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+    ///     2: |                         OPTION-LENGTH                         |
+    ///        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+    ///     4: |                                                               |
+    ///        /                          OPTION-DATA                          /
+    ///        /                                                               /
+    ///        +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
+    /// ```
+    </span>OPT(OPT),
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// 3.3.12. PTR RDATA format</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-    <span class="doccomment">///     /                   PTRDNAME                    /</span>
-    <span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// where:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// PTRDNAME        A &lt;domain-name&gt; which points to some location in the</span>
-    <span class="doccomment">///                 domain name space.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// PTR records cause no additional section processing.  These RRs are used</span>
-    <span class="doccomment">/// in special domains to point to some other location in the domain space.</span>
-    <span class="doccomment">/// These records are simple data, and don&#39;t imply any special processing</span>
-    <span class="doccomment">/// similar to that performed by CNAME, which identifies aliases.  See the</span>
-    <span class="doccomment">/// description of the IN-ADDR.ARPA domain for an example.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">PTR</span>(<span class="ident">Name</span>),
+    <span class="doccomment">/// ```text
+    /// 3.3.12. PTR RDATA format
+    ///
+    ///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    ///     /                   PTRDNAME                    /
+    ///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    ///
+    /// where:
+    ///
+    /// PTRDNAME        A &lt;domain-name&gt; which points to some location in the
+    ///                 domain name space.
+    ///
+    /// PTR records cause no additional section processing.  These RRs are used
+    /// in special domains to point to some other location in the domain space.
+    /// These records are simple data, and don&#39;t imply any special processing
+    /// similar to that performed by CNAME, which identifies aliases.  See the
+    /// description of the IN-ADDR.ARPA domain for an example.
+    /// ```
+    </span>PTR(Name),
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// 3.3.13. SOA RDATA format</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-    <span class="doccomment">///     /                     MNAME                     /</span>
-    <span class="doccomment">///     /                                               /</span>
-    <span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-    <span class="doccomment">///     /                     RNAME                     /</span>
-    <span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-    <span class="doccomment">///     |                    SERIAL                     |</span>
-    <span class="doccomment">///     |                                               |</span>
-    <span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-    <span class="doccomment">///     |                    REFRESH                    |</span>
-    <span class="doccomment">///     |                                               |</span>
-    <span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-    <span class="doccomment">///     |                     RETRY                     |</span>
-    <span class="doccomment">///     |                                               |</span>
-    <span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-    <span class="doccomment">///     |                    EXPIRE                     |</span>
-    <span class="doccomment">///     |                                               |</span>
-    <span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-    <span class="doccomment">///     |                    MINIMUM                    |</span>
-    <span class="doccomment">///     |                                               |</span>
-    <span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// where:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// MNAME           The &lt;domain-name&gt; of the name server that was the</span>
-    <span class="doccomment">///                 original or primary source of data for this zone.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// RNAME           A &lt;domain-name&gt; which specifies the mailbox of the</span>
-    <span class="doccomment">///                 person responsible for this zone.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// SERIAL          The unsigned 32 bit version number of the original copy</span>
-    <span class="doccomment">///                 of the zone.  Zone transfers preserve this value.  This</span>
-    <span class="doccomment">///                 value wraps and should be compared using sequence space</span>
-    <span class="doccomment">///                 arithmetic.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// REFRESH         A 32 bit time interval before the zone should be</span>
-    <span class="doccomment">///                 refreshed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// RETRY           A 32 bit time interval that should elapse before a</span>
-    <span class="doccomment">///                 failed refresh should be retried.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// EXPIRE          A 32 bit time value that specifies the upper limit on</span>
-    <span class="doccomment">///                 the time interval that can elapse before the zone is no</span>
-    <span class="doccomment">///                 longer authoritative.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// MINIMUM         The unsigned 32 bit minimum TTL field that should be</span>
-    <span class="doccomment">///                 exported with any RR from this zone.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// SOA records cause no additional section processing.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// All times are in units of seconds.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Most of these fields are pertinent only for name server maintenance</span>
-    <span class="doccomment">/// operations.  However, MINIMUM is used in all query operations that</span>
-    <span class="doccomment">/// retrieve RRs from a zone.  Whenever a RR is sent in a response to a</span>
-    <span class="doccomment">/// query, the TTL field is set to the maximum of the TTL field from the RR</span>
-    <span class="doccomment">/// and the MINIMUM field in the appropriate SOA.  Thus MINIMUM is a lower</span>
-    <span class="doccomment">/// bound on the TTL field for all RRs in a zone.  Note that this use of</span>
-    <span class="doccomment">/// MINIMUM should occur when the RRs are copied into the response and not</span>
-    <span class="doccomment">/// when the zone is loaded from a Zone File or via a zone transfer.  The</span>
-    <span class="doccomment">/// reason for this provision is to allow future dynamic update facilities to</span>
-    <span class="doccomment">/// change the SOA RR with known semantics.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">SOA</span>(<span class="ident">SOA</span>),
+    <span class="doccomment">/// ```text
+    /// 3.3.13. SOA RDATA format
+    ///
+    ///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    ///     /                     MNAME                     /
+    ///     /                                               /
+    ///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    ///     /                     RNAME                     /
+    ///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    ///     |                    SERIAL                     |
+    ///     |                                               |
+    ///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    ///     |                    REFRESH                    |
+    ///     |                                               |
+    ///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    ///     |                     RETRY                     |
+    ///     |                                               |
+    ///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    ///     |                    EXPIRE                     |
+    ///     |                                               |
+    ///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    ///     |                    MINIMUM                    |
+    ///     |                                               |
+    ///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    ///
+    /// where:
+    ///
+    /// MNAME           The &lt;domain-name&gt; of the name server that was the
+    ///                 original or primary source of data for this zone.
+    ///
+    /// RNAME           A &lt;domain-name&gt; which specifies the mailbox of the
+    ///                 person responsible for this zone.
+    ///
+    /// SERIAL          The unsigned 32 bit version number of the original copy
+    ///                 of the zone.  Zone transfers preserve this value.  This
+    ///                 value wraps and should be compared using sequence space
+    ///                 arithmetic.
+    ///
+    /// REFRESH         A 32 bit time interval before the zone should be
+    ///                 refreshed.
+    ///
+    /// RETRY           A 32 bit time interval that should elapse before a
+    ///                 failed refresh should be retried.
+    ///
+    /// EXPIRE          A 32 bit time value that specifies the upper limit on
+    ///                 the time interval that can elapse before the zone is no
+    ///                 longer authoritative.
+    ///
+    /// MINIMUM         The unsigned 32 bit minimum TTL field that should be
+    ///                 exported with any RR from this zone.
+    ///
+    /// SOA records cause no additional section processing.
+    ///
+    /// All times are in units of seconds.
+    ///
+    /// Most of these fields are pertinent only for name server maintenance
+    /// operations.  However, MINIMUM is used in all query operations that
+    /// retrieve RRs from a zone.  Whenever a RR is sent in a response to a
+    /// query, the TTL field is set to the maximum of the TTL field from the RR
+    /// and the MINIMUM field in the appropriate SOA.  Thus MINIMUM is a lower
+    /// bound on the TTL field for all RRs in a zone.  Note that this use of
+    /// MINIMUM should occur when the RRs are copied into the response and not
+    /// when the zone is loaded from a Zone File or via a zone transfer.  The
+    /// reason for this provision is to allow future dynamic update facilities to
+    /// change the SOA RR with known semantics.
+    /// ```
+    </span>SOA(SOA),
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// RFC 2782                       DNS SRV RR                  February 2000</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The format of the SRV RR</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///  _Service._Proto.Name TTL Class SRV Priority Weight Port Target</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">SRV</span>(<span class="ident">SRV</span>),
+    <span class="doccomment">/// ```text
+    /// RFC 2782                       DNS SRV RR                  February 2000
+    ///
+    /// The format of the SRV RR
+    ///
+    ///  _Service._Proto.Name TTL Class SRV Priority Weight Port Target
+    /// ```
+    </span>SRV(SRV),
 
-    <span class="doccomment">/// [RFC 4255](https://tools.ietf.org/html/rfc4255#section-3.1)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// 3.1.  The SSHFP RDATA Format</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///    The RDATA for a SSHFP RR consists of an algorithm number, fingerprint</span>
-    <span class="doccomment">///    type and the fingerprint of the public host key.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///        1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3</span>
-    <span class="doccomment">///        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1</span>
-    <span class="doccomment">///        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
-    <span class="doccomment">///        |   algorithm   |    fp type    |                               /</span>
-    <span class="doccomment">///        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               /</span>
-    <span class="doccomment">///        /                                                               /</span>
-    <span class="doccomment">///        /                          fingerprint                          /</span>
-    <span class="doccomment">///        /                                                               /</span>
-    <span class="doccomment">///        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// 3.1.1.  Algorithm Number Specification</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///    This algorithm number octet describes the algorithm of the public</span>
-    <span class="doccomment">///    key.  The following values are assigned:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///           Value    Algorithm name</span>
-    <span class="doccomment">///           -----    --------------</span>
-    <span class="doccomment">///           0        reserved</span>
-    <span class="doccomment">///           1        RSA</span>
-    <span class="doccomment">///           2        DSS</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///    Reserving other types requires IETF consensus [4].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// 3.1.2.  Fingerprint Type Specification</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///    The fingerprint type octet describes the message-digest algorithm</span>
-    <span class="doccomment">///    used to calculate the fingerprint of the public key.  The following</span>
-    <span class="doccomment">///    values are assigned:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///           Value    Fingerprint type</span>
-    <span class="doccomment">///           -----    ----------------</span>
-    <span class="doccomment">///           0        reserved</span>
-    <span class="doccomment">///           1        SHA-1</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///    Reserving other types requires IETF consensus [4].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///    For interoperability reasons, as few fingerprint types as possible</span>
-    <span class="doccomment">///    should be reserved.  The only reason to reserve additional types is</span>
-    <span class="doccomment">///    to increase security.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// 3.1.3.  Fingerprint</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///    The fingerprint is calculated over the public key blob as described</span>
-    <span class="doccomment">///    in [7].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///    The message-digest algorithm is presumed to produce an opaque octet</span>
-    <span class="doccomment">///    string output, which is placed as-is in the RDATA fingerprint field.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The algorithm and fingerprint type values have been updated in</span>
-    <span class="doccomment">/// [RFC 6594](https://tools.ietf.org/html/rfc6594) and</span>
-    <span class="doccomment">/// [RFC 7479](https://tools.ietf.org/html/rfc7479).</span>
-    <span class="ident">SSHFP</span>(<span class="ident">SSHFP</span>),
+    <span class="doccomment">/// [RFC 4255](https://tools.ietf.org/html/rfc4255#section-3.1)
+    ///
+    /// ```text
+    /// 3.1.  The SSHFP RDATA Format
+    ///
+    ///    The RDATA for a SSHFP RR consists of an algorithm number, fingerprint
+    ///    type and the fingerprint of the public host key.
+    ///
+    ///        1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3
+    ///        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    ///        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    ///        |   algorithm   |    fp type    |                               /
+    ///        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                               /
+    ///        /                                                               /
+    ///        /                          fingerprint                          /
+    ///        /                                                               /
+    ///        +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    ///
+    /// 3.1.1.  Algorithm Number Specification
+    ///
+    ///    This algorithm number octet describes the algorithm of the public
+    ///    key.  The following values are assigned:
+    ///
+    ///           Value    Algorithm name
+    ///           -----    --------------
+    ///           0        reserved
+    ///           1        RSA
+    ///           2        DSS
+    ///
+    ///    Reserving other types requires IETF consensus [4].
+    ///
+    /// 3.1.2.  Fingerprint Type Specification
+    ///
+    ///    The fingerprint type octet describes the message-digest algorithm
+    ///    used to calculate the fingerprint of the public key.  The following
+    ///    values are assigned:
+    ///
+    ///           Value    Fingerprint type
+    ///           -----    ----------------
+    ///           0        reserved
+    ///           1        SHA-1
+    ///
+    ///    Reserving other types requires IETF consensus [4].
+    ///
+    ///    For interoperability reasons, as few fingerprint types as possible
+    ///    should be reserved.  The only reason to reserve additional types is
+    ///    to increase security.
+    ///
+    /// 3.1.3.  Fingerprint
+    ///
+    ///    The fingerprint is calculated over the public key blob as described
+    ///    in [7].
+    ///
+    ///    The message-digest algorithm is presumed to produce an opaque octet
+    ///    string output, which is placed as-is in the RDATA fingerprint field.
+    /// ```
+    ///
+    /// The algorithm and fingerprint type values have been updated in
+    /// [RFC 6594](https://tools.ietf.org/html/rfc6594) and
+    /// [RFC 7479](https://tools.ietf.org/html/rfc7479).
+    </span>SSHFP(SSHFP),
 
-    <span class="doccomment">/// [RFC draft-ietf-dnsop-svcb-https-03, DNS SVCB and HTTPS RRs](https://datatracker.ietf.org/doc/html/draft-ietf-dnsop-svcb-https-03#section-2)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">///    2.  The SVCB record type</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///   The SVCB DNS resource record (RR) type (RR type 64) is used to locate</span>
-    <span class="doccomment">///   alternative endpoints for a service.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///   The algorithm for resolving SVCB records and associated address</span>
-    <span class="doccomment">///   records is specified in Section 3.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///   Other SVCB-compatible resource record types can also be defined as-</span>
-    <span class="doccomment">///   needed.  In particular, the HTTPS RR (RR type 65) provides special</span>
-    <span class="doccomment">///   handling for the case of &quot;https&quot; origins as described in Section 8.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///   SVCB RRs are extensible by a list of SvcParams, which are pairs</span>
-    <span class="doccomment">///   consisting of a SvcParamKey and a SvcParamValue.  Each SvcParamKey</span>
-    <span class="doccomment">///   has a presentation name and a registered number.  Values are in a</span>
-    <span class="doccomment">///   format specific to the SvcParamKey.  Their definition should specify</span>
-    <span class="doccomment">///   both their presentation format and wire encoding (e.g., domain names,</span>
-    <span class="doccomment">///   binary data, or numeric values).  The initial SvcParamKeys and</span>
-    <span class="doccomment">///   formats are defined in Section 6.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">SVCB</span>(<span class="ident">SVCB</span>),
+    <span class="doccomment">/// [RFC draft-ietf-dnsop-svcb-https-03, DNS SVCB and HTTPS RRs](https://datatracker.ietf.org/doc/html/draft-ietf-dnsop-svcb-https-03#section-2)
+    ///
+    /// ```text
+    ///    2.  The SVCB record type
+    ///
+    ///   The SVCB DNS resource record (RR) type (RR type 64) is used to locate
+    ///   alternative endpoints for a service.
+    ///
+    ///   The algorithm for resolving SVCB records and associated address
+    ///   records is specified in Section 3.
+    ///
+    ///   Other SVCB-compatible resource record types can also be defined as-
+    ///   needed.  In particular, the HTTPS RR (RR type 65) provides special
+    ///   handling for the case of &quot;https&quot; origins as described in Section 8.
+    ///
+    ///   SVCB RRs are extensible by a list of SvcParams, which are pairs
+    ///   consisting of a SvcParamKey and a SvcParamValue.  Each SvcParamKey
+    ///   has a presentation name and a registered number.  Values are in a
+    ///   format specific to the SvcParamKey.  Their definition should specify
+    ///   both their presentation format and wire encoding (e.g., domain names,
+    ///   binary data, or numeric values).  The initial SvcParamKeys and
+    ///   formats are defined in Section 6.
+    /// ```
+    </span>SVCB(SVCB),
 
-    <span class="doccomment">/// [RFC 6698, DNS-Based Authentication for TLS](https://tools.ietf.org/html/rfc6698#section-2.1)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">///                         1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3</span>
-    <span class="doccomment">///     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1</span>
-    <span class="doccomment">///    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
-    <span class="doccomment">///    |  Cert. Usage  |   Selector    | Matching Type |               /</span>
-    <span class="doccomment">///    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               /</span>
-    <span class="doccomment">///    /                                                               /</span>
-    <span class="doccomment">///    /                 Certificate Association Data                  /</span>
-    <span class="doccomment">///    /                                                               /</span>
-    <span class="doccomment">///    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">TLSA</span>(<span class="ident">TLSA</span>),
+    <span class="doccomment">/// [RFC 6698, DNS-Based Authentication for TLS](https://tools.ietf.org/html/rfc6698#section-2.1)
+    ///
+    /// ```text
+    ///                         1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3
+    ///     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+    ///    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    ///    |  Cert. Usage  |   Selector    | Matching Type |               /
+    ///    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+               /
+    ///    /                                                               /
+    ///    /                 Certificate Association Data                  /
+    ///    /                                                               /
+    ///    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    /// ```
+    </span>TLSA(TLSA),
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// 3.3.14. TXT RDATA format</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-    <span class="doccomment">///     /                   TXT-DATA                    /</span>
-    <span class="doccomment">///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// where:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// TXT-DATA        One or more &lt;character-string&gt;s.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// TXT RRs are used to hold descriptive text.  The semantics of the text</span>
-    <span class="doccomment">/// depends on the domain where it is found.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">TXT</span>(<span class="ident">TXT</span>),
+    <span class="doccomment">/// ```text
+    /// 3.3.14. TXT RDATA format
+    ///
+    ///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    ///     /                   TXT-DATA                    /
+    ///     +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    ///
+    /// where:
+    ///
+    /// TXT-DATA        One or more &lt;character-string&gt;s.
+    ///
+    /// TXT RRs are used to hold descriptive text.  The semantics of the text
+    /// depends on the domain where it is found.
+    /// ```
+    </span>TXT(TXT),
 
-    <span class="doccomment">/// A DNSSEC- or SIG(0)- specific record. See `DNSSECRData` for details.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// These types are in `DNSSECRData` to make them easy to disable when</span>
-    <span class="doccomment">/// crypto functionality isn&#39;t needed.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)))]</span>
-    <span class="ident">DNSSEC</span>(<span class="ident">DNSSECRData</span>),
+    <span class="doccomment">/// A DNSSEC- or SIG(0)- specific record. See `DNSSECRData` for details.
+    ///
+    /// These types are in `DNSSECRData` to make them easy to disable when
+    /// crypto functionality isn&#39;t needed.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;dnssec&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dnssec&quot;</span>)))]
+    </span>DNSSEC(DNSSECRData),
 
-    <span class="doccomment">/// Unknown RecordData is for record types not supported by Trust-DNS</span>
-    <span class="ident">Unknown</span> {
-        <span class="doccomment">/// RecordType code</span>
-        <span class="ident">code</span>: <span class="ident">u16</span>,
-        <span class="doccomment">/// RData associated to the record</span>
-        <span class="ident">rdata</span>: <span class="ident">NULL</span>,
+    <span class="doccomment">/// Unknown RecordData is for record types not supported by Trust-DNS
+    </span>Unknown {
+        <span class="doccomment">/// RecordType code
+        </span>code: u16,
+        <span class="doccomment">/// RData associated to the record
+        </span>rdata: NULL,
     },
 
-    <span class="doccomment">/// This corresponds to a record type of 0, unspecified</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Use None for the RData in the resource record instead&quot;</span>)]</span>
-    <span class="ident">ZERO</span>,
+    <span class="doccomment">/// This corresponds to a record type of 0, unspecified
+    </span><span class="attribute">#[deprecated(note = <span class="string">&quot;Use None for the RData in the resource record instead&quot;</span>)]
+    </span>ZERO,
 }
 
-<span class="kw">impl</span> <span class="ident">RData</span> {
-    <span class="kw">fn</span> <span class="ident">to_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+<span class="kw">impl </span>RData {
+    <span class="kw">fn </span>to_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;u8&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>buf: Vec&lt;u8&gt; = Vec::new();
         {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span>: <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BinEncoder::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>);
-            <span class="self">self</span>.<span class="ident">emit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">encoder</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
+            <span class="kw">let </span><span class="kw-2">mut </span>encoder: BinEncoder&lt;<span class="lifetime">&#39;_</span>&gt; = BinEncoder::new(<span class="kw-2">&amp;mut </span>buf);
+            <span class="self">self</span>.emit(<span class="kw-2">&amp;mut </span>encoder).unwrap_or_else(|<span class="kw">_</span>| {
                 <span class="macro">warn!</span>(<span class="string">&quot;could not encode RDATA: {:?}&quot;</span>, <span class="self">self</span>);
             });
         }
-        <span class="ident">buf</span>
+        buf
     }
 
-    <span class="doccomment">/// Read the RData from the given Decoder</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(
-        <span class="ident">decoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">record_type</span>: <span class="ident">RecordType</span>,
-        <span class="ident">rdata_length</span>: <span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">start_idx</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">index</span>();
+    <span class="doccomment">/// Read the RData from the given Decoder
+    </span><span class="kw">pub fn </span>read(
+        decoder: <span class="kw-2">&amp;mut </span>BinDecoder&lt;<span class="lifetime">&#39;_</span>&gt;,
+        record_type: RecordType,
+        rdata_length: Restrict&lt;u16&gt;,
+    ) -&gt; ProtoResult&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>start_idx = decoder.index();
 
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">record_type</span> {
-            <span class="ident">RecordType::A</span> =&gt; {
+        <span class="kw">let </span>result = <span class="kw">match </span>record_type {
+            RecordType::A =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading A&quot;</span>);
-                <span class="ident">rdata::a::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::A</span>)
+                rdata::a::read(decoder).map(<span class="self">Self</span>::A)
             }
-            <span class="ident">RecordType::AAAA</span> =&gt; {
+            RecordType::AAAA =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading AAAA&quot;</span>);
-                <span class="ident">rdata::aaaa::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::AAAA</span>)
+                rdata::aaaa::read(decoder).map(<span class="self">Self</span>::AAAA)
             }
-            <span class="ident">RecordType::ANAME</span> =&gt; {
+            RecordType::ANAME =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading ANAME&quot;</span>);
-                <span class="ident">rdata::name::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::ANAME</span>)
+                rdata::name::read(decoder).map(<span class="self">Self</span>::ANAME)
             }
-            <span class="ident">rt</span> @ <span class="ident">RecordType::ANY</span> <span class="op">|</span> <span class="ident">rt</span> @ <span class="ident">RecordType::AXFR</span> <span class="op">|</span> <span class="ident">rt</span> @ <span class="ident">RecordType::IXFR</span> =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ProtoErrorKind::UnknownRecordTypeValue</span>(<span class="ident">rt</span>.<span class="ident">into</span>()).<span class="ident">into</span>());
+            rt @ RecordType::ANY | rt @ RecordType::AXFR | rt @ RecordType::IXFR =&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(ProtoErrorKind::UnknownRecordTypeValue(rt.into()).into());
             }
-            <span class="ident">RecordType::CAA</span> =&gt; {
+            RecordType::CAA =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading CAA&quot;</span>);
-                <span class="ident">rdata::caa::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::CAA</span>)
+                rdata::caa::read(decoder, rdata_length).map(<span class="self">Self</span>::CAA)
             }
-            <span class="ident">RecordType::CNAME</span> =&gt; {
+            RecordType::CNAME =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading CNAME&quot;</span>);
-                <span class="ident">rdata::name::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::CNAME</span>)
+                rdata::name::read(decoder).map(<span class="self">Self</span>::CNAME)
             }
-            <span class="ident">RecordType::CSYNC</span> =&gt; {
+            RecordType::CSYNC =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading CSYNC&quot;</span>);
-                <span class="ident">rdata::csync::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::CSYNC</span>)
+                rdata::csync::read(decoder, rdata_length).map(<span class="self">Self</span>::CSYNC)
             }
-            <span class="ident">RecordType::HINFO</span> =&gt; {
+            RecordType::HINFO =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading HINFO&quot;</span>);
-                <span class="ident">rdata::hinfo::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::HINFO</span>)
+                rdata::hinfo::read(decoder).map(<span class="self">Self</span>::HINFO)
             }
-            <span class="ident">RecordType::HTTPS</span> =&gt; {
+            RecordType::HTTPS =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading HTTPS&quot;</span>);
-                <span class="ident">rdata::svcb::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::HTTPS</span>)
+                rdata::svcb::read(decoder, rdata_length).map(<span class="self">Self</span>::HTTPS)
             }
-            <span class="ident">RecordType::ZERO</span> =&gt; {
+            RecordType::ZERO =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading EMPTY&quot;</span>);
-                <span class="comment">// we should never get here, since ZERO should be 0 length, and None in the Record.</span>
-                <span class="comment">//   this invariant is verified below, and the decoding will fail with an err.</span>
-                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
-                <span class="prelude-val">Ok</span>(<span class="ident"><span class="self">Self</span>::ZERO</span>)
+                <span class="comment">// we should never get here, since ZERO should be 0 length, and None in the Record.
+                //   this invariant is verified below, and the decoding will fail with an err.
+                </span><span class="attribute">#[allow(deprecated)]
+                </span><span class="prelude-val">Ok</span>(<span class="self">Self</span>::ZERO)
             }
-            <span class="ident">RecordType::MX</span> =&gt; {
+            RecordType::MX =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading MX&quot;</span>);
-                <span class="ident">rdata::mx::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::MX</span>)
+                rdata::mx::read(decoder).map(<span class="self">Self</span>::MX)
             }
-            <span class="ident">RecordType::NAPTR</span> =&gt; {
+            RecordType::NAPTR =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading NAPTR&quot;</span>);
-                <span class="ident">rdata::naptr::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::NAPTR</span>)
+                rdata::naptr::read(decoder).map(<span class="self">Self</span>::NAPTR)
             }
-            <span class="ident">RecordType::NULL</span> =&gt; {
+            RecordType::NULL =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading NULL&quot;</span>);
-                <span class="ident">rdata::null::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::NULL</span>)
+                rdata::null::read(decoder, rdata_length).map(<span class="self">Self</span>::NULL)
             }
-            <span class="ident">RecordType::NS</span> =&gt; {
+            RecordType::NS =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading NS&quot;</span>);
-                <span class="ident">rdata::name::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::NS</span>)
+                rdata::name::read(decoder).map(<span class="self">Self</span>::NS)
             }
-            <span class="ident">RecordType::OPENPGPKEY</span> =&gt; {
+            RecordType::OPENPGPKEY =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading OPENPGPKEY&quot;</span>);
-                <span class="ident">rdata::openpgpkey::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::OPENPGPKEY</span>)
+                rdata::openpgpkey::read(decoder, rdata_length).map(<span class="self">Self</span>::OPENPGPKEY)
             }
-            <span class="ident">RecordType::OPT</span> =&gt; {
+            RecordType::OPT =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading OPT&quot;</span>);
-                <span class="ident">rdata::opt::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::OPT</span>)
+                rdata::opt::read(decoder, rdata_length).map(<span class="self">Self</span>::OPT)
             }
-            <span class="ident">RecordType::PTR</span> =&gt; {
+            RecordType::PTR =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading PTR&quot;</span>);
-                <span class="ident">rdata::name::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::PTR</span>)
+                rdata::name::read(decoder).map(<span class="self">Self</span>::PTR)
             }
-            <span class="ident">RecordType::SOA</span> =&gt; {
+            RecordType::SOA =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading SOA&quot;</span>);
-                <span class="ident">rdata::soa::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::SOA</span>)
+                rdata::soa::read(decoder).map(<span class="self">Self</span>::SOA)
             }
-            <span class="ident">RecordType::SRV</span> =&gt; {
+            RecordType::SRV =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading SRV&quot;</span>);
-                <span class="ident">rdata::srv::read</span>(<span class="ident">decoder</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::SRV</span>)
+                rdata::srv::read(decoder).map(<span class="self">Self</span>::SRV)
             }
-            <span class="ident">RecordType::SSHFP</span> =&gt; {
+            RecordType::SSHFP =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading SSHFP&quot;</span>);
-                <span class="ident">rdata::sshfp::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::SSHFP</span>)
+                rdata::sshfp::read(decoder, rdata_length).map(<span class="self">Self</span>::SSHFP)
             }
-            <span class="ident">RecordType::SVCB</span> =&gt; {
+            RecordType::SVCB =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading SVCB&quot;</span>);
-                <span class="ident">rdata::svcb::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::SVCB</span>)
+                rdata::svcb::read(decoder, rdata_length).map(<span class="self">Self</span>::SVCB)
             }
-            <span class="ident">RecordType::TLSA</span> =&gt; {
+            RecordType::TLSA =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading TLSA&quot;</span>);
-                <span class="ident">rdata::tlsa::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::TLSA</span>)
+                rdata::tlsa::read(decoder, rdata_length).map(<span class="self">Self</span>::TLSA)
             }
-            <span class="ident">RecordType::TXT</span> =&gt; {
+            RecordType::TXT =&gt; {
                 <span class="macro">trace!</span>(<span class="string">&quot;reading TXT&quot;</span>);
-                <span class="ident">rdata::txt::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::TXT</span>)
+                rdata::txt::read(decoder, rdata_length).map(<span class="self">Self</span>::TXT)
             }
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-            <span class="ident">r</span> <span class="kw">if</span> <span class="ident">r</span>.<span class="ident">is_dnssec</span>() =&gt; {
-                <span class="ident">DNSSECRData::read</span>(<span class="ident">decoder</span>, <span class="ident">record_type</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::DNSSEC</span>)
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;dnssec&quot;</span>)]
+            </span>r <span class="kw">if </span>r.is_dnssec() =&gt; {
+                DNSSECRData::read(decoder, record_type, rdata_length).map(<span class="self">Self</span>::DNSSEC)
             }
-            <span class="ident">record_type</span> =&gt; {
-                <span class="macro">trace!</span>(<span class="string">&quot;reading Unknown record: {}&quot;</span>, <span class="ident">record_type</span>);
-                <span class="ident">rdata::null::read</span>(<span class="ident">decoder</span>, <span class="ident">rdata_length</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">rdata</span><span class="op">|</span> <span class="ident"><span class="self">Self</span>::Unknown</span> {
-                    <span class="ident">code</span>: <span class="ident">record_type</span>.<span class="ident">into</span>(),
-                    <span class="ident">rdata</span>,
+            record_type =&gt; {
+                <span class="macro">trace!</span>(<span class="string">&quot;reading Unknown record: {}&quot;</span>, record_type);
+                rdata::null::read(decoder, rdata_length).map(|rdata| <span class="self">Self</span>::Unknown {
+                    code: record_type.into(),
+                    rdata,
                 })
             }
         };
 
-        <span class="comment">// we should have read rdata_length, but we did not</span>
-        <span class="kw">let</span> <span class="ident">read</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">index</span>() <span class="op">-</span> <span class="ident">start_idx</span>;
-        <span class="ident">rdata_length</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">u</span> <span class="kw">as</span> <span class="ident">usize</span>)
-            .<span class="ident">verify_unwrap</span>(<span class="op">|</span><span class="ident">rdata_length</span><span class="op">|</span> <span class="ident">read</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">rdata_length</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">rdata_length</span><span class="op">|</span> {
-                <span class="ident">ProtoError::from</span>(<span class="ident">ProtoErrorKind::IncorrectRDataLengthRead</span> {
-                    <span class="ident">read</span>,
-                    <span class="ident">len</span>: <span class="ident">rdata_length</span>,
+        <span class="comment">// we should have read rdata_length, but we did not
+        </span><span class="kw">let </span>read = decoder.index() - start_idx;
+        rdata_length
+            .map(|u| u <span class="kw">as </span>usize)
+            .verify_unwrap(|rdata_length| read == <span class="kw-2">*</span>rdata_length)
+            .map_err(|rdata_length| {
+                ProtoError::from(ProtoErrorKind::IncorrectRDataLengthRead {
+                    read,
+                    len: rdata_length,
                 })
             })<span class="question-mark">?</span>;
 
-        <span class="ident">result</span>
+        result
     }
 
-    <span class="doccomment">/// [RFC 4034](https://tools.ietf.org/html/rfc4034#section-6), DNSSEC Resource Records, March 2005</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// 6.2.  Canonical RR Form</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///    For the purposes of DNS security, the canonical form of an RR is the</span>
-    <span class="doccomment">///    wire format of the RR where:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///    ...</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///    3.  if the type of the RR is NS, MD, MF, CNAME, SOA, MB, MG, MR, PTR,</span>
-    <span class="doccomment">///        HINFO, MINFO, MX, HINFO, RP, AFSDB, RT, SIG, PX, NXT, NAPTR, KX,</span>
-    <span class="doccomment">///        SRV, DNAME, A6, RRSIG, or (rfc6840 removes NSEC), all uppercase</span>
-    <span class="doccomment">///        US-ASCII letters in the DNS names contained within the RDATA are replaced</span>
-    <span class="doccomment">///        by the corresponding lowercase US-ASCII letters;</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Canonical name form for all non-1035 records:</span>
-    <span class="doccomment">///   [RFC 3579](https://tools.ietf.org/html/rfc3597)</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">///  4.  Domain Name Compression</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///   RRs containing compression pointers in the RDATA part cannot be</span>
-    <span class="doccomment">///   treated transparently, as the compression pointers are only</span>
-    <span class="doccomment">///   meaningful within the context of a DNS message.  Transparently</span>
-    <span class="doccomment">///   copying the RDATA into a new DNS message would cause the compression</span>
-    <span class="doccomment">///   pointers to point at the corresponding location in the new message,</span>
-    <span class="doccomment">///   which now contains unrelated data.  This would cause the compressed</span>
-    <span class="doccomment">///   name to be corrupted.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///   To avoid such corruption, servers MUST NOT compress domain names</span>
-    <span class="doccomment">///   embedded in the RDATA of types that are class-specific or not well-</span>
-    <span class="doccomment">///   known.  This requirement was stated in [RFC1123] without defining the</span>
-    <span class="doccomment">///   term &quot;well-known&quot;; it is hereby specified that only the RR types</span>
-    <span class="doccomment">///   defined in [RFC1035] are to be considered &quot;well-known&quot;.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///   The specifications of a few existing RR types have explicitly allowed</span>
-    <span class="doccomment">///   compression contrary to this specification: [RFC2163] specified that</span>
-    <span class="doccomment">///   compression applies to the PX RR, and [RFC2535] allowed compression</span>
-    <span class="doccomment">///   in SIG RRs and NXT RRs records.  Since this specification disallows</span>
-    <span class="doccomment">///   compression in these cases, it is an update to [RFC2163] (section 4)</span>
-    <span class="doccomment">///   and [RFC2535] (sections 4.1.7 and 5.2).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///   Receiving servers MUST decompress domain names in RRs of well-known</span>
-    <span class="doccomment">///   type, and SHOULD also decompress RRs of type RP, AFSDB, RT, SIG, PX,</span>
-    <span class="doccomment">///   NXT, NAPTR, and SRV (although the current specification of the SRV RR</span>
-    <span class="doccomment">///   in [RFC2782] prohibits compression, [RFC2052] mandated it, and some</span>
-    <span class="doccomment">///   servers following that earlier specification are still in use).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///   Future specifications for new RR types that contain domain names</span>
-    <span class="doccomment">///   within their RDATA MUST NOT allow the use of name compression for</span>
-    <span class="doccomment">///   those names, and SHOULD explicitly state that the embedded domain</span>
-    <span class="doccomment">///   names MUST NOT be compressed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///   As noted in [RFC1123], the owner name of an RR is always eligible for</span>
-    <span class="doccomment">///   compression.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///   ...</span>
-    <span class="doccomment">///   As a courtesy to implementors, it is hereby noted that the complete</span>
-    <span class="doccomment">///    set of such previously published RR types that contain embedded</span>
-    <span class="doccomment">///    domain names, and whose DNSSEC canonical form therefore involves</span>
-    <span class="doccomment">///   downcasing according to the DNS rules for character comparisons,</span>
-    <span class="doccomment">///   consists of the RR types NS, MD, MF, CNAME, SOA, MB, MG, MR, PTR,</span>
-    <span class="doccomment">///   HINFO, MINFO, MX, HINFO, RP, AFSDB, RT, SIG, PX, NXT, NAPTR, KX, SRV,</span>
-    <span class="doccomment">///   DNAME, and A6.</span>
-    <span class="doccomment">///   ...</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">encoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">RData::A</span>(<span class="ident">address</span>) =&gt; <span class="ident">rdata::a::emit</span>(<span class="ident">encoder</span>, <span class="ident">address</span>),
-            <span class="ident">RData::AAAA</span>(<span class="kw-2">ref</span> <span class="ident">address</span>) =&gt; <span class="ident">rdata::aaaa::emit</span>(<span class="ident">encoder</span>, <span class="ident">address</span>),
-            <span class="ident">RData::ANAME</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) =&gt; {
-                <span class="ident">encoder</span>.<span class="ident">with_canonical_names</span>(<span class="op">|</span><span class="ident">encoder</span><span class="op">|</span> <span class="ident">rdata::name::emit</span>(<span class="ident">encoder</span>, <span class="ident">name</span>))
+    <span class="doccomment">/// [RFC 4034](https://tools.ietf.org/html/rfc4034#section-6), DNSSEC Resource Records, March 2005
+    ///
+    /// ```text
+    /// 6.2.  Canonical RR Form
+    ///
+    ///    For the purposes of DNS security, the canonical form of an RR is the
+    ///    wire format of the RR where:
+    ///
+    ///    ...
+    ///
+    ///    3.  if the type of the RR is NS, MD, MF, CNAME, SOA, MB, MG, MR, PTR,
+    ///        HINFO, MINFO, MX, HINFO, RP, AFSDB, RT, SIG, PX, NXT, NAPTR, KX,
+    ///        SRV, DNAME, A6, RRSIG, or (rfc6840 removes NSEC), all uppercase
+    ///        US-ASCII letters in the DNS names contained within the RDATA are replaced
+    ///        by the corresponding lowercase US-ASCII letters;
+    /// ```
+    ///
+    /// Canonical name form for all non-1035 records:
+    ///   [RFC 3579](https://tools.ietf.org/html/rfc3597)
+    /// ```text
+    ///  4.  Domain Name Compression
+    ///
+    ///   RRs containing compression pointers in the RDATA part cannot be
+    ///   treated transparently, as the compression pointers are only
+    ///   meaningful within the context of a DNS message.  Transparently
+    ///   copying the RDATA into a new DNS message would cause the compression
+    ///   pointers to point at the corresponding location in the new message,
+    ///   which now contains unrelated data.  This would cause the compressed
+    ///   name to be corrupted.
+    ///
+    ///   To avoid such corruption, servers MUST NOT compress domain names
+    ///   embedded in the RDATA of types that are class-specific or not well-
+    ///   known.  This requirement was stated in [RFC1123] without defining the
+    ///   term &quot;well-known&quot;; it is hereby specified that only the RR types
+    ///   defined in [RFC1035] are to be considered &quot;well-known&quot;.
+    ///
+    ///   The specifications of a few existing RR types have explicitly allowed
+    ///   compression contrary to this specification: [RFC2163] specified that
+    ///   compression applies to the PX RR, and [RFC2535] allowed compression
+    ///   in SIG RRs and NXT RRs records.  Since this specification disallows
+    ///   compression in these cases, it is an update to [RFC2163] (section 4)
+    ///   and [RFC2535] (sections 4.1.7 and 5.2).
+    ///
+    ///   Receiving servers MUST decompress domain names in RRs of well-known
+    ///   type, and SHOULD also decompress RRs of type RP, AFSDB, RT, SIG, PX,
+    ///   NXT, NAPTR, and SRV (although the current specification of the SRV RR
+    ///   in [RFC2782] prohibits compression, [RFC2052] mandated it, and some
+    ///   servers following that earlier specification are still in use).
+    ///
+    ///   Future specifications for new RR types that contain domain names
+    ///   within their RDATA MUST NOT allow the use of name compression for
+    ///   those names, and SHOULD explicitly state that the embedded domain
+    ///   names MUST NOT be compressed.
+    ///
+    ///   As noted in [RFC1123], the owner name of an RR is always eligible for
+    ///   compression.
+    ///
+    ///   ...
+    ///   As a courtesy to implementors, it is hereby noted that the complete
+    ///    set of such previously published RR types that contain embedded
+    ///    domain names, and whose DNSSEC canonical form therefore involves
+    ///   downcasing according to the DNS rules for character comparisons,
+    ///   consists of the RR types NS, MD, MF, CNAME, SOA, MB, MG, MR, PTR,
+    ///   HINFO, MINFO, MX, HINFO, RP, AFSDB, RT, SIG, PX, NXT, NAPTR, KX, SRV,
+    ///   DNAME, and A6.
+    ///   ...
+    /// ```
+    </span><span class="kw">pub fn </span>emit(<span class="kw-2">&amp;</span><span class="self">self</span>, encoder: <span class="kw-2">&amp;mut </span>BinEncoder&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; ProtoResult&lt;()&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            RData::A(address) =&gt; rdata::a::emit(encoder, address),
+            RData::AAAA(<span class="kw-2">ref </span>address) =&gt; rdata::aaaa::emit(encoder, address),
+            RData::ANAME(<span class="kw-2">ref </span>name) =&gt; {
+                encoder.with_canonical_names(|encoder| rdata::name::emit(encoder, name))
             }
-            <span class="ident">RData::CAA</span>(<span class="kw-2">ref</span> <span class="ident">caa</span>) =&gt; {
-                <span class="ident">encoder</span>.<span class="ident">with_canonical_names</span>(<span class="op">|</span><span class="ident">encoder</span><span class="op">|</span> <span class="ident">rdata::caa::emit</span>(<span class="ident">encoder</span>, <span class="ident">caa</span>))
+            RData::CAA(<span class="kw-2">ref </span>caa) =&gt; {
+                encoder.with_canonical_names(|encoder| rdata::caa::emit(encoder, caa))
             }
-            <span class="comment">// to_lowercase for rfc4034 and rfc6840</span>
-            <span class="ident">RData::CNAME</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">|</span> <span class="ident">RData::NS</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">|</span> <span class="ident">RData::PTR</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) =&gt; {
-                <span class="ident">rdata::name::emit</span>(<span class="ident">encoder</span>, <span class="ident">name</span>)
+            <span class="comment">// to_lowercase for rfc4034 and rfc6840
+            </span>RData::CNAME(<span class="kw-2">ref </span>name) | RData::NS(<span class="kw-2">ref </span>name) | RData::PTR(<span class="kw-2">ref </span>name) =&gt; {
+                rdata::name::emit(encoder, name)
             }
-            <span class="ident">RData::CSYNC</span>(<span class="kw-2">ref</span> <span class="ident">csync</span>) =&gt; <span class="ident">rdata::csync::emit</span>(<span class="ident">encoder</span>, <span class="ident">csync</span>),
-            <span class="ident">RData::HINFO</span>(<span class="kw-2">ref</span> <span class="ident">hinfo</span>) =&gt; <span class="ident">rdata::hinfo::emit</span>(<span class="ident">encoder</span>, <span class="ident">hinfo</span>),
-            <span class="ident">RData::HTTPS</span>(<span class="kw-2">ref</span> <span class="ident">svcb</span>) =&gt; <span class="ident">rdata::svcb::emit</span>(<span class="ident">encoder</span>, <span class="ident">svcb</span>),
-            <span class="ident">RData::ZERO</span> =&gt; <span class="prelude-val">Ok</span>(()),
-            <span class="comment">// to_lowercase for rfc4034 and rfc6840</span>
-            <span class="ident">RData::MX</span>(<span class="kw-2">ref</span> <span class="ident">mx</span>) =&gt; <span class="ident">rdata::mx::emit</span>(<span class="ident">encoder</span>, <span class="ident">mx</span>),
-            <span class="ident">RData::NAPTR</span>(<span class="kw-2">ref</span> <span class="ident">naptr</span>) =&gt; {
-                <span class="ident">encoder</span>.<span class="ident">with_canonical_names</span>(<span class="op">|</span><span class="ident">encoder</span><span class="op">|</span> <span class="ident">rdata::naptr::emit</span>(<span class="ident">encoder</span>, <span class="ident">naptr</span>))
+            RData::CSYNC(<span class="kw-2">ref </span>csync) =&gt; rdata::csync::emit(encoder, csync),
+            RData::HINFO(<span class="kw-2">ref </span>hinfo) =&gt; rdata::hinfo::emit(encoder, hinfo),
+            RData::HTTPS(<span class="kw-2">ref </span>svcb) =&gt; rdata::svcb::emit(encoder, svcb),
+            RData::ZERO =&gt; <span class="prelude-val">Ok</span>(()),
+            <span class="comment">// to_lowercase for rfc4034 and rfc6840
+            </span>RData::MX(<span class="kw-2">ref </span>mx) =&gt; rdata::mx::emit(encoder, mx),
+            RData::NAPTR(<span class="kw-2">ref </span>naptr) =&gt; {
+                encoder.with_canonical_names(|encoder| rdata::naptr::emit(encoder, naptr))
             }
-            <span class="ident">RData::NULL</span>(<span class="kw-2">ref</span> <span class="ident">null</span>) =&gt; <span class="ident">rdata::null::emit</span>(<span class="ident">encoder</span>, <span class="ident">null</span>),
-            <span class="ident">RData::OPENPGPKEY</span>(<span class="kw-2">ref</span> <span class="ident">openpgpkey</span>) =&gt; {
-                <span class="ident">encoder</span>.<span class="ident">with_canonical_names</span>(<span class="op">|</span><span class="ident">encoder</span><span class="op">|</span> <span class="ident">rdata::openpgpkey::emit</span>(<span class="ident">encoder</span>, <span class="ident">openpgpkey</span>))
+            RData::NULL(<span class="kw-2">ref </span>null) =&gt; rdata::null::emit(encoder, null),
+            RData::OPENPGPKEY(<span class="kw-2">ref </span>openpgpkey) =&gt; {
+                encoder.with_canonical_names(|encoder| rdata::openpgpkey::emit(encoder, openpgpkey))
             }
-            <span class="ident">RData::OPT</span>(<span class="kw-2">ref</span> <span class="ident">opt</span>) =&gt; <span class="ident">rdata::opt::emit</span>(<span class="ident">encoder</span>, <span class="ident">opt</span>),
-            <span class="comment">// to_lowercase for rfc4034 and rfc6840</span>
-            <span class="ident">RData::SOA</span>(<span class="kw-2">ref</span> <span class="ident">soa</span>) =&gt; <span class="ident">rdata::soa::emit</span>(<span class="ident">encoder</span>, <span class="ident">soa</span>),
-            <span class="comment">// to_lowercase for rfc4034 and rfc6840</span>
-            <span class="ident">RData::SRV</span>(<span class="kw-2">ref</span> <span class="ident">srv</span>) =&gt; {
-                <span class="ident">encoder</span>.<span class="ident">with_canonical_names</span>(<span class="op">|</span><span class="ident">encoder</span><span class="op">|</span> <span class="ident">rdata::srv::emit</span>(<span class="ident">encoder</span>, <span class="ident">srv</span>))
+            RData::OPT(<span class="kw-2">ref </span>opt) =&gt; rdata::opt::emit(encoder, opt),
+            <span class="comment">// to_lowercase for rfc4034 and rfc6840
+            </span>RData::SOA(<span class="kw-2">ref </span>soa) =&gt; rdata::soa::emit(encoder, soa),
+            <span class="comment">// to_lowercase for rfc4034 and rfc6840
+            </span>RData::SRV(<span class="kw-2">ref </span>srv) =&gt; {
+                encoder.with_canonical_names(|encoder| rdata::srv::emit(encoder, srv))
             }
-            <span class="ident">RData::SSHFP</span>(<span class="kw-2">ref</span> <span class="ident">sshfp</span>) =&gt; {
-                <span class="ident">encoder</span>.<span class="ident">with_canonical_names</span>(<span class="op">|</span><span class="ident">encoder</span><span class="op">|</span> <span class="ident">rdata::sshfp::emit</span>(<span class="ident">encoder</span>, <span class="ident">sshfp</span>))
+            RData::SSHFP(<span class="kw-2">ref </span>sshfp) =&gt; {
+                encoder.with_canonical_names(|encoder| rdata::sshfp::emit(encoder, sshfp))
             }
-            <span class="ident">RData::SVCB</span>(<span class="kw-2">ref</span> <span class="ident">svcb</span>) =&gt; <span class="ident">rdata::svcb::emit</span>(<span class="ident">encoder</span>, <span class="ident">svcb</span>),
-            <span class="ident">RData::TLSA</span>(<span class="kw-2">ref</span> <span class="ident">tlsa</span>) =&gt; {
-                <span class="ident">encoder</span>.<span class="ident">with_canonical_names</span>(<span class="op">|</span><span class="ident">encoder</span><span class="op">|</span> <span class="ident">rdata::tlsa::emit</span>(<span class="ident">encoder</span>, <span class="ident">tlsa</span>))
+            RData::SVCB(<span class="kw-2">ref </span>svcb) =&gt; rdata::svcb::emit(encoder, svcb),
+            RData::TLSA(<span class="kw-2">ref </span>tlsa) =&gt; {
+                encoder.with_canonical_names(|encoder| rdata::tlsa::emit(encoder, tlsa))
             }
-            <span class="ident">RData::TXT</span>(<span class="kw-2">ref</span> <span class="ident">txt</span>) =&gt; <span class="ident">rdata::txt::emit</span>(<span class="ident">encoder</span>, <span class="ident">txt</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-            <span class="ident">RData::DNSSEC</span>(<span class="kw-2">ref</span> <span class="ident">rdata</span>) =&gt; <span class="ident">encoder</span>.<span class="ident">with_canonical_names</span>(<span class="op">|</span><span class="ident">encoder</span><span class="op">|</span> <span class="ident">rdata</span>.<span class="ident">emit</span>(<span class="ident">encoder</span>)),
-            <span class="ident">RData::Unknown</span> { <span class="kw-2">ref</span> <span class="ident">rdata</span>, .. } =&gt; <span class="ident">rdata::null::emit</span>(<span class="ident">encoder</span>, <span class="ident">rdata</span>),
+            RData::TXT(<span class="kw-2">ref </span>txt) =&gt; rdata::txt::emit(encoder, txt),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;dnssec&quot;</span>)]
+            </span>RData::DNSSEC(<span class="kw-2">ref </span>rdata) =&gt; encoder.with_canonical_names(|encoder| rdata.emit(encoder)),
+            RData::Unknown { <span class="kw-2">ref </span>rdata, .. } =&gt; rdata::null::emit(encoder, rdata),
         }
     }
 
-    <span class="doccomment">/// Converts this to a Recordtype</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_record_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RecordType</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">RData::A</span>(..) =&gt; <span class="ident">RecordType::A</span>,
-            <span class="ident">RData::AAAA</span>(..) =&gt; <span class="ident">RecordType::AAAA</span>,
-            <span class="ident">RData::ANAME</span>(..) =&gt; <span class="ident">RecordType::ANAME</span>,
-            <span class="ident">RData::CAA</span>(..) =&gt; <span class="ident">RecordType::CAA</span>,
-            <span class="ident">RData::CNAME</span>(..) =&gt; <span class="ident">RecordType::CNAME</span>,
-            <span class="ident">RData::CSYNC</span>(..) =&gt; <span class="ident">RecordType::CSYNC</span>,
-            <span class="ident">RData::HINFO</span>(..) =&gt; <span class="ident">RecordType::HINFO</span>,
-            <span class="ident">RData::HTTPS</span>(..) =&gt; <span class="ident">RecordType::HTTPS</span>,
-            <span class="ident">RData::MX</span>(..) =&gt; <span class="ident">RecordType::MX</span>,
-            <span class="ident">RData::NAPTR</span>(..) =&gt; <span class="ident">RecordType::NAPTR</span>,
-            <span class="ident">RData::NS</span>(..) =&gt; <span class="ident">RecordType::NS</span>,
-            <span class="ident">RData::NULL</span>(..) =&gt; <span class="ident">RecordType::NULL</span>,
-            <span class="ident">RData::OPENPGPKEY</span>(..) =&gt; <span class="ident">RecordType::OPENPGPKEY</span>,
-            <span class="ident">RData::OPT</span>(..) =&gt; <span class="ident">RecordType::OPT</span>,
-            <span class="ident">RData::PTR</span>(..) =&gt; <span class="ident">RecordType::PTR</span>,
-            <span class="ident">RData::SOA</span>(..) =&gt; <span class="ident">RecordType::SOA</span>,
-            <span class="ident">RData::SRV</span>(..) =&gt; <span class="ident">RecordType::SRV</span>,
-            <span class="ident">RData::SSHFP</span>(..) =&gt; <span class="ident">RecordType::SSHFP</span>,
-            <span class="ident">RData::SVCB</span>(..) =&gt; <span class="ident">RecordType::SVCB</span>,
-            <span class="ident">RData::TLSA</span>(..) =&gt; <span class="ident">RecordType::TLSA</span>,
-            <span class="ident">RData::TXT</span>(..) =&gt; <span class="ident">RecordType::TXT</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-            <span class="ident">RData::DNSSEC</span>(<span class="kw-2">ref</span> <span class="ident">rdata</span>) =&gt; <span class="ident">DNSSECRData::to_record_type</span>(<span class="ident">rdata</span>),
-            <span class="ident">RData::Unknown</span> { <span class="ident">code</span>, .. } =&gt; <span class="ident">RecordType::Unknown</span>(<span class="ident">code</span>),
-            <span class="ident">RData::ZERO</span> =&gt; <span class="ident">RecordType::ZERO</span>,
+    <span class="doccomment">/// Converts this to a Recordtype
+    </span><span class="kw">pub fn </span>to_record_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RecordType {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            RData::A(..) =&gt; RecordType::A,
+            RData::AAAA(..) =&gt; RecordType::AAAA,
+            RData::ANAME(..) =&gt; RecordType::ANAME,
+            RData::CAA(..) =&gt; RecordType::CAA,
+            RData::CNAME(..) =&gt; RecordType::CNAME,
+            RData::CSYNC(..) =&gt; RecordType::CSYNC,
+            RData::HINFO(..) =&gt; RecordType::HINFO,
+            RData::HTTPS(..) =&gt; RecordType::HTTPS,
+            RData::MX(..) =&gt; RecordType::MX,
+            RData::NAPTR(..) =&gt; RecordType::NAPTR,
+            RData::NS(..) =&gt; RecordType::NS,
+            RData::NULL(..) =&gt; RecordType::NULL,
+            RData::OPENPGPKEY(..) =&gt; RecordType::OPENPGPKEY,
+            RData::OPT(..) =&gt; RecordType::OPT,
+            RData::PTR(..) =&gt; RecordType::PTR,
+            RData::SOA(..) =&gt; RecordType::SOA,
+            RData::SRV(..) =&gt; RecordType::SRV,
+            RData::SSHFP(..) =&gt; RecordType::SSHFP,
+            RData::SVCB(..) =&gt; RecordType::SVCB,
+            RData::TLSA(..) =&gt; RecordType::TLSA,
+            RData::TXT(..) =&gt; RecordType::TXT,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;dnssec&quot;</span>)]
+            </span>RData::DNSSEC(<span class="kw-2">ref </span>rdata) =&gt; DNSSECRData::to_record_type(rdata),
+            RData::Unknown { code, .. } =&gt; RecordType::Unknown(code),
+            RData::ZERO =&gt; RecordType::ZERO,
         }
     }
 
-    <span class="doccomment">/// If this is an A or AAAA record type, then an IpAddr will be returned</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_ip_addr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IpAddr</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">RData::A</span>(<span class="ident">a</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">IpAddr::from</span>(<span class="ident">a</span>)),
-            <span class="ident">RData::AAAA</span>(<span class="ident">aaaa</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">IpAddr::from</span>(<span class="ident">aaaa</span>)),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">RData</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">w</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">fmt::Display</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">d</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
-            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{rdata}&quot;</span>, <span class="ident">rdata</span> <span class="op">=</span> <span class="ident">d</span>)
-        }
-
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">RData::A</span>(<span class="ident">address</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">address</span>),
-            <span class="ident">RData::AAAA</span>(<span class="kw-2">ref</span> <span class="ident">address</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">address</span>),
-            <span class="ident">RData::ANAME</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">name</span>),
-            <span class="ident">RData::CAA</span>(<span class="kw-2">ref</span> <span class="ident">caa</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">caa</span>),
-            <span class="comment">// to_lowercase for rfc4034 and rfc6840</span>
-            <span class="ident">RData::CNAME</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">|</span> <span class="ident">RData::NS</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">|</span> <span class="ident">RData::PTR</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">name</span>),
-            <span class="ident">RData::CSYNC</span>(<span class="kw-2">ref</span> <span class="ident">csync</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">csync</span>),
-            <span class="ident">RData::HINFO</span>(<span class="kw-2">ref</span> <span class="ident">hinfo</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">hinfo</span>),
-            <span class="ident">RData::HTTPS</span>(<span class="kw-2">ref</span> <span class="ident">svcb</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">svcb</span>),
-            <span class="ident">RData::ZERO</span> =&gt; <span class="prelude-val">Ok</span>(()),
-            <span class="comment">// to_lowercase for rfc4034 and rfc6840</span>
-            <span class="ident">RData::MX</span>(<span class="kw-2">ref</span> <span class="ident">mx</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">mx</span>),
-            <span class="ident">RData::NAPTR</span>(<span class="kw-2">ref</span> <span class="ident">naptr</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">naptr</span>),
-            <span class="ident">RData::NULL</span>(<span class="kw-2">ref</span> <span class="ident">null</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">null</span>),
-            <span class="ident">RData::OPENPGPKEY</span>(<span class="kw-2">ref</span> <span class="ident">openpgpkey</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">openpgpkey</span>),
-            <span class="comment">// Opt has no display representation</span>
-            <span class="ident">RData::OPT</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">fmt::Error</span>),
-            <span class="comment">// to_lowercase for rfc4034 and rfc6840</span>
-            <span class="ident">RData::SOA</span>(<span class="kw-2">ref</span> <span class="ident">soa</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">soa</span>),
-            <span class="comment">// to_lowercase for rfc4034 and rfc6840</span>
-            <span class="ident">RData::SRV</span>(<span class="kw-2">ref</span> <span class="ident">srv</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">srv</span>),
-            <span class="ident">RData::SSHFP</span>(<span class="kw-2">ref</span> <span class="ident">sshfp</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">sshfp</span>),
-            <span class="ident">RData::SVCB</span>(<span class="kw-2">ref</span> <span class="ident">svcb</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">svcb</span>),
-            <span class="ident">RData::TLSA</span>(<span class="kw-2">ref</span> <span class="ident">tlsa</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">tlsa</span>),
-            <span class="ident">RData::TXT</span>(<span class="kw-2">ref</span> <span class="ident">txt</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">txt</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-            <span class="ident">RData::DNSSEC</span>(<span class="kw-2">ref</span> <span class="ident">rdata</span>) =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">rdata</span>),
-            <span class="ident">RData::Unknown</span> { <span class="kw-2">ref</span> <span class="ident">rdata</span>, .. } =&gt; <span class="ident">w</span>(<span class="ident">f</span>, <span class="ident">rdata</span>),
+    <span class="doccomment">/// If this is an A or AAAA record type, then an IpAddr will be returned
+    </span><span class="kw">pub fn </span>to_ip_addr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;IpAddr&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            RData::A(a) =&gt; <span class="prelude-val">Some</span>(IpAddr::from(a)),
+            RData::AAAA(aaaa) =&gt; <span class="prelude-val">Some</span>(IpAddr::from(aaaa)),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RData</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">cmp</span>(<span class="ident">other</span>))
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>RData {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), fmt::Error&gt; {
+        <span class="kw">fn </span>w&lt;D: fmt::Display&gt;(f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;, d: D) -&gt; <span class="prelude-ty">Result</span>&lt;(), fmt::Error&gt; {
+            <span class="macro">write!</span>(f, <span class="string">&quot;{rdata}&quot;</span>, rdata = d)
+        }
+
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            RData::A(address) =&gt; w(f, address),
+            RData::AAAA(<span class="kw-2">ref </span>address) =&gt; w(f, address),
+            RData::ANAME(<span class="kw-2">ref </span>name) =&gt; w(f, name),
+            RData::CAA(<span class="kw-2">ref </span>caa) =&gt; w(f, caa),
+            <span class="comment">// to_lowercase for rfc4034 and rfc6840
+            </span>RData::CNAME(<span class="kw-2">ref </span>name) | RData::NS(<span class="kw-2">ref </span>name) | RData::PTR(<span class="kw-2">ref </span>name) =&gt; w(f, name),
+            RData::CSYNC(<span class="kw-2">ref </span>csync) =&gt; w(f, csync),
+            RData::HINFO(<span class="kw-2">ref </span>hinfo) =&gt; w(f, hinfo),
+            RData::HTTPS(<span class="kw-2">ref </span>svcb) =&gt; w(f, svcb),
+            RData::ZERO =&gt; <span class="prelude-val">Ok</span>(()),
+            <span class="comment">// to_lowercase for rfc4034 and rfc6840
+            </span>RData::MX(<span class="kw-2">ref </span>mx) =&gt; w(f, mx),
+            RData::NAPTR(<span class="kw-2">ref </span>naptr) =&gt; w(f, naptr),
+            RData::NULL(<span class="kw-2">ref </span>null) =&gt; w(f, null),
+            RData::OPENPGPKEY(<span class="kw-2">ref </span>openpgpkey) =&gt; w(f, openpgpkey),
+            <span class="comment">// Opt has no display representation
+            </span>RData::OPT(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(fmt::Error),
+            <span class="comment">// to_lowercase for rfc4034 and rfc6840
+            </span>RData::SOA(<span class="kw-2">ref </span>soa) =&gt; w(f, soa),
+            <span class="comment">// to_lowercase for rfc4034 and rfc6840
+            </span>RData::SRV(<span class="kw-2">ref </span>srv) =&gt; w(f, srv),
+            RData::SSHFP(<span class="kw-2">ref </span>sshfp) =&gt; w(f, sshfp),
+            RData::SVCB(<span class="kw-2">ref </span>svcb) =&gt; w(f, svcb),
+            RData::TLSA(<span class="kw-2">ref </span>tlsa) =&gt; w(f, tlsa),
+            RData::TXT(<span class="kw-2">ref </span>txt) =&gt; w(f, txt),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;dnssec&quot;</span>)]
+            </span>RData::DNSSEC(<span class="kw-2">ref </span>rdata) =&gt; w(f, rdata),
+            RData::Unknown { <span class="kw-2">ref </span>rdata, .. } =&gt; w(f, rdata),
+        }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">RData</span> {
-    <span class="comment">// RFC 4034                DNSSEC Resource Records               March 2005</span>
-    <span class="comment">//</span>
-    <span class="comment">// 6.3.  Canonical RR Ordering within an RRset</span>
-    <span class="comment">//</span>
-    <span class="comment">//    For the purposes of DNS security, RRs with the same owner name,</span>
-    <span class="comment">//    class, and type are sorted by treating the RDATA portion of the</span>
-    <span class="comment">//    canonical form of each RR as a left-justified unsigned octet sequence</span>
-    <span class="comment">//    in which the absence of an octet sorts before a zero octet.</span>
-    <span class="comment">//</span>
-    <span class="comment">//    [RFC2181] specifies that an RRset is not allowed to contain duplicate</span>
-    <span class="comment">//    records (multiple RRs with the same owner name, class, type, and</span>
-    <span class="comment">//    RDATA).  Therefore, if an implementation detects duplicate RRs when</span>
-    <span class="comment">//    putting the RRset in canonical form, it MUST treat this as a protocol</span>
-    <span class="comment">//    error.  If the implementation chooses to handle this protocol error</span>
-    <span class="comment">//    in the spirit of the robustness principle (being liberal in what it</span>
-    <span class="comment">//    accepts), it MUST remove all but one of the duplicate RR(s) for the</span>
-    <span class="comment">//    purposes of calculating the canonical form of the RRset.</span>
-    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">Ordering</span> {
-        <span class="comment">// TODO: how about we just store the bytes with the decoded data?</span>
-        <span class="comment">//  the decoded data is useful for queries, the encoded data is needed for transfers, signing</span>
-        <span class="comment">//  and ordering.</span>
-        <span class="self">self</span>.<span class="ident">to_bytes</span>().<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">to_bytes</span>())
+<span class="kw">impl </span>PartialOrd&lt;<span class="self">Self</span>&gt; <span class="kw">for </span>RData {
+    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Ordering&gt; {
+        <span class="prelude-val">Some</span>(<span class="self">self</span>.cmp(other))
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::dbg_macro</span>, <span class="ident">clippy::print_stdout</span>)]</span>
+<span class="kw">impl </span>Ord <span class="kw">for </span>RData {
+    <span class="comment">// RFC 4034                DNSSEC Resource Records               March 2005
+    //
+    // 6.3.  Canonical RR Ordering within an RRset
+    //
+    //    For the purposes of DNS security, RRs with the same owner name,
+    //    class, and type are sorted by treating the RDATA portion of the
+    //    canonical form of each RR as a left-justified unsigned octet sequence
+    //    in which the absence of an octet sorts before a zero octet.
+    //
+    //    [RFC2181] specifies that an RRset is not allowed to contain duplicate
+    //    records (multiple RRs with the same owner name, class, type, and
+    //    RDATA).  Therefore, if an implementation detects duplicate RRs when
+    //    putting the RRset in canonical form, it MUST treat this as a protocol
+    //    error.  If the implementation chooses to handle this protocol error
+    //    in the spirit of the robustness principle (being liberal in what it
+    //    accepts), it MUST remove all but one of the duplicate RR(s) for the
+    //    purposes of calculating the canonical form of the RRset.
+    </span><span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; Ordering {
+        <span class="comment">// TODO: how about we just store the bytes with the decoded data?
+        //  the decoded data is useful for queries, the encoded data is needed for transfers, signing
+        //  and ordering.
+        </span><span class="self">self</span>.to_bytes().cmp(<span class="kw-2">&amp;</span>other.to_bytes())
+    }
+}
 
-    <span class="kw">use</span> <span class="ident">std::net::Ipv4Addr</span>;
-    <span class="kw">use</span> <span class="ident">std::net::Ipv6Addr</span>;
-    <span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="attribute">#![allow(clippy::dbg_macro, clippy::print_stdout)]
 
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::rr::domain::Name</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::rr::rdata</span>::{<span class="ident">MX</span>, <span class="ident">SOA</span>, <span class="ident">SRV</span>, <span class="ident">TXT</span>};
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::serialize::binary::bin_tests::test_emit_data_set</span>;
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::useless_attribute</span>)]</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::serialize::binary</span>::<span class="kw-2">*</span>;
+    </span><span class="kw">use </span>std::net::Ipv4Addr;
+    <span class="kw">use </span>std::net::Ipv6Addr;
+    <span class="kw">use </span>std::str::FromStr;
 
-    <span class="kw">fn</span> <span class="ident">get_data</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">RData</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::rr::domain::Name;
+    <span class="kw">use </span><span class="kw">crate</span>::rr::rdata::{MX, SOA, SRV, TXT};
+    <span class="kw">use </span><span class="kw">crate</span>::serialize::binary::bin_tests::test_emit_data_set;
+    <span class="attribute">#[allow(clippy::useless_attribute)]
+    #[allow(unused)]
+    </span><span class="kw">use </span><span class="kw">crate</span>::serialize::binary::<span class="kw-2">*</span>;
+
+    <span class="kw">fn </span>get_data() -&gt; Vec&lt;(RData, Vec&lt;u8&gt;)&gt; {
         <span class="macro">vec!</span>[
             (
-                <span class="ident">RData::CNAME</span>(<span class="ident">Name::from_str</span>(<span class="string">&quot;www.example.com&quot;</span>).<span class="ident">unwrap</span>()),
+                RData::CNAME(Name::from_str(<span class="string">&quot;www.example.com&quot;</span>).unwrap()),
                 <span class="macro">vec!</span>[
                     <span class="number">3</span>, <span class="string">b&#39;w&#39;</span>, <span class="string">b&#39;w&#39;</span>, <span class="string">b&#39;w&#39;</span>, <span class="number">7</span>, <span class="string">b&#39;e&#39;</span>, <span class="string">b&#39;x&#39;</span>, <span class="string">b&#39;a&#39;</span>, <span class="string">b&#39;m&#39;</span>, <span class="string">b&#39;p&#39;</span>, <span class="string">b&#39;l&#39;</span>, <span class="string">b&#39;e&#39;</span>, <span class="number">3</span>, <span class="string">b&#39;c&#39;</span>,
                     <span class="string">b&#39;o&#39;</span>, <span class="string">b&#39;m&#39;</span>, <span class="number">0</span>,
                 ],
             ),
             (
-                <span class="ident">RData::MX</span>(<span class="ident">MX::new</span>(<span class="number">256</span>, <span class="ident">Name::from_str</span>(<span class="string">&quot;n&quot;</span>).<span class="ident">unwrap</span>())),
+                RData::MX(MX::new(<span class="number">256</span>, Name::from_str(<span class="string">&quot;n&quot;</span>).unwrap())),
                 <span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="string">b&#39;n&#39;</span>, <span class="number">0</span>],
             ),
             (
-                <span class="ident">RData::NS</span>(<span class="ident">Name::from_str</span>(<span class="string">&quot;www.example.com&quot;</span>).<span class="ident">unwrap</span>()),
+                RData::NS(Name::from_str(<span class="string">&quot;www.example.com&quot;</span>).unwrap()),
                 <span class="macro">vec!</span>[
                     <span class="number">3</span>, <span class="string">b&#39;w&#39;</span>, <span class="string">b&#39;w&#39;</span>, <span class="string">b&#39;w&#39;</span>, <span class="number">7</span>, <span class="string">b&#39;e&#39;</span>, <span class="string">b&#39;x&#39;</span>, <span class="string">b&#39;a&#39;</span>, <span class="string">b&#39;m&#39;</span>, <span class="string">b&#39;p&#39;</span>, <span class="string">b&#39;l&#39;</span>, <span class="string">b&#39;e&#39;</span>, <span class="number">3</span>, <span class="string">b&#39;c&#39;</span>,
                     <span class="string">b&#39;o&#39;</span>, <span class="string">b&#39;m&#39;</span>, <span class="number">0</span>,
                 ],
             ),
             (
-                <span class="ident">RData::PTR</span>(<span class="ident">Name::from_str</span>(<span class="string">&quot;www.example.com&quot;</span>).<span class="ident">unwrap</span>()),
+                RData::PTR(Name::from_str(<span class="string">&quot;www.example.com&quot;</span>).unwrap()),
                 <span class="macro">vec!</span>[
                     <span class="number">3</span>, <span class="string">b&#39;w&#39;</span>, <span class="string">b&#39;w&#39;</span>, <span class="string">b&#39;w&#39;</span>, <span class="number">7</span>, <span class="string">b&#39;e&#39;</span>, <span class="string">b&#39;x&#39;</span>, <span class="string">b&#39;a&#39;</span>, <span class="string">b&#39;m&#39;</span>, <span class="string">b&#39;p&#39;</span>, <span class="string">b&#39;l&#39;</span>, <span class="string">b&#39;e&#39;</span>, <span class="number">3</span>, <span class="string">b&#39;c&#39;</span>,
                     <span class="string">b&#39;o&#39;</span>, <span class="string">b&#39;m&#39;</span>, <span class="number">0</span>,
                 ],
             ),
             (
-                <span class="ident">RData::SOA</span>(<span class="ident">SOA::new</span>(
-                    <span class="ident">Name::from_str</span>(<span class="string">&quot;www.example.com&quot;</span>).<span class="ident">unwrap</span>(),
-                    <span class="ident">Name::from_str</span>(<span class="string">&quot;xxx.example.com&quot;</span>).<span class="ident">unwrap</span>(),
-                    <span class="ident">u32::max_value</span>(),
-                    <span class="op">-</span><span class="number">1</span>,
-                    <span class="op">-</span><span class="number">1</span>,
-                    <span class="op">-</span><span class="number">1</span>,
-                    <span class="ident">u32::max_value</span>(),
+                RData::SOA(SOA::new(
+                    Name::from_str(<span class="string">&quot;www.example.com&quot;</span>).unwrap(),
+                    Name::from_str(<span class="string">&quot;xxx.example.com&quot;</span>).unwrap(),
+                    u32::max_value(),
+                    -<span class="number">1</span>,
+                    -<span class="number">1</span>,
+                    -<span class="number">1</span>,
+                    u32::max_value(),
                 )),
                 <span class="macro">vec!</span>[
                     <span class="number">3</span>, <span class="string">b&#39;w&#39;</span>, <span class="string">b&#39;w&#39;</span>, <span class="string">b&#39;w&#39;</span>, <span class="number">7</span>, <span class="string">b&#39;e&#39;</span>, <span class="string">b&#39;x&#39;</span>, <span class="string">b&#39;a&#39;</span>, <span class="string">b&#39;m&#39;</span>, <span class="string">b&#39;p&#39;</span>, <span class="string">b&#39;l&#39;</span>, <span class="string">b&#39;e&#39;</span>, <span class="number">3</span>, <span class="string">b&#39;c&#39;</span>,
@@ -2407,30 +2407,30 @@
                 ],
             ),
             (
-                <span class="ident">RData::TXT</span>(<span class="ident">TXT::new</span>(<span class="macro">vec!</span>[
-                    <span class="string">&quot;abcdef&quot;</span>.<span class="ident">to_string</span>(),
-                    <span class="string">&quot;ghi&quot;</span>.<span class="ident">to_string</span>(),
-                    <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>(),
-                    <span class="string">&quot;j&quot;</span>.<span class="ident">to_string</span>(),
+                RData::TXT(TXT::new(<span class="macro">vec!</span>[
+                    <span class="string">&quot;abcdef&quot;</span>.to_string(),
+                    <span class="string">&quot;ghi&quot;</span>.to_string(),
+                    <span class="string">&quot;&quot;</span>.to_string(),
+                    <span class="string">&quot;j&quot;</span>.to_string(),
                 ])),
                 <span class="macro">vec!</span>[
                     <span class="number">6</span>, <span class="string">b&#39;a&#39;</span>, <span class="string">b&#39;b&#39;</span>, <span class="string">b&#39;c&#39;</span>, <span class="string">b&#39;d&#39;</span>, <span class="string">b&#39;e&#39;</span>, <span class="string">b&#39;f&#39;</span>, <span class="number">3</span>, <span class="string">b&#39;g&#39;</span>, <span class="string">b&#39;h&#39;</span>, <span class="string">b&#39;i&#39;</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="string">b&#39;j&#39;</span>,
                 ],
             ),
             (
-                <span class="ident">RData::A</span>(<span class="ident">Ipv4Addr::from_str</span>(<span class="string">&quot;0.0.0.0&quot;</span>).<span class="ident">unwrap</span>()),
+                RData::A(Ipv4Addr::from_str(<span class="string">&quot;0.0.0.0&quot;</span>).unwrap()),
                 <span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>],
             ),
             (
-                <span class="ident">RData::AAAA</span>(<span class="ident">Ipv6Addr::from_str</span>(<span class="string">&quot;::&quot;</span>).<span class="ident">unwrap</span>()),
+                RData::AAAA(Ipv6Addr::from_str(<span class="string">&quot;::&quot;</span>).unwrap()),
                 <span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>],
             ),
             (
-                <span class="ident">RData::SRV</span>(<span class="ident">SRV::new</span>(
+                RData::SRV(SRV::new(
                     <span class="number">1</span>,
                     <span class="number">2</span>,
                     <span class="number">3</span>,
-                    <span class="ident">Name::from_str</span>(<span class="string">&quot;www.example.com&quot;</span>).<span class="ident">unwrap</span>(),
+                    Name::from_str(<span class="string">&quot;www.example.com&quot;</span>).unwrap(),
                 )),
                 <span class="macro">vec!</span>[
                     <span class="number">0x00</span>, <span class="number">0x01</span>, <span class="number">0x00</span>, <span class="number">0x02</span>, <span class="number">0x00</span>, <span class="number">0x03</span>, <span class="number">3</span>, <span class="string">b&#39;w&#39;</span>, <span class="string">b&#39;w&#39;</span>, <span class="string">b&#39;w&#39;</span>, <span class="number">7</span>, <span class="string">b&#39;e&#39;</span>, <span class="string">b&#39;x&#39;</span>, <span class="string">b&#39;a&#39;</span>,
@@ -2438,131 +2438,131 @@
                 ],
             ),
             (
-                <span class="ident">RData::HINFO</span>(<span class="ident">HINFO::new</span>(<span class="string">&quot;cpu&quot;</span>.<span class="ident">to_string</span>(), <span class="string">&quot;os&quot;</span>.<span class="ident">to_string</span>())),
+                RData::HINFO(HINFO::new(<span class="string">&quot;cpu&quot;</span>.to_string(), <span class="string">&quot;os&quot;</span>.to_string())),
                 <span class="macro">vec!</span>[<span class="number">3</span>, <span class="string">b&#39;c&#39;</span>, <span class="string">b&#39;p&#39;</span>, <span class="string">b&#39;u&#39;</span>, <span class="number">2</span>, <span class="string">b&#39;o&#39;</span>, <span class="string">b&#39;s&#39;</span>],
             ),
         ]
     }
 
-    <span class="comment">// TODO this test kinda sucks, shows the problem with not storing the binary parts</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_order</span>() {
-        <span class="kw">let</span> <span class="ident">ordered</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RData</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[
-            <span class="ident">RData::A</span>(<span class="ident">Ipv4Addr::from_str</span>(<span class="string">&quot;0.0.0.0&quot;</span>).<span class="ident">unwrap</span>()),
-            <span class="ident">RData::AAAA</span>(<span class="ident">Ipv6Addr::from_str</span>(<span class="string">&quot;::&quot;</span>).<span class="ident">unwrap</span>()),
-            <span class="ident">RData::SRV</span>(<span class="ident">SRV::new</span>(
+    <span class="comment">// TODO this test kinda sucks, shows the problem with not storing the binary parts
+    </span><span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_order() {
+        <span class="kw">let </span>ordered: Vec&lt;RData&gt; = <span class="macro">vec!</span>[
+            RData::A(Ipv4Addr::from_str(<span class="string">&quot;0.0.0.0&quot;</span>).unwrap()),
+            RData::AAAA(Ipv6Addr::from_str(<span class="string">&quot;::&quot;</span>).unwrap()),
+            RData::SRV(SRV::new(
                 <span class="number">1</span>,
                 <span class="number">2</span>,
                 <span class="number">3</span>,
-                <span class="ident">Name::from_str</span>(<span class="string">&quot;www.example.com&quot;</span>).<span class="ident">unwrap</span>(),
+                Name::from_str(<span class="string">&quot;www.example.com&quot;</span>).unwrap(),
             )),
-            <span class="ident">RData::MX</span>(<span class="ident">MX::new</span>(<span class="number">256</span>, <span class="ident">Name::from_str</span>(<span class="string">&quot;n&quot;</span>).<span class="ident">unwrap</span>())),
-            <span class="ident">RData::CNAME</span>(<span class="ident">Name::from_str</span>(<span class="string">&quot;www.example.com&quot;</span>).<span class="ident">unwrap</span>()),
-            <span class="ident">RData::PTR</span>(<span class="ident">Name::from_str</span>(<span class="string">&quot;www.example.com&quot;</span>).<span class="ident">unwrap</span>()),
-            <span class="ident">RData::NS</span>(<span class="ident">Name::from_str</span>(<span class="string">&quot;www.example.com&quot;</span>).<span class="ident">unwrap</span>()),
-            <span class="ident">RData::SOA</span>(<span class="ident">SOA::new</span>(
-                <span class="ident">Name::from_str</span>(<span class="string">&quot;www.example.com&quot;</span>).<span class="ident">unwrap</span>(),
-                <span class="ident">Name::from_str</span>(<span class="string">&quot;xxx.example.com&quot;</span>).<span class="ident">unwrap</span>(),
-                <span class="ident">u32::max_value</span>(),
-                <span class="op">-</span><span class="number">1</span>,
-                <span class="op">-</span><span class="number">1</span>,
-                <span class="op">-</span><span class="number">1</span>,
-                <span class="ident">u32::max_value</span>(),
+            RData::MX(MX::new(<span class="number">256</span>, Name::from_str(<span class="string">&quot;n&quot;</span>).unwrap())),
+            RData::CNAME(Name::from_str(<span class="string">&quot;www.example.com&quot;</span>).unwrap()),
+            RData::PTR(Name::from_str(<span class="string">&quot;www.example.com&quot;</span>).unwrap()),
+            RData::NS(Name::from_str(<span class="string">&quot;www.example.com&quot;</span>).unwrap()),
+            RData::SOA(SOA::new(
+                Name::from_str(<span class="string">&quot;www.example.com&quot;</span>).unwrap(),
+                Name::from_str(<span class="string">&quot;xxx.example.com&quot;</span>).unwrap(),
+                u32::max_value(),
+                -<span class="number">1</span>,
+                -<span class="number">1</span>,
+                -<span class="number">1</span>,
+                u32::max_value(),
             )),
-            <span class="ident">RData::TXT</span>(<span class="ident">TXT::new</span>(<span class="macro">vec!</span>[
-                <span class="string">&quot;abcdef&quot;</span>.<span class="ident">to_string</span>(),
-                <span class="string">&quot;ghi&quot;</span>.<span class="ident">to_string</span>(),
-                <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>(),
-                <span class="string">&quot;j&quot;</span>.<span class="ident">to_string</span>(),
+            RData::TXT(TXT::new(<span class="macro">vec!</span>[
+                <span class="string">&quot;abcdef&quot;</span>.to_string(),
+                <span class="string">&quot;ghi&quot;</span>.to_string(),
+                <span class="string">&quot;&quot;</span>.to_string(),
+                <span class="string">&quot;j&quot;</span>.to_string(),
             ])),
         ];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">unordered</span> <span class="op">=</span> <span class="macro">vec!</span>[
-            <span class="ident">RData::CNAME</span>(<span class="ident">Name::from_str</span>(<span class="string">&quot;www.example.com&quot;</span>).<span class="ident">unwrap</span>()),
-            <span class="ident">RData::MX</span>(<span class="ident">MX::new</span>(<span class="number">256</span>, <span class="ident">Name::from_str</span>(<span class="string">&quot;n&quot;</span>).<span class="ident">unwrap</span>())),
-            <span class="ident">RData::PTR</span>(<span class="ident">Name::from_str</span>(<span class="string">&quot;www.example.com&quot;</span>).<span class="ident">unwrap</span>()),
-            <span class="ident">RData::NS</span>(<span class="ident">Name::from_str</span>(<span class="string">&quot;www.example.com&quot;</span>).<span class="ident">unwrap</span>()),
-            <span class="ident">RData::SOA</span>(<span class="ident">SOA::new</span>(
-                <span class="ident">Name::from_str</span>(<span class="string">&quot;www.example.com&quot;</span>).<span class="ident">unwrap</span>(),
-                <span class="ident">Name::from_str</span>(<span class="string">&quot;xxx.example.com&quot;</span>).<span class="ident">unwrap</span>(),
-                <span class="ident">u32::max_value</span>(),
-                <span class="op">-</span><span class="number">1</span>,
-                <span class="op">-</span><span class="number">1</span>,
-                <span class="op">-</span><span class="number">1</span>,
-                <span class="ident">u32::max_value</span>(),
+        <span class="kw">let </span><span class="kw-2">mut </span>unordered = <span class="macro">vec!</span>[
+            RData::CNAME(Name::from_str(<span class="string">&quot;www.example.com&quot;</span>).unwrap()),
+            RData::MX(MX::new(<span class="number">256</span>, Name::from_str(<span class="string">&quot;n&quot;</span>).unwrap())),
+            RData::PTR(Name::from_str(<span class="string">&quot;www.example.com&quot;</span>).unwrap()),
+            RData::NS(Name::from_str(<span class="string">&quot;www.example.com&quot;</span>).unwrap()),
+            RData::SOA(SOA::new(
+                Name::from_str(<span class="string">&quot;www.example.com&quot;</span>).unwrap(),
+                Name::from_str(<span class="string">&quot;xxx.example.com&quot;</span>).unwrap(),
+                u32::max_value(),
+                -<span class="number">1</span>,
+                -<span class="number">1</span>,
+                -<span class="number">1</span>,
+                u32::max_value(),
             )),
-            <span class="ident">RData::TXT</span>(<span class="ident">TXT::new</span>(<span class="macro">vec!</span>[
-                <span class="string">&quot;abcdef&quot;</span>.<span class="ident">to_string</span>(),
-                <span class="string">&quot;ghi&quot;</span>.<span class="ident">to_string</span>(),
-                <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>(),
-                <span class="string">&quot;j&quot;</span>.<span class="ident">to_string</span>(),
+            RData::TXT(TXT::new(<span class="macro">vec!</span>[
+                <span class="string">&quot;abcdef&quot;</span>.to_string(),
+                <span class="string">&quot;ghi&quot;</span>.to_string(),
+                <span class="string">&quot;&quot;</span>.to_string(),
+                <span class="string">&quot;j&quot;</span>.to_string(),
             ])),
-            <span class="ident">RData::A</span>(<span class="ident">Ipv4Addr::from_str</span>(<span class="string">&quot;0.0.0.0&quot;</span>).<span class="ident">unwrap</span>()),
-            <span class="ident">RData::AAAA</span>(<span class="ident">Ipv6Addr::from_str</span>(<span class="string">&quot;::&quot;</span>).<span class="ident">unwrap</span>()),
-            <span class="ident">RData::SRV</span>(<span class="ident">SRV::new</span>(
+            RData::A(Ipv4Addr::from_str(<span class="string">&quot;0.0.0.0&quot;</span>).unwrap()),
+            RData::AAAA(Ipv6Addr::from_str(<span class="string">&quot;::&quot;</span>).unwrap()),
+            RData::SRV(SRV::new(
                 <span class="number">1</span>,
                 <span class="number">2</span>,
                 <span class="number">3</span>,
-                <span class="ident">Name::from_str</span>(<span class="string">&quot;www.example.com&quot;</span>).<span class="ident">unwrap</span>(),
+                Name::from_str(<span class="string">&quot;www.example.com&quot;</span>).unwrap(),
             )),
         ];
 
-        <span class="ident">unordered</span>.<span class="ident">sort</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">ordered</span>, <span class="ident">unordered</span>);
+        unordered.sort();
+        <span class="macro">assert_eq!</span>(ordered, unordered);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_read</span>() {
-        <span class="kw">for</span> (<span class="ident">test_pass</span>, (<span class="ident">expect</span>, <span class="ident">binary</span>)) <span class="kw">in</span> <span class="ident">get_data</span>().<span class="ident">into_iter</span>().<span class="ident">enumerate</span>() {
-            <span class="macro">println!</span>(<span class="string">&quot;test {}: {:?}&quot;</span>, <span class="ident">test_pass</span>, <span class="ident">binary</span>);
-            <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">binary</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u16</span>; <span class="comment">// pre exclusive borrow</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span> <span class="op">=</span> <span class="ident">BinDecoder::new</span>(<span class="kw-2">&amp;</span><span class="ident">binary</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_read() {
+        <span class="kw">for </span>(test_pass, (expect, binary)) <span class="kw">in </span>get_data().into_iter().enumerate() {
+            <span class="macro">println!</span>(<span class="string">&quot;test {}: {:?}&quot;</span>, test_pass, binary);
+            <span class="kw">let </span>length = binary.len() <span class="kw">as </span>u16; <span class="comment">// pre exclusive borrow
+            </span><span class="kw">let </span><span class="kw-2">mut </span>decoder = BinDecoder::new(<span class="kw-2">&amp;</span>binary);
 
             <span class="macro">assert_eq!</span>(
-                <span class="ident">RData::read</span>(
-                    <span class="kw-2">&amp;mut</span> <span class="ident">decoder</span>,
-                    <span class="ident">record_type_from_rdata</span>(<span class="kw-2">&amp;</span><span class="ident">expect</span>),
-                    <span class="ident">Restrict::new</span>(<span class="ident">length</span>)
+                RData::read(
+                    <span class="kw-2">&amp;mut </span>decoder,
+                    record_type_from_rdata(<span class="kw-2">&amp;</span>expect),
+                    Restrict::new(length)
                 )
-                .<span class="ident">unwrap</span>(),
-                <span class="ident">expect</span>
+                .unwrap(),
+                expect
             );
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">record_type_from_rdata</span>(<span class="ident">rdata</span>: <span class="kw-2">&amp;</span><span class="ident">RData</span>) -&gt; <span class="ident"><span class="kw">crate</span>::rr::record_type::RecordType</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">rdata</span> {
-            <span class="ident">RData::A</span>(..) =&gt; <span class="ident">RecordType::A</span>,
-            <span class="ident">RData::AAAA</span>(..) =&gt; <span class="ident">RecordType::AAAA</span>,
-            <span class="ident">RData::ANAME</span>(..) =&gt; <span class="ident">RecordType::ANAME</span>,
-            <span class="ident">RData::CAA</span>(..) =&gt; <span class="ident">RecordType::CAA</span>,
-            <span class="ident">RData::CNAME</span>(..) =&gt; <span class="ident">RecordType::CNAME</span>,
-            <span class="ident">RData::CSYNC</span>(..) =&gt; <span class="ident">RecordType::CSYNC</span>,
-            <span class="ident">RData::HINFO</span>(..) =&gt; <span class="ident">RecordType::HINFO</span>,
-            <span class="ident">RData::HTTPS</span>(..) =&gt; <span class="ident">RecordType::HTTPS</span>,
-            <span class="ident">RData::MX</span>(..) =&gt; <span class="ident">RecordType::MX</span>,
-            <span class="ident">RData::NAPTR</span>(..) =&gt; <span class="ident">RecordType::NAPTR</span>,
-            <span class="ident">RData::NS</span>(..) =&gt; <span class="ident">RecordType::NS</span>,
-            <span class="ident">RData::NULL</span>(..) =&gt; <span class="ident">RecordType::NULL</span>,
-            <span class="ident">RData::OPENPGPKEY</span>(..) =&gt; <span class="ident">RecordType::OPENPGPKEY</span>,
-            <span class="ident">RData::OPT</span>(..) =&gt; <span class="ident">RecordType::OPT</span>,
-            <span class="ident">RData::PTR</span>(..) =&gt; <span class="ident">RecordType::PTR</span>,
-            <span class="ident">RData::SOA</span>(..) =&gt; <span class="ident">RecordType::SOA</span>,
-            <span class="ident">RData::SRV</span>(..) =&gt; <span class="ident">RecordType::SRV</span>,
-            <span class="ident">RData::SSHFP</span>(..) =&gt; <span class="ident">RecordType::SSHFP</span>,
-            <span class="ident">RData::SVCB</span>(..) =&gt; <span class="ident">RecordType::SVCB</span>,
-            <span class="ident">RData::TLSA</span>(..) =&gt; <span class="ident">RecordType::TLSA</span>,
-            <span class="ident">RData::TXT</span>(..) =&gt; <span class="ident">RecordType::TXT</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-            <span class="ident">RData::DNSSEC</span>(<span class="kw-2">ref</span> <span class="ident">rdata</span>) =&gt; <span class="ident">rdata</span>.<span class="ident">to_record_type</span>(),
-            <span class="ident">RData::Unknown</span> { <span class="ident">code</span>, .. } =&gt; <span class="ident">RecordType::Unknown</span>(<span class="ident">code</span>),
-            <span class="ident">RData::ZERO</span> =&gt; <span class="ident">RecordType::ZERO</span>,
+    <span class="kw">fn </span>record_type_from_rdata(rdata: <span class="kw-2">&amp;</span>RData) -&gt; <span class="kw">crate</span>::rr::record_type::RecordType {
+        <span class="kw">match </span><span class="kw-2">*</span>rdata {
+            RData::A(..) =&gt; RecordType::A,
+            RData::AAAA(..) =&gt; RecordType::AAAA,
+            RData::ANAME(..) =&gt; RecordType::ANAME,
+            RData::CAA(..) =&gt; RecordType::CAA,
+            RData::CNAME(..) =&gt; RecordType::CNAME,
+            RData::CSYNC(..) =&gt; RecordType::CSYNC,
+            RData::HINFO(..) =&gt; RecordType::HINFO,
+            RData::HTTPS(..) =&gt; RecordType::HTTPS,
+            RData::MX(..) =&gt; RecordType::MX,
+            RData::NAPTR(..) =&gt; RecordType::NAPTR,
+            RData::NS(..) =&gt; RecordType::NS,
+            RData::NULL(..) =&gt; RecordType::NULL,
+            RData::OPENPGPKEY(..) =&gt; RecordType::OPENPGPKEY,
+            RData::OPT(..) =&gt; RecordType::OPT,
+            RData::PTR(..) =&gt; RecordType::PTR,
+            RData::SOA(..) =&gt; RecordType::SOA,
+            RData::SRV(..) =&gt; RecordType::SRV,
+            RData::SSHFP(..) =&gt; RecordType::SSHFP,
+            RData::SVCB(..) =&gt; RecordType::SVCB,
+            RData::TLSA(..) =&gt; RecordType::TLSA,
+            RData::TXT(..) =&gt; RecordType::TXT,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;dnssec&quot;</span>)]
+            </span>RData::DNSSEC(<span class="kw-2">ref </span>rdata) =&gt; rdata.to_record_type(),
+            RData::Unknown { code, .. } =&gt; RecordType::Unknown(code),
+            RData::ZERO =&gt; RecordType::ZERO,
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_write_to</span>() {
-        <span class="ident">test_emit_data_set</span>(<span class="ident">get_data</span>(), <span class="op">|</span><span class="ident">e</span>, <span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">emit</span>(<span class="ident">e</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_write_to() {
+        test_emit_data_set(get_data(), |e, d| d.emit(e));
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

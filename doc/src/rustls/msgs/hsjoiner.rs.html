@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/msgs/hsjoiner.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>hsjoiner.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/msgs/hsjoiner.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>hsjoiner.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -294,301 +294,301 @@
 <span id="294">294</span>
 <span id="295">295</span>
 <span id="296">296</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::VecDeque</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::collections::VecDeque;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::base::Payload</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::codec</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::enums</span>::{<span class="ident">ContentType</span>, <span class="ident">ProtocolVersion</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::handshake::HandshakeMessagePayload</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::message</span>::{<span class="ident">Message</span>, <span class="ident">MessagePayload</span>, <span class="ident">PlainMessage</span>};
+<span class="kw">use </span><span class="kw">crate</span>::msgs::base::Payload;
+<span class="kw">use </span><span class="kw">crate</span>::msgs::codec;
+<span class="kw">use </span><span class="kw">crate</span>::msgs::enums::{ContentType, ProtocolVersion};
+<span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::HandshakeMessagePayload;
+<span class="kw">use </span><span class="kw">crate</span>::msgs::message::{Message, MessagePayload, PlainMessage};
 
-<span class="kw">const</span> <span class="ident">HEADER_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span> <span class="op">+</span> <span class="number">3</span>;
+<span class="kw">const </span>HEADER_SIZE: usize = <span class="number">1 </span>+ <span class="number">3</span>;
 
-<span class="doccomment">/// TLS allows for handshake messages of up to 16MB.  We</span>
-<span class="doccomment">/// restrict that to 64KB to limit potential for denial-of-</span>
-<span class="doccomment">/// service.</span>
-<span class="kw">const</span> <span class="ident">MAX_HANDSHAKE_SIZE</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0xffff</span>;
+<span class="doccomment">/// TLS allows for handshake messages of up to 16MB.  We
+/// restrict that to 64KB to limit potential for denial-of-
+/// service.
+</span><span class="kw">const </span>MAX_HANDSHAKE_SIZE: u32 = <span class="number">0xffff</span>;
 
-<span class="doccomment">/// This works to reconstruct TLS handshake messages</span>
-<span class="doccomment">/// from individual TLS messages.  It&#39;s guaranteed that</span>
-<span class="doccomment">/// TLS messages output from this layer contain precisely</span>
-<span class="doccomment">/// one handshake payload.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HandshakeJoiner</span> {
-    <span class="doccomment">/// Completed handshake frames for output.</span>
-    <span class="kw">pub</span> <span class="ident">frames</span>: <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>,
+<span class="doccomment">/// This works to reconstruct TLS handshake messages
+/// from individual TLS messages.  It&#39;s guaranteed that
+/// TLS messages output from this layer contain precisely
+/// one handshake payload.
+</span><span class="kw">pub struct </span>HandshakeJoiner {
+    <span class="doccomment">/// Completed handshake frames for output.
+    </span><span class="kw">pub </span>frames: VecDeque&lt;Message&gt;,
 
-    <span class="doccomment">/// The message payload we&#39;re currently accumulating.</span>
-    <span class="ident">buf</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The message payload we&#39;re currently accumulating.
+    </span>buf: Vec&lt;u8&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">HandshakeJoiner</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>()
+<span class="kw">impl </span>Default <span class="kw">for </span>HandshakeJoiner {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new()
     }
 }
 
-<span class="kw">enum</span> <span class="ident">BufferState</span> {
-    <span class="doccomment">/// Buffer contains a header that introduces a message that is too long.</span>
-    <span class="ident">MessageTooLarge</span>,
+<span class="kw">enum </span>BufferState {
+    <span class="doccomment">/// Buffer contains a header that introduces a message that is too long.
+    </span>MessageTooLarge,
 
-    <span class="doccomment">/// Buffer contains a full header and body.</span>
-    <span class="ident">OneMessage</span>,
+    <span class="doccomment">/// Buffer contains a full header and body.
+    </span>OneMessage,
 
-    <span class="doccomment">/// We need more data to see a header and complete body.</span>
-    <span class="ident">NeedsMoreData</span>,
+    <span class="doccomment">/// We need more data to see a header and complete body.
+    </span>NeedsMoreData,
 }
 
-<span class="kw">impl</span> <span class="ident">HandshakeJoiner</span> {
-    <span class="doccomment">/// Make a new HandshakeJoiner.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">frames</span>: <span class="ident">VecDeque::new</span>(),
-            <span class="ident">buf</span>: <span class="ident">Vec::new</span>(),
+<span class="kw">impl </span>HandshakeJoiner {
+    <span class="doccomment">/// Make a new HandshakeJoiner.
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            frames: VecDeque::new(),
+            buf: Vec::new(),
         }
     }
 
-    <span class="doccomment">/// Do we want to process this message?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">want_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">PlainMessage</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">msg</span>.<span class="ident">typ</span> <span class="op">==</span> <span class="ident">ContentType::Handshake</span>
+    <span class="doccomment">/// Do we want to process this message?
+    </span><span class="kw">pub fn </span>want_message(<span class="kw-2">&amp;</span><span class="self">self</span>, msg: <span class="kw-2">&amp;</span>PlainMessage) -&gt; bool {
+        msg.typ == ContentType::Handshake
     }
 
-    <span class="doccomment">/// Do we have any buffered data?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">is_empty</span>()
+    <span class="doccomment">/// Do we have any buffered data?
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.buf.is_empty()
     }
 
-    <span class="doccomment">/// Take the message, and join/split it as needed.</span>
-    <span class="doccomment">/// Return the number of new messages added to the</span>
-    <span class="doccomment">/// output deque as a result of this message.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns None if msg or a preceding message was corrupt.</span>
-    <span class="doccomment">/// You cannot recover from this situation.  Otherwise returns</span>
-    <span class="doccomment">/// a count of how many messages we queued.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_message</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">msg</span>: <span class="ident">PlainMessage</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="comment">// The vast majority of the time `self.buf` will be empty since most</span>
-        <span class="comment">// handshake messages arrive in a single fragment. Avoid allocating and</span>
-        <span class="comment">// copying in that common case.</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">is_empty</span>() {
-            <span class="self">self</span>.<span class="ident">buf</span> <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">payload</span>.<span class="number">0</span>;
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">buf</span>
-                .<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>.<span class="ident">payload</span>.<span class="number">0</span>[..]);
+    <span class="doccomment">/// Take the message, and join/split it as needed.
+    /// Return the number of new messages added to the
+    /// output deque as a result of this message.
+    ///
+    /// Returns None if msg or a preceding message was corrupt.
+    /// You cannot recover from this situation.  Otherwise returns
+    /// a count of how many messages we queued.
+    </span><span class="kw">pub fn </span>take_message(<span class="kw-2">&amp;mut </span><span class="self">self</span>, msg: PlainMessage) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+        <span class="comment">// The vast majority of the time `self.buf` will be empty since most
+        // handshake messages arrive in a single fragment. Avoid allocating and
+        // copying in that common case.
+        </span><span class="kw">if </span><span class="self">self</span>.buf.is_empty() {
+            <span class="self">self</span>.buf = msg.payload.<span class="number">0</span>;
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.buf
+                .extend_from_slice(<span class="kw-2">&amp;</span>msg.payload.<span class="number">0</span>[..]);
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">count</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">buf_contains_message</span>() {
-                <span class="ident">BufferState::MessageTooLarge</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
-                <span class="ident">BufferState::NeedsMoreData</span> =&gt; <span class="kw">break</span>,
-                <span class="ident">BufferState::OneMessage</span> =&gt; {
-                    <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">deframe_one</span>(<span class="ident">msg</span>.<span class="ident">version</span>) {
-                        <span class="kw">return</span> <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>count = <span class="number">0</span>;
+        <span class="kw">loop </span>{
+            <span class="kw">match </span><span class="self">self</span>.buf_contains_message() {
+                BufferState::MessageTooLarge =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
+                BufferState::NeedsMoreData =&gt; <span class="kw">break</span>,
+                BufferState::OneMessage =&gt; {
+                    <span class="kw">if </span>!<span class="self">self</span>.deframe_one(msg.version) {
+                        <span class="kw">return </span><span class="prelude-val">None</span>;
                     }
 
-                    <span class="ident">count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+                    count += <span class="number">1</span>;
                 }
             }
         }
 
-        <span class="prelude-val">Some</span>(<span class="ident">count</span>)
+        <span class="prelude-val">Some</span>(count)
     }
 
-    <span class="doccomment">/// Does our `buf` contain a full handshake payload?  It does if it is big</span>
-    <span class="doccomment">/// enough to contain a header, and that header has a length which falls</span>
-    <span class="doccomment">/// within `buf`.</span>
-    <span class="kw">fn</span> <span class="ident">buf_contains_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BufferState</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="ident">HEADER_SIZE</span> {
-            <span class="kw">return</span> <span class="ident">BufferState::NeedsMoreData</span>;
+    <span class="doccomment">/// Does our `buf` contain a full handshake payload?  It does if it is big
+    /// enough to contain a header, and that header has a length which falls
+    /// within `buf`.
+    </span><span class="kw">fn </span>buf_contains_message(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BufferState {
+        <span class="kw">if </span><span class="self">self</span>.buf.len() &lt; HEADER_SIZE {
+            <span class="kw">return </span>BufferState::NeedsMoreData;
         }
 
-        <span class="kw">let</span> (<span class="ident">header</span>, <span class="ident">rest</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">split_at</span>(<span class="ident">HEADER_SIZE</span>);
-        <span class="kw">match</span> <span class="ident">codec::u24::decode</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>[<span class="number">1</span>..]) {
-            <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="ident">len</span>.<span class="number">0</span> <span class="op">&gt;</span> <span class="ident">MAX_HANDSHAKE_SIZE</span> =&gt; <span class="ident">BufferState::MessageTooLarge</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">len</span>) <span class="kw">if</span> <span class="ident">rest</span>.<span class="ident">get</span>(..<span class="ident">len</span>.<span class="ident">into</span>()).<span class="ident">is_some</span>() =&gt; <span class="ident">BufferState::OneMessage</span>,
-            <span class="kw">_</span> =&gt; <span class="ident">BufferState::NeedsMoreData</span>,
+        <span class="kw">let </span>(header, rest) = <span class="self">self</span>.buf.split_at(HEADER_SIZE);
+        <span class="kw">match </span>codec::u24::decode(<span class="kw-2">&amp;</span>header[<span class="number">1</span>..]) {
+            <span class="prelude-val">Some</span>(len) <span class="kw">if </span>len.<span class="number">0 </span>&gt; MAX_HANDSHAKE_SIZE =&gt; BufferState::MessageTooLarge,
+            <span class="prelude-val">Some</span>(len) <span class="kw">if </span>rest.get(..len.into()).is_some() =&gt; BufferState::OneMessage,
+            <span class="kw">_ </span>=&gt; BufferState::NeedsMoreData,
         }
     }
 
-    <span class="doccomment">/// Take a TLS handshake payload off the front of `buf`, and put it onto</span>
-    <span class="doccomment">/// the back of our `frames` deque inside a normal `Message`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns false if the stream is desynchronised beyond repair.</span>
-    <span class="kw">fn</span> <span class="ident">deframe_one</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">version</span>: <span class="ident">ProtocolVersion</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">used</span> <span class="op">=</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rd</span> <span class="op">=</span> <span class="ident">codec::Reader::init</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">buf</span>);
-            <span class="kw">let</span> <span class="ident">parsed</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">HandshakeMessagePayload::read_version</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rd</span>, <span class="ident">version</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">p</span>) =&gt; <span class="ident">p</span>,
-                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="bool-val">false</span>,
+    <span class="doccomment">/// Take a TLS handshake payload off the front of `buf`, and put it onto
+    /// the back of our `frames` deque inside a normal `Message`.
+    ///
+    /// Returns false if the stream is desynchronised beyond repair.
+    </span><span class="kw">fn </span>deframe_one(<span class="kw-2">&amp;mut </span><span class="self">self</span>, version: ProtocolVersion) -&gt; bool {
+        <span class="kw">let </span>used = {
+            <span class="kw">let </span><span class="kw-2">mut </span>rd = codec::Reader::init(<span class="kw-2">&amp;</span><span class="self">self</span>.buf);
+            <span class="kw">let </span>parsed = <span class="kw">match </span>HandshakeMessagePayload::read_version(<span class="kw-2">&amp;mut </span>rd, version) {
+                <span class="prelude-val">Some</span>(p) =&gt; p,
+                <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="bool-val">false</span>,
             };
 
-            <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">Message</span> {
-                <span class="ident">version</span>,
-                <span class="ident">payload</span>: <span class="ident">MessagePayload::Handshake</span> {
-                    <span class="ident">parsed</span>,
-                    <span class="ident">encoded</span>: <span class="ident">Payload::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">buf</span>[..<span class="ident">rd</span>.<span class="ident">used</span>()]),
+            <span class="kw">let </span>m = Message {
+                version,
+                payload: MessagePayload::Handshake {
+                    parsed,
+                    encoded: Payload::new(<span class="kw-2">&amp;</span><span class="self">self</span>.buf[..rd.used()]),
                 },
             };
 
-            <span class="self">self</span>.<span class="ident">frames</span>.<span class="ident">push_back</span>(<span class="ident">m</span>);
-            <span class="ident">rd</span>.<span class="ident">used</span>()
+            <span class="self">self</span>.frames.push_back(m);
+            rd.used()
         };
-        <span class="self">self</span>.<span class="ident">buf</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">split_off</span>(<span class="ident">used</span>);
-        <span class="bool-val">true</span>
-    }
+        <span class="self">self</span>.buf = <span class="self">self</span>.buf.split_off(used);
+        <span class="bool-val">true
+    </span>}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::HandshakeJoiner</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::base::Payload</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::codec::Codec</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::enums</span>::{<span class="ident">ContentType</span>, <span class="ident">HandshakeType</span>, <span class="ident">ProtocolVersion</span>};
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::handshake</span>::{<span class="ident">HandshakeMessagePayload</span>, <span class="ident">HandshakePayload</span>};
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::message</span>::{<span class="ident">Message</span>, <span class="ident">MessagePayload</span>, <span class="ident">PlainMessage</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">super</span>::HandshakeJoiner;
+    <span class="kw">use </span><span class="kw">crate</span>::msgs::base::Payload;
+    <span class="kw">use </span><span class="kw">crate</span>::msgs::codec::Codec;
+    <span class="kw">use </span><span class="kw">crate</span>::msgs::enums::{ContentType, HandshakeType, ProtocolVersion};
+    <span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::{HandshakeMessagePayload, HandshakePayload};
+    <span class="kw">use </span><span class="kw">crate</span>::msgs::message::{Message, MessagePayload, PlainMessage};
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">want</span>() {
-        <span class="kw">let</span> <span class="ident">hj</span> <span class="op">=</span> <span class="ident">HandshakeJoiner::new</span>();
-        <span class="macro">assert!</span>(<span class="ident">hj</span>.<span class="ident">is_empty</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>want() {
+        <span class="kw">let </span>hj = HandshakeJoiner::new();
+        <span class="macro">assert!</span>(hj.is_empty());
 
-        <span class="kw">let</span> <span class="ident">wanted</span> <span class="op">=</span> <span class="ident">PlainMessage</span> {
-            <span class="ident">typ</span>: <span class="ident">ContentType::Handshake</span>,
-            <span class="ident">version</span>: <span class="ident">ProtocolVersion::TLSv1_2</span>,
-            <span class="ident">payload</span>: <span class="ident">Payload::new</span>(<span class="string">b&quot;hello world&quot;</span>.<span class="ident">to_vec</span>()),
+        <span class="kw">let </span>wanted = PlainMessage {
+            typ: ContentType::Handshake,
+            version: ProtocolVersion::TLSv1_2,
+            payload: Payload::new(<span class="string">b&quot;hello world&quot;</span>.to_vec()),
         };
 
-        <span class="kw">let</span> <span class="ident">unwanted</span> <span class="op">=</span> <span class="ident">PlainMessage</span> {
-            <span class="ident">typ</span>: <span class="ident">ContentType::Alert</span>,
-            <span class="ident">version</span>: <span class="ident">ProtocolVersion::TLSv1_2</span>,
-            <span class="ident">payload</span>: <span class="ident">Payload::new</span>(<span class="string">b&quot;ponytown&quot;</span>.<span class="ident">to_vec</span>()),
+        <span class="kw">let </span>unwanted = PlainMessage {
+            typ: ContentType::Alert,
+            version: ProtocolVersion::TLSv1_2,
+            payload: Payload::new(<span class="string">b&quot;ponytown&quot;</span>.to_vec()),
         };
 
-        <span class="macro">assert!</span>(<span class="ident">hj</span>.<span class="ident">want_message</span>(<span class="kw-2">&amp;</span><span class="ident">wanted</span>));
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">hj</span>.<span class="ident">want_message</span>(<span class="kw-2">&amp;</span><span class="ident">unwanted</span>));
+        <span class="macro">assert!</span>(hj.want_message(<span class="kw-2">&amp;</span>wanted));
+        <span class="macro">assert!</span>(!hj.want_message(<span class="kw-2">&amp;</span>unwanted));
     }
 
-    <span class="kw">fn</span> <span class="ident">pop_eq</span>(<span class="ident">expect</span>: <span class="kw-2">&amp;</span><span class="ident">PlainMessage</span>, <span class="ident">hj</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HandshakeJoiner</span>) {
-        <span class="kw">let</span> <span class="ident">got</span> <span class="op">=</span> <span class="ident">hj</span>.<span class="ident">frames</span>.<span class="ident">pop_front</span>().<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">got</span>.<span class="ident">payload</span>.<span class="ident">content_type</span>(), <span class="ident">expect</span>.<span class="ident">typ</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">got</span>.<span class="ident">version</span>, <span class="ident">expect</span>.<span class="ident">version</span>);
+    <span class="kw">fn </span>pop_eq(expect: <span class="kw-2">&amp;</span>PlainMessage, hj: <span class="kw-2">&amp;mut </span>HandshakeJoiner) {
+        <span class="kw">let </span>got = hj.frames.pop_front().unwrap();
+        <span class="macro">assert_eq!</span>(got.payload.content_type(), expect.typ);
+        <span class="macro">assert_eq!</span>(got.version, expect.version);
 
-        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">left</span>, <span class="kw-2">mut</span> <span class="ident">right</span>) <span class="op">=</span> (<span class="ident">Vec::new</span>(), <span class="ident">Vec::new</span>());
-        <span class="ident">got</span>.<span class="ident">payload</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">left</span>);
-        <span class="ident">expect</span>.<span class="ident">payload</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">right</span>);
+        <span class="kw">let </span>(<span class="kw-2">mut </span>left, <span class="kw-2">mut </span>right) = (Vec::new(), Vec::new());
+        got.payload.encode(<span class="kw-2">&amp;mut </span>left);
+        expect.payload.encode(<span class="kw-2">&amp;mut </span>right);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">left</span>, <span class="ident">right</span>);
+        <span class="macro">assert_eq!</span>(left, right);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">split</span>() {
-        <span class="comment">// Check we split two handshake messages within one PDU.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hj</span> <span class="op">=</span> <span class="ident">HandshakeJoiner::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>split() {
+        <span class="comment">// Check we split two handshake messages within one PDU.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>hj = HandshakeJoiner::new();
 
-        <span class="comment">// two HelloRequests</span>
-        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">PlainMessage</span> {
-            <span class="ident">typ</span>: <span class="ident">ContentType::Handshake</span>,
-            <span class="ident">version</span>: <span class="ident">ProtocolVersion::TLSv1_2</span>,
-            <span class="ident">payload</span>: <span class="ident">Payload::new</span>(<span class="string">b&quot;\x00\x00\x00\x00\x00\x00\x00\x00&quot;</span>.<span class="ident">to_vec</span>()),
+        <span class="comment">// two HelloRequests
+        </span><span class="kw">let </span>msg = PlainMessage {
+            typ: ContentType::Handshake,
+            version: ProtocolVersion::TLSv1_2,
+            payload: Payload::new(<span class="string">b&quot;\x00\x00\x00\x00\x00\x00\x00\x00&quot;</span>.to_vec()),
         };
 
-        <span class="macro">assert!</span>(<span class="ident">hj</span>.<span class="ident">want_message</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">hj</span>.<span class="ident">take_message</span>(<span class="ident">msg</span>), <span class="prelude-val">Some</span>(<span class="number">2</span>));
-        <span class="macro">assert!</span>(<span class="ident">hj</span>.<span class="ident">is_empty</span>());
+        <span class="macro">assert!</span>(hj.want_message(<span class="kw-2">&amp;</span>msg));
+        <span class="macro">assert_eq!</span>(hj.take_message(msg), <span class="prelude-val">Some</span>(<span class="number">2</span>));
+        <span class="macro">assert!</span>(hj.is_empty());
 
-        <span class="kw">let</span> <span class="ident">expect</span> <span class="op">=</span> <span class="ident">Message</span> {
-            <span class="ident">version</span>: <span class="ident">ProtocolVersion::TLSv1_2</span>,
-            <span class="ident">payload</span>: <span class="ident">MessagePayload::handshake</span>(<span class="ident">HandshakeMessagePayload</span> {
-                <span class="ident">typ</span>: <span class="ident">HandshakeType::HelloRequest</span>,
-                <span class="ident">payload</span>: <span class="ident">HandshakePayload::HelloRequest</span>,
+        <span class="kw">let </span>expect = Message {
+            version: ProtocolVersion::TLSv1_2,
+            payload: MessagePayload::handshake(HandshakeMessagePayload {
+                typ: HandshakeType::HelloRequest,
+                payload: HandshakePayload::HelloRequest,
             }),
         }
-        .<span class="ident">into</span>();
+        .into();
 
-        <span class="ident">pop_eq</span>(<span class="kw-2">&amp;</span><span class="ident">expect</span>, <span class="kw-2">&amp;mut</span> <span class="ident">hj</span>);
-        <span class="ident">pop_eq</span>(<span class="kw-2">&amp;</span><span class="ident">expect</span>, <span class="kw-2">&amp;mut</span> <span class="ident">hj</span>);
+        pop_eq(<span class="kw-2">&amp;</span>expect, <span class="kw-2">&amp;mut </span>hj);
+        pop_eq(<span class="kw-2">&amp;</span>expect, <span class="kw-2">&amp;mut </span>hj);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">broken</span>() {
-        <span class="comment">// Check obvious crap payloads are reported as errors, not panics.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hj</span> <span class="op">=</span> <span class="ident">HandshakeJoiner::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>broken() {
+        <span class="comment">// Check obvious crap payloads are reported as errors, not panics.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>hj = HandshakeJoiner::new();
 
-        <span class="comment">// short ClientHello</span>
-        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">PlainMessage</span> {
-            <span class="ident">typ</span>: <span class="ident">ContentType::Handshake</span>,
-            <span class="ident">version</span>: <span class="ident">ProtocolVersion::TLSv1_2</span>,
-            <span class="ident">payload</span>: <span class="ident">Payload::new</span>(<span class="string">b&quot;\x01\x00\x00\x02\xff\xff&quot;</span>.<span class="ident">to_vec</span>()),
+        <span class="comment">// short ClientHello
+        </span><span class="kw">let </span>msg = PlainMessage {
+            typ: ContentType::Handshake,
+            version: ProtocolVersion::TLSv1_2,
+            payload: Payload::new(<span class="string">b&quot;\x01\x00\x00\x02\xff\xff&quot;</span>.to_vec()),
         };
 
-        <span class="macro">assert!</span>(<span class="ident">hj</span>.<span class="ident">want_message</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">hj</span>.<span class="ident">take_message</span>(<span class="ident">msg</span>), <span class="prelude-val">None</span>);
+        <span class="macro">assert!</span>(hj.want_message(<span class="kw-2">&amp;</span>msg));
+        <span class="macro">assert_eq!</span>(hj.take_message(msg), <span class="prelude-val">None</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">join</span>() {
-        <span class="comment">// Check we join one handshake message split over two PDUs.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hj</span> <span class="op">=</span> <span class="ident">HandshakeJoiner::new</span>();
-        <span class="macro">assert!</span>(<span class="ident">hj</span>.<span class="ident">is_empty</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>join() {
+        <span class="comment">// Check we join one handshake message split over two PDUs.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>hj = HandshakeJoiner::new();
+        <span class="macro">assert!</span>(hj.is_empty());
 
-        <span class="comment">// Introduce Finished of 16 bytes, providing 4.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">PlainMessage</span> {
-            <span class="ident">typ</span>: <span class="ident">ContentType::Handshake</span>,
-            <span class="ident">version</span>: <span class="ident">ProtocolVersion::TLSv1_2</span>,
-            <span class="ident">payload</span>: <span class="ident">Payload::new</span>(<span class="string">b&quot;\x14\x00\x00\x10\x00\x01\x02\x03\x04&quot;</span>.<span class="ident">to_vec</span>()),
+        <span class="comment">// Introduce Finished of 16 bytes, providing 4.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>msg = PlainMessage {
+            typ: ContentType::Handshake,
+            version: ProtocolVersion::TLSv1_2,
+            payload: Payload::new(<span class="string">b&quot;\x14\x00\x00\x10\x00\x01\x02\x03\x04&quot;</span>.to_vec()),
         };
 
-        <span class="macro">assert!</span>(<span class="ident">hj</span>.<span class="ident">want_message</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">hj</span>.<span class="ident">take_message</span>(<span class="ident">msg</span>), <span class="prelude-val">Some</span>(<span class="number">0</span>));
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">hj</span>.<span class="ident">is_empty</span>());
+        <span class="macro">assert!</span>(hj.want_message(<span class="kw-2">&amp;</span>msg));
+        <span class="macro">assert_eq!</span>(hj.take_message(msg), <span class="prelude-val">Some</span>(<span class="number">0</span>));
+        <span class="macro">assert!</span>(!hj.is_empty());
 
-        <span class="comment">// 11 more bytes.</span>
-        <span class="ident">msg</span> <span class="op">=</span> <span class="ident">PlainMessage</span> {
-            <span class="ident">typ</span>: <span class="ident">ContentType::Handshake</span>,
-            <span class="ident">version</span>: <span class="ident">ProtocolVersion::TLSv1_2</span>,
-            <span class="ident">payload</span>: <span class="ident">Payload::new</span>(<span class="string">b&quot;\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e&quot;</span>.<span class="ident">to_vec</span>()),
+        <span class="comment">// 11 more bytes.
+        </span>msg = PlainMessage {
+            typ: ContentType::Handshake,
+            version: ProtocolVersion::TLSv1_2,
+            payload: Payload::new(<span class="string">b&quot;\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e&quot;</span>.to_vec()),
         };
 
-        <span class="macro">assert!</span>(<span class="ident">hj</span>.<span class="ident">want_message</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">hj</span>.<span class="ident">take_message</span>(<span class="ident">msg</span>), <span class="prelude-val">Some</span>(<span class="number">0</span>));
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">hj</span>.<span class="ident">is_empty</span>());
+        <span class="macro">assert!</span>(hj.want_message(<span class="kw-2">&amp;</span>msg));
+        <span class="macro">assert_eq!</span>(hj.take_message(msg), <span class="prelude-val">Some</span>(<span class="number">0</span>));
+        <span class="macro">assert!</span>(!hj.is_empty());
 
-        <span class="comment">// Final 1 byte.</span>
-        <span class="ident">msg</span> <span class="op">=</span> <span class="ident">PlainMessage</span> {
-            <span class="ident">typ</span>: <span class="ident">ContentType::Handshake</span>,
-            <span class="ident">version</span>: <span class="ident">ProtocolVersion::TLSv1_2</span>,
-            <span class="ident">payload</span>: <span class="ident">Payload::new</span>(<span class="string">b&quot;\x0f&quot;</span>.<span class="ident">to_vec</span>()),
+        <span class="comment">// Final 1 byte.
+        </span>msg = PlainMessage {
+            typ: ContentType::Handshake,
+            version: ProtocolVersion::TLSv1_2,
+            payload: Payload::new(<span class="string">b&quot;\x0f&quot;</span>.to_vec()),
         };
 
-        <span class="macro">assert!</span>(<span class="ident">hj</span>.<span class="ident">want_message</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">hj</span>.<span class="ident">take_message</span>(<span class="ident">msg</span>), <span class="prelude-val">Some</span>(<span class="number">1</span>));
-        <span class="macro">assert!</span>(<span class="ident">hj</span>.<span class="ident">is_empty</span>());
+        <span class="macro">assert!</span>(hj.want_message(<span class="kw-2">&amp;</span>msg));
+        <span class="macro">assert_eq!</span>(hj.take_message(msg), <span class="prelude-val">Some</span>(<span class="number">1</span>));
+        <span class="macro">assert!</span>(hj.is_empty());
 
-        <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> <span class="string">b&quot;\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f&quot;</span>.<span class="ident">to_vec</span>();
-        <span class="kw">let</span> <span class="ident">expect</span> <span class="op">=</span> <span class="ident">Message</span> {
-            <span class="ident">version</span>: <span class="ident">ProtocolVersion::TLSv1_2</span>,
-            <span class="ident">payload</span>: <span class="ident">MessagePayload::handshake</span>(<span class="ident">HandshakeMessagePayload</span> {
-                <span class="ident">typ</span>: <span class="ident">HandshakeType::Finished</span>,
-                <span class="ident">payload</span>: <span class="ident">HandshakePayload::Finished</span>(<span class="ident">Payload::new</span>(<span class="ident">payload</span>)),
+        <span class="kw">let </span>payload = <span class="string">b&quot;\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f&quot;</span>.to_vec();
+        <span class="kw">let </span>expect = Message {
+            version: ProtocolVersion::TLSv1_2,
+            payload: MessagePayload::handshake(HandshakeMessagePayload {
+                typ: HandshakeType::Finished,
+                payload: HandshakePayload::Finished(Payload::new(payload)),
             }),
         }
-        .<span class="ident">into</span>();
+        .into();
 
-        <span class="ident">pop_eq</span>(<span class="kw-2">&amp;</span><span class="ident">expect</span>, <span class="kw-2">&amp;mut</span> <span class="ident">hj</span>);
+        pop_eq(<span class="kw-2">&amp;</span>expect, <span class="kw-2">&amp;mut </span>hj);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_rejects_giant_certs</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hj</span> <span class="op">=</span> <span class="ident">HandshakeJoiner::new</span>();
-        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">PlainMessage</span> {
-            <span class="ident">typ</span>: <span class="ident">ContentType::Handshake</span>,
-            <span class="ident">version</span>: <span class="ident">ProtocolVersion::TLSv1_2</span>,
-            <span class="ident">payload</span>: <span class="ident">Payload::new</span>(<span class="string">b&quot;\x0b\x01\x00\x04\x01\x00\x01\x00\xff\xfe&quot;</span>.<span class="ident">to_vec</span>()),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_rejects_giant_certs() {
+        <span class="kw">let </span><span class="kw-2">mut </span>hj = HandshakeJoiner::new();
+        <span class="kw">let </span>msg = PlainMessage {
+            typ: ContentType::Handshake,
+            version: ProtocolVersion::TLSv1_2,
+            payload: Payload::new(<span class="string">b&quot;\x0b\x01\x00\x04\x01\x00\x01\x00\xff\xfe&quot;</span>.to_vec()),
         };
 
-        <span class="macro">assert!</span>(<span class="ident">hj</span>.<span class="ident">want_message</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">hj</span>.<span class="ident">take_message</span>(<span class="ident">msg</span>), <span class="prelude-val">None</span>);
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">hj</span>.<span class="ident">is_empty</span>());
+        <span class="macro">assert!</span>(hj.want_message(<span class="kw-2">&amp;</span>msg));
+        <span class="macro">assert_eq!</span>(hj.take_message(msg), <span class="prelude-val">None</span>);
+        <span class="macro">assert!</span>(!hj.is_empty());
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

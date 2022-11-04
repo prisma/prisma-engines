@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/sql-query-connector/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_query_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/sql-query-connector/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_query_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -35,42 +35,42 @@
 <span id="35">35</span>
 <span id="36">36</span>
 <span id="37">37</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(
-    <span class="ident">clippy::wrong_self_convention</span>,
-    <span class="ident">clippy::upper_case_acronyms</span>,
-    <span class="ident">clippy::needless_question_mark</span>,
-    <span class="ident">clippy::branches_sharing_code</span>,
-    <span class="ident">clippy::mem_replace_with_default</span>,
-    <span class="ident">clippy::needless_borrow</span>,
-    <span class="ident">clippy::needless_collect</span>
-)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(
+    clippy::wrong_self_convention,
+    clippy::upper_case_acronyms,
+    clippy::needless_question_mark,
+    clippy::branches_sharing_code,
+    clippy::mem_replace_with_default,
+    clippy::needless_borrow,
+    clippy::needless_collect
+)]
 
-<span class="kw">mod</span> <span class="ident">column_metadata</span>;
-<span class="kw">mod</span> <span class="ident">cursor_condition</span>;
-<span class="kw">mod</span> <span class="ident">database</span>;
-<span class="kw">mod</span> <span class="ident">error</span>;
-<span class="kw">mod</span> <span class="ident">filter_conversion</span>;
-<span class="kw">mod</span> <span class="ident">join_utils</span>;
-<span class="kw">mod</span> <span class="ident">model_extensions</span>;
-<span class="kw">mod</span> <span class="ident">nested_aggregations</span>;
-<span class="kw">mod</span> <span class="ident">ordering</span>;
-<span class="kw">mod</span> <span class="ident">query_arguments_ext</span>;
-<span class="kw">mod</span> <span class="ident">query_builder</span>;
-<span class="kw">mod</span> <span class="ident">query_ext</span>;
-<span class="kw">mod</span> <span class="ident">row</span>;
-<span class="kw">mod</span> <span class="ident">sql_info</span>;
-<span class="kw">mod</span> <span class="ident">sql_trace</span>;
-<span class="kw">mod</span> <span class="ident">value</span>;
-<span class="kw">mod</span> <span class="ident">value_ext</span>;
+</span><span class="kw">mod </span>column_metadata;
+<span class="kw">mod </span>cursor_condition;
+<span class="kw">mod </span>database;
+<span class="kw">mod </span>error;
+<span class="kw">mod </span>filter_conversion;
+<span class="kw">mod </span>join_utils;
+<span class="kw">mod </span>model_extensions;
+<span class="kw">mod </span>nested_aggregations;
+<span class="kw">mod </span>ordering;
+<span class="kw">mod </span>query_arguments_ext;
+<span class="kw">mod </span>query_builder;
+<span class="kw">mod </span>query_ext;
+<span class="kw">mod </span>row;
+<span class="kw">mod </span>sql_info;
+<span class="kw">mod </span>sql_trace;
+<span class="kw">mod </span>value;
+<span class="kw">mod </span>value_ext;
 
-<span class="kw">use</span> <span class="ident">column_metadata</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">filter_conversion</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">query_ext::QueryExt</span>;
-<span class="kw">use</span> <span class="ident">row</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span>column_metadata::<span class="kw-2">*</span>;
+<span class="kw">use </span>filter_conversion::<span class="kw-2">*</span>;
+<span class="kw">use </span>query_ext::QueryExt;
+<span class="kw">use </span>row::<span class="kw-2">*</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">database</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">error::SqlError</span>;
+<span class="kw">pub use </span>database::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>error::SqlError;
 
-<span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">error::SqlError</span><span class="op">&gt;</span>;
+<span class="kw">type </span><span class="prelude-ty">Result</span>&lt;T&gt; = std::result::Result&lt;T, error::SqlError&gt;;
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

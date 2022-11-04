@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ansi_term-0.12.1/src/style.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>style.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../ansi_term/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../ansi_term/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../ansi_term/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ansi_term-0.12.1/src/style.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>style.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../ansi_term/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../ansi_term/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../ansi_term/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -519,526 +519,526 @@
 <span id="519">519</span>
 <span id="520">520</span>
 <span id="521">521</span>
-</pre><pre class="rust"><code><span class="doccomment">/// A style is a collection of properties that can format a string</span>
-<span class="doccomment">/// using ANSI escape codes.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use ansi_term::{Style, Colour};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let style = Style::new().bold().on(Colour::Black);</span>
-<span class="doccomment">/// println!(&quot;{}&quot;, style.paint(&quot;Bold on black&quot;));</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;derive_serde_style&quot;</span>, <span class="ident">derive</span>(<span class="ident">serde::Deserialize</span>, <span class="ident">serde::Serialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Style</span> {
+</pre><pre class="rust"><code><span class="doccomment">/// A style is a collection of properties that can format a string
+/// using ANSI escape codes.
+///
+/// # Examples
+///
+/// ```
+/// use ansi_term::{Style, Colour};
+///
+/// let style = Style::new().bold().on(Colour::Black);
+/// println!(&quot;{}&quot;, style.paint(&quot;Bold on black&quot;));
+/// ```
+</span><span class="attribute">#[derive(PartialEq, Clone, Copy)]
+#[cfg_attr(feature = <span class="string">&quot;derive_serde_style&quot;</span>, derive(serde::Deserialize, serde::Serialize))]
+</span><span class="kw">pub struct </span>Style {
 
-    <span class="doccomment">/// The style&#39;s foreground colour, if it has one.</span>
-    <span class="kw">pub</span> <span class="ident">foreground</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Colour</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The style&#39;s foreground colour, if it has one.
+    </span><span class="kw">pub </span>foreground: <span class="prelude-ty">Option</span>&lt;Colour&gt;,
 
-    <span class="doccomment">/// The style&#39;s background colour, if it has one.</span>
-    <span class="kw">pub</span> <span class="ident">background</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Colour</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The style&#39;s background colour, if it has one.
+    </span><span class="kw">pub </span>background: <span class="prelude-ty">Option</span>&lt;Colour&gt;,
 
-    <span class="doccomment">/// Whether this style is bold.</span>
-    <span class="kw">pub</span> <span class="ident">is_bold</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Whether this style is bold.
+    </span><span class="kw">pub </span>is_bold: bool,
 
-    <span class="doccomment">/// Whether this style is dimmed.</span>
-    <span class="kw">pub</span> <span class="ident">is_dimmed</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Whether this style is dimmed.
+    </span><span class="kw">pub </span>is_dimmed: bool,
 
-    <span class="doccomment">/// Whether this style is italic.</span>
-    <span class="kw">pub</span> <span class="ident">is_italic</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Whether this style is italic.
+    </span><span class="kw">pub </span>is_italic: bool,
 
-    <span class="doccomment">/// Whether this style is underlined.</span>
-    <span class="kw">pub</span> <span class="ident">is_underline</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Whether this style is underlined.
+    </span><span class="kw">pub </span>is_underline: bool,
 
-    <span class="doccomment">/// Whether this style is blinking.</span>
-    <span class="kw">pub</span> <span class="ident">is_blink</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Whether this style is blinking.
+    </span><span class="kw">pub </span>is_blink: bool,
 
-    <span class="doccomment">/// Whether this style has reverse colours.</span>
-    <span class="kw">pub</span> <span class="ident">is_reverse</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Whether this style has reverse colours.
+    </span><span class="kw">pub </span>is_reverse: bool,
 
-    <span class="doccomment">/// Whether this style is hidden.</span>
-    <span class="kw">pub</span> <span class="ident">is_hidden</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Whether this style is hidden.
+    </span><span class="kw">pub </span>is_hidden: bool,
 
-    <span class="doccomment">/// Whether this style is struckthrough.</span>
-    <span class="kw">pub</span> <span class="ident">is_strikethrough</span>: <span class="ident">bool</span>
+    <span class="doccomment">/// Whether this style is struckthrough.
+    </span><span class="kw">pub </span>is_strikethrough: bool
 }
 
-<span class="kw">impl</span> <span class="ident">Style</span> {
+<span class="kw">impl </span>Style {
 
-    <span class="doccomment">/// Creates a new Style with no properties set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ansi_term::Style;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let style = Style::new();</span>
-    <span class="doccomment">/// println!(&quot;{}&quot;, style.paint(&quot;hi&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Style</span> {
-        <span class="ident">Style::default</span>()
+    <span class="doccomment">/// Creates a new Style with no properties set.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ansi_term::Style;
+    ///
+    /// let style = Style::new();
+    /// println!(&quot;{}&quot;, style.paint(&quot;hi&quot;));
+    /// ```
+    </span><span class="kw">pub fn </span>new() -&gt; Style {
+        Style::default()
     }
 
-    <span class="doccomment">/// Returns a `Style` with the bold property set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ansi_term::Style;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let style = Style::new().bold();</span>
-    <span class="doccomment">/// println!(&quot;{}&quot;, style.paint(&quot;hey&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bold</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Style</span> {
-        <span class="ident">Style</span> { <span class="ident">is_bold</span>: <span class="bool-val">true</span>, .. <span class="kw-2">*</span><span class="self">self</span> }
+    <span class="doccomment">/// Returns a `Style` with the bold property set.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ansi_term::Style;
+    ///
+    /// let style = Style::new().bold();
+    /// println!(&quot;{}&quot;, style.paint(&quot;hey&quot;));
+    /// ```
+    </span><span class="kw">pub fn </span>bold(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Style {
+        Style { is_bold: <span class="bool-val">true</span>, .. <span class="kw-2">*</span><span class="self">self </span>}
     }
 
-    <span class="doccomment">/// Returns a `Style` with the dimmed property set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ansi_term::Style;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let style = Style::new().dimmed();</span>
-    <span class="doccomment">/// println!(&quot;{}&quot;, style.paint(&quot;sup&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dimmed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Style</span> {
-        <span class="ident">Style</span> { <span class="ident">is_dimmed</span>: <span class="bool-val">true</span>, .. <span class="kw-2">*</span><span class="self">self</span> }
+    <span class="doccomment">/// Returns a `Style` with the dimmed property set.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ansi_term::Style;
+    ///
+    /// let style = Style::new().dimmed();
+    /// println!(&quot;{}&quot;, style.paint(&quot;sup&quot;));
+    /// ```
+    </span><span class="kw">pub fn </span>dimmed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Style {
+        Style { is_dimmed: <span class="bool-val">true</span>, .. <span class="kw-2">*</span><span class="self">self </span>}
     }
 
-    <span class="doccomment">/// Returns a `Style` with the italic property set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ansi_term::Style;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let style = Style::new().italic();</span>
-    <span class="doccomment">/// println!(&quot;{}&quot;, style.paint(&quot;greetings&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">italic</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Style</span> {
-        <span class="ident">Style</span> { <span class="ident">is_italic</span>: <span class="bool-val">true</span>, .. <span class="kw-2">*</span><span class="self">self</span> }
+    <span class="doccomment">/// Returns a `Style` with the italic property set.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ansi_term::Style;
+    ///
+    /// let style = Style::new().italic();
+    /// println!(&quot;{}&quot;, style.paint(&quot;greetings&quot;));
+    /// ```
+    </span><span class="kw">pub fn </span>italic(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Style {
+        Style { is_italic: <span class="bool-val">true</span>, .. <span class="kw-2">*</span><span class="self">self </span>}
     }
 
-    <span class="doccomment">/// Returns a `Style` with the underline property set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ansi_term::Style;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let style = Style::new().underline();</span>
-    <span class="doccomment">/// println!(&quot;{}&quot;, style.paint(&quot;salutations&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">underline</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Style</span> {
-        <span class="ident">Style</span> { <span class="ident">is_underline</span>: <span class="bool-val">true</span>, .. <span class="kw-2">*</span><span class="self">self</span> }
+    <span class="doccomment">/// Returns a `Style` with the underline property set.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ansi_term::Style;
+    ///
+    /// let style = Style::new().underline();
+    /// println!(&quot;{}&quot;, style.paint(&quot;salutations&quot;));
+    /// ```
+    </span><span class="kw">pub fn </span>underline(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Style {
+        Style { is_underline: <span class="bool-val">true</span>, .. <span class="kw-2">*</span><span class="self">self </span>}
     }
 
-    <span class="doccomment">/// Returns a `Style` with the blink property set.</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ansi_term::Style;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let style = Style::new().blink();</span>
-    <span class="doccomment">/// println!(&quot;{}&quot;, style.paint(&quot;wazzup&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">blink</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Style</span> {
-        <span class="ident">Style</span> { <span class="ident">is_blink</span>: <span class="bool-val">true</span>, .. <span class="kw-2">*</span><span class="self">self</span> }
+    <span class="doccomment">/// Returns a `Style` with the blink property set.
+    /// # Examples
+    ///
+    /// ```
+    /// use ansi_term::Style;
+    ///
+    /// let style = Style::new().blink();
+    /// println!(&quot;{}&quot;, style.paint(&quot;wazzup&quot;));
+    /// ```
+    </span><span class="kw">pub fn </span>blink(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Style {
+        Style { is_blink: <span class="bool-val">true</span>, .. <span class="kw-2">*</span><span class="self">self </span>}
     }
 
-    <span class="doccomment">/// Returns a `Style` with the reverse property set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ansi_term::Style;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let style = Style::new().reverse();</span>
-    <span class="doccomment">/// println!(&quot;{}&quot;, style.paint(&quot;aloha&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reverse</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Style</span> {
-        <span class="ident">Style</span> { <span class="ident">is_reverse</span>: <span class="bool-val">true</span>, .. <span class="kw-2">*</span><span class="self">self</span> }
+    <span class="doccomment">/// Returns a `Style` with the reverse property set.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ansi_term::Style;
+    ///
+    /// let style = Style::new().reverse();
+    /// println!(&quot;{}&quot;, style.paint(&quot;aloha&quot;));
+    /// ```
+    </span><span class="kw">pub fn </span>reverse(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Style {
+        Style { is_reverse: <span class="bool-val">true</span>, .. <span class="kw-2">*</span><span class="self">self </span>}
     }
 
-    <span class="doccomment">/// Returns a `Style` with the hidden property set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ansi_term::Style;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let style = Style::new().hidden();</span>
-    <span class="doccomment">/// println!(&quot;{}&quot;, style.paint(&quot;ahoy&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hidden</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Style</span> {
-        <span class="ident">Style</span> { <span class="ident">is_hidden</span>: <span class="bool-val">true</span>, .. <span class="kw-2">*</span><span class="self">self</span> }
+    <span class="doccomment">/// Returns a `Style` with the hidden property set.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ansi_term::Style;
+    ///
+    /// let style = Style::new().hidden();
+    /// println!(&quot;{}&quot;, style.paint(&quot;ahoy&quot;));
+    /// ```
+    </span><span class="kw">pub fn </span>hidden(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Style {
+        Style { is_hidden: <span class="bool-val">true</span>, .. <span class="kw-2">*</span><span class="self">self </span>}
     }
 
-    <span class="doccomment">/// Returns a `Style` with the strikethrough property set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ansi_term::Style;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let style = Style::new().strikethrough();</span>
-    <span class="doccomment">/// println!(&quot;{}&quot;, style.paint(&quot;yo&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">strikethrough</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Style</span> {
-        <span class="ident">Style</span> { <span class="ident">is_strikethrough</span>: <span class="bool-val">true</span>, .. <span class="kw-2">*</span><span class="self">self</span> }
+    <span class="doccomment">/// Returns a `Style` with the strikethrough property set.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ansi_term::Style;
+    ///
+    /// let style = Style::new().strikethrough();
+    /// println!(&quot;{}&quot;, style.paint(&quot;yo&quot;));
+    /// ```
+    </span><span class="kw">pub fn </span>strikethrough(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Style {
+        Style { is_strikethrough: <span class="bool-val">true</span>, .. <span class="kw-2">*</span><span class="self">self </span>}
     }
 
-    <span class="doccomment">/// Returns a `Style` with the foreground colour property set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ansi_term::{Style, Colour};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let style = Style::new().fg(Colour::Yellow);</span>
-    <span class="doccomment">/// println!(&quot;{}&quot;, style.paint(&quot;hi&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fg</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">foreground</span>: <span class="ident">Colour</span>) -&gt; <span class="ident">Style</span> {
-        <span class="ident">Style</span> { <span class="ident">foreground</span>: <span class="prelude-val">Some</span>(<span class="ident">foreground</span>), .. <span class="kw-2">*</span><span class="self">self</span> }
+    <span class="doccomment">/// Returns a `Style` with the foreground colour property set.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ansi_term::{Style, Colour};
+    ///
+    /// let style = Style::new().fg(Colour::Yellow);
+    /// println!(&quot;{}&quot;, style.paint(&quot;hi&quot;));
+    /// ```
+    </span><span class="kw">pub fn </span>fg(<span class="kw-2">&amp;</span><span class="self">self</span>, foreground: Colour) -&gt; Style {
+        Style { foreground: <span class="prelude-val">Some</span>(foreground), .. <span class="kw-2">*</span><span class="self">self </span>}
     }
 
-    <span class="doccomment">/// Returns a `Style` with the background colour property set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ansi_term::{Style, Colour};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let style = Style::new().on(Colour::Blue);</span>
-    <span class="doccomment">/// println!(&quot;{}&quot;, style.paint(&quot;eyyyy&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">background</span>: <span class="ident">Colour</span>) -&gt; <span class="ident">Style</span> {
-        <span class="ident">Style</span> { <span class="ident">background</span>: <span class="prelude-val">Some</span>(<span class="ident">background</span>), .. <span class="kw-2">*</span><span class="self">self</span> }
+    <span class="doccomment">/// Returns a `Style` with the background colour property set.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ansi_term::{Style, Colour};
+    ///
+    /// let style = Style::new().on(Colour::Blue);
+    /// println!(&quot;{}&quot;, style.paint(&quot;eyyyy&quot;));
+    /// ```
+    </span><span class="kw">pub fn </span>on(<span class="kw-2">&amp;</span><span class="self">self</span>, background: Colour) -&gt; Style {
+        Style { background: <span class="prelude-val">Some</span>(background), .. <span class="kw-2">*</span><span class="self">self </span>}
     }
 
-    <span class="doccomment">/// Return true if this `Style` has no actual styles, and can be written</span>
-    <span class="doccomment">/// without any control characters.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ansi_term::Style;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(true,  Style::default().is_plain());</span>
-    <span class="doccomment">/// assert_eq!(false, Style::default().bold().is_plain());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_plain</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span> <span class="op">==</span> <span class="ident">Style::default</span>()
+    <span class="doccomment">/// Return true if this `Style` has no actual styles, and can be written
+    /// without any control characters.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ansi_term::Style;
+    ///
+    /// assert_eq!(true,  Style::default().is_plain());
+    /// assert_eq!(false, Style::default().bold().is_plain());
+    /// ```
+    </span><span class="kw">pub fn </span>is_plain(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self </span>== Style::default()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Style</span> {
+<span class="kw">impl </span>Default <span class="kw">for </span>Style {
 
-    <span class="doccomment">/// Returns a style with *no* properties set. Formatting text using this</span>
-    <span class="doccomment">/// style returns the exact same text.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ansi_term::Style;</span>
-    <span class="doccomment">/// assert_eq!(None,  Style::default().foreground);</span>
-    <span class="doccomment">/// assert_eq!(None,  Style::default().background);</span>
-    <span class="doccomment">/// assert_eq!(false, Style::default().is_bold);</span>
-    <span class="doccomment">/// assert_eq!(&quot;txt&quot;, Style::default().paint(&quot;txt&quot;).to_string());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">Style</span> {
-        <span class="ident">Style</span> {
-            <span class="ident">foreground</span>: <span class="prelude-val">None</span>,
-            <span class="ident">background</span>: <span class="prelude-val">None</span>,
-            <span class="ident">is_bold</span>: <span class="bool-val">false</span>,
-            <span class="ident">is_dimmed</span>: <span class="bool-val">false</span>,
-            <span class="ident">is_italic</span>: <span class="bool-val">false</span>,
-            <span class="ident">is_underline</span>: <span class="bool-val">false</span>,
-            <span class="ident">is_blink</span>: <span class="bool-val">false</span>,
-            <span class="ident">is_reverse</span>: <span class="bool-val">false</span>,
-            <span class="ident">is_hidden</span>: <span class="bool-val">false</span>,
-            <span class="ident">is_strikethrough</span>: <span class="bool-val">false</span>,
+    <span class="doccomment">/// Returns a style with *no* properties set. Formatting text using this
+    /// style returns the exact same text.
+    ///
+    /// ```
+    /// use ansi_term::Style;
+    /// assert_eq!(None,  Style::default().foreground);
+    /// assert_eq!(None,  Style::default().background);
+    /// assert_eq!(false, Style::default().is_bold);
+    /// assert_eq!(&quot;txt&quot;, Style::default().paint(&quot;txt&quot;).to_string());
+    /// ```
+    </span><span class="kw">fn </span>default() -&gt; Style {
+        Style {
+            foreground: <span class="prelude-val">None</span>,
+            background: <span class="prelude-val">None</span>,
+            is_bold: <span class="bool-val">false</span>,
+            is_dimmed: <span class="bool-val">false</span>,
+            is_italic: <span class="bool-val">false</span>,
+            is_underline: <span class="bool-val">false</span>,
+            is_blink: <span class="bool-val">false</span>,
+            is_reverse: <span class="bool-val">false</span>,
+            is_hidden: <span class="bool-val">false</span>,
+            is_strikethrough: <span class="bool-val">false</span>,
         }
     }
 }
 
 
-<span class="comment">// ---- colours ----</span>
+<span class="comment">// ---- colours ----
 
-<span class="doccomment">/// A colour is one specific type of ANSI escape code, and can refer</span>
-<span class="doccomment">/// to either the foreground or background colour.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// These use the standard numeric sequences.</span>
-<span class="doccomment">/// See &lt;http://invisible-island.net/xterm/ctlseqs/ctlseqs.html&gt;</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;derive_serde_style&quot;</span>, <span class="ident">derive</span>(<span class="ident">serde::Deserialize</span>, <span class="ident">serde::Serialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Colour</span> {
+</span><span class="doccomment">/// A colour is one specific type of ANSI escape code, and can refer
+/// to either the foreground or background colour.
+///
+/// These use the standard numeric sequences.
+/// See &lt;http://invisible-island.net/xterm/ctlseqs/ctlseqs.html&gt;
+</span><span class="attribute">#[derive(PartialEq, Clone, Copy, Debug)]
+#[cfg_attr(feature = <span class="string">&quot;derive_serde_style&quot;</span>, derive(serde::Deserialize, serde::Serialize))]
+</span><span class="kw">pub enum </span>Colour {
 
-    <span class="doccomment">/// Colour #0 (foreground code `30`, background code `40`).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is not necessarily the background colour, and using it as one may</span>
-    <span class="doccomment">/// render the text hard to read on terminals with dark backgrounds.</span>
-    <span class="ident">Black</span>,
+    <span class="doccomment">/// Colour #0 (foreground code `30`, background code `40`).
+    ///
+    /// This is not necessarily the background colour, and using it as one may
+    /// render the text hard to read on terminals with dark backgrounds.
+    </span>Black,
 
-    <span class="doccomment">/// Colour #1 (foreground code `31`, background code `41`).</span>
-    <span class="ident">Red</span>,
+    <span class="doccomment">/// Colour #1 (foreground code `31`, background code `41`).
+    </span>Red,
 
-    <span class="doccomment">/// Colour #2 (foreground code `32`, background code `42`).</span>
-    <span class="ident">Green</span>,
+    <span class="doccomment">/// Colour #2 (foreground code `32`, background code `42`).
+    </span>Green,
 
-    <span class="doccomment">/// Colour #3 (foreground code `33`, background code `43`).</span>
-    <span class="ident">Yellow</span>,
+    <span class="doccomment">/// Colour #3 (foreground code `33`, background code `43`).
+    </span>Yellow,
 
-    <span class="doccomment">/// Colour #4 (foreground code `34`, background code `44`).</span>
-    <span class="ident">Blue</span>,
+    <span class="doccomment">/// Colour #4 (foreground code `34`, background code `44`).
+    </span>Blue,
 
-    <span class="doccomment">/// Colour #5 (foreground code `35`, background code `45`).</span>
-    <span class="ident">Purple</span>,
+    <span class="doccomment">/// Colour #5 (foreground code `35`, background code `45`).
+    </span>Purple,
 
-    <span class="doccomment">/// Colour #6 (foreground code `36`, background code `46`).</span>
-    <span class="ident">Cyan</span>,
+    <span class="doccomment">/// Colour #6 (foreground code `36`, background code `46`).
+    </span>Cyan,
 
-    <span class="doccomment">/// Colour #7 (foreground code `37`, background code `47`).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// As above, this is not necessarily the foreground colour, and may be</span>
-    <span class="doccomment">/// hard to read on terminals with light backgrounds.</span>
-    <span class="ident">White</span>,
+    <span class="doccomment">/// Colour #7 (foreground code `37`, background code `47`).
+    ///
+    /// As above, this is not necessarily the foreground colour, and may be
+    /// hard to read on terminals with light backgrounds.
+    </span>White,
 
-    <span class="doccomment">/// A colour number from 0 to 255, for use in 256-colour terminal</span>
-    <span class="doccomment">/// environments.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - Colours 0 to 7 are the `Black` to `White` variants respectively.</span>
-    <span class="doccomment">///   These colours can usually be changed in the terminal emulator.</span>
-    <span class="doccomment">/// - Colours 8 to 15 are brighter versions of the eight colours above.</span>
-    <span class="doccomment">///   These can also usually be changed in the terminal emulator, or it</span>
-    <span class="doccomment">///   could be configured to use the original colours and show the text in</span>
-    <span class="doccomment">///   bold instead. It varies depending on the program.</span>
-    <span class="doccomment">/// - Colours 16 to 231 contain several palettes of bright colours,</span>
-    <span class="doccomment">///   arranged in six squares measuring six by six each.</span>
-    <span class="doccomment">/// - Colours 232 to 255 are shades of grey from black to white.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// It might make more sense to look at a [colour chart][cc].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [cc]: https://upload.wikimedia.org/wikipedia/commons/1/15/Xterm_256color_chart.svg</span>
-    <span class="ident">Fixed</span>(<span class="ident">u8</span>),
+    <span class="doccomment">/// A colour number from 0 to 255, for use in 256-colour terminal
+    /// environments.
+    ///
+    /// - Colours 0 to 7 are the `Black` to `White` variants respectively.
+    ///   These colours can usually be changed in the terminal emulator.
+    /// - Colours 8 to 15 are brighter versions of the eight colours above.
+    ///   These can also usually be changed in the terminal emulator, or it
+    ///   could be configured to use the original colours and show the text in
+    ///   bold instead. It varies depending on the program.
+    /// - Colours 16 to 231 contain several palettes of bright colours,
+    ///   arranged in six squares measuring six by six each.
+    /// - Colours 232 to 255 are shades of grey from black to white.
+    ///
+    /// It might make more sense to look at a [colour chart][cc].
+    ///
+    /// [cc]: https://upload.wikimedia.org/wikipedia/commons/1/15/Xterm_256color_chart.svg
+    </span>Fixed(u8),
 
-    <span class="doccomment">/// A 24-bit RGB color, as specified by ISO-8613-3.</span>
-    <span class="ident">RGB</span>(<span class="ident">u8</span>, <span class="ident">u8</span>, <span class="ident">u8</span>),
+    <span class="doccomment">/// A 24-bit RGB color, as specified by ISO-8613-3.
+    </span>RGB(u8, u8, u8),
 }
 
 
-<span class="kw">impl</span> <span class="ident">Colour</span> {
+<span class="kw">impl </span>Colour {
 
-    <span class="doccomment">/// Returns a `Style` with the foreground colour set to this colour.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ansi_term::Colour;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let style = Colour::Red.normal();</span>
-    <span class="doccomment">/// println!(&quot;{}&quot;, style.paint(&quot;hi&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">normal</span>(<span class="self">self</span>) -&gt; <span class="ident">Style</span> {
-        <span class="ident">Style</span> { <span class="ident">foreground</span>: <span class="prelude-val">Some</span>(<span class="self">self</span>), .. <span class="ident">Style::default</span>() }
+    <span class="doccomment">/// Returns a `Style` with the foreground colour set to this colour.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ansi_term::Colour;
+    ///
+    /// let style = Colour::Red.normal();
+    /// println!(&quot;{}&quot;, style.paint(&quot;hi&quot;));
+    /// ```
+    </span><span class="kw">pub fn </span>normal(<span class="self">self</span>) -&gt; Style {
+        Style { foreground: <span class="prelude-val">Some</span>(<span class="self">self</span>), .. Style::default() }
     }
 
-    <span class="doccomment">/// Returns a `Style` with the foreground colour set to this colour and the</span>
-    <span class="doccomment">/// bold property set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ansi_term::Colour;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let style = Colour::Green.bold();</span>
-    <span class="doccomment">/// println!(&quot;{}&quot;, style.paint(&quot;hey&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bold</span>(<span class="self">self</span>) -&gt; <span class="ident">Style</span> {
-        <span class="ident">Style</span> { <span class="ident">foreground</span>: <span class="prelude-val">Some</span>(<span class="self">self</span>), <span class="ident">is_bold</span>: <span class="bool-val">true</span>, .. <span class="ident">Style::default</span>() }
+    <span class="doccomment">/// Returns a `Style` with the foreground colour set to this colour and the
+    /// bold property set.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ansi_term::Colour;
+    ///
+    /// let style = Colour::Green.bold();
+    /// println!(&quot;{}&quot;, style.paint(&quot;hey&quot;));
+    /// ```
+    </span><span class="kw">pub fn </span>bold(<span class="self">self</span>) -&gt; Style {
+        Style { foreground: <span class="prelude-val">Some</span>(<span class="self">self</span>), is_bold: <span class="bool-val">true</span>, .. Style::default() }
     }
 
-    <span class="doccomment">/// Returns a `Style` with the foreground colour set to this colour and the</span>
-    <span class="doccomment">/// dimmed property set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ansi_term::Colour;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let style = Colour::Yellow.dimmed();</span>
-    <span class="doccomment">/// println!(&quot;{}&quot;, style.paint(&quot;sup&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dimmed</span>(<span class="self">self</span>) -&gt; <span class="ident">Style</span> {
-        <span class="ident">Style</span> { <span class="ident">foreground</span>: <span class="prelude-val">Some</span>(<span class="self">self</span>), <span class="ident">is_dimmed</span>: <span class="bool-val">true</span>, .. <span class="ident">Style::default</span>() }
+    <span class="doccomment">/// Returns a `Style` with the foreground colour set to this colour and the
+    /// dimmed property set.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ansi_term::Colour;
+    ///
+    /// let style = Colour::Yellow.dimmed();
+    /// println!(&quot;{}&quot;, style.paint(&quot;sup&quot;));
+    /// ```
+    </span><span class="kw">pub fn </span>dimmed(<span class="self">self</span>) -&gt; Style {
+        Style { foreground: <span class="prelude-val">Some</span>(<span class="self">self</span>), is_dimmed: <span class="bool-val">true</span>, .. Style::default() }
     }
 
-    <span class="doccomment">/// Returns a `Style` with the foreground colour set to this colour and the</span>
-    <span class="doccomment">/// italic property set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ansi_term::Colour;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let style = Colour::Blue.italic();</span>
-    <span class="doccomment">/// println!(&quot;{}&quot;, style.paint(&quot;greetings&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">italic</span>(<span class="self">self</span>) -&gt; <span class="ident">Style</span> {
-        <span class="ident">Style</span> { <span class="ident">foreground</span>: <span class="prelude-val">Some</span>(<span class="self">self</span>), <span class="ident">is_italic</span>: <span class="bool-val">true</span>, .. <span class="ident">Style::default</span>() }
+    <span class="doccomment">/// Returns a `Style` with the foreground colour set to this colour and the
+    /// italic property set.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ansi_term::Colour;
+    ///
+    /// let style = Colour::Blue.italic();
+    /// println!(&quot;{}&quot;, style.paint(&quot;greetings&quot;));
+    /// ```
+    </span><span class="kw">pub fn </span>italic(<span class="self">self</span>) -&gt; Style {
+        Style { foreground: <span class="prelude-val">Some</span>(<span class="self">self</span>), is_italic: <span class="bool-val">true</span>, .. Style::default() }
     }
 
-    <span class="doccomment">/// Returns a `Style` with the foreground colour set to this colour and the</span>
-    <span class="doccomment">/// underline property set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ansi_term::Colour;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let style = Colour::Purple.underline();</span>
-    <span class="doccomment">/// println!(&quot;{}&quot;, style.paint(&quot;salutations&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">underline</span>(<span class="self">self</span>) -&gt; <span class="ident">Style</span> {
-        <span class="ident">Style</span> { <span class="ident">foreground</span>: <span class="prelude-val">Some</span>(<span class="self">self</span>), <span class="ident">is_underline</span>: <span class="bool-val">true</span>, .. <span class="ident">Style::default</span>() }
+    <span class="doccomment">/// Returns a `Style` with the foreground colour set to this colour and the
+    /// underline property set.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ansi_term::Colour;
+    ///
+    /// let style = Colour::Purple.underline();
+    /// println!(&quot;{}&quot;, style.paint(&quot;salutations&quot;));
+    /// ```
+    </span><span class="kw">pub fn </span>underline(<span class="self">self</span>) -&gt; Style {
+        Style { foreground: <span class="prelude-val">Some</span>(<span class="self">self</span>), is_underline: <span class="bool-val">true</span>, .. Style::default() }
     }
 
-    <span class="doccomment">/// Returns a `Style` with the foreground colour set to this colour and the</span>
-    <span class="doccomment">/// blink property set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ansi_term::Colour;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let style = Colour::Cyan.blink();</span>
-    <span class="doccomment">/// println!(&quot;{}&quot;, style.paint(&quot;wazzup&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">blink</span>(<span class="self">self</span>) -&gt; <span class="ident">Style</span> {
-        <span class="ident">Style</span> { <span class="ident">foreground</span>: <span class="prelude-val">Some</span>(<span class="self">self</span>), <span class="ident">is_blink</span>: <span class="bool-val">true</span>, .. <span class="ident">Style::default</span>() }
+    <span class="doccomment">/// Returns a `Style` with the foreground colour set to this colour and the
+    /// blink property set.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ansi_term::Colour;
+    ///
+    /// let style = Colour::Cyan.blink();
+    /// println!(&quot;{}&quot;, style.paint(&quot;wazzup&quot;));
+    /// ```
+    </span><span class="kw">pub fn </span>blink(<span class="self">self</span>) -&gt; Style {
+        Style { foreground: <span class="prelude-val">Some</span>(<span class="self">self</span>), is_blink: <span class="bool-val">true</span>, .. Style::default() }
     }
 
-    <span class="doccomment">/// Returns a `Style` with the foreground colour set to this colour and the</span>
-    <span class="doccomment">/// reverse property set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ansi_term::Colour;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let style = Colour::Black.reverse();</span>
-    <span class="doccomment">/// println!(&quot;{}&quot;, style.paint(&quot;aloha&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">reverse</span>(<span class="self">self</span>) -&gt; <span class="ident">Style</span> {
-        <span class="ident">Style</span> { <span class="ident">foreground</span>: <span class="prelude-val">Some</span>(<span class="self">self</span>), <span class="ident">is_reverse</span>: <span class="bool-val">true</span>, .. <span class="ident">Style::default</span>() }
+    <span class="doccomment">/// Returns a `Style` with the foreground colour set to this colour and the
+    /// reverse property set.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ansi_term::Colour;
+    ///
+    /// let style = Colour::Black.reverse();
+    /// println!(&quot;{}&quot;, style.paint(&quot;aloha&quot;));
+    /// ```
+    </span><span class="kw">pub fn </span>reverse(<span class="self">self</span>) -&gt; Style {
+        Style { foreground: <span class="prelude-val">Some</span>(<span class="self">self</span>), is_reverse: <span class="bool-val">true</span>, .. Style::default() }
     }
 
-    <span class="doccomment">/// Returns a `Style` with the foreground colour set to this colour and the</span>
-    <span class="doccomment">/// hidden property set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ansi_term::Colour;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let style = Colour::White.hidden();</span>
-    <span class="doccomment">/// println!(&quot;{}&quot;, style.paint(&quot;ahoy&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hidden</span>(<span class="self">self</span>) -&gt; <span class="ident">Style</span> {
-        <span class="ident">Style</span> { <span class="ident">foreground</span>: <span class="prelude-val">Some</span>(<span class="self">self</span>), <span class="ident">is_hidden</span>: <span class="bool-val">true</span>, .. <span class="ident">Style::default</span>() }
+    <span class="doccomment">/// Returns a `Style` with the foreground colour set to this colour and the
+    /// hidden property set.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ansi_term::Colour;
+    ///
+    /// let style = Colour::White.hidden();
+    /// println!(&quot;{}&quot;, style.paint(&quot;ahoy&quot;));
+    /// ```
+    </span><span class="kw">pub fn </span>hidden(<span class="self">self</span>) -&gt; Style {
+        Style { foreground: <span class="prelude-val">Some</span>(<span class="self">self</span>), is_hidden: <span class="bool-val">true</span>, .. Style::default() }
     }
 
-    <span class="doccomment">/// Returns a `Style` with the foreground colour set to this colour and the</span>
-    <span class="doccomment">/// strikethrough property set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ansi_term::Colour;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let style = Colour::Fixed(244).strikethrough();</span>
-    <span class="doccomment">/// println!(&quot;{}&quot;, style.paint(&quot;yo&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">strikethrough</span>(<span class="self">self</span>) -&gt; <span class="ident">Style</span> {
-        <span class="ident">Style</span> { <span class="ident">foreground</span>: <span class="prelude-val">Some</span>(<span class="self">self</span>), <span class="ident">is_strikethrough</span>: <span class="bool-val">true</span>, .. <span class="ident">Style::default</span>() }
+    <span class="doccomment">/// Returns a `Style` with the foreground colour set to this colour and the
+    /// strikethrough property set.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ansi_term::Colour;
+    ///
+    /// let style = Colour::Fixed(244).strikethrough();
+    /// println!(&quot;{}&quot;, style.paint(&quot;yo&quot;));
+    /// ```
+    </span><span class="kw">pub fn </span>strikethrough(<span class="self">self</span>) -&gt; Style {
+        Style { foreground: <span class="prelude-val">Some</span>(<span class="self">self</span>), is_strikethrough: <span class="bool-val">true</span>, .. Style::default() }
     }
 
-    <span class="doccomment">/// Returns a `Style` with the foreground colour set to this colour and the</span>
-    <span class="doccomment">/// background colour property set to the given colour.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ansi_term::Colour;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let style = Colour::RGB(31, 31, 31).on(Colour::White);</span>
-    <span class="doccomment">/// println!(&quot;{}&quot;, style.paint(&quot;eyyyy&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on</span>(<span class="self">self</span>, <span class="ident">background</span>: <span class="ident">Colour</span>) -&gt; <span class="ident">Style</span> {
-        <span class="ident">Style</span> { <span class="ident">foreground</span>: <span class="prelude-val">Some</span>(<span class="self">self</span>), <span class="ident">background</span>: <span class="prelude-val">Some</span>(<span class="ident">background</span>), .. <span class="ident">Style::default</span>() }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Colour</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Style</span> {
-
-    <span class="doccomment">/// You can turn a `Colour` into a `Style` with the foreground colour set</span>
-    <span class="doccomment">/// with the `From` trait.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ansi_term::{Style, Colour};</span>
-    <span class="doccomment">/// let green_foreground = Style::default().fg(Colour::Green);</span>
-    <span class="doccomment">/// assert_eq!(green_foreground, Colour::Green.normal());</span>
-    <span class="doccomment">/// assert_eq!(green_foreground, Colour::Green.into());</span>
-    <span class="doccomment">/// assert_eq!(green_foreground, Style::from(Colour::Green));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">colour</span>: <span class="ident">Colour</span>) -&gt; <span class="ident">Style</span> {
-        <span class="ident">colour</span>.<span class="ident">normal</span>()
+    <span class="doccomment">/// Returns a `Style` with the foreground colour set to this colour and the
+    /// background colour property set to the given colour.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ansi_term::Colour;
+    ///
+    /// let style = Colour::RGB(31, 31, 31).on(Colour::White);
+    /// println!(&quot;{}&quot;, style.paint(&quot;eyyyy&quot;));
+    /// ```
+    </span><span class="kw">pub fn </span>on(<span class="self">self</span>, background: Colour) -&gt; Style {
+        Style { foreground: <span class="prelude-val">Some</span>(<span class="self">self</span>), background: <span class="prelude-val">Some</span>(background), .. Style::default() }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;derive_serde_style&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">serde_json_tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Style</span>, <span class="ident">Colour</span>};
+<span class="kw">impl </span>From&lt;Colour&gt; <span class="kw">for </span>Style {
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">colour_serialization</span>() {
+    <span class="doccomment">/// You can turn a `Colour` into a `Style` with the foreground colour set
+    /// with the `From` trait.
+    ///
+    /// ```
+    /// use ansi_term::{Style, Colour};
+    /// let green_foreground = Style::default().fg(Colour::Green);
+    /// assert_eq!(green_foreground, Colour::Green.normal());
+    /// assert_eq!(green_foreground, Colour::Green.into());
+    /// assert_eq!(green_foreground, Style::from(Colour::Green));
+    /// ```
+    </span><span class="kw">fn </span>from(colour: Colour) -&gt; Style {
+        colour.normal()
+    }
+}
 
-        <span class="kw">let</span> <span class="ident">colours</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[
-            <span class="ident">Colour::Red</span>,
-            <span class="ident">Colour::Blue</span>,
-            <span class="ident">Colour::RGB</span>(<span class="number">123</span>, <span class="number">123</span>, <span class="number">123</span>),
-            <span class="ident">Colour::Fixed</span>(<span class="number">255</span>),
+<span class="attribute">#[cfg(test)]
+#[cfg(feature = <span class="string">&quot;derive_serde_style&quot;</span>)]
+</span><span class="kw">mod </span>serde_json_tests {
+    <span class="kw">use super</span>::{Style, Colour};
+
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>colour_serialization() {
+
+        <span class="kw">let </span>colours = <span class="kw-2">&amp;</span>[
+            Colour::Red,
+            Colour::Blue,
+            Colour::RGB(<span class="number">123</span>, <span class="number">123</span>, <span class="number">123</span>),
+            Colour::Fixed(<span class="number">255</span>),
         ];
 
-        <span class="macro">assert_eq!</span>(<span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">colours</span>).<span class="ident">unwrap</span>(), <span class="ident">String::from</span>(<span class="string">&quot;[\&quot;Red\&quot;,\&quot;Blue\&quot;,{\&quot;RGB\&quot;:[123,123,123]},{\&quot;Fixed\&quot;:255}]&quot;</span>));
+        <span class="macro">assert_eq!</span>(serde_json::to_string(<span class="kw-2">&amp;</span>colours).unwrap(), String::from(<span class="string">&quot;[\&quot;Red\&quot;,\&quot;Blue\&quot;,{\&quot;RGB\&quot;:[123,123,123]},{\&quot;Fixed\&quot;:255}]&quot;</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">colour_deserialization</span>() {
-        <span class="kw">let</span> <span class="ident">colours</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[
-            <span class="ident">Colour::Red</span>,
-            <span class="ident">Colour::Blue</span>,
-            <span class="ident">Colour::RGB</span>(<span class="number">123</span>, <span class="number">123</span>, <span class="number">123</span>),
-            <span class="ident">Colour::Fixed</span>(<span class="number">255</span>),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>colour_deserialization() {
+        <span class="kw">let </span>colours = <span class="kw-2">&amp;</span>[
+            Colour::Red,
+            Colour::Blue,
+            Colour::RGB(<span class="number">123</span>, <span class="number">123</span>, <span class="number">123</span>),
+            Colour::Fixed(<span class="number">255</span>),
         ];
 
-        <span class="kw">for</span> <span class="ident">colour</span> <span class="kw">in</span> <span class="ident">colours</span>.<span class="ident">into_iter</span>() {
-            <span class="kw">let</span> <span class="ident">serialized</span> <span class="op">=</span> <span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">colour</span>).<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">deserialized</span>: <span class="ident">Colour</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">serialized</span>).<span class="ident">unwrap</span>();
+        <span class="kw">for </span>colour <span class="kw">in </span>colours.into_iter() {
+            <span class="kw">let </span>serialized = serde_json::to_string(<span class="kw-2">&amp;</span>colour).unwrap();
+            <span class="kw">let </span>deserialized: Colour = serde_json::from_str(<span class="kw-2">&amp;</span>serialized).unwrap();
 
-            <span class="macro">assert_eq!</span>(<span class="ident">colour</span>, <span class="kw-2">&amp;</span><span class="ident">deserialized</span>);
+            <span class="macro">assert_eq!</span>(colour, <span class="kw-2">&amp;</span>deserialized);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">style_serialization</span>() {
-        <span class="kw">let</span> <span class="ident">style</span> <span class="op">=</span> <span class="ident">Style::default</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>style_serialization() {
+        <span class="kw">let </span>style = Style::default();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">style</span>).<span class="ident">unwrap</span>(), <span class="string">&quot;{\&quot;foreground\&quot;:null,\&quot;background\&quot;:null,\&quot;is_bold\&quot;:false,\&quot;is_dimmed\&quot;:false,\&quot;is_italic\&quot;:false,\&quot;is_underline\&quot;:false,\&quot;is_blink\&quot;:false,\&quot;is_reverse\&quot;:false,\&quot;is_hidden\&quot;:false,\&quot;is_strikethrough\&quot;:false}&quot;</span>.<span class="ident">to_string</span>());
+        <span class="macro">assert_eq!</span>(serde_json::to_string(<span class="kw-2">&amp;</span>style).unwrap(), <span class="string">&quot;{\&quot;foreground\&quot;:null,\&quot;background\&quot;:null,\&quot;is_bold\&quot;:false,\&quot;is_dimmed\&quot;:false,\&quot;is_italic\&quot;:false,\&quot;is_underline\&quot;:false,\&quot;is_blink\&quot;:false,\&quot;is_reverse\&quot;:false,\&quot;is_hidden\&quot;:false,\&quot;is_strikethrough\&quot;:false}&quot;</span>.to_string());
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ansi_term" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ansi_term" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

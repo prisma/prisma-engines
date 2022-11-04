@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/fixedbitset-0.1.9/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../fixedbitset/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../fixedbitset/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../fixedbitset/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/fixedbitset-0.1.9/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../fixedbitset/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../fixedbitset/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../fixedbitset/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -986,993 +986,993 @@
 <span id="986">986</span>
 <span id="987">987</span>
 <span id="988">988</span>
-</pre><pre class="rust"><code><span class="doccomment">//! `FixedBitSet` is a simple fixed size set of bits.</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span><span class="op">=</span><span class="string">&quot;https://docs.rs/fixedbitset/0.1/&quot;</span>)]</span>
+</pre><pre class="rust"><code><span class="doccomment">//! `FixedBitSet` is a simple fixed size set of bits.
+</span><span class="attribute">#![doc(html_root_url=<span class="string">&quot;https://docs.rs/fixedbitset/0.1/&quot;</span>)]
 
-<span class="kw">mod</span> <span class="ident">range</span>;
+</span><span class="kw">mod </span>range;
 
-<span class="kw">use</span> <span class="ident">std::ops</span>::{<span class="ident">BitAnd</span>, <span class="ident">BitOr</span>, <span class="ident">Index</span>};
-<span class="kw">use</span> <span class="ident">std::cmp</span>::{<span class="ident">Ord</span>, <span class="ident">Ordering</span>};
-<span class="kw">use</span> <span class="ident">std::iter</span>::{<span class="ident">Chain</span>, <span class="ident">FromIterator</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">range::IndexRange</span>;
+<span class="kw">use </span>std::ops::{BitAnd, BitOr, Index};
+<span class="kw">use </span>std::cmp::{Ord, Ordering};
+<span class="kw">use </span>std::iter::{Chain, FromIterator};
+<span class="kw">pub use </span>range::IndexRange;
 
-<span class="kw">static</span> <span class="ident">TRUE</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="bool-val">true</span>;
-<span class="kw">static</span> <span class="ident">FALSE</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="bool-val">false</span>;
+<span class="kw">static </span>TRUE: bool = <span class="bool-val">true</span>;
+<span class="kw">static </span>FALSE: bool = <span class="bool-val">false</span>;
 
-<span class="kw">const</span> <span class="ident">BITS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">32</span>;
-<span class="kw">type</span> <span class="ident">Block</span> <span class="op">=</span> <span class="ident">u32</span>;
+<span class="kw">const </span>BITS: usize = <span class="number">32</span>;
+<span class="kw">type </span>Block = u32;
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">div_rem</span>(<span class="ident">x</span>: <span class="ident">usize</span>, <span class="ident">d</span>: <span class="ident">usize</span>) -&gt; (<span class="ident">usize</span>, <span class="ident">usize</span>)
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>div_rem(x: usize, d: usize) -&gt; (usize, usize)
 {
-    (<span class="ident">x</span> <span class="op">/</span> <span class="ident">d</span>, <span class="ident">x</span> <span class="op">%</span> <span class="ident">d</span>)
+    (x / d, x % d)
 }
 
-<span class="doccomment">/// `FixedBitSet` is a simple fixed size set of bits that each can</span>
-<span class="doccomment">/// be enabled (1 / **true**) or disabled (0 / **false**).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The bit set has a fixed capacity in terms of enabling bits (and the</span>
-<span class="doccomment">/// capacity can grow using the `grow` method).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FixedBitSet</span> {
-    <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Block</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// length in bits</span>
-    <span class="ident">length</span>: <span class="ident">usize</span>,
+<span class="doccomment">/// `FixedBitSet` is a simple fixed size set of bits that each can
+/// be enabled (1 / **true**) or disabled (0 / **false**).
+///
+/// The bit set has a fixed capacity in terms of enabling bits (and the
+/// capacity can grow using the `grow` method).
+</span><span class="attribute">#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
+</span><span class="kw">pub struct </span>FixedBitSet {
+    data: Vec&lt;Block&gt;,
+    <span class="doccomment">/// length in bits
+    </span>length: usize,
 }
 
-<span class="kw">impl</span> <span class="ident">FixedBitSet</span>
+<span class="kw">impl </span>FixedBitSet
 {
-    <span class="doccomment">/// Create a new **FixedBitSet** with a specific number of bits,</span>
-    <span class="doccomment">/// all initially clear.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_capacity</span>(<span class="ident">bits</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span>
-    {
-        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">blocks</span>, <span class="ident">rem</span>) <span class="op">=</span> <span class="ident">div_rem</span>(<span class="ident">bits</span>, <span class="ident">BITS</span>);
-        <span class="ident">blocks</span> <span class="op">+</span><span class="op">=</span> (<span class="ident">rem</span> <span class="op">&gt;</span> <span class="number">0</span>) <span class="kw">as</span> <span class="ident">usize</span>;
-        <span class="ident">FixedBitSet</span> {
-            <span class="ident">data</span>: <span class="macro">vec!</span>[<span class="number">0</span>; <span class="ident">blocks</span>],
-            <span class="ident">length</span>: <span class="ident">bits</span>,
+    <span class="doccomment">/// Create a new **FixedBitSet** with a specific number of bits,
+    /// all initially clear.
+    </span><span class="kw">pub fn </span>with_capacity(bits: usize) -&gt; <span class="self">Self
+    </span>{
+        <span class="kw">let </span>(<span class="kw-2">mut </span>blocks, rem) = div_rem(bits, BITS);
+        blocks += (rem &gt; <span class="number">0</span>) <span class="kw">as </span>usize;
+        FixedBitSet {
+            data: <span class="macro">vec!</span>[<span class="number">0</span>; blocks],
+            length: bits,
         }
     }
     
-    <span class="doccomment">/// Grow capacity to **bits**, all new bits initialized to zero</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">grow</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">bits</span>: <span class="ident">usize</span>) {
-        <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">blocks</span>, <span class="ident">rem</span>) <span class="op">=</span> <span class="ident">div_rem</span>(<span class="ident">bits</span>, <span class="ident">BITS</span>);
-        <span class="ident">blocks</span> <span class="op">+</span><span class="op">=</span> (<span class="ident">rem</span> <span class="op">&gt;</span> <span class="number">0</span>) <span class="kw">as</span> <span class="ident">usize</span>;
-        <span class="kw">if</span> <span class="ident">bits</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">length</span> {
-            <span class="self">self</span>.<span class="ident">length</span> <span class="op">=</span> <span class="ident">bits</span>;
-            <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">resize</span>(<span class="ident">blocks</span>, <span class="number">0</span>);
+    <span class="doccomment">/// Grow capacity to **bits**, all new bits initialized to zero
+    </span><span class="kw">pub fn </span>grow(<span class="kw-2">&amp;mut </span><span class="self">self</span>, bits: usize) {
+        <span class="kw">let </span>(<span class="kw-2">mut </span>blocks, rem) = div_rem(bits, BITS);
+        blocks += (rem &gt; <span class="number">0</span>) <span class="kw">as </span>usize;
+        <span class="kw">if </span>bits &gt; <span class="self">self</span>.length {
+            <span class="self">self</span>.length = bits;
+            <span class="self">self</span>.data.resize(blocks, <span class="number">0</span>);
         }
     }
 
-    <span class="doccomment">/// Return the length of the `FixedBitSet` in bits.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> { <span class="self">self</span>.<span class="ident">length</span> }
+    <span class="doccomment">/// Return the length of the `FixedBitSet` in bits.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize { <span class="self">self</span>.length }
 
-    <span class="doccomment">/// Return **true** if the bit is enabled in the **FixedBitSet**,</span>
-    <span class="doccomment">/// **false** otherwise.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note: bits outside the capacity are always disabled.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note: Also available with index syntax: `bitset[bit]`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bit</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span>
+    <span class="doccomment">/// Return **true** if the bit is enabled in the **FixedBitSet**,
+    /// **false** otherwise.
+    ///
+    /// Note: bits outside the capacity are always disabled.
+    ///
+    /// Note: Also available with index syntax: `bitset[bit]`.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>contains(<span class="kw-2">&amp;</span><span class="self">self</span>, bit: usize) -&gt; bool
     {
-        <span class="kw">let</span> (<span class="ident">block</span>, <span class="ident">i</span>) <span class="op">=</span> <span class="ident">div_rem</span>(<span class="ident">bit</span>, <span class="ident">BITS</span>);
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">get</span>(<span class="ident">block</span>) {
-            <span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">b</span>) =&gt; (<span class="ident">b</span> <span class="op">&amp;</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">i</span>)) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>,
+        <span class="kw">let </span>(block, i) = div_rem(bit, BITS);
+        <span class="kw">match </span><span class="self">self</span>.data.get(block) {
+            <span class="prelude-val">None </span>=&gt; <span class="bool-val">false</span>,
+            <span class="prelude-val">Some</span>(b) =&gt; (b &amp; (<span class="number">1 </span>&lt;&lt; i)) != <span class="number">0</span>,
         }
     }
 
-    <span class="doccomment">/// Clear all bits.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>)
+    <span class="doccomment">/// Clear all bits.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>clear(<span class="kw-2">&amp;mut </span><span class="self">self</span>)
     {
-        <span class="kw">for</span> <span class="ident">elt</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span>[..] {
-            <span class="kw-2">*</span><span class="ident">elt</span> <span class="op">=</span> <span class="number">0</span>
+        <span class="kw">for </span>elt <span class="kw">in </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.data[..] {
+            <span class="kw-2">*</span>elt = <span class="number">0
+        </span>}
+    }
+
+    <span class="doccomment">/// Enable `bit`.
+    ///
+    /// **Panics** if **bit** is out of bounds.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>insert(<span class="kw-2">&amp;mut </span><span class="self">self</span>, bit: usize)
+    {
+        <span class="macro">assert!</span>(bit &lt; <span class="self">self</span>.length);
+        <span class="kw">let </span>(block, i) = div_rem(bit, BITS);
+        <span class="kw">unsafe </span>{
+            <span class="kw-2">*</span><span class="self">self</span>.data.get_unchecked_mut(block) |= <span class="number">1 </span>&lt;&lt; i;
         }
     }
 
-    <span class="doccomment">/// Enable `bit`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Panics** if **bit** is out of bounds.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">bit</span>: <span class="ident">usize</span>)
+    <span class="doccomment">/// Enable `bit`, and return its previous value.
+    ///
+    /// **Panics** if **bit** is out of bounds.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>put(<span class="kw-2">&amp;mut </span><span class="self">self</span>, bit: usize) -&gt; bool
     {
-        <span class="macro">assert!</span>(<span class="ident">bit</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">length</span>);
-        <span class="kw">let</span> (<span class="ident">block</span>, <span class="ident">i</span>) <span class="op">=</span> <span class="ident">div_rem</span>(<span class="ident">bit</span>, <span class="ident">BITS</span>);
-        <span class="kw">unsafe</span> {
-            <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">data</span>.<span class="ident">get_unchecked_mut</span>(<span class="ident">block</span>) <span class="op">|</span><span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">i</span>;
+        <span class="macro">assert!</span>(bit &lt; <span class="self">self</span>.length);
+        <span class="kw">let </span>(block, i) = div_rem(bit, BITS);
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span>word = <span class="self">self</span>.data.get_unchecked_mut(block);
+            <span class="kw">let </span>prev = <span class="kw-2">*</span>word &amp; (<span class="number">1 </span>&lt;&lt; i) != <span class="number">0</span>;
+            <span class="kw-2">*</span>word |= <span class="number">1 </span>&lt;&lt; i;
+            prev
         }
     }
 
-    <span class="doccomment">/// Enable `bit`, and return its previous value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Panics** if **bit** is out of bounds.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">put</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">bit</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span>
+    <span class="doccomment">/// **Panics** if **bit** is out of bounds.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>set(<span class="kw-2">&amp;mut </span><span class="self">self</span>, bit: usize, enabled: bool)
     {
-        <span class="macro">assert!</span>(<span class="ident">bit</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">length</span>);
-        <span class="kw">let</span> (<span class="ident">block</span>, <span class="ident">i</span>) <span class="op">=</span> <span class="ident">div_rem</span>(<span class="ident">bit</span>, <span class="ident">BITS</span>);
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">word</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">get_unchecked_mut</span>(<span class="ident">block</span>);
-            <span class="kw">let</span> <span class="ident">prev</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">word</span> <span class="op">&amp;</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">i</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>;
-            <span class="kw-2">*</span><span class="ident">word</span> <span class="op">|</span><span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">i</span>;
-            <span class="ident">prev</span>
-        }
-    }
-
-    <span class="doccomment">/// **Panics** if **bit** is out of bounds.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">bit</span>: <span class="ident">usize</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>)
-    {
-        <span class="macro">assert!</span>(<span class="ident">bit</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">length</span>);
-        <span class="kw">let</span> (<span class="ident">block</span>, <span class="ident">i</span>) <span class="op">=</span> <span class="ident">div_rem</span>(<span class="ident">bit</span>, <span class="ident">BITS</span>);
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">elt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">get_unchecked_mut</span>(<span class="ident">block</span>);
-            <span class="kw">if</span> <span class="ident">enabled</span> {
-                <span class="kw-2">*</span><span class="ident">elt</span> <span class="op">|</span><span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">i</span>;
-            } <span class="kw">else</span> {
-                <span class="kw-2">*</span><span class="ident">elt</span> <span class="op">&amp;=</span> <span class="op">!</span>(<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">i</span>);
+        <span class="macro">assert!</span>(bit &lt; <span class="self">self</span>.length);
+        <span class="kw">let </span>(block, i) = div_rem(bit, BITS);
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span>elt = <span class="self">self</span>.data.get_unchecked_mut(block);
+            <span class="kw">if </span>enabled {
+                <span class="kw-2">*</span>elt |= <span class="number">1 </span>&lt;&lt; i;
+            } <span class="kw">else </span>{
+                <span class="kw-2">*</span>elt &amp;= !(<span class="number">1 </span>&lt;&lt; i);
             }
         }
     }
 
-    <span class="doccomment">/// Copies boolean value from specified bit to the specified bit.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Panics** if **to** is out of bounds.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">copy_bit</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">from</span>: <span class="ident">usize</span>, <span class="ident">to</span>: <span class="ident">usize</span>)
+    <span class="doccomment">/// Copies boolean value from specified bit to the specified bit.
+    ///
+    /// **Panics** if **to** is out of bounds.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>copy_bit(<span class="kw-2">&amp;mut </span><span class="self">self</span>, from: usize, to: usize)
     {
-        <span class="macro">assert!</span>(<span class="ident">to</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">length</span>);
-        <span class="kw">let</span> (<span class="ident">to_block</span>, <span class="ident">t</span>) <span class="op">=</span> <span class="ident">div_rem</span>(<span class="ident">to</span>, <span class="ident">BITS</span>);
-        <span class="kw">let</span> <span class="ident">enabled</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident">from</span>);
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">to_elt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">get_unchecked_mut</span>(<span class="ident">to_block</span>);
-            <span class="kw">if</span> <span class="ident">enabled</span> {
-                <span class="kw-2">*</span><span class="ident">to_elt</span> <span class="op">|</span><span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">t</span>;
-            } <span class="kw">else</span> {
-                <span class="kw-2">*</span><span class="ident">to_elt</span> <span class="op">&amp;=</span> <span class="op">!</span>(<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">t</span>);
+        <span class="macro">assert!</span>(to &lt; <span class="self">self</span>.length);
+        <span class="kw">let </span>(to_block, t) = div_rem(to, BITS);
+        <span class="kw">let </span>enabled = <span class="self">self</span>.contains(from);
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span>to_elt = <span class="self">self</span>.data.get_unchecked_mut(to_block);
+            <span class="kw">if </span>enabled {
+                <span class="kw-2">*</span>to_elt |= <span class="number">1 </span>&lt;&lt; t;
+            } <span class="kw">else </span>{
+                <span class="kw-2">*</span>to_elt &amp;= !(<span class="number">1 </span>&lt;&lt; t);
             }
         }
     }
 
-    <span class="doccomment">/// Count the number of set bits in the given bit range.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Use `..` to count the whole content of the bitset.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Panics** if the range extends past the end of the bitset.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">count_ones</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">IndexRange</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">range</span>: <span class="ident">T</span>) -&gt; <span class="ident">usize</span>
+    <span class="doccomment">/// Count the number of set bits in the given bit range.
+    ///
+    /// Use `..` to count the whole content of the bitset.
+    ///
+    /// **Panics** if the range extends past the end of the bitset.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>count_ones&lt;T: IndexRange&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, range: T) -&gt; usize
     {
-        <span class="ident">Masks::new</span>(<span class="ident">range</span>, <span class="self">self</span>.<span class="ident">length</span>)
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">block</span>, <span class="ident">mask</span>)<span class="op">|</span> <span class="kw">unsafe</span> {
-                <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">data</span>.<span class="ident">get_unchecked</span>(<span class="ident">block</span>);
-                (<span class="ident">value</span> <span class="op">&amp;</span> <span class="ident">mask</span>).<span class="ident">count_ones</span>() <span class="kw">as</span> <span class="ident">usize</span>
+        Masks::new(range, <span class="self">self</span>.length)
+            .map(|(block, mask)| <span class="kw">unsafe </span>{
+                <span class="kw">let </span>value = <span class="kw-2">*</span><span class="self">self</span>.data.get_unchecked(block);
+                (value &amp; mask).count_ones() <span class="kw">as </span>usize
             })
-            .<span class="ident">sum</span>()
+            .sum()
     }
 
-    <span class="doccomment">/// Sets every bit in the given range to the given state (`enabled`)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Use `..` to toggle the whole bitset.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Panics** if the range extends past the end of the bitset.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_range</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">IndexRange</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">range</span>: <span class="ident">T</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>)
+    <span class="doccomment">/// Sets every bit in the given range to the given state (`enabled`)
+    ///
+    /// Use `..` to toggle the whole bitset.
+    ///
+    /// **Panics** if the range extends past the end of the bitset.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>set_range&lt;T: IndexRange&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, range: T, enabled: bool)
     {
-        <span class="kw">for</span> (<span class="ident">block</span>, <span class="ident">mask</span>) <span class="kw">in</span> <span class="ident">Masks::new</span>(<span class="ident">range</span>, <span class="self">self</span>.<span class="ident">length</span>) {
-            <span class="kw">unsafe</span> {
-                <span class="kw">if</span> <span class="ident">enabled</span> {
-                    <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">data</span>.<span class="ident">get_unchecked_mut</span>(<span class="ident">block</span>) <span class="op">|</span><span class="op">=</span> <span class="ident">mask</span>;
-                } <span class="kw">else</span> {
-                    <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">data</span>.<span class="ident">get_unchecked_mut</span>(<span class="ident">block</span>) <span class="op">&amp;=</span> <span class="op">!</span><span class="ident">mask</span>;
+        <span class="kw">for </span>(block, mask) <span class="kw">in </span>Masks::new(range, <span class="self">self</span>.length) {
+            <span class="kw">unsafe </span>{
+                <span class="kw">if </span>enabled {
+                    <span class="kw-2">*</span><span class="self">self</span>.data.get_unchecked_mut(block) |= mask;
+                } <span class="kw">else </span>{
+                    <span class="kw-2">*</span><span class="self">self</span>.data.get_unchecked_mut(block) &amp;= !mask;
                 }
             }
         }
     }
 
-    <span class="doccomment">/// Enables every bit in the given range.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Use `..` to make the whole bitset ones.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Panics** if the range extends past the end of the bitset.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert_range</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">IndexRange</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">range</span>: <span class="ident">T</span>)
+    <span class="doccomment">/// Enables every bit in the given range.
+    ///
+    /// Use `..` to make the whole bitset ones.
+    ///
+    /// **Panics** if the range extends past the end of the bitset.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>insert_range&lt;T: IndexRange&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, range: T)
     {
-        <span class="self">self</span>.<span class="ident">set_range</span>(<span class="ident">range</span>, <span class="bool-val">true</span>);
+        <span class="self">self</span>.set_range(range, <span class="bool-val">true</span>);
     }
 
-    <span class="doccomment">/// View the bitset as a slice of `u32` blocks</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u32</span>]
+    <span class="doccomment">/// View the bitset as a slice of `u32` blocks
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>as_slice(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u32]
     {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>
+        <span class="kw-2">&amp;</span><span class="self">self</span>.data
     }
 
-    <span class="doccomment">/// View the bitset as a mutable slice of `u32` blocks. Writing past the bitlength in the last</span>
-    <span class="doccomment">/// will cause `contains` to return potentially incorrect results for bits past the bitlength.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_mut_slice</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> [<span class="ident">u32</span>]
+    <span class="doccomment">/// View the bitset as a mutable slice of `u32` blocks. Writing past the bitlength in the last
+    /// will cause `contains` to return potentially incorrect results for bits past the bitlength.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>as_mut_slice(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>[u32]
     {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span>
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.data
     }
 
-    <span class="doccomment">/// Iterates over all enabled bits.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Iterator element is the index of the `1` bit, type `usize`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ones</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Ones</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">as_slice</span>().<span class="ident">split_first</span>() {
-            <span class="prelude-val">Some</span>((<span class="kw-2">&amp;</span><span class="ident">block</span>, <span class="ident">rem</span>)) =&gt; {
-                <span class="ident">Ones</span> {
-                    <span class="ident">current_bit_idx</span>: <span class="number">0</span>,
-                    <span class="ident">current_block_idx</span>: <span class="number">0</span>,
-                    <span class="ident">current_block</span>: <span class="ident">block</span>,
-                    <span class="ident">remaining_blocks</span>: <span class="ident">rem</span>
+    <span class="doccomment">/// Iterates over all enabled bits.
+    ///
+    /// Iterator element is the index of the `1` bit, type `usize`.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>ones(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Ones {
+        <span class="kw">match </span><span class="self">self</span>.as_slice().split_first() {
+            <span class="prelude-val">Some</span>((<span class="kw-2">&amp;</span>block, rem)) =&gt; {
+                Ones {
+                    current_bit_idx: <span class="number">0</span>,
+                    current_block_idx: <span class="number">0</span>,
+                    current_block: block,
+                    remaining_blocks: rem
                 }
             }
-            <span class="prelude-val">None</span> =&gt; {
-                <span class="ident">Ones</span> {
-                    <span class="ident">current_bit_idx</span>: <span class="number">0</span>,
-                    <span class="ident">current_block_idx</span>: <span class="number">0</span>,
-                    <span class="ident">current_block</span>: <span class="number">0</span>,
-                    <span class="ident">remaining_blocks</span>: <span class="kw-2">&amp;</span>[]
+            <span class="prelude-val">None </span>=&gt; {
+                Ones {
+                    current_bit_idx: <span class="number">0</span>,
+                    current_block_idx: <span class="number">0</span>,
+                    current_block: <span class="number">0</span>,
+                    remaining_blocks: <span class="kw-2">&amp;</span>[]
                 }
             }
         }
     }
 
-    <span class="doccomment">/// Returns a lazy iterator over the intersection of two `FixedBitSet`s</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">intersection</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">FixedBitSet</span>) -&gt; <span class="ident">Intersection</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
+    <span class="doccomment">/// Returns a lazy iterator over the intersection of two `FixedBitSet`s
+    </span><span class="kw">pub fn </span>intersection&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>FixedBitSet) -&gt; Intersection&lt;<span class="lifetime">&#39;a</span>&gt;
     {
-        <span class="ident">Intersection</span> {
-            <span class="ident">iter</span>: <span class="self">self</span>.<span class="ident">ones</span>(),
-            <span class="ident">other</span>: <span class="ident">other</span>,
+        Intersection {
+            iter: <span class="self">self</span>.ones(),
+            other: other,
         }
     }
 
-    <span class="doccomment">/// Returns a lazy iterator over the union of two `FixedBitSet`s.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">union</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">FixedBitSet</span>) -&gt; <span class="ident">Union</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
+    <span class="doccomment">/// Returns a lazy iterator over the union of two `FixedBitSet`s.
+    </span><span class="kw">pub fn </span>union&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>FixedBitSet) -&gt; Union&lt;<span class="lifetime">&#39;a</span>&gt;
     {
-        <span class="ident">Union</span> {
-            <span class="ident">iter</span>: <span class="self">self</span>.<span class="ident">ones</span>().<span class="ident">chain</span>(<span class="ident">other</span>.<span class="ident">difference</span>(<span class="self">self</span>)),
+        Union {
+            iter: <span class="self">self</span>.ones().chain(other.difference(<span class="self">self</span>)),
         }
     }
 
-    <span class="doccomment">/// Returns a lazy iterator over the difference of two `FixedBitSet`s. The difference of `a`</span>
-    <span class="doccomment">/// and `b` is the elements of `a` which are not in `b`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">difference</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">FixedBitSet</span>) -&gt; <span class="ident">Difference</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>
+    <span class="doccomment">/// Returns a lazy iterator over the difference of two `FixedBitSet`s. The difference of `a`
+    /// and `b` is the elements of `a` which are not in `b`.
+    </span><span class="kw">pub fn </span>difference&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>FixedBitSet) -&gt; Difference&lt;<span class="lifetime">&#39;a</span>&gt;
     {
-        <span class="ident">Difference</span> {
-            <span class="ident">iter</span>: <span class="self">self</span>.<span class="ident">ones</span>(),
-            <span class="ident">other</span>: <span class="ident">other</span>,
+        Difference {
+            iter: <span class="self">self</span>.ones(),
+            other: other,
         }
     }
 }
 
-<span class="doccomment">/// An iterator producing elements in the difference of two sets.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This struct is created by the [`FixedBitSet::difference`] method.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Difference</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">iter</span>: <span class="ident">Ones</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">FixedBitSet</span>,
+<span class="doccomment">/// An iterator producing elements in the difference of two sets.
+///
+/// This struct is created by the [`FixedBitSet::difference`] method.
+</span><span class="kw">pub struct </span>Difference&lt;<span class="lifetime">&#39;a</span>&gt; {
+    iter: Ones&lt;<span class="lifetime">&#39;a</span>&gt;,
+    other: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>FixedBitSet,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Difference</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">usize</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>Difference&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Item = usize;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">nxt</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">next</span>() {
-            <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">other</span>.<span class="ident">contains</span>(<span class="ident">nxt</span>) {
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">nxt</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(nxt) = <span class="self">self</span>.iter.next() {
+            <span class="kw">if </span>!<span class="self">self</span>.other.contains(nxt) {
+                <span class="kw">return </span><span class="prelude-val">Some</span>(nxt);
             }
         }
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">None
+    </span>}
 }
 
 
-<span class="doccomment">/// An iterator producing elements in the intersection of two sets.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This struct is created by the [`FixedBitSet::intersection`] method.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Intersection</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">iter</span>: <span class="ident">Ones</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">FixedBitSet</span>,
+<span class="doccomment">/// An iterator producing elements in the intersection of two sets.
+///
+/// This struct is created by the [`FixedBitSet::intersection`] method.
+</span><span class="kw">pub struct </span>Intersection&lt;<span class="lifetime">&#39;a</span>&gt; {
+    iter: Ones&lt;<span class="lifetime">&#39;a</span>&gt;,
+    other: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>FixedBitSet,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Intersection</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">usize</span>; <span class="comment">// the bit position of the &#39;1&#39;</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>Intersection&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Item = usize; <span class="comment">// the bit position of the &#39;1&#39;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">nxt</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">next</span>() {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">other</span>.<span class="ident">contains</span>(<span class="ident">nxt</span>) {
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">nxt</span>);
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(nxt) = <span class="self">self</span>.iter.next() {
+            <span class="kw">if </span><span class="self">self</span>.other.contains(nxt) {
+                <span class="kw">return </span><span class="prelude-val">Some</span>(nxt);
             }
         }
-        <span class="prelude-val">None</span>
+        <span class="prelude-val">None
+    </span>}
+}
+
+<span class="doccomment">/// An iterator producing elements in the union of two sets.
+///
+/// This struct is created by the [`FixedBitSet::union`] method.
+</span><span class="kw">pub struct </span>Union&lt;<span class="lifetime">&#39;a</span>&gt; {
+    iter: Chain&lt;Ones&lt;<span class="lifetime">&#39;a</span>&gt;, Difference&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>Union&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Item = usize;
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="self">self</span>.iter.next()
     }
 }
 
-<span class="doccomment">/// An iterator producing elements in the union of two sets.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This struct is created by the [`FixedBitSet::union`] method.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Union</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">iter</span>: <span class="ident">Chain</span><span class="op">&lt;</span><span class="ident">Ones</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">Difference</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+
+<span class="kw">struct </span>Masks {
+    first_block: usize,
+    first_mask: Block,
+    last_block: usize,
+    last_mask: Block,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Union</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">usize</span>;
+<span class="kw">impl </span>Masks {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>new&lt;T: IndexRange&gt;(range: T, length: usize) -&gt; Masks {
+        <span class="kw">let </span>start = range.start().unwrap_or(<span class="number">0</span>);
+        <span class="kw">let </span>end = range.end().unwrap_or(length);
+        <span class="macro">assert!</span>(start &lt;= end &amp;&amp; end &lt;= length);
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">iter</span>.<span class="ident">next</span>()
+        <span class="kw">let </span>(first_block, first_rem) = div_rem(start, BITS);
+        <span class="kw">let </span>(last_block, last_rem) = div_rem(end, BITS);
+
+        Masks {
+            first_block: first_block <span class="kw">as </span>usize,
+            first_mask: Block::max_value() &lt;&lt; first_rem,
+            last_block: last_block <span class="kw">as </span>usize,
+            last_mask: (Block::max_value() &gt;&gt; <span class="number">1</span>) &gt;&gt; (BITS - last_rem - <span class="number">1</span>),
+            <span class="comment">// this is equivalent to `MAX &gt;&gt; (BITS - x)` with correct semantics when x == 0.
+        </span>}
     }
 }
 
-
-<span class="kw">struct</span> <span class="ident">Masks</span> {
-    <span class="ident">first_block</span>: <span class="ident">usize</span>,
-    <span class="ident">first_mask</span>: <span class="ident">Block</span>,
-    <span class="ident">last_block</span>: <span class="ident">usize</span>,
-    <span class="ident">last_mask</span>: <span class="ident">Block</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">Masks</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">IndexRange</span><span class="op">&gt;</span>(<span class="ident">range</span>: <span class="ident">T</span>, <span class="ident">length</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Masks</span> {
-        <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">range</span>.<span class="ident">start</span>().<span class="ident">unwrap_or</span>(<span class="number">0</span>);
-        <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">range</span>.<span class="ident">end</span>().<span class="ident">unwrap_or</span>(<span class="ident">length</span>);
-        <span class="macro">assert!</span>(<span class="ident">start</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">end</span> <span class="op">&amp;&amp;</span> <span class="ident">end</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">length</span>);
-
-        <span class="kw">let</span> (<span class="ident">first_block</span>, <span class="ident">first_rem</span>) <span class="op">=</span> <span class="ident">div_rem</span>(<span class="ident">start</span>, <span class="ident">BITS</span>);
-        <span class="kw">let</span> (<span class="ident">last_block</span>, <span class="ident">last_rem</span>) <span class="op">=</span> <span class="ident">div_rem</span>(<span class="ident">end</span>, <span class="ident">BITS</span>);
-
-        <span class="ident">Masks</span> {
-            <span class="ident">first_block</span>: <span class="ident">first_block</span> <span class="kw">as</span> <span class="ident">usize</span>,
-            <span class="ident">first_mask</span>: <span class="ident">Block::max_value</span>() <span class="op">&lt;</span><span class="op">&lt;</span> <span class="ident">first_rem</span>,
-            <span class="ident">last_block</span>: <span class="ident">last_block</span> <span class="kw">as</span> <span class="ident">usize</span>,
-            <span class="ident">last_mask</span>: (<span class="ident">Block::max_value</span>() <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">1</span>) <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="ident">BITS</span> <span class="op">-</span> <span class="ident">last_rem</span> <span class="op">-</span> <span class="number">1</span>),
-            <span class="comment">// this is equivalent to `MAX &gt;&gt; (BITS - x)` with correct semantics when x == 0.</span>
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Masks</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="ident">usize</span>, <span class="ident">Block</span>);
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">first_block</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">last_block</span>) {
-            <span class="ident">Ordering::Less</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">first_block</span>, <span class="self">self</span>.<span class="ident">first_mask</span>);
-                <span class="self">self</span>.<span class="ident">first_block</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="self">self</span>.<span class="ident">first_mask</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>;
-                <span class="prelude-val">Some</span>(<span class="ident">res</span>)
+<span class="kw">impl </span>Iterator <span class="kw">for </span>Masks {
+    <span class="kw">type </span>Item = (usize, Block);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">match </span><span class="self">self</span>.first_block.cmp(<span class="kw-2">&amp;</span><span class="self">self</span>.last_block) {
+            Ordering::Less =&gt; {
+                <span class="kw">let </span>res = (<span class="self">self</span>.first_block, <span class="self">self</span>.first_mask);
+                <span class="self">self</span>.first_block += <span class="number">1</span>;
+                <span class="self">self</span>.first_mask = !<span class="number">0</span>;
+                <span class="prelude-val">Some</span>(res)
             }
-            <span class="ident">Ordering::Equal</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">mask</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">first_mask</span> <span class="op">&amp;</span> <span class="self">self</span>.<span class="ident">last_mask</span>;
-                <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">mask</span> <span class="op">==</span> <span class="number">0</span> {
-                    <span class="prelude-val">None</span>
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">Some</span>((<span class="self">self</span>.<span class="ident">first_block</span>, <span class="ident">mask</span>))
+            Ordering::Equal =&gt; {
+                <span class="kw">let </span>mask = <span class="self">self</span>.first_mask &amp; <span class="self">self</span>.last_mask;
+                <span class="kw">let </span>res = <span class="kw">if </span>mask == <span class="number">0 </span>{
+                    <span class="prelude-val">None
+                </span>} <span class="kw">else </span>{
+                    <span class="prelude-val">Some</span>((<span class="self">self</span>.first_block, mask))
                 };
-                <span class="self">self</span>.<span class="ident">first_block</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="ident">res</span>
+                <span class="self">self</span>.first_block += <span class="number">1</span>;
+                res
             }
-            <span class="ident">Ordering::Greater</span> =&gt; <span class="prelude-val">None</span>,
+            Ordering::Greater =&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
 
-<span class="doccomment">/// An  iterator producing the indices of the set bit in a set.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This struct is created by the [`FixedBitSet::ones`] method.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Ones</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">current_bit_idx</span>: <span class="ident">usize</span>,
-    <span class="ident">current_block_idx</span>: <span class="ident">usize</span>,
-    <span class="ident">remaining_blocks</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">Block</span>],
-    <span class="ident">current_block</span>: <span class="ident">Block</span>
+<span class="doccomment">/// An  iterator producing the indices of the set bit in a set.
+///
+/// This struct is created by the [`FixedBitSet::ones`] method.
+</span><span class="kw">pub struct </span>Ones&lt;<span class="lifetime">&#39;a</span>&gt; {
+    current_bit_idx: usize,
+    current_block_idx: usize,
+    remaining_blocks: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[Block],
+    current_block: Block
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Ones</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">usize</span>; <span class="comment">// the bit position of the &#39;1&#39;</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>Ones&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Item = usize; <span class="comment">// the bit position of the &#39;1&#39;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">block</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">current_block</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">idx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">current_bit_idx</span>;
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>block = <span class="self">self</span>.current_block;
+        <span class="kw">let </span><span class="kw-2">mut </span>idx = <span class="self">self</span>.current_bit_idx;
 
-        <span class="kw">loop</span> {
-            <span class="kw">loop</span> {
-                <span class="kw">if</span> (<span class="ident">block</span> <span class="op">&amp;</span> <span class="number">1</span>) <span class="op">==</span> <span class="number">1</span> {
-                    <span class="self">self</span>.<span class="ident">current_block</span> <span class="op">=</span> <span class="ident">block</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">1</span>;
-                    <span class="self">self</span>.<span class="ident">current_bit_idx</span> <span class="op">=</span> <span class="ident">idx</span> <span class="op">+</span> <span class="number">1</span>;
-                    <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">idx</span>);
+        <span class="kw">loop </span>{
+            <span class="kw">loop </span>{
+                <span class="kw">if </span>(block &amp; <span class="number">1</span>) == <span class="number">1 </span>{
+                    <span class="self">self</span>.current_block = block &gt;&gt; <span class="number">1</span>;
+                    <span class="self">self</span>.current_bit_idx = idx + <span class="number">1</span>;
+                    <span class="kw">return </span><span class="prelude-val">Some</span>(idx);
                 }
-                <span class="comment">// reordering the two lines below makes a huge (2x) difference in performance!</span>
-                <span class="ident">block</span> <span class="op">=</span> <span class="ident">block</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">1</span>;
-                <span class="ident">idx</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="kw">if</span> <span class="ident">block</span> <span class="op">==</span> <span class="number">0</span> {
+                <span class="comment">// reordering the two lines below makes a huge (2x) difference in performance!
+                </span>block = block &gt;&gt; <span class="number">1</span>;
+                idx += <span class="number">1</span>;
+                <span class="kw">if </span>block == <span class="number">0 </span>{
                     <span class="kw">break</span>;
                 }
             }
 
-            <span class="comment">// go to next block</span>
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">remaining_blocks</span>.<span class="ident">split_first</span>() {
-                <span class="prelude-val">Some</span>((<span class="kw-2">&amp;</span><span class="ident">next_block</span>, <span class="ident">rest</span>)) =&gt; {
-                    <span class="self">self</span>.<span class="ident">remaining_blocks</span> <span class="op">=</span> <span class="ident">rest</span>;
-                    <span class="self">self</span>.<span class="ident">current_block_idx</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                    <span class="ident">idx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">current_block_idx</span> <span class="op">*</span> <span class="ident">BITS</span>;
-                    <span class="ident">block</span> <span class="op">=</span> <span class="ident">next_block</span>;
+            <span class="comment">// go to next block
+            </span><span class="kw">match </span><span class="self">self</span>.remaining_blocks.split_first() {
+                <span class="prelude-val">Some</span>((<span class="kw-2">&amp;</span>next_block, rest)) =&gt; {
+                    <span class="self">self</span>.remaining_blocks = rest;
+                    <span class="self">self</span>.current_block_idx += <span class="number">1</span>;
+                    idx = <span class="self">self</span>.current_block_idx * BITS;
+                    block = next_block;
                 }
-                <span class="prelude-val">None</span> =&gt; {
-                    <span class="comment">// last block =&gt; done</span>
-                    <span class="kw">return</span> <span class="prelude-val">None</span>;
+                <span class="prelude-val">None </span>=&gt; {
+                    <span class="comment">// last block =&gt; done
+                    </span><span class="kw">return </span><span class="prelude-val">None</span>;
                 }
             }
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">FixedBitSet</span>
+<span class="kw">impl </span>Clone <span class="kw">for </span>FixedBitSet
 {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>
-    {
-        <span class="ident">FixedBitSet</span> {
-            <span class="ident">data</span>: <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">clone</span>(),
-            <span class="ident">length</span>: <span class="self">self</span>.<span class="ident">length</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self
+    </span>{
+        FixedBitSet {
+            data: <span class="self">self</span>.data.clone(),
+            length: <span class="self">self</span>.length,
         }
     }
 }
 
-<span class="doccomment">/// Return **true** if the bit is enabled in the bitset,</span>
-<span class="doccomment">/// or **false** otherwise.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note: bits outside the capacity are always disabled, and thus</span>
-<span class="doccomment">/// indexing a FixedBitSet will not panic.</span>
-<span class="kw">impl</span> <span class="ident">Index</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FixedBitSet</span>
+<span class="doccomment">/// Return **true** if the bit is enabled in the bitset,
+/// or **false** otherwise.
+///
+/// Note: bits outside the capacity are always disabled, and thus
+/// indexing a FixedBitSet will not panic.
+</span><span class="kw">impl </span>Index&lt;usize&gt; <span class="kw">for </span>FixedBitSet
 {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">bool</span>;
+    <span class="kw">type </span>Output = bool;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bit</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">bool</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>index(<span class="kw-2">&amp;</span><span class="self">self</span>, bit: usize) -&gt; <span class="kw-2">&amp;</span>bool
     {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">contains</span>(<span class="ident">bit</span>) {
-            <span class="kw-2">&amp;</span><span class="ident">TRUE</span>
-        } <span class="kw">else</span> {
-            <span class="kw-2">&amp;</span><span class="ident">FALSE</span>
+        <span class="kw">if </span><span class="self">self</span>.contains(bit) {
+            <span class="kw-2">&amp;</span>TRUE
+        } <span class="kw">else </span>{
+            <span class="kw-2">&amp;</span>FALSE
         }
     }
 }
 
-<span class="doccomment">/// Sets the bit at index **i** to **true** for each item **i** in the input **src**.</span>
-<span class="kw">impl</span> <span class="ident">Extend</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FixedBitSet</span>
+<span class="doccomment">/// Sets the bit at index **i** to **true** for each item **i** in the input **src**.
+</span><span class="kw">impl </span>Extend&lt;usize&gt; <span class="kw">for </span>FixedBitSet
 {
-    <span class="kw">fn</span> <span class="ident">extend</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">src</span>: <span class="ident">I</span>) {
-        <span class="kw">let</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">src</span>.<span class="ident">into_iter</span>();
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">iter</span> {
-            <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>() {
-                <span class="self">self</span>.<span class="ident">grow</span>(<span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>);
+    <span class="kw">fn </span>extend&lt;I: IntoIterator&lt;Item=usize&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, src: I) {
+        <span class="kw">let </span>iter = src.into_iter();
+        <span class="kw">for </span>i <span class="kw">in </span>iter {
+            <span class="kw">if </span>i &gt;= <span class="self">self</span>.len() {
+                <span class="self">self</span>.grow(i + <span class="number">1</span>);
             }
-            <span class="self">self</span>.<span class="ident">put</span>(<span class="ident">i</span>);
+            <span class="self">self</span>.put(i);
         }
     }
 }
 
-<span class="doccomment">/// Return a FixedBitSet containing bits set to **true** for every bit index in</span>
-<span class="doccomment">/// the iterator, other bits are set to **false**.</span>
-<span class="kw">impl</span> <span class="ident">FromIterator</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">FixedBitSet</span>
+<span class="doccomment">/// Return a FixedBitSet containing bits set to **true** for every bit index in
+/// the iterator, other bits are set to **false**.
+</span><span class="kw">impl </span>FromIterator&lt;usize&gt; <span class="kw">for </span>FixedBitSet
 {
-    <span class="kw">fn</span> <span class="ident">from_iter</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">src</span>: <span class="ident">I</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fbs</span> <span class="op">=</span> <span class="ident">FixedBitSet::with_capacity</span>(<span class="number">0</span>);
-        <span class="ident">fbs</span>.<span class="ident">extend</span>(<span class="ident">src</span>);
-        <span class="ident">fbs</span>
+    <span class="kw">fn </span>from_iter&lt;I: IntoIterator&lt;Item=usize&gt;&gt;(src: I) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>fbs = FixedBitSet::with_capacity(<span class="number">0</span>);
+        fbs.extend(src);
+        fbs
     }
 }
 
-<span class="kw">impl</span> <span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">BitAnd</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">FixedBitSet</span>
+<span class="kw">impl </span>&lt;<span class="lifetime">&#39;a</span>&gt; BitAnd <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>FixedBitSet
 {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">FixedBitSet</span>;
-    <span class="kw">fn</span> <span class="ident">bitand</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">FixedBitSet</span>) -&gt; <span class="ident">FixedBitSet</span> {
-        <span class="kw">let</span> (<span class="ident">short</span>, <span class="ident">long</span>) <span class="op">=</span> {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">len</span>() {
-                (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>, <span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">data</span>)
-            } <span class="kw">else</span> {
-                (<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">data</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>)
+    <span class="kw">type </span>Output = FixedBitSet;
+    <span class="kw">fn </span>bitand(<span class="self">self</span>, other: <span class="kw-2">&amp;</span>FixedBitSet) -&gt; FixedBitSet {
+        <span class="kw">let </span>(short, long) = {
+            <span class="kw">if </span><span class="self">self</span>.len() &lt;= other.len() {
+                (<span class="kw-2">&amp;</span><span class="self">self</span>.data, <span class="kw-2">&amp;</span>other.data)
+            } <span class="kw">else </span>{
+                (<span class="kw-2">&amp;</span>other.data, <span class="kw-2">&amp;</span><span class="self">self</span>.data)
             }
         };
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">short</span>.<span class="ident">clone</span>();
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="kw-2">&amp;</span><span class="ident">block</span>) <span class="kw">in</span> <span class="ident">long</span>.<span class="ident">iter</span>().<span class="ident">take</span>(<span class="ident">short</span>.<span class="ident">len</span>()).<span class="ident">enumerate</span>() {
-            <span class="ident">data</span>[<span class="ident">i</span>] <span class="op">&amp;=</span> <span class="ident">block</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>data = short.clone();
+        <span class="kw">for </span>(i, <span class="kw-2">&amp;</span>block) <span class="kw">in </span>long.iter().take(short.len()).enumerate() {
+            data[i] &amp;= block;
         }
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">std::cmp::min</span>(<span class="self">self</span>.<span class="ident">len</span>(), <span class="ident">other</span>.<span class="ident">len</span>());
-        <span class="ident">FixedBitSet</span>{<span class="ident">data</span>: <span class="ident">data</span>, <span class="ident">length</span>: <span class="ident">len</span>}
+        <span class="kw">let </span>len = std::cmp::min(<span class="self">self</span>.len(), other.len());
+        FixedBitSet{data: data, length: len}
     }
 }
 
-<span class="kw">impl</span> <span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">BitOr</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">FixedBitSet</span>
+<span class="kw">impl </span>&lt;<span class="lifetime">&#39;a</span>&gt; BitOr <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>FixedBitSet
 {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">FixedBitSet</span>;
-    <span class="kw">fn</span> <span class="ident">bitor</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">FixedBitSet</span>) -&gt; <span class="ident">FixedBitSet</span> {
-        <span class="kw">let</span> (<span class="ident">short</span>, <span class="ident">long</span>) <span class="op">=</span> {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">len</span>() {
-                (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>, <span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">data</span>)
-            } <span class="kw">else</span> {
-                (<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">data</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>)
+    <span class="kw">type </span>Output = FixedBitSet;
+    <span class="kw">fn </span>bitor(<span class="self">self</span>, other: <span class="kw-2">&amp;</span>FixedBitSet) -&gt; FixedBitSet {
+        <span class="kw">let </span>(short, long) = {
+            <span class="kw">if </span><span class="self">self</span>.len() &lt;= other.len() {
+                (<span class="kw-2">&amp;</span><span class="self">self</span>.data, <span class="kw-2">&amp;</span>other.data)
+            } <span class="kw">else </span>{
+                (<span class="kw-2">&amp;</span>other.data, <span class="kw-2">&amp;</span><span class="self">self</span>.data)
             }
         };
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">long</span>.<span class="ident">clone</span>();
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="kw-2">&amp;</span><span class="ident">block</span>) <span class="kw">in</span> <span class="ident">short</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="ident">data</span>[<span class="ident">i</span>] <span class="op">|</span><span class="op">=</span> <span class="ident">block</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>data = long.clone();
+        <span class="kw">for </span>(i, <span class="kw-2">&amp;</span>block) <span class="kw">in </span>short.iter().enumerate() {
+            data[i] |= block;
         }
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">std::cmp::max</span>(<span class="self">self</span>.<span class="ident">len</span>(), <span class="ident">other</span>.<span class="ident">len</span>());
-        <span class="ident">FixedBitSet</span>{<span class="ident">data</span>: <span class="ident">data</span>, <span class="ident">length</span>: <span class="ident">len</span>}
+        <span class="kw">let </span>len = std::cmp::max(<span class="self">self</span>.len(), other.len());
+        FixedBitSet{data: data, length: len}
     }
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">it_works</span>() {
-    <span class="kw">const</span> <span class="ident">N</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">50</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fb</span> <span class="op">=</span> <span class="ident">FixedBitSet::with_capacity</span>(<span class="ident">N</span>);
-    <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">fb</span>);
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>it_works() {
+    <span class="kw">const </span>N: usize = <span class="number">50</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>fb = FixedBitSet::with_capacity(N);
+    <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, fb);
 
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..(<span class="ident">N</span> <span class="op">+</span> <span class="number">10</span>) {
-        <span class="macro">assert_eq!</span>(<span class="ident">fb</span>.<span class="ident">contains</span>(<span class="ident">i</span>), <span class="bool-val">false</span>);
+    <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..(N + <span class="number">10</span>) {
+        <span class="macro">assert_eq!</span>(fb.contains(i), <span class="bool-val">false</span>);
     }
 
-    <span class="ident">fb</span>.<span class="ident">insert</span>(<span class="number">10</span>);
-    <span class="ident">fb</span>.<span class="ident">set</span>(<span class="number">11</span>, <span class="bool-val">false</span>);
-    <span class="ident">fb</span>.<span class="ident">set</span>(<span class="number">12</span>, <span class="bool-val">false</span>);
-    <span class="ident">fb</span>.<span class="ident">set</span>(<span class="number">12</span>, <span class="bool-val">true</span>);
-    <span class="ident">fb</span>.<span class="ident">set</span>(<span class="ident">N</span><span class="op">-</span><span class="number">1</span>, <span class="bool-val">true</span>);
-    <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">fb</span>);
-    <span class="macro">assert!</span>(<span class="ident">fb</span>.<span class="ident">contains</span>(<span class="number">10</span>));
-    <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">fb</span>.<span class="ident">contains</span>(<span class="number">11</span>));
-    <span class="macro">assert!</span>(<span class="ident">fb</span>.<span class="ident">contains</span>(<span class="number">12</span>));
-    <span class="macro">assert!</span>(<span class="ident">fb</span>.<span class="ident">contains</span>(<span class="ident">N</span><span class="op">-</span><span class="number">1</span>));
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">N</span> {
-        <span class="kw">let</span> <span class="ident">contain</span> <span class="op">=</span> <span class="ident">i</span> <span class="op">==</span> <span class="number">10</span> <span class="op">|</span><span class="op">|</span> <span class="ident">i</span> <span class="op">==</span> <span class="number">12</span> <span class="op">|</span><span class="op">|</span> <span class="ident">i</span> <span class="op">==</span> <span class="ident">N</span> <span class="op">-</span> <span class="number">1</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">contain</span>, <span class="ident">fb</span>[<span class="ident">i</span>]);
+    fb.insert(<span class="number">10</span>);
+    fb.set(<span class="number">11</span>, <span class="bool-val">false</span>);
+    fb.set(<span class="number">12</span>, <span class="bool-val">false</span>);
+    fb.set(<span class="number">12</span>, <span class="bool-val">true</span>);
+    fb.set(N-<span class="number">1</span>, <span class="bool-val">true</span>);
+    <span class="macro">println!</span>(<span class="string">&quot;{:?}&quot;</span>, fb);
+    <span class="macro">assert!</span>(fb.contains(<span class="number">10</span>));
+    <span class="macro">assert!</span>(!fb.contains(<span class="number">11</span>));
+    <span class="macro">assert!</span>(fb.contains(<span class="number">12</span>));
+    <span class="macro">assert!</span>(fb.contains(N-<span class="number">1</span>));
+    <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..N {
+        <span class="kw">let </span>contain = i == <span class="number">10 </span>|| i == <span class="number">12 </span>|| i == N - <span class="number">1</span>;
+        <span class="macro">assert_eq!</span>(contain, fb[i]);
     }
 
-    <span class="ident">fb</span>.<span class="ident">clear</span>();
+    fb.clear();
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">grow</span>() {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fb</span> <span class="op">=</span> <span class="ident">FixedBitSet::with_capacity</span>(<span class="number">48</span>);
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">fb</span>.<span class="ident">len</span>() {
-        <span class="ident">fb</span>.<span class="ident">set</span>(<span class="ident">i</span>, <span class="bool-val">true</span>);
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>grow() {
+    <span class="kw">let </span><span class="kw-2">mut </span>fb = FixedBitSet::with_capacity(<span class="number">48</span>);
+    <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..fb.len() {
+        fb.set(i, <span class="bool-val">true</span>);
     }
 
-    <span class="kw">let</span> <span class="ident">old_len</span> <span class="op">=</span> <span class="ident">fb</span>.<span class="ident">len</span>();
-    <span class="ident">fb</span>.<span class="ident">grow</span>(<span class="number">72</span>);
-    <span class="kw">for</span> <span class="ident">j</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">fb</span>.<span class="ident">len</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">fb</span>.<span class="ident">contains</span>(<span class="ident">j</span>), <span class="ident">j</span> <span class="op">&lt;</span> <span class="ident">old_len</span>);
+    <span class="kw">let </span>old_len = fb.len();
+    fb.grow(<span class="number">72</span>);
+    <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..fb.len() {
+        <span class="macro">assert_eq!</span>(fb.contains(j), j &lt; old_len);
     }
-    <span class="ident">fb</span>.<span class="ident">set</span>(<span class="number">64</span>, <span class="bool-val">true</span>);
-    <span class="macro">assert!</span>(<span class="ident">fb</span>.<span class="ident">contains</span>(<span class="number">64</span>));
+    fb.set(<span class="number">64</span>, <span class="bool-val">true</span>);
+    <span class="macro">assert!</span>(fb.contains(<span class="number">64</span>));
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">copy_bit</span>() {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fb</span> <span class="op">=</span> <span class="ident">FixedBitSet::with_capacity</span>(<span class="number">48</span>);
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">fb</span>.<span class="ident">len</span>() {
-        <span class="ident">fb</span>.<span class="ident">set</span>(<span class="ident">i</span>, <span class="bool-val">true</span>);
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>copy_bit() {
+    <span class="kw">let </span><span class="kw-2">mut </span>fb = FixedBitSet::with_capacity(<span class="number">48</span>);
+    <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..fb.len() {
+        fb.set(i, <span class="bool-val">true</span>);
     }
-    <span class="ident">fb</span>.<span class="ident">set</span>(<span class="number">42</span>, <span class="bool-val">false</span>);
-    <span class="ident">fb</span>.<span class="ident">copy_bit</span>(<span class="number">42</span>, <span class="number">2</span>);
-    <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">fb</span>.<span class="ident">contains</span>(<span class="number">42</span>));
-    <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">fb</span>.<span class="ident">contains</span>(<span class="number">2</span>));
-    <span class="macro">assert!</span>(<span class="ident">fb</span>.<span class="ident">contains</span>(<span class="number">1</span>));
-    <span class="ident">fb</span>.<span class="ident">copy_bit</span>(<span class="number">1</span>, <span class="number">42</span>);
-    <span class="macro">assert!</span>(<span class="ident">fb</span>.<span class="ident">contains</span>(<span class="number">42</span>));
-    <span class="ident">fb</span>.<span class="ident">copy_bit</span>(<span class="number">1024</span>, <span class="number">42</span>);
-    <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">fb</span>[<span class="number">42</span>]);
+    fb.set(<span class="number">42</span>, <span class="bool-val">false</span>);
+    fb.copy_bit(<span class="number">42</span>, <span class="number">2</span>);
+    <span class="macro">assert!</span>(!fb.contains(<span class="number">42</span>));
+    <span class="macro">assert!</span>(!fb.contains(<span class="number">2</span>));
+    <span class="macro">assert!</span>(fb.contains(<span class="number">1</span>));
+    fb.copy_bit(<span class="number">1</span>, <span class="number">42</span>);
+    <span class="macro">assert!</span>(fb.contains(<span class="number">42</span>));
+    fb.copy_bit(<span class="number">1024</span>, <span class="number">42</span>);
+    <span class="macro">assert!</span>(!fb[<span class="number">42</span>]);
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">count_ones</span>() {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fb</span> <span class="op">=</span> <span class="ident">FixedBitSet::with_capacity</span>(<span class="number">100</span>);
-    <span class="ident">fb</span>.<span class="ident">set</span>(<span class="number">11</span>, <span class="bool-val">true</span>);
-    <span class="ident">fb</span>.<span class="ident">set</span>(<span class="number">12</span>, <span class="bool-val">true</span>);
-    <span class="ident">fb</span>.<span class="ident">set</span>(<span class="number">7</span>, <span class="bool-val">true</span>);
-    <span class="ident">fb</span>.<span class="ident">set</span>(<span class="number">35</span>, <span class="bool-val">true</span>);
-    <span class="ident">fb</span>.<span class="ident">set</span>(<span class="number">40</span>, <span class="bool-val">true</span>);
-    <span class="ident">fb</span>.<span class="ident">set</span>(<span class="number">77</span>, <span class="bool-val">true</span>);
-    <span class="ident">fb</span>.<span class="ident">set</span>(<span class="number">95</span>, <span class="bool-val">true</span>);
-    <span class="ident">fb</span>.<span class="ident">set</span>(<span class="number">50</span>, <span class="bool-val">true</span>);
-    <span class="ident">fb</span>.<span class="ident">set</span>(<span class="number">99</span>, <span class="bool-val">true</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">fb</span>.<span class="ident">count_ones</span>(..<span class="number">7</span>), <span class="number">0</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">fb</span>.<span class="ident">count_ones</span>(..<span class="number">8</span>), <span class="number">1</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">fb</span>.<span class="ident">count_ones</span>(..<span class="number">11</span>), <span class="number">1</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">fb</span>.<span class="ident">count_ones</span>(..<span class="number">12</span>), <span class="number">2</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">fb</span>.<span class="ident">count_ones</span>(..<span class="number">13</span>), <span class="number">3</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">fb</span>.<span class="ident">count_ones</span>(..<span class="number">35</span>), <span class="number">3</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">fb</span>.<span class="ident">count_ones</span>(..<span class="number">36</span>), <span class="number">4</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">fb</span>.<span class="ident">count_ones</span>(..<span class="number">40</span>), <span class="number">4</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">fb</span>.<span class="ident">count_ones</span>(..<span class="number">41</span>), <span class="number">5</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">fb</span>.<span class="ident">count_ones</span>(<span class="number">50</span>..), <span class="number">4</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">fb</span>.<span class="ident">count_ones</span>(<span class="number">70</span>..<span class="number">95</span>), <span class="number">1</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">fb</span>.<span class="ident">count_ones</span>(<span class="number">70</span>..<span class="number">96</span>), <span class="number">2</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">fb</span>.<span class="ident">count_ones</span>(<span class="number">70</span>..<span class="number">99</span>), <span class="number">2</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">fb</span>.<span class="ident">count_ones</span>(..), <span class="number">9</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">fb</span>.<span class="ident">count_ones</span>(<span class="number">0</span>..<span class="number">100</span>), <span class="number">9</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">fb</span>.<span class="ident">count_ones</span>(<span class="number">0</span>..<span class="number">0</span>), <span class="number">0</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">fb</span>.<span class="ident">count_ones</span>(<span class="number">100</span>..<span class="number">100</span>), <span class="number">0</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">fb</span>.<span class="ident">count_ones</span>(<span class="number">7</span>..), <span class="number">9</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">fb</span>.<span class="ident">count_ones</span>(<span class="number">8</span>..), <span class="number">8</span>);
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>count_ones() {
+    <span class="kw">let </span><span class="kw-2">mut </span>fb = FixedBitSet::with_capacity(<span class="number">100</span>);
+    fb.set(<span class="number">11</span>, <span class="bool-val">true</span>);
+    fb.set(<span class="number">12</span>, <span class="bool-val">true</span>);
+    fb.set(<span class="number">7</span>, <span class="bool-val">true</span>);
+    fb.set(<span class="number">35</span>, <span class="bool-val">true</span>);
+    fb.set(<span class="number">40</span>, <span class="bool-val">true</span>);
+    fb.set(<span class="number">77</span>, <span class="bool-val">true</span>);
+    fb.set(<span class="number">95</span>, <span class="bool-val">true</span>);
+    fb.set(<span class="number">50</span>, <span class="bool-val">true</span>);
+    fb.set(<span class="number">99</span>, <span class="bool-val">true</span>);
+    <span class="macro">assert_eq!</span>(fb.count_ones(..<span class="number">7</span>), <span class="number">0</span>);
+    <span class="macro">assert_eq!</span>(fb.count_ones(..<span class="number">8</span>), <span class="number">1</span>);
+    <span class="macro">assert_eq!</span>(fb.count_ones(..<span class="number">11</span>), <span class="number">1</span>);
+    <span class="macro">assert_eq!</span>(fb.count_ones(..<span class="number">12</span>), <span class="number">2</span>);
+    <span class="macro">assert_eq!</span>(fb.count_ones(..<span class="number">13</span>), <span class="number">3</span>);
+    <span class="macro">assert_eq!</span>(fb.count_ones(..<span class="number">35</span>), <span class="number">3</span>);
+    <span class="macro">assert_eq!</span>(fb.count_ones(..<span class="number">36</span>), <span class="number">4</span>);
+    <span class="macro">assert_eq!</span>(fb.count_ones(..<span class="number">40</span>), <span class="number">4</span>);
+    <span class="macro">assert_eq!</span>(fb.count_ones(..<span class="number">41</span>), <span class="number">5</span>);
+    <span class="macro">assert_eq!</span>(fb.count_ones(<span class="number">50</span>..), <span class="number">4</span>);
+    <span class="macro">assert_eq!</span>(fb.count_ones(<span class="number">70</span>..<span class="number">95</span>), <span class="number">1</span>);
+    <span class="macro">assert_eq!</span>(fb.count_ones(<span class="number">70</span>..<span class="number">96</span>), <span class="number">2</span>);
+    <span class="macro">assert_eq!</span>(fb.count_ones(<span class="number">70</span>..<span class="number">99</span>), <span class="number">2</span>);
+    <span class="macro">assert_eq!</span>(fb.count_ones(..), <span class="number">9</span>);
+    <span class="macro">assert_eq!</span>(fb.count_ones(<span class="number">0</span>..<span class="number">100</span>), <span class="number">9</span>);
+    <span class="macro">assert_eq!</span>(fb.count_ones(<span class="number">0</span>..<span class="number">0</span>), <span class="number">0</span>);
+    <span class="macro">assert_eq!</span>(fb.count_ones(<span class="number">100</span>..<span class="number">100</span>), <span class="number">0</span>);
+    <span class="macro">assert_eq!</span>(fb.count_ones(<span class="number">7</span>..), <span class="number">9</span>);
+    <span class="macro">assert_eq!</span>(fb.count_ones(<span class="number">8</span>..), <span class="number">8</span>);
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">ones</span>() {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fb</span> <span class="op">=</span> <span class="ident">FixedBitSet::with_capacity</span>(<span class="number">100</span>);
-    <span class="ident">fb</span>.<span class="ident">set</span>(<span class="number">11</span>, <span class="bool-val">true</span>);
-    <span class="ident">fb</span>.<span class="ident">set</span>(<span class="number">12</span>, <span class="bool-val">true</span>);
-    <span class="ident">fb</span>.<span class="ident">set</span>(<span class="number">7</span>, <span class="bool-val">true</span>);
-    <span class="ident">fb</span>.<span class="ident">set</span>(<span class="number">35</span>, <span class="bool-val">true</span>);
-    <span class="ident">fb</span>.<span class="ident">set</span>(<span class="number">40</span>, <span class="bool-val">true</span>);
-    <span class="ident">fb</span>.<span class="ident">set</span>(<span class="number">77</span>, <span class="bool-val">true</span>);
-    <span class="ident">fb</span>.<span class="ident">set</span>(<span class="number">95</span>, <span class="bool-val">true</span>);
-    <span class="ident">fb</span>.<span class="ident">set</span>(<span class="number">50</span>, <span class="bool-val">true</span>);
-    <span class="ident">fb</span>.<span class="ident">set</span>(<span class="number">99</span>, <span class="bool-val">true</span>);
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>ones() {
+    <span class="kw">let </span><span class="kw-2">mut </span>fb = FixedBitSet::with_capacity(<span class="number">100</span>);
+    fb.set(<span class="number">11</span>, <span class="bool-val">true</span>);
+    fb.set(<span class="number">12</span>, <span class="bool-val">true</span>);
+    fb.set(<span class="number">7</span>, <span class="bool-val">true</span>);
+    fb.set(<span class="number">35</span>, <span class="bool-val">true</span>);
+    fb.set(<span class="number">40</span>, <span class="bool-val">true</span>);
+    fb.set(<span class="number">77</span>, <span class="bool-val">true</span>);
+    fb.set(<span class="number">95</span>, <span class="bool-val">true</span>);
+    fb.set(<span class="number">50</span>, <span class="bool-val">true</span>);
+    fb.set(<span class="number">99</span>, <span class="bool-val">true</span>);
 
-    <span class="kw">let</span> <span class="ident">ones</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">fb</span>.<span class="ident">ones</span>().<span class="ident">collect</span>();
+    <span class="kw">let </span>ones: Vec&lt;<span class="kw">_</span>&gt; = fb.ones().collect();
 
-    <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[<span class="number">7</span>, <span class="number">11</span>, <span class="number">12</span>, <span class="number">35</span>, <span class="number">40</span>, <span class="number">50</span>, <span class="number">77</span>, <span class="number">95</span>, <span class="number">99</span>], <span class="ident">ones</span>);
+    <span class="macro">assert_eq!</span>(<span class="macro">vec!</span>[<span class="number">7</span>, <span class="number">11</span>, <span class="number">12</span>, <span class="number">35</span>, <span class="number">40</span>, <span class="number">50</span>, <span class="number">77</span>, <span class="number">95</span>, <span class="number">99</span>], ones);
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">iter_ones_range</span>() {
-    <span class="kw">fn</span> <span class="ident">test_range</span>(<span class="ident">from</span>: <span class="ident">usize</span>, <span class="ident">to</span>: <span class="ident">usize</span>, <span class="ident">capa</span>: <span class="ident">usize</span>) {
-        <span class="macro">assert!</span>(<span class="ident">to</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">capa</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fb</span> <span class="op">=</span> <span class="ident">FixedBitSet::with_capacity</span>(<span class="ident">capa</span>);
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">from</span>..<span class="ident">to</span> {
-            <span class="ident">fb</span>.<span class="ident">insert</span>(<span class="ident">i</span>);
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>iter_ones_range() {
+    <span class="kw">fn </span>test_range(from: usize, to: usize, capa: usize) {
+        <span class="macro">assert!</span>(to &lt;= capa);
+        <span class="kw">let </span><span class="kw-2">mut </span>fb = FixedBitSet::with_capacity(capa);
+        <span class="kw">for </span>i <span class="kw">in </span>from..to {
+            fb.insert(i);
         }
-        <span class="kw">let</span> <span class="ident">ones</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">fb</span>.<span class="ident">ones</span>().<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="ident">expected</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> (<span class="ident">from</span>..<span class="ident">to</span>).<span class="ident">collect</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">expected</span>, <span class="ident">ones</span>);
+        <span class="kw">let </span>ones: Vec&lt;<span class="kw">_</span>&gt; = fb.ones().collect();
+        <span class="kw">let </span>expected: Vec&lt;<span class="kw">_</span>&gt; = (from..to).collect();
+        <span class="macro">assert_eq!</span>(expected, ones);
     }
 
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">100</span> {
-      <span class="ident">test_range</span>(<span class="ident">i</span>, <span class="number">100</span>, <span class="number">100</span>);
-      <span class="ident">test_range</span>(<span class="number">0</span>, <span class="ident">i</span>, <span class="number">100</span>);
+    <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">100 </span>{
+      test_range(i, <span class="number">100</span>, <span class="number">100</span>);
+      test_range(<span class="number">0</span>, i, <span class="number">100</span>);
     }
 }
 
-<span class="attribute">#[<span class="ident">should_panic</span>]</span>
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">count_ones_oob</span>() {
-    <span class="kw">let</span> <span class="ident">fb</span> <span class="op">=</span> <span class="ident">FixedBitSet::with_capacity</span>(<span class="number">100</span>);
-    <span class="ident">fb</span>.<span class="ident">count_ones</span>(<span class="number">90</span>..<span class="number">101</span>);
+<span class="attribute">#[should_panic]
+#[test]
+</span><span class="kw">fn </span>count_ones_oob() {
+    <span class="kw">let </span>fb = FixedBitSet::with_capacity(<span class="number">100</span>);
+    fb.count_ones(<span class="number">90</span>..<span class="number">101</span>);
 }
 
-<span class="attribute">#[<span class="ident">should_panic</span>]</span>
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">count_ones_negative_range</span>() {
-    <span class="kw">let</span> <span class="ident">fb</span> <span class="op">=</span> <span class="ident">FixedBitSet::with_capacity</span>(<span class="number">100</span>);
-    <span class="ident">fb</span>.<span class="ident">count_ones</span>(<span class="number">90</span>..<span class="number">80</span>);
+<span class="attribute">#[should_panic]
+#[test]
+</span><span class="kw">fn </span>count_ones_negative_range() {
+    <span class="kw">let </span>fb = FixedBitSet::with_capacity(<span class="number">100</span>);
+    fb.count_ones(<span class="number">90</span>..<span class="number">80</span>);
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">count_ones_panic</span>() {
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">1</span>..<span class="number">128</span> {
-        <span class="kw">let</span> <span class="ident">fb</span> <span class="op">=</span> <span class="ident">FixedBitSet::with_capacity</span>(<span class="ident">i</span>);
-        <span class="kw">for</span> <span class="ident">j</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">fb</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span> {
-            <span class="kw">for</span> <span class="ident">k</span> <span class="kw">in</span> <span class="ident">j</span>..<span class="ident">fb</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="number">1</span> {
-                <span class="macro">assert_eq!</span>(<span class="ident">fb</span>.<span class="ident">count_ones</span>(<span class="ident">j</span>..<span class="ident">k</span>), <span class="number">0</span>);
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>count_ones_panic() {
+    <span class="kw">for </span>i <span class="kw">in </span><span class="number">1</span>..<span class="number">128 </span>{
+        <span class="kw">let </span>fb = FixedBitSet::with_capacity(i);
+        <span class="kw">for </span>j <span class="kw">in </span><span class="number">0</span>..fb.len() + <span class="number">1 </span>{
+            <span class="kw">for </span>k <span class="kw">in </span>j..fb.len() + <span class="number">1 </span>{
+                <span class="macro">assert_eq!</span>(fb.count_ones(j..k), <span class="number">0</span>);
             }
         }
     }
 }
 
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">default</span>() {
-    <span class="kw">let</span> <span class="ident">fb</span> <span class="op">=</span> <span class="ident">FixedBitSet::default</span>();
-    <span class="macro">assert_eq!</span>(<span class="ident">fb</span>.<span class="ident">len</span>(), <span class="number">0</span>);
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>default() {
+    <span class="kw">let </span>fb = FixedBitSet::default();
+    <span class="macro">assert_eq!</span>(fb.len(), <span class="number">0</span>);
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">insert_range</span>() {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fb</span> <span class="op">=</span> <span class="ident">FixedBitSet::with_capacity</span>(<span class="number">97</span>);
-    <span class="ident">fb</span>.<span class="ident">insert_range</span>(..<span class="number">3</span>);
-    <span class="ident">fb</span>.<span class="ident">insert_range</span>(<span class="number">9</span>..<span class="number">32</span>);
-    <span class="ident">fb</span>.<span class="ident">insert_range</span>(<span class="number">37</span>..<span class="number">81</span>);
-    <span class="ident">fb</span>.<span class="ident">insert_range</span>(<span class="number">90</span>..);
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">97</span> {
-        <span class="macro">assert_eq!</span>(<span class="ident">fb</span>.<span class="ident">contains</span>(<span class="ident">i</span>), <span class="ident">i</span><span class="op">&lt;</span><span class="number">3</span> <span class="op">|</span><span class="op">|</span> <span class="number">9</span><span class="op">&lt;</span><span class="op">=</span><span class="ident">i</span><span class="op">&amp;&amp;</span><span class="ident">i</span><span class="op">&lt;</span><span class="number">32</span> <span class="op">|</span><span class="op">|</span> <span class="number">37</span><span class="op">&lt;</span><span class="op">=</span><span class="ident">i</span><span class="op">&amp;&amp;</span><span class="ident">i</span><span class="op">&lt;</span><span class="number">81</span> <span class="op">|</span><span class="op">|</span> <span class="number">90</span><span class="op">&lt;</span><span class="op">=</span><span class="ident">i</span>);
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>insert_range() {
+    <span class="kw">let </span><span class="kw-2">mut </span>fb = FixedBitSet::with_capacity(<span class="number">97</span>);
+    fb.insert_range(..<span class="number">3</span>);
+    fb.insert_range(<span class="number">9</span>..<span class="number">32</span>);
+    fb.insert_range(<span class="number">37</span>..<span class="number">81</span>);
+    fb.insert_range(<span class="number">90</span>..);
+    <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">97 </span>{
+        <span class="macro">assert_eq!</span>(fb.contains(i), i&lt;<span class="number">3 </span>|| <span class="number">9</span>&lt;=i&amp;&amp;i&lt;<span class="number">32 </span>|| <span class="number">37</span>&lt;=i&amp;&amp;i&lt;<span class="number">81 </span>|| <span class="number">90</span>&lt;=i);
     }
-    <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">fb</span>.<span class="ident">contains</span>(<span class="number">97</span>));
-    <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">fb</span>.<span class="ident">contains</span>(<span class="number">127</span>));
-    <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">fb</span>.<span class="ident">contains</span>(<span class="number">128</span>));
+    <span class="macro">assert!</span>(!fb.contains(<span class="number">97</span>));
+    <span class="macro">assert!</span>(!fb.contains(<span class="number">127</span>));
+    <span class="macro">assert!</span>(!fb.contains(<span class="number">128</span>));
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">set_range</span>() {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fb</span> <span class="op">=</span> <span class="ident">FixedBitSet::with_capacity</span>(<span class="number">48</span>);
-    <span class="ident">fb</span>.<span class="ident">insert_range</span>(..);
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>set_range() {
+    <span class="kw">let </span><span class="kw-2">mut </span>fb = FixedBitSet::with_capacity(<span class="number">48</span>);
+    fb.insert_range(..);
 
-    <span class="ident">fb</span>.<span class="ident">set_range</span>(..<span class="number">32</span>, <span class="bool-val">false</span>);
-    <span class="ident">fb</span>.<span class="ident">set_range</span>(<span class="number">37</span>.., <span class="bool-val">false</span>);
-    <span class="ident">fb</span>.<span class="ident">set_range</span>(<span class="number">5</span>..<span class="number">9</span>, <span class="bool-val">true</span>);
-    <span class="ident">fb</span>.<span class="ident">set_range</span>(<span class="number">40</span>..<span class="number">40</span>, <span class="bool-val">true</span>);
+    fb.set_range(..<span class="number">32</span>, <span class="bool-val">false</span>);
+    fb.set_range(<span class="number">37</span>.., <span class="bool-val">false</span>);
+    fb.set_range(<span class="number">5</span>..<span class="number">9</span>, <span class="bool-val">true</span>);
+    fb.set_range(<span class="number">40</span>..<span class="number">40</span>, <span class="bool-val">true</span>);
 
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">48</span> {
-        <span class="macro">assert_eq!</span>(<span class="ident">fb</span>.<span class="ident">contains</span>(<span class="ident">i</span>), <span class="number">5</span><span class="op">&lt;</span><span class="op">=</span><span class="ident">i</span><span class="op">&amp;&amp;</span><span class="ident">i</span><span class="op">&lt;</span><span class="number">9</span> <span class="op">|</span><span class="op">|</span> <span class="number">32</span><span class="op">&lt;</span><span class="op">=</span><span class="ident">i</span><span class="op">&amp;&amp;</span><span class="ident">i</span><span class="op">&lt;</span><span class="number">37</span>);
+    <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">48 </span>{
+        <span class="macro">assert_eq!</span>(fb.contains(i), <span class="number">5</span>&lt;=i&amp;&amp;i&lt;<span class="number">9 </span>|| <span class="number">32</span>&lt;=i&amp;&amp;i&lt;<span class="number">37</span>);
     }
-    <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">fb</span>.<span class="ident">contains</span>(<span class="number">48</span>));
-    <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">fb</span>.<span class="ident">contains</span>(<span class="number">64</span>));
+    <span class="macro">assert!</span>(!fb.contains(<span class="number">48</span>));
+    <span class="macro">assert!</span>(!fb.contains(<span class="number">64</span>));
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">bitand_equal_lengths</span>() {
-    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="number">109</span>;
-    <span class="kw">let</span> <span class="ident">a_end</span> <span class="op">=</span> <span class="number">59</span>;
-    <span class="kw">let</span> <span class="ident">b_start</span> <span class="op">=</span> <span class="number">23</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">FixedBitSet::with_capacity</span>(<span class="ident">len</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">FixedBitSet::with_capacity</span>(<span class="ident">len</span>);
-    <span class="ident">a</span>.<span class="ident">set_range</span>(..<span class="ident">a_end</span>, <span class="bool-val">true</span>);
-    <span class="ident">b</span>.<span class="ident">set_range</span>(<span class="ident">b_start</span>.., <span class="bool-val">true</span>);
-    <span class="kw">let</span> <span class="ident">ab</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">a</span> <span class="op">&amp;</span> <span class="kw-2">&amp;</span><span class="ident">b</span>;
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">b_start</span> {
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">ab</span>.<span class="ident">contains</span>(<span class="ident">i</span>));
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>bitand_equal_lengths() {
+    <span class="kw">let </span>len = <span class="number">109</span>;
+    <span class="kw">let </span>a_end = <span class="number">59</span>;
+    <span class="kw">let </span>b_start = <span class="number">23</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>a = FixedBitSet::with_capacity(len);
+    <span class="kw">let </span><span class="kw-2">mut </span>b = FixedBitSet::with_capacity(len);
+    a.set_range(..a_end, <span class="bool-val">true</span>);
+    b.set_range(b_start.., <span class="bool-val">true</span>);
+    <span class="kw">let </span>ab = <span class="kw-2">&amp;</span>a &amp; <span class="kw-2">&amp;</span>b;
+    <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..b_start {
+        <span class="macro">assert!</span>(!ab.contains(i));
     }
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">b_start</span>..<span class="ident">a_end</span> {
-        <span class="macro">assert!</span>(<span class="ident">ab</span>.<span class="ident">contains</span>(<span class="ident">i</span>));
+    <span class="kw">for </span>i <span class="kw">in </span>b_start..a_end {
+        <span class="macro">assert!</span>(ab.contains(i));
     }
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">a_end</span>..<span class="ident">len</span> {
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">ab</span>.<span class="ident">contains</span>(<span class="ident">i</span>));
+    <span class="kw">for </span>i <span class="kw">in </span>a_end..len {
+        <span class="macro">assert!</span>(!ab.contains(i));
     }
-    <span class="macro">assert_eq!</span>(<span class="ident">a</span>.<span class="ident">len</span>(), <span class="ident">ab</span>.<span class="ident">len</span>());
+    <span class="macro">assert_eq!</span>(a.len(), ab.len());
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">bitand_first_smaller</span>() {
-    <span class="kw">let</span> <span class="ident">a_len</span> <span class="op">=</span> <span class="number">113</span>;
-    <span class="kw">let</span> <span class="ident">b_len</span> <span class="op">=</span> <span class="number">137</span>;
-    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">std::cmp::min</span>(<span class="ident">a_len</span>, <span class="ident">b_len</span>);
-    <span class="kw">let</span> <span class="ident">a_end</span> <span class="op">=</span> <span class="number">97</span>;
-    <span class="kw">let</span> <span class="ident">b_start</span> <span class="op">=</span> <span class="number">89</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">FixedBitSet::with_capacity</span>(<span class="ident">a_len</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">FixedBitSet::with_capacity</span>(<span class="ident">b_len</span>);
-    <span class="ident">a</span>.<span class="ident">set_range</span>(..<span class="ident">a_end</span>, <span class="bool-val">true</span>);
-    <span class="ident">b</span>.<span class="ident">set_range</span>(<span class="ident">b_start</span>.., <span class="bool-val">true</span>);
-    <span class="kw">let</span> <span class="ident">ab</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">a</span> <span class="op">&amp;</span> <span class="kw-2">&amp;</span><span class="ident">b</span>;
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">b_start</span> {
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">ab</span>.<span class="ident">contains</span>(<span class="ident">i</span>));
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>bitand_first_smaller() {
+    <span class="kw">let </span>a_len = <span class="number">113</span>;
+    <span class="kw">let </span>b_len = <span class="number">137</span>;
+    <span class="kw">let </span>len = std::cmp::min(a_len, b_len);
+    <span class="kw">let </span>a_end = <span class="number">97</span>;
+    <span class="kw">let </span>b_start = <span class="number">89</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>a = FixedBitSet::with_capacity(a_len);
+    <span class="kw">let </span><span class="kw-2">mut </span>b = FixedBitSet::with_capacity(b_len);
+    a.set_range(..a_end, <span class="bool-val">true</span>);
+    b.set_range(b_start.., <span class="bool-val">true</span>);
+    <span class="kw">let </span>ab = <span class="kw-2">&amp;</span>a &amp; <span class="kw-2">&amp;</span>b;
+    <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..b_start {
+        <span class="macro">assert!</span>(!ab.contains(i));
     }
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">b_start</span>..<span class="ident">a_end</span> {
-        <span class="macro">assert!</span>(<span class="ident">ab</span>.<span class="ident">contains</span>(<span class="ident">i</span>));
+    <span class="kw">for </span>i <span class="kw">in </span>b_start..a_end {
+        <span class="macro">assert!</span>(ab.contains(i));
     }
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">a_end</span>..<span class="ident">len</span> {
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">ab</span>.<span class="ident">contains</span>(<span class="ident">i</span>));
+    <span class="kw">for </span>i <span class="kw">in </span>a_end..len {
+        <span class="macro">assert!</span>(!ab.contains(i));
     }
-    <span class="macro">assert_eq!</span>(<span class="ident">a</span>.<span class="ident">len</span>(), <span class="ident">ab</span>.<span class="ident">len</span>());
+    <span class="macro">assert_eq!</span>(a.len(), ab.len());
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">bitand_first_larger</span>() {
-    <span class="kw">let</span> <span class="ident">a_len</span> <span class="op">=</span> <span class="number">173</span>;
-    <span class="kw">let</span> <span class="ident">b_len</span> <span class="op">=</span> <span class="number">137</span>;
-    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">std::cmp::min</span>(<span class="ident">a_len</span>, <span class="ident">b_len</span>);
-    <span class="kw">let</span> <span class="ident">a_end</span> <span class="op">=</span> <span class="number">107</span>;
-    <span class="kw">let</span> <span class="ident">b_start</span> <span class="op">=</span> <span class="number">43</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">FixedBitSet::with_capacity</span>(<span class="ident">a_len</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">FixedBitSet::with_capacity</span>(<span class="ident">b_len</span>);
-    <span class="ident">a</span>.<span class="ident">set_range</span>(..<span class="ident">a_end</span>, <span class="bool-val">true</span>);
-    <span class="ident">b</span>.<span class="ident">set_range</span>(<span class="ident">b_start</span>.., <span class="bool-val">true</span>);
-    <span class="kw">let</span> <span class="ident">ab</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">a</span> <span class="op">&amp;</span> <span class="kw-2">&amp;</span><span class="ident">b</span>;
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">b_start</span> {
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">ab</span>.<span class="ident">contains</span>(<span class="ident">i</span>));
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>bitand_first_larger() {
+    <span class="kw">let </span>a_len = <span class="number">173</span>;
+    <span class="kw">let </span>b_len = <span class="number">137</span>;
+    <span class="kw">let </span>len = std::cmp::min(a_len, b_len);
+    <span class="kw">let </span>a_end = <span class="number">107</span>;
+    <span class="kw">let </span>b_start = <span class="number">43</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>a = FixedBitSet::with_capacity(a_len);
+    <span class="kw">let </span><span class="kw-2">mut </span>b = FixedBitSet::with_capacity(b_len);
+    a.set_range(..a_end, <span class="bool-val">true</span>);
+    b.set_range(b_start.., <span class="bool-val">true</span>);
+    <span class="kw">let </span>ab = <span class="kw-2">&amp;</span>a &amp; <span class="kw-2">&amp;</span>b;
+    <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..b_start {
+        <span class="macro">assert!</span>(!ab.contains(i));
     }
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">b_start</span>..<span class="ident">a_end</span> {
-        <span class="macro">assert!</span>(<span class="ident">ab</span>.<span class="ident">contains</span>(<span class="ident">i</span>));
+    <span class="kw">for </span>i <span class="kw">in </span>b_start..a_end {
+        <span class="macro">assert!</span>(ab.contains(i));
     }
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">a_end</span>..<span class="ident">len</span> {
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">ab</span>.<span class="ident">contains</span>(<span class="ident">i</span>));
+    <span class="kw">for </span>i <span class="kw">in </span>a_end..len {
+        <span class="macro">assert!</span>(!ab.contains(i));
     }
-    <span class="macro">assert_eq!</span>(<span class="ident">b</span>.<span class="ident">len</span>(), <span class="ident">ab</span>.<span class="ident">len</span>());
+    <span class="macro">assert_eq!</span>(b.len(), ab.len());
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">intersection</span>() {
-    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="number">109</span>;
-    <span class="kw">let</span> <span class="ident">a_end</span> <span class="op">=</span> <span class="number">59</span>;
-    <span class="kw">let</span> <span class="ident">b_start</span> <span class="op">=</span> <span class="number">23</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">FixedBitSet::with_capacity</span>(<span class="ident">len</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">FixedBitSet::with_capacity</span>(<span class="ident">len</span>);
-    <span class="ident">a</span>.<span class="ident">set_range</span>(..<span class="ident">a_end</span>, <span class="bool-val">true</span>);
-    <span class="ident">b</span>.<span class="ident">set_range</span>(<span class="ident">b_start</span>.., <span class="bool-val">true</span>);
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>intersection() {
+    <span class="kw">let </span>len = <span class="number">109</span>;
+    <span class="kw">let </span>a_end = <span class="number">59</span>;
+    <span class="kw">let </span>b_start = <span class="number">23</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>a = FixedBitSet::with_capacity(len);
+    <span class="kw">let </span><span class="kw-2">mut </span>b = FixedBitSet::with_capacity(len);
+    a.set_range(..a_end, <span class="bool-val">true</span>);
+    b.set_range(b_start.., <span class="bool-val">true</span>);
 
-    <span class="kw">let</span> <span class="ident">ab</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">intersection</span>(<span class="kw-2">&amp;</span><span class="ident">b</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">FixedBitSet</span><span class="op">&gt;</span>();
+    <span class="kw">let </span>ab = a.intersection(<span class="kw-2">&amp;</span>b).collect::&lt;FixedBitSet&gt;();
 
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">b_start</span> {
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">ab</span>.<span class="ident">contains</span>(<span class="ident">i</span>));
+    <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..b_start {
+        <span class="macro">assert!</span>(!ab.contains(i));
     }
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">b_start</span>..<span class="ident">a_end</span> {
-        <span class="macro">assert!</span>(<span class="ident">ab</span>.<span class="ident">contains</span>(<span class="ident">i</span>));
+    <span class="kw">for </span>i <span class="kw">in </span>b_start..a_end {
+        <span class="macro">assert!</span>(ab.contains(i));
     }
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">a_end</span>..<span class="ident">len</span> {
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">ab</span>.<span class="ident">contains</span>(<span class="ident">i</span>));
-    }
-}
-
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">union</span>() {
-    <span class="kw">let</span> <span class="ident">a_len</span> <span class="op">=</span> <span class="number">173</span>;
-    <span class="kw">let</span> <span class="ident">b_len</span> <span class="op">=</span> <span class="number">137</span>;
-    <span class="kw">let</span> <span class="ident">a_start</span> <span class="op">=</span> <span class="number">139</span>;
-    <span class="kw">let</span> <span class="ident">b_end</span> <span class="op">=</span> <span class="number">107</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">FixedBitSet::with_capacity</span>(<span class="ident">a_len</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">FixedBitSet::with_capacity</span>(<span class="ident">b_len</span>);
-    <span class="ident">a</span>.<span class="ident">set_range</span>(<span class="ident">a_start</span>.., <span class="bool-val">true</span>);
-    <span class="ident">b</span>.<span class="ident">set_range</span>(..<span class="ident">b_end</span>, <span class="bool-val">true</span>);
-    <span class="kw">let</span> <span class="ident">ab</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">union</span>(<span class="kw-2">&amp;</span><span class="ident">b</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">FixedBitSet</span><span class="op">&gt;</span>();
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">a_start</span>..<span class="ident">a_len</span> {
-        <span class="macro">assert!</span>(<span class="ident">ab</span>.<span class="ident">contains</span>(<span class="ident">i</span>));
-    }
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">b_end</span> {
-        <span class="macro">assert!</span>(<span class="ident">ab</span>.<span class="ident">contains</span>(<span class="ident">i</span>));
-    }
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">b_end</span>..<span class="ident">a_start</span> {
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">ab</span>.<span class="ident">contains</span>(<span class="ident">i</span>));
+    <span class="kw">for </span>i <span class="kw">in </span>a_end..len {
+        <span class="macro">assert!</span>(!ab.contains(i));
     }
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">difference</span>() {
-    <span class="kw">let</span> <span class="ident">a_len</span> <span class="op">=</span> <span class="number">83</span>;
-    <span class="kw">let</span> <span class="ident">b_len</span> <span class="op">=</span> <span class="number">151</span>;
-    <span class="kw">let</span> <span class="ident">a_start</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">let</span> <span class="ident">a_end</span> <span class="op">=</span> <span class="number">79</span>;
-    <span class="kw">let</span> <span class="ident">b_start</span> <span class="op">=</span> <span class="number">53</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">FixedBitSet::with_capacity</span>(<span class="ident">a_len</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">FixedBitSet::with_capacity</span>(<span class="ident">b_len</span>);
-    <span class="ident">a</span>.<span class="ident">set_range</span>(<span class="ident">a_start</span>..<span class="ident">a_end</span>, <span class="bool-val">true</span>);
-    <span class="ident">b</span>.<span class="ident">set_range</span>(<span class="ident">b_start</span>..<span class="ident">b_len</span>, <span class="bool-val">true</span>);
-    <span class="kw">let</span> <span class="ident">a_diff_b</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">difference</span>(<span class="kw-2">&amp;</span><span class="ident">b</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">FixedBitSet</span><span class="op">&gt;</span>();
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">a_start</span>..<span class="ident">b_start</span> {
-        <span class="macro">assert!</span>(<span class="ident">a_diff_b</span>.<span class="ident">contains</span>(<span class="ident">i</span>));
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>union() {
+    <span class="kw">let </span>a_len = <span class="number">173</span>;
+    <span class="kw">let </span>b_len = <span class="number">137</span>;
+    <span class="kw">let </span>a_start = <span class="number">139</span>;
+    <span class="kw">let </span>b_end = <span class="number">107</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>a = FixedBitSet::with_capacity(a_len);
+    <span class="kw">let </span><span class="kw-2">mut </span>b = FixedBitSet::with_capacity(b_len);
+    a.set_range(a_start.., <span class="bool-val">true</span>);
+    b.set_range(..b_end, <span class="bool-val">true</span>);
+    <span class="kw">let </span>ab = a.union(<span class="kw-2">&amp;</span>b).collect::&lt;FixedBitSet&gt;();
+    <span class="kw">for </span>i <span class="kw">in </span>a_start..a_len {
+        <span class="macro">assert!</span>(ab.contains(i));
     }
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">b_start</span>..<span class="ident">b_len</span> {
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">a_diff_b</span>.<span class="ident">contains</span>(<span class="ident">i</span>));
+    <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..b_end {
+        <span class="macro">assert!</span>(ab.contains(i));
+    }
+    <span class="kw">for </span>i <span class="kw">in </span>b_end..a_start {
+        <span class="macro">assert!</span>(!ab.contains(i));
     }
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">bitor_equal_lengths</span>() {
-    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="number">109</span>;
-    <span class="kw">let</span> <span class="ident">a_start</span> <span class="op">=</span> <span class="number">17</span>;
-    <span class="kw">let</span> <span class="ident">a_end</span> <span class="op">=</span> <span class="number">23</span>;
-    <span class="kw">let</span> <span class="ident">b_start</span> <span class="op">=</span> <span class="number">19</span>;
-    <span class="kw">let</span> <span class="ident">b_end</span> <span class="op">=</span> <span class="number">59</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">FixedBitSet::with_capacity</span>(<span class="ident">len</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">FixedBitSet::with_capacity</span>(<span class="ident">len</span>);
-    <span class="ident">a</span>.<span class="ident">set_range</span>(<span class="ident">a_start</span>..<span class="ident">a_end</span>, <span class="bool-val">true</span>);
-    <span class="ident">b</span>.<span class="ident">set_range</span>(<span class="ident">b_start</span>..<span class="ident">b_end</span>, <span class="bool-val">true</span>);
-    <span class="kw">let</span> <span class="ident">ab</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">a</span> <span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">b</span>;
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">a_start</span> {
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">ab</span>.<span class="ident">contains</span>(<span class="ident">i</span>));
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>difference() {
+    <span class="kw">let </span>a_len = <span class="number">83</span>;
+    <span class="kw">let </span>b_len = <span class="number">151</span>;
+    <span class="kw">let </span>a_start = <span class="number">0</span>;
+    <span class="kw">let </span>a_end = <span class="number">79</span>;
+    <span class="kw">let </span>b_start = <span class="number">53</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>a = FixedBitSet::with_capacity(a_len);
+    <span class="kw">let </span><span class="kw-2">mut </span>b = FixedBitSet::with_capacity(b_len);
+    a.set_range(a_start..a_end, <span class="bool-val">true</span>);
+    b.set_range(b_start..b_len, <span class="bool-val">true</span>);
+    <span class="kw">let </span>a_diff_b = a.difference(<span class="kw-2">&amp;</span>b).collect::&lt;FixedBitSet&gt;();
+    <span class="kw">for </span>i <span class="kw">in </span>a_start..b_start {
+        <span class="macro">assert!</span>(a_diff_b.contains(i));
     }
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">a_start</span>..<span class="ident">b_end</span> {
-        <span class="macro">assert!</span>(<span class="ident">ab</span>.<span class="ident">contains</span>(<span class="ident">i</span>));
+    <span class="kw">for </span>i <span class="kw">in </span>b_start..b_len {
+        <span class="macro">assert!</span>(!a_diff_b.contains(i));
     }
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">b_end</span>..<span class="ident">len</span> {
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">ab</span>.<span class="ident">contains</span>(<span class="ident">i</span>));
-    }
-    <span class="macro">assert_eq!</span>(<span class="ident">ab</span>.<span class="ident">len</span>(), <span class="ident">len</span>);
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">bitor_first_smaller</span>() {
-    <span class="kw">let</span> <span class="ident">a_len</span> <span class="op">=</span> <span class="number">113</span>;
-    <span class="kw">let</span> <span class="ident">b_len</span> <span class="op">=</span> <span class="number">137</span>;
-    <span class="kw">let</span> <span class="ident">a_end</span> <span class="op">=</span> <span class="number">89</span>;
-    <span class="kw">let</span> <span class="ident">b_start</span> <span class="op">=</span> <span class="number">97</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">FixedBitSet::with_capacity</span>(<span class="ident">a_len</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">FixedBitSet::with_capacity</span>(<span class="ident">b_len</span>);
-    <span class="ident">a</span>.<span class="ident">set_range</span>(..<span class="ident">a_end</span>, <span class="bool-val">true</span>);
-    <span class="ident">b</span>.<span class="ident">set_range</span>(<span class="ident">b_start</span>.., <span class="bool-val">true</span>);
-    <span class="kw">let</span> <span class="ident">ab</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">a</span> <span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">b</span>;
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">a_end</span> {
-        <span class="macro">assert!</span>(<span class="ident">ab</span>.<span class="ident">contains</span>(<span class="ident">i</span>));
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>bitor_equal_lengths() {
+    <span class="kw">let </span>len = <span class="number">109</span>;
+    <span class="kw">let </span>a_start = <span class="number">17</span>;
+    <span class="kw">let </span>a_end = <span class="number">23</span>;
+    <span class="kw">let </span>b_start = <span class="number">19</span>;
+    <span class="kw">let </span>b_end = <span class="number">59</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>a = FixedBitSet::with_capacity(len);
+    <span class="kw">let </span><span class="kw-2">mut </span>b = FixedBitSet::with_capacity(len);
+    a.set_range(a_start..a_end, <span class="bool-val">true</span>);
+    b.set_range(b_start..b_end, <span class="bool-val">true</span>);
+    <span class="kw">let </span>ab = <span class="kw-2">&amp;</span>a | <span class="kw-2">&amp;</span>b;
+    <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..a_start {
+        <span class="macro">assert!</span>(!ab.contains(i));
     }
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">a_end</span>..<span class="ident">b_start</span> {
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">ab</span>.<span class="ident">contains</span>(<span class="ident">i</span>));
+    <span class="kw">for </span>i <span class="kw">in </span>a_start..b_end {
+        <span class="macro">assert!</span>(ab.contains(i));
     }
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">b_start</span>..<span class="ident">b_len</span> {
-        <span class="macro">assert!</span>(<span class="ident">ab</span>.<span class="ident">contains</span>(<span class="ident">i</span>));
+    <span class="kw">for </span>i <span class="kw">in </span>b_end..len {
+        <span class="macro">assert!</span>(!ab.contains(i));
     }
-    <span class="macro">assert_eq!</span>(<span class="ident">b_len</span>, <span class="ident">ab</span>.<span class="ident">len</span>());
+    <span class="macro">assert_eq!</span>(ab.len(), len);
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">bitor_first_larger</span>() {
-    <span class="kw">let</span> <span class="ident">a_len</span> <span class="op">=</span> <span class="number">173</span>;
-    <span class="kw">let</span> <span class="ident">b_len</span> <span class="op">=</span> <span class="number">137</span>;
-    <span class="kw">let</span> <span class="ident">a_start</span> <span class="op">=</span> <span class="number">139</span>;
-    <span class="kw">let</span> <span class="ident">b_end</span> <span class="op">=</span> <span class="number">107</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">a</span> <span class="op">=</span> <span class="ident">FixedBitSet::with_capacity</span>(<span class="ident">a_len</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">FixedBitSet::with_capacity</span>(<span class="ident">b_len</span>);
-    <span class="ident">a</span>.<span class="ident">set_range</span>(<span class="ident">a_start</span>.., <span class="bool-val">true</span>);
-    <span class="ident">b</span>.<span class="ident">set_range</span>(..<span class="ident">b_end</span>, <span class="bool-val">true</span>);
-    <span class="kw">let</span> <span class="ident">ab</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">a</span> <span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">b</span>;
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">a_start</span>..<span class="ident">a_len</span> {
-        <span class="macro">assert!</span>(<span class="ident">ab</span>.<span class="ident">contains</span>(<span class="ident">i</span>));
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>bitor_first_smaller() {
+    <span class="kw">let </span>a_len = <span class="number">113</span>;
+    <span class="kw">let </span>b_len = <span class="number">137</span>;
+    <span class="kw">let </span>a_end = <span class="number">89</span>;
+    <span class="kw">let </span>b_start = <span class="number">97</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>a = FixedBitSet::with_capacity(a_len);
+    <span class="kw">let </span><span class="kw-2">mut </span>b = FixedBitSet::with_capacity(b_len);
+    a.set_range(..a_end, <span class="bool-val">true</span>);
+    b.set_range(b_start.., <span class="bool-val">true</span>);
+    <span class="kw">let </span>ab = <span class="kw-2">&amp;</span>a | <span class="kw-2">&amp;</span>b;
+    <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..a_end {
+        <span class="macro">assert!</span>(ab.contains(i));
     }
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">b_end</span> {
-        <span class="macro">assert!</span>(<span class="ident">ab</span>.<span class="ident">contains</span>(<span class="ident">i</span>));
+    <span class="kw">for </span>i <span class="kw">in </span>a_end..b_start {
+        <span class="macro">assert!</span>(!ab.contains(i));
     }
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">b_end</span>..<span class="ident">a_start</span> {
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">ab</span>.<span class="ident">contains</span>(<span class="ident">i</span>));
+    <span class="kw">for </span>i <span class="kw">in </span>b_start..b_len {
+        <span class="macro">assert!</span>(ab.contains(i));
     }
-    <span class="macro">assert_eq!</span>(<span class="ident">a_len</span>, <span class="ident">ab</span>.<span class="ident">len</span>());
+    <span class="macro">assert_eq!</span>(b_len, ab.len());
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">extend_on_empty</span>() {
-    <span class="kw">let</span> <span class="ident">items</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">2</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">11</span>, <span class="number">13</span>, <span class="number">17</span>, <span class="number">19</span>, <span class="number">23</span>, <span class="number">27</span>, <span class="number">29</span>, <span class="number">31</span>, <span class="number">37</span>, <span class="number">167</span>];
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fbs</span> <span class="op">=</span> <span class="ident">FixedBitSet::with_capacity</span>(<span class="number">0</span>);
-    <span class="ident">fbs</span>.<span class="ident">extend</span>(<span class="ident">items</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>());
-    <span class="kw">let</span> <span class="ident">ones</span> <span class="op">=</span> <span class="ident">fbs</span>.<span class="ident">ones</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-    <span class="macro">assert!</span>(<span class="ident">ones</span> <span class="op">==</span> <span class="ident">items</span>);
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>bitor_first_larger() {
+    <span class="kw">let </span>a_len = <span class="number">173</span>;
+    <span class="kw">let </span>b_len = <span class="number">137</span>;
+    <span class="kw">let </span>a_start = <span class="number">139</span>;
+    <span class="kw">let </span>b_end = <span class="number">107</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>a = FixedBitSet::with_capacity(a_len);
+    <span class="kw">let </span><span class="kw-2">mut </span>b = FixedBitSet::with_capacity(b_len);
+    a.set_range(a_start.., <span class="bool-val">true</span>);
+    b.set_range(..b_end, <span class="bool-val">true</span>);
+    <span class="kw">let </span>ab = <span class="kw-2">&amp;</span>a | <span class="kw-2">&amp;</span>b;
+    <span class="kw">for </span>i <span class="kw">in </span>a_start..a_len {
+        <span class="macro">assert!</span>(ab.contains(i));
+    }
+    <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..b_end {
+        <span class="macro">assert!</span>(ab.contains(i));
+    }
+    <span class="kw">for </span>i <span class="kw">in </span>b_end..a_start {
+        <span class="macro">assert!</span>(!ab.contains(i));
+    }
+    <span class="macro">assert_eq!</span>(a_len, ab.len());
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">extend</span>() {
-    <span class="kw">let</span> <span class="ident">items</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">2</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">11</span>, <span class="number">13</span>, <span class="number">17</span>, <span class="number">19</span>, <span class="number">23</span>, <span class="number">27</span>, <span class="number">29</span>, <span class="number">31</span>, <span class="number">37</span>, <span class="number">167</span>];
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fbs</span> <span class="op">=</span> <span class="ident">FixedBitSet::with_capacity</span>(<span class="number">168</span>);
-    <span class="kw">let</span> <span class="ident">new</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">7</span>, <span class="number">37</span>, <span class="number">67</span>, <span class="number">137</span>];
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">new</span> {
-        <span class="ident">fbs</span>.<span class="ident">put</span>(<span class="kw-2">*</span><span class="ident">i</span>);
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>extend_on_empty() {
+    <span class="kw">let </span>items: Vec&lt;usize&gt; = <span class="macro">vec!</span>[<span class="number">2</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">11</span>, <span class="number">13</span>, <span class="number">17</span>, <span class="number">19</span>, <span class="number">23</span>, <span class="number">27</span>, <span class="number">29</span>, <span class="number">31</span>, <span class="number">37</span>, <span class="number">167</span>];
+    <span class="kw">let </span><span class="kw-2">mut </span>fbs = FixedBitSet::with_capacity(<span class="number">0</span>);
+    fbs.extend(items.iter().cloned());
+    <span class="kw">let </span>ones = fbs.ones().collect::&lt;Vec&lt;usize&gt;&gt;();
+    <span class="macro">assert!</span>(ones == items);
+}
+
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>extend() {
+    <span class="kw">let </span>items: Vec&lt;usize&gt; = <span class="macro">vec!</span>[<span class="number">2</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">11</span>, <span class="number">13</span>, <span class="number">17</span>, <span class="number">19</span>, <span class="number">23</span>, <span class="number">27</span>, <span class="number">29</span>, <span class="number">31</span>, <span class="number">37</span>, <span class="number">167</span>];
+    <span class="kw">let </span><span class="kw-2">mut </span>fbs = FixedBitSet::with_capacity(<span class="number">168</span>);
+    <span class="kw">let </span>new: Vec&lt;usize&gt; = <span class="macro">vec!</span>[<span class="number">7</span>, <span class="number">37</span>, <span class="number">67</span>, <span class="number">137</span>];
+    <span class="kw">for </span>i <span class="kw">in </span><span class="kw-2">&amp;</span>new {
+        fbs.put(<span class="kw-2">*</span>i);
     }
 
-    <span class="ident">fbs</span>.<span class="ident">extend</span>(<span class="ident">items</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>());
+    fbs.extend(items.iter().cloned());
 
-    <span class="kw">let</span> <span class="ident">ones</span> <span class="op">=</span> <span class="ident">fbs</span>.<span class="ident">ones</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-    <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tmp</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">clone</span>();
-        <span class="ident">tmp</span>.<span class="ident">extend</span>(<span class="ident">new</span>);
-        <span class="ident">tmp</span>.<span class="ident">sort</span>();
-        <span class="ident">tmp</span>.<span class="ident">dedup</span>();
-        <span class="ident">tmp</span>
+    <span class="kw">let </span>ones = fbs.ones().collect::&lt;Vec&lt;usize&gt;&gt;();
+    <span class="kw">let </span>expected = {
+        <span class="kw">let </span><span class="kw-2">mut </span>tmp = items.clone();
+        tmp.extend(new);
+        tmp.sort();
+        tmp.dedup();
+        tmp
     };
 
-    <span class="macro">assert!</span>(<span class="ident">ones</span> <span class="op">==</span> <span class="ident">expected</span>);
+    <span class="macro">assert!</span>(ones == expected);
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">from_iterator</span>() {
-    <span class="kw">let</span> <span class="ident">items</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">2</span>, <span class="number">4</span>, <span class="number">6</span>, <span class="number">8</span>];
-    <span class="kw">let</span> <span class="ident">fb</span> <span class="op">=</span> <span class="ident">items</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">FixedBitSet</span><span class="op">&gt;</span>();
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">items</span> {
-        <span class="macro">assert!</span>(<span class="ident">fb</span>.<span class="ident">contains</span>(<span class="ident">i</span>));
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>from_iterator() {
+    <span class="kw">let </span>items: Vec&lt;usize&gt; = <span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">2</span>, <span class="number">4</span>, <span class="number">6</span>, <span class="number">8</span>];
+    <span class="kw">let </span>fb = items.iter().cloned().collect::&lt;FixedBitSet&gt;();
+    <span class="kw">for </span>i <span class="kw">in </span>items {
+        <span class="macro">assert!</span>(fb.contains(i));
     }
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>] {
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">fb</span>.<span class="ident">contains</span>(<span class="ident">i</span>));
+    <span class="kw">for </span>i <span class="kw">in </span><span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>] {
+        <span class="macro">assert!</span>(!fb.contains(i));
     }
-    <span class="macro">assert_eq!</span>(<span class="ident">fb</span>.<span class="ident">len</span>(), <span class="number">9</span>);
+    <span class="macro">assert_eq!</span>(fb.len(), <span class="number">9</span>);
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">from_iterator_ones</span>() {
-    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="number">257</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fb</span> <span class="op">=</span> <span class="ident">FixedBitSet::with_capacity</span>(<span class="ident">len</span>);
-    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> (<span class="number">0</span>..<span class="ident">len</span>).<span class="ident">filter</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span> <span class="op">%</span> <span class="number">7</span> <span class="op">==</span> <span class="number">0</span>) {
-        <span class="ident">fb</span>.<span class="ident">put</span>(<span class="ident">i</span>);
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>from_iterator_ones() {
+    <span class="kw">let </span>len = <span class="number">257</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>fb = FixedBitSet::with_capacity(len);
+    <span class="kw">for </span>i <span class="kw">in </span>(<span class="number">0</span>..len).filter(|i| i % <span class="number">7 </span>== <span class="number">0</span>) {
+        fb.put(i);
     }
-    <span class="ident">fb</span>.<span class="ident">put</span>(<span class="ident">len</span> <span class="op">-</span> <span class="number">1</span>);
-    <span class="kw">let</span> <span class="ident">dup</span> <span class="op">=</span> <span class="ident">fb</span>.<span class="ident">ones</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">FixedBitSet</span><span class="op">&gt;</span>();
-    <span class="macro">println!</span>(<span class="string">&quot;{0:?}\n{1:?}&quot;</span>, <span class="ident">fb</span>, <span class="ident">dup</span>);
-    <span class="macro">println!</span>(<span class="string">&quot;{0:?}\n{1:?}&quot;</span>, <span class="ident">fb</span>.<span class="ident">ones</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span>(), <span class="ident">dup</span>.<span class="ident">ones</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span>());
-    <span class="macro">assert_eq!</span>(<span class="ident">fb</span>.<span class="ident">len</span>(), <span class="ident">dup</span>.<span class="ident">len</span>());
-    <span class="macro">assert_eq!</span>(<span class="ident">fb</span>.<span class="ident">ones</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span>(), <span class="ident">dup</span>.<span class="ident">ones</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span>());
+    fb.put(len - <span class="number">1</span>);
+    <span class="kw">let </span>dup = fb.ones().collect::&lt;FixedBitSet&gt;();
+    <span class="macro">println!</span>(<span class="string">&quot;{0:?}\n{1:?}&quot;</span>, fb, dup);
+    <span class="macro">println!</span>(<span class="string">&quot;{0:?}\n{1:?}&quot;</span>, fb.ones().collect::&lt;Vec&lt;usize&gt;&gt;(), dup.ones().collect::&lt;Vec&lt;usize&gt;&gt;());
+    <span class="macro">assert_eq!</span>(fb.len(), dup.len());
+    <span class="macro">assert_eq!</span>(fb.ones().collect::&lt;Vec&lt;usize&gt;&gt;(), dup.ones().collect::&lt;Vec&lt;usize&gt;&gt;());
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="fixedbitset" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="fixedbitset" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

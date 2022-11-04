@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/psl-core/src/datamodel_connector/empty_connector.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>empty_connector.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../psl_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/psl-core/src/datamodel_connector/empty_connector.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>empty_connector.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../psl_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -82,89 +82,89 @@
 <span id="82">82</span>
 <span id="83">83</span>
 <span id="84">84</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::datamodel_connector</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Span</span>};
-<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::datamodel_connector::<span class="kw-2">*</span>;
+<span class="kw">use </span>diagnostics::{DatamodelError, Span};
+<span class="kw">use </span>enumflags2::BitFlags;
 
-<span class="doccomment">/// A [Connector](/trait.Connector.html) implementor meant to</span>
-<span class="doccomment">/// be used as a default when no datasource is defined.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EmptyDatamodelConnector</span>;
+<span class="doccomment">/// A [Connector](/trait.Connector.html) implementor meant to
+/// be used as a default when no datasource is defined.
+</span><span class="kw">pub struct </span>EmptyDatamodelConnector;
 
-<span class="kw">impl</span> <span class="ident">Connector</span> <span class="kw">for</span> <span class="ident">EmptyDatamodelConnector</span> {
-    <span class="kw">fn</span> <span class="ident">provider_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="string">&quot;empty&quot;</span>
+<span class="kw">impl </span>Connector <span class="kw">for </span>EmptyDatamodelConnector {
+    <span class="kw">fn </span>provider_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="string">&quot;empty&quot;
+    </span>}
+
+    <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        std::any::type_name::&lt;EmptyDatamodelConnector&gt;()
     }
 
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="ident">std::any::type_name</span>::<span class="op">&lt;</span><span class="ident">EmptyDatamodelConnector</span><span class="op">&gt;</span>()
+    <span class="kw">fn </span>referential_actions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BitFlags&lt;ReferentialAction&gt; {
+        BitFlags::all()
     }
 
-    <span class="kw">fn</span> <span class="ident">referential_actions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
-        <span class="ident">BitFlags::all</span>()
-    }
-
-    <span class="kw">fn</span> <span class="ident">capabilities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">ConnectorCapability</span>] {
+    <span class="kw">fn </span>capabilities(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[ConnectorCapability] {
         <span class="kw-2">&amp;</span>[
-            <span class="ident">ConnectorCapability::AutoIncrement</span>,
-            <span class="ident">ConnectorCapability::CompoundIds</span>,
-            <span class="ident">ConnectorCapability::Enums</span>,
-            <span class="ident">ConnectorCapability::Json</span>,
-            <span class="ident">ConnectorCapability::ImplicitManyToManyRelation</span>,
+            ConnectorCapability::AutoIncrement,
+            ConnectorCapability::CompoundIds,
+            ConnectorCapability::Enums,
+            ConnectorCapability::Json,
+            ConnectorCapability::ImplicitManyToManyRelation,
         ]
     }
 
-    <span class="kw">fn</span> <span class="ident">max_identifier_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="ident">usize::MAX</span>
+    <span class="kw">fn </span>max_identifier_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        usize::MAX
     }
 
-    <span class="kw">fn</span> <span class="ident">available_native_type_constructors</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">NativeTypeConstructor</span>] {
+    <span class="kw">fn </span>available_native_type_constructors(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[NativeTypeConstructor] {
         <span class="kw-2">&amp;</span>[]
     }
 
-    <span class="kw">fn</span> <span class="ident">scalar_type_for_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_native_type</span>: <span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span>) -&gt; <span class="ident">ScalarType</span> {
-        <span class="ident">ScalarType::String</span>
+    <span class="kw">fn </span>scalar_type_for_native_type(<span class="kw-2">&amp;</span><span class="self">self</span>, _native_type: <span class="kw-2">&amp;</span>NativeTypeInstance) -&gt; ScalarType {
+        ScalarType::String
     }
 
-    <span class="kw">fn</span> <span class="ident">default_native_type_for_scalar_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_scalar_type</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarType</span>) -&gt; <span class="ident">NativeTypeInstance</span> {
+    <span class="kw">fn </span>default_native_type_for_scalar_type(<span class="kw-2">&amp;</span><span class="self">self</span>, _scalar_type: <span class="kw-2">&amp;</span>ScalarType) -&gt; NativeTypeInstance {
         <span class="macro">unreachable!</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">native_type_is_default_for_scalar_type</span>(
+    <span class="kw">fn </span>native_type_is_default_for_scalar_type(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">_native_type</span>: <span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span>,
-        <span class="ident">_scalar_type</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarType</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
-    }
+        _native_type: <span class="kw-2">&amp;</span>NativeTypeInstance,
+        _scalar_type: <span class="kw-2">&amp;</span>ScalarType,
+    ) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">native_type_to_parts</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_native_type</span>: <span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span>) -&gt; (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) {
+    <span class="kw">fn </span>native_type_to_parts(<span class="kw-2">&amp;</span><span class="self">self</span>, _native_type: <span class="kw-2">&amp;</span>NativeTypeInstance) -&gt; (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, Vec&lt;String&gt;) {
         <span class="macro">unreachable!</span>(<span class="string">&quot;EmptyDatamodelConnector::native_type_to_string()&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_native_type</span>(
+    <span class="kw">fn </span>parse_native_type(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="kw">_</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>],
-        <span class="ident">span</span>: <span class="ident">Span</span>,
-        <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span> {
-        <span class="ident">diagnostics</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_native_type_parser_error</span>(<span class="ident">name</span>, <span class="ident">span</span>));
-        <span class="prelude-val">None</span>
-    }
+        name: <span class="kw-2">&amp;</span>str,
+        <span class="kw">_</span>: <span class="kw-2">&amp;</span>[String],
+        span: Span,
+        diagnostics: <span class="kw-2">&amp;mut </span>Diagnostics,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;NativeTypeInstance&gt; {
+        diagnostics.push_error(DatamodelError::new_native_type_parser_error(name, span));
+        <span class="prelude-val">None
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">validate_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn </span>validate_url(<span class="kw-2">&amp;</span><span class="self">self</span>, _url: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;(), String&gt; {
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">empty_datamodel_connector_as_dyn_connector</span>() {
-        <span class="kw">let</span> <span class="ident">_connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">EmptyDatamodelConnector</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>empty_datamodel_connector_as_dyn_connector() {
+        <span class="kw">let </span>_connector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Connector = <span class="kw-2">&amp;</span>EmptyDatamodelConnector;
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="psl_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="psl_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

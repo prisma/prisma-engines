@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tiberius-0.11.2/src/client/config.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>config.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tiberius/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tiberius-0.11.2/src/client/config.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>config.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tiberius/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -370,377 +370,377 @@
 <span id="370">370</span>
 <span id="371">371</span>
 <span id="372">372</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">ado_net</span>;
-<span class="kw">mod</span> <span class="ident">jdbc</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>ado_net;
+<span class="kw">mod </span>jdbc;
 
-<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
-<span class="kw">use</span> <span class="ident">std::path::PathBuf</span>;
+<span class="kw">use </span>std::collections::HashMap;
+<span class="kw">use </span>std::path::PathBuf;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::AuthMethod</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::EncryptionLevel</span>;
-<span class="kw">use</span> <span class="ident">ado_net</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">jdbc</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">super</span>::AuthMethod;
+<span class="kw">use </span><span class="kw">crate</span>::EncryptionLevel;
+<span class="kw">use </span>ado_net::<span class="kw-2">*</span>;
+<span class="kw">use </span>jdbc::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="doccomment">/// The `Config` struct contains all configuration information</span>
-<span class="doccomment">/// required for connecting to the database with a [`Client`]. It also provides</span>
-<span class="doccomment">/// the server address when connecting to a `TcpStream` via the</span>
-<span class="doccomment">/// [`get_addr`] method.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// When using an [ADO.NET connection string], it can be</span>
-<span class="doccomment">/// constructed using the [`from_ado_string`] function.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Client`]: struct.Client.html</span>
-<span class="doccomment">/// [ADO.NET connection string]: https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-strings</span>
-<span class="doccomment">/// [`from_ado_string`]: struct.Config.html#method.from_ado_string</span>
-<span class="doccomment">/// [`get_addr`]: struct.Config.html#method.get_addr</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Config</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">host</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">port</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">database</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">instance_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">application_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">encryption</span>: <span class="ident">EncryptionLevel</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">trust</span>: <span class="ident">TrustConfig</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">auth</span>: <span class="ident">AuthMethod</span>,
+<span class="attribute">#[derive(Clone, Debug)]
+</span><span class="doccomment">/// The `Config` struct contains all configuration information
+/// required for connecting to the database with a [`Client`]. It also provides
+/// the server address when connecting to a `TcpStream` via the
+/// [`get_addr`] method.
+///
+/// When using an [ADO.NET connection string], it can be
+/// constructed using the [`from_ado_string`] function.
+///
+/// [`Client`]: struct.Client.html
+/// [ADO.NET connection string]: https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-strings
+/// [`from_ado_string`]: struct.Config.html#method.from_ado_string
+/// [`get_addr`]: struct.Config.html#method.get_addr
+</span><span class="kw">pub struct </span>Config {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) host: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) port: <span class="prelude-ty">Option</span>&lt;u16&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) database: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) instance_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) application_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) encryption: EncryptionLevel,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) trust: TrustConfig,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) auth: AuthMethod,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">TrustConfig</span> {
-    <span class="ident">CaCertificateLocation</span>(<span class="ident">PathBuf</span>),
-    <span class="ident">TrustAll</span>,
-    <span class="ident">Default</span>,
+<span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>TrustConfig {
+    CaCertificateLocation(PathBuf),
+    TrustAll,
+    Default,
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Config</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">host</span>: <span class="prelude-val">None</span>,
-            <span class="ident">port</span>: <span class="prelude-val">None</span>,
-            <span class="ident">database</span>: <span class="prelude-val">None</span>,
-            <span class="ident">instance_name</span>: <span class="prelude-val">None</span>,
-            <span class="ident">application_name</span>: <span class="prelude-val">None</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-                <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls&quot;</span>,
-                <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native-tls&quot;</span>,
-                <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vendored-openssl&quot;</span>
-            ))]</span>
-            <span class="ident">encryption</span>: <span class="ident">EncryptionLevel::Required</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(
-                <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls&quot;</span>,
-                <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native-tls&quot;</span>,
-                <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vendored-openssl&quot;</span>
-            )))]</span>
-            <span class="ident">encryption</span>: <span class="ident">EncryptionLevel::NotSupported</span>,
-            <span class="ident">trust</span>: <span class="ident">TrustConfig::Default</span>,
-            <span class="ident">auth</span>: <span class="ident">AuthMethod::None</span>,
+<span class="kw">impl </span>Default <span class="kw">for </span>Config {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            host: <span class="prelude-val">None</span>,
+            port: <span class="prelude-val">None</span>,
+            database: <span class="prelude-val">None</span>,
+            instance_name: <span class="prelude-val">None</span>,
+            application_name: <span class="prelude-val">None</span>,
+            <span class="attribute">#[cfg(any(
+                feature = <span class="string">&quot;rustls&quot;</span>,
+                feature = <span class="string">&quot;native-tls&quot;</span>,
+                feature = <span class="string">&quot;vendored-openssl&quot;
+            </span>))]
+            </span>encryption: EncryptionLevel::Required,
+            <span class="attribute">#[cfg(not(any(
+                feature = <span class="string">&quot;rustls&quot;</span>,
+                feature = <span class="string">&quot;native-tls&quot;</span>,
+                feature = <span class="string">&quot;vendored-openssl&quot;
+            </span>)))]
+            </span>encryption: EncryptionLevel::NotSupported,
+            trust: TrustConfig::Default,
+            auth: AuthMethod::None,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Config</span> {
-    <span class="doccomment">/// Create a new `Config` with the default settings.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::default</span>()
+<span class="kw">impl </span>Config {
+    <span class="doccomment">/// Create a new `Config` with the default settings.
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
     }
 
-    <span class="doccomment">/// A host or ip address to connect to.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - Defaults to `localhost`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">host</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">host</span>: <span class="kw">impl</span> <span class="ident">ToString</span>) {
-        <span class="self">self</span>.<span class="ident">host</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">host</span>.<span class="ident">to_string</span>());
+    <span class="doccomment">/// A host or ip address to connect to.
+    ///
+    /// - Defaults to `localhost`.
+    </span><span class="kw">pub fn </span>host(<span class="kw-2">&amp;mut </span><span class="self">self</span>, host: <span class="kw">impl </span>ToString) {
+        <span class="self">self</span>.host = <span class="prelude-val">Some</span>(host.to_string());
     }
 
-    <span class="doccomment">/// The server port.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - Defaults to `1433`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">port</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">port</span>: <span class="ident">u16</span>) {
-        <span class="self">self</span>.<span class="ident">port</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">port</span>);
+    <span class="doccomment">/// The server port.
+    ///
+    /// - Defaults to `1433`.
+    </span><span class="kw">pub fn </span>port(<span class="kw-2">&amp;mut </span><span class="self">self</span>, port: u16) {
+        <span class="self">self</span>.port = <span class="prelude-val">Some</span>(port);
     }
 
-    <span class="doccomment">/// The database to connect to.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - Defaults to `master`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">database</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">database</span>: <span class="kw">impl</span> <span class="ident">ToString</span>) {
-        <span class="self">self</span>.<span class="ident">database</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">database</span>.<span class="ident">to_string</span>())
+    <span class="doccomment">/// The database to connect to.
+    ///
+    /// - Defaults to `master`.
+    </span><span class="kw">pub fn </span>database(<span class="kw-2">&amp;mut </span><span class="self">self</span>, database: <span class="kw">impl </span>ToString) {
+        <span class="self">self</span>.database = <span class="prelude-val">Some</span>(database.to_string())
     }
 
-    <span class="doccomment">/// The instance name as defined in the SQL Browser. Only available on</span>
-    <span class="doccomment">/// Windows platforms.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If specified, the port is replaced with the value returned from the</span>
-    <span class="doccomment">/// browser.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - Defaults to no name specified.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">instance_name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">ToString</span>) {
-        <span class="self">self</span>.<span class="ident">instance_name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>.<span class="ident">to_string</span>());
+    <span class="doccomment">/// The instance name as defined in the SQL Browser. Only available on
+    /// Windows platforms.
+    ///
+    /// If specified, the port is replaced with the value returned from the
+    /// browser.
+    ///
+    /// - Defaults to no name specified.
+    </span><span class="kw">pub fn </span>instance_name(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw">impl </span>ToString) {
+        <span class="self">self</span>.instance_name = <span class="prelude-val">Some</span>(name.to_string());
     }
 
-    <span class="doccomment">/// Sets the application name to the connection, queryable with the</span>
-    <span class="doccomment">/// `APP_NAME()` command.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - Defaults to no name specified.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">application_name</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">ToString</span>) {
-        <span class="self">self</span>.<span class="ident">application_name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>.<span class="ident">to_string</span>());
+    <span class="doccomment">/// Sets the application name to the connection, queryable with the
+    /// `APP_NAME()` command.
+    ///
+    /// - Defaults to no name specified.
+    </span><span class="kw">pub fn </span>application_name(<span class="kw-2">&amp;mut </span><span class="self">self</span>, name: <span class="kw">impl </span>ToString) {
+        <span class="self">self</span>.application_name = <span class="prelude-val">Some</span>(name.to_string());
     }
 
-    <span class="doccomment">/// Set the preferred encryption level.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - With `tls` feature, defaults to `Required`.</span>
-    <span class="doccomment">/// - Without `tls` feature, defaults to `NotSupported`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encryption</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">encryption</span>: <span class="ident">EncryptionLevel</span>) {
-        <span class="self">self</span>.<span class="ident">encryption</span> <span class="op">=</span> <span class="ident">encryption</span>;
+    <span class="doccomment">/// Set the preferred encryption level.
+    ///
+    /// - With `tls` feature, defaults to `Required`.
+    /// - Without `tls` feature, defaults to `NotSupported`.
+    </span><span class="kw">pub fn </span>encryption(<span class="kw-2">&amp;mut </span><span class="self">self</span>, encryption: EncryptionLevel) {
+        <span class="self">self</span>.encryption = encryption;
     }
 
-    <span class="doccomment">/// If set, the server certificate will not be validated and it is accepted</span>
-    <span class="doccomment">/// as-is.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// On production setting, the certificate should be added to the local key</span>
-    <span class="doccomment">/// storage (or use `trust_cert_ca` instead), using this setting is potentially dangerous.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">/// Will panic in case `trust_cert_ca` was called before.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - Defaults to `default`, meaning server certificate is validated against system-truststore.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trust_cert</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">TrustConfig::CaCertificateLocation</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">trust</span> {
+    <span class="doccomment">/// If set, the server certificate will not be validated and it is accepted
+    /// as-is.
+    ///
+    /// On production setting, the certificate should be added to the local key
+    /// storage (or use `trust_cert_ca` instead), using this setting is potentially dangerous.
+    ///
+    /// # Panics
+    /// Will panic in case `trust_cert_ca` was called before.
+    ///
+    /// - Defaults to `default`, meaning server certificate is validated against system-truststore.
+    </span><span class="kw">pub fn </span>trust_cert(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">if let </span>TrustConfig::CaCertificateLocation(<span class="kw">_</span>) = <span class="kw-2">&amp;</span><span class="self">self</span>.trust {
             <span class="macro">panic!</span>(<span class="string">&quot;&#39;trust_cert&#39; and &#39;trust_cert_ca&#39; are mutual exclusive! Only use one.&quot;</span>)
         }
-        <span class="self">self</span>.<span class="ident">trust</span> <span class="op">=</span> <span class="ident">TrustConfig::TrustAll</span>;
+        <span class="self">self</span>.trust = TrustConfig::TrustAll;
     }
 
-    <span class="doccomment">/// If set, the server certificate will be validated against the given CA certificate in</span>
-    <span class="doccomment">/// in addition to the system-truststore.</span>
-    <span class="doccomment">/// Useful when using self-signed certificates on the server without having to disable the</span>
-    <span class="doccomment">/// trust-chain.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">/// Will panic in case `trust_cert` was called before.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - Defaults to validating the server certificate is validated against system&#39;s certificate storage.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trust_cert_ca</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">path</span>: <span class="kw">impl</span> <span class="ident">ToString</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">TrustConfig::TrustAll</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">trust</span> {
+    <span class="doccomment">/// If set, the server certificate will be validated against the given CA certificate in
+    /// in addition to the system-truststore.
+    /// Useful when using self-signed certificates on the server without having to disable the
+    /// trust-chain.
+    ///
+    /// # Panics
+    /// Will panic in case `trust_cert` was called before.
+    ///
+    /// - Defaults to validating the server certificate is validated against system&#39;s certificate storage.
+    </span><span class="kw">pub fn </span>trust_cert_ca(<span class="kw-2">&amp;mut </span><span class="self">self</span>, path: <span class="kw">impl </span>ToString) {
+        <span class="kw">if let </span>TrustConfig::TrustAll = <span class="kw-2">&amp;</span><span class="self">self</span>.trust {
             <span class="macro">panic!</span>(<span class="string">&quot;&#39;trust_cert&#39; and &#39;trust_cert_ca&#39; are mutual exclusive! Only use one.&quot;</span>)
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">trust</span> <span class="op">=</span> <span class="ident">TrustConfig::CaCertificateLocation</span>(<span class="ident">PathBuf::from</span>(<span class="ident">path</span>.<span class="ident">to_string</span>()))
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.trust = TrustConfig::CaCertificateLocation(PathBuf::from(path.to_string()))
         }
     }
 
-    <span class="doccomment">/// Sets the authentication method.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - Defaults to `None`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">authentication</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">auth</span>: <span class="ident">AuthMethod</span>) {
-        <span class="self">self</span>.<span class="ident">auth</span> <span class="op">=</span> <span class="ident">auth</span>;
+    <span class="doccomment">/// Sets the authentication method.
+    ///
+    /// - Defaults to `None`.
+    </span><span class="kw">pub fn </span>authentication(<span class="kw-2">&amp;mut </span><span class="self">self</span>, auth: AuthMethod) {
+        <span class="self">self</span>.auth = auth;
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_host</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">host</span>
-            .<span class="ident">as_deref</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span> <span class="op">!</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="string">&quot;.&quot;</span>)
-            .<span class="ident">unwrap_or</span>(<span class="string">&quot;localhost&quot;</span>)
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_host(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.host
+            .as_deref()
+            .filter(|v| v != <span class="kw-2">&amp;</span><span class="string">&quot;.&quot;</span>)
+            .unwrap_or(<span class="string">&quot;localhost&quot;</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_port</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
-        <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">port</span>, <span class="self">self</span>.<span class="ident">instance_name</span>.<span class="ident">as_ref</span>()) {
-            <span class="comment">// A user-defined port, we must use that.</span>
-            (<span class="prelude-val">Some</span>(<span class="ident">port</span>), <span class="kw">_</span>) =&gt; <span class="ident">port</span>,
-            <span class="comment">// If using a named instance, we&#39;ll give the default port of SQL</span>
-            <span class="comment">// Browser.</span>
-            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; <span class="number">1434</span>,
-            <span class="comment">// Otherwise the defaulting to the default SQL Server port.</span>
-            (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="number">1433</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_port(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
+        <span class="kw">match </span>(<span class="self">self</span>.port, <span class="self">self</span>.instance_name.as_ref()) {
+            <span class="comment">// A user-defined port, we must use that.
+            </span>(<span class="prelude-val">Some</span>(port), <span class="kw">_</span>) =&gt; port,
+            <span class="comment">// If using a named instance, we&#39;ll give the default port of SQL
+            // Browser.
+            </span>(<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; <span class="number">1434</span>,
+            <span class="comment">// Otherwise the defaulting to the default SQL Server port.
+            </span>(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="number">1433</span>,
         }
     }
 
-    <span class="doccomment">/// Get the host address including port</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_addr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="string">&quot;{}:{}&quot;</span>, <span class="self">self</span>.<span class="ident">get_host</span>(), <span class="self">self</span>.<span class="ident">get_port</span>())
+    <span class="doccomment">/// Get the host address including port
+    </span><span class="kw">pub fn </span>get_addr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="macro">format!</span>(<span class="string">&quot;{}:{}&quot;</span>, <span class="self">self</span>.get_host(), <span class="self">self</span>.get_port())
     }
 
-    <span class="doccomment">/// Creates a new `Config` from an [ADO.NET connection string].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Supported parameters</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// All parameter keys are handled case-insensitive.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// |Parameter|Allowed values|Description|</span>
-    <span class="doccomment">/// |--------|--------|--------|</span>
-    <span class="doccomment">/// |`server`|`&lt;string&gt;`|The name or network address of the instance of SQL Server to which to connect. The port number can be specified after the server name. The correct form of this parameter is either `tcp:host,port` or `tcp:host\\instance`|</span>
-    <span class="doccomment">/// |`IntegratedSecurity`|`true`,`false`,`yes`,`no`|Toggle between Windows/Kerberos authentication and SQL authentication.|</span>
-    <span class="doccomment">/// |`uid`,`username`,`user`,`user id`|`&lt;string&gt;`|The SQL Server login account.|</span>
-    <span class="doccomment">/// |`password`,`pwd`|`&lt;string&gt;`|The password for the SQL Server account logging on.|</span>
-    <span class="doccomment">/// |`database`|`&lt;string&gt;`|The name of the database.|</span>
-    <span class="doccomment">/// |`TrustServerCertificate`|`true`,`false`,`yes`,`no`|Specifies whether the driver trusts the server certificate when connecting using TLS. Cannot be used toghether with `TrustServerCertificateCA`|</span>
-    <span class="doccomment">/// |`TrustServerCertificateCA`|`&lt;path&gt;`|Path to a `pem`, `crt` or `der` certificate file. Cannot be used together with `TrustServerCertificate`|</span>
-    <span class="doccomment">/// |`encrypt`|`true`,`false`,`yes`,`no`,`DANGER_PLAINTEXT`|Specifies whether the driver uses TLS to encrypt communication.|</span>
-    <span class="doccomment">/// |`Application Name`, `ApplicationName`|`&lt;string&gt;`|Sets the application name for the connection.|</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [ADO.NET connection string]: https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-strings</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_ado_string</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">ado</span>: <span class="ident">AdoNetConfig</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
-        <span class="ident"><span class="self">Self</span>::from_config_string</span>(<span class="ident">ado</span>)
+    <span class="doccomment">/// Creates a new `Config` from an [ADO.NET connection string].
+    ///
+    /// # Supported parameters
+    ///
+    /// All parameter keys are handled case-insensitive.
+    ///
+    /// |Parameter|Allowed values|Description|
+    /// |--------|--------|--------|
+    /// |`server`|`&lt;string&gt;`|The name or network address of the instance of SQL Server to which to connect. The port number can be specified after the server name. The correct form of this parameter is either `tcp:host,port` or `tcp:host\\instance`|
+    /// |`IntegratedSecurity`|`true`,`false`,`yes`,`no`|Toggle between Windows/Kerberos authentication and SQL authentication.|
+    /// |`uid`,`username`,`user`,`user id`|`&lt;string&gt;`|The SQL Server login account.|
+    /// |`password`,`pwd`|`&lt;string&gt;`|The password for the SQL Server account logging on.|
+    /// |`database`|`&lt;string&gt;`|The name of the database.|
+    /// |`TrustServerCertificate`|`true`,`false`,`yes`,`no`|Specifies whether the driver trusts the server certificate when connecting using TLS. Cannot be used toghether with `TrustServerCertificateCA`|
+    /// |`TrustServerCertificateCA`|`&lt;path&gt;`|Path to a `pem`, `crt` or `der` certificate file. Cannot be used together with `TrustServerCertificate`|
+    /// |`encrypt`|`true`,`false`,`yes`,`no`,`DANGER_PLAINTEXT`|Specifies whether the driver uses TLS to encrypt communication.|
+    /// |`Application Name`, `ApplicationName`|`&lt;string&gt;`|Sets the application name for the connection.|
+    ///
+    /// [ADO.NET connection string]: https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/connection-strings
+    </span><span class="kw">pub fn </span>from_ado_string(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>ado: AdoNetConfig = s.parse()<span class="question-mark">?</span>;
+        <span class="self">Self</span>::from_config_string(ado)
     }
 
-    <span class="doccomment">/// Creates a new `Config` from a [JDBC connection string].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See [`from_ado_string`] method for supported parameters.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [JDBC connection string]: https://docs.microsoft.com/en-us/sql/connect/jdbc/building-the-connection-url?view=sql-server-ver15</span>
-    <span class="doccomment">/// [`from_ado_string`]: #method.from_ado_string</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_jdbc_string</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">jdbc</span>: <span class="ident">JdbcConfig</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>;
-        <span class="ident"><span class="self">Self</span>::from_config_string</span>(<span class="ident">jdbc</span>)
+    <span class="doccomment">/// Creates a new `Config` from a [JDBC connection string].
+    ///
+    /// See [`from_ado_string`] method for supported parameters.
+    ///
+    /// [JDBC connection string]: https://docs.microsoft.com/en-us/sql/connect/jdbc/building-the-connection-url?view=sql-server-ver15
+    /// [`from_ado_string`]: #method.from_ado_string
+    </span><span class="kw">pub fn </span>from_jdbc_string(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>jdbc: JdbcConfig = s.parse()<span class="question-mark">?</span>;
+        <span class="self">Self</span>::from_config_string(jdbc)
     }
 
-    <span class="kw">fn</span> <span class="ident">from_config_string</span>(<span class="ident">s</span>: <span class="kw">impl</span> <span class="ident">ConfigString</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::new</span>();
+    <span class="kw">fn </span>from_config_string(s: <span class="kw">impl </span>ConfigString) -&gt; <span class="kw">crate</span>::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>builder = <span class="self">Self</span>::new();
 
-        <span class="kw">let</span> <span class="ident">server</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">server</span>()<span class="question-mark">?</span>;
+        <span class="kw">let </span>server = s.server()<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">host</span>) <span class="op">=</span> <span class="ident">server</span>.<span class="ident">host</span> {
-            <span class="ident">builder</span>.<span class="ident">host</span>(<span class="ident">host</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(host) = server.host {
+            builder.host(host);
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">port</span>) <span class="op">=</span> <span class="ident">server</span>.<span class="ident">port</span> {
-            <span class="ident">builder</span>.<span class="ident">port</span>(<span class="ident">port</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(port) = server.port {
+            builder.port(port);
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">instance</span>) <span class="op">=</span> <span class="ident">server</span>.<span class="ident">instance</span> {
-            <span class="ident">builder</span>.<span class="ident">instance_name</span>(<span class="ident">instance</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(instance) = server.instance {
+            builder.instance_name(instance);
         }
 
-        <span class="ident">builder</span>.<span class="ident">authentication</span>(<span class="ident">s</span>.<span class="ident">authentication</span>()<span class="question-mark">?</span>);
+        builder.authentication(s.authentication()<span class="question-mark">?</span>);
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">database</span>) <span class="op">=</span> <span class="ident">s</span>.<span class="ident">database</span>() {
-            <span class="ident">builder</span>.<span class="ident">database</span>(<span class="ident">database</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(database) = s.database() {
+            builder.database(database);
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">s</span>.<span class="ident">application_name</span>() {
-            <span class="ident">builder</span>.<span class="ident">application_name</span>(<span class="ident">name</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(name) = s.application_name() {
+            builder.application_name(name);
         }
 
-        <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">trust_cert</span>()<span class="question-mark">?</span> {
-            <span class="ident">builder</span>.<span class="ident">trust_cert</span>();
+        <span class="kw">if </span>s.trust_cert()<span class="question-mark">? </span>{
+            builder.trust_cert();
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ca</span>) <span class="op">=</span> <span class="ident">s</span>.<span class="ident">trust_cert_ca</span>() {
-            <span class="ident">builder</span>.<span class="ident">trust_cert_ca</span>(<span class="ident">ca</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(ca) = s.trust_cert_ca() {
+            builder.trust_cert_ca(ca);
         }
 
-        <span class="ident">builder</span>.<span class="ident">encryption</span>(<span class="ident">s</span>.<span class="ident">encrypt</span>()<span class="question-mark">?</span>);
+        builder.encryption(s.encrypt()<span class="question-mark">?</span>);
 
-        <span class="prelude-val">Ok</span>(<span class="ident">builder</span>)
+        <span class="prelude-val">Ok</span>(builder)
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ServerDefinition</span> {
-    <span class="ident">host</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">port</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
-    <span class="ident">instance</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ServerDefinition {
+    host: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    port: <span class="prelude-ty">Option</span>&lt;u16&gt;,
+    instance: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">ConfigString</span> {
-    <span class="kw">fn</span> <span class="ident">dict</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>ConfigString {
+    <span class="kw">fn </span>dict(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>HashMap&lt;String, String&gt;;
 
-    <span class="kw">fn</span> <span class="ident">server</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ServerDefinition</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>server(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;ServerDefinition&gt;;
 
-    <span class="kw">fn</span> <span class="ident">authentication</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">AuthMethod</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">dict</span>()
-            .<span class="ident">get</span>(<span class="string">&quot;uid&quot;</span>)
-            .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">dict</span>().<span class="ident">get</span>(<span class="string">&quot;username&quot;</span>))
-            .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">dict</span>().<span class="ident">get</span>(<span class="string">&quot;user&quot;</span>))
-            .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">dict</span>().<span class="ident">get</span>(<span class="string">&quot;user id&quot;</span>))
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">as_str</span>());
+    <span class="kw">fn </span>authentication(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;AuthMethod&gt; {
+        <span class="kw">let </span>user = <span class="self">self
+            </span>.dict()
+            .get(<span class="string">&quot;uid&quot;</span>)
+            .or_else(|| <span class="self">self</span>.dict().get(<span class="string">&quot;username&quot;</span>))
+            .or_else(|| <span class="self">self</span>.dict().get(<span class="string">&quot;user&quot;</span>))
+            .or_else(|| <span class="self">self</span>.dict().get(<span class="string">&quot;user id&quot;</span>))
+            .map(|s| s.as_str());
 
-        <span class="kw">let</span> <span class="ident">pw</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">dict</span>()
-            .<span class="ident">get</span>(<span class="string">&quot;password&quot;</span>)
-            .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">dict</span>().<span class="ident">get</span>(<span class="string">&quot;pwd&quot;</span>))
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">as_str</span>());
+        <span class="kw">let </span>pw = <span class="self">self
+            </span>.dict()
+            .get(<span class="string">&quot;password&quot;</span>)
+            .or_else(|| <span class="self">self</span>.dict().get(<span class="string">&quot;pwd&quot;</span>))
+            .map(|s| s.as_str());
 
-        <span class="kw">match</span> <span class="self">self</span>
-            .<span class="ident">dict</span>()
-            .<span class="ident">get</span>(<span class="string">&quot;integratedsecurity&quot;</span>)
-            .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">dict</span>().<span class="ident">get</span>(<span class="string">&quot;integrated security&quot;</span>))
+        <span class="kw">match </span><span class="self">self
+            </span>.dict()
+            .get(<span class="string">&quot;integratedsecurity&quot;</span>)
+            .or_else(|| <span class="self">self</span>.dict().get(<span class="string">&quot;integrated security&quot;</span>))
         {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">windows</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;winauth&quot;</span>))]</span>
-            <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="kw">if</span> <span class="ident">val</span>.<span class="ident">to_lowercase</span>() <span class="op">==</span> <span class="string">&quot;sspi&quot;</span> <span class="op">|</span><span class="op">|</span> <span class="ident"><span class="self">Self</span>::parse_bool</span>(<span class="ident">val</span>)<span class="question-mark">?</span> =&gt; <span class="kw">match</span> (<span class="ident">user</span>, <span class="ident">pw</span>)
+            <span class="attribute">#[cfg(all(windows, feature = <span class="string">&quot;winauth&quot;</span>))]
+            </span><span class="prelude-val">Some</span>(val) <span class="kw">if </span>val.to_lowercase() == <span class="string">&quot;sspi&quot; </span>|| <span class="self">Self</span>::parse_bool(val)<span class="question-mark">? </span>=&gt; <span class="kw">match </span>(user, pw)
             {
-                (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AuthMethod::Integrated</span>),
-                <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AuthMethod::windows</span>(<span class="ident">user</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>), <span class="ident">pw</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>))),
+                (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Ok</span>(AuthMethod::Integrated),
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(AuthMethod::windows(user.unwrap_or(<span class="string">&quot;&quot;</span>), pw.unwrap_or(<span class="string">&quot;&quot;</span>))),
             },
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;integrated-auth-gssapi&quot;</span>)]</span>
-            <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="kw">if</span> <span class="ident">val</span>.<span class="ident">to_lowercase</span>() <span class="op">==</span> <span class="string">&quot;sspi&quot;</span> <span class="op">|</span><span class="op">|</span> <span class="ident"><span class="self">Self</span>::parse_bool</span>(<span class="ident">val</span>)<span class="question-mark">?</span> =&gt; {
-                <span class="prelude-val">Ok</span>(<span class="ident">AuthMethod::Integrated</span>)
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;integrated-auth-gssapi&quot;</span>)]
+            </span><span class="prelude-val">Some</span>(val) <span class="kw">if </span>val.to_lowercase() == <span class="string">&quot;sspi&quot; </span>|| <span class="self">Self</span>::parse_bool(val)<span class="question-mark">? </span>=&gt; {
+                <span class="prelude-val">Ok</span>(AuthMethod::Integrated)
             }
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AuthMethod::sql_server</span>(<span class="ident">user</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>), <span class="ident">pw</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>))),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(AuthMethod::sql_server(user.unwrap_or(<span class="string">&quot;&quot;</span>), pw.unwrap_or(<span class="string">&quot;&quot;</span>))),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">database</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">dict</span>()
-            .<span class="ident">get</span>(<span class="string">&quot;database&quot;</span>)
-            .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">dict</span>().<span class="ident">get</span>(<span class="string">&quot;initial catalog&quot;</span>))
-            .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">dict</span>().<span class="ident">get</span>(<span class="string">&quot;databasename&quot;</span>))
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">db</span><span class="op">|</span> <span class="ident">db</span>.<span class="ident">to_string</span>())
+    <span class="kw">fn </span>database(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+        <span class="self">self</span>.dict()
+            .get(<span class="string">&quot;database&quot;</span>)
+            .or_else(|| <span class="self">self</span>.dict().get(<span class="string">&quot;initial catalog&quot;</span>))
+            .or_else(|| <span class="self">self</span>.dict().get(<span class="string">&quot;databasename&quot;</span>))
+            .map(|db| db.to_string())
     }
 
-    <span class="kw">fn</span> <span class="ident">application_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">dict</span>()
-            .<span class="ident">get</span>(<span class="string">&quot;application name&quot;</span>)
-            .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">dict</span>().<span class="ident">get</span>(<span class="string">&quot;applicationname&quot;</span>))
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="ident">name</span>.<span class="ident">to_string</span>())
+    <span class="kw">fn </span>application_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+        <span class="self">self</span>.dict()
+            .get(<span class="string">&quot;application name&quot;</span>)
+            .or_else(|| <span class="self">self</span>.dict().get(<span class="string">&quot;applicationname&quot;</span>))
+            .map(|name| name.to_string())
     }
 
-    <span class="kw">fn</span> <span class="ident">trust_cert</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">dict</span>()
-            .<span class="ident">get</span>(<span class="string">&quot;trustservercertificate&quot;</span>)
-            .<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::parse_bool</span>)
-            .<span class="ident">unwrap_or</span>(<span class="prelude-val">Ok</span>(<span class="bool-val">false</span>))
+    <span class="kw">fn </span>trust_cert(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;bool&gt; {
+        <span class="self">self</span>.dict()
+            .get(<span class="string">&quot;trustservercertificate&quot;</span>)
+            .map(<span class="self">Self</span>::parse_bool)
+            .unwrap_or(<span class="prelude-val">Ok</span>(<span class="bool-val">false</span>))
     }
 
-    <span class="kw">fn</span> <span class="ident">trust_cert_ca</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">dict</span>()
-            .<span class="ident">get</span>(<span class="string">&quot;trustservercertificateca&quot;</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">ca</span><span class="op">|</span> <span class="ident">ca</span>.<span class="ident">to_string</span>())
+    <span class="kw">fn </span>trust_cert_ca(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;String&gt; {
+        <span class="self">self</span>.dict()
+            .get(<span class="string">&quot;trustservercertificateca&quot;</span>)
+            .map(|ca| ca.to_string())
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-        <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls&quot;</span>,
-        <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native-tls&quot;</span>,
-        <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vendored-openssl&quot;</span>
-    ))]</span>
-    <span class="kw">fn</span> <span class="ident">encrypt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">EncryptionLevel</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">dict</span>()
-            .<span class="ident">get</span>(<span class="string">&quot;encrypt&quot;</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> <span class="kw">match</span> <span class="ident"><span class="self">Self</span>::parse_bool</span>(<span class="ident">val</span>) {
-                <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">EncryptionLevel::Required</span>),
-                <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">EncryptionLevel::Off</span>),
-                <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="kw">if</span> <span class="ident">val</span> <span class="op">==</span> <span class="string">&quot;DANGER_PLAINTEXT&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">EncryptionLevel::NotSupported</span>),
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">e</span>),
+    <span class="attribute">#[cfg(any(
+        feature = <span class="string">&quot;rustls&quot;</span>,
+        feature = <span class="string">&quot;native-tls&quot;</span>,
+        feature = <span class="string">&quot;vendored-openssl&quot;
+    </span>))]
+    </span><span class="kw">fn </span>encrypt(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;EncryptionLevel&gt; {
+        <span class="self">self</span>.dict()
+            .get(<span class="string">&quot;encrypt&quot;</span>)
+            .map(|val| <span class="kw">match </span><span class="self">Self</span>::parse_bool(val) {
+                <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>) =&gt; <span class="prelude-val">Ok</span>(EncryptionLevel::Required),
+                <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>) =&gt; <span class="prelude-val">Ok</span>(EncryptionLevel::Off),
+                <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="kw">if </span>val == <span class="string">&quot;DANGER_PLAINTEXT&quot; </span>=&gt; <span class="prelude-val">Ok</span>(EncryptionLevel::NotSupported),
+                <span class="prelude-val">Err</span>(e) =&gt; <span class="prelude-val">Err</span>(e),
             })
-            .<span class="ident">unwrap_or</span>(<span class="prelude-val">Ok</span>(<span class="ident">EncryptionLevel::Off</span>))
+            .unwrap_or(<span class="prelude-val">Ok</span>(EncryptionLevel::Off))
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(
-        <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls&quot;</span>,
-        <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native-tls&quot;</span>,
-        <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vendored-openssl&quot;</span>
-    )))]</span>
-    <span class="kw">fn</span> <span class="ident">encrypt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">EncryptionLevel</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">EncryptionLevel::NotSupported</span>)
+    <span class="attribute">#[cfg(not(any(
+        feature = <span class="string">&quot;rustls&quot;</span>,
+        feature = <span class="string">&quot;native-tls&quot;</span>,
+        feature = <span class="string">&quot;vendored-openssl&quot;
+    </span>)))]
+    </span><span class="kw">fn </span>encrypt(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;EncryptionLevel&gt; {
+        <span class="prelude-val">Ok</span>(EncryptionLevel::NotSupported)
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_bool</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">v</span>: <span class="ident">T</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">v</span>.<span class="ident">as_ref</span>().<span class="ident">trim</span>().<span class="ident">to_lowercase</span>().<span class="ident">as_str</span>() {
-            <span class="string">&quot;true&quot;</span> <span class="op">|</span> <span class="string">&quot;yes&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
-            <span class="string">&quot;false&quot;</span> <span class="op">|</span> <span class="string">&quot;no&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::Conversion</span>(
-                <span class="string">&quot;Connection string: Not a valid boolean&quot;</span>.<span class="ident">into</span>(),
+    <span class="kw">fn </span>parse_bool&lt;T: AsRef&lt;str&gt;&gt;(v: T) -&gt; <span class="kw">crate</span>::Result&lt;bool&gt; {
+        <span class="kw">match </span>v.as_ref().trim().to_lowercase().as_str() {
+            <span class="string">&quot;true&quot; </span>| <span class="string">&quot;yes&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
+            <span class="string">&quot;false&quot; </span>| <span class="string">&quot;no&quot; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(<span class="kw">crate</span>::Error::Conversion(
+                <span class="string">&quot;Connection string: Not a valid boolean&quot;</span>.into(),
             )),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tiberius" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tiberius" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

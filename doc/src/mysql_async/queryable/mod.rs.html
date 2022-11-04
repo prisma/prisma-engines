@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mysql_async-998d87ac262afe55/e3f8bdb/src/queryable/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mysql_async/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mysql_async-998d87ac262afe55/e3f8bdb/src/queryable/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mysql_async/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mysql_async/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -606,613 +606,613 @@
 <span id="606">606</span>
 <span id="607">607</span>
 <span id="608">608</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2017 Anatoly Ikorsky</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2017 Anatoly Ikorsky
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="ident">futures_util::FutureExt</span>;
-<span class="kw">use</span> <span class="ident">mysql_common</span>::{
-    <span class="ident">io::ParseBuf</span>,
-    <span class="ident">packets</span>::{<span class="ident">OkPacketDeserializer</span>, <span class="ident">ResultSetTerminator</span>},
-    <span class="ident">proto</span>::{<span class="ident">Binary</span>, <span class="ident">Text</span>},
-    <span class="ident">row::RowDeserializer</span>,
-    <span class="ident">value::ServerSide</span>,
+</span><span class="kw">use </span>futures_util::FutureExt;
+<span class="kw">use </span>mysql_common::{
+    io::ParseBuf,
+    packets::{OkPacketDeserializer, ResultSetTerminator},
+    proto::{Binary, Text},
+    row::RowDeserializer,
+    value::ServerSide,
 };
 
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">sync::Arc</span>};
+<span class="kw">use </span>std::{fmt, sync::Arc};
 
-<span class="kw">use</span> <span class="self">self</span>::{
-    <span class="ident">query_result::QueryResult</span>,
-    <span class="ident">stmt::Statement</span>,
-    <span class="ident">transaction</span>::{<span class="ident">Transaction</span>, <span class="ident">TxStatus</span>},
+<span class="kw">use </span><span class="self">self</span>::{
+    query_result::QueryResult,
+    stmt::Statement,
+    transaction::{Transaction, TxStatus},
 };
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">conn::routines</span>::{<span class="ident">PingRoutine</span>, <span class="ident">QueryRoutine</span>},
-    <span class="ident">consts::CapabilityFlags</span>,
-    <span class="ident">error</span>::<span class="kw-2">*</span>,
-    <span class="ident">prelude</span>::{<span class="ident">FromRow</span>, <span class="ident">StatementLike</span>},
-    <span class="ident">query::AsQuery</span>,
-    <span class="ident">queryable::query_result::ResultSetMeta</span>,
-    <span class="ident">BoxFuture</span>, <span class="ident">Column</span>, <span class="ident">Conn</span>, <span class="ident">Params</span>, <span class="ident">ResultSetStream</span>, <span class="ident">Row</span>,
+<span class="kw">use crate</span>::{
+    conn::routines::{PingRoutine, QueryRoutine},
+    consts::CapabilityFlags,
+    error::<span class="kw-2">*</span>,
+    prelude::{FromRow, StatementLike},
+    query::AsQuery,
+    queryable::query_result::ResultSetMeta,
+    BoxFuture, Column, Conn, Params, ResultSetStream, Row,
 };
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">query_result</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">stmt</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">transaction</span>;
+<span class="kw">pub mod </span>query_result;
+<span class="kw">pub mod </span>stmt;
+<span class="kw">pub mod </span>transaction;
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Protocol</span>: <span class="ident">fmt::Debug</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> {
-    <span class="doccomment">/// Returns `ResultSetMeta`, that corresponds to the current protocol.</span>
-    <span class="kw">fn</span> <span class="ident">result_set_meta</span>(<span class="ident">columns</span>: <span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">Column</span>]<span class="op">&gt;</span>) -&gt; <span class="ident">ResultSetMeta</span>;
-    <span class="kw">fn</span> <span class="ident">read_result_set_row</span>(<span class="ident">packet</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">columns</span>: <span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">Column</span>]<span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">is_last_result_set_packet</span>(<span class="ident">capabilities</span>: <span class="ident">CapabilityFlags</span>, <span class="ident">packet</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">bool</span> {
-        <span class="ident">packet</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">8</span>
-            <span class="op">&amp;&amp;</span> <span class="ident">ParseBuf</span>(<span class="ident">packet</span>)
-                .<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">OkPacketDeserializer</span><span class="op">&lt;</span><span class="ident">ResultSetTerminator</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">capabilities</span>)
-                .<span class="ident">is_ok</span>()
+<span class="kw">pub trait </span>Protocol: fmt::Debug + Send + Sync + <span class="lifetime">&#39;static </span>{
+    <span class="doccomment">/// Returns `ResultSetMeta`, that corresponds to the current protocol.
+    </span><span class="kw">fn </span>result_set_meta(columns: Arc&lt;[Column]&gt;) -&gt; ResultSetMeta;
+    <span class="kw">fn </span>read_result_set_row(packet: <span class="kw-2">&amp;</span>[u8], columns: Arc&lt;[Column]&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Row&gt;;
+    <span class="kw">fn </span>is_last_result_set_packet(capabilities: CapabilityFlags, packet: <span class="kw-2">&amp;</span>[u8]) -&gt; bool {
+        packet.len() &lt; <span class="number">8
+            </span>&amp;&amp; ParseBuf(packet)
+                .parse::&lt;OkPacketDeserializer&lt;ResultSetTerminator&gt;&gt;(capabilities)
+                .is_ok()
     }
 }
 
-<span class="doccomment">/// Phantom struct used to specify MySql text protocol.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TextProtocol</span>;
+<span class="doccomment">/// Phantom struct used to specify MySql text protocol.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>TextProtocol;
 
-<span class="doccomment">/// Phantom struct used to specify MySql binary protocol.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BinaryProtocol</span>;
+<span class="doccomment">/// Phantom struct used to specify MySql binary protocol.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>BinaryProtocol;
 
-<span class="kw">impl</span> <span class="ident">Protocol</span> <span class="kw">for</span> <span class="ident">TextProtocol</span> {
-    <span class="kw">fn</span> <span class="ident">result_set_meta</span>(<span class="ident">columns</span>: <span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">Column</span>]<span class="op">&gt;</span>) -&gt; <span class="ident">ResultSetMeta</span> {
-        <span class="ident">ResultSetMeta::Text</span>(<span class="ident">columns</span>)
+<span class="kw">impl </span>Protocol <span class="kw">for </span>TextProtocol {
+    <span class="kw">fn </span>result_set_meta(columns: Arc&lt;[Column]&gt;) -&gt; ResultSetMeta {
+        ResultSetMeta::Text(columns)
     }
 
-    <span class="kw">fn</span> <span class="ident">read_result_set_row</span>(<span class="ident">packet</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">columns</span>: <span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">Column</span>]<span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&gt;</span> {
-        <span class="ident">ParseBuf</span>(<span class="ident">packet</span>)
-            .<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">RowDeserializer</span><span class="op">&lt;</span><span class="ident">ServerSide</span>, <span class="ident">Text</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">columns</span>)
-            .<span class="ident">map</span>(<span class="ident">Into::into</span>)
-            .<span class="ident">map_err</span>(<span class="ident">Into::into</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Protocol</span> <span class="kw">for</span> <span class="ident">BinaryProtocol</span> {
-    <span class="kw">fn</span> <span class="ident">result_set_meta</span>(<span class="ident">columns</span>: <span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">Column</span>]<span class="op">&gt;</span>) -&gt; <span class="ident">ResultSetMeta</span> {
-        <span class="ident">ResultSetMeta::Binary</span>(<span class="ident">columns</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">read_result_set_row</span>(<span class="ident">packet</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">columns</span>: <span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">Column</span>]<span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&gt;</span> {
-        <span class="ident">ParseBuf</span>(<span class="ident">packet</span>)
-            .<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">RowDeserializer</span><span class="op">&lt;</span><span class="ident">ServerSide</span>, <span class="ident">Binary</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">columns</span>)
-            .<span class="ident">map</span>(<span class="ident">Into::into</span>)
-            .<span class="ident">map_err</span>(<span class="ident">Into::into</span>)
+    <span class="kw">fn </span>read_result_set_row(packet: <span class="kw-2">&amp;</span>[u8], columns: Arc&lt;[Column]&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Row&gt; {
+        ParseBuf(packet)
+            .parse::&lt;RowDeserializer&lt;ServerSide, Text&gt;&gt;(columns)
+            .map(Into::into)
+            .map_err(Into::into)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Conn</span> {
-    <span class="doccomment">/// The purpose of this function is to rollback a transaction or to drop query result in cases,</span>
-    <span class="doccomment">/// where `Transaction` was dropped without an explicit call to `commit` or `rollback`,</span>
-    <span class="doccomment">/// or where `QueryResult` was dropped without being consumed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The difference betwee this function and [`Conn::cleanup`] is that this function</span>
-    <span class="doccomment">/// won&#39;t rollback existing transaction. Another difference, is that this function</span>
-    <span class="doccomment">/// won&#39;t ignore non-fatal errors.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">clean_dirty</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">drop_result</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">get_tx_status</span>() <span class="op">==</span> <span class="ident">TxStatus::RequiresRollback</span> {
-            <span class="self">self</span>.<span class="ident">set_tx_status</span>(<span class="ident">TxStatus::None</span>);
-            <span class="self">self</span>.<span class="ident">exec_drop</span>(<span class="string">&quot;ROLLBACK&quot;</span>, ()).<span class="kw">await</span><span class="question-mark">?</span>;
+<span class="kw">impl </span>Protocol <span class="kw">for </span>BinaryProtocol {
+    <span class="kw">fn </span>result_set_meta(columns: Arc&lt;[Column]&gt;) -&gt; ResultSetMeta {
+        ResultSetMeta::Binary(columns)
+    }
+
+    <span class="kw">fn </span>read_result_set_row(packet: <span class="kw-2">&amp;</span>[u8], columns: Arc&lt;[Column]&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Row&gt; {
+        ParseBuf(packet)
+            .parse::&lt;RowDeserializer&lt;ServerSide, Binary&gt;&gt;(columns)
+            .map(Into::into)
+            .map_err(Into::into)
+    }
+}
+
+<span class="kw">impl </span>Conn {
+    <span class="doccomment">/// The purpose of this function is to rollback a transaction or to drop query result in cases,
+    /// where `Transaction` was dropped without an explicit call to `commit` or `rollback`,
+    /// or where `QueryResult` was dropped without being consumed.
+    ///
+    /// The difference betwee this function and [`Conn::cleanup`] is that this function
+    /// won&#39;t rollback existing transaction. Another difference, is that this function
+    /// won&#39;t ignore non-fatal errors.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>clean_dirty(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="self">self</span>.drop_result().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">if </span><span class="self">self</span>.get_tx_status() == TxStatus::RequiresRollback {
+            <span class="self">self</span>.set_tx_status(TxStatus::None);
+            <span class="self">self</span>.exec_drop(<span class="string">&quot;ROLLBACK&quot;</span>, ()).<span class="kw">await</span><span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Low level function that performs a text query.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">raw_query</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Q</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">query</span>: <span class="ident">Q</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">Q</span>: <span class="ident">AsQuery</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
+    <span class="doccomment">/// Low level function that performs a text query.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>raw_query&lt;<span class="lifetime">&#39;a</span>, Q&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, query: Q) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;
+    <span class="kw">where
+        </span>Q: AsQuery + <span class="lifetime">&#39;a</span>,
     {
-        <span class="self">self</span>.<span class="ident">routine</span>(<span class="ident">QueryRoutine::new</span>(<span class="ident">query</span>.<span class="ident">as_query</span>().<span class="ident">as_ref</span>()))
-            .<span class="kw">await</span>
+        <span class="self">self</span>.routine(QueryRoutine::new(query.as_query().as_ref()))
+            .<span class="kw">await
+    </span>}
+}
+
+<span class="doccomment">/// Methods of this trait are used to execute database queries.
+///
+/// `Conn` is a `Queryable` as well as `Transaction`.
+</span><span class="kw">pub trait </span>Queryable: Send {
+    <span class="doccomment">/// Executes `COM_PING`.
+    </span><span class="kw">fn </span>ping(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ()&gt;;
+
+    <span class="doccomment">/// Performs the given query and returns the result.
+    </span><span class="kw">fn </span>query_iter&lt;<span class="lifetime">&#39;a</span>, Q&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+        query: Q,
+    ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, QueryResult&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;static</span>, TextProtocol&gt;&gt;
+    <span class="kw">where
+        </span>Q: AsQuery + <span class="lifetime">&#39;a</span>;
+
+    <span class="doccomment">/// Prepares the given statement.
+    ///
+    /// Note, that `Statement` will exist only in the context of this queryable.
+    ///
+    /// Also note, that this call may close the least recently used statement
+    /// if statement cache is at its capacity (see. [`stmt_cache_size`][stmt_cache_size]).
+    ///
+    /// [stmt_cache_size]: crate::Opts::stmt_cache_size
+    </span><span class="kw">fn </span>prep&lt;<span class="lifetime">&#39;a</span>, Q&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, query: Q) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, Statement&gt;
+    <span class="kw">where
+        </span>Q: AsQuery + <span class="lifetime">&#39;a</span>;
+
+    <span class="doccomment">/// Closes the given statement.
+    ///
+    /// Usually there is no need to explicitly close statements
+    /// (see. [`stmt_cache_size`][stmt_cache_size]).
+    ///
+    /// [stmt_cache_size]: crate::Opts::stmt_cache_size
+    </span><span class="kw">fn </span>close(<span class="kw-2">&amp;mut </span><span class="self">self</span>, stmt: Statement) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ()&gt;;
+
+    <span class="doccomment">/// Executes the given statement with given params.
+    ///
+    /// It&#39;ll prepare `stmt`, if necessary.
+    </span><span class="kw">fn </span>exec_iter&lt;<span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;s</span>, <span class="lifetime">&#39;s</span>, Q, P&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+        stmt: Q,
+        params: P,
+    ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;s</span>, QueryResult&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;static</span>, BinaryProtocol&gt;&gt;
+    <span class="kw">where
+        </span>Q: StatementLike + <span class="lifetime">&#39;a</span>,
+        P: Into&lt;Params&gt;;
+
+    <span class="doccomment">/// Performs the given query and collects the first result set.
+    ///
+    /// ## Conversion
+    ///
+    /// This stream will convert each row into `T` using [`FromRow`] implementation.
+    /// If the row type is unknown please use the [`Row`] type for `T`
+    /// to make this conversion infallible.
+    </span><span class="kw">fn </span>query&lt;<span class="lifetime">&#39;a</span>, T, Q&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, query: Q) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, Vec&lt;T&gt;&gt;
+    <span class="kw">where
+        </span>Q: AsQuery + <span class="lifetime">&#39;a</span>,
+        T: FromRow + Send + <span class="lifetime">&#39;static</span>,
+    {
+        <span class="kw">async move </span>{ <span class="self">self</span>.query_iter(query).<span class="kw">await</span><span class="question-mark">?</span>.collect_and_drop::&lt;T&gt;().<span class="kw">await </span>}.boxed()
+    }
+
+    <span class="doccomment">/// Performs the given query and returns the first row of the first result set.
+    ///
+    /// ## Conversion
+    ///
+    /// This stream will convert each row into `T` using [`FromRow`] implementation.
+    /// If the row type is unknown please use the [`Row`] type for `T`
+    /// to make this conversion infallible.
+    </span><span class="kw">fn </span>query_first&lt;<span class="lifetime">&#39;a</span>, T, Q&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, query: Q) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, <span class="prelude-ty">Option</span>&lt;T&gt;&gt;
+    <span class="kw">where
+        </span>Q: AsQuery + <span class="lifetime">&#39;a</span>,
+        T: FromRow + Send + <span class="lifetime">&#39;static</span>,
+    {
+        <span class="kw">async move </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>result = <span class="self">self</span>.query_iter(query).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="kw">let </span>output = <span class="kw">if </span>result.is_empty() {
+                <span class="prelude-val">None
+            </span>} <span class="kw">else </span>{
+                result.next().<span class="kw">await</span><span class="question-mark">?</span>.map(<span class="kw">crate</span>::from_row)
+            };
+            result.drop_result().<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(output)
+        }
+        .boxed()
+    }
+
+    <span class="doccomment">/// Performs the given query and maps each row of the first result set.
+    ///
+    /// ## Conversion
+    ///
+    /// This stream will convert each row into `T` using [`FromRow`] implementation.
+    /// If the row type is unknown please use the [`Row`] type for `T`
+    /// to make this conversion infallible.
+    </span><span class="kw">fn </span>query_map&lt;<span class="lifetime">&#39;a</span>, T, F, Q, U&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, query: Q, <span class="kw-2">mut </span>f: F) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, Vec&lt;U&gt;&gt;
+    <span class="kw">where
+        </span>Q: AsQuery + <span class="lifetime">&#39;a</span>,
+        T: FromRow + Send + <span class="lifetime">&#39;static</span>,
+        F: FnMut(T) -&gt; U + Send + <span class="lifetime">&#39;a</span>,
+        U: Send,
+    {
+        <span class="kw">async move </span>{
+            <span class="self">self</span>.query_fold(query, Vec::new(), |<span class="kw-2">mut </span>acc, row| {
+                acc.push(f(<span class="kw">crate</span>::from_row(row)));
+                acc
+            })
+            .<span class="kw">await
+        </span>}
+        .boxed()
+    }
+
+    <span class="doccomment">/// Performs the given query and folds the first result set to a single value.
+    ///
+    /// ## Conversion
+    ///
+    /// This stream will convert each row into `T` using [`FromRow`] implementation.
+    /// If the row type is unknown please use the [`Row`] type for `T`
+    /// to make this conversion infallible.
+    </span><span class="kw">fn </span>query_fold&lt;<span class="lifetime">&#39;a</span>, T, F, Q, U&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, query: Q, init: U, <span class="kw-2">mut </span>f: F) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, U&gt;
+    <span class="kw">where
+        </span>Q: AsQuery + <span class="lifetime">&#39;a</span>,
+        T: FromRow + Send + <span class="lifetime">&#39;static</span>,
+        F: FnMut(U, T) -&gt; U + Send + <span class="lifetime">&#39;a</span>,
+        U: Send + <span class="lifetime">&#39;a</span>,
+    {
+        <span class="kw">async move </span>{
+            <span class="self">self</span>.query_iter(query)
+                .<span class="kw">await</span><span class="question-mark">?
+                </span>.reduce_and_drop(init, |acc, row| f(acc, <span class="kw">crate</span>::from_row(row)))
+                .<span class="kw">await
+        </span>}
+        .boxed()
+    }
+
+    <span class="doccomment">/// Performs the given query and drops the query result.
+    </span><span class="kw">fn </span>query_drop&lt;<span class="lifetime">&#39;a</span>, Q&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, query: Q) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ()&gt;
+    <span class="kw">where
+        </span>Q: AsQuery + <span class="lifetime">&#39;a</span>,
+    {
+        <span class="kw">async move </span>{ <span class="self">self</span>.query_iter(query).<span class="kw">await</span><span class="question-mark">?</span>.drop_result().<span class="kw">await </span>}.boxed()
+    }
+
+    <span class="doccomment">/// Exectues the given statement for each item in the given params iterator.
+    ///
+    /// It&#39;ll prepare `stmt` (once), if necessary.
+    </span><span class="kw">fn </span>exec_batch&lt;<span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;b</span>, S, P, I&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, stmt: S, params_iter: I) -&gt; BoxFuture&lt;<span class="lifetime">&#39;b</span>, ()&gt;
+    <span class="kw">where
+        </span>S: StatementLike + <span class="lifetime">&#39;b</span>,
+        I: IntoIterator&lt;Item = P&gt; + Send + <span class="lifetime">&#39;b</span>,
+        I::IntoIter: Send,
+        P: Into&lt;Params&gt; + Send;
+
+    <span class="doccomment">/// Exectues the given statement and collects the first result set.
+    ///
+    /// It&#39;ll prepare `stmt`, if necessary.
+    ///
+    /// ## Conversion
+    ///
+    /// This stream will convert each row into `T` using [`FromRow`] implementation.
+    /// If the row type is unknown please use the [`Row`] type for `T`
+    /// to make this conversion infallible.
+    </span><span class="kw">fn </span>exec&lt;<span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;b</span>, T, S, P&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, stmt: S, params: P) -&gt; BoxFuture&lt;<span class="lifetime">&#39;b</span>, Vec&lt;T&gt;&gt;
+    <span class="kw">where
+        </span>S: StatementLike + <span class="lifetime">&#39;b</span>,
+        P: Into&lt;Params&gt; + Send + <span class="lifetime">&#39;b</span>,
+        T: FromRow + Send + <span class="lifetime">&#39;static</span>,
+    {
+        <span class="kw">async move </span>{
+            <span class="self">self</span>.exec_iter(stmt, params)
+                .<span class="kw">await</span><span class="question-mark">?
+                </span>.collect_and_drop::&lt;T&gt;()
+                .<span class="kw">await
+        </span>}
+        .boxed()
+    }
+
+    <span class="doccomment">/// Exectues the given statement and returns the first row of the first result set.
+    ///
+    /// It&#39;ll prepare `stmt`, if necessary.
+    ///
+    /// ## Conversion
+    ///
+    /// This stream will convert each row into `T` using [`FromRow`] implementation.
+    /// If the row type is unknown please use the [`Row`] type for `T`
+    /// to make this conversion infallible.
+    </span><span class="kw">fn </span>exec_first&lt;<span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;b</span>, T, S, P&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, stmt: S, params: P) -&gt; BoxFuture&lt;<span class="lifetime">&#39;b</span>, <span class="prelude-ty">Option</span>&lt;T&gt;&gt;
+    <span class="kw">where
+        </span>S: StatementLike + <span class="lifetime">&#39;b</span>,
+        P: Into&lt;Params&gt; + Send + <span class="lifetime">&#39;b</span>,
+        T: FromRow + Send + <span class="lifetime">&#39;static</span>,
+    {
+        <span class="kw">async move </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>result = <span class="self">self</span>.exec_iter(stmt, params).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="kw">let </span>row = <span class="kw">if </span>result.is_empty() {
+                <span class="prelude-val">None
+            </span>} <span class="kw">else </span>{
+                result.next().<span class="kw">await</span><span class="question-mark">?
+            </span>};
+            result.drop_result().<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(row.map(<span class="kw">crate</span>::from_row))
+        }
+        .boxed()
+    }
+
+    <span class="doccomment">/// Exectues the given stmt and maps each row of the first result set.
+    ///
+    /// It&#39;ll prepare `stmt`, if necessary.
+    ///
+    /// ## Conversion
+    ///
+    /// This stream will convert each row into `T` using [`FromRow`] implementation.
+    /// If the row type is unknown please use the [`Row`] type for `T`
+    /// to make this conversion infallible.
+    </span><span class="kw">fn </span>exec_map&lt;<span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;b</span>, T, S, P, U, F&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+        stmt: S,
+        params: P,
+        <span class="kw-2">mut </span>f: F,
+    ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;b</span>, Vec&lt;U&gt;&gt;
+    <span class="kw">where
+        </span>S: StatementLike + <span class="lifetime">&#39;b</span>,
+        P: Into&lt;Params&gt; + Send + <span class="lifetime">&#39;b</span>,
+        T: FromRow + Send + <span class="lifetime">&#39;static</span>,
+        F: FnMut(T) -&gt; U + Send + <span class="lifetime">&#39;a</span>,
+        U: Send + <span class="lifetime">&#39;a</span>,
+    {
+        <span class="kw">async move </span>{
+            <span class="self">self</span>.exec_fold(stmt, params, Vec::new(), |<span class="kw-2">mut </span>acc, row| {
+                acc.push(f(<span class="kw">crate</span>::from_row(row)));
+                acc
+            })
+            .<span class="kw">await
+        </span>}
+        .boxed()
+    }
+
+    <span class="doccomment">/// Exectues the given stmt and folds the first result set to a signel value.
+    ///
+    /// It&#39;ll prepare `stmt`, if necessary.
+    ///
+    /// ## Conversion
+    ///
+    /// This stream will convert each row into `T` using [`FromRow`] implementation.
+    /// If the row type is unknown please use the [`Row`] type for `T`
+    /// to make this conversion infallible.
+    </span><span class="kw">fn </span>exec_fold&lt;<span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;b</span>, T, S, P, U, F&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+        stmt: S,
+        params: P,
+        init: U,
+        <span class="kw-2">mut </span>f: F,
+    ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;b</span>, U&gt;
+    <span class="kw">where
+        </span>S: StatementLike + <span class="lifetime">&#39;b</span>,
+        P: Into&lt;Params&gt; + Send + <span class="lifetime">&#39;b</span>,
+        T: FromRow + Send + <span class="lifetime">&#39;static</span>,
+        F: FnMut(U, T) -&gt; U + Send + <span class="lifetime">&#39;a</span>,
+        U: Send + <span class="lifetime">&#39;a</span>,
+    {
+        <span class="kw">async move </span>{
+            <span class="self">self</span>.exec_iter(stmt, params)
+                .<span class="kw">await</span><span class="question-mark">?
+                </span>.reduce_and_drop(init, |acc, row| f(acc, <span class="kw">crate</span>::from_row(row)))
+                .<span class="kw">await
+        </span>}
+        .boxed()
+    }
+
+    <span class="doccomment">/// Exectues the given statement and drops the result.
+    </span><span class="kw">fn </span>exec_drop&lt;<span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;b</span>, S, P&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, stmt: S, params: P) -&gt; BoxFuture&lt;<span class="lifetime">&#39;b</span>, ()&gt;
+    <span class="kw">where
+        </span>S: StatementLike + <span class="lifetime">&#39;b</span>,
+        P: Into&lt;Params&gt; + Send + <span class="lifetime">&#39;b</span>,
+    {
+        <span class="kw">async move </span>{ <span class="self">self</span>.exec_iter(stmt, params).<span class="kw">await</span><span class="question-mark">?</span>.drop_result().<span class="kw">await </span>}.boxed()
+    }
+
+    <span class="doccomment">/// Returns a stream over the first result set.
+    ///
+    /// Please see [`QueryResult::stream_and_drop`][stream_and_drop].
+    ///
+    /// [stream_and_drop]: crate::QueryResult::stream_and_drop
+    </span><span class="kw">fn </span>query_stream&lt;<span class="lifetime">&#39;a</span>, T, Q&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+        query: Q,
+    ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, ResultSetStream&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;static</span>, T, TextProtocol&gt;&gt;
+    <span class="kw">where
+        </span>T: Unpin + FromRow + Send + <span class="lifetime">&#39;static</span>,
+        Q: AsQuery + <span class="lifetime">&#39;a</span>,
+    {
+        <span class="kw">async move </span>{
+            <span class="self">self</span>.query_iter(query)
+                .<span class="kw">await</span><span class="question-mark">?
+                </span>.stream_and_drop()
+                .<span class="kw">await
+                </span>.transpose()
+                .expect(<span class="string">&quot;At least one result set is expected&quot;</span>)
+        }
+        .boxed()
+    }
+
+    <span class="doccomment">/// Returns a stream over the first result set.
+    ///
+    /// Please see [`QueryResult::stream_and_drop`][stream_and_drop].
+    ///
+    /// [stream_and_drop]: crate::QueryResult::stream_and_drop
+    </span><span class="kw">fn </span>exec_stream&lt;<span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;s</span>, <span class="lifetime">&#39;s</span>, T, Q, P&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+        stmt: Q,
+        params: P,
+    ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;s</span>, ResultSetStream&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;static</span>, T, BinaryProtocol&gt;&gt;
+    <span class="kw">where
+        </span>T: Unpin + FromRow + Send + <span class="lifetime">&#39;static</span>,
+        Q: StatementLike + <span class="lifetime">&#39;a</span>,
+        P: Into&lt;Params&gt; + Send + <span class="lifetime">&#39;s</span>,
+    {
+        <span class="kw">async move </span>{
+            <span class="self">self</span>.exec_iter(stmt, params)
+                .<span class="kw">await</span><span class="question-mark">?
+                </span>.stream_and_drop()
+                .<span class="kw">await
+                </span>.transpose()
+                .expect(<span class="string">&quot;At least one result set is expected&quot;</span>)
+        }
+        .boxed()
     }
 }
 
-<span class="doccomment">/// Methods of this trait are used to execute database queries.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `Conn` is a `Queryable` as well as `Transaction`.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Queryable</span>: <span class="ident">Send</span> {
-    <span class="doccomment">/// Executes `COM_PING`.</span>
-    <span class="kw">fn</span> <span class="ident">ping</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, ()<span class="op">&gt;</span>;
-
-    <span class="doccomment">/// Performs the given query and returns the result.</span>
-    <span class="kw">fn</span> <span class="ident">query_iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Q</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">query</span>: <span class="ident">Q</span>,
-    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">QueryResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;static</span>, <span class="ident">TextProtocol</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">Q</span>: <span class="ident">AsQuery</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>;
-
-    <span class="doccomment">/// Prepares the given statement.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note, that `Statement` will exist only in the context of this queryable.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Also note, that this call may close the least recently used statement</span>
-    <span class="doccomment">/// if statement cache is at its capacity (see. [`stmt_cache_size`][stmt_cache_size]).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [stmt_cache_size]: crate::Opts::stmt_cache_size</span>
-    <span class="kw">fn</span> <span class="ident">prep</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Q</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">query</span>: <span class="ident">Q</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Statement</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">Q</span>: <span class="ident">AsQuery</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>;
-
-    <span class="doccomment">/// Closes the given statement.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Usually there is no need to explicitly close statements</span>
-    <span class="doccomment">/// (see. [`stmt_cache_size`][stmt_cache_size]).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [stmt_cache_size]: crate::Opts::stmt_cache_size</span>
-    <span class="kw">fn</span> <span class="ident">close</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">stmt</span>: <span class="ident">Statement</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, ()<span class="op">&gt;</span>;
-
-    <span class="doccomment">/// Executes the given statement with given params.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// It&#39;ll prepare `stmt`, if necessary.</span>
-    <span class="kw">fn</span> <span class="ident">exec_iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;s</span>, <span class="lifetime">&#39;s</span>, <span class="ident">Q</span>, <span class="ident">P</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">stmt</span>: <span class="ident">Q</span>,
-        <span class="ident">params</span>: <span class="ident">P</span>,
-    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">QueryResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;static</span>, <span class="ident">BinaryProtocol</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">Q</span>: <span class="ident">StatementLike</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
-        <span class="ident">P</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Params</span><span class="op">&gt;</span>;
-
-    <span class="doccomment">/// Performs the given query and collects the first result set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Conversion</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This stream will convert each row into `T` using [`FromRow`] implementation.</span>
-    <span class="doccomment">/// If the row type is unknown please use the [`Row`] type for `T`</span>
-    <span class="doccomment">/// to make this conversion infallible.</span>
-    <span class="kw">fn</span> <span class="ident">query</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">Q</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">query</span>: <span class="ident">Q</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">Q</span>: <span class="ident">AsQuery</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
-        <span class="ident">T</span>: <span class="ident">FromRow</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    {
-        <span class="kw">async</span> <span class="kw">move</span> { <span class="self">self</span>.<span class="ident">query_iter</span>(<span class="ident">query</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">collect_and_drop</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>().<span class="kw">await</span> }.<span class="ident">boxed</span>()
-    }
-
-    <span class="doccomment">/// Performs the given query and returns the first row of the first result set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Conversion</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This stream will convert each row into `T` using [`FromRow`] implementation.</span>
-    <span class="doccomment">/// If the row type is unknown please use the [`Row`] type for `T`</span>
-    <span class="doccomment">/// to make this conversion infallible.</span>
-    <span class="kw">fn</span> <span class="ident">query_first</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">Q</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">query</span>: <span class="ident">Q</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">Q</span>: <span class="ident">AsQuery</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
-        <span class="ident">T</span>: <span class="ident">FromRow</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    {
-        <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">query_iter</span>(<span class="ident">query</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">result</span>.<span class="ident">is_empty</span>() {
-                <span class="prelude-val">None</span>
-            } <span class="kw">else</span> {
-                <span class="ident">result</span>.<span class="ident">next</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">map</span>(<span class="ident"><span class="kw">crate</span>::from_row</span>)
-            };
-            <span class="ident">result</span>.<span class="ident">drop_result</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(<span class="ident">output</span>)
-        }
-        .<span class="ident">boxed</span>()
-    }
-
-    <span class="doccomment">/// Performs the given query and maps each row of the first result set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Conversion</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This stream will convert each row into `T` using [`FromRow`] implementation.</span>
-    <span class="doccomment">/// If the row type is unknown please use the [`Row`] type for `T`</span>
-    <span class="doccomment">/// to make this conversion infallible.</span>
-    <span class="kw">fn</span> <span class="ident">query_map</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">F</span>, <span class="ident">Q</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">query</span>: <span class="ident">Q</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">Q</span>: <span class="ident">AsQuery</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
-        <span class="ident">T</span>: <span class="ident">FromRow</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">T</span>) -&gt; <span class="ident">U</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
-        <span class="ident">U</span>: <span class="ident">Send</span>,
-    {
-        <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="self">self</span>.<span class="ident">query_fold</span>(<span class="ident">query</span>, <span class="ident">Vec::new</span>(), <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">acc</span>, <span class="ident">row</span><span class="op">|</span> {
-                <span class="ident">acc</span>.<span class="ident">push</span>(<span class="ident">f</span>(<span class="ident"><span class="kw">crate</span>::from_row</span>(<span class="ident">row</span>)));
-                <span class="ident">acc</span>
-            })
-            .<span class="kw">await</span>
-        }
-        .<span class="ident">boxed</span>()
-    }
-
-    <span class="doccomment">/// Performs the given query and folds the first result set to a single value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Conversion</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This stream will convert each row into `T` using [`FromRow`] implementation.</span>
-    <span class="doccomment">/// If the row type is unknown please use the [`Row`] type for `T`</span>
-    <span class="doccomment">/// to make this conversion infallible.</span>
-    <span class="kw">fn</span> <span class="ident">query_fold</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">F</span>, <span class="ident">Q</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">query</span>: <span class="ident">Q</span>, <span class="ident">init</span>: <span class="ident">U</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">U</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">Q</span>: <span class="ident">AsQuery</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
-        <span class="ident">T</span>: <span class="ident">FromRow</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">U</span>, <span class="ident">T</span>) -&gt; <span class="ident">U</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
-        <span class="ident">U</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
-    {
-        <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="self">self</span>.<span class="ident">query_iter</span>(<span class="ident">query</span>)
-                .<span class="kw">await</span><span class="question-mark">?</span>
-                .<span class="ident">reduce_and_drop</span>(<span class="ident">init</span>, <span class="op">|</span><span class="ident">acc</span>, <span class="ident">row</span><span class="op">|</span> <span class="ident">f</span>(<span class="ident">acc</span>, <span class="ident"><span class="kw">crate</span>::from_row</span>(<span class="ident">row</span>)))
-                .<span class="kw">await</span>
-        }
-        .<span class="ident">boxed</span>()
-    }
-
-    <span class="doccomment">/// Performs the given query and drops the query result.</span>
-    <span class="kw">fn</span> <span class="ident">query_drop</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Q</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">query</span>: <span class="ident">Q</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, ()<span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">Q</span>: <span class="ident">AsQuery</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
-    {
-        <span class="kw">async</span> <span class="kw">move</span> { <span class="self">self</span>.<span class="ident">query_iter</span>(<span class="ident">query</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">drop_result</span>().<span class="kw">await</span> }.<span class="ident">boxed</span>()
-    }
-
-    <span class="doccomment">/// Exectues the given statement for each item in the given params iterator.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// It&#39;ll prepare `stmt` (once), if necessary.</span>
-    <span class="kw">fn</span> <span class="ident">exec_batch</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;b</span>, <span class="ident">S</span>, <span class="ident">P</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">stmt</span>: <span class="ident">S</span>, <span class="ident">params_iter</span>: <span class="ident">I</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, ()<span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">StatementLike</span> <span class="op">+</span> <span class="lifetime">&#39;b</span>,
-        <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">P</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;b</span>,
-        <span class="ident">I::IntoIter</span>: <span class="ident">Send</span>,
-        <span class="ident">P</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Params</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>;
-
-    <span class="doccomment">/// Exectues the given statement and collects the first result set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// It&#39;ll prepare `stmt`, if necessary.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Conversion</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This stream will convert each row into `T` using [`FromRow`] implementation.</span>
-    <span class="doccomment">/// If the row type is unknown please use the [`Row`] type for `T`</span>
-    <span class="doccomment">/// to make this conversion infallible.</span>
-    <span class="kw">fn</span> <span class="ident">exec</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;b</span>, <span class="ident">T</span>, <span class="ident">S</span>, <span class="ident">P</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">stmt</span>: <span class="ident">S</span>, <span class="ident">params</span>: <span class="ident">P</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">StatementLike</span> <span class="op">+</span> <span class="lifetime">&#39;b</span>,
-        <span class="ident">P</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Params</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;b</span>,
-        <span class="ident">T</span>: <span class="ident">FromRow</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    {
-        <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="self">self</span>.<span class="ident">exec_iter</span>(<span class="ident">stmt</span>, <span class="ident">params</span>)
-                .<span class="kw">await</span><span class="question-mark">?</span>
-                .<span class="ident">collect_and_drop</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>()
-                .<span class="kw">await</span>
-        }
-        .<span class="ident">boxed</span>()
-    }
-
-    <span class="doccomment">/// Exectues the given statement and returns the first row of the first result set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// It&#39;ll prepare `stmt`, if necessary.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Conversion</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This stream will convert each row into `T` using [`FromRow`] implementation.</span>
-    <span class="doccomment">/// If the row type is unknown please use the [`Row`] type for `T`</span>
-    <span class="doccomment">/// to make this conversion infallible.</span>
-    <span class="kw">fn</span> <span class="ident">exec_first</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;b</span>, <span class="ident">T</span>, <span class="ident">S</span>, <span class="ident">P</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">stmt</span>: <span class="ident">S</span>, <span class="ident">params</span>: <span class="ident">P</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">StatementLike</span> <span class="op">+</span> <span class="lifetime">&#39;b</span>,
-        <span class="ident">P</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Params</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;b</span>,
-        <span class="ident">T</span>: <span class="ident">FromRow</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    {
-        <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">exec_iter</span>(<span class="ident">stmt</span>, <span class="ident">params</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">row</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">result</span>.<span class="ident">is_empty</span>() {
-                <span class="prelude-val">None</span>
-            } <span class="kw">else</span> {
-                <span class="ident">result</span>.<span class="ident">next</span>().<span class="kw">await</span><span class="question-mark">?</span>
-            };
-            <span class="ident">result</span>.<span class="ident">drop_result</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(<span class="ident">row</span>.<span class="ident">map</span>(<span class="ident"><span class="kw">crate</span>::from_row</span>))
-        }
-        .<span class="ident">boxed</span>()
-    }
-
-    <span class="doccomment">/// Exectues the given stmt and maps each row of the first result set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// It&#39;ll prepare `stmt`, if necessary.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Conversion</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This stream will convert each row into `T` using [`FromRow`] implementation.</span>
-    <span class="doccomment">/// If the row type is unknown please use the [`Row`] type for `T`</span>
-    <span class="doccomment">/// to make this conversion infallible.</span>
-    <span class="kw">fn</span> <span class="ident">exec_map</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;b</span>, <span class="ident">T</span>, <span class="ident">S</span>, <span class="ident">P</span>, <span class="ident">U</span>, <span class="ident">F</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">stmt</span>: <span class="ident">S</span>,
-        <span class="ident">params</span>: <span class="ident">P</span>,
-        <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">StatementLike</span> <span class="op">+</span> <span class="lifetime">&#39;b</span>,
-        <span class="ident">P</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Params</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;b</span>,
-        <span class="ident">T</span>: <span class="ident">FromRow</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">T</span>) -&gt; <span class="ident">U</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
-        <span class="ident">U</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
-    {
-        <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="self">self</span>.<span class="ident">exec_fold</span>(<span class="ident">stmt</span>, <span class="ident">params</span>, <span class="ident">Vec::new</span>(), <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">acc</span>, <span class="ident">row</span><span class="op">|</span> {
-                <span class="ident">acc</span>.<span class="ident">push</span>(<span class="ident">f</span>(<span class="ident"><span class="kw">crate</span>::from_row</span>(<span class="ident">row</span>)));
-                <span class="ident">acc</span>
-            })
-            .<span class="kw">await</span>
-        }
-        .<span class="ident">boxed</span>()
-    }
-
-    <span class="doccomment">/// Exectues the given stmt and folds the first result set to a signel value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// It&#39;ll prepare `stmt`, if necessary.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Conversion</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This stream will convert each row into `T` using [`FromRow`] implementation.</span>
-    <span class="doccomment">/// If the row type is unknown please use the [`Row`] type for `T`</span>
-    <span class="doccomment">/// to make this conversion infallible.</span>
-    <span class="kw">fn</span> <span class="ident">exec_fold</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;b</span>, <span class="ident">T</span>, <span class="ident">S</span>, <span class="ident">P</span>, <span class="ident">U</span>, <span class="ident">F</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">stmt</span>: <span class="ident">S</span>,
-        <span class="ident">params</span>: <span class="ident">P</span>,
-        <span class="ident">init</span>: <span class="ident">U</span>,
-        <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">U</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">StatementLike</span> <span class="op">+</span> <span class="lifetime">&#39;b</span>,
-        <span class="ident">P</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Params</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;b</span>,
-        <span class="ident">T</span>: <span class="ident">FromRow</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">U</span>, <span class="ident">T</span>) -&gt; <span class="ident">U</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
-        <span class="ident">U</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
-    {
-        <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="self">self</span>.<span class="ident">exec_iter</span>(<span class="ident">stmt</span>, <span class="ident">params</span>)
-                .<span class="kw">await</span><span class="question-mark">?</span>
-                .<span class="ident">reduce_and_drop</span>(<span class="ident">init</span>, <span class="op">|</span><span class="ident">acc</span>, <span class="ident">row</span><span class="op">|</span> <span class="ident">f</span>(<span class="ident">acc</span>, <span class="ident"><span class="kw">crate</span>::from_row</span>(<span class="ident">row</span>)))
-                .<span class="kw">await</span>
-        }
-        .<span class="ident">boxed</span>()
-    }
-
-    <span class="doccomment">/// Exectues the given statement and drops the result.</span>
-    <span class="kw">fn</span> <span class="ident">exec_drop</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;b</span>, <span class="ident">S</span>, <span class="ident">P</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">stmt</span>: <span class="ident">S</span>, <span class="ident">params</span>: <span class="ident">P</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, ()<span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">StatementLike</span> <span class="op">+</span> <span class="lifetime">&#39;b</span>,
-        <span class="ident">P</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Params</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;b</span>,
-    {
-        <span class="kw">async</span> <span class="kw">move</span> { <span class="self">self</span>.<span class="ident">exec_iter</span>(<span class="ident">stmt</span>, <span class="ident">params</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">drop_result</span>().<span class="kw">await</span> }.<span class="ident">boxed</span>()
-    }
-
-    <span class="doccomment">/// Returns a stream over the first result set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Please see [`QueryResult::stream_and_drop`][stream_and_drop].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [stream_and_drop]: crate::QueryResult::stream_and_drop</span>
-    <span class="kw">fn</span> <span class="ident">query_stream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">Q</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">query</span>: <span class="ident">Q</span>,
-    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ResultSetStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;static</span>, <span class="ident">T</span>, <span class="ident">TextProtocol</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">FromRow</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">Q</span>: <span class="ident">AsQuery</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
-    {
-        <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="self">self</span>.<span class="ident">query_iter</span>(<span class="ident">query</span>)
-                .<span class="kw">await</span><span class="question-mark">?</span>
-                .<span class="ident">stream_and_drop</span>()
-                .<span class="kw">await</span>
-                .<span class="ident">transpose</span>()
-                .<span class="ident">expect</span>(<span class="string">&quot;At least one result set is expected&quot;</span>)
-        }
-        .<span class="ident">boxed</span>()
-    }
-
-    <span class="doccomment">/// Returns a stream over the first result set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Please see [`QueryResult::stream_and_drop`][stream_and_drop].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [stream_and_drop]: crate::QueryResult::stream_and_drop</span>
-    <span class="kw">fn</span> <span class="ident">exec_stream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;s</span>, <span class="lifetime">&#39;s</span>, <span class="ident">T</span>, <span class="ident">Q</span>, <span class="ident">P</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">stmt</span>: <span class="ident">Q</span>,
-        <span class="ident">params</span>: <span class="ident">P</span>,
-    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">ResultSetStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;static</span>, <span class="ident">T</span>, <span class="ident">BinaryProtocol</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">FromRow</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">Q</span>: <span class="ident">StatementLike</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
-        <span class="ident">P</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Params</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;s</span>,
-    {
-        <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="self">self</span>.<span class="ident">exec_iter</span>(<span class="ident">stmt</span>, <span class="ident">params</span>)
-                .<span class="kw">await</span><span class="question-mark">?</span>
-                .<span class="ident">stream_and_drop</span>()
-                .<span class="kw">await</span>
-                .<span class="ident">transpose</span>()
-                .<span class="ident">expect</span>(<span class="string">&quot;At least one result set is expected&quot;</span>)
-        }
-        .<span class="ident">boxed</span>()
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Queryable</span> <span class="kw">for</span> <span class="ident">Conn</span> {
-    <span class="kw">fn</span> <span class="ident">ping</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, ()<span class="op">&gt;</span> {
-        <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="self">self</span>.<span class="ident">routine</span>(<span class="ident">PingRoutine</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+<span class="kw">impl </span>Queryable <span class="kw">for </span>Conn {
+    <span class="kw">fn </span>ping(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ()&gt; {
+        <span class="kw">async move </span>{
+            <span class="self">self</span>.routine(PingRoutine).<span class="kw">await</span><span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(())
         }
-        .<span class="ident">boxed</span>()
+        .boxed()
     }
 
-    <span class="kw">fn</span> <span class="ident">query_iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Q</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">query</span>: <span class="ident">Q</span>,
-    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">QueryResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;static</span>, <span class="ident">TextProtocol</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">Q</span>: <span class="ident">AsQuery</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
+    <span class="kw">fn </span>query_iter&lt;<span class="lifetime">&#39;a</span>, Q&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+        query: Q,
+    ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, QueryResult&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;static</span>, TextProtocol&gt;&gt;
+    <span class="kw">where
+        </span>Q: AsQuery + <span class="lifetime">&#39;a</span>,
     {
-        <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="self">self</span>.<span class="ident">routine</span>(<span class="ident">QueryRoutine::new</span>(<span class="ident">query</span>.<span class="ident">as_query</span>().<span class="ident">as_ref</span>()))
+        <span class="kw">async move </span>{
+            <span class="self">self</span>.routine(QueryRoutine::new(query.as_query().as_ref()))
                 .<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(<span class="ident">QueryResult::new</span>(<span class="self">self</span>))
+            <span class="prelude-val">Ok</span>(QueryResult::new(<span class="self">self</span>))
         }
-        .<span class="ident">boxed</span>()
+        .boxed()
     }
 
-    <span class="kw">fn</span> <span class="ident">prep</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Q</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">query</span>: <span class="ident">Q</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Statement</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">Q</span>: <span class="ident">AsQuery</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
+    <span class="kw">fn </span>prep&lt;<span class="lifetime">&#39;a</span>, Q&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, query: Q) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, Statement&gt;
+    <span class="kw">where
+        </span>Q: AsQuery + <span class="lifetime">&#39;a</span>,
     {
-        <span class="kw">async</span> <span class="kw">move</span> { <span class="self">self</span>.<span class="ident">get_statement</span>(<span class="ident">query</span>.<span class="ident">as_query</span>()).<span class="kw">await</span> }.<span class="ident">boxed</span>()
+        <span class="kw">async move </span>{ <span class="self">self</span>.get_statement(query.as_query()).<span class="kw">await </span>}.boxed()
     }
 
-    <span class="kw">fn</span> <span class="ident">close</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">stmt</span>: <span class="ident">Statement</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, ()<span class="op">&gt;</span> {
-        <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="self">self</span>.<span class="ident">stmt_cache_mut</span>().<span class="ident">remove</span>(<span class="ident">stmt</span>.<span class="ident">id</span>());
-            <span class="self">self</span>.<span class="ident">close_statement</span>(<span class="ident">stmt</span>.<span class="ident">id</span>()).<span class="kw">await</span>
+    <span class="kw">fn </span>close(<span class="kw-2">&amp;mut </span><span class="self">self</span>, stmt: Statement) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ()&gt; {
+        <span class="kw">async move </span>{
+            <span class="self">self</span>.stmt_cache_mut().remove(stmt.id());
+            <span class="self">self</span>.close_statement(stmt.id()).<span class="kw">await
+        </span>}
+        .boxed()
+    }
+
+    <span class="kw">fn </span>exec_iter&lt;<span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;s</span>, <span class="lifetime">&#39;s</span>, Q, P&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+        stmt: Q,
+        params: P,
+    ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;s</span>, QueryResult&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;static</span>, BinaryProtocol&gt;&gt;
+    <span class="kw">where
+        </span>Q: StatementLike + <span class="lifetime">&#39;a</span>,
+        P: Into&lt;Params&gt;,
+    {
+        <span class="kw">let </span>params = params.into();
+        <span class="kw">async move </span>{
+            <span class="kw">let </span>statement = <span class="self">self</span>.get_statement(stmt).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="self">self</span>.execute_statement(<span class="kw-2">&amp;</span>statement, params).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(QueryResult::new(<span class="self">self</span>))
         }
-        .<span class="ident">boxed</span>()
+        .boxed()
     }
 
-    <span class="kw">fn</span> <span class="ident">exec_iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;s</span>, <span class="lifetime">&#39;s</span>, <span class="ident">Q</span>, <span class="ident">P</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">stmt</span>: <span class="ident">Q</span>,
-        <span class="ident">params</span>: <span class="ident">P</span>,
-    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">QueryResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;static</span>, <span class="ident">BinaryProtocol</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">Q</span>: <span class="ident">StatementLike</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
-        <span class="ident">P</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Params</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>exec_batch&lt;<span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;b</span>, S, P, I&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, stmt: S, params_iter: I) -&gt; BoxFuture&lt;<span class="lifetime">&#39;b</span>, ()&gt;
+    <span class="kw">where
+        </span>S: StatementLike + <span class="lifetime">&#39;b</span>,
+        I: IntoIterator&lt;Item = P&gt; + Send + <span class="lifetime">&#39;b</span>,
+        I::IntoIter: Send,
+        P: Into&lt;Params&gt; + Send,
     {
-        <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">into</span>();
-        <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="kw">let</span> <span class="ident">statement</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_statement</span>(<span class="ident">stmt</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="self">self</span>.<span class="ident">execute_statement</span>(<span class="kw-2">&amp;</span><span class="ident">statement</span>, <span class="ident">params</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(<span class="ident">QueryResult::new</span>(<span class="self">self</span>))
-        }
-        .<span class="ident">boxed</span>()
-    }
-
-    <span class="kw">fn</span> <span class="ident">exec_batch</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;b</span>, <span class="ident">S</span>, <span class="ident">P</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">stmt</span>: <span class="ident">S</span>, <span class="ident">params_iter</span>: <span class="ident">I</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, ()<span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">StatementLike</span> <span class="op">+</span> <span class="lifetime">&#39;b</span>,
-        <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">P</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;b</span>,
-        <span class="ident">I::IntoIter</span>: <span class="ident">Send</span>,
-        <span class="ident">P</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Params</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
-    {
-        <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="kw">let</span> <span class="ident">statement</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_statement</span>(<span class="ident">stmt</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="kw">for</span> <span class="ident">params</span> <span class="kw">in</span> <span class="ident">params_iter</span> {
-                <span class="self">self</span>.<span class="ident">execute_statement</span>(<span class="kw-2">&amp;</span><span class="ident">statement</span>, <span class="ident">params</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="ident">QueryResult</span>::<span class="op">&lt;</span><span class="ident">BinaryProtocol</span><span class="op">&gt;</span><span class="ident">::new</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>)
-                    .<span class="ident">drop_result</span>()
+        <span class="kw">async move </span>{
+            <span class="kw">let </span>statement = <span class="self">self</span>.get_statement(stmt).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="kw">for </span>params <span class="kw">in </span>params_iter {
+                <span class="self">self</span>.execute_statement(<span class="kw-2">&amp;</span>statement, params).<span class="kw">await</span><span class="question-mark">?</span>;
+                QueryResult::&lt;BinaryProtocol&gt;::new(<span class="kw-2">&amp;mut *</span><span class="self">self</span>)
+                    .drop_result()
                     .<span class="kw">await</span><span class="question-mark">?</span>;
             }
             <span class="prelude-val">Ok</span>(())
         }
-        .<span class="ident">boxed</span>()
+        .boxed()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Queryable</span> <span class="kw">for</span> <span class="ident">Transaction</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">ping</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, ()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">ping</span>()
+<span class="kw">impl </span>Queryable <span class="kw">for </span>Transaction&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>ping(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ()&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.ping()
     }
 
-    <span class="kw">fn</span> <span class="ident">query_iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Q</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">query</span>: <span class="ident">Q</span>,
-    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">QueryResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;static</span>, <span class="ident">TextProtocol</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">Q</span>: <span class="ident">AsQuery</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
+    <span class="kw">fn </span>query_iter&lt;<span class="lifetime">&#39;a</span>, Q&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+        query: Q,
+    ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, QueryResult&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;static</span>, TextProtocol&gt;&gt;
+    <span class="kw">where
+        </span>Q: AsQuery + <span class="lifetime">&#39;a</span>,
     {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">query_iter</span>(<span class="ident">query</span>)
+        <span class="self">self</span>.<span class="number">0</span>.query_iter(query)
     }
 
-    <span class="kw">fn</span> <span class="ident">prep</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Q</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">query</span>: <span class="ident">Q</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Statement</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">Q</span>: <span class="ident">AsQuery</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
+    <span class="kw">fn </span>prep&lt;<span class="lifetime">&#39;a</span>, Q&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, query: Q) -&gt; BoxFuture&lt;<span class="lifetime">&#39;a</span>, Statement&gt;
+    <span class="kw">where
+        </span>Q: AsQuery + <span class="lifetime">&#39;a</span>,
     {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">prep</span>(<span class="ident">query</span>)
+        <span class="self">self</span>.<span class="number">0</span>.prep(query)
     }
 
-    <span class="kw">fn</span> <span class="ident">close</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">stmt</span>: <span class="ident">Statement</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, ()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">close</span>(<span class="ident">stmt</span>)
+    <span class="kw">fn </span>close(<span class="kw-2">&amp;mut </span><span class="self">self</span>, stmt: Statement) -&gt; BoxFuture&lt;<span class="lifetime">&#39;_</span>, ()&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.close(stmt)
     }
 
-    <span class="kw">fn</span> <span class="ident">exec_iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;s</span>, <span class="lifetime">&#39;s</span>, <span class="ident">Q</span>, <span class="ident">P</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">stmt</span>: <span class="ident">Q</span>,
-        <span class="ident">params</span>: <span class="ident">P</span>,
-    ) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;s</span>, <span class="ident">QueryResult</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;static</span>, <span class="ident">BinaryProtocol</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">Q</span>: <span class="ident">StatementLike</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
-        <span class="ident">P</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Params</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>exec_iter&lt;<span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;s</span>, <span class="lifetime">&#39;s</span>, Q, P&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+        stmt: Q,
+        params: P,
+    ) -&gt; BoxFuture&lt;<span class="lifetime">&#39;s</span>, QueryResult&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;static</span>, BinaryProtocol&gt;&gt;
+    <span class="kw">where
+        </span>Q: StatementLike + <span class="lifetime">&#39;a</span>,
+        P: Into&lt;Params&gt;,
     {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">exec_iter</span>(<span class="ident">stmt</span>, <span class="ident">params</span>)
+        <span class="self">self</span>.<span class="number">0</span>.exec_iter(stmt, params)
     }
 
-    <span class="kw">fn</span> <span class="ident">exec_batch</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;b</span>, <span class="ident">S</span>, <span class="ident">P</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">stmt</span>: <span class="ident">S</span>, <span class="ident">params_iter</span>: <span class="ident">I</span>) -&gt; <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, ()<span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">StatementLike</span> <span class="op">+</span> <span class="lifetime">&#39;b</span>,
-        <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">P</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;b</span>,
-        <span class="ident">I::IntoIter</span>: <span class="ident">Send</span>,
-        <span class="ident">P</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Params</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
+    <span class="kw">fn </span>exec_batch&lt;<span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>, <span class="lifetime">&#39;b</span>, S, P, I&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>, stmt: S, params_iter: I) -&gt; BoxFuture&lt;<span class="lifetime">&#39;b</span>, ()&gt;
+    <span class="kw">where
+        </span>S: StatementLike + <span class="lifetime">&#39;b</span>,
+        I: IntoIterator&lt;Item = P&gt; + Send + <span class="lifetime">&#39;b</span>,
+        I::IntoIter: Send,
+        P: Into&lt;Params&gt; + Send,
     {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">exec_batch</span>(<span class="ident">stmt</span>, <span class="ident">params_iter</span>)
+        <span class="self">self</span>.<span class="number">0</span>.exec_batch(stmt, params_iter)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Queryable</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error::Result</span>, <span class="ident">prelude</span>::<span class="kw-2">*</span>, <span class="ident">test_misc::get_opts</span>, <span class="ident">Conn</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">super</span>::Queryable;
+    <span class="kw">use crate</span>::{error::Result, prelude::<span class="kw-2">*</span>, test_misc::get_opts, Conn};
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">should_prep</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">const</span> <span class="ident">NAMED</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;SELECT :foo, :bar, :foo&quot;</span>;
-        <span class="kw">const</span> <span class="ident">POSITIONAL</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;SELECT ?, ?, ?&quot;</span>;
+    <span class="attribute">#[tokio::test]
+    </span><span class="kw">async fn </span>should_prep() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">const </span>NAMED: <span class="kw-2">&amp;</span>str = <span class="string">&quot;SELECT :foo, :bar, :foo&quot;</span>;
+        <span class="kw">const </span>POSITIONAL: <span class="kw-2">&amp;</span>str = <span class="string">&quot;SELECT ?, ?, ?&quot;</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">Conn::new</span>(<span class="ident">get_opts</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>conn = Conn::new(get_opts()).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">stmt_named</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">prep</span>(<span class="ident">NAMED</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">stmt_positional</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">prep</span>(<span class="ident">POSITIONAL</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>stmt_named = conn.prep(NAMED).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>stmt_positional = conn.prep(POSITIONAL).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">result_stmt_named</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">u8</span>, <span class="ident">String</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">conn</span>
-            .<span class="ident">exec_first</span>(<span class="kw-2">&amp;</span><span class="ident">stmt_named</span>, <span class="macro">params!</span> { <span class="string">&quot;foo&quot;</span> =&gt; <span class="string">&quot;bar&quot;</span>, <span class="string">&quot;bar&quot;</span> =&gt; <span class="number">42</span> })
+        <span class="kw">let </span>result_stmt_named: <span class="prelude-ty">Option</span>&lt;(String, u8, String)&gt; = conn
+            .exec_first(<span class="kw-2">&amp;</span>stmt_named, <span class="macro">params! </span>{ <span class="string">&quot;foo&quot; </span>=&gt; <span class="string">&quot;bar&quot;</span>, <span class="string">&quot;bar&quot; </span>=&gt; <span class="number">42 </span>})
             .<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">result_str_named</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">u8</span>, <span class="ident">String</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">conn</span>
-            .<span class="ident">exec_first</span>(<span class="ident">NAMED</span>, <span class="macro">params!</span> { <span class="string">&quot;foo&quot;</span> =&gt; <span class="string">&quot;bar&quot;</span>, <span class="string">&quot;bar&quot;</span> =&gt; <span class="number">42</span> })
+        <span class="kw">let </span>result_str_named: <span class="prelude-ty">Option</span>&lt;(String, u8, String)&gt; = conn
+            .exec_first(NAMED, <span class="macro">params! </span>{ <span class="string">&quot;foo&quot; </span>=&gt; <span class="string">&quot;bar&quot;</span>, <span class="string">&quot;bar&quot; </span>=&gt; <span class="number">42 </span>})
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">result_stmt_positional</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">u8</span>, <span class="ident">String</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">conn</span>
-            .<span class="ident">exec_first</span>(<span class="kw-2">&amp;</span><span class="ident">stmt_positional</span>, (<span class="string">&quot;bar&quot;</span>, <span class="number">42</span>, <span class="string">&quot;bar&quot;</span>))
+        <span class="kw">let </span>result_stmt_positional: <span class="prelude-ty">Option</span>&lt;(String, u8, String)&gt; = conn
+            .exec_first(<span class="kw-2">&amp;</span>stmt_positional, (<span class="string">&quot;bar&quot;</span>, <span class="number">42</span>, <span class="string">&quot;bar&quot;</span>))
             .<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">result_str_positional</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">u8</span>, <span class="ident">String</span>)<span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">conn</span>.<span class="ident">exec_first</span>(<span class="ident">NAMED</span>, (<span class="string">&quot;bar&quot;</span>, <span class="number">42</span>, <span class="string">&quot;bar&quot;</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>result_str_positional: <span class="prelude-ty">Option</span>&lt;(String, u8, String)&gt; =
+            conn.exec_first(NAMED, (<span class="string">&quot;bar&quot;</span>, <span class="number">42</span>, <span class="string">&quot;bar&quot;</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="macro">assert_eq!</span>(
-            <span class="prelude-val">Some</span>((<span class="string">&quot;bar&quot;</span>.<span class="ident">to_owned</span>(), <span class="number">42_u8</span>, <span class="string">&quot;bar&quot;</span>.<span class="ident">to_owned</span>())),
-            <span class="ident">result_stmt_named</span>
+            <span class="prelude-val">Some</span>((<span class="string">&quot;bar&quot;</span>.to_owned(), <span class="number">42_u8</span>, <span class="string">&quot;bar&quot;</span>.to_owned())),
+            result_stmt_named
         );
-        <span class="macro">assert_eq!</span>(<span class="ident">result_stmt_named</span>, <span class="ident">result_str_named</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">result_str_named</span>, <span class="ident">result_stmt_positional</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">result_stmt_positional</span>, <span class="ident">result_str_positional</span>);
+        <span class="macro">assert_eq!</span>(result_stmt_named, result_str_named);
+        <span class="macro">assert_eq!</span>(result_str_named, result_stmt_positional);
+        <span class="macro">assert_eq!</span>(result_stmt_positional, result_str_positional);
 
-        <span class="ident">conn</span>.<span class="ident">disconnect</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+        conn.disconnect().<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mysql_async" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mysql_async" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

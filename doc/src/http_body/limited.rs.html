@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/http-body-0.4.5/src/limited.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>limited.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../http_body/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../http_body/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../http_body/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/http-body-0.4.5/src/limited.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>limited.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../http_body/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../http_body/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../http_body/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -297,304 +297,304 @@
 <span id="297">297</span>
 <span id="298">298</span>
 <span id="299">299</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Body</span>, <span class="ident">SizeHint</span>};
-<span class="kw">use</span> <span class="ident">bytes::Buf</span>;
-<span class="kw">use</span> <span class="ident">http::HeaderMap</span>;
-<span class="kw">use</span> <span class="ident">pin_project_lite::pin_project</span>;
-<span class="kw">use</span> <span class="ident">std::error::Error</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{Body, SizeHint};
+<span class="kw">use </span>bytes::Buf;
+<span class="kw">use </span>http::HeaderMap;
+<span class="kw">use </span>pin_project_lite::pin_project;
+<span class="kw">use </span>std::error::Error;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::pin::Pin;
+<span class="kw">use </span>std::task::{Context, Poll};
 
-<span class="macro">pin_project!</span> {
-    <span class="doccomment">/// A length limited body.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This body will return an error if more than the configured number</span>
-    <span class="doccomment">/// of bytes are returned on polling the wrapped body.</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Limited</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-        <span class="ident">remaining</span>: <span class="ident">usize</span>,
-        <span class="attribute">#[<span class="ident">pin</span>]</span>
-        <span class="ident">inner</span>: <span class="ident">B</span>,
+<span class="macro">pin_project! </span>{
+    <span class="doccomment">/// A length limited body.
+    ///
+    /// This body will return an error if more than the configured number
+    /// of bytes are returned on polling the wrapped body.
+    </span><span class="attribute">#[derive(Clone, Copy, Debug)]
+    </span><span class="kw">pub struct </span>Limited&lt;B&gt; {
+        remaining: usize,
+        <span class="attribute">#[pin]
+        </span>inner: B,
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> <span class="ident">Limited</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Create a new `Limited`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">B</span>, <span class="ident">limit</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">remaining</span>: <span class="ident">limit</span>,
-            <span class="ident">inner</span>,
+<span class="kw">impl</span>&lt;B&gt; Limited&lt;B&gt; {
+    <span class="doccomment">/// Create a new `Limited`.
+    </span><span class="kw">pub fn </span>new(inner: B, limit: usize) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            remaining: limit,
+            inner,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span> <span class="ident">Body</span> <span class="kw">for</span> <span class="ident">Limited</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">B</span>: <span class="ident">Body</span>,
-    <span class="ident">B::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;B&gt; Body <span class="kw">for </span>Limited&lt;B&gt;
+<span class="kw">where
+    </span>B: Body,
+    B::Error: Into&lt;Box&lt;<span class="kw">dyn </span>Error + Send + Sync&gt;&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Data</span> <span class="op">=</span> <span class="ident">B::Data</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Data = B::Data;
+    <span class="kw">type </span>Error = Box&lt;<span class="kw">dyn </span>Error + Send + Sync&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll_data</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Data</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">this</span>.<span class="ident">inner</span>.<span class="ident">poll_data</span>(<span class="ident">cx</span>) {
-            <span class="ident">Poll::Pending</span> =&gt; <span class="kw">return</span> <span class="ident">Poll::Pending</span>,
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>) =&gt; <span class="prelude-val">None</span>,
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">data</span>))) =&gt; {
-                <span class="kw">if</span> <span class="ident">data</span>.<span class="ident">remaining</span>() <span class="op">&gt;</span> <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">remaining</span> {
-                    <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">remaining</span> <span class="op">=</span> <span class="number">0</span>;
-                    <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">LengthLimitError</span>.<span class="ident">into</span>()))
-                } <span class="kw">else</span> {
-                    <span class="kw-2">*</span><span class="ident">this</span>.<span class="ident">remaining</span> <span class="op">-</span><span class="op">=</span> <span class="ident">data</span>.<span class="ident">remaining</span>();
-                    <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">data</span>))
+    <span class="kw">fn </span>poll_data(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Data, <span class="self">Self</span>::Error&gt;&gt;&gt; {
+        <span class="kw">let </span>this = <span class="self">self</span>.project();
+        <span class="kw">let </span>res = <span class="kw">match </span>this.inner.poll_data(cx) {
+            Poll::Pending =&gt; <span class="kw">return </span>Poll::Pending,
+            Poll::Ready(<span class="prelude-val">None</span>) =&gt; <span class="prelude-val">None</span>,
+            Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(data))) =&gt; {
+                <span class="kw">if </span>data.remaining() &gt; <span class="kw-2">*</span>this.remaining {
+                    <span class="kw-2">*</span>this.remaining = <span class="number">0</span>;
+                    <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(LengthLimitError.into()))
+                } <span class="kw">else </span>{
+                    <span class="kw-2">*</span>this.remaining -= data.remaining();
+                    <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(data))
                 }
             }
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>))) =&gt; <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>.<span class="ident">into</span>())),
+            Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(err))) =&gt; <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(err.into())),
         };
 
-        <span class="ident">Poll::Ready</span>(<span class="ident">res</span>)
+        Poll::Ready(res)
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_trailers</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HeaderMap</span><span class="op">&gt;</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">project</span>();
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">this</span>.<span class="ident">inner</span>.<span class="ident">poll_trailers</span>(<span class="ident">cx</span>) {
-            <span class="ident">Poll::Pending</span> =&gt; <span class="kw">return</span> <span class="ident">Poll::Pending</span>,
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">data</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">data</span>),
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>)) =&gt; <span class="prelude-val">Err</span>(<span class="ident">err</span>.<span class="ident">into</span>()),
+    <span class="kw">fn </span>poll_trailers(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;HeaderMap&gt;, <span class="self">Self</span>::Error&gt;&gt; {
+        <span class="kw">let </span>this = <span class="self">self</span>.project();
+        <span class="kw">let </span>res = <span class="kw">match </span>this.inner.poll_trailers(cx) {
+            Poll::Pending =&gt; <span class="kw">return </span>Poll::Pending,
+            Poll::Ready(<span class="prelude-val">Ok</span>(data)) =&gt; <span class="prelude-val">Ok</span>(data),
+            Poll::Ready(<span class="prelude-val">Err</span>(err)) =&gt; <span class="prelude-val">Err</span>(err.into()),
         };
 
-        <span class="ident">Poll::Ready</span>(<span class="ident">res</span>)
+        Poll::Ready(res)
     }
 
-    <span class="kw">fn</span> <span class="ident">is_end_stream</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">is_end_stream</span>()
+    <span class="kw">fn </span>is_end_stream(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.inner.is_end_stream()
     }
 
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SizeHint</span> {
-        <span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
-        <span class="kw">match</span> <span class="ident">u64::try_from</span>(<span class="self">self</span>.<span class="ident">remaining</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">n</span>) =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hint</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">size_hint</span>();
-                <span class="kw">if</span> <span class="ident">hint</span>.<span class="ident">lower</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">n</span> {
-                    <span class="ident">hint</span>.<span class="ident">set_exact</span>(<span class="ident">n</span>)
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">max</span>) <span class="op">=</span> <span class="ident">hint</span>.<span class="ident">upper</span>() {
-                    <span class="ident">hint</span>.<span class="ident">set_upper</span>(<span class="ident">n</span>.<span class="ident">min</span>(<span class="ident">max</span>))
-                } <span class="kw">else</span> {
-                    <span class="ident">hint</span>.<span class="ident">set_upper</span>(<span class="ident">n</span>)
+    <span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SizeHint {
+        <span class="kw">use </span>std::convert::TryFrom;
+        <span class="kw">match </span>u64::try_from(<span class="self">self</span>.remaining) {
+            <span class="prelude-val">Ok</span>(n) =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>hint = <span class="self">self</span>.inner.size_hint();
+                <span class="kw">if </span>hint.lower() &gt;= n {
+                    hint.set_exact(n)
+                } <span class="kw">else if let </span><span class="prelude-val">Some</span>(max) = hint.upper() {
+                    hint.set_upper(n.min(max))
+                } <span class="kw">else </span>{
+                    hint.set_upper(n)
                 }
-                <span class="ident">hint</span>
+                hint
             }
-            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">size_hint</span>(),
+            <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="self">self</span>.inner.size_hint(),
         }
     }
 }
 
-<span class="doccomment">/// An error returned when body length exceeds the configured limit.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LengthLimitError</span>;
+<span class="doccomment">/// An error returned when body length exceeds the configured limit.
+</span><span class="attribute">#[derive(Debug)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>LengthLimitError;
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">LengthLimitError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;length limit exceeded&quot;</span>)
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>LengthLimitError {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        f.write_str(<span class="string">&quot;length limit exceeded&quot;</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Error</span> <span class="kw">for</span> <span class="ident">LengthLimitError</span> {}
+<span class="kw">impl </span>Error <span class="kw">for </span>LengthLimitError {}
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Full</span>;
-    <span class="kw">use</span> <span class="ident">bytes::Bytes</span>;
-    <span class="kw">use</span> <span class="ident">std::convert::Infallible</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::Full;
+    <span class="kw">use </span>bytes::Bytes;
+    <span class="kw">use </span>std::convert::Infallible;
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_for_body_under_limit_returns_data</span>() {
-        <span class="kw">const</span> <span class="ident">DATA</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="string">b&quot;testing&quot;</span>;
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">Full::new</span>(<span class="ident">Bytes::from</span>(<span class="ident">DATA</span>));
-        <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">Limited::new</span>(<span class="ident">inner</span>, <span class="number">8</span>);
+    <span class="attribute">#[tokio::test]
+    </span><span class="kw">async fn </span>read_for_body_under_limit_returns_data() {
+        <span class="kw">const </span>DATA: <span class="kw-2">&amp;</span>[u8] = <span class="string">b&quot;testing&quot;</span>;
+        <span class="kw">let </span>inner = Full::new(Bytes::from(DATA));
+        <span class="kw">let </span>body = <span class="kw-2">&amp;mut </span>Limited::new(inner, <span class="number">8</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hint</span> <span class="op">=</span> <span class="ident">SizeHint::new</span>();
-        <span class="ident">hint</span>.<span class="ident">set_upper</span>(<span class="number">7</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">body</span>.<span class="ident">size_hint</span>().<span class="ident">upper</span>(), <span class="ident">hint</span>.<span class="ident">upper</span>());
+        <span class="kw">let </span><span class="kw-2">mut </span>hint = SizeHint::new();
+        hint.set_upper(<span class="number">7</span>);
+        <span class="macro">assert_eq!</span>(body.size_hint().upper(), hint.upper());
 
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">body</span>.<span class="ident">data</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">data</span>, <span class="ident">DATA</span>);
-        <span class="ident">hint</span>.<span class="ident">set_upper</span>(<span class="number">0</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">body</span>.<span class="ident">size_hint</span>().<span class="ident">upper</span>(), <span class="ident">hint</span>.<span class="ident">upper</span>());
+        <span class="kw">let </span>data = body.data().<span class="kw">await</span>.unwrap().unwrap();
+        <span class="macro">assert_eq!</span>(data, DATA);
+        hint.set_upper(<span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(body.size_hint().upper(), hint.upper());
 
-        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="ident">body</span>.<span class="ident">data</span>().<span class="kw">await</span>, <span class="prelude-val">None</span>));
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(body.data().<span class="kw">await</span>, <span class="prelude-val">None</span>));
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_for_body_over_limit_returns_error</span>() {
-        <span class="kw">const</span> <span class="ident">DATA</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="string">b&quot;testing a string that is too long&quot;</span>;
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">Full::new</span>(<span class="ident">Bytes::from</span>(<span class="ident">DATA</span>));
-        <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">Limited::new</span>(<span class="ident">inner</span>, <span class="number">8</span>);
+    <span class="attribute">#[tokio::test]
+    </span><span class="kw">async fn </span>read_for_body_over_limit_returns_error() {
+        <span class="kw">const </span>DATA: <span class="kw-2">&amp;</span>[u8] = <span class="string">b&quot;testing a string that is too long&quot;</span>;
+        <span class="kw">let </span>inner = Full::new(Bytes::from(DATA));
+        <span class="kw">let </span>body = <span class="kw-2">&amp;mut </span>Limited::new(inner, <span class="number">8</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hint</span> <span class="op">=</span> <span class="ident">SizeHint::new</span>();
-        <span class="ident">hint</span>.<span class="ident">set_upper</span>(<span class="number">8</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">body</span>.<span class="ident">size_hint</span>().<span class="ident">upper</span>(), <span class="ident">hint</span>.<span class="ident">upper</span>());
+        <span class="kw">let </span><span class="kw-2">mut </span>hint = SizeHint::new();
+        hint.set_upper(<span class="number">8</span>);
+        <span class="macro">assert_eq!</span>(body.size_hint().upper(), hint.upper());
 
-        <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">body</span>.<span class="ident">data</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">unwrap_err</span>();
-        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="ident">error</span>.<span class="ident">downcast_ref</span>(), <span class="prelude-val">Some</span>(<span class="ident">LengthLimitError</span>)));
+        <span class="kw">let </span>error = body.data().<span class="kw">await</span>.unwrap().unwrap_err();
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(error.downcast_ref(), <span class="prelude-val">Some</span>(LengthLimitError)));
     }
 
-    <span class="kw">struct</span> <span class="ident">Chunky</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>]]);
+    <span class="kw">struct </span>Chunky(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[u8]]);
 
-    <span class="kw">impl</span> <span class="ident">Body</span> <span class="kw">for</span> <span class="ident">Chunky</span> {
-        <span class="kw">type</span> <span class="ident">Data</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>];
-        <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Infallible</span>;
+    <span class="kw">impl </span>Body <span class="kw">for </span>Chunky {
+        <span class="kw">type </span>Data = <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[u8];
+        <span class="kw">type </span>Error = Infallible;
 
-        <span class="kw">fn</span> <span class="ident">poll_data</span>(
-            <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-            <span class="ident">_cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Data</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>;
-            <span class="kw">match</span> <span class="ident">this</span>.<span class="number">0</span>.<span class="ident">split_first</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="kw-2">&amp;</span><span class="ident">head</span>, <span class="ident">tail</span>)<span class="op">|</span> (<span class="prelude-val">Ok</span>(<span class="ident">head</span>), <span class="ident">tail</span>)) {
-                <span class="prelude-val">Some</span>((<span class="ident">data</span>, <span class="ident">new_tail</span>)) =&gt; {
-                    <span class="ident">this</span>.<span class="number">0</span> <span class="op">=</span> <span class="ident">new_tail</span>;
+        <span class="kw">fn </span>poll_data(
+            <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+            _cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        ) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Data, <span class="self">Self</span>::Error&gt;&gt;&gt; {
+            <span class="kw">let </span><span class="kw-2">mut </span>this = <span class="self">self</span>;
+            <span class="kw">match </span>this.<span class="number">0</span>.split_first().map(|(<span class="kw-2">&amp;</span>head, tail)| (<span class="prelude-val">Ok</span>(head), tail)) {
+                <span class="prelude-val">Some</span>((data, new_tail)) =&gt; {
+                    this.<span class="number">0 </span>= new_tail;
 
-                    <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="ident">data</span>))
+                    Poll::Ready(<span class="prelude-val">Some</span>(data))
                 }
-                <span class="prelude-val">None</span> =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>),
+                <span class="prelude-val">None </span>=&gt; Poll::Ready(<span class="prelude-val">None</span>),
             }
         }
 
-        <span class="kw">fn</span> <span class="ident">poll_trailers</span>(
-            <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-            <span class="ident">_cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HeaderMap</span><span class="op">&gt;</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">HeaderMap::new</span>())))
+        <span class="kw">fn </span>poll_trailers(
+            <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+            _cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        ) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;HeaderMap&gt;, <span class="self">Self</span>::Error&gt;&gt; {
+            Poll::Ready(<span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(HeaderMap::new())))
         }
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_for_chunked_body_around_limit_returns_first_chunk_but_returns_error_on_over_limit_chunk</span>(
+    <span class="attribute">#[tokio::test]
+    </span><span class="kw">async fn </span>read_for_chunked_body_around_limit_returns_first_chunk_but_returns_error_on_over_limit_chunk(
     ) {
-        <span class="kw">const</span> <span class="ident">DATA</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>[<span class="ident">u8</span>]] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="string">b&quot;testing &quot;</span>, <span class="string">b&quot;a string that is too long&quot;</span>];
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">Chunky</span>(<span class="ident">DATA</span>);
-        <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">Limited::new</span>(<span class="ident">inner</span>, <span class="number">8</span>);
+        <span class="kw">const </span>DATA: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>[u8]] = <span class="kw-2">&amp;</span>[<span class="string">b&quot;testing &quot;</span>, <span class="string">b&quot;a string that is too long&quot;</span>];
+        <span class="kw">let </span>inner = Chunky(DATA);
+        <span class="kw">let </span>body = <span class="kw-2">&amp;mut </span>Limited::new(inner, <span class="number">8</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hint</span> <span class="op">=</span> <span class="ident">SizeHint::new</span>();
-        <span class="ident">hint</span>.<span class="ident">set_upper</span>(<span class="number">8</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">body</span>.<span class="ident">size_hint</span>().<span class="ident">upper</span>(), <span class="ident">hint</span>.<span class="ident">upper</span>());
+        <span class="kw">let </span><span class="kw-2">mut </span>hint = SizeHint::new();
+        hint.set_upper(<span class="number">8</span>);
+        <span class="macro">assert_eq!</span>(body.size_hint().upper(), hint.upper());
 
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">body</span>.<span class="ident">data</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">data</span>, <span class="ident">DATA</span>[<span class="number">0</span>]);
-        <span class="ident">hint</span>.<span class="ident">set_upper</span>(<span class="number">0</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">body</span>.<span class="ident">size_hint</span>().<span class="ident">upper</span>(), <span class="ident">hint</span>.<span class="ident">upper</span>());
+        <span class="kw">let </span>data = body.data().<span class="kw">await</span>.unwrap().unwrap();
+        <span class="macro">assert_eq!</span>(data, DATA[<span class="number">0</span>]);
+        hint.set_upper(<span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(body.size_hint().upper(), hint.upper());
 
-        <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">body</span>.<span class="ident">data</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">unwrap_err</span>();
-        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="ident">error</span>.<span class="ident">downcast_ref</span>(), <span class="prelude-val">Some</span>(<span class="ident">LengthLimitError</span>)));
+        <span class="kw">let </span>error = body.data().<span class="kw">await</span>.unwrap().unwrap_err();
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(error.downcast_ref(), <span class="prelude-val">Some</span>(LengthLimitError)));
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_for_chunked_body_over_limit_on_first_chunk_returns_error</span>() {
-        <span class="kw">const</span> <span class="ident">DATA</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>[<span class="ident">u8</span>]] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="string">b&quot;testing a string&quot;</span>, <span class="string">b&quot; that is too long&quot;</span>];
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">Chunky</span>(<span class="ident">DATA</span>);
-        <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">Limited::new</span>(<span class="ident">inner</span>, <span class="number">8</span>);
+    <span class="attribute">#[tokio::test]
+    </span><span class="kw">async fn </span>read_for_chunked_body_over_limit_on_first_chunk_returns_error() {
+        <span class="kw">const </span>DATA: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>[u8]] = <span class="kw-2">&amp;</span>[<span class="string">b&quot;testing a string&quot;</span>, <span class="string">b&quot; that is too long&quot;</span>];
+        <span class="kw">let </span>inner = Chunky(DATA);
+        <span class="kw">let </span>body = <span class="kw-2">&amp;mut </span>Limited::new(inner, <span class="number">8</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hint</span> <span class="op">=</span> <span class="ident">SizeHint::new</span>();
-        <span class="ident">hint</span>.<span class="ident">set_upper</span>(<span class="number">8</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">body</span>.<span class="ident">size_hint</span>().<span class="ident">upper</span>(), <span class="ident">hint</span>.<span class="ident">upper</span>());
+        <span class="kw">let </span><span class="kw-2">mut </span>hint = SizeHint::new();
+        hint.set_upper(<span class="number">8</span>);
+        <span class="macro">assert_eq!</span>(body.size_hint().upper(), hint.upper());
 
-        <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">body</span>.<span class="ident">data</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">unwrap_err</span>();
-        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="ident">error</span>.<span class="ident">downcast_ref</span>(), <span class="prelude-val">Some</span>(<span class="ident">LengthLimitError</span>)));
+        <span class="kw">let </span>error = body.data().<span class="kw">await</span>.unwrap().unwrap_err();
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(error.downcast_ref(), <span class="prelude-val">Some</span>(LengthLimitError)));
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_for_chunked_body_under_limit_is_okay</span>() {
-        <span class="kw">const</span> <span class="ident">DATA</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>[<span class="ident">u8</span>]] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="string">b&quot;test&quot;</span>, <span class="string">b&quot;ing!&quot;</span>];
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">Chunky</span>(<span class="ident">DATA</span>);
-        <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">Limited::new</span>(<span class="ident">inner</span>, <span class="number">8</span>);
+    <span class="attribute">#[tokio::test]
+    </span><span class="kw">async fn </span>read_for_chunked_body_under_limit_is_okay() {
+        <span class="kw">const </span>DATA: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>[u8]] = <span class="kw-2">&amp;</span>[<span class="string">b&quot;test&quot;</span>, <span class="string">b&quot;ing!&quot;</span>];
+        <span class="kw">let </span>inner = Chunky(DATA);
+        <span class="kw">let </span>body = <span class="kw-2">&amp;mut </span>Limited::new(inner, <span class="number">8</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hint</span> <span class="op">=</span> <span class="ident">SizeHint::new</span>();
-        <span class="ident">hint</span>.<span class="ident">set_upper</span>(<span class="number">8</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">body</span>.<span class="ident">size_hint</span>().<span class="ident">upper</span>(), <span class="ident">hint</span>.<span class="ident">upper</span>());
+        <span class="kw">let </span><span class="kw-2">mut </span>hint = SizeHint::new();
+        hint.set_upper(<span class="number">8</span>);
+        <span class="macro">assert_eq!</span>(body.size_hint().upper(), hint.upper());
 
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">body</span>.<span class="ident">data</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">data</span>, <span class="ident">DATA</span>[<span class="number">0</span>]);
-        <span class="ident">hint</span>.<span class="ident">set_upper</span>(<span class="number">4</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">body</span>.<span class="ident">size_hint</span>().<span class="ident">upper</span>(), <span class="ident">hint</span>.<span class="ident">upper</span>());
+        <span class="kw">let </span>data = body.data().<span class="kw">await</span>.unwrap().unwrap();
+        <span class="macro">assert_eq!</span>(data, DATA[<span class="number">0</span>]);
+        hint.set_upper(<span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(body.size_hint().upper(), hint.upper());
 
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">body</span>.<span class="ident">data</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">data</span>, <span class="ident">DATA</span>[<span class="number">1</span>]);
-        <span class="ident">hint</span>.<span class="ident">set_upper</span>(<span class="number">0</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">body</span>.<span class="ident">size_hint</span>().<span class="ident">upper</span>(), <span class="ident">hint</span>.<span class="ident">upper</span>());
+        <span class="kw">let </span>data = body.data().<span class="kw">await</span>.unwrap().unwrap();
+        <span class="macro">assert_eq!</span>(data, DATA[<span class="number">1</span>]);
+        hint.set_upper(<span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(body.size_hint().upper(), hint.upper());
 
-        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="ident">body</span>.<span class="ident">data</span>().<span class="kw">await</span>, <span class="prelude-val">None</span>));
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(body.data().<span class="kw">await</span>, <span class="prelude-val">None</span>));
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_for_trailers_propagates_inner_trailers</span>() {
-        <span class="kw">const</span> <span class="ident">DATA</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>[<span class="ident">u8</span>]] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="string">b&quot;test&quot;</span>, <span class="string">b&quot;ing!&quot;</span>];
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">Chunky</span>(<span class="ident">DATA</span>);
-        <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">Limited::new</span>(<span class="ident">inner</span>, <span class="number">8</span>);
-        <span class="kw">let</span> <span class="ident">trailers</span> <span class="op">=</span> <span class="ident">body</span>.<span class="ident">trailers</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">trailers</span>, <span class="prelude-val">Some</span>(<span class="ident">HeaderMap::new</span>()))
+    <span class="attribute">#[tokio::test]
+    </span><span class="kw">async fn </span>read_for_trailers_propagates_inner_trailers() {
+        <span class="kw">const </span>DATA: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>[u8]] = <span class="kw-2">&amp;</span>[<span class="string">b&quot;test&quot;</span>, <span class="string">b&quot;ing!&quot;</span>];
+        <span class="kw">let </span>inner = Chunky(DATA);
+        <span class="kw">let </span>body = <span class="kw-2">&amp;mut </span>Limited::new(inner, <span class="number">8</span>);
+        <span class="kw">let </span>trailers = body.trailers().<span class="kw">await</span>.unwrap();
+        <span class="macro">assert_eq!</span>(trailers, <span class="prelude-val">Some</span>(HeaderMap::new()))
     }
 
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-    <span class="kw">enum</span> <span class="ident">ErrorBodyError</span> {
-        <span class="ident">Data</span>,
-        <span class="ident">Trailers</span>,
+    <span class="attribute">#[derive(Debug)]
+    </span><span class="kw">enum </span>ErrorBodyError {
+        Data,
+        Trailers,
     }
 
-    <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ErrorBodyError</span> {
-        <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
+    <span class="kw">impl </span>fmt::Display <span class="kw">for </span>ErrorBodyError {
+        <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, _f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
             <span class="prelude-val">Ok</span>(())
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">Error</span> <span class="kw">for</span> <span class="ident">ErrorBodyError</span> {}
+    <span class="kw">impl </span>Error <span class="kw">for </span>ErrorBodyError {}
 
-    <span class="kw">struct</span> <span class="ident">ErrorBody</span>;
+    <span class="kw">struct </span>ErrorBody;
 
-    <span class="kw">impl</span> <span class="ident">Body</span> <span class="kw">for</span> <span class="ident">ErrorBody</span> {
-        <span class="kw">type</span> <span class="ident">Data</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>];
-        <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">ErrorBodyError</span>;
+    <span class="kw">impl </span>Body <span class="kw">for </span>ErrorBody {
+        <span class="kw">type </span>Data = <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[u8];
+        <span class="kw">type </span>Error = ErrorBodyError;
 
-        <span class="kw">fn</span> <span class="ident">poll_data</span>(
-            <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-            <span class="ident">_cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Data</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">ErrorBodyError::Data</span>)))
+        <span class="kw">fn </span>poll_data(
+            <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+            _cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        ) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Data, <span class="self">Self</span>::Error&gt;&gt;&gt; {
+            Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(ErrorBodyError::Data)))
         }
 
-        <span class="kw">fn</span> <span class="ident">poll_trailers</span>(
-            <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-            <span class="ident">_cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HeaderMap</span><span class="op">&gt;</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">ErrorBodyError::Trailers</span>))
+        <span class="kw">fn </span>poll_trailers(
+            <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+            _cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        ) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;HeaderMap&gt;, <span class="self">Self</span>::Error&gt;&gt; {
+            Poll::Ready(<span class="prelude-val">Err</span>(ErrorBodyError::Trailers))
         }
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">read_for_body_returning_error_propagates_error</span>() {
-        <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">Limited::new</span>(<span class="ident">ErrorBody</span>, <span class="number">8</span>);
-        <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">body</span>.<span class="ident">data</span>().<span class="kw">await</span>.<span class="ident">unwrap</span>().<span class="ident">unwrap_err</span>();
-        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="ident">error</span>.<span class="ident">downcast_ref</span>(), <span class="prelude-val">Some</span>(<span class="ident">ErrorBodyError::Data</span>)));
+    <span class="attribute">#[tokio::test]
+    </span><span class="kw">async fn </span>read_for_body_returning_error_propagates_error() {
+        <span class="kw">let </span>body = <span class="kw-2">&amp;mut </span>Limited::new(ErrorBody, <span class="number">8</span>);
+        <span class="kw">let </span>error = body.data().<span class="kw">await</span>.unwrap().unwrap_err();
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(error.downcast_ref(), <span class="prelude-val">Some</span>(ErrorBodyError::Data)));
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">trailers_for_body_returning_error_propagates_error</span>() {
-        <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">Limited::new</span>(<span class="ident">ErrorBody</span>, <span class="number">8</span>);
-        <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">body</span>.<span class="ident">trailers</span>().<span class="kw">await</span>.<span class="ident">unwrap_err</span>();
+    <span class="attribute">#[tokio::test]
+    </span><span class="kw">async fn </span>trailers_for_body_returning_error_propagates_error() {
+        <span class="kw">let </span>body = <span class="kw-2">&amp;mut </span>Limited::new(ErrorBody, <span class="number">8</span>);
+        <span class="kw">let </span>error = body.trailers().<span class="kw">await</span>.unwrap_err();
         <span class="macro">assert!</span>(<span class="macro">matches!</span>(
-            <span class="ident">error</span>.<span class="ident">downcast_ref</span>(),
-            <span class="prelude-val">Some</span>(<span class="ident">ErrorBodyError::Trailers</span>)
+            error.downcast_ref(),
+            <span class="prelude-val">Some</span>(ErrorBodyError::Trailers)
         ));
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="http_body" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="http_body" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

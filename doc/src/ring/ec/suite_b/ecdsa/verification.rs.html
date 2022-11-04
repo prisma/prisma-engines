@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/ec/suite_b/ecdsa/verification.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>verification.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../ring/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/ec/suite_b/ecdsa/verification.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>verification.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../ring/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -342,344 +342,344 @@
 <span id="342">342</span>
 <span id="343">343</span>
 <span id="344">344</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2016 Brian Smith.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
-<span class="comment">// purpose with or without fee is hereby granted, provided that the above</span>
-<span class="comment">// copyright notice and this permission notice appear in all copies.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES</span>
-<span class="comment">// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY</span>
-<span class="comment">// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span>
-<span class="comment">// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION</span>
-<span class="comment">// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN</span>
-<span class="comment">// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2016 Brian Smith.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY
+// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-<span class="doccomment">//! ECDSA Signatures using the P-256 and P-384 curves.</span>
+</span><span class="doccomment">//! ECDSA Signatures using the P-256 and P-384 curves.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::digest_scalar::digest_scalar</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">arithmetic::montgomery</span>::<span class="kw-2">*</span>,
-    <span class="ident">digest</span>,
-    <span class="ident">ec::suite_b</span>::{<span class="ident">ops</span>::<span class="kw-2">*</span>, <span class="ident">public_key</span>::<span class="kw-2">*</span>, <span class="ident">verify_jacobian_point_is_on_the_curve</span>},
-    <span class="ident">error</span>,
-    <span class="ident">io::der</span>,
-    <span class="ident">limb</span>, <span class="ident">sealed</span>, <span class="ident">signature</span>,
+</span><span class="kw">use </span><span class="kw">super</span>::digest_scalar::digest_scalar;
+<span class="kw">use crate</span>::{
+    arithmetic::montgomery::<span class="kw-2">*</span>,
+    digest,
+    ec::suite_b::{ops::<span class="kw-2">*</span>, public_key::<span class="kw-2">*</span>, verify_jacobian_point_is_on_the_curve},
+    error,
+    io::der,
+    limb, sealed, signature,
 };
 
-<span class="doccomment">/// An ECDSA verification algorithm.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EcdsaVerificationAlgorithm</span> {
-    <span class="ident">ops</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">PublicScalarOps</span>,
-    <span class="ident">digest_alg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">digest::Algorithm</span>,
-    <span class="ident">split_rs</span>:
-        <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">fn</span>(
-            <span class="ident">ops</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">ScalarOps</span>,
-            <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="doccomment">/// An ECDSA verification algorithm.
+</span><span class="kw">pub struct </span>EcdsaVerificationAlgorithm {
+    ops: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>PublicScalarOps,
+    digest_alg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>digest::Algorithm,
+    split_rs:
+        <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">fn</span>(
+            ops: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>ScalarOps,
+            input: <span class="kw-2">&amp;mut </span>untrusted::Reader&lt;<span class="lifetime">&#39;a</span>&gt;,
         )
-            -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>), <span class="ident">error::Unspecified</span><span class="op">&gt;</span>,
-    <span class="ident">id</span>: <span class="ident">AlgorithmID</span>,
+            -&gt; <span class="prelude-ty">Result</span>&lt;(untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;, untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;), error::Unspecified&gt;,
+    id: AlgorithmID,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">enum</span> <span class="ident">AlgorithmID</span> {
-    <span class="ident">ECDSA_P256_SHA256_ASN1</span>,
-    <span class="ident">ECDSA_P256_SHA256_FIXED</span>,
-    <span class="ident">ECDSA_P256_SHA384_ASN1</span>,
-    <span class="ident">ECDSA_P384_SHA256_ASN1</span>,
-    <span class="ident">ECDSA_P384_SHA384_ASN1</span>,
-    <span class="ident">ECDSA_P384_SHA384_FIXED</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">enum </span>AlgorithmID {
+    ECDSA_P256_SHA256_ASN1,
+    ECDSA_P256_SHA256_FIXED,
+    ECDSA_P256_SHA384_ASN1,
+    ECDSA_P384_SHA256_ASN1,
+    ECDSA_P384_SHA384_ASN1,
+    ECDSA_P384_SHA384_FIXED,
 }
 
-<span class="macro">derive_debug_via_id!</span>(<span class="ident">EcdsaVerificationAlgorithm</span>);
+<span class="macro">derive_debug_via_id!</span>(EcdsaVerificationAlgorithm);
 
-<span class="kw">impl</span> <span class="ident">signature::VerificationAlgorithm</span> <span class="kw">for</span> <span class="ident">EcdsaVerificationAlgorithm</span> {
-    <span class="kw">fn</span> <span class="ident">verify</span>(
+<span class="kw">impl </span>signature::VerificationAlgorithm <span class="kw">for </span>EcdsaVerificationAlgorithm {
+    <span class="kw">fn </span>verify(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">public_key</span>: <span class="ident">untrusted::Input</span>,
-        <span class="ident">msg</span>: <span class="ident">untrusted::Input</span>,
-        <span class="ident">signature</span>: <span class="ident">untrusted::Input</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">e</span> <span class="op">=</span> {
-            <span class="comment">// NSA Guide Step 2: &quot;Use the selected hash function to compute H =</span>
-            <span class="comment">// Hash(M).&quot;</span>
-            <span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">digest::digest</span>(<span class="self">self</span>.<span class="ident">digest_alg</span>, <span class="ident">msg</span>.<span class="ident">as_slice_less_safe</span>());
+        public_key: untrusted::Input,
+        msg: untrusted::Input,
+        signature: untrusted::Input,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt; {
+        <span class="kw">let </span>e = {
+            <span class="comment">// NSA Guide Step 2: &quot;Use the selected hash function to compute H =
+            // Hash(M).&quot;
+            </span><span class="kw">let </span>h = digest::digest(<span class="self">self</span>.digest_alg, msg.as_slice_less_safe());
 
-            <span class="comment">// NSA Guide Step 3: &quot;Convert the bit string H to an integer e as</span>
-            <span class="comment">// described in Appendix B.2.&quot;</span>
-            <span class="ident">digest_scalar</span>(<span class="self">self</span>.<span class="ident">ops</span>.<span class="ident">scalar_ops</span>, <span class="ident">h</span>)
+            <span class="comment">// NSA Guide Step 3: &quot;Convert the bit string H to an integer e as
+            // described in Appendix B.2.&quot;
+            </span>digest_scalar(<span class="self">self</span>.ops.scalar_ops, h)
         };
 
-        <span class="self">self</span>.<span class="ident">verify_digest</span>(<span class="ident">public_key</span>, <span class="ident">e</span>, <span class="ident">signature</span>)
+        <span class="self">self</span>.verify_digest(public_key, e, signature)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">EcdsaVerificationAlgorithm</span> {
-    <span class="doccomment">/// This is intentionally not public.</span>
-    <span class="kw">fn</span> <span class="ident">verify_digest</span>(
+<span class="kw">impl </span>EcdsaVerificationAlgorithm {
+    <span class="doccomment">/// This is intentionally not public.
+    </span><span class="kw">fn </span>verify_digest(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">public_key</span>: <span class="ident">untrusted::Input</span>,
-        <span class="ident">e</span>: <span class="ident">Scalar</span>,
-        <span class="ident">signature</span>: <span class="ident">untrusted::Input</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-        <span class="comment">// NSA Suite B Implementer&#39;s Guide to ECDSA Section 3.4.2.</span>
+        public_key: untrusted::Input,
+        e: Scalar,
+        signature: untrusted::Input,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt; {
+        <span class="comment">// NSA Suite B Implementer&#39;s Guide to ECDSA Section 3.4.2.
 
-        <span class="kw">let</span> <span class="ident">public_key_ops</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ops</span>.<span class="ident">public_key_ops</span>;
-        <span class="kw">let</span> <span class="ident">scalar_ops</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ops</span>.<span class="ident">scalar_ops</span>;
+        </span><span class="kw">let </span>public_key_ops = <span class="self">self</span>.ops.public_key_ops;
+        <span class="kw">let </span>scalar_ops = <span class="self">self</span>.ops.scalar_ops;
 
-        <span class="comment">// NSA Guide Prerequisites:</span>
-        <span class="comment">//</span>
-        <span class="comment">//    Prior to accepting a verified digital signature as valid the</span>
-        <span class="comment">//    verifier shall have:</span>
-        <span class="comment">//</span>
-        <span class="comment">//    1. assurance of the signatory’s claimed identity,</span>
-        <span class="comment">//    2. an authentic copy of the domain parameters, (q, FR, a, b, SEED,</span>
-        <span class="comment">//       G, n, h),</span>
-        <span class="comment">//    3. assurance of the validity of the public key, and</span>
-        <span class="comment">//    4. assurance that the claimed signatory actually possessed the</span>
-        <span class="comment">//       private key that was used to generate the digital signature at</span>
-        <span class="comment">//       the time that the signature was generated.</span>
-        <span class="comment">//</span>
-        <span class="comment">// Prerequisites #1 and #4 are outside the scope of what this function</span>
-        <span class="comment">// can do. Prerequisite #2 is handled implicitly as the domain</span>
-        <span class="comment">// parameters are hard-coded into the source. Prerequisite #3 is</span>
-        <span class="comment">// handled by `parse_uncompressed_point`.</span>
-        <span class="kw">let</span> <span class="ident">peer_pub_key</span> <span class="op">=</span> <span class="ident">parse_uncompressed_point</span>(<span class="ident">public_key_ops</span>, <span class="ident">public_key</span>)<span class="question-mark">?</span>;
+        <span class="comment">// NSA Guide Prerequisites:
+        //
+        //    Prior to accepting a verified digital signature as valid the
+        //    verifier shall have:
+        //
+        //    1. assurance of the signatory’s claimed identity,
+        //    2. an authentic copy of the domain parameters, (q, FR, a, b, SEED,
+        //       G, n, h),
+        //    3. assurance of the validity of the public key, and
+        //    4. assurance that the claimed signatory actually possessed the
+        //       private key that was used to generate the digital signature at
+        //       the time that the signature was generated.
+        //
+        // Prerequisites #1 and #4 are outside the scope of what this function
+        // can do. Prerequisite #2 is handled implicitly as the domain
+        // parameters are hard-coded into the source. Prerequisite #3 is
+        // handled by `parse_uncompressed_point`.
+        </span><span class="kw">let </span>peer_pub_key = parse_uncompressed_point(public_key_ops, public_key)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> (<span class="ident">r</span>, <span class="ident">s</span>) <span class="op">=</span> <span class="ident">signature</span>.<span class="ident">read_all</span>(<span class="ident">error::Unspecified</span>, <span class="op">|</span><span class="ident">input</span><span class="op">|</span> {
-            (<span class="self">self</span>.<span class="ident">split_rs</span>)(<span class="ident">scalar_ops</span>, <span class="ident">input</span>)
+        <span class="kw">let </span>(r, s) = signature.read_all(error::Unspecified, |input| {
+            (<span class="self">self</span>.split_rs)(scalar_ops, input)
         })<span class="question-mark">?</span>;
 
-        <span class="comment">// NSA Guide Step 1: &quot;If r and s are not both integers in the interval</span>
-        <span class="comment">// [1, n − 1], output INVALID.&quot;</span>
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">scalar_parse_big_endian_variable</span>(<span class="ident">public_key_ops</span>.<span class="ident">common</span>, <span class="ident">limb::AllowZero::No</span>, <span class="ident">r</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">scalar_parse_big_endian_variable</span>(<span class="ident">public_key_ops</span>.<span class="ident">common</span>, <span class="ident">limb::AllowZero::No</span>, <span class="ident">s</span>)<span class="question-mark">?</span>;
+        <span class="comment">// NSA Guide Step 1: &quot;If r and s are not both integers in the interval
+        // [1, n − 1], output INVALID.&quot;
+        </span><span class="kw">let </span>r = scalar_parse_big_endian_variable(public_key_ops.common, limb::AllowZero::No, r)<span class="question-mark">?</span>;
+        <span class="kw">let </span>s = scalar_parse_big_endian_variable(public_key_ops.common, limb::AllowZero::No, s)<span class="question-mark">?</span>;
 
-        <span class="comment">// NSA Guide Step 4: &quot;Compute w = s**−1 mod n, using the routine in</span>
-        <span class="comment">// Appendix B.1.&quot;</span>
-        <span class="kw">let</span> <span class="ident">w</span> <span class="op">=</span> <span class="ident">scalar_ops</span>.<span class="ident">scalar_inv_to_mont</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>);
+        <span class="comment">// NSA Guide Step 4: &quot;Compute w = s**−1 mod n, using the routine in
+        // Appendix B.1.&quot;
+        </span><span class="kw">let </span>w = scalar_ops.scalar_inv_to_mont(<span class="kw-2">&amp;</span>s);
 
-        <span class="comment">// NSA Guide Step 5: &quot;Compute u1 = (e * w) mod n, and compute</span>
-        <span class="comment">// u2 = (r * w) mod n.&quot;</span>
-        <span class="kw">let</span> <span class="ident">u1</span> <span class="op">=</span> <span class="ident">scalar_ops</span>.<span class="ident">scalar_product</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>, <span class="kw-2">&amp;</span><span class="ident">w</span>);
-        <span class="kw">let</span> <span class="ident">u2</span> <span class="op">=</span> <span class="ident">scalar_ops</span>.<span class="ident">scalar_product</span>(<span class="kw-2">&amp;</span><span class="ident">r</span>, <span class="kw-2">&amp;</span><span class="ident">w</span>);
+        <span class="comment">// NSA Guide Step 5: &quot;Compute u1 = (e * w) mod n, and compute
+        // u2 = (r * w) mod n.&quot;
+        </span><span class="kw">let </span>u1 = scalar_ops.scalar_product(<span class="kw-2">&amp;</span>e, <span class="kw-2">&amp;</span>w);
+        <span class="kw">let </span>u2 = scalar_ops.scalar_product(<span class="kw-2">&amp;</span>r, <span class="kw-2">&amp;</span>w);
 
-        <span class="comment">// NSA Guide Step 6: &quot;Compute the elliptic curve point</span>
-        <span class="comment">// R = (xR, yR) = u1*G + u2*Q, using EC scalar multiplication and EC</span>
-        <span class="comment">// addition. If R is equal to the point at infinity, output INVALID.&quot;</span>
-        <span class="kw">let</span> <span class="ident">product</span> <span class="op">=</span> <span class="ident">twin_mul</span>(<span class="self">self</span>.<span class="ident">ops</span>.<span class="ident">private_key_ops</span>, <span class="kw-2">&amp;</span><span class="ident">u1</span>, <span class="kw-2">&amp;</span><span class="ident">u2</span>, <span class="kw-2">&amp;</span><span class="ident">peer_pub_key</span>);
+        <span class="comment">// NSA Guide Step 6: &quot;Compute the elliptic curve point
+        // R = (xR, yR) = u1*G + u2*Q, using EC scalar multiplication and EC
+        // addition. If R is equal to the point at infinity, output INVALID.&quot;
+        </span><span class="kw">let </span>product = twin_mul(<span class="self">self</span>.ops.private_key_ops, <span class="kw-2">&amp;</span>u1, <span class="kw-2">&amp;</span>u2, <span class="kw-2">&amp;</span>peer_pub_key);
 
-        <span class="comment">// Verify that the point we computed is on the curve; see</span>
-        <span class="comment">// `verify_affine_point_is_on_the_curve_scaled` for details on why. It</span>
-        <span class="comment">// would be more secure to do the check on the affine coordinates if we</span>
-        <span class="comment">// were going to convert to affine form (again, see</span>
-        <span class="comment">// `verify_affine_point_is_on_the_curve_scaled` for details on why).</span>
-        <span class="comment">// But, we&#39;re going to avoid converting to affine for performance</span>
-        <span class="comment">// reasons, so we do the verification using the Jacobian coordinates.</span>
-        <span class="kw">let</span> <span class="ident">z2</span> <span class="op">=</span> <span class="ident">verify_jacobian_point_is_on_the_curve</span>(<span class="ident">public_key_ops</span>.<span class="ident">common</span>, <span class="kw-2">&amp;</span><span class="ident">product</span>)<span class="question-mark">?</span>;
+        <span class="comment">// Verify that the point we computed is on the curve; see
+        // `verify_affine_point_is_on_the_curve_scaled` for details on why. It
+        // would be more secure to do the check on the affine coordinates if we
+        // were going to convert to affine form (again, see
+        // `verify_affine_point_is_on_the_curve_scaled` for details on why).
+        // But, we&#39;re going to avoid converting to affine for performance
+        // reasons, so we do the verification using the Jacobian coordinates.
+        </span><span class="kw">let </span>z2 = verify_jacobian_point_is_on_the_curve(public_key_ops.common, <span class="kw-2">&amp;</span>product)<span class="question-mark">?</span>;
 
-        <span class="comment">// NSA Guide Step 7: &quot;Compute v = xR mod n.&quot;</span>
-        <span class="comment">// NSA Guide Step 8: &quot;Compare v and r0. If v = r0, output VALID;</span>
-        <span class="comment">// otherwise, output INVALID.&quot;</span>
-        <span class="comment">//</span>
-        <span class="comment">// Instead, we use Greg Maxwell&#39;s trick to avoid the inversion mod `q`</span>
-        <span class="comment">// that would be necessary to compute the affine X coordinate.</span>
-        <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">public_key_ops</span>.<span class="ident">common</span>.<span class="ident">point_x</span>(<span class="kw-2">&amp;</span><span class="ident">product</span>);
-        <span class="kw">fn</span> <span class="ident">sig_r_equals_x</span>(
-            <span class="ident">ops</span>: <span class="kw-2">&amp;</span><span class="ident">PublicScalarOps</span>,
-            <span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">Unencoded</span><span class="op">&gt;</span>,
-            <span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
-            <span class="ident">z2</span>: <span class="kw-2">&amp;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
-        ) -&gt; <span class="ident">bool</span> {
-            <span class="kw">let</span> <span class="ident">cops</span> <span class="op">=</span> <span class="ident">ops</span>.<span class="ident">public_key_ops</span>.<span class="ident">common</span>;
-            <span class="kw">let</span> <span class="ident">r_jacobian</span> <span class="op">=</span> <span class="ident">cops</span>.<span class="ident">elem_product</span>(<span class="ident">z2</span>, <span class="ident">r</span>);
-            <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">cops</span>.<span class="ident">elem_unencoded</span>(<span class="ident">x</span>);
-            <span class="ident">ops</span>.<span class="ident">elem_equals</span>(<span class="kw-2">&amp;</span><span class="ident">r_jacobian</span>, <span class="kw-2">&amp;</span><span class="ident">x</span>)
+        <span class="comment">// NSA Guide Step 7: &quot;Compute v = xR mod n.&quot;
+        // NSA Guide Step 8: &quot;Compare v and r0. If v = r0, output VALID;
+        // otherwise, output INVALID.&quot;
+        //
+        // Instead, we use Greg Maxwell&#39;s trick to avoid the inversion mod `q`
+        // that would be necessary to compute the affine X coordinate.
+        </span><span class="kw">let </span>x = public_key_ops.common.point_x(<span class="kw-2">&amp;</span>product);
+        <span class="kw">fn </span>sig_r_equals_x(
+            ops: <span class="kw-2">&amp;</span>PublicScalarOps,
+            r: <span class="kw-2">&amp;</span>Elem&lt;Unencoded&gt;,
+            x: <span class="kw-2">&amp;</span>Elem&lt;R&gt;,
+            z2: <span class="kw-2">&amp;</span>Elem&lt;R&gt;,
+        ) -&gt; bool {
+            <span class="kw">let </span>cops = ops.public_key_ops.common;
+            <span class="kw">let </span>r_jacobian = cops.elem_product(z2, r);
+            <span class="kw">let </span>x = cops.elem_unencoded(x);
+            ops.elem_equals(<span class="kw-2">&amp;</span>r_jacobian, <span class="kw-2">&amp;</span>x)
         }
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ops</span>.<span class="ident">scalar_as_elem</span>(<span class="kw-2">&amp;</span><span class="ident">r</span>);
-        <span class="kw">if</span> <span class="ident">sig_r_equals_x</span>(<span class="self">self</span>.<span class="ident">ops</span>, <span class="kw-2">&amp;</span><span class="ident">r</span>, <span class="kw-2">&amp;</span><span class="ident">x</span>, <span class="kw-2">&amp;</span><span class="ident">z2</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+        <span class="kw">let </span>r = <span class="self">self</span>.ops.scalar_as_elem(<span class="kw-2">&amp;</span>r);
+        <span class="kw">if </span>sig_r_equals_x(<span class="self">self</span>.ops, <span class="kw-2">&amp;</span>r, <span class="kw-2">&amp;</span>x, <span class="kw-2">&amp;</span>z2) {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(());
         }
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">ops</span>.<span class="ident">elem_less_than</span>(<span class="kw-2">&amp;</span><span class="ident">r</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ops</span>.<span class="ident">q_minus_n</span>) {
-            <span class="kw">let</span> <span class="ident">r_plus_n</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ops</span>.<span class="ident">elem_sum</span>(<span class="kw-2">&amp;</span><span class="ident">r</span>, <span class="kw-2">&amp;</span><span class="ident">public_key_ops</span>.<span class="ident">common</span>.<span class="ident">n</span>);
-            <span class="kw">if</span> <span class="ident">sig_r_equals_x</span>(<span class="self">self</span>.<span class="ident">ops</span>, <span class="kw-2">&amp;</span><span class="ident">r_plus_n</span>, <span class="kw-2">&amp;</span><span class="ident">x</span>, <span class="kw-2">&amp;</span><span class="ident">z2</span>) {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+        <span class="kw">if </span><span class="self">self</span>.ops.elem_less_than(<span class="kw-2">&amp;</span>r, <span class="kw-2">&amp;</span><span class="self">self</span>.ops.q_minus_n) {
+            <span class="kw">let </span>r_plus_n = <span class="self">self</span>.ops.elem_sum(<span class="kw-2">&amp;</span>r, <span class="kw-2">&amp;</span>public_key_ops.common.n);
+            <span class="kw">if </span>sig_r_equals_x(<span class="self">self</span>.ops, <span class="kw-2">&amp;</span>r_plus_n, <span class="kw-2">&amp;</span>x, <span class="kw-2">&amp;</span>z2) {
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(());
             }
         }
 
-        <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>)
+        <span class="prelude-val">Err</span>(error::Unspecified)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">sealed::Sealed</span> <span class="kw">for</span> <span class="ident">EcdsaVerificationAlgorithm</span> {}
+<span class="kw">impl </span>sealed::Sealed <span class="kw">for </span>EcdsaVerificationAlgorithm {}
 
-<span class="kw">fn</span> <span class="ident">split_rs_fixed</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">ops</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">ScalarOps</span>,
-    <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">scalar_len</span> <span class="op">=</span> <span class="ident">ops</span>.<span class="ident">scalar_bytes_len</span>();
-    <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_bytes</span>(<span class="ident">scalar_len</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">read_bytes</span>(<span class="ident">scalar_len</span>)<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>((<span class="ident">r</span>, <span class="ident">s</span>))
+<span class="kw">fn </span>split_rs_fixed&lt;<span class="lifetime">&#39;a</span>&gt;(
+    ops: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>ScalarOps,
+    input: <span class="kw-2">&amp;mut </span>untrusted::Reader&lt;<span class="lifetime">&#39;a</span>&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;, untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;), error::Unspecified&gt; {
+    <span class="kw">let </span>scalar_len = ops.scalar_bytes_len();
+    <span class="kw">let </span>r = input.read_bytes(scalar_len)<span class="question-mark">?</span>;
+    <span class="kw">let </span>s = input.read_bytes(scalar_len)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>((r, s))
 }
 
-<span class="kw">fn</span> <span class="ident">split_rs_asn1</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">_ops</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">ScalarOps</span>,
-    <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-    <span class="ident">der::nested</span>(<span class="ident">input</span>, <span class="ident">der::Tag::Sequence</span>, <span class="ident">error::Unspecified</span>, <span class="op">|</span><span class="ident">input</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">der::positive_integer</span>(<span class="ident">input</span>)<span class="question-mark">?</span>.<span class="ident">big_endian_without_leading_zero_as_input</span>();
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">der::positive_integer</span>(<span class="ident">input</span>)<span class="question-mark">?</span>.<span class="ident">big_endian_without_leading_zero_as_input</span>();
-        <span class="prelude-val">Ok</span>((<span class="ident">r</span>, <span class="ident">s</span>))
+<span class="kw">fn </span>split_rs_asn1&lt;<span class="lifetime">&#39;a</span>&gt;(
+    _ops: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>ScalarOps,
+    input: <span class="kw-2">&amp;mut </span>untrusted::Reader&lt;<span class="lifetime">&#39;a</span>&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;, untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;), error::Unspecified&gt; {
+    der::nested(input, der::Tag::Sequence, error::Unspecified, |input| {
+        <span class="kw">let </span>r = der::positive_integer(input)<span class="question-mark">?</span>.big_endian_without_leading_zero_as_input();
+        <span class="kw">let </span>s = der::positive_integer(input)<span class="question-mark">?</span>.big_endian_without_leading_zero_as_input();
+        <span class="prelude-val">Ok</span>((r, s))
     })
 }
 
-<span class="kw">fn</span> <span class="ident">twin_mul</span>(
-    <span class="ident">ops</span>: <span class="kw-2">&amp;</span><span class="ident">PrivateKeyOps</span>,
-    <span class="ident">g_scalar</span>: <span class="kw-2">&amp;</span><span class="ident">Scalar</span>,
-    <span class="ident">p_scalar</span>: <span class="kw-2">&amp;</span><span class="ident">Scalar</span>,
-    <span class="ident">p_xy</span>: <span class="kw-2">&amp;</span>(<span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>, <span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>),
-) -&gt; <span class="ident">Point</span> {
-    <span class="comment">// XXX: Inefficient. TODO: implement interleaved wNAF multiplication.</span>
-    <span class="kw">let</span> <span class="ident">scaled_g</span> <span class="op">=</span> <span class="ident">ops</span>.<span class="ident">point_mul_base</span>(<span class="ident">g_scalar</span>);
-    <span class="kw">let</span> <span class="ident">scaled_p</span> <span class="op">=</span> <span class="ident">ops</span>.<span class="ident">point_mul</span>(<span class="ident">p_scalar</span>, <span class="ident">p_xy</span>);
-    <span class="ident">ops</span>.<span class="ident">common</span>.<span class="ident">point_sum</span>(<span class="kw-2">&amp;</span><span class="ident">scaled_g</span>, <span class="kw-2">&amp;</span><span class="ident">scaled_p</span>)
+<span class="kw">fn </span>twin_mul(
+    ops: <span class="kw-2">&amp;</span>PrivateKeyOps,
+    g_scalar: <span class="kw-2">&amp;</span>Scalar,
+    p_scalar: <span class="kw-2">&amp;</span>Scalar,
+    p_xy: <span class="kw-2">&amp;</span>(Elem&lt;R&gt;, Elem&lt;R&gt;),
+) -&gt; Point {
+    <span class="comment">// XXX: Inefficient. TODO: implement interleaved wNAF multiplication.
+    </span><span class="kw">let </span>scaled_g = ops.point_mul_base(g_scalar);
+    <span class="kw">let </span>scaled_p = ops.point_mul(p_scalar, p_xy);
+    ops.common.point_sum(<span class="kw-2">&amp;</span>scaled_g, <span class="kw-2">&amp;</span>scaled_p)
 }
 
-<span class="doccomment">/// Verification of fixed-length (PKCS#11 style) ECDSA signatures using the</span>
-<span class="doccomment">/// P-256 curve and SHA-256.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See &quot;`ECDSA_*_FIXED` Details&quot; in `ring::signature`&#39;s module-level</span>
-<span class="doccomment">/// documentation for more details.</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">ECDSA_P256_SHA256_FIXED</span>: <span class="ident">EcdsaVerificationAlgorithm</span> <span class="op">=</span> <span class="ident">EcdsaVerificationAlgorithm</span> {
-    <span class="ident">ops</span>: <span class="kw-2">&amp;</span><span class="ident">p256::PUBLIC_SCALAR_OPS</span>,
-    <span class="ident">digest_alg</span>: <span class="kw-2">&amp;</span><span class="ident">digest::SHA256</span>,
-    <span class="ident">split_rs</span>: <span class="ident">split_rs_fixed</span>,
-    <span class="ident">id</span>: <span class="ident">AlgorithmID::ECDSA_P256_SHA256_FIXED</span>,
+<span class="doccomment">/// Verification of fixed-length (PKCS#11 style) ECDSA signatures using the
+/// P-256 curve and SHA-256.
+///
+/// See &quot;`ECDSA_*_FIXED` Details&quot; in `ring::signature`&#39;s module-level
+/// documentation for more details.
+</span><span class="kw">pub static </span>ECDSA_P256_SHA256_FIXED: EcdsaVerificationAlgorithm = EcdsaVerificationAlgorithm {
+    ops: <span class="kw-2">&amp;</span>p256::PUBLIC_SCALAR_OPS,
+    digest_alg: <span class="kw-2">&amp;</span>digest::SHA256,
+    split_rs: split_rs_fixed,
+    id: AlgorithmID::ECDSA_P256_SHA256_FIXED,
 };
 
-<span class="doccomment">/// Verification of fixed-length (PKCS#11 style) ECDSA signatures using the</span>
-<span class="doccomment">/// P-384 curve and SHA-384.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See &quot;`ECDSA_*_FIXED` Details&quot; in `ring::signature`&#39;s module-level</span>
-<span class="doccomment">/// documentation for more details.</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">ECDSA_P384_SHA384_FIXED</span>: <span class="ident">EcdsaVerificationAlgorithm</span> <span class="op">=</span> <span class="ident">EcdsaVerificationAlgorithm</span> {
-    <span class="ident">ops</span>: <span class="kw-2">&amp;</span><span class="ident">p384::PUBLIC_SCALAR_OPS</span>,
-    <span class="ident">digest_alg</span>: <span class="kw-2">&amp;</span><span class="ident">digest::SHA384</span>,
-    <span class="ident">split_rs</span>: <span class="ident">split_rs_fixed</span>,
-    <span class="ident">id</span>: <span class="ident">AlgorithmID::ECDSA_P384_SHA384_FIXED</span>,
+<span class="doccomment">/// Verification of fixed-length (PKCS#11 style) ECDSA signatures using the
+/// P-384 curve and SHA-384.
+///
+/// See &quot;`ECDSA_*_FIXED` Details&quot; in `ring::signature`&#39;s module-level
+/// documentation for more details.
+</span><span class="kw">pub static </span>ECDSA_P384_SHA384_FIXED: EcdsaVerificationAlgorithm = EcdsaVerificationAlgorithm {
+    ops: <span class="kw-2">&amp;</span>p384::PUBLIC_SCALAR_OPS,
+    digest_alg: <span class="kw-2">&amp;</span>digest::SHA384,
+    split_rs: split_rs_fixed,
+    id: AlgorithmID::ECDSA_P384_SHA384_FIXED,
 };
 
-<span class="doccomment">/// Verification of ASN.1 DER-encoded ECDSA signatures using the P-256 curve</span>
-<span class="doccomment">/// and SHA-256.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See &quot;`ECDSA_*_ASN1` Details&quot; in `ring::signature`&#39;s module-level</span>
-<span class="doccomment">/// documentation for more details.</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">ECDSA_P256_SHA256_ASN1</span>: <span class="ident">EcdsaVerificationAlgorithm</span> <span class="op">=</span> <span class="ident">EcdsaVerificationAlgorithm</span> {
-    <span class="ident">ops</span>: <span class="kw-2">&amp;</span><span class="ident">p256::PUBLIC_SCALAR_OPS</span>,
-    <span class="ident">digest_alg</span>: <span class="kw-2">&amp;</span><span class="ident">digest::SHA256</span>,
-    <span class="ident">split_rs</span>: <span class="ident">split_rs_asn1</span>,
-    <span class="ident">id</span>: <span class="ident">AlgorithmID::ECDSA_P256_SHA256_ASN1</span>,
+<span class="doccomment">/// Verification of ASN.1 DER-encoded ECDSA signatures using the P-256 curve
+/// and SHA-256.
+///
+/// See &quot;`ECDSA_*_ASN1` Details&quot; in `ring::signature`&#39;s module-level
+/// documentation for more details.
+</span><span class="kw">pub static </span>ECDSA_P256_SHA256_ASN1: EcdsaVerificationAlgorithm = EcdsaVerificationAlgorithm {
+    ops: <span class="kw-2">&amp;</span>p256::PUBLIC_SCALAR_OPS,
+    digest_alg: <span class="kw-2">&amp;</span>digest::SHA256,
+    split_rs: split_rs_asn1,
+    id: AlgorithmID::ECDSA_P256_SHA256_ASN1,
 };
 
-<span class="doccomment">/// *Not recommended*. Verification of ASN.1 DER-encoded ECDSA signatures using</span>
-<span class="doccomment">/// the P-256 curve and SHA-384.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// In most situations, P-256 should be used only with SHA-256 and P-384</span>
-<span class="doccomment">/// should be used only with SHA-384. However, in some cases, particularly TLS</span>
-<span class="doccomment">/// on the web, it is necessary to support P-256 with SHA-384 for compatibility</span>
-<span class="doccomment">/// with widely-deployed implementations that do not follow these guidelines.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See &quot;`ECDSA_*_ASN1` Details&quot; in `ring::signature`&#39;s module-level</span>
-<span class="doccomment">/// documentation for more details.</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">ECDSA_P256_SHA384_ASN1</span>: <span class="ident">EcdsaVerificationAlgorithm</span> <span class="op">=</span> <span class="ident">EcdsaVerificationAlgorithm</span> {
-    <span class="ident">ops</span>: <span class="kw-2">&amp;</span><span class="ident">p256::PUBLIC_SCALAR_OPS</span>,
-    <span class="ident">digest_alg</span>: <span class="kw-2">&amp;</span><span class="ident">digest::SHA384</span>,
-    <span class="ident">split_rs</span>: <span class="ident">split_rs_asn1</span>,
-    <span class="ident">id</span>: <span class="ident">AlgorithmID::ECDSA_P256_SHA384_ASN1</span>,
+<span class="doccomment">/// *Not recommended*. Verification of ASN.1 DER-encoded ECDSA signatures using
+/// the P-256 curve and SHA-384.
+///
+/// In most situations, P-256 should be used only with SHA-256 and P-384
+/// should be used only with SHA-384. However, in some cases, particularly TLS
+/// on the web, it is necessary to support P-256 with SHA-384 for compatibility
+/// with widely-deployed implementations that do not follow these guidelines.
+///
+/// See &quot;`ECDSA_*_ASN1` Details&quot; in `ring::signature`&#39;s module-level
+/// documentation for more details.
+</span><span class="kw">pub static </span>ECDSA_P256_SHA384_ASN1: EcdsaVerificationAlgorithm = EcdsaVerificationAlgorithm {
+    ops: <span class="kw-2">&amp;</span>p256::PUBLIC_SCALAR_OPS,
+    digest_alg: <span class="kw-2">&amp;</span>digest::SHA384,
+    split_rs: split_rs_asn1,
+    id: AlgorithmID::ECDSA_P256_SHA384_ASN1,
 };
 
-<span class="doccomment">/// *Not recommended*. Verification of ASN.1 DER-encoded ECDSA signatures using</span>
-<span class="doccomment">/// the P-384 curve and SHA-256.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// In most situations, P-256 should be used only with SHA-256 and P-384</span>
-<span class="doccomment">/// should be used only with SHA-384. However, in some cases, particularly TLS</span>
-<span class="doccomment">/// on the web, it is necessary to support P-256 with SHA-384 for compatibility</span>
-<span class="doccomment">/// with widely-deployed implementations that do not follow these guidelines.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See &quot;`ECDSA_*_ASN1` Details&quot; in `ring::signature`&#39;s module-level</span>
-<span class="doccomment">/// documentation for more details.</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">ECDSA_P384_SHA256_ASN1</span>: <span class="ident">EcdsaVerificationAlgorithm</span> <span class="op">=</span> <span class="ident">EcdsaVerificationAlgorithm</span> {
-    <span class="ident">ops</span>: <span class="kw-2">&amp;</span><span class="ident">p384::PUBLIC_SCALAR_OPS</span>,
-    <span class="ident">digest_alg</span>: <span class="kw-2">&amp;</span><span class="ident">digest::SHA256</span>,
-    <span class="ident">split_rs</span>: <span class="ident">split_rs_asn1</span>,
-    <span class="ident">id</span>: <span class="ident">AlgorithmID::ECDSA_P384_SHA256_ASN1</span>,
+<span class="doccomment">/// *Not recommended*. Verification of ASN.1 DER-encoded ECDSA signatures using
+/// the P-384 curve and SHA-256.
+///
+/// In most situations, P-256 should be used only with SHA-256 and P-384
+/// should be used only with SHA-384. However, in some cases, particularly TLS
+/// on the web, it is necessary to support P-256 with SHA-384 for compatibility
+/// with widely-deployed implementations that do not follow these guidelines.
+///
+/// See &quot;`ECDSA_*_ASN1` Details&quot; in `ring::signature`&#39;s module-level
+/// documentation for more details.
+</span><span class="kw">pub static </span>ECDSA_P384_SHA256_ASN1: EcdsaVerificationAlgorithm = EcdsaVerificationAlgorithm {
+    ops: <span class="kw-2">&amp;</span>p384::PUBLIC_SCALAR_OPS,
+    digest_alg: <span class="kw-2">&amp;</span>digest::SHA256,
+    split_rs: split_rs_asn1,
+    id: AlgorithmID::ECDSA_P384_SHA256_ASN1,
 };
 
-<span class="doccomment">/// Verification of ASN.1 DER-encoded ECDSA signatures using the P-384 curve</span>
-<span class="doccomment">/// and SHA-384.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See &quot;`ECDSA_*_ASN1` Details&quot; in `ring::signature`&#39;s module-level</span>
-<span class="doccomment">/// documentation for more details.</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">ECDSA_P384_SHA384_ASN1</span>: <span class="ident">EcdsaVerificationAlgorithm</span> <span class="op">=</span> <span class="ident">EcdsaVerificationAlgorithm</span> {
-    <span class="ident">ops</span>: <span class="kw-2">&amp;</span><span class="ident">p384::PUBLIC_SCALAR_OPS</span>,
-    <span class="ident">digest_alg</span>: <span class="kw-2">&amp;</span><span class="ident">digest::SHA384</span>,
-    <span class="ident">split_rs</span>: <span class="ident">split_rs_asn1</span>,
-    <span class="ident">id</span>: <span class="ident">AlgorithmID::ECDSA_P384_SHA384_ASN1</span>,
+<span class="doccomment">/// Verification of ASN.1 DER-encoded ECDSA signatures using the P-384 curve
+/// and SHA-384.
+///
+/// See &quot;`ECDSA_*_ASN1` Details&quot; in `ring::signature`&#39;s module-level
+/// documentation for more details.
+</span><span class="kw">pub static </span>ECDSA_P384_SHA384_ASN1: EcdsaVerificationAlgorithm = EcdsaVerificationAlgorithm {
+    ops: <span class="kw-2">&amp;</span>p384::PUBLIC_SCALAR_OPS,
+    digest_alg: <span class="kw-2">&amp;</span>digest::SHA384,
+    split_rs: split_rs_asn1,
+    id: AlgorithmID::ECDSA_P384_SHA384_ASN1,
 };
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::test</span>;
-    <span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::test;
+    <span class="kw">use </span>alloc::vec::Vec;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_digest_based_test_vectors</span>() {
-        <span class="ident">test::run</span>(
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_digest_based_test_vectors() {
+        test::run(
             <span class="macro">test_file!</span>(<span class="string">&quot;../../../../crypto/fipsmodule/ecdsa/ecdsa_verify_tests.txt&quot;</span>),
-            <span class="op">|</span><span class="ident">section</span>, <span class="ident">test_case</span><span class="op">|</span> {
-                <span class="macro">assert_eq!</span>(<span class="ident">section</span>, <span class="string">&quot;&quot;</span>);
+            |section, test_case| {
+                <span class="macro">assert_eq!</span>(section, <span class="string">&quot;&quot;</span>);
 
-                <span class="kw">let</span> <span class="ident">curve_name</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_string</span>(<span class="string">&quot;Curve&quot;</span>);
+                <span class="kw">let </span>curve_name = test_case.consume_string(<span class="string">&quot;Curve&quot;</span>);
 
-                <span class="kw">let</span> <span class="ident">public_key</span> <span class="op">=</span> {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">public_key</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-                    <span class="ident">public_key</span>.<span class="ident">push</span>(<span class="number">0x04</span>);
-                    <span class="ident">public_key</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span><span class="ident">test_case</span>.<span class="ident">consume_bytes</span>(<span class="string">&quot;X&quot;</span>));
-                    <span class="ident">public_key</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span><span class="ident">test_case</span>.<span class="ident">consume_bytes</span>(<span class="string">&quot;Y&quot;</span>));
-                    <span class="ident">public_key</span>
+                <span class="kw">let </span>public_key = {
+                    <span class="kw">let </span><span class="kw-2">mut </span>public_key = Vec::new();
+                    public_key.push(<span class="number">0x04</span>);
+                    public_key.extend(<span class="kw-2">&amp;</span>test_case.consume_bytes(<span class="string">&quot;X&quot;</span>));
+                    public_key.extend(<span class="kw-2">&amp;</span>test_case.consume_bytes(<span class="string">&quot;Y&quot;</span>));
+                    public_key
                 };
 
-                <span class="kw">let</span> <span class="ident">digest</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_bytes</span>(<span class="string">&quot;Digest&quot;</span>);
+                <span class="kw">let </span>digest = test_case.consume_bytes(<span class="string">&quot;Digest&quot;</span>);
 
-                <span class="kw">let</span> <span class="ident">sig</span> <span class="op">=</span> {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sig</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-                    <span class="ident">sig</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span><span class="ident">test_case</span>.<span class="ident">consume_bytes</span>(<span class="string">&quot;R&quot;</span>));
-                    <span class="ident">sig</span>.<span class="ident">extend</span>(<span class="kw-2">&amp;</span><span class="ident">test_case</span>.<span class="ident">consume_bytes</span>(<span class="string">&quot;S&quot;</span>));
-                    <span class="ident">sig</span>
+                <span class="kw">let </span>sig = {
+                    <span class="kw">let </span><span class="kw-2">mut </span>sig = Vec::new();
+                    sig.extend(<span class="kw-2">&amp;</span>test_case.consume_bytes(<span class="string">&quot;R&quot;</span>));
+                    sig.extend(<span class="kw-2">&amp;</span>test_case.consume_bytes(<span class="string">&quot;S&quot;</span>));
+                    sig
                 };
 
-                <span class="kw">let</span> <span class="ident">invalid</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_optional_string</span>(<span class="string">&quot;Invalid&quot;</span>);
+                <span class="kw">let </span>invalid = test_case.consume_optional_string(<span class="string">&quot;Invalid&quot;</span>);
 
-                <span class="kw">let</span> <span class="ident">alg</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">curve_name</span>.<span class="ident">as_str</span>() {
-                    <span class="string">&quot;P-256&quot;</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">ECDSA_P256_SHA256_FIXED</span>,
-                    <span class="string">&quot;P-384&quot;</span> =&gt; <span class="kw-2">&amp;</span><span class="ident">ECDSA_P384_SHA384_FIXED</span>,
-                    <span class="kw">_</span> =&gt; {
-                        <span class="macro">panic!</span>(<span class="string">&quot;Unsupported curve: {}&quot;</span>, <span class="ident">curve_name</span>);
+                <span class="kw">let </span>alg = <span class="kw">match </span>curve_name.as_str() {
+                    <span class="string">&quot;P-256&quot; </span>=&gt; <span class="kw-2">&amp;</span>ECDSA_P256_SHA256_FIXED,
+                    <span class="string">&quot;P-384&quot; </span>=&gt; <span class="kw-2">&amp;</span>ECDSA_P384_SHA384_FIXED,
+                    <span class="kw">_ </span>=&gt; {
+                        <span class="macro">panic!</span>(<span class="string">&quot;Unsupported curve: {}&quot;</span>, curve_name);
                     }
                 };
 
-                <span class="kw">let</span> <span class="ident">digest</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::digest_scalar::digest_bytes_scalar</span>(
-                    <span class="kw-2">&amp;</span><span class="ident">alg</span>.<span class="ident">ops</span>.<span class="ident">scalar_ops</span>,
-                    <span class="kw-2">&amp;</span><span class="ident">digest</span>[..],
+                <span class="kw">let </span>digest = <span class="kw">super</span>::<span class="kw">super</span>::digest_scalar::digest_bytes_scalar(
+                    <span class="kw-2">&amp;</span>alg.ops.scalar_ops,
+                    <span class="kw-2">&amp;</span>digest[..],
                 );
-                <span class="kw">let</span> <span class="ident">actual_result</span> <span class="op">=</span> <span class="ident">alg</span>.<span class="ident">verify_digest</span>(
-                    <span class="ident">untrusted::Input::from</span>(<span class="kw-2">&amp;</span><span class="ident">public_key</span>[..]),
-                    <span class="ident">digest</span>,
-                    <span class="ident">untrusted::Input::from</span>(<span class="kw-2">&amp;</span><span class="ident">sig</span>[..]),
+                <span class="kw">let </span>actual_result = alg.verify_digest(
+                    untrusted::Input::from(<span class="kw-2">&amp;</span>public_key[..]),
+                    digest,
+                    untrusted::Input::from(<span class="kw-2">&amp;</span>sig[..]),
                 );
-                <span class="macro">assert_eq!</span>(<span class="ident">actual_result</span>.<span class="ident">is_ok</span>(), <span class="ident">invalid</span>.<span class="ident">is_none</span>());
+                <span class="macro">assert_eq!</span>(actual_result.is_ok(), invalid.is_none());
 
                 <span class="prelude-val">Ok</span>(())
             },
@@ -687,4 +687,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/rust-postgres-dc0fca9be721a90f/064a6a5/postgres-protocol/src/message/backend.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>backend.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../postgres_protocol/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../postgres_protocol/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../postgres_protocol/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/rust-postgres-dc0fca9be721a90f/064a6a5/postgres-protocol/src/message/backend.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>backend.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../postgres_protocol/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../postgres_protocol/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../postgres_protocol/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -883,890 +883,890 @@
 <span id="883">883</span>
 <span id="884">884</span>
 <span id="885">885</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(missing_docs)]
 
-<span class="kw">use</span> <span class="ident">byteorder</span>::{<span class="ident">BigEndian</span>, <span class="ident">ByteOrder</span>, <span class="ident">ReadBytesExt</span>};
-<span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">Bytes</span>, <span class="ident">BytesMut</span>};
-<span class="kw">use</span> <span class="ident">fallible_iterator::FallibleIterator</span>;
-<span class="kw">use</span> <span class="ident">memchr::memchr</span>;
-<span class="kw">use</span> <span class="ident">std::cmp</span>;
-<span class="kw">use</span> <span class="ident">std::io</span>::{<span class="self">self</span>, <span class="ident">Read</span>};
-<span class="kw">use</span> <span class="ident">std::ops::Range</span>;
-<span class="kw">use</span> <span class="ident">std::str</span>;
+</span><span class="kw">use </span>byteorder::{BigEndian, ByteOrder, ReadBytesExt};
+<span class="kw">use </span>bytes::{Bytes, BytesMut};
+<span class="kw">use </span>fallible_iterator::FallibleIterator;
+<span class="kw">use </span>memchr::memchr;
+<span class="kw">use </span>std::cmp;
+<span class="kw">use </span>std::io::{<span class="self">self</span>, Read};
+<span class="kw">use </span>std::ops::Range;
+<span class="kw">use </span>std::str;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Oid</span>;
+<span class="kw">use </span><span class="kw">crate</span>::Oid;
 
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PARSE_COMPLETE_TAG</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="string">b&#39;1&#39;</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">BIND_COMPLETE_TAG</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="string">b&#39;2&#39;</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CLOSE_COMPLETE_TAG</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="string">b&#39;3&#39;</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">NOTIFICATION_RESPONSE_TAG</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="string">b&#39;A&#39;</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">COPY_DONE_TAG</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="string">b&#39;c&#39;</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">COMMAND_COMPLETE_TAG</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="string">b&#39;C&#39;</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">COPY_DATA_TAG</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="string">b&#39;d&#39;</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DATA_ROW_TAG</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="string">b&#39;D&#39;</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ERROR_RESPONSE_TAG</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="string">b&#39;E&#39;</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">COPY_IN_RESPONSE_TAG</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="string">b&#39;G&#39;</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">COPY_OUT_RESPONSE_TAG</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="string">b&#39;H&#39;</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">EMPTY_QUERY_RESPONSE_TAG</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="string">b&#39;I&#39;</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">BACKEND_KEY_DATA_TAG</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="string">b&#39;K&#39;</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">NO_DATA_TAG</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="string">b&#39;n&#39;</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">NOTICE_RESPONSE_TAG</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="string">b&#39;N&#39;</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">AUTHENTICATION_TAG</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="string">b&#39;R&#39;</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PORTAL_SUSPENDED_TAG</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="string">b&#39;s&#39;</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PARAMETER_STATUS_TAG</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="string">b&#39;S&#39;</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">PARAMETER_DESCRIPTION_TAG</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="string">b&#39;t&#39;</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ROW_DESCRIPTION_TAG</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="string">b&#39;T&#39;</span>;
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">READY_FOR_QUERY_TAG</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="string">b&#39;Z&#39;</span>;
+<span class="kw">pub const </span>PARSE_COMPLETE_TAG: u8 = <span class="string">b&#39;1&#39;</span>;
+<span class="kw">pub const </span>BIND_COMPLETE_TAG: u8 = <span class="string">b&#39;2&#39;</span>;
+<span class="kw">pub const </span>CLOSE_COMPLETE_TAG: u8 = <span class="string">b&#39;3&#39;</span>;
+<span class="kw">pub const </span>NOTIFICATION_RESPONSE_TAG: u8 = <span class="string">b&#39;A&#39;</span>;
+<span class="kw">pub const </span>COPY_DONE_TAG: u8 = <span class="string">b&#39;c&#39;</span>;
+<span class="kw">pub const </span>COMMAND_COMPLETE_TAG: u8 = <span class="string">b&#39;C&#39;</span>;
+<span class="kw">pub const </span>COPY_DATA_TAG: u8 = <span class="string">b&#39;d&#39;</span>;
+<span class="kw">pub const </span>DATA_ROW_TAG: u8 = <span class="string">b&#39;D&#39;</span>;
+<span class="kw">pub const </span>ERROR_RESPONSE_TAG: u8 = <span class="string">b&#39;E&#39;</span>;
+<span class="kw">pub const </span>COPY_IN_RESPONSE_TAG: u8 = <span class="string">b&#39;G&#39;</span>;
+<span class="kw">pub const </span>COPY_OUT_RESPONSE_TAG: u8 = <span class="string">b&#39;H&#39;</span>;
+<span class="kw">pub const </span>EMPTY_QUERY_RESPONSE_TAG: u8 = <span class="string">b&#39;I&#39;</span>;
+<span class="kw">pub const </span>BACKEND_KEY_DATA_TAG: u8 = <span class="string">b&#39;K&#39;</span>;
+<span class="kw">pub const </span>NO_DATA_TAG: u8 = <span class="string">b&#39;n&#39;</span>;
+<span class="kw">pub const </span>NOTICE_RESPONSE_TAG: u8 = <span class="string">b&#39;N&#39;</span>;
+<span class="kw">pub const </span>AUTHENTICATION_TAG: u8 = <span class="string">b&#39;R&#39;</span>;
+<span class="kw">pub const </span>PORTAL_SUSPENDED_TAG: u8 = <span class="string">b&#39;s&#39;</span>;
+<span class="kw">pub const </span>PARAMETER_STATUS_TAG: u8 = <span class="string">b&#39;S&#39;</span>;
+<span class="kw">pub const </span>PARAMETER_DESCRIPTION_TAG: u8 = <span class="string">b&#39;t&#39;</span>;
+<span class="kw">pub const </span>ROW_DESCRIPTION_TAG: u8 = <span class="string">b&#39;T&#39;</span>;
+<span class="kw">pub const </span>READY_FOR_QUERY_TAG: u8 = <span class="string">b&#39;Z&#39;</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Header</span> {
-    <span class="ident">tag</span>: <span class="ident">u8</span>,
-    <span class="ident">len</span>: <span class="ident">i32</span>,
+<span class="attribute">#[derive(Debug, Copy, Clone)]
+</span><span class="kw">pub struct </span>Header {
+    tag: u8,
+    len: i32,
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::len_without_is_empty</span>)]</span>
-<span class="kw">impl</span> <span class="ident">Header</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Header</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">5</span> {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
+<span class="attribute">#[allow(clippy::len_without_is_empty)]
+</span><span class="kw">impl </span>Header {
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>parse(buf: <span class="kw-2">&amp;</span>[u8]) -&gt; io::Result&lt;<span class="prelude-ty">Option</span>&lt;Header&gt;&gt; {
+        <span class="kw">if </span>buf.len() &lt; <span class="number">5 </span>{
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
         }
 
-        <span class="kw">let</span> <span class="ident">tag</span> <span class="op">=</span> <span class="ident">buf</span>[<span class="number">0</span>];
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">BigEndian::read_i32</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>[<span class="number">1</span>..]);
+        <span class="kw">let </span>tag = buf[<span class="number">0</span>];
+        <span class="kw">let </span>len = BigEndian::read_i32(<span class="kw-2">&amp;</span>buf[<span class="number">1</span>..]);
 
-        <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span> <span class="number">4</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
-                <span class="ident">io::ErrorKind::InvalidData</span>,
+        <span class="kw">if </span>len &lt; <span class="number">4 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(io::Error::new(
+                io::ErrorKind::InvalidData,
                 <span class="string">&quot;invalid message length: header length &lt; 4&quot;</span>,
             ));
         }
 
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Header</span> { <span class="ident">tag</span>, <span class="ident">len</span> }))
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(Header { tag, len }))
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tag</span>(<span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">tag</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>tag(<span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.tag
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="self">self</span>) -&gt; <span class="ident">i32</span> {
-        <span class="self">self</span>.<span class="ident">len</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>len(<span class="self">self</span>) -&gt; i32 {
+        <span class="self">self</span>.len
     }
 }
 
-<span class="doccomment">/// An enum representing Postgres backend messages.</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Message</span> {
-    <span class="ident">AuthenticationCleartextPassword</span>,
-    <span class="ident">AuthenticationGss</span>,
-    <span class="ident">AuthenticationKerberosV5</span>,
-    <span class="ident">AuthenticationMd5Password</span>(<span class="ident">AuthenticationMd5PasswordBody</span>),
-    <span class="ident">AuthenticationOk</span>,
-    <span class="ident">AuthenticationScmCredential</span>,
-    <span class="ident">AuthenticationSspi</span>,
-    <span class="ident">AuthenticationGssContinue</span>(<span class="ident">AuthenticationGssContinueBody</span>),
-    <span class="ident">AuthenticationSasl</span>(<span class="ident">AuthenticationSaslBody</span>),
-    <span class="ident">AuthenticationSaslContinue</span>(<span class="ident">AuthenticationSaslContinueBody</span>),
-    <span class="ident">AuthenticationSaslFinal</span>(<span class="ident">AuthenticationSaslFinalBody</span>),
-    <span class="ident">BackendKeyData</span>(<span class="ident">BackendKeyDataBody</span>),
-    <span class="ident">BindComplete</span>,
-    <span class="ident">CloseComplete</span>,
-    <span class="ident">CommandComplete</span>(<span class="ident">CommandCompleteBody</span>),
-    <span class="ident">CopyData</span>(<span class="ident">CopyDataBody</span>),
-    <span class="ident">CopyDone</span>,
-    <span class="ident">CopyInResponse</span>(<span class="ident">CopyInResponseBody</span>),
-    <span class="ident">CopyOutResponse</span>(<span class="ident">CopyOutResponseBody</span>),
-    <span class="ident">DataRow</span>(<span class="ident">DataRowBody</span>),
-    <span class="ident">EmptyQueryResponse</span>,
-    <span class="ident">ErrorResponse</span>(<span class="ident">ErrorResponseBody</span>),
-    <span class="ident">NoData</span>,
-    <span class="ident">NoticeResponse</span>(<span class="ident">NoticeResponseBody</span>),
-    <span class="ident">NotificationResponse</span>(<span class="ident">NotificationResponseBody</span>),
-    <span class="ident">ParameterDescription</span>(<span class="ident">ParameterDescriptionBody</span>),
-    <span class="ident">ParameterStatus</span>(<span class="ident">ParameterStatusBody</span>),
-    <span class="ident">ParseComplete</span>,
-    <span class="ident">PortalSuspended</span>,
-    <span class="ident">ReadyForQuery</span>(<span class="ident">ReadyForQueryBody</span>),
-    <span class="ident">RowDescription</span>(<span class="ident">RowDescriptionBody</span>),
+<span class="doccomment">/// An enum representing Postgres backend messages.
+</span><span class="attribute">#[non_exhaustive]
+</span><span class="kw">pub enum </span>Message {
+    AuthenticationCleartextPassword,
+    AuthenticationGss,
+    AuthenticationKerberosV5,
+    AuthenticationMd5Password(AuthenticationMd5PasswordBody),
+    AuthenticationOk,
+    AuthenticationScmCredential,
+    AuthenticationSspi,
+    AuthenticationGssContinue(AuthenticationGssContinueBody),
+    AuthenticationSasl(AuthenticationSaslBody),
+    AuthenticationSaslContinue(AuthenticationSaslContinueBody),
+    AuthenticationSaslFinal(AuthenticationSaslFinalBody),
+    BackendKeyData(BackendKeyDataBody),
+    BindComplete,
+    CloseComplete,
+    CommandComplete(CommandCompleteBody),
+    CopyData(CopyDataBody),
+    CopyDone,
+    CopyInResponse(CopyInResponseBody),
+    CopyOutResponse(CopyOutResponseBody),
+    DataRow(DataRowBody),
+    EmptyQueryResponse,
+    ErrorResponse(ErrorResponseBody),
+    NoData,
+    NoticeResponse(NoticeResponseBody),
+    NotificationResponse(NotificationResponseBody),
+    ParameterDescription(ParameterDescriptionBody),
+    ParameterStatus(ParameterStatusBody),
+    ParseComplete,
+    PortalSuspended,
+    ReadyForQuery(ReadyForQueryBody),
+    RowDescription(RowDescriptionBody),
 }
 
-<span class="kw">impl</span> <span class="ident">Message</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BytesMut</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">5</span> {
-            <span class="kw">let</span> <span class="ident">to_read</span> <span class="op">=</span> <span class="number">5</span> <span class="op">-</span> <span class="ident">buf</span>.<span class="ident">len</span>();
-            <span class="ident">buf</span>.<span class="ident">reserve</span>(<span class="ident">to_read</span>);
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
+<span class="kw">impl </span>Message {
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>parse(buf: <span class="kw-2">&amp;mut </span>BytesMut) -&gt; io::Result&lt;<span class="prelude-ty">Option</span>&lt;Message&gt;&gt; {
+        <span class="kw">if </span>buf.len() &lt; <span class="number">5 </span>{
+            <span class="kw">let </span>to_read = <span class="number">5 </span>- buf.len();
+            buf.reserve(to_read);
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
         }
 
-        <span class="kw">let</span> <span class="ident">tag</span> <span class="op">=</span> <span class="ident">buf</span>[<span class="number">0</span>];
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="ident">buf</span>[<span class="number">1</span>..<span class="number">5</span>]).<span class="ident">read_u32</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let </span>tag = buf[<span class="number">0</span>];
+        <span class="kw">let </span>len = (<span class="kw-2">&amp;</span>buf[<span class="number">1</span>..<span class="number">5</span>]).read_u32::&lt;BigEndian&gt;().unwrap();
 
-        <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span> <span class="number">4</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
-                <span class="ident">io::ErrorKind::InvalidInput</span>,
+        <span class="kw">if </span>len &lt; <span class="number">4 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(io::Error::new(
+                io::ErrorKind::InvalidInput,
                 <span class="string">&quot;invalid message length: parsing u32&quot;</span>,
             ));
         }
 
-        <span class="kw">let</span> <span class="ident">total_len</span> <span class="op">=</span> <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="number">1</span>;
-        <span class="kw">if</span> <span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="ident">total_len</span> {
-            <span class="kw">let</span> <span class="ident">to_read</span> <span class="op">=</span> <span class="ident">total_len</span> <span class="op">-</span> <span class="ident">buf</span>.<span class="ident">len</span>();
-            <span class="ident">buf</span>.<span class="ident">reserve</span>(<span class="ident">to_read</span>);
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
+        <span class="kw">let </span>total_len = len <span class="kw">as </span>usize + <span class="number">1</span>;
+        <span class="kw">if </span>buf.len() &lt; total_len {
+            <span class="kw">let </span>to_read = total_len - buf.len();
+            buf.reserve(to_read);
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Buffer</span> {
-            <span class="ident">bytes</span>: <span class="ident">buf</span>.<span class="ident">split_to</span>(<span class="ident">total_len</span>).<span class="ident">freeze</span>(),
-            <span class="ident">idx</span>: <span class="number">5</span>,
+        <span class="kw">let </span><span class="kw-2">mut </span>buf = Buffer {
+            bytes: buf.split_to(total_len).freeze(),
+            idx: <span class="number">5</span>,
         };
 
-        <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">tag</span> {
-            <span class="ident">PARSE_COMPLETE_TAG</span> =&gt; <span class="ident">Message::ParseComplete</span>,
-            <span class="ident">BIND_COMPLETE_TAG</span> =&gt; <span class="ident">Message::BindComplete</span>,
-            <span class="ident">CLOSE_COMPLETE_TAG</span> =&gt; <span class="ident">Message::CloseComplete</span>,
-            <span class="ident">NOTIFICATION_RESPONSE_TAG</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">process_id</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_i32</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_cstr</span>()<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_cstr</span>()<span class="question-mark">?</span>;
-                <span class="ident">Message::NotificationResponse</span>(<span class="ident">NotificationResponseBody</span> {
-                    <span class="ident">process_id</span>,
-                    <span class="ident">channel</span>,
-                    <span class="ident">message</span>,
+        <span class="kw">let </span>message = <span class="kw">match </span>tag {
+            PARSE_COMPLETE_TAG =&gt; Message::ParseComplete,
+            BIND_COMPLETE_TAG =&gt; Message::BindComplete,
+            CLOSE_COMPLETE_TAG =&gt; Message::CloseComplete,
+            NOTIFICATION_RESPONSE_TAG =&gt; {
+                <span class="kw">let </span>process_id = buf.read_i32::&lt;BigEndian&gt;()<span class="question-mark">?</span>;
+                <span class="kw">let </span>channel = buf.read_cstr()<span class="question-mark">?</span>;
+                <span class="kw">let </span>message = buf.read_cstr()<span class="question-mark">?</span>;
+                Message::NotificationResponse(NotificationResponseBody {
+                    process_id,
+                    channel,
+                    message,
                 })
             }
-            <span class="ident">COPY_DONE_TAG</span> =&gt; <span class="ident">Message::CopyDone</span>,
-            <span class="ident">COMMAND_COMPLETE_TAG</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">tag</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_cstr</span>()<span class="question-mark">?</span>;
-                <span class="ident">Message::CommandComplete</span>(<span class="ident">CommandCompleteBody</span> { <span class="ident">tag</span> })
+            COPY_DONE_TAG =&gt; Message::CopyDone,
+            COMMAND_COMPLETE_TAG =&gt; {
+                <span class="kw">let </span>tag = buf.read_cstr()<span class="question-mark">?</span>;
+                Message::CommandComplete(CommandCompleteBody { tag })
             }
-            <span class="ident">COPY_DATA_TAG</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">storage</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_all</span>();
-                <span class="ident">Message::CopyData</span>(<span class="ident">CopyDataBody</span> { <span class="ident">storage</span> })
+            COPY_DATA_TAG =&gt; {
+                <span class="kw">let </span>storage = buf.read_all();
+                Message::CopyData(CopyDataBody { storage })
             }
-            <span class="ident">DATA_ROW_TAG</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">storage</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_all</span>();
-                <span class="ident">Message::DataRow</span>(<span class="ident">DataRowBody</span> { <span class="ident">storage</span>, <span class="ident">len</span> })
+            DATA_ROW_TAG =&gt; {
+                <span class="kw">let </span>len = buf.read_u16::&lt;BigEndian&gt;()<span class="question-mark">?</span>;
+                <span class="kw">let </span>storage = buf.read_all();
+                Message::DataRow(DataRowBody { storage, len })
             }
-            <span class="ident">ERROR_RESPONSE_TAG</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">storage</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_all</span>();
-                <span class="ident">Message::ErrorResponse</span>(<span class="ident">ErrorResponseBody</span> { <span class="ident">storage</span> })
+            ERROR_RESPONSE_TAG =&gt; {
+                <span class="kw">let </span>storage = buf.read_all();
+                Message::ErrorResponse(ErrorResponseBody { storage })
             }
-            <span class="ident">COPY_IN_RESPONSE_TAG</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">storage</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_all</span>();
-                <span class="ident">Message::CopyInResponse</span>(<span class="ident">CopyInResponseBody</span> {
-                    <span class="ident">format</span>,
-                    <span class="ident">len</span>,
-                    <span class="ident">storage</span>,
+            COPY_IN_RESPONSE_TAG =&gt; {
+                <span class="kw">let </span>format = buf.read_u8()<span class="question-mark">?</span>;
+                <span class="kw">let </span>len = buf.read_u16::&lt;BigEndian&gt;()<span class="question-mark">?</span>;
+                <span class="kw">let </span>storage = buf.read_all();
+                Message::CopyInResponse(CopyInResponseBody {
+                    format,
+                    len,
+                    storage,
                 })
             }
-            <span class="ident">COPY_OUT_RESPONSE_TAG</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">storage</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_all</span>();
-                <span class="ident">Message::CopyOutResponse</span>(<span class="ident">CopyOutResponseBody</span> {
-                    <span class="ident">format</span>,
-                    <span class="ident">len</span>,
-                    <span class="ident">storage</span>,
+            COPY_OUT_RESPONSE_TAG =&gt; {
+                <span class="kw">let </span>format = buf.read_u8()<span class="question-mark">?</span>;
+                <span class="kw">let </span>len = buf.read_u16::&lt;BigEndian&gt;()<span class="question-mark">?</span>;
+                <span class="kw">let </span>storage = buf.read_all();
+                Message::CopyOutResponse(CopyOutResponseBody {
+                    format,
+                    len,
+                    storage,
                 })
             }
-            <span class="ident">EMPTY_QUERY_RESPONSE_TAG</span> =&gt; <span class="ident">Message::EmptyQueryResponse</span>,
-            <span class="ident">BACKEND_KEY_DATA_TAG</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">process_id</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_i32</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">secret_key</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_i32</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-                <span class="ident">Message::BackendKeyData</span>(<span class="ident">BackendKeyDataBody</span> {
-                    <span class="ident">process_id</span>,
-                    <span class="ident">secret_key</span>,
+            EMPTY_QUERY_RESPONSE_TAG =&gt; Message::EmptyQueryResponse,
+            BACKEND_KEY_DATA_TAG =&gt; {
+                <span class="kw">let </span>process_id = buf.read_i32::&lt;BigEndian&gt;()<span class="question-mark">?</span>;
+                <span class="kw">let </span>secret_key = buf.read_i32::&lt;BigEndian&gt;()<span class="question-mark">?</span>;
+                Message::BackendKeyData(BackendKeyDataBody {
+                    process_id,
+                    secret_key,
                 })
             }
-            <span class="ident">NO_DATA_TAG</span> =&gt; <span class="ident">Message::NoData</span>,
-            <span class="ident">NOTICE_RESPONSE_TAG</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">storage</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_all</span>();
-                <span class="ident">Message::NoticeResponse</span>(<span class="ident">NoticeResponseBody</span> { <span class="ident">storage</span> })
+            NO_DATA_TAG =&gt; Message::NoData,
+            NOTICE_RESPONSE_TAG =&gt; {
+                <span class="kw">let </span>storage = buf.read_all();
+                Message::NoticeResponse(NoticeResponseBody { storage })
             }
-            <span class="ident">AUTHENTICATION_TAG</span> =&gt; <span class="kw">match</span> <span class="ident">buf</span>.<span class="ident">read_i32</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span> {
-                <span class="number">0</span> =&gt; <span class="ident">Message::AuthenticationOk</span>,
-                <span class="number">2</span> =&gt; <span class="ident">Message::AuthenticationKerberosV5</span>,
-                <span class="number">3</span> =&gt; <span class="ident">Message::AuthenticationCleartextPassword</span>,
-                <span class="number">5</span> =&gt; {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">salt</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">4</span>];
-                    <span class="ident">buf</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">salt</span>)<span class="question-mark">?</span>;
-                    <span class="ident">Message::AuthenticationMd5Password</span>(<span class="ident">AuthenticationMd5PasswordBody</span> { <span class="ident">salt</span> })
+            AUTHENTICATION_TAG =&gt; <span class="kw">match </span>buf.read_i32::&lt;BigEndian&gt;()<span class="question-mark">? </span>{
+                <span class="number">0 </span>=&gt; Message::AuthenticationOk,
+                <span class="number">2 </span>=&gt; Message::AuthenticationKerberosV5,
+                <span class="number">3 </span>=&gt; Message::AuthenticationCleartextPassword,
+                <span class="number">5 </span>=&gt; {
+                    <span class="kw">let </span><span class="kw-2">mut </span>salt = [<span class="number">0</span>; <span class="number">4</span>];
+                    buf.read_exact(<span class="kw-2">&amp;mut </span>salt)<span class="question-mark">?</span>;
+                    Message::AuthenticationMd5Password(AuthenticationMd5PasswordBody { salt })
                 }
-                <span class="number">6</span> =&gt; <span class="ident">Message::AuthenticationScmCredential</span>,
-                <span class="number">7</span> =&gt; <span class="ident">Message::AuthenticationGss</span>,
-                <span class="number">8</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">storage</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_all</span>();
-                    <span class="ident">Message::AuthenticationGssContinue</span>(<span class="ident">AuthenticationGssContinueBody</span>(<span class="ident">storage</span>))
+                <span class="number">6 </span>=&gt; Message::AuthenticationScmCredential,
+                <span class="number">7 </span>=&gt; Message::AuthenticationGss,
+                <span class="number">8 </span>=&gt; {
+                    <span class="kw">let </span>storage = buf.read_all();
+                    Message::AuthenticationGssContinue(AuthenticationGssContinueBody(storage))
                 }
-                <span class="number">9</span> =&gt; <span class="ident">Message::AuthenticationSspi</span>,
-                <span class="number">10</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">storage</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_all</span>();
-                    <span class="ident">Message::AuthenticationSasl</span>(<span class="ident">AuthenticationSaslBody</span>(<span class="ident">storage</span>))
+                <span class="number">9 </span>=&gt; Message::AuthenticationSspi,
+                <span class="number">10 </span>=&gt; {
+                    <span class="kw">let </span>storage = buf.read_all();
+                    Message::AuthenticationSasl(AuthenticationSaslBody(storage))
                 }
-                <span class="number">11</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">storage</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_all</span>();
-                    <span class="ident">Message::AuthenticationSaslContinue</span>(<span class="ident">AuthenticationSaslContinueBody</span>(<span class="ident">storage</span>))
+                <span class="number">11 </span>=&gt; {
+                    <span class="kw">let </span>storage = buf.read_all();
+                    Message::AuthenticationSaslContinue(AuthenticationSaslContinueBody(storage))
                 }
-                <span class="number">12</span> =&gt; {
-                    <span class="kw">let</span> <span class="ident">storage</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_all</span>();
-                    <span class="ident">Message::AuthenticationSaslFinal</span>(<span class="ident">AuthenticationSaslFinalBody</span>(<span class="ident">storage</span>))
+                <span class="number">12 </span>=&gt; {
+                    <span class="kw">let </span>storage = buf.read_all();
+                    Message::AuthenticationSaslFinal(AuthenticationSaslFinalBody(storage))
                 }
-                <span class="ident">tag</span> =&gt; {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
-                        <span class="ident">io::ErrorKind::InvalidInput</span>,
-                        <span class="macro">format!</span>(<span class="string">&quot;unknown authentication tag `{}`&quot;</span>, <span class="ident">tag</span>),
+                tag =&gt; {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(io::Error::new(
+                        io::ErrorKind::InvalidInput,
+                        <span class="macro">format!</span>(<span class="string">&quot;unknown authentication tag `{}`&quot;</span>, tag),
                     ));
                 }
             },
-            <span class="ident">PORTAL_SUSPENDED_TAG</span> =&gt; <span class="ident">Message::PortalSuspended</span>,
-            <span class="ident">PARAMETER_STATUS_TAG</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_cstr</span>()<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_cstr</span>()<span class="question-mark">?</span>;
-                <span class="ident">Message::ParameterStatus</span>(<span class="ident">ParameterStatusBody</span> { <span class="ident">name</span>, <span class="ident">value</span> })
+            PORTAL_SUSPENDED_TAG =&gt; Message::PortalSuspended,
+            PARAMETER_STATUS_TAG =&gt; {
+                <span class="kw">let </span>name = buf.read_cstr()<span class="question-mark">?</span>;
+                <span class="kw">let </span>value = buf.read_cstr()<span class="question-mark">?</span>;
+                Message::ParameterStatus(ParameterStatusBody { name, value })
             }
-            <span class="ident">PARAMETER_DESCRIPTION_TAG</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">storage</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_all</span>();
-                <span class="ident">Message::ParameterDescription</span>(<span class="ident">ParameterDescriptionBody</span> { <span class="ident">storage</span>, <span class="ident">len</span> })
+            PARAMETER_DESCRIPTION_TAG =&gt; {
+                <span class="kw">let </span>len = buf.read_u16::&lt;BigEndian&gt;()<span class="question-mark">?</span>;
+                <span class="kw">let </span>storage = buf.read_all();
+                Message::ParameterDescription(ParameterDescriptionBody { storage, len })
             }
-            <span class="ident">ROW_DESCRIPTION_TAG</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">storage</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_all</span>();
-                <span class="ident">Message::RowDescription</span>(<span class="ident">RowDescriptionBody</span> { <span class="ident">storage</span>, <span class="ident">len</span> })
+            ROW_DESCRIPTION_TAG =&gt; {
+                <span class="kw">let </span>len = buf.read_u16::&lt;BigEndian&gt;()<span class="question-mark">?</span>;
+                <span class="kw">let </span>storage = buf.read_all();
+                Message::RowDescription(RowDescriptionBody { storage, len })
             }
-            <span class="ident">READY_FOR_QUERY_TAG</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
-                <span class="ident">Message::ReadyForQuery</span>(<span class="ident">ReadyForQueryBody</span> { <span class="ident">status</span> })
+            READY_FOR_QUERY_TAG =&gt; {
+                <span class="kw">let </span>status = buf.read_u8()<span class="question-mark">?</span>;
+                Message::ReadyForQuery(ReadyForQueryBody { status })
             }
-            <span class="ident">tag</span> =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
-                    <span class="ident">io::ErrorKind::InvalidInput</span>,
-                    <span class="macro">format!</span>(<span class="string">&quot;unknown message tag `{}`&quot;</span>, <span class="ident">tag</span>),
+            tag =&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(io::Error::new(
+                    io::ErrorKind::InvalidInput,
+                    <span class="macro">format!</span>(<span class="string">&quot;unknown message tag `{}`&quot;</span>, tag),
                 ));
             }
         };
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">buf</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
-                <span class="ident">io::ErrorKind::InvalidInput</span>,
+        <span class="kw">if </span>!buf.is_empty() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(io::Error::new(
+                io::ErrorKind::InvalidInput,
                 <span class="string">&quot;invalid message length: expected buffer to be empty&quot;</span>,
             ));
         }
 
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">message</span>))
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(message))
     }
 }
 
-<span class="kw">struct</span> <span class="ident">Buffer</span> {
-    <span class="ident">bytes</span>: <span class="ident">Bytes</span>,
-    <span class="ident">idx</span>: <span class="ident">usize</span>,
+<span class="kw">struct </span>Buffer {
+    bytes: Bytes,
+    idx: usize,
 }
 
-<span class="kw">impl</span> <span class="ident">Buffer</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">bytes</span>[<span class="self">self</span>.<span class="ident">idx</span>..]
+<span class="kw">impl </span>Buffer {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>slice(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.bytes[<span class="self">self</span>.idx..]
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">slice</span>().<span class="ident">is_empty</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.slice().is_empty()
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">read_cstr</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Bytes</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">memchr</span>(<span class="number">0</span>, <span class="self">self</span>.<span class="ident">slice</span>()) {
-            <span class="prelude-val">Some</span>(<span class="ident">pos</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">idx</span>;
-                <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">start</span> <span class="op">+</span> <span class="ident">pos</span>;
-                <span class="kw">let</span> <span class="ident">cstr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">slice</span>(<span class="ident">start</span>..<span class="ident">end</span>);
-                <span class="self">self</span>.<span class="ident">idx</span> <span class="op">=</span> <span class="ident">end</span> <span class="op">+</span> <span class="number">1</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">cstr</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>read_cstr(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;Bytes&gt; {
+        <span class="kw">match </span>memchr(<span class="number">0</span>, <span class="self">self</span>.slice()) {
+            <span class="prelude-val">Some</span>(pos) =&gt; {
+                <span class="kw">let </span>start = <span class="self">self</span>.idx;
+                <span class="kw">let </span>end = start + pos;
+                <span class="kw">let </span>cstr = <span class="self">self</span>.bytes.slice(start..end);
+                <span class="self">self</span>.idx = end + <span class="number">1</span>;
+                <span class="prelude-val">Ok</span>(cstr)
             }
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
-                <span class="ident">io::ErrorKind::UnexpectedEof</span>,
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(io::Error::new(
+                io::ErrorKind::UnexpectedEof,
                 <span class="string">&quot;unexpected EOF&quot;</span>,
             )),
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">read_all</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Bytes</span> {
-        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">slice</span>(<span class="self">self</span>.<span class="ident">idx</span>..);
-        <span class="self">self</span>.<span class="ident">idx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">bytes</span>.<span class="ident">len</span>();
-        <span class="ident">buf</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>read_all(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Bytes {
+        <span class="kw">let </span>buf = <span class="self">self</span>.bytes.slice(<span class="self">self</span>.idx..);
+        <span class="self">self</span>.idx = <span class="self">self</span>.bytes.len();
+        buf
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Read</span> <span class="kw">for</span> <span class="ident">Buffer</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> {
-            <span class="kw">let</span> <span class="ident">slice</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">slice</span>();
-            <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">cmp::min</span>(<span class="ident">slice</span>.<span class="ident">len</span>(), <span class="ident">buf</span>.<span class="ident">len</span>());
-            <span class="ident">buf</span>[..<span class="ident">len</span>].<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">slice</span>[..<span class="ident">len</span>]);
-            <span class="ident">len</span>
+<span class="kw">impl </span>Read <span class="kw">for </span>Buffer {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>read(<span class="kw-2">&amp;mut </span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>[u8]) -&gt; io::Result&lt;usize&gt; {
+        <span class="kw">let </span>len = {
+            <span class="kw">let </span>slice = <span class="self">self</span>.slice();
+            <span class="kw">let </span>len = cmp::min(slice.len(), buf.len());
+            buf[..len].copy_from_slice(<span class="kw-2">&amp;</span>slice[..len]);
+            len
         };
-        <span class="self">self</span>.<span class="ident">idx</span> <span class="op">+</span><span class="op">=</span> <span class="ident">len</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">len</span>)
+        <span class="self">self</span>.idx += len;
+        <span class="prelude-val">Ok</span>(len)
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AuthenticationMd5PasswordBody</span> {
-    <span class="ident">salt</span>: [<span class="ident">u8</span>; <span class="number">4</span>],
+<span class="kw">pub struct </span>AuthenticationMd5PasswordBody {
+    salt: [u8; <span class="number">4</span>],
 }
 
-<span class="kw">impl</span> <span class="ident">AuthenticationMd5PasswordBody</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">salt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [<span class="ident">u8</span>; <span class="number">4</span>] {
-        <span class="self">self</span>.<span class="ident">salt</span>
+<span class="kw">impl </span>AuthenticationMd5PasswordBody {
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>salt(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [u8; <span class="number">4</span>] {
+        <span class="self">self</span>.salt
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AuthenticationGssContinueBody</span>(<span class="ident">Bytes</span>);
+<span class="kw">pub struct </span>AuthenticationGssContinueBody(Bytes);
 
-<span class="kw">impl</span> <span class="ident">AuthenticationGssContinueBody</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
+<span class="kw">impl </span>AuthenticationGssContinueBody {
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>data(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
+    </span>}
+}
+
+<span class="kw">pub struct </span>AuthenticationSaslBody(Bytes);
+
+<span class="kw">impl </span>AuthenticationSaslBody {
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>mechanisms(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SaslMechanisms&lt;<span class="lifetime">&#39;_</span>&gt; {
+        SaslMechanisms(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>)
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AuthenticationSaslBody</span>(<span class="ident">Bytes</span>);
+<span class="kw">pub struct </span>SaslMechanisms&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]);
 
-<span class="kw">impl</span> <span class="ident">AuthenticationSaslBody</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mechanisms</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SaslMechanisms</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">SaslMechanisms</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>)
-    }
-}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; FallibleIterator <span class="kw">for </span>SaslMechanisms&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str;
+    <span class="kw">type </span>Error = io::Error;
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SaslMechanisms</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]);
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FallibleIterator</span> <span class="kw">for</span> <span class="ident">SaslMechanisms</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">io::Error</span>;
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">value_end</span> <span class="op">=</span> <span class="ident">find_null</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="number">0</span>)<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">value_end</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">1</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
-                    <span class="ident">io::ErrorKind::InvalidData</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;&gt; {
+        <span class="kw">let </span>value_end = find_null(<span class="self">self</span>.<span class="number">0</span>, <span class="number">0</span>)<span class="question-mark">?</span>;
+        <span class="kw">if </span>value_end == <span class="number">0 </span>{
+            <span class="kw">if </span><span class="self">self</span>.<span class="number">0</span>.len() != <span class="number">1 </span>{
+                <span class="kw">return </span><span class="prelude-val">Err</span>(io::Error::new(
+                    io::ErrorKind::InvalidData,
                     <span class="string">&quot;invalid message length: expected to be at end of iterator for sasl&quot;</span>,
                 ));
             }
             <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">get_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>[..<span class="ident">value_end</span>])<span class="question-mark">?</span>;
-            <span class="self">self</span>.<span class="number">0</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>[<span class="ident">value_end</span> <span class="op">+</span> <span class="number">1</span>..];
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">value</span>))
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>value = get_str(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>[..value_end])<span class="question-mark">?</span>;
+            <span class="self">self</span>.<span class="number">0 </span>= <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>[value_end + <span class="number">1</span>..];
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(value))
         }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AuthenticationSaslContinueBody</span>(<span class="ident">Bytes</span>);
+<span class="kw">pub struct </span>AuthenticationSaslContinueBody(Bytes);
 
-<span class="kw">impl</span> <span class="ident">AuthenticationSaslContinueBody</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
+<span class="kw">impl </span>AuthenticationSaslContinueBody {
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>data(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
+    </span>}
+}
+
+<span class="kw">pub struct </span>AuthenticationSaslFinalBody(Bytes);
+
+<span class="kw">impl </span>AuthenticationSaslFinalBody {
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>data(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
+    </span>}
+}
+
+<span class="kw">pub struct </span>BackendKeyDataBody {
+    process_id: i32,
+    secret_key: i32,
+}
+
+<span class="kw">impl </span>BackendKeyDataBody {
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>process_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32 {
+        <span class="self">self</span>.process_id
+    }
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>secret_key(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32 {
+        <span class="self">self</span>.secret_key
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AuthenticationSaslFinalBody</span>(<span class="ident">Bytes</span>);
+<span class="kw">pub struct </span>CommandCompleteBody {
+    tag: Bytes,
+}
 
-<span class="kw">impl</span> <span class="ident">AuthenticationSaslFinalBody</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
+<span class="kw">impl </span>CommandCompleteBody {
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>tag(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; io::Result&lt;<span class="kw-2">&amp;</span>str&gt; {
+        get_str(<span class="kw-2">&amp;</span><span class="self">self</span>.tag)
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BackendKeyDataBody</span> {
-    <span class="ident">process_id</span>: <span class="ident">i32</span>,
-    <span class="ident">secret_key</span>: <span class="ident">i32</span>,
+<span class="kw">pub struct </span>CopyDataBody {
+    storage: Bytes,
 }
 
-<span class="kw">impl</span> <span class="ident">BackendKeyDataBody</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">process_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i32</span> {
-        <span class="self">self</span>.<span class="ident">process_id</span>
+<span class="kw">impl </span>CopyDataBody {
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>data(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.storage
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secret_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i32</span> {
-        <span class="self">self</span>.<span class="ident">secret_key</span>
-    }
-}
-
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CommandCompleteBody</span> {
-    <span class="ident">tag</span>: <span class="ident">Bytes</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">CommandCompleteBody</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tag</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="ident">get_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">tag</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>into_bytes(<span class="self">self</span>) -&gt; Bytes {
+        <span class="self">self</span>.storage
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CopyDataBody</span> {
-    <span class="ident">storage</span>: <span class="ident">Bytes</span>,
+<span class="kw">pub struct </span>CopyInResponseBody {
+    format: u8,
+    len: u16,
+    storage: Bytes,
 }
 
-<span class="kw">impl</span> <span class="ident">CopyDataBody</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">storage</span>
+<span class="kw">impl </span>CopyInResponseBody {
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>format(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.format
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_bytes</span>(<span class="self">self</span>) -&gt; <span class="ident">Bytes</span> {
-        <span class="self">self</span>.<span class="ident">storage</span>
-    }
-}
-
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CopyInResponseBody</span> {
-    <span class="ident">format</span>: <span class="ident">u8</span>,
-    <span class="ident">len</span>: <span class="ident">u16</span>,
-    <span class="ident">storage</span>: <span class="ident">Bytes</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">CopyInResponseBody</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">format</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">format</span>
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_formats</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ColumnFormats</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">ColumnFormats</span> {
-            <span class="ident">remaining</span>: <span class="self">self</span>.<span class="ident">len</span>,
-            <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">storage</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>column_formats(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ColumnFormats&lt;<span class="lifetime">&#39;_</span>&gt; {
+        ColumnFormats {
+            remaining: <span class="self">self</span>.len,
+            buf: <span class="kw-2">&amp;</span><span class="self">self</span>.storage,
         }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ColumnFormats</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],
-    <span class="ident">remaining</span>: <span class="ident">u16</span>,
+<span class="kw">pub struct </span>ColumnFormats&lt;<span class="lifetime">&#39;a</span>&gt; {
+    buf: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8],
+    remaining: u16,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FallibleIterator</span> <span class="kw">for</span> <span class="ident">ColumnFormats</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">u16</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">io::Error</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; FallibleIterator <span class="kw">for </span>ColumnFormats&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Item = u16;
+    <span class="kw">type </span>Error = io::Error;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">remaining</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">is_empty</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
-            } <span class="kw">else</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
-                    <span class="ident">io::ErrorKind::InvalidInput</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;<span class="prelude-ty">Option</span>&lt;u16&gt;&gt; {
+        <span class="kw">if </span><span class="self">self</span>.remaining == <span class="number">0 </span>{
+            <span class="kw">if </span><span class="self">self</span>.buf.is_empty() {
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
+            } <span class="kw">else </span>{
+                <span class="kw">return </span><span class="prelude-val">Err</span>(io::Error::new(
+                    io::ErrorKind::InvalidInput,
                     <span class="string">&quot;invalid message length: wrong column formats&quot;</span>,
                 ));
             }
         }
 
-        <span class="self">self</span>.<span class="ident">remaining</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">read_u16</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>().<span class="ident">map</span>(<span class="prelude-val">Some</span>)
+        <span class="self">self</span>.remaining -= <span class="number">1</span>;
+        <span class="self">self</span>.buf.read_u16::&lt;BigEndian&gt;().map(<span class="prelude-val">Some</span>)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">remaining</span> <span class="kw">as</span> <span class="ident">usize</span>;
-        (<span class="ident">len</span>, <span class="prelude-val">Some</span>(<span class="ident">len</span>))
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
+        <span class="kw">let </span>len = <span class="self">self</span>.remaining <span class="kw">as </span>usize;
+        (len, <span class="prelude-val">Some</span>(len))
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CopyOutResponseBody</span> {
-    <span class="ident">format</span>: <span class="ident">u8</span>,
-    <span class="ident">len</span>: <span class="ident">u16</span>,
-    <span class="ident">storage</span>: <span class="ident">Bytes</span>,
+<span class="kw">pub struct </span>CopyOutResponseBody {
+    format: u8,
+    len: u16,
+    storage: Bytes,
 }
 
-<span class="kw">impl</span> <span class="ident">CopyOutResponseBody</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">format</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">format</span>
+<span class="kw">impl </span>CopyOutResponseBody {
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>format(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.format
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_formats</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ColumnFormats</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">ColumnFormats</span> {
-            <span class="ident">remaining</span>: <span class="self">self</span>.<span class="ident">len</span>,
-            <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">storage</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>column_formats(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ColumnFormats&lt;<span class="lifetime">&#39;_</span>&gt; {
+        ColumnFormats {
+            remaining: <span class="self">self</span>.len,
+            buf: <span class="kw-2">&amp;</span><span class="self">self</span>.storage,
         }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DataRowBody</span> {
-    <span class="ident">storage</span>: <span class="ident">Bytes</span>,
-    <span class="ident">len</span>: <span class="ident">u16</span>,
+<span class="kw">pub struct </span>DataRowBody {
+    storage: Bytes,
+    len: u16,
 }
 
-<span class="kw">impl</span> <span class="ident">DataRowBody</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ranges</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">DataRowRanges</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">DataRowRanges</span> {
-            <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">storage</span>,
-            <span class="ident">len</span>: <span class="self">self</span>.<span class="ident">storage</span>.<span class="ident">len</span>(),
-            <span class="ident">remaining</span>: <span class="self">self</span>.<span class="ident">len</span>,
+<span class="kw">impl </span>DataRowBody {
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>ranges(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; DataRowRanges&lt;<span class="lifetime">&#39;_</span>&gt; {
+        DataRowRanges {
+            buf: <span class="kw-2">&amp;</span><span class="self">self</span>.storage,
+            len: <span class="self">self</span>.storage.len(),
+            remaining: <span class="self">self</span>.len,
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">buffer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">storage</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>buffer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.storage
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DataRowRanges</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],
-    <span class="ident">len</span>: <span class="ident">usize</span>,
-    <span class="ident">remaining</span>: <span class="ident">u16</span>,
+<span class="kw">pub struct </span>DataRowRanges&lt;<span class="lifetime">&#39;a</span>&gt; {
+    buf: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8],
+    len: usize,
+    remaining: u16,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FallibleIterator</span> <span class="kw">for</span> <span class="ident">DataRowRanges</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">io::Error</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; FallibleIterator <span class="kw">for </span>DataRowRanges&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Item = <span class="prelude-ty">Option</span>&lt;Range&lt;usize&gt;&gt;;
+    <span class="kw">type </span>Error = io::Error;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">remaining</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">is_empty</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
-            } <span class="kw">else</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
-                    <span class="ident">io::ErrorKind::InvalidInput</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;<span class="prelude-ty">Option</span>&lt;<span class="prelude-ty">Option</span>&lt;Range&lt;usize&gt;&gt;&gt;&gt; {
+        <span class="kw">if </span><span class="self">self</span>.remaining == <span class="number">0 </span>{
+            <span class="kw">if </span><span class="self">self</span>.buf.is_empty() {
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
+            } <span class="kw">else </span>{
+                <span class="kw">return </span><span class="prelude-val">Err</span>(io::Error::new(
+                    io::ErrorKind::InvalidInput,
                     <span class="string">&quot;invalid message length: datarowrange is not empty&quot;</span>,
                 ));
             }
         }
 
-        <span class="self">self</span>.<span class="ident">remaining</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">read_i32</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">len</span> <span class="op">&lt;</span> <span class="number">0</span> {
+        <span class="self">self</span>.remaining -= <span class="number">1</span>;
+        <span class="kw">let </span>len = <span class="self">self</span>.buf.read_i32::&lt;BigEndian&gt;()<span class="question-mark">?</span>;
+        <span class="kw">if </span>len &lt; <span class="number">0 </span>{
             <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">None</span>))
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>;
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="ident">len</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
-                    <span class="ident">io::ErrorKind::UnexpectedEof</span>,
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>len = len <span class="kw">as </span>usize;
+            <span class="kw">if </span><span class="self">self</span>.buf.len() &lt; len {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(io::Error::new(
+                    io::ErrorKind::UnexpectedEof,
                     <span class="string">&quot;unexpected EOF&quot;</span>,
                 ));
             }
-            <span class="kw">let</span> <span class="ident">base</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">len</span>();
-            <span class="self">self</span>.<span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">buf</span>[<span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>..];
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Some</span>(<span class="ident">base</span>..<span class="ident">base</span> <span class="op">+</span> <span class="ident">len</span>)))
+            <span class="kw">let </span>base = <span class="self">self</span>.len - <span class="self">self</span>.buf.len();
+            <span class="self">self</span>.buf = <span class="kw-2">&amp;</span><span class="self">self</span>.buf[len <span class="kw">as </span>usize..];
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Some</span>(base..base + len)))
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">remaining</span> <span class="kw">as</span> <span class="ident">usize</span>;
-        (<span class="ident">len</span>, <span class="prelude-val">Some</span>(<span class="ident">len</span>))
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
+        <span class="kw">let </span>len = <span class="self">self</span>.remaining <span class="kw">as </span>usize;
+        (len, <span class="prelude-val">Some</span>(len))
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ErrorResponseBody</span> {
-    <span class="ident">storage</span>: <span class="ident">Bytes</span>,
+<span class="kw">pub struct </span>ErrorResponseBody {
+    storage: Bytes,
 }
 
-<span class="kw">impl</span> <span class="ident">ErrorResponseBody</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ErrorFields</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">ErrorFields</span> { <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">storage</span> }
+<span class="kw">impl </span>ErrorResponseBody {
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ErrorFields&lt;<span class="lifetime">&#39;_</span>&gt; {
+        ErrorFields { buf: <span class="kw-2">&amp;</span><span class="self">self</span>.storage }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ErrorFields</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],
+<span class="kw">pub struct </span>ErrorFields&lt;<span class="lifetime">&#39;a</span>&gt; {
+    buf: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8],
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FallibleIterator</span> <span class="kw">for</span> <span class="ident">ErrorFields</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">ErrorField</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">io::Error</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; FallibleIterator <span class="kw">for </span>ErrorFields&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Item = ErrorField&lt;<span class="lifetime">&#39;a</span>&gt;;
+    <span class="kw">type </span>Error = io::Error;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ErrorField</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">type_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">type_</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">is_empty</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
-            } <span class="kw">else</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
-                    <span class="ident">io::ErrorKind::InvalidInput</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;<span class="prelude-ty">Option</span>&lt;ErrorField&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt; {
+        <span class="kw">let </span>type_ = <span class="self">self</span>.buf.read_u8()<span class="question-mark">?</span>;
+        <span class="kw">if </span>type_ == <span class="number">0 </span>{
+            <span class="kw">if </span><span class="self">self</span>.buf.is_empty() {
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
+            } <span class="kw">else </span>{
+                <span class="kw">return </span><span class="prelude-val">Err</span>(io::Error::new(
+                    io::ErrorKind::InvalidInput,
                     <span class="string">&quot;invalid message length: error fields is not drained&quot;</span>,
                 ));
             }
         }
 
-        <span class="kw">let</span> <span class="ident">value_end</span> <span class="op">=</span> <span class="ident">find_null</span>(<span class="self">self</span>.<span class="ident">buf</span>, <span class="number">0</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">get_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">buf</span>[..<span class="ident">value_end</span>])<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">buf</span>[<span class="ident">value_end</span> <span class="op">+</span> <span class="number">1</span>..];
+        <span class="kw">let </span>value_end = find_null(<span class="self">self</span>.buf, <span class="number">0</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>value = get_str(<span class="kw-2">&amp;</span><span class="self">self</span>.buf[..value_end])<span class="question-mark">?</span>;
+        <span class="self">self</span>.buf = <span class="kw-2">&amp;</span><span class="self">self</span>.buf[value_end + <span class="number">1</span>..];
 
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ErrorField</span> { <span class="ident">type_</span>, <span class="ident">value</span> }))
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(ErrorField { type_, value }))
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ErrorField</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">type_</span>: <span class="ident">u8</span>,
-    <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
+<span class="kw">pub struct </span>ErrorField&lt;<span class="lifetime">&#39;a</span>&gt; {
+    type_: u8,
+    value: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ErrorField</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">type_</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ErrorField&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>type_(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.type_
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">value</span>
-    }
-}
-
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NoticeResponseBody</span> {
-    <span class="ident">storage</span>: <span class="ident">Bytes</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">NoticeResponseBody</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ErrorFields</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">ErrorFields</span> { <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">storage</span> }
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.value
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NotificationResponseBody</span> {
-    <span class="ident">process_id</span>: <span class="ident">i32</span>,
-    <span class="ident">channel</span>: <span class="ident">Bytes</span>,
-    <span class="ident">message</span>: <span class="ident">Bytes</span>,
+<span class="kw">pub struct </span>NoticeResponseBody {
+    storage: Bytes,
 }
 
-<span class="kw">impl</span> <span class="ident">NotificationResponseBody</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">process_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i32</span> {
-        <span class="self">self</span>.<span class="ident">process_id</span>
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="ident">get_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">channel</span>)
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="ident">get_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">message</span>)
+<span class="kw">impl </span>NoticeResponseBody {
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ErrorFields&lt;<span class="lifetime">&#39;_</span>&gt; {
+        ErrorFields { buf: <span class="kw-2">&amp;</span><span class="self">self</span>.storage }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ParameterDescriptionBody</span> {
-    <span class="ident">storage</span>: <span class="ident">Bytes</span>,
-    <span class="ident">len</span>: <span class="ident">u16</span>,
+<span class="kw">pub struct </span>NotificationResponseBody {
+    process_id: i32,
+    channel: Bytes,
+    message: Bytes,
 }
 
-<span class="kw">impl</span> <span class="ident">ParameterDescriptionBody</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parameters</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Parameters</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">Parameters</span> {
-            <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">storage</span>,
-            <span class="ident">remaining</span>: <span class="self">self</span>.<span class="ident">len</span>,
+<span class="kw">impl </span>NotificationResponseBody {
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>process_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32 {
+        <span class="self">self</span>.process_id
+    }
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>channel(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; io::Result&lt;<span class="kw-2">&amp;</span>str&gt; {
+        get_str(<span class="kw-2">&amp;</span><span class="self">self</span>.channel)
+    }
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>message(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; io::Result&lt;<span class="kw-2">&amp;</span>str&gt; {
+        get_str(<span class="kw-2">&amp;</span><span class="self">self</span>.message)
+    }
+}
+
+<span class="kw">pub struct </span>ParameterDescriptionBody {
+    storage: Bytes,
+    len: u16,
+}
+
+<span class="kw">impl </span>ParameterDescriptionBody {
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>parameters(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Parameters&lt;<span class="lifetime">&#39;_</span>&gt; {
+        Parameters {
+            buf: <span class="kw-2">&amp;</span><span class="self">self</span>.storage,
+            remaining: <span class="self">self</span>.len,
         }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Parameters</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],
-    <span class="ident">remaining</span>: <span class="ident">u16</span>,
+<span class="kw">pub struct </span>Parameters&lt;<span class="lifetime">&#39;a</span>&gt; {
+    buf: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8],
+    remaining: u16,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FallibleIterator</span> <span class="kw">for</span> <span class="ident">Parameters</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">Oid</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">io::Error</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; FallibleIterator <span class="kw">for </span>Parameters&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Item = Oid;
+    <span class="kw">type </span>Error = io::Error;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Oid</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">remaining</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">is_empty</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
-            } <span class="kw">else</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
-                    <span class="ident">io::ErrorKind::InvalidInput</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;<span class="prelude-ty">Option</span>&lt;Oid&gt;&gt; {
+        <span class="kw">if </span><span class="self">self</span>.remaining == <span class="number">0 </span>{
+            <span class="kw">if </span><span class="self">self</span>.buf.is_empty() {
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
+            } <span class="kw">else </span>{
+                <span class="kw">return </span><span class="prelude-val">Err</span>(io::Error::new(
+                    io::ErrorKind::InvalidInput,
                     <span class="string">&quot;invalid message length: parameters is not drained&quot;</span>,
                 ));
             }
         }
 
-        <span class="self">self</span>.<span class="ident">remaining</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">read_u32</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>().<span class="ident">map</span>(<span class="prelude-val">Some</span>)
+        <span class="self">self</span>.remaining -= <span class="number">1</span>;
+        <span class="self">self</span>.buf.read_u32::&lt;BigEndian&gt;().map(<span class="prelude-val">Some</span>)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">size_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">usize</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">remaining</span> <span class="kw">as</span> <span class="ident">usize</span>;
-        (<span class="ident">len</span>, <span class="prelude-val">Some</span>(<span class="ident">len</span>))
-    }
-}
-
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ParameterStatusBody</span> {
-    <span class="ident">name</span>: <span class="ident">Bytes</span>,
-    <span class="ident">value</span>: <span class="ident">Bytes</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">ParameterStatusBody</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="ident">get_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>)
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="ident">get_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">value</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>size_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (usize, <span class="prelude-ty">Option</span>&lt;usize&gt;) {
+        <span class="kw">let </span>len = <span class="self">self</span>.remaining <span class="kw">as </span>usize;
+        (len, <span class="prelude-val">Some</span>(len))
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ReadyForQueryBody</span> {
-    <span class="ident">status</span>: <span class="ident">u8</span>,
+<span class="kw">pub struct </span>ParameterStatusBody {
+    name: Bytes,
+    value: Bytes,
 }
 
-<span class="kw">impl</span> <span class="ident">ReadyForQueryBody</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">status</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">status</span>
+<span class="kw">impl </span>ParameterStatusBody {
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; io::Result&lt;<span class="kw-2">&amp;</span>str&gt; {
+        get_str(<span class="kw-2">&amp;</span><span class="self">self</span>.name)
+    }
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; io::Result&lt;<span class="kw-2">&amp;</span>str&gt; {
+        get_str(<span class="kw-2">&amp;</span><span class="self">self</span>.value)
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RowDescriptionBody</span> {
-    <span class="ident">storage</span>: <span class="ident">Bytes</span>,
-    <span class="ident">len</span>: <span class="ident">u16</span>,
+<span class="kw">pub struct </span>ReadyForQueryBody {
+    status: u8,
 }
 
-<span class="kw">impl</span> <span class="ident">RowDescriptionBody</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Fields</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">Fields</span> {
-            <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">storage</span>,
-            <span class="ident">remaining</span>: <span class="self">self</span>.<span class="ident">len</span>,
+<span class="kw">impl </span>ReadyForQueryBody {
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>status(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.status
+    }
+}
+
+<span class="kw">pub struct </span>RowDescriptionBody {
+    storage: Bytes,
+    len: u16,
+}
+
+<span class="kw">impl </span>RowDescriptionBody {
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Fields&lt;<span class="lifetime">&#39;_</span>&gt; {
+        Fields {
+            buf: <span class="kw-2">&amp;</span><span class="self">self</span>.storage,
+            remaining: <span class="self">self</span>.len,
         }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Fields</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],
-    <span class="ident">remaining</span>: <span class="ident">u16</span>,
+<span class="kw">pub struct </span>Fields&lt;<span class="lifetime">&#39;a</span>&gt; {
+    buf: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8],
+    remaining: u16,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FallibleIterator</span> <span class="kw">for</span> <span class="ident">Fields</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">Field</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">io::Error</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; FallibleIterator <span class="kw">for </span>Fields&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Item = Field&lt;<span class="lifetime">&#39;a</span>&gt;;
+    <span class="kw">type </span>Error = io::Error;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Field</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">remaining</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">is_empty</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
-            } <span class="kw">else</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
-                    <span class="ident">io::ErrorKind::InvalidInput</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;<span class="prelude-ty">Option</span>&lt;Field&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt; {
+        <span class="kw">if </span><span class="self">self</span>.remaining == <span class="number">0 </span>{
+            <span class="kw">if </span><span class="self">self</span>.buf.is_empty() {
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
+            } <span class="kw">else </span>{
+                <span class="kw">return </span><span class="prelude-val">Err</span>(io::Error::new(
+                    io::ErrorKind::InvalidInput,
                     <span class="string">&quot;invalid message length: field is not drained&quot;</span>,
                 ));
             }
         }
 
-        <span class="self">self</span>.<span class="ident">remaining</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="kw">let</span> <span class="ident">name_end</span> <span class="op">=</span> <span class="ident">find_null</span>(<span class="self">self</span>.<span class="ident">buf</span>, <span class="number">0</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">get_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">buf</span>[..<span class="ident">name_end</span>])<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">buf</span>[<span class="ident">name_end</span> <span class="op">+</span> <span class="number">1</span>..];
-        <span class="kw">let</span> <span class="ident">table_oid</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">read_u32</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">column_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">read_i16</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">type_oid</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">read_u32</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">type_size</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">read_i16</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">type_modifier</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">read_i32</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">read_i16</span>::<span class="op">&lt;</span><span class="ident">BigEndian</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+        <span class="self">self</span>.remaining -= <span class="number">1</span>;
+        <span class="kw">let </span>name_end = find_null(<span class="self">self</span>.buf, <span class="number">0</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>name = get_str(<span class="kw-2">&amp;</span><span class="self">self</span>.buf[..name_end])<span class="question-mark">?</span>;
+        <span class="self">self</span>.buf = <span class="kw-2">&amp;</span><span class="self">self</span>.buf[name_end + <span class="number">1</span>..];
+        <span class="kw">let </span>table_oid = <span class="self">self</span>.buf.read_u32::&lt;BigEndian&gt;()<span class="question-mark">?</span>;
+        <span class="kw">let </span>column_id = <span class="self">self</span>.buf.read_i16::&lt;BigEndian&gt;()<span class="question-mark">?</span>;
+        <span class="kw">let </span>type_oid = <span class="self">self</span>.buf.read_u32::&lt;BigEndian&gt;()<span class="question-mark">?</span>;
+        <span class="kw">let </span>type_size = <span class="self">self</span>.buf.read_i16::&lt;BigEndian&gt;()<span class="question-mark">?</span>;
+        <span class="kw">let </span>type_modifier = <span class="self">self</span>.buf.read_i32::&lt;BigEndian&gt;()<span class="question-mark">?</span>;
+        <span class="kw">let </span>format = <span class="self">self</span>.buf.read_i16::&lt;BigEndian&gt;()<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Field</span> {
-            <span class="ident">name</span>,
-            <span class="ident">table_oid</span>,
-            <span class="ident">column_id</span>,
-            <span class="ident">type_oid</span>,
-            <span class="ident">type_size</span>,
-            <span class="ident">type_modifier</span>,
-            <span class="ident">format</span>,
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(Field {
+            name,
+            table_oid,
+            column_id,
+            type_oid,
+            type_size,
+            type_modifier,
+            format,
         }))
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Field</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-    <span class="ident">table_oid</span>: <span class="ident">Oid</span>,
-    <span class="ident">column_id</span>: <span class="ident">i16</span>,
-    <span class="ident">type_oid</span>: <span class="ident">Oid</span>,
-    <span class="ident">type_size</span>: <span class="ident">i16</span>,
-    <span class="ident">type_modifier</span>: <span class="ident">i32</span>,
-    <span class="ident">format</span>: <span class="ident">i16</span>,
+<span class="kw">pub struct </span>Field&lt;<span class="lifetime">&#39;a</span>&gt; {
+    name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    table_oid: Oid,
+    column_id: i16,
+    type_oid: Oid,
+    type_size: i16,
+    type_modifier: i32,
+    format: i16,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Field</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">name</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Field&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
+        <span class="self">self</span>.name
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">table_oid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Oid</span> {
-        <span class="self">self</span>.<span class="ident">table_oid</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>table_oid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Oid {
+        <span class="self">self</span>.table_oid
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i16</span> {
-        <span class="self">self</span>.<span class="ident">column_id</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>column_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i16 {
+        <span class="self">self</span>.column_id
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_oid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Oid</span> {
-        <span class="self">self</span>.<span class="ident">type_oid</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>type_oid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Oid {
+        <span class="self">self</span>.type_oid
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i16</span> {
-        <span class="self">self</span>.<span class="ident">type_size</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>type_size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i16 {
+        <span class="self">self</span>.type_size
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_modifier</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i32</span> {
-        <span class="self">self</span>.<span class="ident">type_modifier</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>type_modifier(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32 {
+        <span class="self">self</span>.type_modifier
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">format</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i16</span> {
-        <span class="self">self</span>.<span class="ident">format</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>format(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i16 {
+        <span class="self">self</span>.format
     }
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">find_null</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">start</span>: <span class="ident">usize</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">memchr</span>(<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">buf</span>[<span class="ident">start</span>..]) {
-        <span class="prelude-val">Some</span>(<span class="ident">pos</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">pos</span> <span class="op">+</span> <span class="ident">start</span>),
-        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
-            <span class="ident">io::ErrorKind::UnexpectedEof</span>,
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>find_null(buf: <span class="kw-2">&amp;</span>[u8], start: usize) -&gt; io::Result&lt;usize&gt; {
+    <span class="kw">match </span>memchr(<span class="number">0</span>, <span class="kw-2">&amp;</span>buf[start..]) {
+        <span class="prelude-val">Some</span>(pos) =&gt; <span class="prelude-val">Ok</span>(pos + start),
+        <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(io::Error::new(
+            io::ErrorKind::UnexpectedEof,
             <span class="string">&quot;unexpected EOF&quot;</span>,
         )),
     }
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">get_str</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="ident">str::from_utf8</span>(<span class="ident">buf</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::InvalidInput</span>, <span class="ident">e</span>))
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>get_str(buf: <span class="kw-2">&amp;</span>[u8]) -&gt; io::Result&lt;<span class="kw-2">&amp;</span>str&gt; {
+    str::from_utf8(buf).map_err(|e| io::Error::new(io::ErrorKind::InvalidInput, e))
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="postgres_protocol" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="postgres_protocol" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

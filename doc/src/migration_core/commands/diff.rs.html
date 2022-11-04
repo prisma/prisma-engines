@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/core/src/commands/diff.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>diff.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../migration_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../migration_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../migration_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/core/src/commands/diff.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>diff.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../migration_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../migration_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../migration_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -212,219 +212,219 @@
 <span id="212">212</span>
 <span id="213">213</span>
 <span id="214">214</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">core_error::CoreResult</span>,
-    <span class="ident">json_rpc::types</span>::{<span class="ident">DiffParams</span>, <span class="ident">DiffResult</span>, <span class="ident">DiffTarget</span>, <span class="ident">PathContainer</span>, <span class="ident">SchemaContainer</span>, <span class="ident">UrlContainer</span>},
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
+    core_error::CoreResult,
+    json_rpc::types::{DiffParams, DiffResult, DiffTarget, PathContainer, SchemaContainer, UrlContainer},
 };
-<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
-<span class="kw">use</span> <span class="ident">migration_connector</span>::{
-    <span class="ident">ConnectorError</span>, <span class="ident">ConnectorHost</span>, <span class="ident">DatabaseSchema</span>, <span class="ident">DiffTarget</span> <span class="kw">as</span> <span class="ident">McDiff</span>, <span class="ident">MigrationConnector</span>, <span class="ident">Namespaces</span>,
+<span class="kw">use </span>enumflags2::BitFlags;
+<span class="kw">use </span>migration_connector::{
+    ConnectorError, ConnectorHost, DatabaseSchema, DiffTarget <span class="kw">as </span>McDiff, MigrationConnector, Namespaces,
 };
-<span class="kw">use</span> <span class="ident">psl::parser_database::SourceFile</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">path::Path</span>, <span class="ident">sync::Arc</span>};
+<span class="kw">use </span>psl::parser_database::SourceFile;
+<span class="kw">use </span>std::{path::Path, sync::Arc};
 
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">diff</span>(<span class="ident">params</span>: <span class="ident">DiffParams</span>, <span class="ident">host</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">ConnectorHost</span><span class="op">&gt;</span>) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">DiffResult</span><span class="op">&gt;</span> {
-    <span class="comment">// In order to properly handle MultiSchema, we need to make sure the preview feature is</span>
-    <span class="comment">// correctly set, and we need to grab the namespaces from the Schema, if any.</span>
-    <span class="comment">// Note that currently, we union all namespaces and preview features. This may not be correct.</span>
-    <span class="comment">// TODO: This effectively reads and parses (parts of) the schema twice: once here, and once</span>
-    <span class="comment">// below, when defining &#39;from&#39;/&#39;to&#39;. We should revisit this.</span>
-    <span class="kw">let</span> (<span class="ident">namespaces</span>, <span class="ident">preview_features</span>) <span class="op">=</span>
-        <span class="ident">namespaces_and_preview_features_from_diff_targets</span>(<span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">from</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">to</span>])<span class="question-mark">?</span>;
+<span class="kw">pub async fn </span>diff(params: DiffParams, host: Arc&lt;<span class="kw">dyn </span>ConnectorHost&gt;) -&gt; CoreResult&lt;DiffResult&gt; {
+    <span class="comment">// In order to properly handle MultiSchema, we need to make sure the preview feature is
+    // correctly set, and we need to grab the namespaces from the Schema, if any.
+    // Note that currently, we union all namespaces and preview features. This may not be correct.
+    // TODO: This effectively reads and parses (parts of) the schema twice: once here, and once
+    // below, when defining &#39;from&#39;/&#39;to&#39;. We should revisit this.
+    </span><span class="kw">let </span>(namespaces, preview_features) =
+        namespaces_and_preview_features_from_diff_targets(<span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>params.from, <span class="kw-2">&amp;</span>params.to])<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">from</span> <span class="op">=</span> <span class="ident">json_rpc_diff_target_to_connector</span>(
-        <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">from</span>,
-        <span class="ident">params</span>.<span class="ident">shadow_database_url</span>.<span class="ident">as_deref</span>(),
-        <span class="ident">namespaces</span>.<span class="ident">clone</span>(),
-        <span class="ident">preview_features</span>,
+    <span class="kw">let </span><span class="kw-2">mut </span>from = json_rpc_diff_target_to_connector(
+        <span class="kw-2">&amp;</span>params.from,
+        params.shadow_database_url.as_deref(),
+        namespaces.clone(),
+        preview_features,
     )
     .<span class="kw">await</span><span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">to</span> <span class="op">=</span> <span class="ident">json_rpc_diff_target_to_connector</span>(
-        <span class="kw-2">&amp;</span><span class="ident">params</span>.<span class="ident">to</span>,
-        <span class="ident">params</span>.<span class="ident">shadow_database_url</span>.<span class="ident">as_deref</span>(),
-        <span class="ident">namespaces</span>,
-        <span class="ident">preview_features</span>,
+    <span class="kw">let </span><span class="kw-2">mut </span>to = json_rpc_diff_target_to_connector(
+        <span class="kw-2">&amp;</span>params.to,
+        params.shadow_database_url.as_deref(),
+        namespaces,
+        preview_features,
     )
     .<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="kw">for</span> (<span class="ident">connector</span>, <span class="kw">_</span>) <span class="kw">in</span> [<span class="ident">from</span>.<span class="ident">as_mut</span>(), <span class="ident">to</span>.<span class="ident">as_mut</span>()].<span class="ident">into_iter</span>().<span class="ident">flatten</span>() {
-        <span class="ident">connector</span>.<span class="ident">set_host</span>(<span class="ident">host</span>.<span class="ident">clone</span>());
+    <span class="kw">for </span>(connector, <span class="kw">_</span>) <span class="kw">in </span>[from.as_mut(), to.as_mut()].into_iter().flatten() {
+        connector.set_host(host.clone());
     }
 
-    <span class="comment">// The `from` connector takes precedence, because if we think of diffs as migrations, `from` is</span>
-    <span class="comment">// the target where the migration would be applied.</span>
-    <span class="comment">//</span>
-    <span class="comment">// TODO: make sure the shadow_database_url param is _always_ taken into account.</span>
-    <span class="comment">// TODO: make sure the connectors are the same in from and to.</span>
-    <span class="kw">let</span> (<span class="ident">connector</span>, <span class="ident">from</span>, <span class="ident">to</span>) <span class="op">=</span> <span class="kw">match</span> (<span class="ident">from</span>, <span class="ident">to</span>) {
-        (<span class="prelude-val">Some</span>((<span class="ident">connector</span>, <span class="ident">from</span>)), <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">to</span>))) =&gt; (<span class="ident">connector</span>, <span class="ident">from</span>, <span class="ident">to</span>),
-        (<span class="prelude-val">Some</span>((<span class="ident">connector</span>, <span class="ident">from</span>)), <span class="prelude-val">None</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">to</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">empty_database_schema</span>();
-            (<span class="ident">connector</span>, <span class="ident">from</span>, <span class="ident">to</span>)
+    <span class="comment">// The `from` connector takes precedence, because if we think of diffs as migrations, `from` is
+    // the target where the migration would be applied.
+    //
+    // TODO: make sure the shadow_database_url param is _always_ taken into account.
+    // TODO: make sure the connectors are the same in from and to.
+    </span><span class="kw">let </span>(connector, from, to) = <span class="kw">match </span>(from, to) {
+        (<span class="prelude-val">Some</span>((connector, from)), <span class="prelude-val">Some</span>((<span class="kw">_</span>, to))) =&gt; (connector, from, to),
+        (<span class="prelude-val">Some</span>((connector, from)), <span class="prelude-val">None</span>) =&gt; {
+            <span class="kw">let </span>to = connector.empty_database_schema();
+            (connector, from, to)
         }
-        (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>((<span class="ident">connector</span>, <span class="ident">to</span>))) =&gt; {
-            <span class="kw">let</span> <span class="ident">from</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">empty_database_schema</span>();
-            (<span class="ident">connector</span>, <span class="ident">from</span>, <span class="ident">to</span>)
+        (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>((connector, to))) =&gt; {
+            <span class="kw">let </span>from = connector.empty_database_schema();
+            (connector, from, to)
         }
         (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::from_msg</span>(
-                <span class="string">&quot;Could not determine the connector to use for diffing.&quot;</span>.<span class="ident">to_owned</span>(),
+            <span class="kw">return </span><span class="prelude-val">Err</span>(ConnectorError::from_msg(
+                <span class="string">&quot;Could not determine the connector to use for diffing.&quot;</span>.to_owned(),
             ))
         }
     };
 
-    <span class="kw">let</span> <span class="ident">migration</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">diff</span>(<span class="ident">from</span>, <span class="ident">to</span>);
+    <span class="kw">let </span>migration = connector.diff(from, to);
 
-    <span class="kw">if</span> <span class="ident">params</span>.<span class="ident">script</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">script_string</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">render_script</span>(<span class="kw-2">&amp;</span><span class="ident">migration</span>, <span class="kw-2">&amp;</span><span class="ident">Default::default</span>())<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">script_string</span>.<span class="ident">ends_with</span>(<span class="string">&#39;\n&#39;</span>) {
-            <span class="ident">script_string</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
+    <span class="kw">if </span>params.script {
+        <span class="kw">let </span><span class="kw-2">mut </span>script_string = connector.render_script(<span class="kw-2">&amp;</span>migration, <span class="kw-2">&amp;</span>Default::default())<span class="question-mark">?</span>;
+        <span class="kw">if </span>!script_string.ends_with(<span class="string">&#39;\n&#39;</span>) {
+            script_string.push(<span class="string">&#39;\n&#39;</span>);
         }
-        <span class="ident">connector</span>.<span class="ident">host</span>().<span class="ident">print</span>(<span class="kw-2">&amp;</span><span class="ident">script_string</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-    } <span class="kw">else</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">summary</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">migration_summary</span>(<span class="kw-2">&amp;</span><span class="ident">migration</span>);
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">summary</span>.<span class="ident">ends_with</span>(<span class="string">&#39;\n&#39;</span>) {
-            <span class="ident">summary</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
+        connector.host().print(<span class="kw-2">&amp;</span>script_string).<span class="kw">await</span><span class="question-mark">?</span>;
+    } <span class="kw">else </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>summary = connector.migration_summary(<span class="kw-2">&amp;</span>migration);
+        <span class="kw">if </span>!summary.ends_with(<span class="string">&#39;\n&#39;</span>) {
+            summary.push(<span class="string">&#39;\n&#39;</span>);
         }
-        <span class="ident">connector</span>.<span class="ident">host</span>().<span class="ident">print</span>(<span class="kw-2">&amp;</span><span class="ident">summary</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        connector.host().print(<span class="kw-2">&amp;</span>summary).<span class="kw">await</span><span class="question-mark">?</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">exit_code</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">params</span>.<span class="ident">exit_code</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">connector</span>.<span class="ident">migration_is_empty</span>(<span class="kw-2">&amp;</span><span class="ident">migration</span>) {
-        <span class="number">2</span>
-    } <span class="kw">else</span> {
-        <span class="number">0</span>
-    };
+    <span class="kw">let </span>exit_code = <span class="kw">if </span>params.exit_code == <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) &amp;&amp; !connector.migration_is_empty(<span class="kw-2">&amp;</span>migration) {
+        <span class="number">2
+    </span>} <span class="kw">else </span>{
+        <span class="number">0
+    </span>};
 
-    <span class="prelude-val">Ok</span>(<span class="ident">DiffResult</span> { <span class="ident">exit_code</span> })
+    <span class="prelude-val">Ok</span>(DiffResult { exit_code })
 }
 
-<span class="comment">// Grab the preview features and namespaces. Normally, we can only grab these from Schema files,</span>
-<span class="comment">// and we usually only expect one of these within a set of DiffTarget.</span>
-<span class="comment">// However, in case there&#39;s multiple, we union the results. This may be wrong.</span>
-<span class="kw">fn</span> <span class="ident">namespaces_and_preview_features_from_diff_targets</span>(
-    <span class="ident">targets</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">DiffTarget</span>],
-) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Namespaces</span><span class="op">&gt;</span>, <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">psl::PreviewFeature</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">namespaces</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">preview_features</span> <span class="op">=</span> <span class="ident">BitFlags::default</span>();
+<span class="comment">// Grab the preview features and namespaces. Normally, we can only grab these from Schema files,
+// and we usually only expect one of these within a set of DiffTarget.
+// However, in case there&#39;s multiple, we union the results. This may be wrong.
+</span><span class="kw">fn </span>namespaces_and_preview_features_from_diff_targets(
+    targets: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>DiffTarget],
+) -&gt; CoreResult&lt;(<span class="prelude-ty">Option</span>&lt;Namespaces&gt;, BitFlags&lt;psl::PreviewFeature&gt;)&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>namespaces = Vec::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>preview_features = BitFlags::default();
 
-    <span class="kw">for</span> <span class="ident">target</span> <span class="kw">in</span> <span class="ident">targets</span> {
-        <span class="kw">match</span> <span class="ident">target</span> {
-            <span class="ident">DiffTarget::Migrations</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">DiffTarget::Empty</span> <span class="op">|</span> <span class="ident">DiffTarget::Url</span>(<span class="kw">_</span>) =&gt; (),
-            <span class="ident">DiffTarget::SchemaDatasource</span>(<span class="ident">SchemaContainer</span> { <span class="ident">schema</span> })
-            <span class="op">|</span> <span class="ident">DiffTarget::SchemaDatamodel</span>(<span class="ident">SchemaContainer</span> { <span class="ident">schema</span> }) =&gt; {
-                <span class="kw">let</span> <span class="ident">schema_str</span>: <span class="ident">String</span> <span class="op">=</span> <span class="ident">std::fs::read_to_string</span>(<span class="kw-2">&amp;</span><span class="ident">schema</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> {
-                    <span class="ident">ConnectorError::from_source_with_context</span>(
-                        <span class="ident">err</span>,
-                        <span class="macro">format!</span>(<span class="string">&quot;Error trying to read Prisma schema file at `{}`.&quot;</span>, <span class="ident">schema</span>).<span class="ident">into_boxed_str</span>(),
+    <span class="kw">for </span>target <span class="kw">in </span>targets {
+        <span class="kw">match </span>target {
+            DiffTarget::Migrations(<span class="kw">_</span>) | DiffTarget::Empty | DiffTarget::Url(<span class="kw">_</span>) =&gt; (),
+            DiffTarget::SchemaDatasource(SchemaContainer { schema })
+            | DiffTarget::SchemaDatamodel(SchemaContainer { schema }) =&gt; {
+                <span class="kw">let </span>schema_str: String = std::fs::read_to_string(schema).map_err(|err| {
+                    ConnectorError::from_source_with_context(
+                        err,
+                        <span class="macro">format!</span>(<span class="string">&quot;Error trying to read Prisma schema file at `{}`.&quot;</span>, schema).into_boxed_str(),
                     )
                 })<span class="question-mark">?</span>;
 
-                <span class="kw">let</span> <span class="ident">validated_schema</span> <span class="op">=</span> <span class="ident">psl::validate</span>(<span class="ident">schema_str</span>.<span class="ident">into</span>());
-                <span class="kw">for</span> (<span class="ident">namespace</span>, <span class="ident">_span</span>) <span class="kw">in</span> <span class="ident">validated_schema</span>
-                    .<span class="ident">configuration</span>
-                    .<span class="ident">datasources</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">ds</span><span class="op">|</span> <span class="ident">ds</span>.<span class="ident">namespaces</span>.<span class="ident">iter</span>())
+                <span class="kw">let </span>validated_schema = psl::validate(schema_str.into());
+                <span class="kw">for </span>(namespace, _span) <span class="kw">in </span>validated_schema
+                    .configuration
+                    .datasources
+                    .iter()
+                    .flat_map(|ds| ds.namespaces.iter())
                 {
-                    <span class="ident">namespaces</span>.<span class="ident">push</span>(<span class="ident">namespace</span>.<span class="ident">clone</span>());
+                    namespaces.push(namespace.clone());
                 }
 
-                <span class="kw">for</span> <span class="ident">generator</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">validated_schema</span>.<span class="ident">configuration</span>.<span class="ident">generators</span> {
-                    <span class="ident">preview_features</span> <span class="op">|</span><span class="op">=</span> <span class="ident">generator</span>.<span class="ident">preview_features</span>.<span class="ident">unwrap_or_default</span>();
+                <span class="kw">for </span>generator <span class="kw">in </span><span class="kw-2">&amp;</span>validated_schema.configuration.generators {
+                    preview_features |= generator.preview_features.unwrap_or_default();
                 }
             }
         }
     }
 
-    <span class="prelude-val">Ok</span>((<span class="ident">Namespaces::from_vec</span>(<span class="kw-2">&amp;mut</span> <span class="ident">namespaces</span>), <span class="ident">preview_features</span>))
+    <span class="prelude-val">Ok</span>((Namespaces::from_vec(<span class="kw-2">&amp;mut </span>namespaces), preview_features))
 }
 
-<span class="comment">// `None` in case the target is empty</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">json_rpc_diff_target_to_connector</span>(
-    <span class="ident">target</span>: <span class="kw-2">&amp;</span><span class="ident">DiffTarget</span>,
-    <span class="ident">shadow_database_url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
-    <span class="ident">namespaces</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Namespaces</span><span class="op">&gt;</span>,
-    <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">psl::PreviewFeature</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">MigrationConnector</span><span class="op">&gt;</span>, <span class="ident">DatabaseSchema</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">read_prisma_schema_from_path</span> <span class="op">=</span> <span class="op">|</span><span class="ident">schema_path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> -&gt; <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="ident">std::fs::read_to_string</span>(<span class="ident">schema_path</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> {
-            <span class="ident">ConnectorError::from_source_with_context</span>(
-                <span class="ident">err</span>,
-                <span class="macro">format!</span>(<span class="string">&quot;Error trying to read Prisma schema file at `{}`.&quot;</span>, <span class="ident">schema_path</span>).<span class="ident">into_boxed_str</span>(),
+<span class="comment">// `None` in case the target is empty
+</span><span class="kw">async fn </span>json_rpc_diff_target_to_connector(
+    target: <span class="kw-2">&amp;</span>DiffTarget,
+    shadow_database_url: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+    namespaces: <span class="prelude-ty">Option</span>&lt;Namespaces&gt;,
+    preview_features: BitFlags&lt;psl::PreviewFeature&gt;,
+) -&gt; CoreResult&lt;<span class="prelude-ty">Option</span>&lt;(Box&lt;<span class="kw">dyn </span>MigrationConnector&gt;, DatabaseSchema)&gt;&gt; {
+    <span class="kw">let </span>read_prisma_schema_from_path = |schema_path: <span class="kw-2">&amp;</span>str| -&gt; CoreResult&lt;String&gt; {
+        std::fs::read_to_string(schema_path).map_err(|err| {
+            ConnectorError::from_source_with_context(
+                err,
+                <span class="macro">format!</span>(<span class="string">&quot;Error trying to read Prisma schema file at `{}`.&quot;</span>, schema_path).into_boxed_str(),
             )
         })
     };
 
-    <span class="kw">match</span> <span class="ident">target</span> {
-        <span class="ident">DiffTarget::Empty</span> =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
-        <span class="ident">DiffTarget::SchemaDatasource</span>(<span class="ident">SchemaContainer</span> { <span class="ident">schema</span> }) =&gt; {
-            <span class="kw">let</span> <span class="ident">schema_contents</span> <span class="op">=</span> <span class="ident">read_prisma_schema_from_path</span>(<span class="ident">schema</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">schema_dir</span> <span class="op">=</span> <span class="ident">std::path::Path::new</span>(<span class="ident">schema</span>).<span class="ident">parent</span>();
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::schema_to_connector</span>(<span class="kw-2">&amp;</span><span class="ident">schema_contents</span>, <span class="ident">schema_dir</span>)<span class="question-mark">?</span>;
-            <span class="ident">connector</span>.<span class="ident">ensure_connection_validity</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="ident">connector</span>.<span class="ident">set_preview_features</span>(<span class="ident">preview_features</span>);
-            <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">connector</span>
-                .<span class="ident">database_schema_from_diff_target</span>(<span class="ident">McDiff::Database</span>, <span class="prelude-val">None</span>, <span class="ident">namespaces</span>)
+    <span class="kw">match </span>target {
+        DiffTarget::Empty =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+        DiffTarget::SchemaDatasource(SchemaContainer { schema }) =&gt; {
+            <span class="kw">let </span>schema_contents = read_prisma_schema_from_path(schema)<span class="question-mark">?</span>;
+            <span class="kw">let </span>schema_dir = std::path::Path::new(schema).parent();
+            <span class="kw">let </span><span class="kw-2">mut </span>connector = <span class="kw">crate</span>::schema_to_connector(<span class="kw-2">&amp;</span>schema_contents, schema_dir)<span class="question-mark">?</span>;
+            connector.ensure_connection_validity().<span class="kw">await</span><span class="question-mark">?</span>;
+            connector.set_preview_features(preview_features);
+            <span class="kw">let </span>schema = connector
+                .database_schema_from_diff_target(McDiff::Database, <span class="prelude-val">None</span>, namespaces)
                 .<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>((<span class="ident">connector</span>, <span class="ident">schema</span>)))
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>((connector, schema)))
         }
-        <span class="ident">DiffTarget::SchemaDatamodel</span>(<span class="ident">SchemaContainer</span> { <span class="ident">schema</span> }) =&gt; {
-            <span class="kw">let</span> <span class="ident">schema_contents</span> <span class="op">=</span> <span class="ident">read_prisma_schema_from_path</span>(<span class="ident">schema</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::schema_to_connector_unchecked</span>(<span class="kw-2">&amp;</span><span class="ident">schema_contents</span>)<span class="question-mark">?</span>;
-            <span class="ident">connector</span>.<span class="ident">set_preview_features</span>(<span class="ident">preview_features</span>);
-            <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">connector</span>
-                .<span class="ident">database_schema_from_diff_target</span>(
-                    <span class="ident">McDiff::Datamodel</span>(<span class="ident">SourceFile::new_allocated</span>(<span class="ident">Arc::from</span>(<span class="ident">schema_contents</span>.<span class="ident">into_boxed_str</span>()))),
+        DiffTarget::SchemaDatamodel(SchemaContainer { schema }) =&gt; {
+            <span class="kw">let </span>schema_contents = read_prisma_schema_from_path(schema)<span class="question-mark">?</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>connector = <span class="kw">crate</span>::schema_to_connector_unchecked(<span class="kw-2">&amp;</span>schema_contents)<span class="question-mark">?</span>;
+            connector.set_preview_features(preview_features);
+            <span class="kw">let </span>schema = connector
+                .database_schema_from_diff_target(
+                    McDiff::Datamodel(SourceFile::new_allocated(Arc::from(schema_contents.into_boxed_str()))),
                     <span class="prelude-val">None</span>,
-                    <span class="ident">namespaces</span>,
+                    namespaces,
                 )
                 .<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>((<span class="ident">connector</span>, <span class="ident">schema</span>)))
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>((connector, schema)))
         }
-        <span class="ident">DiffTarget::Url</span>(<span class="ident">UrlContainer</span> { <span class="ident">url</span> }) =&gt; {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::connector_for_connection_string</span>(<span class="ident">url</span>.<span class="ident">clone</span>(), <span class="prelude-val">None</span>, <span class="ident">BitFlags::empty</span>())<span class="question-mark">?</span>;
-            <span class="ident">connector</span>.<span class="ident">ensure_connection_validity</span>().<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="ident">connector</span>.<span class="ident">set_preview_features</span>(<span class="ident">preview_features</span>);
-            <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">connector</span>
-                .<span class="ident">database_schema_from_diff_target</span>(<span class="ident">McDiff::Database</span>, <span class="prelude-val">None</span>, <span class="ident">namespaces</span>)
+        DiffTarget::Url(UrlContainer { url }) =&gt; {
+            <span class="kw">let </span><span class="kw-2">mut </span>connector = <span class="kw">crate</span>::connector_for_connection_string(url.clone(), <span class="prelude-val">None</span>, BitFlags::empty())<span class="question-mark">?</span>;
+            connector.ensure_connection_validity().<span class="kw">await</span><span class="question-mark">?</span>;
+            connector.set_preview_features(preview_features);
+            <span class="kw">let </span>schema = connector
+                .database_schema_from_diff_target(McDiff::Database, <span class="prelude-val">None</span>, namespaces)
                 .<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>((<span class="ident">connector</span>, <span class="ident">schema</span>)))
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>((connector, schema)))
         }
-        <span class="ident">DiffTarget::Migrations</span>(<span class="ident">PathContainer</span> { <span class="ident">path</span> }) =&gt; {
-            <span class="kw">let</span> <span class="ident">provider</span> <span class="op">=</span> <span class="ident">migration_connector::migrations_directory::read_provider_from_lock_file</span>(<span class="ident">path</span>);
-            <span class="kw">match</span> (<span class="ident">provider</span>.<span class="ident">as_deref</span>(), <span class="ident">shadow_database_url</span>) {
-                (<span class="prelude-val">Some</span>(<span class="ident">provider</span>), <span class="prelude-val">Some</span>(<span class="ident">shadow_database_url</span>)) =&gt; {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::connector_for_provider</span>(<span class="ident">provider</span>)<span class="question-mark">?</span>;
-                    <span class="ident">connector</span>.<span class="ident">set_preview_features</span>(<span class="ident">preview_features</span>);
-                    <span class="kw">let</span> <span class="ident">directories</span> <span class="op">=</span> <span class="ident">migration_connector::migrations_directory::list_migrations</span>(<span class="ident">Path::new</span>(<span class="ident">path</span>))<span class="question-mark">?</span>;
-                    <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">connector</span>
-                        .<span class="ident">database_schema_from_diff_target</span>(
-                            <span class="ident">McDiff::Migrations</span>(<span class="kw-2">&amp;</span><span class="ident">directories</span>),
-                            <span class="prelude-val">Some</span>(<span class="ident">shadow_database_url</span>.<span class="ident">to_owned</span>()),
-                            <span class="ident">namespaces</span>,
+        DiffTarget::Migrations(PathContainer { path }) =&gt; {
+            <span class="kw">let </span>provider = migration_connector::migrations_directory::read_provider_from_lock_file(path);
+            <span class="kw">match </span>(provider.as_deref(), shadow_database_url) {
+                (<span class="prelude-val">Some</span>(provider), <span class="prelude-val">Some</span>(shadow_database_url)) =&gt; {
+                    <span class="kw">let </span><span class="kw-2">mut </span>connector = <span class="kw">crate</span>::connector_for_provider(provider)<span class="question-mark">?</span>;
+                    connector.set_preview_features(preview_features);
+                    <span class="kw">let </span>directories = migration_connector::migrations_directory::list_migrations(Path::new(path))<span class="question-mark">?</span>;
+                    <span class="kw">let </span>schema = connector
+                        .database_schema_from_diff_target(
+                            McDiff::Migrations(<span class="kw-2">&amp;</span>directories),
+                            <span class="prelude-val">Some</span>(shadow_database_url.to_owned()),
+                            namespaces,
                         )
                         .<span class="kw">await</span><span class="question-mark">?</span>;
-                    <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>((<span class="ident">connector</span>, <span class="ident">schema</span>)))
+                    <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>((connector, schema)))
                 }
                 (<span class="prelude-val">Some</span>(<span class="string">&quot;sqlite&quot;</span>), <span class="prelude-val">None</span>) =&gt; {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::connector_for_provider</span>(<span class="string">&quot;sqlite&quot;</span>)<span class="question-mark">?</span>;
-                    <span class="ident">connector</span>.<span class="ident">set_preview_features</span>(<span class="ident">preview_features</span>);
-                    <span class="kw">let</span> <span class="ident">directories</span> <span class="op">=</span> <span class="ident">migration_connector::migrations_directory::list_migrations</span>(<span class="ident">Path::new</span>(<span class="ident">path</span>))<span class="question-mark">?</span>;
-                    <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">connector</span>
-                        .<span class="ident">database_schema_from_diff_target</span>(<span class="ident">McDiff::Migrations</span>(<span class="kw-2">&amp;</span><span class="ident">directories</span>), <span class="prelude-val">None</span>, <span class="ident">namespaces</span>)
+                    <span class="kw">let </span><span class="kw-2">mut </span>connector = <span class="kw">crate</span>::connector_for_provider(<span class="string">&quot;sqlite&quot;</span>)<span class="question-mark">?</span>;
+                    connector.set_preview_features(preview_features);
+                    <span class="kw">let </span>directories = migration_connector::migrations_directory::list_migrations(Path::new(path))<span class="question-mark">?</span>;
+                    <span class="kw">let </span>schema = connector
+                        .database_schema_from_diff_target(McDiff::Migrations(<span class="kw-2">&amp;</span>directories), <span class="prelude-val">None</span>, namespaces)
                         .<span class="kw">await</span><span class="question-mark">?</span>;
-                    <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>((<span class="ident">connector</span>, <span class="ident">schema</span>)))
+                    <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>((connector, schema)))
                 }
-                (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::from_msg</span>(
-                    <span class="string">&quot;You must pass the --shadow-database-url if you want to diff a migrations directory.&quot;</span>.<span class="ident">to_owned</span>(),
+                (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Err</span>(ConnectorError::from_msg(
+                    <span class="string">&quot;You must pass the --shadow-database-url if you want to diff a migrations directory.&quot;</span>.to_owned(),
                 )),
-                (<span class="prelude-val">None</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">ConnectorError::from_msg</span>(
-                    <span class="string">&quot;Could not determine the connector from the migrations directory (missing migration_lock.toml).&quot;</span>
-                        .<span class="ident">to_owned</span>(),
+                (<span class="prelude-val">None</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(ConnectorError::from_msg(
+                    <span class="string">&quot;Could not determine the connector from the migrations directory (missing migration_lock.toml).&quot;
+                        </span>.to_owned(),
                 )),
             }
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="migration_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="migration_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

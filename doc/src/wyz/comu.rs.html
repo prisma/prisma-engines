@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/wyz-0.5.0/src/comu.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>comu.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../wyz/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../wyz/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../wyz/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/wyz-0.5.0/src/comu.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>comu.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../wyz/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../wyz/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../wyz/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -636,47 +636,47 @@
 
 This module provides a system of marker types that can be used to encode write
 permissions into type parameters rather than duplicate structures.
-!*/</span>
+!*/
 
-<span class="comment">//  This module has no compute logic of its own; it only exists in the</span>
-<span class="comment">//  type-system and to forward to the standard library.</span>
-<span class="attribute">#![<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">tarpaulin_include</span>))]</span>
+</span><span class="comment">//  This module has no compute logic of its own; it only exists in the
+//  type-system and to forward to the standard library.
+</span><span class="attribute">#![cfg(not(tarpaulin_include))]
 
-<span class="kw">use</span> <span class="ident">core</span>::{
-	<span class="ident">cmp</span>,
-	<span class="ident">convert::TryFrom</span>,
-	<span class="ident">fmt</span>::{
+</span><span class="kw">use </span>core::{
+	cmp,
+	convert::TryFrom,
+	fmt::{
 		<span class="self">self</span>,
-		<span class="ident">Debug</span>,
-		<span class="ident">Display</span>,
-		<span class="ident">Formatter</span>,
-		<span class="ident">Pointer</span>,
+		Debug,
+		Display,
+		Formatter,
+		Pointer,
 	},
-	<span class="ident">hash</span>::{
-		<span class="ident">Hash</span>,
-		<span class="ident">Hasher</span>,
+	hash::{
+		Hash,
+		Hasher,
 	},
-	<span class="ident">ops::Deref</span>,
-	<span class="ident">ptr::NonNull</span>,
-	<span class="ident">slice</span>,
+	ops::Deref,
+	ptr::NonNull,
+	slice,
 };
 
-<span class="kw">use</span> <span class="ident">tap::Pipe</span>;
+<span class="kw">use </span>tap::Pipe;
 
-<span class="doccomment">/// A basic `const` marker.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Const</span>;
+<span class="doccomment">/// A basic `const` marker.
+</span><span class="attribute">#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
+</span><span class="kw">pub struct </span>Const;
 
-<span class="doccomment">/// A basic `mut` marker.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Mut</span>;
+<span class="doccomment">/// A basic `mut` marker.
+</span><span class="attribute">#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
+</span><span class="kw">pub struct </span>Mut;
 
-<span class="doccomment">/// A frozen wrapper over some other `Mutability` marker.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Frozen</span><span class="op">&lt;</span><span class="ident">Inner</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">Inner</span>: <span class="ident">Mutability</span>
+<span class="doccomment">/// A frozen wrapper over some other `Mutability` marker.
+</span><span class="attribute">#[derive(Clone, Copy, Debug, Default, Eq, Hash, Ord, PartialEq, PartialOrd)]
+</span><span class="kw">pub struct </span>Frozen&lt;Inner&gt;
+<span class="kw">where </span>Inner: Mutability
 {
-	<span class="ident">inner</span>: <span class="ident">Inner</span>,
+	inner: Inner,
 }
 
 <span class="doccomment">/** Generalized mutability permissions.
@@ -689,64 +689,64 @@ An equivalent library implementation might be `Ptr&lt;T, M: Mutability&gt;`, whe
 shared logic can be placed in an `impl&lt;T, M&gt; Ptr&lt;T, M&gt;` block, but unique logic
 (such as freezing a `Mut` pointer, or unfreezing a `Frozen&lt;Mut&gt;`) can be placed
 in specialized `impl&lt;T&gt; Ptr&lt;T, Mut&gt;` blocks.
-**/</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Mutability</span>: <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">Sized</span> <span class="op">+</span> <span class="ident"><span class="self">self</span>::seal::Sealed</span> {
-	<span class="doccomment">/// Marks whether this type contains mutability permissions within it.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// This is `false` for `Const` and `true` for `Mut`. `Frozen` wrappers</span>
-	<span class="doccomment">/// atop either of these types inherit their interior marker.</span>
-	<span class="kw">const</span> <span class="ident">CONTAINS_MUTABILITY</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="bool-val">false</span>;
+**/
+</span><span class="kw">pub trait </span>Mutability: <span class="lifetime">&#39;static </span>+ Copy + Sized + <span class="self">self</span>::seal::Sealed {
+	<span class="doccomment">/// Marks whether this type contains mutability permissions within it.
+	///
+	/// This is `false` for `Const` and `true` for `Mut`. `Frozen` wrappers
+	/// atop either of these types inherit their interior marker.
+	</span><span class="kw">const </span>CONTAINS_MUTABILITY: bool = <span class="bool-val">false</span>;
 
-	<span class="doccomment">/// Counts the layers of `Frozen&lt;&gt;` wrapping around a base `Const` or `Mut`.</span>
-	<span class="kw">const</span> <span class="ident">PEANO_NUMBER</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
+	<span class="doccomment">/// Counts the layers of `Frozen&lt;&gt;` wrapping around a base `Const` or `Mut`.
+	</span><span class="kw">const </span>PEANO_NUMBER: usize = <span class="number">0</span>;
 
-	<span class="doccomment">/// Allow instances to be constructed generically.</span>
-	<span class="kw">const</span> <span class="ident">SELF</span>: <span class="self">Self</span>;
+	<span class="doccomment">/// Allow instances to be constructed generically.
+	</span><span class="kw">const </span>SELF: <span class="self">Self</span>;
 
-	<span class="doccomment">/// One of `*const` or `*mut`.</span>
-	<span class="kw">const</span> <span class="ident">RENDER</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>;
+	<span class="doccomment">/// One of `*const` or `*mut`.
+	</span><span class="kw">const </span>RENDER: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str;
 
-	<span class="doccomment">/// Freeze this type, wrapping it in a `const` marker that may later be</span>
-	<span class="doccomment">/// removed to thaw it.</span>
-	<span class="kw">fn</span> <span class="ident">freeze</span>(<span class="self">self</span>) -&gt; <span class="ident">Frozen</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-		<span class="ident">Frozen</span> { <span class="ident">inner</span>: <span class="self">self</span> }
+	<span class="doccomment">/// Freeze this type, wrapping it in a `const` marker that may later be
+	/// removed to thaw it.
+	</span><span class="kw">fn </span>freeze(<span class="self">self</span>) -&gt; Frozen&lt;<span class="self">Self</span>&gt; {
+		Frozen { inner: <span class="self">self </span>}
 	}
 
-	<span class="doccomment">/// Thaw a previously-frozen type, removing its `Frozen` marker and</span>
-	<span class="doccomment">/// restoring it to `Self`.</span>
-	<span class="kw">fn</span> <span class="ident">thaw</span>(<span class="ident">Frozen</span> { <span class="ident">inner</span> }: <span class="ident">Frozen</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-		<span class="ident">inner</span>
+	<span class="doccomment">/// Thaw a previously-frozen type, removing its `Frozen` marker and
+	/// restoring it to `Self`.
+	</span><span class="kw">fn </span>thaw(Frozen { inner }: Frozen&lt;<span class="self">Self</span>&gt;) -&gt; <span class="self">Self </span>{
+		inner
 	}
 }
 
-<span class="kw">impl</span> <span class="ident">Mutability</span> <span class="kw">for</span> <span class="ident">Const</span> {
-	<span class="kw">const</span> <span class="ident">RENDER</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;*const&quot;</span>;
-	<span class="kw">const</span> <span class="ident">SELF</span>: <span class="self">Self</span> <span class="op">=</span> <span class="self">Self</span>;
+<span class="kw">impl </span>Mutability <span class="kw">for </span>Const {
+	<span class="kw">const </span>RENDER: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;*const&quot;</span>;
+	<span class="kw">const </span>SELF: <span class="self">Self </span>= <span class="self">Self</span>;
 }
 
-<span class="kw">impl</span> <span class="ident"><span class="self">self</span>::seal::Sealed</span> <span class="kw">for</span> <span class="ident">Const</span> {
+<span class="kw">impl </span><span class="self">self</span>::seal::Sealed <span class="kw">for </span>Const {
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Inner</span><span class="op">&gt;</span> <span class="ident">Mutability</span> <span class="kw">for</span> <span class="ident">Frozen</span><span class="op">&lt;</span><span class="ident">Inner</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">Inner</span>: <span class="ident">Mutability</span> <span class="op">+</span> <span class="ident">Sized</span>
+<span class="kw">impl</span>&lt;Inner&gt; Mutability <span class="kw">for </span>Frozen&lt;Inner&gt;
+<span class="kw">where </span>Inner: Mutability + Sized
 {
-	<span class="kw">const</span> <span class="ident">CONTAINS_MUTABILITY</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="ident">Inner::CONTAINS_MUTABILITY</span>;
-	<span class="kw">const</span> <span class="ident">PEANO_NUMBER</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span> <span class="op">+</span> <span class="ident">Inner::PEANO_NUMBER</span>;
-	<span class="kw">const</span> <span class="ident">RENDER</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="ident">Inner::RENDER</span>;
-	<span class="kw">const</span> <span class="ident">SELF</span>: <span class="self">Self</span> <span class="op">=</span> <span class="self">Self</span> { <span class="ident">inner</span>: <span class="ident">Inner::SELF</span> };
+	<span class="kw">const </span>CONTAINS_MUTABILITY: bool = Inner::CONTAINS_MUTABILITY;
+	<span class="kw">const </span>PEANO_NUMBER: usize = <span class="number">1 </span>+ Inner::PEANO_NUMBER;
+	<span class="kw">const </span>RENDER: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = Inner::RENDER;
+	<span class="kw">const </span>SELF: <span class="self">Self </span>= <span class="self">Self </span>{ inner: Inner::SELF };
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Inner</span><span class="op">&gt;</span> <span class="ident"><span class="self">self</span>::seal::Sealed</span> <span class="kw">for</span> <span class="ident">Frozen</span><span class="op">&lt;</span><span class="ident">Inner</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">Inner</span>: <span class="ident">Mutability</span> <span class="op">+</span> <span class="ident">Sized</span>
+<span class="kw">impl</span>&lt;Inner&gt; <span class="self">self</span>::seal::Sealed <span class="kw">for </span>Frozen&lt;Inner&gt; <span class="kw">where </span>Inner: Mutability + Sized
 {
 }
 
-<span class="kw">impl</span> <span class="ident">Mutability</span> <span class="kw">for</span> <span class="ident">Mut</span> {
-	<span class="kw">const</span> <span class="ident">CONTAINS_MUTABILITY</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="bool-val">true</span>;
-	<span class="kw">const</span> <span class="ident">RENDER</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;*mut&quot;</span>;
-	<span class="kw">const</span> <span class="ident">SELF</span>: <span class="self">Self</span> <span class="op">=</span> <span class="self">Self</span>;
+<span class="kw">impl </span>Mutability <span class="kw">for </span>Mut {
+	<span class="kw">const </span>CONTAINS_MUTABILITY: bool = <span class="bool-val">true</span>;
+	<span class="kw">const </span>RENDER: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;*mut&quot;</span>;
+	<span class="kw">const </span>SELF: <span class="self">Self </span>= <span class="self">Self</span>;
 }
 
-<span class="kw">impl</span> <span class="ident"><span class="self">self</span>::seal::Sealed</span> <span class="kw">for</span> <span class="ident">Mut</span> {
+<span class="kw">impl </span><span class="self">self</span>::seal::Sealed <span class="kw">for </span>Mut {
 }
 
 <span class="doccomment">/** A generic non-null pointer with type-system mutability tracking.
@@ -755,516 +755,516 @@ in specialized `impl&lt;T&gt; Ptr&lt;T, Mut&gt;` blocks.
 
 - `M`: The mutability permissions of the source pointer.
 - `T`: The referent type of the source pointer.
-**/</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
+**/
+</span><span class="kw">pub struct </span>Address&lt;M, T&gt;
+<span class="kw">where
+	</span>M: Mutability,
+	T: <span class="question-mark">?</span>Sized,
 {
-	<span class="doccomment">/// The address value.</span>
-	<span class="ident">inner</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-	<span class="doccomment">/// The mutability permissions.</span>
-	<span class="ident">comu</span>: <span class="ident">M</span>,
+	<span class="doccomment">/// The address value.
+	</span>inner: NonNull&lt;T&gt;,
+	<span class="doccomment">/// The mutability permissions.
+	</span>comu: M,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">M</span>: <span class="ident">Mutability</span>
+<span class="kw">impl</span>&lt;M, T&gt; Address&lt;M, T&gt;
+<span class="kw">where </span>M: Mutability
 {
-	<span class="doccomment">/// The dangling pointer.</span>
-	<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DANGLING</span>: <span class="self">Self</span> <span class="op">=</span> <span class="self">Self</span> {
-		<span class="ident">inner</span>: <span class="ident">NonNull::dangling</span>(),
-		<span class="ident">comu</span>: <span class="ident">M::SELF</span>,
+	<span class="doccomment">/// The dangling pointer.
+	</span><span class="kw">pub const </span>DANGLING: <span class="self">Self </span>= <span class="self">Self </span>{
+		inner: NonNull::dangling(),
+		comu: M::SELF,
 	};
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
+<span class="kw">impl</span>&lt;M, T&gt; Address&lt;M, T&gt;
+<span class="kw">where
+	</span>M: Mutability,
+	T: <span class="question-mark">?</span>Sized,
 {
-	<span class="doccomment">/// Constructs a new `Address` over some pointer value.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// You are responsible for selecting the correct `Mutability` marker.</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">addr</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-		<span class="self">Self</span> {
-			<span class="ident">inner</span>: <span class="ident">addr</span>,
-			<span class="ident">comu</span>: <span class="ident">M::SELF</span>,
+	<span class="doccomment">/// Constructs a new `Address` over some pointer value.
+	///
+	/// You are responsible for selecting the correct `Mutability` marker.
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">pub fn </span>new(addr: NonNull&lt;T&gt;) -&gt; <span class="self">Self </span>{
+		<span class="self">Self </span>{
+			inner: addr,
+			comu: M::SELF,
 		}
 	}
 
-	<span class="doccomment">/// Permanently converts an `Address&lt;_&gt;` into an `Address&lt;Const&gt;`.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// You should generally prefer [`Address::freeze`].</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">immut</span>(<span class="self">self</span>) -&gt; <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">Const</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-		<span class="ident">Address</span> {
-			<span class="ident">inner</span>: <span class="self">self</span>.<span class="ident">inner</span>,
-			<span class="ident">comu</span>: <span class="ident">Const</span>,
+	<span class="doccomment">/// Permanently converts an `Address&lt;_&gt;` into an `Address&lt;Const&gt;`.
+	///
+	/// You should generally prefer [`Address::freeze`].
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">pub fn </span>immut(<span class="self">self</span>) -&gt; Address&lt;Const, T&gt; {
+		Address {
+			inner: <span class="self">self</span>.inner,
+			comu: Const,
 		}
 	}
 
-	<span class="doccomment">/// Force an `Address&lt;Const&gt;` to be `Address&lt;Mut&gt;`.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ## Safety</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// You should only call this on addresses you know to have been created</span>
-	<span class="doccomment">/// with `Mut`able permissions and previously removed by [`Address::immut`].</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// You should prefer using [`Address::freeze`] for temporary, trackable,</span>
-	<span class="doccomment">/// immutability constraints instead.</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">assert_mut</span>(<span class="self">self</span>) -&gt; <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">Mut</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-		<span class="ident">Address</span> {
-			<span class="ident">inner</span>: <span class="self">self</span>.<span class="ident">inner</span>,
-			<span class="ident">comu</span>: <span class="ident">Mut</span>,
+	<span class="doccomment">/// Force an `Address&lt;Const&gt;` to be `Address&lt;Mut&gt;`.
+	///
+	/// ## Safety
+	///
+	/// You should only call this on addresses you know to have been created
+	/// with `Mut`able permissions and previously removed by [`Address::immut`].
+	///
+	/// You should prefer using [`Address::freeze`] for temporary, trackable,
+	/// immutability constraints instead.
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">pub unsafe fn </span>assert_mut(<span class="self">self</span>) -&gt; Address&lt;Mut, T&gt; {
+		Address {
+			inner: <span class="self">self</span>.inner,
+			comu: Mut,
 		}
 	}
 
-	<span class="doccomment">/// Freezes the `Address` so that it is read-only.</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">freeze</span>(<span class="self">self</span>) -&gt; <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">Frozen</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="self">Self</span> { <span class="ident">inner</span>, <span class="ident">comu</span> } <span class="op">=</span> <span class="self">self</span>;
-		<span class="ident">Address</span> {
-			<span class="ident">inner</span>,
-			<span class="ident">comu</span>: <span class="ident">comu</span>.<span class="ident">freeze</span>(),
+	<span class="doccomment">/// Freezes the `Address` so that it is read-only.
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">pub fn </span>freeze(<span class="self">self</span>) -&gt; Address&lt;Frozen&lt;M&gt;, T&gt; {
+		<span class="kw">let </span><span class="self">Self </span>{ inner, comu } = <span class="self">self</span>;
+		Address {
+			inner,
+			comu: comu.freeze(),
 		}
 	}
 
-	<span class="doccomment">/// Removes the `Address` type marker, returning the original pointer.</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">inner</span>
+	<span class="doccomment">/// Removes the `Address` type marker, returning the original pointer.
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">pub fn </span>into_inner(<span class="self">self</span>) -&gt; NonNull&lt;T&gt; {
+		<span class="self">self</span>.inner
 	}
 
-	<span class="doccomment">/// Gets the address as a read-only pointer.</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_const</span>(<span class="self">self</span>) -&gt; <span class="kw-2">*const</span> <span class="ident">T</span> {
-		<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">T</span>
+	<span class="doccomment">/// Gets the address as a read-only pointer.
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">pub fn </span>to_const(<span class="self">self</span>) -&gt; <span class="kw-2">*const </span>T {
+		<span class="self">self</span>.inner.as_ptr() <span class="kw">as </span><span class="kw-2">*const </span>T
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">Mut</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="doccomment">/// Gets the address as a write-capable pointer.</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::wrong_self_convention</span>)]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_mut</span>(<span class="self">self</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">T</span> {
-		<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">as_ptr</span>()
+<span class="kw">impl</span>&lt;T&gt; Address&lt;Mut, T&gt; {
+	<span class="doccomment">/// Gets the address as a write-capable pointer.
+	</span><span class="attribute">#[inline(always)]
+	#[allow(clippy::wrong_self_convention)]
+	</span><span class="kw">pub fn </span>to_mut(<span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>T {
+		<span class="self">self</span>.inner.as_ptr()
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">Frozen</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
+<span class="kw">impl</span>&lt;M, T&gt; Address&lt;Frozen&lt;M&gt;, T&gt;
+<span class="kw">where
+	</span>M: Mutability,
+	T: <span class="question-mark">?</span>Sized,
 {
-	<span class="doccomment">/// Thaws the `Address` to its original mutability permission.</span>
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">thaw</span>(<span class="self">self</span>) -&gt; <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-		<span class="kw">let</span> <span class="self">Self</span> { <span class="ident">inner</span>, <span class="ident">comu</span> } <span class="op">=</span> <span class="self">self</span>;
-		<span class="ident">Address</span> {
-			<span class="ident">inner</span>,
-			<span class="ident">comu</span>: <span class="ident">Mutability::thaw</span>(<span class="ident">comu</span>),
+	<span class="doccomment">/// Thaws the `Address` to its original mutability permission.
+	</span><span class="attribute">#[inline(always)]
+	</span><span class="kw">pub fn </span>thaw(<span class="self">self</span>) -&gt; Address&lt;M, T&gt; {
+		<span class="kw">let </span><span class="self">Self </span>{ inner, comu } = <span class="self">self</span>;
+		Address {
+			inner,
+			comu: Mutability::thaw(comu),
 		}
 	}
 }
 
-<span class="doccomment">/// Implement `*T -&gt; *T` functions as `Address&lt;T&gt; -&gt; Address&lt;T&gt;`.</span>
-<span class="macro">macro_rules!</span> <span class="ident">fwd</span> {
+<span class="doccomment">/// Implement `*T -&gt; *T` functions as `Address&lt;T&gt; -&gt; Address&lt;T&gt;`.
+</span><span class="macro">macro_rules! </span>fwd {
 	($(
-		$(@<span class="macro-nonterminal">$</span><span class="kw">unsafe</span>:<span class="macro-nonterminal">ident</span>)<span class="question-mark">?</span>
-		<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>
-		$(<span class="op">&lt;</span>
-			$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">lt</span>:<span class="ident">lifetime</span>),<span class="op">*</span>
-			$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">typaram</span>:<span class="ident">ident</span>$(: $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">bound</span>:<span class="ident">ident</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>)<span class="question-mark">?</span>),<span class="op">*</span>
-			$(,)<span class="op">*</span>
-		<span class="op">&gt;</span>)<span class="question-mark">?</span>
-		$(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>:<span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">ty</span>)<span class="op">*</span>
-		$(=&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret</span>:<span class="ident">ty</span>)<span class="question-mark">?</span>
-	);<span class="op">+</span> $(;)<span class="question-mark">?</span>) =&gt; { $(
-		<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">concat!</span>(<span class="string">&quot;Applies `&lt;*T&gt;::&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>), <span class="string">&quot;`.&quot;</span>)]</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// See [original documentation][orig].</span>
-		<span class="doccomment">///</span>
-		<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">concat!</span>(<span class="string">&quot;[orig]: https://doc.rust-lang.org/std/primitive.pointer.html#method.&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>))]</span>
-		<span class="kw">pub</span> $(<span class="macro-nonterminal">$</span><span class="kw">unsafe</span>)<span class="question-mark">?</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>$(<span class="op">&lt;</span>
-			$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">lt</span>,)<span class="op">*</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">typaram</span>$(: $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">bound</span>),<span class="op">+</span>)<span class="question-mark">?</span>,)<span class="op">*</span>
-		<span class="op">&gt;</span>)<span class="question-mark">?</span>(<span class="self">self</span>$(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret</span>)<span class="question-mark">?</span> {
-			<span class="self">self</span>.<span class="ident">with_ptr</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="ident">ptr</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>),<span class="kw-2">*</span>))
+		$(@<span class="macro-nonterminal">$</span><span class="kw">unsafe</span>:<span class="macro-nonterminal">ident</span>)<span class="question-mark">?
+		</span><span class="macro-nonterminal">$name</span>:ident
+		$(&lt;
+			$(<span class="macro-nonterminal">$lt</span>:lifetime),*
+			$(<span class="macro-nonterminal">$typaram</span>:ident$(: $(<span class="macro-nonterminal">$bound</span>:ident),+ $(,)<span class="question-mark">?</span>)<span class="question-mark">?</span>),*
+			$(,)*
+		&gt;)<span class="question-mark">?
+		</span>$(, <span class="macro-nonterminal">$arg</span>:ident: <span class="macro-nonterminal">$ty</span>:ty)*
+		$(=&gt; <span class="macro-nonterminal">$ret</span>:ty)<span class="question-mark">?
+	</span>);+ $(;)<span class="question-mark">?</span>) =&gt; { $(
+		<span class="attribute">#[doc = <span class="macro">concat!</span>(<span class="string">&quot;Applies `&lt;*T&gt;::&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$name</span>), <span class="string">&quot;`.&quot;</span>)]
+		</span><span class="doccomment">///
+		/// See [original documentation][orig].
+		///
+		</span><span class="attribute">#[doc = <span class="macro">concat!</span>(<span class="string">&quot;[orig]: https://doc.rust-lang.org/std/primitive.pointer.html#method.&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$name</span>))]
+		</span><span class="kw">pub </span>$(<span class="macro-nonterminal">$</span><span class="kw">unsafe</span>)<span class="question-mark">? </span><span class="kw">fn </span><span class="macro-nonterminal">$name</span>$(&lt;
+			$(<span class="macro-nonterminal">$lt</span>,)* $(<span class="macro-nonterminal">$typaram</span>$(: $(<span class="macro-nonterminal">$bound</span>),+)<span class="question-mark">?</span>,)*
+		&gt;)<span class="question-mark">?</span>(<span class="self">self</span>$(, <span class="macro-nonterminal">$arg</span>: <span class="macro-nonterminal">$ty</span>)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$ret</span>)<span class="question-mark">? </span>{
+			<span class="self">self</span>.with_ptr(|ptr| ptr.<span class="macro-nonterminal">$name</span>($(<span class="macro-nonterminal">$arg</span>),<span class="kw-2">*</span>))
 		}
-	)<span class="op">+</span> };
+	)+ };
 }
 
-<span class="doccomment">/// Implement all other pointer functions.</span>
-<span class="macro">macro_rules!</span> <span class="ident">map</span> {
+<span class="doccomment">/// Implement all other pointer functions.
+</span><span class="macro">macro_rules! </span>map {
 	($(
-		$(@<span class="macro-nonterminal">$</span><span class="kw">unsafe</span>:<span class="macro-nonterminal">ident</span>)<span class="question-mark">?</span>
-		<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>
-		$(<span class="op">&lt;</span>
-			$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">lt</span>:<span class="ident">lifetime</span>),<span class="op">*</span>
-			$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">typaram</span>:<span class="ident">ident</span>$(: $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">bound</span>:<span class="ident">ident</span>),<span class="op">+</span> $(,)<span class="question-mark">?</span>)<span class="question-mark">?</span>),<span class="op">*</span>
-			$(,)<span class="question-mark">?</span>
-		<span class="op">&gt;</span>)<span class="question-mark">?</span>
-		$(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>:<span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>:<span class="ident">ty</span> $(<span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>:<span class="ident">expr</span>)<span class="question-mark">?</span>)<span class="op">*</span>
-		$(=&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret</span>:<span class="ident">ty</span>)<span class="question-mark">?</span>
-	);<span class="op">+</span> $(;)<span class="question-mark">?</span>) =&gt; { $(
-		<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">concat!</span>(<span class="string">&quot;Applies `&lt;*T&gt;::&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>), <span class="string">&quot;`.&quot;</span>)]</span>
-		<span class="doccomment">///</span>
-		<span class="doccomment">/// See [original documentation][orig].</span>
-		<span class="doccomment">///</span>
-		<span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">concat!</span>(<span class="string">&quot;[orig]: https://doc.rust-lang.org/std/primitive.pointer.html#method.&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>))]</span>
-		<span class="kw">pub</span> $(<span class="macro-nonterminal">$</span><span class="kw">unsafe</span>)<span class="question-mark">?</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>$(<span class="op">&lt;</span>
-			$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">lt</span>,)<span class="op">*</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">typaram</span>$(: $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">bound</span>),<span class="op">+</span>)<span class="question-mark">?</span>,)<span class="op">*</span>
-		<span class="op">&gt;</span>)<span class="question-mark">?</span>(<span class="self">self</span>$(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ty</span>)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ret</span>)<span class="question-mark">?</span> {
-			<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">as_ptr</span>().<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>$(.<span class="ident">pipe</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">map</span>))<span class="question-mark">?</span>),<span class="kw-2">*</span>)
+		$(@<span class="macro-nonterminal">$</span><span class="kw">unsafe</span>:<span class="macro-nonterminal">ident</span>)<span class="question-mark">?
+		</span><span class="macro-nonterminal">$name</span>:ident
+		$(&lt;
+			$(<span class="macro-nonterminal">$lt</span>:lifetime),*
+			$(<span class="macro-nonterminal">$typaram</span>:ident$(: $(<span class="macro-nonterminal">$bound</span>:ident),+ $(,)<span class="question-mark">?</span>)<span class="question-mark">?</span>),*
+			$(,)<span class="question-mark">?
+		</span>&gt;)<span class="question-mark">?
+		</span>$(, <span class="macro-nonterminal">$arg</span>:ident: <span class="macro-nonterminal">$ty</span>:ty $(<span class="kw">as </span><span class="macro-nonterminal">$map</span>:expr)<span class="question-mark">?</span>)*
+		$(=&gt; <span class="macro-nonterminal">$ret</span>:ty)<span class="question-mark">?
+	</span>);+ $(;)<span class="question-mark">?</span>) =&gt; { $(
+		<span class="attribute">#[doc = <span class="macro">concat!</span>(<span class="string">&quot;Applies `&lt;*T&gt;::&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$name</span>), <span class="string">&quot;`.&quot;</span>)]
+		</span><span class="doccomment">///
+		/// See [original documentation][orig].
+		///
+		</span><span class="attribute">#[doc = <span class="macro">concat!</span>(<span class="string">&quot;[orig]: https://doc.rust-lang.org/std/primitive.pointer.html#method.&quot;</span>, <span class="macro">stringify!</span>(<span class="macro-nonterminal">$name</span>))]
+		</span><span class="kw">pub </span>$(<span class="macro-nonterminal">$</span><span class="kw">unsafe</span>)<span class="question-mark">? </span><span class="kw">fn </span><span class="macro-nonterminal">$name</span>$(&lt;
+			$(<span class="macro-nonterminal">$lt</span>,)* $(<span class="macro-nonterminal">$typaram</span>$(: $(<span class="macro-nonterminal">$bound</span>),+)<span class="question-mark">?</span>,)*
+		&gt;)<span class="question-mark">?</span>(<span class="self">self</span>$(, <span class="macro-nonterminal">$arg</span>: <span class="macro-nonterminal">$ty</span>)<span class="kw-2">*</span>) $(-&gt; <span class="macro-nonterminal">$ret</span>)<span class="question-mark">? </span>{
+			<span class="self">self</span>.inner.as_ptr().<span class="macro-nonterminal">$name</span>($(<span class="macro-nonterminal">$arg</span>$(.pipe(<span class="macro-nonterminal">$map</span>))<span class="question-mark">?</span>),<span class="kw-2">*</span>)
 		}
-	)<span class="op">+</span> };
+	)+ };
 }
 
-<span class="doccomment">/// Port of the pointer inherent methods on `Address`es of `Sized` types.</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::missing_safety_doc</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">M</span>: <span class="ident">Mutability</span>
+<span class="doccomment">/// Port of the pointer inherent methods on `Address`es of `Sized` types.
+</span><span class="attribute">#[allow(clippy::missing_safety_doc)]
+</span><span class="kw">impl</span>&lt;M, T&gt; Address&lt;M, T&gt;
+<span class="kw">where </span>M: Mutability
 {
-	<span class="macro">fwd!</span> {
-		<span class="ident">cast</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span> =&gt; <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">U</span><span class="op">&gt;</span>;
-		@<span class="kw">unsafe</span> <span class="ident">offset</span>, <span class="ident">count</span>: <span class="ident">isize</span> =&gt; <span class="self">Self</span>;
-		@<span class="kw">unsafe</span> <span class="ident">add</span>, <span class="ident">count</span>: <span class="ident">usize</span> =&gt; <span class="self">Self</span>;
-		@<span class="kw">unsafe</span> <span class="ident">sub</span>, <span class="ident">count</span>: <span class="ident">usize</span> =&gt; <span class="self">Self</span>;
-		<span class="ident">wrapping_offset</span>, <span class="ident">count</span>: <span class="ident">isize</span> =&gt; <span class="self">Self</span>;
-		<span class="ident">wrapping_add</span>, <span class="ident">count</span>: <span class="ident">usize</span> =&gt; <span class="self">Self</span>;
-		<span class="ident">wrapping_sub</span>, <span class="ident">count</span>: <span class="ident">usize</span> =&gt; <span class="self">Self</span>;
+	<span class="macro">fwd! </span>{
+		cast&lt;U&gt; =&gt; Address&lt;M, U&gt;;
+		@<span class="kw">unsafe </span>offset, count: isize =&gt; <span class="self">Self</span>;
+		@<span class="kw">unsafe </span>add, count: usize =&gt; <span class="self">Self</span>;
+		@<span class="kw">unsafe </span>sub, count: usize =&gt; <span class="self">Self</span>;
+		wrapping_offset, count: isize =&gt; <span class="self">Self</span>;
+		wrapping_add, count: usize =&gt; <span class="self">Self</span>;
+		wrapping_sub, count: usize =&gt; <span class="self">Self</span>;
 	}
 
-	<span class="macro">map!</span> {
-		@<span class="kw">unsafe</span> <span class="ident">offset_from</span>, <span class="ident">origin</span>: <span class="self">Self</span> <span class="kw">as</span> <span class="op">|</span><span class="ident">orig</span><span class="op">|</span> <span class="ident">orig</span>.<span class="ident">to_const</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">T</span> =&gt; <span class="ident">isize</span>;
-		@<span class="kw">unsafe</span> <span class="ident">read</span> =&gt; <span class="ident">T</span>;
-		@<span class="kw">unsafe</span> <span class="ident">read_volatile</span> =&gt; <span class="ident">T</span>;
-		@<span class="kw">unsafe</span> <span class="ident">read_unaligned</span> =&gt; <span class="ident">T</span>;
-		@<span class="kw">unsafe</span> <span class="ident">copy_to</span>, <span class="ident">dest</span>: <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">Mut</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">Address::to_mut</span>, <span class="ident">count</span>: <span class="ident">usize</span>;
-		@<span class="kw">unsafe</span> <span class="ident">copy_to_nonoverlapping</span>, <span class="ident">dest</span>: <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">Mut</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">Address::to_mut</span>, <span class="ident">count</span>: <span class="ident">usize</span>;
-		<span class="ident">align_offset</span>, <span class="ident">align</span>: <span class="ident">usize</span> =&gt; <span class="ident">usize</span>;
+	<span class="macro">map! </span>{
+		@<span class="kw">unsafe </span>offset_from, origin: <span class="self">Self </span><span class="kw">as </span>|orig| orig.to_const() <span class="kw">as </span><span class="kw-2">*mut </span>T =&gt; isize;
+		@<span class="kw">unsafe </span>read =&gt; T;
+		@<span class="kw">unsafe </span>read_volatile =&gt; T;
+		@<span class="kw">unsafe </span>read_unaligned =&gt; T;
+		@<span class="kw">unsafe </span>copy_to, dest: Address&lt;Mut, T&gt; <span class="kw">as </span>Address::to_mut, count: usize;
+		@<span class="kw">unsafe </span>copy_to_nonoverlapping, dest: Address&lt;Mut, T&gt; <span class="kw">as </span>Address::to_mut, count: usize;
+		align_offset, align: usize =&gt; usize;
 	}
 }
 
-<span class="doccomment">/// Port of the pointer inherent methods on `Address`es of any type.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
+<span class="doccomment">/// Port of the pointer inherent methods on `Address`es of any type.
+</span><span class="kw">impl</span>&lt;M, T&gt; Address&lt;M, T&gt;
+<span class="kw">where
+	</span>M: Mutability,
+	T: <span class="question-mark">?</span>Sized,
 {
-	<span class="macro">map!</span> {
-		@<span class="kw">unsafe</span> <span class="ident">as_ref</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> =&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span>;
+	<span class="macro">map! </span>{
+		@<span class="kw">unsafe </span>as_ref&lt;<span class="lifetime">&#39;a</span>&gt; =&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T&gt;;
 	}
 
-	<span class="doccomment">/// Applies a pointer -&gt; pointer function within an Address -&gt; Address.</span>
-	<span class="attribute">#[<span class="ident">track_caller</span>]</span>
-	<span class="kw">fn</span> <span class="ident">with_ptr</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">func</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">*mut</span> <span class="ident">T</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">U</span>) -&gt; <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">U</span><span class="op">&gt;</span> {
-		<span class="self">self</span>.<span class="ident">inner</span>
-			.<span class="ident">as_ptr</span>()
-			.<span class="ident">pipe</span>(<span class="ident">func</span>)
-			.<span class="ident">pipe</span>(<span class="ident">NonNull::new</span>)
-			.<span class="ident">unwrap</span>()
-			.<span class="ident">pipe</span>(<span class="ident">Address::new</span>)
-	}
-}
-
-<span class="doccomment">/// Port of pointer inherent methods on mutable `Address`es of sized types.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">Mut</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-	<span class="macro">map!</span> {
-		@<span class="kw">unsafe</span> <span class="ident">copy_from</span><span class="op">&lt;</span><span class="ident">M2</span>: <span class="ident">Mutability</span><span class="op">&gt;</span>, <span class="ident">src</span>: <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">M2</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">Address::to_const</span>, <span class="ident">count</span>: <span class="ident">usize</span>;
-		@<span class="kw">unsafe</span> <span class="ident">copy_from_nonoverlapping</span><span class="op">&lt;</span><span class="ident">M2</span>: <span class="ident">Mutability</span><span class="op">&gt;</span>, <span class="ident">src</span>: <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">M2</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">Address::to_const</span>, <span class="ident">count</span>: <span class="ident">usize</span>;
-		@<span class="kw">unsafe</span> <span class="ident">write</span>, <span class="ident">value</span>: <span class="ident">T</span>;
-		@<span class="kw">unsafe</span> <span class="ident">write_volatile</span>, <span class="ident">value</span>: <span class="ident">T</span>;
-		@<span class="kw">unsafe</span> <span class="ident">write_unaligned</span>, <span class="ident">value</span>: <span class="ident">T</span>;
-		@<span class="kw">unsafe</span> <span class="ident">replace</span>, <span class="ident">src</span>: <span class="ident">T</span> =&gt; <span class="ident">T</span>;
-		@<span class="kw">unsafe</span> <span class="ident">swap</span>, <span class="ident">with</span>: <span class="self">Self</span> <span class="kw">as</span> <span class="ident"><span class="self">Self</span>::to_mut</span>;
+	<span class="doccomment">/// Applies a pointer -&gt; pointer function within an Address -&gt; Address.
+	</span><span class="attribute">#[track_caller]
+	</span><span class="kw">fn </span>with_ptr&lt;U&gt;(<span class="self">self</span>, func: <span class="kw">impl </span>FnOnce(<span class="kw-2">*mut </span>T) -&gt; <span class="kw-2">*mut </span>U) -&gt; Address&lt;M, U&gt; {
+		<span class="self">self</span>.inner
+			.as_ptr()
+			.pipe(func)
+			.pipe(NonNull::new)
+			.unwrap()
+			.pipe(Address::new)
 	}
 }
 
-<span class="doccomment">/// Port of pointer inherent methods on mutable `Address`es of any type.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">Mut</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span>
+<span class="doccomment">/// Port of pointer inherent methods on mutable `Address`es of sized types.
+</span><span class="kw">impl</span>&lt;T&gt; Address&lt;Mut, T&gt; {
+	<span class="macro">map! </span>{
+		@<span class="kw">unsafe </span>copy_from&lt;M2: Mutability&gt;, src: Address&lt;M2, T&gt; <span class="kw">as </span>Address::to_const, count: usize;
+		@<span class="kw">unsafe </span>copy_from_nonoverlapping&lt;M2: Mutability&gt;, src: Address&lt;M2, T&gt; <span class="kw">as </span>Address::to_const, count: usize;
+		@<span class="kw">unsafe </span>write, value: T;
+		@<span class="kw">unsafe </span>write_volatile, value: T;
+		@<span class="kw">unsafe </span>write_unaligned, value: T;
+		@<span class="kw">unsafe </span>replace, src: T =&gt; T;
+		@<span class="kw">unsafe </span>swap, with: <span class="self">Self </span><span class="kw">as </span><span class="self">Self</span>::to_mut;
+	}
+}
+
+<span class="doccomment">/// Port of pointer inherent methods on mutable `Address`es of any type.
+</span><span class="kw">impl</span>&lt;T&gt; Address&lt;Mut, T&gt;
+<span class="kw">where </span>T: <span class="question-mark">?</span>Sized
 {
-	<span class="macro">map!</span> {
-		@<span class="kw">unsafe</span> <span class="ident">as_mut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> =&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">T</span><span class="op">&gt;</span>;
-		@<span class="kw">unsafe</span> <span class="ident">drop_in_place</span>;
+	<span class="macro">map! </span>{
+		@<span class="kw">unsafe </span>as_mut&lt;<span class="lifetime">&#39;a</span>&gt; =&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>T&gt;;
+		@<span class="kw">unsafe </span>drop_in_place;
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
+<span class="kw">impl</span>&lt;M, T&gt; Clone <span class="kw">for </span>Address&lt;M, T&gt;
+<span class="kw">where
+	</span>M: Mutability,
+	T: <span class="question-mark">?</span>Sized,
 {
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-		<span class="kw-2">*</span><span class="self">self</span>
+	<span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+		<span class="kw-2">*</span><span class="self">self
+	</span>}
+}
+
+<span class="kw">impl</span>&lt;T&gt; TryFrom&lt;<span class="kw-2">*const </span>T&gt; <span class="kw">for </span>Address&lt;Const, T&gt;
+<span class="kw">where </span>T: <span class="question-mark">?</span>Sized
+{
+	<span class="kw">type </span>Error = NullPtrError;
+
+	<span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>try_from(elem: <span class="kw-2">*const </span>T) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+		NonNull::new(elem <span class="kw">as </span><span class="kw-2">*mut </span>T)
+			.ok_or(NullPtrError)
+			.map(<span class="self">Self</span>::new)
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">*const</span> <span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">Const</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span>
+<span class="kw">impl</span>&lt;T&gt; From&lt;<span class="kw-2">&amp;</span>T&gt; <span class="kw">for </span>Address&lt;Const, T&gt;
+<span class="kw">where </span>T: <span class="question-mark">?</span>Sized
 {
-	<span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">NullPtrError</span>;
-
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">elem</span>: <span class="kw-2">*const</span> <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-		<span class="ident">NonNull::new</span>(<span class="ident">elem</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">T</span>)
-			.<span class="ident">ok_or</span>(<span class="ident">NullPtrError</span>)
-			.<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::new</span>)
+	<span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>from(elem: <span class="kw-2">&amp;</span>T) -&gt; <span class="self">Self </span>{
+		<span class="self">Self</span>::new(elem.into())
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">Const</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span>
+<span class="kw">impl</span>&lt;T&gt; TryFrom&lt;<span class="kw-2">*mut </span>T&gt; <span class="kw">for </span>Address&lt;Mut, T&gt;
+<span class="kw">where </span>T: <span class="question-mark">?</span>Sized
 {
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">elem</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-		<span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">elem</span>.<span class="ident">into</span>())
+	<span class="kw">type </span>Error = NullPtrError;
+
+	<span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>try_from(elem: <span class="kw-2">*mut </span>T) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Error&gt; {
+		NonNull::new(elem).ok_or(NullPtrError).map(<span class="self">Self</span>::new)
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">*mut</span> <span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">Mut</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span>
+<span class="kw">impl</span>&lt;T&gt; From&lt;<span class="kw-2">&amp;mut </span>T&gt; <span class="kw">for </span>Address&lt;Mut, T&gt;
+<span class="kw">where </span>T: <span class="question-mark">?</span>Sized
 {
-	<span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">NullPtrError</span>;
-
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">elem</span>: <span class="kw-2">*mut</span> <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span> {
-		<span class="ident">NonNull::new</span>(<span class="ident">elem</span>).<span class="ident">ok_or</span>(<span class="ident">NullPtrError</span>).<span class="ident">map</span>(<span class="ident"><span class="self">Self</span>::new</span>)
+	<span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>from(elem: <span class="kw-2">&amp;mut </span>T) -&gt; <span class="self">Self </span>{
+		<span class="self">Self</span>::new(elem.into())
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">Mut</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span>
-{
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">elem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-		<span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">elem</span>.<span class="ident">into</span>())
-	}
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">M</span>: <span class="ident">Mutability</span>
-{
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M1</span>, <span class="ident">M2</span>, <span class="ident">T1</span>, <span class="ident">T2</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">Address</span><span class="op">&lt;</span><span class="ident">M2</span>, <span class="ident">T2</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">M1</span>, <span class="ident">T1</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">M1</span>: <span class="ident">Mutability</span>,
-	<span class="ident">M2</span>: <span class="ident">Mutability</span>,
-{
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Address</span><span class="op">&lt;</span><span class="ident">M2</span>, <span class="ident">T2</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-		<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">inner</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>
-	}
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">M</span>: <span class="ident">Mutability</span>
-{
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">cmp::Ordering</span> {
-		<span class="self">self</span>.<span class="ident">partial_cmp</span>(<span class="ident">other</span>)
-			.<span class="ident">expect</span>(<span class="string">&quot;Addresses have a total ordering&quot;</span>)
-	}
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M1</span>, <span class="ident">M2</span>, <span class="ident">T1</span>, <span class="ident">T2</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">Address</span><span class="op">&lt;</span><span class="ident">M2</span>, <span class="ident">T2</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">M1</span>, <span class="ident">T1</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">M1</span>: <span class="ident">Mutability</span>,
-	<span class="ident">M2</span>: <span class="ident">Mutability</span>,
-{
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Address</span><span class="op">&lt;</span><span class="ident">M2</span>, <span class="ident">T2</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">cmp::Ordering</span><span class="op">&gt;</span> {
-		(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>)
-			.<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span>(<span class="ident">other</span>.<span class="ident">inner</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="ident">usize</span>))
-	}
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
-{
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-		<span class="ident">Debug::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">to_const</span>(), <span class="ident">fmt</span>)
-	}
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Pointer</span> <span class="kw">for</span> <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
-{
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-		<span class="ident">Pointer::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">to_const</span>(), <span class="ident">fmt</span>)
-	}
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Hash</span> <span class="kw">for</span> <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
-{
-	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-	<span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">H</span>)
-	<span class="kw">where</span> <span class="ident">H</span>: <span class="ident">Hasher</span> {
-		<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">hash</span>(<span class="ident">state</span>)
-	}
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Copy</span> <span class="kw">for</span> <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
+<span class="kw">impl</span>&lt;M, T&gt; Eq <span class="kw">for </span>Address&lt;M, T&gt; <span class="kw">where </span>M: Mutability
 {
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident"><span class="self">self</span>::seal::Sealed</span> <span class="kw">for</span> <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
+<span class="kw">impl</span>&lt;M1, M2, T1, T2&gt; PartialEq&lt;Address&lt;M2, T2&gt;&gt; <span class="kw">for </span>Address&lt;M1, T1&gt;
+<span class="kw">where
+	</span>M1: Mutability,
+	M2: Mutability,
+{
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Address&lt;M2, T2&gt;) -&gt; bool {
+		<span class="self">self</span>.inner.as_ptr() <span class="kw">as </span>usize == other.inner.as_ptr() <span class="kw">as </span>usize
+	}
+}
+
+<span class="kw">impl</span>&lt;M, T&gt; Ord <span class="kw">for </span>Address&lt;M, T&gt;
+<span class="kw">where </span>M: Mutability
+{
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; cmp::Ordering {
+		<span class="self">self</span>.partial_cmp(other)
+			.expect(<span class="string">&quot;Addresses have a total ordering&quot;</span>)
+	}
+}
+
+<span class="kw">impl</span>&lt;M1, M2, T1, T2&gt; PartialOrd&lt;Address&lt;M2, T2&gt;&gt; <span class="kw">for </span>Address&lt;M1, T1&gt;
+<span class="kw">where
+	</span>M1: Mutability,
+	M2: Mutability,
+{
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Address&lt;M2, T2&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;cmp::Ordering&gt; {
+		(<span class="self">self</span>.inner.as_ptr() <span class="kw">as </span>usize)
+			.partial_cmp(<span class="kw-2">&amp;</span>(other.inner.as_ptr() <span class="kw">as </span>usize))
+	}
+}
+
+<span class="kw">impl</span>&lt;M, T&gt; Debug <span class="kw">for </span>Address&lt;M, T&gt;
+<span class="kw">where
+	</span>M: Mutability,
+	T: <span class="question-mark">?</span>Sized,
+{
+	<span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>Formatter) -&gt; fmt::Result {
+		Debug::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.to_const(), fmt)
+	}
+}
+
+<span class="kw">impl</span>&lt;M, T&gt; Pointer <span class="kw">for </span>Address&lt;M, T&gt;
+<span class="kw">where
+	</span>M: Mutability,
+	T: <span class="question-mark">?</span>Sized,
+{
+	<span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>Formatter) -&gt; fmt::Result {
+		Pointer::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.to_const(), fmt)
+	}
+}
+
+<span class="kw">impl</span>&lt;M, T&gt; Hash <span class="kw">for </span>Address&lt;M, T&gt;
+<span class="kw">where
+	</span>M: Mutability,
+	T: <span class="question-mark">?</span>Sized,
+{
+	<span class="attribute">#[inline(always)]
+	</span><span class="kw">fn </span>hash&lt;H&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, state: <span class="kw-2">&amp;mut </span>H)
+	<span class="kw">where </span>H: Hasher {
+		<span class="self">self</span>.inner.hash(state)
+	}
+}
+
+<span class="kw">impl</span>&lt;M, T&gt; Copy <span class="kw">for </span>Address&lt;M, T&gt;
+<span class="kw">where
+	</span>M: Mutability,
+	T: <span class="question-mark">?</span>Sized,
 {
 }
 
-<span class="doccomment">/// Allows an `Address` to produce an ordinary reference.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Referential</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>: <span class="ident"><span class="self">self</span>::seal::Sealed</span> {
-	<span class="doccomment">/// The created reference type. Must be one of `&amp;T` or `&amp;mut T`.</span>
-	<span class="kw">type</span> <span class="ident">Ref</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">Deref</span>;
-
-	<span class="doccomment">/// Converts the `Address` to a reference.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ## Safety</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// The caller is responsible for ensuring that the memory location that the</span>
-	<span class="doccomment">/// `Address` describes contains an initialized value, and that the produced</span>
-	<span class="doccomment">/// reference abides by the Rust `&amp;`/`&amp;mut` exclusion rules.</span>
-	<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">to_ref</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Ref</span>;
-
-	<span class="doccomment">/// Converts a reference back into an `Address`.</span>
-	<span class="kw">fn</span> <span class="ident">from_ref</span>(<span class="ident">this</span>: <span class="ident"><span class="self">Self</span>::Ref</span>) -&gt; <span class="self">Self</span>;
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Referential</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">Const</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">T</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>
+<span class="kw">impl</span>&lt;M, T&gt; <span class="self">self</span>::seal::Sealed <span class="kw">for </span>Address&lt;M, T&gt;
+<span class="kw">where
+	</span>M: Mutability,
+	T: <span class="question-mark">?</span>Sized,
 {
-	<span class="kw">type</span> <span class="ident">Ref</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>;
-
-	<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">to_ref</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Ref</span> {
-		<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">as_ref</span>()
-	}
-
-	<span class="kw">fn</span> <span class="ident">from_ref</span>(<span class="ident">this</span>: <span class="ident"><span class="self">Self</span>::Ref</span>) -&gt; <span class="self">Self</span> {
-		<span class="ident">this</span>.<span class="ident">into</span>()
-	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Referential</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">Mut</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">T</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>
+<span class="doccomment">/// Allows an `Address` to produce an ordinary reference.
+</span><span class="kw">pub trait </span>Referential&lt;<span class="lifetime">&#39;a</span>&gt;: <span class="self">self</span>::seal::Sealed {
+	<span class="doccomment">/// The created reference type. Must be one of `&amp;T` or `&amp;mut T`.
+	</span><span class="kw">type </span>Ref: <span class="lifetime">&#39;a </span>+ Deref;
+
+	<span class="doccomment">/// Converts the `Address` to a reference.
+	///
+	/// ## Safety
+	///
+	/// The caller is responsible for ensuring that the memory location that the
+	/// `Address` describes contains an initialized value, and that the produced
+	/// reference abides by the Rust `&amp;`/`&amp;mut` exclusion rules.
+	</span><span class="kw">unsafe fn </span>to_ref(<span class="self">self</span>) -&gt; <span class="self">Self</span>::Ref;
+
+	<span class="doccomment">/// Converts a reference back into an `Address`.
+	</span><span class="kw">fn </span>from_ref(this: <span class="self">Self</span>::Ref) -&gt; <span class="self">Self</span>;
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; Referential&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>Address&lt;Const, T&gt;
+<span class="kw">where </span>T: <span class="lifetime">&#39;a </span>+ <span class="question-mark">?</span>Sized
 {
-	<span class="kw">type</span> <span class="ident">Ref</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">T</span>;
+	<span class="kw">type </span>Ref = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T;
 
-	<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">to_ref</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Ref</span> {
-		<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">as_mut</span>()
+	<span class="kw">unsafe fn </span>to_ref(<span class="self">self</span>) -&gt; <span class="self">Self</span>::Ref {
+		<span class="self">self</span>.inner.as_ref()
 	}
 
-	<span class="kw">fn</span> <span class="ident">from_ref</span>(<span class="ident">this</span>: <span class="ident"><span class="self">Self</span>::Ref</span>) -&gt; <span class="self">Self</span> {
-		<span class="ident">this</span>.<span class="ident">into</span>()
+	<span class="kw">fn </span>from_ref(this: <span class="self">Self</span>::Ref) -&gt; <span class="self">Self </span>{
+		this.into()
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">M</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Referential</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">Frozen</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">T</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; Referential&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>Address&lt;Mut, T&gt;
+<span class="kw">where </span>T: <span class="lifetime">&#39;a </span>+ <span class="question-mark">?</span>Sized
 {
-	<span class="kw">type</span> <span class="ident">Ref</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>;
+	<span class="kw">type </span>Ref = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>T;
 
-	<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">to_ref</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Ref</span> {
-		<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">as_ref</span>()
+	<span class="kw">unsafe fn </span>to_ref(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Ref {
+		<span class="self">self</span>.inner.as_mut()
 	}
 
-	<span class="kw">fn</span> <span class="ident">from_ref</span>(<span class="ident">this</span>: <span class="ident"><span class="self">Self</span>::Ref</span>) -&gt; <span class="self">Self</span> {
-		<span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">NonNull::from</span>(<span class="ident">this</span>))
+	<span class="kw">fn </span>from_ref(this: <span class="self">Self</span>::Ref) -&gt; <span class="self">Self </span>{
+		this.into()
 	}
 }
 
-<span class="doccomment">/// A generically-mutable reference.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Reference</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">M</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">Address</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">Referential</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Ref</span>;
-
-<span class="doccomment">/// Allows an `Address&lt;M, [T]&gt;` to produce an ordinary slice reference.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">SliceReferential</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>: <span class="ident">Referential</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident"><span class="self">self</span>::seal::Sealed</span> {
-	<span class="doccomment">/// The type of the element pointer.</span>
-	<span class="kw">type</span> <span class="ident">ElementAddr</span>;
-
-	<span class="doccomment">/// Constructs an ordinary slice reference from a base-address and a length.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ## Parameters</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// - `ptr`: The address of the base element in the slice.</span>
-	<span class="doccomment">/// - `len`: The number of elements, beginning at `ptr`, in the slice.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// ## Safety</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// The base address and the element count must describe a valid region of</span>
-	<span class="doccomment">/// memory.</span>
-	<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw_parts</span>(<span class="ident">ptr</span>: <span class="ident"><span class="self">Self</span>::ElementAddr</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident"><span class="self">Self</span>::Ref</span>;
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">SliceReferential</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">Const</span>, [<span class="ident">T</span>]<span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">T</span>: <span class="lifetime">&#39;a</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, M, T&gt; Referential&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>Address&lt;Frozen&lt;M&gt;, T&gt;
+<span class="kw">where
+	</span>M: Mutability,
+	T: <span class="lifetime">&#39;a </span>+ <span class="question-mark">?</span>Sized,
 {
-	<span class="kw">type</span> <span class="ident">ElementAddr</span> <span class="op">=</span> <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">Const</span>, <span class="ident">T</span><span class="op">&gt;</span>;
+	<span class="kw">type </span>Ref = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T;
 
-	<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw_parts</span>(<span class="ident">ptr</span>: <span class="ident"><span class="self">Self</span>::ElementAddr</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident"><span class="self">Self</span>::Ref</span> {
-		<span class="ident">slice::from_raw_parts</span>(<span class="ident">ptr</span>.<span class="ident">to_const</span>(), <span class="ident">len</span>)
+	<span class="kw">unsafe fn </span>to_ref(<span class="self">self</span>) -&gt; <span class="self">Self</span>::Ref {
+		<span class="self">self</span>.inner.as_ref()
+	}
+
+	<span class="kw">fn </span>from_ref(this: <span class="self">Self</span>::Ref) -&gt; <span class="self">Self </span>{
+		<span class="self">Self</span>::new(NonNull::from(this))
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">M</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">SliceReferential</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">Frozen</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, [<span class="ident">T</span>]<span class="op">&gt;</span>
-<span class="kw">where</span>
-	<span class="ident">M</span>: <span class="ident">Mutability</span>,
-	<span class="ident">T</span>: <span class="lifetime">&#39;a</span>,
+<span class="doccomment">/// A generically-mutable reference.
+</span><span class="kw">pub type </span>Reference&lt;<span class="lifetime">&#39;a</span>, M, T&gt; = &lt;Address&lt;M, T&gt; <span class="kw">as </span>Referential&lt;<span class="lifetime">&#39;a</span>&gt;&gt;::Ref;
+
+<span class="doccomment">/// Allows an `Address&lt;M, [T]&gt;` to produce an ordinary slice reference.
+</span><span class="kw">pub trait </span>SliceReferential&lt;<span class="lifetime">&#39;a</span>&gt;: Referential&lt;<span class="lifetime">&#39;a</span>&gt; + <span class="self">self</span>::seal::Sealed {
+	<span class="doccomment">/// The type of the element pointer.
+	</span><span class="kw">type </span>ElementAddr;
+
+	<span class="doccomment">/// Constructs an ordinary slice reference from a base-address and a length.
+	///
+	/// ## Parameters
+	///
+	/// - `ptr`: The address of the base element in the slice.
+	/// - `len`: The number of elements, beginning at `ptr`, in the slice.
+	///
+	/// ## Safety
+	///
+	/// The base address and the element count must describe a valid region of
+	/// memory.
+	</span><span class="kw">unsafe fn </span>from_raw_parts(ptr: <span class="self">Self</span>::ElementAddr, len: usize) -&gt; <span class="self">Self</span>::Ref;
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; SliceReferential&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>Address&lt;Const, [T]&gt;
+<span class="kw">where </span>T: <span class="lifetime">&#39;a
+</span>{
+	<span class="kw">type </span>ElementAddr = Address&lt;Const, T&gt;;
+
+	<span class="kw">unsafe fn </span>from_raw_parts(ptr: <span class="self">Self</span>::ElementAddr, len: usize) -&gt; <span class="self">Self</span>::Ref {
+		slice::from_raw_parts(ptr.to_const(), len)
+	}
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, M, T&gt; SliceReferential&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>Address&lt;Frozen&lt;M&gt;, [T]&gt;
+<span class="kw">where
+	</span>M: Mutability,
+	T: <span class="lifetime">&#39;a</span>,
 {
-	<span class="kw">type</span> <span class="ident">ElementAddr</span> <span class="op">=</span> <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">Frozen</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>, <span class="ident">T</span><span class="op">&gt;</span>;
+	<span class="kw">type </span>ElementAddr = Address&lt;Frozen&lt;M&gt;, T&gt;;
 
-	<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw_parts</span>(<span class="ident">ptr</span>: <span class="ident"><span class="self">Self</span>::ElementAddr</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident"><span class="self">Self</span>::Ref</span> {
-		<span class="ident">slice::from_raw_parts</span>(<span class="ident">ptr</span>.<span class="ident">to_const</span>(), <span class="ident">len</span>)
+	<span class="kw">unsafe fn </span>from_raw_parts(ptr: <span class="self">Self</span>::ElementAddr, len: usize) -&gt; <span class="self">Self</span>::Ref {
+		slice::from_raw_parts(ptr.to_const(), len)
 	}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">SliceReferential</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">Mut</span>, [<span class="ident">T</span>]<span class="op">&gt;</span>
-<span class="kw">where</span> <span class="ident">T</span>: <span class="lifetime">&#39;a</span>
-{
-	<span class="kw">type</span> <span class="ident">ElementAddr</span> <span class="op">=</span> <span class="ident">Address</span><span class="op">&lt;</span><span class="ident">Mut</span>, <span class="ident">T</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; SliceReferential&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>Address&lt;Mut, [T]&gt;
+<span class="kw">where </span>T: <span class="lifetime">&#39;a
+</span>{
+	<span class="kw">type </span>ElementAddr = Address&lt;Mut, T&gt;;
 
-	<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw_parts</span>(<span class="ident">ptr</span>: <span class="ident"><span class="self">Self</span>::ElementAddr</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="ident"><span class="self">Self</span>::Ref</span> {
-		<span class="ident">slice::from_raw_parts_mut</span>(<span class="ident">ptr</span>.<span class="ident">to_mut</span>(), <span class="ident">len</span>)
+	<span class="kw">unsafe fn </span>from_raw_parts(ptr: <span class="self">Self</span>::ElementAddr, len: usize) -&gt; <span class="self">Self</span>::Ref {
+		slice::from_raw_parts_mut(ptr.to_mut(), len)
 	}
 }
 
-<span class="doccomment">/// [`Address`] cannot be constructed over null pointers.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NullPtrError</span>;
+<span class="doccomment">/// [`Address`] cannot be constructed over null pointers.
+</span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+</span><span class="kw">pub struct </span>NullPtrError;
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">NullPtrError</span> {
-	<span class="attribute">#[<span class="ident">inline</span>]</span>
-	<span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-		<span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;wyz::Address cannot contain a null pointer&quot;</span>)
+<span class="kw">impl </span>Display <span class="kw">for </span>NullPtrError {
+	<span class="attribute">#[inline]
+	</span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>Formatter) -&gt; fmt::Result {
+		<span class="macro">write!</span>(fmt, <span class="string">&quot;wyz::Address cannot contain a null pointer&quot;</span>)
 	}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">NullPtrError</span> {
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">impl </span>std::error::Error <span class="kw">for </span>NullPtrError {
 }
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">mod</span> <span class="ident">seal</span> {
-	<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-	<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Sealed</span> {}
+<span class="attribute">#[doc(hidden)]
+</span><span class="kw">mod </span>seal {
+	<span class="attribute">#[doc(hidden)]
+	</span><span class="kw">pub trait </span>Sealed {}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="wyz" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="wyz" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/metrics/src/recorder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>recorder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../query_engine_metrics/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../query_engine_metrics/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../query_engine_metrics/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/metrics/src/recorder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>recorder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../query_engine_metrics/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../query_engine_metrics/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../query_engine_metrics/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -120,127 +120,127 @@
 <span id="120">120</span>
 <span id="121">121</span>
 <span id="122">122</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::sync::Arc;
 
-<span class="kw">use</span> <span class="ident">metrics::KeyName</span>;
-<span class="kw">use</span> <span class="ident">metrics</span>::{<span class="ident">Counter</span>, <span class="ident">CounterFn</span>, <span class="ident">Gauge</span>, <span class="ident">GaugeFn</span>, <span class="ident">Histogram</span>, <span class="ident">HistogramFn</span>, <span class="ident">Key</span>, <span class="ident">Recorder</span>, <span class="ident">Unit</span>};
-<span class="kw">use</span> <span class="ident">tracing::trace</span>;
+<span class="kw">use </span>metrics::KeyName;
+<span class="kw">use </span>metrics::{Counter, CounterFn, Gauge, GaugeFn, Histogram, HistogramFn, Key, Recorder, Unit};
+<span class="kw">use </span>tracing::trace;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::common::KeyLabels</span>;
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">METRIC_COUNTER</span>, <span class="ident">METRIC_DESCRIPTION</span>, <span class="ident">METRIC_GAUGE</span>, <span class="ident">METRIC_HISTOGRAM</span>, <span class="ident">METRIC_TARGET</span>};
+<span class="kw">use </span><span class="kw">super</span>::common::KeyLabels;
+<span class="kw">use super</span>::{METRIC_COUNTER, METRIC_DESCRIPTION, METRIC_GAUGE, METRIC_HISTOGRAM, METRIC_TARGET};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">MetricRecorder</span>;
+<span class="attribute">#[derive(Default)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>MetricRecorder;
 
-<span class="kw">impl</span> <span class="ident">MetricRecorder</span> {
-    <span class="kw">fn</span> <span class="ident">register_description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">description</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
+<span class="kw">impl </span>MetricRecorder {
+    <span class="kw">fn </span>register_description(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str, description: <span class="kw-2">&amp;</span>str) {
         <span class="macro">trace!</span>(
-            <span class="ident">target</span>: <span class="ident">METRIC_TARGET</span>,
-            <span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>,
-            <span class="ident">metric_type</span> <span class="op">=</span> <span class="ident">METRIC_DESCRIPTION</span>,
-            <span class="ident">description</span> <span class="op">=</span> <span class="ident">description</span>
+            target: METRIC_TARGET,
+            name = name,
+            metric_type = METRIC_DESCRIPTION,
+            description = description
         );
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Recorder</span> <span class="kw">for</span> <span class="ident">MetricRecorder</span> {
-    <span class="kw">fn</span> <span class="ident">describe_counter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key_name</span>: <span class="ident">KeyName</span>, <span class="ident">_unit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Unit</span><span class="op">&gt;</span>, <span class="ident">description</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) {
-        <span class="self">self</span>.<span class="ident">register_description</span>(<span class="ident">key_name</span>.<span class="ident">as_str</span>(), <span class="ident">description</span>);
+<span class="kw">impl </span>Recorder <span class="kw">for </span>MetricRecorder {
+    <span class="kw">fn </span>describe_counter(<span class="kw-2">&amp;</span><span class="self">self</span>, key_name: KeyName, _unit: <span class="prelude-ty">Option</span>&lt;Unit&gt;, description: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) {
+        <span class="self">self</span>.register_description(key_name.as_str(), description);
     }
 
-    <span class="kw">fn</span> <span class="ident">describe_gauge</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key_name</span>: <span class="ident">KeyName</span>, <span class="ident">_unit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Unit</span><span class="op">&gt;</span>, <span class="ident">description</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) {
-        <span class="self">self</span>.<span class="ident">register_description</span>(<span class="ident">key_name</span>.<span class="ident">as_str</span>(), <span class="ident">description</span>);
+    <span class="kw">fn </span>describe_gauge(<span class="kw-2">&amp;</span><span class="self">self</span>, key_name: KeyName, _unit: <span class="prelude-ty">Option</span>&lt;Unit&gt;, description: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) {
+        <span class="self">self</span>.register_description(key_name.as_str(), description);
     }
 
-    <span class="kw">fn</span> <span class="ident">describe_histogram</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key_name</span>: <span class="ident">KeyName</span>, <span class="ident">_unit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Unit</span><span class="op">&gt;</span>, <span class="ident">description</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) {
-        <span class="self">self</span>.<span class="ident">register_description</span>(<span class="ident">key_name</span>.<span class="ident">as_str</span>(), <span class="ident">description</span>);
+    <span class="kw">fn </span>describe_histogram(<span class="kw-2">&amp;</span><span class="self">self</span>, key_name: KeyName, _unit: <span class="prelude-ty">Option</span>&lt;Unit&gt;, description: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) {
+        <span class="self">self</span>.register_description(key_name.as_str(), description);
     }
 
-    <span class="kw">fn</span> <span class="ident">register_counter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Key</span>) -&gt; <span class="ident">Counter</span> {
-        <span class="ident">Counter::from_arc</span>(<span class="ident">Arc::new</span>(<span class="ident">MetricHandle</span>(<span class="ident">key</span>.<span class="ident">clone</span>())))
+    <span class="kw">fn </span>register_counter(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>Key) -&gt; Counter {
+        Counter::from_arc(Arc::new(MetricHandle(key.clone())))
     }
 
-    <span class="kw">fn</span> <span class="ident">register_gauge</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Key</span>) -&gt; <span class="ident">Gauge</span> {
-        <span class="ident">Gauge::from_arc</span>(<span class="ident">Arc::new</span>(<span class="ident">MetricHandle</span>(<span class="ident">key</span>.<span class="ident">clone</span>())))
+    <span class="kw">fn </span>register_gauge(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>Key) -&gt; Gauge {
+        Gauge::from_arc(Arc::new(MetricHandle(key.clone())))
     }
 
-    <span class="kw">fn</span> <span class="ident">register_histogram</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Key</span>) -&gt; <span class="ident">Histogram</span> {
-        <span class="ident">Histogram::from_arc</span>(<span class="ident">Arc::new</span>(<span class="ident">MetricHandle</span>(<span class="ident">key</span>.<span class="ident">clone</span>())))
-    }
-}
-
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">MetricHandle</span>(<span class="ident">Key</span>);
-
-<span class="kw">impl</span> <span class="ident">CounterFn</span> <span class="kw">for</span> <span class="ident">MetricHandle</span> {
-    <span class="kw">fn</span> <span class="ident">increment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u64</span>) {
-        <span class="kw">let</span> <span class="ident">keylabels</span>: <span class="ident">KeyLabels</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>().<span class="ident">into</span>();
-        <span class="kw">let</span> <span class="ident">json_string</span> <span class="op">=</span> <span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">keylabels</span>).<span class="ident">unwrap</span>();
-        <span class="macro">trace!</span>(
-            <span class="ident">target</span>: <span class="ident">METRIC_TARGET</span>,
-            <span class="ident">key_labels</span> <span class="op">=</span> <span class="ident">json_string</span>.<span class="ident">as_str</span>(),
-            <span class="ident">metric_type</span> <span class="op">=</span> <span class="ident">METRIC_COUNTER</span>,
-            <span class="ident">increment</span> <span class="op">=</span> <span class="ident">value</span>,
-        );
-    }
-
-    <span class="kw">fn</span> <span class="ident">absolute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">u64</span>) {
-        <span class="kw">let</span> <span class="ident">keylabels</span>: <span class="ident">KeyLabels</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>().<span class="ident">into</span>();
-        <span class="kw">let</span> <span class="ident">json_string</span> <span class="op">=</span> <span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">keylabels</span>).<span class="ident">unwrap</span>();
-        <span class="macro">trace!</span>(
-            <span class="ident">target</span>: <span class="ident">METRIC_TARGET</span>,
-            <span class="ident">key_labels</span> <span class="op">=</span> <span class="ident">json_string</span>.<span class="ident">as_str</span>(),
-            <span class="ident">metric_type</span> <span class="op">=</span> <span class="ident">METRIC_COUNTER</span>,
-            <span class="ident">absolute</span> <span class="op">=</span> <span class="ident">value</span>,
-        );
+    <span class="kw">fn </span>register_histogram(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>Key) -&gt; Histogram {
+        Histogram::from_arc(Arc::new(MetricHandle(key.clone())))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">GaugeFn</span> <span class="kw">for</span> <span class="ident">MetricHandle</span> {
-    <span class="kw">fn</span> <span class="ident">increment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">f64</span>) {
-        <span class="kw">let</span> <span class="ident">keylabels</span>: <span class="ident">KeyLabels</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>().<span class="ident">into</span>();
-        <span class="kw">let</span> <span class="ident">json_string</span> <span class="op">=</span> <span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">keylabels</span>).<span class="ident">unwrap</span>();
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>MetricHandle(Key);
+
+<span class="kw">impl </span>CounterFn <span class="kw">for </span>MetricHandle {
+    <span class="kw">fn </span>increment(<span class="kw-2">&amp;</span><span class="self">self</span>, value: u64) {
+        <span class="kw">let </span>keylabels: KeyLabels = <span class="self">self</span>.<span class="number">0</span>.clone().into();
+        <span class="kw">let </span>json_string = serde_json::to_string(<span class="kw-2">&amp;</span>keylabels).unwrap();
         <span class="macro">trace!</span>(
-            <span class="ident">target</span>: <span class="ident">METRIC_TARGET</span>,
-            <span class="ident">key_labels</span> <span class="op">=</span> <span class="ident">json_string</span>.<span class="ident">as_str</span>(),
-            <span class="ident">metric_type</span> <span class="op">=</span> <span class="ident">METRIC_GAUGE</span>,
-            <span class="ident">gauge_inc</span> <span class="op">=</span> <span class="ident">value</span>,
+            target: METRIC_TARGET,
+            key_labels = json_string.as_str(),
+            metric_type = METRIC_COUNTER,
+            increment = value,
         );
     }
 
-    <span class="kw">fn</span> <span class="ident">decrement</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">f64</span>) {
-        <span class="kw">let</span> <span class="ident">keylabels</span>: <span class="ident">KeyLabels</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>().<span class="ident">into</span>();
-        <span class="kw">let</span> <span class="ident">json_string</span> <span class="op">=</span> <span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">keylabels</span>).<span class="ident">unwrap</span>();
+    <span class="kw">fn </span>absolute(<span class="kw-2">&amp;</span><span class="self">self</span>, value: u64) {
+        <span class="kw">let </span>keylabels: KeyLabels = <span class="self">self</span>.<span class="number">0</span>.clone().into();
+        <span class="kw">let </span>json_string = serde_json::to_string(<span class="kw-2">&amp;</span>keylabels).unwrap();
         <span class="macro">trace!</span>(
-            <span class="ident">target</span>: <span class="ident">METRIC_TARGET</span>,
-            <span class="ident">key_labels</span> <span class="op">=</span> <span class="ident">json_string</span>.<span class="ident">as_str</span>(),
-            <span class="ident">metric_type</span> <span class="op">=</span> <span class="ident">METRIC_GAUGE</span>,
-            <span class="ident">gauge_dec</span> <span class="op">=</span> <span class="ident">value</span>,
-        );
-    }
-
-    <span class="kw">fn</span> <span class="ident">set</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">f64</span>) {
-        <span class="kw">let</span> <span class="ident">keylabels</span>: <span class="ident">KeyLabels</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>().<span class="ident">into</span>();
-        <span class="kw">let</span> <span class="ident">json_string</span> <span class="op">=</span> <span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">keylabels</span>).<span class="ident">unwrap</span>();
-        <span class="macro">trace!</span>(
-            <span class="ident">target</span>: <span class="ident">METRIC_TARGET</span>,
-            <span class="ident">key_labels</span> <span class="op">=</span> <span class="ident">json_string</span>.<span class="ident">as_str</span>(),
-            <span class="ident">metric_type</span> <span class="op">=</span> <span class="ident">METRIC_GAUGE</span>,
-            <span class="ident">gauge_set</span> <span class="op">=</span> <span class="ident">value</span>,
+            target: METRIC_TARGET,
+            key_labels = json_string.as_str(),
+            metric_type = METRIC_COUNTER,
+            absolute = value,
         );
     }
 }
 
-<span class="kw">impl</span> <span class="ident">HistogramFn</span> <span class="kw">for</span> <span class="ident">MetricHandle</span> {
-    <span class="kw">fn</span> <span class="ident">record</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">f64</span>) {
-        <span class="kw">let</span> <span class="ident">keylabels</span>: <span class="ident">KeyLabels</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>().<span class="ident">into</span>();
-        <span class="kw">let</span> <span class="ident">json_string</span> <span class="op">=</span> <span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">keylabels</span>).<span class="ident">unwrap</span>();
+<span class="kw">impl </span>GaugeFn <span class="kw">for </span>MetricHandle {
+    <span class="kw">fn </span>increment(<span class="kw-2">&amp;</span><span class="self">self</span>, value: f64) {
+        <span class="kw">let </span>keylabels: KeyLabels = <span class="self">self</span>.<span class="number">0</span>.clone().into();
+        <span class="kw">let </span>json_string = serde_json::to_string(<span class="kw-2">&amp;</span>keylabels).unwrap();
         <span class="macro">trace!</span>(
-            <span class="ident">target</span>: <span class="ident">METRIC_TARGET</span>,
-            <span class="ident">key_labels</span> <span class="op">=</span> <span class="ident">json_string</span>.<span class="ident">as_str</span>(),
-            <span class="ident">metric_type</span> <span class="op">=</span> <span class="ident">METRIC_HISTOGRAM</span>,
-            <span class="ident">hist_record</span> <span class="op">=</span> <span class="ident">value</span>,
+            target: METRIC_TARGET,
+            key_labels = json_string.as_str(),
+            metric_type = METRIC_GAUGE,
+            gauge_inc = value,
+        );
+    }
+
+    <span class="kw">fn </span>decrement(<span class="kw-2">&amp;</span><span class="self">self</span>, value: f64) {
+        <span class="kw">let </span>keylabels: KeyLabels = <span class="self">self</span>.<span class="number">0</span>.clone().into();
+        <span class="kw">let </span>json_string = serde_json::to_string(<span class="kw-2">&amp;</span>keylabels).unwrap();
+        <span class="macro">trace!</span>(
+            target: METRIC_TARGET,
+            key_labels = json_string.as_str(),
+            metric_type = METRIC_GAUGE,
+            gauge_dec = value,
+        );
+    }
+
+    <span class="kw">fn </span>set(<span class="kw-2">&amp;</span><span class="self">self</span>, value: f64) {
+        <span class="kw">let </span>keylabels: KeyLabels = <span class="self">self</span>.<span class="number">0</span>.clone().into();
+        <span class="kw">let </span>json_string = serde_json::to_string(<span class="kw-2">&amp;</span>keylabels).unwrap();
+        <span class="macro">trace!</span>(
+            target: METRIC_TARGET,
+            key_labels = json_string.as_str(),
+            metric_type = METRIC_GAUGE,
+            gauge_set = value,
+        );
+    }
+}
+
+<span class="kw">impl </span>HistogramFn <span class="kw">for </span>MetricHandle {
+    <span class="kw">fn </span>record(<span class="kw-2">&amp;</span><span class="self">self</span>, value: f64) {
+        <span class="kw">let </span>keylabels: KeyLabels = <span class="self">self</span>.<span class="number">0</span>.clone().into();
+        <span class="kw">let </span>json_string = serde_json::to_string(<span class="kw-2">&amp;</span>keylabels).unwrap();
+        <span class="macro">trace!</span>(
+            target: METRIC_TARGET,
+            key_labels = json_string.as_str(),
+            metric_type = METRIC_HISTOGRAM,
+            hist_record = value,
         );
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="query_engine_metrics" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="query_engine_metrics" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

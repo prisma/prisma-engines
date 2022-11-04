@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pretty-hex-0.3.0/src/pretty_hex.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>pretty_hex.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../pretty_hex/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../pretty_hex/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../pretty_hex/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pretty-hex-0.3.0/src/pretty_hex.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>pretty_hex.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../pretty_hex/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../pretty_hex/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../pretty_hex/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -203,210 +203,210 @@
 <span id="203">203</span>
 <span id="204">204</span>
 <span id="205">205</span>
-</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">alloc::string::String</span>;
-<span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">default::Default</span>, <span class="ident">fmt</span>};
+</pre><pre class="rust"><code><span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">use </span>alloc::string::String;
+<span class="kw">use </span>core::{default::Default, fmt};
 
-<span class="doccomment">/// Returns a one-line hexdump of `source` grouped in default format without header</span>
-<span class="doccomment">/// and ASCII column.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">simple_hex</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writer</span> <span class="op">=</span> <span class="ident">String::new</span>();
-    <span class="ident">hex_write</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writer</span>, <span class="ident">source</span>, <span class="ident">HexConfig::simple</span>()).<span class="ident">unwrap_or</span>(());
-    <span class="ident">writer</span>
+<span class="doccomment">/// Returns a one-line hexdump of `source` grouped in default format without header
+/// and ASCII column.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">pub fn </span>simple_hex&lt;T: AsRef&lt;[u8]&gt;&gt;(source: <span class="kw-2">&amp;</span>T) -&gt; String {
+    <span class="kw">let </span><span class="kw-2">mut </span>writer = String::new();
+    hex_write(<span class="kw-2">&amp;mut </span>writer, source, HexConfig::simple()).unwrap_or(());
+    writer
 }
 
-<span class="doccomment">/// Dump `source` as hex octets in default format without header and ASCII column to the `writer`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">simple_hex_write</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">W</span><span class="op">&gt;</span>(<span class="ident">writer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>, <span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">fmt::Result</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-    <span class="ident">W</span>: <span class="ident">fmt::Write</span>,
+<span class="doccomment">/// Dump `source` as hex octets in default format without header and ASCII column to the `writer`.
+</span><span class="kw">pub fn </span>simple_hex_write&lt;T, W&gt;(writer: <span class="kw-2">&amp;mut </span>W, source: <span class="kw-2">&amp;</span>T) -&gt; fmt::Result
+<span class="kw">where
+    </span>T: AsRef&lt;[u8]&gt;,
+    W: fmt::Write,
 {
-    <span class="ident">hex_write</span>(<span class="ident">writer</span>, <span class="ident">source</span>, <span class="ident">HexConfig::simple</span>())
+    hex_write(writer, source, HexConfig::simple())
 }
 
-<span class="doccomment">/// Return a multi-line hexdump in default format complete with addressing, hex digits,</span>
-<span class="doccomment">/// and ASCII representation.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pretty_hex</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writer</span> <span class="op">=</span> <span class="ident">String::new</span>();
-    <span class="ident">hex_write</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writer</span>, <span class="ident">source</span>, <span class="ident">HexConfig::default</span>()).<span class="ident">unwrap_or</span>(());
-    <span class="ident">writer</span>
+<span class="doccomment">/// Return a multi-line hexdump in default format complete with addressing, hex digits,
+/// and ASCII representation.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">pub fn </span>pretty_hex&lt;T: AsRef&lt;[u8]&gt;&gt;(source: <span class="kw-2">&amp;</span>T) -&gt; String {
+    <span class="kw">let </span><span class="kw-2">mut </span>writer = String::new();
+    hex_write(<span class="kw-2">&amp;mut </span>writer, source, HexConfig::default()).unwrap_or(());
+    writer
 }
 
-<span class="doccomment">/// Write multi-line hexdump in default format complete with addressing, hex digits,</span>
-<span class="doccomment">/// and ASCII representation to the writer.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pretty_hex_write</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">W</span><span class="op">&gt;</span>(<span class="ident">writer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>, <span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">fmt::Result</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-    <span class="ident">W</span>: <span class="ident">fmt::Write</span>,
+<span class="doccomment">/// Write multi-line hexdump in default format complete with addressing, hex digits,
+/// and ASCII representation to the writer.
+</span><span class="kw">pub fn </span>pretty_hex_write&lt;T, W&gt;(writer: <span class="kw-2">&amp;mut </span>W, source: <span class="kw-2">&amp;</span>T) -&gt; fmt::Result
+<span class="kw">where
+    </span>T: AsRef&lt;[u8]&gt;,
+    W: fmt::Write,
 {
-    <span class="ident">hex_write</span>(<span class="ident">writer</span>, <span class="ident">source</span>, <span class="ident">HexConfig::default</span>())
+    hex_write(writer, source, HexConfig::default())
 }
 
-<span class="doccomment">/// Return a hexdump of `source` in specified format.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">config_hex</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">cfg</span>: <span class="ident">HexConfig</span>) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writer</span> <span class="op">=</span> <span class="ident">String::new</span>();
-    <span class="ident">hex_write</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writer</span>, <span class="ident">source</span>, <span class="ident">cfg</span>).<span class="ident">unwrap_or</span>(());
-    <span class="ident">writer</span>
+<span class="doccomment">/// Return a hexdump of `source` in specified format.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">pub fn </span>config_hex&lt;T: AsRef&lt;[u8]&gt;&gt;(source: <span class="kw-2">&amp;</span>T, cfg: HexConfig) -&gt; String {
+    <span class="kw">let </span><span class="kw-2">mut </span>writer = String::new();
+    hex_write(<span class="kw-2">&amp;mut </span>writer, source, cfg).unwrap_or(());
+    writer
 }
 
-<span class="doccomment">/// Configuration parameters for hexdump.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HexConfig</span> {
-    <span class="doccomment">/// Write first line header with data length.</span>
-    <span class="kw">pub</span> <span class="ident">title</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Append ASCII representation column.</span>
-    <span class="kw">pub</span> <span class="ident">ascii</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// Source bytes per row. 0 for single row without address prefix.</span>
-    <span class="kw">pub</span> <span class="ident">width</span>: <span class="ident">usize</span>,
-    <span class="doccomment">/// Chunks count per group. 0 for single group (column).</span>
-    <span class="kw">pub</span> <span class="ident">group</span>: <span class="ident">usize</span>,
-    <span class="doccomment">/// Source bytes per chunk (word). 0 for single word.</span>
-    <span class="kw">pub</span> <span class="ident">chunk</span>: <span class="ident">usize</span>,
-    <span class="doccomment">/// Maximum bytes to print.</span>
-    <span class="kw">pub</span> <span class="ident">max_bytes</span>: <span class="ident">usize</span>,
+<span class="doccomment">/// Configuration parameters for hexdump.
+</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+</span><span class="kw">pub struct </span>HexConfig {
+    <span class="doccomment">/// Write first line header with data length.
+    </span><span class="kw">pub </span>title: bool,
+    <span class="doccomment">/// Append ASCII representation column.
+    </span><span class="kw">pub </span>ascii: bool,
+    <span class="doccomment">/// Source bytes per row. 0 for single row without address prefix.
+    </span><span class="kw">pub </span>width: usize,
+    <span class="doccomment">/// Chunks count per group. 0 for single group (column).
+    </span><span class="kw">pub </span>group: usize,
+    <span class="doccomment">/// Source bytes per chunk (word). 0 for single word.
+    </span><span class="kw">pub </span>chunk: usize,
+    <span class="doccomment">/// Maximum bytes to print.
+    </span><span class="kw">pub </span>max_bytes: usize,
 }
 
-<span class="doccomment">/// Default configuration with `title`, `ascii`, 16 source bytes `width` grouped to 4 separate</span>
-<span class="doccomment">/// hex bytes. Using in `pretty_hex`, `pretty_hex_write` and `fmt::Debug` implementation.</span>
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">HexConfig</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">HexConfig</span> {
-        <span class="ident">HexConfig</span> {
-            <span class="ident">title</span>: <span class="bool-val">true</span>,
-            <span class="ident">ascii</span>: <span class="bool-val">true</span>,
-            <span class="ident">width</span>: <span class="number">16</span>,
-            <span class="ident">group</span>: <span class="number">4</span>,
-            <span class="ident">chunk</span>: <span class="number">1</span>,
-            <span class="ident">max_bytes</span>: <span class="ident">usize::MAX</span>,
+<span class="doccomment">/// Default configuration with `title`, `ascii`, 16 source bytes `width` grouped to 4 separate
+/// hex bytes. Using in `pretty_hex`, `pretty_hex_write` and `fmt::Debug` implementation.
+</span><span class="kw">impl </span>Default <span class="kw">for </span>HexConfig {
+    <span class="kw">fn </span>default() -&gt; HexConfig {
+        HexConfig {
+            title: <span class="bool-val">true</span>,
+            ascii: <span class="bool-val">true</span>,
+            width: <span class="number">16</span>,
+            group: <span class="number">4</span>,
+            chunk: <span class="number">1</span>,
+            max_bytes: usize::MAX,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">HexConfig</span> {
-    <span class="doccomment">/// Returns configuration for `simple_hex`, `simple_hex_write` and `fmt::Display` implementation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">simple</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">HexConfig::default</span>().<span class="ident">to_simple</span>()
+<span class="kw">impl </span>HexConfig {
+    <span class="doccomment">/// Returns configuration for `simple_hex`, `simple_hex_write` and `fmt::Display` implementation.
+    </span><span class="kw">pub fn </span>simple() -&gt; <span class="self">Self </span>{
+        HexConfig::default().to_simple()
     }
 
-    <span class="kw">fn</span> <span class="ident">delimiter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">i</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">chunk</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">i</span> <span class="op">%</span> <span class="self">self</span>.<span class="ident">chunk</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">group</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">i</span> <span class="op">%</span> (<span class="self">self</span>.<span class="ident">group</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">chunk</span>) <span class="op">==</span> <span class="number">0</span> {
-                <span class="string">&quot;  &quot;</span>
-            } <span class="kw">else</span> {
-                <span class="string">&quot; &quot;</span>
-            }
-        } <span class="kw">else</span> {
-            <span class="string">&quot;&quot;</span>
-        }
+    <span class="kw">fn </span>delimiter(<span class="kw-2">&amp;</span><span class="self">self</span>, i: usize) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="kw">if </span>i &gt; <span class="number">0 </span>&amp;&amp; <span class="self">self</span>.chunk &gt; <span class="number">0 </span>&amp;&amp; i % <span class="self">self</span>.chunk == <span class="number">0 </span>{
+            <span class="kw">if </span><span class="self">self</span>.group &gt; <span class="number">0 </span>&amp;&amp; i % (<span class="self">self</span>.group * <span class="self">self</span>.chunk) == <span class="number">0 </span>{
+                <span class="string">&quot;  &quot;
+            </span>} <span class="kw">else </span>{
+                <span class="string">&quot; &quot;
+            </span>}
+        } <span class="kw">else </span>{
+            <span class="string">&quot;&quot;
+        </span>}
     }
 
-    <span class="kw">fn</span> <span class="ident">to_simple</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">HexConfig</span> {
-            <span class="ident">title</span>: <span class="bool-val">false</span>,
-            <span class="ident">ascii</span>: <span class="bool-val">false</span>,
-            <span class="ident">width</span>: <span class="number">0</span>,
-            ..<span class="self">self</span>
-        }
+    <span class="kw">fn </span>to_simple(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        HexConfig {
+            title: <span class="bool-val">false</span>,
+            ascii: <span class="bool-val">false</span>,
+            width: <span class="number">0</span>,
+            ..<span class="self">self
+        </span>}
     }
 }
 
-<span class="kw">const</span> <span class="ident">NON_ASCII</span>: <span class="ident">char</span> <span class="op">=</span> <span class="string">&#39;.&#39;</span>;
+<span class="kw">const </span>NON_ASCII: char = <span class="string">&#39;.&#39;</span>;
 
-<span class="doccomment">/// Write hex dump in specified format.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hex_write</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">W</span><span class="op">&gt;</span>(<span class="ident">writer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>, <span class="ident">source</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>, <span class="ident">cfg</span>: <span class="ident">HexConfig</span>) -&gt; <span class="ident">fmt::Result</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
-    <span class="ident">W</span>: <span class="ident">fmt::Write</span>,
+<span class="doccomment">/// Write hex dump in specified format.
+</span><span class="kw">pub fn </span>hex_write&lt;T, W&gt;(writer: <span class="kw-2">&amp;mut </span>W, source: <span class="kw-2">&amp;</span>T, cfg: HexConfig) -&gt; fmt::Result
+<span class="kw">where
+    </span>T: AsRef&lt;[u8]&gt; + <span class="question-mark">?</span>Sized,
+    W: fmt::Write,
 {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">source</span> <span class="op">=</span> <span class="ident">source</span>.<span class="ident">as_ref</span>();
-    <span class="kw">if</span> <span class="ident">cfg</span>.<span class="ident">title</span> {
-        <span class="macro">writeln!</span>(<span class="ident">writer</span>, <span class="string">&quot;Length: {0} (0x{0:x}) bytes&quot;</span>, <span class="ident">source</span>.<span class="ident">len</span>())<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>source = source.as_ref();
+    <span class="kw">if </span>cfg.title {
+        <span class="macro">writeln!</span>(writer, <span class="string">&quot;Length: {0} (0x{0:x}) bytes&quot;</span>, source.len())<span class="question-mark">?</span>;
     }
 
-    <span class="kw">if</span> <span class="ident">source</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+    <span class="kw">if </span>source.is_empty() {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(());
     }
 
-    <span class="kw">let</span> <span class="ident">omitted</span> <span class="op">=</span> <span class="ident">source</span>.<span class="ident">len</span>().<span class="ident">checked_sub</span>(<span class="ident">cfg</span>.<span class="ident">max_bytes</span>);
-    <span class="kw">if</span> <span class="ident">omitted</span>.<span class="ident">is_some</span>() {
-        <span class="ident">source</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">source</span>[..<span class="ident">cfg</span>.<span class="ident">max_bytes</span>];
+    <span class="kw">let </span>omitted = source.len().checked_sub(cfg.max_bytes);
+    <span class="kw">if </span>omitted.is_some() {
+        source = <span class="kw-2">&amp;</span>source[..cfg.max_bytes];
     }
-    <span class="kw">let</span> <span class="ident">lines</span> <span class="op">=</span> <span class="ident">source</span>.<span class="ident">chunks</span>(<span class="kw">if</span> <span class="ident">cfg</span>.<span class="ident">width</span> <span class="op">&gt;</span> <span class="number">0</span> {
-        <span class="ident">cfg</span>.<span class="ident">width</span>
-    } <span class="kw">else</span> {
-        <span class="ident">source</span>.<span class="ident">len</span>()
+    <span class="kw">let </span>lines = source.chunks(<span class="kw">if </span>cfg.width &gt; <span class="number">0 </span>{
+        cfg.width
+    } <span class="kw">else </span>{
+        source.len()
     });
-    <span class="kw">let</span> <span class="ident">lines_len</span> <span class="op">=</span> <span class="ident">lines</span>.<span class="ident">len</span>();
-    <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">row</span>) <span class="kw">in</span> <span class="ident">lines</span>.<span class="ident">enumerate</span>() {
-        <span class="kw">if</span> <span class="ident">cfg</span>.<span class="ident">width</span> <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{:04x}:   &quot;</span>, <span class="ident">i</span> <span class="op">*</span> <span class="ident">cfg</span>.<span class="ident">width</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>lines_len = lines.len();
+    <span class="kw">for </span>(i, row) <span class="kw">in </span>lines.enumerate() {
+        <span class="kw">if </span>cfg.width &gt; <span class="number">0 </span>{
+            <span class="macro">write!</span>(writer, <span class="string">&quot;{:04x}:   &quot;</span>, i * cfg.width)<span class="question-mark">?</span>;
         }
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">x</span>) <span class="kw">in</span> <span class="ident">row</span>.<span class="ident">as_ref</span>().<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{}{:02x}&quot;</span>, <span class="ident">cfg</span>.<span class="ident">delimiter</span>(<span class="ident">i</span>), <span class="ident">x</span>)<span class="question-mark">?</span>;
+        <span class="kw">for </span>(i, x) <span class="kw">in </span>row.as_ref().iter().enumerate() {
+            <span class="macro">write!</span>(writer, <span class="string">&quot;{}{:02x}&quot;</span>, cfg.delimiter(i), x)<span class="question-mark">?</span>;
         }
-        <span class="kw">if</span> <span class="ident">cfg</span>.<span class="ident">ascii</span> {
-            <span class="kw">for</span> <span class="ident">j</span> <span class="kw">in</span> <span class="ident">row</span>.<span class="ident">len</span>()..<span class="ident">cfg</span>.<span class="ident">width</span> {
-                <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;{}  &quot;</span>, <span class="ident">cfg</span>.<span class="ident">delimiter</span>(<span class="ident">j</span>))<span class="question-mark">?</span>;
+        <span class="kw">if </span>cfg.ascii {
+            <span class="kw">for </span>j <span class="kw">in </span>row.len()..cfg.width {
+                <span class="macro">write!</span>(writer, <span class="string">&quot;{}  &quot;</span>, cfg.delimiter(j))<span class="question-mark">?</span>;
             }
-            <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;   &quot;</span>)<span class="question-mark">?</span>;
-            <span class="kw">for</span> <span class="ident">x</span> <span class="kw">in</span> <span class="ident">row</span> {
-                <span class="kw">if</span> <span class="ident">x</span>.<span class="ident">is_ascii</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">x</span>.<span class="ident">is_ascii_control</span>() {
-                    <span class="ident">writer</span>.<span class="ident">write_char</span>((<span class="kw-2">*</span><span class="ident">x</span>).<span class="ident">into</span>())<span class="question-mark">?</span>;
-                } <span class="kw">else</span> {
-                    <span class="ident">writer</span>.<span class="ident">write_char</span>(<span class="ident">NON_ASCII</span>)<span class="question-mark">?</span>;
+            <span class="macro">write!</span>(writer, <span class="string">&quot;   &quot;</span>)<span class="question-mark">?</span>;
+            <span class="kw">for </span>x <span class="kw">in </span>row {
+                <span class="kw">if </span>x.is_ascii() &amp;&amp; !x.is_ascii_control() {
+                    writer.write_char((<span class="kw-2">*</span>x).into())<span class="question-mark">?</span>;
+                } <span class="kw">else </span>{
+                    writer.write_char(NON_ASCII)<span class="question-mark">?</span>;
                 }
             }
         }
-        <span class="kw">if</span> <span class="ident">i</span> <span class="op">+</span> <span class="number">1</span> <span class="op">&lt;</span> <span class="ident">lines_len</span> {
-            <span class="macro">writeln!</span>(<span class="ident">writer</span>)<span class="question-mark">?</span>;
+        <span class="kw">if </span>i + <span class="number">1 </span>&lt; lines_len {
+            <span class="macro">writeln!</span>(writer)<span class="question-mark">?</span>;
         }
     }
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">o</span>) <span class="op">=</span> <span class="ident">omitted</span> {
-        <span class="macro">write!</span>(<span class="ident">writer</span>, <span class="string">&quot;\n...{0} (0x{0:x}) bytes not shown...&quot;</span>, <span class="ident">o</span>)<span class="question-mark">?</span>;
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(o) = omitted {
+        <span class="macro">write!</span>(writer, <span class="string">&quot;\n...{0} (0x{0:x}) bytes not shown...&quot;</span>, o)<span class="question-mark">?</span>;
     }
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="doccomment">/// Reference wrapper for use in arguments formatting.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Hex</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span>, <span class="ident">HexConfig</span>);
+<span class="doccomment">/// Reference wrapper for use in arguments formatting.
+</span><span class="kw">pub struct </span>Hex&lt;<span class="lifetime">&#39;a</span>, T: <span class="lifetime">&#39;a </span>+ <span class="question-mark">?</span>Sized&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T, HexConfig);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Hex</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Formats the value by `simple_hex_write` using the given formatter.</span>
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">hex_write</span>(<span class="ident">f</span>, <span class="self">self</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="number">1</span>.<span class="ident">to_simple</span>())
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: <span class="lifetime">&#39;a </span>+ AsRef&lt;[u8]&gt; + <span class="question-mark">?</span>Sized&gt; fmt::Display <span class="kw">for </span>Hex&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+    <span class="doccomment">/// Formats the value by `simple_hex_write` using the given formatter.
+    </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        hex_write(f, <span class="self">self</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="number">1</span>.to_simple())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="lifetime">&#39;a</span> <span class="op">+</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Hex</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Formats the value by `pretty_hex_write` using the given formatter.</span>
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">hex_write</span>(<span class="ident">f</span>, <span class="self">self</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="number">1</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: <span class="lifetime">&#39;a </span>+ AsRef&lt;[u8]&gt; + <span class="question-mark">?</span>Sized&gt; fmt::Debug <span class="kw">for </span>Hex&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+    <span class="doccomment">/// Formats the value by `pretty_hex_write` using the given formatter.
+    </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        hex_write(f, <span class="self">self</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="number">1</span>)
     }
 }
 
-<span class="doccomment">/// Allows generates hex dumps to a formatter.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">PrettyHex</span> {
-    <span class="doccomment">/// Wrap self reference for use in `std::fmt::Display` and `std::fmt::Debug`</span>
-    <span class="doccomment">/// formatting as hex dumps.</span>
-    <span class="kw">fn</span> <span class="ident">hex_dump</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Hex</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Allows generates hex dumps to a formatter.
+</span><span class="kw">pub trait </span>PrettyHex {
+    <span class="doccomment">/// Wrap self reference for use in `std::fmt::Display` and `std::fmt::Debug`
+    /// formatting as hex dumps.
+    </span><span class="kw">fn </span>hex_dump(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Hex&lt;<span class="self">Self</span>&gt;;
 
-    <span class="doccomment">/// Wrap self reference for use in `std::fmt::Display` and `std::fmt::Debug`</span>
-    <span class="doccomment">/// formatting as hex dumps in specified format.</span>
-    <span class="kw">fn</span> <span class="ident">hex_conf</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cfg</span>: <span class="ident">HexConfig</span>) -&gt; <span class="ident">Hex</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Wrap self reference for use in `std::fmt::Display` and `std::fmt::Debug`
+    /// formatting as hex dumps in specified format.
+    </span><span class="kw">fn </span>hex_conf(<span class="kw-2">&amp;</span><span class="self">self</span>, cfg: HexConfig) -&gt; Hex&lt;<span class="self">Self</span>&gt;;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">PrettyHex</span> <span class="kw">for</span> <span class="ident">T</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
+<span class="kw">impl</span>&lt;T&gt; PrettyHex <span class="kw">for </span>T
+<span class="kw">where
+    </span>T: AsRef&lt;[u8]&gt; + <span class="question-mark">?</span>Sized,
 {
-    <span class="kw">fn</span> <span class="ident">hex_dump</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Hex</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">Hex</span>(<span class="self">self</span>, <span class="ident">HexConfig::default</span>())
+    <span class="kw">fn </span>hex_dump(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Hex&lt;<span class="self">Self</span>&gt; {
+        Hex(<span class="self">self</span>, HexConfig::default())
     }
-    <span class="kw">fn</span> <span class="ident">hex_conf</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cfg</span>: <span class="ident">HexConfig</span>) -&gt; <span class="ident">Hex</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">Hex</span>(<span class="self">self</span>, <span class="ident">cfg</span>)
+    <span class="kw">fn </span>hex_conf(<span class="kw-2">&amp;</span><span class="self">self</span>, cfg: HexConfig) -&gt; Hex&lt;<span class="self">Self</span>&gt; {
+        Hex(<span class="self">self</span>, cfg)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="pretty_hex" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="pretty_hex" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

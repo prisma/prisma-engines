@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/rust-postgres-dc0fca9be721a90f/064a6a5/tokio-postgres/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tokio_postgres/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/rust-postgres-dc0fca9be721a90f/064a6a5/tokio-postgres/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tokio_postgres/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -254,261 +254,261 @@
 <span id="254">254</span>
 <span id="255">255</span>
 <span id="256">256</span>
-</pre><pre class="rust"><code><span class="doccomment">//! An asynchronous, pipelined, PostgreSQL client.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Example</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```no_run</span>
-<span class="doccomment">//! use tokio_postgres::{NoTls, Error};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # #[cfg(not(feature = &quot;runtime&quot;))] fn main() {}</span>
-<span class="doccomment">//! # #[cfg(feature = &quot;runtime&quot;)]</span>
-<span class="doccomment">//! #[tokio::main] // By default, tokio_postgres uses the tokio crate as its runtime.</span>
-<span class="doccomment">//! async fn main() -&gt; Result&lt;(), Error&gt; {</span>
-<span class="doccomment">//!     // Connect to the database.</span>
-<span class="doccomment">//!     let (client, connection) =</span>
-<span class="doccomment">//!         tokio_postgres::connect(&quot;host=localhost user=postgres&quot;, NoTls).await?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     // The connection object performs the actual communication with the database,</span>
-<span class="doccomment">//!     // so spawn it off to run on its own.</span>
-<span class="doccomment">//!     tokio::spawn(async move {</span>
-<span class="doccomment">//!         if let Err(e) = connection.await {</span>
-<span class="doccomment">//!             eprintln!(&quot;connection error: {}&quot;, e);</span>
-<span class="doccomment">//!         }</span>
-<span class="doccomment">//!     });</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     // Now we can execute a simple statement that just returns its parameter.</span>
-<span class="doccomment">//!     let rows = client</span>
-<span class="doccomment">//!         .query(&quot;SELECT $1::TEXT&quot;, &amp;[&amp;&quot;hello world&quot;])</span>
-<span class="doccomment">//!         .await?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     // And then check that we got back the same string we sent over.</span>
-<span class="doccomment">//!     let value: &amp;str = rows[0].get(0);</span>
-<span class="doccomment">//!     assert_eq!(value, &quot;hello world&quot;);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     Ok(())</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Behavior</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Calling a method like `Client::query` on its own does nothing. The associated request is not sent to the database</span>
-<span class="doccomment">//! until the future returned by the method is first polled. Requests are executed in the order that they are first</span>
-<span class="doccomment">//! polled, not in the order that their futures are created.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Pipelining</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The client supports *pipelined* requests. Pipelining can improve performance in use cases in which multiple,</span>
-<span class="doccomment">//! independent queries need to be executed. In a traditional workflow, each query is sent to the server after the</span>
-<span class="doccomment">//! previous query completes. In contrast, pipelining allows the client to send all of the queries to the server up</span>
-<span class="doccomment">//! front, minimizing time spent by one side waiting for the other to finish sending data:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```not_rust</span>
-<span class="doccomment">//!             Sequential                              Pipelined</span>
-<span class="doccomment">//! | Client         | Server          |    | Client         | Server          |</span>
-<span class="doccomment">//! |----------------|-----------------|    |----------------|-----------------|</span>
-<span class="doccomment">//! | send query 1   |                 |    | send query 1   |                 |</span>
-<span class="doccomment">//! |                | process query 1 |    | send query 2   | process query 1 |</span>
-<span class="doccomment">//! | receive rows 1 |                 |    | send query 3   | process query 2 |</span>
-<span class="doccomment">//! | send query 2   |                 |    | receive rows 1 | process query 3 |</span>
-<span class="doccomment">//! |                | process query 2 |    | receive rows 2 |                 |</span>
-<span class="doccomment">//! | receive rows 2 |                 |    | receive rows 3 |                 |</span>
-<span class="doccomment">//! | send query 3   |                 |</span>
-<span class="doccomment">//! |                | process query 3 |</span>
-<span class="doccomment">//! | receive rows 3 |                 |</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! In both cases, the PostgreSQL server is executing the queries sequentially - pipelining just allows both sides of</span>
-<span class="doccomment">//! the connection to work concurrently when possible.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Pipelining happens automatically when futures are polled concurrently (for example, by using the futures `join`</span>
-<span class="doccomment">//! combinator):</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! use futures_util::future;</span>
-<span class="doccomment">//! use std::future::Future;</span>
-<span class="doccomment">//! use tokio_postgres::{Client, Error, Statement};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! async fn pipelined_prepare(</span>
-<span class="doccomment">//!     client: &amp;Client,</span>
-<span class="doccomment">//! ) -&gt; Result&lt;(Statement, Statement), Error&gt;</span>
-<span class="doccomment">//! {</span>
-<span class="doccomment">//!     future::try_join(</span>
-<span class="doccomment">//!         client.prepare(&quot;SELECT * FROM foo&quot;),</span>
-<span class="doccomment">//!         client.prepare(&quot;INSERT INTO bar (id, name) VALUES ($1, $2)&quot;)</span>
-<span class="doccomment">//!     ).await</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Runtime</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The client works with arbitrary `AsyncRead + AsyncWrite` streams. Convenience APIs are provided to handle the</span>
-<span class="doccomment">//! connection process, but these are gated by the `runtime` Cargo feature, which is enabled by default. If disabled,</span>
-<span class="doccomment">//! all dependence on the tokio runtime is removed.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # SSL/TLS support</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! TLS support is implemented via external libraries. `Client::connect` and `Config::connect` take a TLS implementation</span>
-<span class="doccomment">//! as an argument. The `NoTls` type in this crate can be used when TLS is not required. Otherwise, the</span>
-<span class="doccomment">//! `postgres-openssl` and `postgres-native-tls` crates provide implementations backed by the `openssl` and `native-tls`</span>
-<span class="doccomment">//! crates, respectively.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Features</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The following features can be enabled from `Cargo.toml`:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! | Feature | Description | Extra dependencies | Default |</span>
-<span class="doccomment">//! | ------- | ----------- | ------------------ | ------- |</span>
-<span class="doccomment">//! | `runtime` | Enable convenience API for the connection process based on the `tokio` crate. | [tokio](https://crates.io/crates/tokio) 1.0 with the features `net` and `time` | yes |</span>
-<span class="doccomment">//! | `array-impls` | Enables `ToSql` and `FromSql` trait impls for arrays | - | no |</span>
-<span class="doccomment">//! | `with-bit-vec-0_6` | Enable support for the `bit-vec` crate. | [bit-vec](https://crates.io/crates/bit-vec) 0.6 | no |</span>
-<span class="doccomment">//! | `with-chrono-0_4` | Enable support for the `chrono` crate. | [chrono](https://crates.io/crates/chrono) 0.4 | no |</span>
-<span class="doccomment">//! | `with-eui48-0_4` | Enable support for the 0.4 version of the `eui48` crate. | [eui48](https://crates.io/crates/eui48) 0.4 | no |</span>
-<span class="doccomment">//! | `with-eui48-1` | Enable support for the 1.0 version of the `eui48` crate. | [eui48](https://crates.io/crates/eui48) 1.0 | no |</span>
-<span class="doccomment">//! | `with-geo-types-0_6` | Enable support for the 0.6 version of the `geo-types` crate. | [geo-types](https://crates.io/crates/geo-types/0.6.0) 0.6 | no |</span>
-<span class="doccomment">//! | `with-geo-types-0_7` | Enable support for the 0.7 version of the `geo-types` crate. | [geo-types](https://crates.io/crates/geo-types/0.7.0) 0.7 | no |</span>
-<span class="doccomment">//! | `with-serde_json-1` | Enable support for the `serde_json` crate. | [serde_json](https://crates.io/crates/serde_json) 1.0 | no |</span>
-<span class="doccomment">//! | `with-uuid-0_8` | Enable support for the `uuid` crate. | [uuid](https://crates.io/crates/uuid) 0.8 | no |</span>
-<span class="doccomment">//! | `with-uuid-1` | Enable support for the `uuid` crate. | [uuid](https://crates.io/crates/uuid) 1.0 | no |</span>
-<span class="doccomment">//! | `with-time-0_2` | Enable support for the 0.2 version of the `time` crate. | [time](https://crates.io/crates/time/0.2.0) 0.2 | no |</span>
-<span class="doccomment">//! | `with-time-0_3` | Enable support for the 0.3 version of the `time` crate. | [time](https://crates.io/crates/time/0.3.0) 0.3 | no |</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/tokio-postgres/0.7&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">rust_2018_idioms</span>, <span class="ident">clippy::all</span>, <span class="ident">missing_docs</span>)]</span>
+</pre><pre class="rust"><code><span class="doccomment">//! An asynchronous, pipelined, PostgreSQL client.
+//!
+//! # Example
+//!
+//! ```no_run
+//! use tokio_postgres::{NoTls, Error};
+//!
+//! # #[cfg(not(feature = &quot;runtime&quot;))] fn main() {}
+//! # #[cfg(feature = &quot;runtime&quot;)]
+//! #[tokio::main] // By default, tokio_postgres uses the tokio crate as its runtime.
+//! async fn main() -&gt; Result&lt;(), Error&gt; {
+//!     // Connect to the database.
+//!     let (client, connection) =
+//!         tokio_postgres::connect(&quot;host=localhost user=postgres&quot;, NoTls).await?;
+//!
+//!     // The connection object performs the actual communication with the database,
+//!     // so spawn it off to run on its own.
+//!     tokio::spawn(async move {
+//!         if let Err(e) = connection.await {
+//!             eprintln!(&quot;connection error: {}&quot;, e);
+//!         }
+//!     });
+//!
+//!     // Now we can execute a simple statement that just returns its parameter.
+//!     let rows = client
+//!         .query(&quot;SELECT $1::TEXT&quot;, &amp;[&amp;&quot;hello world&quot;])
+//!         .await?;
+//!
+//!     // And then check that we got back the same string we sent over.
+//!     let value: &amp;str = rows[0].get(0);
+//!     assert_eq!(value, &quot;hello world&quot;);
+//!
+//!     Ok(())
+//! }
+//! ```
+//!
+//! # Behavior
+//!
+//! Calling a method like `Client::query` on its own does nothing. The associated request is not sent to the database
+//! until the future returned by the method is first polled. Requests are executed in the order that they are first
+//! polled, not in the order that their futures are created.
+//!
+//! # Pipelining
+//!
+//! The client supports *pipelined* requests. Pipelining can improve performance in use cases in which multiple,
+//! independent queries need to be executed. In a traditional workflow, each query is sent to the server after the
+//! previous query completes. In contrast, pipelining allows the client to send all of the queries to the server up
+//! front, minimizing time spent by one side waiting for the other to finish sending data:
+//!
+//! ```not_rust
+//!             Sequential                              Pipelined
+//! | Client         | Server          |    | Client         | Server          |
+//! |----------------|-----------------|    |----------------|-----------------|
+//! | send query 1   |                 |    | send query 1   |                 |
+//! |                | process query 1 |    | send query 2   | process query 1 |
+//! | receive rows 1 |                 |    | send query 3   | process query 2 |
+//! | send query 2   |                 |    | receive rows 1 | process query 3 |
+//! |                | process query 2 |    | receive rows 2 |                 |
+//! | receive rows 2 |                 |    | receive rows 3 |                 |
+//! | send query 3   |                 |
+//! |                | process query 3 |
+//! | receive rows 3 |                 |
+//! ```
+//!
+//! In both cases, the PostgreSQL server is executing the queries sequentially - pipelining just allows both sides of
+//! the connection to work concurrently when possible.
+//!
+//! Pipelining happens automatically when futures are polled concurrently (for example, by using the futures `join`
+//! combinator):
+//!
+//! ```rust
+//! use futures_util::future;
+//! use std::future::Future;
+//! use tokio_postgres::{Client, Error, Statement};
+//!
+//! async fn pipelined_prepare(
+//!     client: &amp;Client,
+//! ) -&gt; Result&lt;(Statement, Statement), Error&gt;
+//! {
+//!     future::try_join(
+//!         client.prepare(&quot;SELECT * FROM foo&quot;),
+//!         client.prepare(&quot;INSERT INTO bar (id, name) VALUES ($1, $2)&quot;)
+//!     ).await
+//! }
+//! ```
+//!
+//! # Runtime
+//!
+//! The client works with arbitrary `AsyncRead + AsyncWrite` streams. Convenience APIs are provided to handle the
+//! connection process, but these are gated by the `runtime` Cargo feature, which is enabled by default. If disabled,
+//! all dependence on the tokio runtime is removed.
+//!
+//! # SSL/TLS support
+//!
+//! TLS support is implemented via external libraries. `Client::connect` and `Config::connect` take a TLS implementation
+//! as an argument. The `NoTls` type in this crate can be used when TLS is not required. Otherwise, the
+//! `postgres-openssl` and `postgres-native-tls` crates provide implementations backed by the `openssl` and `native-tls`
+//! crates, respectively.
+//!
+//! # Features
+//!
+//! The following features can be enabled from `Cargo.toml`:
+//!
+//! | Feature | Description | Extra dependencies | Default |
+//! | ------- | ----------- | ------------------ | ------- |
+//! | `runtime` | Enable convenience API for the connection process based on the `tokio` crate. | [tokio](https://crates.io/crates/tokio) 1.0 with the features `net` and `time` | yes |
+//! | `array-impls` | Enables `ToSql` and `FromSql` trait impls for arrays | - | no |
+//! | `with-bit-vec-0_6` | Enable support for the `bit-vec` crate. | [bit-vec](https://crates.io/crates/bit-vec) 0.6 | no |
+//! | `with-chrono-0_4` | Enable support for the `chrono` crate. | [chrono](https://crates.io/crates/chrono) 0.4 | no |
+//! | `with-eui48-0_4` | Enable support for the 0.4 version of the `eui48` crate. | [eui48](https://crates.io/crates/eui48) 0.4 | no |
+//! | `with-eui48-1` | Enable support for the 1.0 version of the `eui48` crate. | [eui48](https://crates.io/crates/eui48) 1.0 | no |
+//! | `with-geo-types-0_6` | Enable support for the 0.6 version of the `geo-types` crate. | [geo-types](https://crates.io/crates/geo-types/0.6.0) 0.6 | no |
+//! | `with-geo-types-0_7` | Enable support for the 0.7 version of the `geo-types` crate. | [geo-types](https://crates.io/crates/geo-types/0.7.0) 0.7 | no |
+//! | `with-serde_json-1` | Enable support for the `serde_json` crate. | [serde_json](https://crates.io/crates/serde_json) 1.0 | no |
+//! | `with-uuid-0_8` | Enable support for the `uuid` crate. | [uuid](https://crates.io/crates/uuid) 0.8 | no |
+//! | `with-uuid-1` | Enable support for the `uuid` crate. | [uuid](https://crates.io/crates/uuid) 1.0 | no |
+//! | `with-time-0_2` | Enable support for the 0.2 version of the `time` crate. | [time](https://crates.io/crates/time/0.2.0) 0.2 | no |
+//! | `with-time-0_3` | Enable support for the 0.3 version of the `time` crate. | [time](https://crates.io/crates/time/0.3.0) 0.3 | no |
+</span><span class="attribute">#![doc(html_root_url = <span class="string">&quot;https://docs.rs/tokio-postgres/0.7&quot;</span>)]
+#![warn(rust_2018_idioms, clippy::all, missing_docs)]
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cancel_token::CancelToken</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client::Client</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::config::Config</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::connection::Connection</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::copy_in::CopyInSink</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::copy_out::CopyOutStream</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::DbError</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::Error</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::generic_client::GenericClient</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::portal::Portal</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::query::RowStream</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::row</span>::{<span class="ident">Row</span>, <span class="ident">SimpleQueryRow</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::simple_query::SimpleQueryStream</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::socket::Socket</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::statement</span>::{<span class="ident">Column</span>, <span class="ident">Statement</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tls::MakeTlsConnect</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tls::NoTls</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::to_statement::ToStatement</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::transaction::Transaction</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::transaction_builder</span>::{<span class="ident">IsolationLevel</span>, <span class="ident">TransactionBuilder</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::types::ToSql</span>;
+</span><span class="kw">pub use </span><span class="kw">crate</span>::cancel_token::CancelToken;
+<span class="kw">pub use </span><span class="kw">crate</span>::client::Client;
+<span class="kw">pub use </span><span class="kw">crate</span>::config::Config;
+<span class="kw">pub use </span><span class="kw">crate</span>::connection::Connection;
+<span class="kw">pub use </span><span class="kw">crate</span>::copy_in::CopyInSink;
+<span class="kw">pub use </span><span class="kw">crate</span>::copy_out::CopyOutStream;
+<span class="kw">use </span><span class="kw">crate</span>::error::DbError;
+<span class="kw">pub use </span><span class="kw">crate</span>::error::Error;
+<span class="kw">pub use </span><span class="kw">crate</span>::generic_client::GenericClient;
+<span class="kw">pub use </span><span class="kw">crate</span>::portal::Portal;
+<span class="kw">pub use </span><span class="kw">crate</span>::query::RowStream;
+<span class="kw">pub use </span><span class="kw">crate</span>::row::{Row, SimpleQueryRow};
+<span class="kw">pub use </span><span class="kw">crate</span>::simple_query::SimpleQueryStream;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::socket::Socket;
+<span class="kw">pub use </span><span class="kw">crate</span>::statement::{Column, Statement};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::tls::MakeTlsConnect;
+<span class="kw">pub use </span><span class="kw">crate</span>::tls::NoTls;
+<span class="kw">pub use </span><span class="kw">crate</span>::to_statement::ToStatement;
+<span class="kw">pub use </span><span class="kw">crate</span>::transaction::Transaction;
+<span class="kw">pub use </span><span class="kw">crate</span>::transaction_builder::{IsolationLevel, TransactionBuilder};
+<span class="kw">use </span><span class="kw">crate</span>::types::ToSql;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">binary_copy</span>;
-<span class="kw">mod</span> <span class="ident">bind</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">cancel_query</span>;
-<span class="kw">mod</span> <span class="ident">cancel_query_raw</span>;
-<span class="kw">mod</span> <span class="ident">cancel_token</span>;
-<span class="kw">mod</span> <span class="ident">client</span>;
-<span class="kw">mod</span> <span class="ident">codec</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">config</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">connect</span>;
-<span class="kw">mod</span> <span class="ident">connect_raw</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">connect_socket</span>;
-<span class="kw">mod</span> <span class="ident">connect_tls</span>;
-<span class="kw">mod</span> <span class="ident">connection</span>;
-<span class="kw">mod</span> <span class="ident">copy_in</span>;
-<span class="kw">mod</span> <span class="ident">copy_out</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">error</span>;
-<span class="kw">mod</span> <span class="ident">generic_client</span>;
-<span class="kw">mod</span> <span class="ident">keepalive</span>;
-<span class="kw">mod</span> <span class="ident">maybe_tls_stream</span>;
-<span class="kw">mod</span> <span class="ident">portal</span>;
-<span class="kw">mod</span> <span class="ident">prepare</span>;
-<span class="kw">mod</span> <span class="ident">query</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">row</span>;
-<span class="kw">mod</span> <span class="ident">simple_query</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">socket</span>;
-<span class="kw">mod</span> <span class="ident">statement</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">tls</span>;
-<span class="kw">mod</span> <span class="ident">to_statement</span>;
-<span class="kw">mod</span> <span class="ident">transaction</span>;
-<span class="kw">mod</span> <span class="ident">transaction_builder</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">types</span>;
+<span class="kw">pub mod </span>binary_copy;
+<span class="kw">mod </span>bind;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+</span><span class="kw">mod </span>cancel_query;
+<span class="kw">mod </span>cancel_query_raw;
+<span class="kw">mod </span>cancel_token;
+<span class="kw">mod </span>client;
+<span class="kw">mod </span>codec;
+<span class="kw">pub mod </span>config;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+</span><span class="kw">mod </span>connect;
+<span class="kw">mod </span>connect_raw;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+</span><span class="kw">mod </span>connect_socket;
+<span class="kw">mod </span>connect_tls;
+<span class="kw">mod </span>connection;
+<span class="kw">mod </span>copy_in;
+<span class="kw">mod </span>copy_out;
+<span class="kw">pub mod </span>error;
+<span class="kw">mod </span>generic_client;
+<span class="kw">mod </span>keepalive;
+<span class="kw">mod </span>maybe_tls_stream;
+<span class="kw">mod </span>portal;
+<span class="kw">mod </span>prepare;
+<span class="kw">mod </span>query;
+<span class="kw">pub mod </span>row;
+<span class="kw">mod </span>simple_query;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+</span><span class="kw">mod </span>socket;
+<span class="kw">mod </span>statement;
+<span class="kw">pub mod </span>tls;
+<span class="kw">mod </span>to_statement;
+<span class="kw">mod </span>transaction;
+<span class="kw">mod </span>transaction_builder;
+<span class="kw">pub mod </span>types;
 
-<span class="doccomment">/// A convenience function which parses a connection string and connects to the database.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See the documentation for [`Config`] for details on the connection string format.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Requires the `runtime` Cargo feature (enabled by default).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Config`]: config/struct.Config.html</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
-    <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">tls</span>: <span class="ident">T</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Client</span>, <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">Socket</span>, <span class="ident">T::Stream</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">MakeTlsConnect</span><span class="op">&lt;</span><span class="ident">Socket</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A convenience function which parses a connection string and connects to the database.
+///
+/// See the documentation for [`Config`] for details on the connection string format.
+///
+/// Requires the `runtime` Cargo feature (enabled by default).
+///
+/// [`Config`]: config/struct.Config.html
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+</span><span class="kw">pub async fn </span>connect&lt;T&gt;(
+    config: <span class="kw-2">&amp;</span>str,
+    tls: T,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(Client, Connection&lt;Socket, T::Stream&gt;), Error&gt;
+<span class="kw">where
+    </span>T: MakeTlsConnect&lt;Socket&gt;,
 {
-    <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">config</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">Config</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
-    <span class="ident">config</span>.<span class="ident">connect</span>(<span class="ident">tls</span>).<span class="kw">await</span>
+    <span class="kw">let </span>config = config.parse::&lt;Config&gt;()<span class="question-mark">?</span>;
+    config.connect(tls).<span class="kw">await
+</span>}
+
+<span class="doccomment">/// An asynchronous notification.
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub struct </span>Notification {
+    process_id: i32,
+    channel: String,
+    payload: String,
 }
 
-<span class="doccomment">/// An asynchronous notification.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Notification</span> {
-    <span class="ident">process_id</span>: <span class="ident">i32</span>,
-    <span class="ident">channel</span>: <span class="ident">String</span>,
-    <span class="ident">payload</span>: <span class="ident">String</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">Notification</span> {
-    <span class="doccomment">/// The process ID of the notifying backend process.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">process_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i32</span> {
-        <span class="self">self</span>.<span class="ident">process_id</span>
+<span class="kw">impl </span>Notification {
+    <span class="doccomment">/// The process ID of the notifying backend process.
+    </span><span class="kw">pub fn </span>process_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32 {
+        <span class="self">self</span>.process_id
     }
 
-    <span class="doccomment">/// The name of the channel that the notify has been raised on.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">channel</span>
+    <span class="doccomment">/// The name of the channel that the notify has been raised on.
+    </span><span class="kw">pub fn </span>channel(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.channel
     }
 
-    <span class="doccomment">/// The &quot;payload&quot; string passed from the notifying process.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">payload</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">payload</span>
+    <span class="doccomment">/// The &quot;payload&quot; string passed from the notifying process.
+    </span><span class="kw">pub fn </span>payload(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.payload
     }
 }
 
-<span class="doccomment">/// An asynchronous message from the server.</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::large_enum_variant</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">AsyncMessage</span> {
-    <span class="doccomment">/// A notice.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Notices use the same format as errors, but aren&#39;t &quot;errors&quot; per-se.</span>
-    <span class="ident">Notice</span>(<span class="ident">DbError</span>),
-    <span class="doccomment">/// A notification.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Connections can subscribe to notifications with the `LISTEN` command.</span>
-    <span class="ident">Notification</span>(<span class="ident">Notification</span>),
+<span class="doccomment">/// An asynchronous message from the server.
+</span><span class="attribute">#[allow(clippy::large_enum_variant)]
+#[derive(Debug, Clone)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>AsyncMessage {
+    <span class="doccomment">/// A notice.
+    ///
+    /// Notices use the same format as errors, but aren&#39;t &quot;errors&quot; per-se.
+    </span>Notice(DbError),
+    <span class="doccomment">/// A notification.
+    ///
+    /// Connections can subscribe to notifications with the `LISTEN` command.
+    </span>Notification(Notification),
 }
 
-<span class="doccomment">/// Message returned by the `SimpleQuery` stream.</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">SimpleQueryMessage</span> {
-    <span class="doccomment">/// A row of data.</span>
-    <span class="ident">Row</span>(<span class="ident">SimpleQueryRow</span>),
-    <span class="doccomment">/// A statement in the query has completed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The number of rows modified or selected is returned.</span>
-    <span class="ident">CommandComplete</span>(<span class="ident">u64</span>),
+<span class="doccomment">/// Message returned by the `SimpleQuery` stream.
+</span><span class="attribute">#[non_exhaustive]
+</span><span class="kw">pub enum </span>SimpleQueryMessage {
+    <span class="doccomment">/// A row of data.
+    </span>Row(SimpleQueryRow),
+    <span class="doccomment">/// A statement in the query has completed.
+    ///
+    /// The number of rows modified or selected is returned.
+    </span>CommandComplete(u64),
 }
 
-<span class="kw">fn</span> <span class="ident">slice_iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> (<span class="kw">dyn</span> <span class="ident">ToSql</span> <span class="op">+</span> <span class="ident">Sync</span>)],
-) -&gt; <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">dyn</span> <span class="ident">ToSql</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
-    <span class="ident">s</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">s</span> <span class="kw">as</span> <span class="kw">_</span>)
+<span class="kw">fn </span>slice_iter&lt;<span class="lifetime">&#39;a</span>&gt;(
+    s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>(<span class="kw">dyn </span>ToSql + Sync)],
+) -&gt; <span class="kw">impl </span>ExactSizeIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw">dyn </span>ToSql&gt; + <span class="lifetime">&#39;a </span>{
+    s.iter().map(|s| <span class="kw-2">*</span>s <span class="kw">as _</span>)
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio_postgres" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio_postgres" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

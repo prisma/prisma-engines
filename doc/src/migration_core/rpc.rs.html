@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/core/src/rpc.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>rpc.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../migration_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../migration_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../migration_core/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/core/src/rpc.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>rpc.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../migration_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../migration_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../migration_core/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -64,71 +64,71 @@
 <span id="64">64</span>
 <span id="65">65</span>
 <span id="66">66</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">json_rpc::method_names</span>::<span class="kw-2">*</span>, <span class="ident">CoreError</span>, <span class="ident">CoreResult</span>, <span class="ident">GenericApi</span>};
-<span class="kw">use</span> <span class="ident">jsonrpc_core</span>::{<span class="ident">types::error::Error</span> <span class="kw">as</span> <span class="ident">JsonRpcError</span>, <span class="ident">IoHandler</span>, <span class="ident">Params</span>};
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{json_rpc::method_names::<span class="kw-2">*</span>, CoreError, CoreResult, GenericApi};
+<span class="kw">use </span>jsonrpc_core::{types::error::Error <span class="kw">as </span>JsonRpcError, IoHandler, Params};
+<span class="kw">use </span>std::sync::Arc;
 
-<span class="doccomment">/// Initialize a JSON-RPC ready migration engine API.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">rpc_api</span>(<span class="ident">datamodel</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">host</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">migration_connector::ConnectorHost</span><span class="op">&gt;</span>) -&gt; <span class="ident">IoHandler</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">io_handler</span> <span class="op">=</span> <span class="ident">IoHandler::default</span>();
-    <span class="kw">let</span> <span class="ident">api</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident"><span class="kw">crate</span>::state::EngineState::new</span>(<span class="ident">datamodel</span>, <span class="prelude-val">Some</span>(<span class="ident">host</span>)));
+<span class="doccomment">/// Initialize a JSON-RPC ready migration engine API.
+</span><span class="kw">pub fn </span>rpc_api(datamodel: <span class="prelude-ty">Option</span>&lt;String&gt;, host: Arc&lt;<span class="kw">dyn </span>migration_connector::ConnectorHost&gt;) -&gt; IoHandler {
+    <span class="kw">let </span><span class="kw-2">mut </span>io_handler = IoHandler::default();
+    <span class="kw">let </span>api = Arc::new(<span class="kw">crate</span>::state::EngineState::new(datamodel, <span class="prelude-val">Some</span>(host)));
 
-    <span class="kw">for</span> <span class="ident">cmd</span> <span class="kw">in</span> <span class="ident">METHOD_NAMES</span> {
-        <span class="kw">let</span> <span class="ident">api</span> <span class="op">=</span> <span class="ident">api</span>.<span class="ident">clone</span>();
-        <span class="ident">io_handler</span>.<span class="ident">add_method</span>(<span class="ident">cmd</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">params</span>: <span class="ident">Params</span><span class="op">|</span> {
-            <span class="ident">Box::pin</span>(<span class="ident">run_command</span>(<span class="ident">api</span>.<span class="ident">clone</span>(), <span class="ident">cmd</span>, <span class="ident">params</span>))
+    <span class="kw">for </span>cmd <span class="kw">in </span>METHOD_NAMES {
+        <span class="kw">let </span>api = api.clone();
+        io_handler.add_method(cmd, <span class="kw">move </span>|params: Params| {
+            Box::pin(run_command(api.clone(), cmd, params))
         });
     }
 
-    <span class="ident">io_handler</span>
+    io_handler
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::redundant_allocation</span>)]</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run_command</span>(
-    <span class="ident">executor</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">GenericApi</span><span class="op">&gt;</span>,
-    <span class="ident">cmd</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">params</span>: <span class="ident">Params</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">serde_json::Value</span>, <span class="ident">JsonRpcError</span><span class="op">&gt;</span> {
-    <span class="macro">tracing::debug!</span>(<span class="question-mark">?</span><span class="ident">cmd</span>, <span class="string">&quot;running the command&quot;</span>);
-    <span class="kw">match</span> <span class="ident">cmd</span> {
-        <span class="ident">APPLY_MIGRATIONS</span> =&gt; <span class="ident">render</span>(<span class="ident">executor</span>.<span class="ident">apply_migrations</span>(<span class="ident">params</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>).<span class="kw">await</span>),
-        <span class="ident">CREATE_DATABASE</span> =&gt; <span class="ident">render</span>(<span class="ident">executor</span>.<span class="ident">create_database</span>(<span class="ident">params</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>).<span class="kw">await</span>),
-        <span class="ident">CREATE_MIGRATION</span> =&gt; <span class="ident">render</span>(<span class="ident">executor</span>.<span class="ident">create_migration</span>(<span class="ident">params</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>).<span class="kw">await</span>),
-        <span class="ident">DB_EXECUTE</span> =&gt; <span class="ident">render</span>(<span class="ident">executor</span>.<span class="ident">db_execute</span>(<span class="ident">params</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>).<span class="kw">await</span>),
-        <span class="ident">DEV_DIAGNOSTIC</span> =&gt; <span class="ident">render</span>(<span class="ident">executor</span>.<span class="ident">dev_diagnostic</span>(<span class="ident">params</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>).<span class="kw">await</span>),
-        <span class="ident">DIFF</span> =&gt; <span class="ident">render</span>(<span class="ident">executor</span>.<span class="ident">diff</span>(<span class="ident">params</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>).<span class="kw">await</span>),
-        <span class="ident">DEBUG_PANIC</span> =&gt; <span class="ident">render</span>(<span class="ident">executor</span>.<span class="ident">debug_panic</span>().<span class="kw">await</span>),
-        <span class="ident">DIAGNOSE_MIGRATION_HISTORY</span> =&gt; <span class="ident">render</span>(<span class="ident">executor</span>.<span class="ident">diagnose_migration_history</span>(<span class="ident">params</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>).<span class="kw">await</span>),
-        <span class="ident">ENSURE_CONNECTION_VALIDITY</span> =&gt; <span class="ident">render</span>(<span class="ident">executor</span>.<span class="ident">ensure_connection_validity</span>(<span class="ident">params</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>).<span class="kw">await</span>),
-        <span class="ident">EVALUATE_DATA_LOSS</span> =&gt; <span class="ident">render</span>(<span class="ident">executor</span>.<span class="ident">evaluate_data_loss</span>(<span class="ident">params</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>).<span class="kw">await</span>),
-        <span class="ident">GET_DATABASE_VERSION</span> =&gt; <span class="ident">render</span>(<span class="ident">executor</span>.<span class="ident">version</span>().<span class="kw">await</span>),
-        <span class="ident">INTROSPECT</span> =&gt; <span class="ident">render</span>(<span class="ident">executor</span>.<span class="ident">introspect</span>(<span class="ident">params</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>).<span class="kw">await</span>),
-        <span class="ident">LIST_MIGRATION_DIRECTORIES</span> =&gt; <span class="ident">render</span>(<span class="ident">executor</span>.<span class="ident">list_migration_directories</span>(<span class="ident">params</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>).<span class="kw">await</span>),
-        <span class="ident">MARK_MIGRATION_APPLIED</span> =&gt; <span class="ident">render</span>(<span class="ident">executor</span>.<span class="ident">mark_migration_applied</span>(<span class="ident">params</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>).<span class="kw">await</span>),
-        <span class="ident">MARK_MIGRATION_ROLLED_BACK</span> =&gt; <span class="ident">render</span>(<span class="ident">executor</span>.<span class="ident">mark_migration_rolled_back</span>(<span class="ident">params</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>).<span class="kw">await</span>),
-        <span class="comment">// TODO(MultiSchema): we probably need to grab the namespaces from the params</span>
-        <span class="ident">RESET</span> =&gt; <span class="ident">render</span>(<span class="ident">executor</span>.<span class="ident">reset</span>(<span class="prelude-val">None</span>).<span class="kw">await</span>),
-        <span class="ident">SCHEMA_PUSH</span> =&gt; <span class="ident">render</span>(<span class="ident">executor</span>.<span class="ident">schema_push</span>(<span class="ident">params</span>.<span class="ident">parse</span>()<span class="question-mark">?</span>).<span class="kw">await</span>),
-        <span class="ident">other</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Unknown command {}&quot;</span>, <span class="ident">other</span>),
+<span class="attribute">#[allow(clippy::redundant_allocation)]
+</span><span class="kw">async fn </span>run_command(
+    executor: Arc&lt;<span class="kw">dyn </span>GenericApi&gt;,
+    cmd: <span class="kw-2">&amp;</span>str,
+    params: Params,
+) -&gt; <span class="prelude-ty">Result</span>&lt;serde_json::Value, JsonRpcError&gt; {
+    <span class="macro">tracing::debug!</span>(<span class="question-mark">?</span>cmd, <span class="string">&quot;running the command&quot;</span>);
+    <span class="kw">match </span>cmd {
+        APPLY_MIGRATIONS =&gt; render(executor.apply_migrations(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
+        CREATE_DATABASE =&gt; render(executor.create_database(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
+        CREATE_MIGRATION =&gt; render(executor.create_migration(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
+        DB_EXECUTE =&gt; render(executor.db_execute(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
+        DEV_DIAGNOSTIC =&gt; render(executor.dev_diagnostic(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
+        DIFF =&gt; render(executor.diff(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
+        DEBUG_PANIC =&gt; render(executor.debug_panic().<span class="kw">await</span>),
+        DIAGNOSE_MIGRATION_HISTORY =&gt; render(executor.diagnose_migration_history(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
+        ENSURE_CONNECTION_VALIDITY =&gt; render(executor.ensure_connection_validity(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
+        EVALUATE_DATA_LOSS =&gt; render(executor.evaluate_data_loss(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
+        GET_DATABASE_VERSION =&gt; render(executor.version().<span class="kw">await</span>),
+        INTROSPECT =&gt; render(executor.introspect(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
+        LIST_MIGRATION_DIRECTORIES =&gt; render(executor.list_migration_directories(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
+        MARK_MIGRATION_APPLIED =&gt; render(executor.mark_migration_applied(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
+        MARK_MIGRATION_ROLLED_BACK =&gt; render(executor.mark_migration_rolled_back(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
+        <span class="comment">// TODO(MultiSchema): we probably need to grab the namespaces from the params
+        </span>RESET =&gt; render(executor.reset(<span class="prelude-val">None</span>).<span class="kw">await</span>),
+        SCHEMA_PUSH =&gt; render(executor.schema_push(params.parse()<span class="question-mark">?</span>).<span class="kw">await</span>),
+        other =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;Unknown command {}&quot;</span>, other),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">render</span>(<span class="ident">result</span>: <span class="ident">CoreResult</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">serde::Serialize</span><span class="op">&gt;</span>) -&gt; <span class="ident">jsonrpc_core::Result</span><span class="op">&lt;</span><span class="ident">jsonrpc_core::Value</span><span class="op">&gt;</span> {
-    <span class="ident">result</span>
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">response</span><span class="op">|</span> <span class="ident">serde_json::to_value</span>(<span class="ident">response</span>).<span class="ident">expect</span>(<span class="string">&quot;Rendering of RPC response failed&quot;</span>))
-        .<span class="ident">map_err</span>(<span class="ident">render_jsonrpc_error</span>)
+<span class="kw">fn </span>render(result: CoreResult&lt;<span class="kw">impl </span>serde::Serialize&gt;) -&gt; jsonrpc_core::Result&lt;jsonrpc_core::Value&gt; {
+    result
+        .map(|response| serde_json::to_value(response).expect(<span class="string">&quot;Rendering of RPC response failed&quot;</span>))
+        .map_err(render_jsonrpc_error)
 }
 
-<span class="kw">fn</span> <span class="ident">render_jsonrpc_error</span>(<span class="ident">crate_error</span>: <span class="ident">CoreError</span>) -&gt; <span class="ident">JsonRpcError</span> {
-    <span class="ident">serde_json::to_value</span>(<span class="kw-2">&amp;</span><span class="ident">crate_error</span>.<span class="ident">to_user_facing</span>())
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">data</span><span class="op">|</span> <span class="ident">JsonRpcError</span> {
-            <span class="comment">// We separate the JSON-RPC error code (defined by the JSON-RPC spec) from the</span>
-            <span class="comment">// prisma error code, which is located in `data`.</span>
-            <span class="ident">code</span>: <span class="ident">jsonrpc_core::types::error::ErrorCode::ServerError</span>(<span class="number">4466</span>),
-            <span class="ident">message</span>: <span class="string">&quot;An error happened. Check the data field for details.&quot;</span>.<span class="ident">to_string</span>(),
-            <span class="ident">data</span>: <span class="prelude-val">Some</span>(<span class="ident">data</span>),
+<span class="kw">fn </span>render_jsonrpc_error(crate_error: CoreError) -&gt; JsonRpcError {
+    serde_json::to_value(<span class="kw-2">&amp;</span>crate_error.to_user_facing())
+        .map(|data| JsonRpcError {
+            <span class="comment">// We separate the JSON-RPC error code (defined by the JSON-RPC spec) from the
+            // prisma error code, which is located in `data`.
+            </span>code: jsonrpc_core::types::error::ErrorCode::ServerError(<span class="number">4466</span>),
+            message: <span class="string">&quot;An error happened. Check the data field for details.&quot;</span>.to_string(),
+            data: <span class="prelude-val">Some</span>(data),
         })
-        .<span class="ident">unwrap</span>()
+        .unwrap()
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="migration_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="migration_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

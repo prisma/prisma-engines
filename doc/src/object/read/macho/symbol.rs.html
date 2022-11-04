@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/object-0.29.0/src/read/macho/symbol.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>symbol.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../object/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../object/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../object/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/object-0.29.0/src/read/macho/symbol.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>symbol.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../object/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../object/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../object/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -486,493 +486,493 @@
 <span id="486">486</span>
 <span id="487">487</span>
 <span id="488">488</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
-<span class="kw">use</span> <span class="ident">core::fmt::Debug</span>;
-<span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">fmt</span>, <span class="ident">slice</span>, <span class="ident">str</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>alloc::vec::Vec;
+<span class="kw">use </span>core::fmt::Debug;
+<span class="kw">use </span>core::{fmt, slice, str};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::endian</span>::{<span class="self">self</span>, <span class="ident">Endianness</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::macho</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::pod::Pod</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::read::util::StringTable</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::read</span>::{
-    <span class="self">self</span>, <span class="ident">ObjectMap</span>, <span class="ident">ObjectMapEntry</span>, <span class="ident">ObjectSymbol</span>, <span class="ident">ObjectSymbolTable</span>, <span class="ident">ReadError</span>, <span class="ident">ReadRef</span>, <span class="prelude-ty">Result</span>,
-    <span class="ident">SectionIndex</span>, <span class="ident">SectionKind</span>, <span class="ident">SymbolFlags</span>, <span class="ident">SymbolIndex</span>, <span class="ident">SymbolKind</span>, <span class="ident">SymbolMap</span>, <span class="ident">SymbolMapEntry</span>,
-    <span class="ident">SymbolScope</span>, <span class="ident">SymbolSection</span>,
+<span class="kw">use </span><span class="kw">crate</span>::endian::{<span class="self">self</span>, Endianness};
+<span class="kw">use </span><span class="kw">crate</span>::macho;
+<span class="kw">use </span><span class="kw">crate</span>::pod::Pod;
+<span class="kw">use </span><span class="kw">crate</span>::read::util::StringTable;
+<span class="kw">use </span><span class="kw">crate</span>::read::{
+    <span class="self">self</span>, ObjectMap, ObjectMapEntry, ObjectSymbol, ObjectSymbolTable, ReadError, ReadRef, <span class="prelude-ty">Result</span>,
+    SectionIndex, SectionKind, SymbolFlags, SymbolIndex, SymbolKind, SymbolMap, SymbolMapEntry,
+    SymbolScope, SymbolSection,
 };
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">MachHeader</span>, <span class="ident">MachOFile</span>};
+<span class="kw">use super</span>::{MachHeader, MachOFile};
 
-<span class="doccomment">/// A table of symbol entries in a Mach-O file.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Also includes the string table used for the symbol names.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Mach</span>: <span class="ident">MachHeader</span>, <span class="ident">R</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A table of symbol entries in a Mach-O file.
+///
+/// Also includes the string table used for the symbol names.
+</span><span class="attribute">#[derive(Debug, Clone, Copy)]
+</span><span class="kw">pub struct </span>SymbolTable&lt;<span class="lifetime">&#39;data</span>, Mach: MachHeader, R = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt;
+<span class="kw">where
+    </span>R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;,
 {
-    <span class="ident">symbols</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">Mach::Nlist</span>],
-    <span class="ident">strings</span>: <span class="ident">StringTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span><span class="op">&gt;</span>,
+    symbols: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[Mach::Nlist],
+    strings: StringTable&lt;<span class="lifetime">&#39;data</span>, R&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Mach</span>: <span class="ident">MachHeader</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">SymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Mach</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">SymbolTable</span> {
-            <span class="ident">symbols</span>: <span class="kw-2">&amp;</span>[],
-            <span class="ident">strings</span>: <span class="ident">Default::default</span>(),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, Mach: MachHeader, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;&gt; Default <span class="kw">for </span>SymbolTable&lt;<span class="lifetime">&#39;data</span>, Mach, R&gt; {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        SymbolTable {
+            symbols: <span class="kw-2">&amp;</span>[],
+            strings: Default::default(),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Mach</span>: <span class="ident">MachHeader</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">SymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Mach</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">symbols</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">Mach::Nlist</span>], <span class="ident">strings</span>: <span class="ident">StringTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">SymbolTable</span> { <span class="ident">symbols</span>, <span class="ident">strings</span> }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, Mach: MachHeader, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;&gt; SymbolTable&lt;<span class="lifetime">&#39;data</span>, Mach, R&gt; {
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new(symbols: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[Mach::Nlist], strings: StringTable&lt;<span class="lifetime">&#39;data</span>, R&gt;) -&gt; <span class="self">Self </span>{
+        SymbolTable { symbols, strings }
     }
 
-    <span class="doccomment">/// Return the string table used for the symbol names.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">strings</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">StringTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">strings</span>
+    <span class="doccomment">/// Return the string table used for the symbol names.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>strings(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; StringTable&lt;<span class="lifetime">&#39;data</span>, R&gt; {
+        <span class="self">self</span>.strings
     }
 
-    <span class="doccomment">/// Iterate over the symbols.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">slice::Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Mach::Nlist</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">symbols</span>.<span class="ident">iter</span>()
+    <span class="doccomment">/// Iterate over the symbols.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; slice::Iter&lt;<span class="lifetime">&#39;data</span>, Mach::Nlist&gt; {
+        <span class="self">self</span>.symbols.iter()
     }
 
-    <span class="doccomment">/// Return true if the symbol table is empty.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">symbols</span>.<span class="ident">is_empty</span>()
+    <span class="doccomment">/// Return true if the symbol table is empty.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.symbols.is_empty()
     }
 
-    <span class="doccomment">/// The number of symbols.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">symbols</span>.<span class="ident">len</span>()
+    <span class="doccomment">/// The number of symbols.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.symbols.len()
     }
 
-    <span class="doccomment">/// Return the symbol at the given index.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">symbol</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="ident">Mach::Nlist</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">symbols</span>
-            .<span class="ident">get</span>(<span class="ident">index</span>)
-            .<span class="ident">read_error</span>(<span class="string">&quot;Invalid Mach-O symbol index&quot;</span>)
+    <span class="doccomment">/// Return the symbol at the given index.
+    </span><span class="kw">pub fn </span>symbol(<span class="kw-2">&amp;</span><span class="self">self</span>, index: usize) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>Mach::Nlist&gt; {
+        <span class="self">self</span>.symbols
+            .get(index)
+            .read_error(<span class="string">&quot;Invalid Mach-O symbol index&quot;</span>)
     }
 
-    <span class="doccomment">/// Construct a map from addresses to a user-defined map entry.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map</span><span class="op">&lt;</span><span class="ident">Entry</span>: <span class="ident">SymbolMapEntry</span>, <span class="ident">F</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="ident">Mach::Nlist</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Entry</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Construct a map from addresses to a user-defined map entry.
+    </span><span class="kw">pub fn </span>map&lt;Entry: SymbolMapEntry, F: Fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>Mach::Nlist) -&gt; <span class="prelude-ty">Option</span>&lt;Entry&gt;&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">f</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="ident">SymbolMap</span><span class="op">&lt;</span><span class="ident">Entry</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">symbols</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="kw">for</span> <span class="ident">nlist</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">symbols</span> {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">nlist</span>.<span class="ident">is_definition</span>() {
+        f: F,
+    ) -&gt; SymbolMap&lt;Entry&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>symbols = Vec::new();
+        <span class="kw">for </span>nlist <span class="kw">in </span><span class="self">self</span>.symbols {
+            <span class="kw">if </span>!nlist.is_definition() {
                 <span class="kw">continue</span>;
             }
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">entry</span>) <span class="op">=</span> <span class="ident">f</span>(<span class="ident">nlist</span>) {
-                <span class="ident">symbols</span>.<span class="ident">push</span>(<span class="ident">entry</span>);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(entry) = f(nlist) {
+                symbols.push(entry);
             }
         }
-        <span class="ident">SymbolMap::new</span>(<span class="ident">symbols</span>)
+        SymbolMap::new(symbols)
     }
 
-    <span class="doccomment">/// Construct a map from addresses to symbol names and object file names.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">object_map</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident">Mach::Endian</span>) -&gt; <span class="ident">ObjectMap</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">symbols</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">objects</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">object</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">current_function</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="comment">// Each module starts with one or two N_SO symbols (path, or directory + filename)</span>
-        <span class="comment">// and one N_OSO symbol. The module is terminated by an empty N_SO symbol.</span>
-        <span class="kw">for</span> <span class="ident">nlist</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">symbols</span> {
-            <span class="kw">let</span> <span class="ident">n_type</span> <span class="op">=</span> <span class="ident">nlist</span>.<span class="ident">n_type</span>();
-            <span class="kw">if</span> <span class="ident">n_type</span> <span class="op">&amp;</span> <span class="ident">macho::N_STAB</span> <span class="op">==</span> <span class="number">0</span> {
+    <span class="doccomment">/// Construct a map from addresses to symbol names and object file names.
+    </span><span class="kw">pub fn </span>object_map(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: Mach::Endian) -&gt; ObjectMap&lt;<span class="lifetime">&#39;data</span>&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>symbols = Vec::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>objects = Vec::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>object = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>current_function = <span class="prelude-val">None</span>;
+        <span class="comment">// Each module starts with one or two N_SO symbols (path, or directory + filename)
+        // and one N_OSO symbol. The module is terminated by an empty N_SO symbol.
+        </span><span class="kw">for </span>nlist <span class="kw">in </span><span class="self">self</span>.symbols {
+            <span class="kw">let </span>n_type = nlist.n_type();
+            <span class="kw">if </span>n_type &amp; macho::N_STAB == <span class="number">0 </span>{
                 <span class="kw">continue</span>;
             }
-            <span class="comment">// TODO: includes variables too (N_GSYM, N_STSYM). These may need to get their</span>
-            <span class="comment">// address from regular symbols though.</span>
-            <span class="kw">match</span> <span class="ident">n_type</span> {
-                <span class="ident">macho::N_SO</span> =&gt; {
-                    <span class="ident">object</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+            <span class="comment">// TODO: includes variables too (N_GSYM, N_STSYM). These may need to get their
+            // address from regular symbols though.
+            </span><span class="kw">match </span>n_type {
+                macho::N_SO =&gt; {
+                    object = <span class="prelude-val">None</span>;
                 }
-                <span class="ident">macho::N_OSO</span> =&gt; {
-                    <span class="ident">object</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">nlist</span>.<span class="ident">name</span>(<span class="ident">endian</span>, <span class="self">self</span>.<span class="ident">strings</span>) {
-                        <span class="kw">if</span> <span class="op">!</span><span class="ident">name</span>.<span class="ident">is_empty</span>() {
-                            <span class="ident">object</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">objects</span>.<span class="ident">len</span>());
-                            <span class="ident">objects</span>.<span class="ident">push</span>(<span class="ident">name</span>);
+                macho::N_OSO =&gt; {
+                    object = <span class="prelude-val">None</span>;
+                    <span class="kw">if let </span><span class="prelude-val">Ok</span>(name) = nlist.name(endian, <span class="self">self</span>.strings) {
+                        <span class="kw">if </span>!name.is_empty() {
+                            object = <span class="prelude-val">Some</span>(objects.len());
+                            objects.push(name);
                         }
                     }
                 }
-                <span class="ident">macho::N_FUN</span> =&gt; {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">nlist</span>.<span class="ident">name</span>(<span class="ident">endian</span>, <span class="self">self</span>.<span class="ident">strings</span>) {
-                        <span class="kw">if</span> <span class="op">!</span><span class="ident">name</span>.<span class="ident">is_empty</span>() {
-                            <span class="ident">current_function</span> <span class="op">=</span> <span class="prelude-val">Some</span>((<span class="ident">name</span>, <span class="ident">nlist</span>.<span class="ident">n_value</span>(<span class="ident">endian</span>).<span class="ident">into</span>()))
-                        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">name</span>, <span class="ident">address</span>)) <span class="op">=</span> <span class="ident">current_function</span>.<span class="ident">take</span>() {
-                            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">object</span>) <span class="op">=</span> <span class="ident">object</span> {
-                                <span class="ident">symbols</span>.<span class="ident">push</span>(<span class="ident">ObjectMapEntry</span> {
-                                    <span class="ident">address</span>,
-                                    <span class="ident">size</span>: <span class="ident">nlist</span>.<span class="ident">n_value</span>(<span class="ident">endian</span>).<span class="ident">into</span>(),
-                                    <span class="ident">name</span>,
-                                    <span class="ident">object</span>,
+                macho::N_FUN =&gt; {
+                    <span class="kw">if let </span><span class="prelude-val">Ok</span>(name) = nlist.name(endian, <span class="self">self</span>.strings) {
+                        <span class="kw">if </span>!name.is_empty() {
+                            current_function = <span class="prelude-val">Some</span>((name, nlist.n_value(endian).into()))
+                        } <span class="kw">else if let </span><span class="prelude-val">Some</span>((name, address)) = current_function.take() {
+                            <span class="kw">if let </span><span class="prelude-val">Some</span>(object) = object {
+                                symbols.push(ObjectMapEntry {
+                                    address,
+                                    size: nlist.n_value(endian).into(),
+                                    name,
+                                    object,
                                 });
                             }
                         }
                     }
                 }
-                <span class="kw">_</span> =&gt; {}
+                <span class="kw">_ </span>=&gt; {}
             }
         }
-        <span class="ident">ObjectMap</span> {
-            <span class="ident">symbols</span>: <span class="ident">SymbolMap::new</span>(<span class="ident">symbols</span>),
-            <span class="ident">objects</span>,
+        ObjectMap {
+            symbols: SymbolMap::new(symbols),
+            objects,
         }
     }
 }
 
-<span class="doccomment">/// An iterator over the symbols of a `MachOFile32`.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">MachOSymbolTable32</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Endian</span> <span class="op">=</span> <span class="ident">Endianness</span>, <span class="ident">R</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">=</span>
-    <span class="ident">MachOSymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">macho::MachHeader32</span><span class="op">&lt;</span><span class="ident">Endian</span><span class="op">&gt;</span>, <span class="ident">R</span><span class="op">&gt;</span>;
-<span class="doccomment">/// An iterator over the symbols of a `MachOFile64`.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">MachOSymbolTable64</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Endian</span> <span class="op">=</span> <span class="ident">Endianness</span>, <span class="ident">R</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">=</span>
-    <span class="ident">MachOSymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">macho::MachHeader64</span><span class="op">&lt;</span><span class="ident">Endian</span><span class="op">&gt;</span>, <span class="ident">R</span><span class="op">&gt;</span>;
+<span class="doccomment">/// An iterator over the symbols of a `MachOFile32`.
+</span><span class="kw">pub type </span>MachOSymbolTable32&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Endian = Endianness, R = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt; =
+    MachOSymbolTable&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, macho::MachHeader32&lt;Endian&gt;, R&gt;;
+<span class="doccomment">/// An iterator over the symbols of a `MachOFile64`.
+</span><span class="kw">pub type </span>MachOSymbolTable64&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Endian = Endianness, R = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt; =
+    MachOSymbolTable&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, macho::MachHeader64&lt;Endian&gt;, R&gt;;
 
-<span class="doccomment">/// A symbol table of a `MachOFile`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MachOSymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Mach</span>, <span class="ident">R</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">Mach</span>: <span class="ident">MachHeader</span>,
-    <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A symbol table of a `MachOFile`.
+</span><span class="attribute">#[derive(Debug, Clone, Copy)]
+</span><span class="kw">pub struct </span>MachOSymbolTable&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Mach, R = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt;
+<span class="kw">where
+    </span>Mach: MachHeader,
+    R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;,
 {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file</span> <span class="ident">MachOFile</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Mach</span>, <span class="ident">R</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) file: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file </span>MachOFile&lt;<span class="lifetime">&#39;data</span>, Mach, R&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Mach</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">read::private::Sealed</span> <span class="kw">for</span> <span class="ident">MachOSymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Mach</span>, <span class="ident">R</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">Mach</span>: <span class="ident">MachHeader</span>,
-    <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Mach, R&gt; read::private::Sealed <span class="kw">for </span>MachOSymbolTable&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Mach, R&gt;
+<span class="kw">where
+    </span>Mach: MachHeader,
+    R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;,
 {
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Mach</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">ObjectSymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MachOSymbolTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Mach</span>, <span class="ident">R</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">Mach</span>: <span class="ident">MachHeader</span>,
-    <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Mach, R&gt; ObjectSymbolTable&lt;<span class="lifetime">&#39;data</span>&gt; <span class="kw">for </span>MachOSymbolTable&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Mach, R&gt;
+<span class="kw">where
+    </span>Mach: MachHeader,
+    R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Symbol</span> <span class="op">=</span> <span class="ident">MachOSymbol</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Mach</span>, <span class="ident">R</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">SymbolIterator</span> <span class="op">=</span> <span class="ident">MachOSymbolIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Mach</span>, <span class="ident">R</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Symbol = MachOSymbol&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Mach, R&gt;;
+    <span class="kw">type </span>SymbolIterator = MachOSymbolIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Mach, R&gt;;
 
-    <span class="kw">fn</span> <span class="ident">symbols</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::SymbolIterator</span> {
-        <span class="ident">MachOSymbolIterator</span> {
-            <span class="ident">file</span>: <span class="self">self</span>.<span class="ident">file</span>,
-            <span class="ident">index</span>: <span class="number">0</span>,
+    <span class="kw">fn </span>symbols(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::SymbolIterator {
+        MachOSymbolIterator {
+            file: <span class="self">self</span>.file,
+            index: <span class="number">0</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">symbol_by_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">SymbolIndex</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Symbol</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">nlist</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">file</span>.<span class="ident">symbols</span>.<span class="ident">symbol</span>(<span class="ident">index</span>.<span class="number">0</span>)<span class="question-mark">?</span>;
-        <span class="ident">MachOSymbol::new</span>(<span class="self">self</span>.<span class="ident">file</span>, <span class="ident">index</span>, <span class="ident">nlist</span>).<span class="ident">read_error</span>(<span class="string">&quot;Unsupported Mach-O symbol index&quot;</span>)
+    <span class="kw">fn </span>symbol_by_index(<span class="kw-2">&amp;</span><span class="self">self</span>, index: SymbolIndex) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::Symbol&gt; {
+        <span class="kw">let </span>nlist = <span class="self">self</span>.file.symbols.symbol(index.<span class="number">0</span>)<span class="question-mark">?</span>;
+        MachOSymbol::new(<span class="self">self</span>.file, index, nlist).read_error(<span class="string">&quot;Unsupported Mach-O symbol index&quot;</span>)
     }
 }
 
-<span class="doccomment">/// An iterator over the symbols of a `MachOFile32`.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">MachOSymbolIterator32</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Endian</span> <span class="op">=</span> <span class="ident">Endianness</span>, <span class="ident">R</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">=</span>
-    <span class="ident">MachOSymbolIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">macho::MachHeader32</span><span class="op">&lt;</span><span class="ident">Endian</span><span class="op">&gt;</span>, <span class="ident">R</span><span class="op">&gt;</span>;
-<span class="doccomment">/// An iterator over the symbols of a `MachOFile64`.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">MachOSymbolIterator64</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Endian</span> <span class="op">=</span> <span class="ident">Endianness</span>, <span class="ident">R</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">=</span>
-    <span class="ident">MachOSymbolIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">macho::MachHeader64</span><span class="op">&lt;</span><span class="ident">Endian</span><span class="op">&gt;</span>, <span class="ident">R</span><span class="op">&gt;</span>;
+<span class="doccomment">/// An iterator over the symbols of a `MachOFile32`.
+</span><span class="kw">pub type </span>MachOSymbolIterator32&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Endian = Endianness, R = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt; =
+    MachOSymbolIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, macho::MachHeader32&lt;Endian&gt;, R&gt;;
+<span class="doccomment">/// An iterator over the symbols of a `MachOFile64`.
+</span><span class="kw">pub type </span>MachOSymbolIterator64&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Endian = Endianness, R = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt; =
+    MachOSymbolIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, macho::MachHeader64&lt;Endian&gt;, R&gt;;
 
-<span class="doccomment">/// An iterator over the symbols of a `MachOFile`.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MachOSymbolIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Mach</span>, <span class="ident">R</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">Mach</span>: <span class="ident">MachHeader</span>,
-    <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
+<span class="doccomment">/// An iterator over the symbols of a `MachOFile`.
+</span><span class="kw">pub struct </span>MachOSymbolIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Mach, R = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt;
+<span class="kw">where
+    </span>Mach: MachHeader,
+    R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;,
 {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file</span> <span class="ident">MachOFile</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Mach</span>, <span class="ident">R</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">index</span>: <span class="ident">usize</span>,
+    <span class="kw">pub</span>(<span class="kw">super</span>) file: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file </span>MachOFile&lt;<span class="lifetime">&#39;data</span>, Mach, R&gt;,
+    <span class="kw">pub</span>(<span class="kw">super</span>) index: usize,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Mach</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">MachOSymbolIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Mach</span>, <span class="ident">R</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">Mach</span>: <span class="ident">MachHeader</span>,
-    <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Mach, R&gt; fmt::Debug <span class="kw">for </span>MachOSymbolIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Mach, R&gt;
+<span class="kw">where
+    </span>Mach: MachHeader,
+    R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;MachOSymbolIterator&quot;</span>).<span class="ident">finish</span>()
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;MachOSymbolIterator&quot;</span>).finish()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Mach</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">MachOSymbolIterator</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Mach</span>, <span class="ident">R</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">Mach</span>: <span class="ident">MachHeader</span>,
-    <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Mach, R&gt; Iterator <span class="kw">for </span>MachOSymbolIterator&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Mach, R&gt;
+<span class="kw">where
+    </span>Mach: MachHeader,
+    R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">MachOSymbol</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Mach</span>, <span class="ident">R</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Item = MachOSymbol&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Mach, R&gt;;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index</span>;
-            <span class="kw">let</span> <span class="ident">nlist</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">file</span>.<span class="ident">symbols</span>.<span class="ident">symbols</span>.<span class="ident">get</span>(<span class="ident">index</span>)<span class="question-mark">?</span>;
-            <span class="self">self</span>.<span class="ident">index</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">symbol</span>) <span class="op">=</span> <span class="ident">MachOSymbol::new</span>(<span class="self">self</span>.<span class="ident">file</span>, <span class="ident">SymbolIndex</span>(<span class="ident">index</span>), <span class="ident">nlist</span>) {
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">symbol</span>);
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>index = <span class="self">self</span>.index;
+            <span class="kw">let </span>nlist = <span class="self">self</span>.file.symbols.symbols.get(index)<span class="question-mark">?</span>;
+            <span class="self">self</span>.index += <span class="number">1</span>;
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(symbol) = MachOSymbol::new(<span class="self">self</span>.file, SymbolIndex(index), nlist) {
+                <span class="kw">return </span><span class="prelude-val">Some</span>(symbol);
             }
         }
     }
 }
 
-<span class="doccomment">/// A symbol of a `MachOFile32`.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">MachOSymbol32</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Endian</span> <span class="op">=</span> <span class="ident">Endianness</span>, <span class="ident">R</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">=</span>
-    <span class="ident">MachOSymbol</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">macho::MachHeader32</span><span class="op">&lt;</span><span class="ident">Endian</span><span class="op">&gt;</span>, <span class="ident">R</span><span class="op">&gt;</span>;
-<span class="doccomment">/// A symbol of a `MachOFile64`.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">MachOSymbol64</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Endian</span> <span class="op">=</span> <span class="ident">Endianness</span>, <span class="ident">R</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">=</span>
-    <span class="ident">MachOSymbol</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">macho::MachHeader64</span><span class="op">&lt;</span><span class="ident">Endian</span><span class="op">&gt;</span>, <span class="ident">R</span><span class="op">&gt;</span>;
+<span class="doccomment">/// A symbol of a `MachOFile32`.
+</span><span class="kw">pub type </span>MachOSymbol32&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Endian = Endianness, R = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt; =
+    MachOSymbol&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, macho::MachHeader32&lt;Endian&gt;, R&gt;;
+<span class="doccomment">/// A symbol of a `MachOFile64`.
+</span><span class="kw">pub type </span>MachOSymbol64&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Endian = Endianness, R = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt; =
+    MachOSymbol&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, macho::MachHeader64&lt;Endian&gt;, R&gt;;
 
-<span class="doccomment">/// A symbol of a `MachOFile`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MachOSymbol</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Mach</span>, <span class="ident">R</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">Mach</span>: <span class="ident">MachHeader</span>,
-    <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A symbol of a `MachOFile`.
+</span><span class="attribute">#[derive(Debug, Clone, Copy)]
+</span><span class="kw">pub struct </span>MachOSymbol&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Mach, R = <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt;
+<span class="kw">where
+    </span>Mach: MachHeader,
+    R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;,
 {
-    <span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file</span> <span class="ident">MachOFile</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Mach</span>, <span class="ident">R</span><span class="op">&gt;</span>,
-    <span class="ident">index</span>: <span class="ident">SymbolIndex</span>,
-    <span class="ident">nlist</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="ident">Mach::Nlist</span>,
+    file: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file </span>MachOFile&lt;<span class="lifetime">&#39;data</span>, Mach, R&gt;,
+    index: SymbolIndex,
+    nlist: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>Mach::Nlist,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Mach</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">MachOSymbol</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Mach</span>, <span class="ident">R</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">Mach</span>: <span class="ident">MachHeader</span>,
-    <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Mach, R&gt; MachOSymbol&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Mach, R&gt;
+<span class="kw">where
+    </span>Mach: MachHeader,
+    R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;,
 {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file</span> <span class="ident">MachOFile</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">Mach</span>, <span class="ident">R</span><span class="op">&gt;</span>,
-        <span class="ident">index</span>: <span class="ident">SymbolIndex</span>,
-        <span class="ident">nlist</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="ident">Mach::Nlist</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">nlist</span>.<span class="ident">n_type</span>() <span class="op">&amp;</span> <span class="ident">macho::N_STAB</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new(
+        file: <span class="kw-2">&amp;</span><span class="lifetime">&#39;file </span>MachOFile&lt;<span class="lifetime">&#39;data</span>, Mach, R&gt;,
+        index: SymbolIndex,
+        nlist: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>Mach::Nlist,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">if </span>nlist.n_type() &amp; macho::N_STAB != <span class="number">0 </span>{
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
-        <span class="prelude-val">Some</span>(<span class="ident">MachOSymbol</span> { <span class="ident">file</span>, <span class="ident">index</span>, <span class="ident">nlist</span> })
+        <span class="prelude-val">Some</span>(MachOSymbol { file, index, nlist })
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Mach</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">read::private::Sealed</span> <span class="kw">for</span> <span class="ident">MachOSymbol</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Mach</span>, <span class="ident">R</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">Mach</span>: <span class="ident">MachHeader</span>,
-    <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Mach, R&gt; read::private::Sealed <span class="kw">for </span>MachOSymbol&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Mach, R&gt;
+<span class="kw">where
+    </span>Mach: MachHeader,
+    R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;,
 {
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Mach</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">ObjectSymbol</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MachOSymbol</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, <span class="ident">Mach</span>, <span class="ident">R</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">Mach</span>: <span class="ident">MachHeader</span>,
-    <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Mach, R&gt; ObjectSymbol&lt;<span class="lifetime">&#39;data</span>&gt; <span class="kw">for </span>MachOSymbol&lt;<span class="lifetime">&#39;data</span>, <span class="lifetime">&#39;file</span>, Mach, R&gt;
+<span class="kw">where
+    </span>Mach: MachHeader,
+    R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;,
 {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SymbolIndex</span> {
-        <span class="self">self</span>.<span class="ident">index</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>index(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SymbolIndex {
+        <span class="self">self</span>.index
     }
 
-    <span class="kw">fn</span> <span class="ident">name_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">nlist</span>.<span class="ident">name</span>(<span class="self">self</span>.<span class="ident">file</span>.<span class="ident">endian</span>, <span class="self">self</span>.<span class="ident">file</span>.<span class="ident">symbols</span>.<span class="ident">strings</span>)
+    <span class="kw">fn </span>name_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt; {
+        <span class="self">self</span>.nlist.name(<span class="self">self</span>.file.endian, <span class="self">self</span>.file.symbols.strings)
     }
 
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">name_bytes</span>()<span class="question-mark">?</span>;
-        <span class="ident">str::from_utf8</span>(<span class="ident">name</span>)
-            .<span class="ident">ok</span>()
-            .<span class="ident">read_error</span>(<span class="string">&quot;Non UTF-8 Mach-O symbol name&quot;</span>)
+    <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>str&gt; {
+        <span class="kw">let </span>name = <span class="self">self</span>.name_bytes()<span class="question-mark">?</span>;
+        str::from_utf8(name)
+            .ok()
+            .read_error(<span class="string">&quot;Non UTF-8 Mach-O symbol name&quot;</span>)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">address</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="self">self</span>.<span class="ident">nlist</span>.<span class="ident">n_value</span>(<span class="self">self</span>.<span class="ident">file</span>.<span class="ident">endian</span>).<span class="ident">into</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>address(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="self">self</span>.nlist.n_value(<span class="self">self</span>.file.endian).into()
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="number">0</span>
-    }
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="number">0
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SymbolKind</span> {
-        <span class="self">self</span>.<span class="ident">section</span>()
-            .<span class="ident">index</span>()
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">index</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">file</span>.<span class="ident">section_internal</span>(<span class="ident">index</span>).<span class="ident">ok</span>())
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">section</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">section</span>.<span class="ident">kind</span> {
-                <span class="ident">SectionKind::Text</span> =&gt; <span class="ident">SymbolKind::Text</span>,
-                <span class="ident">SectionKind::Data</span>
-                <span class="op">|</span> <span class="ident">SectionKind::ReadOnlyData</span>
-                <span class="op">|</span> <span class="ident">SectionKind::ReadOnlyString</span>
-                <span class="op">|</span> <span class="ident">SectionKind::UninitializedData</span>
-                <span class="op">|</span> <span class="ident">SectionKind::Common</span> =&gt; <span class="ident">SymbolKind::Data</span>,
-                <span class="ident">SectionKind::Tls</span> <span class="op">|</span> <span class="ident">SectionKind::UninitializedTls</span> <span class="op">|</span> <span class="ident">SectionKind::TlsVariables</span> =&gt; {
-                    <span class="ident">SymbolKind::Tls</span>
+    <span class="kw">fn </span>kind(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SymbolKind {
+        <span class="self">self</span>.section()
+            .index()
+            .and_then(|index| <span class="self">self</span>.file.section_internal(index).ok())
+            .map(|section| <span class="kw">match </span>section.kind {
+                SectionKind::Text =&gt; SymbolKind::Text,
+                SectionKind::Data
+                | SectionKind::ReadOnlyData
+                | SectionKind::ReadOnlyString
+                | SectionKind::UninitializedData
+                | SectionKind::Common =&gt; SymbolKind::Data,
+                SectionKind::Tls | SectionKind::UninitializedTls | SectionKind::TlsVariables =&gt; {
+                    SymbolKind::Tls
                 }
-                <span class="kw">_</span> =&gt; <span class="ident">SymbolKind::Unknown</span>,
+                <span class="kw">_ </span>=&gt; SymbolKind::Unknown,
             })
-            .<span class="ident">unwrap_or</span>(<span class="ident">SymbolKind::Unknown</span>)
+            .unwrap_or(SymbolKind::Unknown)
     }
 
-    <span class="kw">fn</span> <span class="ident">section</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SymbolSection</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">nlist</span>.<span class="ident">n_type</span>() <span class="op">&amp;</span> <span class="ident">macho::N_TYPE</span> {
-            <span class="ident">macho::N_UNDF</span> =&gt; <span class="ident">SymbolSection::Undefined</span>,
-            <span class="ident">macho::N_ABS</span> =&gt; <span class="ident">SymbolSection::Absolute</span>,
-            <span class="ident">macho::N_SECT</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">n_sect</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">nlist</span>.<span class="ident">n_sect</span>();
-                <span class="kw">if</span> <span class="ident">n_sect</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                    <span class="ident">SymbolSection::Section</span>(<span class="ident">SectionIndex</span>(<span class="ident">n_sect</span> <span class="kw">as</span> <span class="ident">usize</span>))
-                } <span class="kw">else</span> {
-                    <span class="ident">SymbolSection::Unknown</span>
+    <span class="kw">fn </span>section(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SymbolSection {
+        <span class="kw">match </span><span class="self">self</span>.nlist.n_type() &amp; macho::N_TYPE {
+            macho::N_UNDF =&gt; SymbolSection::Undefined,
+            macho::N_ABS =&gt; SymbolSection::Absolute,
+            macho::N_SECT =&gt; {
+                <span class="kw">let </span>n_sect = <span class="self">self</span>.nlist.n_sect();
+                <span class="kw">if </span>n_sect != <span class="number">0 </span>{
+                    SymbolSection::Section(SectionIndex(n_sect <span class="kw">as </span>usize))
+                } <span class="kw">else </span>{
+                    SymbolSection::Unknown
                 }
             }
-            <span class="kw">_</span> =&gt; <span class="ident">SymbolSection::Unknown</span>,
+            <span class="kw">_ </span>=&gt; SymbolSection::Unknown,
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_undefined</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">nlist</span>.<span class="ident">n_type</span>() <span class="op">&amp;</span> <span class="ident">macho::N_TYPE</span> <span class="op">==</span> <span class="ident">macho::N_UNDF</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_undefined(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.nlist.n_type() &amp; macho::N_TYPE == macho::N_UNDF
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_definition</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">nlist</span>.<span class="ident">is_definition</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_definition(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.nlist.is_definition()
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_common</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// Mach-O common symbols are based on section, not symbol</span>
-        <span class="bool-val">false</span>
-    }
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_common(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="comment">// Mach-O common symbols are based on section, not symbol
+        </span><span class="bool-val">false
+    </span>}
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_weak</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">nlist</span>.<span class="ident">n_desc</span>(<span class="self">self</span>.<span class="ident">file</span>.<span class="ident">endian</span>) <span class="op">&amp;</span> (<span class="ident">macho::N_WEAK_REF</span> <span class="op">|</span> <span class="ident">macho::N_WEAK_DEF</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
-    }
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_weak(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.nlist.n_desc(<span class="self">self</span>.file.endian) &amp; (macho::N_WEAK_REF | macho::N_WEAK_DEF) != <span class="number">0
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">scope</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SymbolScope</span> {
-        <span class="kw">let</span> <span class="ident">n_type</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">nlist</span>.<span class="ident">n_type</span>();
-        <span class="kw">if</span> <span class="ident">n_type</span> <span class="op">&amp;</span> <span class="ident">macho::N_TYPE</span> <span class="op">==</span> <span class="ident">macho::N_UNDF</span> {
-            <span class="ident">SymbolScope::Unknown</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">n_type</span> <span class="op">&amp;</span> <span class="ident">macho::N_EXT</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="ident">SymbolScope::Compilation</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">n_type</span> <span class="op">&amp;</span> <span class="ident">macho::N_PEXT</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="ident">SymbolScope::Linkage</span>
-        } <span class="kw">else</span> {
-            <span class="ident">SymbolScope::Dynamic</span>
+    <span class="kw">fn </span>scope(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SymbolScope {
+        <span class="kw">let </span>n_type = <span class="self">self</span>.nlist.n_type();
+        <span class="kw">if </span>n_type &amp; macho::N_TYPE == macho::N_UNDF {
+            SymbolScope::Unknown
+        } <span class="kw">else if </span>n_type &amp; macho::N_EXT == <span class="number">0 </span>{
+            SymbolScope::Compilation
+        } <span class="kw">else if </span>n_type &amp; macho::N_PEXT != <span class="number">0 </span>{
+            SymbolScope::Linkage
+        } <span class="kw">else </span>{
+            SymbolScope::Dynamic
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_global</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">scope</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">SymbolScope::Compilation</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_global(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.scope() != SymbolScope::Compilation
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_local</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">scope</span>() <span class="op">==</span> <span class="ident">SymbolScope::Compilation</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>is_local(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.scope() == SymbolScope::Compilation
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">flags</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SymbolFlags</span><span class="op">&lt;</span><span class="ident">SectionIndex</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">n_desc</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">nlist</span>.<span class="ident">n_desc</span>(<span class="self">self</span>.<span class="ident">file</span>.<span class="ident">endian</span>);
-        <span class="ident">SymbolFlags::MachO</span> { <span class="ident">n_desc</span> }
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>flags(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SymbolFlags&lt;SectionIndex&gt; {
+        <span class="kw">let </span>n_desc = <span class="self">self</span>.nlist.n_desc(<span class="self">self</span>.file.endian);
+        SymbolFlags::MachO { n_desc }
     }
 }
 
-<span class="doccomment">/// A trait for generic access to `Nlist32` and `Nlist64`.</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">missing_docs</span>)]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Nlist</span>: <span class="ident">Debug</span> <span class="op">+</span> <span class="ident">Pod</span> {
-    <span class="kw">type</span> <span class="ident">Word</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">Endian</span>: <span class="ident">endian::Endian</span>;
+<span class="doccomment">/// A trait for generic access to `Nlist32` and `Nlist64`.
+</span><span class="attribute">#[allow(missing_docs)]
+</span><span class="kw">pub trait </span>Nlist: Debug + Pod {
+    <span class="kw">type </span>Word: Into&lt;u64&gt;;
+    <span class="kw">type </span>Endian: endian::Endian;
 
-    <span class="kw">fn</span> <span class="ident">n_strx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u32</span>;
-    <span class="kw">fn</span> <span class="ident">n_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span>;
-    <span class="kw">fn</span> <span class="ident">n_sect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span>;
-    <span class="kw">fn</span> <span class="ident">n_desc</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u16</span>;
-    <span class="kw">fn</span> <span class="ident">n_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident"><span class="self">Self</span>::Word</span>;
+    <span class="kw">fn </span>n_strx(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: <span class="self">Self</span>::Endian) -&gt; u32;
+    <span class="kw">fn </span>n_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8;
+    <span class="kw">fn </span>n_sect(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8;
+    <span class="kw">fn </span>n_desc(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: <span class="self">Self</span>::Endian) -&gt; u16;
+    <span class="kw">fn </span>n_value(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: <span class="self">Self</span>::Endian) -&gt; <span class="self">Self</span>::Word;
 
-    <span class="kw">fn</span> <span class="ident">name</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span>: <span class="ident">ReadRef</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+    <span class="kw">fn </span>name&lt;<span class="lifetime">&#39;data</span>, R: ReadRef&lt;<span class="lifetime">&#39;data</span>&gt;&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>,
-        <span class="ident">strings</span>: <span class="ident">StringTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span>, <span class="ident">R</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
-        <span class="ident">strings</span>
-            .<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">n_strx</span>(<span class="ident">endian</span>))
-            .<span class="ident">read_error</span>(<span class="string">&quot;Invalid Mach-O symbol name offset&quot;</span>)
+        endian: <span class="self">Self</span>::Endian,
+        strings: StringTable&lt;<span class="lifetime">&#39;data</span>, R&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt; {
+        strings
+            .get(<span class="self">self</span>.n_strx(endian))
+            .read_error(<span class="string">&quot;Invalid Mach-O symbol name offset&quot;</span>)
     }
 
-    <span class="doccomment">/// Return true if this is a STAB symbol.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This determines the meaning of the `n_type` field.</span>
-    <span class="kw">fn</span> <span class="ident">is_stab</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">n_type</span>() <span class="op">&amp;</span> <span class="ident">macho::N_STAB</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
+    <span class="doccomment">/// Return true if this is a STAB symbol.
+    ///
+    /// This determines the meaning of the `n_type` field.
+    </span><span class="kw">fn </span>is_stab(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.n_type() &amp; macho::N_STAB != <span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Return true if this is an undefined symbol.
+    </span><span class="kw">fn </span>is_undefined(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span>n_type = <span class="self">self</span>.n_type();
+        n_type &amp; macho::N_STAB == <span class="number">0 </span>&amp;&amp; n_type &amp; macho::N_TYPE == macho::N_UNDF
     }
 
-    <span class="doccomment">/// Return true if this is an undefined symbol.</span>
-    <span class="kw">fn</span> <span class="ident">is_undefined</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">n_type</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">n_type</span>();
-        <span class="ident">n_type</span> <span class="op">&amp;</span> <span class="ident">macho::N_STAB</span> <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">n_type</span> <span class="op">&amp;</span> <span class="ident">macho::N_TYPE</span> <span class="op">==</span> <span class="ident">macho::N_UNDF</span>
+    <span class="doccomment">/// Return true if the symbol is a definition of a function or data object.
+    </span><span class="kw">fn </span>is_definition(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span>n_type = <span class="self">self</span>.n_type();
+        n_type &amp; macho::N_STAB == <span class="number">0 </span>&amp;&amp; n_type &amp; macho::N_TYPE != macho::N_UNDF
     }
 
-    <span class="doccomment">/// Return true if the symbol is a definition of a function or data object.</span>
-    <span class="kw">fn</span> <span class="ident">is_definition</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">n_type</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">n_type</span>();
-        <span class="ident">n_type</span> <span class="op">&amp;</span> <span class="ident">macho::N_STAB</span> <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">n_type</span> <span class="op">&amp;</span> <span class="ident">macho::N_TYPE</span> <span class="op">!</span><span class="op">=</span> <span class="ident">macho::N_UNDF</span>
-    }
-
-    <span class="doccomment">/// Return the library ordinal.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is either a 1-based index into the dylib load commands,</span>
-    <span class="doccomment">/// or a special ordinal.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">library_ordinal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u8</span> {
-        (<span class="self">self</span>.<span class="ident">n_desc</span>(<span class="ident">endian</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">8</span>) <span class="kw">as</span> <span class="ident">u8</span>
+    <span class="doccomment">/// Return the library ordinal.
+    ///
+    /// This is either a 1-based index into the dylib load commands,
+    /// or a special ordinal.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>library_ordinal(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: <span class="self">Self</span>::Endian) -&gt; u8 {
+        (<span class="self">self</span>.n_desc(endian) &gt;&gt; <span class="number">8</span>) <span class="kw">as </span>u8
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Endian</span>: <span class="ident">endian::Endian</span><span class="op">&gt;</span> <span class="ident">Nlist</span> <span class="kw">for</span> <span class="ident">macho::Nlist32</span><span class="op">&lt;</span><span class="ident">Endian</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Word</span> <span class="op">=</span> <span class="ident">u32</span>;
-    <span class="kw">type</span> <span class="ident">Endian</span> <span class="op">=</span> <span class="ident">Endian</span>;
+<span class="kw">impl</span>&lt;Endian: endian::Endian&gt; Nlist <span class="kw">for </span>macho::Nlist32&lt;Endian&gt; {
+    <span class="kw">type </span>Word = u32;
+    <span class="kw">type </span>Endian = Endian;
 
-    <span class="kw">fn</span> <span class="ident">n_strx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">n_strx</span>.<span class="ident">get</span>(<span class="ident">endian</span>)
+    <span class="kw">fn </span>n_strx(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: <span class="self">Self</span>::Endian) -&gt; u32 {
+        <span class="self">self</span>.n_strx.get(endian)
     }
-    <span class="kw">fn</span> <span class="ident">n_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">n_type</span>
+    <span class="kw">fn </span>n_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.n_type
     }
-    <span class="kw">fn</span> <span class="ident">n_sect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">n_sect</span>
+    <span class="kw">fn </span>n_sect(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.n_sect
     }
-    <span class="kw">fn</span> <span class="ident">n_desc</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u16</span> {
-        <span class="self">self</span>.<span class="ident">n_desc</span>.<span class="ident">get</span>(<span class="ident">endian</span>)
+    <span class="kw">fn </span>n_desc(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: <span class="self">Self</span>::Endian) -&gt; u16 {
+        <span class="self">self</span>.n_desc.get(endian)
     }
-    <span class="kw">fn</span> <span class="ident">n_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident"><span class="self">Self</span>::Word</span> {
-        <span class="self">self</span>.<span class="ident">n_value</span>.<span class="ident">get</span>(<span class="ident">endian</span>)
+    <span class="kw">fn </span>n_value(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: <span class="self">Self</span>::Endian) -&gt; <span class="self">Self</span>::Word {
+        <span class="self">self</span>.n_value.get(endian)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Endian</span>: <span class="ident">endian::Endian</span><span class="op">&gt;</span> <span class="ident">Nlist</span> <span class="kw">for</span> <span class="ident">macho::Nlist64</span><span class="op">&lt;</span><span class="ident">Endian</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Word</span> <span class="op">=</span> <span class="ident">u64</span>;
-    <span class="kw">type</span> <span class="ident">Endian</span> <span class="op">=</span> <span class="ident">Endian</span>;
+<span class="kw">impl</span>&lt;Endian: endian::Endian&gt; Nlist <span class="kw">for </span>macho::Nlist64&lt;Endian&gt; {
+    <span class="kw">type </span>Word = u64;
+    <span class="kw">type </span>Endian = Endian;
 
-    <span class="kw">fn</span> <span class="ident">n_strx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">n_strx</span>.<span class="ident">get</span>(<span class="ident">endian</span>)
+    <span class="kw">fn </span>n_strx(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: <span class="self">Self</span>::Endian) -&gt; u32 {
+        <span class="self">self</span>.n_strx.get(endian)
     }
-    <span class="kw">fn</span> <span class="ident">n_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">n_type</span>
+    <span class="kw">fn </span>n_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.n_type
     }
-    <span class="kw">fn</span> <span class="ident">n_sect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="ident">n_sect</span>
+    <span class="kw">fn </span>n_sect(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.n_sect
     }
-    <span class="kw">fn</span> <span class="ident">n_desc</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident">u16</span> {
-        <span class="self">self</span>.<span class="ident">n_desc</span>.<span class="ident">get</span>(<span class="ident">endian</span>)
+    <span class="kw">fn </span>n_desc(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: <span class="self">Self</span>::Endian) -&gt; u16 {
+        <span class="self">self</span>.n_desc.get(endian)
     }
-    <span class="kw">fn</span> <span class="ident">n_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">endian</span>: <span class="ident"><span class="self">Self</span>::Endian</span>) -&gt; <span class="ident"><span class="self">Self</span>::Word</span> {
-        <span class="self">self</span>.<span class="ident">n_value</span>.<span class="ident">get</span>(<span class="ident">endian</span>)
+    <span class="kw">fn </span>n_value(<span class="kw-2">&amp;</span><span class="self">self</span>, endian: <span class="self">Self</span>::Endian) -&gt; <span class="self">Self</span>::Word {
+        <span class="self">self</span>.n_value.get(endian)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="object" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="object" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

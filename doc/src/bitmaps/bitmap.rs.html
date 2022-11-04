@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bitmaps-2.1.0/src/bitmap.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bitmap.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../bitmaps/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../bitmaps/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../bitmaps/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bitmaps-2.1.0/src/bitmap.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bitmap.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../bitmaps/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../bitmaps/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../bitmaps/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -508,515 +508,515 @@
 <span id="508">508</span>
 <span id="509">509</span>
 <span id="510">510</span>
-</pre><pre class="rust"><code><span class="comment">// This Source Code Form is subject to the terms of the Mozilla Public</span>
-<span class="comment">// License, v. 2.0. If a copy of the MPL was not distributed with this</span>
-<span class="comment">// file, You can obtain one at http://mozilla.org/MPL/2.0/.</span>
+</pre><pre class="rust"><code><span class="comment">// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-<span class="kw">use</span> <span class="ident">core::ops</span>::<span class="kw-2">*</span>;
+</span><span class="kw">use </span>core::ops::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident">typenum</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span>typenum::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::types</span>::{<span class="ident">BitOps</span>, <span class="ident">Bits</span>};
+<span class="kw">use </span><span class="kw">crate</span>::types::{BitOps, Bits};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::fmt</span>::{<span class="ident">Debug</span>, <span class="ident">Error</span>, <span class="ident">Formatter</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">use </span>std::fmt::{Debug, Error, Formatter};
 
-<span class="doccomment">/// A compact array of bits.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The type used to store the bitmap will be the minimum unsigned integer type</span>
-<span class="doccomment">/// required to fit the number of bits, from `u8` to `u128`. If the size is 1,</span>
-<span class="doccomment">/// `bool` is used. If the size exceeds 128, an array of `u128` will be used,</span>
-<span class="doccomment">/// sized as appropriately. The maximum supported size is currently 1024,</span>
-<span class="doccomment">/// represented by an array `[u128; 8]`.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">Size</span>: <span class="ident">Bits</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">data</span>: <span class="ident">Size::Store</span>,
+<span class="doccomment">/// A compact array of bits.
+///
+/// The type used to store the bitmap will be the minimum unsigned integer type
+/// required to fit the number of bits, from `u8` to `u128`. If the size is 1,
+/// `bool` is used. If the size exceeds 128, an array of `u128` will be used,
+/// sized as appropriately. The maximum supported size is currently 1024,
+/// represented by an array `[u128; 8]`.
+</span><span class="kw">pub struct </span>Bitmap&lt;Size: Bits&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) data: Size::Store,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Size</span>: <span class="ident">Bits</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">Size</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Bitmap</span> { <span class="ident">data</span>: <span class="self">self</span>.<span class="ident">data</span> }
+<span class="kw">impl</span>&lt;Size: Bits&gt; Clone <span class="kw">for </span>Bitmap&lt;Size&gt; {
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        Bitmap { data: <span class="self">self</span>.data }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Size</span>: <span class="ident">Bits</span><span class="op">&gt;</span> <span class="ident">Copy</span> <span class="kw">for</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">Size</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span>&lt;Size: Bits&gt; Copy <span class="kw">for </span>Bitmap&lt;Size&gt; {}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Size</span>: <span class="ident">Bits</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">Size</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">Bitmap</span> {
-            <span class="ident">data</span>: <span class="ident">Size::Store::default</span>(),
+<span class="kw">impl</span>&lt;Size: Bits&gt; Default <span class="kw">for </span>Bitmap&lt;Size&gt; {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        Bitmap {
+            data: Size::Store::default(),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Size</span>: <span class="ident">Bits</span><span class="op">&gt;</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">Size</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">data</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">data</span>
+<span class="kw">impl</span>&lt;Size: Bits&gt; PartialEq <span class="kw">for </span>Bitmap&lt;Size&gt; {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="self">self</span>.data == other.data
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Size</span>: <span class="ident">Bits</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">Size</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">Size::Store::to_hex</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>))
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">impl</span>&lt;Size: Bits&gt; Debug <span class="kw">for </span>Bitmap&lt;Size&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, Size::Store::to_hex(<span class="kw-2">&amp;</span><span class="self">self</span>.data))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Size</span>: <span class="ident">Bits</span><span class="op">&gt;</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">Size</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Construct a bitmap with every bit set to `false`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::default</span>()
+<span class="kw">impl</span>&lt;Size: Bits&gt; Bitmap&lt;Size&gt; {
+    <span class="doccomment">/// Construct a bitmap with every bit set to `false`.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
     }
 
-    <span class="doccomment">/// Construct a bitmap where every bit with index less than `bits` is</span>
-    <span class="doccomment">/// `true`, and every other bit is `false`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mask</span>(<span class="ident">bits</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="macro">debug_assert!</span>(<span class="ident">bits</span> <span class="op">&lt;</span> <span class="ident">Size::USIZE</span>);
-        <span class="self">Self</span> {
-            <span class="ident">data</span>: <span class="ident">Size::Store::make_mask</span>(<span class="ident">bits</span>),
+    <span class="doccomment">/// Construct a bitmap where every bit with index less than `bits` is
+    /// `true`, and every other bit is `false`.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>mask(bits: usize) -&gt; <span class="self">Self </span>{
+        <span class="macro">debug_assert!</span>(bits &lt; Size::USIZE);
+        <span class="self">Self </span>{
+            data: Size::Store::make_mask(bits),
         }
     }
 
-    <span class="doccomment">/// Construct a bitmap from a value of the same type as its backing store.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_value</span>(<span class="ident">data</span>: <span class="ident">Size::Store</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">data</span> }
+    <span class="doccomment">/// Construct a bitmap from a value of the same type as its backing store.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>from_value(data: Size::Store) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ data }
     }
 
-    <span class="doccomment">/// Convert this bitmap into a value of the type of its backing store.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_value</span>(<span class="self">self</span>) -&gt; <span class="ident">Size::Store</span> {
-        <span class="self">self</span>.<span class="ident">data</span>
+    <span class="doccomment">/// Convert this bitmap into a value of the type of its backing store.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>into_value(<span class="self">self</span>) -&gt; Size::Store {
+        <span class="self">self</span>.data
     }
 
-    <span class="doccomment">/// Count the number of `true` bits in the bitmap.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="ident">Size::Store::len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>)
+    <span class="doccomment">/// Count the number of `true` bits in the bitmap.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>len(<span class="self">self</span>) -&gt; usize {
+        Size::Store::len(<span class="kw-2">&amp;</span><span class="self">self</span>.data)
     }
 
-    <span class="doccomment">/// Test if the bitmap contains only `false` bits.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">first_index</span>().<span class="ident">is_none</span>()
+    <span class="doccomment">/// Test if the bitmap contains only `false` bits.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>is_empty(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.first_index().is_none()
     }
 
-    <span class="doccomment">/// Get the value of the bit at a given index.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">debug_assert!</span>(<span class="ident">index</span> <span class="op">&lt;</span> <span class="ident">Size::USIZE</span>);
-        <span class="ident">Size::Store::get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>, <span class="ident">index</span>)
+    <span class="doccomment">/// Get the value of the bit at a given index.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>get(<span class="self">self</span>, index: usize) -&gt; bool {
+        <span class="macro">debug_assert!</span>(index &lt; Size::USIZE);
+        Size::Store::get(<span class="kw-2">&amp;</span><span class="self">self</span>.data, index)
     }
 
-    <span class="doccomment">/// Set the value of the bit at a given index.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns the previous value of the bit.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>, <span class="ident">value</span>: <span class="ident">bool</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">debug_assert!</span>(<span class="ident">index</span> <span class="op">&lt;</span> <span class="ident">Size::USIZE</span>);
-        <span class="ident">Size::Store::set</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span>, <span class="ident">index</span>, <span class="ident">value</span>)
+    <span class="doccomment">/// Set the value of the bit at a given index.
+    ///
+    /// Returns the previous value of the bit.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>set(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize, value: bool) -&gt; bool {
+        <span class="macro">debug_assert!</span>(index &lt; Size::USIZE);
+        Size::Store::set(<span class="kw-2">&amp;mut </span><span class="self">self</span>.data, index, value)
     }
 
-    <span class="doccomment">/// Find the index of the first `true` bit in the bitmap.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">first_index</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="ident">Size::Store::first_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span>)
+    <span class="doccomment">/// Find the index of the first `true` bit in the bitmap.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>first_index(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+        Size::Store::first_index(<span class="kw-2">&amp;</span><span class="self">self</span>.data)
     }
 
-    <span class="doccomment">/// Invert all the bits in the bitmap.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invert</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="ident">Size::Store::invert</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span>);
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Size</span>: <span class="ident">Bits</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">Size</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">usize</span>;
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Size</span><span class="op">&gt;</span>;
-
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-        <span class="ident">Iter</span> {
-            <span class="ident">index</span>: <span class="number">0</span>,
-            <span class="ident">data</span>: <span class="self">self</span>,
-        }
+    <span class="doccomment">/// Invert all the bits in the bitmap.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>invert(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        Size::Store::invert(<span class="kw-2">&amp;mut </span><span class="self">self</span>.data);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Size</span>: <span class="ident">Bits</span><span class="op">&gt;</span> <span class="ident">BitAnd</span> <span class="kw">for</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">Size</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
-    <span class="kw">fn</span> <span class="ident">bitand</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="ident">Size::Store::bit_and</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span>, <span class="kw-2">&amp;</span><span class="ident">rhs</span>.<span class="ident">data</span>);
-        <span class="self">self</span>
-    }
-}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, Size: Bits&gt; IntoIterator <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Bitmap&lt;Size&gt; {
+    <span class="kw">type </span>Item = usize;
+    <span class="kw">type </span>IntoIter = Iter&lt;<span class="lifetime">&#39;a</span>, Size&gt;;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Size</span>: <span class="ident">Bits</span><span class="op">&gt;</span> <span class="ident">BitOr</span> <span class="kw">for</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">Size</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
-    <span class="kw">fn</span> <span class="ident">bitor</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="ident">Size::Store::bit_or</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span>, <span class="kw-2">&amp;</span><span class="ident">rhs</span>.<span class="ident">data</span>);
-        <span class="self">self</span>
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Size</span>: <span class="ident">Bits</span><span class="op">&gt;</span> <span class="ident">BitXor</span> <span class="kw">for</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">Size</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
-    <span class="kw">fn</span> <span class="ident">bitxor</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="ident">Size::Store::bit_xor</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span>, <span class="kw-2">&amp;</span><span class="ident">rhs</span>.<span class="ident">data</span>);
-        <span class="self">self</span>
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Size</span>: <span class="ident">Bits</span><span class="op">&gt;</span> <span class="ident">Not</span> <span class="kw">for</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">Size</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
-    <span class="kw">fn</span> <span class="ident">not</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="ident">Size::Store::invert</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span>);
-        <span class="self">self</span>
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Size</span>: <span class="ident">Bits</span><span class="op">&gt;</span> <span class="ident">BitAndAssign</span> <span class="kw">for</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">Size</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">bitand_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) {
-        <span class="ident">Size::Store::bit_and</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span>, <span class="kw-2">&amp;</span><span class="ident">rhs</span>.<span class="ident">data</span>);
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Size</span>: <span class="ident">Bits</span><span class="op">&gt;</span> <span class="ident">BitOrAssign</span> <span class="kw">for</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">Size</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">bitor_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) {
-        <span class="ident">Size::Store::bit_or</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span>, <span class="kw-2">&amp;</span><span class="ident">rhs</span>.<span class="ident">data</span>);
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Size</span>: <span class="ident">Bits</span><span class="op">&gt;</span> <span class="ident">BitXorAssign</span> <span class="kw">for</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">Size</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">bitxor_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) {
-        <span class="ident">Size::Store::bit_xor</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span>, <span class="kw-2">&amp;</span><span class="ident">rhs</span>.<span class="ident">data</span>);
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>[<span class="ident">u128</span>; <span class="number">2</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">U256</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">data</span>: [<span class="ident">u128</span>; <span class="number">2</span>]) -&gt; <span class="self">Self</span> {
-        <span class="ident">Bitmap</span> { <span class="ident">data</span> }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>[<span class="ident">u128</span>; <span class="number">3</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">U384</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">data</span>: [<span class="ident">u128</span>; <span class="number">3</span>]) -&gt; <span class="self">Self</span> {
-        <span class="ident">Bitmap</span> { <span class="ident">data</span> }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>[<span class="ident">u128</span>; <span class="number">4</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">U512</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">data</span>: [<span class="ident">u128</span>; <span class="number">4</span>]) -&gt; <span class="self">Self</span> {
-        <span class="ident">Bitmap</span> { <span class="ident">data</span> }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>[<span class="ident">u128</span>; <span class="number">5</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">U640</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">data</span>: [<span class="ident">u128</span>; <span class="number">5</span>]) -&gt; <span class="self">Self</span> {
-        <span class="ident">Bitmap</span> { <span class="ident">data</span> }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>[<span class="ident">u128</span>; <span class="number">6</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">U768</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">data</span>: [<span class="ident">u128</span>; <span class="number">6</span>]) -&gt; <span class="self">Self</span> {
-        <span class="ident">Bitmap</span> { <span class="ident">data</span> }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>[<span class="ident">u128</span>; <span class="number">7</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">U896</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">data</span>: [<span class="ident">u128</span>; <span class="number">7</span>]) -&gt; <span class="self">Self</span> {
-        <span class="ident">Bitmap</span> { <span class="ident">data</span> }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>[<span class="ident">u128</span>; <span class="number">8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">U1024</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">data</span>: [<span class="ident">u128</span>; <span class="number">8</span>]) -&gt; <span class="self">Self</span> {
-        <span class="ident">Bitmap</span> { <span class="ident">data</span> }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span>[<span class="ident">u128</span>; <span class="number">2</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">U256</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; [<span class="ident">u128</span>; <span class="number">2</span>] {
-        <span class="self">self</span>.<span class="ident">data</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span>[<span class="ident">u128</span>; <span class="number">3</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">U384</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; [<span class="ident">u128</span>; <span class="number">3</span>] {
-        <span class="self">self</span>.<span class="ident">data</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span>[<span class="ident">u128</span>; <span class="number">4</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">U512</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; [<span class="ident">u128</span>; <span class="number">4</span>] {
-        <span class="self">self</span>.<span class="ident">data</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span>[<span class="ident">u128</span>; <span class="number">5</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">U640</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; [<span class="ident">u128</span>; <span class="number">5</span>] {
-        <span class="self">self</span>.<span class="ident">data</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span>[<span class="ident">u128</span>; <span class="number">6</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">U768</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; [<span class="ident">u128</span>; <span class="number">6</span>] {
-        <span class="self">self</span>.<span class="ident">data</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span>[<span class="ident">u128</span>; <span class="number">7</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">U896</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; [<span class="ident">u128</span>; <span class="number">7</span>] {
-        <span class="self">self</span>.<span class="ident">data</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span>[<span class="ident">u128</span>; <span class="number">8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">U1024</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; [<span class="ident">u128</span>; <span class="number">8</span>] {
-        <span class="self">self</span>.<span class="ident">data</span>
-    }
-}
-
-<span class="doccomment">/// An iterator over the indices in a bitmap which are `true`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This yields a sequence of `usize` indices, not their contents (which are</span>
-<span class="doccomment">/// always `true` anyway, by definition).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use bitmaps::Bitmap;</span>
-<span class="doccomment">/// # use typenum::U10;</span>
-<span class="doccomment">/// let mut bitmap: Bitmap&lt;U10&gt; = Bitmap::new();</span>
-<span class="doccomment">/// bitmap.set(3, true);</span>
-<span class="doccomment">/// bitmap.set(5, true);</span>
-<span class="doccomment">/// bitmap.set(8, true);</span>
-<span class="doccomment">/// let true_indices: Vec&lt;usize&gt; = bitmap.into_iter().collect();</span>
-<span class="doccomment">/// assert_eq!(vec![3, 5, 8], true_indices);</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Size</span>: <span class="ident">Bits</span><span class="op">&gt;</span> {
-    <span class="ident">index</span>: <span class="ident">usize</span>,
-    <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">Size</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Size</span>: <span class="ident">Bits</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Size</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">usize</span>;
-
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">Size::USIZE</span> {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
-        }
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">index</span>) {
-            <span class="self">self</span>.<span class="ident">index</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">index</span> <span class="op">-</span> <span class="number">1</span>)
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">index</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="self">self</span>.<span class="ident">next</span>()
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+        Iter {
+            index: <span class="number">0</span>,
+            data: <span class="self">self</span>,
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>, <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::cast_ptr_alignment</span>)]</span>
-<span class="kw">mod</span> <span class="ident">x86_arch</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86&quot;</span>)]</span>
-    <span class="kw">use</span> <span class="ident">core::arch::x86</span>::<span class="kw-2">*</span>;
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;x86_64&quot;</span>)]</span>
-    <span class="kw">use</span> <span class="ident">core::arch::x86_64</span>::<span class="kw-2">*</span>;
+<span class="kw">impl</span>&lt;Size: Bits&gt; BitAnd <span class="kw">for </span>Bitmap&lt;Size&gt; {
+    <span class="kw">type </span>Output = <span class="self">Self</span>;
+    <span class="kw">fn </span>bitand(<span class="kw-2">mut </span><span class="self">self</span>, rhs: <span class="self">Self</span>) -&gt; <span class="self">Self</span>::Output {
+        Size::Store::bit_and(<span class="kw-2">&amp;mut </span><span class="self">self</span>.data, <span class="kw-2">&amp;</span>rhs.data);
+        <span class="self">self
+    </span>}
+}
 
-    <span class="kw">impl</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">U128</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">target_feature</span>(<span class="ident">enable</span> <span class="op">=</span> <span class="string">&quot;sse2&quot;</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">load_m128i</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">__m128i</span> {
-            <span class="ident">_mm_loadu_si128</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">__m128i</span>)
+<span class="kw">impl</span>&lt;Size: Bits&gt; BitOr <span class="kw">for </span>Bitmap&lt;Size&gt; {
+    <span class="kw">type </span>Output = <span class="self">Self</span>;
+    <span class="kw">fn </span>bitor(<span class="kw-2">mut </span><span class="self">self</span>, rhs: <span class="self">Self</span>) -&gt; <span class="self">Self</span>::Output {
+        Size::Store::bit_or(<span class="kw-2">&amp;mut </span><span class="self">self</span>.data, <span class="kw-2">&amp;</span>rhs.data);
+        <span class="self">self
+    </span>}
+}
+
+<span class="kw">impl</span>&lt;Size: Bits&gt; BitXor <span class="kw">for </span>Bitmap&lt;Size&gt; {
+    <span class="kw">type </span>Output = <span class="self">Self</span>;
+    <span class="kw">fn </span>bitxor(<span class="kw-2">mut </span><span class="self">self</span>, rhs: <span class="self">Self</span>) -&gt; <span class="self">Self</span>::Output {
+        Size::Store::bit_xor(<span class="kw-2">&amp;mut </span><span class="self">self</span>.data, <span class="kw-2">&amp;</span>rhs.data);
+        <span class="self">self
+    </span>}
+}
+
+<span class="kw">impl</span>&lt;Size: Bits&gt; Not <span class="kw">for </span>Bitmap&lt;Size&gt; {
+    <span class="kw">type </span>Output = <span class="self">Self</span>;
+    <span class="kw">fn </span>not(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Output {
+        Size::Store::invert(<span class="kw-2">&amp;mut </span><span class="self">self</span>.data);
+        <span class="self">self
+    </span>}
+}
+
+<span class="kw">impl</span>&lt;Size: Bits&gt; BitAndAssign <span class="kw">for </span>Bitmap&lt;Size&gt; {
+    <span class="kw">fn </span>bitand_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, rhs: <span class="self">Self</span>) {
+        Size::Store::bit_and(<span class="kw-2">&amp;mut </span><span class="self">self</span>.data, <span class="kw-2">&amp;</span>rhs.data);
+    }
+}
+
+<span class="kw">impl</span>&lt;Size: Bits&gt; BitOrAssign <span class="kw">for </span>Bitmap&lt;Size&gt; {
+    <span class="kw">fn </span>bitor_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, rhs: <span class="self">Self</span>) {
+        Size::Store::bit_or(<span class="kw-2">&amp;mut </span><span class="self">self</span>.data, <span class="kw-2">&amp;</span>rhs.data);
+    }
+}
+
+<span class="kw">impl</span>&lt;Size: Bits&gt; BitXorAssign <span class="kw">for </span>Bitmap&lt;Size&gt; {
+    <span class="kw">fn </span>bitxor_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, rhs: <span class="self">Self</span>) {
+        Size::Store::bit_xor(<span class="kw-2">&amp;mut </span><span class="self">self</span>.data, <span class="kw-2">&amp;</span>rhs.data);
+    }
+}
+
+<span class="kw">impl </span>From&lt;[u128; <span class="number">2</span>]&gt; <span class="kw">for </span>Bitmap&lt;U256&gt; {
+    <span class="kw">fn </span>from(data: [u128; <span class="number">2</span>]) -&gt; <span class="self">Self </span>{
+        Bitmap { data }
+    }
+}
+
+<span class="kw">impl </span>From&lt;[u128; <span class="number">3</span>]&gt; <span class="kw">for </span>Bitmap&lt;U384&gt; {
+    <span class="kw">fn </span>from(data: [u128; <span class="number">3</span>]) -&gt; <span class="self">Self </span>{
+        Bitmap { data }
+    }
+}
+
+<span class="kw">impl </span>From&lt;[u128; <span class="number">4</span>]&gt; <span class="kw">for </span>Bitmap&lt;U512&gt; {
+    <span class="kw">fn </span>from(data: [u128; <span class="number">4</span>]) -&gt; <span class="self">Self </span>{
+        Bitmap { data }
+    }
+}
+
+<span class="kw">impl </span>From&lt;[u128; <span class="number">5</span>]&gt; <span class="kw">for </span>Bitmap&lt;U640&gt; {
+    <span class="kw">fn </span>from(data: [u128; <span class="number">5</span>]) -&gt; <span class="self">Self </span>{
+        Bitmap { data }
+    }
+}
+
+<span class="kw">impl </span>From&lt;[u128; <span class="number">6</span>]&gt; <span class="kw">for </span>Bitmap&lt;U768&gt; {
+    <span class="kw">fn </span>from(data: [u128; <span class="number">6</span>]) -&gt; <span class="self">Self </span>{
+        Bitmap { data }
+    }
+}
+
+<span class="kw">impl </span>From&lt;[u128; <span class="number">7</span>]&gt; <span class="kw">for </span>Bitmap&lt;U896&gt; {
+    <span class="kw">fn </span>from(data: [u128; <span class="number">7</span>]) -&gt; <span class="self">Self </span>{
+        Bitmap { data }
+    }
+}
+
+<span class="kw">impl </span>From&lt;[u128; <span class="number">8</span>]&gt; <span class="kw">for </span>Bitmap&lt;U1024&gt; {
+    <span class="kw">fn </span>from(data: [u128; <span class="number">8</span>]) -&gt; <span class="self">Self </span>{
+        Bitmap { data }
+    }
+}
+
+<span class="kw">impl </span>Into&lt;[u128; <span class="number">2</span>]&gt; <span class="kw">for </span>Bitmap&lt;U256&gt; {
+    <span class="kw">fn </span>into(<span class="self">self</span>) -&gt; [u128; <span class="number">2</span>] {
+        <span class="self">self</span>.data
+    }
+}
+
+<span class="kw">impl </span>Into&lt;[u128; <span class="number">3</span>]&gt; <span class="kw">for </span>Bitmap&lt;U384&gt; {
+    <span class="kw">fn </span>into(<span class="self">self</span>) -&gt; [u128; <span class="number">3</span>] {
+        <span class="self">self</span>.data
+    }
+}
+
+<span class="kw">impl </span>Into&lt;[u128; <span class="number">4</span>]&gt; <span class="kw">for </span>Bitmap&lt;U512&gt; {
+    <span class="kw">fn </span>into(<span class="self">self</span>) -&gt; [u128; <span class="number">4</span>] {
+        <span class="self">self</span>.data
+    }
+}
+
+<span class="kw">impl </span>Into&lt;[u128; <span class="number">5</span>]&gt; <span class="kw">for </span>Bitmap&lt;U640&gt; {
+    <span class="kw">fn </span>into(<span class="self">self</span>) -&gt; [u128; <span class="number">5</span>] {
+        <span class="self">self</span>.data
+    }
+}
+
+<span class="kw">impl </span>Into&lt;[u128; <span class="number">6</span>]&gt; <span class="kw">for </span>Bitmap&lt;U768&gt; {
+    <span class="kw">fn </span>into(<span class="self">self</span>) -&gt; [u128; <span class="number">6</span>] {
+        <span class="self">self</span>.data
+    }
+}
+
+<span class="kw">impl </span>Into&lt;[u128; <span class="number">7</span>]&gt; <span class="kw">for </span>Bitmap&lt;U896&gt; {
+    <span class="kw">fn </span>into(<span class="self">self</span>) -&gt; [u128; <span class="number">7</span>] {
+        <span class="self">self</span>.data
+    }
+}
+
+<span class="kw">impl </span>Into&lt;[u128; <span class="number">8</span>]&gt; <span class="kw">for </span>Bitmap&lt;U1024&gt; {
+    <span class="kw">fn </span>into(<span class="self">self</span>) -&gt; [u128; <span class="number">8</span>] {
+        <span class="self">self</span>.data
+    }
+}
+
+<span class="doccomment">/// An iterator over the indices in a bitmap which are `true`.
+///
+/// This yields a sequence of `usize` indices, not their contents (which are
+/// always `true` anyway, by definition).
+///
+/// # Examples
+///
+/// ```rust
+/// # use bitmaps::Bitmap;
+/// # use typenum::U10;
+/// let mut bitmap: Bitmap&lt;U10&gt; = Bitmap::new();
+/// bitmap.set(3, true);
+/// bitmap.set(5, true);
+/// bitmap.set(8, true);
+/// let true_indices: Vec&lt;usize&gt; = bitmap.into_iter().collect();
+/// assert_eq!(vec![3, 5, 8], true_indices);
+/// ```
+</span><span class="kw">pub struct </span>Iter&lt;<span class="lifetime">&#39;a</span>, Size: Bits&gt; {
+    index: usize,
+    data: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Bitmap&lt;Size&gt;,
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, Size: Bits&gt; Iterator <span class="kw">for </span>Iter&lt;<span class="lifetime">&#39;a</span>, Size&gt; {
+    <span class="kw">type </span>Item = usize;
+
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">if </span><span class="self">self</span>.index &gt;= Size::USIZE {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
+        }
+        <span class="kw">if </span><span class="self">self</span>.data.get(<span class="self">self</span>.index) {
+            <span class="self">self</span>.index += <span class="number">1</span>;
+            <span class="prelude-val">Some</span>(<span class="self">self</span>.index - <span class="number">1</span>)
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.index += <span class="number">1</span>;
+            <span class="self">self</span>.next()
+        }
+    }
+}
+
+<span class="attribute">#[cfg(any(target_arch = <span class="string">&quot;x86&quot;</span>, target_arch = <span class="string">&quot;x86_64&quot;</span>))]
+#[allow(clippy::cast_ptr_alignment)]
+</span><span class="kw">mod </span>x86_arch {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="attribute">#[cfg(target_arch = <span class="string">&quot;x86&quot;</span>)]
+    </span><span class="kw">use </span>core::arch::x86::<span class="kw-2">*</span>;
+    <span class="attribute">#[cfg(target_arch = <span class="string">&quot;x86_64&quot;</span>)]
+    </span><span class="kw">use </span>core::arch::x86_64::<span class="kw-2">*</span>;
+
+    <span class="kw">impl </span>Bitmap&lt;U128&gt; {
+        <span class="attribute">#[target_feature(enable = <span class="string">&quot;sse2&quot;</span>)]
+        </span><span class="kw">pub unsafe fn </span>load_m128i(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; __m128i {
+            _mm_loadu_si128(<span class="kw-2">&amp;</span><span class="self">self</span>.data <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span><span class="kw-2">*const </span>__m128i)
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">U256</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">target_feature</span>(<span class="ident">enable</span> <span class="op">=</span> <span class="string">&quot;sse2&quot;</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">load_m128i</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [<span class="ident">__m128i</span>; <span class="number">2</span>] {
-            <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">__m128i</span>;
-            [<span class="ident">_mm_loadu_si128</span>(<span class="ident">ptr</span>), <span class="ident">_mm_loadu_si128</span>(<span class="ident">ptr</span>.<span class="ident">add</span>(<span class="number">1</span>))]
+    <span class="kw">impl </span>Bitmap&lt;U256&gt; {
+        <span class="attribute">#[target_feature(enable = <span class="string">&quot;sse2&quot;</span>)]
+        </span><span class="kw">pub unsafe fn </span>load_m128i(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [__m128i; <span class="number">2</span>] {
+            <span class="kw">let </span>ptr = <span class="kw-2">&amp;</span><span class="self">self</span>.data <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span><span class="kw-2">*const </span>__m128i;
+            [_mm_loadu_si128(ptr), _mm_loadu_si128(ptr.add(<span class="number">1</span>))]
         }
 
-        <span class="attribute">#[<span class="ident">target_feature</span>(<span class="ident">enable</span> <span class="op">=</span> <span class="string">&quot;avx&quot;</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">load_m256i</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">__m256i</span> {
-            <span class="ident">_mm256_loadu_si256</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">__m256i</span>)
+        <span class="attribute">#[target_feature(enable = <span class="string">&quot;avx&quot;</span>)]
+        </span><span class="kw">pub unsafe fn </span>load_m256i(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; __m256i {
+            _mm256_loadu_si256(<span class="kw-2">&amp;</span><span class="self">self</span>.data <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span><span class="kw-2">*const </span>__m256i)
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">U512</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">target_feature</span>(<span class="ident">enable</span> <span class="op">=</span> <span class="string">&quot;sse2&quot;</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">load_m128i</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [<span class="ident">__m128i</span>; <span class="number">4</span>] {
-            <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">__m128i</span>;
+    <span class="kw">impl </span>Bitmap&lt;U512&gt; {
+        <span class="attribute">#[target_feature(enable = <span class="string">&quot;sse2&quot;</span>)]
+        </span><span class="kw">pub unsafe fn </span>load_m128i(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [__m128i; <span class="number">4</span>] {
+            <span class="kw">let </span>ptr = <span class="kw-2">&amp;</span><span class="self">self</span>.data <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span><span class="kw-2">*const </span>__m128i;
             [
-                <span class="ident">_mm_loadu_si128</span>(<span class="ident">ptr</span>),
-                <span class="ident">_mm_loadu_si128</span>(<span class="ident">ptr</span>.<span class="ident">add</span>(<span class="number">1</span>)),
-                <span class="ident">_mm_loadu_si128</span>(<span class="ident">ptr</span>.<span class="ident">add</span>(<span class="number">2</span>)),
-                <span class="ident">_mm_loadu_si128</span>(<span class="ident">ptr</span>.<span class="ident">add</span>(<span class="number">3</span>)),
+                _mm_loadu_si128(ptr),
+                _mm_loadu_si128(ptr.add(<span class="number">1</span>)),
+                _mm_loadu_si128(ptr.add(<span class="number">2</span>)),
+                _mm_loadu_si128(ptr.add(<span class="number">3</span>)),
             ]
         }
 
-        <span class="attribute">#[<span class="ident">target_feature</span>(<span class="ident">enable</span> <span class="op">=</span> <span class="string">&quot;avx&quot;</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">load_m256i</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [<span class="ident">__m256i</span>; <span class="number">2</span>] {
-            <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">__m256i</span>;
-            [<span class="ident">_mm256_loadu_si256</span>(<span class="ident">ptr</span>), <span class="ident">_mm256_loadu_si256</span>(<span class="ident">ptr</span>.<span class="ident">add</span>(<span class="number">1</span>))]
+        <span class="attribute">#[target_feature(enable = <span class="string">&quot;avx&quot;</span>)]
+        </span><span class="kw">pub unsafe fn </span>load_m256i(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [__m256i; <span class="number">2</span>] {
+            <span class="kw">let </span>ptr = <span class="kw-2">&amp;</span><span class="self">self</span>.data <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span><span class="kw-2">*const </span>__m256i;
+            [_mm256_loadu_si256(ptr), _mm256_loadu_si256(ptr.add(<span class="number">1</span>))]
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">U768</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">target_feature</span>(<span class="ident">enable</span> <span class="op">=</span> <span class="string">&quot;sse2&quot;</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">load_m128i</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [<span class="ident">__m128i</span>; <span class="number">6</span>] {
-            <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">__m128i</span>;
+    <span class="kw">impl </span>Bitmap&lt;U768&gt; {
+        <span class="attribute">#[target_feature(enable = <span class="string">&quot;sse2&quot;</span>)]
+        </span><span class="kw">pub unsafe fn </span>load_m128i(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [__m128i; <span class="number">6</span>] {
+            <span class="kw">let </span>ptr = <span class="kw-2">&amp;</span><span class="self">self</span>.data <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span><span class="kw-2">*const </span>__m128i;
             [
-                <span class="ident">_mm_loadu_si128</span>(<span class="ident">ptr</span>),
-                <span class="ident">_mm_loadu_si128</span>(<span class="ident">ptr</span>.<span class="ident">add</span>(<span class="number">1</span>)),
-                <span class="ident">_mm_loadu_si128</span>(<span class="ident">ptr</span>.<span class="ident">add</span>(<span class="number">2</span>)),
-                <span class="ident">_mm_loadu_si128</span>(<span class="ident">ptr</span>.<span class="ident">add</span>(<span class="number">3</span>)),
-                <span class="ident">_mm_loadu_si128</span>(<span class="ident">ptr</span>.<span class="ident">add</span>(<span class="number">4</span>)),
-                <span class="ident">_mm_loadu_si128</span>(<span class="ident">ptr</span>.<span class="ident">add</span>(<span class="number">5</span>)),
+                _mm_loadu_si128(ptr),
+                _mm_loadu_si128(ptr.add(<span class="number">1</span>)),
+                _mm_loadu_si128(ptr.add(<span class="number">2</span>)),
+                _mm_loadu_si128(ptr.add(<span class="number">3</span>)),
+                _mm_loadu_si128(ptr.add(<span class="number">4</span>)),
+                _mm_loadu_si128(ptr.add(<span class="number">5</span>)),
             ]
         }
 
-        <span class="attribute">#[<span class="ident">target_feature</span>(<span class="ident">enable</span> <span class="op">=</span> <span class="string">&quot;avx&quot;</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">load_m256i</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [<span class="ident">__m256i</span>; <span class="number">3</span>] {
-            <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">__m256i</span>;
+        <span class="attribute">#[target_feature(enable = <span class="string">&quot;avx&quot;</span>)]
+        </span><span class="kw">pub unsafe fn </span>load_m256i(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [__m256i; <span class="number">3</span>] {
+            <span class="kw">let </span>ptr = <span class="kw-2">&amp;</span><span class="self">self</span>.data <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span><span class="kw-2">*const </span>__m256i;
             [
-                <span class="ident">_mm256_loadu_si256</span>(<span class="ident">ptr</span>),
-                <span class="ident">_mm256_loadu_si256</span>(<span class="ident">ptr</span>.<span class="ident">add</span>(<span class="number">1</span>)),
-                <span class="ident">_mm256_loadu_si256</span>(<span class="ident">ptr</span>.<span class="ident">add</span>(<span class="number">2</span>)),
-            ]
-        }
-    }
-
-    <span class="kw">impl</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">U1024</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">target_feature</span>(<span class="ident">enable</span> <span class="op">=</span> <span class="string">&quot;sse2&quot;</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">load_m128i</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [<span class="ident">__m128i</span>; <span class="number">8</span>] {
-            <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">__m128i</span>;
-            [
-                <span class="ident">_mm_loadu_si128</span>(<span class="ident">ptr</span>),
-                <span class="ident">_mm_loadu_si128</span>(<span class="ident">ptr</span>.<span class="ident">add</span>(<span class="number">1</span>)),
-                <span class="ident">_mm_loadu_si128</span>(<span class="ident">ptr</span>.<span class="ident">add</span>(<span class="number">2</span>)),
-                <span class="ident">_mm_loadu_si128</span>(<span class="ident">ptr</span>.<span class="ident">add</span>(<span class="number">3</span>)),
-                <span class="ident">_mm_loadu_si128</span>(<span class="ident">ptr</span>.<span class="ident">add</span>(<span class="number">4</span>)),
-                <span class="ident">_mm_loadu_si128</span>(<span class="ident">ptr</span>.<span class="ident">add</span>(<span class="number">5</span>)),
-                <span class="ident">_mm_loadu_si128</span>(<span class="ident">ptr</span>.<span class="ident">add</span>(<span class="number">6</span>)),
-                <span class="ident">_mm_loadu_si128</span>(<span class="ident">ptr</span>.<span class="ident">add</span>(<span class="number">7</span>)),
-            ]
-        }
-
-        <span class="attribute">#[<span class="ident">target_feature</span>(<span class="ident">enable</span> <span class="op">=</span> <span class="string">&quot;avx&quot;</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">load_m256i</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [<span class="ident">__m256i</span>; <span class="number">4</span>] {
-            <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">__m256i</span>;
-            [
-                <span class="ident">_mm256_loadu_si256</span>(<span class="ident">ptr</span>),
-                <span class="ident">_mm256_loadu_si256</span>(<span class="ident">ptr</span>.<span class="ident">add</span>(<span class="number">1</span>)),
-                <span class="ident">_mm256_loadu_si256</span>(<span class="ident">ptr</span>.<span class="ident">add</span>(<span class="number">2</span>)),
-                <span class="ident">_mm256_loadu_si256</span>(<span class="ident">ptr</span>.<span class="ident">add</span>(<span class="number">3</span>)),
+                _mm256_loadu_si256(ptr),
+                _mm256_loadu_si256(ptr.add(<span class="number">1</span>)),
+                _mm256_loadu_si256(ptr.add(<span class="number">2</span>)),
             ]
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">__m128i</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">U128</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">data</span>: <span class="ident">__m128i</span>) -&gt; <span class="self">Self</span> {
-            <span class="self">Self</span> {
-                <span class="ident">data</span>: <span class="kw">unsafe</span> { <span class="ident">core::mem::transmute</span>(<span class="ident">data</span>) },
+    <span class="kw">impl </span>Bitmap&lt;U1024&gt; {
+        <span class="attribute">#[target_feature(enable = <span class="string">&quot;sse2&quot;</span>)]
+        </span><span class="kw">pub unsafe fn </span>load_m128i(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [__m128i; <span class="number">8</span>] {
+            <span class="kw">let </span>ptr = <span class="kw-2">&amp;</span><span class="self">self</span>.data <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span><span class="kw-2">*const </span>__m128i;
+            [
+                _mm_loadu_si128(ptr),
+                _mm_loadu_si128(ptr.add(<span class="number">1</span>)),
+                _mm_loadu_si128(ptr.add(<span class="number">2</span>)),
+                _mm_loadu_si128(ptr.add(<span class="number">3</span>)),
+                _mm_loadu_si128(ptr.add(<span class="number">4</span>)),
+                _mm_loadu_si128(ptr.add(<span class="number">5</span>)),
+                _mm_loadu_si128(ptr.add(<span class="number">6</span>)),
+                _mm_loadu_si128(ptr.add(<span class="number">7</span>)),
+            ]
+        }
+
+        <span class="attribute">#[target_feature(enable = <span class="string">&quot;avx&quot;</span>)]
+        </span><span class="kw">pub unsafe fn </span>load_m256i(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [__m256i; <span class="number">4</span>] {
+            <span class="kw">let </span>ptr = <span class="kw-2">&amp;</span><span class="self">self</span>.data <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span><span class="kw-2">*const </span>__m256i;
+            [
+                _mm256_loadu_si256(ptr),
+                _mm256_loadu_si256(ptr.add(<span class="number">1</span>)),
+                _mm256_loadu_si256(ptr.add(<span class="number">2</span>)),
+                _mm256_loadu_si256(ptr.add(<span class="number">3</span>)),
+            ]
+        }
+    }
+
+    <span class="kw">impl </span>From&lt;__m128i&gt; <span class="kw">for </span>Bitmap&lt;U128&gt; {
+        <span class="kw">fn </span>from(data: __m128i) -&gt; <span class="self">Self </span>{
+            <span class="self">Self </span>{
+                data: <span class="kw">unsafe </span>{ core::mem::transmute(data) },
             }
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">__m256i</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">U256</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">data</span>: <span class="ident">__m256i</span>) -&gt; <span class="self">Self</span> {
-            <span class="self">Self</span> {
-                <span class="ident">data</span>: <span class="kw">unsafe</span> { <span class="ident">core::mem::transmute</span>(<span class="ident">data</span>) },
+    <span class="kw">impl </span>From&lt;__m256i&gt; <span class="kw">for </span>Bitmap&lt;U256&gt; {
+        <span class="kw">fn </span>from(data: __m256i) -&gt; <span class="self">Self </span>{
+            <span class="self">Self </span>{
+                data: <span class="kw">unsafe </span>{ core::mem::transmute(data) },
             }
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">__m128i</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">U128</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; <span class="ident">__m128i</span> {
-            <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">load_m128i</span>() }
+    <span class="kw">impl </span>Into&lt;__m128i&gt; <span class="kw">for </span>Bitmap&lt;U128&gt; {
+        <span class="kw">fn </span>into(<span class="self">self</span>) -&gt; __m128i {
+            <span class="kw">unsafe </span>{ <span class="self">self</span>.load_m128i() }
         }
     }
 
-    <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">__m256i</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">U256</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; <span class="ident">__m256i</span> {
-            <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">load_m256i</span>() }
+    <span class="kw">impl </span>Into&lt;__m256i&gt; <span class="kw">for </span>Bitmap&lt;U256&gt; {
+        <span class="kw">fn </span>into(<span class="self">self</span>) -&gt; __m256i {
+            <span class="kw">unsafe </span>{ <span class="self">self</span>.load_m256i() }
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">mod</span> <span class="ident">test</span> {
-        <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+    <span class="attribute">#[cfg(test)]
+    </span><span class="kw">mod </span>test {
+        <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-        <span class="kw">struct</span> <span class="ident">AlignmentTester</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>
-        <span class="kw">where</span>
-            <span class="ident">B</span>: <span class="ident">Bits</span>,
+        <span class="kw">struct </span>AlignmentTester&lt;B&gt;
+        <span class="kw">where
+            </span>B: Bits,
         {
-            <span class="ident">_byte</span>: <span class="ident">u8</span>,
-            <span class="ident">bits</span>: <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">B</span><span class="op">&gt;</span>,
+            _byte: u8,
+            bits: Bitmap&lt;B&gt;,
         }
 
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">load_128</span>() {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">t</span>: <span class="ident">AlignmentTester</span><span class="op">&lt;</span><span class="ident">U128</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">AlignmentTester</span> {
-                <span class="ident">_byte</span>: <span class="number">0</span>,
-                <span class="ident">bits</span>: <span class="ident">Bitmap::new</span>(),
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>load_128() {
+            <span class="kw">let </span><span class="kw-2">mut </span>t: AlignmentTester&lt;U128&gt; = AlignmentTester {
+                _byte: <span class="number">0</span>,
+                bits: Bitmap::new(),
             };
-            <span class="ident">t</span>.<span class="ident">bits</span>.<span class="ident">set</span>(<span class="number">5</span>, <span class="bool-val">true</span>);
-            <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">t</span>.<span class="ident">bits</span>.<span class="ident">load_m128i</span>() };
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bits</span>: <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">U128</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">m</span>.<span class="ident">into</span>();
-            <span class="macro">assert!</span>(<span class="ident">bits</span>.<span class="ident">set</span>(<span class="number">5</span>, <span class="bool-val">false</span>));
-            <span class="macro">assert!</span>(<span class="ident">bits</span>.<span class="ident">is_empty</span>());
+            t.bits.set(<span class="number">5</span>, <span class="bool-val">true</span>);
+            <span class="kw">let </span>m = <span class="kw">unsafe </span>{ t.bits.load_m128i() };
+            <span class="kw">let </span><span class="kw-2">mut </span>bits: Bitmap&lt;U128&gt; = m.into();
+            <span class="macro">assert!</span>(bits.set(<span class="number">5</span>, <span class="bool-val">false</span>));
+            <span class="macro">assert!</span>(bits.is_empty());
         }
 
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">load_256</span>() {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">t</span>: <span class="ident">AlignmentTester</span><span class="op">&lt;</span><span class="ident">U256</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">AlignmentTester</span> {
-                <span class="ident">_byte</span>: <span class="number">0</span>,
-                <span class="ident">bits</span>: <span class="ident">Bitmap::new</span>(),
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>load_256() {
+            <span class="kw">let </span><span class="kw-2">mut </span>t: AlignmentTester&lt;U256&gt; = AlignmentTester {
+                _byte: <span class="number">0</span>,
+                bits: Bitmap::new(),
             };
-            <span class="ident">t</span>.<span class="ident">bits</span>.<span class="ident">set</span>(<span class="number">5</span>, <span class="bool-val">true</span>);
-            <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">t</span>.<span class="ident">bits</span>.<span class="ident">load_m256i</span>() };
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bits</span>: <span class="ident">Bitmap</span><span class="op">&lt;</span><span class="ident">U256</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">m</span>.<span class="ident">into</span>();
-            <span class="macro">assert!</span>(<span class="ident">bits</span>.<span class="ident">set</span>(<span class="number">5</span>, <span class="bool-val">false</span>));
-            <span class="macro">assert!</span>(<span class="ident">bits</span>.<span class="ident">is_empty</span>());
+            t.bits.set(<span class="number">5</span>, <span class="bool-val">true</span>);
+            <span class="kw">let </span>m = <span class="kw">unsafe </span>{ t.bits.load_m256i() };
+            <span class="kw">let </span><span class="kw-2">mut </span>bits: Bitmap&lt;U256&gt; = m.into();
+            <span class="macro">assert!</span>(bits.set(<span class="number">5</span>, <span class="bool-val">false</span>));
+            <span class="macro">assert!</span>(bits.is_empty());
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">proptest::collection::btree_set</span>;
-    <span class="kw">use</span> <span class="ident">proptest::proptest</span>;
-    <span class="kw">use</span> <span class="ident">typenum</span>::{<span class="ident">U1024</span>, <span class="ident">U64</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>proptest::collection::btree_set;
+    <span class="kw">use </span>proptest::proptest;
+    <span class="kw">use </span>typenum::{U1024, U64};
 
-    <span class="macro">proptest!</span> {
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">get_set_and_iter_64</span>(<span class="ident">bits</span> <span class="kw">in</span> <span class="ident">btree_set</span>(<span class="number">0</span>..<span class="number">64usize</span>, <span class="number">0</span>..<span class="number">64</span>)) {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bitmap</span> <span class="op">=</span> <span class="ident">Bitmap</span>::<span class="op">&lt;</span><span class="ident">U64</span><span class="op">&gt;</span><span class="ident">::new</span>();
-            <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">bits</span> {
-                <span class="ident">bitmap</span>.<span class="ident">set</span>(<span class="kw-2">*</span><span class="ident">i</span>, <span class="bool-val">true</span>);
+    <span class="macro">proptest! </span>{
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>get_set_and_iter_64(bits <span class="kw">in </span>btree_set(<span class="number">0</span>..<span class="number">64usize</span>, <span class="number">0</span>..<span class="number">64</span>)) {
+            <span class="kw">let </span><span class="kw-2">mut </span>bitmap = Bitmap::&lt;U64&gt;::new();
+            <span class="kw">for </span>i <span class="kw">in </span><span class="kw-2">&amp;</span>bits {
+                bitmap.set(<span class="kw-2">*</span>i, <span class="bool-val">true</span>);
             }
-            <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">64</span> {
-                <span class="macro">assert_eq!</span>(<span class="ident">bitmap</span>.<span class="ident">get</span>(<span class="ident">i</span>), <span class="ident">bits</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>));
+            <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">64 </span>{
+                <span class="macro">assert_eq!</span>(bitmap.get(i), bits.contains(<span class="kw-2">&amp;</span>i));
             }
-            <span class="macro">assert!</span>(<span class="ident">bitmap</span>.<span class="ident">into_iter</span>().<span class="ident">eq</span>(<span class="ident">bits</span>.<span class="ident">into_iter</span>()));
+            <span class="macro">assert!</span>(bitmap.into_iter().eq(bits.into_iter()));
         }
 
-        <span class="attribute">#[<span class="ident">test</span>]</span>
-        <span class="kw">fn</span> <span class="ident">get_set_and_iter_1024</span>(<span class="ident">bits</span> <span class="kw">in</span> <span class="ident">btree_set</span>(<span class="number">0</span>..<span class="number">1024usize</span>, <span class="number">0</span>..<span class="number">1024</span>)) {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bitmap</span> <span class="op">=</span> <span class="ident">Bitmap</span>::<span class="op">&lt;</span><span class="ident">U1024</span><span class="op">&gt;</span><span class="ident">::new</span>();
-            <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">bits</span> {
-                <span class="ident">bitmap</span>.<span class="ident">set</span>(<span class="kw-2">*</span><span class="ident">i</span>, <span class="bool-val">true</span>);
+        <span class="attribute">#[test]
+        </span><span class="kw">fn </span>get_set_and_iter_1024(bits <span class="kw">in </span>btree_set(<span class="number">0</span>..<span class="number">1024usize</span>, <span class="number">0</span>..<span class="number">1024</span>)) {
+            <span class="kw">let </span><span class="kw-2">mut </span>bitmap = Bitmap::&lt;U1024&gt;::new();
+            <span class="kw">for </span>i <span class="kw">in </span><span class="kw-2">&amp;</span>bits {
+                bitmap.set(<span class="kw-2">*</span>i, <span class="bool-val">true</span>);
             }
-            <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">1024</span> {
-                <span class="macro">assert_eq!</span>(<span class="ident">bitmap</span>.<span class="ident">get</span>(<span class="ident">i</span>), <span class="ident">bits</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>));
+            <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">1024 </span>{
+                <span class="macro">assert_eq!</span>(bitmap.get(i), bits.contains(<span class="kw-2">&amp;</span>i));
             }
-            <span class="macro">assert!</span>(<span class="ident">bitmap</span>.<span class="ident">into_iter</span>().<span class="ident">eq</span>(<span class="ident">bits</span>.<span class="ident">into_iter</span>()));
+            <span class="macro">assert!</span>(bitmap.into_iter().eq(bits.into_iter()));
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="bitmaps" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="bitmaps" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

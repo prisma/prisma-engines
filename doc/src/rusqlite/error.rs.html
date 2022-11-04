@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rusqlite-0.25.4/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rusqlite/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rusqlite-0.25.4/src/error.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>error.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rusqlite/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -358,365 +358,365 @@
 <span id="358">358</span>
 <span id="359">359</span>
 <span id="360">360</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::types::FromSqlError</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::types::Type</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">errmsg_to_string</span>, <span class="ident">ffi</span>};
-<span class="kw">use</span> <span class="ident">std::error</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::os::raw::c_int</span>;
-<span class="kw">use</span> <span class="ident">std::path::PathBuf</span>;
-<span class="kw">use</span> <span class="ident">std::str</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::types::FromSqlError;
+<span class="kw">use </span><span class="kw">crate</span>::types::Type;
+<span class="kw">use crate</span>::{errmsg_to_string, ffi};
+<span class="kw">use </span>std::error;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::os::raw::c_int;
+<span class="kw">use </span>std::path::PathBuf;
+<span class="kw">use </span>std::str;
 
-<span class="doccomment">/// Enum listing possible errors from rusqlite.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::enum_variant_names</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Error</span> {
-    <span class="doccomment">/// An error from an underlying SQLite call.</span>
-    <span class="ident">SqliteFailure</span>(<span class="ident">ffi::Error</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>),
+<span class="doccomment">/// Enum listing possible errors from rusqlite.
+</span><span class="attribute">#[derive(Debug)]
+#[allow(clippy::enum_variant_names)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>Error {
+    <span class="doccomment">/// An error from an underlying SQLite call.
+    </span>SqliteFailure(ffi::Error, <span class="prelude-ty">Option</span>&lt;String&gt;),
 
-    <span class="doccomment">/// Error reported when attempting to open a connection when SQLite was</span>
-    <span class="doccomment">/// configured to allow single-threaded use only.</span>
-    <span class="ident">SqliteSingleThreadedMode</span>,
+    <span class="doccomment">/// Error reported when attempting to open a connection when SQLite was
+    /// configured to allow single-threaded use only.
+    </span>SqliteSingleThreadedMode,
 
-    <span class="doccomment">/// Error when the value of a particular column is requested, but it cannot</span>
-    <span class="doccomment">/// be converted to the requested Rust type.</span>
-    <span class="ident">FromSqlConversionFailure</span>(<span class="ident">usize</span>, <span class="ident">Type</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>),
+    <span class="doccomment">/// Error when the value of a particular column is requested, but it cannot
+    /// be converted to the requested Rust type.
+    </span>FromSqlConversionFailure(usize, Type, Box&lt;<span class="kw">dyn </span>error::Error + Send + Sync + <span class="lifetime">&#39;static</span>&gt;),
 
-    <span class="doccomment">/// Error when SQLite gives us an integral value outside the range of the</span>
-    <span class="doccomment">/// requested type (e.g., trying to get the value 1000 into a `u8`).</span>
-    <span class="doccomment">/// The associated `usize` is the column index,</span>
-    <span class="doccomment">/// and the associated `i64` is the value returned by SQLite.</span>
-    <span class="ident">IntegralValueOutOfRange</span>(<span class="ident">usize</span>, <span class="ident">i64</span>),
+    <span class="doccomment">/// Error when SQLite gives us an integral value outside the range of the
+    /// requested type (e.g., trying to get the value 1000 into a `u8`).
+    /// The associated `usize` is the column index,
+    /// and the associated `i64` is the value returned by SQLite.
+    </span>IntegralValueOutOfRange(usize, i64),
 
-    <span class="doccomment">/// Error converting a string to UTF-8.</span>
-    <span class="ident">Utf8Error</span>(<span class="ident">str::Utf8Error</span>),
+    <span class="doccomment">/// Error converting a string to UTF-8.
+    </span>Utf8Error(str::Utf8Error),
 
-    <span class="doccomment">/// Error converting a string to a C-compatible string because it contained</span>
-    <span class="doccomment">/// an embedded nul.</span>
-    <span class="ident">NulError</span>(<span class="ident">::std::ffi::NulError</span>),
+    <span class="doccomment">/// Error converting a string to a C-compatible string because it contained
+    /// an embedded nul.
+    </span>NulError(::std::ffi::NulError),
 
-    <span class="doccomment">/// Error when using SQL named parameters and passing a parameter name not</span>
-    <span class="doccomment">/// present in the SQL.</span>
-    <span class="ident">InvalidParameterName</span>(<span class="ident">String</span>),
+    <span class="doccomment">/// Error when using SQL named parameters and passing a parameter name not
+    /// present in the SQL.
+    </span>InvalidParameterName(String),
 
-    <span class="doccomment">/// Error converting a file path to a string.</span>
-    <span class="ident">InvalidPath</span>(<span class="ident">PathBuf</span>),
+    <span class="doccomment">/// Error converting a file path to a string.
+    </span>InvalidPath(PathBuf),
 
-    <span class="doccomment">/// Error returned when an [`execute`](crate::Connection::execute) call</span>
-    <span class="doccomment">/// returns rows.</span>
-    <span class="ident">ExecuteReturnedResults</span>,
+    <span class="doccomment">/// Error returned when an [`execute`](crate::Connection::execute) call
+    /// returns rows.
+    </span>ExecuteReturnedResults,
 
-    <span class="doccomment">/// Error when a query that was expected to return at least one row (e.g.,</span>
-    <span class="doccomment">/// for [`query_row`](crate::Connection::query_row)) did not return any.</span>
-    <span class="ident">QueryReturnedNoRows</span>,
+    <span class="doccomment">/// Error when a query that was expected to return at least one row (e.g.,
+    /// for [`query_row`](crate::Connection::query_row)) did not return any.
+    </span>QueryReturnedNoRows,
 
-    <span class="doccomment">/// Error when the value of a particular column is requested, but the index</span>
-    <span class="doccomment">/// is out of range for the statement.</span>
-    <span class="ident">InvalidColumnIndex</span>(<span class="ident">usize</span>),
+    <span class="doccomment">/// Error when the value of a particular column is requested, but the index
+    /// is out of range for the statement.
+    </span>InvalidColumnIndex(usize),
 
-    <span class="doccomment">/// Error when the value of a named column is requested, but no column</span>
-    <span class="doccomment">/// matches the name for the statement.</span>
-    <span class="ident">InvalidColumnName</span>(<span class="ident">String</span>),
+    <span class="doccomment">/// Error when the value of a named column is requested, but no column
+    /// matches the name for the statement.
+    </span>InvalidColumnName(String),
 
-    <span class="doccomment">/// Error when the value of a particular column is requested, but the type</span>
-    <span class="doccomment">/// of the result in that column cannot be converted to the requested</span>
-    <span class="doccomment">/// Rust type.</span>
-    <span class="ident">InvalidColumnType</span>(<span class="ident">usize</span>, <span class="ident">String</span>, <span class="ident">Type</span>),
+    <span class="doccomment">/// Error when the value of a particular column is requested, but the type
+    /// of the result in that column cannot be converted to the requested
+    /// Rust type.
+    </span>InvalidColumnType(usize, String, Type),
 
-    <span class="doccomment">/// Error when a query that was expected to insert one row did not insert</span>
-    <span class="doccomment">/// any or insert many.</span>
-    <span class="ident">StatementChangedRows</span>(<span class="ident">usize</span>),
+    <span class="doccomment">/// Error when a query that was expected to insert one row did not insert
+    /// any or insert many.
+    </span>StatementChangedRows(usize),
 
-    <span class="doccomment">/// Error returned by</span>
-    <span class="doccomment">/// [`functions::Context::get`](crate::functions::Context::get) when the</span>
-    <span class="doccomment">/// function argument cannot be converted to the requested type.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;functions&quot;</span>)]</span>
-    <span class="ident">InvalidFunctionParameterType</span>(<span class="ident">usize</span>, <span class="ident">Type</span>),
-    <span class="doccomment">/// Error returned by [`vtab::Values::get`](crate::vtab::Values::get) when</span>
-    <span class="doccomment">/// the filter argument cannot be converted to the requested type.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vtab&quot;</span>)]</span>
-    <span class="ident">InvalidFilterParameterType</span>(<span class="ident">usize</span>, <span class="ident">Type</span>),
+    <span class="doccomment">/// Error returned by
+    /// [`functions::Context::get`](crate::functions::Context::get) when the
+    /// function argument cannot be converted to the requested type.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;functions&quot;</span>)]
+    </span>InvalidFunctionParameterType(usize, Type),
+    <span class="doccomment">/// Error returned by [`vtab::Values::get`](crate::vtab::Values::get) when
+    /// the filter argument cannot be converted to the requested type.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;vtab&quot;</span>)]
+    </span>InvalidFilterParameterType(usize, Type),
 
-    <span class="doccomment">/// An error case available for implementors of custom user functions (e.g.,</span>
-    <span class="doccomment">/// [`create_scalar_function`](crate::Connection::create_scalar_function)).</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;functions&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-    <span class="ident">UserFunctionError</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>),
+    <span class="doccomment">/// An error case available for implementors of custom user functions (e.g.,
+    /// [`create_scalar_function`](crate::Connection::create_scalar_function)).
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;functions&quot;</span>)]
+    #[allow(dead_code)]
+    </span>UserFunctionError(Box&lt;<span class="kw">dyn </span>error::Error + Send + Sync + <span class="lifetime">&#39;static</span>&gt;),
 
-    <span class="doccomment">/// Error available for the implementors of the</span>
-    <span class="doccomment">/// [`ToSql`](crate::types::ToSql) trait.</span>
-    <span class="ident">ToSqlConversionFailure</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>),
+    <span class="doccomment">/// Error available for the implementors of the
+    /// [`ToSql`](crate::types::ToSql) trait.
+    </span>ToSqlConversionFailure(Box&lt;<span class="kw">dyn </span>error::Error + Send + Sync + <span class="lifetime">&#39;static</span>&gt;),
 
-    <span class="doccomment">/// Error when the SQL is not a `SELECT`, is not read-only.</span>
-    <span class="ident">InvalidQuery</span>,
+    <span class="doccomment">/// Error when the SQL is not a `SELECT`, is not read-only.
+    </span>InvalidQuery,
 
-    <span class="doccomment">/// An error case available for implementors of custom modules (e.g.,</span>
-    <span class="doccomment">/// [`create_module`](crate::Connection::create_module)).</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vtab&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-    <span class="ident">ModuleError</span>(<span class="ident">String</span>),
+    <span class="doccomment">/// An error case available for implementors of custom modules (e.g.,
+    /// [`create_module`](crate::Connection::create_module)).
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;vtab&quot;</span>)]
+    #[allow(dead_code)]
+    </span>ModuleError(String),
 
-    <span class="doccomment">/// An unwinding panic occurs in an UDF (user-defined function).</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;functions&quot;</span>)]</span>
-    <span class="ident">UnwindingPanic</span>,
+    <span class="doccomment">/// An unwinding panic occurs in an UDF (user-defined function).
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;functions&quot;</span>)]
+    </span>UnwindingPanic,
 
-    <span class="doccomment">/// An error returned when</span>
-    <span class="doccomment">/// [`Context::get_aux`](crate::functions::Context::get_aux) attempts to</span>
-    <span class="doccomment">/// retrieve data of a different type than what had been stored using</span>
-    <span class="doccomment">/// [`Context::set_aux`](crate::functions::Context::set_aux).</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;functions&quot;</span>)]</span>
-    <span class="ident">GetAuxWrongType</span>,
+    <span class="doccomment">/// An error returned when
+    /// [`Context::get_aux`](crate::functions::Context::get_aux) attempts to
+    /// retrieve data of a different type than what had been stored using
+    /// [`Context::set_aux`](crate::functions::Context::set_aux).
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;functions&quot;</span>)]
+    </span>GetAuxWrongType,
 
-    <span class="doccomment">/// Error when the SQL contains multiple statements.</span>
-    <span class="ident">MultipleStatement</span>,
-    <span class="doccomment">/// Error when the number of bound parameters does not match the number of</span>
-    <span class="doccomment">/// parameters in the query. The first `usize` is how many parameters were</span>
-    <span class="doccomment">/// given, the 2nd is how many were expected.</span>
-    <span class="ident">InvalidParameterCount</span>(<span class="ident">usize</span>, <span class="ident">usize</span>),
+    <span class="doccomment">/// Error when the SQL contains multiple statements.
+    </span>MultipleStatement,
+    <span class="doccomment">/// Error when the number of bound parameters does not match the number of
+    /// parameters in the query. The first `usize` is how many parameters were
+    /// given, the 2nd is how many were expected.
+    </span>InvalidParameterCount(usize, usize),
 
-    <span class="doccomment">/// Returned from various functions in the Blob IO positional API. For</span>
-    <span class="doccomment">/// example,</span>
-    <span class="doccomment">/// [`Blob::raw_read_at_exact`](crate::blob::Blob::raw_read_at_exact) will</span>
-    <span class="doccomment">/// return it if the blob has insufficient data.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;blob&quot;</span>)]</span>
-    <span class="ident">BlobSizeError</span>,
+    <span class="doccomment">/// Returned from various functions in the Blob IO positional API. For
+    /// example,
+    /// [`Blob::raw_read_at_exact`](crate::blob::Blob::raw_read_at_exact) will
+    /// return it if the blob has insufficient data.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;blob&quot;</span>)]
+    </span>BlobSizeError,
 }
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Error</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> (<span class="self">self</span>, <span class="ident">other</span>) {
-            (<span class="ident">Error::SqliteFailure</span>(<span class="ident">e1</span>, <span class="ident">s1</span>), <span class="ident">Error::SqliteFailure</span>(<span class="ident">e2</span>, <span class="ident">s2</span>)) =&gt; <span class="ident">e1</span> <span class="op">==</span> <span class="ident">e2</span> <span class="op">&amp;&amp;</span> <span class="ident">s1</span> <span class="op">==</span> <span class="ident">s2</span>,
-            (<span class="ident">Error::SqliteSingleThreadedMode</span>, <span class="ident">Error::SqliteSingleThreadedMode</span>) =&gt; <span class="bool-val">true</span>,
-            (<span class="ident">Error::IntegralValueOutOfRange</span>(<span class="ident">i1</span>, <span class="ident">n1</span>), <span class="ident">Error::IntegralValueOutOfRange</span>(<span class="ident">i2</span>, <span class="ident">n2</span>)) =&gt; {
-                <span class="ident">i1</span> <span class="op">==</span> <span class="ident">i2</span> <span class="op">&amp;&amp;</span> <span class="ident">n1</span> <span class="op">==</span> <span class="ident">n2</span>
+<span class="kw">impl </span>PartialEq <span class="kw">for </span>Error {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Error) -&gt; bool {
+        <span class="kw">match </span>(<span class="self">self</span>, other) {
+            (Error::SqliteFailure(e1, s1), Error::SqliteFailure(e2, s2)) =&gt; e1 == e2 &amp;&amp; s1 == s2,
+            (Error::SqliteSingleThreadedMode, Error::SqliteSingleThreadedMode) =&gt; <span class="bool-val">true</span>,
+            (Error::IntegralValueOutOfRange(i1, n1), Error::IntegralValueOutOfRange(i2, n2)) =&gt; {
+                i1 == i2 &amp;&amp; n1 == n2
             }
-            (<span class="ident">Error::Utf8Error</span>(<span class="ident">e1</span>), <span class="ident">Error::Utf8Error</span>(<span class="ident">e2</span>)) =&gt; <span class="ident">e1</span> <span class="op">==</span> <span class="ident">e2</span>,
-            (<span class="ident">Error::NulError</span>(<span class="ident">e1</span>), <span class="ident">Error::NulError</span>(<span class="ident">e2</span>)) =&gt; <span class="ident">e1</span> <span class="op">==</span> <span class="ident">e2</span>,
-            (<span class="ident">Error::InvalidParameterName</span>(<span class="ident">n1</span>), <span class="ident">Error::InvalidParameterName</span>(<span class="ident">n2</span>)) =&gt; <span class="ident">n1</span> <span class="op">==</span> <span class="ident">n2</span>,
-            (<span class="ident">Error::InvalidPath</span>(<span class="ident">p1</span>), <span class="ident">Error::InvalidPath</span>(<span class="ident">p2</span>)) =&gt; <span class="ident">p1</span> <span class="op">==</span> <span class="ident">p2</span>,
-            (<span class="ident">Error::ExecuteReturnedResults</span>, <span class="ident">Error::ExecuteReturnedResults</span>) =&gt; <span class="bool-val">true</span>,
-            (<span class="ident">Error::QueryReturnedNoRows</span>, <span class="ident">Error::QueryReturnedNoRows</span>) =&gt; <span class="bool-val">true</span>,
-            (<span class="ident">Error::InvalidColumnIndex</span>(<span class="ident">i1</span>), <span class="ident">Error::InvalidColumnIndex</span>(<span class="ident">i2</span>)) =&gt; <span class="ident">i1</span> <span class="op">==</span> <span class="ident">i2</span>,
-            (<span class="ident">Error::InvalidColumnName</span>(<span class="ident">n1</span>), <span class="ident">Error::InvalidColumnName</span>(<span class="ident">n2</span>)) =&gt; <span class="ident">n1</span> <span class="op">==</span> <span class="ident">n2</span>,
-            (<span class="ident">Error::InvalidColumnType</span>(<span class="ident">i1</span>, <span class="ident">n1</span>, <span class="ident">t1</span>), <span class="ident">Error::InvalidColumnType</span>(<span class="ident">i2</span>, <span class="ident">n2</span>, <span class="ident">t2</span>)) =&gt; {
-                <span class="ident">i1</span> <span class="op">==</span> <span class="ident">i2</span> <span class="op">&amp;&amp;</span> <span class="ident">t1</span> <span class="op">==</span> <span class="ident">t2</span> <span class="op">&amp;&amp;</span> <span class="ident">n1</span> <span class="op">==</span> <span class="ident">n2</span>
+            (Error::Utf8Error(e1), Error::Utf8Error(e2)) =&gt; e1 == e2,
+            (Error::NulError(e1), Error::NulError(e2)) =&gt; e1 == e2,
+            (Error::InvalidParameterName(n1), Error::InvalidParameterName(n2)) =&gt; n1 == n2,
+            (Error::InvalidPath(p1), Error::InvalidPath(p2)) =&gt; p1 == p2,
+            (Error::ExecuteReturnedResults, Error::ExecuteReturnedResults) =&gt; <span class="bool-val">true</span>,
+            (Error::QueryReturnedNoRows, Error::QueryReturnedNoRows) =&gt; <span class="bool-val">true</span>,
+            (Error::InvalidColumnIndex(i1), Error::InvalidColumnIndex(i2)) =&gt; i1 == i2,
+            (Error::InvalidColumnName(n1), Error::InvalidColumnName(n2)) =&gt; n1 == n2,
+            (Error::InvalidColumnType(i1, n1, t1), Error::InvalidColumnType(i2, n2, t2)) =&gt; {
+                i1 == i2 &amp;&amp; t1 == t2 &amp;&amp; n1 == n2
             }
-            (<span class="ident">Error::StatementChangedRows</span>(<span class="ident">n1</span>), <span class="ident">Error::StatementChangedRows</span>(<span class="ident">n2</span>)) =&gt; <span class="ident">n1</span> <span class="op">==</span> <span class="ident">n2</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;functions&quot;</span>)]</span>
-            (
-                <span class="ident">Error::InvalidFunctionParameterType</span>(<span class="ident">i1</span>, <span class="ident">t1</span>),
-                <span class="ident">Error::InvalidFunctionParameterType</span>(<span class="ident">i2</span>, <span class="ident">t2</span>),
-            ) =&gt; <span class="ident">i1</span> <span class="op">==</span> <span class="ident">i2</span> <span class="op">&amp;&amp;</span> <span class="ident">t1</span> <span class="op">==</span> <span class="ident">t2</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vtab&quot;</span>)]</span>
-            (
-                <span class="ident">Error::InvalidFilterParameterType</span>(<span class="ident">i1</span>, <span class="ident">t1</span>),
-                <span class="ident">Error::InvalidFilterParameterType</span>(<span class="ident">i2</span>, <span class="ident">t2</span>),
-            ) =&gt; <span class="ident">i1</span> <span class="op">==</span> <span class="ident">i2</span> <span class="op">&amp;&amp;</span> <span class="ident">t1</span> <span class="op">==</span> <span class="ident">t2</span>,
-            (<span class="ident">Error::InvalidQuery</span>, <span class="ident">Error::InvalidQuery</span>) =&gt; <span class="bool-val">true</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vtab&quot;</span>)]</span>
-            (<span class="ident">Error::ModuleError</span>(<span class="ident">s1</span>), <span class="ident">Error::ModuleError</span>(<span class="ident">s2</span>)) =&gt; <span class="ident">s1</span> <span class="op">==</span> <span class="ident">s2</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;functions&quot;</span>)]</span>
-            (<span class="ident">Error::UnwindingPanic</span>, <span class="ident">Error::UnwindingPanic</span>) =&gt; <span class="bool-val">true</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;functions&quot;</span>)]</span>
-            (<span class="ident">Error::GetAuxWrongType</span>, <span class="ident">Error::GetAuxWrongType</span>) =&gt; <span class="bool-val">true</span>,
-            (<span class="ident">Error::InvalidParameterCount</span>(<span class="ident">i1</span>, <span class="ident">n1</span>), <span class="ident">Error::InvalidParameterCount</span>(<span class="ident">i2</span>, <span class="ident">n2</span>)) =&gt; {
-                <span class="ident">i1</span> <span class="op">==</span> <span class="ident">i2</span> <span class="op">&amp;&amp;</span> <span class="ident">n1</span> <span class="op">==</span> <span class="ident">n2</span>
+            (Error::StatementChangedRows(n1), Error::StatementChangedRows(n2)) =&gt; n1 == n2,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;functions&quot;</span>)]
+            </span>(
+                Error::InvalidFunctionParameterType(i1, t1),
+                Error::InvalidFunctionParameterType(i2, t2),
+            ) =&gt; i1 == i2 &amp;&amp; t1 == t2,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;vtab&quot;</span>)]
+            </span>(
+                Error::InvalidFilterParameterType(i1, t1),
+                Error::InvalidFilterParameterType(i2, t2),
+            ) =&gt; i1 == i2 &amp;&amp; t1 == t2,
+            (Error::InvalidQuery, Error::InvalidQuery) =&gt; <span class="bool-val">true</span>,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;vtab&quot;</span>)]
+            </span>(Error::ModuleError(s1), Error::ModuleError(s2)) =&gt; s1 == s2,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;functions&quot;</span>)]
+            </span>(Error::UnwindingPanic, Error::UnwindingPanic) =&gt; <span class="bool-val">true</span>,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;functions&quot;</span>)]
+            </span>(Error::GetAuxWrongType, Error::GetAuxWrongType) =&gt; <span class="bool-val">true</span>,
+            (Error::InvalidParameterCount(i1, n1), Error::InvalidParameterCount(i2, n2)) =&gt; {
+                i1 == i2 &amp;&amp; n1 == n2
             }
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;blob&quot;</span>)]</span>
-            (<span class="ident">Error::BlobSizeError</span>, <span class="ident">Error::BlobSizeError</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;blob&quot;</span>)]
+            </span>(Error::BlobSizeError, Error::BlobSizeError) =&gt; <span class="bool-val">true</span>,
             (..) =&gt; <span class="bool-val">false</span>,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">str::Utf8Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="attribute">#[<span class="ident">cold</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">str::Utf8Error</span>) -&gt; <span class="ident">Error</span> {
-        <span class="ident">Error::Utf8Error</span>(<span class="ident">err</span>)
+<span class="kw">impl </span>From&lt;str::Utf8Error&gt; <span class="kw">for </span>Error {
+    <span class="attribute">#[cold]
+    </span><span class="kw">fn </span>from(err: str::Utf8Error) -&gt; Error {
+        Error::Utf8Error(err)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">::std::ffi::NulError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="attribute">#[<span class="ident">cold</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">::std::ffi::NulError</span>) -&gt; <span class="ident">Error</span> {
-        <span class="ident">Error::NulError</span>(<span class="ident">err</span>)
+<span class="kw">impl </span>From&lt;::std::ffi::NulError&gt; <span class="kw">for </span>Error {
+    <span class="attribute">#[cold]
+    </span><span class="kw">fn </span>from(err: ::std::ffi::NulError) -&gt; Error {
+        Error::NulError(err)
     }
 }
 
-<span class="kw">const</span> <span class="ident">UNKNOWN_COLUMN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">std::usize::MAX</span>;
+<span class="kw">const </span>UNKNOWN_COLUMN: usize = std::usize::MAX;
 
-<span class="doccomment">/// The conversion isn&#39;t precise, but it&#39;s convenient to have it</span>
-<span class="doccomment">/// to allow use of `get_raw(…).as_…()?` in callbacks that take `Error`.</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">FromSqlError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="attribute">#[<span class="ident">cold</span>]</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">FromSqlError</span>) -&gt; <span class="ident">Error</span> {
-        <span class="comment">// The error type requires index and type fields, but they aren&#39;t known in this</span>
-        <span class="comment">// context.</span>
-        <span class="kw">match</span> <span class="ident">err</span> {
-            <span class="ident">FromSqlError::OutOfRange</span>(<span class="ident">val</span>) =&gt; <span class="ident">Error::IntegralValueOutOfRange</span>(<span class="ident">UNKNOWN_COLUMN</span>, <span class="ident">val</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;i128_blob&quot;</span>)]</span>
-            <span class="ident">FromSqlError::InvalidI128Size</span>(<span class="kw">_</span>) =&gt; {
-                <span class="ident">Error::FromSqlConversionFailure</span>(<span class="ident">UNKNOWN_COLUMN</span>, <span class="ident">Type::Blob</span>, <span class="ident">Box::new</span>(<span class="ident">err</span>))
+<span class="doccomment">/// The conversion isn&#39;t precise, but it&#39;s convenient to have it
+/// to allow use of `get_raw(…).as_…()?` in callbacks that take `Error`.
+</span><span class="kw">impl </span>From&lt;FromSqlError&gt; <span class="kw">for </span>Error {
+    <span class="attribute">#[cold]
+    </span><span class="kw">fn </span>from(err: FromSqlError) -&gt; Error {
+        <span class="comment">// The error type requires index and type fields, but they aren&#39;t known in this
+        // context.
+        </span><span class="kw">match </span>err {
+            FromSqlError::OutOfRange(val) =&gt; Error::IntegralValueOutOfRange(UNKNOWN_COLUMN, val),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;i128_blob&quot;</span>)]
+            </span>FromSqlError::InvalidI128Size(<span class="kw">_</span>) =&gt; {
+                Error::FromSqlConversionFailure(UNKNOWN_COLUMN, Type::Blob, Box::new(err))
             }
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;uuid&quot;</span>)]</span>
-            <span class="ident">FromSqlError::InvalidUuidSize</span>(<span class="kw">_</span>) =&gt; {
-                <span class="ident">Error::FromSqlConversionFailure</span>(<span class="ident">UNKNOWN_COLUMN</span>, <span class="ident">Type::Blob</span>, <span class="ident">Box::new</span>(<span class="ident">err</span>))
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
+            </span>FromSqlError::InvalidUuidSize(<span class="kw">_</span>) =&gt; {
+                Error::FromSqlConversionFailure(UNKNOWN_COLUMN, Type::Blob, Box::new(err))
             }
-            <span class="ident">FromSqlError::Other</span>(<span class="ident">source</span>) =&gt; {
-                <span class="ident">Error::FromSqlConversionFailure</span>(<span class="ident">UNKNOWN_COLUMN</span>, <span class="ident">Type::Null</span>, <span class="ident">source</span>)
+            FromSqlError::Other(source) =&gt; {
+                Error::FromSqlConversionFailure(UNKNOWN_COLUMN, Type::Null, source)
             }
-            <span class="kw">_</span> =&gt; <span class="ident">Error::FromSqlConversionFailure</span>(<span class="ident">UNKNOWN_COLUMN</span>, <span class="ident">Type::Null</span>, <span class="ident">Box::new</span>(<span class="ident">err</span>)),
+            <span class="kw">_ </span>=&gt; Error::FromSqlConversionFailure(UNKNOWN_COLUMN, Type::Null, Box::new(err)),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Error::SqliteFailure</span>(<span class="kw-2">ref</span> <span class="ident">err</span>, <span class="prelude-val">None</span>) =&gt; <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
-            <span class="ident">Error::SqliteFailure</span>(<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">s</span>)) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">s</span>),
-            <span class="ident">Error::SqliteSingleThreadedMode</span> =&gt; <span class="macro">write!</span>(
-                <span class="ident">f</span>,
-                <span class="string">&quot;SQLite was compiled or configured for single-threaded use only&quot;</span>
-            ),
-            <span class="ident">Error::FromSqlConversionFailure</span>(<span class="ident">i</span>, <span class="kw-2">ref</span> <span class="ident">t</span>, <span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; {
-                <span class="kw">if</span> <span class="ident">i</span> <span class="op">!</span><span class="op">=</span> <span class="ident">UNKNOWN_COLUMN</span> {
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Error {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Error::SqliteFailure(<span class="kw-2">ref </span>err, <span class="prelude-val">None</span>) =&gt; err.fmt(f),
+            Error::SqliteFailure(<span class="kw">_</span>, <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>s)) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, s),
+            Error::SqliteSingleThreadedMode =&gt; <span class="macro">write!</span>(
+                f,
+                <span class="string">&quot;SQLite was compiled or configured for single-threaded use only&quot;
+            </span>),
+            Error::FromSqlConversionFailure(i, <span class="kw-2">ref </span>t, <span class="kw-2">ref </span>err) =&gt; {
+                <span class="kw">if </span>i != UNKNOWN_COLUMN {
                     <span class="macro">write!</span>(
-                        <span class="ident">f</span>,
+                        f,
                         <span class="string">&quot;Conversion error from type {} at index: {}, {}&quot;</span>,
-                        <span class="ident">t</span>, <span class="ident">i</span>, <span class="ident">err</span>
+                        t, i, err
                     )
-                } <span class="kw">else</span> {
-                    <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)
+                } <span class="kw">else </span>{
+                    err.fmt(f)
                 }
             }
-            <span class="ident">Error::IntegralValueOutOfRange</span>(<span class="ident">col</span>, <span class="ident">val</span>) =&gt; {
-                <span class="kw">if</span> <span class="ident">col</span> <span class="op">!</span><span class="op">=</span> <span class="ident">UNKNOWN_COLUMN</span> {
-                    <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Integer {} out of range at index {}&quot;</span>, <span class="ident">val</span>, <span class="ident">col</span>)
-                } <span class="kw">else</span> {
-                    <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Integer {} out of range&quot;</span>, <span class="ident">val</span>)
+            Error::IntegralValueOutOfRange(col, val) =&gt; {
+                <span class="kw">if </span>col != UNKNOWN_COLUMN {
+                    <span class="macro">write!</span>(f, <span class="string">&quot;Integer {} out of range at index {}&quot;</span>, val, col)
+                } <span class="kw">else </span>{
+                    <span class="macro">write!</span>(f, <span class="string">&quot;Integer {} out of range&quot;</span>, val)
                 }
             }
-            <span class="ident">Error::Utf8Error</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
-            <span class="ident">Error::NulError</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
-            <span class="ident">Error::InvalidParameterName</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Invalid parameter name: {}&quot;</span>, <span class="ident">name</span>),
-            <span class="ident">Error::InvalidPath</span>(<span class="kw-2">ref</span> <span class="ident">p</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Invalid path: {}&quot;</span>, <span class="ident">p</span>.<span class="ident">to_string_lossy</span>()),
-            <span class="ident">Error::ExecuteReturnedResults</span> =&gt; {
-                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Execute returned results - did you mean to call query?&quot;</span>)
+            Error::Utf8Error(<span class="kw-2">ref </span>err) =&gt; err.fmt(f),
+            Error::NulError(<span class="kw-2">ref </span>err) =&gt; err.fmt(f),
+            Error::InvalidParameterName(<span class="kw-2">ref </span>name) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Invalid parameter name: {}&quot;</span>, name),
+            Error::InvalidPath(<span class="kw-2">ref </span>p) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Invalid path: {}&quot;</span>, p.to_string_lossy()),
+            Error::ExecuteReturnedResults =&gt; {
+                <span class="macro">write!</span>(f, <span class="string">&quot;Execute returned results - did you mean to call query?&quot;</span>)
             }
-            <span class="ident">Error::QueryReturnedNoRows</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Query returned no rows&quot;</span>),
-            <span class="ident">Error::InvalidColumnIndex</span>(<span class="ident">i</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Invalid column index: {}&quot;</span>, <span class="ident">i</span>),
-            <span class="ident">Error::InvalidColumnName</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Invalid column name: {}&quot;</span>, <span class="ident">name</span>),
-            <span class="ident">Error::InvalidColumnType</span>(<span class="ident">i</span>, <span class="kw-2">ref</span> <span class="ident">name</span>, <span class="kw-2">ref</span> <span class="ident">t</span>) =&gt; <span class="macro">write!</span>(
-                <span class="ident">f</span>,
+            Error::QueryReturnedNoRows =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Query returned no rows&quot;</span>),
+            Error::InvalidColumnIndex(i) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Invalid column index: {}&quot;</span>, i),
+            Error::InvalidColumnName(<span class="kw-2">ref </span>name) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Invalid column name: {}&quot;</span>, name),
+            Error::InvalidColumnType(i, <span class="kw-2">ref </span>name, <span class="kw-2">ref </span>t) =&gt; <span class="macro">write!</span>(
+                f,
                 <span class="string">&quot;Invalid column type {} at index: {}, name: {}&quot;</span>,
-                <span class="ident">t</span>, <span class="ident">i</span>, <span class="ident">name</span>
+                t, i, name
             ),
-            <span class="ident">Error::InvalidParameterCount</span>(<span class="ident">i1</span>, <span class="ident">n1</span>) =&gt; <span class="macro">write!</span>(
-                <span class="ident">f</span>,
+            Error::InvalidParameterCount(i1, n1) =&gt; <span class="macro">write!</span>(
+                f,
                 <span class="string">&quot;Wrong number of parameters passed to query. Got {}, needed {}&quot;</span>,
-                <span class="ident">i1</span>, <span class="ident">n1</span>
+                i1, n1
             ),
-            <span class="ident">Error::StatementChangedRows</span>(<span class="ident">i</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Query changed {} rows&quot;</span>, <span class="ident">i</span>),
+            Error::StatementChangedRows(i) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Query changed {} rows&quot;</span>, i),
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;functions&quot;</span>)]</span>
-            <span class="ident">Error::InvalidFunctionParameterType</span>(<span class="ident">i</span>, <span class="kw-2">ref</span> <span class="ident">t</span>) =&gt; {
-                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Invalid function parameter type {} at index {}&quot;</span>, <span class="ident">t</span>, <span class="ident">i</span>)
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;functions&quot;</span>)]
+            </span>Error::InvalidFunctionParameterType(i, <span class="kw-2">ref </span>t) =&gt; {
+                <span class="macro">write!</span>(f, <span class="string">&quot;Invalid function parameter type {} at index {}&quot;</span>, t, i)
             }
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vtab&quot;</span>)]</span>
-            <span class="ident">Error::InvalidFilterParameterType</span>(<span class="ident">i</span>, <span class="kw-2">ref</span> <span class="ident">t</span>) =&gt; {
-                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Invalid filter parameter type {} at index {}&quot;</span>, <span class="ident">t</span>, <span class="ident">i</span>)
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;vtab&quot;</span>)]
+            </span>Error::InvalidFilterParameterType(i, <span class="kw-2">ref </span>t) =&gt; {
+                <span class="macro">write!</span>(f, <span class="string">&quot;Invalid filter parameter type {} at index {}&quot;</span>, t, i)
             }
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;functions&quot;</span>)]</span>
-            <span class="ident">Error::UserFunctionError</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
-            <span class="ident">Error::ToSqlConversionFailure</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="ident">err</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
-            <span class="ident">Error::InvalidQuery</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Query is not read-only&quot;</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vtab&quot;</span>)]</span>
-            <span class="ident">Error::ModuleError</span>(<span class="kw-2">ref</span> <span class="ident">desc</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">desc</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;functions&quot;</span>)]</span>
-            <span class="ident">Error::UnwindingPanic</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;unwinding panic&quot;</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;functions&quot;</span>)]</span>
-            <span class="ident">Error::GetAuxWrongType</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;get_aux called with wrong type&quot;</span>),
-            <span class="ident">Error::MultipleStatement</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Multiple statements provided&quot;</span>),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;functions&quot;</span>)]
+            </span>Error::UserFunctionError(<span class="kw-2">ref </span>err) =&gt; err.fmt(f),
+            Error::ToSqlConversionFailure(<span class="kw-2">ref </span>err) =&gt; err.fmt(f),
+            Error::InvalidQuery =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Query is not read-only&quot;</span>),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;vtab&quot;</span>)]
+            </span>Error::ModuleError(<span class="kw-2">ref </span>desc) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, desc),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;functions&quot;</span>)]
+            </span>Error::UnwindingPanic =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;unwinding panic&quot;</span>),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;functions&quot;</span>)]
+            </span>Error::GetAuxWrongType =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;get_aux called with wrong type&quot;</span>),
+            Error::MultipleStatement =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Multiple statements provided&quot;</span>),
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;blob&quot;</span>)]</span>
-            <span class="ident">Error::BlobSizeError</span> =&gt; <span class="string">&quot;Blob size is insufficient&quot;</span>.<span class="ident">fmt</span>(<span class="ident">f</span>),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;blob&quot;</span>)]
+            </span>Error::BlobSizeError =&gt; <span class="string">&quot;Blob size is insufficient&quot;</span>.fmt(f),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">error::Error</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Error::SqliteFailure</span>(<span class="kw-2">ref</span> <span class="ident">err</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">err</span>),
-            <span class="ident">Error::Utf8Error</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">err</span>),
-            <span class="ident">Error::NulError</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">err</span>),
+<span class="kw">impl </span>error::Error <span class="kw">for </span>Error {
+    <span class="kw">fn </span>source(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>(<span class="kw">dyn </span>error::Error + <span class="lifetime">&#39;static</span>)&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Error::SqliteFailure(<span class="kw-2">ref </span>err, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(err),
+            Error::Utf8Error(<span class="kw-2">ref </span>err) =&gt; <span class="prelude-val">Some</span>(err),
+            Error::NulError(<span class="kw-2">ref </span>err) =&gt; <span class="prelude-val">Some</span>(err),
 
-            <span class="ident">Error::IntegralValueOutOfRange</span>(..)
-            <span class="op">|</span> <span class="ident">Error::SqliteSingleThreadedMode</span>
-            <span class="op">|</span> <span class="ident">Error::InvalidParameterName</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">Error::ExecuteReturnedResults</span>
-            <span class="op">|</span> <span class="ident">Error::QueryReturnedNoRows</span>
-            <span class="op">|</span> <span class="ident">Error::InvalidColumnIndex</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">Error::InvalidColumnName</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">Error::InvalidColumnType</span>(..)
-            <span class="op">|</span> <span class="ident">Error::InvalidPath</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">Error::InvalidParameterCount</span>(..)
-            <span class="op">|</span> <span class="ident">Error::StatementChangedRows</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">Error::InvalidQuery</span>
-            <span class="op">|</span> <span class="ident">Error::MultipleStatement</span> =&gt; <span class="prelude-val">None</span>,
+            Error::IntegralValueOutOfRange(..)
+            | Error::SqliteSingleThreadedMode
+            | Error::InvalidParameterName(<span class="kw">_</span>)
+            | Error::ExecuteReturnedResults
+            | Error::QueryReturnedNoRows
+            | Error::InvalidColumnIndex(<span class="kw">_</span>)
+            | Error::InvalidColumnName(<span class="kw">_</span>)
+            | Error::InvalidColumnType(..)
+            | Error::InvalidPath(<span class="kw">_</span>)
+            | Error::InvalidParameterCount(..)
+            | Error::StatementChangedRows(<span class="kw">_</span>)
+            | Error::InvalidQuery
+            | Error::MultipleStatement =&gt; <span class="prelude-val">None</span>,
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;functions&quot;</span>)]</span>
-            <span class="ident">Error::InvalidFunctionParameterType</span>(..) =&gt; <span class="prelude-val">None</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vtab&quot;</span>)]</span>
-            <span class="ident">Error::InvalidFilterParameterType</span>(..) =&gt; <span class="prelude-val">None</span>,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;functions&quot;</span>)]
+            </span>Error::InvalidFunctionParameterType(..) =&gt; <span class="prelude-val">None</span>,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;vtab&quot;</span>)]
+            </span>Error::InvalidFilterParameterType(..) =&gt; <span class="prelude-val">None</span>,
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;functions&quot;</span>)]</span>
-            <span class="ident">Error::UserFunctionError</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">err</span>),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;functions&quot;</span>)]
+            </span>Error::UserFunctionError(<span class="kw-2">ref </span>err) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;**</span>err),
 
-            <span class="ident">Error::FromSqlConversionFailure</span>(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw-2">ref</span> <span class="ident">err</span>)
-            <span class="op">|</span> <span class="ident">Error::ToSqlConversionFailure</span>(<span class="kw-2">ref</span> <span class="ident">err</span>) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">err</span>),
+            Error::FromSqlConversionFailure(<span class="kw">_</span>, <span class="kw">_</span>, <span class="kw-2">ref </span>err)
+            | Error::ToSqlConversionFailure(<span class="kw-2">ref </span>err) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;**</span>err),
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vtab&quot;</span>)]</span>
-            <span class="ident">Error::ModuleError</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;vtab&quot;</span>)]
+            </span>Error::ModuleError(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;functions&quot;</span>)]</span>
-            <span class="ident">Error::UnwindingPanic</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;functions&quot;</span>)]
+            </span>Error::UnwindingPanic =&gt; <span class="prelude-val">None</span>,
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;functions&quot;</span>)]</span>
-            <span class="ident">Error::GetAuxWrongType</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;functions&quot;</span>)]
+            </span>Error::GetAuxWrongType =&gt; <span class="prelude-val">None</span>,
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;blob&quot;</span>)]</span>
-            <span class="ident">Error::BlobSizeError</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;blob&quot;</span>)]
+            </span>Error::BlobSizeError =&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="comment">// These are public but not re-exported by lib.rs, so only visible within crate.</span>
+<span class="comment">// These are public but not re-exported by lib.rs, so only visible within crate.
 
-<span class="attribute">#[<span class="ident">cold</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">error_from_sqlite_code</span>(<span class="ident">code</span>: <span class="ident">c_int</span>, <span class="ident">message</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="ident">Error</span> {
-    <span class="ident">Error::SqliteFailure</span>(<span class="ident">ffi::Error::new</span>(<span class="ident">code</span>), <span class="ident">message</span>)
+</span><span class="attribute">#[cold]
+</span><span class="kw">pub fn </span>error_from_sqlite_code(code: c_int, message: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; Error {
+    Error::SqliteFailure(ffi::Error::new(code), message)
 }
 
-<span class="attribute">#[<span class="ident">cold</span>]</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">error_from_handle</span>(<span class="ident">db</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::sqlite3</span>, <span class="ident">code</span>: <span class="ident">c_int</span>) -&gt; <span class="ident">Error</span> {
-    <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">db</span>.<span class="ident">is_null</span>() {
-        <span class="prelude-val">None</span>
-    } <span class="kw">else</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">errmsg_to_string</span>(<span class="ident">ffi::sqlite3_errmsg</span>(<span class="ident">db</span>)))
+<span class="attribute">#[cold]
+</span><span class="kw">pub unsafe fn </span>error_from_handle(db: <span class="kw-2">*mut </span>ffi::sqlite3, code: c_int) -&gt; Error {
+    <span class="kw">let </span>message = <span class="kw">if </span>db.is_null() {
+        <span class="prelude-val">None
+    </span>} <span class="kw">else </span>{
+        <span class="prelude-val">Some</span>(errmsg_to_string(ffi::sqlite3_errmsg(db)))
     };
-    <span class="ident">error_from_sqlite_code</span>(<span class="ident">code</span>, <span class="ident">message</span>)
+    error_from_sqlite_code(code, message)
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">check</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">funcall</span>:<span class="ident">expr</span>) =&gt; {{
-        <span class="kw">let</span> <span class="ident">rc</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">funcall</span>;
-        <span class="kw">if</span> <span class="ident">rc</span> <span class="op">!</span><span class="op">=</span> <span class="ident"><span class="kw">crate</span>::ffi::SQLITE_OK</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::error::error_from_sqlite_code</span>(<span class="ident">rc</span>, <span class="prelude-val">None</span>).<span class="ident">into</span>());
+<span class="macro">macro_rules! </span>check {
+    (<span class="macro-nonterminal">$funcall</span>:expr) =&gt; {{
+        <span class="kw">let </span>rc = <span class="macro-nonterminal">$funcall</span>;
+        <span class="kw">if </span>rc != <span class="kw">crate</span>::ffi::SQLITE_OK {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="kw">crate</span>::error::error_from_sqlite_code(rc, <span class="prelude-val">None</span>).into());
         }
     }};
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rusqlite" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rusqlite" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

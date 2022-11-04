@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/take_mut-0.2.2/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../take_mut/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../take_mut/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../take_mut/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/take_mut-0.2.2/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../take_mut/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../take_mut/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../take_mut/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -148,100 +148,100 @@
 <span id="148">148</span>
 <span id="149">149</span>
 <span id="150">150</span>
-</pre><pre class="rust"><code><span class="doccomment">//! This crate provides several functions for handling `&amp;mut T` including `take()`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `take()` allows for taking `T` out of a `&amp;mut T`, doing anything with it including consuming it, and producing another `T` to put back in the `&amp;mut T`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! During `take()`, if a panic occurs, the entire process will be aborted, as there&#39;s no valid `T` to put back into the `&amp;mut T`.</span>
-<span class="doccomment">//! Use `take_or_recover()` to replace the `&amp;mut T` with a recovery value before continuing the panic.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Contrast with `std::mem::replace()`, which allows for putting a different `T` into a `&amp;mut T`, but requiring the new `T` to be available before being able to consume the old `T`.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! This crate provides several functions for handling `&amp;mut T` including `take()`.
+//!
+//! `take()` allows for taking `T` out of a `&amp;mut T`, doing anything with it including consuming it, and producing another `T` to put back in the `&amp;mut T`.
+//!
+//! During `take()`, if a panic occurs, the entire process will be aborted, as there&#39;s no valid `T` to put back into the `&amp;mut T`.
+//! Use `take_or_recover()` to replace the `&amp;mut T` with a recovery value before continuing the panic.
+//!
+//! Contrast with `std::mem::replace()`, which allows for putting a different `T` into a `&amp;mut T`, but requiring the new `T` to be available before being able to consume the old `T`.
 
-<span class="kw">use</span> <span class="ident">std::panic</span>;
+</span><span class="kw">use </span>std::panic;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">scoped</span>;
+<span class="kw">pub mod </span>scoped;
 
-<span class="doccomment">/// Allows use of a value pointed to by `&amp;mut T` as though it was owned, as long as a `T` is made available afterwards.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The closure must return a valid T.</span>
-<span class="doccomment">/// # Important</span>
-<span class="doccomment">/// Will abort the program if the closure panics.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// struct Foo;</span>
-<span class="doccomment">/// let mut foo = Foo;</span>
-<span class="doccomment">/// take_mut::take(&amp;mut foo, |foo| {</span>
-<span class="doccomment">///     // Can now consume the Foo, and provide a new value later</span>
-<span class="doccomment">///     drop(foo);</span>
-<span class="doccomment">///     // Do more stuff</span>
-<span class="doccomment">///     Foo // Return new Foo from closure, which goes back into the &amp;mut Foo</span>
-<span class="doccomment">/// });</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">mut_ref</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>, <span class="ident">closure</span>: <span class="ident">F</span>)
-  <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">T</span>) -&gt; <span class="ident">T</span> {
-    <span class="kw">use</span> <span class="ident">std::ptr</span>;
+<span class="doccomment">/// Allows use of a value pointed to by `&amp;mut T` as though it was owned, as long as a `T` is made available afterwards.
+///
+/// The closure must return a valid T.
+/// # Important
+/// Will abort the program if the closure panics.
+///
+/// # Example
+/// ```
+/// struct Foo;
+/// let mut foo = Foo;
+/// take_mut::take(&amp;mut foo, |foo| {
+///     // Can now consume the Foo, and provide a new value later
+///     drop(foo);
+///     // Do more stuff
+///     Foo // Return new Foo from closure, which goes back into the &amp;mut Foo
+/// });
+/// ```
+</span><span class="kw">pub fn </span>take&lt;T, F&gt;(mut_ref: <span class="kw-2">&amp;mut </span>T, closure: F)
+  <span class="kw">where </span>F: FnOnce(T) -&gt; T {
+    <span class="kw">use </span>std::ptr;
 
-    <span class="kw">unsafe</span> {
-        <span class="kw">let</span> <span class="ident">old_t</span> <span class="op">=</span> <span class="ident">ptr::read</span>(<span class="ident">mut_ref</span>);
-        <span class="kw">let</span> <span class="ident">new_t</span> <span class="op">=</span> <span class="ident">panic::catch_unwind</span>(<span class="ident">panic::AssertUnwindSafe</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">closure</span>(<span class="ident">old_t</span>)))
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">::std::process::abort</span>());
-        <span class="ident">ptr::write</span>(<span class="ident">mut_ref</span>, <span class="ident">new_t</span>);
+    <span class="kw">unsafe </span>{
+        <span class="kw">let </span>old_t = ptr::read(mut_ref);
+        <span class="kw">let </span>new_t = panic::catch_unwind(panic::AssertUnwindSafe(|| closure(old_t)))
+            .unwrap_or_else(|<span class="kw">_</span>| ::std::process::abort());
+        ptr::write(mut_ref, new_t);
     }
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">it_works</span>() {
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Debug</span>)]</span>
-    <span class="kw">enum</span> <span class="ident">Foo</span> {<span class="ident">A</span>, <span class="ident">B</span>};
-    <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Foo</span> {
-        <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-            <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-                <span class="ident">Foo::A</span> =&gt; <span class="macro">println!</span>(<span class="string">&quot;Foo::A dropped&quot;</span>),
-                <span class="ident">Foo::B</span> =&gt; <span class="macro">println!</span>(<span class="string">&quot;Foo::B dropped&quot;</span>)
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>it_works() {
+    <span class="attribute">#[derive(PartialEq, Eq, Debug)]
+    </span><span class="kw">enum </span>Foo {A, B};
+    <span class="kw">impl </span>Drop <span class="kw">for </span>Foo {
+        <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+            <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+                Foo::A =&gt; <span class="macro">println!</span>(<span class="string">&quot;Foo::A dropped&quot;</span>),
+                Foo::B =&gt; <span class="macro">println!</span>(<span class="string">&quot;Foo::B dropped&quot;</span>)
             }
         }
     }
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">foo</span> <span class="op">=</span> <span class="ident">Foo::A</span>;
-    <span class="ident">take</span>(<span class="kw-2">&amp;mut</span> <span class="ident">foo</span>, <span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
-       <span class="ident">drop</span>(<span class="ident">f</span>);
-       <span class="ident">Foo::B</span>
+    <span class="kw">let </span><span class="kw-2">mut </span>foo = Foo::A;
+    take(<span class="kw-2">&amp;mut </span>foo, |f| {
+       drop(f);
+       Foo::B
     });
-    <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">foo</span>, <span class="kw-2">&amp;</span><span class="ident">Foo::B</span>);
+    <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>foo, <span class="kw-2">&amp;</span>Foo::B);
 }
 
 
-<span class="doccomment">/// Allows use of a value pointed to by `&amp;mut T` as though it was owned, as long as a `T` is made available afterwards.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The closure must return a valid T.</span>
-<span class="doccomment">/// # Important</span>
-<span class="doccomment">/// Will replace `&amp;mut T` with `recover` if the closure panics, then continues the panic.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// struct Foo;</span>
-<span class="doccomment">/// let mut foo = Foo;</span>
-<span class="doccomment">/// take_mut::take_or_recover(&amp;mut foo, || Foo, |foo| {</span>
-<span class="doccomment">///     // Can now consume the Foo, and provide a new value later</span>
-<span class="doccomment">///     drop(foo);</span>
-<span class="doccomment">///     // Do more stuff</span>
-<span class="doccomment">///     Foo // Return new Foo from closure, which goes back into the &amp;mut Foo</span>
-<span class="doccomment">/// });</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_or_recover</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">mut_ref</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>, <span class="ident">recover</span>: <span class="ident">R</span>, <span class="ident">closure</span>: <span class="ident">F</span>)
-  <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">T</span>) -&gt; <span class="ident">T</span>, <span class="ident">R</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">T</span> {
-    <span class="kw">use</span> <span class="ident">std::ptr</span>;
-    <span class="kw">unsafe</span> {
-        <span class="kw">let</span> <span class="ident">old_t</span> <span class="op">=</span> <span class="ident">ptr::read</span>(<span class="ident">mut_ref</span>);
-        <span class="kw">let</span> <span class="ident">new_t</span> <span class="op">=</span> <span class="ident">panic::catch_unwind</span>(<span class="ident">panic::AssertUnwindSafe</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">closure</span>(<span class="ident">old_t</span>)));
-        <span class="kw">match</span> <span class="ident">new_t</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">panic::catch_unwind</span>(<span class="ident">panic::AssertUnwindSafe</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">recover</span>()))
-                    .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">::std::process::abort</span>());
-                <span class="ident">ptr::write</span>(<span class="ident">mut_ref</span>, <span class="ident">r</span>);
-                <span class="ident">panic::resume_unwind</span>(<span class="ident">err</span>);
+<span class="doccomment">/// Allows use of a value pointed to by `&amp;mut T` as though it was owned, as long as a `T` is made available afterwards.
+///
+/// The closure must return a valid T.
+/// # Important
+/// Will replace `&amp;mut T` with `recover` if the closure panics, then continues the panic.
+///
+/// # Example
+/// ```
+/// struct Foo;
+/// let mut foo = Foo;
+/// take_mut::take_or_recover(&amp;mut foo, || Foo, |foo| {
+///     // Can now consume the Foo, and provide a new value later
+///     drop(foo);
+///     // Do more stuff
+///     Foo // Return new Foo from closure, which goes back into the &amp;mut Foo
+/// });
+/// ```
+</span><span class="kw">pub fn </span>take_or_recover&lt;T, F, R&gt;(mut_ref: <span class="kw-2">&amp;mut </span>T, recover: R, closure: F)
+  <span class="kw">where </span>F: FnOnce(T) -&gt; T, R: FnOnce() -&gt; T {
+    <span class="kw">use </span>std::ptr;
+    <span class="kw">unsafe </span>{
+        <span class="kw">let </span>old_t = ptr::read(mut_ref);
+        <span class="kw">let </span>new_t = panic::catch_unwind(panic::AssertUnwindSafe(|| closure(old_t)));
+        <span class="kw">match </span>new_t {
+            <span class="prelude-val">Err</span>(err) =&gt; {
+                <span class="kw">let </span>r = panic::catch_unwind(panic::AssertUnwindSafe(|| recover()))
+                    .unwrap_or_else(|<span class="kw">_</span>| ::std::process::abort());
+                ptr::write(mut_ref, r);
+                panic::resume_unwind(err);
             }
-            <span class="prelude-val">Ok</span>(<span class="ident">new_t</span>) =&gt; <span class="ident">ptr::write</span>(<span class="ident">mut_ref</span>, <span class="ident">new_t</span>),
+            <span class="prelude-val">Ok</span>(new_t) =&gt; ptr::write(mut_ref, new_t),
         }
     }
 }
@@ -249,54 +249,54 @@
 
 
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">it_works_recover</span>() {
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Debug</span>)]</span>
-    <span class="kw">enum</span> <span class="ident">Foo</span> {<span class="ident">A</span>, <span class="ident">B</span>};
-    <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Foo</span> {
-        <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-            <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-                <span class="ident">Foo::A</span> =&gt; <span class="macro">println!</span>(<span class="string">&quot;Foo::A dropped&quot;</span>),
-                <span class="ident">Foo::B</span> =&gt; <span class="macro">println!</span>(<span class="string">&quot;Foo::B dropped&quot;</span>)
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>it_works_recover() {
+    <span class="attribute">#[derive(PartialEq, Eq, Debug)]
+    </span><span class="kw">enum </span>Foo {A, B};
+    <span class="kw">impl </span>Drop <span class="kw">for </span>Foo {
+        <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+            <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+                Foo::A =&gt; <span class="macro">println!</span>(<span class="string">&quot;Foo::A dropped&quot;</span>),
+                Foo::B =&gt; <span class="macro">println!</span>(<span class="string">&quot;Foo::B dropped&quot;</span>)
             }
         }
     }
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">foo</span> <span class="op">=</span> <span class="ident">Foo::A</span>;
-    <span class="ident">take_or_recover</span>(<span class="kw-2">&amp;mut</span> <span class="ident">foo</span>, <span class="op">|</span><span class="op">|</span> <span class="ident">Foo::A</span>, <span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
-       <span class="ident">drop</span>(<span class="ident">f</span>);
-       <span class="ident">Foo::B</span>
+    <span class="kw">let </span><span class="kw-2">mut </span>foo = Foo::A;
+    take_or_recover(<span class="kw-2">&amp;mut </span>foo, || Foo::A, |f| {
+       drop(f);
+       Foo::B
     });
-    <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">foo</span>, <span class="kw-2">&amp;</span><span class="ident">Foo::B</span>);
+    <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>foo, <span class="kw-2">&amp;</span>Foo::B);
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">it_works_recover_panic</span>() {
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Debug</span>)]</span>
-    <span class="kw">enum</span> <span class="ident">Foo</span> {<span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>};
-    <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Foo</span> {
-        <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-            <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-                <span class="ident">Foo::A</span> =&gt; <span class="macro">println!</span>(<span class="string">&quot;Foo::A dropped&quot;</span>),
-                <span class="ident">Foo::B</span> =&gt; <span class="macro">println!</span>(<span class="string">&quot;Foo::B dropped&quot;</span>),
-                <span class="ident">Foo::C</span> =&gt; <span class="macro">println!</span>(<span class="string">&quot;Foo::C dropped&quot;</span>)
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>it_works_recover_panic() {
+    <span class="attribute">#[derive(PartialEq, Eq, Debug)]
+    </span><span class="kw">enum </span>Foo {A, B, C};
+    <span class="kw">impl </span>Drop <span class="kw">for </span>Foo {
+        <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+            <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+                Foo::A =&gt; <span class="macro">println!</span>(<span class="string">&quot;Foo::A dropped&quot;</span>),
+                Foo::B =&gt; <span class="macro">println!</span>(<span class="string">&quot;Foo::B dropped&quot;</span>),
+                Foo::C =&gt; <span class="macro">println!</span>(<span class="string">&quot;Foo::C dropped&quot;</span>)
             }
         }
     }
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">foo</span> <span class="op">=</span> <span class="ident">Foo::A</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>foo = Foo::A;
 
-    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">panic::catch_unwind</span>(<span class="ident">panic::AssertUnwindSafe</span>(<span class="op">|</span><span class="op">|</span> {
-        <span class="ident">take_or_recover</span>(<span class="kw-2">&amp;mut</span> <span class="ident">foo</span>, <span class="op">|</span><span class="op">|</span> <span class="ident">Foo::C</span>, <span class="op">|</span><span class="ident">f</span><span class="op">|</span> {
-            <span class="ident">drop</span>(<span class="ident">f</span>);
+    <span class="kw">let </span>res = panic::catch_unwind(panic::AssertUnwindSafe(|| {
+        take_or_recover(<span class="kw-2">&amp;mut </span>foo, || Foo::C, |f| {
+            drop(f);
             <span class="macro">panic!</span>(<span class="string">&quot;panic&quot;</span>);
-            <span class="ident">Foo::B</span>
+            Foo::B
         });
     }));
 
-    <span class="macro">assert!</span>(<span class="ident">res</span>.<span class="ident">is_err</span>());
-    <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">foo</span>, <span class="kw-2">&amp;</span><span class="ident">Foo::C</span>);
+    <span class="macro">assert!</span>(res.is_err());
+    <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>foo, <span class="kw-2">&amp;</span>Foo::C);
 }
 
 
 
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="take_mut" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="take_mut" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

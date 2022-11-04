@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hmac-0.12.1/src/simple.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>simple.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/RustCrypto/media/26acc39f/logo.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../hmac/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/RustCrypto/media/26acc39f/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../hmac/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hmac-0.12.1/src/simple.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>simple.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/RustCrypto/media/26acc39f/logo.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../hmac/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/RustCrypto/media/26acc39f/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../hmac/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/RustCrypto/media/26acc39f/logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../hmac/index.html">
                         <img src="https://raw.githubusercontent.com/RustCrypto/media/26acc39f/logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -106,111 +106,111 @@
 <span id="104">104</span>
 <span id="105">105</span>
 <span id="106">106</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">get_der_key</span>, <span class="ident">IPAD</span>, <span class="ident">OPAD</span>};
-<span class="kw">use</span> <span class="ident">core::fmt</span>;
-<span class="kw">use</span> <span class="ident">digest</span>::{
-    <span class="ident">crypto_common</span>::{<span class="ident">Block</span>, <span class="ident">BlockSizeUser</span>, <span class="ident">InvalidLength</span>, <span class="ident">Key</span>, <span class="ident">KeySizeUser</span>},
-    <span class="ident">Digest</span>, <span class="ident">FixedOutput</span>, <span class="ident">KeyInit</span>, <span class="ident">MacMarker</span>, <span class="ident">Output</span>, <span class="ident">OutputSizeUser</span>, <span class="ident">Update</span>,
+</pre><pre class="rust"><code><span class="kw">use super</span>::{get_der_key, IPAD, OPAD};
+<span class="kw">use </span>core::fmt;
+<span class="kw">use </span>digest::{
+    crypto_common::{Block, BlockSizeUser, InvalidLength, Key, KeySizeUser},
+    Digest, FixedOutput, KeyInit, MacMarker, Output, OutputSizeUser, Update,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;reset&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">digest</span>::{<span class="ident">FixedOutputReset</span>, <span class="ident">Reset</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;reset&quot;</span>)]
+</span><span class="kw">use </span>digest::{FixedOutputReset, Reset};
 
-<span class="doccomment">/// Simplified HMAC instance able to operate over hash functions</span>
-<span class="doccomment">/// which do not expose block-level API and hash functions which</span>
-<span class="doccomment">/// process blocks lazily (e.g. BLAKE2).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SimpleHmac</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Digest</span> <span class="op">+</span> <span class="ident">BlockSizeUser</span><span class="op">&gt;</span> {
-    <span class="ident">digest</span>: <span class="ident">D</span>,
-    <span class="ident">opad_key</span>: <span class="ident">Block</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;reset&quot;</span>)]</span>
-    <span class="ident">ipad_key</span>: <span class="ident">Block</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Simplified HMAC instance able to operate over hash functions
+/// which do not expose block-level API and hash functions which
+/// process blocks lazily (e.g. BLAKE2).
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>SimpleHmac&lt;D: Digest + BlockSizeUser&gt; {
+    digest: D,
+    opad_key: Block&lt;D&gt;,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;reset&quot;</span>)]
+    </span>ipad_key: Block&lt;D&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Digest</span> <span class="op">+</span> <span class="ident">BlockSizeUser</span><span class="op">&gt;</span> <span class="ident">KeySizeUser</span> <span class="kw">for</span> <span class="ident">SimpleHmac</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">KeySize</span> <span class="op">=</span> <span class="ident">D::BlockSize</span>;
+<span class="kw">impl</span>&lt;D: Digest + BlockSizeUser&gt; KeySizeUser <span class="kw">for </span>SimpleHmac&lt;D&gt; {
+    <span class="kw">type </span>KeySize = D::BlockSize;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Digest</span> <span class="op">+</span> <span class="ident">BlockSizeUser</span><span class="op">&gt;</span> <span class="ident">MacMarker</span> <span class="kw">for</span> <span class="ident">SimpleHmac</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span>&lt;D: Digest + BlockSizeUser&gt; MacMarker <span class="kw">for </span>SimpleHmac&lt;D&gt; {}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Digest</span> <span class="op">+</span> <span class="ident">BlockSizeUser</span><span class="op">&gt;</span> <span class="ident">KeyInit</span> <span class="kw">for</span> <span class="ident">SimpleHmac</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">Key</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new_from_slice</span>(<span class="ident">key</span>.<span class="ident">as_slice</span>()).<span class="ident">unwrap</span>()
+<span class="kw">impl</span>&lt;D: Digest + BlockSizeUser&gt; KeyInit <span class="kw">for </span>SimpleHmac&lt;D&gt; {
+    <span class="kw">fn </span>new(key: <span class="kw-2">&amp;</span>Key&lt;<span class="self">Self</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new_from_slice(key.as_slice()).unwrap()
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">new_from_slice</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">InvalidLength</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">der_key</span> <span class="op">=</span> <span class="ident">get_der_key</span>::<span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">key</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ipad_key</span> <span class="op">=</span> <span class="ident">der_key</span>.<span class="ident">clone</span>();
-        <span class="kw">for</span> <span class="ident">b</span> <span class="kw">in</span> <span class="ident">ipad_key</span>.<span class="ident">iter_mut</span>() {
-            <span class="kw-2">*</span><span class="ident">b</span> <span class="op">^</span><span class="op">=</span> <span class="ident">IPAD</span>;
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>new_from_slice(key: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, InvalidLength&gt; {
+        <span class="kw">let </span>der_key = get_der_key::&lt;D&gt;(key);
+        <span class="kw">let </span><span class="kw-2">mut </span>ipad_key = der_key.clone();
+        <span class="kw">for </span>b <span class="kw">in </span>ipad_key.iter_mut() {
+            <span class="kw-2">*</span>b ^= IPAD;
         }
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">digest</span> <span class="op">=</span> <span class="ident">D::new</span>();
-        <span class="ident">digest</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">ipad_key</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>digest = D::new();
+        digest.update(<span class="kw-2">&amp;</span>ipad_key);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">opad_key</span> <span class="op">=</span> <span class="ident">der_key</span>;
-        <span class="kw">for</span> <span class="ident">b</span> <span class="kw">in</span> <span class="ident">opad_key</span>.<span class="ident">iter_mut</span>() {
-            <span class="kw-2">*</span><span class="ident">b</span> <span class="op">^</span><span class="op">=</span> <span class="ident">OPAD</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>opad_key = der_key;
+        <span class="kw">for </span>b <span class="kw">in </span>opad_key.iter_mut() {
+            <span class="kw-2">*</span>b ^= OPAD;
         }
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">digest</span>,
-            <span class="ident">opad_key</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;reset&quot;</span>)]</span>
-            <span class="ident">ipad_key</span>,
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            digest,
+            opad_key,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;reset&quot;</span>)]
+            </span>ipad_key,
         })
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Digest</span> <span class="op">+</span> <span class="ident">BlockSizeUser</span><span class="op">&gt;</span> <span class="ident">Update</span> <span class="kw">for</span> <span class="ident">SimpleHmac</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
-        <span class="self">self</span>.<span class="ident">digest</span>.<span class="ident">update</span>(<span class="ident">data</span>);
+<span class="kw">impl</span>&lt;D: Digest + BlockSizeUser&gt; Update <span class="kw">for </span>SimpleHmac&lt;D&gt; {
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, data: <span class="kw-2">&amp;</span>[u8]) {
+        <span class="self">self</span>.digest.update(data);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Digest</span> <span class="op">+</span> <span class="ident">BlockSizeUser</span><span class="op">&gt;</span> <span class="ident">OutputSizeUser</span> <span class="kw">for</span> <span class="ident">SimpleHmac</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">OutputSize</span> <span class="op">=</span> <span class="ident">D::OutputSize</span>;
+<span class="kw">impl</span>&lt;D: Digest + BlockSizeUser&gt; OutputSizeUser <span class="kw">for </span>SimpleHmac&lt;D&gt; {
+    <span class="kw">type </span>OutputSize = D::OutputSize;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Digest</span> <span class="op">+</span> <span class="ident">BlockSizeUser</span><span class="op">&gt;</span> <span class="ident">FixedOutput</span> <span class="kw">for</span> <span class="ident">SimpleHmac</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">finalize_into</span>(<span class="self">self</span>, <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Output</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">D::new</span>();
-        <span class="ident">h</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">opad_key</span>);
-        <span class="ident">h</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">digest</span>.<span class="ident">finalize</span>());
-        <span class="ident">h</span>.<span class="ident">finalize_into</span>(<span class="ident">out</span>);
+<span class="kw">impl</span>&lt;D: Digest + BlockSizeUser&gt; FixedOutput <span class="kw">for </span>SimpleHmac&lt;D&gt; {
+    <span class="kw">fn </span>finalize_into(<span class="self">self</span>, out: <span class="kw-2">&amp;mut </span>Output&lt;<span class="self">Self</span>&gt;) {
+        <span class="kw">let </span><span class="kw-2">mut </span>h = D::new();
+        h.update(<span class="kw-2">&amp;</span><span class="self">self</span>.opad_key);
+        h.update(<span class="kw-2">&amp;</span><span class="self">self</span>.digest.finalize());
+        h.finalize_into(out);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Digest</span> <span class="op">+</span> <span class="ident">BlockSizeUser</span> <span class="op">+</span> <span class="ident">fmt::Debug</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">SimpleHmac</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;SimpleHmac&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;digest&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">digest</span>)
-            <span class="comment">// TODO: replace with `finish_non_exhaustive` on MSRV</span>
-            <span class="comment">// bump to 1.53</span>
-            .<span class="ident">field</span>(<span class="string">&quot;..&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;..&quot;</span>)
-            .<span class="ident">finish</span>()
+<span class="kw">impl</span>&lt;D: Digest + BlockSizeUser + fmt::Debug&gt; fmt::Debug <span class="kw">for </span>SimpleHmac&lt;D&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;SimpleHmac&quot;</span>)
+            .field(<span class="string">&quot;digest&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.digest)
+            <span class="comment">// TODO: replace with `finish_non_exhaustive` on MSRV
+            // bump to 1.53
+            </span>.field(<span class="string">&quot;..&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;..&quot;</span>)
+            .finish()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;reset&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;reset&quot;</span>)))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Digest</span> <span class="op">+</span> <span class="ident">BlockSizeUser</span> <span class="op">+</span> <span class="ident">Reset</span><span class="op">&gt;</span> <span class="ident">Reset</span> <span class="kw">for</span> <span class="ident">SimpleHmac</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="ident">Reset::reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">digest</span>);
-        <span class="self">self</span>.<span class="ident">digest</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ipad_key</span>);
+<span class="attribute">#[cfg(feature = <span class="string">&quot;reset&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;reset&quot;</span>)))]
+</span><span class="kw">impl</span>&lt;D: Digest + BlockSizeUser + Reset&gt; Reset <span class="kw">for </span>SimpleHmac&lt;D&gt; {
+    <span class="kw">fn </span>reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        Reset::reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>.digest);
+        <span class="self">self</span>.digest.update(<span class="kw-2">&amp;</span><span class="self">self</span>.ipad_key);
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;reset&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;reset&quot;</span>)))]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Digest</span> <span class="op">+</span> <span class="ident">BlockSizeUser</span> <span class="op">+</span> <span class="ident">FixedOutputReset</span><span class="op">&gt;</span> <span class="ident">FixedOutputReset</span> <span class="kw">for</span> <span class="ident">SimpleHmac</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">finalize_into_reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Output</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">D::new</span>();
-        <span class="ident">Update::update</span>(<span class="kw-2">&amp;mut</span> <span class="ident">h</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">opad_key</span>);
-        <span class="ident">Update::update</span>(<span class="kw-2">&amp;mut</span> <span class="ident">h</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">digest</span>.<span class="ident">finalize_reset</span>());
-        <span class="ident">Update::update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">digest</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ipad_key</span>);
-        <span class="ident">Digest::finalize_into</span>(<span class="ident">h</span>, <span class="ident">out</span>);
+<span class="attribute">#[cfg(feature = <span class="string">&quot;reset&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;reset&quot;</span>)))]
+</span><span class="kw">impl</span>&lt;D: Digest + BlockSizeUser + FixedOutputReset&gt; FixedOutputReset <span class="kw">for </span>SimpleHmac&lt;D&gt; {
+    <span class="kw">fn </span>finalize_into_reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>, out: <span class="kw-2">&amp;mut </span>Output&lt;<span class="self">Self</span>&gt;) {
+        <span class="kw">let </span><span class="kw-2">mut </span>h = D::new();
+        Update::update(<span class="kw-2">&amp;mut </span>h, <span class="kw-2">&amp;</span><span class="self">self</span>.opad_key);
+        Update::update(<span class="kw-2">&amp;mut </span>h, <span class="kw-2">&amp;</span><span class="self">self</span>.digest.finalize_reset());
+        Update::update(<span class="kw-2">&amp;mut </span><span class="self">self</span>.digest, <span class="kw-2">&amp;</span><span class="self">self</span>.ipad_key);
+        Digest::finalize_into(h, out);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="hmac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="hmac" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

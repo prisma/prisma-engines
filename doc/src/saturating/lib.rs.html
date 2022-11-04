@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/saturating-0.1.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../saturating/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../saturating/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../saturating/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/saturating-0.1.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../saturating/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../saturating/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../saturating/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -191,198 +191,198 @@
 <span id="191">191</span>
 <span id="192">192</span>
 <span id="193">193</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Provides [`Saturating&lt;T&gt;`](`Saturating`), an intentionally-saturating arithmetic wrapper,</span>
-<span class="doccomment">//! similar to [`std::num::Wrapping`].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Examples</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! use saturating::Saturating;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let foo = Saturating(253u8);</span>
-<span class="doccomment">//! let bar = Saturating(100u8);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! assert_eq!(std::u8::MAX, (foo + bar).0);</span>
-<span class="doccomment">//! ```</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Provides [`Saturating&lt;T&gt;`](`Saturating`), an intentionally-saturating arithmetic wrapper,
+//! similar to [`std::num::Wrapping`].
+//!
+//! # Examples
+//!
+//! ```
+//! use saturating::Saturating;
+//!
+//! let foo = Saturating(253u8);
+//! let bar = Saturating(100u8);
+//!
+//! assert_eq!(std::u8::MAX, (foo + bar).0);
+//! ```
 
-<span class="attribute">#![<span class="ident">no_std</span>]</span>
+</span><span class="attribute">#![no_std]
 
-<span class="kw">use</span> <span class="ident">core::fmt</span>;
-<span class="kw">use</span> <span class="ident">core::ops</span>::<span class="kw-2">*</span>;
+</span><span class="kw">use </span>core::fmt;
+<span class="kw">use </span>core::ops::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// Provides intentionally-saturating arithmetic on `T`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The underlying value can be retrieved through the `.0` index of the</span>
-<span class="doccomment">/// `Saturating` tuple.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Default</span>, <span class="ident">Hash</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Saturating</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw">pub</span> <span class="ident">T</span>);
+<span class="doccomment">/// Provides intentionally-saturating arithmetic on `T`.
+///
+/// The underlying value can be retrieved through the `.0` index of the
+/// `Saturating` tuple.
+</span><span class="attribute">#[derive(PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Default, Hash)]
+#[repr(transparent)]
+</span><span class="kw">pub struct </span>Saturating&lt;T&gt;(<span class="kw">pub </span>T);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">fmt::Debug</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Saturating</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)
+<span class="kw">impl</span>&lt;T: fmt::Debug&gt; fmt::Debug <span class="kw">for </span>Saturating&lt;T&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="self">self</span>.<span class="number">0</span>.fmt(f)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">fmt::Display</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Saturating</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)
+<span class="kw">impl</span>&lt;T: fmt::Display&gt; fmt::Display <span class="kw">for </span>Saturating&lt;T&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="self">self</span>.<span class="number">0</span>.fmt(f)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">fmt::Binary</span><span class="op">&gt;</span> <span class="ident">fmt::Binary</span> <span class="kw">for</span> <span class="ident">Saturating</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)
+<span class="kw">impl</span>&lt;T: fmt::Binary&gt; fmt::Binary <span class="kw">for </span>Saturating&lt;T&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="self">self</span>.<span class="number">0</span>.fmt(f)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">fmt::Octal</span><span class="op">&gt;</span> <span class="ident">fmt::Octal</span> <span class="kw">for</span> <span class="ident">Saturating</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)
+<span class="kw">impl</span>&lt;T: fmt::Octal&gt; fmt::Octal <span class="kw">for </span>Saturating&lt;T&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="self">self</span>.<span class="number">0</span>.fmt(f)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">fmt::LowerHex</span><span class="op">&gt;</span> <span class="ident">fmt::LowerHex</span> <span class="kw">for</span> <span class="ident">Saturating</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)
+<span class="kw">impl</span>&lt;T: fmt::LowerHex&gt; fmt::LowerHex <span class="kw">for </span>Saturating&lt;T&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="self">self</span>.<span class="number">0</span>.fmt(f)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">fmt::UpperHex</span><span class="op">&gt;</span> <span class="ident">fmt::UpperHex</span> <span class="kw">for</span> <span class="ident">Saturating</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)
+<span class="kw">impl</span>&lt;T: fmt::UpperHex&gt; fmt::UpperHex <span class="kw">for </span>Saturating&lt;T&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="self">self</span>.<span class="number">0</span>.fmt(f)
     }
 }
 
-<span class="comment">// implements the unary operator &quot;op &amp;T&quot;</span>
-<span class="comment">// based on &quot;op T&quot; where T is expected to be `Copy`able</span>
-<span class="macro">macro_rules!</span> <span class="ident">forward_ref_unop</span> {
-    (<span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>:<span class="ident">ident</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>) =&gt; {
-        <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
-            <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span><span class="op">&gt;</span><span class="ident">::Output</span>;
+<span class="comment">// implements the unary operator &quot;op &amp;T&quot;
+// based on &quot;op T&quot; where T is expected to be `Copy`able
+</span><span class="macro">macro_rules! </span>forward_ref_unop {
+    (<span class="kw">impl </span><span class="macro-nonterminal">$imp</span>:ident, <span class="macro-nonterminal">$method</span>:ident <span class="kw">for </span><span class="macro-nonterminal">$t</span>:ty) =&gt; {
+        <span class="kw">impl </span><span class="macro-nonterminal">$imp </span><span class="kw">for </span><span class="kw-2">&amp;</span><span class="macro-nonterminal">$t </span>{
+            <span class="kw">type </span>Output = &lt;<span class="macro-nonterminal">$t </span><span class="kw">as </span><span class="macro-nonterminal">$imp</span>&gt;::Output;
 
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>(<span class="self">self</span>) -&gt; <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span><span class="op">&gt;</span><span class="ident">::Output</span> {
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>(<span class="kw-2">*</span><span class="self">self</span>)
-            }
-        }
-    }
-}
-
-<span class="comment">// implements binary operators &quot;&amp;T op U&quot;, &quot;T op &amp;U&quot;, &quot;&amp;T op &amp;U&quot;</span>
-<span class="comment">// based on &quot;T op U&quot; where T and U are expected to be `Copy`able</span>
-<span class="macro">macro_rules!</span> <span class="ident">forward_ref_binop</span> {
-    (<span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>:<span class="ident">ident</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span>:<span class="ident">ty</span>) =&gt; {
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
-            <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Output</span>;
-
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span>) -&gt; <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Output</span> {
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>(<span class="kw-2">*</span><span class="self">self</span>, <span class="ident">other</span>)
-            }
-        }
-
-        <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
-            <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Output</span>;
-
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span>) -&gt; <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Output</span> {
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>(<span class="self">self</span>, <span class="kw-2">*</span><span class="ident">other</span>)
-            }
-        }
-
-        <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
-            <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Output</span>;
-
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span>) -&gt; <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Output</span> {
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>(<span class="kw-2">*</span><span class="self">self</span>, <span class="kw-2">*</span><span class="ident">other</span>)
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span><span class="macro-nonterminal">$method</span>(<span class="self">self</span>) -&gt; &lt;<span class="macro-nonterminal">$t </span><span class="kw">as </span><span class="macro-nonterminal">$imp</span>&gt;::Output {
+                <span class="macro-nonterminal">$imp</span>::<span class="macro-nonterminal">$method</span>(<span class="kw-2">*</span><span class="self">self</span>)
             }
         }
     }
 }
 
-<span class="comment">// implements &quot;T op= &amp;U&quot;, based on &quot;T op= U&quot;</span>
-<span class="comment">// where U is expected to be `Copy`able</span>
-<span class="macro">macro_rules!</span> <span class="ident">forward_ref_op_assign</span> {
-    (<span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>:<span class="ident">ident</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span>:<span class="ident">ty</span>) =&gt; {
-        <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">u</span>) {
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>(<span class="self">self</span>, <span class="kw-2">*</span><span class="ident">other</span>);
+<span class="comment">// implements binary operators &quot;&amp;T op U&quot;, &quot;T op &amp;U&quot;, &quot;&amp;T op &amp;U&quot;
+// based on &quot;T op U&quot; where T and U are expected to be `Copy`able
+</span><span class="macro">macro_rules! </span>forward_ref_binop {
+    (<span class="kw">impl </span><span class="macro-nonterminal">$imp</span>:ident, <span class="macro-nonterminal">$method</span>:ident <span class="kw">for </span><span class="macro-nonterminal">$t</span>:ty, <span class="macro-nonterminal">$u</span>:ty) =&gt; {
+        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="macro-nonterminal">$imp</span>&lt;<span class="macro-nonterminal">$u</span>&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="macro-nonterminal">$t </span>{
+            <span class="kw">type </span>Output = &lt;<span class="macro-nonterminal">$t </span><span class="kw">as </span><span class="macro-nonterminal">$imp</span>&lt;<span class="macro-nonterminal">$u</span>&gt;&gt;::Output;
+
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span><span class="macro-nonterminal">$method</span>(<span class="self">self</span>, other: <span class="macro-nonterminal">$u</span>) -&gt; &lt;<span class="macro-nonterminal">$t </span><span class="kw">as </span><span class="macro-nonterminal">$imp</span>&lt;<span class="macro-nonterminal">$u</span>&gt;&gt;::Output {
+                <span class="macro-nonterminal">$imp</span>::<span class="macro-nonterminal">$method</span>(<span class="kw-2">*</span><span class="self">self</span>, other)
+            }
+        }
+
+        <span class="kw">impl </span><span class="macro-nonterminal">$imp</span>&lt;<span class="kw-2">&amp;</span><span class="macro-nonterminal">$u</span>&gt; <span class="kw">for </span><span class="macro-nonterminal">$t </span>{
+            <span class="kw">type </span>Output = &lt;<span class="macro-nonterminal">$t </span><span class="kw">as </span><span class="macro-nonterminal">$imp</span>&lt;<span class="macro-nonterminal">$u</span>&gt;&gt;::Output;
+
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span><span class="macro-nonterminal">$method</span>(<span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$u</span>) -&gt; &lt;<span class="macro-nonterminal">$t </span><span class="kw">as </span><span class="macro-nonterminal">$imp</span>&lt;<span class="macro-nonterminal">$u</span>&gt;&gt;::Output {
+                <span class="macro-nonterminal">$imp</span>::<span class="macro-nonterminal">$method</span>(<span class="self">self</span>, <span class="kw-2">*</span>other)
+            }
+        }
+
+        <span class="kw">impl </span><span class="macro-nonterminal">$imp</span>&lt;<span class="kw-2">&amp;</span><span class="macro-nonterminal">$u</span>&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="macro-nonterminal">$t </span>{
+            <span class="kw">type </span>Output = &lt;<span class="macro-nonterminal">$t </span><span class="kw">as </span><span class="macro-nonterminal">$imp</span>&lt;<span class="macro-nonterminal">$u</span>&gt;&gt;::Output;
+
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span><span class="macro-nonterminal">$method</span>(<span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$u</span>) -&gt; &lt;<span class="macro-nonterminal">$t </span><span class="kw">as </span><span class="macro-nonterminal">$imp</span>&lt;<span class="macro-nonterminal">$u</span>&gt;&gt;::Output {
+                <span class="macro-nonterminal">$imp</span>::<span class="macro-nonterminal">$method</span>(<span class="kw-2">*</span><span class="self">self</span>, <span class="kw-2">*</span>other)
             }
         }
     }
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">saturating_impl</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>)<span class="kw-2">*</span>) =&gt; ($(
-        <span class="kw">impl</span> <span class="ident">Add</span> <span class="kw">for</span> <span class="ident">Saturating</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> {
-            <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Saturating</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>;
-
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">add</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Saturating</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>) -&gt; <span class="ident">Saturating</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> {
-                <span class="ident">Saturating</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">saturating_add</span>(<span class="ident">other</span>.<span class="number">0</span>))
+<span class="comment">// implements &quot;T op= &amp;U&quot;, based on &quot;T op= U&quot;
+// where U is expected to be `Copy`able
+</span><span class="macro">macro_rules! </span>forward_ref_op_assign {
+    (<span class="kw">impl </span><span class="macro-nonterminal">$imp</span>:ident, <span class="macro-nonterminal">$method</span>:ident <span class="kw">for </span><span class="macro-nonterminal">$t</span>:ty, <span class="macro-nonterminal">$u</span>:ty) =&gt; {
+        <span class="kw">impl </span><span class="macro-nonterminal">$imp</span>&lt;<span class="kw-2">&amp;</span><span class="macro-nonterminal">$u</span>&gt; <span class="kw">for </span><span class="macro-nonterminal">$t </span>{
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span><span class="macro-nonterminal">$method</span>(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$u</span>) {
+                <span class="macro-nonterminal">$imp</span>::<span class="macro-nonterminal">$method</span>(<span class="self">self</span>, <span class="kw-2">*</span>other);
             }
         }
-        <span class="macro">forward_ref_binop!</span> { <span class="kw">impl</span> <span class="ident">Add</span>, <span class="ident">add</span> <span class="kw">for</span> <span class="ident">Saturating</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>, <span class="ident">Saturating</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> }
+    }
+}
 
-        <span class="kw">impl</span> <span class="ident">AddAssign</span> <span class="kw">for</span> <span class="ident">Saturating</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> {
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">add_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Saturating</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>) {
-                <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span> <span class="op">+</span> <span class="ident">other</span>;
+<span class="macro">macro_rules! </span>saturating_impl {
+    ($(<span class="macro-nonterminal">$t</span>:ty)<span class="kw-2">*</span>) =&gt; ($(
+        <span class="kw">impl </span>Add <span class="kw">for </span>Saturating&lt;<span class="macro-nonterminal">$t</span>&gt; {
+            <span class="kw">type </span>Output = Saturating&lt;<span class="macro-nonterminal">$t</span>&gt;;
+
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>add(<span class="self">self</span>, other: Saturating&lt;<span class="macro-nonterminal">$t</span>&gt;) -&gt; Saturating&lt;<span class="macro-nonterminal">$t</span>&gt; {
+                Saturating(<span class="self">self</span>.<span class="number">0</span>.saturating_add(other.<span class="number">0</span>))
             }
         }
-        <span class="macro">forward_ref_op_assign!</span> { <span class="kw">impl</span> <span class="ident">AddAssign</span>, <span class="ident">add_assign</span> <span class="kw">for</span> <span class="ident">Saturating</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>, <span class="ident">Saturating</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> }
+        <span class="macro">forward_ref_binop! </span>{ <span class="kw">impl </span>Add, add <span class="kw">for </span>Saturating&lt;<span class="macro-nonterminal">$t</span>&gt;, Saturating&lt;<span class="macro-nonterminal">$t</span>&gt; }
 
-        <span class="kw">impl</span> <span class="ident">Sub</span> <span class="kw">for</span> <span class="ident">Saturating</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> {
-            <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Saturating</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>;
-
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Saturating</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>) -&gt; <span class="ident">Saturating</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> {
-                <span class="ident">Saturating</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">saturating_sub</span>(<span class="ident">other</span>.<span class="number">0</span>))
+        <span class="kw">impl </span>AddAssign <span class="kw">for </span>Saturating&lt;<span class="macro-nonterminal">$t</span>&gt; {
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>add_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: Saturating&lt;<span class="macro-nonterminal">$t</span>&gt;) {
+                <span class="kw-2">*</span><span class="self">self </span>= <span class="kw-2">*</span><span class="self">self </span>+ other;
             }
         }
-        <span class="macro">forward_ref_binop!</span> { <span class="kw">impl</span> <span class="ident">Sub</span>, <span class="ident">sub</span> <span class="kw">for</span> <span class="ident">Saturating</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>, <span class="ident">Saturating</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> }
+        <span class="macro">forward_ref_op_assign! </span>{ <span class="kw">impl </span>AddAssign, add_assign <span class="kw">for </span>Saturating&lt;<span class="macro-nonterminal">$t</span>&gt;, Saturating&lt;<span class="macro-nonterminal">$t</span>&gt; }
 
-        <span class="kw">impl</span> <span class="ident">SubAssign</span> <span class="kw">for</span> <span class="ident">Saturating</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> {
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">sub_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Saturating</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>) {
-                <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span> <span class="op">-</span> <span class="ident">other</span>;
+        <span class="kw">impl </span>Sub <span class="kw">for </span>Saturating&lt;<span class="macro-nonterminal">$t</span>&gt; {
+            <span class="kw">type </span>Output = Saturating&lt;<span class="macro-nonterminal">$t</span>&gt;;
+
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>sub(<span class="self">self</span>, other: Saturating&lt;<span class="macro-nonterminal">$t</span>&gt;) -&gt; Saturating&lt;<span class="macro-nonterminal">$t</span>&gt; {
+                Saturating(<span class="self">self</span>.<span class="number">0</span>.saturating_sub(other.<span class="number">0</span>))
             }
         }
-        <span class="macro">forward_ref_op_assign!</span> { <span class="kw">impl</span> <span class="ident">SubAssign</span>, <span class="ident">sub_assign</span> <span class="kw">for</span> <span class="ident">Saturating</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>, <span class="ident">Saturating</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> }
+        <span class="macro">forward_ref_binop! </span>{ <span class="kw">impl </span>Sub, sub <span class="kw">for </span>Saturating&lt;<span class="macro-nonterminal">$t</span>&gt;, Saturating&lt;<span class="macro-nonterminal">$t</span>&gt; }
 
-        <span class="kw">impl</span> <span class="ident">Mul</span> <span class="kw">for</span> <span class="ident">Saturating</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> {
-            <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Saturating</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>;
-
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Saturating</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>) -&gt; <span class="ident">Saturating</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> {
-                <span class="ident">Saturating</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">saturating_mul</span>(<span class="ident">other</span>.<span class="number">0</span>))
+        <span class="kw">impl </span>SubAssign <span class="kw">for </span>Saturating&lt;<span class="macro-nonterminal">$t</span>&gt; {
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>sub_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: Saturating&lt;<span class="macro-nonterminal">$t</span>&gt;) {
+                <span class="kw-2">*</span><span class="self">self </span>= <span class="kw-2">*</span><span class="self">self </span>- other;
             }
         }
-        <span class="macro">forward_ref_binop!</span> { <span class="kw">impl</span> <span class="ident">Mul</span>, <span class="ident">mul</span> <span class="kw">for</span> <span class="ident">Saturating</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>, <span class="ident">Saturating</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> }
+        <span class="macro">forward_ref_op_assign! </span>{ <span class="kw">impl </span>SubAssign, sub_assign <span class="kw">for </span>Saturating&lt;<span class="macro-nonterminal">$t</span>&gt;, Saturating&lt;<span class="macro-nonterminal">$t</span>&gt; }
 
-        <span class="kw">impl</span> <span class="ident">MulAssign</span> <span class="kw">for</span> <span class="ident">Saturating</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> {
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">mul_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Saturating</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>) {
-                <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span> <span class="op">*</span> <span class="ident">other</span>;
+        <span class="kw">impl </span>Mul <span class="kw">for </span>Saturating&lt;<span class="macro-nonterminal">$t</span>&gt; {
+            <span class="kw">type </span>Output = Saturating&lt;<span class="macro-nonterminal">$t</span>&gt;;
+
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>mul(<span class="self">self</span>, other: Saturating&lt;<span class="macro-nonterminal">$t</span>&gt;) -&gt; Saturating&lt;<span class="macro-nonterminal">$t</span>&gt; {
+                Saturating(<span class="self">self</span>.<span class="number">0</span>.saturating_mul(other.<span class="number">0</span>))
             }
         }
-        <span class="macro">forward_ref_op_assign!</span> { <span class="kw">impl</span> <span class="ident">MulAssign</span>, <span class="ident">mul_assign</span> <span class="kw">for</span> <span class="ident">Saturating</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span>, <span class="ident">Saturating</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> }
+        <span class="macro">forward_ref_binop! </span>{ <span class="kw">impl </span>Mul, mul <span class="kw">for </span>Saturating&lt;<span class="macro-nonterminal">$t</span>&gt;, Saturating&lt;<span class="macro-nonterminal">$t</span>&gt; }
 
-        <span class="kw">impl</span> <span class="ident">Neg</span> <span class="kw">for</span> <span class="ident">Saturating</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> {
-            <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">neg</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
-                <span class="ident">Saturating</span>(<span class="number">0</span>) <span class="op">-</span> <span class="self">self</span>
+        <span class="kw">impl </span>MulAssign <span class="kw">for </span>Saturating&lt;<span class="macro-nonterminal">$t</span>&gt; {
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>mul_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: Saturating&lt;<span class="macro-nonterminal">$t</span>&gt;) {
+                <span class="kw-2">*</span><span class="self">self </span>= <span class="kw-2">*</span><span class="self">self </span>* other;
             }
         }
-        <span class="macro">forward_ref_unop!</span> { <span class="kw">impl</span> <span class="ident">Neg</span>, <span class="ident">neg</span> <span class="kw">for</span> <span class="ident">Saturating</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> }
+        <span class="macro">forward_ref_op_assign! </span>{ <span class="kw">impl </span>MulAssign, mul_assign <span class="kw">for </span>Saturating&lt;<span class="macro-nonterminal">$t</span>&gt;, Saturating&lt;<span class="macro-nonterminal">$t</span>&gt; }
+
+        <span class="kw">impl </span>Neg <span class="kw">for </span>Saturating&lt;<span class="macro-nonterminal">$t</span>&gt; {
+            <span class="kw">type </span>Output = <span class="self">Self</span>;
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span>neg(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+                Saturating(<span class="number">0</span>) - <span class="self">self
+            </span>}
+        }
+        <span class="macro">forward_ref_unop! </span>{ <span class="kw">impl </span>Neg, neg <span class="kw">for </span>Saturating&lt;<span class="macro-nonterminal">$t</span>&gt; }
 
     )<span class="kw-2">*</span>)
 }
 
-<span class="macro">saturating_impl!</span> { <span class="ident">usize</span> <span class="ident">u8</span> <span class="ident">u16</span> <span class="ident">u32</span> <span class="ident">u64</span> <span class="ident">u128</span> <span class="ident">isize</span> <span class="ident">i8</span> <span class="ident">i16</span> <span class="ident">i32</span> <span class="ident">i64</span> <span class="ident">i128</span> }
+<span class="macro">saturating_impl! </span>{ usize u8 u16 u32 u64 u128 isize i8 i16 i32 i64 i128 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="saturating" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="saturating" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

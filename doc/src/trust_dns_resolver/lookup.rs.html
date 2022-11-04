@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-resolver-0.21.2/src/lookup.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lookup.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../trust_dns_resolver/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../trust_dns_resolver/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../trust_dns_resolver/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-resolver-0.21.2/src/lookup.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lookup.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../trust_dns_resolver/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../trust_dns_resolver/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../trust_dns_resolver/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -685,692 +685,692 @@
 <span id="685">685</span>
 <span id="686">686</span>
 <span id="687">687</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2017 Benjamin Fry &lt;benjaminfry@me.com&gt;</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2017 Benjamin Fry &lt;benjaminfry@me.com&gt;
+//
+// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="doccomment">//! Lookup result from a resolution of ipv4 and ipv6 records with a Resolver.</span>
+</span><span class="doccomment">//! Lookup result from a resolution of ipv4 and ipv6 records with a Resolver.
 
-<span class="kw">use</span> <span class="ident">std::cmp::min</span>;
-<span class="kw">use</span> <span class="ident">std::error::Error</span>;
-<span class="kw">use</span> <span class="ident">std::net</span>::{<span class="ident">Ipv4Addr</span>, <span class="ident">Ipv6Addr</span>};
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
-<span class="kw">use</span> <span class="ident">std::slice::Iter</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
-<span class="kw">use</span> <span class="ident">std::time</span>::{<span class="ident">Duration</span>, <span class="ident">Instant</span>};
+</span><span class="kw">use </span>std::cmp::min;
+<span class="kw">use </span>std::error::Error;
+<span class="kw">use </span>std::net::{Ipv4Addr, Ipv6Addr};
+<span class="kw">use </span>std::pin::Pin;
+<span class="kw">use </span>std::slice::Iter;
+<span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>std::task::{Context, Poll};
+<span class="kw">use </span>std::time::{Duration, Instant};
 
-<span class="kw">use</span> <span class="ident">futures_util::stream::Stream</span>;
-<span class="kw">use</span> <span class="ident">futures_util</span>::{<span class="ident">future</span>, <span class="ident">future::Future</span>, <span class="ident">FutureExt</span>};
+<span class="kw">use </span>futures_util::stream::Stream;
+<span class="kw">use </span>futures_util::{future, future::Future, FutureExt};
 
-<span class="kw">use</span> <span class="ident">proto::error::ProtoError</span>;
-<span class="kw">use</span> <span class="ident">proto::op::Query</span>;
-<span class="kw">use</span> <span class="ident">proto::rr::rdata</span>;
-<span class="kw">use</span> <span class="ident">proto::rr</span>::{<span class="ident">Name</span>, <span class="ident">RData</span>, <span class="ident">Record</span>, <span class="ident">RecordType</span>};
-<span class="kw">use</span> <span class="ident">proto::xfer</span>::{<span class="ident">DnsRequest</span>, <span class="ident">DnsRequestOptions</span>, <span class="ident">DnsResponse</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">proto::DnssecDnsHandle</span>;
-<span class="kw">use</span> <span class="ident">proto</span>::{<span class="ident">DnsHandle</span>, <span class="ident">RetryDnsHandle</span>};
+<span class="kw">use </span>proto::error::ProtoError;
+<span class="kw">use </span>proto::op::Query;
+<span class="kw">use </span>proto::rr::rdata;
+<span class="kw">use </span>proto::rr::{Name, RData, Record, RecordType};
+<span class="kw">use </span>proto::xfer::{DnsRequest, DnsRequestOptions, DnsResponse};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;dnssec&quot;</span>)]
+</span><span class="kw">use </span>proto::DnssecDnsHandle;
+<span class="kw">use </span>proto::{DnsHandle, RetryDnsHandle};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::caching_client::CachingClient</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::dns_lru::MAX_TTL</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::lookup_ip::LookupIpIter</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::name_server</span>::{<span class="ident">ConnectionProvider</span>, <span class="ident">NameServerPool</span>};
+<span class="kw">use </span><span class="kw">crate</span>::caching_client::CachingClient;
+<span class="kw">use </span><span class="kw">crate</span>::dns_lru::MAX_TTL;
+<span class="kw">use </span><span class="kw">crate</span>::error::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::lookup_ip::LookupIpIter;
+<span class="kw">use </span><span class="kw">crate</span>::name_server::{ConnectionProvider, NameServerPool};
 
-<span class="doccomment">/// Result of a DNS query when querying for any record type supported by the Trust-DNS Proto library.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For IP resolution see LookupIp, as it has more features for A and AAAA lookups.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Lookup</span> {
-    <span class="ident">query</span>: <span class="ident">Query</span>,
-    <span class="ident">records</span>: <span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">Record</span>]<span class="op">&gt;</span>,
-    <span class="ident">valid_until</span>: <span class="ident">Instant</span>,
+<span class="doccomment">/// Result of a DNS query when querying for any record type supported by the Trust-DNS Proto library.
+///
+/// For IP resolution see LookupIp, as it has more features for A and AAAA lookups.
+</span><span class="attribute">#[derive(Clone, Debug, Eq, PartialEq)]
+</span><span class="kw">pub struct </span>Lookup {
+    query: Query,
+    records: Arc&lt;[Record]&gt;,
+    valid_until: Instant,
 }
 
-<span class="kw">impl</span> <span class="ident">Lookup</span> {
-    <span class="doccomment">/// Return new instance with given rdata and the maximum TTL.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_rdata</span>(<span class="ident">query</span>: <span class="ident">Query</span>, <span class="ident">rdata</span>: <span class="ident">RData</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">record</span> <span class="op">=</span> <span class="ident">Record::from_rdata</span>(<span class="ident">query</span>.<span class="ident">name</span>().<span class="ident">clone</span>(), <span class="ident">MAX_TTL</span>, <span class="ident">rdata</span>);
-        <span class="ident"><span class="self">Self</span>::new_with_max_ttl</span>(<span class="ident">query</span>, <span class="ident">Arc::from</span>([<span class="ident">record</span>]))
+<span class="kw">impl </span>Lookup {
+    <span class="doccomment">/// Return new instance with given rdata and the maximum TTL.
+    </span><span class="kw">pub fn </span>from_rdata(query: Query, rdata: RData) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>record = Record::from_rdata(query.name().clone(), MAX_TTL, rdata);
+        <span class="self">Self</span>::new_with_max_ttl(query, Arc::from([record]))
     }
 
-    <span class="doccomment">/// Return new instance with given records and the maximum TTL.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_max_ttl</span>(<span class="ident">query</span>: <span class="ident">Query</span>, <span class="ident">records</span>: <span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">Record</span>]<span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">valid_until</span> <span class="op">=</span> <span class="ident">Instant::now</span>() <span class="op">+</span> <span class="ident">Duration::from_secs</span>(<span class="ident">u64::from</span>(<span class="ident">MAX_TTL</span>));
-        <span class="self">Self</span> {
-            <span class="ident">query</span>,
-            <span class="ident">records</span>,
-            <span class="ident">valid_until</span>,
+    <span class="doccomment">/// Return new instance with given records and the maximum TTL.
+    </span><span class="kw">pub fn </span>new_with_max_ttl(query: Query, records: Arc&lt;[Record]&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>valid_until = Instant::now() + Duration::from_secs(u64::from(MAX_TTL));
+        <span class="self">Self </span>{
+            query,
+            records,
+            valid_until,
         }
     }
 
-    <span class="doccomment">/// Return a new instance with the given records and deadline.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_deadline</span>(<span class="ident">query</span>: <span class="ident">Query</span>, <span class="ident">records</span>: <span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">Record</span>]<span class="op">&gt;</span>, <span class="ident">valid_until</span>: <span class="ident">Instant</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">query</span>,
-            <span class="ident">records</span>,
-            <span class="ident">valid_until</span>,
+    <span class="doccomment">/// Return a new instance with the given records and deadline.
+    </span><span class="kw">pub fn </span>new_with_deadline(query: Query, records: Arc&lt;[Record]&gt;, valid_until: Instant) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            query,
+            records,
+            valid_until,
         }
     }
 
-    <span class="doccomment">/// Returns a reference to the `Query` that was used to produce this result.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Query</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">query</span>
+    <span class="doccomment">/// Returns a reference to the `Query` that was used to produce this result.
+    </span><span class="kw">pub fn </span>query(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Query {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.query
     }
 
-    <span class="doccomment">/// Returns a borrowed iterator of the returned IPs</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">LookupIter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">LookupIter</span>(<span class="self">self</span>.<span class="ident">records</span>.<span class="ident">iter</span>())
+    <span class="doccomment">/// Returns a borrowed iterator of the returned IPs
+    </span><span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; LookupIter&lt;<span class="lifetime">&#39;_</span>&gt; {
+        LookupIter(<span class="self">self</span>.records.iter())
     }
 
-    <span class="doccomment">/// Returns a borrowed iterator of the returned IPs</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">record_iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">LookupRecordIter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">LookupRecordIter</span>(<span class="self">self</span>.<span class="ident">records</span>.<span class="ident">iter</span>())
+    <span class="doccomment">/// Returns a borrowed iterator of the returned IPs
+    </span><span class="kw">pub fn </span>record_iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; LookupRecordIter&lt;<span class="lifetime">&#39;_</span>&gt; {
+        LookupRecordIter(<span class="self">self</span>.records.iter())
     }
 
-    <span class="doccomment">/// Returns the `Instant` at which this `Lookup` is no longer valid.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">valid_until</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Instant</span> {
-        <span class="self">self</span>.<span class="ident">valid_until</span>
+    <span class="doccomment">/// Returns the `Instant` at which this `Lookup` is no longer valid.
+    </span><span class="kw">pub fn </span>valid_until(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Instant {
+        <span class="self">self</span>.valid_until
     }
 
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">records</span>.<span class="ident">is_empty</span>()
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.records.is_empty()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">records</span>.<span class="ident">len</span>()
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.records.len()
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">records</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">Record</span>] {
-        <span class="self">self</span>.<span class="ident">records</span>.<span class="ident">as_ref</span>()
+    <span class="attribute">#[cfg(test)]
+    </span><span class="kw">pub fn </span>records(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[Record] {
+        <span class="self">self</span>.records.as_ref()
     }
 
-    <span class="doccomment">/// Clones the inner vec, appends the other vec</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">append</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">records</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="self">self</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">other</span>.<span class="ident">len</span>());
-        <span class="ident">records</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">records</span>);
-        <span class="ident">records</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">other</span>.<span class="ident">records</span>);
+    <span class="doccomment">/// Clones the inner vec, appends the other vec
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>append(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>records = Vec::with_capacity(<span class="self">self</span>.len() + other.len());
+        records.extend_from_slice(<span class="kw-2">&amp;*</span><span class="self">self</span>.records);
+        records.extend_from_slice(<span class="kw-2">&amp;*</span>other.records);
 
-        <span class="comment">// Choose the sooner deadline of the two lookups.</span>
-        <span class="kw">let</span> <span class="ident">valid_until</span> <span class="op">=</span> <span class="ident">min</span>(<span class="self">self</span>.<span class="ident">valid_until</span>(), <span class="ident">other</span>.<span class="ident">valid_until</span>());
-        <span class="ident"><span class="self">Self</span>::new_with_deadline</span>(<span class="self">self</span>.<span class="ident">query</span>.<span class="ident">clone</span>(), <span class="ident">Arc::from</span>(<span class="ident">records</span>), <span class="ident">valid_until</span>)
-    }
-}
-
-<span class="doccomment">/// Borrowed view of set of [`RData`]s returned from a Lookup</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LookupIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Record</span><span class="op">&gt;</span>);
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">LookupIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">RData</span>;
-
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">next</span>().<span class="ident">and_then</span>(<span class="ident">Record::data</span>)
+        <span class="comment">// Choose the sooner deadline of the two lookups.
+        </span><span class="kw">let </span>valid_until = min(<span class="self">self</span>.valid_until(), other.valid_until());
+        <span class="self">Self</span>::new_with_deadline(<span class="self">self</span>.query.clone(), Arc::from(records), valid_until)
     }
 }
 
-<span class="doccomment">/// Borrowed view of set of [`Record`]s returned from a Lookup</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LookupRecordIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Record</span><span class="op">&gt;</span>);
+<span class="doccomment">/// Borrowed view of set of [`RData`]s returned from a Lookup
+</span><span class="kw">pub struct </span>LookupIter&lt;<span class="lifetime">&#39;a</span>&gt;(Iter&lt;<span class="lifetime">&#39;a</span>, Record&gt;);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">LookupRecordIter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Record</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>LookupIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>RData;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">next</span>()
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.next().and_then(Record::data)
     }
 }
 
-<span class="comment">// TODO: consider removing this as it&#39;s not a zero-cost abstraction</span>
-<span class="kw">impl</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="ident">Lookup</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">RData</span>;
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">LookupIntoIter</span>;
+<span class="doccomment">/// Borrowed view of set of [`Record`]s returned from a Lookup
+</span><span class="kw">pub struct </span>LookupRecordIter&lt;<span class="lifetime">&#39;a</span>&gt;(Iter&lt;<span class="lifetime">&#39;a</span>, Record&gt;);
 
-    <span class="doccomment">/// This is most likely not a free conversion, the `RData`s will be cloned if data is</span>
-    <span class="doccomment">///  held behind an Arc with more than one reference (which is most likely the case coming from cache)</span>
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-        <span class="ident">LookupIntoIter</span> {
-            <span class="ident">records</span>: <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">records</span>),
-            <span class="ident">index</span>: <span class="number">0</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>LookupRecordIter&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Record;
+
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.next()
+    }
+}
+
+<span class="comment">// TODO: consider removing this as it&#39;s not a zero-cost abstraction
+</span><span class="kw">impl </span>IntoIterator <span class="kw">for </span>Lookup {
+    <span class="kw">type </span>Item = RData;
+    <span class="kw">type </span>IntoIter = LookupIntoIter;
+
+    <span class="doccomment">/// This is most likely not a free conversion, the `RData`s will be cloned if data is
+    ///  held behind an Arc with more than one reference (which is most likely the case coming from cache)
+    </span><span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+        LookupIntoIter {
+            records: Arc::clone(<span class="kw-2">&amp;</span><span class="self">self</span>.records),
+            index: <span class="number">0</span>,
         }
     }
 }
 
-<span class="doccomment">/// Borrowed view of set of [`RData`]s returned from a [`Lookup`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is not usually a zero overhead `Iterator`, it may result in clones of the [`RData`].</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LookupIntoIter</span> {
-    <span class="comment">// the result of the try_unwrap on Arc</span>
-    <span class="ident">records</span>: <span class="ident">Arc</span><span class="op">&lt;</span>[<span class="ident">Record</span>]<span class="op">&gt;</span>,
-    <span class="ident">index</span>: <span class="ident">usize</span>,
+<span class="doccomment">/// Borrowed view of set of [`RData`]s returned from a [`Lookup`].
+///
+/// This is not usually a zero overhead `Iterator`, it may result in clones of the [`RData`].
+</span><span class="kw">pub struct </span>LookupIntoIter {
+    <span class="comment">// the result of the try_unwrap on Arc
+    </span>records: Arc&lt;[Record]&gt;,
+    index: usize,
 }
 
-<span class="kw">impl</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">LookupIntoIter</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">RData</span>;
+<span class="kw">impl </span>Iterator <span class="kw">for </span>LookupIntoIter {
+    <span class="kw">type </span>Item = RData;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">rdata</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">records</span>.<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">index</span>).<span class="ident">and_then</span>(<span class="ident">Record::data</span>);
-        <span class="self">self</span>.<span class="ident">index</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="ident">rdata</span>.<span class="ident">cloned</span>()
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">let </span>rdata = <span class="self">self</span>.records.get(<span class="self">self</span>.index).and_then(Record::data);
+        <span class="self">self</span>.index += <span class="number">1</span>;
+        rdata.cloned()
     }
 }
 
-<span class="doccomment">/// Different lookup options for the lookup attempts and validation</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">LookupEither</span><span class="op">&lt;</span>
-    <span class="ident">C</span>: <span class="ident">DnsHandle</span><span class="op">&lt;</span><span class="ident">Error</span> <span class="op">=</span> <span class="ident">ResolveError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">P</span>: <span class="ident">ConnectionProvider</span><span class="op">&lt;</span><span class="ident">Conn</span> <span class="op">=</span> <span class="ident">C</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-<span class="op">&gt;</span> {
-    <span class="ident">Retry</span>(<span class="ident">RetryDnsHandle</span><span class="op">&lt;</span><span class="ident">NameServerPool</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">P</span><span class="op">&gt;</span><span class="op">&gt;</span>),
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)))]</span>
-    <span class="ident">Secure</span>(<span class="ident">DnssecDnsHandle</span><span class="op">&lt;</span><span class="ident">RetryDnsHandle</span><span class="op">&lt;</span><span class="ident">NameServerPool</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">P</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>),
+<span class="doccomment">/// Different lookup options for the lookup attempts and validation
+</span><span class="attribute">#[derive(Clone)]
+#[doc(hidden)]
+</span><span class="kw">pub enum </span>LookupEither&lt;
+    C: DnsHandle&lt;Error = ResolveError&gt; + <span class="lifetime">&#39;static</span>,
+    P: ConnectionProvider&lt;Conn = C&gt; + <span class="lifetime">&#39;static</span>,
+&gt; {
+    Retry(RetryDnsHandle&lt;NameServerPool&lt;C, P&gt;&gt;),
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;dnssec&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dnssec&quot;</span>)))]
+    </span>Secure(DnssecDnsHandle&lt;RetryDnsHandle&lt;NameServerPool&lt;C, P&gt;&gt;&gt;),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">DnsHandle</span><span class="op">&lt;</span><span class="ident">Error</span> <span class="op">=</span> <span class="ident">ResolveError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Sync</span>, <span class="ident">P</span>: <span class="ident">ConnectionProvider</span><span class="op">&lt;</span><span class="ident">Conn</span> <span class="op">=</span> <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">DnsHandle</span>
-    <span class="kw">for</span> <span class="ident">LookupEither</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">P</span><span class="op">&gt;</span>
+<span class="kw">impl</span>&lt;C: DnsHandle&lt;Error = ResolveError&gt; + Sync, P: ConnectionProvider&lt;Conn = C&gt;&gt; DnsHandle
+    <span class="kw">for </span>LookupEither&lt;C, P&gt;
 {
-    <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">ResolveError</span>;
+    <span class="kw">type </span>Response = Pin&lt;Box&lt;<span class="kw">dyn </span>Stream&lt;Item = <span class="prelude-ty">Result</span>&lt;DnsResponse, ResolveError&gt;&gt; + Send&gt;&gt;;
+    <span class="kw">type </span>Error = ResolveError;
 
-    <span class="kw">fn</span> <span class="ident">is_verifying_dnssec</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">LookupEither::Retry</span>(<span class="kw-2">ref</span> <span class="ident">c</span>) =&gt; <span class="ident">c</span>.<span class="ident">is_verifying_dnssec</span>(),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-            <span class="ident">LookupEither::Secure</span>(<span class="kw-2">ref</span> <span class="ident">c</span>) =&gt; <span class="ident">c</span>.<span class="ident">is_verifying_dnssec</span>(),
+    <span class="kw">fn </span>is_verifying_dnssec(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            LookupEither::Retry(<span class="kw-2">ref </span>c) =&gt; c.is_verifying_dnssec(),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;dnssec&quot;</span>)]
+            </span>LookupEither::Secure(<span class="kw-2">ref </span>c) =&gt; c.is_verifying_dnssec(),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">send</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">DnsRequest</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">request</span>: <span class="ident">R</span>) -&gt; <span class="ident"><span class="self">Self</span>::Response</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">LookupEither::Retry</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">c</span>) =&gt; <span class="ident">c</span>.<span class="ident">send</span>(<span class="ident">request</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-            <span class="ident">LookupEither::Secure</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">c</span>) =&gt; <span class="ident">c</span>.<span class="ident">send</span>(<span class="ident">request</span>),
+    <span class="kw">fn </span>send&lt;R: Into&lt;DnsRequest&gt; + Unpin + Send + <span class="lifetime">&#39;static</span>&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, request: R) -&gt; <span class="self">Self</span>::Response {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            LookupEither::Retry(<span class="kw-2">ref mut </span>c) =&gt; c.send(request),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;dnssec&quot;</span>)]
+            </span>LookupEither::Secure(<span class="kw-2">ref mut </span>c) =&gt; c.send(request),
         }
     }
 }
 
-<span class="doccomment">/// The Future returned from [`AsyncResolver`] when performing a lookup.</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LookupFuture</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">DnsHandle</span><span class="op">&lt;</span><span class="ident">Error</span> <span class="op">=</span> <span class="ident">E</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ResolveError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ProtoError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="doccomment">/// The Future returned from [`AsyncResolver`] when performing a lookup.
+</span><span class="attribute">#[doc(hidden)]
+</span><span class="kw">pub struct </span>LookupFuture&lt;C, E&gt;
+<span class="kw">where
+    </span>C: DnsHandle&lt;Error = E&gt; + <span class="lifetime">&#39;static</span>,
+    E: Into&lt;ResolveError&gt; + From&lt;ProtoError&gt; + Error + Clone + Send + Unpin + <span class="lifetime">&#39;static</span>,
 {
-    <span class="ident">client_cache</span>: <span class="ident">CachingClient</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>,
-    <span class="ident">names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Name</span><span class="op">&gt;</span>,
-    <span class="ident">record_type</span>: <span class="ident">RecordType</span>,
-    <span class="ident">options</span>: <span class="ident">DnsRequestOptions</span>,
-    <span class="ident">query</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    client_cache: CachingClient&lt;C, E&gt;,
+    names: Vec&lt;Name&gt;,
+    record_type: RecordType,
+    options: DnsRequestOptions,
+    query: Pin&lt;Box&lt;<span class="kw">dyn </span>Future&lt;Output = <span class="prelude-ty">Result</span>&lt;Lookup, ResolveError&gt;&gt; + Send&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">LookupFuture</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">DnsHandle</span><span class="op">&lt;</span><span class="ident">Error</span> <span class="op">=</span> <span class="ident">E</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ResolveError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ProtoError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="kw">impl</span>&lt;C, E&gt; LookupFuture&lt;C, E&gt;
+<span class="kw">where
+    </span>C: DnsHandle&lt;Error = E&gt; + <span class="lifetime">&#39;static</span>,
+    E: Into&lt;ResolveError&gt; + From&lt;ProtoError&gt; + Error + Clone + Send + Unpin + <span class="lifetime">&#39;static</span>,
 {
-    <span class="doccomment">/// Perform a lookup from a name and type to a set of RDatas</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `names` - a set of DNS names to attempt to resolve, they will be attempted in queue order, i.e. the first is `names.pop()`. Upon each failure, the next will be attempted.</span>
-    <span class="doccomment">/// * `record_type` - type of record being sought</span>
-    <span class="doccomment">/// * `client_cache` - cache with a connection to use for performing all lookups</span>
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">lookup</span>(
-        <span class="kw-2">mut</span> <span class="ident">names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Name</span><span class="op">&gt;</span>,
-        <span class="ident">record_type</span>: <span class="ident">RecordType</span>,
-        <span class="ident">options</span>: <span class="ident">DnsRequestOptions</span>,
-        <span class="kw-2">mut</span> <span class="ident">client_cache</span>: <span class="ident">CachingClient</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">names</span>.<span class="ident">pop</span>().<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">ResolveError::from</span>(<span class="ident">ResolveErrorKind::Message</span>(<span class="string">&quot;can not lookup for no names&quot;</span>))
+    <span class="doccomment">/// Perform a lookup from a name and type to a set of RDatas
+    ///
+    /// # Arguments
+    ///
+    /// * `names` - a set of DNS names to attempt to resolve, they will be attempted in queue order, i.e. the first is `names.pop()`. Upon each failure, the next will be attempted.
+    /// * `record_type` - type of record being sought
+    /// * `client_cache` - cache with a connection to use for performing all lookups
+    </span><span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub fn </span>lookup(
+        <span class="kw-2">mut </span>names: Vec&lt;Name&gt;,
+        record_type: RecordType,
+        options: DnsRequestOptions,
+        <span class="kw-2">mut </span>client_cache: CachingClient&lt;C, E&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>name = names.pop().ok_or_else(|| {
+            ResolveError::from(ResolveErrorKind::Message(<span class="string">&quot;can not lookup for no names&quot;</span>))
         });
 
-        <span class="kw">let</span> <span class="ident">query</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">name</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">name</span>) =&gt; <span class="ident">client_cache</span>
-                .<span class="ident">lookup</span>(<span class="ident">Query::query</span>(<span class="ident">name</span>, <span class="ident">record_type</span>), <span class="ident">options</span>)
-                .<span class="ident">boxed</span>(),
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="ident">future::err</span>(<span class="ident">err</span>).<span class="ident">boxed</span>(),
+        <span class="kw">let </span>query: Pin&lt;Box&lt;<span class="kw">dyn </span>Future&lt;Output = <span class="prelude-ty">Result</span>&lt;Lookup, ResolveError&gt;&gt; + Send&gt;&gt; = <span class="kw">match </span>name {
+            <span class="prelude-val">Ok</span>(name) =&gt; client_cache
+                .lookup(Query::query(name, record_type), options)
+                .boxed(),
+            <span class="prelude-val">Err</span>(err) =&gt; future::err(err).boxed(),
         };
 
-        <span class="self">Self</span> {
-            <span class="ident">client_cache</span>,
-            <span class="ident">names</span>,
-            <span class="ident">record_type</span>,
-            <span class="ident">options</span>,
-            <span class="ident">query</span>,
+        <span class="self">Self </span>{
+            client_cache,
+            names,
+            record_type,
+            options,
+            query,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">LookupFuture</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">E</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">DnsHandle</span><span class="op">&lt;</span><span class="ident">Error</span> <span class="op">=</span> <span class="ident">E</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">E</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ResolveError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ProtoError</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Error</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="kw">impl</span>&lt;C, E&gt; Future <span class="kw">for </span>LookupFuture&lt;C, E&gt;
+<span class="kw">where
+    </span>C: DnsHandle&lt;Error = E&gt; + <span class="lifetime">&#39;static</span>,
+    E: Into&lt;ResolveError&gt; + From&lt;ProtoError&gt; + Error + Clone + Send + Unpin + <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Lookup</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Output = <span class="prelude-ty">Result</span>&lt;Lookup, ResolveError&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="kw">loop</span> {
-            <span class="comment">// Try polling the underlying DNS query.</span>
-            <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">query</span>.<span class="ident">as_mut</span>().<span class="ident">poll_unpin</span>(<span class="ident">cx</span>);
+    <span class="kw">fn </span>poll(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="kw">loop </span>{
+            <span class="comment">// Try polling the underlying DNS query.
+            </span><span class="kw">let </span>query = <span class="self">self</span>.query.as_mut().poll_unpin(cx);
 
-            <span class="comment">// Determine whether or not we will attempt to retry the query.</span>
-            <span class="kw">let</span> <span class="ident">should_retry</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">query</span> {
-                <span class="comment">// If the query is NotReady, yield immediately.</span>
-                <span class="ident">Poll::Pending</span> =&gt; <span class="kw">return</span> <span class="ident">Poll::Pending</span>,
-                <span class="comment">// If the query returned a successful lookup, we will attempt</span>
-                <span class="comment">// to retry if the lookup is empty. Otherwise, we will return</span>
-                <span class="comment">// that lookup.</span>
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="kw-2">ref</span> <span class="ident">lookup</span>)) =&gt; <span class="ident">lookup</span>.<span class="ident">records</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>,
-                <span class="comment">// If the query failed, we will attempt to retry.</span>
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="kw">_</span>)) =&gt; <span class="bool-val">true</span>,
+            <span class="comment">// Determine whether or not we will attempt to retry the query.
+            </span><span class="kw">let </span>should_retry = <span class="kw">match </span>query {
+                <span class="comment">// If the query is NotReady, yield immediately.
+                </span>Poll::Pending =&gt; <span class="kw">return </span>Poll::Pending,
+                <span class="comment">// If the query returned a successful lookup, we will attempt
+                // to retry if the lookup is empty. Otherwise, we will return
+                // that lookup.
+                </span>Poll::Ready(<span class="prelude-val">Ok</span>(<span class="kw-2">ref </span>lookup)) =&gt; lookup.records.len() == <span class="number">0</span>,
+                <span class="comment">// If the query failed, we will attempt to retry.
+                </span>Poll::Ready(<span class="prelude-val">Err</span>(<span class="kw">_</span>)) =&gt; <span class="bool-val">true</span>,
             };
 
-            <span class="kw">if</span> <span class="ident">should_retry</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">names</span>.<span class="ident">pop</span>() {
-                    <span class="kw">let</span> <span class="ident">record_type</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">record_type</span>;
-                    <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">options</span>;
+            <span class="kw">if </span>should_retry {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(name) = <span class="self">self</span>.names.pop() {
+                    <span class="kw">let </span>record_type = <span class="self">self</span>.record_type;
+                    <span class="kw">let </span>options = <span class="self">self</span>.options;
 
-                    <span class="comment">// If there&#39;s another name left to try, build a new query</span>
-                    <span class="comment">// for that next name and continue looping.</span>
-                    <span class="self">self</span>.<span class="ident">query</span> <span class="op">=</span> <span class="self">self</span>
-                        .<span class="ident">client_cache</span>
-                        .<span class="ident">lookup</span>(<span class="ident">Query::query</span>(<span class="ident">name</span>, <span class="ident">record_type</span>), <span class="ident">options</span>);
-                    <span class="comment">// Continue looping with the new query. It will be polled</span>
-                    <span class="comment">// on the next iteration of the loop.</span>
-                    <span class="kw">continue</span>;
+                    <span class="comment">// If there&#39;s another name left to try, build a new query
+                    // for that next name and continue looping.
+                    </span><span class="self">self</span>.query = <span class="self">self
+                        </span>.client_cache
+                        .lookup(Query::query(name, record_type), options);
+                    <span class="comment">// Continue looping with the new query. It will be polled
+                    // on the next iteration of the loop.
+                    </span><span class="kw">continue</span>;
                 }
             }
-            <span class="comment">// If we didn&#39;t have to retry the query, or we weren&#39;t able to</span>
-            <span class="comment">// retry because we&#39;ve exhausted the names to search, return the</span>
-            <span class="comment">// current query.</span>
-            <span class="kw">return</span> <span class="ident">query</span>;
-            <span class="comment">// If we skipped retrying the  query, this will return the</span>
-            <span class="comment">// successful lookup, otherwise, if the retry failed, this will</span>
-            <span class="comment">// return the last  query result --- either an empty lookup or the</span>
-            <span class="comment">// last error we saw.</span>
-        }
+            <span class="comment">// If we didn&#39;t have to retry the query, or we weren&#39;t able to
+            // retry because we&#39;ve exhausted the names to search, return the
+            // current query.
+            </span><span class="kw">return </span>query;
+            <span class="comment">// If we skipped retrying the  query, this will return the
+            // successful lookup, otherwise, if the retry failed, this will
+            // return the last  query result --- either an empty lookup or the
+            // last error we saw.
+        </span>}
     }
 }
 
-<span class="doccomment">/// The result of an SRV lookup</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SrvLookup</span>(<span class="ident">Lookup</span>);
+<span class="doccomment">/// The result of an SRV lookup
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>SrvLookup(Lookup);
 
-<span class="kw">impl</span> <span class="ident">SrvLookup</span> {
-    <span class="doccomment">/// Returns an iterator over the SRV RData</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SrvLookupIter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">SrvLookupIter</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">iter</span>())
+<span class="kw">impl </span>SrvLookup {
+    <span class="doccomment">/// Returns an iterator over the SRV RData
+    </span><span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SrvLookupIter&lt;<span class="lifetime">&#39;_</span>&gt; {
+        SrvLookupIter(<span class="self">self</span>.<span class="number">0</span>.iter())
     }
 
-    <span class="doccomment">/// Returns a reference to the Query that was used to produce this result.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Query</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">query</span>()
+    <span class="doccomment">/// Returns a reference to the Query that was used to produce this result.
+    </span><span class="kw">pub fn </span>query(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Query {
+        <span class="self">self</span>.<span class="number">0</span>.query()
     }
 
-    <span class="doccomment">/// Returns the list of IPs associated with the SRV record.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// *Note*: That Trust-DNS performs a recursive lookup on SRV records for IPs if they were not included in the original request. If there are no IPs associated to the result, a subsequent query for the IPs via the `srv.target()` should not resolve to the IPs.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ip_iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">LookupIpIter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="ident">LookupIpIter</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">iter</span>())
+    <span class="doccomment">/// Returns the list of IPs associated with the SRV record.
+    ///
+    /// *Note*: That Trust-DNS performs a recursive lookup on SRV records for IPs if they were not included in the original request. If there are no IPs associated to the result, a subsequent query for the IPs via the `srv.target()` should not resolve to the IPs.
+    </span><span class="kw">pub fn </span>ip_iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; LookupIpIter&lt;<span class="lifetime">&#39;_</span>&gt; {
+        LookupIpIter(<span class="self">self</span>.<span class="number">0</span>.iter())
     }
 
-    <span class="doccomment">/// Return a reference to the inner lookup</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This can be useful for getting all records from the request</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_lookup</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Lookup</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
+    <span class="doccomment">/// Return a reference to the inner lookup
+    ///
+    /// This can be useful for getting all records from the request
+    </span><span class="kw">pub fn </span>as_lookup(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Lookup {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
+    </span>}
+}
+
+<span class="kw">impl </span>From&lt;Lookup&gt; <span class="kw">for </span>SrvLookup {
+    <span class="kw">fn </span>from(lookup: Lookup) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(lookup)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Lookup</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SrvLookup</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">lookup</span>: <span class="ident">Lookup</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">lookup</span>)
-    }
-}
+<span class="doccomment">/// An iterator over the Lookup type
+</span><span class="kw">pub struct </span>SrvLookupIter&lt;<span class="lifetime">&#39;i</span>&gt;(LookupIter&lt;<span class="lifetime">&#39;i</span>&gt;);
 
-<span class="doccomment">/// An iterator over the Lookup type</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SrvLookupIter</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span>(<span class="ident">LookupIter</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;i</span>&gt; Iterator <span class="kw">for </span>SrvLookupIter&lt;<span class="lifetime">&#39;i</span>&gt; {
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;i </span>rdata::SRV;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">SrvLookupIter</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;i</span> <span class="ident">rdata::SRV</span>;
-
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">iter</span>: <span class="kw-2">&amp;mut</span> <span class="kw">_</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="number">0</span>;
-        <span class="ident">iter</span>.<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">rdata</span><span class="op">|</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">rdata</span> {
-            <span class="ident">RData::SRV</span>(<span class="kw-2">ref</span> <span class="ident">data</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">data</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">let </span>iter: <span class="kw-2">&amp;mut </span><span class="kw">_ </span>= <span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0</span>;
+        iter.filter_map(|rdata| <span class="kw">match </span><span class="kw-2">*</span>rdata {
+            RData::SRV(<span class="kw-2">ref </span>data) =&gt; <span class="prelude-val">Some</span>(data),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         })
-        .<span class="ident">next</span>()
+        .next()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="ident">SrvLookup</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">rdata::SRV</span>;
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">SrvLookupIntoIter</span>;
+<span class="kw">impl </span>IntoIterator <span class="kw">for </span>SrvLookup {
+    <span class="kw">type </span>Item = rdata::SRV;
+    <span class="kw">type </span>IntoIter = SrvLookupIntoIter;
 
-    <span class="doccomment">/// This is most likely not a free conversion, the RDatas will be cloned if data is</span>
-    <span class="doccomment">///  held behind an Arc with more than one reference (which is most likely the case coming from cache)</span>
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-        <span class="ident">SrvLookupIntoIter</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">into_iter</span>())
+    <span class="doccomment">/// This is most likely not a free conversion, the RDatas will be cloned if data is
+    ///  held behind an Arc with more than one reference (which is most likely the case coming from cache)
+    </span><span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+        SrvLookupIntoIter(<span class="self">self</span>.<span class="number">0</span>.into_iter())
     }
 }
 
-<span class="doccomment">/// Borrowed view of set of RDatas returned from a Lookup</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SrvLookupIntoIter</span>(<span class="ident">LookupIntoIter</span>);
+<span class="doccomment">/// Borrowed view of set of RDatas returned from a Lookup
+</span><span class="kw">pub struct </span>SrvLookupIntoIter(LookupIntoIter);
 
-<span class="kw">impl</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">SrvLookupIntoIter</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">rdata::SRV</span>;
+<span class="kw">impl </span>Iterator <span class="kw">for </span>SrvLookupIntoIter {
+    <span class="kw">type </span>Item = rdata::SRV;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">iter</span>: <span class="kw-2">&amp;mut</span> <span class="kw">_</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="number">0</span>;
-        <span class="ident">iter</span>.<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">rdata</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">rdata</span> {
-            <span class="ident">RData::SRV</span>(<span class="ident">data</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">data</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+        <span class="kw">let </span>iter: <span class="kw-2">&amp;mut </span><span class="kw">_ </span>= <span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0</span>;
+        iter.filter_map(|rdata| <span class="kw">match </span>rdata {
+            RData::SRV(data) =&gt; <span class="prelude-val">Some</span>(data),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         })
-        .<span class="ident">next</span>()
+        .next()
     }
 }
 
-<span class="doccomment">/// Creates a Lookup result type from the specified components</span>
-<span class="macro">macro_rules!</span> <span class="ident">lookup_type</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ii</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>:<span class="ident">path</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">path</span>) =&gt; {
-        <span class="doccomment">/// Contains the results of a lookup for the associated RecordType</span>
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span>(<span class="ident">Lookup</span>);
+<span class="doccomment">/// Creates a Lookup result type from the specified components
+</span><span class="macro">macro_rules! </span>lookup_type {
+    (<span class="macro-nonterminal">$l</span>:ident, <span class="macro-nonterminal">$i</span>:ident, <span class="macro-nonterminal">$ii</span>:ident, <span class="macro-nonterminal">$r</span>:path, <span class="macro-nonterminal">$t</span>:path) =&gt; {
+        <span class="doccomment">/// Contains the results of a lookup for the associated RecordType
+        </span><span class="attribute">#[derive(Debug, Clone)]
+        </span><span class="kw">pub struct </span><span class="macro-nonterminal">$l</span>(Lookup);
 
-        <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span> {
-            <span class="doccomment">/// Returns an iterator over the RData</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">iter</span>())
+        <span class="kw">impl </span><span class="macro-nonterminal">$l </span>{
+            <span class="doccomment">/// Returns an iterator over the RData
+            </span><span class="kw">pub fn </span>iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="macro-nonterminal">$i</span>&lt;<span class="lifetime">&#39;_</span>&gt; {
+                <span class="macro-nonterminal">$i</span>(<span class="self">self</span>.<span class="number">0</span>.iter())
             }
 
-            <span class="doccomment">/// Returns a reference to the Query that was used to produce this result.</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Query</span> {
-                <span class="self">self</span>.<span class="number">0</span>.<span class="ident">query</span>()
+            <span class="doccomment">/// Returns a reference to the Query that was used to produce this result.
+            </span><span class="kw">pub fn </span>query(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Query {
+                <span class="self">self</span>.<span class="number">0</span>.query()
             }
 
-            <span class="doccomment">/// Returns the `Instant` at which this result is no longer valid.</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">valid_until</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Instant</span> {
-                <span class="self">self</span>.<span class="number">0</span>.<span class="ident">valid_until</span>()
+            <span class="doccomment">/// Returns the `Instant` at which this result is no longer valid.
+            </span><span class="kw">pub fn </span>valid_until(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Instant {
+                <span class="self">self</span>.<span class="number">0</span>.valid_until()
             }
 
-            <span class="doccomment">/// Return a reference to the inner lookup</span>
-            <span class="doccomment">///</span>
-            <span class="doccomment">/// This can be useful for getting all records from the request</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_lookup</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Lookup</span> {
-                <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
+            <span class="doccomment">/// Return a reference to the inner lookup
+            ///
+            /// This can be useful for getting all records from the request
+            </span><span class="kw">pub fn </span>as_lookup(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Lookup {
+                <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
+            </span>}
+        }
+
+        <span class="kw">impl </span>From&lt;Lookup&gt; <span class="kw">for </span><span class="macro-nonterminal">$l </span>{
+            <span class="kw">fn </span>from(lookup: Lookup) -&gt; <span class="self">Self </span>{
+                <span class="macro-nonterminal">$l</span>(lookup)
             }
         }
 
-        <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Lookup</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span> {
-            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">lookup</span>: <span class="ident">Lookup</span>) -&gt; <span class="self">Self</span> {
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span>(<span class="ident">lookup</span>)
-            }
-        }
+        <span class="doccomment">/// An iterator over the Lookup type
+        </span><span class="kw">pub struct </span><span class="macro-nonterminal">$i</span>&lt;<span class="lifetime">&#39;i</span>&gt;(LookupIter&lt;<span class="lifetime">&#39;i</span>&gt;);
 
-        <span class="doccomment">/// An iterator over the Lookup type</span>
-        <span class="kw">pub</span> <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span>(<span class="ident">LookupIter</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span>);
+        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;i</span>&gt; Iterator <span class="kw">for </span><span class="macro-nonterminal">$i</span>&lt;<span class="lifetime">&#39;i</span>&gt; {
+            <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;i </span><span class="macro-nonterminal">$t</span>;
 
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span><span class="op">&lt;</span><span class="lifetime">&#39;i</span><span class="op">&gt;</span> {
-            <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;i</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>;
-
-            <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">iter</span>: <span class="kw-2">&amp;mut</span> <span class="kw">_</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="number">0</span>;
-                <span class="ident">iter</span>.<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">rdata</span><span class="op">|</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">rdata</span> {
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>(<span class="kw-2">ref</span> <span class="ident">data</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">data</span>),
-                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+                <span class="kw">let </span>iter: <span class="kw-2">&amp;mut </span><span class="kw">_ </span>= <span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0</span>;
+                iter.filter_map(|rdata| <span class="kw">match </span><span class="kw-2">*</span>rdata {
+                    <span class="macro-nonterminal">$r</span>(<span class="kw-2">ref </span>data) =&gt; <span class="prelude-val">Some</span>(data),
+                    <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
                 })
-                .<span class="ident">next</span>()
+                .next()
             }
         }
 
-        <span class="kw">impl</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">l</span> {
-            <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>;
-            <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ii</span>;
+        <span class="kw">impl </span>IntoIterator <span class="kw">for </span><span class="macro-nonterminal">$l </span>{
+            <span class="kw">type </span>Item = <span class="macro-nonterminal">$t</span>;
+            <span class="kw">type </span>IntoIter = <span class="macro-nonterminal">$ii</span>;
 
-            <span class="doccomment">/// This is most likely not a free conversion, the RDatas will be cloned if data is</span>
-            <span class="doccomment">///  held behind an Arc with more than one reference (which is most likely the case coming from cache)</span>
-            <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ii</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">into_iter</span>())
+            <span class="doccomment">/// This is most likely not a free conversion, the RDatas will be cloned if data is
+            ///  held behind an Arc with more than one reference (which is most likely the case coming from cache)
+            </span><span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+                <span class="macro-nonterminal">$ii</span>(<span class="self">self</span>.<span class="number">0</span>.into_iter())
             }
         }
 
-        <span class="doccomment">/// Borrowed view of set of RDatas returned from a Lookup</span>
-        <span class="kw">pub</span> <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ii</span>(<span class="ident">LookupIntoIter</span>);
+        <span class="doccomment">/// Borrowed view of set of RDatas returned from a Lookup
+        </span><span class="kw">pub struct </span><span class="macro-nonterminal">$ii</span>(LookupIntoIter);
 
-        <span class="kw">impl</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ii</span> {
-            <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>;
+        <span class="kw">impl </span>Iterator <span class="kw">for </span><span class="macro-nonterminal">$ii </span>{
+            <span class="kw">type </span>Item = <span class="macro-nonterminal">$t</span>;
 
-            <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">iter</span>: <span class="kw-2">&amp;mut</span> <span class="kw">_</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="number">0</span>;
-                <span class="ident">iter</span>.<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">rdata</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">rdata</span> {
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">r</span>(<span class="ident">data</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">data</span>),
-                    <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt; {
+                <span class="kw">let </span>iter: <span class="kw-2">&amp;mut </span><span class="kw">_ </span>= <span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0</span>;
+                iter.filter_map(|rdata| <span class="kw">match </span>rdata {
+                    <span class="macro-nonterminal">$r</span>(data) =&gt; <span class="prelude-val">Some</span>(data),
+                    <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
                 })
-                .<span class="ident">next</span>()
+                .next()
             }
         }
     };
 }
 
-<span class="comment">// Generate all Lookup record types</span>
-<span class="macro">lookup_type!</span>(
-    <span class="ident">ReverseLookup</span>,
-    <span class="ident">ReverseLookupIter</span>,
-    <span class="ident">ReverseLookupIntoIter</span>,
-    <span class="ident">RData::PTR</span>,
-    <span class="ident">Name</span>
+<span class="comment">// Generate all Lookup record types
+</span><span class="macro">lookup_type!</span>(
+    ReverseLookup,
+    ReverseLookupIter,
+    ReverseLookupIntoIter,
+    RData::PTR,
+    Name
 );
 <span class="macro">lookup_type!</span>(
-    <span class="ident">Ipv4Lookup</span>,
-    <span class="ident">Ipv4LookupIter</span>,
-    <span class="ident">Ipv4LookupIntoIter</span>,
-    <span class="ident">RData::A</span>,
-    <span class="ident">Ipv4Addr</span>
+    Ipv4Lookup,
+    Ipv4LookupIter,
+    Ipv4LookupIntoIter,
+    RData::A,
+    Ipv4Addr
 );
 <span class="macro">lookup_type!</span>(
-    <span class="ident">Ipv6Lookup</span>,
-    <span class="ident">Ipv6LookupIter</span>,
-    <span class="ident">Ipv6LookupIntoIter</span>,
-    <span class="ident">RData::AAAA</span>,
-    <span class="ident">Ipv6Addr</span>
+    Ipv6Lookup,
+    Ipv6LookupIter,
+    Ipv6LookupIntoIter,
+    RData::AAAA,
+    Ipv6Addr
 );
 <span class="macro">lookup_type!</span>(
-    <span class="ident">MxLookup</span>,
-    <span class="ident">MxLookupIter</span>,
-    <span class="ident">MxLookupIntoIter</span>,
-    <span class="ident">RData::MX</span>,
-    <span class="ident">rdata::MX</span>
+    MxLookup,
+    MxLookupIter,
+    MxLookupIntoIter,
+    RData::MX,
+    rdata::MX
 );
 <span class="macro">lookup_type!</span>(
-    <span class="ident">TlsaLookup</span>,
-    <span class="ident">TlsaLookupIter</span>,
-    <span class="ident">TlsaLookupIntoIter</span>,
-    <span class="ident">RData::TLSA</span>,
-    <span class="ident">rdata::TLSA</span>
+    TlsaLookup,
+    TlsaLookupIter,
+    TlsaLookupIntoIter,
+    RData::TLSA,
+    rdata::TLSA
 );
 <span class="macro">lookup_type!</span>(
-    <span class="ident">TxtLookup</span>,
-    <span class="ident">TxtLookupIter</span>,
-    <span class="ident">TxtLookupIntoIter</span>,
-    <span class="ident">RData::TXT</span>,
-    <span class="ident">rdata::TXT</span>
+    TxtLookup,
+    TxtLookupIter,
+    TxtLookupIntoIter,
+    RData::TXT,
+    rdata::TXT
 );
 <span class="macro">lookup_type!</span>(
-    <span class="ident">SoaLookup</span>,
-    <span class="ident">SoaLookupIter</span>,
-    <span class="ident">SoaLookupIntoIter</span>,
-    <span class="ident">RData::SOA</span>,
-    <span class="ident">rdata::SOA</span>
+    SoaLookup,
+    SoaLookupIter,
+    SoaLookupIntoIter,
+    RData::SOA,
+    rdata::SOA
 );
-<span class="macro">lookup_type!</span>(<span class="ident">NsLookup</span>, <span class="ident">NsLookupIter</span>, <span class="ident">NsLookupIntoIter</span>, <span class="ident">RData::NS</span>, <span class="ident">Name</span>);
+<span class="macro">lookup_type!</span>(NsLookup, NsLookupIter, NsLookupIntoIter, RData::NS, Name);
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident">std::net</span>::{<span class="ident">IpAddr</span>, <span class="ident">Ipv4Addr</span>};
-    <span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
-    <span class="kw">use</span> <span class="ident">std::sync</span>::{<span class="ident">Arc</span>, <span class="ident">Mutex</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">pub mod </span>tests {
+    <span class="kw">use </span>std::net::{IpAddr, Ipv4Addr};
+    <span class="kw">use </span>std::str::FromStr;
+    <span class="kw">use </span>std::sync::{Arc, Mutex};
 
-    <span class="kw">use</span> <span class="ident">futures_executor::block_on</span>;
-    <span class="kw">use</span> <span class="ident">futures_util::future</span>;
-    <span class="kw">use</span> <span class="ident">futures_util::stream::once</span>;
+    <span class="kw">use </span>futures_executor::block_on;
+    <span class="kw">use </span>futures_util::future;
+    <span class="kw">use </span>futures_util::stream::once;
 
-    <span class="kw">use</span> <span class="ident">proto::op</span>::{<span class="ident">Message</span>, <span class="ident">Query</span>};
-    <span class="kw">use</span> <span class="ident">proto::rr</span>::{<span class="ident">Name</span>, <span class="ident">RData</span>, <span class="ident">Record</span>, <span class="ident">RecordType</span>};
-    <span class="kw">use</span> <span class="ident">proto::xfer</span>::{<span class="ident">DnsRequest</span>, <span class="ident">DnsRequestOptions</span>};
+    <span class="kw">use </span>proto::op::{Message, Query};
+    <span class="kw">use </span>proto::rr::{Name, RData, Record, RecordType};
+    <span class="kw">use </span>proto::xfer::{DnsRequest, DnsRequestOptions};
 
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::ResolveError</span>;
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::error::ResolveError;
 
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MockDnsHandle</span> {
-        <span class="ident">messages</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="attribute">#[derive(Clone)]
+    </span><span class="kw">pub struct </span>MockDnsHandle {
+        messages: Arc&lt;Mutex&lt;Vec&lt;<span class="prelude-ty">Result</span>&lt;DnsResponse, ResolveError&gt;&gt;&gt;&gt;,
     }
 
-    <span class="kw">impl</span> <span class="ident">DnsHandle</span> <span class="kw">for</span> <span class="ident">MockDnsHandle</span> {
-        <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-        <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">ResolveError</span>;
+    <span class="kw">impl </span>DnsHandle <span class="kw">for </span>MockDnsHandle {
+        <span class="kw">type </span>Response = Pin&lt;Box&lt;<span class="kw">dyn </span>Stream&lt;Item = <span class="prelude-ty">Result</span>&lt;DnsResponse, ResolveError&gt;&gt; + Send&gt;&gt;;
+        <span class="kw">type </span>Error = ResolveError;
 
-        <span class="kw">fn</span> <span class="ident">send</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">DnsRequest</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw">_</span>: <span class="ident">R</span>) -&gt; <span class="ident"><span class="self">Self</span>::Response</span> {
-            <span class="ident">Box::pin</span>(<span class="ident">once</span>(
-                <span class="ident">future::ready</span>(<span class="self">self</span>.<span class="ident">messages</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>().<span class="ident">pop</span>().<span class="ident">unwrap_or_else</span>(<span class="ident">empty</span>)).<span class="ident">boxed</span>(),
+        <span class="kw">fn </span>send&lt;R: Into&lt;DnsRequest&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw">_</span>: R) -&gt; <span class="self">Self</span>::Response {
+            Box::pin(once(
+                future::ready(<span class="self">self</span>.messages.lock().unwrap().pop().unwrap_or_else(empty)).boxed(),
             ))
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">v4_message</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">Message::new</span>();
-        <span class="ident">message</span>.<span class="ident">add_query</span>(<span class="ident">Query::query</span>(<span class="ident">Name::root</span>(), <span class="ident">RecordType::A</span>));
-        <span class="ident">message</span>.<span class="ident">insert_answers</span>(<span class="macro">vec!</span>[<span class="ident">Record::from_rdata</span>(
-            <span class="ident">Name::root</span>(),
+    <span class="kw">pub fn </span>v4_message() -&gt; <span class="prelude-ty">Result</span>&lt;DnsResponse, ResolveError&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>message = Message::new();
+        message.add_query(Query::query(Name::root(), RecordType::A));
+        message.insert_answers(<span class="macro">vec!</span>[Record::from_rdata(
+            Name::root(),
             <span class="number">86400</span>,
-            <span class="ident">RData::A</span>(<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)),
+            RData::A(Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)),
         )]);
 
-        <span class="kw">let</span> <span class="ident">resp</span>: <span class="ident">DnsResponse</span> <span class="op">=</span> <span class="ident">message</span>.<span class="ident">into</span>();
-        <span class="macro">assert!</span>(<span class="ident">resp</span>.<span class="ident">contains_answer</span>());
-        <span class="prelude-val">Ok</span>(<span class="ident">resp</span>)
+        <span class="kw">let </span>resp: DnsResponse = message.into();
+        <span class="macro">assert!</span>(resp.contains_answer());
+        <span class="prelude-val">Ok</span>(resp)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">Message::new</span>().<span class="ident">into</span>())
+    <span class="kw">pub fn </span>empty() -&gt; <span class="prelude-ty">Result</span>&lt;DnsResponse, ResolveError&gt; {
+        <span class="prelude-val">Ok</span>(Message::new().into())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">error</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">ResolveError::from</span>(<span class="ident">ProtoError::from</span>(<span class="ident">std::io::Error::from</span>(
-            <span class="ident">std::io::ErrorKind::Other</span>,
+    <span class="kw">pub fn </span>error() -&gt; <span class="prelude-ty">Result</span>&lt;DnsResponse, ResolveError&gt; {
+        <span class="prelude-val">Err</span>(ResolveError::from(ProtoError::from(std::io::Error::from(
+            std::io::ErrorKind::Other,
         ))))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mock</span>(<span class="ident">messages</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">DnsResponse</span>, <span class="ident">ResolveError</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">MockDnsHandle</span> {
-        <span class="ident">MockDnsHandle</span> {
-            <span class="ident">messages</span>: <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">messages</span>)),
+    <span class="kw">pub fn </span>mock(messages: Vec&lt;<span class="prelude-ty">Result</span>&lt;DnsResponse, ResolveError&gt;&gt;) -&gt; MockDnsHandle {
+        MockDnsHandle {
+            messages: Arc::new(Mutex::new(messages)),
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_lookup</span>() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_lookup() {
         <span class="macro">assert_eq!</span>(
-            <span class="ident">block_on</span>(<span class="ident">LookupFuture::lookup</span>(
-                <span class="macro">vec!</span>[<span class="ident">Name::root</span>()],
-                <span class="ident">RecordType::A</span>,
-                <span class="ident">DnsRequestOptions::default</span>(),
-                <span class="ident">CachingClient::new</span>(<span class="number">0</span>, <span class="ident">mock</span>(<span class="macro">vec!</span>[<span class="ident">v4_message</span>()]), <span class="bool-val">false</span>),
+            block_on(LookupFuture::lookup(
+                <span class="macro">vec!</span>[Name::root()],
+                RecordType::A,
+                DnsRequestOptions::default(),
+                CachingClient::new(<span class="number">0</span>, mock(<span class="macro">vec!</span>[v4_message()]), <span class="bool-val">false</span>),
             ))
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">to_ip_addr</span>().<span class="ident">unwrap</span>())
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IpAddr</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
-            <span class="macro">vec!</span>[<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)]
+            .unwrap()
+            .iter()
+            .map(|r| r.to_ip_addr().unwrap())
+            .collect::&lt;Vec&lt;IpAddr&gt;&gt;(),
+            <span class="macro">vec!</span>[Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_lookup_into_iter</span>() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_lookup_into_iter() {
         <span class="macro">assert_eq!</span>(
-            <span class="ident">block_on</span>(<span class="ident">LookupFuture::lookup</span>(
-                <span class="macro">vec!</span>[<span class="ident">Name::root</span>()],
-                <span class="ident">RecordType::A</span>,
-                <span class="ident">DnsRequestOptions::default</span>(),
-                <span class="ident">CachingClient::new</span>(<span class="number">0</span>, <span class="ident">mock</span>(<span class="macro">vec!</span>[<span class="ident">v4_message</span>()]), <span class="bool-val">false</span>),
+            block_on(LookupFuture::lookup(
+                <span class="macro">vec!</span>[Name::root()],
+                RecordType::A,
+                DnsRequestOptions::default(),
+                CachingClient::new(<span class="number">0</span>, mock(<span class="macro">vec!</span>[v4_message()]), <span class="bool-val">false</span>),
             ))
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">to_ip_addr</span>().<span class="ident">unwrap</span>())
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IpAddr</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
-            <span class="macro">vec!</span>[<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)]
+            .unwrap()
+            .into_iter()
+            .map(|r| r.to_ip_addr().unwrap())
+            .collect::&lt;Vec&lt;IpAddr&gt;&gt;(),
+            <span class="macro">vec!</span>[Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_error</span>() {
-        <span class="macro">assert!</span>(<span class="ident">block_on</span>(<span class="ident">LookupFuture::lookup</span>(
-            <span class="macro">vec!</span>[<span class="ident">Name::root</span>()],
-            <span class="ident">RecordType::A</span>,
-            <span class="ident">DnsRequestOptions::default</span>(),
-            <span class="ident">CachingClient::new</span>(<span class="number">0</span>, <span class="ident">mock</span>(<span class="macro">vec!</span>[<span class="ident">error</span>()]), <span class="bool-val">false</span>),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_error() {
+        <span class="macro">assert!</span>(block_on(LookupFuture::lookup(
+            <span class="macro">vec!</span>[Name::root()],
+            RecordType::A,
+            DnsRequestOptions::default(),
+            CachingClient::new(<span class="number">0</span>, mock(<span class="macro">vec!</span>[error()]), <span class="bool-val">false</span>),
         ))
-        .<span class="ident">is_err</span>());
+        .is_err());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_empty_no_response</span>() {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ResolveErrorKind::NoRecordsFound</span> {
-            <span class="ident">query</span>,
-            <span class="ident">negative_ttl</span>,
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_empty_no_response() {
+        <span class="kw">if let </span>ResolveErrorKind::NoRecordsFound {
+            query,
+            negative_ttl,
             ..
-        } <span class="op">=</span> <span class="ident">block_on</span>(<span class="ident">LookupFuture::lookup</span>(
-            <span class="macro">vec!</span>[<span class="ident">Name::root</span>()],
-            <span class="ident">RecordType::A</span>,
-            <span class="ident">DnsRequestOptions::default</span>(),
-            <span class="ident">CachingClient::new</span>(<span class="number">0</span>, <span class="ident">mock</span>(<span class="macro">vec!</span>[<span class="ident">empty</span>()]), <span class="bool-val">false</span>),
+        } = block_on(LookupFuture::lookup(
+            <span class="macro">vec!</span>[Name::root()],
+            RecordType::A,
+            DnsRequestOptions::default(),
+            CachingClient::new(<span class="number">0</span>, mock(<span class="macro">vec!</span>[empty()]), <span class="bool-val">false</span>),
         ))
-        .<span class="ident">unwrap_err</span>()
-        .<span class="ident">kind</span>()
+        .unwrap_err()
+        .kind()
         {
-            <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">query</span>, <span class="ident">Query::query</span>(<span class="ident">Name::root</span>(), <span class="ident">RecordType::A</span>));
-            <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">negative_ttl</span>, <span class="prelude-val">None</span>);
-        } <span class="kw">else</span> {
+            <span class="macro">assert_eq!</span>(<span class="kw-2">**</span>query, Query::query(Name::root(), RecordType::A));
+            <span class="macro">assert_eq!</span>(<span class="kw-2">*</span>negative_ttl, <span class="prelude-val">None</span>);
+        } <span class="kw">else </span>{
             <span class="macro">panic!</span>(<span class="string">&quot;wrong error recieved&quot;</span>);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_lookup_into_iter_arc</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lookup</span> <span class="op">=</span> <span class="ident">LookupIntoIter</span> {
-            <span class="ident">records</span>: <span class="ident">Arc::from</span>([
-                <span class="ident">Record::from_rdata</span>(
-                    <span class="ident">Name::from_str</span>(<span class="string">&quot;www.example.com.&quot;</span>).<span class="ident">unwrap</span>(),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_lookup_into_iter_arc() {
+        <span class="kw">let </span><span class="kw-2">mut </span>lookup = LookupIntoIter {
+            records: Arc::from([
+                Record::from_rdata(
+                    Name::from_str(<span class="string">&quot;www.example.com.&quot;</span>).unwrap(),
                     <span class="number">80</span>,
-                    <span class="ident">RData::A</span>(<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)),
+                    RData::A(Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>)),
                 ),
-                <span class="ident">Record::from_rdata</span>(
-                    <span class="ident">Name::from_str</span>(<span class="string">&quot;www.example.com.&quot;</span>).<span class="ident">unwrap</span>(),
+                Record::from_rdata(
+                    Name::from_str(<span class="string">&quot;www.example.com.&quot;</span>).unwrap(),
                     <span class="number">80</span>,
-                    <span class="ident">RData::A</span>(<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>)),
+                    RData::A(Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>)),
                 ),
             ]),
-            <span class="ident">index</span>: <span class="number">0</span>,
+            index: <span class="number">0</span>,
         };
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">lookup</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">RData::A</span>(<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))
+            lookup.next().unwrap(),
+            RData::A(Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">lookup</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">RData::A</span>(<span class="ident">Ipv4Addr::new</span>(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>))
+            lookup.next().unwrap(),
+            RData::A(Ipv4Addr::new(<span class="number">127</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>))
         );
-        <span class="macro">assert_eq!</span>(<span class="ident">lookup</span>.<span class="ident">next</span>(), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(lookup.next(), <span class="prelude-val">None</span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="trust_dns_resolver" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="trust_dns_resolver" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

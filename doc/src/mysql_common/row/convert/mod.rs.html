@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/row/convert/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mysql_common/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/row/convert/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mysql_common/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -800,807 +800,807 @@
 <span id="800">800</span>
 <span id="801">801</span>
 <span id="802">802</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2017 Anatoly Ikorsky</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2017 Anatoly Ikorsky
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">row::Row</span>,
-    <span class="ident">value::convert</span>::{<span class="ident">ConvIr</span>, <span class="ident">FromValue</span>, <span class="ident">FromValueError</span>},
+</span><span class="kw">use crate</span>::{
+    row::Row,
+    value::convert::{ConvIr, FromValue, FromValueError},
 };
 
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">any::type_name</span>, <span class="ident">error::Error</span>, <span class="ident">fmt</span>};
+<span class="kw">use </span>std::{any::type_name, error::Error, fmt};
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">frunk</span>;
+<span class="kw">pub mod </span>frunk;
 
-<span class="doccomment">/// `FromRow` conversion error.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FromRowError</span>(<span class="kw">pub</span> <span class="ident">Row</span>);
+<span class="doccomment">/// `FromRow` conversion error.
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>FromRowError(<span class="kw">pub </span>Row);
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">FromRowError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>FromRowError {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
         <span class="macro">write!</span>(
-            <span class="ident">f</span>,
+            f,
             <span class="string">&quot;Couldn&#39;t convert the row `{:?}` to a desired type&quot;</span>,
-            <span class="self">self</span>.<span class="number">0</span>
-        )
+            <span class="self">self</span>.<span class="number">0
+        </span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Error</span> <span class="kw">for</span> <span class="ident">FromRowError</span> {
-    <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="string">&quot;Couldn&#39;t convert the row to a desired type&quot;</span>
-    }
+<span class="kw">impl </span>Error <span class="kw">for </span>FromRowError {
+    <span class="kw">fn </span>description(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="string">&quot;Couldn&#39;t convert the row to a desired type&quot;
+    </span>}
 }
 
-<span class="doccomment">/// Will *panic* if could not convert `row` to `T`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_row</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">FromRow</span><span class="op">&gt;</span>(<span class="ident">row</span>: <span class="ident">Row</span>) -&gt; <span class="ident">T</span> {
-    <span class="ident">FromRow::from_row</span>(<span class="ident">row</span>)
+<span class="doccomment">/// Will *panic* if could not convert `row` to `T`.
+</span><span class="kw">pub fn </span>from_row&lt;T: FromRow&gt;(row: Row) -&gt; T {
+    FromRow::from_row(row)
 }
 
-<span class="doccomment">/// Will return `Err(row)` if could not convert `row` to `T`</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_row_opt</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">FromRow</span><span class="op">&gt;</span>(<span class="ident">row</span>: <span class="ident">Row</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">FromRowError</span><span class="op">&gt;</span> {
-    <span class="ident">FromRow::from_row_opt</span>(<span class="ident">row</span>)
+<span class="doccomment">/// Will return `Err(row)` if could not convert `row` to `T`
+</span><span class="kw">pub fn </span>from_row_opt&lt;T: FromRow&gt;(row: Row) -&gt; <span class="prelude-ty">Result</span>&lt;T, FromRowError&gt; {
+    FromRow::from_row_opt(row)
 }
 
-<span class="doccomment">/// Trait to convert `Row` into a tuple of `FromValue` implementors up to arity 12.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This trait is convenient way to convert mysql row to a tuple or rust types and relies on</span>
-<span class="doccomment">/// `FromValue` trait, i.e. calling `from_row::&lt;(T, U)&gt;(row)` is similar to calling</span>
-<span class="doccomment">/// `(T::from_value(column_1), U::from_value(column_2))`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note that conversion will always fail if any of columns was taken using `Row::take` method.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Conversion of individual columns of a row may fail. In this case `from_row` will panic, and</span>
-<span class="doccomment">/// `from_row_opt` will roll back conversion and return original row.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Concrete types of columns in a row is usually known to a programmer so `from_value` should never</span>
-<span class="doccomment">/// panic if types specified correctly. This means that column which holds `NULL` should correspond</span>
-<span class="doccomment">/// to a type wrapped in `Option`, `String` is used only with column which hold correct utf8, size</span>
-<span class="doccomment">/// and signedness of a numeric type should match to a value stored in a column and so on.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```ignore</span>
-<span class="doccomment">/// // Consider columns in the row is: Bytes(&lt;some binary data&gt;), NULL and Int(1024)</span>
-<span class="doccomment">/// from_row::&lt;(String, u8, u8)&gt;(row) // this will panic because of invalid utf8 in first column.</span>
-<span class="doccomment">/// from_row::&lt;(Vec&lt;u8&gt;, u8, u8)&gt;(row) // this will panic because of a NULL in second column.</span>
-<span class="doccomment">/// from_row::&lt;(Vec&lt;u8&gt;, Option&lt;u8&gt;, u8)&gt;(row) // this will panic because 1024 does not fit in u8.</span>
-<span class="doccomment">/// from_row::&lt;(Vec&lt;u8&gt;)&gt;(row) // this will panic because number of columns != arity of a tuple.</span>
-<span class="doccomment">/// from_row::&lt;(Vec&lt;u8&gt;, Option&lt;u8&gt;, u16, Option&lt;u8&gt;)&gt;(row) // same reason of panic as previous.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// from_row::&lt;(Vec&lt;u8&gt;, Option&lt;u8&gt;, u16)&gt;(row) // this&#39;ll work and return (vec![..], None, 1024u16)</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">FromRow</span> {
-    <span class="kw">fn</span> <span class="ident">from_row</span>(<span class="ident">row</span>: <span class="ident">Row</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
+<span class="doccomment">/// Trait to convert `Row` into a tuple of `FromValue` implementors up to arity 12.
+///
+/// This trait is convenient way to convert mysql row to a tuple or rust types and relies on
+/// `FromValue` trait, i.e. calling `from_row::&lt;(T, U)&gt;(row)` is similar to calling
+/// `(T::from_value(column_1), U::from_value(column_2))`.
+///
+/// Note that conversion will always fail if any of columns was taken using `Row::take` method.
+///
+/// Conversion of individual columns of a row may fail. In this case `from_row` will panic, and
+/// `from_row_opt` will roll back conversion and return original row.
+///
+/// Concrete types of columns in a row is usually known to a programmer so `from_value` should never
+/// panic if types specified correctly. This means that column which holds `NULL` should correspond
+/// to a type wrapped in `Option`, `String` is used only with column which hold correct utf8, size
+/// and signedness of a numeric type should match to a value stored in a column and so on.
+///
+/// ```ignore
+/// // Consider columns in the row is: Bytes(&lt;some binary data&gt;), NULL and Int(1024)
+/// from_row::&lt;(String, u8, u8)&gt;(row) // this will panic because of invalid utf8 in first column.
+/// from_row::&lt;(Vec&lt;u8&gt;, u8, u8)&gt;(row) // this will panic because of a NULL in second column.
+/// from_row::&lt;(Vec&lt;u8&gt;, Option&lt;u8&gt;, u8)&gt;(row) // this will panic because 1024 does not fit in u8.
+/// from_row::&lt;(Vec&lt;u8&gt;)&gt;(row) // this will panic because number of columns != arity of a tuple.
+/// from_row::&lt;(Vec&lt;u8&gt;, Option&lt;u8&gt;, u16, Option&lt;u8&gt;)&gt;(row) // same reason of panic as previous.
+///
+/// from_row::&lt;(Vec&lt;u8&gt;, Option&lt;u8&gt;, u16)&gt;(row) // this&#39;ll work and return (vec![..], None, 1024u16)
+/// ```
+</span><span class="kw">pub trait </span>FromRow {
+    <span class="kw">fn </span>from_row(row: Row) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span><span class="self">Self</span>: Sized,
     {
-        <span class="kw">match</span> <span class="ident"><span class="self">Self</span>::from_row_opt</span>(<span class="ident">row</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">FromRowError</span>(<span class="ident">row</span>)) =&gt; <span class="macro">panic!</span>(
+        <span class="kw">match </span><span class="self">Self</span>::from_row_opt(row) {
+            <span class="prelude-val">Ok</span>(x) =&gt; x,
+            <span class="prelude-val">Err</span>(FromRowError(row)) =&gt; <span class="macro">panic!</span>(
                 <span class="string">&quot;Couldn&#39;t convert {:?} to type {}. (see FromRow documentation)&quot;</span>,
-                <span class="ident">row</span>,
-                <span class="ident">type_name</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>(),
+                row,
+                type_name::&lt;<span class="self">Self</span>&gt;(),
             ),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">from_row_opt</span>(<span class="ident">row</span>: <span class="ident">Row</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">FromRowError</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>;
+    <span class="kw">fn </span>from_row_opt(row: Row) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, FromRowError&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized;
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">take_or_place</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">row</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">index</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ident</span>) =&gt; (
-        <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">row</span>.<span class="ident">take</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">index</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; {
-                <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t::get_intermediate</span>(<span class="ident">value</span>) {
-                    <span class="prelude-val">Ok</span>(<span class="ident">ir</span>) =&gt; <span class="ident">ir</span>,
-                    <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">value</span>)) =&gt; {
-                        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">row</span>.<span class="ident">place</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">index</span>, <span class="ident">value</span>);
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">FromRowError</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">row</span>));
+<span class="macro">macro_rules! </span>take_or_place {
+    (<span class="macro-nonterminal">$row</span>:expr, <span class="macro-nonterminal">$index</span>:expr, <span class="macro-nonterminal">$t</span>:ident) =&gt; (
+        <span class="kw">match </span><span class="macro-nonterminal">$row</span>.take(<span class="macro-nonterminal">$index</span>) {
+            <span class="prelude-val">Some</span>(value) =&gt; {
+                <span class="kw">match </span><span class="macro-nonterminal">$t::get_intermediate</span>(value) {
+                    <span class="prelude-val">Ok</span>(ir) =&gt; ir,
+                    <span class="prelude-val">Err</span>(FromValueError(value)) =&gt; {
+                        <span class="macro-nonterminal">$row</span>.place(<span class="macro-nonterminal">$index</span>, value);
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(FromRowError(<span class="macro-nonterminal">$row</span>));
                     },
                 }
             },
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">FromRowError</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">row</span>)),
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(FromRowError(<span class="macro-nonterminal">$row</span>)),
         }
     );
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">row</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">index</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ident</span>, $( [<span class="macro-nonterminal">$</span><span class="macro-nonterminal">idx</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ir</span>:<span class="ident">expr</span>] ),<span class="kw-2">*</span>) =&gt; (
-        <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">row</span>.<span class="ident">take</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">index</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; {
-                <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t::get_intermediate</span>(<span class="ident">value</span>) {
-                    <span class="prelude-val">Ok</span>(<span class="ident">ir</span>) =&gt; <span class="ident">ir</span>,
-                    <span class="prelude-val">Err</span>(<span class="ident">FromValueError</span>(<span class="ident">value</span>)) =&gt; {
-                        $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">row</span>.<span class="ident">place</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">idx</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ir</span>.<span class="ident">rollback</span>());)<span class="op">*</span>
-                        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">row</span>.<span class="ident">place</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">index</span>, <span class="ident">value</span>);
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">FromRowError</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">row</span>));
+    (<span class="macro-nonterminal">$row</span>:expr, <span class="macro-nonterminal">$index</span>:expr, <span class="macro-nonterminal">$t</span>:ident, $( [<span class="macro-nonterminal">$idx</span>:expr, <span class="macro-nonterminal">$ir</span>:expr] ),<span class="kw-2">*</span>) =&gt; (
+        <span class="kw">match </span><span class="macro-nonterminal">$row</span>.take(<span class="macro-nonterminal">$index</span>) {
+            <span class="prelude-val">Some</span>(value) =&gt; {
+                <span class="kw">match </span><span class="macro-nonterminal">$t::get_intermediate</span>(value) {
+                    <span class="prelude-val">Ok</span>(ir) =&gt; ir,
+                    <span class="prelude-val">Err</span>(FromValueError(value)) =&gt; {
+                        $(<span class="macro-nonterminal">$row</span>.place(<span class="macro-nonterminal">$idx</span>, <span class="macro-nonterminal">$ir</span>.rollback());)*
+                        <span class="macro-nonterminal">$row</span>.place(<span class="macro-nonterminal">$index</span>, value);
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(FromRowError(<span class="macro-nonterminal">$row</span>));
                     },
                 }
             },
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">FromRowError</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">row</span>)),
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(FromRowError(<span class="macro-nonterminal">$row</span>)),
         }
     );
 }
 
-<span class="kw">impl</span> <span class="ident">FromRow</span> <span class="kw">for</span> <span class="ident">Row</span> {
-    <span class="kw">fn</span> <span class="ident">from_row</span>(<span class="ident">row</span>: <span class="ident">Row</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">row</span>
+<span class="kw">impl </span>FromRow <span class="kw">for </span>Row {
+    <span class="kw">fn </span>from_row(row: Row) -&gt; <span class="self">Self </span>{
+        row
     }
 
-    <span class="kw">fn</span> <span class="ident">from_row_opt</span>(<span class="ident">row</span>: <span class="ident">Row</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">FromRowError</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
+    <span class="kw">fn </span>from_row_opt(row: Row) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, FromRowError&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
     {
-        <span class="prelude-val">Ok</span>(<span class="ident">row</span>)
+        <span class="prelude-val">Ok</span>(row)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">FromRow</span> <span class="kw">for</span> <span class="ident">T</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">FromValue</span>,
+<span class="kw">impl</span>&lt;T&gt; FromRow <span class="kw">for </span>T
+<span class="kw">where
+    </span>T: FromValue,
 {
-    <span class="kw">fn</span> <span class="ident">from_row_opt</span>(<span class="kw-2">mut</span> <span class="ident">row</span>: <span class="ident">Row</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">FromRowError</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">row</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
-            <span class="prelude-val">Ok</span>(<span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">0</span>, <span class="ident">T</span>).<span class="ident">commit</span>())
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">FromRowError</span>(<span class="ident">row</span>))
+    <span class="kw">fn </span>from_row_opt(<span class="kw-2">mut </span>row: Row) -&gt; <span class="prelude-ty">Result</span>&lt;T, FromRowError&gt; {
+        <span class="kw">if </span>row.len() == <span class="number">1 </span>{
+            <span class="prelude-val">Ok</span>(<span class="macro">take_or_place!</span>(row, <span class="number">0</span>, T).commit())
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(FromRowError(row))
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T1</span><span class="op">&gt;</span> <span class="ident">FromRow</span> <span class="kw">for</span> (<span class="ident">T1</span>,)
-<span class="kw">where</span>
-    <span class="ident">T1</span>: <span class="ident">FromValue</span>,
+<span class="kw">impl</span>&lt;T1&gt; FromRow <span class="kw">for </span>(T1,)
+<span class="kw">where
+    </span>T1: FromValue,
 {
-    <span class="kw">fn</span> <span class="ident">from_row_opt</span>(<span class="ident">row</span>: <span class="ident">Row</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">T1</span>,), <span class="ident">FromRowError</span><span class="op">&gt;</span> {
-        <span class="ident">T1::from_row_opt</span>(<span class="ident">row</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> (<span class="ident">t</span>,))
+    <span class="kw">fn </span>from_row_opt(row: Row) -&gt; <span class="prelude-ty">Result</span>&lt;(T1,), FromRowError&gt; {
+        T1::from_row_opt(row).map(|t| (t,))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">T2</span><span class="op">&gt;</span> <span class="ident">FromRow</span> <span class="kw">for</span> (<span class="ident">T1</span>, <span class="ident">T2</span>)
-<span class="kw">where</span>
-    <span class="ident">T1</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T2</span>: <span class="ident">FromValue</span>,
+<span class="kw">impl</span>&lt;T1, T2&gt; FromRow <span class="kw">for </span>(T1, T2)
+<span class="kw">where
+    </span>T1: FromValue,
+    T2: FromValue,
 {
-    <span class="kw">fn</span> <span class="ident">from_row_opt</span>(<span class="kw-2">mut</span> <span class="ident">row</span>: <span class="ident">Row</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">T1</span>, <span class="ident">T2</span>), <span class="ident">FromRowError</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">row</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">2</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">FromRowError</span>(<span class="ident">row</span>));
+    <span class="kw">fn </span>from_row_opt(<span class="kw-2">mut </span>row: Row) -&gt; <span class="prelude-ty">Result</span>&lt;(T1, T2), FromRowError&gt; {
+        <span class="kw">if </span>row.len() != <span class="number">2 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(FromRowError(row));
         }
-        <span class="kw">let</span> <span class="ident">ir1</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">0</span>, <span class="ident">T1</span>);
-        <span class="kw">let</span> <span class="ident">ir2</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">1</span>, <span class="ident">T2</span>, [<span class="number">0</span>, <span class="ident">ir1</span>]);
-        <span class="prelude-val">Ok</span>((<span class="ident">ir1</span>.<span class="ident">commit</span>(), <span class="ident">ir2</span>.<span class="ident">commit</span>()))
+        <span class="kw">let </span>ir1 = <span class="macro">take_or_place!</span>(row, <span class="number">0</span>, T1);
+        <span class="kw">let </span>ir2 = <span class="macro">take_or_place!</span>(row, <span class="number">1</span>, T2, [<span class="number">0</span>, ir1]);
+        <span class="prelude-val">Ok</span>((ir1.commit(), ir2.commit()))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span><span class="op">&gt;</span> <span class="ident">FromRow</span> <span class="kw">for</span> (<span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>)
-<span class="kw">where</span>
-    <span class="ident">T1</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T2</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T3</span>: <span class="ident">FromValue</span>,
+<span class="kw">impl</span>&lt;T1, T2, T3&gt; FromRow <span class="kw">for </span>(T1, T2, T3)
+<span class="kw">where
+    </span>T1: FromValue,
+    T2: FromValue,
+    T3: FromValue,
 {
-    <span class="kw">fn</span> <span class="ident">from_row_opt</span>(<span class="kw-2">mut</span> <span class="ident">row</span>: <span class="ident">Row</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>), <span class="ident">FromRowError</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">row</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">3</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">FromRowError</span>(<span class="ident">row</span>));
+    <span class="kw">fn </span>from_row_opt(<span class="kw-2">mut </span>row: Row) -&gt; <span class="prelude-ty">Result</span>&lt;(T1, T2, T3), FromRowError&gt; {
+        <span class="kw">if </span>row.len() != <span class="number">3 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(FromRowError(row));
         }
-        <span class="kw">let</span> <span class="ident">ir1</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">0</span>, <span class="ident">T1</span>);
-        <span class="kw">let</span> <span class="ident">ir2</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">1</span>, <span class="ident">T2</span>, [<span class="number">0</span>, <span class="ident">ir1</span>]);
-        <span class="kw">let</span> <span class="ident">ir3</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">2</span>, <span class="ident">T3</span>, [<span class="number">0</span>, <span class="ident">ir1</span>], [<span class="number">1</span>, <span class="ident">ir2</span>]);
-        <span class="prelude-val">Ok</span>((<span class="ident">ir1</span>.<span class="ident">commit</span>(), <span class="ident">ir2</span>.<span class="ident">commit</span>(), <span class="ident">ir3</span>.<span class="ident">commit</span>()))
+        <span class="kw">let </span>ir1 = <span class="macro">take_or_place!</span>(row, <span class="number">0</span>, T1);
+        <span class="kw">let </span>ir2 = <span class="macro">take_or_place!</span>(row, <span class="number">1</span>, T2, [<span class="number">0</span>, ir1]);
+        <span class="kw">let </span>ir3 = <span class="macro">take_or_place!</span>(row, <span class="number">2</span>, T3, [<span class="number">0</span>, ir1], [<span class="number">1</span>, ir2]);
+        <span class="prelude-val">Ok</span>((ir1.commit(), ir2.commit(), ir3.commit()))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span><span class="op">&gt;</span> <span class="ident">FromRow</span> <span class="kw">for</span> (<span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>)
-<span class="kw">where</span>
-    <span class="ident">T1</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T2</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T3</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T4</span>: <span class="ident">FromValue</span>,
+<span class="kw">impl</span>&lt;T1, T2, T3, T4&gt; FromRow <span class="kw">for </span>(T1, T2, T3, T4)
+<span class="kw">where
+    </span>T1: FromValue,
+    T2: FromValue,
+    T3: FromValue,
+    T4: FromValue,
 {
-    <span class="kw">fn</span> <span class="ident">from_row_opt</span>(<span class="kw-2">mut</span> <span class="ident">row</span>: <span class="ident">Row</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>), <span class="ident">FromRowError</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">row</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">4</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">FromRowError</span>(<span class="ident">row</span>));
+    <span class="kw">fn </span>from_row_opt(<span class="kw-2">mut </span>row: Row) -&gt; <span class="prelude-ty">Result</span>&lt;(T1, T2, T3, T4), FromRowError&gt; {
+        <span class="kw">if </span>row.len() != <span class="number">4 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(FromRowError(row));
         }
-        <span class="kw">let</span> <span class="ident">ir1</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">0</span>, <span class="ident">T1</span>);
-        <span class="kw">let</span> <span class="ident">ir2</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">1</span>, <span class="ident">T2</span>, [<span class="number">0</span>, <span class="ident">ir1</span>]);
-        <span class="kw">let</span> <span class="ident">ir3</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">2</span>, <span class="ident">T3</span>, [<span class="number">0</span>, <span class="ident">ir1</span>], [<span class="number">1</span>, <span class="ident">ir2</span>]);
-        <span class="kw">let</span> <span class="ident">ir4</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">3</span>, <span class="ident">T4</span>, [<span class="number">0</span>, <span class="ident">ir1</span>], [<span class="number">1</span>, <span class="ident">ir2</span>], [<span class="number">2</span>, <span class="ident">ir3</span>]);
-        <span class="prelude-val">Ok</span>((<span class="ident">ir1</span>.<span class="ident">commit</span>(), <span class="ident">ir2</span>.<span class="ident">commit</span>(), <span class="ident">ir3</span>.<span class="ident">commit</span>(), <span class="ident">ir4</span>.<span class="ident">commit</span>()))
+        <span class="kw">let </span>ir1 = <span class="macro">take_or_place!</span>(row, <span class="number">0</span>, T1);
+        <span class="kw">let </span>ir2 = <span class="macro">take_or_place!</span>(row, <span class="number">1</span>, T2, [<span class="number">0</span>, ir1]);
+        <span class="kw">let </span>ir3 = <span class="macro">take_or_place!</span>(row, <span class="number">2</span>, T3, [<span class="number">0</span>, ir1], [<span class="number">1</span>, ir2]);
+        <span class="kw">let </span>ir4 = <span class="macro">take_or_place!</span>(row, <span class="number">3</span>, T4, [<span class="number">0</span>, ir1], [<span class="number">1</span>, ir2], [<span class="number">2</span>, ir3]);
+        <span class="prelude-val">Ok</span>((ir1.commit(), ir2.commit(), ir3.commit(), ir4.commit()))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span><span class="op">&gt;</span> <span class="ident">FromRow</span> <span class="kw">for</span> (<span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>)
-<span class="kw">where</span>
-    <span class="ident">T1</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T2</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T3</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T4</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T5</span>: <span class="ident">FromValue</span>,
+<span class="kw">impl</span>&lt;T1, T2, T3, T4, T5&gt; FromRow <span class="kw">for </span>(T1, T2, T3, T4, T5)
+<span class="kw">where
+    </span>T1: FromValue,
+    T2: FromValue,
+    T3: FromValue,
+    T4: FromValue,
+    T5: FromValue,
 {
-    <span class="kw">fn</span> <span class="ident">from_row_opt</span>(<span class="kw-2">mut</span> <span class="ident">row</span>: <span class="ident">Row</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>), <span class="ident">FromRowError</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">row</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">5</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">FromRowError</span>(<span class="ident">row</span>));
+    <span class="kw">fn </span>from_row_opt(<span class="kw-2">mut </span>row: Row) -&gt; <span class="prelude-ty">Result</span>&lt;(T1, T2, T3, T4, T5), FromRowError&gt; {
+        <span class="kw">if </span>row.len() != <span class="number">5 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(FromRowError(row));
         }
-        <span class="kw">let</span> <span class="ident">ir1</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">0</span>, <span class="ident">T1</span>);
-        <span class="kw">let</span> <span class="ident">ir2</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">1</span>, <span class="ident">T2</span>, [<span class="number">0</span>, <span class="ident">ir1</span>]);
-        <span class="kw">let</span> <span class="ident">ir3</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">2</span>, <span class="ident">T3</span>, [<span class="number">0</span>, <span class="ident">ir1</span>], [<span class="number">1</span>, <span class="ident">ir2</span>]);
-        <span class="kw">let</span> <span class="ident">ir4</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">3</span>, <span class="ident">T4</span>, [<span class="number">0</span>, <span class="ident">ir1</span>], [<span class="number">1</span>, <span class="ident">ir2</span>], [<span class="number">2</span>, <span class="ident">ir3</span>]);
-        <span class="kw">let</span> <span class="ident">ir5</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">4</span>, <span class="ident">T5</span>, [<span class="number">0</span>, <span class="ident">ir1</span>], [<span class="number">1</span>, <span class="ident">ir2</span>], [<span class="number">2</span>, <span class="ident">ir3</span>], [<span class="number">3</span>, <span class="ident">ir4</span>]);
+        <span class="kw">let </span>ir1 = <span class="macro">take_or_place!</span>(row, <span class="number">0</span>, T1);
+        <span class="kw">let </span>ir2 = <span class="macro">take_or_place!</span>(row, <span class="number">1</span>, T2, [<span class="number">0</span>, ir1]);
+        <span class="kw">let </span>ir3 = <span class="macro">take_or_place!</span>(row, <span class="number">2</span>, T3, [<span class="number">0</span>, ir1], [<span class="number">1</span>, ir2]);
+        <span class="kw">let </span>ir4 = <span class="macro">take_or_place!</span>(row, <span class="number">3</span>, T4, [<span class="number">0</span>, ir1], [<span class="number">1</span>, ir2], [<span class="number">2</span>, ir3]);
+        <span class="kw">let </span>ir5 = <span class="macro">take_or_place!</span>(row, <span class="number">4</span>, T5, [<span class="number">0</span>, ir1], [<span class="number">1</span>, ir2], [<span class="number">2</span>, ir3], [<span class="number">3</span>, ir4]);
         <span class="prelude-val">Ok</span>((
-            <span class="ident">ir1</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir2</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir3</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir4</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir5</span>.<span class="ident">commit</span>(),
+            ir1.commit(),
+            ir2.commit(),
+            ir3.commit(),
+            ir4.commit(),
+            ir5.commit(),
         ))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span><span class="op">&gt;</span> <span class="ident">FromRow</span> <span class="kw">for</span> (<span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>)
-<span class="kw">where</span>
-    <span class="ident">T1</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T2</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T3</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T4</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T5</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T6</span>: <span class="ident">FromValue</span>,
+<span class="kw">impl</span>&lt;T1, T2, T3, T4, T5, T6&gt; FromRow <span class="kw">for </span>(T1, T2, T3, T4, T5, T6)
+<span class="kw">where
+    </span>T1: FromValue,
+    T2: FromValue,
+    T3: FromValue,
+    T4: FromValue,
+    T5: FromValue,
+    T6: FromValue,
 {
-    <span class="kw">fn</span> <span class="ident">from_row_opt</span>(<span class="kw-2">mut</span> <span class="ident">row</span>: <span class="ident">Row</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>), <span class="ident">FromRowError</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">row</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">6</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">FromRowError</span>(<span class="ident">row</span>));
+    <span class="kw">fn </span>from_row_opt(<span class="kw-2">mut </span>row: Row) -&gt; <span class="prelude-ty">Result</span>&lt;(T1, T2, T3, T4, T5, T6), FromRowError&gt; {
+        <span class="kw">if </span>row.len() != <span class="number">6 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(FromRowError(row));
         }
-        <span class="kw">let</span> <span class="ident">ir1</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">0</span>, <span class="ident">T1</span>);
-        <span class="kw">let</span> <span class="ident">ir2</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">1</span>, <span class="ident">T2</span>, [<span class="number">0</span>, <span class="ident">ir1</span>]);
-        <span class="kw">let</span> <span class="ident">ir3</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">2</span>, <span class="ident">T3</span>, [<span class="number">0</span>, <span class="ident">ir1</span>], [<span class="number">1</span>, <span class="ident">ir2</span>]);
-        <span class="kw">let</span> <span class="ident">ir4</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">3</span>, <span class="ident">T4</span>, [<span class="number">0</span>, <span class="ident">ir1</span>], [<span class="number">1</span>, <span class="ident">ir2</span>], [<span class="number">2</span>, <span class="ident">ir3</span>]);
-        <span class="kw">let</span> <span class="ident">ir5</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">4</span>, <span class="ident">T5</span>, [<span class="number">0</span>, <span class="ident">ir1</span>], [<span class="number">1</span>, <span class="ident">ir2</span>], [<span class="number">2</span>, <span class="ident">ir3</span>], [<span class="number">3</span>, <span class="ident">ir4</span>]);
-        <span class="kw">let</span> <span class="ident">ir6</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">5</span>, <span class="ident">T6</span>, [<span class="number">0</span>, <span class="ident">ir1</span>], [<span class="number">1</span>, <span class="ident">ir2</span>], [<span class="number">2</span>, <span class="ident">ir3</span>], [<span class="number">3</span>, <span class="ident">ir4</span>], [<span class="number">4</span>, <span class="ident">ir5</span>]);
+        <span class="kw">let </span>ir1 = <span class="macro">take_or_place!</span>(row, <span class="number">0</span>, T1);
+        <span class="kw">let </span>ir2 = <span class="macro">take_or_place!</span>(row, <span class="number">1</span>, T2, [<span class="number">0</span>, ir1]);
+        <span class="kw">let </span>ir3 = <span class="macro">take_or_place!</span>(row, <span class="number">2</span>, T3, [<span class="number">0</span>, ir1], [<span class="number">1</span>, ir2]);
+        <span class="kw">let </span>ir4 = <span class="macro">take_or_place!</span>(row, <span class="number">3</span>, T4, [<span class="number">0</span>, ir1], [<span class="number">1</span>, ir2], [<span class="number">2</span>, ir3]);
+        <span class="kw">let </span>ir5 = <span class="macro">take_or_place!</span>(row, <span class="number">4</span>, T5, [<span class="number">0</span>, ir1], [<span class="number">1</span>, ir2], [<span class="number">2</span>, ir3], [<span class="number">3</span>, ir4]);
+        <span class="kw">let </span>ir6 = <span class="macro">take_or_place!</span>(row, <span class="number">5</span>, T6, [<span class="number">0</span>, ir1], [<span class="number">1</span>, ir2], [<span class="number">2</span>, ir3], [<span class="number">3</span>, ir4], [<span class="number">4</span>, ir5]);
         <span class="prelude-val">Ok</span>((
-            <span class="ident">ir1</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir2</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir3</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir4</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir5</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir6</span>.<span class="ident">commit</span>(),
+            ir1.commit(),
+            ir2.commit(),
+            ir3.commit(),
+            ir4.commit(),
+            ir5.commit(),
+            ir6.commit(),
         ))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>, <span class="ident">T7</span><span class="op">&gt;</span> <span class="ident">FromRow</span> <span class="kw">for</span> (<span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>, <span class="ident">T7</span>)
-<span class="kw">where</span>
-    <span class="ident">T1</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T2</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T3</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T4</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T5</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T6</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T7</span>: <span class="ident">FromValue</span>,
+<span class="kw">impl</span>&lt;T1, T2, T3, T4, T5, T6, T7&gt; FromRow <span class="kw">for </span>(T1, T2, T3, T4, T5, T6, T7)
+<span class="kw">where
+    </span>T1: FromValue,
+    T2: FromValue,
+    T3: FromValue,
+    T4: FromValue,
+    T5: FromValue,
+    T6: FromValue,
+    T7: FromValue,
 {
-    <span class="kw">fn</span> <span class="ident">from_row_opt</span>(<span class="kw-2">mut</span> <span class="ident">row</span>: <span class="ident">Row</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>, <span class="ident">T7</span>), <span class="ident">FromRowError</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">row</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">7</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">FromRowError</span>(<span class="ident">row</span>));
+    <span class="kw">fn </span>from_row_opt(<span class="kw-2">mut </span>row: Row) -&gt; <span class="prelude-ty">Result</span>&lt;(T1, T2, T3, T4, T5, T6, T7), FromRowError&gt; {
+        <span class="kw">if </span>row.len() != <span class="number">7 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(FromRowError(row));
         }
-        <span class="kw">let</span> <span class="ident">ir1</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">0</span>, <span class="ident">T1</span>);
-        <span class="kw">let</span> <span class="ident">ir2</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">1</span>, <span class="ident">T2</span>, [<span class="number">0</span>, <span class="ident">ir1</span>]);
-        <span class="kw">let</span> <span class="ident">ir3</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">2</span>, <span class="ident">T3</span>, [<span class="number">0</span>, <span class="ident">ir1</span>], [<span class="number">1</span>, <span class="ident">ir2</span>]);
-        <span class="kw">let</span> <span class="ident">ir4</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">3</span>, <span class="ident">T4</span>, [<span class="number">0</span>, <span class="ident">ir1</span>], [<span class="number">1</span>, <span class="ident">ir2</span>], [<span class="number">2</span>, <span class="ident">ir3</span>]);
-        <span class="kw">let</span> <span class="ident">ir5</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">4</span>, <span class="ident">T5</span>, [<span class="number">0</span>, <span class="ident">ir1</span>], [<span class="number">1</span>, <span class="ident">ir2</span>], [<span class="number">2</span>, <span class="ident">ir3</span>], [<span class="number">3</span>, <span class="ident">ir4</span>]);
-        <span class="kw">let</span> <span class="ident">ir6</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">5</span>, <span class="ident">T6</span>, [<span class="number">0</span>, <span class="ident">ir1</span>], [<span class="number">1</span>, <span class="ident">ir2</span>], [<span class="number">2</span>, <span class="ident">ir3</span>], [<span class="number">3</span>, <span class="ident">ir4</span>], [<span class="number">4</span>, <span class="ident">ir5</span>]);
-        <span class="kw">let</span> <span class="ident">ir7</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(
-            <span class="ident">row</span>,
+        <span class="kw">let </span>ir1 = <span class="macro">take_or_place!</span>(row, <span class="number">0</span>, T1);
+        <span class="kw">let </span>ir2 = <span class="macro">take_or_place!</span>(row, <span class="number">1</span>, T2, [<span class="number">0</span>, ir1]);
+        <span class="kw">let </span>ir3 = <span class="macro">take_or_place!</span>(row, <span class="number">2</span>, T3, [<span class="number">0</span>, ir1], [<span class="number">1</span>, ir2]);
+        <span class="kw">let </span>ir4 = <span class="macro">take_or_place!</span>(row, <span class="number">3</span>, T4, [<span class="number">0</span>, ir1], [<span class="number">1</span>, ir2], [<span class="number">2</span>, ir3]);
+        <span class="kw">let </span>ir5 = <span class="macro">take_or_place!</span>(row, <span class="number">4</span>, T5, [<span class="number">0</span>, ir1], [<span class="number">1</span>, ir2], [<span class="number">2</span>, ir3], [<span class="number">3</span>, ir4]);
+        <span class="kw">let </span>ir6 = <span class="macro">take_or_place!</span>(row, <span class="number">5</span>, T6, [<span class="number">0</span>, ir1], [<span class="number">1</span>, ir2], [<span class="number">2</span>, ir3], [<span class="number">3</span>, ir4], [<span class="number">4</span>, ir5]);
+        <span class="kw">let </span>ir7 = <span class="macro">take_or_place!</span>(
+            row,
             <span class="number">6</span>,
-            <span class="ident">T7</span>,
-            [<span class="number">0</span>, <span class="ident">ir1</span>],
-            [<span class="number">1</span>, <span class="ident">ir2</span>],
-            [<span class="number">2</span>, <span class="ident">ir3</span>],
-            [<span class="number">3</span>, <span class="ident">ir4</span>],
-            [<span class="number">4</span>, <span class="ident">ir5</span>],
-            [<span class="number">5</span>, <span class="ident">ir6</span>]
+            T7,
+            [<span class="number">0</span>, ir1],
+            [<span class="number">1</span>, ir2],
+            [<span class="number">2</span>, ir3],
+            [<span class="number">3</span>, ir4],
+            [<span class="number">4</span>, ir5],
+            [<span class="number">5</span>, ir6]
         );
         <span class="prelude-val">Ok</span>((
-            <span class="ident">ir1</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir2</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir3</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir4</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir5</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir6</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir7</span>.<span class="ident">commit</span>(),
+            ir1.commit(),
+            ir2.commit(),
+            ir3.commit(),
+            ir4.commit(),
+            ir5.commit(),
+            ir6.commit(),
+            ir7.commit(),
         ))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>, <span class="ident">T7</span>, <span class="ident">T8</span><span class="op">&gt;</span> <span class="ident">FromRow</span> <span class="kw">for</span> (<span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>, <span class="ident">T7</span>, <span class="ident">T8</span>)
-<span class="kw">where</span>
-    <span class="ident">T1</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T2</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T3</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T4</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T5</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T6</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T7</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T8</span>: <span class="ident">FromValue</span>,
+<span class="kw">impl</span>&lt;T1, T2, T3, T4, T5, T6, T7, T8&gt; FromRow <span class="kw">for </span>(T1, T2, T3, T4, T5, T6, T7, T8)
+<span class="kw">where
+    </span>T1: FromValue,
+    T2: FromValue,
+    T3: FromValue,
+    T4: FromValue,
+    T5: FromValue,
+    T6: FromValue,
+    T7: FromValue,
+    T8: FromValue,
 {
-    <span class="kw">fn</span> <span class="ident">from_row_opt</span>(<span class="kw-2">mut</span> <span class="ident">row</span>: <span class="ident">Row</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>, <span class="ident">T7</span>, <span class="ident">T8</span>), <span class="ident">FromRowError</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">row</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">8</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">FromRowError</span>(<span class="ident">row</span>));
+    <span class="kw">fn </span>from_row_opt(<span class="kw-2">mut </span>row: Row) -&gt; <span class="prelude-ty">Result</span>&lt;(T1, T2, T3, T4, T5, T6, T7, T8), FromRowError&gt; {
+        <span class="kw">if </span>row.len() != <span class="number">8 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(FromRowError(row));
         }
-        <span class="kw">let</span> <span class="ident">ir1</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">0</span>, <span class="ident">T1</span>);
-        <span class="kw">let</span> <span class="ident">ir2</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">1</span>, <span class="ident">T2</span>, [<span class="number">0</span>, <span class="ident">ir1</span>]);
-        <span class="kw">let</span> <span class="ident">ir3</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">2</span>, <span class="ident">T3</span>, [<span class="number">0</span>, <span class="ident">ir1</span>], [<span class="number">1</span>, <span class="ident">ir2</span>]);
-        <span class="kw">let</span> <span class="ident">ir4</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">3</span>, <span class="ident">T4</span>, [<span class="number">0</span>, <span class="ident">ir1</span>], [<span class="number">1</span>, <span class="ident">ir2</span>], [<span class="number">2</span>, <span class="ident">ir3</span>]);
-        <span class="kw">let</span> <span class="ident">ir5</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">4</span>, <span class="ident">T5</span>, [<span class="number">0</span>, <span class="ident">ir1</span>], [<span class="number">1</span>, <span class="ident">ir2</span>], [<span class="number">2</span>, <span class="ident">ir3</span>], [<span class="number">3</span>, <span class="ident">ir4</span>]);
-        <span class="kw">let</span> <span class="ident">ir6</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">5</span>, <span class="ident">T6</span>, [<span class="number">0</span>, <span class="ident">ir1</span>], [<span class="number">1</span>, <span class="ident">ir2</span>], [<span class="number">2</span>, <span class="ident">ir3</span>], [<span class="number">3</span>, <span class="ident">ir4</span>], [<span class="number">4</span>, <span class="ident">ir5</span>]);
-        <span class="kw">let</span> <span class="ident">ir7</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(
-            <span class="ident">row</span>,
+        <span class="kw">let </span>ir1 = <span class="macro">take_or_place!</span>(row, <span class="number">0</span>, T1);
+        <span class="kw">let </span>ir2 = <span class="macro">take_or_place!</span>(row, <span class="number">1</span>, T2, [<span class="number">0</span>, ir1]);
+        <span class="kw">let </span>ir3 = <span class="macro">take_or_place!</span>(row, <span class="number">2</span>, T3, [<span class="number">0</span>, ir1], [<span class="number">1</span>, ir2]);
+        <span class="kw">let </span>ir4 = <span class="macro">take_or_place!</span>(row, <span class="number">3</span>, T4, [<span class="number">0</span>, ir1], [<span class="number">1</span>, ir2], [<span class="number">2</span>, ir3]);
+        <span class="kw">let </span>ir5 = <span class="macro">take_or_place!</span>(row, <span class="number">4</span>, T5, [<span class="number">0</span>, ir1], [<span class="number">1</span>, ir2], [<span class="number">2</span>, ir3], [<span class="number">3</span>, ir4]);
+        <span class="kw">let </span>ir6 = <span class="macro">take_or_place!</span>(row, <span class="number">5</span>, T6, [<span class="number">0</span>, ir1], [<span class="number">1</span>, ir2], [<span class="number">2</span>, ir3], [<span class="number">3</span>, ir4], [<span class="number">4</span>, ir5]);
+        <span class="kw">let </span>ir7 = <span class="macro">take_or_place!</span>(
+            row,
             <span class="number">6</span>,
-            <span class="ident">T7</span>,
-            [<span class="number">0</span>, <span class="ident">ir1</span>],
-            [<span class="number">1</span>, <span class="ident">ir2</span>],
-            [<span class="number">2</span>, <span class="ident">ir3</span>],
-            [<span class="number">3</span>, <span class="ident">ir4</span>],
-            [<span class="number">4</span>, <span class="ident">ir5</span>],
-            [<span class="number">5</span>, <span class="ident">ir6</span>]
+            T7,
+            [<span class="number">0</span>, ir1],
+            [<span class="number">1</span>, ir2],
+            [<span class="number">2</span>, ir3],
+            [<span class="number">3</span>, ir4],
+            [<span class="number">4</span>, ir5],
+            [<span class="number">5</span>, ir6]
         );
-        <span class="kw">let</span> <span class="ident">ir8</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(
-            <span class="ident">row</span>,
+        <span class="kw">let </span>ir8 = <span class="macro">take_or_place!</span>(
+            row,
             <span class="number">7</span>,
-            <span class="ident">T8</span>,
-            [<span class="number">0</span>, <span class="ident">ir1</span>],
-            [<span class="number">1</span>, <span class="ident">ir2</span>],
-            [<span class="number">2</span>, <span class="ident">ir3</span>],
-            [<span class="number">3</span>, <span class="ident">ir4</span>],
-            [<span class="number">4</span>, <span class="ident">ir5</span>],
-            [<span class="number">5</span>, <span class="ident">ir6</span>],
-            [<span class="number">6</span>, <span class="ident">ir7</span>]
+            T8,
+            [<span class="number">0</span>, ir1],
+            [<span class="number">1</span>, ir2],
+            [<span class="number">2</span>, ir3],
+            [<span class="number">3</span>, ir4],
+            [<span class="number">4</span>, ir5],
+            [<span class="number">5</span>, ir6],
+            [<span class="number">6</span>, ir7]
         );
         <span class="prelude-val">Ok</span>((
-            <span class="ident">ir1</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir2</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir3</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir4</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir5</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir6</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir7</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir8</span>.<span class="ident">commit</span>(),
+            ir1.commit(),
+            ir2.commit(),
+            ir3.commit(),
+            ir4.commit(),
+            ir5.commit(),
+            ir6.commit(),
+            ir7.commit(),
+            ir8.commit(),
         ))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>, <span class="ident">T7</span>, <span class="ident">T8</span>, <span class="ident">T9</span><span class="op">&gt;</span> <span class="ident">FromRow</span> <span class="kw">for</span> (<span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>, <span class="ident">T7</span>, <span class="ident">T8</span>, <span class="ident">T9</span>)
-<span class="kw">where</span>
-    <span class="ident">T1</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T2</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T3</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T4</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T5</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T6</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T7</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T8</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T9</span>: <span class="ident">FromValue</span>,
+<span class="kw">impl</span>&lt;T1, T2, T3, T4, T5, T6, T7, T8, T9&gt; FromRow <span class="kw">for </span>(T1, T2, T3, T4, T5, T6, T7, T8, T9)
+<span class="kw">where
+    </span>T1: FromValue,
+    T2: FromValue,
+    T3: FromValue,
+    T4: FromValue,
+    T5: FromValue,
+    T6: FromValue,
+    T7: FromValue,
+    T8: FromValue,
+    T9: FromValue,
 {
-    <span class="kw">fn</span> <span class="ident">from_row_opt</span>(<span class="kw-2">mut</span> <span class="ident">row</span>: <span class="ident">Row</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>, <span class="ident">T7</span>, <span class="ident">T8</span>, <span class="ident">T9</span>), <span class="ident">FromRowError</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">row</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">9</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">FromRowError</span>(<span class="ident">row</span>));
+    <span class="kw">fn </span>from_row_opt(<span class="kw-2">mut </span>row: Row) -&gt; <span class="prelude-ty">Result</span>&lt;(T1, T2, T3, T4, T5, T6, T7, T8, T9), FromRowError&gt; {
+        <span class="kw">if </span>row.len() != <span class="number">9 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(FromRowError(row));
         }
-        <span class="kw">let</span> <span class="ident">ir1</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">0</span>, <span class="ident">T1</span>);
-        <span class="kw">let</span> <span class="ident">ir2</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">1</span>, <span class="ident">T2</span>, [<span class="number">0</span>, <span class="ident">ir1</span>]);
-        <span class="kw">let</span> <span class="ident">ir3</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">2</span>, <span class="ident">T3</span>, [<span class="number">0</span>, <span class="ident">ir1</span>], [<span class="number">1</span>, <span class="ident">ir2</span>]);
-        <span class="kw">let</span> <span class="ident">ir4</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">3</span>, <span class="ident">T4</span>, [<span class="number">0</span>, <span class="ident">ir1</span>], [<span class="number">1</span>, <span class="ident">ir2</span>], [<span class="number">2</span>, <span class="ident">ir3</span>]);
-        <span class="kw">let</span> <span class="ident">ir5</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">4</span>, <span class="ident">T5</span>, [<span class="number">0</span>, <span class="ident">ir1</span>], [<span class="number">1</span>, <span class="ident">ir2</span>], [<span class="number">2</span>, <span class="ident">ir3</span>], [<span class="number">3</span>, <span class="ident">ir4</span>]);
-        <span class="kw">let</span> <span class="ident">ir6</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">5</span>, <span class="ident">T6</span>, [<span class="number">0</span>, <span class="ident">ir1</span>], [<span class="number">1</span>, <span class="ident">ir2</span>], [<span class="number">2</span>, <span class="ident">ir3</span>], [<span class="number">3</span>, <span class="ident">ir4</span>], [<span class="number">4</span>, <span class="ident">ir5</span>]);
-        <span class="kw">let</span> <span class="ident">ir7</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(
-            <span class="ident">row</span>,
+        <span class="kw">let </span>ir1 = <span class="macro">take_or_place!</span>(row, <span class="number">0</span>, T1);
+        <span class="kw">let </span>ir2 = <span class="macro">take_or_place!</span>(row, <span class="number">1</span>, T2, [<span class="number">0</span>, ir1]);
+        <span class="kw">let </span>ir3 = <span class="macro">take_or_place!</span>(row, <span class="number">2</span>, T3, [<span class="number">0</span>, ir1], [<span class="number">1</span>, ir2]);
+        <span class="kw">let </span>ir4 = <span class="macro">take_or_place!</span>(row, <span class="number">3</span>, T4, [<span class="number">0</span>, ir1], [<span class="number">1</span>, ir2], [<span class="number">2</span>, ir3]);
+        <span class="kw">let </span>ir5 = <span class="macro">take_or_place!</span>(row, <span class="number">4</span>, T5, [<span class="number">0</span>, ir1], [<span class="number">1</span>, ir2], [<span class="number">2</span>, ir3], [<span class="number">3</span>, ir4]);
+        <span class="kw">let </span>ir6 = <span class="macro">take_or_place!</span>(row, <span class="number">5</span>, T6, [<span class="number">0</span>, ir1], [<span class="number">1</span>, ir2], [<span class="number">2</span>, ir3], [<span class="number">3</span>, ir4], [<span class="number">4</span>, ir5]);
+        <span class="kw">let </span>ir7 = <span class="macro">take_or_place!</span>(
+            row,
             <span class="number">6</span>,
-            <span class="ident">T7</span>,
-            [<span class="number">0</span>, <span class="ident">ir1</span>],
-            [<span class="number">1</span>, <span class="ident">ir2</span>],
-            [<span class="number">2</span>, <span class="ident">ir3</span>],
-            [<span class="number">3</span>, <span class="ident">ir4</span>],
-            [<span class="number">4</span>, <span class="ident">ir5</span>],
-            [<span class="number">5</span>, <span class="ident">ir6</span>]
+            T7,
+            [<span class="number">0</span>, ir1],
+            [<span class="number">1</span>, ir2],
+            [<span class="number">2</span>, ir3],
+            [<span class="number">3</span>, ir4],
+            [<span class="number">4</span>, ir5],
+            [<span class="number">5</span>, ir6]
         );
-        <span class="kw">let</span> <span class="ident">ir8</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(
-            <span class="ident">row</span>,
+        <span class="kw">let </span>ir8 = <span class="macro">take_or_place!</span>(
+            row,
             <span class="number">7</span>,
-            <span class="ident">T8</span>,
-            [<span class="number">0</span>, <span class="ident">ir1</span>],
-            [<span class="number">1</span>, <span class="ident">ir2</span>],
-            [<span class="number">2</span>, <span class="ident">ir3</span>],
-            [<span class="number">3</span>, <span class="ident">ir4</span>],
-            [<span class="number">4</span>, <span class="ident">ir5</span>],
-            [<span class="number">5</span>, <span class="ident">ir6</span>],
-            [<span class="number">6</span>, <span class="ident">ir7</span>]
+            T8,
+            [<span class="number">0</span>, ir1],
+            [<span class="number">1</span>, ir2],
+            [<span class="number">2</span>, ir3],
+            [<span class="number">3</span>, ir4],
+            [<span class="number">4</span>, ir5],
+            [<span class="number">5</span>, ir6],
+            [<span class="number">6</span>, ir7]
         );
-        <span class="kw">let</span> <span class="ident">ir9</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(
-            <span class="ident">row</span>,
+        <span class="kw">let </span>ir9 = <span class="macro">take_or_place!</span>(
+            row,
             <span class="number">8</span>,
-            <span class="ident">T9</span>,
-            [<span class="number">0</span>, <span class="ident">ir1</span>],
-            [<span class="number">1</span>, <span class="ident">ir2</span>],
-            [<span class="number">2</span>, <span class="ident">ir3</span>],
-            [<span class="number">3</span>, <span class="ident">ir4</span>],
-            [<span class="number">4</span>, <span class="ident">ir5</span>],
-            [<span class="number">5</span>, <span class="ident">ir6</span>],
-            [<span class="number">6</span>, <span class="ident">ir7</span>],
-            [<span class="number">7</span>, <span class="ident">ir8</span>]
+            T9,
+            [<span class="number">0</span>, ir1],
+            [<span class="number">1</span>, ir2],
+            [<span class="number">2</span>, ir3],
+            [<span class="number">3</span>, ir4],
+            [<span class="number">4</span>, ir5],
+            [<span class="number">5</span>, ir6],
+            [<span class="number">6</span>, ir7],
+            [<span class="number">7</span>, ir8]
         );
         <span class="prelude-val">Ok</span>((
-            <span class="ident">ir1</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir2</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir3</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir4</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir5</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir6</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir7</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir8</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir9</span>.<span class="ident">commit</span>(),
+            ir1.commit(),
+            ir2.commit(),
+            ir3.commit(),
+            ir4.commit(),
+            ir5.commit(),
+            ir6.commit(),
+            ir7.commit(),
+            ir8.commit(),
+            ir9.commit(),
         ))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>, <span class="ident">T7</span>, <span class="ident">T8</span>, <span class="ident">T9</span>, <span class="ident">T10</span><span class="op">&gt;</span> <span class="ident">FromRow</span> <span class="kw">for</span> (<span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>, <span class="ident">T7</span>, <span class="ident">T8</span>, <span class="ident">T9</span>, <span class="ident">T10</span>)
-<span class="kw">where</span>
-    <span class="ident">T1</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T2</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T3</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T4</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T5</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T6</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T7</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T8</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T9</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T10</span>: <span class="ident">FromValue</span>,
+<span class="kw">impl</span>&lt;T1, T2, T3, T4, T5, T6, T7, T8, T9, T10&gt; FromRow <span class="kw">for </span>(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10)
+<span class="kw">where
+    </span>T1: FromValue,
+    T2: FromValue,
+    T3: FromValue,
+    T4: FromValue,
+    T5: FromValue,
+    T6: FromValue,
+    T7: FromValue,
+    T8: FromValue,
+    T9: FromValue,
+    T10: FromValue,
 {
-    <span class="kw">fn</span> <span class="ident">from_row_opt</span>(
-        <span class="kw-2">mut</span> <span class="ident">row</span>: <span class="ident">Row</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>, <span class="ident">T7</span>, <span class="ident">T8</span>, <span class="ident">T9</span>, <span class="ident">T10</span>), <span class="ident">FromRowError</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">row</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">10</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">FromRowError</span>(<span class="ident">row</span>));
+    <span class="kw">fn </span>from_row_opt(
+        <span class="kw-2">mut </span>row: Row,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10), FromRowError&gt; {
+        <span class="kw">if </span>row.len() != <span class="number">10 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(FromRowError(row));
         }
-        <span class="kw">let</span> <span class="ident">ir1</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">0</span>, <span class="ident">T1</span>);
-        <span class="kw">let</span> <span class="ident">ir2</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">1</span>, <span class="ident">T2</span>, [<span class="number">0</span>, <span class="ident">ir1</span>]);
-        <span class="kw">let</span> <span class="ident">ir3</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">2</span>, <span class="ident">T3</span>, [<span class="number">0</span>, <span class="ident">ir1</span>], [<span class="number">1</span>, <span class="ident">ir2</span>]);
-        <span class="kw">let</span> <span class="ident">ir4</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">3</span>, <span class="ident">T4</span>, [<span class="number">0</span>, <span class="ident">ir1</span>], [<span class="number">1</span>, <span class="ident">ir2</span>], [<span class="number">2</span>, <span class="ident">ir3</span>]);
-        <span class="kw">let</span> <span class="ident">ir5</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">4</span>, <span class="ident">T5</span>, [<span class="number">0</span>, <span class="ident">ir1</span>], [<span class="number">1</span>, <span class="ident">ir2</span>], [<span class="number">2</span>, <span class="ident">ir3</span>], [<span class="number">3</span>, <span class="ident">ir4</span>]);
-        <span class="kw">let</span> <span class="ident">ir6</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">5</span>, <span class="ident">T6</span>, [<span class="number">0</span>, <span class="ident">ir1</span>], [<span class="number">1</span>, <span class="ident">ir2</span>], [<span class="number">2</span>, <span class="ident">ir3</span>], [<span class="number">3</span>, <span class="ident">ir4</span>], [<span class="number">4</span>, <span class="ident">ir5</span>]);
-        <span class="kw">let</span> <span class="ident">ir7</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(
-            <span class="ident">row</span>,
+        <span class="kw">let </span>ir1 = <span class="macro">take_or_place!</span>(row, <span class="number">0</span>, T1);
+        <span class="kw">let </span>ir2 = <span class="macro">take_or_place!</span>(row, <span class="number">1</span>, T2, [<span class="number">0</span>, ir1]);
+        <span class="kw">let </span>ir3 = <span class="macro">take_or_place!</span>(row, <span class="number">2</span>, T3, [<span class="number">0</span>, ir1], [<span class="number">1</span>, ir2]);
+        <span class="kw">let </span>ir4 = <span class="macro">take_or_place!</span>(row, <span class="number">3</span>, T4, [<span class="number">0</span>, ir1], [<span class="number">1</span>, ir2], [<span class="number">2</span>, ir3]);
+        <span class="kw">let </span>ir5 = <span class="macro">take_or_place!</span>(row, <span class="number">4</span>, T5, [<span class="number">0</span>, ir1], [<span class="number">1</span>, ir2], [<span class="number">2</span>, ir3], [<span class="number">3</span>, ir4]);
+        <span class="kw">let </span>ir6 = <span class="macro">take_or_place!</span>(row, <span class="number">5</span>, T6, [<span class="number">0</span>, ir1], [<span class="number">1</span>, ir2], [<span class="number">2</span>, ir3], [<span class="number">3</span>, ir4], [<span class="number">4</span>, ir5]);
+        <span class="kw">let </span>ir7 = <span class="macro">take_or_place!</span>(
+            row,
             <span class="number">6</span>,
-            <span class="ident">T7</span>,
-            [<span class="number">0</span>, <span class="ident">ir1</span>],
-            [<span class="number">1</span>, <span class="ident">ir2</span>],
-            [<span class="number">2</span>, <span class="ident">ir3</span>],
-            [<span class="number">3</span>, <span class="ident">ir4</span>],
-            [<span class="number">4</span>, <span class="ident">ir5</span>],
-            [<span class="number">5</span>, <span class="ident">ir6</span>]
+            T7,
+            [<span class="number">0</span>, ir1],
+            [<span class="number">1</span>, ir2],
+            [<span class="number">2</span>, ir3],
+            [<span class="number">3</span>, ir4],
+            [<span class="number">4</span>, ir5],
+            [<span class="number">5</span>, ir6]
         );
-        <span class="kw">let</span> <span class="ident">ir8</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(
-            <span class="ident">row</span>,
+        <span class="kw">let </span>ir8 = <span class="macro">take_or_place!</span>(
+            row,
             <span class="number">7</span>,
-            <span class="ident">T8</span>,
-            [<span class="number">0</span>, <span class="ident">ir1</span>],
-            [<span class="number">1</span>, <span class="ident">ir2</span>],
-            [<span class="number">2</span>, <span class="ident">ir3</span>],
-            [<span class="number">3</span>, <span class="ident">ir4</span>],
-            [<span class="number">4</span>, <span class="ident">ir5</span>],
-            [<span class="number">5</span>, <span class="ident">ir6</span>],
-            [<span class="number">6</span>, <span class="ident">ir7</span>]
+            T8,
+            [<span class="number">0</span>, ir1],
+            [<span class="number">1</span>, ir2],
+            [<span class="number">2</span>, ir3],
+            [<span class="number">3</span>, ir4],
+            [<span class="number">4</span>, ir5],
+            [<span class="number">5</span>, ir6],
+            [<span class="number">6</span>, ir7]
         );
-        <span class="kw">let</span> <span class="ident">ir9</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(
-            <span class="ident">row</span>,
+        <span class="kw">let </span>ir9 = <span class="macro">take_or_place!</span>(
+            row,
             <span class="number">8</span>,
-            <span class="ident">T9</span>,
-            [<span class="number">0</span>, <span class="ident">ir1</span>],
-            [<span class="number">1</span>, <span class="ident">ir2</span>],
-            [<span class="number">2</span>, <span class="ident">ir3</span>],
-            [<span class="number">3</span>, <span class="ident">ir4</span>],
-            [<span class="number">4</span>, <span class="ident">ir5</span>],
-            [<span class="number">5</span>, <span class="ident">ir6</span>],
-            [<span class="number">6</span>, <span class="ident">ir7</span>],
-            [<span class="number">7</span>, <span class="ident">ir8</span>]
+            T9,
+            [<span class="number">0</span>, ir1],
+            [<span class="number">1</span>, ir2],
+            [<span class="number">2</span>, ir3],
+            [<span class="number">3</span>, ir4],
+            [<span class="number">4</span>, ir5],
+            [<span class="number">5</span>, ir6],
+            [<span class="number">6</span>, ir7],
+            [<span class="number">7</span>, ir8]
         );
-        <span class="kw">let</span> <span class="ident">ir10</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(
-            <span class="ident">row</span>,
+        <span class="kw">let </span>ir10 = <span class="macro">take_or_place!</span>(
+            row,
             <span class="number">9</span>,
-            <span class="ident">T10</span>,
-            [<span class="number">0</span>, <span class="ident">ir1</span>],
-            [<span class="number">1</span>, <span class="ident">ir2</span>],
-            [<span class="number">2</span>, <span class="ident">ir3</span>],
-            [<span class="number">3</span>, <span class="ident">ir4</span>],
-            [<span class="number">4</span>, <span class="ident">ir5</span>],
-            [<span class="number">5</span>, <span class="ident">ir6</span>],
-            [<span class="number">6</span>, <span class="ident">ir7</span>],
-            [<span class="number">7</span>, <span class="ident">ir8</span>],
-            [<span class="number">8</span>, <span class="ident">ir9</span>]
+            T10,
+            [<span class="number">0</span>, ir1],
+            [<span class="number">1</span>, ir2],
+            [<span class="number">2</span>, ir3],
+            [<span class="number">3</span>, ir4],
+            [<span class="number">4</span>, ir5],
+            [<span class="number">5</span>, ir6],
+            [<span class="number">6</span>, ir7],
+            [<span class="number">7</span>, ir8],
+            [<span class="number">8</span>, ir9]
         );
         <span class="prelude-val">Ok</span>((
-            <span class="ident">ir1</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir2</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir3</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir4</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir5</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir6</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir7</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir8</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir9</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir10</span>.<span class="ident">commit</span>(),
+            ir1.commit(),
+            ir2.commit(),
+            ir3.commit(),
+            ir4.commit(),
+            ir5.commit(),
+            ir6.commit(),
+            ir7.commit(),
+            ir8.commit(),
+            ir9.commit(),
+            ir10.commit(),
         ))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>, <span class="ident">T7</span>, <span class="ident">T8</span>, <span class="ident">T9</span>, <span class="ident">T10</span>, <span class="ident">T11</span><span class="op">&gt;</span> <span class="ident">FromRow</span>
-    <span class="kw">for</span> (<span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>, <span class="ident">T7</span>, <span class="ident">T8</span>, <span class="ident">T9</span>, <span class="ident">T10</span>, <span class="ident">T11</span>)
-<span class="kw">where</span>
-    <span class="ident">T1</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T2</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T3</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T4</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T5</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T6</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T7</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T8</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T9</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T10</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T11</span>: <span class="ident">FromValue</span>,
+<span class="kw">impl</span>&lt;T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11&gt; FromRow
+    <span class="kw">for </span>(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11)
+<span class="kw">where
+    </span>T1: FromValue,
+    T2: FromValue,
+    T3: FromValue,
+    T4: FromValue,
+    T5: FromValue,
+    T6: FromValue,
+    T7: FromValue,
+    T8: FromValue,
+    T9: FromValue,
+    T10: FromValue,
+    T11: FromValue,
 {
-    <span class="kw">fn</span> <span class="ident">from_row_opt</span>(
-        <span class="kw-2">mut</span> <span class="ident">row</span>: <span class="ident">Row</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>, <span class="ident">T7</span>, <span class="ident">T8</span>, <span class="ident">T9</span>, <span class="ident">T10</span>, <span class="ident">T11</span>), <span class="ident">FromRowError</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">row</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">11</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">FromRowError</span>(<span class="ident">row</span>));
+    <span class="kw">fn </span>from_row_opt(
+        <span class="kw-2">mut </span>row: Row,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11), FromRowError&gt; {
+        <span class="kw">if </span>row.len() != <span class="number">11 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(FromRowError(row));
         }
-        <span class="kw">let</span> <span class="ident">ir1</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">0</span>, <span class="ident">T1</span>);
-        <span class="kw">let</span> <span class="ident">ir2</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">1</span>, <span class="ident">T2</span>, [<span class="number">0</span>, <span class="ident">ir1</span>]);
-        <span class="kw">let</span> <span class="ident">ir3</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">2</span>, <span class="ident">T3</span>, [<span class="number">0</span>, <span class="ident">ir1</span>], [<span class="number">1</span>, <span class="ident">ir2</span>]);
-        <span class="kw">let</span> <span class="ident">ir4</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">3</span>, <span class="ident">T4</span>, [<span class="number">0</span>, <span class="ident">ir1</span>], [<span class="number">1</span>, <span class="ident">ir2</span>], [<span class="number">2</span>, <span class="ident">ir3</span>]);
-        <span class="kw">let</span> <span class="ident">ir5</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">4</span>, <span class="ident">T5</span>, [<span class="number">0</span>, <span class="ident">ir1</span>], [<span class="number">1</span>, <span class="ident">ir2</span>], [<span class="number">2</span>, <span class="ident">ir3</span>], [<span class="number">3</span>, <span class="ident">ir4</span>]);
-        <span class="kw">let</span> <span class="ident">ir6</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">5</span>, <span class="ident">T6</span>, [<span class="number">0</span>, <span class="ident">ir1</span>], [<span class="number">1</span>, <span class="ident">ir2</span>], [<span class="number">2</span>, <span class="ident">ir3</span>], [<span class="number">3</span>, <span class="ident">ir4</span>], [<span class="number">4</span>, <span class="ident">ir5</span>]);
-        <span class="kw">let</span> <span class="ident">ir7</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(
-            <span class="ident">row</span>,
+        <span class="kw">let </span>ir1 = <span class="macro">take_or_place!</span>(row, <span class="number">0</span>, T1);
+        <span class="kw">let </span>ir2 = <span class="macro">take_or_place!</span>(row, <span class="number">1</span>, T2, [<span class="number">0</span>, ir1]);
+        <span class="kw">let </span>ir3 = <span class="macro">take_or_place!</span>(row, <span class="number">2</span>, T3, [<span class="number">0</span>, ir1], [<span class="number">1</span>, ir2]);
+        <span class="kw">let </span>ir4 = <span class="macro">take_or_place!</span>(row, <span class="number">3</span>, T4, [<span class="number">0</span>, ir1], [<span class="number">1</span>, ir2], [<span class="number">2</span>, ir3]);
+        <span class="kw">let </span>ir5 = <span class="macro">take_or_place!</span>(row, <span class="number">4</span>, T5, [<span class="number">0</span>, ir1], [<span class="number">1</span>, ir2], [<span class="number">2</span>, ir3], [<span class="number">3</span>, ir4]);
+        <span class="kw">let </span>ir6 = <span class="macro">take_or_place!</span>(row, <span class="number">5</span>, T6, [<span class="number">0</span>, ir1], [<span class="number">1</span>, ir2], [<span class="number">2</span>, ir3], [<span class="number">3</span>, ir4], [<span class="number">4</span>, ir5]);
+        <span class="kw">let </span>ir7 = <span class="macro">take_or_place!</span>(
+            row,
             <span class="number">6</span>,
-            <span class="ident">T7</span>,
-            [<span class="number">0</span>, <span class="ident">ir1</span>],
-            [<span class="number">1</span>, <span class="ident">ir2</span>],
-            [<span class="number">2</span>, <span class="ident">ir3</span>],
-            [<span class="number">3</span>, <span class="ident">ir4</span>],
-            [<span class="number">4</span>, <span class="ident">ir5</span>],
-            [<span class="number">5</span>, <span class="ident">ir6</span>]
+            T7,
+            [<span class="number">0</span>, ir1],
+            [<span class="number">1</span>, ir2],
+            [<span class="number">2</span>, ir3],
+            [<span class="number">3</span>, ir4],
+            [<span class="number">4</span>, ir5],
+            [<span class="number">5</span>, ir6]
         );
-        <span class="kw">let</span> <span class="ident">ir8</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(
-            <span class="ident">row</span>,
+        <span class="kw">let </span>ir8 = <span class="macro">take_or_place!</span>(
+            row,
             <span class="number">7</span>,
-            <span class="ident">T8</span>,
-            [<span class="number">0</span>, <span class="ident">ir1</span>],
-            [<span class="number">1</span>, <span class="ident">ir2</span>],
-            [<span class="number">2</span>, <span class="ident">ir3</span>],
-            [<span class="number">3</span>, <span class="ident">ir4</span>],
-            [<span class="number">4</span>, <span class="ident">ir5</span>],
-            [<span class="number">5</span>, <span class="ident">ir6</span>],
-            [<span class="number">6</span>, <span class="ident">ir7</span>]
+            T8,
+            [<span class="number">0</span>, ir1],
+            [<span class="number">1</span>, ir2],
+            [<span class="number">2</span>, ir3],
+            [<span class="number">3</span>, ir4],
+            [<span class="number">4</span>, ir5],
+            [<span class="number">5</span>, ir6],
+            [<span class="number">6</span>, ir7]
         );
-        <span class="kw">let</span> <span class="ident">ir9</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(
-            <span class="ident">row</span>,
+        <span class="kw">let </span>ir9 = <span class="macro">take_or_place!</span>(
+            row,
             <span class="number">8</span>,
-            <span class="ident">T9</span>,
-            [<span class="number">0</span>, <span class="ident">ir1</span>],
-            [<span class="number">1</span>, <span class="ident">ir2</span>],
-            [<span class="number">2</span>, <span class="ident">ir3</span>],
-            [<span class="number">3</span>, <span class="ident">ir4</span>],
-            [<span class="number">4</span>, <span class="ident">ir5</span>],
-            [<span class="number">5</span>, <span class="ident">ir6</span>],
-            [<span class="number">6</span>, <span class="ident">ir7</span>],
-            [<span class="number">7</span>, <span class="ident">ir8</span>]
+            T9,
+            [<span class="number">0</span>, ir1],
+            [<span class="number">1</span>, ir2],
+            [<span class="number">2</span>, ir3],
+            [<span class="number">3</span>, ir4],
+            [<span class="number">4</span>, ir5],
+            [<span class="number">5</span>, ir6],
+            [<span class="number">6</span>, ir7],
+            [<span class="number">7</span>, ir8]
         );
-        <span class="kw">let</span> <span class="ident">ir10</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(
-            <span class="ident">row</span>,
+        <span class="kw">let </span>ir10 = <span class="macro">take_or_place!</span>(
+            row,
             <span class="number">9</span>,
-            <span class="ident">T10</span>,
-            [<span class="number">0</span>, <span class="ident">ir1</span>],
-            [<span class="number">1</span>, <span class="ident">ir2</span>],
-            [<span class="number">2</span>, <span class="ident">ir3</span>],
-            [<span class="number">3</span>, <span class="ident">ir4</span>],
-            [<span class="number">4</span>, <span class="ident">ir5</span>],
-            [<span class="number">5</span>, <span class="ident">ir6</span>],
-            [<span class="number">6</span>, <span class="ident">ir7</span>],
-            [<span class="number">7</span>, <span class="ident">ir8</span>],
-            [<span class="number">8</span>, <span class="ident">ir9</span>]
+            T10,
+            [<span class="number">0</span>, ir1],
+            [<span class="number">1</span>, ir2],
+            [<span class="number">2</span>, ir3],
+            [<span class="number">3</span>, ir4],
+            [<span class="number">4</span>, ir5],
+            [<span class="number">5</span>, ir6],
+            [<span class="number">6</span>, ir7],
+            [<span class="number">7</span>, ir8],
+            [<span class="number">8</span>, ir9]
         );
-        <span class="kw">let</span> <span class="ident">ir11</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(
-            <span class="ident">row</span>,
+        <span class="kw">let </span>ir11 = <span class="macro">take_or_place!</span>(
+            row,
             <span class="number">10</span>,
-            <span class="ident">T11</span>,
-            [<span class="number">0</span>, <span class="ident">ir1</span>],
-            [<span class="number">1</span>, <span class="ident">ir2</span>],
-            [<span class="number">2</span>, <span class="ident">ir3</span>],
-            [<span class="number">3</span>, <span class="ident">ir4</span>],
-            [<span class="number">4</span>, <span class="ident">ir5</span>],
-            [<span class="number">5</span>, <span class="ident">ir6</span>],
-            [<span class="number">6</span>, <span class="ident">ir7</span>],
-            [<span class="number">7</span>, <span class="ident">ir8</span>],
-            [<span class="number">8</span>, <span class="ident">ir9</span>],
-            [<span class="number">9</span>, <span class="ident">ir10</span>]
+            T11,
+            [<span class="number">0</span>, ir1],
+            [<span class="number">1</span>, ir2],
+            [<span class="number">2</span>, ir3],
+            [<span class="number">3</span>, ir4],
+            [<span class="number">4</span>, ir5],
+            [<span class="number">5</span>, ir6],
+            [<span class="number">6</span>, ir7],
+            [<span class="number">7</span>, ir8],
+            [<span class="number">8</span>, ir9],
+            [<span class="number">9</span>, ir10]
         );
         <span class="prelude-val">Ok</span>((
-            <span class="ident">ir1</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir2</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir3</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir4</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir5</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir6</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir7</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir8</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir9</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir10</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir11</span>.<span class="ident">commit</span>(),
+            ir1.commit(),
+            ir2.commit(),
+            ir3.commit(),
+            ir4.commit(),
+            ir5.commit(),
+            ir6.commit(),
+            ir7.commit(),
+            ir8.commit(),
+            ir9.commit(),
+            ir10.commit(),
+            ir11.commit(),
         ))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>, <span class="ident">T7</span>, <span class="ident">T8</span>, <span class="ident">T9</span>, <span class="ident">T10</span>, <span class="ident">T11</span>, <span class="ident">T12</span><span class="op">&gt;</span> <span class="ident">FromRow</span>
-    <span class="kw">for</span> (<span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>, <span class="ident">T7</span>, <span class="ident">T8</span>, <span class="ident">T9</span>, <span class="ident">T10</span>, <span class="ident">T11</span>, <span class="ident">T12</span>)
-<span class="kw">where</span>
-    <span class="ident">T1</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T2</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T3</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T4</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T5</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T6</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T7</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T8</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T9</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T10</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T11</span>: <span class="ident">FromValue</span>,
-    <span class="ident">T12</span>: <span class="ident">FromValue</span>,
+<span class="kw">impl</span>&lt;T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12&gt; FromRow
+    <span class="kw">for </span>(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12)
+<span class="kw">where
+    </span>T1: FromValue,
+    T2: FromValue,
+    T3: FromValue,
+    T4: FromValue,
+    T5: FromValue,
+    T6: FromValue,
+    T7: FromValue,
+    T8: FromValue,
+    T9: FromValue,
+    T10: FromValue,
+    T11: FromValue,
+    T12: FromValue,
 {
-    <span class="kw">fn</span> <span class="ident">from_row_opt</span>(
-        <span class="kw-2">mut</span> <span class="ident">row</span>: <span class="ident">Row</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>, <span class="ident">T7</span>, <span class="ident">T8</span>, <span class="ident">T9</span>, <span class="ident">T10</span>, <span class="ident">T11</span>, <span class="ident">T12</span>), <span class="ident">FromRowError</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">row</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">12</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">FromRowError</span>(<span class="ident">row</span>));
+    <span class="kw">fn </span>from_row_opt(
+        <span class="kw-2">mut </span>row: Row,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12), FromRowError&gt; {
+        <span class="kw">if </span>row.len() != <span class="number">12 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(FromRowError(row));
         }
-        <span class="kw">let</span> <span class="ident">ir1</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">0</span>, <span class="ident">T1</span>);
-        <span class="kw">let</span> <span class="ident">ir2</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">1</span>, <span class="ident">T2</span>, [<span class="number">0</span>, <span class="ident">ir1</span>]);
-        <span class="kw">let</span> <span class="ident">ir3</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">2</span>, <span class="ident">T3</span>, [<span class="number">0</span>, <span class="ident">ir1</span>], [<span class="number">1</span>, <span class="ident">ir2</span>]);
-        <span class="kw">let</span> <span class="ident">ir4</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">3</span>, <span class="ident">T4</span>, [<span class="number">0</span>, <span class="ident">ir1</span>], [<span class="number">1</span>, <span class="ident">ir2</span>], [<span class="number">2</span>, <span class="ident">ir3</span>]);
-        <span class="kw">let</span> <span class="ident">ir5</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">4</span>, <span class="ident">T5</span>, [<span class="number">0</span>, <span class="ident">ir1</span>], [<span class="number">1</span>, <span class="ident">ir2</span>], [<span class="number">2</span>, <span class="ident">ir3</span>], [<span class="number">3</span>, <span class="ident">ir4</span>]);
-        <span class="kw">let</span> <span class="ident">ir6</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(<span class="ident">row</span>, <span class="number">5</span>, <span class="ident">T6</span>, [<span class="number">0</span>, <span class="ident">ir1</span>], [<span class="number">1</span>, <span class="ident">ir2</span>], [<span class="number">2</span>, <span class="ident">ir3</span>], [<span class="number">3</span>, <span class="ident">ir4</span>], [<span class="number">4</span>, <span class="ident">ir5</span>]);
-        <span class="kw">let</span> <span class="ident">ir7</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(
-            <span class="ident">row</span>,
+        <span class="kw">let </span>ir1 = <span class="macro">take_or_place!</span>(row, <span class="number">0</span>, T1);
+        <span class="kw">let </span>ir2 = <span class="macro">take_or_place!</span>(row, <span class="number">1</span>, T2, [<span class="number">0</span>, ir1]);
+        <span class="kw">let </span>ir3 = <span class="macro">take_or_place!</span>(row, <span class="number">2</span>, T3, [<span class="number">0</span>, ir1], [<span class="number">1</span>, ir2]);
+        <span class="kw">let </span>ir4 = <span class="macro">take_or_place!</span>(row, <span class="number">3</span>, T4, [<span class="number">0</span>, ir1], [<span class="number">1</span>, ir2], [<span class="number">2</span>, ir3]);
+        <span class="kw">let </span>ir5 = <span class="macro">take_or_place!</span>(row, <span class="number">4</span>, T5, [<span class="number">0</span>, ir1], [<span class="number">1</span>, ir2], [<span class="number">2</span>, ir3], [<span class="number">3</span>, ir4]);
+        <span class="kw">let </span>ir6 = <span class="macro">take_or_place!</span>(row, <span class="number">5</span>, T6, [<span class="number">0</span>, ir1], [<span class="number">1</span>, ir2], [<span class="number">2</span>, ir3], [<span class="number">3</span>, ir4], [<span class="number">4</span>, ir5]);
+        <span class="kw">let </span>ir7 = <span class="macro">take_or_place!</span>(
+            row,
             <span class="number">6</span>,
-            <span class="ident">T7</span>,
-            [<span class="number">0</span>, <span class="ident">ir1</span>],
-            [<span class="number">1</span>, <span class="ident">ir2</span>],
-            [<span class="number">2</span>, <span class="ident">ir3</span>],
-            [<span class="number">3</span>, <span class="ident">ir4</span>],
-            [<span class="number">4</span>, <span class="ident">ir5</span>],
-            [<span class="number">5</span>, <span class="ident">ir6</span>]
+            T7,
+            [<span class="number">0</span>, ir1],
+            [<span class="number">1</span>, ir2],
+            [<span class="number">2</span>, ir3],
+            [<span class="number">3</span>, ir4],
+            [<span class="number">4</span>, ir5],
+            [<span class="number">5</span>, ir6]
         );
-        <span class="kw">let</span> <span class="ident">ir8</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(
-            <span class="ident">row</span>,
+        <span class="kw">let </span>ir8 = <span class="macro">take_or_place!</span>(
+            row,
             <span class="number">7</span>,
-            <span class="ident">T8</span>,
-            [<span class="number">0</span>, <span class="ident">ir1</span>],
-            [<span class="number">1</span>, <span class="ident">ir2</span>],
-            [<span class="number">2</span>, <span class="ident">ir3</span>],
-            [<span class="number">3</span>, <span class="ident">ir4</span>],
-            [<span class="number">4</span>, <span class="ident">ir5</span>],
-            [<span class="number">5</span>, <span class="ident">ir6</span>],
-            [<span class="number">6</span>, <span class="ident">ir7</span>]
+            T8,
+            [<span class="number">0</span>, ir1],
+            [<span class="number">1</span>, ir2],
+            [<span class="number">2</span>, ir3],
+            [<span class="number">3</span>, ir4],
+            [<span class="number">4</span>, ir5],
+            [<span class="number">5</span>, ir6],
+            [<span class="number">6</span>, ir7]
         );
-        <span class="kw">let</span> <span class="ident">ir9</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(
-            <span class="ident">row</span>,
+        <span class="kw">let </span>ir9 = <span class="macro">take_or_place!</span>(
+            row,
             <span class="number">8</span>,
-            <span class="ident">T9</span>,
-            [<span class="number">0</span>, <span class="ident">ir1</span>],
-            [<span class="number">1</span>, <span class="ident">ir2</span>],
-            [<span class="number">2</span>, <span class="ident">ir3</span>],
-            [<span class="number">3</span>, <span class="ident">ir4</span>],
-            [<span class="number">4</span>, <span class="ident">ir5</span>],
-            [<span class="number">5</span>, <span class="ident">ir6</span>],
-            [<span class="number">6</span>, <span class="ident">ir7</span>],
-            [<span class="number">7</span>, <span class="ident">ir8</span>]
+            T9,
+            [<span class="number">0</span>, ir1],
+            [<span class="number">1</span>, ir2],
+            [<span class="number">2</span>, ir3],
+            [<span class="number">3</span>, ir4],
+            [<span class="number">4</span>, ir5],
+            [<span class="number">5</span>, ir6],
+            [<span class="number">6</span>, ir7],
+            [<span class="number">7</span>, ir8]
         );
-        <span class="kw">let</span> <span class="ident">ir10</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(
-            <span class="ident">row</span>,
+        <span class="kw">let </span>ir10 = <span class="macro">take_or_place!</span>(
+            row,
             <span class="number">9</span>,
-            <span class="ident">T10</span>,
-            [<span class="number">0</span>, <span class="ident">ir1</span>],
-            [<span class="number">1</span>, <span class="ident">ir2</span>],
-            [<span class="number">2</span>, <span class="ident">ir3</span>],
-            [<span class="number">3</span>, <span class="ident">ir4</span>],
-            [<span class="number">4</span>, <span class="ident">ir5</span>],
-            [<span class="number">5</span>, <span class="ident">ir6</span>],
-            [<span class="number">6</span>, <span class="ident">ir7</span>],
-            [<span class="number">7</span>, <span class="ident">ir8</span>],
-            [<span class="number">8</span>, <span class="ident">ir9</span>]
+            T10,
+            [<span class="number">0</span>, ir1],
+            [<span class="number">1</span>, ir2],
+            [<span class="number">2</span>, ir3],
+            [<span class="number">3</span>, ir4],
+            [<span class="number">4</span>, ir5],
+            [<span class="number">5</span>, ir6],
+            [<span class="number">6</span>, ir7],
+            [<span class="number">7</span>, ir8],
+            [<span class="number">8</span>, ir9]
         );
-        <span class="kw">let</span> <span class="ident">ir11</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(
-            <span class="ident">row</span>,
+        <span class="kw">let </span>ir11 = <span class="macro">take_or_place!</span>(
+            row,
             <span class="number">10</span>,
-            <span class="ident">T11</span>,
-            [<span class="number">0</span>, <span class="ident">ir1</span>],
-            [<span class="number">1</span>, <span class="ident">ir2</span>],
-            [<span class="number">2</span>, <span class="ident">ir3</span>],
-            [<span class="number">3</span>, <span class="ident">ir4</span>],
-            [<span class="number">4</span>, <span class="ident">ir5</span>],
-            [<span class="number">5</span>, <span class="ident">ir6</span>],
-            [<span class="number">6</span>, <span class="ident">ir7</span>],
-            [<span class="number">7</span>, <span class="ident">ir8</span>],
-            [<span class="number">8</span>, <span class="ident">ir9</span>],
-            [<span class="number">9</span>, <span class="ident">ir10</span>]
+            T11,
+            [<span class="number">0</span>, ir1],
+            [<span class="number">1</span>, ir2],
+            [<span class="number">2</span>, ir3],
+            [<span class="number">3</span>, ir4],
+            [<span class="number">4</span>, ir5],
+            [<span class="number">5</span>, ir6],
+            [<span class="number">6</span>, ir7],
+            [<span class="number">7</span>, ir8],
+            [<span class="number">8</span>, ir9],
+            [<span class="number">9</span>, ir10]
         );
-        <span class="kw">let</span> <span class="ident">ir12</span> <span class="op">=</span> <span class="macro">take_or_place!</span>(
-            <span class="ident">row</span>,
+        <span class="kw">let </span>ir12 = <span class="macro">take_or_place!</span>(
+            row,
             <span class="number">11</span>,
-            <span class="ident">T12</span>,
-            [<span class="number">0</span>, <span class="ident">ir1</span>],
-            [<span class="number">1</span>, <span class="ident">ir2</span>],
-            [<span class="number">2</span>, <span class="ident">ir3</span>],
-            [<span class="number">3</span>, <span class="ident">ir4</span>],
-            [<span class="number">4</span>, <span class="ident">ir5</span>],
-            [<span class="number">5</span>, <span class="ident">ir6</span>],
-            [<span class="number">6</span>, <span class="ident">ir7</span>],
-            [<span class="number">7</span>, <span class="ident">ir8</span>],
-            [<span class="number">8</span>, <span class="ident">ir9</span>],
-            [<span class="number">9</span>, <span class="ident">ir10</span>],
-            [<span class="number">10</span>, <span class="ident">ir11</span>]
+            T12,
+            [<span class="number">0</span>, ir1],
+            [<span class="number">1</span>, ir2],
+            [<span class="number">2</span>, ir3],
+            [<span class="number">3</span>, ir4],
+            [<span class="number">4</span>, ir5],
+            [<span class="number">5</span>, ir6],
+            [<span class="number">6</span>, ir7],
+            [<span class="number">7</span>, ir8],
+            [<span class="number">8</span>, ir9],
+            [<span class="number">9</span>, ir10],
+            [<span class="number">10</span>, ir11]
         );
         <span class="prelude-val">Ok</span>((
-            <span class="ident">ir1</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir2</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir3</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir4</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir5</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir6</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir7</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir8</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir9</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir10</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir11</span>.<span class="ident">commit</span>(),
-            <span class="ident">ir12</span>.<span class="ident">commit</span>(),
+            ir1.commit(),
+            ir2.commit(),
+            ir3.commit(),
+            ir4.commit(),
+            ir5.commit(),
+            ir6.commit(),
+            ir7.commit(),
+            ir8.commit(),
+            ir9.commit(),
+            ir10.commit(),
+            ir11.commit(),
+            ir12.commit(),
         ))
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;nightly&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">bench</span>]</span>
-<span class="kw">fn</span> <span class="ident">bench_from_row</span>(<span class="ident">bencher</span>: <span class="kw-2">&amp;mut</span> <span class="ident">test::Bencher</span>) {
-    <span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;nightly&quot;</span>)]
+#[bench]
+</span><span class="kw">fn </span>bench_from_row(bencher: <span class="kw-2">&amp;mut </span>test::Bencher) {
+    <span class="kw">use </span>std::sync::Arc;
 
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">constants::ColumnType</span>, <span class="ident">io::WriteMysqlExt</span>, <span class="ident">packets::Column</span>, <span class="ident">value::Value</span>};
+    <span class="kw">use crate</span>::{constants::ColumnType, io::WriteMysqlExt, packets::Column, value::Value};
 
-    <span class="kw">fn</span> <span class="ident">col</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">ty</span>: <span class="ident">ColumnType</span>) -&gt; <span class="ident">Column</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">payload</span> <span class="op">=</span> <span class="string">b&quot;\x00def&quot;</span>.<span class="ident">to_vec</span>();
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">5</span> {
-            <span class="ident">payload</span>.<span class="ident">write_lenenc_str</span>(<span class="ident">name</span>.<span class="ident">as_bytes</span>()).<span class="ident">unwrap</span>();
+    <span class="kw">fn </span>col(name: <span class="kw-2">&amp;</span>str, ty: ColumnType) -&gt; Column {
+        <span class="kw">let </span><span class="kw-2">mut </span>payload = <span class="string">b&quot;\x00def&quot;</span>.to_vec();
+        <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">5 </span>{
+            payload.write_lenenc_str(name.as_bytes()).unwrap();
         }
-        <span class="ident">payload</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="string">b&quot;_\x2d\x00\xff\xff\xff\xff&quot;</span>[..]);
-        <span class="ident">payload</span>.<span class="ident">push</span>(<span class="ident">ty</span> <span class="kw">as</span> <span class="ident">u8</span>);
-        <span class="ident">payload</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="string">b&quot;\x00\x00\x00&quot;</span>[..]);
-        <span class="ident">Column::read</span>(<span class="kw-2">&amp;</span><span class="ident">payload</span>[..]).<span class="ident">unwrap</span>()
+        payload.extend_from_slice(<span class="kw-2">&amp;</span><span class="string">b&quot;_\x2d\x00\xff\xff\xff\xff&quot;</span>[..]);
+        payload.push(ty <span class="kw">as </span>u8);
+        payload.extend_from_slice(<span class="kw-2">&amp;</span><span class="string">b&quot;\x00\x00\x00&quot;</span>[..]);
+        Column::read(<span class="kw-2">&amp;</span>payload[..]).unwrap()
     }
 
-    <span class="kw">let</span> <span class="ident">row</span> <span class="op">=</span> <span class="ident">Row</span> {
-        <span class="ident">values</span>: <span class="macro">vec!</span>[
-            <span class="prelude-val">Some</span>(<span class="ident">Value::Bytes</span>(<span class="string">b&quot;12.3456789&quot;</span>.<span class="ident">to_vec</span>())),
-            <span class="prelude-val">Some</span>(<span class="ident">Value::Int</span>(<span class="number">0xF0</span>)),
-            <span class="prelude-val">Some</span>(<span class="ident">Value::Int</span>(<span class="number">0xF000</span>)),
-            <span class="prelude-val">Some</span>(<span class="ident">Value::Int</span>(<span class="number">0xF0000000</span>)),
+    <span class="kw">let </span>row = Row {
+        values: <span class="macro">vec!</span>[
+            <span class="prelude-val">Some</span>(Value::Bytes(<span class="string">b&quot;12.3456789&quot;</span>.to_vec())),
+            <span class="prelude-val">Some</span>(Value::Int(<span class="number">0xF0</span>)),
+            <span class="prelude-val">Some</span>(Value::Int(<span class="number">0xF000</span>)),
+            <span class="prelude-val">Some</span>(Value::Int(<span class="number">0xF0000000</span>)),
         ],
-        <span class="ident">columns</span>: <span class="ident">Arc::from</span>(
+        columns: Arc::from(
             <span class="macro">vec!</span>[
-                <span class="ident">col</span>(<span class="string">&quot;foo&quot;</span>, <span class="ident">ColumnType::MYSQL_TYPE_STRING</span>),
-                <span class="ident">col</span>(<span class="string">&quot;foo&quot;</span>, <span class="ident">ColumnType::MYSQL_TYPE_TINY</span>),
-                <span class="ident">col</span>(<span class="string">&quot;foo&quot;</span>, <span class="ident">ColumnType::MYSQL_TYPE_SHORT</span>),
-                <span class="ident">col</span>(<span class="string">&quot;foo&quot;</span>, <span class="ident">ColumnType::MYSQL_TYPE_LONG</span>),
+                col(<span class="string">&quot;foo&quot;</span>, ColumnType::MYSQL_TYPE_STRING),
+                col(<span class="string">&quot;foo&quot;</span>, ColumnType::MYSQL_TYPE_TINY),
+                col(<span class="string">&quot;foo&quot;</span>, ColumnType::MYSQL_TYPE_SHORT),
+                col(<span class="string">&quot;foo&quot;</span>, ColumnType::MYSQL_TYPE_LONG),
             ]
-            .<span class="ident">into_boxed_slice</span>(),
+            .into_boxed_slice(),
         ),
     };
 
-    <span class="ident">bencher</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">from_row</span>::<span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">u8</span>, <span class="ident">u16</span>, <span class="ident">u32</span>)<span class="op">&gt;</span>(<span class="ident">row</span>.<span class="ident">clone</span>()));
+    bencher.iter(|| from_row::&lt;(String, u8, u16, u32)&gt;(row.clone()));
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

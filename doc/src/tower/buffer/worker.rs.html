@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-0.4.13/src/buffer/worker.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>worker.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tower/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tower-0.4.13/src/buffer/worker.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>worker.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tower/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tower/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -254,261 +254,261 @@
 <span id="254">254</span>
 <span id="255">255</span>
 <span id="256">256</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">error</span>::{<span class="ident">Closed</span>, <span class="ident">ServiceError</span>},
-    <span class="ident">message::Message</span>,
+</pre><pre class="rust"><code><span class="kw">use super</span>::{
+    error::{Closed, ServiceError},
+    message::Message,
 };
-<span class="kw">use</span> <span class="ident">futures_core::ready</span>;
-<span class="kw">use</span> <span class="ident">std::sync</span>::{<span class="ident">Arc</span>, <span class="ident">Mutex</span>, <span class="ident">Weak</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">future::Future</span>,
-    <span class="ident">pin::Pin</span>,
-    <span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>},
+<span class="kw">use </span>futures_core::ready;
+<span class="kw">use </span>std::sync::{Arc, Mutex, Weak};
+<span class="kw">use </span>std::{
+    future::Future,
+    pin::Pin,
+    task::{Context, Poll},
 };
-<span class="kw">use</span> <span class="ident">tokio::sync</span>::{<span class="ident">mpsc</span>, <span class="ident">Semaphore</span>};
-<span class="kw">use</span> <span class="ident">tower_service::Service</span>;
+<span class="kw">use </span>tokio::sync::{mpsc, Semaphore};
+<span class="kw">use </span>tower_service::Service;
 
-<span class="macro">pin_project_lite::pin_project!</span> {
-    <span class="doccomment">/// Task that handles processing the buffer. This type should not be used</span>
-    <span class="doccomment">/// directly, instead `Buffer` requires an `Executor` that can accept this task.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The struct is `pub` in the private module and the type is *not* re-exported</span>
-    <span class="doccomment">/// as part of the public API. This is the &quot;sealed&quot; pattern to include &quot;private&quot;</span>
-    <span class="doccomment">/// types in public traits that are not meant for consumers of the library to</span>
-    <span class="doccomment">/// implement (only call).</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Worker</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Request</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>,
+<span class="macro">pin_project_lite::pin_project! </span>{
+    <span class="doccomment">/// Task that handles processing the buffer. This type should not be used
+    /// directly, instead `Buffer` requires an `Executor` that can accept this task.
+    ///
+    /// The struct is `pub` in the private module and the type is *not* re-exported
+    /// as part of the public API. This is the &quot;sealed&quot; pattern to include &quot;private&quot;
+    /// types in public traits that are not meant for consumers of the library to
+    /// implement (only call).
+    </span><span class="attribute">#[derive(Debug)]
+    </span><span class="kw">pub struct </span>Worker&lt;T, Request&gt;
+    <span class="kw">where
+        </span>T: Service&lt;Request&gt;,
     {
-        <span class="ident">current_message</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&lt;</span><span class="ident">Request</span>, <span class="ident">T::Future</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">rx</span>: <span class="ident">mpsc::UnboundedReceiver</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&lt;</span><span class="ident">Request</span>, <span class="ident">T::Future</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">service</span>: <span class="ident">T</span>,
-        <span class="ident">finish</span>: <span class="ident">bool</span>,
-        <span class="ident">failed</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ServiceError</span><span class="op">&gt;</span>,
-        <span class="ident">handle</span>: <span class="ident">Handle</span>,
-        <span class="ident">close</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Weak</span><span class="op">&lt;</span><span class="ident">Semaphore</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+        current_message: <span class="prelude-ty">Option</span>&lt;Message&lt;Request, T::Future&gt;&gt;,
+        rx: mpsc::UnboundedReceiver&lt;Message&lt;Request, T::Future&gt;&gt;,
+        service: T,
+        finish: bool,
+        failed: <span class="prelude-ty">Option</span>&lt;ServiceError&gt;,
+        handle: Handle,
+        close: <span class="prelude-ty">Option</span>&lt;Weak&lt;Semaphore&gt;&gt;,
     }
 
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>, <span class="ident">Request</span><span class="op">&gt;</span> <span class="ident">PinnedDrop</span> <span class="kw">for</span> <span class="ident">Worker</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Request</span><span class="op">&gt;</span>
+    <span class="kw">impl</span>&lt;T: Service&lt;Request&gt;, Request&gt; PinnedDrop <span class="kw">for </span>Worker&lt;T, Request&gt;
     {
-        <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">mut</span> <span class="ident">this</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>) {
-            <span class="ident">this</span>.<span class="ident">as_mut</span>().<span class="ident">close_semaphore</span>();
+        <span class="kw">fn </span>drop(<span class="kw-2">mut </span>this: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;) {
+            this.as_mut().close_semaphore();
         }
     }
 }
 
-<span class="doccomment">/// Get the error out</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Handle</span> {
-    <span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ServiceError</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Get the error out
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Handle {
+    inner: Arc&lt;Mutex&lt;<span class="prelude-ty">Option</span>&lt;ServiceError&gt;&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Request</span><span class="op">&gt;</span> <span class="ident">Worker</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Request</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T, Request&gt; Worker&lt;T, Request&gt;
+<span class="kw">where
+    </span>T: Service&lt;Request&gt;,
 {
-    <span class="doccomment">/// Closes the buffer&#39;s semaphore if it is still open, waking any pending</span>
-    <span class="doccomment">/// tasks.</span>
-    <span class="kw">fn</span> <span class="ident">close_semaphore</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">close</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">close</span>.<span class="ident">take</span>().<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="ident">Weak::upgrade</span>) {
+    <span class="doccomment">/// Closes the buffer&#39;s semaphore if it is still open, waking any pending
+    /// tasks.
+    </span><span class="kw">fn </span>close_semaphore(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(close) = <span class="self">self</span>.close.take().as_ref().and_then(Weak::upgrade) {
             <span class="macro">tracing::debug!</span>(<span class="string">&quot;buffer closing; waking pending tasks&quot;</span>);
-            <span class="ident">close</span>.<span class="ident">close</span>();
-        } <span class="kw">else</span> {
+            close.close();
+        } <span class="kw">else </span>{
             <span class="macro">tracing::trace!</span>(<span class="string">&quot;buffer already closed&quot;</span>);
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Request</span><span class="op">&gt;</span> <span class="ident">Worker</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Request</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>,
-    <span class="ident">T::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::BoxError</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T, Request&gt; Worker&lt;T, Request&gt;
+<span class="kw">where
+    </span>T: Service&lt;Request&gt;,
+    T::Error: Into&lt;<span class="kw">crate</span>::BoxError&gt;,
 {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">service</span>: <span class="ident">T</span>,
-        <span class="ident">rx</span>: <span class="ident">mpsc::UnboundedReceiver</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&lt;</span><span class="ident">Request</span>, <span class="ident">T::Future</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">semaphore</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Semaphore</span><span class="op">&gt;</span>,
-    ) -&gt; (<span class="ident">Handle</span>, <span class="ident">Worker</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Request</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">handle</span> <span class="op">=</span> <span class="ident">Handle</span> {
-            <span class="ident">inner</span>: <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="prelude-val">None</span>)),
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(
+        service: T,
+        rx: mpsc::UnboundedReceiver&lt;Message&lt;Request, T::Future&gt;&gt;,
+        semaphore: <span class="kw-2">&amp;</span>Arc&lt;Semaphore&gt;,
+    ) -&gt; (Handle, Worker&lt;T, Request&gt;) {
+        <span class="kw">let </span>handle = Handle {
+            inner: Arc::new(Mutex::new(<span class="prelude-val">None</span>)),
         };
 
-        <span class="kw">let</span> <span class="ident">semaphore</span> <span class="op">=</span> <span class="ident">Arc::downgrade</span>(<span class="ident">semaphore</span>);
-        <span class="kw">let</span> <span class="ident">worker</span> <span class="op">=</span> <span class="ident">Worker</span> {
-            <span class="ident">current_message</span>: <span class="prelude-val">None</span>,
-            <span class="ident">finish</span>: <span class="bool-val">false</span>,
-            <span class="ident">failed</span>: <span class="prelude-val">None</span>,
-            <span class="ident">rx</span>,
-            <span class="ident">service</span>,
-            <span class="ident">handle</span>: <span class="ident">handle</span>.<span class="ident">clone</span>(),
-            <span class="ident">close</span>: <span class="prelude-val">Some</span>(<span class="ident">semaphore</span>),
+        <span class="kw">let </span>semaphore = Arc::downgrade(semaphore);
+        <span class="kw">let </span>worker = Worker {
+            current_message: <span class="prelude-val">None</span>,
+            finish: <span class="bool-val">false</span>,
+            failed: <span class="prelude-val">None</span>,
+            rx,
+            service,
+            handle: handle.clone(),
+            close: <span class="prelude-val">Some</span>(semaphore),
         };
 
-        (<span class="ident">handle</span>, <span class="ident">worker</span>)
+        (handle, worker)
     }
 
-    <span class="doccomment">/// Return the next queued Message that hasn&#39;t been canceled.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If a `Message` is returned, the `bool` is true if this is the first time we received this</span>
-    <span class="doccomment">/// message, and false otherwise (i.e., we tried to forward it to the backing service before).</span>
-    <span class="kw">fn</span> <span class="ident">poll_next_msg</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">Message</span><span class="op">&lt;</span><span class="ident">Request</span>, <span class="ident">T::Future</span><span class="op">&gt;</span>, <span class="ident">bool</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">finish</span> {
-            <span class="comment">// We&#39;ve already received None and are shutting down</span>
-            <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>);
+    <span class="doccomment">/// Return the next queued Message that hasn&#39;t been canceled.
+    ///
+    /// If a `Message` is returned, the `bool` is true if this is the first time we received this
+    /// message, and false otherwise (i.e., we tried to forward it to the backing service before).
+    </span><span class="kw">fn </span>poll_next_msg(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;(Message&lt;Request, T::Future&gt;, bool)&gt;&gt; {
+        <span class="kw">if </span><span class="self">self</span>.finish {
+            <span class="comment">// We&#39;ve already received None and are shutting down
+            </span><span class="kw">return </span>Poll::Ready(<span class="prelude-val">None</span>);
         }
 
         <span class="macro">tracing::trace!</span>(<span class="string">&quot;worker polling for next message&quot;</span>);
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">msg</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">current_message</span>.<span class="ident">take</span>() {
-            <span class="comment">// If the oneshot sender is closed, then the receiver is dropped,</span>
-            <span class="comment">// and nobody cares about the response. If this is the case, we</span>
-            <span class="comment">// should continue to the next request.</span>
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">msg</span>.<span class="ident">tx</span>.<span class="ident">is_closed</span>() {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(msg) = <span class="self">self</span>.current_message.take() {
+            <span class="comment">// If the oneshot sender is closed, then the receiver is dropped,
+            // and nobody cares about the response. If this is the case, we
+            // should continue to the next request.
+            </span><span class="kw">if </span>!msg.tx.is_closed() {
                 <span class="macro">tracing::trace!</span>(<span class="string">&quot;resuming buffered request&quot;</span>);
-                <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>((<span class="ident">msg</span>, <span class="bool-val">false</span>)));
+                <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>((msg, <span class="bool-val">false</span>)));
             }
 
             <span class="macro">tracing::trace!</span>(<span class="string">&quot;dropping cancelled buffered request&quot;</span>);
         }
 
-        <span class="comment">// Get the next request</span>
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">msg</span>) <span class="op">=</span> <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">rx</span>).<span class="ident">poll_recv</span>(<span class="ident">cx</span>)) {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">msg</span>.<span class="ident">tx</span>.<span class="ident">is_closed</span>() {
+        <span class="comment">// Get the next request
+        </span><span class="kw">while let </span><span class="prelude-val">Some</span>(msg) = <span class="macro">ready!</span>(Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.rx).poll_recv(cx)) {
+            <span class="kw">if </span>!msg.tx.is_closed() {
                 <span class="macro">tracing::trace!</span>(<span class="string">&quot;processing new request&quot;</span>);
-                <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>((<span class="ident">msg</span>, <span class="bool-val">true</span>)));
+                <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>((msg, <span class="bool-val">true</span>)));
             }
-            <span class="comment">// Otherwise, request is canceled, so pop the next one.</span>
-            <span class="macro">tracing::trace!</span>(<span class="string">&quot;dropping cancelled request&quot;</span>);
+            <span class="comment">// Otherwise, request is canceled, so pop the next one.
+            </span><span class="macro">tracing::trace!</span>(<span class="string">&quot;dropping cancelled request&quot;</span>);
         }
 
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>)
+        Poll::Ready(<span class="prelude-val">None</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">failed</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">error</span>: <span class="ident"><span class="kw">crate</span>::BoxError</span>) {
-        <span class="comment">// The underlying service failed when we called `poll_ready` on it with the given `error`. We</span>
-        <span class="comment">// need to communicate this to all the `Buffer` handles. To do so, we wrap up the error in</span>
-        <span class="comment">// an `Arc`, send that `Arc&lt;E&gt;` to all pending requests, and store it so that subsequent</span>
-        <span class="comment">// requests will also fail with the same error.</span>
+    <span class="kw">fn </span>failed(<span class="kw-2">&amp;mut </span><span class="self">self</span>, error: <span class="kw">crate</span>::BoxError) {
+        <span class="comment">// The underlying service failed when we called `poll_ready` on it with the given `error`. We
+        // need to communicate this to all the `Buffer` handles. To do so, we wrap up the error in
+        // an `Arc`, send that `Arc&lt;E&gt;` to all pending requests, and store it so that subsequent
+        // requests will also fail with the same error.
 
-        <span class="comment">// Note that we need to handle the case where some handle is concurrently trying to send us</span>
-        <span class="comment">// a request. We need to make sure that *either* the send of the request fails *or* it</span>
-        <span class="comment">// receives an error on the `oneshot` it constructed. Specifically, we want to avoid the</span>
-        <span class="comment">// case where we send errors to all outstanding requests, and *then* the caller sends its</span>
-        <span class="comment">// request. We do this by *first* exposing the error, *then* closing the channel used to</span>
-        <span class="comment">// send more requests (so the client will see the error when the send fails), and *then*</span>
-        <span class="comment">// sending the error to all outstanding requests.</span>
-        <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">ServiceError::new</span>(<span class="ident">error</span>);
+        // Note that we need to handle the case where some handle is concurrently trying to send us
+        // a request. We need to make sure that *either* the send of the request fails *or* it
+        // receives an error on the `oneshot` it constructed. Specifically, we want to avoid the
+        // case where we send errors to all outstanding requests, and *then* the caller sends its
+        // request. We do this by *first* exposing the error, *then* closing the channel used to
+        // send more requests (so the client will see the error when the send fails), and *then*
+        // sending the error to all outstanding requests.
+        </span><span class="kw">let </span>error = ServiceError::new(error);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inner</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">handle</span>.<span class="ident">inner</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>inner = <span class="self">self</span>.handle.inner.lock().unwrap();
 
-        <span class="kw">if</span> <span class="ident">inner</span>.<span class="ident">is_some</span>() {
-            <span class="comment">// Future::poll was called after we&#39;ve already errored out!</span>
-            <span class="kw">return</span>;
+        <span class="kw">if </span>inner.is_some() {
+            <span class="comment">// Future::poll was called after we&#39;ve already errored out!
+            </span><span class="kw">return</span>;
         }
 
-        <span class="kw-2">*</span><span class="ident">inner</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">error</span>.<span class="ident">clone</span>());
-        <span class="ident">drop</span>(<span class="ident">inner</span>);
+        <span class="kw-2">*</span>inner = <span class="prelude-val">Some</span>(error.clone());
+        drop(inner);
 
-        <span class="self">self</span>.<span class="ident">rx</span>.<span class="ident">close</span>();
+        <span class="self">self</span>.rx.close();
 
-        <span class="comment">// By closing the mpsc::Receiver, we know that poll_next_msg will soon return Ready(None),</span>
-        <span class="comment">// which will trigger the `self.finish == true` phase. We just need to make sure that any</span>
-        <span class="comment">// requests that we receive before we&#39;ve exhausted the receiver receive the error:</span>
-        <span class="self">self</span>.<span class="ident">failed</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">error</span>);
+        <span class="comment">// By closing the mpsc::Receiver, we know that poll_next_msg will soon return Ready(None),
+        // which will trigger the `self.finish == true` phase. We just need to make sure that any
+        // requests that we receive before we&#39;ve exhausted the receiver receive the error:
+        </span><span class="self">self</span>.failed = <span class="prelude-val">Some</span>(error);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Request</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">Worker</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Request</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span>,
-    <span class="ident">T::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::BoxError</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T, Request&gt; Future <span class="kw">for </span>Worker&lt;T, Request&gt;
+<span class="kw">where
+    </span>T: Service&lt;Request&gt;,
+    T::Error: Into&lt;<span class="kw">crate</span>::BoxError&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> ();
+    <span class="kw">type </span>Output = ();
 
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">finish</span> {
-            <span class="kw">return</span> <span class="ident">Poll::Ready</span>(());
+    <span class="kw">fn </span>poll(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
+        <span class="kw">if </span><span class="self">self</span>.finish {
+            <span class="kw">return </span>Poll::Ready(());
         }
 
-        <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">poll_next_msg</span>(<span class="ident">cx</span>)) {
-                <span class="prelude-val">Some</span>((<span class="ident">msg</span>, <span class="ident">first</span>)) =&gt; {
-                    <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">span</span>.<span class="ident">enter</span>();
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">failed</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">failed</span> {
+        <span class="kw">loop </span>{
+            <span class="kw">match </span><span class="macro">ready!</span>(<span class="self">self</span>.poll_next_msg(cx)) {
+                <span class="prelude-val">Some</span>((msg, first)) =&gt; {
+                    <span class="kw">let </span>_guard = msg.span.enter();
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>failed) = <span class="self">self</span>.failed {
                         <span class="macro">tracing::trace!</span>(<span class="string">&quot;notifying caller about worker failure&quot;</span>);
-                        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">tx</span>.<span class="ident">send</span>(<span class="prelude-val">Err</span>(<span class="ident">failed</span>.<span class="ident">clone</span>()));
+                        <span class="kw">let _ </span>= msg.tx.send(<span class="prelude-val">Err</span>(failed.clone()));
                         <span class="kw">continue</span>;
                     }
 
-                    <span class="comment">// Wait for the service to be ready</span>
-                    <span class="macro">tracing::trace!</span>(
-                        <span class="ident">resumed</span> <span class="op">=</span> <span class="op">!</span><span class="ident">first</span>,
-                        <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;worker received request; waiting for service readiness&quot;</span>
-                    );
-                    <span class="kw">match</span> <span class="self">self</span>.<span class="ident">service</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>) {
-                        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(())) =&gt; {
-                            <span class="macro">tracing::debug!</span>(<span class="ident">service</span>.<span class="ident">ready</span> <span class="op">=</span> <span class="bool-val">true</span>, <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;processing request&quot;</span>);
-                            <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">service</span>.<span class="ident">call</span>(<span class="ident">msg</span>.<span class="ident">request</span>);
+                    <span class="comment">// Wait for the service to be ready
+                    </span><span class="macro">tracing::trace!</span>(
+                        resumed = !first,
+                        message = <span class="string">&quot;worker received request; waiting for service readiness&quot;
+                    </span>);
+                    <span class="kw">match </span><span class="self">self</span>.service.poll_ready(cx) {
+                        Poll::Ready(<span class="prelude-val">Ok</span>(())) =&gt; {
+                            <span class="macro">tracing::debug!</span>(service.ready = <span class="bool-val">true</span>, message = <span class="string">&quot;processing request&quot;</span>);
+                            <span class="kw">let </span>response = <span class="self">self</span>.service.call(msg.request);
 
-                            <span class="comment">// Send the response future back to the sender.</span>
-                            <span class="comment">//</span>
-                            <span class="comment">// An error means the request had been canceled in-between</span>
-                            <span class="comment">// our calls, the response future will just be dropped.</span>
-                            <span class="macro">tracing::trace!</span>(<span class="string">&quot;returning response future&quot;</span>);
-                            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">tx</span>.<span class="ident">send</span>(<span class="prelude-val">Ok</span>(<span class="ident">response</span>));
+                            <span class="comment">// Send the response future back to the sender.
+                            //
+                            // An error means the request had been canceled in-between
+                            // our calls, the response future will just be dropped.
+                            </span><span class="macro">tracing::trace!</span>(<span class="string">&quot;returning response future&quot;</span>);
+                            <span class="kw">let _ </span>= msg.tx.send(<span class="prelude-val">Ok</span>(response));
                         }
-                        <span class="ident">Poll::Pending</span> =&gt; {
-                            <span class="macro">tracing::trace!</span>(<span class="ident">service</span>.<span class="ident">ready</span> <span class="op">=</span> <span class="bool-val">false</span>, <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;delay&quot;</span>);
-                            <span class="comment">// Put out current message back in its slot.</span>
-                            <span class="ident">drop</span>(<span class="ident">_guard</span>);
-                            <span class="self">self</span>.<span class="ident">current_message</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">msg</span>);
-                            <span class="kw">return</span> <span class="ident">Poll::Pending</span>;
+                        Poll::Pending =&gt; {
+                            <span class="macro">tracing::trace!</span>(service.ready = <span class="bool-val">false</span>, message = <span class="string">&quot;delay&quot;</span>);
+                            <span class="comment">// Put out current message back in its slot.
+                            </span>drop(_guard);
+                            <span class="self">self</span>.current_message = <span class="prelude-val">Some</span>(msg);
+                            <span class="kw">return </span>Poll::Pending;
                         }
-                        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) =&gt; {
-                            <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">into</span>();
-                            <span class="macro">tracing::debug!</span>({ <span class="op">%</span><span class="ident">error</span> }, <span class="string">&quot;service failed&quot;</span>);
-                            <span class="ident">drop</span>(<span class="ident">_guard</span>);
-                            <span class="self">self</span>.<span class="ident">failed</span>(<span class="ident">error</span>);
-                            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">tx</span>.<span class="ident">send</span>(<span class="prelude-val">Err</span>(<span class="self">self</span>
-                                .<span class="ident">failed</span>
-                                .<span class="ident">as_ref</span>()
-                                .<span class="ident">expect</span>(<span class="string">&quot;Worker::failed did not set self.failed?&quot;</span>)
-                                .<span class="ident">clone</span>()));
-                            <span class="comment">// Wake any tasks waiting on channel capacity.</span>
-                            <span class="self">self</span>.<span class="ident">close_semaphore</span>();
+                        Poll::Ready(<span class="prelude-val">Err</span>(e)) =&gt; {
+                            <span class="kw">let </span>error = e.into();
+                            <span class="macro">tracing::debug!</span>({ %error }, <span class="string">&quot;service failed&quot;</span>);
+                            drop(_guard);
+                            <span class="self">self</span>.failed(error);
+                            <span class="kw">let _ </span>= msg.tx.send(<span class="prelude-val">Err</span>(<span class="self">self
+                                </span>.failed
+                                .as_ref()
+                                .expect(<span class="string">&quot;Worker::failed did not set self.failed?&quot;</span>)
+                                .clone()));
+                            <span class="comment">// Wake any tasks waiting on channel capacity.
+                            </span><span class="self">self</span>.close_semaphore();
                         }
                     }
                 }
-                <span class="prelude-val">None</span> =&gt; {
-                    <span class="comment">// No more more requests _ever_.</span>
-                    <span class="self">self</span>.<span class="ident">finish</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                    <span class="kw">return</span> <span class="ident">Poll::Ready</span>(());
+                <span class="prelude-val">None </span>=&gt; {
+                    <span class="comment">// No more more requests _ever_.
+                    </span><span class="self">self</span>.finish = <span class="bool-val">true</span>;
+                    <span class="kw">return </span>Poll::Ready(());
                 }
             }
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Handle</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_error_on_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::BoxError</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>
-            .<span class="ident">lock</span>()
-            .<span class="ident">unwrap</span>()
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">svc_err</span><span class="op">|</span> <span class="ident">svc_err</span>.<span class="ident">clone</span>().<span class="ident">into</span>())
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Closed::new</span>().<span class="ident">into</span>())
+<span class="kw">impl </span>Handle {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>get_error_on_closed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::BoxError {
+        <span class="self">self</span>.inner
+            .lock()
+            .unwrap()
+            .as_ref()
+            .map(|svc_err| svc_err.clone().into())
+            .unwrap_or_else(|| Closed::new().into())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Handle</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Handle</span> {
-        <span class="ident">Handle</span> {
-            <span class="ident">inner</span>: <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">clone</span>(),
+<span class="kw">impl </span>Clone <span class="kw">for </span>Handle {
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Handle {
+        Handle {
+            inner: <span class="self">self</span>.inner.clone(),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tower" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tower" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

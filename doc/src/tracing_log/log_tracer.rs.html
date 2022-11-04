@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-log-0.1.3/src/log_tracer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>log_tracer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tracing_log/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tracing_log/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-log-0.1.3/src/log_tracer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>log_tracer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tracing_log/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tracing_log/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tracing_log/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -307,312 +307,312 @@
 <span id="305">305</span>
 <span id="306">306</span>
 <span id="307">307</span>
-</pre><pre class="rust"><code><span class="doccomment">//! An adapter for converting [`log`] records into `tracing` `Event`s.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This module provides the [`LogTracer`] type which implements `log`&#39;s [logger</span>
-<span class="doccomment">//! interface] by recording log records as `tracing` `Event`s. This is intended for</span>
-<span class="doccomment">//! use in conjunction with a `tracing` `Subscriber` to consume events from</span>
-<span class="doccomment">//! dependencies that emit [`log`] records within a trace context.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Usage</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! To create and initialize a `LogTracer` with the default configurations, use:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! * [`init`] if you want to convert all logs, regardless of log level,</span>
-<span class="doccomment">//!   allowing the tracing `Subscriber` to perform any filtering</span>
-<span class="doccomment">//! * [`init_with_filter`] to convert all logs up to a specified log level</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! In addition, a [builder] is available for cases where more advanced</span>
-<span class="doccomment">//! configuration is required. In particular, the builder can be used to [ignore</span>
-<span class="doccomment">//! log records][ignore] emitted by particular crates. This is useful in cases</span>
-<span class="doccomment">//! such as when a crate emits both `tracing` diagnostics _and_ log records by</span>
-<span class="doccomment">//! default.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [logger interface]: log::Log</span>
-<span class="doccomment">//! [`init`]: LogTracer.html#method.init</span>
-<span class="doccomment">//! [`init_with_filter`]: LogTracer.html#method.init_with_filter</span>
-<span class="doccomment">//! [builder]: LogTracer::builder()</span>
-<span class="doccomment">//! [ignore]: Builder::ignore_crate()</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::AsTrace</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">log::SetLoggerError</span>;
-<span class="kw">use</span> <span class="ident">tracing_core::dispatcher</span>;
+</pre><pre class="rust"><code><span class="doccomment">//! An adapter for converting [`log`] records into `tracing` `Event`s.
+//!
+//! This module provides the [`LogTracer`] type which implements `log`&#39;s [logger
+//! interface] by recording log records as `tracing` `Event`s. This is intended for
+//! use in conjunction with a `tracing` `Subscriber` to consume events from
+//! dependencies that emit [`log`] records within a trace context.
+//!
+//! # Usage
+//!
+//! To create and initialize a `LogTracer` with the default configurations, use:
+//!
+//! * [`init`] if you want to convert all logs, regardless of log level,
+//!   allowing the tracing `Subscriber` to perform any filtering
+//! * [`init_with_filter`] to convert all logs up to a specified log level
+//!
+//! In addition, a [builder] is available for cases where more advanced
+//! configuration is required. In particular, the builder can be used to [ignore
+//! log records][ignore] emitted by particular crates. This is useful in cases
+//! such as when a crate emits both `tracing` diagnostics _and_ log records by
+//! default.
+//!
+//! [logger interface]: log::Log
+//! [`init`]: LogTracer.html#method.init
+//! [`init_with_filter`]: LogTracer.html#method.init_with_filter
+//! [builder]: LogTracer::builder()
+//! [ignore]: Builder::ignore_crate()
+</span><span class="kw">use </span><span class="kw">crate</span>::AsTrace;
+<span class="kw">pub use </span>log::SetLoggerError;
+<span class="kw">use </span>tracing_core::dispatcher;
 
-<span class="doccomment">/// A simple &quot;logger&quot; that converts all log records into `tracing` `Event`s.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LogTracer</span> {
-    <span class="ident">ignore_crates</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">String</span>]<span class="op">&gt;</span>,
+<span class="doccomment">/// A simple &quot;logger&quot; that converts all log records into `tracing` `Event`s.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>LogTracer {
+    ignore_crates: Box&lt;[String]&gt;,
 }
 
-<span class="doccomment">/// Configures a new `LogTracer`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Builder</span> {
-    <span class="ident">ignore_crates</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">filter</span>: <span class="ident">log::LevelFilter</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;interest-cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-    <span class="ident">interest_cache_config</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::InterestCacheConfig</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Configures a new `LogTracer`.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Builder {
+    ignore_crates: Vec&lt;String&gt;,
+    filter: log::LevelFilter,
+    <span class="attribute">#[cfg(all(feature = <span class="string">&quot;interest-cache&quot;</span>, feature = <span class="string">&quot;std&quot;</span>))]
+    </span>interest_cache_config: <span class="prelude-ty">Option</span>&lt;<span class="kw">crate</span>::InterestCacheConfig&gt;,
 }
 
-<span class="comment">// ===== impl LogTracer =====</span>
+<span class="comment">// ===== impl LogTracer =====
 
-<span class="kw">impl</span> <span class="ident">LogTracer</span> {
-    <span class="doccomment">/// Returns a builder that allows customizing a `LogTracer` and setting it</span>
-    <span class="doccomment">/// the default logger.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For example:</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use std::error::Error;</span>
-    <span class="doccomment">/// use tracing_log::LogTracer;</span>
-    <span class="doccomment">/// use log;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Box&lt;Error&gt;&gt; {</span>
-    <span class="doccomment">/// LogTracer::builder()</span>
-    <span class="doccomment">///     .ignore_crate(&quot;foo&quot;) // suppose the `foo` crate is using `tracing`&#39;s log feature</span>
-    <span class="doccomment">///     .with_max_level(log::LevelFilter::Info)</span>
-    <span class="doccomment">///     .init()?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // will be available for Subscribers as a tracing Event</span>
-    <span class="doccomment">/// log::info!(&quot;an example info log&quot;);</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span>() -&gt; <span class="ident">Builder</span> {
-        <span class="ident">Builder::default</span>()
+</span><span class="kw">impl </span>LogTracer {
+    <span class="doccomment">/// Returns a builder that allows customizing a `LogTracer` and setting it
+    /// the default logger.
+    ///
+    /// For example:
+    /// ```rust
+    /// # use std::error::Error;
+    /// use tracing_log::LogTracer;
+    /// use log;
+    ///
+    /// # fn main() -&gt; Result&lt;(), Box&lt;Error&gt;&gt; {
+    /// LogTracer::builder()
+    ///     .ignore_crate(&quot;foo&quot;) // suppose the `foo` crate is using `tracing`&#39;s log feature
+    ///     .with_max_level(log::LevelFilter::Info)
+    ///     .init()?;
+    ///
+    /// // will be available for Subscribers as a tracing Event
+    /// log::info!(&quot;an example info log&quot;);
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>builder() -&gt; Builder {
+        Builder::default()
     }
 
-    <span class="doccomment">/// Creates a new `LogTracer` that can then be used as a logger for the `log` crate.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// It is generally simpler to use the [`init`] or [`init_with_filter`] methods</span>
-    <span class="doccomment">/// which will create the `LogTracer` and set it as the global logger.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Logger setup without the initialization methods can be done with:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use std::error::Error;</span>
-    <span class="doccomment">/// use tracing_log::LogTracer;</span>
-    <span class="doccomment">/// use log;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Box&lt;Error&gt;&gt; {</span>
-    <span class="doccomment">/// let logger = LogTracer::new();</span>
-    <span class="doccomment">/// log::set_boxed_logger(Box::new(logger))?;</span>
-    <span class="doccomment">/// log::set_max_level(log::LevelFilter::Trace);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // will be available for Subscribers as a tracing Event</span>
-    <span class="doccomment">/// log::trace!(&quot;an example trace log&quot;);</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`init`]: LogTracer::init()</span>
-    <span class="doccomment">/// [`init_with_filter`]: .#method.init_with_filter</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">ignore_crates</span>: <span class="ident">Vec::new</span>().<span class="ident">into_boxed_slice</span>(),
+    <span class="doccomment">/// Creates a new `LogTracer` that can then be used as a logger for the `log` crate.
+    ///
+    /// It is generally simpler to use the [`init`] or [`init_with_filter`] methods
+    /// which will create the `LogTracer` and set it as the global logger.
+    ///
+    /// Logger setup without the initialization methods can be done with:
+    ///
+    /// ```rust
+    /// # use std::error::Error;
+    /// use tracing_log::LogTracer;
+    /// use log;
+    ///
+    /// # fn main() -&gt; Result&lt;(), Box&lt;Error&gt;&gt; {
+    /// let logger = LogTracer::new();
+    /// log::set_boxed_logger(Box::new(logger))?;
+    /// log::set_max_level(log::LevelFilter::Trace);
+    ///
+    /// // will be available for Subscribers as a tracing Event
+    /// log::trace!(&quot;an example trace log&quot;);
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// [`init`]: LogTracer::init()
+    /// [`init_with_filter`]: .#method.init_with_filter
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            ignore_crates: Vec::new().into_boxed_slice(),
         }
     }
 
-    <span class="doccomment">/// Sets up `LogTracer` as global logger for the `log` crate,</span>
-    <span class="doccomment">/// with the given level as max level filter.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Setting a global logger can only be done once.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The [`builder`] function can be used to customize the `LogTracer` before</span>
-    <span class="doccomment">/// initializing it.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`builder`]: LogTracer::builder()</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init_with_filter</span>(<span class="ident">level</span>: <span class="ident">log::LevelFilter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SetLoggerError</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::builder</span>().<span class="ident">with_max_level</span>(<span class="ident">level</span>).<span class="ident">init</span>()
+    <span class="doccomment">/// Sets up `LogTracer` as global logger for the `log` crate,
+    /// with the given level as max level filter.
+    ///
+    /// Setting a global logger can only be done once.
+    ///
+    /// The [`builder`] function can be used to customize the `LogTracer` before
+    /// initializing it.
+    ///
+    /// [`builder`]: LogTracer::builder()
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;std&quot;</span>)))]
+    </span><span class="kw">pub fn </span>init_with_filter(level: log::LevelFilter) -&gt; <span class="prelude-ty">Result</span>&lt;(), SetLoggerError&gt; {
+        <span class="self">Self</span>::builder().with_max_level(level).init()
     }
 
-    <span class="doccomment">/// Sets a `LogTracer` as the global logger for the `log` crate.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Setting a global logger can only be done once.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use std::error::Error;</span>
-    <span class="doccomment">/// use tracing_log::LogTracer;</span>
-    <span class="doccomment">/// use log;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), Box&lt;Error&gt;&gt; {</span>
-    <span class="doccomment">/// LogTracer::init()?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // will be available for Subscribers as a tracing Event</span>
-    <span class="doccomment">/// log::trace!(&quot;an example trace log&quot;);</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will forward all logs to `tracing` and lets the current `Subscriber`</span>
-    <span class="doccomment">/// determine if they are enabled.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The [`builder`] function can be used to customize the `LogTracer` before</span>
-    <span class="doccomment">/// initializing it.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If you know in advance you want to filter some log levels,</span>
-    <span class="doccomment">/// use [`builder`] or [`init_with_filter`] instead.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`init_with_filter`]: LogTracer::init_with_filter()</span>
-    <span class="doccomment">/// [`builder`]: LogTracer::builder()</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SetLoggerError</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::builder</span>().<span class="ident">init</span>()
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">LogTracer</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>()
+    <span class="doccomment">/// Sets a `LogTracer` as the global logger for the `log` crate.
+    ///
+    /// Setting a global logger can only be done once.
+    ///
+    /// ```rust
+    /// # use std::error::Error;
+    /// use tracing_log::LogTracer;
+    /// use log;
+    ///
+    /// # fn main() -&gt; Result&lt;(), Box&lt;Error&gt;&gt; {
+    /// LogTracer::init()?;
+    ///
+    /// // will be available for Subscribers as a tracing Event
+    /// log::trace!(&quot;an example trace log&quot;);
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// This will forward all logs to `tracing` and lets the current `Subscriber`
+    /// determine if they are enabled.
+    ///
+    /// The [`builder`] function can be used to customize the `LogTracer` before
+    /// initializing it.
+    ///
+    /// If you know in advance you want to filter some log levels,
+    /// use [`builder`] or [`init_with_filter`] instead.
+    ///
+    /// [`init_with_filter`]: LogTracer::init_with_filter()
+    /// [`builder`]: LogTracer::builder()
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;std&quot;</span>)))]
+    </span><span class="kw">pub fn </span>init() -&gt; <span class="prelude-ty">Result</span>&lt;(), SetLoggerError&gt; {
+        <span class="self">Self</span>::builder().init()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;interest-cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::interest_cache::try_cache</span> <span class="kw">as</span> <span class="ident">try_cache_interest</span>;
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;interest-cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)))]</span>
-<span class="kw">fn</span> <span class="ident">try_cache_interest</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">log::Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">callback</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>() -&gt; <span class="ident">bool</span>) -&gt; <span class="ident">bool</span> {
-    <span class="ident">callback</span>()
+<span class="kw">impl </span>Default <span class="kw">for </span>LogTracer {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new()
+    }
 }
 
-<span class="kw">impl</span> <span class="ident">log::Log</span> <span class="kw">for</span> <span class="ident">LogTracer</span> {
-    <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">log::Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// First, check the log record against the current max level enabled by</span>
-        <span class="comment">// the current `tracing` subscriber.</span>
-        <span class="kw">if</span> <span class="ident">metadata</span>.<span class="ident">level</span>().<span class="ident">as_trace</span>() <span class="op">&gt;</span> <span class="ident">tracing_core::LevelFilter::current</span>() {
-            <span class="comment">// If the log record&#39;s level is above that, disable it.</span>
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;interest-cache&quot;</span>, feature = <span class="string">&quot;std&quot;</span>))]
+</span><span class="kw">use </span><span class="kw">crate</span>::interest_cache::try_cache <span class="kw">as </span>try_cache_interest;
+
+<span class="attribute">#[cfg(not(all(feature = <span class="string">&quot;interest-cache&quot;</span>, feature = <span class="string">&quot;std&quot;</span>)))]
+</span><span class="kw">fn </span>try_cache_interest(<span class="kw">_</span>: <span class="kw-2">&amp;</span>log::Metadata&lt;<span class="lifetime">&#39;_</span>&gt;, callback: <span class="kw">impl </span>FnOnce() -&gt; bool) -&gt; bool {
+    callback()
+}
+
+<span class="kw">impl </span>log::Log <span class="kw">for </span>LogTracer {
+    <span class="kw">fn </span>enabled(<span class="kw-2">&amp;</span><span class="self">self</span>, metadata: <span class="kw-2">&amp;</span>log::Metadata&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+        <span class="comment">// First, check the log record against the current max level enabled by
+        // the current `tracing` subscriber.
+        </span><span class="kw">if </span>metadata.level().as_trace() &gt; tracing_core::LevelFilter::current() {
+            <span class="comment">// If the log record&#39;s level is above that, disable it.
+            </span><span class="kw">return </span><span class="bool-val">false</span>;
         }
 
-        <span class="comment">// Okay, it wasn&#39;t disabled by the max level — do we have any specific</span>
-        <span class="comment">// modules to ignore?</span>
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">ignore_crates</span>.<span class="ident">is_empty</span>() {
-            <span class="comment">// If we are ignoring certain module paths, ensure that the metadata</span>
-            <span class="comment">// does not start with one of those paths.</span>
-            <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="ident">metadata</span>.<span class="ident">target</span>();
-            <span class="kw">for</span> <span class="ident">ignored</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ignore_crates</span>[..] {
-                <span class="kw">if</span> <span class="ident">target</span>.<span class="ident">starts_with</span>(<span class="ident">ignored</span>) {
-                    <span class="kw">return</span> <span class="bool-val">false</span>;
+        <span class="comment">// Okay, it wasn&#39;t disabled by the max level — do we have any specific
+        // modules to ignore?
+        </span><span class="kw">if </span>!<span class="self">self</span>.ignore_crates.is_empty() {
+            <span class="comment">// If we are ignoring certain module paths, ensure that the metadata
+            // does not start with one of those paths.
+            </span><span class="kw">let </span>target = metadata.target();
+            <span class="kw">for </span>ignored <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.ignore_crates[..] {
+                <span class="kw">if </span>target.starts_with(ignored) {
+                    <span class="kw">return </span><span class="bool-val">false</span>;
                 }
             }
         }
 
-        <span class="ident">try_cache_interest</span>(<span class="ident">metadata</span>, <span class="op">|</span><span class="op">|</span> {
-            <span class="comment">// Finally, check if the current `tracing` dispatcher cares about this.</span>
-            <span class="ident">dispatcher::get_default</span>(<span class="op">|</span><span class="ident">dispatch</span><span class="op">|</span> <span class="ident">dispatch</span>.<span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="ident">metadata</span>.<span class="ident">as_trace</span>()))
+        try_cache_interest(metadata, || {
+            <span class="comment">// Finally, check if the current `tracing` dispatcher cares about this.
+            </span>dispatcher::get_default(|dispatch| dispatch.enabled(<span class="kw-2">&amp;</span>metadata.as_trace()))
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">log</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">record</span>: <span class="kw-2">&amp;</span><span class="ident">log::Record</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">enabled</span>(<span class="ident">record</span>.<span class="ident">metadata</span>()) {
-            <span class="ident"><span class="kw">crate</span>::dispatch_record</span>(<span class="ident">record</span>);
+    <span class="kw">fn </span>log(<span class="kw-2">&amp;</span><span class="self">self</span>, record: <span class="kw-2">&amp;</span>log::Record&lt;<span class="lifetime">&#39;_</span>&gt;) {
+        <span class="kw">if </span><span class="self">self</span>.enabled(record.metadata()) {
+            <span class="kw">crate</span>::dispatch_record(record);
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">flush</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {}
+    <span class="kw">fn </span>flush(<span class="kw-2">&amp;</span><span class="self">self</span>) {}
 }
 
-<span class="comment">// ===== impl Builder =====</span>
+<span class="comment">// ===== impl Builder =====
 
-<span class="kw">impl</span> <span class="ident">Builder</span> {
-    <span class="doccomment">/// Returns a new `Builder` to construct a [`LogTracer`].</span>
-    <span class="doccomment">///</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::default</span>()
+</span><span class="kw">impl </span>Builder {
+    <span class="doccomment">/// Returns a new `Builder` to construct a [`LogTracer`].
+    ///
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
     }
 
-    <span class="doccomment">/// Sets a global maximum level for `log` records.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Log records whose level is more verbose than the provided level will be</span>
-    <span class="doccomment">/// disabled.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// By default, all `log` records will be enabled.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_max_level</span>(<span class="self">self</span>, <span class="ident">filter</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">log::LevelFilter</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">filter</span>.<span class="ident">into</span>();
-        <span class="self">Self</span> { <span class="ident">filter</span>, ..<span class="self">self</span> }
+    <span class="doccomment">/// Sets a global maximum level for `log` records.
+    ///
+    /// Log records whose level is more verbose than the provided level will be
+    /// disabled.
+    ///
+    /// By default, all `log` records will be enabled.
+    </span><span class="kw">pub fn </span>with_max_level(<span class="self">self</span>, filter: <span class="kw">impl </span>Into&lt;log::LevelFilter&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>filter = filter.into();
+        <span class="self">Self </span>{ filter, ..<span class="self">self </span>}
     }
 
-    <span class="doccomment">/// Configures the `LogTracer` to ignore all log records whose target</span>
-    <span class="doccomment">/// starts with the given string.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This should be used when a crate enables the `tracing/log` feature to</span>
-    <span class="doccomment">/// emit log records for tracing events. Otherwise, those events will be</span>
-    <span class="doccomment">/// recorded twice.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ignore_crate</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">ignore_crates</span>.<span class="ident">push</span>(<span class="ident">name</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Configures the `LogTracer` to ignore all log records whose target
+    /// starts with the given string.
+    ///
+    /// This should be used when a crate enables the `tracing/log` feature to
+    /// emit log records for tracing events. Otherwise, those events will be
+    /// recorded twice.
+    </span><span class="kw">pub fn </span>ignore_crate(<span class="kw-2">mut </span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.ignore_crates.push(name.into());
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Configures the `LogTracer` to ignore all log records whose target</span>
-    <span class="doccomment">/// starts with any of the given the given strings.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This should be used when a crate enables the `tracing/log` feature to</span>
-    <span class="doccomment">/// emit log records for tracing events. Otherwise, those events will be</span>
-    <span class="doccomment">/// recorded twice.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ignore_all</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">crates</span>: <span class="kw">impl</span> <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">I</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">I</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Configures the `LogTracer` to ignore all log records whose target
+    /// starts with any of the given the given strings.
+    ///
+    /// This should be used when a crate enables the `tracing/log` feature to
+    /// emit log records for tracing events. Otherwise, those events will be
+    /// recorded twice.
+    </span><span class="kw">pub fn </span>ignore_all&lt;I&gt;(<span class="self">self</span>, crates: <span class="kw">impl </span>IntoIterator&lt;Item = I&gt;) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>I: Into&lt;String&gt;,
     {
-        <span class="ident">crates</span>.<span class="ident">into_iter</span>().<span class="ident">fold</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::ignore_crate</span>)
+        crates.into_iter().fold(<span class="self">self</span>, <span class="self">Self</span>::ignore_crate)
     }
 
-    <span class="doccomment">/// Configures the `LogTracer` to either disable or enable the interest cache.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When enabled, a per-thread LRU cache will be used to cache whenever the logger</span>
-    <span class="doccomment">/// is interested in a given [level] + [target] pair for records generated through</span>
-    <span class="doccomment">/// the `log` crate.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When no `trace!` logs are enabled the logger is able to cheaply filter</span>
-    <span class="doccomment">/// them out just by comparing their log level to the globally specified</span>
-    <span class="doccomment">/// maximum, and immediately reject them. When *any* other `trace!` log is</span>
-    <span class="doccomment">/// enabled (even one which doesn&#39;t actually exist!) the logger has to run</span>
-    <span class="doccomment">/// its full filtering machinery on each and every `trace!` log, which can</span>
-    <span class="doccomment">/// potentially be very expensive.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Enabling this cache is useful in such situations to improve performance.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// You most likely do not want to enabled this if you have registered any dynamic</span>
-    <span class="doccomment">/// filters on your logger and you want them to be run every time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is disabled by default.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [level]: log::Metadata::level</span>
-    <span class="doccomment">/// [target]: log::Metadata::target</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;interest-cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;interest-cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_interest_cache</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">config</span>: <span class="ident"><span class="kw">crate</span>::InterestCacheConfig</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">interest_cache_config</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">config</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Configures the `LogTracer` to either disable or enable the interest cache.
+    ///
+    /// When enabled, a per-thread LRU cache will be used to cache whenever the logger
+    /// is interested in a given [level] + [target] pair for records generated through
+    /// the `log` crate.
+    ///
+    /// When no `trace!` logs are enabled the logger is able to cheaply filter
+    /// them out just by comparing their log level to the globally specified
+    /// maximum, and immediately reject them. When *any* other `trace!` log is
+    /// enabled (even one which doesn&#39;t actually exist!) the logger has to run
+    /// its full filtering machinery on each and every `trace!` log, which can
+    /// potentially be very expensive.
+    ///
+    /// Enabling this cache is useful in such situations to improve performance.
+    ///
+    /// You most likely do not want to enabled this if you have registered any dynamic
+    /// filters on your logger and you want them to be run every time.
+    ///
+    /// This is disabled by default.
+    ///
+    /// [level]: log::Metadata::level
+    /// [target]: log::Metadata::target
+    </span><span class="attribute">#[cfg(all(feature = <span class="string">&quot;interest-cache&quot;</span>, feature = <span class="string">&quot;std&quot;</span>))]
+    #[cfg_attr(docsrs, doc(cfg(all(feature = <span class="string">&quot;interest-cache&quot;</span>, feature = <span class="string">&quot;std&quot;</span>))))]
+    </span><span class="kw">pub fn </span>with_interest_cache(<span class="kw-2">mut </span><span class="self">self</span>, config: <span class="kw">crate</span>::InterestCacheConfig) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.interest_cache_config = <span class="prelude-val">Some</span>(config);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Constructs a new `LogTracer` with the provided configuration and sets it</span>
-    <span class="doccomment">/// as the default logger.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Setting a global logger can only be done once.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)))]</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_mut</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">init</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">SetLoggerError</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;interest-cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-        <span class="ident"><span class="kw">crate</span>::interest_cache::configure</span>(<span class="self">self</span>.<span class="ident">interest_cache_config</span>.<span class="ident">take</span>());
+    <span class="doccomment">/// Constructs a new `LogTracer` with the provided configuration and sets it
+    /// as the default logger.
+    ///
+    /// Setting a global logger can only be done once.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;std&quot;</span>)))]
+    #[allow(unused_mut)]
+    </span><span class="kw">pub fn </span>init(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;(), SetLoggerError&gt; {
+        <span class="attribute">#[cfg(all(feature = <span class="string">&quot;interest-cache&quot;</span>, feature = <span class="string">&quot;std&quot;</span>))]
+        </span><span class="kw">crate</span>::interest_cache::configure(<span class="self">self</span>.interest_cache_config.take());
 
-        <span class="kw">let</span> <span class="ident">ignore_crates</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ignore_crates</span>.<span class="ident">into_boxed_slice</span>();
-        <span class="kw">let</span> <span class="ident">logger</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">LogTracer</span> { <span class="ident">ignore_crates</span> });
-        <span class="ident">log::set_boxed_logger</span>(<span class="ident">logger</span>)<span class="question-mark">?</span>;
-        <span class="ident">log::set_max_level</span>(<span class="self">self</span>.<span class="ident">filter</span>);
+        <span class="kw">let </span>ignore_crates = <span class="self">self</span>.ignore_crates.into_boxed_slice();
+        <span class="kw">let </span>logger = Box::new(LogTracer { ignore_crates });
+        log::set_boxed_logger(logger)<span class="question-mark">?</span>;
+        log::set_max_level(<span class="self">self</span>.filter);
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Builder</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">ignore_crates</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">filter</span>: <span class="ident">log::LevelFilter::max</span>(),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;interest-cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-            <span class="ident">interest_cache_config</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl </span>Default <span class="kw">for </span>Builder {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            ignore_crates: Vec::new(),
+            filter: log::LevelFilter::max(),
+            <span class="attribute">#[cfg(all(feature = <span class="string">&quot;interest-cache&quot;</span>, feature = <span class="string">&quot;std&quot;</span>))]
+            </span>interest_cache_config: <span class="prelude-val">None</span>,
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing_log" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing_log" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

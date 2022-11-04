@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sharded-slab-0.1.4/src/pool.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>pool.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sharded_slab/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sharded_slab/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sharded_slab/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sharded-slab-0.1.4/src/pool.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>pool.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sharded_slab/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sharded_slab/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sharded_slab/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1340,1347 +1340,1347 @@
 <span id="1340">1340</span>
 <span id="1341">1341</span>
 <span id="1342">1342</span>
-</pre><pre class="rust"><code><span class="doccomment">//! A lock-free concurrent object pool.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! See the [`Pool` type&#39;s documentation][pool] for details on the object pool API and how</span>
-<span class="doccomment">//! it differs from the [`Slab`] API.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [pool]: ../struct.Pool.html</span>
-<span class="doccomment">//! [`Slab`]: ../struct.Slab.html</span>
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">cfg</span>::{<span class="self">self</span>, <span class="ident">CfgPrivate</span>, <span class="ident">DefaultConfig</span>},
-    <span class="ident">clear::Clear</span>,
-    <span class="ident">page</span>, <span class="ident">shard</span>,
-    <span class="ident">tid::Tid</span>,
-    <span class="ident">Pack</span>, <span class="ident">Shard</span>,
+</pre><pre class="rust"><code><span class="doccomment">//! A lock-free concurrent object pool.
+//!
+//! See the [`Pool` type&#39;s documentation][pool] for details on the object pool API and how
+//! it differs from the [`Slab`] API.
+//!
+//! [pool]: ../struct.Pool.html
+//! [`Slab`]: ../struct.Slab.html
+</span><span class="kw">use crate</span>::{
+    cfg::{<span class="self">self</span>, CfgPrivate, DefaultConfig},
+    clear::Clear,
+    page, shard,
+    tid::Tid,
+    Pack, Shard,
 };
 
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">marker::PhantomData</span>, <span class="ident">sync::Arc</span>};
+<span class="kw">use </span>std::{fmt, marker::PhantomData, sync::Arc};
 
-<span class="doccomment">/// A lock-free concurrent object pool.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Slabs provide pre-allocated storage for many instances of a single type. But, when working with</span>
-<span class="doccomment">/// heap allocated objects, the advantages of a slab are lost, as the memory allocated for the</span>
-<span class="doccomment">/// object is freed when the object is removed from the slab. With a pool, we can instead reuse</span>
-<span class="doccomment">/// this memory for objects being added to the pool in the future, therefore reducing memory</span>
-<span class="doccomment">/// fragmentation and avoiding additional allocations.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This type implements a lock-free concurrent pool, indexed by `usize`s. The items stored in this</span>
-<span class="doccomment">/// type need to implement [`Clear`] and `Default`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The `Pool` type shares similar semantics to [`Slab`] when it comes to sharing across threads</span>
-<span class="doccomment">/// and storing mutable shared data. The biggest difference is there are no [`Slab::insert`] and</span>
-<span class="doccomment">/// [`Slab::take`] analouges for the `Pool` type. Instead new items are added to the pool by using</span>
-<span class="doccomment">/// the [`Pool::create`] method, and marked for clearing by the [`Pool::clear`] method.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Add an entry to the pool, returning an index:</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use sharded_slab::Pool;</span>
-<span class="doccomment">/// let pool: Pool&lt;String&gt; = Pool::new();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let key = pool.create_with(|item| item.push_str(&quot;hello world&quot;)).unwrap();</span>
-<span class="doccomment">/// assert_eq!(pool.get(key).unwrap(), String::from(&quot;hello world&quot;));</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Create a new pooled item, returning a guard that allows mutable access:</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use sharded_slab::Pool;</span>
-<span class="doccomment">/// let pool: Pool&lt;String&gt; = Pool::new();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut guard = pool.create().unwrap();</span>
-<span class="doccomment">/// let key = guard.key();</span>
-<span class="doccomment">/// guard.push_str(&quot;hello world&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// drop(guard); // release the guard, allowing immutable access.</span>
-<span class="doccomment">/// assert_eq!(pool.get(key).unwrap(), String::from(&quot;hello world&quot;));</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Pool entries can be cleared by calling [`Pool::clear`]. This marks the entry to</span>
-<span class="doccomment">/// be cleared when the guards referencing to it are dropped.</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use sharded_slab::Pool;</span>
-<span class="doccomment">/// let pool: Pool&lt;String&gt; = Pool::new();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let key = pool.create_with(|item| item.push_str(&quot;hello world&quot;)).unwrap();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Mark this entry to be cleared.</span>
-<span class="doccomment">/// pool.clear(key);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // The cleared entry is no longer available in the pool</span>
-<span class="doccomment">/// assert!(pool.get(key).is_none());</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # Configuration</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Both `Pool` and [`Slab`] share the same configuration mechanism. See [crate level documentation][config-doc]</span>
-<span class="doccomment">/// for more details.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Slab::take`]: crate::Slab::take</span>
-<span class="doccomment">/// [`Slab::insert`]: crate::Slab::insert</span>
-<span class="doccomment">/// [`Pool::create`]: Pool::create</span>
-<span class="doccomment">/// [`Pool::clear`]: Pool::clear</span>
-<span class="doccomment">/// [config-doc]: crate#configuration</span>
-<span class="doccomment">/// [`Clear`]: crate::Clear</span>
-<span class="doccomment">/// [`Slab`]: crate::Slab</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span> <span class="op">=</span> <span class="ident">DefaultConfig</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="doccomment">/// A lock-free concurrent object pool.
+///
+/// Slabs provide pre-allocated storage for many instances of a single type. But, when working with
+/// heap allocated objects, the advantages of a slab are lost, as the memory allocated for the
+/// object is freed when the object is removed from the slab. With a pool, we can instead reuse
+/// this memory for objects being added to the pool in the future, therefore reducing memory
+/// fragmentation and avoiding additional allocations.
+///
+/// This type implements a lock-free concurrent pool, indexed by `usize`s. The items stored in this
+/// type need to implement [`Clear`] and `Default`.
+///
+/// The `Pool` type shares similar semantics to [`Slab`] when it comes to sharing across threads
+/// and storing mutable shared data. The biggest difference is there are no [`Slab::insert`] and
+/// [`Slab::take`] analouges for the `Pool` type. Instead new items are added to the pool by using
+/// the [`Pool::create`] method, and marked for clearing by the [`Pool::clear`] method.
+///
+/// # Examples
+///
+/// Add an entry to the pool, returning an index:
+/// ```
+/// # use sharded_slab::Pool;
+/// let pool: Pool&lt;String&gt; = Pool::new();
+///
+/// let key = pool.create_with(|item| item.push_str(&quot;hello world&quot;)).unwrap();
+/// assert_eq!(pool.get(key).unwrap(), String::from(&quot;hello world&quot;));
+/// ```
+///
+/// Create a new pooled item, returning a guard that allows mutable access:
+/// ```
+/// # use sharded_slab::Pool;
+/// let pool: Pool&lt;String&gt; = Pool::new();
+///
+/// let mut guard = pool.create().unwrap();
+/// let key = guard.key();
+/// guard.push_str(&quot;hello world&quot;);
+///
+/// drop(guard); // release the guard, allowing immutable access.
+/// assert_eq!(pool.get(key).unwrap(), String::from(&quot;hello world&quot;));
+/// ```
+///
+/// Pool entries can be cleared by calling [`Pool::clear`]. This marks the entry to
+/// be cleared when the guards referencing to it are dropped.
+/// ```
+/// # use sharded_slab::Pool;
+/// let pool: Pool&lt;String&gt; = Pool::new();
+///
+/// let key = pool.create_with(|item| item.push_str(&quot;hello world&quot;)).unwrap();
+///
+/// // Mark this entry to be cleared.
+/// pool.clear(key);
+///
+/// // The cleared entry is no longer available in the pool
+/// assert!(pool.get(key).is_none());
+/// ```
+/// # Configuration
+///
+/// Both `Pool` and [`Slab`] share the same configuration mechanism. See [crate level documentation][config-doc]
+/// for more details.
+///
+/// [`Slab::take`]: crate::Slab::take
+/// [`Slab::insert`]: crate::Slab::insert
+/// [`Pool::create`]: Pool::create
+/// [`Pool::clear`]: Pool::clear
+/// [config-doc]: crate#configuration
+/// [`Clear`]: crate::Clear
+/// [`Slab`]: crate::Slab
+</span><span class="kw">pub struct </span>Pool&lt;T, C = DefaultConfig&gt;
+<span class="kw">where
+    </span>T: Clear + Default,
+    C: cfg::Config,
 {
-    <span class="ident">shards</span>: <span class="ident">shard::Array</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>,
-    <span class="ident">_cfg</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>,
+    shards: shard::Array&lt;T, C&gt;,
+    _cfg: PhantomData&lt;C&gt;,
 }
 
-<span class="doccomment">/// A guard that allows access to an object in a pool.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// While the guard exists, it indicates to the pool that the item the guard references is</span>
-<span class="doccomment">/// currently being accessed. If the item is removed from the pool while the guard exists, the</span>
-<span class="doccomment">/// removal will be deferred until all guards are dropped.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Ref</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span> <span class="op">=</span> <span class="ident">DefaultConfig</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="doccomment">/// A guard that allows access to an object in a pool.
+///
+/// While the guard exists, it indicates to the pool that the item the guard references is
+/// currently being accessed. If the item is removed from the pool while the guard exists, the
+/// removal will be deferred until all guards are dropped.
+</span><span class="kw">pub struct </span>Ref&lt;<span class="lifetime">&#39;a</span>, T, C = DefaultConfig&gt;
+<span class="kw">where
+    </span>T: Clear + Default,
+    C: cfg::Config,
 {
-    <span class="ident">inner</span>: <span class="ident">page::slot::Guard</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>,
-    <span class="ident">shard</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Shard</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>,
-    <span class="ident">key</span>: <span class="ident">usize</span>,
+    inner: page::slot::Guard&lt;T, C&gt;,
+    shard: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Shard&lt;T, C&gt;,
+    key: usize,
 }
 
-<span class="doccomment">/// A guard that allows exclusive mutable access to an object in a pool.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// While the guard exists, it indicates to the pool that the item the guard</span>
-<span class="doccomment">/// references is currently being accessed. If the item is removed from the pool</span>
-<span class="doccomment">/// while a guard exists, the removal will be deferred until the guard is</span>
-<span class="doccomment">/// dropped. The slot cannot be accessed by other threads while it is accessed</span>
-<span class="doccomment">/// mutably.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RefMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span> <span class="op">=</span> <span class="ident">DefaultConfig</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="doccomment">/// A guard that allows exclusive mutable access to an object in a pool.
+///
+/// While the guard exists, it indicates to the pool that the item the guard
+/// references is currently being accessed. If the item is removed from the pool
+/// while a guard exists, the removal will be deferred until the guard is
+/// dropped. The slot cannot be accessed by other threads while it is accessed
+/// mutably.
+</span><span class="kw">pub struct </span>RefMut&lt;<span class="lifetime">&#39;a</span>, T, C = DefaultConfig&gt;
+<span class="kw">where
+    </span>T: Clear + Default,
+    C: cfg::Config,
 {
-    <span class="ident">inner</span>: <span class="ident">page::slot::InitGuard</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>,
-    <span class="ident">shard</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Shard</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>,
-    <span class="ident">key</span>: <span class="ident">usize</span>,
+    inner: page::slot::InitGuard&lt;T, C&gt;,
+    shard: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Shard&lt;T, C&gt;,
+    key: usize,
 }
 
-<span class="doccomment">/// An owned guard that allows shared immutable access to an object in a pool.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// While the guard exists, it indicates to the pool that the item the guard references is</span>
-<span class="doccomment">/// currently being accessed. If the item is removed from the pool while the guard exists, the</span>
-<span class="doccomment">/// removal will be deferred until all guards are dropped.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Unlike [`Ref`], which borrows the pool, an `OwnedRef` clones the `Arc`</span>
-<span class="doccomment">/// around the pool. Therefore, it keeps the pool from being dropped until all</span>
-<span class="doccomment">/// such guards have been dropped. This means that an `OwnedRef` may be held for</span>
-<span class="doccomment">/// an arbitrary lifetime.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use sharded_slab::Pool;</span>
-<span class="doccomment">/// use std::sync::Arc;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let pool: Arc&lt;Pool&lt;String&gt;&gt; = Arc::new(Pool::new());</span>
-<span class="doccomment">/// let key = pool.create_with(|item| item.push_str(&quot;hello world&quot;)).unwrap();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Look up the created `Key`, returning an `OwnedRef`.</span>
-<span class="doccomment">/// let value = pool.clone().get_owned(key).unwrap();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Now, the original `Arc` clone of the pool may be dropped, but the</span>
-<span class="doccomment">/// // returned `OwnedRef` can still access the value.</span>
-<span class="doccomment">/// assert_eq!(value, String::from(&quot;hello world&quot;));</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Unlike [`Ref`], an `OwnedRef` may be stored in a struct which must live</span>
-<span class="doccomment">/// for the `&#39;static` lifetime:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use sharded_slab::Pool;</span>
-<span class="doccomment">/// use sharded_slab::pool::OwnedRef;</span>
-<span class="doccomment">/// use std::sync::Arc;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// pub struct MyStruct {</span>
-<span class="doccomment">///     pool_ref: OwnedRef&lt;String&gt;,</span>
-<span class="doccomment">///     // ... other fields ...</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Suppose this is some arbitrary function which requires a value that</span>
-<span class="doccomment">/// // lives for the &#39;static lifetime...</span>
-<span class="doccomment">/// fn function_requiring_static&lt;T: &#39;static&gt;(t: &amp;T) {</span>
-<span class="doccomment">///     // ... do something extremely important and interesting ...</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let pool: Arc&lt;Pool&lt;String&gt;&gt; = Arc::new(Pool::new());</span>
-<span class="doccomment">/// let key = pool.create_with(|item| item.push_str(&quot;hello world&quot;)).unwrap();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Look up the created `Key`, returning an `OwnedRef`.</span>
-<span class="doccomment">/// let pool_ref = pool.clone().get_owned(key).unwrap();</span>
-<span class="doccomment">/// let my_struct = MyStruct {</span>
-<span class="doccomment">///     pool_ref,</span>
-<span class="doccomment">///     // ...</span>
-<span class="doccomment">/// };</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // We can use `my_struct` anywhere where it is required to have the</span>
-<span class="doccomment">/// // `&#39;static` lifetime:</span>
-<span class="doccomment">/// function_requiring_static(&amp;my_struct);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `OwnedRef`s may be sent between threads:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use sharded_slab::Pool;</span>
-<span class="doccomment">/// use std::{thread, sync::Arc};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let pool: Arc&lt;Pool&lt;String&gt;&gt; = Arc::new(Pool::new());</span>
-<span class="doccomment">/// let key = pool.create_with(|item| item.push_str(&quot;hello world&quot;)).unwrap();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Look up the created `Key`, returning an `OwnedRef`.</span>
-<span class="doccomment">/// let value = pool.clone().get_owned(key).unwrap();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// thread::spawn(move || {</span>
-<span class="doccomment">///     assert_eq!(value, String::from(&quot;hello world&quot;));</span>
-<span class="doccomment">///     // ...</span>
-<span class="doccomment">/// }).join().unwrap();</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Ref`]: crate::pool::Ref</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OwnedRef</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span> <span class="op">=</span> <span class="ident">DefaultConfig</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="doccomment">/// An owned guard that allows shared immutable access to an object in a pool.
+///
+/// While the guard exists, it indicates to the pool that the item the guard references is
+/// currently being accessed. If the item is removed from the pool while the guard exists, the
+/// removal will be deferred until all guards are dropped.
+///
+/// Unlike [`Ref`], which borrows the pool, an `OwnedRef` clones the `Arc`
+/// around the pool. Therefore, it keeps the pool from being dropped until all
+/// such guards have been dropped. This means that an `OwnedRef` may be held for
+/// an arbitrary lifetime.
+///
+///
+/// # Examples
+///
+/// ```
+/// # use sharded_slab::Pool;
+/// use std::sync::Arc;
+///
+/// let pool: Arc&lt;Pool&lt;String&gt;&gt; = Arc::new(Pool::new());
+/// let key = pool.create_with(|item| item.push_str(&quot;hello world&quot;)).unwrap();
+///
+/// // Look up the created `Key`, returning an `OwnedRef`.
+/// let value = pool.clone().get_owned(key).unwrap();
+///
+/// // Now, the original `Arc` clone of the pool may be dropped, but the
+/// // returned `OwnedRef` can still access the value.
+/// assert_eq!(value, String::from(&quot;hello world&quot;));
+/// ```
+///
+/// Unlike [`Ref`], an `OwnedRef` may be stored in a struct which must live
+/// for the `&#39;static` lifetime:
+///
+/// ```
+/// # use sharded_slab::Pool;
+/// use sharded_slab::pool::OwnedRef;
+/// use std::sync::Arc;
+///
+/// pub struct MyStruct {
+///     pool_ref: OwnedRef&lt;String&gt;,
+///     // ... other fields ...
+/// }
+///
+/// // Suppose this is some arbitrary function which requires a value that
+/// // lives for the &#39;static lifetime...
+/// fn function_requiring_static&lt;T: &#39;static&gt;(t: &amp;T) {
+///     // ... do something extremely important and interesting ...
+/// }
+///
+/// let pool: Arc&lt;Pool&lt;String&gt;&gt; = Arc::new(Pool::new());
+/// let key = pool.create_with(|item| item.push_str(&quot;hello world&quot;)).unwrap();
+///
+/// // Look up the created `Key`, returning an `OwnedRef`.
+/// let pool_ref = pool.clone().get_owned(key).unwrap();
+/// let my_struct = MyStruct {
+///     pool_ref,
+///     // ...
+/// };
+///
+/// // We can use `my_struct` anywhere where it is required to have the
+/// // `&#39;static` lifetime:
+/// function_requiring_static(&amp;my_struct);
+/// ```
+///
+/// `OwnedRef`s may be sent between threads:
+///
+/// ```
+/// # use sharded_slab::Pool;
+/// use std::{thread, sync::Arc};
+///
+/// let pool: Arc&lt;Pool&lt;String&gt;&gt; = Arc::new(Pool::new());
+/// let key = pool.create_with(|item| item.push_str(&quot;hello world&quot;)).unwrap();
+///
+/// // Look up the created `Key`, returning an `OwnedRef`.
+/// let value = pool.clone().get_owned(key).unwrap();
+///
+/// thread::spawn(move || {
+///     assert_eq!(value, String::from(&quot;hello world&quot;));
+///     // ...
+/// }).join().unwrap();
+/// ```
+///
+/// [`Ref`]: crate::pool::Ref
+</span><span class="kw">pub struct </span>OwnedRef&lt;T, C = DefaultConfig&gt;
+<span class="kw">where
+    </span>T: Clear + Default,
+    C: cfg::Config,
 {
-    <span class="ident">inner</span>: <span class="ident">page::slot::Guard</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>,
-    <span class="ident">pool</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">key</span>: <span class="ident">usize</span>,
+    inner: page::slot::Guard&lt;T, C&gt;,
+    pool: Arc&lt;Pool&lt;T, C&gt;&gt;,
+    key: usize,
 }
 
-<span class="doccomment">/// An owned guard that allows exclusive, mutable access to an object in a pool.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// An `OwnedRefMut&lt;T&gt;` functions more or less identically to an owned</span>
-<span class="doccomment">/// `Box&lt;T&gt;`: it can be passed to functions, stored in structure fields, and</span>
-<span class="doccomment">/// borrowed mutably or immutably, and can be owned for arbitrary lifetimes.</span>
-<span class="doccomment">/// The difference is that, unlike a `Box&lt;T&gt;`, the memory allocation for the</span>
-<span class="doccomment">/// `T` lives in the `Pool`; when an `OwnedRefMut` is created, it may reuse</span>
-<span class="doccomment">/// memory that was allocated for a previous pooled object that has been</span>
-<span class="doccomment">/// cleared. Additionally, the `OwnedRefMut` may be [downgraded] to an</span>
-<span class="doccomment">/// [`OwnedRef`] which may be shared freely, essentially turning the `Box`</span>
-<span class="doccomment">/// into an `Arc`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is returned by [`Pool::create_owned`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// While the guard exists, it indicates to the pool that the item the guard</span>
-<span class="doccomment">/// references is currently being accessed. If the item is removed from the pool</span>
-<span class="doccomment">/// while the guard exists, theremoval will be deferred until all guards are</span>
-<span class="doccomment">/// dropped.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Unlike [`RefMut`], which borrows the pool, an `OwnedRefMut` clones the `Arc`</span>
-<span class="doccomment">/// around the pool. Therefore, it keeps the pool from being dropped until all</span>
-<span class="doccomment">/// such guards have been dropped. This means that an `OwnedRefMut` may be held for</span>
-<span class="doccomment">/// an arbitrary lifetime.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use sharded_slab::Pool;</span>
-<span class="doccomment">/// # use std::thread;</span>
-<span class="doccomment">/// use std::sync::Arc;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let pool: Arc&lt;Pool&lt;String&gt;&gt; = Arc::new(Pool::new());</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Create a new pooled item, returning an owned guard that allows mutable</span>
-<span class="doccomment">/// // access to the new item.</span>
-<span class="doccomment">/// let mut item = pool.clone().create_owned().unwrap();</span>
-<span class="doccomment">/// // Return a key that allows indexing the created item once the guard</span>
-<span class="doccomment">/// // has been dropped.</span>
-<span class="doccomment">/// let key = item.key();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Mutate the item.</span>
-<span class="doccomment">/// item.push_str(&quot;Hello&quot;);</span>
-<span class="doccomment">/// // Drop the guard, releasing mutable access to the new item.</span>
-<span class="doccomment">/// drop(item);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// /// Other threads may now (immutably) access the item using the returned key.</span>
-<span class="doccomment">/// thread::spawn(move || {</span>
-<span class="doccomment">///    assert_eq!(pool.get(key).unwrap(), String::from(&quot;Hello&quot;));</span>
-<span class="doccomment">/// }).join().unwrap();</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use sharded_slab::Pool;</span>
-<span class="doccomment">/// use std::sync::Arc;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let pool: Arc&lt;Pool&lt;String&gt;&gt; = Arc::new(Pool::new());</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Create a new item, returning an owned, mutable guard.</span>
-<span class="doccomment">/// let mut value = pool.clone().create_owned().unwrap();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Now, the original `Arc` clone of the pool may be dropped, but the</span>
-<span class="doccomment">/// // returned `OwnedRefMut` can still access the value.</span>
-<span class="doccomment">/// drop(pool);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// value.push_str(&quot;hello world&quot;);</span>
-<span class="doccomment">/// assert_eq!(value, String::from(&quot;hello world&quot;));</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Unlike [`RefMut`], an `OwnedRefMut` may be stored in a struct which must live</span>
-<span class="doccomment">/// for the `&#39;static` lifetime:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use sharded_slab::Pool;</span>
-<span class="doccomment">/// use sharded_slab::pool::OwnedRefMut;</span>
-<span class="doccomment">/// use std::sync::Arc;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// pub struct MyStruct {</span>
-<span class="doccomment">///     pool_ref: OwnedRefMut&lt;String&gt;,</span>
-<span class="doccomment">///     // ... other fields ...</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Suppose this is some arbitrary function which requires a value that</span>
-<span class="doccomment">/// // lives for the &#39;static lifetime...</span>
-<span class="doccomment">/// fn function_requiring_static&lt;T: &#39;static&gt;(t: &amp;T) {</span>
-<span class="doccomment">///     // ... do something extremely important and interesting ...</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let pool: Arc&lt;Pool&lt;String&gt;&gt; = Arc::new(Pool::new());</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Create a new item, returning a mutable owned reference.</span>
-<span class="doccomment">/// let pool_ref = pool.clone().create_owned().unwrap();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let my_struct = MyStruct {</span>
-<span class="doccomment">///     pool_ref,</span>
-<span class="doccomment">///     // ...</span>
-<span class="doccomment">/// };</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // We can use `my_struct` anywhere where it is required to have the</span>
-<span class="doccomment">/// // `&#39;static` lifetime:</span>
-<span class="doccomment">/// function_requiring_static(&amp;my_struct);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `OwnedRefMut`s may be sent between threads:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use sharded_slab::Pool;</span>
-<span class="doccomment">/// use std::{thread, sync::Arc};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let pool: Arc&lt;Pool&lt;String&gt;&gt; = Arc::new(Pool::new());</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut value = pool.clone().create_owned().unwrap();</span>
-<span class="doccomment">/// let key = value.key();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// thread::spawn(move || {</span>
-<span class="doccomment">///     value.push_str(&quot;hello world&quot;);</span>
-<span class="doccomment">///     // ...</span>
-<span class="doccomment">/// }).join().unwrap();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Once the `OwnedRefMut` has been dropped by the other thread, we may</span>
-<span class="doccomment">/// // now access the value immutably on this thread.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(pool.get(key).unwrap(), String::from(&quot;hello world&quot;));</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Downgrading from a mutable to an immutable reference:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # use sharded_slab::Pool;</span>
-<span class="doccomment">/// use std::{thread, sync::Arc};</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let pool: Arc&lt;Pool&lt;String&gt;&gt; = Arc::new(Pool::new());</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut value = pool.clone().create_owned().unwrap();</span>
-<span class="doccomment">/// let key = value.key();</span>
-<span class="doccomment">/// value.push_str(&quot;hello world&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Downgrade the mutable owned ref to an immutable owned ref.</span>
-<span class="doccomment">/// let value = value.downgrade();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Once the `OwnedRefMut` has been downgraded, other threads may</span>
-<span class="doccomment">/// // immutably access the pooled value:</span>
-<span class="doccomment">/// thread::spawn(move || {</span>
-<span class="doccomment">///     assert_eq!(pool.get(key).unwrap(), String::from(&quot;hello world&quot;));</span>
-<span class="doccomment">/// }).join().unwrap();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // This thread can still access the pooled value through the</span>
-<span class="doccomment">/// // immutable owned ref:</span>
-<span class="doccomment">/// assert_eq!(value, String::from(&quot;hello world&quot;));</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Pool::create_owned`]: crate::Pool::create_owned</span>
-<span class="doccomment">/// [`RefMut`]: crate::pool::RefMut</span>
-<span class="doccomment">/// [`OwnedRefMut`]: crate::pool::OwnedRefMut</span>
-<span class="doccomment">/// [downgraded]: crate::pool::OwnedRefMut::downgrade</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OwnedRefMut</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span> <span class="op">=</span> <span class="ident">DefaultConfig</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="doccomment">/// An owned guard that allows exclusive, mutable access to an object in a pool.
+///
+/// An `OwnedRefMut&lt;T&gt;` functions more or less identically to an owned
+/// `Box&lt;T&gt;`: it can be passed to functions, stored in structure fields, and
+/// borrowed mutably or immutably, and can be owned for arbitrary lifetimes.
+/// The difference is that, unlike a `Box&lt;T&gt;`, the memory allocation for the
+/// `T` lives in the `Pool`; when an `OwnedRefMut` is created, it may reuse
+/// memory that was allocated for a previous pooled object that has been
+/// cleared. Additionally, the `OwnedRefMut` may be [downgraded] to an
+/// [`OwnedRef`] which may be shared freely, essentially turning the `Box`
+/// into an `Arc`.
+///
+/// This is returned by [`Pool::create_owned`].
+///
+/// While the guard exists, it indicates to the pool that the item the guard
+/// references is currently being accessed. If the item is removed from the pool
+/// while the guard exists, theremoval will be deferred until all guards are
+/// dropped.
+///
+/// Unlike [`RefMut`], which borrows the pool, an `OwnedRefMut` clones the `Arc`
+/// around the pool. Therefore, it keeps the pool from being dropped until all
+/// such guards have been dropped. This means that an `OwnedRefMut` may be held for
+/// an arbitrary lifetime.
+///
+/// # Examples
+///
+/// ```rust
+/// # use sharded_slab::Pool;
+/// # use std::thread;
+/// use std::sync::Arc;
+///
+/// let pool: Arc&lt;Pool&lt;String&gt;&gt; = Arc::new(Pool::new());
+///
+/// // Create a new pooled item, returning an owned guard that allows mutable
+/// // access to the new item.
+/// let mut item = pool.clone().create_owned().unwrap();
+/// // Return a key that allows indexing the created item once the guard
+/// // has been dropped.
+/// let key = item.key();
+///
+/// // Mutate the item.
+/// item.push_str(&quot;Hello&quot;);
+/// // Drop the guard, releasing mutable access to the new item.
+/// drop(item);
+///
+/// /// Other threads may now (immutably) access the item using the returned key.
+/// thread::spawn(move || {
+///    assert_eq!(pool.get(key).unwrap(), String::from(&quot;Hello&quot;));
+/// }).join().unwrap();
+/// ```
+///
+/// ```rust
+/// # use sharded_slab::Pool;
+/// use std::sync::Arc;
+///
+/// let pool: Arc&lt;Pool&lt;String&gt;&gt; = Arc::new(Pool::new());
+///
+/// // Create a new item, returning an owned, mutable guard.
+/// let mut value = pool.clone().create_owned().unwrap();
+///
+/// // Now, the original `Arc` clone of the pool may be dropped, but the
+/// // returned `OwnedRefMut` can still access the value.
+/// drop(pool);
+///
+/// value.push_str(&quot;hello world&quot;);
+/// assert_eq!(value, String::from(&quot;hello world&quot;));
+/// ```
+///
+/// Unlike [`RefMut`], an `OwnedRefMut` may be stored in a struct which must live
+/// for the `&#39;static` lifetime:
+///
+/// ```
+/// # use sharded_slab::Pool;
+/// use sharded_slab::pool::OwnedRefMut;
+/// use std::sync::Arc;
+///
+/// pub struct MyStruct {
+///     pool_ref: OwnedRefMut&lt;String&gt;,
+///     // ... other fields ...
+/// }
+///
+/// // Suppose this is some arbitrary function which requires a value that
+/// // lives for the &#39;static lifetime...
+/// fn function_requiring_static&lt;T: &#39;static&gt;(t: &amp;T) {
+///     // ... do something extremely important and interesting ...
+/// }
+///
+/// let pool: Arc&lt;Pool&lt;String&gt;&gt; = Arc::new(Pool::new());
+///
+/// // Create a new item, returning a mutable owned reference.
+/// let pool_ref = pool.clone().create_owned().unwrap();
+///
+/// let my_struct = MyStruct {
+///     pool_ref,
+///     // ...
+/// };
+///
+/// // We can use `my_struct` anywhere where it is required to have the
+/// // `&#39;static` lifetime:
+/// function_requiring_static(&amp;my_struct);
+/// ```
+///
+/// `OwnedRefMut`s may be sent between threads:
+///
+/// ```
+/// # use sharded_slab::Pool;
+/// use std::{thread, sync::Arc};
+///
+/// let pool: Arc&lt;Pool&lt;String&gt;&gt; = Arc::new(Pool::new());
+///
+/// let mut value = pool.clone().create_owned().unwrap();
+/// let key = value.key();
+///
+/// thread::spawn(move || {
+///     value.push_str(&quot;hello world&quot;);
+///     // ...
+/// }).join().unwrap();
+///
+/// // Once the `OwnedRefMut` has been dropped by the other thread, we may
+/// // now access the value immutably on this thread.
+///
+/// assert_eq!(pool.get(key).unwrap(), String::from(&quot;hello world&quot;));
+/// ```
+///
+/// Downgrading from a mutable to an immutable reference:
+///
+/// ```
+/// # use sharded_slab::Pool;
+/// use std::{thread, sync::Arc};
+///
+/// let pool: Arc&lt;Pool&lt;String&gt;&gt; = Arc::new(Pool::new());
+///
+/// let mut value = pool.clone().create_owned().unwrap();
+/// let key = value.key();
+/// value.push_str(&quot;hello world&quot;);
+///
+/// // Downgrade the mutable owned ref to an immutable owned ref.
+/// let value = value.downgrade();
+///
+/// // Once the `OwnedRefMut` has been downgraded, other threads may
+/// // immutably access the pooled value:
+/// thread::spawn(move || {
+///     assert_eq!(pool.get(key).unwrap(), String::from(&quot;hello world&quot;));
+/// }).join().unwrap();
+///
+/// // This thread can still access the pooled value through the
+/// // immutable owned ref:
+/// assert_eq!(value, String::from(&quot;hello world&quot;));
+/// ```
+///
+/// [`Pool::create_owned`]: crate::Pool::create_owned
+/// [`RefMut`]: crate::pool::RefMut
+/// [`OwnedRefMut`]: crate::pool::OwnedRefMut
+/// [downgraded]: crate::pool::OwnedRefMut::downgrade
+</span><span class="kw">pub struct </span>OwnedRefMut&lt;T, C = DefaultConfig&gt;
+<span class="kw">where
+    </span>T: Clear + Default,
+    C: cfg::Config,
 {
-    <span class="ident">inner</span>: <span class="ident">page::slot::InitGuard</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>,
-    <span class="ident">pool</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">key</span>: <span class="ident">usize</span>,
+    inner: page::slot::InitGuard&lt;T, C&gt;,
+    pool: Arc&lt;Pool&lt;T, C&gt;&gt;,
+    key: usize,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
+<span class="kw">impl</span>&lt;T&gt; Pool&lt;T&gt;
+<span class="kw">where
+    </span>T: Clear + Default,
 {
-    <span class="doccomment">/// Returns a new `Pool` with the default configuration parameters.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new_with_config</span>()
+    <span class="doccomment">/// Returns a new `Pool` with the default configuration parameters.
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new_with_config()
     }
 
-    <span class="doccomment">/// Returns a new `Pool` with the provided configuration parameters.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_config</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span>() -&gt; <span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-        <span class="ident">C::validate</span>();
-        <span class="ident">Pool</span> {
-            <span class="ident">shards</span>: <span class="ident">shard::Array::new</span>(),
-            <span class="ident">_cfg</span>: <span class="ident">PhantomData</span>,
+    <span class="doccomment">/// Returns a new `Pool` with the provided configuration parameters.
+    </span><span class="kw">pub fn </span>new_with_config&lt;C: cfg::Config&gt;() -&gt; Pool&lt;T, C&gt; {
+        C::validate();
+        Pool {
+            shards: shard::Array::new(),
+            _cfg: PhantomData,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="kw">impl</span>&lt;T, C&gt; Pool&lt;T, C&gt;
+<span class="kw">where
+    </span>T: Clear + Default,
+    C: cfg::Config,
 {
-    <span class="doccomment">/// The number of bits in each index which are used by the pool.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If other data is packed into the `usize` indices returned by</span>
-    <span class="doccomment">/// [`Pool::create`], user code is free to use any bits higher than the</span>
-    <span class="doccomment">/// `USED_BITS`-th bit freely.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is determined by the [`Config`] type that configures the pool&#39;s</span>
-    <span class="doccomment">/// parameters. By default, all bits are used; this can be changed by</span>
-    <span class="doccomment">/// overriding the [`Config::RESERVED_BITS`][res] constant.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Config`]: trait.Config.html</span>
-    <span class="doccomment">/// [res]: trait.Config.html#associatedconstant.RESERVED_BITS</span>
-    <span class="doccomment">/// [`Slab::insert`]: struct.Slab.html#method.insert</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">USED_BITS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">C::USED_BITS</span>;
+    <span class="doccomment">/// The number of bits in each index which are used by the pool.
+    ///
+    /// If other data is packed into the `usize` indices returned by
+    /// [`Pool::create`], user code is free to use any bits higher than the
+    /// `USED_BITS`-th bit freely.
+    ///
+    /// This is determined by the [`Config`] type that configures the pool&#39;s
+    /// parameters. By default, all bits are used; this can be changed by
+    /// overriding the [`Config::RESERVED_BITS`][res] constant.
+    ///
+    /// [`Config`]: trait.Config.html
+    /// [res]: trait.Config.html#associatedconstant.RESERVED_BITS
+    /// [`Slab::insert`]: struct.Slab.html#method.insert
+    </span><span class="kw">pub const </span>USED_BITS: usize = C::USED_BITS;
 
-    <span class="doccomment">/// Creates a new object in the pool, returning an [`RefMut`] guard that</span>
-    <span class="doccomment">/// may be used to mutate the new object.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If this function returns `None`, then the shard for the current thread is full and no items</span>
-    <span class="doccomment">/// can be added until some are removed, or the maximum number of shards has been reached.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use sharded_slab::Pool;</span>
-    <span class="doccomment">/// # use std::thread;</span>
-    <span class="doccomment">/// let pool: Pool&lt;String&gt; = Pool::new();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Create a new pooled item, returning a guard that allows mutable</span>
-    <span class="doccomment">/// // access to the new item.</span>
-    <span class="doccomment">/// let mut item = pool.create().unwrap();</span>
-    <span class="doccomment">/// // Return a key that allows indexing the created item once the guard</span>
-    <span class="doccomment">/// // has been dropped.</span>
-    <span class="doccomment">/// let key = item.key();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Mutate the item.</span>
-    <span class="doccomment">/// item.push_str(&quot;Hello&quot;);</span>
-    <span class="doccomment">/// // Drop the guard, releasing mutable access to the new item.</span>
-    <span class="doccomment">/// drop(item);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// /// Other threads may now (immutably) access the item using the returned key.</span>
-    <span class="doccomment">/// thread::spawn(move || {</span>
-    <span class="doccomment">///    assert_eq!(pool.get(key).unwrap(), String::from(&quot;Hello&quot;));</span>
-    <span class="doccomment">/// }).join().unwrap();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`RefMut`]: crate::pool::RefMut</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RefMut</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">tid</span>, <span class="ident">shard</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">shards</span>.<span class="ident">current</span>();
-        <span class="macro">test_println!</span>(<span class="string">&quot;pool: create {:?}&quot;</span>, <span class="ident">tid</span>);
-        <span class="kw">let</span> (<span class="ident">key</span>, <span class="ident">inner</span>) <span class="op">=</span> <span class="ident">shard</span>.<span class="ident">init_with</span>(<span class="op">|</span><span class="ident">idx</span>, <span class="ident">slot</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">guard</span> <span class="op">=</span> <span class="ident">slot</span>.<span class="ident">init</span>()<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">gen</span> <span class="op">=</span> <span class="ident">guard</span>.<span class="ident">generation</span>();
-            <span class="prelude-val">Some</span>((<span class="ident">gen</span>.<span class="ident">pack</span>(<span class="ident">idx</span>), <span class="ident">guard</span>))
+    <span class="doccomment">/// Creates a new object in the pool, returning an [`RefMut`] guard that
+    /// may be used to mutate the new object.
+    ///
+    /// If this function returns `None`, then the shard for the current thread is full and no items
+    /// can be added until some are removed, or the maximum number of shards has been reached.
+    ///
+    /// # Examples
+    /// ```rust
+    /// # use sharded_slab::Pool;
+    /// # use std::thread;
+    /// let pool: Pool&lt;String&gt; = Pool::new();
+    ///
+    /// // Create a new pooled item, returning a guard that allows mutable
+    /// // access to the new item.
+    /// let mut item = pool.create().unwrap();
+    /// // Return a key that allows indexing the created item once the guard
+    /// // has been dropped.
+    /// let key = item.key();
+    ///
+    /// // Mutate the item.
+    /// item.push_str(&quot;Hello&quot;);
+    /// // Drop the guard, releasing mutable access to the new item.
+    /// drop(item);
+    ///
+    /// /// Other threads may now (immutably) access the item using the returned key.
+    /// thread::spawn(move || {
+    ///    assert_eq!(pool.get(key).unwrap(), String::from(&quot;Hello&quot;));
+    /// }).join().unwrap();
+    /// ```
+    ///
+    /// [`RefMut`]: crate::pool::RefMut
+    </span><span class="kw">pub fn </span>create(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;RefMut&lt;<span class="lifetime">&#39;_</span>, T, C&gt;&gt; {
+        <span class="kw">let </span>(tid, shard) = <span class="self">self</span>.shards.current();
+        <span class="macro">test_println!</span>(<span class="string">&quot;pool: create {:?}&quot;</span>, tid);
+        <span class="kw">let </span>(key, inner) = shard.init_with(|idx, slot| {
+            <span class="kw">let </span>guard = slot.init()<span class="question-mark">?</span>;
+            <span class="kw">let </span>gen = guard.generation();
+            <span class="prelude-val">Some</span>((gen.pack(idx), guard))
         })<span class="question-mark">?</span>;
-        <span class="prelude-val">Some</span>(<span class="ident">RefMut</span> {
-            <span class="ident">inner</span>,
-            <span class="ident">key</span>: <span class="ident">tid</span>.<span class="ident">pack</span>(<span class="ident">key</span>),
-            <span class="ident">shard</span>,
+        <span class="prelude-val">Some</span>(RefMut {
+            inner,
+            key: tid.pack(key),
+            shard,
         })
     }
 
-    <span class="doccomment">/// Creates a new object in the pool, returning an [`OwnedRefMut`] guard that</span>
-    <span class="doccomment">/// may be used to mutate the new object.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If this function returns `None`, then the shard for the current thread</span>
-    <span class="doccomment">/// is full and no items can be added until some are removed, or the maximum</span>
-    <span class="doccomment">/// number of shards has been reached.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Unlike [`create`], which borrows the pool, this method _clones_ the `Arc`</span>
-    <span class="doccomment">/// around the pool if a value exists for the given key. This means that the</span>
-    <span class="doccomment">/// returned [`OwnedRefMut`] can be held for an arbitrary lifetime. However,</span>
-    <span class="doccomment">/// this method requires that the pool itself be wrapped in an `Arc`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// An `OwnedRefMut&lt;T&gt;` functions more or less identically to an owned</span>
-    <span class="doccomment">/// `Box&lt;T&gt;`: it can be passed to functions, stored in structure fields, and</span>
-    <span class="doccomment">/// borrowed mutably or immutably, and can be owned for arbitrary lifetimes.</span>
-    <span class="doccomment">/// The difference is that, unlike a `Box&lt;T&gt;`, the memory allocation for the</span>
-    <span class="doccomment">/// `T` lives in the `Pool`; when an `OwnedRefMut` is created, it may reuse</span>
-    <span class="doccomment">/// memory that was allocated for a previous pooled object that has been</span>
-    <span class="doccomment">/// cleared. Additionally, the `OwnedRefMut` may be [downgraded] to an</span>
-    <span class="doccomment">/// [`OwnedRef`] which may be shared freely, essentially turning the `Box`</span>
-    <span class="doccomment">/// into an `Arc`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use sharded_slab::Pool;</span>
-    <span class="doccomment">/// # use std::thread;</span>
-    <span class="doccomment">/// use std::sync::Arc;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let pool: Arc&lt;Pool&lt;String&gt;&gt; = Arc::new(Pool::new());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Create a new pooled item, returning an owned guard that allows mutable</span>
-    <span class="doccomment">/// // access to the new item.</span>
-    <span class="doccomment">/// let mut item = pool.clone().create_owned().unwrap();</span>
-    <span class="doccomment">/// // Return a key that allows indexing the created item once the guard</span>
-    <span class="doccomment">/// // has been dropped.</span>
-    <span class="doccomment">/// let key = item.key();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Mutate the item.</span>
-    <span class="doccomment">/// item.push_str(&quot;Hello&quot;);</span>
-    <span class="doccomment">/// // Drop the guard, releasing mutable access to the new item.</span>
-    <span class="doccomment">/// drop(item);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// /// Other threads may now (immutably) access the item using the returned key.</span>
-    <span class="doccomment">/// thread::spawn(move || {</span>
-    <span class="doccomment">///    assert_eq!(pool.get(key).unwrap(), String::from(&quot;Hello&quot;));</span>
-    <span class="doccomment">/// }).join().unwrap();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use sharded_slab::Pool;</span>
-    <span class="doccomment">/// use std::sync::Arc;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let pool: Arc&lt;Pool&lt;String&gt;&gt; = Arc::new(Pool::new());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Create a new item, returning an owned, mutable guard.</span>
-    <span class="doccomment">/// let mut value = pool.clone().create_owned().unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Now, the original `Arc` clone of the pool may be dropped, but the</span>
-    <span class="doccomment">/// // returned `OwnedRefMut` can still access the value.</span>
-    <span class="doccomment">/// drop(pool);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// value.push_str(&quot;hello world&quot;);</span>
-    <span class="doccomment">/// assert_eq!(value, String::from(&quot;hello world&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Unlike [`RefMut`], an `OwnedRefMut` may be stored in a struct which must live</span>
-    <span class="doccomment">/// for the `&#39;static` lifetime:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use sharded_slab::Pool;</span>
-    <span class="doccomment">/// use sharded_slab::pool::OwnedRefMut;</span>
-    <span class="doccomment">/// use std::sync::Arc;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// pub struct MyStruct {</span>
-    <span class="doccomment">///     pool_ref: OwnedRefMut&lt;String&gt;,</span>
-    <span class="doccomment">///     // ... other fields ...</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Suppose this is some arbitrary function which requires a value that</span>
-    <span class="doccomment">/// // lives for the &#39;static lifetime...</span>
-    <span class="doccomment">/// fn function_requiring_static&lt;T: &#39;static&gt;(t: &amp;T) {</span>
-    <span class="doccomment">///     // ... do something extremely important and interesting ...</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let pool: Arc&lt;Pool&lt;String&gt;&gt; = Arc::new(Pool::new());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Create a new item, returning a mutable owned reference.</span>
-    <span class="doccomment">/// let pool_ref = pool.clone().create_owned().unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let my_struct = MyStruct {</span>
-    <span class="doccomment">///     pool_ref,</span>
-    <span class="doccomment">///     // ...</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // We can use `my_struct` anywhere where it is required to have the</span>
-    <span class="doccomment">/// // `&#39;static` lifetime:</span>
-    <span class="doccomment">/// function_requiring_static(&amp;my_struct);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `OwnedRefMut`s may be sent between threads:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use sharded_slab::Pool;</span>
-    <span class="doccomment">/// use std::{thread, sync::Arc};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let pool: Arc&lt;Pool&lt;String&gt;&gt; = Arc::new(Pool::new());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut value = pool.clone().create_owned().unwrap();</span>
-    <span class="doccomment">/// let key = value.key();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// thread::spawn(move || {</span>
-    <span class="doccomment">///     value.push_str(&quot;hello world&quot;);</span>
-    <span class="doccomment">///     // ...</span>
-    <span class="doccomment">/// }).join().unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Once the `OwnedRefMut` has been dropped by the other thread, we may</span>
-    <span class="doccomment">/// // now access the value immutably on this thread.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(pool.get(key).unwrap(), String::from(&quot;hello world&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Downgrading from a mutable to an immutable reference:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use sharded_slab::Pool;</span>
-    <span class="doccomment">/// use std::{thread, sync::Arc};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let pool: Arc&lt;Pool&lt;String&gt;&gt; = Arc::new(Pool::new());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut value = pool.clone().create_owned().unwrap();</span>
-    <span class="doccomment">/// let key = value.key();</span>
-    <span class="doccomment">/// value.push_str(&quot;hello world&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Downgrade the mutable owned ref to an immutable owned ref.</span>
-    <span class="doccomment">/// let value = value.downgrade();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Once the `OwnedRefMut` has been downgraded, other threads may</span>
-    <span class="doccomment">/// // immutably access the pooled value:</span>
-    <span class="doccomment">/// thread::spawn(move || {</span>
-    <span class="doccomment">///     assert_eq!(pool.get(key).unwrap(), String::from(&quot;hello world&quot;));</span>
-    <span class="doccomment">/// }).join().unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // This thread can still access the pooled value through the</span>
-    <span class="doccomment">/// // immutable owned ref:</span>
-    <span class="doccomment">/// assert_eq!(value, String::from(&quot;hello world&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`create`]: Pool::create</span>
-    <span class="doccomment">/// [`OwnedRef`]: crate::pool::OwnedRef</span>
-    <span class="doccomment">/// [`RefMut`]: crate::pool::RefMut</span>
-    <span class="doccomment">/// [`OwnedRefMut`]: crate::pool::OwnedRefMut</span>
-    <span class="doccomment">/// [downgraded]: crate::pool::OwnedRefMut::downgrade</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_owned</span>(<span class="self">self</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OwnedRefMut</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">tid</span>, <span class="ident">shard</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">shards</span>.<span class="ident">current</span>();
-        <span class="macro">test_println!</span>(<span class="string">&quot;pool: create_owned {:?}&quot;</span>, <span class="ident">tid</span>);
-        <span class="kw">let</span> (<span class="ident">inner</span>, <span class="ident">key</span>) <span class="op">=</span> <span class="ident">shard</span>.<span class="ident">init_with</span>(<span class="op">|</span><span class="ident">idx</span>, <span class="ident">slot</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">slot</span>.<span class="ident">init</span>()<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">gen</span> <span class="op">=</span> <span class="ident">inner</span>.<span class="ident">generation</span>();
-            <span class="prelude-val">Some</span>((<span class="ident">inner</span>, <span class="ident">tid</span>.<span class="ident">pack</span>(<span class="ident">gen</span>.<span class="ident">pack</span>(<span class="ident">idx</span>))))
+    <span class="doccomment">/// Creates a new object in the pool, returning an [`OwnedRefMut`] guard that
+    /// may be used to mutate the new object.
+    ///
+    /// If this function returns `None`, then the shard for the current thread
+    /// is full and no items can be added until some are removed, or the maximum
+    /// number of shards has been reached.
+    ///
+    /// Unlike [`create`], which borrows the pool, this method _clones_ the `Arc`
+    /// around the pool if a value exists for the given key. This means that the
+    /// returned [`OwnedRefMut`] can be held for an arbitrary lifetime. However,
+    /// this method requires that the pool itself be wrapped in an `Arc`.
+    ///
+    /// An `OwnedRefMut&lt;T&gt;` functions more or less identically to an owned
+    /// `Box&lt;T&gt;`: it can be passed to functions, stored in structure fields, and
+    /// borrowed mutably or immutably, and can be owned for arbitrary lifetimes.
+    /// The difference is that, unlike a `Box&lt;T&gt;`, the memory allocation for the
+    /// `T` lives in the `Pool`; when an `OwnedRefMut` is created, it may reuse
+    /// memory that was allocated for a previous pooled object that has been
+    /// cleared. Additionally, the `OwnedRefMut` may be [downgraded] to an
+    /// [`OwnedRef`] which may be shared freely, essentially turning the `Box`
+    /// into an `Arc`.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use sharded_slab::Pool;
+    /// # use std::thread;
+    /// use std::sync::Arc;
+    ///
+    /// let pool: Arc&lt;Pool&lt;String&gt;&gt; = Arc::new(Pool::new());
+    ///
+    /// // Create a new pooled item, returning an owned guard that allows mutable
+    /// // access to the new item.
+    /// let mut item = pool.clone().create_owned().unwrap();
+    /// // Return a key that allows indexing the created item once the guard
+    /// // has been dropped.
+    /// let key = item.key();
+    ///
+    /// // Mutate the item.
+    /// item.push_str(&quot;Hello&quot;);
+    /// // Drop the guard, releasing mutable access to the new item.
+    /// drop(item);
+    ///
+    /// /// Other threads may now (immutably) access the item using the returned key.
+    /// thread::spawn(move || {
+    ///    assert_eq!(pool.get(key).unwrap(), String::from(&quot;Hello&quot;));
+    /// }).join().unwrap();
+    /// ```
+    ///
+    /// ```rust
+    /// # use sharded_slab::Pool;
+    /// use std::sync::Arc;
+    ///
+    /// let pool: Arc&lt;Pool&lt;String&gt;&gt; = Arc::new(Pool::new());
+    ///
+    /// // Create a new item, returning an owned, mutable guard.
+    /// let mut value = pool.clone().create_owned().unwrap();
+    ///
+    /// // Now, the original `Arc` clone of the pool may be dropped, but the
+    /// // returned `OwnedRefMut` can still access the value.
+    /// drop(pool);
+    ///
+    /// value.push_str(&quot;hello world&quot;);
+    /// assert_eq!(value, String::from(&quot;hello world&quot;));
+    /// ```
+    ///
+    /// Unlike [`RefMut`], an `OwnedRefMut` may be stored in a struct which must live
+    /// for the `&#39;static` lifetime:
+    ///
+    /// ```
+    /// # use sharded_slab::Pool;
+    /// use sharded_slab::pool::OwnedRefMut;
+    /// use std::sync::Arc;
+    ///
+    /// pub struct MyStruct {
+    ///     pool_ref: OwnedRefMut&lt;String&gt;,
+    ///     // ... other fields ...
+    /// }
+    ///
+    /// // Suppose this is some arbitrary function which requires a value that
+    /// // lives for the &#39;static lifetime...
+    /// fn function_requiring_static&lt;T: &#39;static&gt;(t: &amp;T) {
+    ///     // ... do something extremely important and interesting ...
+    /// }
+    ///
+    /// let pool: Arc&lt;Pool&lt;String&gt;&gt; = Arc::new(Pool::new());
+    ///
+    /// // Create a new item, returning a mutable owned reference.
+    /// let pool_ref = pool.clone().create_owned().unwrap();
+    ///
+    /// let my_struct = MyStruct {
+    ///     pool_ref,
+    ///     // ...
+    /// };
+    ///
+    /// // We can use `my_struct` anywhere where it is required to have the
+    /// // `&#39;static` lifetime:
+    /// function_requiring_static(&amp;my_struct);
+    /// ```
+    ///
+    /// `OwnedRefMut`s may be sent between threads:
+    ///
+    /// ```
+    /// # use sharded_slab::Pool;
+    /// use std::{thread, sync::Arc};
+    ///
+    /// let pool: Arc&lt;Pool&lt;String&gt;&gt; = Arc::new(Pool::new());
+    ///
+    /// let mut value = pool.clone().create_owned().unwrap();
+    /// let key = value.key();
+    ///
+    /// thread::spawn(move || {
+    ///     value.push_str(&quot;hello world&quot;);
+    ///     // ...
+    /// }).join().unwrap();
+    ///
+    /// // Once the `OwnedRefMut` has been dropped by the other thread, we may
+    /// // now access the value immutably on this thread.
+    ///
+    /// assert_eq!(pool.get(key).unwrap(), String::from(&quot;hello world&quot;));
+    /// ```
+    ///
+    /// Downgrading from a mutable to an immutable reference:
+    ///
+    /// ```
+    /// # use sharded_slab::Pool;
+    /// use std::{thread, sync::Arc};
+    ///
+    /// let pool: Arc&lt;Pool&lt;String&gt;&gt; = Arc::new(Pool::new());
+    ///
+    /// let mut value = pool.clone().create_owned().unwrap();
+    /// let key = value.key();
+    /// value.push_str(&quot;hello world&quot;);
+    ///
+    /// // Downgrade the mutable owned ref to an immutable owned ref.
+    /// let value = value.downgrade();
+    ///
+    /// // Once the `OwnedRefMut` has been downgraded, other threads may
+    /// // immutably access the pooled value:
+    /// thread::spawn(move || {
+    ///     assert_eq!(pool.get(key).unwrap(), String::from(&quot;hello world&quot;));
+    /// }).join().unwrap();
+    ///
+    /// // This thread can still access the pooled value through the
+    /// // immutable owned ref:
+    /// assert_eq!(value, String::from(&quot;hello world&quot;));
+    /// ```
+    ///
+    /// [`create`]: Pool::create
+    /// [`OwnedRef`]: crate::pool::OwnedRef
+    /// [`RefMut`]: crate::pool::RefMut
+    /// [`OwnedRefMut`]: crate::pool::OwnedRefMut
+    /// [downgraded]: crate::pool::OwnedRefMut::downgrade
+    </span><span class="kw">pub fn </span>create_owned(<span class="self">self</span>: Arc&lt;<span class="self">Self</span>&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;OwnedRefMut&lt;T, C&gt;&gt; {
+        <span class="kw">let </span>(tid, shard) = <span class="self">self</span>.shards.current();
+        <span class="macro">test_println!</span>(<span class="string">&quot;pool: create_owned {:?}&quot;</span>, tid);
+        <span class="kw">let </span>(inner, key) = shard.init_with(|idx, slot| {
+            <span class="kw">let </span>inner = slot.init()<span class="question-mark">?</span>;
+            <span class="kw">let </span>gen = inner.generation();
+            <span class="prelude-val">Some</span>((inner, tid.pack(gen.pack(idx))))
         })<span class="question-mark">?</span>;
-        <span class="prelude-val">Some</span>(<span class="ident">OwnedRefMut</span> {
-            <span class="ident">inner</span>,
-            <span class="ident">pool</span>: <span class="self">self</span>,
-            <span class="ident">key</span>,
+        <span class="prelude-val">Some</span>(OwnedRefMut {
+            inner,
+            pool: <span class="self">self</span>,
+            key,
         })
     }
 
-    <span class="doccomment">/// Creates a new object in the pool with the provided initializer,</span>
-    <span class="doccomment">/// returning a key that may be used to access the new object.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If this function returns `None`, then the shard for the current thread is full and no items</span>
-    <span class="doccomment">/// can be added until some are removed, or the maximum number of shards has been reached.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use sharded_slab::Pool;</span>
-    <span class="doccomment">/// # use std::thread;</span>
-    <span class="doccomment">/// let pool: Pool&lt;String&gt; = Pool::new();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Create a new pooled item, returning its integer key.</span>
-    <span class="doccomment">/// let key = pool.create_with(|s| s.push_str(&quot;Hello&quot;)).unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// /// Other threads may now (immutably) access the item using the key.</span>
-    <span class="doccomment">/// thread::spawn(move || {</span>
-    <span class="doccomment">///    assert_eq!(pool.get(key).unwrap(), String::from(&quot;Hello&quot;));</span>
-    <span class="doccomment">/// }).join().unwrap();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_with</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">init</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">T</span>)) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Creates a new object in the pool with the provided initializer,
+    /// returning a key that may be used to access the new object.
+    ///
+    /// If this function returns `None`, then the shard for the current thread is full and no items
+    /// can be added until some are removed, or the maximum number of shards has been reached.
+    ///
+    /// # Examples
+    /// ```rust
+    /// # use sharded_slab::Pool;
+    /// # use std::thread;
+    /// let pool: Pool&lt;String&gt; = Pool::new();
+    ///
+    /// // Create a new pooled item, returning its integer key.
+    /// let key = pool.create_with(|s| s.push_str(&quot;Hello&quot;)).unwrap();
+    ///
+    /// /// Other threads may now (immutably) access the item using the key.
+    /// thread::spawn(move || {
+    ///    assert_eq!(pool.get(key).unwrap(), String::from(&quot;Hello&quot;));
+    /// }).join().unwrap();
+    /// ```
+    </span><span class="kw">pub fn </span>create_with(<span class="kw-2">&amp;</span><span class="self">self</span>, init: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;mut </span>T)) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
         <span class="macro">test_println!</span>(<span class="string">&quot;pool: create_with&quot;</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">guard</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">create</span>()<span class="question-mark">?</span>;
-        <span class="ident">init</span>(<span class="kw-2">&amp;mut</span> <span class="ident">guard</span>);
-        <span class="prelude-val">Some</span>(<span class="ident">guard</span>.<span class="ident">key</span>())
+        <span class="kw">let </span><span class="kw-2">mut </span>guard = <span class="self">self</span>.create()<span class="question-mark">?</span>;
+        init(<span class="kw-2">&amp;mut </span>guard);
+        <span class="prelude-val">Some</span>(guard.key())
     }
 
-    <span class="doccomment">/// Return a borrowed reference to the value associated with the given key.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the pool does not contain a value for the given key, `None` is returned instead.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use sharded_slab::Pool;</span>
-    <span class="doccomment">/// let pool: Pool&lt;String&gt; = Pool::new();</span>
-    <span class="doccomment">/// let key = pool.create_with(|item| item.push_str(&quot;hello world&quot;)).unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(pool.get(key).unwrap(), String::from(&quot;hello world&quot;));</span>
-    <span class="doccomment">/// assert!(pool.get(12345).is_none());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ref</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">tid</span> <span class="op">=</span> <span class="ident">C::unpack_tid</span>(<span class="ident">key</span>);
+    <span class="doccomment">/// Return a borrowed reference to the value associated with the given key.
+    ///
+    /// If the pool does not contain a value for the given key, `None` is returned instead.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use sharded_slab::Pool;
+    /// let pool: Pool&lt;String&gt; = Pool::new();
+    /// let key = pool.create_with(|item| item.push_str(&quot;hello world&quot;)).unwrap();
+    ///
+    /// assert_eq!(pool.get(key).unwrap(), String::from(&quot;hello world&quot;));
+    /// assert!(pool.get(12345).is_none());
+    /// ```
+    </span><span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, key: usize) -&gt; <span class="prelude-ty">Option</span>&lt;Ref&lt;<span class="lifetime">&#39;_</span>, T, C&gt;&gt; {
+        <span class="kw">let </span>tid = C::unpack_tid(key);
 
-        <span class="macro">test_println!</span>(<span class="string">&quot;pool: get{:?}; current={:?}&quot;</span>, <span class="ident">tid</span>, <span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::current</span>());
-        <span class="kw">let</span> <span class="ident">shard</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shards</span>.<span class="ident">get</span>(<span class="ident">tid</span>.<span class="ident">as_usize</span>())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">shard</span>.<span class="ident">with_slot</span>(<span class="ident">key</span>, <span class="op">|</span><span class="ident">slot</span><span class="op">|</span> <span class="ident">slot</span>.<span class="ident">get</span>(<span class="ident">C::unpack_gen</span>(<span class="ident">key</span>)))<span class="question-mark">?</span>;
-        <span class="prelude-val">Some</span>(<span class="ident">Ref</span> { <span class="ident">inner</span>, <span class="ident">shard</span>, <span class="ident">key</span> })
+        <span class="macro">test_println!</span>(<span class="string">&quot;pool: get{:?}; current={:?}&quot;</span>, tid, Tid::&lt;C&gt;::current());
+        <span class="kw">let </span>shard = <span class="self">self</span>.shards.get(tid.as_usize())<span class="question-mark">?</span>;
+        <span class="kw">let </span>inner = shard.with_slot(key, |slot| slot.get(C::unpack_gen(key)))<span class="question-mark">?</span>;
+        <span class="prelude-val">Some</span>(Ref { inner, shard, key })
     }
 
-    <span class="doccomment">/// Return an owned reference to the value associated with the given key.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the pool does not contain a value for the given key, `None` is</span>
-    <span class="doccomment">/// returned instead.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Unlike [`get`], which borrows the pool, this method _clones_ the `Arc`</span>
-    <span class="doccomment">/// around the pool if a value exists for the given key. This means that the</span>
-    <span class="doccomment">/// returned [`OwnedRef`] can be held for an arbitrary lifetime. However,</span>
-    <span class="doccomment">/// this method requires that the pool itself be wrapped in an `Arc`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use sharded_slab::Pool;</span>
-    <span class="doccomment">/// use std::sync::Arc;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let pool: Arc&lt;Pool&lt;String&gt;&gt; = Arc::new(Pool::new());</span>
-    <span class="doccomment">/// let key = pool.create_with(|item| item.push_str(&quot;hello world&quot;)).unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Look up the created `Key`, returning an `OwnedRef`.</span>
-    <span class="doccomment">/// let value = pool.clone().get_owned(key).unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Now, the original `Arc` clone of the pool may be dropped, but the</span>
-    <span class="doccomment">/// // returned `OwnedRef` can still access the value.</span>
-    <span class="doccomment">/// assert_eq!(value, String::from(&quot;hello world&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Unlike [`Ref`], an `OwnedRef` may be stored in a struct which must live</span>
-    <span class="doccomment">/// for the `&#39;static` lifetime:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use sharded_slab::Pool;</span>
-    <span class="doccomment">/// use sharded_slab::pool::OwnedRef;</span>
-    <span class="doccomment">/// use std::sync::Arc;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// pub struct MyStruct {</span>
-    <span class="doccomment">///     pool_ref: OwnedRef&lt;String&gt;,</span>
-    <span class="doccomment">///     // ... other fields ...</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Suppose this is some arbitrary function which requires a value that</span>
-    <span class="doccomment">/// // lives for the &#39;static lifetime...</span>
-    <span class="doccomment">/// fn function_requiring_static&lt;T: &#39;static&gt;(t: &amp;T) {</span>
-    <span class="doccomment">///     // ... do something extremely important and interesting ...</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let pool: Arc&lt;Pool&lt;String&gt;&gt; = Arc::new(Pool::new());</span>
-    <span class="doccomment">/// let key = pool.create_with(|item| item.push_str(&quot;hello world&quot;)).unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Look up the created `Key`, returning an `OwnedRef`.</span>
-    <span class="doccomment">/// let pool_ref = pool.clone().get_owned(key).unwrap();</span>
-    <span class="doccomment">/// let my_struct = MyStruct {</span>
-    <span class="doccomment">///     pool_ref,</span>
-    <span class="doccomment">///     // ...</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // We can use `my_struct` anywhere where it is required to have the</span>
-    <span class="doccomment">/// // `&#39;static` lifetime:</span>
-    <span class="doccomment">/// function_requiring_static(&amp;my_struct);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `OwnedRef`s may be sent between threads:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use sharded_slab::Pool;</span>
-    <span class="doccomment">/// use std::{thread, sync::Arc};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let pool: Arc&lt;Pool&lt;String&gt;&gt; = Arc::new(Pool::new());</span>
-    <span class="doccomment">/// let key = pool.create_with(|item| item.push_str(&quot;hello world&quot;)).unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Look up the created `Key`, returning an `OwnedRef`.</span>
-    <span class="doccomment">/// let value = pool.clone().get_owned(key).unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// thread::spawn(move || {</span>
-    <span class="doccomment">///     assert_eq!(value, String::from(&quot;hello world&quot;));</span>
-    <span class="doccomment">///     // ...</span>
-    <span class="doccomment">/// }).join().unwrap();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`get`]: Pool::get</span>
-    <span class="doccomment">/// [`OwnedRef`]: crate::pool::OwnedRef</span>
-    <span class="doccomment">/// [`Ref`]: crate::pool::Ref</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_owned</span>(<span class="self">self</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">key</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OwnedRef</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">tid</span> <span class="op">=</span> <span class="ident">C::unpack_tid</span>(<span class="ident">key</span>);
+    <span class="doccomment">/// Return an owned reference to the value associated with the given key.
+    ///
+    /// If the pool does not contain a value for the given key, `None` is
+    /// returned instead.
+    ///
+    /// Unlike [`get`], which borrows the pool, this method _clones_ the `Arc`
+    /// around the pool if a value exists for the given key. This means that the
+    /// returned [`OwnedRef`] can be held for an arbitrary lifetime. However,
+    /// this method requires that the pool itself be wrapped in an `Arc`.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use sharded_slab::Pool;
+    /// use std::sync::Arc;
+    ///
+    /// let pool: Arc&lt;Pool&lt;String&gt;&gt; = Arc::new(Pool::new());
+    /// let key = pool.create_with(|item| item.push_str(&quot;hello world&quot;)).unwrap();
+    ///
+    /// // Look up the created `Key`, returning an `OwnedRef`.
+    /// let value = pool.clone().get_owned(key).unwrap();
+    ///
+    /// // Now, the original `Arc` clone of the pool may be dropped, but the
+    /// // returned `OwnedRef` can still access the value.
+    /// assert_eq!(value, String::from(&quot;hello world&quot;));
+    /// ```
+    ///
+    /// Unlike [`Ref`], an `OwnedRef` may be stored in a struct which must live
+    /// for the `&#39;static` lifetime:
+    ///
+    /// ```
+    /// # use sharded_slab::Pool;
+    /// use sharded_slab::pool::OwnedRef;
+    /// use std::sync::Arc;
+    ///
+    /// pub struct MyStruct {
+    ///     pool_ref: OwnedRef&lt;String&gt;,
+    ///     // ... other fields ...
+    /// }
+    ///
+    /// // Suppose this is some arbitrary function which requires a value that
+    /// // lives for the &#39;static lifetime...
+    /// fn function_requiring_static&lt;T: &#39;static&gt;(t: &amp;T) {
+    ///     // ... do something extremely important and interesting ...
+    /// }
+    ///
+    /// let pool: Arc&lt;Pool&lt;String&gt;&gt; = Arc::new(Pool::new());
+    /// let key = pool.create_with(|item| item.push_str(&quot;hello world&quot;)).unwrap();
+    ///
+    /// // Look up the created `Key`, returning an `OwnedRef`.
+    /// let pool_ref = pool.clone().get_owned(key).unwrap();
+    /// let my_struct = MyStruct {
+    ///     pool_ref,
+    ///     // ...
+    /// };
+    ///
+    /// // We can use `my_struct` anywhere where it is required to have the
+    /// // `&#39;static` lifetime:
+    /// function_requiring_static(&amp;my_struct);
+    /// ```
+    ///
+    /// `OwnedRef`s may be sent between threads:
+    ///
+    /// ```
+    /// # use sharded_slab::Pool;
+    /// use std::{thread, sync::Arc};
+    ///
+    /// let pool: Arc&lt;Pool&lt;String&gt;&gt; = Arc::new(Pool::new());
+    /// let key = pool.create_with(|item| item.push_str(&quot;hello world&quot;)).unwrap();
+    ///
+    /// // Look up the created `Key`, returning an `OwnedRef`.
+    /// let value = pool.clone().get_owned(key).unwrap();
+    ///
+    /// thread::spawn(move || {
+    ///     assert_eq!(value, String::from(&quot;hello world&quot;));
+    ///     // ...
+    /// }).join().unwrap();
+    /// ```
+    ///
+    /// [`get`]: Pool::get
+    /// [`OwnedRef`]: crate::pool::OwnedRef
+    /// [`Ref`]: crate::pool::Ref
+    </span><span class="kw">pub fn </span>get_owned(<span class="self">self</span>: Arc&lt;<span class="self">Self</span>&gt;, key: usize) -&gt; <span class="prelude-ty">Option</span>&lt;OwnedRef&lt;T, C&gt;&gt; {
+        <span class="kw">let </span>tid = C::unpack_tid(key);
 
-        <span class="macro">test_println!</span>(<span class="string">&quot;pool: get{:?}; current={:?}&quot;</span>, <span class="ident">tid</span>, <span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::current</span>());
-        <span class="kw">let</span> <span class="ident">shard</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shards</span>.<span class="ident">get</span>(<span class="ident">tid</span>.<span class="ident">as_usize</span>())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">shard</span>.<span class="ident">with_slot</span>(<span class="ident">key</span>, <span class="op">|</span><span class="ident">slot</span><span class="op">|</span> <span class="ident">slot</span>.<span class="ident">get</span>(<span class="ident">C::unpack_gen</span>(<span class="ident">key</span>)))<span class="question-mark">?</span>;
-        <span class="prelude-val">Some</span>(<span class="ident">OwnedRef</span> {
-            <span class="ident">inner</span>,
-            <span class="ident">pool</span>: <span class="self">self</span>.<span class="ident">clone</span>(),
-            <span class="ident">key</span>,
+        <span class="macro">test_println!</span>(<span class="string">&quot;pool: get{:?}; current={:?}&quot;</span>, tid, Tid::&lt;C&gt;::current());
+        <span class="kw">let </span>shard = <span class="self">self</span>.shards.get(tid.as_usize())<span class="question-mark">?</span>;
+        <span class="kw">let </span>inner = shard.with_slot(key, |slot| slot.get(C::unpack_gen(key)))<span class="question-mark">?</span>;
+        <span class="prelude-val">Some</span>(OwnedRef {
+            inner,
+            pool: <span class="self">self</span>.clone(),
+            key,
         })
     }
 
-    <span class="doccomment">/// Remove the value using the storage associated with the given key from the pool, returning</span>
-    <span class="doccomment">/// `true` if the value was removed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method does _not_ block the current thread until the value can be</span>
-    <span class="doccomment">/// cleared. Instead, if another thread is currently accessing that value, this marks it to be</span>
-    <span class="doccomment">/// cleared by that thread when it is done accessing that value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use sharded_slab::Pool;</span>
-    <span class="doccomment">/// let pool: Pool&lt;String&gt; = Pool::new();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Check out an item from the pool.</span>
-    <span class="doccomment">/// let mut item = pool.create().unwrap();</span>
-    <span class="doccomment">/// let key = item.key();</span>
-    <span class="doccomment">/// item.push_str(&quot;hello world&quot;);</span>
-    <span class="doccomment">/// drop(item);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(pool.get(key).unwrap(), String::from(&quot;hello world&quot;));</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// pool.clear(key);</span>
-    <span class="doccomment">/// assert!(pool.get(key).is_none());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use sharded_slab::Pool;</span>
-    <span class="doccomment">/// let pool: Pool&lt;String&gt; = Pool::new();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let key = pool.create_with(|item| item.push_str(&quot;Hello world!&quot;)).unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Clearing a key that doesn&#39;t exist in the `Pool` will return `false`</span>
-    <span class="doccomment">/// assert_eq!(pool.clear(key + 69420), false);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Clearing a key that does exist returns `true`</span>
-    <span class="doccomment">/// assert!(pool.clear(key));</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Clearing a key that has previously been cleared will return `false`</span>
-    <span class="doccomment">/// assert_eq!(pool.clear(key), false);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [`clear`]: #method.clear</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clear</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">tid</span> <span class="op">=</span> <span class="ident">C::unpack_tid</span>(<span class="ident">key</span>);
+    <span class="doccomment">/// Remove the value using the storage associated with the given key from the pool, returning
+    /// `true` if the value was removed.
+    ///
+    /// This method does _not_ block the current thread until the value can be
+    /// cleared. Instead, if another thread is currently accessing that value, this marks it to be
+    /// cleared by that thread when it is done accessing that value.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use sharded_slab::Pool;
+    /// let pool: Pool&lt;String&gt; = Pool::new();
+    ///
+    /// // Check out an item from the pool.
+    /// let mut item = pool.create().unwrap();
+    /// let key = item.key();
+    /// item.push_str(&quot;hello world&quot;);
+    /// drop(item);
+    ///
+    /// assert_eq!(pool.get(key).unwrap(), String::from(&quot;hello world&quot;));
+    ///
+    /// pool.clear(key);
+    /// assert!(pool.get(key).is_none());
+    /// ```
+    ///
+    /// ```
+    /// # use sharded_slab::Pool;
+    /// let pool: Pool&lt;String&gt; = Pool::new();
+    ///
+    /// let key = pool.create_with(|item| item.push_str(&quot;Hello world!&quot;)).unwrap();
+    ///
+    /// // Clearing a key that doesn&#39;t exist in the `Pool` will return `false`
+    /// assert_eq!(pool.clear(key + 69420), false);
+    ///
+    /// // Clearing a key that does exist returns `true`
+    /// assert!(pool.clear(key));
+    ///
+    /// // Clearing a key that has previously been cleared will return `false`
+    /// assert_eq!(pool.clear(key), false);
+    /// ```
+    /// [`clear`]: #method.clear
+    </span><span class="kw">pub fn </span>clear(<span class="kw-2">&amp;</span><span class="self">self</span>, key: usize) -&gt; bool {
+        <span class="kw">let </span>tid = C::unpack_tid(key);
 
-        <span class="kw">let</span> <span class="ident">shard</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shards</span>.<span class="ident">get</span>(<span class="ident">tid</span>.<span class="ident">as_usize</span>());
-        <span class="kw">if</span> <span class="ident">tid</span>.<span class="ident">is_current</span>() {
-            <span class="ident">shard</span>
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">shard</span><span class="op">|</span> <span class="ident">shard</span>.<span class="ident">mark_clear_local</span>(<span class="ident">key</span>))
-                .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
-        } <span class="kw">else</span> {
-            <span class="ident">shard</span>
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">shard</span><span class="op">|</span> <span class="ident">shard</span>.<span class="ident">mark_clear_remote</span>(<span class="ident">key</span>))
-                .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+        <span class="kw">let </span>shard = <span class="self">self</span>.shards.get(tid.as_usize());
+        <span class="kw">if </span>tid.is_current() {
+            shard
+                .map(|shard| shard.mark_clear_local(key))
+                .unwrap_or(<span class="bool-val">false</span>)
+        } <span class="kw">else </span>{
+            shard
+                .map(|shard| shard.mark_clear_remote(key))
+                .unwrap_or(<span class="bool-val">false</span>)
         }
     }
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="kw">unsafe impl</span>&lt;T, C&gt; Send <span class="kw">for </span>Pool&lt;T, C&gt;
+<span class="kw">where
+    </span>T: Send + Clear + Default,
+    C: cfg::Config,
 {
 }
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="kw">unsafe impl</span>&lt;T, C&gt; Sync <span class="kw">for </span>Pool&lt;T, C&gt;
+<span class="kw">where
+    </span>T: Sync + Clear + Default,
+    C: cfg::Config,
 {
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
+<span class="kw">impl</span>&lt;T&gt; Default <span class="kw">for </span>Pool&lt;T&gt;
+<span class="kw">where
+    </span>T: Clear + Default,
 {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>()
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">fmt::Debug</span> <span class="op">+</span> <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="kw">impl</span>&lt;T, C&gt; fmt::Debug <span class="kw">for </span>Pool&lt;T, C&gt;
+<span class="kw">where
+    </span>T: fmt::Debug + Clear + Default,
+    C: cfg::Config,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Pool&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;shards&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shards</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;config&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">C::debug</span>())
-            .<span class="ident">finish</span>()
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;Pool&quot;</span>)
+            .field(<span class="string">&quot;shards&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.shards)
+            .field(<span class="string">&quot;config&quot;</span>, <span class="kw-2">&amp;</span>C::debug())
+            .finish()
     }
 }
 
-<span class="comment">// === impl Ref ===</span>
+<span class="comment">// === impl Ref ===
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">Ref</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T, C&gt; Ref&lt;<span class="lifetime">&#39;a</span>, T, C&gt;
+<span class="kw">where
+    </span>T: Clear + Default,
+    C: cfg::Config,
 {
-    <span class="doccomment">/// Returns the key used to access this guard</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">key</span>
+    <span class="doccomment">/// Returns the key used to access this guard
+    </span><span class="kw">pub fn </span>key(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.key
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
-        <span class="kw">unsafe</span> {
-            <span class="comment">// Safety: calling `slot::Guard::value` is unsafe, since the `Guard`</span>
-            <span class="comment">// value contains a pointer to the slot that may outlive the slab</span>
-            <span class="comment">// containing that slot. Here, the `Ref` has a borrowed reference to</span>
-            <span class="comment">// the shard containing that slot, which ensures that the slot will</span>
-            <span class="comment">// not be dropped while this `Guard` exists.</span>
-            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">value</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
+        <span class="kw">unsafe </span>{
+            <span class="comment">// Safety: calling `slot::Guard::value` is unsafe, since the `Guard`
+            // value contains a pointer to the slot that may outlive the slab
+            // containing that slot. Here, the `Ref` has a borrowed reference to
+            // the shard containing that slot, which ensures that the slot will
+            // not be dropped while this `Guard` exists.
+            </span><span class="self">self</span>.inner.value()
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">std::ops::Deref</span> <span class="kw">for</span> <span class="ident">Ref</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T, C&gt; std::ops::Deref <span class="kw">for </span>Ref&lt;<span class="lifetime">&#39;a</span>, T, C&gt;
+<span class="kw">where
+    </span>T: Clear + Default,
+    C: cfg::Config,
 {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">T</span>;
+    <span class="kw">type </span>Target = T;
 
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="self">self</span>.<span class="ident">value</span>()
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+        <span class="self">self</span>.value()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Ref</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T, C&gt; Drop <span class="kw">for </span>Ref&lt;<span class="lifetime">&#39;a</span>, T, C&gt;
+<span class="kw">where
+    </span>T: Clear + Default,
+    C: cfg::Config,
 {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="macro">test_println!</span>(<span class="string">&quot;drop Ref: try clearing data&quot;</span>);
-        <span class="kw">let</span> <span class="ident">should_clear</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="comment">// Safety: calling `slot::Guard::release` is unsafe, since the</span>
-            <span class="comment">// `Guard` value contains a pointer to the slot that may outlive the</span>
-            <span class="comment">// slab containing that slot. Here, the `Ref` guard owns a</span>
-            <span class="comment">// borrowed reference to the shard containing that slot, which</span>
-            <span class="comment">// ensures that the slot will not be dropped while this `Ref`</span>
-            <span class="comment">// exists.</span>
-            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">release</span>()
+        <span class="kw">let </span>should_clear = <span class="kw">unsafe </span>{
+            <span class="comment">// Safety: calling `slot::Guard::release` is unsafe, since the
+            // `Guard` value contains a pointer to the slot that may outlive the
+            // slab containing that slot. Here, the `Ref` guard owns a
+            // borrowed reference to the shard containing that slot, which
+            // ensures that the slot will not be dropped while this `Ref`
+            // exists.
+            </span><span class="self">self</span>.inner.release()
         };
-        <span class="kw">if</span> <span class="ident">should_clear</span> {
-            <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">clear_after_release</span>(<span class="self">self</span>.<span class="ident">key</span>);
+        <span class="kw">if </span>should_clear {
+            <span class="self">self</span>.shard.clear_after_release(<span class="self">self</span>.key);
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Ref</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">fmt::Debug</span> <span class="op">+</span> <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T, C&gt; fmt::Debug <span class="kw">for </span>Ref&lt;<span class="lifetime">&#39;a</span>, T, C&gt;
+<span class="kw">where
+    </span>T: fmt::Debug + Clear + Default,
+    C: cfg::Config,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">fmt::Debug::fmt</span>(<span class="self">self</span>.<span class="ident">value</span>(), <span class="ident">f</span>)
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        fmt::Debug::fmt(<span class="self">self</span>.value(), f)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Ref</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T, C&gt; PartialEq&lt;T&gt; <span class="kw">for </span>Ref&lt;<span class="lifetime">&#39;a</span>, T, C&gt;
+<span class="kw">where
+    </span>T: PartialEq&lt;T&gt; + Clear + Default,
+    C: cfg::Config,
 {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">value</span>() <span class="op">==</span> <span class="kw-2">*</span><span class="ident">other</span>
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>T) -&gt; bool {
+        <span class="kw-2">*</span><span class="self">self</span>.value() == <span class="kw-2">*</span>other
     }
 }
 
-<span class="comment">// === impl GuardMut ===</span>
+<span class="comment">// === impl GuardMut ===
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">RefMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T, C: cfg::Config&gt; RefMut&lt;<span class="lifetime">&#39;a</span>, T, C&gt;
+<span class="kw">where
+    </span>T: Clear + Default,
+    C: cfg::Config,
 {
-    <span class="doccomment">/// Returns the key used to access the guard.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">key</span>
+    <span class="doccomment">/// Returns the key used to access the guard.
+    </span><span class="kw">pub fn </span>key(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.key
     }
 
-    <span class="doccomment">/// Downgrades the mutable guard to an immutable guard, allowing access to</span>
-    <span class="doccomment">/// the pooled value from other threads.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use sharded_slab::Pool;</span>
-    <span class="doccomment">/// # use std::{sync::Arc, thread};</span>
-    <span class="doccomment">/// let pool = Arc::new(Pool::&lt;String&gt;::new());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut guard_mut = pool.clone().create_owned().unwrap();</span>
-    <span class="doccomment">/// let key = guard_mut.key();</span>
-    <span class="doccomment">/// guard_mut.push_str(&quot;Hello&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // The pooled string is currently borrowed mutably, so other threads</span>
-    <span class="doccomment">/// // may not access it.</span>
-    <span class="doccomment">/// let pool2 = pool.clone();</span>
-    <span class="doccomment">/// thread::spawn(move || {</span>
-    <span class="doccomment">///     assert!(pool2.get(key).is_none())</span>
-    <span class="doccomment">/// }).join().unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Downgrade the guard to an immutable reference.</span>
-    <span class="doccomment">/// let guard = guard_mut.downgrade();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Now, other threads may also access the pooled value.</span>
-    <span class="doccomment">/// let pool2 = pool.clone();</span>
-    <span class="doccomment">/// thread::spawn(move || {</span>
-    <span class="doccomment">///     let guard = pool2.get(key)</span>
-    <span class="doccomment">///         .expect(&quot;the item may now be referenced by other threads&quot;);</span>
-    <span class="doccomment">///     assert_eq!(guard, String::from(&quot;Hello&quot;));</span>
-    <span class="doccomment">/// }).join().unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // We can still access the value immutably through the downgraded guard.</span>
-    <span class="doccomment">/// assert_eq!(guard, String::from(&quot;Hello&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">downgrade</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">Ref</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">downgrade</span>() };
-        <span class="ident">Ref</span> {
-            <span class="ident">inner</span>,
-            <span class="ident">shard</span>: <span class="self">self</span>.<span class="ident">shard</span>,
-            <span class="ident">key</span>: <span class="self">self</span>.<span class="ident">key</span>,
+    <span class="doccomment">/// Downgrades the mutable guard to an immutable guard, allowing access to
+    /// the pooled value from other threads.
+    ///
+    /// ## Examples
+    ///
+    /// ```
+    /// # use sharded_slab::Pool;
+    /// # use std::{sync::Arc, thread};
+    /// let pool = Arc::new(Pool::&lt;String&gt;::new());
+    ///
+    /// let mut guard_mut = pool.clone().create_owned().unwrap();
+    /// let key = guard_mut.key();
+    /// guard_mut.push_str(&quot;Hello&quot;);
+    ///
+    /// // The pooled string is currently borrowed mutably, so other threads
+    /// // may not access it.
+    /// let pool2 = pool.clone();
+    /// thread::spawn(move || {
+    ///     assert!(pool2.get(key).is_none())
+    /// }).join().unwrap();
+    ///
+    /// // Downgrade the guard to an immutable reference.
+    /// let guard = guard_mut.downgrade();
+    ///
+    /// // Now, other threads may also access the pooled value.
+    /// let pool2 = pool.clone();
+    /// thread::spawn(move || {
+    ///     let guard = pool2.get(key)
+    ///         .expect(&quot;the item may now be referenced by other threads&quot;);
+    ///     assert_eq!(guard, String::from(&quot;Hello&quot;));
+    /// }).join().unwrap();
+    ///
+    /// // We can still access the value immutably through the downgraded guard.
+    /// assert_eq!(guard, String::from(&quot;Hello&quot;));
+    /// ```
+    </span><span class="kw">pub fn </span>downgrade(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; Ref&lt;<span class="lifetime">&#39;a</span>, T, C&gt; {
+        <span class="kw">let </span>inner = <span class="kw">unsafe </span>{ <span class="self">self</span>.inner.downgrade() };
+        Ref {
+            inner,
+            shard: <span class="self">self</span>.shard,
+            key: <span class="self">self</span>.key,
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
-        <span class="kw">unsafe</span> {
-            <span class="comment">// Safety: we are holding a reference to the shard which keeps the</span>
-            <span class="comment">// pointed slot alive. The returned reference will not outlive</span>
-            <span class="comment">// `self`.</span>
-            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">value</span>()
-        }
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span>: <span class="ident">cfg::Config</span><span class="op">&gt;</span> <span class="ident">std::ops::Deref</span> <span class="kw">for</span> <span class="ident">RefMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
-{
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">T</span>;
-
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="self">self</span>.<span class="ident">value</span>()
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">std::ops::DerefMut</span> <span class="kw">for</span> <span class="ident">RefMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
-{
-    <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="kw">unsafe</span> {
-            <span class="comment">// Safety: we are holding a reference to the shard which keeps the</span>
-            <span class="comment">// pointed slot alive. The returned reference will not outlive `self`.</span>
-            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">value_mut</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
+        <span class="kw">unsafe </span>{
+            <span class="comment">// Safety: we are holding a reference to the shard which keeps the
+            // pointed slot alive. The returned reference will not outlive
+            // `self`.
+            </span><span class="self">self</span>.inner.value()
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">RefMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T, C: cfg::Config&gt; std::ops::Deref <span class="kw">for </span>RefMut&lt;<span class="lifetime">&#39;a</span>, T, C&gt;
+<span class="kw">where
+    </span>T: Clear + Default,
+    C: cfg::Config,
 {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
+    <span class="kw">type </span>Target = T;
+
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+        <span class="self">self</span>.value()
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T, C&gt; std::ops::DerefMut <span class="kw">for </span>RefMut&lt;<span class="lifetime">&#39;a</span>, T, C&gt;
+<span class="kw">where
+    </span>T: Clear + Default,
+    C: cfg::Config,
+{
+    <span class="kw">fn </span>deref_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Target {
+        <span class="kw">unsafe </span>{
+            <span class="comment">// Safety: we are holding a reference to the shard which keeps the
+            // pointed slot alive. The returned reference will not outlive `self`.
+            </span><span class="self">self</span>.inner.value_mut()
+        }
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T, C&gt; Drop <span class="kw">for </span>RefMut&lt;<span class="lifetime">&#39;a</span>, T, C&gt;
+<span class="kw">where
+    </span>T: Clear + Default,
+    C: cfg::Config,
+{
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="macro">test_println!</span>(<span class="string">&quot; -&gt; drop RefMut: try clearing data&quot;</span>);
-        <span class="kw">let</span> <span class="ident">should_clear</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="comment">// Safety: we are holding a reference to the shard which keeps the</span>
-            <span class="comment">// pointed slot alive. The returned reference will not outlive `self`.</span>
-            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">release</span>()
+        <span class="kw">let </span>should_clear = <span class="kw">unsafe </span>{
+            <span class="comment">// Safety: we are holding a reference to the shard which keeps the
+            // pointed slot alive. The returned reference will not outlive `self`.
+            </span><span class="self">self</span>.inner.release()
         };
-        <span class="kw">if</span> <span class="ident">should_clear</span> {
-            <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">clear_after_release</span>(<span class="self">self</span>.<span class="ident">key</span>);
+        <span class="kw">if </span>should_clear {
+            <span class="self">self</span>.shard.clear_after_release(<span class="self">self</span>.key);
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">RefMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">fmt::Debug</span> <span class="op">+</span> <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T, C&gt; fmt::Debug <span class="kw">for </span>RefMut&lt;<span class="lifetime">&#39;a</span>, T, C&gt;
+<span class="kw">where
+    </span>T: fmt::Debug + Clear + Default,
+    C: cfg::Config,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">fmt::Debug::fmt</span>(<span class="self">self</span>.<span class="ident">value</span>(), <span class="ident">f</span>)
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        fmt::Debug::fmt(<span class="self">self</span>.value(), f)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RefMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T, C&gt; PartialEq&lt;T&gt; <span class="kw">for </span>RefMut&lt;<span class="lifetime">&#39;a</span>, T, C&gt;
+<span class="kw">where
+    </span>T: PartialEq&lt;T&gt; + Clear + Default,
+    C: cfg::Config,
 {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">value</span>().<span class="ident">eq</span>(<span class="ident">other</span>)
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>T) -&gt; bool {
+        <span class="self">self</span>.value().eq(other)
     }
 }
 
-<span class="comment">// === impl OwnedRef ===</span>
+<span class="comment">// === impl OwnedRef ===
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">OwnedRef</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+</span><span class="kw">impl</span>&lt;T, C&gt; OwnedRef&lt;T, C&gt;
+<span class="kw">where
+    </span>T: Clear + Default,
+    C: cfg::Config,
 {
-    <span class="doccomment">/// Returns the key used to access this guard</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">key</span>
+    <span class="doccomment">/// Returns the key used to access this guard
+    </span><span class="kw">pub fn </span>key(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.key
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
-        <span class="kw">unsafe</span> {
-            <span class="comment">// Safety: calling `slot::Guard::value` is unsafe, since the `Guard`</span>
-            <span class="comment">// value contains a pointer to the slot that may outlive the slab</span>
-            <span class="comment">// containing that slot. Here, the `Ref` has a borrowed reference to</span>
-            <span class="comment">// the shard containing that slot, which ensures that the slot will</span>
-            <span class="comment">// not be dropped while this `Guard` exists.</span>
-            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">value</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
+        <span class="kw">unsafe </span>{
+            <span class="comment">// Safety: calling `slot::Guard::value` is unsafe, since the `Guard`
+            // value contains a pointer to the slot that may outlive the slab
+            // containing that slot. Here, the `Ref` has a borrowed reference to
+            // the shard containing that slot, which ensures that the slot will
+            // not be dropped while this `Guard` exists.
+            </span><span class="self">self</span>.inner.value()
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">std::ops::Deref</span> <span class="kw">for</span> <span class="ident">OwnedRef</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="kw">impl</span>&lt;T, C&gt; std::ops::Deref <span class="kw">for </span>OwnedRef&lt;T, C&gt;
+<span class="kw">where
+    </span>T: Clear + Default,
+    C: cfg::Config,
 {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">T</span>;
+    <span class="kw">type </span>Target = T;
 
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="self">self</span>.<span class="ident">value</span>()
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+        <span class="self">self</span>.value()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">OwnedRef</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="kw">impl</span>&lt;T, C&gt; Drop <span class="kw">for </span>OwnedRef&lt;T, C&gt;
+<span class="kw">where
+    </span>T: Clear + Default,
+    C: cfg::Config,
 {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="macro">test_println!</span>(<span class="string">&quot;drop OwnedRef: try clearing data&quot;</span>);
-        <span class="kw">let</span> <span class="ident">should_clear</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="comment">// Safety: calling `slot::Guard::release` is unsafe, since the</span>
-            <span class="comment">// `Guard` value contains a pointer to the slot that may outlive the</span>
-            <span class="comment">// slab containing that slot. Here, the `OwnedRef` owns an `Arc`</span>
-            <span class="comment">// clone of the pool, which keeps it alive as long as the `OwnedRef`</span>
-            <span class="comment">// exists.</span>
-            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">release</span>()
+        <span class="kw">let </span>should_clear = <span class="kw">unsafe </span>{
+            <span class="comment">// Safety: calling `slot::Guard::release` is unsafe, since the
+            // `Guard` value contains a pointer to the slot that may outlive the
+            // slab containing that slot. Here, the `OwnedRef` owns an `Arc`
+            // clone of the pool, which keeps it alive as long as the `OwnedRef`
+            // exists.
+            </span><span class="self">self</span>.inner.release()
         };
-        <span class="kw">if</span> <span class="ident">should_clear</span> {
-            <span class="kw">let</span> <span class="ident">shard_idx</span> <span class="op">=</span> <span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="self">self</span>.<span class="ident">key</span>);
-            <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; shard={:?}&quot;</span>, <span class="ident">shard_idx</span>);
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">shard</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">pool</span>.<span class="ident">shards</span>.<span class="ident">get</span>(<span class="ident">shard_idx</span>.<span class="ident">as_usize</span>()) {
-                <span class="ident">shard</span>.<span class="ident">clear_after_release</span>(<span class="self">self</span>.<span class="ident">key</span>);
-            } <span class="kw">else</span> {
-                <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; shard={:?} does not exist! THIS IS A BUG&quot;</span>, <span class="ident">shard_idx</span>);
-                <span class="macro">debug_assert!</span>(<span class="ident">std::thread::panicking</span>(), <span class="string">&quot;[internal error] tried to drop an `OwnedRef` to a slot on a shard that never existed!&quot;</span>);
+        <span class="kw">if </span>should_clear {
+            <span class="kw">let </span>shard_idx = Tid::&lt;C&gt;::from_packed(<span class="self">self</span>.key);
+            <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; shard={:?}&quot;</span>, shard_idx);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(shard) = <span class="self">self</span>.pool.shards.get(shard_idx.as_usize()) {
+                shard.clear_after_release(<span class="self">self</span>.key);
+            } <span class="kw">else </span>{
+                <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; shard={:?} does not exist! THIS IS A BUG&quot;</span>, shard_idx);
+                <span class="macro">debug_assert!</span>(std::thread::panicking(), <span class="string">&quot;[internal error] tried to drop an `OwnedRef` to a slot on a shard that never existed!&quot;</span>);
             }
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">OwnedRef</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">fmt::Debug</span> <span class="op">+</span> <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="kw">impl</span>&lt;T, C&gt; fmt::Debug <span class="kw">for </span>OwnedRef&lt;T, C&gt;
+<span class="kw">where
+    </span>T: fmt::Debug + Clear + Default,
+    C: cfg::Config,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">fmt::Debug::fmt</span>(<span class="self">self</span>.<span class="ident">value</span>(), <span class="ident">f</span>)
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        fmt::Debug::fmt(<span class="self">self</span>.value(), f)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedRef</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="kw">impl</span>&lt;T, C&gt; PartialEq&lt;T&gt; <span class="kw">for </span>OwnedRef&lt;T, C&gt;
+<span class="kw">where
+    </span>T: PartialEq&lt;T&gt; + Clear + Default,
+    C: cfg::Config,
 {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">value</span>() <span class="op">==</span> <span class="kw-2">*</span><span class="ident">other</span>
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>T) -&gt; bool {
+        <span class="kw-2">*</span><span class="self">self</span>.value() == <span class="kw-2">*</span>other
     }
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">OwnedRef</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="kw">unsafe impl</span>&lt;T, C&gt; Sync <span class="kw">for </span>OwnedRef&lt;T, C&gt;
+<span class="kw">where
+    </span>T: Sync + Clear + Default,
+    C: cfg::Config,
 {
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">OwnedRef</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="kw">unsafe impl</span>&lt;T, C&gt; Send <span class="kw">for </span>OwnedRef&lt;T, C&gt;
+<span class="kw">where
+    </span>T: Sync + Clear + Default,
+    C: cfg::Config,
 {
 }
 
-<span class="comment">// === impl OwnedRefMut ===</span>
+<span class="comment">// === impl OwnedRefMut ===
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">OwnedRefMut</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+</span><span class="kw">impl</span>&lt;T, C&gt; OwnedRefMut&lt;T, C&gt;
+<span class="kw">where
+    </span>T: Clear + Default,
+    C: cfg::Config,
 {
-    <span class="doccomment">/// Returns the key used to access this guard</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">key</span>
+    <span class="doccomment">/// Returns the key used to access this guard
+    </span><span class="kw">pub fn </span>key(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.key
     }
 
-    <span class="doccomment">/// Downgrades the owned mutable guard to an owned immutable guard, allowing</span>
-    <span class="doccomment">/// access to the pooled value from other threads.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # use sharded_slab::Pool;</span>
-    <span class="doccomment">/// # use std::{sync::Arc, thread};</span>
-    <span class="doccomment">/// let pool = Arc::new(Pool::&lt;String&gt;::new());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut guard_mut = pool.clone().create_owned().unwrap();</span>
-    <span class="doccomment">/// let key = guard_mut.key();</span>
-    <span class="doccomment">/// guard_mut.push_str(&quot;Hello&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // The pooled string is currently borrowed mutably, so other threads</span>
-    <span class="doccomment">/// // may not access it.</span>
-    <span class="doccomment">/// let pool2 = pool.clone();</span>
-    <span class="doccomment">/// thread::spawn(move || {</span>
-    <span class="doccomment">///     assert!(pool2.get(key).is_none())</span>
-    <span class="doccomment">/// }).join().unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Downgrade the guard to an immutable reference.</span>
-    <span class="doccomment">/// let guard = guard_mut.downgrade();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Now, other threads may also access the pooled value.</span>
-    <span class="doccomment">/// let pool2 = pool.clone();</span>
-    <span class="doccomment">/// thread::spawn(move || {</span>
-    <span class="doccomment">///     let guard = pool2.get(key)</span>
-    <span class="doccomment">///         .expect(&quot;the item may now be referenced by other threads&quot;);</span>
-    <span class="doccomment">///     assert_eq!(guard, String::from(&quot;Hello&quot;));</span>
-    <span class="doccomment">/// }).join().unwrap();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // We can still access the value immutably through the downgraded guard.</span>
-    <span class="doccomment">/// assert_eq!(guard, String::from(&quot;Hello&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">downgrade</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">OwnedRef</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">downgrade</span>() };
-        <span class="ident">OwnedRef</span> {
-            <span class="ident">inner</span>,
-            <span class="ident">pool</span>: <span class="self">self</span>.<span class="ident">pool</span>.<span class="ident">clone</span>(),
-            <span class="ident">key</span>: <span class="self">self</span>.<span class="ident">key</span>,
+    <span class="doccomment">/// Downgrades the owned mutable guard to an owned immutable guard, allowing
+    /// access to the pooled value from other threads.
+    ///
+    /// ## Examples
+    ///
+    /// ```
+    /// # use sharded_slab::Pool;
+    /// # use std::{sync::Arc, thread};
+    /// let pool = Arc::new(Pool::&lt;String&gt;::new());
+    ///
+    /// let mut guard_mut = pool.clone().create_owned().unwrap();
+    /// let key = guard_mut.key();
+    /// guard_mut.push_str(&quot;Hello&quot;);
+    ///
+    /// // The pooled string is currently borrowed mutably, so other threads
+    /// // may not access it.
+    /// let pool2 = pool.clone();
+    /// thread::spawn(move || {
+    ///     assert!(pool2.get(key).is_none())
+    /// }).join().unwrap();
+    ///
+    /// // Downgrade the guard to an immutable reference.
+    /// let guard = guard_mut.downgrade();
+    ///
+    /// // Now, other threads may also access the pooled value.
+    /// let pool2 = pool.clone();
+    /// thread::spawn(move || {
+    ///     let guard = pool2.get(key)
+    ///         .expect(&quot;the item may now be referenced by other threads&quot;);
+    ///     assert_eq!(guard, String::from(&quot;Hello&quot;));
+    /// }).join().unwrap();
+    ///
+    /// // We can still access the value immutably through the downgraded guard.
+    /// assert_eq!(guard, String::from(&quot;Hello&quot;));
+    /// ```
+    </span><span class="kw">pub fn </span>downgrade(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; OwnedRef&lt;T, C&gt; {
+        <span class="kw">let </span>inner = <span class="kw">unsafe </span>{ <span class="self">self</span>.inner.downgrade() };
+        OwnedRef {
+            inner,
+            pool: <span class="self">self</span>.pool.clone(),
+            key: <span class="self">self</span>.key,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">shard</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Shard</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">shard_idx</span> <span class="op">=</span> <span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span><span class="ident">::from_packed</span>(<span class="self">self</span>.<span class="ident">key</span>);
-        <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; shard={:?}&quot;</span>, <span class="ident">shard_idx</span>);
-        <span class="self">self</span>.<span class="ident">pool</span>.<span class="ident">shards</span>.<span class="ident">get</span>(<span class="ident">shard_idx</span>.<span class="ident">as_usize</span>())
+    <span class="kw">fn </span>shard(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Shard&lt;T, C&gt;&gt; {
+        <span class="kw">let </span>shard_idx = Tid::&lt;C&gt;::from_packed(<span class="self">self</span>.key);
+        <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; shard={:?}&quot;</span>, shard_idx);
+        <span class="self">self</span>.pool.shards.get(shard_idx.as_usize())
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
-        <span class="kw">unsafe</span> {
-            <span class="comment">// Safety: calling `slot::InitGuard::value` is unsafe, since the `Guard`</span>
-            <span class="comment">// value contains a pointer to the slot that may outlive the slab</span>
-            <span class="comment">// containing that slot. Here, the `OwnedRefMut` has an `Arc` clone of</span>
-            <span class="comment">// the shard containing that slot, which ensures that the slot will</span>
-            <span class="comment">// not be dropped while this `Guard` exists.</span>
-            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">value</span>()
-        }
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">std::ops::Deref</span> <span class="kw">for</span> <span class="ident">OwnedRefMut</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
-{
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">T</span>;
-
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="self">self</span>.<span class="ident">value</span>()
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">std::ops::DerefMut</span> <span class="kw">for</span> <span class="ident">OwnedRefMut</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
-{
-    <span class="kw">fn</span> <span class="ident">deref_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="kw">unsafe</span> {
-            <span class="comment">// Safety: calling `slot::InitGuard::value_mut` is unsafe, since the</span>
-            <span class="comment">// `Guard`  value contains a pointer to the slot that may outlive</span>
-            <span class="comment">// the slab   containing that slot. Here, the `OwnedRefMut` has an</span>
-            <span class="comment">// `Arc` clone of the shard containing that slot, which ensures that</span>
-            <span class="comment">// the slot will not be dropped while this `Guard` exists.</span>
-            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">value_mut</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
+        <span class="kw">unsafe </span>{
+            <span class="comment">// Safety: calling `slot::InitGuard::value` is unsafe, since the `Guard`
+            // value contains a pointer to the slot that may outlive the slab
+            // containing that slot. Here, the `OwnedRefMut` has an `Arc` clone of
+            // the shard containing that slot, which ensures that the slot will
+            // not be dropped while this `Guard` exists.
+            </span><span class="self">self</span>.inner.value()
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">OwnedRefMut</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="kw">impl</span>&lt;T, C&gt; std::ops::Deref <span class="kw">for </span>OwnedRefMut&lt;T, C&gt;
+<span class="kw">where
+    </span>T: Clear + Default,
+    C: cfg::Config,
 {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
+    <span class="kw">type </span>Target = T;
+
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+        <span class="self">self</span>.value()
+    }
+}
+
+<span class="kw">impl</span>&lt;T, C&gt; std::ops::DerefMut <span class="kw">for </span>OwnedRefMut&lt;T, C&gt;
+<span class="kw">where
+    </span>T: Clear + Default,
+    C: cfg::Config,
+{
+    <span class="kw">fn </span>deref_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Target {
+        <span class="kw">unsafe </span>{
+            <span class="comment">// Safety: calling `slot::InitGuard::value_mut` is unsafe, since the
+            // `Guard`  value contains a pointer to the slot that may outlive
+            // the slab   containing that slot. Here, the `OwnedRefMut` has an
+            // `Arc` clone of the shard containing that slot, which ensures that
+            // the slot will not be dropped while this `Guard` exists.
+            </span><span class="self">self</span>.inner.value_mut()
+        }
+    }
+}
+
+<span class="kw">impl</span>&lt;T, C&gt; Drop <span class="kw">for </span>OwnedRefMut&lt;T, C&gt;
+<span class="kw">where
+    </span>T: Clear + Default,
+    C: cfg::Config,
+{
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="macro">test_println!</span>(<span class="string">&quot;drop OwnedRefMut: try clearing data&quot;</span>);
-        <span class="kw">let</span> <span class="ident">should_clear</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="comment">// Safety: calling `slot::Guard::release` is unsafe, since the</span>
-            <span class="comment">// `Guard` value contains a pointer to the slot that may outlive the</span>
-            <span class="comment">// slab containing that slot. Here, the `OwnedRefMut` owns an `Arc`</span>
-            <span class="comment">// clone of the pool, which keeps it alive as long as the</span>
-            <span class="comment">// `OwnedRefMut` exists.</span>
-            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">release</span>()
+        <span class="kw">let </span>should_clear = <span class="kw">unsafe </span>{
+            <span class="comment">// Safety: calling `slot::Guard::release` is unsafe, since the
+            // `Guard` value contains a pointer to the slot that may outlive the
+            // slab containing that slot. Here, the `OwnedRefMut` owns an `Arc`
+            // clone of the pool, which keeps it alive as long as the
+            // `OwnedRefMut` exists.
+            </span><span class="self">self</span>.inner.release()
         };
-        <span class="kw">if</span> <span class="ident">should_clear</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">shard</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">shard</span>() {
-                <span class="ident">shard</span>.<span class="ident">clear_after_release</span>(<span class="self">self</span>.<span class="ident">key</span>);
-            } <span class="kw">else</span> {
+        <span class="kw">if </span>should_clear {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(shard) = <span class="self">self</span>.shard() {
+                shard.clear_after_release(<span class="self">self</span>.key);
+            } <span class="kw">else </span>{
                 <span class="macro">test_println!</span>(<span class="string">&quot;-&gt; shard does not exist! THIS IS A BUG&quot;</span>);
-                <span class="macro">debug_assert!</span>(<span class="ident">std::thread::panicking</span>(), <span class="string">&quot;[internal error] tried to drop an `OwnedRefMut` to a slot on a shard that never existed!&quot;</span>);
+                <span class="macro">debug_assert!</span>(std::thread::panicking(), <span class="string">&quot;[internal error] tried to drop an `OwnedRefMut` to a slot on a shard that never existed!&quot;</span>);
             }
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">OwnedRefMut</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">fmt::Debug</span> <span class="op">+</span> <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="kw">impl</span>&lt;T, C&gt; fmt::Debug <span class="kw">for </span>OwnedRefMut&lt;T, C&gt;
+<span class="kw">where
+    </span>T: fmt::Debug + Clear + Default,
+    C: cfg::Config,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">fmt::Debug::fmt</span>(<span class="self">self</span>.<span class="ident">value</span>(), <span class="ident">f</span>)
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        fmt::Debug::fmt(<span class="self">self</span>.value(), f)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OwnedRefMut</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="kw">impl</span>&lt;T, C&gt; PartialEq&lt;T&gt; <span class="kw">for </span>OwnedRefMut&lt;T, C&gt;
+<span class="kw">where
+    </span>T: PartialEq&lt;T&gt; + Clear + Default,
+    C: cfg::Config,
 {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">T</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">value</span>() <span class="op">==</span> <span class="kw-2">*</span><span class="ident">other</span>
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>T) -&gt; bool {
+        <span class="kw-2">*</span><span class="self">self</span>.value() == <span class="kw-2">*</span>other
     }
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">OwnedRefMut</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="kw">unsafe impl</span>&lt;T, C&gt; Sync <span class="kw">for </span>OwnedRefMut&lt;T, C&gt;
+<span class="kw">where
+    </span>T: Sync + Clear + Default,
+    C: cfg::Config,
 {
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">OwnedRefMut</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Clear</span> <span class="op">+</span> <span class="ident">Default</span>,
-    <span class="ident">C</span>: <span class="ident">cfg::Config</span>,
+<span class="kw">unsafe impl</span>&lt;T, C&gt; Send <span class="kw">for </span>OwnedRefMut&lt;T, C&gt;
+<span class="kw">where
+    </span>T: Sync + Clear + Default,
+    C: cfg::Config,
 {
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sharded_slab" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sharded_slab" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

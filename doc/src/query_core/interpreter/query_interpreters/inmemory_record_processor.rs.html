@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/interpreter/query_interpreters/inmemory_record_processor.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>inmemory_record_processor.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../query_core/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/interpreter/query_interpreters/inmemory_record_processor.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>inmemory_record_processor.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../query_core/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -189,196 +189,196 @@
 <span id="189">189</span>
 <span id="190">190</span>
 <span id="191">191</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">connector::QueryArguments</span>;
-<span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">FieldSelection</span>, <span class="ident">ManyRecords</span>, <span class="ident">Record</span>, <span class="ident">SelectionResult</span>};
-<span class="kw">use</span> <span class="ident">std::ops::Deref</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>connector::QueryArguments;
+<span class="kw">use </span>itertools::Itertools;
+<span class="kw">use </span>prisma_models::{FieldSelection, ManyRecords, Record, SelectionResult};
+<span class="kw">use </span>std::ops::Deref;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="doccomment">/// Allows to manipulate a set of records in-memory instead of on the database level.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InMemoryRecordProcessor</span> {
-    <span class="ident">args</span>: <span class="ident">QueryArguments</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="doccomment">/// Allows to manipulate a set of records in-memory instead of on the database level.
+</span><span class="kw">pub struct </span>InMemoryRecordProcessor {
+    args: QueryArguments,
 }
 
-<span class="kw">impl</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">InMemoryRecordProcessor</span> {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">QueryArguments</span>;
+<span class="kw">impl </span>Deref <span class="kw">for </span>InMemoryRecordProcessor {
+    <span class="kw">type </span>Target = QueryArguments;
 
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">args</span>
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.args
     }
 }
 
-<span class="kw">impl</span> <span class="ident">InMemoryRecordProcessor</span> {
-    <span class="doccomment">/// Creates a new processor from the given query args.</span>
-    <span class="doccomment">/// The original args will be modified to prevent db level processing.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_from_query_args</span>(<span class="ident">args</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryArguments</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">processor</span> <span class="op">=</span> <span class="self">Self</span> { <span class="ident">args</span>: <span class="ident">args</span>.<span class="ident">clone</span>() };
+<span class="kw">impl </span>InMemoryRecordProcessor {
+    <span class="doccomment">/// Creates a new processor from the given query args.
+    /// The original args will be modified to prevent db level processing.
+    </span><span class="kw">pub fn </span>new_from_query_args(args: <span class="kw-2">&amp;mut </span>QueryArguments) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>processor = <span class="self">Self </span>{ args: args.clone() };
 
-        <span class="ident">args</span>.<span class="ident">distinct</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="ident">args</span>.<span class="ident">ignore_take</span> <span class="op">=</span> <span class="bool-val">true</span>;
-        <span class="ident">args</span>.<span class="ident">ignore_skip</span> <span class="op">=</span> <span class="bool-val">true</span>;
+        args.distinct = <span class="prelude-val">None</span>;
+        args.ignore_take = <span class="bool-val">true</span>;
+        args.ignore_skip = <span class="bool-val">true</span>;
 
-        <span class="ident">processor</span>
+        processor
     }
 
-    <span class="kw">fn</span> <span class="ident">take_abs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">take</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="kw">if</span> <span class="ident">t</span> <span class="op">&lt;</span> <span class="number">0</span> { <span class="op">-</span><span class="ident">t</span> } <span class="kw">else</span> { <span class="ident">t</span> })
+    <span class="kw">fn </span>take_abs(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;i64&gt; {
+        <span class="self">self</span>.take.map(|t| <span class="kw">if </span>t &lt; <span class="number">0 </span>{ -t } <span class="kw">else </span>{ t })
     }
 
-    <span class="doccomment">/// Checks whether or not we need to take records going backwards in the record list,</span>
-    <span class="doccomment">/// which requires reversing the list of records at some point.</span>
-    <span class="kw">fn</span> <span class="ident">needs_reversed_order</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">take</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span> <span class="op">&lt;</span> <span class="number">0</span>).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+    <span class="doccomment">/// Checks whether or not we need to take records going backwards in the record list,
+    /// which requires reversing the list of records at some point.
+    </span><span class="kw">fn </span>needs_reversed_order(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.take.map(|t| t &lt; <span class="number">0</span>).unwrap_or(<span class="bool-val">false</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">apply</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">records</span>: <span class="ident">ManyRecords</span>) -&gt; <span class="ident">ManyRecords</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">needs_reversed_order</span>() {
-            <span class="ident">records</span>.<span class="ident">reverse</span>();
+    <span class="kw">pub fn </span>apply(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>records: ManyRecords) -&gt; ManyRecords {
+        <span class="kw">if </span><span class="self">self</span>.needs_reversed_order() {
+            records.reverse();
         }
 
-        <span class="kw">let</span> <span class="ident">records</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident"><span class="self">Self</span>::is_nested</span>(<span class="kw-2">&amp;</span><span class="ident">records</span>) {
-            <span class="ident"><span class="self">Self</span>::order_by_parent</span>(<span class="ident">records</span>)
-        } <span class="kw">else</span> {
-            <span class="ident">records</span>
+        <span class="kw">let </span>records = <span class="kw">if </span><span class="self">Self</span>::is_nested(<span class="kw-2">&amp;</span>records) {
+            <span class="self">Self</span>::order_by_parent(records)
+        } <span class="kw">else </span>{
+            records
         };
 
-        <span class="kw">let</span> <span class="ident">records</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">apply_distinct</span>(<span class="ident">records</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">records</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">apply_pagination</span>(<span class="ident">records</span>);
+        <span class="kw">let </span>records = <span class="self">self</span>.apply_distinct(records);
+        <span class="kw">let </span><span class="kw-2">mut </span>records = <span class="self">self</span>.apply_pagination(records);
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">needs_reversed_order</span>() {
-            <span class="ident">records</span>.<span class="ident">reverse</span>();
+        <span class="kw">if </span><span class="self">self</span>.needs_reversed_order() {
+            records.reverse();
         }
 
-        <span class="ident">records</span>
+        records
     }
 
-    <span class="kw">fn</span> <span class="ident">order_by_parent</span>(<span class="kw-2">mut</span> <span class="ident">records</span>: <span class="ident">ManyRecords</span>) -&gt; <span class="ident">ManyRecords</span> {
-        <span class="ident">records</span>.<span class="ident">records</span>.<span class="ident">sort_by_key</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">r</span>
-                .<span class="ident">parent_id</span>
-                .<span class="ident">as_ref</span>()
-                .<span class="ident">expect</span>(<span class="string">&quot;Expected parent IDs to be set when ordering by parent ID.&quot;</span>)
-                .<span class="ident">values</span>()
-                .<span class="ident">collect</span>();
+    <span class="kw">fn </span>order_by_parent(<span class="kw-2">mut </span>records: ManyRecords) -&gt; ManyRecords {
+        records.records.sort_by_key(|r| {
+            <span class="kw">let </span>values: Vec&lt;<span class="kw">_</span>&gt; = r
+                .parent_id
+                .as_ref()
+                .expect(<span class="string">&quot;Expected parent IDs to be set when ordering by parent ID.&quot;</span>)
+                .values()
+                .collect();
 
-            <span class="ident">values</span>
+            values
         });
 
-        <span class="ident">records</span>
+        records
     }
 
-    <span class="kw">fn</span> <span class="ident">is_nested</span>(<span class="ident">records</span>: <span class="kw-2">&amp;</span><span class="ident">ManyRecords</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">records</span>.<span class="ident">records</span>.<span class="ident">first</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">parent_id</span>.<span class="ident">is_some</span>()).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+    <span class="kw">fn </span>is_nested(records: <span class="kw-2">&amp;</span>ManyRecords) -&gt; bool {
+        records.records.first().map(|x| x.parent_id.is_some()).unwrap_or(<span class="bool-val">false</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">apply_distinct</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">records</span>: <span class="ident">ManyRecords</span>) -&gt; <span class="ident">ManyRecords</span> {
-        <span class="kw">let</span> <span class="ident">field_names</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">records</span>.<span class="ident">field_names</span>;
+    <span class="kw">fn </span>apply_distinct(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>records: ManyRecords) -&gt; ManyRecords {
+        <span class="kw">let </span>field_names = <span class="kw-2">&amp;</span>records.field_names;
 
-        <span class="kw">let</span> <span class="ident">distinct_selection</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">distinct</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">distinct</span> {
-            <span class="ident">distinct</span>.<span class="ident">clone</span>()
-        } <span class="kw">else</span> {
-            <span class="kw">return</span> <span class="ident">records</span>;
+        <span class="kw">let </span>distinct_selection = <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>distinct) = <span class="self">self</span>.distinct {
+            distinct.clone()
+        } <span class="kw">else </span>{
+            <span class="kw">return </span>records;
         };
 
-        <span class="kw">let</span> <span class="ident">new_records</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Record</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident"><span class="self">Self</span>::is_nested</span>(<span class="kw-2">&amp;</span><span class="ident">records</span>) {
-            <span class="ident">records</span>
-                .<span class="ident">records</span>
-                .<span class="ident">into_iter</span>()
-                .<span class="ident">group_by</span>(<span class="op">|</span><span class="ident">record</span><span class="op">|</span> <span class="ident">record</span>.<span class="ident">parent_id</span>.<span class="ident">clone</span>())
-                .<span class="ident">into_iter</span>()
-                .<span class="ident">flat_map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">group</span>)<span class="op">|</span> {
-                    <span class="kw">let</span> <span class="ident">filtered</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">group</span>
-                        .<span class="ident">into_iter</span>()
-                        .<span class="ident">unique_by</span>(<span class="op">|</span><span class="ident">record</span><span class="op">|</span> {
-                            <span class="ident">record</span>
-                                .<span class="ident">extract_selection_result</span>(<span class="kw-2">&amp;</span><span class="ident">field_names</span>, <span class="kw-2">&amp;</span><span class="ident">distinct_selection</span>)
-                                .<span class="ident">unwrap</span>()
+        <span class="kw">let </span>new_records: Vec&lt;Record&gt; = <span class="kw">if </span><span class="self">Self</span>::is_nested(<span class="kw-2">&amp;</span>records) {
+            records
+                .records
+                .into_iter()
+                .group_by(|record| record.parent_id.clone())
+                .into_iter()
+                .flat_map(|(<span class="kw">_</span>, group)| {
+                    <span class="kw">let </span>filtered: Vec&lt;<span class="kw">_</span>&gt; = group
+                        .into_iter()
+                        .unique_by(|record| {
+                            record
+                                .extract_selection_result(<span class="kw-2">&amp;</span>field_names, <span class="kw-2">&amp;</span>distinct_selection)
+                                .unwrap()
                         })
-                        .<span class="ident">collect</span>();
+                        .collect();
 
-                    <span class="ident">filtered</span>
+                    filtered
                 })
-                .<span class="ident">collect</span>()
-        } <span class="kw">else</span> {
-            <span class="ident">records</span>
-                .<span class="ident">records</span>
-                .<span class="ident">into_iter</span>()
-                .<span class="ident">unique_by</span>(<span class="op">|</span><span class="ident">record</span><span class="op">|</span> {
-                    <span class="ident">record</span>
-                        .<span class="ident">extract_selection_result</span>(<span class="kw-2">&amp;</span><span class="ident">field_names</span>, <span class="kw-2">&amp;</span><span class="ident">distinct_selection</span>)
-                        .<span class="ident">unwrap</span>()
+                .collect()
+        } <span class="kw">else </span>{
+            records
+                .records
+                .into_iter()
+                .unique_by(|record| {
+                    record
+                        .extract_selection_result(<span class="kw-2">&amp;</span>field_names, <span class="kw-2">&amp;</span>distinct_selection)
+                        .unwrap()
                 })
-                .<span class="ident">collect</span>()
+                .collect()
         };
 
-        <span class="ident">records</span>.<span class="ident">records</span> <span class="op">=</span> <span class="ident">new_records</span>;
-        <span class="ident">records</span>
+        records.records = new_records;
+        records
     }
 
-    <span class="kw">fn</span> <span class="ident">apply_pagination</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">many_records</span>: <span class="ident">ManyRecords</span>) -&gt; <span class="ident">ManyRecords</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">must_apply_pagination</span>() {
-            <span class="kw">return</span> <span class="ident">many_records</span>;
+    <span class="kw">fn </span>apply_pagination(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>many_records: ManyRecords) -&gt; ManyRecords {
+        <span class="kw">if </span>!<span class="self">self</span>.must_apply_pagination() {
+            <span class="kw">return </span>many_records;
         }
 
-        <span class="comment">// If we have a cursor, skip records until we find it for each parent id. Pagination is applied afterwards.</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cursor</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cursor</span> {
-            <span class="kw">let</span> <span class="ident">cursor_values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">values</span>().<span class="ident">collect</span>();
-            <span class="kw">let</span> <span class="ident">cursor_selection</span>: <span class="ident">FieldSelection</span> <span class="op">=</span> <span class="ident">cursor</span>.<span class="ident">into</span>();
-            <span class="kw">let</span> <span class="ident">field_names</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">many_records</span>.<span class="ident">field_names</span>;
+        <span class="comment">// If we have a cursor, skip records until we find it for each parent id. Pagination is applied afterwards.
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(cursor) = <span class="kw-2">&amp;</span><span class="self">self</span>.cursor {
+            <span class="kw">let </span>cursor_values: Vec&lt;<span class="kw">_</span>&gt; = cursor.values().collect();
+            <span class="kw">let </span>cursor_selection: FieldSelection = cursor.into();
+            <span class="kw">let </span>field_names = <span class="kw-2">&amp;</span>many_records.field_names;
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">current_parent_id</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cursor_seen</span> <span class="op">=</span> <span class="bool-val">false</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>current_parent_id = <span class="prelude-val">None</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>cursor_seen = <span class="bool-val">false</span>;
 
-            <span class="ident">many_records</span>.<span class="ident">records</span>.<span class="ident">retain</span>(<span class="op">|</span><span class="ident">record</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">cursor_comparator</span> <span class="op">=</span> <span class="ident">record</span>.<span class="ident">extract_selection_result</span>(<span class="ident">field_names</span>, <span class="kw-2">&amp;</span><span class="ident">cursor_selection</span>).<span class="ident">unwrap</span>();
-                <span class="kw">let</span> <span class="ident">record_values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">cursor_comparator</span>.<span class="ident">values</span>().<span class="ident">collect</span>();
+            many_records.records.retain(|record| {
+                <span class="kw">let </span>cursor_comparator = record.extract_selection_result(field_names, <span class="kw-2">&amp;</span>cursor_selection).unwrap();
+                <span class="kw">let </span>record_values: Vec&lt;<span class="kw">_</span>&gt; = cursor_comparator.values().collect();
 
-                <span class="comment">// Reset, new parent</span>
-                <span class="kw">if</span> <span class="ident">current_parent_id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">record</span>.<span class="ident">parent_id</span> {
-                    <span class="ident">current_parent_id</span> <span class="op">=</span> <span class="ident">record</span>.<span class="ident">parent_id</span>.<span class="ident">clone</span>();
-                    <span class="ident">cursor_seen</span> <span class="op">=</span> <span class="bool-val">false</span>;
+                <span class="comment">// Reset, new parent
+                </span><span class="kw">if </span>current_parent_id != record.parent_id {
+                    current_parent_id = record.parent_id.clone();
+                    cursor_seen = <span class="bool-val">false</span>;
                 }
 
-                <span class="comment">// As long as the cursor has not been seen we recheck every record.</span>
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">cursor_seen</span> {
-                    <span class="ident">cursor_seen</span> <span class="op">=</span> <span class="ident">record_values</span> <span class="op">==</span> <span class="ident">cursor_values</span>;
+                <span class="comment">// As long as the cursor has not been seen we recheck every record.
+                </span><span class="kw">if </span>!cursor_seen {
+                    cursor_seen = record_values == cursor_values;
                 }
 
-                <span class="comment">// If the cursor has been seen for this parent, we retain all records coming afterwards (and including the cursor).</span>
-                <span class="ident">cursor_seen</span>
+                <span class="comment">// If the cursor has been seen for this parent, we retain all records coming afterwards (and including the cursor).
+                </span>cursor_seen
             });
         }
 
-        <span class="comment">// The records are sorted by their parent id. Hence we just need to remember the count for the last parent id to apply pagination.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">current_count</span>: <span class="ident">i64</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">last_parent_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+        <span class="comment">// The records are sorted by their parent id. Hence we just need to remember the count for the last parent id to apply pagination.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>current_count: i64 = <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>last_parent_id: <span class="prelude-ty">Option</span>&lt;SelectionResult&gt; = <span class="prelude-val">None</span>;
 
-        <span class="ident">many_records</span>.<span class="ident">records</span>.<span class="ident">retain</span>(<span class="op">|</span><span class="ident">record</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="ident">last_parent_id</span> <span class="op">==</span> <span class="ident">record</span>.<span class="ident">parent_id</span> {
-                <span class="ident">current_count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            } <span class="kw">else</span> {
-                <span class="ident">last_parent_id</span> <span class="op">=</span> <span class="ident">record</span>.<span class="ident">parent_id</span>.<span class="ident">clone</span>();
-                <span class="ident">current_count</span> <span class="op">=</span> <span class="number">1</span>; <span class="comment">// this is the first record we see for this parent id</span>
+        many_records.records.retain(|record| {
+            <span class="kw">if </span>last_parent_id == record.parent_id {
+                current_count += <span class="number">1</span>;
+            } <span class="kw">else </span>{
+                last_parent_id = record.parent_id.clone();
+                current_count = <span class="number">1</span>; <span class="comment">// this is the first record we see for this parent id
+            </span>};
+
+            <span class="kw">let </span>is_beyond_skip_range = <span class="kw">match </span><span class="self">self</span>.skip {
+                <span class="prelude-val">None </span>=&gt; <span class="bool-val">true</span>,
+                <span class="prelude-val">Some</span>(skip) =&gt; current_count &gt; skip,
+            };
+            <span class="kw">let </span>is_within_take_range = <span class="kw">match </span><span class="self">self</span>.take_abs() {
+                <span class="prelude-val">None </span>=&gt; <span class="bool-val">true</span>,
+                <span class="prelude-val">Some</span>(take) =&gt; current_count &lt;= take + <span class="self">self</span>.skip.unwrap_or(<span class="number">0</span>),
             };
 
-            <span class="kw">let</span> <span class="ident">is_beyond_skip_range</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">skip</span> {
-                <span class="prelude-val">None</span> =&gt; <span class="bool-val">true</span>,
-                <span class="prelude-val">Some</span>(<span class="ident">skip</span>) =&gt; <span class="ident">current_count</span> <span class="op">&gt;</span> <span class="ident">skip</span>,
-            };
-            <span class="kw">let</span> <span class="ident">is_within_take_range</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">take_abs</span>() {
-                <span class="prelude-val">None</span> =&gt; <span class="bool-val">true</span>,
-                <span class="prelude-val">Some</span>(<span class="ident">take</span>) =&gt; <span class="ident">current_count</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">take</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">skip</span>.<span class="ident">unwrap_or</span>(<span class="number">0</span>),
-            };
-
-            <span class="ident">is_beyond_skip_range</span> <span class="op">&amp;&amp;</span> <span class="ident">is_within_take_range</span>
+            is_beyond_skip_range &amp;&amp; is_within_take_range
         });
 
-        <span class="ident">many_records</span>
+        many_records
     }
 
-    <span class="kw">fn</span> <span class="ident">must_apply_pagination</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">take</span>.<span class="ident">or</span>(<span class="self">self</span>.<span class="ident">skip</span>).<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">cursor</span>.<span class="ident">is_some</span>()
+    <span class="kw">fn </span>must_apply_pagination(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.take.or(<span class="self">self</span>.skip).is_some() || <span class="self">self</span>.cursor.is_some()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

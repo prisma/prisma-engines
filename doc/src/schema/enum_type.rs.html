@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/schema/src/enum_type.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>enum_type.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../schema/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../schema/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../schema/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/schema/src/enum_type.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>enum_type.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../schema/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../schema/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../schema/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -126,133 +126,133 @@
 <span id="126">126</span>
 <span id="127">127</span>
 <span id="128">128</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">InternalEnumRef</span>, <span class="ident">PrismaValue</span>, <span class="ident">ScalarFieldRef</span>};
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span>prisma_models::{InternalEnumRef, PrismaValue, ScalarFieldRef};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">EnumType</span> {
-    <span class="doccomment">/// Generic, prisma-application specific string enum.</span>
-    <span class="doccomment">/// Semantics are defined by the component interpreting the contents.</span>
-    <span class="ident">String</span>(<span class="ident">StringEnumType</span>),
+<span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub enum </span>EnumType {
+    <span class="doccomment">/// Generic, prisma-application specific string enum.
+    /// Semantics are defined by the component interpreting the contents.
+    </span>String(StringEnumType),
 
-    <span class="doccomment">/// Enum from the internal data model, representing an enum on the database level.</span>
-    <span class="ident">Database</span>(<span class="ident">DatabaseEnumType</span>),
+    <span class="doccomment">/// Enum from the internal data model, representing an enum on the database level.
+    </span>Database(DatabaseEnumType),
 
-    <span class="doccomment">/// Enum referencing fields on a model.</span>
-    <span class="ident">FieldRef</span>(<span class="ident">FieldRefEnumType</span>),
+    <span class="doccomment">/// Enum referencing fields on a model.
+    </span>FieldRef(FieldRefEnumType),
 }
 
-<span class="kw">impl</span> <span class="ident">EnumType</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">identifier</span>().<span class="ident">name</span>()
+<span class="kw">impl </span>EnumType {
+    <span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.identifier().name()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">identifier</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Identifier</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::String</span>(<span class="ident">s</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">s</span>.<span class="ident">identifier</span>,
-            <span class="ident"><span class="self">Self</span>::Database</span>(<span class="ident">db</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">db</span>.<span class="ident">identifier</span>,
-            <span class="ident"><span class="self">Self</span>::FieldRef</span>(<span class="ident">f</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">f</span>.<span class="ident">identifier</span>,
+    <span class="kw">pub fn </span>identifier(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Identifier {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::String(s) =&gt; <span class="kw-2">&amp;</span>s.identifier,
+            <span class="self">Self</span>::Database(db) =&gt; <span class="kw-2">&amp;</span>db.identifier,
+            <span class="self">Self</span>::FieldRef(f) =&gt; <span class="kw-2">&amp;</span>f.identifier,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">database</span>(<span class="ident">identifier</span>: <span class="ident">Identifier</span>, <span class="ident">internal_enum</span>: <span class="ident">InternalEnumRef</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Database</span>(<span class="ident">DatabaseEnumType</span> {
-            <span class="ident">identifier</span>,
-            <span class="ident">internal_enum</span>,
+    <span class="kw">pub fn </span>database(identifier: Identifier, internal_enum: InternalEnumRef) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Database(DatabaseEnumType {
+            identifier,
+            internal_enum,
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field_ref</span>(<span class="ident">identifier</span>: <span class="ident">Identifier</span>, <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">ScalarFieldRef</span>)<span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::FieldRef</span>(<span class="ident">FieldRefEnumType</span> { <span class="ident">identifier</span>, <span class="ident">values</span> })
+    <span class="kw">pub fn </span>field_ref(identifier: Identifier, values: Vec&lt;(String, ScalarFieldRef)&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::FieldRef(FieldRefEnumType { identifier, values })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">string</span>(<span class="ident">identifier</span>: <span class="ident">Identifier</span>, <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::String</span>(<span class="ident">StringEnumType</span> { <span class="ident">identifier</span>, <span class="ident">values</span> })
-    }
-}
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StringEnumType</span> {
-    <span class="kw">pub</span> <span class="ident">identifier</span>: <span class="ident">Identifier</span>,
-    <span class="kw">pub</span> <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">StringEnumType</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">identifier</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Identifier</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">identifier</span>
-    }
-
-    <span class="doccomment">/// Attempts to find an enum value for the given value key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value_for</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">values</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> (<span class="ident">val</span> <span class="op">==</span> <span class="ident">name</span>).<span class="ident">then_some</span>(<span class="ident">val</span>.<span class="ident">as_str</span>()))
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">values</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">String</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">values</span>
+    <span class="kw">pub fn </span>string(identifier: Identifier, values: Vec&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::String(StringEnumType { identifier, values })
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DatabaseEnumType</span> {
-    <span class="kw">pub</span> <span class="ident">identifier</span>: <span class="ident">Identifier</span>,
-    <span class="kw">pub</span> <span class="ident">internal_enum</span>: <span class="ident">InternalEnumRef</span>,
+<span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>StringEnumType {
+    <span class="kw">pub </span>identifier: Identifier,
+    <span class="kw">pub </span>values: Vec&lt;String&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">DatabaseEnumType</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">identifier</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Identifier</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">identifier</span>
+<span class="kw">impl </span>StringEnumType {
+    <span class="kw">pub fn </span>identifier(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Identifier {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.identifier
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_input_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">PrismaValue::Enum</span>(
-            <span class="self">self</span>.<span class="ident">internal_enum</span>
-                .<span class="ident">values</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">find</span>(<span class="op">|</span><span class="ident">ev</span><span class="op">|</span> <span class="ident">ev</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">val</span>)<span class="question-mark">?</span>
-                .<span class="ident">db_name</span>()
-                .<span class="ident">clone</span>(),
+    <span class="doccomment">/// Attempts to find an enum value for the given value key.
+    </span><span class="kw">pub fn </span>value_for(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.values.iter().find_map(|val| (val == name).then_some(val.as_str()))
+    }
+
+    <span class="kw">pub fn </span>values(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[String] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.values
+    }
+}
+
+<span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>DatabaseEnumType {
+    <span class="kw">pub </span>identifier: Identifier,
+    <span class="kw">pub </span>internal_enum: InternalEnumRef,
+}
+
+<span class="kw">impl </span>DatabaseEnumType {
+    <span class="kw">pub fn </span>identifier(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Identifier {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.identifier
+    }
+
+    <span class="kw">pub fn </span>map_input_value(<span class="kw-2">&amp;</span><span class="self">self</span>, val: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;PrismaValue&gt; {
+        <span class="prelude-val">Some</span>(PrismaValue::Enum(
+            <span class="self">self</span>.internal_enum
+                .values
+                .iter()
+                .find(|ev| ev.name == val)<span class="question-mark">?
+                </span>.db_name()
+                .clone(),
         ))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">map_output_value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">PrismaValue::Enum</span>(
-            <span class="self">self</span>.<span class="ident">internal_enum</span>
-                .<span class="ident">values</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">find</span>(<span class="op">|</span><span class="ident">ev</span><span class="op">|</span> <span class="ident">ev</span>.<span class="ident">db_name</span>() <span class="op">==</span> <span class="ident">val</span>)<span class="question-mark">?</span>
-                .<span class="ident">name</span>
-                .<span class="ident">clone</span>(),
+    <span class="kw">pub fn </span>map_output_value(<span class="kw-2">&amp;</span><span class="self">self</span>, val: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;PrismaValue&gt; {
+        <span class="prelude-val">Some</span>(PrismaValue::Enum(
+            <span class="self">self</span>.internal_enum
+                .values
+                .iter()
+                .find(|ev| ev.db_name() == val)<span class="question-mark">?
+                </span>.name
+                .clone(),
         ))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">external_values</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">internal_enum</span>
-            .<span class="ident">values</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">name</span>.<span class="ident">to_string</span>())
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>()
+    <span class="kw">pub fn </span>external_values(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;String&gt; {
+        <span class="self">self</span>.internal_enum
+            .values
+            .iter()
+            .map(|v| v.name.to_string())
+            .collect::&lt;Vec&lt;String&gt;&gt;()
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FieldRefEnumType</span> {
-    <span class="kw">pub</span> <span class="ident">identifier</span>: <span class="ident">Identifier</span>,
-    <span class="kw">pub</span> <span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">ScalarFieldRef</span>)<span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>FieldRefEnumType {
+    <span class="kw">pub </span>identifier: Identifier,
+    <span class="kw">pub </span>values: Vec&lt;(String, ScalarFieldRef)&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">FieldRefEnumType</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">identifier</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Identifier</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">identifier</span>
+<span class="kw">impl </span>FieldRefEnumType {
+    <span class="kw">pub fn </span>identifier(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Identifier {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.identifier
     }
 
-    <span class="doccomment">/// Attempts to find an enum value for the given value key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value_for</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">values</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">val</span><span class="op">|</span> (<span class="ident">val</span>.<span class="number">0</span> <span class="op">==</span> <span class="ident">name</span>).<span class="ident">then_some</span>(<span class="kw-2">&amp;</span><span class="ident">val</span>.<span class="number">1</span>))
+    <span class="doccomment">/// Attempts to find an enum value for the given value key.
+    </span><span class="kw">pub fn </span>value_for(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ScalarFieldRef&gt; {
+        <span class="self">self</span>.values.iter().find_map(|val| (val.<span class="number">0 </span>== name).then_some(<span class="kw-2">&amp;</span>val.<span class="number">1</span>))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">values</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">values</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">name</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">name</span>.<span class="ident">to_owned</span>()).<span class="ident">collect</span>()
+    <span class="kw">pub fn </span>values(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;String&gt; {
+        <span class="self">self</span>.values.iter().map(|(name, <span class="kw">_</span>)| name.to_owned()).collect()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="schema" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="schema" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

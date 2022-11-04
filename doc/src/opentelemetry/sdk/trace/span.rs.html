@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/sdk/trace/span.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>span.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../opentelemetry/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/sdk/trace/span.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>span.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../opentelemetry/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../opentelemetry/index.html">
                         <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -622,217 +622,217 @@
 <span id="620">620</span>
 <span id="621">621</span>
 <span id="622">622</span>
-</pre><pre class="rust"><code><span class="doccomment">//! # Span</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `Span`s represent a single operation within a trace. `Span`s can be nested to form a trace</span>
-<span class="doccomment">//! tree. Each trace contains a root span, which typically describes the end-to-end latency and,</span>
-<span class="doccomment">//! optionally, one or more sub-spans for its sub-operations.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The `Span`&#39;s start and end timestamps reflect the elapsed real time of the operation. A `Span`&#39;s</span>
-<span class="doccomment">//! start time is set to the current time on span creation. After the `Span` is created, it</span>
-<span class="doccomment">//! is possible to change its name, set its `Attributes`, and add `Links` and `Events`.</span>
-<span class="doccomment">//! These cannot be changed after the `Span`&#39;s end time has been set.</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sdk::trace::SpanLimits</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::trace</span>::{<span class="ident">Event</span>, <span class="ident">SpanContext</span>, <span class="ident">SpanId</span>, <span class="ident">SpanKind</span>, <span class="ident">StatusCode</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">sdk</span>, <span class="ident">trace</span>, <span class="ident">KeyValue</span>};
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
-<span class="kw">use</span> <span class="ident">std::time::SystemTime</span>;
+</pre><pre class="rust"><code><span class="doccomment">//! # Span
+//!
+//! `Span`s represent a single operation within a trace. `Span`s can be nested to form a trace
+//! tree. Each trace contains a root span, which typically describes the end-to-end latency and,
+//! optionally, one or more sub-spans for its sub-operations.
+//!
+//! The `Span`&#39;s start and end timestamps reflect the elapsed real time of the operation. A `Span`&#39;s
+//! start time is set to the current time on span creation. After the `Span` is created, it
+//! is possible to change its name, set its `Attributes`, and add `Links` and `Events`.
+//! These cannot be changed after the `Span`&#39;s end time has been set.
+</span><span class="kw">use </span><span class="kw">crate</span>::sdk::trace::SpanLimits;
+<span class="kw">use </span><span class="kw">crate</span>::trace::{Event, SpanContext, SpanId, SpanKind, StatusCode};
+<span class="kw">use crate</span>::{sdk, trace, KeyValue};
+<span class="kw">use </span>std::borrow::Cow;
+<span class="kw">use </span>std::sync::Arc;
+<span class="kw">use </span>std::time::SystemTime;
 
-<span class="doccomment">/// Single operation within a trace.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Span</span> {
-    <span class="ident">span_context</span>: <span class="ident">SpanContext</span>,
-    <span class="ident">data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SpanData</span><span class="op">&gt;</span>,
-    <span class="ident">tracer</span>: <span class="ident">sdk::trace::Tracer</span>,
-    <span class="ident">span_limits</span>: <span class="ident">SpanLimits</span>,
+<span class="doccomment">/// Single operation within a trace.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Span {
+    span_context: SpanContext,
+    data: <span class="prelude-ty">Option</span>&lt;SpanData&gt;,
+    tracer: sdk::trace::Tracer,
+    span_limits: SpanLimits,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">SpanData</span> {
-    <span class="doccomment">/// Span parent id</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">parent_span_id</span>: <span class="ident">SpanId</span>,
-    <span class="doccomment">/// Span kind</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">span_kind</span>: <span class="ident">SpanKind</span>,
-    <span class="doccomment">/// Span name</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">name</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Span start time</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">start_time</span>: <span class="ident">SystemTime</span>,
-    <span class="doccomment">/// Span end time</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">end_time</span>: <span class="ident">SystemTime</span>,
-    <span class="doccomment">/// Span attributes</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">attributes</span>: <span class="ident">sdk::trace::EvictedHashMap</span>,
-    <span class="doccomment">/// Span events</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">events</span>: <span class="ident">sdk::trace::EvictedQueue</span><span class="op">&lt;</span><span class="ident">trace::Event</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Span Links</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">links</span>: <span class="ident">sdk::trace::EvictedQueue</span><span class="op">&lt;</span><span class="ident">trace::Link</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Span status code</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">status_code</span>: <span class="ident">StatusCode</span>,
-    <span class="doccomment">/// Span status message</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">status_message</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Clone, Debug, PartialEq)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>SpanData {
+    <span class="doccomment">/// Span parent id
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) parent_span_id: SpanId,
+    <span class="doccomment">/// Span kind
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) span_kind: SpanKind,
+    <span class="doccomment">/// Span name
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) name: Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;,
+    <span class="doccomment">/// Span start time
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) start_time: SystemTime,
+    <span class="doccomment">/// Span end time
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) end_time: SystemTime,
+    <span class="doccomment">/// Span attributes
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) attributes: sdk::trace::EvictedHashMap,
+    <span class="doccomment">/// Span events
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) events: sdk::trace::EvictedQueue&lt;trace::Event&gt;,
+    <span class="doccomment">/// Span Links
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) links: sdk::trace::EvictedQueue&lt;trace::Link&gt;,
+    <span class="doccomment">/// Span status code
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) status_code: StatusCode,
+    <span class="doccomment">/// Span status message
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) status_message: Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Span</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">span_context</span>: <span class="ident">SpanContext</span>,
-        <span class="ident">data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SpanData</span><span class="op">&gt;</span>,
-        <span class="ident">tracer</span>: <span class="ident">sdk::trace::Tracer</span>,
-        <span class="ident">span_limit</span>: <span class="ident">SpanLimits</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="ident">Span</span> {
-            <span class="ident">span_context</span>,
-            <span class="ident">data</span>,
-            <span class="ident">tracer</span>,
-            <span class="ident">span_limits</span>: <span class="ident">span_limit</span>,
+<span class="kw">impl </span>Span {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(
+        span_context: SpanContext,
+        data: <span class="prelude-ty">Option</span>&lt;SpanData&gt;,
+        tracer: sdk::trace::Tracer,
+        span_limit: SpanLimits,
+    ) -&gt; <span class="self">Self </span>{
+        Span {
+            span_context,
+            data,
+            tracer,
+            span_limits: span_limit,
         }
     }
 
-    <span class="doccomment">/// Operate on a mutable reference to span data</span>
-    <span class="kw">fn</span> <span class="ident">with_data</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">SpanData</span>) -&gt; <span class="ident">T</span>,
+    <span class="doccomment">/// Operate on a mutable reference to span data
+    </span><span class="kw">fn </span>with_data&lt;T, F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, f: F) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt;
+    <span class="kw">where
+        </span>F: FnOnce(<span class="kw-2">&amp;mut </span>SpanData) -&gt; T,
     {
-        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">as_mut</span>().<span class="ident">map</span>(<span class="ident">f</span>)
+        <span class="self">self</span>.data.as_mut().map(f)
     }
 
-    <span class="doccomment">/// Convert information in this span into `exporter::trace::SpanData`.</span>
-    <span class="doccomment">/// This function copies all data from the current span, which will create a</span>
-    <span class="doccomment">/// overhead.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exported_data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::sdk::export::trace::SpanData</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">span_context</span>, <span class="ident">tracer</span>) <span class="op">=</span> (<span class="self">self</span>.<span class="ident">span_context</span>.<span class="ident">clone</span>(), <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">tracer</span>);
-        <span class="kw">let</span> <span class="ident">resource</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">provider</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">tracer</span>.<span class="ident">provider</span>() {
-            <span class="ident">provider</span>.<span class="ident">config</span>().<span class="ident">resource</span>.<span class="ident">clone</span>()
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        };
-        <span class="self">self</span>.<span class="ident">data</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">data</span><span class="op">|</span> <span class="ident">build_export_data</span>(<span class="ident">data</span>.<span class="ident">clone</span>(), <span class="ident">span_context</span>, <span class="ident">resource</span>, <span class="ident">tracer</span>))
+    <span class="doccomment">/// Convert information in this span into `exporter::trace::SpanData`.
+    /// This function copies all data from the current span, which will create a
+    /// overhead.
+    </span><span class="kw">pub fn </span>exported_data(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw">crate</span>::sdk::export::trace::SpanData&gt; {
+        <span class="kw">let </span>(span_context, tracer) = (<span class="self">self</span>.span_context.clone(), <span class="kw-2">&amp;</span><span class="self">self</span>.tracer);
+        <span class="kw">let </span>resource = <span class="kw">if let </span><span class="prelude-val">Some</span>(provider) = <span class="self">self</span>.tracer.provider() {
+            provider.config().resource.clone()
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>};
+        <span class="self">self</span>.data
+            .as_ref()
+            .map(|data| build_export_data(data.clone(), span_context, resource, tracer))
     }
 }
 
-<span class="kw">impl</span> <span class="ident"><span class="kw">crate</span>::trace::Span</span> <span class="kw">for</span> <span class="ident">Span</span> {
-    <span class="doccomment">/// Records events at a specific time in the context of a given `Span`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that the OpenTelemetry project documents certain [&quot;standard event names and</span>
-    <span class="doccomment">/// keys&quot;](https://github.com/open-telemetry/opentelemetry-specification/tree/v0.5.0/specification/trace/semantic_conventions/README.md)</span>
-    <span class="doccomment">/// which have prescribed semantic meanings.</span>
-    <span class="kw">fn</span> <span class="ident">add_event_with_timestamp</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">name</span>: <span class="ident">T</span>,
-        <span class="ident">timestamp</span>: <span class="ident">SystemTime</span>,
-        <span class="kw-2">mut</span> <span class="ident">attributes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span>,
-    ) <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">impl </span><span class="kw">crate</span>::trace::Span <span class="kw">for </span>Span {
+    <span class="doccomment">/// Records events at a specific time in the context of a given `Span`.
+    ///
+    /// Note that the OpenTelemetry project documents certain [&quot;standard event names and
+    /// keys&quot;](https://github.com/open-telemetry/opentelemetry-specification/tree/v0.5.0/specification/trace/semantic_conventions/README.md)
+    /// which have prescribed semantic meanings.
+    </span><span class="kw">fn </span>add_event_with_timestamp&lt;T&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        name: T,
+        timestamp: SystemTime,
+        <span class="kw-2">mut </span>attributes: Vec&lt;KeyValue&gt;,
+    ) <span class="kw">where
+        </span>T: Into&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;,
     {
-        <span class="kw">let</span> <span class="ident">event_attributes_limit</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">span_limits</span>.<span class="ident">max_attributes_per_event</span> <span class="kw">as</span> <span class="ident">usize</span>;
-        <span class="self">self</span>.<span class="ident">with_data</span>(<span class="op">|</span><span class="ident">data</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">dropped_attributes_count</span> <span class="op">=</span> <span class="ident">attributes</span>.<span class="ident">len</span>().<span class="ident">saturating_sub</span>(<span class="ident">event_attributes_limit</span>);
-            <span class="ident">attributes</span>.<span class="ident">truncate</span>(<span class="ident">event_attributes_limit</span>);
+        <span class="kw">let </span>event_attributes_limit = <span class="self">self</span>.span_limits.max_attributes_per_event <span class="kw">as </span>usize;
+        <span class="self">self</span>.with_data(|data| {
+            <span class="kw">let </span>dropped_attributes_count = attributes.len().saturating_sub(event_attributes_limit);
+            attributes.truncate(event_attributes_limit);
 
-            <span class="ident">data</span>.<span class="ident">events</span>.<span class="ident">push_back</span>(<span class="ident">Event::new</span>(
-                <span class="ident">name</span>,
-                <span class="ident">timestamp</span>,
-                <span class="ident">attributes</span>,
-                <span class="ident">dropped_attributes_count</span> <span class="kw">as</span> <span class="ident">u32</span>,
+            data.events.push_back(Event::new(
+                name,
+                timestamp,
+                attributes,
+                dropped_attributes_count <span class="kw">as </span>u32,
             ))
         });
     }
 
-    <span class="doccomment">/// Returns the `SpanContext` for the given `Span`.</span>
-    <span class="kw">fn</span> <span class="ident">span_context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">SpanContext</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">span_context</span>
+    <span class="doccomment">/// Returns the `SpanContext` for the given `Span`.
+    </span><span class="kw">fn </span>span_context(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>SpanContext {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.span_context
     }
 
-    <span class="doccomment">/// Returns true if this `Span` is recording information like events with the `add_event`</span>
-    <span class="doccomment">/// operation, attributes using `set_attributes`, status with `set_status`, etc.</span>
-    <span class="doccomment">/// Always returns false after span `end`.</span>
-    <span class="kw">fn</span> <span class="ident">is_recording</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">is_some</span>()
+    <span class="doccomment">/// Returns true if this `Span` is recording information like events with the `add_event`
+    /// operation, attributes using `set_attributes`, status with `set_status`, etc.
+    /// Always returns false after span `end`.
+    </span><span class="kw">fn </span>is_recording(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.data.is_some()
     }
 
-    <span class="doccomment">/// Sets a single `Attribute` where the attribute properties are passed as arguments.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that the OpenTelemetry project documents certain [&quot;standard</span>
-    <span class="doccomment">/// attributes&quot;](https://github.com/open-telemetry/opentelemetry-specification/tree/v0.5.0/specification/trace/semantic_conventions/README.md)</span>
-    <span class="doccomment">/// that have prescribed semantic meanings.</span>
-    <span class="kw">fn</span> <span class="ident">set_attribute</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">attribute</span>: <span class="ident">KeyValue</span>) {
-        <span class="self">self</span>.<span class="ident">with_data</span>(<span class="op">|</span><span class="ident">data</span><span class="op">|</span> {
-            <span class="ident">data</span>.<span class="ident">attributes</span>.<span class="ident">insert</span>(<span class="ident">attribute</span>);
+    <span class="doccomment">/// Sets a single `Attribute` where the attribute properties are passed as arguments.
+    ///
+    /// Note that the OpenTelemetry project documents certain [&quot;standard
+    /// attributes&quot;](https://github.com/open-telemetry/opentelemetry-specification/tree/v0.5.0/specification/trace/semantic_conventions/README.md)
+    /// that have prescribed semantic meanings.
+    </span><span class="kw">fn </span>set_attribute(<span class="kw-2">&amp;mut </span><span class="self">self</span>, attribute: KeyValue) {
+        <span class="self">self</span>.with_data(|data| {
+            data.attributes.insert(attribute);
         });
     }
 
-    <span class="doccomment">/// Sets the status of the `Span`. If used, this will override the default `Span`</span>
-    <span class="doccomment">/// status, which is `Unset`. `message` MUST be ignored when the status is `OK` or `Unset`</span>
-    <span class="kw">fn</span> <span class="ident">set_status</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">code</span>: <span class="ident">StatusCode</span>, <span class="ident">message</span>: <span class="ident">String</span>) {
-        <span class="self">self</span>.<span class="ident">with_data</span>(<span class="op">|</span><span class="ident">data</span><span class="op">|</span> {
-            <span class="comment">// check if we should ignore</span>
-            <span class="kw">if</span> <span class="ident">code</span>.<span class="ident">priority</span>() <span class="op">&lt;</span> <span class="ident">data</span>.<span class="ident">status_code</span>.<span class="ident">priority</span>() {
-                <span class="comment">// ignore if the current code has higher priority.</span>
-                <span class="kw">return</span>;
+    <span class="doccomment">/// Sets the status of the `Span`. If used, this will override the default `Span`
+    /// status, which is `Unset`. `message` MUST be ignored when the status is `OK` or `Unset`
+    </span><span class="kw">fn </span>set_status(<span class="kw-2">&amp;mut </span><span class="self">self</span>, code: StatusCode, message: String) {
+        <span class="self">self</span>.with_data(|data| {
+            <span class="comment">// check if we should ignore
+            </span><span class="kw">if </span>code.priority() &lt; data.status_code.priority() {
+                <span class="comment">// ignore if the current code has higher priority.
+                </span><span class="kw">return</span>;
             }
-            <span class="kw">if</span> <span class="ident">code</span> <span class="op">==</span> <span class="ident">StatusCode::Error</span> {
-                <span class="ident">data</span>.<span class="ident">status_message</span> <span class="op">=</span> <span class="ident">message</span>.<span class="ident">into</span>();
+            <span class="kw">if </span>code == StatusCode::Error {
+                data.status_message = message.into();
             }
-            <span class="ident">data</span>.<span class="ident">status_code</span> <span class="op">=</span> <span class="ident">code</span>;
+            data.status_code = code;
         });
     }
 
-    <span class="doccomment">/// Updates the `Span`&#39;s name.</span>
-    <span class="kw">fn</span> <span class="ident">update_name</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">new_name</span>: <span class="ident">T</span>)
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Updates the `Span`&#39;s name.
+    </span><span class="kw">fn </span>update_name&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, new_name: T)
+    <span class="kw">where
+        </span>T: Into&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;,
     {
-        <span class="self">self</span>.<span class="ident">with_data</span>(<span class="op">|</span><span class="ident">data</span><span class="op">|</span> {
-            <span class="ident">data</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">new_name</span>.<span class="ident">into</span>();
+        <span class="self">self</span>.with_data(|data| {
+            data.name = new_name.into();
         });
     }
 
-    <span class="doccomment">/// Finishes the span with given timestamp.</span>
-    <span class="kw">fn</span> <span class="ident">end_with_timestamp</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="ident">SystemTime</span>) {
-        <span class="self">self</span>.<span class="ident">ensure_ended_and_exported</span>(<span class="prelude-val">Some</span>(<span class="ident">timestamp</span>));
+    <span class="doccomment">/// Finishes the span with given timestamp.
+    </span><span class="kw">fn </span>end_with_timestamp(<span class="kw-2">&amp;mut </span><span class="self">self</span>, timestamp: SystemTime) {
+        <span class="self">self</span>.ensure_ended_and_exported(<span class="prelude-val">Some</span>(timestamp));
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Span</span> {
-    <span class="kw">fn</span> <span class="ident">ensure_ended_and_exported</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">timestamp</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SystemTime</span><span class="op">&gt;</span>) {
-        <span class="comment">// skip if data has already been exported</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">take</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">data</span>) =&gt; <span class="ident">data</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
+<span class="kw">impl </span>Span {
+    <span class="kw">fn </span>ensure_ended_and_exported(<span class="kw-2">&amp;mut </span><span class="self">self</span>, timestamp: <span class="prelude-ty">Option</span>&lt;SystemTime&gt;) {
+        <span class="comment">// skip if data has already been exported
+        </span><span class="kw">let </span><span class="kw-2">mut </span>data = <span class="kw">match </span><span class="self">self</span>.data.take() {
+            <span class="prelude-val">Some</span>(data) =&gt; data,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
         };
 
-        <span class="comment">// skip if provider has been shut down</span>
-        <span class="kw">let</span> <span class="ident">provider</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">tracer</span>.<span class="ident">provider</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">provider</span>) =&gt; <span class="ident">provider</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span>,
+        <span class="comment">// skip if provider has been shut down
+        </span><span class="kw">let </span>provider = <span class="kw">match </span><span class="self">self</span>.tracer.provider() {
+            <span class="prelude-val">Some</span>(provider) =&gt; provider,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return</span>,
         };
 
-        <span class="comment">// ensure end time is set via explicit end or implicitly on drop</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">timestamp</span>) <span class="op">=</span> <span class="ident">timestamp</span> {
-            <span class="ident">data</span>.<span class="ident">end_time</span> <span class="op">=</span> <span class="ident">timestamp</span>;
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">data</span>.<span class="ident">end_time</span> <span class="op">==</span> <span class="ident">data</span>.<span class="ident">start_time</span> {
-            <span class="ident">data</span>.<span class="ident">end_time</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::time::now</span>();
+        <span class="comment">// ensure end time is set via explicit end or implicitly on drop
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(timestamp) = timestamp {
+            data.end_time = timestamp;
+        } <span class="kw">else if </span>data.end_time == data.start_time {
+            data.end_time = <span class="kw">crate</span>::time::now();
         }
 
-        <span class="kw">match</span> <span class="ident">provider</span>.<span class="ident">span_processors</span>().<span class="ident">as_slice</span>() {
+        <span class="kw">match </span>provider.span_processors().as_slice() {
             [] =&gt; {}
-            [<span class="ident">processor</span>] =&gt; {
-                <span class="ident">processor</span>.<span class="ident">on_end</span>(<span class="ident">build_export_data</span>(
-                    <span class="ident">data</span>,
-                    <span class="self">self</span>.<span class="ident">span_context</span>.<span class="ident">clone</span>(),
-                    <span class="ident">provider</span>.<span class="ident">config</span>().<span class="ident">resource</span>.<span class="ident">clone</span>(),
-                    <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">tracer</span>,
+            [processor] =&gt; {
+                processor.on_end(build_export_data(
+                    data,
+                    <span class="self">self</span>.span_context.clone(),
+                    provider.config().resource.clone(),
+                    <span class="kw-2">&amp;</span><span class="self">self</span>.tracer,
                 ));
             }
-            <span class="ident">processors</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">provider</span>.<span class="ident">config</span>();
-                <span class="kw">for</span> <span class="ident">processor</span> <span class="kw">in</span> <span class="ident">processors</span> {
-                    <span class="ident">processor</span>.<span class="ident">on_end</span>(<span class="ident">build_export_data</span>(
-                        <span class="ident">data</span>.<span class="ident">clone</span>(),
-                        <span class="self">self</span>.<span class="ident">span_context</span>.<span class="ident">clone</span>(),
-                        <span class="ident">config</span>.<span class="ident">resource</span>.<span class="ident">clone</span>(),
-                        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">tracer</span>,
+            processors =&gt; {
+                <span class="kw">let </span>config = provider.config();
+                <span class="kw">for </span>processor <span class="kw">in </span>processors {
+                    processor.on_end(build_export_data(
+                        data.clone(),
+                        <span class="self">self</span>.span_context.clone(),
+                        config.resource.clone(),
+                        <span class="kw-2">&amp;</span><span class="self">self</span>.tracer,
                     ));
                 }
             }
@@ -840,409 +840,409 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Span</span> {
-    <span class="doccomment">/// Report span on inner drop</span>
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">ensure_ended_and_exported</span>(<span class="prelude-val">None</span>);
+<span class="kw">impl </span>Drop <span class="kw">for </span>Span {
+    <span class="doccomment">/// Report span on inner drop
+    </span><span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.ensure_ended_and_exported(<span class="prelude-val">None</span>);
     }
 }
 
-<span class="kw">fn</span> <span class="ident">build_export_data</span>(
-    <span class="ident">data</span>: <span class="ident">SpanData</span>,
-    <span class="ident">span_context</span>: <span class="ident">SpanContext</span>,
-    <span class="ident">resource</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">sdk::Resource</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">tracer</span>: <span class="kw-2">&amp;</span><span class="ident">sdk::trace::Tracer</span>,
-) -&gt; <span class="ident">sdk::export::trace::SpanData</span> {
-    <span class="ident">sdk::export::trace::SpanData</span> {
-        <span class="ident">span_context</span>,
-        <span class="ident">parent_span_id</span>: <span class="ident">data</span>.<span class="ident">parent_span_id</span>,
-        <span class="ident">span_kind</span>: <span class="ident">data</span>.<span class="ident">span_kind</span>,
-        <span class="ident">name</span>: <span class="ident">data</span>.<span class="ident">name</span>,
-        <span class="ident">start_time</span>: <span class="ident">data</span>.<span class="ident">start_time</span>,
-        <span class="ident">end_time</span>: <span class="ident">data</span>.<span class="ident">end_time</span>,
-        <span class="ident">attributes</span>: <span class="ident">data</span>.<span class="ident">attributes</span>,
-        <span class="ident">events</span>: <span class="ident">data</span>.<span class="ident">events</span>,
-        <span class="ident">links</span>: <span class="ident">data</span>.<span class="ident">links</span>,
-        <span class="ident">status_code</span>: <span class="ident">data</span>.<span class="ident">status_code</span>,
-        <span class="ident">status_message</span>: <span class="ident">data</span>.<span class="ident">status_message</span>,
-        <span class="ident">resource</span>,
-        <span class="ident">instrumentation_lib</span>: <span class="ident">tracer</span>.<span class="ident">instrumentation_library</span>().<span class="ident">clone</span>(),
+<span class="kw">fn </span>build_export_data(
+    data: SpanData,
+    span_context: SpanContext,
+    resource: <span class="prelude-ty">Option</span>&lt;Arc&lt;sdk::Resource&gt;&gt;,
+    tracer: <span class="kw-2">&amp;</span>sdk::trace::Tracer,
+) -&gt; sdk::export::trace::SpanData {
+    sdk::export::trace::SpanData {
+        span_context,
+        parent_span_id: data.parent_span_id,
+        span_kind: data.span_kind,
+        name: data.name,
+        start_time: data.start_time,
+        end_time: data.end_time,
+        attributes: data.attributes,
+        events: data.events,
+        links: data.links,
+        status_code: data.status_code,
+        status_message: data.status_message,
+        resource,
+        instrumentation_lib: tracer.instrumentation_library().clone(),
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sdk::trace::span_limit</span>::{
-        <span class="ident">DEFAULT_MAX_ATTRIBUTES_PER_EVENT</span>, <span class="ident">DEFAULT_MAX_ATTRIBUTES_PER_LINK</span>,
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::sdk::trace::span_limit::{
+        DEFAULT_MAX_ATTRIBUTES_PER_EVENT, DEFAULT_MAX_ATTRIBUTES_PER_LINK,
     };
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::trace</span>::{<span class="ident">noop::NoopSpanExporter</span>, <span class="ident">Link</span>, <span class="ident">TraceFlags</span>, <span class="ident">TraceId</span>, <span class="ident">Tracer</span>};
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">trace::Span</span> <span class="kw">as</span> <span class="kw">_</span>, <span class="ident">trace::TracerProvider</span>, <span class="ident">KeyValue</span>};
-    <span class="kw">use</span> <span class="ident">std::time::Duration</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::trace::{noop::NoopSpanExporter, Link, TraceFlags, TraceId, Tracer};
+    <span class="kw">use crate</span>::{trace::Span <span class="kw">as _</span>, trace::TracerProvider, KeyValue};
+    <span class="kw">use </span>std::time::Duration;
 
-    <span class="kw">fn</span> <span class="ident">init</span>() -&gt; (<span class="ident">sdk::trace::Tracer</span>, <span class="ident">SpanData</span>) {
-        <span class="kw">let</span> <span class="ident">provider</span> <span class="op">=</span> <span class="ident">sdk::trace::TracerProvider::default</span>();
-        <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">provider</span>.<span class="ident">config</span>();
-        <span class="kw">let</span> <span class="ident">tracer</span> <span class="op">=</span> <span class="ident">provider</span>.<span class="ident">tracer</span>(<span class="string">&quot;opentelemetry&quot;</span>);
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">SpanData</span> {
-            <span class="ident">parent_span_id</span>: <span class="ident">SpanId::from_u64</span>(<span class="number">0</span>),
-            <span class="ident">span_kind</span>: <span class="ident">trace::SpanKind::Internal</span>,
-            <span class="ident">name</span>: <span class="string">&quot;opentelemetry&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">start_time</span>: <span class="ident"><span class="kw">crate</span>::time::now</span>(),
-            <span class="ident">end_time</span>: <span class="ident"><span class="kw">crate</span>::time::now</span>(),
-            <span class="ident">attributes</span>: <span class="ident">sdk::trace::EvictedHashMap::new</span>(
-                <span class="ident">config</span>.<span class="ident">span_limits</span>.<span class="ident">max_attributes_per_span</span>,
+    <span class="kw">fn </span>init() -&gt; (sdk::trace::Tracer, SpanData) {
+        <span class="kw">let </span>provider = sdk::trace::TracerProvider::default();
+        <span class="kw">let </span>config = provider.config();
+        <span class="kw">let </span>tracer = provider.tracer(<span class="string">&quot;opentelemetry&quot;</span>);
+        <span class="kw">let </span>data = SpanData {
+            parent_span_id: SpanId::from_u64(<span class="number">0</span>),
+            span_kind: trace::SpanKind::Internal,
+            name: <span class="string">&quot;opentelemetry&quot;</span>.into(),
+            start_time: <span class="kw">crate</span>::time::now(),
+            end_time: <span class="kw">crate</span>::time::now(),
+            attributes: sdk::trace::EvictedHashMap::new(
+                config.span_limits.max_attributes_per_span,
                 <span class="number">0</span>,
             ),
-            <span class="ident">events</span>: <span class="ident">sdk::trace::EvictedQueue::new</span>(<span class="ident">config</span>.<span class="ident">span_limits</span>.<span class="ident">max_events_per_span</span>),
-            <span class="ident">links</span>: <span class="ident">sdk::trace::EvictedQueue::new</span>(<span class="ident">config</span>.<span class="ident">span_limits</span>.<span class="ident">max_links_per_span</span>),
-            <span class="ident">status_code</span>: <span class="ident">StatusCode::Unset</span>,
-            <span class="ident">status_message</span>: <span class="string">&quot;&quot;</span>.<span class="ident">into</span>(),
+            events: sdk::trace::EvictedQueue::new(config.span_limits.max_events_per_span),
+            links: sdk::trace::EvictedQueue::new(config.span_limits.max_links_per_span),
+            status_code: StatusCode::Unset,
+            status_message: <span class="string">&quot;&quot;</span>.into(),
         };
-        (<span class="ident">tracer</span>, <span class="ident">data</span>)
+        (tracer, data)
     }
 
-    <span class="kw">fn</span> <span class="ident">create_span</span>() -&gt; <span class="ident">Span</span> {
-        <span class="kw">let</span> (<span class="ident">tracer</span>, <span class="ident">data</span>) <span class="op">=</span> <span class="ident">init</span>();
-        <span class="ident">Span::new</span>(
-            <span class="ident">SpanContext::empty_context</span>(),
-            <span class="prelude-val">Some</span>(<span class="ident">data</span>),
-            <span class="ident">tracer</span>,
-            <span class="ident">Default::default</span>(),
+    <span class="kw">fn </span>create_span() -&gt; Span {
+        <span class="kw">let </span>(tracer, data) = init();
+        Span::new(
+            SpanContext::empty_context(),
+            <span class="prelude-val">Some</span>(data),
+            tracer,
+            Default::default(),
         )
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">create_span_without_data</span>() {
-        <span class="kw">let</span> (<span class="ident">tracer</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">init</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">Span::new</span>(
-            <span class="ident">SpanContext::empty_context</span>(),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>create_span_without_data() {
+        <span class="kw">let </span>(tracer, <span class="kw">_</span>) = init();
+        <span class="kw">let </span><span class="kw-2">mut </span>span = Span::new(
+            SpanContext::empty_context(),
             <span class="prelude-val">None</span>,
-            <span class="ident">tracer</span>,
-            <span class="ident">Default::default</span>(),
+            tracer,
+            Default::default(),
         );
-        <span class="ident">span</span>.<span class="ident">with_data</span>(<span class="op">|</span><span class="ident">_data</span><span class="op">|</span> <span class="macro">panic!</span>(<span class="string">&quot;there are data&quot;</span>));
+        span.with_data(|_data| <span class="macro">panic!</span>(<span class="string">&quot;there are data&quot;</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">create_span_with_data_mut</span>() {
-        <span class="kw">let</span> (<span class="ident">tracer</span>, <span class="ident">data</span>) <span class="op">=</span> <span class="ident">init</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">Span::new</span>(
-            <span class="ident">SpanContext::empty_context</span>(),
-            <span class="prelude-val">Some</span>(<span class="ident">data</span>.<span class="ident">clone</span>()),
-            <span class="ident">tracer</span>,
-            <span class="ident">Default::default</span>(),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>create_span_with_data_mut() {
+        <span class="kw">let </span>(tracer, data) = init();
+        <span class="kw">let </span><span class="kw-2">mut </span>span = Span::new(
+            SpanContext::empty_context(),
+            <span class="prelude-val">Some</span>(data.clone()),
+            tracer,
+            Default::default(),
         );
-        <span class="ident">span</span>.<span class="ident">with_data</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">d</span>, <span class="ident">data</span>));
+        span.with_data(|d| <span class="macro">assert_eq!</span>(<span class="kw-2">*</span>d, data));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">add_event</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">create_span</span>();
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="string">&quot;some_event&quot;</span>.<span class="ident">to_string</span>();
-        <span class="kw">let</span> <span class="ident">attributes</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">KeyValue::new</span>(<span class="string">&quot;k&quot;</span>, <span class="string">&quot;v&quot;</span>)];
-        <span class="ident">span</span>.<span class="ident">add_event</span>(<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">attributes</span>.<span class="ident">clone</span>());
-        <span class="ident">span</span>.<span class="ident">with_data</span>(<span class="op">|</span><span class="ident">data</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">event</span>) <span class="op">=</span> <span class="ident">data</span>.<span class="ident">events</span>.<span class="ident">iter</span>().<span class="ident">next</span>() {
-                <span class="macro">assert_eq!</span>(<span class="ident">event</span>.<span class="ident">name</span>, <span class="ident">name</span>);
-                <span class="macro">assert_eq!</span>(<span class="ident">event</span>.<span class="ident">attributes</span>, <span class="ident">attributes</span>);
-            } <span class="kw">else</span> {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>add_event() {
+        <span class="kw">let </span><span class="kw-2">mut </span>span = create_span();
+        <span class="kw">let </span>name = <span class="string">&quot;some_event&quot;</span>.to_string();
+        <span class="kw">let </span>attributes = <span class="macro">vec!</span>[KeyValue::new(<span class="string">&quot;k&quot;</span>, <span class="string">&quot;v&quot;</span>)];
+        span.add_event(name.clone(), attributes.clone());
+        span.with_data(|data| {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(event) = data.events.iter().next() {
+                <span class="macro">assert_eq!</span>(event.name, name);
+                <span class="macro">assert_eq!</span>(event.attributes, attributes);
+            } <span class="kw">else </span>{
                 <span class="macro">panic!</span>(<span class="string">&quot;no event&quot;</span>);
             }
         });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">add_event_with_timestamp</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">create_span</span>();
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="string">&quot;some_event&quot;</span>.<span class="ident">to_string</span>();
-        <span class="kw">let</span> <span class="ident">attributes</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">KeyValue::new</span>(<span class="string">&quot;k&quot;</span>, <span class="string">&quot;v&quot;</span>)];
-        <span class="kw">let</span> <span class="ident">timestamp</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::time::now</span>();
-        <span class="ident">span</span>.<span class="ident">add_event_with_timestamp</span>(<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">timestamp</span>, <span class="ident">attributes</span>.<span class="ident">clone</span>());
-        <span class="ident">span</span>.<span class="ident">with_data</span>(<span class="op">|</span><span class="ident">data</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">event</span>) <span class="op">=</span> <span class="ident">data</span>.<span class="ident">events</span>.<span class="ident">iter</span>().<span class="ident">next</span>() {
-                <span class="macro">assert_eq!</span>(<span class="ident">event</span>.<span class="ident">timestamp</span>, <span class="ident">timestamp</span>);
-                <span class="macro">assert_eq!</span>(<span class="ident">event</span>.<span class="ident">name</span>, <span class="ident">name</span>);
-                <span class="macro">assert_eq!</span>(<span class="ident">event</span>.<span class="ident">attributes</span>, <span class="ident">attributes</span>);
-            } <span class="kw">else</span> {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>add_event_with_timestamp() {
+        <span class="kw">let </span><span class="kw-2">mut </span>span = create_span();
+        <span class="kw">let </span>name = <span class="string">&quot;some_event&quot;</span>.to_string();
+        <span class="kw">let </span>attributes = <span class="macro">vec!</span>[KeyValue::new(<span class="string">&quot;k&quot;</span>, <span class="string">&quot;v&quot;</span>)];
+        <span class="kw">let </span>timestamp = <span class="kw">crate</span>::time::now();
+        span.add_event_with_timestamp(name.clone(), timestamp, attributes.clone());
+        span.with_data(|data| {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(event) = data.events.iter().next() {
+                <span class="macro">assert_eq!</span>(event.timestamp, timestamp);
+                <span class="macro">assert_eq!</span>(event.name, name);
+                <span class="macro">assert_eq!</span>(event.attributes, attributes);
+            } <span class="kw">else </span>{
                 <span class="macro">panic!</span>(<span class="string">&quot;no event&quot;</span>);
             }
         });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">record_exception</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">create_span</span>();
-        <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">std::io::Error::from</span>(<span class="ident">std::io::ErrorKind::Other</span>);
-        <span class="ident">span</span>.<span class="ident">record_exception</span>(<span class="kw-2">&amp;</span><span class="ident">err</span>);
-        <span class="ident">span</span>.<span class="ident">with_data</span>(<span class="op">|</span><span class="ident">data</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">event</span>) <span class="op">=</span> <span class="ident">data</span>.<span class="ident">events</span>.<span class="ident">iter</span>().<span class="ident">next</span>() {
-                <span class="macro">assert_eq!</span>(<span class="ident">event</span>.<span class="ident">name</span>, <span class="string">&quot;exception&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>record_exception() {
+        <span class="kw">let </span><span class="kw-2">mut </span>span = create_span();
+        <span class="kw">let </span>err = std::io::Error::from(std::io::ErrorKind::Other);
+        span.record_exception(<span class="kw-2">&amp;</span>err);
+        span.with_data(|data| {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(event) = data.events.iter().next() {
+                <span class="macro">assert_eq!</span>(event.name, <span class="string">&quot;exception&quot;</span>);
                 <span class="macro">assert_eq!</span>(
-                    <span class="ident">event</span>.<span class="ident">attributes</span>,
-                    <span class="macro">vec!</span>[<span class="ident">KeyValue::new</span>(<span class="string">&quot;exception.message&quot;</span>, <span class="ident">err</span>.<span class="ident">to_string</span>())]
+                    event.attributes,
+                    <span class="macro">vec!</span>[KeyValue::new(<span class="string">&quot;exception.message&quot;</span>, err.to_string())]
                 );
-            } <span class="kw">else</span> {
+            } <span class="kw">else </span>{
                 <span class="macro">panic!</span>(<span class="string">&quot;no event&quot;</span>);
             }
         });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">record_exception_with_stacktrace</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">create_span</span>();
-        <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">std::io::Error::from</span>(<span class="ident">std::io::ErrorKind::Other</span>);
-        <span class="kw">let</span> <span class="ident">stacktrace</span> <span class="op">=</span> <span class="string">&quot;stacktrace...&quot;</span>.<span class="ident">to_string</span>();
-        <span class="ident">span</span>.<span class="ident">record_exception_with_stacktrace</span>(<span class="kw-2">&amp;</span><span class="ident">err</span>, <span class="ident">stacktrace</span>.<span class="ident">clone</span>());
-        <span class="ident">span</span>.<span class="ident">with_data</span>(<span class="op">|</span><span class="ident">data</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">event</span>) <span class="op">=</span> <span class="ident">data</span>.<span class="ident">events</span>.<span class="ident">iter</span>().<span class="ident">next</span>() {
-                <span class="macro">assert_eq!</span>(<span class="ident">event</span>.<span class="ident">name</span>, <span class="string">&quot;exception&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>record_exception_with_stacktrace() {
+        <span class="kw">let </span><span class="kw-2">mut </span>span = create_span();
+        <span class="kw">let </span>err = std::io::Error::from(std::io::ErrorKind::Other);
+        <span class="kw">let </span>stacktrace = <span class="string">&quot;stacktrace...&quot;</span>.to_string();
+        span.record_exception_with_stacktrace(<span class="kw-2">&amp;</span>err, stacktrace.clone());
+        span.with_data(|data| {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(event) = data.events.iter().next() {
+                <span class="macro">assert_eq!</span>(event.name, <span class="string">&quot;exception&quot;</span>);
                 <span class="macro">assert_eq!</span>(
-                    <span class="ident">event</span>.<span class="ident">attributes</span>,
+                    event.attributes,
                     <span class="macro">vec!</span>[
-                        <span class="ident">KeyValue::new</span>(<span class="string">&quot;exception.message&quot;</span>, <span class="ident">err</span>.<span class="ident">to_string</span>()),
-                        <span class="ident">KeyValue::new</span>(<span class="string">&quot;exception.stacktrace&quot;</span>, <span class="ident">stacktrace</span>),
+                        KeyValue::new(<span class="string">&quot;exception.message&quot;</span>, err.to_string()),
+                        KeyValue::new(<span class="string">&quot;exception.stacktrace&quot;</span>, stacktrace),
                     ]
                 );
-            } <span class="kw">else</span> {
+            } <span class="kw">else </span>{
                 <span class="macro">panic!</span>(<span class="string">&quot;no event&quot;</span>);
             }
         });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">set_attribute</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">create_span</span>();
-        <span class="kw">let</span> <span class="ident">attributes</span> <span class="op">=</span> <span class="ident">KeyValue::new</span>(<span class="string">&quot;k&quot;</span>, <span class="string">&quot;v&quot;</span>);
-        <span class="ident">span</span>.<span class="ident">set_attribute</span>(<span class="ident">attributes</span>.<span class="ident">clone</span>());
-        <span class="ident">span</span>.<span class="ident">with_data</span>(<span class="op">|</span><span class="ident">data</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span> <span class="ident">data</span>.<span class="ident">attributes</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">attributes</span>.<span class="ident">key</span>) {
-                <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">val</span>, <span class="ident">attributes</span>.<span class="ident">value</span>);
-            } <span class="kw">else</span> {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>set_attribute() {
+        <span class="kw">let </span><span class="kw-2">mut </span>span = create_span();
+        <span class="kw">let </span>attributes = KeyValue::new(<span class="string">&quot;k&quot;</span>, <span class="string">&quot;v&quot;</span>);
+        span.set_attribute(attributes.clone());
+        span.with_data(|data| {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(val) = data.attributes.get(<span class="kw-2">&amp;</span>attributes.key) {
+                <span class="macro">assert_eq!</span>(<span class="kw-2">*</span>val, attributes.value);
+            } <span class="kw">else </span>{
                 <span class="macro">panic!</span>(<span class="string">&quot;no attribute&quot;</span>);
             }
         });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">set_status</span>() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>set_status() {
         {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">create_span</span>();
-            <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">StatusCode::Ok</span>;
-            <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;OK&quot;</span>.<span class="ident">to_string</span>();
-            <span class="ident">span</span>.<span class="ident">set_status</span>(<span class="ident">status</span>, <span class="ident">message</span>);
-            <span class="ident">span</span>.<span class="ident">with_data</span>(<span class="op">|</span><span class="ident">data</span><span class="op">|</span> {
-                <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">status_code</span>, <span class="ident">status</span>);
-                <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">status_message</span>, <span class="string">&quot;&quot;</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>span = create_span();
+            <span class="kw">let </span>status = StatusCode::Ok;
+            <span class="kw">let </span>message = <span class="string">&quot;OK&quot;</span>.to_string();
+            span.set_status(status, message);
+            span.with_data(|data| {
+                <span class="macro">assert_eq!</span>(data.status_code, status);
+                <span class="macro">assert_eq!</span>(data.status_message, <span class="string">&quot;&quot;</span>);
             });
         }
         {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">create_span</span>();
-            <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">StatusCode::Unset</span>;
-            <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;OK&quot;</span>.<span class="ident">to_string</span>();
-            <span class="ident">span</span>.<span class="ident">set_status</span>(<span class="ident">status</span>, <span class="ident">message</span>);
-            <span class="ident">span</span>.<span class="ident">with_data</span>(<span class="op">|</span><span class="ident">data</span><span class="op">|</span> {
-                <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">status_code</span>, <span class="ident">status</span>);
-                <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">status_message</span>, <span class="string">&quot;&quot;</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>span = create_span();
+            <span class="kw">let </span>status = StatusCode::Unset;
+            <span class="kw">let </span>message = <span class="string">&quot;OK&quot;</span>.to_string();
+            span.set_status(status, message);
+            span.with_data(|data| {
+                <span class="macro">assert_eq!</span>(data.status_code, status);
+                <span class="macro">assert_eq!</span>(data.status_message, <span class="string">&quot;&quot;</span>);
             });
         }
         {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">create_span</span>();
-            <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">StatusCode::Error</span>;
-            <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Error&quot;</span>.<span class="ident">to_string</span>();
-            <span class="ident">span</span>.<span class="ident">set_status</span>(<span class="ident">status</span>, <span class="ident">message</span>);
-            <span class="ident">span</span>.<span class="ident">with_data</span>(<span class="op">|</span><span class="ident">data</span><span class="op">|</span> {
-                <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">status_code</span>, <span class="ident">status</span>);
-                <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">status_message</span>, <span class="string">&quot;Error&quot;</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>span = create_span();
+            <span class="kw">let </span>status = StatusCode::Error;
+            <span class="kw">let </span>message = <span class="string">&quot;Error&quot;</span>.to_string();
+            span.set_status(status, message);
+            span.with_data(|data| {
+                <span class="macro">assert_eq!</span>(data.status_code, status);
+                <span class="macro">assert_eq!</span>(data.status_message, <span class="string">&quot;Error&quot;</span>);
             });
         }
         {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">create_span</span>();
-            <span class="comment">// ok status code should be final</span>
-            <span class="ident">span</span>.<span class="ident">set_status</span>(<span class="ident">StatusCode::Ok</span>, <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>());
-            <span class="ident">span</span>.<span class="ident">set_status</span>(<span class="ident">StatusCode::Error</span>, <span class="string">&quot;error&quot;</span>.<span class="ident">to_string</span>());
-            <span class="ident">span</span>.<span class="ident">with_data</span>(<span class="op">|</span><span class="ident">data</span><span class="op">|</span> {
-                <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">status_code</span>, <span class="ident">StatusCode::Ok</span>);
-                <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">status_message</span>, <span class="string">&quot;&quot;</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>span = create_span();
+            <span class="comment">// ok status code should be final
+            </span>span.set_status(StatusCode::Ok, <span class="string">&quot;&quot;</span>.to_string());
+            span.set_status(StatusCode::Error, <span class="string">&quot;error&quot;</span>.to_string());
+            span.with_data(|data| {
+                <span class="macro">assert_eq!</span>(data.status_code, StatusCode::Ok);
+                <span class="macro">assert_eq!</span>(data.status_message, <span class="string">&quot;&quot;</span>);
             });
         }
         {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">create_span</span>();
-            <span class="comment">// error status code should be able to override unset</span>
-            <span class="ident">span</span>.<span class="ident">set_status</span>(<span class="ident">StatusCode::Error</span>, <span class="string">&quot;error&quot;</span>.<span class="ident">to_string</span>());
-            <span class="ident">span</span>.<span class="ident">with_data</span>(<span class="op">|</span><span class="ident">data</span><span class="op">|</span> {
-                <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">status_code</span>, <span class="ident">StatusCode::Error</span>);
-                <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">status_message</span>, <span class="string">&quot;error&quot;</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>span = create_span();
+            <span class="comment">// error status code should be able to override unset
+            </span>span.set_status(StatusCode::Error, <span class="string">&quot;error&quot;</span>.to_string());
+            span.with_data(|data| {
+                <span class="macro">assert_eq!</span>(data.status_code, StatusCode::Error);
+                <span class="macro">assert_eq!</span>(data.status_message, <span class="string">&quot;error&quot;</span>);
             });
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">update_name</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">create_span</span>();
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="string">&quot;new_name&quot;</span>.<span class="ident">to_string</span>();
-        <span class="ident">span</span>.<span class="ident">update_name</span>(<span class="ident">name</span>.<span class="ident">clone</span>());
-        <span class="ident">span</span>.<span class="ident">with_data</span>(<span class="op">|</span><span class="ident">data</span><span class="op">|</span> {
-            <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">name</span>, <span class="ident">name</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>update_name() {
+        <span class="kw">let </span><span class="kw-2">mut </span>span = create_span();
+        <span class="kw">let </span>name = <span class="string">&quot;new_name&quot;</span>.to_string();
+        span.update_name(name.clone());
+        span.with_data(|data| {
+            <span class="macro">assert_eq!</span>(data.name, name);
         });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">end</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">create_span</span>();
-        <span class="ident">span</span>.<span class="ident">end</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>end() {
+        <span class="kw">let </span><span class="kw-2">mut </span>span = create_span();
+        span.end();
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">end_with_timestamp</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">create_span</span>();
-        <span class="kw">let</span> <span class="ident">timestamp</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::time::now</span>();
-        <span class="ident">span</span>.<span class="ident">end_with_timestamp</span>(<span class="ident">timestamp</span>);
-        <span class="ident">span</span>.<span class="ident">with_data</span>(<span class="op">|</span><span class="ident">data</span><span class="op">|</span> <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">end_time</span>, <span class="ident">timestamp</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>end_with_timestamp() {
+        <span class="kw">let </span><span class="kw-2">mut </span>span = create_span();
+        <span class="kw">let </span>timestamp = <span class="kw">crate</span>::time::now();
+        span.end_with_timestamp(timestamp);
+        span.with_data(|data| <span class="macro">assert_eq!</span>(data.end_time, timestamp));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">allows_to_get_span_context_after_end</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">create_span</span>();
-        <span class="ident">span</span>.<span class="ident">end</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">span</span>.<span class="ident">span_context</span>(), <span class="kw-2">&amp;</span><span class="ident">SpanContext::empty_context</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>allows_to_get_span_context_after_end() {
+        <span class="kw">let </span><span class="kw-2">mut </span>span = create_span();
+        span.end();
+        <span class="macro">assert_eq!</span>(span.span_context(), <span class="kw-2">&amp;</span>SpanContext::empty_context());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">end_only_once</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">create_span</span>();
-        <span class="kw">let</span> <span class="ident">timestamp</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::time::now</span>();
-        <span class="ident">span</span>.<span class="ident">end_with_timestamp</span>(<span class="ident">timestamp</span>);
-        <span class="ident">span</span>.<span class="ident">end_with_timestamp</span>(<span class="ident">timestamp</span>.<span class="ident">checked_add</span>(<span class="ident">Duration::from_secs</span>(<span class="number">10</span>)).<span class="ident">unwrap</span>());
-        <span class="ident">span</span>.<span class="ident">with_data</span>(<span class="op">|</span><span class="ident">data</span><span class="op">|</span> <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">end_time</span>, <span class="ident">timestamp</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>end_only_once() {
+        <span class="kw">let </span><span class="kw-2">mut </span>span = create_span();
+        <span class="kw">let </span>timestamp = <span class="kw">crate</span>::time::now();
+        span.end_with_timestamp(timestamp);
+        span.end_with_timestamp(timestamp.checked_add(Duration::from_secs(<span class="number">10</span>)).unwrap());
+        span.with_data(|data| <span class="macro">assert_eq!</span>(data.end_time, timestamp));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">noop_after_end</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">create_span</span>();
-        <span class="kw">let</span> <span class="ident">initial</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">with_data</span>(<span class="op">|</span><span class="ident">data</span><span class="op">|</span> <span class="ident">data</span>.<span class="ident">clone</span>()).<span class="ident">unwrap</span>();
-        <span class="ident">span</span>.<span class="ident">end</span>();
-        <span class="ident">span</span>.<span class="ident">add_event</span>(<span class="string">&quot;some_event&quot;</span>.<span class="ident">to_string</span>(), <span class="macro">vec!</span>[<span class="ident">KeyValue::new</span>(<span class="string">&quot;k&quot;</span>, <span class="string">&quot;v&quot;</span>)]);
-        <span class="ident">span</span>.<span class="ident">add_event_with_timestamp</span>(
-            <span class="string">&quot;some_event&quot;</span>.<span class="ident">to_string</span>(),
-            <span class="ident"><span class="kw">crate</span>::time::now</span>(),
-            <span class="macro">vec!</span>[<span class="ident">KeyValue::new</span>(<span class="string">&quot;k&quot;</span>, <span class="string">&quot;v&quot;</span>)],
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>noop_after_end() {
+        <span class="kw">let </span><span class="kw-2">mut </span>span = create_span();
+        <span class="kw">let </span>initial = span.with_data(|data| data.clone()).unwrap();
+        span.end();
+        span.add_event(<span class="string">&quot;some_event&quot;</span>.to_string(), <span class="macro">vec!</span>[KeyValue::new(<span class="string">&quot;k&quot;</span>, <span class="string">&quot;v&quot;</span>)]);
+        span.add_event_with_timestamp(
+            <span class="string">&quot;some_event&quot;</span>.to_string(),
+            <span class="kw">crate</span>::time::now(),
+            <span class="macro">vec!</span>[KeyValue::new(<span class="string">&quot;k&quot;</span>, <span class="string">&quot;v&quot;</span>)],
         );
-        <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">std::io::Error::from</span>(<span class="ident">std::io::ErrorKind::Other</span>);
-        <span class="ident">span</span>.<span class="ident">record_exception</span>(<span class="kw-2">&amp;</span><span class="ident">err</span>);
-        <span class="ident">span</span>.<span class="ident">record_exception_with_stacktrace</span>(<span class="kw-2">&amp;</span><span class="ident">err</span>, <span class="string">&quot;stacktrace...&quot;</span>.<span class="ident">to_string</span>());
-        <span class="ident">span</span>.<span class="ident">set_attribute</span>(<span class="ident">KeyValue::new</span>(<span class="string">&quot;k&quot;</span>, <span class="string">&quot;v&quot;</span>));
-        <span class="ident">span</span>.<span class="ident">set_status</span>(<span class="ident">StatusCode::Error</span>, <span class="string">&quot;ERROR&quot;</span>.<span class="ident">to_string</span>());
-        <span class="ident">span</span>.<span class="ident">update_name</span>(<span class="string">&quot;new_name&quot;</span>.<span class="ident">to_string</span>());
-        <span class="ident">span</span>.<span class="ident">with_data</span>(<span class="op">|</span><span class="ident">data</span><span class="op">|</span> {
-            <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">events</span>, <span class="ident">initial</span>.<span class="ident">events</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">attributes</span>, <span class="ident">initial</span>.<span class="ident">attributes</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">status_code</span>, <span class="ident">initial</span>.<span class="ident">status_code</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">status_message</span>, <span class="ident">initial</span>.<span class="ident">status_message</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">data</span>.<span class="ident">name</span>, <span class="ident">initial</span>.<span class="ident">name</span>);
+        <span class="kw">let </span>err = std::io::Error::from(std::io::ErrorKind::Other);
+        span.record_exception(<span class="kw-2">&amp;</span>err);
+        span.record_exception_with_stacktrace(<span class="kw-2">&amp;</span>err, <span class="string">&quot;stacktrace...&quot;</span>.to_string());
+        span.set_attribute(KeyValue::new(<span class="string">&quot;k&quot;</span>, <span class="string">&quot;v&quot;</span>));
+        span.set_status(StatusCode::Error, <span class="string">&quot;ERROR&quot;</span>.to_string());
+        span.update_name(<span class="string">&quot;new_name&quot;</span>.to_string());
+        span.with_data(|data| {
+            <span class="macro">assert_eq!</span>(data.events, initial.events);
+            <span class="macro">assert_eq!</span>(data.attributes, initial.attributes);
+            <span class="macro">assert_eq!</span>(data.status_code, initial.status_code);
+            <span class="macro">assert_eq!</span>(data.status_message, initial.status_message);
+            <span class="macro">assert_eq!</span>(data.name, initial.name);
         });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_recording_true_when_not_ended</span>() {
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">create_span</span>();
-        <span class="macro">assert!</span>(<span class="ident">span</span>.<span class="ident">is_recording</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>is_recording_true_when_not_ended() {
+        <span class="kw">let </span>span = create_span();
+        <span class="macro">assert!</span>(span.is_recording());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">is_recording_false_after_end</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">create_span</span>();
-        <span class="ident">span</span>.<span class="ident">end</span>();
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">span</span>.<span class="ident">is_recording</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>is_recording_false_after_end() {
+        <span class="kw">let </span><span class="kw-2">mut </span>span = create_span();
+        span.end();
+        <span class="macro">assert!</span>(!span.is_recording());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">exceed_event_attributes_limit</span>() {
-        <span class="kw">let</span> <span class="ident">exporter</span> <span class="op">=</span> <span class="ident">NoopSpanExporter::new</span>();
-        <span class="kw">let</span> <span class="ident">provider_builder</span> <span class="op">=</span> <span class="ident">sdk::trace::TracerProvider::builder</span>().<span class="ident">with_simple_exporter</span>(<span class="ident">exporter</span>);
-        <span class="kw">let</span> <span class="ident">provider</span> <span class="op">=</span> <span class="ident">provider_builder</span>.<span class="ident">build</span>();
-        <span class="kw">let</span> <span class="ident">tracer</span> <span class="op">=</span> <span class="ident">provider</span>.<span class="ident">tracer</span>(<span class="string">&quot;opentelemetry-test&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>exceed_event_attributes_limit() {
+        <span class="kw">let </span>exporter = NoopSpanExporter::new();
+        <span class="kw">let </span>provider_builder = sdk::trace::TracerProvider::builder().with_simple_exporter(exporter);
+        <span class="kw">let </span>provider = provider_builder.build();
+        <span class="kw">let </span>tracer = provider.tracer(<span class="string">&quot;opentelemetry-test&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">event1</span> <span class="op">=</span> <span class="ident">Event::with_name</span>(<span class="string">&quot;test event&quot;</span>);
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..(<span class="ident">DEFAULT_MAX_ATTRIBUTES_PER_EVENT</span> <span class="op">*</span> <span class="number">2</span>) {
-            <span class="ident">event1</span>
-                .<span class="ident">attributes</span>
-                .<span class="ident">push</span>(<span class="ident">KeyValue::new</span>(<span class="macro">format!</span>(<span class="string">&quot;key {}&quot;</span>, <span class="ident">i</span>), <span class="ident">i</span>.<span class="ident">to_string</span>()))
+        <span class="kw">let </span><span class="kw-2">mut </span>event1 = Event::with_name(<span class="string">&quot;test event&quot;</span>);
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..(DEFAULT_MAX_ATTRIBUTES_PER_EVENT * <span class="number">2</span>) {
+            event1
+                .attributes
+                .push(KeyValue::new(<span class="macro">format!</span>(<span class="string">&quot;key {}&quot;</span>, i), i.to_string()))
         }
-        <span class="kw">let</span> <span class="ident">event2</span> <span class="op">=</span> <span class="ident">event1</span>.<span class="ident">clone</span>();
+        <span class="kw">let </span>event2 = event1.clone();
 
-        <span class="comment">// add event when build</span>
-        <span class="kw">let</span> <span class="ident">span_builder</span> <span class="op">=</span> <span class="ident">tracer</span>.<span class="ident">span_builder</span>(<span class="string">&quot;test&quot;</span>).<span class="ident">with_events</span>(<span class="macro">vec!</span>[<span class="ident">event1</span>]);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">tracer</span>.<span class="ident">build</span>(<span class="ident">span_builder</span>);
+        <span class="comment">// add event when build
+        </span><span class="kw">let </span>span_builder = tracer.span_builder(<span class="string">&quot;test&quot;</span>).with_events(<span class="macro">vec!</span>[event1]);
+        <span class="kw">let </span><span class="kw-2">mut </span>span = tracer.build(span_builder);
 
-        <span class="comment">// add event after build</span>
-        <span class="ident">span</span>.<span class="ident">add_event</span>(<span class="string">&quot;another test event&quot;</span>, <span class="ident">event2</span>.<span class="ident">attributes</span>);
+        <span class="comment">// add event after build
+        </span>span.add_event(<span class="string">&quot;another test event&quot;</span>, event2.attributes);
 
-        <span class="kw">let</span> <span class="ident">event_queue</span> <span class="op">=</span> <span class="ident">span</span>
-            .<span class="ident">data</span>
-            .<span class="ident">clone</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;span data should not be empty as we already set it before&quot;</span>)
-            .<span class="ident">events</span>;
-        <span class="kw">let</span> <span class="ident">event_vec</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">event_queue</span>.<span class="ident">iter</span>().<span class="ident">take</span>(<span class="number">2</span>).<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="ident">processed_event_1</span> <span class="op">=</span> <span class="ident">event_vec</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">expect</span>(<span class="string">&quot;should have at least two events&quot;</span>);
-        <span class="kw">let</span> <span class="ident">processed_event_2</span> <span class="op">=</span> <span class="ident">event_vec</span>.<span class="ident">get</span>(<span class="number">1</span>).<span class="ident">expect</span>(<span class="string">&quot;should have at least two events&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">processed_event_1</span>.<span class="ident">attributes</span>.<span class="ident">len</span>(), <span class="number">128</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">processed_event_2</span>.<span class="ident">attributes</span>.<span class="ident">len</span>(), <span class="number">128</span>);
+        <span class="kw">let </span>event_queue = span
+            .data
+            .clone()
+            .expect(<span class="string">&quot;span data should not be empty as we already set it before&quot;</span>)
+            .events;
+        <span class="kw">let </span>event_vec: Vec&lt;<span class="kw">_</span>&gt; = event_queue.iter().take(<span class="number">2</span>).collect();
+        <span class="kw">let </span>processed_event_1 = event_vec.get(<span class="number">0</span>).expect(<span class="string">&quot;should have at least two events&quot;</span>);
+        <span class="kw">let </span>processed_event_2 = event_vec.get(<span class="number">1</span>).expect(<span class="string">&quot;should have at least two events&quot;</span>);
+        <span class="macro">assert_eq!</span>(processed_event_1.attributes.len(), <span class="number">128</span>);
+        <span class="macro">assert_eq!</span>(processed_event_2.attributes.len(), <span class="number">128</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">exceed_link_attributes_limit</span>() {
-        <span class="kw">let</span> <span class="ident">exporter</span> <span class="op">=</span> <span class="ident">NoopSpanExporter::new</span>();
-        <span class="kw">let</span> <span class="ident">provider_builder</span> <span class="op">=</span> <span class="ident">sdk::trace::TracerProvider::builder</span>().<span class="ident">with_simple_exporter</span>(<span class="ident">exporter</span>);
-        <span class="kw">let</span> <span class="ident">provider</span> <span class="op">=</span> <span class="ident">provider_builder</span>.<span class="ident">build</span>();
-        <span class="kw">let</span> <span class="ident">tracer</span> <span class="op">=</span> <span class="ident">provider</span>.<span class="ident">tracer</span>(<span class="string">&quot;opentelemetry-test&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>exceed_link_attributes_limit() {
+        <span class="kw">let </span>exporter = NoopSpanExporter::new();
+        <span class="kw">let </span>provider_builder = sdk::trace::TracerProvider::builder().with_simple_exporter(exporter);
+        <span class="kw">let </span>provider = provider_builder.build();
+        <span class="kw">let </span>tracer = provider.tracer(<span class="string">&quot;opentelemetry-test&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">link</span> <span class="op">=</span> <span class="ident">Link::new</span>(
-            <span class="ident">SpanContext::new</span>(
-                <span class="ident">TraceId::from_u128</span>(<span class="number">12</span>),
-                <span class="ident">SpanId::from_u64</span>(<span class="number">12</span>),
-                <span class="ident">TraceFlags::default</span>(),
+        <span class="kw">let </span><span class="kw-2">mut </span>link = Link::new(
+            SpanContext::new(
+                TraceId::from_u128(<span class="number">12</span>),
+                SpanId::from_u64(<span class="number">12</span>),
+                TraceFlags::default(),
                 <span class="bool-val">false</span>,
-                <span class="ident">Default::default</span>(),
+                Default::default(),
             ),
-            <span class="ident">Vec::new</span>(),
+            Vec::new(),
         );
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..(<span class="ident">DEFAULT_MAX_ATTRIBUTES_PER_LINK</span> <span class="op">*</span> <span class="number">2</span>) {
-            <span class="ident">link</span>.<span class="ident">attributes</span>
-                .<span class="ident">push</span>(<span class="ident">KeyValue::new</span>(<span class="macro">format!</span>(<span class="string">&quot;key {}&quot;</span>, <span class="ident">i</span>), <span class="ident">i</span>.<span class="ident">to_string</span>()));
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..(DEFAULT_MAX_ATTRIBUTES_PER_LINK * <span class="number">2</span>) {
+            link.attributes
+                .push(KeyValue::new(<span class="macro">format!</span>(<span class="string">&quot;key {}&quot;</span>, i), i.to_string()));
         }
 
-        <span class="kw">let</span> <span class="ident">span_builder</span> <span class="op">=</span> <span class="ident">tracer</span>.<span class="ident">span_builder</span>(<span class="string">&quot;test&quot;</span>).<span class="ident">with_links</span>(<span class="macro">vec!</span>[<span class="ident">link</span>]);
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">tracer</span>.<span class="ident">build</span>(<span class="ident">span_builder</span>);
-        <span class="kw">let</span> <span class="ident">link_queue</span> <span class="op">=</span> <span class="ident">span</span>
-            .<span class="ident">data</span>
-            .<span class="ident">clone</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;span data should not be empty as we already set it before&quot;</span>)
-            .<span class="ident">links</span>;
-        <span class="kw">let</span> <span class="ident">link_vec</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">link_queue</span>.<span class="ident">iter</span>().<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="ident">processed_link</span> <span class="op">=</span> <span class="ident">link_vec</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">expect</span>(<span class="string">&quot;should have at least one link&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">processed_link</span>.<span class="ident">attributes</span>().<span class="ident">len</span>(), <span class="number">128</span>);
+        <span class="kw">let </span>span_builder = tracer.span_builder(<span class="string">&quot;test&quot;</span>).with_links(<span class="macro">vec!</span>[link]);
+        <span class="kw">let </span>span = tracer.build(span_builder);
+        <span class="kw">let </span>link_queue = span
+            .data
+            .clone()
+            .expect(<span class="string">&quot;span data should not be empty as we already set it before&quot;</span>)
+            .links;
+        <span class="kw">let </span>link_vec: Vec&lt;<span class="kw">_</span>&gt; = link_queue.iter().collect();
+        <span class="kw">let </span>processed_link = link_vec.get(<span class="number">0</span>).expect(<span class="string">&quot;should have at least one link&quot;</span>);
+        <span class="macro">assert_eq!</span>(processed_link.attributes().len(), <span class="number">128</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_span_exported_data</span>() {
-        <span class="kw">let</span> <span class="ident">provider</span> <span class="op">=</span> <span class="ident">sdk::trace::TracerProvider::builder</span>()
-            .<span class="ident">with_simple_exporter</span>(<span class="ident">NoopSpanExporter::new</span>())
-            .<span class="ident">build</span>();
-        <span class="kw">let</span> <span class="ident">tracer</span> <span class="op">=</span> <span class="ident">provider</span>.<span class="ident">tracer</span>(<span class="string">&quot;test&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_span_exported_data() {
+        <span class="kw">let </span>provider = sdk::trace::TracerProvider::builder()
+            .with_simple_exporter(NoopSpanExporter::new())
+            .build();
+        <span class="kw">let </span>tracer = provider.tracer(<span class="string">&quot;test&quot;</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">tracer</span>.<span class="ident">start</span>(<span class="string">&quot;test_span&quot;</span>);
-        <span class="ident">span</span>.<span class="ident">add_event</span>(<span class="string">&quot;test_event&quot;</span>.<span class="ident">to_string</span>(), <span class="macro">vec!</span>[]);
-        <span class="ident">span</span>.<span class="ident">set_status</span>(<span class="ident">StatusCode::Error</span>, <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>());
+        <span class="kw">let </span><span class="kw-2">mut </span>span = tracer.start(<span class="string">&quot;test_span&quot;</span>);
+        span.add_event(<span class="string">&quot;test_event&quot;</span>.to_string(), <span class="macro">vec!</span>[]);
+        span.set_status(StatusCode::Error, <span class="string">&quot;&quot;</span>.to_string());
 
-        <span class="kw">let</span> <span class="ident">exported_data</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">exported_data</span>();
-        <span class="macro">assert!</span>(<span class="ident">exported_data</span>.<span class="ident">is_some</span>());
+        <span class="kw">let </span>exported_data = span.exported_data();
+        <span class="macro">assert!</span>(exported_data.is_some());
 
-        <span class="ident">drop</span>(<span class="ident">provider</span>);
-        <span class="kw">let</span> <span class="ident">dropped_span</span> <span class="op">=</span> <span class="ident">tracer</span>.<span class="ident">start</span>(<span class="string">&quot;span_with_dropped_provider&quot;</span>);
-        <span class="comment">// return none if the provider has already been dropped</span>
-        <span class="macro">assert!</span>(<span class="ident">dropped_span</span>.<span class="ident">exported_data</span>().<span class="ident">is_none</span>());
+        drop(provider);
+        <span class="kw">let </span>dropped_span = tracer.start(<span class="string">&quot;span_with_dropped_provider&quot;</span>);
+        <span class="comment">// return none if the provider has already been dropped
+        </span><span class="macro">assert!</span>(dropped_span.exported_data().is_none());
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

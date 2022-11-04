@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-util-0.7.3/src/compat.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>compat.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tokio_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tokio_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tokio_util/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-util-0.7.3/src/compat.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>compat.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tokio_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tokio_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tokio_util/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -272,279 +272,279 @@
 <span id="272">272</span>
 <span id="273">273</span>
 <span id="274">274</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Compatibility between the `tokio::io` and `futures-io` versions of the</span>
-<span class="doccomment">//! `AsyncRead` and `AsyncWrite` traits.</span>
-<span class="kw">use</span> <span class="ident">futures_core::ready</span>;
-<span class="kw">use</span> <span class="ident">pin_project_lite::pin_project</span>;
-<span class="kw">use</span> <span class="ident">std::io</span>;
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
+</pre><pre class="rust"><code><span class="doccomment">//! Compatibility between the `tokio::io` and `futures-io` versions of the
+//! `AsyncRead` and `AsyncWrite` traits.
+</span><span class="kw">use </span>futures_core::ready;
+<span class="kw">use </span>pin_project_lite::pin_project;
+<span class="kw">use </span>std::io;
+<span class="kw">use </span>std::pin::Pin;
+<span class="kw">use </span>std::task::{Context, Poll};
 
-<span class="macro">pin_project!</span> {
-    <span class="doccomment">/// A compatibility layer that allows conversion between the</span>
-    <span class="doccomment">/// `tokio::io` and `futures-io` `AsyncRead` and `AsyncWrite` traits.</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Compat</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="attribute">#[<span class="ident">pin</span>]</span>
-        <span class="ident">inner</span>: <span class="ident">T</span>,
-        <span class="ident">seek_pos</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">io::SeekFrom</span><span class="op">&gt;</span>,
+<span class="macro">pin_project! </span>{
+    <span class="doccomment">/// A compatibility layer that allows conversion between the
+    /// `tokio::io` and `futures-io` `AsyncRead` and `AsyncWrite` traits.
+    </span><span class="attribute">#[derive(Copy, Clone, Debug)]
+    </span><span class="kw">pub struct </span>Compat&lt;T&gt; {
+        <span class="attribute">#[pin]
+        </span>inner: T,
+        seek_pos: <span class="prelude-ty">Option</span>&lt;io::SeekFrom&gt;,
     }
 }
 
-<span class="doccomment">/// Extension trait that allows converting a type implementing</span>
-<span class="doccomment">/// `futures_io::AsyncRead` to implement `tokio::io::AsyncRead`.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">FuturesAsyncReadCompatExt</span>: <span class="ident">futures_io::AsyncRead</span> {
-    <span class="doccomment">/// Wraps `self` with a compatibility layer that implements</span>
-    <span class="doccomment">/// `tokio_io::AsyncRead`.</span>
-    <span class="kw">fn</span> <span class="ident">compat</span>(<span class="self">self</span>) -&gt; <span class="ident">Compat</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
+<span class="doccomment">/// Extension trait that allows converting a type implementing
+/// `futures_io::AsyncRead` to implement `tokio::io::AsyncRead`.
+</span><span class="kw">pub trait </span>FuturesAsyncReadCompatExt: futures_io::AsyncRead {
+    <span class="doccomment">/// Wraps `self` with a compatibility layer that implements
+    /// `tokio_io::AsyncRead`.
+    </span><span class="kw">fn </span>compat(<span class="self">self</span>) -&gt; Compat&lt;<span class="self">Self</span>&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
     {
-        <span class="ident">Compat::new</span>(<span class="self">self</span>)
+        Compat::new(<span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">futures_io::AsyncRead</span><span class="op">&gt;</span> <span class="ident">FuturesAsyncReadCompatExt</span> <span class="kw">for</span> <span class="ident">T</span> {}
+<span class="kw">impl</span>&lt;T: futures_io::AsyncRead&gt; FuturesAsyncReadCompatExt <span class="kw">for </span>T {}
 
-<span class="doccomment">/// Extension trait that allows converting a type implementing</span>
-<span class="doccomment">/// `futures_io::AsyncWrite` to implement `tokio::io::AsyncWrite`.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">FuturesAsyncWriteCompatExt</span>: <span class="ident">futures_io::AsyncWrite</span> {
-    <span class="doccomment">/// Wraps `self` with a compatibility layer that implements</span>
-    <span class="doccomment">/// `tokio::io::AsyncWrite`.</span>
-    <span class="kw">fn</span> <span class="ident">compat_write</span>(<span class="self">self</span>) -&gt; <span class="ident">Compat</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
+<span class="doccomment">/// Extension trait that allows converting a type implementing
+/// `futures_io::AsyncWrite` to implement `tokio::io::AsyncWrite`.
+</span><span class="kw">pub trait </span>FuturesAsyncWriteCompatExt: futures_io::AsyncWrite {
+    <span class="doccomment">/// Wraps `self` with a compatibility layer that implements
+    /// `tokio::io::AsyncWrite`.
+    </span><span class="kw">fn </span>compat_write(<span class="self">self</span>) -&gt; Compat&lt;<span class="self">Self</span>&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
     {
-        <span class="ident">Compat::new</span>(<span class="self">self</span>)
+        Compat::new(<span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">futures_io::AsyncWrite</span><span class="op">&gt;</span> <span class="ident">FuturesAsyncWriteCompatExt</span> <span class="kw">for</span> <span class="ident">T</span> {}
+<span class="kw">impl</span>&lt;T: futures_io::AsyncWrite&gt; FuturesAsyncWriteCompatExt <span class="kw">for </span>T {}
 
-<span class="doccomment">/// Extension trait that allows converting a type implementing</span>
-<span class="doccomment">/// `tokio::io::AsyncRead` to implement `futures_io::AsyncRead`.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">TokioAsyncReadCompatExt</span>: <span class="ident">tokio::io::AsyncRead</span> {
-    <span class="doccomment">/// Wraps `self` with a compatibility layer that implements</span>
-    <span class="doccomment">/// `futures_io::AsyncRead`.</span>
-    <span class="kw">fn</span> <span class="ident">compat</span>(<span class="self">self</span>) -&gt; <span class="ident">Compat</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
+<span class="doccomment">/// Extension trait that allows converting a type implementing
+/// `tokio::io::AsyncRead` to implement `futures_io::AsyncRead`.
+</span><span class="kw">pub trait </span>TokioAsyncReadCompatExt: tokio::io::AsyncRead {
+    <span class="doccomment">/// Wraps `self` with a compatibility layer that implements
+    /// `futures_io::AsyncRead`.
+    </span><span class="kw">fn </span>compat(<span class="self">self</span>) -&gt; Compat&lt;<span class="self">Self</span>&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
     {
-        <span class="ident">Compat::new</span>(<span class="self">self</span>)
+        Compat::new(<span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">tokio::io::AsyncRead</span><span class="op">&gt;</span> <span class="ident">TokioAsyncReadCompatExt</span> <span class="kw">for</span> <span class="ident">T</span> {}
+<span class="kw">impl</span>&lt;T: tokio::io::AsyncRead&gt; TokioAsyncReadCompatExt <span class="kw">for </span>T {}
 
-<span class="doccomment">/// Extension trait that allows converting a type implementing</span>
-<span class="doccomment">/// `tokio::io::AsyncWrite` to implement `futures_io::AsyncWrite`.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">TokioAsyncWriteCompatExt</span>: <span class="ident">tokio::io::AsyncWrite</span> {
-    <span class="doccomment">/// Wraps `self` with a compatibility layer that implements</span>
-    <span class="doccomment">/// `futures_io::AsyncWrite`.</span>
-    <span class="kw">fn</span> <span class="ident">compat_write</span>(<span class="self">self</span>) -&gt; <span class="ident">Compat</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Sized</span>,
+<span class="doccomment">/// Extension trait that allows converting a type implementing
+/// `tokio::io::AsyncWrite` to implement `futures_io::AsyncWrite`.
+</span><span class="kw">pub trait </span>TokioAsyncWriteCompatExt: tokio::io::AsyncWrite {
+    <span class="doccomment">/// Wraps `self` with a compatibility layer that implements
+    /// `futures_io::AsyncWrite`.
+    </span><span class="kw">fn </span>compat_write(<span class="self">self</span>) -&gt; Compat&lt;<span class="self">Self</span>&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: Sized,
     {
-        <span class="ident">Compat::new</span>(<span class="self">self</span>)
+        Compat::new(<span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">tokio::io::AsyncWrite</span><span class="op">&gt;</span> <span class="ident">TokioAsyncWriteCompatExt</span> <span class="kw">for</span> <span class="ident">T</span> {}
+<span class="kw">impl</span>&lt;T: tokio::io::AsyncWrite&gt; TokioAsyncWriteCompatExt <span class="kw">for </span>T {}
 
-<span class="comment">// === impl Compat ===</span>
+<span class="comment">// === impl Compat ===
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Compat</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">inner</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">inner</span>,
-            <span class="ident">seek_pos</span>: <span class="prelude-val">None</span>,
+</span><span class="kw">impl</span>&lt;T&gt; Compat&lt;T&gt; {
+    <span class="kw">fn </span>new(inner: T) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            inner,
+            seek_pos: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Get a reference to the `Future`, `Stream`, `AsyncRead`, or `AsyncWrite` object</span>
-    <span class="doccomment">/// contained within.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">T</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>
+    <span class="doccomment">/// Get a reference to the `Future`, `Stream`, `AsyncRead`, or `AsyncWrite` object
+    /// contained within.
+    </span><span class="kw">pub fn </span>get_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>T {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.inner
     }
 
-    <span class="doccomment">/// Get a mutable reference to the `Future`, `Stream`, `AsyncRead`, or `AsyncWrite` object</span>
-    <span class="doccomment">/// contained within.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">T</span> {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>
+    <span class="doccomment">/// Get a mutable reference to the `Future`, `Stream`, `AsyncRead`, or `AsyncWrite` object
+    /// contained within.
+    </span><span class="kw">pub fn </span>get_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>T {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.inner
     }
 
-    <span class="doccomment">/// Returns the wrapped item.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="ident">T</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>
+    <span class="doccomment">/// Returns the wrapped item.
+    </span><span class="kw">pub fn </span>into_inner(<span class="self">self</span>) -&gt; T {
+        <span class="self">self</span>.inner
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">tokio::io::AsyncRead</span> <span class="kw">for</span> <span class="ident">Compat</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">futures_io::AsyncRead</span>,
+<span class="kw">impl</span>&lt;T&gt; tokio::io::AsyncRead <span class="kw">for </span>Compat&lt;T&gt;
+<span class="kw">where
+    </span>T: futures_io::AsyncRead,
 {
-    <span class="kw">fn</span> <span class="ident">poll_read</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">tokio::io::ReadBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="comment">// We can&#39;t trust the inner type to not peak at the bytes,</span>
-        <span class="comment">// so we must defensively initialize the buffer.</span>
-        <span class="kw">let</span> <span class="ident">slice</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">initialize_unfilled</span>();
-        <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="ident">futures_io::AsyncRead::poll_read</span>(
-            <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">inner</span>,
-            <span class="ident">cx</span>,
-            <span class="ident">slice</span>
+    <span class="kw">fn </span>poll_read(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        buf: <span class="kw-2">&amp;mut </span>tokio::io::ReadBuf&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+        <span class="comment">// We can&#39;t trust the inner type to not peak at the bytes,
+        // so we must defensively initialize the buffer.
+        </span><span class="kw">let </span>slice = buf.initialize_unfilled();
+        <span class="kw">let </span>n = <span class="macro">ready!</span>(futures_io::AsyncRead::poll_read(
+            <span class="self">self</span>.project().inner,
+            cx,
+            slice
         ))<span class="question-mark">?</span>;
-        <span class="ident">buf</span>.<span class="ident">advance</span>(<span class="ident">n</span>);
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
+        buf.advance(n);
+        Poll::Ready(<span class="prelude-val">Ok</span>(()))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">futures_io::AsyncRead</span> <span class="kw">for</span> <span class="ident">Compat</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">tokio::io::AsyncRead</span>,
+<span class="kw">impl</span>&lt;T&gt; futures_io::AsyncRead <span class="kw">for </span>Compat&lt;T&gt;
+<span class="kw">where
+    </span>T: tokio::io::AsyncRead,
 {
-    <span class="kw">fn</span> <span class="ident">poll_read</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">slice</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">tokio::io::ReadBuf::new</span>(<span class="ident">slice</span>);
-        <span class="macro">ready!</span>(<span class="ident">tokio::io::AsyncRead::poll_read</span>(
-            <span class="self">self</span>.<span class="ident">project</span>().<span class="ident">inner</span>,
-            <span class="ident">cx</span>,
-            <span class="kw-2">&amp;mut</span> <span class="ident">buf</span>
+    <span class="kw">fn </span>poll_read(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        slice: <span class="kw-2">&amp;mut </span>[u8],
+    ) -&gt; Poll&lt;io::Result&lt;usize&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>buf = tokio::io::ReadBuf::new(slice);
+        <span class="macro">ready!</span>(tokio::io::AsyncRead::poll_read(
+            <span class="self">self</span>.project().inner,
+            cx,
+            <span class="kw-2">&amp;mut </span>buf
         ))<span class="question-mark">?</span>;
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">buf</span>.<span class="ident">filled</span>().<span class="ident">len</span>()))
+        Poll::Ready(<span class="prelude-val">Ok</span>(buf.filled().len()))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">tokio::io::AsyncBufRead</span> <span class="kw">for</span> <span class="ident">Compat</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">futures_io::AsyncBufRead</span>,
+<span class="kw">impl</span>&lt;T&gt; tokio::io::AsyncBufRead <span class="kw">for </span>Compat&lt;T&gt;
+<span class="kw">where
+    </span>T: futures_io::AsyncBufRead,
 {
-    <span class="kw">fn</span> <span class="ident">poll_fill_buf</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">futures_io::AsyncBufRead::poll_fill_buf</span>(<span class="self">self</span>.<span class="ident">project</span>().<span class="ident">inner</span>, <span class="ident">cx</span>)
+    <span class="kw">fn </span>poll_fill_buf&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;io::Result&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]&gt;&gt; {
+        futures_io::AsyncBufRead::poll_fill_buf(<span class="self">self</span>.project().inner, cx)
     }
 
-    <span class="kw">fn</span> <span class="ident">consume</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">amt</span>: <span class="ident">usize</span>) {
-        <span class="ident">futures_io::AsyncBufRead::consume</span>(<span class="self">self</span>.<span class="ident">project</span>().<span class="ident">inner</span>, <span class="ident">amt</span>)
+    <span class="kw">fn </span>consume(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, amt: usize) {
+        futures_io::AsyncBufRead::consume(<span class="self">self</span>.project().inner, amt)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">futures_io::AsyncBufRead</span> <span class="kw">for</span> <span class="ident">Compat</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">tokio::io::AsyncBufRead</span>,
+<span class="kw">impl</span>&lt;T&gt; futures_io::AsyncBufRead <span class="kw">for </span>Compat&lt;T&gt;
+<span class="kw">where
+    </span>T: tokio::io::AsyncBufRead,
 {
-    <span class="kw">fn</span> <span class="ident">poll_fill_buf</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">tokio::io::AsyncBufRead::poll_fill_buf</span>(<span class="self">self</span>.<span class="ident">project</span>().<span class="ident">inner</span>, <span class="ident">cx</span>)
+    <span class="kw">fn </span>poll_fill_buf&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;io::Result&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8]&gt;&gt; {
+        tokio::io::AsyncBufRead::poll_fill_buf(<span class="self">self</span>.project().inner, cx)
     }
 
-    <span class="kw">fn</span> <span class="ident">consume</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">amt</span>: <span class="ident">usize</span>) {
-        <span class="ident">tokio::io::AsyncBufRead::consume</span>(<span class="self">self</span>.<span class="ident">project</span>().<span class="ident">inner</span>, <span class="ident">amt</span>)
+    <span class="kw">fn </span>consume(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, amt: usize) {
+        tokio::io::AsyncBufRead::consume(<span class="self">self</span>.project().inner, amt)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">tokio::io::AsyncWrite</span> <span class="kw">for</span> <span class="ident">Compat</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">futures_io::AsyncWrite</span>,
+<span class="kw">impl</span>&lt;T&gt; tokio::io::AsyncWrite <span class="kw">for </span>Compat&lt;T&gt;
+<span class="kw">where
+    </span>T: futures_io::AsyncWrite,
 {
-    <span class="kw">fn</span> <span class="ident">poll_write</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">futures_io::AsyncWrite::poll_write</span>(<span class="self">self</span>.<span class="ident">project</span>().<span class="ident">inner</span>, <span class="ident">cx</span>, <span class="ident">buf</span>)
+    <span class="kw">fn </span>poll_write(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        buf: <span class="kw-2">&amp;</span>[u8],
+    ) -&gt; Poll&lt;io::Result&lt;usize&gt;&gt; {
+        futures_io::AsyncWrite::poll_write(<span class="self">self</span>.project().inner, cx, buf)
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">futures_io::AsyncWrite::poll_flush</span>(<span class="self">self</span>.<span class="ident">project</span>().<span class="ident">inner</span>, <span class="ident">cx</span>)
+    <span class="kw">fn </span>poll_flush(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+        futures_io::AsyncWrite::poll_flush(<span class="self">self</span>.project().inner, cx)
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_shutdown</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">futures_io::AsyncWrite::poll_close</span>(<span class="self">self</span>.<span class="ident">project</span>().<span class="ident">inner</span>, <span class="ident">cx</span>)
+    <span class="kw">fn </span>poll_shutdown(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+        futures_io::AsyncWrite::poll_close(<span class="self">self</span>.project().inner, cx)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">futures_io::AsyncWrite</span> <span class="kw">for</span> <span class="ident">Compat</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">tokio::io::AsyncWrite</span>,
+<span class="kw">impl</span>&lt;T&gt; futures_io::AsyncWrite <span class="kw">for </span>Compat&lt;T&gt;
+<span class="kw">where
+    </span>T: tokio::io::AsyncWrite,
 {
-    <span class="kw">fn</span> <span class="ident">poll_write</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">tokio::io::AsyncWrite::poll_write</span>(<span class="self">self</span>.<span class="ident">project</span>().<span class="ident">inner</span>, <span class="ident">cx</span>, <span class="ident">buf</span>)
+    <span class="kw">fn </span>poll_write(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        buf: <span class="kw-2">&amp;</span>[u8],
+    ) -&gt; Poll&lt;io::Result&lt;usize&gt;&gt; {
+        tokio::io::AsyncWrite::poll_write(<span class="self">self</span>.project().inner, cx, buf)
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">tokio::io::AsyncWrite::poll_flush</span>(<span class="self">self</span>.<span class="ident">project</span>().<span class="ident">inner</span>, <span class="ident">cx</span>)
+    <span class="kw">fn </span>poll_flush(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+        tokio::io::AsyncWrite::poll_flush(<span class="self">self</span>.project().inner, cx)
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_close</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">tokio::io::AsyncWrite::poll_shutdown</span>(<span class="self">self</span>.<span class="ident">project</span>().<span class="ident">inner</span>, <span class="ident">cx</span>)
+    <span class="kw">fn </span>poll_close(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+        tokio::io::AsyncWrite::poll_shutdown(<span class="self">self</span>.project().inner, cx)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">tokio::io::AsyncSeek</span><span class="op">&gt;</span> <span class="ident">futures_io::AsyncSeek</span> <span class="kw">for</span> <span class="ident">Compat</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">poll_seek</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">pos</span>: <span class="ident">io::SeekFrom</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">seek_pos</span> <span class="op">!</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">pos</span>) {
-            <span class="self">self</span>.<span class="ident">as_mut</span>().<span class="ident">project</span>().<span class="ident">inner</span>.<span class="ident">start_seek</span>(<span class="ident">pos</span>)<span class="question-mark">?</span>;
-            <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">as_mut</span>().<span class="ident">project</span>().<span class="ident">seek_pos</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">pos</span>);
+<span class="kw">impl</span>&lt;T: tokio::io::AsyncSeek&gt; futures_io::AsyncSeek <span class="kw">for </span>Compat&lt;T&gt; {
+    <span class="kw">fn </span>poll_seek(
+        <span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        pos: io::SeekFrom,
+    ) -&gt; Poll&lt;io::Result&lt;u64&gt;&gt; {
+        <span class="kw">if </span><span class="self">self</span>.seek_pos != <span class="prelude-val">Some</span>(pos) {
+            <span class="self">self</span>.as_mut().project().inner.start_seek(pos)<span class="question-mark">?</span>;
+            <span class="kw-2">*</span><span class="self">self</span>.as_mut().project().seek_pos = <span class="prelude-val">Some</span>(pos);
         }
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">as_mut</span>().<span class="ident">project</span>().<span class="ident">inner</span>.<span class="ident">poll_complete</span>(<span class="ident">cx</span>));
-        <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">as_mut</span>().<span class="ident">project</span>().<span class="ident">seek_pos</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="ident">Poll::Ready</span>(<span class="ident">res</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span> <span class="kw">as</span> <span class="ident">u64</span>))
+        <span class="kw">let </span>res = <span class="macro">ready!</span>(<span class="self">self</span>.as_mut().project().inner.poll_complete(cx));
+        <span class="kw-2">*</span><span class="self">self</span>.as_mut().project().seek_pos = <span class="prelude-val">None</span>;
+        Poll::Ready(res.map(|p| p <span class="kw">as </span>u64))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">futures_io::AsyncSeek</span><span class="op">&gt;</span> <span class="ident">tokio::io::AsyncSeek</span> <span class="kw">for</span> <span class="ident">Compat</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">start_seek</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">pos</span>: <span class="ident">io::SeekFrom</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">as_mut</span>().<span class="ident">project</span>().<span class="ident">seek_pos</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">pos</span>);
+<span class="kw">impl</span>&lt;T: futures_io::AsyncSeek&gt; tokio::io::AsyncSeek <span class="kw">for </span>Compat&lt;T&gt; {
+    <span class="kw">fn </span>start_seek(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, pos: io::SeekFrom) -&gt; io::Result&lt;()&gt; {
+        <span class="kw-2">*</span><span class="self">self</span>.as_mut().project().seek_pos = <span class="prelude-val">Some</span>(pos);
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_complete</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">pos</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">seek_pos</span> {
-            <span class="prelude-val">None</span> =&gt; {
-                <span class="comment">// tokio 1.x AsyncSeek recommends calling poll_complete before start_seek.</span>
-                <span class="comment">// We don&#39;t have to guarantee that the value returned by</span>
-                <span class="comment">// poll_complete called without start_seek is correct,</span>
-                <span class="comment">// so we&#39;ll return 0.</span>
-                <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="number">0</span>));
+    <span class="kw">fn </span>poll_complete(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;io::Result&lt;u64&gt;&gt; {
+        <span class="kw">let </span>pos = <span class="kw">match </span><span class="self">self</span>.seek_pos {
+            <span class="prelude-val">None </span>=&gt; {
+                <span class="comment">// tokio 1.x AsyncSeek recommends calling poll_complete before start_seek.
+                // We don&#39;t have to guarantee that the value returned by
+                // poll_complete called without start_seek is correct,
+                // so we&#39;ll return 0.
+                </span><span class="kw">return </span>Poll::Ready(<span class="prelude-val">Ok</span>(<span class="number">0</span>));
             }
-            <span class="prelude-val">Some</span>(<span class="ident">pos</span>) =&gt; <span class="ident">pos</span>,
+            <span class="prelude-val">Some</span>(pos) =&gt; pos,
         };
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="self">self</span>.<span class="ident">as_mut</span>().<span class="ident">project</span>().<span class="ident">inner</span>.<span class="ident">poll_seek</span>(<span class="ident">cx</span>, <span class="ident">pos</span>));
-        <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">as_mut</span>().<span class="ident">project</span>().<span class="ident">seek_pos</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="ident">Poll::Ready</span>(<span class="ident">res</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span> <span class="kw">as</span> <span class="ident">u64</span>))
+        <span class="kw">let </span>res = <span class="macro">ready!</span>(<span class="self">self</span>.as_mut().project().inner.poll_seek(cx, pos));
+        <span class="kw-2">*</span><span class="self">self</span>.as_mut().project().seek_pos = <span class="prelude-val">None</span>;
+        Poll::Ready(res.map(|p| p <span class="kw">as </span>u64))
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">unix</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">std::os::unix::io::AsRawFd</span><span class="op">&gt;</span> <span class="ident">std::os::unix::io::AsRawFd</span> <span class="kw">for</span> <span class="ident">Compat</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">as_raw_fd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">std::os::unix::io::RawFd</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">as_raw_fd</span>()
+<span class="attribute">#[cfg(unix)]
+</span><span class="kw">impl</span>&lt;T: std::os::unix::io::AsRawFd&gt; std::os::unix::io::AsRawFd <span class="kw">for </span>Compat&lt;T&gt; {
+    <span class="kw">fn </span>as_raw_fd(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; std::os::unix::io::RawFd {
+        <span class="self">self</span>.inner.as_raw_fd()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">windows</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">std::os::windows::io::AsRawHandle</span><span class="op">&gt;</span> <span class="ident">std::os::windows::io::AsRawHandle</span> <span class="kw">for</span> <span class="ident">Compat</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">as_raw_handle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">std::os::windows::io::RawHandle</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">as_raw_handle</span>()
+<span class="attribute">#[cfg(windows)]
+</span><span class="kw">impl</span>&lt;T: std::os::windows::io::AsRawHandle&gt; std::os::windows::io::AsRawHandle <span class="kw">for </span>Compat&lt;T&gt; {
+    <span class="kw">fn </span>as_raw_handle(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; std::os::windows::io::RawHandle {
+        <span class="self">self</span>.inner.as_raw_handle()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tokio_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

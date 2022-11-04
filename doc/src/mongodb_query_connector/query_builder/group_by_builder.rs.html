@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/mongodb-query-connector/src/query_builder/group_by_builder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>group_by_builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb_query_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/mongodb-query-connector/src/query_builder/group_by_builder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>group_by_builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb_query_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -228,235 +228,235 @@
 <span id="228">228</span>
 <span id="229">229</span>
 <span id="230">230</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants</span>::<span class="kw-2">*</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::constants::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident">connector_interface</span>::{<span class="ident">AggregationSelection</span>, <span class="ident">Filter</span>};
-<span class="kw">use</span> <span class="ident">mongodb::bson</span>::{<span class="ident">doc</span>, <span class="ident">Bson</span>, <span class="ident">Document</span>};
-<span class="kw">use</span> <span class="ident">prisma_models::ScalarFieldRef</span>;
-<span class="kw">use</span> <span class="ident">std::collections::HashSet</span>;
+<span class="kw">use </span>connector_interface::{AggregationSelection, Filter};
+<span class="kw">use </span>mongodb::bson::{doc, Bson, Document};
+<span class="kw">use </span>prisma_models::ScalarFieldRef;
+<span class="kw">use </span>std::collections::HashSet;
 
-<span class="doccomment">/// Represents a `$group` aggregation stage.</span>
-<span class="doccomment">/// Groupings can be generated either from some `AggregationSelection` or a having `Filter`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GroupByBuilder</span> {
-    <span class="doccomment">/// A set of all aggregated fields.</span>
-    <span class="ident">aggregations</span>: <span class="ident">HashSet</span><span class="op">&lt;</span>(<span class="ident">ScalarFieldRef</span>, <span class="ident">AggregationType</span>)<span class="op">&gt;</span>,
-    <span class="doccomment">/// Whether we need to group by count(*).</span>
-    <span class="ident">count_all</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// Represents a `$group` aggregation stage.
+/// Groupings can be generated either from some `AggregationSelection` or a having `Filter`.
+</span><span class="attribute">#[derive(Debug, Default)]
+</span><span class="kw">pub struct </span>GroupByBuilder {
+    <span class="doccomment">/// A set of all aggregated fields.
+    </span>aggregations: HashSet&lt;(ScalarFieldRef, AggregationType)&gt;,
+    <span class="doccomment">/// Whether we need to group by count(*).
+    </span>count_all: bool,
 }
 
-<span class="doccomment">/// A generic aggregation type that abstracts selections &amp; filter aggregations.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">AggregationType</span> {
-    <span class="ident">Count</span>,
-    <span class="ident">Min</span>,
-    <span class="ident">Max</span>,
-    <span class="ident">Sum</span>,
-    <span class="ident">Average</span>,
+<span class="doccomment">/// A generic aggregation type that abstracts selections &amp; filter aggregations.
+</span><span class="attribute">#[derive(Debug, Clone, Eq, PartialEq, Hash)]
+</span><span class="kw">pub enum </span>AggregationType {
+    Count,
+    Min,
+    Max,
+    Sum,
+    Average,
 }
 
-<span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">AggregationType</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">AggregationType::Count</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;count&quot;</span>),
-            <span class="ident">AggregationType::Min</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;min&quot;</span>),
-            <span class="ident">AggregationType::Max</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;max&quot;</span>),
-            <span class="ident">AggregationType::Sum</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;sum&quot;</span>),
-            <span class="ident">AggregationType::Average</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;avg&quot;</span>),
+<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>AggregationType {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            AggregationType::Count =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;count&quot;</span>),
+            AggregationType::Min =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;min&quot;</span>),
+            AggregationType::Max =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;max&quot;</span>),
+            AggregationType::Sum =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;sum&quot;</span>),
+            AggregationType::Average =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;avg&quot;</span>),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">GroupByBuilder</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { ..<span class="ident">Default::default</span>() }
+<span class="kw">impl </span>GroupByBuilder {
+    <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ ..Default::default() }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">render</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">by_fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span>) -&gt; (<span class="ident">Document</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">grouping</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">by_fields</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">Bson::Null</span> <span class="comment">// Null =&gt; group over the entire collection.</span>
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">group_doc</span> <span class="op">=</span> <span class="ident">Document::new</span>();
+    <span class="kw">pub fn </span>render(<span class="kw-2">&amp;</span><span class="self">self</span>, by_fields: Vec&lt;ScalarFieldRef&gt;) -&gt; (Document, <span class="prelude-ty">Option</span>&lt;Document&gt;) {
+        <span class="kw">let </span>grouping = <span class="kw">if </span>by_fields.is_empty() {
+            Bson::Null <span class="comment">// Null =&gt; group over the entire collection.
+        </span>} <span class="kw">else </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>group_doc = Document::new();
 
-            <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">by_fields</span> {
-                <span class="ident">group_doc</span>.<span class="ident">insert</span>(<span class="ident">field</span>.<span class="ident">db_name</span>(), <span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="ident">field</span>.<span class="ident">db_name</span>()));
+            <span class="kw">for </span>field <span class="kw">in </span>by_fields {
+                group_doc.insert(field.db_name(), <span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, field.db_name()));
             }
 
-            <span class="ident">group_doc</span>.<span class="ident">into</span>()
+            group_doc.into()
         };
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">group_stage</span> <span class="op">=</span> <span class="macro">doc!</span> { <span class="ident">group_by::UNDERSCORE_ID</span>: <span class="ident">grouping</span> };
-        <span class="comment">// Needed for field-count aggregations</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">project_stage</span> <span class="op">=</span> <span class="macro">doc!</span> {};
+        <span class="kw">let </span><span class="kw-2">mut </span>group_stage = <span class="macro">doc! </span>{ group_by::UNDERSCORE_ID: grouping };
+        <span class="comment">// Needed for field-count aggregations
+        </span><span class="kw">let </span><span class="kw-2">mut </span>project_stage = <span class="macro">doc! </span>{};
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">count_all</span> {
-            <span class="ident">group_stage</span>.<span class="ident">insert</span>(<span class="string">&quot;count_all&quot;</span>, <span class="macro">doc!</span> { <span class="string">&quot;$sum&quot;</span>: <span class="number">1</span> });
-            <span class="ident">project_stage</span>.<span class="ident">extend</span>(<span class="ident">projection_doc</span>(<span class="string">&quot;count_all&quot;</span>));
+        <span class="kw">if </span><span class="self">self</span>.count_all {
+            group_stage.insert(<span class="string">&quot;count_all&quot;</span>, <span class="macro">doc! </span>{ <span class="string">&quot;$sum&quot;</span>: <span class="number">1 </span>});
+            project_stage.extend(projection_doc(<span class="string">&quot;count_all&quot;</span>));
         }
 
-        <span class="kw">for</span> (<span class="ident">sf</span>, <span class="ident">aggr_type</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">aggregations</span> {
-            <span class="kw">match</span> <span class="ident">aggr_type</span> {
-                <span class="ident">AggregationType::Count</span> =&gt; {
-                    <span class="comment">// MongoDB requires a different construct for counting on fields.</span>
-                    <span class="comment">// First, we push them into an array and then, in a separate project stage,</span>
-                    <span class="comment">// we count the number of items in the array.</span>
-                    <span class="kw">let</span> <span class="ident">push_pair</span> <span class="op">=</span> <span class="ident">aggregation_pair</span>(<span class="string">&quot;push&quot;</span>, <span class="ident">sf</span>);
-                    <span class="kw">let</span> (<span class="ident">count_key</span>, <span class="ident">count_val</span>) <span class="op">=</span> <span class="ident">count_field_pair</span>(<span class="ident">sf</span>);
+        <span class="kw">for </span>(sf, aggr_type) <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.aggregations {
+            <span class="kw">match </span>aggr_type {
+                AggregationType::Count =&gt; {
+                    <span class="comment">// MongoDB requires a different construct for counting on fields.
+                    // First, we push them into an array and then, in a separate project stage,
+                    // we count the number of items in the array.
+                    </span><span class="kw">let </span>push_pair = aggregation_pair(<span class="string">&quot;push&quot;</span>, sf);
+                    <span class="kw">let </span>(count_key, count_val) = count_field_pair(sf);
 
-                    <span class="ident">project_stage</span>.<span class="ident">insert</span>(<span class="kw-2">&amp;</span><span class="ident">count_key</span>, <span class="macro">doc!</span> { <span class="string">&quot;$sum&quot;</span>: <span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">count_key</span>) });
+                    project_stage.insert(<span class="kw-2">&amp;</span>count_key, <span class="macro">doc! </span>{ <span class="string">&quot;$sum&quot;</span>: <span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="kw-2">&amp;</span>count_key) });
 
-                    <span class="ident">group_stage</span>.<span class="ident">insert</span>(<span class="ident">push_pair</span>.<span class="number">0</span>, <span class="ident">push_pair</span>.<span class="number">1</span>);
-                    <span class="ident">group_stage</span>.<span class="ident">insert</span>(<span class="ident">count_key</span>, <span class="ident">count_val</span>);
+                    group_stage.insert(push_pair.<span class="number">0</span>, push_pair.<span class="number">1</span>);
+                    group_stage.insert(count_key, count_val);
                 }
-                <span class="ident">AggregationType::Min</span> =&gt; {
-                    <span class="kw">let</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="op">=</span> <span class="ident">aggregation_pair</span>(<span class="string">&quot;min&quot;</span>, <span class="ident">sf</span>);
+                AggregationType::Min =&gt; {
+                    <span class="kw">let </span>(k, v) = aggregation_pair(<span class="string">&quot;min&quot;</span>, sf);
 
-                    <span class="ident">project_stage</span>.<span class="ident">extend</span>(<span class="ident">projection_doc</span>(<span class="kw-2">&amp;</span><span class="ident">k</span>));
-                    <span class="ident">group_stage</span>.<span class="ident">insert</span>(<span class="ident">k</span>, <span class="ident">v</span>);
+                    project_stage.extend(projection_doc(<span class="kw-2">&amp;</span>k));
+                    group_stage.insert(k, v);
                 }
-                <span class="ident">AggregationType::Max</span> =&gt; {
-                    <span class="kw">let</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="op">=</span> <span class="ident">aggregation_pair</span>(<span class="string">&quot;max&quot;</span>, <span class="ident">sf</span>);
+                AggregationType::Max =&gt; {
+                    <span class="kw">let </span>(k, v) = aggregation_pair(<span class="string">&quot;max&quot;</span>, sf);
 
-                    <span class="ident">project_stage</span>.<span class="ident">extend</span>(<span class="ident">projection_doc</span>(<span class="kw-2">&amp;</span><span class="ident">k</span>));
-                    <span class="ident">group_stage</span>.<span class="ident">insert</span>(<span class="ident">k</span>, <span class="ident">v</span>);
+                    project_stage.extend(projection_doc(<span class="kw-2">&amp;</span>k));
+                    group_stage.insert(k, v);
                 }
-                <span class="ident">AggregationType::Sum</span> =&gt; {
-                    <span class="kw">let</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="op">=</span> <span class="ident">aggregation_pair</span>(<span class="string">&quot;sum&quot;</span>, <span class="ident">sf</span>);
+                AggregationType::Sum =&gt; {
+                    <span class="kw">let </span>(k, v) = aggregation_pair(<span class="string">&quot;sum&quot;</span>, sf);
 
-                    <span class="ident">project_stage</span>.<span class="ident">extend</span>(<span class="ident">projection_doc</span>(<span class="kw-2">&amp;</span><span class="ident">k</span>));
-                    <span class="ident">group_stage</span>.<span class="ident">insert</span>(<span class="ident">k</span>, <span class="ident">v</span>);
+                    project_stage.extend(projection_doc(<span class="kw-2">&amp;</span>k));
+                    group_stage.insert(k, v);
                 }
-                <span class="ident">AggregationType::Average</span> =&gt; {
-                    <span class="kw">let</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="op">=</span> <span class="ident">aggregation_pair</span>(<span class="string">&quot;avg&quot;</span>, <span class="ident">sf</span>);
+                AggregationType::Average =&gt; {
+                    <span class="kw">let </span>(k, v) = aggregation_pair(<span class="string">&quot;avg&quot;</span>, sf);
 
-                    <span class="ident">project_stage</span>.<span class="ident">extend</span>(<span class="ident">projection_doc</span>(<span class="kw-2">&amp;</span><span class="ident">k</span>));
-                    <span class="ident">group_stage</span>.<span class="ident">insert</span>(<span class="ident">k</span>, <span class="ident">v</span>);
+                    project_stage.extend(projection_doc(<span class="kw-2">&amp;</span>k));
+                    group_stage.insert(k, v);
                 }
             }
         }
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">requires_projection</span>() {
-            (<span class="ident">group_stage</span>, <span class="prelude-val">Some</span>(<span class="ident">project_stage</span>))
-        } <span class="kw">else</span> {
-            (<span class="ident">group_stage</span>, <span class="prelude-val">None</span>)
+        <span class="kw">if </span><span class="self">self</span>.requires_projection() {
+            (group_stage, <span class="prelude-val">Some</span>(project_stage))
+        } <span class="kw">else </span>{
+            (group_stage, <span class="prelude-val">None</span>)
         }
     }
 
-    <span class="doccomment">/// Derives aggregated groupings from an `AggregationSelection`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_selections</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">selections</span>: <span class="kw-2">&amp;</span>[<span class="ident">AggregationSelection</span>]) {
-        <span class="kw">for</span> <span class="ident">selection</span> <span class="kw">in</span> <span class="ident">selections</span> {
-            <span class="kw">match</span> <span class="ident">selection</span> {
-                <span class="ident">AggregationSelection::Count</span> { <span class="ident">all</span>, <span class="ident">fields</span> } =&gt; {
-                    <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">all</span> {
-                        <span class="self">self</span>.<span class="ident">count_all</span> <span class="op">=</span> <span class="bool-val">true</span>;
+    <span class="doccomment">/// Derives aggregated groupings from an `AggregationSelection`.
+    </span><span class="kw">pub fn </span>with_selections(<span class="kw-2">&amp;mut </span><span class="self">self</span>, selections: <span class="kw-2">&amp;</span>[AggregationSelection]) {
+        <span class="kw">for </span>selection <span class="kw">in </span>selections {
+            <span class="kw">match </span>selection {
+                AggregationSelection::Count { all, fields } =&gt; {
+                    <span class="kw">if </span><span class="kw-2">*</span>all {
+                        <span class="self">self</span>.count_all = <span class="bool-val">true</span>;
                     }
 
-                    <span class="self">self</span>.<span class="ident">insert_groupings</span>(<span class="ident">fields</span>, <span class="ident">AggregationType::Count</span>);
+                    <span class="self">self</span>.insert_groupings(fields, AggregationType::Count);
                 }
-                <span class="ident">AggregationSelection::Average</span>(<span class="ident">fields</span>) =&gt; {
-                    <span class="self">self</span>.<span class="ident">insert_groupings</span>(<span class="ident">fields</span>, <span class="ident">AggregationType::Average</span>);
+                AggregationSelection::Average(fields) =&gt; {
+                    <span class="self">self</span>.insert_groupings(fields, AggregationType::Average);
                 }
-                <span class="ident">AggregationSelection::Sum</span>(<span class="ident">fields</span>) =&gt; {
-                    <span class="self">self</span>.<span class="ident">insert_groupings</span>(<span class="ident">fields</span>, <span class="ident">AggregationType::Sum</span>);
+                AggregationSelection::Sum(fields) =&gt; {
+                    <span class="self">self</span>.insert_groupings(fields, AggregationType::Sum);
                 }
-                <span class="ident">AggregationSelection::Min</span>(<span class="ident">fields</span>) =&gt; {
-                    <span class="self">self</span>.<span class="ident">insert_groupings</span>(<span class="ident">fields</span>, <span class="ident">AggregationType::Min</span>);
+                AggregationSelection::Min(fields) =&gt; {
+                    <span class="self">self</span>.insert_groupings(fields, AggregationType::Min);
                 }
-                <span class="ident">AggregationSelection::Max</span>(<span class="ident">fields</span>) =&gt; {
-                    <span class="self">self</span>.<span class="ident">insert_groupings</span>(<span class="ident">fields</span>, <span class="ident">AggregationType::Max</span>);
+                AggregationSelection::Max(fields) =&gt; {
+                    <span class="self">self</span>.insert_groupings(fields, AggregationType::Max);
                 }
-                <span class="ident">AggregationSelection::Field</span>(<span class="kw">_</span>) =&gt; (),
+                AggregationSelection::Field(<span class="kw">_</span>) =&gt; (),
             }
         }
     }
 
-    <span class="doccomment">/// Derives aggregated groupings from a having `Filter`.</span>
-    <span class="doccomment">/// Required because the filter needs to match against a grouping,</span>
-    <span class="doccomment">/// which is not present if no aggregation selection is made but an aggregation filter is used.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_having_filter</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">having</span>: <span class="kw-2">&amp;</span><span class="ident">Filter</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">unfold_filters</span> <span class="op">=</span> <span class="op">|</span><span class="ident">filters</span>: <span class="kw-2">&amp;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span><span class="op">|</span> {
-            <span class="kw">for</span> <span class="ident">filter</span> <span class="kw">in</span> <span class="ident">filters</span> {
-                <span class="self">self</span>.<span class="ident">with_having_filter</span>(<span class="ident">filter</span>);
+    <span class="doccomment">/// Derives aggregated groupings from a having `Filter`.
+    /// Required because the filter needs to match against a grouping,
+    /// which is not present if no aggregation selection is made but an aggregation filter is used.
+    </span><span class="kw">pub fn </span>with_having_filter(<span class="kw-2">&amp;mut </span><span class="self">self</span>, having: <span class="kw-2">&amp;</span>Filter) {
+        <span class="kw">let </span><span class="kw-2">mut </span>unfold_filters = |filters: <span class="kw-2">&amp;</span>Vec&lt;Filter&gt;| {
+            <span class="kw">for </span>filter <span class="kw">in </span>filters {
+                <span class="self">self</span>.with_having_filter(filter);
             }
         };
 
-        <span class="kw">match</span> <span class="ident">having</span> {
-            <span class="ident">Filter::And</span>(<span class="ident">filters</span>) =&gt; {
-                <span class="ident">unfold_filters</span>(<span class="ident">filters</span>);
+        <span class="kw">match </span>having {
+            Filter::And(filters) =&gt; {
+                unfold_filters(filters);
             }
-            <span class="ident">Filter::Or</span>(<span class="ident">filters</span>) =&gt; {
-                <span class="ident">unfold_filters</span>(<span class="ident">filters</span>);
+            Filter::Or(filters) =&gt; {
+                unfold_filters(filters);
             }
-            <span class="ident">Filter::Not</span>(<span class="ident">filters</span>) =&gt; {
-                <span class="ident">unfold_filters</span>(<span class="ident">filters</span>);
+            Filter::Not(filters) =&gt; {
+                unfold_filters(filters);
             }
-            <span class="ident">Filter::Aggregation</span>(<span class="ident">aggregation</span>) =&gt; <span class="kw">match</span> <span class="ident">aggregation</span> {
-                <span class="ident">connector_interface::AggregationFilter::Count</span>(<span class="ident">filter</span>) =&gt; {
-                    <span class="self">self</span>.<span class="ident">insert_from_filter</span>(<span class="ident">filter</span>.<span class="ident">as_ref</span>(), <span class="ident">AggregationType::Count</span>);
+            Filter::Aggregation(aggregation) =&gt; <span class="kw">match </span>aggregation {
+                connector_interface::AggregationFilter::Count(filter) =&gt; {
+                    <span class="self">self</span>.insert_from_filter(filter.as_ref(), AggregationType::Count);
                 }
-                <span class="ident">connector_interface::AggregationFilter::Average</span>(<span class="ident">filter</span>) =&gt; {
-                    <span class="self">self</span>.<span class="ident">insert_from_filter</span>(<span class="ident">filter</span>.<span class="ident">as_ref</span>(), <span class="ident">AggregationType::Average</span>);
+                connector_interface::AggregationFilter::Average(filter) =&gt; {
+                    <span class="self">self</span>.insert_from_filter(filter.as_ref(), AggregationType::Average);
                 }
-                <span class="ident">connector_interface::AggregationFilter::Sum</span>(<span class="ident">filter</span>) =&gt; {
-                    <span class="self">self</span>.<span class="ident">insert_from_filter</span>(<span class="ident">filter</span>.<span class="ident">as_ref</span>(), <span class="ident">AggregationType::Sum</span>);
+                connector_interface::AggregationFilter::Sum(filter) =&gt; {
+                    <span class="self">self</span>.insert_from_filter(filter.as_ref(), AggregationType::Sum);
                 }
-                <span class="ident">connector_interface::AggregationFilter::Min</span>(<span class="ident">filter</span>) =&gt; {
-                    <span class="self">self</span>.<span class="ident">insert_from_filter</span>(<span class="ident">filter</span>.<span class="ident">as_ref</span>(), <span class="ident">AggregationType::Min</span>);
+                connector_interface::AggregationFilter::Min(filter) =&gt; {
+                    <span class="self">self</span>.insert_from_filter(filter.as_ref(), AggregationType::Min);
                 }
-                <span class="ident">connector_interface::AggregationFilter::Max</span>(<span class="ident">filter</span>) =&gt; {
-                    <span class="self">self</span>.<span class="ident">insert_from_filter</span>(<span class="ident">filter</span>.<span class="ident">as_ref</span>(), <span class="ident">AggregationType::Max</span>);
+                connector_interface::AggregationFilter::Max(filter) =&gt; {
+                    <span class="self">self</span>.insert_from_filter(filter.as_ref(), AggregationType::Max);
                 }
             },
-            <span class="kw">_</span> =&gt; (),
+            <span class="kw">_ </span>=&gt; (),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">requires_projection</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">aggregations</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">any</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">aggr_type</span>)<span class="op">|</span> <span class="macro">matches!</span>(<span class="ident">aggr_type</span>, <span class="ident">AggregationType::Count</span>))
+    <span class="kw">fn </span>requires_projection(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.aggregations
+            .iter()
+            .any(|(<span class="kw">_</span>, aggr_type)| <span class="macro">matches!</span>(aggr_type, AggregationType::Count))
     }
 
-    <span class="kw">fn</span> <span class="ident">insert_from_filter</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">filter</span>: <span class="kw-2">&amp;</span><span class="ident">Filter</span>, <span class="ident">aggregation_type</span>: <span class="ident">AggregationType</span>) {
-        <span class="kw">let</span> <span class="ident">scalar_filter</span> <span class="op">=</span> <span class="ident">filter</span>.<span class="ident">as_scalar</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">scalar_filter</span>.<span class="ident">projection</span>.<span class="ident">as_single</span>().<span class="ident">unwrap</span>();
+    <span class="kw">fn </span>insert_from_filter(<span class="kw-2">&amp;mut </span><span class="self">self</span>, filter: <span class="kw-2">&amp;</span>Filter, aggregation_type: AggregationType) {
+        <span class="kw">let </span>scalar_filter = filter.as_scalar().unwrap();
+        <span class="kw">let </span>field = scalar_filter.projection.as_single().unwrap();
 
-        <span class="self">self</span>.<span class="ident">insert_grouping</span>(<span class="ident">field</span>, <span class="kw-2">&amp;</span><span class="ident">aggregation_type</span>);
+        <span class="self">self</span>.insert_grouping(field, <span class="kw-2">&amp;</span>aggregation_type);
     }
 
-    <span class="kw">fn</span> <span class="ident">insert_groupings</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">fields</span>: <span class="kw-2">&amp;</span>[<span class="ident">ScalarFieldRef</span>], <span class="ident">aggregation_type</span>: <span class="ident">AggregationType</span>) {
-        <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">fields</span> {
-            <span class="self">self</span>.<span class="ident">insert_grouping</span>(<span class="ident">field</span>, <span class="kw-2">&amp;</span><span class="ident">aggregation_type</span>)
+    <span class="kw">fn </span>insert_groupings(<span class="kw-2">&amp;mut </span><span class="self">self</span>, fields: <span class="kw-2">&amp;</span>[ScalarFieldRef], aggregation_type: AggregationType) {
+        <span class="kw">for </span>field <span class="kw">in </span>fields {
+            <span class="self">self</span>.insert_grouping(field, <span class="kw-2">&amp;</span>aggregation_type)
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">insert_grouping</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>, <span class="ident">aggregation_type</span>: <span class="kw-2">&amp;</span><span class="ident">AggregationType</span>) {
-        <span class="self">self</span>.<span class="ident">aggregations</span>.<span class="ident">insert</span>((<span class="ident">field</span>.<span class="ident">clone</span>(), <span class="ident">aggregation_type</span>.<span class="ident">clone</span>()));
+    <span class="kw">fn </span>insert_grouping(<span class="kw-2">&amp;mut </span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>ScalarFieldRef, aggregation_type: <span class="kw-2">&amp;</span>AggregationType) {
+        <span class="self">self</span>.aggregations.insert((field.clone(), aggregation_type.clone()));
     }
 }
 
-<span class="doccomment">/// Produces pair like `(&quot;sum_fieldName&quot;, { &quot;$sum&quot;: &quot;$fieldName&quot; })`.</span>
-<span class="doccomment">/// Important: Only valid for non-count aggregations.</span>
-<span class="kw">fn</span> <span class="ident">aggregation_pair</span>(<span class="ident">op</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>) -&gt; (<span class="ident">String</span>, <span class="ident">Bson</span>) {
+<span class="doccomment">/// Produces pair like `(&quot;sum_fieldName&quot;, { &quot;$sum&quot;: &quot;$fieldName&quot; })`.
+/// Important: Only valid for non-count aggregations.
+</span><span class="kw">fn </span>aggregation_pair(op: <span class="kw-2">&amp;</span>str, field: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; (String, Bson) {
     (
-        <span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, <span class="ident">op</span>, <span class="ident">field</span>.<span class="ident">db_name</span>()),
-        <span class="macro">doc!</span> { <span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="ident">op</span>): <span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="ident">field</span>.<span class="ident">db_name</span>()) }.<span class="ident">into</span>(),
+        <span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, op, field.db_name()),
+        <span class="macro">doc! </span>{ <span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, op): <span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, field.db_name()) }.into(),
     )
 }
 
-<span class="doccomment">/// Produces pair like `(&quot;count_fieldName&quot;, { &quot;$sum&quot;: &quot;$fieldName&quot; })`.</span>
-<span class="doccomment">/// Important: Only valid for field-level count aggregations.</span>
-<span class="kw">fn</span> <span class="ident">count_field_pair</span>(<span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span>) -&gt; (<span class="ident">String</span>, <span class="ident">Bson</span>) {
+<span class="doccomment">/// Produces pair like `(&quot;count_fieldName&quot;, { &quot;$sum&quot;: &quot;$fieldName&quot; })`.
+/// Important: Only valid for field-level count aggregations.
+</span><span class="kw">fn </span>count_field_pair(field: <span class="kw-2">&amp;</span>ScalarFieldRef) -&gt; (String, Bson) {
     (
-        <span class="macro">format!</span>(<span class="string">&quot;count_{}&quot;</span>, <span class="ident">field</span>.<span class="ident">db_name</span>()),
-        <span class="macro">doc!</span> { <span class="string">&quot;$push&quot;</span>: { <span class="string">&quot;$cond&quot;</span>: { <span class="string">&quot;if&quot;</span>: <span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, <span class="ident">field</span>.<span class="ident">db_name</span>()), <span class="string">&quot;then&quot;</span>: <span class="number">1</span>, <span class="string">&quot;else&quot;</span>: <span class="number">0</span> }}}.<span class="ident">into</span>(),
+        <span class="macro">format!</span>(<span class="string">&quot;count_{}&quot;</span>, field.db_name()),
+        <span class="macro">doc! </span>{ <span class="string">&quot;$push&quot;</span>: { <span class="string">&quot;$cond&quot;</span>: { <span class="string">&quot;if&quot;</span>: <span class="macro">format!</span>(<span class="string">&quot;${}&quot;</span>, field.db_name()), <span class="string">&quot;then&quot;</span>: <span class="number">1</span>, <span class="string">&quot;else&quot;</span>: <span class="number">0 </span>}}}.into(),
     )
 }
 
-<span class="doccomment">/// Produces a document that projects a field.</span>
-<span class="doccomment">/// Important: Only valid for non-count aggregations.</span>
-<span class="kw">fn</span> <span class="ident">projection_doc</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Document</span> {
-    <span class="macro">doc!</span> { <span class="ident">key</span>: <span class="number">1</span> }
+<span class="doccomment">/// Produces a document that projects a field.
+/// Important: Only valid for non-count aggregations.
+</span><span class="kw">fn </span>projection_doc(key: <span class="kw-2">&amp;</span>str) -&gt; Document {
+    <span class="macro">doc! </span>{ key: <span class="number">1 </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

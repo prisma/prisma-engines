@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/schema-builder/src/output_types/objects/composite.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>composite.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../schema_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../schema_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../schema_builder/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/schema-builder/src/output_types/objects/composite.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>composite.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../schema_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../schema_builder/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../schema_builder/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -37,44 +37,44 @@
 <span id="37">37</span>
 <span id="38">38</span>
 <span id="39">39</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::unnecessary_to_owned</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(clippy::unnecessary_to_owned)]
 
-<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">prisma_models::CompositeTypeRef</span>;
+</span><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span>prisma_models::CompositeTypeRef;
 
-<span class="doccomment">/// Compute initial composites cache. No fields are computed because we first</span>
-<span class="doccomment">/// need all composites to be present, then we can compute fields in a second pass.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">initialize_cache</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>) {
-    <span class="ident">ctx</span>.<span class="ident">composite_types</span>().<span class="ident">into_iter</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">composite</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(<span class="ident">composite</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">MODEL_NAMESPACE</span>);
-        <span class="ident">ctx</span>.<span class="ident">cache_output_type</span>(<span class="ident">ident</span>.<span class="ident">clone</span>(), <span class="ident">Arc::new</span>(<span class="ident">ObjectType::new</span>(<span class="ident">ident</span>, <span class="prelude-val">None</span>)));
+<span class="doccomment">/// Compute initial composites cache. No fields are computed because we first
+/// need all composites to be present, then we can compute fields in a second pass.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>initialize_cache(ctx: <span class="kw-2">&amp;mut </span>BuilderContext) {
+    ctx.composite_types().into_iter().for_each(|composite| {
+        <span class="kw">let </span>ident = Identifier::new(composite.name.clone(), MODEL_NAMESPACE);
+        ctx.cache_output_type(ident.clone(), Arc::new(ObjectType::new(ident, <span class="prelude-val">None</span>)));
     });
 }
 
-<span class="comment">// Compute fields on all cached composite object types.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">initialize_fields</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>) {
-    <span class="ident">ctx</span>.<span class="ident">composite_types</span>().<span class="ident">into_iter</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">composite</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">compute_composite_object_type_fields</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">composite</span>);
-        <span class="kw">let</span> <span class="ident">obj</span>: <span class="ident">ObjectTypeWeakRef</span> <span class="op">=</span> <span class="ident">map_type</span>(<span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">composite</span>);
+<span class="comment">// Compute fields on all cached composite object types.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>initialize_fields(ctx: <span class="kw-2">&amp;mut </span>BuilderContext) {
+    ctx.composite_types().into_iter().for_each(|composite| {
+        <span class="kw">let </span>fields = compute_composite_object_type_fields(ctx, <span class="kw-2">&amp;</span>composite);
+        <span class="kw">let </span>obj: ObjectTypeWeakRef = map_type(ctx, <span class="kw-2">&amp;</span>composite);
 
-        <span class="ident">obj</span>.<span class="ident">into_arc</span>().<span class="ident">set_fields</span>(<span class="ident">fields</span>);
+        obj.into_arc().set_fields(fields);
     });
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">map_type</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">ct</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeTypeRef</span>) -&gt; <span class="ident">ObjectTypeWeakRef</span> {
-    <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">Identifier::new</span>(<span class="ident">ct</span>.<span class="ident">name</span>.<span class="ident">clone</span>(), <span class="ident">MODEL_NAMESPACE</span>);
-    <span class="ident">ctx</span>.<span class="ident">get_output_type</span>(<span class="kw-2">&amp;</span><span class="ident">ident</span>)
-        .<span class="ident">expect</span>(<span class="string">&quot;Invariant violation: Initialized output object type for each composite.&quot;</span>)
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>map_type(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, ct: <span class="kw-2">&amp;</span>CompositeTypeRef) -&gt; ObjectTypeWeakRef {
+    <span class="kw">let </span>ident = Identifier::new(ct.name.clone(), MODEL_NAMESPACE);
+    ctx.get_output_type(<span class="kw-2">&amp;</span>ident)
+        .expect(<span class="string">&quot;Invariant violation: Initialized output object type for each composite.&quot;</span>)
 }
 
-<span class="doccomment">/// Computes composite output type fields.</span>
-<span class="doccomment">/// Requires an initialized cache.</span>
-<span class="kw">fn</span> <span class="ident">compute_composite_object_type_fields</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BuilderContext</span>, <span class="ident">composite</span>: <span class="kw-2">&amp;</span><span class="ident">CompositeTypeRef</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">OutputField</span><span class="op">&gt;</span> {
-    <span class="ident">composite</span>
-        .<span class="ident">fields</span>()
-        .<span class="ident">iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">field::map_output_field</span>(<span class="ident">ctx</span>, <span class="ident">f</span>))
-        .<span class="ident">collect</span>()
+<span class="doccomment">/// Computes composite output type fields.
+/// Requires an initialized cache.
+</span><span class="kw">fn </span>compute_composite_object_type_fields(ctx: <span class="kw-2">&amp;mut </span>BuilderContext, composite: <span class="kw-2">&amp;</span>CompositeTypeRef) -&gt; Vec&lt;OutputField&gt; {
+    composite
+        .fields()
+        .iter()
+        .map(|f| field::map_output_field(ctx, f))
+        .collect()
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="schema_builder" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="schema_builder" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

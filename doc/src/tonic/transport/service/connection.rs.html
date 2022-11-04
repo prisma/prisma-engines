@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/transport/service/connection.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>connection.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tonic/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/transport/service/connection.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>connection.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tonic/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tonic/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -121,126 +121,126 @@
 <span id="119">119</span>
 <span id="120">120</span>
 <span id="121">121</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::BoxFuture</span>;
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">grpc_timeout::GrpcTimeout</span>, <span class="ident">reconnect::Reconnect</span>, <span class="ident">AddOrigin</span>, <span class="ident">UserAgent</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">body::BoxBody</span>, <span class="ident">transport::Endpoint</span>};
-<span class="kw">use</span> <span class="ident">http::Uri</span>;
-<span class="kw">use</span> <span class="ident">hyper::client::conn::Builder</span>;
-<span class="kw">use</span> <span class="ident">hyper::client::connect::Connection</span> <span class="kw">as</span> <span class="ident">HyperConnection</span>;
-<span class="kw">use</span> <span class="ident">hyper::client::service::Connect</span> <span class="kw">as</span> <span class="ident">HyperConnect</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">fmt</span>,
-    <span class="ident">task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>},
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::BoxFuture;
+<span class="kw">use super</span>::{grpc_timeout::GrpcTimeout, reconnect::Reconnect, AddOrigin, UserAgent};
+<span class="kw">use crate</span>::{body::BoxBody, transport::Endpoint};
+<span class="kw">use </span>http::Uri;
+<span class="kw">use </span>hyper::client::conn::Builder;
+<span class="kw">use </span>hyper::client::connect::Connection <span class="kw">as </span>HyperConnection;
+<span class="kw">use </span>hyper::client::service::Connect <span class="kw">as </span>HyperConnect;
+<span class="kw">use </span>std::{
+    fmt,
+    task::{Context, Poll},
 };
-<span class="kw">use</span> <span class="ident">tokio::io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>};
-<span class="kw">use</span> <span class="ident">tower::load::Load</span>;
-<span class="kw">use</span> <span class="ident">tower</span>::{
-    <span class="ident">layer::Layer</span>,
-    <span class="ident">limit</span>::{<span class="ident">concurrency::ConcurrencyLimitLayer</span>, <span class="ident">rate::RateLimitLayer</span>},
-    <span class="ident">util::BoxService</span>,
-    <span class="ident">ServiceBuilder</span>, <span class="ident">ServiceExt</span>,
+<span class="kw">use </span>tokio::io::{AsyncRead, AsyncWrite};
+<span class="kw">use </span>tower::load::Load;
+<span class="kw">use </span>tower::{
+    layer::Layer,
+    limit::{concurrency::ConcurrencyLimitLayer, rate::RateLimitLayer},
+    util::BoxService,
+    ServiceBuilder, ServiceExt,
 };
-<span class="kw">use</span> <span class="ident">tower_service::Service</span>;
+<span class="kw">use </span>tower_service::Service;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">Request</span> <span class="op">=</span> <span class="ident">http::Request</span><span class="op">&lt;</span><span class="ident">BoxBody</span><span class="op">&gt;</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> <span class="ident">http::Response</span><span class="op">&lt;</span><span class="ident">hyper::Body</span><span class="op">&gt;</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>Request = http::Request&lt;BoxBody&gt;;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>Response = http::Response&lt;hyper::Body&gt;;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Connection</span> {
-    <span class="ident">inner</span>: <span class="ident">BoxService</span><span class="op">&lt;</span><span class="ident">Request</span>, <span class="ident">Response</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Connection {
+    inner: BoxService&lt;Request, Response, <span class="kw">crate</span>::Error&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Connection</span> {
-    <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">connector</span>: <span class="ident">C</span>, <span class="ident">endpoint</span>: <span class="ident">Endpoint</span>, <span class="ident">is_lazy</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">C</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Uri</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">C::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
-        <span class="ident">C::Future</span>: <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span>,
-        <span class="ident">C::Response</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">HyperConnection</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="kw">impl </span>Connection {
+    <span class="kw">fn </span>new&lt;C&gt;(connector: C, endpoint: Endpoint, is_lazy: bool) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>C: Service&lt;Uri&gt; + Send + <span class="lifetime">&#39;static</span>,
+        C::Error: Into&lt;<span class="kw">crate</span>::Error&gt; + Send,
+        C::Future: Unpin + Send,
+        C::Response: AsyncRead + AsyncWrite + HyperConnection + Unpin + Send + <span class="lifetime">&#39;static</span>,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">settings</span> <span class="op">=</span> <span class="ident">Builder::new</span>()
-            .<span class="ident">http2_initial_stream_window_size</span>(<span class="ident">endpoint</span>.<span class="ident">init_stream_window_size</span>)
-            .<span class="ident">http2_initial_connection_window_size</span>(<span class="ident">endpoint</span>.<span class="ident">init_connection_window_size</span>)
-            .<span class="ident">http2_only</span>(<span class="bool-val">true</span>)
-            .<span class="ident">http2_keep_alive_interval</span>(<span class="ident">endpoint</span>.<span class="ident">http2_keep_alive_interval</span>)
-            .<span class="ident">clone</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>settings = Builder::new()
+            .http2_initial_stream_window_size(endpoint.init_stream_window_size)
+            .http2_initial_connection_window_size(endpoint.init_connection_window_size)
+            .http2_only(<span class="bool-val">true</span>)
+            .http2_keep_alive_interval(endpoint.http2_keep_alive_interval)
+            .clone();
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span> <span class="ident">endpoint</span>.<span class="ident">http2_keep_alive_timeout</span> {
-            <span class="ident">settings</span>.<span class="ident">http2_keep_alive_timeout</span>(<span class="ident">val</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(val) = endpoint.http2_keep_alive_timeout {
+            settings.http2_keep_alive_timeout(val);
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span> <span class="ident">endpoint</span>.<span class="ident">http2_keep_alive_while_idle</span> {
-            <span class="ident">settings</span>.<span class="ident">http2_keep_alive_while_idle</span>(<span class="ident">val</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(val) = endpoint.http2_keep_alive_while_idle {
+            settings.http2_keep_alive_while_idle(val);
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span> <span class="ident">endpoint</span>.<span class="ident">http2_adaptive_window</span> {
-            <span class="ident">settings</span>.<span class="ident">http2_adaptive_window</span>(<span class="ident">val</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(val) = endpoint.http2_adaptive_window {
+            settings.http2_adaptive_window(val);
         }
 
-        <span class="kw">let</span> <span class="ident">stack</span> <span class="op">=</span> <span class="ident">ServiceBuilder::new</span>()
-            .<span class="ident">layer_fn</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">AddOrigin::new</span>(<span class="ident">s</span>, <span class="ident">endpoint</span>.<span class="ident">uri</span>.<span class="ident">clone</span>()))
-            .<span class="ident">layer_fn</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">UserAgent::new</span>(<span class="ident">s</span>, <span class="ident">endpoint</span>.<span class="ident">user_agent</span>.<span class="ident">clone</span>()))
-            .<span class="ident">layer_fn</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">GrpcTimeout::new</span>(<span class="ident">s</span>, <span class="ident">endpoint</span>.<span class="ident">timeout</span>))
-            .<span class="ident">option_layer</span>(<span class="ident">endpoint</span>.<span class="ident">concurrency_limit</span>.<span class="ident">map</span>(<span class="ident">ConcurrencyLimitLayer::new</span>))
-            .<span class="ident">option_layer</span>(<span class="ident">endpoint</span>.<span class="ident">rate_limit</span>.<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">l</span>, <span class="ident">d</span>)<span class="op">|</span> <span class="ident">RateLimitLayer::new</span>(<span class="ident">l</span>, <span class="ident">d</span>)))
-            .<span class="ident">into_inner</span>();
+        <span class="kw">let </span>stack = ServiceBuilder::new()
+            .layer_fn(|s| AddOrigin::new(s, endpoint.uri.clone()))
+            .layer_fn(|s| UserAgent::new(s, endpoint.user_agent.clone()))
+            .layer_fn(|s| GrpcTimeout::new(s, endpoint.timeout))
+            .option_layer(endpoint.concurrency_limit.map(ConcurrencyLimitLayer::new))
+            .option_layer(endpoint.rate_limit.map(|(l, d)| RateLimitLayer::new(l, d)))
+            .into_inner();
 
-        <span class="kw">let</span> <span class="ident">connector</span> <span class="op">=</span> <span class="ident">HyperConnect::new</span>(<span class="ident">connector</span>, <span class="ident">settings</span>);
-        <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">Reconnect::new</span>(<span class="ident">connector</span>, <span class="ident">endpoint</span>.<span class="ident">uri</span>.<span class="ident">clone</span>(), <span class="ident">is_lazy</span>);
+        <span class="kw">let </span>connector = HyperConnect::new(connector, settings);
+        <span class="kw">let </span>conn = Reconnect::new(connector, endpoint.uri.clone(), is_lazy);
 
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">stack</span>.<span class="ident">layer</span>(<span class="ident">conn</span>);
+        <span class="kw">let </span>inner = stack.layer(conn);
 
-        <span class="self">Self</span> {
-            <span class="ident">inner</span>: <span class="ident">BoxService::new</span>(<span class="ident">inner</span>),
+        <span class="self">Self </span>{
+            inner: BoxService::new(inner),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">connector</span>: <span class="ident">C</span>, <span class="ident">endpoint</span>: <span class="ident">Endpoint</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">C</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Uri</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">C::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
-        <span class="ident">C::Future</span>: <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span>,
-        <span class="ident">C::Response</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">HyperConnection</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>connect&lt;C&gt;(connector: C, endpoint: Endpoint) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="kw">crate</span>::Error&gt;
+    <span class="kw">where
+        </span>C: Service&lt;Uri&gt; + Send + <span class="lifetime">&#39;static</span>,
+        C::Error: Into&lt;<span class="kw">crate</span>::Error&gt; + Send,
+        C::Future: Unpin + Send,
+        C::Response: AsyncRead + AsyncWrite + HyperConnection + Unpin + Send + <span class="lifetime">&#39;static</span>,
     {
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">connector</span>, <span class="ident">endpoint</span>, <span class="bool-val">false</span>).<span class="ident">ready_oneshot</span>().<span class="kw">await</span>
-    }
+        <span class="self">Self</span>::new(connector, endpoint, <span class="bool-val">false</span>).ready_oneshot().<span class="kw">await
+    </span>}
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">lazy</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">connector</span>: <span class="ident">C</span>, <span class="ident">endpoint</span>: <span class="ident">Endpoint</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">C</span>: <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Uri</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-        <span class="ident">C::Error</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>,
-        <span class="ident">C::Future</span>: <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span>,
-        <span class="ident">C::Response</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">HyperConnection</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>lazy&lt;C&gt;(connector: C, endpoint: Endpoint) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>C: Service&lt;Uri&gt; + Send + <span class="lifetime">&#39;static</span>,
+        C::Error: Into&lt;<span class="kw">crate</span>::Error&gt; + Send,
+        C::Future: Unpin + Send,
+        C::Response: AsyncRead + AsyncWrite + HyperConnection + Unpin + Send + <span class="lifetime">&#39;static</span>,
     {
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">connector</span>, <span class="ident">endpoint</span>, <span class="bool-val">true</span>)
+        <span class="self">Self</span>::new(connector, endpoint, <span class="bool-val">true</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Service</span><span class="op">&lt;</span><span class="ident">Request</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Connection</span> {
-    <span class="kw">type</span> <span class="ident">Response</span> <span class="op">=</span> <span class="ident">Response</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Error</span>;
-    <span class="kw">type</span> <span class="ident">Future</span> <span class="op">=</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Response</span>, <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span>;
+<span class="kw">impl </span>Service&lt;Request&gt; <span class="kw">for </span>Connection {
+    <span class="kw">type </span>Response = Response;
+    <span class="kw">type </span>Error = <span class="kw">crate</span>::Error;
+    <span class="kw">type </span>Future = BoxFuture&lt;<span class="self">Self</span>::Response, <span class="self">Self</span>::Error&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll_ready</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">Self</span>::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Service::poll_ready</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>, <span class="ident">cx</span>).<span class="ident">map_err</span>(<span class="ident">Into::into</span>)
+    <span class="kw">fn </span>poll_ready(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), <span class="self">Self</span>::Error&gt;&gt; {
+        Service::poll_ready(<span class="kw-2">&amp;mut </span><span class="self">self</span>.inner, cx).map_err(Into::into)
     }
 
-    <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">req</span>: <span class="ident">Request</span>) -&gt; <span class="ident"><span class="self">Self</span>::Future</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">call</span>(<span class="ident">req</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Load</span> <span class="kw">for</span> <span class="ident">Connection</span> {
-    <span class="kw">type</span> <span class="ident">Metric</span> <span class="op">=</span> <span class="ident">usize</span>;
-
-    <span class="kw">fn</span> <span class="ident">load</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Metric</span> {
-        <span class="number">0</span>
+    <span class="kw">fn </span>call(<span class="kw-2">&amp;mut </span><span class="self">self</span>, req: Request) -&gt; <span class="self">Self</span>::Future {
+        <span class="self">self</span>.inner.call(req)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Connection</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Connection&quot;</span>).<span class="ident">finish</span>()
+<span class="kw">impl </span>Load <span class="kw">for </span>Connection {
+    <span class="kw">type </span>Metric = usize;
+
+    <span class="kw">fn </span>load(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Metric {
+        <span class="number">0
+    </span>}
+}
+
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Connection {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;Connection&quot;</span>).finish()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tonic" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tonic" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

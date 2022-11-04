@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/event/sdam/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mongodb/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/event/sdam/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mongodb/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -263,270 +263,270 @@
 <span id="263">263</span>
 <span id="264">264</span>
 <span id="265">265</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Contains the events and functionality for monitoring Server Discovery and Monitoring.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Contains the events and functionality for monitoring Server Discovery and Monitoring.
 
-<span class="kw">mod</span> <span class="ident">topology_description</span>;
+</span><span class="kw">mod </span>topology_description;
 
-<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
+<span class="kw">use </span>std::time::Duration;
 
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">bson</span>::{<span class="ident">oid::ObjectId</span>, <span class="ident">Document</span>},
-    <span class="ident">bson_util::serialize_error_as_string</span>,
-    <span class="ident">error::Error</span>,
-    <span class="ident">options::ServerAddress</span>,
+<span class="kw">use crate</span>::{
+    bson::{oid::ObjectId, Document},
+    bson_util::serialize_error_as_string,
+    error::Error,
+    options::ServerAddress,
 };
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sdam::public::TopologyType</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">topology_description::TopologyDescription</span>;
+<span class="kw">pub use </span><span class="kw">crate</span>::sdam::public::TopologyType;
+<span class="kw">pub use </span>topology_description::TopologyDescription;
 
-<span class="doccomment">/// A description of the most up-to-date information known about a server. Further details can be</span>
-<span class="doccomment">/// found in the [Server Discovery and Monitoring specification](https://github.com/mongodb/specifications/blob/master/source/server-discovery-and-monitoring/server-discovery-and-monitoring.rst).</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ServerDescription</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::sdam::public::ServerInfo</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>;
+<span class="doccomment">/// A description of the most up-to-date information known about a server. Further details can be
+/// found in the [Server Discovery and Monitoring specification](https://github.com/mongodb/specifications/blob/master/source/server-discovery-and-monitoring/server-discovery-and-monitoring.rst).
+</span><span class="kw">pub type </span>ServerDescription = <span class="kw">crate</span>::sdam::public::ServerInfo&lt;<span class="lifetime">&#39;static</span>&gt;;
 
-<span class="doccomment">/// Published when a server description changes.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ServerDescriptionChangedEvent</span> {
-    <span class="doccomment">/// The address of the server.</span>
-    <span class="kw">pub</span> <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
+<span class="doccomment">/// Published when a server description changes.
+</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>ServerDescriptionChangedEvent {
+    <span class="doccomment">/// The address of the server.
+    </span><span class="kw">pub </span>address: ServerAddress,
 
-    <span class="doccomment">/// The unique ID of the topology.</span>
-    <span class="kw">pub</span> <span class="ident">topology_id</span>: <span class="ident">ObjectId</span>,
+    <span class="doccomment">/// The unique ID of the topology.
+    </span><span class="kw">pub </span>topology_id: ObjectId,
 
-    <span class="doccomment">/// The server&#39;s previous description.</span>
-    <span class="kw">pub</span> <span class="ident">previous_description</span>: <span class="ident">ServerDescription</span>,
+    <span class="doccomment">/// The server&#39;s previous description.
+    </span><span class="kw">pub </span>previous_description: ServerDescription,
 
-    <span class="doccomment">/// The server&#39;s new description.</span>
-    <span class="kw">pub</span> <span class="ident">new_description</span>: <span class="ident">ServerDescription</span>,
+    <span class="doccomment">/// The server&#39;s new description.
+    </span><span class="kw">pub </span>new_description: ServerDescription,
 }
 
-<span class="kw">impl</span> <span class="ident">ServerDescriptionChangedEvent</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_marked_unknown_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">previous_description</span>
-            .<span class="ident">description</span>
-            .<span class="ident">server_type</span>
-            .<span class="ident">is_available</span>()
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">new_description</span>.<span class="ident">description</span>.<span class="ident">server_type</span> <span class="op">==</span> <span class="ident"><span class="kw">crate</span>::ServerType::Unknown</span>
+<span class="kw">impl </span>ServerDescriptionChangedEvent {
+    <span class="attribute">#[cfg(test)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_marked_unknown_event(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.previous_description
+            .description
+            .server_type
+            .is_available()
+            &amp;&amp; <span class="self">self</span>.new_description.description.server_type == <span class="kw">crate</span>::ServerType::Unknown
     }
 }
 
-<span class="doccomment">/// Published when a server is initialized.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ServerOpeningEvent</span> {
-    <span class="doccomment">/// The address of the server.</span>
-    <span class="kw">pub</span> <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
+<span class="doccomment">/// Published when a server is initialized.
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>ServerOpeningEvent {
+    <span class="doccomment">/// The address of the server.
+    </span><span class="kw">pub </span>address: ServerAddress,
 
-    <span class="doccomment">/// The unique ID of the topology.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>, <span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;ObjectId::new&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">topology_id</span>: <span class="ident">ObjectId</span>,
+    <span class="doccomment">/// The unique ID of the topology.
+    </span><span class="attribute">#[serde(skip, default = <span class="string">&quot;ObjectId::new&quot;</span>)]
+    </span><span class="kw">pub </span>topology_id: ObjectId,
 }
 
-<span class="doccomment">/// Published when a server is closed.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ServerClosedEvent</span> {
-    <span class="doccomment">/// The address of the server.</span>
-    <span class="kw">pub</span> <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
+<span class="doccomment">/// Published when a server is closed.
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>ServerClosedEvent {
+    <span class="doccomment">/// The address of the server.
+    </span><span class="kw">pub </span>address: ServerAddress,
 
-    <span class="doccomment">/// The unique ID of the topology.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>, <span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;ObjectId::new&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">topology_id</span>: <span class="ident">ObjectId</span>,
+    <span class="doccomment">/// The unique ID of the topology.
+    </span><span class="attribute">#[serde(skip, default = <span class="string">&quot;ObjectId::new&quot;</span>)]
+    </span><span class="kw">pub </span>topology_id: ObjectId,
 }
 
-<span class="doccomment">/// Published when a topology description changes.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TopologyDescriptionChangedEvent</span> {
-    <span class="doccomment">/// The ID of the topology.</span>
-    <span class="kw">pub</span> <span class="ident">topology_id</span>: <span class="ident">ObjectId</span>,
+<span class="doccomment">/// Published when a topology description changes.
+</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>TopologyDescriptionChangedEvent {
+    <span class="doccomment">/// The ID of the topology.
+    </span><span class="kw">pub </span>topology_id: ObjectId,
 
-    <span class="doccomment">/// The topology&#39;s previous description.</span>
-    <span class="kw">pub</span> <span class="ident">previous_description</span>: <span class="ident">TopologyDescription</span>,
+    <span class="doccomment">/// The topology&#39;s previous description.
+    </span><span class="kw">pub </span>previous_description: TopologyDescription,
 
-    <span class="doccomment">/// The topology&#39;s new description.</span>
-    <span class="kw">pub</span> <span class="ident">new_description</span>: <span class="ident">TopologyDescription</span>,
+    <span class="doccomment">/// The topology&#39;s new description.
+    </span><span class="kw">pub </span>new_description: TopologyDescription,
 }
 
-<span class="doccomment">/// Published when a topology is initialized.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TopologyOpeningEvent</span> {
-    <span class="doccomment">/// The unique ID of the topology.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>, <span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;ObjectId::new&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">topology_id</span>: <span class="ident">ObjectId</span>,
+<span class="doccomment">/// Published when a topology is initialized.
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>TopologyOpeningEvent {
+    <span class="doccomment">/// The unique ID of the topology.
+    </span><span class="attribute">#[serde(skip, default = <span class="string">&quot;ObjectId::new&quot;</span>)]
+    </span><span class="kw">pub </span>topology_id: ObjectId,
 }
 
-<span class="doccomment">/// Published when a topology is closed. Note that this event will not be published until the client</span>
-<span class="doccomment">/// associated with the topology is dropped.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TopologyClosedEvent</span> {
-    <span class="doccomment">/// The unique ID of the topology.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>, <span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;ObjectId::new&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">topology_id</span>: <span class="ident">ObjectId</span>,
+<span class="doccomment">/// Published when a topology is closed. Note that this event will not be published until the client
+/// associated with the topology is dropped.
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>TopologyClosedEvent {
+    <span class="doccomment">/// The unique ID of the topology.
+    </span><span class="attribute">#[serde(skip, default = <span class="string">&quot;ObjectId::new&quot;</span>)]
+    </span><span class="kw">pub </span>topology_id: ObjectId,
 }
 
-<span class="doccomment">/// Published when a server monitor&#39;s `hello` or legacy hello command is started.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ServerHeartbeatStartedEvent</span> {
-    <span class="doccomment">/// The address of the server.</span>
-    <span class="kw">pub</span> <span class="ident">server_address</span>: <span class="ident">ServerAddress</span>,
-    <span class="comment">// TODO RUST-560 add awaited field</span>
+<span class="doccomment">/// Published when a server monitor&#39;s `hello` or legacy hello command is started.
+</span><span class="attribute">#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>ServerHeartbeatStartedEvent {
+    <span class="doccomment">/// The address of the server.
+    </span><span class="kw">pub </span>server_address: ServerAddress,
+    <span class="comment">// TODO RUST-560 add awaited field
+</span>}
+
+<span class="doccomment">/// Published when a server monitor&#39;s `hello` or legacy hello command succeeds.
+</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>ServerHeartbeatSucceededEvent {
+    <span class="doccomment">/// The execution time of the event.
+    </span><span class="kw">pub </span>duration: Duration,
+
+    <span class="doccomment">/// The reply to the `hello` or legacy hello command.
+    </span><span class="kw">pub </span>reply: Document,
+
+    <span class="doccomment">/// The address of the server.
+    </span><span class="kw">pub </span>server_address: ServerAddress,
+    <span class="comment">// TODO RUST-560 add awaited field
+</span>}
+
+<span class="doccomment">/// Published when a server monitor&#39;s `hello` or legacy hello command fails.
+</span><span class="attribute">#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>ServerHeartbeatFailedEvent {
+    <span class="doccomment">/// The execution time of the event.
+    </span><span class="kw">pub </span>duration: Duration,
+
+    <span class="doccomment">/// The failure that occurred.
+    </span><span class="attribute">#[serde(serialize_with = <span class="string">&quot;serialize_error_as_string&quot;</span>)]
+    </span><span class="kw">pub </span>failure: Error,
+
+    <span class="doccomment">/// The address of the server.
+    </span><span class="kw">pub </span>server_address: ServerAddress,
+    <span class="comment">// TODO RUST-560 add awaited field
+</span>}
+
+<span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>SdamEvent {
+    ServerDescriptionChanged(Box&lt;ServerDescriptionChangedEvent&gt;),
+    ServerOpening(ServerOpeningEvent),
+    ServerClosed(ServerClosedEvent),
+    TopologyDescriptionChanged(Box&lt;TopologyDescriptionChangedEvent&gt;),
+    TopologyOpening(TopologyOpeningEvent),
+    TopologyClosed(TopologyClosedEvent),
+    ServerHeartbeatStarted(ServerHeartbeatStartedEvent),
+    ServerHeartbeatSucceeded(ServerHeartbeatSucceededEvent),
+    ServerHeartbeatFailed(ServerHeartbeatFailedEvent),
 }
 
-<span class="doccomment">/// Published when a server monitor&#39;s `hello` or legacy hello command succeeds.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ServerHeartbeatSucceededEvent</span> {
-    <span class="doccomment">/// The execution time of the event.</span>
-    <span class="kw">pub</span> <span class="ident">duration</span>: <span class="ident">Duration</span>,
+<span class="doccomment">/// Applications can implement this trait to specify custom logic to run on each SDAM event sent
+/// by the driver.
+///
+/// ```rust
+/// # use std::sync::Arc;
+/// #
+/// # use mongodb::{
+/// #     error::Result,
+/// #     event::sdam::{
+/// #         SdamEventHandler,
+/// #         ServerHeartbeatFailedEvent,
+/// #     },
+/// #     options::ClientOptions,
+/// # };
+/// # #[cfg(any(feature = &quot;sync&quot;, feature = &quot;tokio-sync&quot;))]
+/// # use mongodb::sync::Client;
+/// # #[cfg(all(not(feature = &quot;sync&quot;), not(feature = &quot;tokio-sync&quot;)))]
+/// # use mongodb::Client;
+/// #
+/// struct FailedHeartbeatLogger;
+///
+/// impl SdamEventHandler for FailedHeartbeatLogger {
+///     fn handle_server_heartbeat_failed_event(&amp;self, event: ServerHeartbeatFailedEvent) {
+///         eprintln!(&quot;Failed server heartbeat: {:?}&quot;, event);
+///     }
+/// }
+///
+/// # fn do_stuff() -&gt; Result&lt;()&gt; {
+/// let handler: Arc&lt;dyn SdamEventHandler&gt; = Arc::new(FailedHeartbeatLogger);
+/// let options = ClientOptions::builder()
+///                   .sdam_event_handler(handler)
+///                   .build();
+/// let client = Client::with_options(options)?;
+///
+/// // Do things with the client, and failed server heartbeats will be logged to stderr.
+/// # Ok(())
+/// # }
+/// ```
+</span><span class="kw">pub trait </span>SdamEventHandler: Send + Sync {
+    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler when
+    /// a server description changes.
+    </span><span class="kw">fn </span>handle_server_description_changed_event(<span class="kw-2">&amp;</span><span class="self">self</span>, _event: ServerDescriptionChangedEvent) {}
 
-    <span class="doccomment">/// The reply to the `hello` or legacy hello command.</span>
-    <span class="kw">pub</span> <span class="ident">reply</span>: <span class="ident">Document</span>,
+    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler when
+    /// a server is initialized.
+    </span><span class="kw">fn </span>handle_server_opening_event(<span class="kw-2">&amp;</span><span class="self">self</span>, _event: ServerOpeningEvent) {}
 
-    <span class="doccomment">/// The address of the server.</span>
-    <span class="kw">pub</span> <span class="ident">server_address</span>: <span class="ident">ServerAddress</span>,
-    <span class="comment">// TODO RUST-560 add awaited field</span>
+    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler when
+    /// a server is closed.
+    </span><span class="kw">fn </span>handle_server_closed_event(<span class="kw-2">&amp;</span><span class="self">self</span>, _event: ServerClosedEvent) {}
+
+    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler when
+    /// its topology description changes.
+    </span><span class="kw">fn </span>handle_topology_description_changed_event(<span class="kw-2">&amp;</span><span class="self">self</span>, _event: TopologyDescriptionChangedEvent) {}
+
+    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler when
+    /// its topology is initialized.
+    </span><span class="kw">fn </span>handle_topology_opening_event(<span class="kw-2">&amp;</span><span class="self">self</span>, _event: TopologyOpeningEvent) {}
+
+    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler when
+    /// its topology closes.  Note that this method will not be called until the
+    /// [`Client`](../../struct.Client.html) is dropped.
+    </span><span class="kw">fn </span>handle_topology_closed_event(<span class="kw-2">&amp;</span><span class="self">self</span>, _event: TopologyClosedEvent) {}
+
+    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler when
+    /// a server heartbeat begins.
+    </span><span class="kw">fn </span>handle_server_heartbeat_started_event(<span class="kw-2">&amp;</span><span class="self">self</span>, _event: ServerHeartbeatStartedEvent) {}
+
+    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler when
+    /// a server heartbeat succeeds.
+    </span><span class="kw">fn </span>handle_server_heartbeat_succeeded_event(<span class="kw-2">&amp;</span><span class="self">self</span>, _event: ServerHeartbeatSucceededEvent) {}
+
+    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler when
+    /// a server heartbeat fails.
+    </span><span class="kw">fn </span>handle_server_heartbeat_failed_event(<span class="kw-2">&amp;</span><span class="self">self</span>, _event: ServerHeartbeatFailedEvent) {}
 }
 
-<span class="doccomment">/// Published when a server monitor&#39;s `hello` or legacy hello command fails.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ServerHeartbeatFailedEvent</span> {
-    <span class="doccomment">/// The execution time of the event.</span>
-    <span class="kw">pub</span> <span class="ident">duration</span>: <span class="ident">Duration</span>,
-
-    <span class="doccomment">/// The failure that occurred.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;serialize_error_as_string&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">failure</span>: <span class="ident">Error</span>,
-
-    <span class="doccomment">/// The address of the server.</span>
-    <span class="kw">pub</span> <span class="ident">server_address</span>: <span class="ident">ServerAddress</span>,
-    <span class="comment">// TODO RUST-560 add awaited field</span>
-}
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">SdamEvent</span> {
-    <span class="ident">ServerDescriptionChanged</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ServerDescriptionChangedEvent</span><span class="op">&gt;</span>),
-    <span class="ident">ServerOpening</span>(<span class="ident">ServerOpeningEvent</span>),
-    <span class="ident">ServerClosed</span>(<span class="ident">ServerClosedEvent</span>),
-    <span class="ident">TopologyDescriptionChanged</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">TopologyDescriptionChangedEvent</span><span class="op">&gt;</span>),
-    <span class="ident">TopologyOpening</span>(<span class="ident">TopologyOpeningEvent</span>),
-    <span class="ident">TopologyClosed</span>(<span class="ident">TopologyClosedEvent</span>),
-    <span class="ident">ServerHeartbeatStarted</span>(<span class="ident">ServerHeartbeatStartedEvent</span>),
-    <span class="ident">ServerHeartbeatSucceeded</span>(<span class="ident">ServerHeartbeatSucceededEvent</span>),
-    <span class="ident">ServerHeartbeatFailed</span>(<span class="ident">ServerHeartbeatFailedEvent</span>),
-}
-
-<span class="doccomment">/// Applications can implement this trait to specify custom logic to run on each SDAM event sent</span>
-<span class="doccomment">/// by the driver.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # use std::sync::Arc;</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// # use mongodb::{</span>
-<span class="doccomment">/// #     error::Result,</span>
-<span class="doccomment">/// #     event::sdam::{</span>
-<span class="doccomment">/// #         SdamEventHandler,</span>
-<span class="doccomment">/// #         ServerHeartbeatFailedEvent,</span>
-<span class="doccomment">/// #     },</span>
-<span class="doccomment">/// #     options::ClientOptions,</span>
-<span class="doccomment">/// # };</span>
-<span class="doccomment">/// # #[cfg(any(feature = &quot;sync&quot;, feature = &quot;tokio-sync&quot;))]</span>
-<span class="doccomment">/// # use mongodb::sync::Client;</span>
-<span class="doccomment">/// # #[cfg(all(not(feature = &quot;sync&quot;), not(feature = &quot;tokio-sync&quot;)))]</span>
-<span class="doccomment">/// # use mongodb::Client;</span>
-<span class="doccomment">/// #</span>
-<span class="doccomment">/// struct FailedHeartbeatLogger;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// impl SdamEventHandler for FailedHeartbeatLogger {</span>
-<span class="doccomment">///     fn handle_server_heartbeat_failed_event(&amp;self, event: ServerHeartbeatFailedEvent) {</span>
-<span class="doccomment">///         eprintln!(&quot;Failed server heartbeat: {:?}&quot;, event);</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # fn do_stuff() -&gt; Result&lt;()&gt; {</span>
-<span class="doccomment">/// let handler: Arc&lt;dyn SdamEventHandler&gt; = Arc::new(FailedHeartbeatLogger);</span>
-<span class="doccomment">/// let options = ClientOptions::builder()</span>
-<span class="doccomment">///                   .sdam_event_handler(handler)</span>
-<span class="doccomment">///                   .build();</span>
-<span class="doccomment">/// let client = Client::with_options(options)?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Do things with the client, and failed server heartbeats will be logged to stderr.</span>
-<span class="doccomment">/// # Ok(())</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">SdamEventHandler</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
-    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler when</span>
-    <span class="doccomment">/// a server description changes.</span>
-    <span class="kw">fn</span> <span class="ident">handle_server_description_changed_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_event</span>: <span class="ident">ServerDescriptionChangedEvent</span>) {}
-
-    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler when</span>
-    <span class="doccomment">/// a server is initialized.</span>
-    <span class="kw">fn</span> <span class="ident">handle_server_opening_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_event</span>: <span class="ident">ServerOpeningEvent</span>) {}
-
-    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler when</span>
-    <span class="doccomment">/// a server is closed.</span>
-    <span class="kw">fn</span> <span class="ident">handle_server_closed_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_event</span>: <span class="ident">ServerClosedEvent</span>) {}
-
-    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler when</span>
-    <span class="doccomment">/// its topology description changes.</span>
-    <span class="kw">fn</span> <span class="ident">handle_topology_description_changed_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_event</span>: <span class="ident">TopologyDescriptionChangedEvent</span>) {}
-
-    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler when</span>
-    <span class="doccomment">/// its topology is initialized.</span>
-    <span class="kw">fn</span> <span class="ident">handle_topology_opening_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_event</span>: <span class="ident">TopologyOpeningEvent</span>) {}
-
-    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler when</span>
-    <span class="doccomment">/// its topology closes.  Note that this method will not be called until the</span>
-    <span class="doccomment">/// [`Client`](../../struct.Client.html) is dropped.</span>
-    <span class="kw">fn</span> <span class="ident">handle_topology_closed_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_event</span>: <span class="ident">TopologyClosedEvent</span>) {}
-
-    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler when</span>
-    <span class="doccomment">/// a server heartbeat begins.</span>
-    <span class="kw">fn</span> <span class="ident">handle_server_heartbeat_started_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_event</span>: <span class="ident">ServerHeartbeatStartedEvent</span>) {}
-
-    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler when</span>
-    <span class="doccomment">/// a server heartbeat succeeds.</span>
-    <span class="kw">fn</span> <span class="ident">handle_server_heartbeat_succeeded_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_event</span>: <span class="ident">ServerHeartbeatSucceededEvent</span>) {}
-
-    <span class="doccomment">/// A [`Client`](../../struct.Client.html) will call this method on each registered handler when</span>
-    <span class="doccomment">/// a server heartbeat fails.</span>
-    <span class="kw">fn</span> <span class="ident">handle_server_heartbeat_failed_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_event</span>: <span class="ident">ServerHeartbeatFailedEvent</span>) {}
-}
-
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">handle_sdam_event</span>(<span class="ident">handler</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">SdamEventHandler</span>, <span class="ident">event</span>: <span class="ident">SdamEvent</span>) {
-    <span class="kw">match</span> <span class="ident">event</span> {
-        <span class="ident">SdamEvent::ServerClosed</span>(<span class="ident">event</span>) =&gt; <span class="ident">handler</span>.<span class="ident">handle_server_closed_event</span>(<span class="ident">event</span>),
-        <span class="ident">SdamEvent::ServerDescriptionChanged</span>(<span class="ident">e</span>) =&gt; {
-            <span class="ident">handler</span>.<span class="ident">handle_server_description_changed_event</span>(<span class="kw-2">*</span><span class="ident">e</span>)
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>handle_sdam_event(handler: <span class="kw-2">&amp;</span><span class="kw">dyn </span>SdamEventHandler, event: SdamEvent) {
+    <span class="kw">match </span>event {
+        SdamEvent::ServerClosed(event) =&gt; handler.handle_server_closed_event(event),
+        SdamEvent::ServerDescriptionChanged(e) =&gt; {
+            handler.handle_server_description_changed_event(<span class="kw-2">*</span>e)
         }
-        <span class="ident">SdamEvent::ServerOpening</span>(<span class="ident">e</span>) =&gt; <span class="ident">handler</span>.<span class="ident">handle_server_opening_event</span>(<span class="ident">e</span>),
-        <span class="ident">SdamEvent::TopologyDescriptionChanged</span>(<span class="ident">e</span>) =&gt; {
-            <span class="ident">handler</span>.<span class="ident">handle_topology_description_changed_event</span>(<span class="kw-2">*</span><span class="ident">e</span>)
+        SdamEvent::ServerOpening(e) =&gt; handler.handle_server_opening_event(e),
+        SdamEvent::TopologyDescriptionChanged(e) =&gt; {
+            handler.handle_topology_description_changed_event(<span class="kw-2">*</span>e)
         }
-        <span class="ident">SdamEvent::TopologyOpening</span>(<span class="ident">e</span>) =&gt; <span class="ident">handler</span>.<span class="ident">handle_topology_opening_event</span>(<span class="ident">e</span>),
-        <span class="ident">SdamEvent::TopologyClosed</span>(<span class="ident">e</span>) =&gt; <span class="ident">handler</span>.<span class="ident">handle_topology_closed_event</span>(<span class="ident">e</span>),
-        <span class="ident">SdamEvent::ServerHeartbeatStarted</span>(<span class="ident">e</span>) =&gt; <span class="ident">handler</span>.<span class="ident">handle_server_heartbeat_started_event</span>(<span class="ident">e</span>),
-        <span class="ident">SdamEvent::ServerHeartbeatSucceeded</span>(<span class="ident">e</span>) =&gt; {
-            <span class="ident">handler</span>.<span class="ident">handle_server_heartbeat_succeeded_event</span>(<span class="ident">e</span>)
+        SdamEvent::TopologyOpening(e) =&gt; handler.handle_topology_opening_event(e),
+        SdamEvent::TopologyClosed(e) =&gt; handler.handle_topology_closed_event(e),
+        SdamEvent::ServerHeartbeatStarted(e) =&gt; handler.handle_server_heartbeat_started_event(e),
+        SdamEvent::ServerHeartbeatSucceeded(e) =&gt; {
+            handler.handle_server_heartbeat_succeeded_event(e)
         }
-        <span class="ident">SdamEvent::ServerHeartbeatFailed</span>(<span class="ident">e</span>) =&gt; <span class="ident">handler</span>.<span class="ident">handle_server_heartbeat_failed_event</span>(<span class="ident">e</span>),
+        SdamEvent::ServerHeartbeatFailed(e) =&gt; handler.handle_server_heartbeat_failed_event(e),
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/kx.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>kx.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rustls/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/kx.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>kx.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rustls/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -98,105 +98,105 @@
 <span id="98">98</span>
 <span id="99">99</span>
 <span id="100">100</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::fmt</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::fmt;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::Error</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::enums::NamedGroup</span>;
+<span class="kw">use </span><span class="kw">crate</span>::error::Error;
+<span class="kw">use </span><span class="kw">crate</span>::msgs::enums::NamedGroup;
 
-<span class="doccomment">/// An in-progress key exchange.  This has the algorithm,</span>
-<span class="doccomment">/// our private key, and our public key.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">KeyExchange</span> {
-    <span class="ident">skxg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">SupportedKxGroup</span>,
-    <span class="ident">privkey</span>: <span class="ident">ring::agreement::EphemeralPrivateKey</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">pubkey</span>: <span class="ident">ring::agreement::PublicKey</span>,
+<span class="doccomment">/// An in-progress key exchange.  This has the algorithm,
+/// our private key, and our public key.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>KeyExchange {
+    skxg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>SupportedKxGroup,
+    privkey: ring::agreement::EphemeralPrivateKey,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) pubkey: ring::agreement::PublicKey,
 }
 
-<span class="kw">impl</span> <span class="ident">KeyExchange</span> {
-    <span class="doccomment">/// Choose a SupportedKxGroup by name, from a list of supported groups.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">choose</span>(
-        <span class="ident">name</span>: <span class="ident">NamedGroup</span>,
-        <span class="ident">supported</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">SupportedKxGroup</span>],
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">SupportedKxGroup</span><span class="op">&gt;</span> {
-        <span class="ident">supported</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">find</span>(<span class="op">|</span><span class="ident">skxg</span><span class="op">|</span> <span class="ident">skxg</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">name</span>)
-            .<span class="ident">cloned</span>()
+<span class="kw">impl </span>KeyExchange {
+    <span class="doccomment">/// Choose a SupportedKxGroup by name, from a list of supported groups.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>choose(
+        name: NamedGroup,
+        supported: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>SupportedKxGroup],
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>SupportedKxGroup&gt; {
+        supported
+            .iter()
+            .find(|skxg| skxg.name == name)
+            .cloned()
     }
 
-    <span class="doccomment">/// Start a key exchange, using the given SupportedKxGroup.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This generates an ephemeral key pair and stores it in the returned KeyExchange object.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">start</span>(<span class="ident">skxg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">SupportedKxGroup</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">ring::rand::SystemRandom::new</span>();
-        <span class="kw">let</span> <span class="ident">ours</span> <span class="op">=</span>
-            <span class="ident">ring::agreement::EphemeralPrivateKey::generate</span>(<span class="ident">skxg</span>.<span class="ident">agreement_algorithm</span>, <span class="kw-2">&amp;</span><span class="ident">rng</span>).<span class="ident">ok</span>()<span class="question-mark">?</span>;
+    <span class="doccomment">/// Start a key exchange, using the given SupportedKxGroup.
+    ///
+    /// This generates an ephemeral key pair and stores it in the returned KeyExchange object.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>start(skxg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>SupportedKxGroup) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>rng = ring::rand::SystemRandom::new();
+        <span class="kw">let </span>ours =
+            ring::agreement::EphemeralPrivateKey::generate(skxg.agreement_algorithm, <span class="kw-2">&amp;</span>rng).ok()<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">pubkey</span> <span class="op">=</span> <span class="ident">ours</span>.<span class="ident">compute_public_key</span>().<span class="ident">ok</span>()<span class="question-mark">?</span>;
+        <span class="kw">let </span>pubkey = ours.compute_public_key().ok()<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Some</span>(<span class="self">Self</span> {
-            <span class="ident">skxg</span>,
-            <span class="ident">privkey</span>: <span class="ident">ours</span>,
-            <span class="ident">pubkey</span>,
+        <span class="prelude-val">Some</span>(<span class="self">Self </span>{
+            skxg,
+            privkey: ours,
+            pubkey,
         })
     }
 
-    <span class="doccomment">/// Return the group being used.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">group</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">NamedGroup</span> {
-        <span class="self">self</span>.<span class="ident">skxg</span>.<span class="ident">name</span>
+    <span class="doccomment">/// Return the group being used.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>group(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; NamedGroup {
+        <span class="self">self</span>.skxg.name
     }
 
-    <span class="doccomment">/// Completes the key exchange, given the peer&#39;s public key.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The shared secret is passed into the closure passed down in `f`, and the result of calling</span>
-    <span class="doccomment">/// `f` is returned to the caller.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">complete</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Completes the key exchange, given the peer&#39;s public key.
+    ///
+    /// The shared secret is passed into the closure passed down in `f`, and the result of calling
+    /// `f` is returned to the caller.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>complete&lt;T&gt;(
         <span class="self">self</span>,
-        <span class="ident">peer</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-        <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, ()<span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">peer_key</span> <span class="op">=</span> <span class="ident">ring::agreement::UnparsedPublicKey::new</span>(<span class="self">self</span>.<span class="ident">skxg</span>.<span class="ident">agreement_algorithm</span>, <span class="ident">peer</span>);
-        <span class="ident">ring::agreement::agree_ephemeral</span>(<span class="self">self</span>.<span class="ident">privkey</span>, <span class="kw-2">&amp;</span><span class="ident">peer_key</span>, (), <span class="ident">f</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span>()<span class="op">|</span> <span class="ident">Error::PeerMisbehavedError</span>(<span class="string">&quot;key agreement failed&quot;</span>.<span class="ident">to_string</span>()))
+        peer: <span class="kw-2">&amp;</span>[u8],
+        f: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;T, ()&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;T, Error&gt; {
+        <span class="kw">let </span>peer_key = ring::agreement::UnparsedPublicKey::new(<span class="self">self</span>.skxg.agreement_algorithm, peer);
+        ring::agreement::agree_ephemeral(<span class="self">self</span>.privkey, <span class="kw-2">&amp;</span>peer_key, (), f)
+            .map_err(|()| Error::PeerMisbehavedError(<span class="string">&quot;key agreement failed&quot;</span>.to_string()))
     }
 }
 
-<span class="doccomment">/// A key-exchange group supported by rustls.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// All possible instances of this class are provided by the library in</span>
-<span class="doccomment">/// the `ALL_KX_GROUPS` array.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SupportedKxGroup</span> {
-    <span class="doccomment">/// The IANA &quot;TLS Supported Groups&quot; name of the group</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">NamedGroup</span>,
+<span class="doccomment">/// A key-exchange group supported by rustls.
+///
+/// All possible instances of this class are provided by the library in
+/// the `ALL_KX_GROUPS` array.
+</span><span class="kw">pub struct </span>SupportedKxGroup {
+    <span class="doccomment">/// The IANA &quot;TLS Supported Groups&quot; name of the group
+    </span><span class="kw">pub </span>name: NamedGroup,
 
-    <span class="doccomment">/// The corresponding ring agreement::Algorithm</span>
-    <span class="ident">agreement_algorithm</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">ring::agreement::Algorithm</span>,
+    <span class="doccomment">/// The corresponding ring agreement::Algorithm
+    </span>agreement_algorithm: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>ring::agreement::Algorithm,
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">SupportedKxGroup</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>SupportedKxGroup {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="self">self</span>.name.fmt(f)
     }
 }
 
-<span class="doccomment">/// Ephemeral ECDH on curve25519 (see RFC7748)</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">X25519</span>: <span class="ident">SupportedKxGroup</span> <span class="op">=</span> <span class="ident">SupportedKxGroup</span> {
-    <span class="ident">name</span>: <span class="ident">NamedGroup::X25519</span>,
-    <span class="ident">agreement_algorithm</span>: <span class="kw-2">&amp;</span><span class="ident">ring::agreement::X25519</span>,
+<span class="doccomment">/// Ephemeral ECDH on curve25519 (see RFC7748)
+</span><span class="kw">pub static </span>X25519: SupportedKxGroup = SupportedKxGroup {
+    name: NamedGroup::X25519,
+    agreement_algorithm: <span class="kw-2">&amp;</span>ring::agreement::X25519,
 };
 
-<span class="doccomment">/// Ephemeral ECDH on secp256r1 (aka NIST-P256)</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">SECP256R1</span>: <span class="ident">SupportedKxGroup</span> <span class="op">=</span> <span class="ident">SupportedKxGroup</span> {
-    <span class="ident">name</span>: <span class="ident">NamedGroup::secp256r1</span>,
-    <span class="ident">agreement_algorithm</span>: <span class="kw-2">&amp;</span><span class="ident">ring::agreement::ECDH_P256</span>,
+<span class="doccomment">/// Ephemeral ECDH on secp256r1 (aka NIST-P256)
+</span><span class="kw">pub static </span>SECP256R1: SupportedKxGroup = SupportedKxGroup {
+    name: NamedGroup::secp256r1,
+    agreement_algorithm: <span class="kw-2">&amp;</span>ring::agreement::ECDH_P256,
 };
 
-<span class="doccomment">/// Ephemeral ECDH on secp384r1 (aka NIST-P384)</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">SECP384R1</span>: <span class="ident">SupportedKxGroup</span> <span class="op">=</span> <span class="ident">SupportedKxGroup</span> {
-    <span class="ident">name</span>: <span class="ident">NamedGroup::secp384r1</span>,
-    <span class="ident">agreement_algorithm</span>: <span class="kw-2">&amp;</span><span class="ident">ring::agreement::ECDH_P384</span>,
+<span class="doccomment">/// Ephemeral ECDH on secp384r1 (aka NIST-P384)
+</span><span class="kw">pub static </span>SECP384R1: SupportedKxGroup = SupportedKxGroup {
+    name: NamedGroup::secp384r1,
+    agreement_algorithm: <span class="kw-2">&amp;</span>ring::agreement::ECDH_P384,
 };
 
-<span class="doccomment">/// A list of all the key exchange groups supported by rustls.</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">ALL_KX_GROUPS</span>: [<span class="kw-2">&amp;</span><span class="ident">SupportedKxGroup</span>; <span class="number">3</span>] <span class="op">=</span> [<span class="kw-2">&amp;</span><span class="ident">X25519</span>, <span class="kw-2">&amp;</span><span class="ident">SECP256R1</span>, <span class="kw-2">&amp;</span><span class="ident">SECP384R1</span>];
+<span class="doccomment">/// A list of all the key exchange groups supported by rustls.
+</span><span class="kw">pub static </span>ALL_KX_GROUPS: [<span class="kw-2">&amp;</span>SupportedKxGroup; <span class="number">3</span>] = [<span class="kw-2">&amp;</span>X25519, <span class="kw-2">&amp;</span>SECP256R1, <span class="kw-2">&amp;</span>SECP384R1];
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

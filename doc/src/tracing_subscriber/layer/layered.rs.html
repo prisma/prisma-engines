@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/layer/layered.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>layered.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tracing_subscriber/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/layer/layered.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>layered.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tracing_subscriber/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tracing_subscriber/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -471,476 +471,476 @@
 <span id="469">469</span>
 <span id="470">470</span>
 <span id="471">471</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">tracing_core</span>::{
-    <span class="ident">metadata::Metadata</span>,
-    <span class="ident">span</span>,
-    <span class="ident">subscriber</span>::{<span class="ident">Interest</span>, <span class="ident">Subscriber</span>},
-    <span class="ident">Event</span>, <span class="ident">LevelFilter</span>,
+</pre><pre class="rust"><code><span class="kw">use </span>tracing_core::{
+    metadata::Metadata,
+    span,
+    subscriber::{Interest, Subscriber},
+    Event, LevelFilter,
 };
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">filter</span>,
-    <span class="ident">layer</span>::{<span class="ident">Context</span>, <span class="ident">Layer</span>},
-    <span class="ident">registry::LookupSpan</span>,
+<span class="kw">use crate</span>::{
+    filter,
+    layer::{Context, Layer},
+    registry::LookupSpan,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">filter::FilterId</span>, <span class="ident">registry::Registry</span>};
-<span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">any::TypeId</span>, <span class="ident">cmp</span>, <span class="ident">fmt</span>, <span class="ident">marker::PhantomData</span>};
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;registry&quot;</span>, feature = <span class="string">&quot;std&quot;</span>))]
+</span><span class="kw">use crate</span>::{filter::FilterId, registry::Registry};
+<span class="kw">use </span>core::{any::TypeId, cmp, fmt, marker::PhantomData};
 
-<span class="doccomment">/// A [`Subscriber`] composed of a `Subscriber` wrapped by one or more</span>
-<span class="doccomment">/// [`Layer`]s.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Layer`]: crate::Layer</span>
-<span class="doccomment">/// [`Subscriber`]: https://docs.rs/tracing-core/latest/tracing_core/trait.Subscriber.html</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Layered</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">I</span>, <span class="ident">S</span> <span class="op">=</span> <span class="ident">I</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The layer.</span>
-    <span class="ident">layer</span>: <span class="ident">L</span>,
+<span class="doccomment">/// A [`Subscriber`] composed of a `Subscriber` wrapped by one or more
+/// [`Layer`]s.
+///
+/// [`Layer`]: crate::Layer
+/// [`Subscriber`]: https://docs.rs/tracing-core/latest/tracing_core/trait.Subscriber.html
+</span><span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>Layered&lt;L, I, S = I&gt; {
+    <span class="doccomment">/// The layer.
+    </span>layer: L,
 
-    <span class="doccomment">/// The inner value that `self.layer` was layered onto.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If this is also a `Layer`, then this `Layered` will implement `Layer`.</span>
-    <span class="doccomment">/// If this is a `Subscriber`, then this `Layered` will implement</span>
-    <span class="doccomment">/// `Subscriber` instead.</span>
-    <span class="ident">inner</span>: <span class="ident">I</span>,
+    <span class="doccomment">/// The inner value that `self.layer` was layered onto.
+    ///
+    /// If this is also a `Layer`, then this `Layered` will implement `Layer`.
+    /// If this is a `Subscriber`, then this `Layered` will implement
+    /// `Subscriber` instead.
+    </span>inner: I,
 
-    <span class="comment">// These booleans are used to determine how to combine `Interest`s and max</span>
-    <span class="comment">// level hints when per-layer filters are in use.</span>
-    <span class="doccomment">/// Is `self.inner` a `Registry`?</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If so, when combining `Interest`s, we want to &quot;bubble up&quot; its</span>
-    <span class="doccomment">/// `Interest`.</span>
-    <span class="ident">inner_is_registry</span>: <span class="ident">bool</span>,
+    <span class="comment">// These booleans are used to determine how to combine `Interest`s and max
+    // level hints when per-layer filters are in use.
+    </span><span class="doccomment">/// Is `self.inner` a `Registry`?
+    ///
+    /// If so, when combining `Interest`s, we want to &quot;bubble up&quot; its
+    /// `Interest`.
+    </span>inner_is_registry: bool,
 
-    <span class="doccomment">/// Does `self.layer` have per-layer filters?</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will be true if:</span>
-    <span class="doccomment">/// - `self.inner` is a `Filtered`.</span>
-    <span class="doccomment">/// - `self.inner` is a tree of `Layered`s where _all_ arms of those</span>
-    <span class="doccomment">///   `Layered`s have per-layer filters.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Otherwise, if it&#39;s a `Layered` with one per-layer filter in one branch,</span>
-    <span class="doccomment">/// but a non-per-layer-filtered layer in the other branch, this will be</span>
-    <span class="doccomment">/// _false_, because the `Layered` is already handling the combining of</span>
-    <span class="doccomment">/// per-layer filter `Interest`s and max level hints with its non-filtered</span>
-    <span class="doccomment">/// `Layer`.</span>
-    <span class="ident">has_layer_filter</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Does `self.layer` have per-layer filters?
+    ///
+    /// This will be true if:
+    /// - `self.inner` is a `Filtered`.
+    /// - `self.inner` is a tree of `Layered`s where _all_ arms of those
+    ///   `Layered`s have per-layer filters.
+    ///
+    /// Otherwise, if it&#39;s a `Layered` with one per-layer filter in one branch,
+    /// but a non-per-layer-filtered layer in the other branch, this will be
+    /// _false_, because the `Layered` is already handling the combining of
+    /// per-layer filter `Interest`s and max level hints with its non-filtered
+    /// `Layer`.
+    </span>has_layer_filter: bool,
 
-    <span class="doccomment">/// Does `self.inner` have per-layer filters?</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is determined according to the same rules as</span>
-    <span class="doccomment">/// `has_layer_filter` above.</span>
-    <span class="ident">inner_has_layer_filter</span>: <span class="ident">bool</span>,
-    <span class="ident">_s</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">S</span>)<span class="op">&gt;</span>,
+    <span class="doccomment">/// Does `self.inner` have per-layer filters?
+    ///
+    /// This is determined according to the same rules as
+    /// `has_layer_filter` above.
+    </span>inner_has_layer_filter: bool,
+    _s: PhantomData&lt;<span class="kw">fn</span>(S)&gt;,
 }
 
-<span class="comment">// === impl Layered ===</span>
+<span class="comment">// === impl Layered ===
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Subscriber</span> <span class="kw">for</span> <span class="ident">Layered</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">L</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
-    <span class="ident">S</span>: <span class="ident">Subscriber</span>,
+</span><span class="kw">impl</span>&lt;L, S&gt; Subscriber <span class="kw">for </span>Layered&lt;L, S&gt;
+<span class="kw">where
+    </span>L: Layer&lt;S&gt;,
+    S: Subscriber,
 {
-    <span class="kw">fn</span> <span class="ident">register_callsite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) -&gt; <span class="ident">Interest</span> {
-        <span class="self">self</span>.<span class="ident">pick_interest</span>(<span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">register_callsite</span>(<span class="ident">metadata</span>), <span class="op">|</span><span class="op">|</span> {
-            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">register_callsite</span>(<span class="ident">metadata</span>)
+    <span class="kw">fn </span>register_callsite(<span class="kw-2">&amp;</span><span class="self">self</span>, metadata: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Metadata&lt;<span class="lifetime">&#39;static</span>&gt;) -&gt; Interest {
+        <span class="self">self</span>.pick_interest(<span class="self">self</span>.layer.register_callsite(metadata), || {
+            <span class="self">self</span>.inner.register_callsite(metadata)
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">enabled</span>(<span class="ident">metadata</span>, <span class="self">self</span>.<span class="ident">ctx</span>()) {
-            <span class="comment">// if the outer layer enables the callsite metadata, ask the subscriber.</span>
-            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">enabled</span>(<span class="ident">metadata</span>)
-        } <span class="kw">else</span> {
-            <span class="comment">// otherwise, the callsite is disabled by the layer</span>
+    <span class="kw">fn </span>enabled(<span class="kw-2">&amp;</span><span class="self">self</span>, metadata: <span class="kw-2">&amp;</span>Metadata&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+        <span class="kw">if </span><span class="self">self</span>.layer.enabled(metadata, <span class="self">self</span>.ctx()) {
+            <span class="comment">// if the outer layer enables the callsite metadata, ask the subscriber.
+            </span><span class="self">self</span>.inner.enabled(metadata)
+        } <span class="kw">else </span>{
+            <span class="comment">// otherwise, the callsite is disabled by the layer
 
-            <span class="comment">// If per-layer filters are in use, and we are short-circuiting</span>
-            <span class="comment">// (rather than calling into the inner type), clear the current</span>
-            <span class="comment">// per-layer filter `enabled` state.</span>
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>)]</span>
-            <span class="ident">filter::FilterState::clear_enabled</span>();
+            // If per-layer filters are in use, and we are short-circuiting
+            // (rather than calling into the inner type), clear the current
+            // per-layer filter `enabled` state.
+            </span><span class="attribute">#[cfg(feature = <span class="string">&quot;registry&quot;</span>)]
+            </span>filter::FilterState::clear_enabled();
 
-            <span class="bool-val">false</span>
-        }
+            <span class="bool-val">false
+        </span>}
     }
 
-    <span class="kw">fn</span> <span class="ident">max_level_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">pick_level_hint</span>(<span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">max_level_hint</span>(), <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">max_level_hint</span>())
+    <span class="kw">fn </span>max_level_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;LevelFilter&gt; {
+        <span class="self">self</span>.pick_level_hint(<span class="self">self</span>.layer.max_level_hint(), <span class="self">self</span>.inner.max_level_hint())
     }
 
-    <span class="kw">fn</span> <span class="ident">new_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">span</span>: <span class="kw-2">&amp;</span><span class="ident">span::Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">span::Id</span> {
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">new_span</span>(<span class="ident">span</span>);
-        <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">on_new_span</span>(<span class="ident">span</span>, <span class="kw-2">&amp;</span><span class="ident">id</span>, <span class="self">self</span>.<span class="ident">ctx</span>());
-        <span class="ident">id</span>
+    <span class="kw">fn </span>new_span(<span class="kw-2">&amp;</span><span class="self">self</span>, span: <span class="kw-2">&amp;</span>span::Attributes&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; span::Id {
+        <span class="kw">let </span>id = <span class="self">self</span>.inner.new_span(span);
+        <span class="self">self</span>.layer.on_new_span(span, <span class="kw-2">&amp;</span>id, <span class="self">self</span>.ctx());
+        id
     }
 
-    <span class="kw">fn</span> <span class="ident">record</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">span</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">values</span>: <span class="kw-2">&amp;</span><span class="ident">span::Record</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">record</span>(<span class="ident">span</span>, <span class="ident">values</span>);
-        <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">on_record</span>(<span class="ident">span</span>, <span class="ident">values</span>, <span class="self">self</span>.<span class="ident">ctx</span>());
+    <span class="kw">fn </span>record(<span class="kw-2">&amp;</span><span class="self">self</span>, span: <span class="kw-2">&amp;</span>span::Id, values: <span class="kw-2">&amp;</span>span::Record&lt;<span class="lifetime">&#39;_</span>&gt;) {
+        <span class="self">self</span>.inner.record(span, values);
+        <span class="self">self</span>.layer.on_record(span, values, <span class="self">self</span>.ctx());
     }
 
-    <span class="kw">fn</span> <span class="ident">record_follows_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">span</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">follows</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">record_follows_from</span>(<span class="ident">span</span>, <span class="ident">follows</span>);
-        <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">on_follows_from</span>(<span class="ident">span</span>, <span class="ident">follows</span>, <span class="self">self</span>.<span class="ident">ctx</span>());
+    <span class="kw">fn </span>record_follows_from(<span class="kw-2">&amp;</span><span class="self">self</span>, span: <span class="kw-2">&amp;</span>span::Id, follows: <span class="kw-2">&amp;</span>span::Id) {
+        <span class="self">self</span>.inner.record_follows_from(span, follows);
+        <span class="self">self</span>.layer.on_follows_from(span, follows, <span class="self">self</span>.ctx());
     }
 
-    <span class="kw">fn</span> <span class="ident">event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">Event</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">event</span>(<span class="ident">event</span>);
-        <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">on_event</span>(<span class="ident">event</span>, <span class="self">self</span>.<span class="ident">ctx</span>());
+    <span class="kw">fn </span>event(<span class="kw-2">&amp;</span><span class="self">self</span>, event: <span class="kw-2">&amp;</span>Event&lt;<span class="lifetime">&#39;_</span>&gt;) {
+        <span class="self">self</span>.inner.event(event);
+        <span class="self">self</span>.layer.on_event(event, <span class="self">self</span>.ctx());
     }
 
-    <span class="kw">fn</span> <span class="ident">enter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">span</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">enter</span>(<span class="ident">span</span>);
-        <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">on_enter</span>(<span class="ident">span</span>, <span class="self">self</span>.<span class="ident">ctx</span>());
+    <span class="kw">fn </span>enter(<span class="kw-2">&amp;</span><span class="self">self</span>, span: <span class="kw-2">&amp;</span>span::Id) {
+        <span class="self">self</span>.inner.enter(span);
+        <span class="self">self</span>.layer.on_enter(span, <span class="self">self</span>.ctx());
     }
 
-    <span class="kw">fn</span> <span class="ident">exit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">span</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">exit</span>(<span class="ident">span</span>);
-        <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">on_exit</span>(<span class="ident">span</span>, <span class="self">self</span>.<span class="ident">ctx</span>());
+    <span class="kw">fn </span>exit(<span class="kw-2">&amp;</span><span class="self">self</span>, span: <span class="kw-2">&amp;</span>span::Id) {
+        <span class="self">self</span>.inner.exit(span);
+        <span class="self">self</span>.layer.on_exit(span, <span class="self">self</span>.ctx());
     }
 
-    <span class="kw">fn</span> <span class="ident">clone_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">old</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>) -&gt; <span class="ident">span::Id</span> {
-        <span class="kw">let</span> <span class="ident">new</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">clone_span</span>(<span class="ident">old</span>);
-        <span class="kw">if</span> <span class="kw-2">&amp;</span><span class="ident">new</span> <span class="op">!</span><span class="op">=</span> <span class="ident">old</span> {
-            <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">on_id_change</span>(<span class="ident">old</span>, <span class="kw-2">&amp;</span><span class="ident">new</span>, <span class="self">self</span>.<span class="ident">ctx</span>())
+    <span class="kw">fn </span>clone_span(<span class="kw-2">&amp;</span><span class="self">self</span>, old: <span class="kw-2">&amp;</span>span::Id) -&gt; span::Id {
+        <span class="kw">let </span>new = <span class="self">self</span>.inner.clone_span(old);
+        <span class="kw">if </span><span class="kw-2">&amp;</span>new != old {
+            <span class="self">self</span>.layer.on_id_change(old, <span class="kw-2">&amp;</span>new, <span class="self">self</span>.ctx())
         };
-        <span class="ident">new</span>
+        new
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">drop_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">span::Id</span>) {
-        <span class="self">self</span>.<span class="ident">try_close</span>(<span class="ident">id</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>drop_span(<span class="kw-2">&amp;</span><span class="self">self</span>, id: span::Id) {
+        <span class="self">self</span>.try_close(id);
     }
 
-    <span class="kw">fn</span> <span class="ident">try_close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">span::Id</span>) -&gt; <span class="ident">bool</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-        <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span> <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Subscriber</span>;
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">guard</span> <span class="op">=</span> <span class="ident">subscriber</span>
-            .<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="ident">Registry</span><span class="op">&gt;</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">registry</span><span class="op">|</span> <span class="ident">registry</span>.<span class="ident">start_close</span>(<span class="ident">id</span>.<span class="ident">clone</span>()));
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">try_close</span>(<span class="ident">id</span>.<span class="ident">clone</span>()) {
-            <span class="comment">// If we have a registry&#39;s close guard, indicate that the span is</span>
-            <span class="comment">// closing.</span>
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-            {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">g</span>) <span class="op">=</span> <span class="ident">guard</span>.<span class="ident">as_mut</span>() {
-                    <span class="ident">g</span>.<span class="ident">set_closing</span>()
+    <span class="kw">fn </span>try_close(<span class="kw-2">&amp;</span><span class="self">self</span>, id: span::Id) -&gt; bool {
+        <span class="attribute">#[cfg(all(feature = <span class="string">&quot;registry&quot;</span>, feature = <span class="string">&quot;std&quot;</span>))]
+        </span><span class="kw">let </span>subscriber = <span class="kw-2">&amp;</span><span class="self">self</span>.inner <span class="kw">as </span><span class="kw-2">&amp;</span><span class="kw">dyn </span>Subscriber;
+        <span class="attribute">#[cfg(all(feature = <span class="string">&quot;registry&quot;</span>, feature = <span class="string">&quot;std&quot;</span>))]
+        </span><span class="kw">let </span><span class="kw-2">mut </span>guard = subscriber
+            .downcast_ref::&lt;Registry&gt;()
+            .map(|registry| registry.start_close(id.clone()));
+        <span class="kw">if </span><span class="self">self</span>.inner.try_close(id.clone()) {
+            <span class="comment">// If we have a registry&#39;s close guard, indicate that the span is
+            // closing.
+            </span><span class="attribute">#[cfg(all(feature = <span class="string">&quot;registry&quot;</span>, feature = <span class="string">&quot;std&quot;</span>))]
+            </span>{
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(g) = guard.as_mut() {
+                    g.set_closing()
                 };
             }
 
-            <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">on_close</span>(<span class="ident">id</span>, <span class="self">self</span>.<span class="ident">ctx</span>());
-            <span class="bool-val">true</span>
-        } <span class="kw">else</span> {
-            <span class="bool-val">false</span>
-        }
+            <span class="self">self</span>.layer.on_close(id, <span class="self">self</span>.ctx());
+            <span class="bool-val">true
+        </span>} <span class="kw">else </span>{
+            <span class="bool-val">false
+        </span>}
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">current_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">span::Current</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">current_span</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>current_span(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; span::Current {
+        <span class="self">self</span>.inner.current_span()
     }
 
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">downcast_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">TypeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">*const</span> ()<span class="op">&gt;</span> {
-        <span class="comment">// Unlike the implementation of `Layer` for `Layered`, we don&#39;t have to</span>
-        <span class="comment">// handle the &quot;magic PLF downcast marker&quot; here. If a `Layered`</span>
-        <span class="comment">// implements `Subscriber`, we already know that the `inner` branch is</span>
-        <span class="comment">// going to contain something that doesn&#39;t have per-layer filters (the</span>
-        <span class="comment">// actual root `Subscriber`). Thus, a `Layered` that implements</span>
-        <span class="comment">// `Subscriber` will always be propagating the root subscriber&#39;s</span>
-        <span class="comment">// `Interest`/level hint, even if it includes a `Layer` that has</span>
-        <span class="comment">// per-layer filters, because it will only ever contain layers where</span>
-        <span class="comment">// _one_ child has per-layer filters.</span>
-        <span class="comment">//</span>
-        <span class="comment">// The complex per-layer filter detection logic is only relevant to</span>
-        <span class="comment">// *trees* of layers, which involve the `Layer` implementation for</span>
-        <span class="comment">// `Layered`, not *lists* of layers, where every `Layered` implements</span>
-        <span class="comment">// `Subscriber`. Of course, a linked list can be thought of as a</span>
-        <span class="comment">// degenerate tree...but luckily, we are able to make a type-level</span>
-        <span class="comment">// distinction between individual `Layered`s that are definitely</span>
-        <span class="comment">// list-shaped (their inner child implements `Subscriber`), and</span>
-        <span class="comment">// `Layered`s that might be tree-shaped (the inner child is also a</span>
-        <span class="comment">// `Layer`).</span>
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">unsafe fn </span>downcast_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, id: TypeId) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">*const </span>()&gt; {
+        <span class="comment">// Unlike the implementation of `Layer` for `Layered`, we don&#39;t have to
+        // handle the &quot;magic PLF downcast marker&quot; here. If a `Layered`
+        // implements `Subscriber`, we already know that the `inner` branch is
+        // going to contain something that doesn&#39;t have per-layer filters (the
+        // actual root `Subscriber`). Thus, a `Layered` that implements
+        // `Subscriber` will always be propagating the root subscriber&#39;s
+        // `Interest`/level hint, even if it includes a `Layer` that has
+        // per-layer filters, because it will only ever contain layers where
+        // _one_ child has per-layer filters.
+        //
+        // The complex per-layer filter detection logic is only relevant to
+        // *trees* of layers, which involve the `Layer` implementation for
+        // `Layered`, not *lists* of layers, where every `Layered` implements
+        // `Subscriber`. Of course, a linked list can be thought of as a
+        // degenerate tree...but luckily, we are able to make a type-level
+        // distinction between individual `Layered`s that are definitely
+        // list-shaped (their inner child implements `Subscriber`), and
+        // `Layered`s that might be tree-shaped (the inner child is also a
+        // `Layer`).
 
-        <span class="comment">// If downcasting to `Self`, return a pointer to `self`.</span>
-        <span class="kw">if</span> <span class="ident">id</span> <span class="op">==</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*const</span> ());
+        // If downcasting to `Self`, return a pointer to `self`.
+        </span><span class="kw">if </span>id == TypeId::of::&lt;<span class="self">Self</span>&gt;() {
+            <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="self">self </span><span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span><span class="kw-2">*const </span>());
         }
 
-        <span class="self">self</span>.<span class="ident">layer</span>
-            .<span class="ident">downcast_raw</span>(<span class="ident">id</span>)
-            .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">downcast_raw</span>(<span class="ident">id</span>))
+        <span class="self">self</span>.layer
+            .downcast_raw(id)
+            .or_else(|| <span class="self">self</span>.inner.downcast_raw(id))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">A</span>, <span class="ident">B</span><span class="op">&gt;</span> <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Layered</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
-    <span class="ident">B</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
-    <span class="ident">S</span>: <span class="ident">Subscriber</span>,
+<span class="kw">impl</span>&lt;S, A, B&gt; Layer&lt;S&gt; <span class="kw">for </span>Layered&lt;A, B, S&gt;
+<span class="kw">where
+    </span>A: Layer&lt;S&gt;,
+    B: Layer&lt;S&gt;,
+    S: Subscriber,
 {
-    <span class="kw">fn</span> <span class="ident">on_layer</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">subscriber</span>: <span class="kw-2">&amp;mut</span> <span class="ident">S</span>) {
-        <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">on_layer</span>(<span class="ident">subscriber</span>);
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">on_layer</span>(<span class="ident">subscriber</span>);
+    <span class="kw">fn </span>on_layer(<span class="kw-2">&amp;mut </span><span class="self">self</span>, subscriber: <span class="kw-2">&amp;mut </span>S) {
+        <span class="self">self</span>.layer.on_layer(subscriber);
+        <span class="self">self</span>.inner.on_layer(subscriber);
     }
 
-    <span class="kw">fn</span> <span class="ident">register_callsite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>) -&gt; <span class="ident">Interest</span> {
-        <span class="self">self</span>.<span class="ident">pick_interest</span>(<span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">register_callsite</span>(<span class="ident">metadata</span>), <span class="op">|</span><span class="op">|</span> {
-            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">register_callsite</span>(<span class="ident">metadata</span>)
+    <span class="kw">fn </span>register_callsite(<span class="kw-2">&amp;</span><span class="self">self</span>, metadata: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Metadata&lt;<span class="lifetime">&#39;static</span>&gt;) -&gt; Interest {
+        <span class="self">self</span>.pick_interest(<span class="self">self</span>.layer.register_callsite(metadata), || {
+            <span class="self">self</span>.inner.register_callsite(metadata)
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">enabled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">metadata</span>: <span class="kw-2">&amp;</span><span class="ident">Metadata</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">enabled</span>(<span class="ident">metadata</span>, <span class="ident">ctx</span>.<span class="ident">clone</span>()) {
-            <span class="comment">// if the outer subscriber enables the callsite metadata, ask the inner layer.</span>
-            <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">enabled</span>(<span class="ident">metadata</span>, <span class="ident">ctx</span>)
-        } <span class="kw">else</span> {
-            <span class="comment">// otherwise, the callsite is disabled by this layer</span>
-            <span class="bool-val">false</span>
-        }
+    <span class="kw">fn </span>enabled(<span class="kw-2">&amp;</span><span class="self">self</span>, metadata: <span class="kw-2">&amp;</span>Metadata&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) -&gt; bool {
+        <span class="kw">if </span><span class="self">self</span>.layer.enabled(metadata, ctx.clone()) {
+            <span class="comment">// if the outer subscriber enables the callsite metadata, ask the inner layer.
+            </span><span class="self">self</span>.inner.enabled(metadata, ctx)
+        } <span class="kw">else </span>{
+            <span class="comment">// otherwise, the callsite is disabled by this layer
+            </span><span class="bool-val">false
+        </span>}
     }
 
-    <span class="kw">fn</span> <span class="ident">max_level_hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">pick_level_hint</span>(<span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">max_level_hint</span>(), <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">max_level_hint</span>())
+    <span class="kw">fn </span>max_level_hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;LevelFilter&gt; {
+        <span class="self">self</span>.pick_level_hint(<span class="self">self</span>.layer.max_level_hint(), <span class="self">self</span>.inner.max_level_hint())
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_new_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">attrs</span>: <span class="kw-2">&amp;</span><span class="ident">span::Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">on_new_span</span>(<span class="ident">attrs</span>, <span class="ident">id</span>, <span class="ident">ctx</span>.<span class="ident">clone</span>());
-        <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">on_new_span</span>(<span class="ident">attrs</span>, <span class="ident">id</span>, <span class="ident">ctx</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>on_new_span(<span class="kw-2">&amp;</span><span class="self">self</span>, attrs: <span class="kw-2">&amp;</span>span::Attributes&lt;<span class="lifetime">&#39;_</span>&gt;, id: <span class="kw-2">&amp;</span>span::Id, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="self">self</span>.inner.on_new_span(attrs, id, ctx.clone());
+        <span class="self">self</span>.layer.on_new_span(attrs, id, ctx);
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_record</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">span</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">values</span>: <span class="kw-2">&amp;</span><span class="ident">span::Record</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">on_record</span>(<span class="ident">span</span>, <span class="ident">values</span>, <span class="ident">ctx</span>.<span class="ident">clone</span>());
-        <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">on_record</span>(<span class="ident">span</span>, <span class="ident">values</span>, <span class="ident">ctx</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>on_record(<span class="kw-2">&amp;</span><span class="self">self</span>, span: <span class="kw-2">&amp;</span>span::Id, values: <span class="kw-2">&amp;</span>span::Record&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="self">self</span>.inner.on_record(span, values, ctx.clone());
+        <span class="self">self</span>.layer.on_record(span, values, ctx);
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_follows_from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">span</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">follows</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">on_follows_from</span>(<span class="ident">span</span>, <span class="ident">follows</span>, <span class="ident">ctx</span>.<span class="ident">clone</span>());
-        <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">on_follows_from</span>(<span class="ident">span</span>, <span class="ident">follows</span>, <span class="ident">ctx</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>on_follows_from(<span class="kw-2">&amp;</span><span class="self">self</span>, span: <span class="kw-2">&amp;</span>span::Id, follows: <span class="kw-2">&amp;</span>span::Id, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="self">self</span>.inner.on_follows_from(span, follows, ctx.clone());
+        <span class="self">self</span>.layer.on_follows_from(span, follows, ctx);
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">Event</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">on_event</span>(<span class="ident">event</span>, <span class="ident">ctx</span>.<span class="ident">clone</span>());
-        <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">on_event</span>(<span class="ident">event</span>, <span class="ident">ctx</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>on_event(<span class="kw-2">&amp;</span><span class="self">self</span>, event: <span class="kw-2">&amp;</span>Event&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="self">self</span>.inner.on_event(event, ctx.clone());
+        <span class="self">self</span>.layer.on_event(event, ctx);
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_enter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">on_enter</span>(<span class="ident">id</span>, <span class="ident">ctx</span>.<span class="ident">clone</span>());
-        <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">on_enter</span>(<span class="ident">id</span>, <span class="ident">ctx</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>on_enter(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="kw-2">&amp;</span>span::Id, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="self">self</span>.inner.on_enter(id, ctx.clone());
+        <span class="self">self</span>.layer.on_enter(id, ctx);
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_exit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">on_exit</span>(<span class="ident">id</span>, <span class="ident">ctx</span>.<span class="ident">clone</span>());
-        <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">on_exit</span>(<span class="ident">id</span>, <span class="ident">ctx</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>on_exit(<span class="kw-2">&amp;</span><span class="self">self</span>, id: <span class="kw-2">&amp;</span>span::Id, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="self">self</span>.inner.on_exit(id, ctx.clone());
+        <span class="self">self</span>.layer.on_exit(id, ctx);
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_close</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">on_close</span>(<span class="ident">id</span>.<span class="ident">clone</span>(), <span class="ident">ctx</span>.<span class="ident">clone</span>());
-        <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">on_close</span>(<span class="ident">id</span>, <span class="ident">ctx</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>on_close(<span class="kw-2">&amp;</span><span class="self">self</span>, id: span::Id, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="self">self</span>.inner.on_close(id.clone(), ctx.clone());
+        <span class="self">self</span>.layer.on_close(id, ctx);
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">on_id_change</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">old</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">new</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">on_id_change</span>(<span class="ident">old</span>, <span class="ident">new</span>, <span class="ident">ctx</span>.<span class="ident">clone</span>());
-        <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">on_id_change</span>(<span class="ident">old</span>, <span class="ident">new</span>, <span class="ident">ctx</span>);
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>on_id_change(<span class="kw-2">&amp;</span><span class="self">self</span>, old: <span class="kw-2">&amp;</span>span::Id, new: <span class="kw-2">&amp;</span>span::Id, ctx: Context&lt;<span class="lifetime">&#39;_</span>, S&gt;) {
+        <span class="self">self</span>.inner.on_id_change(old, new, ctx.clone());
+        <span class="self">self</span>.layer.on_id_change(old, new, ctx);
     }
 
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">downcast_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">TypeId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">*const</span> ()<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">id</span> {
-            <span class="comment">// If downcasting to `Self`, return a pointer to `self`.</span>
-            <span class="ident">id</span> <span class="kw">if</span> <span class="ident">id</span> <span class="op">==</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>() =&gt; <span class="prelude-val">Some</span>(<span class="self">self</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="kw-2">*const</span> ()),
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">unsafe fn </span>downcast_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, id: TypeId) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">*const </span>()&gt; {
+        <span class="kw">match </span>id {
+            <span class="comment">// If downcasting to `Self`, return a pointer to `self`.
+            </span>id <span class="kw">if </span>id == TypeId::of::&lt;<span class="self">Self</span>&gt;() =&gt; <span class="prelude-val">Some</span>(<span class="self">self </span><span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span><span class="kw-2">*const </span>()),
 
-            <span class="comment">// Oh, we&#39;re looking for per-layer filters!</span>
-            <span class="comment">//</span>
-            <span class="comment">// This should only happen if we are inside of another `Layered`,</span>
-            <span class="comment">// and it&#39;s trying to determine how it should combine `Interest`s</span>
-            <span class="comment">// and max level hints.</span>
-            <span class="comment">//</span>
-            <span class="comment">// In that case, this `Layered` should be considered to be</span>
-            <span class="comment">// &quot;per-layer filtered&quot; if *both* the outer layer and the inner</span>
-            <span class="comment">// layer/subscriber have per-layer filters. Otherwise, this `Layered</span>
-            <span class="comment">// should *not* be considered per-layer filtered (even if one or the</span>
-            <span class="comment">// other has per layer filters). If only one `Layer` is per-layer</span>
-            <span class="comment">// filtered, *this* `Layered` will handle aggregating the `Interest`</span>
-            <span class="comment">// and level hints on behalf of its children, returning the</span>
-            <span class="comment">// aggregate (which is the value from the &amp;non-per-layer-filtered*</span>
-            <span class="comment">// child).</span>
-            <span class="comment">//</span>
-            <span class="comment">// Yes, this rule *is* slightly counter-intuitive, but it&#39;s</span>
-            <span class="comment">// necessary due to a weird edge case that can occur when two</span>
-            <span class="comment">// `Layered`s where one side is per-layer filtered and the other</span>
-            <span class="comment">// isn&#39;t are `Layered` together to form a tree. If we didn&#39;t have</span>
-            <span class="comment">// this rule, we would actually end up *ignoring* `Interest`s from</span>
-            <span class="comment">// the non-per-layer-filtered layers, since both branches would</span>
-            <span class="comment">// claim to have PLF.</span>
-            <span class="comment">//</span>
-            <span class="comment">// If you don&#39;t understand this...that&#39;s fine, just don&#39;t mess with</span>
-            <span class="comment">// it. :)</span>
-            <span class="ident">id</span> <span class="kw">if</span> <span class="ident">filter::is_plf_downcast_marker</span>(<span class="ident">id</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">layer</span>.<span class="ident">downcast_raw</span>(<span class="ident">id</span>).<span class="ident">and</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">downcast_raw</span>(<span class="ident">id</span>))
+            <span class="comment">// Oh, we&#39;re looking for per-layer filters!
+            //
+            // This should only happen if we are inside of another `Layered`,
+            // and it&#39;s trying to determine how it should combine `Interest`s
+            // and max level hints.
+            //
+            // In that case, this `Layered` should be considered to be
+            // &quot;per-layer filtered&quot; if *both* the outer layer and the inner
+            // layer/subscriber have per-layer filters. Otherwise, this `Layered
+            // should *not* be considered per-layer filtered (even if one or the
+            // other has per layer filters). If only one `Layer` is per-layer
+            // filtered, *this* `Layered` will handle aggregating the `Interest`
+            // and level hints on behalf of its children, returning the
+            // aggregate (which is the value from the &amp;non-per-layer-filtered*
+            // child).
+            //
+            // Yes, this rule *is* slightly counter-intuitive, but it&#39;s
+            // necessary due to a weird edge case that can occur when two
+            // `Layered`s where one side is per-layer filtered and the other
+            // isn&#39;t are `Layered` together to form a tree. If we didn&#39;t have
+            // this rule, we would actually end up *ignoring* `Interest`s from
+            // the non-per-layer-filtered layers, since both branches would
+            // claim to have PLF.
+            //
+            // If you don&#39;t understand this...that&#39;s fine, just don&#39;t mess with
+            // it. :)
+            </span>id <span class="kw">if </span>filter::is_plf_downcast_marker(id) =&gt; {
+                <span class="self">self</span>.layer.downcast_raw(id).and(<span class="self">self</span>.inner.downcast_raw(id))
             }
 
-            <span class="comment">// Otherwise, try to downcast both branches normally...</span>
-            <span class="kw">_</span> =&gt; <span class="self">self</span>
-                .<span class="ident">layer</span>
-                .<span class="ident">downcast_raw</span>(<span class="ident">id</span>)
-                .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">downcast_raw</span>(<span class="ident">id</span>)),
+            <span class="comment">// Otherwise, try to downcast both branches normally...
+            </span><span class="kw">_ </span>=&gt; <span class="self">self
+                </span>.layer
+                .downcast_raw(id)
+                .or_else(|| <span class="self">self</span>.inner.downcast_raw(id)),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">LookupSpan</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Layered</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Subscriber</span> <span class="op">+</span> <span class="ident">LookupSpan</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, L, S&gt; LookupSpan&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>Layered&lt;L, S&gt;
+<span class="kw">where
+    </span>S: Subscriber + LookupSpan&lt;<span class="lifetime">&#39;a</span>&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Data</span> <span class="op">=</span> <span class="ident">S::Data</span>;
+    <span class="kw">type </span>Data = S::Data;
 
-    <span class="kw">fn</span> <span class="ident">span_data</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">span::Id</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Data</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">span_data</span>(<span class="ident">id</span>)
+    <span class="kw">fn </span>span_data(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, id: <span class="kw-2">&amp;</span>span::Id) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Data&gt; {
+        <span class="self">self</span>.inner.span_data(id)
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">register_filter</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">FilterId</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">register_filter</span>()
+    <span class="attribute">#[cfg(all(feature = <span class="string">&quot;registry&quot;</span>, feature = <span class="string">&quot;std&quot;</span>))]
+    </span><span class="kw">fn </span>register_filter(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; FilterId {
+        <span class="self">self</span>.inner.register_filter()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Layered</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Subscriber</span>,
+<span class="kw">impl</span>&lt;L, S&gt; Layered&lt;L, S&gt;
+<span class="kw">where
+    </span>S: Subscriber,
 {
-    <span class="kw">fn</span> <span class="ident">ctx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-        <span class="ident">Context::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>)
+    <span class="kw">fn </span>ctx(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Context&lt;<span class="lifetime">&#39;_</span>, S&gt; {
+        Context::new(<span class="kw-2">&amp;</span><span class="self">self</span>.inner)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Layered</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Layer</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
-    <span class="ident">S</span>: <span class="ident">Subscriber</span>,
+<span class="kw">impl</span>&lt;A, B, S&gt; Layered&lt;A, B, S&gt;
+<span class="kw">where
+    </span>A: Layer&lt;S&gt;,
+    S: Subscriber,
 {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">layer</span>: <span class="ident">A</span>, <span class="ident">inner</span>: <span class="ident">B</span>, <span class="ident">inner_has_layer_filter</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-        <span class="kw">let</span> <span class="ident">inner_is_registry</span> <span class="op">=</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::registry::Registry</span><span class="op">&gt;</span>();
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new(layer: A, inner: B, inner_has_layer_filter: bool) -&gt; <span class="self">Self </span>{
+        <span class="attribute">#[cfg(all(feature = <span class="string">&quot;registry&quot;</span>, feature = <span class="string">&quot;std&quot;</span>))]
+        </span><span class="kw">let </span>inner_is_registry = TypeId::of::&lt;S&gt;() == TypeId::of::&lt;<span class="kw">crate</span>::registry::Registry&gt;();
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)))]</span>
-        <span class="kw">let</span> <span class="ident">inner_is_registry</span> <span class="op">=</span> <span class="bool-val">false</span>;
+        <span class="attribute">#[cfg(not(all(feature = <span class="string">&quot;registry&quot;</span>, feature = <span class="string">&quot;std&quot;</span>)))]
+        </span><span class="kw">let </span>inner_is_registry = <span class="bool-val">false</span>;
 
-        <span class="kw">let</span> <span class="ident">inner_has_layer_filter</span> <span class="op">=</span> <span class="ident">inner_has_layer_filter</span> <span class="op">|</span><span class="op">|</span> <span class="ident">inner_is_registry</span>;
-        <span class="kw">let</span> <span class="ident">has_layer_filter</span> <span class="op">=</span> <span class="ident">filter::layer_has_plf</span>(<span class="kw-2">&amp;</span><span class="ident">layer</span>);
-        <span class="self">Self</span> {
-            <span class="ident">layer</span>,
-            <span class="ident">inner</span>,
-            <span class="ident">has_layer_filter</span>,
-            <span class="ident">inner_has_layer_filter</span>,
-            <span class="ident">inner_is_registry</span>,
-            <span class="ident">_s</span>: <span class="ident">PhantomData</span>,
+        <span class="kw">let </span>inner_has_layer_filter = inner_has_layer_filter || inner_is_registry;
+        <span class="kw">let </span>has_layer_filter = filter::layer_has_plf(<span class="kw-2">&amp;</span>layer);
+        <span class="self">Self </span>{
+            layer,
+            inner,
+            has_layer_filter,
+            inner_has_layer_filter,
+            inner_is_registry,
+            _s: PhantomData,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">pick_interest</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">outer</span>: <span class="ident">Interest</span>, <span class="ident">inner</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>() -&gt; <span class="ident">Interest</span>) -&gt; <span class="ident">Interest</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">has_layer_filter</span> {
-            <span class="kw">return</span> <span class="ident">inner</span>();
+    <span class="kw">fn </span>pick_interest(<span class="kw-2">&amp;</span><span class="self">self</span>, outer: Interest, inner: <span class="kw">impl </span>FnOnce() -&gt; Interest) -&gt; Interest {
+        <span class="kw">if </span><span class="self">self</span>.has_layer_filter {
+            <span class="kw">return </span>inner();
         }
 
-        <span class="comment">// If the outer layer has disabled the callsite, return now so that</span>
-        <span class="comment">// the inner layer/subscriber doesn&#39;t get its hopes up.</span>
-        <span class="kw">if</span> <span class="ident">outer</span>.<span class="ident">is_never</span>() {
-            <span class="comment">// If per-layer filters are in use, and we are short-circuiting</span>
-            <span class="comment">// (rather than calling into the inner type), clear the current</span>
-            <span class="comment">// per-layer filter interest state.</span>
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>)]</span>
-            <span class="ident">drop</span>(<span class="ident">filter::FilterState::take_interest</span>());
+        <span class="comment">// If the outer layer has disabled the callsite, return now so that
+        // the inner layer/subscriber doesn&#39;t get its hopes up.
+        </span><span class="kw">if </span>outer.is_never() {
+            <span class="comment">// If per-layer filters are in use, and we are short-circuiting
+            // (rather than calling into the inner type), clear the current
+            // per-layer filter interest state.
+            </span><span class="attribute">#[cfg(feature = <span class="string">&quot;registry&quot;</span>)]
+            </span>drop(filter::FilterState::take_interest());
 
-            <span class="kw">return</span> <span class="ident">outer</span>;
+            <span class="kw">return </span>outer;
         }
 
-        <span class="comment">// The `inner` closure will call `inner.register_callsite()`. We do this</span>
-        <span class="comment">// before the `if` statement to  ensure that the inner subscriber is</span>
-        <span class="comment">// informed that the callsite exists regardless of the outer layer&#39;s</span>
-        <span class="comment">// filtering decision.</span>
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="ident">inner</span>();
-        <span class="kw">if</span> <span class="ident">outer</span>.<span class="ident">is_sometimes</span>() {
-            <span class="comment">// if this interest is &quot;sometimes&quot;, return &quot;sometimes&quot; to ensure that</span>
-            <span class="comment">// filters are reevaluated.</span>
-            <span class="kw">return</span> <span class="ident">outer</span>;
+        <span class="comment">// The `inner` closure will call `inner.register_callsite()`. We do this
+        // before the `if` statement to  ensure that the inner subscriber is
+        // informed that the callsite exists regardless of the outer layer&#39;s
+        // filtering decision.
+        </span><span class="kw">let </span>inner = inner();
+        <span class="kw">if </span>outer.is_sometimes() {
+            <span class="comment">// if this interest is &quot;sometimes&quot;, return &quot;sometimes&quot; to ensure that
+            // filters are reevaluated.
+            </span><span class="kw">return </span>outer;
         }
 
-        <span class="comment">// If there is a per-layer filter in the `inner` stack, and it returns</span>
-        <span class="comment">// `never`, change the interest to `sometimes`, because the `outer`</span>
-        <span class="comment">// layer didn&#39;t return `never`. This means that _some_ layer still wants</span>
-        <span class="comment">// to see that callsite, even though the inner stack&#39;s per-layer filter</span>
-        <span class="comment">// didn&#39;t want it. Therefore, returning `sometimes` will ensure</span>
-        <span class="comment">// `enabled` is called so that the per-layer filter can skip that</span>
-        <span class="comment">// span/event, while the `outer` layer still gets to see it.</span>
-        <span class="kw">if</span> <span class="ident">inner</span>.<span class="ident">is_never</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">inner_has_layer_filter</span> {
-            <span class="kw">return</span> <span class="ident">Interest::sometimes</span>();
+        <span class="comment">// If there is a per-layer filter in the `inner` stack, and it returns
+        // `never`, change the interest to `sometimes`, because the `outer`
+        // layer didn&#39;t return `never`. This means that _some_ layer still wants
+        // to see that callsite, even though the inner stack&#39;s per-layer filter
+        // didn&#39;t want it. Therefore, returning `sometimes` will ensure
+        // `enabled` is called so that the per-layer filter can skip that
+        // span/event, while the `outer` layer still gets to see it.
+        </span><span class="kw">if </span>inner.is_never() &amp;&amp; <span class="self">self</span>.inner_has_layer_filter {
+            <span class="kw">return </span>Interest::sometimes();
         }
 
-        <span class="comment">// otherwise, allow the inner subscriber or collector to weigh in.</span>
-        <span class="ident">inner</span>
+        <span class="comment">// otherwise, allow the inner subscriber or collector to weigh in.
+        </span>inner
     }
 
-    <span class="kw">fn</span> <span class="ident">pick_level_hint</span>(
+    <span class="kw">fn </span>pick_level_hint(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">outer_hint</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span>,
-        <span class="ident">inner_hint</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">LevelFilter</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">inner_is_registry</span> {
-            <span class="kw">return</span> <span class="ident">outer_hint</span>;
+        outer_hint: <span class="prelude-ty">Option</span>&lt;LevelFilter&gt;,
+        inner_hint: <span class="prelude-ty">Option</span>&lt;LevelFilter&gt;,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;LevelFilter&gt; {
+        <span class="kw">if </span><span class="self">self</span>.inner_is_registry {
+            <span class="kw">return </span>outer_hint;
         }
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">has_layer_filter</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">inner_has_layer_filter</span> {
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">cmp::max</span>(<span class="ident">outer_hint</span><span class="question-mark">?</span>, <span class="ident">inner_hint</span><span class="question-mark">?</span>));
+        <span class="kw">if </span><span class="self">self</span>.has_layer_filter &amp;&amp; <span class="self">self</span>.inner_has_layer_filter {
+            <span class="kw">return </span><span class="prelude-val">Some</span>(cmp::max(outer_hint<span class="question-mark">?</span>, inner_hint<span class="question-mark">?</span>));
         }
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">has_layer_filter</span> <span class="op">&amp;&amp;</span> <span class="ident">inner_hint</span>.<span class="ident">is_none</span>() {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+        <span class="kw">if </span><span class="self">self</span>.has_layer_filter &amp;&amp; inner_hint.is_none() {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">inner_has_layer_filter</span> <span class="op">&amp;&amp;</span> <span class="ident">outer_hint</span>.<span class="ident">is_none</span>() {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+        <span class="kw">if </span><span class="self">self</span>.inner_has_layer_filter &amp;&amp; outer_hint.is_none() {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
 
-        <span class="ident">cmp::max</span>(<span class="ident">outer_hint</span>, <span class="ident">inner_hint</span>)
+        cmp::max(outer_hint, inner_hint)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Layered</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">fmt::Debug</span>,
-    <span class="ident">B</span>: <span class="ident">fmt::Debug</span>,
+<span class="kw">impl</span>&lt;A, B, S&gt; fmt::Debug <span class="kw">for </span>Layered&lt;A, B, S&gt;
+<span class="kw">where
+    </span>A: fmt::Debug,
+    B: fmt::Debug,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-        <span class="kw">let</span> <span class="ident">alt</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">alternate</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Layered&quot;</span>);
-        <span class="comment">// These additional fields are more verbose and usually only necessary</span>
-        <span class="comment">// for internal debugging purposes, so only print them if alternate mode</span>
-        <span class="comment">// is enabled.</span>
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="attribute">#[cfg(all(feature = <span class="string">&quot;registry&quot;</span>, feature = <span class="string">&quot;std&quot;</span>))]
+        </span><span class="kw">let </span>alt = f.alternate();
+        <span class="kw">let </span><span class="kw-2">mut </span>s = f.debug_struct(<span class="string">&quot;Layered&quot;</span>);
+        <span class="comment">// These additional fields are more verbose and usually only necessary
+        // for internal debugging purposes, so only print them if alternate mode
+        // is enabled.
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-        {
-            <span class="kw">if</span> <span class="ident">alt</span> {
-                <span class="ident">s</span>.<span class="ident">field</span>(<span class="string">&quot;inner_is_registry&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner_is_registry</span>)
-                    .<span class="ident">field</span>(<span class="string">&quot;has_layer_filter&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">has_layer_filter</span>)
-                    .<span class="ident">field</span>(<span class="string">&quot;inner_has_layer_filter&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner_has_layer_filter</span>);
+        </span><span class="attribute">#[cfg(all(feature = <span class="string">&quot;registry&quot;</span>, feature = <span class="string">&quot;std&quot;</span>))]
+        </span>{
+            <span class="kw">if </span>alt {
+                s.field(<span class="string">&quot;inner_is_registry&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.inner_is_registry)
+                    .field(<span class="string">&quot;has_layer_filter&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.has_layer_filter)
+                    .field(<span class="string">&quot;inner_has_layer_filter&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.inner_has_layer_filter);
             }
         }
 
-        <span class="ident">s</span>.<span class="ident">field</span>(<span class="string">&quot;layer&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">layer</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;inner&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>)
-            .<span class="ident">finish</span>()
+        s.field(<span class="string">&quot;layer&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.layer)
+            .field(<span class="string">&quot;inner&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.inner)
+            .finish()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

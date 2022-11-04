@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/clap-2.34.0/src/completions/fish.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>fish.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../clap/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/clap-2.34.0/src/completions/fish.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>fish.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../clap/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -101,108 +101,108 @@
 <span id="101">101</span>
 <span id="102">102</span>
 <span id="103">103</span>
-</pre><pre class="rust"><code><span class="comment">// Std</span>
-<span class="kw">use</span> <span class="ident">std::io::Write</span>;
+</pre><pre class="rust"><code><span class="comment">// Std
+</span><span class="kw">use </span>std::io::Write;
 
-<span class="comment">// Internal</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::app::parser::Parser</span>;
+<span class="comment">// Internal
+</span><span class="kw">use </span><span class="kw">crate</span>::app::parser::Parser;
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FishGen</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>,
+<span class="kw">pub struct </span>FishGen&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;
+<span class="kw">where
+    </span><span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;b</span>,
 {
-    <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span>,
+    p: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>Parser&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">FishGen</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">FishGen</span> { <span class="ident">p</span> }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; FishGen&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
+    <span class="kw">pub fn </span>new(p: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>Parser&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt;) -&gt; <span class="self">Self </span>{
+        FishGen { p }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate_to</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">Write</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>) {
-        <span class="kw">let</span> <span class="ident">command</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">p</span>.<span class="ident">meta</span>.<span class="ident">bin_name</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="ident">String::new</span>();
-        <span class="ident">gen_fish_inner</span>(<span class="ident">command</span>, <span class="self">self</span>, <span class="ident">command</span>, <span class="kw-2">&amp;mut</span> <span class="ident">buffer</span>);
-        <span class="macro">w!</span>(<span class="ident">buf</span>, <span class="ident">buffer</span>.<span class="ident">as_bytes</span>());
+    <span class="kw">pub fn </span>generate_to&lt;W: Write&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>W) {
+        <span class="kw">let </span>command = <span class="self">self</span>.p.meta.bin_name.as_ref().unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>buffer = String::new();
+        gen_fish_inner(command, <span class="self">self</span>, command, <span class="kw-2">&amp;mut </span>buffer);
+        <span class="macro">w!</span>(buf, buffer.as_bytes());
     }
 }
 
-<span class="comment">// Escape string inside single quotes</span>
-<span class="kw">fn</span> <span class="ident">escape_string</span>(<span class="ident">string</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-    <span class="ident">string</span>.<span class="ident">replace</span>(<span class="string">&quot;\\&quot;</span>, <span class="string">&quot;\\\\&quot;</span>).<span class="ident">replace</span>(<span class="string">&quot;&#39;&quot;</span>, <span class="string">&quot;\\&#39;&quot;</span>)
+<span class="comment">// Escape string inside single quotes
+</span><span class="kw">fn </span>escape_string(string: <span class="kw-2">&amp;</span>str) -&gt; String {
+    string.replace(<span class="string">&quot;\\&quot;</span>, <span class="string">&quot;\\\\&quot;</span>).replace(<span class="string">&quot;&#39;&quot;</span>, <span class="string">&quot;\\&#39;&quot;</span>)
 }
 
-<span class="kw">fn</span> <span class="ident">gen_fish_inner</span>(<span class="ident">root_command</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">comp_gen</span>: <span class="kw-2">&amp;</span><span class="ident">FishGen</span>, <span class="ident">subcommand</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">buffer</span>: <span class="kw-2">&amp;mut</span> <span class="ident">String</span>) {
+<span class="kw">fn </span>gen_fish_inner(root_command: <span class="kw-2">&amp;</span>str, comp_gen: <span class="kw-2">&amp;</span>FishGen, subcommand: <span class="kw-2">&amp;</span>str, buffer: <span class="kw-2">&amp;mut </span>String) {
     <span class="macro">debugln!</span>(<span class="string">&quot;FishGen::gen_fish_inner;&quot;</span>);
-    <span class="comment">// example :</span>
-    <span class="comment">//</span>
-    <span class="comment">// complete</span>
-    <span class="comment">//      -c {command}</span>
-    <span class="comment">//      -d &quot;{description}&quot;</span>
-    <span class="comment">//      -s {short}</span>
-    <span class="comment">//      -l {long}</span>
-    <span class="comment">//      -a &quot;{possible_arguments}&quot;</span>
-    <span class="comment">//      -r # if require parameter</span>
-    <span class="comment">//      -f # don&#39;t use file completion</span>
-    <span class="comment">//      -n &quot;__fish_use_subcommand&quot;               # complete for command &quot;myprog&quot;</span>
-    <span class="comment">//      -n &quot;__fish_seen_subcommand_from subcmd1&quot; # complete for command &quot;myprog subcmd1&quot;</span>
+    <span class="comment">// example :
+    //
+    // complete
+    //      -c {command}
+    //      -d &quot;{description}&quot;
+    //      -s {short}
+    //      -l {long}
+    //      -a &quot;{possible_arguments}&quot;
+    //      -r # if require parameter
+    //      -f # don&#39;t use file completion
+    //      -n &quot;__fish_use_subcommand&quot;               # complete for command &quot;myprog&quot;
+    //      -n &quot;__fish_seen_subcommand_from subcmd1&quot; # complete for command &quot;myprog subcmd1&quot;
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">basic_template</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;complete -c {} -n &quot;</span>, <span class="ident">root_command</span>);
-    <span class="kw">if</span> <span class="ident">root_command</span> <span class="op">==</span> <span class="ident">subcommand</span> {
-        <span class="ident">basic_template</span>.<span class="ident">push_str</span>(<span class="string">&quot;\&quot;__fish_use_subcommand\&quot;&quot;</span>);
-    } <span class="kw">else</span> {
-        <span class="ident">basic_template</span>.<span class="ident">push_str</span>(<span class="macro">format!</span>(<span class="string">&quot;\&quot;__fish_seen_subcommand_from {}\&quot;&quot;</span>, <span class="ident">subcommand</span>).<span class="ident">as_str</span>());
+    </span><span class="kw">let </span><span class="kw-2">mut </span>basic_template = <span class="macro">format!</span>(<span class="string">&quot;complete -c {} -n &quot;</span>, root_command);
+    <span class="kw">if </span>root_command == subcommand {
+        basic_template.push_str(<span class="string">&quot;\&quot;__fish_use_subcommand\&quot;&quot;</span>);
+    } <span class="kw">else </span>{
+        basic_template.push_str(<span class="macro">format!</span>(<span class="string">&quot;\&quot;__fish_seen_subcommand_from {}\&quot;&quot;</span>, subcommand).as_str());
     }
 
-    <span class="kw">for</span> <span class="ident">option</span> <span class="kw">in</span> <span class="ident">comp_gen</span>.<span class="ident">p</span>.<span class="ident">opts</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">template</span> <span class="op">=</span> <span class="ident">basic_template</span>.<span class="ident">clone</span>();
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">data</span>) <span class="op">=</span> <span class="ident">option</span>.<span class="ident">s</span>.<span class="ident">short</span> {
-            <span class="ident">template</span>.<span class="ident">push_str</span>(<span class="macro">format!</span>(<span class="string">&quot; -s {}&quot;</span>, <span class="ident">data</span>).<span class="ident">as_str</span>());
+    <span class="kw">for </span>option <span class="kw">in </span>comp_gen.p.opts() {
+        <span class="kw">let </span><span class="kw-2">mut </span>template = basic_template.clone();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(data) = option.s.short {
+            template.push_str(<span class="macro">format!</span>(<span class="string">&quot; -s {}&quot;</span>, data).as_str());
         }
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">data</span>) <span class="op">=</span> <span class="ident">option</span>.<span class="ident">s</span>.<span class="ident">long</span> {
-            <span class="ident">template</span>.<span class="ident">push_str</span>(<span class="macro">format!</span>(<span class="string">&quot; -l {}&quot;</span>, <span class="ident">data</span>).<span class="ident">as_str</span>());
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(data) = option.s.long {
+            template.push_str(<span class="macro">format!</span>(<span class="string">&quot; -l {}&quot;</span>, data).as_str());
         }
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">data</span>) <span class="op">=</span> <span class="ident">option</span>.<span class="ident">b</span>.<span class="ident">help</span> {
-            <span class="ident">template</span>.<span class="ident">push_str</span>(<span class="macro">format!</span>(<span class="string">&quot; -d &#39;{}&#39;&quot;</span>, <span class="ident">escape_string</span>(<span class="ident">data</span>)).<span class="ident">as_str</span>());
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(data) = option.b.help {
+            template.push_str(<span class="macro">format!</span>(<span class="string">&quot; -d &#39;{}&#39;&quot;</span>, escape_string(data)).as_str());
         }
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">data</span>) <span class="op">=</span> <span class="ident">option</span>.<span class="ident">v</span>.<span class="ident">possible_vals</span> {
-            <span class="ident">template</span>.<span class="ident">push_str</span>(<span class="macro">format!</span>(<span class="string">&quot; -r -f -a \&quot;{}\&quot;&quot;</span>, <span class="ident">data</span>.<span class="ident">join</span>(<span class="string">&quot; &quot;</span>)).<span class="ident">as_str</span>());
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>data) = option.v.possible_vals {
+            template.push_str(<span class="macro">format!</span>(<span class="string">&quot; -r -f -a \&quot;{}\&quot;&quot;</span>, data.join(<span class="string">&quot; &quot;</span>)).as_str());
         }
-        <span class="ident">buffer</span>.<span class="ident">push_str</span>(<span class="ident">template</span>.<span class="ident">as_str</span>());
-        <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
+        buffer.push_str(template.as_str());
+        buffer.push(<span class="string">&#39;\n&#39;</span>);
     }
 
-    <span class="kw">for</span> <span class="ident">flag</span> <span class="kw">in</span> <span class="ident">comp_gen</span>.<span class="ident">p</span>.<span class="ident">flags</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">template</span> <span class="op">=</span> <span class="ident">basic_template</span>.<span class="ident">clone</span>();
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">data</span>) <span class="op">=</span> <span class="ident">flag</span>.<span class="ident">s</span>.<span class="ident">short</span> {
-            <span class="ident">template</span>.<span class="ident">push_str</span>(<span class="macro">format!</span>(<span class="string">&quot; -s {}&quot;</span>, <span class="ident">data</span>).<span class="ident">as_str</span>());
+    <span class="kw">for </span>flag <span class="kw">in </span>comp_gen.p.flags() {
+        <span class="kw">let </span><span class="kw-2">mut </span>template = basic_template.clone();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(data) = flag.s.short {
+            template.push_str(<span class="macro">format!</span>(<span class="string">&quot; -s {}&quot;</span>, data).as_str());
         }
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">data</span>) <span class="op">=</span> <span class="ident">flag</span>.<span class="ident">s</span>.<span class="ident">long</span> {
-            <span class="ident">template</span>.<span class="ident">push_str</span>(<span class="macro">format!</span>(<span class="string">&quot; -l {}&quot;</span>, <span class="ident">data</span>).<span class="ident">as_str</span>());
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(data) = flag.s.long {
+            template.push_str(<span class="macro">format!</span>(<span class="string">&quot; -l {}&quot;</span>, data).as_str());
         }
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">data</span>) <span class="op">=</span> <span class="ident">flag</span>.<span class="ident">b</span>.<span class="ident">help</span> {
-            <span class="ident">template</span>.<span class="ident">push_str</span>(<span class="macro">format!</span>(<span class="string">&quot; -d &#39;{}&#39;&quot;</span>, <span class="ident">escape_string</span>(<span class="ident">data</span>)).<span class="ident">as_str</span>());
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(data) = flag.b.help {
+            template.push_str(<span class="macro">format!</span>(<span class="string">&quot; -d &#39;{}&#39;&quot;</span>, escape_string(data)).as_str());
         }
-        <span class="ident">buffer</span>.<span class="ident">push_str</span>(<span class="ident">template</span>.<span class="ident">as_str</span>());
-        <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
+        buffer.push_str(template.as_str());
+        buffer.push(<span class="string">&#39;\n&#39;</span>);
     }
 
-    <span class="kw">for</span> <span class="ident">subcommand</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">comp_gen</span>.<span class="ident">p</span>.<span class="ident">subcommands</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">template</span> <span class="op">=</span> <span class="ident">basic_template</span>.<span class="ident">clone</span>();
-        <span class="ident">template</span>.<span class="ident">push_str</span>(<span class="string">&quot; -f&quot;</span>);
-        <span class="ident">template</span>.<span class="ident">push_str</span>(<span class="macro">format!</span>(<span class="string">&quot; -a \&quot;{}\&quot;&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">subcommand</span>.<span class="ident">p</span>.<span class="ident">meta</span>.<span class="ident">name</span>).<span class="ident">as_str</span>());
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">data</span>) <span class="op">=</span> <span class="ident">subcommand</span>.<span class="ident">p</span>.<span class="ident">meta</span>.<span class="ident">about</span> {
-            <span class="ident">template</span>.<span class="ident">push_str</span>(<span class="macro">format!</span>(<span class="string">&quot; -d &#39;{}&#39;&quot;</span>, <span class="ident">escape_string</span>(<span class="ident">data</span>)).<span class="ident">as_str</span>())
+    <span class="kw">for </span>subcommand <span class="kw">in </span><span class="kw-2">&amp;</span>comp_gen.p.subcommands {
+        <span class="kw">let </span><span class="kw-2">mut </span>template = basic_template.clone();
+        template.push_str(<span class="string">&quot; -f&quot;</span>);
+        template.push_str(<span class="macro">format!</span>(<span class="string">&quot; -a \&quot;{}\&quot;&quot;</span>, <span class="kw-2">&amp;</span>subcommand.p.meta.name).as_str());
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(data) = subcommand.p.meta.about {
+            template.push_str(<span class="macro">format!</span>(<span class="string">&quot; -d &#39;{}&#39;&quot;</span>, escape_string(data)).as_str())
         }
-        <span class="ident">buffer</span>.<span class="ident">push_str</span>(<span class="ident">template</span>.<span class="ident">as_str</span>());
-        <span class="ident">buffer</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
+        buffer.push_str(template.as_str());
+        buffer.push(<span class="string">&#39;\n&#39;</span>);
     }
 
-    <span class="comment">// generate options of subcommands</span>
-    <span class="kw">for</span> <span class="ident">subcommand</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">comp_gen</span>.<span class="ident">p</span>.<span class="ident">subcommands</span> {
-        <span class="kw">let</span> <span class="ident">sub_comp_gen</span> <span class="op">=</span> <span class="ident">FishGen::new</span>(<span class="kw-2">&amp;</span><span class="ident">subcommand</span>.<span class="ident">p</span>);
-        <span class="ident">gen_fish_inner</span>(<span class="ident">root_command</span>, <span class="kw-2">&amp;</span><span class="ident">sub_comp_gen</span>, <span class="kw-2">&amp;</span><span class="ident">subcommand</span>.<span class="ident">to_string</span>(), <span class="ident">buffer</span>);
+    <span class="comment">// generate options of subcommands
+    </span><span class="kw">for </span>subcommand <span class="kw">in </span><span class="kw-2">&amp;</span>comp_gen.p.subcommands {
+        <span class="kw">let </span>sub_comp_gen = FishGen::new(<span class="kw-2">&amp;</span>subcommand.p);
+        gen_fish_inner(root_command, <span class="kw-2">&amp;</span>sub_comp_gen, <span class="kw-2">&amp;</span>subcommand.to_string(), buffer);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="clap" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="clap" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

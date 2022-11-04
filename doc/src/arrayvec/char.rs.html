@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.7.2/src/char.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>char.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../arrayvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../arrayvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../arrayvec/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/arrayvec-0.7.2/src/char.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>char.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../arrayvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../arrayvec/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../arrayvec/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -90,97 +90,97 @@
 <span id="90">90</span>
 <span id="91">91</span>
 <span id="92">92</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2012-2016 The Rust Project Developers. See the COPYRIGHT</span>
-<span class="comment">// file at the top-level directory of this distribution and at</span>
-<span class="comment">// http://rust-lang.org/COPYRIGHT.</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license</span>
-<span class="comment">// &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. This file may not be copied, modified, or distributed</span>
-<span class="comment">// except according to those terms.</span>
-<span class="comment">//</span>
-<span class="comment">// Original authors: alexchrichton, bluss</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2012-2016 The Rust Project Developers. See the COPYRIGHT
+// file at the top-level directory of this distribution and at
+// http://rust-lang.org/COPYRIGHT.
+//
+// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+// http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license
+// &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. This file may not be copied, modified, or distributed
+// except according to those terms.
+//
+// Original authors: alexchrichton, bluss
 
-<span class="comment">// UTF-8 ranges and tags for encoding characters</span>
-<span class="kw">const</span> <span class="ident">TAG_CONT</span>: <span class="ident">u8</span>    <span class="op">=</span> <span class="number">0b1000_0000</span>;
-<span class="kw">const</span> <span class="ident">TAG_TWO_B</span>: <span class="ident">u8</span>   <span class="op">=</span> <span class="number">0b1100_0000</span>;
-<span class="kw">const</span> <span class="ident">TAG_THREE_B</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">0b1110_0000</span>;
-<span class="kw">const</span> <span class="ident">TAG_FOUR_B</span>: <span class="ident">u8</span>  <span class="op">=</span> <span class="number">0b1111_0000</span>;
-<span class="kw">const</span> <span class="ident">MAX_ONE_B</span>: <span class="ident">u32</span>   <span class="op">=</span>     <span class="number">0x80</span>;
-<span class="kw">const</span> <span class="ident">MAX_TWO_B</span>: <span class="ident">u32</span>   <span class="op">=</span>    <span class="number">0x800</span>;
-<span class="kw">const</span> <span class="ident">MAX_THREE_B</span>: <span class="ident">u32</span> <span class="op">=</span>  <span class="number">0x10000</span>;
+// UTF-8 ranges and tags for encoding characters
+</span><span class="kw">const </span>TAG_CONT: u8    = <span class="number">0b1000_0000</span>;
+<span class="kw">const </span>TAG_TWO_B: u8   = <span class="number">0b1100_0000</span>;
+<span class="kw">const </span>TAG_THREE_B: u8 = <span class="number">0b1110_0000</span>;
+<span class="kw">const </span>TAG_FOUR_B: u8  = <span class="number">0b1111_0000</span>;
+<span class="kw">const </span>MAX_ONE_B: u32   =     <span class="number">0x80</span>;
+<span class="kw">const </span>MAX_TWO_B: u32   =    <span class="number">0x800</span>;
+<span class="kw">const </span>MAX_THREE_B: u32 =  <span class="number">0x10000</span>;
 
-<span class="doccomment">/// Placeholder</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EncodeUtf8Error</span>;
+<span class="doccomment">/// Placeholder
+</span><span class="kw">pub struct </span>EncodeUtf8Error;
 
-<span class="doccomment">/// Encode a char into buf using UTF-8.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// On success, return the byte length of the encoding (1, 2, 3 or 4).&lt;br&gt;</span>
-<span class="doccomment">/// On error, return `EncodeUtf8Error` if the buffer was too short for the char.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Safety: `ptr` must be writable for `len` bytes.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">encode_utf8</span>(<span class="ident">ch</span>: <span class="ident">char</span>, <span class="ident">ptr</span>: <span class="kw-2">*mut</span> <span class="ident">u8</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">EncodeUtf8Error</span><span class="op">&gt;</span>
+<span class="doccomment">/// Encode a char into buf using UTF-8.
+///
+/// On success, return the byte length of the encoding (1, 2, 3 or 4).&lt;br&gt;
+/// On error, return `EncodeUtf8Error` if the buffer was too short for the char.
+///
+/// Safety: `ptr` must be writable for `len` bytes.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub unsafe fn </span>encode_utf8(ch: char, ptr: <span class="kw-2">*mut </span>u8, len: usize) -&gt; <span class="prelude-ty">Result</span>&lt;usize, EncodeUtf8Error&gt;
 {
-    <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> <span class="ident">ch</span> <span class="kw">as</span> <span class="ident">u32</span>;
-    <span class="kw">if</span> <span class="ident">code</span> <span class="op">&lt;</span> <span class="ident">MAX_ONE_B</span> <span class="op">&amp;&amp;</span> <span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">1</span> {
-        <span class="ident">ptr</span>.<span class="ident">add</span>(<span class="number">0</span>).<span class="ident">write</span>(<span class="ident">code</span> <span class="kw">as</span> <span class="ident">u8</span>);
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="number">1</span>);
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">code</span> <span class="op">&lt;</span> <span class="ident">MAX_TWO_B</span> <span class="op">&amp;&amp;</span> <span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">2</span> {
-        <span class="ident">ptr</span>.<span class="ident">add</span>(<span class="number">0</span>).<span class="ident">write</span>((<span class="ident">code</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">6</span> <span class="op">&amp;</span> <span class="number">0x1F</span>) <span class="kw">as</span> <span class="ident">u8</span> <span class="op">|</span> <span class="ident">TAG_TWO_B</span>);
-        <span class="ident">ptr</span>.<span class="ident">add</span>(<span class="number">1</span>).<span class="ident">write</span>((<span class="ident">code</span> <span class="op">&amp;</span> <span class="number">0x3F</span>) <span class="kw">as</span> <span class="ident">u8</span> <span class="op">|</span> <span class="ident">TAG_CONT</span>);
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="number">2</span>);
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">code</span> <span class="op">&lt;</span> <span class="ident">MAX_THREE_B</span> <span class="op">&amp;&amp;</span> <span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">3</span> {
-        <span class="ident">ptr</span>.<span class="ident">add</span>(<span class="number">0</span>).<span class="ident">write</span>((<span class="ident">code</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">12</span> <span class="op">&amp;</span> <span class="number">0x0F</span>) <span class="kw">as</span> <span class="ident">u8</span> <span class="op">|</span> <span class="ident">TAG_THREE_B</span>);
-        <span class="ident">ptr</span>.<span class="ident">add</span>(<span class="number">1</span>).<span class="ident">write</span>((<span class="ident">code</span> <span class="op">&gt;</span><span class="op">&gt;</span>  <span class="number">6</span> <span class="op">&amp;</span> <span class="number">0x3F</span>) <span class="kw">as</span> <span class="ident">u8</span> <span class="op">|</span> <span class="ident">TAG_CONT</span>);
-        <span class="ident">ptr</span>.<span class="ident">add</span>(<span class="number">2</span>).<span class="ident">write</span>((<span class="ident">code</span> <span class="op">&amp;</span> <span class="number">0x3F</span>) <span class="kw">as</span> <span class="ident">u8</span> <span class="op">|</span> <span class="ident">TAG_CONT</span>);
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="number">3</span>);
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">4</span> {
-        <span class="ident">ptr</span>.<span class="ident">add</span>(<span class="number">0</span>).<span class="ident">write</span>((<span class="ident">code</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">18</span> <span class="op">&amp;</span> <span class="number">0x07</span>) <span class="kw">as</span> <span class="ident">u8</span> <span class="op">|</span> <span class="ident">TAG_FOUR_B</span>);
-        <span class="ident">ptr</span>.<span class="ident">add</span>(<span class="number">1</span>).<span class="ident">write</span>((<span class="ident">code</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">12</span> <span class="op">&amp;</span> <span class="number">0x3F</span>) <span class="kw">as</span> <span class="ident">u8</span> <span class="op">|</span> <span class="ident">TAG_CONT</span>);
-        <span class="ident">ptr</span>.<span class="ident">add</span>(<span class="number">2</span>).<span class="ident">write</span>((<span class="ident">code</span> <span class="op">&gt;</span><span class="op">&gt;</span>  <span class="number">6</span> <span class="op">&amp;</span> <span class="number">0x3F</span>) <span class="kw">as</span> <span class="ident">u8</span> <span class="op">|</span> <span class="ident">TAG_CONT</span>);
-        <span class="ident">ptr</span>.<span class="ident">add</span>(<span class="number">3</span>).<span class="ident">write</span>((<span class="ident">code</span> <span class="op">&amp;</span> <span class="number">0x3F</span>) <span class="kw">as</span> <span class="ident">u8</span> <span class="op">|</span> <span class="ident">TAG_CONT</span>);
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="number">4</span>);
+    <span class="kw">let </span>code = ch <span class="kw">as </span>u32;
+    <span class="kw">if </span>code &lt; MAX_ONE_B &amp;&amp; len &gt;= <span class="number">1 </span>{
+        ptr.add(<span class="number">0</span>).write(code <span class="kw">as </span>u8);
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="number">1</span>);
+    } <span class="kw">else if </span>code &lt; MAX_TWO_B &amp;&amp; len &gt;= <span class="number">2 </span>{
+        ptr.add(<span class="number">0</span>).write((code &gt;&gt; <span class="number">6 </span>&amp; <span class="number">0x1F</span>) <span class="kw">as </span>u8 | TAG_TWO_B);
+        ptr.add(<span class="number">1</span>).write((code &amp; <span class="number">0x3F</span>) <span class="kw">as </span>u8 | TAG_CONT);
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="number">2</span>);
+    } <span class="kw">else if </span>code &lt; MAX_THREE_B &amp;&amp; len &gt;= <span class="number">3 </span>{
+        ptr.add(<span class="number">0</span>).write((code &gt;&gt; <span class="number">12 </span>&amp; <span class="number">0x0F</span>) <span class="kw">as </span>u8 | TAG_THREE_B);
+        ptr.add(<span class="number">1</span>).write((code &gt;&gt;  <span class="number">6 </span>&amp; <span class="number">0x3F</span>) <span class="kw">as </span>u8 | TAG_CONT);
+        ptr.add(<span class="number">2</span>).write((code &amp; <span class="number">0x3F</span>) <span class="kw">as </span>u8 | TAG_CONT);
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="number">3</span>);
+    } <span class="kw">else if </span>len &gt;= <span class="number">4 </span>{
+        ptr.add(<span class="number">0</span>).write((code &gt;&gt; <span class="number">18 </span>&amp; <span class="number">0x07</span>) <span class="kw">as </span>u8 | TAG_FOUR_B);
+        ptr.add(<span class="number">1</span>).write((code &gt;&gt; <span class="number">12 </span>&amp; <span class="number">0x3F</span>) <span class="kw">as </span>u8 | TAG_CONT);
+        ptr.add(<span class="number">2</span>).write((code &gt;&gt;  <span class="number">6 </span>&amp; <span class="number">0x3F</span>) <span class="kw">as </span>u8 | TAG_CONT);
+        ptr.add(<span class="number">3</span>).write((code &amp; <span class="number">0x3F</span>) <span class="kw">as </span>u8 | TAG_CONT);
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="number">4</span>);
     };
-    <span class="prelude-val">Err</span>(<span class="ident">EncodeUtf8Error</span>)
+    <span class="prelude-val">Err</span>(EncodeUtf8Error)
 }
 
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">miri</span>, <span class="ident">ignore</span>)]</span> <span class="comment">// Miri is too slow</span>
-<span class="kw">fn</span> <span class="ident">test_encode_utf8</span>() {
-    <span class="comment">// Test that all codepoints are encoded correctly</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">16</span>];
-    <span class="kw">for</span> <span class="ident">codepoint</span> <span class="kw">in</span> <span class="number">0</span>..<span class="op">=</span>(<span class="ident">std::char::MAX</span> <span class="kw">as</span> <span class="ident">u32</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ch</span>) <span class="op">=</span> <span class="ident">std::char::from_u32</span>(<span class="ident">codepoint</span>) {
-            <span class="kw">for</span> <span class="ident">elt</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="ident">data</span> { <span class="kw-2">*</span><span class="ident">elt</span> <span class="op">=</span> <span class="number">0</span>; }
-            <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">as_mut_ptr</span>();
-            <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">len</span>();
-            <span class="kw">unsafe</span> {
-                <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">encode_utf8</span>(<span class="ident">ch</span>, <span class="ident">ptr</span>, <span class="ident">len</span>).<span class="ident">ok</span>().<span class="ident">unwrap</span>();
-                <span class="macro">assert_eq!</span>(<span class="ident">res</span>, <span class="ident">ch</span>.<span class="ident">len_utf8</span>());
+<span class="attribute">#[test]
+#[cfg_attr(miri, ignore)] </span><span class="comment">// Miri is too slow
+</span><span class="kw">fn </span>test_encode_utf8() {
+    <span class="comment">// Test that all codepoints are encoded correctly
+    </span><span class="kw">let </span><span class="kw-2">mut </span>data = [<span class="number">0u8</span>; <span class="number">16</span>];
+    <span class="kw">for </span>codepoint <span class="kw">in </span><span class="number">0</span>..=(std::char::MAX <span class="kw">as </span>u32) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(ch) = std::char::from_u32(codepoint) {
+            <span class="kw">for </span>elt <span class="kw">in </span><span class="kw-2">&amp;mut </span>data { <span class="kw-2">*</span>elt = <span class="number">0</span>; }
+            <span class="kw">let </span>ptr = data.as_mut_ptr();
+            <span class="kw">let </span>len = data.len();
+            <span class="kw">unsafe </span>{
+                <span class="kw">let </span>res = encode_utf8(ch, ptr, len).ok().unwrap();
+                <span class="macro">assert_eq!</span>(res, ch.len_utf8());
             }
-            <span class="kw">let</span> <span class="ident">string</span> <span class="op">=</span> <span class="ident">std::str::from_utf8</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">unwrap</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">string</span>.<span class="ident">chars</span>().<span class="ident">next</span>(), <span class="prelude-val">Some</span>(<span class="ident">ch</span>));
+            <span class="kw">let </span>string = std::str::from_utf8(<span class="kw-2">&amp;</span>data).unwrap();
+            <span class="macro">assert_eq!</span>(string.chars().next(), <span class="prelude-val">Some</span>(ch));
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_encode_utf8_oob</span>() {
-    <span class="comment">// test that we report oob if the buffer is too short</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">16</span>];
-    <span class="kw">let</span> <span class="ident">chars</span> <span class="op">=</span> [<span class="string">&#39;a&#39;</span>, <span class="string">&#39;α&#39;</span>, <span class="string">&#39;�&#39;</span>, <span class="string">&#39;𐍈&#39;</span>];
-    <span class="kw">for</span> (<span class="ident">len</span>, <span class="kw-2">&amp;</span><span class="ident">ch</span>) <span class="kw">in</span> (<span class="number">1</span>..<span class="op">=</span><span class="number">4</span>).<span class="ident">zip</span>(<span class="kw-2">&amp;</span><span class="ident">chars</span>) {
-        <span class="macro">assert_eq!</span>(<span class="ident">len</span>, <span class="ident">ch</span>.<span class="ident">len_utf8</span>(), <span class="string">&quot;Len of ch={}&quot;</span>, <span class="ident">ch</span>);
-        <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">as_mut_ptr</span>();
-        <span class="kw">unsafe</span> {
-            <span class="macro">assert!</span>(<span class="macro">matches::matches!</span>(<span class="ident">encode_utf8</span>(<span class="ident">ch</span>, <span class="ident">ptr</span>, <span class="ident">len</span> <span class="op">-</span> <span class="number">1</span>), <span class="prelude-val">Err</span>(<span class="kw">_</span>)));
-            <span class="macro">assert!</span>(<span class="macro">matches::matches!</span>(<span class="ident">encode_utf8</span>(<span class="ident">ch</span>, <span class="ident">ptr</span>, <span class="ident">len</span>), <span class="prelude-val">Ok</span>(<span class="kw">_</span>)));
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>test_encode_utf8_oob() {
+    <span class="comment">// test that we report oob if the buffer is too short
+    </span><span class="kw">let </span><span class="kw-2">mut </span>data = [<span class="number">0u8</span>; <span class="number">16</span>];
+    <span class="kw">let </span>chars = [<span class="string">&#39;a&#39;</span>, <span class="string">&#39;α&#39;</span>, <span class="string">&#39;�&#39;</span>, <span class="string">&#39;𐍈&#39;</span>];
+    <span class="kw">for </span>(len, <span class="kw-2">&amp;</span>ch) <span class="kw">in </span>(<span class="number">1</span>..=<span class="number">4</span>).zip(<span class="kw-2">&amp;</span>chars) {
+        <span class="macro">assert_eq!</span>(len, ch.len_utf8(), <span class="string">&quot;Len of ch={}&quot;</span>, ch);
+        <span class="kw">let </span>ptr = data.as_mut_ptr();
+        <span class="kw">unsafe </span>{
+            <span class="macro">assert!</span>(<span class="macro">matches::matches!</span>(encode_utf8(ch, ptr, len - <span class="number">1</span>), <span class="prelude-val">Err</span>(<span class="kw">_</span>)));
+            <span class="macro">assert!</span>(<span class="macro">matches::matches!</span>(encode_utf8(ch, ptr, len), <span class="prelude-val">Ok</span>(<span class="kw">_</span>)));
         }
     }
 }
 
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="arrayvec" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="arrayvec" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

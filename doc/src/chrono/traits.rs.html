@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/chrono-0.4.20/src/traits.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>traits.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../chrono/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../chrono/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../chrono/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/chrono-0.4.20/src/traits.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>traits.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../chrono/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../chrono/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../chrono/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -239,246 +239,246 @@
 <span id="239">239</span>
 <span id="240">240</span>
 <span id="241">241</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">IsoWeek</span>, <span class="ident">Weekday</span>};
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{IsoWeek, Weekday};
 
-<span class="doccomment">/// The common set of methods for date component.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Datelike</span>: <span class="ident">Sized</span> {
-    <span class="doccomment">/// Returns the year number in the [calendar date](./naive/struct.NaiveDate.html#calendar-date).</span>
-    <span class="kw">fn</span> <span class="ident">year</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i32</span>;
+<span class="doccomment">/// The common set of methods for date component.
+</span><span class="kw">pub trait </span>Datelike: Sized {
+    <span class="doccomment">/// Returns the year number in the [calendar date](./naive/struct.NaiveDate.html#calendar-date).
+    </span><span class="kw">fn </span>year(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32;
 
-    <span class="doccomment">/// Returns the absolute year number starting from 1 with a boolean flag,</span>
-    <span class="doccomment">/// which is false when the year predates the epoch (BCE/BC) and true otherwise (CE/AD).</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">year_ce</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">bool</span>, <span class="ident">u32</span>) {
-        <span class="kw">let</span> <span class="ident">year</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">year</span>();
-        <span class="kw">if</span> <span class="ident">year</span> <span class="op">&lt;</span> <span class="number">1</span> {
-            (<span class="bool-val">false</span>, (<span class="number">1</span> <span class="op">-</span> <span class="ident">year</span>) <span class="kw">as</span> <span class="ident">u32</span>)
-        } <span class="kw">else</span> {
-            (<span class="bool-val">true</span>, <span class="ident">year</span> <span class="kw">as</span> <span class="ident">u32</span>)
+    <span class="doccomment">/// Returns the absolute year number starting from 1 with a boolean flag,
+    /// which is false when the year predates the epoch (BCE/BC) and true otherwise (CE/AD).
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>year_ce(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (bool, u32) {
+        <span class="kw">let </span>year = <span class="self">self</span>.year();
+        <span class="kw">if </span>year &lt; <span class="number">1 </span>{
+            (<span class="bool-val">false</span>, (<span class="number">1 </span>- year) <span class="kw">as </span>u32)
+        } <span class="kw">else </span>{
+            (<span class="bool-val">true</span>, year <span class="kw">as </span>u32)
         }
     }
 
-    <span class="doccomment">/// Returns the month number starting from 1.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The return value ranges from 1 to 12.</span>
-    <span class="kw">fn</span> <span class="ident">month</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span>;
+    <span class="doccomment">/// Returns the month number starting from 1.
+    ///
+    /// The return value ranges from 1 to 12.
+    </span><span class="kw">fn </span>month(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32;
 
-    <span class="doccomment">/// Returns the month number starting from 0.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The return value ranges from 0 to 11.</span>
-    <span class="kw">fn</span> <span class="ident">month0</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span>;
+    <span class="doccomment">/// Returns the month number starting from 0.
+    ///
+    /// The return value ranges from 0 to 11.
+    </span><span class="kw">fn </span>month0(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32;
 
-    <span class="doccomment">/// Returns the day of month starting from 1.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The return value ranges from 1 to 31. (The last day of month differs by months.)</span>
-    <span class="kw">fn</span> <span class="ident">day</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span>;
+    <span class="doccomment">/// Returns the day of month starting from 1.
+    ///
+    /// The return value ranges from 1 to 31. (The last day of month differs by months.)
+    </span><span class="kw">fn </span>day(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32;
 
-    <span class="doccomment">/// Returns the day of month starting from 0.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The return value ranges from 0 to 30. (The last day of month differs by months.)</span>
-    <span class="kw">fn</span> <span class="ident">day0</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span>;
+    <span class="doccomment">/// Returns the day of month starting from 0.
+    ///
+    /// The return value ranges from 0 to 30. (The last day of month differs by months.)
+    </span><span class="kw">fn </span>day0(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32;
 
-    <span class="doccomment">/// Returns the day of year starting from 1.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The return value ranges from 1 to 366. (The last day of year differs by years.)</span>
-    <span class="kw">fn</span> <span class="ident">ordinal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span>;
+    <span class="doccomment">/// Returns the day of year starting from 1.
+    ///
+    /// The return value ranges from 1 to 366. (The last day of year differs by years.)
+    </span><span class="kw">fn </span>ordinal(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32;
 
-    <span class="doccomment">/// Returns the day of year starting from 0.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The return value ranges from 0 to 365. (The last day of year differs by years.)</span>
-    <span class="kw">fn</span> <span class="ident">ordinal0</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span>;
+    <span class="doccomment">/// Returns the day of year starting from 0.
+    ///
+    /// The return value ranges from 0 to 365. (The last day of year differs by years.)
+    </span><span class="kw">fn </span>ordinal0(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32;
 
-    <span class="doccomment">/// Returns the day of week.</span>
-    <span class="kw">fn</span> <span class="ident">weekday</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Weekday</span>;
+    <span class="doccomment">/// Returns the day of week.
+    </span><span class="kw">fn </span>weekday(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Weekday;
 
-    <span class="doccomment">/// Returns the ISO week.</span>
-    <span class="kw">fn</span> <span class="ident">iso_week</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">IsoWeek</span>;
+    <span class="doccomment">/// Returns the ISO week.
+    </span><span class="kw">fn </span>iso_week(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; IsoWeek;
 
-    <span class="doccomment">/// Makes a new value with the year number changed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `None` when the resulting value would be invalid.</span>
-    <span class="kw">fn</span> <span class="ident">with_year</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">year</span>: <span class="ident">i32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Makes a new value with the year number changed.
+    ///
+    /// Returns `None` when the resulting value would be invalid.
+    </span><span class="kw">fn </span>with_year(<span class="kw-2">&amp;</span><span class="self">self</span>, year: i32) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt;;
 
-    <span class="doccomment">/// Makes a new value with the month number (starting from 1) changed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `None` when the resulting value would be invalid.</span>
-    <span class="kw">fn</span> <span class="ident">with_month</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">month</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Makes a new value with the month number (starting from 1) changed.
+    ///
+    /// Returns `None` when the resulting value would be invalid.
+    </span><span class="kw">fn </span>with_month(<span class="kw-2">&amp;</span><span class="self">self</span>, month: u32) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt;;
 
-    <span class="doccomment">/// Makes a new value with the month number (starting from 0) changed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `None` when the resulting value would be invalid.</span>
-    <span class="kw">fn</span> <span class="ident">with_month0</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">month0</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Makes a new value with the month number (starting from 0) changed.
+    ///
+    /// Returns `None` when the resulting value would be invalid.
+    </span><span class="kw">fn </span>with_month0(<span class="kw-2">&amp;</span><span class="self">self</span>, month0: u32) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt;;
 
-    <span class="doccomment">/// Makes a new value with the day of month (starting from 1) changed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `None` when the resulting value would be invalid.</span>
-    <span class="kw">fn</span> <span class="ident">with_day</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">day</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Makes a new value with the day of month (starting from 1) changed.
+    ///
+    /// Returns `None` when the resulting value would be invalid.
+    </span><span class="kw">fn </span>with_day(<span class="kw-2">&amp;</span><span class="self">self</span>, day: u32) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt;;
 
-    <span class="doccomment">/// Makes a new value with the day of month (starting from 0) changed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `None` when the resulting value would be invalid.</span>
-    <span class="kw">fn</span> <span class="ident">with_day0</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">day0</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Makes a new value with the day of month (starting from 0) changed.
+    ///
+    /// Returns `None` when the resulting value would be invalid.
+    </span><span class="kw">fn </span>with_day0(<span class="kw-2">&amp;</span><span class="self">self</span>, day0: u32) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt;;
 
-    <span class="doccomment">/// Makes a new value with the day of year (starting from 1) changed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `None` when the resulting value would be invalid.</span>
-    <span class="kw">fn</span> <span class="ident">with_ordinal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ordinal</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Makes a new value with the day of year (starting from 1) changed.
+    ///
+    /// Returns `None` when the resulting value would be invalid.
+    </span><span class="kw">fn </span>with_ordinal(<span class="kw-2">&amp;</span><span class="self">self</span>, ordinal: u32) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt;;
 
-    <span class="doccomment">/// Makes a new value with the day of year (starting from 0) changed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `None` when the resulting value would be invalid.</span>
-    <span class="kw">fn</span> <span class="ident">with_ordinal0</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ordinal0</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Makes a new value with the day of year (starting from 0) changed.
+    ///
+    /// Returns `None` when the resulting value would be invalid.
+    </span><span class="kw">fn </span>with_ordinal0(<span class="kw-2">&amp;</span><span class="self">self</span>, ordinal0: u32) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt;;
 
-    <span class="doccomment">/// Counts the days in the proleptic Gregorian calendar, with January 1, Year 1 (CE) as day 1.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use chrono::{NaiveDate, Datelike};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(NaiveDate::from_ymd(1970, 1, 1).num_days_from_ce(), 719_163);</span>
-    <span class="doccomment">/// assert_eq!(NaiveDate::from_ymd(2, 1, 1).num_days_from_ce(), 366);</span>
-    <span class="doccomment">/// assert_eq!(NaiveDate::from_ymd(1, 1, 1).num_days_from_ce(), 1);</span>
-    <span class="doccomment">/// assert_eq!(NaiveDate::from_ymd(0, 1, 1).num_days_from_ce(), -365);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">num_days_from_ce</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">i32</span> {
-        <span class="comment">// See test_num_days_from_ce_against_alternative_impl below for a more straightforward</span>
-        <span class="comment">// implementation.</span>
+    <span class="doccomment">/// Counts the days in the proleptic Gregorian calendar, with January 1, Year 1 (CE) as day 1.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use chrono::{NaiveDate, Datelike};
+    ///
+    /// assert_eq!(NaiveDate::from_ymd(1970, 1, 1).num_days_from_ce(), 719_163);
+    /// assert_eq!(NaiveDate::from_ymd(2, 1, 1).num_days_from_ce(), 366);
+    /// assert_eq!(NaiveDate::from_ymd(1, 1, 1).num_days_from_ce(), 1);
+    /// assert_eq!(NaiveDate::from_ymd(0, 1, 1).num_days_from_ce(), -365);
+    /// ```
+    </span><span class="kw">fn </span>num_days_from_ce(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; i32 {
+        <span class="comment">// See test_num_days_from_ce_against_alternative_impl below for a more straightforward
+        // implementation.
 
-        <span class="comment">// we know this wouldn&#39;t overflow since year is limited to 1/2^13 of i32&#39;s full range.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">year</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">year</span>() <span class="op">-</span> <span class="number">1</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ndays</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">if</span> <span class="ident">year</span> <span class="op">&lt;</span> <span class="number">0</span> {
-            <span class="kw">let</span> <span class="ident">excess</span> <span class="op">=</span> <span class="number">1</span> <span class="op">+</span> (<span class="op">-</span><span class="ident">year</span>) <span class="op">/</span> <span class="number">400</span>;
-            <span class="ident">year</span> <span class="op">+</span><span class="op">=</span> <span class="ident">excess</span> <span class="op">*</span> <span class="number">400</span>;
-            <span class="ident">ndays</span> <span class="op">-</span><span class="op">=</span> <span class="ident">excess</span> <span class="op">*</span> <span class="number">146_097</span>;
+        // we know this wouldn&#39;t overflow since year is limited to 1/2^13 of i32&#39;s full range.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>year = <span class="self">self</span>.year() - <span class="number">1</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>ndays = <span class="number">0</span>;
+        <span class="kw">if </span>year &lt; <span class="number">0 </span>{
+            <span class="kw">let </span>excess = <span class="number">1 </span>+ (-year) / <span class="number">400</span>;
+            year += excess * <span class="number">400</span>;
+            ndays -= excess * <span class="number">146_097</span>;
         }
-        <span class="kw">let</span> <span class="ident">div_100</span> <span class="op">=</span> <span class="ident">year</span> <span class="op">/</span> <span class="number">100</span>;
-        <span class="ident">ndays</span> <span class="op">+</span><span class="op">=</span> ((<span class="ident">year</span> <span class="op">*</span> <span class="number">1461</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">2</span>) <span class="op">-</span> <span class="ident">div_100</span> <span class="op">+</span> (<span class="ident">div_100</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">2</span>);
-        <span class="ident">ndays</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">ordinal</span>() <span class="kw">as</span> <span class="ident">i32</span>
-    }
-}
-
-<span class="doccomment">/// The common set of methods for time component.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Timelike</span>: <span class="ident">Sized</span> {
-    <span class="doccomment">/// Returns the hour number from 0 to 23.</span>
-    <span class="kw">fn</span> <span class="ident">hour</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span>;
-
-    <span class="doccomment">/// Returns the hour number from 1 to 12 with a boolean flag,</span>
-    <span class="doccomment">/// which is false for AM and true for PM.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">hour12</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (<span class="ident">bool</span>, <span class="ident">u32</span>) {
-        <span class="kw">let</span> <span class="ident">hour</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">hour</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hour12</span> <span class="op">=</span> <span class="ident">hour</span> <span class="op">%</span> <span class="number">12</span>;
-        <span class="kw">if</span> <span class="ident">hour12</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="ident">hour12</span> <span class="op">=</span> <span class="number">12</span>;
-        }
-        (<span class="ident">hour</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">12</span>, <span class="ident">hour12</span>)
-    }
-
-    <span class="doccomment">/// Returns the minute number from 0 to 59.</span>
-    <span class="kw">fn</span> <span class="ident">minute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span>;
-
-    <span class="doccomment">/// Returns the second number from 0 to 59.</span>
-    <span class="kw">fn</span> <span class="ident">second</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span>;
-
-    <span class="doccomment">/// Returns the number of nanoseconds since the whole non-leap second.</span>
-    <span class="doccomment">/// The range from 1,000,000,000 to 1,999,999,999 represents</span>
-    <span class="doccomment">/// the [leap second](./naive/struct.NaiveTime.html#leap-second-handling).</span>
-    <span class="kw">fn</span> <span class="ident">nanosecond</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span>;
-
-    <span class="doccomment">/// Makes a new value with the hour number changed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `None` when the resulting value would be invalid.</span>
-    <span class="kw">fn</span> <span class="ident">with_hour</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">hour</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
-
-    <span class="doccomment">/// Makes a new value with the minute number changed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `None` when the resulting value would be invalid.</span>
-    <span class="kw">fn</span> <span class="ident">with_minute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">min</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
-
-    <span class="doccomment">/// Makes a new value with the second number changed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `None` when the resulting value would be invalid.</span>
-    <span class="doccomment">/// As with the [`second`](#tymethod.second) method,</span>
-    <span class="doccomment">/// the input range is restricted to 0 through 59.</span>
-    <span class="kw">fn</span> <span class="ident">with_second</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sec</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
-
-    <span class="doccomment">/// Makes a new value with nanoseconds since the whole non-leap second changed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `None` when the resulting value would be invalid.</span>
-    <span class="doccomment">/// As with the [`nanosecond`](#tymethod.nanosecond) method,</span>
-    <span class="doccomment">/// the input range can exceed 1,000,000,000 for leap seconds.</span>
-    <span class="kw">fn</span> <span class="ident">with_nanosecond</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">nano</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
-
-    <span class="doccomment">/// Returns the number of non-leap seconds past the last midnight.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">num_seconds_from_midnight</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">hour</span>() <span class="op">*</span> <span class="number">3600</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">minute</span>() <span class="op">*</span> <span class="number">60</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">second</span>()
+        <span class="kw">let </span>div_100 = year / <span class="number">100</span>;
+        ndays += ((year * <span class="number">1461</span>) &gt;&gt; <span class="number">2</span>) - div_100 + (div_100 &gt;&gt; <span class="number">2</span>);
+        ndays + <span class="self">self</span>.ordinal() <span class="kw">as </span>i32
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Datelike</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Duration</span>, <span class="ident">NaiveDate</span>};
+<span class="doccomment">/// The common set of methods for time component.
+</span><span class="kw">pub trait </span>Timelike: Sized {
+    <span class="doccomment">/// Returns the hour number from 0 to 23.
+    </span><span class="kw">fn </span>hour(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32;
 
-    <span class="doccomment">/// Tests `Datelike::num_days_from_ce` against an alternative implementation.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The alternative implementation is not as short as the current one but it is simpler to</span>
-    <span class="doccomment">/// understand, with less unexplained magic constants.</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_num_days_from_ce_against_alternative_impl</span>() {
-        <span class="doccomment">/// Returns the number of multiples of `div` in the range `start..end`.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// If the range `start..end` is back-to-front, i.e. `start` is greater than `end`, the</span>
-        <span class="doccomment">/// behaviour is defined by the following equation:</span>
-        <span class="doccomment">/// `in_between(start, end, div) == - in_between(end, start, div)`.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// When `div` is 1, this is equivalent to `end - start`, i.e. the length of `start..end`.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// # Panics</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// Panics if `div` is not positive.</span>
-        <span class="kw">fn</span> <span class="ident">in_between</span>(<span class="ident">start</span>: <span class="ident">i32</span>, <span class="ident">end</span>: <span class="ident">i32</span>, <span class="ident">div</span>: <span class="ident">i32</span>) -&gt; <span class="ident">i32</span> {
-            <span class="macro">assert!</span>(<span class="ident">div</span> <span class="op">&gt;</span> <span class="number">0</span>, <span class="string">&quot;in_between: nonpositive div = {}&quot;</span>, <span class="ident">div</span>);
-            <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> (<span class="ident">start</span>.<span class="ident">div_euclid</span>(<span class="ident">div</span>), <span class="ident">start</span>.<span class="ident">rem_euclid</span>(<span class="ident">div</span>));
-            <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> (<span class="ident">end</span>.<span class="ident">div_euclid</span>(<span class="ident">div</span>), <span class="ident">end</span>.<span class="ident">rem_euclid</span>(<span class="ident">div</span>));
-            <span class="comment">// The lowest multiple of `div` greater than or equal to `start`, divided.</span>
-            <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">start</span>.<span class="number">0</span> <span class="op">+</span> (<span class="ident">start</span>.<span class="number">1</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>) <span class="kw">as</span> <span class="ident">i32</span>;
-            <span class="comment">// The lowest multiple of `div` greater than or equal to   `end`, divided.</span>
-            <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">end</span>.<span class="number">0</span> <span class="op">+</span> (<span class="ident">end</span>.<span class="number">1</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>) <span class="kw">as</span> <span class="ident">i32</span>;
-            <span class="ident">end</span> <span class="op">-</span> <span class="ident">start</span>
+    <span class="doccomment">/// Returns the hour number from 1 to 12 with a boolean flag,
+    /// which is false for AM and true for PM.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>hour12(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; (bool, u32) {
+        <span class="kw">let </span>hour = <span class="self">self</span>.hour();
+        <span class="kw">let </span><span class="kw-2">mut </span>hour12 = hour % <span class="number">12</span>;
+        <span class="kw">if </span>hour12 == <span class="number">0 </span>{
+            hour12 = <span class="number">12</span>;
+        }
+        (hour &gt;= <span class="number">12</span>, hour12)
+    }
+
+    <span class="doccomment">/// Returns the minute number from 0 to 59.
+    </span><span class="kw">fn </span>minute(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32;
+
+    <span class="doccomment">/// Returns the second number from 0 to 59.
+    </span><span class="kw">fn </span>second(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32;
+
+    <span class="doccomment">/// Returns the number of nanoseconds since the whole non-leap second.
+    /// The range from 1,000,000,000 to 1,999,999,999 represents
+    /// the [leap second](./naive/struct.NaiveTime.html#leap-second-handling).
+    </span><span class="kw">fn </span>nanosecond(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32;
+
+    <span class="doccomment">/// Makes a new value with the hour number changed.
+    ///
+    /// Returns `None` when the resulting value would be invalid.
+    </span><span class="kw">fn </span>with_hour(<span class="kw-2">&amp;</span><span class="self">self</span>, hour: u32) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt;;
+
+    <span class="doccomment">/// Makes a new value with the minute number changed.
+    ///
+    /// Returns `None` when the resulting value would be invalid.
+    </span><span class="kw">fn </span>with_minute(<span class="kw-2">&amp;</span><span class="self">self</span>, min: u32) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt;;
+
+    <span class="doccomment">/// Makes a new value with the second number changed.
+    ///
+    /// Returns `None` when the resulting value would be invalid.
+    /// As with the [`second`](#tymethod.second) method,
+    /// the input range is restricted to 0 through 59.
+    </span><span class="kw">fn </span>with_second(<span class="kw-2">&amp;</span><span class="self">self</span>, sec: u32) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt;;
+
+    <span class="doccomment">/// Makes a new value with nanoseconds since the whole non-leap second changed.
+    ///
+    /// Returns `None` when the resulting value would be invalid.
+    /// As with the [`nanosecond`](#tymethod.nanosecond) method,
+    /// the input range can exceed 1,000,000,000 for leap seconds.
+    </span><span class="kw">fn </span>with_nanosecond(<span class="kw-2">&amp;</span><span class="self">self</span>, nano: u32) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt;;
+
+    <span class="doccomment">/// Returns the number of non-leap seconds past the last midnight.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">fn </span>num_seconds_from_midnight(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.hour() * <span class="number">3600 </span>+ <span class="self">self</span>.minute() * <span class="number">60 </span>+ <span class="self">self</span>.second()
+    }
+}
+
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">super</span>::Datelike;
+    <span class="kw">use crate</span>::{Duration, NaiveDate};
+
+    <span class="doccomment">/// Tests `Datelike::num_days_from_ce` against an alternative implementation.
+    ///
+    /// The alternative implementation is not as short as the current one but it is simpler to
+    /// understand, with less unexplained magic constants.
+    </span><span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_num_days_from_ce_against_alternative_impl() {
+        <span class="doccomment">/// Returns the number of multiples of `div` in the range `start..end`.
+        ///
+        /// If the range `start..end` is back-to-front, i.e. `start` is greater than `end`, the
+        /// behaviour is defined by the following equation:
+        /// `in_between(start, end, div) == - in_between(end, start, div)`.
+        ///
+        /// When `div` is 1, this is equivalent to `end - start`, i.e. the length of `start..end`.
+        ///
+        /// # Panics
+        ///
+        /// Panics if `div` is not positive.
+        </span><span class="kw">fn </span>in_between(start: i32, end: i32, div: i32) -&gt; i32 {
+            <span class="macro">assert!</span>(div &gt; <span class="number">0</span>, <span class="string">&quot;in_between: nonpositive div = {}&quot;</span>, div);
+            <span class="kw">let </span>start = (start.div_euclid(div), start.rem_euclid(div));
+            <span class="kw">let </span>end = (end.div_euclid(div), end.rem_euclid(div));
+            <span class="comment">// The lowest multiple of `div` greater than or equal to `start`, divided.
+            </span><span class="kw">let </span>start = start.<span class="number">0 </span>+ (start.<span class="number">1 </span>!= <span class="number">0</span>) <span class="kw">as </span>i32;
+            <span class="comment">// The lowest multiple of `div` greater than or equal to   `end`, divided.
+            </span><span class="kw">let </span>end = end.<span class="number">0 </span>+ (end.<span class="number">1 </span>!= <span class="number">0</span>) <span class="kw">as </span>i32;
+            end - start
         }
 
-        <span class="doccomment">/// Alternative implementation to `Datelike::num_days_from_ce`</span>
-        <span class="kw">fn</span> <span class="ident">num_days_from_ce</span><span class="op">&lt;</span><span class="ident">Date</span>: <span class="ident">Datelike</span><span class="op">&gt;</span>(<span class="ident">date</span>: <span class="kw-2">&amp;</span><span class="ident">Date</span>) -&gt; <span class="ident">i32</span> {
-            <span class="kw">let</span> <span class="ident">year</span> <span class="op">=</span> <span class="ident">date</span>.<span class="ident">year</span>();
-            <span class="kw">let</span> <span class="ident">diff</span> <span class="op">=</span> <span class="kw">move</span> <span class="op">|</span><span class="ident">div</span><span class="op">|</span> <span class="ident">in_between</span>(<span class="number">1</span>, <span class="ident">year</span>, <span class="ident">div</span>);
-            <span class="comment">// 365 days a year, one more in leap years. In the gregorian calendar, leap years are all</span>
-            <span class="comment">// the multiples of 4 except multiples of 100 but including multiples of 400.</span>
-            <span class="ident">date</span>.<span class="ident">ordinal</span>() <span class="kw">as</span> <span class="ident">i32</span> <span class="op">+</span> <span class="number">365</span> <span class="op">*</span> <span class="ident">diff</span>(<span class="number">1</span>) <span class="op">+</span> <span class="ident">diff</span>(<span class="number">4</span>) <span class="op">-</span> <span class="ident">diff</span>(<span class="number">100</span>) <span class="op">+</span> <span class="ident">diff</span>(<span class="number">400</span>)
+        <span class="doccomment">/// Alternative implementation to `Datelike::num_days_from_ce`
+        </span><span class="kw">fn </span>num_days_from_ce&lt;Date: Datelike&gt;(date: <span class="kw-2">&amp;</span>Date) -&gt; i32 {
+            <span class="kw">let </span>year = date.year();
+            <span class="kw">let </span>diff = <span class="kw">move </span>|div| in_between(<span class="number">1</span>, year, div);
+            <span class="comment">// 365 days a year, one more in leap years. In the gregorian calendar, leap years are all
+            // the multiples of 4 except multiples of 100 but including multiples of 400.
+            </span>date.ordinal() <span class="kw">as </span>i32 + <span class="number">365 </span>* diff(<span class="number">1</span>) + diff(<span class="number">4</span>) - diff(<span class="number">100</span>) + diff(<span class="number">400</span>)
         }
 
-        <span class="kw">use</span> <span class="ident">num_iter::range_inclusive</span>;
+        <span class="kw">use </span>num_iter::range_inclusive;
 
-        <span class="kw">for</span> <span class="ident">year</span> <span class="kw">in</span> <span class="ident">range_inclusive</span>(<span class="ident">NaiveDate::MIN</span>.<span class="ident">year</span>(), <span class="ident">NaiveDate::MAX</span>.<span class="ident">year</span>()) {
-            <span class="kw">let</span> <span class="ident">jan1_year</span> <span class="op">=</span> <span class="ident">NaiveDate::from_ymd</span>(<span class="ident">year</span>, <span class="number">1</span>, <span class="number">1</span>);
+        <span class="kw">for </span>year <span class="kw">in </span>range_inclusive(NaiveDate::MIN.year(), NaiveDate::MAX.year()) {
+            <span class="kw">let </span>jan1_year = NaiveDate::from_ymd(year, <span class="number">1</span>, <span class="number">1</span>);
             <span class="macro">assert_eq!</span>(
-                <span class="ident">jan1_year</span>.<span class="ident">num_days_from_ce</span>(),
-                <span class="ident">num_days_from_ce</span>(<span class="kw-2">&amp;</span><span class="ident">jan1_year</span>),
+                jan1_year.num_days_from_ce(),
+                num_days_from_ce(<span class="kw-2">&amp;</span>jan1_year),
                 <span class="string">&quot;on {:?}&quot;</span>,
-                <span class="ident">jan1_year</span>
+                jan1_year
             );
-            <span class="kw">let</span> <span class="ident">mid_year</span> <span class="op">=</span> <span class="ident">jan1_year</span> <span class="op">+</span> <span class="ident">Duration::days</span>(<span class="number">133</span>);
+            <span class="kw">let </span>mid_year = jan1_year + Duration::days(<span class="number">133</span>);
             <span class="macro">assert_eq!</span>(
-                <span class="ident">mid_year</span>.<span class="ident">num_days_from_ce</span>(),
-                <span class="ident">num_days_from_ce</span>(<span class="kw-2">&amp;</span><span class="ident">mid_year</span>),
+                mid_year.num_days_from_ce(),
+                num_days_from_ce(<span class="kw-2">&amp;</span>mid_year),
                 <span class="string">&quot;on {:?}&quot;</span>,
-                <span class="ident">mid_year</span>
+                mid_year
             );
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="chrono" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="chrono" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

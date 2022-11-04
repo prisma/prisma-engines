@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_graph_builder/read/utils.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>utils.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../query_core/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_graph_builder/read/utils.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>utils.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../query_core/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -168,175 +168,175 @@
 <span id="168">168</span>
 <span id="169">169</span>
 <span id="170">170</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ArgumentListLookup</span>, <span class="ident">FieldPair</span>, <span class="ident">ParsedField</span>, <span class="ident">ReadQuery</span>};
-<span class="kw">use</span> <span class="ident">connector::RelAggregationSelection</span>;
-<span class="kw">use</span> <span class="ident">prisma_models::prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">schema_builder::constants</span>::{<span class="ident">aggregations</span>::<span class="kw-2">*</span>, <span class="ident">args</span>};
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use crate</span>::{ArgumentListLookup, FieldPair, ParsedField, ReadQuery};
+<span class="kw">use </span>connector::RelAggregationSelection;
+<span class="kw">use </span>prisma_models::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span>schema_builder::constants::{aggregations::<span class="kw-2">*</span>, args};
+<span class="kw">use </span>std::sync::Arc;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">collect_selection_order</span>(<span class="ident">from</span>: <span class="kw-2">&amp;</span>[<span class="ident">FieldPair</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="ident">from</span>.<span class="ident">iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">pair</span><span class="op">|</span> {
-            <span class="ident">pair</span>.<span class="ident">parsed_field</span>
-                .<span class="ident">alias</span>
-                .<span class="ident">clone</span>()
-                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">pair</span>.<span class="ident">parsed_field</span>.<span class="ident">name</span>.<span class="ident">clone</span>())
+<span class="kw">pub fn </span>collect_selection_order(from: <span class="kw-2">&amp;</span>[FieldPair]) -&gt; Vec&lt;String&gt; {
+    from.iter()
+        .map(|pair| {
+            pair.parsed_field
+                .alias
+                .clone()
+                .unwrap_or_else(|| pair.parsed_field.name.clone())
         })
-        .<span class="ident">collect</span>()
+        .collect()
 }
 
-<span class="doccomment">/// Creates a `FieldSelection` from a query selection.</span>
-<span class="doccomment">/// Automatically adds model IDs to the selected fields as well.</span>
-<span class="doccomment">/// Unwraps are safe due to query validation.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">collect_selected_fields</span>(
-    <span class="ident">from_pairs</span>: <span class="kw-2">&amp;</span>[<span class="ident">FieldPair</span>],
-    <span class="ident">distinct</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FieldSelection</span><span class="op">&gt;</span>,
-    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-) -&gt; <span class="ident">FieldSelection</span> {
-    <span class="kw">let</span> <span class="ident">model_id</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_identifier</span>();
-    <span class="kw">let</span> <span class="ident">selected_fields</span> <span class="op">=</span> <span class="ident">pairs_to_selections</span>(<span class="ident">model</span>, <span class="ident">from_pairs</span>);
+<span class="doccomment">/// Creates a `FieldSelection` from a query selection.
+/// Automatically adds model IDs to the selected fields as well.
+/// Unwraps are safe due to query validation.
+</span><span class="kw">pub fn </span>collect_selected_fields(
+    from_pairs: <span class="kw-2">&amp;</span>[FieldPair],
+    distinct: <span class="prelude-ty">Option</span>&lt;FieldSelection&gt;,
+    model: <span class="kw-2">&amp;</span>ModelRef,
+) -&gt; FieldSelection {
+    <span class="kw">let </span>model_id = model.primary_identifier();
+    <span class="kw">let </span>selected_fields = pairs_to_selections(model, from_pairs);
 
-    <span class="kw">let</span> <span class="ident">selection</span> <span class="op">=</span> <span class="ident">FieldSelection::new</span>(<span class="ident">selected_fields</span>);
-    <span class="kw">let</span> <span class="ident">selection</span> <span class="op">=</span> <span class="ident">model_id</span>.<span class="ident">merge</span>(<span class="ident">selection</span>);
+    <span class="kw">let </span>selection = FieldSelection::new(selected_fields);
+    <span class="kw">let </span>selection = model_id.merge(selection);
 
-    <span class="comment">// Distinct fields are always selected because we are processing them in-memory</span>
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">distinct</span>) <span class="op">=</span> <span class="ident">distinct</span> {
-        <span class="ident">selection</span>.<span class="ident">merge</span>(<span class="ident">distinct</span>)
-    } <span class="kw">else</span> {
-        <span class="ident">selection</span>
+    <span class="comment">// Distinct fields are always selected because we are processing them in-memory
+    </span><span class="kw">if let </span><span class="prelude-val">Some</span>(distinct) = distinct {
+        selection.merge(distinct)
+    } <span class="kw">else </span>{
+        selection
     }
 }
 
-<span class="kw">fn</span> <span class="ident">pairs_to_selections</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">parent</span>: <span class="ident">T</span>, <span class="ident">pairs</span>: <span class="kw-2">&amp;</span>[<span class="ident">FieldPair</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectedField</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ParentContainer</span><span class="op">&gt;</span>,
+<span class="kw">fn </span>pairs_to_selections&lt;T&gt;(parent: T, pairs: <span class="kw-2">&amp;</span>[FieldPair]) -&gt; Vec&lt;SelectedField&gt;
+<span class="kw">where
+    </span>T: Into&lt;ParentContainer&gt;,
 {
-    <span class="kw">let</span> <span class="ident">parent</span> <span class="op">=</span> <span class="ident">parent</span>.<span class="ident">into</span>();
-    <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">pairs</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">pair</span><span class="op">|</span> {
-            <span class="ident">parent</span>
-                .<span class="ident">find_field</span>(<span class="kw-2">&amp;</span><span class="ident">pair</span>.<span class="ident">parsed_field</span>.<span class="ident">name</span>)
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> (<span class="ident">pair</span>.<span class="ident">parsed_field</span>.<span class="ident">clone</span>(), <span class="ident">field</span>))
+    <span class="kw">let </span>parent = parent.into();
+    <span class="kw">let </span>fields = pairs
+        .iter()
+        .filter_map(|pair| {
+            parent
+                .find_field(<span class="kw-2">&amp;</span>pair.parsed_field.name)
+                .map(|field| (pair.parsed_field.clone(), field))
         })
-        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">ParsedField</span>, <span class="ident">Field</span>)<span class="op">&gt;</span><span class="op">&gt;</span>();
+        .collect::&lt;Vec&lt;(ParsedField, Field)&gt;&gt;();
 
-    <span class="ident">fields</span>
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">field</span> {
-            (<span class="kw">_</span>, <span class="ident">Field::Relation</span>(<span class="ident">rf</span>)) =&gt; <span class="ident">rf</span>.<span class="ident">scalar_fields</span>().<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
-            (<span class="kw">_</span>, <span class="ident">Field::Scalar</span>(<span class="ident">sf</span>)) =&gt; <span class="macro">vec!</span>[<span class="ident">sf</span>.<span class="ident">into</span>()],
-            (<span class="ident">pf</span>, <span class="ident">Field::Composite</span>(<span class="ident">cf</span>)) =&gt; <span class="macro">vec!</span>[<span class="ident">extract_composite_selection</span>(<span class="ident">pf</span>, <span class="ident">cf</span>)],
+    fields
+        .into_iter()
+        .flat_map(|field| <span class="kw">match </span>field {
+            (<span class="kw">_</span>, Field::Relation(rf)) =&gt; rf.scalar_fields().into_iter().map(Into::into).collect(),
+            (<span class="kw">_</span>, Field::Scalar(sf)) =&gt; <span class="macro">vec!</span>[sf.into()],
+            (pf, Field::Composite(cf)) =&gt; <span class="macro">vec!</span>[extract_composite_selection(pf, cf)],
         })
-        .<span class="ident">collect</span>()
+        .collect()
 }
 
-<span class="kw">fn</span> <span class="ident">extract_composite_selection</span>(<span class="ident">pf</span>: <span class="ident">ParsedField</span>, <span class="ident">cf</span>: <span class="ident">CompositeFieldRef</span>) -&gt; <span class="ident">SelectedField</span> {
-    <span class="kw">let</span> <span class="ident">object</span> <span class="op">=</span> <span class="ident">pf</span>
-        .<span class="ident">nested_fields</span>
-        .<span class="ident">expect</span>(<span class="string">&quot;Invalid composite query shape: Composite field selected without sub-selection.&quot;</span>);
+<span class="kw">fn </span>extract_composite_selection(pf: ParsedField, cf: CompositeFieldRef) -&gt; SelectedField {
+    <span class="kw">let </span>object = pf
+        .nested_fields
+        .expect(<span class="string">&quot;Invalid composite query shape: Composite field selected without sub-selection.&quot;</span>);
 
-    <span class="kw">let</span> <span class="ident">typ</span> <span class="op">=</span> <span class="ident">cf</span>.<span class="ident">typ</span>.<span class="ident">clone</span>();
+    <span class="kw">let </span>typ = cf.typ.clone();
 
-    <span class="ident">SelectedField::Composite</span>(<span class="ident">CompositeSelection</span> {
-        <span class="ident">field</span>: <span class="ident">cf</span>,
-        <span class="ident">selections</span>: <span class="ident">pairs_to_selections</span>(<span class="kw-2">&amp;</span><span class="ident">typ</span>, <span class="kw-2">&amp;</span><span class="ident">object</span>.<span class="ident">fields</span>),
+    SelectedField::Composite(CompositeSelection {
+        field: cf,
+        selections: pairs_to_selections(<span class="kw-2">&amp;</span>typ, <span class="kw-2">&amp;</span>object.fields),
     })
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">collect_nested_queries</span>(<span class="ident">from</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FieldPair</span><span class="op">&gt;</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ReadQuery</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">from</span>.<span class="ident">into_iter</span>()
-        .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">pair</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="ident">is_aggr_selection</span>(<span class="kw-2">&amp;</span><span class="ident">pair</span>) {
-                <span class="kw">return</span> <span class="prelude-val">None</span>;
+<span class="kw">pub fn </span>collect_nested_queries(from: Vec&lt;FieldPair&gt;, model: <span class="kw-2">&amp;</span>ModelRef) -&gt; QueryGraphBuilderResult&lt;Vec&lt;ReadQuery&gt;&gt; {
+    from.into_iter()
+        .filter_map(|pair| {
+            <span class="kw">if </span>is_aggr_selection(<span class="kw-2">&amp;</span>pair) {
+                <span class="kw">return </span><span class="prelude-val">None</span>;
             }
 
-            <span class="kw">let</span> <span class="ident">model_field</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">find_from_all</span>(<span class="kw-2">&amp;</span><span class="ident">pair</span>.<span class="ident">parsed_field</span>.<span class="ident">name</span>).<span class="ident">unwrap</span>();
+            <span class="kw">let </span>model_field = model.fields().find_from_all(<span class="kw-2">&amp;</span>pair.parsed_field.name).unwrap();
 
-            <span class="kw">match</span> <span class="ident">model_field</span> {
-                <span class="ident">Field::Scalar</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-                <span class="ident">Field::Composite</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
-                <span class="ident">Field::Relation</span>(<span class="kw-2">ref</span> <span class="ident">rf</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="ident">rf</span>.<span class="ident">related_model</span>();
-                    <span class="kw">let</span> <span class="ident">parent</span> <span class="op">=</span> <span class="ident">Arc::clone</span>(<span class="kw-2">&amp;</span><span class="ident">rf</span>);
+            <span class="kw">match </span>model_field {
+                Field::Scalar(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+                Field::Composite(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+                Field::Relation(<span class="kw-2">ref </span>rf) =&gt; {
+                    <span class="kw">let </span>model = rf.related_model();
+                    <span class="kw">let </span>parent = Arc::clone(<span class="kw-2">&amp;</span>rf);
 
-                    <span class="prelude-val">Some</span>(<span class="ident">related::find_related</span>(<span class="ident">pair</span>.<span class="ident">parsed_field</span>, <span class="ident">parent</span>, <span class="ident">model</span>))
+                    <span class="prelude-val">Some</span>(related::find_related(pair.parsed_field, parent, model))
                 }
             }
         })
-        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ReadQuery</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()
+        .collect::&lt;QueryGraphBuilderResult&lt;Vec&lt;ReadQuery&gt;&gt;&gt;()
 }
 
-<span class="doccomment">/// Performs a lookahead based on the nested queries and merges fields required</span>
-<span class="doccomment">/// to resolve the nested queries.</span>
-<span class="doccomment">/// A lookback on the parent is also performed to ensure that fields required for</span>
-<span class="doccomment">/// resolving the parent relation are present.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">merge_relation_selections</span>(
-    <span class="ident">selected_fields</span>: <span class="ident">FieldSelection</span>,
-    <span class="ident">parent_relation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RelationFieldRef</span><span class="op">&gt;</span>,
-    <span class="ident">nested_queries</span>: <span class="kw-2">&amp;</span>[<span class="ident">ReadQuery</span>],
-) -&gt; <span class="ident">FieldSelection</span> {
-    <span class="comment">// Context: We are on the child model when calling this function.</span>
-    <span class="kw">let</span> <span class="ident">selected_fields</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">rf</span>) <span class="op">=</span> <span class="ident">parent_relation</span> {
-        <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">rf</span>.<span class="ident">related_field</span>();
-        <span class="ident">selected_fields</span>.<span class="ident">merge</span>(<span class="ident">field</span>.<span class="ident">linking_fields</span>())
-    } <span class="kw">else</span> {
-        <span class="ident">selected_fields</span>
+<span class="doccomment">/// Performs a lookahead based on the nested queries and merges fields required
+/// to resolve the nested queries.
+/// A lookback on the parent is also performed to ensure that fields required for
+/// resolving the parent relation are present.
+</span><span class="kw">pub fn </span>merge_relation_selections(
+    selected_fields: FieldSelection,
+    parent_relation: <span class="prelude-ty">Option</span>&lt;RelationFieldRef&gt;,
+    nested_queries: <span class="kw-2">&amp;</span>[ReadQuery],
+) -&gt; FieldSelection {
+    <span class="comment">// Context: We are on the child model when calling this function.
+    </span><span class="kw">let </span>selected_fields = <span class="kw">if let </span><span class="prelude-val">Some</span>(rf) = parent_relation {
+        <span class="kw">let </span>field = rf.related_field();
+        selected_fields.merge(field.linking_fields())
+    } <span class="kw">else </span>{
+        selected_fields
     };
 
-    <span class="kw">let</span> <span class="ident">nested</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">nested_queries</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">nested_query</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ReadQuery::RelatedRecordsQuery</span>(<span class="kw-2">ref</span> <span class="ident">rq</span>) <span class="op">=</span> <span class="ident">nested_query</span> {
-                <span class="ident">rq</span>.<span class="ident">parent_field</span>.<span class="ident">linking_fields</span>()
-            } <span class="kw">else</span> {
+    <span class="kw">let </span>nested: Vec&lt;<span class="kw">_</span>&gt; = nested_queries
+        .iter()
+        .map(|nested_query| {
+            <span class="kw">if let </span>ReadQuery::RelatedRecordsQuery(<span class="kw-2">ref </span>rq) = nested_query {
+                rq.parent_field.linking_fields()
+            } <span class="kw">else </span>{
                 <span class="macro">unreachable!</span>()
             }
         })
-        .<span class="ident">collect</span>();
+        .collect();
 
-    <span class="ident">selected_fields</span>.<span class="ident">merge</span>(<span class="ident">FieldSelection::union</span>(<span class="ident">nested</span>))
+    selected_fields.merge(FieldSelection::union(nested))
 }
 
-<span class="doccomment">/// Ensures that if a cursor is provided, its fields are also selected.</span>
-<span class="doccomment">/// Necessary for post-processing of unstable orderings with cursor operations.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">merge_cursor_fields</span>(<span class="ident">selected_fields</span>: <span class="ident">FieldSelection</span>, <span class="ident">cursor</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span>) -&gt; <span class="ident">FieldSelection</span> {
-    <span class="kw">match</span> <span class="ident">cursor</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">cursor</span>) =&gt; <span class="ident">selected_fields</span>.<span class="ident">merge</span>(<span class="ident">cursor</span>.<span class="ident">into</span>()),
-        <span class="prelude-val">None</span> =&gt; <span class="ident">selected_fields</span>,
+<span class="doccomment">/// Ensures that if a cursor is provided, its fields are also selected.
+/// Necessary for post-processing of unstable orderings with cursor operations.
+</span><span class="kw">pub fn </span>merge_cursor_fields(selected_fields: FieldSelection, cursor: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;SelectionResult&gt;) -&gt; FieldSelection {
+    <span class="kw">match </span>cursor {
+        <span class="prelude-val">Some</span>(cursor) =&gt; selected_fields.merge(cursor.into()),
+        <span class="prelude-val">None </span>=&gt; selected_fields,
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">collect_relation_aggr_selections</span>(
-    <span class="ident">from</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FieldPair</span><span class="op">&gt;</span>,
-    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelAggregationSelection</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">selections</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+<span class="kw">pub fn </span>collect_relation_aggr_selections(
+    from: Vec&lt;FieldPair&gt;,
+    model: <span class="kw-2">&amp;</span>ModelRef,
+) -&gt; QueryGraphBuilderResult&lt;Vec&lt;RelAggregationSelection&gt;&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>selections = <span class="macro">vec!</span>[];
 
-    <span class="kw">for</span> <span class="ident">pair</span> <span class="kw">in</span> <span class="ident">from</span> {
-        <span class="kw">match</span> <span class="ident">pair</span>.<span class="ident">parsed_field</span>.<span class="ident">name</span>.<span class="ident">as_str</span>() {
-            <span class="ident">UNDERSCORE_COUNT</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">nested_fields</span> <span class="op">=</span> <span class="ident">pair</span>.<span class="ident">parsed_field</span>.<span class="ident">nested_fields</span>.<span class="ident">unwrap</span>();
+    <span class="kw">for </span>pair <span class="kw">in </span>from {
+        <span class="kw">match </span>pair.parsed_field.name.as_str() {
+            UNDERSCORE_COUNT =&gt; {
+                <span class="kw">let </span>nested_fields = pair.parsed_field.nested_fields.unwrap();
 
-                <span class="kw">for</span> <span class="kw-2">mut</span> <span class="ident">nested_pair</span> <span class="kw">in</span> <span class="ident">nested_fields</span>.<span class="ident">fields</span> {
-                    <span class="kw">let</span> <span class="ident">rf</span> <span class="op">=</span> <span class="ident">model</span>
-                        .<span class="ident">fields</span>()
-                        .<span class="ident">find_from_relation_fields</span>(<span class="kw-2">&amp;</span><span class="ident">nested_pair</span>.<span class="ident">parsed_field</span>.<span class="ident">name</span>)
-                        .<span class="ident">unwrap</span>();
-                    <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">nested_pair</span>.<span class="ident">parsed_field</span>.<span class="ident">arguments</span>.<span class="ident">lookup</span>(<span class="ident">args::WHERE</span>) {
-                        <span class="prelude-val">Some</span>(<span class="ident">where_arg</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">extract_filter</span>(<span class="ident">where_arg</span>.<span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>, <span class="ident">rf</span>.<span class="ident">related_model</span>())<span class="question-mark">?</span>),
-                        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+                <span class="kw">for </span><span class="kw-2">mut </span>nested_pair <span class="kw">in </span>nested_fields.fields {
+                    <span class="kw">let </span>rf = model
+                        .fields()
+                        .find_from_relation_fields(<span class="kw-2">&amp;</span>nested_pair.parsed_field.name)
+                        .unwrap();
+                    <span class="kw">let </span>filter = <span class="kw">match </span>nested_pair.parsed_field.arguments.lookup(args::WHERE) {
+                        <span class="prelude-val">Some</span>(where_arg) =&gt; <span class="prelude-val">Some</span>(extract_filter(where_arg.value.try_into()<span class="question-mark">?</span>, rf.related_model())<span class="question-mark">?</span>),
+                        <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
                     };
 
-                    <span class="ident">selections</span>.<span class="ident">push</span>(<span class="ident">RelAggregationSelection::Count</span>(<span class="ident">rf</span>, <span class="ident">filter</span>));
+                    selections.push(RelAggregationSelection::Count(rf, filter));
                 }
             }
-            <span class="ident">field_name</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unknown field name \&quot;{}\&quot; for a relation aggregation&quot;</span>, <span class="ident">field_name</span>),
+            field_name =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Unknown field name \&quot;{}\&quot; for a relation aggregation&quot;</span>, field_name),
         }
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">selections</span>)
+    <span class="prelude-val">Ok</span>(selections)
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

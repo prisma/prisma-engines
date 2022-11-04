@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/interactive_transactions/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/interactive_transactions/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_core/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -140,147 +140,147 @@
 <span id="140">140</span>
 <span id="141">141</span>
 <span id="142">142</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::CoreError</span>;
-<span class="kw">use</span> <span class="ident">connector</span>::{<span class="ident">Connection</span>, <span class="ident">ConnectionLike</span>, <span class="ident">Transaction</span>};
-<span class="kw">use</span> <span class="ident">std::fmt::Display</span>;
-<span class="kw">use</span> <span class="ident">tokio::task::JoinHandle</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::CoreError;
+<span class="kw">use </span>connector::{Connection, ConnectionLike, Transaction};
+<span class="kw">use </span>std::fmt::Display;
+<span class="kw">use </span>tokio::task::JoinHandle;
 
-<span class="kw">mod</span> <span class="ident">actor_manager</span>;
-<span class="kw">mod</span> <span class="ident">actors</span>;
-<span class="kw">mod</span> <span class="ident">error</span>;
-<span class="kw">mod</span> <span class="ident">messages</span>;
+<span class="kw">mod </span>actor_manager;
+<span class="kw">mod </span>actors;
+<span class="kw">mod </span>error;
+<span class="kw">mod </span>messages;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">actor_manager</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">actors</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">error</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">messages</span>::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>actor_manager::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>actors::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>error::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>messages::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// How Interactive Transactions work</span>
-<span class="doccomment">/// The Interactive Transactions (iTx) follow an actor model design. Where each iTx is created in its own process.</span>
-<span class="doccomment">/// When a prisma client requests to start a new transaction, the Transaction Actor Manager spawns a new ITXServer. The ITXServer runs in its own</span>
-<span class="doccomment">/// process and waits for messages to arrive via its receive channel to process.</span>
-<span class="doccomment">/// The Transaction Actor Manager will also create an ITXClient and add it to hashmap managed by an RwLock. The ITXClient is the only way to communicate</span>
-<span class="doccomment">/// with the ITXServer.</span>
+<span class="doccomment">/// How Interactive Transactions work
+/// The Interactive Transactions (iTx) follow an actor model design. Where each iTx is created in its own process.
+/// When a prisma client requests to start a new transaction, the Transaction Actor Manager spawns a new ITXServer. The ITXServer runs in its own
+/// process and waits for messages to arrive via its receive channel to process.
+/// The Transaction Actor Manager will also create an ITXClient and add it to hashmap managed by an RwLock. The ITXClient is the only way to communicate
+/// with the ITXServer.
 
-<span class="doccomment">/// Once the prisma client receives the iTx Id it can perform database operations using that iTx id. When an operation request is received by the</span>
-<span class="doccomment">/// TransactionActorManager, it looks for the client in the hashmap and passes the operation to the client. The ITXClient sends a message to the</span>
-<span class="doccomment">/// ITXServer and waits for a response. The ITXServer will then perform the operation and return the result. The ITXServer will perform one</span>
-<span class="doccomment">/// operation at a time. All other operations will sit in the message queue waiting to be processed.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The ITXServer will handle all messages until:</span>
-<span class="doccomment">/// - It transitions state, e.g &quot;rollback&quot; or &quot;commit&quot;</span>
-<span class="doccomment">/// - It exceeds its timeout, in which case the iTx is rolledback and the connection to the database is closed.</span>
+/// Once the prisma client receives the iTx Id it can perform database operations using that iTx id. When an operation request is received by the
+/// TransactionActorManager, it looks for the client in the hashmap and passes the operation to the client. The ITXClient sends a message to the
+/// ITXServer and waits for a response. The ITXServer will then perform the operation and return the result. The ITXServer will perform one
+/// operation at a time. All other operations will sit in the message queue waiting to be processed.
+///
+/// The ITXServer will handle all messages until:
+/// - It transitions state, e.g &quot;rollback&quot; or &quot;commit&quot;
+/// - It exceeds its timeout, in which case the iTx is rolledback and the connection to the database is closed.
 
-<span class="doccomment">/// Once the ITXServer is done handling messages from the iTx Client, it sends a last message to the Background Client list Actor to say that it is completed and then shuts down.</span>
-<span class="doccomment">/// The Background Client list Actor removes the client from the list of active clients and keeps in cache the iTx id of the closed transaction.</span>
+/// Once the ITXServer is done handling messages from the iTx Client, it sends a last message to the Background Client list Actor to say that it is completed and then shuts down.
+/// The Background Client list Actor removes the client from the list of active clients and keeps in cache the iTx id of the closed transaction.
 
-<span class="doccomment">/// We keep a list of closed transactions so that if any further messages are received for this iTx id,</span>
-<span class="doccomment">/// the TransactionActorManager can reply with a helpful error message which explains that no operation can be performed on a closed transaction</span>
-<span class="doccomment">/// rather than an error message stating that the transaction does not exist.</span>
+/// We keep a list of closed transactions so that if any further messages are received for this iTx id,
+/// the TransactionActorManager can reply with a helpful error message which explains that no operation can be performed on a closed transaction
+/// rather than an error message stating that the transaction does not exist.
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TxId</span>(<span class="ident">String</span>);
+</span><span class="attribute">#[derive(Debug, Clone, Hash, Eq, PartialEq)]
+</span><span class="kw">pub struct </span>TxId(String);
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">TxId</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">cuid::cuid</span>().<span class="ident">unwrap</span>())
+<span class="kw">impl </span>Default <span class="kw">for </span>TxId {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(cuid::cuid().unwrap())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TxId</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T&gt; From&lt;T&gt; <span class="kw">for </span>TxId
+<span class="kw">where
+    </span>T: Into&lt;String&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">s</span>.<span class="ident">into</span>())
+    <span class="kw">fn </span>from(s: T) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(s.into())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">TxId</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
+<span class="kw">impl </span>Display <span class="kw">for </span>TxId {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>)
     }
 }
 
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CachedTx</span> {
-    <span class="ident">Open</span>(<span class="ident">OpenTx</span>),
-    <span class="ident">Aborted</span>,
-    <span class="ident">Committed</span>,
-    <span class="ident">RolledBack</span>,
-    <span class="ident">Expired</span>,
+<span class="kw">pub enum </span>CachedTx {
+    Open(OpenTx),
+    Aborted,
+    Committed,
+    RolledBack,
+    Expired,
 }
 
-<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">CachedTx</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">CachedTx::Open</span>(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Open&quot;</span>),
-            <span class="ident">CachedTx::Aborted</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Aborted&quot;</span>),
-            <span class="ident">CachedTx::Committed</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Committed&quot;</span>),
-            <span class="ident">CachedTx::RolledBack</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Rolled back&quot;</span>),
-            <span class="ident">CachedTx::Expired</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Expired&quot;</span>),
+<span class="kw">impl </span>Display <span class="kw">for </span>CachedTx {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            CachedTx::Open(<span class="kw">_</span>) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Open&quot;</span>),
+            CachedTx::Aborted =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Aborted&quot;</span>),
+            CachedTx::Committed =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Committed&quot;</span>),
+            CachedTx::RolledBack =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Rolled back&quot;</span>),
+            CachedTx::Expired =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Expired&quot;</span>),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CachedTx</span> {
-    <span class="doccomment">/// Requires this cached TX to be `Open`, else an error will be raised that it is no longer valid.</span>
-    <span class="doccomment">/// Consumes self to remove the `CachedTx` indirection to get to the underlying `OpenTx`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_open</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">OpenTx</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="self">Self</span>::Open</span>(<span class="ident">otx</span>) <span class="op">=</span> <span class="self">self</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">otx</span>)
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">reason</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;Transaction is no longer valid. Last state: &#39;{}&#39;&quot;</span>, <span class="self">self</span>);
-            <span class="prelude-val">Err</span>(<span class="ident">CoreError::from</span>(<span class="ident">TransactionError::Closed</span> { <span class="ident">reason</span> }))
+<span class="kw">impl </span>CachedTx {
+    <span class="doccomment">/// Requires this cached TX to be `Open`, else an error will be raised that it is no longer valid.
+    /// Consumes self to remove the `CachedTx` indirection to get to the underlying `OpenTx`.
+    </span><span class="kw">pub fn </span>into_open(<span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;OpenTx&gt; {
+        <span class="kw">if let </span><span class="self">Self</span>::Open(otx) = <span class="self">self </span>{
+            <span class="prelude-val">Ok</span>(otx)
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>reason = <span class="macro">format!</span>(<span class="string">&quot;Transaction is no longer valid. Last state: &#39;{}&#39;&quot;</span>, <span class="self">self</span>);
+            <span class="prelude-val">Err</span>(CoreError::from(TransactionError::Closed { reason }))
         }
     }
 
-    <span class="doccomment">/// Requires this cached TX to be `Open`, else an error will be raised that it is no longer valid.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_open</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">OpenTx</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="self">Self</span>::Open</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">otx</span>) <span class="op">=</span> <span class="self">self</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">otx</span>)
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">reason</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;Transaction is no longer valid. Last state: &#39;{}&#39;&quot;</span>, <span class="self">self</span>);
-            <span class="prelude-val">Err</span>(<span class="ident">CoreError::from</span>(<span class="ident">TransactionError::Closed</span> { <span class="ident">reason</span> }))
+    <span class="doccomment">/// Requires this cached TX to be `Open`, else an error will be raised that it is no longer valid.
+    </span><span class="kw">pub fn </span>as_open(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;<span class="kw-2">&amp;mut </span>OpenTx&gt; {
+        <span class="kw">if let </span><span class="self">Self</span>::Open(<span class="kw-2">ref mut </span>otx) = <span class="self">self </span>{
+            <span class="prelude-val">Ok</span>(otx)
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>reason = <span class="macro">format!</span>(<span class="string">&quot;Transaction is no longer valid. Last state: &#39;{}&#39;&quot;</span>, <span class="self">self</span>);
+            <span class="prelude-val">Err</span>(CoreError::from(TransactionError::Closed { reason }))
         }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OpenTx</span> {
-    <span class="kw">pub</span> <span class="ident">conn</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Connection</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">tx</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Transaction</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">expiration_timer</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">JoinHandle</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>OpenTx {
+    <span class="kw">pub </span>conn: Box&lt;<span class="kw">dyn </span>Connection&gt;,
+    <span class="kw">pub </span>tx: Box&lt;<span class="kw">dyn </span>Transaction + <span class="lifetime">&#39;static</span>&gt;,
+    <span class="kw">pub </span>expiration_timer: <span class="prelude-ty">Option</span>&lt;JoinHandle&lt;()&gt;&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">OpenTx</span> {
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start</span>(<span class="kw-2">mut</span> <span class="ident">conn</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Connection</span><span class="op">&gt;</span>, <span class="ident">isolation_level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="comment">// Forces static lifetime for the transaction, disabling the lifetime checks for `tx`.</span>
-        <span class="comment">// Why is this okay? We store the connection the tx depends on with its lifetime next to</span>
-        <span class="comment">// the tx in the struct. Neither the connection nor the tx are moved out of this struct.</span>
-        <span class="comment">// The `OpenTx` struct is dropped as a unit.</span>
-        <span class="kw">let</span> <span class="ident">transaction</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Transaction</span> <span class="op">+</span> <span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">start_transaction</span>(<span class="ident">isolation_level</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">tx</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">tx</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Transaction</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::mem::transmute</span>(<span class="ident">transaction</span>);
-            <span class="ident">tx</span>
+<span class="kw">impl </span>OpenTx {
+    <span class="kw">pub async fn </span>start(<span class="kw-2">mut </span>conn: Box&lt;<span class="kw">dyn </span>Connection&gt;, isolation_level: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; <span class="kw">crate</span>::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="comment">// Forces static lifetime for the transaction, disabling the lifetime checks for `tx`.
+        // Why is this okay? We store the connection the tx depends on with its lifetime next to
+        // the tx in the struct. Neither the connection nor the tx are moved out of this struct.
+        // The `OpenTx` struct is dropped as a unit.
+        </span><span class="kw">let </span>transaction: Box&lt;<span class="kw">dyn </span>Transaction + <span class="lifetime">&#39;_</span>&gt; = conn.start_transaction(isolation_level).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>tx = <span class="kw">unsafe </span>{
+            <span class="kw">let </span>tx: Box&lt;<span class="kw">dyn </span>Transaction + <span class="lifetime">&#39;static</span>&gt; = std::mem::transmute(transaction);
+            tx
         };
 
-        <span class="kw">let</span> <span class="ident">c_tx</span> <span class="op">=</span> <span class="ident">OpenTx</span> {
-            <span class="ident">conn</span>,
-            <span class="ident">tx</span>,
-            <span class="ident">expiration_timer</span>: <span class="prelude-val">None</span>,
+        <span class="kw">let </span>c_tx = OpenTx {
+            conn,
+            tx,
+            expiration_timer: <span class="prelude-val">None</span>,
         };
 
-        <span class="prelude-val">Ok</span>(<span class="ident">c_tx</span>)
+        <span class="prelude-val">Ok</span>(c_tx)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_connection_like</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">ConnectionLike</span> {
-        <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">as_mut</span>().<span class="ident">as_connection_like</span>()
+    <span class="kw">pub fn </span>as_connection_like(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>ConnectionLike {
+        <span class="self">self</span>.tx.as_mut().as_connection_like()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">CachedTx</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OpenTx</span> {
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; <span class="ident">CachedTx</span> {
-        <span class="ident">CachedTx::Open</span>(<span class="self">self</span>)
+<span class="kw">impl </span>Into&lt;CachedTx&gt; <span class="kw">for </span>OpenTx {
+    <span class="kw">fn </span>into(<span class="self">self</span>) -&gt; CachedTx {
+        CachedTx::Open(<span class="self">self</span>)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

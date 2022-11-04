@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/dissimilar-1.0.4/src/find.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>find.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../dissimilar/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../dissimilar/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../dissimilar/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/dissimilar-1.0.4/src/find.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>find.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../dissimilar/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../dissimilar/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../dissimilar/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -230,237 +230,237 @@
 <span id="230">230</span>
 <span id="231">231</span>
 <span id="232">232</span>
-</pre><pre class="rust"><code><span class="comment">// The strstr implementation in this file is extracted from the Rust standard</span>
-<span class="comment">// library&#39;s str::find. The algorithm works for arbitrary &amp;[u8] haystack and</span>
-<span class="comment">// needle but is only exposed by the standard library on UTF-8 strings.</span>
-<span class="comment">//</span>
-<span class="comment">// https://github.com/rust-lang/rust/blob/1.40.0/src/libcore/str/pattern.rs</span>
-<span class="comment">//</span>
-<span class="comment">// ---</span>
-<span class="comment">//</span>
-<span class="comment">// This is the Two-Way search algorithm, which was introduced in the paper:</span>
-<span class="comment">// Crochemore, M., Perrin, D., 1991, Two-way string-matching, Journal of the ACM 38(3):651-675.</span>
-<span class="comment">//</span>
-<span class="comment">// Here&#39;s some background information.</span>
-<span class="comment">//</span>
-<span class="comment">// A *word* is a string of symbols. The *length* of a word should be a familiar</span>
-<span class="comment">// notion, and here we denote it for any word x by |x|. (We also allow for the</span>
-<span class="comment">// possibility of the *empty word*, a word of length zero.)</span>
-<span class="comment">//</span>
-<span class="comment">// If x is any non-empty word, then an integer p with 0 &lt; p &lt;= |x| is said to be</span>
-<span class="comment">// a *period* for x iff for all i with 0 &lt;= i &lt;= |x| - p - 1, we have x[i] ==</span>
-<span class="comment">// x[i+p]. For example, both 1 and 2 are periods for the string &quot;aa&quot;. As another</span>
-<span class="comment">// example, the only period of the string &quot;abcd&quot; is 4.</span>
-<span class="comment">//</span>
-<span class="comment">// We denote by period(x) the *smallest* period of x (provided that x is</span>
-<span class="comment">// non-empty). This is always well-defined since every non-empty word x has at</span>
-<span class="comment">// least one period, |x|. We sometimes call this *the period* of x.</span>
-<span class="comment">//</span>
-<span class="comment">// If u, v and x are words such that x = uv, where uv is the concatenation of u</span>
-<span class="comment">// and v, then we say that (u, v) is a *factorization* of x.</span>
-<span class="comment">//</span>
-<span class="comment">// Let (u, v) be a factorization for a word x. Then if w is a non-empty word</span>
-<span class="comment">// such that both of the following hold</span>
-<span class="comment">//</span>
-<span class="comment">//   - either w is a suffix of u or u is a suffix of w</span>
-<span class="comment">//   - either w is a prefix of v or v is a prefix of w</span>
-<span class="comment">//</span>
-<span class="comment">// then w is said to be a *repetition* for the factorization (u, v).</span>
-<span class="comment">//</span>
-<span class="comment">// Just to unpack this, there are four possibilities here. Let w = &quot;abc&quot;. Then</span>
-<span class="comment">// we might have:</span>
-<span class="comment">//</span>
-<span class="comment">//   - w is a suffix of u and w is a prefix of v. ex: (&quot;lolabc&quot;, &quot;abcde&quot;)</span>
-<span class="comment">//   - w is a suffix of u and v is a prefix of w. ex: (&quot;lolabc&quot;, &quot;ab&quot;)</span>
-<span class="comment">//   - u is a suffix of w and w is a prefix of v. ex: (&quot;bc&quot;, &quot;abchi&quot;)</span>
-<span class="comment">//   - u is a suffix of w and v is a prefix of w. ex: (&quot;bc&quot;, &quot;a&quot;)</span>
-<span class="comment">//</span>
-<span class="comment">// Note that the word vu is a repetition for any factorization (u,v) of x = uv,</span>
-<span class="comment">// so every factorization has at least one repetition.</span>
-<span class="comment">//</span>
-<span class="comment">// If x is a string and (u, v) is a factorization for x, then a *local period*</span>
-<span class="comment">// for (u, v) is an integer r such that there is some word w such that |w| = r</span>
-<span class="comment">// and w is a repetition for (u, v).</span>
-<span class="comment">//</span>
-<span class="comment">// We denote by local_period(u, v) the smallest local period of (u, v). We</span>
-<span class="comment">// sometimes call this *the local period* of (u, v). Provided that x = uv is</span>
-<span class="comment">// non-empty, this is well-defined (because each non-empty word has at least one</span>
-<span class="comment">// factorization, as noted above).</span>
-<span class="comment">//</span>
-<span class="comment">// It can be proven that the following is an equivalent definition of a local</span>
-<span class="comment">// period for a factorization (u, v): any positive integer r such that x[i] ==</span>
-<span class="comment">// x[i+r] for all i such that |u| - r &lt;= i &lt;= |u| - 1 and such that both x[i]</span>
-<span class="comment">// and x[i+r] are defined. (i.e., i &gt; 0 and i + r &lt; |x|).</span>
-<span class="comment">//</span>
-<span class="comment">// Using the above reformulation, it is easy to prove that</span>
-<span class="comment">//</span>
-<span class="comment">//     1 &lt;= local_period(u, v) &lt;= period(uv)</span>
-<span class="comment">//</span>
-<span class="comment">// A factorization (u, v) of x such that local_period(u,v) = period(x) is called</span>
-<span class="comment">// a *critical factorization*.</span>
-<span class="comment">//</span>
-<span class="comment">// The algorithm hinges on the following theorem, which is stated without proof:</span>
-<span class="comment">//</span>
-<span class="comment">// **Critical Factorization Theorem** Any word x has at least one critical</span>
-<span class="comment">// factorization (u, v) such that |u| &lt; period(x).</span>
-<span class="comment">//</span>
-<span class="comment">// The purpose of maximal_suffix is to find such a critical factorization.</span>
-<span class="comment">//</span>
-<span class="comment">// If the period is short, compute another factorization x = u&#39; v&#39; to use for</span>
-<span class="comment">// reverse search, chosen instead so that |v&#39;| &lt; period(x).</span>
+</pre><pre class="rust"><code><span class="comment">// The strstr implementation in this file is extracted from the Rust standard
+// library&#39;s str::find. The algorithm works for arbitrary &amp;[u8] haystack and
+// needle but is only exposed by the standard library on UTF-8 strings.
+//
+// https://github.com/rust-lang/rust/blob/1.40.0/src/libcore/str/pattern.rs
+//
+// ---
+//
+// This is the Two-Way search algorithm, which was introduced in the paper:
+// Crochemore, M., Perrin, D., 1991, Two-way string-matching, Journal of the ACM 38(3):651-675.
+//
+// Here&#39;s some background information.
+//
+// A *word* is a string of symbols. The *length* of a word should be a familiar
+// notion, and here we denote it for any word x by |x|. (We also allow for the
+// possibility of the *empty word*, a word of length zero.)
+//
+// If x is any non-empty word, then an integer p with 0 &lt; p &lt;= |x| is said to be
+// a *period* for x iff for all i with 0 &lt;= i &lt;= |x| - p - 1, we have x[i] ==
+// x[i+p]. For example, both 1 and 2 are periods for the string &quot;aa&quot;. As another
+// example, the only period of the string &quot;abcd&quot; is 4.
+//
+// We denote by period(x) the *smallest* period of x (provided that x is
+// non-empty). This is always well-defined since every non-empty word x has at
+// least one period, |x|. We sometimes call this *the period* of x.
+//
+// If u, v and x are words such that x = uv, where uv is the concatenation of u
+// and v, then we say that (u, v) is a *factorization* of x.
+//
+// Let (u, v) be a factorization for a word x. Then if w is a non-empty word
+// such that both of the following hold
+//
+//   - either w is a suffix of u or u is a suffix of w
+//   - either w is a prefix of v or v is a prefix of w
+//
+// then w is said to be a *repetition* for the factorization (u, v).
+//
+// Just to unpack this, there are four possibilities here. Let w = &quot;abc&quot;. Then
+// we might have:
+//
+//   - w is a suffix of u and w is a prefix of v. ex: (&quot;lolabc&quot;, &quot;abcde&quot;)
+//   - w is a suffix of u and v is a prefix of w. ex: (&quot;lolabc&quot;, &quot;ab&quot;)
+//   - u is a suffix of w and w is a prefix of v. ex: (&quot;bc&quot;, &quot;abchi&quot;)
+//   - u is a suffix of w and v is a prefix of w. ex: (&quot;bc&quot;, &quot;a&quot;)
+//
+// Note that the word vu is a repetition for any factorization (u,v) of x = uv,
+// so every factorization has at least one repetition.
+//
+// If x is a string and (u, v) is a factorization for x, then a *local period*
+// for (u, v) is an integer r such that there is some word w such that |w| = r
+// and w is a repetition for (u, v).
+//
+// We denote by local_period(u, v) the smallest local period of (u, v). We
+// sometimes call this *the local period* of (u, v). Provided that x = uv is
+// non-empty, this is well-defined (because each non-empty word has at least one
+// factorization, as noted above).
+//
+// It can be proven that the following is an equivalent definition of a local
+// period for a factorization (u, v): any positive integer r such that x[i] ==
+// x[i+r] for all i such that |u| - r &lt;= i &lt;= |u| - 1 and such that both x[i]
+// and x[i+r] are defined. (i.e., i &gt; 0 and i + r &lt; |x|).
+//
+// Using the above reformulation, it is easy to prove that
+//
+//     1 &lt;= local_period(u, v) &lt;= period(uv)
+//
+// A factorization (u, v) of x such that local_period(u,v) = period(x) is called
+// a *critical factorization*.
+//
+// The algorithm hinges on the following theorem, which is stated without proof:
+//
+// **Critical Factorization Theorem** Any word x has at least one critical
+// factorization (u, v) such that |u| &lt; period(x).
+//
+// The purpose of maximal_suffix is to find such a critical factorization.
+//
+// If the period is short, compute another factorization x = u&#39; v&#39; to use for
+// reverse search, chosen instead so that |v&#39;| &lt; period(x).
 
-<span class="kw">use</span> <span class="ident">std::cmp</span>;
-<span class="kw">use</span> <span class="ident">std::usize</span>;
+</span><span class="kw">use </span>std::cmp;
+<span class="kw">use </span>std::usize;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find</span>(<span class="ident">haystack</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">needle</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-    <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">needle</span>.<span class="ident">is_empty</span>());
+<span class="kw">pub fn </span>find(haystack: <span class="kw-2">&amp;</span>[u8], needle: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+    <span class="macro">assert!</span>(!needle.is_empty());
 
-    <span class="comment">// crit_pos: critical factorization index</span>
-    <span class="kw">let</span> (<span class="ident">crit_pos_false</span>, <span class="ident">period_false</span>) <span class="op">=</span> <span class="ident">maximal_suffix</span>(<span class="ident">needle</span>, <span class="bool-val">false</span>);
-    <span class="kw">let</span> (<span class="ident">crit_pos_true</span>, <span class="ident">period_true</span>) <span class="op">=</span> <span class="ident">maximal_suffix</span>(<span class="ident">needle</span>, <span class="bool-val">true</span>);
-    <span class="kw">let</span> (<span class="ident">crit_pos</span>, <span class="kw-2">mut</span> <span class="ident">period</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">crit_pos_false</span> <span class="op">&gt;</span> <span class="ident">crit_pos_true</span> {
-        (<span class="ident">crit_pos_false</span>, <span class="ident">period_false</span>)
-    } <span class="kw">else</span> {
-        (<span class="ident">crit_pos_true</span>, <span class="ident">period_true</span>)
+    <span class="comment">// crit_pos: critical factorization index
+    </span><span class="kw">let </span>(crit_pos_false, period_false) = maximal_suffix(needle, <span class="bool-val">false</span>);
+    <span class="kw">let </span>(crit_pos_true, period_true) = maximal_suffix(needle, <span class="bool-val">true</span>);
+    <span class="kw">let </span>(crit_pos, <span class="kw-2">mut </span>period) = <span class="kw">if </span>crit_pos_false &gt; crit_pos_true {
+        (crit_pos_false, period_false)
+    } <span class="kw">else </span>{
+        (crit_pos_true, period_true)
     };
 
-    <span class="comment">// Byteset is an extension (not part of the two way algorithm); it is a</span>
-    <span class="comment">// 64-bit &quot;fingerprint&quot; where each set bit j corresponds to a (byte &amp; 63) ==</span>
-    <span class="comment">// j present in the needle.</span>
-    <span class="kw">let</span> <span class="ident">byteset</span>;
-    <span class="comment">// Index into needle before which we have already matched.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">memory</span>;
+    <span class="comment">// Byteset is an extension (not part of the two way algorithm); it is a
+    // 64-bit &quot;fingerprint&quot; where each set bit j corresponds to a (byte &amp; 63) ==
+    // j present in the needle.
+    </span><span class="kw">let </span>byteset;
+    <span class="comment">// Index into needle before which we have already matched.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>memory;
 
-    <span class="comment">// A particularly readable explanation of what&#39;s going on here can be found</span>
-    <span class="comment">// in Crochemore and Rytter&#39;s book &quot;Text Algorithms&quot;, ch 13. Specifically</span>
-    <span class="comment">// see the code for &quot;Algorithm CP&quot; on p. 323.</span>
-    <span class="comment">//</span>
-    <span class="comment">// What&#39;s going on is we have some critical factorization (u, v) of the</span>
-    <span class="comment">// needle, and we want to determine whether u is a suffix of &amp;v[..period].</span>
-    <span class="comment">// If it is, we use &quot;Algorithm CP1&quot;. Otherwise we use &quot;Algorithm CP2&quot;, which</span>
-    <span class="comment">// is optimized for when the period of the needle is large.</span>
-    <span class="kw">let</span> <span class="ident">long_period</span> <span class="op">=</span> <span class="ident">needle</span>[..<span class="ident">crit_pos</span>] <span class="op">!</span><span class="op">=</span> <span class="ident">needle</span>[<span class="ident">period</span>..<span class="ident">period</span> <span class="op">+</span> <span class="ident">crit_pos</span>];
-    <span class="kw">if</span> <span class="ident">long_period</span> {
-        <span class="comment">// Long period case -- we have an approximation to the actual period,</span>
-        <span class="comment">// and don&#39;t use memorization.</span>
-        <span class="comment">//</span>
-        <span class="comment">// Approximate the period by lower bound max(|u|, |v|) + 1.</span>
-        <span class="ident">period</span> <span class="op">=</span> <span class="ident">cmp::max</span>(<span class="ident">crit_pos</span>, <span class="ident">needle</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">crit_pos</span>) <span class="op">+</span> <span class="number">1</span>;
-        <span class="ident">byteset</span> <span class="op">=</span> <span class="ident">byteset_create</span>(<span class="ident">needle</span>);
-        <span class="comment">// Dummy value to signify that the period is long.</span>
-        <span class="ident">memory</span> <span class="op">=</span> <span class="ident">usize::MAX</span>;
-    } <span class="kw">else</span> {
-        <span class="comment">// Short period case -- the period is exact.</span>
-        <span class="ident">byteset</span> <span class="op">=</span> <span class="ident">byteset_create</span>(<span class="kw-2">&amp;</span><span class="ident">needle</span>[..<span class="ident">period</span>]);
-        <span class="ident">memory</span> <span class="op">=</span> <span class="number">0</span>;
+    <span class="comment">// A particularly readable explanation of what&#39;s going on here can be found
+    // in Crochemore and Rytter&#39;s book &quot;Text Algorithms&quot;, ch 13. Specifically
+    // see the code for &quot;Algorithm CP&quot; on p. 323.
+    //
+    // What&#39;s going on is we have some critical factorization (u, v) of the
+    // needle, and we want to determine whether u is a suffix of &amp;v[..period].
+    // If it is, we use &quot;Algorithm CP1&quot;. Otherwise we use &quot;Algorithm CP2&quot;, which
+    // is optimized for when the period of the needle is large.
+    </span><span class="kw">let </span>long_period = needle[..crit_pos] != needle[period..period + crit_pos];
+    <span class="kw">if </span>long_period {
+        <span class="comment">// Long period case -- we have an approximation to the actual period,
+        // and don&#39;t use memorization.
+        //
+        // Approximate the period by lower bound max(|u|, |v|) + 1.
+        </span>period = cmp::max(crit_pos, needle.len() - crit_pos) + <span class="number">1</span>;
+        byteset = byteset_create(needle);
+        <span class="comment">// Dummy value to signify that the period is long.
+        </span>memory = usize::MAX;
+    } <span class="kw">else </span>{
+        <span class="comment">// Short period case -- the period is exact.
+        </span>byteset = byteset_create(<span class="kw-2">&amp;</span>needle[..period]);
+        memory = <span class="number">0</span>;
     }
 
-    <span class="comment">// One of the main ideas of Two-Way is that we factorize the needle into two</span>
-    <span class="comment">// halves, (u, v), and begin trying to find v in the haystack by scanning</span>
-    <span class="comment">// left to right. If v matches, we try to match u by scanning right to left.</span>
-    <span class="comment">// How far we can jump when we encounter a mismatch is all based on the fact</span>
-    <span class="comment">// that (u, v) is a critical factorization for the needle.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">position</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">let</span> <span class="ident">needle_last</span> <span class="op">=</span> <span class="ident">needle</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>;
-    <span class="lifetime">&#39;search</span>: <span class="kw">loop</span> {
-        <span class="comment">// Check that we have room to search in. position + needle_last cannot</span>
-        <span class="comment">// overflow if we assume slices are bounded by isize&#39;s range.</span>
-        <span class="kw">let</span> <span class="ident">tail_byte</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">haystack</span>.<span class="ident">get</span>(<span class="ident">position</span> <span class="op">+</span> <span class="ident">needle_last</span>)<span class="question-mark">?</span>;
+    <span class="comment">// One of the main ideas of Two-Way is that we factorize the needle into two
+    // halves, (u, v), and begin trying to find v in the haystack by scanning
+    // left to right. If v matches, we try to match u by scanning right to left.
+    // How far we can jump when we encounter a mismatch is all based on the fact
+    // that (u, v) is a critical factorization for the needle.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>position = <span class="number">0</span>;
+    <span class="kw">let </span>needle_last = needle.len() - <span class="number">1</span>;
+    <span class="lifetime">&#39;search</span>: <span class="kw">loop </span>{
+        <span class="comment">// Check that we have room to search in. position + needle_last cannot
+        // overflow if we assume slices are bounded by isize&#39;s range.
+        </span><span class="kw">let </span>tail_byte = <span class="kw-2">*</span>haystack.get(position + needle_last)<span class="question-mark">?</span>;
 
-        <span class="comment">// Quickly skip by large portions unrelated to our substring.</span>
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">byteset_contains</span>(<span class="ident">byteset</span>, <span class="ident">tail_byte</span>) {
-            <span class="ident">position</span> <span class="op">+</span><span class="op">=</span> <span class="ident">needle</span>.<span class="ident">len</span>();
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">long_period</span> {
-                <span class="ident">memory</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="comment">// Quickly skip by large portions unrelated to our substring.
+        </span><span class="kw">if </span>!byteset_contains(byteset, tail_byte) {
+            position += needle.len();
+            <span class="kw">if </span>!long_period {
+                memory = <span class="number">0</span>;
             }
-            <span class="kw">continue</span> <span class="lifetime">&#39;search</span>;
+            <span class="kw">continue </span><span class="lifetime">&#39;search</span>;
         }
 
-        <span class="comment">// See if the right part of the needle matches.</span>
-        <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">long_period</span> {
-            <span class="ident">crit_pos</span>
-        } <span class="kw">else</span> {
-            <span class="ident">cmp::max</span>(<span class="ident">crit_pos</span>, <span class="ident">memory</span>)
+        <span class="comment">// See if the right part of the needle matches.
+        </span><span class="kw">let </span>start = <span class="kw">if </span>long_period {
+            crit_pos
+        } <span class="kw">else </span>{
+            cmp::max(crit_pos, memory)
         };
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="ident">start</span>..<span class="ident">needle</span>.<span class="ident">len</span>() {
-            <span class="kw">if</span> <span class="ident">needle</span>[<span class="ident">i</span>] <span class="op">!</span><span class="op">=</span> <span class="ident">haystack</span>[<span class="ident">position</span> <span class="op">+</span> <span class="ident">i</span>] {
-                <span class="ident">position</span> <span class="op">+</span><span class="op">=</span> <span class="ident">i</span> <span class="op">-</span> <span class="ident">crit_pos</span> <span class="op">+</span> <span class="number">1</span>;
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">long_period</span> {
-                    <span class="ident">memory</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="kw">for </span>i <span class="kw">in </span>start..needle.len() {
+            <span class="kw">if </span>needle[i] != haystack[position + i] {
+                position += i - crit_pos + <span class="number">1</span>;
+                <span class="kw">if </span>!long_period {
+                    memory = <span class="number">0</span>;
                 }
-                <span class="kw">continue</span> <span class="lifetime">&#39;search</span>;
+                <span class="kw">continue </span><span class="lifetime">&#39;search</span>;
             }
         }
 
-        <span class="comment">// See if the left part of the needle matches.</span>
-        <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">long_period</span> { <span class="number">0</span> } <span class="kw">else</span> { <span class="ident">memory</span> };
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> (<span class="ident">start</span>..<span class="ident">crit_pos</span>).<span class="ident">rev</span>() {
-            <span class="kw">if</span> <span class="ident">needle</span>[<span class="ident">i</span>] <span class="op">!</span><span class="op">=</span> <span class="ident">haystack</span>[<span class="ident">position</span> <span class="op">+</span> <span class="ident">i</span>] {
-                <span class="ident">position</span> <span class="op">+</span><span class="op">=</span> <span class="ident">period</span>;
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">long_period</span> {
-                    <span class="ident">memory</span> <span class="op">=</span> <span class="ident">needle</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">period</span>;
+        <span class="comment">// See if the left part of the needle matches.
+        </span><span class="kw">let </span>start = <span class="kw">if </span>long_period { <span class="number">0 </span>} <span class="kw">else </span>{ memory };
+        <span class="kw">for </span>i <span class="kw">in </span>(start..crit_pos).rev() {
+            <span class="kw">if </span>needle[i] != haystack[position + i] {
+                position += period;
+                <span class="kw">if </span>!long_period {
+                    memory = needle.len() - period;
                 }
-                <span class="kw">continue</span> <span class="lifetime">&#39;search</span>;
+                <span class="kw">continue </span><span class="lifetime">&#39;search</span>;
             }
         }
 
-        <span class="comment">// We have found a match!</span>
-        <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">position</span>);
+        <span class="comment">// We have found a match!
+        </span><span class="kw">return </span><span class="prelude-val">Some</span>(position);
     }
 }
 
-<span class="kw">fn</span> <span class="ident">byteset_create</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">u64</span> {
-    <span class="ident">bytes</span>.<span class="ident">iter</span>().<span class="ident">fold</span>(<span class="number">0</span>, <span class="op">|</span><span class="ident">a</span>, <span class="kw-2">&amp;</span><span class="ident">b</span><span class="op">|</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="ident">b</span> <span class="op">&amp;</span> <span class="number">0x3f</span>)) <span class="op">|</span> <span class="ident">a</span>)
+<span class="kw">fn </span>byteset_create(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; u64 {
+    bytes.iter().fold(<span class="number">0</span>, |a, <span class="kw-2">&amp;</span>b| (<span class="number">1 </span>&lt;&lt; (b &amp; <span class="number">0x3f</span>)) | a)
 }
 
-<span class="kw">fn</span> <span class="ident">byteset_contains</span>(<span class="ident">byteset</span>: <span class="ident">u64</span>, <span class="ident">byte</span>: <span class="ident">u8</span>) -&gt; <span class="ident">bool</span> {
-    (<span class="ident">byteset</span> <span class="op">&gt;</span><span class="op">&gt;</span> ((<span class="ident">byte</span> <span class="op">&amp;</span> <span class="number">0x3f</span>) <span class="kw">as</span> <span class="ident">usize</span>)) <span class="op">&amp;</span> <span class="number">1</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
-}
+<span class="kw">fn </span>byteset_contains(byteset: u64, byte: u8) -&gt; bool {
+    (byteset &gt;&gt; ((byte &amp; <span class="number">0x3f</span>) <span class="kw">as </span>usize)) &amp; <span class="number">1 </span>!= <span class="number">0
+</span>}
 
-<span class="comment">// Compute the maximal suffix of `arr`.</span>
-<span class="comment">//</span>
-<span class="comment">// The maximal suffix is a possible critical factorization (u, v) of `arr`.</span>
-<span class="comment">//</span>
-<span class="comment">// Returns (`i`, `p`) where `i` is the starting index of v and `p` is the</span>
-<span class="comment">// period of v.</span>
-<span class="comment">//</span>
-<span class="comment">// `order_greater` determines if lexical order is `&lt;` or `&gt;`. Both</span>
-<span class="comment">// orders must be computed -- the ordering with the largest `i` gives</span>
-<span class="comment">// a critical factorization.</span>
-<span class="comment">//</span>
-<span class="comment">// For long period cases, the resulting period is not exact (it is too short).</span>
-<span class="kw">fn</span> <span class="ident">maximal_suffix</span>(<span class="ident">arr</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">order_greater</span>: <span class="ident">bool</span>) -&gt; (<span class="ident">usize</span>, <span class="ident">usize</span>) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">left</span> <span class="op">=</span> <span class="number">0</span>; <span class="comment">// Corresponds to i in the paper</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">right</span> <span class="op">=</span> <span class="number">1</span>; <span class="comment">// Corresponds to j in the paper</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">offset</span> <span class="op">=</span> <span class="number">0</span>; <span class="comment">// Corresponds to k in the paper, but starting at 0</span>
-                        <span class="comment">// to match 0-based indexing.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">period</span> <span class="op">=</span> <span class="number">1</span>; <span class="comment">// Corresponds to p in the paper</span>
+<span class="comment">// Compute the maximal suffix of `arr`.
+//
+// The maximal suffix is a possible critical factorization (u, v) of `arr`.
+//
+// Returns (`i`, `p`) where `i` is the starting index of v and `p` is the
+// period of v.
+//
+// `order_greater` determines if lexical order is `&lt;` or `&gt;`. Both
+// orders must be computed -- the ordering with the largest `i` gives
+// a critical factorization.
+//
+// For long period cases, the resulting period is not exact (it is too short).
+</span><span class="kw">fn </span>maximal_suffix(arr: <span class="kw-2">&amp;</span>[u8], order_greater: bool) -&gt; (usize, usize) {
+    <span class="kw">let </span><span class="kw-2">mut </span>left = <span class="number">0</span>; <span class="comment">// Corresponds to i in the paper
+    </span><span class="kw">let </span><span class="kw-2">mut </span>right = <span class="number">1</span>; <span class="comment">// Corresponds to j in the paper
+    </span><span class="kw">let </span><span class="kw-2">mut </span>offset = <span class="number">0</span>; <span class="comment">// Corresponds to k in the paper, but starting at 0
+                        // to match 0-based indexing.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>period = <span class="number">1</span>; <span class="comment">// Corresponds to p in the paper
 
-    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>) <span class="op">=</span> <span class="ident">arr</span>.<span class="ident">get</span>(<span class="ident">right</span> <span class="op">+</span> <span class="ident">offset</span>) {
-        <span class="comment">// `left` will be inbounds when `right` is.</span>
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">arr</span>[<span class="ident">left</span> <span class="op">+</span> <span class="ident">offset</span>];
-        <span class="kw">if</span> (<span class="ident">a</span> <span class="op">&lt;</span> <span class="ident">b</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">order_greater</span>) <span class="op">|</span><span class="op">|</span> (<span class="ident">a</span> <span class="op">&gt;</span> <span class="ident">b</span> <span class="op">&amp;&amp;</span> <span class="ident">order_greater</span>) {
-            <span class="comment">// Suffix is smaller, period is entire prefix so far.</span>
-            <span class="ident">right</span> <span class="op">+</span><span class="op">=</span> <span class="ident">offset</span> <span class="op">+</span> <span class="number">1</span>;
-            <span class="ident">offset</span> <span class="op">=</span> <span class="number">0</span>;
-            <span class="ident">period</span> <span class="op">=</span> <span class="ident">right</span> <span class="op">-</span> <span class="ident">left</span>;
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="ident">b</span> {
-            <span class="comment">// Advance through repetition of the current period.</span>
-            <span class="kw">if</span> <span class="ident">offset</span> <span class="op">+</span> <span class="number">1</span> <span class="op">==</span> <span class="ident">period</span> {
-                <span class="ident">right</span> <span class="op">+</span><span class="op">=</span> <span class="ident">offset</span> <span class="op">+</span> <span class="number">1</span>;
-                <span class="ident">offset</span> <span class="op">=</span> <span class="number">0</span>;
-            } <span class="kw">else</span> {
-                <span class="ident">offset</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+    </span><span class="kw">while let </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>a) = arr.get(right + offset) {
+        <span class="comment">// `left` will be inbounds when `right` is.
+        </span><span class="kw">let </span>b = arr[left + offset];
+        <span class="kw">if </span>(a &lt; b &amp;&amp; !order_greater) || (a &gt; b &amp;&amp; order_greater) {
+            <span class="comment">// Suffix is smaller, period is entire prefix so far.
+            </span>right += offset + <span class="number">1</span>;
+            offset = <span class="number">0</span>;
+            period = right - left;
+        } <span class="kw">else if </span>a == b {
+            <span class="comment">// Advance through repetition of the current period.
+            </span><span class="kw">if </span>offset + <span class="number">1 </span>== period {
+                right += offset + <span class="number">1</span>;
+                offset = <span class="number">0</span>;
+            } <span class="kw">else </span>{
+                offset += <span class="number">1</span>;
             }
-        } <span class="kw">else</span> {
-            <span class="comment">// Suffix is larger, start over from current location.</span>
-            <span class="ident">left</span> <span class="op">=</span> <span class="ident">right</span>;
-            <span class="ident">right</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="ident">offset</span> <span class="op">=</span> <span class="number">0</span>;
-            <span class="ident">period</span> <span class="op">=</span> <span class="number">1</span>;
+        } <span class="kw">else </span>{
+            <span class="comment">// Suffix is larger, start over from current location.
+            </span>left = right;
+            right += <span class="number">1</span>;
+            offset = <span class="number">0</span>;
+            period = <span class="number">1</span>;
         }
     }
-    (<span class="ident">left</span>, <span class="ident">period</span>)
+    (left, period)
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="dissimilar" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="dissimilar" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

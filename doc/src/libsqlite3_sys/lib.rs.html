@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/libsqlite3-sys-0.22.2/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../libsqlite3_sys/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../libsqlite3_sys/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../libsqlite3_sys/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/libsqlite3-sys-0.22.2/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../libsqlite3_sys/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../libsqlite3_sys/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../libsqlite3_sys/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -71,78 +71,78 @@
 <span id="71">71</span>
 <span id="72">72</span>
 <span id="73">73</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_snake_case</span>, <span class="ident">non_camel_case_types</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(non_snake_case, non_camel_case_types)]
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::error</span>::<span class="kw-2">*</span>;
+</span><span class="kw">pub use </span><span class="self">self</span>::error::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident">std::default::Default</span>;
-<span class="kw">use</span> <span class="ident">std::mem</span>;
+<span class="kw">use </span>std::default::Default;
+<span class="kw">use </span>std::mem;
 
-<span class="kw">mod</span> <span class="ident">error</span>;
+<span class="kw">mod </span>error;
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">SQLITE_STATIC</span>() -&gt; <span class="ident">sqlite3_destructor_type</span> {
-    <span class="prelude-val">None</span>
+<span class="kw">pub fn </span>SQLITE_STATIC() -&gt; sqlite3_destructor_type {
+    <span class="prelude-val">None
+</span>}
+
+<span class="kw">pub fn </span>SQLITE_TRANSIENT() -&gt; sqlite3_destructor_type {
+    <span class="prelude-val">Some</span>(<span class="kw">unsafe </span>{ mem::transmute(-<span class="number">1isize</span>) })
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">SQLITE_TRANSIENT</span>() -&gt; <span class="ident">sqlite3_destructor_type</span> {
-    <span class="prelude-val">Some</span>(<span class="kw">unsafe</span> { <span class="ident">mem::transmute</span>(<span class="op">-</span><span class="number">1isize</span>) })
+<span class="doccomment">/// Run-Time Limit Categories
+</span><span class="attribute">#[repr(i32)]
+#[non_exhaustive]
+#[allow(clippy::upper_case_acronyms)]
+</span><span class="kw">pub enum </span>Limit {
+    <span class="doccomment">/// The maximum size of any string or BLOB or table row, in bytes.
+    </span>SQLITE_LIMIT_LENGTH = SQLITE_LIMIT_LENGTH,
+    <span class="doccomment">/// The maximum length of an SQL statement, in bytes.
+    </span>SQLITE_LIMIT_SQL_LENGTH = SQLITE_LIMIT_SQL_LENGTH,
+    <span class="doccomment">/// The maximum number of columns in a table definition or in the result set
+    /// of a SELECT or the maximum number of columns in an index or in an
+    /// ORDER BY or GROUP BY clause.
+    </span>SQLITE_LIMIT_COLUMN = SQLITE_LIMIT_COLUMN,
+    <span class="doccomment">/// The maximum depth of the parse tree on any expression.
+    </span>SQLITE_LIMIT_EXPR_DEPTH = SQLITE_LIMIT_EXPR_DEPTH,
+    <span class="doccomment">/// The maximum number of terms in a compound SELECT statement.
+    </span>SQLITE_LIMIT_COMPOUND_SELECT = SQLITE_LIMIT_COMPOUND_SELECT,
+    <span class="doccomment">/// The maximum number of instructions in a virtual machine program used to
+    /// implement an SQL statement.
+    </span>SQLITE_LIMIT_VDBE_OP = SQLITE_LIMIT_VDBE_OP,
+    <span class="doccomment">/// The maximum number of arguments on a function.
+    </span>SQLITE_LIMIT_FUNCTION_ARG = SQLITE_LIMIT_FUNCTION_ARG,
+    <span class="doccomment">/// The maximum number of attached databases.
+    </span>SQLITE_LIMIT_ATTACHED = SQLITE_LIMIT_ATTACHED,
+    <span class="doccomment">/// The maximum length of the pattern argument to the LIKE or GLOB
+    /// operators.
+    </span>SQLITE_LIMIT_LIKE_PATTERN_LENGTH = SQLITE_LIMIT_LIKE_PATTERN_LENGTH,
+    <span class="doccomment">/// The maximum index number of any parameter in an SQL statement.
+    </span>SQLITE_LIMIT_VARIABLE_NUMBER = SQLITE_LIMIT_VARIABLE_NUMBER,
+    <span class="doccomment">/// The maximum depth of recursion for triggers.
+    </span>SQLITE_LIMIT_TRIGGER_DEPTH = <span class="number">10</span>,
+    <span class="doccomment">/// The maximum number of auxiliary worker threads that a single prepared
+    /// statement may start.
+    </span>SQLITE_LIMIT_WORKER_THREADS = <span class="number">11</span>,
 }
 
-<span class="doccomment">/// Run-Time Limit Categories</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">i32</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::upper_case_acronyms</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Limit</span> {
-    <span class="doccomment">/// The maximum size of any string or BLOB or table row, in bytes.</span>
-    <span class="ident">SQLITE_LIMIT_LENGTH</span> <span class="op">=</span> <span class="ident">SQLITE_LIMIT_LENGTH</span>,
-    <span class="doccomment">/// The maximum length of an SQL statement, in bytes.</span>
-    <span class="ident">SQLITE_LIMIT_SQL_LENGTH</span> <span class="op">=</span> <span class="ident">SQLITE_LIMIT_SQL_LENGTH</span>,
-    <span class="doccomment">/// The maximum number of columns in a table definition or in the result set</span>
-    <span class="doccomment">/// of a SELECT or the maximum number of columns in an index or in an</span>
-    <span class="doccomment">/// ORDER BY or GROUP BY clause.</span>
-    <span class="ident">SQLITE_LIMIT_COLUMN</span> <span class="op">=</span> <span class="ident">SQLITE_LIMIT_COLUMN</span>,
-    <span class="doccomment">/// The maximum depth of the parse tree on any expression.</span>
-    <span class="ident">SQLITE_LIMIT_EXPR_DEPTH</span> <span class="op">=</span> <span class="ident">SQLITE_LIMIT_EXPR_DEPTH</span>,
-    <span class="doccomment">/// The maximum number of terms in a compound SELECT statement.</span>
-    <span class="ident">SQLITE_LIMIT_COMPOUND_SELECT</span> <span class="op">=</span> <span class="ident">SQLITE_LIMIT_COMPOUND_SELECT</span>,
-    <span class="doccomment">/// The maximum number of instructions in a virtual machine program used to</span>
-    <span class="doccomment">/// implement an SQL statement.</span>
-    <span class="ident">SQLITE_LIMIT_VDBE_OP</span> <span class="op">=</span> <span class="ident">SQLITE_LIMIT_VDBE_OP</span>,
-    <span class="doccomment">/// The maximum number of arguments on a function.</span>
-    <span class="ident">SQLITE_LIMIT_FUNCTION_ARG</span> <span class="op">=</span> <span class="ident">SQLITE_LIMIT_FUNCTION_ARG</span>,
-    <span class="doccomment">/// The maximum number of attached databases.</span>
-    <span class="ident">SQLITE_LIMIT_ATTACHED</span> <span class="op">=</span> <span class="ident">SQLITE_LIMIT_ATTACHED</span>,
-    <span class="doccomment">/// The maximum length of the pattern argument to the LIKE or GLOB</span>
-    <span class="doccomment">/// operators.</span>
-    <span class="ident">SQLITE_LIMIT_LIKE_PATTERN_LENGTH</span> <span class="op">=</span> <span class="ident">SQLITE_LIMIT_LIKE_PATTERN_LENGTH</span>,
-    <span class="doccomment">/// The maximum index number of any parameter in an SQL statement.</span>
-    <span class="ident">SQLITE_LIMIT_VARIABLE_NUMBER</span> <span class="op">=</span> <span class="ident">SQLITE_LIMIT_VARIABLE_NUMBER</span>,
-    <span class="doccomment">/// The maximum depth of recursion for triggers.</span>
-    <span class="ident">SQLITE_LIMIT_TRIGGER_DEPTH</span> <span class="op">=</span> <span class="number">10</span>,
-    <span class="doccomment">/// The maximum number of auxiliary worker threads that a single prepared</span>
-    <span class="doccomment">/// statement may start.</span>
-    <span class="ident">SQLITE_LIMIT_WORKER_THREADS</span> <span class="op">=</span> <span class="number">11</span>,
-}
-
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::all</span>)]</span>
-<span class="kw">mod</span> <span class="ident">bindings</span> {
+<span class="attribute">#[allow(clippy::all)]
+</span><span class="kw">mod </span>bindings {
     <span class="macro">include!</span>(<span class="macro">concat!</span>(<span class="macro">env!</span>(<span class="string">&quot;OUT_DIR&quot;</span>), <span class="string">&quot;/bindgen.rs&quot;</span>));
 }
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">bindings</span>::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>bindings::<span class="kw-2">*</span>;
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">sqlite3_index_constraint</span> <span class="op">=</span> <span class="ident">sqlite3_index_info_sqlite3_index_constraint</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">sqlite3_index_constraint_usage</span> <span class="op">=</span> <span class="ident">sqlite3_index_info_sqlite3_index_constraint_usage</span>;
+<span class="kw">pub type </span>sqlite3_index_constraint = sqlite3_index_info_sqlite3_index_constraint;
+<span class="kw">pub type </span>sqlite3_index_constraint_usage = sqlite3_index_info_sqlite3_index_constraint_usage;
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">sqlite3_vtab</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="kw">unsafe</span> { <span class="ident">mem::zeroed</span>() }
+<span class="kw">impl </span>Default <span class="kw">for </span>sqlite3_vtab {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="kw">unsafe </span>{ mem::zeroed() }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">sqlite3_vtab_cursor</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="kw">unsafe</span> { <span class="ident">mem::zeroed</span>() }
+<span class="kw">impl </span>Default <span class="kw">for </span>sqlite3_vtab_cursor {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="kw">unsafe </span>{ mem::zeroed() }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="libsqlite3_sys" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="libsqlite3_sys" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

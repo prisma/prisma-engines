@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/common.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>common.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../opentelemetry/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/common.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>common.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../opentelemetry/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../opentelemetry/index.html">
                         <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -261,266 +261,266 @@
 <span id="259">259</span>
 <span id="260">260</span>
 <span id="261">261</span>
-</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
+</pre><pre class="rust"><code><span class="attribute">#[cfg(feature = <span class="string">&quot;serialize&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
+<span class="kw">use </span>std::borrow::Cow;
+<span class="kw">use </span>std::fmt;
 
-<span class="doccomment">/// Key used for metric `AttributeSet`s and trace `Span` attributes.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Key</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>);
+<span class="doccomment">/// Key used for metric `AttributeSet`s and trace `Span` attributes.
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serialize&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
+</span><span class="kw">pub struct </span>Key(Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;);
 
-<span class="kw">impl</span> <span class="ident">Key</span> {
-    <span class="doccomment">/// Create a new `Key`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">value</span>: <span class="ident">S</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Key</span>(<span class="ident">value</span>.<span class="ident">into</span>())
+<span class="kw">impl </span>Key {
+    <span class="doccomment">/// Create a new `Key`.
+    </span><span class="kw">pub fn </span>new&lt;S: Into&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;&gt;(value: S) -&gt; <span class="self">Self </span>{
+        Key(value.into())
     }
 
-    <span class="doccomment">/// Create a new const `Key`.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_static_str</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Key</span>(<span class="ident">Cow::Borrowed</span>(<span class="ident">value</span>))
+    <span class="doccomment">/// Create a new const `Key`.
+    </span><span class="kw">pub const fn </span>from_static_str(value: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="self">Self </span>{
+        Key(Cow::Borrowed(value))
     }
 
-    <span class="doccomment">/// Create a `KeyValue` pair for `bool` values.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bool</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) -&gt; <span class="ident">KeyValue</span> {
-        <span class="ident">KeyValue</span> {
-            <span class="ident">key</span>: <span class="self">self</span>,
-            <span class="ident">value</span>: <span class="ident">Value::Bool</span>(<span class="ident">value</span>.<span class="ident">into</span>()),
+    <span class="doccomment">/// Create a `KeyValue` pair for `bool` values.
+    </span><span class="kw">pub fn </span>bool&lt;T: Into&lt;bool&gt;&gt;(<span class="self">self</span>, value: T) -&gt; KeyValue {
+        KeyValue {
+            key: <span class="self">self</span>,
+            value: Value::Bool(value.into()),
         }
     }
 
-    <span class="doccomment">/// Create a `KeyValue` pair for `i64` values.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">i64</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="ident">i64</span>) -&gt; <span class="ident">KeyValue</span> {
-        <span class="ident">KeyValue</span> {
-            <span class="ident">key</span>: <span class="self">self</span>,
-            <span class="ident">value</span>: <span class="ident">Value::I64</span>(<span class="ident">value</span>),
+    <span class="doccomment">/// Create a `KeyValue` pair for `i64` values.
+    </span><span class="kw">pub fn </span>i64(<span class="self">self</span>, value: i64) -&gt; KeyValue {
+        KeyValue {
+            key: <span class="self">self</span>,
+            value: Value::I64(value),
         }
     }
 
-    <span class="doccomment">/// Create a `KeyValue` pair for `f64` values.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">f64</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="ident">f64</span>) -&gt; <span class="ident">KeyValue</span> {
-        <span class="ident">KeyValue</span> {
-            <span class="ident">key</span>: <span class="self">self</span>,
-            <span class="ident">value</span>: <span class="ident">Value::F64</span>(<span class="ident">value</span>),
+    <span class="doccomment">/// Create a `KeyValue` pair for `f64` values.
+    </span><span class="kw">pub fn </span>f64(<span class="self">self</span>, value: f64) -&gt; KeyValue {
+        KeyValue {
+            key: <span class="self">self</span>,
+            value: Value::F64(value),
         }
     }
 
-    <span class="doccomment">/// Create a `KeyValue` pair for `String` values.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">string</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) -&gt; <span class="ident">KeyValue</span> {
-        <span class="ident">KeyValue</span> {
-            <span class="ident">key</span>: <span class="self">self</span>,
-            <span class="ident">value</span>: <span class="ident">Value::String</span>(<span class="ident">value</span>.<span class="ident">into</span>()),
+    <span class="doccomment">/// Create a `KeyValue` pair for `String` values.
+    </span><span class="kw">pub fn </span>string&lt;T: Into&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;&gt;(<span class="self">self</span>, value: T) -&gt; KeyValue {
+        KeyValue {
+            key: <span class="self">self</span>,
+            value: Value::String(value.into()),
         }
     }
 
-    <span class="doccomment">/// Create a `KeyValue` pair for arrays.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">array</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Array</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) -&gt; <span class="ident">KeyValue</span> {
-        <span class="ident">KeyValue</span> {
-            <span class="ident">key</span>: <span class="self">self</span>,
-            <span class="ident">value</span>: <span class="ident">Value::Array</span>(<span class="ident">value</span>.<span class="ident">into</span>()),
+    <span class="doccomment">/// Create a `KeyValue` pair for arrays.
+    </span><span class="kw">pub fn </span>array&lt;T: Into&lt;Array&gt;&gt;(<span class="self">self</span>, value: T) -&gt; KeyValue {
+        KeyValue {
+            key: <span class="self">self</span>,
+            value: Value::Array(value.into()),
         }
     }
 
-    <span class="doccomment">/// Returns a reference to the underlying key name</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_ref</span>()
+    <span class="doccomment">/// Returns a reference to the underlying key name
+    </span><span class="kw">pub fn </span>as_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.<span class="number">0</span>.as_ref()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Key</span> {
-    <span class="doccomment">/// Convert a `&amp;str` to a `Key`.</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">key_str</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Key</span>(<span class="ident">Cow::from</span>(<span class="ident">key_str</span>))
+<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; <span class="kw">for </span>Key {
+    <span class="doccomment">/// Convert a `&amp;str` to a `Key`.
+    </span><span class="kw">fn </span>from(key_str: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="self">Self </span>{
+        Key(Cow::from(key_str))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Key</span> {
-    <span class="doccomment">/// Convert a `String` to a `Key`.</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">string</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Key</span>(<span class="ident">Cow::from</span>(<span class="ident">string</span>))
+<span class="kw">impl </span>From&lt;String&gt; <span class="kw">for </span>Key {
+    <span class="doccomment">/// Convert a `String` to a `Key`.
+    </span><span class="kw">fn </span>from(string: String) -&gt; <span class="self">Self </span>{
+        Key(Cow::from(string))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Key</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">String</span> {
-    <span class="doccomment">/// Converts `Key` instances into `String`.</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">key</span>: <span class="ident">Key</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">key</span>.<span class="number">0</span>.<span class="ident">into_owned</span>()
+<span class="kw">impl </span>From&lt;Key&gt; <span class="kw">for </span>String {
+    <span class="doccomment">/// Converts `Key` instances into `String`.
+    </span><span class="kw">fn </span>from(key: Key) -&gt; <span class="self">Self </span>{
+        key.<span class="number">0</span>.into_owned()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Key</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">fmt</span>(<span class="ident">fmt</span>)
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Key {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="self">self</span>.<span class="number">0</span>.fmt(fmt)
     }
 }
 
-<span class="doccomment">/// Array of homogeneous values</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Array</span> {
-    <span class="doccomment">/// Array of bools</span>
-    <span class="ident">Bool</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>),
-    <span class="doccomment">/// Array of integers</span>
-    <span class="ident">I64</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>),
-    <span class="doccomment">/// Array of floats</span>
-    <span class="ident">F64</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>),
-    <span class="doccomment">/// Array of strings</span>
-    <span class="ident">String</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>),
+<span class="doccomment">/// Array of homogeneous values
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serialize&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Clone, Debug, PartialEq)]
+</span><span class="kw">pub enum </span>Array {
+    <span class="doccomment">/// Array of bools
+    </span>Bool(Vec&lt;bool&gt;),
+    <span class="doccomment">/// Array of integers
+    </span>I64(Vec&lt;i64&gt;),
+    <span class="doccomment">/// Array of floats
+    </span>F64(Vec&lt;f64&gt;),
+    <span class="doccomment">/// Array of strings
+    </span>String(Vec&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;),
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Array</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Array::Bool</span>(<span class="ident">values</span>) =&gt; <span class="ident">display_array_str</span>(<span class="ident">values</span>, <span class="ident">fmt</span>),
-            <span class="ident">Array::I64</span>(<span class="ident">values</span>) =&gt; <span class="ident">display_array_str</span>(<span class="ident">values</span>, <span class="ident">fmt</span>),
-            <span class="ident">Array::F64</span>(<span class="ident">values</span>) =&gt; <span class="ident">display_array_str</span>(<span class="ident">values</span>, <span class="ident">fmt</span>),
-            <span class="ident">Array::String</span>(<span class="ident">values</span>) =&gt; {
-                <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;[&quot;</span>)<span class="question-mark">?</span>;
-                <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">t</span>) <span class="kw">in</span> <span class="ident">values</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-                    <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                        <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;,&quot;</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Array {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            Array::Bool(values) =&gt; display_array_str(values, fmt),
+            Array::I64(values) =&gt; display_array_str(values, fmt),
+            Array::F64(values) =&gt; display_array_str(values, fmt),
+            Array::String(values) =&gt; {
+                <span class="macro">write!</span>(fmt, <span class="string">&quot;[&quot;</span>)<span class="question-mark">?</span>;
+                <span class="kw">for </span>(i, t) <span class="kw">in </span>values.iter().enumerate() {
+                    <span class="kw">if </span>i &gt; <span class="number">0 </span>{
+                        <span class="macro">write!</span>(fmt, <span class="string">&quot;,&quot;</span>)<span class="question-mark">?</span>;
                     }
-                    <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;{:?}&quot;</span>, <span class="ident">t</span>)<span class="question-mark">?</span>;
+                    <span class="macro">write!</span>(fmt, <span class="string">&quot;{:?}&quot;</span>, t)<span class="question-mark">?</span>;
                 }
-                <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;]&quot;</span>)
+                <span class="macro">write!</span>(fmt, <span class="string">&quot;]&quot;</span>)
             }
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">display_array_str</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">fmt::Display</span><span class="op">&gt;</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span>[<span class="ident">T</span>], <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-    <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;[&quot;</span>)<span class="question-mark">?</span>;
-    <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">t</span>) <span class="kw">in</span> <span class="ident">slice</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-        <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;,&quot;</span>)<span class="question-mark">?</span>;
+<span class="kw">fn </span>display_array_str&lt;T: fmt::Display&gt;(slice: <span class="kw-2">&amp;</span>[T], fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+    <span class="macro">write!</span>(fmt, <span class="string">&quot;[&quot;</span>)<span class="question-mark">?</span>;
+    <span class="kw">for </span>(i, t) <span class="kw">in </span>slice.iter().enumerate() {
+        <span class="kw">if </span>i &gt; <span class="number">0 </span>{
+            <span class="macro">write!</span>(fmt, <span class="string">&quot;,&quot;</span>)<span class="question-mark">?</span>;
         }
-        <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">t</span>)<span class="question-mark">?</span>;
+        <span class="macro">write!</span>(fmt, <span class="string">&quot;{}&quot;</span>, t)<span class="question-mark">?</span>;
     }
-    <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;]&quot;</span>)
+    <span class="macro">write!</span>(fmt, <span class="string">&quot;]&quot;</span>)
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">into_array</span> {
-    ($((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>),)<span class="op">+</span>) =&gt; {
+<span class="macro">macro_rules! </span>into_array {
+    ($((<span class="macro-nonterminal">$t</span>:ty, <span class="macro-nonterminal">$val</span>:expr),)+) =&gt; {
         $(
-            <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Array</span> {
-                <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">t</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>) -&gt; <span class="self">Self</span> {
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>(<span class="ident">t</span>)
+            <span class="kw">impl </span>From&lt;<span class="macro-nonterminal">$t</span>&gt; <span class="kw">for </span>Array {
+                <span class="kw">fn </span>from(t: <span class="macro-nonterminal">$t</span>) -&gt; <span class="self">Self </span>{
+                    <span class="macro-nonterminal">$val</span>(t)
                 }
             }
-        )<span class="op">+</span>
+        )+
     }
 }
 
 <span class="macro">into_array!</span>(
-    (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>, <span class="ident">Array::Bool</span>),
-    (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>, <span class="ident">Array::I64</span>),
-    (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>, <span class="ident">Array::F64</span>),
-    (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Array::String</span>),
+    (Vec&lt;bool&gt;, Array::Bool),
+    (Vec&lt;i64&gt;, Array::I64),
+    (Vec&lt;f64&gt;, Array::F64),
+    (Vec&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;, Array::String),
 );
 
-<span class="doccomment">/// Value types for use in `KeyValue` pairs.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Value</span> {
-    <span class="doccomment">/// bool values</span>
-    <span class="ident">Bool</span>(<span class="ident">bool</span>),
-    <span class="doccomment">/// i64 values</span>
-    <span class="ident">I64</span>(<span class="ident">i64</span>),
-    <span class="doccomment">/// f64 values</span>
-    <span class="ident">F64</span>(<span class="ident">f64</span>),
-    <span class="doccomment">/// String values</span>
-    <span class="ident">String</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>),
-    <span class="doccomment">/// Array of homogeneous values</span>
-    <span class="ident">Array</span>(<span class="ident">Array</span>),
+<span class="doccomment">/// Value types for use in `KeyValue` pairs.
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serialize&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Clone, Debug, PartialEq)]
+</span><span class="kw">pub enum </span>Value {
+    <span class="doccomment">/// bool values
+    </span>Bool(bool),
+    <span class="doccomment">/// i64 values
+    </span>I64(i64),
+    <span class="doccomment">/// f64 values
+    </span>F64(f64),
+    <span class="doccomment">/// String values
+    </span>String(Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;),
+    <span class="doccomment">/// Array of homogeneous values
+    </span>Array(Array),
 }
 
-<span class="kw">impl</span> <span class="ident">Value</span> {
-    <span class="doccomment">/// String representation of the `Value`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This will allocate iff the underlying value is not a `String`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Value::Bool</span>(<span class="ident">v</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">v</span>).<span class="ident">into</span>(),
-            <span class="ident">Value::I64</span>(<span class="ident">v</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">v</span>).<span class="ident">into</span>(),
-            <span class="ident">Value::F64</span>(<span class="ident">v</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">v</span>).<span class="ident">into</span>(),
-            <span class="ident">Value::String</span>(<span class="ident">v</span>) =&gt; <span class="ident">Cow::Borrowed</span>(<span class="ident">v</span>.<span class="ident">as_ref</span>()),
-            <span class="ident">Value::Array</span>(<span class="ident">v</span>) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">v</span>).<span class="ident">into</span>(),
+<span class="kw">impl </span>Value {
+    <span class="doccomment">/// String representation of the `Value`
+    ///
+    /// This will allocate iff the underlying value is not a `String`.
+    </span><span class="kw">pub fn </span>as_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;_</span>, str&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            Value::Bool(v) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, v).into(),
+            Value::I64(v) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, v).into(),
+            Value::F64(v) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, v).into(),
+            Value::String(v) =&gt; Cow::Borrowed(v.as_ref()),
+            Value::Array(v) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, v).into(),
         }
     }
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">from_values</span> {
+<span class="macro">macro_rules! </span>from_values {
    (
         $(
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>:<span class="ident">expr</span>);
-        )<span class="op">+</span>
+            (<span class="macro-nonterminal">$t</span>:ty, <span class="macro-nonterminal">$val</span>:expr);
+        )+
     ) =&gt; {
         $(
-            <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Value</span> {
-                <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">t</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>) -&gt; <span class="self">Self</span> {
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">val</span>(<span class="ident">t</span>)
+            <span class="kw">impl </span>From&lt;<span class="macro-nonterminal">$t</span>&gt; <span class="kw">for </span>Value {
+                <span class="kw">fn </span>from(t: <span class="macro-nonterminal">$t</span>) -&gt; <span class="self">Self </span>{
+                    <span class="macro-nonterminal">$val</span>(t)
                 }
             }
-        )<span class="op">+</span>
+        )+
     }
 }
 
 <span class="macro">from_values!</span>(
-    (<span class="ident">bool</span>, <span class="ident">Value::Bool</span>);
-    (<span class="ident">i64</span>, <span class="ident">Value::I64</span>);
-    (<span class="ident">f64</span>, <span class="ident">Value::F64</span>);
-    (<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Value::String</span>);
+    (bool, Value::Bool);
+    (i64, Value::I64);
+    (f64, Value::F64);
+    (Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;, Value::String);
 );
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Value</span> {
-    <span class="doccomment">/// Convenience method for creating a `Value` from a `&amp;&#39;static str`.</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Value::String</span>(<span class="ident">s</span>.<span class="ident">into</span>())
+<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; <span class="kw">for </span>Value {
+    <span class="doccomment">/// Convenience method for creating a `Value` from a `&amp;&#39;static str`.
+    </span><span class="kw">fn </span>from(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="self">Self </span>{
+        Value::String(s.into())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Value</span> {
-    <span class="doccomment">/// Convenience method for creating a `Value` from a `String`.</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Value::String</span>(<span class="ident">s</span>.<span class="ident">into</span>())
+<span class="kw">impl </span>From&lt;String&gt; <span class="kw">for </span>Value {
+    <span class="doccomment">/// Convenience method for creating a `Value` from a `String`.
+    </span><span class="kw">fn </span>from(s: String) -&gt; <span class="self">Self </span>{
+        Value::String(s.into())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Value</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Value::Bool</span>(<span class="ident">v</span>) =&gt; <span class="ident">fmt</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">v</span>)),
-            <span class="ident">Value::I64</span>(<span class="ident">v</span>) =&gt; <span class="ident">fmt</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">v</span>)),
-            <span class="ident">Value::F64</span>(<span class="ident">v</span>) =&gt; <span class="ident">fmt</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">v</span>)),
-            <span class="ident">Value::String</span>(<span class="ident">v</span>) =&gt; <span class="ident">fmt</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">v</span>)),
-            <span class="ident">Value::Array</span>(<span class="ident">v</span>) =&gt; <span class="ident">fmt</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">v</span>)),
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Value {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            Value::Bool(v) =&gt; fmt.write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;{}&quot;</span>, v)),
+            Value::I64(v) =&gt; fmt.write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;{}&quot;</span>, v)),
+            Value::F64(v) =&gt; fmt.write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;{}&quot;</span>, v)),
+            Value::String(v) =&gt; fmt.write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;{}&quot;</span>, v)),
+            Value::Array(v) =&gt; fmt.write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;{}&quot;</span>, v)),
         }
     }
 }
 
-<span class="doccomment">/// `KeyValue` pairs are used by `AttributeSet`s and `Span` attributes.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">KeyValue</span> {
-    <span class="doccomment">/// Dimension or event key</span>
-    <span class="kw">pub</span> <span class="ident">key</span>: <span class="ident">Key</span>,
-    <span class="doccomment">/// Dimension or event value</span>
-    <span class="kw">pub</span> <span class="ident">value</span>: <span class="ident">Value</span>,
+<span class="doccomment">/// `KeyValue` pairs are used by `AttributeSet`s and `Span` attributes.
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serialize&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Clone, Debug, PartialEq)]
+</span><span class="kw">pub struct </span>KeyValue {
+    <span class="doccomment">/// Dimension or event key
+    </span><span class="kw">pub </span>key: Key,
+    <span class="doccomment">/// Dimension or event value
+    </span><span class="kw">pub </span>value: Value,
 }
 
-<span class="kw">impl</span> <span class="ident">KeyValue</span> {
-    <span class="doccomment">/// Create a new `KeyValue` pair.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>(<span class="ident">key</span>: <span class="ident">K</span>, <span class="ident">value</span>: <span class="ident">V</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">K</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Key</span><span class="op">&gt;</span>,
-        <span class="ident">V</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>,
+<span class="kw">impl </span>KeyValue {
+    <span class="doccomment">/// Create a new `KeyValue` pair.
+    </span><span class="kw">pub fn </span>new&lt;K, V&gt;(key: K, value: V) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>K: Into&lt;Key&gt;,
+        V: Into&lt;Value&gt;,
     {
-        <span class="ident">KeyValue</span> {
-            <span class="ident">key</span>: <span class="ident">key</span>.<span class="ident">into</span>(),
-            <span class="ident">value</span>: <span class="ident">value</span>.<span class="ident">into</span>(),
+        KeyValue {
+            key: key.into(),
+            value: value.into(),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

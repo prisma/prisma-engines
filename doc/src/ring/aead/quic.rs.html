@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/aead/quic.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>quic.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../ring/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/aead/quic.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>quic.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../ring/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -184,191 +184,191 @@
 <span id="184">184</span>
 <span id="185">185</span>
 <span id="186">186</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2018 Brian Smith.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
-<span class="comment">// purpose with or without fee is hereby granted, provided that the above</span>
-<span class="comment">// copyright notice and this permission notice appear in all copies.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES</span>
-<span class="comment">// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY</span>
-<span class="comment">// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span>
-<span class="comment">// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION</span>
-<span class="comment">// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN</span>
-<span class="comment">// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2018 Brian Smith.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY
+// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-<span class="doccomment">//! QUIC Header Protection.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! See draft-ietf-quic-tls.</span>
+</span><span class="doccomment">//! QUIC Header Protection.
+//!
+//! See draft-ietf-quic-tls.
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">aead</span>::{<span class="ident">aes</span>, <span class="ident">chacha</span>},
-    <span class="ident">cpu</span>, <span class="ident">error</span>, <span class="ident">hkdf</span>,
+</span><span class="kw">use crate</span>::{
+    aead::{aes, chacha},
+    cpu, error, hkdf,
 };
-<span class="kw">use</span> <span class="ident">core::convert</span>::{<span class="ident">TryFrom</span>, <span class="ident">TryInto</span>};
+<span class="kw">use </span>core::convert::{TryFrom, TryInto};
 
-<span class="doccomment">/// A key for generating QUIC Header Protection masks.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">HeaderProtectionKey</span> {
-    <span class="ident">inner</span>: <span class="ident">KeyInner</span>,
-    <span class="ident">algorithm</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span>,
+<span class="doccomment">/// A key for generating QUIC Header Protection masks.
+</span><span class="kw">pub struct </span>HeaderProtectionKey {
+    inner: KeyInner,
+    algorithm: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Algorithm,
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::large_enum_variant</span>, <span class="ident">variant_size_differences</span>)]</span>
-<span class="kw">enum</span> <span class="ident">KeyInner</span> {
-    <span class="ident">Aes</span>(<span class="ident">aes::Key</span>),
-    <span class="ident">ChaCha20</span>(<span class="ident">chacha::Key</span>),
+<span class="attribute">#[allow(clippy::large_enum_variant, variant_size_differences)]
+</span><span class="kw">enum </span>KeyInner {
+    Aes(aes::Key),
+    ChaCha20(chacha::Key),
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">hkdf::Okm</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HeaderProtectionKey</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">okm</span>: <span class="ident">hkdf::Okm</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">key_bytes</span> <span class="op">=</span> [<span class="number">0</span>; <span class="ident"><span class="kw">super</span>::MAX_KEY_LEN</span>];
-        <span class="kw">let</span> <span class="ident">algorithm</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">okm</span>.<span class="ident">len</span>();
-        <span class="kw">let</span> <span class="ident">key_bytes</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">key_bytes</span>[..<span class="ident">algorithm</span>.<span class="ident">key_len</span>()];
-        <span class="ident">okm</span>.<span class="ident">fill</span>(<span class="ident">key_bytes</span>).<span class="ident">unwrap</span>();
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">algorithm</span>, <span class="ident">key_bytes</span>).<span class="ident">unwrap</span>()
+<span class="kw">impl </span>From&lt;hkdf::Okm&lt;<span class="lifetime">&#39;_</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Algorithm&gt;&gt; <span class="kw">for </span>HeaderProtectionKey {
+    <span class="kw">fn </span>from(okm: hkdf::Okm&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Algorithm&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>key_bytes = [<span class="number">0</span>; <span class="kw">super</span>::MAX_KEY_LEN];
+        <span class="kw">let </span>algorithm = <span class="kw-2">*</span>okm.len();
+        <span class="kw">let </span>key_bytes = <span class="kw-2">&amp;mut </span>key_bytes[..algorithm.key_len()];
+        okm.fill(key_bytes).unwrap();
+        <span class="self">Self</span>::new(algorithm, key_bytes).unwrap()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">HeaderProtectionKey</span> {
-    <span class="doccomment">/// Create a new header protection key.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `key_bytes` must be exactly `algorithm.key_len` bytes long.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">algorithm</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span>,
-        <span class="ident">key_bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">inner</span>: (<span class="ident">algorithm</span>.<span class="ident">init</span>)(<span class="ident">key_bytes</span>, <span class="ident">cpu::features</span>())<span class="question-mark">?</span>,
-            <span class="ident">algorithm</span>,
+<span class="kw">impl </span>HeaderProtectionKey {
+    <span class="doccomment">/// Create a new header protection key.
+    ///
+    /// `key_bytes` must be exactly `algorithm.key_len` bytes long.
+    </span><span class="kw">pub fn </span>new(
+        algorithm: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Algorithm,
+        key_bytes: <span class="kw-2">&amp;</span>[u8],
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::Unspecified&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            inner: (algorithm.init)(key_bytes, cpu::features())<span class="question-mark">?</span>,
+            algorithm,
         })
     }
 
-    <span class="doccomment">/// Generate a new QUIC Header Protection mask.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `sample` must be exactly `self.algorithm().sample_len()` bytes long.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_mask</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sample</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">5</span>], <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">sample</span> <span class="op">=</span> <span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="ident">SAMPLE_LEN</span>]<span class="op">&gt;</span><span class="ident">::try_from</span>(<span class="ident">sample</span>)<span class="question-mark">?</span>;
+    <span class="doccomment">/// Generate a new QUIC Header Protection mask.
+    ///
+    /// `sample` must be exactly `self.algorithm().sample_len()` bytes long.
+    </span><span class="kw">pub fn </span>new_mask(<span class="kw-2">&amp;</span><span class="self">self</span>, sample: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;[u8; <span class="number">5</span>], error::Unspecified&gt; {
+        <span class="kw">let </span>sample = &lt;<span class="kw-2">&amp;</span>[u8; SAMPLE_LEN]&gt;::try_from(sample)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">out</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">algorithm</span>.<span class="ident">new_mask</span>)(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>, <span class="kw-2">*</span><span class="ident">sample</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">out</span>)
+        <span class="kw">let </span>out = (<span class="self">self</span>.algorithm.new_mask)(<span class="kw-2">&amp;</span><span class="self">self</span>.inner, <span class="kw-2">*</span>sample);
+        <span class="prelude-val">Ok</span>(out)
     }
 
-    <span class="doccomment">/// The key&#39;s algorithm.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span> {
-        <span class="self">self</span>.<span class="ident">algorithm</span>
-    }
-}
-
-<span class="kw">const</span> <span class="ident">SAMPLE_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::TAG_LEN</span>;
-
-<span class="doccomment">/// QUIC sample for new key masks</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Sample</span> <span class="op">=</span> [<span class="ident">u8</span>; <span class="ident">SAMPLE_LEN</span>];
-
-<span class="doccomment">/// A QUIC Header Protection Algorithm.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Algorithm</span> {
-    <span class="ident">init</span>: <span class="kw">fn</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">KeyInner</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span>,
-
-    <span class="ident">new_mask</span>: <span class="kw">fn</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">KeyInner</span>, <span class="ident">sample</span>: <span class="ident">Sample</span>) -&gt; [<span class="ident">u8</span>; <span class="number">5</span>],
-
-    <span class="ident">key_len</span>: <span class="ident">usize</span>,
-    <span class="ident">id</span>: <span class="ident">AlgorithmID</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">hkdf::KeyType</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">key_len</span>()
+    <span class="doccomment">/// The key&#39;s algorithm.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub fn </span>algorithm(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Algorithm {
+        <span class="self">self</span>.algorithm
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Algorithm</span> {
-    <span class="doccomment">/// The length of the key.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">key_len</span>
-    }
+<span class="kw">const </span>SAMPLE_LEN: usize = <span class="kw">super</span>::TAG_LEN;
 
-    <span class="doccomment">/// The required sample length.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sample_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="ident">SAMPLE_LEN</span>
-    }
+<span class="doccomment">/// QUIC sample for new key masks
+</span><span class="kw">pub type </span>Sample = [u8; SAMPLE_LEN];
+
+<span class="doccomment">/// A QUIC Header Protection Algorithm.
+</span><span class="kw">pub struct </span>Algorithm {
+    init: <span class="kw">fn</span>(key: <span class="kw-2">&amp;</span>[u8], cpu_features: cpu::Features) -&gt; <span class="prelude-ty">Result</span>&lt;KeyInner, error::Unspecified&gt;,
+
+    new_mask: <span class="kw">fn</span>(key: <span class="kw-2">&amp;</span>KeyInner, sample: Sample) -&gt; [u8; <span class="number">5</span>],
+
+    key_len: usize,
+    id: AlgorithmID,
 }
 
-<span class="macro">derive_debug_via_id!</span>(<span class="ident">Algorithm</span>);
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">enum</span> <span class="ident">AlgorithmID</span> {
-    <span class="ident">AES_128</span>,
-    <span class="ident">AES_256</span>,
-    <span class="ident">CHACHA20</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">Algorithm</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">id</span>
+<span class="kw">impl </span>hkdf::KeyType <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Algorithm {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.key_len()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">Algorithm</span> {}
+<span class="kw">impl </span>Algorithm {
+    <span class="doccomment">/// The length of the key.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub fn </span>key_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.key_len
+    }
 
-<span class="doccomment">/// AES-128.</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">AES_128</span>: <span class="ident">Algorithm</span> <span class="op">=</span> <span class="ident">Algorithm</span> {
-    <span class="ident">key_len</span>: <span class="number">16</span>,
-    <span class="ident">init</span>: <span class="ident">aes_init_128</span>,
-    <span class="ident">new_mask</span>: <span class="ident">aes_new_mask</span>,
-    <span class="ident">id</span>: <span class="ident">AlgorithmID::AES_128</span>,
+    <span class="doccomment">/// The required sample length.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub fn </span>sample_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        SAMPLE_LEN
+    }
+}
+
+<span class="macro">derive_debug_via_id!</span>(Algorithm);
+
+<span class="attribute">#[derive(Debug, Eq, PartialEq)]
+</span><span class="kw">enum </span>AlgorithmID {
+    AES_128,
+    AES_256,
+    CHACHA20,
+}
+
+<span class="kw">impl </span>PartialEq <span class="kw">for </span>Algorithm {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="self">self</span>.id == other.id
+    }
+}
+
+<span class="kw">impl </span>Eq <span class="kw">for </span>Algorithm {}
+
+<span class="doccomment">/// AES-128.
+</span><span class="kw">pub static </span>AES_128: Algorithm = Algorithm {
+    key_len: <span class="number">16</span>,
+    init: aes_init_128,
+    new_mask: aes_new_mask,
+    id: AlgorithmID::AES_128,
 };
 
-<span class="doccomment">/// AES-256.</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">AES_256</span>: <span class="ident">Algorithm</span> <span class="op">=</span> <span class="ident">Algorithm</span> {
-    <span class="ident">key_len</span>: <span class="number">32</span>,
-    <span class="ident">init</span>: <span class="ident">aes_init_256</span>,
-    <span class="ident">new_mask</span>: <span class="ident">aes_new_mask</span>,
-    <span class="ident">id</span>: <span class="ident">AlgorithmID::AES_256</span>,
+<span class="doccomment">/// AES-256.
+</span><span class="kw">pub static </span>AES_256: Algorithm = Algorithm {
+    key_len: <span class="number">32</span>,
+    init: aes_init_256,
+    new_mask: aes_new_mask,
+    id: AlgorithmID::AES_256,
 };
 
-<span class="kw">fn</span> <span class="ident">aes_init_128</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">KeyInner</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">aes_key</span> <span class="op">=</span> <span class="ident">aes::Key::new</span>(<span class="ident">key</span>, <span class="ident">aes::Variant::AES_128</span>, <span class="ident">cpu_features</span>)<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>(<span class="ident">KeyInner::Aes</span>(<span class="ident">aes_key</span>))
+<span class="kw">fn </span>aes_init_128(key: <span class="kw-2">&amp;</span>[u8], cpu_features: cpu::Features) -&gt; <span class="prelude-ty">Result</span>&lt;KeyInner, error::Unspecified&gt; {
+    <span class="kw">let </span>aes_key = aes::Key::new(key, aes::Variant::AES_128, cpu_features)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>(KeyInner::Aes(aes_key))
 }
 
-<span class="kw">fn</span> <span class="ident">aes_init_256</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">KeyInner</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">aes_key</span> <span class="op">=</span> <span class="ident">aes::Key::new</span>(<span class="ident">key</span>, <span class="ident">aes::Variant::AES_256</span>, <span class="ident">cpu_features</span>)<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>(<span class="ident">KeyInner::Aes</span>(<span class="ident">aes_key</span>))
+<span class="kw">fn </span>aes_init_256(key: <span class="kw-2">&amp;</span>[u8], cpu_features: cpu::Features) -&gt; <span class="prelude-ty">Result</span>&lt;KeyInner, error::Unspecified&gt; {
+    <span class="kw">let </span>aes_key = aes::Key::new(key, aes::Variant::AES_256, cpu_features)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>(KeyInner::Aes(aes_key))
 }
 
-<span class="kw">fn</span> <span class="ident">aes_new_mask</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">KeyInner</span>, <span class="ident">sample</span>: <span class="ident">Sample</span>) -&gt; [<span class="ident">u8</span>; <span class="number">5</span>] {
-    <span class="kw">let</span> <span class="ident">aes_key</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">key</span> {
-        <span class="ident">KeyInner::Aes</span>(<span class="ident">key</span>) =&gt; <span class="ident">key</span>,
-        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+<span class="kw">fn </span>aes_new_mask(key: <span class="kw-2">&amp;</span>KeyInner, sample: Sample) -&gt; [u8; <span class="number">5</span>] {
+    <span class="kw">let </span>aes_key = <span class="kw">match </span>key {
+        KeyInner::Aes(key) =&gt; key,
+        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
     };
 
-    <span class="ident">aes_key</span>.<span class="ident">new_mask</span>(<span class="ident">sample</span>)
+    aes_key.new_mask(sample)
 }
 
-<span class="doccomment">/// ChaCha20.</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">CHACHA20</span>: <span class="ident">Algorithm</span> <span class="op">=</span> <span class="ident">Algorithm</span> {
-    <span class="ident">key_len</span>: <span class="ident">chacha::KEY_LEN</span>,
-    <span class="ident">init</span>: <span class="ident">chacha20_init</span>,
-    <span class="ident">new_mask</span>: <span class="ident">chacha20_new_mask</span>,
-    <span class="ident">id</span>: <span class="ident">AlgorithmID::CHACHA20</span>,
+<span class="doccomment">/// ChaCha20.
+</span><span class="kw">pub static </span>CHACHA20: Algorithm = Algorithm {
+    key_len: chacha::KEY_LEN,
+    init: chacha20_init,
+    new_mask: chacha20_new_mask,
+    id: AlgorithmID::CHACHA20,
 };
 
-<span class="kw">fn</span> <span class="ident">chacha20_init</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">_todo</span>: <span class="ident">cpu::Features</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">KeyInner</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">chacha20_key</span>: [<span class="ident">u8</span>; <span class="ident">chacha::KEY_LEN</span>] <span class="op">=</span> <span class="ident">key</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>(<span class="ident">KeyInner::ChaCha20</span>(<span class="ident">chacha::Key::from</span>(<span class="ident">chacha20_key</span>)))
+<span class="kw">fn </span>chacha20_init(key: <span class="kw-2">&amp;</span>[u8], _todo: cpu::Features) -&gt; <span class="prelude-ty">Result</span>&lt;KeyInner, error::Unspecified&gt; {
+    <span class="kw">let </span>chacha20_key: [u8; chacha::KEY_LEN] = key.try_into()<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>(KeyInner::ChaCha20(chacha::Key::from(chacha20_key)))
 }
 
-<span class="kw">fn</span> <span class="ident">chacha20_new_mask</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">KeyInner</span>, <span class="ident">sample</span>: <span class="ident">Sample</span>) -&gt; [<span class="ident">u8</span>; <span class="number">5</span>] {
-    <span class="kw">let</span> <span class="ident">chacha20_key</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">key</span> {
-        <span class="ident">KeyInner::ChaCha20</span>(<span class="ident">key</span>) =&gt; <span class="ident">key</span>,
-        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+<span class="kw">fn </span>chacha20_new_mask(key: <span class="kw-2">&amp;</span>KeyInner, sample: Sample) -&gt; [u8; <span class="number">5</span>] {
+    <span class="kw">let </span>chacha20_key = <span class="kw">match </span>key {
+        KeyInner::ChaCha20(key) =&gt; key,
+        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
     };
 
-    <span class="ident">chacha20_key</span>.<span class="ident">new_mask</span>(<span class="ident">sample</span>)
+    chacha20_key.new_mask(sample)
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lsp-types-0.91.1/src/file_operations.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>file_operations.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lsp_types/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lsp-types-0.91.1/src/file_operations.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>file_operations.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lsp_types/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -211,218 +211,218 @@
 <span id="211">211</span>
 <span id="212">212</span>
 <span id="213">213</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WorkspaceFileOperationsClientCapabilities</span> {
-    <span class="doccomment">/// Whether the client supports dynamic registration for file</span>
-    <span class="doccomment">/// requests/notifications.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">dynamic_registration</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>WorkspaceFileOperationsClientCapabilities {
+    <span class="doccomment">/// Whether the client supports dynamic registration for file
+    /// requests/notifications.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>dynamic_registration: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="doccomment">/// The client has support for sending didCreateFiles notifications.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">did_create</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The client has support for sending didCreateFiles notifications.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>did_create: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="doccomment">/// The server is interested in receiving willCreateFiles requests.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">will_create</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The server is interested in receiving willCreateFiles requests.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>will_create: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="doccomment">/// The server is interested in receiving didRenameFiles requests.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">did_rename</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The server is interested in receiving didRenameFiles requests.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>did_rename: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="doccomment">/// The server is interested in receiving willRenameFiles requests.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">will_rename</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The server is interested in receiving willRenameFiles requests.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>will_rename: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="doccomment">/// The server is interested in receiving didDeleteFiles requests.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">did_delete</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The server is interested in receiving didDeleteFiles requests.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>did_delete: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="doccomment">/// The server is interested in receiving willDeleteFiles requests.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">will_delete</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The server is interested in receiving willDeleteFiles requests.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>will_delete: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WorkspaceFileOperationsServerCapabilities</span> {
-    <span class="doccomment">/// The server is interested in receiving didCreateFiles</span>
-    <span class="doccomment">/// notifications.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">did_create</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FileOperationRegistrationOptions</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>WorkspaceFileOperationsServerCapabilities {
+    <span class="doccomment">/// The server is interested in receiving didCreateFiles
+    /// notifications.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>did_create: <span class="prelude-ty">Option</span>&lt;FileOperationRegistrationOptions&gt;,
 
-    <span class="doccomment">/// The server is interested in receiving willCreateFiles requests.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">will_create</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FileOperationRegistrationOptions</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The server is interested in receiving willCreateFiles requests.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>will_create: <span class="prelude-ty">Option</span>&lt;FileOperationRegistrationOptions&gt;,
 
-    <span class="doccomment">/// The server is interested in receiving didRenameFiles</span>
-    <span class="doccomment">/// notifications.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">did_rename</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FileOperationRegistrationOptions</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The server is interested in receiving didRenameFiles
+    /// notifications.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>did_rename: <span class="prelude-ty">Option</span>&lt;FileOperationRegistrationOptions&gt;,
 
-    <span class="doccomment">/// The server is interested in receiving willRenameFiles requests.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">will_rename</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FileOperationRegistrationOptions</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The server is interested in receiving willRenameFiles requests.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>will_rename: <span class="prelude-ty">Option</span>&lt;FileOperationRegistrationOptions&gt;,
 
-    <span class="doccomment">/// The server is interested in receiving didDeleteFiles file</span>
-    <span class="doccomment">/// notifications.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">did_delete</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FileOperationRegistrationOptions</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The server is interested in receiving didDeleteFiles file
+    /// notifications.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>did_delete: <span class="prelude-ty">Option</span>&lt;FileOperationRegistrationOptions&gt;,
 
-    <span class="doccomment">/// The server is interested in receiving willDeleteFiles file</span>
-    <span class="doccomment">/// requests.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">will_delete</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FileOperationRegistrationOptions</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The server is interested in receiving willDeleteFiles file
+    /// requests.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>will_delete: <span class="prelude-ty">Option</span>&lt;FileOperationRegistrationOptions&gt;,
 }
 
-<span class="doccomment">/// The options to register for file operations.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// @since 3.16.0</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FileOperationRegistrationOptions</span> {
-    <span class="doccomment">/// The actual filters.</span>
-    <span class="kw">pub</span> <span class="ident">filters</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FileOperationFilter</span><span class="op">&gt;</span>,
+<span class="doccomment">/// The options to register for file operations.
+///
+/// @since 3.16.0
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>FileOperationRegistrationOptions {
+    <span class="doccomment">/// The actual filters.
+    </span><span class="kw">pub </span>filters: Vec&lt;FileOperationFilter&gt;,
 }
 
-<span class="doccomment">/// A filter to describe in which file operation requests or notifications</span>
-<span class="doccomment">/// the server is interested in.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// @since 3.16.0</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FileOperationFilter</span> {
-    <span class="doccomment">/// A Uri like `file` or `untitled`.</span>
-    <span class="kw">pub</span> <span class="ident">scheme</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A filter to describe in which file operation requests or notifications
+/// the server is interested in.
+///
+/// @since 3.16.0
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>FileOperationFilter {
+    <span class="doccomment">/// A Uri like `file` or `untitled`.
+    </span><span class="kw">pub </span>scheme: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-    <span class="doccomment">/// The actual file operation pattern.</span>
-    <span class="kw">pub</span> <span class="ident">pattern</span>: <span class="ident">FileOperationPattern</span>,
+    <span class="doccomment">/// The actual file operation pattern.
+    </span><span class="kw">pub </span>pattern: FileOperationPattern,
 }
 
-<span class="doccomment">/// A pattern kind describing if a glob pattern matches a file a folder or</span>
-<span class="doccomment">///  both.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///  @since 3.16.0</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>, <span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;lowercase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">FileOperationPatternKind</span> {
-    <span class="doccomment">/// The pattern matches a file only.</span>
-    <span class="ident">File</span>,
+<span class="doccomment">/// A pattern kind describing if a glob pattern matches a file a folder or
+///  both.
+///
+///  @since 3.16.0
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, Deserialize, Serialize, Clone)]
+#[serde(rename_all = <span class="string">&quot;lowercase&quot;</span>)]
+</span><span class="kw">pub enum </span>FileOperationPatternKind {
+    <span class="doccomment">/// The pattern matches a file only.
+    </span>File,
 
-    <span class="doccomment">/// The pattern matches a folder only.</span>
-    <span class="ident">Folder</span>,
+    <span class="doccomment">/// The pattern matches a folder only.
+    </span>Folder,
 }
 
-<span class="doccomment">/// Matching options for the file operation pattern.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// @since 3.16.0</span>
-<span class="doccomment">///</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FileOperationPatternOptions</span> {
-    <span class="doccomment">/// The pattern should be matched ignoring casing.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">ignore_case</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Matching options for the file operation pattern.
+///
+/// @since 3.16.0
+///
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>FileOperationPatternOptions {
+    <span class="doccomment">/// The pattern should be matched ignoring casing.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>ignore_case: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 }
 
-<span class="doccomment">/// A pattern to describe in which file operation requests or notifications</span>
-<span class="doccomment">/// the server is interested in.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// @since 3.16.0</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FileOperationPattern</span> {
-    <span class="doccomment">/// The glob pattern to match. Glob patterns can have the following syntax:</span>
-    <span class="doccomment">/// - `*` to match one or more characters in a path segment</span>
-    <span class="doccomment">/// - `?` to match on one character in a path segment</span>
-    <span class="doccomment">/// - `**` to match any number of path segments, including none</span>
-    <span class="doccomment">/// - `{}` to group conditions (e.g. `**​/*.{ts,js}` matches all TypeScript</span>
-    <span class="doccomment">///   and JavaScript files)</span>
-    <span class="doccomment">/// - `[]` to declare a range of characters to match in a path segment</span>
-    <span class="doccomment">///   (e.g., `example.[0-9]` to match on `example.0`, `example.1`, …)</span>
-    <span class="doccomment">/// - `[!...]` to negate a range of characters to match in a path segment</span>
-    <span class="doccomment">///   (e.g., `example.[!0-9]` to match on `example.a`, `example.b`, but</span>
-    <span class="doccomment">///   not `example.0`)</span>
-    <span class="kw">pub</span> <span class="ident">glob</span>: <span class="ident">String</span>,
+<span class="doccomment">/// A pattern to describe in which file operation requests or notifications
+/// the server is interested in.
+///
+/// @since 3.16.0
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>FileOperationPattern {
+    <span class="doccomment">/// The glob pattern to match. Glob patterns can have the following syntax:
+    /// - `*` to match one or more characters in a path segment
+    /// - `?` to match on one character in a path segment
+    /// - `**` to match any number of path segments, including none
+    /// - `{}` to group conditions (e.g. `**​/*.{ts,js}` matches all TypeScript
+    ///   and JavaScript files)
+    /// - `[]` to declare a range of characters to match in a path segment
+    ///   (e.g., `example.[0-9]` to match on `example.0`, `example.1`, …)
+    /// - `[!...]` to negate a range of characters to match in a path segment
+    ///   (e.g., `example.[!0-9]` to match on `example.a`, `example.b`, but
+    ///   not `example.0`)
+    </span><span class="kw">pub </span>glob: String,
 
-    <span class="doccomment">/// Whether to match files or folders with this pattern.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Matches both if undefined.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">matches</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FileOperationPatternKind</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Whether to match files or folders with this pattern.
+    ///
+    /// Matches both if undefined.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>matches: <span class="prelude-ty">Option</span>&lt;FileOperationPatternKind&gt;,
 
-    <span class="doccomment">/// Additional options used during matching.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FileOperationPatternOptions</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Additional options used during matching.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>options: <span class="prelude-ty">Option</span>&lt;FileOperationPatternOptions&gt;,
 }
 
-<span class="doccomment">/// The parameters sent in notifications/requests for user-initiated creation</span>
-<span class="doccomment">///  of files.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///  @since 3.16.0</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateFilesParams</span> {
-    <span class="doccomment">/// An array of all files/folders created in this operation.</span>
-    <span class="kw">pub</span> <span class="ident">files</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FileCreate</span><span class="op">&gt;</span>,
+<span class="doccomment">/// The parameters sent in notifications/requests for user-initiated creation
+///  of files.
+///
+///  @since 3.16.0
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>CreateFilesParams {
+    <span class="doccomment">/// An array of all files/folders created in this operation.
+    </span><span class="kw">pub </span>files: Vec&lt;FileCreate&gt;,
 }
-<span class="doccomment">/// Represents information on a file/folder create.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// @since 3.16.0</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FileCreate</span> {
-    <span class="doccomment">/// A file:// URI for the location of the file/folder being created.</span>
-    <span class="kw">pub</span> <span class="ident">uri</span>: <span class="ident">String</span>,
-}
-
-<span class="doccomment">/// The parameters sent in notifications/requests for user-initiated renames</span>
-<span class="doccomment">/// of files.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// @since 3.16.0</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RenameFilesParams</span> {
-    <span class="doccomment">/// An array of all files/folders renamed in this operation. When a folder</span>
-    <span class="doccomment">/// is renamed, only the folder will be included, and not its children.</span>
-    <span class="kw">pub</span> <span class="ident">files</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FileRename</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Represents information on a file/folder create.
+///
+/// @since 3.16.0
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>FileCreate {
+    <span class="doccomment">/// A file:// URI for the location of the file/folder being created.
+    </span><span class="kw">pub </span>uri: String,
 }
 
-<span class="doccomment">/// Represents information on a file/folder rename.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// @since 3.16.0</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FileRename</span> {
-    <span class="doccomment">/// A file:// URI for the original location of the file/folder being renamed.</span>
-    <span class="kw">pub</span> <span class="ident">old_uri</span>: <span class="ident">String</span>,
-
-    <span class="doccomment">/// A file:// URI for the new location of the file/folder being renamed.</span>
-    <span class="kw">pub</span> <span class="ident">new_uri</span>: <span class="ident">String</span>,
+<span class="doccomment">/// The parameters sent in notifications/requests for user-initiated renames
+/// of files.
+///
+/// @since 3.16.0
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>RenameFilesParams {
+    <span class="doccomment">/// An array of all files/folders renamed in this operation. When a folder
+    /// is renamed, only the folder will be included, and not its children.
+    </span><span class="kw">pub </span>files: Vec&lt;FileRename&gt;,
 }
 
-<span class="doccomment">/// The parameters sent in notifications/requests for user-initiated deletes</span>
-<span class="doccomment">/// of files.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// @since 3.16.0</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DeleteFilesParams</span> {
-    <span class="doccomment">/// An array of all files/folders deleted in this operation.</span>
-    <span class="kw">pub</span> <span class="ident">files</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FileDelete</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Represents information on a file/folder rename.
+///
+/// @since 3.16.0
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>FileRename {
+    <span class="doccomment">/// A file:// URI for the original location of the file/folder being renamed.
+    </span><span class="kw">pub </span>old_uri: String,
+
+    <span class="doccomment">/// A file:// URI for the new location of the file/folder being renamed.
+    </span><span class="kw">pub </span>new_uri: String,
 }
 
-<span class="doccomment">/// Represents information on a file/folder delete.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// @since 3.16.0</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FileDelete</span> {
-    <span class="doccomment">/// A file:// URI for the location of the file/folder being deleted.</span>
-    <span class="kw">pub</span> <span class="ident">uri</span>: <span class="ident">String</span>,
+<span class="doccomment">/// The parameters sent in notifications/requests for user-initiated deletes
+/// of files.
+///
+/// @since 3.16.0
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>DeleteFilesParams {
+    <span class="doccomment">/// An array of all files/folders deleted in this operation.
+    </span><span class="kw">pub </span>files: Vec&lt;FileDelete&gt;,
+}
+
+<span class="doccomment">/// Represents information on a file/folder delete.
+///
+/// @since 3.16.0
+</span><span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>FileDelete {
+    <span class="doccomment">/// A file:// URI for the location of the file/folder being deleted.
+    </span><span class="kw">pub </span>uri: String,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lsp_types" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lsp_types" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

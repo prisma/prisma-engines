@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/08831df/src/ast/table.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>table.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../quaint/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/08831df/src/ast/table.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>table.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../quaint/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -427,434 +427,434 @@
 <span id="427">427</span>
 <span id="428">428</span>
 <span id="429">429</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Column</span>, <span class="ident">Comparable</span>, <span class="ident">ConditionTree</span>, <span class="ident">DefaultValue</span>, <span class="ident">ExpressionKind</span>, <span class="ident">IndexDefinition</span>, <span class="ident">Join</span>, <span class="ident">JoinData</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">ast</span>::{<span class="ident">Expression</span>, <span class="ident">Row</span>, <span class="ident">Select</span>, <span class="ident">Values</span>},
-    <span class="ident">error</span>::{<span class="ident">Error</span>, <span class="ident">ErrorKind</span>},
+</pre><pre class="rust"><code><span class="kw">use super</span>::{Column, Comparable, ConditionTree, DefaultValue, ExpressionKind, IndexDefinition, Join, JoinData};
+<span class="kw">use crate</span>::{
+    ast::{Expression, Row, Select, Values},
+    error::{Error, ErrorKind},
 };
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+<span class="kw">use </span>std::borrow::Cow;
 
-<span class="doccomment">/// An object that can be aliased.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Aliasable</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Target</span>;
+<span class="doccomment">/// An object that can be aliased.
+</span><span class="kw">pub trait </span>Aliasable&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Target;
 
-    <span class="doccomment">/// Alias table for usage elsewhere in the query.</span>
-    <span class="kw">fn</span> <span class="ident">alias</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">alias</span>: <span class="ident">T</span>) -&gt; <span class="ident"><span class="self">Self</span>::Target</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Alias table for usage elsewhere in the query.
+    </span><span class="kw">fn </span>alias&lt;T&gt;(<span class="self">self</span>, alias: T) -&gt; <span class="self">Self</span>::Target
+    <span class="kw">where
+        </span>T: Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;;
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="doccomment">/// Either an identifier or a nested query.</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TableType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">Table</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>),
-    <span class="ident">JoinedTable</span>(<span class="ident">Box</span><span class="op">&lt;</span>(<span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Join</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>)<span class="op">&gt;</span>),
-    <span class="ident">Query</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Select</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>),
-    <span class="ident">Values</span>(<span class="ident">Values</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
+<span class="attribute">#[derive(Clone, Debug, PartialEq)]
+</span><span class="doccomment">/// Either an identifier or a nested query.
+</span><span class="kw">pub enum </span>TableType&lt;<span class="lifetime">&#39;a</span>&gt; {
+    Table(Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;),
+    JoinedTable(Box&lt;(Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;, Vec&lt;Join&lt;<span class="lifetime">&#39;a</span>&gt;&gt;)&gt;),
+    Query(Box&lt;Select&lt;<span class="lifetime">&#39;a</span>&gt;&gt;),
+    Values(Values&lt;<span class="lifetime">&#39;a</span>&gt;),
 }
 
-<span class="doccomment">/// A table definition</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">typ</span>: <span class="ident">TableType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">alias</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">database</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">index_definitions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IndexDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A table definition
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub struct </span>Table&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub </span>typ: TableType&lt;<span class="lifetime">&#39;a</span>&gt;,
+    <span class="kw">pub </span>alias: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
+    <span class="kw">pub </span>database: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) index_definitions: Vec&lt;IndexDefinition&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Table</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">typ</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">typ</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">database</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">database</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; PartialEq <span class="kw">for </span>Table&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>Table) -&gt; bool {
+        <span class="self">self</span>.typ == other.typ &amp;&amp; <span class="self">self</span>.database == other.database
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Define in which database the table is located</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">database</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">database</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Table&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Define in which database the table is located
+    </span><span class="kw">pub fn </span>database&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, database: T) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>T: Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
     {
-        <span class="self">self</span>.<span class="ident">database</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">database</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
+        <span class="self">self</span>.database = <span class="prelude-val">Some</span>(database.into());
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// A qualified asterisk to this table</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">asterisk</span>(<span class="self">self</span>) -&gt; <span class="ident">Expression</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">Expression</span> {
-            <span class="ident">kind</span>: <span class="ident">ExpressionKind::Asterisk</span>(<span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="self">self</span>))),
-            <span class="ident">alias</span>: <span class="prelude-val">None</span>,
+    <span class="doccomment">/// A qualified asterisk to this table
+    </span><span class="kw">pub fn </span>asterisk(<span class="self">self</span>) -&gt; Expression&lt;<span class="lifetime">&#39;a</span>&gt; {
+        Expression {
+            kind: ExpressionKind::Asterisk(<span class="prelude-val">Some</span>(Box::new(<span class="self">self</span>))),
+            alias: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Add unique index definition.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_unique_index</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">i</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">IndexDefinition</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">definition</span> <span class="op">=</span> <span class="ident">i</span>.<span class="ident">into</span>();
-        <span class="self">self</span>.<span class="ident">index_definitions</span>.<span class="ident">push</span>(<span class="ident">definition</span>.<span class="ident">set_table</span>(<span class="self">self</span>.<span class="ident">clone</span>()));
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Add unique index definition.
+    </span><span class="kw">pub fn </span>add_unique_index(<span class="kw-2">mut </span><span class="self">self</span>, i: <span class="kw">impl </span>Into&lt;IndexDefinition&lt;<span class="lifetime">&#39;a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>definition = i.into();
+        <span class="self">self</span>.index_definitions.push(definition.set_table(<span class="self">self</span>.clone()));
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Conditions for Microsoft T-SQL MERGE using the table metadata.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - Find the unique indices from the table that matches the inserted columns</span>
-    <span class="doccomment">/// - Create a join from the virtual table with the uniques</span>
-    <span class="doccomment">/// - Combine joins with `OR`</span>
-    <span class="doccomment">/// - If the the index is a compound with other columns, combine them with `AND`</span>
-    <span class="doccomment">/// - If the column is not provided and index exists, try inserting a default value.</span>
-    <span class="doccomment">/// - Otherwise the function will return an error.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">join_conditions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">inserted_columns</span>: <span class="kw-2">&amp;</span>[<span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>]) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">ConditionTree::NegativeCondition</span>;
+    <span class="doccomment">/// Conditions for Microsoft T-SQL MERGE using the table metadata.
+    ///
+    /// - Find the unique indices from the table that matches the inserted columns
+    /// - Create a join from the virtual table with the uniques
+    /// - Combine joins with `OR`
+    /// - If the the index is a compound with other columns, combine them with `AND`
+    /// - If the column is not provided and index exists, try inserting a default value.
+    /// - Otherwise the function will return an error.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>join_conditions(<span class="kw-2">&amp;</span><span class="self">self</span>, inserted_columns: <span class="kw-2">&amp;</span>[Column&lt;<span class="lifetime">&#39;a</span>&gt;]) -&gt; <span class="kw">crate</span>::Result&lt;ConditionTree&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>result = ConditionTree::NegativeCondition;
 
-        <span class="kw">let</span> <span class="ident">join_cond</span> <span class="op">=</span> <span class="op">|</span><span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">cond</span> <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">inserted_columns</span>.<span class="ident">contains</span>(<span class="ident">column</span>) {
-                <span class="kw">match</span> <span class="ident">column</span>.<span class="ident">default</span>.<span class="ident">clone</span>() {
-                    <span class="prelude-val">Some</span>(<span class="ident">DefaultValue::Provided</span>(<span class="ident">val</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">column</span>.<span class="ident">clone</span>().<span class="ident">equals</span>(<span class="ident">val</span>).<span class="ident">into</span>()),
-                    <span class="prelude-val">Some</span>(<span class="ident">DefaultValue::Generated</span>) =&gt; <span class="prelude-val">None</span>,
-                    <span class="prelude-val">None</span> =&gt; {
-                        <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span>
-                            <span class="ident">ErrorKind::conversion</span>(<span class="string">&quot;A unique column missing from insert and table has no default.&quot;</span>);
+        <span class="kw">let </span>join_cond = |column: <span class="kw-2">&amp;</span>Column&lt;<span class="lifetime">&#39;a</span>&gt;| {
+            <span class="kw">let </span>cond = <span class="kw">if </span>!inserted_columns.contains(column) {
+                <span class="kw">match </span>column.default.clone() {
+                    <span class="prelude-val">Some</span>(DefaultValue::Provided(val)) =&gt; <span class="prelude-val">Some</span>(column.clone().equals(val).into()),
+                    <span class="prelude-val">Some</span>(DefaultValue::Generated) =&gt; <span class="prelude-val">None</span>,
+                    <span class="prelude-val">None </span>=&gt; {
+                        <span class="kw">let </span>kind =
+                            ErrorKind::conversion(<span class="string">&quot;A unique column missing from insert and table has no default.&quot;</span>);
 
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::builder</span>(<span class="ident">kind</span>).<span class="ident">build</span>());
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::builder(kind).build());
                     }
                 }
-            } <span class="kw">else</span> {
-                <span class="kw">let</span> <span class="ident">dual_col</span> <span class="op">=</span> <span class="ident">column</span>.<span class="ident">clone</span>().<span class="ident">table</span>(<span class="string">&quot;dual&quot;</span>);
-                <span class="prelude-val">Some</span>(<span class="ident">dual_col</span>.<span class="ident">equals</span>(<span class="ident">column</span>.<span class="ident">clone</span>()).<span class="ident">into</span>())
+            } <span class="kw">else </span>{
+                <span class="kw">let </span>dual_col = column.clone().table(<span class="string">&quot;dual&quot;</span>);
+                <span class="prelude-val">Some</span>(dual_col.equals(column.clone()).into())
             };
 
-            <span class="prelude-val">Ok</span>::<span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ConditionTree</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span>(<span class="ident">cond</span>)
+            <span class="prelude-val">Ok</span>::&lt;<span class="prelude-ty">Option</span>&lt;ConditionTree&gt;, Error&gt;(cond)
         };
 
-        <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">index_definitions</span>.<span class="ident">iter</span>() {
-            <span class="kw">match</span> <span class="ident">index</span> {
-                <span class="ident">IndexDefinition::Single</span>(<span class="ident">column</span>) =&gt; {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">right_cond</span>) <span class="op">=</span> <span class="ident">join_cond</span>(<span class="ident">column</span>)<span class="question-mark">?</span> {
-                        <span class="kw">match</span> <span class="ident">result</span> {
-                            <span class="ident">ConditionTree::NegativeCondition</span> =&gt; <span class="ident">result</span> <span class="op">=</span> <span class="ident">right_cond</span>,
-                            <span class="ident">left_cond</span> =&gt; <span class="ident">result</span> <span class="op">=</span> <span class="ident">left_cond</span>.<span class="ident">or</span>(<span class="ident">right_cond</span>),
+        <span class="kw">for </span>index <span class="kw">in </span><span class="self">self</span>.index_definitions.iter() {
+            <span class="kw">match </span>index {
+                IndexDefinition::Single(column) =&gt; {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(right_cond) = join_cond(column)<span class="question-mark">? </span>{
+                        <span class="kw">match </span>result {
+                            ConditionTree::NegativeCondition =&gt; result = right_cond,
+                            left_cond =&gt; result = left_cond.or(right_cond),
                         }
                     }
                 }
-                <span class="ident">IndexDefinition::Compound</span>(<span class="ident">cols</span>) =&gt; {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sub_result</span> <span class="op">=</span> <span class="ident">ConditionTree::NoCondition</span>;
+                IndexDefinition::Compound(cols) =&gt; {
+                    <span class="kw">let </span><span class="kw-2">mut </span>sub_result = ConditionTree::NoCondition;
 
-                    <span class="kw">for</span> <span class="ident">right</span> <span class="kw">in</span> <span class="ident">cols</span>.<span class="ident">iter</span>() {
-                        <span class="kw">let</span> <span class="ident">right_cond</span> <span class="op">=</span> <span class="ident">join_cond</span>(<span class="ident">right</span>)<span class="question-mark">?</span>.<span class="ident">unwrap_or</span>(<span class="ident">ConditionTree::NegativeCondition</span>);
+                    <span class="kw">for </span>right <span class="kw">in </span>cols.iter() {
+                        <span class="kw">let </span>right_cond = join_cond(right)<span class="question-mark">?</span>.unwrap_or(ConditionTree::NegativeCondition);
 
-                        <span class="kw">match</span> <span class="ident">sub_result</span> {
-                            <span class="ident">ConditionTree::NoCondition</span> =&gt; <span class="ident">sub_result</span> <span class="op">=</span> <span class="ident">right_cond</span>,
-                            <span class="ident">left_cond</span> =&gt; <span class="ident">sub_result</span> <span class="op">=</span> <span class="ident">left_cond</span>.<span class="ident">and</span>(<span class="ident">right_cond</span>),
+                        <span class="kw">match </span>sub_result {
+                            ConditionTree::NoCondition =&gt; sub_result = right_cond,
+                            left_cond =&gt; sub_result = left_cond.and(right_cond),
                         }
                     }
 
-                    <span class="kw">match</span> <span class="ident">result</span> {
-                        <span class="ident">ConditionTree::NegativeCondition</span> =&gt; <span class="ident">result</span> <span class="op">=</span> <span class="ident">sub_result</span>,
-                        <span class="ident">left_cond</span> =&gt; <span class="ident">result</span> <span class="op">=</span> <span class="ident">left_cond</span>.<span class="ident">or</span>(<span class="ident">sub_result</span>),
+                    <span class="kw">match </span>result {
+                        ConditionTree::NegativeCondition =&gt; result = sub_result,
+                        left_cond =&gt; result = left_cond.or(sub_result),
                     }
                 }
             }
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">result</span>)
+        <span class="prelude-val">Ok</span>(result)
     }
 
-    <span class="doccomment">/// Adds a `LEFT JOIN` clause to the query, specifically for that table.</span>
-    <span class="doccomment">/// Useful to positionally add a JOIN clause in case you are selecting from multiple tables.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {</span>
-    <span class="doccomment">/// let join = &quot;posts&quot;.alias(&quot;p&quot;).on((&quot;p&quot;, &quot;visible&quot;).equals(true));</span>
-    <span class="doccomment">/// let joined_table = Table::from(&quot;users&quot;).left_join(join);</span>
-    <span class="doccomment">/// let query = Select::from_table(joined_table).and_from(&quot;comments&quot;);</span>
-    <span class="doccomment">/// let (sql, params) = Sqlite::build(query)?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     &quot;SELECT `users`.*, `comments`.* FROM \</span>
-    <span class="doccomment">///     `users` LEFT JOIN `posts` AS `p` ON `p`.`visible` = ?, \</span>
-    <span class="doccomment">///     `comments`&quot;,</span>
-    <span class="doccomment">///     sql</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     vec![</span>
-    <span class="doccomment">///         Value::from(true),</span>
-    <span class="doccomment">///     ],</span>
-    <span class="doccomment">///     params</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">left_join</span><span class="op">&lt;</span><span class="ident">J</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">join</span>: <span class="ident">J</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">J</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">JoinData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Adds a `LEFT JOIN` clause to the query, specifically for that table.
+    /// Useful to positionally add a JOIN clause in case you are selecting from multiple tables.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {
+    /// let join = &quot;posts&quot;.alias(&quot;p&quot;).on((&quot;p&quot;, &quot;visible&quot;).equals(true));
+    /// let joined_table = Table::from(&quot;users&quot;).left_join(join);
+    /// let query = Select::from_table(joined_table).and_from(&quot;comments&quot;);
+    /// let (sql, params) = Sqlite::build(query)?;
+    ///
+    /// assert_eq!(
+    ///     &quot;SELECT `users`.*, `comments`.* FROM \
+    ///     `users` LEFT JOIN `posts` AS `p` ON `p`.`visible` = ?, \
+    ///     `comments`&quot;,
+    ///     sql
+    /// );
+    ///
+    /// assert_eq!(
+    ///     vec![
+    ///         Value::from(true),
+    ///     ],
+    ///     params
+    /// );
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>left_join&lt;J&gt;(<span class="kw-2">mut </span><span class="self">self</span>, join: J) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>J: Into&lt;JoinData&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">typ</span> {
-            <span class="ident">TableType::Table</span>(<span class="ident">table_name</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">typ</span> <span class="op">=</span> <span class="ident">TableType::JoinedTable</span>(<span class="ident">Box::new</span>((<span class="ident">table_name</span>, <span class="macro">vec!</span>[<span class="ident">Join::Left</span>(<span class="ident">join</span>.<span class="ident">into</span>())])))
+        <span class="kw">match </span><span class="self">self</span>.typ {
+            TableType::Table(table_name) =&gt; {
+                <span class="self">self</span>.typ = TableType::JoinedTable(Box::new((table_name, <span class="macro">vec!</span>[Join::Left(join.into())])))
             }
-            <span class="ident">TableType::JoinedTable</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">jt</span>) =&gt; <span class="ident">jt</span>.<span class="number">1</span>.<span class="ident">push</span>(<span class="ident">Join::Left</span>(<span class="ident">join</span>.<span class="ident">into</span>())),
-            <span class="ident">TableType::Query</span>(<span class="kw">_</span>) =&gt; {
+            TableType::JoinedTable(<span class="kw-2">ref mut </span>jt) =&gt; jt.<span class="number">1</span>.push(Join::Left(join.into())),
+            TableType::Query(<span class="kw">_</span>) =&gt; {
                 <span class="macro">panic!</span>(<span class="string">&quot;You cannot left_join on a table of type Query&quot;</span>)
             }
-            <span class="ident">TableType::Values</span>(<span class="kw">_</span>) =&gt; {
+            TableType::Values(<span class="kw">_</span>) =&gt; {
                 <span class="macro">panic!</span>(<span class="string">&quot;You cannot left_join on a table of type Values&quot;</span>)
             }
         }
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Adds an `INNER JOIN` clause to the query, specifically for that table.</span>
-    <span class="doccomment">/// Useful to positionally add a JOIN clause in case you are selecting from multiple tables.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {</span>
-    <span class="doccomment">/// let join = &quot;posts&quot;.alias(&quot;p&quot;).on((&quot;p&quot;, &quot;visible&quot;).equals(true));</span>
-    <span class="doccomment">/// let joined_table = Table::from(&quot;users&quot;).inner_join(join);</span>
-    <span class="doccomment">/// let query = Select::from_table(joined_table).and_from(&quot;comments&quot;);</span>
-    <span class="doccomment">/// let (sql, params) = Sqlite::build(query)?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     &quot;SELECT `users`.*, `comments`.* FROM \</span>
-    <span class="doccomment">///     `users` INNER JOIN `posts` AS `p` ON `p`.`visible` = ?, \</span>
-    <span class="doccomment">///     `comments`&quot;,</span>
-    <span class="doccomment">///     sql</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     vec![</span>
-    <span class="doccomment">///         Value::from(true),</span>
-    <span class="doccomment">///     ],</span>
-    <span class="doccomment">///     params</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inner_join</span><span class="op">&lt;</span><span class="ident">J</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">join</span>: <span class="ident">J</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">J</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">JoinData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Adds an `INNER JOIN` clause to the query, specifically for that table.
+    /// Useful to positionally add a JOIN clause in case you are selecting from multiple tables.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {
+    /// let join = &quot;posts&quot;.alias(&quot;p&quot;).on((&quot;p&quot;, &quot;visible&quot;).equals(true));
+    /// let joined_table = Table::from(&quot;users&quot;).inner_join(join);
+    /// let query = Select::from_table(joined_table).and_from(&quot;comments&quot;);
+    /// let (sql, params) = Sqlite::build(query)?;
+    ///
+    /// assert_eq!(
+    ///     &quot;SELECT `users`.*, `comments`.* FROM \
+    ///     `users` INNER JOIN `posts` AS `p` ON `p`.`visible` = ?, \
+    ///     `comments`&quot;,
+    ///     sql
+    /// );
+    ///
+    /// assert_eq!(
+    ///     vec![
+    ///         Value::from(true),
+    ///     ],
+    ///     params
+    /// );
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>inner_join&lt;J&gt;(<span class="kw-2">mut </span><span class="self">self</span>, join: J) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>J: Into&lt;JoinData&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">typ</span> {
-            <span class="ident">TableType::Table</span>(<span class="ident">table_name</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">typ</span> <span class="op">=</span> <span class="ident">TableType::JoinedTable</span>(<span class="ident">Box::new</span>((<span class="ident">table_name</span>, <span class="macro">vec!</span>[<span class="ident">Join::Inner</span>(<span class="ident">join</span>.<span class="ident">into</span>())])))
+        <span class="kw">match </span><span class="self">self</span>.typ {
+            TableType::Table(table_name) =&gt; {
+                <span class="self">self</span>.typ = TableType::JoinedTable(Box::new((table_name, <span class="macro">vec!</span>[Join::Inner(join.into())])))
             }
-            <span class="ident">TableType::JoinedTable</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">jt</span>) =&gt; <span class="ident">jt</span>.<span class="number">1</span>.<span class="ident">push</span>(<span class="ident">Join::Inner</span>(<span class="ident">join</span>.<span class="ident">into</span>())),
-            <span class="ident">TableType::Query</span>(<span class="kw">_</span>) =&gt; {
+            TableType::JoinedTable(<span class="kw-2">ref mut </span>jt) =&gt; jt.<span class="number">1</span>.push(Join::Inner(join.into())),
+            TableType::Query(<span class="kw">_</span>) =&gt; {
                 <span class="macro">panic!</span>(<span class="string">&quot;You cannot inner_join on a table of type Query&quot;</span>)
             }
-            <span class="ident">TableType::Values</span>(<span class="kw">_</span>) =&gt; {
+            TableType::Values(<span class="kw">_</span>) =&gt; {
                 <span class="macro">panic!</span>(<span class="string">&quot;You cannot inner_join on a table of type Values&quot;</span>)
             }
         }
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Adds a `RIGHT JOIN` clause to the query, specifically for that table.</span>
-    <span class="doccomment">/// Useful to positionally add a JOIN clause in case you are selecting from multiple tables.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {</span>
-    <span class="doccomment">/// let join = &quot;posts&quot;.alias(&quot;p&quot;).on((&quot;p&quot;, &quot;visible&quot;).equals(true));</span>
-    <span class="doccomment">/// let joined_table = Table::from(&quot;users&quot;).right_join(join);</span>
-    <span class="doccomment">/// let query = Select::from_table(joined_table).and_from(&quot;comments&quot;);</span>
-    <span class="doccomment">/// let (sql, params) = Sqlite::build(query)?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     &quot;SELECT `users`.*, `comments`.* FROM \</span>
-    <span class="doccomment">///     `users` RIGHT JOIN `posts` AS `p` ON `p`.`visible` = ?, \</span>
-    <span class="doccomment">///     `comments`&quot;,</span>
-    <span class="doccomment">///     sql</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     vec![</span>
-    <span class="doccomment">///         Value::from(true),</span>
-    <span class="doccomment">///     ],</span>
-    <span class="doccomment">///     params</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">right_join</span><span class="op">&lt;</span><span class="ident">J</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">join</span>: <span class="ident">J</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">J</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">JoinData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Adds a `RIGHT JOIN` clause to the query, specifically for that table.
+    /// Useful to positionally add a JOIN clause in case you are selecting from multiple tables.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {
+    /// let join = &quot;posts&quot;.alias(&quot;p&quot;).on((&quot;p&quot;, &quot;visible&quot;).equals(true));
+    /// let joined_table = Table::from(&quot;users&quot;).right_join(join);
+    /// let query = Select::from_table(joined_table).and_from(&quot;comments&quot;);
+    /// let (sql, params) = Sqlite::build(query)?;
+    ///
+    /// assert_eq!(
+    ///     &quot;SELECT `users`.*, `comments`.* FROM \
+    ///     `users` RIGHT JOIN `posts` AS `p` ON `p`.`visible` = ?, \
+    ///     `comments`&quot;,
+    ///     sql
+    /// );
+    ///
+    /// assert_eq!(
+    ///     vec![
+    ///         Value::from(true),
+    ///     ],
+    ///     params
+    /// );
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>right_join&lt;J&gt;(<span class="kw-2">mut </span><span class="self">self</span>, join: J) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>J: Into&lt;JoinData&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">typ</span> {
-            <span class="ident">TableType::Table</span>(<span class="ident">table_name</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">typ</span> <span class="op">=</span> <span class="ident">TableType::JoinedTable</span>(<span class="ident">Box::new</span>((<span class="ident">table_name</span>, <span class="macro">vec!</span>[<span class="ident">Join::Right</span>(<span class="ident">join</span>.<span class="ident">into</span>())])))
+        <span class="kw">match </span><span class="self">self</span>.typ {
+            TableType::Table(table_name) =&gt; {
+                <span class="self">self</span>.typ = TableType::JoinedTable(Box::new((table_name, <span class="macro">vec!</span>[Join::Right(join.into())])))
             }
-            <span class="ident">TableType::JoinedTable</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">jt</span>) =&gt; <span class="ident">jt</span>.<span class="number">1</span>.<span class="ident">push</span>(<span class="ident">Join::Right</span>(<span class="ident">join</span>.<span class="ident">into</span>())),
-            <span class="ident">TableType::Query</span>(<span class="kw">_</span>) =&gt; {
+            TableType::JoinedTable(<span class="kw-2">ref mut </span>jt) =&gt; jt.<span class="number">1</span>.push(Join::Right(join.into())),
+            TableType::Query(<span class="kw">_</span>) =&gt; {
                 <span class="macro">panic!</span>(<span class="string">&quot;You cannot right_join on a table of type Query&quot;</span>)
             }
-            <span class="ident">TableType::Values</span>(<span class="kw">_</span>) =&gt; {
+            TableType::Values(<span class="kw">_</span>) =&gt; {
                 <span class="macro">panic!</span>(<span class="string">&quot;You cannot right_join on a table of type Values&quot;</span>)
             }
         }
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Adds a `FULL JOIN` clause to the query, specifically for that table.</span>
-    <span class="doccomment">/// Useful to positionally add a JOIN clause in case you are selecting from multiple tables.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};</span>
-    <span class="doccomment">/// # fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {</span>
-    <span class="doccomment">/// let join = &quot;posts&quot;.alias(&quot;p&quot;).on((&quot;p&quot;, &quot;visible&quot;).equals(true));</span>
-    <span class="doccomment">/// let joined_table = Table::from(&quot;users&quot;).full_join(join);</span>
-    <span class="doccomment">/// let query = Select::from_table(joined_table).and_from(&quot;comments&quot;);</span>
-    <span class="doccomment">/// let (sql, params) = Sqlite::build(query)?;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     &quot;SELECT `users`.*, `comments`.* FROM \</span>
-    <span class="doccomment">///     `users` FULL JOIN `posts` AS `p` ON `p`.`visible` = ?, \</span>
-    <span class="doccomment">///     `comments`&quot;,</span>
-    <span class="doccomment">///     sql</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(</span>
-    <span class="doccomment">///     vec![</span>
-    <span class="doccomment">///         Value::from(true),</span>
-    <span class="doccomment">///     ],</span>
-    <span class="doccomment">///     params</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// # Ok(())</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">full_join</span><span class="op">&lt;</span><span class="ident">J</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">join</span>: <span class="ident">J</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">J</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">JoinData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Adds a `FULL JOIN` clause to the query, specifically for that table.
+    /// Useful to positionally add a JOIN clause in case you are selecting from multiple tables.
+    ///
+    /// ```rust
+    /// # use quaint::{ast::*, visitor::{Visitor, Sqlite}};
+    /// # fn main() -&gt; Result&lt;(), quaint::error::Error&gt; {
+    /// let join = &quot;posts&quot;.alias(&quot;p&quot;).on((&quot;p&quot;, &quot;visible&quot;).equals(true));
+    /// let joined_table = Table::from(&quot;users&quot;).full_join(join);
+    /// let query = Select::from_table(joined_table).and_from(&quot;comments&quot;);
+    /// let (sql, params) = Sqlite::build(query)?;
+    ///
+    /// assert_eq!(
+    ///     &quot;SELECT `users`.*, `comments`.* FROM \
+    ///     `users` FULL JOIN `posts` AS `p` ON `p`.`visible` = ?, \
+    ///     `comments`&quot;,
+    ///     sql
+    /// );
+    ///
+    /// assert_eq!(
+    ///     vec![
+    ///         Value::from(true),
+    ///     ],
+    ///     params
+    /// );
+    /// # Ok(())
+    /// # }
+    /// ```
+    </span><span class="kw">pub fn </span>full_join&lt;J&gt;(<span class="kw-2">mut </span><span class="self">self</span>, join: J) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>J: Into&lt;JoinData&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">typ</span> {
-            <span class="ident">TableType::Table</span>(<span class="ident">table_name</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">typ</span> <span class="op">=</span> <span class="ident">TableType::JoinedTable</span>(<span class="ident">Box::new</span>((<span class="ident">table_name</span>, <span class="macro">vec!</span>[<span class="ident">Join::Full</span>(<span class="ident">join</span>.<span class="ident">into</span>())])))
+        <span class="kw">match </span><span class="self">self</span>.typ {
+            TableType::Table(table_name) =&gt; {
+                <span class="self">self</span>.typ = TableType::JoinedTable(Box::new((table_name, <span class="macro">vec!</span>[Join::Full(join.into())])))
             }
-            <span class="ident">TableType::JoinedTable</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">jt</span>) =&gt; <span class="ident">jt</span>.<span class="number">1</span>.<span class="ident">push</span>(<span class="ident">Join::Full</span>(<span class="ident">join</span>.<span class="ident">into</span>())),
-            <span class="ident">TableType::Query</span>(<span class="kw">_</span>) =&gt; {
+            TableType::JoinedTable(<span class="kw-2">ref mut </span>jt) =&gt; jt.<span class="number">1</span>.push(Join::Full(join.into())),
+            TableType::Query(<span class="kw">_</span>) =&gt; {
                 <span class="macro">panic!</span>(<span class="string">&quot;You cannot full_join on a table of type Query&quot;</span>)
             }
-            <span class="ident">TableType::Values</span>(<span class="kw">_</span>) =&gt; {
+            TableType::Values(<span class="kw">_</span>) =&gt; {
                 <span class="macro">panic!</span>(<span class="string">&quot;You cannot full_join on a table of type Values&quot;</span>)
             }
         }
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) -&gt; <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">Table</span> {
-            <span class="ident">typ</span>: <span class="ident">TableType::Table</span>(<span class="ident">s</span>.<span class="ident">into</span>()),
-            <span class="ident">alias</span>: <span class="prelude-val">None</span>,
-            <span class="ident">database</span>: <span class="prelude-val">None</span>,
-            <span class="ident">index_definitions</span>: <span class="ident">Vec::new</span>(),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; <span class="kw">for </span>Table&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>from(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; Table&lt;<span class="lifetime">&#39;a</span>&gt; {
+        Table {
+            typ: TableType::Table(s.into()),
+            alias: <span class="prelude-val">None</span>,
+            database: <span class="prelude-val">None</span>,
+            index_definitions: Vec::new(),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">String</span>) -&gt; <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">Table</span> {
-            <span class="ident">typ</span>: <span class="ident">TableType::Table</span>(<span class="ident">s</span>.<span class="ident">into</span>()),
-            <span class="ident">alias</span>: <span class="prelude-val">None</span>,
-            <span class="ident">database</span>: <span class="prelude-val">None</span>,
-            <span class="ident">index_definitions</span>: <span class="ident">Vec::new</span>(),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>String&gt; <span class="kw">for </span>Table&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>from(s: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>String) -&gt; Table&lt;<span class="lifetime">&#39;a</span>&gt; {
+        Table {
+            typ: TableType::Table(s.into()),
+            alias: <span class="prelude-val">None</span>,
+            database: <span class="prelude-val">None</span>,
+            index_definitions: Vec::new(),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>)) -&gt; <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">table</span>: <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">s</span>.<span class="number">1</span>.<span class="ident">into</span>();
-        <span class="ident">table</span>.<span class="ident">database</span>(<span class="ident">s</span>.<span class="number">0</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str)&gt; <span class="kw">for </span>Table&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>from(s: (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str)) -&gt; Table&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="kw">let </span>table: Table&lt;<span class="lifetime">&#39;a</span>&gt; = s.<span class="number">1</span>.into();
+        table.database(s.<span class="number">0</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">String</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">String</span>)) -&gt; <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">table</span>: <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">s</span>.<span class="number">1</span>.<span class="ident">into</span>();
-        <span class="ident">table</span>.<span class="ident">database</span>(<span class="ident">s</span>.<span class="number">0</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>String)&gt; <span class="kw">for </span>Table&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>from(s: (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>String)) -&gt; Table&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="kw">let </span>table: Table&lt;<span class="lifetime">&#39;a</span>&gt; = s.<span class="number">1</span>.into();
+        table.database(s.<span class="number">0</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">String</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">String</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>)) -&gt; <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">table</span>: <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">s</span>.<span class="number">1</span>.<span class="ident">into</span>();
-        <span class="ident">table</span>.<span class="ident">database</span>(<span class="ident">s</span>.<span class="number">0</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>String, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str)&gt; <span class="kw">for </span>Table&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>from(s: (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>String, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str)) -&gt; Table&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="kw">let </span>table: Table&lt;<span class="lifetime">&#39;a</span>&gt; = s.<span class="number">1</span>.into();
+        table.database(s.<span class="number">0</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">String</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">String</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">String</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">String</span>)) -&gt; <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">table</span>: <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">s</span>.<span class="number">1</span>.<span class="ident">into</span>();
-        <span class="ident">table</span>.<span class="ident">database</span>(<span class="ident">s</span>.<span class="number">0</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>String, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>String)&gt; <span class="kw">for </span>Table&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>from(s: (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>String, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>String)) -&gt; Table&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="kw">let </span>table: Table&lt;<span class="lifetime">&#39;a</span>&gt; = s.<span class="number">1</span>.into();
+        table.database(s.<span class="number">0</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Table</span> {
-            <span class="ident">typ</span>: <span class="ident">TableType::Table</span>(<span class="ident">s</span>.<span class="ident">into</span>()),
-            <span class="ident">alias</span>: <span class="prelude-val">None</span>,
-            <span class="ident">database</span>: <span class="prelude-val">None</span>,
-            <span class="ident">index_definitions</span>: <span class="ident">Vec::new</span>(),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;String&gt; <span class="kw">for </span>Table&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>from(s: String) -&gt; <span class="self">Self </span>{
+        Table {
+            typ: TableType::Table(s.into()),
+            alias: <span class="prelude-val">None</span>,
+            database: <span class="prelude-val">None</span>,
+            index_definitions: Vec::new(),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Row</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Table::from</span>(<span class="ident">Values::from</span>(<span class="ident">values</span>.<span class="ident">into_iter</span>()))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;Vec&lt;Row&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt; <span class="kw">for </span>Table&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>from(values: Vec&lt;Row&lt;<span class="lifetime">&#39;a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
+        Table::from(Values::from(values.into_iter()))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Values</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">values</span>: <span class="ident">Values</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">typ</span>: <span class="ident">TableType::Values</span>(<span class="ident">values</span>),
-            <span class="ident">alias</span>: <span class="prelude-val">None</span>,
-            <span class="ident">database</span>: <span class="prelude-val">None</span>,
-            <span class="ident">index_definitions</span>: <span class="ident">Vec::new</span>(),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;Values&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>Table&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>from(values: Values&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            typ: TableType::Values(values),
+            alias: <span class="prelude-val">None</span>,
+            database: <span class="prelude-val">None</span>,
+            index_definitions: Vec::new(),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">String</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">s</span>: (<span class="ident">String</span>, <span class="ident">String</span>)) -&gt; <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">table</span>: <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">s</span>.<span class="number">1</span>.<span class="ident">into</span>();
-        <span class="ident">table</span>.<span class="ident">database</span>(<span class="ident">s</span>.<span class="number">0</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;(String, String)&gt; <span class="kw">for </span>Table&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>from(s: (String, String)) -&gt; Table&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="kw">let </span>table: Table&lt;<span class="lifetime">&#39;a</span>&gt; = s.<span class="number">1</span>.into();
+        table.database(s.<span class="number">0</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Select</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">select</span>: <span class="ident">Select</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Table</span> {
-            <span class="ident">typ</span>: <span class="ident">TableType::Query</span>(<span class="ident">Box::new</span>(<span class="ident">select</span>)),
-            <span class="ident">alias</span>: <span class="prelude-val">None</span>,
-            <span class="ident">database</span>: <span class="prelude-val">None</span>,
-            <span class="ident">index_definitions</span>: <span class="ident">Vec::new</span>(),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;Select&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>Table&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>from(select: Select&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="self">Self </span>{
+        Table {
+            typ: TableType::Query(Box::new(select)),
+            alias: <span class="prelude-val">None</span>,
+            database: <span class="prelude-val">None</span>,
+            index_definitions: Vec::new(),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Aliasable</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Aliasable&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>Table&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Target = Table&lt;<span class="lifetime">&#39;a</span>&gt;;
 
-    <span class="kw">fn</span> <span class="ident">alias</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">alias</span>: <span class="ident">T</span>) -&gt; <span class="ident"><span class="self">Self</span>::Target</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>alias&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, alias: T) -&gt; <span class="self">Self</span>::Target
+    <span class="kw">where
+        </span>T: Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
     {
-        <span class="self">self</span>.<span class="ident">alias</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">alias</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
+        <span class="self">self</span>.alias = <span class="prelude-val">Some</span>(alias.into());
+        <span class="self">self
+    </span>}
 }
 
-<span class="macro">aliasable!</span>(<span class="ident">String</span>, (<span class="ident">String</span>, <span class="ident">String</span>));
-<span class="macro">aliasable!</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>));
+<span class="macro">aliasable!</span>(String, (String, String));
+<span class="macro">aliasable!</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str));
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="quaint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="quaint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

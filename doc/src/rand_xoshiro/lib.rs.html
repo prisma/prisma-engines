@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rand_xoshiro-0.6.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://www.rust-lang.org/favicon.ico"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rand_xoshiro/index.html"><div class="logo-container"><img src="https://www.rust-lang.org/logos/rust-logo-128x128-blk.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rand_xoshiro/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rand_xoshiro-0.6.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://www.rust-lang.org/favicon.ico"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rand_xoshiro/index.html"><div class="logo-container"><img src="https://www.rust-lang.org/logos/rust-logo-128x128-blk.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rand_xoshiro/index.html"><div class="logo-container">
                     <img src="https://www.rust-lang.org/logos/rust-logo-128x128-blk.png" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rand_xoshiro/index.html">
                         <img src="https://www.rust-lang.org/logos/rust-logo-128x128-blk.png" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -114,119 +114,119 @@
 <span id="112">112</span>
 <span id="113">113</span>
 <span id="114">114</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2018 Developers of the Rand project.</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// https://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license</span>
-<span class="comment">// &lt;LICENSE-MIT or https://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. This file may not be copied, modified, or distributed</span>
-<span class="comment">// except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2018 Developers of the Rand project.
+//
+// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+// https://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license
+// &lt;LICENSE-MIT or https://opensource.org/licenses/MIT&gt;, at your
+// option. This file may not be copied, modified, or distributed
+// except according to those terms.
 
-<span class="doccomment">//! This crate implements the [xoshiro] family of pseudorandom number generators</span>
-<span class="doccomment">//! designed by David Blackman and Sebastiano Vigna. They feature high</span>
-<span class="doccomment">//! perfomance and a small state and superseed the previous xorshift-based</span>
-<span class="doccomment">//! generators. However, they are no cryptographically secure and their output</span>
-<span class="doccomment">//! can be predicted by observing a few samples.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The following generators are implemented:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # 64-bit generators</span>
-<span class="doccomment">//! - [`Xoshiro256StarStar`]: Recommended for all purposes. Excellent speed and</span>
-<span class="doccomment">//!   a state space (256 bits) large enough for any parallel application.</span>
-<span class="doccomment">//! - [`Xoshiro256PlusPlus`]: Recommended for all purposes. Excellent speed and</span>
-<span class="doccomment">//!   a state space (256 bits) large enough for any parallel application.</span>
-<span class="doccomment">//! - [`Xoshiro256Plus`]: Recommended for generating 64-bit floating-point</span>
-<span class="doccomment">//!   numbers. About 15% faster than `Xoshiro256StarStar`, but has a [low linear</span>
-<span class="doccomment">//!   complexity] in the lowest bits (which are discarded when generating</span>
-<span class="doccomment">//!   floats), making it fail linearity tests. This is unlikely to have any</span>
-<span class="doccomment">//!   impact in practise.</span>
-<span class="doccomment">//! - [`Xoroshiro128StarStar`]: An alternative to `Xoshiro256StarStar`, having</span>
-<span class="doccomment">//!   the same speed but using half the state. Only suited for low-scale parallel</span>
-<span class="doccomment">//!   applications.</span>
-<span class="doccomment">//! - [`Xoroshiro128PlusPlus`]: An alternative to `Xoshiro256PlusPlus`, having</span>
-<span class="doccomment">//!   the same speed but using half the state. Only suited for low-scale parallel</span>
-<span class="doccomment">//!   applications.</span>
-<span class="doccomment">//! - [`Xoroshiro128Plus`]: An alternative to `Xoshiro256Plus`, having the same</span>
-<span class="doccomment">//!   speed but using half the state. Only suited for low-scale parallel</span>
-<span class="doccomment">//!   applications. Has a [low linear complexity] in the lowest bits (which are</span>
-<span class="doccomment">//!   discarded when generating floats), making it fail linearity tests. This is</span>
-<span class="doccomment">//!   unlikely to have any impact in practise.</span>
-<span class="doccomment">//! - [`Xoshiro512StarStar`]: An alternative to `Xoshiro256StarStar` with more</span>
-<span class="doccomment">//!   state and the same speed.</span>
-<span class="doccomment">//! - [`Xoshiro512PlusPlus`]: An alternative to `Xoshiro256PlusPlus` with more</span>
-<span class="doccomment">//!   state and the same speed.</span>
-<span class="doccomment">//! - [`Xoshiro512Plus`]: An alternative to `Xoshiro512Plus` with more</span>
-<span class="doccomment">//!   state and the same speed. Has a [low linear complexity] in the lowest bits</span>
-<span class="doccomment">//!   (which are discarded when generating floats), making it fail linearity</span>
-<span class="doccomment">//!   tests. This is unlikely to have any impact in practise.</span>
-<span class="doccomment">//! - [`SplitMix64`]: Recommended for initializing generators of the xoshiro</span>
-<span class="doccomment">//!   familiy from a 64-bit seed. Used for implementing `seed_from_u64`.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # 32-bit generators</span>
-<span class="doccomment">//! - [`Xoshiro128StarStar`]: Recommended for all purposes. Excellent speed.</span>
-<span class="doccomment">//! - [`Xoshiro128PlusPlus`]: Recommended for all purposes. Excellent speed.</span>
-<span class="doccomment">//! - [`Xoshiro128Plus`]: Recommended for generating 32-bit floating-point</span>
-<span class="doccomment">//!   numbers. Faster than `Xoshiro128StarStar`, but has a [low linear</span>
-<span class="doccomment">//!   complexity] in the lowest bits (which are discarded when generating</span>
-<span class="doccomment">//!   floats), making it fail linearity tests. This is unlikely to have any</span>
-<span class="doccomment">//!   impact in practise.</span>
-<span class="doccomment">//! - [`Xoroshiro64StarStar`]: An alternative to `Xoshiro128StarStar`, having</span>
-<span class="doccomment">//!   the same speed but using half the state.</span>
-<span class="doccomment">//! - [`Xoroshiro64Star`]: An alternative to `Xoshiro128Plus`, having the</span>
-<span class="doccomment">//!   same speed but using half the state. Has a [low linear complexity] in the</span>
-<span class="doccomment">//!   lowest bits (which are discarded when generating floats), making it fail</span>
-<span class="doccomment">//!   linearity tests. This is unlikely to have any impact in practise.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The `*PlusPlus` generators perform similarily to the `*StarStar` generators.</span>
-<span class="doccomment">//! See the [xoshiro paper], where the differences are discussed in detail.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [xoshiro]: http://xoshiro.di.unimi.it/</span>
-<span class="doccomment">//! [xoshiro paper]: http://vigna.di.unimi.it/ftp/papers/ScrambledLinear.pdf</span>
-<span class="doccomment">//! [low linear complexity]: http://xoshiro.di.unimi.it/lowcomp.php</span>
+</span><span class="doccomment">//! This crate implements the [xoshiro] family of pseudorandom number generators
+//! designed by David Blackman and Sebastiano Vigna. They feature high
+//! perfomance and a small state and superseed the previous xorshift-based
+//! generators. However, they are no cryptographically secure and their output
+//! can be predicted by observing a few samples.
+//!
+//! The following generators are implemented:
+//!
+//! # 64-bit generators
+//! - [`Xoshiro256StarStar`]: Recommended for all purposes. Excellent speed and
+//!   a state space (256 bits) large enough for any parallel application.
+//! - [`Xoshiro256PlusPlus`]: Recommended for all purposes. Excellent speed and
+//!   a state space (256 bits) large enough for any parallel application.
+//! - [`Xoshiro256Plus`]: Recommended for generating 64-bit floating-point
+//!   numbers. About 15% faster than `Xoshiro256StarStar`, but has a [low linear
+//!   complexity] in the lowest bits (which are discarded when generating
+//!   floats), making it fail linearity tests. This is unlikely to have any
+//!   impact in practise.
+//! - [`Xoroshiro128StarStar`]: An alternative to `Xoshiro256StarStar`, having
+//!   the same speed but using half the state. Only suited for low-scale parallel
+//!   applications.
+//! - [`Xoroshiro128PlusPlus`]: An alternative to `Xoshiro256PlusPlus`, having
+//!   the same speed but using half the state. Only suited for low-scale parallel
+//!   applications.
+//! - [`Xoroshiro128Plus`]: An alternative to `Xoshiro256Plus`, having the same
+//!   speed but using half the state. Only suited for low-scale parallel
+//!   applications. Has a [low linear complexity] in the lowest bits (which are
+//!   discarded when generating floats), making it fail linearity tests. This is
+//!   unlikely to have any impact in practise.
+//! - [`Xoshiro512StarStar`]: An alternative to `Xoshiro256StarStar` with more
+//!   state and the same speed.
+//! - [`Xoshiro512PlusPlus`]: An alternative to `Xoshiro256PlusPlus` with more
+//!   state and the same speed.
+//! - [`Xoshiro512Plus`]: An alternative to `Xoshiro512Plus` with more
+//!   state and the same speed. Has a [low linear complexity] in the lowest bits
+//!   (which are discarded when generating floats), making it fail linearity
+//!   tests. This is unlikely to have any impact in practise.
+//! - [`SplitMix64`]: Recommended for initializing generators of the xoshiro
+//!   familiy from a 64-bit seed. Used for implementing `seed_from_u64`.
+//!
+//! # 32-bit generators
+//! - [`Xoshiro128StarStar`]: Recommended for all purposes. Excellent speed.
+//! - [`Xoshiro128PlusPlus`]: Recommended for all purposes. Excellent speed.
+//! - [`Xoshiro128Plus`]: Recommended for generating 32-bit floating-point
+//!   numbers. Faster than `Xoshiro128StarStar`, but has a [low linear
+//!   complexity] in the lowest bits (which are discarded when generating
+//!   floats), making it fail linearity tests. This is unlikely to have any
+//!   impact in practise.
+//! - [`Xoroshiro64StarStar`]: An alternative to `Xoshiro128StarStar`, having
+//!   the same speed but using half the state.
+//! - [`Xoroshiro64Star`]: An alternative to `Xoshiro128Plus`, having the
+//!   same speed but using half the state. Has a [low linear complexity] in the
+//!   lowest bits (which are discarded when generating floats), making it fail
+//!   linearity tests. This is unlikely to have any impact in practise.
+//!
+//! The `*PlusPlus` generators perform similarily to the `*StarStar` generators.
+//! See the [xoshiro paper], where the differences are discussed in detail.
+//!
+//! [xoshiro]: http://xoshiro.di.unimi.it/
+//! [xoshiro paper]: http://vigna.di.unimi.it/ftp/papers/ScrambledLinear.pdf
+//! [low linear complexity]: http://xoshiro.di.unimi.it/lowcomp.php
 
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_logo_url</span> <span class="op">=</span> <span class="string">&quot;https://www.rust-lang.org/logos/rust-logo-128x128-blk.png&quot;</span>,
-       <span class="ident">html_favicon_url</span> <span class="op">=</span> <span class="string">&quot;https://www.rust-lang.org/favicon.ico&quot;</span>,
-       <span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/rand_xoshiro/0.6.0&quot;</span>)]</span>
+</span><span class="attribute">#![doc(html_logo_url = <span class="string">&quot;https://www.rust-lang.org/logos/rust-logo-128x128-blk.png&quot;</span>,
+       html_favicon_url = <span class="string">&quot;https://www.rust-lang.org/favicon.ico&quot;</span>,
+       html_root_url = <span class="string">&quot;https://docs.rs/rand_xoshiro/0.6.0&quot;</span>)]
 
-<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_docs</span>)]</span>
-<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_debug_implementations</span>)]</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::unreadable_literal</span>)]</span>
-<span class="attribute">#![<span class="ident">no_std</span>]</span>
+#![deny(missing_docs)]
+#![deny(missing_debug_implementations)]
+#![allow(clippy::unreadable_literal)]
+#![no_std]
 
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">mod</span> <span class="ident">common</span>;
-<span class="kw">mod</span> <span class="ident">splitmix64</span>;
-<span class="kw">mod</span> <span class="ident">xoshiro128starstar</span>;
-<span class="kw">mod</span> <span class="ident">xoshiro128plusplus</span>;
-<span class="kw">mod</span> <span class="ident">xoshiro128plus</span>;
-<span class="kw">mod</span> <span class="ident">xoshiro256starstar</span>;
-<span class="kw">mod</span> <span class="ident">xoshiro256plusplus</span>;
-<span class="kw">mod</span> <span class="ident">xoshiro256plus</span>;
-<span class="kw">mod</span> <span class="ident">xoshiro512starstar</span>;
-<span class="kw">mod</span> <span class="ident">xoshiro512plusplus</span>;
-<span class="kw">mod</span> <span class="ident">xoshiro512plus</span>;
-<span class="kw">mod</span> <span class="ident">xoroshiro128plus</span>;
-<span class="kw">mod</span> <span class="ident">xoroshiro128plusplus</span>;
-<span class="kw">mod</span> <span class="ident">xoroshiro128starstar</span>;
-<span class="kw">mod</span> <span class="ident">xoroshiro64starstar</span>;
-<span class="kw">mod</span> <span class="ident">xoroshiro64star</span>;
+#[macro_use]
+</span><span class="kw">mod </span>common;
+<span class="kw">mod </span>splitmix64;
+<span class="kw">mod </span>xoshiro128starstar;
+<span class="kw">mod </span>xoshiro128plusplus;
+<span class="kw">mod </span>xoshiro128plus;
+<span class="kw">mod </span>xoshiro256starstar;
+<span class="kw">mod </span>xoshiro256plusplus;
+<span class="kw">mod </span>xoshiro256plus;
+<span class="kw">mod </span>xoshiro512starstar;
+<span class="kw">mod </span>xoshiro512plusplus;
+<span class="kw">mod </span>xoshiro512plus;
+<span class="kw">mod </span>xoroshiro128plus;
+<span class="kw">mod </span>xoroshiro128plusplus;
+<span class="kw">mod </span>xoroshiro128starstar;
+<span class="kw">mod </span>xoroshiro64starstar;
+<span class="kw">mod </span>xoroshiro64star;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">rand_core</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">splitmix64::SplitMix64</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">xoshiro128starstar::Xoshiro128StarStar</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">xoshiro128plusplus::Xoshiro128PlusPlus</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">xoshiro128plus::Xoshiro128Plus</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">xoshiro256starstar::Xoshiro256StarStar</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">xoshiro256plusplus::Xoshiro256PlusPlus</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">xoshiro256plus::Xoshiro256Plus</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">common::Seed512</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">xoshiro512starstar::Xoshiro512StarStar</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">xoshiro512plusplus::Xoshiro512PlusPlus</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">xoshiro512plus::Xoshiro512Plus</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">xoroshiro128plus::Xoroshiro128Plus</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">xoroshiro128starstar::Xoroshiro128StarStar</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">xoroshiro128plusplus::Xoroshiro128PlusPlus</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">xoroshiro64starstar::Xoroshiro64StarStar</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">xoroshiro64star::Xoroshiro64Star</span>;
+<span class="kw">pub use </span>rand_core;
+<span class="kw">pub use </span>splitmix64::SplitMix64;
+<span class="kw">pub use </span>xoshiro128starstar::Xoshiro128StarStar;
+<span class="kw">pub use </span>xoshiro128plusplus::Xoshiro128PlusPlus;
+<span class="kw">pub use </span>xoshiro128plus::Xoshiro128Plus;
+<span class="kw">pub use </span>xoshiro256starstar::Xoshiro256StarStar;
+<span class="kw">pub use </span>xoshiro256plusplus::Xoshiro256PlusPlus;
+<span class="kw">pub use </span>xoshiro256plus::Xoshiro256Plus;
+<span class="kw">pub use </span>common::Seed512;
+<span class="kw">pub use </span>xoshiro512starstar::Xoshiro512StarStar;
+<span class="kw">pub use </span>xoshiro512plusplus::Xoshiro512PlusPlus;
+<span class="kw">pub use </span>xoshiro512plus::Xoshiro512Plus;
+<span class="kw">pub use </span>xoroshiro128plus::Xoroshiro128Plus;
+<span class="kw">pub use </span>xoroshiro128starstar::Xoroshiro128StarStar;
+<span class="kw">pub use </span>xoroshiro128plusplus::Xoroshiro128PlusPlus;
+<span class="kw">pub use </span>xoroshiro64starstar::Xoroshiro64StarStar;
+<span class="kw">pub use </span>xoroshiro64star::Xoroshiro64Star;
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rand_xoshiro" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rand_xoshiro" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

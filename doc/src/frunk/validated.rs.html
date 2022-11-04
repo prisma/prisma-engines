@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/frunk-0.4.0/src/validated.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>validated.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../frunk/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../frunk/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../frunk/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/frunk-0.4.0/src/validated.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>validated.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../frunk/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../frunk/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../frunk/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -359,366 +359,366 @@
 <span id="359">359</span>
 <span id="360">360</span>
 <span id="361">361</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Module for holding Validated logic</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `Validated` is a way of running a bunch of operations that can go wrong (for example,</span>
-<span class="doccomment">//! functions returning `Result&lt;T, E&gt;`) and, in the case of one or more things going wrong,</span>
-<span class="doccomment">//! having all the errors returned to you all at once. In the case that everything went well, you get</span>
-<span class="doccomment">//! an `HList` of all your results.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Examples</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! #[macro_use]</span>
-<span class="doccomment">//! extern crate frunk;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # fn main() {</span>
-<span class="doccomment">//! use frunk::Validated;</span>
-<span class="doccomment">//! use frunk::prelude::*; // for .into_validated()</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #[derive(PartialEq, Eq, Debug)]</span>
-<span class="doccomment">//! struct Person {</span>
-<span class="doccomment">//!     age: i32,</span>
-<span class="doccomment">//!     name: String,</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! fn get_name() -&gt; Result&lt;String, String&gt; {</span>
-<span class="doccomment">//!     Result::Ok(&quot;James&quot;.to_owned())</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! fn get_age() -&gt; Result&lt;i32, String&gt; {</span>
-<span class="doccomment">//!     Result::Ok(32)</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let v: Validated&lt;HList!(String, i32), String&gt; = get_name().into_validated() + get_age();</span>
-<span class="doccomment">//! let person = v.into_result()</span>
-<span class="doccomment">//!                .map(|hlist_pat!(name, age)| {</span>
-<span class="doccomment">//!                     Person {</span>
-<span class="doccomment">//!                         name: name,</span>
-<span class="doccomment">//!                         age: age,</span>
-<span class="doccomment">//!                     }</span>
-<span class="doccomment">//!                 });</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!  assert_eq!(person.unwrap(),</span>
-<span class="doccomment">//!             Person {</span>
-<span class="doccomment">//!                 name: &quot;James&quot;.to_owned(),</span>
-<span class="doccomment">//!                 age: 32,</span>
-<span class="doccomment">//!             });</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! ```</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Module for holding Validated logic
+//!
+//! `Validated` is a way of running a bunch of operations that can go wrong (for example,
+//! functions returning `Result&lt;T, E&gt;`) and, in the case of one or more things going wrong,
+//! having all the errors returned to you all at once. In the case that everything went well, you get
+//! an `HList` of all your results.
+//!
+//! # Examples
+//!
+//! ```
+//! #[macro_use]
+//! extern crate frunk;
+//!
+//! # fn main() {
+//! use frunk::Validated;
+//! use frunk::prelude::*; // for .into_validated()
+//!
+//! #[derive(PartialEq, Eq, Debug)]
+//! struct Person {
+//!     age: i32,
+//!     name: String,
+//! }
+//!
+//! fn get_name() -&gt; Result&lt;String, String&gt; {
+//!     Result::Ok(&quot;James&quot;.to_owned())
+//! }
+//!
+//! fn get_age() -&gt; Result&lt;i32, String&gt; {
+//!     Result::Ok(32)
+//! }
+//!
+//! let v: Validated&lt;HList!(String, i32), String&gt; = get_name().into_validated() + get_age();
+//! let person = v.into_result()
+//!                .map(|hlist_pat!(name, age)| {
+//!                     Person {
+//!                         name: name,
+//!                         age: age,
+//!                     }
+//!                 });
+//!
+//!  assert_eq!(person.unwrap(),
+//!             Person {
+//!                 name: &quot;James&quot;.to_owned(),
+//!                 age: 32,
+//!             });
+//! # }
+//! ```
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::hlist</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">std::ops::Add</span>;
+</span><span class="kw">use </span><span class="kw">super</span>::hlist::<span class="kw-2">*</span>;
+<span class="kw">use </span>std::ops::Add;
 
-<span class="doccomment">/// A Validated is either an Ok holding an HList or an Err, holding a vector</span>
-<span class="doccomment">/// of collected errors.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Validated</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">HList</span>,
+<span class="doccomment">/// A Validated is either an Ok holding an HList or an Err, holding a vector
+/// of collected errors.
+</span><span class="attribute">#[derive(PartialEq, Debug, Eq, Clone, PartialOrd, Ord, Hash)]
+</span><span class="kw">pub enum </span>Validated&lt;T, E&gt;
+<span class="kw">where
+    </span>T: HList,
 {
-    <span class="prelude-val">Ok</span>(<span class="ident">T</span>),
-    <span class="prelude-val">Err</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>),
+    <span class="prelude-val">Ok</span>(T),
+    <span class="prelude-val">Err</span>(Vec&lt;E&gt;),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">Validated</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">HList</span>,
+<span class="kw">impl</span>&lt;T, E&gt; Validated&lt;T, E&gt;
+<span class="kw">where
+    </span>T: HList,
 {
-    <span class="doccomment">/// Returns true if this validation is Ok, false otherwise</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use frunk::Validated;</span>
-    <span class="doccomment">/// use frunk::prelude::*;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let r1: Result&lt;String, String&gt; = Result::Ok(String::from(&quot;hello&quot;));</span>
-    <span class="doccomment">/// let v = r1.into_validated();</span>
-    <span class="doccomment">/// assert!(v.is_ok());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_ok</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="kw-2">*</span><span class="self">self</span>, <span class="ident">Validated::Ok</span>(<span class="kw">_</span>))
+    <span class="doccomment">/// Returns true if this validation is Ok, false otherwise
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use frunk::Validated;
+    /// use frunk::prelude::*;
+    ///
+    /// let r1: Result&lt;String, String&gt; = Result::Ok(String::from(&quot;hello&quot;));
+    /// let v = r1.into_validated();
+    /// assert!(v.is_ok());
+    /// ```
+    </span><span class="kw">pub fn </span>is_ok(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="kw-2">*</span><span class="self">self</span>, Validated::Ok(<span class="kw">_</span>))
     }
 
-    <span class="doccomment">/// Returns true if this validation is Err, false otherwise</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use frunk::prelude::*;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let r1: Result&lt;String, i32&gt; = Result::Err(32);</span>
-    <span class="doccomment">/// let v = r1.into_validated();</span>
-    <span class="doccomment">/// assert!(v.is_err());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_err</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="op">!</span><span class="self">self</span>.<span class="ident">is_ok</span>()
+    <span class="doccomment">/// Returns true if this validation is Err, false otherwise
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use frunk::prelude::*;
+    ///
+    /// let r1: Result&lt;String, i32&gt; = Result::Err(32);
+    /// let v = r1.into_validated();
+    /// assert!(v.is_err());
+    /// ```
+    </span><span class="kw">pub fn </span>is_err(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        !<span class="self">self</span>.is_ok()
     }
 
-    <span class="doccomment">/// Turns this Validated into a Result.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If this Validated is Ok, it will become a Result::Ok, holding an HList of all the accumulated</span>
-    <span class="doccomment">/// results. Otherwise, it will become a Result::Err with a list of all accumulated errors.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// #[macro_use] extern crate frunk;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// use frunk::Validated;</span>
-    <span class="doccomment">/// use frunk::prelude::*;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// #[derive(PartialEq, Eq, Debug)]</span>
-    <span class="doccomment">/// struct Person {</span>
-    <span class="doccomment">///     age: i32,</span>
-    <span class="doccomment">///     name: String,</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// fn get_name() -&gt; Result&lt;String, String&gt; {</span>
-    <span class="doccomment">///     Result::Ok(&quot;James&quot;.to_owned())</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// fn get_age() -&gt; Result&lt;i32, String&gt; {</span>
-    <span class="doccomment">///     Result::Ok(32)</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let v = get_name().into_validated() + get_age();</span>
-    <span class="doccomment">/// let person = v.into_result()</span>
-    <span class="doccomment">///                .map(|hlist_pat!(name, age)| {</span>
-    <span class="doccomment">///                     Person {</span>
-    <span class="doccomment">///                         name: name,</span>
-    <span class="doccomment">///                         age: age,</span>
-    <span class="doccomment">///                     }</span>
-    <span class="doccomment">///                 });</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///  assert_eq!(person.unwrap(),</span>
-    <span class="doccomment">///             Person {</span>
-    <span class="doccomment">///                 name: &quot;James&quot;.to_owned(),</span>
-    <span class="doccomment">///                 age: 32,</span>
-    <span class="doccomment">///             });</span>
-    <span class="doccomment">/// # }</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_result</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Validated::Ok</span>(<span class="ident">h</span>) =&gt; <span class="ident">Result::Ok</span>(<span class="ident">h</span>),
-            <span class="ident">Validated::Err</span>(<span class="ident">errors</span>) =&gt; <span class="ident">Result::Err</span>(<span class="ident">errors</span>),
+    <span class="doccomment">/// Turns this Validated into a Result.
+    ///
+    /// If this Validated is Ok, it will become a Result::Ok, holding an HList of all the accumulated
+    /// results. Otherwise, it will become a Result::Err with a list of all accumulated errors.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// #[macro_use] extern crate frunk;
+    ///
+    /// use frunk::Validated;
+    /// use frunk::prelude::*;
+    ///
+    /// # fn main() {
+    /// #[derive(PartialEq, Eq, Debug)]
+    /// struct Person {
+    ///     age: i32,
+    ///     name: String,
+    /// }
+    ///
+    /// fn get_name() -&gt; Result&lt;String, String&gt; {
+    ///     Result::Ok(&quot;James&quot;.to_owned())
+    /// }
+    ///
+    /// fn get_age() -&gt; Result&lt;i32, String&gt; {
+    ///     Result::Ok(32)
+    /// }
+    ///
+    /// let v = get_name().into_validated() + get_age();
+    /// let person = v.into_result()
+    ///                .map(|hlist_pat!(name, age)| {
+    ///                     Person {
+    ///                         name: name,
+    ///                         age: age,
+    ///                     }
+    ///                 });
+    ///
+    ///  assert_eq!(person.unwrap(),
+    ///             Person {
+    ///                 name: &quot;James&quot;.to_owned(),
+    ///                 age: 32,
+    ///             });
+    /// # }
+    </span><span class="kw">pub fn </span>into_result(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;T, Vec&lt;E&gt;&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            Validated::Ok(h) =&gt; Result::Ok(h),
+            Validated::Err(errors) =&gt; Result::Err(errors),
         }
     }
 }
 
-<span class="doccomment">/// Trait for &quot;lifting&quot; a given type into a Validated</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IntoValidated</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Consumes the current Result into a Validated so that we can begin chaining</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use frunk::prelude::*; // IntoValidated is in the prelude</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let r1: Result&lt;String, i32&gt; = Result::Err(32);</span>
-    <span class="doccomment">/// let v = r1.into_validated();</span>
-    <span class="doccomment">/// assert!(v.is_err());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">into_validated</span>(<span class="self">self</span>) -&gt; <span class="ident">Validated</span><span class="op">&lt;</span><span class="ident">HCons</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">HNil</span><span class="op">&gt;</span>, <span class="ident">E</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Trait for &quot;lifting&quot; a given type into a Validated
+</span><span class="kw">pub trait </span>IntoValidated&lt;T, E&gt; {
+    <span class="doccomment">/// Consumes the current Result into a Validated so that we can begin chaining
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use frunk::prelude::*; // IntoValidated is in the prelude
+    ///
+    /// let r1: Result&lt;String, i32&gt; = Result::Err(32);
+    /// let v = r1.into_validated();
+    /// assert!(v.is_err());
+    /// ```
+    </span><span class="kw">fn </span>into_validated(<span class="self">self</span>) -&gt; Validated&lt;HCons&lt;T, HNil&gt;, E&gt;;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">IntoValidated</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">into_validated</span>(<span class="self">self</span>) -&gt; <span class="ident">Validated</span><span class="op">&lt;</span><span class="ident">HCons</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">HNil</span><span class="op">&gt;</span>, <span class="ident">E</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Result::Err</span>(<span class="ident">e</span>) =&gt; <span class="ident">Validated::Err</span>(<span class="macro">vec!</span>[<span class="ident">e</span>]),
-            <span class="ident">Result::Ok</span>(<span class="ident">v</span>) =&gt; <span class="ident">Validated::Ok</span>(<span class="ident">HCons</span> {
-                <span class="ident">head</span>: <span class="ident">v</span>,
-                <span class="ident">tail</span>: <span class="ident">HNil</span>,
+<span class="kw">impl</span>&lt;T, E&gt; IntoValidated&lt;T, E&gt; <span class="kw">for </span><span class="prelude-ty">Result</span>&lt;T, E&gt; {
+    <span class="kw">fn </span>into_validated(<span class="self">self</span>) -&gt; Validated&lt;HCons&lt;T, HNil&gt;, E&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            Result::Err(e) =&gt; Validated::Err(<span class="macro">vec!</span>[e]),
+            Result::Ok(v) =&gt; Validated::Ok(HCons {
+                head: v,
+                tail: HNil,
             }),
         }
     }
 }
 
-<span class="doccomment">/// Implements Add for the current Validated with a Result, returning a new Validated.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # #[macro_use] extern crate frunk;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// use frunk::Validated;</span>
-<span class="doccomment">/// use frunk::prelude::*;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let r1: Result&lt;String, String&gt; = Result::Ok(String::from(&quot;hello&quot;));</span>
-<span class="doccomment">/// let r2: Result&lt;i32, String&gt; = Result::Ok(1);</span>
-<span class="doccomment">/// let v = r1.into_validated() + r2;</span>
-<span class="doccomment">/// assert_eq!(v, Validated::Ok(hlist!(String::from(&quot;hello&quot;), 1)))</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span>, <span class="ident">T2</span><span class="op">&gt;</span> <span class="ident">Add</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Validated</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">HList</span> <span class="op">+</span> <span class="ident">Add</span><span class="op">&lt;</span><span class="ident">HCons</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">HNil</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Add</span><span class="op">&lt;</span><span class="ident">HCons</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">HNil</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Output</span>: <span class="ident">HList</span>,
+<span class="doccomment">/// Implements Add for the current Validated with a Result, returning a new Validated.
+///
+/// # Examples
+///
+/// ```
+/// # #[macro_use] extern crate frunk;
+/// # fn main() {
+/// use frunk::Validated;
+/// use frunk::prelude::*;
+///
+/// let r1: Result&lt;String, String&gt; = Result::Ok(String::from(&quot;hello&quot;));
+/// let r2: Result&lt;i32, String&gt; = Result::Ok(1);
+/// let v = r1.into_validated() + r2;
+/// assert_eq!(v, Validated::Ok(hlist!(String::from(&quot;hello&quot;), 1)))
+/// # }
+/// ```
+///
+</span><span class="kw">impl</span>&lt;T, E, T2&gt; Add&lt;<span class="prelude-ty">Result</span>&lt;T2, E&gt;&gt; <span class="kw">for </span>Validated&lt;T, E&gt;
+<span class="kw">where
+    </span>T: HList + Add&lt;HCons&lt;T2, HNil&gt;&gt;,
+    &lt;T <span class="kw">as </span>Add&lt;HCons&lt;T2, HNil&gt;&gt;&gt;::Output: HList,
 {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Validated</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Add</span><span class="op">&lt;</span><span class="ident">HCons</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">HNil</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Output</span>, <span class="ident">E</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Output = Validated&lt;&lt;T <span class="kw">as </span>Add&lt;HCons&lt;T2, HNil&gt;&gt;&gt;::Output, E&gt;;
 
-    <span class="kw">fn</span> <span class="ident">add</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">E</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="kw">let</span> <span class="ident">other_as_validated</span> <span class="op">=</span> <span class="ident">other</span>.<span class="ident">into_validated</span>();
-        <span class="self">self</span> <span class="op">+</span> <span class="ident">other_as_validated</span>
+    <span class="kw">fn </span>add(<span class="self">self</span>, other: <span class="prelude-ty">Result</span>&lt;T2, E&gt;) -&gt; <span class="self">Self</span>::Output {
+        <span class="kw">let </span>other_as_validated = other.into_validated();
+        <span class="self">self </span>+ other_as_validated
     }
 }
 
-<span class="doccomment">/// Implements Add for the current Validated with another Validated, returning a new Validated.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # #[macro_use] extern crate frunk;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// use frunk::Validated;</span>
-<span class="doccomment">/// use frunk::prelude::*;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let r1: Result&lt;String, String&gt; = Result::Ok(String::from(&quot;hello&quot;));</span>
-<span class="doccomment">/// let r2: Result&lt;i32, String&gt; = Result::Ok(1);</span>
-<span class="doccomment">/// let v1 = r1.into_validated();</span>
-<span class="doccomment">/// let v2 = r2.into_validated();</span>
-<span class="doccomment">/// let v3 = v1 + v2;</span>
-<span class="doccomment">/// assert_eq!(v3, Validated::Ok(hlist!(String::from(&quot;hello&quot;), 1)))</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span>, <span class="ident">T2</span><span class="op">&gt;</span> <span class="ident">Add</span><span class="op">&lt;</span><span class="ident">Validated</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Validated</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">HList</span> <span class="op">+</span> <span class="ident">Add</span><span class="op">&lt;</span><span class="ident">T2</span><span class="op">&gt;</span>,
-    <span class="ident">T2</span>: <span class="ident">HList</span>,
-    <span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Add</span><span class="op">&lt;</span><span class="ident">T2</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Output</span>: <span class="ident">HList</span>,
+<span class="doccomment">/// Implements Add for the current Validated with another Validated, returning a new Validated.
+///
+/// # Examples
+///
+/// ```
+/// # #[macro_use] extern crate frunk;
+/// # fn main() {
+/// use frunk::Validated;
+/// use frunk::prelude::*;
+///
+/// let r1: Result&lt;String, String&gt; = Result::Ok(String::from(&quot;hello&quot;));
+/// let r2: Result&lt;i32, String&gt; = Result::Ok(1);
+/// let v1 = r1.into_validated();
+/// let v2 = r2.into_validated();
+/// let v3 = v1 + v2;
+/// assert_eq!(v3, Validated::Ok(hlist!(String::from(&quot;hello&quot;), 1)))
+/// # }
+/// ```
+</span><span class="kw">impl</span>&lt;T, E, T2&gt; Add&lt;Validated&lt;T2, E&gt;&gt; <span class="kw">for </span>Validated&lt;T, E&gt;
+<span class="kw">where
+    </span>T: HList + Add&lt;T2&gt;,
+    T2: HList,
+    &lt;T <span class="kw">as </span>Add&lt;T2&gt;&gt;::Output: HList,
 {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Validated</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T</span> <span class="kw">as</span> <span class="ident">Add</span><span class="op">&lt;</span><span class="ident">T2</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Output</span>, <span class="ident">E</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Output = Validated&lt;&lt;T <span class="kw">as </span>Add&lt;T2&gt;&gt;::Output, E&gt;;
 
-    <span class="kw">fn</span> <span class="ident">add</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Validated</span><span class="op">&lt;</span><span class="ident">T2</span>, <span class="ident">E</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="kw">match</span> (<span class="self">self</span>, <span class="ident">other</span>) {
-            (<span class="ident">Validated::Err</span>(<span class="kw-2">mut</span> <span class="ident">errs</span>), <span class="ident">Validated::Err</span>(<span class="ident">errs2</span>)) =&gt; {
-                <span class="ident">errs</span>.<span class="ident">extend</span>(<span class="ident">errs2</span>);
-                <span class="ident">Validated::Err</span>(<span class="ident">errs</span>)
+    <span class="kw">fn </span>add(<span class="self">self</span>, other: Validated&lt;T2, E&gt;) -&gt; <span class="self">Self</span>::Output {
+        <span class="kw">match </span>(<span class="self">self</span>, other) {
+            (Validated::Err(<span class="kw-2">mut </span>errs), Validated::Err(errs2)) =&gt; {
+                errs.extend(errs2);
+                Validated::Err(errs)
             }
-            (<span class="ident">Validated::Err</span>(<span class="ident">errs</span>), <span class="kw">_</span>) =&gt; <span class="ident">Validated::Err</span>(<span class="ident">errs</span>),
-            (<span class="kw">_</span>, <span class="ident">Validated::Err</span>(<span class="ident">errs</span>)) =&gt; <span class="ident">Validated::Err</span>(<span class="ident">errs</span>),
-            (<span class="ident">Validated::Ok</span>(<span class="ident">h1</span>), <span class="ident">Validated::Ok</span>(<span class="ident">h2</span>)) =&gt; <span class="ident">Validated::Ok</span>(<span class="ident">h1</span> <span class="op">+</span> <span class="ident">h2</span>),
+            (Validated::Err(errs), <span class="kw">_</span>) =&gt; Validated::Err(errs),
+            (<span class="kw">_</span>, Validated::Err(errs)) =&gt; Validated::Err(errs),
+            (Validated::Ok(h1), Validated::Ok(h2)) =&gt; Validated::Ok(h1 + h2),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_adding_ok_results</span>() {
-        <span class="kw">let</span> <span class="ident">r1</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Result::Ok</span>(<span class="ident">String::from</span>(<span class="string">&quot;hello&quot;</span>));
-        <span class="kw">let</span> <span class="ident">r2</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i32</span>, <span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Result::Ok</span>(<span class="number">1</span>);
-        <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">r1</span>.<span class="ident">into_validated</span>() <span class="op">+</span> <span class="ident">r2</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">v</span>, <span class="ident">Validated::Ok</span>(<span class="macro">hlist!</span>(<span class="ident">String::from</span>(<span class="string">&quot;hello&quot;</span>), <span class="number">1</span>)))
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_adding_ok_results() {
+        <span class="kw">let </span>r1: <span class="prelude-ty">Result</span>&lt;String, String&gt; = Result::Ok(String::from(<span class="string">&quot;hello&quot;</span>));
+        <span class="kw">let </span>r2: <span class="prelude-ty">Result</span>&lt;i32, String&gt; = Result::Ok(<span class="number">1</span>);
+        <span class="kw">let </span>v = r1.into_validated() + r2;
+        <span class="macro">assert_eq!</span>(v, Validated::Ok(<span class="macro">hlist!</span>(String::from(<span class="string">&quot;hello&quot;</span>), <span class="number">1</span>)))
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_adding_validated_oks</span>() {
-        <span class="kw">let</span> <span class="ident">r1</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Result::Ok</span>(<span class="ident">String::from</span>(<span class="string">&quot;hello&quot;</span>));
-        <span class="kw">let</span> <span class="ident">r2</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i32</span>, <span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Result::Ok</span>(<span class="number">1</span>);
-        <span class="kw">let</span> <span class="ident">r3</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i32</span>, <span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Result::Ok</span>(<span class="number">3</span>);
-        <span class="kw">let</span> <span class="ident">v1</span> <span class="op">=</span> <span class="ident">r1</span>.<span class="ident">into_validated</span>();
-        <span class="kw">let</span> <span class="ident">v2</span> <span class="op">=</span> <span class="ident">r2</span>.<span class="ident">into_validated</span>();
-        <span class="kw">let</span> <span class="ident">v3</span> <span class="op">=</span> <span class="ident">r3</span>.<span class="ident">into_validated</span>();
-        <span class="kw">let</span> <span class="ident">comb</span> <span class="op">=</span> <span class="ident">v1</span> <span class="op">+</span> <span class="ident">v2</span> <span class="op">+</span> <span class="ident">v3</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">comb</span>, <span class="ident">Validated::Ok</span>(<span class="macro">hlist!</span>(<span class="ident">String::from</span>(<span class="string">&quot;hello&quot;</span>), <span class="number">1</span>, <span class="number">3</span>)))
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_adding_validated_oks() {
+        <span class="kw">let </span>r1: <span class="prelude-ty">Result</span>&lt;String, String&gt; = Result::Ok(String::from(<span class="string">&quot;hello&quot;</span>));
+        <span class="kw">let </span>r2: <span class="prelude-ty">Result</span>&lt;i32, String&gt; = Result::Ok(<span class="number">1</span>);
+        <span class="kw">let </span>r3: <span class="prelude-ty">Result</span>&lt;i32, String&gt; = Result::Ok(<span class="number">3</span>);
+        <span class="kw">let </span>v1 = r1.into_validated();
+        <span class="kw">let </span>v2 = r2.into_validated();
+        <span class="kw">let </span>v3 = r3.into_validated();
+        <span class="kw">let </span>comb = v1 + v2 + v3;
+        <span class="macro">assert_eq!</span>(comb, Validated::Ok(<span class="macro">hlist!</span>(String::from(<span class="string">&quot;hello&quot;</span>), <span class="number">1</span>, <span class="number">3</span>)))
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_adding_err_results</span>() {
-        <span class="kw">let</span> <span class="ident">r1</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i16</span>, <span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Result::Ok</span>(<span class="number">1</span>);
-        <span class="kw">let</span> <span class="ident">r2</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i16</span>, <span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Result::Err</span>(<span class="ident">String::from</span>(<span class="string">&quot;NO!&quot;</span>));
-        <span class="kw">let</span> <span class="ident">v1</span> <span class="op">=</span> <span class="ident">r1</span>.<span class="ident">into_validated</span>() <span class="op">+</span> <span class="ident">r2</span>;
-        <span class="macro">assert!</span>(<span class="ident">v1</span>.<span class="ident">is_err</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">v1</span>, <span class="ident">Validated::Err</span>(<span class="macro">vec!</span>[<span class="string">&quot;NO!&quot;</span>.<span class="ident">to_owned</span>()]))
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_adding_err_results() {
+        <span class="kw">let </span>r1: <span class="prelude-ty">Result</span>&lt;i16, String&gt; = Result::Ok(<span class="number">1</span>);
+        <span class="kw">let </span>r2: <span class="prelude-ty">Result</span>&lt;i16, String&gt; = Result::Err(String::from(<span class="string">&quot;NO!&quot;</span>));
+        <span class="kw">let </span>v1 = r1.into_validated() + r2;
+        <span class="macro">assert!</span>(v1.is_err());
+        <span class="macro">assert_eq!</span>(v1, Validated::Err(<span class="macro">vec!</span>[<span class="string">&quot;NO!&quot;</span>.to_owned()]))
     }
 
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Debug</span>)]</span>
-    <span class="kw">struct</span> <span class="ident">Person</span> {
-        <span class="ident">age</span>: <span class="ident">i32</span>,
-        <span class="ident">name</span>: <span class="ident">String</span>,
-        <span class="ident">email</span>: <span class="ident">String</span>,
+    <span class="attribute">#[derive(PartialEq, Eq, Debug)]
+    </span><span class="kw">struct </span>Person {
+        age: i32,
+        name: String,
+        email: String,
     }
 
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Debug</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">YahNah</span> {
-        <span class="ident">Yah</span>,
-        <span class="ident">Nah</span>,
+    <span class="attribute">#[derive(PartialEq, Eq, Debug)]
+    </span><span class="kw">pub enum </span>YahNah {
+        Yah,
+        Nah,
     }
 
-    <span class="doccomment">/// Our Errors</span>
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Debug</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Nope</span> {
-        <span class="ident">NameNope</span>,
-        <span class="ident">AgeNope</span>,
-        <span class="ident">EmailNope</span>,
+    <span class="doccomment">/// Our Errors
+    </span><span class="attribute">#[derive(PartialEq, Eq, Debug)]
+    </span><span class="kw">pub enum </span>Nope {
+        NameNope,
+        AgeNope,
+        EmailNope,
     }
 
-    <span class="kw">fn</span> <span class="ident">get_name</span>(<span class="ident">yah_nah</span>: <span class="ident">YahNah</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Nope</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">yah_nah</span> {
-            <span class="ident">YahNah::Yah</span> =&gt; <span class="ident">Result::Ok</span>(<span class="string">&quot;James&quot;</span>.<span class="ident">to_owned</span>()),
-            <span class="kw">_</span> =&gt; <span class="ident">Result::Err</span>(<span class="ident">Nope::NameNope</span>),
+    <span class="kw">fn </span>get_name(yah_nah: YahNah) -&gt; <span class="prelude-ty">Result</span>&lt;String, Nope&gt; {
+        <span class="kw">match </span>yah_nah {
+            YahNah::Yah =&gt; Result::Ok(<span class="string">&quot;James&quot;</span>.to_owned()),
+            <span class="kw">_ </span>=&gt; Result::Err(Nope::NameNope),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">get_age</span>(<span class="ident">yah_nah</span>: <span class="ident">YahNah</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i32</span>, <span class="ident">Nope</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">yah_nah</span> {
-            <span class="ident">YahNah::Yah</span> =&gt; <span class="ident">Result::Ok</span>(<span class="number">32</span>),
-            <span class="kw">_</span> =&gt; <span class="ident">Result::Err</span>(<span class="ident">Nope::AgeNope</span>),
+    <span class="kw">fn </span>get_age(yah_nah: YahNah) -&gt; <span class="prelude-ty">Result</span>&lt;i32, Nope&gt; {
+        <span class="kw">match </span>yah_nah {
+            YahNah::Yah =&gt; Result::Ok(<span class="number">32</span>),
+            <span class="kw">_ </span>=&gt; Result::Err(Nope::AgeNope),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">get_email</span>(<span class="ident">yah_nah</span>: <span class="ident">YahNah</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Nope</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">yah_nah</span> {
-            <span class="ident">YahNah::Yah</span> =&gt; <span class="ident">Result::Ok</span>(<span class="string">&quot;hello@world.com&quot;</span>.<span class="ident">to_owned</span>()),
-            <span class="kw">_</span> =&gt; <span class="ident">Result::Err</span>(<span class="ident">Nope::EmailNope</span>),
+    <span class="kw">fn </span>get_email(yah_nah: YahNah) -&gt; <span class="prelude-ty">Result</span>&lt;String, Nope&gt; {
+        <span class="kw">match </span>yah_nah {
+            YahNah::Yah =&gt; Result::Ok(<span class="string">&quot;hello@world.com&quot;</span>.to_owned()),
+            <span class="kw">_ </span>=&gt; Result::Err(Nope::EmailNope),
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_to_result_ok</span>() {
-        <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span>
-            <span class="ident">get_name</span>(<span class="ident">YahNah::Yah</span>).<span class="ident">into_validated</span>() <span class="op">+</span> <span class="ident">get_age</span>(<span class="ident">YahNah::Yah</span>) <span class="op">+</span> <span class="ident">get_email</span>(<span class="ident">YahNah::Yah</span>);
-        <span class="kw">let</span> <span class="ident">person</span> <span class="op">=</span> <span class="ident">v</span>.<span class="ident">into_result</span>().<span class="ident">map</span>(<span class="op">|</span><span class="macro">hlist_pat!</span>(<span class="ident">name</span>, <span class="ident">age</span>, <span class="ident">email</span>)<span class="op">|</span> <span class="ident">Person</span> {
-            <span class="ident">name</span>: <span class="ident">name</span>,
-            <span class="ident">age</span>: <span class="ident">age</span>,
-            <span class="ident">email</span>: <span class="ident">email</span>,
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_to_result_ok() {
+        <span class="kw">let </span>v =
+            get_name(YahNah::Yah).into_validated() + get_age(YahNah::Yah) + get_email(YahNah::Yah);
+        <span class="kw">let </span>person = v.into_result().map(|<span class="macro">hlist_pat!</span>(name, age, email)| Person {
+            name: name,
+            age: age,
+            email: email,
         });
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">person</span>.<span class="ident">unwrap</span>(),
-            <span class="ident">Person</span> {
-                <span class="ident">name</span>: <span class="string">&quot;James&quot;</span>.<span class="ident">to_owned</span>(),
-                <span class="ident">age</span>: <span class="number">32</span>,
-                <span class="ident">email</span>: <span class="string">&quot;hello@world.com&quot;</span>.<span class="ident">to_owned</span>(),
+            person.unwrap(),
+            Person {
+                name: <span class="string">&quot;James&quot;</span>.to_owned(),
+                age: <span class="number">32</span>,
+                email: <span class="string">&quot;hello@world.com&quot;</span>.to_owned(),
             }
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_to_result_all_faulty</span>() {
-        <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span>
-            <span class="ident">get_name</span>(<span class="ident">YahNah::Nah</span>).<span class="ident">into_validated</span>() <span class="op">+</span> <span class="ident">get_age</span>(<span class="ident">YahNah::Nah</span>) <span class="op">+</span> <span class="ident">get_email</span>(<span class="ident">YahNah::Nah</span>);
-        <span class="kw">let</span> <span class="ident">person</span> <span class="op">=</span> <span class="ident">v</span>.<span class="ident">into_result</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="macro">unimplemented!</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_to_result_all_faulty() {
+        <span class="kw">let </span>v =
+            get_name(YahNah::Nah).into_validated() + get_age(YahNah::Nah) + get_email(YahNah::Nah);
+        <span class="kw">let </span>person = v.into_result().map(|<span class="kw">_</span>| <span class="macro">unimplemented!</span>());
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">person</span>.<span class="ident">unwrap_err</span>(),
-            <span class="macro">vec!</span>[<span class="ident">Nope::NameNope</span>, <span class="ident">Nope::AgeNope</span>, <span class="ident">Nope::EmailNope</span>]
+            person.unwrap_err(),
+            <span class="macro">vec!</span>[Nope::NameNope, Nope::AgeNope, Nope::EmailNope]
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_to_result_one_faulty</span>() {
-        <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span>
-            <span class="ident">get_name</span>(<span class="ident">YahNah::Nah</span>).<span class="ident">into_validated</span>() <span class="op">+</span> <span class="ident">get_age</span>(<span class="ident">YahNah::Yah</span>) <span class="op">+</span> <span class="ident">get_email</span>(<span class="ident">YahNah::Nah</span>);
-        <span class="kw">let</span> <span class="ident">person</span> <span class="op">=</span> <span class="ident">v</span>.<span class="ident">into_result</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="macro">unimplemented!</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_to_result_one_faulty() {
+        <span class="kw">let </span>v =
+            get_name(YahNah::Nah).into_validated() + get_age(YahNah::Yah) + get_email(YahNah::Nah);
+        <span class="kw">let </span>person = v.into_result().map(|<span class="kw">_</span>| <span class="macro">unimplemented!</span>());
 
-        <span class="macro">assert_eq!</span>(<span class="ident">person</span>.<span class="ident">unwrap_err</span>(), <span class="macro">vec!</span>[<span class="ident">Nope::NameNope</span>, <span class="ident">Nope::EmailNope</span>]);
+        <span class="macro">assert_eq!</span>(person.unwrap_err(), <span class="macro">vec!</span>[Nope::NameNope, Nope::EmailNope]);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="frunk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="frunk" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

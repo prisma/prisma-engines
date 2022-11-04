@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/fmt/format/json.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>json.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tracing_subscriber/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/fmt/format/json.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>json.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tracing_subscriber/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tracing_subscriber/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -888,893 +888,893 @@
 <span id="886">886</span>
 <span id="887">887</span>
 <span id="888">888</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Format</span>, <span class="ident">FormatEvent</span>, <span class="ident">FormatFields</span>, <span class="ident">FormatTime</span>, <span class="ident">Writer</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">field</span>::{<span class="ident">RecordFields</span>, <span class="ident">VisitOutput</span>},
-    <span class="ident">fmt</span>::{
-        <span class="ident">fmt_layer</span>::{<span class="ident">FmtContext</span>, <span class="ident">FormattedFields</span>},
-        <span class="ident">writer::WriteAdaptor</span>,
+</pre><pre class="rust"><code><span class="kw">use super</span>::{Format, FormatEvent, FormatFields, FormatTime, Writer};
+<span class="kw">use crate</span>::{
+    field::{RecordFields, VisitOutput},
+    fmt::{
+        fmt_layer::{FmtContext, FormattedFields},
+        writer::WriteAdaptor,
     },
-    <span class="ident">registry::LookupSpan</span>,
+    registry::LookupSpan,
 };
-<span class="kw">use</span> <span class="ident">serde::ser</span>::{<span class="ident">SerializeMap</span>, <span class="ident">Serializer</span> <span class="kw">as</span> <span class="kw">_</span>};
-<span class="kw">use</span> <span class="ident">serde_json::Serializer</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">collections::BTreeMap</span>,
-    <span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Write</span>},
+<span class="kw">use </span>serde::ser::{SerializeMap, Serializer <span class="kw">as _</span>};
+<span class="kw">use </span>serde_json::Serializer;
+<span class="kw">use </span>std::{
+    collections::BTreeMap,
+    fmt::{<span class="self">self</span>, Write},
 };
-<span class="kw">use</span> <span class="ident">tracing_core</span>::{
-    <span class="ident">field</span>::{<span class="self">self</span>, <span class="ident">Field</span>},
-    <span class="ident">span::Record</span>,
-    <span class="ident">Event</span>, <span class="ident">Subscriber</span>,
+<span class="kw">use </span>tracing_core::{
+    field::{<span class="self">self</span>, Field},
+    span::Record,
+    Event, Subscriber,
 };
-<span class="kw">use</span> <span class="ident">tracing_serde::AsSerde</span>;
+<span class="kw">use </span>tracing_serde::AsSerde;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tracing-log&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">tracing_log::NormalizeEvent</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tracing-log&quot;</span>)]
+</span><span class="kw">use </span>tracing_log::NormalizeEvent;
 
-<span class="doccomment">/// Marker for [`Format`] that indicates that the newline-delimited JSON log</span>
-<span class="doccomment">/// format should be used.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This formatter is intended for production use with systems where structured</span>
-<span class="doccomment">/// logs are consumed as JSON by analysis and viewing tools. The JSON output is</span>
-<span class="doccomment">/// not optimized for human readability; instead, it should be pretty-printed</span>
-<span class="doccomment">/// using external JSON tools such as `jq`, or using a JSON log viewer.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example Output</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// &lt;pre&gt;&lt;font color=&quot;#4E9A06&quot;&gt;&lt;b&gt;:;&lt;/b&gt;&lt;/font&gt; &lt;font color=&quot;#4E9A06&quot;&gt;cargo&lt;/font&gt; run --example fmt-json</span>
-<span class="doccomment">/// &lt;font color=&quot;#4E9A06&quot;&gt;&lt;b&gt;    Finished&lt;/b&gt;&lt;/font&gt; dev [unoptimized + debuginfo] target(s) in 0.08s</span>
-<span class="doccomment">/// &lt;font color=&quot;#4E9A06&quot;&gt;&lt;b&gt;     Running&lt;/b&gt;&lt;/font&gt; `target/debug/examples/fmt-json`</span>
-<span class="doccomment">/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.821315Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;INFO&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;message&amp;quot;:&amp;quot;preparing to shave yaks&amp;quot;,&amp;quot;number_of_yaks&amp;quot;:3},&amp;quot;target&amp;quot;:&amp;quot;fmt_json&amp;quot;}</span>
-<span class="doccomment">/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.821422Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;INFO&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;message&amp;quot;:&amp;quot;shaving yaks&amp;quot;},&amp;quot;target&amp;quot;:&amp;quot;fmt_json::yak_shave&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;}]}</span>
-<span class="doccomment">/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.821495Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;TRACE&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;message&amp;quot;:&amp;quot;hello! I&amp;apos;m gonna shave a yak&amp;quot;,&amp;quot;excitement&amp;quot;:&amp;quot;yay!&amp;quot;},&amp;quot;target&amp;quot;:&amp;quot;fmt_json::yak_shave&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;},{&amp;quot;yak&amp;quot;:1,&amp;quot;name&amp;quot;:&amp;quot;shave&amp;quot;}]}</span>
-<span class="doccomment">/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.821546Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;TRACE&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;message&amp;quot;:&amp;quot;yak shaved successfully&amp;quot;},&amp;quot;target&amp;quot;:&amp;quot;fmt_json::yak_shave&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;},{&amp;quot;yak&amp;quot;:1,&amp;quot;name&amp;quot;:&amp;quot;shave&amp;quot;}]}</span>
-<span class="doccomment">/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.821598Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;DEBUG&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;yak&amp;quot;:1,&amp;quot;shaved&amp;quot;:true},&amp;quot;target&amp;quot;:&amp;quot;yak_events&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;}]}</span>
-<span class="doccomment">/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.821637Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;TRACE&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;yaks_shaved&amp;quot;:1},&amp;quot;target&amp;quot;:&amp;quot;fmt_json::yak_shave&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;}]}</span>
-<span class="doccomment">/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.821684Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;TRACE&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;message&amp;quot;:&amp;quot;hello! I&amp;apos;m gonna shave a yak&amp;quot;,&amp;quot;excitement&amp;quot;:&amp;quot;yay!&amp;quot;},&amp;quot;target&amp;quot;:&amp;quot;fmt_json::yak_shave&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;},{&amp;quot;yak&amp;quot;:2,&amp;quot;name&amp;quot;:&amp;quot;shave&amp;quot;}]}</span>
-<span class="doccomment">/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.821727Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;TRACE&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;message&amp;quot;:&amp;quot;yak shaved successfully&amp;quot;},&amp;quot;target&amp;quot;:&amp;quot;fmt_json::yak_shave&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;},{&amp;quot;yak&amp;quot;:2,&amp;quot;name&amp;quot;:&amp;quot;shave&amp;quot;}]}</span>
-<span class="doccomment">/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.821773Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;DEBUG&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;yak&amp;quot;:2,&amp;quot;shaved&amp;quot;:true},&amp;quot;target&amp;quot;:&amp;quot;yak_events&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;}]}</span>
-<span class="doccomment">/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.821806Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;TRACE&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;yaks_shaved&amp;quot;:2},&amp;quot;target&amp;quot;:&amp;quot;fmt_json::yak_shave&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;}]}</span>
-<span class="doccomment">/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.821909Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;TRACE&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;message&amp;quot;:&amp;quot;hello! I&amp;apos;m gonna shave a yak&amp;quot;,&amp;quot;excitement&amp;quot;:&amp;quot;yay!&amp;quot;},&amp;quot;target&amp;quot;:&amp;quot;fmt_json::yak_shave&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;},{&amp;quot;yak&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shave&amp;quot;}]}</span>
-<span class="doccomment">/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.821956Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;WARN&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;message&amp;quot;:&amp;quot;could not locate yak&amp;quot;},&amp;quot;target&amp;quot;:&amp;quot;fmt_json::yak_shave&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;},{&amp;quot;yak&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shave&amp;quot;}]}</span>
-<span class="doccomment">/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.822006Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;DEBUG&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;yak&amp;quot;:3,&amp;quot;shaved&amp;quot;:false},&amp;quot;target&amp;quot;:&amp;quot;yak_events&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;}]}</span>
-<span class="doccomment">/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.822041Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;ERROR&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;message&amp;quot;:&amp;quot;failed to shave yak&amp;quot;,&amp;quot;yak&amp;quot;:3,&amp;quot;error&amp;quot;:&amp;quot;missing yak&amp;quot;},&amp;quot;target&amp;quot;:&amp;quot;fmt_json::yak_shave&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;}]}</span>
-<span class="doccomment">/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.822079Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;TRACE&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;yaks_shaved&amp;quot;:2},&amp;quot;target&amp;quot;:&amp;quot;fmt_json::yak_shave&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;}]}</span>
-<span class="doccomment">/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.822117Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;INFO&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;message&amp;quot;:&amp;quot;yak shaving completed&amp;quot;,&amp;quot;all_yaks_shaved&amp;quot;:false},&amp;quot;target&amp;quot;:&amp;quot;fmt_json&amp;quot;}</span>
-<span class="doccomment">/// &lt;/pre&gt;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Options</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This formatter exposes additional options to configure the structure of the</span>
-<span class="doccomment">/// output JSON objects:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - [`Json::flatten_event`] can be used to enable flattening event fields into</span>
-<span class="doccomment">/// the root</span>
-<span class="doccomment">/// - [`Json::with_current_span`] can be used to control logging of the current</span>
-<span class="doccomment">/// span</span>
-<span class="doccomment">/// - [`Json::with_span_list`] can be used to control logging of the span list</span>
-<span class="doccomment">/// object.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// By default, event fields are not flattened, and both current span and span</span>
-<span class="doccomment">/// list are logged.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Valuable Support</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Experimental support is available for using the [`valuable`] crate to record</span>
-<span class="doccomment">/// user-defined values as structured JSON. When the [&quot;valuable&quot; unstable</span>
-<span class="doccomment">/// feature][unstable] is enabled, types implementing [`valuable::Valuable`] will</span>
-<span class="doccomment">/// be recorded as structured JSON, rather than</span>
-<span class="doccomment">/// using their [`std::fmt::Debug`] implementations.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// **Note**: This is an experimental feature. [Unstable features][unstable]</span>
-<span class="doccomment">/// must be enabled in order to use `valuable` support.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Json::flatten_event`]: #method.flatten_event</span>
-<span class="doccomment">/// [`Json::with_current_span`]: #method.with_current_span</span>
-<span class="doccomment">/// [`Json::with_span_list`]: #method.with_span_list</span>
-<span class="doccomment">/// [`valuable`]: https://crates.io/crates/valuable</span>
-<span class="doccomment">/// [unstable]: crate#unstable-features</span>
-<span class="doccomment">/// [`valuable::Valuable`]: https://docs.rs/valuable/latest/valuable/trait.Valuable.html</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Json</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">flatten_event</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">display_current_span</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">display_span_list</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// Marker for [`Format`] that indicates that the newline-delimited JSON log
+/// format should be used.
+///
+/// This formatter is intended for production use with systems where structured
+/// logs are consumed as JSON by analysis and viewing tools. The JSON output is
+/// not optimized for human readability; instead, it should be pretty-printed
+/// using external JSON tools such as `jq`, or using a JSON log viewer.
+///
+/// # Example Output
+///
+/// &lt;pre&gt;&lt;font color=&quot;#4E9A06&quot;&gt;&lt;b&gt;:;&lt;/b&gt;&lt;/font&gt; &lt;font color=&quot;#4E9A06&quot;&gt;cargo&lt;/font&gt; run --example fmt-json
+/// &lt;font color=&quot;#4E9A06&quot;&gt;&lt;b&gt;    Finished&lt;/b&gt;&lt;/font&gt; dev [unoptimized + debuginfo] target(s) in 0.08s
+/// &lt;font color=&quot;#4E9A06&quot;&gt;&lt;b&gt;     Running&lt;/b&gt;&lt;/font&gt; `target/debug/examples/fmt-json`
+/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.821315Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;INFO&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;message&amp;quot;:&amp;quot;preparing to shave yaks&amp;quot;,&amp;quot;number_of_yaks&amp;quot;:3},&amp;quot;target&amp;quot;:&amp;quot;fmt_json&amp;quot;}
+/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.821422Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;INFO&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;message&amp;quot;:&amp;quot;shaving yaks&amp;quot;},&amp;quot;target&amp;quot;:&amp;quot;fmt_json::yak_shave&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;}]}
+/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.821495Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;TRACE&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;message&amp;quot;:&amp;quot;hello! I&amp;apos;m gonna shave a yak&amp;quot;,&amp;quot;excitement&amp;quot;:&amp;quot;yay!&amp;quot;},&amp;quot;target&amp;quot;:&amp;quot;fmt_json::yak_shave&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;},{&amp;quot;yak&amp;quot;:1,&amp;quot;name&amp;quot;:&amp;quot;shave&amp;quot;}]}
+/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.821546Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;TRACE&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;message&amp;quot;:&amp;quot;yak shaved successfully&amp;quot;},&amp;quot;target&amp;quot;:&amp;quot;fmt_json::yak_shave&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;},{&amp;quot;yak&amp;quot;:1,&amp;quot;name&amp;quot;:&amp;quot;shave&amp;quot;}]}
+/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.821598Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;DEBUG&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;yak&amp;quot;:1,&amp;quot;shaved&amp;quot;:true},&amp;quot;target&amp;quot;:&amp;quot;yak_events&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;}]}
+/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.821637Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;TRACE&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;yaks_shaved&amp;quot;:1},&amp;quot;target&amp;quot;:&amp;quot;fmt_json::yak_shave&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;}]}
+/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.821684Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;TRACE&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;message&amp;quot;:&amp;quot;hello! I&amp;apos;m gonna shave a yak&amp;quot;,&amp;quot;excitement&amp;quot;:&amp;quot;yay!&amp;quot;},&amp;quot;target&amp;quot;:&amp;quot;fmt_json::yak_shave&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;},{&amp;quot;yak&amp;quot;:2,&amp;quot;name&amp;quot;:&amp;quot;shave&amp;quot;}]}
+/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.821727Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;TRACE&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;message&amp;quot;:&amp;quot;yak shaved successfully&amp;quot;},&amp;quot;target&amp;quot;:&amp;quot;fmt_json::yak_shave&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;},{&amp;quot;yak&amp;quot;:2,&amp;quot;name&amp;quot;:&amp;quot;shave&amp;quot;}]}
+/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.821773Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;DEBUG&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;yak&amp;quot;:2,&amp;quot;shaved&amp;quot;:true},&amp;quot;target&amp;quot;:&amp;quot;yak_events&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;}]}
+/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.821806Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;TRACE&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;yaks_shaved&amp;quot;:2},&amp;quot;target&amp;quot;:&amp;quot;fmt_json::yak_shave&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;}]}
+/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.821909Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;TRACE&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;message&amp;quot;:&amp;quot;hello! I&amp;apos;m gonna shave a yak&amp;quot;,&amp;quot;excitement&amp;quot;:&amp;quot;yay!&amp;quot;},&amp;quot;target&amp;quot;:&amp;quot;fmt_json::yak_shave&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;},{&amp;quot;yak&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shave&amp;quot;}]}
+/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.821956Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;WARN&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;message&amp;quot;:&amp;quot;could not locate yak&amp;quot;},&amp;quot;target&amp;quot;:&amp;quot;fmt_json::yak_shave&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;},{&amp;quot;yak&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shave&amp;quot;}]}
+/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.822006Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;DEBUG&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;yak&amp;quot;:3,&amp;quot;shaved&amp;quot;:false},&amp;quot;target&amp;quot;:&amp;quot;yak_events&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;}]}
+/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.822041Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;ERROR&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;message&amp;quot;:&amp;quot;failed to shave yak&amp;quot;,&amp;quot;yak&amp;quot;:3,&amp;quot;error&amp;quot;:&amp;quot;missing yak&amp;quot;},&amp;quot;target&amp;quot;:&amp;quot;fmt_json::yak_shave&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;}]}
+/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.822079Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;TRACE&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;yaks_shaved&amp;quot;:2},&amp;quot;target&amp;quot;:&amp;quot;fmt_json::yak_shave&amp;quot;,&amp;quot;spans&amp;quot;:[{&amp;quot;yaks&amp;quot;:3,&amp;quot;name&amp;quot;:&amp;quot;shaving_yaks&amp;quot;}]}
+/// {&amp;quot;timestamp&amp;quot;:&amp;quot;2022-02-15T18:47:10.822117Z&amp;quot;,&amp;quot;level&amp;quot;:&amp;quot;INFO&amp;quot;,&amp;quot;fields&amp;quot;:{&amp;quot;message&amp;quot;:&amp;quot;yak shaving completed&amp;quot;,&amp;quot;all_yaks_shaved&amp;quot;:false},&amp;quot;target&amp;quot;:&amp;quot;fmt_json&amp;quot;}
+/// &lt;/pre&gt;
+///
+/// # Options
+///
+/// This formatter exposes additional options to configure the structure of the
+/// output JSON objects:
+///
+/// - [`Json::flatten_event`] can be used to enable flattening event fields into
+/// the root
+/// - [`Json::with_current_span`] can be used to control logging of the current
+/// span
+/// - [`Json::with_span_list`] can be used to control logging of the span list
+/// object.
+///
+/// By default, event fields are not flattened, and both current span and span
+/// list are logged.
+///
+/// # Valuable Support
+///
+/// Experimental support is available for using the [`valuable`] crate to record
+/// user-defined values as structured JSON. When the [&quot;valuable&quot; unstable
+/// feature][unstable] is enabled, types implementing [`valuable::Valuable`] will
+/// be recorded as structured JSON, rather than
+/// using their [`std::fmt::Debug`] implementations.
+///
+/// **Note**: This is an experimental feature. [Unstable features][unstable]
+/// must be enabled in order to use `valuable` support.
+///
+/// [`Json::flatten_event`]: #method.flatten_event
+/// [`Json::with_current_span`]: #method.with_current_span
+/// [`Json::with_span_list`]: #method.with_span_list
+/// [`valuable`]: https://crates.io/crates/valuable
+/// [unstable]: crate#unstable-features
+/// [`valuable::Valuable`]: https://docs.rs/valuable/latest/valuable/trait.Valuable.html
+</span><span class="attribute">#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+</span><span class="kw">pub struct </span>Json {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) flatten_event: bool,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) display_current_span: bool,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) display_span_list: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">Json</span> {
-    <span class="doccomment">/// If set to `true` event metadata will be flattened into the root object.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flatten_event</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">flatten_event</span>: <span class="ident">bool</span>) {
-        <span class="self">self</span>.<span class="ident">flatten_event</span> <span class="op">=</span> <span class="ident">flatten_event</span>;
+<span class="kw">impl </span>Json {
+    <span class="doccomment">/// If set to `true` event metadata will be flattened into the root object.
+    </span><span class="kw">pub fn </span>flatten_event(<span class="kw-2">&amp;mut </span><span class="self">self</span>, flatten_event: bool) {
+        <span class="self">self</span>.flatten_event = flatten_event;
     }
 
-    <span class="doccomment">/// If set to `false`, formatted events won&#39;t contain a field for the current span.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_current_span</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">display_current_span</span>: <span class="ident">bool</span>) {
-        <span class="self">self</span>.<span class="ident">display_current_span</span> <span class="op">=</span> <span class="ident">display_current_span</span>;
+    <span class="doccomment">/// If set to `false`, formatted events won&#39;t contain a field for the current span.
+    </span><span class="kw">pub fn </span>with_current_span(<span class="kw-2">&amp;mut </span><span class="self">self</span>, display_current_span: bool) {
+        <span class="self">self</span>.display_current_span = display_current_span;
     }
 
-    <span class="doccomment">/// If set to `false`, formatted events won&#39;t contain a list of all currently</span>
-    <span class="doccomment">/// entered spans. Spans are logged in a list from root to leaf.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_span_list</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">display_span_list</span>: <span class="ident">bool</span>) {
-        <span class="self">self</span>.<span class="ident">display_span_list</span> <span class="op">=</span> <span class="ident">display_span_list</span>;
+    <span class="doccomment">/// If set to `false`, formatted events won&#39;t contain a list of all currently
+    /// entered spans. Spans are logged in a list from root to leaf.
+    </span><span class="kw">pub fn </span>with_span_list(<span class="kw-2">&amp;mut </span><span class="self">self</span>, display_span_list: bool) {
+        <span class="self">self</span>.display_span_list = display_span_list;
     }
 }
 
-<span class="kw">struct</span> <span class="ident">SerializableContext</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="ident">Span</span>, <span class="ident">N</span><span class="op">&gt;</span>(
-    <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident"><span class="kw">crate</span>::layer::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Span</span><span class="op">&gt;</span>,
-    <span class="ident">std::marker::PhantomData</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>,
+<span class="kw">struct </span>SerializableContext&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, Span, N&gt;(
+    <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="kw">crate</span>::layer::Context&lt;<span class="lifetime">&#39;a</span>, Span&gt;,
+    std::marker::PhantomData&lt;N&gt;,
 )
-<span class="kw">where</span>
-    <span class="ident">Span</span>: <span class="ident">Subscriber</span> <span class="op">+</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;lookup</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::registry::LookupSpan</span><span class="op">&lt;</span><span class="lifetime">&#39;lookup</span><span class="op">&gt;</span>,
-    <span class="ident">N</span>: <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;writer</span><span class="op">&gt;</span> <span class="ident">FormatFields</span><span class="op">&lt;</span><span class="lifetime">&#39;writer</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>;
+<span class="kw">where
+    </span>Span: Subscriber + <span class="kw">for</span>&lt;<span class="lifetime">&#39;lookup</span>&gt; <span class="kw">crate</span>::registry::LookupSpan&lt;<span class="lifetime">&#39;lookup</span>&gt;,
+    N: <span class="kw">for</span>&lt;<span class="lifetime">&#39;writer</span>&gt; FormatFields&lt;<span class="lifetime">&#39;writer</span>&gt; + <span class="lifetime">&#39;static</span>;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="ident">Span</span>, <span class="ident">N</span><span class="op">&gt;</span> <span class="ident">serde::ser::Serialize</span> <span class="kw">for</span> <span class="ident">SerializableContext</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="ident">Span</span>, <span class="ident">N</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">Span</span>: <span class="ident">Subscriber</span> <span class="op">+</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;lookup</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::registry::LookupSpan</span><span class="op">&lt;</span><span class="lifetime">&#39;lookup</span><span class="op">&gt;</span>,
-    <span class="ident">N</span>: <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;writer</span><span class="op">&gt;</span> <span class="ident">FormatFields</span><span class="op">&lt;</span><span class="lifetime">&#39;writer</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, Span, N&gt; serde::ser::Serialize <span class="kw">for </span>SerializableContext&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, Span, N&gt;
+<span class="kw">where
+    </span>Span: Subscriber + <span class="kw">for</span>&lt;<span class="lifetime">&#39;lookup</span>&gt; <span class="kw">crate</span>::registry::LookupSpan&lt;<span class="lifetime">&#39;lookup</span>&gt;,
+    N: <span class="kw">for</span>&lt;<span class="lifetime">&#39;writer</span>&gt; FormatFields&lt;<span class="lifetime">&#39;writer</span>&gt; + <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">Ser</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer_o</span>: <span class="ident">Ser</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Ser::Ok</span>, <span class="ident">Ser::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">Ser</span>: <span class="ident">serde::ser::Serializer</span>,
+    <span class="kw">fn </span>serialize&lt;Ser&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer_o: Ser) -&gt; <span class="prelude-ty">Result</span>&lt;Ser::Ok, Ser::Error&gt;
+    <span class="kw">where
+        </span>Ser: serde::ser::Serializer,
     {
-        <span class="kw">use</span> <span class="ident">serde::ser::SerializeSeq</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">serializer</span> <span class="op">=</span> <span class="ident">serializer_o</span>.<span class="ident">serialize_seq</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+        <span class="kw">use </span>serde::ser::SerializeSeq;
+        <span class="kw">let </span><span class="kw-2">mut </span>serializer = serializer_o.serialize_seq(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">leaf_span</span>) <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">lookup_current</span>() {
-            <span class="kw">for</span> <span class="ident">span</span> <span class="kw">in</span> <span class="ident">leaf_span</span>.<span class="ident">scope</span>().<span class="ident">from_root</span>() {
-                <span class="ident">serializer</span>.<span class="ident">serialize_element</span>(<span class="kw-2">&amp;</span><span class="ident">SerializableSpan</span>(<span class="kw-2">&amp;</span><span class="ident">span</span>, <span class="self">self</span>.<span class="number">1</span>))<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(leaf_span) = <span class="self">self</span>.<span class="number">0</span>.lookup_current() {
+            <span class="kw">for </span>span <span class="kw">in </span>leaf_span.scope().from_root() {
+                serializer.serialize_element(<span class="kw-2">&amp;</span>SerializableSpan(<span class="kw-2">&amp;</span>span, <span class="self">self</span>.<span class="number">1</span>))<span class="question-mark">?</span>;
             }
         }
 
-        <span class="ident">serializer</span>.<span class="ident">end</span>()
+        serializer.end()
     }
 }
 
-<span class="kw">struct</span> <span class="ident">SerializableSpan</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="ident">Span</span>, <span class="ident">N</span><span class="op">&gt;</span>(
-    <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident"><span class="kw">crate</span>::registry::SpanRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Span</span><span class="op">&gt;</span>,
-    <span class="ident">std::marker::PhantomData</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>,
+<span class="kw">struct </span>SerializableSpan&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, Span, N&gt;(
+    <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span><span class="kw">crate</span>::registry::SpanRef&lt;<span class="lifetime">&#39;a</span>, Span&gt;,
+    std::marker::PhantomData&lt;N&gt;,
 )
-<span class="kw">where</span>
-    <span class="ident">Span</span>: <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;lookup</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::registry::LookupSpan</span><span class="op">&lt;</span><span class="lifetime">&#39;lookup</span><span class="op">&gt;</span>,
-    <span class="ident">N</span>: <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;writer</span><span class="op">&gt;</span> <span class="ident">FormatFields</span><span class="op">&lt;</span><span class="lifetime">&#39;writer</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>;
+<span class="kw">where
+    </span>Span: <span class="kw">for</span>&lt;<span class="lifetime">&#39;lookup</span>&gt; <span class="kw">crate</span>::registry::LookupSpan&lt;<span class="lifetime">&#39;lookup</span>&gt;,
+    N: <span class="kw">for</span>&lt;<span class="lifetime">&#39;writer</span>&gt; FormatFields&lt;<span class="lifetime">&#39;writer</span>&gt; + <span class="lifetime">&#39;static</span>;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="ident">Span</span>, <span class="ident">N</span><span class="op">&gt;</span> <span class="ident">serde::ser::Serialize</span> <span class="kw">for</span> <span class="ident">SerializableSpan</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, <span class="ident">Span</span>, <span class="ident">N</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">Span</span>: <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;lookup</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::registry::LookupSpan</span><span class="op">&lt;</span><span class="lifetime">&#39;lookup</span><span class="op">&gt;</span>,
-    <span class="ident">N</span>: <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;writer</span><span class="op">&gt;</span> <span class="ident">FormatFields</span><span class="op">&lt;</span><span class="lifetime">&#39;writer</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, Span, N&gt; serde::ser::Serialize <span class="kw">for </span>SerializableSpan&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>, Span, N&gt;
+<span class="kw">where
+    </span>Span: <span class="kw">for</span>&lt;<span class="lifetime">&#39;lookup</span>&gt; <span class="kw">crate</span>::registry::LookupSpan&lt;<span class="lifetime">&#39;lookup</span>&gt;,
+    N: <span class="kw">for</span>&lt;<span class="lifetime">&#39;writer</span>&gt; FormatFields&lt;<span class="lifetime">&#39;writer</span>&gt; + <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">Ser</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">Ser</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Ser::Ok</span>, <span class="ident">Ser::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">Ser</span>: <span class="ident">serde::ser::Serializer</span>,
+    <span class="kw">fn </span>serialize&lt;Ser&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: Ser) -&gt; <span class="prelude-ty">Result</span>&lt;Ser::Ok, Ser::Error&gt;
+    <span class="kw">where
+        </span>Ser: serde::ser::Serializer,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">serializer</span> <span class="op">=</span> <span class="ident">serializer</span>.<span class="ident">serialize_map</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>serializer = serializer.serialize_map(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">ext</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">extensions</span>();
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">ext</span>
-            .<span class="ident">get</span>::<span class="op">&lt;</span><span class="ident">FormattedFields</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;Unable to find FormattedFields in extensions; this is a bug&quot;</span>);
+        <span class="kw">let </span>ext = <span class="self">self</span>.<span class="number">0</span>.extensions();
+        <span class="kw">let </span>data = ext
+            .get::&lt;FormattedFields&lt;N&gt;&gt;()
+            .expect(<span class="string">&quot;Unable to find FormattedFields in extensions; this is a bug&quot;</span>);
 
-        <span class="comment">// TODO: let&#39;s _not_ do this, but this resolves</span>
-        <span class="comment">// https://github.com/tokio-rs/tracing/issues/391.</span>
-        <span class="comment">// We should probably rework this to use a `serde_json::Value` or something</span>
-        <span class="comment">// similar in a JSON-specific layer, but I&#39;d (david)</span>
-        <span class="comment">// rather have a uglier fix now rather than shipping broken JSON.</span>
-        <span class="kw">match</span> <span class="ident">serde_json::from_str</span>::<span class="op">&lt;</span><span class="ident">serde_json::Value</span><span class="op">&gt;</span>(<span class="ident">data</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">serde_json::Value::Object</span>(<span class="ident">fields</span>)) =&gt; {
-                <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">fields</span> {
-                    <span class="ident">serializer</span>.<span class="ident">serialize_entry</span>(<span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="number">1</span>)<span class="question-mark">?</span>;
+        <span class="comment">// TODO: let&#39;s _not_ do this, but this resolves
+        // https://github.com/tokio-rs/tracing/issues/391.
+        // We should probably rework this to use a `serde_json::Value` or something
+        // similar in a JSON-specific layer, but I&#39;d (david)
+        // rather have a uglier fix now rather than shipping broken JSON.
+        </span><span class="kw">match </span>serde_json::from_str::&lt;serde_json::Value&gt;(data) {
+            <span class="prelude-val">Ok</span>(serde_json::Value::Object(fields)) =&gt; {
+                <span class="kw">for </span>field <span class="kw">in </span>fields {
+                    serializer.serialize_entry(<span class="kw-2">&amp;</span>field.<span class="number">0</span>, <span class="kw-2">&amp;</span>field.<span class="number">1</span>)<span class="question-mark">?</span>;
                 }
             }
-            <span class="comment">// We have fields for this span which are valid JSON but not an object.</span>
-            <span class="comment">// This is probably a bug, so panic if we&#39;re in debug mode</span>
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">debug_assertions</span>) =&gt; <span class="macro">panic!</span>(
+            <span class="comment">// We have fields for this span which are valid JSON but not an object.
+            // This is probably a bug, so panic if we&#39;re in debug mode
+            </span><span class="prelude-val">Ok</span>(<span class="kw">_</span>) <span class="kw">if </span><span class="macro">cfg!</span>(debug_assertions) =&gt; <span class="macro">panic!</span>(
                 <span class="string">&quot;span &#39;{}&#39; had malformed fields! this is a bug.\n  error: invalid JSON object\n  fields: {:?}&quot;</span>,
-                <span class="self">self</span>.<span class="number">0</span>.<span class="ident">metadata</span>().<span class="ident">name</span>(),
-                <span class="ident">data</span>
+                <span class="self">self</span>.<span class="number">0</span>.metadata().name(),
+                data
             ),
-            <span class="comment">// If we *aren&#39;t* in debug mode, it&#39;s probably best not to</span>
-            <span class="comment">// crash the program, let&#39;s log the field found but also an</span>
-            <span class="comment">// message saying it&#39;s type  is invalid</span>
-            <span class="prelude-val">Ok</span>(<span class="ident">value</span>) =&gt; {
-                <span class="ident">serializer</span>.<span class="ident">serialize_entry</span>(<span class="string">&quot;field&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">value</span>)<span class="question-mark">?</span>;
-                <span class="ident">serializer</span>.<span class="ident">serialize_entry</span>(<span class="string">&quot;field_error&quot;</span>, <span class="string">&quot;field was no a valid object&quot;</span>)<span class="question-mark">?</span>
-            }
-            <span class="comment">// We have previously recorded fields for this span</span>
-            <span class="comment">// should be valid JSON. However, they appear to *not*</span>
-            <span class="comment">// be valid JSON. This is almost certainly a bug, so</span>
-            <span class="comment">// panic if we&#39;re in debug mode</span>
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">debug_assertions</span>) =&gt; <span class="macro">panic!</span>(
+            <span class="comment">// If we *aren&#39;t* in debug mode, it&#39;s probably best not to
+            // crash the program, let&#39;s log the field found but also an
+            // message saying it&#39;s type  is invalid
+            </span><span class="prelude-val">Ok</span>(value) =&gt; {
+                serializer.serialize_entry(<span class="string">&quot;field&quot;</span>, <span class="kw-2">&amp;</span>value)<span class="question-mark">?</span>;
+                serializer.serialize_entry(<span class="string">&quot;field_error&quot;</span>, <span class="string">&quot;field was no a valid object&quot;</span>)<span class="question-mark">?
+            </span>}
+            <span class="comment">// We have previously recorded fields for this span
+            // should be valid JSON. However, they appear to *not*
+            // be valid JSON. This is almost certainly a bug, so
+            // panic if we&#39;re in debug mode
+            </span><span class="prelude-val">Err</span>(e) <span class="kw">if </span><span class="macro">cfg!</span>(debug_assertions) =&gt; <span class="macro">panic!</span>(
                 <span class="string">&quot;span &#39;{}&#39; had malformed fields! this is a bug.\n  error: {}\n  fields: {:?}&quot;</span>,
-                <span class="self">self</span>.<span class="number">0</span>.<span class="ident">metadata</span>().<span class="ident">name</span>(),
-                <span class="ident">e</span>,
-                <span class="ident">data</span>
+                <span class="self">self</span>.<span class="number">0</span>.metadata().name(),
+                e,
+                data
             ),
-            <span class="comment">// If we *aren&#39;t* in debug mode, it&#39;s probably best not</span>
-            <span class="comment">// crash the program, but let&#39;s at least make sure it&#39;s clear</span>
-            <span class="comment">// that the fields are not supposed to be missing.</span>
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="ident">serializer</span>.<span class="ident">serialize_entry</span>(<span class="string">&quot;field_error&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">e</span>))<span class="question-mark">?</span>,
+            <span class="comment">// If we *aren&#39;t* in debug mode, it&#39;s probably best not
+            // crash the program, but let&#39;s at least make sure it&#39;s clear
+            // that the fields are not supposed to be missing.
+            </span><span class="prelude-val">Err</span>(e) =&gt; serializer.serialize_entry(<span class="string">&quot;field_error&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, e))<span class="question-mark">?</span>,
         };
-        <span class="ident">serializer</span>.<span class="ident">serialize_entry</span>(<span class="string">&quot;name&quot;</span>, <span class="self">self</span>.<span class="number">0</span>.<span class="ident">metadata</span>().<span class="ident">name</span>())<span class="question-mark">?</span>;
-        <span class="ident">serializer</span>.<span class="ident">end</span>()
+        serializer.serialize_entry(<span class="string">&quot;name&quot;</span>, <span class="self">self</span>.<span class="number">0</span>.metadata().name())<span class="question-mark">?</span>;
+        serializer.end()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">N</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">FormatEvent</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">N</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">Json</span>, <span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Subscriber</span> <span class="op">+</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;lookup</span><span class="op">&gt;</span> <span class="ident">LookupSpan</span><span class="op">&lt;</span><span class="lifetime">&#39;lookup</span><span class="op">&gt;</span>,
-    <span class="ident">N</span>: <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;writer</span><span class="op">&gt;</span> <span class="ident">FormatFields</span><span class="op">&lt;</span><span class="lifetime">&#39;writer</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">T</span>: <span class="ident">FormatTime</span>,
+<span class="kw">impl</span>&lt;S, N, T&gt; FormatEvent&lt;S, N&gt; <span class="kw">for </span>Format&lt;Json, T&gt;
+<span class="kw">where
+    </span>S: Subscriber + <span class="kw">for</span>&lt;<span class="lifetime">&#39;lookup</span>&gt; LookupSpan&lt;<span class="lifetime">&#39;lookup</span>&gt;,
+    N: <span class="kw">for</span>&lt;<span class="lifetime">&#39;writer</span>&gt; FormatFields&lt;<span class="lifetime">&#39;writer</span>&gt; + <span class="lifetime">&#39;static</span>,
+    T: FormatTime,
 {
-    <span class="kw">fn</span> <span class="ident">format_event</span>(
+    <span class="kw">fn </span>format_event(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">FmtContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span>, <span class="ident">N</span><span class="op">&gt;</span>,
-        <span class="kw-2">mut</span> <span class="ident">writer</span>: <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="ident">Event</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">fmt::Result</span>
-    <span class="kw">where</span>
-        <span class="ident">S</span>: <span class="ident">Subscriber</span> <span class="op">+</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">LookupSpan</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+        ctx: <span class="kw-2">&amp;</span>FmtContext&lt;<span class="lifetime">&#39;_</span>, S, N&gt;,
+        <span class="kw-2">mut </span>writer: Writer&lt;<span class="lifetime">&#39;_</span>&gt;,
+        event: <span class="kw-2">&amp;</span>Event&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; fmt::Result
+    <span class="kw">where
+        </span>S: Subscriber + <span class="kw">for</span>&lt;<span class="lifetime">&#39;a</span>&gt; LookupSpan&lt;<span class="lifetime">&#39;a</span>&gt;,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">timestamp</span> <span class="op">=</span> <span class="ident">String::new</span>();
-        <span class="self">self</span>.<span class="ident">timer</span>.<span class="ident">format_time</span>(<span class="kw-2">&amp;mut</span> <span class="ident">Writer::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">timestamp</span>))<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>timestamp = String::new();
+        <span class="self">self</span>.timer.format_time(<span class="kw-2">&amp;mut </span>Writer::new(<span class="kw-2">&amp;mut </span>timestamp))<span class="question-mark">?</span>;
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tracing-log&quot;</span>)]</span>
-        <span class="kw">let</span> <span class="ident">normalized_meta</span> <span class="op">=</span> <span class="ident">event</span>.<span class="ident">normalized_metadata</span>();
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tracing-log&quot;</span>)]</span>
-        <span class="kw">let</span> <span class="ident">meta</span> <span class="op">=</span> <span class="ident">normalized_meta</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">event</span>.<span class="ident">metadata</span>());
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tracing-log&quot;</span>))]</span>
-        <span class="kw">let</span> <span class="ident">meta</span> <span class="op">=</span> <span class="ident">event</span>.<span class="ident">metadata</span>();
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;tracing-log&quot;</span>)]
+        </span><span class="kw">let </span>normalized_meta = event.normalized_metadata();
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;tracing-log&quot;</span>)]
+        </span><span class="kw">let </span>meta = normalized_meta.as_ref().unwrap_or_else(|| event.metadata());
+        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;tracing-log&quot;</span>))]
+        </span><span class="kw">let </span>meta = event.metadata();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">visit</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">serializer</span> <span class="op">=</span> <span class="ident">Serializer::new</span>(<span class="ident">WriteAdaptor::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writer</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>visit = || {
+            <span class="kw">let </span><span class="kw-2">mut </span>serializer = Serializer::new(WriteAdaptor::new(<span class="kw-2">&amp;mut </span>writer));
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">serializer</span> <span class="op">=</span> <span class="ident">serializer</span>.<span class="ident">serialize_map</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>serializer = serializer.serialize_map(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
 
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">display_timestamp</span> {
-                <span class="ident">serializer</span>.<span class="ident">serialize_entry</span>(<span class="string">&quot;timestamp&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">timestamp</span>)<span class="question-mark">?</span>;
+            <span class="kw">if </span><span class="self">self</span>.display_timestamp {
+                serializer.serialize_entry(<span class="string">&quot;timestamp&quot;</span>, <span class="kw-2">&amp;</span>timestamp)<span class="question-mark">?</span>;
             }
 
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">display_level</span> {
-                <span class="ident">serializer</span>.<span class="ident">serialize_entry</span>(<span class="string">&quot;level&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">meta</span>.<span class="ident">level</span>().<span class="ident">as_serde</span>())<span class="question-mark">?</span>;
+            <span class="kw">if </span><span class="self">self</span>.display_level {
+                serializer.serialize_entry(<span class="string">&quot;level&quot;</span>, <span class="kw-2">&amp;</span>meta.level().as_serde())<span class="question-mark">?</span>;
             }
 
-            <span class="kw">let</span> <span class="ident">format_field_marker</span>: <span class="ident">std::marker::PhantomData</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std::marker::PhantomData</span>;
+            <span class="kw">let </span>format_field_marker: std::marker::PhantomData&lt;N&gt; = std::marker::PhantomData;
 
-            <span class="kw">let</span> <span class="ident">current_span</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">format</span>.<span class="ident">display_current_span</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">format</span>.<span class="ident">display_span_list</span>
+            <span class="kw">let </span>current_span = <span class="kw">if </span><span class="self">self</span>.format.display_current_span || <span class="self">self</span>.format.display_span_list
             {
-                <span class="ident">event</span>
-                    .<span class="ident">parent</span>()
-                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="ident">ctx</span>.<span class="ident">span</span>(<span class="ident">id</span>))
-                    .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">ctx</span>.<span class="ident">lookup_current</span>())
-            } <span class="kw">else</span> {
-                <span class="prelude-val">None</span>
+                event
+                    .parent()
+                    .and_then(|id| ctx.span(id))
+                    .or_else(|| ctx.lookup_current())
+            } <span class="kw">else </span>{
+                <span class="prelude-val">None
+            </span>};
+
+            <span class="kw">if </span><span class="self">self</span>.format.flatten_event {
+                <span class="kw">let </span><span class="kw-2">mut </span>visitor = tracing_serde::SerdeMapVisitor::new(serializer);
+                event.record(<span class="kw-2">&amp;mut </span>visitor);
+
+                serializer = visitor.take_serializer()<span class="question-mark">?</span>;
+            } <span class="kw">else </span>{
+                <span class="kw">use </span>tracing_serde::fields::AsMap;
+                serializer.serialize_entry(<span class="string">&quot;fields&quot;</span>, <span class="kw-2">&amp;</span>event.field_map())<span class="question-mark">?</span>;
             };
 
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">format</span>.<span class="ident">flatten_event</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">visitor</span> <span class="op">=</span> <span class="ident">tracing_serde::SerdeMapVisitor::new</span>(<span class="ident">serializer</span>);
-                <span class="ident">event</span>.<span class="ident">record</span>(<span class="kw-2">&amp;mut</span> <span class="ident">visitor</span>);
-
-                <span class="ident">serializer</span> <span class="op">=</span> <span class="ident">visitor</span>.<span class="ident">take_serializer</span>()<span class="question-mark">?</span>;
-            } <span class="kw">else</span> {
-                <span class="kw">use</span> <span class="ident">tracing_serde::fields::AsMap</span>;
-                <span class="ident">serializer</span>.<span class="ident">serialize_entry</span>(<span class="string">&quot;fields&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">field_map</span>())<span class="question-mark">?</span>;
-            };
-
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">display_target</span> {
-                <span class="ident">serializer</span>.<span class="ident">serialize_entry</span>(<span class="string">&quot;target&quot;</span>, <span class="ident">meta</span>.<span class="ident">target</span>())<span class="question-mark">?</span>;
+            <span class="kw">if </span><span class="self">self</span>.display_target {
+                serializer.serialize_entry(<span class="string">&quot;target&quot;</span>, meta.target())<span class="question-mark">?</span>;
             }
 
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">display_filename</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">filename</span>) <span class="op">=</span> <span class="ident">meta</span>.<span class="ident">file</span>() {
-                    <span class="ident">serializer</span>.<span class="ident">serialize_entry</span>(<span class="string">&quot;filename&quot;</span>, <span class="ident">filename</span>)<span class="question-mark">?</span>;
+            <span class="kw">if </span><span class="self">self</span>.display_filename {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(filename) = meta.file() {
+                    serializer.serialize_entry(<span class="string">&quot;filename&quot;</span>, filename)<span class="question-mark">?</span>;
                 }
             }
 
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">display_line_number</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">line_number</span>) <span class="op">=</span> <span class="ident">meta</span>.<span class="ident">line</span>() {
-                    <span class="ident">serializer</span>.<span class="ident">serialize_entry</span>(<span class="string">&quot;line_number&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">line_number</span>)<span class="question-mark">?</span>;
+            <span class="kw">if </span><span class="self">self</span>.display_line_number {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(line_number) = meta.line() {
+                    serializer.serialize_entry(<span class="string">&quot;line_number&quot;</span>, <span class="kw-2">&amp;</span>line_number)<span class="question-mark">?</span>;
                 }
             }
 
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">format</span>.<span class="ident">display_current_span</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">span</span>) <span class="op">=</span> <span class="ident">current_span</span> {
-                    <span class="ident">serializer</span>
-                        .<span class="ident">serialize_entry</span>(<span class="string">&quot;span&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">SerializableSpan</span>(<span class="ident">span</span>, <span class="ident">format_field_marker</span>))
-                        .<span class="ident">unwrap_or</span>(());
+            <span class="kw">if </span><span class="self">self</span>.format.display_current_span {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>span) = current_span {
+                    serializer
+                        .serialize_entry(<span class="string">&quot;span&quot;</span>, <span class="kw-2">&amp;</span>SerializableSpan(span, format_field_marker))
+                        .unwrap_or(());
                 }
             }
 
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">format</span>.<span class="ident">display_span_list</span> <span class="op">&amp;&amp;</span> <span class="ident">current_span</span>.<span class="ident">is_some</span>() {
-                <span class="ident">serializer</span>.<span class="ident">serialize_entry</span>(
+            <span class="kw">if </span><span class="self">self</span>.format.display_span_list &amp;&amp; current_span.is_some() {
+                serializer.serialize_entry(
                     <span class="string">&quot;spans&quot;</span>,
-                    <span class="kw-2">&amp;</span><span class="ident">SerializableContext</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">ctx</span>, <span class="ident">format_field_marker</span>),
+                    <span class="kw-2">&amp;</span>SerializableContext(<span class="kw-2">&amp;</span>ctx.ctx, format_field_marker),
                 )<span class="question-mark">?</span>;
             }
 
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">display_thread_name</span> {
-                <span class="kw">let</span> <span class="ident">current_thread</span> <span class="op">=</span> <span class="ident">std::thread::current</span>();
-                <span class="kw">match</span> <span class="ident">current_thread</span>.<span class="ident">name</span>() {
-                    <span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; {
-                        <span class="ident">serializer</span>.<span class="ident">serialize_entry</span>(<span class="string">&quot;threadName&quot;</span>, <span class="ident">name</span>)<span class="question-mark">?</span>;
+            <span class="kw">if </span><span class="self">self</span>.display_thread_name {
+                <span class="kw">let </span>current_thread = std::thread::current();
+                <span class="kw">match </span>current_thread.name() {
+                    <span class="prelude-val">Some</span>(name) =&gt; {
+                        serializer.serialize_entry(<span class="string">&quot;threadName&quot;</span>, name)<span class="question-mark">?</span>;
                     }
-                    <span class="comment">// fall-back to thread id when name is absent and ids are not enabled</span>
-                    <span class="prelude-val">None</span> <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">display_thread_id</span> =&gt; {
-                        <span class="ident">serializer</span>
-                            .<span class="ident">serialize_entry</span>(<span class="string">&quot;threadName&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">current_thread</span>.<span class="ident">id</span>()))<span class="question-mark">?</span>;
+                    <span class="comment">// fall-back to thread id when name is absent and ids are not enabled
+                    </span><span class="prelude-val">None </span><span class="kw">if </span>!<span class="self">self</span>.display_thread_id =&gt; {
+                        serializer
+                            .serialize_entry(<span class="string">&quot;threadName&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, current_thread.id()))<span class="question-mark">?</span>;
                     }
-                    <span class="kw">_</span> =&gt; {}
+                    <span class="kw">_ </span>=&gt; {}
                 }
             }
 
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">display_thread_id</span> {
-                <span class="ident">serializer</span>
-                    .<span class="ident">serialize_entry</span>(<span class="string">&quot;threadId&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">std::thread::current</span>().<span class="ident">id</span>()))<span class="question-mark">?</span>;
+            <span class="kw">if </span><span class="self">self</span>.display_thread_id {
+                serializer
+                    .serialize_entry(<span class="string">&quot;threadId&quot;</span>, <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, std::thread::current().id()))<span class="question-mark">?</span>;
             }
 
-            <span class="ident">serializer</span>.<span class="ident">end</span>()
+            serializer.end()
         };
 
-        <span class="ident">visit</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">fmt::Error</span>)<span class="question-mark">?</span>;
-        <span class="macro">writeln!</span>(<span class="ident">writer</span>)
+        visit().map_err(|<span class="kw">_</span>| fmt::Error)<span class="question-mark">?</span>;
+        <span class="macro">writeln!</span>(writer)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Json</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="ident">Json</span> {
-        <span class="ident">Json</span> {
-            <span class="ident">flatten_event</span>: <span class="bool-val">false</span>,
-            <span class="ident">display_current_span</span>: <span class="bool-val">true</span>,
-            <span class="ident">display_span_list</span>: <span class="bool-val">true</span>,
+<span class="kw">impl </span>Default <span class="kw">for </span>Json {
+    <span class="kw">fn </span>default() -&gt; Json {
+        Json {
+            flatten_event: <span class="bool-val">false</span>,
+            display_current_span: <span class="bool-val">true</span>,
+            display_span_list: <span class="bool-val">true</span>,
         }
     }
 }
 
-<span class="doccomment">/// The JSON [`FormatFields`] implementation.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`FormatFields`]: trait.FormatFields.html</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">JsonFields</span> {
-    <span class="comment">// reserve the ability to add fields to this without causing a breaking</span>
-    <span class="comment">// change in the future.</span>
-    <span class="ident">_private</span>: (),
+<span class="doccomment">/// The JSON [`FormatFields`] implementation.
+///
+/// [`FormatFields`]: trait.FormatFields.html
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>JsonFields {
+    <span class="comment">// reserve the ability to add fields to this without causing a breaking
+    // change in the future.
+    </span>_private: (),
 }
 
-<span class="kw">impl</span> <span class="ident">JsonFields</span> {
-    <span class="doccomment">/// Returns a new JSON [`FormatFields`] implementation.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`FormatFields`]: trait.FormatFields.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">_private</span>: () }
+<span class="kw">impl </span>JsonFields {
+    <span class="doccomment">/// Returns a new JSON [`FormatFields`] implementation.
+    ///
+    /// [`FormatFields`]: trait.FormatFields.html
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ _private: () }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">JsonFields</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>()
+<span class="kw">impl </span>Default <span class="kw">for </span>JsonFields {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">FormatFields</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">JsonFields</span> {
-    <span class="doccomment">/// Format the provided `fields` to the provided `writer`, returning a result.</span>
-    <span class="kw">fn</span> <span class="ident">format_fields</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">RecordFields</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">writer</span>: <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">fields</span>: <span class="ident">R</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">JsonVisitor::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writer</span>);
-        <span class="ident">fields</span>.<span class="ident">record</span>(<span class="kw-2">&amp;mut</span> <span class="ident">v</span>);
-        <span class="ident">v</span>.<span class="ident">finish</span>()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; FormatFields&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>JsonFields {
+    <span class="doccomment">/// Format the provided `fields` to the provided `writer`, returning a result.
+    </span><span class="kw">fn </span>format_fields&lt;R: RecordFields&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>writer: Writer&lt;<span class="lifetime">&#39;_</span>&gt;, fields: R) -&gt; fmt::Result {
+        <span class="kw">let </span><span class="kw-2">mut </span>v = JsonVisitor::new(<span class="kw-2">&amp;mut </span>writer);
+        fields.record(<span class="kw-2">&amp;mut </span>v);
+        v.finish()
     }
 
-    <span class="doccomment">/// Record additional field(s) on an existing span.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// By default, this appends a space to the current set of fields if it is</span>
-    <span class="doccomment">/// non-empty, and then calls `self.format_fields`. If different behavior is</span>
-    <span class="doccomment">/// required, the default implementation of this method can be overridden.</span>
-    <span class="kw">fn</span> <span class="ident">add_fields</span>(
+    <span class="doccomment">/// Record additional field(s) on an existing span.
+    ///
+    /// By default, this appends a space to the current set of fields if it is
+    /// non-empty, and then calls `self.format_fields`. If different behavior is
+    /// required, the default implementation of this method can be overridden.
+    </span><span class="kw">fn </span>add_fields(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">current</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">FormattedFields</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">fields</span>: <span class="kw-2">&amp;</span><span class="ident">Record</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">if</span> <span class="ident">current</span>.<span class="ident">is_empty</span>() {
-            <span class="comment">// If there are no previously recorded fields, we can just reuse the</span>
-            <span class="comment">// existing string.</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writer</span> <span class="op">=</span> <span class="ident">current</span>.<span class="ident">as_writer</span>();
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">JsonVisitor::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writer</span>);
-            <span class="ident">fields</span>.<span class="ident">record</span>(<span class="kw-2">&amp;mut</span> <span class="ident">v</span>);
-            <span class="ident">v</span>.<span class="ident">finish</span>()<span class="question-mark">?</span>;
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+        current: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>FormattedFields&lt;<span class="self">Self</span>&gt;,
+        fields: <span class="kw-2">&amp;</span>Record&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; fmt::Result {
+        <span class="kw">if </span>current.is_empty() {
+            <span class="comment">// If there are no previously recorded fields, we can just reuse the
+            // existing string.
+            </span><span class="kw">let </span><span class="kw-2">mut </span>writer = current.as_writer();
+            <span class="kw">let </span><span class="kw-2">mut </span>v = JsonVisitor::new(<span class="kw-2">&amp;mut </span>writer);
+            fields.record(<span class="kw-2">&amp;mut </span>v);
+            v.finish()<span class="question-mark">?</span>;
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(());
         }
 
-        <span class="comment">// If fields were previously recorded on this span, we need to parse</span>
-        <span class="comment">// the current set of fields as JSON, add the new fields, and</span>
-        <span class="comment">// re-serialize them. Otherwise, if we just appended the new fields</span>
-        <span class="comment">// to a previously serialized JSON object, we would end up with</span>
-        <span class="comment">// malformed JSON.</span>
-        <span class="comment">//</span>
-        <span class="comment">// XXX(eliza): this is far from efficient, but unfortunately, it is</span>
-        <span class="comment">// necessary as long as the JSON formatter is implemented on top of</span>
-        <span class="comment">// an interface that stores all formatted fields as strings.</span>
-        <span class="comment">//</span>
-        <span class="comment">// We should consider reimplementing the JSON formatter as a</span>
-        <span class="comment">// separate layer, rather than a formatter for the `fmt` layer —</span>
-        <span class="comment">// then, we could store fields as JSON values, and add to them</span>
-        <span class="comment">// without having to parse and re-serialize.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new</span> <span class="op">=</span> <span class="ident">String::new</span>();
-        <span class="kw">let</span> <span class="ident">map</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;_</span> <span class="ident">str</span>, <span class="ident">serde_json::Value</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">serde_json::from_str</span>(<span class="ident">current</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">fmt::Error</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">JsonVisitor::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">new</span>);
-        <span class="ident">v</span>.<span class="ident">values</span> <span class="op">=</span> <span class="ident">map</span>;
-        <span class="ident">fields</span>.<span class="ident">record</span>(<span class="kw-2">&amp;mut</span> <span class="ident">v</span>);
-        <span class="ident">v</span>.<span class="ident">finish</span>()<span class="question-mark">?</span>;
-        <span class="ident">current</span>.<span class="ident">fields</span> <span class="op">=</span> <span class="ident">new</span>;
+        <span class="comment">// If fields were previously recorded on this span, we need to parse
+        // the current set of fields as JSON, add the new fields, and
+        // re-serialize them. Otherwise, if we just appended the new fields
+        // to a previously serialized JSON object, we would end up with
+        // malformed JSON.
+        //
+        // XXX(eliza): this is far from efficient, but unfortunately, it is
+        // necessary as long as the JSON formatter is implemented on top of
+        // an interface that stores all formatted fields as strings.
+        //
+        // We should consider reimplementing the JSON formatter as a
+        // separate layer, rather than a formatter for the `fmt` layer —
+        // then, we could store fields as JSON values, and add to them
+        // without having to parse and re-serialize.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>new = String::new();
+        <span class="kw">let </span>map: BTreeMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;_ </span>str, serde_json::Value&gt; =
+            serde_json::from_str(current).map_err(|<span class="kw">_</span>| fmt::Error)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>v = JsonVisitor::new(<span class="kw-2">&amp;mut </span>new);
+        v.values = map;
+        fields.record(<span class="kw-2">&amp;mut </span>v);
+        v.finish()<span class="question-mark">?</span>;
+        current.fields = new;
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="doccomment">/// The [visitor] produced by [`JsonFields`]&#39;s [`MakeVisitor`] implementation.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [visitor]: ../../field/trait.Visit.html</span>
-<span class="doccomment">/// [`JsonFields`]: struct.JsonFields.html</span>
-<span class="doccomment">/// [`MakeVisitor`]: ../../field/trait.MakeVisitor.html</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">JsonVisitor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">values</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">serde_json::Value</span><span class="op">&gt;</span>,
-    <span class="ident">writer</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">Write</span>,
+<span class="doccomment">/// The [visitor] produced by [`JsonFields`]&#39;s [`MakeVisitor`] implementation.
+///
+/// [visitor]: ../../field/trait.Visit.html
+/// [`JsonFields`]: struct.JsonFields.html
+/// [`MakeVisitor`]: ../../field/trait.MakeVisitor.html
+</span><span class="kw">pub struct </span>JsonVisitor&lt;<span class="lifetime">&#39;a</span>&gt; {
+    values: BTreeMap&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, serde_json::Value&gt;,
+    writer: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="kw">dyn </span>Write,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">JsonVisitor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(<span class="string">&quot;JsonVisitor {{ values: {:?} }}&quot;</span>, <span class="self">self</span>.<span class="ident">values</span>))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; fmt::Debug <span class="kw">for </span>JsonVisitor&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;JsonVisitor {{ values: {:?} }}&quot;</span>, <span class="self">self</span>.values))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">JsonVisitor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns a new default visitor that formats to the provided `writer`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// - `writer`: the writer to format to.</span>
-    <span class="doccomment">/// - `is_empty`: whether or not any fields have been previously written to</span>
-    <span class="doccomment">///   that writer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">writer</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">Write</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">values</span>: <span class="ident">BTreeMap::new</span>(),
-            <span class="ident">writer</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; JsonVisitor&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Returns a new default visitor that formats to the provided `writer`.
+    ///
+    /// # Arguments
+    /// - `writer`: the writer to format to.
+    /// - `is_empty`: whether or not any fields have been previously written to
+    ///   that writer.
+    </span><span class="kw">pub fn </span>new(writer: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="kw">dyn </span>Write) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            values: BTreeMap::new(),
+            writer,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::field::VisitFmt</span> <span class="kw">for</span> <span class="ident">JsonVisitor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">writer</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">fmt::Write</span> {
-        <span class="self">self</span>.<span class="ident">writer</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">crate</span>::field::VisitFmt <span class="kw">for </span>JsonVisitor&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>writer(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>fmt::Write {
+        <span class="self">self</span>.writer
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident"><span class="kw">crate</span>::field::VisitOutput</span><span class="op">&lt;</span><span class="ident">fmt::Result</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">JsonVisitor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">finish</span>(<span class="self">self</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="ident">inner</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">serializer</span> <span class="op">=</span> <span class="ident">Serializer::new</span>(<span class="ident">WriteAdaptor::new</span>(<span class="self">self</span>.<span class="ident">writer</span>));
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ser_map</span> <span class="op">=</span> <span class="ident">serializer</span>.<span class="ident">serialize_map</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">crate</span>::field::VisitOutput&lt;fmt::Result&gt; <span class="kw">for </span>JsonVisitor&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>finish(<span class="self">self</span>) -&gt; fmt::Result {
+        <span class="kw">let </span>inner = || {
+            <span class="kw">let </span><span class="kw-2">mut </span>serializer = Serializer::new(WriteAdaptor::new(<span class="self">self</span>.writer));
+            <span class="kw">let </span><span class="kw-2">mut </span>ser_map = serializer.serialize_map(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
 
-            <span class="kw">for</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">values</span> {
-                <span class="ident">ser_map</span>.<span class="ident">serialize_entry</span>(<span class="ident">k</span>, <span class="kw-2">&amp;</span><span class="ident">v</span>)<span class="question-mark">?</span>;
+            <span class="kw">for </span>(k, v) <span class="kw">in </span><span class="self">self</span>.values {
+                ser_map.serialize_entry(k, <span class="kw-2">&amp;</span>v)<span class="question-mark">?</span>;
             }
 
-            <span class="ident">ser_map</span>.<span class="ident">end</span>()
+            ser_map.end()
         };
 
-        <span class="kw">if</span> <span class="ident">inner</span>().<span class="ident">is_err</span>() {
-            <span class="prelude-val">Err</span>(<span class="ident">fmt::Error</span>)
-        } <span class="kw">else</span> {
+        <span class="kw">if </span>inner().is_err() {
+            <span class="prelude-val">Err</span>(fmt::Error)
+        } <span class="kw">else </span>{
             <span class="prelude-val">Ok</span>(())
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">field::Visit</span> <span class="kw">for</span> <span class="ident">JsonVisitor</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">tracing_unstable</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;valuable&quot;</span>))]</span>
-    <span class="kw">fn</span> <span class="ident">record_value</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">value</span>: <span class="ident">valuable_crate::Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">serde_json::to_value</span>(<span class="ident">valuable_serde::Serializable::new</span>(<span class="ident">value</span>)) {
-            <span class="prelude-val">Ok</span>(<span class="ident">value</span>) =&gt; <span class="ident">value</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">_e</span>) =&gt; {
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
-                <span class="macro">unreachable!</span>(
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; field::Visit <span class="kw">for </span>JsonVisitor&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="attribute">#[cfg(all(tracing_unstable, feature = <span class="string">&quot;valuable&quot;</span>))]
+    </span><span class="kw">fn </span>record_value(<span class="kw-2">&amp;mut </span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>Field, value: valuable_crate::Value&lt;<span class="lifetime">&#39;_</span>&gt;) {
+        <span class="kw">let </span>value = <span class="kw">match </span>serde_json::to_value(valuable_serde::Serializable::new(value)) {
+            <span class="prelude-val">Ok</span>(value) =&gt; value,
+            <span class="prelude-val">Err</span>(_e) =&gt; {
+                <span class="attribute">#[cfg(debug_assertions)]
+                </span><span class="macro">unreachable!</span>(
                     <span class="string">&quot;`valuable::Valuable` implementations should always serialize \
                     successfully, but an error occurred: {}&quot;</span>,
-                    <span class="ident">_e</span>,
+                    _e,
                 );
 
-                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">debug_assertions</span>))]</span>
-                <span class="kw">return</span>;
+                <span class="attribute">#[cfg(not(debug_assertions))]
+                </span><span class="kw">return</span>;
             }
         };
 
-        <span class="self">self</span>.<span class="ident">values</span>.<span class="ident">insert</span>(<span class="ident">field</span>.<span class="ident">name</span>(), <span class="ident">value</span>);
+        <span class="self">self</span>.values.insert(field.name(), value);
     }
 
-    <span class="doccomment">/// Visit a double precision floating point value.</span>
-    <span class="kw">fn</span> <span class="ident">record_f64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">value</span>: <span class="ident">f64</span>) {
-        <span class="self">self</span>.<span class="ident">values</span>
-            .<span class="ident">insert</span>(<span class="ident">field</span>.<span class="ident">name</span>(), <span class="ident">serde_json::Value::from</span>(<span class="ident">value</span>));
+    <span class="doccomment">/// Visit a double precision floating point value.
+    </span><span class="kw">fn </span>record_f64(<span class="kw-2">&amp;mut </span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>Field, value: f64) {
+        <span class="self">self</span>.values
+            .insert(field.name(), serde_json::Value::from(value));
     }
 
-    <span class="doccomment">/// Visit a signed 64-bit integer value.</span>
-    <span class="kw">fn</span> <span class="ident">record_i64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">value</span>: <span class="ident">i64</span>) {
-        <span class="self">self</span>.<span class="ident">values</span>
-            .<span class="ident">insert</span>(<span class="ident">field</span>.<span class="ident">name</span>(), <span class="ident">serde_json::Value::from</span>(<span class="ident">value</span>));
+    <span class="doccomment">/// Visit a signed 64-bit integer value.
+    </span><span class="kw">fn </span>record_i64(<span class="kw-2">&amp;mut </span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>Field, value: i64) {
+        <span class="self">self</span>.values
+            .insert(field.name(), serde_json::Value::from(value));
     }
 
-    <span class="doccomment">/// Visit an unsigned 64-bit integer value.</span>
-    <span class="kw">fn</span> <span class="ident">record_u64</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">value</span>: <span class="ident">u64</span>) {
-        <span class="self">self</span>.<span class="ident">values</span>
-            .<span class="ident">insert</span>(<span class="ident">field</span>.<span class="ident">name</span>(), <span class="ident">serde_json::Value::from</span>(<span class="ident">value</span>));
+    <span class="doccomment">/// Visit an unsigned 64-bit integer value.
+    </span><span class="kw">fn </span>record_u64(<span class="kw-2">&amp;mut </span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>Field, value: u64) {
+        <span class="self">self</span>.values
+            .insert(field.name(), serde_json::Value::from(value));
     }
 
-    <span class="doccomment">/// Visit a boolean value.</span>
-    <span class="kw">fn</span> <span class="ident">record_bool</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">value</span>: <span class="ident">bool</span>) {
-        <span class="self">self</span>.<span class="ident">values</span>
-            .<span class="ident">insert</span>(<span class="ident">field</span>.<span class="ident">name</span>(), <span class="ident">serde_json::Value::from</span>(<span class="ident">value</span>));
+    <span class="doccomment">/// Visit a boolean value.
+    </span><span class="kw">fn </span>record_bool(<span class="kw-2">&amp;mut </span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>Field, value: bool) {
+        <span class="self">self</span>.values
+            .insert(field.name(), serde_json::Value::from(value));
     }
 
-    <span class="doccomment">/// Visit a string value.</span>
-    <span class="kw">fn</span> <span class="ident">record_str</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="self">self</span>.<span class="ident">values</span>
-            .<span class="ident">insert</span>(<span class="ident">field</span>.<span class="ident">name</span>(), <span class="ident">serde_json::Value::from</span>(<span class="ident">value</span>));
+    <span class="doccomment">/// Visit a string value.
+    </span><span class="kw">fn </span>record_str(<span class="kw-2">&amp;mut </span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>Field, value: <span class="kw-2">&amp;</span>str) {
+        <span class="self">self</span>.values
+            .insert(field.name(), serde_json::Value::from(value));
     }
 
-    <span class="kw">fn</span> <span class="ident">record_debug</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">Field</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">fmt::Debug</span>) {
-        <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">name</span>() {
-            <span class="comment">// Skip fields that are actually log metadata that have already been handled</span>
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tracing-log&quot;</span>)]</span>
-            <span class="ident">name</span> <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">starts_with</span>(<span class="string">&quot;log.&quot;</span>) =&gt; (),
-            <span class="ident">name</span> <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">starts_with</span>(<span class="string">&quot;r#&quot;</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">values</span>
-                    .<span class="ident">insert</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>[<span class="number">2</span>..], <span class="ident">serde_json::Value::from</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">value</span>)));
+    <span class="kw">fn </span>record_debug(<span class="kw-2">&amp;mut </span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>Field, value: <span class="kw-2">&amp;</span><span class="kw">dyn </span>fmt::Debug) {
+        <span class="kw">match </span>field.name() {
+            <span class="comment">// Skip fields that are actually log metadata that have already been handled
+            </span><span class="attribute">#[cfg(feature = <span class="string">&quot;tracing-log&quot;</span>)]
+            </span>name <span class="kw">if </span>name.starts_with(<span class="string">&quot;log.&quot;</span>) =&gt; (),
+            name <span class="kw">if </span>name.starts_with(<span class="string">&quot;r#&quot;</span>) =&gt; {
+                <span class="self">self</span>.values
+                    .insert(<span class="kw-2">&amp;</span>name[<span class="number">2</span>..], serde_json::Value::from(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, value)));
             }
-            <span class="ident">name</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">values</span>
-                    .<span class="ident">insert</span>(<span class="ident">name</span>, <span class="ident">serde_json::Value::from</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">value</span>)));
+            name =&gt; {
+                <span class="self">self</span>.values
+                    .insert(name, serde_json::Value::from(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, value)));
             }
         };
     }
 }
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::fmt</span>::{<span class="ident">format::FmtSpan</span>, <span class="ident">test::MockMakeWriter</span>, <span class="ident">time::FormatTime</span>, <span class="ident">SubscriberBuilder</span>};
-    <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="self">self</span>, <span class="ident">subscriber::with_default</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::fmt::{format::FmtSpan, test::MockMakeWriter, time::FormatTime, SubscriberBuilder};
+    <span class="kw">use </span>tracing::{<span class="self">self</span>, subscriber::with_default};
 
-    <span class="kw">use</span> <span class="ident">std::fmt</span>;
-    <span class="kw">use</span> <span class="ident">std::path::Path</span>;
+    <span class="kw">use </span>std::fmt;
+    <span class="kw">use </span>std::path::Path;
 
-    <span class="kw">struct</span> <span class="ident">MockTime</span>;
-    <span class="kw">impl</span> <span class="ident">FormatTime</span> <span class="kw">for</span> <span class="ident">MockTime</span> {
-        <span class="kw">fn</span> <span class="ident">format_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">w</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Writer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-            <span class="macro">write!</span>(<span class="ident">w</span>, <span class="string">&quot;fake time&quot;</span>)
+    <span class="kw">struct </span>MockTime;
+    <span class="kw">impl </span>FormatTime <span class="kw">for </span>MockTime {
+        <span class="kw">fn </span>format_time(<span class="kw-2">&amp;</span><span class="self">self</span>, w: <span class="kw-2">&amp;mut </span>Writer&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+            <span class="macro">write!</span>(w, <span class="string">&quot;fake time&quot;</span>)
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">subscriber</span>() -&gt; <span class="ident">SubscriberBuilder</span><span class="op">&lt;</span><span class="ident">JsonFields</span>, <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">Json</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">SubscriberBuilder::default</span>().<span class="ident">json</span>()
+    <span class="kw">fn </span>subscriber() -&gt; SubscriberBuilder&lt;JsonFields, Format&lt;Json&gt;&gt; {
+        SubscriberBuilder::default().json()
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">json</span>() {
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span>
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>json() {
+        <span class="kw">let </span>expected =
         <span class="string">&quot;{\&quot;timestamp\&quot;:\&quot;fake time\&quot;,\&quot;level\&quot;:\&quot;INFO\&quot;,\&quot;span\&quot;:{\&quot;answer\&quot;:42,\&quot;name\&quot;:\&quot;json_span\&quot;,\&quot;number\&quot;:3},\&quot;spans\&quot;:[{\&quot;answer\&quot;:42,\&quot;name\&quot;:\&quot;json_span\&quot;,\&quot;number\&quot;:3}],\&quot;target\&quot;:\&quot;tracing_subscriber::fmt::format::json::test\&quot;,\&quot;fields\&quot;:{\&quot;message\&quot;:\&quot;some json test\&quot;}}\n&quot;</span>;
-        <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">subscriber</span>()
-            .<span class="ident">flatten_event</span>(<span class="bool-val">false</span>)
-            .<span class="ident">with_current_span</span>(<span class="bool-val">true</span>)
-            .<span class="ident">with_span_list</span>(<span class="bool-val">true</span>);
-        <span class="ident">test_json</span>(<span class="ident">expected</span>, <span class="ident">subscriber</span>, <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::span!</span>(<span class="ident">tracing::Level::INFO</span>, <span class="string">&quot;json_span&quot;</span>, <span class="ident">answer</span> <span class="op">=</span> <span class="number">42</span>, <span class="ident">number</span> <span class="op">=</span> <span class="number">3</span>);
-            <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">enter</span>();
+        <span class="kw">let </span>subscriber = subscriber()
+            .flatten_event(<span class="bool-val">false</span>)
+            .with_current_span(<span class="bool-val">true</span>)
+            .with_span_list(<span class="bool-val">true</span>);
+        test_json(expected, subscriber, || {
+            <span class="kw">let </span>span = <span class="macro">tracing::span!</span>(tracing::Level::INFO, <span class="string">&quot;json_span&quot;</span>, answer = <span class="number">42</span>, number = <span class="number">3</span>);
+            <span class="kw">let </span>_guard = span.enter();
             <span class="macro">tracing::info!</span>(<span class="string">&quot;some json test&quot;</span>);
         });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">json_filename</span>() {
-        <span class="kw">let</span> <span class="ident">current_path</span> <span class="op">=</span> <span class="ident">Path::new</span>(<span class="string">&quot;tracing-subscriber&quot;</span>)
-            .<span class="ident">join</span>(<span class="string">&quot;src&quot;</span>)
-            .<span class="ident">join</span>(<span class="string">&quot;fmt&quot;</span>)
-            .<span class="ident">join</span>(<span class="string">&quot;format&quot;</span>)
-            .<span class="ident">join</span>(<span class="string">&quot;json.rs&quot;</span>)
-            .<span class="ident">to_str</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;path must be valid unicode&quot;</span>)
-            <span class="comment">// escape windows backslashes</span>
-            .<span class="ident">replace</span>(<span class="string">&#39;\\&#39;</span>, <span class="string">&quot;\\\\&quot;</span>);
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span>
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>json_filename() {
+        <span class="kw">let </span>current_path = Path::new(<span class="string">&quot;tracing-subscriber&quot;</span>)
+            .join(<span class="string">&quot;src&quot;</span>)
+            .join(<span class="string">&quot;fmt&quot;</span>)
+            .join(<span class="string">&quot;format&quot;</span>)
+            .join(<span class="string">&quot;json.rs&quot;</span>)
+            .to_str()
+            .expect(<span class="string">&quot;path must be valid unicode&quot;</span>)
+            <span class="comment">// escape windows backslashes
+            </span>.replace(<span class="string">&#39;\\&#39;</span>, <span class="string">&quot;\\\\&quot;</span>);
+        <span class="kw">let </span>expected =
             <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}{}{}&quot;</span>,
                     <span class="string">&quot;{\&quot;timestamp\&quot;:\&quot;fake time\&quot;,\&quot;level\&quot;:\&quot;INFO\&quot;,\&quot;span\&quot;:{\&quot;answer\&quot;:42,\&quot;name\&quot;:\&quot;json_span\&quot;,\&quot;number\&quot;:3},\&quot;spans\&quot;:[{\&quot;answer\&quot;:42,\&quot;name\&quot;:\&quot;json_span\&quot;,\&quot;number\&quot;:3}],\&quot;target\&quot;:\&quot;tracing_subscriber::fmt::format::json::test\&quot;,\&quot;filename\&quot;:\&quot;&quot;</span>,
-                    <span class="ident">current_path</span>,
+                    current_path,
                     <span class="string">&quot;\&quot;,\&quot;fields\&quot;:{\&quot;message\&quot;:\&quot;some json test\&quot;}}\n&quot;</span>);
-        <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">subscriber</span>()
-            .<span class="ident">flatten_event</span>(<span class="bool-val">false</span>)
-            .<span class="ident">with_current_span</span>(<span class="bool-val">true</span>)
-            .<span class="ident">with_file</span>(<span class="bool-val">true</span>)
-            .<span class="ident">with_span_list</span>(<span class="bool-val">true</span>);
-        <span class="ident">test_json</span>(<span class="ident">expected</span>, <span class="ident">subscriber</span>, <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::span!</span>(<span class="ident">tracing::Level::INFO</span>, <span class="string">&quot;json_span&quot;</span>, <span class="ident">answer</span> <span class="op">=</span> <span class="number">42</span>, <span class="ident">number</span> <span class="op">=</span> <span class="number">3</span>);
-            <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">enter</span>();
+        <span class="kw">let </span>subscriber = subscriber()
+            .flatten_event(<span class="bool-val">false</span>)
+            .with_current_span(<span class="bool-val">true</span>)
+            .with_file(<span class="bool-val">true</span>)
+            .with_span_list(<span class="bool-val">true</span>);
+        test_json(expected, subscriber, || {
+            <span class="kw">let </span>span = <span class="macro">tracing::span!</span>(tracing::Level::INFO, <span class="string">&quot;json_span&quot;</span>, answer = <span class="number">42</span>, number = <span class="number">3</span>);
+            <span class="kw">let </span>_guard = span.enter();
             <span class="macro">tracing::info!</span>(<span class="string">&quot;some json test&quot;</span>);
         });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">json_line_number</span>() {
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span>
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>json_line_number() {
+        <span class="kw">let </span>expected =
             <span class="string">&quot;{\&quot;timestamp\&quot;:\&quot;fake time\&quot;,\&quot;level\&quot;:\&quot;INFO\&quot;,\&quot;span\&quot;:{\&quot;answer\&quot;:42,\&quot;name\&quot;:\&quot;json_span\&quot;,\&quot;number\&quot;:3},\&quot;spans\&quot;:[{\&quot;answer\&quot;:42,\&quot;name\&quot;:\&quot;json_span\&quot;,\&quot;number\&quot;:3}],\&quot;target\&quot;:\&quot;tracing_subscriber::fmt::format::json::test\&quot;,\&quot;line_number\&quot;:42,\&quot;fields\&quot;:{\&quot;message\&quot;:\&quot;some json test\&quot;}}\n&quot;</span>;
-        <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">subscriber</span>()
-            .<span class="ident">flatten_event</span>(<span class="bool-val">false</span>)
-            .<span class="ident">with_current_span</span>(<span class="bool-val">true</span>)
-            .<span class="ident">with_line_number</span>(<span class="bool-val">true</span>)
-            .<span class="ident">with_span_list</span>(<span class="bool-val">true</span>);
-        <span class="ident">test_json_with_line_number</span>(<span class="ident">expected</span>, <span class="ident">subscriber</span>, <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::span!</span>(<span class="ident">tracing::Level::INFO</span>, <span class="string">&quot;json_span&quot;</span>, <span class="ident">answer</span> <span class="op">=</span> <span class="number">42</span>, <span class="ident">number</span> <span class="op">=</span> <span class="number">3</span>);
-            <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">enter</span>();
+        <span class="kw">let </span>subscriber = subscriber()
+            .flatten_event(<span class="bool-val">false</span>)
+            .with_current_span(<span class="bool-val">true</span>)
+            .with_line_number(<span class="bool-val">true</span>)
+            .with_span_list(<span class="bool-val">true</span>);
+        test_json_with_line_number(expected, subscriber, || {
+            <span class="kw">let </span>span = <span class="macro">tracing::span!</span>(tracing::Level::INFO, <span class="string">&quot;json_span&quot;</span>, answer = <span class="number">42</span>, number = <span class="number">3</span>);
+            <span class="kw">let </span>_guard = span.enter();
             <span class="macro">tracing::info!</span>(<span class="string">&quot;some json test&quot;</span>);
         });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">json_flattened_event</span>() {
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span>
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>json_flattened_event() {
+        <span class="kw">let </span>expected =
         <span class="string">&quot;{\&quot;timestamp\&quot;:\&quot;fake time\&quot;,\&quot;level\&quot;:\&quot;INFO\&quot;,\&quot;span\&quot;:{\&quot;answer\&quot;:42,\&quot;name\&quot;:\&quot;json_span\&quot;,\&quot;number\&quot;:3},\&quot;spans\&quot;:[{\&quot;answer\&quot;:42,\&quot;name\&quot;:\&quot;json_span\&quot;,\&quot;number\&quot;:3}],\&quot;target\&quot;:\&quot;tracing_subscriber::fmt::format::json::test\&quot;,\&quot;message\&quot;:\&quot;some json test\&quot;}\n&quot;</span>;
 
-        <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">subscriber</span>()
-            .<span class="ident">flatten_event</span>(<span class="bool-val">true</span>)
-            .<span class="ident">with_current_span</span>(<span class="bool-val">true</span>)
-            .<span class="ident">with_span_list</span>(<span class="bool-val">true</span>);
-        <span class="ident">test_json</span>(<span class="ident">expected</span>, <span class="ident">subscriber</span>, <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::span!</span>(<span class="ident">tracing::Level::INFO</span>, <span class="string">&quot;json_span&quot;</span>, <span class="ident">answer</span> <span class="op">=</span> <span class="number">42</span>, <span class="ident">number</span> <span class="op">=</span> <span class="number">3</span>);
-            <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">enter</span>();
+        <span class="kw">let </span>subscriber = subscriber()
+            .flatten_event(<span class="bool-val">true</span>)
+            .with_current_span(<span class="bool-val">true</span>)
+            .with_span_list(<span class="bool-val">true</span>);
+        test_json(expected, subscriber, || {
+            <span class="kw">let </span>span = <span class="macro">tracing::span!</span>(tracing::Level::INFO, <span class="string">&quot;json_span&quot;</span>, answer = <span class="number">42</span>, number = <span class="number">3</span>);
+            <span class="kw">let </span>_guard = span.enter();
             <span class="macro">tracing::info!</span>(<span class="string">&quot;some json test&quot;</span>);
         });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">json_disabled_current_span_event</span>() {
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span>
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>json_disabled_current_span_event() {
+        <span class="kw">let </span>expected =
         <span class="string">&quot;{\&quot;timestamp\&quot;:\&quot;fake time\&quot;,\&quot;level\&quot;:\&quot;INFO\&quot;,\&quot;spans\&quot;:[{\&quot;answer\&quot;:42,\&quot;name\&quot;:\&quot;json_span\&quot;,\&quot;number\&quot;:3}],\&quot;target\&quot;:\&quot;tracing_subscriber::fmt::format::json::test\&quot;,\&quot;fields\&quot;:{\&quot;message\&quot;:\&quot;some json test\&quot;}}\n&quot;</span>;
-        <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">subscriber</span>()
-            .<span class="ident">flatten_event</span>(<span class="bool-val">false</span>)
-            .<span class="ident">with_current_span</span>(<span class="bool-val">false</span>)
-            .<span class="ident">with_span_list</span>(<span class="bool-val">true</span>);
-        <span class="ident">test_json</span>(<span class="ident">expected</span>, <span class="ident">subscriber</span>, <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::span!</span>(<span class="ident">tracing::Level::INFO</span>, <span class="string">&quot;json_span&quot;</span>, <span class="ident">answer</span> <span class="op">=</span> <span class="number">42</span>, <span class="ident">number</span> <span class="op">=</span> <span class="number">3</span>);
-            <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">enter</span>();
+        <span class="kw">let </span>subscriber = subscriber()
+            .flatten_event(<span class="bool-val">false</span>)
+            .with_current_span(<span class="bool-val">false</span>)
+            .with_span_list(<span class="bool-val">true</span>);
+        test_json(expected, subscriber, || {
+            <span class="kw">let </span>span = <span class="macro">tracing::span!</span>(tracing::Level::INFO, <span class="string">&quot;json_span&quot;</span>, answer = <span class="number">42</span>, number = <span class="number">3</span>);
+            <span class="kw">let </span>_guard = span.enter();
             <span class="macro">tracing::info!</span>(<span class="string">&quot;some json test&quot;</span>);
         });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">json_disabled_span_list_event</span>() {
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span>
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>json_disabled_span_list_event() {
+        <span class="kw">let </span>expected =
         <span class="string">&quot;{\&quot;timestamp\&quot;:\&quot;fake time\&quot;,\&quot;level\&quot;:\&quot;INFO\&quot;,\&quot;span\&quot;:{\&quot;answer\&quot;:42,\&quot;name\&quot;:\&quot;json_span\&quot;,\&quot;number\&quot;:3},\&quot;target\&quot;:\&quot;tracing_subscriber::fmt::format::json::test\&quot;,\&quot;fields\&quot;:{\&quot;message\&quot;:\&quot;some json test\&quot;}}\n&quot;</span>;
-        <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">subscriber</span>()
-            .<span class="ident">flatten_event</span>(<span class="bool-val">false</span>)
-            .<span class="ident">with_current_span</span>(<span class="bool-val">true</span>)
-            .<span class="ident">with_span_list</span>(<span class="bool-val">false</span>);
-        <span class="ident">test_json</span>(<span class="ident">expected</span>, <span class="ident">subscriber</span>, <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::span!</span>(<span class="ident">tracing::Level::INFO</span>, <span class="string">&quot;json_span&quot;</span>, <span class="ident">answer</span> <span class="op">=</span> <span class="number">42</span>, <span class="ident">number</span> <span class="op">=</span> <span class="number">3</span>);
-            <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">enter</span>();
+        <span class="kw">let </span>subscriber = subscriber()
+            .flatten_event(<span class="bool-val">false</span>)
+            .with_current_span(<span class="bool-val">true</span>)
+            .with_span_list(<span class="bool-val">false</span>);
+        test_json(expected, subscriber, || {
+            <span class="kw">let </span>span = <span class="macro">tracing::span!</span>(tracing::Level::INFO, <span class="string">&quot;json_span&quot;</span>, answer = <span class="number">42</span>, number = <span class="number">3</span>);
+            <span class="kw">let </span>_guard = span.enter();
             <span class="macro">tracing::info!</span>(<span class="string">&quot;some json test&quot;</span>);
         });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">json_nested_span</span>() {
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span>
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>json_nested_span() {
+        <span class="kw">let </span>expected =
         <span class="string">&quot;{\&quot;timestamp\&quot;:\&quot;fake time\&quot;,\&quot;level\&quot;:\&quot;INFO\&quot;,\&quot;span\&quot;:{\&quot;answer\&quot;:43,\&quot;name\&quot;:\&quot;nested_json_span\&quot;,\&quot;number\&quot;:4},\&quot;spans\&quot;:[{\&quot;answer\&quot;:42,\&quot;name\&quot;:\&quot;json_span\&quot;,\&quot;number\&quot;:3},{\&quot;answer\&quot;:43,\&quot;name\&quot;:\&quot;nested_json_span\&quot;,\&quot;number\&quot;:4}],\&quot;target\&quot;:\&quot;tracing_subscriber::fmt::format::json::test\&quot;,\&quot;fields\&quot;:{\&quot;message\&quot;:\&quot;some json test\&quot;}}\n&quot;</span>;
-        <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">subscriber</span>()
-            .<span class="ident">flatten_event</span>(<span class="bool-val">false</span>)
-            .<span class="ident">with_current_span</span>(<span class="bool-val">true</span>)
-            .<span class="ident">with_span_list</span>(<span class="bool-val">true</span>);
-        <span class="ident">test_json</span>(<span class="ident">expected</span>, <span class="ident">subscriber</span>, <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::span!</span>(<span class="ident">tracing::Level::INFO</span>, <span class="string">&quot;json_span&quot;</span>, <span class="ident">answer</span> <span class="op">=</span> <span class="number">42</span>, <span class="ident">number</span> <span class="op">=</span> <span class="number">3</span>);
-            <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">enter</span>();
-            <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::span!</span>(
-                <span class="ident">tracing::Level::INFO</span>,
+        <span class="kw">let </span>subscriber = subscriber()
+            .flatten_event(<span class="bool-val">false</span>)
+            .with_current_span(<span class="bool-val">true</span>)
+            .with_span_list(<span class="bool-val">true</span>);
+        test_json(expected, subscriber, || {
+            <span class="kw">let </span>span = <span class="macro">tracing::span!</span>(tracing::Level::INFO, <span class="string">&quot;json_span&quot;</span>, answer = <span class="number">42</span>, number = <span class="number">3</span>);
+            <span class="kw">let </span>_guard = span.enter();
+            <span class="kw">let </span>span = <span class="macro">tracing::span!</span>(
+                tracing::Level::INFO,
                 <span class="string">&quot;nested_json_span&quot;</span>,
-                <span class="ident">answer</span> <span class="op">=</span> <span class="number">43</span>,
-                <span class="ident">number</span> <span class="op">=</span> <span class="number">4</span>
-            );
-            <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">enter</span>();
+                answer = <span class="number">43</span>,
+                number = <span class="number">4
+            </span>);
+            <span class="kw">let </span>_guard = span.enter();
             <span class="macro">tracing::info!</span>(<span class="string">&quot;some json test&quot;</span>);
         });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">json_no_span</span>() {
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span>
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>json_no_span() {
+        <span class="kw">let </span>expected =
         <span class="string">&quot;{\&quot;timestamp\&quot;:\&quot;fake time\&quot;,\&quot;level\&quot;:\&quot;INFO\&quot;,\&quot;target\&quot;:\&quot;tracing_subscriber::fmt::format::json::test\&quot;,\&quot;fields\&quot;:{\&quot;message\&quot;:\&quot;some json test\&quot;}}\n&quot;</span>;
-        <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">subscriber</span>()
-            .<span class="ident">flatten_event</span>(<span class="bool-val">false</span>)
-            .<span class="ident">with_current_span</span>(<span class="bool-val">true</span>)
-            .<span class="ident">with_span_list</span>(<span class="bool-val">true</span>);
-        <span class="ident">test_json</span>(<span class="ident">expected</span>, <span class="ident">subscriber</span>, <span class="op">|</span><span class="op">|</span> {
+        <span class="kw">let </span>subscriber = subscriber()
+            .flatten_event(<span class="bool-val">false</span>)
+            .with_current_span(<span class="bool-val">true</span>)
+            .with_span_list(<span class="bool-val">true</span>);
+        test_json(expected, subscriber, || {
             <span class="macro">tracing::info!</span>(<span class="string">&quot;some json test&quot;</span>);
         });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">record_works</span>() {
-        <span class="comment">// This test reproduces issue #707, where using `Span::record` causes</span>
-        <span class="comment">// any events inside the span to be ignored.</span>
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>record_works() {
+        <span class="comment">// This test reproduces issue #707, where using `Span::record` causes
+        // any events inside the span to be ignored.
 
-        <span class="kw">let</span> <span class="ident">make_writer</span> <span class="op">=</span> <span class="ident">MockMakeWriter::default</span>();
-        <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::fmt</span>()
-            .<span class="ident">json</span>()
-            .<span class="ident">with_writer</span>(<span class="ident">make_writer</span>.<span class="ident">clone</span>())
-            .<span class="ident">finish</span>();
+        </span><span class="kw">let </span>make_writer = MockMakeWriter::default();
+        <span class="kw">let </span>subscriber = <span class="kw">crate</span>::fmt()
+            .json()
+            .with_writer(make_writer.clone())
+            .finish();
 
-        <span class="ident">with_default</span>(<span class="ident">subscriber</span>, <span class="op">|</span><span class="op">|</span> {
+        with_default(subscriber, || {
             <span class="macro">tracing::info!</span>(<span class="string">&quot;an event outside the root span&quot;</span>);
             <span class="macro">assert_eq!</span>(
-                <span class="ident">parse_as_json</span>(<span class="kw-2">&amp;</span><span class="ident">make_writer</span>)[<span class="string">&quot;fields&quot;</span>][<span class="string">&quot;message&quot;</span>],
-                <span class="string">&quot;an event outside the root span&quot;</span>
-            );
+                parse_as_json(<span class="kw-2">&amp;</span>make_writer)[<span class="string">&quot;fields&quot;</span>][<span class="string">&quot;message&quot;</span>],
+                <span class="string">&quot;an event outside the root span&quot;
+            </span>);
 
-            <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::info_span!</span>(<span class="string">&quot;the span&quot;</span>, <span class="ident">na</span> <span class="op">=</span> <span class="ident">tracing::field::Empty</span>);
-            <span class="ident">span</span>.<span class="ident">record</span>(<span class="string">&quot;na&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;value&quot;</span>);
-            <span class="kw">let</span> <span class="ident">_enter</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">enter</span>();
+            <span class="kw">let </span>span = <span class="macro">tracing::info_span!</span>(<span class="string">&quot;the span&quot;</span>, na = tracing::field::Empty);
+            span.record(<span class="string">&quot;na&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;value&quot;</span>);
+            <span class="kw">let </span>_enter = span.enter();
 
             <span class="macro">tracing::info!</span>(<span class="string">&quot;an event inside the root span&quot;</span>);
             <span class="macro">assert_eq!</span>(
-                <span class="ident">parse_as_json</span>(<span class="kw-2">&amp;</span><span class="ident">make_writer</span>)[<span class="string">&quot;fields&quot;</span>][<span class="string">&quot;message&quot;</span>],
-                <span class="string">&quot;an event inside the root span&quot;</span>
-            );
+                parse_as_json(<span class="kw-2">&amp;</span>make_writer)[<span class="string">&quot;fields&quot;</span>][<span class="string">&quot;message&quot;</span>],
+                <span class="string">&quot;an event inside the root span&quot;
+            </span>);
         });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">json_span_event_show_correct_context</span>() {
-        <span class="kw">let</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="ident">MockMakeWriter::default</span>();
-        <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">subscriber</span>()
-            .<span class="ident">with_writer</span>(<span class="ident">buffer</span>.<span class="ident">clone</span>())
-            .<span class="ident">flatten_event</span>(<span class="bool-val">false</span>)
-            .<span class="ident">with_current_span</span>(<span class="bool-val">true</span>)
-            .<span class="ident">with_span_list</span>(<span class="bool-val">false</span>)
-            .<span class="ident">with_span_events</span>(<span class="ident">FmtSpan::FULL</span>)
-            .<span class="ident">finish</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>json_span_event_show_correct_context() {
+        <span class="kw">let </span>buffer = MockMakeWriter::default();
+        <span class="kw">let </span>subscriber = subscriber()
+            .with_writer(buffer.clone())
+            .flatten_event(<span class="bool-val">false</span>)
+            .with_current_span(<span class="bool-val">true</span>)
+            .with_span_list(<span class="bool-val">false</span>)
+            .with_span_events(FmtSpan::FULL)
+            .finish();
 
-        <span class="ident">with_default</span>(<span class="ident">subscriber</span>, <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> <span class="string">&quot;parent&quot;</span>;
-            <span class="kw">let</span> <span class="ident">parent_span</span> <span class="op">=</span> <span class="macro">tracing::info_span!</span>(<span class="string">&quot;parent_span&quot;</span>, <span class="ident">context</span>);
+        with_default(subscriber, || {
+            <span class="kw">let </span>context = <span class="string">&quot;parent&quot;</span>;
+            <span class="kw">let </span>parent_span = <span class="macro">tracing::info_span!</span>(<span class="string">&quot;parent_span&quot;</span>, context);
 
-            <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">parse_as_json</span>(<span class="kw-2">&amp;</span><span class="ident">buffer</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">event</span>[<span class="string">&quot;fields&quot;</span>][<span class="string">&quot;message&quot;</span>], <span class="string">&quot;new&quot;</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">event</span>[<span class="string">&quot;span&quot;</span>][<span class="string">&quot;context&quot;</span>], <span class="string">&quot;parent&quot;</span>);
+            <span class="kw">let </span>event = parse_as_json(<span class="kw-2">&amp;</span>buffer);
+            <span class="macro">assert_eq!</span>(event[<span class="string">&quot;fields&quot;</span>][<span class="string">&quot;message&quot;</span>], <span class="string">&quot;new&quot;</span>);
+            <span class="macro">assert_eq!</span>(event[<span class="string">&quot;span&quot;</span>][<span class="string">&quot;context&quot;</span>], <span class="string">&quot;parent&quot;</span>);
 
-            <span class="kw">let</span> <span class="ident">_parent_enter</span> <span class="op">=</span> <span class="ident">parent_span</span>.<span class="ident">enter</span>();
-            <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">parse_as_json</span>(<span class="kw-2">&amp;</span><span class="ident">buffer</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">event</span>[<span class="string">&quot;fields&quot;</span>][<span class="string">&quot;message&quot;</span>], <span class="string">&quot;enter&quot;</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">event</span>[<span class="string">&quot;span&quot;</span>][<span class="string">&quot;context&quot;</span>], <span class="string">&quot;parent&quot;</span>);
+            <span class="kw">let </span>_parent_enter = parent_span.enter();
+            <span class="kw">let </span>event = parse_as_json(<span class="kw-2">&amp;</span>buffer);
+            <span class="macro">assert_eq!</span>(event[<span class="string">&quot;fields&quot;</span>][<span class="string">&quot;message&quot;</span>], <span class="string">&quot;enter&quot;</span>);
+            <span class="macro">assert_eq!</span>(event[<span class="string">&quot;span&quot;</span>][<span class="string">&quot;context&quot;</span>], <span class="string">&quot;parent&quot;</span>);
 
-            <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> <span class="string">&quot;child&quot;</span>;
-            <span class="kw">let</span> <span class="ident">child_span</span> <span class="op">=</span> <span class="macro">tracing::info_span!</span>(<span class="string">&quot;child_span&quot;</span>, <span class="ident">context</span>);
-            <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">parse_as_json</span>(<span class="kw-2">&amp;</span><span class="ident">buffer</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">event</span>[<span class="string">&quot;fields&quot;</span>][<span class="string">&quot;message&quot;</span>], <span class="string">&quot;new&quot;</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">event</span>[<span class="string">&quot;span&quot;</span>][<span class="string">&quot;context&quot;</span>], <span class="string">&quot;child&quot;</span>);
+            <span class="kw">let </span>context = <span class="string">&quot;child&quot;</span>;
+            <span class="kw">let </span>child_span = <span class="macro">tracing::info_span!</span>(<span class="string">&quot;child_span&quot;</span>, context);
+            <span class="kw">let </span>event = parse_as_json(<span class="kw-2">&amp;</span>buffer);
+            <span class="macro">assert_eq!</span>(event[<span class="string">&quot;fields&quot;</span>][<span class="string">&quot;message&quot;</span>], <span class="string">&quot;new&quot;</span>);
+            <span class="macro">assert_eq!</span>(event[<span class="string">&quot;span&quot;</span>][<span class="string">&quot;context&quot;</span>], <span class="string">&quot;child&quot;</span>);
 
-            <span class="kw">let</span> <span class="ident">_child_enter</span> <span class="op">=</span> <span class="ident">child_span</span>.<span class="ident">enter</span>();
-            <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">parse_as_json</span>(<span class="kw-2">&amp;</span><span class="ident">buffer</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">event</span>[<span class="string">&quot;fields&quot;</span>][<span class="string">&quot;message&quot;</span>], <span class="string">&quot;enter&quot;</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">event</span>[<span class="string">&quot;span&quot;</span>][<span class="string">&quot;context&quot;</span>], <span class="string">&quot;child&quot;</span>);
+            <span class="kw">let </span>_child_enter = child_span.enter();
+            <span class="kw">let </span>event = parse_as_json(<span class="kw-2">&amp;</span>buffer);
+            <span class="macro">assert_eq!</span>(event[<span class="string">&quot;fields&quot;</span>][<span class="string">&quot;message&quot;</span>], <span class="string">&quot;enter&quot;</span>);
+            <span class="macro">assert_eq!</span>(event[<span class="string">&quot;span&quot;</span>][<span class="string">&quot;context&quot;</span>], <span class="string">&quot;child&quot;</span>);
 
-            <span class="ident">drop</span>(<span class="ident">_child_enter</span>);
-            <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">parse_as_json</span>(<span class="kw-2">&amp;</span><span class="ident">buffer</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">event</span>[<span class="string">&quot;fields&quot;</span>][<span class="string">&quot;message&quot;</span>], <span class="string">&quot;exit&quot;</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">event</span>[<span class="string">&quot;span&quot;</span>][<span class="string">&quot;context&quot;</span>], <span class="string">&quot;child&quot;</span>);
+            drop(_child_enter);
+            <span class="kw">let </span>event = parse_as_json(<span class="kw-2">&amp;</span>buffer);
+            <span class="macro">assert_eq!</span>(event[<span class="string">&quot;fields&quot;</span>][<span class="string">&quot;message&quot;</span>], <span class="string">&quot;exit&quot;</span>);
+            <span class="macro">assert_eq!</span>(event[<span class="string">&quot;span&quot;</span>][<span class="string">&quot;context&quot;</span>], <span class="string">&quot;child&quot;</span>);
 
-            <span class="ident">drop</span>(<span class="ident">child_span</span>);
-            <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">parse_as_json</span>(<span class="kw-2">&amp;</span><span class="ident">buffer</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">event</span>[<span class="string">&quot;fields&quot;</span>][<span class="string">&quot;message&quot;</span>], <span class="string">&quot;close&quot;</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">event</span>[<span class="string">&quot;span&quot;</span>][<span class="string">&quot;context&quot;</span>], <span class="string">&quot;child&quot;</span>);
+            drop(child_span);
+            <span class="kw">let </span>event = parse_as_json(<span class="kw-2">&amp;</span>buffer);
+            <span class="macro">assert_eq!</span>(event[<span class="string">&quot;fields&quot;</span>][<span class="string">&quot;message&quot;</span>], <span class="string">&quot;close&quot;</span>);
+            <span class="macro">assert_eq!</span>(event[<span class="string">&quot;span&quot;</span>][<span class="string">&quot;context&quot;</span>], <span class="string">&quot;child&quot;</span>);
 
-            <span class="ident">drop</span>(<span class="ident">_parent_enter</span>);
-            <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">parse_as_json</span>(<span class="kw-2">&amp;</span><span class="ident">buffer</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">event</span>[<span class="string">&quot;fields&quot;</span>][<span class="string">&quot;message&quot;</span>], <span class="string">&quot;exit&quot;</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">event</span>[<span class="string">&quot;span&quot;</span>][<span class="string">&quot;context&quot;</span>], <span class="string">&quot;parent&quot;</span>);
+            drop(_parent_enter);
+            <span class="kw">let </span>event = parse_as_json(<span class="kw-2">&amp;</span>buffer);
+            <span class="macro">assert_eq!</span>(event[<span class="string">&quot;fields&quot;</span>][<span class="string">&quot;message&quot;</span>], <span class="string">&quot;exit&quot;</span>);
+            <span class="macro">assert_eq!</span>(event[<span class="string">&quot;span&quot;</span>][<span class="string">&quot;context&quot;</span>], <span class="string">&quot;parent&quot;</span>);
 
-            <span class="ident">drop</span>(<span class="ident">parent_span</span>);
-            <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">parse_as_json</span>(<span class="kw-2">&amp;</span><span class="ident">buffer</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">event</span>[<span class="string">&quot;fields&quot;</span>][<span class="string">&quot;message&quot;</span>], <span class="string">&quot;close&quot;</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">event</span>[<span class="string">&quot;span&quot;</span>][<span class="string">&quot;context&quot;</span>], <span class="string">&quot;parent&quot;</span>);
+            drop(parent_span);
+            <span class="kw">let </span>event = parse_as_json(<span class="kw-2">&amp;</span>buffer);
+            <span class="macro">assert_eq!</span>(event[<span class="string">&quot;fields&quot;</span>][<span class="string">&quot;message&quot;</span>], <span class="string">&quot;close&quot;</span>);
+            <span class="macro">assert_eq!</span>(event[<span class="string">&quot;span&quot;</span>][<span class="string">&quot;context&quot;</span>], <span class="string">&quot;parent&quot;</span>);
         });
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">json_span_event_with_no_fields</span>() {
-        <span class="comment">// Check span events serialize correctly.</span>
-        <span class="comment">// Discussion: https://github.com/tokio-rs/tracing/issues/829#issuecomment-661984255</span>
-        <span class="kw">let</span> <span class="ident">buffer</span> <span class="op">=</span> <span class="ident">MockMakeWriter::default</span>();
-        <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">subscriber</span>()
-            .<span class="ident">with_writer</span>(<span class="ident">buffer</span>.<span class="ident">clone</span>())
-            .<span class="ident">flatten_event</span>(<span class="bool-val">false</span>)
-            .<span class="ident">with_current_span</span>(<span class="bool-val">false</span>)
-            .<span class="ident">with_span_list</span>(<span class="bool-val">false</span>)
-            .<span class="ident">with_span_events</span>(<span class="ident">FmtSpan::FULL</span>)
-            .<span class="ident">finish</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>json_span_event_with_no_fields() {
+        <span class="comment">// Check span events serialize correctly.
+        // Discussion: https://github.com/tokio-rs/tracing/issues/829#issuecomment-661984255
+        </span><span class="kw">let </span>buffer = MockMakeWriter::default();
+        <span class="kw">let </span>subscriber = subscriber()
+            .with_writer(buffer.clone())
+            .flatten_event(<span class="bool-val">false</span>)
+            .with_current_span(<span class="bool-val">false</span>)
+            .with_span_list(<span class="bool-val">false</span>)
+            .with_span_events(FmtSpan::FULL)
+            .finish();
 
-        <span class="ident">with_default</span>(<span class="ident">subscriber</span>, <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="macro">tracing::info_span!</span>(<span class="string">&quot;valid_json&quot;</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">parse_as_json</span>(<span class="kw-2">&amp;</span><span class="ident">buffer</span>)[<span class="string">&quot;fields&quot;</span>][<span class="string">&quot;message&quot;</span>], <span class="string">&quot;new&quot;</span>);
+        with_default(subscriber, || {
+            <span class="kw">let </span>span = <span class="macro">tracing::info_span!</span>(<span class="string">&quot;valid_json&quot;</span>);
+            <span class="macro">assert_eq!</span>(parse_as_json(<span class="kw-2">&amp;</span>buffer)[<span class="string">&quot;fields&quot;</span>][<span class="string">&quot;message&quot;</span>], <span class="string">&quot;new&quot;</span>);
 
-            <span class="kw">let</span> <span class="ident">_enter</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">enter</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">parse_as_json</span>(<span class="kw-2">&amp;</span><span class="ident">buffer</span>)[<span class="string">&quot;fields&quot;</span>][<span class="string">&quot;message&quot;</span>], <span class="string">&quot;enter&quot;</span>);
+            <span class="kw">let </span>_enter = span.enter();
+            <span class="macro">assert_eq!</span>(parse_as_json(<span class="kw-2">&amp;</span>buffer)[<span class="string">&quot;fields&quot;</span>][<span class="string">&quot;message&quot;</span>], <span class="string">&quot;enter&quot;</span>);
 
-            <span class="ident">drop</span>(<span class="ident">_enter</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">parse_as_json</span>(<span class="kw-2">&amp;</span><span class="ident">buffer</span>)[<span class="string">&quot;fields&quot;</span>][<span class="string">&quot;message&quot;</span>], <span class="string">&quot;exit&quot;</span>);
+            drop(_enter);
+            <span class="macro">assert_eq!</span>(parse_as_json(<span class="kw-2">&amp;</span>buffer)[<span class="string">&quot;fields&quot;</span>][<span class="string">&quot;message&quot;</span>], <span class="string">&quot;exit&quot;</span>);
 
-            <span class="ident">drop</span>(<span class="ident">span</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">parse_as_json</span>(<span class="kw-2">&amp;</span><span class="ident">buffer</span>)[<span class="string">&quot;fields&quot;</span>][<span class="string">&quot;message&quot;</span>], <span class="string">&quot;close&quot;</span>);
+            drop(span);
+            <span class="macro">assert_eq!</span>(parse_as_json(<span class="kw-2">&amp;</span>buffer)[<span class="string">&quot;fields&quot;</span>][<span class="string">&quot;message&quot;</span>], <span class="string">&quot;close&quot;</span>);
         });
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_as_json</span>(<span class="ident">buffer</span>: <span class="kw-2">&amp;</span><span class="ident">MockMakeWriter</span>) -&gt; <span class="ident">serde_json::Value</span> {
-        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">String::from_utf8</span>(<span class="ident">buffer</span>.<span class="ident">buf</span>().<span class="ident">to_vec</span>()).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">json</span> <span class="op">=</span> <span class="ident">buf</span>
-            .<span class="ident">lines</span>()
-            .<span class="ident">last</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;expected at least one line to be written!&quot;</span>);
-        <span class="kw">match</span> <span class="ident">serde_json::from_str</span>(<span class="ident">json</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="macro">panic!</span>(
+    <span class="kw">fn </span>parse_as_json(buffer: <span class="kw-2">&amp;</span>MockMakeWriter) -&gt; serde_json::Value {
+        <span class="kw">let </span>buf = String::from_utf8(buffer.buf().to_vec()).unwrap();
+        <span class="kw">let </span>json = buf
+            .lines()
+            .last()
+            .expect(<span class="string">&quot;expected at least one line to be written!&quot;</span>);
+        <span class="kw">match </span>serde_json::from_str(json) {
+            <span class="prelude-val">Ok</span>(v) =&gt; v,
+            <span class="prelude-val">Err</span>(e) =&gt; <span class="macro">panic!</span>(
                 <span class="string">&quot;assertion failed: JSON shouldn&#39;t be malformed\n  error: {}\n  json: {}&quot;</span>,
-                <span class="ident">e</span>, <span class="ident">json</span>
+                e, json
             ),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">test_json</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
-        <span class="ident">expected</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">builder</span>: <span class="ident"><span class="kw">crate</span>::fmt::SubscriberBuilder</span><span class="op">&lt;</span><span class="ident">JsonFields</span>, <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">Json</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">producer</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>() -&gt; <span class="ident">T</span>,
+    <span class="kw">fn </span>test_json&lt;T&gt;(
+        expected: <span class="kw-2">&amp;</span>str,
+        builder: <span class="kw">crate</span>::fmt::SubscriberBuilder&lt;JsonFields, Format&lt;Json&gt;&gt;,
+        producer: <span class="kw">impl </span>FnOnce() -&gt; T,
     ) {
-        <span class="kw">let</span> <span class="ident">make_writer</span> <span class="op">=</span> <span class="ident">MockMakeWriter::default</span>();
-        <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">builder</span>
-            .<span class="ident">with_writer</span>(<span class="ident">make_writer</span>.<span class="ident">clone</span>())
-            .<span class="ident">with_timer</span>(<span class="ident">MockTime</span>)
-            .<span class="ident">finish</span>();
+        <span class="kw">let </span>make_writer = MockMakeWriter::default();
+        <span class="kw">let </span>subscriber = builder
+            .with_writer(make_writer.clone())
+            .with_timer(MockTime)
+            .finish();
 
-        <span class="ident">with_default</span>(<span class="ident">subscriber</span>, <span class="ident">producer</span>);
+        with_default(subscriber, producer);
 
-        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">make_writer</span>.<span class="ident">buf</span>();
-        <span class="kw">let</span> <span class="ident">actual</span> <span class="op">=</span> <span class="ident">std::str::from_utf8</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>[..]).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>buf = make_writer.buf();
+        <span class="kw">let </span>actual = std::str::from_utf8(<span class="kw-2">&amp;</span>buf[..]).unwrap();
         <span class="macro">assert_eq!</span>(
-            <span class="ident">serde_json::from_str</span>::<span class="op">&lt;</span><span class="ident">std::collections::HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">serde_json::Value</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">expected</span>)
-                .<span class="ident">unwrap</span>(),
-            <span class="ident">serde_json::from_str</span>(<span class="ident">actual</span>).<span class="ident">unwrap</span>()
+            serde_json::from_str::&lt;std::collections::HashMap&lt;<span class="kw-2">&amp;</span>str, serde_json::Value&gt;&gt;(expected)
+                .unwrap(),
+            serde_json::from_str(actual).unwrap()
         );
     }
 
-    <span class="kw">fn</span> <span class="ident">test_json_with_line_number</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(
-        <span class="ident">expected</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">builder</span>: <span class="ident"><span class="kw">crate</span>::fmt::SubscriberBuilder</span><span class="op">&lt;</span><span class="ident">JsonFields</span>, <span class="ident">Format</span><span class="op">&lt;</span><span class="ident">Json</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">producer</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>() -&gt; <span class="ident">T</span>,
+    <span class="kw">fn </span>test_json_with_line_number&lt;T&gt;(
+        expected: <span class="kw-2">&amp;</span>str,
+        builder: <span class="kw">crate</span>::fmt::SubscriberBuilder&lt;JsonFields, Format&lt;Json&gt;&gt;,
+        producer: <span class="kw">impl </span>FnOnce() -&gt; T,
     ) {
-        <span class="kw">let</span> <span class="ident">make_writer</span> <span class="op">=</span> <span class="ident">MockMakeWriter::default</span>();
-        <span class="kw">let</span> <span class="ident">subscriber</span> <span class="op">=</span> <span class="ident">builder</span>
-            .<span class="ident">with_writer</span>(<span class="ident">make_writer</span>.<span class="ident">clone</span>())
-            .<span class="ident">with_timer</span>(<span class="ident">MockTime</span>)
-            .<span class="ident">finish</span>();
+        <span class="kw">let </span>make_writer = MockMakeWriter::default();
+        <span class="kw">let </span>subscriber = builder
+            .with_writer(make_writer.clone())
+            .with_timer(MockTime)
+            .finish();
 
-        <span class="ident">with_default</span>(<span class="ident">subscriber</span>, <span class="ident">producer</span>);
+        with_default(subscriber, producer);
 
-        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">make_writer</span>.<span class="ident">buf</span>();
-        <span class="kw">let</span> <span class="ident">actual</span> <span class="op">=</span> <span class="ident">std::str::from_utf8</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>[..]).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">expected</span> <span class="op">=</span>
-            <span class="ident">serde_json::from_str</span>::<span class="op">&lt;</span><span class="ident">std::collections::HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">serde_json::Value</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">expected</span>)
-                .<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">expect_line_number</span> <span class="op">=</span> <span class="ident">expected</span>.<span class="ident">remove</span>(<span class="string">&quot;line_number&quot;</span>).<span class="ident">is_some</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">actual</span>: <span class="ident">std::collections::HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">serde_json::Value</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">serde_json::from_str</span>(<span class="ident">actual</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">line_number</span> <span class="op">=</span> <span class="ident">actual</span>.<span class="ident">remove</span>(<span class="string">&quot;line_number&quot;</span>);
-        <span class="kw">if</span> <span class="ident">expect_line_number</span> {
-            <span class="macro">assert_eq!</span>(<span class="ident">line_number</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">is_number</span>()), <span class="prelude-val">Some</span>(<span class="bool-val">true</span>));
-        } <span class="kw">else</span> {
-            <span class="macro">assert!</span>(<span class="ident">line_number</span>.<span class="ident">is_none</span>());
+        <span class="kw">let </span>buf = make_writer.buf();
+        <span class="kw">let </span>actual = std::str::from_utf8(<span class="kw-2">&amp;</span>buf[..]).unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>expected =
+            serde_json::from_str::&lt;std::collections::HashMap&lt;<span class="kw-2">&amp;</span>str, serde_json::Value&gt;&gt;(expected)
+                .unwrap();
+        <span class="kw">let </span>expect_line_number = expected.remove(<span class="string">&quot;line_number&quot;</span>).is_some();
+        <span class="kw">let </span><span class="kw-2">mut </span>actual: std::collections::HashMap&lt;<span class="kw-2">&amp;</span>str, serde_json::Value&gt; =
+            serde_json::from_str(actual).unwrap();
+        <span class="kw">let </span>line_number = actual.remove(<span class="string">&quot;line_number&quot;</span>);
+        <span class="kw">if </span>expect_line_number {
+            <span class="macro">assert_eq!</span>(line_number.map(|x| x.is_number()), <span class="prelude-val">Some</span>(<span class="bool-val">true</span>));
+        } <span class="kw">else </span>{
+            <span class="macro">assert!</span>(line_number.is_none());
         }
-        <span class="macro">assert_eq!</span>(<span class="ident">actual</span>, <span class="ident">expected</span>);
+        <span class="macro">assert_eq!</span>(actual, expected);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

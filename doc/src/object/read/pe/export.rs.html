@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/object-0.29.0/src/read/pe/export.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>export.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../object/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../object/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../object/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/object-0.29.0/src/read/pe/export.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>export.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../object/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../object/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../object/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -329,336 +329,336 @@
 <span id="329">329</span>
 <span id="330">330</span>
 <span id="331">331</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
-<span class="kw">use</span> <span class="ident">core::fmt::Debug</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>alloc::vec::Vec;
+<span class="kw">use </span>core::fmt::Debug;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::read</span>::{<span class="ident">ByteString</span>, <span class="ident">Bytes</span>, <span class="ident">Error</span>, <span class="ident">ReadError</span>, <span class="ident">ReadRef</span>, <span class="prelude-ty">Result</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">pe</span>, <span class="ident">LittleEndian</span> <span class="kw">as</span> <span class="ident">LE</span>, <span class="ident">U16Bytes</span>, <span class="ident">U32Bytes</span>};
+<span class="kw">use </span><span class="kw">crate</span>::read::{ByteString, Bytes, Error, ReadError, ReadRef, <span class="prelude-ty">Result</span>};
+<span class="kw">use crate</span>::{pe, LittleEndian <span class="kw">as </span>LE, U16Bytes, U32Bytes};
 
-<span class="doccomment">/// Where an export is pointing to.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ExportTarget</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The address of the export, relative to the image base.</span>
-    <span class="ident">Address</span>(<span class="ident">u32</span>),
-    <span class="doccomment">/// Forwarded to an export ordinal in another DLL.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This gives the name of the DLL, and the ordinal.</span>
-    <span class="ident">ForwardByOrdinal</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>], <span class="ident">u32</span>),
-    <span class="doccomment">/// Forwarded to an export name in another DLL.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This gives the name of the DLL, and the export name.</span>
-    <span class="ident">ForwardByName</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>], <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]),
+<span class="doccomment">/// Where an export is pointing to.
+</span><span class="attribute">#[derive(Clone, Copy)]
+</span><span class="kw">pub enum </span>ExportTarget&lt;<span class="lifetime">&#39;data</span>&gt; {
+    <span class="doccomment">/// The address of the export, relative to the image base.
+    </span>Address(u32),
+    <span class="doccomment">/// Forwarded to an export ordinal in another DLL.
+    ///
+    /// This gives the name of the DLL, and the ordinal.
+    </span>ForwardByOrdinal(<span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8], u32),
+    <span class="doccomment">/// Forwarded to an export name in another DLL.
+    ///
+    /// This gives the name of the DLL, and the export name.
+    </span>ForwardByName(<span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8], <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span> <span class="ident">ExportTarget</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Returns true if the target is an address.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_address</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ExportTarget::Address</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
-            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>&gt; ExportTarget&lt;<span class="lifetime">&#39;data</span>&gt; {
+    <span class="doccomment">/// Returns true if the target is an address.
+    </span><span class="kw">pub fn </span>is_address(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="self">self </span>{
+            ExportTarget::Address(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="doccomment">/// Returns true if the export is forwarded to another DLL.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_forward</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="op">!</span><span class="self">self</span>.<span class="ident">is_address</span>()
+    <span class="doccomment">/// Returns true if the export is forwarded to another DLL.
+    </span><span class="kw">pub fn </span>is_forward(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        !<span class="self">self</span>.is_address()
     }
 }
 
-<span class="doccomment">/// An export from a PE file.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// There are multiple kinds of PE exports (with or without a name, and local or forwarded).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Export</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The ordinal of the export.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// These are sequential, starting at a base specified in the DLL.</span>
-    <span class="kw">pub</span> <span class="ident">ordinal</span>: <span class="ident">u32</span>,
-    <span class="doccomment">/// The name of the export, if known.</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span>,
-    <span class="doccomment">/// The target of this export.</span>
-    <span class="kw">pub</span> <span class="ident">target</span>: <span class="ident">ExportTarget</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
+<span class="doccomment">/// An export from a PE file.
+///
+/// There are multiple kinds of PE exports (with or without a name, and local or forwarded).
+</span><span class="attribute">#[derive(Clone, Copy)]
+</span><span class="kw">pub struct </span>Export&lt;<span class="lifetime">&#39;data</span>&gt; {
+    <span class="doccomment">/// The ordinal of the export.
+    ///
+    /// These are sequential, starting at a base specified in the DLL.
+    </span><span class="kw">pub </span>ordinal: u32,
+    <span class="doccomment">/// The name of the export, if known.
+    </span><span class="kw">pub </span>name: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt;,
+    <span class="doccomment">/// The target of this export.
+    </span><span class="kw">pub </span>target: ExportTarget&lt;<span class="lifetime">&#39;data</span>&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Export</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">core::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">core::result::Result</span><span class="op">&lt;</span>(), <span class="ident">core::fmt::Error</span><span class="op">&gt;</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Export&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;ordinal&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ordinal</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>.<span class="ident">map</span>(<span class="ident">ByteString</span>))
-            .<span class="ident">field</span>(<span class="string">&quot;target&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">target</span>)
-            .<span class="ident">finish</span>()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Debug <span class="kw">for </span>Export&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; core::result::Result&lt;(), core::fmt::Error&gt; {
+        f.debug_struct(<span class="string">&quot;Export&quot;</span>)
+            .field(<span class="string">&quot;ordinal&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.ordinal)
+            .field(<span class="string">&quot;name&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.name.map(ByteString))
+            .field(<span class="string">&quot;target&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.target)
+            .finish()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">ExportTarget</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">core::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">core::result::Result</span><span class="op">&lt;</span>(), <span class="ident">core::fmt::Error</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">ExportTarget::Address</span>(<span class="ident">address</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Address({:#x})&quot;</span>, <span class="ident">address</span>),
-            <span class="ident">ExportTarget::ForwardByOrdinal</span>(<span class="ident">library</span>, <span class="ident">ordinal</span>) =&gt; <span class="macro">write!</span>(
-                <span class="ident">f</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Debug <span class="kw">for </span>ExportTarget&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; core::result::Result&lt;(), core::fmt::Error&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            ExportTarget::Address(address) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Address({:#x})&quot;</span>, address),
+            ExportTarget::ForwardByOrdinal(library, ordinal) =&gt; <span class="macro">write!</span>(
+                f,
                 <span class="string">&quot;ForwardByOrdinal({:?}.#{})&quot;</span>,
-                <span class="ident">ByteString</span>(<span class="ident">library</span>),
-                <span class="ident">ordinal</span>
+                ByteString(library),
+                ordinal
             ),
-            <span class="ident">ExportTarget::ForwardByName</span>(<span class="ident">library</span>, <span class="ident">name</span>) =&gt; <span class="macro">write!</span>(
-                <span class="ident">f</span>,
+            ExportTarget::ForwardByName(library, name) =&gt; <span class="macro">write!</span>(
+                f,
                 <span class="string">&quot;ForwardByName({:?}.{:?})&quot;</span>,
-                <span class="ident">ByteString</span>(<span class="ident">library</span>),
-                <span class="ident">ByteString</span>(<span class="ident">name</span>)
+                ByteString(library),
+                ByteString(name)
             ),
         }
     }
 }
 
-<span class="doccomment">/// A partially parsed PE export table.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ExportTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span> {
-    <span class="ident">data</span>: <span class="ident">Bytes</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span>,
-    <span class="ident">virtual_address</span>: <span class="ident">u32</span>,
-    <span class="ident">directory</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="ident">pe::ImageExportDirectory</span>,
-    <span class="ident">addresses</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">U32Bytes</span><span class="op">&lt;</span><span class="ident">LE</span><span class="op">&gt;</span>],
-    <span class="ident">names</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">U32Bytes</span><span class="op">&lt;</span><span class="ident">LE</span><span class="op">&gt;</span>],
-    <span class="ident">name_ordinals</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">U16Bytes</span><span class="op">&lt;</span><span class="ident">LE</span><span class="op">&gt;</span>],
+<span class="doccomment">/// A partially parsed PE export table.
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>ExportTable&lt;<span class="lifetime">&#39;data</span>&gt; {
+    data: Bytes&lt;<span class="lifetime">&#39;data</span>&gt;,
+    virtual_address: u32,
+    directory: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>pe::ImageExportDirectory,
+    addresses: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[U32Bytes&lt;LE&gt;],
+    names: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[U32Bytes&lt;LE&gt;],
+    name_ordinals: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[U16Bytes&lt;LE&gt;],
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span> <span class="ident">ExportTable</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Parse the export table given its section data and address.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>], <span class="ident">virtual_address</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">directory</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::parse_directory</span>(<span class="ident">data</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">Bytes</span>(<span class="ident">data</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;data</span>&gt; ExportTable&lt;<span class="lifetime">&#39;data</span>&gt; {
+    <span class="doccomment">/// Parse the export table given its section data and address.
+    </span><span class="kw">pub fn </span>parse(data: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8], virtual_address: u32) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>directory = <span class="self">Self</span>::parse_directory(data)<span class="question-mark">?</span>;
+        <span class="kw">let </span>data = Bytes(data);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">addresses</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[][..];
-        <span class="kw">let</span> <span class="ident">address_of_functions</span> <span class="op">=</span> <span class="ident">directory</span>.<span class="ident">address_of_functions</span>.<span class="ident">get</span>(<span class="ident">LE</span>);
-        <span class="kw">if</span> <span class="ident">address_of_functions</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="ident">addresses</span> <span class="op">=</span> <span class="ident">data</span>
-                .<span class="ident">read_slice_at</span>::<span class="op">&lt;</span><span class="ident">U32Bytes</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(
-                    <span class="ident">address_of_functions</span>.<span class="ident">wrapping_sub</span>(<span class="ident">virtual_address</span>) <span class="kw">as</span> <span class="ident">usize</span>,
-                    <span class="ident">directory</span>.<span class="ident">number_of_functions</span>.<span class="ident">get</span>(<span class="ident">LE</span>) <span class="kw">as</span> <span class="ident">usize</span>,
+        <span class="kw">let </span><span class="kw-2">mut </span>addresses = <span class="kw-2">&amp;</span>[][..];
+        <span class="kw">let </span>address_of_functions = directory.address_of_functions.get(LE);
+        <span class="kw">if </span>address_of_functions != <span class="number">0 </span>{
+            addresses = data
+                .read_slice_at::&lt;U32Bytes&lt;<span class="kw">_</span>&gt;&gt;(
+                    address_of_functions.wrapping_sub(virtual_address) <span class="kw">as </span>usize,
+                    directory.number_of_functions.get(LE) <span class="kw">as </span>usize,
                 )
-                .<span class="ident">read_error</span>(<span class="string">&quot;Invalid PE export address table&quot;</span>)<span class="question-mark">?</span>;
+                .read_error(<span class="string">&quot;Invalid PE export address table&quot;</span>)<span class="question-mark">?</span>;
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">names</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[][..];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">name_ordinals</span> <span class="op">=</span> <span class="kw-2">&amp;</span>[][..];
-        <span class="kw">let</span> <span class="ident">address_of_names</span> <span class="op">=</span> <span class="ident">directory</span>.<span class="ident">address_of_names</span>.<span class="ident">get</span>(<span class="ident">LE</span>);
-        <span class="kw">let</span> <span class="ident">address_of_name_ordinals</span> <span class="op">=</span> <span class="ident">directory</span>.<span class="ident">address_of_name_ordinals</span>.<span class="ident">get</span>(<span class="ident">LE</span>);
-        <span class="kw">if</span> <span class="ident">address_of_names</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="kw">if</span> <span class="ident">address_of_name_ordinals</span> <span class="op">==</span> <span class="number">0</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>(<span class="string">&quot;Missing PE export ordinal table&quot;</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>names = <span class="kw-2">&amp;</span>[][..];
+        <span class="kw">let </span><span class="kw-2">mut </span>name_ordinals = <span class="kw-2">&amp;</span>[][..];
+        <span class="kw">let </span>address_of_names = directory.address_of_names.get(LE);
+        <span class="kw">let </span>address_of_name_ordinals = directory.address_of_name_ordinals.get(LE);
+        <span class="kw">if </span>address_of_names != <span class="number">0 </span>{
+            <span class="kw">if </span>address_of_name_ordinals == <span class="number">0 </span>{
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error(<span class="string">&quot;Missing PE export ordinal table&quot;</span>));
             }
 
-            <span class="kw">let</span> <span class="ident">number</span> <span class="op">=</span> <span class="ident">directory</span>.<span class="ident">number_of_names</span>.<span class="ident">get</span>(<span class="ident">LE</span>) <span class="kw">as</span> <span class="ident">usize</span>;
-            <span class="ident">names</span> <span class="op">=</span> <span class="ident">data</span>
-                .<span class="ident">read_slice_at</span>::<span class="op">&lt;</span><span class="ident">U32Bytes</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(
-                    <span class="ident">address_of_names</span>.<span class="ident">wrapping_sub</span>(<span class="ident">virtual_address</span>) <span class="kw">as</span> <span class="ident">usize</span>,
-                    <span class="ident">number</span>,
+            <span class="kw">let </span>number = directory.number_of_names.get(LE) <span class="kw">as </span>usize;
+            names = data
+                .read_slice_at::&lt;U32Bytes&lt;<span class="kw">_</span>&gt;&gt;(
+                    address_of_names.wrapping_sub(virtual_address) <span class="kw">as </span>usize,
+                    number,
                 )
-                .<span class="ident">read_error</span>(<span class="string">&quot;Invalid PE export name pointer table&quot;</span>)<span class="question-mark">?</span>;
-            <span class="ident">name_ordinals</span> <span class="op">=</span> <span class="ident">data</span>
-                .<span class="ident">read_slice_at</span>::<span class="op">&lt;</span><span class="ident">U16Bytes</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>(
-                    <span class="ident">address_of_name_ordinals</span>.<span class="ident">wrapping_sub</span>(<span class="ident">virtual_address</span>) <span class="kw">as</span> <span class="ident">usize</span>,
-                    <span class="ident">number</span>,
+                .read_error(<span class="string">&quot;Invalid PE export name pointer table&quot;</span>)<span class="question-mark">?</span>;
+            name_ordinals = data
+                .read_slice_at::&lt;U16Bytes&lt;<span class="kw">_</span>&gt;&gt;(
+                    address_of_name_ordinals.wrapping_sub(virtual_address) <span class="kw">as </span>usize,
+                    number,
                 )
-                .<span class="ident">read_error</span>(<span class="string">&quot;Invalid PE export ordinal table&quot;</span>)<span class="question-mark">?</span>;
+                .read_error(<span class="string">&quot;Invalid PE export ordinal table&quot;</span>)<span class="question-mark">?</span>;
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">ExportTable</span> {
-            <span class="ident">data</span>,
-            <span class="ident">virtual_address</span>,
-            <span class="ident">directory</span>,
-            <span class="ident">addresses</span>,
-            <span class="ident">names</span>,
-            <span class="ident">name_ordinals</span>,
+        <span class="prelude-val">Ok</span>(ExportTable {
+            data,
+            virtual_address,
+            directory,
+            addresses,
+            names,
+            name_ordinals,
         })
     }
 
-    <span class="doccomment">/// Parse the export directory given its section data.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_directory</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="ident">pe::ImageExportDirectory</span><span class="op">&gt;</span> {
-        <span class="ident">data</span>.<span class="ident">read_at</span>::<span class="op">&lt;</span><span class="ident">pe::ImageExportDirectory</span><span class="op">&gt;</span>(<span class="number">0</span>)
-            .<span class="ident">read_error</span>(<span class="string">&quot;Invalid PE export dir size&quot;</span>)
+    <span class="doccomment">/// Parse the export directory given its section data.
+    </span><span class="kw">pub fn </span>parse_directory(data: <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>pe::ImageExportDirectory&gt; {
+        data.read_at::&lt;pe::ImageExportDirectory&gt;(<span class="number">0</span>)
+            .read_error(<span class="string">&quot;Invalid PE export dir size&quot;</span>)
     }
 
-    <span class="doccomment">/// Returns the header of the export table.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">directory</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> <span class="ident">pe::ImageExportDirectory</span> {
-        <span class="self">self</span>.<span class="ident">directory</span>
+    <span class="doccomment">/// Returns the header of the export table.
+    </span><span class="kw">pub fn </span>directory(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>pe::ImageExportDirectory {
+        <span class="self">self</span>.directory
     }
 
-    <span class="doccomment">/// Returns the base value of ordinals.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Adding this to an address index will give an ordinal.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ordinal_base</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">directory</span>.<span class="ident">base</span>.<span class="ident">get</span>(<span class="ident">LE</span>)
+    <span class="doccomment">/// Returns the base value of ordinals.
+    ///
+    /// Adding this to an address index will give an ordinal.
+    </span><span class="kw">pub fn </span>ordinal_base(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.directory.base.get(LE)
     }
 
-    <span class="doccomment">/// Returns the unparsed address table.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// An address table entry may be a local address, or the address of a forwarded export entry.</span>
-    <span class="doccomment">/// See [`Self::is_forward`] and [`Self::target_from_address`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">addresses</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">U32Bytes</span><span class="op">&lt;</span><span class="ident">LE</span><span class="op">&gt;</span>] {
-        <span class="self">self</span>.<span class="ident">addresses</span>
+    <span class="doccomment">/// Returns the unparsed address table.
+    ///
+    /// An address table entry may be a local address, or the address of a forwarded export entry.
+    /// See [`Self::is_forward`] and [`Self::target_from_address`].
+    </span><span class="kw">pub fn </span>addresses(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[U32Bytes&lt;LE&gt;] {
+        <span class="self">self</span>.addresses
     }
 
-    <span class="doccomment">/// Returns the unparsed name pointer table.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A name pointer table entry can be used with [`Self::name_from_pointer`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name_pointers</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">U32Bytes</span><span class="op">&lt;</span><span class="ident">LE</span><span class="op">&gt;</span>] {
-        <span class="self">self</span>.<span class="ident">names</span>
+    <span class="doccomment">/// Returns the unparsed name pointer table.
+    ///
+    /// A name pointer table entry can be used with [`Self::name_from_pointer`].
+    </span><span class="kw">pub fn </span>name_pointers(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[U32Bytes&lt;LE&gt;] {
+        <span class="self">self</span>.names
     }
 
-    <span class="doccomment">/// Returns the unparsed ordinal table.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// An ordinal table entry is a 0-based index into the address table.</span>
-    <span class="doccomment">/// See [`Self::address_by_index`] and [`Self::target_by_index`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name_ordinals</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">U16Bytes</span><span class="op">&lt;</span><span class="ident">LE</span><span class="op">&gt;</span>] {
-        <span class="self">self</span>.<span class="ident">name_ordinals</span>
+    <span class="doccomment">/// Returns the unparsed ordinal table.
+    ///
+    /// An ordinal table entry is a 0-based index into the address table.
+    /// See [`Self::address_by_index`] and [`Self::target_by_index`].
+    </span><span class="kw">pub fn </span>name_ordinals(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[U16Bytes&lt;LE&gt;] {
+        <span class="self">self</span>.name_ordinals
     }
 
-    <span class="doccomment">/// Returns an iterator for the entries in the name pointer table and ordinal table.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A name pointer table entry can be used with [`Self::name_from_pointer`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// An ordinal table entry is a 0-based index into the address table.</span>
-    <span class="doccomment">/// See [`Self::address_by_index`] and [`Self::target_by_index`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name_iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">u32</span>, <span class="ident">u16</span>)<span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;data</span> {
-        <span class="self">self</span>.<span class="ident">names</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">get</span>(<span class="ident">LE</span>))
-            .<span class="ident">zip</span>(<span class="self">self</span>.<span class="ident">name_ordinals</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">get</span>(<span class="ident">LE</span>)))
+    <span class="doccomment">/// Returns an iterator for the entries in the name pointer table and ordinal table.
+    ///
+    /// A name pointer table entry can be used with [`Self::name_from_pointer`].
+    ///
+    /// An ordinal table entry is a 0-based index into the address table.
+    /// See [`Self::address_by_index`] and [`Self::target_by_index`].
+    </span><span class="kw">pub fn </span>name_iter(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = (u32, u16)&gt; + <span class="lifetime">&#39;data </span>{
+        <span class="self">self</span>.names
+            .iter()
+            .map(|x| x.get(LE))
+            .zip(<span class="self">self</span>.name_ordinals.iter().map(|x| x.get(LE)))
     }
 
-    <span class="doccomment">/// Returns the export address table entry at the given address index.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This may be a local address, or the address of a forwarded export entry.</span>
-    <span class="doccomment">/// See [`Self::is_forward`] and [`Self::target_from_address`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `index` is a 0-based index into the export address table.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">address_by_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>
-            .<span class="ident">addresses</span>
-            .<span class="ident">get</span>(<span class="ident">index</span> <span class="kw">as</span> <span class="ident">usize</span>)
-            .<span class="ident">read_error</span>(<span class="string">&quot;Invalid PE export address index&quot;</span>)<span class="question-mark">?</span>
-            .<span class="ident">get</span>(<span class="ident">LE</span>))
+    <span class="doccomment">/// Returns the export address table entry at the given address index.
+    ///
+    /// This may be a local address, or the address of a forwarded export entry.
+    /// See [`Self::is_forward`] and [`Self::target_from_address`].
+    ///
+    /// `index` is a 0-based index into the export address table.
+    </span><span class="kw">pub fn </span>address_by_index(<span class="kw-2">&amp;</span><span class="self">self</span>, index: u32) -&gt; <span class="prelude-ty">Result</span>&lt;u32&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">self
+            </span>.addresses
+            .get(index <span class="kw">as </span>usize)
+            .read_error(<span class="string">&quot;Invalid PE export address index&quot;</span>)<span class="question-mark">?
+            </span>.get(LE))
     }
 
-    <span class="doccomment">/// Returns the export address table entry at the given ordinal.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This may be a local address, or the address of a forwarded export entry.</span>
-    <span class="doccomment">/// See [`Self::is_forward`] and [`Self::target_from_address`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">address_by_ordinal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ordinal</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">address_by_index</span>(<span class="ident">ordinal</span>.<span class="ident">wrapping_sub</span>(<span class="self">self</span>.<span class="ident">ordinal_base</span>()))
+    <span class="doccomment">/// Returns the export address table entry at the given ordinal.
+    ///
+    /// This may be a local address, or the address of a forwarded export entry.
+    /// See [`Self::is_forward`] and [`Self::target_from_address`].
+    </span><span class="kw">pub fn </span>address_by_ordinal(<span class="kw-2">&amp;</span><span class="self">self</span>, ordinal: u32) -&gt; <span class="prelude-ty">Result</span>&lt;u32&gt; {
+        <span class="self">self</span>.address_by_index(ordinal.wrapping_sub(<span class="self">self</span>.ordinal_base()))
     }
 
-    <span class="doccomment">/// Returns the target of the export at the given address index.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `index` is a 0-based index into the export address table.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">target_by_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ExportTarget</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">target_from_address</span>(<span class="self">self</span>.<span class="ident">address_by_index</span>(<span class="ident">index</span>)<span class="question-mark">?</span>)
+    <span class="doccomment">/// Returns the target of the export at the given address index.
+    ///
+    /// `index` is a 0-based index into the export address table.
+    </span><span class="kw">pub fn </span>target_by_index(<span class="kw-2">&amp;</span><span class="self">self</span>, index: u32) -&gt; <span class="prelude-ty">Result</span>&lt;ExportTarget&lt;<span class="lifetime">&#39;data</span>&gt;&gt; {
+        <span class="self">self</span>.target_from_address(<span class="self">self</span>.address_by_index(index)<span class="question-mark">?</span>)
     }
 
-    <span class="doccomment">/// Returns the target of the export at the given ordinal.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">target_by_ordinal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ordinal</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ExportTarget</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">target_from_address</span>(<span class="self">self</span>.<span class="ident">address_by_ordinal</span>(<span class="ident">ordinal</span>)<span class="question-mark">?</span>)
+    <span class="doccomment">/// Returns the target of the export at the given ordinal.
+    </span><span class="kw">pub fn </span>target_by_ordinal(<span class="kw-2">&amp;</span><span class="self">self</span>, ordinal: u32) -&gt; <span class="prelude-ty">Result</span>&lt;ExportTarget&lt;<span class="lifetime">&#39;data</span>&gt;&gt; {
+        <span class="self">self</span>.target_from_address(<span class="self">self</span>.address_by_ordinal(ordinal)<span class="question-mark">?</span>)
     }
 
-    <span class="doccomment">/// Convert an export address table entry into a target.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">target_from_address</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">address</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ExportTarget</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">forward</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">forward_string</span>(<span class="ident">address</span>)<span class="question-mark">?</span> {
-            <span class="kw">let</span> <span class="ident">i</span> <span class="op">=</span> <span class="ident">forward</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">position</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">x</span> <span class="op">==</span> <span class="string">b&#39;.&#39;</span>)
-                .<span class="ident">read_error</span>(<span class="string">&quot;Missing PE forwarded export separator&quot;</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">library</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">forward</span>[..<span class="ident">i</span>];
-            <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">forward</span>[<span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>..] {
-                [<span class="string">b&#39;#&#39;</span>, <span class="ident">digits</span> @ ..] =&gt; {
-                    <span class="kw">let</span> <span class="ident">ordinal</span> <span class="op">=</span>
-                        <span class="ident">parse_ordinal</span>(<span class="ident">digits</span>).<span class="ident">read_error</span>(<span class="string">&quot;Invalid PE forwarded export ordinal&quot;</span>)<span class="question-mark">?</span>;
-                    <span class="ident">ExportTarget::ForwardByOrdinal</span>(<span class="ident">library</span>, <span class="ident">ordinal</span>)
+    <span class="doccomment">/// Convert an export address table entry into a target.
+    </span><span class="kw">pub fn </span>target_from_address(<span class="kw-2">&amp;</span><span class="self">self</span>, address: u32) -&gt; <span class="prelude-ty">Result</span>&lt;ExportTarget&lt;<span class="lifetime">&#39;data</span>&gt;&gt; {
+        <span class="prelude-val">Ok</span>(<span class="kw">if let </span><span class="prelude-val">Some</span>(forward) = <span class="self">self</span>.forward_string(address)<span class="question-mark">? </span>{
+            <span class="kw">let </span>i = forward
+                .iter()
+                .position(|x| <span class="kw-2">*</span>x == <span class="string">b&#39;.&#39;</span>)
+                .read_error(<span class="string">&quot;Missing PE forwarded export separator&quot;</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span>library = <span class="kw-2">&amp;</span>forward[..i];
+            <span class="kw">match </span><span class="kw-2">&amp;</span>forward[i + <span class="number">1</span>..] {
+                [<span class="string">b&#39;#&#39;</span>, digits @ ..] =&gt; {
+                    <span class="kw">let </span>ordinal =
+                        parse_ordinal(digits).read_error(<span class="string">&quot;Invalid PE forwarded export ordinal&quot;</span>)<span class="question-mark">?</span>;
+                    ExportTarget::ForwardByOrdinal(library, ordinal)
                 }
                 [] =&gt; {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>(<span class="string">&quot;Missing PE forwarded export name&quot;</span>));
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(Error(<span class="string">&quot;Missing PE forwarded export name&quot;</span>));
                 }
-                <span class="ident">name</span> =&gt; <span class="ident">ExportTarget::ForwardByName</span>(<span class="ident">library</span>, <span class="ident">name</span>),
+                name =&gt; ExportTarget::ForwardByName(library, name),
             }
-        } <span class="kw">else</span> {
-            <span class="ident">ExportTarget::Address</span>(<span class="ident">address</span>)
+        } <span class="kw">else </span>{
+            ExportTarget::Address(address)
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">forward_offset</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">address</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">address</span>.<span class="ident">wrapping_sub</span>(<span class="self">self</span>.<span class="ident">virtual_address</span>) <span class="kw">as</span> <span class="ident">usize</span>;
-        <span class="kw">if</span> <span class="ident">offset</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">len</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">offset</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+    <span class="kw">fn </span>forward_offset(<span class="kw-2">&amp;</span><span class="self">self</span>, address: u32) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+        <span class="kw">let </span>offset = address.wrapping_sub(<span class="self">self</span>.virtual_address) <span class="kw">as </span>usize;
+        <span class="kw">if </span>offset &lt; <span class="self">self</span>.data.len() {
+            <span class="prelude-val">Some</span>(offset)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 
-    <span class="doccomment">/// Return true if the export address table entry is a forward.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_forward</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">address</span>: <span class="ident">u32</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">forward_offset</span>(<span class="ident">address</span>).<span class="ident">is_some</span>()
+    <span class="doccomment">/// Return true if the export address table entry is a forward.
+    </span><span class="kw">pub fn </span>is_forward(<span class="kw-2">&amp;</span><span class="self">self</span>, address: u32) -&gt; bool {
+        <span class="self">self</span>.forward_offset(address).is_some()
     }
 
-    <span class="doccomment">/// Return the forward string if the export address table entry is a forward.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">forward_string</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">address</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">offset</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">forward_offset</span>(<span class="ident">address</span>) {
-            <span class="self">self</span>.<span class="ident">data</span>
-                .<span class="ident">read_string_at</span>(<span class="ident">offset</span>)
-                .<span class="ident">read_error</span>(<span class="string">&quot;Invalid PE forwarded export address&quot;</span>)
-                .<span class="ident">map</span>(<span class="prelude-val">Some</span>)
-        } <span class="kw">else</span> {
+    <span class="doccomment">/// Return the forward string if the export address table entry is a forward.
+    </span><span class="kw">pub fn </span>forward_string(<span class="kw-2">&amp;</span><span class="self">self</span>, address: u32) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt;&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(offset) = <span class="self">self</span>.forward_offset(address) {
+            <span class="self">self</span>.data
+                .read_string_at(offset)
+                .read_error(<span class="string">&quot;Invalid PE forwarded export address&quot;</span>)
+                .map(<span class="prelude-val">Some</span>)
+        } <span class="kw">else </span>{
             <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
         }
     }
 
-    <span class="doccomment">/// Convert an export name pointer table entry into a name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name_from_pointer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name_pointer</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;data</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="ident">name_pointer</span>.<span class="ident">wrapping_sub</span>(<span class="self">self</span>.<span class="ident">virtual_address</span>);
-        <span class="self">self</span>.<span class="ident">data</span>
-            .<span class="ident">read_string_at</span>(<span class="ident">offset</span> <span class="kw">as</span> <span class="ident">usize</span>)
-            .<span class="ident">read_error</span>(<span class="string">&quot;Invalid PE export name pointer&quot;</span>)
+    <span class="doccomment">/// Convert an export name pointer table entry into a name.
+    </span><span class="kw">pub fn </span>name_from_pointer(<span class="kw-2">&amp;</span><span class="self">self</span>, name_pointer: u32) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;data </span>[u8]&gt; {
+        <span class="kw">let </span>offset = name_pointer.wrapping_sub(<span class="self">self</span>.virtual_address);
+        <span class="self">self</span>.data
+            .read_string_at(offset <span class="kw">as </span>usize)
+            .read_error(<span class="string">&quot;Invalid PE export name pointer&quot;</span>)
     }
 
-    <span class="doccomment">/// Returns the parsed exports in this table.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exports</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Export</span><span class="op">&lt;</span><span class="lifetime">&#39;data</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="comment">// First, let&#39;s list all exports.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">exports</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="kw">let</span> <span class="ident">ordinal_base</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ordinal_base</span>();
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">address</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">addresses</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="comment">// Convert from an array index to an ordinal.</span>
-            <span class="kw">let</span> <span class="ident">ordinal</span> <span class="op">=</span> <span class="ident">ordinal_base</span>.<span class="ident">wrapping_add</span>(<span class="ident">i</span> <span class="kw">as</span> <span class="ident">u32</span>);
-            <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">target_from_address</span>(<span class="ident">address</span>.<span class="ident">get</span>(<span class="ident">LE</span>))<span class="question-mark">?</span>;
-            <span class="ident">exports</span>.<span class="ident">push</span>(<span class="ident">Export</span> {
-                <span class="ident">ordinal</span>,
-                <span class="ident">target</span>,
-                <span class="comment">// Might be populated later.</span>
-                <span class="ident">name</span>: <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Returns the parsed exports in this table.
+    </span><span class="kw">pub fn </span>exports(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;Export&lt;<span class="lifetime">&#39;data</span>&gt;&gt;&gt; {
+        <span class="comment">// First, let&#39;s list all exports.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>exports = Vec::new();
+        <span class="kw">let </span>ordinal_base = <span class="self">self</span>.ordinal_base();
+        <span class="kw">for </span>(i, address) <span class="kw">in </span><span class="self">self</span>.addresses.iter().enumerate() {
+            <span class="comment">// Convert from an array index to an ordinal.
+            </span><span class="kw">let </span>ordinal = ordinal_base.wrapping_add(i <span class="kw">as </span>u32);
+            <span class="kw">let </span>target = <span class="self">self</span>.target_from_address(address.get(LE))<span class="question-mark">?</span>;
+            exports.push(Export {
+                ordinal,
+                target,
+                <span class="comment">// Might be populated later.
+                </span>name: <span class="prelude-val">None</span>,
             });
         }
 
-        <span class="comment">// Now, check whether some (or all) of them have an associated name.</span>
-        <span class="comment">// `ordinal_index` is a 0-based index into `addresses`.</span>
-        <span class="kw">for</span> (<span class="ident">name_pointer</span>, <span class="ident">ordinal_index</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">name_iter</span>() {
-            <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">name_from_pointer</span>(<span class="ident">name_pointer</span>)<span class="question-mark">?</span>;
-            <span class="ident">exports</span>
-                .<span class="ident">get_mut</span>(<span class="ident">ordinal_index</span> <span class="kw">as</span> <span class="ident">usize</span>)
-                .<span class="ident">read_error</span>(<span class="string">&quot;Invalid PE export ordinal&quot;</span>)<span class="question-mark">?</span>
-                .<span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>);
+        <span class="comment">// Now, check whether some (or all) of them have an associated name.
+        // `ordinal_index` is a 0-based index into `addresses`.
+        </span><span class="kw">for </span>(name_pointer, ordinal_index) <span class="kw">in </span><span class="self">self</span>.name_iter() {
+            <span class="kw">let </span>name = <span class="self">self</span>.name_from_pointer(name_pointer)<span class="question-mark">?</span>;
+            exports
+                .get_mut(ordinal_index <span class="kw">as </span>usize)
+                .read_error(<span class="string">&quot;Invalid PE export ordinal&quot;</span>)<span class="question-mark">?
+                </span>.name = <span class="prelude-val">Some</span>(name);
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">exports</span>)
+        <span class="prelude-val">Ok</span>(exports)
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parse_ordinal</span>(<span class="ident">digits</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">digits</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">return</span> <span class="prelude-val">None</span>;
+<span class="kw">fn </span>parse_ordinal(digits: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Option</span>&lt;u32&gt; {
+    <span class="kw">if </span>digits.is_empty() {
+        <span class="kw">return </span><span class="prelude-val">None</span>;
     }
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">c</span> <span class="kw">in</span> <span class="ident">digits</span> {
-        <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> (<span class="ident">c</span> <span class="kw">as</span> <span class="ident">char</span>).<span class="ident">to_digit</span>(<span class="number">10</span>)<span class="question-mark">?</span>;
-        <span class="ident">result</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">checked_mul</span>(<span class="number">10</span>)<span class="question-mark">?</span>.<span class="ident">checked_add</span>(<span class="ident">x</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>result: u32 = <span class="number">0</span>;
+    <span class="kw">for </span><span class="kw-2">&amp;</span>c <span class="kw">in </span>digits {
+        <span class="kw">let </span>x = (c <span class="kw">as </span>char).to_digit(<span class="number">10</span>)<span class="question-mark">?</span>;
+        result = result.checked_mul(<span class="number">10</span>)<span class="question-mark">?</span>.checked_add(x)<span class="question-mark">?</span>;
     }
-    <span class="prelude-val">Some</span>(<span class="ident">result</span>)
+    <span class="prelude-val">Some</span>(result)
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="object" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="object" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

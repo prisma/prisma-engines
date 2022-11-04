@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/dissimilar-1.0.4/src/range.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>range.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../dissimilar/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../dissimilar/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../dissimilar/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/dissimilar-1.0.4/src/range.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>range.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../dissimilar/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../dissimilar/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../dissimilar/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -146,153 +146,153 @@
 <span id="146">146</span>
 <span id="147">147</span>
 <span id="148">148</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::find::find</span>;
-<span class="kw">use</span> <span class="ident">std::fmt::Debug</span>;
-<span class="kw">use</span> <span class="ident">std::ops</span>::{<span class="self">self</span>, <span class="ident">RangeFrom</span>, <span class="ident">RangeFull</span>, <span class="ident">RangeTo</span>};
-<span class="kw">use</span> <span class="ident">std::str</span>::{<span class="ident">CharIndices</span>, <span class="ident">Chars</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::find::find;
+<span class="kw">use </span>std::fmt::Debug;
+<span class="kw">use </span>std::ops::{<span class="self">self</span>, RangeFrom, RangeFull, RangeTo};
+<span class="kw">use </span>std::str::{CharIndices, Chars};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Range</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">doc</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-    <span class="kw">pub</span> <span class="ident">offset</span>: <span class="ident">usize</span>,
-    <span class="kw">pub</span> <span class="ident">len</span>: <span class="ident">usize</span>,
+<span class="attribute">#[derive(Copy, Clone)]
+</span><span class="kw">pub struct </span>Range&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub </span>doc: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    <span class="kw">pub </span>offset: usize,
+    <span class="kw">pub </span>len: usize,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Range</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">Range</span> {
-            <span class="ident">doc</span>: <span class="string">&quot;&quot;</span>,
-            <span class="ident">offset</span>: <span class="number">0</span>,
-            <span class="ident">len</span>: <span class="number">0</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Range&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub fn </span>empty() -&gt; <span class="self">Self </span>{
+        Range {
+            doc: <span class="string">&quot;&quot;</span>,
+            offset: <span class="number">0</span>,
+            len: <span class="number">0</span>,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">doc</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">bounds</span>: <span class="kw">impl</span> <span class="ident">RangeBounds</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> (<span class="ident">offset</span>, <span class="ident">len</span>) <span class="op">=</span> <span class="ident">bounds</span>.<span class="ident">index</span>(<span class="ident">doc</span>.<span class="ident">len</span>());
-        <span class="ident">Range</span> { <span class="ident">doc</span>, <span class="ident">offset</span>, <span class="ident">len</span> }
+    <span class="kw">pub fn </span>new(doc: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, bounds: <span class="kw">impl </span>RangeBounds) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>(offset, len) = bounds.index(doc.len());
+        Range { doc, offset, len }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">len</span> <span class="op">==</span> <span class="number">0</span>
-    }
+    <span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.len == <span class="number">0
+    </span>}
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">substring</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bounds</span>: <span class="kw">impl</span> <span class="ident">RangeBounds</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> (<span class="ident">offset</span>, <span class="ident">len</span>) <span class="op">=</span> <span class="ident">bounds</span>.<span class="ident">index</span>(<span class="self">self</span>.<span class="ident">len</span>);
-        <span class="ident">Range</span> {
-            <span class="ident">doc</span>: <span class="self">self</span>.<span class="ident">doc</span>,
-            <span class="ident">offset</span>: <span class="self">self</span>.<span class="ident">offset</span> <span class="op">+</span> <span class="ident">offset</span>,
-            <span class="ident">len</span>,
+    <span class="kw">pub fn </span>substring(<span class="kw-2">&amp;</span><span class="self">self</span>, bounds: <span class="kw">impl </span>RangeBounds) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>(offset, len) = bounds.index(<span class="self">self</span>.len);
+        Range {
+            doc: <span class="self">self</span>.doc,
+            offset: <span class="self">self</span>.offset + offset,
+            len,
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bounds</span>: <span class="kw">impl</span> <span class="ident">RangeBounds</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">offset</span>, <span class="ident">len</span>) <span class="op">=</span> <span class="ident">bounds</span>.<span class="ident">try_index</span>(<span class="self">self</span>.<span class="ident">len</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Some</span>(<span class="ident">Range</span> {
-            <span class="ident">doc</span>: <span class="self">self</span>.<span class="ident">doc</span>,
-            <span class="ident">offset</span>: <span class="self">self</span>.<span class="ident">offset</span> <span class="op">+</span> <span class="ident">offset</span>,
-            <span class="ident">len</span>,
+    <span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, bounds: <span class="kw">impl </span>RangeBounds) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>(offset, len) = bounds.try_index(<span class="self">self</span>.len)<span class="question-mark">?</span>;
+        <span class="prelude-val">Some</span>(Range {
+            doc: <span class="self">self</span>.doc,
+            offset: <span class="self">self</span>.offset + offset,
+            len,
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">split_at</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">mid</span>: <span class="ident">usize</span>) -&gt; (<span class="self">Self</span>, <span class="self">Self</span>) {
-        (<span class="self">self</span>.<span class="ident">substring</span>(..<span class="ident">mid</span>), <span class="self">self</span>.<span class="ident">substring</span>(<span class="ident">mid</span>..))
+    <span class="kw">pub fn </span>split_at(<span class="kw-2">&amp;</span><span class="self">self</span>, mid: usize) -&gt; (<span class="self">Self</span>, <span class="self">Self</span>) {
+        (<span class="self">self</span>.substring(..mid), <span class="self">self</span>.substring(mid..))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">chars</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Chars</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">str</span>(<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">chars</span>()
+    <span class="kw">pub fn </span>chars(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Chars&lt;<span class="lifetime">&#39;a</span>&gt; {
+        str(<span class="kw-2">*</span><span class="self">self</span>).chars()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">char_indices</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">CharIndices</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">str</span>(<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">char_indices</span>()
+    <span class="kw">pub fn </span>char_indices(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; CharIndices&lt;<span class="lifetime">&#39;a</span>&gt; {
+        str(<span class="kw-2">*</span><span class="self">self</span>).char_indices()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">u8</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">DoubleEndedIterator</span> <span class="op">+</span> <span class="ident">ExactSizeIterator</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
-        <span class="ident">bytes</span>(<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">iter</span>().<span class="ident">cloned</span>()
+    <span class="kw">pub fn </span>bytes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = u8&gt; + DoubleEndedIterator + ExactSizeIterator + <span class="lifetime">&#39;a </span>{
+        bytes(<span class="kw-2">*</span><span class="self">self</span>).iter().cloned()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">starts_with</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">prefix</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">bytes</span>(<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">starts_with</span>(<span class="ident">prefix</span>.<span class="ident">as_ref</span>())
+    <span class="kw">pub fn </span>starts_with(<span class="kw-2">&amp;</span><span class="self">self</span>, prefix: <span class="kw">impl </span>AsRef&lt;[u8]&gt;) -&gt; bool {
+        bytes(<span class="kw-2">*</span><span class="self">self</span>).starts_with(prefix.as_ref())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ends_with</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">suffix</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">bytes</span>(<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">ends_with</span>(<span class="ident">suffix</span>.<span class="ident">as_ref</span>())
+    <span class="kw">pub fn </span>ends_with(<span class="kw-2">&amp;</span><span class="self">self</span>, suffix: <span class="kw">impl </span>AsRef&lt;[u8]&gt;) -&gt; bool {
+        bytes(<span class="kw-2">*</span><span class="self">self</span>).ends_with(suffix.as_ref())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">needle</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="ident">find</span>(<span class="ident">bytes</span>(<span class="kw-2">*</span><span class="self">self</span>), <span class="ident">needle</span>.<span class="ident">as_ref</span>())
+    <span class="kw">pub fn </span>find(<span class="kw-2">&amp;</span><span class="self">self</span>, needle: <span class="kw">impl </span>AsRef&lt;[u8]&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;usize&gt; {
+        find(bytes(<span class="kw-2">*</span><span class="self">self</span>), needle.as_ref())
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">str</span>(<span class="ident">range</span>: <span class="ident">Range</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-    <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">debug</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">range</span>
-            .<span class="ident">doc</span>
-            .<span class="ident">get</span>(<span class="ident">range</span>.<span class="ident">offset</span>..<span class="ident">range</span>.<span class="ident">offset</span> <span class="op">+</span> <span class="ident">range</span>.<span class="ident">len</span>)
-            .<span class="ident">is_none</span>()
+<span class="kw">pub fn </span>str(range: Range) -&gt; <span class="kw-2">&amp;</span>str {
+    <span class="kw">if </span><span class="macro">cfg!</span>(debug)
+        &amp;&amp; range
+            .doc
+            .get(range.offset..range.offset + range.len)
+            .is_none()
     {
         <span class="macro">eprintln!</span>(
             <span class="string">&quot;doc={:?} offset={} len={}&quot;</span>,
-            <span class="ident">range</span>.<span class="ident">doc</span>, <span class="ident">range</span>.<span class="ident">offset</span>, <span class="ident">range</span>.<span class="ident">len</span>
+            range.doc, range.offset, range.len
         );
     }
-    <span class="kw-2">&amp;</span><span class="ident">range</span>.<span class="ident">doc</span>[<span class="ident">range</span>.<span class="ident">offset</span>..<span class="ident">range</span>.<span class="ident">offset</span> <span class="op">+</span> <span class="ident">range</span>.<span class="ident">len</span>]
+    <span class="kw-2">&amp;</span>range.doc[range.offset..range.offset + range.len]
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bytes</span>(<span class="ident">range</span>: <span class="ident">Range</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-    <span class="kw-2">&amp;</span><span class="ident">range</span>.<span class="ident">doc</span>.<span class="ident">as_bytes</span>()[<span class="ident">range</span>.<span class="ident">offset</span>..<span class="ident">range</span>.<span class="ident">offset</span> <span class="op">+</span> <span class="ident">range</span>.<span class="ident">len</span>]
+<span class="kw">pub fn </span>bytes(range: Range) -&gt; <span class="kw-2">&amp;</span>[u8] {
+    <span class="kw-2">&amp;</span>range.doc.as_bytes()[range.offset..range.offset + range.len]
 }
 
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Range</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="ident">bytes</span>(<span class="kw-2">*</span><span class="self">self</span>)
+<span class="kw">impl </span>AsRef&lt;[u8]&gt; <span class="kw">for </span>Range&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        bytes(<span class="kw-2">*</span><span class="self">self</span>)
     }
 }
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">RangeBounds</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Debug</span> {
-    <span class="comment">// Returns (offset, len).</span>
-    <span class="kw">fn</span> <span class="ident">try_index</span>(<span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">usize</span>)<span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">index</span>(<span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; (<span class="ident">usize</span>, <span class="ident">usize</span>) {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">try_index</span>(<span class="ident">len</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">range</span>) =&gt; <span class="ident">range</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;index out of range, index={:?}, len={}&quot;</span>, <span class="self">self</span>, <span class="ident">len</span>),
+<span class="kw">pub trait </span>RangeBounds: Sized + Clone + Debug {
+    <span class="comment">// Returns (offset, len).
+    </span><span class="kw">fn </span>try_index(<span class="self">self</span>, len: usize) -&gt; <span class="prelude-ty">Option</span>&lt;(usize, usize)&gt;;
+    <span class="kw">fn </span>index(<span class="self">self</span>, len: usize) -&gt; (usize, usize) {
+        <span class="kw">match </span><span class="self">self</span>.clone().try_index(len) {
+            <span class="prelude-val">Some</span>(range) =&gt; range,
+            <span class="prelude-val">None </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;index out of range, index={:?}, len={}&quot;</span>, <span class="self">self</span>, len),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">RangeBounds</span> <span class="kw">for</span> <span class="ident">ops::Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">try_index</span>(<span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">start</span> <span class="op">&lt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">end</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">end</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">len</span> {
-            <span class="prelude-val">Some</span>((<span class="self">self</span>.<span class="ident">start</span>, <span class="self">self</span>.<span class="ident">end</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">start</span>))
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+<span class="kw">impl </span>RangeBounds <span class="kw">for </span>ops::Range&lt;usize&gt; {
+    <span class="kw">fn </span>try_index(<span class="self">self</span>, len: usize) -&gt; <span class="prelude-ty">Option</span>&lt;(usize, usize)&gt; {
+        <span class="kw">if </span><span class="self">self</span>.start &lt;= <span class="self">self</span>.end &amp;&amp; <span class="self">self</span>.end &lt;= len {
+            <span class="prelude-val">Some</span>((<span class="self">self</span>.start, <span class="self">self</span>.end - <span class="self">self</span>.start))
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 }
 
-<span class="kw">impl</span> <span class="ident">RangeBounds</span> <span class="kw">for</span> <span class="ident">RangeFrom</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">try_index</span>(<span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">start</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">len</span> {
-            <span class="prelude-val">Some</span>((<span class="self">self</span>.<span class="ident">start</span>, <span class="ident">len</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">start</span>))
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+<span class="kw">impl </span>RangeBounds <span class="kw">for </span>RangeFrom&lt;usize&gt; {
+    <span class="kw">fn </span>try_index(<span class="self">self</span>, len: usize) -&gt; <span class="prelude-ty">Option</span>&lt;(usize, usize)&gt; {
+        <span class="kw">if </span><span class="self">self</span>.start &lt;= len {
+            <span class="prelude-val">Some</span>((<span class="self">self</span>.start, len - <span class="self">self</span>.start))
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 }
 
-<span class="kw">impl</span> <span class="ident">RangeBounds</span> <span class="kw">for</span> <span class="ident">RangeTo</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">try_index</span>(<span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">end</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">len</span> {
-            <span class="prelude-val">Some</span>((<span class="number">0</span>, <span class="self">self</span>.<span class="ident">end</span>))
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+<span class="kw">impl </span>RangeBounds <span class="kw">for </span>RangeTo&lt;usize&gt; {
+    <span class="kw">fn </span>try_index(<span class="self">self</span>, len: usize) -&gt; <span class="prelude-ty">Option</span>&lt;(usize, usize)&gt; {
+        <span class="kw">if </span><span class="self">self</span>.end &lt;= len {
+            <span class="prelude-val">Some</span>((<span class="number">0</span>, <span class="self">self</span>.end))
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 }
 
-<span class="kw">impl</span> <span class="ident">RangeBounds</span> <span class="kw">for</span> <span class="ident">RangeFull</span> {
-    <span class="kw">fn</span> <span class="ident">try_index</span>(<span class="self">self</span>, <span class="ident">len</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">usize</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>((<span class="number">0</span>, <span class="ident">len</span>))
+<span class="kw">impl </span>RangeBounds <span class="kw">for </span>RangeFull {
+    <span class="kw">fn </span>try_index(<span class="self">self</span>, len: usize) -&gt; <span class="prelude-ty">Option</span>&lt;(usize, usize)&gt; {
+        <span class="prelude-val">Some</span>((<span class="number">0</span>, len))
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="dissimilar" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="dissimilar" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-util-0.8.5/src/options.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>options.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_util/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-util-0.8.5/src/options.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>options.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_util/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -142,149 +142,149 @@
 <span id="142">142</span>
 <span id="143">143</span>
 <span id="144">144</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Shared traits for the options API.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Shared traits for the options API.
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::constants::FormattedSize</span>;
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;write&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::constants::FormattedSize;
 
-<span class="comment">// TRAITS</span>
-<span class="comment">// ------</span>
+<span class="comment">// TRAITS
+// ------
 
-<span class="doccomment">/// Shared trait for all writer options.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">WriteOptions</span>: <span class="ident">Default</span> {
-    <span class="doccomment">/// Determine if the options are valid.</span>
-    <span class="kw">fn</span> <span class="ident">is_valid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+</span><span class="doccomment">/// Shared trait for all writer options.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;write&quot;</span>)]
+</span><span class="kw">pub trait </span>WriteOptions: Default {
+    <span class="doccomment">/// Determine if the options are valid.
+    </span><span class="kw">fn </span>is_valid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool;
 
-    <span class="doccomment">/// Get an upper bound on the buffer size.</span>
-    <span class="kw">fn</span> <span class="ident">buffer_size</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">FormattedSize</span>, <span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span>;
+    <span class="doccomment">/// Get an upper bound on the buffer size.
+    </span><span class="kw">fn </span>buffer_size&lt;T: FormattedSize, <span class="kw">const </span>FORMAT: u128&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize;
 }
 
-<span class="doccomment">/// Shared trait for all parser options.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parse&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ParseOptions</span>: <span class="ident">Default</span> {
-    <span class="doccomment">/// Determine if the options are valid.</span>
-    <span class="kw">fn</span> <span class="ident">is_valid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+<span class="doccomment">/// Shared trait for all parser options.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;parse&quot;</span>)]
+</span><span class="kw">pub trait </span>ParseOptions: Default {
+    <span class="doccomment">/// Determine if the options are valid.
+    </span><span class="kw">fn </span>is_valid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool;
 }
 
-<span class="comment">// PRE-DEFINED CONSTANTS</span>
-<span class="comment">// ---------------------</span>
+<span class="comment">// PRE-DEFINED CONSTANTS
+// ---------------------
 
-<span class="comment">// The following constants have the following signifiers:</span>
-<span class="comment">//  ${X}_LITERAL - Applies to all literal values for that language.</span>
-<span class="comment">//  ${X}_STRING - Applies to all string values for that language.</span>
-<span class="comment">//  ${X} - Applies to all values for that language.</span>
-<span class="comment">//  ${X}_(NAN|INF|INFINITY) - Applies to only a single special value.</span>
-<span class="comment">//  IF it&#39;s not defined, all values are the default.</span>
+// The following constants have the following signifiers:
+//  ${X}_LITERAL - Applies to all literal values for that language.
+//  ${X}_STRING - Applies to all string values for that language.
+//  ${X} - Applies to all values for that language.
+//  ${X}_(NAN|INF|INFINITY) - Applies to only a single special value.
+//  IF it&#39;s not defined, all values are the default.
 
-<span class="macro">macro_rules!</span> <span class="ident">literal</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">ident</span>) =&gt; {
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>;
+</span><span class="macro">macro_rules! </span>literal {
+    (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$value</span>:ident) =&gt; {
+        <span class="kw">pub const </span><span class="macro-nonterminal">$name</span>: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[u8]&gt; = <span class="macro-nonterminal">$value</span>;
     };
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">literal</span>) =&gt; {
-        <span class="kw">pub</span> <span class="kw">const</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>);
+    (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$value</span>:literal) =&gt; {
+        <span class="kw">pub const </span><span class="macro-nonterminal">$name</span>: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[u8]&gt; = <span class="prelude-val">Some</span>(<span class="macro-nonterminal">$value</span>);
     };
 }
 
-<span class="macro">literal!</span>(<span class="ident">RUST_LITERAL</span>, <span class="prelude-val">None</span>);
-<span class="comment">// RUST_STRING</span>
-<span class="macro">literal!</span>(<span class="ident">PYTHON_LITERAL</span>, <span class="prelude-val">None</span>);
-<span class="comment">// PYTHON_STRING</span>
-<span class="macro">literal!</span>(<span class="ident">CXX_LITERAL_NAN</span>, <span class="string">b&quot;NAN&quot;</span>);
-<span class="macro">literal!</span>(<span class="ident">CXX_LITERAL_INF</span>, <span class="string">b&quot;INFINITY&quot;</span>);
-<span class="macro">literal!</span>(<span class="ident">CXX_LITERAL_INFINITY</span>, <span class="string">b&quot;INFINITY&quot;</span>);
-<span class="comment">// CXX_STRING</span>
-<span class="macro">literal!</span>(<span class="ident">C_LITERAL_NAN</span>, <span class="string">b&quot;NAN&quot;</span>);
-<span class="macro">literal!</span>(<span class="ident">C_LITERAL_INF</span>, <span class="string">b&quot;INFINITY&quot;</span>);
-<span class="macro">literal!</span>(<span class="ident">C_LITERAL_INFINITY</span>, <span class="string">b&quot;INFINITY&quot;</span>);
-<span class="comment">// C_STRING</span>
-<span class="macro">literal!</span>(<span class="ident">RUBY</span>, <span class="prelude-val">None</span>);
-<span class="macro">literal!</span>(<span class="ident">SWIFT_LITERAL</span>, <span class="prelude-val">None</span>);
-<span class="comment">// SWIFT_STRING</span>
-<span class="macro">literal!</span>(<span class="ident">GO_LITERAL</span>, <span class="prelude-val">None</span>);
-<span class="comment">// GO_STRING</span>
-<span class="macro">literal!</span>(<span class="ident">HASKELL_LITERAL</span>, <span class="prelude-val">None</span>);
-<span class="macro">literal!</span>(<span class="ident">HASKELL_STRING_INF</span>, <span class="string">b&quot;Infinity&quot;</span>);
-<span class="macro">literal!</span>(<span class="ident">HASKELL_STRING_INFINITY</span>, <span class="string">b&quot;Infinity&quot;</span>);
-<span class="macro">literal!</span>(<span class="ident">JAVASCRIPT_INF</span>, <span class="string">b&quot;Infinity&quot;</span>);
-<span class="macro">literal!</span>(<span class="ident">JAVASCRIPT_INFINITY</span>, <span class="string">b&quot;Infinity&quot;</span>);
-<span class="macro">literal!</span>(<span class="ident">PERL_LITERAL</span>, <span class="prelude-val">None</span>);
-<span class="comment">// PERL_STRING</span>
-<span class="macro">literal!</span>(<span class="ident">PHP_LITERAL_NAN</span>, <span class="string">b&quot;NAN&quot;</span>);
-<span class="macro">literal!</span>(<span class="ident">PHP_LITERAL_INF</span>, <span class="string">b&quot;INF&quot;</span>);
-<span class="macro">literal!</span>(<span class="ident">PHP_LITERAL_INFINITY</span>, <span class="string">b&quot;INF&quot;</span>);
-<span class="comment">// PHP_STRING</span>
-<span class="macro">literal!</span>(<span class="ident">JAVA_LITERAL</span>, <span class="prelude-val">None</span>);
-<span class="macro">literal!</span>(<span class="ident">JAVA_STRING_INF</span>, <span class="string">b&quot;Infinity&quot;</span>);
-<span class="macro">literal!</span>(<span class="ident">JAVA_STRING_INFINITY</span>, <span class="string">b&quot;Infinity&quot;</span>);
-<span class="macro">literal!</span>(<span class="ident">R_LITERAL_INF</span>, <span class="string">b&quot;Inf&quot;</span>);
-<span class="macro">literal!</span>(<span class="ident">R_LITERAL_INFINITY</span>, <span class="string">b&quot;Inf&quot;</span>);
-<span class="comment">// R_STRING</span>
-<span class="macro">literal!</span>(<span class="ident">KOTLIN_LITERAL</span>, <span class="prelude-val">None</span>);
-<span class="macro">literal!</span>(<span class="ident">KOTLIN_STRING_INF</span>, <span class="string">b&quot;Infinity&quot;</span>);
-<span class="macro">literal!</span>(<span class="ident">KOTLIN_STRING_INFINITY</span>, <span class="string">b&quot;Infinity&quot;</span>);
-<span class="macro">literal!</span>(<span class="ident">JULIA_LITERAL_INF</span>, <span class="string">b&quot;Inf&quot;</span>);
-<span class="macro">literal!</span>(<span class="ident">JULIA_LITERAL_INFINITY</span>, <span class="string">b&quot;Inf&quot;</span>);
-<span class="comment">// JULIA_STRING</span>
-<span class="macro">literal!</span>(<span class="ident">CSHARP_LITERAL</span>, <span class="prelude-val">None</span>);
-<span class="macro">literal!</span>(<span class="ident">CSHARP_STRING_INF</span>, <span class="string">b&quot;Infinity&quot;</span>);
-<span class="macro">literal!</span>(<span class="ident">CSHARP_STRING_INFINITY</span>, <span class="string">b&quot;Infinity&quot;</span>);
-<span class="macro">literal!</span>(<span class="ident">KAWA</span>, <span class="prelude-val">None</span>);
-<span class="macro">literal!</span>(<span class="ident">GAMBITC</span>, <span class="prelude-val">None</span>);
-<span class="macro">literal!</span>(<span class="ident">GUILE</span>, <span class="prelude-val">None</span>);
-<span class="macro">literal!</span>(<span class="ident">CLOJURE_LITERAL</span>, <span class="prelude-val">None</span>);
-<span class="macro">literal!</span>(<span class="ident">CLOJURE_STRING_INF</span>, <span class="string">b&quot;Infinity&quot;</span>);
-<span class="macro">literal!</span>(<span class="ident">CLOJURE_STRING_INFINITY</span>, <span class="string">b&quot;Infinity&quot;</span>);
-<span class="macro">literal!</span>(<span class="ident">ERLANG_LITERAL_NAN</span>, <span class="string">b&quot;nan&quot;</span>);
-<span class="macro">literal!</span>(<span class="ident">ERLANG_STRING</span>, <span class="prelude-val">None</span>);
-<span class="macro">literal!</span>(<span class="ident">ELM_LITERAL</span>, <span class="prelude-val">None</span>);
-<span class="macro">literal!</span>(<span class="ident">ELM_STRING_NAN</span>, <span class="prelude-val">None</span>);
-<span class="macro">literal!</span>(<span class="ident">ELM_STRING_INF</span>, <span class="string">b&quot;Infinity&quot;</span>);
-<span class="macro">literal!</span>(<span class="ident">ELM_STRING_INFINITY</span>, <span class="string">b&quot;Infinity&quot;</span>);
-<span class="macro">literal!</span>(<span class="ident">SCALA_LITERAL</span>, <span class="prelude-val">None</span>);
-<span class="macro">literal!</span>(<span class="ident">SCALA_STRING_INF</span>, <span class="string">b&quot;Infinity&quot;</span>);
-<span class="macro">literal!</span>(<span class="ident">SCALA_STRING_INFINITY</span>, <span class="string">b&quot;Infinity&quot;</span>);
-<span class="macro">literal!</span>(<span class="ident">ELIXIR</span>, <span class="prelude-val">None</span>);
-<span class="macro">literal!</span>(<span class="ident">FORTRAN_LITERAL</span>, <span class="prelude-val">None</span>);
-<span class="comment">// FORTRAN_STRING</span>
-<span class="macro">literal!</span>(<span class="ident">D_LITERAL</span>, <span class="prelude-val">None</span>);
-<span class="comment">// D_STRING</span>
-<span class="macro">literal!</span>(<span class="ident">COFFEESCRIPT_INF</span>, <span class="string">b&quot;Infinity&quot;</span>);
-<span class="macro">literal!</span>(<span class="ident">COFFEESCRIPT_INFINITY</span>, <span class="string">b&quot;Infinity&quot;</span>);
-<span class="macro">literal!</span>(<span class="ident">COBOL</span>, <span class="prelude-val">None</span>);
-<span class="macro">literal!</span>(<span class="ident">FSHARP_LITERAL_NAN</span>, <span class="string">b&quot;nan&quot;</span>);
-<span class="macro">literal!</span>(<span class="ident">FSHARP_LITERAL_INF</span>, <span class="string">b&quot;infinity&quot;</span>);
-<span class="macro">literal!</span>(<span class="ident">FSHARP_LITERAL_INFINITY</span>, <span class="string">b&quot;infinity&quot;</span>);
-<span class="comment">// FSHARP_STRING</span>
-<span class="macro">literal!</span>(<span class="ident">VB_LITERAL</span>, <span class="prelude-val">None</span>);
-<span class="macro">literal!</span>(<span class="ident">VB_STRING_INF</span>, <span class="prelude-val">None</span>);
-<span class="macro">literal!</span>(<span class="ident">VB_STRING_INFINITY</span>, <span class="prelude-val">None</span>);
-<span class="macro">literal!</span>(<span class="ident">OCAML_LITERAL_NAN</span>, <span class="string">b&quot;nan&quot;</span>);
-<span class="macro">literal!</span>(<span class="ident">OCAML_LITERAL_INF</span>, <span class="string">b&quot;infinity&quot;</span>);
-<span class="macro">literal!</span>(<span class="ident">OCAML_LITERAL_INFINITY</span>, <span class="string">b&quot;infinity&quot;</span>);
-<span class="comment">// OCAML_STRING</span>
-<span class="macro">literal!</span>(<span class="ident">OBJECTIVEC</span>, <span class="prelude-val">None</span>);
-<span class="macro">literal!</span>(<span class="ident">REASONML_LITERAL_NAN</span>, <span class="string">b&quot;nan&quot;</span>);
-<span class="macro">literal!</span>(<span class="ident">REASONML_LITERAL_INF</span>, <span class="string">b&quot;infinity&quot;</span>);
-<span class="macro">literal!</span>(<span class="ident">REASONML_LITERAL_INFINITY</span>, <span class="string">b&quot;infinity&quot;</span>);
-<span class="comment">// REASONML_STRING</span>
-<span class="macro">literal!</span>(<span class="ident">MATLAB_LITERAL_INF</span>, <span class="string">b&quot;inf&quot;</span>);
-<span class="macro">literal!</span>(<span class="ident">MATLAB_LITERAL_INFINITY</span>, <span class="string">b&quot;Inf&quot;</span>);
-<span class="comment">// MATLAB_STRING</span>
-<span class="macro">literal!</span>(<span class="ident">ZIG_LITERAL</span>, <span class="prelude-val">None</span>);
-<span class="comment">// ZIG_STRING</span>
-<span class="macro">literal!</span>(<span class="ident">SAGE_LITERAL_INF</span>, <span class="string">b&quot;infinity&quot;</span>);
-<span class="macro">literal!</span>(<span class="ident">SAGE_LITERAL_INFINITY</span>, <span class="string">b&quot;Infinity&quot;</span>);
-<span class="comment">// SAGE_STRING</span>
-<span class="macro">literal!</span>(<span class="ident">JSON</span>, <span class="prelude-val">None</span>);
-<span class="macro">literal!</span>(<span class="ident">TOML</span>, <span class="prelude-val">None</span>);
-<span class="macro">literal!</span>(<span class="ident">YAML</span>, <span class="prelude-val">None</span>);
-<span class="macro">literal!</span>(<span class="ident">XML_INF</span>, <span class="prelude-val">None</span>);
-<span class="macro">literal!</span>(<span class="ident">XML_INFINITY</span>, <span class="prelude-val">None</span>);
-<span class="macro">literal!</span>(<span class="ident">SQLITE</span>, <span class="prelude-val">None</span>);
-<span class="macro">literal!</span>(<span class="ident">POSTGRESQL</span>, <span class="prelude-val">None</span>);
-<span class="macro">literal!</span>(<span class="ident">MYSQL</span>, <span class="prelude-val">None</span>);
-<span class="macro">literal!</span>(<span class="ident">MONGODB_INF</span>, <span class="string">b&quot;Infinity&quot;</span>);
-<span class="macro">literal!</span>(<span class="ident">MONGODB_INFINITY</span>, <span class="string">b&quot;Infinity&quot;</span>);
+<span class="macro">literal!</span>(RUST_LITERAL, <span class="prelude-val">None</span>);
+<span class="comment">// RUST_STRING
+</span><span class="macro">literal!</span>(PYTHON_LITERAL, <span class="prelude-val">None</span>);
+<span class="comment">// PYTHON_STRING
+</span><span class="macro">literal!</span>(CXX_LITERAL_NAN, <span class="string">b&quot;NAN&quot;</span>);
+<span class="macro">literal!</span>(CXX_LITERAL_INF, <span class="string">b&quot;INFINITY&quot;</span>);
+<span class="macro">literal!</span>(CXX_LITERAL_INFINITY, <span class="string">b&quot;INFINITY&quot;</span>);
+<span class="comment">// CXX_STRING
+</span><span class="macro">literal!</span>(C_LITERAL_NAN, <span class="string">b&quot;NAN&quot;</span>);
+<span class="macro">literal!</span>(C_LITERAL_INF, <span class="string">b&quot;INFINITY&quot;</span>);
+<span class="macro">literal!</span>(C_LITERAL_INFINITY, <span class="string">b&quot;INFINITY&quot;</span>);
+<span class="comment">// C_STRING
+</span><span class="macro">literal!</span>(RUBY, <span class="prelude-val">None</span>);
+<span class="macro">literal!</span>(SWIFT_LITERAL, <span class="prelude-val">None</span>);
+<span class="comment">// SWIFT_STRING
+</span><span class="macro">literal!</span>(GO_LITERAL, <span class="prelude-val">None</span>);
+<span class="comment">// GO_STRING
+</span><span class="macro">literal!</span>(HASKELL_LITERAL, <span class="prelude-val">None</span>);
+<span class="macro">literal!</span>(HASKELL_STRING_INF, <span class="string">b&quot;Infinity&quot;</span>);
+<span class="macro">literal!</span>(HASKELL_STRING_INFINITY, <span class="string">b&quot;Infinity&quot;</span>);
+<span class="macro">literal!</span>(JAVASCRIPT_INF, <span class="string">b&quot;Infinity&quot;</span>);
+<span class="macro">literal!</span>(JAVASCRIPT_INFINITY, <span class="string">b&quot;Infinity&quot;</span>);
+<span class="macro">literal!</span>(PERL_LITERAL, <span class="prelude-val">None</span>);
+<span class="comment">// PERL_STRING
+</span><span class="macro">literal!</span>(PHP_LITERAL_NAN, <span class="string">b&quot;NAN&quot;</span>);
+<span class="macro">literal!</span>(PHP_LITERAL_INF, <span class="string">b&quot;INF&quot;</span>);
+<span class="macro">literal!</span>(PHP_LITERAL_INFINITY, <span class="string">b&quot;INF&quot;</span>);
+<span class="comment">// PHP_STRING
+</span><span class="macro">literal!</span>(JAVA_LITERAL, <span class="prelude-val">None</span>);
+<span class="macro">literal!</span>(JAVA_STRING_INF, <span class="string">b&quot;Infinity&quot;</span>);
+<span class="macro">literal!</span>(JAVA_STRING_INFINITY, <span class="string">b&quot;Infinity&quot;</span>);
+<span class="macro">literal!</span>(R_LITERAL_INF, <span class="string">b&quot;Inf&quot;</span>);
+<span class="macro">literal!</span>(R_LITERAL_INFINITY, <span class="string">b&quot;Inf&quot;</span>);
+<span class="comment">// R_STRING
+</span><span class="macro">literal!</span>(KOTLIN_LITERAL, <span class="prelude-val">None</span>);
+<span class="macro">literal!</span>(KOTLIN_STRING_INF, <span class="string">b&quot;Infinity&quot;</span>);
+<span class="macro">literal!</span>(KOTLIN_STRING_INFINITY, <span class="string">b&quot;Infinity&quot;</span>);
+<span class="macro">literal!</span>(JULIA_LITERAL_INF, <span class="string">b&quot;Inf&quot;</span>);
+<span class="macro">literal!</span>(JULIA_LITERAL_INFINITY, <span class="string">b&quot;Inf&quot;</span>);
+<span class="comment">// JULIA_STRING
+</span><span class="macro">literal!</span>(CSHARP_LITERAL, <span class="prelude-val">None</span>);
+<span class="macro">literal!</span>(CSHARP_STRING_INF, <span class="string">b&quot;Infinity&quot;</span>);
+<span class="macro">literal!</span>(CSHARP_STRING_INFINITY, <span class="string">b&quot;Infinity&quot;</span>);
+<span class="macro">literal!</span>(KAWA, <span class="prelude-val">None</span>);
+<span class="macro">literal!</span>(GAMBITC, <span class="prelude-val">None</span>);
+<span class="macro">literal!</span>(GUILE, <span class="prelude-val">None</span>);
+<span class="macro">literal!</span>(CLOJURE_LITERAL, <span class="prelude-val">None</span>);
+<span class="macro">literal!</span>(CLOJURE_STRING_INF, <span class="string">b&quot;Infinity&quot;</span>);
+<span class="macro">literal!</span>(CLOJURE_STRING_INFINITY, <span class="string">b&quot;Infinity&quot;</span>);
+<span class="macro">literal!</span>(ERLANG_LITERAL_NAN, <span class="string">b&quot;nan&quot;</span>);
+<span class="macro">literal!</span>(ERLANG_STRING, <span class="prelude-val">None</span>);
+<span class="macro">literal!</span>(ELM_LITERAL, <span class="prelude-val">None</span>);
+<span class="macro">literal!</span>(ELM_STRING_NAN, <span class="prelude-val">None</span>);
+<span class="macro">literal!</span>(ELM_STRING_INF, <span class="string">b&quot;Infinity&quot;</span>);
+<span class="macro">literal!</span>(ELM_STRING_INFINITY, <span class="string">b&quot;Infinity&quot;</span>);
+<span class="macro">literal!</span>(SCALA_LITERAL, <span class="prelude-val">None</span>);
+<span class="macro">literal!</span>(SCALA_STRING_INF, <span class="string">b&quot;Infinity&quot;</span>);
+<span class="macro">literal!</span>(SCALA_STRING_INFINITY, <span class="string">b&quot;Infinity&quot;</span>);
+<span class="macro">literal!</span>(ELIXIR, <span class="prelude-val">None</span>);
+<span class="macro">literal!</span>(FORTRAN_LITERAL, <span class="prelude-val">None</span>);
+<span class="comment">// FORTRAN_STRING
+</span><span class="macro">literal!</span>(D_LITERAL, <span class="prelude-val">None</span>);
+<span class="comment">// D_STRING
+</span><span class="macro">literal!</span>(COFFEESCRIPT_INF, <span class="string">b&quot;Infinity&quot;</span>);
+<span class="macro">literal!</span>(COFFEESCRIPT_INFINITY, <span class="string">b&quot;Infinity&quot;</span>);
+<span class="macro">literal!</span>(COBOL, <span class="prelude-val">None</span>);
+<span class="macro">literal!</span>(FSHARP_LITERAL_NAN, <span class="string">b&quot;nan&quot;</span>);
+<span class="macro">literal!</span>(FSHARP_LITERAL_INF, <span class="string">b&quot;infinity&quot;</span>);
+<span class="macro">literal!</span>(FSHARP_LITERAL_INFINITY, <span class="string">b&quot;infinity&quot;</span>);
+<span class="comment">// FSHARP_STRING
+</span><span class="macro">literal!</span>(VB_LITERAL, <span class="prelude-val">None</span>);
+<span class="macro">literal!</span>(VB_STRING_INF, <span class="prelude-val">None</span>);
+<span class="macro">literal!</span>(VB_STRING_INFINITY, <span class="prelude-val">None</span>);
+<span class="macro">literal!</span>(OCAML_LITERAL_NAN, <span class="string">b&quot;nan&quot;</span>);
+<span class="macro">literal!</span>(OCAML_LITERAL_INF, <span class="string">b&quot;infinity&quot;</span>);
+<span class="macro">literal!</span>(OCAML_LITERAL_INFINITY, <span class="string">b&quot;infinity&quot;</span>);
+<span class="comment">// OCAML_STRING
+</span><span class="macro">literal!</span>(OBJECTIVEC, <span class="prelude-val">None</span>);
+<span class="macro">literal!</span>(REASONML_LITERAL_NAN, <span class="string">b&quot;nan&quot;</span>);
+<span class="macro">literal!</span>(REASONML_LITERAL_INF, <span class="string">b&quot;infinity&quot;</span>);
+<span class="macro">literal!</span>(REASONML_LITERAL_INFINITY, <span class="string">b&quot;infinity&quot;</span>);
+<span class="comment">// REASONML_STRING
+</span><span class="macro">literal!</span>(MATLAB_LITERAL_INF, <span class="string">b&quot;inf&quot;</span>);
+<span class="macro">literal!</span>(MATLAB_LITERAL_INFINITY, <span class="string">b&quot;Inf&quot;</span>);
+<span class="comment">// MATLAB_STRING
+</span><span class="macro">literal!</span>(ZIG_LITERAL, <span class="prelude-val">None</span>);
+<span class="comment">// ZIG_STRING
+</span><span class="macro">literal!</span>(SAGE_LITERAL_INF, <span class="string">b&quot;infinity&quot;</span>);
+<span class="macro">literal!</span>(SAGE_LITERAL_INFINITY, <span class="string">b&quot;Infinity&quot;</span>);
+<span class="comment">// SAGE_STRING
+</span><span class="macro">literal!</span>(JSON, <span class="prelude-val">None</span>);
+<span class="macro">literal!</span>(TOML, <span class="prelude-val">None</span>);
+<span class="macro">literal!</span>(YAML, <span class="prelude-val">None</span>);
+<span class="macro">literal!</span>(XML_INF, <span class="prelude-val">None</span>);
+<span class="macro">literal!</span>(XML_INFINITY, <span class="prelude-val">None</span>);
+<span class="macro">literal!</span>(SQLITE, <span class="prelude-val">None</span>);
+<span class="macro">literal!</span>(POSTGRESQL, <span class="prelude-val">None</span>);
+<span class="macro">literal!</span>(MYSQL, <span class="prelude-val">None</span>);
+<span class="macro">literal!</span>(MONGODB_INF, <span class="string">b&quot;Infinity&quot;</span>);
+<span class="macro">literal!</span>(MONGODB_INFINITY, <span class="string">b&quot;Infinity&quot;</span>);
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

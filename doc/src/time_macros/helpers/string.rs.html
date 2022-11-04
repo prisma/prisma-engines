@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-macros-0.2.4/src/helpers/string.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>string.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../time_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../time_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../time_macros/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-macros-0.2.4/src/helpers/string.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>string.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../time_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../time_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../time_macros/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -186,193 +186,193 @@
 <span id="186">186</span>
 <span id="187">187</span>
 <span id="188">188</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::ops</span>::{<span class="ident">Index</span>, <span class="ident">RangeFrom</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>std::ops::{Index, RangeFrom};
 
-<span class="kw">use</span> <span class="ident">proc_macro::Span</span>;
+<span class="kw">use </span>proc_macro::Span;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Error</span>;
+<span class="kw">use </span><span class="kw">crate</span>::Error;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">proc_macro::Literal</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Span</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">token</span>.<span class="ident">span</span>();
-    <span class="kw">let</span> <span class="ident">repr</span> <span class="op">=</span> <span class="ident">token</span>.<span class="ident">to_string</span>();
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse(token: <span class="kw-2">&amp;</span>proc_macro::Literal) -&gt; <span class="prelude-ty">Result</span>&lt;(Span, Vec&lt;u8&gt;), Error&gt; {
+    <span class="kw">let </span>span = token.span();
+    <span class="kw">let </span>repr = token.to_string();
 
-    <span class="kw">match</span> <span class="ident">repr</span>.<span class="ident">as_bytes</span>() {
-        [<span class="string">b&#39;&quot;&#39;</span>, ..] =&gt; <span class="prelude-val">Ok</span>((<span class="ident">span</span>, <span class="ident">parse_lit_str_cooked</span>(<span class="kw-2">&amp;</span><span class="ident">repr</span>[<span class="number">1</span>..]))),
-        [<span class="string">b&#39;b&#39;</span>, <span class="string">b&#39;&quot;&#39;</span>, <span class="ident">rest</span> @ ..] =&gt; <span class="prelude-val">Ok</span>((<span class="ident">span</span>, <span class="ident">parse_lit_byte_str_cooked</span>(<span class="ident">rest</span>))),
-        [<span class="string">b&#39;r&#39;</span>, <span class="ident">rest</span> @ ..] <span class="op">|</span> [<span class="string">b&#39;b&#39;</span>, <span class="string">b&#39;r&#39;</span>, <span class="ident">rest</span> @ ..] =&gt; <span class="prelude-val">Ok</span>((<span class="ident">span</span>, <span class="ident">parse_lit_str_raw</span>(<span class="ident">rest</span>))),
-        <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::ExpectedString</span> {
-            <span class="ident">span_start</span>: <span class="prelude-val">Some</span>(<span class="ident">span</span>),
-            <span class="ident">span_end</span>: <span class="prelude-val">Some</span>(<span class="ident">span</span>),
+    <span class="kw">match </span>repr.as_bytes() {
+        [<span class="string">b&#39;&quot;&#39;</span>, ..] =&gt; <span class="prelude-val">Ok</span>((span, parse_lit_str_cooked(<span class="kw-2">&amp;</span>repr[<span class="number">1</span>..]))),
+        [<span class="string">b&#39;b&#39;</span>, <span class="string">b&#39;&quot;&#39;</span>, rest @ ..] =&gt; <span class="prelude-val">Ok</span>((span, parse_lit_byte_str_cooked(rest))),
+        [<span class="string">b&#39;r&#39;</span>, rest @ ..] | [<span class="string">b&#39;b&#39;</span>, <span class="string">b&#39;r&#39;</span>, rest @ ..] =&gt; <span class="prelude-val">Ok</span>((span, parse_lit_str_raw(rest))),
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(Error::ExpectedString {
+            span_start: <span class="prelude-val">Some</span>(span),
+            span_end: <span class="prelude-val">Some</span>(span),
         }),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">byte</span>(<span class="ident">s</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="ident">u8</span> {
-    <span class="ident">s</span>.<span class="ident">as_ref</span>().<span class="ident">get</span>(<span class="ident">idx</span>).<span class="ident">copied</span>().<span class="ident">unwrap_or_default</span>()
+<span class="kw">fn </span>byte(s: <span class="kw">impl </span>AsRef&lt;[u8]&gt;, idx: usize) -&gt; u8 {
+    s.as_ref().get(idx).copied().unwrap_or_default()
 }
 
-<span class="kw">fn</span> <span class="ident">parse_lit_str_cooked</span>(<span class="kw-2">mut</span> <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">content</span> <span class="op">=</span> <span class="ident">String::new</span>();
-    <span class="lifetime">&#39;outer</span>: <span class="kw">loop</span> {
-        <span class="kw">let</span> <span class="ident">ch</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">byte</span>(<span class="ident">s</span>, <span class="number">0</span>) {
-            <span class="string">b&#39;&quot;&#39;</span> =&gt; <span class="kw">break</span>,
-            <span class="string">b&#39;\\&#39;</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">byte</span>(<span class="ident">s</span>, <span class="number">1</span>);
-                <span class="ident">s</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="number">2</span>..];
-                <span class="kw">match</span> <span class="ident">b</span> {
-                    <span class="string">b&#39;x&#39;</span> =&gt; {
-                        <span class="kw">let</span> (<span class="ident">byte</span>, <span class="ident">rest</span>) <span class="op">=</span> <span class="ident">backslash_x</span>(<span class="ident">s</span>);
-                        <span class="ident">s</span> <span class="op">=</span> <span class="ident">rest</span>;
-                        <span class="ident">char::from_u32</span>(<span class="ident">u32::from</span>(<span class="ident">byte</span>)).<span class="ident">expect</span>(<span class="string">&quot;byte was just validated&quot;</span>)
+<span class="kw">fn </span>parse_lit_str_cooked(<span class="kw-2">mut </span>s: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;u8&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>content = String::new();
+    <span class="lifetime">&#39;outer</span>: <span class="kw">loop </span>{
+        <span class="kw">let </span>ch = <span class="kw">match </span>byte(s, <span class="number">0</span>) {
+            <span class="string">b&#39;&quot;&#39; </span>=&gt; <span class="kw">break</span>,
+            <span class="string">b&#39;\\&#39; </span>=&gt; {
+                <span class="kw">let </span>b = byte(s, <span class="number">1</span>);
+                s = <span class="kw-2">&amp;</span>s[<span class="number">2</span>..];
+                <span class="kw">match </span>b {
+                    <span class="string">b&#39;x&#39; </span>=&gt; {
+                        <span class="kw">let </span>(byte, rest) = backslash_x(s);
+                        s = rest;
+                        char::from_u32(u32::from(byte)).expect(<span class="string">&quot;byte was just validated&quot;</span>)
                     }
-                    <span class="string">b&#39;u&#39;</span> =&gt; {
-                        <span class="kw">let</span> (<span class="ident">chr</span>, <span class="ident">rest</span>) <span class="op">=</span> <span class="ident">backslash_u</span>(<span class="ident">s</span>);
-                        <span class="ident">s</span> <span class="op">=</span> <span class="ident">rest</span>;
-                        <span class="ident">chr</span>
+                    <span class="string">b&#39;u&#39; </span>=&gt; {
+                        <span class="kw">let </span>(chr, rest) = backslash_u(s);
+                        s = rest;
+                        chr
                     }
-                    <span class="string">b&#39;n&#39;</span> =&gt; <span class="string">&#39;\n&#39;</span>,
-                    <span class="string">b&#39;r&#39;</span> =&gt; <span class="string">&#39;\r&#39;</span>,
-                    <span class="string">b&#39;t&#39;</span> =&gt; <span class="string">&#39;\t&#39;</span>,
-                    <span class="string">b&#39;\\&#39;</span> =&gt; <span class="string">&#39;\\&#39;</span>,
-                    <span class="string">b&#39;0&#39;</span> =&gt; <span class="string">&#39;\0&#39;</span>,
-                    <span class="string">b&#39;\&#39;&#39;</span> =&gt; <span class="string">&#39;\&#39;&#39;</span>,
-                    <span class="string">b&#39;&quot;&#39;</span> =&gt; <span class="string">&#39;&quot;&#39;</span>,
-                    <span class="string">b&#39;\r&#39;</span> <span class="op">|</span> <span class="string">b&#39;\n&#39;</span> =&gt; <span class="kw">loop</span> {
-                        <span class="kw">let</span> <span class="ident">ch</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">chars</span>().<span class="ident">next</span>().<span class="ident">unwrap_or_default</span>();
-                        <span class="kw">if</span> <span class="ident">ch</span>.<span class="ident">is_whitespace</span>() {
-                            <span class="ident">s</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="ident">ch</span>.<span class="ident">len_utf8</span>()..];
-                        } <span class="kw">else</span> {
-                            <span class="kw">continue</span> <span class="lifetime">&#39;outer</span>;
+                    <span class="string">b&#39;n&#39; </span>=&gt; <span class="string">&#39;\n&#39;</span>,
+                    <span class="string">b&#39;r&#39; </span>=&gt; <span class="string">&#39;\r&#39;</span>,
+                    <span class="string">b&#39;t&#39; </span>=&gt; <span class="string">&#39;\t&#39;</span>,
+                    <span class="string">b&#39;\\&#39; </span>=&gt; <span class="string">&#39;\\&#39;</span>,
+                    <span class="string">b&#39;0&#39; </span>=&gt; <span class="string">&#39;\0&#39;</span>,
+                    <span class="string">b&#39;\&#39;&#39; </span>=&gt; <span class="string">&#39;\&#39;&#39;</span>,
+                    <span class="string">b&#39;&quot;&#39; </span>=&gt; <span class="string">&#39;&quot;&#39;</span>,
+                    <span class="string">b&#39;\r&#39; </span>| <span class="string">b&#39;\n&#39; </span>=&gt; <span class="kw">loop </span>{
+                        <span class="kw">let </span>ch = s.chars().next().unwrap_or_default();
+                        <span class="kw">if </span>ch.is_whitespace() {
+                            s = <span class="kw-2">&amp;</span>s[ch.len_utf8()..];
+                        } <span class="kw">else </span>{
+                            <span class="kw">continue </span><span class="lifetime">&#39;outer</span>;
                         }
                     },
-                    <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;invalid escape&quot;</span>),
+                    <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;invalid escape&quot;</span>),
                 }
             }
-            <span class="string">b&#39;\r&#39;</span> =&gt; {
-                <span class="comment">// bare CR not permitted</span>
-                <span class="ident">s</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="number">2</span>..];
-                <span class="string">&#39;\n&#39;</span>
-            }
-            <span class="kw">_</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">ch</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">chars</span>().<span class="ident">next</span>().<span class="ident">unwrap_or_default</span>();
-                <span class="ident">s</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="ident">ch</span>.<span class="ident">len_utf8</span>()..];
-                <span class="ident">ch</span>
+            <span class="string">b&#39;\r&#39; </span>=&gt; {
+                <span class="comment">// bare CR not permitted
+                </span>s = <span class="kw-2">&amp;</span>s[<span class="number">2</span>..];
+                <span class="string">&#39;\n&#39;
+            </span>}
+            <span class="kw">_ </span>=&gt; {
+                <span class="kw">let </span>ch = s.chars().next().unwrap_or_default();
+                s = <span class="kw-2">&amp;</span>s[ch.len_utf8()..];
+                ch
             }
         };
-        <span class="ident">content</span>.<span class="ident">push</span>(<span class="ident">ch</span>);
+        content.push(ch);
     }
 
-    <span class="ident">content</span>.<span class="ident">into_bytes</span>()
+    content.into_bytes()
 }
 
-<span class="kw">fn</span> <span class="ident">parse_lit_str_raw</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pounds</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">while</span> <span class="ident">byte</span>(<span class="ident">s</span>, <span class="ident">pounds</span>) <span class="op">==</span> <span class="string">b&#39;#&#39;</span> {
-        <span class="ident">pounds</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+<span class="kw">fn </span>parse_lit_str_raw(s: <span class="kw-2">&amp;</span>[u8]) -&gt; Vec&lt;u8&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>pounds = <span class="number">0</span>;
+    <span class="kw">while </span>byte(s, pounds) == <span class="string">b&#39;#&#39; </span>{
+        pounds += <span class="number">1</span>;
     }
-    <span class="kw">let</span> <span class="ident">close</span> <span class="op">=</span> <span class="ident">s</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">rposition</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span> <span class="op">==</span> <span class="string">b&#39;&quot;&#39;</span>)
-        .<span class="ident">expect</span>(<span class="string">&quot;had a string without trailing \&quot;&quot;</span>);
+    <span class="kw">let </span>close = s
+        .iter()
+        .rposition(|<span class="kw-2">&amp;</span>b| b == <span class="string">b&#39;&quot;&#39;</span>)
+        .expect(<span class="string">&quot;had a string without trailing \&quot;&quot;</span>);
 
-    <span class="ident">s</span>[<span class="ident">pounds</span> <span class="op">+</span> <span class="number">1</span>..<span class="ident">close</span>].<span class="ident">to_owned</span>()
+    s[pounds + <span class="number">1</span>..close].to_owned()
 }
 
-<span class="kw">fn</span> <span class="ident">parse_lit_byte_str_cooked</span>(<span class="kw-2">mut</span> <span class="ident">v</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-    <span class="lifetime">&#39;outer</span>: <span class="kw">loop</span> {
-        <span class="kw">let</span> <span class="ident">byte</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">byte</span>(<span class="ident">v</span>, <span class="number">0</span>) {
-            <span class="string">b&#39;&quot;&#39;</span> =&gt; <span class="kw">break</span>,
-            <span class="string">b&#39;\\&#39;</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">byte</span>(<span class="ident">v</span>, <span class="number">1</span>);
-                <span class="ident">v</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">v</span>[<span class="number">2</span>..];
-                <span class="kw">match</span> <span class="ident">b</span> {
-                    <span class="string">b&#39;x&#39;</span> =&gt; {
-                        <span class="kw">let</span> (<span class="ident">byte</span>, <span class="ident">rest</span>) <span class="op">=</span> <span class="ident">backslash_x</span>(<span class="ident">v</span>);
-                        <span class="ident">v</span> <span class="op">=</span> <span class="ident">rest</span>;
-                        <span class="ident">byte</span>
+<span class="kw">fn </span>parse_lit_byte_str_cooked(<span class="kw-2">mut </span>v: <span class="kw-2">&amp;</span>[u8]) -&gt; Vec&lt;u8&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>out = Vec::new();
+    <span class="lifetime">&#39;outer</span>: <span class="kw">loop </span>{
+        <span class="kw">let </span>byte = <span class="kw">match </span>byte(v, <span class="number">0</span>) {
+            <span class="string">b&#39;&quot;&#39; </span>=&gt; <span class="kw">break</span>,
+            <span class="string">b&#39;\\&#39; </span>=&gt; {
+                <span class="kw">let </span>b = byte(v, <span class="number">1</span>);
+                v = <span class="kw-2">&amp;</span>v[<span class="number">2</span>..];
+                <span class="kw">match </span>b {
+                    <span class="string">b&#39;x&#39; </span>=&gt; {
+                        <span class="kw">let </span>(byte, rest) = backslash_x(v);
+                        v = rest;
+                        byte
                     }
-                    <span class="string">b&#39;n&#39;</span> =&gt; <span class="string">b&#39;\n&#39;</span>,
-                    <span class="string">b&#39;r&#39;</span> =&gt; <span class="string">b&#39;\r&#39;</span>,
-                    <span class="string">b&#39;t&#39;</span> =&gt; <span class="string">b&#39;\t&#39;</span>,
-                    <span class="string">b&#39;\\&#39;</span> =&gt; <span class="string">b&#39;\\&#39;</span>,
-                    <span class="string">b&#39;0&#39;</span> =&gt; <span class="string">b&#39;\0&#39;</span>,
-                    <span class="string">b&#39;\&#39;&#39;</span> =&gt; <span class="string">b&#39;\&#39;&#39;</span>,
-                    <span class="string">b&#39;&quot;&#39;</span> =&gt; <span class="string">b&#39;&quot;&#39;</span>,
-                    <span class="string">b&#39;\r&#39;</span> <span class="op">|</span> <span class="string">b&#39;\n&#39;</span> =&gt; <span class="kw">loop</span> {
-                        <span class="kw">let</span> <span class="ident">byte</span> <span class="op">=</span> <span class="ident">byte</span>(<span class="ident">v</span>, <span class="number">0</span>);
-                        <span class="kw">let</span> <span class="ident">ch</span> <span class="op">=</span> <span class="ident">char::from_u32</span>(<span class="ident">u32::from</span>(<span class="ident">byte</span>)).<span class="ident">expect</span>(<span class="string">&quot;invalid byte&quot;</span>);
-                        <span class="kw">if</span> <span class="ident">ch</span>.<span class="ident">is_whitespace</span>() {
-                            <span class="ident">v</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">v</span>[<span class="number">1</span>..];
-                        } <span class="kw">else</span> {
-                            <span class="kw">continue</span> <span class="lifetime">&#39;outer</span>;
+                    <span class="string">b&#39;n&#39; </span>=&gt; <span class="string">b&#39;\n&#39;</span>,
+                    <span class="string">b&#39;r&#39; </span>=&gt; <span class="string">b&#39;\r&#39;</span>,
+                    <span class="string">b&#39;t&#39; </span>=&gt; <span class="string">b&#39;\t&#39;</span>,
+                    <span class="string">b&#39;\\&#39; </span>=&gt; <span class="string">b&#39;\\&#39;</span>,
+                    <span class="string">b&#39;0&#39; </span>=&gt; <span class="string">b&#39;\0&#39;</span>,
+                    <span class="string">b&#39;\&#39;&#39; </span>=&gt; <span class="string">b&#39;\&#39;&#39;</span>,
+                    <span class="string">b&#39;&quot;&#39; </span>=&gt; <span class="string">b&#39;&quot;&#39;</span>,
+                    <span class="string">b&#39;\r&#39; </span>| <span class="string">b&#39;\n&#39; </span>=&gt; <span class="kw">loop </span>{
+                        <span class="kw">let </span>byte = byte(v, <span class="number">0</span>);
+                        <span class="kw">let </span>ch = char::from_u32(u32::from(byte)).expect(<span class="string">&quot;invalid byte&quot;</span>);
+                        <span class="kw">if </span>ch.is_whitespace() {
+                            v = <span class="kw-2">&amp;</span>v[<span class="number">1</span>..];
+                        } <span class="kw">else </span>{
+                            <span class="kw">continue </span><span class="lifetime">&#39;outer</span>;
                         }
                     },
-                    <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;invalid escape&quot;</span>),
+                    <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;invalid escape&quot;</span>),
                 }
             }
-            <span class="string">b&#39;\r&#39;</span> =&gt; {
-                <span class="comment">// bare CR not permitted</span>
-                <span class="ident">v</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">v</span>[<span class="number">2</span>..];
-                <span class="string">b&#39;\n&#39;</span>
-            }
-            <span class="ident">b</span> =&gt; {
-                <span class="ident">v</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">v</span>[<span class="number">1</span>..];
-                <span class="ident">b</span>
+            <span class="string">b&#39;\r&#39; </span>=&gt; {
+                <span class="comment">// bare CR not permitted
+                </span>v = <span class="kw-2">&amp;</span>v[<span class="number">2</span>..];
+                <span class="string">b&#39;\n&#39;
+            </span>}
+            b =&gt; {
+                v = <span class="kw-2">&amp;</span>v[<span class="number">1</span>..];
+                b
             }
         };
-        <span class="ident">out</span>.<span class="ident">push</span>(<span class="ident">byte</span>);
+        out.push(byte);
     }
 
-    <span class="ident">out</span>
+    out
 }
 
-<span class="kw">fn</span> <span class="ident">backslash_x</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">S</span>) -&gt; (<span class="ident">u8</span>, <span class="kw-2">&amp;</span><span class="ident">S</span>)
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">Index</span><span class="op">&lt;</span><span class="ident">RangeFrom</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">S</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
+<span class="kw">fn </span>backslash_x&lt;S&gt;(s: <span class="kw-2">&amp;</span>S) -&gt; (u8, <span class="kw-2">&amp;</span>S)
+<span class="kw">where
+    </span>S: Index&lt;RangeFrom&lt;usize&gt;, Output = S&gt; + AsRef&lt;[u8]&gt; + <span class="question-mark">?</span>Sized,
 {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ch</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">let</span> <span class="ident">b0</span> <span class="op">=</span> <span class="ident">byte</span>(<span class="ident">s</span>, <span class="number">0</span>);
-    <span class="kw">let</span> <span class="ident">b1</span> <span class="op">=</span> <span class="ident">byte</span>(<span class="ident">s</span>, <span class="number">1</span>);
-    <span class="ident">ch</span> <span class="op">+</span><span class="op">=</span> <span class="number">0x10</span> <span class="op">*</span> (<span class="ident">b0</span> <span class="op">-</span> <span class="string">b&#39;0&#39;</span>);
-    <span class="ident">ch</span> <span class="op">+</span><span class="op">=</span> <span class="kw">match</span> <span class="ident">b1</span> {
-        <span class="string">b&#39;0&#39;</span>..<span class="op">=</span><span class="string">b&#39;9&#39;</span> =&gt; <span class="ident">b1</span> <span class="op">-</span> <span class="string">b&#39;0&#39;</span>,
-        <span class="string">b&#39;a&#39;</span>..<span class="op">=</span><span class="string">b&#39;f&#39;</span> =&gt; <span class="number">10</span> <span class="op">+</span> (<span class="ident">b1</span> <span class="op">-</span> <span class="string">b&#39;a&#39;</span>),
-        <span class="string">b&#39;A&#39;</span>..<span class="op">=</span><span class="string">b&#39;F&#39;</span> =&gt; <span class="number">10</span> <span class="op">+</span> (<span class="ident">b1</span> <span class="op">-</span> <span class="string">b&#39;A&#39;</span>),
-        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;invalid hex escape&quot;</span>),
+    <span class="kw">let </span><span class="kw-2">mut </span>ch = <span class="number">0</span>;
+    <span class="kw">let </span>b0 = byte(s, <span class="number">0</span>);
+    <span class="kw">let </span>b1 = byte(s, <span class="number">1</span>);
+    ch += <span class="number">0x10 </span>* (b0 - <span class="string">b&#39;0&#39;</span>);
+    ch += <span class="kw">match </span>b1 {
+        <span class="string">b&#39;0&#39;</span>..=<span class="string">b&#39;9&#39; </span>=&gt; b1 - <span class="string">b&#39;0&#39;</span>,
+        <span class="string">b&#39;a&#39;</span>..=<span class="string">b&#39;f&#39; </span>=&gt; <span class="number">10 </span>+ (b1 - <span class="string">b&#39;a&#39;</span>),
+        <span class="string">b&#39;A&#39;</span>..=<span class="string">b&#39;F&#39; </span>=&gt; <span class="number">10 </span>+ (b1 - <span class="string">b&#39;A&#39;</span>),
+        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;invalid hex escape&quot;</span>),
     };
-    (<span class="ident">ch</span>, <span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="number">2</span>..])
+    (ch, <span class="kw-2">&amp;</span>s[<span class="number">2</span>..])
 }
 
-<span class="kw">fn</span> <span class="ident">backslash_u</span>(<span class="kw-2">mut</span> <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; (<span class="ident">char</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-    <span class="ident">s</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="number">1</span>..];
+<span class="kw">fn </span>backslash_u(<span class="kw-2">mut </span>s: <span class="kw-2">&amp;</span>str) -&gt; (char, <span class="kw-2">&amp;</span>str) {
+    s = <span class="kw-2">&amp;</span>s[<span class="number">1</span>..];
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ch</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">digits</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">loop</span> {
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">byte</span>(<span class="ident">s</span>, <span class="number">0</span>);
-        <span class="kw">let</span> <span class="ident">digit</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">b</span> {
-            <span class="string">b&#39;0&#39;</span>..<span class="op">=</span><span class="string">b&#39;9&#39;</span> =&gt; <span class="ident">b</span> <span class="op">-</span> <span class="string">b&#39;0&#39;</span>,
-            <span class="string">b&#39;a&#39;</span>..<span class="op">=</span><span class="string">b&#39;f&#39;</span> =&gt; <span class="number">10</span> <span class="op">+</span> <span class="ident">b</span> <span class="op">-</span> <span class="string">b&#39;a&#39;</span>,
-            <span class="string">b&#39;A&#39;</span>..<span class="op">=</span><span class="string">b&#39;F&#39;</span> =&gt; <span class="number">10</span> <span class="op">+</span> <span class="ident">b</span> <span class="op">-</span> <span class="string">b&#39;A&#39;</span>,
-            <span class="string">b&#39;_&#39;</span> <span class="kw">if</span> <span class="ident">digits</span> <span class="op">&gt;</span> <span class="number">0</span> =&gt; {
-                <span class="ident">s</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="number">1</span>..];
+    <span class="kw">let </span><span class="kw-2">mut </span>ch = <span class="number">0</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>digits = <span class="number">0</span>;
+    <span class="kw">loop </span>{
+        <span class="kw">let </span>b = byte(s, <span class="number">0</span>);
+        <span class="kw">let </span>digit = <span class="kw">match </span>b {
+            <span class="string">b&#39;0&#39;</span>..=<span class="string">b&#39;9&#39; </span>=&gt; b - <span class="string">b&#39;0&#39;</span>,
+            <span class="string">b&#39;a&#39;</span>..=<span class="string">b&#39;f&#39; </span>=&gt; <span class="number">10 </span>+ b - <span class="string">b&#39;a&#39;</span>,
+            <span class="string">b&#39;A&#39;</span>..=<span class="string">b&#39;F&#39; </span>=&gt; <span class="number">10 </span>+ b - <span class="string">b&#39;A&#39;</span>,
+            <span class="string">b&#39;_&#39; </span><span class="kw">if </span>digits &gt; <span class="number">0 </span>=&gt; {
+                s = <span class="kw-2">&amp;</span>s[<span class="number">1</span>..];
                 <span class="kw">continue</span>;
             }
-            <span class="string">b&#39;}&#39;</span> <span class="kw">if</span> <span class="ident">digits</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> =&gt; <span class="kw">break</span>,
-            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;invalid unicode escape&quot;</span>),
+            <span class="string">b&#39;}&#39; </span><span class="kw">if </span>digits != <span class="number">0 </span>=&gt; <span class="kw">break</span>,
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;invalid unicode escape&quot;</span>),
         };
-        <span class="ident">ch</span> <span class="kw-2">*</span><span class="op">=</span> <span class="number">0x10</span>;
-        <span class="ident">ch</span> <span class="op">+</span><span class="op">=</span> <span class="ident">u32::from</span>(<span class="ident">digit</span>);
-        <span class="ident">digits</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="ident">s</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="number">1</span>..];
+        ch <span class="kw-2">*</span>= <span class="number">0x10</span>;
+        ch += u32::from(digit);
+        digits += <span class="number">1</span>;
+        s = <span class="kw-2">&amp;</span>s[<span class="number">1</span>..];
     }
-    <span class="ident">s</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="number">1</span>..];
+    s = <span class="kw-2">&amp;</span>s[<span class="number">1</span>..];
 
     (
-        <span class="ident">char::from_u32</span>(<span class="ident">ch</span>).<span class="ident">expect</span>(<span class="string">&quot;invalid unicode escape passed by compiler&quot;</span>),
-        <span class="ident">s</span>,
+        char::from_u32(ch).expect(<span class="string">&quot;invalid unicode escape passed by compiler&quot;</span>),
+        s,
     )
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="time_macros" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="time_macros" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

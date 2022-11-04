@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/connectors/sql-introspection-connector/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_introspection_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/connectors/sql-introspection-connector/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_introspection_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -192,199 +192,199 @@
 <span id="192">192</span>
 <span id="193">193</span>
 <span id="194">194</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::vec_init_then_push</span>)]</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::ptr_arg</span>)]</span> <span class="comment">// remove after https://github.com/rust-lang/rust-clippy/issues/8482 is fixed and shipped</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(clippy::vec_init_then_push)]
+#![allow(clippy::ptr_arg)] </span><span class="comment">// remove after https://github.com/rust-lang/rust-clippy/issues/8482 is fixed and shipped
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">calculate_datamodel</span>; <span class="comment">// only exported to be able to unit test it</span>
+</span><span class="kw">pub mod </span>calculate_datamodel; <span class="comment">// only exported to be able to unit test it
 
-<span class="kw">mod</span> <span class="ident">commenting_out_guardrails</span>;
-<span class="kw">mod</span> <span class="ident">defaults</span>;
-<span class="kw">mod</span> <span class="ident">error</span>;
-<span class="kw">mod</span> <span class="ident">introspection</span>;
-<span class="kw">mod</span> <span class="ident">introspection_helpers</span>;
-<span class="kw">mod</span> <span class="ident">introspection_map</span>;
-<span class="kw">mod</span> <span class="ident">prisma_1_defaults</span>;
-<span class="kw">mod</span> <span class="ident">re_introspection</span>;
-<span class="kw">mod</span> <span class="ident">sanitize_datamodel_names</span>;
-<span class="kw">mod</span> <span class="ident">schema_describer_loading</span>;
-<span class="kw">mod</span> <span class="ident">version_checker</span>;
-<span class="kw">mod</span> <span class="ident">warnings</span>;
+</span><span class="kw">mod </span>commenting_out_guardrails;
+<span class="kw">mod </span>defaults;
+<span class="kw">mod </span>error;
+<span class="kw">mod </span>introspection;
+<span class="kw">mod </span>introspection_helpers;
+<span class="kw">mod </span>introspection_map;
+<span class="kw">mod </span>prisma_1_defaults;
+<span class="kw">mod </span>re_introspection;
+<span class="kw">mod </span>sanitize_datamodel_names;
+<span class="kw">mod </span>schema_describer_loading;
+<span class="kw">mod </span>version_checker;
+<span class="kw">mod </span>warnings;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">error</span>::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>error::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
-<span class="kw">use</span> <span class="ident">introspection_connector</span>::{
-    <span class="ident">ConnectorError</span>, <span class="ident">ConnectorResult</span>, <span class="ident">DatabaseMetadata</span>, <span class="ident">ErrorKind</span>, <span class="ident">IntrospectionConnector</span>, <span class="ident">IntrospectionContext</span>,
-    <span class="ident">IntrospectionResult</span>,
+<span class="kw">use </span>enumflags2::BitFlags;
+<span class="kw">use </span>introspection_connector::{
+    ConnectorError, ConnectorResult, DatabaseMetadata, ErrorKind, IntrospectionConnector, IntrospectionContext,
+    IntrospectionResult,
 };
-<span class="kw">use</span> <span class="ident">psl::PreviewFeature</span>;
-<span class="kw">use</span> <span class="ident">quaint::prelude::SqlFamily</span>;
-<span class="kw">use</span> <span class="ident">quaint</span>::{<span class="ident">prelude::ConnectionInfo</span>, <span class="ident">single::Quaint</span>};
-<span class="kw">use</span> <span class="ident">schema_describer_loading::load_describer</span>;
-<span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="ident">SqlSchema</span>, <span class="ident">SqlSchemaDescriberBackend</span>};
-<span class="kw">use</span> <span class="ident">std::future::Future</span>;
-<span class="kw">use</span> <span class="ident">user_facing_errors::common::InvalidConnectionString</span>;
-<span class="kw">use</span> <span class="ident">user_facing_errors::KnownError</span>;
+<span class="kw">use </span>psl::PreviewFeature;
+<span class="kw">use </span>quaint::prelude::SqlFamily;
+<span class="kw">use </span>quaint::{prelude::ConnectionInfo, single::Quaint};
+<span class="kw">use </span>schema_describer_loading::load_describer;
+<span class="kw">use </span>sql_schema_describer::{SqlSchema, SqlSchemaDescriberBackend};
+<span class="kw">use </span>std::future::Future;
+<span class="kw">use </span>user_facing_errors::common::InvalidConnectionString;
+<span class="kw">use </span>user_facing_errors::KnownError;
 
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">SqlIntrospectionResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">core::result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">SqlError</span><span class="op">&gt;</span>;
+<span class="kw">pub type </span>SqlIntrospectionResult&lt;T&gt; = core::result::Result&lt;T, SqlError&gt;;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SqlIntrospectionConnector</span> {
-    <span class="ident">connection</span>: <span class="ident">Quaint</span>,
-    <span class="ident">_preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>SqlIntrospectionConnector {
+    connection: Quaint,
+    _preview_features: BitFlags&lt;PreviewFeature&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">SqlIntrospectionConnector</span> {
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">connection_string</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">preview_features</span>: <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">PreviewFeature</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">SqlIntrospectionConnector</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">connection</span> <span class="op">=</span> <span class="ident">Quaint::new</span>(<span class="ident">connection_string</span>).<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error</span><span class="op">|</span> {
-            <span class="ident">ConnectionInfo::from_url</span>(<span class="ident">connection_string</span>)
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">connection_info</span><span class="op">|</span> <span class="ident">SqlError::from</span>(<span class="ident">error</span>).<span class="ident">into_connector_error</span>(<span class="kw-2">&amp;</span><span class="ident">connection_info</span>))
-                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> {
-                    <span class="kw">let</span> <span class="ident">details</span> <span class="op">=</span> <span class="ident">user_facing_errors::quaint::invalid_connection_string_description</span>(<span class="kw-2">&amp;</span><span class="ident">err</span>.<span class="ident">to_string</span>());
-                    <span class="kw">let</span> <span class="ident">known</span> <span class="op">=</span> <span class="ident">KnownError::new</span>(<span class="ident">InvalidConnectionString</span> { <span class="ident">details</span> });
+<span class="kw">impl </span>SqlIntrospectionConnector {
+    <span class="kw">pub async fn </span>new(
+        connection_string: <span class="kw-2">&amp;</span>str,
+        preview_features: BitFlags&lt;PreviewFeature&gt;,
+    ) -&gt; ConnectorResult&lt;SqlIntrospectionConnector&gt; {
+        <span class="kw">let </span>connection = Quaint::new(connection_string).<span class="kw">await</span>.map_err(|error| {
+            ConnectionInfo::from_url(connection_string)
+                .map(|connection_info| SqlError::from(error).into_connector_error(<span class="kw-2">&amp;</span>connection_info))
+                .unwrap_or_else(|err| {
+                    <span class="kw">let </span>details = user_facing_errors::quaint::invalid_connection_string_description(<span class="kw-2">&amp;</span>err.to_string());
+                    <span class="kw">let </span>known = KnownError::new(InvalidConnectionString { details });
 
-                    <span class="ident">ConnectorError</span> {
-                        <span class="ident">user_facing_error</span>: <span class="prelude-val">Some</span>(<span class="ident">known</span>),
-                        <span class="ident">kind</span>: <span class="ident">ErrorKind::InvalidDatabaseUrl</span>(<span class="macro">format!</span>(<span class="string">&quot;{} in database URL&quot;</span>, <span class="ident">err</span>)),
+                    ConnectorError {
+                        user_facing_error: <span class="prelude-val">Some</span>(known),
+                        kind: ErrorKind::InvalidDatabaseUrl(<span class="macro">format!</span>(<span class="string">&quot;{} in database URL&quot;</span>, err)),
                     }
                 })
         })<span class="question-mark">?</span>;
 
         <span class="macro">tracing::debug!</span>(<span class="string">&quot;SqlIntrospectionConnector initialized.&quot;</span>);
 
-        <span class="prelude-val">Ok</span>(<span class="ident">SqlIntrospectionConnector</span> {
-            <span class="ident">connection</span>,
-            <span class="ident">_preview_features</span>: <span class="ident">preview_features</span>,
+        <span class="prelude-val">Ok</span>(SqlIntrospectionConnector {
+            connection,
+            _preview_features: preview_features,
         })
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">catch</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fut</span>: <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">O</span>, <span class="ident">SqlError</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">O</span><span class="op">&gt;</span> {
-        <span class="ident">fut</span>.<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">sql_introspection_error</span><span class="op">|</span> {
-            <span class="ident">sql_introspection_error</span>.<span class="ident">into_connector_error</span>(<span class="self">self</span>.<span class="ident">connection</span>.<span class="ident">connection_info</span>())
+    <span class="kw">async fn </span>catch&lt;O&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, fut: <span class="kw">impl </span>Future&lt;Output = <span class="prelude-ty">Result</span>&lt;O, SqlError&gt;&gt;) -&gt; ConnectorResult&lt;O&gt; {
+        fut.<span class="kw">await</span>.map_err(|sql_introspection_error| {
+            sql_introspection_error.into_connector_error(<span class="self">self</span>.connection.connection_info())
         })
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">describer</span>(
+    <span class="kw">async fn </span>describer(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">provider</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">SqlIntrospectionResult</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">SqlSchemaDescriberBackend</span> <span class="op">+</span> <span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">load_describer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">connection</span>, <span class="self">self</span>.<span class="ident">connection</span>.<span class="ident">connection_info</span>(), <span class="ident">provider</span>).<span class="kw">await</span>
+        provider: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;,
+    ) -&gt; SqlIntrospectionResult&lt;Box&lt;<span class="kw">dyn </span>SqlSchemaDescriberBackend + <span class="lifetime">&#39;_</span>&gt;&gt; {
+        load_describer(<span class="kw-2">&amp;</span><span class="self">self</span>.connection, <span class="self">self</span>.connection.connection_info(), provider).<span class="kw">await
+    </span>}
+
+    <span class="kw">async fn </span>list_databases_internal(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SqlIntrospectionResult&lt;Vec&lt;String&gt;&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.describer(<span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>.list_databases().<span class="kw">await</span><span class="question-mark">?</span>)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">list_databases_internal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SqlIntrospectionResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">describer</span>(<span class="prelude-val">None</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">list_databases</span>().<span class="kw">await</span><span class="question-mark">?</span>)
-    }
-
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_metadata_internal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SqlIntrospectionResult</span><span class="op">&lt;</span><span class="ident">DatabaseMetadata</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">sql_metadata</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">describer</span>(<span class="prelude-val">None</span>)
-            .<span class="kw">await</span><span class="question-mark">?</span>
-            .<span class="ident">get_metadata</span>(<span class="self">self</span>.<span class="ident">connection</span>.<span class="ident">connection_info</span>().<span class="ident">schema_name</span>())
+    <span class="kw">async fn </span>get_metadata_internal(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SqlIntrospectionResult&lt;DatabaseMetadata&gt; {
+        <span class="kw">let </span>sql_metadata = <span class="self">self
+            </span>.describer(<span class="prelude-val">None</span>)
+            .<span class="kw">await</span><span class="question-mark">?
+            </span>.get_metadata(<span class="self">self</span>.connection.connection_info().schema_name())
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">db_metadate</span> <span class="op">=</span> <span class="ident">DatabaseMetadata</span> {
-            <span class="ident">table_count</span>: <span class="ident">sql_metadata</span>.<span class="ident">table_count</span>,
-            <span class="ident">size_in_bytes</span>: <span class="ident">sql_metadata</span>.<span class="ident">size_in_bytes</span>,
+        <span class="kw">let </span>db_metadate = DatabaseMetadata {
+            table_count: sql_metadata.table_count,
+            size_in_bytes: sql_metadata.size_in_bytes,
         };
 
-        <span class="prelude-val">Ok</span>(<span class="ident">db_metadate</span>)
+        <span class="prelude-val">Ok</span>(db_metadate)
     }
 
-    <span class="doccomment">/// Exported for tests</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">quaint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Quaint</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">connection</span>
+    <span class="doccomment">/// Exported for tests
+    </span><span class="kw">pub fn </span>quaint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Quaint {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.connection
     }
 
-    <span class="doccomment">/// Exported for tests</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">describe</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">provider</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">namespaces</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="ident">str</span>]) -&gt; <span class="ident">SqlIntrospectionResult</span><span class="op">&lt;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">describer</span>(<span class="ident">provider</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">describe</span>(<span class="ident">namespaces</span>).<span class="kw">await</span><span class="question-mark">?</span>)
+    <span class="doccomment">/// Exported for tests
+    </span><span class="kw">pub async fn </span>describe(<span class="kw-2">&amp;</span><span class="self">self</span>, provider: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;, namespaces: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span>str]) -&gt; SqlIntrospectionResult&lt;SqlSchema&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.describer(provider).<span class="kw">await</span><span class="question-mark">?</span>.describe(namespaces).<span class="kw">await</span><span class="question-mark">?</span>)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SqlIntrospectionResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>
-            .<span class="ident">describer</span>(<span class="prelude-val">None</span>)
-            .<span class="kw">await</span><span class="question-mark">?</span>
-            .<span class="ident">version</span>()
-            .<span class="kw">await</span><span class="question-mark">?</span>
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="string">&quot;Database version information not available.&quot;</span>.<span class="ident">into</span>()))
+    <span class="kw">async fn </span>version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SqlIntrospectionResult&lt;String&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">self
+            </span>.describer(<span class="prelude-val">None</span>)
+            .<span class="kw">await</span><span class="question-mark">?
+            </span>.version()
+            .<span class="kw">await</span><span class="question-mark">?
+            </span>.unwrap_or_else(|| <span class="string">&quot;Database version information not available.&quot;</span>.into()))
     }
 }
 
-<span class="attribute">#[<span class="ident">async_trait::async_trait</span>]</span>
-<span class="kw">impl</span> <span class="ident">IntrospectionConnector</span> <span class="kw">for</span> <span class="ident">SqlIntrospectionConnector</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">list_databases</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">catch</span>(<span class="self">self</span>.<span class="ident">list_databases_internal</span>()).<span class="kw">await</span><span class="question-mark">?</span>)
+<span class="attribute">#[async_trait::async_trait]
+</span><span class="kw">impl </span>IntrospectionConnector <span class="kw">for </span>SqlIntrospectionConnector {
+    <span class="kw">async fn </span>list_databases(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ConnectorResult&lt;Vec&lt;String&gt;&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.catch(<span class="self">self</span>.list_databases_internal()).<span class="kw">await</span><span class="question-mark">?</span>)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_metadata</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">DatabaseMetadata</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">catch</span>(<span class="self">self</span>.<span class="ident">get_metadata_internal</span>()).<span class="kw">await</span><span class="question-mark">?</span>)
+    <span class="kw">async fn </span>get_metadata(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ConnectorResult&lt;DatabaseMetadata&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.catch(<span class="self">self</span>.get_metadata_internal()).<span class="kw">await</span><span class="question-mark">?</span>)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_database_description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">sql_schema</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">catch</span>(<span class="self">self</span>.<span class="ident">describe</span>(<span class="prelude-val">None</span>, <span class="kw-2">&amp;</span>[<span class="self">self</span>.<span class="ident">connection</span>.<span class="ident">connection_info</span>().<span class="ident">schema_name</span>()]))
+    <span class="kw">async fn </span>get_database_description(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ConnectorResult&lt;String&gt; {
+        <span class="kw">let </span>sql_schema = <span class="self">self
+            </span>.catch(<span class="self">self</span>.describe(<span class="prelude-val">None</span>, <span class="kw-2">&amp;</span>[<span class="self">self</span>.connection.connection_info().schema_name()]))
             .<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="macro">tracing::debug!</span>(<span class="string">&quot;SQL Schema Describer is done: {:?}&quot;</span>, <span class="ident">sql_schema</span>);
-        <span class="kw">let</span> <span class="ident">description</span> <span class="op">=</span> <span class="ident">serde_json::to_string_pretty</span>(<span class="kw-2">&amp;</span><span class="ident">sql_schema</span>).<span class="ident">unwrap</span>();
-        <span class="prelude-val">Ok</span>(<span class="ident">description</span>)
+        <span class="macro">tracing::debug!</span>(<span class="string">&quot;SQL Schema Describer is done: {:?}&quot;</span>, sql_schema);
+        <span class="kw">let </span>description = serde_json::to_string_pretty(<span class="kw-2">&amp;</span>sql_schema).unwrap();
+        <span class="prelude-val">Ok</span>(description)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_database_version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">sql_schema</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">catch</span>(<span class="self">self</span>.<span class="ident">version</span>()).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="macro">tracing::debug!</span>(<span class="string">&quot;Fetched db version for: {:?}&quot;</span>, <span class="ident">sql_schema</span>);
-        <span class="kw">let</span> <span class="ident">description</span> <span class="op">=</span> <span class="ident">serde_json::to_string</span>(<span class="kw-2">&amp;</span><span class="ident">sql_schema</span>).<span class="ident">unwrap</span>();
-        <span class="prelude-val">Ok</span>(<span class="ident">description</span>)
+    <span class="kw">async fn </span>get_database_version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; ConnectorResult&lt;String&gt; {
+        <span class="kw">let </span>sql_schema = <span class="self">self</span>.catch(<span class="self">self</span>.version()).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="macro">tracing::debug!</span>(<span class="string">&quot;Fetched db version for: {:?}&quot;</span>, sql_schema);
+        <span class="kw">let </span>description = serde_json::to_string(<span class="kw-2">&amp;</span>sql_schema).unwrap();
+        <span class="prelude-val">Ok</span>(description)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">introspect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">IntrospectionContext</span>) -&gt; <span class="ident">ConnectorResult</span><span class="op">&lt;</span><span class="ident">IntrospectionResult</span><span class="op">&gt;</span> {
-        <span class="comment">//TODO(matthias) do we even need extra preview flagging here?</span>
-        <span class="kw">let</span> <span class="ident">namespaces</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">ctx</span>
-            .<span class="ident">datasource</span>()
-            .<span class="ident">namespaces</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">ns</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">ns</span>.<span class="ident">as_ref</span>())
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-        <span class="kw">if</span> <span class="ident">namespaces</span>.<span class="ident">is_empty</span>() {
-            <span class="ident">namespaces</span>.<span class="ident">push</span>(<span class="self">self</span>.<span class="ident">connection</span>.<span class="ident">connection_info</span>().<span class="ident">schema_name</span>())
+    <span class="kw">async fn </span>introspect(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;</span>IntrospectionContext) -&gt; ConnectorResult&lt;IntrospectionResult&gt; {
+        <span class="comment">//TODO(matthias) do we even need extra preview flagging here?
+        </span><span class="kw">let </span>namespaces = <span class="kw-2">&amp;mut </span>ctx
+            .datasource()
+            .namespaces
+            .iter()
+            .map(|(ns, <span class="kw">_</span>)| ns.as_ref())
+            .collect::&lt;Vec&lt;<span class="kw-2">&amp;</span>str&gt;&gt;();
+        <span class="kw">if </span>namespaces.is_empty() {
+            namespaces.push(<span class="self">self</span>.connection.connection_info().schema_name())
         }
 
-        <span class="kw">let</span> <span class="ident">sql_schema</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">catch</span>(<span class="self">self</span>.<span class="ident">describe</span>(<span class="prelude-val">Some</span>(<span class="ident">ctx</span>.<span class="ident">datasource</span>().<span class="ident">active_provider</span>), <span class="ident">namespaces</span>))
+        <span class="kw">let </span>sql_schema = <span class="self">self
+            </span>.catch(<span class="self">self</span>.describe(<span class="prelude-val">Some</span>(ctx.datasource().active_provider), namespaces))
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">introspection_result</span> <span class="op">=</span>
-            <span class="ident">calculate_datamodel::calculate_datamodel</span>(<span class="kw-2">&amp;</span><span class="ident">sql_schema</span>, <span class="ident">ctx</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">sql_introspection_error</span><span class="op">|</span> {
-                <span class="ident">sql_introspection_error</span>.<span class="ident">into_connector_error</span>(<span class="self">self</span>.<span class="ident">connection</span>.<span class="ident">connection_info</span>())
+        <span class="kw">let </span>introspection_result =
+            calculate_datamodel::calculate_datamodel(<span class="kw-2">&amp;</span>sql_schema, ctx).map_err(|sql_introspection_error| {
+                sql_introspection_error.into_connector_error(<span class="self">self</span>.connection.connection_info())
             })<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">introspection_result</span>)
+        <span class="prelude-val">Ok</span>(introspection_result)
     }
 }
 
-<span class="kw">trait</span> <span class="ident">SqlFamilyTrait</span> {
-    <span class="kw">fn</span> <span class="ident">sql_family</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SqlFamily</span>;
+<span class="kw">trait </span>SqlFamilyTrait {
+    <span class="kw">fn </span>sql_family(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SqlFamily;
 }
 
-<span class="kw">impl</span> <span class="ident">SqlFamilyTrait</span> <span class="kw">for</span> <span class="ident">IntrospectionContext</span> {
-    <span class="kw">fn</span> <span class="ident">sql_family</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SqlFamily</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">datasource</span>().<span class="ident">active_provider</span> {
-            <span class="string">&quot;postgresql&quot;</span> =&gt; <span class="ident">SqlFamily::Postgres</span>,
-            <span class="string">&quot;cockroachdb&quot;</span> =&gt; <span class="ident">SqlFamily::Postgres</span>,
-            <span class="string">&quot;sqlite&quot;</span> =&gt; <span class="ident">SqlFamily::Sqlite</span>,
-            <span class="string">&quot;sqlserver&quot;</span> =&gt; <span class="ident">SqlFamily::Mssql</span>,
-            <span class="string">&quot;mysql&quot;</span> =&gt; <span class="ident">SqlFamily::Mysql</span>,
-            <span class="ident">name</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;The name `{}` for the datamodel connector is not known&quot;</span>, <span class="ident">name</span>),
+<span class="kw">impl </span>SqlFamilyTrait <span class="kw">for </span>IntrospectionContext {
+    <span class="kw">fn </span>sql_family(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SqlFamily {
+        <span class="kw">match </span><span class="self">self</span>.datasource().active_provider {
+            <span class="string">&quot;postgresql&quot; </span>=&gt; SqlFamily::Postgres,
+            <span class="string">&quot;cockroachdb&quot; </span>=&gt; SqlFamily::Postgres,
+            <span class="string">&quot;sqlite&quot; </span>=&gt; SqlFamily::Sqlite,
+            <span class="string">&quot;sqlserver&quot; </span>=&gt; SqlFamily::Mssql,
+            <span class="string">&quot;mysql&quot; </span>=&gt; SqlFamily::Mysql,
+            name =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;The name `{}` for the datamodel connector is not known&quot;</span>, name),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">SqlFamilyTrait</span> <span class="kw">for</span> <span class="ident">calculate_datamodel::CalculateDatamodelContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">sql_family</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SqlFamily</span> {
-        <span class="self">self</span>.<span class="ident">sql_family</span>
+<span class="kw">impl </span>SqlFamilyTrait <span class="kw">for </span>calculate_datamodel::CalculateDatamodelContext&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>sql_family(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SqlFamily {
+        <span class="self">self</span>.sql_family
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_introspection_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_introspection_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/sdam/monitor.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>monitor.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/sdam/monitor.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>monitor.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -217,224 +217,224 @@
 <span id="217">217</span>
 <span id="218">218</span>
 <span id="219">219</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::time</span>::{<span class="ident">Duration</span>, <span class="ident">Instant</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>std::time::{Duration, Instant};
 
-<span class="kw">use</span> <span class="ident">bson::doc</span>;
+<span class="kw">use </span>bson::doc;
 
-<span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">description::server::ServerDescription</span>,
-    <span class="ident">topology::SdamEventEmitter</span>,
-    <span class="ident">TopologyCheckRequestReceiver</span>,
-    <span class="ident">TopologyUpdater</span>,
-    <span class="ident">TopologyWatcher</span>,
+<span class="kw">use super</span>::{
+    description::server::ServerDescription,
+    topology::SdamEventEmitter,
+    TopologyCheckRequestReceiver,
+    TopologyUpdater,
+    TopologyWatcher,
 };
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">cmap</span>::{<span class="ident">Connection</span>, <span class="ident">Handshaker</span>},
-    <span class="ident">error</span>::{<span class="ident">Error</span>, <span class="prelude-ty">Result</span>},
-    <span class="ident">event::sdam</span>::{
-        <span class="ident">SdamEvent</span>,
-        <span class="ident">ServerHeartbeatFailedEvent</span>,
-        <span class="ident">ServerHeartbeatStartedEvent</span>,
-        <span class="ident">ServerHeartbeatSucceededEvent</span>,
+<span class="kw">use crate</span>::{
+    cmap::{Connection, Handshaker},
+    error::{Error, <span class="prelude-ty">Result</span>},
+    event::sdam::{
+        SdamEvent,
+        ServerHeartbeatFailedEvent,
+        ServerHeartbeatStartedEvent,
+        ServerHeartbeatSucceededEvent,
     },
-    <span class="ident">hello</span>::{<span class="ident">hello_command</span>, <span class="ident">run_hello</span>, <span class="ident">HelloReply</span>},
-    <span class="ident">options</span>::{<span class="ident">ClientOptions</span>, <span class="ident">ServerAddress</span>},
-    <span class="ident">runtime</span>,
+    hello::{hello_command, run_hello, HelloReply},
+    options::{ClientOptions, ServerAddress},
+    runtime,
 };
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">DEFAULT_HEARTBEAT_FREQUENCY</span>: <span class="ident">Duration</span> <span class="op">=</span> <span class="ident">Duration::from_secs</span>(<span class="number">10</span>);
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">MIN_HEARTBEAT_FREQUENCY</span>: <span class="ident">Duration</span> <span class="op">=</span> <span class="ident">Duration::from_millis</span>(<span class="number">500</span>);
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>DEFAULT_HEARTBEAT_FREQUENCY: Duration = Duration::from_secs(<span class="number">10</span>);
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>MIN_HEARTBEAT_FREQUENCY: Duration = Duration::from_millis(<span class="number">500</span>);
 
-<span class="doccomment">/// Monitor that performs regular heartbeats to determine server status.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Monitor</span> {
-    <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
-    <span class="ident">connection</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span>,
-    <span class="ident">handshaker</span>: <span class="ident">Handshaker</span>,
-    <span class="ident">topology_updater</span>: <span class="ident">TopologyUpdater</span>,
-    <span class="ident">topology_watcher</span>: <span class="ident">TopologyWatcher</span>,
-    <span class="ident">sdam_event_emitter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SdamEventEmitter</span><span class="op">&gt;</span>,
-    <span class="ident">update_request_receiver</span>: <span class="ident">TopologyCheckRequestReceiver</span>,
-    <span class="ident">client_options</span>: <span class="ident">ClientOptions</span>,
+<span class="doccomment">/// Monitor that performs regular heartbeats to determine server status.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Monitor {
+    address: ServerAddress,
+    connection: <span class="prelude-ty">Option</span>&lt;Connection&gt;,
+    handshaker: Handshaker,
+    topology_updater: TopologyUpdater,
+    topology_watcher: TopologyWatcher,
+    sdam_event_emitter: <span class="prelude-ty">Option</span>&lt;SdamEventEmitter&gt;,
+    update_request_receiver: TopologyCheckRequestReceiver,
+    client_options: ClientOptions,
 }
 
-<span class="kw">impl</span> <span class="ident">Monitor</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">start</span>(
-        <span class="ident">address</span>: <span class="ident">ServerAddress</span>,
-        <span class="ident">topology_updater</span>: <span class="ident">TopologyUpdater</span>,
-        <span class="ident">topology_watcher</span>: <span class="ident">TopologyWatcher</span>,
-        <span class="ident">sdam_event_emitter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SdamEventEmitter</span><span class="op">&gt;</span>,
-        <span class="ident">update_request_receiver</span>: <span class="ident">TopologyCheckRequestReceiver</span>,
-        <span class="ident">client_options</span>: <span class="ident">ClientOptions</span>,
+<span class="kw">impl </span>Monitor {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>start(
+        address: ServerAddress,
+        topology_updater: TopologyUpdater,
+        topology_watcher: TopologyWatcher,
+        sdam_event_emitter: <span class="prelude-ty">Option</span>&lt;SdamEventEmitter&gt;,
+        update_request_receiver: TopologyCheckRequestReceiver,
+        client_options: ClientOptions,
     ) {
-        <span class="kw">let</span> <span class="ident">handshaker</span> <span class="op">=</span> <span class="ident">Handshaker::new</span>(<span class="prelude-val">Some</span>(<span class="ident">client_options</span>.<span class="ident">clone</span>().<span class="ident">into</span>()));
-        <span class="kw">let</span> <span class="ident">monitor</span> <span class="op">=</span> <span class="self">Self</span> {
-            <span class="ident">address</span>,
-            <span class="ident">client_options</span>,
-            <span class="ident">handshaker</span>,
-            <span class="ident">topology_updater</span>,
-            <span class="ident">topology_watcher</span>,
-            <span class="ident">sdam_event_emitter</span>,
-            <span class="ident">update_request_receiver</span>,
-            <span class="ident">connection</span>: <span class="prelude-val">None</span>,
+        <span class="kw">let </span>handshaker = Handshaker::new(<span class="prelude-val">Some</span>(client_options.clone().into()));
+        <span class="kw">let </span>monitor = <span class="self">Self </span>{
+            address,
+            client_options,
+            handshaker,
+            topology_updater,
+            topology_watcher,
+            sdam_event_emitter,
+            update_request_receiver,
+            connection: <span class="prelude-val">None</span>,
         };
-        <span class="ident">runtime::execute</span>(<span class="ident">monitor</span>.<span class="ident">execute</span>())
+        runtime::execute(monitor.execute())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(<span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="kw">let</span> <span class="ident">heartbeat_frequency</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">client_options</span>
-            .<span class="ident">heartbeat_freq</span>
-            .<span class="ident">unwrap_or</span>(<span class="ident">DEFAULT_HEARTBEAT_FREQUENCY</span>);
+    <span class="kw">async fn </span>execute(<span class="kw-2">mut </span><span class="self">self</span>) {
+        <span class="kw">let </span>heartbeat_frequency = <span class="self">self
+            </span>.client_options
+            .heartbeat_freq
+            .unwrap_or(DEFAULT_HEARTBEAT_FREQUENCY);
 
-        <span class="kw">while</span> <span class="self">self</span>.<span class="ident">topology_watcher</span>.<span class="ident">is_alive</span>() {
-            <span class="self">self</span>.<span class="ident">check_server</span>().<span class="kw">await</span>;
+        <span class="kw">while </span><span class="self">self</span>.topology_watcher.is_alive() {
+            <span class="self">self</span>.check_server().<span class="kw">await</span>;
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-            <span class="kw">let</span> <span class="ident">min_frequency</span> <span class="op">=</span> <span class="self">self</span>
-                .<span class="ident">client_options</span>
-                .<span class="ident">test_options</span>
-                .<span class="ident">as_ref</span>()
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">to</span><span class="op">|</span> <span class="ident">to</span>.<span class="ident">heartbeat_freq</span>)
-                .<span class="ident">unwrap_or</span>(<span class="ident">MIN_HEARTBEAT_FREQUENCY</span>);
+            <span class="attribute">#[cfg(test)]
+            </span><span class="kw">let </span>min_frequency = <span class="self">self
+                </span>.client_options
+                .test_options
+                .as_ref()
+                .and_then(|to| to.heartbeat_freq)
+                .unwrap_or(MIN_HEARTBEAT_FREQUENCY);
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">test</span>))]</span>
-            <span class="kw">let</span> <span class="ident">min_frequency</span> <span class="op">=</span> <span class="ident">MIN_HEARTBEAT_FREQUENCY</span>;
+            <span class="attribute">#[cfg(not(test))]
+            </span><span class="kw">let </span>min_frequency = MIN_HEARTBEAT_FREQUENCY;
 
-            <span class="ident">runtime::delay_for</span>(<span class="ident">min_frequency</span>).<span class="kw">await</span>;
-            <span class="self">self</span>.<span class="ident">update_request_receiver</span>
-                .<span class="ident">wait_for_check_request</span>(<span class="ident">heartbeat_frequency</span> <span class="op">-</span> <span class="ident">min_frequency</span>)
+            runtime::delay_for(min_frequency).<span class="kw">await</span>;
+            <span class="self">self</span>.update_request_receiver
+                .wait_for_check_request(heartbeat_frequency - min_frequency)
                 .<span class="kw">await</span>;
         }
     }
 
-    <span class="doccomment">/// Checks the the server by running a hello command. If an I/O error occurs, the</span>
-    <span class="doccomment">/// connection will replaced with a new one.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns true if the topology has changed and false otherwise.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">check_server</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">update_request_receiver</span>.<span class="ident">clear_check_requests</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">retried</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        <span class="kw">let</span> <span class="ident">check_result</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">perform_hello</span>().<span class="kw">await</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">reply</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">reply</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">previous_description</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">topology_watcher</span>.<span class="ident">server_description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">address</span>);
-                <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">is_network_error</span>()
-                    <span class="op">&amp;&amp;</span> <span class="ident">previous_description</span>
-                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">sd</span><span class="op">|</span> <span class="ident">sd</span>.<span class="ident">is_available</span>())
-                        .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+    <span class="doccomment">/// Checks the the server by running a hello command. If an I/O error occurs, the
+    /// connection will replaced with a new one.
+    ///
+    /// Returns true if the topology has changed and false otherwise.
+    </span><span class="kw">async fn </span>check_server(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.update_request_receiver.clear_check_requests();
+        <span class="kw">let </span><span class="kw-2">mut </span>retried = <span class="bool-val">false</span>;
+        <span class="kw">let </span>check_result = <span class="kw">match </span><span class="self">self</span>.perform_hello().<span class="kw">await </span>{
+            <span class="prelude-val">Ok</span>(reply) =&gt; <span class="prelude-val">Ok</span>(reply),
+            <span class="prelude-val">Err</span>(e) =&gt; {
+                <span class="kw">let </span>previous_description = <span class="self">self</span>.topology_watcher.server_description(<span class="kw-2">&amp;</span><span class="self">self</span>.address);
+                <span class="kw">if </span>e.is_network_error()
+                    &amp;&amp; previous_description
+                        .map(|sd| sd.is_available())
+                        .unwrap_or(<span class="bool-val">false</span>)
                 {
-                    <span class="self">self</span>.<span class="ident">handle_error</span>(<span class="ident">e</span>).<span class="kw">await</span>;
-                    <span class="ident">retried</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                    <span class="self">self</span>.<span class="ident">perform_hello</span>().<span class="kw">await</span>
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">Err</span>(<span class="ident">e</span>)
+                    <span class="self">self</span>.handle_error(e).<span class="kw">await</span>;
+                    retried = <span class="bool-val">true</span>;
+                    <span class="self">self</span>.perform_hello().<span class="kw">await
+                </span>} <span class="kw">else </span>{
+                    <span class="prelude-val">Err</span>(e)
                 }
             }
         };
 
-        <span class="kw">match</span> <span class="ident">check_result</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">reply</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">server_description</span> <span class="op">=</span>
-                    <span class="ident">ServerDescription::new</span>(<span class="self">self</span>.<span class="ident">address</span>.<span class="ident">clone</span>(), <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">reply</span>)));
-                <span class="self">self</span>.<span class="ident">topology_updater</span>.<span class="ident">update</span>(<span class="ident">server_description</span>).<span class="kw">await</span>
-            }
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="self">self</span>.<span class="ident">handle_error</span>(<span class="ident">e</span>).<span class="kw">await</span> <span class="op">|</span><span class="op">|</span> <span class="ident">retried</span>,
+        <span class="kw">match </span>check_result {
+            <span class="prelude-val">Ok</span>(reply) =&gt; {
+                <span class="kw">let </span>server_description =
+                    ServerDescription::new(<span class="self">self</span>.address.clone(), <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(reply)));
+                <span class="self">self</span>.topology_updater.update(server_description).<span class="kw">await
+            </span>}
+            <span class="prelude-val">Err</span>(e) =&gt; <span class="self">self</span>.handle_error(e).<span class="kw">await </span>|| retried,
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">perform_hello</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HelloReply</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">emit_event</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="ident">SdamEvent::ServerHeartbeatStarted</span>(<span class="ident">ServerHeartbeatStartedEvent</span> {
-                <span class="ident">server_address</span>: <span class="self">self</span>.<span class="ident">address</span>.<span class="ident">clone</span>(),
+    <span class="kw">async fn </span>perform_hello(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;HelloReply&gt; {
+        <span class="self">self</span>.emit_event(|| {
+            SdamEvent::ServerHeartbeatStarted(ServerHeartbeatStartedEvent {
+                server_address: <span class="self">self</span>.address.clone(),
             })
         })
         .<span class="kw">await</span>;
 
-        <span class="kw">let</span> (<span class="ident">duration</span>, <span class="ident">result</span>) <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">connection</span> {
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">conn</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">command</span> <span class="op">=</span> <span class="ident">hello_command</span>(
-                    <span class="self">self</span>.<span class="ident">client_options</span>.<span class="ident">server_api</span>.<span class="ident">as_ref</span>(),
-                    <span class="self">self</span>.<span class="ident">client_options</span>.<span class="ident">load_balanced</span>,
-                    <span class="prelude-val">Some</span>(<span class="ident">conn</span>.<span class="ident">stream_description</span>()<span class="question-mark">?</span>.<span class="ident">hello_ok</span>),
+        <span class="kw">let </span>(duration, result) = <span class="kw">match </span><span class="self">self</span>.connection {
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref mut </span>conn) =&gt; {
+                <span class="kw">let </span>command = hello_command(
+                    <span class="self">self</span>.client_options.server_api.as_ref(),
+                    <span class="self">self</span>.client_options.load_balanced,
+                    <span class="prelude-val">Some</span>(conn.stream_description()<span class="question-mark">?</span>.hello_ok),
                 );
-                <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
+                <span class="kw">let </span>start = Instant::now();
                 (
-                    <span class="ident">start</span>.<span class="ident">elapsed</span>(),
-                    <span class="ident">run_hello</span>(<span class="ident">conn</span>, <span class="ident">command</span>, <span class="prelude-val">None</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">client_options</span>.<span class="ident">sdam_event_handler</span>).<span class="kw">await</span>,
+                    start.elapsed(),
+                    run_hello(conn, command, <span class="prelude-val">None</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.client_options.sdam_event_handler).<span class="kw">await</span>,
                 )
             }
-            <span class="prelude-val">None</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">connection</span> <span class="op">=</span> <span class="ident">Connection::connect_monitoring</span>(
-                    <span class="self">self</span>.<span class="ident">address</span>.<span class="ident">clone</span>(),
-                    <span class="self">self</span>.<span class="ident">client_options</span>.<span class="ident">connect_timeout</span>,
-                    <span class="self">self</span>.<span class="ident">client_options</span>.<span class="ident">tls_options</span>(),
+            <span class="prelude-val">None </span>=&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>connection = Connection::connect_monitoring(
+                    <span class="self">self</span>.address.clone(),
+                    <span class="self">self</span>.client_options.connect_timeout,
+                    <span class="self">self</span>.client_options.tls_options(),
                 )
                 .<span class="kw">await</span><span class="question-mark">?</span>;
 
-                <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">Instant::now</span>();
-                <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="self">self</span>
-                    .<span class="ident">handshaker</span>
-                    .<span class="ident">handshake</span>(
-                        <span class="kw-2">&amp;mut</span> <span class="ident">connection</span>,
+                <span class="kw">let </span>start = Instant::now();
+                <span class="kw">let </span>res = <span class="self">self
+                    </span>.handshaker
+                    .handshake(
+                        <span class="kw-2">&amp;mut </span>connection,
                         <span class="prelude-val">None</span>,
-                        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">client_options</span>.<span class="ident">sdam_event_handler</span>,
+                        <span class="kw-2">&amp;</span><span class="self">self</span>.client_options.sdam_event_handler,
                     )
-                    .<span class="kw">await</span>
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">hello_reply</span>);
+                    .<span class="kw">await
+                    </span>.map(|r| r.hello_reply);
 
-                <span class="self">self</span>.<span class="ident">connection</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">connection</span>);
-                (<span class="ident">start</span>.<span class="ident">elapsed</span>(), <span class="ident">res</span>)
+                <span class="self">self</span>.connection = <span class="prelude-val">Some</span>(connection);
+                (start.elapsed(), res)
             }
         };
 
-        <span class="kw">match</span> <span class="ident">result</span> {
-            <span class="prelude-val">Ok</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">emit_event</span>(<span class="op">|</span><span class="op">|</span> {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reply</span> <span class="op">=</span> <span class="ident">r</span>
-                        .<span class="ident">raw_command_response</span>
-                        .<span class="ident">to_document</span>()
-                        .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="macro">doc!</span> { <span class="string">&quot;deserialization error&quot;</span>: <span class="ident">e</span>.<span class="ident">to_string</span>() });
-                    <span class="comment">// if this hello call is part of a handshake, remove speculative authentication</span>
-                    <span class="comment">// information before publishing an event</span>
-                    <span class="ident">reply</span>.<span class="ident">remove</span>(<span class="string">&quot;speculativeAuthenticate&quot;</span>);
-                    <span class="ident">SdamEvent::ServerHeartbeatSucceeded</span>(<span class="ident">ServerHeartbeatSucceededEvent</span> {
-                        <span class="ident">duration</span>,
-                        <span class="ident">reply</span>,
-                        <span class="ident">server_address</span>: <span class="self">self</span>.<span class="ident">address</span>.<span class="ident">clone</span>(),
+        <span class="kw">match </span>result {
+            <span class="prelude-val">Ok</span>(<span class="kw-2">ref </span>r) =&gt; {
+                <span class="self">self</span>.emit_event(|| {
+                    <span class="kw">let </span><span class="kw-2">mut </span>reply = r
+                        .raw_command_response
+                        .to_document()
+                        .unwrap_or_else(|e| <span class="macro">doc! </span>{ <span class="string">&quot;deserialization error&quot;</span>: e.to_string() });
+                    <span class="comment">// if this hello call is part of a handshake, remove speculative authentication
+                    // information before publishing an event
+                    </span>reply.remove(<span class="string">&quot;speculativeAuthenticate&quot;</span>);
+                    SdamEvent::ServerHeartbeatSucceeded(ServerHeartbeatSucceededEvent {
+                        duration,
+                        reply,
+                        server_address: <span class="self">self</span>.address.clone(),
                     })
                 })
                 .<span class="kw">await</span>;
             }
-            <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">connection</span>.<span class="ident">take</span>();
-                <span class="self">self</span>.<span class="ident">emit_event</span>(<span class="op">|</span><span class="op">|</span> {
-                    <span class="ident">SdamEvent::ServerHeartbeatFailed</span>(<span class="ident">ServerHeartbeatFailedEvent</span> {
-                        <span class="ident">duration</span>,
-                        <span class="ident">failure</span>: <span class="ident">e</span>.<span class="ident">clone</span>(),
-                        <span class="ident">server_address</span>: <span class="self">self</span>.<span class="ident">address</span>.<span class="ident">clone</span>(),
+            <span class="prelude-val">Err</span>(<span class="kw-2">ref </span>e) =&gt; {
+                <span class="self">self</span>.connection.take();
+                <span class="self">self</span>.emit_event(|| {
+                    SdamEvent::ServerHeartbeatFailed(ServerHeartbeatFailedEvent {
+                        duration,
+                        failure: e.clone(),
+                        server_address: <span class="self">self</span>.address.clone(),
                     })
                 })
                 .<span class="kw">await</span>;
             }
         }
 
-        <span class="ident">result</span>
+        result
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_error</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">error</span>: <span class="ident">Error</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">topology_updater</span>
-            .<span class="ident">handle_monitor_error</span>(<span class="self">self</span>.<span class="ident">address</span>.<span class="ident">clone</span>(), <span class="ident">error</span>)
-            .<span class="kw">await</span>
-    }
+    <span class="kw">async fn </span>handle_error(<span class="kw-2">&amp;mut </span><span class="self">self</span>, error: Error) -&gt; bool {
+        <span class="self">self</span>.topology_updater
+            .handle_monitor_error(<span class="self">self</span>.address.clone(), error)
+            .<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">emit_event</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">event</span>: <span class="ident">F</span>)
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>() -&gt; <span class="ident">SdamEvent</span>,
+    <span class="kw">async fn </span>emit_event&lt;F&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, event: F)
+    <span class="kw">where
+        </span>F: FnOnce() -&gt; SdamEvent,
     {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">emitter</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">sdam_event_emitter</span> {
-            <span class="ident">emitter</span>.<span class="ident">emit</span>(<span class="ident">event</span>()).<span class="kw">await</span>
-        }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>emitter) = <span class="self">self</span>.sdam_event_emitter {
+            emitter.emit(event()).<span class="kw">await
+        </span>}
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

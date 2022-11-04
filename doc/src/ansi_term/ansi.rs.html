@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ansi_term-0.12.1/src/ansi.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ansi.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../ansi_term/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../ansi_term/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../ansi_term/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ansi_term-0.12.1/src/ansi.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>ansi.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../ansi_term/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../ansi_term/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../ansi_term/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -372,379 +372,379 @@
 <span id="372">372</span>
 <span id="373">373</span>
 <span id="374">374</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">style</span>::{<span class="ident">Colour</span>, <span class="ident">Style</span>};
+</pre><pre class="rust"><code><span class="kw">use </span>style::{Colour, Style};
 
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
+<span class="kw">use </span>std::fmt;
 
-<span class="kw">use</span> <span class="ident">write::AnyWrite</span>;
+<span class="kw">use </span>write::AnyWrite;
 
 
-<span class="comment">// ---- generating ANSI codes ----</span>
+<span class="comment">// ---- generating ANSI codes ----
 
-<span class="kw">impl</span> <span class="ident">Style</span> {
+</span><span class="kw">impl </span>Style {
 
-    <span class="doccomment">/// Write any bytes that go *before* a piece of text to the given writer.</span>
-    <span class="kw">fn</span> <span class="ident">write_prefix</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">AnyWrite</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">W::Error</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Write any bytes that go *before* a piece of text to the given writer.
+    </span><span class="kw">fn </span>write_prefix&lt;W: AnyWrite + <span class="question-mark">?</span>Sized&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>W) -&gt; <span class="prelude-ty">Result</span>&lt;(), W::Error&gt; {
 
-        <span class="comment">// If there are actually no styles here, then don’t write *any* codes</span>
-        <span class="comment">// as the prefix. An empty ANSI code may not affect the terminal</span>
-        <span class="comment">// output at all, but a user may just want a code-free string.</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_plain</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+        <span class="comment">// If there are actually no styles here, then don’t write *any* codes
+        // as the prefix. An empty ANSI code may not affect the terminal
+        // output at all, but a user may just want a code-free string.
+        </span><span class="kw">if </span><span class="self">self</span>.is_plain() {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(());
         }
 
-        <span class="comment">// Write the codes’ prefix, then write numbers, separated by</span>
-        <span class="comment">// semicolons, for each text style we want to apply.</span>
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;\x1B[&quot;</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">written_anything</span> <span class="op">=</span> <span class="bool-val">false</span>;
+        <span class="comment">// Write the codes’ prefix, then write numbers, separated by
+        // semicolons, for each text style we want to apply.
+        </span><span class="macro">write!</span>(f, <span class="string">&quot;\x1B[&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>written_anything = <span class="bool-val">false</span>;
 
         {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">write_char</span> <span class="op">=</span> <span class="op">|</span><span class="ident">c</span><span class="op">|</span> {
-                <span class="kw">if</span> <span class="ident">written_anything</span> { <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;;&quot;</span>)<span class="question-mark">?</span>; }
-                <span class="ident">written_anything</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">c</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>write_char = |c| {
+                <span class="kw">if </span>written_anything { <span class="macro">write!</span>(f, <span class="string">&quot;;&quot;</span>)<span class="question-mark">?</span>; }
+                written_anything = <span class="bool-val">true</span>;
+                <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, c)<span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(())
             };
 
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_bold</span>           { <span class="ident">write_char</span>(<span class="string">&#39;1&#39;</span>)<span class="question-mark">?</span> }
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_dimmed</span>         { <span class="ident">write_char</span>(<span class="string">&#39;2&#39;</span>)<span class="question-mark">?</span> }
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_italic</span>         { <span class="ident">write_char</span>(<span class="string">&#39;3&#39;</span>)<span class="question-mark">?</span> }
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_underline</span>      { <span class="ident">write_char</span>(<span class="string">&#39;4&#39;</span>)<span class="question-mark">?</span> }
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_blink</span>          { <span class="ident">write_char</span>(<span class="string">&#39;5&#39;</span>)<span class="question-mark">?</span> }
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_reverse</span>        { <span class="ident">write_char</span>(<span class="string">&#39;7&#39;</span>)<span class="question-mark">?</span> }
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_hidden</span>         { <span class="ident">write_char</span>(<span class="string">&#39;8&#39;</span>)<span class="question-mark">?</span> }
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_strikethrough</span>  { <span class="ident">write_char</span>(<span class="string">&#39;9&#39;</span>)<span class="question-mark">?</span> }
+            <span class="kw">if </span><span class="self">self</span>.is_bold           { write_char(<span class="string">&#39;1&#39;</span>)<span class="question-mark">? </span>}
+            <span class="kw">if </span><span class="self">self</span>.is_dimmed         { write_char(<span class="string">&#39;2&#39;</span>)<span class="question-mark">? </span>}
+            <span class="kw">if </span><span class="self">self</span>.is_italic         { write_char(<span class="string">&#39;3&#39;</span>)<span class="question-mark">? </span>}
+            <span class="kw">if </span><span class="self">self</span>.is_underline      { write_char(<span class="string">&#39;4&#39;</span>)<span class="question-mark">? </span>}
+            <span class="kw">if </span><span class="self">self</span>.is_blink          { write_char(<span class="string">&#39;5&#39;</span>)<span class="question-mark">? </span>}
+            <span class="kw">if </span><span class="self">self</span>.is_reverse        { write_char(<span class="string">&#39;7&#39;</span>)<span class="question-mark">? </span>}
+            <span class="kw">if </span><span class="self">self</span>.is_hidden         { write_char(<span class="string">&#39;8&#39;</span>)<span class="question-mark">? </span>}
+            <span class="kw">if </span><span class="self">self</span>.is_strikethrough  { write_char(<span class="string">&#39;9&#39;</span>)<span class="question-mark">? </span>}
         }
 
-        <span class="comment">// The foreground and background colours, if specified, need to be</span>
-        <span class="comment">// handled specially because the number codes are more complicated.</span>
-        <span class="comment">// (see `write_background_code` and `write_foreground_code`)</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">bg</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">background</span> {
-            <span class="kw">if</span> <span class="ident">written_anything</span> { <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;;&quot;</span>)<span class="question-mark">?</span>; }
-            <span class="ident">written_anything</span> <span class="op">=</span> <span class="bool-val">true</span>;
-            <span class="ident">bg</span>.<span class="ident">write_background_code</span>(<span class="ident">f</span>)<span class="question-mark">?</span>;
+        <span class="comment">// The foreground and background colours, if specified, need to be
+        // handled specially because the number codes are more complicated.
+        // (see `write_background_code` and `write_foreground_code`)
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(bg) = <span class="self">self</span>.background {
+            <span class="kw">if </span>written_anything { <span class="macro">write!</span>(f, <span class="string">&quot;;&quot;</span>)<span class="question-mark">?</span>; }
+            written_anything = <span class="bool-val">true</span>;
+            bg.write_background_code(f)<span class="question-mark">?</span>;
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">fg</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">foreground</span> {
-            <span class="kw">if</span> <span class="ident">written_anything</span> { <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;;&quot;</span>)<span class="question-mark">?</span>; }
-            <span class="ident">fg</span>.<span class="ident">write_foreground_code</span>(<span class="ident">f</span>)<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(fg) = <span class="self">self</span>.foreground {
+            <span class="kw">if </span>written_anything { <span class="macro">write!</span>(f, <span class="string">&quot;;&quot;</span>)<span class="question-mark">?</span>; }
+            fg.write_foreground_code(f)<span class="question-mark">?</span>;
         }
 
-        <span class="comment">// All the codes end with an `m`, because reasons.</span>
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;m&quot;</span>)<span class="question-mark">?</span>;
+        <span class="comment">// All the codes end with an `m`, because reasons.
+        </span><span class="macro">write!</span>(f, <span class="string">&quot;m&quot;</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Write any bytes that go *after* a piece of text to the given writer.</span>
-    <span class="kw">fn</span> <span class="ident">write_suffix</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">AnyWrite</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">W::Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_plain</span>() {
+    <span class="doccomment">/// Write any bytes that go *after* a piece of text to the given writer.
+    </span><span class="kw">fn </span>write_suffix&lt;W: AnyWrite + <span class="question-mark">?</span>Sized&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>W) -&gt; <span class="prelude-ty">Result</span>&lt;(), W::Error&gt; {
+        <span class="kw">if </span><span class="self">self</span>.is_plain() {
             <span class="prelude-val">Ok</span>(())
         }
-        <span class="kw">else</span> {
-            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">RESET</span>)
+        <span class="kw">else </span>{
+            <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, RESET)
         }
     }
 }
 
 
-<span class="doccomment">/// The code to send to reset all styles and return to `Style::default()`.</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">RESET</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;\x1B[0m&quot;</span>;
+<span class="doccomment">/// The code to send to reset all styles and return to `Style::default()`.
+</span><span class="kw">pub static </span>RESET: <span class="kw-2">&amp;</span>str = <span class="string">&quot;\x1B[0m&quot;</span>;
 
 
 
-<span class="kw">impl</span> <span class="ident">Colour</span> {
-    <span class="kw">fn</span> <span class="ident">write_foreground_code</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">AnyWrite</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">W::Error</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Colour::Black</span>      =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;30&quot;</span>),
-            <span class="ident">Colour::Red</span>        =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;31&quot;</span>),
-            <span class="ident">Colour::Green</span>      =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;32&quot;</span>),
-            <span class="ident">Colour::Yellow</span>     =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;33&quot;</span>),
-            <span class="ident">Colour::Blue</span>       =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;34&quot;</span>),
-            <span class="ident">Colour::Purple</span>     =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;35&quot;</span>),
-            <span class="ident">Colour::Cyan</span>       =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;36&quot;</span>),
-            <span class="ident">Colour::White</span>      =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;37&quot;</span>),
-            <span class="ident">Colour::Fixed</span>(<span class="ident">num</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;38;5;{}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">num</span>),
-            <span class="ident">Colour::RGB</span>(<span class="ident">r</span>,<span class="ident">g</span>,<span class="ident">b</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;38;2;{};{};{}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">r</span>, <span class="kw-2">&amp;</span><span class="ident">g</span>, <span class="kw-2">&amp;</span><span class="ident">b</span>),
+<span class="kw">impl </span>Colour {
+    <span class="kw">fn </span>write_foreground_code&lt;W: AnyWrite + <span class="question-mark">?</span>Sized&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>W) -&gt; <span class="prelude-ty">Result</span>&lt;(), W::Error&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Colour::Black      =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;30&quot;</span>),
+            Colour::Red        =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;31&quot;</span>),
+            Colour::Green      =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;32&quot;</span>),
+            Colour::Yellow     =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;33&quot;</span>),
+            Colour::Blue       =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;34&quot;</span>),
+            Colour::Purple     =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;35&quot;</span>),
+            Colour::Cyan       =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;36&quot;</span>),
+            Colour::White      =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;37&quot;</span>),
+            Colour::Fixed(num) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;38;5;{}&quot;</span>, <span class="kw-2">&amp;</span>num),
+            Colour::RGB(r,g,b) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;38;2;{};{};{}&quot;</span>, <span class="kw-2">&amp;</span>r, <span class="kw-2">&amp;</span>g, <span class="kw-2">&amp;</span>b),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">write_background_code</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">AnyWrite</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">W</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">W::Error</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Colour::Black</span>      =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;40&quot;</span>),
-            <span class="ident">Colour::Red</span>        =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;41&quot;</span>),
-            <span class="ident">Colour::Green</span>      =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;42&quot;</span>),
-            <span class="ident">Colour::Yellow</span>     =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;43&quot;</span>),
-            <span class="ident">Colour::Blue</span>       =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;44&quot;</span>),
-            <span class="ident">Colour::Purple</span>     =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;45&quot;</span>),
-            <span class="ident">Colour::Cyan</span>       =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;46&quot;</span>),
-            <span class="ident">Colour::White</span>      =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;47&quot;</span>),
-            <span class="ident">Colour::Fixed</span>(<span class="ident">num</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;48;5;{}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">num</span>),
-            <span class="ident">Colour::RGB</span>(<span class="ident">r</span>,<span class="ident">g</span>,<span class="ident">b</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;48;2;{};{};{}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">r</span>, <span class="kw-2">&amp;</span><span class="ident">g</span>, <span class="kw-2">&amp;</span><span class="ident">b</span>),
+    <span class="kw">fn </span>write_background_code&lt;W: AnyWrite + <span class="question-mark">?</span>Sized&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>W) -&gt; <span class="prelude-ty">Result</span>&lt;(), W::Error&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Colour::Black      =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;40&quot;</span>),
+            Colour::Red        =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;41&quot;</span>),
+            Colour::Green      =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;42&quot;</span>),
+            Colour::Yellow     =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;43&quot;</span>),
+            Colour::Blue       =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;44&quot;</span>),
+            Colour::Purple     =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;45&quot;</span>),
+            Colour::Cyan       =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;46&quot;</span>),
+            Colour::White      =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;47&quot;</span>),
+            Colour::Fixed(num) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;48;5;{}&quot;</span>, <span class="kw-2">&amp;</span>num),
+            Colour::RGB(r,g,b) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;48;2;{};{};{}&quot;</span>, <span class="kw-2">&amp;</span>r, <span class="kw-2">&amp;</span>g, <span class="kw-2">&amp;</span>b),
         }
     }
 }
 
 
-<span class="doccomment">/// Like `ANSIString`, but only displays the style prefix.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This type implements the `Display` trait, meaning it can be written to a</span>
-<span class="doccomment">/// `std::fmt` formatting without doing any extra allocation, and written to a</span>
-<span class="doccomment">/// string with the `.to_string()` method. For examples, see</span>
-<span class="doccomment">/// [`Style::prefix`](struct.Style.html#method.prefix).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Prefix</span>(<span class="ident">Style</span>);
+<span class="doccomment">/// Like `ANSIString`, but only displays the style prefix.
+///
+/// This type implements the `Display` trait, meaning it can be written to a
+/// `std::fmt` formatting without doing any extra allocation, and written to a
+/// string with the `.to_string()` method. For examples, see
+/// [`Style::prefix`](struct.Style.html#method.prefix).
+</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+</span><span class="kw">pub struct </span>Prefix(Style);
 
-<span class="doccomment">/// Like `ANSIString`, but only displays the difference between two</span>
-<span class="doccomment">/// styles.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This type implements the `Display` trait, meaning it can be written to a</span>
-<span class="doccomment">/// `std::fmt` formatting without doing any extra allocation, and written to a</span>
-<span class="doccomment">/// string with the `.to_string()` method. For examples, see</span>
-<span class="doccomment">/// [`Style::infix`](struct.Style.html#method.infix).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Infix</span>(<span class="ident">Style</span>, <span class="ident">Style</span>);
+<span class="doccomment">/// Like `ANSIString`, but only displays the difference between two
+/// styles.
+///
+/// This type implements the `Display` trait, meaning it can be written to a
+/// `std::fmt` formatting without doing any extra allocation, and written to a
+/// string with the `.to_string()` method. For examples, see
+/// [`Style::infix`](struct.Style.html#method.infix).
+</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+</span><span class="kw">pub struct </span>Infix(Style, Style);
 
-<span class="doccomment">/// Like `ANSIString`, but only displays the style suffix.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This type implements the `Display` trait, meaning it can be written to a</span>
-<span class="doccomment">/// `std::fmt` formatting without doing any extra allocation, and written to a</span>
-<span class="doccomment">/// string with the `.to_string()` method. For examples, see</span>
-<span class="doccomment">/// [`Style::suffix`](struct.Style.html#method.suffix).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Suffix</span>(<span class="ident">Style</span>);
+<span class="doccomment">/// Like `ANSIString`, but only displays the style suffix.
+///
+/// This type implements the `Display` trait, meaning it can be written to a
+/// `std::fmt` formatting without doing any extra allocation, and written to a
+/// string with the `.to_string()` method. For examples, see
+/// [`Style::suffix`](struct.Style.html#method.suffix).
+</span><span class="attribute">#[derive(Clone, Copy, Debug)]
+</span><span class="kw">pub struct </span>Suffix(Style);
 
 
-<span class="kw">impl</span> <span class="ident">Style</span> {
+<span class="kw">impl </span>Style {
 
-    <span class="doccomment">/// The prefix bytes for this style. These are the bytes that tell the</span>
-    <span class="doccomment">/// terminal to use a different colour or font style.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ansi_term::{Style, Colour::Blue};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let style = Style::default().bold();</span>
-    <span class="doccomment">/// assert_eq!(&quot;\x1b[1m&quot;,</span>
-    <span class="doccomment">///            style.prefix().to_string());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let style = Blue.bold();</span>
-    <span class="doccomment">/// assert_eq!(&quot;\x1b[1;34m&quot;,</span>
-    <span class="doccomment">///            style.prefix().to_string());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let style = Style::default();</span>
-    <span class="doccomment">/// assert_eq!(&quot;&quot;,</span>
-    <span class="doccomment">///            style.prefix().to_string());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prefix</span>(<span class="self">self</span>) -&gt; <span class="ident">Prefix</span> {
-        <span class="ident">Prefix</span>(<span class="self">self</span>)
+    <span class="doccomment">/// The prefix bytes for this style. These are the bytes that tell the
+    /// terminal to use a different colour or font style.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ansi_term::{Style, Colour::Blue};
+    ///
+    /// let style = Style::default().bold();
+    /// assert_eq!(&quot;\x1b[1m&quot;,
+    ///            style.prefix().to_string());
+    ///
+    /// let style = Blue.bold();
+    /// assert_eq!(&quot;\x1b[1;34m&quot;,
+    ///            style.prefix().to_string());
+    ///
+    /// let style = Style::default();
+    /// assert_eq!(&quot;&quot;,
+    ///            style.prefix().to_string());
+    /// ```
+    </span><span class="kw">pub fn </span>prefix(<span class="self">self</span>) -&gt; Prefix {
+        Prefix(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// The infix bytes between this style and `next` style. These are the bytes</span>
-    <span class="doccomment">/// that tell the terminal to change the style to `next`. These may include</span>
-    <span class="doccomment">/// a reset followed by the next colour and style, depending on the two styles.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ansi_term::{Style, Colour::Green};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let style = Style::default().bold();</span>
-    <span class="doccomment">/// assert_eq!(&quot;\x1b[32m&quot;,</span>
-    <span class="doccomment">///            style.infix(Green.bold()).to_string());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let style = Green.normal();</span>
-    <span class="doccomment">/// assert_eq!(&quot;\x1b[1m&quot;,</span>
-    <span class="doccomment">///            style.infix(Green.bold()).to_string());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let style = Style::default();</span>
-    <span class="doccomment">/// assert_eq!(&quot;&quot;,</span>
-    <span class="doccomment">///            style.infix(style).to_string());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">infix</span>(<span class="self">self</span>, <span class="ident">next</span>: <span class="ident">Style</span>) -&gt; <span class="ident">Infix</span> {
-        <span class="ident">Infix</span>(<span class="self">self</span>, <span class="ident">next</span>)
+    <span class="doccomment">/// The infix bytes between this style and `next` style. These are the bytes
+    /// that tell the terminal to change the style to `next`. These may include
+    /// a reset followed by the next colour and style, depending on the two styles.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ansi_term::{Style, Colour::Green};
+    ///
+    /// let style = Style::default().bold();
+    /// assert_eq!(&quot;\x1b[32m&quot;,
+    ///            style.infix(Green.bold()).to_string());
+    ///
+    /// let style = Green.normal();
+    /// assert_eq!(&quot;\x1b[1m&quot;,
+    ///            style.infix(Green.bold()).to_string());
+    ///
+    /// let style = Style::default();
+    /// assert_eq!(&quot;&quot;,
+    ///            style.infix(style).to_string());
+    /// ```
+    </span><span class="kw">pub fn </span>infix(<span class="self">self</span>, next: Style) -&gt; Infix {
+        Infix(<span class="self">self</span>, next)
     }
 
-    <span class="doccomment">/// The suffix for this style. These are the bytes that tell the terminal</span>
-    <span class="doccomment">/// to reset back to its normal colour and font style.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ansi_term::{Style, Colour::Green};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let style = Style::default().bold();</span>
-    <span class="doccomment">/// assert_eq!(&quot;\x1b[0m&quot;,</span>
-    <span class="doccomment">///            style.suffix().to_string());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let style = Green.normal().bold();</span>
-    <span class="doccomment">/// assert_eq!(&quot;\x1b[0m&quot;,</span>
-    <span class="doccomment">///            style.suffix().to_string());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let style = Style::default();</span>
-    <span class="doccomment">/// assert_eq!(&quot;&quot;,</span>
-    <span class="doccomment">///            style.suffix().to_string());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">suffix</span>(<span class="self">self</span>) -&gt; <span class="ident">Suffix</span> {
-        <span class="ident">Suffix</span>(<span class="self">self</span>)
-    }
-}
-
-
-<span class="kw">impl</span> <span class="ident">Colour</span> {
-
-    <span class="doccomment">/// The prefix bytes for this colour as a `Style`. These are the bytes</span>
-    <span class="doccomment">/// that tell the terminal to use a different colour or font style.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See also [`Style::prefix`](struct.Style.html#method.prefix).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ansi_term::Colour::Green;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(&quot;\x1b[0m&quot;,</span>
-    <span class="doccomment">///            Green.suffix().to_string());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prefix</span>(<span class="self">self</span>) -&gt; <span class="ident">Prefix</span> {
-        <span class="ident">Prefix</span>(<span class="self">self</span>.<span class="ident">normal</span>())
-    }
-
-    <span class="doccomment">/// The infix bytes between this colour and `next` colour. These are the bytes</span>
-    <span class="doccomment">/// that tell the terminal to use the `next` colour, or to do nothing if</span>
-    <span class="doccomment">/// the two colours are equal.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See also [`Style::infix`](struct.Style.html#method.infix).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ansi_term::Colour::{Red, Yellow};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(&quot;\x1b[33m&quot;,</span>
-    <span class="doccomment">///            Red.infix(Yellow).to_string());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">infix</span>(<span class="self">self</span>, <span class="ident">next</span>: <span class="ident">Colour</span>) -&gt; <span class="ident">Infix</span> {
-        <span class="ident">Infix</span>(<span class="self">self</span>.<span class="ident">normal</span>(), <span class="ident">next</span>.<span class="ident">normal</span>())
-    }
-
-    <span class="doccomment">/// The suffix for this colour as a `Style`. These are the bytes that</span>
-    <span class="doccomment">/// tell the terminal to reset back to its normal colour and font style.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See also [`Style::suffix`](struct.Style.html#method.suffix).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use ansi_term::Colour::Purple;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(&quot;\x1b[0m&quot;,</span>
-    <span class="doccomment">///            Purple.suffix().to_string());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">suffix</span>(<span class="self">self</span>) -&gt; <span class="ident">Suffix</span> {
-        <span class="ident">Suffix</span>(<span class="self">self</span>.<span class="ident">normal</span>())
+    <span class="doccomment">/// The suffix for this style. These are the bytes that tell the terminal
+    /// to reset back to its normal colour and font style.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ansi_term::{Style, Colour::Green};
+    ///
+    /// let style = Style::default().bold();
+    /// assert_eq!(&quot;\x1b[0m&quot;,
+    ///            style.suffix().to_string());
+    ///
+    /// let style = Green.normal().bold();
+    /// assert_eq!(&quot;\x1b[0m&quot;,
+    ///            style.suffix().to_string());
+    ///
+    /// let style = Style::default();
+    /// assert_eq!(&quot;&quot;,
+    ///            style.suffix().to_string());
+    /// ```
+    </span><span class="kw">pub fn </span>suffix(<span class="self">self</span>) -&gt; Suffix {
+        Suffix(<span class="self">self</span>)
     }
 }
 
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Prefix</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Write</span> <span class="op">=</span> <span class="ident">f</span>;
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">write_prefix</span>(<span class="ident">f</span>)
+<span class="kw">impl </span>Colour {
+
+    <span class="doccomment">/// The prefix bytes for this colour as a `Style`. These are the bytes
+    /// that tell the terminal to use a different colour or font style.
+    ///
+    /// See also [`Style::prefix`](struct.Style.html#method.prefix).
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ansi_term::Colour::Green;
+    ///
+    /// assert_eq!(&quot;\x1b[0m&quot;,
+    ///            Green.suffix().to_string());
+    /// ```
+    </span><span class="kw">pub fn </span>prefix(<span class="self">self</span>) -&gt; Prefix {
+        Prefix(<span class="self">self</span>.normal())
+    }
+
+    <span class="doccomment">/// The infix bytes between this colour and `next` colour. These are the bytes
+    /// that tell the terminal to use the `next` colour, or to do nothing if
+    /// the two colours are equal.
+    ///
+    /// See also [`Style::infix`](struct.Style.html#method.infix).
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ansi_term::Colour::{Red, Yellow};
+    ///
+    /// assert_eq!(&quot;\x1b[33m&quot;,
+    ///            Red.infix(Yellow).to_string());
+    /// ```
+    </span><span class="kw">pub fn </span>infix(<span class="self">self</span>, next: Colour) -&gt; Infix {
+        Infix(<span class="self">self</span>.normal(), next.normal())
+    }
+
+    <span class="doccomment">/// The suffix for this colour as a `Style`. These are the bytes that
+    /// tell the terminal to reset back to its normal colour and font style.
+    ///
+    /// See also [`Style::suffix`](struct.Style.html#method.suffix).
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ansi_term::Colour::Purple;
+    ///
+    /// assert_eq!(&quot;\x1b[0m&quot;,
+    ///            Purple.suffix().to_string());
+    /// ```
+    </span><span class="kw">pub fn </span>suffix(<span class="self">self</span>) -&gt; Suffix {
+        Suffix(<span class="self">self</span>.normal())
     }
 }
 
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Infix</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">use</span> <span class="ident">difference::Difference</span>;
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Prefix {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">let </span>f: <span class="kw-2">&amp;mut </span>fmt::Write = f;
+        <span class="self">self</span>.<span class="number">0</span>.write_prefix(f)
+    }
+}
 
-        <span class="kw">match</span> <span class="ident">Difference::between</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">1</span>) {
-            <span class="ident">Difference::ExtraStyles</span>(<span class="ident">style</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Write</span> <span class="op">=</span> <span class="ident">f</span>;
-                <span class="ident">style</span>.<span class="ident">write_prefix</span>(<span class="ident">f</span>)
+
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Infix {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">use </span>difference::Difference;
+
+        <span class="kw">match </span>Difference::between(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">1</span>) {
+            Difference::ExtraStyles(style) =&gt; {
+                <span class="kw">let </span>f: <span class="kw-2">&amp;mut </span>fmt::Write = f;
+                style.write_prefix(f)
             },
-            <span class="ident">Difference::Reset</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Write</span> <span class="op">=</span> <span class="ident">f</span>;
-                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}{}&quot;</span>, <span class="ident">RESET</span>, <span class="self">self</span>.<span class="number">1</span>.<span class="ident">prefix</span>())
+            Difference::Reset =&gt; {
+                <span class="kw">let </span>f: <span class="kw-2">&amp;mut </span>fmt::Write = f;
+                <span class="macro">write!</span>(f, <span class="string">&quot;{}{}&quot;</span>, RESET, <span class="self">self</span>.<span class="number">1</span>.prefix())
             },
-            <span class="ident">Difference::NoDifference</span> =&gt; {
-                <span class="prelude-val">Ok</span>(())   <span class="comment">// nothing to write</span>
-            },
+            Difference::NoDifference =&gt; {
+                <span class="prelude-val">Ok</span>(())   <span class="comment">// nothing to write
+            </span>},
         }
     }
 }
 
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Suffix</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Write</span> <span class="op">=</span> <span class="ident">f</span>;
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">write_suffix</span>(<span class="ident">f</span>)
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Suffix {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">let </span>f: <span class="kw-2">&amp;mut </span>fmt::Write = f;
+        <span class="self">self</span>.<span class="number">0</span>.write_suffix(f)
     }
 }
 
 
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="ident">style::Style</span>;
-    <span class="kw">use</span> <span class="ident">style::Colour</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use </span>style::Style;
+    <span class="kw">use </span>style::Colour::<span class="kw-2">*</span>;
 
-    <span class="macro">macro_rules!</span> <span class="ident">test</span> {
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="ident">ident</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">style</span>: <span class="ident">expr</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">input</span>: <span class="ident">expr</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>: <span class="ident">expr</span>) =&gt; {
-            <span class="attribute">#[<span class="ident">test</span>]</span>
-            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>() {
-                <span class="macro">assert_eq!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">style</span>.<span class="ident">paint</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input</span>).<span class="ident">to_string</span>(), <span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>.<span class="ident">to_string</span>());
+    <span class="macro">macro_rules! </span>test {
+        (<span class="macro-nonterminal">$name</span>: ident: <span class="macro-nonterminal">$style</span>: expr; <span class="macro-nonterminal">$input</span>: expr =&gt; <span class="macro-nonterminal">$result</span>: expr) =&gt; {
+            <span class="attribute">#[test]
+            </span><span class="kw">fn </span><span class="macro-nonterminal">$name</span>() {
+                <span class="macro">assert_eq!</span>(<span class="macro-nonterminal">$style</span>.paint(<span class="macro-nonterminal">$input</span>).to_string(), <span class="macro-nonterminal">$result</span>.to_string());
 
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">style</span>.<span class="ident">paint</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">input</span>.<span class="ident">as_bytes</span>()).<span class="ident">write_to</span>(<span class="kw-2">&amp;mut</span> <span class="ident">v</span>).<span class="ident">unwrap</span>();
-                <span class="macro">assert_eq!</span>(<span class="ident">v</span>.<span class="ident">as_slice</span>(), <span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>.<span class="ident">as_bytes</span>());
+                <span class="kw">let </span><span class="kw-2">mut </span>v = Vec::new();
+                <span class="macro-nonterminal">$style</span>.paint(<span class="macro-nonterminal">$input</span>.as_bytes()).write_to(<span class="kw-2">&amp;mut </span>v).unwrap();
+                <span class="macro">assert_eq!</span>(v.as_slice(), <span class="macro-nonterminal">$result</span>.as_bytes());
             }
         };
     }
 
-    <span class="macro">test!</span>(<span class="ident">plain</span>:                 <span class="ident">Style::default</span>();                  <span class="string">&quot;text/plain&quot;</span> =&gt; <span class="string">&quot;text/plain&quot;</span>);
-    <span class="macro">test!</span>(<span class="ident">red</span>:                   <span class="ident">Red</span>;                               <span class="string">&quot;hi&quot;</span> =&gt; <span class="string">&quot;\x1B[31mhi\x1B[0m&quot;</span>);
-    <span class="macro">test!</span>(<span class="ident">black</span>:                 <span class="ident">Black</span>.<span class="ident">normal</span>();                    <span class="string">&quot;hi&quot;</span> =&gt; <span class="string">&quot;\x1B[30mhi\x1B[0m&quot;</span>);
-    <span class="macro">test!</span>(<span class="ident">yellow_bold</span>:           <span class="ident">Yellow</span>.<span class="ident">bold</span>();                     <span class="string">&quot;hi&quot;</span> =&gt; <span class="string">&quot;\x1B[1;33mhi\x1B[0m&quot;</span>);
-    <span class="macro">test!</span>(<span class="ident">yellow_bold_2</span>:         <span class="ident">Yellow</span>.<span class="ident">normal</span>().<span class="ident">bold</span>();            <span class="string">&quot;hi&quot;</span> =&gt; <span class="string">&quot;\x1B[1;33mhi\x1B[0m&quot;</span>);
-    <span class="macro">test!</span>(<span class="ident">blue_underline</span>:        <span class="ident">Blue</span>.<span class="ident">underline</span>();                  <span class="string">&quot;hi&quot;</span> =&gt; <span class="string">&quot;\x1B[4;34mhi\x1B[0m&quot;</span>);
-    <span class="macro">test!</span>(<span class="ident">green_bold_ul</span>:         <span class="ident">Green</span>.<span class="ident">bold</span>().<span class="ident">underline</span>();          <span class="string">&quot;hi&quot;</span> =&gt; <span class="string">&quot;\x1B[1;4;32mhi\x1B[0m&quot;</span>);
-    <span class="macro">test!</span>(<span class="ident">green_bold_ul_2</span>:       <span class="ident">Green</span>.<span class="ident">underline</span>().<span class="ident">bold</span>();          <span class="string">&quot;hi&quot;</span> =&gt; <span class="string">&quot;\x1B[1;4;32mhi\x1B[0m&quot;</span>);
-    <span class="macro">test!</span>(<span class="ident">purple_on_white</span>:       <span class="ident">Purple</span>.<span class="ident">on</span>(<span class="ident">White</span>);                  <span class="string">&quot;hi&quot;</span> =&gt; <span class="string">&quot;\x1B[47;35mhi\x1B[0m&quot;</span>);
-    <span class="macro">test!</span>(<span class="ident">purple_on_white_2</span>:     <span class="ident">Purple</span>.<span class="ident">normal</span>().<span class="ident">on</span>(<span class="ident">White</span>);         <span class="string">&quot;hi&quot;</span> =&gt; <span class="string">&quot;\x1B[47;35mhi\x1B[0m&quot;</span>);
-    <span class="macro">test!</span>(<span class="ident">yellow_on_blue</span>:        <span class="ident">Style::new</span>().<span class="ident">on</span>(<span class="ident">Blue</span>).<span class="ident">fg</span>(<span class="ident">Yellow</span>);  <span class="string">&quot;hi&quot;</span> =&gt; <span class="string">&quot;\x1B[44;33mhi\x1B[0m&quot;</span>);
-    <span class="macro">test!</span>(<span class="ident">yellow_on_blue_2</span>:      <span class="ident">Cyan</span>.<span class="ident">on</span>(<span class="ident">Blue</span>).<span class="ident">fg</span>(<span class="ident">Yellow</span>);          <span class="string">&quot;hi&quot;</span> =&gt; <span class="string">&quot;\x1B[44;33mhi\x1B[0m&quot;</span>);
-    <span class="macro">test!</span>(<span class="ident">cyan_bold_on_white</span>:    <span class="ident">Cyan</span>.<span class="ident">bold</span>().<span class="ident">on</span>(<span class="ident">White</span>);             <span class="string">&quot;hi&quot;</span> =&gt; <span class="string">&quot;\x1B[1;47;36mhi\x1B[0m&quot;</span>);
-    <span class="macro">test!</span>(<span class="ident">cyan_ul_on_white</span>:      <span class="ident">Cyan</span>.<span class="ident">underline</span>().<span class="ident">on</span>(<span class="ident">White</span>);        <span class="string">&quot;hi&quot;</span> =&gt; <span class="string">&quot;\x1B[4;47;36mhi\x1B[0m&quot;</span>);
-    <span class="macro">test!</span>(<span class="ident">cyan_bold_ul_on_white</span>: <span class="ident">Cyan</span>.<span class="ident">bold</span>().<span class="ident">underline</span>().<span class="ident">on</span>(<span class="ident">White</span>); <span class="string">&quot;hi&quot;</span> =&gt; <span class="string">&quot;\x1B[1;4;47;36mhi\x1B[0m&quot;</span>);
-    <span class="macro">test!</span>(<span class="ident">cyan_ul_bold_on_white</span>: <span class="ident">Cyan</span>.<span class="ident">underline</span>().<span class="ident">bold</span>().<span class="ident">on</span>(<span class="ident">White</span>); <span class="string">&quot;hi&quot;</span> =&gt; <span class="string">&quot;\x1B[1;4;47;36mhi\x1B[0m&quot;</span>);
-    <span class="macro">test!</span>(<span class="ident">fixed</span>:                 <span class="ident">Fixed</span>(<span class="number">100</span>);                        <span class="string">&quot;hi&quot;</span> =&gt; <span class="string">&quot;\x1B[38;5;100mhi\x1B[0m&quot;</span>);
-    <span class="macro">test!</span>(<span class="ident">fixed_on_purple</span>:       <span class="ident">Fixed</span>(<span class="number">100</span>).<span class="ident">on</span>(<span class="ident">Purple</span>);             <span class="string">&quot;hi&quot;</span> =&gt; <span class="string">&quot;\x1B[45;38;5;100mhi\x1B[0m&quot;</span>);
-    <span class="macro">test!</span>(<span class="ident">fixed_on_fixed</span>:        <span class="ident">Fixed</span>(<span class="number">100</span>).<span class="ident">on</span>(<span class="ident">Fixed</span>(<span class="number">200</span>));         <span class="string">&quot;hi&quot;</span> =&gt; <span class="string">&quot;\x1B[48;5;200;38;5;100mhi\x1B[0m&quot;</span>);
-    <span class="macro">test!</span>(<span class="ident">rgb</span>:                   <span class="ident">RGB</span>(<span class="number">70</span>,<span class="number">130</span>,<span class="number">180</span>);                   <span class="string">&quot;hi&quot;</span> =&gt; <span class="string">&quot;\x1B[38;2;70;130;180mhi\x1B[0m&quot;</span>);
-    <span class="macro">test!</span>(<span class="ident">rgb_on_blue</span>:           <span class="ident">RGB</span>(<span class="number">70</span>,<span class="number">130</span>,<span class="number">180</span>).<span class="ident">on</span>(<span class="ident">Blue</span>);          <span class="string">&quot;hi&quot;</span> =&gt; <span class="string">&quot;\x1B[44;38;2;70;130;180mhi\x1B[0m&quot;</span>);
-    <span class="macro">test!</span>(<span class="ident">blue_on_rgb</span>:           <span class="ident">Blue</span>.<span class="ident">on</span>(<span class="ident">RGB</span>(<span class="number">70</span>,<span class="number">130</span>,<span class="number">180</span>));          <span class="string">&quot;hi&quot;</span> =&gt; <span class="string">&quot;\x1B[48;2;70;130;180;34mhi\x1B[0m&quot;</span>);
-    <span class="macro">test!</span>(<span class="ident">rgb_on_rgb</span>:            <span class="ident">RGB</span>(<span class="number">70</span>,<span class="number">130</span>,<span class="number">180</span>).<span class="ident">on</span>(<span class="ident">RGB</span>(<span class="number">5</span>,<span class="number">10</span>,<span class="number">15</span>));  <span class="string">&quot;hi&quot;</span> =&gt; <span class="string">&quot;\x1B[48;2;5;10;15;38;2;70;130;180mhi\x1B[0m&quot;</span>);
-    <span class="macro">test!</span>(<span class="ident">bold</span>:                  <span class="ident">Style::new</span>().<span class="ident">bold</span>();               <span class="string">&quot;hi&quot;</span> =&gt; <span class="string">&quot;\x1B[1mhi\x1B[0m&quot;</span>);
-    <span class="macro">test!</span>(<span class="ident">underline</span>:             <span class="ident">Style::new</span>().<span class="ident">underline</span>();          <span class="string">&quot;hi&quot;</span> =&gt; <span class="string">&quot;\x1B[4mhi\x1B[0m&quot;</span>);
-    <span class="macro">test!</span>(<span class="ident">bunderline</span>:            <span class="ident">Style::new</span>().<span class="ident">bold</span>().<span class="ident">underline</span>();   <span class="string">&quot;hi&quot;</span> =&gt; <span class="string">&quot;\x1B[1;4mhi\x1B[0m&quot;</span>);
-    <span class="macro">test!</span>(<span class="ident">dimmed</span>:                <span class="ident">Style::new</span>().<span class="ident">dimmed</span>();             <span class="string">&quot;hi&quot;</span> =&gt; <span class="string">&quot;\x1B[2mhi\x1B[0m&quot;</span>);
-    <span class="macro">test!</span>(<span class="ident">italic</span>:                <span class="ident">Style::new</span>().<span class="ident">italic</span>();             <span class="string">&quot;hi&quot;</span> =&gt; <span class="string">&quot;\x1B[3mhi\x1B[0m&quot;</span>);
-    <span class="macro">test!</span>(<span class="ident">blink</span>:                 <span class="ident">Style::new</span>().<span class="ident">blink</span>();              <span class="string">&quot;hi&quot;</span> =&gt; <span class="string">&quot;\x1B[5mhi\x1B[0m&quot;</span>);
-    <span class="macro">test!</span>(<span class="ident">reverse</span>:               <span class="ident">Style::new</span>().<span class="ident">reverse</span>();            <span class="string">&quot;hi&quot;</span> =&gt; <span class="string">&quot;\x1B[7mhi\x1B[0m&quot;</span>);
-    <span class="macro">test!</span>(<span class="ident">hidden</span>:                <span class="ident">Style::new</span>().<span class="ident">hidden</span>();             <span class="string">&quot;hi&quot;</span> =&gt; <span class="string">&quot;\x1B[8mhi\x1B[0m&quot;</span>);
-    <span class="macro">test!</span>(<span class="ident">stricken</span>:              <span class="ident">Style::new</span>().<span class="ident">strikethrough</span>();      <span class="string">&quot;hi&quot;</span> =&gt; <span class="string">&quot;\x1B[9mhi\x1B[0m&quot;</span>);
+    <span class="macro">test!</span>(plain:                 Style::default();                  <span class="string">&quot;text/plain&quot; </span>=&gt; <span class="string">&quot;text/plain&quot;</span>);
+    <span class="macro">test!</span>(red:                   Red;                               <span class="string">&quot;hi&quot; </span>=&gt; <span class="string">&quot;\x1B[31mhi\x1B[0m&quot;</span>);
+    <span class="macro">test!</span>(black:                 Black.normal();                    <span class="string">&quot;hi&quot; </span>=&gt; <span class="string">&quot;\x1B[30mhi\x1B[0m&quot;</span>);
+    <span class="macro">test!</span>(yellow_bold:           Yellow.bold();                     <span class="string">&quot;hi&quot; </span>=&gt; <span class="string">&quot;\x1B[1;33mhi\x1B[0m&quot;</span>);
+    <span class="macro">test!</span>(yellow_bold_2:         Yellow.normal().bold();            <span class="string">&quot;hi&quot; </span>=&gt; <span class="string">&quot;\x1B[1;33mhi\x1B[0m&quot;</span>);
+    <span class="macro">test!</span>(blue_underline:        Blue.underline();                  <span class="string">&quot;hi&quot; </span>=&gt; <span class="string">&quot;\x1B[4;34mhi\x1B[0m&quot;</span>);
+    <span class="macro">test!</span>(green_bold_ul:         Green.bold().underline();          <span class="string">&quot;hi&quot; </span>=&gt; <span class="string">&quot;\x1B[1;4;32mhi\x1B[0m&quot;</span>);
+    <span class="macro">test!</span>(green_bold_ul_2:       Green.underline().bold();          <span class="string">&quot;hi&quot; </span>=&gt; <span class="string">&quot;\x1B[1;4;32mhi\x1B[0m&quot;</span>);
+    <span class="macro">test!</span>(purple_on_white:       Purple.on(White);                  <span class="string">&quot;hi&quot; </span>=&gt; <span class="string">&quot;\x1B[47;35mhi\x1B[0m&quot;</span>);
+    <span class="macro">test!</span>(purple_on_white_2:     Purple.normal().on(White);         <span class="string">&quot;hi&quot; </span>=&gt; <span class="string">&quot;\x1B[47;35mhi\x1B[0m&quot;</span>);
+    <span class="macro">test!</span>(yellow_on_blue:        Style::new().on(Blue).fg(Yellow);  <span class="string">&quot;hi&quot; </span>=&gt; <span class="string">&quot;\x1B[44;33mhi\x1B[0m&quot;</span>);
+    <span class="macro">test!</span>(yellow_on_blue_2:      Cyan.on(Blue).fg(Yellow);          <span class="string">&quot;hi&quot; </span>=&gt; <span class="string">&quot;\x1B[44;33mhi\x1B[0m&quot;</span>);
+    <span class="macro">test!</span>(cyan_bold_on_white:    Cyan.bold().on(White);             <span class="string">&quot;hi&quot; </span>=&gt; <span class="string">&quot;\x1B[1;47;36mhi\x1B[0m&quot;</span>);
+    <span class="macro">test!</span>(cyan_ul_on_white:      Cyan.underline().on(White);        <span class="string">&quot;hi&quot; </span>=&gt; <span class="string">&quot;\x1B[4;47;36mhi\x1B[0m&quot;</span>);
+    <span class="macro">test!</span>(cyan_bold_ul_on_white: Cyan.bold().underline().on(White); <span class="string">&quot;hi&quot; </span>=&gt; <span class="string">&quot;\x1B[1;4;47;36mhi\x1B[0m&quot;</span>);
+    <span class="macro">test!</span>(cyan_ul_bold_on_white: Cyan.underline().bold().on(White); <span class="string">&quot;hi&quot; </span>=&gt; <span class="string">&quot;\x1B[1;4;47;36mhi\x1B[0m&quot;</span>);
+    <span class="macro">test!</span>(fixed:                 Fixed(<span class="number">100</span>);                        <span class="string">&quot;hi&quot; </span>=&gt; <span class="string">&quot;\x1B[38;5;100mhi\x1B[0m&quot;</span>);
+    <span class="macro">test!</span>(fixed_on_purple:       Fixed(<span class="number">100</span>).on(Purple);             <span class="string">&quot;hi&quot; </span>=&gt; <span class="string">&quot;\x1B[45;38;5;100mhi\x1B[0m&quot;</span>);
+    <span class="macro">test!</span>(fixed_on_fixed:        Fixed(<span class="number">100</span>).on(Fixed(<span class="number">200</span>));         <span class="string">&quot;hi&quot; </span>=&gt; <span class="string">&quot;\x1B[48;5;200;38;5;100mhi\x1B[0m&quot;</span>);
+    <span class="macro">test!</span>(rgb:                   RGB(<span class="number">70</span>,<span class="number">130</span>,<span class="number">180</span>);                   <span class="string">&quot;hi&quot; </span>=&gt; <span class="string">&quot;\x1B[38;2;70;130;180mhi\x1B[0m&quot;</span>);
+    <span class="macro">test!</span>(rgb_on_blue:           RGB(<span class="number">70</span>,<span class="number">130</span>,<span class="number">180</span>).on(Blue);          <span class="string">&quot;hi&quot; </span>=&gt; <span class="string">&quot;\x1B[44;38;2;70;130;180mhi\x1B[0m&quot;</span>);
+    <span class="macro">test!</span>(blue_on_rgb:           Blue.on(RGB(<span class="number">70</span>,<span class="number">130</span>,<span class="number">180</span>));          <span class="string">&quot;hi&quot; </span>=&gt; <span class="string">&quot;\x1B[48;2;70;130;180;34mhi\x1B[0m&quot;</span>);
+    <span class="macro">test!</span>(rgb_on_rgb:            RGB(<span class="number">70</span>,<span class="number">130</span>,<span class="number">180</span>).on(RGB(<span class="number">5</span>,<span class="number">10</span>,<span class="number">15</span>));  <span class="string">&quot;hi&quot; </span>=&gt; <span class="string">&quot;\x1B[48;2;5;10;15;38;2;70;130;180mhi\x1B[0m&quot;</span>);
+    <span class="macro">test!</span>(bold:                  Style::new().bold();               <span class="string">&quot;hi&quot; </span>=&gt; <span class="string">&quot;\x1B[1mhi\x1B[0m&quot;</span>);
+    <span class="macro">test!</span>(underline:             Style::new().underline();          <span class="string">&quot;hi&quot; </span>=&gt; <span class="string">&quot;\x1B[4mhi\x1B[0m&quot;</span>);
+    <span class="macro">test!</span>(bunderline:            Style::new().bold().underline();   <span class="string">&quot;hi&quot; </span>=&gt; <span class="string">&quot;\x1B[1;4mhi\x1B[0m&quot;</span>);
+    <span class="macro">test!</span>(dimmed:                Style::new().dimmed();             <span class="string">&quot;hi&quot; </span>=&gt; <span class="string">&quot;\x1B[2mhi\x1B[0m&quot;</span>);
+    <span class="macro">test!</span>(italic:                Style::new().italic();             <span class="string">&quot;hi&quot; </span>=&gt; <span class="string">&quot;\x1B[3mhi\x1B[0m&quot;</span>);
+    <span class="macro">test!</span>(blink:                 Style::new().blink();              <span class="string">&quot;hi&quot; </span>=&gt; <span class="string">&quot;\x1B[5mhi\x1B[0m&quot;</span>);
+    <span class="macro">test!</span>(reverse:               Style::new().reverse();            <span class="string">&quot;hi&quot; </span>=&gt; <span class="string">&quot;\x1B[7mhi\x1B[0m&quot;</span>);
+    <span class="macro">test!</span>(hidden:                Style::new().hidden();             <span class="string">&quot;hi&quot; </span>=&gt; <span class="string">&quot;\x1B[8mhi\x1B[0m&quot;</span>);
+    <span class="macro">test!</span>(stricken:              Style::new().strikethrough();      <span class="string">&quot;hi&quot; </span>=&gt; <span class="string">&quot;\x1B[9mhi\x1B[0m&quot;</span>);
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_infix</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">Style::new</span>().<span class="ident">dimmed</span>().<span class="ident">infix</span>(<span class="ident">Style::new</span>()).<span class="ident">to_string</span>(), <span class="string">&quot;\x1B[0m&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">White</span>.<span class="ident">dimmed</span>().<span class="ident">infix</span>(<span class="ident">White</span>.<span class="ident">normal</span>()).<span class="ident">to_string</span>(), <span class="string">&quot;\x1B[0m\x1B[37m&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">White</span>.<span class="ident">normal</span>().<span class="ident">infix</span>(<span class="ident">White</span>.<span class="ident">bold</span>()).<span class="ident">to_string</span>(), <span class="string">&quot;\x1B[1m&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">White</span>.<span class="ident">normal</span>().<span class="ident">infix</span>(<span class="ident">Blue</span>.<span class="ident">normal</span>()).<span class="ident">to_string</span>(), <span class="string">&quot;\x1B[34m&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Blue</span>.<span class="ident">bold</span>().<span class="ident">infix</span>(<span class="ident">Blue</span>.<span class="ident">bold</span>()).<span class="ident">to_string</span>(), <span class="string">&quot;&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_infix() {
+        <span class="macro">assert_eq!</span>(Style::new().dimmed().infix(Style::new()).to_string(), <span class="string">&quot;\x1B[0m&quot;</span>);
+        <span class="macro">assert_eq!</span>(White.dimmed().infix(White.normal()).to_string(), <span class="string">&quot;\x1B[0m\x1B[37m&quot;</span>);
+        <span class="macro">assert_eq!</span>(White.normal().infix(White.bold()).to_string(), <span class="string">&quot;\x1B[1m&quot;</span>);
+        <span class="macro">assert_eq!</span>(White.normal().infix(Blue.normal()).to_string(), <span class="string">&quot;\x1B[34m&quot;</span>);
+        <span class="macro">assert_eq!</span>(Blue.bold().infix(Blue.bold()).to_string(), <span class="string">&quot;&quot;</span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ansi_term" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ansi_term" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

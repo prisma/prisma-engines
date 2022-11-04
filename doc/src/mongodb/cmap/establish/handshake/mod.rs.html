@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/cmap/establish/handshake/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../mongodb/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/cmap/establish/handshake/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../mongodb/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -354,361 +354,361 @@
 <span id="354">354</span>
 <span id="355">355</span>
 <span id="356">356</span>
-</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span>;
+</pre><pre class="rust"><code><span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test;
 
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<span class="kw">use </span>std::sync::Arc;
 
-<span class="kw">use</span> <span class="ident">lazy_static::lazy_static</span>;
-<span class="kw">use</span> <span class="ident">os_info</span>::{<span class="ident">Type</span>, <span class="ident">Version</span>};
+<span class="kw">use </span>lazy_static::lazy_static;
+<span class="kw">use </span>os_info::{Type, Version};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">bson</span>::{<span class="ident">doc</span>, <span class="ident">Bson</span>, <span class="ident">Document</span>},
-    <span class="ident">client::auth</span>::{<span class="ident">ClientFirst</span>, <span class="ident">FirstRound</span>},
-    <span class="ident">cmap</span>::{<span class="ident">options::ConnectionPoolOptions</span>, <span class="ident">Command</span>, <span class="ident">Connection</span>, <span class="ident">StreamDescription</span>},
-    <span class="ident">compression::Compressor</span>,
-    <span class="ident">error</span>::{<span class="ident">ErrorKind</span>, <span class="prelude-ty">Result</span>},
-    <span class="ident">event::sdam::SdamEventHandler</span>,
-    <span class="ident">hello</span>::{<span class="ident">hello_command</span>, <span class="ident">run_hello</span>, <span class="ident">HelloReply</span>},
-    <span class="ident">options</span>::{<span class="ident">AuthMechanism</span>, <span class="ident">ClientOptions</span>, <span class="ident">Credential</span>, <span class="ident">DriverInfo</span>, <span class="ident">ServerApi</span>},
-    <span class="ident">sdam::Topology</span>,
+<span class="kw">use crate</span>::{
+    bson::{doc, Bson, Document},
+    client::auth::{ClientFirst, FirstRound},
+    cmap::{options::ConnectionPoolOptions, Command, Connection, StreamDescription},
+    compression::Compressor,
+    error::{ErrorKind, <span class="prelude-ty">Result</span>},
+    event::sdam::SdamEventHandler,
+    hello::{hello_command, run_hello, HelloReply},
+    options::{AuthMechanism, ClientOptions, Credential, DriverInfo, ServerApi},
+    sdam::Topology,
 };
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-sync&quot;</span>)))]</span>
-<span class="kw">const</span> <span class="ident">RUNTIME_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;tokio&quot;</span>;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;tokio-runtime&quot;</span>, not(feature = <span class="string">&quot;tokio-sync&quot;</span>)))]
+</span><span class="kw">const </span>RUNTIME_NAME: <span class="kw-2">&amp;</span>str = <span class="string">&quot;tokio&quot;</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-std-runtime&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>)))]</span>
-<span class="kw">const</span> <span class="ident">RUNTIME_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;async-std&quot;</span>;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;async-std-runtime&quot;</span>, not(feature = <span class="string">&quot;sync&quot;</span>)))]
+</span><span class="kw">const </span>RUNTIME_NAME: <span class="kw-2">&amp;</span>str = <span class="string">&quot;async-std&quot;</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sync&quot;</span>)]</span>
-<span class="kw">const</span> <span class="ident">RUNTIME_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;sync (with async-std)&quot;</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;sync&quot;</span>)]
+</span><span class="kw">const </span>RUNTIME_NAME: <span class="kw-2">&amp;</span>str = <span class="string">&quot;sync (with async-std)&quot;</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-sync&quot;</span>)]</span>
-<span class="kw">const</span> <span class="ident">RUNTIME_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;sync (with tokio)&quot;</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tokio-sync&quot;</span>)]
+</span><span class="kw">const </span>RUNTIME_NAME: <span class="kw-2">&amp;</span>str = <span class="string">&quot;sync (with tokio)&quot;</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">ClientMetadata</span> {
-    <span class="ident">application</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AppMetadata</span><span class="op">&gt;</span>,
-    <span class="ident">driver</span>: <span class="ident">DriverMetadata</span>,
-    <span class="ident">os</span>: <span class="ident">OsMetadata</span>,
-    <span class="ident">platform</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">struct </span>ClientMetadata {
+    application: <span class="prelude-ty">Option</span>&lt;AppMetadata&gt;,
+    driver: DriverMetadata,
+    os: OsMetadata,
+    platform: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">AppMetadata</span> {
-    <span class="ident">name</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">struct </span>AppMetadata {
+    name: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">DriverMetadata</span> {
-    <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="ident">version</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">struct </span>DriverMetadata {
+    name: String,
+    version: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">OsMetadata</span> {
-    <span class="ident">os_type</span>: <span class="ident">String</span>,
-    <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">architecture</span>: <span class="ident">String</span>,
-    <span class="ident">version</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">struct </span>OsMetadata {
+    os_type: String,
+    name: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    architecture: String,
+    version: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ClientMetadata</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">metadata</span>: <span class="ident">ClientMetadata</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">metadata_doc</span> <span class="op">=</span> <span class="ident">Document::new</span>();
+<span class="kw">impl </span>From&lt;ClientMetadata&gt; <span class="kw">for </span>Bson {
+    <span class="kw">fn </span>from(metadata: ClientMetadata) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>metadata_doc = Document::new();
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">application</span>) <span class="op">=</span> <span class="ident">metadata</span>.<span class="ident">application</span> {
-            <span class="ident">metadata_doc</span>.<span class="ident">insert</span>(<span class="string">&quot;application&quot;</span>, <span class="macro">doc!</span> { <span class="string">&quot;name&quot;</span>: <span class="ident">application</span>.<span class="ident">name</span> });
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(application) = metadata.application {
+            metadata_doc.insert(<span class="string">&quot;application&quot;</span>, <span class="macro">doc! </span>{ <span class="string">&quot;name&quot;</span>: application.name });
         }
 
-        <span class="ident">metadata_doc</span>.<span class="ident">insert</span>(
+        metadata_doc.insert(
             <span class="string">&quot;driver&quot;</span>,
-            <span class="macro">doc!</span> {
-                <span class="string">&quot;name&quot;</span>: <span class="ident">metadata</span>.<span class="ident">driver</span>.<span class="ident">name</span>,
-                <span class="string">&quot;version&quot;</span>: <span class="ident">metadata</span>.<span class="ident">driver</span>.<span class="ident">version</span>,
+            <span class="macro">doc! </span>{
+                <span class="string">&quot;name&quot;</span>: metadata.driver.name,
+                <span class="string">&quot;version&quot;</span>: metadata.driver.version,
             },
         );
 
-        <span class="ident">metadata_doc</span>.<span class="ident">insert</span>(<span class="string">&quot;os&quot;</span>, <span class="ident">metadata</span>.<span class="ident">os</span>);
-        <span class="ident">metadata_doc</span>.<span class="ident">insert</span>(<span class="string">&quot;platform&quot;</span>, <span class="ident">metadata</span>.<span class="ident">platform</span>);
+        metadata_doc.insert(<span class="string">&quot;os&quot;</span>, metadata.os);
+        metadata_doc.insert(<span class="string">&quot;platform&quot;</span>, metadata.platform);
 
-        <span class="ident">Bson::Document</span>(<span class="ident">metadata_doc</span>)
+        Bson::Document(metadata_doc)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">OsMetadata</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Bson</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">metadata</span>: <span class="ident">OsMetadata</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">doc</span> <span class="op">=</span> <span class="macro">doc!</span> { <span class="string">&quot;type&quot;</span>: <span class="ident">metadata</span>.<span class="ident">os_type</span> };
+<span class="kw">impl </span>From&lt;OsMetadata&gt; <span class="kw">for </span>Bson {
+    <span class="kw">fn </span>from(metadata: OsMetadata) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>doc = <span class="macro">doc! </span>{ <span class="string">&quot;type&quot;</span>: metadata.os_type };
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">metadata</span>.<span class="ident">name</span> {
-            <span class="ident">doc</span>.<span class="ident">insert</span>(<span class="string">&quot;name&quot;</span>, <span class="ident">name</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(name) = metadata.name {
+            doc.insert(<span class="string">&quot;name&quot;</span>, name);
         }
 
-        <span class="ident">doc</span>.<span class="ident">insert</span>(<span class="string">&quot;architecture&quot;</span>, <span class="ident">metadata</span>.<span class="ident">architecture</span>);
+        doc.insert(<span class="string">&quot;architecture&quot;</span>, metadata.architecture);
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">version</span>) <span class="op">=</span> <span class="ident">metadata</span>.<span class="ident">version</span> {
-            <span class="ident">doc</span>.<span class="ident">insert</span>(<span class="string">&quot;version&quot;</span>, <span class="ident">version</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(version) = metadata.version {
+            doc.insert(<span class="string">&quot;version&quot;</span>, version);
         }
 
-        <span class="ident">Bson::Document</span>(<span class="ident">doc</span>)
+        Bson::Document(doc)
     }
 }
 
-<span class="macro">lazy_static!</span> {
-    <span class="doccomment">/// Contains the basic handshake information that can be statically determined. This document</span>
-    <span class="doccomment">/// (potentially with additional fields added) can be cloned and put in the `client` field of</span>
-    <span class="doccomment">/// the `hello` or legacy hello command.</span>
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">BASE_CLIENT_METADATA</span>: <span class="ident">ClientMetadata</span> <span class="op">=</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">metadata</span> <span class="op">=</span> <span class="ident">ClientMetadata</span> {
-            <span class="ident">application</span>: <span class="prelude-val">None</span>,
-            <span class="ident">driver</span>: <span class="ident">DriverMetadata</span> {
-                <span class="ident">name</span>: <span class="string">&quot;mongo-rust-driver&quot;</span>.<span class="ident">into</span>(),
-                <span class="ident">version</span>: <span class="macro">env!</span>(<span class="string">&quot;CARGO_PKG_VERSION&quot;</span>).<span class="ident">into</span>(),
+<span class="macro">lazy_static! </span>{
+    <span class="doccomment">/// Contains the basic handshake information that can be statically determined. This document
+    /// (potentially with additional fields added) can be cloned and put in the `client` field of
+    /// the `hello` or legacy hello command.
+    </span><span class="kw">static </span><span class="kw-2">ref </span>BASE_CLIENT_METADATA: ClientMetadata = {
+        <span class="kw">let </span><span class="kw-2">mut </span>metadata = ClientMetadata {
+            application: <span class="prelude-val">None</span>,
+            driver: DriverMetadata {
+                name: <span class="string">&quot;mongo-rust-driver&quot;</span>.into(),
+                version: <span class="macro">env!</span>(<span class="string">&quot;CARGO_PKG_VERSION&quot;</span>).into(),
             },
-            <span class="ident">os</span>: <span class="ident">OsMetadata</span> {
-                <span class="ident">os_type</span>: <span class="ident">std::env::consts::OS</span>.<span class="ident">into</span>(),
-                <span class="ident">architecture</span>: <span class="ident">std::env::consts::ARCH</span>.<span class="ident">into</span>(),
-                <span class="ident">name</span>: <span class="prelude-val">None</span>,
-                <span class="ident">version</span>: <span class="prelude-val">None</span>,
+            os: OsMetadata {
+                os_type: std::env::consts::OS.into(),
+                architecture: std::env::consts::ARCH.into(),
+                name: <span class="prelude-val">None</span>,
+                version: <span class="prelude-val">None</span>,
             },
-            <span class="ident">platform</span>: <span class="macro">format!</span>(<span class="string">&quot;{} with {}&quot;</span>, <span class="ident">rustc_version_runtime::version_meta</span>().<span class="ident">short_version_string</span>, <span class="ident">RUNTIME_NAME</span>),
+            platform: <span class="macro">format!</span>(<span class="string">&quot;{} with {}&quot;</span>, rustc_version_runtime::version_meta().short_version_string, RUNTIME_NAME),
         };
 
-        <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="ident">os_info::get</span>();
+        <span class="kw">let </span>info = os_info::get();
 
-        <span class="kw">if</span> <span class="ident">info</span>.<span class="ident">os_type</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">Type::Unknown</span> {
-            <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">info</span>.<span class="ident">version</span>();
+        <span class="kw">if </span>info.os_type() != Type::Unknown {
+            <span class="kw">let </span>version = info.version();
 
-            <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">version</span> <span class="op">!</span><span class="op">=</span> <span class="ident">Version::Unknown</span> {
-                <span class="ident">metadata</span>.<span class="ident">os</span>.<span class="ident">version</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">info</span>.<span class="ident">version</span>().<span class="ident">to_string</span>());
+            <span class="kw">if </span><span class="kw-2">*</span>version != Version::Unknown {
+                metadata.os.version = <span class="prelude-val">Some</span>(info.version().to_string());
             }
         }
 
-        <span class="ident">metadata</span>
+        metadata
     };
 }
 
-<span class="doccomment">/// Contains the logic needed to handshake a connection.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Handshaker</span> {
-    <span class="doccomment">/// The hello or legacy hello command to send when handshaking. This will always be identical</span>
-    <span class="doccomment">/// given the same pool options, so it can be created at the time the Handshaker is created.</span>
-    <span class="ident">command</span>: <span class="ident">Command</span>,
+<span class="doccomment">/// Contains the logic needed to handshake a connection.
+</span><span class="attribute">#[derive(Clone, Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Handshaker {
+    <span class="doccomment">/// The hello or legacy hello command to send when handshaking. This will always be identical
+    /// given the same pool options, so it can be created at the time the Handshaker is created.
+    </span>command: Command,
 
-    <span class="ident">credential</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Credential</span><span class="op">&gt;</span>,
+    credential: <span class="prelude-ty">Option</span>&lt;Credential&gt;,
 
-    <span class="comment">// This field is not read without a compression feature flag turned on.</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-    <span class="ident">compressors</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Compressor</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="comment">// This field is not read without a compression feature flag turned on.
+    </span><span class="attribute">#[allow(dead_code)]
+    </span>compressors: <span class="prelude-ty">Option</span>&lt;Vec&lt;Compressor&gt;&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Handshaker</span> {
-    <span class="doccomment">/// Creates a new Handshaker.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">HandshakerOptions</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">metadata</span> <span class="op">=</span> <span class="ident">BASE_CLIENT_METADATA</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">credential</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+<span class="kw">impl </span>Handshaker {
+    <span class="doccomment">/// Creates a new Handshaker.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(options: <span class="prelude-ty">Option</span>&lt;HandshakerOptions&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>metadata = BASE_CLIENT_METADATA.clone();
+        <span class="kw">let </span><span class="kw-2">mut </span>credential = <span class="prelude-val">None</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">compressors</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>compressors = <span class="prelude-val">None</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">command</span> <span class="op">=</span> <span class="ident">hello_command</span>(
-            <span class="ident">options</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">opts</span><span class="op">|</span> <span class="ident">opts</span>.<span class="ident">server_api</span>.<span class="ident">as_ref</span>()),
-            <span class="ident">options</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">opts</span><span class="op">|</span> <span class="ident">opts</span>.<span class="ident">load_balanced</span>.<span class="ident">into</span>()),
+        <span class="kw">let </span><span class="kw-2">mut </span>command = hello_command(
+            options.as_ref().and_then(|opts| opts.server_api.as_ref()),
+            options.as_ref().and_then(|opts| opts.load_balanced.into()),
             <span class="prelude-val">None</span>,
         );
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">options</span>) <span class="op">=</span> <span class="ident">options</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">app_name</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">app_name</span> {
-                <span class="ident">metadata</span>.<span class="ident">application</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">AppMetadata</span> { <span class="ident">name</span>: <span class="ident">app_name</span> });
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(options) = options {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(app_name) = options.app_name {
+                metadata.application = <span class="prelude-val">Some</span>(AppMetadata { name: app_name });
             }
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">driver_info</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">driver_info</span> {
-                <span class="ident">metadata</span>.<span class="ident">driver</span>.<span class="ident">name</span>.<span class="ident">push</span>(<span class="string">&#39;|&#39;</span>);
-                <span class="ident">metadata</span>.<span class="ident">driver</span>.<span class="ident">name</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">driver_info</span>.<span class="ident">name</span>);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(driver_info) = options.driver_info {
+                metadata.driver.name.push(<span class="string">&#39;|&#39;</span>);
+                metadata.driver.name.push_str(<span class="kw-2">&amp;</span>driver_info.name);
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">version</span>) <span class="op">=</span> <span class="ident">driver_info</span>.<span class="ident">version</span> {
-                    <span class="ident">metadata</span>.<span class="ident">driver</span>.<span class="ident">version</span>.<span class="ident">push</span>(<span class="string">&#39;|&#39;</span>);
-                    <span class="ident">metadata</span>.<span class="ident">driver</span>.<span class="ident">version</span>.<span class="ident">push_str</span>(<span class="ident">version</span>);
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>version) = driver_info.version {
+                    metadata.driver.version.push(<span class="string">&#39;|&#39;</span>);
+                    metadata.driver.version.push_str(version);
                 }
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">driver_info_platform</span>) <span class="op">=</span> <span class="ident">driver_info</span>.<span class="ident">platform</span> {
-                    <span class="ident">metadata</span>.<span class="ident">platform</span>.<span class="ident">push</span>(<span class="string">&#39;|&#39;</span>);
-                    <span class="ident">metadata</span>.<span class="ident">platform</span>.<span class="ident">push_str</span>(<span class="ident">driver_info_platform</span>);
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>driver_info_platform) = driver_info.platform {
+                    metadata.platform.push(<span class="string">&#39;|&#39;</span>);
+                    metadata.platform.push_str(driver_info_platform);
                 }
             }
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cred</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">credential</span> {
-                <span class="ident">cred</span>.<span class="ident">append_needed_mechanism_negotiation</span>(<span class="kw-2">&amp;mut</span> <span class="ident">command</span>.<span class="ident">body</span>);
-                <span class="ident">command</span>.<span class="ident">target_db</span> <span class="op">=</span> <span class="ident">cred</span>.<span class="ident">resolved_source</span>().<span class="ident">to_string</span>();
-                <span class="ident">credential</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">cred</span>);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(cred) = options.credential {
+                cred.append_needed_mechanism_negotiation(<span class="kw-2">&amp;mut </span>command.body);
+                command.target_db = cred.resolved_source().to_string();
+                credential = <span class="prelude-val">Some</span>(cred);
             }
 
-            <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">load_balanced</span> {
-                <span class="ident">command</span>.<span class="ident">body</span>.<span class="ident">insert</span>(<span class="string">&quot;loadBalanced&quot;</span>, <span class="bool-val">true</span>);
+            <span class="kw">if </span>options.load_balanced {
+                command.body.insert(<span class="string">&quot;loadBalanced&quot;</span>, <span class="bool-val">true</span>);
             }
 
-            <span class="comment">// Add compressors to handshake.</span>
-            <span class="comment">// See https://github.com/mongodb/specifications/blob/master/source/compression/OP_COMPRESSED.rst</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">compressors</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">compressors</span> {
-                <span class="ident">command</span>.<span class="ident">body</span>.<span class="ident">insert</span>(
+            <span class="comment">// Add compressors to handshake.
+            // See https://github.com/mongodb/specifications/blob/master/source/compression/OP_COMPRESSED.rst
+            </span><span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>compressors) = options.compressors {
+                command.body.insert(
                     <span class="string">&quot;compression&quot;</span>,
-                    <span class="ident">compressors</span>
-                        .<span class="ident">iter</span>()
-                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">name</span>())
-                        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
+                    compressors
+                        .iter()
+                        .map(|x| x.name())
+                        .collect::&lt;Vec&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;&gt;(),
                 );
             }
-            <span class="ident">compressors</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">compressors</span>;
+            compressors = options.compressors;
         }
 
-        <span class="ident">command</span>.<span class="ident">body</span>.<span class="ident">insert</span>(<span class="string">&quot;client&quot;</span>, <span class="ident">metadata</span>);
+        command.body.insert(<span class="string">&quot;client&quot;</span>, metadata);
 
-        <span class="self">Self</span> {
-            <span class="ident">command</span>,
-            <span class="ident">credential</span>,
-            <span class="ident">compressors</span>,
+        <span class="self">Self </span>{
+            command,
+            credential,
+            compressors,
         }
     }
 
-    <span class="doccomment">/// Handshakes a connection.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handshake</span>(
+    <span class="doccomment">/// Handshakes a connection.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>handshake(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">conn</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Connection</span>,
-        <span class="ident">topology</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Topology</span><span class="op">&gt;</span>,
-        <span class="ident">handler</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">SdamEventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HandshakeResult</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">command</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">command</span>.<span class="ident">clone</span>();
+        conn: <span class="kw-2">&amp;mut </span>Connection,
+        topology: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Topology&gt;,
+        handler: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;Arc&lt;<span class="kw">dyn </span>SdamEventHandler&gt;&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;HandshakeResult&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>command = <span class="self">self</span>.command.clone();
 
-        <span class="kw">let</span> <span class="ident">client_first</span> <span class="op">=</span> <span class="ident">set_speculative_auth_info</span>(<span class="kw-2">&amp;mut</span> <span class="ident">command</span>.<span class="ident">body</span>, <span class="self">self</span>.<span class="ident">credential</span>.<span class="ident">as_ref</span>())<span class="question-mark">?</span>;
+        <span class="kw">let </span>client_first = set_speculative_auth_info(<span class="kw-2">&amp;mut </span>command.body, <span class="self">self</span>.credential.as_ref())<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hello_reply</span> <span class="op">=</span> <span class="ident">run_hello</span>(<span class="ident">conn</span>, <span class="ident">command</span>, <span class="ident">topology</span>, <span class="ident">handler</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>hello_reply = run_hello(conn, command, topology, handler).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">command</span>.<span class="ident">body</span>.<span class="ident">contains_key</span>(<span class="string">&quot;loadBalanced&quot;</span>)
-            <span class="op">&amp;&amp;</span> <span class="ident">hello_reply</span>.<span class="ident">command_response</span>.<span class="ident">service_id</span>.<span class="ident">is_none</span>()
+        <span class="kw">if </span><span class="self">self</span>.command.body.contains_key(<span class="string">&quot;loadBalanced&quot;</span>)
+            &amp;&amp; hello_reply.command_response.service_id.is_none()
         {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::IncompatibleServer</span> {
-                <span class="ident">message</span>: <span class="string">&quot;Driver attempted to initialize in load balancing mode, but the server \
-                          does not support this mode.&quot;</span>
-                    .<span class="ident">to_string</span>(),
+            <span class="kw">return </span><span class="prelude-val">Err</span>(ErrorKind::IncompatibleServer {
+                message: <span class="string">&quot;Driver attempted to initialize in load balancing mode, but the server \
+                          does not support this mode.&quot;
+                    </span>.to_string(),
             }
-            .<span class="ident">into</span>());
+            .into());
         }
-        <span class="ident">conn</span>.<span class="ident">stream_description</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">StreamDescription::from_hello_reply</span>(<span class="kw-2">&amp;</span><span class="ident">hello_reply</span>));
+        conn.stream_description = <span class="prelude-val">Some</span>(StreamDescription::from_hello_reply(<span class="kw-2">&amp;</span>hello_reply));
 
-        <span class="comment">// Record the client&#39;s message and the server&#39;s response from speculative authentication if</span>
-        <span class="comment">// the server did send a response.</span>
-        <span class="kw">let</span> <span class="ident">first_round</span> <span class="op">=</span> <span class="ident">client_first</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">client_first</span><span class="op">|</span> {
-            <span class="ident">hello_reply</span>
-                .<span class="ident">command_response</span>
-                .<span class="ident">speculative_authenticate</span>
-                .<span class="ident">take</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">server_first</span><span class="op">|</span> <span class="ident">client_first</span>.<span class="ident">into_first_round</span>(<span class="ident">server_first</span>))
+        <span class="comment">// Record the client&#39;s message and the server&#39;s response from speculative authentication if
+        // the server did send a response.
+        </span><span class="kw">let </span>first_round = client_first.and_then(|client_first| {
+            hello_reply
+                .command_response
+                .speculative_authenticate
+                .take()
+                .map(|server_first| client_first.into_first_round(server_first))
         });
 
-        <span class="comment">// Check that the hello reply has a compressor list and unpack it</span>
-        <span class="kw">if</span> <span class="kw">let</span> (<span class="prelude-val">Some</span>(<span class="ident">server_compressors</span>), <span class="prelude-val">Some</span>(<span class="ident">client_compressors</span>)) <span class="op">=</span> (
-            <span class="ident">hello_reply</span>.<span class="ident">command_response</span>.<span class="ident">compressors</span>.<span class="ident">as_ref</span>(),
-            <span class="self">self</span>.<span class="ident">compressors</span>.<span class="ident">as_ref</span>(),
+        <span class="comment">// Check that the hello reply has a compressor list and unpack it
+        </span><span class="kw">if let </span>(<span class="prelude-val">Some</span>(server_compressors), <span class="prelude-val">Some</span>(client_compressors)) = (
+            hello_reply.command_response.compressors.as_ref(),
+            <span class="self">self</span>.compressors.as_ref(),
         ) {
-            <span class="comment">// Use the Client&#39;s first compressor choice that the server supports (comparing only on</span>
-            <span class="comment">// enum variant)</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">compressor</span>) <span class="op">=</span> <span class="ident">client_compressors</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">find</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">server_compressors</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">x</span>))
+            <span class="comment">// Use the Client&#39;s first compressor choice that the server supports (comparing only on
+            // enum variant)
+            </span><span class="kw">if let </span><span class="prelude-val">Some</span>(compressor) = client_compressors
+                .iter()
+                .find(|c| server_compressors.iter().any(|x| c.name() == x))
             {
-                <span class="comment">// Without a feature flag turned on, the Compressor enum is empty which causes an</span>
-                <span class="comment">// unreachable code warning.</span>
-                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unreachable_code</span>)]</span>
-                <span class="comment">// zlib compression level is already set</span>
-                {
-                    <span class="ident">conn</span>.<span class="ident">compressor</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">compressor</span>.<span class="ident">clone</span>());
+                <span class="comment">// Without a feature flag turned on, the Compressor enum is empty which causes an
+                // unreachable code warning.
+                </span><span class="attribute">#[allow(unreachable_code)]
+                </span><span class="comment">// zlib compression level is already set
+                </span>{
+                    conn.compressor = <span class="prelude-val">Some</span>(compressor.clone());
                 }
             }
         }
 
-        <span class="ident">conn</span>.<span class="ident">server_id</span> <span class="op">=</span> <span class="ident">hello_reply</span>.<span class="ident">command_response</span>.<span class="ident">connection_id</span>;
+        conn.server_id = hello_reply.command_response.connection_id;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">HandshakeResult</span> {
-            <span class="ident">hello_reply</span>,
-            <span class="ident">first_round</span>,
+        <span class="prelude-val">Ok</span>(HandshakeResult {
+            hello_reply,
+            first_round,
         })
     }
 }
 
-<span class="doccomment">/// The information returned from the server as part of the handshake.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Also optionally includes the first round of speculative authentication</span>
-<span class="doccomment">/// if applicable.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">HandshakeResult</span> {
-    <span class="doccomment">/// The response from the server.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">hello_reply</span>: <span class="ident">HelloReply</span>,
+<span class="doccomment">/// The information returned from the server as part of the handshake.
+///
+/// Also optionally includes the first round of speculative authentication
+/// if applicable.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>HandshakeResult {
+    <span class="doccomment">/// The response from the server.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) hello_reply: HelloReply,
 
-    <span class="doccomment">/// The first round of speculative authentication, if applicable.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">first_round</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FirstRound</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The first round of speculative authentication, if applicable.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) first_round: <span class="prelude-ty">Option</span>&lt;FirstRound&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">HandshakerOptions</span> {
-    <span class="ident">app_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">credential</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Credential</span><span class="op">&gt;</span>,
-    <span class="ident">compressors</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Compressor</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">driver_info</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DriverInfo</span><span class="op">&gt;</span>,
-    <span class="ident">server_api</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ServerApi</span><span class="op">&gt;</span>,
-    <span class="ident">load_balanced</span>: <span class="ident">bool</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>HandshakerOptions {
+    app_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    credential: <span class="prelude-ty">Option</span>&lt;Credential&gt;,
+    compressors: <span class="prelude-ty">Option</span>&lt;Vec&lt;Compressor&gt;&gt;,
+    driver_info: <span class="prelude-ty">Option</span>&lt;DriverInfo&gt;,
+    server_api: <span class="prelude-ty">Option</span>&lt;ServerApi&gt;,
+    load_balanced: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ConnectionPoolOptions</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HandshakerOptions</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">options</span>: <span class="ident">ConnectionPoolOptions</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">app_name</span>: <span class="ident">options</span>.<span class="ident">app_name</span>,
-            <span class="ident">compressors</span>: <span class="ident">options</span>.<span class="ident">compressors</span>,
-            <span class="ident">credential</span>: <span class="ident">options</span>.<span class="ident">credential</span>,
-            <span class="ident">driver_info</span>: <span class="ident">options</span>.<span class="ident">driver_info</span>,
-            <span class="ident">server_api</span>: <span class="ident">options</span>.<span class="ident">server_api</span>,
-            <span class="ident">load_balanced</span>: <span class="ident">options</span>.<span class="ident">load_balanced</span>.<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>),
+<span class="kw">impl </span>From&lt;ConnectionPoolOptions&gt; <span class="kw">for </span>HandshakerOptions {
+    <span class="kw">fn </span>from(options: ConnectionPoolOptions) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            app_name: options.app_name,
+            compressors: options.compressors,
+            credential: options.credential,
+            driver_info: options.driver_info,
+            server_api: options.server_api,
+            load_balanced: options.load_balanced.unwrap_or(<span class="bool-val">false</span>),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ClientOptions</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">HandshakerOptions</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">options</span>: <span class="ident">ClientOptions</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">app_name</span>: <span class="ident">options</span>.<span class="ident">app_name</span>,
-            <span class="ident">compressors</span>: <span class="ident">options</span>.<span class="ident">compressors</span>,
-            <span class="ident">credential</span>: <span class="ident">options</span>.<span class="ident">credential</span>,
-            <span class="ident">driver_info</span>: <span class="ident">options</span>.<span class="ident">driver_info</span>,
-            <span class="ident">server_api</span>: <span class="ident">options</span>.<span class="ident">server_api</span>,
-            <span class="ident">load_balanced</span>: <span class="ident">options</span>.<span class="ident">load_balanced</span>.<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>),
+<span class="kw">impl </span>From&lt;ClientOptions&gt; <span class="kw">for </span>HandshakerOptions {
+    <span class="kw">fn </span>from(options: ClientOptions) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            app_name: options.app_name,
+            compressors: options.compressors,
+            credential: options.credential,
+            driver_info: options.driver_info,
+            server_api: options.server_api,
+            load_balanced: options.load_balanced.unwrap_or(<span class="bool-val">false</span>),
         }
     }
 }
 
-<span class="doccomment">/// Updates the handshake command document with the speculative authenitication info.</span>
-<span class="kw">fn</span> <span class="ident">set_speculative_auth_info</span>(
-    <span class="ident">command</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Document</span>,
-    <span class="ident">credential</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Credential</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClientFirst</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">credential</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">credential</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">credential</span>) =&gt; <span class="ident">credential</span>,
-        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+<span class="doccomment">/// Updates the handshake command document with the speculative authenitication info.
+</span><span class="kw">fn </span>set_speculative_auth_info(
+    command: <span class="kw-2">&amp;mut </span>Document,
+    credential: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Credential&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;ClientFirst&gt;&gt; {
+    <span class="kw">let </span>credential = <span class="kw">match </span>credential {
+        <span class="prelude-val">Some</span>(credential) =&gt; credential,
+        <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
     };
 
-    <span class="comment">// The spec indicates that SCRAM-SHA-256 should be assumed for speculative authentication if no</span>
-    <span class="comment">// mechanism is provided. This doesn&#39;t cause issues with servers where SCRAM-SHA-256 is not the</span>
-    <span class="comment">// default due to them being too old to support speculative authentication at all.</span>
-    <span class="kw">let</span> <span class="ident">auth_mechanism</span> <span class="op">=</span> <span class="ident">credential</span>
-        .<span class="ident">mechanism</span>
-        .<span class="ident">as_ref</span>()
-        .<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span><span class="ident">AuthMechanism::ScramSha256</span>);
+    <span class="comment">// The spec indicates that SCRAM-SHA-256 should be assumed for speculative authentication if no
+    // mechanism is provided. This doesn&#39;t cause issues with servers where SCRAM-SHA-256 is not the
+    // default due to them being too old to support speculative authentication at all.
+    </span><span class="kw">let </span>auth_mechanism = credential
+        .mechanism
+        .as_ref()
+        .unwrap_or(<span class="kw-2">&amp;</span>AuthMechanism::ScramSha256);
 
-    <span class="kw">let</span> <span class="ident">client_first</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">auth_mechanism</span>.<span class="ident">build_speculative_client_first</span>(<span class="ident">credential</span>)<span class="question-mark">?</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">client_first</span>) =&gt; <span class="ident">client_first</span>,
-        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+    <span class="kw">let </span>client_first = <span class="kw">match </span>auth_mechanism.build_speculative_client_first(credential)<span class="question-mark">? </span>{
+        <span class="prelude-val">Some</span>(client_first) =&gt; client_first,
+        <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
     };
 
-    <span class="ident">command</span>.<span class="ident">insert</span>(<span class="string">&quot;speculativeAuthenticate&quot;</span>, <span class="ident">client_first</span>.<span class="ident">to_document</span>());
+    command.insert(<span class="string">&quot;speculativeAuthenticate&quot;</span>, client_first.to_document());
 
-    <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">client_first</span>))
+    <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(client_first))
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

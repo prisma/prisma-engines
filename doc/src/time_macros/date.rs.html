@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-macros-0.2.4/src/date.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>date.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../time_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../time_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../time_macros/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-macros-0.2.4/src/date.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>date.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../time_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../time_macros/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../time_macros/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -135,142 +135,142 @@
 <span id="135">135</span>
 <span id="136">136</span>
 <span id="137">137</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::iter::Peekable</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::iter::Peekable;
 
-<span class="kw">use</span> <span class="ident">proc_macro</span>::{<span class="ident">token_stream</span>, <span class="ident">TokenTree</span>};
+<span class="kw">use </span>proc_macro::{token_stream, TokenTree};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::helpers</span>::{
-    <span class="ident">consume_any_ident</span>, <span class="ident">consume_number</span>, <span class="ident">consume_punct</span>, <span class="ident">days_in_year</span>, <span class="ident">days_in_year_month</span>,
-    <span class="ident">weeks_in_year</span>, <span class="ident">ymd_to_yo</span>, <span class="ident">ywd_to_yo</span>,
+<span class="kw">use </span><span class="kw">crate</span>::helpers::{
+    consume_any_ident, consume_number, consume_punct, days_in_year, days_in_year_month,
+    weeks_in_year, ymd_to_yo, ywd_to_yo,
 };
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::to_tokens::ToTokenTree</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Error</span>;
+<span class="kw">use </span><span class="kw">crate</span>::to_tokens::ToTokenTree;
+<span class="kw">use </span><span class="kw">crate</span>::Error;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;large-dates&quot;</span>)]</span>
-<span class="kw">const</span> <span class="ident">MAX_YEAR</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">999_999</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;large-dates&quot;</span>))]</span>
-<span class="kw">const</span> <span class="ident">MAX_YEAR</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">9_999</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;large-dates&quot;</span>)]
+</span><span class="kw">const </span>MAX_YEAR: i32 = <span class="number">999_999</span>;
+<span class="attribute">#[cfg(not(feature = <span class="string">&quot;large-dates&quot;</span>))]
+</span><span class="kw">const </span>MAX_YEAR: i32 = <span class="number">9_999</span>;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Date</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">year</span>: <span class="ident">i32</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">ordinal</span>: <span class="ident">u16</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Date {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) year: i32,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) ordinal: u16,
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">chars</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Peekable</span><span class="op">&lt;</span><span class="ident">token_stream::IntoIter</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Date</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">year_sign_span</span>, <span class="ident">year_sign</span>, <span class="ident">explicit_sign</span>) <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">span</span>) <span class="op">=</span> <span class="ident">consume_punct</span>(<span class="string">&#39;-&#39;</span>, <span class="ident">chars</span>) {
-        (<span class="prelude-val">Some</span>(<span class="ident">span</span>), <span class="op">-</span><span class="number">1</span>, <span class="bool-val">true</span>)
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">span</span>) <span class="op">=</span> <span class="ident">consume_punct</span>(<span class="string">&#39;+&#39;</span>, <span class="ident">chars</span>) {
-        (<span class="prelude-val">Some</span>(<span class="ident">span</span>), <span class="number">1</span>, <span class="bool-val">true</span>)
-    } <span class="kw">else</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse(chars: <span class="kw-2">&amp;mut </span>Peekable&lt;token_stream::IntoIter&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Date, Error&gt; {
+    <span class="kw">let </span>(year_sign_span, year_sign, explicit_sign) = <span class="kw">if let </span><span class="prelude-val">Ok</span>(span) = consume_punct(<span class="string">&#39;-&#39;</span>, chars) {
+        (<span class="prelude-val">Some</span>(span), -<span class="number">1</span>, <span class="bool-val">true</span>)
+    } <span class="kw">else if let </span><span class="prelude-val">Ok</span>(span) = consume_punct(<span class="string">&#39;+&#39;</span>, chars) {
+        (<span class="prelude-val">Some</span>(span), <span class="number">1</span>, <span class="bool-val">true</span>)
+    } <span class="kw">else </span>{
         (<span class="prelude-val">None</span>, <span class="number">1</span>, <span class="bool-val">false</span>)
     };
-    <span class="kw">let</span> (<span class="ident">year_span</span>, <span class="kw-2">mut</span> <span class="ident">year</span>) <span class="op">=</span> <span class="ident">consume_number</span>::<span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>(<span class="string">&quot;year&quot;</span>, <span class="ident">chars</span>)<span class="question-mark">?</span>;
-    <span class="ident">year</span> <span class="kw-2">*</span><span class="op">=</span> <span class="ident">year_sign</span>;
-    <span class="kw">if</span> <span class="ident">year</span>.<span class="ident">abs</span>() <span class="op">&gt;</span> <span class="ident">MAX_YEAR</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidComponent</span> {
-            <span class="ident">name</span>: <span class="string">&quot;year&quot;</span>,
-            <span class="ident">value</span>: <span class="ident">year</span>.<span class="ident">to_string</span>(),
-            <span class="ident">span_start</span>: <span class="prelude-val">Some</span>(<span class="ident">year_sign_span</span>.<span class="ident">unwrap_or</span>(<span class="ident">year_span</span>)),
-            <span class="ident">span_end</span>: <span class="prelude-val">Some</span>(<span class="ident">year_span</span>),
+    <span class="kw">let </span>(year_span, <span class="kw-2">mut </span>year) = consume_number::&lt;i32&gt;(<span class="string">&quot;year&quot;</span>, chars)<span class="question-mark">?</span>;
+    year <span class="kw-2">*</span>= year_sign;
+    <span class="kw">if </span>year.abs() &gt; MAX_YEAR {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidComponent {
+            name: <span class="string">&quot;year&quot;</span>,
+            value: year.to_string(),
+            span_start: <span class="prelude-val">Some</span>(year_sign_span.unwrap_or(year_span)),
+            span_end: <span class="prelude-val">Some</span>(year_span),
         });
     }
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">explicit_sign</span> <span class="op">&amp;&amp;</span> <span class="ident">year</span>.<span class="ident">abs</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">10_000</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Custom</span> {
-            <span class="ident">message</span>: <span class="string">&quot;years with more than four digits must have an explicit sign&quot;</span>.<span class="ident">into</span>(),
-            <span class="ident">span_start</span>: <span class="prelude-val">Some</span>(<span class="ident">year_sign_span</span>.<span class="ident">unwrap_or</span>(<span class="ident">year_span</span>)),
-            <span class="ident">span_end</span>: <span class="prelude-val">Some</span>(<span class="ident">year_span</span>),
+    <span class="kw">if </span>!explicit_sign &amp;&amp; year.abs() &gt;= <span class="number">10_000 </span>{
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::Custom {
+            message: <span class="string">&quot;years with more than four digits must have an explicit sign&quot;</span>.into(),
+            span_start: <span class="prelude-val">Some</span>(year_sign_span.unwrap_or(year_span)),
+            span_end: <span class="prelude-val">Some</span>(year_span),
         });
     }
 
-    <span class="ident">consume_punct</span>(<span class="string">&#39;-&#39;</span>, <span class="ident">chars</span>)<span class="question-mark">?</span>;
+    consume_punct(<span class="string">&#39;-&#39;</span>, chars)<span class="question-mark">?</span>;
 
-    <span class="comment">// year-week-day</span>
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">w_span</span>) <span class="op">=</span> <span class="ident">consume_any_ident</span>(<span class="kw-2">&amp;</span>[<span class="string">&quot;W&quot;</span>], <span class="ident">chars</span>) {
-        <span class="kw">let</span> (<span class="ident">week_span</span>, <span class="ident">week</span>) <span class="op">=</span> <span class="ident">consume_number</span>::<span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>(<span class="string">&quot;week&quot;</span>, <span class="ident">chars</span>)<span class="question-mark">?</span>;
-        <span class="ident">consume_punct</span>(<span class="string">&#39;-&#39;</span>, <span class="ident">chars</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> (<span class="ident">day_span</span>, <span class="ident">day</span>) <span class="op">=</span> <span class="ident">consume_number</span>::<span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>(<span class="string">&quot;day&quot;</span>, <span class="ident">chars</span>)<span class="question-mark">?</span>;
+    <span class="comment">// year-week-day
+    </span><span class="kw">if let </span><span class="prelude-val">Ok</span>(w_span) = consume_any_ident(<span class="kw-2">&amp;</span>[<span class="string">&quot;W&quot;</span>], chars) {
+        <span class="kw">let </span>(week_span, week) = consume_number::&lt;u8&gt;(<span class="string">&quot;week&quot;</span>, chars)<span class="question-mark">?</span>;
+        consume_punct(<span class="string">&#39;-&#39;</span>, chars)<span class="question-mark">?</span>;
+        <span class="kw">let </span>(day_span, day) = consume_number::&lt;u8&gt;(<span class="string">&quot;day&quot;</span>, chars)<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="ident">week</span> <span class="op">&gt;</span> <span class="ident">weeks_in_year</span>(<span class="ident">year</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidComponent</span> {
-                <span class="ident">name</span>: <span class="string">&quot;week&quot;</span>,
-                <span class="ident">value</span>: <span class="ident">week</span>.<span class="ident">to_string</span>(),
-                <span class="ident">span_start</span>: <span class="prelude-val">Some</span>(<span class="ident">w_span</span>),
-                <span class="ident">span_end</span>: <span class="prelude-val">Some</span>(<span class="ident">week_span</span>),
+        <span class="kw">if </span>week &gt; weeks_in_year(year) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidComponent {
+                name: <span class="string">&quot;week&quot;</span>,
+                value: week.to_string(),
+                span_start: <span class="prelude-val">Some</span>(w_span),
+                span_end: <span class="prelude-val">Some</span>(week_span),
             });
         }
-        <span class="kw">if</span> <span class="ident">day</span> <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">day</span> <span class="op">&gt;</span> <span class="number">7</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidComponent</span> {
-                <span class="ident">name</span>: <span class="string">&quot;day&quot;</span>,
-                <span class="ident">value</span>: <span class="ident">day</span>.<span class="ident">to_string</span>(),
-                <span class="ident">span_start</span>: <span class="prelude-val">Some</span>(<span class="ident">day_span</span>),
-                <span class="ident">span_end</span>: <span class="prelude-val">Some</span>(<span class="ident">day_span</span>),
+        <span class="kw">if </span>day == <span class="number">0 </span>|| day &gt; <span class="number">7 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidComponent {
+                name: <span class="string">&quot;day&quot;</span>,
+                value: day.to_string(),
+                span_start: <span class="prelude-val">Some</span>(day_span),
+                span_end: <span class="prelude-val">Some</span>(day_span),
             });
         }
 
-        <span class="kw">let</span> (<span class="ident">year</span>, <span class="ident">ordinal</span>) <span class="op">=</span> <span class="ident">ywd_to_yo</span>(<span class="ident">year</span>, <span class="ident">week</span>, <span class="ident">day</span>);
+        <span class="kw">let </span>(year, ordinal) = ywd_to_yo(year, week, day);
 
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Date</span> { <span class="ident">year</span>, <span class="ident">ordinal</span> });
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(Date { year, ordinal });
     }
 
-    <span class="comment">// We don&#39;t yet know whether it&#39;s year-month-day or year-ordinal.</span>
-    <span class="kw">let</span> (<span class="ident">month_or_ordinal_span</span>, <span class="ident">month_or_ordinal</span>) <span class="op">=</span>
-        <span class="ident">consume_number</span>::<span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>(<span class="string">&quot;month or ordinal&quot;</span>, <span class="ident">chars</span>)<span class="question-mark">?</span>;
+    <span class="comment">// We don&#39;t yet know whether it&#39;s year-month-day or year-ordinal.
+    </span><span class="kw">let </span>(month_or_ordinal_span, month_or_ordinal) =
+        consume_number::&lt;u16&gt;(<span class="string">&quot;month or ordinal&quot;</span>, chars)<span class="question-mark">?</span>;
 
-    <span class="comment">// year-month-day</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::branches_sharing_code</span>)]</span> <span class="comment">// clarity</span>
-    <span class="kw">if</span> <span class="ident">consume_punct</span>(<span class="string">&#39;-&#39;</span>, <span class="ident">chars</span>).<span class="ident">is_ok</span>() {
-        <span class="kw">let</span> (<span class="ident">month_span</span>, <span class="ident">month</span>) <span class="op">=</span> (<span class="ident">month_or_ordinal_span</span>, <span class="ident">month_or_ordinal</span>);
-        <span class="kw">let</span> (<span class="ident">day_span</span>, <span class="ident">day</span>) <span class="op">=</span> <span class="ident">consume_number</span>::<span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>(<span class="string">&quot;day&quot;</span>, <span class="ident">chars</span>)<span class="question-mark">?</span>;
+    <span class="comment">// year-month-day
+    </span><span class="attribute">#[allow(clippy::branches_sharing_code)] </span><span class="comment">// clarity
+    </span><span class="kw">if </span>consume_punct(<span class="string">&#39;-&#39;</span>, chars).is_ok() {
+        <span class="kw">let </span>(month_span, month) = (month_or_ordinal_span, month_or_ordinal);
+        <span class="kw">let </span>(day_span, day) = consume_number::&lt;u8&gt;(<span class="string">&quot;day&quot;</span>, chars)<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="ident">month</span> <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">month</span> <span class="op">&gt;</span> <span class="number">12</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidComponent</span> {
-                <span class="ident">name</span>: <span class="string">&quot;month&quot;</span>,
-                <span class="ident">value</span>: <span class="ident">month</span>.<span class="ident">to_string</span>(),
-                <span class="ident">span_start</span>: <span class="prelude-val">Some</span>(<span class="ident">month_span</span>),
-                <span class="ident">span_end</span>: <span class="prelude-val">Some</span>(<span class="ident">month_span</span>),
+        <span class="kw">if </span>month == <span class="number">0 </span>|| month &gt; <span class="number">12 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidComponent {
+                name: <span class="string">&quot;month&quot;</span>,
+                value: month.to_string(),
+                span_start: <span class="prelude-val">Some</span>(month_span),
+                span_end: <span class="prelude-val">Some</span>(month_span),
             });
         }
-        <span class="kw">let</span> <span class="ident">month</span> <span class="op">=</span> <span class="ident">month</span> <span class="kw">as</span> <span class="kw">_</span>;
-        <span class="kw">if</span> <span class="ident">day</span> <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">day</span> <span class="op">&gt;</span> <span class="ident">days_in_year_month</span>(<span class="ident">year</span>, <span class="ident">month</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidComponent</span> {
-                <span class="ident">name</span>: <span class="string">&quot;day&quot;</span>,
-                <span class="ident">value</span>: <span class="ident">day</span>.<span class="ident">to_string</span>(),
-                <span class="ident">span_start</span>: <span class="prelude-val">Some</span>(<span class="ident">day_span</span>),
-                <span class="ident">span_end</span>: <span class="prelude-val">Some</span>(<span class="ident">day_span</span>),
+        <span class="kw">let </span>month = month <span class="kw">as _</span>;
+        <span class="kw">if </span>day == <span class="number">0 </span>|| day &gt; days_in_year_month(year, month) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidComponent {
+                name: <span class="string">&quot;day&quot;</span>,
+                value: day.to_string(),
+                span_start: <span class="prelude-val">Some</span>(day_span),
+                span_end: <span class="prelude-val">Some</span>(day_span),
             });
         }
 
-        <span class="kw">let</span> (<span class="ident">year</span>, <span class="ident">ordinal</span>) <span class="op">=</span> <span class="ident">ymd_to_yo</span>(<span class="ident">year</span>, <span class="ident">month</span>, <span class="ident">day</span>);
+        <span class="kw">let </span>(year, ordinal) = ymd_to_yo(year, month, day);
 
-        <span class="prelude-val">Ok</span>(<span class="ident">Date</span> { <span class="ident">year</span>, <span class="ident">ordinal</span> })
+        <span class="prelude-val">Ok</span>(Date { year, ordinal })
     }
-    <span class="comment">// year-ordinal</span>
-    <span class="kw">else</span> {
-        <span class="kw">let</span> (<span class="ident">ordinal_span</span>, <span class="ident">ordinal</span>) <span class="op">=</span> (<span class="ident">month_or_ordinal_span</span>, <span class="ident">month_or_ordinal</span>);
+    <span class="comment">// year-ordinal
+    </span><span class="kw">else </span>{
+        <span class="kw">let </span>(ordinal_span, ordinal) = (month_or_ordinal_span, month_or_ordinal);
 
-        <span class="kw">if</span> <span class="ident">ordinal</span> <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">ordinal</span> <span class="op">&gt;</span> <span class="ident">days_in_year</span>(<span class="ident">year</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidComponent</span> {
-                <span class="ident">name</span>: <span class="string">&quot;ordinal&quot;</span>,
-                <span class="ident">value</span>: <span class="ident">ordinal</span>.<span class="ident">to_string</span>(),
-                <span class="ident">span_start</span>: <span class="prelude-val">Some</span>(<span class="ident">ordinal_span</span>),
-                <span class="ident">span_end</span>: <span class="prelude-val">Some</span>(<span class="ident">ordinal_span</span>),
+        <span class="kw">if </span>ordinal == <span class="number">0 </span>|| ordinal &gt; days_in_year(year) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::InvalidComponent {
+                name: <span class="string">&quot;ordinal&quot;</span>,
+                value: ordinal.to_string(),
+                span_start: <span class="prelude-val">Some</span>(ordinal_span),
+                span_end: <span class="prelude-val">Some</span>(ordinal_span),
             });
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">Date</span> { <span class="ident">year</span>, <span class="ident">ordinal</span> })
+        <span class="prelude-val">Ok</span>(Date { year, ordinal })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ToTokenTree</span> <span class="kw">for</span> <span class="ident">Date</span> {
-    <span class="kw">fn</span> <span class="ident">into_token_tree</span>(<span class="self">self</span>) -&gt; <span class="ident">TokenTree</span> {
-        <span class="macro">quote_group!</span> {{
-            <span class="kw">const</span> <span class="ident">DATE</span>: <span class="ident">::time::Date</span> <span class="op">=</span> <span class="ident">::time::Date::__from_ordinal_date_unchecked</span>(
-                #(<span class="self">self</span>.<span class="ident">year</span>),
-                #(<span class="self">self</span>.<span class="ident">ordinal</span>),
+<span class="kw">impl </span>ToTokenTree <span class="kw">for </span>Date {
+    <span class="kw">fn </span>into_token_tree(<span class="self">self</span>) -&gt; TokenTree {
+        <span class="macro">quote_group! </span>{{
+            <span class="kw">const </span>DATE: ::time::Date = ::time::Date::__from_ordinal_date_unchecked(
+                #(<span class="self">self</span>.year),
+                #(<span class="self">self</span>.ordinal),
             );
-            <span class="ident">DATE</span>
+            DATE
         }}
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="time_macros" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="time_macros" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

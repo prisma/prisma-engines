@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connector-test-kit-rs/query-tests-setup/src/runner/binary.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>binary.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_tests_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_tests_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_tests_setup/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connector-test-kit-rs/query-tests-setup/src/runner/binary.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>binary.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_tests_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_tests_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_tests_setup/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -219,226 +219,226 @@
 <span id="219">219</span>
 <span id="220">220</span>
 <span id="221">221</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">ConnectorTag</span>, <span class="ident">RunnerInterface</span>, <span class="ident">TestError</span>, <span class="ident">TestResult</span>, <span class="ident">TxResult</span>};
-<span class="kw">use</span> <span class="ident">hyper</span>::{<span class="ident">Body</span>, <span class="ident">Method</span>, <span class="ident">Request</span>, <span class="ident">Response</span>};
-<span class="kw">use</span> <span class="ident">query_core::TxId</span>;
-<span class="kw">use</span> <span class="ident">query_engine::opt::PrismaOpt</span>;
-<span class="kw">use</span> <span class="ident">query_engine::server</span>::{<span class="ident">routes</span>, <span class="ident">setup</span>, <span class="ident">State</span>};
-<span class="kw">use</span> <span class="ident">query_engine_metrics::MetricRegistry</span>;
-<span class="kw">use</span> <span class="ident">request_handlers</span>::{<span class="ident">GQLBatchResponse</span>, <span class="ident">GQLError</span>, <span class="ident">GQLResponse</span>, <span class="ident">GraphQlBody</span>, <span class="ident">MultiQuery</span>, <span class="ident">PrismaResponse</span>};
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{ConnectorTag, RunnerInterface, TestError, TestResult, TxResult};
+<span class="kw">use </span>hyper::{Body, Method, Request, Response};
+<span class="kw">use </span>query_core::TxId;
+<span class="kw">use </span>query_engine::opt::PrismaOpt;
+<span class="kw">use </span>query_engine::server::{routes, setup, State};
+<span class="kw">use </span>query_engine_metrics::MetricRegistry;
+<span class="kw">use </span>request_handlers::{GQLBatchResponse, GQLError, GQLResponse, GraphQlBody, MultiQuery, PrismaResponse};
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BinaryRunner</span> {
-    <span class="ident">connector_tag</span>: <span class="ident">ConnectorTag</span>,
-    <span class="ident">current_tx_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TxId</span><span class="op">&gt;</span>,
-    <span class="ident">state</span>: <span class="ident">State</span>,
+<span class="kw">pub struct </span>BinaryRunner {
+    connector_tag: ConnectorTag,
+    current_tx_id: <span class="prelude-ty">Option</span>&lt;TxId&gt;,
+    state: State,
 }
 
-<span class="attribute">#[<span class="ident">async_trait::async_trait</span>]</span>
-<span class="kw">impl</span> <span class="ident">RunnerInterface</span> <span class="kw">for</span> <span class="ident">BinaryRunner</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">load</span>(<span class="ident">datamodel</span>: <span class="ident">String</span>, <span class="ident">connector_tag</span>: <span class="ident">ConnectorTag</span>, <span class="ident">metrics</span>: <span class="ident">MetricRegistry</span>) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">opts</span> <span class="op">=</span> <span class="ident">PrismaOpt::from_list</span>(<span class="kw-2">&amp;</span>[<span class="string">&quot;binary&quot;</span>, <span class="string">&quot;--enable-raw-queries&quot;</span>, <span class="string">&quot;--datamodel&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">datamodel</span>]);
-        <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">setup</span>(<span class="kw-2">&amp;</span><span class="ident">opts</span>, <span class="ident">metrics</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+<span class="attribute">#[async_trait::async_trait]
+</span><span class="kw">impl </span>RunnerInterface <span class="kw">for </span>BinaryRunner {
+    <span class="kw">async fn </span>load(datamodel: String, connector_tag: ConnectorTag, metrics: MetricRegistry) -&gt; TestResult&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>opts = PrismaOpt::from_list(<span class="kw-2">&amp;</span>[<span class="string">&quot;binary&quot;</span>, <span class="string">&quot;--enable-raw-queries&quot;</span>, <span class="string">&quot;--datamodel&quot;</span>, <span class="kw-2">&amp;</span>datamodel]);
+        <span class="kw">let </span>state = setup(<span class="kw-2">&amp;</span>opts, metrics).<span class="kw">await</span>.unwrap();
 
-        <span class="prelude-val">Ok</span>(<span class="ident">BinaryRunner</span> {
-            <span class="ident">state</span>,
-            <span class="ident">connector_tag</span>,
-            <span class="ident">current_tx_id</span>: <span class="prelude-val">None</span>,
+        <span class="prelude-val">Ok</span>(BinaryRunner {
+            state,
+            connector_tag,
+            current_tx_id: <span class="prelude-val">None</span>,
         })
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">query</span>: <span class="ident">String</span>) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::QueryResult</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">GraphQlBody::Single</span>(<span class="ident">query</span>.<span class="ident">into</span>());
-        <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">serde_json::to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>).<span class="ident">unwrap</span>();
+    <span class="kw">async fn </span>query(<span class="kw-2">&amp;</span><span class="self">self</span>, query: String) -&gt; TestResult&lt;<span class="kw">crate</span>::QueryResult&gt; {
+        <span class="kw">let </span>query = GraphQlBody::Single(query.into());
+        <span class="kw">let </span>body = serde_json::to_vec(<span class="kw-2">&amp;</span>query).unwrap();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Request::builder</span>().<span class="ident">method</span>(<span class="ident">Method::POST</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>builder = Request::builder().method(Method::POST);
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">current_tx_id</span>.<span class="ident">is_some</span>() {
-            <span class="kw">let</span> <span class="ident">tx_id</span>: <span class="ident">String</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">current_tx_id</span>.<span class="ident">clone</span>().<span class="ident">unwrap</span>().<span class="ident">to_string</span>();
-            <span class="ident">builder</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">header</span>(<span class="string">&quot;X-transaction-id&quot;</span>, <span class="ident">tx_id</span>);
+        <span class="kw">if </span><span class="self">self</span>.current_tx_id.is_some() {
+            <span class="kw">let </span>tx_id: String = <span class="self">self</span>.current_tx_id.clone().unwrap().to_string();
+            builder = builder.header(<span class="string">&quot;X-transaction-id&quot;</span>, tx_id);
         }
 
-        <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">body</span>(<span class="ident">Body::from</span>(<span class="ident">body</span>)).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>req = builder.body(Body::from(body)).unwrap();
 
-        <span class="kw">let</span> <span class="ident">resp</span> <span class="op">=</span> <span class="ident">routes</span>(<span class="self">self</span>.<span class="ident">state</span>.<span class="ident">clone</span>(), <span class="ident">req</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let </span>resp = routes(<span class="self">self</span>.state.clone(), req).<span class="kw">await</span>.unwrap();
 
-        <span class="kw">let</span> <span class="ident">json_resp</span>: <span class="ident">serde_json::Value</span> <span class="op">=</span> <span class="ident">response_to_json</span>(<span class="ident">resp</span>).<span class="kw">await</span>;
-        <span class="kw">let</span> <span class="ident">gql_response</span> <span class="op">=</span> <span class="ident">json_to_gql_response</span>(<span class="kw-2">&amp;</span><span class="ident">json_resp</span>);
+        <span class="kw">let </span>json_resp: serde_json::Value = response_to_json(resp).<span class="kw">await</span>;
+        <span class="kw">let </span>gql_response = json_to_gql_response(<span class="kw-2">&amp;</span>json_resp);
 
-        <span class="prelude-val">Ok</span>(<span class="ident">PrismaResponse::Single</span>(<span class="ident">gql_response</span>).<span class="ident">into</span>())
+        <span class="prelude-val">Ok</span>(PrismaResponse::Single(gql_response).into())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">batch</span>(
+    <span class="kw">async fn </span>batch(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">queries</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="ident">transaction</span>: <span class="ident">bool</span>,
-        <span class="ident">isolation_level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::QueryResult</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">GraphQlBody::Multi</span>(<span class="ident">MultiQuery::new</span>(
-            <span class="ident">queries</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Into::into</span>).<span class="ident">collect</span>(),
-            <span class="ident">transaction</span>,
-            <span class="ident">isolation_level</span>,
+        queries: Vec&lt;String&gt;,
+        transaction: bool,
+        isolation_level: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; TestResult&lt;<span class="kw">crate</span>::QueryResult&gt; {
+        <span class="kw">let </span>query = GraphQlBody::Multi(MultiQuery::new(
+            queries.into_iter().map(Into::into).collect(),
+            transaction,
+            isolation_level,
         ));
 
-        <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">serde_json::to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">query</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>body = serde_json::to_vec(<span class="kw-2">&amp;</span>query).unwrap();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">Request::builder</span>().<span class="ident">method</span>(<span class="ident">Method::POST</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>builder = Request::builder().method(Method::POST);
 
-        <span class="comment">// Garren: basically if there is a current_tx_id we run it as a transaction</span>
-        <span class="comment">// I don&#39;t fully understand how ITX works and I need to do this to pass the tests</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">current_tx_id</span>.<span class="ident">is_some</span>() {
-            <span class="kw">let</span> <span class="ident">tx_id</span>: <span class="ident">String</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">current_tx_id</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">clone</span>().<span class="ident">to_string</span>();
-            <span class="ident">builder</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">header</span>(<span class="string">&quot;X-transaction-id&quot;</span>, <span class="ident">tx_id</span>);
+        <span class="comment">// Garren: basically if there is a current_tx_id we run it as a transaction
+        // I don&#39;t fully understand how ITX works and I need to do this to pass the tests
+        </span><span class="kw">if </span><span class="self">self</span>.current_tx_id.is_some() {
+            <span class="kw">let </span>tx_id: String = <span class="self">self</span>.current_tx_id.as_ref().unwrap().clone().to_string();
+            builder = builder.header(<span class="string">&quot;X-transaction-id&quot;</span>, tx_id);
         }
 
-        <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">body</span>(<span class="ident">Body::from</span>(<span class="ident">body</span>)).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>req = builder.body(Body::from(body)).unwrap();
 
-        <span class="kw">let</span> <span class="ident">resp</span> <span class="op">=</span> <span class="ident">routes</span>(<span class="self">self</span>.<span class="ident">state</span>.<span class="ident">clone</span>(), <span class="ident">req</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">json_resp</span>: <span class="ident">serde_json::Value</span> <span class="op">=</span> <span class="ident">response_to_json</span>(<span class="ident">resp</span>).<span class="kw">await</span>;
+        <span class="kw">let </span>resp = routes(<span class="self">self</span>.state.clone(), req).<span class="kw">await</span>.unwrap();
+        <span class="kw">let </span>json_resp: serde_json::Value = response_to_json(resp).<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">batch_response</span> <span class="op">=</span> <span class="ident">GQLBatchResponse::default</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>batch_response = GQLBatchResponse::default();
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">batch</span>) <span class="op">=</span> <span class="ident">json_resp</span>.<span class="ident">get</span>(<span class="string">&quot;batchResult&quot;</span>) {
-            <span class="kw">let</span> <span class="ident">results</span> <span class="op">=</span> <span class="ident">batch</span>.<span class="ident">as_array</span>().<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">responses</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GQLResponse</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">results</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">json_to_gql_response</span>).<span class="ident">collect</span>();
-            <span class="ident">batch_response</span>.<span class="ident">insert_responses</span>(<span class="ident">responses</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(batch) = json_resp.get(<span class="string">&quot;batchResult&quot;</span>) {
+            <span class="kw">let </span>results = batch.as_array().unwrap();
+            <span class="kw">let </span>responses: Vec&lt;GQLResponse&gt; = results.iter().map(json_to_gql_response).collect();
+            batch_response.insert_responses(responses);
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">error_val</span>) <span class="op">=</span> <span class="ident">json_resp</span>.<span class="ident">get</span>(<span class="string">&quot;errors&quot;</span>) {
-            <span class="kw">let</span> <span class="ident">errors</span> <span class="op">=</span> <span class="ident">error_val</span>.<span class="ident">as_array</span>().<span class="ident">unwrap</span>();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(error_val) = json_resp.get(<span class="string">&quot;errors&quot;</span>) {
+            <span class="kw">let </span>errors = error_val.as_array().unwrap();
 
-            <span class="ident">errors</span>.<span class="ident">iter</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">gql_error</span>: <span class="ident">GQLError</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">err</span>.<span class="ident">clone</span>()).<span class="ident">unwrap</span>();
-                <span class="ident">batch_response</span>.<span class="ident">insert_error</span>(<span class="ident">gql_error</span>);
+            errors.iter().for_each(|err| {
+                <span class="kw">let </span>gql_error: GQLError = serde_json::from_value(err.clone()).unwrap();
+                batch_response.insert_error(gql_error);
             })
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">PrismaResponse::Multi</span>(<span class="ident">batch_response</span>).<span class="ident">into</span>())
+        <span class="prelude-val">Ok</span>(PrismaResponse::Multi(batch_response).into())
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_tx</span>(
+    <span class="kw">async fn </span>start_tx(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">max_acquisition_millis</span>: <span class="ident">u64</span>,
-        <span class="ident">valid_for_millis</span>: <span class="ident">u64</span>,
-        <span class="ident">isolation_level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span><span class="ident">TxId</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="macro">serde_json::json!</span>({
-            <span class="string">&quot;max_wait&quot;</span>: <span class="ident">max_acquisition_millis</span>,
-            <span class="string">&quot;timeout&quot;</span>: <span class="ident">valid_for_millis</span>,
-            <span class="string">&quot;isolation_level&quot;</span>: <span class="ident">isolation_level</span>,
+        max_acquisition_millis: u64,
+        valid_for_millis: u64,
+        isolation_level: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; TestResult&lt;TxId&gt; {
+        <span class="kw">let </span>body = <span class="macro">serde_json::json!</span>({
+            <span class="string">&quot;max_wait&quot;</span>: max_acquisition_millis,
+            <span class="string">&quot;timeout&quot;</span>: valid_for_millis,
+            <span class="string">&quot;isolation_level&quot;</span>: isolation_level,
         });
 
-        <span class="kw">let</span> <span class="ident">body_bytes</span> <span class="op">=</span> <span class="ident">serde_json::to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">body</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>body_bytes = serde_json::to_vec(<span class="kw-2">&amp;</span>body).unwrap();
 
-        <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">Request::builder</span>()
-            .<span class="ident">uri</span>(<span class="string">&quot;/transaction/start&quot;</span>)
-            .<span class="ident">method</span>(<span class="ident">Method::POST</span>)
-            .<span class="ident">body</span>(<span class="ident">Body::from</span>(<span class="ident">body_bytes</span>))
-            .<span class="ident">unwrap</span>();
+        <span class="kw">let </span>req = Request::builder()
+            .uri(<span class="string">&quot;/transaction/start&quot;</span>)
+            .method(Method::POST)
+            .body(Body::from(body_bytes))
+            .unwrap();
 
-        <span class="kw">let</span> <span class="ident">resp</span> <span class="op">=</span> <span class="ident">routes</span>(<span class="self">self</span>.<span class="ident">state</span>.<span class="ident">clone</span>(), <span class="ident">req</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">json_resp</span> <span class="op">=</span> <span class="ident">response_to_json</span>(<span class="ident">resp</span>).<span class="kw">await</span>;
-        <span class="kw">let</span> <span class="ident">json_obj</span> <span class="op">=</span> <span class="ident">json_resp</span>.<span class="ident">as_object</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let </span>resp = routes(<span class="self">self</span>.state.clone(), req).<span class="kw">await</span>.unwrap();
+        <span class="kw">let </span>json_resp = response_to_json(resp).<span class="kw">await</span>;
+        <span class="kw">let </span>json_obj = json_resp.as_object().unwrap();
 
-        <span class="kw">match</span> <span class="ident">json_obj</span>.<span class="ident">get</span>(<span class="string">&quot;error_code&quot;</span>) {
-            <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">TestError::InteractiveTransactionError</span>(
-                <span class="ident">serde_json::to_string</span>(<span class="ident">json_obj</span>).<span class="ident">unwrap</span>(),
+        <span class="kw">match </span>json_obj.get(<span class="string">&quot;error_code&quot;</span>) {
+            <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(TestError::InteractiveTransactionError(
+                serde_json::to_string(json_obj).unwrap(),
             )),
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">json_obj</span>.<span class="ident">get</span>(<span class="string">&quot;id&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>().<span class="ident">unwrap</span>().<span class="ident">into</span>()),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(json_obj.get(<span class="string">&quot;id&quot;</span>).unwrap().as_str().unwrap().into()),
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">commit_tx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">tx_id</span>: <span class="ident">TxId</span>) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span><span class="ident">TxResult</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">uri</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;/transaction/{}/commit&quot;</span>, <span class="ident">tx_id</span>);
+    <span class="kw">async fn </span>commit_tx(<span class="kw-2">&amp;</span><span class="self">self</span>, tx_id: TxId) -&gt; TestResult&lt;TxResult&gt; {
+        <span class="kw">let </span>uri = <span class="macro">format!</span>(<span class="string">&quot;/transaction/{}/commit&quot;</span>, tx_id);
 
-        <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">Request::builder</span>()
-            .<span class="ident">uri</span>(<span class="ident">uri</span>.<span class="ident">as_str</span>())
-            .<span class="ident">method</span>(<span class="ident">Method::POST</span>)
-            .<span class="ident">body</span>(<span class="ident">Body::from</span>(<span class="string">r#&quot;{}&quot;#</span>))
-            .<span class="ident">unwrap</span>();
+        <span class="kw">let </span>req = Request::builder()
+            .uri(uri.as_str())
+            .method(Method::POST)
+            .body(Body::from(<span class="string">r#&quot;{}&quot;#</span>))
+            .unwrap();
 
-        <span class="kw">let</span> <span class="ident">resp</span> <span class="op">=</span> <span class="ident">routes</span>(<span class="self">self</span>.<span class="ident">state</span>.<span class="ident">clone</span>(), <span class="ident">req</span>).<span class="kw">await</span>;
-        <span class="kw">let</span> <span class="ident">resp</span> <span class="op">=</span> <span class="ident">resp</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let </span>resp = routes(<span class="self">self</span>.state.clone(), req).<span class="kw">await</span>;
+        <span class="kw">let </span>resp = resp.unwrap();
 
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">response_to_json</span>(<span class="ident">resp</span>).<span class="kw">await</span>;
-        <span class="kw">let</span> <span class="ident">error</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">user_facing_errors::Error</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">result</span>);
+        <span class="kw">let </span>result = response_to_json(resp).<span class="kw">await</span>;
+        <span class="kw">let </span>error: <span class="prelude-ty">Result</span>&lt;user_facing_errors::Error, <span class="kw">_</span>&gt; = serde_json::from_value(result);
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">user_error</span>) <span class="op">=</span> <span class="ident">error</span> {
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(<span class="ident">user_error</span>))
-        } <span class="kw">else</span> {
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(user_error) = error {
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(user_error))
+        } <span class="kw">else </span>{
             <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(()))
         }
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">rollback_tx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">tx_id</span>: <span class="ident">TxId</span>) -&gt; <span class="ident">TestResult</span><span class="op">&lt;</span><span class="ident">TxResult</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">uri</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;/transaction/{}/rollback&quot;</span>, <span class="ident">tx_id</span>);
+    <span class="kw">async fn </span>rollback_tx(<span class="kw-2">&amp;</span><span class="self">self</span>, tx_id: TxId) -&gt; TestResult&lt;TxResult&gt; {
+        <span class="kw">let </span>uri = <span class="macro">format!</span>(<span class="string">&quot;/transaction/{}/rollback&quot;</span>, tx_id);
 
-        <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">Request::builder</span>()
-            .<span class="ident">uri</span>(<span class="ident">uri</span>.<span class="ident">as_str</span>())
-            .<span class="ident">method</span>(<span class="ident">Method::POST</span>)
-            .<span class="ident">body</span>(<span class="ident">Body::from</span>(<span class="string">r#&quot;{}&quot;#</span>))
-            .<span class="ident">unwrap</span>();
+        <span class="kw">let </span>req = Request::builder()
+            .uri(uri.as_str())
+            .method(Method::POST)
+            .body(Body::from(<span class="string">r#&quot;{}&quot;#</span>))
+            .unwrap();
 
-        <span class="kw">let</span> <span class="ident">resp</span> <span class="op">=</span> <span class="ident">routes</span>(<span class="self">self</span>.<span class="ident">state</span>.<span class="ident">clone</span>(), <span class="ident">req</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">response_to_json</span>(<span class="ident">resp</span>).<span class="kw">await</span>;
+        <span class="kw">let </span>resp = routes(<span class="self">self</span>.state.clone(), req).<span class="kw">await</span>.unwrap();
+        <span class="kw">let </span>result = response_to_json(resp).<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">error</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">user_facing_errors::Error</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">result</span>);
+        <span class="kw">let </span>error: <span class="prelude-ty">Result</span>&lt;user_facing_errors::Error, <span class="kw">_</span>&gt; = serde_json::from_value(result);
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">user_error</span>) <span class="op">=</span> <span class="ident">error</span> {
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(<span class="ident">user_error</span>))
-        } <span class="kw">else</span> {
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(user_error) = error {
+            <span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(user_error))
+        } <span class="kw">else </span>{
             <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(()))
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">connector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="kw">crate</span>::ConnectorTag</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">connector_tag</span>
+    <span class="kw">fn </span>connector(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw">crate</span>::ConnectorTag {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.connector_tag
     }
 
-    <span class="kw">fn</span> <span class="ident">set_active_tx</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">tx_id</span>: <span class="ident">query_core::TxId</span>) {
-        <span class="self">self</span>.<span class="ident">current_tx_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">tx_id</span>);
+    <span class="kw">fn </span>set_active_tx(<span class="kw-2">&amp;mut </span><span class="self">self</span>, tx_id: query_core::TxId) {
+        <span class="self">self</span>.current_tx_id = <span class="prelude-val">Some</span>(tx_id);
     }
 
-    <span class="kw">fn</span> <span class="ident">clear_active_tx</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">current_tx_id</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+    <span class="kw">fn </span>clear_active_tx(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.current_tx_id = <span class="prelude-val">None</span>;
     }
 
-    <span class="kw">fn</span> <span class="ident">get_metrics</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">MetricRegistry</span> {
-        <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">get_metrics</span>()
+    <span class="kw">fn </span>get_metrics(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; MetricRegistry {
+        <span class="self">self</span>.state.get_metrics()
     }
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">response_to_json</span>(<span class="ident">resp</span>: <span class="ident">Response</span><span class="op">&lt;</span><span class="ident">Body</span><span class="op">&gt;</span>) -&gt; <span class="ident">serde_json::Value</span> {
-    <span class="kw">let</span> <span class="ident">body_start</span> <span class="op">=</span> <span class="ident">resp</span>.<span class="ident">into_body</span>();
-    <span class="kw">let</span> <span class="ident">full_body</span> <span class="op">=</span> <span class="ident">hyper::body::to_bytes</span>(<span class="ident">body_start</span>).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+<span class="kw">async fn </span>response_to_json(resp: Response&lt;Body&gt;) -&gt; serde_json::Value {
+    <span class="kw">let </span>body_start = resp.into_body();
+    <span class="kw">let </span>full_body = hyper::body::to_bytes(body_start).<span class="kw">await</span>.unwrap();
 
-    <span class="ident">serde_json::from_slice</span>(<span class="ident">full_body</span>.<span class="ident">as_ref</span>()).<span class="ident">unwrap</span>()
+    serde_json::from_slice(full_body.as_ref()).unwrap()
 }
 
-<span class="kw">fn</span> <span class="ident">json_to_gql_response</span>(<span class="ident">json_resp</span>: <span class="kw-2">&amp;</span><span class="ident">serde_json::Value</span>) -&gt; <span class="ident">GQLResponse</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gql_response</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">json_resp</span>.<span class="ident">get</span>(<span class="string">&quot;data&quot;</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">data_val</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">obj</span> <span class="op">=</span> <span class="ident">data_val</span>.<span class="ident">as_object</span>().<span class="ident">unwrap</span>();
+<span class="kw">fn </span>json_to_gql_response(json_resp: <span class="kw-2">&amp;</span>serde_json::Value) -&gt; GQLResponse {
+    <span class="kw">let </span><span class="kw-2">mut </span>gql_response = <span class="kw">match </span>json_resp.get(<span class="string">&quot;data&quot;</span>) {
+        <span class="prelude-val">Some</span>(data_val) =&gt; {
+            <span class="kw">let </span>obj = data_val.as_object().unwrap();
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">gql_response</span> <span class="op">=</span> <span class="ident">GQLResponse::with_capacity</span>(<span class="ident">obj</span>.<span class="ident">keys</span>().<span class="ident">count</span>());
+            <span class="kw">let </span><span class="kw-2">mut </span>gql_response = GQLResponse::with_capacity(obj.keys().count());
 
-            <span class="ident">obj</span>.<span class="ident">iter</span>().<span class="ident">for_each</span>(<span class="op">|</span>(<span class="ident">k</span>, <span class="ident">v</span>)<span class="op">|</span> {
-                <span class="ident">gql_response</span>.<span class="ident">insert_data</span>(<span class="ident">k</span>.<span class="ident">to_string</span>(), <span class="ident">query_core::Item::Json</span>(<span class="ident">v</span>.<span class="ident">clone</span>()));
+            obj.iter().for_each(|(k, v)| {
+                gql_response.insert_data(k.to_string(), query_core::Item::Json(v.clone()));
             });
-            <span class="ident">gql_response</span>
+            gql_response
         }
-        <span class="prelude-val">None</span> =&gt; <span class="ident">GQLResponse::with_capacity</span>(<span class="number">0</span>),
+        <span class="prelude-val">None </span>=&gt; GQLResponse::with_capacity(<span class="number">0</span>),
     };
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">error_val</span>) <span class="op">=</span> <span class="ident">json_resp</span>.<span class="ident">get</span>(<span class="string">&quot;errors&quot;</span>) {
-        <span class="kw">let</span> <span class="ident">errors</span> <span class="op">=</span> <span class="ident">error_val</span>.<span class="ident">as_array</span>().<span class="ident">unwrap</span>();
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(error_val) = json_resp.get(<span class="string">&quot;errors&quot;</span>) {
+        <span class="kw">let </span>errors = error_val.as_array().unwrap();
 
-        <span class="ident">errors</span>.<span class="ident">iter</span>().<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">gql_error</span>: <span class="ident">GQLError</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">err</span>.<span class="ident">clone</span>()).<span class="ident">unwrap</span>();
-            <span class="ident">gql_response</span>.<span class="ident">insert_error</span>(<span class="ident">gql_error</span>);
+        errors.iter().for_each(|err| {
+            <span class="kw">let </span>gql_error: GQLError = serde_json::from_value(err.clone()).unwrap();
+            gql_response.insert_error(gql_error);
         })
     }
 
-    <span class="ident">gql_response</span>
+    gql_response
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_tests_setup" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_tests_setup" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

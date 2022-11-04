@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/08831df/src/ast/merge.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>merge.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../quaint/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/08831df/src/ast/merge.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>merge.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../quaint/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -159,166 +159,166 @@
 <span id="159">159</span>
 <span id="160">160</span>
 <span id="161">161</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::error::<span class="kw-2">*</span>;
+<span class="kw">use </span>std::convert::TryFrom;
 
-<span class="doccomment">/// A builder for SQL `MERGE` queries.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Not complete and not meant for external use in this state. Made for</span>
-<span class="doccomment">/// compatibility purposes.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Merge</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">table</span>: <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">using</span>: <span class="ident">Using</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">when_not_matched</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">returning</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A builder for SQL `MERGE` queries.
+///
+/// Not complete and not meant for external use in this state. Made for
+/// compatibility purposes.
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>Merge&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) table: Table&lt;<span class="lifetime">&#39;a</span>&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) using: Using&lt;<span class="lifetime">&#39;a</span>&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) when_not_matched: <span class="prelude-ty">Option</span>&lt;Query&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) returning: <span class="prelude-ty">Option</span>&lt;Vec&lt;Column&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Merge</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="ident">table</span>: <span class="ident">T</span>, <span class="ident">using</span>: <span class="ident">U</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">U</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Using</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Merge&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new&lt;T, U&gt;(table: T, using: U) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>T: Into&lt;Table&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+        U: Into&lt;Using&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="self">Self</span> {
-            <span class="ident">table</span>: <span class="ident">table</span>.<span class="ident">into</span>(),
-            <span class="ident">using</span>: <span class="ident">using</span>.<span class="ident">into</span>(),
-            <span class="ident">when_not_matched</span>: <span class="prelude-val">None</span>,
-            <span class="ident">returning</span>: <span class="prelude-val">None</span>,
+        <span class="self">Self </span>{
+            table: table.into(),
+            using: using.into(),
+            when_not_matched: <span class="prelude-val">None</span>,
+            returning: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">when_not_matched</span><span class="op">&lt;</span><span class="ident">Q</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">query</span>: <span class="ident">Q</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">Q</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>when_not_matched&lt;Q&gt;(<span class="kw-2">mut </span><span class="self">self</span>, query: Q) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>Q: Into&lt;Query&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="self">self</span>.<span class="ident">when_not_matched</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">query</span>.<span class="ident">into</span>());
-        <span class="self">self</span>
-    }
+        <span class="self">self</span>.when_not_matched = <span class="prelude-val">Some</span>(query.into());
+        <span class="self">self
+    </span>}
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">returning</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">columns</span>: <span class="ident">I</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">K</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">K</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>returning&lt;K, I&gt;(<span class="kw-2">mut </span><span class="self">self</span>, columns: I) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>K: Into&lt;Column&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+        I: IntoIterator&lt;Item = K&gt;,
     {
-        <span class="self">self</span>.<span class="ident">returning</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">columns</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">k</span><span class="op">|</span> <span class="ident">k</span>.<span class="ident">into</span>()).<span class="ident">collect</span>());
-        <span class="self">self</span>
+        <span class="self">self</span>.returning = <span class="prelude-val">Some</span>(columns.into_iter().map(|k| k.into()).collect());
+        <span class="self">self
+    </span>}
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; From&lt;Merge&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>Query&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>from(merge: Merge&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Merge(Box::new(merge))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Merge</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">merge</span>: <span class="ident">Merge</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Merge</span>(<span class="ident">Box::new</span>(<span class="ident">merge</span>))
-    }
+<span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>Using&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) base_query: Query&lt;<span class="lifetime">&#39;a</span>&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) columns: Vec&lt;Column&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) as_table: Table&lt;<span class="lifetime">&#39;a</span>&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) on_conditions: ConditionTree&lt;<span class="lifetime">&#39;a</span>&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Using</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">base_query</span>: <span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">as_table</span>: <span class="ident">Table</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">on_conditions</span>: <span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Using</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">on</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">conditions</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ConditionTree</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Using&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>on&lt;T&gt;(<span class="kw-2">mut </span><span class="self">self</span>, conditions: T) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>T: Into&lt;ConditionTree&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
-        <span class="self">self</span>.<span class="ident">on_conditions</span> <span class="op">=</span> <span class="ident">conditions</span>.<span class="ident">into</span>();
-        <span class="self">self</span>
-    }
+        <span class="self">self</span>.on_conditions = conditions.into();
+        <span class="self">self
+    </span>}
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">IntoUsing</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">into_using</span>(<span class="self">self</span>, <span class="ident">alias</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">Using</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>IntoUsing&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>into_using(<span class="self">self</span>, alias: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, columns: Vec&lt;Column&lt;<span class="lifetime">&#39;a</span>&gt;&gt;) -&gt; Using&lt;<span class="lifetime">&#39;a</span>&gt;;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">I</span><span class="op">&gt;</span> <span class="ident">IntoUsing</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">I</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, I&gt; IntoUsing&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>I
+<span class="kw">where
+    </span>I: Into&lt;Query&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">into_using</span>(<span class="self">self</span>, <span class="ident">alias</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Column</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">Using</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="ident">Using</span> {
-            <span class="ident">base_query</span>: <span class="self">self</span>.<span class="ident">into</span>(),
-            <span class="ident">as_table</span>: <span class="ident">Table::from</span>(<span class="ident">alias</span>),
-            <span class="ident">columns</span>,
-            <span class="ident">on_conditions</span>: <span class="ident">ConditionTree::NoCondition</span>,
+    <span class="kw">fn </span>into_using(<span class="self">self</span>, alias: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, columns: Vec&lt;Column&lt;<span class="lifetime">&#39;a</span>&gt;&gt;) -&gt; Using&lt;<span class="lifetime">&#39;a</span>&gt; {
+        Using {
+            base_query: <span class="self">self</span>.into(),
+            as_table: Table::from(alias),
+            columns,
+            on_conditions: ConditionTree::NoCondition,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">Insert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Merge</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TryFrom&lt;Insert&lt;<span class="lifetime">&#39;a</span>&gt;&gt; <span class="kw">for </span>Merge&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Error = Error;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">insert</span>: <span class="ident">Insert</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">insert</span>.<span class="ident">table</span>.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::conversion</span>(<span class="string">&quot;Insert needs to point to a table for conversion to Merge.&quot;</span>);
-            <span class="ident">Error::builder</span>(<span class="ident">kind</span>).<span class="ident">build</span>()
+    <span class="kw">fn </span>try_from(insert: Insert&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="kw">crate</span>::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>table = insert.table.ok_or_else(|| {
+            <span class="kw">let </span>kind = ErrorKind::conversion(<span class="string">&quot;Insert needs to point to a table for conversion to Merge.&quot;</span>);
+            Error::builder(kind).build()
         })<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="ident">table</span>.<span class="ident">index_definitions</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::conversion</span>(<span class="string">&quot;Insert table needs schema metadata for conversion to Merge.&quot;</span>);
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::builder</span>(<span class="ident">kind</span>).<span class="ident">build</span>());
+        <span class="kw">if </span>table.index_definitions.is_empty() {
+            <span class="kw">let </span>kind = ErrorKind::conversion(<span class="string">&quot;Insert table needs schema metadata for conversion to Merge.&quot;</span>);
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::builder(kind).build());
         }
 
-        <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">insert</span>.<span class="ident">columns</span>;
+        <span class="kw">let </span>columns = insert.columns;
 
-        <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">insert</span>.<span class="ident">values</span>.<span class="ident">kind</span> {
-            <span class="ident">ExpressionKind::Row</span>(<span class="ident">row</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">cols_vals</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="ident">row</span>.<span class="ident">values</span>.<span class="ident">into_iter</span>());
+        <span class="kw">let </span>query = <span class="kw">match </span>insert.values.kind {
+            ExpressionKind::Row(row) =&gt; {
+                <span class="kw">let </span>cols_vals = columns.iter().zip(row.values.into_iter());
 
-                <span class="kw">let</span> <span class="ident">select</span> <span class="op">=</span> <span class="ident">cols_vals</span>.<span class="ident">fold</span>(<span class="ident">Select::default</span>(), <span class="op">|</span><span class="ident">query</span>, (<span class="ident">col</span>, <span class="ident">val</span>)<span class="op">|</span> {
-                    <span class="ident">query</span>.<span class="ident">value</span>(<span class="ident">val</span>.<span class="ident">alias</span>(<span class="ident">col</span>.<span class="ident">name</span>.<span class="ident">clone</span>()))
+                <span class="kw">let </span>select = cols_vals.fold(Select::default(), |query, (col, val)| {
+                    query.value(val.alias(col.name.clone()))
                 });
 
-                <span class="ident">Query::from</span>(<span class="ident">select</span>)
+                Query::from(select)
             }
-            <span class="ident">ExpressionKind::Values</span>(<span class="ident">values</span>) =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rows</span> <span class="op">=</span> <span class="ident">values</span>.<span class="ident">rows</span>;
-                <span class="kw">let</span> <span class="ident">row</span> <span class="op">=</span> <span class="ident">rows</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>();
-                <span class="kw">let</span> <span class="ident">cols_vals</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="ident">row</span>.<span class="ident">values</span>.<span class="ident">into_iter</span>());
+            ExpressionKind::Values(values) =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>rows = values.rows;
+                <span class="kw">let </span>row = rows.pop().unwrap();
+                <span class="kw">let </span>cols_vals = columns.iter().zip(row.values.into_iter());
 
-                <span class="kw">let</span> <span class="ident">select</span> <span class="op">=</span> <span class="ident">cols_vals</span>.<span class="ident">fold</span>(<span class="ident">Select::default</span>(), <span class="op">|</span><span class="ident">query</span>, (<span class="ident">col</span>, <span class="ident">val</span>)<span class="op">|</span> {
-                    <span class="ident">query</span>.<span class="ident">value</span>(<span class="ident">val</span>.<span class="ident">alias</span>(<span class="ident">col</span>.<span class="ident">name</span>.<span class="ident">clone</span>()))
+                <span class="kw">let </span>select = cols_vals.fold(Select::default(), |query, (col, val)| {
+                    query.value(val.alias(col.name.clone()))
                 });
 
-                <span class="kw">let</span> <span class="ident">union</span> <span class="op">=</span> <span class="ident">rows</span>.<span class="ident">into_iter</span>().<span class="ident">fold</span>(<span class="ident">Union::new</span>(<span class="ident">select</span>), <span class="op">|</span><span class="ident">union</span>, <span class="ident">row</span><span class="op">|</span> {
-                    <span class="kw">let</span> <span class="ident">cols_vals</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">iter</span>().<span class="ident">zip</span>(<span class="ident">row</span>.<span class="ident">values</span>.<span class="ident">into_iter</span>());
+                <span class="kw">let </span>union = rows.into_iter().fold(Union::new(select), |union, row| {
+                    <span class="kw">let </span>cols_vals = columns.iter().zip(row.values.into_iter());
 
-                    <span class="kw">let</span> <span class="ident">select</span> <span class="op">=</span> <span class="ident">cols_vals</span>.<span class="ident">fold</span>(<span class="ident">Select::default</span>(), <span class="op">|</span><span class="ident">query</span>, (<span class="ident">col</span>, <span class="ident">val</span>)<span class="op">|</span> {
-                        <span class="ident">query</span>.<span class="ident">value</span>(<span class="ident">val</span>.<span class="ident">alias</span>(<span class="ident">col</span>.<span class="ident">name</span>.<span class="ident">clone</span>()))
+                    <span class="kw">let </span>select = cols_vals.fold(Select::default(), |query, (col, val)| {
+                        query.value(val.alias(col.name.clone()))
                     });
 
-                    <span class="ident">union</span>.<span class="ident">all</span>(<span class="ident">select</span>)
+                    union.all(select)
                 });
 
-                <span class="ident">Query::from</span>(<span class="ident">union</span>)
+                Query::from(union)
             }
-            <span class="ident">ExpressionKind::Selection</span>(<span class="ident">selection</span>) =&gt; <span class="ident">Query::from</span>(<span class="ident">selection</span>),
-            <span class="kw">_</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::conversion</span>(<span class="string">&quot;Insert type not supported.&quot;</span>);
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::builder</span>(<span class="ident">kind</span>).<span class="ident">build</span>());
+            ExpressionKind::Selection(selection) =&gt; Query::from(selection),
+            <span class="kw">_ </span>=&gt; {
+                <span class="kw">let </span>kind = ErrorKind::conversion(<span class="string">&quot;Insert type not supported.&quot;</span>);
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::builder(kind).build());
             }
         };
 
-        <span class="kw">let</span> <span class="ident">bare_columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">clone</span>().<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">into_bare</span>()).<span class="ident">collect</span>();
+        <span class="kw">let </span>bare_columns: Vec&lt;<span class="kw">_</span>&gt; = columns.clone().into_iter().map(|c| c.into_bare()).collect();
 
-        <span class="kw">let</span> <span class="ident">using</span> <span class="op">=</span> <span class="ident">query</span>
-            .<span class="ident">into_using</span>(<span class="string">&quot;dual&quot;</span>, <span class="ident">bare_columns</span>.<span class="ident">clone</span>())
-            .<span class="ident">on</span>(<span class="ident">table</span>.<span class="ident">join_conditions</span>(<span class="kw-2">&amp;</span><span class="ident">columns</span>).<span class="ident">unwrap</span>());
+        <span class="kw">let </span>using = query
+            .into_using(<span class="string">&quot;dual&quot;</span>, bare_columns.clone())
+            .on(table.join_conditions(<span class="kw-2">&amp;</span>columns).unwrap());
 
-        <span class="kw">let</span> <span class="ident">dual_columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">columns</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">table</span>(<span class="string">&quot;dual&quot;</span>)).<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="ident">not_matched</span> <span class="op">=</span> <span class="ident">Insert::multi</span>(<span class="ident">bare_columns</span>).<span class="ident">values</span>(<span class="ident">dual_columns</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">merge</span> <span class="op">=</span> <span class="ident">Merge::new</span>(<span class="ident">table</span>, <span class="ident">using</span>).<span class="ident">when_not_matched</span>(<span class="ident">not_matched</span>);
+        <span class="kw">let </span>dual_columns: Vec&lt;<span class="kw">_</span>&gt; = columns.into_iter().map(|c| c.table(<span class="string">&quot;dual&quot;</span>)).collect();
+        <span class="kw">let </span>not_matched = Insert::multi(bare_columns).values(dual_columns);
+        <span class="kw">let </span><span class="kw-2">mut </span>merge = Merge::new(table, using).when_not_matched(not_matched);
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">columns</span>) <span class="op">=</span> <span class="ident">insert</span>.<span class="ident">returning</span> {
-            <span class="ident">merge</span> <span class="op">=</span> <span class="ident">merge</span>.<span class="ident">returning</span>(<span class="ident">columns</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(columns) = insert.returning {
+            merge = merge.returning(columns);
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">merge</span>)
+        <span class="prelude-val">Ok</span>(merge)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="quaint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="quaint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/aead.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>aead.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../ring/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/aead.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>aead.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../ring/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -677,684 +677,684 @@
 <span id="677">677</span>
 <span id="678">678</span>
 <span id="679">679</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2016 Brian Smith.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
-<span class="comment">// purpose with or without fee is hereby granted, provided that the above</span>
-<span class="comment">// copyright notice and this permission notice appear in all copies.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES</span>
-<span class="comment">// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY</span>
-<span class="comment">// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span>
-<span class="comment">// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION</span>
-<span class="comment">// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN</span>
-<span class="comment">// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2016 Brian Smith.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY
+// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-<span class="doccomment">//! Authenticated Encryption with Associated Data (AEAD).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! See [Authenticated encryption: relations among notions and analysis of the</span>
-<span class="doccomment">//! generic composition paradigm][AEAD] for an introduction to the concept of</span>
-<span class="doccomment">//! AEADs.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [AEAD]: http://www-cse.ucsd.edu/~mihir/papers/oem.html</span>
-<span class="doccomment">//! [`crypto.cipher.AEAD`]: https://golang.org/pkg/crypto/cipher/#AEAD</span>
+</span><span class="doccomment">//! Authenticated Encryption with Associated Data (AEAD).
+//!
+//! See [Authenticated encryption: relations among notions and analysis of the
+//! generic composition paradigm][AEAD] for an introduction to the concept of
+//! AEADs.
+//!
+//! [AEAD]: http://www-cse.ucsd.edu/~mihir/papers/oem.html
+//! [`crypto.cipher.AEAD`]: https://golang.org/pkg/crypto/cipher/#AEAD
 
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::block</span>::{<span class="ident">Block</span>, <span class="ident">BLOCK_LEN</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">constant_time</span>, <span class="ident">cpu</span>, <span class="ident">error</span>, <span class="ident">hkdf</span>, <span class="ident">polyfill</span>};
-<span class="kw">use</span> <span class="ident">core::ops::RangeFrom</span>;
+</span><span class="kw">use </span><span class="self">self</span>::block::{Block, BLOCK_LEN};
+<span class="kw">use crate</span>::{constant_time, cpu, error, hkdf, polyfill};
+<span class="kw">use </span>core::ops::RangeFrom;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::{
-    <span class="ident">aes_gcm</span>::{<span class="ident">AES_128_GCM</span>, <span class="ident">AES_256_GCM</span>},
-    <span class="ident">chacha20_poly1305::CHACHA20_POLY1305</span>,
-    <span class="ident">nonce</span>::{<span class="ident">Nonce</span>, <span class="ident">NONCE_LEN</span>},
+<span class="kw">pub use </span><span class="self">self</span>::{
+    aes_gcm::{AES_128_GCM, AES_256_GCM},
+    chacha20_poly1305::CHACHA20_POLY1305,
+    nonce::{Nonce, NONCE_LEN},
 };
 
-<span class="doccomment">/// A sequences of unique nonces.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A given `NonceSequence` must never return the same `Nonce` twice from</span>
-<span class="doccomment">/// `advance()`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A simple counter is a reasonable (but probably not ideal) `NonceSequence`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Intentionally not `Clone` or `Copy` since cloning would allow duplication</span>
-<span class="doccomment">/// of the sequence.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">NonceSequence</span> {
-    <span class="doccomment">/// Returns the next nonce in the sequence.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This may fail if &quot;too many&quot; nonces have been requested, where how many</span>
-    <span class="doccomment">/// is too many is up to the implementation of `NonceSequence`. An</span>
-    <span class="doccomment">/// implementation may that enforce a maximum number of records are</span>
-    <span class="doccomment">/// sent/received under a key this way. Once `advance()` fails, it must</span>
-    <span class="doccomment">/// fail for all subsequent calls.</span>
-    <span class="kw">fn</span> <span class="ident">advance</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Nonce</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span>;
+<span class="doccomment">/// A sequences of unique nonces.
+///
+/// A given `NonceSequence` must never return the same `Nonce` twice from
+/// `advance()`.
+///
+/// A simple counter is a reasonable (but probably not ideal) `NonceSequence`.
+///
+/// Intentionally not `Clone` or `Copy` since cloning would allow duplication
+/// of the sequence.
+</span><span class="kw">pub trait </span>NonceSequence {
+    <span class="doccomment">/// Returns the next nonce in the sequence.
+    ///
+    /// This may fail if &quot;too many&quot; nonces have been requested, where how many
+    /// is too many is up to the implementation of `NonceSequence`. An
+    /// implementation may that enforce a maximum number of records are
+    /// sent/received under a key this way. Once `advance()` fails, it must
+    /// fail for all subsequent calls.
+    </span><span class="kw">fn </span>advance(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Nonce, error::Unspecified&gt;;
 }
 
-<span class="doccomment">/// An AEAD key bound to a nonce sequence.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">BoundKey</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">NonceSequence</span><span class="op">&gt;</span>: <span class="ident">core::fmt::Debug</span> {
-    <span class="doccomment">/// Constructs a new key from the given `UnboundKey` and `NonceSequence`.</span>
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: <span class="ident">UnboundKey</span>, <span class="ident">nonce_sequence</span>: <span class="ident">N</span>) -&gt; <span class="self">Self</span>;
+<span class="doccomment">/// An AEAD key bound to a nonce sequence.
+</span><span class="kw">pub trait </span>BoundKey&lt;N: NonceSequence&gt;: core::fmt::Debug {
+    <span class="doccomment">/// Constructs a new key from the given `UnboundKey` and `NonceSequence`.
+    </span><span class="kw">fn </span>new(key: UnboundKey, nonce_sequence: N) -&gt; <span class="self">Self</span>;
 
-    <span class="doccomment">/// The key&#39;s AEAD algorithm.</span>
-    <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span>;
+    <span class="doccomment">/// The key&#39;s AEAD algorithm.
+    </span><span class="kw">fn </span>algorithm(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Algorithm;
 }
 
-<span class="doccomment">/// An AEAD key for authenticating and decrypting (&quot;opening&quot;), bound to a nonce</span>
-<span class="doccomment">/// sequence.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Intentionally not `Clone` or `Copy` since cloning would allow duplication</span>
-<span class="doccomment">/// of the nonce sequence.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OpeningKey</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">NonceSequence</span><span class="op">&gt;</span> {
-    <span class="ident">key</span>: <span class="ident">UnboundKey</span>,
-    <span class="ident">nonce_sequence</span>: <span class="ident">N</span>,
+<span class="doccomment">/// An AEAD key for authenticating and decrypting (&quot;opening&quot;), bound to a nonce
+/// sequence.
+///
+/// Intentionally not `Clone` or `Copy` since cloning would allow duplication
+/// of the nonce sequence.
+</span><span class="kw">pub struct </span>OpeningKey&lt;N: NonceSequence&gt; {
+    key: UnboundKey,
+    nonce_sequence: N,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">NonceSequence</span><span class="op">&gt;</span> <span class="ident">BoundKey</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">OpeningKey</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: <span class="ident">UnboundKey</span>, <span class="ident">nonce_sequence</span>: <span class="ident">N</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">key</span>,
-            <span class="ident">nonce_sequence</span>,
+<span class="kw">impl</span>&lt;N: NonceSequence&gt; BoundKey&lt;N&gt; <span class="kw">for </span>OpeningKey&lt;N&gt; {
+    <span class="kw">fn </span>new(key: UnboundKey, nonce_sequence: N) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            key,
+            nonce_sequence,
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span> {
-        <span class="self">self</span>.<span class="ident">key</span>.<span class="ident">algorithm</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>algorithm(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Algorithm {
+        <span class="self">self</span>.key.algorithm
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">NonceSequence</span><span class="op">&gt;</span> <span class="ident">core::fmt::Debug</span> <span class="kw">for</span> <span class="ident">OpeningKey</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">core::fmt::Formatter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">core::fmt::Error</span><span class="op">&gt;</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;OpeningKey&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;algorithm&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">algorithm</span>())
-            .<span class="ident">finish</span>()
+<span class="kw">impl</span>&lt;N: NonceSequence&gt; core::fmt::Debug <span class="kw">for </span>OpeningKey&lt;N&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter) -&gt; <span class="prelude-ty">Result</span>&lt;(), core::fmt::Error&gt; {
+        f.debug_struct(<span class="string">&quot;OpeningKey&quot;</span>)
+            .field(<span class="string">&quot;algorithm&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.algorithm())
+            .finish()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">NonceSequence</span><span class="op">&gt;</span> <span class="ident">OpeningKey</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Authenticates and decrypts (“opens”) data in place.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `aad` is the additional authenticated data (AAD), if any.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// On input, `in_out` must be the ciphertext followed by the tag. When</span>
-    <span class="doccomment">/// `open_in_place()` returns `Ok(plaintext)`, the input ciphertext</span>
-    <span class="doccomment">/// has been overwritten by the plaintext; `plaintext` will refer to the</span>
-    <span class="doccomment">/// plaintext without the tag.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When `open_in_place()` returns `Err(..)`, `in_out` may have been</span>
-    <span class="doccomment">/// overwritten in an unspecified way.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open_in_place</span><span class="op">&lt;</span><span class="lifetime">&#39;in_out</span>, <span class="ident">A</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">aad</span>: <span class="ident">Aad</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
-        <span class="ident">in_out</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>],
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>], <span class="ident">error::Unspecified</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">A</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;N: NonceSequence&gt; OpeningKey&lt;N&gt; {
+    <span class="doccomment">/// Authenticates and decrypts (“opens”) data in place.
+    ///
+    /// `aad` is the additional authenticated data (AAD), if any.
+    ///
+    /// On input, `in_out` must be the ciphertext followed by the tag. When
+    /// `open_in_place()` returns `Ok(plaintext)`, the input ciphertext
+    /// has been overwritten by the plaintext; `plaintext` will refer to the
+    /// plaintext without the tag.
+    ///
+    /// When `open_in_place()` returns `Err(..)`, `in_out` may have been
+    /// overwritten in an unspecified way.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>open_in_place&lt;<span class="lifetime">&#39;in_out</span>, A&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        aad: Aad&lt;A&gt;,
+        in_out: <span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out </span><span class="kw-2">mut </span>[u8],
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out </span><span class="kw-2">mut </span>[u8], error::Unspecified&gt;
+    <span class="kw">where
+        </span>A: AsRef&lt;[u8]&gt;,
     {
-        <span class="self">self</span>.<span class="ident">open_within</span>(<span class="ident">aad</span>, <span class="ident">in_out</span>, <span class="number">0</span>..)
+        <span class="self">self</span>.open_within(aad, in_out, <span class="number">0</span>..)
     }
 
-    <span class="doccomment">/// Authenticates and decrypts (“opens”) data in place, with a shift.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `aad` is the additional authenticated data (AAD), if any.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// On input, `in_out[ciphertext_and_tag]` must be the ciphertext followed</span>
-    <span class="doccomment">/// by the tag. When `open_within()` returns `Ok(plaintext)`, the plaintext</span>
-    <span class="doccomment">/// will be at `in_out[0..plaintext.len()]`. In other words, the following</span>
-    <span class="doccomment">/// two code fragments are equivalent for valid values of</span>
-    <span class="doccomment">/// `ciphertext_and_tag`, except `open_within` will often be more efficient:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```skip</span>
-    <span class="doccomment">/// let plaintext = key.open_within(aad, in_out, cipertext_and_tag)?;</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```skip</span>
-    <span class="doccomment">/// let ciphertext_and_tag_len = in_out[ciphertext_and_tag].len();</span>
-    <span class="doccomment">/// in_out.copy_within(ciphertext_and_tag, 0);</span>
-    <span class="doccomment">/// let plaintext = key.open_in_place(aad, &amp;mut in_out[..ciphertext_and_tag_len])?;</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Similarly, `key.open_within(aad, in_out, 0..)` is equivalent to</span>
-    <span class="doccomment">/// `key.open_in_place(aad, in_out)`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///  When `open_in_place()` returns `Err(..)`, `in_out` may have been</span>
-    <span class="doccomment">/// overwritten in an unspecified way.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The shifting feature is useful in the case where multiple packets are</span>
-    <span class="doccomment">/// being reassembled in place. Consider this example where the peer has</span>
-    <span class="doccomment">/// sent the message “Split stream reassembled in place” split into</span>
-    <span class="doccomment">/// three sealed packets:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ascii-art</span>
-    <span class="doccomment">///                 Packet 1                  Packet 2                 Packet 3</span>
-    <span class="doccomment">/// Input:  [Header][Ciphertext][Tag][Header][Ciphertext][Tag][Header][Ciphertext][Tag]</span>
-    <span class="doccomment">///                      |         +--------------+                        |</span>
-    <span class="doccomment">///               +------+   +-----+    +----------------------------------+</span>
-    <span class="doccomment">///               v          v          v</span>
-    <span class="doccomment">/// Output: [Plaintext][Plaintext][Plaintext]</span>
-    <span class="doccomment">///        “Split stream reassembled in place”</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This reassembly be accomplished with three calls to `open_within()`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open_within</span><span class="op">&lt;</span><span class="lifetime">&#39;in_out</span>, <span class="ident">A</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">aad</span>: <span class="ident">Aad</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
-        <span class="ident">in_out</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>],
-        <span class="ident">ciphertext_and_tag</span>: <span class="ident">RangeFrom</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>], <span class="ident">error::Unspecified</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">A</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
+    <span class="doccomment">/// Authenticates and decrypts (“opens”) data in place, with a shift.
+    ///
+    /// `aad` is the additional authenticated data (AAD), if any.
+    ///
+    /// On input, `in_out[ciphertext_and_tag]` must be the ciphertext followed
+    /// by the tag. When `open_within()` returns `Ok(plaintext)`, the plaintext
+    /// will be at `in_out[0..plaintext.len()]`. In other words, the following
+    /// two code fragments are equivalent for valid values of
+    /// `ciphertext_and_tag`, except `open_within` will often be more efficient:
+    ///
+    ///
+    /// ```skip
+    /// let plaintext = key.open_within(aad, in_out, cipertext_and_tag)?;
+    /// ```
+    ///
+    /// ```skip
+    /// let ciphertext_and_tag_len = in_out[ciphertext_and_tag].len();
+    /// in_out.copy_within(ciphertext_and_tag, 0);
+    /// let plaintext = key.open_in_place(aad, &amp;mut in_out[..ciphertext_and_tag_len])?;
+    /// ```
+    ///
+    /// Similarly, `key.open_within(aad, in_out, 0..)` is equivalent to
+    /// `key.open_in_place(aad, in_out)`.
+    ///
+    ///  When `open_in_place()` returns `Err(..)`, `in_out` may have been
+    /// overwritten in an unspecified way.
+    ///
+    /// The shifting feature is useful in the case where multiple packets are
+    /// being reassembled in place. Consider this example where the peer has
+    /// sent the message “Split stream reassembled in place” split into
+    /// three sealed packets:
+    ///
+    /// ```ascii-art
+    ///                 Packet 1                  Packet 2                 Packet 3
+    /// Input:  [Header][Ciphertext][Tag][Header][Ciphertext][Tag][Header][Ciphertext][Tag]
+    ///                      |         +--------------+                        |
+    ///               +------+   +-----+    +----------------------------------+
+    ///               v          v          v
+    /// Output: [Plaintext][Plaintext][Plaintext]
+    ///        “Split stream reassembled in place”
+    /// ```
+    ///
+    /// This reassembly be accomplished with three calls to `open_within()`.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>open_within&lt;<span class="lifetime">&#39;in_out</span>, A&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        aad: Aad&lt;A&gt;,
+        in_out: <span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out </span><span class="kw-2">mut </span>[u8],
+        ciphertext_and_tag: RangeFrom&lt;usize&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out </span><span class="kw-2">mut </span>[u8], error::Unspecified&gt;
+    <span class="kw">where
+        </span>A: AsRef&lt;[u8]&gt;,
     {
-        <span class="ident">open_within_</span>(
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">key</span>,
-            <span class="self">self</span>.<span class="ident">nonce_sequence</span>.<span class="ident">advance</span>()<span class="question-mark">?</span>,
-            <span class="ident">aad</span>,
-            <span class="ident">in_out</span>,
-            <span class="ident">ciphertext_and_tag</span>,
+        open_within_(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.key,
+            <span class="self">self</span>.nonce_sequence.advance()<span class="question-mark">?</span>,
+            aad,
+            in_out,
+            ciphertext_and_tag,
         )
     }
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">open_within_</span><span class="op">&lt;</span><span class="lifetime">&#39;in_out</span>, <span class="ident">A</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(
-    <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">UnboundKey</span>,
-    <span class="ident">nonce</span>: <span class="ident">Nonce</span>,
-    <span class="ident">Aad</span>(<span class="ident">aad</span>): <span class="ident">Aad</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
-    <span class="ident">in_out</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>],
-    <span class="ident">ciphertext_and_tag</span>: <span class="ident">RangeFrom</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>], <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">open_within</span><span class="op">&lt;</span><span class="lifetime">&#39;in_out</span><span class="op">&gt;</span>(
-        <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">UnboundKey</span>,
-        <span class="ident">nonce</span>: <span class="ident">Nonce</span>,
-        <span class="ident">aad</span>: <span class="ident">Aad</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-        <span class="ident">in_out</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>],
-        <span class="ident">ciphertext_and_tag</span>: <span class="ident">RangeFrom</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>], <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">in_prefix_len</span> <span class="op">=</span> <span class="ident">ciphertext_and_tag</span>.<span class="ident">start</span>;
-        <span class="kw">let</span> <span class="ident">ciphertext_and_tag_len</span> <span class="op">=</span> <span class="ident">in_out</span>
-            .<span class="ident">len</span>()
-            .<span class="ident">checked_sub</span>(<span class="ident">in_prefix_len</span>)
-            .<span class="ident">ok_or</span>(<span class="ident">error::Unspecified</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">ciphertext_len</span> <span class="op">=</span> <span class="ident">ciphertext_and_tag_len</span>
-            .<span class="ident">checked_sub</span>(<span class="ident">TAG_LEN</span>)
-            .<span class="ident">ok_or</span>(<span class="ident">error::Unspecified</span>)<span class="question-mark">?</span>;
-        <span class="ident">check_per_nonce_max_bytes</span>(<span class="ident">key</span>.<span class="ident">algorithm</span>, <span class="ident">ciphertext_len</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> (<span class="ident">in_out</span>, <span class="ident">received_tag</span>) <span class="op">=</span> <span class="ident">in_out</span>.<span class="ident">split_at_mut</span>(<span class="ident">in_prefix_len</span> <span class="op">+</span> <span class="ident">ciphertext_len</span>);
-        <span class="kw">let</span> <span class="ident">Tag</span>(<span class="ident">calculated_tag</span>) <span class="op">=</span> (<span class="ident">key</span>.<span class="ident">algorithm</span>.<span class="ident">open</span>)(
-            <span class="kw-2">&amp;</span><span class="ident">key</span>.<span class="ident">inner</span>,
-            <span class="ident">nonce</span>,
-            <span class="ident">aad</span>,
-            <span class="ident">in_prefix_len</span>,
-            <span class="ident">in_out</span>,
-            <span class="ident">key</span>.<span class="ident">cpu_features</span>,
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>open_within_&lt;<span class="lifetime">&#39;in_out</span>, A: AsRef&lt;[u8]&gt;&gt;(
+    key: <span class="kw-2">&amp;</span>UnboundKey,
+    nonce: Nonce,
+    Aad(aad): Aad&lt;A&gt;,
+    in_out: <span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out </span><span class="kw-2">mut </span>[u8],
+    ciphertext_and_tag: RangeFrom&lt;usize&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out </span><span class="kw-2">mut </span>[u8], error::Unspecified&gt; {
+    <span class="kw">fn </span>open_within&lt;<span class="lifetime">&#39;in_out</span>&gt;(
+        key: <span class="kw-2">&amp;</span>UnboundKey,
+        nonce: Nonce,
+        aad: Aad&lt;<span class="kw-2">&amp;</span>[u8]&gt;,
+        in_out: <span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out </span><span class="kw-2">mut </span>[u8],
+        ciphertext_and_tag: RangeFrom&lt;usize&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out </span><span class="kw-2">mut </span>[u8], error::Unspecified&gt; {
+        <span class="kw">let </span>in_prefix_len = ciphertext_and_tag.start;
+        <span class="kw">let </span>ciphertext_and_tag_len = in_out
+            .len()
+            .checked_sub(in_prefix_len)
+            .ok_or(error::Unspecified)<span class="question-mark">?</span>;
+        <span class="kw">let </span>ciphertext_len = ciphertext_and_tag_len
+            .checked_sub(TAG_LEN)
+            .ok_or(error::Unspecified)<span class="question-mark">?</span>;
+        check_per_nonce_max_bytes(key.algorithm, ciphertext_len)<span class="question-mark">?</span>;
+        <span class="kw">let </span>(in_out, received_tag) = in_out.split_at_mut(in_prefix_len + ciphertext_len);
+        <span class="kw">let </span>Tag(calculated_tag) = (key.algorithm.open)(
+            <span class="kw-2">&amp;</span>key.inner,
+            nonce,
+            aad,
+            in_prefix_len,
+            in_out,
+            key.cpu_features,
         );
-        <span class="kw">if</span> <span class="ident">constant_time::verify_slices_are_equal</span>(<span class="ident">calculated_tag</span>.<span class="ident">as_ref</span>(), <span class="ident">received_tag</span>).<span class="ident">is_err</span>() {
-            <span class="comment">// Zero out the plaintext so that it isn&#39;t accidentally leaked or used</span>
-            <span class="comment">// after verification fails. It would be safest if we could check the</span>
-            <span class="comment">// tag before decrypting, but some `open` implementations interleave</span>
-            <span class="comment">// authentication with decryption for performance.</span>
-            <span class="kw">for</span> <span class="ident">b</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="ident">in_out</span>[..<span class="ident">ciphertext_len</span>] {
-                <span class="kw-2">*</span><span class="ident">b</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="kw">if </span>constant_time::verify_slices_are_equal(calculated_tag.as_ref(), received_tag).is_err() {
+            <span class="comment">// Zero out the plaintext so that it isn&#39;t accidentally leaked or used
+            // after verification fails. It would be safest if we could check the
+            // tag before decrypting, but some `open` implementations interleave
+            // authentication with decryption for performance.
+            </span><span class="kw">for </span>b <span class="kw">in </span><span class="kw-2">&amp;mut </span>in_out[..ciphertext_len] {
+                <span class="kw-2">*</span>b = <span class="number">0</span>;
             }
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>);
+            <span class="kw">return </span><span class="prelude-val">Err</span>(error::Unspecified);
         }
-        <span class="comment">// `ciphertext_len` is also the plaintext length.</span>
-        <span class="prelude-val">Ok</span>(<span class="kw-2">&amp;mut</span> <span class="ident">in_out</span>[..<span class="ident">ciphertext_len</span>])
+        <span class="comment">// `ciphertext_len` is also the plaintext length.
+        </span><span class="prelude-val">Ok</span>(<span class="kw-2">&amp;mut </span>in_out[..ciphertext_len])
     }
 
-    <span class="ident">open_within</span>(
-        <span class="ident">key</span>,
-        <span class="ident">nonce</span>,
-        <span class="ident">Aad::from</span>(<span class="ident">aad</span>.<span class="ident">as_ref</span>()),
-        <span class="ident">in_out</span>,
-        <span class="ident">ciphertext_and_tag</span>,
+    open_within(
+        key,
+        nonce,
+        Aad::from(aad.as_ref()),
+        in_out,
+        ciphertext_and_tag,
     )
 }
 
-<span class="doccomment">/// An AEAD key for encrypting and signing (&quot;sealing&quot;), bound to a nonce</span>
-<span class="doccomment">/// sequence.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Intentionally not `Clone` or `Copy` since cloning would allow duplication</span>
-<span class="doccomment">/// of the nonce sequence.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SealingKey</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">NonceSequence</span><span class="op">&gt;</span> {
-    <span class="ident">key</span>: <span class="ident">UnboundKey</span>,
-    <span class="ident">nonce_sequence</span>: <span class="ident">N</span>,
+<span class="doccomment">/// An AEAD key for encrypting and signing (&quot;sealing&quot;), bound to a nonce
+/// sequence.
+///
+/// Intentionally not `Clone` or `Copy` since cloning would allow duplication
+/// of the nonce sequence.
+</span><span class="kw">pub struct </span>SealingKey&lt;N: NonceSequence&gt; {
+    key: UnboundKey,
+    nonce_sequence: N,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">NonceSequence</span><span class="op">&gt;</span> <span class="ident">BoundKey</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SealingKey</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: <span class="ident">UnboundKey</span>, <span class="ident">nonce_sequence</span>: <span class="ident">N</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">key</span>,
-            <span class="ident">nonce_sequence</span>,
+<span class="kw">impl</span>&lt;N: NonceSequence&gt; BoundKey&lt;N&gt; <span class="kw">for </span>SealingKey&lt;N&gt; {
+    <span class="kw">fn </span>new(key: UnboundKey, nonce_sequence: N) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            key,
+            nonce_sequence,
         }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span> {
-        <span class="self">self</span>.<span class="ident">key</span>.<span class="ident">algorithm</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>algorithm(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Algorithm {
+        <span class="self">self</span>.key.algorithm
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">NonceSequence</span><span class="op">&gt;</span> <span class="ident">core::fmt::Debug</span> <span class="kw">for</span> <span class="ident">SealingKey</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">core::fmt::Formatter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">core::fmt::Error</span><span class="op">&gt;</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;SealingKey&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;algorithm&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">algorithm</span>())
-            .<span class="ident">finish</span>()
+<span class="kw">impl</span>&lt;N: NonceSequence&gt; core::fmt::Debug <span class="kw">for </span>SealingKey&lt;N&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter) -&gt; <span class="prelude-ty">Result</span>&lt;(), core::fmt::Error&gt; {
+        f.debug_struct(<span class="string">&quot;SealingKey&quot;</span>)
+            .field(<span class="string">&quot;algorithm&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.algorithm())
+            .finish()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">NonceSequence</span><span class="op">&gt;</span> <span class="ident">SealingKey</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Deprecated. Renamed to `seal_in_place_append_tag()`.</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Renamed to `seal_in_place_append_tag`.&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">seal_in_place</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">InOut</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">aad</span>: <span class="ident">Aad</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
-        <span class="ident">in_out</span>: <span class="kw-2">&amp;mut</span> <span class="ident">InOut</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">A</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-        <span class="ident">InOut</span>: <span class="ident">AsMut</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">+</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;in_out</span><span class="op">&gt;</span> <span class="ident">Extend</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="ident">u8</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;N: NonceSequence&gt; SealingKey&lt;N&gt; {
+    <span class="doccomment">/// Deprecated. Renamed to `seal_in_place_append_tag()`.
+    </span><span class="attribute">#[deprecated(note = <span class="string">&quot;Renamed to `seal_in_place_append_tag`.&quot;</span>)]
+    #[inline]
+    </span><span class="kw">pub fn </span>seal_in_place&lt;A, InOut&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        aad: Aad&lt;A&gt;,
+        in_out: <span class="kw-2">&amp;mut </span>InOut,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt;
+    <span class="kw">where
+        </span>A: AsRef&lt;[u8]&gt;,
+        InOut: AsMut&lt;[u8]&gt; + <span class="kw">for</span>&lt;<span class="lifetime">&#39;in_out</span>&gt; Extend&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out </span>u8&gt;,
     {
-        <span class="self">self</span>.<span class="ident">seal_in_place_append_tag</span>(<span class="ident">aad</span>, <span class="ident">in_out</span>)
+        <span class="self">self</span>.seal_in_place_append_tag(aad, in_out)
     }
 
-    <span class="doccomment">/// Encrypts and signs (“seals”) data in place, appending the tag to the</span>
-    <span class="doccomment">/// resulting ciphertext.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `key.seal_in_place_append_tag(aad, in_out)` is equivalent to:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```skip</span>
-    <span class="doccomment">/// key.seal_in_place_separate_tag(aad, in_out.as_mut())</span>
-    <span class="doccomment">///     .map(|tag| in_out.extend(tag.as_ref()))</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">seal_in_place_append_tag</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">InOut</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">aad</span>: <span class="ident">Aad</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
-        <span class="ident">in_out</span>: <span class="kw-2">&amp;mut</span> <span class="ident">InOut</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">A</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-        <span class="ident">InOut</span>: <span class="ident">AsMut</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">+</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;in_out</span><span class="op">&gt;</span> <span class="ident">Extend</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="ident">u8</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Encrypts and signs (“seals”) data in place, appending the tag to the
+    /// resulting ciphertext.
+    ///
+    /// `key.seal_in_place_append_tag(aad, in_out)` is equivalent to:
+    ///
+    /// ```skip
+    /// key.seal_in_place_separate_tag(aad, in_out.as_mut())
+    ///     .map(|tag| in_out.extend(tag.as_ref()))
+    /// ```
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>seal_in_place_append_tag&lt;A, InOut&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        aad: Aad&lt;A&gt;,
+        in_out: <span class="kw-2">&amp;mut </span>InOut,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt;
+    <span class="kw">where
+        </span>A: AsRef&lt;[u8]&gt;,
+        InOut: AsMut&lt;[u8]&gt; + <span class="kw">for</span>&lt;<span class="lifetime">&#39;in_out</span>&gt; Extend&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out </span>u8&gt;,
     {
-        <span class="self">self</span>.<span class="ident">seal_in_place_separate_tag</span>(<span class="ident">aad</span>, <span class="ident">in_out</span>.<span class="ident">as_mut</span>())
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">tag</span><span class="op">|</span> <span class="ident">in_out</span>.<span class="ident">extend</span>(<span class="ident">tag</span>.<span class="ident">as_ref</span>()))
+        <span class="self">self</span>.seal_in_place_separate_tag(aad, in_out.as_mut())
+            .map(|tag| in_out.extend(tag.as_ref()))
     }
 
-    <span class="doccomment">/// Encrypts and signs (“seals”) data in place.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `aad` is the additional authenticated data (AAD), if any. This is</span>
-    <span class="doccomment">/// authenticated but not encrypted. The type `A` could be a byte slice</span>
-    <span class="doccomment">/// `&amp;[u8]`, a byte array `[u8; N]` for some constant `N`, `Vec&lt;u8&gt;`, etc.</span>
-    <span class="doccomment">/// If there is no AAD then use `Aad::empty()`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The plaintext is given as the input value of `in_out`. `seal_in_place()`</span>
-    <span class="doccomment">/// will overwrite the plaintext with the ciphertext and return the tag.</span>
-    <span class="doccomment">/// For most protocols, the caller must append the tag to the ciphertext.</span>
-    <span class="doccomment">/// The tag will be `self.algorithm.tag_len()` bytes long.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">seal_in_place_separate_tag</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">aad</span>: <span class="ident">Aad</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
-        <span class="ident">in_out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Tag</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">A</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
+    <span class="doccomment">/// Encrypts and signs (“seals”) data in place.
+    ///
+    /// `aad` is the additional authenticated data (AAD), if any. This is
+    /// authenticated but not encrypted. The type `A` could be a byte slice
+    /// `&amp;[u8]`, a byte array `[u8; N]` for some constant `N`, `Vec&lt;u8&gt;`, etc.
+    /// If there is no AAD then use `Aad::empty()`.
+    ///
+    /// The plaintext is given as the input value of `in_out`. `seal_in_place()`
+    /// will overwrite the plaintext with the ciphertext and return the tag.
+    /// For most protocols, the caller must append the tag to the ciphertext.
+    /// The tag will be `self.algorithm.tag_len()` bytes long.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>seal_in_place_separate_tag&lt;A&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        aad: Aad&lt;A&gt;,
+        in_out: <span class="kw-2">&amp;mut </span>[u8],
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Tag, error::Unspecified&gt;
+    <span class="kw">where
+        </span>A: AsRef&lt;[u8]&gt;,
     {
-        <span class="ident">seal_in_place_separate_tag_</span>(
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">key</span>,
-            <span class="self">self</span>.<span class="ident">nonce_sequence</span>.<span class="ident">advance</span>()<span class="question-mark">?</span>,
-            <span class="ident">Aad::from</span>(<span class="ident">aad</span>.<span class="ident">as_ref</span>()),
-            <span class="ident">in_out</span>,
+        seal_in_place_separate_tag_(
+            <span class="kw-2">&amp;</span><span class="self">self</span>.key,
+            <span class="self">self</span>.nonce_sequence.advance()<span class="question-mark">?</span>,
+            Aad::from(aad.as_ref()),
+            in_out,
         )
     }
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">seal_in_place_separate_tag_</span>(
-    <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">UnboundKey</span>,
-    <span class="ident">nonce</span>: <span class="ident">Nonce</span>,
-    <span class="ident">aad</span>: <span class="ident">Aad</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-    <span class="ident">in_out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Tag</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-    <span class="ident">check_per_nonce_max_bytes</span>(<span class="ident">key</span>.<span class="ident">algorithm</span>, <span class="ident">in_out</span>.<span class="ident">len</span>())<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>((<span class="ident">key</span>.<span class="ident">algorithm</span>.<span class="ident">seal</span>)(
-        <span class="kw-2">&amp;</span><span class="ident">key</span>.<span class="ident">inner</span>,
-        <span class="ident">nonce</span>,
-        <span class="ident">aad</span>,
-        <span class="ident">in_out</span>,
-        <span class="ident">key</span>.<span class="ident">cpu_features</span>,
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>seal_in_place_separate_tag_(
+    key: <span class="kw-2">&amp;</span>UnboundKey,
+    nonce: Nonce,
+    aad: Aad&lt;<span class="kw-2">&amp;</span>[u8]&gt;,
+    in_out: <span class="kw-2">&amp;mut </span>[u8],
+) -&gt; <span class="prelude-ty">Result</span>&lt;Tag, error::Unspecified&gt; {
+    check_per_nonce_max_bytes(key.algorithm, in_out.len())<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>((key.algorithm.seal)(
+        <span class="kw-2">&amp;</span>key.inner,
+        nonce,
+        aad,
+        in_out,
+        key.cpu_features,
     ))
 }
 
-<span class="doccomment">/// The additionally authenticated data (AAD) for an opening or sealing</span>
-<span class="doccomment">/// operation. This data is authenticated but is **not** encrypted.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The type `A` could be a byte slice `&amp;[u8]`, a byte array `[u8; N]`</span>
-<span class="doccomment">/// for some constant `N`, `Vec&lt;u8&gt;`, etc.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Aad</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">A</span>);
+<span class="doccomment">/// The additionally authenticated data (AAD) for an opening or sealing
+/// operation. This data is authenticated but is **not** encrypted.
+///
+/// The type `A` could be a byte slice `&amp;[u8]`, a byte array `[u8; N]`
+/// for some constant `N`, `Vec&lt;u8&gt;`, etc.
+</span><span class="kw">pub struct </span>Aad&lt;A: AsRef&lt;[u8]&gt;&gt;(A);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">Aad</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Construct the `Aad` from the given bytes.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">aad</span>: <span class="ident">A</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Aad</span>(<span class="ident">aad</span>)
+<span class="kw">impl</span>&lt;A: AsRef&lt;[u8]&gt;&gt; Aad&lt;A&gt; {
+    <span class="doccomment">/// Construct the `Aad` from the given bytes.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>from(aad: A) -&gt; <span class="self">Self </span>{
+        Aad(aad)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Aad</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;A&gt; AsRef&lt;[u8]&gt; <span class="kw">for </span>Aad&lt;A&gt;
+<span class="kw">where
+    </span>A: AsRef&lt;[u8]&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_ref</span>()
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="self">self</span>.<span class="number">0</span>.as_ref()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Aad</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">0</span>]<span class="op">&gt;</span> {
-    <span class="doccomment">/// Construct an empty `Aad`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::from</span>([])
+<span class="kw">impl </span>Aad&lt;[u8; <span class="number">0</span>]&gt; {
+    <span class="doccomment">/// Construct an empty `Aad`.
+    </span><span class="kw">pub fn </span>empty() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::from([])
     }
 }
 
-<span class="doccomment">/// An AEAD key without a designated role or nonce sequence.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UnboundKey</span> {
-    <span class="ident">inner</span>: <span class="ident">KeyInner</span>,
-    <span class="ident">algorithm</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span>,
-    <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>,
+<span class="doccomment">/// An AEAD key without a designated role or nonce sequence.
+</span><span class="kw">pub struct </span>UnboundKey {
+    inner: KeyInner,
+    algorithm: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Algorithm,
+    cpu_features: cpu::Features,
 }
 
-<span class="kw">impl</span> <span class="ident">core::fmt::Debug</span> <span class="kw">for</span> <span class="ident">UnboundKey</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">core::fmt::Formatter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">core::fmt::Error</span><span class="op">&gt;</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;UnboundKey&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;algorithm&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">algorithm</span>)
-            .<span class="ident">finish</span>()
+<span class="kw">impl </span>core::fmt::Debug <span class="kw">for </span>UnboundKey {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter) -&gt; <span class="prelude-ty">Result</span>&lt;(), core::fmt::Error&gt; {
+        f.debug_struct(<span class="string">&quot;UnboundKey&quot;</span>)
+            .field(<span class="string">&quot;algorithm&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.algorithm)
+            .finish()
     }
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::large_enum_variant</span>, <span class="ident">variant_size_differences</span>)]</span>
-<span class="kw">enum</span> <span class="ident">KeyInner</span> {
-    <span class="ident">AesGcm</span>(<span class="ident">aes_gcm::Key</span>),
-    <span class="ident">ChaCha20Poly1305</span>(<span class="ident">chacha20_poly1305::Key</span>),
+<span class="attribute">#[allow(clippy::large_enum_variant, variant_size_differences)]
+</span><span class="kw">enum </span>KeyInner {
+    AesGcm(aes_gcm::Key),
+    ChaCha20Poly1305(chacha20_poly1305::Key),
 }
 
-<span class="kw">impl</span> <span class="ident">UnboundKey</span> {
-    <span class="doccomment">/// Constructs an `UnboundKey`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Fails if `key_bytes.len() != algorithm.key_len()`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">algorithm</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span>,
-        <span class="ident">key_bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">cpu_features</span> <span class="op">=</span> <span class="ident">cpu::features</span>();
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">inner</span>: (<span class="ident">algorithm</span>.<span class="ident">init</span>)(<span class="ident">key_bytes</span>, <span class="ident">cpu_features</span>)<span class="question-mark">?</span>,
-            <span class="ident">algorithm</span>,
-            <span class="ident">cpu_features</span>,
+<span class="kw">impl </span>UnboundKey {
+    <span class="doccomment">/// Constructs an `UnboundKey`.
+    ///
+    /// Fails if `key_bytes.len() != algorithm.key_len()`.
+    </span><span class="kw">pub fn </span>new(
+        algorithm: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Algorithm,
+        key_bytes: <span class="kw-2">&amp;</span>[u8],
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::Unspecified&gt; {
+        <span class="kw">let </span>cpu_features = cpu::features();
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            inner: (algorithm.init)(key_bytes, cpu_features)<span class="question-mark">?</span>,
+            algorithm,
+            cpu_features,
         })
     }
 
-    <span class="doccomment">/// The key&#39;s AEAD algorithm.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span> {
-        <span class="self">self</span>.<span class="ident">algorithm</span>
+    <span class="doccomment">/// The key&#39;s AEAD algorithm.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>algorithm(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Algorithm {
+        <span class="self">self</span>.algorithm
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">hkdf::Okm</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">UnboundKey</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">okm</span>: <span class="ident">hkdf::Okm</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">key_bytes</span> <span class="op">=</span> [<span class="number">0</span>; <span class="ident">MAX_KEY_LEN</span>];
-        <span class="kw">let</span> <span class="ident">key_bytes</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">key_bytes</span>[..<span class="ident">okm</span>.<span class="ident">len</span>().<span class="ident">key_len</span>];
-        <span class="kw">let</span> <span class="ident">algorithm</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">okm</span>.<span class="ident">len</span>();
-        <span class="ident">okm</span>.<span class="ident">fill</span>(<span class="ident">key_bytes</span>).<span class="ident">unwrap</span>();
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">algorithm</span>, <span class="ident">key_bytes</span>).<span class="ident">unwrap</span>()
+<span class="kw">impl </span>From&lt;hkdf::Okm&lt;<span class="lifetime">&#39;_</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Algorithm&gt;&gt; <span class="kw">for </span>UnboundKey {
+    <span class="kw">fn </span>from(okm: hkdf::Okm&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Algorithm&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>key_bytes = [<span class="number">0</span>; MAX_KEY_LEN];
+        <span class="kw">let </span>key_bytes = <span class="kw-2">&amp;mut </span>key_bytes[..okm.len().key_len];
+        <span class="kw">let </span>algorithm = <span class="kw-2">*</span>okm.len();
+        okm.fill(key_bytes).unwrap();
+        <span class="self">Self</span>::new(algorithm, key_bytes).unwrap()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">hkdf::KeyType</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">key_len</span>()
+<span class="kw">impl </span>hkdf::KeyType <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Algorithm {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.key_len()
     }
 }
 
-<span class="doccomment">/// Immutable keys for use in situations where `OpeningKey`/`SealingKey` and</span>
-<span class="doccomment">/// `NonceSequence` cannot reasonably be used.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Prefer to use `OpeningKey`/`SealingKey` and `NonceSequence` when practical.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LessSafeKey</span> {
-    <span class="ident">key</span>: <span class="ident">UnboundKey</span>,
+<span class="doccomment">/// Immutable keys for use in situations where `OpeningKey`/`SealingKey` and
+/// `NonceSequence` cannot reasonably be used.
+///
+/// Prefer to use `OpeningKey`/`SealingKey` and `NonceSequence` when practical.
+</span><span class="kw">pub struct </span>LessSafeKey {
+    key: UnboundKey,
 }
 
-<span class="kw">impl</span> <span class="ident">LessSafeKey</span> {
-    <span class="doccomment">/// Constructs a `LessSafeKey` from an `UnboundKey`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: <span class="ident">UnboundKey</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">key</span> }
+<span class="kw">impl </span>LessSafeKey {
+    <span class="doccomment">/// Constructs a `LessSafeKey` from an `UnboundKey`.
+    </span><span class="kw">pub fn </span>new(key: UnboundKey) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ key }
     }
 
-    <span class="doccomment">/// Like [`OpeningKey::open_in_place()`], except it accepts an arbitrary nonce.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `nonce` must be unique for every use of the key to open data.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open_in_place</span><span class="op">&lt;</span><span class="lifetime">&#39;in_out</span>, <span class="ident">A</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Like [`OpeningKey::open_in_place()`], except it accepts an arbitrary nonce.
+    ///
+    /// `nonce` must be unique for every use of the key to open data.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>open_in_place&lt;<span class="lifetime">&#39;in_out</span>, A&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">nonce</span>: <span class="ident">Nonce</span>,
-        <span class="ident">aad</span>: <span class="ident">Aad</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
-        <span class="ident">in_out</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>],
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>], <span class="ident">error::Unspecified</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">A</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
+        nonce: Nonce,
+        aad: Aad&lt;A&gt;,
+        in_out: <span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out </span><span class="kw-2">mut </span>[u8],
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out </span><span class="kw-2">mut </span>[u8], error::Unspecified&gt;
+    <span class="kw">where
+        </span>A: AsRef&lt;[u8]&gt;,
     {
-        <span class="self">self</span>.<span class="ident">open_within</span>(<span class="ident">nonce</span>, <span class="ident">aad</span>, <span class="ident">in_out</span>, <span class="number">0</span>..)
+        <span class="self">self</span>.open_within(nonce, aad, in_out, <span class="number">0</span>..)
     }
 
-    <span class="doccomment">/// Like [`OpeningKey::open_within()`], except it accepts an arbitrary nonce.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `nonce` must be unique for every use of the key to open data.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">open_within</span><span class="op">&lt;</span><span class="lifetime">&#39;in_out</span>, <span class="ident">A</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Like [`OpeningKey::open_within()`], except it accepts an arbitrary nonce.
+    ///
+    /// `nonce` must be unique for every use of the key to open data.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>open_within&lt;<span class="lifetime">&#39;in_out</span>, A&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">nonce</span>: <span class="ident">Nonce</span>,
-        <span class="ident">aad</span>: <span class="ident">Aad</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
-        <span class="ident">in_out</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>],
-        <span class="ident">ciphertext_and_tag</span>: <span class="ident">RangeFrom</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>], <span class="ident">error::Unspecified</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">A</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
+        nonce: Nonce,
+        aad: Aad&lt;A&gt;,
+        in_out: <span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out </span><span class="kw-2">mut </span>[u8],
+        ciphertext_and_tag: RangeFrom&lt;usize&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out </span><span class="kw-2">mut </span>[u8], error::Unspecified&gt;
+    <span class="kw">where
+        </span>A: AsRef&lt;[u8]&gt;,
     {
-        <span class="ident">open_within_</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">key</span>, <span class="ident">nonce</span>, <span class="ident">aad</span>, <span class="ident">in_out</span>, <span class="ident">ciphertext_and_tag</span>)
+        open_within_(<span class="kw-2">&amp;</span><span class="self">self</span>.key, nonce, aad, in_out, ciphertext_and_tag)
     }
 
-    <span class="doccomment">/// Deprecated. Renamed to `seal_in_place_append_tag()`.</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Renamed to `seal_in_place_append_tag`.&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">seal_in_place</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">InOut</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Deprecated. Renamed to `seal_in_place_append_tag()`.
+    </span><span class="attribute">#[deprecated(note = <span class="string">&quot;Renamed to `seal_in_place_append_tag`.&quot;</span>)]
+    #[inline]
+    </span><span class="kw">pub fn </span>seal_in_place&lt;A, InOut&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">nonce</span>: <span class="ident">Nonce</span>,
-        <span class="ident">aad</span>: <span class="ident">Aad</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
-        <span class="ident">in_out</span>: <span class="kw-2">&amp;mut</span> <span class="ident">InOut</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">A</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-        <span class="ident">InOut</span>: <span class="ident">AsMut</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">+</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;in_out</span><span class="op">&gt;</span> <span class="ident">Extend</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="ident">u8</span><span class="op">&gt;</span>,
+        nonce: Nonce,
+        aad: Aad&lt;A&gt;,
+        in_out: <span class="kw-2">&amp;mut </span>InOut,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt;
+    <span class="kw">where
+        </span>A: AsRef&lt;[u8]&gt;,
+        InOut: AsMut&lt;[u8]&gt; + <span class="kw">for</span>&lt;<span class="lifetime">&#39;in_out</span>&gt; Extend&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out </span>u8&gt;,
     {
-        <span class="self">self</span>.<span class="ident">seal_in_place_append_tag</span>(<span class="ident">nonce</span>, <span class="ident">aad</span>, <span class="ident">in_out</span>)
+        <span class="self">self</span>.seal_in_place_append_tag(nonce, aad, in_out)
     }
 
-    <span class="doccomment">/// Like [`SealingKey::seal_in_place_append_tag()`], except it accepts an</span>
-    <span class="doccomment">/// arbitrary nonce.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `nonce` must be unique for every use of the key to seal data.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">seal_in_place_append_tag</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">InOut</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Like [`SealingKey::seal_in_place_append_tag()`], except it accepts an
+    /// arbitrary nonce.
+    ///
+    /// `nonce` must be unique for every use of the key to seal data.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>seal_in_place_append_tag&lt;A, InOut&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">nonce</span>: <span class="ident">Nonce</span>,
-        <span class="ident">aad</span>: <span class="ident">Aad</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
-        <span class="ident">in_out</span>: <span class="kw-2">&amp;mut</span> <span class="ident">InOut</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">A</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-        <span class="ident">InOut</span>: <span class="ident">AsMut</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="op">+</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;in_out</span><span class="op">&gt;</span> <span class="ident">Extend</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out</span> <span class="ident">u8</span><span class="op">&gt;</span>,
+        nonce: Nonce,
+        aad: Aad&lt;A&gt;,
+        in_out: <span class="kw-2">&amp;mut </span>InOut,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt;
+    <span class="kw">where
+        </span>A: AsRef&lt;[u8]&gt;,
+        InOut: AsMut&lt;[u8]&gt; + <span class="kw">for</span>&lt;<span class="lifetime">&#39;in_out</span>&gt; Extend&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;in_out </span>u8&gt;,
     {
-        <span class="self">self</span>.<span class="ident">seal_in_place_separate_tag</span>(<span class="ident">nonce</span>, <span class="ident">aad</span>, <span class="ident">in_out</span>.<span class="ident">as_mut</span>())
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">tag</span><span class="op">|</span> <span class="ident">in_out</span>.<span class="ident">extend</span>(<span class="ident">tag</span>.<span class="ident">as_ref</span>()))
+        <span class="self">self</span>.seal_in_place_separate_tag(nonce, aad, in_out.as_mut())
+            .map(|tag| in_out.extend(tag.as_ref()))
     }
 
-    <span class="doccomment">/// Like `SealingKey::seal_in_place_separate_tag()`, except it accepts an</span>
-    <span class="doccomment">/// arbitrary nonce.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `nonce` must be unique for every use of the key to seal data.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">seal_in_place_separate_tag</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Like `SealingKey::seal_in_place_separate_tag()`, except it accepts an
+    /// arbitrary nonce.
+    ///
+    /// `nonce` must be unique for every use of the key to seal data.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>seal_in_place_separate_tag&lt;A&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">nonce</span>: <span class="ident">Nonce</span>,
-        <span class="ident">aad</span>: <span class="ident">Aad</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
-        <span class="ident">in_out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Tag</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">A</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
+        nonce: Nonce,
+        aad: Aad&lt;A&gt;,
+        in_out: <span class="kw-2">&amp;mut </span>[u8],
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Tag, error::Unspecified&gt;
+    <span class="kw">where
+        </span>A: AsRef&lt;[u8]&gt;,
     {
-        <span class="ident">seal_in_place_separate_tag_</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">key</span>, <span class="ident">nonce</span>, <span class="ident">Aad::from</span>(<span class="ident">aad</span>.<span class="ident">as_ref</span>()), <span class="ident">in_out</span>)
+        seal_in_place_separate_tag_(<span class="kw-2">&amp;</span><span class="self">self</span>.key, nonce, Aad::from(aad.as_ref()), in_out)
     }
 
-    <span class="doccomment">/// The key&#39;s AEAD algorithm.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">algorithm</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Algorithm</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">key</span>.<span class="ident">algorithm</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">core::fmt::Debug</span> <span class="kw">for</span> <span class="ident">LessSafeKey</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">core::fmt::Formatter</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">core::fmt::Error</span><span class="op">&gt;</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;LessSafeKey&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;algorithm&quot;</span>, <span class="self">self</span>.<span class="ident">algorithm</span>())
-            .<span class="ident">finish</span>()
+    <span class="doccomment">/// The key&#39;s AEAD algorithm.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub fn </span>algorithm(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Algorithm {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.key.algorithm
     }
 }
 
-<span class="doccomment">/// An AEAD Algorithm.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Algorithm</span> {
-    <span class="ident">init</span>: <span class="kw">fn</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">KeyInner</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span>,
-
-    <span class="ident">seal</span>: <span class="kw">fn</span>(
-        <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">KeyInner</span>,
-        <span class="ident">nonce</span>: <span class="ident">Nonce</span>,
-        <span class="ident">aad</span>: <span class="ident">Aad</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-        <span class="ident">in_out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-        <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>,
-    ) -&gt; <span class="ident">Tag</span>,
-    <span class="ident">open</span>: <span class="kw">fn</span>(
-        <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">KeyInner</span>,
-        <span class="ident">nonce</span>: <span class="ident">Nonce</span>,
-        <span class="ident">aad</span>: <span class="ident">Aad</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-        <span class="ident">in_prefix_len</span>: <span class="ident">usize</span>,
-        <span class="ident">in_out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-        <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>,
-    ) -&gt; <span class="ident">Tag</span>,
-
-    <span class="ident">key_len</span>: <span class="ident">usize</span>,
-    <span class="ident">id</span>: <span class="ident">AlgorithmID</span>,
-
-    <span class="doccomment">/// Use `max_input_len!()` to initialize this.</span>
-    <span class="comment">// TODO: Make this `usize`.</span>
-    <span class="ident">max_input_len</span>: <span class="ident">u64</span>,
-}
-
-<span class="kw">const</span> <span class="kw">fn</span> <span class="ident">max_input_len</span>(<span class="ident">block_len</span>: <span class="ident">usize</span>, <span class="ident">overhead_blocks_per_nonce</span>: <span class="ident">usize</span>) -&gt; <span class="ident">u64</span> {
-    <span class="comment">// Each of our AEADs use a 32-bit block counter so the maximum is the</span>
-    <span class="comment">// largest input that will not overflow the counter.</span>
-    ((<span class="number">1u64</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>) <span class="op">-</span> <span class="ident">polyfill::u64_from_usize</span>(<span class="ident">overhead_blocks_per_nonce</span>))
-        <span class="op">*</span> <span class="ident">polyfill::u64_from_usize</span>(<span class="ident">block_len</span>)
-}
-
-<span class="kw">impl</span> <span class="ident">Algorithm</span> {
-    <span class="doccomment">/// The length of the key.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">key_len</span>
-    }
-
-    <span class="doccomment">/// The length of a tag.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// See also `MAX_TAG_LEN`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tag_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="ident">TAG_LEN</span>
-    }
-
-    <span class="doccomment">/// The length of the nonces.</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nonce_len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="ident">NONCE_LEN</span>
+<span class="kw">impl </span>core::fmt::Debug <span class="kw">for </span>LessSafeKey {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter) -&gt; <span class="prelude-ty">Result</span>&lt;(), core::fmt::Error&gt; {
+        f.debug_struct(<span class="string">&quot;LessSafeKey&quot;</span>)
+            .field(<span class="string">&quot;algorithm&quot;</span>, <span class="self">self</span>.algorithm())
+            .finish()
     }
 }
 
-<span class="macro">derive_debug_via_id!</span>(<span class="ident">Algorithm</span>);
+<span class="doccomment">/// An AEAD Algorithm.
+</span><span class="kw">pub struct </span>Algorithm {
+    init: <span class="kw">fn</span>(key: <span class="kw-2">&amp;</span>[u8], cpu_features: cpu::Features) -&gt; <span class="prelude-ty">Result</span>&lt;KeyInner, error::Unspecified&gt;,
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">enum</span> <span class="ident">AlgorithmID</span> {
-    <span class="ident">AES_128_GCM</span>,
-    <span class="ident">AES_256_GCM</span>,
-    <span class="ident">CHACHA20_POLY1305</span>,
+    seal: <span class="kw">fn</span>(
+        key: <span class="kw-2">&amp;</span>KeyInner,
+        nonce: Nonce,
+        aad: Aad&lt;<span class="kw-2">&amp;</span>[u8]&gt;,
+        in_out: <span class="kw-2">&amp;mut </span>[u8],
+        cpu_features: cpu::Features,
+    ) -&gt; Tag,
+    open: <span class="kw">fn</span>(
+        key: <span class="kw-2">&amp;</span>KeyInner,
+        nonce: Nonce,
+        aad: Aad&lt;<span class="kw-2">&amp;</span>[u8]&gt;,
+        in_prefix_len: usize,
+        in_out: <span class="kw-2">&amp;mut </span>[u8],
+        cpu_features: cpu::Features,
+    ) -&gt; Tag,
+
+    key_len: usize,
+    id: AlgorithmID,
+
+    <span class="doccomment">/// Use `max_input_len!()` to initialize this.
+    </span><span class="comment">// TODO: Make this `usize`.
+    </span>max_input_len: u64,
 }
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">Algorithm</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">id</span>
+<span class="kw">const fn </span>max_input_len(block_len: usize, overhead_blocks_per_nonce: usize) -&gt; u64 {
+    <span class="comment">// Each of our AEADs use a 32-bit block counter so the maximum is the
+    // largest input that will not overflow the counter.
+    </span>((<span class="number">1u64 </span>&lt;&lt; <span class="number">32</span>) - polyfill::u64_from_usize(overhead_blocks_per_nonce))
+        * polyfill::u64_from_usize(block_len)
+}
+
+<span class="kw">impl </span>Algorithm {
+    <span class="doccomment">/// The length of the key.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub fn </span>key_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.key_len
+    }
+
+    <span class="doccomment">/// The length of a tag.
+    ///
+    /// See also `MAX_TAG_LEN`.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub fn </span>tag_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        TAG_LEN
+    }
+
+    <span class="doccomment">/// The length of the nonces.
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub fn </span>nonce_len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        NONCE_LEN
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">Algorithm</span> {}
+<span class="macro">derive_debug_via_id!</span>(Algorithm);
 
-<span class="doccomment">/// An authentication tag.</span>
-<span class="attribute">#[<span class="ident">must_use</span>]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Tag</span>([<span class="ident">u8</span>; <span class="ident">TAG_LEN</span>]);
+<span class="attribute">#[derive(Debug, Eq, PartialEq)]
+</span><span class="kw">enum </span>AlgorithmID {
+    AES_128_GCM,
+    AES_256_GCM,
+    CHACHA20_POLY1305,
+}
 
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Tag</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_ref</span>()
+<span class="kw">impl </span>PartialEq <span class="kw">for </span>Algorithm {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="self">self</span>.id == other.id
     }
 }
 
-<span class="kw">const</span> <span class="ident">MAX_KEY_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">32</span>;
+<span class="kw">impl </span>Eq <span class="kw">for </span>Algorithm {}
 
-<span class="comment">// All the AEADs we support use 128-bit tags.</span>
-<span class="kw">const</span> <span class="ident">TAG_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">BLOCK_LEN</span>;
+<span class="doccomment">/// An authentication tag.
+</span><span class="attribute">#[must_use]
+#[repr(C)]
+</span><span class="kw">pub struct </span>Tag([u8; TAG_LEN]);
 
-<span class="doccomment">/// The maximum length of a tag for the algorithms in this module.</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MAX_TAG_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">TAG_LEN</span>;
+<span class="kw">impl </span>AsRef&lt;[u8]&gt; <span class="kw">for </span>Tag {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="self">self</span>.<span class="number">0</span>.as_ref()
+    }
+}
 
-<span class="kw">fn</span> <span class="ident">check_per_nonce_max_bytes</span>(<span class="ident">alg</span>: <span class="kw-2">&amp;</span><span class="ident">Algorithm</span>, <span class="ident">in_out_len</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="ident">polyfill::u64_from_usize</span>(<span class="ident">in_out_len</span>) <span class="op">&gt;</span> <span class="ident">alg</span>.<span class="ident">max_input_len</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>);
+<span class="kw">const </span>MAX_KEY_LEN: usize = <span class="number">32</span>;
+
+<span class="comment">// All the AEADs we support use 128-bit tags.
+</span><span class="kw">const </span>TAG_LEN: usize = BLOCK_LEN;
+
+<span class="doccomment">/// The maximum length of a tag for the algorithms in this module.
+</span><span class="kw">pub const </span>MAX_TAG_LEN: usize = TAG_LEN;
+
+<span class="kw">fn </span>check_per_nonce_max_bytes(alg: <span class="kw-2">&amp;</span>Algorithm, in_out_len: usize) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt; {
+    <span class="kw">if </span>polyfill::u64_from_usize(in_out_len) &gt; alg.max_input_len {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(error::Unspecified);
     }
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">enum</span> <span class="ident">Direction</span> {
-    <span class="ident">Opening</span> { <span class="ident">in_prefix_len</span>: <span class="ident">usize</span> },
-    <span class="ident">Sealing</span>,
+<span class="attribute">#[derive(Clone, Copy)]
+</span><span class="kw">enum </span>Direction {
+    Opening { in_prefix_len: usize },
+    Sealing,
 }
 
-<span class="kw">mod</span> <span class="ident">aes</span>;
-<span class="kw">mod</span> <span class="ident">aes_gcm</span>;
-<span class="kw">mod</span> <span class="ident">block</span>;
-<span class="kw">mod</span> <span class="ident">chacha</span>;
-<span class="kw">mod</span> <span class="ident">chacha20_poly1305</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">chacha20_poly1305_openssh</span>;
-<span class="kw">mod</span> <span class="ident">counter</span>;
-<span class="kw">mod</span> <span class="ident">gcm</span>;
-<span class="kw">mod</span> <span class="ident">iv</span>;
-<span class="kw">mod</span> <span class="ident">nonce</span>;
-<span class="kw">mod</span> <span class="ident">poly1305</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">quic</span>;
-<span class="kw">mod</span> <span class="ident">shift</span>;
+<span class="kw">mod </span>aes;
+<span class="kw">mod </span>aes_gcm;
+<span class="kw">mod </span>block;
+<span class="kw">mod </span>chacha;
+<span class="kw">mod </span>chacha20_poly1305;
+<span class="kw">pub mod </span>chacha20_poly1305_openssh;
+<span class="kw">mod </span>counter;
+<span class="kw">mod </span>gcm;
+<span class="kw">mod </span>iv;
+<span class="kw">mod </span>nonce;
+<span class="kw">mod </span>poly1305;
+<span class="kw">pub mod </span>quic;
+<span class="kw">mod </span>shift;
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

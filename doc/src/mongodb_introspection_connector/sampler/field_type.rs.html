@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/connectors/mongodb-introspection-connector/src/sampler/field_type.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>field_type.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb_introspection_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/connectors/mongodb-introspection-connector/src/sampler/field_type.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>field_type.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb_introspection_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -147,154 +147,154 @@
 <span id="147">147</span>
 <span id="148">148</span>
 <span id="149">149</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::statistics::Name</span>;
-<span class="kw">use</span> <span class="ident">mongodb::bson::Bson</span>;
-<span class="kw">use</span> <span class="ident">psl</span>::{
-    <span class="ident">builtin_connectors::MongoDbType</span>,
-    <span class="ident">datamodel_connector</span>,
-    <span class="ident">dml</span>::{<span class="self">self</span>, <span class="ident">NativeTypeInstance</span>, <span class="ident">ScalarType</span>},
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::statistics::Name;
+<span class="kw">use </span>mongodb::bson::Bson;
+<span class="kw">use </span>psl::{
+    builtin_connectors::MongoDbType,
+    datamodel_connector,
+    dml::{<span class="self">self</span>, NativeTypeInstance, ScalarType},
 };
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
+<span class="kw">use </span>std::fmt;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum</span> <span class="ident">FieldType</span> {
-    <span class="ident">String</span>,
-    <span class="ident">Double</span>,
-    <span class="ident">BinData</span>,
-    <span class="ident">ObjectId</span>,
-    <span class="ident">Bool</span>,
-    <span class="ident">Date</span>,
-    <span class="ident">Int32</span>,
-    <span class="ident">Timestamp</span>,
-    <span class="ident">Int64</span>,
-    <span class="ident">Json</span>,
-    <span class="ident">Document</span>(<span class="ident">String</span>),
-    <span class="ident">Array</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">FieldType</span><span class="op">&gt;</span>),
-    <span class="ident">Unsupported</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>),
+<span class="attribute">#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">enum </span>FieldType {
+    String,
+    Double,
+    BinData,
+    ObjectId,
+    Bool,
+    Date,
+    Int32,
+    Timestamp,
+    Int64,
+    Json,
+    Document(String),
+    Array(Box&lt;FieldType&gt;),
+    Unsupported(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str),
 }
 
-<span class="kw">impl</span> <span class="ident">FieldType</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">from_bson</span>(<span class="ident">bson</span>: <span class="kw-2">&amp;</span><span class="ident">Bson</span>, <span class="ident">composite_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Name</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">bson</span> {
-            <span class="ident">Bson::Double</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Double</span>),
-            <span class="ident">Bson::String</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::String</span>),
-            <span class="ident">Bson::Array</span>(<span class="ident">docs</span>) <span class="kw">if</span> <span class="ident">docs</span>.<span class="ident">is_empty</span>() =&gt; <span class="prelude-val">None</span>,
-            <span class="ident">Bson::Array</span>(<span class="ident">docs</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Array</span>(<span class="ident">Box::new</span>(
-                <span class="ident">docs</span>.<span class="ident">first</span>()
-                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">FieldType::from_bson</span>(<span class="ident">d</span>, <span class="ident">composite_name</span>))
-                    .<span class="ident">unwrap_or</span>(<span class="ident"><span class="self">Self</span>::Unsupported</span>(<span class="string">&quot;Unknown&quot;</span>)),
+<span class="kw">impl </span>FieldType {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>from_bson(bson: <span class="kw-2">&amp;</span>Bson, composite_name: <span class="prelude-ty">Option</span>&lt;Name&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">match </span>bson {
+            Bson::Double(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::Double),
+            Bson::String(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::String),
+            Bson::Array(docs) <span class="kw">if </span>docs.is_empty() =&gt; <span class="prelude-val">None</span>,
+            Bson::Array(docs) =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::Array(Box::new(
+                docs.first()
+                    .and_then(|d| FieldType::from_bson(d, composite_name))
+                    .unwrap_or(<span class="self">Self</span>::Unsupported(<span class="string">&quot;Unknown&quot;</span>)),
             ))),
-            <span class="ident">Bson::Document</span>(<span class="kw">_</span>) =&gt; <span class="kw">match</span> <span class="ident">composite_name</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Document</span>(<span class="ident">name</span>.<span class="ident">take</span>())),
-                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Json</span>),
+            Bson::Document(<span class="kw">_</span>) =&gt; <span class="kw">match </span>composite_name {
+                <span class="prelude-val">Some</span>(name) =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::Document(name.take())),
+                <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::Json),
             },
-            <span class="ident">Bson::Boolean</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Bool</span>),
-            <span class="ident">Bson::RegularExpression</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Unsupported</span>(<span class="string">&quot;RegularExpression&quot;</span>)),
-            <span class="ident">Bson::JavaScriptCode</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Unsupported</span>(<span class="string">&quot;JavaScriptCode&quot;</span>)),
-            <span class="ident">Bson::JavaScriptCodeWithScope</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Unsupported</span>(<span class="string">&quot;JavaScriptCodeWithScope&quot;</span>)),
-            <span class="ident">Bson::Int32</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Int32</span>),
-            <span class="ident">Bson::Int64</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Int64</span>),
-            <span class="ident">Bson::Timestamp</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Timestamp</span>),
-            <span class="ident">Bson::Binary</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::BinData</span>),
-            <span class="ident">Bson::ObjectId</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::ObjectId</span>),
-            <span class="ident">Bson::DateTime</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Date</span>),
-            <span class="ident">Bson::Symbol</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Unsupported</span>(<span class="string">&quot;Symbol&quot;</span>)),
-            <span class="ident">Bson::Decimal128</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Unsupported</span>(<span class="string">&quot;Decimal128&quot;</span>)),
-            <span class="ident">Bson::Undefined</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Unsupported</span>(<span class="string">&quot;Undefined&quot;</span>)),
-            <span class="ident">Bson::MaxKey</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Unsupported</span>(<span class="string">&quot;MaxKey&quot;</span>)),
-            <span class="ident">Bson::MinKey</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Unsupported</span>(<span class="string">&quot;MinKey&quot;</span>)),
-            <span class="ident">Bson::DbPointer</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident"><span class="self">Self</span>::Unsupported</span>(<span class="string">&quot;DbPointer&quot;</span>)),
-            <span class="ident">Bson::Null</span> =&gt; <span class="prelude-val">None</span>,
+            Bson::Boolean(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::Bool),
+            Bson::RegularExpression(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::Unsupported(<span class="string">&quot;RegularExpression&quot;</span>)),
+            Bson::JavaScriptCode(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::Unsupported(<span class="string">&quot;JavaScriptCode&quot;</span>)),
+            Bson::JavaScriptCodeWithScope(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::Unsupported(<span class="string">&quot;JavaScriptCodeWithScope&quot;</span>)),
+            Bson::Int32(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::Int32),
+            Bson::Int64(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::Int64),
+            Bson::Timestamp(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::Timestamp),
+            Bson::Binary(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::BinData),
+            Bson::ObjectId(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::ObjectId),
+            Bson::DateTime(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::Date),
+            Bson::Symbol(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::Unsupported(<span class="string">&quot;Symbol&quot;</span>)),
+            Bson::Decimal128(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::Unsupported(<span class="string">&quot;Decimal128&quot;</span>)),
+            Bson::Undefined =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::Unsupported(<span class="string">&quot;Undefined&quot;</span>)),
+            Bson::MaxKey =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::Unsupported(<span class="string">&quot;MaxKey&quot;</span>)),
+            Bson::MinKey =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::Unsupported(<span class="string">&quot;MinKey&quot;</span>)),
+            Bson::DbPointer(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="self">Self</span>::Unsupported(<span class="string">&quot;DbPointer&quot;</span>)),
+            Bson::Null =&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">is_array</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::Array</span>(<span class="kw">_</span>))
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>is_array(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::Array(<span class="kw">_</span>))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">FieldType</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FieldType::String</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;String&quot;</span>),
-            <span class="ident">FieldType::Double</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Float&quot;</span>),
-            <span class="ident">FieldType::BinData</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Binary&quot;</span>),
-            <span class="ident">FieldType::ObjectId</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;String (ObjectId)&quot;</span>),
-            <span class="ident">FieldType::Bool</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Boolean&quot;</span>),
-            <span class="ident">FieldType::Date</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;DateTime (Date)&quot;</span>),
-            <span class="ident">FieldType::Int32</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Int&quot;</span>),
-            <span class="ident">FieldType::Timestamp</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;DateTime (Timestamp)&quot;</span>),
-            <span class="ident">FieldType::Int64</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;BigInt&quot;</span>),
-            <span class="ident">FieldType::Json</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Json&quot;</span>),
-            <span class="ident">FieldType::Document</span>(<span class="ident">s</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">s</span>),
-            <span class="ident">FieldType::Array</span>(<span class="ident">r#type</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Array({})&quot;</span>, <span class="ident">r#type</span>),
-            <span class="ident">FieldType::Unsupported</span>(<span class="ident">r#type</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">r#type</span>),
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">FieldType</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">dml::CompositeTypeFieldType</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">r#type</span>: <span class="ident">FieldType</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">r#type</span> {
-            <span class="ident">FieldType::String</span> =&gt; <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::String</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Double</span> =&gt; <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::Float</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::BinData</span> =&gt; <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::Bytes</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::ObjectId</span> =&gt; <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(
-                <span class="ident">ScalarType::String</span>,
-                <span class="prelude-val">Some</span>(<span class="ident">NativeTypeInstance::new</span>(
-                    <span class="ident">datamodel_connector::NativeTypeInstance::new</span>::<span class="op">&lt;</span><span class="ident">MongoDbType</span><span class="op">&gt;</span>(<span class="ident">MongoDbType::ObjectId</span>),
-                    <span class="ident">psl::builtin_connectors::MONGODB</span>,
-                )),
-            ),
-            <span class="ident">FieldType::Bool</span> =&gt; <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::Boolean</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Date</span> =&gt; <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(
-                <span class="ident">ScalarType::DateTime</span>,
-                <span class="prelude-val">Some</span>(<span class="ident">NativeTypeInstance::new</span>(
-                    <span class="ident">datamodel_connector::NativeTypeInstance::new</span>::<span class="op">&lt;</span><span class="ident">MongoDbType</span><span class="op">&gt;</span>(<span class="ident">MongoDbType::Date</span>),
-                    <span class="ident">psl::builtin_connectors::MONGODB</span>,
-                )),
-            ),
-            <span class="ident">FieldType::Int32</span> =&gt; <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::Int</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Timestamp</span> =&gt; <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::DateTime</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Int64</span> =&gt; <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::BigInt</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Json</span> =&gt; <span class="ident">dml::CompositeTypeFieldType::Scalar</span>(<span class="ident">ScalarType::Json</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Document</span>(<span class="ident">name</span>) =&gt; <span class="ident">dml::CompositeTypeFieldType::CompositeType</span>(<span class="ident">name</span>),
-            <span class="ident">FieldType::Array</span>(<span class="ident">r#type</span>) =&gt; <span class="ident">dml::CompositeTypeFieldType::from</span>(<span class="kw-2">*</span><span class="ident">r#type</span>),
-            <span class="ident">FieldType::Unsupported</span>(<span class="ident">name</span>) =&gt; <span class="ident">dml::CompositeTypeFieldType::Unsupported</span>(<span class="ident">name</span>.<span class="ident">to_string</span>()),
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>FieldType {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            FieldType::String =&gt; f.write_str(<span class="string">&quot;String&quot;</span>),
+            FieldType::Double =&gt; f.write_str(<span class="string">&quot;Float&quot;</span>),
+            FieldType::BinData =&gt; f.write_str(<span class="string">&quot;Binary&quot;</span>),
+            FieldType::ObjectId =&gt; f.write_str(<span class="string">&quot;String (ObjectId)&quot;</span>),
+            FieldType::Bool =&gt; f.write_str(<span class="string">&quot;Boolean&quot;</span>),
+            FieldType::Date =&gt; f.write_str(<span class="string">&quot;DateTime (Date)&quot;</span>),
+            FieldType::Int32 =&gt; f.write_str(<span class="string">&quot;Int&quot;</span>),
+            FieldType::Timestamp =&gt; f.write_str(<span class="string">&quot;DateTime (Timestamp)&quot;</span>),
+            FieldType::Int64 =&gt; f.write_str(<span class="string">&quot;BigInt&quot;</span>),
+            FieldType::Json =&gt; f.write_str(<span class="string">&quot;Json&quot;</span>),
+            FieldType::Document(s) =&gt; f.write_str(s),
+            FieldType::Array(r#type) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Array({})&quot;</span>, r#type),
+            FieldType::Unsupported(r#type) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, r#type),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">FieldType</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">dml::FieldType</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">r#type</span>: <span class="ident">FieldType</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">r#type</span> {
-            <span class="ident">FieldType::String</span> =&gt; <span class="ident">dml::FieldType::Scalar</span>(<span class="ident">ScalarType::String</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Double</span> =&gt; <span class="ident">dml::FieldType::Scalar</span>(<span class="ident">ScalarType::Float</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::BinData</span> =&gt; <span class="ident">dml::FieldType::Scalar</span>(<span class="ident">ScalarType::Bytes</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::ObjectId</span> =&gt; <span class="ident">dml::FieldType::Scalar</span>(
-                <span class="ident">ScalarType::String</span>,
-                <span class="prelude-val">Some</span>(<span class="ident">NativeTypeInstance::new</span>(
-                    <span class="ident">datamodel_connector::NativeTypeInstance::new</span>::<span class="op">&lt;</span><span class="ident">MongoDbType</span><span class="op">&gt;</span>(<span class="ident">MongoDbType::ObjectId</span>),
-                    <span class="ident">psl::builtin_connectors::MONGODB</span>,
+<span class="kw">impl </span>From&lt;FieldType&gt; <span class="kw">for </span>dml::CompositeTypeFieldType {
+    <span class="kw">fn </span>from(r#type: FieldType) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>r#type {
+            FieldType::String =&gt; dml::CompositeTypeFieldType::Scalar(ScalarType::String, <span class="prelude-val">None</span>),
+            FieldType::Double =&gt; dml::CompositeTypeFieldType::Scalar(ScalarType::Float, <span class="prelude-val">None</span>),
+            FieldType::BinData =&gt; dml::CompositeTypeFieldType::Scalar(ScalarType::Bytes, <span class="prelude-val">None</span>),
+            FieldType::ObjectId =&gt; dml::CompositeTypeFieldType::Scalar(
+                ScalarType::String,
+                <span class="prelude-val">Some</span>(NativeTypeInstance::new(
+                    datamodel_connector::NativeTypeInstance::new::&lt;MongoDbType&gt;(MongoDbType::ObjectId),
+                    psl::builtin_connectors::MONGODB,
                 )),
             ),
-            <span class="ident">FieldType::Bool</span> =&gt; <span class="ident">dml::FieldType::Scalar</span>(<span class="ident">ScalarType::Boolean</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Date</span> =&gt; <span class="ident">dml::FieldType::Scalar</span>(
-                <span class="ident">ScalarType::DateTime</span>,
-                <span class="prelude-val">Some</span>(<span class="ident">NativeTypeInstance::new</span>(
-                    <span class="ident">datamodel_connector::NativeTypeInstance::new</span>::<span class="op">&lt;</span><span class="ident">MongoDbType</span><span class="op">&gt;</span>(<span class="ident">MongoDbType::Date</span>),
-                    <span class="ident">psl::builtin_connectors::MONGODB</span>,
+            FieldType::Bool =&gt; dml::CompositeTypeFieldType::Scalar(ScalarType::Boolean, <span class="prelude-val">None</span>),
+            FieldType::Date =&gt; dml::CompositeTypeFieldType::Scalar(
+                ScalarType::DateTime,
+                <span class="prelude-val">Some</span>(NativeTypeInstance::new(
+                    datamodel_connector::NativeTypeInstance::new::&lt;MongoDbType&gt;(MongoDbType::Date),
+                    psl::builtin_connectors::MONGODB,
                 )),
             ),
-            <span class="ident">FieldType::Int32</span> =&gt; <span class="ident">dml::FieldType::Scalar</span>(<span class="ident">ScalarType::Int</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Timestamp</span> =&gt; <span class="ident">dml::FieldType::Scalar</span>(<span class="ident">ScalarType::DateTime</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Int64</span> =&gt; <span class="ident">dml::FieldType::Scalar</span>(<span class="ident">ScalarType::BigInt</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Json</span> =&gt; <span class="ident">dml::FieldType::Scalar</span>(<span class="ident">ScalarType::Json</span>, <span class="prelude-val">None</span>),
-            <span class="ident">FieldType::Document</span>(<span class="ident">name</span>) =&gt; <span class="ident">dml::FieldType::CompositeType</span>(<span class="ident">name</span>),
-            <span class="ident">FieldType::Array</span>(<span class="ident">r#type</span>) =&gt; <span class="ident">dml::FieldType::from</span>(<span class="kw-2">*</span><span class="ident">r#type</span>),
-            <span class="ident">FieldType::Unsupported</span>(<span class="ident">type_name</span>) =&gt; <span class="ident">dml::FieldType::Unsupported</span>(<span class="ident">type_name</span>.<span class="ident">to_string</span>()),
+            FieldType::Int32 =&gt; dml::CompositeTypeFieldType::Scalar(ScalarType::Int, <span class="prelude-val">None</span>),
+            FieldType::Timestamp =&gt; dml::CompositeTypeFieldType::Scalar(ScalarType::DateTime, <span class="prelude-val">None</span>),
+            FieldType::Int64 =&gt; dml::CompositeTypeFieldType::Scalar(ScalarType::BigInt, <span class="prelude-val">None</span>),
+            FieldType::Json =&gt; dml::CompositeTypeFieldType::Scalar(ScalarType::Json, <span class="prelude-val">None</span>),
+            FieldType::Document(name) =&gt; dml::CompositeTypeFieldType::CompositeType(name),
+            FieldType::Array(r#type) =&gt; dml::CompositeTypeFieldType::from(<span class="kw-2">*</span>r#type),
+            FieldType::Unsupported(name) =&gt; dml::CompositeTypeFieldType::Unsupported(name.to_string()),
+        }
+    }
+}
+
+<span class="kw">impl </span>From&lt;FieldType&gt; <span class="kw">for </span>dml::FieldType {
+    <span class="kw">fn </span>from(r#type: FieldType) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>r#type {
+            FieldType::String =&gt; dml::FieldType::Scalar(ScalarType::String, <span class="prelude-val">None</span>),
+            FieldType::Double =&gt; dml::FieldType::Scalar(ScalarType::Float, <span class="prelude-val">None</span>),
+            FieldType::BinData =&gt; dml::FieldType::Scalar(ScalarType::Bytes, <span class="prelude-val">None</span>),
+            FieldType::ObjectId =&gt; dml::FieldType::Scalar(
+                ScalarType::String,
+                <span class="prelude-val">Some</span>(NativeTypeInstance::new(
+                    datamodel_connector::NativeTypeInstance::new::&lt;MongoDbType&gt;(MongoDbType::ObjectId),
+                    psl::builtin_connectors::MONGODB,
+                )),
+            ),
+            FieldType::Bool =&gt; dml::FieldType::Scalar(ScalarType::Boolean, <span class="prelude-val">None</span>),
+            FieldType::Date =&gt; dml::FieldType::Scalar(
+                ScalarType::DateTime,
+                <span class="prelude-val">Some</span>(NativeTypeInstance::new(
+                    datamodel_connector::NativeTypeInstance::new::&lt;MongoDbType&gt;(MongoDbType::Date),
+                    psl::builtin_connectors::MONGODB,
+                )),
+            ),
+            FieldType::Int32 =&gt; dml::FieldType::Scalar(ScalarType::Int, <span class="prelude-val">None</span>),
+            FieldType::Timestamp =&gt; dml::FieldType::Scalar(ScalarType::DateTime, <span class="prelude-val">None</span>),
+            FieldType::Int64 =&gt; dml::FieldType::Scalar(ScalarType::BigInt, <span class="prelude-val">None</span>),
+            FieldType::Json =&gt; dml::FieldType::Scalar(ScalarType::Json, <span class="prelude-val">None</span>),
+            FieldType::Document(name) =&gt; dml::FieldType::CompositeType(name),
+            FieldType::Array(r#type) =&gt; dml::FieldType::from(<span class="kw-2">*</span>r#type),
+            FieldType::Unsupported(type_name) =&gt; dml::FieldType::Unsupported(type_name.to_string()),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb_introspection_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb_introspection_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

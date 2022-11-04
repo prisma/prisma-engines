@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-opentelemetry-0.17.4/src/tracer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tracer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tracing_opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tracing_opentelemetry/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-opentelemetry-0.17.4/src/tracer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tracer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tracing_opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tracing_opentelemetry/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tracing_opentelemetry/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -242,247 +242,247 @@
 <span id="240">240</span>
 <span id="241">241</span>
 <span id="242">242</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">opentelemetry::sdk::trace</span>::{<span class="ident">SamplingDecision</span>, <span class="ident">SamplingResult</span>, <span class="ident">Tracer</span>, <span class="ident">TracerProvider</span>};
-<span class="kw">use</span> <span class="ident">opentelemetry</span>::{
-    <span class="ident">trace</span> <span class="kw">as</span> <span class="ident">otel</span>,
-    <span class="ident">trace</span>::{
-        <span class="ident">noop</span>, <span class="ident">SpanBuilder</span>, <span class="ident">SpanContext</span>, <span class="ident">SpanId</span>, <span class="ident">SpanKind</span>, <span class="ident">TraceContextExt</span>, <span class="ident">TraceFlags</span>, <span class="ident">TraceId</span>,
-        <span class="ident">TraceState</span>,
+</pre><pre class="rust"><code><span class="kw">use </span>opentelemetry::sdk::trace::{SamplingDecision, SamplingResult, Tracer, TracerProvider};
+<span class="kw">use </span>opentelemetry::{
+    trace <span class="kw">as </span>otel,
+    trace::{
+        noop, SpanBuilder, SpanContext, SpanId, SpanKind, TraceContextExt, TraceFlags, TraceId,
+        TraceState,
     },
-    <span class="ident">Context</span> <span class="kw">as</span> <span class="ident">OtelContext</span>,
+    Context <span class="kw">as </span>OtelContext,
 };
 
-<span class="doccomment">/// An interface for authors of OpenTelemetry SDKs to build pre-sampled tracers.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The OpenTelemetry spec does not allow trace ids to be updated after a span</span>
-<span class="doccomment">/// has been created. In order to associate extracted parent trace ids with</span>
-<span class="doccomment">/// existing `tracing` spans, `tracing-opentelemetry` builds up otel span data</span>
-<span class="doccomment">/// using a [`SpanBuilder`] instead, and creates / exports full otel spans only</span>
-<span class="doccomment">/// when the associated `tracing` span is closed. However, in order to properly</span>
-<span class="doccomment">/// inject otel [`Context`] information to downstream requests, the sampling</span>
-<span class="doccomment">/// state must now be known _before_ the otel span has been created.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The logic for coming to a sampling decision and creating an injectable span</span>
-<span class="doccomment">/// context from a [`SpanBuilder`] is encapsulated in the</span>
-<span class="doccomment">/// [`PreSampledTracer::sampled_context`] method and has been implemented</span>
-<span class="doccomment">/// for the standard OpenTelemetry SDK, but this trait may be implemented by</span>
-<span class="doccomment">/// authors of alternate OpenTelemetry SDK implementations if they wish to have</span>
-<span class="doccomment">/// `tracing` compatibility.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See the [`OpenTelemetrySpanExt::set_parent`] and</span>
-<span class="doccomment">/// [`OpenTelemetrySpanExt::context`] methods for example usage.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Tracer`]: opentelemetry::trace::Tracer</span>
-<span class="doccomment">/// [`SpanBuilder`]: opentelemetry::trace::SpanBuilder</span>
-<span class="doccomment">/// [`PreSampledTracer::sampled_span_context`]: crate::PreSampledTracer::sampled_span_context</span>
-<span class="doccomment">/// [`OpenTelemetrySpanExt::set_parent`]: crate::OpenTelemetrySpanExt::set_parent</span>
-<span class="doccomment">/// [`OpenTelemetrySpanExt::context`]: crate::OpenTelemetrySpanExt::context</span>
-<span class="doccomment">/// [`Context`]: opentelemetry::Context</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">PreSampledTracer</span> {
-    <span class="doccomment">/// Produce an otel context containing an active and pre-sampled span for</span>
-    <span class="doccomment">/// the given span builder data.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The sampling decision, span context information, and parent context</span>
-    <span class="doccomment">/// values must match the values recorded when the tracing span is closed.</span>
-    <span class="kw">fn</span> <span class="ident">sampled_context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">data</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">crate</span>::OtelData</span>) -&gt; <span class="ident">OtelContext</span>;
+<span class="doccomment">/// An interface for authors of OpenTelemetry SDKs to build pre-sampled tracers.
+///
+/// The OpenTelemetry spec does not allow trace ids to be updated after a span
+/// has been created. In order to associate extracted parent trace ids with
+/// existing `tracing` spans, `tracing-opentelemetry` builds up otel span data
+/// using a [`SpanBuilder`] instead, and creates / exports full otel spans only
+/// when the associated `tracing` span is closed. However, in order to properly
+/// inject otel [`Context`] information to downstream requests, the sampling
+/// state must now be known _before_ the otel span has been created.
+///
+/// The logic for coming to a sampling decision and creating an injectable span
+/// context from a [`SpanBuilder`] is encapsulated in the
+/// [`PreSampledTracer::sampled_context`] method and has been implemented
+/// for the standard OpenTelemetry SDK, but this trait may be implemented by
+/// authors of alternate OpenTelemetry SDK implementations if they wish to have
+/// `tracing` compatibility.
+///
+/// See the [`OpenTelemetrySpanExt::set_parent`] and
+/// [`OpenTelemetrySpanExt::context`] methods for example usage.
+///
+/// [`Tracer`]: opentelemetry::trace::Tracer
+/// [`SpanBuilder`]: opentelemetry::trace::SpanBuilder
+/// [`PreSampledTracer::sampled_span_context`]: crate::PreSampledTracer::sampled_span_context
+/// [`OpenTelemetrySpanExt::set_parent`]: crate::OpenTelemetrySpanExt::set_parent
+/// [`OpenTelemetrySpanExt::context`]: crate::OpenTelemetrySpanExt::context
+/// [`Context`]: opentelemetry::Context
+</span><span class="kw">pub trait </span>PreSampledTracer {
+    <span class="doccomment">/// Produce an otel context containing an active and pre-sampled span for
+    /// the given span builder data.
+    ///
+    /// The sampling decision, span context information, and parent context
+    /// values must match the values recorded when the tracing span is closed.
+    </span><span class="kw">fn </span>sampled_context(<span class="kw-2">&amp;</span><span class="self">self</span>, data: <span class="kw-2">&amp;mut </span><span class="kw">crate</span>::OtelData) -&gt; OtelContext;
 
-    <span class="doccomment">/// Generate a new trace id.</span>
-    <span class="kw">fn</span> <span class="ident">new_trace_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">otel::TraceId</span>;
+    <span class="doccomment">/// Generate a new trace id.
+    </span><span class="kw">fn </span>new_trace_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; otel::TraceId;
 
-    <span class="doccomment">/// Generate a new span id.</span>
-    <span class="kw">fn</span> <span class="ident">new_span_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">otel::SpanId</span>;
+    <span class="doccomment">/// Generate a new span id.
+    </span><span class="kw">fn </span>new_span_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; otel::SpanId;
 }
 
-<span class="kw">impl</span> <span class="ident">PreSampledTracer</span> <span class="kw">for</span> <span class="ident">noop::NoopTracer</span> {
-    <span class="kw">fn</span> <span class="ident">sampled_context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">data</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">crate</span>::OtelData</span>) -&gt; <span class="ident">OtelContext</span> {
-        <span class="ident">data</span>.<span class="ident">parent_cx</span>.<span class="ident">clone</span>()
+<span class="kw">impl </span>PreSampledTracer <span class="kw">for </span>noop::NoopTracer {
+    <span class="kw">fn </span>sampled_context(<span class="kw-2">&amp;</span><span class="self">self</span>, data: <span class="kw-2">&amp;mut </span><span class="kw">crate</span>::OtelData) -&gt; OtelContext {
+        data.parent_cx.clone()
     }
 
-    <span class="kw">fn</span> <span class="ident">new_trace_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">otel::TraceId</span> {
-        <span class="ident">otel::TraceId::INVALID</span>
+    <span class="kw">fn </span>new_trace_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; otel::TraceId {
+        otel::TraceId::INVALID
     }
 
-    <span class="kw">fn</span> <span class="ident">new_span_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">otel::SpanId</span> {
-        <span class="ident">otel::SpanId::INVALID</span>
+    <span class="kw">fn </span>new_span_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; otel::SpanId {
+        otel::SpanId::INVALID
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PreSampledTracer</span> <span class="kw">for</span> <span class="ident">Tracer</span> {
-    <span class="kw">fn</span> <span class="ident">sampled_context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">data</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">crate</span>::OtelData</span>) -&gt; <span class="ident">OtelContext</span> {
-        <span class="comment">// Ensure tracing pipeline is still installed.</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">provider</span>().<span class="ident">is_none</span>() {
-            <span class="kw">return</span> <span class="ident">OtelContext::new</span>();
+<span class="kw">impl </span>PreSampledTracer <span class="kw">for </span>Tracer {
+    <span class="kw">fn </span>sampled_context(<span class="kw-2">&amp;</span><span class="self">self</span>, data: <span class="kw-2">&amp;mut </span><span class="kw">crate</span>::OtelData) -&gt; OtelContext {
+        <span class="comment">// Ensure tracing pipeline is still installed.
+        </span><span class="kw">if </span><span class="self">self</span>.provider().is_none() {
+            <span class="kw">return </span>OtelContext::new();
         }
-        <span class="kw">let</span> <span class="ident">provider</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">provider</span>().<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">parent_cx</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">data</span>.<span class="ident">parent_cx</span>;
-        <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">data</span>.<span class="ident">builder</span>;
+        <span class="kw">let </span>provider = <span class="self">self</span>.provider().unwrap();
+        <span class="kw">let </span>parent_cx = <span class="kw-2">&amp;</span>data.parent_cx;
+        <span class="kw">let </span>builder = <span class="kw-2">&amp;mut </span>data.builder;
 
-        <span class="comment">// Gather trace state</span>
-        <span class="kw">let</span> (<span class="ident">no_parent</span>, <span class="ident">trace_id</span>, <span class="ident">remote_parent</span>, <span class="ident">parent_trace_flags</span>) <span class="op">=</span>
-            <span class="ident">current_trace_state</span>(<span class="ident">builder</span>, <span class="ident">parent_cx</span>, <span class="kw-2">&amp;</span><span class="ident">provider</span>);
+        <span class="comment">// Gather trace state
+        </span><span class="kw">let </span>(no_parent, trace_id, remote_parent, parent_trace_flags) =
+            current_trace_state(builder, parent_cx, <span class="kw-2">&amp;</span>provider);
 
-        <span class="comment">// Sample or defer to existing sampling decisions</span>
-        <span class="kw">let</span> (<span class="ident">flags</span>, <span class="ident">trace_state</span>) <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">result</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">builder</span>.<span class="ident">sampling_result</span> {
-            <span class="ident">process_sampling_result</span>(<span class="ident">result</span>, <span class="ident">parent_trace_flags</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">no_parent</span> <span class="op">|</span><span class="op">|</span> <span class="ident">remote_parent</span> {
-            <span class="ident">builder</span>.<span class="ident">sampling_result</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">provider</span>.<span class="ident">config</span>().<span class="ident">sampler</span>.<span class="ident">should_sample</span>(
-                <span class="prelude-val">Some</span>(<span class="ident">parent_cx</span>),
-                <span class="ident">trace_id</span>,
-                <span class="kw-2">&amp;</span><span class="ident">builder</span>.<span class="ident">name</span>,
-                <span class="ident">builder</span>.<span class="ident">span_kind</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span><span class="ident">SpanKind::Internal</span>),
-                <span class="ident">builder</span>.<span class="ident">attributes</span>.<span class="ident">as_deref</span>().<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span>[]),
-                <span class="ident">builder</span>.<span class="ident">links</span>.<span class="ident">as_deref</span>().<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span>[]),
-                <span class="self">self</span>.<span class="ident">instrumentation_library</span>(),
+        <span class="comment">// Sample or defer to existing sampling decisions
+        </span><span class="kw">let </span>(flags, trace_state) = <span class="kw">if let </span><span class="prelude-val">Some</span>(result) = <span class="kw-2">&amp;</span>builder.sampling_result {
+            process_sampling_result(result, parent_trace_flags)
+        } <span class="kw">else if </span>no_parent || remote_parent {
+            builder.sampling_result = <span class="prelude-val">Some</span>(provider.config().sampler.should_sample(
+                <span class="prelude-val">Some</span>(parent_cx),
+                trace_id,
+                <span class="kw-2">&amp;</span>builder.name,
+                builder.span_kind.as_ref().unwrap_or(<span class="kw-2">&amp;</span>SpanKind::Internal),
+                builder.attributes.as_deref().unwrap_or(<span class="kw-2">&amp;</span>[]),
+                builder.links.as_deref().unwrap_or(<span class="kw-2">&amp;</span>[]),
+                <span class="self">self</span>.instrumentation_library(),
             ));
 
-            <span class="ident">process_sampling_result</span>(
-                <span class="ident">builder</span>.<span class="ident">sampling_result</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>(),
-                <span class="ident">parent_trace_flags</span>,
+            process_sampling_result(
+                builder.sampling_result.as_ref().unwrap(),
+                parent_trace_flags,
             )
-        } <span class="kw">else</span> {
-            <span class="comment">// has parent that is local</span>
-            <span class="prelude-val">Some</span>((
-                <span class="ident">parent_trace_flags</span>,
-                <span class="ident">parent_cx</span>.<span class="ident">span</span>().<span class="ident">span_context</span>().<span class="ident">trace_state</span>().<span class="ident">clone</span>(),
+        } <span class="kw">else </span>{
+            <span class="comment">// has parent that is local
+            </span><span class="prelude-val">Some</span>((
+                parent_trace_flags,
+                parent_cx.span().span_context().trace_state().clone(),
             ))
         }
-        .<span class="ident">unwrap_or_default</span>();
+        .unwrap_or_default();
 
-        <span class="kw">let</span> <span class="ident">span_id</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">span_id</span>.<span class="ident">unwrap_or</span>(<span class="ident">SpanId::INVALID</span>);
-        <span class="kw">let</span> <span class="ident">span_context</span> <span class="op">=</span> <span class="ident">SpanContext::new</span>(<span class="ident">trace_id</span>, <span class="ident">span_id</span>, <span class="ident">flags</span>, <span class="bool-val">false</span>, <span class="ident">trace_state</span>);
-        <span class="ident">parent_cx</span>.<span class="ident">with_remote_span_context</span>(<span class="ident">span_context</span>)
+        <span class="kw">let </span>span_id = builder.span_id.unwrap_or(SpanId::INVALID);
+        <span class="kw">let </span>span_context = SpanContext::new(trace_id, span_id, flags, <span class="bool-val">false</span>, trace_state);
+        parent_cx.with_remote_span_context(span_context)
     }
 
-    <span class="kw">fn</span> <span class="ident">new_trace_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">otel::TraceId</span> {
-        <span class="self">self</span>.<span class="ident">provider</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">provider</span><span class="op">|</span> <span class="ident">provider</span>.<span class="ident">config</span>().<span class="ident">id_generator</span>.<span class="ident">new_trace_id</span>())
-            .<span class="ident">unwrap_or</span>(<span class="ident">otel::TraceId::INVALID</span>)
+    <span class="kw">fn </span>new_trace_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; otel::TraceId {
+        <span class="self">self</span>.provider()
+            .map(|provider| provider.config().id_generator.new_trace_id())
+            .unwrap_or(otel::TraceId::INVALID)
     }
 
-    <span class="kw">fn</span> <span class="ident">new_span_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">otel::SpanId</span> {
-        <span class="self">self</span>.<span class="ident">provider</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">provider</span><span class="op">|</span> <span class="ident">provider</span>.<span class="ident">config</span>().<span class="ident">id_generator</span>.<span class="ident">new_span_id</span>())
-            .<span class="ident">unwrap_or</span>(<span class="ident">otel::SpanId::INVALID</span>)
+    <span class="kw">fn </span>new_span_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; otel::SpanId {
+        <span class="self">self</span>.provider()
+            .map(|provider| provider.config().id_generator.new_span_id())
+            .unwrap_or(otel::SpanId::INVALID)
     }
 }
 
-<span class="kw">fn</span> <span class="ident">current_trace_state</span>(
-    <span class="ident">builder</span>: <span class="kw-2">&amp;</span><span class="ident">SpanBuilder</span>,
-    <span class="ident">parent_cx</span>: <span class="kw-2">&amp;</span><span class="ident">OtelContext</span>,
-    <span class="ident">provider</span>: <span class="kw-2">&amp;</span><span class="ident">TracerProvider</span>,
-) -&gt; (<span class="ident">bool</span>, <span class="ident">TraceId</span>, <span class="ident">bool</span>, <span class="ident">TraceFlags</span>) {
-    <span class="kw">if</span> <span class="ident">parent_cx</span>.<span class="ident">has_active_span</span>() {
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">parent_cx</span>.<span class="ident">span</span>();
-        <span class="kw">let</span> <span class="ident">sc</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">span_context</span>();
-        (<span class="bool-val">false</span>, <span class="ident">sc</span>.<span class="ident">trace_id</span>(), <span class="ident">sc</span>.<span class="ident">is_remote</span>(), <span class="ident">sc</span>.<span class="ident">trace_flags</span>())
-    } <span class="kw">else</span> {
+<span class="kw">fn </span>current_trace_state(
+    builder: <span class="kw-2">&amp;</span>SpanBuilder,
+    parent_cx: <span class="kw-2">&amp;</span>OtelContext,
+    provider: <span class="kw-2">&amp;</span>TracerProvider,
+) -&gt; (bool, TraceId, bool, TraceFlags) {
+    <span class="kw">if </span>parent_cx.has_active_span() {
+        <span class="kw">let </span>span = parent_cx.span();
+        <span class="kw">let </span>sc = span.span_context();
+        (<span class="bool-val">false</span>, sc.trace_id(), sc.is_remote(), sc.trace_flags())
+    } <span class="kw">else </span>{
         (
             <span class="bool-val">true</span>,
-            <span class="ident">builder</span>
-                .<span class="ident">trace_id</span>
-                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">provider</span>.<span class="ident">config</span>().<span class="ident">id_generator</span>.<span class="ident">new_trace_id</span>()),
+            builder
+                .trace_id
+                .unwrap_or_else(|| provider.config().id_generator.new_trace_id()),
             <span class="bool-val">false</span>,
-            <span class="ident">Default::default</span>(),
+            Default::default(),
         )
     }
 }
 
-<span class="kw">fn</span> <span class="ident">process_sampling_result</span>(
-    <span class="ident">sampling_result</span>: <span class="kw-2">&amp;</span><span class="ident">SamplingResult</span>,
-    <span class="ident">trace_flags</span>: <span class="ident">TraceFlags</span>,
-) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="ident">TraceFlags</span>, <span class="ident">TraceState</span>)<span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">sampling_result</span> {
-        <span class="ident">SamplingResult</span> {
-            <span class="ident">decision</span>: <span class="ident">SamplingDecision::Drop</span>,
+<span class="kw">fn </span>process_sampling_result(
+    sampling_result: <span class="kw-2">&amp;</span>SamplingResult,
+    trace_flags: TraceFlags,
+) -&gt; <span class="prelude-ty">Option</span>&lt;(TraceFlags, TraceState)&gt; {
+    <span class="kw">match </span>sampling_result {
+        SamplingResult {
+            decision: SamplingDecision::Drop,
             ..
         } =&gt; <span class="prelude-val">None</span>,
-        <span class="ident">SamplingResult</span> {
-            <span class="ident">decision</span>: <span class="ident">SamplingDecision::RecordOnly</span>,
-            <span class="ident">trace_state</span>,
+        SamplingResult {
+            decision: SamplingDecision::RecordOnly,
+            trace_state,
             ..
-        } =&gt; <span class="prelude-val">Some</span>((<span class="ident">trace_flags</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">TraceFlags::SAMPLED</span>, <span class="ident">trace_state</span>.<span class="ident">clone</span>())),
-        <span class="ident">SamplingResult</span> {
-            <span class="ident">decision</span>: <span class="ident">SamplingDecision::RecordAndSample</span>,
-            <span class="ident">trace_state</span>,
+        } =&gt; <span class="prelude-val">Some</span>((trace_flags &amp; !TraceFlags::SAMPLED, trace_state.clone())),
+        SamplingResult {
+            decision: SamplingDecision::RecordAndSample,
+            trace_state,
             ..
-        } =&gt; <span class="prelude-val">Some</span>((<span class="ident">trace_flags</span> <span class="op">|</span> <span class="ident">TraceFlags::SAMPLED</span>, <span class="ident">trace_state</span>.<span class="ident">clone</span>())),
+        } =&gt; <span class="prelude-val">Some</span>((trace_flags | TraceFlags::SAMPLED, trace_state.clone())),
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::OtelData</span>;
-    <span class="kw">use</span> <span class="ident">opentelemetry::sdk::trace</span>::{<span class="ident">config</span>, <span class="ident">Sampler</span>, <span class="ident">TracerProvider</span>};
-    <span class="kw">use</span> <span class="ident">opentelemetry::trace</span>::{<span class="ident">SpanBuilder</span>, <span class="ident">SpanId</span>, <span class="ident">TracerProvider</span> <span class="kw">as</span> <span class="kw">_</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::OtelData;
+    <span class="kw">use </span>opentelemetry::sdk::trace::{config, Sampler, TracerProvider};
+    <span class="kw">use </span>opentelemetry::trace::{SpanBuilder, SpanId, TracerProvider <span class="kw">as _</span>};
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">assigns_default_trace_id_if_missing</span>() {
-        <span class="kw">let</span> <span class="ident">provider</span> <span class="op">=</span> <span class="ident">TracerProvider::default</span>();
-        <span class="kw">let</span> <span class="ident">tracer</span> <span class="op">=</span> <span class="ident">provider</span>.<span class="ident">tracer</span>(<span class="string">&quot;test&quot;</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">SpanBuilder::from_name</span>(<span class="string">&quot;empty&quot;</span>.<span class="ident">to_string</span>());
-        <span class="ident">builder</span>.<span class="ident">span_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">SpanId::from</span>(<span class="number">1u64</span>.<span class="ident">to_be_bytes</span>()));
-        <span class="ident">builder</span>.<span class="ident">trace_id</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="ident">parent_cx</span> <span class="op">=</span> <span class="ident">OtelContext::new</span>();
-        <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="ident">tracer</span>.<span class="ident">sampled_context</span>(<span class="kw-2">&amp;mut</span> <span class="ident">OtelData</span> { <span class="ident">builder</span>, <span class="ident">parent_cx</span> });
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">span</span>();
-        <span class="kw">let</span> <span class="ident">span_context</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">span_context</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>assigns_default_trace_id_if_missing() {
+        <span class="kw">let </span>provider = TracerProvider::default();
+        <span class="kw">let </span>tracer = provider.tracer(<span class="string">&quot;test&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>builder = SpanBuilder::from_name(<span class="string">&quot;empty&quot;</span>.to_string());
+        builder.span_id = <span class="prelude-val">Some</span>(SpanId::from(<span class="number">1u64</span>.to_be_bytes()));
+        builder.trace_id = <span class="prelude-val">None</span>;
+        <span class="kw">let </span>parent_cx = OtelContext::new();
+        <span class="kw">let </span>cx = tracer.sampled_context(<span class="kw-2">&amp;mut </span>OtelData { builder, parent_cx });
+        <span class="kw">let </span>span = cx.span();
+        <span class="kw">let </span>span_context = span.span_context();
 
-        <span class="macro">assert!</span>(<span class="ident">span_context</span>.<span class="ident">is_valid</span>());
+        <span class="macro">assert!</span>(span_context.is_valid());
     }
 
-    <span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sampler_data</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Sampler</span>, <span class="ident">OtelContext</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SamplingResult</span><span class="op">&gt;</span>, <span class="ident">bool</span>)<span class="op">&gt;</span> {
+    <span class="attribute">#[rustfmt::skip]
+    </span><span class="kw">fn </span>sampler_data() -&gt; Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, Sampler, OtelContext, <span class="prelude-ty">Option</span>&lt;SamplingResult&gt;, bool)&gt; {
         <span class="macro">vec!</span>[
-            <span class="comment">// No parent samples</span>
-            (<span class="string">&quot;empty_parent_cx_always_on&quot;</span>, <span class="ident">Sampler::AlwaysOn</span>, <span class="ident">OtelContext::new</span>(), <span class="prelude-val">None</span>, <span class="bool-val">true</span>),
-            (<span class="string">&quot;empty_parent_cx_always_off&quot;</span>, <span class="ident">Sampler::AlwaysOff</span>, <span class="ident">OtelContext::new</span>(), <span class="prelude-val">None</span>, <span class="bool-val">false</span>),
+            <span class="comment">// No parent samples
+            </span>(<span class="string">&quot;empty_parent_cx_always_on&quot;</span>, Sampler::AlwaysOn, OtelContext::new(), <span class="prelude-val">None</span>, <span class="bool-val">true</span>),
+            (<span class="string">&quot;empty_parent_cx_always_off&quot;</span>, Sampler::AlwaysOff, OtelContext::new(), <span class="prelude-val">None</span>, <span class="bool-val">false</span>),
 
-            <span class="comment">// Remote parent samples</span>
-            (<span class="string">&quot;remote_parent_cx_always_on&quot;</span>, <span class="ident">Sampler::AlwaysOn</span>, <span class="ident">OtelContext::new</span>().<span class="ident">with_remote_span_context</span>(<span class="ident">span_context</span>(<span class="ident">TraceFlags::SAMPLED</span>, <span class="bool-val">true</span>)), <span class="prelude-val">None</span>, <span class="bool-val">true</span>),
-            (<span class="string">&quot;remote_parent_cx_always_off&quot;</span>, <span class="ident">Sampler::AlwaysOff</span>, <span class="ident">OtelContext::new</span>().<span class="ident">with_remote_span_context</span>(<span class="ident">span_context</span>(<span class="ident">TraceFlags::SAMPLED</span>, <span class="bool-val">true</span>)), <span class="prelude-val">None</span>, <span class="bool-val">false</span>),
-            (<span class="string">&quot;sampled_remote_parent_cx_parent_based&quot;</span>, <span class="ident">Sampler::ParentBased</span>(<span class="ident">Box::new</span>(<span class="ident">Sampler::AlwaysOff</span>)), <span class="ident">OtelContext::new</span>().<span class="ident">with_remote_span_context</span>(<span class="ident">span_context</span>(<span class="ident">TraceFlags::SAMPLED</span>, <span class="bool-val">true</span>)), <span class="prelude-val">None</span>, <span class="bool-val">true</span>),
-            (<span class="string">&quot;unsampled_remote_parent_cx_parent_based&quot;</span>, <span class="ident">Sampler::ParentBased</span>(<span class="ident">Box::new</span>(<span class="ident">Sampler::AlwaysOn</span>)), <span class="ident">OtelContext::new</span>().<span class="ident">with_remote_span_context</span>(<span class="ident">span_context</span>(<span class="ident">TraceFlags::default</span>(), <span class="bool-val">true</span>)), <span class="prelude-val">None</span>, <span class="bool-val">false</span>),
+            <span class="comment">// Remote parent samples
+            </span>(<span class="string">&quot;remote_parent_cx_always_on&quot;</span>, Sampler::AlwaysOn, OtelContext::new().with_remote_span_context(span_context(TraceFlags::SAMPLED, <span class="bool-val">true</span>)), <span class="prelude-val">None</span>, <span class="bool-val">true</span>),
+            (<span class="string">&quot;remote_parent_cx_always_off&quot;</span>, Sampler::AlwaysOff, OtelContext::new().with_remote_span_context(span_context(TraceFlags::SAMPLED, <span class="bool-val">true</span>)), <span class="prelude-val">None</span>, <span class="bool-val">false</span>),
+            (<span class="string">&quot;sampled_remote_parent_cx_parent_based&quot;</span>, Sampler::ParentBased(Box::new(Sampler::AlwaysOff)), OtelContext::new().with_remote_span_context(span_context(TraceFlags::SAMPLED, <span class="bool-val">true</span>)), <span class="prelude-val">None</span>, <span class="bool-val">true</span>),
+            (<span class="string">&quot;unsampled_remote_parent_cx_parent_based&quot;</span>, Sampler::ParentBased(Box::new(Sampler::AlwaysOn)), OtelContext::new().with_remote_span_context(span_context(TraceFlags::default(), <span class="bool-val">true</span>)), <span class="prelude-val">None</span>, <span class="bool-val">false</span>),
 
-            <span class="comment">// Existing sampling result defers</span>
-            (<span class="string">&quot;previous_drop_result_always_on&quot;</span>, <span class="ident">Sampler::AlwaysOn</span>, <span class="ident">OtelContext::new</span>(), <span class="prelude-val">Some</span>(<span class="ident">SamplingResult</span> { <span class="ident">decision</span>: <span class="ident">SamplingDecision::Drop</span>, <span class="ident">attributes</span>: <span class="macro">vec!</span>[], <span class="ident">trace_state</span>: <span class="ident">Default::default</span>() }), <span class="bool-val">false</span>),
-            (<span class="string">&quot;previous_record_and_sample_result_always_off&quot;</span>, <span class="ident">Sampler::AlwaysOff</span>, <span class="ident">OtelContext::new</span>(), <span class="prelude-val">Some</span>(<span class="ident">SamplingResult</span> { <span class="ident">decision</span>: <span class="ident">SamplingDecision::RecordAndSample</span>, <span class="ident">attributes</span>: <span class="macro">vec!</span>[], <span class="ident">trace_state</span>: <span class="ident">Default::default</span>() }), <span class="bool-val">true</span>),
+            <span class="comment">// Existing sampling result defers
+            </span>(<span class="string">&quot;previous_drop_result_always_on&quot;</span>, Sampler::AlwaysOn, OtelContext::new(), <span class="prelude-val">Some</span>(SamplingResult { decision: SamplingDecision::Drop, attributes: <span class="macro">vec!</span>[], trace_state: Default::default() }), <span class="bool-val">false</span>),
+            (<span class="string">&quot;previous_record_and_sample_result_always_off&quot;</span>, Sampler::AlwaysOff, OtelContext::new(), <span class="prelude-val">Some</span>(SamplingResult { decision: SamplingDecision::RecordAndSample, attributes: <span class="macro">vec!</span>[], trace_state: Default::default() }), <span class="bool-val">true</span>),
  
-            <span class="comment">// Existing local parent, defers</span>
-            (<span class="string">&quot;previous_drop_result_always_on&quot;</span>, <span class="ident">Sampler::AlwaysOn</span>, <span class="ident">OtelContext::new</span>(), <span class="prelude-val">Some</span>(<span class="ident">SamplingResult</span> { <span class="ident">decision</span>: <span class="ident">SamplingDecision::Drop</span>, <span class="ident">attributes</span>: <span class="macro">vec!</span>[], <span class="ident">trace_state</span>: <span class="ident">Default::default</span>() }), <span class="bool-val">false</span>),
-            (<span class="string">&quot;previous_record_and_sample_result_always_off&quot;</span>, <span class="ident">Sampler::AlwaysOff</span>, <span class="ident">OtelContext::new</span>(), <span class="prelude-val">Some</span>(<span class="ident">SamplingResult</span> { <span class="ident">decision</span>: <span class="ident">SamplingDecision::RecordAndSample</span>, <span class="ident">attributes</span>: <span class="macro">vec!</span>[], <span class="ident">trace_state</span>: <span class="ident">Default::default</span>() }), <span class="bool-val">true</span>),
+            <span class="comment">// Existing local parent, defers
+            </span>(<span class="string">&quot;previous_drop_result_always_on&quot;</span>, Sampler::AlwaysOn, OtelContext::new(), <span class="prelude-val">Some</span>(SamplingResult { decision: SamplingDecision::Drop, attributes: <span class="macro">vec!</span>[], trace_state: Default::default() }), <span class="bool-val">false</span>),
+            (<span class="string">&quot;previous_record_and_sample_result_always_off&quot;</span>, Sampler::AlwaysOff, OtelContext::new(), <span class="prelude-val">Some</span>(SamplingResult { decision: SamplingDecision::RecordAndSample, attributes: <span class="macro">vec!</span>[], trace_state: Default::default() }), <span class="bool-val">true</span>),
         ]
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sampled_context</span>() {
-        <span class="kw">for</span> (<span class="ident">name</span>, <span class="ident">sampler</span>, <span class="ident">parent_cx</span>, <span class="ident">previous_sampling_result</span>, <span class="ident">is_sampled</span>) <span class="kw">in</span> <span class="ident">sampler_data</span>() {
-            <span class="kw">let</span> <span class="ident">provider</span> <span class="op">=</span> <span class="ident">TracerProvider::builder</span>()
-                .<span class="ident">with_config</span>(<span class="ident">config</span>().<span class="ident">with_sampler</span>(<span class="ident">sampler</span>))
-                .<span class="ident">build</span>();
-            <span class="kw">let</span> <span class="ident">tracer</span> <span class="op">=</span> <span class="ident">provider</span>.<span class="ident">tracer</span>(<span class="string">&quot;test&quot;</span>);
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">SpanBuilder::from_name</span>(<span class="string">&quot;parent&quot;</span>.<span class="ident">to_string</span>());
-            <span class="ident">builder</span>.<span class="ident">sampling_result</span> <span class="op">=</span> <span class="ident">previous_sampling_result</span>;
-            <span class="kw">let</span> <span class="ident">sampled</span> <span class="op">=</span> <span class="ident">tracer</span>.<span class="ident">sampled_context</span>(<span class="kw-2">&amp;mut</span> <span class="ident">OtelData</span> { <span class="ident">builder</span>, <span class="ident">parent_cx</span> });
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>sampled_context() {
+        <span class="kw">for </span>(name, sampler, parent_cx, previous_sampling_result, is_sampled) <span class="kw">in </span>sampler_data() {
+            <span class="kw">let </span>provider = TracerProvider::builder()
+                .with_config(config().with_sampler(sampler))
+                .build();
+            <span class="kw">let </span>tracer = provider.tracer(<span class="string">&quot;test&quot;</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>builder = SpanBuilder::from_name(<span class="string">&quot;parent&quot;</span>.to_string());
+            builder.sampling_result = previous_sampling_result;
+            <span class="kw">let </span>sampled = tracer.sampled_context(<span class="kw-2">&amp;mut </span>OtelData { builder, parent_cx });
 
             <span class="macro">assert_eq!</span>(
-                <span class="ident">sampled</span>.<span class="ident">span</span>().<span class="ident">span_context</span>().<span class="ident">is_sampled</span>(),
-                <span class="ident">is_sampled</span>,
+                sampled.span().span_context().is_sampled(),
+                is_sampled,
                 <span class="string">&quot;{}&quot;</span>,
-                <span class="ident">name</span>
+                name
             )
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">span_context</span>(<span class="ident">trace_flags</span>: <span class="ident">TraceFlags</span>, <span class="ident">is_remote</span>: <span class="ident">bool</span>) -&gt; <span class="ident">SpanContext</span> {
-        <span class="ident">SpanContext::new</span>(
-            <span class="ident">TraceId::from</span>(<span class="number">1u128</span>.<span class="ident">to_be_bytes</span>()),
-            <span class="ident">SpanId::from</span>(<span class="number">1u64</span>.<span class="ident">to_be_bytes</span>()),
-            <span class="ident">trace_flags</span>,
-            <span class="ident">is_remote</span>,
-            <span class="ident">Default::default</span>(),
+    <span class="kw">fn </span>span_context(trace_flags: TraceFlags, is_remote: bool) -&gt; SpanContext {
+        SpanContext::new(
+            TraceId::from(<span class="number">1u128</span>.to_be_bytes()),
+            SpanId::from(<span class="number">1u64</span>.to_be_bytes()),
+            trace_flags,
+            is_remote,
+            Default::default(),
         )
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing_opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing_opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

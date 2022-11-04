@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/rr/rdata/naptr.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>naptr.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/rr/rdata/naptr.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>naptr.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -324,331 +324,331 @@
 <span id="324">324</span>
 <span id="325">325</span>
 <span id="326">326</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2019 Benjamin Fry &lt;benjaminfry@me.com&gt;</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2019 Benjamin Fry &lt;benjaminfry@me.com&gt;
+//
+// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="doccomment">//! Dynamic Delegation Discovery System</span>
+</span><span class="doccomment">//! Dynamic Delegation Discovery System
 
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
+</span><span class="kw">use </span>std::fmt;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde-config&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::rr::domain::Name</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::serialize::binary</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::error::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::rr::domain::Name;
+<span class="kw">use </span><span class="kw">crate</span>::serialize::binary::<span class="kw-2">*</span>;
 
-<span class="doccomment">/// [RFC 3403 DDDS DNS Database, October 2002](https://tools.ietf.org/html/rfc3403#section-4)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// 4.1 Packet Format</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   The packet format of the NAPTR RR is given below.  The DNS type code</span>
-<span class="doccomment">///   for NAPTR is 35.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///      The packet format for the NAPTR record is as follows</span>
-<span class="doccomment">///                                       1  1  1  1  1  1</span>
-<span class="doccomment">///         0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5</span>
-<span class="doccomment">///       +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-<span class="doccomment">///       |                     ORDER                     |</span>
-<span class="doccomment">///       +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-<span class="doccomment">///       |                   PREFERENCE                  |</span>
-<span class="doccomment">///       +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-<span class="doccomment">///       /                     FLAGS                     /</span>
-<span class="doccomment">///       +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-<span class="doccomment">///       /                   SERVICES                    /</span>
-<span class="doccomment">///       +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-<span class="doccomment">///       /                    REGEXP                     /</span>
-<span class="doccomment">///       +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-<span class="doccomment">///       /                  REPLACEMENT                  /</span>
-<span class="doccomment">///       /                                               /</span>
-<span class="doccomment">///       +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   &lt;character-string&gt; and &lt;domain-name&gt; as used here are defined in RFC</span>
-<span class="doccomment">///   1035 [7].</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NAPTR</span> {
-    <span class="ident">order</span>: <span class="ident">u16</span>,
-    <span class="ident">preference</span>: <span class="ident">u16</span>,
-    <span class="ident">flags</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-    <span class="ident">services</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-    <span class="ident">regexp</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-    <span class="ident">replacement</span>: <span class="ident">Name</span>,
+<span class="doccomment">/// [RFC 3403 DDDS DNS Database, October 2002](https://tools.ietf.org/html/rfc3403#section-4)
+///
+/// ```text
+/// 4.1 Packet Format
+///
+///   The packet format of the NAPTR RR is given below.  The DNS type code
+///   for NAPTR is 35.
+///
+///      The packet format for the NAPTR record is as follows
+///                                       1  1  1  1  1  1
+///         0  1  2  3  4  5  6  7  8  9  0  1  2  3  4  5
+///       +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+///       |                     ORDER                     |
+///       +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+///       |                   PREFERENCE                  |
+///       +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+///       /                     FLAGS                     /
+///       +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+///       /                   SERVICES                    /
+///       +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+///       /                    REGEXP                     /
+///       +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+///       /                  REPLACEMENT                  /
+///       /                                               /
+///       +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+///
+///   &lt;character-string&gt; and &lt;domain-name&gt; as used here are defined in RFC
+///   1035 [7].
+/// ```
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serde-config&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Debug, PartialEq, Eq, Hash, Clone)]
+</span><span class="kw">pub struct </span>NAPTR {
+    order: u16,
+    preference: u16,
+    flags: Box&lt;[u8]&gt;,
+    services: Box&lt;[u8]&gt;,
+    regexp: Box&lt;[u8]&gt;,
+    replacement: Name,
 }
 
-<span class="kw">impl</span> <span class="ident">NAPTR</span> {
-    <span class="doccomment">/// Constructs a new NAPTR record</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `order` - the order in which the NAPTR records MUST be processed in order to accurately represent the ordered list of Rules.</span>
-    <span class="doccomment">/// * `preference` - this field is equivalent to the Priority value in the DDDS Algorithm.</span>
-    <span class="doccomment">/// * `flags` - flags to control aspects of the rewriting and interpretation of the fields in the record.  Flags are single characters from the set A-Z and 0-9.</span>
-    <span class="doccomment">/// * `services` - the Service Parameters applicable to this this delegation path.</span>
-    <span class="doccomment">/// * `regexp` - substitution expression that is applied to the original string held by the client in order to construct the next domain name to lookup.</span>
-    <span class="doccomment">/// * `replacement` - the next domain-name to query for depending on the potential values found in the flags field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">order</span>: <span class="ident">u16</span>,
-        <span class="ident">preference</span>: <span class="ident">u16</span>,
-        <span class="ident">flags</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-        <span class="ident">services</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-        <span class="ident">regexp</span>: <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-        <span class="ident">replacement</span>: <span class="ident">Name</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">order</span>,
-            <span class="ident">preference</span>,
-            <span class="ident">flags</span>,
-            <span class="ident">services</span>,
-            <span class="ident">regexp</span>,
-            <span class="ident">replacement</span>,
+<span class="kw">impl </span>NAPTR {
+    <span class="doccomment">/// Constructs a new NAPTR record
+    ///
+    /// # Arguments
+    ///
+    /// * `order` - the order in which the NAPTR records MUST be processed in order to accurately represent the ordered list of Rules.
+    /// * `preference` - this field is equivalent to the Priority value in the DDDS Algorithm.
+    /// * `flags` - flags to control aspects of the rewriting and interpretation of the fields in the record.  Flags are single characters from the set A-Z and 0-9.
+    /// * `services` - the Service Parameters applicable to this this delegation path.
+    /// * `regexp` - substitution expression that is applied to the original string held by the client in order to construct the next domain name to lookup.
+    /// * `replacement` - the next domain-name to query for depending on the potential values found in the flags field.
+    </span><span class="kw">pub fn </span>new(
+        order: u16,
+        preference: u16,
+        flags: Box&lt;[u8]&gt;,
+        services: Box&lt;[u8]&gt;,
+        regexp: Box&lt;[u8]&gt;,
+        replacement: Name,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            order,
+            preference,
+            flags,
+            services,
+            regexp,
+            replacement,
         }
     }
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">///   ORDER</span>
-    <span class="doccomment">///      A 16-bit unsigned integer specifying the order in which the NAPTR</span>
-    <span class="doccomment">///      records MUST be processed in order to accurately represent the</span>
-    <span class="doccomment">///      ordered list of Rules.  The ordering is from lowest to highest.</span>
-    <span class="doccomment">///      If two records have the same order value then they are considered</span>
-    <span class="doccomment">///      to be the same rule and should be selected based on the</span>
-    <span class="doccomment">///      combination of the Preference values and Services offered.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">order</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
-        <span class="self">self</span>.<span class="ident">order</span>
+    <span class="doccomment">/// ```text
+    ///   ORDER
+    ///      A 16-bit unsigned integer specifying the order in which the NAPTR
+    ///      records MUST be processed in order to accurately represent the
+    ///      ordered list of Rules.  The ordering is from lowest to highest.
+    ///      If two records have the same order value then they are considered
+    ///      to be the same rule and should be selected based on the
+    ///      combination of the Preference values and Services offered.
+    /// ```
+    </span><span class="kw">pub fn </span>order(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
+        <span class="self">self</span>.order
     }
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">///   PREFERENCE</span>
-    <span class="doccomment">///      Although it is called &quot;preference&quot; in deference to DNS</span>
-    <span class="doccomment">///      terminology, this field is equivalent to the Priority value in the</span>
-    <span class="doccomment">///      DDDS Algorithm.  It is a 16-bit unsigned integer that specifies</span>
-    <span class="doccomment">///      the order in which NAPTR records with equal Order values SHOULD be</span>
-    <span class="doccomment">///      processed, low numbers being processed before high numbers.  This</span>
-    <span class="doccomment">///      is similar to the preference field in an MX record, and is used so</span>
-    <span class="doccomment">///      domain administrators can direct clients towards more capable</span>
-    <span class="doccomment">///      hosts or lighter weight protocols.  A client MAY look at records</span>
-    <span class="doccomment">///      with higher preference values if it has a good reason to do so</span>
-    <span class="doccomment">///      such as not supporting some protocol or service very well.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///      The important difference between Order and Preference is that once</span>
-    <span class="doccomment">///      a match is found the client MUST NOT consider records with a</span>
-    <span class="doccomment">///      different Order but they MAY process records with the same Order</span>
-    <span class="doccomment">///      but different Preferences.  The only exception to this is noted in</span>
-    <span class="doccomment">///      the second important Note in the DDDS algorithm specification</span>
-    <span class="doccomment">///      concerning allowing clients to use more complex Service</span>
-    <span class="doccomment">///      determination between steps 3 and 4 in the algorithm.  Preference</span>
-    <span class="doccomment">///      is used to give communicate a higher quality of service to rules</span>
-    <span class="doccomment">///      that are considered the same from an authority standpoint but not</span>
-    <span class="doccomment">///      from a simple load balancing standpoint.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///      It is important to note that DNS contains several load balancing</span>
-    <span class="doccomment">///      mechanisms and if load balancing among otherwise equal services</span>
-    <span class="doccomment">///      should be needed then methods such as SRV records or multiple A</span>
-    <span class="doccomment">///      records should be utilized to accomplish load balancing.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">preference</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u16</span> {
-        <span class="self">self</span>.<span class="ident">preference</span>
+    <span class="doccomment">/// ```text
+    ///   PREFERENCE
+    ///      Although it is called &quot;preference&quot; in deference to DNS
+    ///      terminology, this field is equivalent to the Priority value in the
+    ///      DDDS Algorithm.  It is a 16-bit unsigned integer that specifies
+    ///      the order in which NAPTR records with equal Order values SHOULD be
+    ///      processed, low numbers being processed before high numbers.  This
+    ///      is similar to the preference field in an MX record, and is used so
+    ///      domain administrators can direct clients towards more capable
+    ///      hosts or lighter weight protocols.  A client MAY look at records
+    ///      with higher preference values if it has a good reason to do so
+    ///      such as not supporting some protocol or service very well.
+    ///
+    ///      The important difference between Order and Preference is that once
+    ///      a match is found the client MUST NOT consider records with a
+    ///      different Order but they MAY process records with the same Order
+    ///      but different Preferences.  The only exception to this is noted in
+    ///      the second important Note in the DDDS algorithm specification
+    ///      concerning allowing clients to use more complex Service
+    ///      determination between steps 3 and 4 in the algorithm.  Preference
+    ///      is used to give communicate a higher quality of service to rules
+    ///      that are considered the same from an authority standpoint but not
+    ///      from a simple load balancing standpoint.
+    ///
+    ///      It is important to note that DNS contains several load balancing
+    ///      mechanisms and if load balancing among otherwise equal services
+    ///      should be needed then methods such as SRV records or multiple A
+    ///      records should be utilized to accomplish load balancing.
+    /// ```
+    </span><span class="kw">pub fn </span>preference(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u16 {
+        <span class="self">self</span>.preference
     }
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">///   FLAGS</span>
-    <span class="doccomment">///      A &lt;character-string&gt; containing flags to control aspects of the</span>
-    <span class="doccomment">///      rewriting and interpretation of the fields in the record.  Flags</span>
-    <span class="doccomment">///      are single characters from the set A-Z and 0-9.  The case of the</span>
-    <span class="doccomment">///      alphabetic characters is not significant.  The field can be empty.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///      It is up to the Application specifying how it is using this</span>
-    <span class="doccomment">///      Database to define the Flags in this field.  It must define which</span>
-    <span class="doccomment">///      ones are terminal and which ones are not.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flags</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">flags</span>
+    <span class="doccomment">/// ```text
+    ///   FLAGS
+    ///      A &lt;character-string&gt; containing flags to control aspects of the
+    ///      rewriting and interpretation of the fields in the record.  Flags
+    ///      are single characters from the set A-Z and 0-9.  The case of the
+    ///      alphabetic characters is not significant.  The field can be empty.
+    ///
+    ///      It is up to the Application specifying how it is using this
+    ///      Database to define the Flags in this field.  It must define which
+    ///      ones are terminal and which ones are not.
+    /// ```
+    </span><span class="kw">pub fn </span>flags(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.flags
     }
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">///   SERVICES</span>
-    <span class="doccomment">///      A &lt;character-string&gt; that specifies the Service Parameters</span>
-    <span class="doccomment">///      applicable to this this delegation path.  It is up to the</span>
-    <span class="doccomment">///      Application Specification to specify the values found in this</span>
-    <span class="doccomment">///      field.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">services</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">services</span>
+    <span class="doccomment">/// ```text
+    ///   SERVICES
+    ///      A &lt;character-string&gt; that specifies the Service Parameters
+    ///      applicable to this this delegation path.  It is up to the
+    ///      Application Specification to specify the values found in this
+    ///      field.
+    /// ```
+    </span><span class="kw">pub fn </span>services(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.services
     }
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">///   REGEXP</span>
-    <span class="doccomment">///      A &lt;character-string&gt; containing a substitution expression that is</span>
-    <span class="doccomment">///      applied to the original string held by the client in order to</span>
-    <span class="doccomment">///      construct the next domain name to lookup.  See the DDDS Algorithm</span>
-    <span class="doccomment">///      specification for the syntax of this field.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///      As stated in the DDDS algorithm, The regular expressions MUST NOT</span>
-    <span class="doccomment">///      be used in a cumulative fashion, that is, they should only be</span>
-    <span class="doccomment">///      applied to the original string held by the client, never to the</span>
-    <span class="doccomment">///      domain name p  roduced by a previous NAPTR rewrite.  The latter is</span>
-    <span class="doccomment">///      tempting in some applications but experience has shown such use to</span>
-    <span class="doccomment">///      be extremely fault sensitive, very error prone, and extremely</span>
-    <span class="doccomment">///      difficult to debug.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">regexp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">regexp</span>
+    <span class="doccomment">/// ```text
+    ///   REGEXP
+    ///      A &lt;character-string&gt; containing a substitution expression that is
+    ///      applied to the original string held by the client in order to
+    ///      construct the next domain name to lookup.  See the DDDS Algorithm
+    ///      specification for the syntax of this field.
+    ///
+    ///      As stated in the DDDS algorithm, The regular expressions MUST NOT
+    ///      be used in a cumulative fashion, that is, they should only be
+    ///      applied to the original string held by the client, never to the
+    ///      domain name p  roduced by a previous NAPTR rewrite.  The latter is
+    ///      tempting in some applications but experience has shown such use to
+    ///      be extremely fault sensitive, very error prone, and extremely
+    ///      difficult to debug.
+    /// ```
+    </span><span class="kw">pub fn </span>regexp(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.regexp
     }
 
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">///   REPLACEMENT</span>
-    <span class="doccomment">///      A &lt;domain-name&gt; which is the next domain-name to query for</span>
-    <span class="doccomment">///      depending on the potential values found in the flags field.  This</span>
-    <span class="doccomment">///      field is used when the regular expression is a simple replacement</span>
-    <span class="doccomment">///      operation.  Any value in this field MUST be a fully qualified</span>
-    <span class="doccomment">///      domain-name.  Name compression is not to be used for this field.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///      This field and the REGEXP field together make up the Substitution</span>
-    <span class="doccomment">///      Expression in the DDDS Algorithm.  It is simply a historical</span>
-    <span class="doccomment">///      optimization specifically for DNS compression that this field</span>
-    <span class="doccomment">///      exists.  The fields are also mutually exclusive.  If a record is</span>
-    <span class="doccomment">///      returned that has values for both fields then it is considered to</span>
-    <span class="doccomment">///      be in error and SHOULD be either ignored or an error returned.</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">replacement</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Name</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">replacement</span>
+    <span class="doccomment">/// ```text
+    ///   REPLACEMENT
+    ///      A &lt;domain-name&gt; which is the next domain-name to query for
+    ///      depending on the potential values found in the flags field.  This
+    ///      field is used when the regular expression is a simple replacement
+    ///      operation.  Any value in this field MUST be a fully qualified
+    ///      domain-name.  Name compression is not to be used for this field.
+    ///
+    ///      This field and the REGEXP field together make up the Substitution
+    ///      Expression in the DDDS Algorithm.  It is simply a historical
+    ///      optimization specifically for DNS compression that this field
+    ///      exists.  The fields are also mutually exclusive.  If a record is
+    ///      returned that has values for both fields then it is considered to
+    ///      be in error and SHOULD be either ignored or an error returned.
+    /// ```
+    </span><span class="kw">pub fn </span>replacement(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Name {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.replacement
     }
 }
 
-<span class="doccomment">/// verifies that the flags are valid</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">verify_flags</span>(<span class="ident">flags</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">bool</span> {
-    <span class="ident">flags</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">all</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="macro">matches!</span>(<span class="ident">c</span>, <span class="string">b&#39;0&#39;</span>..<span class="op">=</span><span class="string">b&#39;9&#39;</span> <span class="op">|</span> <span class="string">b&#39;a&#39;</span>..<span class="op">=</span><span class="string">b&#39;z&#39;</span> <span class="op">|</span> <span class="string">b&#39;A&#39;</span>..<span class="op">=</span><span class="string">b&#39;Z&#39;</span>))
+<span class="doccomment">/// verifies that the flags are valid
+</span><span class="kw">pub fn </span>verify_flags(flags: <span class="kw-2">&amp;</span>[u8]) -&gt; bool {
+    flags
+        .iter()
+        .all(|c| <span class="macro">matches!</span>(c, <span class="string">b&#39;0&#39;</span>..=<span class="string">b&#39;9&#39; </span>| <span class="string">b&#39;a&#39;</span>..=<span class="string">b&#39;z&#39; </span>| <span class="string">b&#39;A&#39;</span>..=<span class="string">b&#39;Z&#39;</span>))
 }
 
-<span class="doccomment">/// Read the RData from the given Decoder</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">NAPTR</span><span class="op">&gt;</span> {
-    <span class="prelude-val">Ok</span>(<span class="ident">NAPTR::new</span>(
-        <span class="ident">decoder</span>.<span class="ident">read_u16</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*any u16 is valid*/</span>),
-        <span class="ident">decoder</span>.<span class="ident">read_u16</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*any u16 is valid*/</span>),
-        <span class="comment">// must be 0-9a-z</span>
-        <span class="ident">decoder</span>
-            .<span class="ident">read_character_data</span>()<span class="question-mark">?</span>
-            .<span class="ident">verify_unwrap</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">verify_flags</span>(<span class="ident">s</span>))
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">_e</span><span class="op">|</span> <span class="ident">ProtoError::from</span>(<span class="string">&quot;flags are not within range [a-zA-Z0-9]&quot;</span>))<span class="question-mark">?</span>
-            .<span class="ident">to_vec</span>()
-            .<span class="ident">into_boxed_slice</span>(),
-        <span class="ident">decoder</span>.<span class="ident">read_character_data</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*any chardata*/</span>).<span class="ident">to_vec</span>().<span class="ident">into_boxed_slice</span>(),
-        <span class="ident">decoder</span>.<span class="ident">read_character_data</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*any chardata*/</span>).<span class="ident">to_vec</span>().<span class="ident">into_boxed_slice</span>(),
-        <span class="ident">Name::read</span>(<span class="ident">decoder</span>)<span class="question-mark">?</span>,
+<span class="doccomment">/// Read the RData from the given Decoder
+</span><span class="kw">pub fn </span>read(decoder: <span class="kw-2">&amp;mut </span>BinDecoder&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; ProtoResult&lt;NAPTR&gt; {
+    <span class="prelude-val">Ok</span>(NAPTR::new(
+        decoder.read_u16()<span class="question-mark">?</span>.unverified(<span class="comment">/*any u16 is valid*/</span>),
+        decoder.read_u16()<span class="question-mark">?</span>.unverified(<span class="comment">/*any u16 is valid*/</span>),
+        <span class="comment">// must be 0-9a-z
+        </span>decoder
+            .read_character_data()<span class="question-mark">?
+            </span>.verify_unwrap(|s| verify_flags(s))
+            .map_err(|_e| ProtoError::from(<span class="string">&quot;flags are not within range [a-zA-Z0-9]&quot;</span>))<span class="question-mark">?
+            </span>.to_vec()
+            .into_boxed_slice(),
+        decoder.read_character_data()<span class="question-mark">?</span>.unverified(<span class="comment">/*any chardata*/</span>).to_vec().into_boxed_slice(),
+        decoder.read_character_data()<span class="question-mark">?</span>.unverified(<span class="comment">/*any chardata*/</span>).to_vec().into_boxed_slice(),
+        Name::read(decoder)<span class="question-mark">?</span>,
     ))
 }
 
-<span class="doccomment">/// Declares the method for emitting this type</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emit</span>(<span class="ident">encoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">naptr</span>: <span class="kw-2">&amp;</span><span class="ident">NAPTR</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="ident">naptr</span>.<span class="ident">order</span>.<span class="ident">emit</span>(<span class="ident">encoder</span>)<span class="question-mark">?</span>;
-    <span class="ident">naptr</span>.<span class="ident">preference</span>.<span class="ident">emit</span>(<span class="ident">encoder</span>)<span class="question-mark">?</span>;
-    <span class="ident">encoder</span>.<span class="ident">emit_character_data</span>(<span class="kw-2">&amp;</span><span class="ident">naptr</span>.<span class="ident">flags</span>)<span class="question-mark">?</span>;
-    <span class="ident">encoder</span>.<span class="ident">emit_character_data</span>(<span class="kw-2">&amp;</span><span class="ident">naptr</span>.<span class="ident">services</span>)<span class="question-mark">?</span>;
-    <span class="ident">encoder</span>.<span class="ident">emit_character_data</span>(<span class="kw-2">&amp;</span><span class="ident">naptr</span>.<span class="ident">regexp</span>)<span class="question-mark">?</span>;
+<span class="doccomment">/// Declares the method for emitting this type
+</span><span class="kw">pub fn </span>emit(encoder: <span class="kw-2">&amp;mut </span>BinEncoder&lt;<span class="lifetime">&#39;_</span>&gt;, naptr: <span class="kw-2">&amp;</span>NAPTR) -&gt; ProtoResult&lt;()&gt; {
+    naptr.order.emit(encoder)<span class="question-mark">?</span>;
+    naptr.preference.emit(encoder)<span class="question-mark">?</span>;
+    encoder.emit_character_data(<span class="kw-2">&amp;</span>naptr.flags)<span class="question-mark">?</span>;
+    encoder.emit_character_data(<span class="kw-2">&amp;</span>naptr.services)<span class="question-mark">?</span>;
+    encoder.emit_character_data(<span class="kw-2">&amp;</span>naptr.regexp)<span class="question-mark">?</span>;
 
-    <span class="ident">encoder</span>.<span class="ident">with_canonical_names</span>(<span class="op">|</span><span class="ident">encoder</span><span class="op">|</span> <span class="ident">naptr</span>.<span class="ident">replacement</span>.<span class="ident">emit</span>(<span class="ident">encoder</span>))<span class="question-mark">?</span>;
+    encoder.with_canonical_names(|encoder| naptr.replacement.emit(encoder))<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="doccomment">/// [RFC 2915](https://tools.ietf.org/html/rfc2915), NAPTR DNS RR, September 2000</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// Master File Format</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   The master file format follows the standard rules in RFC-1035 [1].</span>
-<span class="doccomment">///   Order and preference, being 16-bit unsigned integers, shall be an</span>
-<span class="doccomment">///   integer between 0 and 65535.  The Flags and Services and Regexp</span>
-<span class="doccomment">///   fields are all quoted &lt;character-string&gt;s.  Since the Regexp field</span>
-<span class="doccomment">///   can contain numerous backslashes and thus should be treated with</span>
-<span class="doccomment">///   care.  See Section 10 for how to correctly enter and escape the</span>
-<span class="doccomment">///   regular expression.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ;;      order pref flags service           regexp replacement</span>
-<span class="doccomment">/// IN NAPTR 100  50  &quot;a&quot;    &quot;z3950+N2L+N2C&quot;     &quot;&quot;   cidserver.example.com.</span>
-<span class="doccomment">/// IN NAPTR 100  50  &quot;a&quot;    &quot;rcds+N2C&quot;          &quot;&quot;   cidserver.example.com.</span>
-<span class="doccomment">/// IN NAPTR 100  50  &quot;s&quot;    &quot;http+N2L+N2C+N2R&quot;  &quot;&quot;   www.example.com.</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">NAPTR</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+<span class="doccomment">/// [RFC 2915](https://tools.ietf.org/html/rfc2915), NAPTR DNS RR, September 2000
+///
+/// ```text
+/// Master File Format
+///
+///   The master file format follows the standard rules in RFC-1035 [1].
+///   Order and preference, being 16-bit unsigned integers, shall be an
+///   integer between 0 and 65535.  The Flags and Services and Regexp
+///   fields are all quoted &lt;character-string&gt;s.  Since the Regexp field
+///   can contain numerous backslashes and thus should be treated with
+///   care.  See Section 10 for how to correctly enter and escape the
+///   regular expression.
+///
+/// ;;      order pref flags service           regexp replacement
+/// IN NAPTR 100  50  &quot;a&quot;    &quot;z3950+N2L+N2C&quot;     &quot;&quot;   cidserver.example.com.
+/// IN NAPTR 100  50  &quot;a&quot;    &quot;rcds+N2C&quot;          &quot;&quot;   cidserver.example.com.
+/// IN NAPTR 100  50  &quot;s&quot;    &quot;http+N2L+N2C+N2R&quot;  &quot;&quot;   www.example.com.
+/// ```
+</span><span class="kw">impl </span>fmt::Display <span class="kw">for </span>NAPTR {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), fmt::Error&gt; {
         <span class="macro">write!</span>(
-            <span class="ident">f</span>,
+            f,
             <span class="string">&quot;{order} {pref} \&quot;{flags}\&quot; \&quot;{service}\&quot; \&quot;{regexp}\&quot; {replace}&quot;</span>,
-            <span class="ident">order</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">order</span>,
-            <span class="ident">pref</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">preference</span>,
-            <span class="ident">flags</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">String::from_utf8_lossy</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">flags</span>),
-            <span class="ident">service</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">String::from_utf8_lossy</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">services</span>),
-            <span class="ident">regexp</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">String::from_utf8_lossy</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">regexp</span>),
-            <span class="ident">replace</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">replacement</span>
+            order = <span class="self">self</span>.order,
+            pref = <span class="self">self</span>.preference,
+            flags = <span class="kw-2">&amp;</span>String::from_utf8_lossy(<span class="kw-2">&amp;</span><span class="self">self</span>.flags),
+            service = <span class="kw-2">&amp;</span>String::from_utf8_lossy(<span class="kw-2">&amp;</span><span class="self">self</span>.services),
+            regexp = <span class="kw-2">&amp;</span>String::from_utf8_lossy(<span class="kw-2">&amp;</span><span class="self">self</span>.regexp),
+            replace = <span class="self">self</span>.replacement
         )
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::dbg_macro</span>, <span class="ident">clippy::print_stdout</span>)]</span>
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="attribute">#![allow(clippy::dbg_macro, clippy::print_stdout)]
 
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test</span>() {
-        <span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
+    </span><span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test() {
+        <span class="kw">use </span>std::str::FromStr;
 
-        <span class="kw">let</span> <span class="ident">rdata</span> <span class="op">=</span> <span class="ident">NAPTR::new</span>(
+        <span class="kw">let </span>rdata = NAPTR::new(
             <span class="number">8</span>,
             <span class="number">16</span>,
-            <span class="string">b&quot;aa11AA&quot;</span>.<span class="ident">to_vec</span>().<span class="ident">into_boxed_slice</span>(),
-            <span class="string">b&quot;services&quot;</span>.<span class="ident">to_vec</span>().<span class="ident">into_boxed_slice</span>(),
-            <span class="string">b&quot;regexpr&quot;</span>.<span class="ident">to_vec</span>().<span class="ident">into_boxed_slice</span>(),
-            <span class="ident">Name::from_str</span>(<span class="string">&quot;naptr.example.com&quot;</span>).<span class="ident">unwrap</span>(),
+            <span class="string">b&quot;aa11AA&quot;</span>.to_vec().into_boxed_slice(),
+            <span class="string">b&quot;services&quot;</span>.to_vec().into_boxed_slice(),
+            <span class="string">b&quot;regexpr&quot;</span>.to_vec().into_boxed_slice(),
+            Name::from_str(<span class="string">&quot;naptr.example.com&quot;</span>).unwrap(),
         );
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span>: <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BinEncoder::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>);
-        <span class="macro">assert!</span>(<span class="ident">emit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">encoder</span>, <span class="kw-2">&amp;</span><span class="ident">rdata</span>).<span class="ident">is_ok</span>());
-        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">into_bytes</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>bytes = Vec::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>encoder: BinEncoder&lt;<span class="lifetime">&#39;_</span>&gt; = BinEncoder::new(<span class="kw-2">&amp;mut </span>bytes);
+        <span class="macro">assert!</span>(emit(<span class="kw-2">&amp;mut </span>encoder, <span class="kw-2">&amp;</span>rdata).is_ok());
+        <span class="kw">let </span>bytes = encoder.into_bytes();
 
-        <span class="macro">println!</span>(<span class="string">&quot;bytes: {:?}&quot;</span>, <span class="ident">bytes</span>);
+        <span class="macro">println!</span>(<span class="string">&quot;bytes: {:?}&quot;</span>, bytes);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span>: <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BinDecoder::new</span>(<span class="ident">bytes</span>);
-        <span class="kw">let</span> <span class="ident">read_rdata</span> <span class="op">=</span> <span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">decoder</span>).<span class="ident">expect</span>(<span class="string">&quot;Decoding error&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">rdata</span>, <span class="ident">read_rdata</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>decoder: BinDecoder&lt;<span class="lifetime">&#39;_</span>&gt; = BinDecoder::new(bytes);
+        <span class="kw">let </span>read_rdata = read(<span class="kw-2">&amp;mut </span>decoder).expect(<span class="string">&quot;Decoding error&quot;</span>);
+        <span class="macro">assert_eq!</span>(rdata, read_rdata);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_bad_data</span>() {
-        <span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_bad_data() {
+        <span class="kw">use </span>std::str::FromStr;
 
-        <span class="kw">let</span> <span class="ident">rdata</span> <span class="op">=</span> <span class="ident">NAPTR::new</span>(
+        <span class="kw">let </span>rdata = NAPTR::new(
             <span class="number">8</span>,
             <span class="number">16</span>,
-            <span class="string">b&quot;aa11AA-&quot;</span>.<span class="ident">to_vec</span>().<span class="ident">into_boxed_slice</span>(),
-            <span class="string">b&quot;services&quot;</span>.<span class="ident">to_vec</span>().<span class="ident">into_boxed_slice</span>(),
-            <span class="string">b&quot;regexpr&quot;</span>.<span class="ident">to_vec</span>().<span class="ident">into_boxed_slice</span>(),
-            <span class="ident">Name::from_str</span>(<span class="string">&quot;naptr.example.com&quot;</span>).<span class="ident">unwrap</span>(),
+            <span class="string">b&quot;aa11AA-&quot;</span>.to_vec().into_boxed_slice(),
+            <span class="string">b&quot;services&quot;</span>.to_vec().into_boxed_slice(),
+            <span class="string">b&quot;regexpr&quot;</span>.to_vec().into_boxed_slice(),
+            Name::from_str(<span class="string">&quot;naptr.example.com&quot;</span>).unwrap(),
         );
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span>: <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BinEncoder::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>);
-        <span class="macro">assert!</span>(<span class="ident">emit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">encoder</span>, <span class="kw-2">&amp;</span><span class="ident">rdata</span>).<span class="ident">is_ok</span>());
-        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">into_bytes</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>bytes = Vec::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>encoder: BinEncoder&lt;<span class="lifetime">&#39;_</span>&gt; = BinEncoder::new(<span class="kw-2">&amp;mut </span>bytes);
+        <span class="macro">assert!</span>(emit(<span class="kw-2">&amp;mut </span>encoder, <span class="kw-2">&amp;</span>rdata).is_ok());
+        <span class="kw">let </span>bytes = encoder.into_bytes();
 
-        <span class="macro">println!</span>(<span class="string">&quot;bytes: {:?}&quot;</span>, <span class="ident">bytes</span>);
+        <span class="macro">println!</span>(<span class="string">&quot;bytes: {:?}&quot;</span>, bytes);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span>: <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BinDecoder::new</span>(<span class="ident">bytes</span>);
-        <span class="kw">let</span> <span class="ident">read_rdata</span> <span class="op">=</span> <span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">decoder</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>decoder: BinDecoder&lt;<span class="lifetime">&#39;_</span>&gt; = BinDecoder::new(bytes);
+        <span class="kw">let </span>read_rdata = read(<span class="kw-2">&amp;mut </span>decoder);
         <span class="macro">assert!</span>(
-            <span class="ident">read_rdata</span>.<span class="ident">is_err</span>(),
-            <span class="string">&quot;should have failed decoding with bad flag data&quot;</span>
-        );
+            read_rdata.is_err(),
+            <span class="string">&quot;should have failed decoding with bad flag data&quot;
+        </span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

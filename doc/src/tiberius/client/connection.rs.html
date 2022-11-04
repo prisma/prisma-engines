@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tiberius-0.11.2/src/client/connection.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>connection.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tiberius/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tiberius-0.11.2/src/client/connection.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>connection.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tiberius/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tiberius/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -562,247 +562,247 @@
 <span id="562">562</span>
 <span id="563">563</span>
 <span id="564">564</span>
-</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls&quot;</span>,
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native-tls&quot;</span>,
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vendored-openssl&quot;</span>
-))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::client</span>::{<span class="ident">tls::TlsPreloginWrapper</span>, <span class="ident">tls_stream::create_tls_stream</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">client</span>::{<span class="ident">tls::MaybeTlsStream</span>, <span class="ident">AuthMethod</span>, <span class="ident">Config</span>},
-    <span class="ident">tds</span>::{
-        <span class="ident">codec</span>::{
-            <span class="self">self</span>, <span class="ident">Encode</span>, <span class="ident">LoginMessage</span>, <span class="ident">Packet</span>, <span class="ident">PacketCodec</span>, <span class="ident">PacketHeader</span>, <span class="ident">PacketStatus</span>,
-            <span class="ident">PreloginMessage</span>, <span class="ident">TokenDone</span>,
+</pre><pre class="rust"><code><span class="attribute">#[cfg(any(
+    feature = <span class="string">&quot;rustls&quot;</span>,
+    feature = <span class="string">&quot;native-tls&quot;</span>,
+    feature = <span class="string">&quot;vendored-openssl&quot;
+</span>))]
+</span><span class="kw">use </span><span class="kw">crate</span>::client::{tls::TlsPreloginWrapper, tls_stream::create_tls_stream};
+<span class="kw">use crate</span>::{
+    client::{tls::MaybeTlsStream, AuthMethod, Config},
+    tds::{
+        codec::{
+            <span class="self">self</span>, Encode, LoginMessage, Packet, PacketCodec, PacketHeader, PacketStatus,
+            PreloginMessage, TokenDone,
         },
-        <span class="ident">stream::TokenStream</span>,
-        <span class="ident">Context</span>, <span class="ident">HEADER_BYTES</span>,
+        stream::TokenStream,
+        Context, HEADER_BYTES,
     },
-    <span class="ident">EncryptionLevel</span>, <span class="ident">SqlReadBytes</span>,
+    EncryptionLevel, SqlReadBytes,
 };
-<span class="kw">use</span> <span class="ident">asynchronous_codec::Framed</span>;
-<span class="kw">use</span> <span class="ident">bytes::BytesMut</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">windows</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;integrated-auth-gssapi&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">codec::TokenSspi</span>;
-<span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">ready</span>, <span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>, <span class="ident">SinkExt</span>, <span class="ident">Stream</span>, <span class="ident">TryStream</span>, <span class="ident">TryStreamExt</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">unix</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;integrated-auth-gssapi&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">libgssapi</span>::{
-    <span class="ident">context</span>::{<span class="ident">ClientCtx</span>, <span class="ident">CtxFlags</span>},
-    <span class="ident">credential</span>::{<span class="ident">Cred</span>, <span class="ident">CredUsage</span>},
-    <span class="ident">name::Name</span>,
-    <span class="ident">oid</span>::{<span class="ident">OidSet</span>, <span class="ident">GSS_MECH_KRB5</span>, <span class="ident">GSS_NT_KRB5_PRINCIPAL</span>},
+<span class="kw">use </span>asynchronous_codec::Framed;
+<span class="kw">use </span>bytes::BytesMut;
+<span class="attribute">#[cfg(any(windows, feature = <span class="string">&quot;integrated-auth-gssapi&quot;</span>))]
+</span><span class="kw">use </span>codec::TokenSspi;
+<span class="kw">use </span>futures::{ready, AsyncRead, AsyncWrite, SinkExt, Stream, TryStream, TryStreamExt};
+<span class="attribute">#[cfg(all(unix, feature = <span class="string">&quot;integrated-auth-gssapi&quot;</span>))]
+</span><span class="kw">use </span>libgssapi::{
+    context::{ClientCtx, CtxFlags},
+    credential::{Cred, CredUsage},
+    name::Name,
+    oid::{OidSet, GSS_MECH_KRB5, GSS_NT_KRB5_PRINCIPAL},
 };
-<span class="kw">use</span> <span class="ident">pretty_hex</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">unix</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;integrated-auth-gssapi&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">std::ops::Deref</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">cmp</span>, <span class="ident">fmt::Debug</span>, <span class="ident">io</span>, <span class="ident">pin::Pin</span>, <span class="ident">task</span>};
-<span class="kw">use</span> <span class="ident">task::Poll</span>;
-<span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">event</span>, <span class="ident">Level</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">windows</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;winauth&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">winauth</span>::{<span class="ident">windows::NtlmSspiBuilder</span>, <span class="ident">NextBytes</span>};
+<span class="kw">use </span>pretty_hex::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(all(unix, feature = <span class="string">&quot;integrated-auth-gssapi&quot;</span>))]
+</span><span class="kw">use </span>std::ops::Deref;
+<span class="kw">use </span>std::{cmp, fmt::Debug, io, pin::Pin, task};
+<span class="kw">use </span>task::Poll;
+<span class="kw">use </span>tracing::{event, Level};
+<span class="attribute">#[cfg(all(windows, feature = <span class="string">&quot;winauth&quot;</span>))]
+</span><span class="kw">use </span>winauth::{windows::NtlmSspiBuilder, NextBytes};
 
-<span class="doccomment">/// A `Connection` is an abstraction between the [`Client`] and the server. It</span>
-<span class="doccomment">/// can be used as a `Stream` to fetch [`Packet`]s from and to `send` packets</span>
-<span class="doccomment">/// splitting them to the negotiated limit automatically.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `Connection` is not meant to use directly, but as an abstraction layer for</span>
-<span class="doccomment">/// the numerous `Stream`s for easy packet handling.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Client`]: struct.Encode.html</span>
-<span class="doccomment">/// [`Packet`]: ../protocol/codec/struct.Packet.html</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span>,
+<span class="doccomment">/// A `Connection` is an abstraction between the [`Client`] and the server. It
+/// can be used as a `Stream` to fetch [`Packet`]s from and to `send` packets
+/// splitting them to the negotiated limit automatically.
+///
+/// `Connection` is not meant to use directly, but as an abstraction layer for
+/// the numerous `Stream`s for easy packet handling.
+///
+/// [`Client`]: struct.Encode.html
+/// [`Packet`]: ../protocol/codec/struct.Packet.html
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Connection&lt;S&gt;
+<span class="kw">where
+    </span>S: AsyncRead + AsyncWrite + Unpin + Send,
 {
-    <span class="ident">transport</span>: <span class="ident">Framed</span><span class="op">&lt;</span><span class="ident">MaybeTlsStream</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>, <span class="ident">PacketCodec</span><span class="op">&gt;</span>,
-    <span class="ident">flushed</span>: <span class="ident">bool</span>,
-    <span class="ident">context</span>: <span class="ident">Context</span>,
-    <span class="ident">buf</span>: <span class="ident">BytesMut</span>,
+    transport: Framed&lt;MaybeTlsStream&lt;S&gt;, PacketCodec&gt;,
+    flushed: bool,
+    context: Context,
+    buf: BytesMut,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Connection&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;transport&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;Framed&lt;..&gt;&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;flushed&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">flushed</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;context&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">context</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;buf&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">as_ref</span>().<span class="ident">hex_dump</span>())
-            .<span class="ident">finish</span>()
+<span class="kw">impl</span>&lt;S: AsyncRead + AsyncWrite + Unpin + Send&gt; Debug <span class="kw">for </span>Connection&lt;S&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        f.debug_struct(<span class="string">&quot;Connection&quot;</span>)
+            .field(<span class="string">&quot;transport&quot;</span>, <span class="kw-2">&amp;</span><span class="string">&quot;Framed&lt;..&gt;&quot;</span>)
+            .field(<span class="string">&quot;flushed&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.flushed)
+            .field(<span class="string">&quot;context&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.context)
+            .field(<span class="string">&quot;buf&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.buf.as_ref().hex_dump())
+            .finish()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Creates a new connection</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span>(<span class="ident">config</span>: <span class="ident">Config</span>, <span class="ident">tcp_stream</span>: <span class="ident">S</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">Context::new</span>();
-            <span class="ident">context</span>.<span class="ident">set_spn</span>(<span class="ident">config</span>.<span class="ident">get_host</span>(), <span class="ident">config</span>.<span class="ident">get_port</span>());
-            <span class="ident">context</span>
+<span class="kw">impl</span>&lt;S: AsyncRead + AsyncWrite + Unpin + Send&gt; Connection&lt;S&gt; {
+    <span class="doccomment">/// Creates a new connection
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>connect(config: Config, tcp_stream: S) -&gt; <span class="kw">crate</span>::Result&lt;Connection&lt;S&gt;&gt; {
+        <span class="kw">let </span>context = {
+            <span class="kw">let </span><span class="kw-2">mut </span>context = Context::new();
+            context.set_spn(config.get_host(), config.get_port());
+            context
         };
 
-        <span class="kw">let</span> <span class="ident">transport</span> <span class="op">=</span> <span class="ident">Framed::new</span>(<span class="ident">MaybeTlsStream::Raw</span>(<span class="ident">tcp_stream</span>), <span class="ident">PacketCodec</span>);
+        <span class="kw">let </span>transport = Framed::new(MaybeTlsStream::Raw(tcp_stream), PacketCodec);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">connection</span> <span class="op">=</span> <span class="self">Self</span> {
-            <span class="ident">transport</span>,
-            <span class="ident">context</span>,
-            <span class="ident">flushed</span>: <span class="bool-val">false</span>,
-            <span class="ident">buf</span>: <span class="ident">BytesMut::new</span>(),
+        <span class="kw">let </span><span class="kw-2">mut </span>connection = <span class="self">Self </span>{
+            transport,
+            context,
+            flushed: <span class="bool-val">false</span>,
+            buf: BytesMut::new(),
         };
 
-        <span class="kw">let</span> <span class="ident">fed_auth_required</span> <span class="op">=</span> <span class="macro">matches!</span>(<span class="ident">config</span>.<span class="ident">auth</span>, <span class="ident">AuthMethod::AADToken</span>(<span class="kw">_</span>));
+        <span class="kw">let </span>fed_auth_required = <span class="macro">matches!</span>(config.auth, AuthMethod::AADToken(<span class="kw">_</span>));
 
-        <span class="kw">let</span> <span class="ident">prelogin</span> <span class="op">=</span> <span class="ident">connection</span>
-            .<span class="ident">prelogin</span>(<span class="ident">config</span>.<span class="ident">encryption</span>, <span class="ident">fed_auth_required</span>)
+        <span class="kw">let </span>prelogin = connection
+            .prelogin(config.encryption, fed_auth_required)
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">encryption</span> <span class="op">=</span> <span class="ident">prelogin</span>.<span class="ident">negotiated_encryption</span>(<span class="ident">config</span>.<span class="ident">encryption</span>);
+        <span class="kw">let </span>encryption = prelogin.negotiated_encryption(config.encryption);
 
-        <span class="kw">let</span> <span class="ident">connection</span> <span class="op">=</span> <span class="ident">connection</span>.<span class="ident">tls_handshake</span>(<span class="kw-2">&amp;</span><span class="ident">config</span>, <span class="ident">encryption</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>connection = connection.tls_handshake(<span class="kw-2">&amp;</span>config, encryption).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">connection</span> <span class="op">=</span> <span class="ident">connection</span>
-            .<span class="ident">login</span>(
-                <span class="ident">config</span>.<span class="ident">auth</span>,
-                <span class="ident">encryption</span>,
-                <span class="ident">config</span>.<span class="ident">database</span>,
-                <span class="ident">config</span>.<span class="ident">host</span>,
-                <span class="ident">config</span>.<span class="ident">application_name</span>,
-                <span class="ident">prelogin</span>,
+        <span class="kw">let </span><span class="kw-2">mut </span>connection = connection
+            .login(
+                config.auth,
+                encryption,
+                config.database,
+                config.host,
+                config.application_name,
+                prelogin,
             )
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="ident">connection</span>.<span class="ident">flush_done</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+        connection.flush_done().<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">connection</span>)
+        <span class="prelude-val">Ok</span>(connection)
     }
 
-    <span class="doccomment">/// Flush the incoming token stream until receiving `DONE` token.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">flush_done</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">TokenDone</span><span class="op">&gt;</span> {
-        <span class="ident">TokenStream::new</span>(<span class="self">self</span>).<span class="ident">flush_done</span>().<span class="kw">await</span>
-    }
+    <span class="doccomment">/// Flush the incoming token stream until receiving `DONE` token.
+    </span><span class="kw">async fn </span>flush_done(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;TokenDone&gt; {
+        TokenStream::new(<span class="self">self</span>).flush_done().<span class="kw">await
+    </span>}
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">windows</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;integrated-auth-gssapi&quot;</span>))]</span>
-    <span class="doccomment">/// Flush the incoming token stream until receiving `SSPI` token.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">flush_sspi</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">TokenSspi</span><span class="op">&gt;</span> {
-        <span class="ident">TokenStream::new</span>(<span class="self">self</span>).<span class="ident">flush_sspi</span>().<span class="kw">await</span>
-    }
+    <span class="attribute">#[cfg(any(windows, feature = <span class="string">&quot;integrated-auth-gssapi&quot;</span>))]
+    </span><span class="doccomment">/// Flush the incoming token stream until receiving `SSPI` token.
+    </span><span class="kw">async fn </span>flush_sspi(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;TokenSspi&gt; {
+        TokenStream::new(<span class="self">self</span>).flush_sspi().<span class="kw">await
+    </span>}
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-        <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls&quot;</span>,
-        <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native-tls&quot;</span>,
-        <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vendored-openssl&quot;</span>
-    ))]</span>
-    <span class="kw">fn</span> <span class="ident">post_login_encryption</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">encryption</span>: <span class="ident">EncryptionLevel</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">EncryptionLevel::Off</span> <span class="op">=</span> <span class="ident">encryption</span> {
+    <span class="attribute">#[cfg(any(
+        feature = <span class="string">&quot;rustls&quot;</span>,
+        feature = <span class="string">&quot;native-tls&quot;</span>,
+        feature = <span class="string">&quot;vendored-openssl&quot;
+    </span>))]
+    </span><span class="kw">fn </span>post_login_encryption(<span class="kw-2">mut </span><span class="self">self</span>, encryption: EncryptionLevel) -&gt; <span class="self">Self </span>{
+        <span class="kw">if let </span>EncryptionLevel::Off = encryption {
             <span class="macro">event!</span>(
-                <span class="ident">Level::WARN</span>,
+                Level::WARN,
                 <span class="string">&quot;Turning TLS off after a login. All traffic from here on is not encrypted.&quot;</span>,
             );
 
-            <span class="kw">let</span> <span class="self">Self</span> { <span class="ident">transport</span>, .. } <span class="op">=</span> <span class="self">self</span>;
-            <span class="kw">let</span> <span class="ident">tcp</span> <span class="op">=</span> <span class="ident">transport</span>.<span class="ident">into_inner</span>().<span class="ident">into_inner</span>();
-            <span class="self">self</span>.<span class="ident">transport</span> <span class="op">=</span> <span class="ident">Framed::new</span>(<span class="ident">MaybeTlsStream::Raw</span>(<span class="ident">tcp</span>), <span class="ident">PacketCodec</span>);
+            <span class="kw">let </span><span class="self">Self </span>{ transport, .. } = <span class="self">self</span>;
+            <span class="kw">let </span>tcp = transport.into_inner().into_inner();
+            <span class="self">self</span>.transport = Framed::new(MaybeTlsStream::Raw(tcp), PacketCodec);
         }
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(
-        <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls&quot;</span>,
-        <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native-tls&quot;</span>,
-        <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vendored-openssl&quot;</span>
-    )))]</span>
-    <span class="kw">fn</span> <span class="ident">post_login_encryption</span>(<span class="self">self</span>, <span class="kw">_</span>: <span class="ident">EncryptionLevel</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>
-    }
+    <span class="attribute">#[cfg(not(any(
+        feature = <span class="string">&quot;rustls&quot;</span>,
+        feature = <span class="string">&quot;native-tls&quot;</span>,
+        feature = <span class="string">&quot;vendored-openssl&quot;
+    </span>)))]
+    </span><span class="kw">fn </span>post_login_encryption(<span class="self">self</span>, <span class="kw">_</span>: EncryptionLevel) -&gt; <span class="self">Self </span>{
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Send an item to the wire. Header should define the item type and item should implement</span>
-    <span class="doccomment">/// [`Encode`], defining the byte structure for the wire.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The `send` will split the packet into multiple packets if bigger than</span>
-    <span class="doccomment">/// the negotiated packet size, and handle flushing to the wire in an optimal way.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Encode`]: ../protocol/codec/trait.Encode.html</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">send</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">header</span>: <span class="ident">PacketHeader</span>, <span class="ident">item</span>: <span class="ident">E</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">E</span>: <span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Encode</span><span class="op">&lt;</span><span class="ident">BytesMut</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Send an item to the wire. Header should define the item type and item should implement
+    /// [`Encode`], defining the byte structure for the wire.
+    ///
+    /// The `send` will split the packet into multiple packets if bigger than
+    /// the negotiated packet size, and handle flushing to the wire in an optimal way.
+    ///
+    /// [`Encode`]: ../protocol/codec/trait.Encode.html
+    </span><span class="kw">pub async fn </span>send&lt;E&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>header: PacketHeader, item: E) -&gt; <span class="kw">crate</span>::Result&lt;()&gt;
+    <span class="kw">where
+        </span>E: Sized + Encode&lt;BytesMut&gt;,
     {
-        <span class="self">self</span>.<span class="ident">flushed</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        <span class="kw">let</span> <span class="ident">packet_size</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">context</span>.<span class="ident">packet_size</span>() <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">-</span> <span class="ident">HEADER_BYTES</span>;
+        <span class="self">self</span>.flushed = <span class="bool-val">false</span>;
+        <span class="kw">let </span>packet_size = (<span class="self">self</span>.context.packet_size() <span class="kw">as </span>usize) - HEADER_BYTES;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">payload</span> <span class="op">=</span> <span class="ident">BytesMut::new</span>();
-        <span class="ident">item</span>.<span class="ident">encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">payload</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>payload = BytesMut::new();
+        item.encode(<span class="kw-2">&amp;mut </span>payload)<span class="question-mark">?</span>;
 
-        <span class="kw">while</span> <span class="op">!</span><span class="ident">payload</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">let</span> <span class="ident">writable</span> <span class="op">=</span> <span class="ident">cmp::min</span>(<span class="ident">payload</span>.<span class="ident">len</span>(), <span class="ident">packet_size</span>);
-            <span class="kw">let</span> <span class="ident">split_payload</span> <span class="op">=</span> <span class="ident">payload</span>.<span class="ident">split_to</span>(<span class="ident">writable</span>);
+        <span class="kw">while </span>!payload.is_empty() {
+            <span class="kw">let </span>writable = cmp::min(payload.len(), packet_size);
+            <span class="kw">let </span>split_payload = payload.split_to(writable);
 
-            <span class="kw">if</span> <span class="ident">payload</span>.<span class="ident">is_empty</span>() {
-                <span class="ident">header</span>.<span class="ident">set_status</span>(<span class="ident">PacketStatus::EndOfMessage</span>);
-            } <span class="kw">else</span> {
-                <span class="ident">header</span>.<span class="ident">set_status</span>(<span class="ident">PacketStatus::NormalMessage</span>);
+            <span class="kw">if </span>payload.is_empty() {
+                header.set_status(PacketStatus::EndOfMessage);
+            } <span class="kw">else </span>{
+                header.set_status(PacketStatus::NormalMessage);
             }
 
             <span class="macro">event!</span>(
-                <span class="ident">Level::TRACE</span>,
+                Level::TRACE,
                 <span class="string">&quot;Sending a packet ({} bytes)&quot;</span>,
-                <span class="ident">split_payload</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">HEADER_BYTES</span>,
+                split_payload.len() + HEADER_BYTES,
             );
 
-            <span class="self">self</span>.<span class="ident">write_to_wire</span>(<span class="ident">header</span>, <span class="ident">split_payload</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            <span class="self">self</span>.write_to_wire(header, split_payload).<span class="kw">await</span><span class="question-mark">?</span>;
         }
 
-        <span class="self">self</span>.<span class="ident">flush_sink</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="self">self</span>.flush_sink().<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Sends a packet of data to the database.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Warning</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Please be sure the packet size doesn&#39;t exceed the largest allowed size</span>
-    <span class="doccomment">/// dictaded by the server.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">write_to_wire</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">header</span>: <span class="ident">PacketHeader</span>,
-        <span class="ident">data</span>: <span class="ident">BytesMut</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">flushed</span> <span class="op">=</span> <span class="bool-val">false</span>;
+    <span class="doccomment">/// Sends a packet of data to the database.
+    ///
+    /// # Warning
+    ///
+    /// Please be sure the packet size doesn&#39;t exceed the largest allowed size
+    /// dictaded by the server.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>write_to_wire(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        header: PacketHeader,
+        data: BytesMut,
+    ) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+        <span class="self">self</span>.flushed = <span class="bool-val">false</span>;
 
-        <span class="kw">let</span> <span class="ident">packet</span> <span class="op">=</span> <span class="ident">Packet::new</span>(<span class="ident">header</span>, <span class="ident">data</span>);
-        <span class="self">self</span>.<span class="ident">transport</span>.<span class="ident">send</span>(<span class="ident">packet</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>packet = Packet::new(header, data);
+        <span class="self">self</span>.transport.send(packet).<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// Sends all pending packages to the wire.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">flush_sink</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">transport</span>.<span class="ident">flush</span>().<span class="kw">await</span>
-    }
+    <span class="doccomment">/// Sends all pending packages to the wire.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>flush_sink(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+        <span class="self">self</span>.transport.flush().<span class="kw">await
+    </span>}
 
-    <span class="doccomment">/// Cleans the packet stream from previous use. It is important to use the</span>
-    <span class="doccomment">/// whole stream before using the connection again. Flushing the stream</span>
-    <span class="doccomment">/// makes sure we don&#39;t have any old data causing undefined behaviour after</span>
-    <span class="doccomment">/// previous queries.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Calling this will slow down the queries if stream is still dirty if all</span>
-    <span class="doccomment">/// results are not handled.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">flush_stream</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">truncate</span>(<span class="number">0</span>);
+    <span class="doccomment">/// Cleans the packet stream from previous use. It is important to use the
+    /// whole stream before using the connection again. Flushing the stream
+    /// makes sure we don&#39;t have any old data causing undefined behaviour after
+    /// previous queries.
+    ///
+    /// Calling this will slow down the queries if stream is still dirty if all
+    /// results are not handled.
+    </span><span class="kw">pub async fn </span>flush_stream(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+        <span class="self">self</span>.buf.truncate(<span class="number">0</span>);
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">flushed</span> {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+        <span class="kw">if </span><span class="self">self</span>.flushed {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(());
         }
 
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">packet</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">try_next</span>().<span class="kw">await</span><span class="question-mark">?</span> {
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(packet) = <span class="self">self</span>.try_next().<span class="kw">await</span><span class="question-mark">? </span>{
             <span class="macro">event!</span>(
-                <span class="ident">Level::WARN</span>,
+                Level::WARN,
                 <span class="string">&quot;Flushing unhandled packet from the wire. Please consume your streams!&quot;</span>,
             );
 
-            <span class="kw">let</span> <span class="ident">is_last</span> <span class="op">=</span> <span class="ident">packet</span>.<span class="ident">is_last</span>();
+            <span class="kw">let </span>is_last = packet.is_last();
 
-            <span class="kw">if</span> <span class="ident">is_last</span> {
+            <span class="kw">if </span>is_last {
                 <span class="kw">break</span>;
             }
         }
@@ -810,321 +810,321 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="doccomment">/// True if the underlying stream has no more data and is consumed</span>
-    <span class="doccomment">/// completely.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_eof</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">flushed</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">is_empty</span>()
+    <span class="doccomment">/// True if the underlying stream has no more data and is consumed
+    /// completely.
+    </span><span class="kw">pub fn </span>is_eof(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.flushed &amp;&amp; <span class="self">self</span>.buf.is_empty()
     }
 
-    <span class="doccomment">/// A message sent by the client to set up context for login. The server</span>
-    <span class="doccomment">/// responds to a client PRELOGIN message with a message of packet header</span>
-    <span class="doccomment">/// type 0x04 and with the packet data containing a PRELOGIN structure.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This message stream is also used to wrap the TLS handshake payload if</span>
-    <span class="doccomment">/// encryption is needed. In this scenario, where PRELOGIN message is</span>
-    <span class="doccomment">/// transporting the TLS handshake payload, the packet data is simply the</span>
-    <span class="doccomment">/// raw bytes of the TLS handshake payload.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">prelogin</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">encryption</span>: <span class="ident">EncryptionLevel</span>,
-        <span class="ident">fed_auth_required</span>: <span class="ident">bool</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">PreloginMessage</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">PreloginMessage::new</span>();
-        <span class="ident">msg</span>.<span class="ident">encryption</span> <span class="op">=</span> <span class="ident">encryption</span>;
-        <span class="ident">msg</span>.<span class="ident">fed_auth_required</span> <span class="op">=</span> <span class="ident">fed_auth_required</span>;
+    <span class="doccomment">/// A message sent by the client to set up context for login. The server
+    /// responds to a client PRELOGIN message with a message of packet header
+    /// type 0x04 and with the packet data containing a PRELOGIN structure.
+    ///
+    /// This message stream is also used to wrap the TLS handshake payload if
+    /// encryption is needed. In this scenario, where PRELOGIN message is
+    /// transporting the TLS handshake payload, the packet data is simply the
+    /// raw bytes of the TLS handshake payload.
+    </span><span class="kw">async fn </span>prelogin(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        encryption: EncryptionLevel,
+        fed_auth_required: bool,
+    ) -&gt; <span class="kw">crate</span>::Result&lt;PreloginMessage&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>msg = PreloginMessage::new();
+        msg.encryption = encryption;
+        msg.fed_auth_required = fed_auth_required;
 
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>.<span class="ident">next_packet_id</span>();
-        <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">PacketHeader::pre_login</span>(<span class="ident">id</span>), <span class="ident">msg</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw">let </span>id = <span class="self">self</span>.context.next_packet_id();
+        <span class="self">self</span>.send(PacketHeader::pre_login(id), msg).<span class="kw">await</span><span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">response</span>: <span class="ident">PreloginMessage</span> <span class="op">=</span> <span class="ident">codec::collect_from</span>(<span class="self">self</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-        <span class="comment">// threadid (should be empty when sent from server to client)</span>
-        <span class="macro">debug_assert_eq!</span>(<span class="ident">response</span>.<span class="ident">thread_id</span>, <span class="number">0</span>);
-        <span class="prelude-val">Ok</span>(<span class="ident">response</span>)
+        <span class="kw">let </span>response: PreloginMessage = codec::collect_from(<span class="self">self</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="comment">// threadid (should be empty when sent from server to client)
+        </span><span class="macro">debug_assert_eq!</span>(response.thread_id, <span class="number">0</span>);
+        <span class="prelude-val">Ok</span>(response)
     }
 
-    <span class="doccomment">/// Defines the login record rules with SQL Server. Authentication with</span>
-    <span class="doccomment">/// connection options.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">login</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">auth</span>: <span class="ident">AuthMethod</span>,
-        <span class="ident">encryption</span>: <span class="ident">EncryptionLevel</span>,
-        <span class="ident">db</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="ident">server_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="ident">application_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="ident">prelogin</span>: <span class="ident">PreloginMessage</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">login_message</span> <span class="op">=</span> <span class="ident">LoginMessage::new</span>();
+    <span class="doccomment">/// Defines the login record rules with SQL Server. Authentication with
+    /// connection options.
+    </span><span class="kw">async fn </span>login&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">mut </span><span class="self">self</span>,
+        auth: AuthMethod,
+        encryption: EncryptionLevel,
+        db: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        server_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        application_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
+        prelogin: PreloginMessage,
+    ) -&gt; <span class="kw">crate</span>::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>login_message = LoginMessage::new();
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">db</span>) <span class="op">=</span> <span class="ident">db</span> {
-            <span class="ident">login_message</span>.<span class="ident">db_name</span>(<span class="ident">db</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(db) = db {
+            login_message.db_name(db);
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">server_name</span>) <span class="op">=</span> <span class="ident">server_name</span> {
-            <span class="ident">login_message</span>.<span class="ident">server_name</span>(<span class="ident">server_name</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(server_name) = server_name {
+            login_message.server_name(server_name);
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">app_name</span>) <span class="op">=</span> <span class="ident">application_name</span> {
-            <span class="ident">login_message</span>.<span class="ident">app_name</span>(<span class="ident">app_name</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(app_name) = application_name {
+            login_message.app_name(app_name);
         }
 
-        <span class="kw">match</span> <span class="ident">auth</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">windows</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;winauth&quot;</span>))]</span>
-            <span class="ident">AuthMethod::Integrated</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">NtlmSspiBuilder::new</span>()
-                    .<span class="ident">target_spn</span>(<span class="self">self</span>.<span class="ident">context</span>.<span class="ident">spn</span>())
-                    .<span class="ident">build</span>()<span class="question-mark">?</span>;
+        <span class="kw">match </span>auth {
+            <span class="attribute">#[cfg(all(windows, feature = <span class="string">&quot;winauth&quot;</span>))]
+            </span>AuthMethod::Integrated =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>client = NtlmSspiBuilder::new()
+                    .target_spn(<span class="self">self</span>.context.spn())
+                    .build()<span class="question-mark">?</span>;
 
-                <span class="ident">login_message</span>.<span class="ident">integrated_security</span>(<span class="ident">client</span>.<span class="ident">next_bytes</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>);
+                login_message.integrated_security(client.next_bytes(<span class="prelude-val">None</span>)<span class="question-mark">?</span>);
 
-                <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>.<span class="ident">next_packet_id</span>();
-                <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">PacketHeader::login</span>(<span class="ident">id</span>), <span class="ident">login_message</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">let </span>id = <span class="self">self</span>.context.next_packet_id();
+                <span class="self">self</span>.send(PacketHeader::login(id), login_message).<span class="kw">await</span><span class="question-mark">?</span>;
 
-                <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">post_login_encryption</span>(<span class="ident">encryption</span>);
+                <span class="self">self </span>= <span class="self">self</span>.post_login_encryption(encryption);
 
-                <span class="kw">let</span> <span class="ident">sspi_bytes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">flush_sspi</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">let </span>sspi_bytes = <span class="self">self</span>.flush_sspi().<span class="kw">await</span><span class="question-mark">?</span>;
 
-                <span class="kw">match</span> <span class="ident">client</span>.<span class="ident">next_bytes</span>(<span class="prelude-val">Some</span>(<span class="ident">sspi_bytes</span>.<span class="ident">as_ref</span>()))<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">sspi_response</span>) =&gt; {
-                        <span class="macro">event!</span>(<span class="ident">Level::TRACE</span>, <span class="ident">sspi_response_len</span> <span class="op">=</span> <span class="ident">sspi_response</span>.<span class="ident">len</span>());
+                <span class="kw">match </span>client.next_bytes(<span class="prelude-val">Some</span>(sspi_bytes.as_ref()))<span class="question-mark">? </span>{
+                    <span class="prelude-val">Some</span>(sspi_response) =&gt; {
+                        <span class="macro">event!</span>(Level::TRACE, sspi_response_len = sspi_response.len());
 
-                        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>.<span class="ident">next_packet_id</span>();
-                        <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">PacketHeader::login</span>(<span class="ident">id</span>);
+                        <span class="kw">let </span>id = <span class="self">self</span>.context.next_packet_id();
+                        <span class="kw">let </span>header = PacketHeader::login(id);
 
-                        <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="ident">TokenSspi::new</span>(<span class="ident">sspi_response</span>);
-                        <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">header</span>, <span class="ident">token</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                        <span class="kw">let </span>token = TokenSspi::new(sspi_response);
+                        <span class="self">self</span>.send(header, token).<span class="kw">await</span><span class="question-mark">?</span>;
                     }
-                    <span class="prelude-val">None</span> =&gt; <span class="macro">unreachable!</span>(),
+                    <span class="prelude-val">None </span>=&gt; <span class="macro">unreachable!</span>(),
                 }
             }
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">unix</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;integrated-auth-gssapi&quot;</span>))]</span>
-            <span class="ident">AuthMethod::Integrated</span> =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">OidSet::new</span>()<span class="question-mark">?</span>;
-                <span class="ident">s</span>.<span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="ident">GSS_MECH_KRB5</span>)<span class="question-mark">?</span>;
+            <span class="attribute">#[cfg(all(unix, feature = <span class="string">&quot;integrated-auth-gssapi&quot;</span>))]
+            </span>AuthMethod::Integrated =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>s = OidSet::new()<span class="question-mark">?</span>;
+                s.add(<span class="kw-2">&amp;</span>GSS_MECH_KRB5)<span class="question-mark">?</span>;
 
-                <span class="kw">let</span> <span class="ident">client_cred</span> <span class="op">=</span> <span class="ident">Cred::acquire</span>(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, <span class="ident">CredUsage::Initiate</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>))<span class="question-mark">?</span>;
+                <span class="kw">let </span>client_cred = Cred::acquire(<span class="prelude-val">None</span>, <span class="prelude-val">None</span>, CredUsage::Initiate, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>s))<span class="question-mark">?</span>;
 
-                <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">ClientCtx::new</span>(
-                    <span class="ident">client_cred</span>,
-                    <span class="ident">Name::new</span>(<span class="self">self</span>.<span class="ident">context</span>.<span class="ident">spn</span>().<span class="ident">as_bytes</span>(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">GSS_NT_KRB5_PRINCIPAL</span>))<span class="question-mark">?</span>,
-                    <span class="ident">CtxFlags::GSS_C_MUTUAL_FLAG</span> <span class="op">|</span> <span class="ident">CtxFlags::GSS_C_SEQUENCE_FLAG</span>,
+                <span class="kw">let </span>ctx = ClientCtx::new(
+                    client_cred,
+                    Name::new(<span class="self">self</span>.context.spn().as_bytes(), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>GSS_NT_KRB5_PRINCIPAL))<span class="question-mark">?</span>,
+                    CtxFlags::GSS_C_MUTUAL_FLAG | CtxFlags::GSS_C_SEQUENCE_FLAG,
                     <span class="prelude-val">None</span>,
                 );
 
-                <span class="kw">let</span> <span class="ident">init_token</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">step</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
+                <span class="kw">let </span>init_token = ctx.step(<span class="prelude-val">None</span>)<span class="question-mark">?</span>;
 
-                <span class="ident">login_message</span>.<span class="ident">integrated_security</span>(<span class="prelude-val">Some</span>(<span class="ident">Vec::from</span>(<span class="ident">init_token</span>.<span class="ident">unwrap</span>().<span class="ident">deref</span>())));
+                login_message.integrated_security(<span class="prelude-val">Some</span>(Vec::from(init_token.unwrap().deref())));
 
-                <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>.<span class="ident">next_packet_id</span>();
-                <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">PacketHeader::login</span>(<span class="ident">id</span>), <span class="ident">login_message</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">let </span>id = <span class="self">self</span>.context.next_packet_id();
+                <span class="self">self</span>.send(PacketHeader::login(id), login_message).<span class="kw">await</span><span class="question-mark">?</span>;
 
-                <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">post_login_encryption</span>(<span class="ident">encryption</span>);
+                <span class="self">self </span>= <span class="self">self</span>.post_login_encryption(encryption);
 
-                <span class="kw">let</span> <span class="ident">auth_bytes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">flush_sspi</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">let </span>auth_bytes = <span class="self">self</span>.flush_sspi().<span class="kw">await</span><span class="question-mark">?</span>;
 
-                <span class="kw">let</span> <span class="ident">next_token</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ctx</span>.<span class="ident">step</span>(<span class="prelude-val">Some</span>(<span class="ident">auth_bytes</span>.<span class="ident">as_ref</span>()))<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">response</span>) =&gt; {
-                        <span class="macro">event!</span>(<span class="ident">Level::TRACE</span>, <span class="ident">response_len</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">len</span>());
-                        <span class="ident">TokenSspi::new</span>(<span class="ident">Vec::from</span>(<span class="ident">response</span>.<span class="ident">deref</span>()))
+                <span class="kw">let </span>next_token = <span class="kw">match </span>ctx.step(<span class="prelude-val">Some</span>(auth_bytes.as_ref()))<span class="question-mark">? </span>{
+                    <span class="prelude-val">Some</span>(response) =&gt; {
+                        <span class="macro">event!</span>(Level::TRACE, response_len = response.len());
+                        TokenSspi::new(Vec::from(response.deref()))
                     }
-                    <span class="prelude-val">None</span> =&gt; {
-                        <span class="macro">event!</span>(<span class="ident">Level::TRACE</span>, <span class="ident">response_len</span> <span class="op">=</span> <span class="number">0</span>);
-                        <span class="ident">TokenSspi::new</span>(<span class="ident">Vec::new</span>())
+                    <span class="prelude-val">None </span>=&gt; {
+                        <span class="macro">event!</span>(Level::TRACE, response_len = <span class="number">0</span>);
+                        TokenSspi::new(Vec::new())
                     }
                 };
 
-                <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>.<span class="ident">next_packet_id</span>();
-                <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">PacketHeader::login</span>(<span class="ident">id</span>);
+                <span class="kw">let </span>id = <span class="self">self</span>.context.next_packet_id();
+                <span class="kw">let </span>header = PacketHeader::login(id);
 
-                <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">header</span>, <span class="ident">next_token</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="self">self</span>.send(header, next_token).<span class="kw">await</span><span class="question-mark">?</span>;
             }
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">windows</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;winauth&quot;</span>))]</span>
-            <span class="ident">AuthMethod::Windows</span>(<span class="ident">auth</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">spn</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>.<span class="ident">spn</span>().<span class="ident">to_string</span>();
-                <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">winauth::NtlmV2ClientBuilder::new</span>().<span class="ident">target_spn</span>(<span class="ident">spn</span>);
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">builder</span>.<span class="ident">build</span>(<span class="ident">auth</span>.<span class="ident">domain</span>, <span class="ident">auth</span>.<span class="ident">user</span>, <span class="ident">auth</span>.<span class="ident">password</span>);
+            <span class="attribute">#[cfg(all(windows, feature = <span class="string">&quot;winauth&quot;</span>))]
+            </span>AuthMethod::Windows(auth) =&gt; {
+                <span class="kw">let </span>spn = <span class="self">self</span>.context.spn().to_string();
+                <span class="kw">let </span>builder = winauth::NtlmV2ClientBuilder::new().target_spn(spn);
+                <span class="kw">let </span><span class="kw-2">mut </span>client = builder.build(auth.domain, auth.user, auth.password);
 
-                <span class="ident">login_message</span>.<span class="ident">integrated_security</span>(<span class="ident">client</span>.<span class="ident">next_bytes</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>);
+                login_message.integrated_security(client.next_bytes(<span class="prelude-val">None</span>)<span class="question-mark">?</span>);
 
-                <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>.<span class="ident">next_packet_id</span>();
-                <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">PacketHeader::login</span>(<span class="ident">id</span>), <span class="ident">login_message</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">let </span>id = <span class="self">self</span>.context.next_packet_id();
+                <span class="self">self</span>.send(PacketHeader::login(id), login_message).<span class="kw">await</span><span class="question-mark">?</span>;
 
-                <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">post_login_encryption</span>(<span class="ident">encryption</span>);
+                <span class="self">self </span>= <span class="self">self</span>.post_login_encryption(encryption);
 
-                <span class="kw">let</span> <span class="ident">sspi_bytes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">flush_sspi</span>().<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">let </span>sspi_bytes = <span class="self">self</span>.flush_sspi().<span class="kw">await</span><span class="question-mark">?</span>;
 
-                <span class="kw">match</span> <span class="ident">client</span>.<span class="ident">next_bytes</span>(<span class="prelude-val">Some</span>(<span class="ident">sspi_bytes</span>.<span class="ident">as_ref</span>()))<span class="question-mark">?</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">sspi_response</span>) =&gt; {
-                        <span class="macro">event!</span>(<span class="ident">Level::TRACE</span>, <span class="ident">sspi_response_len</span> <span class="op">=</span> <span class="ident">sspi_response</span>.<span class="ident">len</span>());
+                <span class="kw">match </span>client.next_bytes(<span class="prelude-val">Some</span>(sspi_bytes.as_ref()))<span class="question-mark">? </span>{
+                    <span class="prelude-val">Some</span>(sspi_response) =&gt; {
+                        <span class="macro">event!</span>(Level::TRACE, sspi_response_len = sspi_response.len());
 
-                        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>.<span class="ident">next_packet_id</span>();
-                        <span class="kw">let</span> <span class="ident">header</span> <span class="op">=</span> <span class="ident">PacketHeader::login</span>(<span class="ident">id</span>);
+                        <span class="kw">let </span>id = <span class="self">self</span>.context.next_packet_id();
+                        <span class="kw">let </span>header = PacketHeader::login(id);
 
-                        <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="ident">TokenSspi::new</span>(<span class="ident">sspi_response</span>);
-                        <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">header</span>, <span class="ident">token</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                        <span class="kw">let </span>token = TokenSspi::new(sspi_response);
+                        <span class="self">self</span>.send(header, token).<span class="kw">await</span><span class="question-mark">?</span>;
                     }
-                    <span class="prelude-val">None</span> =&gt; <span class="macro">unreachable!</span>(),
+                    <span class="prelude-val">None </span>=&gt; <span class="macro">unreachable!</span>(),
                 }
             }
-            <span class="ident">AuthMethod::None</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>.<span class="ident">next_packet_id</span>();
-                <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">PacketHeader::login</span>(<span class="ident">id</span>), <span class="ident">login_message</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">post_login_encryption</span>(<span class="ident">encryption</span>);
+            AuthMethod::None =&gt; {
+                <span class="kw">let </span>id = <span class="self">self</span>.context.next_packet_id();
+                <span class="self">self</span>.send(PacketHeader::login(id), login_message).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="self">self </span>= <span class="self">self</span>.post_login_encryption(encryption);
             }
-            <span class="ident">AuthMethod::SqlServer</span>(<span class="ident">auth</span>) =&gt; {
-                <span class="ident">login_message</span>.<span class="ident">user_name</span>(<span class="ident">auth</span>.<span class="ident">user</span>());
-                <span class="ident">login_message</span>.<span class="ident">password</span>(<span class="ident">auth</span>.<span class="ident">password</span>());
+            AuthMethod::SqlServer(auth) =&gt; {
+                login_message.user_name(auth.user());
+                login_message.password(auth.password());
 
-                <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>.<span class="ident">next_packet_id</span>();
-                <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">PacketHeader::login</span>(<span class="ident">id</span>), <span class="ident">login_message</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">post_login_encryption</span>(<span class="ident">encryption</span>);
+                <span class="kw">let </span>id = <span class="self">self</span>.context.next_packet_id();
+                <span class="self">self</span>.send(PacketHeader::login(id), login_message).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="self">self </span>= <span class="self">self</span>.post_login_encryption(encryption);
             }
-            <span class="ident">AuthMethod::AADToken</span>(<span class="ident">token</span>) =&gt; {
-                <span class="ident">login_message</span>.<span class="ident">aad_token</span>(<span class="ident">token</span>, <span class="ident">prelogin</span>.<span class="ident">fed_auth_required</span>, <span class="ident">prelogin</span>.<span class="ident">nonce</span>);
-                <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>.<span class="ident">next_packet_id</span>();
-                <span class="self">self</span>.<span class="ident">send</span>(<span class="ident">PacketHeader::login</span>(<span class="ident">id</span>), <span class="ident">login_message</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-                <span class="self">self</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">post_login_encryption</span>(<span class="ident">encryption</span>);
+            AuthMethod::AADToken(token) =&gt; {
+                login_message.aad_token(token, prelogin.fed_auth_required, prelogin.nonce);
+                <span class="kw">let </span>id = <span class="self">self</span>.context.next_packet_id();
+                <span class="self">self</span>.send(PacketHeader::login(id), login_message).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="self">self </span>= <span class="self">self</span>.post_login_encryption(encryption);
             }
         }
 
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Implements the TLS handshake with the SQL Server.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(
-        <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls&quot;</span>,
-        <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native-tls&quot;</span>,
-        <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vendored-openssl&quot;</span>
-    ))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">tls_handshake</span>(
+    <span class="doccomment">/// Implements the TLS handshake with the SQL Server.
+    </span><span class="attribute">#[cfg(any(
+        feature = <span class="string">&quot;rustls&quot;</span>,
+        feature = <span class="string">&quot;native-tls&quot;</span>,
+        feature = <span class="string">&quot;vendored-openssl&quot;
+    </span>))]
+    </span><span class="kw">async fn </span>tls_handshake(
         <span class="self">self</span>,
-        <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">Config</span>,
-        <span class="ident">encryption</span>: <span class="ident">EncryptionLevel</span>,
-    ) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">encryption</span> <span class="op">!</span><span class="op">=</span> <span class="ident">EncryptionLevel::NotSupported</span> {
-            <span class="macro">event!</span>(<span class="ident">Level::INFO</span>, <span class="string">&quot;Performing a TLS handshake&quot;</span>);
+        config: <span class="kw-2">&amp;</span>Config,
+        encryption: EncryptionLevel,
+    ) -&gt; <span class="kw">crate</span>::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">if </span>encryption != EncryptionLevel::NotSupported {
+            <span class="macro">event!</span>(Level::INFO, <span class="string">&quot;Performing a TLS handshake&quot;</span>);
 
-            <span class="kw">let</span> <span class="self">Self</span> {
-                <span class="ident">transport</span>, <span class="ident">context</span>, ..
-            } <span class="op">=</span> <span class="self">self</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stream</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">transport</span>.<span class="ident">into_inner</span>() {
-                <span class="ident">MaybeTlsStream::Raw</span>(<span class="ident">tcp</span>) =&gt; {
-                    <span class="ident">create_tls_stream</span>(<span class="ident">config</span>, <span class="ident">TlsPreloginWrapper::new</span>(<span class="ident">tcp</span>)).<span class="kw">await</span><span class="question-mark">?</span>
-                }
-                <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+            <span class="kw">let </span><span class="self">Self </span>{
+                transport, context, ..
+            } = <span class="self">self</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>stream = <span class="kw">match </span>transport.into_inner() {
+                MaybeTlsStream::Raw(tcp) =&gt; {
+                    create_tls_stream(config, TlsPreloginWrapper::new(tcp)).<span class="kw">await</span><span class="question-mark">?
+                </span>}
+                <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
             };
 
-            <span class="ident">stream</span>.<span class="ident">get_mut</span>().<span class="ident">handshake_complete</span>();
-            <span class="macro">event!</span>(<span class="ident">Level::INFO</span>, <span class="string">&quot;TLS handshake successful&quot;</span>);
+            stream.get_mut().handshake_complete();
+            <span class="macro">event!</span>(Level::INFO, <span class="string">&quot;TLS handshake successful&quot;</span>);
 
-            <span class="kw">let</span> <span class="ident">transport</span> <span class="op">=</span> <span class="ident">Framed::new</span>(<span class="ident">MaybeTlsStream::Tls</span>(<span class="ident">stream</span>), <span class="ident">PacketCodec</span>);
+            <span class="kw">let </span>transport = Framed::new(MaybeTlsStream::Tls(stream), PacketCodec);
 
-            <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-                <span class="ident">transport</span>,
-                <span class="ident">context</span>,
-                <span class="ident">flushed</span>: <span class="bool-val">false</span>,
-                <span class="ident">buf</span>: <span class="ident">BytesMut::new</span>(),
+            <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+                transport,
+                context,
+                flushed: <span class="bool-val">false</span>,
+                buf: BytesMut::new(),
             })
-        } <span class="kw">else</span> {
+        } <span class="kw">else </span>{
             <span class="macro">event!</span>(
-                <span class="ident">Level::WARN</span>,
-                <span class="string">&quot;TLS encryption is not enabled. All traffic including the login credentials are not encrypted.&quot;</span>
-            );
+                Level::WARN,
+                <span class="string">&quot;TLS encryption is not enabled. All traffic including the login credentials are not encrypted.&quot;
+            </span>);
 
             <span class="prelude-val">Ok</span>(<span class="self">self</span>)
         }
     }
 
-    <span class="doccomment">/// Implements the TLS handshake with the SQL Server.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(
-        <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls&quot;</span>,
-        <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native-tls&quot;</span>,
-        <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vendored-openssl&quot;</span>
-    )))]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">tls_handshake</span>(<span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Config</span>, <span class="kw">_</span>: <span class="ident">EncryptionLevel</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Implements the TLS handshake with the SQL Server.
+    </span><span class="attribute">#[cfg(not(any(
+        feature = <span class="string">&quot;rustls&quot;</span>,
+        feature = <span class="string">&quot;native-tls&quot;</span>,
+        feature = <span class="string">&quot;vendored-openssl&quot;
+    </span>)))]
+    </span><span class="kw">async fn </span>tls_handshake(<span class="self">self</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span>Config, <span class="kw">_</span>: EncryptionLevel) -&gt; <span class="kw">crate</span>::Result&lt;<span class="self">Self</span>&gt; {
         <span class="macro">event!</span>(
-            <span class="ident">Level::WARN</span>,
-            <span class="string">&quot;TLS encryption is not enabled. All traffic including the login credentials are not encrypted.&quot;</span>
-        );
+            Level::WARN,
+            <span class="string">&quot;TLS encryption is not enabled. All traffic including the login credentials are not encrypted.&quot;
+        </span>);
 
         <span class="prelude-val">Ok</span>(<span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Stream</span> <span class="kw">for</span> <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Packet</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;S: AsyncRead + AsyncWrite + Unpin + Send&gt; Stream <span class="kw">for </span>Connection&lt;S&gt; {
+    <span class="kw">type </span>Item = <span class="kw">crate</span>::Result&lt;Packet&gt;;
 
-    <span class="kw">fn</span> <span class="ident">poll_next</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_mut</span>();
+    <span class="kw">fn </span>poll_next(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>::Item&gt;&gt; {
+        <span class="kw">let </span>this = <span class="self">self</span>.get_mut();
 
-        <span class="kw">match</span> <span class="macro">ready!</span>(<span class="ident">this</span>.<span class="ident">transport</span>.<span class="ident">try_poll_next_unpin</span>(<span class="ident">cx</span>)) {
-            <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">packet</span>)) =&gt; {
-                <span class="ident">this</span>.<span class="ident">flushed</span> <span class="op">=</span> <span class="ident">packet</span>.<span class="ident">is_last</span>();
-                <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">packet</span>)))
+        <span class="kw">match </span><span class="macro">ready!</span>(this.transport.try_poll_next_unpin(cx)) {
+            <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(packet)) =&gt; {
+                this.flushed = packet.is_last();
+                Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(packet)))
             }
-            <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>)) =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>))),
-            <span class="prelude-val">None</span> =&gt; <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>),
+            <span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(e)) =&gt; Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(e))),
+            <span class="prelude-val">None </span>=&gt; Poll::Ready(<span class="prelude-val">None</span>),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">futures::AsyncRead</span> <span class="kw">for</span> <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">poll_read</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">this</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_mut</span>();
-        <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">len</span>();
+<span class="kw">impl</span>&lt;S: AsyncRead + AsyncWrite + Unpin + Send&gt; futures::AsyncRead <span class="kw">for </span>Connection&lt;S&gt; {
+    <span class="kw">fn </span>poll_read(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        buf: <span class="kw-2">&amp;mut </span>[u8],
+    ) -&gt; Poll&lt;io::Result&lt;usize&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>this = <span class="self">self</span>.get_mut();
+        <span class="kw">let </span>size = buf.len();
 
-        <span class="kw">if</span> <span class="ident">this</span>.<span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="ident">size</span> {
-            <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">item</span>) <span class="op">=</span> <span class="macro">ready!</span>(<span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">this</span>).<span class="ident">try_poll_next</span>(<span class="ident">cx</span>)) {
-                <span class="kw">match</span> <span class="ident">item</span> {
-                    <span class="prelude-val">Ok</span>(<span class="ident">packet</span>) =&gt; {
-                        <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">payload</span>) <span class="op">=</span> <span class="ident">packet</span>.<span class="ident">into_parts</span>();
-                        <span class="ident">this</span>.<span class="ident">buf</span>.<span class="ident">extend</span>(<span class="ident">payload</span>);
+        <span class="kw">if </span>this.buf.len() &lt; size {
+            <span class="kw">while let </span><span class="prelude-val">Some</span>(item) = <span class="macro">ready!</span>(Pin::new(<span class="kw-2">&amp;mut </span>this).try_poll_next(cx)) {
+                <span class="kw">match </span>item {
+                    <span class="prelude-val">Ok</span>(packet) =&gt; {
+                        <span class="kw">let </span>(<span class="kw">_</span>, payload) = packet.into_parts();
+                        this.buf.extend(payload);
 
-                        <span class="kw">if</span> <span class="ident">this</span>.<span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">size</span> {
+                        <span class="kw">if </span>this.buf.len() &gt;= size {
                             <span class="kw">break</span>;
                         }
                     }
-                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-                        <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
-                            <span class="ident">io::ErrorKind::BrokenPipe</span>,
-                            <span class="ident">e</span>.<span class="ident">to_string</span>(),
+                    <span class="prelude-val">Err</span>(e) =&gt; {
+                        <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Err</span>(io::Error::new(
+                            io::ErrorKind::BrokenPipe,
+                            e.to_string(),
                         )))
                     }
                 }
             }
 
-            <span class="comment">// Got EOF before having all the data.</span>
-            <span class="kw">if</span> <span class="ident">this</span>.<span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="ident">size</span> {
-                <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
-                    <span class="ident">io::ErrorKind::UnexpectedEof</span>,
+            <span class="comment">// Got EOF before having all the data.
+            </span><span class="kw">if </span>this.buf.len() &lt; size {
+                <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Err</span>(io::Error::new(
+                    io::ErrorKind::UnexpectedEof,
                     <span class="string">&quot;No more packets in the wire&quot;</span>,
                 )));
             }
         }
 
-        <span class="ident">buf</span>.<span class="ident">copy_from_slice</span>(<span class="ident">this</span>.<span class="ident">buf</span>.<span class="ident">split_to</span>(<span class="ident">size</span>).<span class="ident">as_ref</span>());
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">size</span>))
+        buf.copy_from_slice(this.buf.split_to(size).as_ref());
+        Poll::Ready(<span class="prelude-val">Ok</span>(size))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">SqlReadBytes</span> <span class="kw">for</span> <span class="ident">Connection</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Hex dump of the current buffer.</span>
-    <span class="kw">fn</span> <span class="ident">debug_buffer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="macro">dbg!</span>(<span class="self">self</span>.<span class="ident">buf</span>.<span class="ident">as_ref</span>().<span class="ident">hex_dump</span>());
+<span class="kw">impl</span>&lt;S: AsyncRead + AsyncWrite + Unpin + Send&gt; SqlReadBytes <span class="kw">for </span>Connection&lt;S&gt; {
+    <span class="doccomment">/// Hex dump of the current buffer.
+    </span><span class="kw">fn </span>debug_buffer(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="macro">dbg!</span>(<span class="self">self</span>.buf.as_ref().hex_dump());
     }
 
-    <span class="doccomment">/// The current execution context.</span>
-    <span class="kw">fn</span> <span class="ident">context</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Context</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">context</span>
+    <span class="doccomment">/// The current execution context.
+    </span><span class="kw">fn </span>context(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Context {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.context
     }
 
-    <span class="doccomment">/// A mutable reference to the current execution context.</span>
-    <span class="kw">fn</span> <span class="ident">context_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Context</span> {
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">context</span>
+    <span class="doccomment">/// A mutable reference to the current execution context.
+    </span><span class="kw">fn </span>context_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>Context {
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>.context
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tiberius" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tiberius" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

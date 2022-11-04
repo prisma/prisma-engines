@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/parse-hyperlinks-0.23.4/src/parser/markdown.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>markdown.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../parse_hyperlinks/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../parse_hyperlinks/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../parse_hyperlinks/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/parse-hyperlinks-0.23.4/src/parser/markdown.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>markdown.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../parse_hyperlinks/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../parse_hyperlinks/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../parse_hyperlinks/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -803,810 +803,810 @@
 <span id="803">803</span>
 <span id="804">804</span>
 <span id="805">805</span>
-</pre><pre class="rust"><code><span class="doccomment">//! This module implements parsers for Markdown hyperlinks.</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::type_complexity</span>)]</span>
+</pre><pre class="rust"><code><span class="doccomment">//! This module implements parsers for Markdown hyperlinks.
+</span><span class="attribute">#![allow(dead_code)]
+#![allow(clippy::type_complexity)]
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parser::parse::LABEL_LEN_MAX</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parser::Link</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::take_until_unbalanced</span>;
-<span class="kw">use</span> <span class="ident">nom::branch::alt</span>;
-<span class="kw">use</span> <span class="ident">nom::bytes::complete::tag</span>;
-<span class="kw">use</span> <span class="ident">nom::character::complete::multispace1</span>;
-<span class="kw">use</span> <span class="ident">nom::combinator</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::parser::parse::LABEL_LEN_MAX;
+<span class="kw">use </span><span class="kw">crate</span>::parser::Link;
+<span class="kw">use </span><span class="kw">crate</span>::take_until_unbalanced;
+<span class="kw">use </span>nom::branch::alt;
+<span class="kw">use </span>nom::bytes::complete::tag;
+<span class="kw">use </span>nom::character::complete::multispace1;
+<span class="kw">use </span>nom::combinator::<span class="kw-2">*</span>;
+<span class="kw">use </span>std::borrow::Cow;
 
-<span class="doccomment">/// The following character are escapable in _link text_, _link label_, _link</span>
-<span class="doccomment">/// destination_ and _link title_.</span>
-<span class="kw">const</span> <span class="ident">ESCAPABLE</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">r#&quot;\&#39;&quot;()[]{}&lt;&gt;&quot;#</span>;
+<span class="doccomment">/// The following character are escapable in _link text_, _link label_, _link
+/// destination_ and _link title_.
+</span><span class="kw">const </span>ESCAPABLE: <span class="kw-2">&amp;</span>str = <span class="string">r#&quot;\&#39;&quot;()[]{}&lt;&gt;&quot;#</span>;
 
-<span class="doccomment">/// Wrapper around `md_text2dest()` that packs the result in</span>
-<span class="doccomment">/// `Link::Text2Dest`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">md_text2dest_link</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Link</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">i</span>, (<span class="ident">te</span>, <span class="ident">de</span>, <span class="ident">ti</span>)) <span class="op">=</span> <span class="ident">md_text2dest</span>(<span class="ident">i</span>)<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>((<span class="ident">i</span>, <span class="ident">Link::Text2Dest</span>(<span class="ident">te</span>, <span class="ident">de</span>, <span class="ident">ti</span>)))
+<span class="doccomment">/// Wrapper around `md_text2dest()` that packs the result in
+/// `Link::Text2Dest`.
+</span><span class="kw">pub fn </span>md_text2dest_link(i: <span class="kw-2">&amp;</span>str) -&gt; nom::IResult&lt;<span class="kw-2">&amp;</span>str, Link&gt; {
+    <span class="kw">let </span>(i, (te, de, ti)) = md_text2dest(i)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>((i, Link::Text2Dest(te, de, ti)))
 }
 
-<span class="doccomment">/// Parses a Markdown _inline link_.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This parser expects to start at the beginning of the link `[` to succeed.</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use parse_hyperlinks::parser::Link;</span>
-<span class="doccomment">/// use parse_hyperlinks::parser::markdown::md_text2dest;</span>
-<span class="doccomment">/// use std::borrow::Cow;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///   md_text2dest(r#&quot;[text](&lt;destination&gt; &quot;title&quot;)abc&quot;#),</span>
-<span class="doccomment">///   Ok((&quot;abc&quot;, (Cow::from(&quot;text&quot;), Cow::from(&quot;destination&quot;), Cow::from(&quot;title&quot;))))</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">md_text2dest</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">i</span>, <span class="ident">link_text</span>) <span class="op">=</span> <span class="ident">md_link_text</span>(<span class="ident">i</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> (<span class="ident">i</span>, (<span class="ident">link_destination</span>, <span class="ident">link_title</span>)) <span class="op">=</span> <span class="ident">md_link_destination_enclosed</span>(<span class="ident">i</span>)<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>((<span class="ident">i</span>, (<span class="ident">link_text</span>, <span class="ident">link_destination</span>, <span class="ident">link_title</span>)))
+<span class="doccomment">/// Parses a Markdown _inline link_.
+///
+/// This parser expects to start at the beginning of the link `[` to succeed.
+/// ```
+/// use parse_hyperlinks::parser::Link;
+/// use parse_hyperlinks::parser::markdown::md_text2dest;
+/// use std::borrow::Cow;
+///
+/// assert_eq!(
+///   md_text2dest(r#&quot;[text](&lt;destination&gt; &quot;title&quot;)abc&quot;#),
+///   Ok((&quot;abc&quot;, (Cow::from(&quot;text&quot;), Cow::from(&quot;destination&quot;), Cow::from(&quot;title&quot;))))
+/// );
+/// ```
+</span><span class="kw">pub fn </span>md_text2dest(i: <span class="kw-2">&amp;</span>str) -&gt; nom::IResult&lt;<span class="kw-2">&amp;</span>str, (Cow&lt;str&gt;, Cow&lt;str&gt;, Cow&lt;str&gt;)&gt; {
+    <span class="kw">let </span>(i, link_text) = md_link_text(i)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(i, (link_destination, link_title)) = md_link_destination_enclosed(i)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>((i, (link_text, link_destination, link_title)))
 }
 
-<span class="doccomment">/// Wrapper around `md_label2dest()` that packs the result in</span>
-<span class="doccomment">/// `Link::Label2Dest`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">md_label2dest_link</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Link</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">i</span>, (<span class="ident">l</span>, <span class="ident">d</span>, <span class="ident">t</span>)) <span class="op">=</span> <span class="ident">md_label2dest</span>(<span class="ident">i</span>)<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>((<span class="ident">i</span>, <span class="ident">Link::Label2Dest</span>(<span class="ident">l</span>, <span class="ident">d</span>, <span class="ident">t</span>)))
+<span class="doccomment">/// Wrapper around `md_label2dest()` that packs the result in
+/// `Link::Label2Dest`.
+</span><span class="kw">pub fn </span>md_label2dest_link(i: <span class="kw-2">&amp;</span>str) -&gt; nom::IResult&lt;<span class="kw-2">&amp;</span>str, Link&gt; {
+    <span class="kw">let </span>(i, (l, d, t)) = md_label2dest(i)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>((i, Link::Label2Dest(l, d, t)))
 }
 
-<span class="doccomment">/// Matches a Markdown _link reference definition_.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The caller must guarantee, that the parser starts at first character of the</span>
-<span class="doccomment">/// input or at the first character of a line. The parser consumes all bytes</span>
-<span class="doccomment">/// until the end of the line.</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use parse_hyperlinks::parser::Link;</span>
-<span class="doccomment">/// use parse_hyperlinks::parser::markdown::md_label2dest;</span>
-<span class="doccomment">/// use std::borrow::Cow;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///   md_label2dest(&quot;   [label]: &lt;destination&gt; &#39;title&#39;\nabc&quot;),</span>
-<span class="doccomment">///   Ok((&quot;\nabc&quot;, (Cow::from(&quot;label&quot;), Cow::from(&quot;destination&quot;), Cow::from(&quot;title&quot;))))</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [CommonMark</span>
-<span class="doccomment">/// Spec](https://spec.commonmark.org/0.30/#link-reference-definition)\ A [link</span>
-<span class="doccomment">/// reference</span>
-<span class="doccomment">/// definition](https://spec.commonmark.org/0.30/#link-reference-definition)</span>
-<span class="doccomment">/// consists of a [link label](https://spec.commonmark.org/0.30/#link-label),</span>
-<span class="doccomment">/// optionally preceded by up to three spaces of indentation, followed by a</span>
-<span class="doccomment">/// colon (`:`), optional spaces or tabs (including up to one [line</span>
-<span class="doccomment">/// ending](https://spec.commonmark.org/0.30/#line-ending)), a [link</span>
-<span class="doccomment">/// destination](https://spec.commonmark.org/0.30/#link-destination), optional</span>
-<span class="doccomment">/// spaces or tabs (including up to one [line</span>
-<span class="doccomment">/// ending](https://spec.commonmark.org/0.30/#line-ending)), and an optional</span>
-<span class="doccomment">/// [link title](https://spec.commonmark.org/0.30/#link-title), which if it is</span>
-<span class="doccomment">/// present must be separated from the [link</span>
-<span class="doccomment">/// destination](https://spec.commonmark.org/0.30/#link-destination) by spaces</span>
-<span class="doccomment">/// or tabs. No further character may occur.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A [link reference</span>
-<span class="doccomment">/// definition](https://spec.commonmark.org/0.30/#link-reference-definition)</span>
-<span class="doccomment">/// does not correspond to a structural element of a document. Instead, it</span>
-<span class="doccomment">/// defines a label which can be used in [reference</span>
-<span class="doccomment">/// links](https://spec.commonmark.org/0.30/#reference-link) and reference-style</span>
-<span class="doccomment">/// [images](https://spec.commonmark.org/0.30/#images) elsewhere in the</span>
-<span class="doccomment">/// document. [Link reference</span>
-<span class="doccomment">/// definitions](https://spec.commonmark.org/0.30/#link-reference-definition)</span>
-<span class="doccomment">/// can come either before or after the links that use them.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">md_label2dest</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-    <span class="comment">// Consume up to three spaces.</span>
-    <span class="kw">let</span> (<span class="ident">i</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">nom::bytes::complete::take_while_m_n</span>(<span class="number">0</span>, <span class="number">3</span>, <span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39; &#39;</span>)(<span class="ident">i</span>)<span class="question-mark">?</span>;
-    <span class="comment">// Take label.</span>
-    <span class="kw">let</span> (<span class="ident">i</span>, <span class="ident">link_text</span>) <span class="op">=</span> <span class="ident">md_link_label</span>(<span class="ident">i</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> (<span class="ident">i</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">nom::character::complete::char</span>(<span class="string">&#39;:&#39;</span>)(<span class="ident">i</span>)<span class="question-mark">?</span>;
-    <span class="comment">// Take spaces.</span>
-    <span class="kw">let</span> (<span class="ident">i</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">verify</span>(<span class="ident">nom::character::complete::multispace1</span>, <span class="op">|</span><span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> {
-        <span class="op">!</span><span class="ident">s</span>.<span class="ident">contains</span>(<span class="string">&quot;\n\n&quot;</span>)
-    })(<span class="ident">i</span>)<span class="question-mark">?</span>;
-    <span class="comment">// Take destination.</span>
-    <span class="kw">let</span> (<span class="ident">i</span>, <span class="ident">link_destination</span>) <span class="op">=</span> <span class="ident">md_link_destination</span>(<span class="ident">i</span>)<span class="question-mark">?</span>;
-    <span class="comment">// Try, but do not fail.</span>
-    <span class="kw">let</span> (<span class="ident">i</span>, <span class="ident">link_title</span>) <span class="op">=</span> <span class="ident">alt</span>((
-        <span class="comment">// Take link title.</span>
-        <span class="ident">md_link_title</span>,
-        <span class="ident">nom::combinator::success</span>(<span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>)),
-    ))(<span class="ident">i</span>)<span class="question-mark">?</span>;
+<span class="doccomment">/// Matches a Markdown _link reference definition_.
+///
+/// The caller must guarantee, that the parser starts at first character of the
+/// input or at the first character of a line. The parser consumes all bytes
+/// until the end of the line.
+/// ```
+/// use parse_hyperlinks::parser::Link;
+/// use parse_hyperlinks::parser::markdown::md_label2dest;
+/// use std::borrow::Cow;
+///
+/// assert_eq!(
+///   md_label2dest(&quot;   [label]: &lt;destination&gt; &#39;title&#39;\nabc&quot;),
+///   Ok((&quot;\nabc&quot;, (Cow::from(&quot;label&quot;), Cow::from(&quot;destination&quot;), Cow::from(&quot;title&quot;))))
+/// );
+/// ```
+///
+/// [CommonMark
+/// Spec](https://spec.commonmark.org/0.30/#link-reference-definition)\ A [link
+/// reference
+/// definition](https://spec.commonmark.org/0.30/#link-reference-definition)
+/// consists of a [link label](https://spec.commonmark.org/0.30/#link-label),
+/// optionally preceded by up to three spaces of indentation, followed by a
+/// colon (`:`), optional spaces or tabs (including up to one [line
+/// ending](https://spec.commonmark.org/0.30/#line-ending)), a [link
+/// destination](https://spec.commonmark.org/0.30/#link-destination), optional
+/// spaces or tabs (including up to one [line
+/// ending](https://spec.commonmark.org/0.30/#line-ending)), and an optional
+/// [link title](https://spec.commonmark.org/0.30/#link-title), which if it is
+/// present must be separated from the [link
+/// destination](https://spec.commonmark.org/0.30/#link-destination) by spaces
+/// or tabs. No further character may occur.
+///
+/// A [link reference
+/// definition](https://spec.commonmark.org/0.30/#link-reference-definition)
+/// does not correspond to a structural element of a document. Instead, it
+/// defines a label which can be used in [reference
+/// links](https://spec.commonmark.org/0.30/#reference-link) and reference-style
+/// [images](https://spec.commonmark.org/0.30/#images) elsewhere in the
+/// document. [Link reference
+/// definitions](https://spec.commonmark.org/0.30/#link-reference-definition)
+/// can come either before or after the links that use them.
+</span><span class="kw">pub fn </span>md_label2dest(i: <span class="kw-2">&amp;</span>str) -&gt; nom::IResult&lt;<span class="kw-2">&amp;</span>str, (Cow&lt;str&gt;, Cow&lt;str&gt;, Cow&lt;str&gt;)&gt; {
+    <span class="comment">// Consume up to three spaces.
+    </span><span class="kw">let </span>(i, <span class="kw">_</span>) = nom::bytes::complete::take_while_m_n(<span class="number">0</span>, <span class="number">3</span>, |c| c == <span class="string">&#39; &#39;</span>)(i)<span class="question-mark">?</span>;
+    <span class="comment">// Take label.
+    </span><span class="kw">let </span>(i, link_text) = md_link_label(i)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(i, <span class="kw">_</span>) = nom::character::complete::char(<span class="string">&#39;:&#39;</span>)(i)<span class="question-mark">?</span>;
+    <span class="comment">// Take spaces.
+    </span><span class="kw">let </span>(i, <span class="kw">_</span>) = verify(nom::character::complete::multispace1, |s: <span class="kw-2">&amp;</span>str| {
+        !s.contains(<span class="string">&quot;\n\n&quot;</span>)
+    })(i)<span class="question-mark">?</span>;
+    <span class="comment">// Take destination.
+    </span><span class="kw">let </span>(i, link_destination) = md_link_destination(i)<span class="question-mark">?</span>;
+    <span class="comment">// Try, but do not fail.
+    </span><span class="kw">let </span>(i, link_title) = alt((
+        <span class="comment">// Take link title.
+        </span>md_link_title,
+        nom::combinator::success(Cow::from(<span class="string">&quot;&quot;</span>)),
+    ))(i)<span class="question-mark">?</span>;
 
-    <span class="comment">// Now consume as much whitespace as possible.</span>
-    <span class="kw">let</span> (<span class="ident">i</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">nom::character::complete::space0</span>(<span class="ident">i</span>)<span class="question-mark">?</span>;
+    <span class="comment">// Now consume as much whitespace as possible.
+    </span><span class="kw">let </span>(i, <span class="kw">_</span>) = nom::character::complete::space0(i)<span class="question-mark">?</span>;
 
-    <span class="comment">// Check if there is newline coming. Do not consume.</span>
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">i</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">nom::character::complete::newline</span>(<span class="ident">i</span>)<span class="question-mark">?</span>;
+    <span class="comment">// Check if there is newline coming. Do not consume.
+    </span><span class="kw">if </span>!i.is_empty() {
+        <span class="kw">let _ </span>= nom::character::complete::newline(i)<span class="question-mark">?</span>;
     }
 
-    <span class="prelude-val">Ok</span>((<span class="ident">i</span>, (<span class="ident">link_text</span>, <span class="ident">link_destination</span>, <span class="ident">link_title</span>)))
+    <span class="prelude-val">Ok</span>((i, (link_text, link_destination, link_title)))
 }
 
-<span class="doccomment">/// Wrapper around `md_text2label()` that packs the result in</span>
-<span class="doccomment">/// `Link::Text2Label`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">md_text2label_link</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Link</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">i</span>, (<span class="ident">t</span>, <span class="ident">l</span>)) <span class="op">=</span> <span class="ident">md_text2label</span>(<span class="ident">i</span>)<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>((<span class="ident">i</span>, <span class="ident">Link::Text2Label</span>(<span class="ident">t</span>, <span class="ident">l</span>)))
+<span class="doccomment">/// Wrapper around `md_text2label()` that packs the result in
+/// `Link::Text2Label`.
+</span><span class="kw">pub fn </span>md_text2label_link(i: <span class="kw-2">&amp;</span>str) -&gt; nom::IResult&lt;<span class="kw-2">&amp;</span>str, Link&gt; {
+    <span class="kw">let </span>(i, (t, l)) = md_text2label(i)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>((i, Link::Text2Label(t, l)))
 }
 
-<span class="doccomment">/// Parse a Markdown _reference link_.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// There are three kinds of reference links: full, collapsed, and shortcut.</span>
-<span class="doccomment">/// 1. A full reference link consists of a link text immediately followed by a</span>
-<span class="doccomment">///    link label that matches a link reference definition elsewhere in the</span>
-<span class="doccomment">///    document.</span>
-<span class="doccomment">/// 2. A collapsed reference link consists of a link label that matches a link</span>
-<span class="doccomment">///    reference definition elsewhere in the document, followed by the string [].</span>
-<span class="doccomment">///    The contents of the first link label are parsed as inlines, which are used as</span>
-<span class="doccomment">///    the link’s text. The link’s URI and title are provided by the matching</span>
-<span class="doccomment">///    reference link definition. Thus, `[foo][]` is equivalent to `[foo][foo]`.</span>
-<span class="doccomment">/// 3. A shortcut reference link consists of a link label that matches a link</span>
-<span class="doccomment">///    reference definition elsewhere in the document and is not followed by [] or a</span>
-<span class="doccomment">///    link label. The contents of the first link label are parsed as inlines, which</span>
-<span class="doccomment">///    are used as the link’s text. The link’s URI and title are provided by the</span>
-<span class="doccomment">///    matching link reference definition. Thus, `[foo]` is equivalent to `[foo][]`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This parser expects to start at the beginning of the link `[` to succeed.</span>
-<span class="doccomment">/// It should always run at last position after all other parsers.</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// use parse_hyperlinks::parser::Link;</span>
-<span class="doccomment">/// use parse_hyperlinks::parser::markdown::md_text2label;</span>
-<span class="doccomment">/// use std::borrow::Cow;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///   md_text2label(&quot;[link text][link label]abc&quot;),</span>
-<span class="doccomment">///   Ok((&quot;abc&quot;, (Cow::from(&quot;link text&quot;), Cow::from(&quot;link label&quot;))))</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///   md_text2label(&quot;[link text][]abc&quot;),</span>
-<span class="doccomment">///   Ok((&quot;abc&quot;, (Cow::from(&quot;link text&quot;), Cow::from(&quot;link text&quot;))))</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// assert_eq!(</span>
-<span class="doccomment">///   md_text2label(&quot;[link text]abc&quot;),</span>
-<span class="doccomment">///   Ok((&quot;abc&quot;, (Cow::from(&quot;link text&quot;), Cow::from(&quot;link text&quot;))))</span>
-<span class="doccomment">/// );</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">md_text2label</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">i</span>, (<span class="ident">link_text</span>, <span class="ident">link_label</span>)) <span class="op">=</span> <span class="ident">alt</span>((
-        <span class="ident">nom::sequence::pair</span>(<span class="ident">md_link_text</span>, <span class="ident">md_link_label</span>),
-        <span class="ident">nom::combinator::map</span>(<span class="ident">nom::sequence::terminated</span>(<span class="ident">md_link_text</span>, <span class="ident">tag</span>(<span class="string">&quot;[]&quot;</span>)), <span class="op">|</span><span class="ident">s</span><span class="op">|</span> {
-            (<span class="ident">s</span>.<span class="ident">clone</span>(), <span class="ident">s</span>)
+<span class="doccomment">/// Parse a Markdown _reference link_.
+///
+/// There are three kinds of reference links: full, collapsed, and shortcut.
+/// 1. A full reference link consists of a link text immediately followed by a
+///    link label that matches a link reference definition elsewhere in the
+///    document.
+/// 2. A collapsed reference link consists of a link label that matches a link
+///    reference definition elsewhere in the document, followed by the string [].
+///    The contents of the first link label are parsed as inlines, which are used as
+///    the link’s text. The link’s URI and title are provided by the matching
+///    reference link definition. Thus, `[foo][]` is equivalent to `[foo][foo]`.
+/// 3. A shortcut reference link consists of a link label that matches a link
+///    reference definition elsewhere in the document and is not followed by [] or a
+///    link label. The contents of the first link label are parsed as inlines, which
+///    are used as the link’s text. The link’s URI and title are provided by the
+///    matching link reference definition. Thus, `[foo]` is equivalent to `[foo][]`.
+///
+/// This parser expects to start at the beginning of the link `[` to succeed.
+/// It should always run at last position after all other parsers.
+/// ```rust
+/// use parse_hyperlinks::parser::Link;
+/// use parse_hyperlinks::parser::markdown::md_text2label;
+/// use std::borrow::Cow;
+///
+/// assert_eq!(
+///   md_text2label(&quot;[link text][link label]abc&quot;),
+///   Ok((&quot;abc&quot;, (Cow::from(&quot;link text&quot;), Cow::from(&quot;link label&quot;))))
+/// );
+/// assert_eq!(
+///   md_text2label(&quot;[link text][]abc&quot;),
+///   Ok((&quot;abc&quot;, (Cow::from(&quot;link text&quot;), Cow::from(&quot;link text&quot;))))
+/// );
+/// assert_eq!(
+///   md_text2label(&quot;[link text]abc&quot;),
+///   Ok((&quot;abc&quot;, (Cow::from(&quot;link text&quot;), Cow::from(&quot;link text&quot;))))
+/// );
+/// ```
+</span><span class="kw">pub fn </span>md_text2label(i: <span class="kw-2">&amp;</span>str) -&gt; nom::IResult&lt;<span class="kw-2">&amp;</span>str, (Cow&lt;str&gt;, Cow&lt;str&gt;)&gt; {
+    <span class="kw">let </span>(i, (link_text, link_label)) = alt((
+        nom::sequence::pair(md_link_text, md_link_label),
+        nom::combinator::map(nom::sequence::terminated(md_link_text, tag(<span class="string">&quot;[]&quot;</span>)), |s| {
+            (s.clone(), s)
         }),
-        <span class="ident">nom::combinator::map</span>(<span class="ident">md_link_text</span>, <span class="op">|</span><span class="ident">s</span><span class="op">|</span> (<span class="ident">s</span>.<span class="ident">clone</span>(), <span class="ident">s</span>)),
-    ))(<span class="ident">i</span>)<span class="question-mark">?</span>;
+        nom::combinator::map(md_link_text, |s| (s.clone(), s)),
+    ))(i)<span class="question-mark">?</span>;
 
-    <span class="comment">// Check that there is no `[` or `(` following. Do not consume.</span>
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">i</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">nom::character::complete::none_of</span>(<span class="string">&quot;[(&quot;</span>)(<span class="ident">i</span>)<span class="question-mark">?</span>;
+    <span class="comment">// Check that there is no `[` or `(` following. Do not consume.
+    </span><span class="kw">if </span>!i.is_empty() {
+        <span class="kw">let _ </span>= nom::character::complete::none_of(<span class="string">&quot;[(&quot;</span>)(i)<span class="question-mark">?</span>;
     }
 
-    <span class="prelude-val">Ok</span>((<span class="ident">i</span>, (<span class="ident">link_text</span>, <span class="ident">link_label</span>)))
+    <span class="prelude-val">Ok</span>((i, (link_text, link_label)))
 }
 
-<span class="doccomment">/// Parses _link text_.</span>
-<span class="doccomment">/// Brackets are allowed in the</span>
-<span class="doccomment">/// [link text](https://spec.commonmark.org/0.29/#link-text) only if (a) they are</span>
-<span class="doccomment">/// backslash-escaped or (b) they appear as a matched pair of brackets, with</span>
-<span class="doccomment">/// an open bracket `[`, a sequence of zero or more inlines, and a close</span>
-<span class="doccomment">/// bracket `]`.</span>
-<span class="doccomment">/// [CommonMark Spec](https://spec.commonmark.org/0.29/#link-text)</span>
-<span class="kw">fn</span> <span class="ident">md_link_text</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">nom::combinator::map_parser</span>(
-        <span class="ident">nom::sequence::delimited</span>(<span class="ident">tag</span>(<span class="string">&quot;[&quot;</span>), <span class="ident">take_until_unbalanced</span>(<span class="string">&#39;[&#39;</span>, <span class="string">&#39;]&#39;</span>), <span class="ident">tag</span>(<span class="string">&quot;]&quot;</span>)),
-        <span class="ident">md_escaped_str_transform</span>,
-    )(<span class="ident">i</span>)
+<span class="doccomment">/// Parses _link text_.
+/// Brackets are allowed in the
+/// [link text](https://spec.commonmark.org/0.29/#link-text) only if (a) they are
+/// backslash-escaped or (b) they appear as a matched pair of brackets, with
+/// an open bracket `[`, a sequence of zero or more inlines, and a close
+/// bracket `]`.
+/// [CommonMark Spec](https://spec.commonmark.org/0.29/#link-text)
+</span><span class="kw">fn </span>md_link_text(i: <span class="kw-2">&amp;</span>str) -&gt; nom::IResult&lt;<span class="kw-2">&amp;</span>str, Cow&lt;str&gt;&gt; {
+    nom::combinator::map_parser(
+        nom::sequence::delimited(tag(<span class="string">&quot;[&quot;</span>), take_until_unbalanced(<span class="string">&#39;[&#39;</span>, <span class="string">&#39;]&#39;</span>), tag(<span class="string">&quot;]&quot;</span>)),
+        md_escaped_str_transform,
+    )(i)
 }
 
-<span class="doccomment">/// Parses _link label_.</span>
-<span class="doccomment">/// A link label begins with a left bracket ([) and ends with the first right</span>
-<span class="doccomment">/// bracket (]) that is not backslash-escaped. Between these brackets there must</span>
-<span class="doccomment">/// be at least one non-whitespace character. Unescaped square bracket characters</span>
-<span class="doccomment">/// are not allowed inside the opening and closing square brackets of link</span>
-<span class="doccomment">/// labels. A link label can have at most 999 characters inside the square</span>
-<span class="doccomment">/// brackets (TODO).</span>
-<span class="doccomment">/// [CommonMark Spec](https://spec.commonmark.org/0.29/#link-label)</span>
-<span class="kw">fn</span> <span class="ident">md_link_label</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">nom::combinator::map_parser</span>(
-        <span class="ident">nom::combinator::verify</span>(
-            <span class="ident">nom::sequence::delimited</span>(
-                <span class="ident">tag</span>(<span class="string">&quot;[&quot;</span>),
-                <span class="ident">nom::bytes::complete::escaped</span>(
-                    <span class="ident">nom::character::complete::none_of</span>(<span class="string">r#&quot;\[]&quot;#</span>),
+<span class="doccomment">/// Parses _link label_.
+/// A link label begins with a left bracket ([) and ends with the first right
+/// bracket (]) that is not backslash-escaped. Between these brackets there must
+/// be at least one non-whitespace character. Unescaped square bracket characters
+/// are not allowed inside the opening and closing square brackets of link
+/// labels. A link label can have at most 999 characters inside the square
+/// brackets (TODO).
+/// [CommonMark Spec](https://spec.commonmark.org/0.29/#link-label)
+</span><span class="kw">fn </span>md_link_label(i: <span class="kw-2">&amp;</span>str) -&gt; nom::IResult&lt;<span class="kw-2">&amp;</span>str, Cow&lt;str&gt;&gt; {
+    nom::combinator::map_parser(
+        nom::combinator::verify(
+            nom::sequence::delimited(
+                tag(<span class="string">&quot;[&quot;</span>),
+                nom::bytes::complete::escaped(
+                    nom::character::complete::none_of(<span class="string">r#&quot;\[]&quot;#</span>),
                     <span class="string">&#39;\\&#39;</span>,
-                    <span class="ident">nom::character::complete::one_of</span>(<span class="ident">ESCAPABLE</span>),
+                    nom::character::complete::one_of(ESCAPABLE),
                 ),
-                <span class="ident">tag</span>(<span class="string">&quot;]&quot;</span>),
+                tag(<span class="string">&quot;]&quot;</span>),
             ),
-            <span class="op">|</span><span class="ident">l</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> <span class="ident">l</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">LABEL_LEN_MAX</span>,
+            |l: <span class="kw-2">&amp;</span>str| l.len() &lt;= LABEL_LEN_MAX,
         ),
-        <span class="ident">md_escaped_str_transform</span>,
-    )(<span class="ident">i</span>)
+        md_escaped_str_transform,
+    )(i)
 }
 
-<span class="doccomment">/// This is a wrapper around `md_parse_link_destination()`. It takes its result</span>
-<span class="doccomment">/// and removes the `\` before the escaped characters `ESCAPABLE`.</span>
-<span class="kw">fn</span> <span class="ident">md_link_destination</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">nom::combinator::map_parser</span>(<span class="ident">md_parse_link_destination</span>, <span class="ident">md_escaped_str_transform</span>)(<span class="ident">i</span>)
+<span class="doccomment">/// This is a wrapper around `md_parse_link_destination()`. It takes its result
+/// and removes the `\` before the escaped characters `ESCAPABLE`.
+</span><span class="kw">fn </span>md_link_destination(i: <span class="kw-2">&amp;</span>str) -&gt; nom::IResult&lt;<span class="kw-2">&amp;</span>str, Cow&lt;str&gt;&gt; {
+    nom::combinator::map_parser(md_parse_link_destination, md_escaped_str_transform)(i)
 }
 
-<span class="doccomment">/// A [link destination](https://spec.commonmark.org/0.30/#link-destination)</span>
-<span class="doccomment">/// consists of either</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * a sequence of zero or more characters between an opening `&lt;` and a</span>
-<span class="doccomment">/// closing `&gt;` that contains no line endings or unescaped `&lt;` or `&gt;`</span>
-<span class="doccomment">/// characters, or</span>
-<span class="doccomment">/// * a nonempty sequence of characters that does not start with `&lt;`, does not</span>
-<span class="doccomment">/// include [ASCII control</span>
-<span class="doccomment">/// characters](https://spec.commonmark.org/0.30/#ascii-control-character) or</span>
-<span class="doccomment">/// [space](https://spec.commonmark.org/0.30/#space) character, and includes</span>
-<span class="doccomment">/// parentheses only if (a) they are backslash-escaped or (b) they are part of a</span>
-<span class="doccomment">/// balanced pair of unescaped parentheses. (Implementations may impose limits</span>
-<span class="doccomment">/// on parentheses nesting to avoid performance issues, but at least three</span>
-<span class="doccomment">/// levels of nesting should be supported.)</span>
-<span class="kw">fn</span> <span class="ident">md_parse_link_destination</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="ident">alt</span>((
-        <span class="ident">nom::sequence::delimited</span>(
-            <span class="ident">tag</span>(<span class="string">&quot;&lt;&quot;</span>),
-            <span class="ident">nom::bytes::complete::escaped</span>(
-                <span class="ident">nom::character::complete::none_of</span>(<span class="string">r#&quot;\&lt;&gt;&quot;#</span>),
+<span class="doccomment">/// A [link destination](https://spec.commonmark.org/0.30/#link-destination)
+/// consists of either
+///
+/// * a sequence of zero or more characters between an opening `&lt;` and a
+/// closing `&gt;` that contains no line endings or unescaped `&lt;` or `&gt;`
+/// characters, or
+/// * a nonempty sequence of characters that does not start with `&lt;`, does not
+/// include [ASCII control
+/// characters](https://spec.commonmark.org/0.30/#ascii-control-character) or
+/// [space](https://spec.commonmark.org/0.30/#space) character, and includes
+/// parentheses only if (a) they are backslash-escaped or (b) they are part of a
+/// balanced pair of unescaped parentheses. (Implementations may impose limits
+/// on parentheses nesting to avoid performance issues, but at least three
+/// levels of nesting should be supported.)
+</span><span class="kw">fn </span>md_parse_link_destination(i: <span class="kw-2">&amp;</span>str) -&gt; nom::IResult&lt;<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str&gt; {
+    alt((
+        nom::sequence::delimited(
+            tag(<span class="string">&quot;&lt;&quot;</span>),
+            nom::bytes::complete::escaped(
+                nom::character::complete::none_of(<span class="string">r#&quot;\&lt;&gt;&quot;#</span>),
                 <span class="string">&#39;\\&#39;</span>,
-                <span class="ident">nom::character::complete::one_of</span>(<span class="ident">ESCAPABLE</span>),
+                nom::character::complete::one_of(ESCAPABLE),
             ),
-            <span class="ident">tag</span>(<span class="string">&quot;&gt;&quot;</span>),
+            tag(<span class="string">&quot;&gt;&quot;</span>),
         ),
-        <span class="ident">map</span>(<span class="ident">nom::bytes::complete::tag</span>(<span class="string">&quot;&lt;&gt;&quot;</span>), <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="string">&quot;&quot;</span>),
-        <span class="ident">alt</span>((
-            <span class="ident">nom::bytes::complete::is_not</span>(<span class="string">&quot; \t\r\n&quot;</span>),
-            <span class="ident">nom::combinator::success</span>(<span class="string">&quot;&quot;</span>),
+        map(nom::bytes::complete::tag(<span class="string">&quot;&lt;&gt;&quot;</span>), |<span class="kw">_</span>| <span class="string">&quot;&quot;</span>),
+        alt((
+            nom::bytes::complete::is_not(<span class="string">&quot; \t\r\n&quot;</span>),
+            nom::combinator::success(<span class="string">&quot;&quot;</span>),
         )),
-    ))(<span class="ident">i</span>)
+    ))(i)
 }
 
-<span class="doccomment">/// Matches `md_link_destination` in parenthesis.</span>
-<span class="kw">fn</span> <span class="ident">md_link_destination_enclosed</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, (<span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">rest</span>, <span class="ident">inner</span>) <span class="op">=</span>
-        <span class="ident">nom::sequence::delimited</span>(<span class="ident">tag</span>(<span class="string">&quot;(&quot;</span>), <span class="ident">take_until_unbalanced</span>(<span class="string">&#39;(&#39;</span>, <span class="string">&#39;)&#39;</span>), <span class="ident">tag</span>(<span class="string">&quot;)&quot;</span>))(<span class="ident">i</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> (<span class="ident">i</span>, <span class="ident">link_destination</span>) <span class="op">=</span> <span class="ident">md_link_destination</span>(<span class="ident">inner</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> (<span class="ident">_i</span>, <span class="ident">link_title</span>) <span class="op">=</span> <span class="ident">alt</span>((
-        <span class="comment">// Take link title.</span>
-        <span class="ident">md_link_title</span>,
-        <span class="ident">nom::combinator::success</span>(<span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>)),
-    ))(<span class="ident">i</span>)<span class="question-mark">?</span>;
+<span class="doccomment">/// Matches `md_link_destination` in parenthesis.
+</span><span class="kw">fn </span>md_link_destination_enclosed(i: <span class="kw-2">&amp;</span>str) -&gt; nom::IResult&lt;<span class="kw-2">&amp;</span>str, (Cow&lt;str&gt;, Cow&lt;str&gt;)&gt; {
+    <span class="kw">let </span>(rest, inner) =
+        nom::sequence::delimited(tag(<span class="string">&quot;(&quot;</span>), take_until_unbalanced(<span class="string">&#39;(&#39;</span>, <span class="string">&#39;)&#39;</span>), tag(<span class="string">&quot;)&quot;</span>))(i)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(i, link_destination) = md_link_destination(inner)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(_i, link_title) = alt((
+        <span class="comment">// Take link title.
+        </span>md_link_title,
+        nom::combinator::success(Cow::from(<span class="string">&quot;&quot;</span>)),
+    ))(i)<span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>((<span class="ident">rest</span>, (<span class="ident">link_destination</span>, <span class="ident">link_title</span>)))
+    <span class="prelude-val">Ok</span>((rest, (link_destination, link_title)))
 }
 
-<span class="doccomment">/// This is a wrapper around `md_parse_link_title()`. It takes its result</span>
-<span class="doccomment">/// and removes the `\` before the escaped characters `ESCAPABLE`.</span>
-<span class="kw">fn</span> <span class="ident">md_link_title</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">nom::combinator::map_parser</span>(<span class="ident">md_parse_link_title</span>, <span class="ident">md_escaped_str_transform</span>)(<span class="ident">i</span>)
+<span class="doccomment">/// This is a wrapper around `md_parse_link_title()`. It takes its result
+/// and removes the `\` before the escaped characters `ESCAPABLE`.
+</span><span class="kw">fn </span>md_link_title(i: <span class="kw-2">&amp;</span>str) -&gt; nom::IResult&lt;<span class="kw-2">&amp;</span>str, Cow&lt;str&gt;&gt; {
+    nom::combinator::map_parser(md_parse_link_title, md_escaped_str_transform)(i)
 }
 
-<span class="doccomment">/// A link title is always preceded one or more whitespace inluding</span>
-<span class="doccomment">/// one newline.</span>
-<span class="doccomment">/// [CommonMark Spec](https://spec.commonmark.org/0.29/#link-title)</span>
-<span class="doccomment">/// A [link title](https://spec.commonmark.org/0.29/#link-title) consists of either</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///  - a sequence of zero or more characters between straight double-quote</span>
-<span class="doccomment">///    characters (`&quot;`), including a `&quot;` character only if it is</span>
-<span class="doccomment">///    backslash-escaped, or</span>
-<span class="doccomment">///  - a sequence of zero or more characters between straight single-quote</span>
-<span class="doccomment">///    characters (`&#39;`), including a `&#39;` character only if it is</span>
-<span class="doccomment">///    backslash-escaped, or</span>
-<span class="doccomment">///  - a sequence of zero or more characters between matching parentheses</span>
-<span class="doccomment">///    (`(...)`), including a `(` or `)` character only if it is</span>
-<span class="doccomment">///    backslash-escaped.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///  Although [link titles](https://spec.commonmark.org/0.29/#link-title) may</span>
-<span class="doccomment">///  span multiple lines, they may not contain a [blank</span>
-<span class="doccomment">///  line](https://spec.commonmark.org/0.29/#blank-line).</span>
-<span class="kw">fn</span> <span class="ident">md_parse_link_title</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="ident">nom::sequence::preceded</span>(
-        <span class="ident">verify</span>(<span class="ident">multispace1</span>, <span class="op">|</span><span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> <span class="op">!</span><span class="ident">s</span>.<span class="ident">contains</span>(<span class="string">&quot;\n\n&quot;</span>)),
-        <span class="ident">verify</span>(
-            <span class="ident">alt</span>((
-                <span class="ident">nom::sequence::delimited</span>(<span class="ident">tag</span>(<span class="string">&quot;(&quot;</span>), <span class="ident">take_until_unbalanced</span>(<span class="string">&#39;(&#39;</span>, <span class="string">&#39;)&#39;</span>), <span class="ident">tag</span>(<span class="string">&quot;)&quot;</span>)),
-                <span class="ident">nom::sequence::delimited</span>(
-                    <span class="ident">tag</span>(<span class="string">&quot;&#39;&quot;</span>),
-                    <span class="ident">nom::bytes::complete::escaped</span>(
-                        <span class="ident">nom::character::complete::none_of</span>(<span class="string">r#&quot;\&#39;&quot;#</span>),
+<span class="doccomment">/// A link title is always preceded one or more whitespace inluding
+/// one newline.
+/// [CommonMark Spec](https://spec.commonmark.org/0.29/#link-title)
+/// A [link title](https://spec.commonmark.org/0.29/#link-title) consists of either
+///
+///  - a sequence of zero or more characters between straight double-quote
+///    characters (`&quot;`), including a `&quot;` character only if it is
+///    backslash-escaped, or
+///  - a sequence of zero or more characters between straight single-quote
+///    characters (`&#39;`), including a `&#39;` character only if it is
+///    backslash-escaped, or
+///  - a sequence of zero or more characters between matching parentheses
+///    (`(...)`), including a `(` or `)` character only if it is
+///    backslash-escaped.
+///
+///  Although [link titles](https://spec.commonmark.org/0.29/#link-title) may
+///  span multiple lines, they may not contain a [blank
+///  line](https://spec.commonmark.org/0.29/#blank-line).
+</span><span class="kw">fn </span>md_parse_link_title(i: <span class="kw-2">&amp;</span>str) -&gt; nom::IResult&lt;<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>str&gt; {
+    nom::sequence::preceded(
+        verify(multispace1, |s: <span class="kw-2">&amp;</span>str| !s.contains(<span class="string">&quot;\n\n&quot;</span>)),
+        verify(
+            alt((
+                nom::sequence::delimited(tag(<span class="string">&quot;(&quot;</span>), take_until_unbalanced(<span class="string">&#39;(&#39;</span>, <span class="string">&#39;)&#39;</span>), tag(<span class="string">&quot;)&quot;</span>)),
+                nom::sequence::delimited(
+                    tag(<span class="string">&quot;&#39;&quot;</span>),
+                    nom::bytes::complete::escaped(
+                        nom::character::complete::none_of(<span class="string">r#&quot;\&#39;&quot;#</span>),
                         <span class="string">&#39;\\&#39;</span>,
-                        <span class="ident">nom::character::complete::one_of</span>(<span class="ident">ESCAPABLE</span>),
+                        nom::character::complete::one_of(ESCAPABLE),
                     ),
-                    <span class="ident">tag</span>(<span class="string">&quot;&#39;&quot;</span>),
+                    tag(<span class="string">&quot;&#39;&quot;</span>),
                 ),
-                <span class="ident">nom::sequence::delimited</span>(
-                    <span class="ident">tag</span>(<span class="string">&quot;\&quot;&quot;</span>),
-                    <span class="ident">nom::bytes::complete::escaped</span>(
-                        <span class="ident">nom::character::complete::none_of</span>(<span class="string">r#&quot;\&quot;&quot;#</span>),
+                nom::sequence::delimited(
+                    tag(<span class="string">&quot;\&quot;&quot;</span>),
+                    nom::bytes::complete::escaped(
+                        nom::character::complete::none_of(<span class="string">r#&quot;\&quot;&quot;#</span>),
                         <span class="string">&#39;\\&#39;</span>,
-                        <span class="ident">nom::character::complete::one_of</span>(<span class="ident">ESCAPABLE</span>),
+                        nom::character::complete::one_of(ESCAPABLE),
                     ),
-                    <span class="ident">tag</span>(<span class="string">&quot;\&quot;&quot;</span>),
+                    tag(<span class="string">&quot;\&quot;&quot;</span>),
                 ),
             )),
-            <span class="op">|</span><span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">|</span> <span class="op">!</span><span class="ident">s</span>.<span class="ident">contains</span>(<span class="string">&quot;\n\n&quot;</span>),
+            |s: <span class="kw-2">&amp;</span>str| !s.contains(<span class="string">&quot;\n\n&quot;</span>),
         ),
-    )(<span class="ident">i</span>)
+    )(i)
 }
 
-<span class="doccomment">/// Remove the `\` before the escaped characters `ESCAPABLE`.</span>
-<span class="kw">fn</span> <span class="ident">md_escaped_str_transform</span>(<span class="ident">i</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">nom::IResult</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">Cow</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">nom::combinator::map</span>(
-        <span class="ident">nom::bytes::complete::escaped_transform</span>(
-            <span class="ident">nom::bytes::complete::is_not</span>(<span class="string">&quot;\\&quot;</span>),
+<span class="doccomment">/// Remove the `\` before the escaped characters `ESCAPABLE`.
+</span><span class="kw">fn </span>md_escaped_str_transform(i: <span class="kw-2">&amp;</span>str) -&gt; nom::IResult&lt;<span class="kw-2">&amp;</span>str, Cow&lt;str&gt;&gt; {
+    nom::combinator::map(
+        nom::bytes::complete::escaped_transform(
+            nom::bytes::complete::is_not(<span class="string">&quot;\\&quot;</span>),
             <span class="string">&#39;\\&#39;</span>,
-            <span class="ident">nom::character::complete::one_of</span>(<span class="ident">ESCAPABLE</span>),
+            nom::character::complete::one_of(ESCAPABLE),
         ),
-        <span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="kw">if</span> <span class="ident">s</span> <span class="op">==</span> <span class="ident">i</span> { <span class="ident">Cow::from</span>(<span class="ident">i</span>) } <span class="kw">else</span> { <span class="ident">Cow::from</span>(<span class="ident">s</span>) },
-    )(<span class="ident">i</span>)
+        |s| <span class="kw">if </span>s == i { Cow::from(i) } <span class="kw">else </span>{ Cow::from(s) },
+    )(i)
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">nom::error::ErrorKind</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>nom::error::ErrorKind;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_md_text2dest</span>() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_md_text2dest() {
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_text2dest</span>(<span class="string">&quot;[text](url)abc&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, (<span class="ident">Cow::from</span>(<span class="string">&quot;text&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;url&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>))))
+            md_text2dest(<span class="string">&quot;[text](url)abc&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, (Cow::from(<span class="string">&quot;text&quot;</span>), Cow::from(<span class="string">&quot;url&quot;</span>), Cow::from(<span class="string">&quot;&quot;</span>))))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_text2dest</span>(<span class="string">&quot;[text[i]](url)abc&quot;</span>),
+            md_text2dest(<span class="string">&quot;[text[i]](url)abc&quot;</span>),
             <span class="prelude-val">Ok</span>((
                 <span class="string">&quot;abc&quot;</span>,
-                (<span class="ident">Cow::from</span>(<span class="string">&quot;text[i]&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;url&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>))
+                (Cow::from(<span class="string">&quot;text[i]&quot;</span>), Cow::from(<span class="string">&quot;url&quot;</span>), Cow::from(<span class="string">&quot;&quot;</span>))
             ))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_text2dest</span>(<span class="string">&quot;[text[i]](ur(l))abc&quot;</span>),
+            md_text2dest(<span class="string">&quot;[text[i]](ur(l))abc&quot;</span>),
             <span class="prelude-val">Ok</span>((
                 <span class="string">&quot;abc&quot;</span>,
-                (<span class="ident">Cow::from</span>(<span class="string">&quot;text[i]&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;ur(l)&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>))
+                (Cow::from(<span class="string">&quot;text[i]&quot;</span>), Cow::from(<span class="string">&quot;ur(l)&quot;</span>), Cow::from(<span class="string">&quot;&quot;</span>))
             ))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_text2dest</span>(<span class="string">&quot;[text(url)&quot;</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(<span class="string">&quot;&quot;</span>, <span class="ident">ErrorKind::Tag</span>)))
+            md_text2dest(<span class="string">&quot;[text(url)&quot;</span>),
+            <span class="prelude-val">Err</span>(nom::Err::Error(nom::error::Error::new(<span class="string">&quot;&quot;</span>, ErrorKind::Tag)))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_text2dest</span>(<span class="string">&quot;[text](&lt;url&gt;)abc&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, (<span class="ident">Cow::from</span>(<span class="string">&quot;text&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;url&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>))))
+            md_text2dest(<span class="string">&quot;[text](&lt;url&gt;)abc&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, (Cow::from(<span class="string">&quot;text&quot;</span>), Cow::from(<span class="string">&quot;url&quot;</span>), Cow::from(<span class="string">&quot;&quot;</span>))))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_text2dest</span>(<span class="string">&quot;[text](&lt;url&gt; \&quot;link title\&quot;)abc&quot;</span>),
+            md_text2dest(<span class="string">&quot;[text](&lt;url&gt; \&quot;link title\&quot;)abc&quot;</span>),
             <span class="prelude-val">Ok</span>((
                 <span class="string">&quot;abc&quot;</span>,
-                (<span class="ident">Cow::from</span>(<span class="string">&quot;text&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;url&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;link title&quot;</span>))
+                (Cow::from(<span class="string">&quot;text&quot;</span>), Cow::from(<span class="string">&quot;url&quot;</span>), Cow::from(<span class="string">&quot;link title&quot;</span>))
             ))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_text2dest</span>(<span class="string">&quot;[text](url \&quot;link title\&quot;)abc&quot;</span>),
+            md_text2dest(<span class="string">&quot;[text](url \&quot;link title\&quot;)abc&quot;</span>),
             <span class="prelude-val">Ok</span>((
                 <span class="string">&quot;abc&quot;</span>,
-                (<span class="ident">Cow::from</span>(<span class="string">&quot;text&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;url&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;link title&quot;</span>))
+                (Cow::from(<span class="string">&quot;text&quot;</span>), Cow::from(<span class="string">&quot;url&quot;</span>), Cow::from(<span class="string">&quot;link title&quot;</span>))
             ))
         );
-        <span class="comment">// [Example 483](https://spec.commonmark.org/0.30/#example-483)</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">md_text2dest</span>(<span class="string">&quot;[](./target.md)abc&quot;</span>),
+        <span class="comment">// [Example 483](https://spec.commonmark.org/0.30/#example-483)
+        </span><span class="macro">assert_eq!</span>(
+            md_text2dest(<span class="string">&quot;[](./target.md)abc&quot;</span>),
             <span class="prelude-val">Ok</span>((
                 <span class="string">&quot;abc&quot;</span>,
-                (<span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;./target.md&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>))
+                (Cow::from(<span class="string">&quot;&quot;</span>), Cow::from(<span class="string">&quot;./target.md&quot;</span>), Cow::from(<span class="string">&quot;&quot;</span>))
             ))
         );
-        <span class="comment">// [Example 484](https://spec.commonmark.org/0.30/#example-484)</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">md_text2dest</span>(<span class="string">&quot;[link]()abc&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, (<span class="ident">Cow::from</span>(<span class="string">&quot;link&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>))))
+        <span class="comment">// [Example 484](https://spec.commonmark.org/0.30/#example-484)
+        </span><span class="macro">assert_eq!</span>(
+            md_text2dest(<span class="string">&quot;[link]()abc&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, (Cow::from(<span class="string">&quot;link&quot;</span>), Cow::from(<span class="string">&quot;&quot;</span>), Cow::from(<span class="string">&quot;&quot;</span>))))
         );
-        <span class="comment">// [Example 485](https://spec.commonmark.org/0.30/#example-485)</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">md_text2dest</span>(<span class="string">&quot;[link](&lt;&gt;)abc&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, (<span class="ident">Cow::from</span>(<span class="string">&quot;link&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>))))
+        <span class="comment">// [Example 485](https://spec.commonmark.org/0.30/#example-485)
+        </span><span class="macro">assert_eq!</span>(
+            md_text2dest(<span class="string">&quot;[link](&lt;&gt;)abc&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, (Cow::from(<span class="string">&quot;link&quot;</span>), Cow::from(<span class="string">&quot;&quot;</span>), Cow::from(<span class="string">&quot;&quot;</span>))))
         );
-        <span class="comment">// [Example 486](https://spec.commonmark.org/0.30/#example-486)</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">md_text2dest</span>(<span class="string">&quot;[]()abc&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, (<span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>))))
+        <span class="comment">// [Example 486](https://spec.commonmark.org/0.30/#example-486)
+        </span><span class="macro">assert_eq!</span>(
+            md_text2dest(<span class="string">&quot;[]()abc&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, (Cow::from(<span class="string">&quot;&quot;</span>), Cow::from(<span class="string">&quot;&quot;</span>), Cow::from(<span class="string">&quot;&quot;</span>))))
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_md_text2label</span>() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_md_text2label() {
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_text2label</span>(<span class="string">&quot;[link text][link label]abc&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, (<span class="ident">Cow::from</span>(<span class="string">&quot;link text&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;link label&quot;</span>))))
+            md_text2label(<span class="string">&quot;[link text][link label]abc&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, (Cow::from(<span class="string">&quot;link text&quot;</span>), Cow::from(<span class="string">&quot;link label&quot;</span>))))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_text2label</span>(<span class="string">&quot;[link text][]abc&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, (<span class="ident">Cow::from</span>(<span class="string">&quot;link text&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;link text&quot;</span>))))
+            md_text2label(<span class="string">&quot;[link text][]abc&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, (Cow::from(<span class="string">&quot;link text&quot;</span>), Cow::from(<span class="string">&quot;link text&quot;</span>))))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_text2label</span>(<span class="string">&quot;[link text]abc&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, (<span class="ident">Cow::from</span>(<span class="string">&quot;link text&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;link text&quot;</span>))))
+            md_text2label(<span class="string">&quot;[link text]abc&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, (Cow::from(<span class="string">&quot;link text&quot;</span>), Cow::from(<span class="string">&quot;link text&quot;</span>))))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_text2label</span>(<span class="string">&quot;[]abc&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, (<span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>))))
+            md_text2label(<span class="string">&quot;[]abc&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, (Cow::from(<span class="string">&quot;&quot;</span>), Cow::from(<span class="string">&quot;&quot;</span>))))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_text2label</span>(<span class="string">&quot;&quot;</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(<span class="string">&quot;&quot;</span>, <span class="ident">ErrorKind::Tag</span>)))
+            md_text2label(<span class="string">&quot;&quot;</span>),
+            <span class="prelude-val">Err</span>(nom::Err::Error(nom::error::Error::new(<span class="string">&quot;&quot;</span>, ErrorKind::Tag)))
         );
-        <span class="comment">// Check end of input position.</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">md_text2label</span>(<span class="string">&quot;[text]&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, (<span class="ident">Cow::from</span>(<span class="string">&quot;text&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;text&quot;</span>))))
-        );
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">md_text2label</span>(<span class="string">&quot;[text][text]&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, (<span class="ident">Cow::from</span>(<span class="string">&quot;text&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;text&quot;</span>))))
+        <span class="comment">// Check end of input position.
+        </span><span class="macro">assert_eq!</span>(
+            md_text2label(<span class="string">&quot;[text]&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, (Cow::from(<span class="string">&quot;text&quot;</span>), Cow::from(<span class="string">&quot;text&quot;</span>))))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_text2label</span>(<span class="string">&quot;[text][label url&quot;</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(
+            md_text2label(<span class="string">&quot;[text][text]&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, (Cow::from(<span class="string">&quot;text&quot;</span>), Cow::from(<span class="string">&quot;text&quot;</span>))))
+        );
+        <span class="macro">assert_eq!</span>(
+            md_text2label(<span class="string">&quot;[text][label url&quot;</span>),
+            <span class="prelude-val">Err</span>(nom::Err::Error(nom::error::Error::new(
                 <span class="string">&quot;[label url&quot;</span>,
-                <span class="ident">ErrorKind::NoneOf</span>
+                ErrorKind::NoneOf
             )))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_text2label</span>(<span class="string">&quot;[text](url)abc&quot;</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(
+            md_text2label(<span class="string">&quot;[text](url)abc&quot;</span>),
+            <span class="prelude-val">Err</span>(nom::Err::Error(nom::error::Error::new(
                 <span class="string">&quot;(url)abc&quot;</span>,
-                <span class="ident">ErrorKind::NoneOf</span>
+                ErrorKind::NoneOf
             )))
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_md_label2dest</span>() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_md_label2dest() {
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_label2dest</span>(<span class="string">&quot;[text]: url\nabc&quot;</span>),
+            md_label2dest(<span class="string">&quot;[text]: url\nabc&quot;</span>),
             <span class="prelude-val">Ok</span>((
                 <span class="string">&quot;\nabc&quot;</span>,
-                (<span class="ident">Cow::from</span>(<span class="string">&quot;text&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;url&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>))
+                (Cow::from(<span class="string">&quot;text&quot;</span>), Cow::from(<span class="string">&quot;url&quot;</span>), Cow::from(<span class="string">&quot;&quot;</span>))
             ))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_label2dest</span>(<span class="string">&quot;[text]: url  \nabc&quot;</span>),
+            md_label2dest(<span class="string">&quot;[text]: url  \nabc&quot;</span>),
             <span class="prelude-val">Ok</span>((
                 <span class="string">&quot;\nabc&quot;</span>,
-                (<span class="ident">Cow::from</span>(<span class="string">&quot;text&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;url&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>))
+                (Cow::from(<span class="string">&quot;text&quot;</span>), Cow::from(<span class="string">&quot;url&quot;</span>), Cow::from(<span class="string">&quot;&quot;</span>))
             ))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_label2dest</span>(<span class="string">&quot;[text]: &lt;url url&gt; \nabc&quot;</span>),
+            md_label2dest(<span class="string">&quot;[text]: &lt;url url&gt; \nabc&quot;</span>),
             <span class="prelude-val">Ok</span>((
                 <span class="string">&quot;\nabc&quot;</span>,
-                (<span class="ident">Cow::from</span>(<span class="string">&quot;text&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;url url&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>))
+                (Cow::from(<span class="string">&quot;text&quot;</span>), Cow::from(<span class="string">&quot;url url&quot;</span>), Cow::from(<span class="string">&quot;&quot;</span>))
             ))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_label2dest</span>(<span class="string">&quot;[text]: url \&quot;title\&quot;\nabc&quot;</span>),
+            md_label2dest(<span class="string">&quot;[text]: url \&quot;title\&quot;\nabc&quot;</span>),
             <span class="prelude-val">Ok</span>((
                 <span class="string">&quot;\nabc&quot;</span>,
-                (<span class="ident">Cow::from</span>(<span class="string">&quot;text&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;url&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;title&quot;</span>))
+                (Cow::from(<span class="string">&quot;text&quot;</span>), Cow::from(<span class="string">&quot;url&quot;</span>), Cow::from(<span class="string">&quot;title&quot;</span>))
             ))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_label2dest</span>(<span class="string">&quot;[text]: url\n\&quot;title\&quot;\nabc&quot;</span>),
+            md_label2dest(<span class="string">&quot;[text]: url\n\&quot;title\&quot;\nabc&quot;</span>),
             <span class="prelude-val">Ok</span>((
                 <span class="string">&quot;\nabc&quot;</span>,
-                (<span class="ident">Cow::from</span>(<span class="string">&quot;text&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;url&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;title&quot;</span>))
+                (Cow::from(<span class="string">&quot;text&quot;</span>), Cow::from(<span class="string">&quot;url&quot;</span>), Cow::from(<span class="string">&quot;title&quot;</span>))
             ))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_label2dest</span>(<span class="string">&quot;   [text]: url\n\&quot;title\&quot;\nabc&quot;</span>),
+            md_label2dest(<span class="string">&quot;   [text]: url\n\&quot;title\&quot;\nabc&quot;</span>),
             <span class="prelude-val">Ok</span>((
                 <span class="string">&quot;\nabc&quot;</span>,
-                (<span class="ident">Cow::from</span>(<span class="string">&quot;text&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;url&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;title&quot;</span>))
+                (Cow::from(<span class="string">&quot;text&quot;</span>), Cow::from(<span class="string">&quot;url&quot;</span>), Cow::from(<span class="string">&quot;title&quot;</span>))
             ))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_label2dest</span>(<span class="string">&quot;abc[text]: url\n\&quot;title\&quot;&quot;</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(
+            md_label2dest(<span class="string">&quot;abc[text]: url\n\&quot;title\&quot;&quot;</span>),
+            <span class="prelude-val">Err</span>(nom::Err::Error(nom::error::Error::new(
                 <span class="string">&quot;abc[text]: url\n\&quot;title\&quot;&quot;</span>,
-                <span class="ident">ErrorKind::Tag</span>
+                ErrorKind::Tag
             )))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_label2dest</span>(<span class="string">&quot;    [text]: url\n\&quot;title\&quot; abc&quot;</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(
+            md_label2dest(<span class="string">&quot;    [text]: url\n\&quot;title\&quot; abc&quot;</span>),
+            <span class="prelude-val">Err</span>(nom::Err::Error(nom::error::Error::new(
                 <span class="string">&quot; [text]: url\n\&quot;title\&quot; abc&quot;</span>,
-                <span class="ident">ErrorKind::Tag</span>
+                ErrorKind::Tag
             )))
         );
-        <span class="comment">// Nested brackets.</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">md_label2dest</span>(<span class="string">&quot;[text\\[i\\]]: ur(l)url\nabc&quot;</span>),
+        <span class="comment">// Nested brackets.
+        </span><span class="macro">assert_eq!</span>(
+            md_label2dest(<span class="string">&quot;[text\\[i\\]]: ur(l)url\nabc&quot;</span>),
             <span class="prelude-val">Ok</span>((
                 <span class="string">&quot;\nabc&quot;</span>,
-                (<span class="ident">Cow::from</span>(<span class="string">&quot;text[i]&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;ur(l)url&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>))
+                (Cow::from(<span class="string">&quot;text[i]&quot;</span>), Cow::from(<span class="string">&quot;ur(l)url&quot;</span>), Cow::from(<span class="string">&quot;&quot;</span>))
             ))
         );
-        <span class="comment">// Nested but balanced not allowed for link labels.</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">md_label2dest</span>(<span class="string">&quot;[text[i]]: ur(l)(url&quot;</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(
+        <span class="comment">// Nested but balanced not allowed for link labels.
+        </span><span class="macro">assert_eq!</span>(
+            md_label2dest(<span class="string">&quot;[text[i]]: ur(l)(url&quot;</span>),
+            <span class="prelude-val">Err</span>(nom::Err::Error(nom::error::Error::new(
                 <span class="string">&quot;[i]]: ur(l)(url&quot;</span>,
-                <span class="ident">ErrorKind::Tag</span>
+                ErrorKind::Tag
             )))
         );
-        <span class="comment">// Whitespace can have one newline.</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">md_label2dest</span>(<span class="string">&quot;[text]: \nurl&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, (<span class="ident">Cow::from</span>(<span class="string">&quot;text&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;url&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>))))
+        <span class="comment">// Whitespace can have one newline.
+        </span><span class="macro">assert_eq!</span>(
+            md_label2dest(<span class="string">&quot;[text]: \nurl&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, (Cow::from(<span class="string">&quot;text&quot;</span>), Cow::from(<span class="string">&quot;url&quot;</span>), Cow::from(<span class="string">&quot;&quot;</span>))))
         );
-        <span class="comment">// But only one newline is allowed.</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">md_label2dest</span>(<span class="string">&quot;[text]: \n\nurl&quot;</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(
+        <span class="comment">// But only one newline is allowed.
+        </span><span class="macro">assert_eq!</span>(
+            md_label2dest(<span class="string">&quot;[text]: \n\nurl&quot;</span>),
+            <span class="prelude-val">Err</span>(nom::Err::Error(nom::error::Error::new(
                 <span class="string">&quot; \n\nurl&quot;</span>,
-                <span class="ident">ErrorKind::Verify</span>
+                ErrorKind::Verify
             )))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_label2dest</span>(<span class="string">&quot;[text: url&quot;</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(<span class="string">&quot;&quot;</span>, <span class="ident">ErrorKind::Tag</span>)))
+            md_label2dest(<span class="string">&quot;[text: url&quot;</span>),
+            <span class="prelude-val">Err</span>(nom::Err::Error(nom::error::Error::new(<span class="string">&quot;&quot;</span>, ErrorKind::Tag)))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_label2dest</span>(<span class="string">&quot;[text] url&quot;</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(
+            md_label2dest(<span class="string">&quot;[text] url&quot;</span>),
+            <span class="prelude-val">Err</span>(nom::Err::Error(nom::error::Error::new(
                 <span class="string">&quot; url&quot;</span>,
-                <span class="ident">ErrorKind::Char</span>
+                ErrorKind::Char
             )))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_label2dest</span>(<span class="string">&quot;[text]: url \&quot;link title\&quot;\nabc&quot;</span>),
+            md_label2dest(<span class="string">&quot;[text]: url \&quot;link title\&quot;\nabc&quot;</span>),
             <span class="prelude-val">Ok</span>((
                 <span class="string">&quot;\nabc&quot;</span>,
-                (<span class="ident">Cow::from</span>(<span class="string">&quot;text&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;url&quot;</span>), <span class="ident">Cow::from</span>(<span class="string">&quot;link title&quot;</span>))
+                (Cow::from(<span class="string">&quot;text&quot;</span>), Cow::from(<span class="string">&quot;url&quot;</span>), Cow::from(<span class="string">&quot;link title&quot;</span>))
             ))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_label2dest</span>(<span class="string">&quot;[text]: url \&quot;link\ntitle\&quot;\nabc&quot;</span>),
+            md_label2dest(<span class="string">&quot;[text]: url \&quot;link\ntitle\&quot;\nabc&quot;</span>),
             <span class="prelude-val">Ok</span>((
                 <span class="string">&quot;\nabc&quot;</span>,
                 (
-                    <span class="ident">Cow::from</span>(<span class="string">&quot;text&quot;</span>),
-                    <span class="ident">Cow::from</span>(<span class="string">&quot;url&quot;</span>),
-                    <span class="ident">Cow::from</span>(<span class="string">&quot;link\ntitle&quot;</span>)
+                    Cow::from(<span class="string">&quot;text&quot;</span>),
+                    Cow::from(<span class="string">&quot;url&quot;</span>),
+                    Cow::from(<span class="string">&quot;link\ntitle&quot;</span>)
                 )
             ))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_label2dest</span>(<span class="string">&quot;[text]: url \&quot;link\ntitle\&quot;abc&quot;</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(
+            md_label2dest(<span class="string">&quot;[text]: url \&quot;link\ntitle\&quot;abc&quot;</span>),
+            <span class="prelude-val">Err</span>(nom::Err::Error(nom::error::Error::new(
                 <span class="string">&quot;abc&quot;</span>,
-                <span class="ident">ErrorKind::Char</span>
+                ErrorKind::Char
             )))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_label2dest</span>(<span class="string">&quot;[text]:\nurl \&quot;link\ntitle\&quot;\nabc&quot;</span>),
+            md_label2dest(<span class="string">&quot;[text]:\nurl \&quot;link\ntitle\&quot;\nabc&quot;</span>),
             <span class="prelude-val">Ok</span>((
                 <span class="string">&quot;\nabc&quot;</span>,
                 (
-                    <span class="ident">Cow::from</span>(<span class="string">&quot;text&quot;</span>),
-                    <span class="ident">Cow::from</span>(<span class="string">&quot;url&quot;</span>),
-                    <span class="ident">Cow::from</span>(<span class="string">&quot;link\ntitle&quot;</span>)
+                    Cow::from(<span class="string">&quot;text&quot;</span>),
+                    Cow::from(<span class="string">&quot;url&quot;</span>),
+                    Cow::from(<span class="string">&quot;link\ntitle&quot;</span>)
                 )
             ))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_label2dest</span>(<span class="string">&quot;[text]: url \&quot;link\n\ntitle\&quot;\nabc&quot;</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(
+            md_label2dest(<span class="string">&quot;[text]: url \&quot;link\n\ntitle\&quot;\nabc&quot;</span>),
+            <span class="prelude-val">Err</span>(nom::Err::Error(nom::error::Error::new(
                 <span class="string">&quot;\&quot;link\n\ntitle\&quot;\nabc&quot;</span>,
-                <span class="ident">ErrorKind::Char</span>
+                ErrorKind::Char
             )))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_label2dest</span>(<span class="string">&quot;[text]:\n\nurl \&quot;link title\&quot;\nabc&quot;</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(
+            md_label2dest(<span class="string">&quot;[text]:\n\nurl \&quot;link title\&quot;\nabc&quot;</span>),
+            <span class="prelude-val">Err</span>(nom::Err::Error(nom::error::Error::new(
                 <span class="string">&quot;\n\nurl \&quot;link title\&quot;\nabc&quot;</span>,
-                <span class="ident">ErrorKind::Verify</span>
+                ErrorKind::Verify
             )))
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_md_link_text</span>() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_md_link_text() {
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_link_text</span>(<span class="string">&quot;[text](url)&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;(url)&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;text&quot;</span>)))
+            md_link_text(<span class="string">&quot;[text](url)&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;(url)&quot;</span>, Cow::from(<span class="string">&quot;text&quot;</span>)))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_link_text</span>(<span class="string">&quot;[text[i]](url)&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;(url)&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;text[i]&quot;</span>)))
+            md_link_text(<span class="string">&quot;[text[i]](url)&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;(url)&quot;</span>, Cow::from(<span class="string">&quot;text[i]&quot;</span>)))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_link_text</span>(<span class="string">r#&quot;[text\[i\]](url)&quot;#</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;(url)&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;text[i]&quot;</span>)))
+            md_link_text(<span class="string">r#&quot;[text\[i\]](url)&quot;#</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;(url)&quot;</span>, Cow::from(<span class="string">&quot;text[i]&quot;</span>)))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_link_text</span>(<span class="string">&quot;[text(url)&quot;</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(<span class="string">&quot;&quot;</span>, <span class="ident">ErrorKind::Tag</span>)))
+            md_link_text(<span class="string">&quot;[text(url)&quot;</span>),
+            <span class="prelude-val">Err</span>(nom::Err::Error(nom::error::Error::new(<span class="string">&quot;&quot;</span>, ErrorKind::Tag)))
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_md_link_label</span>() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_md_link_label() {
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_link_label</span>(<span class="string">&quot;[text]: url&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;: url&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;text&quot;</span>)))
+            md_link_label(<span class="string">&quot;[text]: url&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;: url&quot;</span>, Cow::from(<span class="string">&quot;text&quot;</span>)))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_link_label</span>(<span class="string">r#&quot;[text\[i\]]: url&quot;#</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;: url&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;text[i]&quot;</span>)))
+            md_link_label(<span class="string">r#&quot;[text\[i\]]: url&quot;#</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;: url&quot;</span>, Cow::from(<span class="string">&quot;text[i]&quot;</span>)))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_link_label</span>(<span class="string">&quot;[text: url&quot;</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(<span class="string">&quot;&quot;</span>, <span class="ident">ErrorKind::Tag</span>)))
+            md_link_label(<span class="string">&quot;[text: url&quot;</span>),
+            <span class="prelude-val">Err</span>(nom::Err::Error(nom::error::Error::new(<span class="string">&quot;&quot;</span>, ErrorKind::Tag)))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_link_label</span>(<span class="string">&quot;[t[ext: url&quot;</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(
+            md_link_label(<span class="string">&quot;[t[ext: url&quot;</span>),
+            <span class="prelude-val">Err</span>(nom::Err::Error(nom::error::Error::new(
                 <span class="string">&quot;[ext: url&quot;</span>,
-                <span class="ident">ErrorKind::Tag</span>
+                ErrorKind::Tag
             )))
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_md_link_destination</span>() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_md_link_destination() {
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_link_destination</span>(<span class="string">&quot;url  abc&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;  abc&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;url&quot;</span>)))
+            md_link_destination(<span class="string">&quot;url  abc&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;  abc&quot;</span>, Cow::from(<span class="string">&quot;url&quot;</span>)))
         );
-        <span class="macro">assert_eq!</span>(<span class="ident">md_link_destination</span>(<span class="string">&quot;url&quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;url&quot;</span>))));
+        <span class="macro">assert_eq!</span>(md_link_destination(<span class="string">&quot;url&quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, Cow::from(<span class="string">&quot;url&quot;</span>))));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_link_destination</span>(<span class="string">&quot;url\nabc&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;\nabc&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;url&quot;</span>)))
-        );
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">md_link_destination</span>(<span class="string">&quot;&lt;url&gt;abc&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;url&quot;</span>)))
+            md_link_destination(<span class="string">&quot;url\nabc&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;\nabc&quot;</span>, Cow::from(<span class="string">&quot;url&quot;</span>)))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_link_destination</span>(<span class="string">r#&quot;&lt;u\&lt;r\&gt;l&gt;abc&quot;#</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">r#&quot;u&lt;r&gt;l&quot;#</span>)))
+            md_link_destination(<span class="string">&quot;&lt;url&gt;abc&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, Cow::from(<span class="string">&quot;url&quot;</span>)))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_link_destination</span>(<span class="string">r#&quot;u\)r\(l abc&quot;#</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot; abc&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">r#&quot;u)r(l&quot;#</span>)))
+            md_link_destination(<span class="string">r#&quot;&lt;u\&lt;r\&gt;l&gt;abc&quot;#</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, Cow::from(<span class="string">r#&quot;u&lt;r&gt;l&quot;#</span>)))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_link_destination</span>(<span class="string">r#&quot;u(r)l abc&quot;#</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot; abc&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">r#&quot;u(r)l&quot;#</span>)))
+            md_link_destination(<span class="string">r#&quot;u\)r\(l abc&quot;#</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot; abc&quot;</span>, Cow::from(<span class="string">r#&quot;u)r(l&quot;#</span>)))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_link_destination</span>(<span class="string">&quot;u(r)l\nabc&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;\nabc&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">r#&quot;u(r)l&quot;#</span>)))
+            md_link_destination(<span class="string">r#&quot;u(r)l abc&quot;#</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot; abc&quot;</span>, Cow::from(<span class="string">r#&quot;u(r)l&quot;#</span>)))
+        );
+        <span class="macro">assert_eq!</span>(
+            md_link_destination(<span class="string">&quot;u(r)l\nabc&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;\nabc&quot;</span>, Cow::from(<span class="string">r#&quot;u(r)l&quot;#</span>)))
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_md_parse_link_destination</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">md_parse_link_destination</span>(<span class="string">&quot;&lt;url&gt;abc&quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, <span class="string">&quot;url&quot;</span>)));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_md_parse_link_destination() {
+        <span class="macro">assert_eq!</span>(md_parse_link_destination(<span class="string">&quot;&lt;url&gt;abc&quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, <span class="string">&quot;url&quot;</span>)));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_parse_link_destination</span>(<span class="string">r#&quot;&lt;u\&lt;r\&gt;l&gt;abc&quot;#</span>),
+            md_parse_link_destination(<span class="string">r#&quot;&lt;u\&lt;r\&gt;l&gt;abc&quot;#</span>),
             <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, <span class="string">r#&quot;u\&lt;r\&gt;l&quot;#</span>))
         );
-        <span class="macro">assert_eq!</span>(<span class="ident">md_parse_link_destination</span>(<span class="string">&quot;&lt;url&gt; abc&quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot; abc&quot;</span>, <span class="string">&quot;url&quot;</span>)));
+        <span class="macro">assert_eq!</span>(md_parse_link_destination(<span class="string">&quot;&lt;url&gt; abc&quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot; abc&quot;</span>, <span class="string">&quot;url&quot;</span>)));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_parse_link_destination</span>(<span class="string">&quot;&lt;url&gt;\nabc&quot;</span>),
+            md_parse_link_destination(<span class="string">&quot;&lt;url&gt;\nabc&quot;</span>),
             <span class="prelude-val">Ok</span>((<span class="string">&quot;\nabc&quot;</span>, <span class="string">&quot;url&quot;</span>))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_parse_link_destination</span>(<span class="string">&quot;&lt;url 2&gt;abc&quot;</span>),
+            md_parse_link_destination(<span class="string">&quot;&lt;url 2&gt;abc&quot;</span>),
             <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, <span class="string">&quot;url 2&quot;</span>))
         );
-        <span class="macro">assert_eq!</span>(<span class="ident">md_parse_link_destination</span>(<span class="string">&quot;url abc&quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot; abc&quot;</span>, <span class="string">&quot;url&quot;</span>)));
+        <span class="macro">assert_eq!</span>(md_parse_link_destination(<span class="string">&quot;url abc&quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot; abc&quot;</span>, <span class="string">&quot;url&quot;</span>)));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_parse_link_destination</span>(<span class="string">&quot;&lt;url(1)&gt; abc&quot;</span>),
+            md_parse_link_destination(<span class="string">&quot;&lt;url(1)&gt; abc&quot;</span>),
             <span class="prelude-val">Ok</span>((<span class="string">&quot; abc&quot;</span>, <span class="string">&quot;url(1)&quot;</span>))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_parse_link_destination</span>(<span class="string">r#&quot;&lt;[1a]\[1b\](2a)\(2b\)\&lt;3b\&gt;{4a}\{4b\}&gt; abc&quot;#</span>),
+            md_parse_link_destination(<span class="string">r#&quot;&lt;[1a]\[1b\](2a)\(2b\)\&lt;3b\&gt;{4a}\{4b\}&gt; abc&quot;#</span>),
             <span class="prelude-val">Ok</span>((<span class="string">&quot; abc&quot;</span>, <span class="string">r#&quot;[1a]\[1b\](2a)\(2b\)\&lt;3b\&gt;{4a}\{4b\}&quot;#</span>))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_parse_link_destination</span>(<span class="string">&quot;ur()l abc&quot;</span>),
+            md_parse_link_destination(<span class="string">&quot;ur()l abc&quot;</span>),
             <span class="prelude-val">Ok</span>((<span class="string">&quot; abc&quot;</span>, <span class="string">&quot;ur()l&quot;</span>))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_parse_link_destination</span>(<span class="string">&quot;ur()l\nabc&quot;</span>),
+            md_parse_link_destination(<span class="string">&quot;ur()l\nabc&quot;</span>),
             <span class="prelude-val">Ok</span>((<span class="string">&quot;\nabc&quot;</span>, <span class="string">&quot;ur()l&quot;</span>))
         );
-        <span class="macro">assert_eq!</span>(<span class="ident">md_parse_link_destination</span>(<span class="string">&quot;&lt;&gt;abc&quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, <span class="string">&quot;&quot;</span>)));
-        <span class="macro">assert_eq!</span>(<span class="ident">md_parse_link_destination</span>(<span class="string">&quot;&lt;&gt;\nabc&quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot;\nabc&quot;</span>, <span class="string">&quot;&quot;</span>)));
-        <span class="macro">assert_eq!</span>(<span class="ident">md_parse_link_destination</span>(<span class="string">&quot;url&quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="string">&quot;url&quot;</span>)));
-        <span class="macro">assert_eq!</span>(<span class="ident">md_parse_link_destination</span>(<span class="string">&quot;&quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>)));
-        <span class="macro">assert_eq!</span>(<span class="ident">md_parse_link_destination</span>(<span class="string">&quot;\nabc&quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot;\nabc&quot;</span>, <span class="string">&quot;&quot;</span>)));
+        <span class="macro">assert_eq!</span>(md_parse_link_destination(<span class="string">&quot;&lt;&gt;abc&quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, <span class="string">&quot;&quot;</span>)));
+        <span class="macro">assert_eq!</span>(md_parse_link_destination(<span class="string">&quot;&lt;&gt;\nabc&quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot;\nabc&quot;</span>, <span class="string">&quot;&quot;</span>)));
+        <span class="macro">assert_eq!</span>(md_parse_link_destination(<span class="string">&quot;url&quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="string">&quot;url&quot;</span>)));
+        <span class="macro">assert_eq!</span>(md_parse_link_destination(<span class="string">&quot;&quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>)));
+        <span class="macro">assert_eq!</span>(md_parse_link_destination(<span class="string">&quot;\nabc&quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot;\nabc&quot;</span>, <span class="string">&quot;&quot;</span>)));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_md_escaped_str_transform</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">md_escaped_str_transform</span>(<span class="string">&quot;&quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;&quot;</span>))));
-        <span class="comment">// Different than the link destination version.</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">md_escaped_str_transform</span>(<span class="string">&quot;   &quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;   &quot;</span>))));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_md_escaped_str_transform() {
+        <span class="macro">assert_eq!</span>(md_escaped_str_transform(<span class="string">&quot;&quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, Cow::from(<span class="string">&quot;&quot;</span>))));
+        <span class="comment">// Different than the link destination version.
+        </span><span class="macro">assert_eq!</span>(md_escaped_str_transform(<span class="string">&quot;   &quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, Cow::from(<span class="string">&quot;   &quot;</span>))));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_escaped_str_transform</span>(<span class="string">r#&quot;abc`:&lt;&gt;abc&quot;#</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">r#&quot;abc`:&lt;&gt;abc&quot;#</span>)))
+            md_escaped_str_transform(<span class="string">r#&quot;abc`:&lt;&gt;abc&quot;#</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, Cow::from(<span class="string">r#&quot;abc`:&lt;&gt;abc&quot;#</span>)))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_escaped_str_transform</span>(<span class="string">r#&quot;\&lt;\&gt;\\&quot;#</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">r#&quot;&lt;&gt;\&quot;#</span>)))
+            md_escaped_str_transform(<span class="string">r#&quot;\&lt;\&gt;\\&quot;#</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, Cow::from(<span class="string">r#&quot;&lt;&gt;\&quot;#</span>)))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_escaped_str_transform</span>(<span class="string">r#&quot;\(\)\\&quot;#</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">r#&quot;()\&quot;#</span>)))
+            md_escaped_str_transform(<span class="string">r#&quot;\(\)\\&quot;#</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, Cow::from(<span class="string">r#&quot;()\&quot;#</span>)))
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_md_link_title</span>() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_md_link_title() {
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_link_title</span>(<span class="string">&quot; (title)abc&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;title&quot;</span>)))
+            md_link_title(<span class="string">&quot; (title)abc&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, Cow::from(<span class="string">&quot;title&quot;</span>)))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_link_title</span>(<span class="string">&quot; (ti(t)le)abc&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;ti(t)le&quot;</span>)))
+            md_link_title(<span class="string">&quot; (ti(t)le)abc&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, Cow::from(<span class="string">&quot;ti(t)le&quot;</span>)))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_link_title</span>(<span class="string">r#&quot; (ti\(t\)le)abc&quot;#</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;ti(t)le&quot;</span>)))
+            md_link_title(<span class="string">r#&quot; (ti\(t\)le)abc&quot;#</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, Cow::from(<span class="string">&quot;ti(t)le&quot;</span>)))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_link_title</span>(<span class="string">r#&quot; &quot;1\\23\&quot;4\&#39;56&quot;abc&quot;#</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">r#&quot;1\23&quot;4&#39;56&quot;#</span>)))
+            md_link_title(<span class="string">r#&quot; &quot;1\\23\&quot;4\&#39;56&quot;abc&quot;#</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, Cow::from(<span class="string">r#&quot;1\23&quot;4&#39;56&quot;#</span>)))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_link_title</span>(<span class="string">&quot; \&quot;tu\nvwxy\&quot;abc&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;tu\nvwxy&quot;</span>)))
+            md_link_title(<span class="string">&quot; \&quot;tu\nvwxy\&quot;abc&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, Cow::from(<span class="string">&quot;tu\nvwxy&quot;</span>)))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_link_title</span>(<span class="string">&quot; &#39;tu\nv\\\&#39;wxy&#39;abc&quot;</span>),
-            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, <span class="ident">Cow::from</span>(<span class="string">&quot;tu\nv\&#39;wxy&quot;</span>)))
+            md_link_title(<span class="string">&quot; &#39;tu\nv\\\&#39;wxy&#39;abc&quot;</span>),
+            <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, Cow::from(<span class="string">&quot;tu\nv\&#39;wxy&quot;</span>)))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_link_title</span>(<span class="string">&quot; (ti\n\ntle)abc&quot;</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(
+            md_link_title(<span class="string">&quot; (ti\n\ntle)abc&quot;</span>),
+            <span class="prelude-val">Err</span>(nom::Err::Error(nom::error::Error::new(
                 <span class="string">&quot;(ti\n\ntle)abc&quot;</span>,
-                <span class="ident">ErrorKind::Verify</span>
+                ErrorKind::Verify
             )))
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_md_parse_link_title</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">md_parse_link_title</span>(<span class="string">&quot; (title)abc&quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, <span class="string">&quot;title&quot;</span>)));
-        <span class="macro">assert_eq!</span>(<span class="ident">md_parse_link_title</span>(<span class="string">&quot; (ti(t)le)abc&quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, <span class="string">&quot;ti(t)le&quot;</span>)));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_md_parse_link_title() {
+        <span class="macro">assert_eq!</span>(md_parse_link_title(<span class="string">&quot; (title)abc&quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, <span class="string">&quot;title&quot;</span>)));
+        <span class="macro">assert_eq!</span>(md_parse_link_title(<span class="string">&quot; (ti(t)le)abc&quot;</span>), <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, <span class="string">&quot;ti(t)le&quot;</span>)));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_parse_link_title</span>(<span class="string">r#&quot; &quot;1\\23\&quot;4\&#39;56&quot;abc&quot;#</span>),
+            md_parse_link_title(<span class="string">r#&quot; &quot;1\\23\&quot;4\&#39;56&quot;abc&quot;#</span>),
             <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, <span class="string">r#&quot;1\\23\&quot;4\&#39;56&quot;#</span>))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_parse_link_title</span>(<span class="string">&quot; \&quot;tu\nvwxy\&quot;abc&quot;</span>),
+            md_parse_link_title(<span class="string">&quot; \&quot;tu\nvwxy\&quot;abc&quot;</span>),
             <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, <span class="string">&quot;tu\nvwxy&quot;</span>))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_parse_link_title</span>(<span class="string">&quot; &#39;tu\nv\\\&#39;wxy&#39;abc&quot;</span>),
+            md_parse_link_title(<span class="string">&quot; &#39;tu\nv\\\&#39;wxy&#39;abc&quot;</span>),
             <span class="prelude-val">Ok</span>((<span class="string">&quot;abc&quot;</span>, <span class="string">&quot;tu\nv\\\&#39;wxy&quot;</span>))
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">md_parse_link_title</span>(<span class="string">&quot; (ti\n\ntle)abc&quot;</span>),
-            <span class="prelude-val">Err</span>(<span class="ident">nom::Err::Error</span>(<span class="ident">nom::error::Error::new</span>(
+            md_parse_link_title(<span class="string">&quot; (ti\n\ntle)abc&quot;</span>),
+            <span class="prelude-val">Err</span>(nom::Err::Error(nom::error::Error::new(
                 <span class="string">&quot;(ti\n\ntle)abc&quot;</span>,
-                <span class="ident">ErrorKind::Verify</span>
+                ErrorKind::Verify
             )))
         );
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="parse_hyperlinks" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="parse_hyperlinks" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

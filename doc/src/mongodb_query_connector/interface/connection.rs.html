@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/mongodb-query-connector/src/interface/connection.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>connection.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb_query_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/mongodb-query-connector/src/interface/connection.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>connection.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb_query_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -251,258 +251,258 @@
 <span id="251">251</span>
 <span id="252">252</span>
 <span id="253">253</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::catch</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">error::MongoError</span>,
-    <span class="ident">root_queries</span>::{<span class="ident">aggregate</span>, <span class="ident">read</span>, <span class="ident">write</span>},
-    <span class="ident">MongoDbTransaction</span>,
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::catch;
+<span class="kw">use crate</span>::{
+    error::MongoError,
+    root_queries::{aggregate, read, write},
+    MongoDbTransaction,
 };
-<span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
-<span class="kw">use</span> <span class="ident">connector_interface</span>::{
-    <span class="ident">Connection</span>, <span class="ident">ConnectionLike</span>, <span class="ident">ReadOperations</span>, <span class="ident">RelAggregationSelection</span>, <span class="ident">Transaction</span>, <span class="ident">UpdateType</span>, <span class="ident">WriteArgs</span>,
-    <span class="ident">WriteOperations</span>,
+<span class="kw">use </span>async_trait::async_trait;
+<span class="kw">use </span>connector_interface::{
+    Connection, ConnectionLike, ReadOperations, RelAggregationSelection, Transaction, UpdateType, WriteArgs,
+    WriteOperations,
 };
-<span class="kw">use</span> <span class="ident">mongodb</span>::{<span class="ident">ClientSession</span>, <span class="ident">Database</span>};
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">prelude</span>::<span class="kw-2">*</span>, <span class="ident">SelectionResult</span>};
-<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+<span class="kw">use </span>mongodb::{ClientSession, Database};
+<span class="kw">use </span>prisma_models::{prelude::<span class="kw-2">*</span>, SelectionResult};
+<span class="kw">use </span>std::collections::HashMap;
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MongoDbConnection</span> {
-    <span class="doccomment">/// The session to use for operations.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">session</span>: <span class="ident">ClientSession</span>,
+<span class="kw">pub struct </span>MongoDbConnection {
+    <span class="doccomment">/// The session to use for operations.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) session: ClientSession,
 
-    <span class="doccomment">/// Handle to a mongo database.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">database</span>: <span class="ident">Database</span>,
+    <span class="doccomment">/// Handle to a mongo database.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) database: Database,
 }
 
-<span class="kw">impl</span> <span class="ident">ConnectionLike</span> <span class="kw">for</span> <span class="ident">MongoDbConnection</span> {}
+<span class="kw">impl </span>ConnectionLike <span class="kw">for </span>MongoDbConnection {}
 
-<span class="attribute">#[<span class="ident">async_trait</span>]</span>
-<span class="kw">impl</span> <span class="ident">Connection</span> <span class="kw">for</span> <span class="ident">MongoDbConnection</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_transaction</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>,
-        <span class="ident">isolation_level</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">connector_interface::Transaction</span> <span class="op">+</span> <span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">isolation_level</span>.<span class="ident">is_some</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">MongoError::Unsupported</span>(
-                <span class="string">&quot;Mongo does not support setting transaction isolation levels.&quot;</span>.<span class="ident">to_owned</span>(),
+<span class="attribute">#[async_trait]
+</span><span class="kw">impl </span>Connection <span class="kw">for </span>MongoDbConnection {
+    <span class="kw">async fn </span>start_transaction&lt;<span class="lifetime">&#39;a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>,
+        isolation_level: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; connector_interface::Result&lt;Box&lt;<span class="kw">dyn </span>connector_interface::Transaction + <span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="kw">if </span>isolation_level.is_some() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(MongoError::Unsupported(
+                <span class="string">&quot;Mongo does not support setting transaction isolation levels.&quot;</span>.to_owned(),
             )
-            .<span class="ident">into_connector_error</span>());
+            .into_connector_error());
         }
 
-        <span class="kw">let</span> <span class="ident">tx</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">MongoDbTransaction::new</span>(<span class="self">self</span>).<span class="kw">await</span><span class="question-mark">?</span>);
+        <span class="kw">let </span>tx = Box::new(MongoDbTransaction::new(<span class="self">self</span>).<span class="kw">await</span><span class="question-mark">?</span>);
 
-        <span class="prelude-val">Ok</span>(<span class="ident">tx</span> <span class="kw">as</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Transaction</span><span class="op">&gt;</span>)
+        <span class="prelude-val">Ok</span>(tx <span class="kw">as </span>Box&lt;<span class="kw">dyn </span>Transaction&gt;)
     }
 
-    <span class="kw">fn</span> <span class="ident">as_connection_like</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="kw">dyn</span> <span class="ident">ConnectionLike</span> {
-        <span class="self">self</span>
-    }
+    <span class="kw">fn </span>as_connection_like(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="kw">dyn </span>ConnectionLike {
+        <span class="self">self
+    </span>}
 }
 
-<span class="attribute">#[<span class="ident">async_trait</span>]</span>
-<span class="kw">impl</span> <span class="ident">WriteOperations</span> <span class="kw">for</span> <span class="ident">MongoDbConnection</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_record</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-        <span class="ident">args</span>: <span class="ident">WriteArgs</span>,
-        <span class="ident">_trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span> {
-        <span class="ident">catch</span>(<span class="kw">async</span> <span class="kw">move</span> { <span class="ident">write::create_record</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">database</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">session</span>, <span class="ident">model</span>, <span class="ident">args</span>).<span class="kw">await</span> }).<span class="kw">await</span>
-    }
+<span class="attribute">#[async_trait]
+</span><span class="kw">impl </span>WriteOperations <span class="kw">for </span>MongoDbConnection {
+    <span class="kw">async fn </span>create_record(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        model: <span class="kw-2">&amp;</span>ModelRef,
+        args: WriteArgs,
+        _trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; connector_interface::Result&lt;SelectionResult&gt; {
+        catch(<span class="kw">async move </span>{ write::create_record(<span class="kw-2">&amp;</span><span class="self">self</span>.database, <span class="kw-2">&amp;mut </span><span class="self">self</span>.session, model, args).<span class="kw">await </span>}).<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_records</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-        <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">WriteArgs</span><span class="op">&gt;</span>,
-        <span class="ident">skip_duplicates</span>: <span class="ident">bool</span>,
-        <span class="ident">_trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="ident">catch</span>(
-            <span class="kw">async</span> <span class="kw">move</span> { <span class="ident">write::create_records</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">database</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">session</span>, <span class="ident">model</span>, <span class="ident">args</span>, <span class="ident">skip_duplicates</span>).<span class="kw">await</span> },
+    <span class="kw">async fn </span>create_records(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        model: <span class="kw-2">&amp;</span>ModelRef,
+        args: Vec&lt;WriteArgs&gt;,
+        skip_duplicates: bool,
+        _trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; connector_interface::Result&lt;usize&gt; {
+        catch(
+            <span class="kw">async move </span>{ write::create_records(<span class="kw-2">&amp;</span><span class="self">self</span>.database, <span class="kw-2">&amp;mut </span><span class="self">self</span>.session, model, args, skip_duplicates).<span class="kw">await </span>},
         )
-        .<span class="kw">await</span>
-    }
+        .<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update_records</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-        <span class="ident">record_filter</span>: <span class="ident">connector_interface::RecordFilter</span>,
-        <span class="ident">args</span>: <span class="ident">WriteArgs</span>,
-        <span class="ident">_trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="ident">catch</span>(<span class="kw">async</span> <span class="kw">move</span> {
-            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">write::update_records</span>(
-                <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">database</span>,
-                <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">session</span>,
-                <span class="ident">model</span>,
-                <span class="ident">record_filter</span>,
-                <span class="ident">args</span>,
-                <span class="ident">UpdateType::Many</span>,
+    <span class="kw">async fn </span>update_records(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        model: <span class="kw-2">&amp;</span>ModelRef,
+        record_filter: connector_interface::RecordFilter,
+        args: WriteArgs,
+        _trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; connector_interface::Result&lt;usize&gt; {
+        catch(<span class="kw">async move </span>{
+            <span class="kw">let </span>result = write::update_records(
+                <span class="kw-2">&amp;</span><span class="self">self</span>.database,
+                <span class="kw-2">&amp;mut </span><span class="self">self</span>.session,
+                model,
+                record_filter,
+                args,
+                UpdateType::Many,
             )
             .<span class="kw">await</span><span class="question-mark">?</span>;
 
-            <span class="prelude-val">Ok</span>(<span class="ident">result</span>.<span class="ident">len</span>())
+            <span class="prelude-val">Ok</span>(result.len())
         })
-        .<span class="kw">await</span>
-    }
+        .<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update_record</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-        <span class="ident">record_filter</span>: <span class="ident">connector_interface::RecordFilter</span>,
-        <span class="ident">args</span>: <span class="ident">WriteArgs</span>,
-        <span class="ident">_trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">catch</span>(<span class="kw">async</span> <span class="kw">move</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">write::update_records</span>(
-                <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">database</span>,
-                <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">session</span>,
-                <span class="ident">model</span>,
-                <span class="ident">record_filter</span>,
-                <span class="ident">args</span>,
-                <span class="ident">UpdateType::One</span>,
+    <span class="kw">async fn </span>update_record(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        model: <span class="kw-2">&amp;</span>ModelRef,
+        record_filter: connector_interface::RecordFilter,
+        args: WriteArgs,
+        _trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; connector_interface::Result&lt;<span class="prelude-ty">Option</span>&lt;SelectionResult&gt;&gt; {
+        catch(<span class="kw">async move </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>res = write::update_records(
+                <span class="kw-2">&amp;</span><span class="self">self</span>.database,
+                <span class="kw-2">&amp;mut </span><span class="self">self</span>.session,
+                model,
+                record_filter,
+                args,
+                UpdateType::One,
             )
             .<span class="kw">await</span><span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(<span class="ident">res</span>.<span class="ident">pop</span>())
+            <span class="prelude-val">Ok</span>(res.pop())
         })
-        .<span class="kw">await</span>
-    }
+        .<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_records</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-        <span class="ident">record_filter</span>: <span class="ident">connector_interface::RecordFilter</span>,
-        <span class="ident">_trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="ident">catch</span>(<span class="kw">async</span> <span class="kw">move</span> { <span class="ident">write::delete_records</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">database</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">session</span>, <span class="ident">model</span>, <span class="ident">record_filter</span>).<span class="kw">await</span> }).<span class="kw">await</span>
-    }
+    <span class="kw">async fn </span>delete_records(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        model: <span class="kw-2">&amp;</span>ModelRef,
+        record_filter: connector_interface::RecordFilter,
+        _trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; connector_interface::Result&lt;usize&gt; {
+        catch(<span class="kw">async move </span>{ write::delete_records(<span class="kw-2">&amp;</span><span class="self">self</span>.database, <span class="kw-2">&amp;mut </span><span class="self">self</span>.session, model, record_filter).<span class="kw">await </span>}).<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">m2m_connect</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-        <span class="ident">parent_id</span>: <span class="kw-2">&amp;</span><span class="ident">SelectionResult</span>,
-        <span class="ident">child_ids</span>: <span class="kw-2">&amp;</span>[<span class="ident">SelectionResult</span>],
-    ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">catch</span>(<span class="kw">async</span> <span class="kw">move</span> { <span class="ident">write::m2m_connect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">database</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">session</span>, <span class="ident">field</span>, <span class="ident">parent_id</span>, <span class="ident">child_ids</span>).<span class="kw">await</span> })
-            .<span class="kw">await</span>
-    }
+    <span class="kw">async fn </span>m2m_connect(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        field: <span class="kw-2">&amp;</span>RelationFieldRef,
+        parent_id: <span class="kw-2">&amp;</span>SelectionResult,
+        child_ids: <span class="kw-2">&amp;</span>[SelectionResult],
+    ) -&gt; connector_interface::Result&lt;()&gt; {
+        catch(<span class="kw">async move </span>{ write::m2m_connect(<span class="kw-2">&amp;</span><span class="self">self</span>.database, <span class="kw-2">&amp;mut </span><span class="self">self</span>.session, field, parent_id, child_ids).<span class="kw">await </span>})
+            .<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">m2m_disconnect</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-        <span class="ident">parent_id</span>: <span class="kw-2">&amp;</span><span class="ident">SelectionResult</span>,
-        <span class="ident">child_ids</span>: <span class="kw-2">&amp;</span>[<span class="ident">SelectionResult</span>],
-        <span class="ident">_trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">catch</span>(
-            <span class="kw">async</span> <span class="kw">move</span> { <span class="ident">write::m2m_disconnect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">database</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">session</span>, <span class="ident">field</span>, <span class="ident">parent_id</span>, <span class="ident">child_ids</span>).<span class="kw">await</span> },
+    <span class="kw">async fn </span>m2m_disconnect(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        field: <span class="kw-2">&amp;</span>RelationFieldRef,
+        parent_id: <span class="kw-2">&amp;</span>SelectionResult,
+        child_ids: <span class="kw-2">&amp;</span>[SelectionResult],
+        _trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; connector_interface::Result&lt;()&gt; {
+        catch(
+            <span class="kw">async move </span>{ write::m2m_disconnect(<span class="kw-2">&amp;</span><span class="self">self</span>.database, <span class="kw-2">&amp;mut </span><span class="self">self</span>.session, field, parent_id, child_ids).<span class="kw">await </span>},
         )
-        .<span class="kw">await</span>
-    }
+        .<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_raw</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">inputs</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">PrismaValue</span><span class="op">&gt;</span>) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="ident">catch</span>(<span class="kw">async</span> <span class="kw">move</span> { <span class="ident">write::execute_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">database</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">session</span>, <span class="ident">inputs</span>).<span class="kw">await</span> }).<span class="kw">await</span>
-    }
+    <span class="kw">async fn </span>execute_raw(<span class="kw-2">&amp;mut </span><span class="self">self</span>, inputs: HashMap&lt;String, PrismaValue&gt;) -&gt; connector_interface::Result&lt;usize&gt; {
+        catch(<span class="kw">async move </span>{ write::execute_raw(<span class="kw-2">&amp;</span><span class="self">self</span>.database, <span class="kw-2">&amp;mut </span><span class="self">self</span>.session, inputs).<span class="kw">await </span>}).<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query_raw</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">model</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ModelRef</span><span class="op">&gt;</span>,
-        <span class="ident">inputs</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">PrismaValue</span><span class="op">&gt;</span>,
-        <span class="ident">query_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">serde_json::Value</span><span class="op">&gt;</span> {
-        <span class="ident">catch</span>(<span class="kw">async</span> <span class="kw">move</span> { <span class="ident">write::query_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">database</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">session</span>, <span class="ident">model</span>, <span class="ident">inputs</span>, <span class="ident">query_type</span>).<span class="kw">await</span> }).<span class="kw">await</span>
-    }
+    <span class="kw">async fn </span>query_raw(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        model: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ModelRef&gt;,
+        inputs: HashMap&lt;String, PrismaValue&gt;,
+        query_type: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; connector_interface::Result&lt;serde_json::Value&gt; {
+        catch(<span class="kw">async move </span>{ write::query_raw(<span class="kw-2">&amp;</span><span class="self">self</span>.database, <span class="kw-2">&amp;mut </span><span class="self">self</span>.session, model, inputs, query_type).<span class="kw">await </span>}).<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">native_upsert_record</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">_upsert</span>: <span class="ident">connector_interface::NativeUpsert</span>,
-        <span class="ident">_trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">SingleRecord</span><span class="op">&gt;</span> {
+    <span class="kw">async fn </span>native_upsert_record(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        _upsert: connector_interface::NativeUpsert,
+        _trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; connector_interface::Result&lt;SingleRecord&gt; {
         <span class="macro">unimplemented!</span>(<span class="string">&quot;Native upsert is not currently supported.&quot;</span>)
     }
 }
 
-<span class="attribute">#[<span class="ident">async_trait</span>]</span>
-<span class="kw">impl</span> <span class="ident">ReadOperations</span> <span class="kw">for</span> <span class="ident">MongoDbConnection</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_single_record</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-        <span class="ident">filter</span>: <span class="kw-2">&amp;</span><span class="ident">connector_interface::Filter</span>,
-        <span class="ident">selected_fields</span>: <span class="kw-2">&amp;</span><span class="ident">FieldSelection</span>,
-        <span class="ident">aggr_selections</span>: <span class="kw-2">&amp;</span>[<span class="ident">RelAggregationSelection</span>],
-        <span class="ident">_trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SingleRecord</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">catch</span>(<span class="kw">async</span> <span class="kw">move</span> {
-            <span class="ident">read::get_single_record</span>(
-                <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">database</span>,
-                <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">session</span>,
-                <span class="ident">model</span>,
-                <span class="ident">filter</span>,
-                <span class="ident">selected_fields</span>,
-                <span class="ident">aggr_selections</span>,
+<span class="attribute">#[async_trait]
+</span><span class="kw">impl </span>ReadOperations <span class="kw">for </span>MongoDbConnection {
+    <span class="kw">async fn </span>get_single_record(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        model: <span class="kw-2">&amp;</span>ModelRef,
+        filter: <span class="kw-2">&amp;</span>connector_interface::Filter,
+        selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
+        aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
+        _trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; connector_interface::Result&lt;<span class="prelude-ty">Option</span>&lt;SingleRecord&gt;&gt; {
+        catch(<span class="kw">async move </span>{
+            read::get_single_record(
+                <span class="kw-2">&amp;</span><span class="self">self</span>.database,
+                <span class="kw-2">&amp;mut </span><span class="self">self</span>.session,
+                model,
+                filter,
+                selected_fields,
+                aggr_selections,
             )
-            .<span class="kw">await</span>
-        })
-        .<span class="kw">await</span>
-    }
+            .<span class="kw">await
+        </span>})
+        .<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_many_records</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-        <span class="ident">query_arguments</span>: <span class="ident">connector_interface::QueryArguments</span>,
-        <span class="ident">selected_fields</span>: <span class="kw-2">&amp;</span><span class="ident">FieldSelection</span>,
-        <span class="ident">aggregation_selections</span>: <span class="kw-2">&amp;</span>[<span class="ident">RelAggregationSelection</span>],
-        <span class="ident">_trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">ManyRecords</span><span class="op">&gt;</span> {
-        <span class="ident">catch</span>(<span class="kw">async</span> <span class="kw">move</span> {
-            <span class="ident">read::get_many_records</span>(
-                <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">database</span>,
-                <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">session</span>,
-                <span class="ident">model</span>,
-                <span class="ident">query_arguments</span>,
-                <span class="ident">selected_fields</span>,
-                <span class="ident">aggregation_selections</span>,
+    <span class="kw">async fn </span>get_many_records(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        model: <span class="kw-2">&amp;</span>ModelRef,
+        query_arguments: connector_interface::QueryArguments,
+        selected_fields: <span class="kw-2">&amp;</span>FieldSelection,
+        aggregation_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
+        _trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; connector_interface::Result&lt;ManyRecords&gt; {
+        catch(<span class="kw">async move </span>{
+            read::get_many_records(
+                <span class="kw-2">&amp;</span><span class="self">self</span>.database,
+                <span class="kw-2">&amp;mut </span><span class="self">self</span>.session,
+                model,
+                query_arguments,
+                selected_fields,
+                aggregation_selections,
             )
-            .<span class="kw">await</span>
-        })
-        .<span class="kw">await</span>
-    }
+            .<span class="kw">await
+        </span>})
+        .<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_related_m2m_record_ids</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">from_field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-        <span class="ident">from_record_ids</span>: <span class="kw-2">&amp;</span>[<span class="ident">SelectionResult</span>],
-        <span class="ident">_trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">SelectionResult</span>, <span class="ident">SelectionResult</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">catch</span>(<span class="kw">async</span> <span class="kw">move</span> {
-            <span class="ident">read::get_related_m2m_record_ids</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">database</span>, <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">session</span>, <span class="ident">from_field</span>, <span class="ident">from_record_ids</span>).<span class="kw">await</span>
-        })
-        .<span class="kw">await</span>
-    }
+    <span class="kw">async fn </span>get_related_m2m_record_ids(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        from_field: <span class="kw-2">&amp;</span>RelationFieldRef,
+        from_record_ids: <span class="kw-2">&amp;</span>[SelectionResult],
+        _trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; connector_interface::Result&lt;Vec&lt;(SelectionResult, SelectionResult)&gt;&gt; {
+        catch(<span class="kw">async move </span>{
+            read::get_related_m2m_record_ids(<span class="kw-2">&amp;</span><span class="self">self</span>.database, <span class="kw-2">&amp;mut </span><span class="self">self</span>.session, from_field, from_record_ids).<span class="kw">await
+        </span>})
+        .<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">aggregate_records</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-        <span class="ident">query_arguments</span>: <span class="ident">connector_interface::QueryArguments</span>,
-        <span class="ident">selections</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">connector_interface::AggregationSelection</span><span class="op">&gt;</span>,
-        <span class="ident">group_by</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span>,
-        <span class="ident">having</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">connector_interface::Filter</span><span class="op">&gt;</span>,
-        <span class="ident">_trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">connector_interface::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">connector_interface::AggregationRow</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">catch</span>(<span class="kw">async</span> <span class="kw">move</span> {
-            <span class="ident">aggregate::aggregate</span>(
-                <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">database</span>,
-                <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">session</span>,
-                <span class="ident">model</span>,
-                <span class="ident">query_arguments</span>,
-                <span class="ident">selections</span>,
-                <span class="ident">group_by</span>,
-                <span class="ident">having</span>,
+    <span class="kw">async fn </span>aggregate_records(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        model: <span class="kw-2">&amp;</span>ModelRef,
+        query_arguments: connector_interface::QueryArguments,
+        selections: Vec&lt;connector_interface::AggregationSelection&gt;,
+        group_by: Vec&lt;ScalarFieldRef&gt;,
+        having: <span class="prelude-ty">Option</span>&lt;connector_interface::Filter&gt;,
+        _trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    ) -&gt; connector_interface::Result&lt;Vec&lt;connector_interface::AggregationRow&gt;&gt; {
+        catch(<span class="kw">async move </span>{
+            aggregate::aggregate(
+                <span class="kw-2">&amp;</span><span class="self">self</span>.database,
+                <span class="kw-2">&amp;mut </span><span class="self">self</span>.session,
+                model,
+                query_arguments,
+                selections,
+                group_by,
+                having,
             )
-            .<span class="kw">await</span>
-        })
-        .<span class="kw">await</span>
-    }
+            .<span class="kw">await
+        </span>})
+        .<span class="kw">await
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

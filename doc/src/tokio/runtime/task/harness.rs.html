@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.21.0/src/runtime/task/harness.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>harness.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tokio/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.21.0/src/runtime/task/harness.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>harness.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tokio/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -503,510 +503,510 @@
 <span id="503">503</span>
 <span id="504">504</span>
 <span id="505">505</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::future::Future</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime::task::core</span>::{<span class="ident">Cell</span>, <span class="ident">Core</span>, <span class="ident">CoreStage</span>, <span class="ident">Header</span>, <span class="ident">Trailer</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime::task::state::Snapshot</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime::task::waker::waker_ref</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtime::task</span>::{<span class="ident">JoinError</span>, <span class="ident">Notified</span>, <span class="ident">Schedule</span>, <span class="ident">Task</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::future::Future;
+<span class="kw">use </span><span class="kw">crate</span>::runtime::task::core::{Cell, Core, CoreStage, Header, Trailer};
+<span class="kw">use </span><span class="kw">crate</span>::runtime::task::state::Snapshot;
+<span class="kw">use </span><span class="kw">crate</span>::runtime::task::waker::waker_ref;
+<span class="kw">use </span><span class="kw">crate</span>::runtime::task::{JoinError, Notified, Schedule, Task};
 
-<span class="kw">use</span> <span class="ident">std::mem</span>;
-<span class="kw">use</span> <span class="ident">std::mem::ManuallyDrop</span>;
-<span class="kw">use</span> <span class="ident">std::panic</span>;
-<span class="kw">use</span> <span class="ident">std::ptr::NonNull</span>;
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>, <span class="ident">Waker</span>};
+<span class="kw">use </span>std::mem;
+<span class="kw">use </span>std::mem::ManuallyDrop;
+<span class="kw">use </span>std::panic;
+<span class="kw">use </span>std::ptr::NonNull;
+<span class="kw">use </span>std::task::{Context, Poll, Waker};
 
-<span class="doccomment">/// Typed raw task handle.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">Harness</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Future</span>, <span class="ident">S</span>: <span class="lifetime">&#39;static</span><span class="op">&gt;</span> {
-    <span class="ident">cell</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Typed raw task handle.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>Harness&lt;T: Future, S: <span class="lifetime">&#39;static</span>&gt; {
+    cell: NonNull&lt;Cell&lt;T, S&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Harness</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Future</span>,
-    <span class="ident">S</span>: <span class="lifetime">&#39;static</span>,
+<span class="kw">impl</span>&lt;T, S&gt; Harness&lt;T, S&gt;
+<span class="kw">where
+    </span>T: Future,
+    S: <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw</span>(<span class="ident">ptr</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">Header</span><span class="op">&gt;</span>) -&gt; <span class="ident">Harness</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-        <span class="ident">Harness</span> {
-            <span class="ident">cell</span>: <span class="ident">ptr</span>.<span class="ident">cast</span>::<span class="op">&lt;</span><span class="ident">Cell</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">unsafe fn </span>from_raw(ptr: NonNull&lt;Header&gt;) -&gt; Harness&lt;T, S&gt; {
+        Harness {
+            cell: ptr.cast::&lt;Cell&lt;T, S&gt;&gt;(),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">header_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">Header</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">cell</span>.<span class="ident">cast</span>()
+    <span class="kw">fn </span>header_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; NonNull&lt;Header&gt; {
+        <span class="self">self</span>.cell.cast()
     }
 
-    <span class="kw">fn</span> <span class="ident">header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Header</span> {
-        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cell</span>.<span class="ident">as_ref</span>().<span class="ident">header</span> }
+    <span class="kw">fn </span>header(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Header {
+        <span class="kw">unsafe </span>{ <span class="kw-2">&amp;</span><span class="self">self</span>.cell.as_ref().header }
     }
 
-    <span class="kw">fn</span> <span class="ident">trailer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Trailer</span> {
-        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cell</span>.<span class="ident">as_ref</span>().<span class="ident">trailer</span> }
+    <span class="kw">fn </span>trailer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Trailer {
+        <span class="kw">unsafe </span>{ <span class="kw-2">&amp;</span><span class="self">self</span>.cell.as_ref().trailer }
     }
 
-    <span class="kw">fn</span> <span class="ident">core</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Core</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cell</span>.<span class="ident">as_ref</span>().<span class="ident">core</span> }
+    <span class="kw">fn </span>core(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Core&lt;T, S&gt; {
+        <span class="kw">unsafe </span>{ <span class="kw-2">&amp;</span><span class="self">self</span>.cell.as_ref().core }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Harness</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Future</span>,
-    <span class="ident">S</span>: <span class="ident">Schedule</span>,
+<span class="kw">impl</span>&lt;T, S&gt; Harness&lt;T, S&gt;
+<span class="kw">where
+    </span>T: Future,
+    S: Schedule,
 {
-    <span class="doccomment">/// Polls the inner future. A ref-count is consumed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// All necessary state checks and transitions are performed.</span>
-    <span class="doccomment">/// Panics raised while polling the future are handled.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">poll</span>(<span class="self">self</span>) {
-        <span class="comment">// We pass our ref-count to `poll_inner`.</span>
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">poll_inner</span>() {
-            <span class="ident">PollFuture::Notified</span> =&gt; {
-                <span class="comment">// The `poll_inner` call has given us two ref-counts back.</span>
-                <span class="comment">// We give one of them to a new task and call `yield_now`.</span>
-                <span class="self">self</span>.<span class="ident">core</span>()
-                    .<span class="ident">scheduler</span>
-                    .<span class="ident">yield_now</span>(<span class="ident">Notified</span>(<span class="self">self</span>.<span class="ident">get_new_task</span>()));
+    <span class="doccomment">/// Polls the inner future. A ref-count is consumed.
+    ///
+    /// All necessary state checks and transitions are performed.
+    /// Panics raised while polling the future are handled.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>poll(<span class="self">self</span>) {
+        <span class="comment">// We pass our ref-count to `poll_inner`.
+        </span><span class="kw">match </span><span class="self">self</span>.poll_inner() {
+            PollFuture::Notified =&gt; {
+                <span class="comment">// The `poll_inner` call has given us two ref-counts back.
+                // We give one of them to a new task and call `yield_now`.
+                </span><span class="self">self</span>.core()
+                    .scheduler
+                    .yield_now(Notified(<span class="self">self</span>.get_new_task()));
 
-                <span class="comment">// The remaining ref-count is now dropped. We kept the extra</span>
-                <span class="comment">// ref-count until now to ensure that even if the `yield_now`</span>
-                <span class="comment">// call drops the provided task, the task isn&#39;t deallocated</span>
-                <span class="comment">// before after `yield_now` returns.</span>
-                <span class="self">self</span>.<span class="ident">drop_reference</span>();
+                <span class="comment">// The remaining ref-count is now dropped. We kept the extra
+                // ref-count until now to ensure that even if the `yield_now`
+                // call drops the provided task, the task isn&#39;t deallocated
+                // before after `yield_now` returns.
+                </span><span class="self">self</span>.drop_reference();
             }
-            <span class="ident">PollFuture::Complete</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">complete</span>();
+            PollFuture::Complete =&gt; {
+                <span class="self">self</span>.complete();
             }
-            <span class="ident">PollFuture::Dealloc</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">dealloc</span>();
+            PollFuture::Dealloc =&gt; {
+                <span class="self">self</span>.dealloc();
             }
-            <span class="ident">PollFuture::Done</span> =&gt; (),
+            PollFuture::Done =&gt; (),
         }
     }
 
-    <span class="doccomment">/// Polls the task and cancel it if necessary. This takes ownership of a</span>
-    <span class="doccomment">/// ref-count.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the return value is Notified, the caller is given ownership of two</span>
-    <span class="doccomment">/// ref-counts.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the return value is Complete, the caller is given ownership of a</span>
-    <span class="doccomment">/// single ref-count, which should be passed on to `complete`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the return value is Dealloc, then this call consumed the last</span>
-    <span class="doccomment">/// ref-count and the caller should call `dealloc`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Otherwise the ref-count is consumed and the caller should not access</span>
-    <span class="doccomment">/// `self` again.</span>
-    <span class="kw">fn</span> <span class="ident">poll_inner</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">PollFuture</span> {
-        <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::state</span>::{<span class="ident">TransitionToIdle</span>, <span class="ident">TransitionToRunning</span>};
+    <span class="doccomment">/// Polls the task and cancel it if necessary. This takes ownership of a
+    /// ref-count.
+    ///
+    /// If the return value is Notified, the caller is given ownership of two
+    /// ref-counts.
+    ///
+    /// If the return value is Complete, the caller is given ownership of a
+    /// single ref-count, which should be passed on to `complete`.
+    ///
+    /// If the return value is Dealloc, then this call consumed the last
+    /// ref-count and the caller should call `dealloc`.
+    ///
+    /// Otherwise the ref-count is consumed and the caller should not access
+    /// `self` again.
+    </span><span class="kw">fn </span>poll_inner(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; PollFuture {
+        <span class="kw">use </span><span class="kw">super</span>::state::{TransitionToIdle, TransitionToRunning};
 
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">header</span>().<span class="ident">state</span>.<span class="ident">transition_to_running</span>() {
-            <span class="ident">TransitionToRunning::Success</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">header_ptr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">header_ptr</span>();
-                <span class="kw">let</span> <span class="ident">waker_ref</span> <span class="op">=</span> <span class="ident">waker_ref</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">header_ptr</span>);
-                <span class="kw">let</span> <span class="ident">cx</span> <span class="op">=</span> <span class="ident">Context::from_waker</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">waker_ref</span>);
-                <span class="kw">let</span> <span class="ident">core</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">core</span>();
-                <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">poll_future</span>(
-                    <span class="kw-2">&amp;</span><span class="ident">core</span>.<span class="ident">stage</span>,
-                    <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">core</span>().<span class="ident">scheduler</span>,
-                    <span class="ident">core</span>.<span class="ident">task_id</span>.<span class="ident">clone</span>(),
-                    <span class="ident">cx</span>,
+        <span class="kw">match </span><span class="self">self</span>.header().state.transition_to_running() {
+            TransitionToRunning::Success =&gt; {
+                <span class="kw">let </span>header_ptr = <span class="self">self</span>.header_ptr();
+                <span class="kw">let </span>waker_ref = waker_ref::&lt;T, S&gt;(<span class="kw-2">&amp;</span>header_ptr);
+                <span class="kw">let </span>cx = Context::from_waker(<span class="kw-2">&amp;*</span>waker_ref);
+                <span class="kw">let </span>core = <span class="self">self</span>.core();
+                <span class="kw">let </span>res = poll_future(
+                    <span class="kw-2">&amp;</span>core.stage,
+                    <span class="kw-2">&amp;</span><span class="self">self</span>.core().scheduler,
+                    core.task_id.clone(),
+                    cx,
                 );
 
-                <span class="kw">if</span> <span class="ident">res</span> <span class="op">==</span> <span class="ident">Poll::Ready</span>(()) {
-                    <span class="comment">// The future completed. Move on to complete the task.</span>
-                    <span class="kw">return</span> <span class="ident">PollFuture::Complete</span>;
+                <span class="kw">if </span>res == Poll::Ready(()) {
+                    <span class="comment">// The future completed. Move on to complete the task.
+                    </span><span class="kw">return </span>PollFuture::Complete;
                 }
 
-                <span class="kw">match</span> <span class="self">self</span>.<span class="ident">header</span>().<span class="ident">state</span>.<span class="ident">transition_to_idle</span>() {
-                    <span class="ident">TransitionToIdle::Ok</span> =&gt; <span class="ident">PollFuture::Done</span>,
-                    <span class="ident">TransitionToIdle::OkNotified</span> =&gt; <span class="ident">PollFuture::Notified</span>,
-                    <span class="ident">TransitionToIdle::OkDealloc</span> =&gt; <span class="ident">PollFuture::Dealloc</span>,
-                    <span class="ident">TransitionToIdle::Cancelled</span> =&gt; {
-                        <span class="comment">// The transition to idle failed because the task was</span>
-                        <span class="comment">// cancelled during the poll.</span>
-                        <span class="kw">let</span> <span class="ident">core</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">core</span>();
-                        <span class="ident">cancel_task</span>(<span class="kw-2">&amp;</span><span class="ident">core</span>.<span class="ident">stage</span>, <span class="ident">core</span>.<span class="ident">task_id</span>.<span class="ident">clone</span>());
-                        <span class="ident">PollFuture::Complete</span>
+                <span class="kw">match </span><span class="self">self</span>.header().state.transition_to_idle() {
+                    TransitionToIdle::Ok =&gt; PollFuture::Done,
+                    TransitionToIdle::OkNotified =&gt; PollFuture::Notified,
+                    TransitionToIdle::OkDealloc =&gt; PollFuture::Dealloc,
+                    TransitionToIdle::Cancelled =&gt; {
+                        <span class="comment">// The transition to idle failed because the task was
+                        // cancelled during the poll.
+                        </span><span class="kw">let </span>core = <span class="self">self</span>.core();
+                        cancel_task(<span class="kw-2">&amp;</span>core.stage, core.task_id.clone());
+                        PollFuture::Complete
                     }
                 }
             }
-            <span class="ident">TransitionToRunning::Cancelled</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">core</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">core</span>();
-                <span class="ident">cancel_task</span>(<span class="kw-2">&amp;</span><span class="ident">core</span>.<span class="ident">stage</span>, <span class="ident">core</span>.<span class="ident">task_id</span>.<span class="ident">clone</span>());
-                <span class="ident">PollFuture::Complete</span>
+            TransitionToRunning::Cancelled =&gt; {
+                <span class="kw">let </span>core = <span class="self">self</span>.core();
+                cancel_task(<span class="kw-2">&amp;</span>core.stage, core.task_id.clone());
+                PollFuture::Complete
             }
-            <span class="ident">TransitionToRunning::Failed</span> =&gt; <span class="ident">PollFuture::Done</span>,
-            <span class="ident">TransitionToRunning::Dealloc</span> =&gt; <span class="ident">PollFuture::Dealloc</span>,
+            TransitionToRunning::Failed =&gt; PollFuture::Done,
+            TransitionToRunning::Dealloc =&gt; PollFuture::Dealloc,
         }
     }
 
-    <span class="doccomment">/// Forcibly shuts down the task.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Attempt to transition to `Running` in order to forcibly shutdown the</span>
-    <span class="doccomment">/// task. If the task is currently running or in a state of completion, then</span>
-    <span class="doccomment">/// there is nothing further to do. When the task completes running, it will</span>
-    <span class="doccomment">/// notice the `CANCELLED` bit and finalize the task.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">shutdown</span>(<span class="self">self</span>) {
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">header</span>().<span class="ident">state</span>.<span class="ident">transition_to_shutdown</span>() {
-            <span class="comment">// The task is concurrently running. No further work needed.</span>
-            <span class="self">self</span>.<span class="ident">drop_reference</span>();
+    <span class="doccomment">/// Forcibly shuts down the task.
+    ///
+    /// Attempt to transition to `Running` in order to forcibly shutdown the
+    /// task. If the task is currently running or in a state of completion, then
+    /// there is nothing further to do. When the task completes running, it will
+    /// notice the `CANCELLED` bit and finalize the task.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>shutdown(<span class="self">self</span>) {
+        <span class="kw">if </span>!<span class="self">self</span>.header().state.transition_to_shutdown() {
+            <span class="comment">// The task is concurrently running. No further work needed.
+            </span><span class="self">self</span>.drop_reference();
             <span class="kw">return</span>;
         }
 
-        <span class="comment">// By transitioning the lifecycle to `Running`, we have permission to</span>
-        <span class="comment">// drop the future.</span>
-        <span class="kw">let</span> <span class="ident">core</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">core</span>();
-        <span class="ident">cancel_task</span>(<span class="kw-2">&amp;</span><span class="ident">core</span>.<span class="ident">stage</span>, <span class="ident">core</span>.<span class="ident">task_id</span>.<span class="ident">clone</span>());
-        <span class="self">self</span>.<span class="ident">complete</span>();
+        <span class="comment">// By transitioning the lifecycle to `Running`, we have permission to
+        // drop the future.
+        </span><span class="kw">let </span>core = <span class="self">self</span>.core();
+        cancel_task(<span class="kw-2">&amp;</span>core.stage, core.task_id.clone());
+        <span class="self">self</span>.complete();
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">dealloc</span>(<span class="self">self</span>) {
-        <span class="comment">// Release the join waker, if there is one.</span>
-        <span class="self">self</span>.<span class="ident">trailer</span>().<span class="ident">waker</span>.<span class="ident">with_mut</span>(<span class="ident">drop</span>);
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>dealloc(<span class="self">self</span>) {
+        <span class="comment">// Release the join waker, if there is one.
+        </span><span class="self">self</span>.trailer().waker.with_mut(drop);
 
-        <span class="comment">// Check causality</span>
-        <span class="self">self</span>.<span class="ident">core</span>().<span class="ident">stage</span>.<span class="ident">with_mut</span>(<span class="ident">drop</span>);
+        <span class="comment">// Check causality
+        </span><span class="self">self</span>.core().stage.with_mut(drop);
 
-        <span class="kw">unsafe</span> {
-            <span class="ident">drop</span>(<span class="ident">Box::from_raw</span>(<span class="self">self</span>.<span class="ident">cell</span>.<span class="ident">as_ptr</span>()));
+        <span class="kw">unsafe </span>{
+            drop(Box::from_raw(<span class="self">self</span>.cell.as_ptr()));
         }
     }
 
-    <span class="comment">// ===== join handle =====</span>
+    <span class="comment">// ===== join handle =====
 
-    <span class="doccomment">/// Read the task output into `dst`.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">try_read_output</span>(<span class="self">self</span>, <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="kw">super</span>::Result</span><span class="op">&lt;</span><span class="ident">T::Output</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">waker</span>: <span class="kw-2">&amp;</span><span class="ident">Waker</span>) {
-        <span class="kw">if</span> <span class="ident">can_read_output</span>(<span class="self">self</span>.<span class="ident">header</span>(), <span class="self">self</span>.<span class="ident">trailer</span>(), <span class="ident">waker</span>) {
-            <span class="kw-2">*</span><span class="ident">dst</span> <span class="op">=</span> <span class="ident">Poll::Ready</span>(<span class="self">self</span>.<span class="ident">core</span>().<span class="ident">stage</span>.<span class="ident">take_output</span>());
+    </span><span class="doccomment">/// Read the task output into `dst`.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>try_read_output(<span class="self">self</span>, dst: <span class="kw-2">&amp;mut </span>Poll&lt;<span class="kw">super</span>::Result&lt;T::Output&gt;&gt;, waker: <span class="kw-2">&amp;</span>Waker) {
+        <span class="kw">if </span>can_read_output(<span class="self">self</span>.header(), <span class="self">self</span>.trailer(), waker) {
+            <span class="kw-2">*</span>dst = Poll::Ready(<span class="self">self</span>.core().stage.take_output());
         }
     }
 
-    <span class="doccomment">/// Try to set the waker notified when the task is complete. Returns true if</span>
-    <span class="doccomment">/// the task has already completed. If this call returns false, then the</span>
-    <span class="doccomment">/// waker will not be notified.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">try_set_join_waker</span>(<span class="self">self</span>, <span class="ident">waker</span>: <span class="kw-2">&amp;</span><span class="ident">Waker</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">can_read_output</span>(<span class="self">self</span>.<span class="ident">header</span>(), <span class="self">self</span>.<span class="ident">trailer</span>(), <span class="ident">waker</span>)
+    <span class="doccomment">/// Try to set the waker notified when the task is complete. Returns true if
+    /// the task has already completed. If this call returns false, then the
+    /// waker will not be notified.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>try_set_join_waker(<span class="self">self</span>, waker: <span class="kw-2">&amp;</span>Waker) -&gt; bool {
+        can_read_output(<span class="self">self</span>.header(), <span class="self">self</span>.trailer(), waker)
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">drop_join_handle_slow</span>(<span class="self">self</span>) {
-        <span class="comment">// Try to unset `JOIN_INTEREST`. This must be done as a first step in</span>
-        <span class="comment">// case the task concurrently completed.</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">header</span>().<span class="ident">state</span>.<span class="ident">unset_join_interested</span>().<span class="ident">is_err</span>() {
-            <span class="comment">// It is our responsibility to drop the output. This is critical as</span>
-            <span class="comment">// the task output may not be `Send` and as such must remain with</span>
-            <span class="comment">// the scheduler or `JoinHandle`. i.e. if the output remains in the</span>
-            <span class="comment">// task structure until the task is deallocated, it may be dropped</span>
-            <span class="comment">// by a Waker on any arbitrary thread.</span>
-            <span class="comment">//</span>
-            <span class="comment">// Panics are delivered to the user via the `JoinHandle`. Given that</span>
-            <span class="comment">// they are dropping the `JoinHandle`, we assume they are not</span>
-            <span class="comment">// interested in the panic and swallow it.</span>
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">panic::catch_unwind</span>(<span class="ident">panic::AssertUnwindSafe</span>(<span class="op">|</span><span class="op">|</span> {
-                <span class="self">self</span>.<span class="ident">core</span>().<span class="ident">stage</span>.<span class="ident">drop_future_or_output</span>();
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>drop_join_handle_slow(<span class="self">self</span>) {
+        <span class="comment">// Try to unset `JOIN_INTEREST`. This must be done as a first step in
+        // case the task concurrently completed.
+        </span><span class="kw">if </span><span class="self">self</span>.header().state.unset_join_interested().is_err() {
+            <span class="comment">// It is our responsibility to drop the output. This is critical as
+            // the task output may not be `Send` and as such must remain with
+            // the scheduler or `JoinHandle`. i.e. if the output remains in the
+            // task structure until the task is deallocated, it may be dropped
+            // by a Waker on any arbitrary thread.
+            //
+            // Panics are delivered to the user via the `JoinHandle`. Given that
+            // they are dropping the `JoinHandle`, we assume they are not
+            // interested in the panic and swallow it.
+            </span><span class="kw">let _ </span>= panic::catch_unwind(panic::AssertUnwindSafe(|| {
+                <span class="self">self</span>.core().stage.drop_future_or_output();
             }));
         }
 
-        <span class="comment">// Drop the `JoinHandle` reference, possibly deallocating the task</span>
-        <span class="self">self</span>.<span class="ident">drop_reference</span>();
+        <span class="comment">// Drop the `JoinHandle` reference, possibly deallocating the task
+        </span><span class="self">self</span>.drop_reference();
     }
 
-    <span class="doccomment">/// Remotely aborts the task.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The caller should hold a ref-count, but we do not consume it.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is similar to `shutdown` except that it asks the runtime to perform</span>
-    <span class="doccomment">/// the shutdown. This is necessary to avoid the shutdown happening in the</span>
-    <span class="doccomment">/// wrong thread for non-Send tasks.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">remote_abort</span>(<span class="self">self</span>) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">header</span>().<span class="ident">state</span>.<span class="ident">transition_to_notified_and_cancel</span>() {
-            <span class="comment">// The transition has created a new ref-count, which we turn into</span>
-            <span class="comment">// a Notified and pass to the task.</span>
-            <span class="comment">//</span>
-            <span class="comment">// Since the caller holds a ref-count, the task cannot be destroyed</span>
-            <span class="comment">// before the call to `schedule` returns even if the call drops the</span>
-            <span class="comment">// `Notified` internally.</span>
-            <span class="self">self</span>.<span class="ident">core</span>()
-                .<span class="ident">scheduler</span>
-                .<span class="ident">schedule</span>(<span class="ident">Notified</span>(<span class="self">self</span>.<span class="ident">get_new_task</span>()));
+    <span class="doccomment">/// Remotely aborts the task.
+    ///
+    /// The caller should hold a ref-count, but we do not consume it.
+    ///
+    /// This is similar to `shutdown` except that it asks the runtime to perform
+    /// the shutdown. This is necessary to avoid the shutdown happening in the
+    /// wrong thread for non-Send tasks.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>remote_abort(<span class="self">self</span>) {
+        <span class="kw">if </span><span class="self">self</span>.header().state.transition_to_notified_and_cancel() {
+            <span class="comment">// The transition has created a new ref-count, which we turn into
+            // a Notified and pass to the task.
+            //
+            // Since the caller holds a ref-count, the task cannot be destroyed
+            // before the call to `schedule` returns even if the call drops the
+            // `Notified` internally.
+            </span><span class="self">self</span>.core()
+                .scheduler
+                .schedule(Notified(<span class="self">self</span>.get_new_task()));
         }
     }
 
-    <span class="comment">// ===== waker behavior =====</span>
+    <span class="comment">// ===== waker behavior =====
 
-    <span class="doccomment">/// This call consumes a ref-count and notifies the task. This will create a</span>
-    <span class="doccomment">/// new Notified and submit it if necessary.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The caller does not need to hold a ref-count besides the one that was</span>
-    <span class="doccomment">/// passed to this call.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">wake_by_val</span>(<span class="self">self</span>) {
-        <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::state::TransitionToNotifiedByVal</span>;
+    </span><span class="doccomment">/// This call consumes a ref-count and notifies the task. This will create a
+    /// new Notified and submit it if necessary.
+    ///
+    /// The caller does not need to hold a ref-count besides the one that was
+    /// passed to this call.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>wake_by_val(<span class="self">self</span>) {
+        <span class="kw">use </span><span class="kw">super</span>::state::TransitionToNotifiedByVal;
 
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">header</span>().<span class="ident">state</span>.<span class="ident">transition_to_notified_by_val</span>() {
-            <span class="ident">TransitionToNotifiedByVal::Submit</span> =&gt; {
-                <span class="comment">// The caller has given us a ref-count, and the transition has</span>
-                <span class="comment">// created a new ref-count, so we now hold two. We turn the new</span>
-                <span class="comment">// ref-count Notified and pass it to the call to `schedule`.</span>
-                <span class="comment">//</span>
-                <span class="comment">// The old ref-count is retained for now to ensure that the task</span>
-                <span class="comment">// is not dropped during the call to `schedule` if the call</span>
-                <span class="comment">// drops the task it was given.</span>
-                <span class="self">self</span>.<span class="ident">core</span>()
-                    .<span class="ident">scheduler</span>
-                    .<span class="ident">schedule</span>(<span class="ident">Notified</span>(<span class="self">self</span>.<span class="ident">get_new_task</span>()));
+        <span class="kw">match </span><span class="self">self</span>.header().state.transition_to_notified_by_val() {
+            TransitionToNotifiedByVal::Submit =&gt; {
+                <span class="comment">// The caller has given us a ref-count, and the transition has
+                // created a new ref-count, so we now hold two. We turn the new
+                // ref-count Notified and pass it to the call to `schedule`.
+                //
+                // The old ref-count is retained for now to ensure that the task
+                // is not dropped during the call to `schedule` if the call
+                // drops the task it was given.
+                </span><span class="self">self</span>.core()
+                    .scheduler
+                    .schedule(Notified(<span class="self">self</span>.get_new_task()));
 
-                <span class="comment">// Now that we have completed the call to schedule, we can</span>
-                <span class="comment">// release our ref-count.</span>
-                <span class="self">self</span>.<span class="ident">drop_reference</span>();
+                <span class="comment">// Now that we have completed the call to schedule, we can
+                // release our ref-count.
+                </span><span class="self">self</span>.drop_reference();
             }
-            <span class="ident">TransitionToNotifiedByVal::Dealloc</span> =&gt; {
-                <span class="self">self</span>.<span class="ident">dealloc</span>();
+            TransitionToNotifiedByVal::Dealloc =&gt; {
+                <span class="self">self</span>.dealloc();
             }
-            <span class="ident">TransitionToNotifiedByVal::DoNothing</span> =&gt; {}
+            TransitionToNotifiedByVal::DoNothing =&gt; {}
         }
     }
 
-    <span class="doccomment">/// This call notifies the task. It will not consume any ref-counts, but the</span>
-    <span class="doccomment">/// caller should hold a ref-count.  This will create a new Notified and</span>
-    <span class="doccomment">/// submit it if necessary.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">wake_by_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::state::TransitionToNotifiedByRef</span>;
+    <span class="doccomment">/// This call notifies the task. It will not consume any ref-counts, but the
+    /// caller should hold a ref-count.  This will create a new Notified and
+    /// submit it if necessary.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>wake_by_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">use </span><span class="kw">super</span>::state::TransitionToNotifiedByRef;
 
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">header</span>().<span class="ident">state</span>.<span class="ident">transition_to_notified_by_ref</span>() {
-            <span class="ident">TransitionToNotifiedByRef::Submit</span> =&gt; {
-                <span class="comment">// The transition above incremented the ref-count for a new task</span>
-                <span class="comment">// and the caller also holds a ref-count. The caller&#39;s ref-count</span>
-                <span class="comment">// ensures that the task is not destroyed even if the new task</span>
-                <span class="comment">// is dropped before `schedule` returns.</span>
-                <span class="self">self</span>.<span class="ident">core</span>()
-                    .<span class="ident">scheduler</span>
-                    .<span class="ident">schedule</span>(<span class="ident">Notified</span>(<span class="self">self</span>.<span class="ident">get_new_task</span>()));
+        <span class="kw">match </span><span class="self">self</span>.header().state.transition_to_notified_by_ref() {
+            TransitionToNotifiedByRef::Submit =&gt; {
+                <span class="comment">// The transition above incremented the ref-count for a new task
+                // and the caller also holds a ref-count. The caller&#39;s ref-count
+                // ensures that the task is not destroyed even if the new task
+                // is dropped before `schedule` returns.
+                </span><span class="self">self</span>.core()
+                    .scheduler
+                    .schedule(Notified(<span class="self">self</span>.get_new_task()));
             }
-            <span class="ident">TransitionToNotifiedByRef::DoNothing</span> =&gt; {}
+            TransitionToNotifiedByRef::DoNothing =&gt; {}
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">drop_reference</span>(<span class="self">self</span>) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">header</span>().<span class="ident">state</span>.<span class="ident">ref_dec</span>() {
-            <span class="self">self</span>.<span class="ident">dealloc</span>();
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>drop_reference(<span class="self">self</span>) {
+        <span class="kw">if </span><span class="self">self</span>.header().state.ref_dec() {
+            <span class="self">self</span>.dealloc();
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">tokio_unstable</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tracing&quot;</span>))]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">tracing::Id</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">header</span>().<span class="ident">id</span>.<span class="ident">as_ref</span>()
+    <span class="attribute">#[cfg(all(tokio_unstable, feature = <span class="string">&quot;tracing&quot;</span>))]
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>tracing::Id&gt; {
+        <span class="self">self</span>.header().id.as_ref()
     }
 
-    <span class="comment">// ====== internal ======</span>
+    <span class="comment">// ====== internal ======
 
-    <span class="doccomment">/// Completes the task. This method assumes that the state is RUNNING.</span>
-    <span class="kw">fn</span> <span class="ident">complete</span>(<span class="self">self</span>) {
-        <span class="comment">// The future has completed and its output has been written to the task</span>
-        <span class="comment">// stage. We transition from running to complete.</span>
+    </span><span class="doccomment">/// Completes the task. This method assumes that the state is RUNNING.
+    </span><span class="kw">fn </span>complete(<span class="self">self</span>) {
+        <span class="comment">// The future has completed and its output has been written to the task
+        // stage. We transition from running to complete.
 
-        <span class="kw">let</span> <span class="ident">snapshot</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">header</span>().<span class="ident">state</span>.<span class="ident">transition_to_complete</span>();
+        </span><span class="kw">let </span>snapshot = <span class="self">self</span>.header().state.transition_to_complete();
 
-        <span class="comment">// We catch panics here in case dropping the future or waking the</span>
-        <span class="comment">// JoinHandle panics.</span>
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">panic::catch_unwind</span>(<span class="ident">panic::AssertUnwindSafe</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">snapshot</span>.<span class="ident">is_join_interested</span>() {
-                <span class="comment">// The `JoinHandle` is not interested in the output of</span>
-                <span class="comment">// this task. It is our responsibility to drop the</span>
-                <span class="comment">// output.</span>
-                <span class="self">self</span>.<span class="ident">core</span>().<span class="ident">stage</span>.<span class="ident">drop_future_or_output</span>();
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">snapshot</span>.<span class="ident">has_join_waker</span>() {
-                <span class="comment">// Notify the join handle. The previous transition obtains the</span>
-                <span class="comment">// lock on the waker cell.</span>
-                <span class="self">self</span>.<span class="ident">trailer</span>().<span class="ident">wake_join</span>();
+        <span class="comment">// We catch panics here in case dropping the future or waking the
+        // JoinHandle panics.
+        </span><span class="kw">let _ </span>= panic::catch_unwind(panic::AssertUnwindSafe(|| {
+            <span class="kw">if </span>!snapshot.is_join_interested() {
+                <span class="comment">// The `JoinHandle` is not interested in the output of
+                // this task. It is our responsibility to drop the
+                // output.
+                </span><span class="self">self</span>.core().stage.drop_future_or_output();
+            } <span class="kw">else if </span>snapshot.has_join_waker() {
+                <span class="comment">// Notify the join handle. The previous transition obtains the
+                // lock on the waker cell.
+                </span><span class="self">self</span>.trailer().wake_join();
             }
         }));
 
-        <span class="comment">// The task has completed execution and will no longer be scheduled.</span>
-        <span class="kw">let</span> <span class="ident">num_release</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">release</span>();
+        <span class="comment">// The task has completed execution and will no longer be scheduled.
+        </span><span class="kw">let </span>num_release = <span class="self">self</span>.release();
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">header</span>().<span class="ident">state</span>.<span class="ident">transition_to_terminal</span>(<span class="ident">num_release</span>) {
-            <span class="self">self</span>.<span class="ident">dealloc</span>();
+        <span class="kw">if </span><span class="self">self</span>.header().state.transition_to_terminal(num_release) {
+            <span class="self">self</span>.dealloc();
         }
     }
 
-    <span class="doccomment">/// Releases the task from the scheduler. Returns the number of ref-counts</span>
-    <span class="doccomment">/// that should be decremented.</span>
-    <span class="kw">fn</span> <span class="ident">release</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="comment">// We don&#39;t actually increment the ref-count here, but the new task is</span>
-        <span class="comment">// never destroyed, so that&#39;s ok.</span>
-        <span class="kw">let</span> <span class="ident">me</span> <span class="op">=</span> <span class="ident">ManuallyDrop::new</span>(<span class="self">self</span>.<span class="ident">get_new_task</span>());
+    <span class="doccomment">/// Releases the task from the scheduler. Returns the number of ref-counts
+    /// that should be decremented.
+    </span><span class="kw">fn </span>release(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="comment">// We don&#39;t actually increment the ref-count here, but the new task is
+        // never destroyed, so that&#39;s ok.
+        </span><span class="kw">let </span>me = ManuallyDrop::new(<span class="self">self</span>.get_new_task());
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">task</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">core</span>().<span class="ident">scheduler</span>.<span class="ident">release</span>(<span class="kw-2">&amp;</span><span class="ident">me</span>) {
-            <span class="ident">mem::forget</span>(<span class="ident">task</span>);
-            <span class="number">2</span>
-        } <span class="kw">else</span> {
-            <span class="number">1</span>
-        }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(task) = <span class="self">self</span>.core().scheduler.release(<span class="kw-2">&amp;</span>me) {
+            mem::forget(task);
+            <span class="number">2
+        </span>} <span class="kw">else </span>{
+            <span class="number">1
+        </span>}
     }
 
-    <span class="doccomment">/// Creates a new task that holds its own ref-count.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Any use of `self` after this call must ensure that a ref-count to the</span>
-    <span class="doccomment">/// task holds the task alive until after the use of `self`. Passing the</span>
-    <span class="doccomment">/// returned Task to any method on `self` is unsound if dropping the Task</span>
-    <span class="doccomment">/// could drop `self` before the call on `self` returned.</span>
-    <span class="kw">fn</span> <span class="ident">get_new_task</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Task</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> {
-        <span class="comment">// safety: The header is at the beginning of the cell, so this cast is</span>
-        <span class="comment">// safe.</span>
-        <span class="kw">unsafe</span> { <span class="ident">Task::from_raw</span>(<span class="self">self</span>.<span class="ident">cell</span>.<span class="ident">cast</span>()) }
+    <span class="doccomment">/// Creates a new task that holds its own ref-count.
+    ///
+    /// # Safety
+    ///
+    /// Any use of `self` after this call must ensure that a ref-count to the
+    /// task holds the task alive until after the use of `self`. Passing the
+    /// returned Task to any method on `self` is unsound if dropping the Task
+    /// could drop `self` before the call on `self` returned.
+    </span><span class="kw">fn </span>get_new_task(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Task&lt;S&gt; {
+        <span class="comment">// safety: The header is at the beginning of the cell, so this cast is
+        // safe.
+        </span><span class="kw">unsafe </span>{ Task::from_raw(<span class="self">self</span>.cell.cast()) }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">can_read_output</span>(<span class="ident">header</span>: <span class="kw-2">&amp;</span><span class="ident">Header</span>, <span class="ident">trailer</span>: <span class="kw-2">&amp;</span><span class="ident">Trailer</span>, <span class="ident">waker</span>: <span class="kw-2">&amp;</span><span class="ident">Waker</span>) -&gt; <span class="ident">bool</span> {
-    <span class="comment">// Load a snapshot of the current task state</span>
-    <span class="kw">let</span> <span class="ident">snapshot</span> <span class="op">=</span> <span class="ident">header</span>.<span class="ident">state</span>.<span class="ident">load</span>();
+<span class="kw">fn </span>can_read_output(header: <span class="kw-2">&amp;</span>Header, trailer: <span class="kw-2">&amp;</span>Trailer, waker: <span class="kw-2">&amp;</span>Waker) -&gt; bool {
+    <span class="comment">// Load a snapshot of the current task state
+    </span><span class="kw">let </span>snapshot = header.state.load();
 
-    <span class="macro">debug_assert!</span>(<span class="ident">snapshot</span>.<span class="ident">is_join_interested</span>());
+    <span class="macro">debug_assert!</span>(snapshot.is_join_interested());
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">snapshot</span>.<span class="ident">is_complete</span>() {
-        <span class="comment">// The waker must be stored in the task struct.</span>
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">snapshot</span>.<span class="ident">has_join_waker</span>() {
-            <span class="comment">// There already is a waker stored in the struct. If it matches</span>
-            <span class="comment">// the provided waker, then there is no further work to do.</span>
-            <span class="comment">// Otherwise, the waker must be swapped.</span>
-            <span class="kw">let</span> <span class="ident">will_wake</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-                <span class="comment">// Safety: when `JOIN_INTEREST` is set, only `JOIN_HANDLE`</span>
-                <span class="comment">// may mutate the `waker` field.</span>
-                <span class="ident">trailer</span>.<span class="ident">will_wake</span>(<span class="ident">waker</span>)
+    <span class="kw">if </span>!snapshot.is_complete() {
+        <span class="comment">// The waker must be stored in the task struct.
+        </span><span class="kw">let </span>res = <span class="kw">if </span>snapshot.has_join_waker() {
+            <span class="comment">// There already is a waker stored in the struct. If it matches
+            // the provided waker, then there is no further work to do.
+            // Otherwise, the waker must be swapped.
+            </span><span class="kw">let </span>will_wake = <span class="kw">unsafe </span>{
+                <span class="comment">// Safety: when `JOIN_INTEREST` is set, only `JOIN_HANDLE`
+                // may mutate the `waker` field.
+                </span>trailer.will_wake(waker)
             };
 
-            <span class="kw">if</span> <span class="ident">will_wake</span> {
-                <span class="comment">// The task is not complete **and** the waker is up to date,</span>
-                <span class="comment">// there is nothing further that needs to be done.</span>
-                <span class="kw">return</span> <span class="bool-val">false</span>;
+            <span class="kw">if </span>will_wake {
+                <span class="comment">// The task is not complete **and** the waker is up to date,
+                // there is nothing further that needs to be done.
+                </span><span class="kw">return </span><span class="bool-val">false</span>;
             }
 
-            <span class="comment">// Unset the `JOIN_WAKER` to gain mutable access to the `waker`</span>
-            <span class="comment">// field then update the field with the new join worker.</span>
-            <span class="comment">//</span>
-            <span class="comment">// This requires two atomic operations, unsetting the bit and</span>
-            <span class="comment">// then resetting it. If the task transitions to complete</span>
-            <span class="comment">// concurrently to either one of those operations, then setting</span>
-            <span class="comment">// the join waker fails and we proceed to reading the task</span>
-            <span class="comment">// output.</span>
-            <span class="ident">header</span>
-                .<span class="ident">state</span>
-                .<span class="ident">unset_waker</span>()
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">snapshot</span><span class="op">|</span> <span class="ident">set_join_waker</span>(<span class="ident">header</span>, <span class="ident">trailer</span>, <span class="ident">waker</span>.<span class="ident">clone</span>(), <span class="ident">snapshot</span>))
-        } <span class="kw">else</span> {
-            <span class="ident">set_join_waker</span>(<span class="ident">header</span>, <span class="ident">trailer</span>, <span class="ident">waker</span>.<span class="ident">clone</span>(), <span class="ident">snapshot</span>)
+            <span class="comment">// Unset the `JOIN_WAKER` to gain mutable access to the `waker`
+            // field then update the field with the new join worker.
+            //
+            // This requires two atomic operations, unsetting the bit and
+            // then resetting it. If the task transitions to complete
+            // concurrently to either one of those operations, then setting
+            // the join waker fails and we proceed to reading the task
+            // output.
+            </span>header
+                .state
+                .unset_waker()
+                .and_then(|snapshot| set_join_waker(header, trailer, waker.clone(), snapshot))
+        } <span class="kw">else </span>{
+            set_join_waker(header, trailer, waker.clone(), snapshot)
         };
 
-        <span class="kw">match</span> <span class="ident">res</span> {
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="bool-val">false</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">snapshot</span>) =&gt; {
-                <span class="macro">assert!</span>(<span class="ident">snapshot</span>.<span class="ident">is_complete</span>());
+        <span class="kw">match </span>res {
+            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="bool-val">false</span>,
+            <span class="prelude-val">Err</span>(snapshot) =&gt; {
+                <span class="macro">assert!</span>(snapshot.is_complete());
             }
         }
     }
-    <span class="bool-val">true</span>
-}
+    <span class="bool-val">true
+</span>}
 
-<span class="kw">fn</span> <span class="ident">set_join_waker</span>(
-    <span class="ident">header</span>: <span class="kw-2">&amp;</span><span class="ident">Header</span>,
-    <span class="ident">trailer</span>: <span class="kw-2">&amp;</span><span class="ident">Trailer</span>,
-    <span class="ident">waker</span>: <span class="ident">Waker</span>,
-    <span class="ident">snapshot</span>: <span class="ident">Snapshot</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Snapshot</span>, <span class="ident">Snapshot</span><span class="op">&gt;</span> {
-    <span class="macro">assert!</span>(<span class="ident">snapshot</span>.<span class="ident">is_join_interested</span>());
-    <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">snapshot</span>.<span class="ident">has_join_waker</span>());
+<span class="kw">fn </span>set_join_waker(
+    header: <span class="kw-2">&amp;</span>Header,
+    trailer: <span class="kw-2">&amp;</span>Trailer,
+    waker: Waker,
+    snapshot: Snapshot,
+) -&gt; <span class="prelude-ty">Result</span>&lt;Snapshot, Snapshot&gt; {
+    <span class="macro">assert!</span>(snapshot.is_join_interested());
+    <span class="macro">assert!</span>(!snapshot.has_join_waker());
 
-    <span class="comment">// Safety: Only the `JoinHandle` may set the `waker` field. When</span>
-    <span class="comment">// `JOIN_INTEREST` is **not** set, nothing else will touch the field.</span>
-    <span class="kw">unsafe</span> {
-        <span class="ident">trailer</span>.<span class="ident">set_waker</span>(<span class="prelude-val">Some</span>(<span class="ident">waker</span>));
+    <span class="comment">// Safety: Only the `JoinHandle` may set the `waker` field. When
+    // `JOIN_INTEREST` is **not** set, nothing else will touch the field.
+    </span><span class="kw">unsafe </span>{
+        trailer.set_waker(<span class="prelude-val">Some</span>(waker));
     }
 
-    <span class="comment">// Update the `JoinWaker` state accordingly</span>
-    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">header</span>.<span class="ident">state</span>.<span class="ident">set_join_waker</span>();
+    <span class="comment">// Update the `JoinWaker` state accordingly
+    </span><span class="kw">let </span>res = header.state.set_join_waker();
 
-    <span class="comment">// If the state could not be updated, then clear the join waker</span>
-    <span class="kw">if</span> <span class="ident">res</span>.<span class="ident">is_err</span>() {
-        <span class="kw">unsafe</span> {
-            <span class="ident">trailer</span>.<span class="ident">set_waker</span>(<span class="prelude-val">None</span>);
+    <span class="comment">// If the state could not be updated, then clear the join waker
+    </span><span class="kw">if </span>res.is_err() {
+        <span class="kw">unsafe </span>{
+            trailer.set_waker(<span class="prelude-val">None</span>);
         }
     }
 
-    <span class="ident">res</span>
+    res
 }
 
-<span class="kw">enum</span> <span class="ident">PollFuture</span> {
-    <span class="ident">Complete</span>,
-    <span class="ident">Notified</span>,
-    <span class="ident">Done</span>,
-    <span class="ident">Dealloc</span>,
+<span class="kw">enum </span>PollFuture {
+    Complete,
+    Notified,
+    Done,
+    Dealloc,
 }
 
-<span class="doccomment">/// Cancels the task and store the appropriate error in the stage field.</span>
-<span class="kw">fn</span> <span class="ident">cancel_task</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Future</span><span class="op">&gt;</span>(<span class="ident">stage</span>: <span class="kw-2">&amp;</span><span class="ident">CoreStage</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">id</span>: <span class="ident"><span class="kw">super</span>::Id</span>) {
-    <span class="comment">// Drop the future from a panic guard.</span>
-    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">panic::catch_unwind</span>(<span class="ident">panic::AssertUnwindSafe</span>(<span class="op">|</span><span class="op">|</span> {
-        <span class="ident">stage</span>.<span class="ident">drop_future_or_output</span>();
+<span class="doccomment">/// Cancels the task and store the appropriate error in the stage field.
+</span><span class="kw">fn </span>cancel_task&lt;T: Future&gt;(stage: <span class="kw-2">&amp;</span>CoreStage&lt;T&gt;, id: <span class="kw">super</span>::Id) {
+    <span class="comment">// Drop the future from a panic guard.
+    </span><span class="kw">let </span>res = panic::catch_unwind(panic::AssertUnwindSafe(|| {
+        stage.drop_future_or_output();
     }));
 
-    <span class="kw">match</span> <span class="ident">res</span> {
+    <span class="kw">match </span>res {
         <span class="prelude-val">Ok</span>(()) =&gt; {
-            <span class="ident">stage</span>.<span class="ident">store_output</span>(<span class="prelude-val">Err</span>(<span class="ident">JoinError::cancelled</span>(<span class="ident">id</span>)));
+            stage.store_output(<span class="prelude-val">Err</span>(JoinError::cancelled(id)));
         }
-        <span class="prelude-val">Err</span>(<span class="ident">panic</span>) =&gt; {
-            <span class="ident">stage</span>.<span class="ident">store_output</span>(<span class="prelude-val">Err</span>(<span class="ident">JoinError::panic</span>(<span class="ident">id</span>, <span class="ident">panic</span>)));
+        <span class="prelude-val">Err</span>(panic) =&gt; {
+            stage.store_output(<span class="prelude-val">Err</span>(JoinError::panic(id, panic)));
         }
     }
 }
 
-<span class="doccomment">/// Polls the future. If the future completes, the output is written to the</span>
-<span class="doccomment">/// stage field.</span>
-<span class="kw">fn</span> <span class="ident">poll_future</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Future</span>, <span class="ident">S</span>: <span class="ident">Schedule</span><span class="op">&gt;</span>(
-    <span class="ident">core</span>: <span class="kw-2">&amp;</span><span class="ident">CoreStage</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">scheduler</span>: <span class="kw-2">&amp;</span><span class="ident">S</span>,
-    <span class="ident">id</span>: <span class="ident"><span class="kw">super</span>::Id</span>,
-    <span class="ident">cx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="comment">// Poll the future.</span>
-    <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">panic::catch_unwind</span>(<span class="ident">panic::AssertUnwindSafe</span>(<span class="op">|</span><span class="op">|</span> {
-        <span class="kw">struct</span> <span class="ident">Guard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Future</span><span class="op">&gt;</span> {
-            <span class="ident">core</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">CoreStage</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Polls the future. If the future completes, the output is written to the
+/// stage field.
+</span><span class="kw">fn </span>poll_future&lt;T: Future, S: Schedule&gt;(
+    core: <span class="kw-2">&amp;</span>CoreStage&lt;T&gt;,
+    scheduler: <span class="kw-2">&amp;</span>S,
+    id: <span class="kw">super</span>::Id,
+    cx: Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+) -&gt; Poll&lt;()&gt; {
+    <span class="comment">// Poll the future.
+    </span><span class="kw">let </span>output = panic::catch_unwind(panic::AssertUnwindSafe(|| {
+        <span class="kw">struct </span>Guard&lt;<span class="lifetime">&#39;a</span>, T: Future&gt; {
+            core: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>CoreStage&lt;T&gt;,
         }
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Future</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Guard</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-            <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-                <span class="comment">// If the future panics on poll, we drop it inside the panic</span>
-                <span class="comment">// guard.</span>
-                <span class="self">self</span>.<span class="ident">core</span>.<span class="ident">drop_future_or_output</span>();
+        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: Future&gt; Drop <span class="kw">for </span>Guard&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+            <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+                <span class="comment">// If the future panics on poll, we drop it inside the panic
+                // guard.
+                </span><span class="self">self</span>.core.drop_future_or_output();
             }
         }
-        <span class="kw">let</span> <span class="ident">guard</span> <span class="op">=</span> <span class="ident">Guard</span> { <span class="ident">core</span> };
-        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">guard</span>.<span class="ident">core</span>.<span class="ident">poll</span>(<span class="ident">cx</span>);
-        <span class="ident">mem::forget</span>(<span class="ident">guard</span>);
-        <span class="ident">res</span>
+        <span class="kw">let </span>guard = Guard { core };
+        <span class="kw">let </span>res = guard.core.poll(cx);
+        mem::forget(guard);
+        res
     }));
 
-    <span class="comment">// Prepare output for being placed in the core stage.</span>
-    <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">output</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">Poll::Pending</span>) =&gt; <span class="kw">return</span> <span class="ident">Poll::Pending</span>,
-        <span class="prelude-val">Ok</span>(<span class="ident">Poll::Ready</span>(<span class="ident">output</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">output</span>),
-        <span class="prelude-val">Err</span>(<span class="ident">panic</span>) =&gt; {
-            <span class="ident">scheduler</span>.<span class="ident">unhandled_panic</span>();
-            <span class="prelude-val">Err</span>(<span class="ident">JoinError::panic</span>(<span class="ident">id</span>, <span class="ident">panic</span>))
+    <span class="comment">// Prepare output for being placed in the core stage.
+    </span><span class="kw">let </span>output = <span class="kw">match </span>output {
+        <span class="prelude-val">Ok</span>(Poll::Pending) =&gt; <span class="kw">return </span>Poll::Pending,
+        <span class="prelude-val">Ok</span>(Poll::Ready(output)) =&gt; <span class="prelude-val">Ok</span>(output),
+        <span class="prelude-val">Err</span>(panic) =&gt; {
+            scheduler.unhandled_panic();
+            <span class="prelude-val">Err</span>(JoinError::panic(id, panic))
         }
     };
 
-    <span class="comment">// Catch and ignore panics if the future panics on drop.</span>
-    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">panic::catch_unwind</span>(<span class="ident">panic::AssertUnwindSafe</span>(<span class="op">|</span><span class="op">|</span> {
-        <span class="ident">core</span>.<span class="ident">store_output</span>(<span class="ident">output</span>);
+    <span class="comment">// Catch and ignore panics if the future panics on drop.
+    </span><span class="kw">let </span>res = panic::catch_unwind(panic::AssertUnwindSafe(|| {
+        core.store_output(output);
     }));
 
-    <span class="kw">if</span> <span class="ident">res</span>.<span class="ident">is_err</span>() {
-        <span class="ident">scheduler</span>.<span class="ident">unhandled_panic</span>();
+    <span class="kw">if </span>res.is_err() {
+        scheduler.unhandled_panic();
     }
 
-    <span class="ident">Poll::Ready</span>(())
+    Poll::Ready(())
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/ec/suite_b/ecdsa/signing.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>signing.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../ring/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/ec/suite_b/ecdsa/signing.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>signing.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../ring/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -595,597 +595,597 @@
 <span id="595">595</span>
 <span id="596">596</span>
 <span id="597">597</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2016 Brian Smith.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
-<span class="comment">// purpose with or without fee is hereby granted, provided that the above</span>
-<span class="comment">// copyright notice and this permission notice appear in all copies.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES</span>
-<span class="comment">// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY</span>
-<span class="comment">// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span>
-<span class="comment">// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION</span>
-<span class="comment">// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN</span>
-<span class="comment">// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2016 Brian Smith.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY
+// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-<span class="doccomment">//! ECDSA Signatures using the P-256 and P-384 curves.</span>
+</span><span class="doccomment">//! ECDSA Signatures using the P-256 and P-384 curves.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::digest_scalar::digest_scalar</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">arithmetic::montgomery</span>::<span class="kw-2">*</span>,
-    <span class="ident">cpu</span>, <span class="ident">digest</span>,
-    <span class="ident">ec</span>::{
+</span><span class="kw">use </span><span class="kw">super</span>::digest_scalar::digest_scalar;
+<span class="kw">use crate</span>::{
+    arithmetic::montgomery::<span class="kw-2">*</span>,
+    cpu, digest,
+    ec::{
         <span class="self">self</span>,
-        <span class="ident">suite_b</span>::{<span class="ident">ops</span>::<span class="kw-2">*</span>, <span class="ident">private_key</span>},
+        suite_b::{ops::<span class="kw-2">*</span>, private_key},
     },
-    <span class="ident">error</span>,
-    <span class="ident">io::der</span>,
-    <span class="ident">limb</span>, <span class="ident">pkcs8</span>, <span class="ident">rand</span>, <span class="ident">sealed</span>, <span class="ident">signature</span>,
+    error,
+    io::der,
+    limb, pkcs8, rand, sealed, signature,
 };
-<span class="doccomment">/// An ECDSA signing algorithm.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EcdsaSigningAlgorithm</span> {
-    <span class="ident">curve</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">ec::Curve</span>,
-    <span class="ident">private_scalar_ops</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">PrivateScalarOps</span>,
-    <span class="ident">private_key_ops</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">PrivateKeyOps</span>,
-    <span class="ident">digest_alg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">digest::Algorithm</span>,
-    <span class="ident">pkcs8_template</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">pkcs8::Template</span>,
-    <span class="ident">format_rs</span>: <span class="kw">fn</span>(<span class="ident">ops</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">ScalarOps</span>, <span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="ident">Scalar</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">Scalar</span>, <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">usize</span>,
-    <span class="ident">id</span>: <span class="ident">AlgorithmID</span>,
+<span class="doccomment">/// An ECDSA signing algorithm.
+</span><span class="kw">pub struct </span>EcdsaSigningAlgorithm {
+    curve: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>ec::Curve,
+    private_scalar_ops: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>PrivateScalarOps,
+    private_key_ops: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>PrivateKeyOps,
+    digest_alg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>digest::Algorithm,
+    pkcs8_template: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>pkcs8::Template,
+    format_rs: <span class="kw">fn</span>(ops: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>ScalarOps, r: <span class="kw-2">&amp;</span>Scalar, s: <span class="kw-2">&amp;</span>Scalar, out: <span class="kw-2">&amp;mut </span>[u8]) -&gt; usize,
+    id: AlgorithmID,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">enum</span> <span class="ident">AlgorithmID</span> {
-    <span class="ident">ECDSA_P256_SHA256_FIXED_SIGNING</span>,
-    <span class="ident">ECDSA_P384_SHA384_FIXED_SIGNING</span>,
-    <span class="ident">ECDSA_P256_SHA256_ASN1_SIGNING</span>,
-    <span class="ident">ECDSA_P384_SHA384_ASN1_SIGNING</span>,
+<span class="attribute">#[derive(Debug, Eq, PartialEq)]
+</span><span class="kw">enum </span>AlgorithmID {
+    ECDSA_P256_SHA256_FIXED_SIGNING,
+    ECDSA_P384_SHA384_FIXED_SIGNING,
+    ECDSA_P256_SHA256_ASN1_SIGNING,
+    ECDSA_P384_SHA384_ASN1_SIGNING,
 }
 
-<span class="macro">derive_debug_via_id!</span>(<span class="ident">EcdsaSigningAlgorithm</span>);
+<span class="macro">derive_debug_via_id!</span>(EcdsaSigningAlgorithm);
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">EcdsaSigningAlgorithm</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">id</span>
+<span class="kw">impl </span>PartialEq <span class="kw">for </span>EcdsaSigningAlgorithm {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="self">self</span>.id == other.id
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">EcdsaSigningAlgorithm</span> {}
+<span class="kw">impl </span>Eq <span class="kw">for </span>EcdsaSigningAlgorithm {}
 
-<span class="kw">impl</span> <span class="ident">sealed::Sealed</span> <span class="kw">for</span> <span class="ident">EcdsaSigningAlgorithm</span> {}
+<span class="kw">impl </span>sealed::Sealed <span class="kw">for </span>EcdsaSigningAlgorithm {}
 
-<span class="doccomment">/// An ECDSA key pair, used for signing.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EcdsaKeyPair</span> {
-    <span class="ident">d</span>: <span class="ident">Scalar</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
-    <span class="ident">nonce_key</span>: <span class="ident">NonceRandomKey</span>,
-    <span class="ident">alg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">EcdsaSigningAlgorithm</span>,
-    <span class="ident">public_key</span>: <span class="ident">PublicKey</span>,
+<span class="doccomment">/// An ECDSA key pair, used for signing.
+</span><span class="kw">pub struct </span>EcdsaKeyPair {
+    d: Scalar&lt;R&gt;,
+    nonce_key: NonceRandomKey,
+    alg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>EcdsaSigningAlgorithm,
+    public_key: PublicKey,
 }
 
-<span class="macro">derive_debug_via_field!</span>(<span class="ident">EcdsaKeyPair</span>, <span class="macro">stringify!</span>(<span class="ident">EcdsaKeyPair</span>), <span class="ident">public_key</span>);
+<span class="macro">derive_debug_via_field!</span>(EcdsaKeyPair, <span class="macro">stringify!</span>(EcdsaKeyPair), public_key);
 
-<span class="kw">impl</span> <span class="ident">EcdsaKeyPair</span> {
-    <span class="doccomment">/// Generates a new key pair and returns the key pair serialized as a</span>
-    <span class="doccomment">/// PKCS#8 document.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The PKCS#8 document will be a v1 `OneAsymmetricKey` with the public key</span>
-    <span class="doccomment">/// included in the `ECPrivateKey` structure, as described in</span>
-    <span class="doccomment">/// [RFC 5958 Section 2] and [RFC 5915]. The `ECPrivateKey` structure will</span>
-    <span class="doccomment">/// not have a `parameters` field so the generated key is compatible with</span>
-    <span class="doccomment">/// PKCS#11.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [RFC 5915]: https://tools.ietf.org/html/rfc5915</span>
-    <span class="doccomment">/// [RFC 5958 Section 2]: https://tools.ietf.org/html/rfc5958#section-2</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate_pkcs8</span>(
-        <span class="ident">alg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">EcdsaSigningAlgorithm</span>,
-        <span class="ident">rng</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">rand::SecureRandom</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">pkcs8::Document</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">private_key</span> <span class="op">=</span> <span class="ident">ec::Seed::generate</span>(<span class="ident">alg</span>.<span class="ident">curve</span>, <span class="ident">rng</span>, <span class="ident">cpu::features</span>())<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">public_key</span> <span class="op">=</span> <span class="ident">private_key</span>.<span class="ident">compute_public_key</span>()<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">pkcs8::wrap_key</span>(
-            <span class="kw-2">&amp;</span><span class="ident">alg</span>.<span class="ident">pkcs8_template</span>,
-            <span class="ident">private_key</span>.<span class="ident">bytes_less_safe</span>(),
-            <span class="ident">public_key</span>.<span class="ident">as_ref</span>(),
+<span class="kw">impl </span>EcdsaKeyPair {
+    <span class="doccomment">/// Generates a new key pair and returns the key pair serialized as a
+    /// PKCS#8 document.
+    ///
+    /// The PKCS#8 document will be a v1 `OneAsymmetricKey` with the public key
+    /// included in the `ECPrivateKey` structure, as described in
+    /// [RFC 5958 Section 2] and [RFC 5915]. The `ECPrivateKey` structure will
+    /// not have a `parameters` field so the generated key is compatible with
+    /// PKCS#11.
+    ///
+    /// [RFC 5915]: https://tools.ietf.org/html/rfc5915
+    /// [RFC 5958 Section 2]: https://tools.ietf.org/html/rfc5958#section-2
+    </span><span class="kw">pub fn </span>generate_pkcs8(
+        alg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>EcdsaSigningAlgorithm,
+        rng: <span class="kw-2">&amp;</span><span class="kw">dyn </span>rand::SecureRandom,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;pkcs8::Document, error::Unspecified&gt; {
+        <span class="kw">let </span>private_key = ec::Seed::generate(alg.curve, rng, cpu::features())<span class="question-mark">?</span>;
+        <span class="kw">let </span>public_key = private_key.compute_public_key()<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(pkcs8::wrap_key(
+            <span class="kw-2">&amp;</span>alg.pkcs8_template,
+            private_key.bytes_less_safe(),
+            public_key.as_ref(),
         ))
     }
 
-    <span class="doccomment">/// Constructs an ECDSA key pair by parsing an unencrypted PKCS#8 v1</span>
-    <span class="doccomment">/// id-ecPublicKey `ECPrivateKey` key.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The input must be in PKCS#8 v1 format. It must contain the public key in</span>
-    <span class="doccomment">/// the `ECPrivateKey` structure; `from_pkcs8()` will verify that the public</span>
-    <span class="doccomment">/// key and the private key are consistent with each other. The algorithm</span>
-    <span class="doccomment">/// identifier must identify the curve by name; it must not use an</span>
-    <span class="doccomment">/// &quot;explicit&quot; encoding of the curve. The `parameters` field of the</span>
-    <span class="doccomment">/// `ECPrivateKey`, if present, must be the same named curve that is in the</span>
-    <span class="doccomment">/// algorithm identifier in the PKCS#8 header.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_pkcs8</span>(
-        <span class="ident">alg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">EcdsaSigningAlgorithm</span>,
-        <span class="ident">pkcs8</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">key_pair</span> <span class="op">=</span> <span class="ident">ec::suite_b::key_pair_from_pkcs8</span>(
-            <span class="ident">alg</span>.<span class="ident">curve</span>,
-            <span class="ident">alg</span>.<span class="ident">pkcs8_template</span>,
-            <span class="ident">untrusted::Input::from</span>(<span class="ident">pkcs8</span>),
-            <span class="ident">cpu::features</span>(),
+    <span class="doccomment">/// Constructs an ECDSA key pair by parsing an unencrypted PKCS#8 v1
+    /// id-ecPublicKey `ECPrivateKey` key.
+    ///
+    /// The input must be in PKCS#8 v1 format. It must contain the public key in
+    /// the `ECPrivateKey` structure; `from_pkcs8()` will verify that the public
+    /// key and the private key are consistent with each other. The algorithm
+    /// identifier must identify the curve by name; it must not use an
+    /// &quot;explicit&quot; encoding of the curve. The `parameters` field of the
+    /// `ECPrivateKey`, if present, must be the same named curve that is in the
+    /// algorithm identifier in the PKCS#8 header.
+    </span><span class="kw">pub fn </span>from_pkcs8(
+        alg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>EcdsaSigningAlgorithm,
+        pkcs8: <span class="kw-2">&amp;</span>[u8],
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::KeyRejected&gt; {
+        <span class="kw">let </span>key_pair = ec::suite_b::key_pair_from_pkcs8(
+            alg.curve,
+            alg.pkcs8_template,
+            untrusted::Input::from(pkcs8),
+            cpu::features(),
         )<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">rand::SystemRandom::new</span>(); <span class="comment">// TODO: make this a parameter.</span>
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">alg</span>, <span class="ident">key_pair</span>, <span class="kw-2">&amp;</span><span class="ident">rng</span>)
+        <span class="kw">let </span>rng = rand::SystemRandom::new(); <span class="comment">// TODO: make this a parameter.
+        </span><span class="self">Self</span>::new(alg, key_pair, <span class="kw-2">&amp;</span>rng)
     }
 
-    <span class="doccomment">/// Constructs an ECDSA key pair from the private key and public key bytes</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The private key must encoded as a big-endian fixed-length integer. For</span>
-    <span class="doccomment">/// example, a P-256 private key must be 32 bytes prefixed with leading</span>
-    <span class="doccomment">/// zeros as needed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The public key is encoding in uncompressed form using the</span>
-    <span class="doccomment">/// Octet-String-to-Elliptic-Curve-Point algorithm in</span>
-    <span class="doccomment">/// [SEC 1: Elliptic Curve Cryptography, Version 2.0].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is intended for use by code that deserializes key pairs. It is</span>
-    <span class="doccomment">/// recommended to use `EcdsaKeyPair::from_pkcs8()` (with a PKCS#8-encoded</span>
-    <span class="doccomment">/// key) instead.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [SEC 1: Elliptic Curve Cryptography, Version 2.0]:</span>
-    <span class="doccomment">///     http://www.secg.org/sec1-v2.pdf</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_private_key_and_public_key</span>(
-        <span class="ident">alg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">EcdsaSigningAlgorithm</span>,
-        <span class="ident">private_key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-        <span class="ident">public_key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">key_pair</span> <span class="op">=</span> <span class="ident">ec::suite_b::key_pair_from_bytes</span>(
-            <span class="ident">alg</span>.<span class="ident">curve</span>,
-            <span class="ident">untrusted::Input::from</span>(<span class="ident">private_key</span>),
-            <span class="ident">untrusted::Input::from</span>(<span class="ident">public_key</span>),
-            <span class="ident">cpu::features</span>(),
+    <span class="doccomment">/// Constructs an ECDSA key pair from the private key and public key bytes
+    ///
+    /// The private key must encoded as a big-endian fixed-length integer. For
+    /// example, a P-256 private key must be 32 bytes prefixed with leading
+    /// zeros as needed.
+    ///
+    /// The public key is encoding in uncompressed form using the
+    /// Octet-String-to-Elliptic-Curve-Point algorithm in
+    /// [SEC 1: Elliptic Curve Cryptography, Version 2.0].
+    ///
+    /// This is intended for use by code that deserializes key pairs. It is
+    /// recommended to use `EcdsaKeyPair::from_pkcs8()` (with a PKCS#8-encoded
+    /// key) instead.
+    ///
+    /// [SEC 1: Elliptic Curve Cryptography, Version 2.0]:
+    ///     http://www.secg.org/sec1-v2.pdf
+    </span><span class="kw">pub fn </span>from_private_key_and_public_key(
+        alg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>EcdsaSigningAlgorithm,
+        private_key: <span class="kw-2">&amp;</span>[u8],
+        public_key: <span class="kw-2">&amp;</span>[u8],
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::KeyRejected&gt; {
+        <span class="kw">let </span>key_pair = ec::suite_b::key_pair_from_bytes(
+            alg.curve,
+            untrusted::Input::from(private_key),
+            untrusted::Input::from(public_key),
+            cpu::features(),
         )<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">rand::SystemRandom::new</span>(); <span class="comment">// TODO: make this a parameter.</span>
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">alg</span>, <span class="ident">key_pair</span>, <span class="kw-2">&amp;</span><span class="ident">rng</span>)
+        <span class="kw">let </span>rng = rand::SystemRandom::new(); <span class="comment">// TODO: make this a parameter.
+        </span><span class="self">Self</span>::new(alg, key_pair, <span class="kw-2">&amp;</span>rng)
     }
 
-    <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">alg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">EcdsaSigningAlgorithm</span>,
-        <span class="ident">key_pair</span>: <span class="ident">ec::KeyPair</span>,
-        <span class="ident">rng</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">rand::SecureRandom</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">seed</span>, <span class="ident">public_key</span>) <span class="op">=</span> <span class="ident">key_pair</span>.<span class="ident">split</span>();
-        <span class="kw">let</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">private_key::private_key_as_scalar</span>(<span class="ident">alg</span>.<span class="ident">private_key_ops</span>, <span class="kw-2">&amp;</span><span class="ident">seed</span>);
-        <span class="kw">let</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">alg</span>
-            .<span class="ident">private_scalar_ops</span>
-            .<span class="ident">scalar_ops</span>
-            .<span class="ident">scalar_product</span>(<span class="kw-2">&amp;</span><span class="ident">d</span>, <span class="kw-2">&amp;</span><span class="ident">alg</span>.<span class="ident">private_scalar_ops</span>.<span class="ident">oneRR_mod_n</span>);
+    <span class="kw">fn </span>new(
+        alg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>EcdsaSigningAlgorithm,
+        key_pair: ec::KeyPair,
+        rng: <span class="kw-2">&amp;</span><span class="kw">dyn </span>rand::SecureRandom,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::KeyRejected&gt; {
+        <span class="kw">let </span>(seed, public_key) = key_pair.split();
+        <span class="kw">let </span>d = private_key::private_key_as_scalar(alg.private_key_ops, <span class="kw-2">&amp;</span>seed);
+        <span class="kw">let </span>d = alg
+            .private_scalar_ops
+            .scalar_ops
+            .scalar_product(<span class="kw-2">&amp;</span>d, <span class="kw-2">&amp;</span>alg.private_scalar_ops.oneRR_mod_n);
 
-        <span class="kw">let</span> <span class="ident">nonce_key</span> <span class="op">=</span> <span class="ident">NonceRandomKey::new</span>(<span class="ident">alg</span>, <span class="kw-2">&amp;</span><span class="ident">seed</span>, <span class="ident">rng</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">d</span>,
-            <span class="ident">nonce_key</span>,
-            <span class="ident">alg</span>,
-            <span class="ident">public_key</span>: <span class="ident">PublicKey</span>(<span class="ident">public_key</span>),
+        <span class="kw">let </span>nonce_key = NonceRandomKey::new(alg, <span class="kw-2">&amp;</span>seed, rng)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            d,
+            nonce_key,
+            alg,
+            public_key: PublicKey(public_key),
         })
     }
 
-    <span class="doccomment">/// Deprecated. Returns the signature of the `message` using a random nonce</span>
-    <span class="doccomment">/// generated by `rng`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sign</span>(
+    <span class="doccomment">/// Deprecated. Returns the signature of the `message` using a random nonce
+    /// generated by `rng`.
+    </span><span class="kw">pub fn </span>sign(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">rng</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">rand::SecureRandom</span>,
-        <span class="ident">message</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">signature::Signature</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-        <span class="comment">// Step 4 (out of order).</span>
-        <span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">digest::digest</span>(<span class="self">self</span>.<span class="ident">alg</span>.<span class="ident">digest_alg</span>, <span class="ident">message</span>);
+        rng: <span class="kw-2">&amp;</span><span class="kw">dyn </span>rand::SecureRandom,
+        message: <span class="kw-2">&amp;</span>[u8],
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;signature::Signature, error::Unspecified&gt; {
+        <span class="comment">// Step 4 (out of order).
+        </span><span class="kw">let </span>h = digest::digest(<span class="self">self</span>.alg.digest_alg, message);
 
-        <span class="comment">// Incorporate `h` into the nonce to hedge against faulty RNGs. (This</span>
-        <span class="comment">// is not an approved random number generator that is mandated in</span>
-        <span class="comment">// the spec.)</span>
-        <span class="kw">let</span> <span class="ident">nonce_rng</span> <span class="op">=</span> <span class="ident">NonceRandom</span> {
-            <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">nonce_key</span>,
-            <span class="ident">message_digest</span>: <span class="kw-2">&amp;</span><span class="ident">h</span>,
-            <span class="ident">rng</span>,
+        <span class="comment">// Incorporate `h` into the nonce to hedge against faulty RNGs. (This
+        // is not an approved random number generator that is mandated in
+        // the spec.)
+        </span><span class="kw">let </span>nonce_rng = NonceRandom {
+            key: <span class="kw-2">&amp;</span><span class="self">self</span>.nonce_key,
+            message_digest: <span class="kw-2">&amp;</span>h,
+            rng,
         };
 
-        <span class="self">self</span>.<span class="ident">sign_digest</span>(<span class="ident">h</span>, <span class="kw-2">&amp;</span><span class="ident">nonce_rng</span>)
+        <span class="self">self</span>.sign_digest(h, <span class="kw-2">&amp;</span>nonce_rng)
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">sign_with_fixed_nonce_during_test</span>(
+    <span class="attribute">#[cfg(test)]
+    </span><span class="kw">fn </span>sign_with_fixed_nonce_during_test(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">rng</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">rand::SecureRandom</span>,
-        <span class="ident">message</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">signature::Signature</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-        <span class="comment">// Step 4 (out of order).</span>
-        <span class="kw">let</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">digest::digest</span>(<span class="self">self</span>.<span class="ident">alg</span>.<span class="ident">digest_alg</span>, <span class="ident">message</span>);
+        rng: <span class="kw-2">&amp;</span><span class="kw">dyn </span>rand::SecureRandom,
+        message: <span class="kw-2">&amp;</span>[u8],
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;signature::Signature, error::Unspecified&gt; {
+        <span class="comment">// Step 4 (out of order).
+        </span><span class="kw">let </span>h = digest::digest(<span class="self">self</span>.alg.digest_alg, message);
 
-        <span class="self">self</span>.<span class="ident">sign_digest</span>(<span class="ident">h</span>, <span class="ident">rng</span>)
+        <span class="self">self</span>.sign_digest(h, rng)
     }
 
-    <span class="doccomment">/// Returns the signature of message digest `h` using a &quot;random&quot; nonce</span>
-    <span class="doccomment">/// generated by `rng`.</span>
-    <span class="kw">fn</span> <span class="ident">sign_digest</span>(
+    <span class="doccomment">/// Returns the signature of message digest `h` using a &quot;random&quot; nonce
+    /// generated by `rng`.
+    </span><span class="kw">fn </span>sign_digest(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">h</span>: <span class="ident">digest::Digest</span>,
-        <span class="ident">rng</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">rand::SecureRandom</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">signature::Signature</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-        <span class="comment">// NSA Suite B Implementer&#39;s Guide to ECDSA Section 3.4.1: ECDSA</span>
-        <span class="comment">// Signature Generation.</span>
+        h: digest::Digest,
+        rng: <span class="kw-2">&amp;</span><span class="kw">dyn </span>rand::SecureRandom,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;signature::Signature, error::Unspecified&gt; {
+        <span class="comment">// NSA Suite B Implementer&#39;s Guide to ECDSA Section 3.4.1: ECDSA
+        // Signature Generation.
 
-        <span class="comment">// NSA Guide Prerequisites:</span>
-        <span class="comment">//</span>
-        <span class="comment">//     Prior to generating an ECDSA signature, the signatory shall</span>
-        <span class="comment">//     obtain:</span>
-        <span class="comment">//</span>
-        <span class="comment">//     1. an authentic copy of the domain parameters,</span>
-        <span class="comment">//     2. a digital signature key pair (d,Q), either generated by a</span>
-        <span class="comment">//        method from Appendix A.1, or obtained from a trusted third</span>
-        <span class="comment">//        party,</span>
-        <span class="comment">//     3. assurance of the validity of the public key Q (see Appendix</span>
-        <span class="comment">//        A.3), and</span>
-        <span class="comment">//     4. assurance that he/she/it actually possesses the associated</span>
-        <span class="comment">//        private key d (see [SP800-89] Section 6).</span>
-        <span class="comment">//</span>
-        <span class="comment">// The domain parameters are hard-coded into the source code.</span>
-        <span class="comment">// `EcdsaKeyPair::generate_pkcs8()` can be used to meet the second</span>
-        <span class="comment">// requirement; otherwise, it is up to the user to ensure the key pair</span>
-        <span class="comment">// was obtained from a trusted private key. The constructors for</span>
-        <span class="comment">// `EcdsaKeyPair` ensure that #3 and #4 are met subject to the caveats</span>
-        <span class="comment">// in SP800-89 Section 6.</span>
+        // NSA Guide Prerequisites:
+        //
+        //     Prior to generating an ECDSA signature, the signatory shall
+        //     obtain:
+        //
+        //     1. an authentic copy of the domain parameters,
+        //     2. a digital signature key pair (d,Q), either generated by a
+        //        method from Appendix A.1, or obtained from a trusted third
+        //        party,
+        //     3. assurance of the validity of the public key Q (see Appendix
+        //        A.3), and
+        //     4. assurance that he/she/it actually possesses the associated
+        //        private key d (see [SP800-89] Section 6).
+        //
+        // The domain parameters are hard-coded into the source code.
+        // `EcdsaKeyPair::generate_pkcs8()` can be used to meet the second
+        // requirement; otherwise, it is up to the user to ensure the key pair
+        // was obtained from a trusted private key. The constructors for
+        // `EcdsaKeyPair` ensure that #3 and #4 are met subject to the caveats
+        // in SP800-89 Section 6.
 
-        <span class="kw">let</span> <span class="ident">ops</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">alg</span>.<span class="ident">private_scalar_ops</span>;
-        <span class="kw">let</span> <span class="ident">scalar_ops</span> <span class="op">=</span> <span class="ident">ops</span>.<span class="ident">scalar_ops</span>;
-        <span class="kw">let</span> <span class="ident">cops</span> <span class="op">=</span> <span class="ident">scalar_ops</span>.<span class="ident">common</span>;
-        <span class="kw">let</span> <span class="ident">private_key_ops</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">alg</span>.<span class="ident">private_key_ops</span>;
+        </span><span class="kw">let </span>ops = <span class="self">self</span>.alg.private_scalar_ops;
+        <span class="kw">let </span>scalar_ops = ops.scalar_ops;
+        <span class="kw">let </span>cops = scalar_ops.common;
+        <span class="kw">let </span>private_key_ops = <span class="self">self</span>.alg.private_key_ops;
 
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">100</span> {
-            <span class="comment">// XXX: iteration conut?</span>
-            <span class="comment">// Step 1.</span>
-            <span class="kw">let</span> <span class="ident">k</span> <span class="op">=</span> <span class="ident">private_key::random_scalar</span>(<span class="self">self</span>.<span class="ident">alg</span>.<span class="ident">private_key_ops</span>, <span class="ident">rng</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">k_inv</span> <span class="op">=</span> <span class="ident">scalar_ops</span>.<span class="ident">scalar_inv_to_mont</span>(<span class="kw-2">&amp;</span><span class="ident">k</span>);
+        <span class="kw">for _ in </span><span class="number">0</span>..<span class="number">100 </span>{
+            <span class="comment">// XXX: iteration conut?
+            // Step 1.
+            </span><span class="kw">let </span>k = private_key::random_scalar(<span class="self">self</span>.alg.private_key_ops, rng)<span class="question-mark">?</span>;
+            <span class="kw">let </span>k_inv = scalar_ops.scalar_inv_to_mont(<span class="kw-2">&amp;</span>k);
 
-            <span class="comment">// Step 2.</span>
-            <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">private_key_ops</span>.<span class="ident">point_mul_base</span>(<span class="kw-2">&amp;</span><span class="ident">k</span>);
+            <span class="comment">// Step 2.
+            </span><span class="kw">let </span>r = private_key_ops.point_mul_base(<span class="kw-2">&amp;</span>k);
 
-            <span class="comment">// Step 3.</span>
-            <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> {
-                <span class="kw">let</span> (<span class="ident">x</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">private_key::affine_from_jacobian</span>(<span class="ident">private_key_ops</span>, <span class="kw-2">&amp;</span><span class="ident">r</span>)<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">cops</span>.<span class="ident">elem_unencoded</span>(<span class="kw-2">&amp;</span><span class="ident">x</span>);
-                <span class="ident">elem_reduced_to_scalar</span>(<span class="ident">cops</span>, <span class="kw-2">&amp;</span><span class="ident">x</span>)
+            <span class="comment">// Step 3.
+            </span><span class="kw">let </span>r = {
+                <span class="kw">let </span>(x, <span class="kw">_</span>) = private_key::affine_from_jacobian(private_key_ops, <span class="kw-2">&amp;</span>r)<span class="question-mark">?</span>;
+                <span class="kw">let </span>x = cops.elem_unencoded(<span class="kw-2">&amp;</span>x);
+                elem_reduced_to_scalar(cops, <span class="kw-2">&amp;</span>x)
             };
-            <span class="kw">if</span> <span class="ident">cops</span>.<span class="ident">is_zero</span>(<span class="kw-2">&amp;</span><span class="ident">r</span>) {
+            <span class="kw">if </span>cops.is_zero(<span class="kw-2">&amp;</span>r) {
                 <span class="kw">continue</span>;
             }
 
-            <span class="comment">// Step 4 is done by the caller.</span>
+            <span class="comment">// Step 4 is done by the caller.
 
-            <span class="comment">// Step 5.</span>
-            <span class="kw">let</span> <span class="ident">e</span> <span class="op">=</span> <span class="ident">digest_scalar</span>(<span class="ident">scalar_ops</span>, <span class="ident">h</span>);
+            // Step 5.
+            </span><span class="kw">let </span>e = digest_scalar(scalar_ops, h);
 
-            <span class="comment">// Step 6.</span>
-            <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> {
-                <span class="kw">let</span> <span class="ident">dr</span> <span class="op">=</span> <span class="ident">scalar_ops</span>.<span class="ident">scalar_product</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">d</span>, <span class="kw-2">&amp;</span><span class="ident">r</span>);
-                <span class="kw">let</span> <span class="ident">e_plus_dr</span> <span class="op">=</span> <span class="ident">scalar_sum</span>(<span class="ident">cops</span>, <span class="kw-2">&amp;</span><span class="ident">e</span>, <span class="kw-2">&amp;</span><span class="ident">dr</span>);
-                <span class="ident">scalar_ops</span>.<span class="ident">scalar_product</span>(<span class="kw-2">&amp;</span><span class="ident">k_inv</span>, <span class="kw-2">&amp;</span><span class="ident">e_plus_dr</span>)
+            <span class="comment">// Step 6.
+            </span><span class="kw">let </span>s = {
+                <span class="kw">let </span>dr = scalar_ops.scalar_product(<span class="kw-2">&amp;</span><span class="self">self</span>.d, <span class="kw-2">&amp;</span>r);
+                <span class="kw">let </span>e_plus_dr = scalar_sum(cops, <span class="kw-2">&amp;</span>e, <span class="kw-2">&amp;</span>dr);
+                scalar_ops.scalar_product(<span class="kw-2">&amp;</span>k_inv, <span class="kw-2">&amp;</span>e_plus_dr)
             };
-            <span class="kw">if</span> <span class="ident">cops</span>.<span class="ident">is_zero</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>) {
+            <span class="kw">if </span>cops.is_zero(<span class="kw-2">&amp;</span>s) {
                 <span class="kw">continue</span>;
             }
 
-            <span class="comment">// Step 7 with encoding.</span>
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">signature::Signature::new</span>(<span class="op">|</span><span class="ident">sig_bytes</span><span class="op">|</span> {
-                (<span class="self">self</span>.<span class="ident">alg</span>.<span class="ident">format_rs</span>)(<span class="ident">scalar_ops</span>, <span class="kw-2">&amp;</span><span class="ident">r</span>, <span class="kw-2">&amp;</span><span class="ident">s</span>, <span class="ident">sig_bytes</span>)
+            <span class="comment">// Step 7 with encoding.
+            </span><span class="kw">return </span><span class="prelude-val">Ok</span>(signature::Signature::new(|sig_bytes| {
+                (<span class="self">self</span>.alg.format_rs)(scalar_ops, <span class="kw-2">&amp;</span>r, <span class="kw-2">&amp;</span>s, sig_bytes)
             }));
         }
 
-        <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>)
+        <span class="prelude-val">Err</span>(error::Unspecified)
     }
 }
 
-<span class="doccomment">/// Generates an ECDSA nonce in a way that attempts to protect against a faulty</span>
-<span class="doccomment">/// `SecureRandom`.</span>
-<span class="kw">struct</span> <span class="ident">NonceRandom</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">NonceRandomKey</span>,
-    <span class="ident">message_digest</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">digest::Digest</span>,
-    <span class="ident">rng</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">dyn</span> <span class="ident">rand::SecureRandom</span>,
+<span class="doccomment">/// Generates an ECDSA nonce in a way that attempts to protect against a faulty
+/// `SecureRandom`.
+</span><span class="kw">struct </span>NonceRandom&lt;<span class="lifetime">&#39;a</span>&gt; {
+    key: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>NonceRandomKey,
+    message_digest: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>digest::Digest,
+    rng: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw">dyn </span>rand::SecureRandom,
 }
 
-<span class="kw">impl</span> <span class="ident">core::fmt::Debug</span> <span class="kw">for</span> <span class="ident">NonceRandom</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">core::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">core::fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;NonceRandom&quot;</span>).<span class="ident">finish</span>()
+<span class="kw">impl </span>core::fmt::Debug <span class="kw">for </span>NonceRandom&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>core::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; core::fmt::Result {
+        f.debug_struct(<span class="string">&quot;NonceRandom&quot;</span>).finish()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">rand::sealed::SecureRandom</span> <span class="kw">for</span> <span class="ident">NonceRandom</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fill_impl</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dest</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-        <span class="comment">// Use the same digest algorithm that will be used to digest the</span>
-        <span class="comment">// message. The digest algorithm&#39;s output is exactly the right size;</span>
-        <span class="comment">// this is checked below.</span>
-        <span class="comment">//</span>
-        <span class="comment">// XXX(perf): The single iteration will require two digest block</span>
-        <span class="comment">// operations because the amount of data digested is larger than one</span>
-        <span class="comment">// block.</span>
-        <span class="kw">let</span> <span class="ident">digest_alg</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">key</span>.<span class="number">0</span>.<span class="ident">algorithm</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">digest::Context::new</span>(<span class="ident">digest_alg</span>);
+<span class="kw">impl </span>rand::sealed::SecureRandom <span class="kw">for </span>NonceRandom&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>fill_impl(<span class="kw-2">&amp;</span><span class="self">self</span>, dest: <span class="kw-2">&amp;mut </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt; {
+        <span class="comment">// Use the same digest algorithm that will be used to digest the
+        // message. The digest algorithm&#39;s output is exactly the right size;
+        // this is checked below.
+        //
+        // XXX(perf): The single iteration will require two digest block
+        // operations because the amount of data digested is larger than one
+        // block.
+        </span><span class="kw">let </span>digest_alg = <span class="self">self</span>.key.<span class="number">0</span>.algorithm();
+        <span class="kw">let </span><span class="kw-2">mut </span>ctx = digest::Context::new(digest_alg);
 
-        <span class="comment">// Digest the randomized digest of the private key.</span>
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">key</span>.<span class="number">0</span>.<span class="ident">as_ref</span>();
-        <span class="ident">ctx</span>.<span class="ident">update</span>(<span class="ident">key</span>);
+        <span class="comment">// Digest the randomized digest of the private key.
+        </span><span class="kw">let </span>key = <span class="self">self</span>.key.<span class="number">0</span>.as_ref();
+        ctx.update(key);
 
-        <span class="comment">// The random value is digested between the key and the message so that</span>
-        <span class="comment">// the key and the message are not directly digested in the same digest</span>
-        <span class="comment">// block.</span>
-        <span class="macro">assert!</span>(<span class="ident">key</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">digest_alg</span>.<span class="ident">block_len</span> <span class="op">/</span> <span class="number">2</span>);
+        <span class="comment">// The random value is digested between the key and the message so that
+        // the key and the message are not directly digested in the same digest
+        // block.
+        </span><span class="macro">assert!</span>(key.len() &lt;= digest_alg.block_len / <span class="number">2</span>);
         {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rand</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="ident">digest::MAX_BLOCK_LEN</span>];
-            <span class="kw">let</span> <span class="ident">rand</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">rand</span>[..<span class="ident">digest_alg</span>.<span class="ident">block_len</span> <span class="op">-</span> <span class="ident">key</span>.<span class="ident">len</span>()];
-            <span class="macro">assert!</span>(<span class="ident">rand</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">dest</span>.<span class="ident">len</span>());
-            <span class="self">self</span>.<span class="ident">rng</span>.<span class="ident">fill</span>(<span class="ident">rand</span>)<span class="question-mark">?</span>;
-            <span class="ident">ctx</span>.<span class="ident">update</span>(<span class="ident">rand</span>);
+            <span class="kw">let </span><span class="kw-2">mut </span>rand = [<span class="number">0u8</span>; digest::MAX_BLOCK_LEN];
+            <span class="kw">let </span>rand = <span class="kw-2">&amp;mut </span>rand[..digest_alg.block_len - key.len()];
+            <span class="macro">assert!</span>(rand.len() &gt;= dest.len());
+            <span class="self">self</span>.rng.fill(rand)<span class="question-mark">?</span>;
+            ctx.update(rand);
         }
 
-        <span class="ident">ctx</span>.<span class="ident">update</span>(<span class="self">self</span>.<span class="ident">message_digest</span>.<span class="ident">as_ref</span>());
+        ctx.update(<span class="self">self</span>.message_digest.as_ref());
 
-        <span class="kw">let</span> <span class="ident">nonce</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">finish</span>();
+        <span class="kw">let </span>nonce = ctx.finish();
 
-        <span class="comment">// `copy_from_slice()` panics if the lengths differ, so we don&#39;t have</span>
-        <span class="comment">// to separately assert that the lengths are the same.</span>
-        <span class="ident">dest</span>.<span class="ident">copy_from_slice</span>(<span class="ident">nonce</span>.<span class="ident">as_ref</span>());
+        <span class="comment">// `copy_from_slice()` panics if the lengths differ, so we don&#39;t have
+        // to separately assert that the lengths are the same.
+        </span>dest.copy_from_slice(nonce.as_ref());
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">sealed::Sealed</span> <span class="kw">for</span> <span class="ident">NonceRandom</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; sealed::Sealed <span class="kw">for </span>NonceRandom&lt;<span class="lifetime">&#39;a</span>&gt; {}
 
-<span class="kw">struct</span> <span class="ident">NonceRandomKey</span>(<span class="ident">digest::Digest</span>);
+<span class="kw">struct </span>NonceRandomKey(digest::Digest);
 
-<span class="kw">impl</span> <span class="ident">NonceRandomKey</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">alg</span>: <span class="kw-2">&amp;</span><span class="ident">EcdsaSigningAlgorithm</span>,
-        <span class="ident">seed</span>: <span class="kw-2">&amp;</span><span class="ident">ec::Seed</span>,
-        <span class="ident">rng</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">rand::SecureRandom</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rand</span> <span class="op">=</span> [<span class="number">0</span>; <span class="ident">digest::MAX_OUTPUT_LEN</span>];
-        <span class="kw">let</span> <span class="ident">rand</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">rand</span>[<span class="number">0</span>..<span class="ident">alg</span>.<span class="ident">curve</span>.<span class="ident">elem_scalar_seed_len</span>];
+<span class="kw">impl </span>NonceRandomKey {
+    <span class="kw">fn </span>new(
+        alg: <span class="kw-2">&amp;</span>EcdsaSigningAlgorithm,
+        seed: <span class="kw-2">&amp;</span>ec::Seed,
+        rng: <span class="kw-2">&amp;</span><span class="kw">dyn </span>rand::SecureRandom,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, error::KeyRejected&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>rand = [<span class="number">0</span>; digest::MAX_OUTPUT_LEN];
+        <span class="kw">let </span>rand = <span class="kw-2">&amp;mut </span>rand[<span class="number">0</span>..alg.curve.elem_scalar_seed_len];
 
-        <span class="comment">// XXX: `KeyRejected` isn&#39;t the right way to model  failure of the RNG,</span>
-        <span class="comment">// but to fix that we&#39;d need to break the API by changing the result type.</span>
-        <span class="comment">// TODO: Fix the API in the next breaking release.</span>
-        <span class="ident">rng</span>.<span class="ident">fill</span>(<span class="ident">rand</span>)
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error::Unspecified</span><span class="op">|</span> <span class="ident">error::KeyRejected::rng_failed</span>())<span class="question-mark">?</span>;
+        <span class="comment">// XXX: `KeyRejected` isn&#39;t the right way to model  failure of the RNG,
+        // but to fix that we&#39;d need to break the API by changing the result type.
+        // TODO: Fix the API in the next breaking release.
+        </span>rng.fill(rand)
+            .map_err(|error::Unspecified| error::KeyRejected::rng_failed())<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">digest::Context::new</span>(<span class="ident">alg</span>.<span class="ident">digest_alg</span>);
-        <span class="ident">ctx</span>.<span class="ident">update</span>(<span class="ident">rand</span>);
-        <span class="ident">ctx</span>.<span class="ident">update</span>(<span class="ident">seed</span>.<span class="ident">bytes_less_safe</span>());
-        <span class="prelude-val">Ok</span>(<span class="ident">NonceRandomKey</span>(<span class="ident">ctx</span>.<span class="ident">finish</span>()))
+        <span class="kw">let </span><span class="kw-2">mut </span>ctx = digest::Context::new(alg.digest_alg);
+        ctx.update(rand);
+        ctx.update(seed.bytes_less_safe());
+        <span class="prelude-val">Ok</span>(NonceRandomKey(ctx.finish()))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">signature::KeyPair</span> <span class="kw">for</span> <span class="ident">EcdsaKeyPair</span> {
-    <span class="kw">type</span> <span class="ident">PublicKey</span> <span class="op">=</span> <span class="ident">PublicKey</span>;
+<span class="kw">impl </span>signature::KeyPair <span class="kw">for </span>EcdsaKeyPair {
+    <span class="kw">type </span>PublicKey = PublicKey;
 
-    <span class="kw">fn</span> <span class="ident">public_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::PublicKey</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">public_key</span>
+    <span class="kw">fn </span>public_key(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::PublicKey {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.public_key
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PublicKey</span>(<span class="ident">ec::PublicKey</span>);
+<span class="attribute">#[derive(Clone, Copy)]
+</span><span class="kw">pub struct </span>PublicKey(ec::PublicKey);
 
-<span class="macro">derive_debug_self_as_ref_hex_bytes!</span>(<span class="ident">PublicKey</span>);
+<span class="macro">derive_debug_self_as_ref_hex_bytes!</span>(PublicKey);
 
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PublicKey</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_ref</span>()
+<span class="kw">impl </span>AsRef&lt;[u8]&gt; <span class="kw">for </span>PublicKey {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="self">self</span>.<span class="number">0</span>.as_ref()
     }
 }
 
-<span class="kw">fn</span> <span class="ident">format_rs_fixed</span>(<span class="ident">ops</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">ScalarOps</span>, <span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="ident">Scalar</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">Scalar</span>, <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">usize</span> {
-    <span class="kw">let</span> <span class="ident">scalar_len</span> <span class="op">=</span> <span class="ident">ops</span>.<span class="ident">scalar_bytes_len</span>();
+<span class="kw">fn </span>format_rs_fixed(ops: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>ScalarOps, r: <span class="kw-2">&amp;</span>Scalar, s: <span class="kw-2">&amp;</span>Scalar, out: <span class="kw-2">&amp;mut </span>[u8]) -&gt; usize {
+    <span class="kw">let </span>scalar_len = ops.scalar_bytes_len();
 
-    <span class="kw">let</span> (<span class="ident">r_out</span>, <span class="ident">rest</span>) <span class="op">=</span> <span class="ident">out</span>.<span class="ident">split_at_mut</span>(<span class="ident">scalar_len</span>);
-    <span class="ident">limb::big_endian_from_limbs</span>(<span class="kw-2">&amp;</span><span class="ident">r</span>.<span class="ident">limbs</span>[..<span class="ident">ops</span>.<span class="ident">common</span>.<span class="ident">num_limbs</span>], <span class="ident">r_out</span>);
+    <span class="kw">let </span>(r_out, rest) = out.split_at_mut(scalar_len);
+    limb::big_endian_from_limbs(<span class="kw-2">&amp;</span>r.limbs[..ops.common.num_limbs], r_out);
 
-    <span class="kw">let</span> (<span class="ident">s_out</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">rest</span>.<span class="ident">split_at_mut</span>(<span class="ident">scalar_len</span>);
-    <span class="ident">limb::big_endian_from_limbs</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>.<span class="ident">limbs</span>[..<span class="ident">ops</span>.<span class="ident">common</span>.<span class="ident">num_limbs</span>], <span class="ident">s_out</span>);
+    <span class="kw">let </span>(s_out, <span class="kw">_</span>) = rest.split_at_mut(scalar_len);
+    limb::big_endian_from_limbs(<span class="kw-2">&amp;</span>s.limbs[..ops.common.num_limbs], s_out);
 
-    <span class="number">2</span> <span class="op">*</span> <span class="ident">scalar_len</span>
+    <span class="number">2 </span>* scalar_len
 }
 
-<span class="kw">fn</span> <span class="ident">format_rs_asn1</span>(<span class="ident">ops</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">ScalarOps</span>, <span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="ident">Scalar</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">Scalar</span>, <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">usize</span> {
-    <span class="comment">// This assumes `a` is not zero since neither `r` or `s` is allowed to be</span>
-    <span class="comment">// zero.</span>
-    <span class="kw">fn</span> <span class="ident">format_integer_tlv</span>(<span class="ident">ops</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarOps</span>, <span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">Scalar</span>, <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">usize</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fixed</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="ident">ec::SCALAR_MAX_BYTES</span> <span class="op">+</span> <span class="number">1</span>];
-        <span class="kw">let</span> <span class="ident">fixed</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">fixed</span>[..(<span class="ident">ops</span>.<span class="ident">scalar_bytes_len</span>() <span class="op">+</span> <span class="number">1</span>)];
-        <span class="ident">limb::big_endian_from_limbs</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="ident">limbs</span>[..<span class="ident">ops</span>.<span class="ident">common</span>.<span class="ident">num_limbs</span>], <span class="kw-2">&amp;mut</span> <span class="ident">fixed</span>[<span class="number">1</span>..]);
+<span class="kw">fn </span>format_rs_asn1(ops: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>ScalarOps, r: <span class="kw-2">&amp;</span>Scalar, s: <span class="kw-2">&amp;</span>Scalar, out: <span class="kw-2">&amp;mut </span>[u8]) -&gt; usize {
+    <span class="comment">// This assumes `a` is not zero since neither `r` or `s` is allowed to be
+    // zero.
+    </span><span class="kw">fn </span>format_integer_tlv(ops: <span class="kw-2">&amp;</span>ScalarOps, a: <span class="kw-2">&amp;</span>Scalar, out: <span class="kw-2">&amp;mut </span>[u8]) -&gt; usize {
+        <span class="kw">let </span><span class="kw-2">mut </span>fixed = [<span class="number">0u8</span>; ec::SCALAR_MAX_BYTES + <span class="number">1</span>];
+        <span class="kw">let </span>fixed = <span class="kw-2">&amp;mut </span>fixed[..(ops.scalar_bytes_len() + <span class="number">1</span>)];
+        limb::big_endian_from_limbs(<span class="kw-2">&amp;</span>a.limbs[..ops.common.num_limbs], <span class="kw-2">&amp;mut </span>fixed[<span class="number">1</span>..]);
 
-        <span class="comment">// Since `a_fixed_out` is an extra byte long, it is guaranteed to start</span>
-        <span class="comment">// with a zero.</span>
-        <span class="macro">debug_assert_eq!</span>(<span class="ident">fixed</span>[<span class="number">0</span>], <span class="number">0</span>);
+        <span class="comment">// Since `a_fixed_out` is an extra byte long, it is guaranteed to start
+        // with a zero.
+        </span><span class="macro">debug_assert_eq!</span>(fixed[<span class="number">0</span>], <span class="number">0</span>);
 
-        <span class="comment">// There must be at least one non-zero byte since `a` isn&#39;t zero.</span>
-        <span class="kw">let</span> <span class="ident">first_index</span> <span class="op">=</span> <span class="ident">fixed</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">b</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>).<span class="ident">unwrap</span>();
+        <span class="comment">// There must be at least one non-zero byte since `a` isn&#39;t zero.
+        </span><span class="kw">let </span>first_index = fixed.iter().position(|b| <span class="kw-2">*</span>b != <span class="number">0</span>).unwrap();
 
-        <span class="comment">// If the first byte has its high bit set, it needs to be prefixed with 0x00.</span>
-        <span class="kw">let</span> <span class="ident">first_index</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">fixed</span>[<span class="ident">first_index</span>] <span class="op">&amp;</span> <span class="number">0x80</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="ident">first_index</span> <span class="op">-</span> <span class="number">1</span>
-        } <span class="kw">else</span> {
-            <span class="ident">first_index</span>
+        <span class="comment">// If the first byte has its high bit set, it needs to be prefixed with 0x00.
+        </span><span class="kw">let </span>first_index = <span class="kw">if </span>fixed[first_index] &amp; <span class="number">0x80 </span>!= <span class="number">0 </span>{
+            first_index - <span class="number">1
+        </span>} <span class="kw">else </span>{
+            first_index
         };
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">fixed</span>[<span class="ident">first_index</span>..];
+        <span class="kw">let </span>value = <span class="kw-2">&amp;</span>fixed[first_index..];
 
-        <span class="ident">out</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">der::Tag::Integer</span> <span class="kw">as</span> <span class="ident">u8</span>;
+        out[<span class="number">0</span>] = der::Tag::Integer <span class="kw">as </span>u8;
 
-        <span class="comment">// Lengths less than 128 are encoded in one byte.</span>
-        <span class="macro">assert!</span>(<span class="ident">value</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">128</span>);
-        <span class="ident">out</span>[<span class="number">1</span>] <span class="op">=</span> <span class="ident">value</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u8</span>;
+        <span class="comment">// Lengths less than 128 are encoded in one byte.
+        </span><span class="macro">assert!</span>(value.len() &lt; <span class="number">128</span>);
+        out[<span class="number">1</span>] = value.len() <span class="kw">as </span>u8;
 
-        <span class="ident">out</span>[<span class="number">2</span>..][..<span class="ident">value</span>.<span class="ident">len</span>()].<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>);
+        out[<span class="number">2</span>..][..value.len()].copy_from_slice(<span class="kw-2">&amp;</span>value);
 
-        <span class="number">2</span> <span class="op">+</span> <span class="ident">value</span>.<span class="ident">len</span>()
+        <span class="number">2 </span>+ value.len()
     }
 
-    <span class="ident">out</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">der::Tag::Sequence</span> <span class="kw">as</span> <span class="ident">u8</span>;
-    <span class="kw">let</span> <span class="ident">r_tlv_len</span> <span class="op">=</span> <span class="ident">format_integer_tlv</span>(<span class="ident">ops</span>, <span class="ident">r</span>, <span class="kw-2">&amp;mut</span> <span class="ident">out</span>[<span class="number">2</span>..]);
-    <span class="kw">let</span> <span class="ident">s_tlv_len</span> <span class="op">=</span> <span class="ident">format_integer_tlv</span>(<span class="ident">ops</span>, <span class="ident">s</span>, <span class="kw-2">&amp;mut</span> <span class="ident">out</span>[<span class="number">2</span>..][<span class="ident">r_tlv_len</span>..]);
+    out[<span class="number">0</span>] = der::Tag::Sequence <span class="kw">as </span>u8;
+    <span class="kw">let </span>r_tlv_len = format_integer_tlv(ops, r, <span class="kw-2">&amp;mut </span>out[<span class="number">2</span>..]);
+    <span class="kw">let </span>s_tlv_len = format_integer_tlv(ops, s, <span class="kw-2">&amp;mut </span>out[<span class="number">2</span>..][r_tlv_len..]);
 
-    <span class="comment">// Lengths less than 128 are encoded in one byte.</span>
-    <span class="kw">let</span> <span class="ident">value_len</span> <span class="op">=</span> <span class="ident">r_tlv_len</span> <span class="op">+</span> <span class="ident">s_tlv_len</span>;
-    <span class="macro">assert!</span>(<span class="ident">value_len</span> <span class="op">&lt;</span> <span class="number">128</span>);
-    <span class="ident">out</span>[<span class="number">1</span>] <span class="op">=</span> <span class="ident">value_len</span> <span class="kw">as</span> <span class="ident">u8</span>;
+    <span class="comment">// Lengths less than 128 are encoded in one byte.
+    </span><span class="kw">let </span>value_len = r_tlv_len + s_tlv_len;
+    <span class="macro">assert!</span>(value_len &lt; <span class="number">128</span>);
+    out[<span class="number">1</span>] = value_len <span class="kw">as </span>u8;
 
-    <span class="number">2</span> <span class="op">+</span> <span class="ident">value_len</span>
+    <span class="number">2 </span>+ value_len
 }
 
-<span class="doccomment">/// Signing of fixed-length (PKCS#11 style) ECDSA signatures using the</span>
-<span class="doccomment">/// P-256 curve and SHA-256.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See &quot;`ECDSA_*_FIXED` Details&quot; in `ring::signature`&#39;s module-level</span>
-<span class="doccomment">/// documentation for more details.</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">ECDSA_P256_SHA256_FIXED_SIGNING</span>: <span class="ident">EcdsaSigningAlgorithm</span> <span class="op">=</span> <span class="ident">EcdsaSigningAlgorithm</span> {
-    <span class="ident">curve</span>: <span class="kw-2">&amp;</span><span class="ident">ec::suite_b::curve::P256</span>,
-    <span class="ident">private_scalar_ops</span>: <span class="kw-2">&amp;</span><span class="ident">p256::PRIVATE_SCALAR_OPS</span>,
-    <span class="ident">private_key_ops</span>: <span class="kw-2">&amp;</span><span class="ident">p256::PRIVATE_KEY_OPS</span>,
-    <span class="ident">digest_alg</span>: <span class="kw-2">&amp;</span><span class="ident">digest::SHA256</span>,
-    <span class="ident">pkcs8_template</span>: <span class="kw-2">&amp;</span><span class="ident">EC_PUBLIC_KEY_P256_PKCS8_V1_TEMPLATE</span>,
-    <span class="ident">format_rs</span>: <span class="ident">format_rs_fixed</span>,
-    <span class="ident">id</span>: <span class="ident">AlgorithmID::ECDSA_P256_SHA256_FIXED_SIGNING</span>,
+<span class="doccomment">/// Signing of fixed-length (PKCS#11 style) ECDSA signatures using the
+/// P-256 curve and SHA-256.
+///
+/// See &quot;`ECDSA_*_FIXED` Details&quot; in `ring::signature`&#39;s module-level
+/// documentation for more details.
+</span><span class="kw">pub static </span>ECDSA_P256_SHA256_FIXED_SIGNING: EcdsaSigningAlgorithm = EcdsaSigningAlgorithm {
+    curve: <span class="kw-2">&amp;</span>ec::suite_b::curve::P256,
+    private_scalar_ops: <span class="kw-2">&amp;</span>p256::PRIVATE_SCALAR_OPS,
+    private_key_ops: <span class="kw-2">&amp;</span>p256::PRIVATE_KEY_OPS,
+    digest_alg: <span class="kw-2">&amp;</span>digest::SHA256,
+    pkcs8_template: <span class="kw-2">&amp;</span>EC_PUBLIC_KEY_P256_PKCS8_V1_TEMPLATE,
+    format_rs: format_rs_fixed,
+    id: AlgorithmID::ECDSA_P256_SHA256_FIXED_SIGNING,
 };
 
-<span class="doccomment">/// Signing of fixed-length (PKCS#11 style) ECDSA signatures using the</span>
-<span class="doccomment">/// P-384 curve and SHA-384.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See &quot;`ECDSA_*_FIXED` Details&quot; in `ring::signature`&#39;s module-level</span>
-<span class="doccomment">/// documentation for more details.</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">ECDSA_P384_SHA384_FIXED_SIGNING</span>: <span class="ident">EcdsaSigningAlgorithm</span> <span class="op">=</span> <span class="ident">EcdsaSigningAlgorithm</span> {
-    <span class="ident">curve</span>: <span class="kw-2">&amp;</span><span class="ident">ec::suite_b::curve::P384</span>,
-    <span class="ident">private_scalar_ops</span>: <span class="kw-2">&amp;</span><span class="ident">p384::PRIVATE_SCALAR_OPS</span>,
-    <span class="ident">private_key_ops</span>: <span class="kw-2">&amp;</span><span class="ident">p384::PRIVATE_KEY_OPS</span>,
-    <span class="ident">digest_alg</span>: <span class="kw-2">&amp;</span><span class="ident">digest::SHA384</span>,
-    <span class="ident">pkcs8_template</span>: <span class="kw-2">&amp;</span><span class="ident">EC_PUBLIC_KEY_P384_PKCS8_V1_TEMPLATE</span>,
-    <span class="ident">format_rs</span>: <span class="ident">format_rs_fixed</span>,
-    <span class="ident">id</span>: <span class="ident">AlgorithmID::ECDSA_P384_SHA384_FIXED_SIGNING</span>,
+<span class="doccomment">/// Signing of fixed-length (PKCS#11 style) ECDSA signatures using the
+/// P-384 curve and SHA-384.
+///
+/// See &quot;`ECDSA_*_FIXED` Details&quot; in `ring::signature`&#39;s module-level
+/// documentation for more details.
+</span><span class="kw">pub static </span>ECDSA_P384_SHA384_FIXED_SIGNING: EcdsaSigningAlgorithm = EcdsaSigningAlgorithm {
+    curve: <span class="kw-2">&amp;</span>ec::suite_b::curve::P384,
+    private_scalar_ops: <span class="kw-2">&amp;</span>p384::PRIVATE_SCALAR_OPS,
+    private_key_ops: <span class="kw-2">&amp;</span>p384::PRIVATE_KEY_OPS,
+    digest_alg: <span class="kw-2">&amp;</span>digest::SHA384,
+    pkcs8_template: <span class="kw-2">&amp;</span>EC_PUBLIC_KEY_P384_PKCS8_V1_TEMPLATE,
+    format_rs: format_rs_fixed,
+    id: AlgorithmID::ECDSA_P384_SHA384_FIXED_SIGNING,
 };
 
-<span class="doccomment">/// Signing of ASN.1 DER-encoded ECDSA signatures using the P-256 curve and</span>
-<span class="doccomment">/// SHA-256.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See &quot;`ECDSA_*_ASN1` Details&quot; in `ring::signature`&#39;s module-level</span>
-<span class="doccomment">/// documentation for more details.</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">ECDSA_P256_SHA256_ASN1_SIGNING</span>: <span class="ident">EcdsaSigningAlgorithm</span> <span class="op">=</span> <span class="ident">EcdsaSigningAlgorithm</span> {
-    <span class="ident">curve</span>: <span class="kw-2">&amp;</span><span class="ident">ec::suite_b::curve::P256</span>,
-    <span class="ident">private_scalar_ops</span>: <span class="kw-2">&amp;</span><span class="ident">p256::PRIVATE_SCALAR_OPS</span>,
-    <span class="ident">private_key_ops</span>: <span class="kw-2">&amp;</span><span class="ident">p256::PRIVATE_KEY_OPS</span>,
-    <span class="ident">digest_alg</span>: <span class="kw-2">&amp;</span><span class="ident">digest::SHA256</span>,
-    <span class="ident">pkcs8_template</span>: <span class="kw-2">&amp;</span><span class="ident">EC_PUBLIC_KEY_P256_PKCS8_V1_TEMPLATE</span>,
-    <span class="ident">format_rs</span>: <span class="ident">format_rs_asn1</span>,
-    <span class="ident">id</span>: <span class="ident">AlgorithmID::ECDSA_P256_SHA256_ASN1_SIGNING</span>,
+<span class="doccomment">/// Signing of ASN.1 DER-encoded ECDSA signatures using the P-256 curve and
+/// SHA-256.
+///
+/// See &quot;`ECDSA_*_ASN1` Details&quot; in `ring::signature`&#39;s module-level
+/// documentation for more details.
+</span><span class="kw">pub static </span>ECDSA_P256_SHA256_ASN1_SIGNING: EcdsaSigningAlgorithm = EcdsaSigningAlgorithm {
+    curve: <span class="kw-2">&amp;</span>ec::suite_b::curve::P256,
+    private_scalar_ops: <span class="kw-2">&amp;</span>p256::PRIVATE_SCALAR_OPS,
+    private_key_ops: <span class="kw-2">&amp;</span>p256::PRIVATE_KEY_OPS,
+    digest_alg: <span class="kw-2">&amp;</span>digest::SHA256,
+    pkcs8_template: <span class="kw-2">&amp;</span>EC_PUBLIC_KEY_P256_PKCS8_V1_TEMPLATE,
+    format_rs: format_rs_asn1,
+    id: AlgorithmID::ECDSA_P256_SHA256_ASN1_SIGNING,
 };
 
-<span class="doccomment">/// Signing of ASN.1 DER-encoded ECDSA signatures using the P-384 curve and</span>
-<span class="doccomment">/// SHA-384.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See &quot;`ECDSA_*_ASN1` Details&quot; in `ring::signature`&#39;s module-level</span>
-<span class="doccomment">/// documentation for more details.</span>
-<span class="kw">pub</span> <span class="kw">static</span> <span class="ident">ECDSA_P384_SHA384_ASN1_SIGNING</span>: <span class="ident">EcdsaSigningAlgorithm</span> <span class="op">=</span> <span class="ident">EcdsaSigningAlgorithm</span> {
-    <span class="ident">curve</span>: <span class="kw-2">&amp;</span><span class="ident">ec::suite_b::curve::P384</span>,
-    <span class="ident">private_scalar_ops</span>: <span class="kw-2">&amp;</span><span class="ident">p384::PRIVATE_SCALAR_OPS</span>,
-    <span class="ident">private_key_ops</span>: <span class="kw-2">&amp;</span><span class="ident">p384::PRIVATE_KEY_OPS</span>,
-    <span class="ident">digest_alg</span>: <span class="kw-2">&amp;</span><span class="ident">digest::SHA384</span>,
-    <span class="ident">pkcs8_template</span>: <span class="kw-2">&amp;</span><span class="ident">EC_PUBLIC_KEY_P384_PKCS8_V1_TEMPLATE</span>,
-    <span class="ident">format_rs</span>: <span class="ident">format_rs_asn1</span>,
-    <span class="ident">id</span>: <span class="ident">AlgorithmID::ECDSA_P384_SHA384_ASN1_SIGNING</span>,
+<span class="doccomment">/// Signing of ASN.1 DER-encoded ECDSA signatures using the P-384 curve and
+/// SHA-384.
+///
+/// See &quot;`ECDSA_*_ASN1` Details&quot; in `ring::signature`&#39;s module-level
+/// documentation for more details.
+</span><span class="kw">pub static </span>ECDSA_P384_SHA384_ASN1_SIGNING: EcdsaSigningAlgorithm = EcdsaSigningAlgorithm {
+    curve: <span class="kw-2">&amp;</span>ec::suite_b::curve::P384,
+    private_scalar_ops: <span class="kw-2">&amp;</span>p384::PRIVATE_SCALAR_OPS,
+    private_key_ops: <span class="kw-2">&amp;</span>p384::PRIVATE_KEY_OPS,
+    digest_alg: <span class="kw-2">&amp;</span>digest::SHA384,
+    pkcs8_template: <span class="kw-2">&amp;</span>EC_PUBLIC_KEY_P384_PKCS8_V1_TEMPLATE,
+    format_rs: format_rs_asn1,
+    id: AlgorithmID::ECDSA_P384_SHA384_ASN1_SIGNING,
 };
 
-<span class="kw">static</span> <span class="ident">EC_PUBLIC_KEY_P256_PKCS8_V1_TEMPLATE</span>: <span class="ident">pkcs8::Template</span> <span class="op">=</span> <span class="ident">pkcs8::Template</span> {
-    <span class="ident">bytes</span>: <span class="macro">include_bytes!</span>(<span class="string">&quot;ecPublicKey_p256_pkcs8_v1_template.der&quot;</span>),
-    <span class="ident">alg_id_range</span>: <span class="ident">core::ops::Range</span> { <span class="ident">start</span>: <span class="number">8</span>, <span class="ident">end</span>: <span class="number">27</span> },
-    <span class="ident">curve_id_index</span>: <span class="number">9</span>,
-    <span class="ident">private_key_index</span>: <span class="number">0x24</span>,
+<span class="kw">static </span>EC_PUBLIC_KEY_P256_PKCS8_V1_TEMPLATE: pkcs8::Template = pkcs8::Template {
+    bytes: <span class="macro">include_bytes!</span>(<span class="string">&quot;ecPublicKey_p256_pkcs8_v1_template.der&quot;</span>),
+    alg_id_range: core::ops::Range { start: <span class="number">8</span>, end: <span class="number">27 </span>},
+    curve_id_index: <span class="number">9</span>,
+    private_key_index: <span class="number">0x24</span>,
 };
 
-<span class="kw">static</span> <span class="ident">EC_PUBLIC_KEY_P384_PKCS8_V1_TEMPLATE</span>: <span class="ident">pkcs8::Template</span> <span class="op">=</span> <span class="ident">pkcs8::Template</span> {
-    <span class="ident">bytes</span>: <span class="macro">include_bytes!</span>(<span class="string">&quot;ecPublicKey_p384_pkcs8_v1_template.der&quot;</span>),
-    <span class="ident">alg_id_range</span>: <span class="ident">core::ops::Range</span> { <span class="ident">start</span>: <span class="number">8</span>, <span class="ident">end</span>: <span class="number">24</span> },
-    <span class="ident">curve_id_index</span>: <span class="number">9</span>,
-    <span class="ident">private_key_index</span>: <span class="number">0x23</span>,
+<span class="kw">static </span>EC_PUBLIC_KEY_P384_PKCS8_V1_TEMPLATE: pkcs8::Template = pkcs8::Template {
+    bytes: <span class="macro">include_bytes!</span>(<span class="string">&quot;ecPublicKey_p384_pkcs8_v1_template.der&quot;</span>),
+    alg_id_range: core::ops::Range { start: <span class="number">8</span>, end: <span class="number">24 </span>},
+    curve_id_index: <span class="number">9</span>,
+    private_key_index: <span class="number">0x23</span>,
 };
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">signature</span>, <span class="ident">test</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use crate</span>::{signature, test};
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">signature_ecdsa_sign_fixed_test</span>() {
-        <span class="ident">test::run</span>(
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>signature_ecdsa_sign_fixed_test() {
+        test::run(
             <span class="macro">test_file!</span>(<span class="string">&quot;ecdsa_sign_fixed_tests.txt&quot;</span>),
-            <span class="op">|</span><span class="ident">section</span>, <span class="ident">test_case</span><span class="op">|</span> {
-                <span class="macro">assert_eq!</span>(<span class="ident">section</span>, <span class="string">&quot;&quot;</span>);
+            |section, test_case| {
+                <span class="macro">assert_eq!</span>(section, <span class="string">&quot;&quot;</span>);
 
-                <span class="kw">let</span> <span class="ident">curve_name</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_string</span>(<span class="string">&quot;Curve&quot;</span>);
-                <span class="kw">let</span> <span class="ident">digest_name</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_string</span>(<span class="string">&quot;Digest&quot;</span>);
-                <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_bytes</span>(<span class="string">&quot;Msg&quot;</span>);
-                <span class="kw">let</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_bytes</span>(<span class="string">&quot;d&quot;</span>);
-                <span class="kw">let</span> <span class="ident">q</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_bytes</span>(<span class="string">&quot;Q&quot;</span>);
-                <span class="kw">let</span> <span class="ident">k</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_bytes</span>(<span class="string">&quot;k&quot;</span>);
+                <span class="kw">let </span>curve_name = test_case.consume_string(<span class="string">&quot;Curve&quot;</span>);
+                <span class="kw">let </span>digest_name = test_case.consume_string(<span class="string">&quot;Digest&quot;</span>);
+                <span class="kw">let </span>msg = test_case.consume_bytes(<span class="string">&quot;Msg&quot;</span>);
+                <span class="kw">let </span>d = test_case.consume_bytes(<span class="string">&quot;d&quot;</span>);
+                <span class="kw">let </span>q = test_case.consume_bytes(<span class="string">&quot;Q&quot;</span>);
+                <span class="kw">let </span>k = test_case.consume_bytes(<span class="string">&quot;k&quot;</span>);
 
-                <span class="kw">let</span> <span class="ident">expected_result</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_bytes</span>(<span class="string">&quot;Sig&quot;</span>);
+                <span class="kw">let </span>expected_result = test_case.consume_bytes(<span class="string">&quot;Sig&quot;</span>);
 
-                <span class="kw">let</span> <span class="ident">alg</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">curve_name</span>.<span class="ident">as_str</span>(), <span class="ident">digest_name</span>.<span class="ident">as_str</span>()) {
-                    (<span class="string">&quot;P-256&quot;</span>, <span class="string">&quot;SHA256&quot;</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">signature::ECDSA_P256_SHA256_FIXED_SIGNING</span>,
-                    (<span class="string">&quot;P-384&quot;</span>, <span class="string">&quot;SHA384&quot;</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">signature::ECDSA_P384_SHA384_FIXED_SIGNING</span>,
-                    <span class="kw">_</span> =&gt; {
-                        <span class="macro">panic!</span>(<span class="string">&quot;Unsupported curve+digest: {}+{}&quot;</span>, <span class="ident">curve_name</span>, <span class="ident">digest_name</span>);
+                <span class="kw">let </span>alg = <span class="kw">match </span>(curve_name.as_str(), digest_name.as_str()) {
+                    (<span class="string">&quot;P-256&quot;</span>, <span class="string">&quot;SHA256&quot;</span>) =&gt; <span class="kw-2">&amp;</span>signature::ECDSA_P256_SHA256_FIXED_SIGNING,
+                    (<span class="string">&quot;P-384&quot;</span>, <span class="string">&quot;SHA384&quot;</span>) =&gt; <span class="kw-2">&amp;</span>signature::ECDSA_P384_SHA384_FIXED_SIGNING,
+                    <span class="kw">_ </span>=&gt; {
+                        <span class="macro">panic!</span>(<span class="string">&quot;Unsupported curve+digest: {}+{}&quot;</span>, curve_name, digest_name);
                     }
                 };
 
-                <span class="kw">let</span> <span class="ident">private_key</span> <span class="op">=</span>
-                    <span class="ident">signature::EcdsaKeyPair::from_private_key_and_public_key</span>(<span class="ident">alg</span>, <span class="kw-2">&amp;</span><span class="ident">d</span>, <span class="kw-2">&amp;</span><span class="ident">q</span>).<span class="ident">unwrap</span>();
-                <span class="kw">let</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">test::rand::FixedSliceRandom</span> { <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="ident">k</span> };
+                <span class="kw">let </span>private_key =
+                    signature::EcdsaKeyPair::from_private_key_and_public_key(alg, <span class="kw-2">&amp;</span>d, <span class="kw-2">&amp;</span>q).unwrap();
+                <span class="kw">let </span>rng = test::rand::FixedSliceRandom { bytes: <span class="kw-2">&amp;</span>k };
 
-                <span class="kw">let</span> <span class="ident">actual_result</span> <span class="op">=</span> <span class="ident">private_key</span>
-                    .<span class="ident">sign_with_fixed_nonce_during_test</span>(<span class="kw-2">&amp;</span><span class="ident">rng</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>)
-                    .<span class="ident">unwrap</span>();
+                <span class="kw">let </span>actual_result = private_key
+                    .sign_with_fixed_nonce_during_test(<span class="kw-2">&amp;</span>rng, <span class="kw-2">&amp;</span>msg)
+                    .unwrap();
 
-                <span class="macro">assert_eq!</span>(<span class="ident">actual_result</span>.<span class="ident">as_ref</span>(), <span class="kw-2">&amp;</span><span class="ident">expected_result</span>[..]);
+                <span class="macro">assert_eq!</span>(actual_result.as_ref(), <span class="kw-2">&amp;</span>expected_result[..]);
 
                 <span class="prelude-val">Ok</span>(())
             },
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">signature_ecdsa_sign_asn1_test</span>() {
-        <span class="ident">test::run</span>(
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>signature_ecdsa_sign_asn1_test() {
+        test::run(
             <span class="macro">test_file!</span>(<span class="string">&quot;ecdsa_sign_asn1_tests.txt&quot;</span>),
-            <span class="op">|</span><span class="ident">section</span>, <span class="ident">test_case</span><span class="op">|</span> {
-                <span class="macro">assert_eq!</span>(<span class="ident">section</span>, <span class="string">&quot;&quot;</span>);
+            |section, test_case| {
+                <span class="macro">assert_eq!</span>(section, <span class="string">&quot;&quot;</span>);
 
-                <span class="kw">let</span> <span class="ident">curve_name</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_string</span>(<span class="string">&quot;Curve&quot;</span>);
-                <span class="kw">let</span> <span class="ident">digest_name</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_string</span>(<span class="string">&quot;Digest&quot;</span>);
-                <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_bytes</span>(<span class="string">&quot;Msg&quot;</span>);
-                <span class="kw">let</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_bytes</span>(<span class="string">&quot;d&quot;</span>);
-                <span class="kw">let</span> <span class="ident">q</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_bytes</span>(<span class="string">&quot;Q&quot;</span>);
-                <span class="kw">let</span> <span class="ident">k</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_bytes</span>(<span class="string">&quot;k&quot;</span>);
+                <span class="kw">let </span>curve_name = test_case.consume_string(<span class="string">&quot;Curve&quot;</span>);
+                <span class="kw">let </span>digest_name = test_case.consume_string(<span class="string">&quot;Digest&quot;</span>);
+                <span class="kw">let </span>msg = test_case.consume_bytes(<span class="string">&quot;Msg&quot;</span>);
+                <span class="kw">let </span>d = test_case.consume_bytes(<span class="string">&quot;d&quot;</span>);
+                <span class="kw">let </span>q = test_case.consume_bytes(<span class="string">&quot;Q&quot;</span>);
+                <span class="kw">let </span>k = test_case.consume_bytes(<span class="string">&quot;k&quot;</span>);
 
-                <span class="kw">let</span> <span class="ident">expected_result</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="ident">consume_bytes</span>(<span class="string">&quot;Sig&quot;</span>);
+                <span class="kw">let </span>expected_result = test_case.consume_bytes(<span class="string">&quot;Sig&quot;</span>);
 
-                <span class="kw">let</span> <span class="ident">alg</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">curve_name</span>.<span class="ident">as_str</span>(), <span class="ident">digest_name</span>.<span class="ident">as_str</span>()) {
-                    (<span class="string">&quot;P-256&quot;</span>, <span class="string">&quot;SHA256&quot;</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">signature::ECDSA_P256_SHA256_ASN1_SIGNING</span>,
-                    (<span class="string">&quot;P-384&quot;</span>, <span class="string">&quot;SHA384&quot;</span>) =&gt; <span class="kw-2">&amp;</span><span class="ident">signature::ECDSA_P384_SHA384_ASN1_SIGNING</span>,
-                    <span class="kw">_</span> =&gt; {
-                        <span class="macro">panic!</span>(<span class="string">&quot;Unsupported curve+digest: {}+{}&quot;</span>, <span class="ident">curve_name</span>, <span class="ident">digest_name</span>);
+                <span class="kw">let </span>alg = <span class="kw">match </span>(curve_name.as_str(), digest_name.as_str()) {
+                    (<span class="string">&quot;P-256&quot;</span>, <span class="string">&quot;SHA256&quot;</span>) =&gt; <span class="kw-2">&amp;</span>signature::ECDSA_P256_SHA256_ASN1_SIGNING,
+                    (<span class="string">&quot;P-384&quot;</span>, <span class="string">&quot;SHA384&quot;</span>) =&gt; <span class="kw-2">&amp;</span>signature::ECDSA_P384_SHA384_ASN1_SIGNING,
+                    <span class="kw">_ </span>=&gt; {
+                        <span class="macro">panic!</span>(<span class="string">&quot;Unsupported curve+digest: {}+{}&quot;</span>, curve_name, digest_name);
                     }
                 };
 
-                <span class="kw">let</span> <span class="ident">private_key</span> <span class="op">=</span>
-                    <span class="ident">signature::EcdsaKeyPair::from_private_key_and_public_key</span>(<span class="ident">alg</span>, <span class="kw-2">&amp;</span><span class="ident">d</span>, <span class="kw-2">&amp;</span><span class="ident">q</span>).<span class="ident">unwrap</span>();
-                <span class="kw">let</span> <span class="ident">rng</span> <span class="op">=</span> <span class="ident">test::rand::FixedSliceRandom</span> { <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="ident">k</span> };
+                <span class="kw">let </span>private_key =
+                    signature::EcdsaKeyPair::from_private_key_and_public_key(alg, <span class="kw-2">&amp;</span>d, <span class="kw-2">&amp;</span>q).unwrap();
+                <span class="kw">let </span>rng = test::rand::FixedSliceRandom { bytes: <span class="kw-2">&amp;</span>k };
 
-                <span class="kw">let</span> <span class="ident">actual_result</span> <span class="op">=</span> <span class="ident">private_key</span>
-                    .<span class="ident">sign_with_fixed_nonce_during_test</span>(<span class="kw-2">&amp;</span><span class="ident">rng</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>)
-                    .<span class="ident">unwrap</span>();
+                <span class="kw">let </span>actual_result = private_key
+                    .sign_with_fixed_nonce_during_test(<span class="kw-2">&amp;</span>rng, <span class="kw-2">&amp;</span>msg)
+                    .unwrap();
 
-                <span class="macro">assert_eq!</span>(<span class="ident">actual_result</span>.<span class="ident">as_ref</span>(), <span class="kw-2">&amp;</span><span class="ident">expected_result</span>[..]);
+                <span class="macro">assert_eq!</span>(actual_result.as_ref(), <span class="kw-2">&amp;</span>expected_result[..]);
 
                 <span class="prelude-val">Ok</span>(())
             },
@@ -1193,4 +1193,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

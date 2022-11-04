@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/operation/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/operation/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../mongodb/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -398,405 +398,405 @@
 <span id="398">398</span>
 <span id="399">399</span>
 <span id="400">400</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">abort_transaction</span>;
-<span class="kw">mod</span> <span class="ident">aggregate</span>;
-<span class="kw">mod</span> <span class="ident">commit_transaction</span>;
-<span class="kw">mod</span> <span class="ident">count</span>;
-<span class="kw">mod</span> <span class="ident">count_documents</span>;
-<span class="kw">mod</span> <span class="ident">create</span>;
-<span class="kw">mod</span> <span class="ident">create_indexes</span>;
-<span class="kw">mod</span> <span class="ident">delete</span>;
-<span class="kw">mod</span> <span class="ident">distinct</span>;
-<span class="kw">mod</span> <span class="ident">drop_collection</span>;
-<span class="kw">mod</span> <span class="ident">drop_database</span>;
-<span class="kw">mod</span> <span class="ident">drop_indexes</span>;
-<span class="kw">mod</span> <span class="ident">find</span>;
-<span class="kw">mod</span> <span class="ident">find_and_modify</span>;
-<span class="kw">mod</span> <span class="ident">get_more</span>;
-<span class="kw">mod</span> <span class="ident">insert</span>;
-<span class="kw">mod</span> <span class="ident">list_collections</span>;
-<span class="kw">mod</span> <span class="ident">list_databases</span>;
-<span class="kw">mod</span> <span class="ident">list_indexes</span>;
-<span class="kw">mod</span> <span class="ident">run_command</span>;
-<span class="kw">mod</span> <span class="ident">update</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>abort_transaction;
+<span class="kw">mod </span>aggregate;
+<span class="kw">mod </span>commit_transaction;
+<span class="kw">mod </span>count;
+<span class="kw">mod </span>count_documents;
+<span class="kw">mod </span>create;
+<span class="kw">mod </span>create_indexes;
+<span class="kw">mod </span>delete;
+<span class="kw">mod </span>distinct;
+<span class="kw">mod </span>drop_collection;
+<span class="kw">mod </span>drop_database;
+<span class="kw">mod </span>drop_indexes;
+<span class="kw">mod </span>find;
+<span class="kw">mod </span>find_and_modify;
+<span class="kw">mod </span>get_more;
+<span class="kw">mod </span>insert;
+<span class="kw">mod </span>list_collections;
+<span class="kw">mod </span>list_databases;
+<span class="kw">mod </span>list_indexes;
+<span class="kw">mod </span>run_command;
+<span class="kw">mod </span>update;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test;
 
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::VecDeque</span>, <span class="ident">fmt::Debug</span>, <span class="ident">ops::Deref</span>};
+<span class="kw">use </span>std::{collections::VecDeque, fmt::Debug, ops::Deref};
 
-<span class="kw">use</span> <span class="ident">bson</span>::{<span class="ident">RawBsonRef</span>, <span class="ident">RawDocument</span>, <span class="ident">RawDocumentBuf</span>, <span class="ident">Timestamp</span>};
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">de::DeserializeOwned</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="kw">use </span>bson::{RawBsonRef, RawDocument, RawDocumentBuf, Timestamp};
+<span class="kw">use </span>serde::{de::DeserializeOwned, Deserialize, Serialize};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">bson</span>::{<span class="self">self</span>, <span class="ident">Bson</span>, <span class="ident">Document</span>},
-    <span class="ident">bson_util</span>,
-    <span class="ident">client</span>::{<span class="ident">ClusterTime</span>, <span class="ident">HELLO_COMMAND_NAMES</span>, <span class="ident">REDACTED_COMMANDS</span>},
-    <span class="ident">cmap</span>::{<span class="ident">conn::PinnedConnectionHandle</span>, <span class="ident">Command</span>, <span class="ident">RawCommandResponse</span>, <span class="ident">StreamDescription</span>},
-    <span class="ident">error</span>::{
-        <span class="ident">BulkWriteError</span>,
-        <span class="ident">BulkWriteFailure</span>,
-        <span class="ident">CommandError</span>,
-        <span class="ident">Error</span>,
-        <span class="ident">ErrorKind</span>,
+<span class="kw">use crate</span>::{
+    bson::{<span class="self">self</span>, Bson, Document},
+    bson_util,
+    client::{ClusterTime, HELLO_COMMAND_NAMES, REDACTED_COMMANDS},
+    cmap::{conn::PinnedConnectionHandle, Command, RawCommandResponse, StreamDescription},
+    error::{
+        BulkWriteError,
+        BulkWriteFailure,
+        CommandError,
+        Error,
+        ErrorKind,
         <span class="prelude-ty">Result</span>,
-        <span class="ident">WriteConcernError</span>,
-        <span class="ident">WriteFailure</span>,
+        WriteConcernError,
+        WriteFailure,
     },
-    <span class="ident">options::WriteConcern</span>,
-    <span class="ident">selection_criteria::SelectionCriteria</span>,
-    <span class="ident">Namespace</span>,
+    options::WriteConcern,
+    selection_criteria::SelectionCriteria,
+    Namespace,
 };
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">abort_transaction::AbortTransaction</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">aggregate</span>::{<span class="ident">Aggregate</span>, <span class="ident">AggregateTarget</span>, <span class="ident">ChangeStreamAggregate</span>};
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">commit_transaction::CommitTransaction</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">count::Count</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">count_documents::CountDocuments</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">create::Create</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">create_indexes::CreateIndexes</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">delete::Delete</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">distinct::Distinct</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">drop_collection::DropCollection</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">drop_database::DropDatabase</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">drop_indexes::DropIndexes</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">find::Find</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">find_and_modify::FindAndModify</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">get_more::GetMore</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">insert::Insert</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">list_collections::ListCollections</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">list_databases::ListDatabases</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">list_indexes::ListIndexes</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">run_command::RunCommand</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">update::Update</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>abort_transaction::AbortTransaction;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>aggregate::{Aggregate, AggregateTarget, ChangeStreamAggregate};
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>commit_transaction::CommitTransaction;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>count::Count;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>count_documents::CountDocuments;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>create::Create;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>create_indexes::CreateIndexes;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>delete::Delete;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>distinct::Distinct;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>drop_collection::DropCollection;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>drop_database::DropDatabase;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>drop_indexes::DropIndexes;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>find::Find;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>find_and_modify::FindAndModify;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>get_more::GetMore;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>insert::Insert;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>list_collections::ListCollections;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>list_databases::ListDatabases;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>list_indexes::ListIndexes;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>run_command::RunCommand;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>update::Update;
 
-<span class="kw">const</span> <span class="ident">SERVER_4_2_0_WIRE_VERSION</span>: <span class="ident">i32</span> <span class="op">=</span> <span class="number">8</span>;
+<span class="kw">const </span>SERVER_4_2_0_WIRE_VERSION: i32 = <span class="number">8</span>;
 
-<span class="doccomment">/// A trait modeling the behavior of a server side operation.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">Operation</span> {
-    <span class="doccomment">/// The output type of this operation.</span>
-    <span class="kw">type</span> <span class="ident">O</span>;
+<span class="doccomment">/// A trait modeling the behavior of a server side operation.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>Operation {
+    <span class="doccomment">/// The output type of this operation.
+    </span><span class="kw">type </span>O;
 
-    <span class="doccomment">/// The format of the command body constructed in `build`.</span>
-    <span class="kw">type</span> <span class="ident">Command</span>: <span class="ident">CommandBody</span>;
+    <span class="doccomment">/// The format of the command body constructed in `build`.
+    </span><span class="kw">type </span>Command: CommandBody;
 
-    <span class="doccomment">/// The name of the server side command associated with this operation.</span>
-    <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>;
+    <span class="doccomment">/// The name of the server side command associated with this operation.
+    </span><span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str;
 
-    <span class="doccomment">/// Returns the command that should be sent to the server as part of this operation.</span>
-    <span class="doccomment">/// The operation may store some additional state that is required for handling the response.</span>
-    <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">description</span>: <span class="kw-2">&amp;</span><span class="ident">StreamDescription</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Command</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Returns the command that should be sent to the server as part of this operation.
+    /// The operation may store some additional state that is required for handling the response.
+    </span><span class="kw">fn </span>build(<span class="kw-2">&amp;mut </span><span class="self">self</span>, description: <span class="kw-2">&amp;</span>StreamDescription) -&gt; <span class="prelude-ty">Result</span>&lt;Command&lt;<span class="self">Self</span>::Command&gt;&gt;;
 
-    <span class="doccomment">/// Perform custom serialization of the built command.</span>
-    <span class="doccomment">/// By default, this will just call through to the `Serialize` implementation of the command.</span>
-    <span class="kw">fn</span> <span class="ident">serialize_command</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">cmd</span>: <span class="ident">Command</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Command</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">bson::to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">cmd</span>)<span class="question-mark">?</span>)
+    <span class="doccomment">/// Perform custom serialization of the built command.
+    /// By default, this will just call through to the `Serialize` implementation of the command.
+    </span><span class="kw">fn </span>serialize_command(<span class="kw-2">&amp;mut </span><span class="self">self</span>, cmd: Command&lt;<span class="self">Self</span>::Command&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;u8&gt;&gt; {
+        <span class="prelude-val">Ok</span>(bson::to_vec(<span class="kw-2">&amp;</span>cmd)<span class="question-mark">?</span>)
     }
 
-    <span class="doccomment">/// Parse the response for the atClusterTime field.</span>
-    <span class="doccomment">/// Depending on the operation, this may be found in different locations.</span>
-    <span class="kw">fn</span> <span class="ident">extract_at_cluster_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_response</span>: <span class="kw-2">&amp;</span><span class="ident">RawDocument</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Parse the response for the atClusterTime field.
+    /// Depending on the operation, this may be found in different locations.
+    </span><span class="kw">fn </span>extract_at_cluster_time(<span class="kw-2">&amp;</span><span class="self">self</span>, _response: <span class="kw-2">&amp;</span>RawDocument) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Timestamp&gt;&gt; {
         <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
     }
 
-    <span class="doccomment">/// Interprets the server response to the command.</span>
-    <span class="kw">fn</span> <span class="ident">handle_response</span>(
+    <span class="doccomment">/// Interprets the server response to the command.
+    </span><span class="kw">fn </span>handle_response(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">response</span>: <span class="ident">RawCommandResponse</span>,
-        <span class="ident">description</span>: <span class="kw-2">&amp;</span><span class="ident">StreamDescription</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::O</span><span class="op">&gt;</span>;
+        response: RawCommandResponse,
+        description: <span class="kw-2">&amp;</span>StreamDescription,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::O&gt;;
 
-    <span class="doccomment">/// Interpret an error encountered while sending the built command to the server, potentially</span>
-    <span class="doccomment">/// recovering.</span>
-    <span class="kw">fn</span> <span class="ident">handle_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">error</span>: <span class="ident">Error</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::O</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Err</span>(<span class="ident">error</span>)
+    <span class="doccomment">/// Interpret an error encountered while sending the built command to the server, potentially
+    /// recovering.
+    </span><span class="kw">fn </span>handle_error(<span class="kw-2">&amp;</span><span class="self">self</span>, error: Error) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::O&gt; {
+        <span class="prelude-val">Err</span>(error)
     }
 
-    <span class="doccomment">/// Criteria to use for selecting the server that this operation will be executed on.</span>
-    <span class="kw">fn</span> <span class="ident">selection_criteria</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SelectionCriteria</span><span class="op">&gt;</span> {
-        <span class="prelude-val">None</span>
+    <span class="doccomment">/// Criteria to use for selecting the server that this operation will be executed on.
+    </span><span class="kw">fn </span>selection_criteria(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>SelectionCriteria&gt; {
+        <span class="prelude-val">None
+    </span>}
+
+    <span class="doccomment">/// Whether or not this operation will request acknowledgment from the server.
+    </span><span class="kw">fn </span>is_acknowledged(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.write_concern()
+            .map(WriteConcern::is_acknowledged)
+            .unwrap_or(<span class="bool-val">true</span>)
     }
 
-    <span class="doccomment">/// Whether or not this operation will request acknowledgment from the server.</span>
-    <span class="kw">fn</span> <span class="ident">is_acknowledged</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">write_concern</span>()
-            .<span class="ident">map</span>(<span class="ident">WriteConcern::is_acknowledged</span>)
-            .<span class="ident">unwrap_or</span>(<span class="bool-val">true</span>)
+    <span class="doccomment">/// The write concern to use for this operation, if any.
+    </span><span class="kw">fn </span>write_concern(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>WriteConcern&gt; {
+        <span class="prelude-val">None
+    </span>}
+
+    <span class="doccomment">/// Returns whether or not this command supports the `readConcern` field.
+    </span><span class="kw">fn </span>supports_read_concern(<span class="kw-2">&amp;</span><span class="self">self</span>, _description: <span class="kw-2">&amp;</span>StreamDescription) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
+
+    <span class="doccomment">/// Whether this operation supports sessions or not.
+    </span><span class="kw">fn </span>supports_sessions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">true
+    </span>}
+
+    <span class="doccomment">/// The level of retryability the operation supports.
+    </span><span class="kw">fn </span>retryability(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Retryability {
+        Retryability::None
     }
 
-    <span class="doccomment">/// The write concern to use for this operation, if any.</span>
-    <span class="kw">fn</span> <span class="ident">write_concern</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">WriteConcern</span><span class="op">&gt;</span> {
-        <span class="prelude-val">None</span>
-    }
+    <span class="doccomment">/// Updates this operation as needed for a retry.
+    </span><span class="kw">fn </span>update_for_retry(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {}
 
-    <span class="doccomment">/// Returns whether or not this command supports the `readConcern` field.</span>
-    <span class="kw">fn</span> <span class="ident">supports_read_concern</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_description</span>: <span class="kw-2">&amp;</span><span class="ident">StreamDescription</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
-    }
+    <span class="kw">fn </span>pinned_connection(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>PinnedConnectionHandle&gt; {
+        <span class="prelude-val">None
+    </span>}
 
-    <span class="doccomment">/// Whether this operation supports sessions or not.</span>
-    <span class="kw">fn</span> <span class="ident">supports_sessions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">true</span>
-    }
-
-    <span class="doccomment">/// The level of retryability the operation supports.</span>
-    <span class="kw">fn</span> <span class="ident">retryability</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Retryability</span> {
-        <span class="ident">Retryability::None</span>
-    }
-
-    <span class="doccomment">/// Updates this operation as needed for a retry.</span>
-    <span class="kw">fn</span> <span class="ident">update_for_retry</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {}
-
-    <span class="kw">fn</span> <span class="ident">pinned_connection</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PinnedConnectionHandle</span><span class="op">&gt;</span> {
-        <span class="prelude-val">None</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="ident"><span class="self">Self</span>::NAME</span>
-    }
-}
-
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">CommandBody</span>: <span class="ident">Serialize</span> {
-    <span class="kw">fn</span> <span class="ident">should_redact</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
+    <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">Self</span>::NAME
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CommandBody</span> <span class="kw">for</span> <span class="ident">Document</span> {
-    <span class="kw">fn</span> <span class="ident">should_redact</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">command_name</span>) <span class="op">=</span> <span class="ident">bson_util::first_key</span>(<span class="self">self</span>) {
-            <span class="ident">HELLO_COMMAND_NAMES</span>.<span class="ident">contains</span>(<span class="ident">command_name</span>.<span class="ident">to_lowercase</span>().<span class="ident">as_str</span>())
-                <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">contains_key</span>(<span class="string">&quot;speculativeAuthenticate&quot;</span>)
-        } <span class="kw">else</span> {
-            <span class="bool-val">false</span>
-        }
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>CommandBody: Serialize {
+    <span class="kw">fn </span>should_redact(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
+}
+
+<span class="kw">impl </span>CommandBody <span class="kw">for </span>Document {
+    <span class="kw">fn </span>should_redact(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(command_name) = bson_util::first_key(<span class="self">self</span>) {
+            HELLO_COMMAND_NAMES.contains(command_name.to_lowercase().as_str())
+                &amp;&amp; <span class="self">self</span>.contains_key(<span class="string">&quot;speculativeAuthenticate&quot;</span>)
+        } <span class="kw">else </span>{
+            <span class="bool-val">false
+        </span>}
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">CommandBody</span><span class="op">&gt;</span> <span class="ident">Command</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">should_redact</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">to_lowercase</span>();
-        <span class="ident">REDACTED_COMMANDS</span>.<span class="ident">contains</span>(<span class="ident">name</span>.<span class="ident">as_str</span>()) <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">body</span>.<span class="ident">should_redact</span>()
+<span class="kw">impl</span>&lt;T: CommandBody&gt; Command&lt;T&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>should_redact(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span>name = <span class="self">self</span>.name.to_lowercase();
+        REDACTED_COMMANDS.contains(name.as_str()) || <span class="self">self</span>.body.should_redact()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">should_compress</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">to_lowercase</span>();
-        <span class="op">!</span><span class="ident">REDACTED_COMMANDS</span>.<span class="ident">contains</span>(<span class="ident">name</span>.<span class="ident">as_str</span>()) <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">HELLO_COMMAND_NAMES</span>.<span class="ident">contains</span>(<span class="ident">name</span>.<span class="ident">as_str</span>())
-    }
-}
-
-<span class="doccomment">/// A response to a command with a body shaped deserialized to a `T`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">ok</span>: <span class="ident">Bson</span>,
-
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;$clusterTime&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">cluster_time</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClusterTime</span><span class="op">&gt;</span>,
-
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">body</span>: <span class="ident">T</span>,
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">DeserializeOwned</span><span class="op">&gt;</span> <span class="ident">CommandResponse</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Whether the command succeeeded or not (i.e. if this response is ok: 1).</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_success</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">bson_util::get_int</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ok</span>) <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="number">1</span>)
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">cluster_time</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ClusterTime</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">cluster_time</span>.<span class="ident">as_ref</span>()
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>should_compress(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span>name = <span class="self">self</span>.name.to_lowercase();
+        !REDACTED_COMMANDS.contains(name.as_str()) &amp;&amp; !HELLO_COMMAND_NAMES.contains(name.as_str())
     }
 }
 
-<span class="doccomment">/// A response body useful for deserializing command errors.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">CommandErrorBody</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;errorLabels&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">error_labels</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A response to a command with a body shaped deserialized to a `T`.
+</span><span class="attribute">#[derive(Deserialize, Debug)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>CommandResponse&lt;T&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) ok: Bson,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">command_error</span>: <span class="ident">CommandError</span>,
+    <span class="attribute">#[serde(rename = <span class="string">&quot;$clusterTime&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) cluster_time: <span class="prelude-ty">Option</span>&lt;ClusterTime&gt;,
+
+    <span class="attribute">#[serde(flatten)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) body: T,
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">CommandErrorBody</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">command_error_response</span>: <span class="ident">CommandErrorBody</span>) -&gt; <span class="ident">Error</span> {
-        <span class="ident">Error::new</span>(
-            <span class="ident">ErrorKind::Command</span>(<span class="ident">command_error_response</span>.<span class="ident">command_error</span>),
-            <span class="ident">command_error_response</span>.<span class="ident">error_labels</span>,
+<span class="kw">impl</span>&lt;T: DeserializeOwned&gt; CommandResponse&lt;T&gt; {
+    <span class="doccomment">/// Whether the command succeeeded or not (i.e. if this response is ok: 1).
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_success(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        bson_util::get_int(<span class="kw-2">&amp;</span><span class="self">self</span>.ok) == <span class="prelude-val">Some</span>(<span class="number">1</span>)
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>cluster_time(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ClusterTime&gt; {
+        <span class="self">self</span>.cluster_time.as_ref()
+    }
+}
+
+<span class="doccomment">/// A response body useful for deserializing command errors.
+</span><span class="attribute">#[derive(Deserialize, Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>CommandErrorBody {
+    <span class="attribute">#[serde(rename = <span class="string">&quot;errorLabels&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) error_labels: <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;,
+
+    <span class="attribute">#[serde(flatten)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) command_error: CommandError,
+}
+
+<span class="kw">impl </span>From&lt;CommandErrorBody&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(command_error_response: CommandErrorBody) -&gt; Error {
+        Error::new(
+            ErrorKind::Command(command_error_response.command_error),
+            command_error_response.error_labels,
         )
     }
 }
 
-<span class="doccomment">/// Appends a serializable struct to the input document.</span>
-<span class="doccomment">/// The serializable struct MUST serialize to a Document, otherwise an error will be thrown.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">append_options</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Serialize</span> <span class="op">+</span> <span class="ident">Debug</span><span class="op">&gt;</span>(
-    <span class="ident">doc</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Document</span>,
-    <span class="ident">options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">options</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">options</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">temp_doc</span> <span class="op">=</span> <span class="ident">bson::to_bson</span>(<span class="ident">options</span>)<span class="question-mark">?</span>;
-            <span class="kw">match</span> <span class="ident">temp_doc</span> {
-                <span class="ident">Bson::Document</span>(<span class="ident">d</span>) =&gt; {
-                    <span class="ident">doc</span>.<span class="ident">extend</span>(<span class="ident">d</span>);
+<span class="doccomment">/// Appends a serializable struct to the input document.
+/// The serializable struct MUST serialize to a Document, otherwise an error will be thrown.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>append_options&lt;T: Serialize + Debug&gt;(
+    doc: <span class="kw-2">&amp;mut </span>Document,
+    options: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>T&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    <span class="kw">match </span>options {
+        <span class="prelude-val">Some</span>(options) =&gt; {
+            <span class="kw">let </span>temp_doc = bson::to_bson(options)<span class="question-mark">?</span>;
+            <span class="kw">match </span>temp_doc {
+                Bson::Document(d) =&gt; {
+                    doc.extend(d);
                     <span class="prelude-val">Ok</span>(())
                 }
-                <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">ErrorKind::Internal</span> {
-                    <span class="ident">message</span>: <span class="macro">format!</span>(<span class="string">&quot;options did not serialize to a Document: {:?}&quot;</span>, <span class="ident">options</span>),
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(ErrorKind::Internal {
+                    message: <span class="macro">format!</span>(<span class="string">&quot;options did not serialize to a Document: {:?}&quot;</span>, options),
                 }
-                .<span class="ident">into</span>()),
+                .into()),
             }
         }
-        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(()),
+        <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(()),
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">EmptyBody</span> {}
+<span class="attribute">#[derive(Deserialize, Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>EmptyBody {}
 
-<span class="doccomment">/// Body of a write response that could possibly have a write concern error but not write errors.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Default</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">WriteConcernOnlyBody</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;writeConcernError&quot;</span>)]</span>
-    <span class="ident">write_concern_error</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">WriteConcernError</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Body of a write response that could possibly have a write concern error but not write errors.
+</span><span class="attribute">#[derive(Debug, Deserialize, Default, Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>WriteConcernOnlyBody {
+    <span class="attribute">#[serde(rename = <span class="string">&quot;writeConcernError&quot;</span>)]
+    </span>write_concern_error: <span class="prelude-ty">Option</span>&lt;WriteConcernError&gt;,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;errorLabels&quot;</span>)]</span>
-    <span class="ident">labels</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="attribute">#[serde(rename = <span class="string">&quot;errorLabels&quot;</span>)]
+    </span>labels: <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">WriteConcernOnlyBody</span> {
-    <span class="kw">fn</span> <span class="ident">validate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">write_concern_error</span> {
-            <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">wc_error</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(
-                <span class="ident">ErrorKind::Write</span>(<span class="ident">WriteFailure::WriteConcernError</span>(<span class="ident">wc_error</span>.<span class="ident">clone</span>())),
-                <span class="self">self</span>.<span class="ident">labels</span>.<span class="ident">clone</span>(),
+<span class="kw">impl </span>WriteConcernOnlyBody {
+    <span class="kw">fn </span>validate(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">match </span><span class="self">self</span>.write_concern_error {
+            <span class="prelude-val">Some</span>(<span class="kw-2">ref </span>wc_error) =&gt; <span class="prelude-val">Err</span>(Error::new(
+                ErrorKind::Write(WriteFailure::WriteConcernError(wc_error.clone())),
+                <span class="self">self</span>.labels.clone(),
             )),
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Ok</span>(()),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Ok</span>(()),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">WriteResponseBody</span><span class="op">&lt;</span><span class="ident">T</span> <span class="op">=</span> <span class="ident">EmptyBody</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
-    <span class="ident">body</span>: <span class="ident">T</span>,
+<span class="attribute">#[derive(Deserialize, Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>WriteResponseBody&lt;T = EmptyBody&gt; {
+    <span class="attribute">#[serde(flatten)]
+    </span>body: T,
 
-    <span class="ident">n</span>: <span class="ident">u64</span>,
+    n: u64,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;writeErrors&quot;</span>)]</span>
-    <span class="ident">write_errors</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">BulkWriteError</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="attribute">#[serde(rename = <span class="string">&quot;writeErrors&quot;</span>)]
+    </span>write_errors: <span class="prelude-ty">Option</span>&lt;Vec&lt;BulkWriteError&gt;&gt;,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;writeConcernError&quot;</span>)]</span>
-    <span class="ident">write_concern_error</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">WriteConcernError</span><span class="op">&gt;</span>,
+    <span class="attribute">#[serde(rename = <span class="string">&quot;writeConcernError&quot;</span>)]
+    </span>write_concern_error: <span class="prelude-ty">Option</span>&lt;WriteConcernError&gt;,
 
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;errorLabels&quot;</span>)]</span>
-    <span class="ident">labels</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="attribute">#[serde(rename = <span class="string">&quot;errorLabels&quot;</span>)]
+    </span>labels: <span class="prelude-ty">Option</span>&lt;Vec&lt;String&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">WriteResponseBody</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">validate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">write_errors</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">write_concern_error</span>.<span class="ident">is_none</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+<span class="kw">impl</span>&lt;T&gt; WriteResponseBody&lt;T&gt; {
+    <span class="kw">fn </span>validate(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        <span class="kw">if </span><span class="self">self</span>.write_errors.is_none() &amp;&amp; <span class="self">self</span>.write_concern_error.is_none() {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(());
         };
 
-        <span class="kw">let</span> <span class="ident">failure</span> <span class="op">=</span> <span class="ident">BulkWriteFailure</span> {
-            <span class="ident">write_errors</span>: <span class="self">self</span>.<span class="ident">write_errors</span>.<span class="ident">clone</span>(),
-            <span class="ident">write_concern_error</span>: <span class="self">self</span>.<span class="ident">write_concern_error</span>.<span class="ident">clone</span>(),
-            <span class="ident">inserted_ids</span>: <span class="ident">Default::default</span>(),
+        <span class="kw">let </span>failure = BulkWriteFailure {
+            write_errors: <span class="self">self</span>.write_errors.clone(),
+            write_concern_error: <span class="self">self</span>.write_concern_error.clone(),
+            inserted_ids: Default::default(),
         };
 
-        <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(
-            <span class="ident">ErrorKind::BulkWrite</span>(<span class="ident">failure</span>),
-            <span class="self">self</span>.<span class="ident">labels</span>.<span class="ident">clone</span>(),
+        <span class="prelude-val">Err</span>(Error::new(
+            ErrorKind::BulkWrite(failure),
+            <span class="self">self</span>.labels.clone(),
         ))
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">WriteResponseBody</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">T</span>;
+<span class="kw">impl</span>&lt;T&gt; Deref <span class="kw">for </span>WriteResponseBody&lt;T&gt; {
+    <span class="kw">type </span>Target = T;
 
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">body</span>
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.body
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">CursorBody</span> {
-    <span class="ident">cursor</span>: <span class="ident">CursorInfo</span>,
+<span class="attribute">#[derive(Debug, Deserialize)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>CursorBody {
+    cursor: CursorInfo,
 }
 
-<span class="kw">impl</span> <span class="ident">CursorBody</span> {
-    <span class="kw">fn</span> <span class="ident">extract_at_cluster_time</span>(<span class="ident">response</span>: <span class="kw-2">&amp;</span><span class="ident">RawDocument</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Timestamp</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">response</span>
-            .<span class="ident">get</span>(<span class="string">&quot;cursor&quot;</span>)<span class="question-mark">?</span>
-            .<span class="ident">and_then</span>(<span class="ident">RawBsonRef::as_document</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">get</span>(<span class="string">&quot;atClusterTime&quot;</span>))
-            .<span class="ident">transpose</span>()<span class="question-mark">?</span>
-            .<span class="ident">flatten</span>()
-            .<span class="ident">and_then</span>(<span class="ident">RawBsonRef::as_timestamp</span>))
+<span class="kw">impl </span>CursorBody {
+    <span class="kw">fn </span>extract_at_cluster_time(response: <span class="kw-2">&amp;</span>RawDocument) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;Timestamp&gt;&gt; {
+        <span class="prelude-val">Ok</span>(response
+            .get(<span class="string">&quot;cursor&quot;</span>)<span class="question-mark">?
+            </span>.and_then(RawBsonRef::as_document)
+            .map(|d| d.get(<span class="string">&quot;atClusterTime&quot;</span>))
+            .transpose()<span class="question-mark">?
+            </span>.flatten()
+            .and_then(RawBsonRef::as_timestamp))
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">CursorInfo</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">id</span>: <span class="ident">i64</span>,
+<span class="attribute">#[derive(Debug, Deserialize, Clone)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>CursorInfo {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) id: i64,
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">ns</span>: <span class="ident">Namespace</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) ns: Namespace,
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">first_batch</span>: <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">RawDocumentBuf</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) first_batch: VecDeque&lt;RawDocumentBuf&gt;,
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">post_batch_resume_token</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RawDocumentBuf</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) post_batch_resume_token: <span class="prelude-ty">Option</span>&lt;RawDocumentBuf&gt;,
 }
 
-<span class="doccomment">/// Type used to deserialize just the first result from a cursor, if any.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">SingleCursorResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
+<span class="doccomment">/// Type used to deserialize just the first result from a cursor, if any.
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>SingleCursorResult&lt;T&gt;(<span class="prelude-ty">Option</span>&lt;T&gt;);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SingleCursorResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, T&gt; Deserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>SingleCursorResult&lt;T&gt;
+<span class="kw">where
+    </span>T: Deserialize&lt;<span class="lifetime">&#39;de</span>&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">D</span>: <span class="ident">serde::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    <span class="kw">fn </span>deserialize&lt;D&gt;(deserializer: D) -&gt; std::result::Result&lt;<span class="self">Self</span>, D::Error&gt;
+    <span class="kw">where
+        </span>D: serde::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt;,
     {
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">FullCursorBody</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-            <span class="ident">cursor</span>: <span class="ident">InteriorBody</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+        <span class="attribute">#[derive(Deserialize)]
+        </span><span class="kw">struct </span>FullCursorBody&lt;T&gt; {
+            cursor: InteriorBody&lt;T&gt;,
         }
 
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">InteriorBody</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-            <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;firstBatch&quot;</span>)]</span>
-            <span class="ident">first_batch</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+        <span class="attribute">#[derive(Deserialize)]
+        </span><span class="kw">struct </span>InteriorBody&lt;T&gt; {
+            <span class="attribute">#[serde(rename = <span class="string">&quot;firstBatch&quot;</span>)]
+            </span>first_batch: Vec&lt;T&gt;,
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">full_body</span> <span class="op">=</span> <span class="ident">FullCursorBody::deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">SingleCursorResult</span>(<span class="ident">full_body</span>.<span class="ident">cursor</span>.<span class="ident">first_batch</span>.<span class="ident">pop</span>()))
+        <span class="kw">let </span><span class="kw-2">mut </span>full_body = FullCursorBody::deserialize(deserializer)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(SingleCursorResult(full_body.cursor.first_batch.pop()))
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">Retryability</span> {
-    <span class="ident">Write</span>,
-    <span class="ident">Read</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Clone, Copy)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>Retryability {
+    Write,
+    Read,
     <span class="prelude-val">None</span>,
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">remove_empty_write_concern</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">opts</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">options</span>) <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">opts</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">write_concern</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">write_concern</span> {
-                <span class="kw">if</span> <span class="ident">write_concern</span>.<span class="ident">is_empty</span>() {
-                    <span class="ident">options</span>.<span class="ident">write_concern</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+<span class="macro">macro_rules! </span>remove_empty_write_concern {
+    (<span class="macro-nonterminal">$opts</span>:expr) =&gt; {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref mut </span>options) = <span class="macro-nonterminal">$opts </span>{
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>write_concern) = options.write_concern {
+                <span class="kw">if </span>write_concern.is_empty() {
+                    options.write_concern = <span class="prelude-val">None</span>;
                 }
             }
         }
     };
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">remove_empty_write_concern</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>remove_empty_write_concern;
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

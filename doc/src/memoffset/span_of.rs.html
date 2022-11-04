@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/memoffset-0.6.5/src/span_of.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>span_of.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../memoffset/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../memoffset/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../memoffset/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/memoffset-0.6.5/src/span_of.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>span_of.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../memoffset/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../memoffset/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../memoffset/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -254,261 +254,261 @@
 <span id="254">254</span>
 <span id="255">255</span>
 <span id="256">256</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2017 Gilad Naaman</span>
-<span class="comment">//</span>
-<span class="comment">// Permission is hereby granted, free of charge, to any person obtaining a copy</span>
-<span class="comment">// of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
-<span class="comment">// in the Software without restriction, including without limitation the rights</span>
-<span class="comment">// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
-<span class="comment">// copies of the Software, and to permit persons to whom the Software is</span>
-<span class="comment">// furnished to do so, subject to the following conditions:</span>
-<span class="comment">//</span>
-<span class="comment">// The above copyright notice and this permission notice shall be included in all</span>
-<span class="comment">// copies or substantial portions of the Software.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
-<span class="comment">// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
-<span class="comment">// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
-<span class="comment">// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
-<span class="comment">// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
-<span class="comment">// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
-<span class="comment">// SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2017 Gilad Naaman
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the &quot;Software&quot;), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 
-<span class="doccomment">/// Reexport for `local_inner_macros`; see</span>
-<span class="doccomment">/// &lt;https://doc.rust-lang.org/edition-guide/rust-2018/macros/macro-changes.html#macros-using-local_inner_macros&gt;.</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">_memoffset__compile_error</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">inner</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {
-        <span class="macro">compile_error!</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">inner</span>)<span class="op">*</span> }
+</span><span class="doccomment">/// Reexport for `local_inner_macros`; see
+/// &lt;https://doc.rust-lang.org/edition-guide/rust-2018/macros/macro-changes.html#macros-using-local_inner_macros&gt;.
+</span><span class="attribute">#[doc(hidden)]
+#[macro_export]
+</span><span class="macro">macro_rules! </span>_memoffset__compile_error {
+    ($(<span class="macro-nonterminal">$inner</span>:tt)<span class="kw-2">*</span>) =&gt; {
+        <span class="macro">compile_error! </span>{ $(<span class="macro-nonterminal">$inner</span>)* }
     }
 }
 
-<span class="doccomment">/// Produces a range instance representing the sub-slice containing the specified member.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This macro provides 2 forms of differing functionalities.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The first form is identical to the appearance of the `offset_of!` macro.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```ignore</span>
-<span class="doccomment">/// span_of!(Struct, member)</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The second form of `span_of!` returns a sub-slice which starts at one field, and ends at another.</span>
-<span class="doccomment">/// The general pattern of this form is:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```ignore</span>
-<span class="doccomment">/// // Exclusive</span>
-<span class="doccomment">/// span_of!(Struct, member_a .. member_b)</span>
-<span class="doccomment">/// // Inclusive</span>
-<span class="doccomment">/// span_of!(Struct, member_a ..= member_b)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Open-ended ranges</span>
-<span class="doccomment">/// span_of!(Struct, .. end)</span>
-<span class="doccomment">/// span_of!(Struct, start ..)</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// *Note*:</span>
-<span class="doccomment">/// This macro uses recursion in order to resolve the range expressions, so there is a limit to</span>
-<span class="doccomment">/// the complexity of the expression.</span>
-<span class="doccomment">/// In order to raise the limit, the compiler&#39;s recursion limit should be lifted.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Examples</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use memoffset::span_of;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[repr(C)]</span>
-<span class="doccomment">/// struct Florp {</span>
-<span class="doccomment">///     a: u32</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[repr(C)]</span>
-<span class="doccomment">/// struct Blarg {</span>
-<span class="doccomment">///     x: [u32; 2],</span>
-<span class="doccomment">///     y: [u8; 56],</span>
-<span class="doccomment">///     z: Florp,</span>
-<span class="doccomment">///     egg: [[u8; 4]; 4]</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// fn main() {</span>
-<span class="doccomment">///     assert_eq!(0..84,  span_of!(Blarg, ..));</span>
-<span class="doccomment">///     assert_eq!(0..8,   span_of!(Blarg, .. y));</span>
-<span class="doccomment">///     assert_eq!(0..64,  span_of!(Blarg, ..= y));</span>
-<span class="doccomment">///     assert_eq!(0..8,   span_of!(Blarg, x));</span>
-<span class="doccomment">///     assert_eq!(8..84,  span_of!(Blarg, y ..));</span>
-<span class="doccomment">///     assert_eq!(0..8,   span_of!(Blarg, x .. y));</span>
-<span class="doccomment">///     assert_eq!(0..64,  span_of!(Blarg, x ..= y));</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">macro_export</span>(<span class="ident">local_inner_macros</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">span_of</span> {
-    (@<span class="ident">helper</span>  <span class="macro-nonterminal">$</span><span class="macro-nonterminal">root</span>:<span class="ident">ident</span>, [] ..<span class="op">=</span>) =&gt; {
+<span class="doccomment">/// Produces a range instance representing the sub-slice containing the specified member.
+///
+/// This macro provides 2 forms of differing functionalities.
+///
+/// The first form is identical to the appearance of the `offset_of!` macro.
+///
+/// ```ignore
+/// span_of!(Struct, member)
+/// ```
+///
+/// The second form of `span_of!` returns a sub-slice which starts at one field, and ends at another.
+/// The general pattern of this form is:
+///
+/// ```ignore
+/// // Exclusive
+/// span_of!(Struct, member_a .. member_b)
+/// // Inclusive
+/// span_of!(Struct, member_a ..= member_b)
+///
+/// // Open-ended ranges
+/// span_of!(Struct, .. end)
+/// span_of!(Struct, start ..)
+/// ```
+///
+/// *Note*:
+/// This macro uses recursion in order to resolve the range expressions, so there is a limit to
+/// the complexity of the expression.
+/// In order to raise the limit, the compiler&#39;s recursion limit should be lifted.
+///
+/// ## Examples
+/// ```
+/// use memoffset::span_of;
+///
+/// #[repr(C)]
+/// struct Florp {
+///     a: u32
+/// }
+///
+/// #[repr(C)]
+/// struct Blarg {
+///     x: [u32; 2],
+///     y: [u8; 56],
+///     z: Florp,
+///     egg: [[u8; 4]; 4]
+/// }
+///
+/// fn main() {
+///     assert_eq!(0..84,  span_of!(Blarg, ..));
+///     assert_eq!(0..8,   span_of!(Blarg, .. y));
+///     assert_eq!(0..64,  span_of!(Blarg, ..= y));
+///     assert_eq!(0..8,   span_of!(Blarg, x));
+///     assert_eq!(8..84,  span_of!(Blarg, y ..));
+///     assert_eq!(0..8,   span_of!(Blarg, x .. y));
+///     assert_eq!(0..64,  span_of!(Blarg, x ..= y));
+/// }
+/// ```
+</span><span class="attribute">#[macro_export(local_inner_macros)]
+</span><span class="macro">macro_rules! </span>span_of {
+    (@helper  <span class="macro-nonterminal">$root</span>:ident, [] ..=) =&gt; {
         <span class="macro">_memoffset__compile_error!</span>(<span class="string">&quot;Expected a range, found &#39;..=&#39;&quot;</span>)
     };
-    (@<span class="ident">helper</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">root</span>:<span class="ident">ident</span>, [] ..) =&gt; {
+    (@helper <span class="macro-nonterminal">$root</span>:ident, [] ..) =&gt; {
         <span class="macro">_memoffset__compile_error!</span>(<span class="string">&quot;Expected a range, found &#39;..&#39;&quot;</span>)
     };
-    <span class="comment">// No explicit begin for range.</span>
-    (@<span class="ident">helper</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">root</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>:<span class="ident">path</span>, [] ..) =&gt; {{
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">root</span> <span class="kw">as</span> <span class="ident">usize</span>,
-         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">root</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::__priv::size_of_pointee</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">root</span>))
+    <span class="comment">// No explicit begin for range.
+    </span>(@helper <span class="macro-nonterminal">$root</span>:ident, <span class="macro-nonterminal">$parent</span>:path, [] ..) =&gt; {{
+        (<span class="macro-nonterminal">$root </span><span class="kw">as </span>usize,
+         <span class="macro-nonterminal">$root </span><span class="kw">as </span>usize + <span class="macro-nonterminal">$crate::__priv::size_of_pointee</span>(<span class="macro-nonterminal">$root</span>))
     }};
-    (@<span class="ident">helper</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">root</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>:<span class="ident">path</span>, [] ..<span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">end</span>:<span class="ident">tt</span>) =&gt; {{
-        <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="macro">raw_field!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">root</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">end</span>);
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">root</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">end</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::__priv::size_of_pointee</span>(<span class="ident">end</span>))
+    (@helper <span class="macro-nonterminal">$root</span>:ident, <span class="macro-nonterminal">$parent</span>:path, [] ..= <span class="macro-nonterminal">$end</span>:tt) =&gt; {{
+        <span class="kw">let </span>end = <span class="macro">raw_field!</span>(<span class="macro-nonterminal">$root</span>, <span class="macro-nonterminal">$parent</span>, <span class="macro-nonterminal">$end</span>);
+        (<span class="macro-nonterminal">$root </span><span class="kw">as </span>usize, end <span class="kw">as </span>usize + <span class="macro-nonterminal">$crate::__priv::size_of_pointee</span>(end))
     }};
-    (@<span class="ident">helper</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">root</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>:<span class="ident">path</span>, [] .. <span class="macro-nonterminal">$</span><span class="macro-nonterminal">end</span>:<span class="ident">tt</span>) =&gt; {{
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">root</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="macro">raw_field!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">root</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">end</span>) <span class="kw">as</span> <span class="ident">usize</span>)
+    (@helper <span class="macro-nonterminal">$root</span>:ident, <span class="macro-nonterminal">$parent</span>:path, [] .. <span class="macro-nonterminal">$end</span>:tt) =&gt; {{
+        (<span class="macro-nonterminal">$root </span><span class="kw">as </span>usize, <span class="macro">raw_field!</span>(<span class="macro-nonterminal">$root</span>, <span class="macro-nonterminal">$parent</span>, <span class="macro-nonterminal">$end</span>) <span class="kw">as </span>usize)
     }};
-    <span class="comment">// Explicit begin and end for range.</span>
-    (@<span class="ident">helper</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">root</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>:<span class="ident">path</span>, # <span class="macro-nonterminal">$</span><span class="macro-nonterminal">begin</span>:<span class="ident">tt</span> [] ..<span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">end</span>:<span class="ident">tt</span>) =&gt; {{
-        <span class="kw">let</span> <span class="ident">begin</span> <span class="op">=</span> <span class="macro">raw_field!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">root</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">begin</span>);
-        <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="macro">raw_field!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">root</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">end</span>);
-        (<span class="ident">begin</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">end</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::__priv::size_of_pointee</span>(<span class="ident">end</span>))
+    <span class="comment">// Explicit begin and end for range.
+    </span>(@helper <span class="macro-nonterminal">$root</span>:ident, <span class="macro-nonterminal">$parent</span>:path, # <span class="macro-nonterminal">$begin</span>:tt [] ..= <span class="macro-nonterminal">$end</span>:tt) =&gt; {{
+        <span class="kw">let </span>begin = <span class="macro">raw_field!</span>(<span class="macro-nonterminal">$root</span>, <span class="macro-nonterminal">$parent</span>, <span class="macro-nonterminal">$begin</span>);
+        <span class="kw">let </span>end = <span class="macro">raw_field!</span>(<span class="macro-nonterminal">$root</span>, <span class="macro-nonterminal">$parent</span>, <span class="macro-nonterminal">$end</span>);
+        (begin <span class="kw">as </span>usize, end <span class="kw">as </span>usize + <span class="macro-nonterminal">$crate::__priv::size_of_pointee</span>(end))
     }};
-    (@<span class="ident">helper</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">root</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>:<span class="ident">path</span>, # <span class="macro-nonterminal">$</span><span class="macro-nonterminal">begin</span>:<span class="ident">tt</span> [] .. <span class="macro-nonterminal">$</span><span class="macro-nonterminal">end</span>:<span class="ident">tt</span>) =&gt; {{
-        (<span class="macro">raw_field!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">root</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">begin</span>) <span class="kw">as</span> <span class="ident">usize</span>,
-         <span class="macro">raw_field!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">root</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">end</span>) <span class="kw">as</span> <span class="ident">usize</span>)
+    (@helper <span class="macro-nonterminal">$root</span>:ident, <span class="macro-nonterminal">$parent</span>:path, # <span class="macro-nonterminal">$begin</span>:tt [] .. <span class="macro-nonterminal">$end</span>:tt) =&gt; {{
+        (<span class="macro">raw_field!</span>(<span class="macro-nonterminal">$root</span>, <span class="macro-nonterminal">$parent</span>, <span class="macro-nonterminal">$begin</span>) <span class="kw">as </span>usize,
+         <span class="macro">raw_field!</span>(<span class="macro-nonterminal">$root</span>, <span class="macro-nonterminal">$parent</span>, <span class="macro-nonterminal">$end</span>) <span class="kw">as </span>usize)
     }};
-    <span class="comment">// No explicit end for range.</span>
-    (@<span class="ident">helper</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">root</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>:<span class="ident">path</span>, # <span class="macro-nonterminal">$</span><span class="macro-nonterminal">begin</span>:<span class="ident">tt</span> [] ..) =&gt; {{
-        (<span class="macro">raw_field!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">root</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">begin</span>) <span class="kw">as</span> <span class="ident">usize</span>,
-         <span class="macro-nonterminal">$</span><span class="macro-nonterminal">root</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::__priv::size_of_pointee</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">root</span>))
+    <span class="comment">// No explicit end for range.
+    </span>(@helper <span class="macro-nonterminal">$root</span>:ident, <span class="macro-nonterminal">$parent</span>:path, # <span class="macro-nonterminal">$begin</span>:tt [] ..) =&gt; {{
+        (<span class="macro">raw_field!</span>(<span class="macro-nonterminal">$root</span>, <span class="macro-nonterminal">$parent</span>, <span class="macro-nonterminal">$begin</span>) <span class="kw">as </span>usize,
+         <span class="macro-nonterminal">$root </span><span class="kw">as </span>usize + <span class="macro-nonterminal">$crate::__priv::size_of_pointee</span>(<span class="macro-nonterminal">$root</span>))
     }};
-    (@<span class="ident">helper</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">root</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>:<span class="ident">path</span>, # <span class="macro-nonterminal">$</span><span class="macro-nonterminal">begin</span>:<span class="ident">tt</span> [] ..<span class="op">=</span>) =&gt; {{
+    (@helper <span class="macro-nonterminal">$root</span>:ident, <span class="macro-nonterminal">$parent</span>:path, # <span class="macro-nonterminal">$begin</span>:tt [] ..=) =&gt; {{
         <span class="macro">_memoffset__compile_error!</span>(
             <span class="string">&quot;Found inclusive range to the end of a struct. Did you mean &#39;..&#39; instead of &#39;..=&#39;?&quot;</span>)
     }};
-    <span class="comment">// Just one field.</span>
-    (@<span class="ident">helper</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">root</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>:<span class="ident">path</span>, # <span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>:<span class="ident">tt</span> []) =&gt; {{
-        <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="macro">raw_field!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">root</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>);
-        (<span class="ident">field</span> <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">field</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::__priv::size_of_pointee</span>(<span class="ident">field</span>))
+    <span class="comment">// Just one field.
+    </span>(@helper <span class="macro-nonterminal">$root</span>:ident, <span class="macro-nonterminal">$parent</span>:path, # <span class="macro-nonterminal">$field</span>:tt []) =&gt; {{
+        <span class="kw">let </span>field = <span class="macro">raw_field!</span>(<span class="macro-nonterminal">$root</span>, <span class="macro-nonterminal">$parent</span>, <span class="macro-nonterminal">$field</span>);
+        (field <span class="kw">as </span>usize, field <span class="kw">as </span>usize + <span class="macro-nonterminal">$crate::__priv::size_of_pointee</span>(field))
     }};
-    <span class="comment">// Parsing.</span>
-    (@<span class="ident">helper</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">root</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>:<span class="ident">path</span>, $(# <span class="macro-nonterminal">$</span><span class="macro-nonterminal">begin</span>:<span class="ident">tt</span>)<span class="op">+</span> [] <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>:<span class="ident">tt</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {{
-        <span class="macro">span_of!</span>(@<span class="ident">helper</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">root</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>, $(#<span class="macro-nonterminal">$</span><span class="macro-nonterminal">begin</span>)<span class="op">*</span> #<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span> [] $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="kw-2">*</span>)
+    <span class="comment">// Parsing.
+    </span>(@helper <span class="macro-nonterminal">$root</span>:ident, <span class="macro-nonterminal">$parent</span>:path, $(# <span class="macro-nonterminal">$begin</span>:tt)+ [] <span class="macro-nonterminal">$tt</span>:tt $(<span class="macro-nonterminal">$rest</span>:tt)<span class="kw-2">*</span>) =&gt; {{
+        <span class="macro">span_of!</span>(@helper <span class="macro-nonterminal">$root</span>, <span class="macro-nonterminal">$parent</span>, $(#<span class="macro-nonterminal">$begin</span>)* #<span class="macro-nonterminal">$tt </span>[] $(<span class="macro-nonterminal">$rest</span>)<span class="kw-2">*</span>)
     }};
-    (@<span class="ident">helper</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">root</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>:<span class="ident">path</span>, [] <span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span>:<span class="ident">tt</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) =&gt; {{
-        <span class="macro">span_of!</span>(@<span class="ident">helper</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">root</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>, #<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tt</span> [] $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="kw-2">*</span>)
+    (@helper <span class="macro-nonterminal">$root</span>:ident, <span class="macro-nonterminal">$parent</span>:path, [] <span class="macro-nonterminal">$tt</span>:tt $(<span class="macro-nonterminal">$rest</span>:tt)<span class="kw-2">*</span>) =&gt; {{
+        <span class="macro">span_of!</span>(@helper <span class="macro-nonterminal">$root</span>, <span class="macro-nonterminal">$parent</span>, #<span class="macro-nonterminal">$tt </span>[] $(<span class="macro-nonterminal">$rest</span>)<span class="kw-2">*</span>)
     }};
 
-    <span class="comment">// Entry point.</span>
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">sty</span>:<span class="ident">path</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">exp</span>:<span class="ident">tt</span>)<span class="op">+</span>) =&gt; ({
-        <span class="comment">// Get a base pointer.</span>
-        <span class="macro">_memoffset__let_base_ptr!</span>(<span class="ident">root</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sty</span>);
-        <span class="kw">let</span> <span class="ident">base</span> <span class="op">=</span> <span class="ident">root</span> <span class="kw">as</span> <span class="ident">usize</span>;
-        <span class="kw">let</span> (<span class="ident">begin</span>, <span class="ident">end</span>) <span class="op">=</span> <span class="macro">span_of!</span>(@<span class="ident">helper</span> <span class="ident">root</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sty</span>, [] $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">exp</span>)<span class="kw-2">*</span>);
-        <span class="ident">begin</span><span class="op">-</span><span class="ident">base</span>..<span class="ident">end</span><span class="op">-</span><span class="ident">base</span>
+    <span class="comment">// Entry point.
+    </span>(<span class="macro-nonterminal">$sty</span>:path, $(<span class="macro-nonterminal">$exp</span>:tt)+) =&gt; ({
+        <span class="comment">// Get a base pointer.
+        </span><span class="macro">_memoffset__let_base_ptr!</span>(root, <span class="macro-nonterminal">$sty</span>);
+        <span class="kw">let </span>base = root <span class="kw">as </span>usize;
+        <span class="kw">let </span>(begin, end) = <span class="macro">span_of!</span>(@helper root, <span class="macro-nonterminal">$sty</span>, [] $(<span class="macro-nonterminal">$exp</span>)<span class="kw-2">*</span>);
+        begin-base..end-base
     });
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident">core::mem</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span>core::mem;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">span_simple</span>() {
-        <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">Foo</span> {
-            <span class="ident">a</span>: <span class="ident">u32</span>,
-            <span class="ident">b</span>: [<span class="ident">u8</span>; <span class="number">2</span>],
-            <span class="ident">c</span>: <span class="ident">i64</span>,
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>span_simple() {
+        <span class="attribute">#[repr(C)]
+        </span><span class="kw">struct </span>Foo {
+            a: u32,
+            b: [u8; <span class="number">2</span>],
+            c: i64,
         }
 
-        <span class="macro">assert_eq!</span>(<span class="macro">span_of!</span>(<span class="ident">Foo</span>, <span class="ident">a</span>), <span class="number">0</span>..<span class="number">4</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">span_of!</span>(<span class="ident">Foo</span>, <span class="ident">b</span>), <span class="number">4</span>..<span class="number">6</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">span_of!</span>(<span class="ident">Foo</span>, <span class="ident">c</span>), <span class="number">8</span>..<span class="number">8</span> <span class="op">+</span> <span class="number">8</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">span_of!</span>(Foo, a), <span class="number">0</span>..<span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">span_of!</span>(Foo, b), <span class="number">4</span>..<span class="number">6</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">span_of!</span>(Foo, c), <span class="number">8</span>..<span class="number">8 </span>+ <span class="number">8</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">miri</span>, <span class="ident">ignore</span>)]</span> <span class="comment">// this creates unaligned references</span>
-    <span class="kw">fn</span> <span class="ident">span_simple_packed</span>() {
-        <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>, <span class="ident">packed</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">Foo</span> {
-            <span class="ident">a</span>: <span class="ident">u32</span>,
-            <span class="ident">b</span>: [<span class="ident">u8</span>; <span class="number">2</span>],
-            <span class="ident">c</span>: <span class="ident">i64</span>,
+    <span class="attribute">#[test]
+    #[cfg_attr(miri, ignore)] </span><span class="comment">// this creates unaligned references
+    </span><span class="kw">fn </span>span_simple_packed() {
+        <span class="attribute">#[repr(C, packed)]
+        </span><span class="kw">struct </span>Foo {
+            a: u32,
+            b: [u8; <span class="number">2</span>],
+            c: i64,
         }
 
-        <span class="macro">assert_eq!</span>(<span class="macro">span_of!</span>(<span class="ident">Foo</span>, <span class="ident">a</span>), <span class="number">0</span>..<span class="number">4</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">span_of!</span>(<span class="ident">Foo</span>, <span class="ident">b</span>), <span class="number">4</span>..<span class="number">6</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">span_of!</span>(<span class="ident">Foo</span>, <span class="ident">c</span>), <span class="number">6</span>..<span class="number">6</span> <span class="op">+</span> <span class="number">8</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">span_of!</span>(Foo, a), <span class="number">0</span>..<span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">span_of!</span>(Foo, b), <span class="number">4</span>..<span class="number">6</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">span_of!</span>(Foo, c), <span class="number">6</span>..<span class="number">6 </span>+ <span class="number">8</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">span_forms</span>() {
-        <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">Florp</span> {
-            <span class="ident">a</span>: <span class="ident">u32</span>,
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>span_forms() {
+        <span class="attribute">#[repr(C)]
+        </span><span class="kw">struct </span>Florp {
+            a: u32,
         }
 
-        <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">Blarg</span> {
-            <span class="ident">x</span>: <span class="ident">u64</span>,
-            <span class="ident">y</span>: [<span class="ident">u8</span>; <span class="number">56</span>],
-            <span class="ident">z</span>: <span class="ident">Florp</span>,
-            <span class="ident">egg</span>: [[<span class="ident">u8</span>; <span class="number">4</span>]; <span class="number">5</span>],
+        <span class="attribute">#[repr(C)]
+        </span><span class="kw">struct </span>Blarg {
+            x: u64,
+            y: [u8; <span class="number">56</span>],
+            z: Florp,
+            egg: [[u8; <span class="number">4</span>]; <span class="number">5</span>],
         }
 
-        <span class="comment">// Love me some brute force</span>
-        <span class="macro">assert_eq!</span>(<span class="number">0</span>..<span class="number">8</span>, <span class="macro">span_of!</span>(<span class="ident">Blarg</span>, <span class="ident">x</span>));
-        <span class="macro">assert_eq!</span>(<span class="number">64</span>..<span class="number">68</span>, <span class="macro">span_of!</span>(<span class="ident">Blarg</span>, <span class="ident">z</span>));
-        <span class="macro">assert_eq!</span>(<span class="number">68</span>..<span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">Blarg</span><span class="op">&gt;</span>(), <span class="macro">span_of!</span>(<span class="ident">Blarg</span>, <span class="ident">egg</span>));
+        <span class="comment">// Love me some brute force
+        </span><span class="macro">assert_eq!</span>(<span class="number">0</span>..<span class="number">8</span>, <span class="macro">span_of!</span>(Blarg, x));
+        <span class="macro">assert_eq!</span>(<span class="number">64</span>..<span class="number">68</span>, <span class="macro">span_of!</span>(Blarg, z));
+        <span class="macro">assert_eq!</span>(<span class="number">68</span>..mem::size_of::&lt;Blarg&gt;(), <span class="macro">span_of!</span>(Blarg, egg));
 
-        <span class="macro">assert_eq!</span>(<span class="number">8</span>..<span class="number">64</span>, <span class="macro">span_of!</span>(<span class="ident">Blarg</span>, <span class="ident">y</span>..<span class="ident">z</span>));
-        <span class="macro">assert_eq!</span>(<span class="number">0</span>..<span class="number">64</span>, <span class="macro">span_of!</span>(<span class="ident">Blarg</span>, <span class="ident">x</span>..<span class="op">=</span><span class="ident">y</span>));
+        <span class="macro">assert_eq!</span>(<span class="number">8</span>..<span class="number">64</span>, <span class="macro">span_of!</span>(Blarg, y..z));
+        <span class="macro">assert_eq!</span>(<span class="number">0</span>..<span class="number">64</span>, <span class="macro">span_of!</span>(Blarg, x..=y));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">ig_test</span>() {
-        <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">Member</span> {
-            <span class="ident">foo</span>: <span class="ident">u32</span>,
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>ig_test() {
+        <span class="attribute">#[repr(C)]
+        </span><span class="kw">struct </span>Member {
+            foo: u32,
         }
 
-        <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">Test</span> {
-            <span class="ident">x</span>: <span class="ident">u64</span>,
-            <span class="ident">y</span>: [<span class="ident">u8</span>; <span class="number">56</span>],
-            <span class="ident">z</span>: <span class="ident">Member</span>,
-            <span class="ident">egg</span>: [[<span class="ident">u8</span>; <span class="number">4</span>]; <span class="number">4</span>],
+        <span class="attribute">#[repr(C)]
+        </span><span class="kw">struct </span>Test {
+            x: u64,
+            y: [u8; <span class="number">56</span>],
+            z: Member,
+            egg: [[u8; <span class="number">4</span>]; <span class="number">4</span>],
         }
 
-        <span class="macro">assert_eq!</span>(<span class="macro">span_of!</span>(<span class="ident">Test</span>, ..<span class="ident">x</span>), <span class="number">0</span>..<span class="number">0</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">span_of!</span>(<span class="ident">Test</span>, ..<span class="op">=</span><span class="ident">x</span>), <span class="number">0</span>..<span class="number">8</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">span_of!</span>(<span class="ident">Test</span>, ..<span class="ident">y</span>), <span class="number">0</span>..<span class="number">8</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">span_of!</span>(<span class="ident">Test</span>, ..<span class="op">=</span><span class="ident">y</span>), <span class="number">0</span>..<span class="number">64</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">span_of!</span>(<span class="ident">Test</span>, ..<span class="ident">z</span>), <span class="number">0</span>..<span class="number">64</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">span_of!</span>(<span class="ident">Test</span>, ..<span class="op">=</span><span class="ident">z</span>), <span class="number">0</span>..<span class="number">68</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">span_of!</span>(<span class="ident">Test</span>, ..<span class="ident">egg</span>), <span class="number">0</span>..<span class="number">68</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">span_of!</span>(<span class="ident">Test</span>, ..<span class="op">=</span><span class="ident">egg</span>), <span class="number">0</span>..<span class="number">84</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">span_of!</span>(<span class="ident">Test</span>, ..), <span class="number">0</span>..<span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span>());
+        <span class="macro">assert_eq!</span>(<span class="macro">span_of!</span>(Test, ..x), <span class="number">0</span>..<span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">span_of!</span>(Test, ..=x), <span class="number">0</span>..<span class="number">8</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">span_of!</span>(Test, ..y), <span class="number">0</span>..<span class="number">8</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">span_of!</span>(Test, ..=y), <span class="number">0</span>..<span class="number">64</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">span_of!</span>(Test, ..z), <span class="number">0</span>..<span class="number">64</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">span_of!</span>(Test, ..=z), <span class="number">0</span>..<span class="number">68</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">span_of!</span>(Test, ..egg), <span class="number">0</span>..<span class="number">68</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">span_of!</span>(Test, ..=egg), <span class="number">0</span>..<span class="number">84</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">span_of!</span>(Test, ..), <span class="number">0</span>..mem::size_of::&lt;Test&gt;());
         <span class="macro">assert_eq!</span>(
-            <span class="macro">span_of!</span>(<span class="ident">Test</span>, <span class="ident">x</span>..),
-            <span class="macro">offset_of!</span>(<span class="ident">Test</span>, <span class="ident">x</span>)..<span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span>()
+            <span class="macro">span_of!</span>(Test, x..),
+            <span class="macro">offset_of!</span>(Test, x)..mem::size_of::&lt;Test&gt;()
         );
         <span class="macro">assert_eq!</span>(
-            <span class="macro">span_of!</span>(<span class="ident">Test</span>, <span class="ident">y</span>..),
-            <span class="macro">offset_of!</span>(<span class="ident">Test</span>, <span class="ident">y</span>)..<span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span>()
+            <span class="macro">span_of!</span>(Test, y..),
+            <span class="macro">offset_of!</span>(Test, y)..mem::size_of::&lt;Test&gt;()
         );
 
         <span class="macro">assert_eq!</span>(
-            <span class="macro">span_of!</span>(<span class="ident">Test</span>, <span class="ident">z</span>..),
-            <span class="macro">offset_of!</span>(<span class="ident">Test</span>, <span class="ident">z</span>)..<span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span>()
+            <span class="macro">span_of!</span>(Test, z..),
+            <span class="macro">offset_of!</span>(Test, z)..mem::size_of::&lt;Test&gt;()
         );
         <span class="macro">assert_eq!</span>(
-            <span class="macro">span_of!</span>(<span class="ident">Test</span>, <span class="ident">egg</span>..),
-            <span class="macro">offset_of!</span>(<span class="ident">Test</span>, <span class="ident">egg</span>)..<span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">Test</span><span class="op">&gt;</span>()
+            <span class="macro">span_of!</span>(Test, egg..),
+            <span class="macro">offset_of!</span>(Test, egg)..mem::size_of::&lt;Test&gt;()
         );
         <span class="macro">assert_eq!</span>(
-            <span class="macro">span_of!</span>(<span class="ident">Test</span>, <span class="ident">x</span>..<span class="ident">y</span>),
-            <span class="macro">offset_of!</span>(<span class="ident">Test</span>, <span class="ident">x</span>)..<span class="macro">offset_of!</span>(<span class="ident">Test</span>, <span class="ident">y</span>)
+            <span class="macro">span_of!</span>(Test, x..y),
+            <span class="macro">offset_of!</span>(Test, x)..<span class="macro">offset_of!</span>(Test, y)
         );
         <span class="macro">assert_eq!</span>(
-            <span class="macro">span_of!</span>(<span class="ident">Test</span>, <span class="ident">x</span>..<span class="op">=</span><span class="ident">y</span>),
-            <span class="macro">offset_of!</span>(<span class="ident">Test</span>, <span class="ident">x</span>)..<span class="macro">offset_of!</span>(<span class="ident">Test</span>, <span class="ident">y</span>) <span class="op">+</span> <span class="ident">mem::size_of</span>::<span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">56</span>]<span class="op">&gt;</span>()
+            <span class="macro">span_of!</span>(Test, x..=y),
+            <span class="macro">offset_of!</span>(Test, x)..<span class="macro">offset_of!</span>(Test, y) + mem::size_of::&lt;[u8; <span class="number">56</span>]&gt;()
         );
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="memoffset" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="memoffset" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

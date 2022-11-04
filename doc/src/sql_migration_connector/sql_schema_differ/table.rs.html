@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/sql_schema_differ/table.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>table.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../sql_migration_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/sql_schema_differ/table.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>table.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../sql_migration_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -195,202 +195,202 @@
 <span id="195">195</span>
 <span id="196">196</span>
 <span id="197">197</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">differ_database::DifferDatabase</span>, <span class="ident">foreign_keys_match</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">flavour::SqlFlavour</span>, <span class="ident">pair::Pair</span>};
-<span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{
-    <span class="ident">walkers</span>::{<span class="ident">ColumnWalker</span>, <span class="ident">ForeignKeyWalker</span>, <span class="ident">IndexWalker</span>, <span class="ident">TableWalker</span>},
-    <span class="ident">TableId</span>,
+</pre><pre class="rust"><code><span class="kw">use super</span>::{differ_database::DifferDatabase, foreign_keys_match};
+<span class="kw">use crate</span>::{flavour::SqlFlavour, pair::Pair};
+<span class="kw">use </span>sql_schema_describer::{
+    walkers::{ColumnWalker, ForeignKeyWalker, IndexWalker, TableWalker},
+    TableId,
 };
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">TableDiffer</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">tables</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">DifferDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TableDiffer&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) tables: Pair&lt;TableWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) db: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>DifferDatabase&lt;<span class="lifetime">&#39;a</span>&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;schema</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">TableDiffer</span><span class="op">&lt;</span><span class="lifetime">&#39;schema</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">column_pairs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;schema</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
-        <span class="self">self</span>.<span class="ident">db</span>
-            .<span class="ident">column_pairs</span>(<span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">id</span>))
-            .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">colids</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">schemas</span>.<span class="ident">walk</span>(<span class="ident">colids</span>))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;schema</span>, <span class="lifetime">&#39;b</span>&gt; TableDiffer&lt;<span class="lifetime">&#39;schema</span>, <span class="lifetime">&#39;b</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>column_pairs(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = Pair&lt;ColumnWalker&lt;<span class="lifetime">&#39;schema</span>&gt;&gt;&gt; + <span class="lifetime">&#39;_ </span>{
+        <span class="self">self</span>.db
+            .column_pairs(<span class="self">self</span>.tables.map(|t| t.id))
+            .map(<span class="kw">move </span>|colids| <span class="self">self</span>.db.schemas.walk(colids))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">any_column_changed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">column_pairs</span>()
-            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">column_changes_for_walkers</span>(<span class="ident">col</span>).<span class="ident">differs_in_something</span>())
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>any_column_changed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.column_pairs()
+            .any(|col| <span class="self">self</span>.db.column_changes_for_walkers(col).differs_in_something())
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">dropped_columns</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;schema</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
-        <span class="self">self</span>.<span class="ident">db</span>
-            .<span class="ident">dropped_columns</span>(<span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">id</span>))
-            .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">colid</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">previous</span>.<span class="ident">walk</span>(<span class="ident">colid</span>))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>dropped_columns&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = ColumnWalker&lt;<span class="lifetime">&#39;schema</span>&gt;&gt; + <span class="lifetime">&#39;a </span>{
+        <span class="self">self</span>.db
+            .dropped_columns(<span class="self">self</span>.tables.map(|t| t.id))
+            .map(<span class="kw">move </span>|colid| <span class="self">self</span>.tables.previous.walk(colid))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">added_columns</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;schema</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
-        <span class="self">self</span>.<span class="ident">db</span>
-            .<span class="ident">created_columns</span>(<span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">id</span>))
-            .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">colid</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">next</span>.<span class="ident">walk</span>(<span class="ident">colid</span>))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>added_columns&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = ColumnWalker&lt;<span class="lifetime">&#39;schema</span>&gt;&gt; + <span class="lifetime">&#39;a </span>{
+        <span class="self">self</span>.db
+            .created_columns(<span class="self">self</span>.tables.map(|t| t.id))
+            .map(<span class="kw">move </span>|colid| <span class="self">self</span>.tables.next.walk(colid))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">created_foreign_keys</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;schema</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
-        <span class="self">self</span>.<span class="ident">next_foreign_keys</span>().<span class="ident">filter</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">next_fk</span><span class="op">|</span> {
-            <span class="op">!</span><span class="self">self</span>
-                .<span class="ident">previous_foreign_keys</span>()
-                .<span class="ident">any</span>(<span class="op">|</span><span class="ident">previous_fk</span><span class="op">|</span> <span class="ident"><span class="kw">super</span>::foreign_keys_match</span>(<span class="ident">Pair::new</span>(<span class="kw-2">&amp;</span><span class="ident">previous_fk</span>, <span class="ident">next_fk</span>), <span class="self">self</span>.<span class="ident">db</span>))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>created_foreign_keys&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = ForeignKeyWalker&lt;<span class="lifetime">&#39;schema</span>&gt;&gt; + <span class="lifetime">&#39;a </span>{
+        <span class="self">self</span>.next_foreign_keys().filter(<span class="kw">move </span>|next_fk| {
+            !<span class="self">self
+                </span>.previous_foreign_keys()
+                .any(|previous_fk| <span class="kw">super</span>::foreign_keys_match(Pair::new(<span class="kw-2">&amp;</span>previous_fk, next_fk), <span class="self">self</span>.db))
         })
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">dropped_foreign_keys</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;schema</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
-        <span class="self">self</span>.<span class="ident">previous_foreign_keys</span>().<span class="ident">filter</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">previous_fk</span><span class="op">|</span> {
-            <span class="op">!</span><span class="self">self</span>
-                .<span class="ident">next_foreign_keys</span>()
-                .<span class="ident">any</span>(<span class="op">|</span><span class="ident">next_fk</span><span class="op">|</span> <span class="ident"><span class="kw">super</span>::foreign_keys_match</span>(<span class="ident">Pair::new</span>(<span class="ident">previous_fk</span>, <span class="kw-2">&amp;</span><span class="ident">next_fk</span>), <span class="self">self</span>.<span class="ident">db</span>))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>dropped_foreign_keys&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = ForeignKeyWalker&lt;<span class="lifetime">&#39;schema</span>&gt;&gt; + <span class="lifetime">&#39;a </span>{
+        <span class="self">self</span>.previous_foreign_keys().filter(<span class="kw">move </span>|previous_fk| {
+            !<span class="self">self
+                </span>.next_foreign_keys()
+                .any(|next_fk| <span class="kw">super</span>::foreign_keys_match(Pair::new(previous_fk, <span class="kw-2">&amp;</span>next_fk), <span class="self">self</span>.db))
         })
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">created_indexes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;schema</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
-        <span class="self">self</span>.<span class="ident">next_indexes</span>().<span class="ident">filter</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">next_index</span><span class="op">|</span> {
-            <span class="op">!</span><span class="self">self</span>
-                .<span class="ident">previous_indexes</span>()
-                .<span class="ident">any</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">previous_index</span><span class="op">|</span> <span class="ident">indexes_match</span>(<span class="ident">previous_index</span>, <span class="kw-2">*</span><span class="ident">next_index</span>, <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">flavour</span>))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>created_indexes&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = IndexWalker&lt;<span class="lifetime">&#39;schema</span>&gt;&gt; + <span class="lifetime">&#39;a </span>{
+        <span class="self">self</span>.next_indexes().filter(<span class="kw">move </span>|next_index| {
+            !<span class="self">self
+                </span>.previous_indexes()
+                .any(<span class="kw">move </span>|previous_index| indexes_match(previous_index, <span class="kw-2">*</span>next_index, <span class="self">self</span>.db.flavour))
         })
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">dropped_indexes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;schema</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
-        <span class="self">self</span>.<span class="ident">previous_indexes</span>().<span class="ident">filter</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">previous_index</span><span class="op">|</span> {
-            <span class="op">!</span><span class="self">self</span>
-                .<span class="ident">next_indexes</span>()
-                .<span class="ident">any</span>(<span class="op">|</span><span class="ident">next_index</span><span class="op">|</span> <span class="ident">indexes_match</span>(<span class="kw-2">*</span><span class="ident">previous_index</span>, <span class="ident">next_index</span>, <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">flavour</span>))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>dropped_indexes&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = IndexWalker&lt;<span class="lifetime">&#39;schema</span>&gt;&gt; + <span class="lifetime">&#39;a </span>{
+        <span class="self">self</span>.previous_indexes().filter(<span class="kw">move </span>|previous_index| {
+            !<span class="self">self
+                </span>.next_indexes()
+                .any(|next_index| indexes_match(<span class="kw-2">*</span>previous_index, next_index, <span class="self">self</span>.db.flavour))
         })
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">foreign_key_pairs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;schema</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
-        <span class="self">self</span>.<span class="ident">previous_foreign_keys</span>().<span class="ident">filter_map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">previous_fk</span><span class="op">|</span> {
-            <span class="self">self</span>.<span class="ident">next_foreign_keys</span>()
-                .<span class="ident">find</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">next_fk</span><span class="op">|</span> <span class="ident">foreign_keys_match</span>(<span class="ident">Pair::new</span>(<span class="kw-2">&amp;</span><span class="ident">previous_fk</span>, <span class="ident">next_fk</span>), <span class="self">self</span>.<span class="ident">db</span>))
-                .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">next_fk</span><span class="op">|</span> <span class="ident">Pair::new</span>(<span class="ident">previous_fk</span>, <span class="ident">next_fk</span>))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>foreign_key_pairs(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = Pair&lt;ForeignKeyWalker&lt;<span class="lifetime">&#39;schema</span>&gt;&gt;&gt; + <span class="lifetime">&#39;_ </span>{
+        <span class="self">self</span>.previous_foreign_keys().filter_map(<span class="kw">move </span>|previous_fk| {
+            <span class="self">self</span>.next_foreign_keys()
+                .find(<span class="kw">move </span>|next_fk| foreign_keys_match(Pair::new(<span class="kw-2">&amp;</span>previous_fk, next_fk), <span class="self">self</span>.db))
+                .map(<span class="kw">move </span>|next_fk| Pair::new(previous_fk, next_fk))
         })
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">index_pairs</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;schema</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
-        <span class="kw">let</span> <span class="ident">singular_indexes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">previous_indexes</span>().<span class="ident">filter</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">left</span><span class="op">|</span> {
-            <span class="comment">// Renaming an index in a situation where we have multiple indexes</span>
-            <span class="comment">// with the same columns, but a different name, is highly unstable.</span>
-            <span class="comment">// We do not rename them for now.</span>
-            <span class="kw">let</span> <span class="ident">number_of_identical_indexes</span> <span class="op">=</span> <span class="self">self</span>
-                .<span class="ident">previous_indexes</span>()
-                .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">right</span><span class="op">|</span> {
-                    <span class="ident">left</span>.<span class="ident">column_names</span>().<span class="ident">len</span>() <span class="op">==</span> <span class="ident">right</span>.<span class="ident">column_names</span>().<span class="ident">len</span>()
-                        <span class="op">&amp;&amp;</span> <span class="ident">left</span>.<span class="ident">column_names</span>().<span class="ident">zip</span>(<span class="ident">right</span>.<span class="ident">column_names</span>()).<span class="ident">all</span>(<span class="op">|</span>(<span class="ident">a</span>, <span class="ident">b</span>)<span class="op">|</span> <span class="ident">a</span> <span class="op">==</span> <span class="ident">b</span>)
-                        <span class="op">&amp;&amp;</span> <span class="ident">left</span>.<span class="ident">index_type</span>() <span class="op">==</span> <span class="ident">right</span>.<span class="ident">index_type</span>()
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>index_pairs&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = Pair&lt;IndexWalker&lt;<span class="lifetime">&#39;schema</span>&gt;&gt;&gt; + <span class="lifetime">&#39;a </span>{
+        <span class="kw">let </span>singular_indexes = <span class="self">self</span>.previous_indexes().filter(<span class="kw">move </span>|left| {
+            <span class="comment">// Renaming an index in a situation where we have multiple indexes
+            // with the same columns, but a different name, is highly unstable.
+            // We do not rename them for now.
+            </span><span class="kw">let </span>number_of_identical_indexes = <span class="self">self
+                </span>.previous_indexes()
+                .filter(|right| {
+                    left.column_names().len() == right.column_names().len()
+                        &amp;&amp; left.column_names().zip(right.column_names()).all(|(a, b)| a == b)
+                        &amp;&amp; left.index_type() == right.index_type()
                 })
-                .<span class="ident">count</span>();
+                .count();
 
-            <span class="ident">number_of_identical_indexes</span> <span class="op">==</span> <span class="number">1</span>
-        });
+            number_of_identical_indexes == <span class="number">1
+        </span>});
 
-        <span class="ident">singular_indexes</span>.<span class="ident">filter_map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">previous_index</span><span class="op">|</span> {
-            <span class="self">self</span>.<span class="ident">next_indexes</span>()
-                .<span class="ident">find</span>(<span class="op">|</span><span class="ident">next_index</span><span class="op">|</span> <span class="ident">indexes_match</span>(<span class="ident">previous_index</span>, <span class="kw-2">*</span><span class="ident">next_index</span>, <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">flavour</span>))
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">renamed_index</span><span class="op">|</span> <span class="ident">Pair::new</span>(<span class="ident">previous_index</span>, <span class="ident">renamed_index</span>))
+        singular_indexes.filter_map(<span class="kw">move </span>|previous_index| {
+            <span class="self">self</span>.next_indexes()
+                .find(|next_index| indexes_match(previous_index, <span class="kw-2">*</span>next_index, <span class="self">self</span>.db.flavour))
+                .map(|renamed_index| Pair::new(previous_index, renamed_index))
         })
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">primary_key_changed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">primary_key</span>()).<span class="ident">into_tuple</span>() {
-            (<span class="prelude-val">Some</span>(<span class="ident">previous_pk</span>), <span class="prelude-val">Some</span>(<span class="ident">next_pk</span>)) =&gt; {
-                <span class="kw">if</span> <span class="ident">previous_pk</span>.<span class="ident">columns</span>().<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">next_pk</span>.<span class="ident">columns</span>().<span class="ident">len</span>() {
-                    <span class="kw">return</span> <span class="bool-val">true</span>;
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>primary_key_changed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="self">self</span>.tables.as_ref().map(|t| t.primary_key()).into_tuple() {
+            (<span class="prelude-val">Some</span>(previous_pk), <span class="prelude-val">Some</span>(next_pk)) =&gt; {
+                <span class="kw">if </span>previous_pk.columns().len() != next_pk.columns().len() {
+                    <span class="kw">return </span><span class="bool-val">true</span>;
                 }
 
-                <span class="kw">if</span> <span class="ident">previous_pk</span>.<span class="ident">columns</span>().<span class="ident">zip</span>(<span class="ident">next_pk</span>.<span class="ident">columns</span>()).<span class="ident">any</span>(<span class="op">|</span>(<span class="ident">a</span>, <span class="ident">b</span>)<span class="op">|</span> {
-                    <span class="ident">a</span>.<span class="ident">name</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">b</span>.<span class="ident">name</span>()
-                        <span class="op">|</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">sort_order</span>().<span class="ident">unwrap_or_default</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">b</span>.<span class="ident">sort_order</span>().<span class="ident">unwrap_or_default</span>()
-                        <span class="op">|</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">length</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">b</span>.<span class="ident">length</span>()
+                <span class="kw">if </span>previous_pk.columns().zip(next_pk.columns()).any(|(a, b)| {
+                    a.name() != b.name()
+                        || a.sort_order().unwrap_or_default() != b.sort_order().unwrap_or_default()
+                        || a.length() != b.length()
                 }) {
-                    <span class="kw">return</span> <span class="bool-val">true</span>;
+                    <span class="kw">return </span><span class="bool-val">true</span>;
                 }
 
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">primary_key_column_changed</span>(<span class="ident">previous_pk</span>) {
-                    <span class="kw">return</span> <span class="bool-val">true</span>;
+                <span class="kw">if </span><span class="self">self</span>.primary_key_column_changed(previous_pk) {
+                    <span class="kw">return </span><span class="bool-val">true</span>;
                 }
 
-                <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">flavour</span>.<span class="ident">primary_key_changed</span>(<span class="self">self</span>.<span class="ident">tables</span>)
+                <span class="self">self</span>.db.flavour.primary_key_changed(<span class="self">self</span>.tables)
             }
-            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="doccomment">/// The primary key present in `next` but not `previous`, if applicable.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">created_primary_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;schema</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">primary_key</span>()).<span class="ident">into_tuple</span>() {
-            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">pk</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">pk</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// The primary key present in `next` but not `previous`, if applicable.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>created_primary_key(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;IndexWalker&lt;<span class="lifetime">&#39;schema</span>&gt;&gt; {
+        <span class="kw">match </span><span class="self">self</span>.tables.as_ref().map(|t| t.primary_key()).into_tuple() {
+            (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(pk)) =&gt; <span class="prelude-val">Some</span>(pk),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// The primary key present in `previous` but not `next`, if applicable.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">dropped_primary_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;schema</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">primary_key</span>()).<span class="ident">into_tuple</span>() {
-            (<span class="prelude-val">Some</span>(<span class="ident">pk</span>), <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">pk</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// The primary key present in `previous` but not `next`, if applicable.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>dropped_primary_key(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;IndexWalker&lt;<span class="lifetime">&#39;schema</span>&gt;&gt; {
+        <span class="kw">match </span><span class="self">self</span>.tables.as_ref().map(|t| t.primary_key()).into_tuple() {
+            (<span class="prelude-val">Some</span>(pk), <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Some</span>(pk),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="doccomment">/// Returns true if any of the columns of the primary key changed type.</span>
-    <span class="kw">fn</span> <span class="ident">primary_key_column_changed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">previous_pk</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">column_pairs</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">columns</span><span class="op">|</span> {
-                <span class="ident">previous_pk</span>
-                    .<span class="ident">columns</span>()
-                    .<span class="ident">any</span>(<span class="op">|</span><span class="ident">pk_col</span><span class="op">|</span> <span class="ident">pk_col</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">name</span>())
+    <span class="doccomment">/// Returns true if any of the columns of the primary key changed type.
+    </span><span class="kw">fn </span>primary_key_column_changed(<span class="kw-2">&amp;</span><span class="self">self</span>, previous_pk: IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+        <span class="self">self</span>.column_pairs()
+            .filter(|columns| {
+                previous_pk
+                    .columns()
+                    .any(|pk_col| pk_col.name() == columns.previous.name())
             })
-            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">columns</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">column_changes_for_walkers</span>(<span class="ident">columns</span>).<span class="ident">type_changed</span>())
+            .any(|columns| <span class="self">self</span>.db.column_changes_for_walkers(columns).type_changed())
     }
 
-    <span class="kw">fn</span> <span class="ident">previous_foreign_keys</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;schema</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
-        <span class="self">self</span>.<span class="ident">previous</span>().<span class="ident">foreign_keys</span>()
+    <span class="kw">fn </span>previous_foreign_keys&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = ForeignKeyWalker&lt;<span class="lifetime">&#39;schema</span>&gt;&gt; + <span class="lifetime">&#39;a </span>{
+        <span class="self">self</span>.previous().foreign_keys()
     }
 
-    <span class="kw">fn</span> <span class="ident">next_foreign_keys</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;schema</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;a</span> {
-        <span class="self">self</span>.<span class="ident">next</span>().<span class="ident">foreign_keys</span>()
+    <span class="kw">fn </span>next_foreign_keys&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = ForeignKeyWalker&lt;<span class="lifetime">&#39;schema</span>&gt;&gt; + <span class="lifetime">&#39;a </span>{
+        <span class="self">self</span>.next().foreign_keys()
     }
 
-    <span class="kw">fn</span> <span class="ident">previous_indexes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;schema</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">previous</span>().<span class="ident">indexes</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="op">!</span><span class="ident">idx</span>.<span class="ident">is_primary_key</span>())
+    <span class="kw">fn </span>previous_indexes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = IndexWalker&lt;<span class="lifetime">&#39;schema</span>&gt;&gt; {
+        <span class="self">self</span>.previous().indexes().filter(|idx| !idx.is_primary_key())
     }
 
-    <span class="kw">fn</span> <span class="ident">next_indexes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;schema</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">next</span>().<span class="ident">indexes</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="op">!</span><span class="ident">idx</span>.<span class="ident">is_primary_key</span>())
+    <span class="kw">fn </span>next_indexes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = IndexWalker&lt;<span class="lifetime">&#39;schema</span>&gt;&gt; {
+        <span class="self">self</span>.next().indexes().filter(|idx| !idx.is_primary_key())
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">previous</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;schema</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">previous</span>
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>previous(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TableWalker&lt;<span class="lifetime">&#39;schema</span>&gt; {
+        <span class="self">self</span>.tables.previous
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;schema</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">next</span>
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>next(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TableWalker&lt;<span class="lifetime">&#39;schema</span>&gt; {
+        <span class="self">self</span>.tables.next
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">table_ids</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">TableId</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">tables</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">id</span>)
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>table_ids(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Pair&lt;TableId&gt; {
+        <span class="self">self</span>.tables.map(|t| t.id)
     }
 }
 
-<span class="doccomment">/// Compare two SQL indexes and return whether they only differ by name.</span>
-<span class="kw">fn</span> <span class="ident">indexes_match</span>(<span class="ident">first</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">second</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">flavour</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">SqlFlavour</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">let</span> <span class="ident">left_cols</span> <span class="op">=</span> <span class="ident">first</span>.<span class="ident">columns</span>();
-    <span class="kw">let</span> <span class="ident">right_cols</span> <span class="op">=</span> <span class="ident">second</span>.<span class="ident">columns</span>();
+<span class="doccomment">/// Compare two SQL indexes and return whether they only differ by name.
+</span><span class="kw">fn </span>indexes_match(first: IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;, second: IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;, flavour: <span class="kw-2">&amp;</span><span class="kw">dyn </span>SqlFlavour) -&gt; bool {
+    <span class="kw">let </span>left_cols = first.columns();
+    <span class="kw">let </span>right_cols = second.columns();
 
-    <span class="ident">left_cols</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="ident">right_cols</span>.<span class="ident">len</span>()
-        <span class="op">&amp;&amp;</span> <span class="ident">left_cols</span>.<span class="ident">zip</span>(<span class="ident">right_cols</span>).<span class="ident">all</span>(<span class="op">|</span>(<span class="ident">a</span>, <span class="ident">b</span>)<span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">names_match</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">as_column</span>().<span class="ident">name</span>() <span class="op">==</span> <span class="ident">b</span>.<span class="ident">as_column</span>().<span class="ident">name</span>();
-            <span class="kw">let</span> <span class="ident">lengths_match</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">length</span>() <span class="op">==</span> <span class="ident">b</span>.<span class="ident">length</span>();
-            <span class="kw">let</span> <span class="ident">orders_match</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">sort_order</span>().<span class="ident">unwrap_or_default</span>() <span class="op">==</span> <span class="ident">b</span>.<span class="ident">sort_order</span>().<span class="ident">unwrap_or_default</span>();
+    left_cols.len() == right_cols.len()
+        &amp;&amp; left_cols.zip(right_cols).all(|(a, b)| {
+            <span class="kw">let </span>names_match = a.as_column().name() == b.as_column().name();
+            <span class="kw">let </span>lengths_match = a.length() == b.length();
+            <span class="kw">let </span>orders_match = a.sort_order().unwrap_or_default() == b.sort_order().unwrap_or_default();
 
-            <span class="ident">names_match</span> <span class="op">&amp;&amp;</span> <span class="ident">lengths_match</span> <span class="op">&amp;&amp;</span> <span class="ident">orders_match</span>
+            names_match &amp;&amp; lengths_match &amp;&amp; orders_match
         })
-        <span class="op">&amp;&amp;</span> <span class="ident">first</span>.<span class="ident">index_type</span>() <span class="op">==</span> <span class="ident">second</span>.<span class="ident">index_type</span>()
-        <span class="op">&amp;&amp;</span> <span class="ident">flavour</span>.<span class="ident">indexes_match</span>(<span class="ident">first</span>, <span class="ident">second</span>)
+        &amp;&amp; first.index_type() == second.index_type()
+        &amp;&amp; flavour.indexes_match(first, second)
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

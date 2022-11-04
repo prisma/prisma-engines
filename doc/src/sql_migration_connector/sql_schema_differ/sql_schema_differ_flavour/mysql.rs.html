@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/sql_schema_differ/sql_schema_differ_flavour/mysql.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mysql.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../sql_migration_connector/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/sql_schema_differ/sql_schema_differ_flavour/mysql.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mysql.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../sql_migration_connector/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1367,1374 +1367,1374 @@
 <span id="1367">1367</span>
 <span id="1368">1368</span>
 <span id="1369">1369</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SqlSchemaDifferFlavour</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">flavour::MysqlFlavour</span>, <span class="ident">pair::Pair</span>, <span class="ident">sql_schema_differ::ColumnTypeChange</span>};
-<span class="kw">use</span> <span class="ident">psl::builtin_connectors::MySqlType</span>;
-<span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{
-    <span class="ident">walkers</span>::{<span class="ident">ColumnWalker</span>, <span class="ident">IndexWalker</span>},
-    <span class="ident">ColumnTypeFamily</span>,
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::SqlSchemaDifferFlavour;
+<span class="kw">use crate</span>::{flavour::MysqlFlavour, pair::Pair, sql_schema_differ::ColumnTypeChange};
+<span class="kw">use </span>psl::builtin_connectors::MySqlType;
+<span class="kw">use </span>sql_schema_describer::{
+    walkers::{ColumnWalker, IndexWalker},
+    ColumnTypeFamily,
 };
 
-<span class="kw">impl</span> <span class="ident">SqlSchemaDifferFlavour</span> <span class="kw">for</span> <span class="ident">MysqlFlavour</span> {
-    <span class="kw">fn</span> <span class="ident">can_rename_foreign_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
+<span class="kw">impl </span>SqlSchemaDifferFlavour <span class="kw">for </span>MysqlFlavour {
+    <span class="kw">fn </span>can_rename_foreign_key(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
+
+    <span class="kw">fn </span>can_rename_index(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        !<span class="self">self</span>.is_mariadb() &amp;&amp; !<span class="self">self</span>.is_mysql_5_6()
     }
 
-    <span class="kw">fn</span> <span class="ident">can_rename_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="op">!</span><span class="self">self</span>.<span class="ident">is_mariadb</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_mysql_5_6</span>()
-    }
+    <span class="kw">fn </span>can_cope_with_foreign_key_column_becoming_non_nullable(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">can_cope_with_foreign_key_column_becoming_non_nullable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">column_type_change</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">differ</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ColumnTypeChange</span><span class="op">&gt;</span> {
-        <span class="comment">// On MariaDB, JSON is an alias for LONGTEXT. https://mariadb.com/kb/en/json-data-type/</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_mariadb</span>() {
-            <span class="kw">match</span> (
-                <span class="ident">differ</span>.<span class="ident">previous</span>.<span class="ident">column_native_type</span>(),
-                <span class="ident">differ</span>.<span class="ident">next</span>.<span class="ident">column_native_type</span>(),
-                <span class="ident">differ</span>.<span class="ident">previous</span>.<span class="ident">column_type_family</span>(),
-                <span class="ident">differ</span>.<span class="ident">next</span>.<span class="ident">column_type_family</span>(),
+    <span class="kw">fn </span>column_type_change(<span class="kw-2">&amp;</span><span class="self">self</span>, differ: Pair&lt;ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;ColumnTypeChange&gt; {
+        <span class="comment">// On MariaDB, JSON is an alias for LONGTEXT. https://mariadb.com/kb/en/json-data-type/
+        </span><span class="kw">if </span><span class="self">self</span>.is_mariadb() {
+            <span class="kw">match </span>(
+                differ.previous.column_native_type(),
+                differ.next.column_native_type(),
+                differ.previous.column_type_family(),
+                differ.next.column_type_family(),
             ) {
-                (<span class="prelude-val">Some</span>(<span class="ident">MySqlType::LongText</span>), <span class="prelude-val">Some</span>(<span class="ident">MySqlType::Json</span>), <span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+                (<span class="prelude-val">Some</span>(MySqlType::LongText), <span class="prelude-val">Some</span>(MySqlType::Json), <span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
                 (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="kw">_</span>, <span class="kw">_</span>) =&gt; (),
-                (<span class="kw">_</span>, <span class="kw">_</span>, <span class="ident">ColumnTypeFamily::String</span>, <span class="ident">ColumnTypeFamily::Json</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
-                <span class="kw">_</span> =&gt; (),
+                (<span class="kw">_</span>, <span class="kw">_</span>, ColumnTypeFamily::String, ColumnTypeFamily::Json) =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
+                <span class="kw">_ </span>=&gt; (),
             }
         }
 
-        <span class="kw">match</span> (
-            <span class="ident">differ</span>.<span class="ident">previous</span>.<span class="ident">column_type_family_as_enum</span>(),
-            <span class="ident">differ</span>.<span class="ident">next</span>.<span class="ident">column_type_family_as_enum</span>(),
+        <span class="kw">match </span>(
+            differ.previous.column_type_family_as_enum(),
+            differ.next.column_type_family_as_enum(),
         ) {
-            (<span class="prelude-val">Some</span>(<span class="ident">previous_enum</span>), <span class="prelude-val">Some</span>(<span class="ident">next_enum</span>)) =&gt; {
-                <span class="kw">if</span> <span class="ident">previous_enum</span>.<span class="ident">values</span>() <span class="op">==</span> <span class="ident">next_enum</span>.<span class="ident">values</span>() {
-                    <span class="kw">return</span> <span class="prelude-val">None</span>;
+            (<span class="prelude-val">Some</span>(previous_enum), <span class="prelude-val">Some</span>(next_enum)) =&gt; {
+                <span class="kw">if </span>previous_enum.values() == next_enum.values() {
+                    <span class="kw">return </span><span class="prelude-val">None</span>;
                 }
 
-                <span class="kw">return</span> <span class="kw">if</span> <span class="ident">previous_enum</span>
-                    .<span class="ident">values</span>()
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">all</span>(<span class="op">|</span><span class="ident">previous_value</span><span class="op">|</span> <span class="ident">next_enum</span>.<span class="ident">values</span>().<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">next_value</span><span class="op">|</span> <span class="ident">previous_value</span> <span class="op">==</span> <span class="ident">next_value</span>))
+                <span class="kw">return if </span>previous_enum
+                    .values()
+                    .iter()
+                    .all(|previous_value| next_enum.values().iter().any(|next_value| previous_value == next_value))
                 {
-                    <span class="prelude-val">Some</span>(<span class="ident">ColumnTypeChange::SafeCast</span>)
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">ColumnTypeChange::RiskyCast</span>)
+                    <span class="prelude-val">Some</span>(ColumnTypeChange::SafeCast)
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">Some</span>(ColumnTypeChange::RiskyCast)
                 };
             }
-            (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) <span class="op">|</span> (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">ColumnTypeChange::RiskyCast</span>),
+            (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) | (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; <span class="kw">return </span><span class="prelude-val">Some</span>(ColumnTypeChange::RiskyCast),
             (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; (),
         };
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">change</span>) <span class="op">=</span> <span class="ident">differ</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">walker</span><span class="op">|</span> <span class="ident">walker</span>.<span class="ident">column_native_type</span>())
-            .<span class="ident">transpose</span>()
-            .<span class="ident">and_then</span>(<span class="ident">native_type_change</span>)
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(change) = differ
+            .map(|walker| walker.column_native_type())
+            .transpose()
+            .and_then(native_type_change)
         {
-            <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">change</span>);
+            <span class="kw">return </span><span class="prelude-val">Some</span>(change);
         }
 
-        <span class="prelude-val">None</span>
+        <span class="prelude-val">None
+    </span>}
+
+    <span class="kw">fn </span>index_should_be_renamed(<span class="kw-2">&amp;</span><span class="self">self</span>, indexes: Pair&lt;IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; bool {
+        <span class="comment">// Implements correct comparison for truncated index names.
+        </span><span class="kw">let </span>(previous_name, next_name) = indexes.as_ref().map(|idx| idx.name()).into_tuple();
+
+        previous_name != next_name
     }
 
-    <span class="kw">fn</span> <span class="ident">index_should_be_renamed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">indexes</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="comment">// Implements correct comparison for truncated index names.</span>
-        <span class="kw">let</span> (<span class="ident">previous_name</span>, <span class="ident">next_name</span>) <span class="op">=</span> <span class="ident">indexes</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">idx</span>.<span class="ident">name</span>()).<span class="ident">into_tuple</span>();
-
-        <span class="ident">previous_name</span> <span class="op">!</span><span class="op">=</span> <span class="ident">next_name</span>
+    <span class="kw">fn </span>lower_cases_table_names(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.lower_cases_table_names()
     }
 
-    <span class="kw">fn</span> <span class="ident">lower_cases_table_names</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">lower_cases_table_names</span>()
-    }
+    <span class="kw">fn </span>should_create_indexes_from_created_tables(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">should_create_indexes_from_created_tables</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
-    }
+    <span class="kw">fn </span>should_ignore_json_defaults(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">true
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">should_ignore_json_defaults</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">true</span>
-    }
+    <span class="kw">fn </span>should_skip_fk_indexes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">true
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">should_skip_fk_indexes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">true</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">table_names_match</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">names</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">lower_cases_table_names</span>() {
-            <span class="ident">names</span>.<span class="ident">previous</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="ident">names</span>.<span class="ident">next</span>)
-        } <span class="kw">else</span> {
-            <span class="ident">names</span>.<span class="ident">previous</span> <span class="op">==</span> <span class="ident">names</span>.<span class="ident">next</span>
+    <span class="kw">fn </span>table_names_match(<span class="kw-2">&amp;</span><span class="self">self</span>, names: Pair&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; bool {
+        <span class="kw">if </span><span class="self">self</span>.lower_cases_table_names() {
+            names.previous.eq_ignore_ascii_case(names.next)
+        } <span class="kw">else </span>{
+            names.previous == names.next
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">risky</span>() -&gt; <span class="ident">ColumnTypeChange</span> {
-    <span class="ident">ColumnTypeChange::RiskyCast</span>
+<span class="kw">fn </span>risky() -&gt; ColumnTypeChange {
+    ColumnTypeChange::RiskyCast
 }
 
-<span class="kw">fn</span> <span class="ident">not_castable</span>() -&gt; <span class="ident">ColumnTypeChange</span> {
-    <span class="ident">ColumnTypeChange::NotCastable</span>
+<span class="kw">fn </span>not_castable() -&gt; ColumnTypeChange {
+    ColumnTypeChange::NotCastable
 }
 
-<span class="kw">fn</span> <span class="ident">safe</span>() -&gt; <span class="ident">ColumnTypeChange</span> {
-    <span class="ident">ColumnTypeChange::SafeCast</span>
+<span class="kw">fn </span>safe() -&gt; ColumnTypeChange {
+    ColumnTypeChange::SafeCast
 }
 
-<span class="kw">fn</span> <span class="ident">native_type_change</span>(<span class="ident">types</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">MySqlType</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ColumnTypeChange</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">next</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">types</span>.<span class="ident">next</span>;
+<span class="kw">fn </span>native_type_change(types: Pair&lt;<span class="kw-2">&amp;</span>MySqlType&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;ColumnTypeChange&gt; {
+    <span class="kw">let </span>next = <span class="kw-2">&amp;</span>types.next;
 
-    <span class="prelude-val">Some</span>(<span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">types</span>.<span class="ident">previous</span> {
-        <span class="ident">MySqlType::BigInt</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-            <span class="ident">MySqlType::BigInt</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+    <span class="prelude-val">Some</span>(<span class="kw">match </span><span class="kw-2">&amp;</span>types.previous {
+        MySqlType::BigInt =&gt; <span class="kw">match </span>next {
+            MySqlType::BigInt =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
 
-            <span class="ident">MySqlType::Binary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Bit</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Blob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Char</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Double</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Float</span>
-            <span class="op">|</span> <span class="ident">MySqlType::LongText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::LongBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Text</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Time</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::TinyText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::VarChar</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::VarBinary</span>(<span class="kw">_</span>) =&gt; <span class="ident">safe</span>(),
+            MySqlType::Binary(<span class="kw">_</span>)
+            | MySqlType::Bit(<span class="kw">_</span>)
+            | MySqlType::Blob
+            | MySqlType::Char(<span class="kw">_</span>)
+            | MySqlType::Double
+            | MySqlType::Float
+            | MySqlType::LongText
+            | MySqlType::LongBlob
+            | MySqlType::MediumText
+            | MySqlType::MediumBlob
+            | MySqlType::Text
+            | MySqlType::TinyBlob
+            | MySqlType::Time(<span class="kw">_</span>)
+            | MySqlType::TinyText
+            | MySqlType::VarChar(<span class="kw">_</span>)
+            | MySqlType::VarBinary(<span class="kw">_</span>) =&gt; safe(),
 
-            <span class="ident">MySqlType::Decimal</span>(<span class="prelude-val">Some</span>((<span class="ident">n</span>, <span class="ident">m</span>))) <span class="kw">if</span> <span class="ident">n</span> <span class="op">-</span> <span class="ident">m</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">20</span> =&gt; <span class="ident">safe</span>(),
+            MySqlType::Decimal(<span class="prelude-val">Some</span>((n, m))) <span class="kw">if </span>n - m &gt;= <span class="number">20 </span>=&gt; safe(),
 
-            <span class="ident">MySqlType::Int</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::SmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedSmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedTinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedMediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedBigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Year</span> =&gt; <span class="ident">risky</span>(),
+            MySqlType::Int
+            | MySqlType::MediumInt
+            | MySqlType::SmallInt
+            | MySqlType::TinyInt
+            | MySqlType::UnsignedSmallInt
+            | MySqlType::UnsignedTinyInt
+            | MySqlType::UnsignedInt
+            | MySqlType::UnsignedMediumInt
+            | MySqlType::UnsignedBigInt
+            | MySqlType::Year =&gt; risky(),
 
-            <span class="ident">MySqlType::Decimal</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Date</span>
-            <span class="op">|</span> <span class="ident">MySqlType::DateTime</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Timestamp</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Json</span> =&gt; <span class="ident">not_castable</span>(),
+            MySqlType::Decimal(<span class="kw">_</span>)
+            | MySqlType::Date
+            | MySqlType::DateTime(<span class="kw">_</span>)
+            | MySqlType::Timestamp(<span class="kw">_</span>)
+            | MySqlType::Json =&gt; not_castable(),
         },
-        <span class="ident">MySqlType::Binary</span>(<span class="ident">size</span>) =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-            <span class="ident">MySqlType::Binary</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="ident">size</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
-            <span class="ident">MySqlType::Binary</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="ident">n</span> <span class="op">&gt;</span> <span class="ident">size</span> =&gt; <span class="ident">safe</span>(),
-            <span class="ident">MySqlType::Binary</span>(<span class="kw">_</span>) =&gt; <span class="ident">risky</span>(),
+        MySqlType::Binary(size) =&gt; <span class="kw">match </span>next {
+            MySqlType::Binary(n) <span class="kw">if </span>n == size =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
+            MySqlType::Binary(n) <span class="kw">if </span>n &gt; size =&gt; safe(),
+            MySqlType::Binary(<span class="kw">_</span>) =&gt; risky(),
 
-            <span class="ident">MySqlType::Blob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Char</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Decimal</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Double</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Float</span>
-            <span class="op">|</span> <span class="ident">MySqlType::LongBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::LongText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Text</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::VarBinary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">safe</span>(),
+            MySqlType::Blob
+            | MySqlType::Char(<span class="kw">_</span>)
+            | MySqlType::Decimal(<span class="kw">_</span>)
+            | MySqlType::Double
+            | MySqlType::Float
+            | MySqlType::LongBlob
+            | MySqlType::LongText
+            | MySqlType::MediumBlob
+            | MySqlType::MediumInt
+            | MySqlType::MediumText
+            | MySqlType::Text
+            | MySqlType::TinyBlob
+            | MySqlType::TinyText
+            | MySqlType::VarBinary(<span class="kw">_</span>)
+            | MySqlType::VarChar(<span class="kw">_</span>) =&gt; safe(),
 
-            <span class="ident">MySqlType::Bit</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">n</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">size</span> <span class="op">*</span> <span class="number">8</span> =&gt; <span class="ident">safe</span>(),
+            MySqlType::Bit(n) <span class="kw">if </span><span class="kw-2">*</span>n &gt;= size * <span class="number">8 </span>=&gt; safe(),
 
-            <span class="ident">MySqlType::BigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Bit</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Int</span>
-            <span class="op">|</span> <span class="ident">MySqlType::SmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Time</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::TinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedBigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedMediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedSmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedTinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Year</span> =&gt; <span class="ident">risky</span>(),
+            MySqlType::BigInt
+            | MySqlType::Bit(<span class="kw">_</span>)
+            | MySqlType::Int
+            | MySqlType::SmallInt
+            | MySqlType::Time(<span class="kw">_</span>)
+            | MySqlType::TinyInt
+            | MySqlType::UnsignedBigInt
+            | MySqlType::UnsignedInt
+            | MySqlType::UnsignedMediumInt
+            | MySqlType::UnsignedSmallInt
+            | MySqlType::UnsignedTinyInt
+            | MySqlType::Year =&gt; risky(),
 
-            <span class="ident">MySqlType::Date</span> <span class="op">|</span> <span class="ident">MySqlType::DateTime</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">MySqlType::Json</span> <span class="op">|</span> <span class="ident">MySqlType::Timestamp</span>(<span class="kw">_</span>) =&gt; <span class="ident">not_castable</span>(),
+            MySqlType::Date | MySqlType::DateTime(<span class="kw">_</span>) | MySqlType::Json | MySqlType::Timestamp(<span class="kw">_</span>) =&gt; not_castable(),
         },
-        <span class="ident">MySqlType::Bit</span>(<span class="ident">n</span>) =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-            <span class="ident">MySqlType::Bit</span>(<span class="ident">m</span>) <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="ident">m</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
-            <span class="ident">MySqlType::Bit</span>(<span class="ident">m</span>) <span class="kw">if</span> <span class="ident">n</span> <span class="op">&lt;</span> <span class="ident">m</span> =&gt; <span class="ident">safe</span>(),
-            <span class="ident">MySqlType::Bit</span>(<span class="kw">_</span>) =&gt; <span class="ident">risky</span>(),
+        MySqlType::Bit(n) =&gt; <span class="kw">match </span>next {
+            MySqlType::Bit(m) <span class="kw">if </span>n == m =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
+            MySqlType::Bit(m) <span class="kw">if </span>n &lt; m =&gt; safe(),
+            MySqlType::Bit(<span class="kw">_</span>) =&gt; risky(),
 
-            <span class="ident">MySqlType::Blob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Char</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Int</span>
-            <span class="op">|</span> <span class="ident">MySqlType::LongBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::LongText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::SmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Text</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Year</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedMediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedSmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedTinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::VarBinary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">safe</span>(),
+            MySqlType::Blob
+            | MySqlType::Char(<span class="kw">_</span>)
+            | MySqlType::Int
+            | MySqlType::LongBlob
+            | MySqlType::LongText
+            | MySqlType::MediumBlob
+            | MySqlType::MediumInt
+            | MySqlType::MediumText
+            | MySqlType::SmallInt
+            | MySqlType::Text
+            | MySqlType::Year
+            | MySqlType::TinyBlob
+            | MySqlType::TinyInt
+            | MySqlType::TinyText
+            | MySqlType::UnsignedInt
+            | MySqlType::UnsignedMediumInt
+            | MySqlType::UnsignedSmallInt
+            | MySqlType::UnsignedTinyInt
+            | MySqlType::VarBinary(<span class="kw">_</span>)
+            | MySqlType::VarChar(<span class="kw">_</span>) =&gt; safe(),
 
-            <span class="ident">MySqlType::BigInt</span> <span class="op">|</span> <span class="ident">MySqlType::UnsignedBigInt</span> <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">n</span> <span class="op">==</span> <span class="number">64</span> =&gt; <span class="ident">safe</span>(),
-            <span class="ident">MySqlType::BigInt</span> <span class="op">|</span> <span class="ident">MySqlType::UnsignedBigInt</span> =&gt; <span class="ident">risky</span>(),
+            MySqlType::BigInt | MySqlType::UnsignedBigInt <span class="kw">if </span><span class="kw-2">*</span>n == <span class="number">64 </span>=&gt; safe(),
+            MySqlType::BigInt | MySqlType::UnsignedBigInt =&gt; risky(),
 
-            <span class="ident">MySqlType::Binary</span>(<span class="ident">m</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">n</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">8</span> <span class="op">*</span> <span class="ident">m</span> =&gt; <span class="ident">safe</span>(),
-            <span class="ident">MySqlType::Binary</span>(<span class="kw">_</span>) =&gt; <span class="ident">not_castable</span>(),
+            MySqlType::Binary(m) <span class="kw">if </span><span class="kw-2">*</span>n &gt;= <span class="number">8 </span>* m =&gt; safe(),
+            MySqlType::Binary(<span class="kw">_</span>) =&gt; not_castable(),
 
-            <span class="ident">MySqlType::Decimal</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">MySqlType::Double</span> <span class="op">|</span> <span class="ident">MySqlType::Float</span> =&gt; <span class="ident">risky</span>(),
+            MySqlType::Decimal(<span class="kw">_</span>) | MySqlType::Double | MySqlType::Float =&gt; risky(),
 
-            <span class="ident">MySqlType::Date</span>
-            <span class="op">|</span> <span class="ident">MySqlType::DateTime</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Time</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Timestamp</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Json</span> =&gt; <span class="ident">not_castable</span>(),
+            MySqlType::Date
+            | MySqlType::DateTime(<span class="kw">_</span>)
+            | MySqlType::Time(<span class="kw">_</span>)
+            | MySqlType::Timestamp(<span class="kw">_</span>)
+            | MySqlType::Json =&gt; not_castable(),
         },
-        <span class="ident">MySqlType::Blob</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-            <span class="ident">MySqlType::Blob</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+        MySqlType::Blob =&gt; <span class="kw">match </span>next {
+            MySqlType::Blob =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
 
-            <span class="ident">MySqlType::TinyBlob</span> <span class="op">|</span> <span class="ident">MySqlType::LongBlob</span> <span class="op">|</span> <span class="ident">MySqlType::MediumBlob</span> =&gt; <span class="ident">safe</span>(),
+            MySqlType::TinyBlob | MySqlType::LongBlob | MySqlType::MediumBlob =&gt; safe(),
 
-            <span class="ident">MySqlType::Binary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Bit</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Char</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::LongText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Text</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::VarBinary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">risky</span>(),
+            MySqlType::Binary(<span class="kw">_</span>)
+            | MySqlType::Bit(<span class="kw">_</span>)
+            | MySqlType::Char(<span class="kw">_</span>)
+            | MySqlType::LongText
+            | MySqlType::MediumText
+            | MySqlType::Text
+            | MySqlType::TinyText
+            | MySqlType::VarBinary(<span class="kw">_</span>)
+            | MySqlType::VarChar(<span class="kw">_</span>) =&gt; risky(),
 
-            <span class="ident">MySqlType::TinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::BigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Date</span>
-            <span class="op">|</span> <span class="ident">MySqlType::DateTime</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Decimal</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Double</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Float</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Int</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Json</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::SmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Time</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Timestamp</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedMediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedSmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedTinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedBigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Year</span> =&gt; <span class="ident">not_castable</span>(),
+            MySqlType::TinyInt
+            | MySqlType::BigInt
+            | MySqlType::Date
+            | MySqlType::DateTime(<span class="kw">_</span>)
+            | MySqlType::Decimal(<span class="kw">_</span>)
+            | MySqlType::Double
+            | MySqlType::Float
+            | MySqlType::Int
+            | MySqlType::Json
+            | MySqlType::MediumInt
+            | MySqlType::SmallInt
+            | MySqlType::Time(<span class="kw">_</span>)
+            | MySqlType::Timestamp(<span class="kw">_</span>)
+            | MySqlType::UnsignedInt
+            | MySqlType::UnsignedMediumInt
+            | MySqlType::UnsignedSmallInt
+            | MySqlType::UnsignedTinyInt
+            | MySqlType::UnsignedBigInt
+            | MySqlType::Year =&gt; not_castable(),
         },
-        <span class="ident">MySqlType::Char</span>(<span class="ident">n</span>) =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-            <span class="ident">MySqlType::Char</span>(<span class="ident">m</span>) <span class="kw">if</span> <span class="ident">m</span> <span class="op">==</span> <span class="ident">n</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
-            <span class="ident">MySqlType::VarChar</span>(<span class="ident">m</span>) <span class="kw">if</span> <span class="ident">m</span> <span class="op">==</span> <span class="ident">n</span> =&gt; <span class="ident">safe</span>(),
-            <span class="ident">MySqlType::VarChar</span>(<span class="ident">m</span>) <span class="op">|</span> <span class="ident">MySqlType::Char</span>(<span class="ident">m</span>) <span class="op">|</span> <span class="ident">MySqlType::VarBinary</span>(<span class="ident">m</span>) <span class="op">|</span> <span class="ident">MySqlType::Binary</span>(<span class="ident">m</span>) <span class="kw">if</span> <span class="ident">m</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">n</span> =&gt; {
-                <span class="ident">safe</span>()
+        MySqlType::Char(n) =&gt; <span class="kw">match </span>next {
+            MySqlType::Char(m) <span class="kw">if </span>m == n =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
+            MySqlType::VarChar(m) <span class="kw">if </span>m == n =&gt; safe(),
+            MySqlType::VarChar(m) | MySqlType::Char(m) | MySqlType::VarBinary(m) | MySqlType::Binary(m) <span class="kw">if </span>m &gt;= n =&gt; {
+                safe()
             }
-            <span class="ident">MySqlType::VarChar</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">MySqlType::Char</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">MySqlType::Binary</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">MySqlType::VarBinary</span>(<span class="kw">_</span>) =&gt; <span class="ident">risky</span>(),
+            MySqlType::VarChar(<span class="kw">_</span>) | MySqlType::Char(<span class="kw">_</span>) | MySqlType::Binary(<span class="kw">_</span>) | MySqlType::VarBinary(<span class="kw">_</span>) =&gt; risky(),
 
-            <span class="comment">// To string</span>
-            <span class="ident">MySqlType::Blob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::LongBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::LongText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Text</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyBlob</span> =&gt; <span class="ident">safe</span>(),
+            <span class="comment">// To string
+            </span>MySqlType::Blob
+            | MySqlType::LongBlob
+            | MySqlType::LongText
+            | MySqlType::MediumText
+            | MySqlType::MediumBlob
+            | MySqlType::Text
+            | MySqlType::TinyText
+            | MySqlType::TinyBlob =&gt; safe(),
 
-            <span class="comment">// Numeric types</span>
-            <span class="ident">MySqlType::BigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Int</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Decimal</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Float</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Double</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::SmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedBigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedMediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedSmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedTinyInt</span> =&gt; <span class="ident">risky</span>(),
+            <span class="comment">// Numeric types
+            </span>MySqlType::BigInt
+            | MySqlType::Int
+            | MySqlType::Decimal(<span class="kw">_</span>)
+            | MySqlType::Float
+            | MySqlType::Double
+            | MySqlType::MediumInt
+            | MySqlType::SmallInt
+            | MySqlType::TinyInt
+            | MySqlType::UnsignedBigInt
+            | MySqlType::UnsignedInt
+            | MySqlType::UnsignedMediumInt
+            | MySqlType::UnsignedSmallInt
+            | MySqlType::UnsignedTinyInt =&gt; risky(),
 
-            <span class="ident">MySqlType::Bit</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Json</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Date</span>
-            <span class="op">|</span> <span class="ident">MySqlType::DateTime</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Timestamp</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Time</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Year</span> =&gt; <span class="ident">risky</span>(),
+            MySqlType::Bit(<span class="kw">_</span>)
+            | MySqlType::Json
+            | MySqlType::Date
+            | MySqlType::DateTime(<span class="kw">_</span>)
+            | MySqlType::Timestamp(<span class="kw">_</span>)
+            | MySqlType::Time(<span class="kw">_</span>)
+            | MySqlType::Year =&gt; risky(),
         },
-        <span class="ident">MySqlType::Date</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-            <span class="ident">MySqlType::Date</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+        MySqlType::Date =&gt; <span class="kw">match </span>next {
+            MySqlType::Date =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
 
-            <span class="ident">MySqlType::DateTime</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::BigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedBigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Int</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedInt</span> =&gt; <span class="ident">safe</span>(),
+            MySqlType::DateTime(<span class="kw">_</span>)
+            | MySqlType::BigInt
+            | MySqlType::UnsignedBigInt
+            | MySqlType::Int
+            | MySqlType::UnsignedInt =&gt; safe(),
 
-            <span class="ident">MySqlType::Decimal</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">MySqlType::Float</span> <span class="op">|</span> <span class="ident">MySqlType::Double</span> =&gt; <span class="ident">safe</span>(),
+            MySqlType::Decimal(<span class="kw">_</span>) | MySqlType::Float | MySqlType::Double =&gt; safe(),
 
-            <span class="ident">MySqlType::TinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedTinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Year</span>
-            <span class="op">|</span> <span class="ident">MySqlType::SmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Time</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Timestamp</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Json</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedMediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedSmallInt</span> =&gt; <span class="ident">not_castable</span>(),
+            MySqlType::TinyInt
+            | MySqlType::UnsignedTinyInt
+            | MySqlType::Year
+            | MySqlType::SmallInt
+            | MySqlType::MediumInt
+            | MySqlType::Time(<span class="kw">_</span>)
+            | MySqlType::Timestamp(<span class="kw">_</span>)
+            | MySqlType::Json
+            | MySqlType::UnsignedMediumInt
+            | MySqlType::UnsignedSmallInt =&gt; not_castable(),
 
-            <span class="comment">// To string</span>
-            <span class="ident">MySqlType::Binary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Bit</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Char</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::LongText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Blob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::LongBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Text</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::VarBinary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">safe</span>(),
+            <span class="comment">// To string
+            </span>MySqlType::Binary(<span class="kw">_</span>)
+            | MySqlType::Bit(<span class="kw">_</span>)
+            | MySqlType::Char(<span class="kw">_</span>)
+            | MySqlType::LongText
+            | MySqlType::TinyBlob
+            | MySqlType::MediumBlob
+            | MySqlType::Blob
+            | MySqlType::LongBlob
+            | MySqlType::MediumText
+            | MySqlType::Text
+            | MySqlType::TinyText
+            | MySqlType::VarBinary(<span class="kw">_</span>)
+            | MySqlType::VarChar(<span class="kw">_</span>) =&gt; safe(),
         },
-        <span class="ident">MySqlType::DateTime</span>(<span class="ident">n</span>) =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-            <span class="ident">MySqlType::DateTime</span>(<span class="ident">m</span>) <span class="kw">if</span> <span class="ident">n</span> <span class="op">&lt;</span> <span class="ident">m</span> =&gt; <span class="ident">safe</span>(),
-            <span class="ident">MySqlType::DateTime</span>(<span class="ident">m</span>) <span class="kw">if</span> <span class="ident">n</span> <span class="op">&gt;</span> <span class="ident">m</span> =&gt; <span class="ident">risky</span>(),
-            <span class="ident">MySqlType::DateTime</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+        MySqlType::DateTime(n) =&gt; <span class="kw">match </span>next {
+            MySqlType::DateTime(m) <span class="kw">if </span>n &lt; m =&gt; safe(),
+            MySqlType::DateTime(m) <span class="kw">if </span>n &gt; m =&gt; risky(),
+            MySqlType::DateTime(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
 
-            <span class="comment">// To string</span>
-            <span class="ident">MySqlType::Binary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Char</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::LongText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Text</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Blob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::LongBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::VarBinary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">safe</span>(),
+            <span class="comment">// To string
+            </span>MySqlType::Binary(<span class="kw">_</span>)
+            | MySqlType::Char(<span class="kw">_</span>)
+            | MySqlType::LongText
+            | MySqlType::MediumText
+            | MySqlType::Text
+            | MySqlType::TinyText
+            | MySqlType::Blob
+            | MySqlType::TinyBlob
+            | MySqlType::LongBlob
+            | MySqlType::MediumBlob
+            | MySqlType::VarBinary(<span class="kw">_</span>)
+            | MySqlType::VarChar(<span class="kw">_</span>) =&gt; safe(),
 
-            <span class="comment">// Numeric types</span>
-            <span class="ident">MySqlType::BigInt</span> <span class="op">|</span> <span class="ident">MySqlType::UnsignedBigInt</span> <span class="op">|</span> <span class="ident">MySqlType::Bit</span>(<span class="number">64</span>) =&gt; <span class="ident">safe</span>(),
-            <span class="ident">MySqlType::Bit</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Double</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Float</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedTinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Decimal</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::TinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Int</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Json</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::SmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedSmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedMediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Year</span> =&gt; <span class="ident">not_castable</span>(),
+            <span class="comment">// Numeric types
+            </span>MySqlType::BigInt | MySqlType::UnsignedBigInt | MySqlType::Bit(<span class="number">64</span>) =&gt; safe(),
+            MySqlType::Bit(<span class="kw">_</span>)
+            | MySqlType::Double
+            | MySqlType::Float
+            | MySqlType::UnsignedTinyInt
+            | MySqlType::Decimal(<span class="kw">_</span>)
+            | MySqlType::TinyInt
+            | MySqlType::Int
+            | MySqlType::Json
+            | MySqlType::UnsignedInt
+            | MySqlType::SmallInt
+            | MySqlType::UnsignedSmallInt
+            | MySqlType::MediumInt
+            | MySqlType::UnsignedMediumInt
+            | MySqlType::Year =&gt; not_castable(),
 
-            <span class="ident">MySqlType::Timestamp</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">MySqlType::Time</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">MySqlType::Date</span> =&gt; <span class="ident">safe</span>(),
+            MySqlType::Timestamp(<span class="kw">_</span>) | MySqlType::Time(<span class="kw">_</span>) | MySqlType::Date =&gt; safe(),
         },
-        <span class="ident">MySqlType::Decimal</span>(<span class="ident">n</span>) =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-            <span class="ident">MySqlType::Decimal</span>(<span class="ident">m</span>) <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="ident">m</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
-            <span class="ident">MySqlType::Decimal</span>(<span class="kw">_</span>) =&gt; <span class="ident">risky</span>(),
+        MySqlType::Decimal(n) =&gt; <span class="kw">match </span>next {
+            MySqlType::Decimal(m) <span class="kw">if </span>n == m =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
+            MySqlType::Decimal(<span class="kw">_</span>) =&gt; risky(),
 
-            <span class="comment">// To string</span>
-            <span class="ident">MySqlType::Binary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Char</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::LongText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Text</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Blob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::LongBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::VarBinary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">safe</span>(),
+            <span class="comment">// To string
+            </span>MySqlType::Binary(<span class="kw">_</span>)
+            | MySqlType::Char(<span class="kw">_</span>)
+            | MySqlType::LongText
+            | MySqlType::MediumText
+            | MySqlType::Text
+            | MySqlType::TinyText
+            | MySqlType::Blob
+            | MySqlType::TinyBlob
+            | MySqlType::LongBlob
+            | MySqlType::MediumBlob
+            | MySqlType::VarBinary(<span class="kw">_</span>)
+            | MySqlType::VarChar(<span class="kw">_</span>) =&gt; safe(),
 
-            <span class="comment">// Numeric</span>
-            <span class="ident">MySqlType::BigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Bit</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Time</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Int</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::SmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedBigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedMediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedSmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedTinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Float</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Double</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Year</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Json</span> =&gt; <span class="ident">risky</span>(),
+            <span class="comment">// Numeric
+            </span>MySqlType::BigInt
+            | MySqlType::Bit(<span class="kw">_</span>)
+            | MySqlType::Time(<span class="kw">_</span>)
+            | MySqlType::Int
+            | MySqlType::MediumInt
+            | MySqlType::SmallInt
+            | MySqlType::TinyInt
+            | MySqlType::UnsignedBigInt
+            | MySqlType::UnsignedInt
+            | MySqlType::UnsignedMediumInt
+            | MySqlType::UnsignedSmallInt
+            | MySqlType::UnsignedTinyInt
+            | MySqlType::Float
+            | MySqlType::Double
+            | MySqlType::Year
+            | MySqlType::Json =&gt; risky(),
 
-            <span class="ident">MySqlType::DateTime</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">MySqlType::Timestamp</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">MySqlType::Date</span> =&gt; <span class="ident">not_castable</span>(),
+            MySqlType::DateTime(<span class="kw">_</span>) | MySqlType::Timestamp(<span class="kw">_</span>) | MySqlType::Date =&gt; not_castable(),
         },
-        <span class="ident">MySqlType::Double</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-            <span class="ident">MySqlType::Double</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+        MySqlType::Double =&gt; <span class="kw">match </span>next {
+            MySqlType::Double =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
 
-            <span class="ident">MySqlType::Float</span> =&gt; <span class="ident">safe</span>(),
-            <span class="ident">MySqlType::Bit</span>(<span class="number">64</span>) =&gt; <span class="ident">safe</span>(),
-            <span class="ident">MySqlType::Bit</span>(<span class="kw">_</span>) =&gt; <span class="ident">not_castable</span>(),
+            MySqlType::Float =&gt; safe(),
+            MySqlType::Bit(<span class="number">64</span>) =&gt; safe(),
+            MySqlType::Bit(<span class="kw">_</span>) =&gt; not_castable(),
 
-            <span class="comment">// Integer types</span>
-            <span class="ident">MySqlType::UnsignedTinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Decimal</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::BigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedBigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Int</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Json</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::SmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedSmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedMediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Year</span> =&gt; <span class="ident">safe</span>(),
+            <span class="comment">// Integer types
+            </span>MySqlType::UnsignedTinyInt
+            | MySqlType::Decimal(<span class="kw">_</span>)
+            | MySqlType::BigInt
+            | MySqlType::UnsignedBigInt
+            | MySqlType::TinyInt
+            | MySqlType::Int
+            | MySqlType::Json
+            | MySqlType::UnsignedInt
+            | MySqlType::SmallInt
+            | MySqlType::UnsignedSmallInt
+            | MySqlType::MediumInt
+            | MySqlType::UnsignedMediumInt
+            | MySqlType::Year =&gt; safe(),
 
-            <span class="ident">MySqlType::Binary</span>(<span class="ident">n</span>) <span class="op">|</span> <span class="ident">MySqlType::Char</span>(<span class="ident">n</span>) <span class="op">|</span> <span class="ident">MySqlType::VarBinary</span>(<span class="ident">n</span>) <span class="op">|</span> <span class="ident">MySqlType::VarChar</span>(<span class="ident">n</span>) =&gt; {
-                <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">n</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">32</span> {
-                    <span class="ident">risky</span>()
-                } <span class="kw">else</span> {
-                    <span class="ident">not_castable</span>()
+            MySqlType::Binary(n) | MySqlType::Char(n) | MySqlType::VarBinary(n) | MySqlType::VarChar(n) =&gt; {
+                <span class="kw">if </span><span class="kw-2">*</span>n &gt;= <span class="number">32 </span>{
+                    risky()
+                } <span class="kw">else </span>{
+                    not_castable()
                 }
             }
 
-            <span class="comment">// To string</span>
-            <span class="ident">MySqlType::LongText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Text</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Blob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::LongBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumBlob</span> =&gt; <span class="ident">safe</span>(),
+            <span class="comment">// To string
+            </span>MySqlType::LongText
+            | MySqlType::MediumText
+            | MySqlType::Text
+            | MySqlType::TinyText
+            | MySqlType::Blob
+            | MySqlType::TinyBlob
+            | MySqlType::LongBlob
+            | MySqlType::MediumBlob =&gt; safe(),
 
-            <span class="ident">MySqlType::Time</span>(<span class="kw">_</span>) =&gt; <span class="ident">safe</span>(),
+            MySqlType::Time(<span class="kw">_</span>) =&gt; safe(),
 
-            <span class="ident">MySqlType::Timestamp</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">MySqlType::DateTime</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">MySqlType::Date</span> =&gt; <span class="ident">not_castable</span>(),
+            MySqlType::Timestamp(<span class="kw">_</span>) | MySqlType::DateTime(<span class="kw">_</span>) | MySqlType::Date =&gt; not_castable(),
         },
-        <span class="ident">MySqlType::Float</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-            <span class="ident">MySqlType::Float</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+        MySqlType::Float =&gt; <span class="kw">match </span>next {
+            MySqlType::Float =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
 
-            <span class="ident">MySqlType::Double</span> =&gt; <span class="ident">safe</span>(),
+            MySqlType::Double =&gt; safe(),
 
-            <span class="ident">MySqlType::Bit</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">n</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">32</span> =&gt; <span class="ident">safe</span>(),
-            <span class="ident">MySqlType::Bit</span>(<span class="kw">_</span>) =&gt; <span class="ident">not_castable</span>(),
+            MySqlType::Bit(n) <span class="kw">if </span><span class="kw-2">*</span>n &gt;= <span class="number">32 </span>=&gt; safe(),
+            MySqlType::Bit(<span class="kw">_</span>) =&gt; not_castable(),
 
-            <span class="comment">// Integer types</span>
-            <span class="ident">MySqlType::UnsignedTinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Decimal</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::BigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedBigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Int</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Json</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::SmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedSmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedMediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Year</span> =&gt; <span class="ident">safe</span>(),
+            <span class="comment">// Integer types
+            </span>MySqlType::UnsignedTinyInt
+            | MySqlType::Decimal(<span class="kw">_</span>)
+            | MySqlType::BigInt
+            | MySqlType::UnsignedBigInt
+            | MySqlType::TinyInt
+            | MySqlType::Int
+            | MySqlType::Json
+            | MySqlType::UnsignedInt
+            | MySqlType::SmallInt
+            | MySqlType::UnsignedSmallInt
+            | MySqlType::MediumInt
+            | MySqlType::UnsignedMediumInt
+            | MySqlType::Year =&gt; safe(),
 
-            <span class="ident">MySqlType::Binary</span>(<span class="ident">n</span>) <span class="op">|</span> <span class="ident">MySqlType::Char</span>(<span class="ident">n</span>) <span class="op">|</span> <span class="ident">MySqlType::VarBinary</span>(<span class="ident">n</span>) <span class="op">|</span> <span class="ident">MySqlType::VarChar</span>(<span class="ident">n</span>) =&gt; {
-                <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">n</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">32</span> {
-                    <span class="ident">risky</span>()
-                } <span class="kw">else</span> {
-                    <span class="ident">not_castable</span>()
+            MySqlType::Binary(n) | MySqlType::Char(n) | MySqlType::VarBinary(n) | MySqlType::VarChar(n) =&gt; {
+                <span class="kw">if </span><span class="kw-2">*</span>n &gt;= <span class="number">32 </span>{
+                    risky()
+                } <span class="kw">else </span>{
+                    not_castable()
                 }
             }
 
-            <span class="comment">// To string</span>
-            <span class="ident">MySqlType::LongText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Text</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Blob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::LongBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumBlob</span> =&gt; <span class="ident">safe</span>(),
+            <span class="comment">// To string
+            </span>MySqlType::LongText
+            | MySqlType::MediumText
+            | MySqlType::Text
+            | MySqlType::TinyText
+            | MySqlType::Blob
+            | MySqlType::TinyBlob
+            | MySqlType::LongBlob
+            | MySqlType::MediumBlob =&gt; safe(),
 
-            <span class="ident">MySqlType::Time</span>(<span class="kw">_</span>) =&gt; <span class="ident">safe</span>(),
+            MySqlType::Time(<span class="kw">_</span>) =&gt; safe(),
 
-            <span class="ident">MySqlType::Timestamp</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">MySqlType::DateTime</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">MySqlType::Date</span> =&gt; <span class="ident">not_castable</span>(),
+            MySqlType::Timestamp(<span class="kw">_</span>) | MySqlType::DateTime(<span class="kw">_</span>) | MySqlType::Date =&gt; not_castable(),
         },
-        <span class="ident">MySqlType::Int</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-            <span class="ident">MySqlType::Int</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+        MySqlType::Int =&gt; <span class="kw">match </span>next {
+            MySqlType::Int =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
 
-            <span class="ident">MySqlType::BigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Binary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::VarBinary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Char</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::LongText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Text</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Blob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::LongBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">safe</span>(),
+            MySqlType::BigInt
+            | MySqlType::Binary(<span class="kw">_</span>)
+            | MySqlType::VarBinary(<span class="kw">_</span>)
+            | MySqlType::Char(<span class="kw">_</span>)
+            | MySqlType::LongText
+            | MySqlType::MediumText
+            | MySqlType::Text
+            | MySqlType::TinyBlob
+            | MySqlType::Blob
+            | MySqlType::MediumBlob
+            | MySqlType::LongBlob
+            | MySqlType::TinyText
+            | MySqlType::VarChar(<span class="kw">_</span>) =&gt; safe(),
 
-            <span class="ident">MySqlType::Bit</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">n</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">32</span> =&gt; <span class="ident">safe</span>(),
-            <span class="ident">MySqlType::Bit</span>(<span class="kw">_</span>) =&gt; <span class="ident">risky</span>(),
+            MySqlType::Bit(n) <span class="kw">if </span><span class="kw-2">*</span>n &gt;= <span class="number">32 </span>=&gt; safe(),
+            MySqlType::Bit(<span class="kw">_</span>) =&gt; risky(),
 
-            <span class="ident">MySqlType::TinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::SmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Year</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Float</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Double</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Decimal</span>(<span class="kw">_</span>) =&gt; <span class="ident">risky</span>(),
+            MySqlType::TinyInt
+            | MySqlType::SmallInt
+            | MySqlType::MediumInt
+            | MySqlType::Year
+            | MySqlType::Float
+            | MySqlType::Double
+            | MySqlType::Decimal(<span class="kw">_</span>) =&gt; risky(),
 
-            <span class="comment">// Signed to unsigned</span>
-            <span class="ident">MySqlType::UnsignedBigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedTinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedMediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedSmallInt</span> =&gt; <span class="ident">risky</span>(),
+            <span class="comment">// Signed to unsigned
+            </span>MySqlType::UnsignedBigInt
+            | MySqlType::UnsignedInt
+            | MySqlType::UnsignedTinyInt
+            | MySqlType::UnsignedMediumInt
+            | MySqlType::UnsignedSmallInt =&gt; risky(),
 
-            <span class="ident">MySqlType::Date</span>
-            <span class="op">|</span> <span class="ident">MySqlType::DateTime</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Timestamp</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Time</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Json</span> =&gt; <span class="ident">not_castable</span>(),
+            MySqlType::Date
+            | MySqlType::DateTime(<span class="kw">_</span>)
+            | MySqlType::Timestamp(<span class="kw">_</span>)
+            | MySqlType::Time(<span class="kw">_</span>)
+            | MySqlType::Json =&gt; not_castable(),
         },
-        <span class="ident">MySqlType::Json</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-            <span class="ident">MySqlType::Json</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+        MySqlType::Json =&gt; <span class="kw">match </span>next {
+            MySqlType::Json =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
 
-            <span class="comment">// To string</span>
-            <span class="ident">MySqlType::Binary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Char</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::TinyBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Blob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::LongBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::LongText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Text</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::VarBinary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">safe</span>(),
+            <span class="comment">// To string
+            </span>MySqlType::Binary(<span class="kw">_</span>)
+            | MySqlType::Char(<span class="kw">_</span>)
+            | MySqlType::TinyBlob
+            | MySqlType::Blob
+            | MySqlType::MediumBlob
+            | MySqlType::LongBlob
+            | MySqlType::LongText
+            | MySqlType::MediumText
+            | MySqlType::Text
+            | MySqlType::TinyText
+            | MySqlType::VarBinary(<span class="kw">_</span>)
+            | MySqlType::VarChar(<span class="kw">_</span>) =&gt; safe(),
 
-            <span class="ident">MySqlType::Time</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Date</span>
-            <span class="op">|</span> <span class="ident">MySqlType::DateTime</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Year</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Timestamp</span>(<span class="kw">_</span>) =&gt; <span class="ident">not_castable</span>(),
+            MySqlType::Time(<span class="kw">_</span>)
+            | MySqlType::Date
+            | MySqlType::DateTime(<span class="kw">_</span>)
+            | MySqlType::Year
+            | MySqlType::Timestamp(<span class="kw">_</span>) =&gt; not_castable(),
 
-            <span class="comment">// Numeric</span>
-            <span class="ident">MySqlType::BigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Bit</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Decimal</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Int</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::SmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedBigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedMediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedSmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedTinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Float</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Double</span> =&gt; <span class="ident">not_castable</span>(),
+            <span class="comment">// Numeric
+            </span>MySqlType::BigInt
+            | MySqlType::Bit(<span class="kw">_</span>)
+            | MySqlType::Decimal(<span class="kw">_</span>)
+            | MySqlType::Int
+            | MySqlType::MediumInt
+            | MySqlType::SmallInt
+            | MySqlType::TinyInt
+            | MySqlType::UnsignedBigInt
+            | MySqlType::UnsignedInt
+            | MySqlType::UnsignedMediumInt
+            | MySqlType::UnsignedSmallInt
+            | MySqlType::UnsignedTinyInt
+            | MySqlType::Float
+            | MySqlType::Double =&gt; not_castable(),
         },
-        <span class="ident">MySqlType::LongBlob</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-            <span class="ident">MySqlType::LongBlob</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+        MySqlType::LongBlob =&gt; <span class="kw">match </span>next {
+            MySqlType::LongBlob =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
 
-            <span class="ident">MySqlType::TinyBlob</span> <span class="op">|</span> <span class="ident">MySqlType::Blob</span> <span class="op">|</span> <span class="ident">MySqlType::MediumBlob</span> =&gt; <span class="ident">safe</span>(),
+            MySqlType::TinyBlob | MySqlType::Blob | MySqlType::MediumBlob =&gt; safe(),
 
-            <span class="ident">MySqlType::Binary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Bit</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Char</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::LongText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Text</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::VarBinary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">risky</span>(),
+            MySqlType::Binary(<span class="kw">_</span>)
+            | MySqlType::Bit(<span class="kw">_</span>)
+            | MySqlType::Char(<span class="kw">_</span>)
+            | MySqlType::LongText
+            | MySqlType::MediumText
+            | MySqlType::Text
+            | MySqlType::TinyText
+            | MySqlType::VarBinary(<span class="kw">_</span>)
+            | MySqlType::VarChar(<span class="kw">_</span>) =&gt; risky(),
 
-            <span class="ident">MySqlType::TinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::BigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Date</span>
-            <span class="op">|</span> <span class="ident">MySqlType::DateTime</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Decimal</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Double</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Float</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Int</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Json</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::SmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Time</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Timestamp</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedMediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedSmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedTinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedBigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Year</span> =&gt; <span class="ident">not_castable</span>(),
+            MySqlType::TinyInt
+            | MySqlType::BigInt
+            | MySqlType::Date
+            | MySqlType::DateTime(<span class="kw">_</span>)
+            | MySqlType::Decimal(<span class="kw">_</span>)
+            | MySqlType::Double
+            | MySqlType::Float
+            | MySqlType::Int
+            | MySqlType::Json
+            | MySqlType::MediumInt
+            | MySqlType::SmallInt
+            | MySqlType::Time(<span class="kw">_</span>)
+            | MySqlType::Timestamp(<span class="kw">_</span>)
+            | MySqlType::UnsignedInt
+            | MySqlType::UnsignedMediumInt
+            | MySqlType::UnsignedSmallInt
+            | MySqlType::UnsignedTinyInt
+            | MySqlType::UnsignedBigInt
+            | MySqlType::Year =&gt; not_castable(),
         },
-        <span class="ident">MySqlType::LongText</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-            <span class="ident">MySqlType::LongText</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+        MySqlType::LongText =&gt; <span class="kw">match </span>next {
+            MySqlType::LongText =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
 
-            <span class="comment">// Numeric types</span>
-            <span class="ident">MySqlType::BigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Int</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Decimal</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Float</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Double</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::SmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedBigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedMediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedSmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedTinyInt</span> =&gt; <span class="ident">risky</span>(),
+            <span class="comment">// Numeric types
+            </span>MySqlType::BigInt
+            | MySqlType::Int
+            | MySqlType::Decimal(<span class="kw">_</span>)
+            | MySqlType::Float
+            | MySqlType::Double
+            | MySqlType::MediumInt
+            | MySqlType::SmallInt
+            | MySqlType::TinyInt
+            | MySqlType::UnsignedBigInt
+            | MySqlType::UnsignedInt
+            | MySqlType::UnsignedMediumInt
+            | MySqlType::UnsignedSmallInt
+            | MySqlType::UnsignedTinyInt =&gt; risky(),
 
-            <span class="comment">// To string</span>
-            <span class="ident">MySqlType::Binary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Bit</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Char</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Blob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Text</span>
-            <span class="op">|</span> <span class="ident">MySqlType::LongBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::VarBinary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">safe</span>(),
+            <span class="comment">// To string
+            </span>MySqlType::Binary(<span class="kw">_</span>)
+            | MySqlType::Bit(<span class="kw">_</span>)
+            | MySqlType::Char(<span class="kw">_</span>)
+            | MySqlType::Blob
+            | MySqlType::MediumBlob
+            | MySqlType::Text
+            | MySqlType::LongBlob
+            | MySqlType::MediumText
+            | MySqlType::VarBinary(<span class="kw">_</span>)
+            | MySqlType::VarChar(<span class="kw">_</span>) =&gt; safe(),
 
-            <span class="ident">MySqlType::TinyText</span> <span class="op">|</span> <span class="ident">MySqlType::TinyBlob</span> =&gt; <span class="ident">risky</span>(),
+            MySqlType::TinyText | MySqlType::TinyBlob =&gt; risky(),
 
-            <span class="ident">MySqlType::Date</span>
-            <span class="op">|</span> <span class="ident">MySqlType::DateTime</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Timestamp</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Json</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Time</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Year</span> =&gt; <span class="ident">risky</span>(),
+            MySqlType::Date
+            | MySqlType::DateTime(<span class="kw">_</span>)
+            | MySqlType::Timestamp(<span class="kw">_</span>)
+            | MySqlType::Json
+            | MySqlType::Time(<span class="kw">_</span>)
+            | MySqlType::Year =&gt; risky(),
         },
-        <span class="ident">MySqlType::MediumBlob</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-            <span class="ident">MySqlType::MediumBlob</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+        MySqlType::MediumBlob =&gt; <span class="kw">match </span>next {
+            MySqlType::MediumBlob =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
 
-            <span class="ident">MySqlType::TinyBlob</span> <span class="op">|</span> <span class="ident">MySqlType::Blob</span> <span class="op">|</span> <span class="ident">MySqlType::LongBlob</span> =&gt; <span class="ident">safe</span>(),
+            MySqlType::TinyBlob | MySqlType::Blob | MySqlType::LongBlob =&gt; safe(),
 
-            <span class="ident">MySqlType::Binary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Bit</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Char</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::LongText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Text</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::VarBinary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">risky</span>(),
+            MySqlType::Binary(<span class="kw">_</span>)
+            | MySqlType::Bit(<span class="kw">_</span>)
+            | MySqlType::Char(<span class="kw">_</span>)
+            | MySqlType::LongText
+            | MySqlType::MediumText
+            | MySqlType::Text
+            | MySqlType::TinyText
+            | MySqlType::VarBinary(<span class="kw">_</span>)
+            | MySqlType::VarChar(<span class="kw">_</span>) =&gt; risky(),
 
-            <span class="ident">MySqlType::TinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::BigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Date</span>
-            <span class="op">|</span> <span class="ident">MySqlType::DateTime</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Decimal</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Double</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Float</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Int</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Json</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::SmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Time</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Timestamp</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedMediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedSmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedTinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedBigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Year</span> =&gt; <span class="ident">not_castable</span>(),
+            MySqlType::TinyInt
+            | MySqlType::BigInt
+            | MySqlType::Date
+            | MySqlType::DateTime(<span class="kw">_</span>)
+            | MySqlType::Decimal(<span class="kw">_</span>)
+            | MySqlType::Double
+            | MySqlType::Float
+            | MySqlType::Int
+            | MySqlType::Json
+            | MySqlType::MediumInt
+            | MySqlType::SmallInt
+            | MySqlType::Time(<span class="kw">_</span>)
+            | MySqlType::Timestamp(<span class="kw">_</span>)
+            | MySqlType::UnsignedInt
+            | MySqlType::UnsignedMediumInt
+            | MySqlType::UnsignedSmallInt
+            | MySqlType::UnsignedTinyInt
+            | MySqlType::UnsignedBigInt
+            | MySqlType::Year =&gt; not_castable(),
         },
-        <span class="ident">MySqlType::MediumInt</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-            <span class="ident">MySqlType::MediumInt</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+        MySqlType::MediumInt =&gt; <span class="kw">match </span>next {
+            MySqlType::MediumInt =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
 
-            <span class="ident">MySqlType::BigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Binary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::VarBinary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Char</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::LongText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Text</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Blob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::LongBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">safe</span>(),
+            MySqlType::BigInt
+            | MySqlType::Binary(<span class="kw">_</span>)
+            | MySqlType::VarBinary(<span class="kw">_</span>)
+            | MySqlType::Char(<span class="kw">_</span>)
+            | MySqlType::LongText
+            | MySqlType::MediumText
+            | MySqlType::Text
+            | MySqlType::TinyBlob
+            | MySqlType::Blob
+            | MySqlType::MediumBlob
+            | MySqlType::LongBlob
+            | MySqlType::TinyText
+            | MySqlType::VarChar(<span class="kw">_</span>) =&gt; safe(),
 
-            <span class="ident">MySqlType::Bit</span>(<span class="ident">n</span>) <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">n</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">32</span> =&gt; <span class="ident">safe</span>(),
-            <span class="ident">MySqlType::Bit</span>(<span class="kw">_</span>) =&gt; <span class="ident">risky</span>(),
+            MySqlType::Bit(n) <span class="kw">if </span><span class="kw-2">*</span>n &gt;= <span class="number">32 </span>=&gt; safe(),
+            MySqlType::Bit(<span class="kw">_</span>) =&gt; risky(),
 
-            <span class="ident">MySqlType::TinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::SmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Int</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Year</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Float</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Double</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Decimal</span>(<span class="kw">_</span>) =&gt; <span class="ident">risky</span>(),
+            MySqlType::TinyInt
+            | MySqlType::SmallInt
+            | MySqlType::Int
+            | MySqlType::Year
+            | MySqlType::Float
+            | MySqlType::Double
+            | MySqlType::Decimal(<span class="kw">_</span>) =&gt; risky(),
 
-            <span class="comment">// Signed to unsigned</span>
-            <span class="ident">MySqlType::UnsignedBigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedTinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedMediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedSmallInt</span> =&gt; <span class="ident">risky</span>(),
+            <span class="comment">// Signed to unsigned
+            </span>MySqlType::UnsignedBigInt
+            | MySqlType::UnsignedInt
+            | MySqlType::UnsignedTinyInt
+            | MySqlType::UnsignedMediumInt
+            | MySqlType::UnsignedSmallInt =&gt; risky(),
 
-            <span class="ident">MySqlType::Date</span>
-            <span class="op">|</span> <span class="ident">MySqlType::DateTime</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Timestamp</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Time</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Json</span> =&gt; <span class="ident">not_castable</span>(),
+            MySqlType::Date
+            | MySqlType::DateTime(<span class="kw">_</span>)
+            | MySqlType::Timestamp(<span class="kw">_</span>)
+            | MySqlType::Time(<span class="kw">_</span>)
+            | MySqlType::Json =&gt; not_castable(),
         },
-        <span class="ident">MySqlType::MediumText</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-            <span class="ident">MySqlType::MediumText</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+        MySqlType::MediumText =&gt; <span class="kw">match </span>next {
+            MySqlType::MediumText =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
 
-            <span class="comment">// Numeric types</span>
-            <span class="ident">MySqlType::BigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Int</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Decimal</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Float</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Double</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::SmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedBigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedMediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedSmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedTinyInt</span> =&gt; <span class="ident">risky</span>(),
+            <span class="comment">// Numeric types
+            </span>MySqlType::BigInt
+            | MySqlType::Int
+            | MySqlType::Decimal(<span class="kw">_</span>)
+            | MySqlType::Float
+            | MySqlType::Double
+            | MySqlType::MediumInt
+            | MySqlType::SmallInt
+            | MySqlType::TinyInt
+            | MySqlType::UnsignedBigInt
+            | MySqlType::UnsignedInt
+            | MySqlType::UnsignedMediumInt
+            | MySqlType::UnsignedSmallInt
+            | MySqlType::UnsignedTinyInt =&gt; risky(),
 
-            <span class="comment">// To string</span>
-            <span class="ident">MySqlType::Binary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Bit</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Char</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Blob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Text</span>
-            <span class="op">|</span> <span class="ident">MySqlType::LongBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::LongText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::VarBinary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">safe</span>(),
+            <span class="comment">// To string
+            </span>MySqlType::Binary(<span class="kw">_</span>)
+            | MySqlType::Bit(<span class="kw">_</span>)
+            | MySqlType::Char(<span class="kw">_</span>)
+            | MySqlType::Blob
+            | MySqlType::MediumBlob
+            | MySqlType::Text
+            | MySqlType::LongBlob
+            | MySqlType::LongText
+            | MySqlType::VarBinary(<span class="kw">_</span>)
+            | MySqlType::VarChar(<span class="kw">_</span>) =&gt; safe(),
 
-            <span class="ident">MySqlType::TinyText</span> <span class="op">|</span> <span class="ident">MySqlType::TinyBlob</span> =&gt; <span class="ident">risky</span>(),
+            MySqlType::TinyText | MySqlType::TinyBlob =&gt; risky(),
 
-            <span class="ident">MySqlType::Date</span>
-            <span class="op">|</span> <span class="ident">MySqlType::DateTime</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Timestamp</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Json</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Time</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Year</span> =&gt; <span class="ident">risky</span>(),
-        },
-
-        <span class="ident">MySqlType::SmallInt</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-            <span class="ident">MySqlType::SmallInt</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
-
-            <span class="comment">// To string</span>
-            <span class="ident">MySqlType::Binary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Bit</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Char</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::LongText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Blob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::LongBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Text</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::VarBinary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">risky</span>(),
-
-            <span class="comment">// Larger int types</span>
-            <span class="ident">MySqlType::MediumInt</span> <span class="op">|</span> <span class="ident">MySqlType::Int</span> <span class="op">|</span> <span class="ident">MySqlType::BigInt</span> <span class="op">|</span> <span class="ident">MySqlType::Time</span>(<span class="kw">_</span>) =&gt; <span class="ident">safe</span>(),
-
-            <span class="ident">MySqlType::TinyInt</span> <span class="op">|</span> <span class="ident">MySqlType::Float</span> <span class="op">|</span> <span class="ident">MySqlType::Double</span> <span class="op">|</span> <span class="ident">MySqlType::Year</span> =&gt; <span class="ident">risky</span>(),
-
-            <span class="comment">// Signed to unsigned</span>
-            <span class="ident">MySqlType::UnsignedBigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedTinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedMediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedSmallInt</span> =&gt; <span class="ident">risky</span>(),
-
-            <span class="ident">MySqlType::Decimal</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Date</span>
-            <span class="op">|</span> <span class="ident">MySqlType::DateTime</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Timestamp</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Json</span> =&gt; <span class="ident">not_castable</span>(),
+            MySqlType::Date
+            | MySqlType::DateTime(<span class="kw">_</span>)
+            | MySqlType::Timestamp(<span class="kw">_</span>)
+            | MySqlType::Json
+            | MySqlType::Time(<span class="kw">_</span>)
+            | MySqlType::Year =&gt; risky(),
         },
 
-        <span class="ident">MySqlType::Text</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-            <span class="ident">MySqlType::Text</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+        MySqlType::SmallInt =&gt; <span class="kw">match </span>next {
+            MySqlType::SmallInt =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
 
-            <span class="comment">// Numeric types</span>
-            <span class="ident">MySqlType::BigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Int</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Decimal</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Float</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Double</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::SmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedBigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedMediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedSmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedTinyInt</span> =&gt; <span class="ident">risky</span>(),
+            <span class="comment">// To string
+            </span>MySqlType::Binary(<span class="kw">_</span>)
+            | MySqlType::Bit(<span class="kw">_</span>)
+            | MySqlType::Char(<span class="kw">_</span>)
+            | MySqlType::LongText
+            | MySqlType::MediumText
+            | MySqlType::Blob
+            | MySqlType::LongBlob
+            | MySqlType::MediumBlob
+            | MySqlType::TinyBlob
+            | MySqlType::Text
+            | MySqlType::TinyText
+            | MySqlType::VarBinary(<span class="kw">_</span>)
+            | MySqlType::VarChar(<span class="kw">_</span>) =&gt; risky(),
 
-            <span class="comment">// To string</span>
-            <span class="ident">MySqlType::Binary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Bit</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Char</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Blob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::LongBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::LongText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::VarBinary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">safe</span>(),
+            <span class="comment">// Larger int types
+            </span>MySqlType::MediumInt | MySqlType::Int | MySqlType::BigInt | MySqlType::Time(<span class="kw">_</span>) =&gt; safe(),
 
-            <span class="ident">MySqlType::TinyText</span> <span class="op">|</span> <span class="ident">MySqlType::TinyBlob</span> =&gt; <span class="ident">risky</span>(),
+            MySqlType::TinyInt | MySqlType::Float | MySqlType::Double | MySqlType::Year =&gt; risky(),
 
-            <span class="ident">MySqlType::Date</span>
-            <span class="op">|</span> <span class="ident">MySqlType::DateTime</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Timestamp</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Json</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Time</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Year</span> =&gt; <span class="ident">risky</span>(),
+            <span class="comment">// Signed to unsigned
+            </span>MySqlType::UnsignedBigInt
+            | MySqlType::UnsignedInt
+            | MySqlType::UnsignedTinyInt
+            | MySqlType::UnsignedMediumInt
+            | MySqlType::UnsignedSmallInt =&gt; risky(),
+
+            MySqlType::Decimal(<span class="kw">_</span>)
+            | MySqlType::Date
+            | MySqlType::DateTime(<span class="kw">_</span>)
+            | MySqlType::Timestamp(<span class="kw">_</span>)
+            | MySqlType::Json =&gt; not_castable(),
         },
 
-        <span class="ident">MySqlType::Time</span>(<span class="ident">n</span>) =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-            <span class="ident">MySqlType::Time</span>(<span class="ident">m</span>) <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="ident">m</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
-            <span class="ident">MySqlType::Time</span>(<span class="kw">_</span>) =&gt; <span class="ident">safe</span>(),
+        MySqlType::Text =&gt; <span class="kw">match </span>next {
+            MySqlType::Text =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
 
-            <span class="comment">// To string</span>
-            <span class="ident">MySqlType::Binary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Char</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::LongText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Text</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Blob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Decimal</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::TinyBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::LongBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::VarBinary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">safe</span>(),
+            <span class="comment">// Numeric types
+            </span>MySqlType::BigInt
+            | MySqlType::Int
+            | MySqlType::Decimal(<span class="kw">_</span>)
+            | MySqlType::Float
+            | MySqlType::Double
+            | MySqlType::MediumInt
+            | MySqlType::SmallInt
+            | MySqlType::TinyInt
+            | MySqlType::UnsignedBigInt
+            | MySqlType::UnsignedInt
+            | MySqlType::UnsignedMediumInt
+            | MySqlType::UnsignedSmallInt
+            | MySqlType::UnsignedTinyInt =&gt; risky(),
 
-            <span class="ident">MySqlType::Date</span> <span class="op">|</span> <span class="ident">MySqlType::DateTime</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">MySqlType::Timestamp</span>(<span class="kw">_</span>) =&gt; <span class="ident">risky</span>(),
+            <span class="comment">// To string
+            </span>MySqlType::Binary(<span class="kw">_</span>)
+            | MySqlType::Bit(<span class="kw">_</span>)
+            | MySqlType::Char(<span class="kw">_</span>)
+            | MySqlType::Blob
+            | MySqlType::MediumBlob
+            | MySqlType::MediumText
+            | MySqlType::LongBlob
+            | MySqlType::LongText
+            | MySqlType::VarBinary(<span class="kw">_</span>)
+            | MySqlType::VarChar(<span class="kw">_</span>) =&gt; safe(),
 
-            <span class="ident">MySqlType::Json</span> <span class="op">|</span> <span class="ident">MySqlType::Year</span> =&gt; <span class="ident">not_castable</span>(),
+            MySqlType::TinyText | MySqlType::TinyBlob =&gt; risky(),
 
-            <span class="comment">// To numeric</span>
-            <span class="ident">MySqlType::BigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Bit</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Int</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Float</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Double</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedTinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::SmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedBigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedMediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedSmallInt</span> =&gt; <span class="ident">safe</span>(),
-        },
-        <span class="ident">MySqlType::Timestamp</span>(<span class="ident">n</span>) =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-            <span class="ident">MySqlType::Timestamp</span>(<span class="ident">m</span>) <span class="kw">if</span> <span class="ident">n</span> <span class="op">&lt;</span> <span class="ident">m</span> =&gt; <span class="ident">safe</span>(),
-            <span class="ident">MySqlType::Timestamp</span>(<span class="ident">m</span>) <span class="kw">if</span> <span class="ident">n</span> <span class="op">&gt;</span> <span class="ident">m</span> =&gt; <span class="ident">risky</span>(),
-            <span class="ident">MySqlType::Timestamp</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
-
-            <span class="comment">// To string</span>
-            <span class="ident">MySqlType::Binary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Char</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::LongText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Text</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Blob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::LongBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::VarBinary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">safe</span>(),
-
-            <span class="comment">// Numeric types</span>
-            <span class="ident">MySqlType::BigInt</span> <span class="op">|</span> <span class="ident">MySqlType::UnsignedBigInt</span> <span class="op">|</span> <span class="ident">MySqlType::Bit</span>(<span class="number">64</span>) =&gt; <span class="ident">safe</span>(),
-            <span class="ident">MySqlType::Bit</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Double</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Float</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedTinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Decimal</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::TinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Int</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Json</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::SmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedSmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedMediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Year</span> =&gt; <span class="ident">not_castable</span>(),
-
-            <span class="ident">MySqlType::DateTime</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">MySqlType::Time</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">MySqlType::Date</span> =&gt; <span class="ident">safe</span>(),
+            MySqlType::Date
+            | MySqlType::DateTime(<span class="kw">_</span>)
+            | MySqlType::Timestamp(<span class="kw">_</span>)
+            | MySqlType::Json
+            | MySqlType::Time(<span class="kw">_</span>)
+            | MySqlType::Year =&gt; risky(),
         },
 
-        <span class="ident">MySqlType::TinyBlob</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-            <span class="ident">MySqlType::TinyBlob</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+        MySqlType::Time(n) =&gt; <span class="kw">match </span>next {
+            MySqlType::Time(m) <span class="kw">if </span>n == m =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
+            MySqlType::Time(<span class="kw">_</span>) =&gt; safe(),
 
-            <span class="ident">MySqlType::LongBlob</span> <span class="op">|</span> <span class="ident">MySqlType::Blob</span> <span class="op">|</span> <span class="ident">MySqlType::MediumBlob</span> =&gt; <span class="ident">safe</span>(),
+            <span class="comment">// To string
+            </span>MySqlType::Binary(<span class="kw">_</span>)
+            | MySqlType::Char(<span class="kw">_</span>)
+            | MySqlType::LongText
+            | MySqlType::MediumText
+            | MySqlType::Text
+            | MySqlType::TinyText
+            | MySqlType::Blob
+            | MySqlType::Decimal(<span class="kw">_</span>)
+            | MySqlType::TinyBlob
+            | MySqlType::LongBlob
+            | MySqlType::MediumBlob
+            | MySqlType::VarBinary(<span class="kw">_</span>)
+            | MySqlType::VarChar(<span class="kw">_</span>) =&gt; safe(),
 
-            <span class="ident">MySqlType::Binary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Bit</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Char</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::LongText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Text</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::VarBinary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">risky</span>(),
+            MySqlType::Date | MySqlType::DateTime(<span class="kw">_</span>) | MySqlType::Timestamp(<span class="kw">_</span>) =&gt; risky(),
 
-            <span class="ident">MySqlType::TinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::BigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Date</span>
-            <span class="op">|</span> <span class="ident">MySqlType::DateTime</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Decimal</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Double</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Float</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Int</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Json</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::SmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Time</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Timestamp</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedMediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedSmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedTinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedBigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Year</span> =&gt; <span class="ident">not_castable</span>(),
+            MySqlType::Json | MySqlType::Year =&gt; not_castable(),
+
+            <span class="comment">// To numeric
+            </span>MySqlType::BigInt
+            | MySqlType::Bit(<span class="kw">_</span>)
+            | MySqlType::Int
+            | MySqlType::Float
+            | MySqlType::Double
+            | MySqlType::TinyInt
+            | MySqlType::UnsignedTinyInt
+            | MySqlType::MediumInt
+            | MySqlType::SmallInt
+            | MySqlType::UnsignedBigInt
+            | MySqlType::UnsignedInt
+            | MySqlType::UnsignedMediumInt
+            | MySqlType::UnsignedSmallInt =&gt; safe(),
+        },
+        MySqlType::Timestamp(n) =&gt; <span class="kw">match </span>next {
+            MySqlType::Timestamp(m) <span class="kw">if </span>n &lt; m =&gt; safe(),
+            MySqlType::Timestamp(m) <span class="kw">if </span>n &gt; m =&gt; risky(),
+            MySqlType::Timestamp(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
+
+            <span class="comment">// To string
+            </span>MySqlType::Binary(<span class="kw">_</span>)
+            | MySqlType::Char(<span class="kw">_</span>)
+            | MySqlType::LongText
+            | MySqlType::MediumText
+            | MySqlType::Text
+            | MySqlType::TinyText
+            | MySqlType::Blob
+            | MySqlType::TinyBlob
+            | MySqlType::LongBlob
+            | MySqlType::MediumBlob
+            | MySqlType::VarBinary(<span class="kw">_</span>)
+            | MySqlType::VarChar(<span class="kw">_</span>) =&gt; safe(),
+
+            <span class="comment">// Numeric types
+            </span>MySqlType::BigInt | MySqlType::UnsignedBigInt | MySqlType::Bit(<span class="number">64</span>) =&gt; safe(),
+            MySqlType::Bit(<span class="kw">_</span>)
+            | MySqlType::Double
+            | MySqlType::Float
+            | MySqlType::UnsignedTinyInt
+            | MySqlType::Decimal(<span class="kw">_</span>)
+            | MySqlType::TinyInt
+            | MySqlType::Int
+            | MySqlType::Json
+            | MySqlType::UnsignedInt
+            | MySqlType::SmallInt
+            | MySqlType::UnsignedSmallInt
+            | MySqlType::MediumInt
+            | MySqlType::UnsignedMediumInt
+            | MySqlType::Year =&gt; not_castable(),
+
+            MySqlType::DateTime(<span class="kw">_</span>) | MySqlType::Time(<span class="kw">_</span>) | MySqlType::Date =&gt; safe(),
         },
 
-        <span class="ident">MySqlType::TinyInt</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-            <span class="ident">MySqlType::TinyInt</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+        MySqlType::TinyBlob =&gt; <span class="kw">match </span>next {
+            MySqlType::TinyBlob =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
 
-            <span class="comment">// To string</span>
-            <span class="ident">MySqlType::Binary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Bit</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Char</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::LongText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Blob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::LongBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Text</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::VarBinary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">risky</span>(),
+            MySqlType::LongBlob | MySqlType::Blob | MySqlType::MediumBlob =&gt; safe(),
 
-            <span class="comment">// Larger int types</span>
-            <span class="ident">MySqlType::SmallInt</span> <span class="op">|</span> <span class="ident">MySqlType::MediumInt</span> <span class="op">|</span> <span class="ident">MySqlType::Int</span> <span class="op">|</span> <span class="ident">MySqlType::BigInt</span> <span class="op">|</span> <span class="ident">MySqlType::Time</span>(<span class="kw">_</span>) =&gt; {
-                <span class="ident">safe</span>()
+            MySqlType::Binary(<span class="kw">_</span>)
+            | MySqlType::Bit(<span class="kw">_</span>)
+            | MySqlType::Char(<span class="kw">_</span>)
+            | MySqlType::LongText
+            | MySqlType::MediumText
+            | MySqlType::Text
+            | MySqlType::TinyText
+            | MySqlType::VarBinary(<span class="kw">_</span>)
+            | MySqlType::VarChar(<span class="kw">_</span>) =&gt; risky(),
+
+            MySqlType::TinyInt
+            | MySqlType::BigInt
+            | MySqlType::Date
+            | MySqlType::DateTime(<span class="kw">_</span>)
+            | MySqlType::Decimal(<span class="kw">_</span>)
+            | MySqlType::Double
+            | MySqlType::Float
+            | MySqlType::Int
+            | MySqlType::Json
+            | MySqlType::MediumInt
+            | MySqlType::SmallInt
+            | MySqlType::Time(<span class="kw">_</span>)
+            | MySqlType::Timestamp(<span class="kw">_</span>)
+            | MySqlType::UnsignedInt
+            | MySqlType::UnsignedMediumInt
+            | MySqlType::UnsignedSmallInt
+            | MySqlType::UnsignedTinyInt
+            | MySqlType::UnsignedBigInt
+            | MySqlType::Year =&gt; not_castable(),
+        },
+
+        MySqlType::TinyInt =&gt; <span class="kw">match </span>next {
+            MySqlType::TinyInt =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
+
+            <span class="comment">// To string
+            </span>MySqlType::Binary(<span class="kw">_</span>)
+            | MySqlType::Bit(<span class="kw">_</span>)
+            | MySqlType::Char(<span class="kw">_</span>)
+            | MySqlType::LongText
+            | MySqlType::MediumText
+            | MySqlType::Blob
+            | MySqlType::LongBlob
+            | MySqlType::MediumBlob
+            | MySqlType::TinyBlob
+            | MySqlType::Text
+            | MySqlType::TinyText
+            | MySqlType::VarBinary(<span class="kw">_</span>)
+            | MySqlType::VarChar(<span class="kw">_</span>) =&gt; risky(),
+
+            <span class="comment">// Larger int types
+            </span>MySqlType::SmallInt | MySqlType::MediumInt | MySqlType::Int | MySqlType::BigInt | MySqlType::Time(<span class="kw">_</span>) =&gt; {
+                safe()
             }
 
-            <span class="ident">MySqlType::Float</span> <span class="op">|</span> <span class="ident">MySqlType::Double</span> <span class="op">|</span> <span class="ident">MySqlType::Year</span> =&gt; <span class="ident">risky</span>(),
+            MySqlType::Float | MySqlType::Double | MySqlType::Year =&gt; risky(),
 
-            <span class="comment">// Signed to unsigned</span>
-            <span class="ident">MySqlType::UnsignedBigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedTinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedMediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedSmallInt</span> =&gt; <span class="ident">risky</span>(),
+            <span class="comment">// Signed to unsigned
+            </span>MySqlType::UnsignedBigInt
+            | MySqlType::UnsignedInt
+            | MySqlType::UnsignedTinyInt
+            | MySqlType::UnsignedMediumInt
+            | MySqlType::UnsignedSmallInt =&gt; risky(),
 
-            <span class="ident">MySqlType::Decimal</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Date</span>
-            <span class="op">|</span> <span class="ident">MySqlType::DateTime</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Timestamp</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Json</span> =&gt; <span class="ident">not_castable</span>(),
+            MySqlType::Decimal(<span class="kw">_</span>)
+            | MySqlType::Date
+            | MySqlType::DateTime(<span class="kw">_</span>)
+            | MySqlType::Timestamp(<span class="kw">_</span>)
+            | MySqlType::Json =&gt; not_castable(),
         },
 
-        <span class="ident">MySqlType::TinyText</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-            <span class="ident">MySqlType::TinyText</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+        MySqlType::TinyText =&gt; <span class="kw">match </span>next {
+            MySqlType::TinyText =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
 
-            <span class="comment">// Numeric types</span>
-            <span class="ident">MySqlType::BigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Int</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Decimal</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Float</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Double</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::SmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedBigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedMediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedSmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedTinyInt</span> =&gt; <span class="ident">risky</span>(),
+            <span class="comment">// Numeric types
+            </span>MySqlType::BigInt
+            | MySqlType::Int
+            | MySqlType::Decimal(<span class="kw">_</span>)
+            | MySqlType::Float
+            | MySqlType::Double
+            | MySqlType::MediumInt
+            | MySqlType::SmallInt
+            | MySqlType::TinyInt
+            | MySqlType::UnsignedBigInt
+            | MySqlType::UnsignedInt
+            | MySqlType::UnsignedMediumInt
+            | MySqlType::UnsignedSmallInt
+            | MySqlType::UnsignedTinyInt =&gt; risky(),
 
-            <span class="comment">// To string</span>
-            <span class="ident">MySqlType::Binary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Bit</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Char</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Blob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::LongBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::LongText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Text</span>
-            <span class="op">|</span> <span class="ident">MySqlType::VarBinary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">safe</span>(),
+            <span class="comment">// To string
+            </span>MySqlType::Binary(<span class="kw">_</span>)
+            | MySqlType::Bit(<span class="kw">_</span>)
+            | MySqlType::Char(<span class="kw">_</span>)
+            | MySqlType::Blob
+            | MySqlType::MediumBlob
+            | MySqlType::MediumText
+            | MySqlType::LongBlob
+            | MySqlType::LongText
+            | MySqlType::Text
+            | MySqlType::VarBinary(<span class="kw">_</span>)
+            | MySqlType::VarChar(<span class="kw">_</span>) =&gt; safe(),
 
-            <span class="ident">MySqlType::TinyBlob</span> =&gt; <span class="ident">risky</span>(),
+            MySqlType::TinyBlob =&gt; risky(),
 
-            <span class="ident">MySqlType::Date</span>
-            <span class="op">|</span> <span class="ident">MySqlType::DateTime</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Timestamp</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Json</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Time</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Year</span> =&gt; <span class="ident">risky</span>(),
+            MySqlType::Date
+            | MySqlType::DateTime(<span class="kw">_</span>)
+            | MySqlType::Timestamp(<span class="kw">_</span>)
+            | MySqlType::Json
+            | MySqlType::Time(<span class="kw">_</span>)
+            | MySqlType::Year =&gt; risky(),
         },
 
-        <span class="ident">MySqlType::UnsignedBigInt</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-            <span class="ident">MySqlType::UnsignedBigInt</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+        MySqlType::UnsignedBigInt =&gt; <span class="kw">match </span>next {
+            MySqlType::UnsignedBigInt =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
 
-            <span class="comment">// To string</span>
-            <span class="ident">MySqlType::Binary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Char</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::LongText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Blob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::LongBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Text</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::VarBinary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">risky</span>(),
+            <span class="comment">// To string
+            </span>MySqlType::Binary(<span class="kw">_</span>)
+            | MySqlType::Char(<span class="kw">_</span>)
+            | MySqlType::LongText
+            | MySqlType::MediumText
+            | MySqlType::Blob
+            | MySqlType::LongBlob
+            | MySqlType::MediumBlob
+            | MySqlType::TinyBlob
+            | MySqlType::Text
+            | MySqlType::TinyText
+            | MySqlType::VarBinary(<span class="kw">_</span>)
+            | MySqlType::VarChar(<span class="kw">_</span>) =&gt; risky(),
 
-            <span class="comment">// Numeric types</span>
-            <span class="ident">MySqlType::BigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Bit</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Int</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Float</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Double</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::SmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedMediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedSmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedTinyInt</span> =&gt; <span class="ident">risky</span>(),
+            <span class="comment">// Numeric types
+            </span>MySqlType::BigInt
+            | MySqlType::Bit(<span class="kw">_</span>)
+            | MySqlType::Int
+            | MySqlType::Float
+            | MySqlType::Double
+            | MySqlType::MediumInt
+            | MySqlType::SmallInt
+            | MySqlType::TinyInt
+            | MySqlType::UnsignedInt
+            | MySqlType::UnsignedMediumInt
+            | MySqlType::UnsignedSmallInt
+            | MySqlType::UnsignedTinyInt =&gt; risky(),
 
-            <span class="ident">MySqlType::Time</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">MySqlType::Year</span> =&gt; <span class="ident">risky</span>(),
+            MySqlType::Time(<span class="kw">_</span>) | MySqlType::Year =&gt; risky(),
 
-            <span class="ident">MySqlType::Decimal</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Date</span>
-            <span class="op">|</span> <span class="ident">MySqlType::DateTime</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Timestamp</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Json</span> =&gt; <span class="ident">not_castable</span>(),
+            MySqlType::Decimal(<span class="kw">_</span>)
+            | MySqlType::Date
+            | MySqlType::DateTime(<span class="kw">_</span>)
+            | MySqlType::Timestamp(<span class="kw">_</span>)
+            | MySqlType::Json =&gt; not_castable(),
         },
 
-        <span class="ident">MySqlType::UnsignedInt</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-            <span class="ident">MySqlType::UnsignedInt</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+        MySqlType::UnsignedInt =&gt; <span class="kw">match </span>next {
+            MySqlType::UnsignedInt =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
 
-            <span class="comment">// To string</span>
-            <span class="ident">MySqlType::Binary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Char</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::LongText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Blob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::LongBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Text</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::VarBinary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">risky</span>(),
+            <span class="comment">// To string
+            </span>MySqlType::Binary(<span class="kw">_</span>)
+            | MySqlType::Char(<span class="kw">_</span>)
+            | MySqlType::LongText
+            | MySqlType::MediumText
+            | MySqlType::Blob
+            | MySqlType::LongBlob
+            | MySqlType::MediumBlob
+            | MySqlType::TinyBlob
+            | MySqlType::Text
+            | MySqlType::TinyText
+            | MySqlType::VarBinary(<span class="kw">_</span>)
+            | MySqlType::VarChar(<span class="kw">_</span>) =&gt; risky(),
 
-            <span class="comment">// Numeric types</span>
-            <span class="ident">MySqlType::BigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Bit</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Int</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Float</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Double</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::SmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedBigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedMediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedSmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedTinyInt</span> =&gt; <span class="ident">risky</span>(),
+            <span class="comment">// Numeric types
+            </span>MySqlType::BigInt
+            | MySqlType::Bit(<span class="kw">_</span>)
+            | MySqlType::Int
+            | MySqlType::Float
+            | MySqlType::Double
+            | MySqlType::MediumInt
+            | MySqlType::SmallInt
+            | MySqlType::TinyInt
+            | MySqlType::UnsignedBigInt
+            | MySqlType::UnsignedMediumInt
+            | MySqlType::UnsignedSmallInt
+            | MySqlType::UnsignedTinyInt =&gt; risky(),
 
-            <span class="ident">MySqlType::Time</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">MySqlType::Year</span> =&gt; <span class="ident">risky</span>(),
+            MySqlType::Time(<span class="kw">_</span>) | MySqlType::Year =&gt; risky(),
 
-            <span class="ident">MySqlType::Decimal</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Date</span>
-            <span class="op">|</span> <span class="ident">MySqlType::DateTime</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Timestamp</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Json</span> =&gt; <span class="ident">not_castable</span>(),
+            MySqlType::Decimal(<span class="kw">_</span>)
+            | MySqlType::Date
+            | MySqlType::DateTime(<span class="kw">_</span>)
+            | MySqlType::Timestamp(<span class="kw">_</span>)
+            | MySqlType::Json =&gt; not_castable(),
         },
-        <span class="ident">MySqlType::UnsignedMediumInt</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-            <span class="ident">MySqlType::UnsignedMediumInt</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+        MySqlType::UnsignedMediumInt =&gt; <span class="kw">match </span>next {
+            MySqlType::UnsignedMediumInt =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
 
-            <span class="comment">// To string</span>
-            <span class="ident">MySqlType::Binary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Char</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::LongText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Blob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::LongBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Text</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::VarBinary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">risky</span>(),
+            <span class="comment">// To string
+            </span>MySqlType::Binary(<span class="kw">_</span>)
+            | MySqlType::Char(<span class="kw">_</span>)
+            | MySqlType::LongText
+            | MySqlType::MediumText
+            | MySqlType::Blob
+            | MySqlType::LongBlob
+            | MySqlType::MediumBlob
+            | MySqlType::TinyBlob
+            | MySqlType::Text
+            | MySqlType::TinyText
+            | MySqlType::VarBinary(<span class="kw">_</span>)
+            | MySqlType::VarChar(<span class="kw">_</span>) =&gt; risky(),
 
-            <span class="comment">// Numeric types</span>
-            <span class="ident">MySqlType::BigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Bit</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Int</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Float</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Double</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::SmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedBigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedSmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedTinyInt</span> =&gt; <span class="ident">risky</span>(),
+            <span class="comment">// Numeric types
+            </span>MySqlType::BigInt
+            | MySqlType::Bit(<span class="kw">_</span>)
+            | MySqlType::Int
+            | MySqlType::Float
+            | MySqlType::Double
+            | MySqlType::MediumInt
+            | MySqlType::SmallInt
+            | MySqlType::TinyInt
+            | MySqlType::UnsignedInt
+            | MySqlType::UnsignedBigInt
+            | MySqlType::UnsignedSmallInt
+            | MySqlType::UnsignedTinyInt =&gt; risky(),
 
-            <span class="ident">MySqlType::Time</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">MySqlType::Year</span> =&gt; <span class="ident">risky</span>(),
+            MySqlType::Time(<span class="kw">_</span>) | MySqlType::Year =&gt; risky(),
 
-            <span class="ident">MySqlType::Decimal</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Date</span>
-            <span class="op">|</span> <span class="ident">MySqlType::DateTime</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Timestamp</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Json</span> =&gt; <span class="ident">not_castable</span>(),
+            MySqlType::Decimal(<span class="kw">_</span>)
+            | MySqlType::Date
+            | MySqlType::DateTime(<span class="kw">_</span>)
+            | MySqlType::Timestamp(<span class="kw">_</span>)
+            | MySqlType::Json =&gt; not_castable(),
         },
-        <span class="ident">MySqlType::UnsignedSmallInt</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-            <span class="ident">MySqlType::UnsignedSmallInt</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+        MySqlType::UnsignedSmallInt =&gt; <span class="kw">match </span>next {
+            MySqlType::UnsignedSmallInt =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
 
-            <span class="comment">// To string</span>
-            <span class="ident">MySqlType::Binary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Char</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::LongText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Blob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::LongBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Text</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::VarBinary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">risky</span>(),
+            <span class="comment">// To string
+            </span>MySqlType::Binary(<span class="kw">_</span>)
+            | MySqlType::Char(<span class="kw">_</span>)
+            | MySqlType::LongText
+            | MySqlType::MediumText
+            | MySqlType::Blob
+            | MySqlType::LongBlob
+            | MySqlType::MediumBlob
+            | MySqlType::TinyBlob
+            | MySqlType::Text
+            | MySqlType::TinyText
+            | MySqlType::VarBinary(<span class="kw">_</span>)
+            | MySqlType::VarChar(<span class="kw">_</span>) =&gt; risky(),
 
-            <span class="ident">MySqlType::UnsignedInt</span> <span class="op">|</span> <span class="ident">MySqlType::UnsignedMediumInt</span> <span class="op">|</span> <span class="ident">MySqlType::UnsignedBigInt</span> =&gt; <span class="ident">safe</span>(),
+            MySqlType::UnsignedInt | MySqlType::UnsignedMediumInt | MySqlType::UnsignedBigInt =&gt; safe(),
 
-            <span class="comment">// Numeric types</span>
-            <span class="ident">MySqlType::BigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Bit</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Int</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Float</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Double</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::SmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedTinyInt</span> =&gt; <span class="ident">risky</span>(),
+            <span class="comment">// Numeric types
+            </span>MySqlType::BigInt
+            | MySqlType::Bit(<span class="kw">_</span>)
+            | MySqlType::Int
+            | MySqlType::Float
+            | MySqlType::Double
+            | MySqlType::MediumInt
+            | MySqlType::SmallInt
+            | MySqlType::TinyInt
+            | MySqlType::UnsignedTinyInt =&gt; risky(),
 
-            <span class="ident">MySqlType::Time</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">MySqlType::Year</span> =&gt; <span class="ident">risky</span>(),
+            MySqlType::Time(<span class="kw">_</span>) | MySqlType::Year =&gt; risky(),
 
-            <span class="ident">MySqlType::Decimal</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Date</span>
-            <span class="op">|</span> <span class="ident">MySqlType::DateTime</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Timestamp</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Json</span> =&gt; <span class="ident">not_castable</span>(),
+            MySqlType::Decimal(<span class="kw">_</span>)
+            | MySqlType::Date
+            | MySqlType::DateTime(<span class="kw">_</span>)
+            | MySqlType::Timestamp(<span class="kw">_</span>)
+            | MySqlType::Json =&gt; not_castable(),
         },
-        <span class="ident">MySqlType::UnsignedTinyInt</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-            <span class="ident">MySqlType::UnsignedTinyInt</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+        MySqlType::UnsignedTinyInt =&gt; <span class="kw">match </span>next {
+            MySqlType::UnsignedTinyInt =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
 
-            <span class="comment">// To string</span>
-            <span class="ident">MySqlType::Binary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Char</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::LongText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Blob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::LongBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Text</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::VarBinary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">risky</span>(),
+            <span class="comment">// To string
+            </span>MySqlType::Binary(<span class="kw">_</span>)
+            | MySqlType::Char(<span class="kw">_</span>)
+            | MySqlType::LongText
+            | MySqlType::MediumText
+            | MySqlType::Blob
+            | MySqlType::LongBlob
+            | MySqlType::MediumBlob
+            | MySqlType::TinyBlob
+            | MySqlType::Text
+            | MySqlType::TinyText
+            | MySqlType::VarBinary(<span class="kw">_</span>)
+            | MySqlType::VarChar(<span class="kw">_</span>) =&gt; risky(),
 
-            <span class="ident">MySqlType::UnsignedInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedMediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedBigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedSmallInt</span> =&gt; <span class="ident">safe</span>(),
+            MySqlType::UnsignedInt
+            | MySqlType::UnsignedMediumInt
+            | MySqlType::UnsignedBigInt
+            | MySqlType::UnsignedSmallInt =&gt; safe(),
 
-            <span class="comment">// Numeric types</span>
-            <span class="ident">MySqlType::BigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Bit</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Int</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Float</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Double</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::SmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyInt</span> =&gt; <span class="ident">risky</span>(),
+            <span class="comment">// Numeric types
+            </span>MySqlType::BigInt
+            | MySqlType::Bit(<span class="kw">_</span>)
+            | MySqlType::Int
+            | MySqlType::Float
+            | MySqlType::Double
+            | MySqlType::MediumInt
+            | MySqlType::SmallInt
+            | MySqlType::TinyInt =&gt; risky(),
 
-            <span class="ident">MySqlType::Time</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">MySqlType::Year</span> =&gt; <span class="ident">risky</span>(),
+            MySqlType::Time(<span class="kw">_</span>) | MySqlType::Year =&gt; risky(),
 
-            <span class="ident">MySqlType::Decimal</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Date</span>
-            <span class="op">|</span> <span class="ident">MySqlType::DateTime</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Timestamp</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Json</span> =&gt; <span class="ident">not_castable</span>(),
+            MySqlType::Decimal(<span class="kw">_</span>)
+            | MySqlType::Date
+            | MySqlType::DateTime(<span class="kw">_</span>)
+            | MySqlType::Timestamp(<span class="kw">_</span>)
+            | MySqlType::Json =&gt; not_castable(),
         },
-        <span class="ident">MySqlType::VarBinary</span>(<span class="ident">n</span>) =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-            <span class="ident">MySqlType::VarBinary</span>(<span class="ident">m</span>) <span class="kw">if</span> <span class="ident">n</span> <span class="op">&gt;</span> <span class="ident">m</span> =&gt; <span class="ident">risky</span>(),
-            <span class="ident">MySqlType::VarBinary</span>(<span class="ident">m</span>) <span class="kw">if</span> <span class="ident">n</span> <span class="op">&lt;</span> <span class="ident">m</span> =&gt; <span class="ident">safe</span>(),
-            <span class="ident">MySqlType::VarBinary</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+        MySqlType::VarBinary(n) =&gt; <span class="kw">match </span>next {
+            MySqlType::VarBinary(m) <span class="kw">if </span>n &gt; m =&gt; risky(),
+            MySqlType::VarBinary(m) <span class="kw">if </span>n &lt; m =&gt; safe(),
+            MySqlType::VarBinary(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
 
-            <span class="ident">MySqlType::LongBlob</span> <span class="op">|</span> <span class="ident">MySqlType::Blob</span> <span class="op">|</span> <span class="ident">MySqlType::MediumBlob</span> =&gt; <span class="ident">safe</span>(),
-            <span class="ident">MySqlType::Binary</span>(<span class="ident">m</span>) <span class="kw">if</span> <span class="ident">m</span> <span class="op">&gt;</span> <span class="ident">n</span> =&gt; <span class="ident">safe</span>(),
+            MySqlType::LongBlob | MySqlType::Blob | MySqlType::MediumBlob =&gt; safe(),
+            MySqlType::Binary(m) <span class="kw">if </span>m &gt; n =&gt; safe(),
 
-            <span class="ident">MySqlType::Binary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Bit</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Char</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::LongText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Text</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">risky</span>(),
+            MySqlType::Binary(<span class="kw">_</span>)
+            | MySqlType::Bit(<span class="kw">_</span>)
+            | MySqlType::Char(<span class="kw">_</span>)
+            | MySqlType::LongText
+            | MySqlType::MediumText
+            | MySqlType::TinyBlob
+            | MySqlType::Text
+            | MySqlType::TinyText
+            | MySqlType::VarChar(<span class="kw">_</span>) =&gt; risky(),
 
-            <span class="ident">MySqlType::TinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::BigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Date</span>
-            <span class="op">|</span> <span class="ident">MySqlType::DateTime</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Decimal</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Double</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Float</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Int</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Json</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::SmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Time</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Timestamp</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedMediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedSmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedTinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedBigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Year</span> =&gt; <span class="ident">not_castable</span>(),
+            MySqlType::TinyInt
+            | MySqlType::BigInt
+            | MySqlType::Date
+            | MySqlType::DateTime(<span class="kw">_</span>)
+            | MySqlType::Decimal(<span class="kw">_</span>)
+            | MySqlType::Double
+            | MySqlType::Float
+            | MySqlType::Int
+            | MySqlType::Json
+            | MySqlType::MediumInt
+            | MySqlType::SmallInt
+            | MySqlType::Time(<span class="kw">_</span>)
+            | MySqlType::Timestamp(<span class="kw">_</span>)
+            | MySqlType::UnsignedInt
+            | MySqlType::UnsignedMediumInt
+            | MySqlType::UnsignedSmallInt
+            | MySqlType::UnsignedTinyInt
+            | MySqlType::UnsignedBigInt
+            | MySqlType::Year =&gt; not_castable(),
         },
-        <span class="ident">MySqlType::VarChar</span>(<span class="ident">n</span>) =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-            <span class="ident">MySqlType::VarChar</span>(<span class="ident">m</span>) <span class="kw">if</span> <span class="ident">m</span> <span class="op">==</span> <span class="ident">n</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
-            <span class="ident">MySqlType::Char</span>(<span class="ident">m</span>) <span class="kw">if</span> <span class="ident">m</span> <span class="op">==</span> <span class="ident">n</span> =&gt; <span class="ident">safe</span>(),
-            <span class="ident">MySqlType::VarChar</span>(<span class="ident">m</span>) <span class="op">|</span> <span class="ident">MySqlType::Char</span>(<span class="ident">m</span>) <span class="op">|</span> <span class="ident">MySqlType::VarBinary</span>(<span class="ident">m</span>) <span class="op">|</span> <span class="ident">MySqlType::Binary</span>(<span class="ident">m</span>) <span class="kw">if</span> <span class="ident">m</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">n</span> =&gt; {
-                <span class="ident">safe</span>()
+        MySqlType::VarChar(n) =&gt; <span class="kw">match </span>next {
+            MySqlType::VarChar(m) <span class="kw">if </span>m == n =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
+            MySqlType::Char(m) <span class="kw">if </span>m == n =&gt; safe(),
+            MySqlType::VarChar(m) | MySqlType::Char(m) | MySqlType::VarBinary(m) | MySqlType::Binary(m) <span class="kw">if </span>m &gt;= n =&gt; {
+                safe()
             }
-            <span class="ident">MySqlType::VarChar</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">MySqlType::Char</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">MySqlType::Binary</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">MySqlType::VarBinary</span>(<span class="kw">_</span>) =&gt; <span class="ident">risky</span>(),
+            MySqlType::VarChar(<span class="kw">_</span>) | MySqlType::Char(<span class="kw">_</span>) | MySqlType::Binary(<span class="kw">_</span>) | MySqlType::VarBinary(<span class="kw">_</span>) =&gt; risky(),
 
-            <span class="comment">// To string</span>
-            <span class="ident">MySqlType::Blob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::LongBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::LongText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Text</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyBlob</span> =&gt; <span class="ident">safe</span>(),
+            <span class="comment">// To string
+            </span>MySqlType::Blob
+            | MySqlType::LongBlob
+            | MySqlType::LongText
+            | MySqlType::MediumText
+            | MySqlType::MediumBlob
+            | MySqlType::Text
+            | MySqlType::TinyText
+            | MySqlType::TinyBlob =&gt; safe(),
 
-            <span class="comment">// Numeric types</span>
-            <span class="ident">MySqlType::BigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Bit</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Date</span>
-            <span class="op">|</span> <span class="ident">MySqlType::DateTime</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Decimal</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Double</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Float</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Int</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::SmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Time</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Timestamp</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::TinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedBigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedMediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedSmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedTinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Year</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Json</span> =&gt; <span class="ident">risky</span>(),
+            <span class="comment">// Numeric types
+            </span>MySqlType::BigInt
+            | MySqlType::Bit(<span class="kw">_</span>)
+            | MySqlType::Date
+            | MySqlType::DateTime(<span class="kw">_</span>)
+            | MySqlType::Decimal(<span class="kw">_</span>)
+            | MySqlType::Double
+            | MySqlType::Float
+            | MySqlType::Int
+            | MySqlType::MediumInt
+            | MySqlType::SmallInt
+            | MySqlType::Time(<span class="kw">_</span>)
+            | MySqlType::Timestamp(<span class="kw">_</span>)
+            | MySqlType::TinyInt
+            | MySqlType::UnsignedBigInt
+            | MySqlType::UnsignedInt
+            | MySqlType::UnsignedMediumInt
+            | MySqlType::UnsignedSmallInt
+            | MySqlType::UnsignedTinyInt
+            | MySqlType::Year
+            | MySqlType::Json =&gt; risky(),
         },
-        <span class="ident">MySqlType::Year</span> =&gt; <span class="kw">match</span> <span class="ident">next</span> {
-            <span class="ident">MySqlType::Year</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+        MySqlType::Year =&gt; <span class="kw">match </span>next {
+            MySqlType::Year =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
 
-            <span class="comment">// To string</span>
-            <span class="ident">MySqlType::Binary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Blob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Char</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::LongBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::LongText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Text</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyText</span>
-            <span class="op">|</span> <span class="ident">MySqlType::TinyBlob</span>
-            <span class="op">|</span> <span class="ident">MySqlType::VarBinary</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::VarChar</span>(<span class="kw">_</span>) =&gt; <span class="ident">safe</span>(),
+            <span class="comment">// To string
+            </span>MySqlType::Binary(<span class="kw">_</span>)
+            | MySqlType::Blob
+            | MySqlType::Char(<span class="kw">_</span>)
+            | MySqlType::LongBlob
+            | MySqlType::LongText
+            | MySqlType::MediumText
+            | MySqlType::MediumBlob
+            | MySqlType::Text
+            | MySqlType::TinyText
+            | MySqlType::TinyBlob
+            | MySqlType::VarBinary(<span class="kw">_</span>)
+            | MySqlType::VarChar(<span class="kw">_</span>) =&gt; safe(),
 
-            <span class="comment">// To Integer</span>
-            <span class="ident">MySqlType::BigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Bit</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Int</span>
-            <span class="op">|</span> <span class="ident">MySqlType::MediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::SmallInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedBigInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedMediumInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedSmallInt</span> =&gt; <span class="ident">safe</span>(),
+            <span class="comment">// To Integer
+            </span>MySqlType::BigInt
+            | MySqlType::Bit(<span class="kw">_</span>)
+            | MySqlType::Int
+            | MySqlType::MediumInt
+            | MySqlType::SmallInt
+            | MySqlType::UnsignedBigInt
+            | MySqlType::UnsignedInt
+            | MySqlType::UnsignedMediumInt
+            | MySqlType::UnsignedSmallInt =&gt; safe(),
 
-            <span class="ident">MySqlType::Float</span> <span class="op">|</span> <span class="ident">MySqlType::Double</span> =&gt; <span class="ident">safe</span>(),
+            MySqlType::Float | MySqlType::Double =&gt; safe(),
 
-            <span class="ident">MySqlType::Decimal</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">MySqlType::Json</span> =&gt; <span class="ident">risky</span>(),
+            MySqlType::Decimal(<span class="kw">_</span>) | MySqlType::Json =&gt; risky(),
 
-            <span class="ident">MySqlType::Date</span>
-            <span class="op">|</span> <span class="ident">MySqlType::DateTime</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::Time</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::TinyInt</span>
-            <span class="op">|</span> <span class="ident">MySqlType::Timestamp</span>(<span class="kw">_</span>)
-            <span class="op">|</span> <span class="ident">MySqlType::UnsignedTinyInt</span> =&gt; <span class="ident">not_castable</span>(), <span class="comment">// out of range</span>
-        },
+            MySqlType::Date
+            | MySqlType::DateTime(<span class="kw">_</span>)
+            | MySqlType::Time(<span class="kw">_</span>)
+            | MySqlType::TinyInt
+            | MySqlType::Timestamp(<span class="kw">_</span>)
+            | MySqlType::UnsignedTinyInt =&gt; not_castable(), <span class="comment">// out of range
+        </span>},
     })
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

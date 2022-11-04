@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/dml/src/composite_type.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>composite_type.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../dml/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../dml/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../dml/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/dml/src/composite_type.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>composite_type.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../dml/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../dml/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../dml/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -103,110 +103,110 @@
 <span id="103">103</span>
 <span id="104">104</span>
 <span id="105">105</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Composite types defined with the `type` keyword.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Composite types defined with the `type` keyword.
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">default_value::DefaultValue</span>, <span class="ident">field::FieldArity</span>, <span class="ident">native_type_instance::NativeTypeInstance</span>, <span class="ident">scalars::ScalarType</span>,
+</span><span class="kw">use crate</span>::{
+    default_value::DefaultValue, field::FieldArity, native_type_instance::NativeTypeInstance, scalars::ScalarType,
 };
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CompositeType</span> {
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CompositeTypeField</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Clone)]
+</span><span class="kw">pub struct </span>CompositeType {
+    <span class="kw">pub </span>name: String,
+    <span class="kw">pub </span>fields: Vec&lt;CompositeTypeField&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CompositeTypeField</span> {
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">r#type</span>: <span class="ident">CompositeTypeFieldType</span>,
-    <span class="kw">pub</span> <span class="ident">arity</span>: <span class="ident">FieldArity</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Clone)]
+</span><span class="kw">pub struct </span>CompositeTypeField {
+    <span class="kw">pub </span>name: String,
+    <span class="kw">pub </span>r#type: CompositeTypeFieldType,
+    <span class="kw">pub </span>arity: FieldArity,
 
-    <span class="doccomment">/// The database internal name.</span>
-    <span class="kw">pub</span> <span class="ident">database_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The database internal name.
+    </span><span class="kw">pub </span>database_name: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-    <span class="doccomment">/// Comments associated with this field.</span>
-    <span class="kw">pub</span> <span class="ident">documentation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Comments associated with this field.
+    </span><span class="kw">pub </span>documentation: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-    <span class="doccomment">/// The default value of this field</span>
-    <span class="kw">pub</span> <span class="ident">default_value</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DefaultValue</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The default value of this field
+    </span><span class="kw">pub </span>default_value: <span class="prelude-ty">Option</span>&lt;DefaultValue&gt;,
 
-    <span class="doccomment">/// Should we comment this field out.</span>
-    <span class="kw">pub</span> <span class="ident">is_commented_out</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Should we comment this field out.
+    </span><span class="kw">pub </span>is_commented_out: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">CompositeType</span> {
-    <span class="doccomment">/// Gets an iterator over all scalar fields.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">CompositeTypeField</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">fields</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="macro">matches!</span>(<span class="ident">f</span>.<span class="ident">r#type</span>, <span class="ident">CompositeTypeFieldType::Scalar</span>(<span class="kw">_</span>, <span class="kw">_</span>)))
+<span class="kw">impl </span>CompositeType {
+    <span class="doccomment">/// Gets an iterator over all scalar fields.
+    </span><span class="kw">pub fn </span>scalar_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span>CompositeTypeField&gt; {
+        <span class="self">self</span>.fields
+            .iter()
+            .filter(|f| <span class="macro">matches!</span>(f.r#type, CompositeTypeFieldType::Scalar(<span class="kw">_</span>, <span class="kw">_</span>)))
     }
 
-    <span class="doccomment">/// Gets an iterator over all enum fields.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enum_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">CompositeTypeField</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">fields</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="macro">matches!</span>(<span class="ident">f</span>.<span class="ident">r#type</span>, <span class="ident">CompositeTypeFieldType::Enum</span>(<span class="kw">_</span>)))
+    <span class="doccomment">/// Gets an iterator over all enum fields.
+    </span><span class="kw">pub fn </span>enum_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span>CompositeTypeField&gt; {
+        <span class="self">self</span>.fields
+            .iter()
+            .filter(|f| <span class="macro">matches!</span>(f.r#type, CompositeTypeFieldType::Enum(<span class="kw">_</span>)))
     }
 
-    <span class="doccomment">/// Gets an iterator over all composite type fields.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">composite_type_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">CompositeTypeField</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">fields</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="macro">matches!</span>(<span class="ident">f</span>.<span class="ident">r#type</span>, <span class="ident">CompositeTypeFieldType::CompositeType</span>(<span class="kw">_</span>)))
+    <span class="doccomment">/// Gets an iterator over all composite type fields.
+    </span><span class="kw">pub fn </span>composite_type_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span>CompositeTypeField&gt; {
+        <span class="self">self</span>.fields
+            .iter()
+            .filter(|f| <span class="macro">matches!</span>(f.r#type, CompositeTypeFieldType::CompositeType(<span class="kw">_</span>)))
     }
 
-    <span class="doccomment">/// Gets an iterator over all unsupported fields.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unsupported_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">CompositeTypeField</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">fields</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="macro">matches!</span>(<span class="ident">f</span>.<span class="ident">r#type</span>, <span class="ident">CompositeTypeFieldType::Unsupported</span>(<span class="kw">_</span>)))
+    <span class="doccomment">/// Gets an iterator over all unsupported fields.
+    </span><span class="kw">pub fn </span>unsupported_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span>CompositeTypeField&gt; {
+        <span class="self">self</span>.fields
+            .iter()
+            .filter(|f| <span class="macro">matches!</span>(f.r#type, CompositeTypeFieldType::Unsupported(<span class="kw">_</span>)))
     }
 
-    <span class="doccomment">/// Finds a field by name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">CompositeTypeField</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">name</span>)
+    <span class="doccomment">/// Finds a field by name.
+    </span><span class="kw">pub fn </span>find_field(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>CompositeTypeField&gt; {
+        <span class="self">self</span>.fields.iter().find(|f| f.name == name)
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CompositeTypeFieldType</span> {
-    <span class="ident">CompositeType</span>(<span class="ident">String</span>),
-    <span class="ident">Scalar</span>(<span class="ident">ScalarType</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span>),
-    <span class="doccomment">/// This is an enum field, with an enum of the given name.</span>
-    <span class="ident">Enum</span>(<span class="ident">String</span>),
-    <span class="doccomment">/// This is a field with an unsupported datatype. The content is the db&#39;s description of the type, it should enable migrate to create the type.</span>
-    <span class="ident">Unsupported</span>(<span class="ident">String</span>),
+<span class="attribute">#[derive(Debug, PartialEq, Clone)]
+</span><span class="kw">pub enum </span>CompositeTypeFieldType {
+    CompositeType(String),
+    Scalar(ScalarType, <span class="prelude-ty">Option</span>&lt;NativeTypeInstance&gt;),
+    <span class="doccomment">/// This is an enum field, with an enum of the given name.
+    </span>Enum(String),
+    <span class="doccomment">/// This is a field with an unsupported datatype. The content is the db&#39;s description of the type, it should enable migrate to create the type.
+    </span>Unsupported(String),
 }
 
-<span class="kw">impl</span> <span class="ident">CompositeTypeFieldType</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_composite_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="self">Self</span>::CompositeType</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="self">self</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+<span class="kw">impl </span>CompositeTypeFieldType {
+    <span class="kw">pub fn </span>as_composite_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>String&gt; {
+        <span class="kw">if let </span><span class="self">Self</span>::CompositeType(v) = <span class="self">self </span>{
+            <span class="prelude-val">Some</span>(v)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_scalar</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">ScalarType</span>, <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="self">Self</span>::Scalar</span>(<span class="ident">typ</span>, <span class="ident">native_type</span>) <span class="op">=</span> <span class="self">self</span> {
-            <span class="prelude-val">Some</span>((<span class="ident">typ</span>, <span class="ident">native_type</span>))
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+    <span class="kw">pub fn </span>as_scalar(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span>ScalarType, <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;NativeTypeInstance&gt;)&gt; {
+        <span class="kw">if let </span><span class="self">Self</span>::Scalar(typ, native_type) = <span class="self">self </span>{
+            <span class="prelude-val">Some</span>((typ, native_type))
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">ScalarType</span>, <span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span>)<span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident"><span class="self">Self</span>::Scalar</span>(<span class="ident">typ</span>, <span class="prelude-val">Some</span>(<span class="ident">native_type</span>)) <span class="op">=</span> <span class="self">self</span> {
-            <span class="prelude-val">Some</span>((<span class="ident">typ</span>, <span class="ident">native_type</span>))
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+    <span class="kw">pub fn </span>as_native_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="kw-2">&amp;</span>ScalarType, <span class="kw-2">&amp;</span>NativeTypeInstance)&gt; {
+        <span class="kw">if let </span><span class="self">Self</span>::Scalar(typ, <span class="prelude-val">Some</span>(native_type)) = <span class="self">self </span>{
+            <span class="prelude-val">Some</span>((typ, native_type))
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_unsupported</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::Unsupported</span>(<span class="kw">_</span>))
+    <span class="kw">pub fn </span>is_unsupported(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::Unsupported(<span class="kw">_</span>))
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="dml" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="dml" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

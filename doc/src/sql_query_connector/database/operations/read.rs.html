@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/sql-query-connector/src/database/operations/read.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>read.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../sql_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../sql_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../sql_query_connector/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/sql-query-connector/src/database/operations/read.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>read.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../sql_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../sql_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../sql_query_connector/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -292,299 +292,299 @@
 <span id="292">292</span>
 <span id="293">293</span>
 <span id="294">294</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">column_metadata</span>,
-    <span class="ident">model_extensions</span>::<span class="kw-2">*</span>,
-    <span class="ident">query_arguments_ext::QueryArgumentsExt</span>,
-    <span class="ident">query_builder</span>::{<span class="self">self</span>, <span class="ident">read</span>},
-    <span class="ident">sql_info::SqlInfo</span>,
-    <span class="ident">QueryExt</span>, <span class="ident">SqlError</span>,
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
+    column_metadata,
+    model_extensions::<span class="kw-2">*</span>,
+    query_arguments_ext::QueryArgumentsExt,
+    query_builder::{<span class="self">self</span>, read},
+    sql_info::SqlInfo,
+    QueryExt, SqlError,
 };
-<span class="kw">use</span> <span class="ident">connector_interface</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">futures::stream</span>::{<span class="ident">FuturesUnordered</span>, <span class="ident">StreamExt</span>};
-<span class="kw">use</span> <span class="ident">prisma_models</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">quaint::ast</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span>connector_interface::<span class="kw-2">*</span>;
+<span class="kw">use </span>futures::stream::{FuturesUnordered, StreamExt};
+<span class="kw">use </span>prisma_models::<span class="kw-2">*</span>;
+<span class="kw">use </span>quaint::ast::<span class="kw-2">*</span>;
 
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_single_record</span>(
-    <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
-    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="ident">filter</span>: <span class="kw-2">&amp;</span><span class="ident">Filter</span>,
-    <span class="ident">selected_fields</span>: <span class="kw-2">&amp;</span><span class="ident">ModelProjection</span>,
-    <span class="ident">aggr_selections</span>: <span class="kw-2">&amp;</span>[<span class="ident">RelAggregationSelection</span>],
-    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SingleRecord</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">read::get_records</span>(
-        <span class="ident">model</span>,
-        <span class="ident">selected_fields</span>.<span class="ident">as_columns</span>(),
-        <span class="ident">aggr_selections</span>,
-        <span class="ident">filter</span>,
-        <span class="ident">trace_id</span>.<span class="ident">clone</span>(),
+<span class="kw">pub async fn </span>get_single_record(
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    model: <span class="kw-2">&amp;</span>ModelRef,
+    filter: <span class="kw-2">&amp;</span>Filter,
+    selected_fields: <span class="kw-2">&amp;</span>ModelProjection,
+    aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
+    trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+) -&gt; <span class="kw">crate</span>::Result&lt;<span class="prelude-ty">Option</span>&lt;SingleRecord&gt;&gt; {
+    <span class="kw">let </span>query = read::get_records(
+        model,
+        selected_fields.as_columns(),
+        aggr_selections,
+        filter,
+        trace_id.clone(),
     );
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">selected_fields</span>.<span class="ident">db_names</span>().<span class="ident">collect</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">aggr_field_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">aggr_selections</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">aggr_sel</span><span class="op">|</span> <span class="ident">aggr_sel</span>.<span class="ident">db_alias</span>()).<span class="ident">collect</span>();
+    <span class="kw">let </span><span class="kw-2">mut </span>field_names: Vec&lt;<span class="kw">_</span>&gt; = selected_fields.db_names().collect();
+    <span class="kw">let </span><span class="kw-2">mut </span>aggr_field_names: Vec&lt;<span class="kw">_</span>&gt; = aggr_selections.iter().map(|aggr_sel| aggr_sel.db_alias()).collect();
 
-    <span class="ident">field_names</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">aggr_field_names</span>);
+    field_names.append(<span class="kw-2">&amp;mut </span>aggr_field_names);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">idents</span> <span class="op">=</span> <span class="ident">selected_fields</span>.<span class="ident">type_identifiers_with_arities</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">aggr_idents</span> <span class="op">=</span> <span class="ident">aggr_selections</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">aggr_sel</span><span class="op">|</span> <span class="ident">aggr_sel</span>.<span class="ident">type_identifier_with_arity</span>())
-        .<span class="ident">collect</span>();
+    <span class="kw">let </span><span class="kw-2">mut </span>idents = selected_fields.type_identifiers_with_arities();
+    <span class="kw">let </span><span class="kw-2">mut </span>aggr_idents = aggr_selections
+        .iter()
+        .map(|aggr_sel| aggr_sel.type_identifier_with_arity())
+        .collect();
 
-    <span class="ident">idents</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">aggr_idents</span>);
+    idents.append(<span class="kw-2">&amp;mut </span>aggr_idents);
 
-    <span class="kw">let</span> <span class="ident">meta</span> <span class="op">=</span> <span class="ident">column_metadata::create</span>(<span class="ident">field_names</span>.<span class="ident">as_slice</span>(), <span class="ident">idents</span>.<span class="ident">as_slice</span>());
+    <span class="kw">let </span>meta = column_metadata::create(field_names.as_slice(), idents.as_slice());
 
-    <span class="kw">let</span> <span class="ident">record</span> <span class="op">=</span> (<span class="kw">match</span> <span class="ident">conn</span>.<span class="ident">find</span>(<span class="ident">query</span>, <span class="ident">meta</span>.<span class="ident">as_slice</span>(), <span class="ident">trace_id</span>).<span class="kw">await</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">result</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">result</span>)),
-        <span class="prelude-val">Err</span>(<span class="ident">_e</span> @ <span class="ident">SqlError::RecordNotFoundForWhere</span>(<span class="kw">_</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
-        <span class="prelude-val">Err</span>(<span class="ident">_e</span> @ <span class="ident">SqlError::RecordDoesNotExist</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
-        <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">e</span>),
-    })<span class="question-mark">?</span>
-    .<span class="ident">map</span>(<span class="ident">Record::from</span>)
-    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">record</span><span class="op">|</span> <span class="ident">SingleRecord</span> { <span class="ident">record</span>, <span class="ident">field_names</span> });
+    <span class="kw">let </span>record = (<span class="kw">match </span>conn.find(query, meta.as_slice(), trace_id).<span class="kw">await </span>{
+        <span class="prelude-val">Ok</span>(result) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(result)),
+        <span class="prelude-val">Err</span>(_e @ SqlError::RecordNotFoundForWhere(<span class="kw">_</span>)) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+        <span class="prelude-val">Err</span>(_e @ SqlError::RecordDoesNotExist) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+        <span class="prelude-val">Err</span>(e) =&gt; <span class="prelude-val">Err</span>(e),
+    })<span class="question-mark">?
+    </span>.map(Record::from)
+    .map(|record| SingleRecord { record, field_names });
 
-    <span class="prelude-val">Ok</span>(<span class="ident">record</span>)
+    <span class="prelude-val">Ok</span>(record)
 }
 
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_many_records</span>(
-    <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
-    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="kw-2">mut</span> <span class="ident">query_arguments</span>: <span class="ident">QueryArguments</span>,
-    <span class="ident">selected_fields</span>: <span class="kw-2">&amp;</span><span class="ident">ModelProjection</span>,
-    <span class="ident">aggr_selections</span>: <span class="kw-2">&amp;</span>[<span class="ident">RelAggregationSelection</span>],
-    <span class="ident">sql_info</span>: <span class="ident">SqlInfo</span>,
-    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ManyRecords</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">reversed</span> <span class="op">=</span> <span class="ident">query_arguments</span>.<span class="ident">needs_reversed_order</span>();
+<span class="kw">pub async fn </span>get_many_records(
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    model: <span class="kw-2">&amp;</span>ModelRef,
+    <span class="kw-2">mut </span>query_arguments: QueryArguments,
+    selected_fields: <span class="kw-2">&amp;</span>ModelProjection,
+    aggr_selections: <span class="kw-2">&amp;</span>[RelAggregationSelection],
+    sql_info: SqlInfo,
+    trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+) -&gt; <span class="kw">crate</span>::Result&lt;ManyRecords&gt; {
+    <span class="kw">let </span>reversed = query_arguments.needs_reversed_order();
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">selected_fields</span>.<span class="ident">db_names</span>().<span class="ident">collect</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">aggr_field_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">aggr_selections</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">aggr_sel</span><span class="op">|</span> <span class="ident">aggr_sel</span>.<span class="ident">db_alias</span>()).<span class="ident">collect</span>();
+    <span class="kw">let </span><span class="kw-2">mut </span>field_names: Vec&lt;<span class="kw">_</span>&gt; = selected_fields.db_names().collect();
+    <span class="kw">let </span><span class="kw-2">mut </span>aggr_field_names: Vec&lt;<span class="kw">_</span>&gt; = aggr_selections.iter().map(|aggr_sel| aggr_sel.db_alias()).collect();
 
-    <span class="ident">field_names</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">aggr_field_names</span>);
+    field_names.append(<span class="kw-2">&amp;mut </span>aggr_field_names);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">aggr_idents</span> <span class="op">=</span> <span class="ident">aggr_selections</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">aggr_sel</span><span class="op">|</span> <span class="ident">aggr_sel</span>.<span class="ident">type_identifier_with_arity</span>())
-        .<span class="ident">collect</span>();
+    <span class="kw">let </span><span class="kw-2">mut </span>aggr_idents = aggr_selections
+        .iter()
+        .map(|aggr_sel| aggr_sel.type_identifier_with_arity())
+        .collect();
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">idents</span> <span class="op">=</span> <span class="ident">selected_fields</span>.<span class="ident">type_identifiers_with_arities</span>();
+    <span class="kw">let </span><span class="kw-2">mut </span>idents = selected_fields.type_identifiers_with_arities();
 
-    <span class="ident">idents</span>.<span class="ident">append</span>(<span class="kw-2">&amp;mut</span> <span class="ident">aggr_idents</span>);
+    idents.append(<span class="kw-2">&amp;mut </span>aggr_idents);
 
-    <span class="kw">let</span> <span class="ident">meta</span> <span class="op">=</span> <span class="ident">column_metadata::create</span>(<span class="ident">field_names</span>.<span class="ident">as_slice</span>(), <span class="ident">idents</span>.<span class="ident">as_slice</span>());
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">records</span> <span class="op">=</span> <span class="ident">ManyRecords::new</span>(<span class="ident">field_names</span>.<span class="ident">clone</span>());
+    <span class="kw">let </span>meta = column_metadata::create(field_names.as_slice(), idents.as_slice());
+    <span class="kw">let </span><span class="kw-2">mut </span>records = ManyRecords::new(field_names.clone());
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="number">0</span>) <span class="op">=</span> <span class="ident">query_arguments</span>.<span class="ident">take</span> {
-        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">records</span>);
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="number">0</span>) = query_arguments.take {
+        <span class="kw">return </span><span class="prelude-val">Ok</span>(records);
     };
 
-    <span class="comment">// Todo: This can&#39;t work for all cases. Cursor-based pagination will not work, because it relies on the ordering</span>
-    <span class="comment">// to determine the right queries to fire, and will default to incorrect orderings if no ordering is found.</span>
-    <span class="comment">// The should_batch has been adjusted to reflect that as a band-aid, but deeper investigation is necessary.</span>
-    <span class="kw">match</span> <span class="ident">sql_info</span>.<span class="ident">max_bind_values</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">chunk_size</span>) <span class="kw">if</span> <span class="ident">query_arguments</span>.<span class="ident">should_batch</span>(<span class="ident">chunk_size</span>) =&gt; {
-            <span class="kw">if</span> <span class="ident">query_arguments</span>.<span class="ident">has_unbatchable_ordering</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">SqlError::QueryParameterLimitExceeded</span>(
-                    <span class="string">&quot;Your query cannot be split into multiple queries because of the order by aggregation or relevance&quot;</span>
-                        .<span class="ident">to_string</span>(),
+    <span class="comment">// Todo: This can&#39;t work for all cases. Cursor-based pagination will not work, because it relies on the ordering
+    // to determine the right queries to fire, and will default to incorrect orderings if no ordering is found.
+    // The should_batch has been adjusted to reflect that as a band-aid, but deeper investigation is necessary.
+    </span><span class="kw">match </span>sql_info.max_bind_values {
+        <span class="prelude-val">Some</span>(chunk_size) <span class="kw">if </span>query_arguments.should_batch(chunk_size) =&gt; {
+            <span class="kw">if </span>query_arguments.has_unbatchable_ordering() {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(SqlError::QueryParameterLimitExceeded(
+                    <span class="string">&quot;Your query cannot be split into multiple queries because of the order by aggregation or relevance&quot;
+                        </span>.to_string(),
                 ));
             }
 
-            <span class="kw">if</span> <span class="ident">query_arguments</span>.<span class="ident">has_unbatchable_filters</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">SqlError::QueryParameterLimitExceeded</span>(
-                    <span class="string">&quot;Parameter limits for this database provider require this query to be split into multiple queries, but the negation filters used prevent the query from being split. Please reduce the used values in the query.&quot;</span>
-                        .<span class="ident">to_string</span>(),
+            <span class="kw">if </span>query_arguments.has_unbatchable_filters() {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(SqlError::QueryParameterLimitExceeded(
+                    <span class="string">&quot;Parameter limits for this database provider require this query to be split into multiple queries, but the negation filters used prevent the query from being split. Please reduce the used values in the query.&quot;
+                        </span>.to_string(),
                 ));
             }
 
-            <span class="comment">// We don&#39;t need to order in the database due to us ordering in this function.</span>
-            <span class="kw">let</span> <span class="ident">order</span> <span class="op">=</span> <span class="ident">std::mem::take</span>(<span class="kw-2">&amp;mut</span> <span class="ident">query_arguments</span>.<span class="ident">order_by</span>);
+            <span class="comment">// We don&#39;t need to order in the database due to us ordering in this function.
+            </span><span class="kw">let </span>order = std::mem::take(<span class="kw-2">&amp;mut </span>query_arguments.order_by);
 
-            <span class="kw">let</span> <span class="ident">batches</span> <span class="op">=</span> <span class="ident">query_arguments</span>.<span class="ident">batched</span>(<span class="ident">chunk_size</span>);
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">futures</span> <span class="op">=</span> <span class="ident">FuturesUnordered::new</span>();
+            <span class="kw">let </span>batches = query_arguments.batched(chunk_size);
+            <span class="kw">let </span><span class="kw-2">mut </span>futures = FuturesUnordered::new();
 
-            <span class="kw">for</span> <span class="ident">args</span> <span class="kw">in</span> <span class="ident">batches</span>.<span class="ident">into_iter</span>() {
-                <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">read::get_records</span>(
-                    <span class="ident">model</span>,
-                    <span class="ident">selected_fields</span>.<span class="ident">as_columns</span>(),
-                    <span class="ident">aggr_selections</span>,
-                    <span class="ident">args</span>,
-                    <span class="ident">trace_id</span>.<span class="ident">clone</span>(),
+            <span class="kw">for </span>args <span class="kw">in </span>batches.into_iter() {
+                <span class="kw">let </span>query = read::get_records(
+                    model,
+                    selected_fields.as_columns(),
+                    aggr_selections,
+                    args,
+                    trace_id.clone(),
                 );
 
-                <span class="ident">futures</span>.<span class="ident">push</span>(<span class="ident">conn</span>.<span class="ident">filter</span>(<span class="ident">query</span>.<span class="ident">into</span>(), <span class="ident">meta</span>.<span class="ident">as_slice</span>(), <span class="ident">trace_id</span>.<span class="ident">clone</span>()));
+                futures.push(conn.filter(query.into(), meta.as_slice(), trace_id.clone()));
             }
 
-            <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">result</span>) <span class="op">=</span> <span class="ident">futures</span>.<span class="ident">next</span>().<span class="kw">await</span> {
-                <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="ident">result</span><span class="question-mark">?</span>.<span class="ident">into_iter</span>() {
-                    <span class="ident">records</span>.<span class="ident">push</span>(<span class="ident">Record::from</span>(<span class="ident">item</span>))
+            <span class="kw">while let </span><span class="prelude-val">Some</span>(result) = futures.next().<span class="kw">await </span>{
+                <span class="kw">for </span>item <span class="kw">in </span>result<span class="question-mark">?</span>.into_iter() {
+                    records.push(Record::from(item))
                 }
             }
 
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">order</span>.<span class="ident">is_empty</span>() {
-                <span class="ident">records</span>.<span class="ident">order_by</span>(<span class="kw-2">&amp;</span><span class="ident">order</span>)
+            <span class="kw">if </span>!order.is_empty() {
+                records.order_by(<span class="kw-2">&amp;</span>order)
             }
         }
-        <span class="kw">_</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">read::get_records</span>(
-                <span class="ident">model</span>,
-                <span class="ident">selected_fields</span>.<span class="ident">as_columns</span>(),
-                <span class="ident">aggr_selections</span>,
-                <span class="ident">query_arguments</span>,
-                <span class="ident">trace_id</span>.<span class="ident">clone</span>(),
+        <span class="kw">_ </span>=&gt; {
+            <span class="kw">let </span>query = read::get_records(
+                model,
+                selected_fields.as_columns(),
+                aggr_selections,
+                query_arguments,
+                trace_id.clone(),
             );
 
-            <span class="kw">for</span> <span class="ident">item</span> <span class="kw">in</span> <span class="ident">conn</span>.<span class="ident">filter</span>(<span class="ident">query</span>.<span class="ident">into</span>(), <span class="ident">meta</span>.<span class="ident">as_slice</span>(), <span class="ident">trace_id</span>).<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">into_iter</span>() {
-                <span class="ident">records</span>.<span class="ident">push</span>(<span class="ident">Record::from</span>(<span class="ident">item</span>))
+            <span class="kw">for </span>item <span class="kw">in </span>conn.filter(query.into(), meta.as_slice(), trace_id).<span class="kw">await</span><span class="question-mark">?</span>.into_iter() {
+                records.push(Record::from(item))
             }
         }
     }
 
-    <span class="kw">if</span> <span class="ident">reversed</span> {
-        <span class="ident">records</span>.<span class="ident">reverse</span>();
+    <span class="kw">if </span>reversed {
+        records.reverse();
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">records</span>)
+    <span class="prelude-val">Ok</span>(records)
 }
 
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_related_m2m_record_ids</span>(
-    <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
-    <span class="ident">from_field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-    <span class="ident">from_record_ids</span>: <span class="kw-2">&amp;</span>[<span class="ident">SelectionResult</span>],
-    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">SelectionResult</span>, <span class="ident">SelectionResult</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">idents</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-    <span class="ident">idents</span>.<span class="ident">extend</span>(<span class="ident">ModelProjection::from</span>(<span class="ident">from_field</span>.<span class="ident">model</span>().<span class="ident">primary_identifier</span>()).<span class="ident">type_identifiers_with_arities</span>());
-    <span class="ident">idents</span>
-        .<span class="ident">extend</span>(<span class="ident">ModelProjection::from</span>(<span class="ident">from_field</span>.<span class="ident">related_model</span>().<span class="ident">primary_identifier</span>()).<span class="ident">type_identifiers_with_arities</span>());
+<span class="kw">pub async fn </span>get_related_m2m_record_ids(
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    from_field: <span class="kw-2">&amp;</span>RelationFieldRef,
+    from_record_ids: <span class="kw-2">&amp;</span>[SelectionResult],
+    trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+) -&gt; <span class="kw">crate</span>::Result&lt;Vec&lt;(SelectionResult, SelectionResult)&gt;&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>idents = <span class="macro">vec!</span>[];
+    idents.extend(ModelProjection::from(from_field.model().primary_identifier()).type_identifiers_with_arities());
+    idents
+        .extend(ModelProjection::from(from_field.related_model().primary_identifier()).type_identifiers_with_arities());
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field_names</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-    <span class="ident">field_names</span>.<span class="ident">extend</span>(<span class="ident">from_field</span>.<span class="ident">model</span>().<span class="ident">primary_identifier</span>().<span class="ident">db_names</span>());
-    <span class="ident">field_names</span>.<span class="ident">extend</span>(<span class="ident">from_field</span>.<span class="ident">related_model</span>().<span class="ident">primary_identifier</span>().<span class="ident">db_names</span>());
+    <span class="kw">let </span><span class="kw-2">mut </span>field_names = Vec::new();
+    field_names.extend(from_field.model().primary_identifier().db_names());
+    field_names.extend(from_field.related_model().primary_identifier().db_names());
 
-    <span class="kw">let</span> <span class="ident">meta</span> <span class="op">=</span> <span class="ident">column_metadata::create</span>(<span class="kw-2">&amp;</span><span class="ident">field_names</span>, <span class="kw-2">&amp;</span><span class="ident">idents</span>);
+    <span class="kw">let </span>meta = column_metadata::create(<span class="kw-2">&amp;</span>field_names, <span class="kw-2">&amp;</span>idents);
 
-    <span class="kw">let</span> <span class="ident">relation</span> <span class="op">=</span> <span class="ident">from_field</span>.<span class="ident">relation</span>();
-    <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">as_table</span>();
+    <span class="kw">let </span>relation = from_field.relation();
+    <span class="kw">let </span>table = relation.as_table();
 
-    <span class="kw">let</span> <span class="ident">from_columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">from_field</span>.<span class="ident">related_field</span>().<span class="ident">m2m_columns</span>();
-    <span class="kw">let</span> <span class="ident">to_columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">from_field</span>.<span class="ident">m2m_columns</span>();
+    <span class="kw">let </span>from_columns: Vec&lt;<span class="kw">_</span>&gt; = from_field.related_field().m2m_columns();
+    <span class="kw">let </span>to_columns: Vec&lt;<span class="kw">_</span>&gt; = from_field.m2m_columns();
 
-    <span class="comment">// [DTODO] To verify: We might need chunked fetch here (too many parameters in the query).</span>
-    <span class="kw">let</span> <span class="ident">select</span> <span class="op">=</span> <span class="ident">Select::from_table</span>(<span class="ident">table</span>)
-        .<span class="ident">so_that</span>(<span class="ident">query_builder::conditions</span>(<span class="kw-2">&amp;</span><span class="ident">from_columns</span>, <span class="ident">from_record_ids</span>))
-        .<span class="ident">columns</span>(<span class="ident">from_columns</span>.<span class="ident">into_iter</span>().<span class="ident">chain</span>(<span class="ident">to_columns</span>.<span class="ident">into_iter</span>()));
+    <span class="comment">// [DTODO] To verify: We might need chunked fetch here (too many parameters in the query).
+    </span><span class="kw">let </span>select = Select::from_table(table)
+        .so_that(query_builder::conditions(<span class="kw-2">&amp;</span>from_columns, from_record_ids))
+        .columns(from_columns.into_iter().chain(to_columns.into_iter()));
 
-    <span class="kw">let</span> <span class="ident">parent_model_id</span> <span class="op">=</span> <span class="ident">from_field</span>.<span class="ident">model</span>().<span class="ident">primary_identifier</span>();
-    <span class="kw">let</span> <span class="ident">child_model_id</span> <span class="op">=</span> <span class="ident">from_field</span>.<span class="ident">related_model</span>().<span class="ident">primary_identifier</span>();
+    <span class="kw">let </span>parent_model_id = from_field.model().primary_identifier();
+    <span class="kw">let </span>child_model_id = from_field.related_model().primary_identifier();
 
-    <span class="kw">let</span> <span class="ident">from_sfs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">parent_model_id</span>
-        .<span class="ident">as_scalar_fields</span>()
-        .<span class="ident">expect</span>(<span class="string">&quot;Parent model ID has non-scalar fields.&quot;</span>);
+    <span class="kw">let </span>from_sfs: Vec&lt;<span class="kw">_</span>&gt; = parent_model_id
+        .as_scalar_fields()
+        .expect(<span class="string">&quot;Parent model ID has non-scalar fields.&quot;</span>);
 
-    <span class="kw">let</span> <span class="ident">to_sfs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">child_model_id</span>
-        .<span class="ident">as_scalar_fields</span>()
-        .<span class="ident">expect</span>(<span class="string">&quot;Child model ID has non-scalar fields.&quot;</span>);
+    <span class="kw">let </span>to_sfs: Vec&lt;<span class="kw">_</span>&gt; = child_model_id
+        .as_scalar_fields()
+        .expect(<span class="string">&quot;Child model ID has non-scalar fields.&quot;</span>);
 
-    <span class="comment">// first parent id, then child id</span>
-    <span class="prelude-val">Ok</span>(<span class="ident">conn</span>
-        .<span class="ident">filter</span>(<span class="ident">select</span>.<span class="ident">into</span>(), <span class="ident">meta</span>.<span class="ident">as_slice</span>(), <span class="ident">trace_id</span>)
-        .<span class="kw">await</span><span class="question-mark">?</span>
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">row</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">values</span> <span class="op">=</span> <span class="ident">row</span>.<span class="ident">values</span>;
+    <span class="comment">// first parent id, then child id
+    </span><span class="prelude-val">Ok</span>(conn
+        .filter(select.into(), meta.as_slice(), trace_id)
+        .<span class="kw">await</span><span class="question-mark">?
+        </span>.into_iter()
+        .map(|row| {
+            <span class="kw">let </span><span class="kw-2">mut </span>values = row.values;
 
-            <span class="kw">let</span> <span class="ident">child_values</span> <span class="op">=</span> <span class="ident">values</span>.<span class="ident">split_off</span>(<span class="ident">from_sfs</span>.<span class="ident">len</span>());
-            <span class="kw">let</span> <span class="ident">parent_values</span> <span class="op">=</span> <span class="ident">values</span>;
+            <span class="kw">let </span>child_values = values.split_off(from_sfs.len());
+            <span class="kw">let </span>parent_values = values;
 
-            <span class="kw">let</span> <span class="ident">p</span>: <span class="ident">SelectionResult</span> <span class="op">=</span> <span class="ident">from_sfs</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">zip</span>(<span class="ident">parent_values</span>)
-                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">sf</span>, <span class="ident">val</span>)<span class="op">|</span> (<span class="ident">sf</span>.<span class="ident">clone</span>(), <span class="ident">val</span>))
-                .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-                .<span class="ident">into</span>();
+            <span class="kw">let </span>p: SelectionResult = from_sfs
+                .iter()
+                .zip(parent_values)
+                .map(|(sf, val)| (sf.clone(), val))
+                .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
+                .into();
 
-            <span class="kw">let</span> <span class="ident">c</span>: <span class="ident">SelectionResult</span> <span class="op">=</span> <span class="ident">to_sfs</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">zip</span>(<span class="ident">child_values</span>)
-                .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">sf</span>, <span class="ident">val</span>)<span class="op">|</span> (<span class="ident">sf</span>.<span class="ident">clone</span>(), <span class="ident">val</span>))
-                .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-                .<span class="ident">into</span>();
+            <span class="kw">let </span>c: SelectionResult = to_sfs
+                .iter()
+                .zip(child_values)
+                .map(|(sf, val)| (sf.clone(), val))
+                .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
+                .into();
 
-            (<span class="ident">p</span>, <span class="ident">c</span>)
+            (p, c)
         })
-        .<span class="ident">collect</span>())
+        .collect())
 }
 
-<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">aggregate</span>(
-    <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
-    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="ident">query_arguments</span>: <span class="ident">QueryArguments</span>,
-    <span class="ident">selections</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AggregationSelection</span><span class="op">&gt;</span>,
-    <span class="ident">group_by</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span>,
-    <span class="ident">having</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>,
-    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AggregationRow</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">group_by</span>.<span class="ident">is_empty</span>() {
-        <span class="ident">group_by_aggregate</span>(<span class="ident">conn</span>, <span class="ident">model</span>, <span class="ident">query_arguments</span>, <span class="ident">selections</span>, <span class="ident">group_by</span>, <span class="ident">having</span>, <span class="ident">trace_id</span>).<span class="kw">await</span>
-    } <span class="kw">else</span> {
-        <span class="ident">plain_aggregate</span>(<span class="ident">conn</span>, <span class="ident">model</span>, <span class="ident">query_arguments</span>, <span class="ident">selections</span>, <span class="ident">trace_id</span>)
-            .<span class="kw">await</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="macro">vec!</span>[<span class="ident">v</span>])
+<span class="kw">pub async fn </span>aggregate(
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    model: <span class="kw-2">&amp;</span>ModelRef,
+    query_arguments: QueryArguments,
+    selections: Vec&lt;AggregationSelection&gt;,
+    group_by: Vec&lt;ScalarFieldRef&gt;,
+    having: <span class="prelude-ty">Option</span>&lt;Filter&gt;,
+    trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+) -&gt; <span class="kw">crate</span>::Result&lt;Vec&lt;AggregationRow&gt;&gt; {
+    <span class="kw">if </span>!group_by.is_empty() {
+        group_by_aggregate(conn, model, query_arguments, selections, group_by, having, trace_id).<span class="kw">await
+    </span>} <span class="kw">else </span>{
+        plain_aggregate(conn, model, query_arguments, selections, trace_id)
+            .<span class="kw">await
+            </span>.map(|v| <span class="macro">vec!</span>[v])
     }
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">plain_aggregate</span>(
-    <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
-    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="ident">query_arguments</span>: <span class="ident">QueryArguments</span>,
-    <span class="ident">selections</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AggregationSelection</span><span class="op">&gt;</span>,
-    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AggregationResult</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">read::aggregate</span>(<span class="ident">model</span>, <span class="kw-2">&amp;</span><span class="ident">selections</span>, <span class="ident">query_arguments</span>, <span class="ident">trace_id</span>.<span class="ident">clone</span>());
+<span class="kw">async fn </span>plain_aggregate(
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    model: <span class="kw-2">&amp;</span>ModelRef,
+    query_arguments: QueryArguments,
+    selections: Vec&lt;AggregationSelection&gt;,
+    trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+) -&gt; <span class="kw">crate</span>::Result&lt;Vec&lt;AggregationResult&gt;&gt; {
+    <span class="kw">let </span>query = read::aggregate(model, <span class="kw-2">&amp;</span>selections, query_arguments, trace_id.clone());
 
-    <span class="kw">let</span> <span class="ident">idents</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">selections</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">aggregator</span><span class="op">|</span> <span class="ident">aggregator</span>.<span class="ident">identifiers</span>())
-        .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">ident</span>, <span class="ident">arity</span>)<span class="op">|</span> (<span class="ident">ident</span>, <span class="ident">arity</span>))
-        .<span class="ident">collect</span>();
+    <span class="kw">let </span>idents: Vec&lt;<span class="kw">_</span>&gt; = selections
+        .iter()
+        .flat_map(|aggregator| aggregator.identifiers())
+        .map(|(<span class="kw">_</span>, ident, arity)| (ident, arity))
+        .collect();
 
-    <span class="kw">let</span> <span class="ident">meta</span> <span class="op">=</span> <span class="ident">column_metadata::create_anonymous</span>(<span class="kw-2">&amp;</span><span class="ident">idents</span>);
+    <span class="kw">let </span>meta = column_metadata::create_anonymous(<span class="kw-2">&amp;</span>idents);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rows</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">filter</span>(<span class="ident">query</span>.<span class="ident">into</span>(), <span class="ident">meta</span>.<span class="ident">as_slice</span>(), <span class="ident">trace_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">row</span> <span class="op">=</span> <span class="ident">rows</span>
-        .<span class="ident">pop</span>()
-        .<span class="ident">expect</span>(<span class="string">&quot;Expected exactly one return row for aggregation query.&quot;</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>rows = conn.filter(query.into(), meta.as_slice(), trace_id).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span>row = rows
+        .pop()
+        .expect(<span class="string">&quot;Expected exactly one return row for aggregation query.&quot;</span>);
 
-    <span class="prelude-val">Ok</span>(<span class="ident">row</span>.<span class="ident">into_aggregation_results</span>(<span class="kw-2">&amp;</span><span class="ident">selections</span>))
+    <span class="prelude-val">Ok</span>(row.into_aggregation_results(<span class="kw-2">&amp;</span>selections))
 }
 
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">group_by_aggregate</span>(
-    <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">QueryExt</span>,
-    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-    <span class="ident">query_arguments</span>: <span class="ident">QueryArguments</span>,
-    <span class="ident">selections</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AggregationSelection</span><span class="op">&gt;</span>,
-    <span class="ident">group_by</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span>,
-    <span class="ident">having</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>,
-    <span class="ident">trace_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AggregationRow</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">read::group_by_aggregate</span>(<span class="ident">model</span>, <span class="ident">query_arguments</span>, <span class="kw-2">&amp;</span><span class="ident">selections</span>, <span class="ident">group_by</span>, <span class="ident">having</span>, <span class="ident">trace_id</span>.<span class="ident">clone</span>());
+<span class="kw">async fn </span>group_by_aggregate(
+    conn: <span class="kw-2">&amp;</span><span class="kw">dyn </span>QueryExt,
+    model: <span class="kw-2">&amp;</span>ModelRef,
+    query_arguments: QueryArguments,
+    selections: Vec&lt;AggregationSelection&gt;,
+    group_by: Vec&lt;ScalarFieldRef&gt;,
+    having: <span class="prelude-ty">Option</span>&lt;Filter&gt;,
+    trace_id: <span class="prelude-ty">Option</span>&lt;String&gt;,
+) -&gt; <span class="kw">crate</span>::Result&lt;Vec&lt;AggregationRow&gt;&gt; {
+    <span class="kw">let </span>query = read::group_by_aggregate(model, query_arguments, <span class="kw-2">&amp;</span>selections, group_by, having, trace_id.clone());
 
-    <span class="kw">let</span> <span class="ident">idents</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">selections</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">aggregator</span><span class="op">|</span> <span class="ident">aggregator</span>.<span class="ident">identifiers</span>())
-        .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">ident</span>, <span class="ident">arity</span>)<span class="op">|</span> (<span class="ident">ident</span>, <span class="ident">arity</span>))
-        .<span class="ident">collect</span>();
+    <span class="kw">let </span>idents: Vec&lt;<span class="kw">_</span>&gt; = selections
+        .iter()
+        .flat_map(|aggregator| aggregator.identifiers())
+        .map(|(<span class="kw">_</span>, ident, arity)| (ident, arity))
+        .collect();
 
-    <span class="kw">let</span> <span class="ident">meta</span> <span class="op">=</span> <span class="ident">column_metadata::create_anonymous</span>(<span class="kw-2">&amp;</span><span class="ident">idents</span>);
-    <span class="kw">let</span> <span class="ident">rows</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">filter</span>(<span class="ident">query</span>.<span class="ident">into</span>(), <span class="ident">meta</span>.<span class="ident">as_slice</span>(), <span class="ident">trace_id</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+    <span class="kw">let </span>meta = column_metadata::create_anonymous(<span class="kw-2">&amp;</span>idents);
+    <span class="kw">let </span>rows = conn.filter(query.into(), meta.as_slice(), trace_id).<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>(<span class="ident">rows</span>
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">row</span><span class="op">|</span> <span class="ident">row</span>.<span class="ident">into_aggregation_results</span>(<span class="kw-2">&amp;</span><span class="ident">selections</span>))
-        .<span class="ident">collect</span>())
+    <span class="prelude-val">Ok</span>(rows
+        .into_iter()
+        .map(|row| row.into_aggregation_results(<span class="kw-2">&amp;</span>selections))
+        .collect())
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="sql_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="sql_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

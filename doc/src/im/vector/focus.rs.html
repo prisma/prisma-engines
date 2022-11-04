@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/im-15.1.0/./src/vector/focus.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>focus.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../im/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../im/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../im/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/im-15.1.0/./src/vector/focus.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>focus.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../im/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../im/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../im/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -907,914 +907,914 @@
 <span id="907">907</span>
 <span id="908">908</span>
 <span id="909">909</span>
-</pre><pre class="rust"><code><span class="comment">// This Source Code Form is subject to the terms of the Mozilla Public</span>
-<span class="comment">// License, v. 2.0. If a copy of the MPL was not distributed with this</span>
-<span class="comment">// file, You can obtain one at http://mozilla.org/MPL/2.0/.</span>
+</pre><pre class="rust"><code><span class="comment">// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-<span class="kw">use</span> <span class="ident">std::mem</span>::{<span class="ident">replace</span>, <span class="ident">swap</span>};
-<span class="kw">use</span> <span class="ident">std::ops</span>::{<span class="ident">Range</span>, <span class="ident">RangeBounds</span>};
-<span class="kw">use</span> <span class="ident">std::ptr::null</span>;
-<span class="kw">use</span> <span class="ident">std::sync::atomic</span>::{<span class="ident">AtomicPtr</span>, <span class="ident">Ordering</span>};
+</span><span class="kw">use </span>std::mem::{replace, swap};
+<span class="kw">use </span>std::ops::{Range, RangeBounds};
+<span class="kw">use </span>std::ptr::null;
+<span class="kw">use </span>std::sync::atomic::{AtomicPtr, Ordering};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::nodes::chunk::Chunk</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sync::Lock</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::util</span>::{<span class="ident">to_range</span>, <span class="ident">PoolRef</span>, <span class="ident">Ref</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::vector</span>::{
-    <span class="ident">Iter</span>, <span class="ident">IterMut</span>, <span class="ident">RRBPool</span>, <span class="ident">Rrb</span>, <span class="ident">Vector</span>,
-    <span class="ident">VectorInner</span>::{<span class="ident">Full</span>, <span class="ident">Inline</span>, <span class="ident">Single</span>},
+<span class="kw">use </span><span class="kw">crate</span>::nodes::chunk::Chunk;
+<span class="kw">use </span><span class="kw">crate</span>::sync::Lock;
+<span class="kw">use </span><span class="kw">crate</span>::util::{to_range, PoolRef, Ref};
+<span class="kw">use </span><span class="kw">crate</span>::vector::{
+    Iter, IterMut, RRBPool, Rrb, Vector,
+    VectorInner::{Full, Inline, Single},
 };
 
-<span class="doccomment">/// Focused indexing over a [`Vector`][Vector].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// By remembering the last tree node accessed through an index lookup and the</span>
-<span class="doccomment">/// path we took to get there, we can speed up lookups for adjacent indices</span>
-<span class="doccomment">/// tremendously. Lookups on indices in the same node are instantaneous, and</span>
-<span class="doccomment">/// lookups on sibling nodes are also very fast.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A `Focus` can also be used as a restricted view into a vector, using the</span>
-<span class="doccomment">/// [`narrow`][narrow] and [`split_at`][split_at] methods.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # When should I use a `Focus` for better performance?</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `Focus` is useful when you need to perform a large number of index lookups</span>
-<span class="doccomment">/// that are more likely than not to be close to each other. It&#39;s usually worth</span>
-<span class="doccomment">/// using a `Focus` in any situation where you&#39;re batching a lot of index</span>
-<span class="doccomment">/// lookups together, even if they&#39;re not obviously adjacent - there&#39;s likely</span>
-<span class="doccomment">/// to be some performance gain for even completely random access.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If you&#39;re just iterating forwards or backwards over the [`Vector`][Vector]</span>
-<span class="doccomment">/// in order, you&#39;re better off with a regular iterator, which, in fact, is</span>
-<span class="doccomment">/// implemented using a `Focus`, but provides a simpler interface.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If you&#39;re just doing a very small number of index lookups, the setup cost</span>
-<span class="doccomment">/// for the `Focus` is probably not worth it.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A `Focus` is never faster than an index lookup on a small [`Vector`][Vector]</span>
-<span class="doccomment">/// with a length below the internal RRB tree&#39;s branching factor of 64.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This example is contrived, as the better way to iterate forwards or</span>
-<span class="doccomment">/// backwards over a vector is with an actual iterator. Even so, the version</span>
-<span class="doccomment">/// using a `Focus` should run nearly an order of magnitude faster than the</span>
-<span class="doccomment">/// version using index lookups at a length of 1000. It should also be noted</span>
-<span class="doccomment">/// that [`vector::Iter`][Iter] is actually implemented using a `Focus` behind</span>
-<span class="doccomment">/// the scenes, so the performance of the two should be identical.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # #[macro_use] extern crate im;</span>
-<span class="doccomment">/// # use im::vector::Vector;</span>
-<span class="doccomment">/// # use std::iter::FromIterator;</span>
-<span class="doccomment">/// let mut vec: Vector&lt;i64&gt; = Vector::from_iter(0..1000);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Summing a vector, the slow way:</span>
-<span class="doccomment">/// let mut sum = 0;</span>
-<span class="doccomment">/// for i in 0..1000 {</span>
-<span class="doccomment">///     sum += *vec.get(i).unwrap();</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// assert_eq!(499500, sum);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // Summing a vector faster using a Focus:</span>
-<span class="doccomment">/// let mut sum = 0;</span>
-<span class="doccomment">/// let mut focus = vec.focus();</span>
-<span class="doccomment">/// for i in 0..1000 {</span>
-<span class="doccomment">///     sum += *focus.get(i).unwrap();</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// assert_eq!(499500, sum);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // And the easy way, for completeness:</span>
-<span class="doccomment">/// let sum: i64 = vec.iter().sum();</span>
-<span class="doccomment">/// assert_eq!(499500, sum);</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Vector]: enum.Vector.html</span>
-<span class="doccomment">/// [Iter]: struct.Iter.html</span>
-<span class="doccomment">/// [narrow]: #method.narrow</span>
-<span class="doccomment">/// [split_at]: #method.split_at</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Focus</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="ident">Single</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">A</span>]),
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="ident">Full</span>(<span class="ident">TreeFocus</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>),
+<span class="doccomment">/// Focused indexing over a [`Vector`][Vector].
+///
+/// By remembering the last tree node accessed through an index lookup and the
+/// path we took to get there, we can speed up lookups for adjacent indices
+/// tremendously. Lookups on indices in the same node are instantaneous, and
+/// lookups on sibling nodes are also very fast.
+///
+/// A `Focus` can also be used as a restricted view into a vector, using the
+/// [`narrow`][narrow] and [`split_at`][split_at] methods.
+///
+/// # When should I use a `Focus` for better performance?
+///
+/// `Focus` is useful when you need to perform a large number of index lookups
+/// that are more likely than not to be close to each other. It&#39;s usually worth
+/// using a `Focus` in any situation where you&#39;re batching a lot of index
+/// lookups together, even if they&#39;re not obviously adjacent - there&#39;s likely
+/// to be some performance gain for even completely random access.
+///
+/// If you&#39;re just iterating forwards or backwards over the [`Vector`][Vector]
+/// in order, you&#39;re better off with a regular iterator, which, in fact, is
+/// implemented using a `Focus`, but provides a simpler interface.
+///
+/// If you&#39;re just doing a very small number of index lookups, the setup cost
+/// for the `Focus` is probably not worth it.
+///
+/// A `Focus` is never faster than an index lookup on a small [`Vector`][Vector]
+/// with a length below the internal RRB tree&#39;s branching factor of 64.
+///
+/// # Examples
+///
+/// This example is contrived, as the better way to iterate forwards or
+/// backwards over a vector is with an actual iterator. Even so, the version
+/// using a `Focus` should run nearly an order of magnitude faster than the
+/// version using index lookups at a length of 1000. It should also be noted
+/// that [`vector::Iter`][Iter] is actually implemented using a `Focus` behind
+/// the scenes, so the performance of the two should be identical.
+///
+/// ```rust
+/// # #[macro_use] extern crate im;
+/// # use im::vector::Vector;
+/// # use std::iter::FromIterator;
+/// let mut vec: Vector&lt;i64&gt; = Vector::from_iter(0..1000);
+///
+/// // Summing a vector, the slow way:
+/// let mut sum = 0;
+/// for i in 0..1000 {
+///     sum += *vec.get(i).unwrap();
+/// }
+/// assert_eq!(499500, sum);
+///
+/// // Summing a vector faster using a Focus:
+/// let mut sum = 0;
+/// let mut focus = vec.focus();
+/// for i in 0..1000 {
+///     sum += *focus.get(i).unwrap();
+/// }
+/// assert_eq!(499500, sum);
+///
+/// // And the easy way, for completeness:
+/// let sum: i64 = vec.iter().sum();
+/// assert_eq!(499500, sum);
+/// ```
+///
+/// [Vector]: enum.Vector.html
+/// [Iter]: struct.Iter.html
+/// [narrow]: #method.narrow
+/// [split_at]: #method.split_at
+</span><span class="kw">pub enum </span>Focus&lt;<span class="lifetime">&#39;a</span>, A&gt; {
+    <span class="attribute">#[doc(hidden)]
+    </span>Single(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[A]),
+    <span class="attribute">#[doc(hidden)]
+    </span>Full(TreeFocus&lt;A&gt;),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> <span class="ident">Focus</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, A&gt; Focus&lt;<span class="lifetime">&#39;a</span>, A&gt;
+<span class="kw">where
+    </span>A: Clone + <span class="lifetime">&#39;a</span>,
 {
-    <span class="doccomment">/// Construct a `Focus` for a [`Vector`][Vector].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Vector]: enum.Vector.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">vector</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Vector</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">vector</span>.<span class="ident">vector</span> {
-            <span class="ident">Inline</span>(<span class="kw">_</span>, <span class="ident">chunk</span>) =&gt; <span class="ident">Focus::Single</span>(<span class="ident">chunk</span>),
-            <span class="ident">Single</span>(<span class="kw">_</span>, <span class="ident">chunk</span>) =&gt; <span class="ident">Focus::Single</span>(<span class="ident">chunk</span>),
-            <span class="ident">Full</span>(<span class="kw">_</span>, <span class="ident">tree</span>) =&gt; <span class="ident">Focus::Full</span>(<span class="ident">TreeFocus::new</span>(<span class="ident">tree</span>)),
+    <span class="doccomment">/// Construct a `Focus` for a [`Vector`][Vector].
+    ///
+    /// [Vector]: enum.Vector.html
+    </span><span class="kw">pub fn </span>new(vector: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Vector&lt;A&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span><span class="kw-2">&amp;</span>vector.vector {
+            Inline(<span class="kw">_</span>, chunk) =&gt; Focus::Single(chunk),
+            Single(<span class="kw">_</span>, chunk) =&gt; Focus::Single(chunk),
+            Full(<span class="kw">_</span>, tree) =&gt; Focus::Full(TreeFocus::new(tree)),
         }
     }
 
-    <span class="doccomment">/// Get the length of the focused [`Vector`][Vector].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Vector]: enum.Vector.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Focus::Single</span>(<span class="ident">chunk</span>) =&gt; <span class="ident">chunk</span>.<span class="ident">len</span>(),
-            <span class="ident">Focus::Full</span>(<span class="ident">tree</span>) =&gt; <span class="ident">tree</span>.<span class="ident">len</span>(),
+    <span class="doccomment">/// Get the length of the focused [`Vector`][Vector].
+    ///
+    /// [Vector]: enum.Vector.html
+    </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="kw">match </span><span class="self">self </span>{
+            Focus::Single(chunk) =&gt; chunk.len(),
+            Focus::Full(tree) =&gt; tree.len(),
         }
     }
 
-    <span class="doccomment">/// Test if the focused [`Vector`][Vector] is empty.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [Vector]: enum.Vector.html</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>
-    }
+    <span class="doccomment">/// Test if the focused [`Vector`][Vector] is empty.
+    ///
+    /// [Vector]: enum.Vector.html
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.len() == <span class="number">0
+    </span>}
 
-    <span class="doccomment">/// Get a reference to the value at a given index.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">A</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Focus::Single</span>(<span class="ident">chunk</span>) =&gt; <span class="ident">chunk</span>.<span class="ident">get</span>(<span class="ident">index</span>),
-            <span class="ident">Focus::Full</span>(<span class="ident">tree</span>) =&gt; <span class="ident">tree</span>.<span class="ident">get</span>(<span class="ident">index</span>),
+    <span class="doccomment">/// Get a reference to the value at a given index.
+    </span><span class="kw">pub fn </span>get(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>A&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            Focus::Single(chunk) =&gt; chunk.get(index),
+            Focus::Full(tree) =&gt; tree.get(index),
         }
     }
 
-    <span class="doccomment">/// Get a reference to the value at a given index.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if the index is out of bounds.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">A</span> {
-        <span class="self">self</span>.<span class="ident">get</span>(<span class="ident">index</span>).<span class="ident">expect</span>(<span class="string">&quot;index out of bounds&quot;</span>)
+    <span class="doccomment">/// Get a reference to the value at a given index.
+    ///
+    /// Panics if the index is out of bounds.
+    </span><span class="kw">pub fn </span>index(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize) -&gt; <span class="kw-2">&amp;</span>A {
+        <span class="self">self</span>.get(index).expect(<span class="string">&quot;index out of bounds&quot;</span>)
     }
 
-    <span class="doccomment">/// Get the chunk for the given index.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This gives you a reference to the leaf node that contains the index,</span>
-    <span class="doccomment">/// along with its start and end indices.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">chunk_at</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; (<span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span>[<span class="ident">A</span>]) {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
-        <span class="kw">if</span> <span class="ident">index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">len</span> {
+    <span class="doccomment">/// Get the chunk for the given index.
+    ///
+    /// This gives you a reference to the leaf node that contains the index,
+    /// along with its start and end indices.
+    </span><span class="kw">pub fn </span>chunk_at(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize) -&gt; (Range&lt;usize&gt;, <span class="kw-2">&amp;</span>[A]) {
+        <span class="kw">let </span>len = <span class="self">self</span>.len();
+        <span class="kw">if </span>index &gt;= len {
             <span class="macro">panic!</span>(<span class="string">&quot;vector::Focus::chunk_at: index out of bounds&quot;</span>);
         }
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Focus::Single</span>(<span class="ident">chunk</span>) =&gt; (<span class="number">0</span>..<span class="ident">len</span>, <span class="ident">chunk</span>),
-            <span class="ident">Focus::Full</span>(<span class="ident">tree</span>) =&gt; <span class="ident">tree</span>.<span class="ident">get_chunk</span>(<span class="ident">index</span>),
+        <span class="kw">match </span><span class="self">self </span>{
+            Focus::Single(chunk) =&gt; (<span class="number">0</span>..len, chunk),
+            Focus::Full(tree) =&gt; tree.get_chunk(index),
         }
     }
 
-    <span class="doccomment">/// Narrow the focus onto a subslice of the vector.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `Focus::narrow(range)` has the same effect as `&amp;slice[range]`, without</span>
-    <span class="doccomment">/// actually modifying the underlying vector.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if the range isn&#39;t fully inside the current focus.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # #[macro_use] extern crate im;</span>
-    <span class="doccomment">/// # use im::vector::Vector;</span>
-    <span class="doccomment">/// # use std::iter::FromIterator;</span>
-    <span class="doccomment">/// let vec = Vector::from_iter(0..1000);</span>
-    <span class="doccomment">/// let narrowed = vec.focus().narrow(100..200);</span>
-    <span class="doccomment">/// let narrowed_vec = narrowed.into_iter().cloned().collect();</span>
-    <span class="doccomment">/// assert_eq!(Vector::from_iter(100..200), narrowed_vec);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [slice::split_at]: https://doc.rust-lang.org/std/primitive.slice.html#method.split_at</span>
-    <span class="doccomment">/// [Vector::split_at]: enum.Vector.html#method.split_at</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">narrow</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">range</span>: <span class="ident">R</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">R</span>: <span class="ident">RangeBounds</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Narrow the focus onto a subslice of the vector.
+    ///
+    /// `Focus::narrow(range)` has the same effect as `&amp;slice[range]`, without
+    /// actually modifying the underlying vector.
+    ///
+    /// Panics if the range isn&#39;t fully inside the current focus.
+    ///
+    /// ## Examples
+    ///
+    /// ```rust
+    /// # #[macro_use] extern crate im;
+    /// # use im::vector::Vector;
+    /// # use std::iter::FromIterator;
+    /// let vec = Vector::from_iter(0..1000);
+    /// let narrowed = vec.focus().narrow(100..200);
+    /// let narrowed_vec = narrowed.into_iter().cloned().collect();
+    /// assert_eq!(Vector::from_iter(100..200), narrowed_vec);
+    /// ```
+    ///
+    /// [slice::split_at]: https://doc.rust-lang.org/std/primitive.slice.html#method.split_at
+    /// [Vector::split_at]: enum.Vector.html#method.split_at
+    </span><span class="kw">pub fn </span>narrow&lt;R&gt;(<span class="self">self</span>, range: R) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>R: RangeBounds&lt;usize&gt;,
     {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">to_range</span>(<span class="kw-2">&amp;</span><span class="ident">range</span>, <span class="self">self</span>.<span class="ident">len</span>());
-        <span class="kw">if</span> <span class="ident">r</span>.<span class="ident">start</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">r</span>.<span class="ident">end</span> <span class="op">|</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">start</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>() {
+        <span class="kw">let </span>r = to_range(<span class="kw-2">&amp;</span>range, <span class="self">self</span>.len());
+        <span class="kw">if </span>r.start &gt;= r.end || r.start &gt;= <span class="self">self</span>.len() {
             <span class="macro">panic!</span>(<span class="string">&quot;vector::Focus::narrow: range out of bounds&quot;</span>);
         }
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Focus::Single</span>(<span class="ident">chunk</span>) =&gt; <span class="ident">Focus::Single</span>(<span class="kw-2">&amp;</span><span class="ident">chunk</span>[<span class="ident">r</span>]),
-            <span class="ident">Focus::Full</span>(<span class="ident">tree</span>) =&gt; <span class="ident">Focus::Full</span>(<span class="ident">tree</span>.<span class="ident">narrow</span>(<span class="ident">r</span>)),
+        <span class="kw">match </span><span class="self">self </span>{
+            Focus::Single(chunk) =&gt; Focus::Single(<span class="kw-2">&amp;</span>chunk[r]),
+            Focus::Full(tree) =&gt; Focus::Full(tree.narrow(r)),
         }
     }
 
-    <span class="doccomment">/// Split the focus into two.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Given an index `index`, consume the focus and produce two new foci, the</span>
-    <span class="doccomment">/// left onto indices `0..index`, and the right onto indices `index..N`</span>
-    <span class="doccomment">/// where `N` is the length of the current focus.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if the index is out of bounds.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is the moral equivalent of [`slice::split_at`][slice::split_at], in</span>
-    <span class="doccomment">/// that it leaves the underlying data structure unchanged, unlike</span>
-    <span class="doccomment">/// [`Vector::split_at`][Vector::split_at].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # #[macro_use] extern crate im;</span>
-    <span class="doccomment">/// # use im::vector::Vector;</span>
-    <span class="doccomment">/// # use std::iter::FromIterator;</span>
-    <span class="doccomment">/// let vec = Vector::from_iter(0..1000);</span>
-    <span class="doccomment">/// let (left, right) = vec.focus().split_at(500);</span>
-    <span class="doccomment">/// let left_vec = left.into_iter().cloned().collect();</span>
-    <span class="doccomment">/// let right_vec = right.into_iter().cloned().collect();</span>
-    <span class="doccomment">/// assert_eq!(Vector::from_iter(0..500), left_vec);</span>
-    <span class="doccomment">/// assert_eq!(Vector::from_iter(500..1000), right_vec);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [slice::split_at]: https://doc.rust-lang.org/std/primitive.slice.html#method.split_at</span>
-    <span class="doccomment">/// [Vector::split_at]: enum.Vector.html#method.split_at</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">split_at</span>(<span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; (<span class="self">Self</span>, <span class="self">Self</span>) {
-        <span class="kw">if</span> <span class="ident">index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>() {
+    <span class="doccomment">/// Split the focus into two.
+    ///
+    /// Given an index `index`, consume the focus and produce two new foci, the
+    /// left onto indices `0..index`, and the right onto indices `index..N`
+    /// where `N` is the length of the current focus.
+    ///
+    /// Panics if the index is out of bounds.
+    ///
+    /// This is the moral equivalent of [`slice::split_at`][slice::split_at], in
+    /// that it leaves the underlying data structure unchanged, unlike
+    /// [`Vector::split_at`][Vector::split_at].
+    ///
+    /// ## Examples
+    ///
+    /// ```rust
+    /// # #[macro_use] extern crate im;
+    /// # use im::vector::Vector;
+    /// # use std::iter::FromIterator;
+    /// let vec = Vector::from_iter(0..1000);
+    /// let (left, right) = vec.focus().split_at(500);
+    /// let left_vec = left.into_iter().cloned().collect();
+    /// let right_vec = right.into_iter().cloned().collect();
+    /// assert_eq!(Vector::from_iter(0..500), left_vec);
+    /// assert_eq!(Vector::from_iter(500..1000), right_vec);
+    /// ```
+    ///
+    /// [slice::split_at]: https://doc.rust-lang.org/std/primitive.slice.html#method.split_at
+    /// [Vector::split_at]: enum.Vector.html#method.split_at
+    </span><span class="kw">pub fn </span>split_at(<span class="self">self</span>, index: usize) -&gt; (<span class="self">Self</span>, <span class="self">Self</span>) {
+        <span class="kw">if </span>index &gt;= <span class="self">self</span>.len() {
             <span class="macro">panic!</span>(<span class="string">&quot;vector::Focus::split_at: index out of bounds&quot;</span>);
         }
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Focus::Single</span>(<span class="ident">chunk</span>) =&gt; {
-                <span class="kw">let</span> (<span class="ident">left</span>, <span class="ident">right</span>) <span class="op">=</span> <span class="ident">chunk</span>.<span class="ident">split_at</span>(<span class="ident">index</span>);
-                (<span class="ident">Focus::Single</span>(<span class="ident">left</span>), <span class="ident">Focus::Single</span>(<span class="ident">right</span>))
+        <span class="kw">match </span><span class="self">self </span>{
+            Focus::Single(chunk) =&gt; {
+                <span class="kw">let </span>(left, right) = chunk.split_at(index);
+                (Focus::Single(left), Focus::Single(right))
             }
-            <span class="ident">Focus::Full</span>(<span class="ident">tree</span>) =&gt; {
-                <span class="kw">let</span> (<span class="ident">left</span>, <span class="ident">right</span>) <span class="op">=</span> <span class="ident">tree</span>.<span class="ident">split_at</span>(<span class="ident">index</span>);
-                (<span class="ident">Focus::Full</span>(<span class="ident">left</span>), <span class="ident">Focus::Full</span>(<span class="ident">right</span>))
+            Focus::Full(tree) =&gt; {
+                <span class="kw">let </span>(left, right) = tree.split_at(index);
+                (Focus::Full(left), Focus::Full(right))
             }
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="ident">Focus</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, A&gt; IntoIterator <span class="kw">for </span>Focus&lt;<span class="lifetime">&#39;a</span>, A&gt;
+<span class="kw">where
+    </span>A: Clone + <span class="lifetime">&#39;a</span>,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">A</span>;
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>A;
+    <span class="kw">type </span>IntoIter = Iter&lt;<span class="lifetime">&#39;a</span>, A&gt;;
 
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-        <span class="ident">Iter::from_focus</span>(<span class="self">self</span>)
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+        Iter::from_focus(<span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Focus</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, A&gt; Clone <span class="kw">for </span>Focus&lt;<span class="lifetime">&#39;a</span>, A&gt;
+<span class="kw">where
+    </span>A: Clone + <span class="lifetime">&#39;a</span>,
 {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Focus::Single</span>(<span class="ident">chunk</span>) =&gt; <span class="ident">Focus::Single</span>(<span class="ident">chunk</span>),
-            <span class="ident">Focus::Full</span>(<span class="ident">tree</span>) =&gt; <span class="ident">Focus::Full</span>(<span class="ident">tree</span>.<span class="ident">clone</span>()),
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span><span class="self">self </span>{
+            Focus::Single(chunk) =&gt; Focus::Single(chunk),
+            Focus::Full(tree) =&gt; Focus::Full(tree.clone()),
         }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TreeFocus</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
-    <span class="ident">tree</span>: <span class="ident">Rrb</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
-    <span class="ident">view</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    <span class="ident">middle_range</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    <span class="ident">target_range</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    <span class="ident">target_ptr</span>: <span class="kw-2">*const</span> <span class="ident">Chunk</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>TreeFocus&lt;A&gt; {
+    tree: Rrb&lt;A&gt;,
+    view: Range&lt;usize&gt;,
+    middle_range: Range&lt;usize&gt;,
+    target_range: Range&lt;usize&gt;,
+    target_ptr: <span class="kw-2">*const </span>Chunk&lt;A&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">TreeFocus</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">tree</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tree</span>.<span class="ident">clone</span>();
-        <span class="ident">TreeFocus</span> {
-            <span class="ident">view</span>: <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">clone</span>(),
-            <span class="ident">middle_range</span>: <span class="self">self</span>.<span class="ident">middle_range</span>.<span class="ident">clone</span>(),
-            <span class="ident">target_range</span>: <span class="number">0</span>..<span class="number">0</span>,
-            <span class="ident">target_ptr</span>: <span class="ident">null</span>(),
-            <span class="ident">tree</span>,
+<span class="kw">impl</span>&lt;A&gt; Clone <span class="kw">for </span>TreeFocus&lt;A&gt; {
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>tree = <span class="self">self</span>.tree.clone();
+        TreeFocus {
+            view: <span class="self">self</span>.view.clone(),
+            middle_range: <span class="self">self</span>.middle_range.clone(),
+            target_range: <span class="number">0</span>..<span class="number">0</span>,
+            target_ptr: null(),
+            tree,
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unsafe_code</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">threadsafe</span>)]</span>
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">TreeFocus</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {}
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unsafe_code</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">threadsafe</span>)]</span>
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">Sync</span><span class="op">&gt;</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">TreeFocus</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {}
+<span class="attribute">#[allow(unsafe_code)]
+#[cfg(threadsafe)]
+</span><span class="kw">unsafe impl</span>&lt;A: Send&gt; Send <span class="kw">for </span>TreeFocus&lt;A&gt; {}
+<span class="attribute">#[allow(unsafe_code)]
+#[cfg(threadsafe)]
+</span><span class="kw">unsafe impl</span>&lt;A: Sync&gt; Sync <span class="kw">for </span>TreeFocus&lt;A&gt; {}
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">contains</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">Ord</span><span class="op">&gt;</span>(<span class="ident">range</span>: <span class="kw-2">&amp;</span><span class="ident">Range</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>, <span class="ident">index</span>: <span class="kw-2">&amp;</span><span class="ident">A</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw-2">*</span><span class="ident">index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">range</span>.<span class="ident">start</span> <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">index</span> <span class="op">&lt;</span> <span class="ident">range</span>.<span class="ident">end</span>
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>contains&lt;A: Ord&gt;(range: <span class="kw-2">&amp;</span>Range&lt;A&gt;, index: <span class="kw-2">&amp;</span>A) -&gt; bool {
+    <span class="kw-2">*</span>index &gt;= range.start &amp;&amp; <span class="kw-2">*</span>index &lt; range.end
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> <span class="ident">TreeFocus</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Clone</span>,
+<span class="kw">impl</span>&lt;A&gt; TreeFocus&lt;A&gt;
+<span class="kw">where
+    </span>A: Clone,
 {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">tree</span>: <span class="kw-2">&amp;</span><span class="ident">Rrb</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">middle_start</span> <span class="op">=</span> <span class="ident">tree</span>.<span class="ident">outer_f</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">tree</span>.<span class="ident">inner_f</span>.<span class="ident">len</span>();
-        <span class="kw">let</span> <span class="ident">middle_end</span> <span class="op">=</span> <span class="ident">middle_start</span> <span class="op">+</span> <span class="ident">tree</span>.<span class="ident">middle</span>.<span class="ident">len</span>();
-        <span class="ident">TreeFocus</span> {
-            <span class="ident">tree</span>: <span class="ident">tree</span>.<span class="ident">clone</span>(),
-            <span class="ident">view</span>: <span class="number">0</span>..<span class="ident">tree</span>.<span class="ident">length</span>,
-            <span class="ident">middle_range</span>: <span class="ident">middle_start</span>..<span class="ident">middle_end</span>,
-            <span class="ident">target_range</span>: <span class="number">0</span>..<span class="number">0</span>,
-            <span class="ident">target_ptr</span>: <span class="ident">null</span>(),
+    <span class="kw">fn </span>new(tree: <span class="kw-2">&amp;</span>Rrb&lt;A&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>middle_start = tree.outer_f.len() + tree.inner_f.len();
+        <span class="kw">let </span>middle_end = middle_start + tree.middle.len();
+        TreeFocus {
+            tree: tree.clone(),
+            view: <span class="number">0</span>..tree.length,
+            middle_range: middle_start..middle_end,
+            target_range: <span class="number">0</span>..<span class="number">0</span>,
+            target_ptr: null(),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">end</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">start</span>
+    <span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.view.end - <span class="self">self</span>.view.start
     }
 
-    <span class="kw">fn</span> <span class="ident">narrow</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">view</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">view</span>.<span class="ident">start</span> <span class="op">+</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">start</span>;
-        <span class="ident">view</span>.<span class="ident">end</span> <span class="op">+</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">start</span>;
-        <span class="ident">TreeFocus</span> {
-            <span class="ident">view</span>,
-            <span class="ident">middle_range</span>: <span class="self">self</span>.<span class="ident">middle_range</span>.<span class="ident">clone</span>(),
-            <span class="ident">target_range</span>: <span class="number">0</span>..<span class="number">0</span>,
-            <span class="ident">target_ptr</span>: <span class="ident">null</span>(),
-            <span class="ident">tree</span>: <span class="self">self</span>.<span class="ident">tree</span>,
+    <span class="kw">fn </span>narrow(<span class="self">self</span>, <span class="kw-2">mut </span>view: Range&lt;usize&gt;) -&gt; <span class="self">Self </span>{
+        view.start += <span class="self">self</span>.view.start;
+        view.end += <span class="self">self</span>.view.start;
+        TreeFocus {
+            view,
+            middle_range: <span class="self">self</span>.middle_range.clone(),
+            target_range: <span class="number">0</span>..<span class="number">0</span>,
+            target_ptr: null(),
+            tree: <span class="self">self</span>.tree,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">split_at</span>(<span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; (<span class="self">Self</span>, <span class="self">Self</span>) {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
-        <span class="kw">let</span> <span class="ident">left</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>().<span class="ident">narrow</span>(<span class="number">0</span>..<span class="ident">index</span>);
-        <span class="kw">let</span> <span class="ident">right</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">narrow</span>(<span class="ident">index</span>..<span class="ident">len</span>);
-        (<span class="ident">left</span>, <span class="ident">right</span>)
+    <span class="kw">fn </span>split_at(<span class="self">self</span>, index: usize) -&gt; (<span class="self">Self</span>, <span class="self">Self</span>) {
+        <span class="kw">let </span>len = <span class="self">self</span>.len();
+        <span class="kw">let </span>left = <span class="self">self</span>.clone().narrow(<span class="number">0</span>..index);
+        <span class="kw">let </span>right = <span class="self">self</span>.narrow(index..len);
+        (left, right)
     }
 
-    <span class="kw">fn</span> <span class="ident">physical_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
-        <span class="macro">debug_assert!</span>(<span class="ident">index</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">end</span>);
-        <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">start</span> <span class="op">+</span> <span class="ident">index</span>
+    <span class="kw">fn </span>physical_index(<span class="kw-2">&amp;</span><span class="self">self</span>, index: usize) -&gt; usize {
+        <span class="macro">debug_assert!</span>(index &lt; <span class="self">self</span>.view.end);
+        <span class="self">self</span>.view.start + index
     }
 
-    <span class="kw">fn</span> <span class="ident">logical_range</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">range</span>: <span class="kw-2">&amp;</span><span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        (<span class="ident">range</span>.<span class="ident">start</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">start</span>)..(<span class="ident">range</span>.<span class="ident">end</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">start</span>)
+    <span class="kw">fn </span>logical_range(<span class="kw-2">&amp;</span><span class="self">self</span>, range: <span class="kw-2">&amp;</span>Range&lt;usize&gt;) -&gt; Range&lt;usize&gt; {
+        (range.start - <span class="self">self</span>.view.start)..(range.end - <span class="self">self</span>.view.start)
     }
 
-    <span class="kw">fn</span> <span class="ident">set_focus</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) {
-        <span class="kw">if</span> <span class="ident">index</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">middle_range</span>.<span class="ident">start</span> {
-            <span class="kw">let</span> <span class="ident">outer_len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tree</span>.<span class="ident">outer_f</span>.<span class="ident">len</span>();
-            <span class="kw">if</span> <span class="ident">index</span> <span class="op">&lt;</span> <span class="ident">outer_len</span> {
-                <span class="self">self</span>.<span class="ident">target_range</span> <span class="op">=</span> <span class="number">0</span>..<span class="ident">outer_len</span>;
-                <span class="self">self</span>.<span class="ident">target_ptr</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">tree</span>.<span class="ident">outer_f</span>;
-            } <span class="kw">else</span> {
-                <span class="self">self</span>.<span class="ident">target_range</span> <span class="op">=</span> <span class="ident">outer_len</span>..<span class="self">self</span>.<span class="ident">middle_range</span>.<span class="ident">start</span>;
-                <span class="self">self</span>.<span class="ident">target_ptr</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">tree</span>.<span class="ident">inner_f</span>;
+    <span class="kw">fn </span>set_focus(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize) {
+        <span class="kw">if </span>index &lt; <span class="self">self</span>.middle_range.start {
+            <span class="kw">let </span>outer_len = <span class="self">self</span>.tree.outer_f.len();
+            <span class="kw">if </span>index &lt; outer_len {
+                <span class="self">self</span>.target_range = <span class="number">0</span>..outer_len;
+                <span class="self">self</span>.target_ptr = <span class="kw-2">&amp;*</span><span class="self">self</span>.tree.outer_f;
+            } <span class="kw">else </span>{
+                <span class="self">self</span>.target_range = outer_len..<span class="self">self</span>.middle_range.start;
+                <span class="self">self</span>.target_ptr = <span class="kw-2">&amp;*</span><span class="self">self</span>.tree.inner_f;
             }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">middle_range</span>.<span class="ident">end</span> {
-            <span class="kw">let</span> <span class="ident">outer_start</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">middle_range</span>.<span class="ident">end</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">tree</span>.<span class="ident">inner_b</span>.<span class="ident">len</span>();
-            <span class="kw">if</span> <span class="ident">index</span> <span class="op">&lt;</span> <span class="ident">outer_start</span> {
-                <span class="self">self</span>.<span class="ident">target_range</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">middle_range</span>.<span class="ident">end</span>..<span class="ident">outer_start</span>;
-                <span class="self">self</span>.<span class="ident">target_ptr</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">tree</span>.<span class="ident">inner_b</span>;
-            } <span class="kw">else</span> {
-                <span class="self">self</span>.<span class="ident">target_range</span> <span class="op">=</span> <span class="ident">outer_start</span>..<span class="self">self</span>.<span class="ident">tree</span>.<span class="ident">length</span>;
-                <span class="self">self</span>.<span class="ident">target_ptr</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">tree</span>.<span class="ident">outer_b</span>;
+        } <span class="kw">else if </span>index &gt;= <span class="self">self</span>.middle_range.end {
+            <span class="kw">let </span>outer_start = <span class="self">self</span>.middle_range.end + <span class="self">self</span>.tree.inner_b.len();
+            <span class="kw">if </span>index &lt; outer_start {
+                <span class="self">self</span>.target_range = <span class="self">self</span>.middle_range.end..outer_start;
+                <span class="self">self</span>.target_ptr = <span class="kw-2">&amp;*</span><span class="self">self</span>.tree.inner_b;
+            } <span class="kw">else </span>{
+                <span class="self">self</span>.target_range = outer_start..<span class="self">self</span>.tree.length;
+                <span class="self">self</span>.target_ptr = <span class="kw-2">&amp;*</span><span class="self">self</span>.tree.outer_b;
             }
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">tree_index</span> <span class="op">=</span> <span class="ident">index</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">middle_range</span>.<span class="ident">start</span>;
-            <span class="kw">let</span> (<span class="ident">range</span>, <span class="ident">ptr</span>) <span class="op">=</span> <span class="self">self</span>
-                .<span class="ident">tree</span>
-                .<span class="ident">middle</span>
-                .<span class="ident">lookup_chunk</span>(<span class="self">self</span>.<span class="ident">tree</span>.<span class="ident">middle_level</span>, <span class="number">0</span>, <span class="ident">tree_index</span>);
-            <span class="self">self</span>.<span class="ident">target_range</span> <span class="op">=</span>
-                (<span class="ident">range</span>.<span class="ident">start</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">middle_range</span>.<span class="ident">start</span>)..(<span class="ident">range</span>.<span class="ident">end</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">middle_range</span>.<span class="ident">start</span>);
-            <span class="self">self</span>.<span class="ident">target_ptr</span> <span class="op">=</span> <span class="ident">ptr</span>;
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>tree_index = index - <span class="self">self</span>.middle_range.start;
+            <span class="kw">let </span>(range, ptr) = <span class="self">self
+                </span>.tree
+                .middle
+                .lookup_chunk(<span class="self">self</span>.tree.middle_level, <span class="number">0</span>, tree_index);
+            <span class="self">self</span>.target_range =
+                (range.start + <span class="self">self</span>.middle_range.start)..(range.end + <span class="self">self</span>.middle_range.start);
+            <span class="self">self</span>.target_ptr = ptr;
         }
     }
 
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unsafe_code</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">get_focus</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Chunk</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">target_ptr</span> }
+    <span class="attribute">#[allow(unsafe_code)]
+    </span><span class="kw">fn </span>get_focus(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Chunk&lt;A&gt; {
+        <span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span><span class="self">self</span>.target_ptr }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">A</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>() {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="kw">pub fn </span>get(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>A&gt; {
+        <span class="kw">if </span>index &gt;= <span class="self">self</span>.len() {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
-        <span class="kw">let</span> <span class="ident">phys_index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">physical_index</span>(<span class="ident">index</span>);
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">target_range</span>, <span class="kw-2">&amp;</span><span class="ident">phys_index</span>) {
-            <span class="self">self</span>.<span class="ident">set_focus</span>(<span class="ident">phys_index</span>);
+        <span class="kw">let </span>phys_index = <span class="self">self</span>.physical_index(index);
+        <span class="kw">if </span>!contains(<span class="kw-2">&amp;</span><span class="self">self</span>.target_range, <span class="kw-2">&amp;</span>phys_index) {
+            <span class="self">self</span>.set_focus(phys_index);
         }
-        <span class="kw">let</span> <span class="ident">target_phys_index</span> <span class="op">=</span> <span class="ident">phys_index</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">target_range</span>.<span class="ident">start</span>;
-        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">get_focus</span>()[<span class="ident">target_phys_index</span>])
+        <span class="kw">let </span>target_phys_index = phys_index - <span class="self">self</span>.target_range.start;
+        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.get_focus()[target_phys_index])
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_chunk</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; (<span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span>[<span class="ident">A</span>]) {
-        <span class="kw">let</span> <span class="ident">phys_index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">physical_index</span>(<span class="ident">index</span>);
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">target_range</span>, <span class="kw-2">&amp;</span><span class="ident">phys_index</span>) {
-            <span class="self">self</span>.<span class="ident">set_focus</span>(<span class="ident">phys_index</span>);
+    <span class="kw">pub fn </span>get_chunk(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize) -&gt; (Range&lt;usize&gt;, <span class="kw-2">&amp;</span>[A]) {
+        <span class="kw">let </span>phys_index = <span class="self">self</span>.physical_index(index);
+        <span class="kw">if </span>!contains(<span class="kw-2">&amp;</span><span class="self">self</span>.target_range, <span class="kw-2">&amp;</span>phys_index) {
+            <span class="self">self</span>.set_focus(phys_index);
         }
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">slice</span>: <span class="kw-2">&amp;</span>[<span class="ident">A</span>] <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_focus</span>().<span class="ident">as_slice</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">left</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">right</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">target_range</span>.<span class="ident">start</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">start</span> {
-            <span class="ident">left</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">start</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">target_range</span>.<span class="ident">start</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>slice: <span class="kw-2">&amp;</span>[A] = <span class="self">self</span>.get_focus().as_slice();
+        <span class="kw">let </span><span class="kw-2">mut </span>left = <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>right = <span class="number">0</span>;
+        <span class="kw">if </span><span class="self">self</span>.target_range.start &lt; <span class="self">self</span>.view.start {
+            left = <span class="self">self</span>.view.start - <span class="self">self</span>.target_range.start;
         }
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">target_range</span>.<span class="ident">end</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">end</span> {
-            <span class="ident">right</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">target_range</span>.<span class="ident">end</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">end</span>;
+        <span class="kw">if </span><span class="self">self</span>.target_range.end &gt; <span class="self">self</span>.view.end {
+            right = <span class="self">self</span>.target_range.end - <span class="self">self</span>.view.end;
         }
-        <span class="ident">slice</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">slice</span>[<span class="ident">left</span>..(<span class="ident">slice</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">right</span>)];
-        <span class="kw">let</span> <span class="ident">phys_range</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">target_range</span>.<span class="ident">start</span> <span class="op">+</span> <span class="ident">left</span>)..(<span class="self">self</span>.<span class="ident">target_range</span>.<span class="ident">end</span> <span class="op">-</span> <span class="ident">right</span>);
-        (<span class="self">self</span>.<span class="ident">logical_range</span>(<span class="kw-2">&amp;</span><span class="ident">phys_range</span>), <span class="ident">slice</span>)
+        slice = <span class="kw-2">&amp;</span>slice[left..(slice.len() - right)];
+        <span class="kw">let </span>phys_range = (<span class="self">self</span>.target_range.start + left)..(<span class="self">self</span>.target_range.end - right);
+        (<span class="self">self</span>.logical_range(<span class="kw-2">&amp;</span>phys_range), slice)
     }
 }
 
-<span class="doccomment">/// A mutable version of [`Focus`][Focus].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See [`Focus`][Focus] for more details.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You can only build one `FocusMut` at a time for a vector, effectively</span>
-<span class="doccomment">/// keeping a lock on the vector until you&#39;re done with the focus, which relies</span>
-<span class="doccomment">/// on the structure of the vector not changing while it exists.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,compile_fail</span>
-<span class="doccomment">/// # #[macro_use] extern crate im;</span>
-<span class="doccomment">/// # use im::vector::Vector;</span>
-<span class="doccomment">/// # use std::iter::FromIterator;</span>
-<span class="doccomment">/// let mut vec = Vector::from_iter(0..1000);</span>
-<span class="doccomment">/// let focus1 = vec.focus_mut();</span>
-<span class="doccomment">/// // Fails here in 2015 edition because you&#39;re creating</span>
-<span class="doccomment">/// // two mutable references to the same thing.</span>
-<span class="doccomment">/// let focus2 = vec.focus_mut();</span>
-<span class="doccomment">/// // Fails here in 2018 edition because creating focus2</span>
-<span class="doccomment">/// // made focus1&#39;s lifetime go out of scope.</span>
-<span class="doccomment">/// assert_eq!(Some(&amp;0), focus1.get(0));</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// On the other hand, you can split that one focus into multiple sub-focuses,</span>
-<span class="doccomment">/// which is safe because they can&#39;t overlap:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust</span>
-<span class="doccomment">/// # #[macro_use] extern crate im;</span>
-<span class="doccomment">/// # use im::vector::Vector;</span>
-<span class="doccomment">/// # use std::iter::FromIterator;</span>
-<span class="doccomment">/// let mut vec = Vector::from_iter(0..1000);</span>
-<span class="doccomment">/// let focus = vec.focus_mut();</span>
-<span class="doccomment">/// let (mut left, mut right) = focus.split_at(500);</span>
-<span class="doccomment">/// assert_eq!(Some(&amp;0), left.get(0));</span>
-<span class="doccomment">/// assert_eq!(Some(&amp;500), right.get(0));</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// These sub-foci also work as a lock on the vector, even if the focus they</span>
-<span class="doccomment">/// were created from goes out of scope.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,compile_fail</span>
-<span class="doccomment">/// # #[macro_use] extern crate im;</span>
-<span class="doccomment">/// # use im::vector::Vector;</span>
-<span class="doccomment">/// # use std::iter::FromIterator;</span>
-<span class="doccomment">/// let mut vec = Vector::from_iter(0..1000);</span>
-<span class="doccomment">/// let (left, right) = {</span>
-<span class="doccomment">///     let focus = vec.focus_mut();</span>
-<span class="doccomment">///     focus.split_at(500)</span>
-<span class="doccomment">/// };</span>
-<span class="doccomment">/// // `left` and `right` are still in scope even if `focus` isn&#39;t, so we can&#39;t</span>
-<span class="doccomment">/// // create another focus:</span>
-<span class="doccomment">/// let focus2 = vec.focus_mut();</span>
-<span class="doccomment">/// assert_eq!(Some(&amp;0), left.get(0));</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [Focus]: enum.Focus.html</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">FocusMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> {
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="ident">Single</span>(<span class="ident">RRBPool</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">A</span>]),
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="ident">Full</span>(<span class="ident">RRBPool</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>, <span class="ident">TreeFocusMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span>),
+<span class="doccomment">/// A mutable version of [`Focus`][Focus].
+///
+/// See [`Focus`][Focus] for more details.
+///
+/// You can only build one `FocusMut` at a time for a vector, effectively
+/// keeping a lock on the vector until you&#39;re done with the focus, which relies
+/// on the structure of the vector not changing while it exists.
+///
+/// ```rust,compile_fail
+/// # #[macro_use] extern crate im;
+/// # use im::vector::Vector;
+/// # use std::iter::FromIterator;
+/// let mut vec = Vector::from_iter(0..1000);
+/// let focus1 = vec.focus_mut();
+/// // Fails here in 2015 edition because you&#39;re creating
+/// // two mutable references to the same thing.
+/// let focus2 = vec.focus_mut();
+/// // Fails here in 2018 edition because creating focus2
+/// // made focus1&#39;s lifetime go out of scope.
+/// assert_eq!(Some(&amp;0), focus1.get(0));
+/// ```
+///
+/// On the other hand, you can split that one focus into multiple sub-focuses,
+/// which is safe because they can&#39;t overlap:
+///
+/// ```rust
+/// # #[macro_use] extern crate im;
+/// # use im::vector::Vector;
+/// # use std::iter::FromIterator;
+/// let mut vec = Vector::from_iter(0..1000);
+/// let focus = vec.focus_mut();
+/// let (mut left, mut right) = focus.split_at(500);
+/// assert_eq!(Some(&amp;0), left.get(0));
+/// assert_eq!(Some(&amp;500), right.get(0));
+/// ```
+///
+/// These sub-foci also work as a lock on the vector, even if the focus they
+/// were created from goes out of scope.
+///
+/// ```rust,compile_fail
+/// # #[macro_use] extern crate im;
+/// # use im::vector::Vector;
+/// # use std::iter::FromIterator;
+/// let mut vec = Vector::from_iter(0..1000);
+/// let (left, right) = {
+///     let focus = vec.focus_mut();
+///     focus.split_at(500)
+/// };
+/// // `left` and `right` are still in scope even if `focus` isn&#39;t, so we can&#39;t
+/// // create another focus:
+/// let focus2 = vec.focus_mut();
+/// assert_eq!(Some(&amp;0), left.get(0));
+/// ```
+///
+/// [Focus]: enum.Focus.html
+</span><span class="kw">pub enum </span>FocusMut&lt;<span class="lifetime">&#39;a</span>, A&gt; {
+    <span class="attribute">#[doc(hidden)]
+    </span>Single(RRBPool&lt;A&gt;, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[A]),
+    <span class="attribute">#[doc(hidden)]
+    </span>Full(RRBPool&lt;A&gt;, TreeFocusMut&lt;<span class="lifetime">&#39;a</span>, A&gt;),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> <span class="ident">FocusMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, A&gt; FocusMut&lt;<span class="lifetime">&#39;a</span>, A&gt;
+<span class="kw">where
+    </span>A: Clone + <span class="lifetime">&#39;a</span>,
 {
-    <span class="doccomment">/// Construct a `FocusMut` for a `Vector`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">vector</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Vector</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;mut</span> <span class="ident">vector</span>.<span class="ident">vector</span> {
-            <span class="ident">Inline</span>(<span class="ident">pool</span>, <span class="ident">chunk</span>) =&gt; <span class="ident">FocusMut::Single</span>(<span class="ident">pool</span>.<span class="ident">clone</span>(), <span class="ident">chunk</span>),
-            <span class="ident">Single</span>(<span class="ident">pool</span>, <span class="ident">chunk</span>) =&gt; <span class="ident">FocusMut::Single</span>(
-                <span class="ident">pool</span>.<span class="ident">clone</span>(),
-                <span class="ident">PoolRef::make_mut</span>(<span class="kw-2">&amp;</span><span class="ident">pool</span>.<span class="ident">value_pool</span>, <span class="ident">chunk</span>).<span class="ident">as_mut_slice</span>(),
+    <span class="doccomment">/// Construct a `FocusMut` for a `Vector`.
+    </span><span class="kw">pub fn </span>new(vector: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Vector&lt;A&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span><span class="kw-2">&amp;mut </span>vector.vector {
+            Inline(pool, chunk) =&gt; FocusMut::Single(pool.clone(), chunk),
+            Single(pool, chunk) =&gt; FocusMut::Single(
+                pool.clone(),
+                PoolRef::make_mut(<span class="kw-2">&amp;</span>pool.value_pool, chunk).as_mut_slice(),
             ),
-            <span class="ident">Full</span>(<span class="ident">pool</span>, <span class="ident">tree</span>) =&gt; <span class="ident">FocusMut::Full</span>(<span class="ident">pool</span>.<span class="ident">clone</span>(), <span class="ident">TreeFocusMut::new</span>(<span class="ident">tree</span>)),
+            Full(pool, tree) =&gt; FocusMut::Full(pool.clone(), TreeFocusMut::new(tree)),
         }
     }
 
-    <span class="doccomment">/// Get the length of the focused `Vector`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FocusMut::Single</span>(<span class="kw">_</span>, <span class="ident">chunk</span>) =&gt; <span class="ident">chunk</span>.<span class="ident">len</span>(),
-            <span class="ident">FocusMut::Full</span>(<span class="kw">_</span>, <span class="ident">tree</span>) =&gt; <span class="ident">tree</span>.<span class="ident">len</span>(),
+    <span class="doccomment">/// Get the length of the focused `Vector`.
+    </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="kw">match </span><span class="self">self </span>{
+            FocusMut::Single(<span class="kw">_</span>, chunk) =&gt; chunk.len(),
+            FocusMut::Full(<span class="kw">_</span>, tree) =&gt; tree.len(),
         }
     }
 
-    <span class="doccomment">/// Test if the focused `Vector` is empty.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>
+    <span class="doccomment">/// Test if the focused `Vector` is empty.
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.len() == <span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Get a reference to the value at a given index.
+    </span><span class="kw">pub fn </span>get(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>A&gt; {
+        <span class="self">self</span>.get_mut(index).map(|r| <span class="kw-2">&amp;*</span>r)
     }
 
-    <span class="doccomment">/// Get a reference to the value at a given index.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">A</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">get_mut</span>(<span class="ident">index</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">r</span>)
-    }
-
-    <span class="doccomment">/// Get a mutable reference to the value at a given index.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">A</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FocusMut::Single</span>(<span class="kw">_</span>, <span class="ident">chunk</span>) =&gt; <span class="ident">chunk</span>.<span class="ident">get_mut</span>(<span class="ident">index</span>),
-            <span class="ident">FocusMut::Full</span>(<span class="ident">pool</span>, <span class="ident">tree</span>) =&gt; <span class="ident">tree</span>.<span class="ident">get</span>(<span class="ident">pool</span>, <span class="ident">index</span>),
+    <span class="doccomment">/// Get a mutable reference to the value at a given index.
+    </span><span class="kw">pub fn </span>get_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>A&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            FocusMut::Single(<span class="kw">_</span>, chunk) =&gt; chunk.get_mut(index),
+            FocusMut::Full(pool, tree) =&gt; tree.get(pool, index),
         }
     }
 
-    <span class="doccomment">/// Get a reference to the value at a given index.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if the index is out of bounds.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">A</span> {
-        <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">index_mut</span>(<span class="ident">index</span>)
+    <span class="doccomment">/// Get a reference to the value at a given index.
+    ///
+    /// Panics if the index is out of bounds.
+    </span><span class="kw">pub fn </span>index(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize) -&gt; <span class="kw-2">&amp;</span>A {
+        <span class="kw-2">&amp;*</span><span class="self">self</span>.index_mut(index)
     }
 
-    <span class="doccomment">/// Get a mutable reference to the value at a given index.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if the index is out of bounds.</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::should_implement_trait</span>)]</span> <span class="comment">// would if I could</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">A</span> {
-        <span class="self">self</span>.<span class="ident">get_mut</span>(<span class="ident">index</span>).<span class="ident">expect</span>(<span class="string">&quot;index out of bounds&quot;</span>)
+    <span class="doccomment">/// Get a mutable reference to the value at a given index.
+    ///
+    /// Panics if the index is out of bounds.
+    </span><span class="attribute">#[allow(clippy::should_implement_trait)] </span><span class="comment">// would if I could
+    </span><span class="kw">pub fn </span>index_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize) -&gt; <span class="kw-2">&amp;mut </span>A {
+        <span class="self">self</span>.get_mut(index).expect(<span class="string">&quot;index out of bounds&quot;</span>)
     }
 
-    <span class="doccomment">/// Update the value at a given index.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns `None` if the index is out of bounds, or the replaced value</span>
-    <span class="doccomment">/// otherwise.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>, <span class="ident">value</span>: <span class="ident">A</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">get_mut</span>(<span class="ident">index</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">pos</span><span class="op">|</span> <span class="ident">replace</span>(<span class="ident">pos</span>, <span class="ident">value</span>))
+    <span class="doccomment">/// Update the value at a given index.
+    ///
+    /// Returns `None` if the index is out of bounds, or the replaced value
+    /// otherwise.
+    </span><span class="kw">pub fn </span>set(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize, value: A) -&gt; <span class="prelude-ty">Option</span>&lt;A&gt; {
+        <span class="self">self</span>.get_mut(index).map(|pos| replace(pos, value))
     }
 
-    <span class="doccomment">/// Swap the values at two given indices.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if either index is out of bounds.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the indices are equal, this function returns without doing anything.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">swap</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="ident">usize</span>, <span class="ident">b</span>: <span class="ident">usize</span>) {
-        <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="ident">b</span> {
+    <span class="doccomment">/// Swap the values at two given indices.
+    ///
+    /// Panics if either index is out of bounds.
+    ///
+    /// If the indices are equal, this function returns without doing anything.
+    </span><span class="kw">pub fn </span>swap(<span class="kw-2">&amp;mut </span><span class="self">self</span>, a: usize, b: usize) {
+        <span class="kw">if </span>a == b {
             <span class="kw">return</span>;
         }
-        <span class="self">self</span>.<span class="ident">pair</span>(<span class="ident">a</span>, <span class="ident">b</span>, <span class="op">|</span><span class="ident">left</span>, <span class="ident">right</span><span class="op">|</span> <span class="ident">swap</span>(<span class="ident">left</span>, <span class="ident">right</span>));
+        <span class="self">self</span>.pair(a, b, |left, right| swap(left, right));
     }
 
-    <span class="doccomment">/// Lookup two indices simultaneously and run a function over them.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Useful because the borrow checker won&#39;t let you have more than one</span>
-    <span class="doccomment">/// mutable reference into the same data structure at any given time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if either index is out of bounds, or if they are the same index.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # #[macro_use] extern crate im;</span>
-    <span class="doccomment">/// # use im::vector::Vector;</span>
-    <span class="doccomment">/// # use std::iter::FromIterator;</span>
-    <span class="doccomment">/// let mut vec = vector![1, 2, 3, 4, 5];</span>
-    <span class="doccomment">/// vec.focus_mut().pair(1, 3, |a, b| *a += *b);</span>
-    <span class="doccomment">/// assert_eq!(vector![1, 6, 3, 4, 5], vec);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unsafe_code</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pair</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="ident">usize</span>, <span class="ident">b</span>: <span class="ident">usize</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">B</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;mut</span> <span class="ident">A</span>, <span class="kw-2">&amp;mut</span> <span class="ident">A</span>) -&gt; <span class="ident">B</span>,
+    <span class="doccomment">/// Lookup two indices simultaneously and run a function over them.
+    ///
+    /// Useful because the borrow checker won&#39;t let you have more than one
+    /// mutable reference into the same data structure at any given time.
+    ///
+    /// Panics if either index is out of bounds, or if they are the same index.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # #[macro_use] extern crate im;
+    /// # use im::vector::Vector;
+    /// # use std::iter::FromIterator;
+    /// let mut vec = vector![1, 2, 3, 4, 5];
+    /// vec.focus_mut().pair(1, 3, |a, b| *a += *b);
+    /// assert_eq!(vector![1, 6, 3, 4, 5], vec);
+    /// ```
+    </span><span class="attribute">#[allow(unsafe_code)]
+    </span><span class="kw">pub fn </span>pair&lt;F, B&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, a: usize, b: usize, <span class="kw-2">mut </span>f: F) -&gt; B
+    <span class="kw">where
+        </span>F: FnMut(<span class="kw-2">&amp;mut </span>A, <span class="kw-2">&amp;mut </span>A) -&gt; B,
     {
-        <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="ident">b</span> {
+        <span class="kw">if </span>a == b {
             <span class="macro">panic!</span>(<span class="string">&quot;vector::FocusMut::pair: indices cannot be equal!&quot;</span>);
         }
-        <span class="kw">let</span> <span class="ident">pa</span>: <span class="kw-2">*mut</span> <span class="ident">A</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index_mut</span>(<span class="ident">a</span>);
-        <span class="kw">let</span> <span class="ident">pb</span>: <span class="kw-2">*mut</span> <span class="ident">A</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index_mut</span>(<span class="ident">b</span>);
-        <span class="kw">unsafe</span> { <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">pa</span>, <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">pb</span>) }
+        <span class="kw">let </span>pa: <span class="kw-2">*mut </span>A = <span class="self">self</span>.index_mut(a);
+        <span class="kw">let </span>pb: <span class="kw-2">*mut </span>A = <span class="self">self</span>.index_mut(b);
+        <span class="kw">unsafe </span>{ f(<span class="kw-2">&amp;mut *</span>pa, <span class="kw-2">&amp;mut *</span>pb) }
     }
 
-    <span class="doccomment">/// Lookup three indices simultaneously and run a function over them.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Useful because the borrow checker won&#39;t let you have more than one</span>
-    <span class="doccomment">/// mutable reference into the same data structure at any given time.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if any index is out of bounds, or if any indices are equal.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # #[macro_use] extern crate im;</span>
-    <span class="doccomment">/// # use im::vector::Vector;</span>
-    <span class="doccomment">/// # use std::iter::FromIterator;</span>
-    <span class="doccomment">/// let mut vec = vector![1, 2, 3, 4, 5];</span>
-    <span class="doccomment">/// vec.focus_mut().triplet(0, 2, 4, |a, b, c| *a += *b + *c);</span>
-    <span class="doccomment">/// assert_eq!(vector![9, 2, 3, 4, 5], vec);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unsafe_code</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">triplet</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">B</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">a</span>: <span class="ident">usize</span>, <span class="ident">b</span>: <span class="ident">usize</span>, <span class="ident">c</span>: <span class="ident">usize</span>, <span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">B</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;mut</span> <span class="ident">A</span>, <span class="kw-2">&amp;mut</span> <span class="ident">A</span>, <span class="kw-2">&amp;mut</span> <span class="ident">A</span>) -&gt; <span class="ident">B</span>,
+    <span class="doccomment">/// Lookup three indices simultaneously and run a function over them.
+    ///
+    /// Useful because the borrow checker won&#39;t let you have more than one
+    /// mutable reference into the same data structure at any given time.
+    ///
+    /// Panics if any index is out of bounds, or if any indices are equal.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # #[macro_use] extern crate im;
+    /// # use im::vector::Vector;
+    /// # use std::iter::FromIterator;
+    /// let mut vec = vector![1, 2, 3, 4, 5];
+    /// vec.focus_mut().triplet(0, 2, 4, |a, b, c| *a += *b + *c);
+    /// assert_eq!(vector![9, 2, 3, 4, 5], vec);
+    /// ```
+    </span><span class="attribute">#[allow(unsafe_code)]
+    </span><span class="kw">pub fn </span>triplet&lt;F, B&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, a: usize, b: usize, c: usize, <span class="kw-2">mut </span>f: F) -&gt; B
+    <span class="kw">where
+        </span>F: FnMut(<span class="kw-2">&amp;mut </span>A, <span class="kw-2">&amp;mut </span>A, <span class="kw-2">&amp;mut </span>A) -&gt; B,
     {
-        <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="ident">b</span> <span class="op">|</span><span class="op">|</span> <span class="ident">b</span> <span class="op">==</span> <span class="ident">c</span> <span class="op">|</span><span class="op">|</span> <span class="ident">a</span> <span class="op">==</span> <span class="ident">c</span> {
+        <span class="kw">if </span>a == b || b == c || a == c {
             <span class="macro">panic!</span>(<span class="string">&quot;vector::FocusMut::triplet: indices cannot be equal!&quot;</span>);
         }
-        <span class="kw">let</span> <span class="ident">pa</span>: <span class="kw-2">*mut</span> <span class="ident">A</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index_mut</span>(<span class="ident">a</span>);
-        <span class="kw">let</span> <span class="ident">pb</span>: <span class="kw-2">*mut</span> <span class="ident">A</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index_mut</span>(<span class="ident">b</span>);
-        <span class="kw">let</span> <span class="ident">pc</span>: <span class="kw-2">*mut</span> <span class="ident">A</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">index_mut</span>(<span class="ident">c</span>);
-        <span class="kw">unsafe</span> { <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">pa</span>, <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">pb</span>, <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">pc</span>) }
+        <span class="kw">let </span>pa: <span class="kw-2">*mut </span>A = <span class="self">self</span>.index_mut(a);
+        <span class="kw">let </span>pb: <span class="kw-2">*mut </span>A = <span class="self">self</span>.index_mut(b);
+        <span class="kw">let </span>pc: <span class="kw-2">*mut </span>A = <span class="self">self</span>.index_mut(c);
+        <span class="kw">unsafe </span>{ f(<span class="kw-2">&amp;mut *</span>pa, <span class="kw-2">&amp;mut *</span>pb, <span class="kw-2">&amp;mut *</span>pc) }
     }
 
-    <span class="doccomment">/// Get the chunk for the given index.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This gives you a reference to the leaf node that contains the index,</span>
-    <span class="doccomment">/// along with its start and end indices.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">chunk_at</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; (<span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>, <span class="kw-2">&amp;mut</span> [<span class="ident">A</span>]) {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
-        <span class="kw">if</span> <span class="ident">index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">len</span> {
+    <span class="doccomment">/// Get the chunk for the given index.
+    ///
+    /// This gives you a reference to the leaf node that contains the index,
+    /// along with its start and end indices.
+    </span><span class="kw">pub fn </span>chunk_at(<span class="kw-2">&amp;mut </span><span class="self">self</span>, index: usize) -&gt; (Range&lt;usize&gt;, <span class="kw-2">&amp;mut </span>[A]) {
+        <span class="kw">let </span>len = <span class="self">self</span>.len();
+        <span class="kw">if </span>index &gt;= len {
             <span class="macro">panic!</span>(<span class="string">&quot;vector::FocusMut::chunk_at: index out of bounds&quot;</span>);
         }
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FocusMut::Single</span>(<span class="kw">_</span>, <span class="ident">chunk</span>) =&gt; (<span class="number">0</span>..<span class="ident">len</span>, <span class="ident">chunk</span>),
-            <span class="ident">FocusMut::Full</span>(<span class="ident">pool</span>, <span class="ident">tree</span>) =&gt; {
-                <span class="kw">let</span> (<span class="ident">range</span>, <span class="ident">chunk</span>) <span class="op">=</span> <span class="ident">tree</span>.<span class="ident">get_chunk</span>(<span class="ident">pool</span>, <span class="ident">index</span>);
-                (<span class="ident">range</span>, <span class="ident">chunk</span>)
+        <span class="kw">match </span><span class="self">self </span>{
+            FocusMut::Single(<span class="kw">_</span>, chunk) =&gt; (<span class="number">0</span>..len, chunk),
+            FocusMut::Full(pool, tree) =&gt; {
+                <span class="kw">let </span>(range, chunk) = tree.get_chunk(pool, index);
+                (range, chunk)
             }
         }
     }
 
-    <span class="doccomment">/// Narrow the focus onto a subslice of the vector.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// `FocusMut::narrow(range)` has the same effect as `&amp;slice[range]`, without</span>
-    <span class="doccomment">/// actually modifying the underlying vector.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if the range isn&#39;t fully inside the current focus.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # #[macro_use] extern crate im;</span>
-    <span class="doccomment">/// # use im::vector::Vector;</span>
-    <span class="doccomment">/// # use std::iter::FromIterator;</span>
-    <span class="doccomment">/// let mut vec = Vector::from_iter(0..1000);</span>
-    <span class="doccomment">/// let narrowed = vec.focus_mut().narrow(100..200);</span>
-    <span class="doccomment">/// let narrowed_vec = narrowed.unmut().into_iter().cloned().collect();</span>
-    <span class="doccomment">/// assert_eq!(Vector::from_iter(100..200), narrowed_vec);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [slice::split_at]: https://doc.rust-lang.org/std/primitive.slice.html#method.split_at</span>
-    <span class="doccomment">/// [Vector::split_at]: enum.Vector.html#method.split_at</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">narrow</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">range</span>: <span class="ident">R</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">R</span>: <span class="ident">RangeBounds</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Narrow the focus onto a subslice of the vector.
+    ///
+    /// `FocusMut::narrow(range)` has the same effect as `&amp;slice[range]`, without
+    /// actually modifying the underlying vector.
+    ///
+    /// Panics if the range isn&#39;t fully inside the current focus.
+    ///
+    /// ## Examples
+    ///
+    /// ```rust
+    /// # #[macro_use] extern crate im;
+    /// # use im::vector::Vector;
+    /// # use std::iter::FromIterator;
+    /// let mut vec = Vector::from_iter(0..1000);
+    /// let narrowed = vec.focus_mut().narrow(100..200);
+    /// let narrowed_vec = narrowed.unmut().into_iter().cloned().collect();
+    /// assert_eq!(Vector::from_iter(100..200), narrowed_vec);
+    /// ```
+    ///
+    /// [slice::split_at]: https://doc.rust-lang.org/std/primitive.slice.html#method.split_at
+    /// [Vector::split_at]: enum.Vector.html#method.split_at
+    </span><span class="kw">pub fn </span>narrow&lt;R&gt;(<span class="self">self</span>, range: R) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>R: RangeBounds&lt;usize&gt;,
     {
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">to_range</span>(<span class="kw-2">&amp;</span><span class="ident">range</span>, <span class="self">self</span>.<span class="ident">len</span>());
-        <span class="kw">if</span> <span class="ident">r</span>.<span class="ident">start</span> <span class="op">&gt;</span> <span class="ident">r</span>.<span class="ident">end</span> <span class="op">|</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">start</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">len</span>() {
+        <span class="kw">let </span>r = to_range(<span class="kw-2">&amp;</span>range, <span class="self">self</span>.len());
+        <span class="kw">if </span>r.start &gt; r.end || r.start &gt; <span class="self">self</span>.len() {
             <span class="macro">panic!</span>(<span class="string">&quot;vector::FocusMut::narrow: range out of bounds&quot;</span>);
         }
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FocusMut::Single</span>(<span class="ident">pool</span>, <span class="ident">chunk</span>) =&gt; <span class="ident">FocusMut::Single</span>(<span class="ident">pool</span>, <span class="kw-2">&amp;mut</span> <span class="ident">chunk</span>[<span class="ident">r</span>]),
-            <span class="ident">FocusMut::Full</span>(<span class="ident">pool</span>, <span class="ident">tree</span>) =&gt; <span class="ident">FocusMut::Full</span>(<span class="ident">pool</span>, <span class="ident">tree</span>.<span class="ident">narrow</span>(<span class="ident">r</span>)),
+        <span class="kw">match </span><span class="self">self </span>{
+            FocusMut::Single(pool, chunk) =&gt; FocusMut::Single(pool, <span class="kw-2">&amp;mut </span>chunk[r]),
+            FocusMut::Full(pool, tree) =&gt; FocusMut::Full(pool, tree.narrow(r)),
         }
     }
 
-    <span class="doccomment">/// Split the focus into two.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Given an index `index`, consume the focus and produce two new foci, the</span>
-    <span class="doccomment">/// left onto indices `0..index`, and the right onto indices `index..N`</span>
-    <span class="doccomment">/// where `N` is the length of the current focus.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if the index is out of bounds.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is the moral equivalent of [`slice::split_at`][slice::split_at], in</span>
-    <span class="doccomment">/// that it leaves the underlying data structure unchanged, unlike</span>
-    <span class="doccomment">/// [`Vector::split_at`][Vector::split_at].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ## Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # #[macro_use] extern crate im;</span>
-    <span class="doccomment">/// # use im::vector::Vector;</span>
-    <span class="doccomment">/// # use std::iter::FromIterator;</span>
-    <span class="doccomment">/// let mut vec = Vector::from_iter(0..1000);</span>
-    <span class="doccomment">/// {</span>
-    <span class="doccomment">///     let (left, right) = vec.focus_mut().split_at(500);</span>
-    <span class="doccomment">///     for ptr in left {</span>
-    <span class="doccomment">///         *ptr += 100;</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">///     for ptr in right {</span>
-    <span class="doccomment">///         *ptr -= 100;</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// let expected = Vector::from_iter(100..600)</span>
-    <span class="doccomment">///              + Vector::from_iter(400..900);</span>
-    <span class="doccomment">/// assert_eq!(expected, vec);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [slice::split_at]: https://doc.rust-lang.org/std/primitive.slice.html#method.split_at</span>
-    <span class="doccomment">/// [Vector::split_at]: enum.Vector.html#method.split_at</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::redundant_clone</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">split_at</span>(<span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; (<span class="self">Self</span>, <span class="self">Self</span>) {
-        <span class="kw">if</span> <span class="ident">index</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">len</span>() {
+    <span class="doccomment">/// Split the focus into two.
+    ///
+    /// Given an index `index`, consume the focus and produce two new foci, the
+    /// left onto indices `0..index`, and the right onto indices `index..N`
+    /// where `N` is the length of the current focus.
+    ///
+    /// Panics if the index is out of bounds.
+    ///
+    /// This is the moral equivalent of [`slice::split_at`][slice::split_at], in
+    /// that it leaves the underlying data structure unchanged, unlike
+    /// [`Vector::split_at`][Vector::split_at].
+    ///
+    /// ## Examples
+    ///
+    /// ```rust
+    /// # #[macro_use] extern crate im;
+    /// # use im::vector::Vector;
+    /// # use std::iter::FromIterator;
+    /// let mut vec = Vector::from_iter(0..1000);
+    /// {
+    ///     let (left, right) = vec.focus_mut().split_at(500);
+    ///     for ptr in left {
+    ///         *ptr += 100;
+    ///     }
+    ///     for ptr in right {
+    ///         *ptr -= 100;
+    ///     }
+    /// }
+    /// let expected = Vector::from_iter(100..600)
+    ///              + Vector::from_iter(400..900);
+    /// assert_eq!(expected, vec);
+    /// ```
+    ///
+    /// [slice::split_at]: https://doc.rust-lang.org/std/primitive.slice.html#method.split_at
+    /// [Vector::split_at]: enum.Vector.html#method.split_at
+    </span><span class="attribute">#[allow(clippy::redundant_clone)]
+    </span><span class="kw">pub fn </span>split_at(<span class="self">self</span>, index: usize) -&gt; (<span class="self">Self</span>, <span class="self">Self</span>) {
+        <span class="kw">if </span>index &gt; <span class="self">self</span>.len() {
             <span class="macro">panic!</span>(<span class="string">&quot;vector::FocusMut::split_at: index out of bounds&quot;</span>);
         }
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FocusMut::Single</span>(<span class="ident">pool</span>, <span class="ident">chunk</span>) =&gt; {
-                <span class="kw">let</span> (<span class="ident">left</span>, <span class="ident">right</span>) <span class="op">=</span> <span class="ident">chunk</span>.<span class="ident">split_at_mut</span>(<span class="ident">index</span>);
+        <span class="kw">match </span><span class="self">self </span>{
+            FocusMut::Single(pool, chunk) =&gt; {
+                <span class="kw">let </span>(left, right) = chunk.split_at_mut(index);
                 (
-                    <span class="ident">FocusMut::Single</span>(<span class="ident">pool</span>.<span class="ident">clone</span>(), <span class="ident">left</span>),
-                    <span class="ident">FocusMut::Single</span>(<span class="ident">pool</span>, <span class="ident">right</span>),
+                    FocusMut::Single(pool.clone(), left),
+                    FocusMut::Single(pool, right),
                 )
             }
-            <span class="ident">FocusMut::Full</span>(<span class="ident">pool</span>, <span class="ident">tree</span>) =&gt; {
-                <span class="kw">let</span> (<span class="ident">left</span>, <span class="ident">right</span>) <span class="op">=</span> <span class="ident">tree</span>.<span class="ident">split_at</span>(<span class="ident">index</span>);
+            FocusMut::Full(pool, tree) =&gt; {
+                <span class="kw">let </span>(left, right) = tree.split_at(index);
                 (
-                    <span class="ident">FocusMut::Full</span>(<span class="ident">pool</span>.<span class="ident">clone</span>(), <span class="ident">left</span>),
-                    <span class="ident">FocusMut::Full</span>(<span class="ident">pool</span>, <span class="ident">right</span>),
+                    FocusMut::Full(pool.clone(), left),
+                    FocusMut::Full(pool, right),
                 )
             }
         }
     }
 
-    <span class="doccomment">/// Convert a `FocusMut` into a `Focus`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">unmut</span>(<span class="self">self</span>) -&gt; <span class="ident">Focus</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">FocusMut::Single</span>(<span class="kw">_</span>, <span class="ident">chunk</span>) =&gt; <span class="ident">Focus::Single</span>(<span class="ident">chunk</span>),
-            <span class="ident">FocusMut::Full</span>(<span class="kw">_</span>, <span class="kw-2">mut</span> <span class="ident">tree</span>) =&gt; <span class="ident">Focus::Full</span>(<span class="ident">TreeFocus</span> {
-                <span class="ident">tree</span>: {
-                    <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">tree</span>.<span class="ident">tree</span>.<span class="ident">lock</span>().<span class="ident">unwrap</span>();
-                    (<span class="kw-2">*</span><span class="ident">t</span>).<span class="ident">clone</span>()
+    <span class="doccomment">/// Convert a `FocusMut` into a `Focus`.
+    </span><span class="kw">pub fn </span>unmut(<span class="self">self</span>) -&gt; Focus&lt;<span class="lifetime">&#39;a</span>, A&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            FocusMut::Single(<span class="kw">_</span>, chunk) =&gt; Focus::Single(chunk),
+            FocusMut::Full(<span class="kw">_</span>, <span class="kw-2">mut </span>tree) =&gt; Focus::Full(TreeFocus {
+                tree: {
+                    <span class="kw">let </span>t = tree.tree.lock().unwrap();
+                    (<span class="kw-2">*</span>t).clone()
                 },
-                <span class="ident">view</span>: <span class="ident">tree</span>.<span class="ident">view</span>.<span class="ident">clone</span>(),
-                <span class="ident">middle_range</span>: <span class="ident">tree</span>.<span class="ident">middle_range</span>.<span class="ident">clone</span>(),
-                <span class="ident">target_range</span>: <span class="number">0</span>..<span class="number">0</span>,
-                <span class="ident">target_ptr</span>: <span class="ident">null</span>(),
+                view: tree.view.clone(),
+                middle_range: tree.middle_range.clone(),
+                target_range: <span class="number">0</span>..<span class="number">0</span>,
+                target_ptr: null(),
             }),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="ident">FocusMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, A&gt; IntoIterator <span class="kw">for </span>FocusMut&lt;<span class="lifetime">&#39;a</span>, A&gt;
+<span class="kw">where
+    </span>A: Clone + <span class="lifetime">&#39;a</span>,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">A</span>;
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">IterMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>A;
+    <span class="kw">type </span>IntoIter = IterMut&lt;<span class="lifetime">&#39;a</span>, A&gt;;
 
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-        <span class="ident">IterMut::from_focus</span>(<span class="self">self</span>)
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+        IterMut::from_focus(<span class="self">self</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">FocusMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Focus</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, A&gt; From&lt;FocusMut&lt;<span class="lifetime">&#39;a</span>, A&gt;&gt; <span class="kw">for </span>Focus&lt;<span class="lifetime">&#39;a</span>, A&gt;
+<span class="kw">where
+    </span>A: Clone + <span class="lifetime">&#39;a</span>,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="ident">FocusMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">f</span>.<span class="ident">unmut</span>()
+    <span class="kw">fn </span>from(f: FocusMut&lt;<span class="lifetime">&#39;a</span>, A&gt;) -&gt; <span class="self">Self </span>{
+        f.unmut()
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TreeFocusMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> {
-    <span class="ident">tree</span>: <span class="ident">Lock</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Rrb</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">view</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    <span class="ident">middle_range</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    <span class="ident">target_range</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    <span class="ident">target_ptr</span>: <span class="ident">AtomicPtr</span><span class="op">&lt;</span><span class="ident">Chunk</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>TreeFocusMut&lt;<span class="lifetime">&#39;a</span>, A&gt; {
+    tree: Lock&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Rrb&lt;A&gt;&gt;,
+    view: Range&lt;usize&gt;,
+    middle_range: Range&lt;usize&gt;,
+    target_range: Range&lt;usize&gt;,
+    target_ptr: AtomicPtr&lt;Chunk&lt;A&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span> <span class="ident">TreeFocusMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">A</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="lifetime">&#39;a</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, A&gt; TreeFocusMut&lt;<span class="lifetime">&#39;a</span>, A&gt;
+<span class="kw">where
+    </span>A: Clone + <span class="lifetime">&#39;a</span>,
 {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">tree</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">Rrb</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">middle_start</span> <span class="op">=</span> <span class="ident">tree</span>.<span class="ident">outer_f</span>.<span class="ident">len</span>() <span class="op">+</span> <span class="ident">tree</span>.<span class="ident">inner_f</span>.<span class="ident">len</span>();
-        <span class="kw">let</span> <span class="ident">middle_end</span> <span class="op">=</span> <span class="ident">middle_start</span> <span class="op">+</span> <span class="ident">tree</span>.<span class="ident">middle</span>.<span class="ident">len</span>();
-        <span class="ident">TreeFocusMut</span> {
-            <span class="ident">view</span>: <span class="number">0</span>..<span class="ident">tree</span>.<span class="ident">length</span>,
-            <span class="ident">tree</span>: <span class="ident">Lock::new</span>(<span class="ident">tree</span>),
-            <span class="ident">middle_range</span>: <span class="ident">middle_start</span>..<span class="ident">middle_end</span>,
-            <span class="ident">target_range</span>: <span class="number">0</span>..<span class="number">0</span>,
-            <span class="ident">target_ptr</span>: <span class="ident">AtomicPtr::default</span>(),
+    <span class="kw">fn </span>new(tree: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>Rrb&lt;A&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>middle_start = tree.outer_f.len() + tree.inner_f.len();
+        <span class="kw">let </span>middle_end = middle_start + tree.middle.len();
+        TreeFocusMut {
+            view: <span class="number">0</span>..tree.length,
+            tree: Lock::new(tree),
+            middle_range: middle_start..middle_end,
+            target_range: <span class="number">0</span>..<span class="number">0</span>,
+            target_ptr: AtomicPtr::default(),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">end</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">start</span>
+    <span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.view.end - <span class="self">self</span>.view.start
     }
 
-    <span class="kw">fn</span> <span class="ident">narrow</span>(<span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">view</span>: <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">view</span>.<span class="ident">start</span> <span class="op">+</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">start</span>;
-        <span class="ident">view</span>.<span class="ident">end</span> <span class="op">+</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">start</span>;
-        <span class="ident">TreeFocusMut</span> {
-            <span class="ident">view</span>,
-            <span class="ident">middle_range</span>: <span class="self">self</span>.<span class="ident">middle_range</span>.<span class="ident">clone</span>(),
-            <span class="ident">target_range</span>: <span class="number">0</span>..<span class="number">0</span>,
-            <span class="ident">target_ptr</span>: <span class="ident">AtomicPtr::default</span>(),
-            <span class="ident">tree</span>: <span class="self">self</span>.<span class="ident">tree</span>,
+    <span class="kw">fn </span>narrow(<span class="self">self</span>, <span class="kw-2">mut </span>view: Range&lt;usize&gt;) -&gt; <span class="self">Self </span>{
+        view.start += <span class="self">self</span>.view.start;
+        view.end += <span class="self">self</span>.view.start;
+        TreeFocusMut {
+            view,
+            middle_range: <span class="self">self</span>.middle_range.clone(),
+            target_range: <span class="number">0</span>..<span class="number">0</span>,
+            target_ptr: AtomicPtr::default(),
+            tree: <span class="self">self</span>.tree,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">split_at</span>(<span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; (<span class="self">Self</span>, <span class="self">Self</span>) {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>();
-        <span class="macro">debug_assert!</span>(<span class="ident">index</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">len</span>);
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unsafe_code</span>)]</span>
-        <span class="kw">let</span> <span class="ident">left</span> <span class="op">=</span> <span class="ident">TreeFocusMut</span> {
-            <span class="ident">view</span>: <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">start</span>..(<span class="self">self</span>.<span class="ident">view</span>.<span class="ident">start</span> <span class="op">+</span> <span class="ident">index</span>),
-            <span class="ident">middle_range</span>: <span class="self">self</span>.<span class="ident">middle_range</span>.<span class="ident">clone</span>(),
-            <span class="ident">target_range</span>: <span class="number">0</span>..<span class="number">0</span>,
-            <span class="ident">target_ptr</span>: <span class="ident">AtomicPtr::default</span>(),
-            <span class="ident">tree</span>: <span class="self">self</span>.<span class="ident">tree</span>.<span class="ident">clone</span>(),
+    <span class="kw">fn </span>split_at(<span class="self">self</span>, index: usize) -&gt; (<span class="self">Self</span>, <span class="self">Self</span>) {
+        <span class="kw">let </span>len = <span class="self">self</span>.len();
+        <span class="macro">debug_assert!</span>(index &lt;= len);
+        <span class="attribute">#[allow(unsafe_code)]
+        </span><span class="kw">let </span>left = TreeFocusMut {
+            view: <span class="self">self</span>.view.start..(<span class="self">self</span>.view.start + index),
+            middle_range: <span class="self">self</span>.middle_range.clone(),
+            target_range: <span class="number">0</span>..<span class="number">0</span>,
+            target_ptr: AtomicPtr::default(),
+            tree: <span class="self">self</span>.tree.clone(),
         };
-        <span class="kw">let</span> <span class="ident">right</span> <span class="op">=</span> <span class="ident">TreeFocusMut</span> {
-            <span class="ident">view</span>: (<span class="self">self</span>.<span class="ident">view</span>.<span class="ident">start</span> <span class="op">+</span> <span class="ident">index</span>)..(<span class="self">self</span>.<span class="ident">view</span>.<span class="ident">start</span> <span class="op">+</span> <span class="ident">len</span>),
-            <span class="ident">middle_range</span>: <span class="self">self</span>.<span class="ident">middle_range</span>.<span class="ident">clone</span>(),
-            <span class="ident">target_range</span>: <span class="number">0</span>..<span class="number">0</span>,
-            <span class="ident">target_ptr</span>: <span class="ident">AtomicPtr::default</span>(),
-            <span class="ident">tree</span>: <span class="self">self</span>.<span class="ident">tree</span>,
+        <span class="kw">let </span>right = TreeFocusMut {
+            view: (<span class="self">self</span>.view.start + index)..(<span class="self">self</span>.view.start + len),
+            middle_range: <span class="self">self</span>.middle_range.clone(),
+            target_range: <span class="number">0</span>..<span class="number">0</span>,
+            target_ptr: AtomicPtr::default(),
+            tree: <span class="self">self</span>.tree,
         };
-        (<span class="ident">left</span>, <span class="ident">right</span>)
+        (left, right)
     }
 
-    <span class="kw">fn</span> <span class="ident">physical_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
-        <span class="macro">debug_assert!</span>(<span class="ident">index</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">end</span>);
-        <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">start</span> <span class="op">+</span> <span class="ident">index</span>
+    <span class="kw">fn </span>physical_index(<span class="kw-2">&amp;</span><span class="self">self</span>, index: usize) -&gt; usize {
+        <span class="macro">debug_assert!</span>(index &lt; <span class="self">self</span>.view.end);
+        <span class="self">self</span>.view.start + index
     }
 
-    <span class="kw">fn</span> <span class="ident">logical_range</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">range</span>: <span class="kw-2">&amp;</span><span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        (<span class="ident">range</span>.<span class="ident">start</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">start</span>)..(<span class="ident">range</span>.<span class="ident">end</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">start</span>)
+    <span class="kw">fn </span>logical_range(<span class="kw-2">&amp;</span><span class="self">self</span>, range: <span class="kw-2">&amp;</span>Range&lt;usize&gt;) -&gt; Range&lt;usize&gt; {
+        (range.start - <span class="self">self</span>.view.start)..(range.end - <span class="self">self</span>.view.start)
     }
 
-    <span class="kw">fn</span> <span class="ident">set_focus</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">pool</span>: <span class="kw-2">&amp;</span><span class="ident">RRBPool</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>, <span class="ident">index</span>: <span class="ident">usize</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tree</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">tree</span>
-            .<span class="ident">lock</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;im::vector::Focus::set_focus: unable to acquire exclusive lock on Vector&quot;</span>);
-        <span class="kw">if</span> <span class="ident">index</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">middle_range</span>.<span class="ident">start</span> {
-            <span class="kw">let</span> <span class="ident">outer_len</span> <span class="op">=</span> <span class="ident">tree</span>.<span class="ident">outer_f</span>.<span class="ident">len</span>();
-            <span class="kw">if</span> <span class="ident">index</span> <span class="op">&lt;</span> <span class="ident">outer_len</span> {
-                <span class="self">self</span>.<span class="ident">target_range</span> <span class="op">=</span> <span class="number">0</span>..<span class="ident">outer_len</span>;
-                <span class="self">self</span>.<span class="ident">target_ptr</span>.<span class="ident">store</span>(
-                    <span class="ident">PoolRef::make_mut</span>(<span class="kw-2">&amp;</span><span class="ident">pool</span>.<span class="ident">value_pool</span>, <span class="kw-2">&amp;mut</span> <span class="ident">tree</span>.<span class="ident">outer_f</span>),
-                    <span class="ident">Ordering::Relaxed</span>,
+    <span class="kw">fn </span>set_focus(<span class="kw-2">&amp;mut </span><span class="self">self</span>, pool: <span class="kw-2">&amp;</span>RRBPool&lt;A&gt;, index: usize) {
+        <span class="kw">let </span><span class="kw-2">mut </span>tree = <span class="self">self
+            </span>.tree
+            .lock()
+            .expect(<span class="string">&quot;im::vector::Focus::set_focus: unable to acquire exclusive lock on Vector&quot;</span>);
+        <span class="kw">if </span>index &lt; <span class="self">self</span>.middle_range.start {
+            <span class="kw">let </span>outer_len = tree.outer_f.len();
+            <span class="kw">if </span>index &lt; outer_len {
+                <span class="self">self</span>.target_range = <span class="number">0</span>..outer_len;
+                <span class="self">self</span>.target_ptr.store(
+                    PoolRef::make_mut(<span class="kw-2">&amp;</span>pool.value_pool, <span class="kw-2">&amp;mut </span>tree.outer_f),
+                    Ordering::Relaxed,
                 );
-            } <span class="kw">else</span> {
-                <span class="self">self</span>.<span class="ident">target_range</span> <span class="op">=</span> <span class="ident">outer_len</span>..<span class="self">self</span>.<span class="ident">middle_range</span>.<span class="ident">start</span>;
-                <span class="self">self</span>.<span class="ident">target_ptr</span>.<span class="ident">store</span>(
-                    <span class="ident">PoolRef::make_mut</span>(<span class="kw-2">&amp;</span><span class="ident">pool</span>.<span class="ident">value_pool</span>, <span class="kw-2">&amp;mut</span> <span class="ident">tree</span>.<span class="ident">inner_f</span>),
-                    <span class="ident">Ordering::Relaxed</span>,
+            } <span class="kw">else </span>{
+                <span class="self">self</span>.target_range = outer_len..<span class="self">self</span>.middle_range.start;
+                <span class="self">self</span>.target_ptr.store(
+                    PoolRef::make_mut(<span class="kw-2">&amp;</span>pool.value_pool, <span class="kw-2">&amp;mut </span>tree.inner_f),
+                    Ordering::Relaxed,
                 );
             }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">middle_range</span>.<span class="ident">end</span> {
-            <span class="kw">let</span> <span class="ident">outer_start</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">middle_range</span>.<span class="ident">end</span> <span class="op">+</span> <span class="ident">tree</span>.<span class="ident">inner_b</span>.<span class="ident">len</span>();
-            <span class="kw">if</span> <span class="ident">index</span> <span class="op">&lt;</span> <span class="ident">outer_start</span> {
-                <span class="self">self</span>.<span class="ident">target_range</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">middle_range</span>.<span class="ident">end</span>..<span class="ident">outer_start</span>;
-                <span class="self">self</span>.<span class="ident">target_ptr</span>.<span class="ident">store</span>(
-                    <span class="ident">PoolRef::make_mut</span>(<span class="kw-2">&amp;</span><span class="ident">pool</span>.<span class="ident">value_pool</span>, <span class="kw-2">&amp;mut</span> <span class="ident">tree</span>.<span class="ident">inner_b</span>),
-                    <span class="ident">Ordering::Relaxed</span>,
+        } <span class="kw">else if </span>index &gt;= <span class="self">self</span>.middle_range.end {
+            <span class="kw">let </span>outer_start = <span class="self">self</span>.middle_range.end + tree.inner_b.len();
+            <span class="kw">if </span>index &lt; outer_start {
+                <span class="self">self</span>.target_range = <span class="self">self</span>.middle_range.end..outer_start;
+                <span class="self">self</span>.target_ptr.store(
+                    PoolRef::make_mut(<span class="kw-2">&amp;</span>pool.value_pool, <span class="kw-2">&amp;mut </span>tree.inner_b),
+                    Ordering::Relaxed,
                 );
-            } <span class="kw">else</span> {
-                <span class="self">self</span>.<span class="ident">target_range</span> <span class="op">=</span> <span class="ident">outer_start</span>..<span class="ident">tree</span>.<span class="ident">length</span>;
-                <span class="self">self</span>.<span class="ident">target_ptr</span>.<span class="ident">store</span>(
-                    <span class="ident">PoolRef::make_mut</span>(<span class="kw-2">&amp;</span><span class="ident">pool</span>.<span class="ident">value_pool</span>, <span class="kw-2">&amp;mut</span> <span class="ident">tree</span>.<span class="ident">outer_b</span>),
-                    <span class="ident">Ordering::Relaxed</span>,
+            } <span class="kw">else </span>{
+                <span class="self">self</span>.target_range = outer_start..tree.length;
+                <span class="self">self</span>.target_ptr.store(
+                    PoolRef::make_mut(<span class="kw-2">&amp;</span>pool.value_pool, <span class="kw-2">&amp;mut </span>tree.outer_b),
+                    Ordering::Relaxed,
                 );
             }
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">tree_index</span> <span class="op">=</span> <span class="ident">index</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">middle_range</span>.<span class="ident">start</span>;
-            <span class="kw">let</span> <span class="ident">level</span> <span class="op">=</span> <span class="ident">tree</span>.<span class="ident">middle_level</span>;
-            <span class="kw">let</span> <span class="ident">middle</span> <span class="op">=</span> <span class="ident">Ref::make_mut</span>(<span class="kw-2">&amp;mut</span> <span class="ident">tree</span>.<span class="ident">middle</span>);
-            <span class="kw">let</span> (<span class="ident">range</span>, <span class="ident">ptr</span>) <span class="op">=</span> <span class="ident">middle</span>.<span class="ident">lookup_chunk_mut</span>(<span class="ident">pool</span>, <span class="ident">level</span>, <span class="number">0</span>, <span class="ident">tree_index</span>);
-            <span class="self">self</span>.<span class="ident">target_range</span> <span class="op">=</span>
-                (<span class="ident">range</span>.<span class="ident">start</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">middle_range</span>.<span class="ident">start</span>)..(<span class="ident">range</span>.<span class="ident">end</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">middle_range</span>.<span class="ident">start</span>);
-            <span class="self">self</span>.<span class="ident">target_ptr</span>.<span class="ident">store</span>(<span class="ident">ptr</span>, <span class="ident">Ordering::Relaxed</span>);
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>tree_index = index - <span class="self">self</span>.middle_range.start;
+            <span class="kw">let </span>level = tree.middle_level;
+            <span class="kw">let </span>middle = Ref::make_mut(<span class="kw-2">&amp;mut </span>tree.middle);
+            <span class="kw">let </span>(range, ptr) = middle.lookup_chunk_mut(pool, level, <span class="number">0</span>, tree_index);
+            <span class="self">self</span>.target_range =
+                (range.start + <span class="self">self</span>.middle_range.start)..(range.end + <span class="self">self</span>.middle_range.start);
+            <span class="self">self</span>.target_ptr.store(ptr, Ordering::Relaxed);
         }
     }
 
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unsafe_code</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">get_focus</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Chunk</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">target_ptr</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>) }
+    <span class="attribute">#[allow(unsafe_code)]
+    </span><span class="kw">fn </span>get_focus(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span>Chunk&lt;A&gt; {
+        <span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span><span class="self">self</span>.target_ptr.load(Ordering::Relaxed) }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">pool</span>: <span class="kw-2">&amp;</span><span class="ident">RRBPool</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">A</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">index</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">len</span>() {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="kw">pub fn </span>get(<span class="kw-2">&amp;mut </span><span class="self">self</span>, pool: <span class="kw-2">&amp;</span>RRBPool&lt;A&gt;, index: usize) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>A&gt; {
+        <span class="kw">if </span>index &gt;= <span class="self">self</span>.len() {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
-        <span class="kw">let</span> <span class="ident">phys_index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">physical_index</span>(<span class="ident">index</span>);
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">target_range</span>, <span class="kw-2">&amp;</span><span class="ident">phys_index</span>) {
-            <span class="self">self</span>.<span class="ident">set_focus</span>(<span class="ident">pool</span>, <span class="ident">phys_index</span>);
+        <span class="kw">let </span>phys_index = <span class="self">self</span>.physical_index(index);
+        <span class="kw">if </span>!contains(<span class="kw-2">&amp;</span><span class="self">self</span>.target_range, <span class="kw-2">&amp;</span>phys_index) {
+            <span class="self">self</span>.set_focus(pool, phys_index);
         }
-        <span class="kw">let</span> <span class="ident">target_phys_index</span> <span class="op">=</span> <span class="ident">phys_index</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">target_range</span>.<span class="ident">start</span>;
-        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">get_focus</span>()[<span class="ident">target_phys_index</span>])
+        <span class="kw">let </span>target_phys_index = phys_index - <span class="self">self</span>.target_range.start;
+        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;mut </span><span class="self">self</span>.get_focus()[target_phys_index])
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_chunk</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">pool</span>: <span class="kw-2">&amp;</span><span class="ident">RRBPool</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; (<span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>, <span class="kw-2">&amp;mut</span> [<span class="ident">A</span>]) {
-        <span class="kw">let</span> <span class="ident">phys_index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">physical_index</span>(<span class="ident">index</span>);
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">target_range</span>, <span class="kw-2">&amp;</span><span class="ident">phys_index</span>) {
-            <span class="self">self</span>.<span class="ident">set_focus</span>(<span class="ident">pool</span>, <span class="ident">phys_index</span>);
+    <span class="kw">pub fn </span>get_chunk(<span class="kw-2">&amp;mut </span><span class="self">self</span>, pool: <span class="kw-2">&amp;</span>RRBPool&lt;A&gt;, index: usize) -&gt; (Range&lt;usize&gt;, <span class="kw-2">&amp;mut </span>[A]) {
+        <span class="kw">let </span>phys_index = <span class="self">self</span>.physical_index(index);
+        <span class="kw">if </span>!contains(<span class="kw-2">&amp;</span><span class="self">self</span>.target_range, <span class="kw-2">&amp;</span>phys_index) {
+            <span class="self">self</span>.set_focus(pool, phys_index);
         }
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">left</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">right</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">target_range</span>.<span class="ident">start</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">start</span> {
-            <span class="ident">left</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">start</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">target_range</span>.<span class="ident">start</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>left = <span class="number">0</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>right = <span class="number">0</span>;
+        <span class="kw">if </span><span class="self">self</span>.target_range.start &lt; <span class="self">self</span>.view.start {
+            left = <span class="self">self</span>.view.start - <span class="self">self</span>.target_range.start;
         }
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">target_range</span>.<span class="ident">end</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">end</span> {
-            <span class="ident">right</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">target_range</span>.<span class="ident">end</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">view</span>.<span class="ident">end</span>;
+        <span class="kw">if </span><span class="self">self</span>.target_range.end &gt; <span class="self">self</span>.view.end {
+            right = <span class="self">self</span>.target_range.end - <span class="self">self</span>.view.end;
         }
-        <span class="kw">let</span> <span class="ident">phys_range</span> <span class="op">=</span> (<span class="self">self</span>.<span class="ident">target_range</span>.<span class="ident">start</span> <span class="op">+</span> <span class="ident">left</span>)..(<span class="self">self</span>.<span class="ident">target_range</span>.<span class="ident">end</span> <span class="op">-</span> <span class="ident">right</span>);
-        <span class="kw">let</span> <span class="ident">log_range</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">logical_range</span>(<span class="kw-2">&amp;</span><span class="ident">phys_range</span>);
-        <span class="kw">let</span> <span class="ident">slice_len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_focus</span>().<span class="ident">len</span>();
-        <span class="kw">let</span> <span class="ident">slice</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> (<span class="self">self</span>.<span class="ident">get_focus</span>().<span class="ident">as_mut_slice</span>())[<span class="ident">left</span>..(<span class="ident">slice_len</span> <span class="op">-</span> <span class="ident">right</span>)];
-        (<span class="ident">log_range</span>, <span class="ident">slice</span>)
+        <span class="kw">let </span>phys_range = (<span class="self">self</span>.target_range.start + left)..(<span class="self">self</span>.target_range.end - right);
+        <span class="kw">let </span>log_range = <span class="self">self</span>.logical_range(<span class="kw-2">&amp;</span>phys_range);
+        <span class="kw">let </span>slice_len = <span class="self">self</span>.get_focus().len();
+        <span class="kw">let </span>slice = <span class="kw-2">&amp;mut </span>(<span class="self">self</span>.get_focus().as_mut_slice())[left..(slice_len - right)];
+        (log_range, slice)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="im" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="im" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

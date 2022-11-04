@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/sql_schema_differ/sql_schema_differ_flavour.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sql_schema_differ_flavour.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../sql_migration_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/sql_schema_differ/sql_schema_differ_flavour.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sql_schema_differ_flavour.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../sql_migration_connector/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -168,175 +168,175 @@
 <span id="168">168</span>
 <span id="169">169</span>
 <span id="170">170</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">differ_database::DifferDatabase</span>, <span class="ident">ColumnTypeChange</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">pair::Pair</span>, <span class="ident">sql_migration::SqlMigrationStep</span>, <span class="ident">sql_schema_differ</span>};
-<span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{
-    <span class="ident">walkers</span>::{<span class="ident">ColumnWalker</span>, <span class="ident">IndexWalker</span>, <span class="ident">TableWalker</span>},
-    <span class="ident">ColumnId</span>,
+</pre><pre class="rust"><code><span class="kw">use super</span>::{differ_database::DifferDatabase, ColumnTypeChange};
+<span class="kw">use crate</span>::{pair::Pair, sql_migration::SqlMigrationStep, sql_schema_differ};
+<span class="kw">use </span>sql_schema_describer::{
+    walkers::{ColumnWalker, IndexWalker, TableWalker},
+    ColumnId,
 };
 
-<span class="kw">mod</span> <span class="ident">mssql</span>;
-<span class="kw">mod</span> <span class="ident">mysql</span>;
-<span class="kw">mod</span> <span class="ident">postgres</span>;
-<span class="kw">mod</span> <span class="ident">sqlite</span>;
+<span class="kw">mod </span>mssql;
+<span class="kw">mod </span>mysql;
+<span class="kw">mod </span>postgres;
+<span class="kw">mod </span>sqlite;
 
-<span class="doccomment">/// Trait to specialize SQL schema diffing (resulting in migration steps) by SQL backend.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait</span> <span class="ident">SqlSchemaDifferFlavour</span> {
-    <span class="kw">fn</span> <span class="ident">can_alter_primary_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
+<span class="doccomment">/// Trait to specialize SQL schema diffing (resulting in migration steps) by SQL backend.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">trait </span>SqlSchemaDifferFlavour {
+    <span class="kw">fn </span>can_alter_primary_keys(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
+
+    <span class="kw">fn </span>can_redefine_tables_with_inbound_foreign_keys(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
+
+    <span class="doccomment">/// If this returns `true`, the differ will generate
+    /// SqlMigrationStep::RedefineIndex steps instead of
+    /// SqlMigrationStep::AlterIndex.
+    </span><span class="kw">fn </span>can_rename_index(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">true
+    </span>}
+
+    <span class="doccomment">/// Returns true only if the database can cope with an optional column
+    /// constrained by a foreign key being made NOT NULL.
+    </span><span class="kw">fn </span>can_cope_with_foreign_key_column_becoming_non_nullable(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">true
+    </span>}
+
+    <span class="doccomment">/// Controls whether we will generate `RenameForeignKey` steps for this flavour.
+    </span><span class="kw">fn </span>can_rename_foreign_key(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool;
+
+    <span class="doccomment">/// This method must return whether a column became or ceased to be autoincrementing.
+    </span><span class="kw">fn </span>column_autoincrement_changed(<span class="kw-2">&amp;</span><span class="self">self</span>, columns: Pair&lt;ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; bool {
+        columns.previous.is_autoincrement() != columns.next.is_autoincrement()
     }
 
-    <span class="kw">fn</span> <span class="ident">can_redefine_tables_with_inbound_foreign_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
+    <span class="doccomment">/// Return whether a column&#39;s type needs to be migrated, and how.
+    </span><span class="kw">fn </span>column_type_change(<span class="kw-2">&amp;</span><span class="self">self</span>, differ: Pair&lt;ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;ColumnTypeChange&gt; {
+        <span class="kw">if </span>differ.previous.column_type_family() != differ.next.column_type_family() {
+            <span class="prelude-val">Some</span>(ColumnTypeChange::RiskyCast)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 
-    <span class="doccomment">/// If this returns `true`, the differ will generate</span>
-    <span class="doccomment">/// SqlMigrationStep::RedefineIndex steps instead of</span>
-    <span class="doccomment">/// SqlMigrationStep::AlterIndex.</span>
-    <span class="kw">fn</span> <span class="ident">can_rename_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">true</span>
+    <span class="doccomment">/// Push enum-related steps.
+    </span><span class="kw">fn </span>push_enum_steps(<span class="kw-2">&amp;</span><span class="self">self</span>, _steps: <span class="kw-2">&amp;mut </span>Vec&lt;SqlMigrationStep&gt;, _db: <span class="kw-2">&amp;</span>DifferDatabase&lt;<span class="lifetime">&#39;_</span>&gt;) {}
+
+    <span class="doccomment">/// Push AlterSequence steps.
+    </span><span class="kw">fn </span>push_alter_sequence_steps(<span class="kw-2">&amp;</span><span class="self">self</span>, _steps: <span class="kw-2">&amp;mut </span>Vec&lt;SqlMigrationStep&gt;, _db: <span class="kw-2">&amp;</span>DifferDatabase&lt;<span class="lifetime">&#39;_</span>&gt;) {}
+
+    <span class="doccomment">/// Push AlterExtension steps.
+    </span><span class="kw">fn </span>push_extension_steps(<span class="kw-2">&amp;</span><span class="self">self</span>, _steps: <span class="kw-2">&amp;mut </span>Vec&lt;SqlMigrationStep&gt;, _db: <span class="kw-2">&amp;</span>DifferDatabase&lt;<span class="lifetime">&#39;_</span>&gt;) {}
+
+    <span class="doccomment">/// Define database-specific extension modules.
+    </span><span class="kw">fn </span>define_extensions(<span class="kw-2">&amp;</span><span class="self">self</span>, _db: <span class="kw-2">&amp;mut </span>DifferDatabase&lt;<span class="lifetime">&#39;_</span>&gt;) {}
+
+    <span class="doccomment">/// Connector-specific criterias deciding whether two indexes match.
+    </span><span class="kw">fn </span>indexes_match(<span class="kw-2">&amp;</span><span class="self">self</span>, _a: IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;, _b: IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+        <span class="bool-val">true
+    </span>}
+
+    <span class="doccomment">/// Returns whether the underlying database implicitly drops indexes on dropped (and potentially recreated) columns.
+    </span><span class="kw">fn </span>indexes_should_be_recreated_after_column_drop(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
+
+    <span class="doccomment">/// Return whether an index should be renamed by the migration.
+    </span><span class="kw">fn </span>index_should_be_renamed(<span class="kw-2">&amp;</span><span class="self">self</span>, indexes: Pair&lt;IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; bool {
+        indexes.previous.name() != indexes.next.name()
     }
 
-    <span class="doccomment">/// Returns true only if the database can cope with an optional column</span>
-    <span class="doccomment">/// constrained by a foreign key being made NOT NULL.</span>
-    <span class="kw">fn</span> <span class="ident">can_cope_with_foreign_key_column_becoming_non_nullable</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">true</span>
-    }
+    <span class="kw">fn </span>lower_cases_table_names(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
 
-    <span class="doccomment">/// Controls whether we will generate `RenameForeignKey` steps for this flavour.</span>
-    <span class="kw">fn</span> <span class="ident">can_rename_foreign_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span>;
+    <span class="doccomment">/// Did something connector-specific change in the primary key definition?
+    </span><span class="kw">fn </span>primary_key_changed(<span class="kw-2">&amp;</span><span class="self">self</span>, _tables: Pair&lt;TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
 
-    <span class="doccomment">/// This method must return whether a column became or ceased to be autoincrementing.</span>
-    <span class="kw">fn</span> <span class="ident">column_autoincrement_changed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">columns</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">is_autoincrement</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">is_autoincrement</span>()
-    }
-
-    <span class="doccomment">/// Return whether a column&#39;s type needs to be migrated, and how.</span>
-    <span class="kw">fn</span> <span class="ident">column_type_change</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">differ</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ColumnTypeChange</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">differ</span>.<span class="ident">previous</span>.<span class="ident">column_type_family</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">differ</span>.<span class="ident">next</span>.<span class="ident">column_type_family</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">ColumnTypeChange::RiskyCast</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
-    }
-
-    <span class="doccomment">/// Push enum-related steps.</span>
-    <span class="kw">fn</span> <span class="ident">push_enum_steps</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_steps</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SqlMigrationStep</span><span class="op">&gt;</span>, <span class="ident">_db</span>: <span class="kw-2">&amp;</span><span class="ident">DifferDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {}
-
-    <span class="doccomment">/// Push AlterSequence steps.</span>
-    <span class="kw">fn</span> <span class="ident">push_alter_sequence_steps</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_steps</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SqlMigrationStep</span><span class="op">&gt;</span>, <span class="ident">_db</span>: <span class="kw-2">&amp;</span><span class="ident">DifferDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {}
-
-    <span class="doccomment">/// Push AlterExtension steps.</span>
-    <span class="kw">fn</span> <span class="ident">push_extension_steps</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_steps</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SqlMigrationStep</span><span class="op">&gt;</span>, <span class="ident">_db</span>: <span class="kw-2">&amp;</span><span class="ident">DifferDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {}
-
-    <span class="doccomment">/// Define database-specific extension modules.</span>
-    <span class="kw">fn</span> <span class="ident">define_extensions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_db</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DifferDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {}
-
-    <span class="doccomment">/// Connector-specific criterias deciding whether two indexes match.</span>
-    <span class="kw">fn</span> <span class="ident">indexes_match</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_a</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">_b</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">true</span>
-    }
-
-    <span class="doccomment">/// Returns whether the underlying database implicitly drops indexes on dropped (and potentially recreated) columns.</span>
-    <span class="kw">fn</span> <span class="ident">indexes_should_be_recreated_after_column_drop</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
-    }
-
-    <span class="doccomment">/// Return whether an index should be renamed by the migration.</span>
-    <span class="kw">fn</span> <span class="ident">index_should_be_renamed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">indexes</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">indexes</span>.<span class="ident">previous</span>.<span class="ident">name</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">indexes</span>.<span class="ident">next</span>.<span class="ident">name</span>()
-    }
-
-    <span class="kw">fn</span> <span class="ident">lower_cases_table_names</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
-    }
-
-    <span class="doccomment">/// Did something connector-specific change in the primary key definition?</span>
-    <span class="kw">fn</span> <span class="ident">primary_key_changed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_tables</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
-    }
-
-    <span class="doccomment">/// Evaluate indexes/constraints that need to be dropped and re-created based on other changes in the schema</span>
-    <span class="kw">fn</span> <span class="ident">push_index_changes_for_column_changes</span>(
+    <span class="doccomment">/// Evaluate indexes/constraints that need to be dropped and re-created based on other changes in the schema
+    </span><span class="kw">fn </span>push_index_changes_for_column_changes(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">_table</span>: <span class="kw-2">&amp;</span><span class="ident">sql_schema_differ::TableDiffer</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">_column_index</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnId</span><span class="op">&gt;</span>,
-        <span class="ident">_column_changes</span>: <span class="ident">sql_schema_differ::ColumnChanges</span>,
-        <span class="ident">_steps</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SqlMigrationStep</span><span class="op">&gt;</span>,
+        _table: <span class="kw-2">&amp;</span>sql_schema_differ::TableDiffer&lt;<span class="lifetime">&#39;_</span>, <span class="lifetime">&#39;_</span>&gt;,
+        _column_index: Pair&lt;ColumnId&gt;,
+        _column_changes: sql_schema_differ::ColumnChanges,
+        _steps: <span class="kw-2">&amp;mut </span>Vec&lt;SqlMigrationStep&gt;,
     ) {
     }
 
-    <span class="doccomment">/// Whether the differ should produce CreateIndex steps for the indexes of</span>
-    <span class="doccomment">/// new tables.</span>
-    <span class="kw">fn</span> <span class="ident">should_create_indexes_from_created_tables</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">true</span>
+    <span class="doccomment">/// Whether the differ should produce CreateIndex steps for the indexes of
+    /// new tables.
+    </span><span class="kw">fn </span>should_create_indexes_from_created_tables(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">true
+    </span>}
+
+    <span class="doccomment">/// Whether the indexes of dropped tables should be dropped before the table
+    /// is dropped.
+    </span><span class="kw">fn </span>should_drop_indexes_from_dropped_tables(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
+
+    <span class="doccomment">/// Whether the foreign keys of dropped tables should be dropped before the table
+    /// is dropped.
+    </span><span class="kw">fn </span>should_drop_foreign_keys_from_dropped_tables(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">true
+    </span>}
+
+    <span class="doccomment">/// Whether to skip diffing JSON defaults.
+    </span><span class="kw">fn </span>should_ignore_json_defaults(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
+
+    <span class="doccomment">/// Whether `AddForeignKey` steps should be generated for created tables.
+    </span><span class="kw">fn </span>should_push_foreign_keys_from_created_tables(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">true
+    </span>}
+
+    <span class="doccomment">/// Whether indexes matching a foreign key should be skipped.
+    </span><span class="kw">fn </span>should_skip_fk_indexes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
+
+    <span class="doccomment">/// Whether a specific index should *not* be produced.
+    </span><span class="kw">fn </span>should_skip_index_for_new_table(<span class="kw-2">&amp;</span><span class="self">self</span>, _index: IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
+
+    <span class="doccomment">/// Whether the primary key should be recreated if the column part of it is
+    /// recreated.
+    </span><span class="kw">fn </span>should_recreate_the_primary_key_on_column_recreate(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
+
+    <span class="doccomment">/// Does the sql expression string match the provided byte array?
+    </span><span class="kw">fn </span>string_matches_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>, string: <span class="kw-2">&amp;</span>str, bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; bool {
+        string.as_bytes() == bytes
     }
 
-    <span class="doccomment">/// Whether the indexes of dropped tables should be dropped before the table</span>
-    <span class="doccomment">/// is dropped.</span>
-    <span class="kw">fn</span> <span class="ident">should_drop_indexes_from_dropped_tables</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
+    <span class="kw">fn </span>table_names_match(<span class="kw-2">&amp;</span><span class="self">self</span>, names: Pair&lt;<span class="kw-2">&amp;</span>str&gt;) -&gt; bool {
+        names.previous == names.next
     }
 
-    <span class="doccomment">/// Whether the foreign keys of dropped tables should be dropped before the table</span>
-    <span class="doccomment">/// is dropped.</span>
-    <span class="kw">fn</span> <span class="ident">should_drop_foreign_keys_from_dropped_tables</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">true</span>
-    }
+    <span class="doccomment">/// Return the tables that cannot be migrated without being redefined. This
+    /// is currently useful only on SQLite.
+    </span><span class="kw">fn </span>set_tables_to_redefine(<span class="kw-2">&amp;</span><span class="self">self</span>, _db: <span class="kw-2">&amp;mut </span>DifferDatabase&lt;<span class="lifetime">&#39;_</span>&gt;) {}
 
-    <span class="doccomment">/// Whether to skip diffing JSON defaults.</span>
-    <span class="kw">fn</span> <span class="ident">should_ignore_json_defaults</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
-    }
+    <span class="doccomment">/// By implementing this method, the flavour signals the differ that
+    /// specific tables should be ignored. This is mostly for system tables.
+    </span><span class="kw">fn </span>table_should_be_ignored(<span class="kw-2">&amp;</span><span class="self">self</span>, _table_name: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
 
-    <span class="doccomment">/// Whether `AddForeignKey` steps should be generated for created tables.</span>
-    <span class="kw">fn</span> <span class="ident">should_push_foreign_keys_from_created_tables</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">true</span>
-    }
+    <span class="kw">fn </span>view_should_be_ignored(<span class="kw-2">&amp;</span><span class="self">self</span>, _view_name: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
 
-    <span class="doccomment">/// Whether indexes matching a foreign key should be skipped.</span>
-    <span class="kw">fn</span> <span class="ident">should_skip_fk_indexes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
-    }
-
-    <span class="doccomment">/// Whether a specific index should *not* be produced.</span>
-    <span class="kw">fn</span> <span class="ident">should_skip_index_for_new_table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
-    }
-
-    <span class="doccomment">/// Whether the primary key should be recreated if the column part of it is</span>
-    <span class="doccomment">/// recreated.</span>
-    <span class="kw">fn</span> <span class="ident">should_recreate_the_primary_key_on_column_recreate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
-    }
-
-    <span class="doccomment">/// Does the sql expression string match the provided byte array?</span>
-    <span class="kw">fn</span> <span class="ident">string_matches_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">string</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">bool</span> {
-        <span class="ident">string</span>.<span class="ident">as_bytes</span>() <span class="op">==</span> <span class="ident">bytes</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">table_names_match</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">names</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">names</span>.<span class="ident">previous</span> <span class="op">==</span> <span class="ident">names</span>.<span class="ident">next</span>
-    }
-
-    <span class="doccomment">/// Return the tables that cannot be migrated without being redefined. This</span>
-    <span class="doccomment">/// is currently useful only on SQLite.</span>
-    <span class="kw">fn</span> <span class="ident">set_tables_to_redefine</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_db</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DifferDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {}
-
-    <span class="doccomment">/// By implementing this method, the flavour signals the differ that</span>
-    <span class="doccomment">/// specific tables should be ignored. This is mostly for system tables.</span>
-    <span class="kw">fn</span> <span class="ident">table_should_be_ignored</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
-    }
-
-    <span class="kw">fn</span> <span class="ident">view_should_be_ignored</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_view_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
-    }
-
-    <span class="doccomment">/// Supports named Foreign Keys.</span>
-    <span class="kw">fn</span> <span class="ident">has_unnamed_foreign_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
-    }
+    <span class="doccomment">/// Supports named Foreign Keys.
+    </span><span class="kw">fn </span>has_unnamed_foreign_keys(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

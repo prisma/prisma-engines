@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/08831df/src/connector/sqlite.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sqlite.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../quaint/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/quaint-9f01e008b9a89c14/08831df/src/connector/sqlite.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sqlite.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../quaint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../quaint/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -351,358 +351,358 @@
 <span id="351">351</span>
 <span id="352">352</span>
 <span id="353">353</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">conversion</span>;
-<span class="kw">mod</span> <span class="ident">error</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>conversion;
+<span class="kw">mod </span>error;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">rusqlite</span>::{<span class="ident">params_from_iter</span>, <span class="ident">version</span> <span class="kw">as</span> <span class="ident">sqlite_version</span>};
+<span class="kw">pub use </span>rusqlite::{params_from_iter, version <span class="kw">as </span>sqlite_version};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::IsolationLevel</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">ast</span>::{<span class="ident">Query</span>, <span class="ident">Value</span>},
-    <span class="ident">connector</span>::{<span class="ident">metrics</span>, <span class="ident">queryable</span>::<span class="kw-2">*</span>, <span class="ident">ResultSet</span>},
-    <span class="ident">error</span>::{<span class="ident">Error</span>, <span class="ident">ErrorKind</span>},
-    <span class="ident">visitor</span>::{<span class="self">self</span>, <span class="ident">Visitor</span>},
+<span class="kw">use </span><span class="kw">super</span>::IsolationLevel;
+<span class="kw">use crate</span>::{
+    ast::{Query, Value},
+    connector::{metrics, queryable::<span class="kw-2">*</span>, ResultSet},
+    error::{Error, ErrorKind},
+    visitor::{<span class="self">self</span>, Visitor},
 };
-<span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::TryFrom</span>, <span class="ident">path::Path</span>, <span class="ident">time::Duration</span>};
-<span class="kw">use</span> <span class="ident">tokio::sync::Mutex</span>;
+<span class="kw">use </span>async_trait::async_trait;
+<span class="kw">use </span>std::{convert::TryFrom, path::Path, time::Duration};
+<span class="kw">use </span>tokio::sync::Mutex;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">DEFAULT_SQLITE_SCHEMA_NAME</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;main&quot;</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>DEFAULT_SQLITE_SCHEMA_NAME: <span class="kw-2">&amp;</span>str = <span class="string">&quot;main&quot;</span>;
 
-<span class="doccomment">/// The underlying sqlite driver. Only available with the `expose-drivers` Cargo feature.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;expose-drivers&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">rusqlite</span>;
+<span class="doccomment">/// The underlying sqlite driver. Only available with the `expose-drivers` Cargo feature.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;expose-drivers&quot;</span>)]
+</span><span class="kw">pub use </span>rusqlite;
 
-<span class="doccomment">/// A connector interface for the SQLite database</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sqlite&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Sqlite</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">client</span>: <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">rusqlite::Connection</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A connector interface for the SQLite database
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;sqlite&quot;</span>)))]
+</span><span class="kw">pub struct </span>Sqlite {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) client: Mutex&lt;rusqlite::Connection&gt;,
 }
 
-<span class="doccomment">/// Wraps a connection url and exposes the parsing logic used by Quaint,</span>
-<span class="doccomment">/// including default values.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;docs&quot;</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;sqlite&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SqliteParams</span> {
-    <span class="kw">pub</span> <span class="ident">connection_limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// This is not a `PathBuf` because we need to `ATTACH` the database to the path, and this can</span>
-    <span class="doccomment">/// only be done with UTF-8 paths.</span>
-    <span class="kw">pub</span> <span class="ident">file_path</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">db_name</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">socket_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">max_connection_lifetime</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">max_idle_connection_lifetime</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Wraps a connection url and exposes the parsing logic used by Quaint,
+/// including default values.
+</span><span class="attribute">#[derive(Debug)]
+#[cfg_attr(feature = <span class="string">&quot;docs&quot;</span>, doc(cfg(feature = <span class="string">&quot;sqlite&quot;</span>)))]
+</span><span class="kw">pub struct </span>SqliteParams {
+    <span class="kw">pub </span>connection_limit: <span class="prelude-ty">Option</span>&lt;usize&gt;,
+    <span class="doccomment">/// This is not a `PathBuf` because we need to `ATTACH` the database to the path, and this can
+    /// only be done with UTF-8 paths.
+    </span><span class="kw">pub </span>file_path: String,
+    <span class="kw">pub </span>db_name: String,
+    <span class="kw">pub </span>socket_timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    <span class="kw">pub </span>max_connection_lifetime: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    <span class="kw">pub </span>max_idle_connection_lifetime: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SqliteParams</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
+<span class="kw">impl </span>TryFrom&lt;<span class="kw-2">&amp;</span>str&gt; <span class="kw">for </span>SqliteParams {
+    <span class="kw">type </span>Error = Error;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">path</span>.<span class="ident">starts_with</span>(<span class="string">&quot;file:&quot;</span>) {
-            <span class="ident">path</span>.<span class="ident">trim_start_matches</span>(<span class="string">&quot;file:&quot;</span>)
-        } <span class="kw">else</span> {
-            <span class="ident">path</span>.<span class="ident">trim_start_matches</span>(<span class="string">&quot;sqlite:&quot;</span>)
+    <span class="kw">fn </span>try_from(path: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>path = <span class="kw">if </span>path.starts_with(<span class="string">&quot;file:&quot;</span>) {
+            path.trim_start_matches(<span class="string">&quot;file:&quot;</span>)
+        } <span class="kw">else </span>{
+            path.trim_start_matches(<span class="string">&quot;sqlite:&quot;</span>)
         };
 
-        <span class="kw">let</span> <span class="ident">path_parts</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">split</span>(<span class="string">&#39;?&#39;</span>).<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="ident">path_str</span> <span class="op">=</span> <span class="ident">path_parts</span>[<span class="number">0</span>];
-        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">Path::new</span>(<span class="ident">path_str</span>);
+        <span class="kw">let </span>path_parts: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = path.split(<span class="string">&#39;?&#39;</span>).collect();
+        <span class="kw">let </span>path_str = path_parts[<span class="number">0</span>];
+        <span class="kw">let </span>path = Path::new(path_str);
 
-        <span class="kw">if</span> <span class="ident">path</span>.<span class="ident">is_dir</span>() {
-            <span class="prelude-val">Err</span>(<span class="ident">Error::builder</span>(<span class="ident">ErrorKind::DatabaseUrlIsInvalid</span>(<span class="ident">path</span>.<span class="ident">to_str</span>().<span class="ident">unwrap</span>().<span class="ident">to_string</span>())).<span class="ident">build</span>())
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">connection_limit</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">socket_timeout</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">max_connection_lifetime</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">max_idle_connection_lifetime</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+        <span class="kw">if </span>path.is_dir() {
+            <span class="prelude-val">Err</span>(Error::builder(ErrorKind::DatabaseUrlIsInvalid(path.to_str().unwrap().to_string())).build())
+        } <span class="kw">else </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>connection_limit = <span class="prelude-val">None</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>socket_timeout = <span class="prelude-val">None</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>max_connection_lifetime = <span class="prelude-val">None</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>max_idle_connection_lifetime = <span class="prelude-val">None</span>;
 
-            <span class="kw">if</span> <span class="ident">path_parts</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">1</span> {
-                <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">path_parts</span>.<span class="ident">last</span>().<span class="ident">unwrap</span>().<span class="ident">split</span>(<span class="string">&#39;&amp;&#39;</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">kv</span><span class="op">|</span> {
-                    <span class="kw">let</span> <span class="ident">splitted</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">kv</span>.<span class="ident">split</span>(<span class="string">&#39;=&#39;</span>).<span class="ident">collect</span>();
-                    (<span class="ident">splitted</span>[<span class="number">0</span>], <span class="ident">splitted</span>[<span class="number">1</span>])
+            <span class="kw">if </span>path_parts.len() &gt; <span class="number">1 </span>{
+                <span class="kw">let </span>params = path_parts.last().unwrap().split(<span class="string">&#39;&amp;&#39;</span>).map(|kv| {
+                    <span class="kw">let </span>splitted: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = kv.split(<span class="string">&#39;=&#39;</span>).collect();
+                    (splitted[<span class="number">0</span>], splitted[<span class="number">1</span>])
                 });
 
-                <span class="kw">for</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="kw">in</span> <span class="ident">params</span> {
-                    <span class="kw">match</span> <span class="ident">k</span> {
-                        <span class="string">&quot;connection_limit&quot;</span> =&gt; {
-                            <span class="kw">let</span> <span class="ident">as_int</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">v</span>
-                                .<span class="ident">parse</span>()
-                                .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::InvalidConnectionArguments</span>).<span class="ident">build</span>())<span class="question-mark">?</span>;
+                <span class="kw">for </span>(k, v) <span class="kw">in </span>params {
+                    <span class="kw">match </span>k {
+                        <span class="string">&quot;connection_limit&quot; </span>=&gt; {
+                            <span class="kw">let </span>as_int: usize = v
+                                .parse()
+                                .map_err(|<span class="kw">_</span>| Error::builder(ErrorKind::InvalidConnectionArguments).build())<span class="question-mark">?</span>;
 
-                            <span class="ident">connection_limit</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">as_int</span>);
+                            connection_limit = <span class="prelude-val">Some</span>(as_int);
                         }
-                        <span class="string">&quot;socket_timeout&quot;</span> =&gt; {
-                            <span class="kw">let</span> <span class="ident">as_int</span> <span class="op">=</span> <span class="ident">v</span>
-                                .<span class="ident">parse</span>()
-                                .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::InvalidConnectionArguments</span>).<span class="ident">build</span>())<span class="question-mark">?</span>;
+                        <span class="string">&quot;socket_timeout&quot; </span>=&gt; {
+                            <span class="kw">let </span>as_int = v
+                                .parse()
+                                .map_err(|<span class="kw">_</span>| Error::builder(ErrorKind::InvalidConnectionArguments).build())<span class="question-mark">?</span>;
 
-                            <span class="ident">socket_timeout</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="ident">as_int</span>));
+                            socket_timeout = <span class="prelude-val">Some</span>(Duration::from_secs(as_int));
                         }
-                        <span class="string">&quot;max_connection_lifetime&quot;</span> =&gt; {
-                            <span class="kw">let</span> <span class="ident">as_int</span> <span class="op">=</span> <span class="ident">v</span>
-                                .<span class="ident">parse</span>()
-                                .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::InvalidConnectionArguments</span>).<span class="ident">build</span>())<span class="question-mark">?</span>;
+                        <span class="string">&quot;max_connection_lifetime&quot; </span>=&gt; {
+                            <span class="kw">let </span>as_int = v
+                                .parse()
+                                .map_err(|<span class="kw">_</span>| Error::builder(ErrorKind::InvalidConnectionArguments).build())<span class="question-mark">?</span>;
 
-                            <span class="kw">if</span> <span class="ident">as_int</span> <span class="op">==</span> <span class="number">0</span> {
-                                <span class="ident">max_connection_lifetime</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-                            } <span class="kw">else</span> {
-                                <span class="ident">max_connection_lifetime</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="ident">as_int</span>));
+                            <span class="kw">if </span>as_int == <span class="number">0 </span>{
+                                max_connection_lifetime = <span class="prelude-val">None</span>;
+                            } <span class="kw">else </span>{
+                                max_connection_lifetime = <span class="prelude-val">Some</span>(Duration::from_secs(as_int));
                             }
                         }
-                        <span class="string">&quot;max_idle_connection_lifetime&quot;</span> =&gt; {
-                            <span class="kw">let</span> <span class="ident">as_int</span> <span class="op">=</span> <span class="ident">v</span>
-                                .<span class="ident">parse</span>()
-                                .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error::builder</span>(<span class="ident">ErrorKind::InvalidConnectionArguments</span>).<span class="ident">build</span>())<span class="question-mark">?</span>;
+                        <span class="string">&quot;max_idle_connection_lifetime&quot; </span>=&gt; {
+                            <span class="kw">let </span>as_int = v
+                                .parse()
+                                .map_err(|<span class="kw">_</span>| Error::builder(ErrorKind::InvalidConnectionArguments).build())<span class="question-mark">?</span>;
 
-                            <span class="kw">if</span> <span class="ident">as_int</span> <span class="op">==</span> <span class="number">0</span> {
-                                <span class="ident">max_idle_connection_lifetime</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-                            } <span class="kw">else</span> {
-                                <span class="ident">max_idle_connection_lifetime</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="ident">as_int</span>));
+                            <span class="kw">if </span>as_int == <span class="number">0 </span>{
+                                max_idle_connection_lifetime = <span class="prelude-val">None</span>;
+                            } <span class="kw">else </span>{
+                                max_idle_connection_lifetime = <span class="prelude-val">Some</span>(Duration::from_secs(as_int));
                             }
                         }
-                        <span class="kw">_</span> =&gt; {
-                            <span class="macro">tracing::trace!</span>(<span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Discarding connection string param&quot;</span>, <span class="ident">param</span> <span class="op">=</span> <span class="ident">k</span>);
+                        <span class="kw">_ </span>=&gt; {
+                            <span class="macro">tracing::trace!</span>(message = <span class="string">&quot;Discarding connection string param&quot;</span>, param = k);
                         }
                     };
                 }
             }
 
-            <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-                <span class="ident">connection_limit</span>,
-                <span class="ident">file_path</span>: <span class="ident">path_str</span>.<span class="ident">to_owned</span>(),
-                <span class="ident">db_name</span>: <span class="ident">DEFAULT_SQLITE_SCHEMA_NAME</span>.<span class="ident">to_owned</span>(),
-                <span class="ident">socket_timeout</span>,
-                <span class="ident">max_connection_lifetime</span>,
-                <span class="ident">max_idle_connection_lifetime</span>,
+            <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+                connection_limit,
+                file_path: path_str.to_owned(),
+                db_name: DEFAULT_SQLITE_SCHEMA_NAME.to_owned(),
+                socket_timeout,
+                max_connection_lifetime,
+                max_idle_connection_lifetime,
             })
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Sqlite</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">Error</span>;
+<span class="kw">impl </span>TryFrom&lt;<span class="kw-2">&amp;</span>str&gt; <span class="kw">for </span>Sqlite {
+    <span class="kw">type </span>Error = Error;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">SqliteParams::try_from</span>(<span class="ident">path</span>)<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">file_path</span> <span class="op">=</span> <span class="ident">params</span>.<span class="ident">file_path</span>;
+    <span class="kw">fn </span>try_from(path: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>params = SqliteParams::try_from(path)<span class="question-mark">?</span>;
+        <span class="kw">let </span>file_path = params.file_path;
 
-        <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">rusqlite::Connection::open</span>(<span class="ident">file_path</span>.<span class="ident">as_str</span>())<span class="question-mark">?</span>;
+        <span class="kw">let </span>conn = rusqlite::Connection::open(file_path.as_str())<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">timeout</span>) <span class="op">=</span> <span class="ident">params</span>.<span class="ident">socket_timeout</span> {
-            <span class="ident">conn</span>.<span class="ident">busy_timeout</span>(<span class="ident">timeout</span>)<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(timeout) = params.socket_timeout {
+            conn.busy_timeout(timeout)<span class="question-mark">?</span>;
         };
 
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Mutex::new</span>(<span class="ident">conn</span>);
+        <span class="kw">let </span>client = Mutex::new(conn);
 
-        <span class="prelude-val">Ok</span>(<span class="ident">Sqlite</span> { <span class="ident">client</span> })
+        <span class="prelude-val">Ok</span>(Sqlite { client })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Sqlite</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">file_path</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Sqlite</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::try_from</span>(<span class="ident">file_path</span>)
+<span class="kw">impl </span>Sqlite {
+    <span class="kw">pub fn </span>new(file_path: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;Sqlite&gt; {
+        <span class="self">Self</span>::try_from(file_path)
     }
 
-    <span class="doccomment">/// Open a new SQLite database in memory.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_in_memory</span>() -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Sqlite</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">rusqlite::Connection::open_in_memory</span>()<span class="question-mark">?</span>;
+    <span class="doccomment">/// Open a new SQLite database in memory.
+    </span><span class="kw">pub fn </span>new_in_memory() -&gt; <span class="kw">crate</span>::Result&lt;Sqlite&gt; {
+        <span class="kw">let </span>client = rusqlite::Connection::open_in_memory()<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">Sqlite</span> {
-            <span class="ident">client</span>: <span class="ident">Mutex::new</span>(<span class="ident">client</span>),
+        <span class="prelude-val">Ok</span>(Sqlite {
+            client: Mutex::new(client),
         })
     }
 
-    <span class="doccomment">/// The underlying rusqlite::Connection. Only available with the `expose-drivers` Cargo</span>
-    <span class="doccomment">/// feature. This is a lower level API when you need to get into database specific features.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;expose-drivers&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">connection</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">rusqlite::Connection</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">client</span>
+    <span class="doccomment">/// The underlying rusqlite::Connection. Only available with the `expose-drivers` Cargo
+    /// feature. This is a lower level API when you need to get into database specific features.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;expose-drivers&quot;</span>)]
+    </span><span class="kw">pub fn </span>connection(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Mutex&lt;rusqlite::Connection&gt; {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.client
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TransactionCapable</span> <span class="kw">for</span> <span class="ident">Sqlite</span> {}
+<span class="kw">impl </span>TransactionCapable <span class="kw">for </span>Sqlite {}
 
-<span class="attribute">#[<span class="ident">async_trait</span>]</span>
-<span class="kw">impl</span> <span class="ident">Queryable</span> <span class="kw">for</span> <span class="ident">Sqlite</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">q</span>: <span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResultSet</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">sql</span>, <span class="ident">params</span>) <span class="op">=</span> <span class="ident">visitor::Sqlite::build</span>(<span class="ident">q</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">query_raw</span>(<span class="kw-2">&amp;</span><span class="ident">sql</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>).<span class="kw">await</span>
-    }
+<span class="attribute">#[async_trait]
+</span><span class="kw">impl </span>Queryable <span class="kw">for </span>Sqlite {
+    <span class="kw">async fn </span>query(<span class="kw-2">&amp;</span><span class="self">self</span>, q: Query&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="kw">crate</span>::Result&lt;ResultSet&gt; {
+        <span class="kw">let </span>(sql, params) = visitor::Sqlite::build(q)<span class="question-mark">?</span>;
+        <span class="self">self</span>.query_raw(<span class="kw-2">&amp;</span>sql, <span class="kw-2">&amp;</span>params).<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResultSet</span><span class="op">&gt;</span> {
-        <span class="ident">metrics::query</span>(<span class="string">&quot;sqlite.query_raw&quot;</span>, <span class="ident">sql</span>, <span class="ident">params</span>, <span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
+    <span class="kw">async fn </span>query_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; <span class="kw">crate</span>::Result&lt;ResultSet&gt; {
+        metrics::query(<span class="string">&quot;sqlite.query_raw&quot;</span>, sql, params, <span class="kw">move </span>|| <span class="kw">async move </span>{
+            <span class="kw">let </span>client = <span class="self">self</span>.client.lock().<span class="kw">await</span>;
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stmt</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">prepare_cached</span>(<span class="ident">sql</span>)<span class="question-mark">?</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>stmt = client.prepare_cached(sql)<span class="question-mark">?</span>;
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rows</span> <span class="op">=</span> <span class="ident">stmt</span>.<span class="ident">query</span>(<span class="ident">params_from_iter</span>(<span class="ident">params</span>.<span class="ident">iter</span>()))<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">ResultSet::new</span>(<span class="ident">rows</span>.<span class="ident">to_column_names</span>(), <span class="ident">Vec::new</span>());
+            <span class="kw">let </span><span class="kw-2">mut </span>rows = stmt.query(params_from_iter(params.iter()))<span class="question-mark">?</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>result = ResultSet::new(rows.to_column_names(), Vec::new());
 
-            <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">row</span>) <span class="op">=</span> <span class="ident">rows</span>.<span class="ident">next</span>()<span class="question-mark">?</span> {
-                <span class="ident">result</span>.<span class="ident">rows</span>.<span class="ident">push</span>(<span class="ident">row</span>.<span class="ident">get_result_row</span>()<span class="question-mark">?</span>);
+            <span class="kw">while let </span><span class="prelude-val">Some</span>(row) = rows.next()<span class="question-mark">? </span>{
+                result.rows.push(row.get_result_row()<span class="question-mark">?</span>);
             }
 
-            <span class="ident">result</span>.<span class="ident">set_last_insert_id</span>(<span class="ident">u64::try_from</span>(<span class="ident">client</span>.<span class="ident">last_insert_rowid</span>()).<span class="ident">unwrap_or</span>(<span class="number">0</span>));
+            result.set_last_insert_id(u64::try_from(client.last_insert_rowid()).unwrap_or(<span class="number">0</span>));
 
-            <span class="prelude-val">Ok</span>(<span class="ident">result</span>)
+            <span class="prelude-val">Ok</span>(result)
         })
-        .<span class="kw">await</span>
-    }
+        .<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">query_raw_typed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">ResultSet</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">query_raw</span>(<span class="ident">sql</span>, <span class="ident">params</span>).<span class="kw">await</span>
-    }
+    <span class="kw">async fn </span>query_raw_typed(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; <span class="kw">crate</span>::Result&lt;ResultSet&gt; {
+        <span class="self">self</span>.query_raw(sql, params).<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">q</span>: <span class="ident">Query</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">sql</span>, <span class="ident">params</span>) <span class="op">=</span> <span class="ident">visitor::Sqlite::build</span>(<span class="ident">q</span>)<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">execute_raw</span>(<span class="kw-2">&amp;</span><span class="ident">sql</span>, <span class="kw-2">&amp;</span><span class="ident">params</span>).<span class="kw">await</span>
-    }
+    <span class="kw">async fn </span>execute(<span class="kw-2">&amp;</span><span class="self">self</span>, q: Query&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="kw">crate</span>::Result&lt;u64&gt; {
+        <span class="kw">let </span>(sql, params) = visitor::Sqlite::build(q)<span class="question-mark">?</span>;
+        <span class="self">self</span>.execute_raw(<span class="kw-2">&amp;</span>sql, <span class="kw-2">&amp;</span>params).<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
-        <span class="ident">metrics::query</span>(<span class="string">&quot;sqlite.query_raw&quot;</span>, <span class="ident">sql</span>, <span class="ident">params</span>, <span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">stmt</span> <span class="op">=</span> <span class="ident">client</span>.<span class="ident">prepare_cached</span>(<span class="ident">sql</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">u64::try_from</span>(<span class="ident">stmt</span>.<span class="ident">execute</span>(<span class="ident">params_from_iter</span>(<span class="ident">params</span>.<span class="ident">iter</span>()))<span class="question-mark">?</span>)<span class="question-mark">?</span>;
+    <span class="kw">async fn </span>execute_raw(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; <span class="kw">crate</span>::Result&lt;u64&gt; {
+        metrics::query(<span class="string">&quot;sqlite.query_raw&quot;</span>, sql, params, <span class="kw">move </span>|| <span class="kw">async move </span>{
+            <span class="kw">let </span>client = <span class="self">self</span>.client.lock().<span class="kw">await</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>stmt = client.prepare_cached(sql)<span class="question-mark">?</span>;
+            <span class="kw">let </span>res = u64::try_from(stmt.execute(params_from_iter(params.iter()))<span class="question-mark">?</span>)<span class="question-mark">?</span>;
 
-            <span class="prelude-val">Ok</span>(<span class="ident">res</span>)
+            <span class="prelude-val">Ok</span>(res)
         })
-        .<span class="kw">await</span>
-    }
+        .<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">execute_raw_typed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sql</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">params</span>: <span class="kw-2">&amp;</span>[<span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>]) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">execute_raw</span>(<span class="ident">sql</span>, <span class="ident">params</span>).<span class="kw">await</span>
-    }
+    <span class="kw">async fn </span>execute_raw_typed(<span class="kw-2">&amp;</span><span class="self">self</span>, sql: <span class="kw-2">&amp;</span>str, params: <span class="kw-2">&amp;</span>[Value&lt;<span class="lifetime">&#39;_</span>&gt;]) -&gt; <span class="kw">crate</span>::Result&lt;u64&gt; {
+        <span class="self">self</span>.execute_raw(sql, params).<span class="kw">await
+    </span>}
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">raw_cmd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cmd</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">metrics::query</span>(<span class="string">&quot;sqlite.raw_cmd&quot;</span>, <span class="ident">cmd</span>, <span class="kw-2">&amp;</span>[], <span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="kw">async</span> <span class="kw">move</span> {
-            <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
-            <span class="ident">client</span>.<span class="ident">execute_batch</span>(<span class="ident">cmd</span>)<span class="question-mark">?</span>;
+    <span class="kw">async fn </span>raw_cmd(<span class="kw-2">&amp;</span><span class="self">self</span>, cmd: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+        metrics::query(<span class="string">&quot;sqlite.raw_cmd&quot;</span>, cmd, <span class="kw-2">&amp;</span>[], <span class="kw">move </span>|| <span class="kw">async move </span>{
+            <span class="kw">let </span>client = <span class="self">self</span>.client.lock().<span class="kw">await</span>;
+            client.execute_batch(cmd)<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(())
         })
-        .<span class="kw">await</span>
+        .<span class="kw">await
+    </span>}
+
+    <span class="kw">async fn </span>version(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;<span class="prelude-ty">Option</span>&lt;String&gt;&gt; {
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(rusqlite::version().into()))
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">version</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">rusqlite::version</span>().<span class="ident">into</span>()))
-    }
+    <span class="kw">fn </span>is_healthy(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">true
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">is_healthy</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">true</span>
-    }
-
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">set_tx_isolation_level</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">isolation_level</span>: <span class="ident">IsolationLevel</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="comment">// SQLite is always &quot;serializable&quot;, other modes involve pragmas</span>
-        <span class="comment">// and shared cache mode, which is out of scope for now and should be implemented</span>
-        <span class="comment">// as part of a separate effort.</span>
-        <span class="kw">if</span> <span class="op">!</span><span class="macro">matches!</span>(<span class="ident">isolation_level</span>, <span class="ident">IsolationLevel::Serializable</span>) {
-            <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">ErrorKind::invalid_isolation_level</span>(<span class="kw-2">&amp;</span><span class="ident">isolation_level</span>);
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::builder</span>(<span class="ident">kind</span>).<span class="ident">build</span>());
+    <span class="kw">async fn </span>set_tx_isolation_level(<span class="kw-2">&amp;</span><span class="self">self</span>, isolation_level: IsolationLevel) -&gt; <span class="kw">crate</span>::Result&lt;()&gt; {
+        <span class="comment">// SQLite is always &quot;serializable&quot;, other modes involve pragmas
+        // and shared cache mode, which is out of scope for now and should be implemented
+        // as part of a separate effort.
+        </span><span class="kw">if </span>!<span class="macro">matches!</span>(isolation_level, IsolationLevel::Serializable) {
+            <span class="kw">let </span>kind = ErrorKind::invalid_isolation_level(<span class="kw-2">&amp;</span>isolation_level);
+            <span class="kw">return </span><span class="prelude-val">Err</span>(Error::builder(kind).build());
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">requires_isolation_first</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
-    }
+    <span class="kw">fn </span>requires_isolation_first(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="kw">crate</span>::{
-        <span class="ident">ast</span>::<span class="kw-2">*</span>,
-        <span class="ident">connector::Queryable</span>,
-        <span class="ident">error</span>::{<span class="ident">ErrorKind</span>, <span class="ident">Name</span>},
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use crate</span>::{
+        ast::<span class="kw-2">*</span>,
+        connector::Queryable,
+        error::{ErrorKind, Name},
     };
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sqlite_params_from_str_should_resolve_path_correctly_with_file_scheme</span>() {
-        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;file:dev.db&quot;</span>;
-        <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">SqliteParams::try_from</span>(<span class="ident">path</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">params</span>.<span class="ident">file_path</span>, <span class="string">&quot;dev.db&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>sqlite_params_from_str_should_resolve_path_correctly_with_file_scheme() {
+        <span class="kw">let </span>path = <span class="string">&quot;file:dev.db&quot;</span>;
+        <span class="kw">let </span>params = SqliteParams::try_from(path).unwrap();
+        <span class="macro">assert_eq!</span>(params.file_path, <span class="string">&quot;dev.db&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sqlite_params_from_str_should_resolve_path_correctly_with_sqlite_scheme</span>() {
-        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;sqlite:dev.db&quot;</span>;
-        <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">SqliteParams::try_from</span>(<span class="ident">path</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">params</span>.<span class="ident">file_path</span>, <span class="string">&quot;dev.db&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>sqlite_params_from_str_should_resolve_path_correctly_with_sqlite_scheme() {
+        <span class="kw">let </span>path = <span class="string">&quot;sqlite:dev.db&quot;</span>;
+        <span class="kw">let </span>params = SqliteParams::try_from(path).unwrap();
+        <span class="macro">assert_eq!</span>(params.file_path, <span class="string">&quot;dev.db&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">sqlite_params_from_str_should_resolve_path_correctly_with_no_scheme</span>() {
-        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="string">&quot;dev.db&quot;</span>;
-        <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">SqliteParams::try_from</span>(<span class="ident">path</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">params</span>.<span class="ident">file_path</span>, <span class="string">&quot;dev.db&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>sqlite_params_from_str_should_resolve_path_correctly_with_no_scheme() {
+        <span class="kw">let </span>path = <span class="string">&quot;dev.db&quot;</span>;
+        <span class="kw">let </span>params = SqliteParams::try_from(path).unwrap();
+        <span class="macro">assert_eq!</span>(params.file_path, <span class="string">&quot;dev.db&quot;</span>);
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">unknown_table_should_give_a_good_error</span>() {
-        <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">Sqlite::try_from</span>(<span class="string">&quot;file:db/test.db&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">select</span> <span class="op">=</span> <span class="ident">Select::from_table</span>(<span class="string">&quot;not_there&quot;</span>);
+    <span class="attribute">#[tokio::test]
+    </span><span class="kw">async fn </span>unknown_table_should_give_a_good_error() {
+        <span class="kw">let </span>conn = Sqlite::try_from(<span class="string">&quot;file:db/test.db&quot;</span>).unwrap();
+        <span class="kw">let </span>select = Select::from_table(<span class="string">&quot;not_there&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">select</span>(<span class="ident">select</span>).<span class="kw">await</span>.<span class="ident">unwrap_err</span>();
+        <span class="kw">let </span>err = conn.select(select).<span class="kw">await</span>.unwrap_err();
 
-        <span class="kw">match</span> <span class="ident">err</span>.<span class="ident">kind</span>() {
-            <span class="ident">ErrorKind::TableDoesNotExist</span> { <span class="ident">table</span> } =&gt; {
-                <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">Name::available</span>(<span class="string">&quot;not_there&quot;</span>), <span class="ident">table</span>);
+        <span class="kw">match </span>err.kind() {
+            ErrorKind::TableDoesNotExist { table } =&gt; {
+                <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>Name::available(<span class="string">&quot;not_there&quot;</span>), table);
             }
-            <span class="ident">e</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected error TableDoesNotExist, got {:?}&quot;</span>, <span class="ident">e</span>),
+            e =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected error TableDoesNotExist, got {:?}&quot;</span>, e),
         }
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">in_memory_sqlite_works</span>() {
-        <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">Sqlite::new_in_memory</span>().<span class="ident">unwrap</span>();
+    <span class="attribute">#[tokio::test]
+    </span><span class="kw">async fn </span>in_memory_sqlite_works() {
+        <span class="kw">let </span>conn = Sqlite::new_in_memory().unwrap();
 
-        <span class="ident">conn</span>.<span class="ident">raw_cmd</span>(<span class="string">&quot;CREATE TABLE test (id INTEGER PRIMARY KEY, txt TEXT NOT NULL);&quot;</span>)
-            .<span class="kw">await</span>
-            .<span class="ident">unwrap</span>();
+        conn.raw_cmd(<span class="string">&quot;CREATE TABLE test (id INTEGER PRIMARY KEY, txt TEXT NOT NULL);&quot;</span>)
+            .<span class="kw">await
+            </span>.unwrap();
 
-        <span class="kw">let</span> <span class="ident">insert</span> <span class="op">=</span> <span class="ident">Insert::single_into</span>(<span class="string">&quot;test&quot;</span>).<span class="ident">value</span>(<span class="string">&quot;txt&quot;</span>, <span class="string">&quot;henlo&quot;</span>);
-        <span class="ident">conn</span>.<span class="ident">insert</span>(<span class="ident">insert</span>.<span class="ident">into</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let </span>insert = Insert::single_into(<span class="string">&quot;test&quot;</span>).value(<span class="string">&quot;txt&quot;</span>, <span class="string">&quot;henlo&quot;</span>);
+        conn.insert(insert.into()).<span class="kw">await</span>.unwrap();
 
-        <span class="kw">let</span> <span class="ident">select</span> <span class="op">=</span> <span class="ident">Select::from_table</span>(<span class="string">&quot;test&quot;</span>).<span class="ident">value</span>(<span class="ident">asterisk</span>());
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">select</span>(<span class="ident">select</span>.<span class="ident">clone</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">into_single</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let </span>select = Select::from_table(<span class="string">&quot;test&quot;</span>).value(asterisk());
+        <span class="kw">let </span>result = conn.select(select.clone()).<span class="kw">await</span>.unwrap();
+        <span class="kw">let </span>result = result.into_single().unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">result</span>.<span class="ident">get</span>(<span class="string">&quot;id&quot;</span>).<span class="ident">unwrap</span>(), <span class="kw-2">&amp;</span><span class="ident">Value::int32</span>(<span class="number">1</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">result</span>.<span class="ident">get</span>(<span class="string">&quot;txt&quot;</span>).<span class="ident">unwrap</span>(), <span class="kw-2">&amp;</span><span class="ident">Value::text</span>(<span class="string">&quot;henlo&quot;</span>));
+        <span class="macro">assert_eq!</span>(result.get(<span class="string">&quot;id&quot;</span>).unwrap(), <span class="kw-2">&amp;</span>Value::int32(<span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(result.get(<span class="string">&quot;txt&quot;</span>).unwrap(), <span class="kw-2">&amp;</span>Value::text(<span class="string">&quot;henlo&quot;</span>));
 
-        <span class="comment">// Check that we do get a separate, new database.</span>
-        <span class="kw">let</span> <span class="ident">other_conn</span> <span class="op">=</span> <span class="ident">Sqlite::new_in_memory</span>().<span class="ident">unwrap</span>();
+        <span class="comment">// Check that we do get a separate, new database.
+        </span><span class="kw">let </span>other_conn = Sqlite::new_in_memory().unwrap();
 
-        <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">other_conn</span>.<span class="ident">select</span>(<span class="ident">select</span>).<span class="kw">await</span>.<span class="ident">unwrap_err</span>();
-        <span class="macro">assert!</span>(<span class="macro">matches!</span>(<span class="ident">err</span>.<span class="ident">kind</span>(), <span class="ident">ErrorKind::TableDoesNotExist</span> { .. }));
+        <span class="kw">let </span>err = other_conn.select(select).<span class="kw">await</span>.unwrap_err();
+        <span class="macro">assert!</span>(<span class="macro">matches!</span>(err.kind(), ErrorKind::TableDoesNotExist { .. }));
     }
 
-    <span class="attribute">#[<span class="ident">tokio::test</span>]</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">quoting_in_returning_in_sqlite_works</span>() {
-        <span class="kw">let</span> <span class="ident">conn</span> <span class="op">=</span> <span class="ident">Sqlite::new_in_memory</span>().<span class="ident">unwrap</span>();
+    <span class="attribute">#[tokio::test]
+    </span><span class="kw">async fn </span>quoting_in_returning_in_sqlite_works() {
+        <span class="kw">let </span>conn = Sqlite::new_in_memory().unwrap();
 
-        <span class="ident">conn</span>.<span class="ident">raw_cmd</span>(<span class="string">&quot;CREATE TABLE test (id  INTEGER PRIMARY KEY, `txt space` TEXT NOT NULL);&quot;</span>)
-            .<span class="kw">await</span>
-            .<span class="ident">unwrap</span>();
+        conn.raw_cmd(<span class="string">&quot;CREATE TABLE test (id  INTEGER PRIMARY KEY, `txt space` TEXT NOT NULL);&quot;</span>)
+            .<span class="kw">await
+            </span>.unwrap();
 
-        <span class="kw">let</span> <span class="ident">insert</span> <span class="op">=</span> <span class="ident">Insert::single_into</span>(<span class="string">&quot;test&quot;</span>).<span class="ident">value</span>(<span class="string">&quot;txt space&quot;</span>, <span class="string">&quot;henlo&quot;</span>);
-        <span class="ident">conn</span>.<span class="ident">insert</span>(<span class="ident">insert</span>.<span class="ident">into</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>();
+        <span class="kw">let </span>insert = Insert::single_into(<span class="string">&quot;test&quot;</span>).value(<span class="string">&quot;txt space&quot;</span>, <span class="string">&quot;henlo&quot;</span>);
+        conn.insert(insert.into()).<span class="kw">await</span>.unwrap();
 
-        <span class="kw">let</span> <span class="ident">select</span> <span class="op">=</span> <span class="ident">Select::from_table</span>(<span class="string">&quot;test&quot;</span>).<span class="ident">value</span>(<span class="ident">asterisk</span>());
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">select</span>(<span class="ident">select</span>.<span class="ident">clone</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">into_single</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let </span>select = Select::from_table(<span class="string">&quot;test&quot;</span>).value(asterisk());
+        <span class="kw">let </span>result = conn.select(select.clone()).<span class="kw">await</span>.unwrap();
+        <span class="kw">let </span>result = result.into_single().unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">result</span>.<span class="ident">get</span>(<span class="string">&quot;id&quot;</span>).<span class="ident">unwrap</span>(), <span class="kw-2">&amp;</span><span class="ident">Value::int32</span>(<span class="number">1</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">result</span>.<span class="ident">get</span>(<span class="string">&quot;txt space&quot;</span>).<span class="ident">unwrap</span>(), <span class="kw-2">&amp;</span><span class="ident">Value::text</span>(<span class="string">&quot;henlo&quot;</span>));
+        <span class="macro">assert_eq!</span>(result.get(<span class="string">&quot;id&quot;</span>).unwrap(), <span class="kw-2">&amp;</span>Value::int32(<span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(result.get(<span class="string">&quot;txt space&quot;</span>).unwrap(), <span class="kw-2">&amp;</span>Value::text(<span class="string">&quot;henlo&quot;</span>));
 
-        <span class="kw">let</span> <span class="ident">insert</span> <span class="op">=</span> <span class="ident">Insert::single_into</span>(<span class="string">&quot;test&quot;</span>).<span class="ident">value</span>(<span class="string">&quot;txt space&quot;</span>, <span class="string">&quot;henlo&quot;</span>);
-        <span class="kw">let</span> <span class="ident">insert</span>: <span class="ident">Insert</span> <span class="op">=</span> <span class="ident">Insert::from</span>(<span class="ident">insert</span>).<span class="ident">returning</span>(<span class="kw-2">&amp;</span>[<span class="string">&quot;txt space&quot;</span>]).<span class="ident">into</span>();
+        <span class="kw">let </span>insert = Insert::single_into(<span class="string">&quot;test&quot;</span>).value(<span class="string">&quot;txt space&quot;</span>, <span class="string">&quot;henlo&quot;</span>);
+        <span class="kw">let </span>insert: Insert = Insert::from(insert).returning(<span class="kw-2">&amp;</span>[<span class="string">&quot;txt space&quot;</span>]).into();
 
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">insert</span>(<span class="ident">insert</span>.<span class="ident">into</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">result</span>.<span class="ident">into_single</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let </span>result = conn.insert(insert.into()).<span class="kw">await</span>.unwrap();
+        <span class="kw">let </span>result = result.into_single().unwrap();
 
-        <span class="macro">assert_eq!</span>(<span class="ident">result</span>.<span class="ident">get</span>(<span class="string">&quot;txt space&quot;</span>).<span class="ident">unwrap</span>(), <span class="kw-2">&amp;</span><span class="ident">Value::text</span>(<span class="string">&quot;henlo&quot;</span>));
+        <span class="macro">assert_eq!</span>(result.get(<span class="string">&quot;txt space&quot;</span>).unwrap(), <span class="kw-2">&amp;</span>Value::text(<span class="string">&quot;henlo&quot;</span>));
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="quaint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="quaint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

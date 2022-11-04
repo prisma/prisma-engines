@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/parser-database/src/names.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>names.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../parser_database/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/parser-database/src/names.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>names.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../parser_database/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -183,190 +183,190 @@
 <span id="183">183</span>
 <span id="184">184</span>
 <span id="185">185</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">reserved_model_names</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>reserved_model_names;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">reserved_model_names::is_reserved_type_name</span>;
+<span class="kw">pub use </span>reserved_model_names::is_reserved_type_name;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">ConfigBlockProperty</span>, <span class="ident">TopId</span>, <span class="ident">WithAttributes</span>, <span class="ident">WithIdentifier</span>, <span class="ident">WithName</span>, <span class="ident">WithSpan</span>},
-    <span class="ident">types::ScalarType</span>,
-    <span class="ident">Context</span>, <span class="ident">DatamodelError</span>, <span class="ident">StringId</span>,
+<span class="kw">use crate</span>::{
+    ast::{<span class="self">self</span>, ConfigBlockProperty, TopId, WithAttributes, WithIdentifier, WithName, WithSpan},
+    types::ScalarType,
+    Context, DatamodelError, StringId,
 };
-<span class="kw">use</span> <span class="ident">reserved_model_names</span>::{<span class="ident">validate_enum_name</span>, <span class="ident">validate_model_name</span>};
-<span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="ident">BTreeMap</span>, <span class="ident">HashMap</span>, <span class="ident">HashSet</span>};
+<span class="kw">use </span>reserved_model_names::{validate_enum_name, validate_model_name};
+<span class="kw">use </span>std::collections::{BTreeMap, HashMap, HashSet};
 
-<span class="doccomment">/// Resolved names for use in the validation process.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">Names</span> {
-    <span class="doccomment">/// Models, enums, composite types and type aliases</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">tops</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">StringId</span>, <span class="ident">TopId</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Generators have their own namespace.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">generators</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">StringId</span>, <span class="ident">TopId</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Datasources have their own namespace.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">datasources</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">StringId</span>, <span class="ident">TopId</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">model_fields</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span>(<span class="ident">ast::ModelId</span>, <span class="ident">StringId</span>), <span class="ident">ast::FieldId</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">composite_type_fields</span>: <span class="ident">HashMap</span><span class="op">&lt;</span>(<span class="ident">ast::CompositeTypeId</span>, <span class="ident">StringId</span>), <span class="ident">ast::FieldId</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Resolved names for use in the validation process.
+</span><span class="attribute">#[derive(Default)]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>Names {
+    <span class="doccomment">/// Models, enums, composite types and type aliases
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) tops: HashMap&lt;StringId, TopId&gt;,
+    <span class="doccomment">/// Generators have their own namespace.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) generators: HashMap&lt;StringId, TopId&gt;,
+    <span class="doccomment">/// Datasources have their own namespace.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) datasources: HashMap&lt;StringId, TopId&gt;,
+    <span class="kw">pub</span>(<span class="kw">super</span>) model_fields: BTreeMap&lt;(ast::ModelId, StringId), ast::FieldId&gt;,
+    <span class="kw">pub</span>(<span class="kw">super</span>) composite_type_fields: HashMap&lt;(ast::CompositeTypeId, StringId), ast::FieldId&gt;,
 }
 
-<span class="doccomment">/// `resolve_names()` is responsible for populating `ParserDatabase.names` and</span>
-<span class="doccomment">/// validating that there are no name collisions in the following namespaces:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// - Model, enum and type alias names</span>
-<span class="doccomment">/// - Generators</span>
-<span class="doccomment">/// - Datasources</span>
-<span class="doccomment">/// - Model fields for each model</span>
-<span class="doccomment">/// - Enum variants for each enum</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">resolve_names</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tmp_names</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">HashSet::new</span>(); <span class="comment">// throwaway container for duplicate checking</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">names</span> <span class="op">=</span> <span class="ident">Names::default</span>();
+<span class="doccomment">/// `resolve_names()` is responsible for populating `ParserDatabase.names` and
+/// validating that there are no name collisions in the following namespaces:
+///
+/// - Model, enum and type alias names
+/// - Generators
+/// - Datasources
+/// - Model fields for each model
+/// - Enum variants for each enum
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>resolve_names(ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">let </span><span class="kw-2">mut </span>tmp_names: HashSet&lt;<span class="kw-2">&amp;</span>str&gt; = HashSet::new(); <span class="comment">// throwaway container for duplicate checking
+    </span><span class="kw">let </span><span class="kw-2">mut </span>names = Names::default();
 
-    <span class="kw">for</span> (<span class="ident">top_id</span>, <span class="ident">top</span>) <span class="kw">in</span> <span class="ident">ctx</span>.<span class="ident">ast</span>.<span class="ident">iter_tops</span>() {
-        <span class="ident">assert_is_not_a_reserved_scalar_type</span>(<span class="ident">top</span>.<span class="ident">identifier</span>(), <span class="ident">ctx</span>);
+    <span class="kw">for </span>(top_id, top) <span class="kw">in </span>ctx.ast.iter_tops() {
+        assert_is_not_a_reserved_scalar_type(top.identifier(), ctx);
 
-        <span class="kw">let</span> <span class="ident">namespace</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">top_id</span>, <span class="ident">top</span>) {
-            (<span class="kw">_</span>, <span class="ident">ast::Top::Enum</span>(<span class="ident">ast_enum</span>)) =&gt; {
-                <span class="ident">tmp_names</span>.<span class="ident">clear</span>();
-                <span class="ident">validate_identifier</span>(<span class="kw-2">&amp;</span><span class="ident">ast_enum</span>.<span class="ident">name</span>, <span class="string">&quot;Enum&quot;</span>, <span class="ident">ctx</span>);
-                <span class="ident">validate_enum_name</span>(<span class="ident">ast_enum</span>, <span class="ident">ctx</span>.<span class="ident">diagnostics</span>);
-                <span class="ident">validate_attribute_identifiers</span>(<span class="ident">ast_enum</span>, <span class="ident">ctx</span>);
+        <span class="kw">let </span>namespace = <span class="kw">match </span>(top_id, top) {
+            (<span class="kw">_</span>, ast::Top::Enum(ast_enum)) =&gt; {
+                tmp_names.clear();
+                validate_identifier(<span class="kw-2">&amp;</span>ast_enum.name, <span class="string">&quot;Enum&quot;</span>, ctx);
+                validate_enum_name(ast_enum, ctx.diagnostics);
+                validate_attribute_identifiers(ast_enum, ctx);
 
-                <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">ast_enum</span>.<span class="ident">values</span> {
-                    <span class="ident">validate_identifier</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>.<span class="ident">name</span>, <span class="string">&quot;Enum Value&quot;</span>, <span class="ident">ctx</span>);
-                    <span class="ident">validate_attribute_identifiers</span>(<span class="ident">value</span>, <span class="ident">ctx</span>);
+                <span class="kw">for </span>value <span class="kw">in </span><span class="kw-2">&amp;</span>ast_enum.values {
+                    validate_identifier(<span class="kw-2">&amp;</span>value.name, <span class="string">&quot;Enum Value&quot;</span>, ctx);
+                    validate_attribute_identifiers(value, ctx);
 
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">tmp_names</span>.<span class="ident">insert</span>(<span class="kw-2">&amp;</span><span class="ident">value</span>.<span class="ident">name</span>.<span class="ident">name</span>) {
-                        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_duplicate_enum_value_error</span>(
-                            <span class="kw-2">&amp;</span><span class="ident">ast_enum</span>.<span class="ident">name</span>.<span class="ident">name</span>,
-                            <span class="kw-2">&amp;</span><span class="ident">value</span>.<span class="ident">name</span>.<span class="ident">name</span>,
-                            <span class="ident">value</span>.<span class="ident">span</span>,
+                    <span class="kw">if </span>!tmp_names.insert(<span class="kw-2">&amp;</span>value.name.name) {
+                        ctx.push_error(DatamodelError::new_duplicate_enum_value_error(
+                            <span class="kw-2">&amp;</span>ast_enum.name.name,
+                            <span class="kw-2">&amp;</span>value.name.name,
+                            value.span,
                         ))
                     }
                 }
 
-                <span class="kw-2">&amp;mut</span> <span class="ident">names</span>.<span class="ident">tops</span>
+                <span class="kw-2">&amp;mut </span>names.tops
             }
-            (<span class="ident">ast::TopId::Model</span>(<span class="ident">model_id</span>), <span class="ident">ast::Top::Model</span>(<span class="ident">model</span>)) =&gt; {
-                <span class="ident">validate_identifier</span>(<span class="ident">model</span>.<span class="ident">identifier</span>(), <span class="string">&quot;Model&quot;</span>, <span class="ident">ctx</span>);
-                <span class="ident">validate_model_name</span>(<span class="ident">model</span>, <span class="ident">ctx</span>.<span class="ident">diagnostics</span>);
-                <span class="ident">validate_attribute_identifiers</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
+            (ast::TopId::Model(model_id), ast::Top::Model(model)) =&gt; {
+                validate_identifier(model.identifier(), <span class="string">&quot;Model&quot;</span>, ctx);
+                validate_model_name(model, ctx.diagnostics);
+                validate_attribute_identifiers(model, ctx);
 
-                <span class="kw">for</span> (<span class="ident">field_id</span>, <span class="ident">field</span>) <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">iter_fields</span>() {
-                    <span class="ident">validate_identifier</span>(<span class="ident">field</span>.<span class="ident">identifier</span>(), <span class="string">&quot;Field&quot;</span>, <span class="ident">ctx</span>);
-                    <span class="ident">validate_attribute_identifiers</span>(<span class="ident">field</span>, <span class="ident">ctx</span>);
-                    <span class="kw">let</span> <span class="ident">field_name_id</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">interner</span>.<span class="ident">intern</span>(<span class="ident">field</span>.<span class="ident">name</span>());
+                <span class="kw">for </span>(field_id, field) <span class="kw">in </span>model.iter_fields() {
+                    validate_identifier(field.identifier(), <span class="string">&quot;Field&quot;</span>, ctx);
+                    validate_attribute_identifiers(field, ctx);
+                    <span class="kw">let </span>field_name_id = ctx.interner.intern(field.name());
 
-                    <span class="kw">if</span> <span class="ident">names</span>.<span class="ident">model_fields</span>.<span class="ident">insert</span>((<span class="ident">model_id</span>, <span class="ident">field_name_id</span>), <span class="ident">field_id</span>).<span class="ident">is_some</span>() {
-                        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_duplicate_field_error</span>(
-                            <span class="ident">model</span>.<span class="ident">name</span>(),
-                            <span class="ident">field</span>.<span class="ident">name</span>(),
-                            <span class="ident">field</span>.<span class="ident">identifier</span>().<span class="ident">span</span>,
+                    <span class="kw">if </span>names.model_fields.insert((model_id, field_name_id), field_id).is_some() {
+                        ctx.push_error(DatamodelError::new_duplicate_field_error(
+                            model.name(),
+                            field.name(),
+                            field.identifier().span,
                         ))
                     }
                 }
 
-                <span class="kw-2">&amp;mut</span> <span class="ident">names</span>.<span class="ident">tops</span>
+                <span class="kw-2">&amp;mut </span>names.tops
             }
-            (<span class="ident">ast::TopId::CompositeType</span>(<span class="ident">ctid</span>), <span class="ident">ast::Top::CompositeType</span>(<span class="ident">ct</span>)) =&gt; {
-                <span class="ident">validate_identifier</span>(<span class="ident">ct</span>.<span class="ident">identifier</span>(), <span class="string">&quot;Composite type&quot;</span>, <span class="ident">ctx</span>);
+            (ast::TopId::CompositeType(ctid), ast::Top::CompositeType(ct)) =&gt; {
+                validate_identifier(ct.identifier(), <span class="string">&quot;Composite type&quot;</span>, ctx);
 
-                <span class="kw">for</span> (<span class="ident">field_id</span>, <span class="ident">field</span>) <span class="kw">in</span> <span class="ident">ct</span>.<span class="ident">iter_fields</span>() {
-                    <span class="kw">let</span> <span class="ident">field_name_id</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">interner</span>.<span class="ident">intern</span>(<span class="ident">field</span>.<span class="ident">name</span>());
-                    <span class="comment">// Check that there is no duplicate field on the composite type</span>
-                    <span class="kw">if</span> <span class="ident">names</span>
-                        .<span class="ident">composite_type_fields</span>
-                        .<span class="ident">insert</span>((<span class="ident">ctid</span>, <span class="ident">field_name_id</span>), <span class="ident">field_id</span>)
-                        .<span class="ident">is_some</span>()
+                <span class="kw">for </span>(field_id, field) <span class="kw">in </span>ct.iter_fields() {
+                    <span class="kw">let </span>field_name_id = ctx.interner.intern(field.name());
+                    <span class="comment">// Check that there is no duplicate field on the composite type
+                    </span><span class="kw">if </span>names
+                        .composite_type_fields
+                        .insert((ctid, field_name_id), field_id)
+                        .is_some()
                     {
-                        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_composite_type_duplicate_field_error</span>(
-                            <span class="ident">ct</span>.<span class="ident">name</span>(),
-                            <span class="ident">field</span>.<span class="ident">name</span>(),
-                            <span class="ident">field</span>.<span class="ident">identifier</span>().<span class="ident">span</span>(),
+                        ctx.push_error(DatamodelError::new_composite_type_duplicate_field_error(
+                            ct.name(),
+                            field.name(),
+                            field.identifier().span(),
                         ))
                     }
                 }
 
-                <span class="kw-2">&amp;mut</span> <span class="ident">names</span>.<span class="ident">tops</span>
+                <span class="kw-2">&amp;mut </span>names.tops
             }
-            (<span class="kw">_</span>, <span class="ident">ast::Top::Source</span>(<span class="ident">datasource</span>)) =&gt; {
-                <span class="ident">check_for_duplicate_properties</span>(<span class="ident">top</span>, <span class="kw-2">&amp;</span><span class="ident">datasource</span>.<span class="ident">properties</span>, <span class="kw-2">&amp;mut</span> <span class="ident">tmp_names</span>, <span class="ident">ctx</span>);
-                <span class="kw-2">&amp;mut</span> <span class="ident">names</span>.<span class="ident">datasources</span>
+            (<span class="kw">_</span>, ast::Top::Source(datasource)) =&gt; {
+                check_for_duplicate_properties(top, <span class="kw-2">&amp;</span>datasource.properties, <span class="kw-2">&amp;mut </span>tmp_names, ctx);
+                <span class="kw-2">&amp;mut </span>names.datasources
             }
-            (<span class="kw">_</span>, <span class="ident">ast::Top::Generator</span>(<span class="ident">generator</span>)) =&gt; {
-                <span class="ident">check_for_duplicate_properties</span>(<span class="ident">top</span>, <span class="kw-2">&amp;</span><span class="ident">generator</span>.<span class="ident">properties</span>, <span class="kw-2">&amp;mut</span> <span class="ident">tmp_names</span>, <span class="ident">ctx</span>);
-                <span class="kw-2">&amp;mut</span> <span class="ident">names</span>.<span class="ident">generators</span>
+            (<span class="kw">_</span>, ast::Top::Generator(generator)) =&gt; {
+                check_for_duplicate_properties(top, <span class="kw-2">&amp;</span>generator.properties, <span class="kw-2">&amp;mut </span>tmp_names, ctx);
+                <span class="kw-2">&amp;mut </span>names.generators
             }
-            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
         };
 
-        <span class="ident">insert_name</span>(<span class="ident">top_id</span>, <span class="ident">top</span>, <span class="ident">namespace</span>, <span class="ident">ctx</span>)
+        insert_name(top_id, top, namespace, ctx)
     }
 
-    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">std::mem::replace</span>(<span class="ident">ctx</span>.<span class="ident">names</span>, <span class="ident">names</span>);
+    <span class="kw">let _ </span>= std::mem::replace(ctx.names, names);
 }
 
-<span class="kw">fn</span> <span class="ident">insert_name</span>(<span class="ident">top_id</span>: <span class="ident">TopId</span>, <span class="ident">top</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Top</span>, <span class="ident">namespace</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">StringId</span>, <span class="ident">TopId</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">interner</span>.<span class="ident">intern</span>(<span class="ident">top</span>.<span class="ident">name</span>());
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">existing</span>) <span class="op">=</span> <span class="ident">namespace</span>.<span class="ident">insert</span>(<span class="ident">name</span>, <span class="ident">top_id</span>) {
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">duplicate_top_error</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">existing</span>], <span class="ident">top</span>));
+<span class="kw">fn </span>insert_name(top_id: TopId, top: <span class="kw-2">&amp;</span>ast::Top, namespace: <span class="kw-2">&amp;mut </span>HashMap&lt;StringId, TopId&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">let </span>name = ctx.interner.intern(top.name());
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(existing) = namespace.insert(name, top_id) {
+        ctx.push_error(duplicate_top_error(<span class="kw-2">&amp;</span>ctx.ast[existing], top));
     }
 }
 
-<span class="kw">fn</span> <span class="ident">duplicate_top_error</span>(<span class="ident">existing</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Top</span>, <span class="ident">duplicate</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Top</span>) -&gt; <span class="ident">DatamodelError</span> {
-    <span class="ident">DatamodelError::new_duplicate_top_error</span>(
-        <span class="ident">duplicate</span>.<span class="ident">name</span>(),
-        <span class="ident">duplicate</span>.<span class="ident">get_type</span>(),
-        <span class="ident">existing</span>.<span class="ident">get_type</span>(),
-        <span class="ident">duplicate</span>.<span class="ident">identifier</span>().<span class="ident">span</span>,
+<span class="kw">fn </span>duplicate_top_error(existing: <span class="kw-2">&amp;</span>ast::Top, duplicate: <span class="kw-2">&amp;</span>ast::Top) -&gt; DatamodelError {
+    DatamodelError::new_duplicate_top_error(
+        duplicate.name(),
+        duplicate.get_type(),
+        existing.get_type(),
+        duplicate.identifier().span,
     )
 }
 
-<span class="kw">fn</span> <span class="ident">assert_is_not_a_reserved_scalar_type</span>(<span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Identifier</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="ident">ScalarType::try_from_str</span>(<span class="kw-2">&amp;</span><span class="ident">ident</span>.<span class="ident">name</span>).<span class="ident">is_some</span>() {
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_reserved_scalar_type_error</span>(<span class="kw-2">&amp;</span><span class="ident">ident</span>.<span class="ident">name</span>, <span class="ident">ident</span>.<span class="ident">span</span>));
+<span class="kw">fn </span>assert_is_not_a_reserved_scalar_type(ident: <span class="kw-2">&amp;</span>ast::Identifier, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">if </span>ScalarType::try_from_str(<span class="kw-2">&amp;</span>ident.name).is_some() {
+        ctx.push_error(DatamodelError::new_reserved_scalar_type_error(<span class="kw-2">&amp;</span>ident.name, ident.span));
     }
 }
 
-<span class="kw">fn</span> <span class="ident">check_for_duplicate_properties</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">top</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Top</span>,
-    <span class="ident">props</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">ConfigBlockProperty</span>],
-    <span class="ident">tmp_names</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+<span class="kw">fn </span>check_for_duplicate_properties&lt;<span class="lifetime">&#39;a</span>&gt;(
+    top: <span class="kw-2">&amp;</span>ast::Top,
+    props: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[ConfigBlockProperty],
+    tmp_names: <span class="kw-2">&amp;mut </span>HashSet&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
+    ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) {
-    <span class="ident">tmp_names</span>.<span class="ident">clear</span>();
-    <span class="kw">for</span> <span class="ident">arg</span> <span class="kw">in</span> <span class="ident">props</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">tmp_names</span>.<span class="ident">insert</span>(<span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">name</span>) {
-            <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_duplicate_config_key_error</span>(
-                <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{} \&quot;{}\&quot;&quot;</span>, <span class="ident">top</span>.<span class="ident">get_type</span>(), <span class="ident">top</span>.<span class="ident">name</span>()),
-                <span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">name</span>,
-                <span class="ident">arg</span>.<span class="ident">name</span>.<span class="ident">span</span>,
+    tmp_names.clear();
+    <span class="kw">for </span>arg <span class="kw">in </span>props {
+        <span class="kw">if </span>!tmp_names.insert(<span class="kw-2">&amp;</span>arg.name.name) {
+            ctx.push_error(DatamodelError::new_duplicate_config_key_error(
+                <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{} \&quot;{}\&quot;&quot;</span>, top.get_type(), top.name()),
+                <span class="kw-2">&amp;</span>arg.name.name,
+                arg.name.span,
             ));
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">validate_attribute_identifiers</span>(<span class="ident">with_attrs</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">WithAttributes</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">for</span> <span class="ident">attribute</span> <span class="kw">in</span> <span class="ident">with_attrs</span>.<span class="ident">attributes</span>() {
-        <span class="ident">validate_identifier</span>(<span class="kw-2">&amp;</span><span class="ident">attribute</span>.<span class="ident">name</span>, <span class="string">&quot;Attribute&quot;</span>, <span class="ident">ctx</span>);
+<span class="kw">fn </span>validate_attribute_identifiers(with_attrs: <span class="kw-2">&amp;</span><span class="kw">dyn </span>WithAttributes, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">for </span>attribute <span class="kw">in </span>with_attrs.attributes() {
+        validate_identifier(<span class="kw-2">&amp;</span>attribute.name, <span class="string">&quot;Attribute&quot;</span>, ctx);
     }
 }
 
-<span class="kw">fn</span> <span class="ident">validate_identifier</span>(<span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">ast::Identifier</span>, <span class="ident">schema_item</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="ident">ident</span>.<span class="ident">name</span>.<span class="ident">is_empty</span>() {
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
-            <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;The name of a {} must not be empty.&quot;</span>, <span class="ident">schema_item</span>),
-            <span class="ident">ident</span>.<span class="ident">span</span>,
+<span class="kw">fn </span>validate_identifier(ident: <span class="kw-2">&amp;</span>ast::Identifier, schema_item: <span class="kw-2">&amp;</span>str, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">if </span>ident.name.is_empty() {
+        ctx.push_error(DatamodelError::new_validation_error(
+            <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;The name of a {} must not be empty.&quot;</span>, schema_item),
+            ident.span,
         ))
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">ident</span>.<span class="ident">name</span>.<span class="ident">chars</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">is_numeric</span>() {
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
-            <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;The name of a {} must not start with a number.&quot;</span>, <span class="ident">schema_item</span>),
-            <span class="ident">ident</span>.<span class="ident">span</span>,
+    } <span class="kw">else if </span>ident.name.chars().next().unwrap().is_numeric() {
+        ctx.push_error(DatamodelError::new_validation_error(
+            <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;The name of a {} must not start with a number.&quot;</span>, schema_item),
+            ident.span,
         ))
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">ident</span>.<span class="ident">name</span>.<span class="ident">contains</span>(<span class="string">&#39;-&#39;</span>) {
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(
-            <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;The character `-` is not allowed in {} names.&quot;</span>, <span class="ident">schema_item</span>),
-            <span class="ident">ident</span>.<span class="ident">span</span>,
+    } <span class="kw">else if </span>ident.name.contains(<span class="string">&#39;-&#39;</span>) {
+        ctx.push_error(DatamodelError::new_validation_error(
+            <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;The character `-` is not allowed in {} names.&quot;</span>, schema_item),
+            ident.span,
         ))
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="parser_database" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="parser_database" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

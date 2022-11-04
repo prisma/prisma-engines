@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.21.0/src/util/idle_notified_set.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>idle_notified_set.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tokio/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.21.0/src/util/idle_notified_set.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>idle_notified_set.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tokio/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -460,467 +460,467 @@
 <span id="460">460</span>
 <span id="461">461</span>
 <span id="462">462</span>
-</pre><pre class="rust"><code><span class="doccomment">//! This module defines an `IdleNotifiedSet`, which is a collection of elements.</span>
-<span class="doccomment">//! Each element is intended to correspond to a task, and the collection will</span>
-<span class="doccomment">//! keep track of which tasks have had their waker notified, and which have not.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Each entry in the set holds some user-specified value. The value&#39;s type is</span>
-<span class="doccomment">//! specified using the `T` parameter. It will usually be a `JoinHandle` or</span>
-<span class="doccomment">//! similar.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! This module defines an `IdleNotifiedSet`, which is a collection of elements.
+//! Each element is intended to correspond to a task, and the collection will
+//! keep track of which tasks have had their waker notified, and which have not.
+//!
+//! Each entry in the set holds some user-specified value. The value&#39;s type is
+//! specified using the `T` parameter. It will usually be a `JoinHandle` or
+//! similar.
 
-<span class="kw">use</span> <span class="ident">std::marker::PhantomPinned</span>;
-<span class="kw">use</span> <span class="ident">std::mem::ManuallyDrop</span>;
-<span class="kw">use</span> <span class="ident">std::ptr::NonNull</span>;
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Waker</span>};
+</span><span class="kw">use </span>std::marker::PhantomPinned;
+<span class="kw">use </span>std::mem::ManuallyDrop;
+<span class="kw">use </span>std::ptr::NonNull;
+<span class="kw">use </span>std::task::{Context, Waker};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::loom::cell::UnsafeCell</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::loom::sync</span>::{<span class="ident">Arc</span>, <span class="ident">Mutex</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::util::linked_list</span>::{<span class="self">self</span>, <span class="ident">Link</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::util</span>::{<span class="ident">waker_ref</span>, <span class="ident">Wake</span>};
+<span class="kw">use </span><span class="kw">crate</span>::loom::cell::UnsafeCell;
+<span class="kw">use </span><span class="kw">crate</span>::loom::sync::{Arc, Mutex};
+<span class="kw">use </span><span class="kw">crate</span>::util::linked_list::{<span class="self">self</span>, Link};
+<span class="kw">use </span><span class="kw">crate</span>::util::{waker_ref, Wake};
 
-<span class="kw">type</span> <span class="ident">LinkedList</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span>
-    <span class="ident">linked_list::LinkedList</span><span class="op">&lt;</span><span class="ident">ListEntry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="op">&lt;</span><span class="ident">ListEntry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">linked_list::Link</span><span class="op">&gt;</span><span class="ident">::Target</span><span class="op">&gt;</span>;
+<span class="kw">type </span>LinkedList&lt;T&gt; =
+    linked_list::LinkedList&lt;ListEntry&lt;T&gt;, &lt;ListEntry&lt;T&gt; <span class="kw">as </span>linked_list::Link&gt;::Target&gt;;
 
-<span class="doccomment">/// This is the main handle to the collection.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">IdleNotifiedSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">lists</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Lists</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">length</span>: <span class="ident">usize</span>,
+<span class="doccomment">/// This is the main handle to the collection.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>IdleNotifiedSet&lt;T&gt; {
+    lists: Arc&lt;Lists&lt;T&gt;&gt;,
+    length: usize,
 }
 
-<span class="doccomment">/// A handle to an entry that is guaranteed to be stored in the idle or notified</span>
-<span class="doccomment">/// list of its `IdleNotifiedSet`. This value borrows the `IdleNotifiedSet`</span>
-<span class="doccomment">/// mutably to prevent the entry from being moved to the `Neither` list, which</span>
-<span class="doccomment">/// only the `IdleNotifiedSet` may do.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The main consequence of being stored in one of the lists is that the `value`</span>
-<span class="doccomment">/// field has not yet been consumed.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note: This entry can be moved from the idle to the notified list while this</span>
-<span class="doccomment">/// object exists by waking its waker.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">EntryInOneOfTheLists</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">entry</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ListEntry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">set</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">IdleNotifiedSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A handle to an entry that is guaranteed to be stored in the idle or notified
+/// list of its `IdleNotifiedSet`. This value borrows the `IdleNotifiedSet`
+/// mutably to prevent the entry from being moved to the `Neither` list, which
+/// only the `IdleNotifiedSet` may do.
+///
+/// The main consequence of being stored in one of the lists is that the `value`
+/// field has not yet been consumed.
+///
+/// Note: This entry can be moved from the idle to the notified list while this
+/// object exists by waking its waker.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>EntryInOneOfTheLists&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+    entry: Arc&lt;ListEntry&lt;T&gt;&gt;,
+    set: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>IdleNotifiedSet&lt;T&gt;,
 }
 
-<span class="kw">type</span> <span class="ident">Lists</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">ListsInner</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="kw">type </span>Lists&lt;T&gt; = Mutex&lt;ListsInner&lt;T&gt;&gt;;
 
-<span class="doccomment">/// The linked lists hold strong references to the ListEntry items, and the</span>
-<span class="doccomment">/// ListEntry items also hold a strong reference back to the Lists object, but</span>
-<span class="doccomment">/// the destructor of the `IdleNotifiedSet` will clear the two lists, so once</span>
-<span class="doccomment">/// that object is destroyed, no ref-cycles will remain.</span>
-<span class="kw">struct</span> <span class="ident">ListsInner</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">notified</span>: <span class="ident">LinkedList</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="ident">idle</span>: <span class="ident">LinkedList</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Whenever an element in the `notified` list is woken, this waker will be</span>
-    <span class="doccomment">/// notified and consumed, if it exists.</span>
-    <span class="ident">waker</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Waker</span><span class="op">&gt;</span>,
+<span class="doccomment">/// The linked lists hold strong references to the ListEntry items, and the
+/// ListEntry items also hold a strong reference back to the Lists object, but
+/// the destructor of the `IdleNotifiedSet` will clear the two lists, so once
+/// that object is destroyed, no ref-cycles will remain.
+</span><span class="kw">struct </span>ListsInner&lt;T&gt; {
+    notified: LinkedList&lt;T&gt;,
+    idle: LinkedList&lt;T&gt;,
+    <span class="doccomment">/// Whenever an element in the `notified` list is woken, this waker will be
+    /// notified and consumed, if it exists.
+    </span>waker: <span class="prelude-ty">Option</span>&lt;Waker&gt;,
 }
 
-<span class="doccomment">/// Which of the two lists in the shared Lists object is this entry stored in?</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If the value is `Idle`, then an entry&#39;s waker may move it to the notified</span>
-<span class="doccomment">/// list. Otherwise, only the `IdleNotifiedSet` may move it.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If the value is `Neither`, then it is still possible that the entry is in</span>
-<span class="doccomment">/// some third external list (this happens in `drain`).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">enum</span> <span class="ident">List</span> {
-    <span class="ident">Notified</span>,
-    <span class="ident">Idle</span>,
-    <span class="ident">Neither</span>,
+<span class="doccomment">/// Which of the two lists in the shared Lists object is this entry stored in?
+///
+/// If the value is `Idle`, then an entry&#39;s waker may move it to the notified
+/// list. Otherwise, only the `IdleNotifiedSet` may move it.
+///
+/// If the value is `Neither`, then it is still possible that the entry is in
+/// some third external list (this happens in `drain`).
+</span><span class="attribute">#[derive(Copy, Clone, Eq, PartialEq)]
+</span><span class="kw">enum </span>List {
+    Notified,
+    Idle,
+    Neither,
 }
 
-<span class="doccomment">/// An entry in the list.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The `my_list` field must only be accessed while holding the mutex in</span>
-<span class="doccomment">/// `parent`. It is an invariant that the value of `my_list` corresponds to</span>
-<span class="doccomment">/// which linked list in the `parent` holds this entry. Once this field takes</span>
-<span class="doccomment">/// the value `Neither`, then it may never be modified again.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If the value of `my_list` is `Notified` or `Idle`, then the `pointers` field</span>
-<span class="doccomment">/// must only be accessed while holding the mutex. If the value of `my_list` is</span>
-<span class="doccomment">/// `Neither`, then the `pointers` field may be accessed by the</span>
-<span class="doccomment">/// `IdleNotifiedSet` (this happens inside `drain`).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The `value` field is owned by the `IdleNotifiedSet` and may only be accessed</span>
-<span class="doccomment">/// by the `IdleNotifiedSet`. The operation that sets the value of `my_list` to</span>
-<span class="doccomment">/// `Neither` assumes ownership of the `value`, and it must either drop it or</span>
-<span class="doccomment">/// move it out from this entry to prevent it from getting leaked. (Since the</span>
-<span class="doccomment">/// two linked lists are emptied in the destructor of `IdleNotifiedSet`, the</span>
-<span class="doccomment">/// value should not be leaked.)</span>
-<span class="kw">struct</span> <span class="ident">ListEntry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The linked list pointers of the list this entry is in.</span>
-    <span class="ident">pointers</span>: <span class="ident">linked_list::Pointers</span><span class="op">&lt;</span><span class="ident">ListEntry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Pointer to the shared `Lists` struct.</span>
-    <span class="ident">parent</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Lists</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The value stored in this entry.</span>
-    <span class="ident">value</span>: <span class="ident">UnsafeCell</span><span class="op">&lt;</span><span class="ident">ManuallyDrop</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Used to remember which list this entry is in.</span>
-    <span class="ident">my_list</span>: <span class="ident">UnsafeCell</span><span class="op">&lt;</span><span class="ident">List</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// Required by the `linked_list::Pointers` field.</span>
-    <span class="ident">_pin</span>: <span class="ident">PhantomPinned</span>,
+<span class="doccomment">/// An entry in the list.
+///
+/// # Safety
+///
+/// The `my_list` field must only be accessed while holding the mutex in
+/// `parent`. It is an invariant that the value of `my_list` corresponds to
+/// which linked list in the `parent` holds this entry. Once this field takes
+/// the value `Neither`, then it may never be modified again.
+///
+/// If the value of `my_list` is `Notified` or `Idle`, then the `pointers` field
+/// must only be accessed while holding the mutex. If the value of `my_list` is
+/// `Neither`, then the `pointers` field may be accessed by the
+/// `IdleNotifiedSet` (this happens inside `drain`).
+///
+/// The `value` field is owned by the `IdleNotifiedSet` and may only be accessed
+/// by the `IdleNotifiedSet`. The operation that sets the value of `my_list` to
+/// `Neither` assumes ownership of the `value`, and it must either drop it or
+/// move it out from this entry to prevent it from getting leaked. (Since the
+/// two linked lists are emptied in the destructor of `IdleNotifiedSet`, the
+/// value should not be leaked.)
+</span><span class="kw">struct </span>ListEntry&lt;T&gt; {
+    <span class="doccomment">/// The linked list pointers of the list this entry is in.
+    </span>pointers: linked_list::Pointers&lt;ListEntry&lt;T&gt;&gt;,
+    <span class="doccomment">/// Pointer to the shared `Lists` struct.
+    </span>parent: Arc&lt;Lists&lt;T&gt;&gt;,
+    <span class="doccomment">/// The value stored in this entry.
+    </span>value: UnsafeCell&lt;ManuallyDrop&lt;T&gt;&gt;,
+    <span class="doccomment">/// Used to remember which list this entry is in.
+    </span>my_list: UnsafeCell&lt;List&gt;,
+    <span class="doccomment">/// Required by the `linked_list::Pointers` field.
+    </span>_pin: PhantomPinned,
 }
 
-<span class="macro">generate_addr_of_methods!</span> {
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">ListEntry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">addr_of_pointers</span>(<span class="self">self</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">linked_list::Pointers</span><span class="op">&lt;</span><span class="ident">ListEntry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">pointers</span>
+<span class="macro">generate_addr_of_methods! </span>{
+    <span class="kw">impl</span>&lt;T&gt; ListEntry&lt;T&gt; {
+        <span class="kw">unsafe fn </span>addr_of_pointers(<span class="self">self</span>: NonNull&lt;<span class="self">Self</span>&gt;) -&gt; NonNull&lt;linked_list::Pointers&lt;ListEntry&lt;T&gt;&gt;&gt; {
+            <span class="kw-2">&amp;</span><span class="self">self</span>.pointers
         }
     }
 }
 
-<span class="comment">// With mutable access to the `IdleNotifiedSet`, you can get mutable access to</span>
-<span class="comment">// the values.</span>
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Send</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">IdleNotifiedSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
-<span class="comment">// With the current API we strictly speaking don&#39;t even need `T: Sync`, but we</span>
-<span class="comment">// require it anyway to support adding &amp;self APIs that access the values in the</span>
-<span class="comment">// future.</span>
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Sync</span><span class="op">&gt;</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">IdleNotifiedSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
+<span class="comment">// With mutable access to the `IdleNotifiedSet`, you can get mutable access to
+// the values.
+</span><span class="kw">unsafe impl</span>&lt;T: Send&gt; Send <span class="kw">for </span>IdleNotifiedSet&lt;T&gt; {}
+<span class="comment">// With the current API we strictly speaking don&#39;t even need `T: Sync`, but we
+// require it anyway to support adding &amp;self APIs that access the values in the
+// future.
+</span><span class="kw">unsafe impl</span>&lt;T: Sync&gt; Sync <span class="kw">for </span>IdleNotifiedSet&lt;T&gt; {}
 
-<span class="comment">// These impls control when it is safe to create a Waker. Since the waker does</span>
-<span class="comment">// not allow access to the value in any way (including its destructor), it is</span>
-<span class="comment">// not necessary for `T` to be Send or Sync.</span>
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Send</span> <span class="kw">for</span> <span class="ident">ListEntry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Sync</span> <span class="kw">for</span> <span class="ident">ListEntry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
+<span class="comment">// These impls control when it is safe to create a Waker. Since the waker does
+// not allow access to the value in any way (including its destructor), it is
+// not necessary for `T` to be Send or Sync.
+</span><span class="kw">unsafe impl</span>&lt;T&gt; Send <span class="kw">for </span>ListEntry&lt;T&gt; {}
+<span class="kw">unsafe impl</span>&lt;T&gt; Sync <span class="kw">for </span>ListEntry&lt;T&gt; {}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">IdleNotifiedSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Create a new IdleNotifiedSet.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">lists</span> <span class="op">=</span> <span class="ident">Mutex::new</span>(<span class="ident">ListsInner</span> {
-            <span class="ident">notified</span>: <span class="ident">LinkedList::new</span>(),
-            <span class="ident">idle</span>: <span class="ident">LinkedList::new</span>(),
-            <span class="ident">waker</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl</span>&lt;T&gt; IdleNotifiedSet&lt;T&gt; {
+    <span class="doccomment">/// Create a new IdleNotifiedSet.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>lists = Mutex::new(ListsInner {
+            notified: LinkedList::new(),
+            idle: LinkedList::new(),
+            waker: <span class="prelude-val">None</span>,
         });
 
-        <span class="ident">IdleNotifiedSet</span> {
-            <span class="ident">lists</span>: <span class="ident">Arc::new</span>(<span class="ident">lists</span>),
-            <span class="ident">length</span>: <span class="number">0</span>,
+        IdleNotifiedSet {
+            lists: Arc::new(lists),
+            length: <span class="number">0</span>,
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">length</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.length
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">length</span> <span class="op">==</span> <span class="number">0</span>
-    }
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.length == <span class="number">0
+    </span>}
 
-    <span class="doccomment">/// Insert the given value into the `idle` list.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">insert_idle</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) -&gt; <span class="ident">EntryInOneOfTheLists</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">length</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+    <span class="doccomment">/// Insert the given value into the `idle` list.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>insert_idle(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: T) -&gt; EntryInOneOfTheLists&lt;<span class="lifetime">&#39;_</span>, T&gt; {
+        <span class="self">self</span>.length += <span class="number">1</span>;
 
-        <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">ListEntry</span> {
-            <span class="ident">parent</span>: <span class="self">self</span>.<span class="ident">lists</span>.<span class="ident">clone</span>(),
-            <span class="ident">value</span>: <span class="ident">UnsafeCell::new</span>(<span class="ident">ManuallyDrop::new</span>(<span class="ident">value</span>)),
-            <span class="ident">my_list</span>: <span class="ident">UnsafeCell::new</span>(<span class="ident">List::Idle</span>),
-            <span class="ident">pointers</span>: <span class="ident">linked_list::Pointers::new</span>(),
-            <span class="ident">_pin</span>: <span class="ident">PhantomPinned</span>,
+        <span class="kw">let </span>entry = Arc::new(ListEntry {
+            parent: <span class="self">self</span>.lists.clone(),
+            value: UnsafeCell::new(ManuallyDrop::new(value)),
+            my_list: UnsafeCell::new(List::Idle),
+            pointers: linked_list::Pointers::new(),
+            _pin: PhantomPinned,
         });
 
         {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lock</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lists</span>.<span class="ident">lock</span>();
-            <span class="ident">lock</span>.<span class="ident">idle</span>.<span class="ident">push_front</span>(<span class="ident">entry</span>.<span class="ident">clone</span>());
+            <span class="kw">let </span><span class="kw-2">mut </span>lock = <span class="self">self</span>.lists.lock();
+            lock.idle.push_front(entry.clone());
         }
 
-        <span class="comment">// Safety: We just put the entry in the idle list, so it is in one of the lists.</span>
-        <span class="ident">EntryInOneOfTheLists</span> { <span class="ident">entry</span>, <span class="ident">set</span>: <span class="self">self</span> }
+        <span class="comment">// Safety: We just put the entry in the idle list, so it is in one of the lists.
+        </span>EntryInOneOfTheLists { entry, set: <span class="self">self </span>}
     }
 
-    <span class="doccomment">/// Pop an entry from the notified list to poll it. The entry is moved to</span>
-    <span class="doccomment">/// the idle list atomically.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">pop_notified</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">waker</span>: <span class="kw-2">&amp;</span><span class="ident">Waker</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EntryInOneOfTheLists</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="comment">// We don&#39;t decrement the length because this call moves the entry to</span>
-        <span class="comment">// the idle list rather than removing it.</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">length</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="comment">// Fast path.</span>
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="doccomment">/// Pop an entry from the notified list to poll it. The entry is moved to
+    /// the idle list atomically.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>pop_notified(<span class="kw-2">&amp;mut </span><span class="self">self</span>, waker: <span class="kw-2">&amp;</span>Waker) -&gt; <span class="prelude-ty">Option</span>&lt;EntryInOneOfTheLists&lt;<span class="lifetime">&#39;_</span>, T&gt;&gt; {
+        <span class="comment">// We don&#39;t decrement the length because this call moves the entry to
+        // the idle list rather than removing it.
+        </span><span class="kw">if </span><span class="self">self</span>.length == <span class="number">0 </span>{
+            <span class="comment">// Fast path.
+            </span><span class="kw">return </span><span class="prelude-val">None</span>;
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lock</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lists</span>.<span class="ident">lock</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>lock = <span class="self">self</span>.lists.lock();
 
-        <span class="kw">let</span> <span class="ident">should_update_waker</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">lock</span>.<span class="ident">waker</span>.<span class="ident">as_mut</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">cur_waker</span>) =&gt; <span class="op">!</span><span class="ident">waker</span>.<span class="ident">will_wake</span>(<span class="ident">cur_waker</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="bool-val">true</span>,
+        <span class="kw">let </span>should_update_waker = <span class="kw">match </span>lock.waker.as_mut() {
+            <span class="prelude-val">Some</span>(cur_waker) =&gt; !waker.will_wake(cur_waker),
+            <span class="prelude-val">None </span>=&gt; <span class="bool-val">true</span>,
         };
-        <span class="kw">if</span> <span class="ident">should_update_waker</span> {
-            <span class="ident">lock</span>.<span class="ident">waker</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">waker</span>.<span class="ident">clone</span>());
+        <span class="kw">if </span>should_update_waker {
+            lock.waker = <span class="prelude-val">Some</span>(waker.clone());
         }
 
-        <span class="comment">// Pop the entry, returning None if empty.</span>
-        <span class="kw">let</span> <span class="ident">entry</span> <span class="op">=</span> <span class="ident">lock</span>.<span class="ident">notified</span>.<span class="ident">pop_back</span>()<span class="question-mark">?</span>;
+        <span class="comment">// Pop the entry, returning None if empty.
+        </span><span class="kw">let </span>entry = lock.notified.pop_back()<span class="question-mark">?</span>;
 
-        <span class="ident">lock</span>.<span class="ident">idle</span>.<span class="ident">push_front</span>(<span class="ident">entry</span>.<span class="ident">clone</span>());
+        lock.idle.push_front(entry.clone());
 
-        <span class="comment">// Safety: We are holding the lock.</span>
-        <span class="ident">entry</span>.<span class="ident">my_list</span>.<span class="ident">with_mut</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="kw">unsafe</span> {
-            <span class="kw-2">*</span><span class="ident">ptr</span> <span class="op">=</span> <span class="ident">List::Idle</span>;
+        <span class="comment">// Safety: We are holding the lock.
+        </span>entry.my_list.with_mut(|ptr| <span class="kw">unsafe </span>{
+            <span class="kw-2">*</span>ptr = List::Idle;
         });
 
-        <span class="ident">drop</span>(<span class="ident">lock</span>);
+        drop(lock);
 
-        <span class="comment">// Safety: We just put the entry in the idle list, so it is in one of the lists.</span>
-        <span class="prelude-val">Some</span>(<span class="ident">EntryInOneOfTheLists</span> { <span class="ident">entry</span>, <span class="ident">set</span>: <span class="self">self</span> })
+        <span class="comment">// Safety: We just put the entry in the idle list, so it is in one of the lists.
+        </span><span class="prelude-val">Some</span>(EntryInOneOfTheLists { entry, set: <span class="self">self </span>})
     }
 
-    <span class="doccomment">/// Call a function on every element in this list.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">for_each</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;mut</span> <span class="ident">T</span>)<span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">func</span>: <span class="ident">F</span>) {
-        <span class="kw">fn</span> <span class="ident">get_ptrs</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">list</span>: <span class="kw-2">&amp;mut</span> <span class="ident">LinkedList</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">ptrs</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">*mut</span> <span class="ident">T</span><span class="op">&gt;</span>) {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">node</span> <span class="op">=</span> <span class="ident">list</span>.<span class="ident">last</span>();
+    <span class="doccomment">/// Call a function on every element in this list.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>for_each&lt;F: FnMut(<span class="kw-2">&amp;mut </span>T)&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>func: F) {
+        <span class="kw">fn </span>get_ptrs&lt;T&gt;(list: <span class="kw-2">&amp;mut </span>LinkedList&lt;T&gt;, ptrs: <span class="kw-2">&amp;mut </span>Vec&lt;<span class="kw-2">*mut </span>T&gt;) {
+            <span class="kw">let </span><span class="kw-2">mut </span>node = list.last();
 
-            <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">entry</span>) <span class="op">=</span> <span class="ident">node</span> {
-                <span class="ident">ptrs</span>.<span class="ident">push</span>(<span class="ident">entry</span>.<span class="ident">value</span>.<span class="ident">with_mut</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> {
-                    <span class="kw">let</span> <span class="ident">ptr</span>: <span class="kw-2">*mut</span> <span class="ident">ManuallyDrop</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ptr</span>;
-                    <span class="kw">let</span> <span class="ident">ptr</span>: <span class="kw-2">*mut</span> <span class="ident">T</span> <span class="op">=</span> <span class="ident">ptr</span>.<span class="ident">cast</span>();
-                    <span class="ident">ptr</span>
+            <span class="kw">while let </span><span class="prelude-val">Some</span>(entry) = node {
+                ptrs.push(entry.value.with_mut(|ptr| {
+                    <span class="kw">let </span>ptr: <span class="kw-2">*mut </span>ManuallyDrop&lt;T&gt; = ptr;
+                    <span class="kw">let </span>ptr: <span class="kw-2">*mut </span>T = ptr.cast();
+                    ptr
                 }));
 
-                <span class="kw">let</span> <span class="ident">prev</span> <span class="op">=</span> <span class="ident">entry</span>.<span class="ident">pointers</span>.<span class="ident">get_prev</span>();
-                <span class="ident">node</span> <span class="op">=</span> <span class="ident">prev</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">prev</span><span class="op">|</span> <span class="kw">unsafe</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">prev</span>.<span class="ident">as_ptr</span>() });
+                <span class="kw">let </span>prev = entry.pointers.get_prev();
+                node = prev.map(|prev| <span class="kw">unsafe </span>{ <span class="kw-2">&amp;*</span>prev.as_ptr() });
             }
         }
 
-        <span class="comment">// Atomically get a raw pointer to the value of every entry.</span>
-        <span class="comment">//</span>
-        <span class="comment">// Since this only locks the mutex once, it is not possible for a value</span>
-        <span class="comment">// to get moved from the idle list to the notified list during the</span>
-        <span class="comment">// operation, which would otherwise result in some value being listed</span>
-        <span class="comment">// twice.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ptrs</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="self">self</span>.<span class="ident">len</span>());
+        <span class="comment">// Atomically get a raw pointer to the value of every entry.
+        //
+        // Since this only locks the mutex once, it is not possible for a value
+        // to get moved from the idle list to the notified list during the
+        // operation, which would otherwise result in some value being listed
+        // twice.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>ptrs = Vec::with_capacity(<span class="self">self</span>.len());
         {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lock</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lists</span>.<span class="ident">lock</span>();
+            <span class="kw">let </span><span class="kw-2">mut </span>lock = <span class="self">self</span>.lists.lock();
 
-            <span class="ident">get_ptrs</span>(<span class="kw-2">&amp;mut</span> <span class="ident">lock</span>.<span class="ident">idle</span>, <span class="kw-2">&amp;mut</span> <span class="ident">ptrs</span>);
-            <span class="ident">get_ptrs</span>(<span class="kw-2">&amp;mut</span> <span class="ident">lock</span>.<span class="ident">notified</span>, <span class="kw-2">&amp;mut</span> <span class="ident">ptrs</span>);
+            get_ptrs(<span class="kw-2">&amp;mut </span>lock.idle, <span class="kw-2">&amp;mut </span>ptrs);
+            get_ptrs(<span class="kw-2">&amp;mut </span>lock.notified, <span class="kw-2">&amp;mut </span>ptrs);
         }
-        <span class="macro">debug_assert_eq!</span>(<span class="ident">ptrs</span>.<span class="ident">len</span>(), <span class="ident">ptrs</span>.<span class="ident">capacity</span>());
+        <span class="macro">debug_assert_eq!</span>(ptrs.len(), ptrs.capacity());
 
-        <span class="kw">for</span> <span class="ident">ptr</span> <span class="kw">in</span> <span class="ident">ptrs</span> {
-            <span class="comment">// Safety: When we grabbed the pointers, the entries were in one of</span>
-            <span class="comment">// the two lists. This means that their value was valid at the time,</span>
-            <span class="comment">// and it must still be valid because we are the IdleNotifiedSet,</span>
-            <span class="comment">// and only we can remove an entry from the two lists. (It&#39;s</span>
-            <span class="comment">// possible that an entry is moved from one list to the other during</span>
-            <span class="comment">// this loop, but that is ok.)</span>
-            <span class="ident">func</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">ptr</span> });
+        <span class="kw">for </span>ptr <span class="kw">in </span>ptrs {
+            <span class="comment">// Safety: When we grabbed the pointers, the entries were in one of
+            // the two lists. This means that their value was valid at the time,
+            // and it must still be valid because we are the IdleNotifiedSet,
+            // and only we can remove an entry from the two lists. (It&#39;s
+            // possible that an entry is moved from one list to the other during
+            // this loop, but that is ok.)
+            </span>func(<span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span>ptr });
         }
     }
 
-    <span class="doccomment">/// Remove all entries in both lists, applying some function to each element.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The closure is called on all elements even if it panics. Having it panic</span>
-    <span class="doccomment">/// twice is a double-panic, and will abort the application.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">drain</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">T</span>)<span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">length</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="comment">// Fast path.</span>
-            <span class="kw">return</span>;
+    <span class="doccomment">/// Remove all entries in both lists, applying some function to each element.
+    ///
+    /// The closure is called on all elements even if it panics. Having it panic
+    /// twice is a double-panic, and will abort the application.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>drain&lt;F: FnMut(T)&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, func: F) {
+        <span class="kw">if </span><span class="self">self</span>.length == <span class="number">0 </span>{
+            <span class="comment">// Fast path.
+            </span><span class="kw">return</span>;
         }
-        <span class="self">self</span>.<span class="ident">length</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="self">self</span>.length = <span class="number">0</span>;
 
-        <span class="comment">// The LinkedList is not cleared on panic, so we use a bomb to clear it.</span>
-        <span class="comment">//</span>
-        <span class="comment">// This value has the invariant that any entry in its `all_entries` list</span>
-        <span class="comment">// has `my_list` set to `Neither` and that the value has not yet been</span>
-        <span class="comment">// dropped.</span>
-        <span class="kw">struct</span> <span class="ident">AllEntries</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">T</span>)<span class="op">&gt;</span> {
-            <span class="ident">all_entries</span>: <span class="ident">LinkedList</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-            <span class="ident">func</span>: <span class="ident">F</span>,
+        <span class="comment">// The LinkedList is not cleared on panic, so we use a bomb to clear it.
+        //
+        // This value has the invariant that any entry in its `all_entries` list
+        // has `my_list` set to `Neither` and that the value has not yet been
+        // dropped.
+        </span><span class="kw">struct </span>AllEntries&lt;T, F: FnMut(T)&gt; {
+            all_entries: LinkedList&lt;T&gt;,
+            func: F,
         }
 
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">T</span>)<span class="op">&gt;</span> <span class="ident">AllEntries</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-            <span class="kw">fn</span> <span class="ident">pop_next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">entry</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">all_entries</span>.<span class="ident">pop_back</span>() {
-                    <span class="comment">// Safety: We just took this value from the list, so we can</span>
-                    <span class="comment">// destroy the value in the entry.</span>
-                    <span class="ident">entry</span>
-                        .<span class="ident">value</span>
-                        .<span class="ident">with_mut</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="kw">unsafe</span> { (<span class="self">self</span>.<span class="ident">func</span>)(<span class="ident">ManuallyDrop::take</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">ptr</span>)) });
-                    <span class="bool-val">true</span>
-                } <span class="kw">else</span> {
-                    <span class="bool-val">false</span>
-                }
+        <span class="kw">impl</span>&lt;T, F: FnMut(T)&gt; AllEntries&lt;T, F&gt; {
+            <span class="kw">fn </span>pop_next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; bool {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(entry) = <span class="self">self</span>.all_entries.pop_back() {
+                    <span class="comment">// Safety: We just took this value from the list, so we can
+                    // destroy the value in the entry.
+                    </span>entry
+                        .value
+                        .with_mut(|ptr| <span class="kw">unsafe </span>{ (<span class="self">self</span>.func)(ManuallyDrop::take(<span class="kw-2">&amp;mut *</span>ptr)) });
+                    <span class="bool-val">true
+                </span>} <span class="kw">else </span>{
+                    <span class="bool-val">false
+                </span>}
             }
         }
 
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">T</span>)<span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">AllEntries</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">F</span><span class="op">&gt;</span> {
-            <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-                <span class="kw">while</span> <span class="self">self</span>.<span class="ident">pop_next</span>() {}
+        <span class="kw">impl</span>&lt;T, F: FnMut(T)&gt; Drop <span class="kw">for </span>AllEntries&lt;T, F&gt; {
+            <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+                <span class="kw">while </span><span class="self">self</span>.pop_next() {}
             }
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">all_entries</span> <span class="op">=</span> <span class="ident">AllEntries</span> {
-            <span class="ident">all_entries</span>: <span class="ident">LinkedList::new</span>(),
-            <span class="ident">func</span>,
+        <span class="kw">let </span><span class="kw-2">mut </span>all_entries = AllEntries {
+            all_entries: LinkedList::new(),
+            func,
         };
 
-        <span class="comment">// Atomically move all entries to the new linked list in the AllEntries</span>
-        <span class="comment">// object.</span>
-        {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lock</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lists</span>.<span class="ident">lock</span>();
-            <span class="kw">unsafe</span> {
-                <span class="comment">// Safety: We are holding the lock and `all_entries` is a new</span>
-                <span class="comment">// LinkedList.</span>
-                <span class="ident">move_to_new_list</span>(<span class="kw-2">&amp;mut</span> <span class="ident">lock</span>.<span class="ident">idle</span>, <span class="kw-2">&amp;mut</span> <span class="ident">all_entries</span>.<span class="ident">all_entries</span>);
-                <span class="ident">move_to_new_list</span>(<span class="kw-2">&amp;mut</span> <span class="ident">lock</span>.<span class="ident">notified</span>, <span class="kw-2">&amp;mut</span> <span class="ident">all_entries</span>.<span class="ident">all_entries</span>);
+        <span class="comment">// Atomically move all entries to the new linked list in the AllEntries
+        // object.
+        </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>lock = <span class="self">self</span>.lists.lock();
+            <span class="kw">unsafe </span>{
+                <span class="comment">// Safety: We are holding the lock and `all_entries` is a new
+                // LinkedList.
+                </span>move_to_new_list(<span class="kw-2">&amp;mut </span>lock.idle, <span class="kw-2">&amp;mut </span>all_entries.all_entries);
+                move_to_new_list(<span class="kw-2">&amp;mut </span>lock.notified, <span class="kw-2">&amp;mut </span>all_entries.all_entries);
             }
         }
 
-        <span class="comment">// Keep destroying entries in the list until it is empty.</span>
-        <span class="comment">//</span>
-        <span class="comment">// If the closure panics, then the destructor of the `AllEntries` bomb</span>
-        <span class="comment">// ensures that we keep running the destructor on the remaining values.</span>
-        <span class="comment">// A second panic will abort the program.</span>
-        <span class="kw">while</span> <span class="ident">all_entries</span>.<span class="ident">pop_next</span>() {}
+        <span class="comment">// Keep destroying entries in the list until it is empty.
+        //
+        // If the closure panics, then the destructor of the `AllEntries` bomb
+        // ensures that we keep running the destructor on the remaining values.
+        // A second panic will abort the program.
+        </span><span class="kw">while </span>all_entries.pop_next() {}
     }
 }
 
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The mutex for the entries must be held, and the target list must be such</span>
-<span class="doccomment">/// that setting `my_list` to `Neither` is ok.</span>
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">move_to_new_list</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">from</span>: <span class="kw-2">&amp;mut</span> <span class="ident">LinkedList</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">to</span>: <span class="kw-2">&amp;mut</span> <span class="ident">LinkedList</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) {
-    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">entry</span>) <span class="op">=</span> <span class="ident">from</span>.<span class="ident">pop_back</span>() {
-        <span class="ident">entry</span>.<span class="ident">my_list</span>.<span class="ident">with_mut</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> {
-            <span class="kw-2">*</span><span class="ident">ptr</span> <span class="op">=</span> <span class="ident">List::Neither</span>;
+<span class="doccomment">/// # Safety
+///
+/// The mutex for the entries must be held, and the target list must be such
+/// that setting `my_list` to `Neither` is ok.
+</span><span class="kw">unsafe fn </span>move_to_new_list&lt;T&gt;(from: <span class="kw-2">&amp;mut </span>LinkedList&lt;T&gt;, to: <span class="kw-2">&amp;mut </span>LinkedList&lt;T&gt;) {
+    <span class="kw">while let </span><span class="prelude-val">Some</span>(entry) = from.pop_back() {
+        entry.my_list.with_mut(|ptr| {
+            <span class="kw-2">*</span>ptr = List::Neither;
         });
-        <span class="ident">to</span>.<span class="ident">push_front</span>(<span class="ident">entry</span>);
+        to.push_front(entry);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">EntryInOneOfTheLists</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Remove this entry from the list it is in, returning the value associated</span>
-    <span class="doccomment">/// with the entry.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This consumes the value, since it is no longer guaranteed to be in a</span>
-    <span class="doccomment">/// list.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">remove</span>(<span class="self">self</span>) -&gt; <span class="ident">T</span> {
-        <span class="self">self</span>.<span class="ident">set</span>.<span class="ident">length</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; EntryInOneOfTheLists&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+    <span class="doccomment">/// Remove this entry from the list it is in, returning the value associated
+    /// with the entry.
+    ///
+    /// This consumes the value, since it is no longer guaranteed to be in a
+    /// list.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>remove(<span class="self">self</span>) -&gt; T {
+        <span class="self">self</span>.set.length -= <span class="number">1</span>;
 
         {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lock</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">set</span>.<span class="ident">lists</span>.<span class="ident">lock</span>();
+            <span class="kw">let </span><span class="kw-2">mut </span>lock = <span class="self">self</span>.set.lists.lock();
 
-            <span class="comment">// Safety: We are holding the lock so there is no race, and we will</span>
-            <span class="comment">// remove the entry afterwards to uphold invariants.</span>
-            <span class="kw">let</span> <span class="ident">old_my_list</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">entry</span>.<span class="ident">my_list</span>.<span class="ident">with_mut</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="kw">unsafe</span> {
-                <span class="kw">let</span> <span class="ident">old_my_list</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">ptr</span>;
-                <span class="kw-2">*</span><span class="ident">ptr</span> <span class="op">=</span> <span class="ident">List::Neither</span>;
-                <span class="ident">old_my_list</span>
+            <span class="comment">// Safety: We are holding the lock so there is no race, and we will
+            // remove the entry afterwards to uphold invariants.
+            </span><span class="kw">let </span>old_my_list = <span class="self">self</span>.entry.my_list.with_mut(|ptr| <span class="kw">unsafe </span>{
+                <span class="kw">let </span>old_my_list = <span class="kw-2">*</span>ptr;
+                <span class="kw-2">*</span>ptr = List::Neither;
+                old_my_list
             });
 
-            <span class="kw">let</span> <span class="ident">list</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">old_my_list</span> {
-                <span class="ident">List::Idle</span> =&gt; <span class="kw-2">&amp;mut</span> <span class="ident">lock</span>.<span class="ident">idle</span>,
-                <span class="ident">List::Notified</span> =&gt; <span class="kw-2">&amp;mut</span> <span class="ident">lock</span>.<span class="ident">notified</span>,
-                <span class="comment">// An entry in one of the lists is in one of the lists.</span>
-                <span class="ident">List::Neither</span> =&gt; <span class="macro">unreachable!</span>(),
+            <span class="kw">let </span>list = <span class="kw">match </span>old_my_list {
+                List::Idle =&gt; <span class="kw-2">&amp;mut </span>lock.idle,
+                List::Notified =&gt; <span class="kw-2">&amp;mut </span>lock.notified,
+                <span class="comment">// An entry in one of the lists is in one of the lists.
+                </span>List::Neither =&gt; <span class="macro">unreachable!</span>(),
             };
 
-            <span class="kw">unsafe</span> {
-                <span class="comment">// Safety: We just checked that the entry is in this particular</span>
-                <span class="comment">// list.</span>
-                <span class="ident">list</span>.<span class="ident">remove</span>(<span class="ident">ListEntry::as_raw</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">entry</span>)).<span class="ident">unwrap</span>();
+            <span class="kw">unsafe </span>{
+                <span class="comment">// Safety: We just checked that the entry is in this particular
+                // list.
+                </span>list.remove(ListEntry::as_raw(<span class="kw-2">&amp;</span><span class="self">self</span>.entry)).unwrap();
             }
         }
 
-        <span class="comment">// By setting `my_list` to `Neither`, we have taken ownership of the</span>
-        <span class="comment">// value. We return it to the caller.</span>
-        <span class="comment">//</span>
-        <span class="comment">// Safety: We have a mutable reference to the `IdleNotifiedSet` that</span>
-        <span class="comment">// owns this entry, so we can use its permission to access the value.</span>
-        <span class="self">self</span>.<span class="ident">entry</span>
-            .<span class="ident">value</span>
-            .<span class="ident">with_mut</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="kw">unsafe</span> { <span class="ident">ManuallyDrop::take</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">ptr</span>) })
+        <span class="comment">// By setting `my_list` to `Neither`, we have taken ownership of the
+        // value. We return it to the caller.
+        //
+        // Safety: We have a mutable reference to the `IdleNotifiedSet` that
+        // owns this entry, so we can use its permission to access the value.
+        </span><span class="self">self</span>.entry
+            .value
+            .with_mut(|ptr| <span class="kw">unsafe </span>{ ManuallyDrop::take(<span class="kw-2">&amp;mut *</span>ptr) })
     }
 
-    <span class="doccomment">/// Access the value in this entry together with a context for its waker.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">with_value_and_context</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">func</span>: <span class="ident">F</span>) -&gt; <span class="ident">U</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">T</span>, <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">U</span>,
-        <span class="ident">T</span>: <span class="lifetime">&#39;static</span>,
+    <span class="doccomment">/// Access the value in this entry together with a context for its waker.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>with_value_and_context&lt;F, U&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, func: F) -&gt; U
+    <span class="kw">where
+        </span>F: FnOnce(<span class="kw-2">&amp;mut </span>T, <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; U,
+        T: <span class="lifetime">&#39;static</span>,
     {
-        <span class="kw">let</span> <span class="ident">waker</span> <span class="op">=</span> <span class="ident">waker_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">entry</span>);
+        <span class="kw">let </span>waker = waker_ref(<span class="kw-2">&amp;</span><span class="self">self</span>.entry);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">Context::from_waker</span>(<span class="kw-2">&amp;</span><span class="ident">waker</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>context = Context::from_waker(<span class="kw-2">&amp;</span>waker);
 
-        <span class="comment">// Safety: We have a mutable reference to the `IdleNotifiedSet` that</span>
-        <span class="comment">// owns this entry, so we can use its permission to access the value.</span>
-        <span class="self">self</span>.<span class="ident">entry</span>
-            .<span class="ident">value</span>
-            .<span class="ident">with_mut</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="kw">unsafe</span> { <span class="ident">func</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">ptr</span>, <span class="kw-2">&amp;mut</span> <span class="ident">context</span>) })
+        <span class="comment">// Safety: We have a mutable reference to the `IdleNotifiedSet` that
+        // owns this entry, so we can use its permission to access the value.
+        </span><span class="self">self</span>.entry
+            .value
+            .with_mut(|ptr| <span class="kw">unsafe </span>{ func(<span class="kw-2">&amp;mut *</span>ptr, <span class="kw-2">&amp;mut </span>context) })
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">IdleNotifiedSet</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="comment">// Clear both lists.</span>
-        <span class="self">self</span>.<span class="ident">drain</span>(<span class="ident">drop</span>);
+<span class="kw">impl</span>&lt;T&gt; Drop <span class="kw">for </span>IdleNotifiedSet&lt;T&gt; {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="comment">// Clear both lists.
+        </span><span class="self">self</span>.drain(drop);
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">debug_assertions</span>)]</span>
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">std::thread::panicking</span>() {
-            <span class="kw">let</span> <span class="ident">lock</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">lists</span>.<span class="ident">lock</span>();
-            <span class="macro">assert!</span>(<span class="ident">lock</span>.<span class="ident">idle</span>.<span class="ident">is_empty</span>());
-            <span class="macro">assert!</span>(<span class="ident">lock</span>.<span class="ident">notified</span>.<span class="ident">is_empty</span>());
+        <span class="attribute">#[cfg(debug_assertions)]
+        </span><span class="kw">if </span>!std::thread::panicking() {
+            <span class="kw">let </span>lock = <span class="self">self</span>.lists.lock();
+            <span class="macro">assert!</span>(lock.idle.is_empty());
+            <span class="macro">assert!</span>(lock.notified.is_empty());
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="ident">Wake</span> <span class="kw">for</span> <span class="ident">ListEntry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">wake_by_ref</span>(<span class="ident">me</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lock</span> <span class="op">=</span> <span class="ident">me</span>.<span class="ident">parent</span>.<span class="ident">lock</span>();
+<span class="kw">impl</span>&lt;T: <span class="lifetime">&#39;static</span>&gt; Wake <span class="kw">for </span>ListEntry&lt;T&gt; {
+    <span class="kw">fn </span>wake_by_ref(me: <span class="kw-2">&amp;</span>Arc&lt;<span class="self">Self</span>&gt;) {
+        <span class="kw">let </span><span class="kw-2">mut </span>lock = me.parent.lock();
 
-        <span class="comment">// Safety: We are holding the lock and we will update the lists to</span>
-        <span class="comment">// maintain invariants.</span>
-        <span class="kw">let</span> <span class="ident">old_my_list</span> <span class="op">=</span> <span class="ident">me</span>.<span class="ident">my_list</span>.<span class="ident">with_mut</span>(<span class="op">|</span><span class="ident">ptr</span><span class="op">|</span> <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">old_my_list</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">ptr</span>;
-            <span class="kw">if</span> <span class="ident">old_my_list</span> <span class="op">==</span> <span class="ident">List::Idle</span> {
-                <span class="kw-2">*</span><span class="ident">ptr</span> <span class="op">=</span> <span class="ident">List::Notified</span>;
+        <span class="comment">// Safety: We are holding the lock and we will update the lists to
+        // maintain invariants.
+        </span><span class="kw">let </span>old_my_list = me.my_list.with_mut(|ptr| <span class="kw">unsafe </span>{
+            <span class="kw">let </span>old_my_list = <span class="kw-2">*</span>ptr;
+            <span class="kw">if </span>old_my_list == List::Idle {
+                <span class="kw-2">*</span>ptr = List::Notified;
             }
-            <span class="ident">old_my_list</span>
+            old_my_list
         });
 
-        <span class="kw">if</span> <span class="ident">old_my_list</span> <span class="op">==</span> <span class="ident">List::Idle</span> {
-            <span class="comment">// We move ourself to the notified list.</span>
-            <span class="kw">let</span> <span class="ident">me</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-                <span class="comment">// Safety: We just checked that we are in this particular list.</span>
-                <span class="ident">lock</span>.<span class="ident">idle</span>.<span class="ident">remove</span>(<span class="ident">NonNull::from</span>(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">me</span>)).<span class="ident">unwrap</span>()
+        <span class="kw">if </span>old_my_list == List::Idle {
+            <span class="comment">// We move ourself to the notified list.
+            </span><span class="kw">let </span>me = <span class="kw">unsafe </span>{
+                <span class="comment">// Safety: We just checked that we are in this particular list.
+                </span>lock.idle.remove(NonNull::from(<span class="kw-2">&amp;**</span>me)).unwrap()
             };
-            <span class="ident">lock</span>.<span class="ident">notified</span>.<span class="ident">push_front</span>(<span class="ident">me</span>);
+            lock.notified.push_front(me);
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">waker</span>) <span class="op">=</span> <span class="ident">lock</span>.<span class="ident">waker</span>.<span class="ident">take</span>() {
-                <span class="ident">drop</span>(<span class="ident">lock</span>);
-                <span class="ident">waker</span>.<span class="ident">wake</span>();
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(waker) = lock.waker.take() {
+                drop(lock);
+                waker.wake();
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">wake</span>(<span class="ident">me</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) {
-        <span class="ident"><span class="self">Self</span>::wake_by_ref</span>(<span class="kw-2">&amp;</span><span class="ident">me</span>)
+    <span class="kw">fn </span>wake(me: Arc&lt;<span class="self">Self</span>&gt;) {
+        <span class="self">Self</span>::wake_by_ref(<span class="kw-2">&amp;</span>me)
     }
 }
 
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `ListEntry` is forced to be !Unpin.</span>
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">linked_list::Link</span> <span class="kw">for</span> <span class="ident">ListEntry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Handle</span> <span class="op">=</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ListEntry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">ListEntry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
+<span class="doccomment">/// # Safety
+///
+/// `ListEntry` is forced to be !Unpin.
+</span><span class="kw">unsafe impl</span>&lt;T&gt; linked_list::Link <span class="kw">for </span>ListEntry&lt;T&gt; {
+    <span class="kw">type </span>Handle = Arc&lt;ListEntry&lt;T&gt;&gt;;
+    <span class="kw">type </span>Target = ListEntry&lt;T&gt;;
 
-    <span class="kw">fn</span> <span class="ident">as_raw</span>(<span class="ident">handle</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Handle</span>) -&gt; <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">ListEntry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">ptr</span>: <span class="kw-2">*const</span> <span class="ident">ListEntry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Arc::as_ptr</span>(<span class="ident">handle</span>);
-        <span class="comment">// Safety: We can&#39;t get a null pointer from `Arc::as_ptr`.</span>
-        <span class="kw">unsafe</span> { <span class="ident">NonNull::new_unchecked</span>(<span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">ListEntry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) }
+    <span class="kw">fn </span>as_raw(handle: <span class="kw-2">&amp;</span><span class="self">Self</span>::Handle) -&gt; NonNull&lt;ListEntry&lt;T&gt;&gt; {
+        <span class="kw">let </span>ptr: <span class="kw-2">*const </span>ListEntry&lt;T&gt; = Arc::as_ptr(handle);
+        <span class="comment">// Safety: We can&#39;t get a null pointer from `Arc::as_ptr`.
+        </span><span class="kw">unsafe </span>{ NonNull::new_unchecked(ptr <span class="kw">as </span><span class="kw-2">*mut </span>ListEntry&lt;T&gt;) }
     }
 
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw</span>(<span class="ident">ptr</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">ListEntry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ListEntry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Arc::from_raw</span>(<span class="ident">ptr</span>.<span class="ident">as_ptr</span>())
+    <span class="kw">unsafe fn </span>from_raw(ptr: NonNull&lt;ListEntry&lt;T&gt;&gt;) -&gt; Arc&lt;ListEntry&lt;T&gt;&gt; {
+        Arc::from_raw(ptr.as_ptr())
     }
 
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">pointers</span>(
-        <span class="ident">target</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">ListEntry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">linked_list::Pointers</span><span class="op">&lt;</span><span class="ident">ListEntry</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">ListEntry::addr_of_pointers</span>(<span class="ident">target</span>)
+    <span class="kw">unsafe fn </span>pointers(
+        target: NonNull&lt;ListEntry&lt;T&gt;&gt;,
+    ) -&gt; NonNull&lt;linked_list::Pointers&lt;ListEntry&lt;T&gt;&gt;&gt; {
+        ListEntry::addr_of_pointers(target)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

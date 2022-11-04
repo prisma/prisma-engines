@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/aead/gcm/gcm_nohw.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>gcm_nohw.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../ring/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/aead/gcm/gcm_nohw.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>gcm_nohw.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../ring/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -240,247 +240,247 @@
 <span id="240">240</span>
 <span id="241">241</span>
 <span id="242">242</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2019, Google Inc.</span>
-<span class="comment">// Portions Copyright 2020 Brian Smith.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
-<span class="comment">// purpose with or without fee is hereby granted, provided that the above</span>
-<span class="comment">// copyright notice and this permission notice appear in all copies.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHOR DISCLAIMS ALL WARRANTIES</span>
-<span class="comment">// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY</span>
-<span class="comment">// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span>
-<span class="comment">// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION</span>
-<span class="comment">// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN</span>
-<span class="comment">// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2019, Google Inc.
+// Portions Copyright 2020 Brian Smith.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
+// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-<span class="comment">// This file is based on BoringSSL&#39;s gcm_nohw.c.</span>
+// This file is based on BoringSSL&#39;s gcm_nohw.c.
 
-<span class="comment">// This file contains a constant-time implementation of GHASH based on the notes</span>
-<span class="comment">// in https://bearssl.org/constanttime.html#ghash-for-gcm and the reduction</span>
-<span class="comment">// algorithm described in</span>
-<span class="comment">// https://crypto.stanford.edu/RealWorldCrypto/slides/gueron.pdf.</span>
-<span class="comment">//</span>
-<span class="comment">// Unlike the BearSSL notes, we use u128 in the 64-bit implementation.</span>
+// This file contains a constant-time implementation of GHASH based on the notes
+// in https://bearssl.org/constanttime.html#ghash-for-gcm and the reduction
+// algorithm described in
+// https://crypto.stanford.edu/RealWorldCrypto/slides/gueron.pdf.
+//
+// Unlike the BearSSL notes, we use u128 in the 64-bit implementation.
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident"><span class="kw">super</span>::Block</span>, <span class="ident">Xi</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::endian::BigEndian</span>;
-<span class="kw">use</span> <span class="ident">core::convert::TryInto</span>;
+</span><span class="kw">use super</span>::{<span class="kw">super</span>::Block, Xi};
+<span class="kw">use </span><span class="kw">crate</span>::endian::BigEndian;
+<span class="kw">use </span>core::convert::TryInto;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;64&quot;</span>)]</span>
-<span class="kw">fn</span> <span class="ident">gcm_mul64_nohw</span>(<span class="ident">a</span>: <span class="ident">u64</span>, <span class="ident">b</span>: <span class="ident">u64</span>) -&gt; (<span class="ident">u64</span>, <span class="ident">u64</span>) {
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">lo</span>(<span class="ident">a</span>: <span class="ident">u128</span>) -&gt; <span class="ident">u64</span> {
-        <span class="ident">a</span> <span class="kw">as</span> <span class="ident">u64</span>
+<span class="attribute">#[cfg(target_pointer_width = <span class="string">&quot;64&quot;</span>)]
+</span><span class="kw">fn </span>gcm_mul64_nohw(a: u64, b: u64) -&gt; (u64, u64) {
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>lo(a: u128) -&gt; u64 {
+        a <span class="kw">as </span>u64
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">hi</span>(<span class="ident">a</span>: <span class="ident">u128</span>) -&gt; <span class="ident">u64</span> {
-        <span class="ident">lo</span>(<span class="ident">a</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">64</span>)
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>hi(a: u128) -&gt; u64 {
+        lo(a &gt;&gt; <span class="number">64</span>)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="ident">a</span>: <span class="ident">u64</span>, <span class="ident">b</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u128</span> {
-        <span class="ident">u128::from</span>(<span class="ident">a</span>) <span class="op">*</span> <span class="ident">u128::from</span>(<span class="ident">b</span>)
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>mul(a: u64, b: u64) -&gt; u128 {
+        u128::from(a) * u128::from(b)
     }
 
-    <span class="comment">// One term every four bits means the largest term is 64/4 = 16, which barely</span>
-    <span class="comment">// overflows into the next term. Using one term every five bits would cost 25</span>
-    <span class="comment">// multiplications instead of 16. It is faster to mask off the bottom four</span>
-    <span class="comment">// bits of |a|, giving a largest term of 60/4 = 15, and apply the bottom bits</span>
-    <span class="comment">// separately.</span>
-    <span class="kw">let</span> <span class="ident">a0</span> <span class="op">=</span> <span class="ident">a</span> <span class="op">&amp;</span> <span class="number">0x1111111111111110</span>;
-    <span class="kw">let</span> <span class="ident">a1</span> <span class="op">=</span> <span class="ident">a</span> <span class="op">&amp;</span> <span class="number">0x2222222222222220</span>;
-    <span class="kw">let</span> <span class="ident">a2</span> <span class="op">=</span> <span class="ident">a</span> <span class="op">&amp;</span> <span class="number">0x4444444444444440</span>;
-    <span class="kw">let</span> <span class="ident">a3</span> <span class="op">=</span> <span class="ident">a</span> <span class="op">&amp;</span> <span class="number">0x8888888888888880</span>;
+    <span class="comment">// One term every four bits means the largest term is 64/4 = 16, which barely
+    // overflows into the next term. Using one term every five bits would cost 25
+    // multiplications instead of 16. It is faster to mask off the bottom four
+    // bits of |a|, giving a largest term of 60/4 = 15, and apply the bottom bits
+    // separately.
+    </span><span class="kw">let </span>a0 = a &amp; <span class="number">0x1111111111111110</span>;
+    <span class="kw">let </span>a1 = a &amp; <span class="number">0x2222222222222220</span>;
+    <span class="kw">let </span>a2 = a &amp; <span class="number">0x4444444444444440</span>;
+    <span class="kw">let </span>a3 = a &amp; <span class="number">0x8888888888888880</span>;
 
-    <span class="kw">let</span> <span class="ident">b0</span> <span class="op">=</span> <span class="ident">b</span> <span class="op">&amp;</span> <span class="number">0x1111111111111111</span>;
-    <span class="kw">let</span> <span class="ident">b1</span> <span class="op">=</span> <span class="ident">b</span> <span class="op">&amp;</span> <span class="number">0x2222222222222222</span>;
-    <span class="kw">let</span> <span class="ident">b2</span> <span class="op">=</span> <span class="ident">b</span> <span class="op">&amp;</span> <span class="number">0x4444444444444444</span>;
-    <span class="kw">let</span> <span class="ident">b3</span> <span class="op">=</span> <span class="ident">b</span> <span class="op">&amp;</span> <span class="number">0x8888888888888888</span>;
+    <span class="kw">let </span>b0 = b &amp; <span class="number">0x1111111111111111</span>;
+    <span class="kw">let </span>b1 = b &amp; <span class="number">0x2222222222222222</span>;
+    <span class="kw">let </span>b2 = b &amp; <span class="number">0x4444444444444444</span>;
+    <span class="kw">let </span>b3 = b &amp; <span class="number">0x8888888888888888</span>;
 
-    <span class="kw">let</span> <span class="ident">c0</span> <span class="op">=</span> <span class="ident">mul</span>(<span class="ident">a0</span>, <span class="ident">b0</span>) <span class="op">^</span> <span class="ident">mul</span>(<span class="ident">a1</span>, <span class="ident">b3</span>) <span class="op">^</span> <span class="ident">mul</span>(<span class="ident">a2</span>, <span class="ident">b2</span>) <span class="op">^</span> <span class="ident">mul</span>(<span class="ident">a3</span>, <span class="ident">b1</span>);
-    <span class="kw">let</span> <span class="ident">c1</span> <span class="op">=</span> <span class="ident">mul</span>(<span class="ident">a0</span>, <span class="ident">b1</span>) <span class="op">^</span> <span class="ident">mul</span>(<span class="ident">a1</span>, <span class="ident">b0</span>) <span class="op">^</span> <span class="ident">mul</span>(<span class="ident">a2</span>, <span class="ident">b3</span>) <span class="op">^</span> <span class="ident">mul</span>(<span class="ident">a3</span>, <span class="ident">b2</span>);
-    <span class="kw">let</span> <span class="ident">c2</span> <span class="op">=</span> <span class="ident">mul</span>(<span class="ident">a0</span>, <span class="ident">b2</span>) <span class="op">^</span> <span class="ident">mul</span>(<span class="ident">a1</span>, <span class="ident">b1</span>) <span class="op">^</span> <span class="ident">mul</span>(<span class="ident">a2</span>, <span class="ident">b0</span>) <span class="op">^</span> <span class="ident">mul</span>(<span class="ident">a3</span>, <span class="ident">b3</span>);
-    <span class="kw">let</span> <span class="ident">c3</span> <span class="op">=</span> <span class="ident">mul</span>(<span class="ident">a0</span>, <span class="ident">b3</span>) <span class="op">^</span> <span class="ident">mul</span>(<span class="ident">a1</span>, <span class="ident">b2</span>) <span class="op">^</span> <span class="ident">mul</span>(<span class="ident">a2</span>, <span class="ident">b1</span>) <span class="op">^</span> <span class="ident">mul</span>(<span class="ident">a3</span>, <span class="ident">b0</span>);
+    <span class="kw">let </span>c0 = mul(a0, b0) ^ mul(a1, b3) ^ mul(a2, b2) ^ mul(a3, b1);
+    <span class="kw">let </span>c1 = mul(a0, b1) ^ mul(a1, b0) ^ mul(a2, b3) ^ mul(a3, b2);
+    <span class="kw">let </span>c2 = mul(a0, b2) ^ mul(a1, b1) ^ mul(a2, b0) ^ mul(a3, b3);
+    <span class="kw">let </span>c3 = mul(a0, b3) ^ mul(a1, b2) ^ mul(a2, b1) ^ mul(a3, b0);
 
-    <span class="comment">// Multiply the bottom four bits of |a| with |b|.</span>
-    <span class="kw">let</span> <span class="ident">a0_mask</span> <span class="op">=</span> <span class="number">0u64</span>.<span class="ident">wrapping_sub</span>(<span class="ident">a</span> <span class="op">&amp;</span> <span class="number">1</span>);
-    <span class="kw">let</span> <span class="ident">a1_mask</span> <span class="op">=</span> <span class="number">0u64</span>.<span class="ident">wrapping_sub</span>((<span class="ident">a</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">1</span>) <span class="op">&amp;</span> <span class="number">1</span>);
-    <span class="kw">let</span> <span class="ident">a2_mask</span> <span class="op">=</span> <span class="number">0u64</span>.<span class="ident">wrapping_sub</span>((<span class="ident">a</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">2</span>) <span class="op">&amp;</span> <span class="number">1</span>);
-    <span class="kw">let</span> <span class="ident">a3_mask</span> <span class="op">=</span> <span class="number">0u64</span>.<span class="ident">wrapping_sub</span>((<span class="ident">a</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">3</span>) <span class="op">&amp;</span> <span class="number">1</span>);
-    <span class="kw">let</span> <span class="ident">extra</span> <span class="op">=</span> <span class="ident">u128::from</span>(<span class="ident">a0_mask</span> <span class="op">&amp;</span> <span class="ident">b</span>)
-        <span class="op">^</span> (<span class="ident">u128::from</span>(<span class="ident">a1_mask</span> <span class="op">&amp;</span> <span class="ident">b</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>)
-        <span class="op">^</span> (<span class="ident">u128::from</span>(<span class="ident">a2_mask</span> <span class="op">&amp;</span> <span class="ident">b</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>)
-        <span class="op">^</span> (<span class="ident">u128::from</span>(<span class="ident">a3_mask</span> <span class="op">&amp;</span> <span class="ident">b</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>);
+    <span class="comment">// Multiply the bottom four bits of |a| with |b|.
+    </span><span class="kw">let </span>a0_mask = <span class="number">0u64</span>.wrapping_sub(a &amp; <span class="number">1</span>);
+    <span class="kw">let </span>a1_mask = <span class="number">0u64</span>.wrapping_sub((a &gt;&gt; <span class="number">1</span>) &amp; <span class="number">1</span>);
+    <span class="kw">let </span>a2_mask = <span class="number">0u64</span>.wrapping_sub((a &gt;&gt; <span class="number">2</span>) &amp; <span class="number">1</span>);
+    <span class="kw">let </span>a3_mask = <span class="number">0u64</span>.wrapping_sub((a &gt;&gt; <span class="number">3</span>) &amp; <span class="number">1</span>);
+    <span class="kw">let </span>extra = u128::from(a0_mask &amp; b)
+        ^ (u128::from(a1_mask &amp; b) &lt;&lt; <span class="number">1</span>)
+        ^ (u128::from(a2_mask &amp; b) &lt;&lt; <span class="number">2</span>)
+        ^ (u128::from(a3_mask &amp; b) &lt;&lt; <span class="number">3</span>);
 
-    <span class="kw">let</span> <span class="ident">lo</span> <span class="op">=</span> (<span class="ident">lo</span>(<span class="ident">c0</span>) <span class="op">&amp;</span> <span class="number">0x1111111111111111</span>)
-        <span class="op">^</span> (<span class="ident">lo</span>(<span class="ident">c1</span>) <span class="op">&amp;</span> <span class="number">0x2222222222222222</span>)
-        <span class="op">^</span> (<span class="ident">lo</span>(<span class="ident">c2</span>) <span class="op">&amp;</span> <span class="number">0x4444444444444444</span>)
-        <span class="op">^</span> (<span class="ident">lo</span>(<span class="ident">c3</span>) <span class="op">&amp;</span> <span class="number">0x8888888888888888</span>)
-        <span class="op">^</span> <span class="ident">lo</span>(<span class="ident">extra</span>);
-    <span class="kw">let</span> <span class="ident">hi</span> <span class="op">=</span> (<span class="ident">hi</span>(<span class="ident">c0</span>) <span class="op">&amp;</span> <span class="number">0x1111111111111111</span>)
-        <span class="op">^</span> (<span class="ident">hi</span>(<span class="ident">c1</span>) <span class="op">&amp;</span> <span class="number">0x2222222222222222</span>)
-        <span class="op">^</span> (<span class="ident">hi</span>(<span class="ident">c2</span>) <span class="op">&amp;</span> <span class="number">0x4444444444444444</span>)
-        <span class="op">^</span> (<span class="ident">hi</span>(<span class="ident">c3</span>) <span class="op">&amp;</span> <span class="number">0x8888888888888888</span>)
-        <span class="op">^</span> <span class="ident">hi</span>(<span class="ident">extra</span>);
-    (<span class="ident">lo</span>, <span class="ident">hi</span>)
+    <span class="kw">let </span>lo = (lo(c0) &amp; <span class="number">0x1111111111111111</span>)
+        ^ (lo(c1) &amp; <span class="number">0x2222222222222222</span>)
+        ^ (lo(c2) &amp; <span class="number">0x4444444444444444</span>)
+        ^ (lo(c3) &amp; <span class="number">0x8888888888888888</span>)
+        ^ lo(extra);
+    <span class="kw">let </span>hi = (hi(c0) &amp; <span class="number">0x1111111111111111</span>)
+        ^ (hi(c1) &amp; <span class="number">0x2222222222222222</span>)
+        ^ (hi(c2) &amp; <span class="number">0x4444444444444444</span>)
+        ^ (hi(c3) &amp; <span class="number">0x8888888888888888</span>)
+        ^ hi(extra);
+    (lo, hi)
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;64&quot;</span>))]</span>
-<span class="kw">fn</span> <span class="ident">gcm_mul32_nohw</span>(<span class="ident">a</span>: <span class="ident">u32</span>, <span class="ident">b</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u64</span> {
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="ident">a</span>: <span class="ident">u32</span>, <span class="ident">b</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u64</span> {
-        <span class="ident">u64::from</span>(<span class="ident">a</span>) <span class="op">*</span> <span class="ident">u64::from</span>(<span class="ident">b</span>)
+<span class="attribute">#[cfg(not(target_pointer_width = <span class="string">&quot;64&quot;</span>))]
+</span><span class="kw">fn </span>gcm_mul32_nohw(a: u32, b: u32) -&gt; u64 {
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>mul(a: u32, b: u32) -&gt; u64 {
+        u64::from(a) * u64::from(b)
     }
 
-    <span class="comment">// One term every four bits means the largest term is 32/4 = 8, which does not</span>
-    <span class="comment">// overflow into the next term.</span>
-    <span class="kw">let</span> <span class="ident">a0</span> <span class="op">=</span> <span class="ident">a</span> <span class="op">&amp;</span> <span class="number">0x11111111</span>;
-    <span class="kw">let</span> <span class="ident">a1</span> <span class="op">=</span> <span class="ident">a</span> <span class="op">&amp;</span> <span class="number">0x22222222</span>;
-    <span class="kw">let</span> <span class="ident">a2</span> <span class="op">=</span> <span class="ident">a</span> <span class="op">&amp;</span> <span class="number">0x44444444</span>;
-    <span class="kw">let</span> <span class="ident">a3</span> <span class="op">=</span> <span class="ident">a</span> <span class="op">&amp;</span> <span class="number">0x88888888</span>;
+    <span class="comment">// One term every four bits means the largest term is 32/4 = 8, which does not
+    // overflow into the next term.
+    </span><span class="kw">let </span>a0 = a &amp; <span class="number">0x11111111</span>;
+    <span class="kw">let </span>a1 = a &amp; <span class="number">0x22222222</span>;
+    <span class="kw">let </span>a2 = a &amp; <span class="number">0x44444444</span>;
+    <span class="kw">let </span>a3 = a &amp; <span class="number">0x88888888</span>;
 
-    <span class="kw">let</span> <span class="ident">b0</span> <span class="op">=</span> <span class="ident">b</span> <span class="op">&amp;</span> <span class="number">0x11111111</span>;
-    <span class="kw">let</span> <span class="ident">b1</span> <span class="op">=</span> <span class="ident">b</span> <span class="op">&amp;</span> <span class="number">0x22222222</span>;
-    <span class="kw">let</span> <span class="ident">b2</span> <span class="op">=</span> <span class="ident">b</span> <span class="op">&amp;</span> <span class="number">0x44444444</span>;
-    <span class="kw">let</span> <span class="ident">b3</span> <span class="op">=</span> <span class="ident">b</span> <span class="op">&amp;</span> <span class="number">0x88888888</span>;
+    <span class="kw">let </span>b0 = b &amp; <span class="number">0x11111111</span>;
+    <span class="kw">let </span>b1 = b &amp; <span class="number">0x22222222</span>;
+    <span class="kw">let </span>b2 = b &amp; <span class="number">0x44444444</span>;
+    <span class="kw">let </span>b3 = b &amp; <span class="number">0x88888888</span>;
 
-    <span class="kw">let</span> <span class="ident">c0</span> <span class="op">=</span> <span class="ident">mul</span>(<span class="ident">a0</span>, <span class="ident">b0</span>) <span class="op">^</span> <span class="ident">mul</span>(<span class="ident">a1</span>, <span class="ident">b3</span>) <span class="op">^</span> <span class="ident">mul</span>(<span class="ident">a2</span>, <span class="ident">b2</span>) <span class="op">^</span> <span class="ident">mul</span>(<span class="ident">a3</span>, <span class="ident">b1</span>);
-    <span class="kw">let</span> <span class="ident">c1</span> <span class="op">=</span> <span class="ident">mul</span>(<span class="ident">a0</span>, <span class="ident">b1</span>) <span class="op">^</span> <span class="ident">mul</span>(<span class="ident">a1</span>, <span class="ident">b0</span>) <span class="op">^</span> <span class="ident">mul</span>(<span class="ident">a2</span>, <span class="ident">b3</span>) <span class="op">^</span> <span class="ident">mul</span>(<span class="ident">a3</span>, <span class="ident">b2</span>);
-    <span class="kw">let</span> <span class="ident">c2</span> <span class="op">=</span> <span class="ident">mul</span>(<span class="ident">a0</span>, <span class="ident">b2</span>) <span class="op">^</span> <span class="ident">mul</span>(<span class="ident">a1</span>, <span class="ident">b1</span>) <span class="op">^</span> <span class="ident">mul</span>(<span class="ident">a2</span>, <span class="ident">b0</span>) <span class="op">^</span> <span class="ident">mul</span>(<span class="ident">a3</span>, <span class="ident">b3</span>);
-    <span class="kw">let</span> <span class="ident">c3</span> <span class="op">=</span> <span class="ident">mul</span>(<span class="ident">a0</span>, <span class="ident">b3</span>) <span class="op">^</span> <span class="ident">mul</span>(<span class="ident">a1</span>, <span class="ident">b2</span>) <span class="op">^</span> <span class="ident">mul</span>(<span class="ident">a2</span>, <span class="ident">b1</span>) <span class="op">^</span> <span class="ident">mul</span>(<span class="ident">a3</span>, <span class="ident">b0</span>);
+    <span class="kw">let </span>c0 = mul(a0, b0) ^ mul(a1, b3) ^ mul(a2, b2) ^ mul(a3, b1);
+    <span class="kw">let </span>c1 = mul(a0, b1) ^ mul(a1, b0) ^ mul(a2, b3) ^ mul(a3, b2);
+    <span class="kw">let </span>c2 = mul(a0, b2) ^ mul(a1, b1) ^ mul(a2, b0) ^ mul(a3, b3);
+    <span class="kw">let </span>c3 = mul(a0, b3) ^ mul(a1, b2) ^ mul(a2, b1) ^ mul(a3, b0);
 
-    (<span class="ident">c0</span> <span class="op">&amp;</span> <span class="number">0x1111111111111111</span>)
-        <span class="op">|</span> (<span class="ident">c1</span> <span class="op">&amp;</span> <span class="number">0x2222222222222222</span>)
-        <span class="op">|</span> (<span class="ident">c2</span> <span class="op">&amp;</span> <span class="number">0x4444444444444444</span>)
-        <span class="op">|</span> (<span class="ident">c3</span> <span class="op">&amp;</span> <span class="number">0x8888888888888888</span>)
+    (c0 &amp; <span class="number">0x1111111111111111</span>)
+        | (c1 &amp; <span class="number">0x2222222222222222</span>)
+        | (c2 &amp; <span class="number">0x4444444444444444</span>)
+        | (c3 &amp; <span class="number">0x8888888888888888</span>)
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_pointer_width</span> <span class="op">=</span> <span class="string">&quot;64&quot;</span>))]</span>
-<span class="kw">fn</span> <span class="ident">gcm_mul64_nohw</span>(<span class="ident">a</span>: <span class="ident">u64</span>, <span class="ident">b</span>: <span class="ident">u64</span>) -&gt; (<span class="ident">u64</span>, <span class="ident">u64</span>) {
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">lo</span>(<span class="ident">a</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u32</span> {
-        <span class="ident">a</span> <span class="kw">as</span> <span class="ident">u32</span>
+<span class="attribute">#[cfg(not(target_pointer_width = <span class="string">&quot;64&quot;</span>))]
+</span><span class="kw">fn </span>gcm_mul64_nohw(a: u64, b: u64) -&gt; (u64, u64) {
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>lo(a: u64) -&gt; u32 {
+        a <span class="kw">as </span>u32
     }
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">hi</span>(<span class="ident">a</span>: <span class="ident">u64</span>) -&gt; <span class="ident">u32</span> {
-        <span class="ident">lo</span>(<span class="ident">a</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>)
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>hi(a: u64) -&gt; u32 {
+        lo(a &gt;&gt; <span class="number">32</span>)
     }
 
-    <span class="kw">let</span> <span class="ident">a0</span> <span class="op">=</span> <span class="ident">lo</span>(<span class="ident">a</span>);
-    <span class="kw">let</span> <span class="ident">a1</span> <span class="op">=</span> <span class="ident">hi</span>(<span class="ident">a</span>);
-    <span class="kw">let</span> <span class="ident">b0</span> <span class="op">=</span> <span class="ident">lo</span>(<span class="ident">b</span>);
-    <span class="kw">let</span> <span class="ident">b1</span> <span class="op">=</span> <span class="ident">hi</span>(<span class="ident">b</span>);
-    <span class="comment">// Karatsuba multiplication.</span>
-    <span class="kw">let</span> <span class="ident">lo</span> <span class="op">=</span> <span class="ident">gcm_mul32_nohw</span>(<span class="ident">a0</span>, <span class="ident">b0</span>);
-    <span class="kw">let</span> <span class="ident">hi</span> <span class="op">=</span> <span class="ident">gcm_mul32_nohw</span>(<span class="ident">a1</span>, <span class="ident">b1</span>);
-    <span class="kw">let</span> <span class="ident">mid</span> <span class="op">=</span> <span class="ident">gcm_mul32_nohw</span>(<span class="ident">a0</span> <span class="op">^</span> <span class="ident">a1</span>, <span class="ident">b0</span> <span class="op">^</span> <span class="ident">b1</span>) <span class="op">^</span> <span class="ident">lo</span> <span class="op">^</span> <span class="ident">hi</span>;
-    (<span class="ident">lo</span> <span class="op">^</span> (<span class="ident">mid</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>), <span class="ident">hi</span> <span class="op">^</span> (<span class="ident">mid</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">32</span>))
+    <span class="kw">let </span>a0 = lo(a);
+    <span class="kw">let </span>a1 = hi(a);
+    <span class="kw">let </span>b0 = lo(b);
+    <span class="kw">let </span>b1 = hi(b);
+    <span class="comment">// Karatsuba multiplication.
+    </span><span class="kw">let </span>lo = gcm_mul32_nohw(a0, b0);
+    <span class="kw">let </span>hi = gcm_mul32_nohw(a1, b1);
+    <span class="kw">let </span>mid = gcm_mul32_nohw(a0 ^ a1, b0 ^ b1) ^ lo ^ hi;
+    (lo ^ (mid &lt;&lt; <span class="number">32</span>), hi ^ (mid &gt;&gt; <span class="number">32</span>))
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">init</span>(<span class="ident">xi</span>: [<span class="ident">u64</span>; <span class="number">2</span>]) -&gt; <span class="ident"><span class="kw">super</span>::u128</span> {
-    <span class="comment">// We implement GHASH in terms of POLYVAL, as described in RFC8452. This</span>
-    <span class="comment">// avoids a shift by 1 in the multiplication, needed to account for bit</span>
-    <span class="comment">// reversal losing a bit after multiplication, that is,</span>
-    <span class="comment">// rev128(X) * rev128(Y) = rev255(X*Y).</span>
-    <span class="comment">//</span>
-    <span class="comment">// Per Appendix A, we run mulX_POLYVAL. Note this is the same transformation</span>
-    <span class="comment">// applied by |gcm_init_clmul|, etc. Note |Xi| has already been byteswapped.</span>
-    <span class="comment">//</span>
-    <span class="comment">// See also slide 16 of</span>
-    <span class="comment">// https://crypto.stanford.edu/RealWorldCrypto/slides/gueron.pdf</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lo</span> <span class="op">=</span> <span class="ident">xi</span>[<span class="number">1</span>];
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hi</span> <span class="op">=</span> <span class="ident">xi</span>[<span class="number">0</span>];
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>init(xi: [u64; <span class="number">2</span>]) -&gt; <span class="kw">super</span>::u128 {
+    <span class="comment">// We implement GHASH in terms of POLYVAL, as described in RFC8452. This
+    // avoids a shift by 1 in the multiplication, needed to account for bit
+    // reversal losing a bit after multiplication, that is,
+    // rev128(X) * rev128(Y) = rev255(X*Y).
+    //
+    // Per Appendix A, we run mulX_POLYVAL. Note this is the same transformation
+    // applied by |gcm_init_clmul|, etc. Note |Xi| has already been byteswapped.
+    //
+    // See also slide 16 of
+    // https://crypto.stanford.edu/RealWorldCrypto/slides/gueron.pdf
+    </span><span class="kw">let </span><span class="kw-2">mut </span>lo = xi[<span class="number">1</span>];
+    <span class="kw">let </span><span class="kw-2">mut </span>hi = xi[<span class="number">0</span>];
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">carry</span> <span class="op">=</span> <span class="ident">hi</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">63</span>;
-    <span class="ident">carry</span> <span class="op">=</span> <span class="number">0u64</span>.<span class="ident">wrapping_sub</span>(<span class="ident">carry</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>carry = hi &gt;&gt; <span class="number">63</span>;
+    carry = <span class="number">0u64</span>.wrapping_sub(carry);
 
-    <span class="ident">hi</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="op">=</span> <span class="number">1</span>;
-    <span class="ident">hi</span> <span class="op">|</span><span class="op">=</span> <span class="ident">lo</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">63</span>;
-    <span class="ident">lo</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="op">=</span> <span class="number">1</span>;
+    hi &lt;&lt;= <span class="number">1</span>;
+    hi |= lo &gt;&gt; <span class="number">63</span>;
+    lo &lt;&lt;= <span class="number">1</span>;
 
-    <span class="comment">// The irreducible polynomial is 1 + x^121 + x^126 + x^127 + x^128, so we</span>
-    <span class="comment">// conditionally add 0xc200...0001.</span>
-    <span class="ident">lo</span> <span class="op">^</span><span class="op">=</span> <span class="ident">carry</span> <span class="op">&amp;</span> <span class="number">1</span>;
-    <span class="ident">hi</span> <span class="op">^</span><span class="op">=</span> <span class="ident">carry</span> <span class="op">&amp;</span> <span class="number">0xc200000000000000</span>;
+    <span class="comment">// The irreducible polynomial is 1 + x^121 + x^126 + x^127 + x^128, so we
+    // conditionally add 0xc200...0001.
+    </span>lo ^= carry &amp; <span class="number">1</span>;
+    hi ^= carry &amp; <span class="number">0xc200000000000000</span>;
 
-    <span class="comment">// This implementation does not use the rest of |Htable|.</span>
-    <span class="ident"><span class="kw">super</span>::u128</span> { <span class="ident">lo</span>, <span class="ident">hi</span> }
+    <span class="comment">// This implementation does not use the rest of |Htable|.
+    </span><span class="kw">super</span>::u128 { lo, hi }
 }
 
-<span class="kw">fn</span> <span class="ident">gcm_polyval_nohw</span>(<span class="ident">xi</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u64</span>; <span class="number">2</span>], <span class="ident">h</span>: <span class="ident"><span class="kw">super</span>::u128</span>) {
-    <span class="comment">// Karatsuba multiplication. The product of |Xi| and |H| is stored in |r0|</span>
-    <span class="comment">// through |r3|. Note there is no byte or bit reversal because we are</span>
-    <span class="comment">// evaluating POLYVAL.</span>
-    <span class="kw">let</span> (<span class="ident">r0</span>, <span class="kw-2">mut</span> <span class="ident">r1</span>) <span class="op">=</span> <span class="ident">gcm_mul64_nohw</span>(<span class="ident">xi</span>[<span class="number">0</span>], <span class="ident">h</span>.<span class="ident">lo</span>);
-    <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">r2</span>, <span class="kw-2">mut</span> <span class="ident">r3</span>) <span class="op">=</span> <span class="ident">gcm_mul64_nohw</span>(<span class="ident">xi</span>[<span class="number">1</span>], <span class="ident">h</span>.<span class="ident">hi</span>);
-    <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">mid0</span>, <span class="kw-2">mut</span> <span class="ident">mid1</span>) <span class="op">=</span> <span class="ident">gcm_mul64_nohw</span>(<span class="ident">xi</span>[<span class="number">0</span>] <span class="op">^</span> <span class="ident">xi</span>[<span class="number">1</span>], <span class="ident">h</span>.<span class="ident">hi</span> <span class="op">^</span> <span class="ident">h</span>.<span class="ident">lo</span>);
-    <span class="ident">mid0</span> <span class="op">^</span><span class="op">=</span> <span class="ident">r0</span> <span class="op">^</span> <span class="ident">r2</span>;
-    <span class="ident">mid1</span> <span class="op">^</span><span class="op">=</span> <span class="ident">r1</span> <span class="op">^</span> <span class="ident">r3</span>;
-    <span class="ident">r2</span> <span class="op">^</span><span class="op">=</span> <span class="ident">mid1</span>;
-    <span class="ident">r1</span> <span class="op">^</span><span class="op">=</span> <span class="ident">mid0</span>;
+<span class="kw">fn </span>gcm_polyval_nohw(xi: <span class="kw-2">&amp;mut </span>[u64; <span class="number">2</span>], h: <span class="kw">super</span>::u128) {
+    <span class="comment">// Karatsuba multiplication. The product of |Xi| and |H| is stored in |r0|
+    // through |r3|. Note there is no byte or bit reversal because we are
+    // evaluating POLYVAL.
+    </span><span class="kw">let </span>(r0, <span class="kw-2">mut </span>r1) = gcm_mul64_nohw(xi[<span class="number">0</span>], h.lo);
+    <span class="kw">let </span>(<span class="kw-2">mut </span>r2, <span class="kw-2">mut </span>r3) = gcm_mul64_nohw(xi[<span class="number">1</span>], h.hi);
+    <span class="kw">let </span>(<span class="kw-2">mut </span>mid0, <span class="kw-2">mut </span>mid1) = gcm_mul64_nohw(xi[<span class="number">0</span>] ^ xi[<span class="number">1</span>], h.hi ^ h.lo);
+    mid0 ^= r0 ^ r2;
+    mid1 ^= r1 ^ r3;
+    r2 ^= mid1;
+    r1 ^= mid0;
 
-    <span class="comment">// Now we multiply our 256-bit result by x^-128 and reduce. |r2| and</span>
-    <span class="comment">// |r3| shifts into position and we must multiply |r0| and |r1| by x^-128. We</span>
-    <span class="comment">// have:</span>
-    <span class="comment">//</span>
-    <span class="comment">//       1 = x^121 + x^126 + x^127 + x^128</span>
-    <span class="comment">//  x^-128 = x^-7 + x^-2 + x^-1 + 1</span>
-    <span class="comment">//</span>
-    <span class="comment">// This is the GHASH reduction step, but with bits flowing in reverse.</span>
+    <span class="comment">// Now we multiply our 256-bit result by x^-128 and reduce. |r2| and
+    // |r3| shifts into position and we must multiply |r0| and |r1| by x^-128. We
+    // have:
+    //
+    //       1 = x^121 + x^126 + x^127 + x^128
+    //  x^-128 = x^-7 + x^-2 + x^-1 + 1
+    //
+    // This is the GHASH reduction step, but with bits flowing in reverse.
 
-    <span class="comment">// The x^-7, x^-2, and x^-1 terms shift bits past x^0, which would require</span>
-    <span class="comment">// another reduction steps. Instead, we gather the excess bits, incorporate</span>
-    <span class="comment">// them into |r0| and |r1| and reduce once. See slides 17-19</span>
-    <span class="comment">// of https://crypto.stanford.edu/RealWorldCrypto/slides/gueron.pdf.</span>
-    <span class="ident">r1</span> <span class="op">^</span><span class="op">=</span> (<span class="ident">r0</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">63</span>) <span class="op">^</span> (<span class="ident">r0</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">62</span>) <span class="op">^</span> (<span class="ident">r0</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">57</span>);
+    // The x^-7, x^-2, and x^-1 terms shift bits past x^0, which would require
+    // another reduction steps. Instead, we gather the excess bits, incorporate
+    // them into |r0| and |r1| and reduce once. See slides 17-19
+    // of https://crypto.stanford.edu/RealWorldCrypto/slides/gueron.pdf.
+    </span>r1 ^= (r0 &lt;&lt; <span class="number">63</span>) ^ (r0 &lt;&lt; <span class="number">62</span>) ^ (r0 &lt;&lt; <span class="number">57</span>);
 
-    <span class="comment">// 1</span>
-    <span class="ident">r2</span> <span class="op">^</span><span class="op">=</span> <span class="ident">r0</span>;
-    <span class="ident">r3</span> <span class="op">^</span><span class="op">=</span> <span class="ident">r1</span>;
+    <span class="comment">// 1
+    </span>r2 ^= r0;
+    r3 ^= r1;
 
-    <span class="comment">// x^-1</span>
-    <span class="ident">r2</span> <span class="op">^</span><span class="op">=</span> <span class="ident">r0</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">1</span>;
-    <span class="ident">r2</span> <span class="op">^</span><span class="op">=</span> <span class="ident">r1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">63</span>;
-    <span class="ident">r3</span> <span class="op">^</span><span class="op">=</span> <span class="ident">r1</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">1</span>;
+    <span class="comment">// x^-1
+    </span>r2 ^= r0 &gt;&gt; <span class="number">1</span>;
+    r2 ^= r1 &lt;&lt; <span class="number">63</span>;
+    r3 ^= r1 &gt;&gt; <span class="number">1</span>;
 
-    <span class="comment">// x^-2</span>
-    <span class="ident">r2</span> <span class="op">^</span><span class="op">=</span> <span class="ident">r0</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">2</span>;
-    <span class="ident">r2</span> <span class="op">^</span><span class="op">=</span> <span class="ident">r1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">62</span>;
-    <span class="ident">r3</span> <span class="op">^</span><span class="op">=</span> <span class="ident">r1</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">2</span>;
+    <span class="comment">// x^-2
+    </span>r2 ^= r0 &gt;&gt; <span class="number">2</span>;
+    r2 ^= r1 &lt;&lt; <span class="number">62</span>;
+    r3 ^= r1 &gt;&gt; <span class="number">2</span>;
 
-    <span class="comment">// x^-7</span>
-    <span class="ident">r2</span> <span class="op">^</span><span class="op">=</span> <span class="ident">r0</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">7</span>;
-    <span class="ident">r2</span> <span class="op">^</span><span class="op">=</span> <span class="ident">r1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">57</span>;
-    <span class="ident">r3</span> <span class="op">^</span><span class="op">=</span> <span class="ident">r1</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">7</span>;
+    <span class="comment">// x^-7
+    </span>r2 ^= r0 &gt;&gt; <span class="number">7</span>;
+    r2 ^= r1 &lt;&lt; <span class="number">57</span>;
+    r3 ^= r1 &gt;&gt; <span class="number">7</span>;
 
-    <span class="kw-2">*</span><span class="ident">xi</span> <span class="op">=</span> [<span class="ident">r2</span>, <span class="ident">r3</span>];
+    <span class="kw-2">*</span>xi = [r2, r3];
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">gmult</span>(<span class="ident">xi</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Xi</span>, <span class="ident">h</span>: <span class="ident"><span class="kw">super</span>::u128</span>) {
-    <span class="ident">with_swapped_xi</span>(<span class="ident">xi</span>, <span class="op">|</span><span class="ident">swapped</span><span class="op">|</span> {
-        <span class="ident">gcm_polyval_nohw</span>(<span class="ident">swapped</span>, <span class="ident">h</span>);
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>gmult(xi: <span class="kw-2">&amp;mut </span>Xi, h: <span class="kw">super</span>::u128) {
+    with_swapped_xi(xi, |swapped| {
+        gcm_polyval_nohw(swapped, h);
     })
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">ghash</span>(<span class="ident">xi</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Xi</span>, <span class="ident">h</span>: <span class="ident"><span class="kw">super</span>::u128</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
-    <span class="ident">with_swapped_xi</span>(<span class="ident">xi</span>, <span class="op">|</span><span class="ident">swapped</span><span class="op">|</span> {
-        <span class="ident">input</span>.<span class="ident">chunks_exact</span>(<span class="number">16</span>).<span class="ident">for_each</span>(<span class="op">|</span><span class="ident">inp</span><span class="op">|</span> {
-            <span class="ident">swapped</span>[<span class="number">0</span>] <span class="op">^</span><span class="op">=</span> <span class="ident">u64::from_be_bytes</span>(<span class="ident">inp</span>[<span class="number">8</span>..].<span class="ident">try_into</span>().<span class="ident">unwrap</span>());
-            <span class="ident">swapped</span>[<span class="number">1</span>] <span class="op">^</span><span class="op">=</span> <span class="ident">u64::from_be_bytes</span>(<span class="ident">inp</span>[..<span class="number">8</span>].<span class="ident">try_into</span>().<span class="ident">unwrap</span>());
-            <span class="ident">gcm_polyval_nohw</span>(<span class="ident">swapped</span>, <span class="ident">h</span>);
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>ghash(xi: <span class="kw-2">&amp;mut </span>Xi, h: <span class="kw">super</span>::u128, input: <span class="kw-2">&amp;</span>[u8]) {
+    with_swapped_xi(xi, |swapped| {
+        input.chunks_exact(<span class="number">16</span>).for_each(|inp| {
+            swapped[<span class="number">0</span>] ^= u64::from_be_bytes(inp[<span class="number">8</span>..].try_into().unwrap());
+            swapped[<span class="number">1</span>] ^= u64::from_be_bytes(inp[..<span class="number">8</span>].try_into().unwrap());
+            gcm_polyval_nohw(swapped, h);
         });
     });
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">with_swapped_xi</span>(<span class="ident">Xi</span>(<span class="ident">xi</span>): <span class="kw-2">&amp;mut</span> <span class="ident">Xi</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> [<span class="ident">u64</span>; <span class="number">2</span>])) {
-    <span class="kw">let</span> <span class="ident">unswapped</span> <span class="op">=</span> <span class="ident">xi</span>.<span class="ident">u64s_be_to_native</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">swapped</span>: [<span class="ident">u64</span>; <span class="number">2</span>] <span class="op">=</span> [<span class="ident">unswapped</span>[<span class="number">1</span>], <span class="ident">unswapped</span>[<span class="number">0</span>]];
-    <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="ident">swapped</span>);
-    <span class="kw-2">*</span><span class="ident">xi</span> <span class="op">=</span> <span class="ident">Block::from_u64_be</span>(<span class="ident">BigEndian::from</span>(<span class="ident">swapped</span>[<span class="number">1</span>]), <span class="ident">BigEndian::from</span>(<span class="ident">swapped</span>[<span class="number">0</span>]))
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>with_swapped_xi(Xi(xi): <span class="kw-2">&amp;mut </span>Xi, f: <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;mut </span>[u64; <span class="number">2</span>])) {
+    <span class="kw">let </span>unswapped = xi.u64s_be_to_native();
+    <span class="kw">let </span><span class="kw-2">mut </span>swapped: [u64; <span class="number">2</span>] = [unswapped[<span class="number">1</span>], unswapped[<span class="number">0</span>]];
+    f(<span class="kw-2">&amp;mut </span>swapped);
+    <span class="kw-2">*</span>xi = Block::from_u64_be(BigEndian::from(swapped[<span class="number">1</span>]), BigEndian::from(swapped[<span class="number">0</span>]))
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

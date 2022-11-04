@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/prisma-models/src/builders/internal_dm_builder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>internal_dm_builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../prisma_models/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/prisma-models/src/builders/internal_dm_builder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>internal_dm_builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../prisma_models/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -418,425 +418,425 @@
 <span id="418">418</span>
 <span id="419">419</span>
 <span id="420">420</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">field_builders::RelationFieldBuilder</span>, <span class="ident">relation_builder::RelationBuilder</span>, <span class="ident">CompositeTypeBuilder</span>, <span class="ident">FieldBuilder</span>,
-    <span class="ident">IndexBuilder</span>, <span class="ident">ModelBuilder</span>, <span class="ident">PrimaryKeyBuilder</span>,
+</pre><pre class="rust"><code><span class="kw">use super</span>::{
+    field_builders::RelationFieldBuilder, relation_builder::RelationBuilder, CompositeTypeBuilder, FieldBuilder,
+    IndexBuilder, ModelBuilder, PrimaryKeyBuilder,
 };
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">builders</span>::{<span class="ident">CompositeFieldBuilder</span>, <span class="ident">ScalarFieldBuilder</span>},
-    <span class="ident">extensions</span>::<span class="kw-2">*</span>,
-    <span class="ident">IndexType</span>, <span class="ident">InlineRelation</span>, <span class="ident">InternalEnum</span>, <span class="ident">InternalEnumValue</span>, <span class="ident">RelationLinkManifestation</span>, <span class="ident">RelationSide</span>, <span class="ident">RelationTable</span>,
-    <span class="ident">TypeIdentifier</span>,
+<span class="kw">use crate</span>::{
+    builders::{CompositeFieldBuilder, ScalarFieldBuilder},
+    extensions::<span class="kw-2">*</span>,
+    IndexType, InlineRelation, InternalEnum, InternalEnumValue, RelationLinkManifestation, RelationSide, RelationTable,
+    TypeIdentifier,
 };
-<span class="kw">use</span> <span class="ident">psl</span>::{
-    <span class="ident">datamodel_connector::RelationMode</span>,
-    <span class="ident">dml</span>::{<span class="self">self</span>, <span class="ident">CompositeTypeFieldType</span>, <span class="ident">Datamodel</span>, <span class="ident">Ignorable</span>, <span class="ident">WithDatabaseName</span>},
+<span class="kw">use </span>psl::{
+    datamodel_connector::RelationMode,
+    dml::{<span class="self">self</span>, CompositeTypeFieldType, Datamodel, Ignorable, WithDatabaseName},
 };
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">model_builders</span>(
-    <span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">Datamodel</span>,
-    <span class="ident">relation_placeholders</span>: <span class="kw-2">&amp;</span>[<span class="ident">RelationPlaceholder</span>],
-) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ModelBuilder</span><span class="op">&gt;</span> {
-    <span class="ident">datamodel</span>
-        .<span class="ident">models</span>()
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> <span class="op">!</span><span class="ident">model</span>.<span class="ident">is_ignored</span>())
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> <span class="ident">model</span>.<span class="ident">is_supported</span>())
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> <span class="ident">ModelBuilder</span> {
-            <span class="ident">name</span>: <span class="ident">model</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-            <span class="ident">fields</span>: <span class="ident">model_field_builders</span>(<span class="ident">datamodel</span>, <span class="ident">model</span>, <span class="ident">relation_placeholders</span>),
-            <span class="ident">manifestation</span>: <span class="ident">model</span>.<span class="ident">database_name</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">to_owned</span>()),
-            <span class="ident">primary_key</span>: <span class="ident">pk_builder</span>(<span class="ident">model</span>),
-            <span class="ident">indexes</span>: <span class="ident">index_builders</span>(<span class="ident">model</span>),
-            <span class="ident">supports_create_operation</span>: <span class="ident">model</span>.<span class="ident">supports_create_operation</span>(),
-            <span class="ident">dml_model</span>: <span class="ident">model</span>.<span class="ident">clone</span>(),
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>model_builders(
+    datamodel: <span class="kw-2">&amp;</span>Datamodel,
+    relation_placeholders: <span class="kw-2">&amp;</span>[RelationPlaceholder],
+) -&gt; Vec&lt;ModelBuilder&gt; {
+    datamodel
+        .models()
+        .filter(|model| !model.is_ignored())
+        .filter(|model| model.is_supported())
+        .map(|model| ModelBuilder {
+            name: model.name.clone(),
+            fields: model_field_builders(datamodel, model, relation_placeholders),
+            manifestation: model.database_name().map(|s| s.to_owned()),
+            primary_key: pk_builder(model),
+            indexes: index_builders(model),
+            supports_create_operation: model.supports_create_operation(),
+            dml_model: model.clone(),
         })
-        .<span class="ident">collect</span>()
+        .collect()
 }
 
-<span class="kw">fn</span> <span class="ident">model_field_builders</span>(
-    <span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">Datamodel</span>,
-    <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Model</span>,
-    <span class="ident">relations</span>: <span class="kw-2">&amp;</span>[<span class="ident">RelationPlaceholder</span>],
-) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FieldBuilder</span><span class="op">&gt;</span> {
-    <span class="ident">model</span>
-        .<span class="ident">fields</span>()
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="op">!</span><span class="ident">field</span>.<span class="ident">is_ignored</span>())
-        .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">field</span> {
-            <span class="ident">dml::Field::CompositeField</span>(<span class="ident">cf</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">FieldBuilder::Composite</span>(<span class="ident">CompositeFieldBuilder</span> {
-                <span class="ident">name</span>: <span class="ident">cf</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-                <span class="ident">db_name</span>: <span class="ident">cf</span>.<span class="ident">database_name</span>.<span class="ident">clone</span>(),
-                <span class="ident">arity</span>: <span class="ident">cf</span>.<span class="ident">arity</span>,
-                <span class="ident">type_name</span>: <span class="ident">cf</span>.<span class="ident">composite_type</span>.<span class="ident">clone</span>(),
-                <span class="ident">default_value</span>: <span class="ident">cf</span>.<span class="ident">default_value</span>.<span class="ident">clone</span>(),
+<span class="kw">fn </span>model_field_builders(
+    datamodel: <span class="kw-2">&amp;</span>Datamodel,
+    model: <span class="kw-2">&amp;</span>dml::Model,
+    relations: <span class="kw-2">&amp;</span>[RelationPlaceholder],
+) -&gt; Vec&lt;FieldBuilder&gt; {
+    model
+        .fields()
+        .filter(|field| !field.is_ignored())
+        .filter_map(|field| <span class="kw">match </span>field {
+            dml::Field::CompositeField(cf) =&gt; <span class="prelude-val">Some</span>(FieldBuilder::Composite(CompositeFieldBuilder {
+                name: cf.name.clone(),
+                db_name: cf.database_name.clone(),
+                arity: cf.arity,
+                type_name: cf.composite_type.clone(),
+                default_value: cf.default_value.clone(),
             })),
-            <span class="ident">dml::Field::RelationField</span>(<span class="ident">rf</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">relation</span> <span class="op">=</span> <span class="ident">relations</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">find</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">is_for_model_and_field</span>(<span class="ident">model</span>, <span class="ident">rf</span>))
-                    .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                        <span class="macro">panic!</span>(<span class="string">&quot;Did not find a relation for model {} and field {}&quot;</span>, <span class="ident">model</span>.<span class="ident">name</span>, <span class="ident">rf</span>.<span class="ident">name</span>)
+            dml::Field::RelationField(rf) =&gt; {
+                <span class="kw">let </span>relation = relations
+                    .iter()
+                    .find(|r| r.is_for_model_and_field(model, rf))
+                    .unwrap_or_else(|| {
+                        <span class="macro">panic!</span>(<span class="string">&quot;Did not find a relation for model {} and field {}&quot;</span>, model.name, rf.name)
                     });
 
-                <span class="comment">// If one side of the relation is not supported, filter out the relation</span>
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">relation</span>.<span class="ident">model_a</span>.<span class="ident">is_relation_supported</span>(<span class="kw-2">&amp;</span><span class="ident">relation</span>.<span class="ident">field_a</span>)
-                    <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">relation</span>.<span class="ident">model_b</span>.<span class="ident">is_relation_supported</span>(<span class="kw-2">&amp;</span><span class="ident">relation</span>.<span class="ident">field_b</span>)
+                <span class="comment">// If one side of the relation is not supported, filter out the relation
+                </span><span class="kw">if </span>!relation.model_a.is_relation_supported(<span class="kw-2">&amp;</span>relation.field_a)
+                    || !relation.model_b.is_relation_supported(<span class="kw-2">&amp;</span>relation.field_b)
                 {
-                    <span class="kw">return</span> <span class="prelude-val">None</span>;
+                    <span class="kw">return </span><span class="prelude-val">None</span>;
                 }
 
-                <span class="prelude-val">Some</span>(<span class="ident">FieldBuilder::Relation</span>(<span class="ident">RelationFieldBuilder</span> {
-                    <span class="ident">name</span>: <span class="ident">rf</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-                    <span class="ident">arity</span>: <span class="ident">rf</span>.<span class="ident">arity</span>,
-                    <span class="ident">relation_name</span>: <span class="ident">relation</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-                    <span class="ident">relation_side</span>: <span class="ident">relation</span>.<span class="ident">relation_side</span>(<span class="ident">rf</span>),
-                    <span class="ident">relation_info</span>: <span class="ident">rf</span>.<span class="ident">relation_info</span>.<span class="ident">clone</span>(),
-                    <span class="ident">on_delete_default</span>: <span class="ident">rf</span>.<span class="ident">default_on_delete_action</span>(),
-                    <span class="ident">on_update_default</span>: <span class="ident">rf</span>.<span class="ident">default_on_update_action</span>(),
+                <span class="prelude-val">Some</span>(FieldBuilder::Relation(RelationFieldBuilder {
+                    name: rf.name.clone(),
+                    arity: rf.arity,
+                    relation_name: relation.name.clone(),
+                    relation_side: relation.relation_side(rf),
+                    relation_info: rf.relation_info.clone(),
+                    on_delete_default: rf.default_on_delete_action(),
+                    on_update_default: rf.default_on_update_action(),
                 }))
             }
-            <span class="ident">dml::Field::ScalarField</span>(<span class="ident">sf</span>) =&gt; {
-                <span class="kw">if</span> <span class="ident">sf</span>.<span class="ident">type_identifier</span>() <span class="op">==</span> <span class="ident">TypeIdentifier::Unsupported</span> {
-                    <span class="prelude-val">None</span>
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">FieldBuilder::Scalar</span>(<span class="ident">ScalarFieldBuilder</span> {
-                        <span class="ident">name</span>: <span class="ident">sf</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-                        <span class="ident">type_identifier</span>: <span class="ident">sf</span>.<span class="ident">type_identifier</span>(),
-                        <span class="ident">is_unique</span>: <span class="ident">model</span>.<span class="ident">field_is_unique</span>(<span class="kw-2">&amp;</span><span class="ident">sf</span>.<span class="ident">name</span>),
-                        <span class="ident">is_id</span>: <span class="ident">model</span>.<span class="ident">field_is_primary</span>(<span class="kw-2">&amp;</span><span class="ident">sf</span>.<span class="ident">name</span>),
-                        <span class="ident">is_auto_generated_int_id</span>: <span class="ident">model</span>.<span class="ident">field_is_auto_generated_int_id</span>(<span class="kw-2">&amp;</span><span class="ident">sf</span>.<span class="ident">name</span>),
-                        <span class="ident">is_autoincrement</span>: <span class="ident">sf</span>.<span class="ident">is_auto_increment</span>(),
-                        <span class="ident">is_updated_at</span>: <span class="ident">sf</span>.<span class="ident">is_updated_at</span>,
-                        <span class="ident">internal_enum</span>: <span class="ident">sf</span>.<span class="ident">internal_enum</span>(<span class="ident">datamodel</span>),
-                        <span class="ident">arity</span>: <span class="ident">sf</span>.<span class="ident">arity</span>,
-                        <span class="ident">db_name</span>: <span class="ident">sf</span>.<span class="ident">database_name</span>.<span class="ident">clone</span>(),
-                        <span class="ident">default_value</span>: <span class="ident">sf</span>.<span class="ident">default_value</span>.<span class="ident">clone</span>(),
-                        <span class="ident">native_type</span>: <span class="ident">sf</span>.<span class="ident">native_type</span>(),
+            dml::Field::ScalarField(sf) =&gt; {
+                <span class="kw">if </span>sf.type_identifier() == TypeIdentifier::Unsupported {
+                    <span class="prelude-val">None
+                </span>} <span class="kw">else </span>{
+                    <span class="prelude-val">Some</span>(FieldBuilder::Scalar(ScalarFieldBuilder {
+                        name: sf.name.clone(),
+                        type_identifier: sf.type_identifier(),
+                        is_unique: model.field_is_unique(<span class="kw-2">&amp;</span>sf.name),
+                        is_id: model.field_is_primary(<span class="kw-2">&amp;</span>sf.name),
+                        is_auto_generated_int_id: model.field_is_auto_generated_int_id(<span class="kw-2">&amp;</span>sf.name),
+                        is_autoincrement: sf.is_auto_increment(),
+                        is_updated_at: sf.is_updated_at,
+                        internal_enum: sf.internal_enum(datamodel),
+                        arity: sf.arity,
+                        db_name: sf.database_name.clone(),
+                        default_value: sf.default_value.clone(),
+                        native_type: sf.native_type(),
                     }))
                 }
             }
         })
-        .<span class="ident">collect</span>()
+        .collect()
 }
 
-<span class="kw">fn</span> <span class="ident">composite_field_builders</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">Datamodel</span>, <span class="ident">composite</span>: <span class="kw-2">&amp;</span><span class="ident">dml::CompositeType</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FieldBuilder</span><span class="op">&gt;</span> {
-    <span class="ident">composite</span>
-        .<span class="ident">fields</span>
-        .<span class="ident">iter</span>()
-        <span class="comment">// .filter(|field| !field.is_ignored()) // Todo(?): Composites are not ignorable at the moment.</span>
-        .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">r#type</span> {
-            <span class="ident">CompositeTypeFieldType::CompositeType</span>(<span class="ident">type_name</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">FieldBuilder::Composite</span>(<span class="ident">CompositeFieldBuilder</span> {
-                <span class="ident">name</span>: <span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-                <span class="ident">db_name</span>: <span class="ident">field</span>.<span class="ident">database_name</span>.<span class="ident">clone</span>(),
-                <span class="ident">arity</span>: <span class="ident">field</span>.<span class="ident">arity</span>,
-                <span class="ident">type_name</span>: <span class="ident">type_name</span>.<span class="ident">clone</span>(),
-                <span class="comment">// No defaults on composite fields of type composite</span>
-                <span class="ident">default_value</span>: <span class="prelude-val">None</span>,
+<span class="kw">fn </span>composite_field_builders(datamodel: <span class="kw-2">&amp;</span>Datamodel, composite: <span class="kw-2">&amp;</span>dml::CompositeType) -&gt; Vec&lt;FieldBuilder&gt; {
+    composite
+        .fields
+        .iter()
+        <span class="comment">// .filter(|field| !field.is_ignored()) // Todo(?): Composites are not ignorable at the moment.
+        </span>.filter_map(|field| <span class="kw">match </span><span class="kw-2">&amp;</span>field.r#type {
+            CompositeTypeFieldType::CompositeType(type_name) =&gt; <span class="prelude-val">Some</span>(FieldBuilder::Composite(CompositeFieldBuilder {
+                name: field.name.clone(),
+                db_name: field.database_name.clone(),
+                arity: field.arity,
+                type_name: type_name.clone(),
+                <span class="comment">// No defaults on composite fields of type composite
+                </span>default_value: <span class="prelude-val">None</span>,
             })),
-            <span class="ident">CompositeTypeFieldType::Scalar</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">|</span> <span class="ident">CompositeTypeFieldType::Enum</span>(<span class="kw">_</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">type_ident</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">type_identifier</span>();
+            CompositeTypeFieldType::Scalar(<span class="kw">_</span>, <span class="kw">_</span>) | CompositeTypeFieldType::Enum(<span class="kw">_</span>) =&gt; {
+                <span class="kw">let </span>type_ident = field.type_identifier();
 
-                <span class="kw">if</span> <span class="ident">type_ident</span> <span class="op">==</span> <span class="ident">TypeIdentifier::Unsupported</span> {
-                    <span class="prelude-val">None</span>
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">FieldBuilder::Scalar</span>(<span class="ident">ScalarFieldBuilder</span> {
-                        <span class="ident">name</span>: <span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-                        <span class="ident">type_identifier</span>: <span class="ident">type_ident</span>,
-                        <span class="ident">is_unique</span>: <span class="bool-val">false</span>, <span class="comment">// Composites can&#39;t have uniques or ids at the moment.</span>
-                        <span class="ident">is_id</span>: <span class="bool-val">false</span>,
-                        <span class="ident">is_auto_generated_int_id</span>: <span class="bool-val">false</span>,
-                        <span class="ident">is_autoincrement</span>: <span class="bool-val">false</span>,
-                        <span class="ident">is_updated_at</span>: <span class="bool-val">false</span>, <span class="comment">// Todo: This info isn&#39;t available here.</span>
-                        <span class="ident">internal_enum</span>: <span class="ident">field</span>.<span class="ident">internal_enum</span>(<span class="ident">datamodel</span>),
-                        <span class="ident">arity</span>: <span class="ident">field</span>.<span class="ident">arity</span>,
-                        <span class="ident">db_name</span>: <span class="ident">field</span>.<span class="ident">database_name</span>.<span class="ident">clone</span>(),
-                        <span class="ident">default_value</span>: <span class="ident">field</span>.<span class="ident">default_value</span>.<span class="ident">as_ref</span>().<span class="ident">cloned</span>(),
-                        <span class="ident">native_type</span>: <span class="ident">field</span>.<span class="ident">native_type</span>(),
+                <span class="kw">if </span>type_ident == TypeIdentifier::Unsupported {
+                    <span class="prelude-val">None
+                </span>} <span class="kw">else </span>{
+                    <span class="prelude-val">Some</span>(FieldBuilder::Scalar(ScalarFieldBuilder {
+                        name: field.name.clone(),
+                        type_identifier: type_ident,
+                        is_unique: <span class="bool-val">false</span>, <span class="comment">// Composites can&#39;t have uniques or ids at the moment.
+                        </span>is_id: <span class="bool-val">false</span>,
+                        is_auto_generated_int_id: <span class="bool-val">false</span>,
+                        is_autoincrement: <span class="bool-val">false</span>,
+                        is_updated_at: <span class="bool-val">false</span>, <span class="comment">// Todo: This info isn&#39;t available here.
+                        </span>internal_enum: field.internal_enum(datamodel),
+                        arity: field.arity,
+                        db_name: field.database_name.clone(),
+                        default_value: field.default_value.as_ref().cloned(),
+                        native_type: field.native_type(),
                     }))
                 }
             }
-            <span class="ident">CompositeTypeFieldType::Unsupported</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+            CompositeTypeFieldType::Unsupported(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
         })
-        .<span class="ident">collect</span>()
+        .collect()
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">relation_builders</span>(
-    <span class="ident">placeholders</span>: <span class="kw-2">&amp;</span>[<span class="ident">RelationPlaceholder</span>],
-    <span class="ident">relation_mode</span>: <span class="ident">RelationMode</span>,
-) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationBuilder</span><span class="op">&gt;</span> {
-    <span class="ident">placeholders</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">model_a</span>.<span class="ident">is_relation_supported</span>(<span class="kw-2">&amp;</span><span class="ident">r</span>.<span class="ident">field_a</span>) <span class="op">&amp;&amp;</span> <span class="ident">r</span>.<span class="ident">model_b</span>.<span class="ident">is_relation_supported</span>(<span class="kw-2">&amp;</span><span class="ident">r</span>.<span class="ident">field_b</span>))
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">RelationBuilder</span> {
-            <span class="ident">name</span>: <span class="ident">r</span>.<span class="ident">name</span>(),
-            <span class="ident">manifestation</span>: <span class="ident">r</span>.<span class="ident">manifestation</span>(),
-            <span class="ident">model_a_name</span>: <span class="ident">r</span>.<span class="ident">model_a</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-            <span class="ident">model_b_name</span>: <span class="ident">r</span>.<span class="ident">model_b</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-            <span class="ident">relation_mode</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>relation_builders(
+    placeholders: <span class="kw-2">&amp;</span>[RelationPlaceholder],
+    relation_mode: RelationMode,
+) -&gt; Vec&lt;RelationBuilder&gt; {
+    placeholders
+        .iter()
+        .filter(|r| r.model_a.is_relation_supported(<span class="kw-2">&amp;</span>r.field_a) &amp;&amp; r.model_b.is_relation_supported(<span class="kw-2">&amp;</span>r.field_b))
+        .map(|r| RelationBuilder {
+            name: r.name(),
+            manifestation: r.manifestation(),
+            model_a_name: r.model_a.name.clone(),
+            model_b_name: r.model_b.name.clone(),
+            relation_mode,
         })
-        .<span class="ident">collect</span>()
+        .collect()
 }
 
-<span class="kw">fn</span> <span class="ident">index_builders</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Model</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">IndexBuilder</span><span class="op">&gt;</span> {
-    <span class="ident">model</span>
-        .<span class="ident">indices</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="ident">model</span>.<span class="ident">is_compound_index_supported</span>(<span class="ident">i</span>)) <span class="comment">// @@unique for 1 field are transformed to is_unique instead</span>
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">path</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">1</span>)) <span class="comment">// TODO: we do not take indices with composite fields for now</span>
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">IndexBuilder</span> {
-            <span class="ident">name</span>: <span class="ident">i</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-            <span class="ident">fields</span>: <span class="ident">i</span>
-                .<span class="ident">fields</span>
-                .<span class="ident">clone</span>()
-                .<span class="ident">into_iter</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">path</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>().<span class="number">0</span>)
-                .<span class="ident">collect</span>(),
-            <span class="ident">typ</span>: <span class="kw">match</span> <span class="ident">i</span>.<span class="ident">tpe</span> {
-                <span class="ident">dml::IndexType::Unique</span> =&gt; <span class="ident">IndexType::Unique</span>,
-                <span class="ident">dml::IndexType::Normal</span> =&gt; <span class="ident">IndexType::Normal</span>,
-                <span class="comment">// TODO: When introducing the indexes in QE, change this.</span>
-                <span class="ident">dml::IndexType::Fulltext</span> =&gt; <span class="ident">IndexType::Normal</span>,
+<span class="kw">fn </span>index_builders(model: <span class="kw-2">&amp;</span>dml::Model) -&gt; Vec&lt;IndexBuilder&gt; {
+    model
+        .indices
+        .iter()
+        .filter(|i| i.fields.len() &gt; <span class="number">1 </span>&amp;&amp; model.is_compound_index_supported(i)) <span class="comment">// @@unique for 1 field are transformed to is_unique instead
+        </span>.filter(|i| i.fields.iter().all(|f| f.path.len() &lt;= <span class="number">1</span>)) <span class="comment">// TODO: we do not take indices with composite fields for now
+        </span>.map(|i| IndexBuilder {
+            name: i.name.clone(),
+            fields: i
+                .fields
+                .clone()
+                .into_iter()
+                .map(|<span class="kw-2">mut </span>f| f.path.pop().unwrap().<span class="number">0</span>)
+                .collect(),
+            typ: <span class="kw">match </span>i.tpe {
+                dml::IndexType::Unique =&gt; IndexType::Unique,
+                dml::IndexType::Normal =&gt; IndexType::Normal,
+                <span class="comment">// TODO: When introducing the indexes in QE, change this.
+                </span>dml::IndexType::Fulltext =&gt; IndexType::Normal,
             },
         })
-        .<span class="ident">collect</span>()
+        .collect()
 }
 
-<span class="kw">fn</span> <span class="ident">pk_builder</span>(<span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Model</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrimaryKeyBuilder</span><span class="op">&gt;</span> {
-    <span class="ident">model</span>.<span class="ident">primary_key</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">PrimaryKeyBuilder</span> {
-        <span class="ident">fields</span>: <span class="ident">pk</span>.<span class="ident">fields</span>.<span class="ident">clone</span>().<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>).<span class="ident">collect</span>(),
-        <span class="ident">alias</span>: <span class="ident">pk</span>.<span class="ident">name</span>.<span class="ident">to_owned</span>(),
+<span class="kw">fn </span>pk_builder(model: <span class="kw-2">&amp;</span>dml::Model) -&gt; <span class="prelude-ty">Option</span>&lt;PrimaryKeyBuilder&gt; {
+    model.primary_key.as_ref().map(|pk| PrimaryKeyBuilder {
+        fields: pk.fields.clone().into_iter().map(|f| f.name).collect(),
+        alias: pk.name.to_owned(),
     })
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">composite_type_builders</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">Datamodel</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CompositeTypeBuilder</span><span class="op">&gt;</span> {
-    <span class="ident">datamodel</span>
-        .<span class="ident">composite_types</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">ct</span><span class="op">|</span> <span class="ident">CompositeTypeBuilder</span> {
-            <span class="ident">name</span>: <span class="ident">ct</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-            <span class="ident">fields</span>: <span class="ident">composite_field_builders</span>(<span class="ident">datamodel</span>, <span class="ident">ct</span>),
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>composite_type_builders(datamodel: <span class="kw-2">&amp;</span>Datamodel) -&gt; Vec&lt;CompositeTypeBuilder&gt; {
+    datamodel
+        .composite_types
+        .iter()
+        .map(|ct| CompositeTypeBuilder {
+            name: ct.name.clone(),
+            fields: composite_field_builders(datamodel, ct),
         })
-        .<span class="ident">collect</span>()
+        .collect()
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">convert_enums</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">Datamodel</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InternalEnum</span><span class="op">&gt;</span> {
-    <span class="ident">datamodel</span>
-        .<span class="ident">enums</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">InternalEnum</span> {
-            <span class="ident">name</span>: <span class="ident">e</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-            <span class="ident">values</span>: <span class="ident">convert_enum_values</span>(<span class="ident">e</span>),
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>convert_enums(datamodel: <span class="kw-2">&amp;</span>Datamodel) -&gt; Vec&lt;InternalEnum&gt; {
+    datamodel
+        .enums()
+        .map(|e| InternalEnum {
+            name: e.name.clone(),
+            values: convert_enum_values(e),
         })
-        .<span class="ident">collect</span>()
+        .collect()
 }
 
-<span class="kw">fn</span> <span class="ident">convert_enum_values</span>(<span class="ident">enm</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Enum</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">InternalEnumValue</span><span class="op">&gt;</span> {
-    <span class="ident">enm</span>.<span class="ident">values</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">enum_value</span><span class="op">|</span> <span class="ident">InternalEnumValue</span> {
-            <span class="ident">name</span>: <span class="ident">enum_value</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-            <span class="ident">database_name</span>: <span class="ident">enum_value</span>.<span class="ident">database_name</span>.<span class="ident">clone</span>(),
+<span class="kw">fn </span>convert_enum_values(enm: <span class="kw-2">&amp;</span>dml::Enum) -&gt; Vec&lt;InternalEnumValue&gt; {
+    enm.values()
+        .map(|enum_value| InternalEnumValue {
+            name: enum_value.name.clone(),
+            database_name: enum_value.database_name.clone(),
         })
-        .<span class="ident">collect</span>()
+        .collect()
 }
 
-<span class="doccomment">/// Calculates placeholders that are used to compute builders dependent on some relation information being present already.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">relation_placeholders</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Datamodel</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RelationPlaceholder</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+<span class="doccomment">/// Calculates placeholders that are used to compute builders dependent on some relation information being present already.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>relation_placeholders(datamodel: <span class="kw-2">&amp;</span>dml::Datamodel) -&gt; Vec&lt;RelationPlaceholder&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>result = Vec::new();
 
-    <span class="kw">for</span> <span class="ident">model</span> <span class="kw">in</span> <span class="ident">datamodel</span>.<span class="ident">models</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">model</span><span class="op">|</span> <span class="op">!</span><span class="ident">model</span>.<span class="ident">is_ignored</span>) {
-        <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">relation_fields</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> <span class="op">!</span><span class="ident">field</span>.<span class="ident">is_ignored</span>) {
-            <span class="kw">let</span> <span class="ident">dml::RelationInfo</span> {
-                <span class="ident">referenced_model</span>: <span class="ident">to</span>,
-                <span class="ident">references</span>,
-                <span class="ident">name</span>,
+    <span class="kw">for </span>model <span class="kw">in </span>datamodel.models().filter(|model| !model.is_ignored) {
+        <span class="kw">for </span>field <span class="kw">in </span>model.relation_fields().filter(|field| !field.is_ignored) {
+            <span class="kw">let </span>dml::RelationInfo {
+                referenced_model: to,
+                references,
+                name,
                 ..
-            } <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">field</span>.<span class="ident">relation_info</span>;
+            } = <span class="kw-2">&amp;</span>field.relation_info;
 
-            <span class="kw">let</span> <span class="ident">related_model</span> <span class="op">=</span> <span class="ident">datamodel</span>
-                .<span class="ident">find_model</span>(<span class="ident">to</span>)
-                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">panic!</span>(<span class="string">&quot;Related model {} not found&quot;</span>, <span class="ident">to</span>));
+            <span class="kw">let </span>related_model = datamodel
+                .find_model(to)
+                .unwrap_or_else(|| <span class="macro">panic!</span>(<span class="string">&quot;Related model {} not found&quot;</span>, to));
 
-            <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">related_field</span>) <span class="op">=</span> <span class="ident">datamodel</span>.<span class="ident">find_related_field_bang</span>(<span class="ident">field</span>);
-            <span class="kw">let</span> <span class="ident">related_field_info</span>: <span class="kw-2">&amp;</span><span class="ident">dml::RelationInfo</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">related_field</span>.<span class="ident">relation_info</span>;
+            <span class="kw">let </span>(<span class="kw">_</span>, related_field) = datamodel.find_related_field_bang(field);
+            <span class="kw">let </span>related_field_info: <span class="kw-2">&amp;</span>dml::RelationInfo = <span class="kw-2">&amp;</span>related_field.relation_info;
 
-            <span class="kw">let</span> (<span class="ident">model_a</span>, <span class="ident">model_b</span>, <span class="ident">field_a</span>, <span class="ident">field_b</span>, <span class="ident">referenced_fields_a</span>, <span class="ident">referenced_fields_b</span>) <span class="op">=</span> <span class="kw">match</span> () {
-                <span class="kw">_</span> <span class="kw">if</span> <span class="ident">model</span>.<span class="ident">name</span> <span class="op">&lt;</span> <span class="ident">related_model</span>.<span class="ident">name</span> =&gt; (
-                    <span class="ident">model</span>.<span class="ident">clone</span>(),
-                    <span class="ident">related_model</span>.<span class="ident">clone</span>(),
-                    <span class="ident">field</span>.<span class="ident">clone</span>(),
-                    <span class="ident">related_field</span>.<span class="ident">clone</span>(),
-                    <span class="ident">references</span>,
-                    <span class="kw-2">&amp;</span><span class="ident">related_field_info</span>.<span class="ident">references</span>,
+            <span class="kw">let </span>(model_a, model_b, field_a, field_b, referenced_fields_a, referenced_fields_b) = <span class="kw">match </span>() {
+                <span class="kw">_ if </span>model.name &lt; related_model.name =&gt; (
+                    model.clone(),
+                    related_model.clone(),
+                    field.clone(),
+                    related_field.clone(),
+                    references,
+                    <span class="kw-2">&amp;</span>related_field_info.references,
                 ),
-                <span class="kw">_</span> <span class="kw">if</span> <span class="ident">related_model</span>.<span class="ident">name</span> <span class="op">&lt;</span> <span class="ident">model</span>.<span class="ident">name</span> =&gt; (
-                    <span class="ident">related_model</span>.<span class="ident">clone</span>(),
-                    <span class="ident">model</span>.<span class="ident">clone</span>(),
-                    <span class="ident">related_field</span>.<span class="ident">clone</span>(),
-                    <span class="ident">field</span>.<span class="ident">clone</span>(),
-                    <span class="kw-2">&amp;</span><span class="ident">related_field_info</span>.<span class="ident">references</span>,
-                    <span class="ident">references</span>,
+                <span class="kw">_ if </span>related_model.name &lt; model.name =&gt; (
+                    related_model.clone(),
+                    model.clone(),
+                    related_field.clone(),
+                    field.clone(),
+                    <span class="kw-2">&amp;</span>related_field_info.references,
+                    references,
                 ),
-                <span class="comment">// Self-relation case</span>
-                <span class="kw">_</span> =&gt; {
-                    <span class="kw">let</span> (<span class="ident">field_a</span>, <span class="ident">field_b</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">field</span>.<span class="ident">name</span> <span class="op">&lt;</span> <span class="ident">related_field</span>.<span class="ident">name</span> {
-                        (<span class="ident">field</span>.<span class="ident">clone</span>(), <span class="ident">related_field</span>.<span class="ident">clone</span>())
-                    } <span class="kw">else</span> {
-                        (<span class="ident">related_field</span>.<span class="ident">clone</span>(), <span class="ident">field</span>.<span class="ident">clone</span>())
+                <span class="comment">// Self-relation case
+                </span><span class="kw">_ </span>=&gt; {
+                    <span class="kw">let </span>(field_a, field_b) = <span class="kw">if </span>field.name &lt; related_field.name {
+                        (field.clone(), related_field.clone())
+                    } <span class="kw">else </span>{
+                        (related_field.clone(), field.clone())
                     };
                     (
-                        <span class="ident">model</span>.<span class="ident">clone</span>(),
-                        <span class="ident">related_model</span>.<span class="ident">clone</span>(),
-                        <span class="ident">field_a</span>,
-                        <span class="ident">field_b</span>,
-                        <span class="ident">references</span>,
-                        <span class="kw-2">&amp;</span><span class="ident">related_field_info</span>.<span class="ident">references</span>,
+                        model.clone(),
+                        related_model.clone(),
+                        field_a,
+                        field_b,
+                        references,
+                        <span class="kw-2">&amp;</span>related_field_info.references,
                     )
                 }
             };
 
-            <span class="kw">let</span> <span class="ident">inline_on_model_a</span> <span class="op">=</span> <span class="ident">ManifestationPlaceholder::Inline</span> {
-                <span class="ident">in_table_of_model</span>: <span class="ident">model_a</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-                <span class="ident">field</span>: <span class="ident">field_a</span>.<span class="ident">clone</span>(),
-                <span class="ident">referenced_fields</span>: <span class="ident">referenced_fields_a</span>.<span class="ident">clone</span>(),
+            <span class="kw">let </span>inline_on_model_a = ManifestationPlaceholder::Inline {
+                in_table_of_model: model_a.name.clone(),
+                field: field_a.clone(),
+                referenced_fields: referenced_fields_a.clone(),
             };
 
-            <span class="kw">let</span> <span class="ident">inline_on_model_b</span> <span class="op">=</span> <span class="ident">ManifestationPlaceholder::Inline</span> {
-                <span class="ident">in_table_of_model</span>: <span class="ident">model_b</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-                <span class="ident">field</span>: <span class="ident">field_b</span>.<span class="ident">clone</span>(),
-                <span class="ident">referenced_fields</span>: <span class="ident">referenced_fields_b</span>.<span class="ident">clone</span>(),
+            <span class="kw">let </span>inline_on_model_b = ManifestationPlaceholder::Inline {
+                in_table_of_model: model_b.name.clone(),
+                field: field_b.clone(),
+                referenced_fields: referenced_fields_b.clone(),
             };
 
-            <span class="kw">let</span> <span class="ident">inline_on_this_model</span> <span class="op">=</span> <span class="ident">ManifestationPlaceholder::Inline</span> {
-                <span class="ident">in_table_of_model</span>: <span class="ident">model</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-                <span class="ident">field</span>: <span class="ident">field</span>.<span class="ident">clone</span>(),
-                <span class="ident">referenced_fields</span>: <span class="ident">references</span>.<span class="ident">clone</span>(),
+            <span class="kw">let </span>inline_on_this_model = ManifestationPlaceholder::Inline {
+                in_table_of_model: model.name.clone(),
+                field: field.clone(),
+                referenced_fields: references.clone(),
             };
 
-            <span class="kw">let</span> <span class="ident">inline_on_related_model</span> <span class="op">=</span> <span class="ident">ManifestationPlaceholder::Inline</span> {
-                <span class="ident">in_table_of_model</span>: <span class="ident">related_model</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-                <span class="ident">field</span>: <span class="ident">related_field</span>.<span class="ident">clone</span>(),
-                <span class="ident">referenced_fields</span>: <span class="ident">related_field_info</span>.<span class="ident">references</span>.<span class="ident">clone</span>(),
+            <span class="kw">let </span>inline_on_related_model = ManifestationPlaceholder::Inline {
+                in_table_of_model: related_model.name.clone(),
+                field: related_field.clone(),
+                referenced_fields: related_field_info.references.clone(),
             };
 
-            <span class="kw">let</span> <span class="ident">manifestation</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">field_a</span>.<span class="ident">is_list</span>(), <span class="ident">field_b</span>.<span class="ident">is_list</span>()) {
-                (<span class="bool-val">true</span>, <span class="bool-val">true</span>) =&gt; <span class="ident">ManifestationPlaceholder::Table</span>,
-                (<span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; <span class="ident">inline_on_model_a</span>,
-                (<span class="bool-val">true</span>, <span class="bool-val">false</span>) =&gt; <span class="ident">inline_on_model_b</span>,
-                (<span class="bool-val">false</span>, <span class="bool-val">false</span>) =&gt; <span class="kw">match</span> (<span class="ident">references</span>.<span class="ident">first</span>(), <span class="kw-2">&amp;</span><span class="ident">related_field_info</span>.<span class="ident">references</span>.<span class="ident">first</span>()) {
-                    (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) =&gt; <span class="ident">inline_on_this_model</span>,
-                    (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; <span class="ident">inline_on_related_model</span>,
+            <span class="kw">let </span>manifestation = <span class="kw">match </span>(field_a.is_list(), field_b.is_list()) {
+                (<span class="bool-val">true</span>, <span class="bool-val">true</span>) =&gt; ManifestationPlaceholder::Table,
+                (<span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; inline_on_model_a,
+                (<span class="bool-val">true</span>, <span class="bool-val">false</span>) =&gt; inline_on_model_b,
+                (<span class="bool-val">false</span>, <span class="bool-val">false</span>) =&gt; <span class="kw">match </span>(references.first(), <span class="kw-2">&amp;</span>related_field_info.references.first()) {
+                    (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) =&gt; inline_on_this_model,
+                    (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; inline_on_related_model,
                     (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; {
-                        <span class="kw">if</span> <span class="ident">model_a</span>.<span class="ident">name</span> <span class="op">&lt;</span> <span class="ident">model_b</span>.<span class="ident">name</span> {
-                            <span class="ident">inline_on_model_a</span>
-                        } <span class="kw">else</span> {
-                            <span class="ident">inline_on_model_b</span>
+                        <span class="kw">if </span>model_a.name &lt; model_b.name {
+                            inline_on_model_a
+                        } <span class="kw">else </span>{
+                            inline_on_model_b
                         }
                     }
                     (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; {
-                        <span class="macro">panic!</span>(<span class="string">&quot;It&#39;s not allowed that both sides of a relation specify the inline policy. The field was {} on model {}. The related field was {} on model {}.&quot;</span>, <span class="ident">field</span>.<span class="ident">name</span>, <span class="ident">model</span>.<span class="ident">name</span>, <span class="ident">related_field</span>.<span class="ident">name</span>, <span class="ident">related_model</span>.<span class="ident">name</span>)
+                        <span class="macro">panic!</span>(<span class="string">&quot;It&#39;s not allowed that both sides of a relation specify the inline policy. The field was {} on model {}. The related field was {} on model {}.&quot;</span>, field.name, model.name, related_field.name, related_model.name)
                     }
                 },
             };
 
-            <span class="kw">let</span> <span class="ident">placeholder</span> <span class="op">=</span> <span class="ident">RelationPlaceholder</span> {
-                <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">clone</span>(),
-                <span class="ident">model_a</span>,
-                <span class="ident">model_b</span>,
-                <span class="ident">field_a</span>,
-                <span class="ident">field_b</span>,
-                <span class="ident">manifestation</span>,
+            <span class="kw">let </span>placeholder = RelationPlaceholder {
+                name: name.clone(),
+                model_a,
+                model_b,
+                field_a,
+                field_b,
+                manifestation,
             };
 
-            <span class="comment">// Skip duplicate placeholders</span>
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">result</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">placeholder</span>) {
-                <span class="ident">result</span>.<span class="ident">push</span>(<span class="ident">placeholder</span>);
+            <span class="comment">// Skip duplicate placeholders
+            </span><span class="kw">if </span>!result.contains(<span class="kw-2">&amp;</span>placeholder) {
+                result.push(placeholder);
             }
         }
     }
 
-    <span class="ident">result</span>
+    result
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RelationPlaceholder</span> {
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">model_a</span>: <span class="ident">dml::Model</span>,
-    <span class="kw">pub</span> <span class="ident">model_b</span>: <span class="ident">dml::Model</span>,
-    <span class="kw">pub</span> <span class="ident">field_a</span>: <span class="ident">dml::RelationField</span>,
-    <span class="kw">pub</span> <span class="ident">field_b</span>: <span class="ident">dml::RelationField</span>,
-    <span class="kw">pub</span> <span class="ident">manifestation</span>: <span class="ident">ManifestationPlaceholder</span>,
+<span class="attribute">#[derive(Debug, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>RelationPlaceholder {
+    <span class="kw">pub </span>name: String,
+    <span class="kw">pub </span>model_a: dml::Model,
+    <span class="kw">pub </span>model_b: dml::Model,
+    <span class="kw">pub </span>field_a: dml::RelationField,
+    <span class="kw">pub </span>field_b: dml::RelationField,
+    <span class="kw">pub </span>manifestation: ManifestationPlaceholder,
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::large_enum_variant</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ManifestationPlaceholder</span> {
-    <span class="ident">Inline</span> {
-        <span class="ident">in_table_of_model</span>: <span class="ident">String</span>,
-        <span class="doccomment">/// The relation field.</span>
-        <span class="ident">field</span>: <span class="ident">dml::RelationField</span>,
-        <span class="doccomment">/// The name of the (dml) fields referenced by the relation.</span>
-        <span class="ident">referenced_fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="attribute">#[allow(clippy::large_enum_variant)]
+#[derive(PartialEq, Debug, Clone)]
+</span><span class="kw">pub enum </span>ManifestationPlaceholder {
+    Inline {
+        in_table_of_model: String,
+        <span class="doccomment">/// The relation field.
+        </span>field: dml::RelationField,
+        <span class="doccomment">/// The name of the (dml) fields referenced by the relation.
+        </span>referenced_fields: Vec&lt;String&gt;,
     },
-    <span class="ident">Table</span>,
+    Table,
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
-<span class="kw">impl</span> <span class="ident">RelationPlaceholder</span> {
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="comment">// TODO: must replicate behaviour of `generateRelationName` from `SchemaInferrer`</span>
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span> <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
-            <span class="string">&quot;&quot;</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot;{}To{}&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">model_a</span>.<span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">model_b</span>.<span class="ident">name</span>),
-            <span class="kw">_</span> =&gt; <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
+<span class="attribute">#[allow(unused)]
+</span><span class="kw">impl </span>RelationPlaceholder {
+    <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="comment">// TODO: must replicate behaviour of `generateRelationName` from `SchemaInferrer`
+        </span><span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.name <span class="kw">as </span><span class="kw-2">&amp;</span>str {
+            <span class="string">&quot;&quot; </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot;{}To{}&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.model_a.name, <span class="kw-2">&amp;</span><span class="self">self</span>.model_b.name),
+            <span class="kw">_ </span>=&gt; <span class="self">self</span>.name.clone(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">table_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="macro">format!</span>(<span class="string">&quot;_{}&quot;</span>, <span class="self">self</span>.<span class="ident">name</span>())
+    <span class="kw">pub fn </span>table_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="macro">format!</span>(<span class="string">&quot;_{}&quot;</span>, <span class="self">self</span>.name())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model_a_column</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="string">&quot;A&quot;</span>.<span class="ident">to_string</span>()
+    <span class="kw">pub fn </span>model_a_column(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="string">&quot;A&quot;</span>.to_string()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model_b_column</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="string">&quot;B&quot;</span>.<span class="ident">to_string</span>()
+    <span class="kw">pub fn </span>model_b_column(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="string">&quot;B&quot;</span>.to_string()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_one_to_one</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="op">!</span><span class="self">self</span>.<span class="ident">field_a</span>.<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">field_b</span>.<span class="ident">is_list</span>()
+    <span class="kw">pub fn </span>is_one_to_one(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        !<span class="self">self</span>.field_a.is_list() &amp;&amp; !<span class="self">self</span>.field_b.is_list()
     }
 
-    <span class="kw">fn</span> <span class="ident">is_many_to_many</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">field_a</span>.<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">field_b</span>.<span class="ident">is_list</span>()
+    <span class="kw">fn </span>is_many_to_many(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.field_a.is_list() &amp;&amp; <span class="self">self</span>.field_b.is_list()
     }
 
-    <span class="kw">fn</span> <span class="ident">is_for_model_and_field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model</span>: <span class="kw-2">&amp;</span><span class="ident">dml::Model</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">dml::RelationField</span>) -&gt; <span class="ident">bool</span> {
-        (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">model_a</span> <span class="op">==</span> <span class="ident">model</span> <span class="op">&amp;&amp;</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">field_a</span> <span class="op">==</span> <span class="ident">field</span>) <span class="op">|</span><span class="op">|</span> (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">model_b</span> <span class="op">==</span> <span class="ident">model</span> <span class="op">&amp;&amp;</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">field_b</span> <span class="op">==</span> <span class="ident">field</span>)
+    <span class="kw">fn </span>is_for_model_and_field(<span class="kw-2">&amp;</span><span class="self">self</span>, model: <span class="kw-2">&amp;</span>dml::Model, field: <span class="kw-2">&amp;</span>dml::RelationField) -&gt; bool {
+        (<span class="kw-2">&amp;</span><span class="self">self</span>.model_a == model &amp;&amp; <span class="kw-2">&amp;</span><span class="self">self</span>.field_a == field) || (<span class="kw-2">&amp;</span><span class="self">self</span>.model_b == model &amp;&amp; <span class="kw-2">&amp;</span><span class="self">self</span>.field_b == field)
     }
 
-    <span class="kw">fn</span> <span class="ident">relation_side</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">field</span>: <span class="kw-2">&amp;</span><span class="ident">dml::RelationField</span>) -&gt; <span class="ident">RelationSide</span> {
-        <span class="kw">if</span> <span class="ident">field</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">field_a</span> {
-            <span class="ident">RelationSide::A</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">field</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">field_b</span> {
-            <span class="ident">RelationSide::B</span>
-        } <span class="kw">else</span> {
+    <span class="kw">fn </span>relation_side(<span class="kw-2">&amp;</span><span class="self">self</span>, field: <span class="kw-2">&amp;</span>dml::RelationField) -&gt; RelationSide {
+        <span class="kw">if </span>field == <span class="kw-2">&amp;</span><span class="self">self</span>.field_a {
+            RelationSide::A
+        } <span class="kw">else if </span>field == <span class="kw-2">&amp;</span><span class="self">self</span>.field_b {
+            RelationSide::B
+        } <span class="kw">else </span>{
             <span class="macro">panic!</span>(<span class="string">&quot;this field is not part of the relations&quot;</span>)
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">manifestation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RelationLinkManifestation</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">manifestation</span> {
-            <span class="comment">// TODO: relation table columns must get renamed: lowercased type names instead of A and B</span>
-            <span class="ident">ManifestationPlaceholder::Table</span> =&gt; <span class="ident">RelationLinkManifestation::RelationTable</span>(<span class="ident">RelationTable</span> {
-                <span class="ident">table</span>: <span class="self">self</span>.<span class="ident">table_name</span>(),
-                <span class="ident">model_a_column</span>: <span class="self">self</span>.<span class="ident">model_a_column</span>(),
-                <span class="ident">model_b_column</span>: <span class="self">self</span>.<span class="ident">model_b_column</span>(),
+    <span class="kw">fn </span>manifestation(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RelationLinkManifestation {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.manifestation {
+            <span class="comment">// TODO: relation table columns must get renamed: lowercased type names instead of A and B
+            </span>ManifestationPlaceholder::Table =&gt; RelationLinkManifestation::RelationTable(RelationTable {
+                table: <span class="self">self</span>.table_name(),
+                model_a_column: <span class="self">self</span>.model_a_column(),
+                model_b_column: <span class="self">self</span>.model_b_column(),
             }),
-            <span class="ident">ManifestationPlaceholder::Inline</span> { <span class="ident">in_table_of_model</span>, .. } =&gt; {
-                <span class="ident">RelationLinkManifestation::Inline</span>(<span class="ident">InlineRelation</span> {
-                    <span class="ident">in_table_of_model_name</span>: <span class="ident">in_table_of_model</span>.<span class="ident">to_string</span>(),
+            ManifestationPlaceholder::Inline { in_table_of_model, .. } =&gt; {
+                RelationLinkManifestation::Inline(InlineRelation {
+                    in_table_of_model_name: in_table_of_model.to_string(),
                 })
             }
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="prisma_models" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="prisma_models" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

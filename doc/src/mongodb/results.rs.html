@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/results.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>results.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mongodb/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/results.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>results.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mongodb/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -190,197 +190,197 @@
 <span id="190">190</span>
 <span id="191">191</span>
 <span id="192">192</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Contains the types of results returned by CRUD operations.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Contains the types of results returned by CRUD operations.
 
-<span class="kw">use</span> <span class="ident">std::collections</span>::{<span class="ident">HashMap</span>, <span class="ident">VecDeque</span>};
+</span><span class="kw">use </span>std::collections::{HashMap, VecDeque};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">bson</span>::{<span class="ident">Bson</span>, <span class="ident">Document</span>},
-    <span class="ident">bson_util</span>,
-    <span class="ident">change_stream::event::ResumeToken</span>,
-    <span class="ident">db::options::CreateCollectionOptions</span>,
+<span class="kw">use crate</span>::{
+    bson::{Bson, Document},
+    bson_util,
+    change_stream::event::ResumeToken,
+    db::options::CreateCollectionOptions,
 };
 
-<span class="kw">use</span> <span class="ident">bson</span>::{<span class="ident">Binary</span>, <span class="ident">RawDocumentBuf</span>};
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="kw">use </span>bson::{Binary, RawDocumentBuf};
+<span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="doccomment">/// The result of a [`Collection::insert_one`](../struct.Collection.html#method.insert_one)</span>
-<span class="doccomment">/// operation.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InsertOneResult</span> {
-    <span class="doccomment">/// The `_id` field of the document inserted.</span>
-    <span class="kw">pub</span> <span class="ident">inserted_id</span>: <span class="ident">Bson</span>,
+<span class="doccomment">/// The result of a [`Collection::insert_one`](../struct.Collection.html#method.insert_one)
+/// operation.
+</span><span class="attribute">#[derive(Debug, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>InsertOneResult {
+    <span class="doccomment">/// The `_id` field of the document inserted.
+    </span><span class="kw">pub </span>inserted_id: Bson,
 }
 
-<span class="kw">impl</span> <span class="ident">InsertOneResult</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_insert_many_result</span>(<span class="ident">result</span>: <span class="ident">InsertManyResult</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">inserted_id</span>: <span class="ident">result</span>.<span class="ident">inserted_ids</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="number">0</span>).<span class="ident">cloned</span>().<span class="ident">unwrap_or</span>(<span class="ident">Bson::Null</span>),
+<span class="kw">impl </span>InsertOneResult {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_insert_many_result(result: InsertManyResult) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            inserted_id: result.inserted_ids.get(<span class="kw-2">&amp;</span><span class="number">0</span>).cloned().unwrap_or(Bson::Null),
         }
     }
 }
 
-<span class="doccomment">/// The result of a [`Collection::insert_many`](../struct.Collection.html#method.insert_many)</span>
-<span class="doccomment">/// operation.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InsertManyResult</span> {
-    <span class="doccomment">/// The `_id` field of the documents inserted.</span>
-    <span class="kw">pub</span> <span class="ident">inserted_ids</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">Bson</span><span class="op">&gt;</span>,
+<span class="doccomment">/// The result of a [`Collection::insert_many`](../struct.Collection.html#method.insert_many)
+/// operation.
+</span><span class="attribute">#[derive(Debug, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>InsertManyResult {
+    <span class="doccomment">/// The `_id` field of the documents inserted.
+    </span><span class="kw">pub </span>inserted_ids: HashMap&lt;usize, Bson&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">InsertManyResult</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">InsertManyResult</span> {
-            <span class="ident">inserted_ids</span>: <span class="ident">HashMap::new</span>(),
+<span class="kw">impl </span>InsertManyResult {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
+        InsertManyResult {
+            inserted_ids: HashMap::new(),
         }
     }
 }
 
-<span class="doccomment">/// The result of a [`Collection::update_one`](../struct.Collection.html#method.update_one) or</span>
-<span class="doccomment">/// [`Collection::update_many`](../struct.Collection.html#method.update_many) operation.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UpdateResult</span> {
-    <span class="doccomment">/// The number of documents that matched the filter.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;crate::bson::serde_helpers::serialize_u64_as_i64&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">matched_count</span>: <span class="ident">u64</span>,
+<span class="doccomment">/// The result of a [`Collection::update_one`](../struct.Collection.html#method.update_one) or
+/// [`Collection::update_many`](../struct.Collection.html#method.update_many) operation.
+</span><span class="attribute">#[derive(Debug, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>UpdateResult {
+    <span class="doccomment">/// The number of documents that matched the filter.
+    </span><span class="attribute">#[serde(serialize_with = <span class="string">&quot;crate::bson::serde_helpers::serialize_u64_as_i64&quot;</span>)]
+    </span><span class="kw">pub </span>matched_count: u64,
 
-    <span class="doccomment">/// The number of documents that were modified by the operation.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;crate::bson::serde_helpers::serialize_u64_as_i64&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">modified_count</span>: <span class="ident">u64</span>,
+    <span class="doccomment">/// The number of documents that were modified by the operation.
+    </span><span class="attribute">#[serde(serialize_with = <span class="string">&quot;crate::bson::serde_helpers::serialize_u64_as_i64&quot;</span>)]
+    </span><span class="kw">pub </span>modified_count: u64,
 
-    <span class="doccomment">/// The `_id` field of the upserted document.</span>
-    <span class="kw">pub</span> <span class="ident">upserted_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Bson</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The `_id` field of the upserted document.
+    </span><span class="kw">pub </span>upserted_id: <span class="prelude-ty">Option</span>&lt;Bson&gt;,
 }
 
-<span class="doccomment">/// The result of a [`Collection::delete_one`](../struct.Collection.html#method.delete_one) or</span>
-<span class="doccomment">/// [`Collection::delete_many`](../struct.Collection.html#method.delete_many) operation.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DeleteResult</span> {
-    <span class="doccomment">/// The number of documents deleted by the operation.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;crate::bson::serde_helpers::serialize_u64_as_i64&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">deleted_count</span>: <span class="ident">u64</span>,
+<span class="doccomment">/// The result of a [`Collection::delete_one`](../struct.Collection.html#method.delete_one) or
+/// [`Collection::delete_many`](../struct.Collection.html#method.delete_many) operation.
+</span><span class="attribute">#[derive(Debug, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>DeleteResult {
+    <span class="doccomment">/// The number of documents deleted by the operation.
+    </span><span class="attribute">#[serde(serialize_with = <span class="string">&quot;crate::bson::serde_helpers::serialize_u64_as_i64&quot;</span>)]
+    </span><span class="kw">pub </span>deleted_count: u64,
 }
 
-<span class="doccomment">/// Information about the index created as a result of a</span>
-<span class="doccomment">/// [`Collection::create_index`](../struct.Collection.html#method.create_index).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateIndexResult</span> {
-    <span class="doccomment">/// The name of the index created in the `createIndex` command.</span>
-    <span class="kw">pub</span> <span class="ident">index_name</span>: <span class="ident">String</span>,
+<span class="doccomment">/// Information about the index created as a result of a
+/// [`Collection::create_index`](../struct.Collection.html#method.create_index).
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>CreateIndexResult {
+    <span class="doccomment">/// The name of the index created in the `createIndex` command.
+    </span><span class="kw">pub </span>index_name: String,
 }
 
-<span class="doccomment">/// Information about the indexes created as a result of a</span>
-<span class="doccomment">/// [`Collection::create_indexes`](../struct.Collection.html#method.create_indexes).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateIndexesResult</span> {
-    <span class="doccomment">/// The list containing the names of all indexes created in the `createIndexes` command.</span>
-    <span class="kw">pub</span> <span class="ident">index_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Information about the indexes created as a result of a
+/// [`Collection::create_indexes`](../struct.Collection.html#method.create_indexes).
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>CreateIndexesResult {
+    <span class="doccomment">/// The list containing the names of all indexes created in the `createIndexes` command.
+    </span><span class="kw">pub </span>index_names: Vec&lt;String&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">CreateIndexesResult</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_create_index_result</span>(<span class="self">self</span>) -&gt; <span class="ident">CreateIndexResult</span> {
-        <span class="ident">CreateIndexResult</span> {
-            <span class="ident">index_name</span>: <span class="self">self</span>.<span class="ident">index_names</span>.<span class="ident">into_iter</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>(),
+<span class="kw">impl </span>CreateIndexesResult {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>into_create_index_result(<span class="self">self</span>) -&gt; CreateIndexResult {
+        CreateIndexResult {
+            index_name: <span class="self">self</span>.index_names.into_iter().next().unwrap(),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">GetMoreResult</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">batch</span>: <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">RawDocumentBuf</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">exhausted</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">post_batch_resume_token</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ResumeToken</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>GetMoreResult {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) batch: VecDeque&lt;RawDocumentBuf&gt;,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) exhausted: bool,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) post_batch_resume_token: <span class="prelude-ty">Option</span>&lt;ResumeToken&gt;,
 }
 
-<span class="doccomment">/// Describes the type of data store returned when executing</span>
-<span class="doccomment">/// [`Database::list_collections`](../struct.Database.html#method.list_collections).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CollectionType</span> {
-    <span class="doccomment">/// Indicates that the data store is a view.</span>
-    <span class="ident">View</span>,
+<span class="doccomment">/// Describes the type of data store returned when executing
+/// [`Database::list_collections`](../struct.Database.html#method.list_collections).
+</span><span class="attribute">#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>CollectionType {
+    <span class="doccomment">/// Indicates that the data store is a view.
+    </span>View,
 
-    <span class="doccomment">/// Indicates that the data store is a collection.</span>
-    <span class="ident">Collection</span>,
+    <span class="doccomment">/// Indicates that the data store is a collection.
+    </span>Collection,
 }
 
-<span class="doccomment">/// Info about the collection that is contained in the `CollectionSpecification::info` field of a</span>
-<span class="doccomment">/// specification returned from</span>
-<span class="doccomment">/// [`Database::list_collections`](../struct.Database.html#method.list_collections).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See the MongoDB [manual](https://www.mongodb.com/docs/manual/reference/command/listCollections/#listCollections.cursor)</span>
-<span class="doccomment">/// for more information.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CollectionSpecificationInfo</span> {
-    <span class="doccomment">/// Indicates whether or not the data store is read-only.</span>
-    <span class="kw">pub</span> <span class="ident">read_only</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// Info about the collection that is contained in the `CollectionSpecification::info` field of a
+/// specification returned from
+/// [`Database::list_collections`](../struct.Database.html#method.list_collections).
+///
+/// See the MongoDB [manual](https://www.mongodb.com/docs/manual/reference/command/listCollections/#listCollections.cursor)
+/// for more information.
+</span><span class="attribute">#[derive(Debug, Clone, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>CollectionSpecificationInfo {
+    <span class="doccomment">/// Indicates whether or not the data store is read-only.
+    </span><span class="kw">pub </span>read_only: bool,
 
-    <span class="doccomment">/// The collection&#39;s UUID - once established, this does not change and remains the same across</span>
-    <span class="doccomment">/// replica set members and shards in a sharded cluster. If the data store is a view, this</span>
-    <span class="doccomment">/// field is `None`.</span>
-    <span class="kw">pub</span> <span class="ident">uuid</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Binary</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The collection&#39;s UUID - once established, this does not change and remains the same across
+    /// replica set members and shards in a sharded cluster. If the data store is a view, this
+    /// field is `None`.
+    </span><span class="kw">pub </span>uuid: <span class="prelude-ty">Option</span>&lt;Binary&gt;,
 }
 
-<span class="doccomment">/// Information about a collection as reported by</span>
-<span class="doccomment">/// [`Database::list_collections`](../struct.Database.html#method.list_collections).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CollectionSpecification</span> {
-    <span class="doccomment">/// The name of the collection.</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
+<span class="doccomment">/// Information about a collection as reported by
+/// [`Database::list_collections`](../struct.Database.html#method.list_collections).
+</span><span class="attribute">#[derive(Debug, Clone, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>CollectionSpecification {
+    <span class="doccomment">/// The name of the collection.
+    </span><span class="kw">pub </span>name: String,
 
-    <span class="doccomment">/// Type of the data store.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">collection_type</span>: <span class="ident">CollectionType</span>,
+    <span class="doccomment">/// Type of the data store.
+    </span><span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="kw">pub </span>collection_type: CollectionType,
 
-    <span class="doccomment">/// The options used to create the collection.</span>
-    <span class="kw">pub</span> <span class="ident">options</span>: <span class="ident">CreateCollectionOptions</span>,
+    <span class="doccomment">/// The options used to create the collection.
+    </span><span class="kw">pub </span>options: CreateCollectionOptions,
 
-    <span class="doccomment">/// Additional info pertaining to the collection.</span>
-    <span class="kw">pub</span> <span class="ident">info</span>: <span class="ident">CollectionSpecificationInfo</span>,
+    <span class="doccomment">/// Additional info pertaining to the collection.
+    </span><span class="kw">pub </span>info: CollectionSpecificationInfo,
 
-    <span class="doccomment">/// Provides information on the _id index for the collection</span>
-    <span class="doccomment">/// For views, this is `None`.</span>
-    <span class="kw">pub</span> <span class="ident">id_index</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Provides information on the _id index for the collection
+    /// For views, this is `None`.
+    </span><span class="kw">pub </span>id_index: <span class="prelude-ty">Option</span>&lt;Document&gt;,
 }
 
-<span class="doccomment">/// A struct modeling the information about an individual database returned from</span>
-<span class="doccomment">/// [`Client::list_databases`](../struct.Client.html#method.list_databases).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DatabaseSpecification</span> {
-    <span class="doccomment">/// The name of the database.</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
+<span class="doccomment">/// A struct modeling the information about an individual database returned from
+/// [`Client::list_databases`](../struct.Client.html#method.list_databases).
+</span><span class="attribute">#[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+#[non_exhaustive]
+</span><span class="kw">pub struct </span>DatabaseSpecification {
+    <span class="doccomment">/// The name of the database.
+    </span><span class="kw">pub </span>name: String,
 
-    <span class="doccomment">/// The amount of disk space in bytes that is consumed by the database.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(
-        <span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;bson_util::deserialize_u64_from_bson_number&quot;</span>,
-        <span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;crate::bson::serde_helpers::serialize_u64_as_i64&quot;</span>
-    )]</span>
-    <span class="kw">pub</span> <span class="ident">size_on_disk</span>: <span class="ident">u64</span>,
+    <span class="doccomment">/// The amount of disk space in bytes that is consumed by the database.
+    </span><span class="attribute">#[serde(
+        deserialize_with = <span class="string">&quot;bson_util::deserialize_u64_from_bson_number&quot;</span>,
+        serialize_with = <span class="string">&quot;crate::bson::serde_helpers::serialize_u64_as_i64&quot;
+    </span>)]
+    </span><span class="kw">pub </span>size_on_disk: u64,
 
-    <span class="doccomment">/// Whether the database has any data.</span>
-    <span class="kw">pub</span> <span class="ident">empty</span>: <span class="ident">bool</span>,
+    <span class="doccomment">/// Whether the database has any data.
+    </span><span class="kw">pub </span>empty: bool,
 
-    <span class="doccomment">/// For sharded clusters, this field includes a document which maps each shard to the size in</span>
-    <span class="doccomment">/// bytes of the database on disk on that shard. For non sharded environments, this field</span>
-    <span class="doccomment">/// is `None`.</span>
-    <span class="kw">pub</span> <span class="ident">shards</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// For sharded clusters, this field includes a document which maps each shard to the size in
+    /// bytes of the database on disk on that shard. For non sharded environments, this field
+    /// is `None`.
+    </span><span class="kw">pub </span>shards: <span class="prelude-ty">Option</span>&lt;Document&gt;,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

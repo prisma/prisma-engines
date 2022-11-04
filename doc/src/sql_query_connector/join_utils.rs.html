@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/sql-query-connector/src/join_utils.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>join_utils.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_query_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/sql-query-connector/src/join_utils.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>join_utils.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_query_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -256,263 +256,263 @@
 <span id="256">256</span>
 <span id="257">257</span>
 <span id="258">258</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">filter_conversion::AliasedCondition</span>, <span class="ident">model_extensions</span>::<span class="kw-2">*</span>};
-<span class="kw">use</span> <span class="ident">connector_interface::Filter</span>;
-<span class="kw">use</span> <span class="ident">prisma_models</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">quaint::prelude</span>::<span class="kw-2">*</span>;
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{filter_conversion::AliasedCondition, model_extensions::<span class="kw-2">*</span>};
+<span class="kw">use </span>connector_interface::Filter;
+<span class="kw">use </span>prisma_models::<span class="kw-2">*</span>;
+<span class="kw">use </span>quaint::prelude::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AliasedJoin</span> {
-    <span class="comment">// Actual join data to be passed to quaint</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">data</span>: <span class="ident">JoinData</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span><span class="op">&gt;</span>,
-    <span class="comment">// Alias used for the join. eg: LEFT JOIN ... AS &lt;alias&gt;</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">alias</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub struct </span>AliasedJoin {
+    <span class="comment">// Actual join data to be passed to quaint
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) data: JoinData&lt;<span class="lifetime">&#39;static</span>&gt;,
+    <span class="comment">// Alias used for the join. eg: LEFT JOIN ... AS &lt;alias&gt;
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) alias: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">AggregationType</span> {
-    <span class="ident">Count</span>,
+<span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub enum </span>AggregationType {
+    Count,
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compute_aggr_join</span>(
-    <span class="ident">rf</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-    <span class="ident">aggregation</span>: <span class="ident">AggregationType</span>,
-    <span class="ident">filter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>,
-    <span class="ident">aggregator_alias</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">join_alias</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">previous_join</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AliasedJoin</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">AliasedJoin</span> {
-    <span class="kw">let</span> <span class="ident">join_alias</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, <span class="ident">join_alias</span>, <span class="kw-2">&amp;</span><span class="ident">rf</span>.<span class="ident">related_model</span>().<span class="ident">name</span>);
+<span class="kw">pub fn </span>compute_aggr_join(
+    rf: <span class="kw-2">&amp;</span>RelationFieldRef,
+    aggregation: AggregationType,
+    filter: <span class="prelude-ty">Option</span>&lt;Filter&gt;,
+    aggregator_alias: <span class="kw-2">&amp;</span>str,
+    join_alias: <span class="kw-2">&amp;</span>str,
+    previous_join: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>AliasedJoin&gt;,
+) -&gt; AliasedJoin {
+    <span class="kw">let </span>join_alias = <span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, join_alias, <span class="kw-2">&amp;</span>rf.related_model().name);
 
-    <span class="kw">if</span> <span class="ident">rf</span>.<span class="ident">relation</span>().<span class="ident">is_many_to_many</span>() {
-        <span class="ident">compute_aggr_join_m2m</span>(
-            <span class="ident">rf</span>,
-            <span class="ident">aggregation</span>,
-            <span class="ident">filter</span>,
-            <span class="ident">aggregator_alias</span>,
-            <span class="ident">join_alias</span>.<span class="ident">as_str</span>(),
-            <span class="ident">previous_join</span>,
+    <span class="kw">if </span>rf.relation().is_many_to_many() {
+        compute_aggr_join_m2m(
+            rf,
+            aggregation,
+            filter,
+            aggregator_alias,
+            join_alias.as_str(),
+            previous_join,
         )
-    } <span class="kw">else</span> {
-        <span class="ident">compute_aggr_join_one2m</span>(
-            <span class="ident">rf</span>,
-            <span class="ident">aggregation</span>,
-            <span class="ident">filter</span>,
-            <span class="ident">aggregator_alias</span>,
-            <span class="ident">join_alias</span>.<span class="ident">as_str</span>(),
-            <span class="ident">previous_join</span>,
+    } <span class="kw">else </span>{
+        compute_aggr_join_one2m(
+            rf,
+            aggregation,
+            filter,
+            aggregator_alias,
+            join_alias.as_str(),
+            previous_join,
         )
     }
 }
 
-<span class="doccomment">/// Computes a one-to-many join for an aggregation (in aggregation selections, order by...).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Preview of the rendered SQL:</span>
-<span class="doccomment">/// ```sql</span>
-<span class="doccomment">/// LEFT JOIN (</span>
-<span class="doccomment">///     SELECT Child.&lt;fk&gt;, COUNT(*) AS &lt;AGGREGATOR_ALIAS&gt; FROM Child WHERE &lt;filter&gt;</span>
-<span class="doccomment">///     GROUP BY Child.&lt;fk&gt;</span>
-<span class="doccomment">/// ) AS &lt;ORDER_JOIN_PREFIX&gt; ON (&lt;Parent | previous_join_alias&gt;.&lt;fk&gt; = &lt;ORDER_JOIN_PREFIX&gt;.&lt;fk&gt;)</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">fn</span> <span class="ident">compute_aggr_join_one2m</span>(
-    <span class="ident">rf</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-    <span class="ident">aggregation</span>: <span class="ident">AggregationType</span>,
-    <span class="ident">filter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>,
-    <span class="ident">aggregator_alias</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">join_alias</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">previous_join</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AliasedJoin</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">AliasedJoin</span> {
-    <span class="kw">let</span> (<span class="ident">left_fields</span>, <span class="ident">right_fields</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">rf</span>.<span class="ident">is_inlined_on_enclosing_model</span>() {
-        (<span class="ident">rf</span>.<span class="ident">scalar_fields</span>(), <span class="ident">rf</span>.<span class="ident">referenced_fields</span>())
-    } <span class="kw">else</span> {
+<span class="doccomment">/// Computes a one-to-many join for an aggregation (in aggregation selections, order by...).
+///
+/// Preview of the rendered SQL:
+/// ```sql
+/// LEFT JOIN (
+///     SELECT Child.&lt;fk&gt;, COUNT(*) AS &lt;AGGREGATOR_ALIAS&gt; FROM Child WHERE &lt;filter&gt;
+///     GROUP BY Child.&lt;fk&gt;
+/// ) AS &lt;ORDER_JOIN_PREFIX&gt; ON (&lt;Parent | previous_join_alias&gt;.&lt;fk&gt; = &lt;ORDER_JOIN_PREFIX&gt;.&lt;fk&gt;)
+/// ```
+</span><span class="kw">fn </span>compute_aggr_join_one2m(
+    rf: <span class="kw-2">&amp;</span>RelationFieldRef,
+    aggregation: AggregationType,
+    filter: <span class="prelude-ty">Option</span>&lt;Filter&gt;,
+    aggregator_alias: <span class="kw-2">&amp;</span>str,
+    join_alias: <span class="kw-2">&amp;</span>str,
+    previous_join: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>AliasedJoin&gt;,
+) -&gt; AliasedJoin {
+    <span class="kw">let </span>(left_fields, right_fields) = <span class="kw">if </span>rf.is_inlined_on_enclosing_model() {
+        (rf.scalar_fields(), rf.referenced_fields())
+    } <span class="kw">else </span>{
         (
-            <span class="ident">rf</span>.<span class="ident">related_field</span>().<span class="ident">referenced_fields</span>(),
-            <span class="ident">rf</span>.<span class="ident">related_field</span>().<span class="ident">scalar_fields</span>(),
+            rf.related_field().referenced_fields(),
+            rf.related_field().scalar_fields(),
         )
     };
-    <span class="kw">let</span> <span class="ident">select_columns</span> <span class="op">=</span> <span class="ident">right_fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">as_column</span>());
-    <span class="kw">let</span> <span class="ident">conditions</span>: <span class="ident">ConditionTree</span> <span class="op">=</span> <span class="ident">filter</span>
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">aliased_condition_from</span>(<span class="prelude-val">None</span>, <span class="bool-val">false</span>))
-        .<span class="ident">unwrap_or</span>(<span class="ident">ConditionTree::NoCondition</span>);
+    <span class="kw">let </span>select_columns = right_fields.iter().map(|f| f.as_column());
+    <span class="kw">let </span>conditions: ConditionTree = filter
+        .map(|f| f.aliased_condition_from(<span class="prelude-val">None</span>, <span class="bool-val">false</span>))
+        .unwrap_or(ConditionTree::NoCondition);
 
-    <span class="comment">// + SELECT Child.&lt;fk&gt; FROM Child WHERE &lt;FILTER&gt;</span>
-    <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">Select::from_table</span>(<span class="ident">rf</span>.<span class="ident">related_model</span>().<span class="ident">as_table</span>())
-        .<span class="ident">columns</span>(<span class="ident">select_columns</span>)
-        .<span class="ident">so_that</span>(<span class="ident">conditions</span>);
-    <span class="kw">let</span> <span class="ident">aggr_expr</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">aggregation</span> {
-        <span class="ident">AggregationType::Count</span> =&gt; <span class="ident">count</span>(<span class="ident">asterisk</span>()),
+    <span class="comment">// + SELECT Child.&lt;fk&gt; FROM Child WHERE &lt;FILTER&gt;
+    </span><span class="kw">let </span>query = Select::from_table(rf.related_model().as_table())
+        .columns(select_columns)
+        .so_that(conditions);
+    <span class="kw">let </span>aggr_expr = <span class="kw">match </span>aggregation {
+        AggregationType::Count =&gt; count(asterisk()),
     };
 
-    <span class="comment">// SELECT Child.&lt;fk&gt;,</span>
-    <span class="comment">// + COUNT(*) AS &lt;AGGREGATOR_ALIAS&gt;</span>
-    <span class="comment">// FROM Child WHERE &lt;FILTER&gt;</span>
-    <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">query</span>.<span class="ident">value</span>(<span class="ident">aggr_expr</span>.<span class="ident">alias</span>(<span class="ident">aggregator_alias</span>.<span class="ident">to_owned</span>()));
+    <span class="comment">// SELECT Child.&lt;fk&gt;,
+    // + COUNT(*) AS &lt;AGGREGATOR_ALIAS&gt;
+    // FROM Child WHERE &lt;FILTER&gt;
+    </span><span class="kw">let </span>query = query.value(aggr_expr.alias(aggregator_alias.to_owned()));
 
-    <span class="comment">// SELECT Child.&lt;fk&gt;, COUNT(*) AS &lt;AGGREGATOR_ALIAS&gt; FROM Child WHERE &lt;FILTER&gt;</span>
-    <span class="comment">// + GROUP BY Child.&lt;fk&gt;</span>
-    <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">right_fields</span>.<span class="ident">iter</span>().<span class="ident">fold</span>(<span class="ident">query</span>, <span class="op">|</span><span class="ident">acc</span>, <span class="ident">f</span><span class="op">|</span> <span class="ident">acc</span>.<span class="ident">group_by</span>(<span class="ident">f</span>.<span class="ident">as_column</span>()));
+    <span class="comment">// SELECT Child.&lt;fk&gt;, COUNT(*) AS &lt;AGGREGATOR_ALIAS&gt; FROM Child WHERE &lt;FILTER&gt;
+    // + GROUP BY Child.&lt;fk&gt;
+    </span><span class="kw">let </span>query = right_fields.iter().fold(query, |acc, f| acc.group_by(f.as_column()));
 
-    <span class="kw">let</span> <span class="ident">pairs</span> <span class="op">=</span> <span class="ident">left_fields</span>.<span class="ident">into_iter</span>().<span class="ident">zip</span>(<span class="ident">right_fields</span>.<span class="ident">into_iter</span>());
-    <span class="kw">let</span> <span class="ident">on_conditions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">pairs</span>
-        .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">a</span>, <span class="ident">b</span>)<span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">col_a</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">previous_join</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">prev_join</span>) =&gt; <span class="ident">Column::from</span>((<span class="ident">prev_join</span>.<span class="ident">alias</span>.<span class="ident">to_owned</span>(), <span class="ident">a</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>())),
-                <span class="prelude-val">None</span> =&gt; <span class="ident">a</span>.<span class="ident">as_column</span>(),
+    <span class="kw">let </span>pairs = left_fields.into_iter().zip(right_fields.into_iter());
+    <span class="kw">let </span>on_conditions: Vec&lt;Expression&gt; = pairs
+        .map(|(a, b)| {
+            <span class="kw">let </span>col_a = <span class="kw">match </span>previous_join {
+                <span class="prelude-val">Some</span>(prev_join) =&gt; Column::from((prev_join.alias.to_owned(), a.db_name().to_owned())),
+                <span class="prelude-val">None </span>=&gt; a.as_column(),
             };
-            <span class="kw">let</span> <span class="ident">col_b</span> <span class="op">=</span> <span class="ident">Column::from</span>((<span class="ident">join_alias</span>.<span class="ident">to_owned</span>(), <span class="ident">b</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>()));
+            <span class="kw">let </span>col_b = Column::from((join_alias.to_owned(), b.db_name().to_owned()));
 
-            <span class="ident">col_a</span>.<span class="ident">equals</span>(<span class="ident">col_b</span>).<span class="ident">into</span>()
+            col_a.equals(col_b).into()
         })
-        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+        .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-    <span class="comment">// + LEFT JOIN (</span>
-    <span class="comment">//     SELECT Child.&lt;fk&gt;, COUNT(*) AS &lt;AGGREGATOR_ALIAS&gt; FROM Child WHERE &lt;FILTER&gt;</span>
-    <span class="comment">//     GROUP BY Child.&lt;fk&gt;</span>
-    <span class="comment">// + ) AS &lt;ORDER_JOIN_PREFIX&gt; ON (&lt;Parent | previous_join_alias&gt;.&lt;fk&gt; = &lt;ORDER_JOIN_PREFIX&gt;.&lt;fk&gt;)</span>
-    <span class="kw">let</span> <span class="ident">join</span> <span class="op">=</span> <span class="ident">Table::from</span>(<span class="ident">query</span>)
-        .<span class="ident">alias</span>(<span class="ident">join_alias</span>.<span class="ident">to_owned</span>())
-        .<span class="ident">on</span>(<span class="ident">ConditionTree::And</span>(<span class="ident">on_conditions</span>));
+    <span class="comment">// + LEFT JOIN (
+    //     SELECT Child.&lt;fk&gt;, COUNT(*) AS &lt;AGGREGATOR_ALIAS&gt; FROM Child WHERE &lt;FILTER&gt;
+    //     GROUP BY Child.&lt;fk&gt;
+    // + ) AS &lt;ORDER_JOIN_PREFIX&gt; ON (&lt;Parent | previous_join_alias&gt;.&lt;fk&gt; = &lt;ORDER_JOIN_PREFIX&gt;.&lt;fk&gt;)
+    </span><span class="kw">let </span>join = Table::from(query)
+        .alias(join_alias.to_owned())
+        .on(ConditionTree::And(on_conditions));
 
-    <span class="ident">AliasedJoin</span> {
-        <span class="ident">data</span>: <span class="ident">join</span>,
-        <span class="ident">alias</span>: <span class="ident">join_alias</span>.<span class="ident">to_owned</span>(),
+    AliasedJoin {
+        data: join,
+        alias: join_alias.to_owned(),
     }
 }
 
-<span class="doccomment">/// Compoutes a many-to-many join for an aggregation (in aggregation selections, order by...).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Preview of the rendered SQL:</span>
-<span class="doccomment">/// ```sql</span>
-<span class="doccomment">/// LEFT JOIN (</span>
-<span class="doccomment">///   SELECT _ParentToChild.ChildId, COUNT(_ParentToChild.ChildId) AS &lt;AGGREGATOR_ALIAS&gt; FROM Child WHERE &lt;FILTER&gt;</span>
-<span class="doccomment">///   LEFT JOIN _ParentToChild ON (Child.id = _ParentToChild.ChildId)</span>
-<span class="doccomment">///   GROUP BY _ParentToChild.ChildId</span>
-<span class="doccomment">/// ) AS &lt;ORDER_JOIN_PREFIX&gt; ON (&lt;Parent | previous_join_alias&gt;.id = &lt;ORDER_JOIN_PREFIX&gt;.ChildId)</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">fn</span> <span class="ident">compute_aggr_join_m2m</span>(
-    <span class="ident">rf</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-    <span class="ident">aggregation</span>: <span class="ident">AggregationType</span>,
-    <span class="ident">filter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Filter</span><span class="op">&gt;</span>,
-    <span class="ident">aggregator_alias</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">join_alias</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">previous_join</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AliasedJoin</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">AliasedJoin</span> {
-    <span class="comment">// m2m join table (_ParentToChild)</span>
-    <span class="kw">let</span> <span class="ident">m2m_table</span> <span class="op">=</span> <span class="ident">rf</span>.<span class="ident">as_table</span>();
-    <span class="comment">// Child colums on the m2m join table (_ParentToChild.ChildId)</span>
-    <span class="kw">let</span> <span class="ident">m2m_child_columns</span> <span class="op">=</span> <span class="ident">rf</span>.<span class="ident">related_field</span>().<span class="ident">m2m_columns</span>();
-    <span class="comment">// Child table</span>
-    <span class="kw">let</span> <span class="ident">child_model</span> <span class="op">=</span> <span class="ident">rf</span>.<span class="ident">related_model</span>();
-    <span class="comment">// Child primary identifiers</span>
-    <span class="kw">let</span> <span class="ident">child_ids</span>: <span class="ident">ModelProjection</span> <span class="op">=</span> <span class="ident">rf</span>.<span class="ident">related_model</span>().<span class="ident">primary_identifier</span>().<span class="ident">into</span>();
-    <span class="comment">// Parent primary identifiers</span>
-    <span class="kw">let</span> <span class="ident">parent_ids</span>: <span class="ident">ModelProjection</span> <span class="op">=</span> <span class="ident">rf</span>.<span class="ident">model</span>().<span class="ident">primary_identifier</span>().<span class="ident">into</span>();
-    <span class="comment">// Rendered filters</span>
-    <span class="kw">let</span> <span class="ident">conditions</span>: <span class="ident">ConditionTree</span> <span class="op">=</span> <span class="ident">filter</span>
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">aliased_condition_from</span>(<span class="prelude-val">None</span>, <span class="bool-val">false</span>))
-        .<span class="ident">unwrap_or</span>(<span class="ident">ConditionTree::NoCondition</span>);
+<span class="doccomment">/// Compoutes a many-to-many join for an aggregation (in aggregation selections, order by...).
+///
+/// Preview of the rendered SQL:
+/// ```sql
+/// LEFT JOIN (
+///   SELECT _ParentToChild.ChildId, COUNT(_ParentToChild.ChildId) AS &lt;AGGREGATOR_ALIAS&gt; FROM Child WHERE &lt;FILTER&gt;
+///   LEFT JOIN _ParentToChild ON (Child.id = _ParentToChild.ChildId)
+///   GROUP BY _ParentToChild.ChildId
+/// ) AS &lt;ORDER_JOIN_PREFIX&gt; ON (&lt;Parent | previous_join_alias&gt;.id = &lt;ORDER_JOIN_PREFIX&gt;.ChildId)
+/// ```
+</span><span class="kw">fn </span>compute_aggr_join_m2m(
+    rf: <span class="kw-2">&amp;</span>RelationFieldRef,
+    aggregation: AggregationType,
+    filter: <span class="prelude-ty">Option</span>&lt;Filter&gt;,
+    aggregator_alias: <span class="kw-2">&amp;</span>str,
+    join_alias: <span class="kw-2">&amp;</span>str,
+    previous_join: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>AliasedJoin&gt;,
+) -&gt; AliasedJoin {
+    <span class="comment">// m2m join table (_ParentToChild)
+    </span><span class="kw">let </span>m2m_table = rf.as_table();
+    <span class="comment">// Child colums on the m2m join table (_ParentToChild.ChildId)
+    </span><span class="kw">let </span>m2m_child_columns = rf.related_field().m2m_columns();
+    <span class="comment">// Child table
+    </span><span class="kw">let </span>child_model = rf.related_model();
+    <span class="comment">// Child primary identifiers
+    </span><span class="kw">let </span>child_ids: ModelProjection = rf.related_model().primary_identifier().into();
+    <span class="comment">// Parent primary identifiers
+    </span><span class="kw">let </span>parent_ids: ModelProjection = rf.model().primary_identifier().into();
+    <span class="comment">// Rendered filters
+    </span><span class="kw">let </span>conditions: ConditionTree = filter
+        .map(|f| f.aliased_condition_from(<span class="prelude-val">None</span>, <span class="bool-val">false</span>))
+        .unwrap_or(ConditionTree::NoCondition);
 
-    <span class="comment">// + SELECT _ParentToChild.ChildId FROM Child WHERE &lt;FILTER&gt;</span>
-    <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">Select::from_table</span>(<span class="ident">child_model</span>.<span class="ident">as_table</span>())
-        .<span class="ident">columns</span>(<span class="ident">m2m_child_columns</span>.<span class="ident">clone</span>())
-        .<span class="ident">so_that</span>(<span class="ident">conditions</span>);
+    <span class="comment">// + SELECT _ParentToChild.ChildId FROM Child WHERE &lt;FILTER&gt;
+    </span><span class="kw">let </span>query = Select::from_table(child_model.as_table())
+        .columns(m2m_child_columns.clone())
+        .so_that(conditions);
 
-    <span class="kw">let</span> <span class="ident">aggr_expr</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">aggregation</span> {
-        <span class="ident">AggregationType::Count</span> =&gt; <span class="ident">count</span>(<span class="ident">m2m_child_columns</span>.<span class="ident">clone</span>()),
+    <span class="kw">let </span>aggr_expr = <span class="kw">match </span>aggregation {
+        AggregationType::Count =&gt; count(m2m_child_columns.clone()),
     };
 
-    <span class="comment">// SELECT _ParentToChild.ChildId,</span>
-    <span class="comment">// + COUNT(_ParentToChild.ChildId) AS &lt;AGGREGATOR_ALIAS&gt;</span>
-    <span class="comment">// FROM Child WHERE &lt;FILTER&gt;</span>
-    <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">query</span>.<span class="ident">value</span>(<span class="ident">aggr_expr</span>.<span class="ident">alias</span>(<span class="ident">aggregator_alias</span>.<span class="ident">to_owned</span>()));
+    <span class="comment">// SELECT _ParentToChild.ChildId,
+    // + COUNT(_ParentToChild.ChildId) AS &lt;AGGREGATOR_ALIAS&gt;
+    // FROM Child WHERE &lt;FILTER&gt;
+    </span><span class="kw">let </span>query = query.value(aggr_expr.alias(aggregator_alias.to_owned()));
 
-    <span class="kw">let</span> <span class="ident">left_join_conditions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">child_ids</span>
-        .<span class="ident">as_columns</span>()
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">equals</span>(<span class="ident">rf</span>.<span class="ident">m2m_columns</span>()).<span class="ident">into</span>())
-        .<span class="ident">collect</span>();
+    <span class="kw">let </span>left_join_conditions: Vec&lt;Expression&gt; = child_ids
+        .as_columns()
+        .into_iter()
+        .map(|c| c.equals(rf.m2m_columns()).into())
+        .collect();
 
-    <span class="comment">// SELECT _ParentToChild.ChildId, COUNT(_ParentToChild.ChildId) AS &lt;AGGREGATOR_ALIAS&gt; FROM Child WHERE &lt;FILTER&gt;</span>
-    <span class="comment">// + LEFT JOIN _ParentToChild ON (Child.id = _ParenTtoChild.ChildId)</span>
-    <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">query</span>.<span class="ident">left_join</span>(<span class="ident">m2m_table</span>.<span class="ident">on</span>(<span class="ident">ConditionTree::And</span>(<span class="ident">left_join_conditions</span>)));
+    <span class="comment">// SELECT _ParentToChild.ChildId, COUNT(_ParentToChild.ChildId) AS &lt;AGGREGATOR_ALIAS&gt; FROM Child WHERE &lt;FILTER&gt;
+    // + LEFT JOIN _ParentToChild ON (Child.id = _ParenTtoChild.ChildId)
+    </span><span class="kw">let </span>query = query.left_join(m2m_table.on(ConditionTree::And(left_join_conditions)));
 
-    <span class="comment">// SELECT _ParentToChild.ChildId, COUNT(_ParentToChild.ChildId) AS &lt;AGGREGATOR_ALIAS&gt; FROM Child WHERE &lt;FILTER&gt;</span>
-    <span class="comment">// LEFT JOIN _ParentToChild ON (Child.id = _ParentToChild.ChildId)</span>
-    <span class="comment">// + GROUP BY _ParentToChild.ChildId</span>
-    <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">rf</span>
-        .<span class="ident">related_field</span>()
-        .<span class="ident">m2m_columns</span>()
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">fold</span>(<span class="ident">query</span>, <span class="op">|</span><span class="ident">acc</span>, <span class="ident">f</span><span class="op">|</span> <span class="ident">acc</span>.<span class="ident">group_by</span>(<span class="ident">f</span>.<span class="ident">clone</span>()));
+    <span class="comment">// SELECT _ParentToChild.ChildId, COUNT(_ParentToChild.ChildId) AS &lt;AGGREGATOR_ALIAS&gt; FROM Child WHERE &lt;FILTER&gt;
+    // LEFT JOIN _ParentToChild ON (Child.id = _ParentToChild.ChildId)
+    // + GROUP BY _ParentToChild.ChildId
+    </span><span class="kw">let </span>query = rf
+        .related_field()
+        .m2m_columns()
+        .into_iter()
+        .fold(query, |acc, f| acc.group_by(f.clone()));
 
-    <span class="kw">let</span> (<span class="ident">left_fields</span>, <span class="ident">right_fields</span>) <span class="op">=</span> (<span class="ident">parent_ids</span>.<span class="ident">scalar_fields</span>(), <span class="ident">m2m_child_columns</span>);
-    <span class="kw">let</span> <span class="ident">pairs</span> <span class="op">=</span> <span class="ident">left_fields</span>.<span class="ident">zip</span>(<span class="ident">right_fields</span>);
-    <span class="kw">let</span> <span class="ident">on_conditions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">pairs</span>
-        .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">a</span>, <span class="ident">b</span>)<span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">col_a</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">previous_join</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">prev_join</span>) =&gt; <span class="ident">Column::from</span>((<span class="ident">prev_join</span>.<span class="ident">alias</span>.<span class="ident">to_owned</span>(), <span class="ident">a</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>())),
-                <span class="prelude-val">None</span> =&gt; <span class="ident">a</span>.<span class="ident">as_column</span>(),
+    <span class="kw">let </span>(left_fields, right_fields) = (parent_ids.scalar_fields(), m2m_child_columns);
+    <span class="kw">let </span>pairs = left_fields.zip(right_fields);
+    <span class="kw">let </span>on_conditions: Vec&lt;Expression&gt; = pairs
+        .map(|(a, b)| {
+            <span class="kw">let </span>col_a = <span class="kw">match </span>previous_join {
+                <span class="prelude-val">Some</span>(prev_join) =&gt; Column::from((prev_join.alias.to_owned(), a.db_name().to_owned())),
+                <span class="prelude-val">None </span>=&gt; a.as_column(),
             };
-            <span class="kw">let</span> <span class="ident">col_b</span> <span class="op">=</span> <span class="ident">Column::from</span>((<span class="ident">join_alias</span>.<span class="ident">to_owned</span>(), <span class="ident">b</span>.<span class="ident">name</span>.<span class="ident">to_string</span>()));
+            <span class="kw">let </span>col_b = Column::from((join_alias.to_owned(), b.name.to_string()));
 
-            <span class="ident">col_a</span>.<span class="ident">equals</span>(<span class="ident">col_b</span>).<span class="ident">into</span>()
+            col_a.equals(col_b).into()
         })
-        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+        .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-    <span class="comment">// + LEFT JOIN (</span>
-    <span class="comment">//     SELECT _ParentToChild.ChildId, COUNT(_ParentToChild.ChildId) AS &lt;AGGREGATOR_ALIAS&gt; FROM Child WHERE &lt;FILTER&gt;</span>
-    <span class="comment">//     LEFT JOIN _ParentToChild ON (Child.id = _ParentToChild.ChildId)</span>
-    <span class="comment">//     GROUP BY _ParentToChild.ChildId</span>
-    <span class="comment">// + ) AS &lt;ORDER_JOIN_PREFIX&gt; ON (&lt;Parent | previous_join_alias&gt;.id = &lt;ORDER_JOIN_PREFIX&gt;.ChildId)</span>
-    <span class="kw">let</span> <span class="ident">join</span> <span class="op">=</span> <span class="ident">Table::from</span>(<span class="ident">query</span>)
-        .<span class="ident">alias</span>(<span class="ident">join_alias</span>.<span class="ident">to_owned</span>())
-        .<span class="ident">on</span>(<span class="ident">ConditionTree::And</span>(<span class="ident">on_conditions</span>));
+    <span class="comment">// + LEFT JOIN (
+    //     SELECT _ParentToChild.ChildId, COUNT(_ParentToChild.ChildId) AS &lt;AGGREGATOR_ALIAS&gt; FROM Child WHERE &lt;FILTER&gt;
+    //     LEFT JOIN _ParentToChild ON (Child.id = _ParentToChild.ChildId)
+    //     GROUP BY _ParentToChild.ChildId
+    // + ) AS &lt;ORDER_JOIN_PREFIX&gt; ON (&lt;Parent | previous_join_alias&gt;.id = &lt;ORDER_JOIN_PREFIX&gt;.ChildId)
+    </span><span class="kw">let </span>join = Table::from(query)
+        .alias(join_alias.to_owned())
+        .on(ConditionTree::And(on_conditions));
 
-    <span class="ident">AliasedJoin</span> {
-        <span class="ident">alias</span>: <span class="ident">join_alias</span>.<span class="ident">to_owned</span>(),
-        <span class="ident">data</span>: <span class="ident">join</span>,
+    AliasedJoin {
+        alias: join_alias.to_owned(),
+        data: join,
     }
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compute_one2m_join</span>(
-    <span class="ident">rf</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-    <span class="ident">join_prefix</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-    <span class="ident">previous_join</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">AliasedJoin</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">AliasedJoin</span> {
-    <span class="kw">let</span> (<span class="ident">left_fields</span>, <span class="ident">right_fields</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">rf</span>.<span class="ident">is_inlined_on_enclosing_model</span>() {
-        (<span class="ident">rf</span>.<span class="ident">scalar_fields</span>(), <span class="ident">rf</span>.<span class="ident">referenced_fields</span>())
-    } <span class="kw">else</span> {
+<span class="kw">pub fn </span>compute_one2m_join(
+    rf: <span class="kw-2">&amp;</span>RelationFieldRef,
+    join_prefix: <span class="kw-2">&amp;</span>str,
+    previous_join: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>AliasedJoin&gt;,
+) -&gt; AliasedJoin {
+    <span class="kw">let </span>(left_fields, right_fields) = <span class="kw">if </span>rf.is_inlined_on_enclosing_model() {
+        (rf.scalar_fields(), rf.referenced_fields())
+    } <span class="kw">else </span>{
         (
-            <span class="ident">rf</span>.<span class="ident">related_field</span>().<span class="ident">referenced_fields</span>(),
-            <span class="ident">rf</span>.<span class="ident">related_field</span>().<span class="ident">scalar_fields</span>(),
+            rf.related_field().referenced_fields(),
+            rf.related_field().scalar_fields(),
         )
     };
 
-    <span class="kw">let</span> <span class="ident">right_table_alias</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, <span class="ident">join_prefix</span>, <span class="kw-2">&amp;</span><span class="ident">rf</span>.<span class="ident">related_model</span>().<span class="ident">name</span>);
+    <span class="kw">let </span>right_table_alias = <span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, join_prefix, <span class="kw-2">&amp;</span>rf.related_model().name);
 
-    <span class="kw">let</span> <span class="ident">related_model</span> <span class="op">=</span> <span class="ident">rf</span>.<span class="ident">related_model</span>();
-    <span class="kw">let</span> <span class="ident">pairs</span> <span class="op">=</span> <span class="ident">left_fields</span>.<span class="ident">into_iter</span>().<span class="ident">zip</span>(<span class="ident">right_fields</span>.<span class="ident">into_iter</span>());
+    <span class="kw">let </span>related_model = rf.related_model();
+    <span class="kw">let </span>pairs = left_fields.into_iter().zip(right_fields.into_iter());
 
-    <span class="kw">let</span> <span class="ident">on_conditions</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Expression</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">pairs</span>
-        .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">a</span>, <span class="ident">b</span>)<span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">a_col</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">previous_join</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">prev_join</span>) =&gt; <span class="ident">Column::from</span>((<span class="ident">prev_join</span>.<span class="ident">alias</span>.<span class="ident">to_owned</span>(), <span class="ident">a</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>())),
-                <span class="prelude-val">None</span> =&gt; <span class="ident">a</span>.<span class="ident">as_column</span>(),
+    <span class="kw">let </span>on_conditions: Vec&lt;Expression&gt; = pairs
+        .map(|(a, b)| {
+            <span class="kw">let </span>a_col = <span class="kw">match </span>previous_join {
+                <span class="prelude-val">Some</span>(prev_join) =&gt; Column::from((prev_join.alias.to_owned(), a.db_name().to_owned())),
+                <span class="prelude-val">None </span>=&gt; a.as_column(),
             };
 
-            <span class="kw">let</span> <span class="ident">b_col</span> <span class="op">=</span> <span class="ident">Column::from</span>((<span class="ident">right_table_alias</span>.<span class="ident">clone</span>(), <span class="ident">b</span>.<span class="ident">db_name</span>().<span class="ident">to_owned</span>()));
+            <span class="kw">let </span>b_col = Column::from((right_table_alias.clone(), b.db_name().to_owned()));
 
-            <span class="ident">a_col</span>.<span class="ident">equals</span>(<span class="ident">b_col</span>).<span class="ident">into</span>()
+            a_col.equals(b_col).into()
         })
-        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+        .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-    <span class="ident">AliasedJoin</span> {
-        <span class="ident">alias</span>: <span class="ident">right_table_alias</span>.<span class="ident">to_owned</span>(),
-        <span class="ident">data</span>: <span class="ident">related_model</span>
-            .<span class="ident">as_table</span>()
-            .<span class="ident">alias</span>(<span class="ident">right_table_alias</span>)
-            .<span class="ident">on</span>(<span class="ident">ConditionTree::And</span>(<span class="ident">on_conditions</span>)),
+    AliasedJoin {
+        alias: right_table_alias.to_owned(),
+        data: related_model
+            .as_table()
+            .alias(right_table_alias)
+            .on(ConditionTree::And(on_conditions)),
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

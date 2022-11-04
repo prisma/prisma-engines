@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/sql-schema-describer/src/walkers.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>walkers.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_schema_describer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_schema_describer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_schema_describer/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/sql-schema-describer/src/walkers.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>walkers.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_schema_describer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_schema_describer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_schema_describer/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -481,488 +481,488 @@
 <span id="481">481</span>
 <span id="482">482</span>
 <span id="483">483</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Functions and types for conveniently traversing and querying a SqlSchema.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Functions and types for conveniently traversing and querying a SqlSchema.
 
-<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_docs</span>)]</span>
+</span><span class="attribute">#![deny(missing_docs)]
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">ids</span>::<span class="kw-2">*</span>, <span class="ident">Column</span>, <span class="ident">ColumnArity</span>, <span class="ident">ColumnType</span>, <span class="ident">ColumnTypeFamily</span>, <span class="ident">DefaultValue</span>, <span class="ident">Enum</span>, <span class="ident">ForeignKey</span>, <span class="ident">ForeignKeyAction</span>,
-    <span class="ident">ForeignKeyColumn</span>, <span class="ident">Index</span>, <span class="ident">IndexColumn</span>, <span class="ident">IndexType</span>, <span class="ident">SQLSortOrder</span>, <span class="ident">SqlSchema</span>, <span class="ident">Table</span>, <span class="ident">UserDefinedType</span>, <span class="ident">View</span>,
+</span><span class="kw">use crate</span>::{
+    ids::<span class="kw-2">*</span>, Column, ColumnArity, ColumnType, ColumnTypeFamily, DefaultValue, Enum, ForeignKey, ForeignKeyAction,
+    ForeignKeyColumn, Index, IndexColumn, IndexType, SQLSortOrder, SqlSchema, Table, UserDefinedType, View,
 };
-<span class="kw">use</span> <span class="ident">std::ops::Range</span>;
+<span class="kw">use </span>std::ops::Range;
 
-<span class="doccomment">/// A generic reference to a schema item. It holds a reference to the schema so it can offer a</span>
-<span class="doccomment">/// convenient API based on the Id type.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Walker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Id</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The identifier.</span>
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">Id</span>,
-    <span class="doccomment">/// The schema for which the identifier is valid.</span>
-    <span class="kw">pub</span> <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">SqlSchema</span>,
+<span class="doccomment">/// A generic reference to a schema item. It holds a reference to the schema so it can offer a
+/// convenient API based on the Id type.
+</span><span class="attribute">#[derive(Clone, Copy)]
+</span><span class="kw">pub struct </span>Walker&lt;<span class="lifetime">&#39;a</span>, Id&gt; {
+    <span class="doccomment">/// The identifier.
+    </span><span class="kw">pub </span>id: Id,
+    <span class="doccomment">/// The schema for which the identifier is valid.
+    </span><span class="kw">pub </span>schema: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>SqlSchema,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>: <span class="ident">std::fmt::Debug</span><span class="op">&gt;</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">Walker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">I</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="ident">std::any::type_name</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>())
-            .<span class="ident">field</span>(<span class="string">&quot;id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">id</span>)
-            .<span class="ident">finish</span>()
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Id</span><span class="op">&gt;</span> <span class="ident">Walker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">Id</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Jump to the item identified by `other_id`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">walk</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">other_id</span>: <span class="ident">I</span>) -&gt; <span class="ident">Walker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">I</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">walk</span>(<span class="ident">other_id</span>)
+<span class="kw">impl</span>&lt;I: std::fmt::Debug&gt; std::fmt::Debug <span class="kw">for </span>Walker&lt;<span class="lifetime">&#39;_</span>, I&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        f.debug_struct(std::any::type_name::&lt;<span class="self">Self</span>&gt;())
+            .field(<span class="string">&quot;id&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.id)
+            .finish()
     }
 }
 
-<span class="doccomment">/// Traverse a foreign key.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Walker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ForeignKeyId</span><span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, Id&gt; Walker&lt;<span class="lifetime">&#39;a</span>, Id&gt; {
+    <span class="doccomment">/// Jump to the item identified by `other_id`.
+    </span><span class="kw">pub fn </span>walk&lt;I&gt;(<span class="self">self</span>, other_id: I) -&gt; Walker&lt;<span class="lifetime">&#39;a</span>, I&gt; {
+        <span class="self">self</span>.schema.walk(other_id)
+    }
+}
 
-<span class="doccomment">/// Traverse column.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Walker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ColumnId</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Traverse a foreign key.
+</span><span class="kw">pub type </span>ForeignKeyWalker&lt;<span class="lifetime">&#39;a</span>&gt; = Walker&lt;<span class="lifetime">&#39;a</span>, ForeignKeyId&gt;;
 
-<span class="doccomment">/// Traverse a table.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Walker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">TableId</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Traverse column.
+</span><span class="kw">pub type </span>ColumnWalker&lt;<span class="lifetime">&#39;a</span>&gt; = Walker&lt;<span class="lifetime">&#39;a</span>, ColumnId&gt;;
 
-<span class="doccomment">/// Traverse an enum.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Walker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">EnumId</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Traverse a table.
+</span><span class="kw">pub type </span>TableWalker&lt;<span class="lifetime">&#39;a</span>&gt; = Walker&lt;<span class="lifetime">&#39;a</span>, TableId&gt;;
 
-<span class="doccomment">/// Traverse an index.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Walker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">IndexId</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Traverse an enum.
+</span><span class="kw">pub type </span>EnumWalker&lt;<span class="lifetime">&#39;a</span>&gt; = Walker&lt;<span class="lifetime">&#39;a</span>, EnumId&gt;;
 
-<span class="doccomment">/// Traverse a specific column inside an index.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">IndexColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Walker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">IndexColumnId</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Traverse an index.
+</span><span class="kw">pub type </span>IndexWalker&lt;<span class="lifetime">&#39;a</span>&gt; = Walker&lt;<span class="lifetime">&#39;a</span>, IndexId&gt;;
 
-<span class="doccomment">/// Traverse a namespace</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">NamespaceWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Walker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">NamespaceId</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Traverse a specific column inside an index.
+</span><span class="kw">pub type </span>IndexColumnWalker&lt;<span class="lifetime">&#39;a</span>&gt; = Walker&lt;<span class="lifetime">&#39;a</span>, IndexColumnId&gt;;
 
-<span class="doccomment">/// Traverse a user-defined type</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">UserDefinedTypeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Walker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">UdtId</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Traverse a namespace
+</span><span class="kw">pub type </span>NamespaceWalker&lt;<span class="lifetime">&#39;a</span>&gt; = Walker&lt;<span class="lifetime">&#39;a</span>, NamespaceId&gt;;
 
-<span class="doccomment">/// Traverse a view</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">ViewWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Walker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ViewId</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Traverse a user-defined type
+</span><span class="kw">pub type </span>UserDefinedTypeWalker&lt;<span class="lifetime">&#39;a</span>&gt; = Walker&lt;<span class="lifetime">&#39;a</span>, UdtId&gt;;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The nullability and arity of the column.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">arity</span>(<span class="self">self</span>) -&gt; <span class="ident">ColumnArity</span> {
-        <span class="self">self</span>.<span class="ident">get</span>().<span class="number">1</span>.<span class="ident">tpe</span>.<span class="ident">arity</span>
+<span class="doccomment">/// Traverse a view
+</span><span class="kw">pub type </span>ViewWalker&lt;<span class="lifetime">&#39;a</span>&gt; = Walker&lt;<span class="lifetime">&#39;a</span>, ViewId&gt;;
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ColumnWalker&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// The nullability and arity of the column.
+    </span><span class="kw">pub fn </span>arity(<span class="self">self</span>) -&gt; ColumnArity {
+        <span class="self">self</span>.get().<span class="number">1</span>.tpe.arity
     }
 
-    <span class="kw">fn</span> <span class="ident">get</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> (<span class="ident">TableId</span>, <span class="ident">Column</span>) {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">columns</span>[<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>]
+    <span class="kw">fn </span>get(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>(TableId, Column) {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.schema.columns[<span class="self">self</span>.id.<span class="number">0 </span><span class="kw">as </span>usize]
     }
 
-    <span class="doccomment">/// Returns whether the column has the enum default value of the given enum type.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_has_enum_default_value</span>(<span class="self">self</span>, <span class="ident">enum_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">column_type_family_as_enum</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">enm</span><span class="op">|</span> <span class="ident">enm</span>.<span class="ident">name</span>()) <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">enum_name</span>)
-            <span class="op">&amp;&amp;</span> <span class="self">self</span>
-                .<span class="ident">default</span>()
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">default</span><span class="op">|</span> <span class="ident">default</span>.<span class="ident">as_value</span>())
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">as_enum_value</span>())
-                <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>)
+    <span class="doccomment">/// Returns whether the column has the enum default value of the given enum type.
+    </span><span class="kw">pub fn </span>column_has_enum_default_value(<span class="self">self</span>, enum_name: <span class="kw-2">&amp;</span>str, value: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        <span class="self">self</span>.column_type_family_as_enum().map(|enm| enm.name()) == <span class="prelude-val">Some</span>(enum_name)
+            &amp;&amp; <span class="self">self
+                </span>.default()
+                .and_then(|default| default.as_value())
+                .and_then(|value| value.as_enum_value())
+                == <span class="prelude-val">Some</span>(value)
     }
 
-    <span class="doccomment">/// Returns whether the type of the column matches the provided enum name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_type_is_enum</span>(<span class="self">self</span>, <span class="ident">enum_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">column_type_family_as_enum</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">enm</span><span class="op">|</span> <span class="ident">enm</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">enum_name</span>)
-            .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+    <span class="doccomment">/// Returns whether the type of the column matches the provided enum name.
+    </span><span class="kw">pub fn </span>column_type_is_enum(<span class="self">self</span>, enum_name: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        <span class="self">self</span>.column_type_family_as_enum()
+            .map(|enm| enm.name() == enum_name)
+            .unwrap_or(<span class="bool-val">false</span>)
     }
 
-    <span class="doccomment">/// The type family.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_type_family</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ColumnTypeFamily</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">get</span>().<span class="number">1</span>.<span class="ident">tpe</span>.<span class="ident">family</span>
+    <span class="doccomment">/// The type family.
+    </span><span class="kw">pub fn </span>column_type_family(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ColumnTypeFamily {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.get().<span class="number">1</span>.tpe.family
     }
 
-    <span class="doccomment">/// Extract an `Enum` column type family, or `None` if the family is something else.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_type_family_as_enum</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">column_type_family</span>().<span class="ident">as_enum</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">enum_id</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">walk</span>(<span class="ident">enum_id</span>))
+    <span class="doccomment">/// Extract an `Enum` column type family, or `None` if the family is something else.
+    </span><span class="kw">pub fn </span>column_type_family_as_enum(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;EnumWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="self">self</span>.column_type_family().as_enum().map(|enum_id| <span class="self">self</span>.walk(enum_id))
     }
 
-    <span class="doccomment">/// The column name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">get</span>().<span class="number">1</span>.<span class="ident">name</span>
+    <span class="doccomment">/// The column name.
+    </span><span class="kw">pub fn </span>name(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.get().<span class="number">1</span>.name
     }
 
-    <span class="doccomment">/// The default value for the column.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">DefaultValue</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">get</span>().<span class="number">1</span>.<span class="ident">default</span>.<span class="ident">as_ref</span>()
+    <span class="doccomment">/// The default value for the column.
+    </span><span class="kw">pub fn </span>default(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>DefaultValue&gt; {
+        <span class="self">self</span>.get().<span class="number">1</span>.default.as_ref()
     }
 
-    <span class="doccomment">/// The full column type.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_type</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ColumnType</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">get</span>().<span class="number">1</span>.<span class="ident">tpe</span>
+    <span class="doccomment">/// The full column type.
+    </span><span class="kw">pub fn </span>column_type(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ColumnType {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.get().<span class="number">1</span>.tpe
     }
 
-    <span class="doccomment">/// The column native type.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_native_type</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">std::any::Any</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">column_type</span>().<span class="ident">native_type</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">nt</span><span class="op">|</span> <span class="ident">nt</span>.<span class="ident">downcast_ref</span>())
+    <span class="doccomment">/// The column native type.
+    </span><span class="kw">pub fn </span>column_native_type&lt;T: std::any::Any + <span class="lifetime">&#39;static</span>&gt;(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>T&gt; {
+        <span class="self">self</span>.column_type().native_type.as_ref().map(|nt| nt.downcast_ref())
     }
 
-    <span class="doccomment">/// Is this column an auto-incrementing integer?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_autoincrement</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">get</span>().<span class="number">1</span>.<span class="ident">auto_increment</span>
+    <span class="doccomment">/// Is this column an auto-incrementing integer?
+    </span><span class="kw">pub fn </span>is_autoincrement(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.get().<span class="number">1</span>.auto_increment
     }
 
-    <span class="doccomment">/// Is this column indexed by a secondary index??</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_part_of_secondary_index</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">table</span>().<span class="ident">indexes</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">idx</span>.<span class="ident">contains_column</span>(<span class="self">self</span>.<span class="ident">id</span>))
+    <span class="doccomment">/// Is this column indexed by a secondary index??
+    </span><span class="kw">pub fn </span>is_part_of_secondary_index(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.table().indexes().any(|idx| idx.contains_column(<span class="self">self</span>.id))
     }
 
-    <span class="doccomment">/// Is this column a part of the table&#39;s primary key?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_part_of_primary_key</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">table</span>().<span class="ident">primary_key</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">pk</span>) =&gt; <span class="ident">pk</span>.<span class="ident">contains_column</span>(<span class="self">self</span>.<span class="ident">id</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="bool-val">false</span>,
+    <span class="doccomment">/// Is this column a part of the table&#39;s primary key?
+    </span><span class="kw">pub fn </span>is_part_of_primary_key(<span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="self">self</span>.table().primary_key() {
+            <span class="prelude-val">Some</span>(pk) =&gt; pk.contains_column(<span class="self">self</span>.id),
+            <span class="prelude-val">None </span>=&gt; <span class="bool-val">false</span>,
         }
     }
 
-    <span class="doccomment">/// Is this column a part of one of the table&#39;s foreign keys?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_part_of_foreign_key</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">column_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">id</span>;
-        <span class="self">self</span>.<span class="ident">table</span>()
-            .<span class="ident">foreign_keys</span>()
-            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">fk</span><span class="op">|</span> <span class="ident">fk</span>.<span class="ident">constrained_columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">id</span> <span class="op">==</span> <span class="ident">column_id</span>))
+    <span class="doccomment">/// Is this column a part of one of the table&#39;s foreign keys?
+    </span><span class="kw">pub fn </span>is_part_of_foreign_key(<span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span>column_id = <span class="self">self</span>.id;
+        <span class="self">self</span>.table()
+            .foreign_keys()
+            .any(|fk| fk.constrained_columns().any(|col| col.id == column_id))
     }
 
-    <span class="doccomment">/// Returns whether two columns are named the same and belong to the same table.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_same_column</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">other</span>.<span class="ident">name</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">table</span>().<span class="ident">name</span>() <span class="op">==</span> <span class="ident">other</span>.<span class="ident">table</span>().<span class="ident">name</span>()
+    <span class="doccomment">/// Returns whether two columns are named the same and belong to the same table.
+    </span><span class="kw">pub fn </span>is_same_column(<span class="self">self</span>, other: ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+        <span class="self">self</span>.name() == other.name() &amp;&amp; <span class="self">self</span>.table().name() == other.table().name()
     }
 
-    <span class="doccomment">/// Returns whether this column is the primary key. If it is only part of the primary key, this will return false.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_single_primary_key</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">table</span>()
-            .<span class="ident">primary_key</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">columns</span>().<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="ident">pk</span>.<span class="ident">columns</span>().<span class="ident">next</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="self">self</span>.<span class="ident">name</span>()).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>))
-            .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+    <span class="doccomment">/// Returns whether this column is the primary key. If it is only part of the primary key, this will return false.
+    </span><span class="kw">pub fn </span>is_single_primary_key(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.table()
+            .primary_key()
+            .map(|pk| pk.columns().len() == <span class="number">1 </span>&amp;&amp; pk.columns().next().map(|c| c.name() == <span class="self">self</span>.name()).unwrap_or(<span class="bool-val">false</span>))
+            .unwrap_or(<span class="bool-val">false</span>)
     }
 
-    <span class="doccomment">/// Traverse to the column&#39;s table.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">table</span>(<span class="self">self</span>) -&gt; <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">walk</span>(<span class="self">self</span>.<span class="ident">get</span>().<span class="number">0</span>)
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ViewWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The name of the view</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">view</span>().<span class="ident">name</span>
-    }
-
-    <span class="doccomment">/// The SQL definition of the view</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">definition</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">view</span>().<span class="ident">definition</span>.<span class="ident">as_deref</span>()
-    }
-
-    <span class="kw">fn</span> <span class="ident">view</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">View</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">views</span>[<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>]
+    <span class="doccomment">/// Traverse to the column&#39;s table.
+    </span><span class="kw">pub fn </span>table(<span class="self">self</span>) -&gt; TableWalker&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="self">self</span>.walk(<span class="self">self</span>.get().<span class="number">0</span>)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">UserDefinedTypeWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The name of the type</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">udt</span>().<span class="ident">name</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ViewWalker&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// The name of the view
+    </span><span class="kw">pub fn </span>name(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.view().name
     }
 
-    <span class="doccomment">/// The SQL definition of the type</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">definition</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">udt</span>().<span class="ident">definition</span>.<span class="ident">as_deref</span>()
+    <span class="doccomment">/// The SQL definition of the view
+    </span><span class="kw">pub fn </span>definition(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
+        <span class="self">self</span>.view().definition.as_deref()
     }
 
-    <span class="kw">fn</span> <span class="ident">udt</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">UserDefinedType</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">user_defined_types</span>[<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>]
+    <span class="kw">fn </span>view(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>View {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.schema.views[<span class="self">self</span>.id.<span class="number">0 </span><span class="kw">as </span>usize]
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Get a column in the table, by name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column</span>(<span class="self">self</span>, <span class="ident">column_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">columns</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">column</span><span class="op">|</span> <span class="ident">column</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">column_name</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; UserDefinedTypeWalker&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// The name of the type
+    </span><span class="kw">pub fn </span>name(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.udt().name
     }
 
-    <span class="doccomment">/// Get a column in the table, by name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_case_insensitive</span>(<span class="self">self</span>, <span class="ident">column_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">columns</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">column</span><span class="op">|</span> <span class="ident">column</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">column_name</span>)
+    <span class="doccomment">/// The SQL definition of the type
+    </span><span class="kw">pub fn </span>definition(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
+        <span class="self">self</span>.udt().definition.as_deref()
     }
 
-    <span class="kw">fn</span> <span class="ident">columns_range</span>(<span class="self">self</span>) -&gt; <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="ident">range_for_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">columns</span>, <span class="self">self</span>.<span class="ident">id</span>, <span class="op">|</span>(<span class="ident">tid</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">tid</span>)
+    <span class="kw">fn </span>udt(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>UserDefinedType {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.schema.user_defined_types[<span class="self">self</span>.id.<span class="number">0 </span><span class="kw">as </span>usize]
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; TableWalker&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Get a column in the table, by name.
+    </span><span class="kw">pub fn </span>column(<span class="self">self</span>, column_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;ColumnWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="self">self</span>.columns().find(|column| column.name() == column_name)
     }
 
-    <span class="doccomment">/// Traverse the table&#39;s columns.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">columns</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">columns_range</span>()
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">walk</span>(<span class="ident">ColumnId</span>(<span class="ident">idx</span> <span class="kw">as</span> <span class="ident">u32</span>)))
+    <span class="doccomment">/// Get a column in the table, by name.
+    </span><span class="kw">pub fn </span>column_case_insensitive(<span class="self">self</span>, column_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;ColumnWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="self">self</span>.columns().find(|column| column.name() == column_name)
     }
 
-    <span class="doccomment">/// The number of foreign key constraints on the table.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">foreign_key_count</span>(<span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">foreign_keys_range</span>().<span class="ident">into_iter</span>().<span class="ident">len</span>()
+    <span class="kw">fn </span>columns_range(<span class="self">self</span>) -&gt; Range&lt;usize&gt; {
+        range_for_key(<span class="kw-2">&amp;</span><span class="self">self</span>.schema.columns, <span class="self">self</span>.id, |(tid, <span class="kw">_</span>)| <span class="kw-2">*</span>tid)
     }
 
-    <span class="doccomment">/// Traverse the indexes on the table.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">indexes</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">range</span> <span class="op">=</span> <span class="ident">range_for_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">indexes</span>, <span class="self">self</span>.<span class="ident">id</span>, <span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">idx</span>.<span class="ident">table_id</span>);
-        <span class="ident">range</span>.<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">walk</span>(<span class="ident">IndexId</span>(<span class="ident">idx</span> <span class="kw">as</span> <span class="ident">u32</span>)))
+    <span class="doccomment">/// Traverse the table&#39;s columns.
+    </span><span class="kw">pub fn </span>columns(<span class="self">self</span>) -&gt; <span class="kw">impl </span>ExactSizeIterator&lt;Item = ColumnWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="self">self</span>.columns_range()
+            .into_iter()
+            .map(<span class="kw">move </span>|idx| <span class="self">self</span>.walk(ColumnId(idx <span class="kw">as </span>u32)))
     }
 
-    <span class="doccomment">/// Traverse the foreign keys on the table.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">foreign_keys</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">foreign_keys_range</span>()
-            .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">walk</span>(<span class="ident">ForeignKeyId</span>(<span class="ident">id</span> <span class="kw">as</span> <span class="ident">u32</span>)))
+    <span class="doccomment">/// The number of foreign key constraints on the table.
+    </span><span class="kw">pub fn </span>foreign_key_count(<span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.foreign_keys_range().into_iter().len()
     }
 
-    <span class="doccomment">/// Traverse foreign keys from other tables, referencing current table.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referencing_foreign_keys</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">table_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">id</span>;
-        <span class="self">self</span>.<span class="ident">schema</span>
-            .<span class="ident">table_walkers</span>()
-            .<span class="ident">filter</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">table_id</span>)
-            .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">foreign_keys</span>())
-            .<span class="ident">filter</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">fk</span><span class="op">|</span> <span class="ident">fk</span>.<span class="ident">referenced_table</span>().<span class="ident">id</span> <span class="op">==</span> <span class="ident">table_id</span>)
+    <span class="doccomment">/// Traverse the indexes on the table.
+    </span><span class="kw">pub fn </span>indexes(<span class="self">self</span>) -&gt; <span class="kw">impl </span>ExactSizeIterator&lt;Item = IndexWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="kw">let </span>range = range_for_key(<span class="kw-2">&amp;</span><span class="self">self</span>.schema.indexes, <span class="self">self</span>.id, |idx| idx.table_id);
+        range.map(<span class="kw">move </span>|idx| <span class="self">self</span>.walk(IndexId(idx <span class="kw">as </span>u32)))
     }
 
-    <span class="doccomment">/// The table name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">table</span>().<span class="ident">name</span>
+    <span class="doccomment">/// Traverse the foreign keys on the table.
+    </span><span class="kw">pub fn </span>foreign_keys(<span class="self">self</span>) -&gt; <span class="kw">impl </span>ExactSizeIterator&lt;Item = ForeignKeyWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="self">self</span>.foreign_keys_range()
+            .map(<span class="kw">move </span>|id| <span class="self">self</span>.walk(ForeignKeyId(id <span class="kw">as </span>u32)))
     }
 
-    <span class="kw">fn</span> <span class="ident">foreign_keys_range</span>(<span class="self">self</span>) -&gt; <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        <span class="ident">range_for_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">foreign_keys</span>, <span class="self">self</span>.<span class="ident">id</span>, <span class="op">|</span><span class="ident">fk</span><span class="op">|</span> <span class="ident">fk</span>.<span class="ident">constrained_table</span>)
+    <span class="doccomment">/// Traverse foreign keys from other tables, referencing current table.
+    </span><span class="kw">pub fn </span>referencing_foreign_keys(<span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = ForeignKeyWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="kw">let </span>table_id = <span class="self">self</span>.id;
+        <span class="self">self</span>.schema
+            .table_walkers()
+            .filter(<span class="kw">move </span>|t| t.id != table_id)
+            .flat_map(|t| t.foreign_keys())
+            .filter(<span class="kw">move </span>|fk| fk.referenced_table().id == table_id)
     }
 
-    <span class="doccomment">/// Try to traverse a foreign key for a single column.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">foreign_key_for_column</span>(<span class="self">self</span>, <span class="ident">column</span>: <span class="ident">ColumnId</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">foreign_keys</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">fk</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">cols</span> <span class="op">=</span> <span class="ident">fk</span>.<span class="ident">columns</span>();
-            <span class="ident">cols</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="ident">cols</span>[<span class="number">0</span>].<span class="ident">constrained_column</span> <span class="op">==</span> <span class="ident">column</span>
+    <span class="doccomment">/// The table name.
+    </span><span class="kw">pub fn </span>name(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.table().name
+    }
+
+    <span class="kw">fn </span>foreign_keys_range(<span class="self">self</span>) -&gt; Range&lt;usize&gt; {
+        range_for_key(<span class="kw-2">&amp;</span><span class="self">self</span>.schema.foreign_keys, <span class="self">self</span>.id, |fk| fk.constrained_table)
+    }
+
+    <span class="doccomment">/// Try to traverse a foreign key for a single column.
+    </span><span class="kw">pub fn </span>foreign_key_for_column(<span class="self">self</span>, column: ColumnId) -&gt; <span class="prelude-ty">Option</span>&lt;ForeignKeyWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="self">self</span>.foreign_keys().find(|fk| {
+            <span class="kw">let </span>cols = fk.columns();
+            cols.len() == <span class="number">1 </span>&amp;&amp; cols[<span class="number">0</span>].constrained_column == column
         })
     }
 
-    <span class="doccomment">/// The namespace the table belongs to, if defined.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">namespace</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">schema</span>
-            .<span class="ident">namespaces</span>
-            .<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">table</span>().<span class="ident">namespace_id</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">as_str</span>())
+    <span class="doccomment">/// The namespace the table belongs to, if defined.
+    </span><span class="kw">pub fn </span>namespace(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
+        <span class="self">self</span>.schema
+            .namespaces
+            .get(<span class="self">self</span>.table().namespace_id.<span class="number">0 </span><span class="kw">as </span>usize)
+            .map(|s| s.as_str())
     }
 
-    <span class="doccomment">/// The namespace the table belongs to.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">namespace_id</span>(<span class="self">self</span>) -&gt; <span class="ident">NamespaceId</span> {
-        <span class="self">self</span>.<span class="ident">table</span>().<span class="ident">namespace_id</span>
+    <span class="doccomment">/// The namespace the table belongs to.
+    </span><span class="kw">pub fn </span>namespace_id(<span class="self">self</span>) -&gt; NamespaceId {
+        <span class="self">self</span>.table().namespace_id
     }
 
-    <span class="doccomment">/// Traverse to the primary key of the table.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">primary_key</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">indexes</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">idx</span>.<span class="ident">is_primary_key</span>())
+    <span class="doccomment">/// Traverse to the primary key of the table.
+    </span><span class="kw">pub fn </span>primary_key(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;IndexWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        <span class="self">self</span>.indexes().find(|idx| idx.is_primary_key())
     }
 
-    <span class="doccomment">/// The columns that are part of the primary keys.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">primary_key_columns</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">IndexColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">primary_key</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">pk</span><span class="op">|</span> <span class="ident">pk</span>.<span class="ident">columns</span>())
+    <span class="doccomment">/// The columns that are part of the primary keys.
+    </span><span class="kw">pub fn </span>primary_key_columns(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw">impl </span>ExactSizeIterator&lt;Item = IndexColumnWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt; {
+        <span class="self">self</span>.primary_key().map(|pk| pk.columns())
     }
 
-    <span class="doccomment">/// How many columns are in the primary key? Returns 0 in the absence of a pk.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">primary_key_columns_count</span>(<span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">primary_key_columns</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">cols</span><span class="op">|</span> <span class="ident">cols</span>.<span class="ident">len</span>()).<span class="ident">unwrap_or</span>(<span class="number">0</span>)
+    <span class="doccomment">/// How many columns are in the primary key? Returns 0 in the absence of a pk.
+    </span><span class="kw">pub fn </span>primary_key_columns_count(<span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.primary_key_columns().map(|cols| cols.len()).unwrap_or(<span class="number">0</span>)
     }
 
-    <span class="doccomment">/// Reference to the underlying `Table` struct.</span>
-    <span class="kw">fn</span> <span class="ident">table</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Table</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">tables</span>[<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>]
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;schema</span><span class="op">&gt;</span> <span class="ident">ForeignKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;schema</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">columns</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;schema</span> [<span class="ident">ForeignKeyColumn</span>] {
-        <span class="kw">let</span> <span class="ident">range</span> <span class="op">=</span> <span class="ident">range_for_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">foreign_key_columns</span>, <span class="self">self</span>.<span class="ident">id</span>, <span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">foreign_key_id</span>);
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">foreign_key_columns</span>[<span class="ident">range</span>]
-    }
-
-    <span class="doccomment">/// The foreign key columns on the referencing table.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">constrained_columns</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;schema</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">columns</span>().<span class="ident">iter</span>().<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">walk</span>(<span class="ident">col</span>.<span class="ident">constrained_column</span>))
-    }
-
-    <span class="doccomment">/// The name of the foreign key constraint.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">constraint_name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;schema</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">foreign_key</span>().<span class="ident">constraint_name</span>.<span class="ident">as_deref</span>()
-    }
-
-    <span class="kw">fn</span> <span class="ident">foreign_key</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;schema</span> <span class="ident">ForeignKey</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">foreign_keys</span>[<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>]
-    }
-
-    <span class="doccomment">/// The `ON DELETE` behaviour of the foreign key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_delete_action</span>(<span class="self">self</span>) -&gt; <span class="ident">ForeignKeyAction</span> {
-        <span class="self">self</span>.<span class="ident">foreign_key</span>().<span class="ident">on_delete_action</span>
-    }
-
-    <span class="doccomment">/// The `ON UPDATE` behaviour of the foreign key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_update_action</span>(<span class="self">self</span>) -&gt; <span class="ident">ForeignKeyAction</span> {
-        <span class="self">self</span>.<span class="ident">foreign_key</span>().<span class="ident">on_update_action</span>
-    }
-
-    <span class="doccomment">/// The columns referenced by the foreign key on the referenced table.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referenced_columns</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;schema</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">columns</span>().<span class="ident">iter</span>().<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">walk</span>(<span class="ident">col</span>.<span class="ident">referenced_column</span>))
-    }
-
-    <span class="doccomment">/// The table the foreign key &quot;points to&quot;.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referenced_table_name</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;schema</span> <span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">referenced_table</span>().<span class="ident">name</span>()
-    }
-
-    <span class="doccomment">/// The table the foreign key &quot;points to&quot;.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referenced_table</span>(<span class="self">self</span>) -&gt; <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;schema</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">walk</span>(<span class="self">self</span>.<span class="ident">foreign_key</span>().<span class="ident">referenced_table</span>)
-    }
-
-    <span class="doccomment">/// Traverse to the referencing/constrained table.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">table</span>(<span class="self">self</span>) -&gt; <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;schema</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">walk</span>(<span class="self">self</span>.<span class="ident">foreign_key</span>().<span class="ident">constrained_table</span>)
-    }
-
-    <span class="doccomment">/// True if relation is back to the same table.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_self_relation</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">fk</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">foreign_key</span>();
-        <span class="ident">fk</span>.<span class="ident">constrained_table</span> <span class="op">==</span> <span class="ident">fk</span>.<span class="ident">referenced_table</span>
+    <span class="doccomment">/// Reference to the underlying `Table` struct.
+    </span><span class="kw">fn </span>table(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Table {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.schema.tables[<span class="self">self</span>.id.<span class="number">0 </span><span class="kw">as </span>usize]
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">IndexColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Get the index column data.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">IndexColumn</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">index_columns</span>[<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>]
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;schema</span>&gt; ForeignKeyWalker&lt;<span class="lifetime">&#39;schema</span>&gt; {
+    <span class="kw">fn </span>columns(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;schema </span>[ForeignKeyColumn] {
+        <span class="kw">let </span>range = range_for_key(<span class="kw-2">&amp;</span><span class="self">self</span>.schema.foreign_key_columns, <span class="self">self</span>.id, |col| col.foreign_key_id);
+        <span class="kw-2">&amp;</span><span class="self">self</span>.schema.foreign_key_columns[range]
     }
 
-    <span class="doccomment">/// The name of the column.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">as_column</span>().<span class="ident">name</span>()
+    <span class="doccomment">/// The foreign key columns on the referencing table.
+    </span><span class="kw">pub fn </span>constrained_columns(<span class="self">self</span>) -&gt; <span class="kw">impl </span>ExactSizeIterator&lt;Item = ColumnWalker&lt;<span class="lifetime">&#39;schema</span>&gt;&gt; {
+        <span class="self">self</span>.columns().iter().map(<span class="kw">move </span>|col| <span class="self">self</span>.walk(col.constrained_column))
     }
 
-    <span class="doccomment">/// The length limit of the (text) column. Matters on MySQL only.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">length</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">length</span>
+    <span class="doccomment">/// The name of the foreign key constraint.
+    </span><span class="kw">pub fn </span>constraint_name(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;schema </span>str&gt; {
+        <span class="self">self</span>.foreign_key().constraint_name.as_deref()
     }
 
-    <span class="doccomment">/// The BTree ordering.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sort_order</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">SQLSortOrder</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">sort_order</span>
+    <span class="kw">fn </span>foreign_key(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;schema </span>ForeignKey {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.schema.foreign_keys[<span class="self">self</span>.id.<span class="number">0 </span><span class="kw">as </span>usize]
     }
 
-    <span class="doccomment">/// The table where the column is located.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">table</span>(<span class="self">self</span>) -&gt; <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">index</span>().<span class="ident">table</span>()
+    <span class="doccomment">/// The `ON DELETE` behaviour of the foreign key.
+    </span><span class="kw">pub fn </span>on_delete_action(<span class="self">self</span>) -&gt; ForeignKeyAction {
+        <span class="self">self</span>.foreign_key().on_delete_action
     }
 
-    <span class="doccomment">/// The index of the column.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index</span>(<span class="self">self</span>) -&gt; <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">walk</span>(<span class="self">self</span>.<span class="ident">get</span>().<span class="ident">index_id</span>)
+    <span class="doccomment">/// The `ON UPDATE` behaviour of the foreign key.
+    </span><span class="kw">pub fn </span>on_update_action(<span class="self">self</span>) -&gt; ForeignKeyAction {
+        <span class="self">self</span>.foreign_key().on_update_action
     }
 
-    <span class="doccomment">/// Convert to a normal column walker, losing the possible index arguments.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_column</span>(<span class="self">self</span>) -&gt; <span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">walk</span>(<span class="self">self</span>.<span class="ident">get</span>().<span class="ident">column_id</span>)
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The names of the indexed columns.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column_names</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">columns</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">as_column</span>().<span class="ident">name</span>())
+    <span class="doccomment">/// The columns referenced by the foreign key on the referenced table.
+    </span><span class="kw">pub fn </span>referenced_columns(<span class="self">self</span>) -&gt; <span class="kw">impl </span>ExactSizeIterator&lt;Item = ColumnWalker&lt;<span class="lifetime">&#39;schema</span>&gt;&gt; {
+        <span class="self">self</span>.columns().iter().map(<span class="kw">move </span>|col| <span class="self">self</span>.walk(col.referenced_column))
     }
 
-    <span class="doccomment">/// Traverse the indexed columns.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">columns</span>(<span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">IndexColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">range_for_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">index_columns</span>, <span class="self">self</span>.<span class="ident">id</span>, <span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">index_id</span>)
-            .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">walk</span>(<span class="ident">IndexColumnId</span>(<span class="ident">idx</span> <span class="kw">as</span> <span class="ident">u32</span>)))
+    <span class="doccomment">/// The table the foreign key &quot;points to&quot;.
+    </span><span class="kw">pub fn </span>referenced_table_name(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;schema </span>str {
+        <span class="self">self</span>.referenced_table().name()
     }
 
-    <span class="doccomment">/// True if index contains the given column.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains_column</span>(<span class="self">self</span>, <span class="ident">column_id</span>: <span class="ident">ColumnId</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">column</span><span class="op">|</span> <span class="ident">column</span>.<span class="ident">as_column</span>().<span class="ident">id</span> <span class="op">==</span> <span class="ident">column_id</span>)
+    <span class="doccomment">/// The table the foreign key &quot;points to&quot;.
+    </span><span class="kw">pub fn </span>referenced_table(<span class="self">self</span>) -&gt; TableWalker&lt;<span class="lifetime">&#39;schema</span>&gt; {
+        <span class="self">self</span>.walk(<span class="self">self</span>.foreign_key().referenced_table)
     }
 
-    <span class="kw">fn</span> <span class="ident">get</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Index</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">indexes</span>[<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>]
+    <span class="doccomment">/// Traverse to the referencing/constrained table.
+    </span><span class="kw">pub fn </span>table(<span class="self">self</span>) -&gt; TableWalker&lt;<span class="lifetime">&#39;schema</span>&gt; {
+        <span class="self">self</span>.walk(<span class="self">self</span>.foreign_key().constrained_table)
     }
 
-    <span class="doccomment">/// The IndexType</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">index_type</span>(<span class="self">self</span>) -&gt; <span class="ident">IndexType</span> {
-        <span class="self">self</span>.<span class="ident">get</span>().<span class="ident">tpe</span>
-    }
-
-    <span class="doccomment">/// Is this index the primary key of the table?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_primary_key</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">get</span>().<span class="ident">tpe</span>, <span class="ident">IndexType::PrimaryKey</span>)
-    }
-
-    <span class="doccomment">/// Is this index a unique constraint? NB: This will return `false` for the primary key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_unique</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">get</span>().<span class="ident">tpe</span>, <span class="ident">IndexType::Unique</span>)
-    }
-
-    <span class="doccomment">/// The name of the index.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">get</span>().<span class="ident">index_name</span>
-    }
-
-    <span class="doccomment">/// Traverse to the table of the index.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">table</span>(<span class="self">self</span>) -&gt; <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">walk</span>(<span class="self">self</span>.<span class="ident">get</span>().<span class="ident">table_id</span>)
+    <span class="doccomment">/// True if relation is back to the same table.
+    </span><span class="kw">pub fn </span>is_self_relation(<span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span>fk = <span class="self">self</span>.foreign_key();
+        fk.constrained_table == fk.referenced_table
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">EnumWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">get</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Enum</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">enums</span>[<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>]
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IndexColumnWalker&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Get the index column data.
+    </span><span class="kw">pub fn </span>get(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>IndexColumn {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.schema.index_columns[<span class="self">self</span>.id.<span class="number">0 </span><span class="kw">as </span>usize]
     }
 
-    <span class="doccomment">/// The namespace the enum belongs to, if defined.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">namespace</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">schema</span>
-            .<span class="ident">namespaces</span>
-            .<span class="ident">get</span>(<span class="self">self</span>.<span class="ident">get</span>().<span class="ident">namespace_id</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">as_str</span>())
+    <span class="doccomment">/// The name of the column.
+    </span><span class="kw">pub fn </span>name(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
+        <span class="self">self</span>.as_column().name()
     }
 
-    <span class="doccomment">/// The name of the enum. This is a made up name on MySQL.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">get</span>().<span class="ident">name</span>
+    <span class="doccomment">/// The length limit of the (text) column. Matters on MySQL only.
+    </span><span class="kw">pub fn </span>length(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u32&gt; {
+        <span class="self">self</span>.get().length
     }
 
-    <span class="doccomment">/// The values of the enum</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">values</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">String</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">get</span>().<span class="ident">values</span>
+    <span class="doccomment">/// The BTree ordering.
+    </span><span class="kw">pub fn </span>sort_order(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;SQLSortOrder&gt; {
+        <span class="self">self</span>.get().sort_order
+    }
+
+    <span class="doccomment">/// The table where the column is located.
+    </span><span class="kw">pub fn </span>table(<span class="self">self</span>) -&gt; TableWalker&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="self">self</span>.index().table()
+    }
+
+    <span class="doccomment">/// The index of the column.
+    </span><span class="kw">pub fn </span>index(<span class="self">self</span>) -&gt; IndexWalker&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="self">self</span>.walk(<span class="self">self</span>.get().index_id)
+    }
+
+    <span class="doccomment">/// Convert to a normal column walker, losing the possible index arguments.
+    </span><span class="kw">pub fn </span>as_column(<span class="self">self</span>) -&gt; ColumnWalker&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="self">self</span>.walk(<span class="self">self</span>.get().column_id)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">NamespaceWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The namespace name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">namespaces</span>[<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>]
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; IndexWalker&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// The names of the indexed columns.
+    </span><span class="kw">pub fn </span>column_names(<span class="self">self</span>) -&gt; <span class="kw">impl </span>ExactSizeIterator&lt;Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
+        <span class="self">self</span>.columns().map(|c| c.as_column().name())
+    }
+
+    <span class="doccomment">/// Traverse the indexed columns.
+    </span><span class="kw">pub fn </span>columns(<span class="self">self</span>) -&gt; <span class="kw">impl </span>ExactSizeIterator&lt;Item = IndexColumnWalker&lt;<span class="lifetime">&#39;a</span>&gt;&gt; {
+        range_for_key(<span class="kw-2">&amp;</span><span class="self">self</span>.schema.index_columns, <span class="self">self</span>.id, |i| i.index_id)
+            .map(<span class="kw">move </span>|idx| <span class="self">self</span>.walk(IndexColumnId(idx <span class="kw">as </span>u32)))
+    }
+
+    <span class="doccomment">/// True if index contains the given column.
+    </span><span class="kw">pub fn </span>contains_column(<span class="self">self</span>, column_id: ColumnId) -&gt; bool {
+        <span class="self">self</span>.columns().any(|column| column.as_column().id == column_id)
+    }
+
+    <span class="kw">fn </span>get(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Index {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.schema.indexes[<span class="self">self</span>.id.<span class="number">0 </span><span class="kw">as </span>usize]
+    }
+
+    <span class="doccomment">/// The IndexType
+    </span><span class="kw">pub fn </span>index_type(<span class="self">self</span>) -&gt; IndexType {
+        <span class="self">self</span>.get().tpe
+    }
+
+    <span class="doccomment">/// Is this index the primary key of the table?
+    </span><span class="kw">pub fn </span>is_primary_key(<span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>.get().tpe, IndexType::PrimaryKey)
+    }
+
+    <span class="doccomment">/// Is this index a unique constraint? NB: This will return `false` for the primary key.
+    </span><span class="kw">pub fn </span>is_unique(<span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>.get().tpe, IndexType::Unique)
+    }
+
+    <span class="doccomment">/// The name of the index.
+    </span><span class="kw">pub fn </span>name(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.get().index_name
+    }
+
+    <span class="doccomment">/// Traverse to the table of the index.
+    </span><span class="kw">pub fn </span>table(<span class="self">self</span>) -&gt; TableWalker&lt;<span class="lifetime">&#39;a</span>&gt; {
+        <span class="self">self</span>.walk(<span class="self">self</span>.get().table_id)
     }
 }
 
-<span class="doccomment">/// For a slice sorted by a key K, return the contiguous range of items matching the key.</span>
-<span class="kw">fn</span> <span class="ident">range_for_key</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">K</span><span class="op">&gt;</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span>[<span class="ident">I</span>], <span class="ident">key</span>: <span class="ident">K</span>, <span class="ident">extract</span>: <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="ident">I</span>) -&gt; <span class="ident">K</span>) -&gt; <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">K</span>: <span class="ident">Copy</span> <span class="op">+</span> <span class="ident">Ord</span> <span class="op">+</span> <span class="ident">PartialOrd</span> <span class="op">+</span> <span class="ident">PartialEq</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; EnumWalker&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>get(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Enum {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.schema.enums[<span class="self">self</span>.id.<span class="number">0 </span><span class="kw">as </span>usize]
+    }
+
+    <span class="doccomment">/// The namespace the enum belongs to, if defined.
+    </span><span class="kw">pub fn </span>namespace(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
+        <span class="self">self</span>.schema
+            .namespaces
+            .get(<span class="self">self</span>.get().namespace_id.<span class="number">0 </span><span class="kw">as </span>usize)
+            .map(|s| s.as_str())
+    }
+
+    <span class="doccomment">/// The name of the enum. This is a made up name on MySQL.
+    </span><span class="kw">pub fn </span>name(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.get().name
+    }
+
+    <span class="doccomment">/// The values of the enum
+    </span><span class="kw">pub fn </span>values(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[String] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.get().values
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; NamespaceWalker&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// The namespace name.
+    </span><span class="kw">pub fn </span>name(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.schema.namespaces[<span class="self">self</span>.id.<span class="number">0 </span><span class="kw">as </span>usize]
+    }
+}
+
+<span class="doccomment">/// For a slice sorted by a key K, return the contiguous range of items matching the key.
+</span><span class="kw">fn </span>range_for_key&lt;I, K&gt;(slice: <span class="kw-2">&amp;</span>[I], key: K, extract: <span class="kw">fn</span>(<span class="kw-2">&amp;</span>I) -&gt; K) -&gt; Range&lt;usize&gt;
+<span class="kw">where
+    </span>K: Copy + Ord + PartialOrd + PartialEq,
 {
-    <span class="kw">let</span> <span class="ident">seed</span> <span class="op">=</span> <span class="ident">slice</span>.<span class="ident">binary_search_by_key</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>, <span class="ident">extract</span>).<span class="ident">unwrap_or</span>(<span class="number">0</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">slice</span>[..<span class="ident">seed</span>].<span class="ident">iter</span>();
-    <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">iter</span>.<span class="ident">rposition</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">extract</span>(<span class="ident">i</span>) <span class="op">!</span><span class="op">=</span> <span class="ident">key</span>) {
-        <span class="prelude-val">None</span> =&gt; <span class="number">0</span>,
-        <span class="prelude-val">Some</span>(<span class="ident">other</span>) =&gt; <span class="ident">other</span> <span class="op">+</span> <span class="number">1</span>,
+    <span class="kw">let </span>seed = slice.binary_search_by_key(<span class="kw-2">&amp;</span>key, extract).unwrap_or(<span class="number">0</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>iter = slice[..seed].iter();
+    <span class="kw">let </span>start = <span class="kw">match </span>iter.rposition(|i| extract(i) != key) {
+        <span class="prelude-val">None </span>=&gt; <span class="number">0</span>,
+        <span class="prelude-val">Some</span>(other) =&gt; other + <span class="number">1</span>,
     };
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">slice</span>[<span class="ident">seed</span>..].<span class="ident">iter</span>();
-    <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">seed</span> <span class="op">+</span> <span class="ident">iter</span>.<span class="ident">position</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">extract</span>(<span class="ident">i</span>) <span class="op">!</span><span class="op">=</span> <span class="ident">key</span>).<span class="ident">unwrap_or</span>(<span class="ident">slice</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">seed</span>);
-    <span class="ident">start</span>..<span class="ident">end</span>
+    <span class="kw">let </span><span class="kw-2">mut </span>iter = slice[seed..].iter();
+    <span class="kw">let </span>end = seed + iter.position(|i| extract(i) != key).unwrap_or(slice.len() - seed);
+    start..end
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_schema_describer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_schema_describer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

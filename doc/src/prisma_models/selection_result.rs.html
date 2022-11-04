@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/prisma-models/src/selection_result.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>selection_result.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../prisma_models/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/prisma-models/src/selection_result.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>selection_result.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../prisma_models/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../prisma_models/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -168,175 +168,175 @@
 <span id="168">168</span>
 <span id="169">169</span>
 <span id="170">170</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">DomainError</span>, <span class="ident">FieldSelection</span>, <span class="ident">PrismaValue</span>, <span class="ident">ScalarFieldRef</span>, <span class="ident">SelectedField</span>};
-<span class="kw">use</span> <span class="ident">itertools::Itertools</span>;
-<span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{DomainError, FieldSelection, PrismaValue, ScalarFieldRef, SelectedField};
+<span class="kw">use </span>itertools::Itertools;
+<span class="kw">use </span>std::convert::TryFrom;
 
-<span class="doccomment">/// Represents a set of results.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SelectionResult</span> {
-    <span class="kw">pub</span> <span class="ident">pairs</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">SelectedField</span>, <span class="ident">PrismaValue</span>)<span class="op">&gt;</span>,
+<span class="doccomment">/// Represents a set of results.
+</span><span class="attribute">#[derive(Default, Clone, PartialEq, Eq, Hash)]
+</span><span class="kw">pub struct </span>SelectionResult {
+    <span class="kw">pub </span>pairs: Vec&lt;(SelectedField, PrismaValue)&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">SelectionResult</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_list</span>()
-            .<span class="ident">entries</span>(
-                <span class="kw-2">&amp;</span><span class="self">self</span>
-                    .<span class="ident">pairs</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">pair</span><span class="op">|</span> (<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">pair</span>.<span class="number">0</span>), <span class="ident">pair</span>.<span class="number">1</span>.<span class="ident">clone</span>()))
-                    .<span class="ident">collect_vec</span>(),
+<span class="kw">impl </span>std::fmt::Debug <span class="kw">for </span>SelectionResult {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        f.debug_list()
+            .entries(
+                <span class="kw-2">&amp;</span><span class="self">self
+                    </span>.pairs
+                    .iter()
+                    .map(|pair| (<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, pair.<span class="number">0</span>), pair.<span class="number">1</span>.clone()))
+                    .collect_vec(),
             )
-            .<span class="ident">finish</span>()
+            .finish()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">SelectionResult</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">pairs</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">T</span>, <span class="ident">PrismaValue</span>)<span class="op">&gt;</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">SelectedField</span><span class="op">&gt;</span>,
+<span class="kw">impl </span>SelectionResult {
+    <span class="kw">pub fn </span>new&lt;T&gt;(pairs: Vec&lt;(T, PrismaValue)&gt;) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>T: Into&lt;SelectedField&gt;,
     {
-        <span class="self">Self</span> {
-            <span class="ident">pairs</span>: <span class="ident">pairs</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">rt</span>, <span class="ident">value</span>)<span class="op">|</span> (<span class="ident">rt</span>.<span class="ident">into</span>(), <span class="ident">value</span>)).<span class="ident">collect</span>(),
+        <span class="self">Self </span>{
+            pairs: pairs.into_iter().map(|(rt, value)| (rt.into(), value)).collect(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">pair</span>: (<span class="ident">T</span>, <span class="ident">PrismaValue</span>))
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">SelectedField</span><span class="op">&gt;</span>,
+    <span class="kw">pub fn </span>add&lt;T&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, pair: (T, PrismaValue))
+    <span class="kw">where
+        </span>T: Into&lt;SelectedField&gt;,
     {
-        <span class="self">self</span>.<span class="ident">pairs</span>.<span class="ident">push</span>((<span class="ident">pair</span>.<span class="number">0</span>.<span class="ident">into</span>(), <span class="ident">pair</span>.<span class="number">1</span>));
+        <span class="self">self</span>.pairs.push((pair.<span class="number">0</span>.into(), pair.<span class="number">1</span>));
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">selection</span>: <span class="kw-2">&amp;</span><span class="ident">SelectedField</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PrismaValue</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">pairs</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span>(<span class="ident">result_selection</span>, <span class="ident">value</span>)<span class="op">|</span> {
-            <span class="kw">if</span> <span class="ident">selection</span> <span class="op">==</span> <span class="ident">result_selection</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">value</span>)
-            } <span class="kw">else</span> {
-                <span class="prelude-val">None</span>
-            }
+    <span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, selection: <span class="kw-2">&amp;</span>SelectedField) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>PrismaValue&gt; {
+        <span class="self">self</span>.pairs.iter().find_map(|(result_selection, value)| {
+            <span class="kw">if </span>selection == result_selection {
+                <span class="prelude-val">Some</span>(value)
+            } <span class="kw">else </span>{
+                <span class="prelude-val">None
+            </span>}
         })
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">values</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">PrismaValue</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;_</span> {
-        <span class="self">self</span>.<span class="ident">pairs</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="number">1</span>.<span class="ident">clone</span>())
+    <span class="kw">pub fn </span>values(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = PrismaValue&gt; + <span class="lifetime">&#39;_ </span>{
+        <span class="self">self</span>.pairs.iter().map(|p| p.<span class="number">1</span>.clone())
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">pairs</span>.<span class="ident">len</span>()
+    <span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.pairs.len()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>
-    }
+    <span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.len() == <span class="number">0
+    </span>}
 
-    <span class="doccomment">/// Consumes this `SelectionResult` and splits it into a set of `SelectionResult`s based on the passed</span>
-    <span class="doccomment">/// `FieldSelection`s. Assumes that the transformation can be done.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">split_into</span>(<span class="self">self</span>, <span class="ident">field_selections</span>: <span class="kw-2">&amp;</span>[<span class="ident">FieldSelection</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span> {
-        <span class="ident">field_selections</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">field_selection</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">pairs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">field_selection</span>
-                    .<span class="ident">selections</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">selected_field</span><span class="op">|</span> {
-                        <span class="self">self</span>.<span class="ident">get</span>(<span class="ident">selected_field</span>)
-                            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> (<span class="ident">selected_field</span>.<span class="ident">clone</span>(), <span class="ident">value</span>.<span class="ident">clone</span>()))
-                            .<span class="ident">expect</span>(<span class="string">&quot;Error splitting `ReturnValues`: `FieldSelection` doesn&#39;t match.&quot;</span>)
+    <span class="doccomment">/// Consumes this `SelectionResult` and splits it into a set of `SelectionResult`s based on the passed
+    /// `FieldSelection`s. Assumes that the transformation can be done.
+    </span><span class="kw">pub fn </span>split_into(<span class="self">self</span>, field_selections: <span class="kw-2">&amp;</span>[FieldSelection]) -&gt; Vec&lt;SelectionResult&gt; {
+        field_selections
+            .iter()
+            .map(|field_selection| {
+                <span class="kw">let </span>pairs: Vec&lt;<span class="kw">_</span>&gt; = field_selection
+                    .selections()
+                    .map(|selected_field| {
+                        <span class="self">self</span>.get(selected_field)
+                            .map(|value| (selected_field.clone(), value.clone()))
+                            .expect(<span class="string">&quot;Error splitting `ReturnValues`: `FieldSelection` doesn&#39;t match.&quot;</span>)
                     })
-                    .<span class="ident">collect</span>();
+                    .collect();
 
-                <span class="ident">SelectionResult::new</span>(<span class="ident">pairs</span>)
+                SelectionResult::new(pairs)
             })
-            .<span class="ident">collect</span>()
+            .collect()
     }
 
-    <span class="doccomment">/// Checks if `self` only contains scalar field selections and if so, returns them all in a list.</span>
-    <span class="doccomment">/// If any other selection is contained, returns `None`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_scalar_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">scalar_fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">pairs</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">filter_map</span>(<span class="op">|</span>(<span class="ident">selection</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="kw">match</span> <span class="ident">selection</span> {
-                <span class="ident">SelectedField::Scalar</span>(<span class="ident">sf</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">sf</span>.<span class="ident">clone</span>()),
-                <span class="ident">SelectedField::Composite</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
+    <span class="doccomment">/// Checks if `self` only contains scalar field selections and if so, returns them all in a list.
+    /// If any other selection is contained, returns `None`.
+    </span><span class="kw">pub fn </span>as_scalar_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;ScalarFieldRef&gt;&gt; {
+        <span class="kw">let </span>scalar_fields: Vec&lt;<span class="kw">_</span>&gt; = <span class="self">self
+            </span>.pairs
+            .iter()
+            .filter_map(|(selection, <span class="kw">_</span>)| <span class="kw">match </span>selection {
+                SelectedField::Scalar(sf) =&gt; <span class="prelude-val">Some</span>(sf.clone()),
+                SelectedField::Composite(<span class="kw">_</span>) =&gt; <span class="prelude-val">None</span>,
             })
-            .<span class="ident">collect</span>();
+            .collect();
 
-        <span class="kw">if</span> <span class="ident">scalar_fields</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="self">self</span>.<span class="ident">pairs</span>.<span class="ident">len</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">scalar_fields</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+        <span class="kw">if </span>scalar_fields.len() == <span class="self">self</span>.pairs.len() {
+            <span class="prelude-val">Some</span>(scalar_fields)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     }
 
-    <span class="doccomment">/// Coerces contained values to best fit their type.</span>
-    <span class="doccomment">/// - Scalar fields coerce values based on the TypeIdentifier.</span>
-    <span class="doccomment">/// - Composite fields must be objects and contained fields must also follow the type coherence.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">coerce_values</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">pairs</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">pairs</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">selection</span>, <span class="ident">value</span>)<span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">selection</span>.<span class="ident">coerce_value</span>(<span class="ident">value</span>)<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>((<span class="ident">selection</span>, <span class="ident">value</span>))
+    <span class="doccomment">/// Coerces contained values to best fit their type.
+    /// - Scalar fields coerce values based on the TypeIdentifier.
+    /// - Composite fields must be objects and contained fields must also follow the type coherence.
+    </span><span class="kw">pub fn </span>coerce_values(<span class="self">self</span>) -&gt; <span class="kw">crate</span>::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>pairs = <span class="self">self
+            </span>.pairs
+            .into_iter()
+            .map(|(selection, value)| {
+                <span class="kw">let </span>value = selection.coerce_value(value)<span class="question-mark">?</span>;
+                <span class="prelude-val">Ok</span>((selection, value))
             })
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+            .collect::&lt;<span class="kw">crate</span>::Result&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;&gt;()<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> { <span class="ident">pairs</span> })
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{ pairs })
     }
 }
 
-<span class="kw">impl</span> <span class="ident">TryFrom</span><span class="op">&lt;</span><span class="ident">SelectionResult</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">PrismaValue</span> {
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">DomainError</span>;
+<span class="kw">impl </span>TryFrom&lt;SelectionResult&gt; <span class="kw">for </span>PrismaValue {
+    <span class="kw">type </span>Error = DomainError;
 
-    <span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">return_values</span>: <span class="ident">SelectionResult</span>) -&gt; <span class="ident"><span class="kw">crate</span>::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">return_values</span>.<span class="ident">pairs</span>.<span class="ident">into_iter</span>().<span class="ident">next</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">value</span>.<span class="number">1</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">DomainError::ConversionFailure</span>(
-                <span class="string">&quot;ReturnValues&quot;</span>.<span class="ident">into</span>(),
-                <span class="string">&quot;PrismaValue&quot;</span>.<span class="ident">into</span>(),
+    <span class="kw">fn </span>try_from(return_values: SelectionResult) -&gt; <span class="kw">crate</span>::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">match </span>return_values.pairs.into_iter().next() {
+            <span class="prelude-val">Some</span>(value) =&gt; <span class="prelude-val">Ok</span>(value.<span class="number">1</span>),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(DomainError::ConversionFailure(
+                <span class="string">&quot;ReturnValues&quot;</span>.into(),
+                <span class="string">&quot;PrismaValue&quot;</span>.into(),
             )),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">IntoIterator</span> <span class="kw">for</span> <span class="ident">SelectionResult</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> (<span class="ident">SelectedField</span>, <span class="ident">PrismaValue</span>);
-    <span class="kw">type</span> <span class="ident">IntoIter</span> <span class="op">=</span> <span class="ident">std::vec::IntoIter</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Item</span><span class="op">&gt;</span>;
+<span class="kw">impl </span>IntoIterator <span class="kw">for </span>SelectionResult {
+    <span class="kw">type </span>Item = (SelectedField, PrismaValue);
+    <span class="kw">type </span>IntoIter = std::vec::IntoIter&lt;<span class="self">Self</span>::Item&gt;;
 
-    <span class="kw">fn</span> <span class="ident">into_iter</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::IntoIter</span> {
-        <span class="self">self</span>.<span class="ident">pairs</span>.<span class="ident">into_iter</span>()
+    <span class="kw">fn </span>into_iter(<span class="self">self</span>) -&gt; <span class="self">Self</span>::IntoIter {
+        <span class="self">self</span>.pairs.into_iter()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="ident">T</span>, <span class="ident">PrismaValue</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SelectionResult</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">SelectedField</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T&gt; From&lt;(T, PrismaValue)&gt; <span class="kw">for </span>SelectionResult
+<span class="kw">where
+    </span>T: Into&lt;SelectedField&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>((<span class="ident">x</span>, <span class="ident">value</span>): (<span class="ident">T</span>, <span class="ident">PrismaValue</span>)) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="macro">vec!</span>[(<span class="ident">x</span>.<span class="ident">into</span>(), <span class="ident">value</span>)])
+    <span class="kw">fn </span>from((x, value): (T, PrismaValue)) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new(<span class="macro">vec!</span>[(x.into(), value)])
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">T</span>, <span class="ident">PrismaValue</span>)<span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SelectionResult</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">SelectedField</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T&gt; From&lt;Vec&lt;(T, PrismaValue)&gt;&gt; <span class="kw">for </span>SelectionResult
+<span class="kw">where
+    </span>T: Into&lt;SelectedField&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">tuples</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">T</span>, <span class="ident">PrismaValue</span>)<span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>(<span class="ident">tuples</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">x</span>, <span class="ident">value</span>)<span class="op">|</span> (<span class="ident">x</span>.<span class="ident">into</span>(), <span class="ident">value</span>)).<span class="ident">collect</span>())
+    <span class="kw">fn </span>from(tuples: Vec&lt;(T, PrismaValue)&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new(tuples.into_iter().map(|(x, value)| (x.into(), value)).collect())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">FieldSelection</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SelectionResult</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">fs</span>: <span class="kw-2">&amp;</span><span class="ident">FieldSelection</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">pairs</span>: <span class="ident">fs</span>
-                .<span class="ident">selections</span>()
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">selection</span><span class="op">|</span> (<span class="ident">selection</span>.<span class="ident">clone</span>(), <span class="ident">PrismaValue::Null</span>))
-                .<span class="ident">collect</span>(),
+<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span>FieldSelection&gt; <span class="kw">for </span>SelectionResult {
+    <span class="kw">fn </span>from(fs: <span class="kw-2">&amp;</span>FieldSelection) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            pairs: fs
+                .selections()
+                .map(|selection| (selection.clone(), PrismaValue::Null))
+                .collect(),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="prisma_models" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="prisma_models" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

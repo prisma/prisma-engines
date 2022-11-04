@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-otlp-0.10.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../opentelemetry_otlp/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../opentelemetry_otlp/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../opentelemetry_otlp/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-otlp-0.10.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../opentelemetry_otlp/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../opentelemetry_otlp/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../opentelemetry_otlp/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -379,386 +379,386 @@
 <span id="379">379</span>
 <span id="380">380</span>
 <span id="381">381</span>
-</pre><pre class="rust"><code><span class="doccomment">//! The OTLP Exporter supports exporting trace and metric data in the OTLP</span>
-<span class="doccomment">//! format to the OpenTelemetry collector or other compatible backend.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The OpenTelemetry Collector offers a vendor-agnostic implementation on how</span>
-<span class="doccomment">//! to receive, process, and export telemetry data. In addition, it removes</span>
-<span class="doccomment">//! the need to run, operate, and maintain multiple agents/collectors in</span>
-<span class="doccomment">//! order to support open-source telemetry data formats (e.g. Jaeger,</span>
-<span class="doccomment">//! Prometheus, etc.) sending to multiple open-source or commercial back-ends.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Currently, this crate only support sending tracing data or metrics in OTLP</span>
-<span class="doccomment">//! via grpc and http(in binary format). Supports for other format and protocol</span>
-<span class="doccomment">//! will be added in the future. The details of what&#39;s currently offering in this</span>
-<span class="doccomment">//! crate can be found in this doc.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Quickstart</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! First make sure you have a running version of the opentelemetry collector</span>
-<span class="doccomment">//! you want to send data to:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```shell</span>
-<span class="doccomment">//! $ docker run -p 4317:4317 otel/opentelemetry-collector-dev:latest</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Then install a new pipeline with the recommended defaults to start exporting</span>
-<span class="doccomment">//! telemetry. You will have to build a OTLP exporter first.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Tracing and metrics pipelines can be started with `new_pipeline().tracing()` and</span>
-<span class="doccomment">//! `new_pipeline().metrics()` respectively.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```no_run</span>
-<span class="doccomment">//! use opentelemetry::trace::Tracer;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error + Send + Sync + &#39;static&gt;&gt; {</span>
-<span class="doccomment">//!     // First, create a OTLP exporter builder. Configure it as you need.</span>
-<span class="doccomment">//!     let otlp_exporter = opentelemetry_otlp::new_exporter().tonic();</span>
-<span class="doccomment">//!     // Then pass it into pipeline builder</span>
-<span class="doccomment">//!     let tracer = opentelemetry_otlp::new_pipeline()</span>
-<span class="doccomment">//!             .tracing()</span>
-<span class="doccomment">//!             .with_exporter(otlp_exporter)</span>
-<span class="doccomment">//!             .install_simple()?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     tracer.in_span(&quot;doing_work&quot;, |cx| {</span>
-<span class="doccomment">//!         // Traced app logic here...</span>
-<span class="doccomment">//!     });</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     Ok(())</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Performance</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! For optimal performance, a batch exporter is recommended as the simple</span>
-<span class="doccomment">//! exporter will export each span synchronously on dropping. You can enable the</span>
-<span class="doccomment">//! [`rt-tokio`], [`rt-tokio-current-thread`] or [`rt-async-std`] features and</span>
-<span class="doccomment">//! specify a runtime on the pipeline builder to have a batch exporter</span>
-<span class="doccomment">//! configured for you automatically.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! [dependencies]</span>
-<span class="doccomment">//! opentelemetry = { version = &quot;*&quot;, features = [&quot;async-std&quot;] }</span>
-<span class="doccomment">//! opentelemetry-otlp = { version = &quot;*&quot;, features = [&quot;grpc-sys&quot;] }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```no_run</span>
-<span class="doccomment">//! # fn main() -&gt; Result&lt;(), opentelemetry::trace::TraceError&gt; {</span>
-<span class="doccomment">//! let tracer = opentelemetry_otlp::new_pipeline()</span>
-<span class="doccomment">//!     .tracing()</span>
-<span class="doccomment">//!     .with_exporter(opentelemetry_otlp::new_exporter().tonic())</span>
-<span class="doccomment">//!     .install_batch(opentelemetry::runtime::AsyncStd)?;</span>
-<span class="doccomment">//! # Ok(())</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`tokio`]: https://tokio.rs</span>
-<span class="doccomment">//! [`async-std`]: https://async.rs</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Kitchen Sink Full Configuration</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Example showing how to override all configuration options.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Generally there are two parts of configuration. One is metrics config</span>
-<span class="doccomment">//! or tracing config. Users can config it via [`OtlpTracePipeline`]</span>
-<span class="doccomment">//! or [`OtlpMetricPipeline`]. The other is exporting configuration.</span>
-<span class="doccomment">//! Users can set those configurations using [`OtlpExporterPipeline`] based</span>
-<span class="doccomment">//! on the choice of exporters.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```no_run</span>
-<span class="doccomment">//! use opentelemetry::{KeyValue, trace::Tracer};</span>
-<span class="doccomment">//! use opentelemetry::sdk::{trace::{self, IdGenerator, Sampler}, Resource};</span>
-<span class="doccomment">//! use opentelemetry::sdk::metrics::{selectors, PushController};</span>
-<span class="doccomment">//! use opentelemetry::util::tokio_interval_stream;</span>
-<span class="doccomment">//! use opentelemetry_otlp::{Protocol, WithExportConfig, ExportConfig};</span>
-<span class="doccomment">//! use std::time::Duration;</span>
-<span class="doccomment">//! use tonic::metadata::*;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error + Send + Sync + &#39;static&gt;&gt; {</span>
-<span class="doccomment">//!     let mut map = MetadataMap::with_capacity(3);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     map.insert(&quot;x-host&quot;, &quot;example.com&quot;.parse().unwrap());</span>
-<span class="doccomment">//!     map.insert(&quot;x-number&quot;, &quot;123&quot;.parse().unwrap());</span>
-<span class="doccomment">//!     map.insert_bin(&quot;trace-proto-bin&quot;, MetadataValue::from_bytes(b&quot;[binary data]&quot;));</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     let tracer = opentelemetry_otlp::new_pipeline()</span>
-<span class="doccomment">//!         .tracing()</span>
-<span class="doccomment">//!         .with_exporter(</span>
-<span class="doccomment">//!             opentelemetry_otlp::new_exporter()</span>
-<span class="doccomment">//!             .tonic()</span>
-<span class="doccomment">//!             .with_endpoint(&quot;http://localhost:4317&quot;)</span>
-<span class="doccomment">//!             .with_timeout(Duration::from_secs(3))</span>
-<span class="doccomment">//!             .with_metadata(map)</span>
-<span class="doccomment">//!          )</span>
-<span class="doccomment">//!         .with_trace_config(</span>
-<span class="doccomment">//!             trace::config()</span>
-<span class="doccomment">//!                 .with_sampler(Sampler::AlwaysOn)</span>
-<span class="doccomment">//!                 .with_id_generator(IdGenerator::default())</span>
-<span class="doccomment">//!                 .with_max_events_per_span(64)</span>
-<span class="doccomment">//!                 .with_max_attributes_per_span(16)</span>
-<span class="doccomment">//!                 .with_max_events_per_span(16)</span>
-<span class="doccomment">//!                 .with_resource(Resource::new(vec![KeyValue::new(&quot;service.name&quot;, &quot;example&quot;)])),</span>
-<span class="doccomment">//!         )</span>
-<span class="doccomment">//!         .install_batch(opentelemetry::runtime::Tokio)?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     let export_config = ExportConfig {</span>
-<span class="doccomment">//!         endpoint: &quot;http://localhost:4317&quot;.to_string(),</span>
-<span class="doccomment">//!         timeout: Duration::from_secs(3),</span>
-<span class="doccomment">//!         protocol: Protocol::Grpc</span>
-<span class="doccomment">//!     };</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     let meter = opentelemetry_otlp::new_pipeline()</span>
-<span class="doccomment">//!         .metrics(tokio::spawn, tokio_interval_stream)</span>
-<span class="doccomment">//!         .with_exporter(</span>
-<span class="doccomment">//!             opentelemetry_otlp::new_exporter()</span>
-<span class="doccomment">//!                 .tonic()</span>
-<span class="doccomment">//!                 .with_export_config(export_config),</span>
-<span class="doccomment">//!                 // can also config it using with_* functions like the tracing part above.</span>
-<span class="doccomment">//!         )</span>
-<span class="doccomment">//!         .with_stateful(true)</span>
-<span class="doccomment">//!         .with_period(Duration::from_secs(3))</span>
-<span class="doccomment">//!         .with_timeout(Duration::from_secs(10))</span>
-<span class="doccomment">//!         .with_aggregator_selector(selectors::simple::Selector::Exact)</span>
-<span class="doccomment">//!         .build();</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     tracer.in_span(&quot;doing_work&quot;, |cx| {</span>
-<span class="doccomment">//!         // Traced app logic here...</span>
-<span class="doccomment">//!     });</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!     Ok(())</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Grpc libraries comparison</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The table below provides a short comparison between `grpcio` and `tonic`, two</span>
-<span class="doccomment">//! of the most popular grpc libraries in Rust. Users can choose between them when</span>
-<span class="doccomment">//! working with otlp and grpc.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! | Project | [hyperium/tonic](https://github.com/hyperium/tonic) | [tikv/grpc-rs](https://github.com/tikv/grpc-rs) |</span>
-<span class="doccomment">//! |---|---|---|</span>
-<span class="doccomment">//! | Feature name | --features=default | --features=grpc-sys |</span>
-<span class="doccomment">//! | gRPC library | [`tonic`](https://crates.io/crates/tonic) | [`grpcio`](https://crates.io/crates/grpcio) |</span>
-<span class="doccomment">//! | Transport | [hyperium/hyper](https://github.com/hyperium/hyper) (Rust) | [grpc/grpc](https://github.com/grpc/grpc) (C++ binding) |</span>
-<span class="doccomment">//! | TLS support | yes | yes |</span>
-<span class="doccomment">//! | TLS optional | yes | yes |</span>
-<span class="doccomment">//! | TLS library | rustls | OpenSSL |</span>
-<span class="doccomment">//! | Supported .proto generator | [`prost`](https://crates.io/crates/prost) | [`prost`](https://crates.io/crates/prost), [`protobuf`](https://crates.io/crates/protobuf) |</span>
-<span class="attribute">#![<span class="ident">warn</span>(
-    <span class="ident">future_incompatible</span>,
-    <span class="ident">missing_debug_implementations</span>,
-    <span class="ident">missing_docs</span>,
-    <span class="ident">nonstandard_style</span>,
-    <span class="ident">rust_2018_idioms</span>,
-    <span class="ident">unreachable_pub</span>,
-    <span class="ident">unused</span>
-)]</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">elided_lifetimes_in_paths</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">feature</span>(<span class="ident">doc_cfg</span>), <span class="ident">deny</span>(<span class="ident">rustdoc::broken_intra_doc_links</span>))]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">test</span>, <span class="ident">deny</span>(<span class="ident">warnings</span>))]</span>
+</pre><pre class="rust"><code><span class="doccomment">//! The OTLP Exporter supports exporting trace and metric data in the OTLP
+//! format to the OpenTelemetry collector or other compatible backend.
+//!
+//! The OpenTelemetry Collector offers a vendor-agnostic implementation on how
+//! to receive, process, and export telemetry data. In addition, it removes
+//! the need to run, operate, and maintain multiple agents/collectors in
+//! order to support open-source telemetry data formats (e.g. Jaeger,
+//! Prometheus, etc.) sending to multiple open-source or commercial back-ends.
+//!
+//! Currently, this crate only support sending tracing data or metrics in OTLP
+//! via grpc and http(in binary format). Supports for other format and protocol
+//! will be added in the future. The details of what&#39;s currently offering in this
+//! crate can be found in this doc.
+//!
+//! # Quickstart
+//!
+//! First make sure you have a running version of the opentelemetry collector
+//! you want to send data to:
+//!
+//! ```shell
+//! $ docker run -p 4317:4317 otel/opentelemetry-collector-dev:latest
+//! ```
+//!
+//! Then install a new pipeline with the recommended defaults to start exporting
+//! telemetry. You will have to build a OTLP exporter first.
+//!
+//! Tracing and metrics pipelines can be started with `new_pipeline().tracing()` and
+//! `new_pipeline().metrics()` respectively.
+//!
+//! ```no_run
+//! use opentelemetry::trace::Tracer;
+//!
+//! fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error + Send + Sync + &#39;static&gt;&gt; {
+//!     // First, create a OTLP exporter builder. Configure it as you need.
+//!     let otlp_exporter = opentelemetry_otlp::new_exporter().tonic();
+//!     // Then pass it into pipeline builder
+//!     let tracer = opentelemetry_otlp::new_pipeline()
+//!             .tracing()
+//!             .with_exporter(otlp_exporter)
+//!             .install_simple()?;
+//!
+//!     tracer.in_span(&quot;doing_work&quot;, |cx| {
+//!         // Traced app logic here...
+//!     });
+//!
+//!     Ok(())
+//! }
+//! ```
+//!
+//! ## Performance
+//!
+//! For optimal performance, a batch exporter is recommended as the simple
+//! exporter will export each span synchronously on dropping. You can enable the
+//! [`rt-tokio`], [`rt-tokio-current-thread`] or [`rt-async-std`] features and
+//! specify a runtime on the pipeline builder to have a batch exporter
+//! configured for you automatically.
+//!
+//! ```toml
+//! [dependencies]
+//! opentelemetry = { version = &quot;*&quot;, features = [&quot;async-std&quot;] }
+//! opentelemetry-otlp = { version = &quot;*&quot;, features = [&quot;grpc-sys&quot;] }
+//! ```
+//!
+//! ```no_run
+//! # fn main() -&gt; Result&lt;(), opentelemetry::trace::TraceError&gt; {
+//! let tracer = opentelemetry_otlp::new_pipeline()
+//!     .tracing()
+//!     .with_exporter(opentelemetry_otlp::new_exporter().tonic())
+//!     .install_batch(opentelemetry::runtime::AsyncStd)?;
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! [`tokio`]: https://tokio.rs
+//! [`async-std`]: https://async.rs
+//!
+//! # Kitchen Sink Full Configuration
+//!
+//! Example showing how to override all configuration options.
+//!
+//! Generally there are two parts of configuration. One is metrics config
+//! or tracing config. Users can config it via [`OtlpTracePipeline`]
+//! or [`OtlpMetricPipeline`]. The other is exporting configuration.
+//! Users can set those configurations using [`OtlpExporterPipeline`] based
+//! on the choice of exporters.
+//!
+//! ```no_run
+//! use opentelemetry::{KeyValue, trace::Tracer};
+//! use opentelemetry::sdk::{trace::{self, IdGenerator, Sampler}, Resource};
+//! use opentelemetry::sdk::metrics::{selectors, PushController};
+//! use opentelemetry::util::tokio_interval_stream;
+//! use opentelemetry_otlp::{Protocol, WithExportConfig, ExportConfig};
+//! use std::time::Duration;
+//! use tonic::metadata::*;
+//!
+//! fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error + Send + Sync + &#39;static&gt;&gt; {
+//!     let mut map = MetadataMap::with_capacity(3);
+//!
+//!     map.insert(&quot;x-host&quot;, &quot;example.com&quot;.parse().unwrap());
+//!     map.insert(&quot;x-number&quot;, &quot;123&quot;.parse().unwrap());
+//!     map.insert_bin(&quot;trace-proto-bin&quot;, MetadataValue::from_bytes(b&quot;[binary data]&quot;));
+//!
+//!     let tracer = opentelemetry_otlp::new_pipeline()
+//!         .tracing()
+//!         .with_exporter(
+//!             opentelemetry_otlp::new_exporter()
+//!             .tonic()
+//!             .with_endpoint(&quot;http://localhost:4317&quot;)
+//!             .with_timeout(Duration::from_secs(3))
+//!             .with_metadata(map)
+//!          )
+//!         .with_trace_config(
+//!             trace::config()
+//!                 .with_sampler(Sampler::AlwaysOn)
+//!                 .with_id_generator(IdGenerator::default())
+//!                 .with_max_events_per_span(64)
+//!                 .with_max_attributes_per_span(16)
+//!                 .with_max_events_per_span(16)
+//!                 .with_resource(Resource::new(vec![KeyValue::new(&quot;service.name&quot;, &quot;example&quot;)])),
+//!         )
+//!         .install_batch(opentelemetry::runtime::Tokio)?;
+//!
+//!     let export_config = ExportConfig {
+//!         endpoint: &quot;http://localhost:4317&quot;.to_string(),
+//!         timeout: Duration::from_secs(3),
+//!         protocol: Protocol::Grpc
+//!     };
+//!
+//!     let meter = opentelemetry_otlp::new_pipeline()
+//!         .metrics(tokio::spawn, tokio_interval_stream)
+//!         .with_exporter(
+//!             opentelemetry_otlp::new_exporter()
+//!                 .tonic()
+//!                 .with_export_config(export_config),
+//!                 // can also config it using with_* functions like the tracing part above.
+//!         )
+//!         .with_stateful(true)
+//!         .with_period(Duration::from_secs(3))
+//!         .with_timeout(Duration::from_secs(10))
+//!         .with_aggregator_selector(selectors::simple::Selector::Exact)
+//!         .build();
+//!
+//!     tracer.in_span(&quot;doing_work&quot;, |cx| {
+//!         // Traced app logic here...
+//!     });
+//!
+//!     Ok(())
+//! }
+//! ```
+//!
+//! # Grpc libraries comparison
+//!
+//! The table below provides a short comparison between `grpcio` and `tonic`, two
+//! of the most popular grpc libraries in Rust. Users can choose between them when
+//! working with otlp and grpc.
+//!
+//! | Project | [hyperium/tonic](https://github.com/hyperium/tonic) | [tikv/grpc-rs](https://github.com/tikv/grpc-rs) |
+//! |---|---|---|
+//! | Feature name | --features=default | --features=grpc-sys |
+//! | gRPC library | [`tonic`](https://crates.io/crates/tonic) | [`grpcio`](https://crates.io/crates/grpcio) |
+//! | Transport | [hyperium/hyper](https://github.com/hyperium/hyper) (Rust) | [grpc/grpc](https://github.com/grpc/grpc) (C++ binding) |
+//! | TLS support | yes | yes |
+//! | TLS optional | yes | yes |
+//! | TLS library | rustls | OpenSSL |
+//! | Supported .proto generator | [`prost`](https://crates.io/crates/prost) | [`prost`](https://crates.io/crates/prost), [`protobuf`](https://crates.io/crates/protobuf) |
+</span><span class="attribute">#![warn(
+    future_incompatible,
+    missing_debug_implementations,
+    missing_docs,
+    nonstandard_style,
+    rust_2018_idioms,
+    unreachable_pub,
+    unused
+)]
+#![allow(elided_lifetimes_in_paths)]
+#![cfg_attr(docsrs, feature(doc_cfg), deny(rustdoc::broken_intra_doc_links))]
+#![cfg_attr(test, deny(warnings))]
 
-<span class="comment">// proto mod contains file generated by protobuf or other build tools.</span>
-<span class="comment">// we should manually change it. Thus skip format and lint check.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(
-<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;integration-testing&quot;</span>)
-)]</span>
-<span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">warnings</span>)]</span>
-<span class="kw">mod</span> <span class="ident">proto</span>;
+</span><span class="comment">// proto mod contains file generated by protobuf or other build tools.
+// we should manually change it. Thus skip format and lint check.
+</span><span class="attribute">#[cfg(
+not(feature = <span class="string">&quot;integration-testing&quot;</span>)
+)]
+#[rustfmt::skip]
+#[allow(warnings)]
+</span><span class="kw">mod </span>proto;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;integration-testing&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">warnings</span>)]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">proto</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;integration-testing&quot;</span>)]
+#[rustfmt::skip]
+#[allow(warnings)]
+#[doc(hidden)]
+</span><span class="kw">pub mod </span>proto;
 
-<span class="kw">mod</span> <span class="ident">exporter</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;metrics&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">metric</span>;
-<span class="kw">mod</span> <span class="ident">span</span>;
-<span class="kw">mod</span> <span class="ident">transform</span>;
+<span class="kw">mod </span>exporter;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;metrics&quot;</span>)]
+</span><span class="kw">mod </span>metric;
+<span class="kw">mod </span>span;
+<span class="kw">mod </span>transform;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::exporter::ExportConfig</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::span</span>::{<span class="ident">OtlpTracePipeline</span>, <span class="ident">SpanExporter</span>, <span class="ident">SpanExporterBuilder</span>};
+<span class="kw">pub use </span><span class="kw">crate</span>::exporter::ExportConfig;
+<span class="kw">pub use </span><span class="kw">crate</span>::span::{OtlpTracePipeline, SpanExporter, SpanExporterBuilder};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;metrics&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::metric</span>::{<span class="ident">MetricsExporter</span>, <span class="ident">OtlpMetricPipeline</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;metrics&quot;</span>)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::metric::{MetricsExporter, OtlpMetricPipeline};
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::exporter</span>::{
-    <span class="ident">HasExportConfig</span>, <span class="ident">WithExportConfig</span>, <span class="ident">OTEL_EXPORTER_OTLP_ENDPOINT</span>,
-    <span class="ident">OTEL_EXPORTER_OTLP_ENDPOINT_DEFAULT</span>, <span class="ident">OTEL_EXPORTER_OTLP_TIMEOUT</span>,
-    <span class="ident">OTEL_EXPORTER_OTLP_TIMEOUT_DEFAULT</span>, <span class="ident">OTEL_EXPORTER_OTLP_TRACES_ENDPOINT</span>,
-    <span class="ident">OTEL_EXPORTER_OTLP_TRACES_TIMEOUT</span>,
+<span class="kw">pub use </span><span class="kw">crate</span>::exporter::{
+    HasExportConfig, WithExportConfig, OTEL_EXPORTER_OTLP_ENDPOINT,
+    OTEL_EXPORTER_OTLP_ENDPOINT_DEFAULT, OTEL_EXPORTER_OTLP_TIMEOUT,
+    OTEL_EXPORTER_OTLP_TIMEOUT_DEFAULT, OTEL_EXPORTER_OTLP_TRACES_ENDPOINT,
+    OTEL_EXPORTER_OTLP_TRACES_TIMEOUT,
 };
 
-<span class="kw">use</span> <span class="ident">opentelemetry::sdk::export::ExportError</span>;
+<span class="kw">use </span>opentelemetry::sdk::export::ExportError;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;grpc-sys&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::exporter::grpcio</span>::{<span class="ident">Compression</span>, <span class="ident">Credentials</span>, <span class="ident">GrpcioExporterBuilder</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-proto&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::exporter::http::HttpExporterBuilder</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tonic&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::exporter::tonic::TonicExporterBuilder</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;grpc-sys&quot;</span>)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::exporter::grpcio::{Compression, Credentials, GrpcioExporterBuilder};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;http-proto&quot;</span>)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::exporter::http::HttpExporterBuilder;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tonic&quot;</span>)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::exporter::tonic::TonicExporterBuilder;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serialize&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="doccomment">/// General builder for both tracing and metrics.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OtlpPipeline</span>;
+<span class="doccomment">/// General builder for both tracing and metrics.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>OtlpPipeline;
 
-<span class="doccomment">/// Build a OTLP metrics or tracing exporter builder. See functions below to understand</span>
-<span class="doccomment">/// what&#39;s currently supported.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OtlpExporterPipeline</span>;
+<span class="doccomment">/// Build a OTLP metrics or tracing exporter builder. See functions below to understand
+/// what&#39;s currently supported.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>OtlpExporterPipeline;
 
-<span class="kw">impl</span> <span class="ident">OtlpExporterPipeline</span> {
-    <span class="doccomment">/// Use tonic as grpc layer, return a `TonicExporterBuilder` to config tonic and build the exporter.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This exporter can be used in both `tracing` and `metrics` pipeline.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tonic&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tonic</span>(<span class="self">self</span>) -&gt; <span class="ident">TonicExporterBuilder</span> {
-        <span class="ident">TonicExporterBuilder::default</span>()
+<span class="kw">impl </span>OtlpExporterPipeline {
+    <span class="doccomment">/// Use tonic as grpc layer, return a `TonicExporterBuilder` to config tonic and build the exporter.
+    ///
+    /// This exporter can be used in both `tracing` and `metrics` pipeline.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;tonic&quot;</span>)]
+    </span><span class="kw">pub fn </span>tonic(<span class="self">self</span>) -&gt; TonicExporterBuilder {
+        TonicExporterBuilder::default()
     }
 
-    <span class="doccomment">/// Use grpcio as grpc layer, return a `GrpcioExporterBuilder` to config the grpcio and build the exporter.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This exporter can only be used in `tracing` pipeline. Support for `metrics` pipeline will be</span>
-    <span class="doccomment">/// added in the future.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;grpc-sys&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">grpcio</span>(<span class="self">self</span>) -&gt; <span class="ident">GrpcioExporterBuilder</span> {
-        <span class="ident">GrpcioExporterBuilder::default</span>()
+    <span class="doccomment">/// Use grpcio as grpc layer, return a `GrpcioExporterBuilder` to config the grpcio and build the exporter.
+    ///
+    /// This exporter can only be used in `tracing` pipeline. Support for `metrics` pipeline will be
+    /// added in the future.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;grpc-sys&quot;</span>)]
+    </span><span class="kw">pub fn </span>grpcio(<span class="self">self</span>) -&gt; GrpcioExporterBuilder {
+        GrpcioExporterBuilder::default()
     }
 
-    <span class="doccomment">/// Use HTTP as transport layer, return a `HttpExporterBuilder` to config the http transport</span>
-    <span class="doccomment">/// and build the exporter.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This exporter can only be used in `tracing` pipeline. Support for `metrics` pipeline will be</span>
-    <span class="doccomment">/// added in the future.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-proto&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">http</span>(<span class="self">self</span>) -&gt; <span class="ident">HttpExporterBuilder</span> {
-        <span class="ident">HttpExporterBuilder::default</span>()
+    <span class="doccomment">/// Use HTTP as transport layer, return a `HttpExporterBuilder` to config the http transport
+    /// and build the exporter.
+    ///
+    /// This exporter can only be used in `tracing` pipeline. Support for `metrics` pipeline will be
+    /// added in the future.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http-proto&quot;</span>)]
+    </span><span class="kw">pub fn </span>http(<span class="self">self</span>) -&gt; HttpExporterBuilder {
+        HttpExporterBuilder::default()
     }
 }
 
-<span class="doccomment">/// Create a new pipeline builder with the recommended configuration.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```no_run</span>
-<span class="doccomment">/// fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error + Send + Sync + &#39;static&gt;&gt; {</span>
-<span class="doccomment">///     let tracing_builder = opentelemetry_otlp::new_pipeline()</span>
-<span class="doccomment">///                    .tracing();</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     Ok(())</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_pipeline</span>() -&gt; <span class="ident">OtlpPipeline</span> {
-    <span class="ident">OtlpPipeline</span>
+<span class="doccomment">/// Create a new pipeline builder with the recommended configuration.
+///
+/// ## Examples
+///
+/// ```no_run
+/// fn main() -&gt; Result&lt;(), Box&lt;dyn std::error::Error + Send + Sync + &#39;static&gt;&gt; {
+///     let tracing_builder = opentelemetry_otlp::new_pipeline()
+///                    .tracing();
+///
+///     Ok(())
+/// }
+/// ```
+</span><span class="kw">pub fn </span>new_pipeline() -&gt; OtlpPipeline {
+    OtlpPipeline
 }
 
-<span class="doccomment">/// Create a builder to build OTLP metrics exporter or tracing exporter.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_exporter</span>() -&gt; <span class="ident">OtlpExporterPipeline</span> {
-    <span class="ident">OtlpExporterPipeline</span>
+<span class="doccomment">/// Create a builder to build OTLP metrics exporter or tracing exporter.
+</span><span class="kw">pub fn </span>new_exporter() -&gt; OtlpExporterPipeline {
+    OtlpExporterPipeline
 }
 
-<span class="doccomment">/// Wrap type for errors from this crate.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">thiserror::Error</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Error</span> {
-    <span class="doccomment">/// Wrap error from [`tonic::transport::Error`]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tonic&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;transport error {0}&quot;</span>)]</span>
-    <span class="ident">Transport</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">tonic::transport::Error</span>),
+<span class="doccomment">/// Wrap type for errors from this crate.
+</span><span class="attribute">#[derive(thiserror::Error, Debug)]
+</span><span class="kw">pub enum </span>Error {
+    <span class="doccomment">/// Wrap error from [`tonic::transport::Error`]
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;tonic&quot;</span>)]
+    #[error(<span class="string">&quot;transport error {0}&quot;</span>)]
+    </span>Transport(<span class="attribute">#[from] </span>tonic::transport::Error),
 
-    <span class="doccomment">/// Wrap the [`tonic::codegen::http::uri::InvalidUri`] error</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tonic&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-proto&quot;</span>))]</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;invalid URI {0}&quot;</span>)]</span>
-    <span class="ident">InvalidUri</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">http::uri::InvalidUri</span>),
+    <span class="doccomment">/// Wrap the [`tonic::codegen::http::uri::InvalidUri`] error
+    </span><span class="attribute">#[cfg(any(feature = <span class="string">&quot;tonic&quot;</span>, feature = <span class="string">&quot;http-proto&quot;</span>))]
+    #[error(<span class="string">&quot;invalid URI {0}&quot;</span>)]
+    </span>InvalidUri(<span class="attribute">#[from] </span>http::uri::InvalidUri),
 
-    <span class="doccomment">/// Wrap type for [`tonic::Status`]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tonic&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;the grpc server returns error ({code}): {message}&quot;</span>)]</span>
-    <span class="ident">Status</span> {
-        <span class="doccomment">/// grpc status code</span>
-        <span class="ident">code</span>: <span class="ident">tonic::Code</span>,
-        <span class="doccomment">/// error message</span>
-        <span class="ident">message</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// Wrap type for [`tonic::Status`]
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;tonic&quot;</span>)]
+    #[error(<span class="string">&quot;the grpc server returns error ({code}): {message}&quot;</span>)]
+    </span>Status {
+        <span class="doccomment">/// grpc status code
+        </span>code: tonic::Code,
+        <span class="doccomment">/// error message
+        </span>message: String,
     },
 
-    <span class="doccomment">/// Wrap errors from grpcio.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;grpc-sys&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;grpcio error {0}&quot;</span>)]</span>
-    <span class="ident">Grpcio</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">grpcio::Error</span>),
+    <span class="doccomment">/// Wrap errors from grpcio.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;grpc-sys&quot;</span>)]
+    #[error(<span class="string">&quot;grpcio error {0}&quot;</span>)]
+    </span>Grpcio(<span class="attribute">#[from] </span>grpcio::Error),
 
-    <span class="doccomment">/// Http requests failed because no http client is provided.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-proto&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">error</span>(
-        <span class="string">&quot;no http client, you must select one from features or provide your own implementation&quot;</span>
-    )]</span>
-    <span class="ident">NoHttpClient</span>,
+    <span class="doccomment">/// Http requests failed because no http client is provided.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http-proto&quot;</span>)]
+    #[error(
+        <span class="string">&quot;no http client, you must select one from features or provide your own implementation&quot;
+    </span>)]
+    </span>NoHttpClient,
 
-    <span class="doccomment">/// Http requests failed.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-proto&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;http request failed with {0}&quot;</span>)]</span>
-    <span class="ident">RequestFailed</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">http::Error</span>),
+    <span class="doccomment">/// Http requests failed.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http-proto&quot;</span>)]
+    #[error(<span class="string">&quot;http request failed with {0}&quot;</span>)]
+    </span>RequestFailed(<span class="attribute">#[from] </span>http::Error),
 
-    <span class="doccomment">/// The provided value is invalid in HTTP headers.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-proto&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;http header value error {0}&quot;</span>)]</span>
-    <span class="ident">InvalidHeaderValue</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">http::header::InvalidHeaderValue</span>),
+    <span class="doccomment">/// The provided value is invalid in HTTP headers.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http-proto&quot;</span>)]
+    #[error(<span class="string">&quot;http header value error {0}&quot;</span>)]
+    </span>InvalidHeaderValue(<span class="attribute">#[from] </span>http::header::InvalidHeaderValue),
 
-    <span class="doccomment">/// The provided name is invalid in HTTP headers.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-proto&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;http header name error {0}&quot;</span>)]</span>
-    <span class="ident">InvalidHeaderName</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">http::header::InvalidHeaderName</span>),
+    <span class="doccomment">/// The provided name is invalid in HTTP headers.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http-proto&quot;</span>)]
+    #[error(<span class="string">&quot;http header name error {0}&quot;</span>)]
+    </span>InvalidHeaderName(<span class="attribute">#[from] </span>http::header::InvalidHeaderName),
 
-    <span class="doccomment">/// Prost encode failed</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http-proto&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;prost encoding error {0}&quot;</span>)]</span>
-    <span class="ident">EncodeError</span>(<span class="attribute">#[<span class="ident">from</span>]</span> <span class="ident">prost::EncodeError</span>),
+    <span class="doccomment">/// Prost encode failed
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;http-proto&quot;</span>)]
+    #[error(<span class="string">&quot;prost encoding error {0}&quot;</span>)]
+    </span>EncodeError(<span class="attribute">#[from] </span>prost::EncodeError),
 
-    <span class="doccomment">/// The lock in exporters has been poisoned.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;metrics&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;the lock of the {0} has been poisoned&quot;</span>)]</span>
-    <span class="ident">PoisonedLock</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>),
+    <span class="doccomment">/// The lock in exporters has been poisoned.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;metrics&quot;</span>)]
+    #[error(<span class="string">&quot;the lock of the {0} has been poisoned&quot;</span>)]
+    </span>PoisonedLock(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str),
 
-    <span class="doccomment">/// The pipeline will need a exporter to complete setup. Throw this error if none is provided.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;no exporter builder is provided, please provide one using with_exporter() method&quot;</span>)]</span>
-    <span class="ident">NoExporterBuilder</span>,
+    <span class="doccomment">/// The pipeline will need a exporter to complete setup. Throw this error if none is provided.
+    </span><span class="attribute">#[error(<span class="string">&quot;no exporter builder is provided, please provide one using with_exporter() method&quot;</span>)]
+    </span>NoExporterBuilder,
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tonic&quot;</span>)]</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">tonic::Status</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">status</span>: <span class="ident">tonic::Status</span>) -&gt; <span class="ident">Error</span> {
-        <span class="ident">Error::Status</span> {
-            <span class="ident">code</span>: <span class="ident">status</span>.<span class="ident">code</span>(),
-            <span class="ident">message</span>: {
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">status</span>.<span class="ident">message</span>().<span class="ident">is_empty</span>() {
-                    <span class="string">&quot;, detailed error message: &quot;</span>.<span class="ident">to_string</span>() <span class="op">+</span> <span class="ident">status</span>.<span class="ident">message</span>()
-                } <span class="kw">else</span> {
-                    <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>()
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tonic&quot;</span>)]
+</span><span class="kw">impl </span>From&lt;tonic::Status&gt; <span class="kw">for </span>Error {
+    <span class="kw">fn </span>from(status: tonic::Status) -&gt; Error {
+        Error::Status {
+            code: status.code(),
+            message: {
+                <span class="kw">if </span>!status.message().is_empty() {
+                    <span class="string">&quot;, detailed error message: &quot;</span>.to_string() + status.message()
+                } <span class="kw">else </span>{
+                    <span class="string">&quot;&quot;</span>.to_string()
                 }
             },
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ExportError</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">exporter_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="string">&quot;otlp&quot;</span>
-    }
+<span class="kw">impl </span>ExportError <span class="kw">for </span>Error {
+    <span class="kw">fn </span>exporter_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="string">&quot;otlp&quot;
+    </span>}
 }
 
-<span class="doccomment">/// The communication protocol to use when exporting data.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Protocol</span> {
-    <span class="doccomment">/// GRPC protocol</span>
-    <span class="ident">Grpc</span>,
-    <span class="comment">// TODO add support for other protocols</span>
-    <span class="comment">// HttpJson,</span>
-    <span class="doccomment">/// HTTP protocol with binary protobuf</span>
-    <span class="ident">HttpBinary</span>,
+<span class="doccomment">/// The communication protocol to use when exporting data.
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serialize&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Clone, Copy, Debug)]
+</span><span class="kw">pub enum </span>Protocol {
+    <span class="doccomment">/// GRPC protocol
+    </span>Grpc,
+    <span class="comment">// TODO add support for other protocols
+    // HttpJson,
+    </span><span class="doccomment">/// HTTP protocol with binary protobuf
+    </span>HttpBinary,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="opentelemetry_otlp" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="opentelemetry_otlp" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

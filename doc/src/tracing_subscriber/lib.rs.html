@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tracing_subscriber/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.3.11/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../tracing_subscriber/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../tracing_subscriber/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../tracing_subscriber/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -252,257 +252,257 @@
 <span id="250">250</span>
 <span id="251">251</span>
 <span id="252">252</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Utilities for implementing and composing [`tracing`] subscribers.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`tracing`] is a framework for instrumenting Rust programs to collect</span>
-<span class="doccomment">//! scoped, structured, and async-aware diagnostics. The [`Subscriber`] trait</span>
-<span class="doccomment">//! represents the functionality necessary to collect this trace data. This</span>
-<span class="doccomment">//! crate contains tools for composing subscribers out of smaller units of</span>
-<span class="doccomment">//! behaviour, and batteries-included implementations of common subscriber</span>
-<span class="doccomment">//! functionality.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `tracing-subscriber` is intended for use by both `Subscriber` authors and</span>
-<span class="doccomment">//! application authors using `tracing` to instrument their applications.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! *Compiler support: [requires `rustc` 1.49+][msrv]*</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [msrv]: #supported-rust-versions</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## `Layer`s and `Filter`s</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The most important component of the `tracing-subscriber` API is the</span>
-<span class="doccomment">//! [`Layer`] trait, which provides a composable abstraction for building</span>
-<span class="doccomment">//! [`Subscriber`]s. Like the [`Subscriber`] trait, a [`Layer`] defines a</span>
-<span class="doccomment">//! particular behavior for collecting trace data. Unlike [`Subscriber`]s,</span>
-<span class="doccomment">//! which implement a *complete* strategy for how trace data is collected,</span>
-<span class="doccomment">//! [`Layer`]s provide *modular* implementations of specific behaviors.</span>
-<span class="doccomment">//! Therefore, they can be [composed together] to form a [`Subscriber`] which is</span>
-<span class="doccomment">//! capable of recording traces in a variety of ways. See the [`layer` module&#39;s</span>
-<span class="doccomment">//! documentation][layer] for details on using [`Layer`]s.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! In addition, the [`Filter`] trait defines an interface for filtering what</span>
-<span class="doccomment">//! spans and events are recorded by a particular layer. This allows different</span>
-<span class="doccomment">//! [`Layer`]s to handle separate subsets of the trace data emitted by a</span>
-<span class="doccomment">//! program. See the [documentation on per-layer filtering][plf] for more</span>
-<span class="doccomment">//! information on using [`Filter`]s.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`Layer`]: crate::layer::Layer</span>
-<span class="doccomment">//! [composed together]: crate::layer#composing-layers</span>
-<span class="doccomment">//! [layer]: crate::layer</span>
-<span class="doccomment">//! [`Filter`]: crate::layer::Filter</span>
-<span class="doccomment">//! [plf]: crate::layer#per-layer-filtering</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Included Subscribers</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The following `Subscriber`s are provided for application authors:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [`fmt`] - Formats and logs tracing data (requires the `fmt` feature flag)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Feature Flags</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - `std`: Enables APIs that depend on the on the Rust standard library</span>
-<span class="doccomment">//!   (enabled by default).</span>
-<span class="doccomment">//! - `alloc`: Depend on [`liballoc`] (enabled by &quot;std&quot;).</span>
-<span class="doccomment">//! - `env-filter`: Enables the [`EnvFilter`] type, which implements filtering</span>
-<span class="doccomment">//!   similar to the [`env_logger` crate]. **Requires &quot;std&quot;**.</span>
-<span class="doccomment">//! - `fmt`: Enables the [`fmt`] module, which provides a subscriber</span>
-<span class="doccomment">//!   implementation for printing formatted representations of trace events.</span>
-<span class="doccomment">//!   Enabled by default. **Requires &quot;std&quot;**.</span>
-<span class="doccomment">//! - `ansi`: Enables `fmt` support for ANSI terminal colors. Enabled by</span>
-<span class="doccomment">//!   default.</span>
-<span class="doccomment">//! - `registry`: enables the [`registry`] module. Enabled by default.</span>
-<span class="doccomment">//!   **Requires &quot;std&quot;**.</span>
-<span class="doccomment">//! - `json`: Enables `fmt` support for JSON output. In JSON output, the ANSI</span>
-<span class="doccomment">//!   feature does nothing. **Requires &quot;fmt&quot; and &quot;std&quot;**.</span>
-<span class="doccomment">//! - `local-time`: Enables local time formatting when using the [`time`</span>
-<span class="doccomment">//!   crate]&#39;s timestamp formatters with the `fmt` subscriber.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`registry`]: mod@registry</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Optional Dependencies</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [`tracing-log`]: Enables better formatting for events emitted by `log`</span>
-<span class="doccomment">//!   macros in the `fmt` subscriber. Enabled by default.</span>
-<span class="doccomment">//! - [`time`][`time` crate]: Enables support for using the [`time` crate] for timestamp</span>
-<span class="doccomment">//!   formatting in the `fmt` subscriber.</span>
-<span class="doccomment">//! - [`smallvec`]: Causes the `EnvFilter` type to use the `smallvec` crate (rather</span>
-<span class="doccomment">//!   than `Vec`) as a performance optimization. Enabled by default.</span>
-<span class="doccomment">//! - [`parking_lot`]: Use the `parking_lot` crate&#39;s `RwLock` implementation</span>
-<span class="doccomment">//!   rather than the Rust standard library&#39;s implementation.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### `no_std` Support</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! In embedded systems and other bare-metal applications, `tracing` can be</span>
-<span class="doccomment">//! used without requiring the Rust standard library, although some features are</span>
-<span class="doccomment">//! disabled. Although most of the APIs provided by `tracing-subscriber`, such</span>
-<span class="doccomment">//! as [`fmt`] and [`EnvFilter`], require the standard library, some</span>
-<span class="doccomment">//! functionality, such as the [`Layer`] trait, can still be used in</span>
-<span class="doccomment">//! `no_std` environments.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The dependency on the standard library is controlled by two crate feature</span>
-<span class="doccomment">//! flags, &quot;std&quot;, which enables the dependency on [`libstd`], and &quot;alloc&quot;, which</span>
-<span class="doccomment">//! enables the dependency on [`liballoc`] (and is enabled by the &quot;std&quot;</span>
-<span class="doccomment">//! feature). These features are enabled by default, but `no_std` users can</span>
-<span class="doccomment">//! disable them using:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! # Cargo.toml</span>
-<span class="doccomment">//! tracing-subscriber = { version = &quot;0.3&quot;, default-features = false }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Additional APIs are available when [`liballoc`] is available. To enable</span>
-<span class="doccomment">//! `liballoc` but not `std`, use:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! # Cargo.toml</span>
-<span class="doccomment">//! tracing-subscriber = { version = &quot;0.3&quot;, default-features = false, features = [&quot;alloc&quot;] }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### Unstable Features</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! These feature flags enable **unstable** features. The public API may break in 0.1.x</span>
-<span class="doccomment">//! releases. To enable these features, the `--cfg tracing_unstable` must be passed to</span>
-<span class="doccomment">//! `rustc` when compiling.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The following unstable feature flags are currently available:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! * `valuable`: Enables support for serializing values recorded using the</span>
-<span class="doccomment">//!   [`valuable`] crate as structured JSON in the [`format::Json`] formatter.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! #### Enabling Unstable Features</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The easiest way to set the `tracing_unstable` cfg is to use the `RUSTFLAGS`</span>
-<span class="doccomment">//! env variable when running `cargo` commands:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```shell</span>
-<span class="doccomment">//! RUSTFLAGS=&quot;--cfg tracing_unstable&quot; cargo build</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! Alternatively, the following can be added to the `.cargo/config` file in a</span>
-<span class="doccomment">//! project to automatically enable the cfg flag for that project:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```toml</span>
-<span class="doccomment">//! [build]</span>
-<span class="doccomment">//! rustflags = [&quot;--cfg&quot;, &quot;tracing_unstable&quot;]</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [feature flags]: https://doc.rust-lang.org/cargo/reference/manifest.html#the-features-section</span>
-<span class="doccomment">//! [`valuable`]: https://crates.io/crates/valuable</span>
-<span class="doccomment">//! [`format::Json`]: crate::fmt::format::Json</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Supported Rust Versions</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Tracing is built against the latest stable release. The minimum supported</span>
-<span class="doccomment">//! version is 1.49. The current Tracing version is not guaranteed to build on</span>
-<span class="doccomment">//! Rust versions earlier than the minimum supported version.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Tracing follows the same compiler support policies as the rest of the Tokio</span>
-<span class="doccomment">//! project. The current stable Rust compiler and the three most recent minor</span>
-<span class="doccomment">//! versions before it will always be supported. For example, if the current</span>
-<span class="doccomment">//! stable compiler version is 1.45, the minimum supported version will not be</span>
-<span class="doccomment">//! increased past 1.42, three minor versions prior. Increasing the minimum</span>
-<span class="doccomment">//! supported compiler version is not considered a semver breaking change as</span>
-<span class="doccomment">//! long as doing so complies with this policy.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`tracing`]: https://docs.rs/tracing/latest/tracing/</span>
-<span class="doccomment">//! [`Subscriber`]: https://docs.rs/tracing-core/latest/tracing_core/subscriber/trait.Subscriber.html</span>
-<span class="doccomment">//! [`EnvFilter`]: filter/struct.EnvFilter.html</span>
-<span class="doccomment">//! [`fmt`]: fmt/index.html</span>
-<span class="doccomment">//! [`tracing-log`]: https://crates.io/crates/tracing-log</span>
-<span class="doccomment">//! [`smallvec`]: https://crates.io/crates/smallvec</span>
-<span class="doccomment">//! [`env_logger` crate]: https://crates.io/crates/env_logger</span>
-<span class="doccomment">//! [`parking_lot`]: https://crates.io/crates/parking_lot</span>
-<span class="doccomment">//! [`time` crate]: https://crates.io/crates/time</span>
-<span class="doccomment">//! [`libstd`]: https://doc.rust-lang.org/std/index.html</span>
-<span class="doccomment">//! [`liballoc`]: https://doc.rust-lang.org/alloc/index.html</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/tracing-subscriber/0.3.11&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">doc</span>(
-    <span class="ident">html_logo_url</span> <span class="op">=</span> <span class="string">&quot;https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png&quot;</span>,
-    <span class="ident">issue_tracker_base_url</span> <span class="op">=</span> <span class="string">&quot;https://github.com/tokio-rs/tracing/issues/&quot;</span>
-)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(
-    <span class="ident">docsrs</span>,
-    <span class="comment">// Allows displaying cfgs/feature flags in the documentation.</span>
-    <span class="ident">feature</span>(<span class="ident">doc_cfg</span>),
-    <span class="comment">// Allows adding traits to RustDoc&#39;s list of &quot;notable traits&quot;</span>
-    <span class="ident">feature</span>(<span class="ident">doc_notable_trait</span>),
-    <span class="comment">// Fail the docs build if any intra-docs links are broken</span>
-    <span class="ident">deny</span>(<span class="ident">rustdoc::broken_intra_doc_links</span>),
-)]</span>
-<span class="attribute">#![<span class="ident">warn</span>(
-    <span class="ident">missing_debug_implementations</span>,
-    <span class="ident">missing_docs</span>,
-    <span class="ident">rust_2018_idioms</span>,
-    <span class="ident">unreachable_pub</span>,
-    <span class="ident">bad_style</span>,
-    <span class="ident">const_err</span>,
-    <span class="ident">dead_code</span>,
-    <span class="ident">improper_ctypes</span>,
-    <span class="ident">non_shorthand_field_patterns</span>,
-    <span class="ident">no_mangle_generic_items</span>,
-    <span class="ident">overflowing_literals</span>,
-    <span class="ident">path_statements</span>,
-    <span class="ident">patterns_in_fns_without_body</span>,
-    <span class="ident">private_in_public</span>,
-    <span class="ident">unconditional_recursion</span>,
-    <span class="ident">unused</span>,
-    <span class="ident">unused_allocation</span>,
-    <span class="ident">unused_comparisons</span>,
-    <span class="ident">unused_parens</span>,
-    <span class="ident">while_true</span>
-)]</span>
-<span class="comment">// Using struct update syntax when a struct has no additional fields avoids</span>
-<span class="comment">// a potential source change if additional fields are added to the struct in the</span>
-<span class="comment">// future, reducing diff noise. Allow this even though clippy considers it</span>
-<span class="comment">// &quot;needless&quot;.</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::needless_update</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>), <span class="ident">no_std</span>)]</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Utilities for implementing and composing [`tracing`] subscribers.
+//!
+//! [`tracing`] is a framework for instrumenting Rust programs to collect
+//! scoped, structured, and async-aware diagnostics. The [`Subscriber`] trait
+//! represents the functionality necessary to collect this trace data. This
+//! crate contains tools for composing subscribers out of smaller units of
+//! behaviour, and batteries-included implementations of common subscriber
+//! functionality.
+//!
+//! `tracing-subscriber` is intended for use by both `Subscriber` authors and
+//! application authors using `tracing` to instrument their applications.
+//!
+//! *Compiler support: [requires `rustc` 1.49+][msrv]*
+//!
+//! [msrv]: #supported-rust-versions
+//!
+//! ## `Layer`s and `Filter`s
+//!
+//! The most important component of the `tracing-subscriber` API is the
+//! [`Layer`] trait, which provides a composable abstraction for building
+//! [`Subscriber`]s. Like the [`Subscriber`] trait, a [`Layer`] defines a
+//! particular behavior for collecting trace data. Unlike [`Subscriber`]s,
+//! which implement a *complete* strategy for how trace data is collected,
+//! [`Layer`]s provide *modular* implementations of specific behaviors.
+//! Therefore, they can be [composed together] to form a [`Subscriber`] which is
+//! capable of recording traces in a variety of ways. See the [`layer` module&#39;s
+//! documentation][layer] for details on using [`Layer`]s.
+//!
+//! In addition, the [`Filter`] trait defines an interface for filtering what
+//! spans and events are recorded by a particular layer. This allows different
+//! [`Layer`]s to handle separate subsets of the trace data emitted by a
+//! program. See the [documentation on per-layer filtering][plf] for more
+//! information on using [`Filter`]s.
+//!
+//! [`Layer`]: crate::layer::Layer
+//! [composed together]: crate::layer#composing-layers
+//! [layer]: crate::layer
+//! [`Filter`]: crate::layer::Filter
+//! [plf]: crate::layer#per-layer-filtering
+//!
+//! ## Included Subscribers
+//!
+//! The following `Subscriber`s are provided for application authors:
+//!
+//! - [`fmt`] - Formats and logs tracing data (requires the `fmt` feature flag)
+//!
+//! ## Feature Flags
+//!
+//! - `std`: Enables APIs that depend on the on the Rust standard library
+//!   (enabled by default).
+//! - `alloc`: Depend on [`liballoc`] (enabled by &quot;std&quot;).
+//! - `env-filter`: Enables the [`EnvFilter`] type, which implements filtering
+//!   similar to the [`env_logger` crate]. **Requires &quot;std&quot;**.
+//! - `fmt`: Enables the [`fmt`] module, which provides a subscriber
+//!   implementation for printing formatted representations of trace events.
+//!   Enabled by default. **Requires &quot;std&quot;**.
+//! - `ansi`: Enables `fmt` support for ANSI terminal colors. Enabled by
+//!   default.
+//! - `registry`: enables the [`registry`] module. Enabled by default.
+//!   **Requires &quot;std&quot;**.
+//! - `json`: Enables `fmt` support for JSON output. In JSON output, the ANSI
+//!   feature does nothing. **Requires &quot;fmt&quot; and &quot;std&quot;**.
+//! - `local-time`: Enables local time formatting when using the [`time`
+//!   crate]&#39;s timestamp formatters with the `fmt` subscriber.
+//!
+//! [`registry`]: mod@registry
+//!
+//! ### Optional Dependencies
+//!
+//! - [`tracing-log`]: Enables better formatting for events emitted by `log`
+//!   macros in the `fmt` subscriber. Enabled by default.
+//! - [`time`][`time` crate]: Enables support for using the [`time` crate] for timestamp
+//!   formatting in the `fmt` subscriber.
+//! - [`smallvec`]: Causes the `EnvFilter` type to use the `smallvec` crate (rather
+//!   than `Vec`) as a performance optimization. Enabled by default.
+//! - [`parking_lot`]: Use the `parking_lot` crate&#39;s `RwLock` implementation
+//!   rather than the Rust standard library&#39;s implementation.
+//!
+//! ### `no_std` Support
+//!
+//! In embedded systems and other bare-metal applications, `tracing` can be
+//! used without requiring the Rust standard library, although some features are
+//! disabled. Although most of the APIs provided by `tracing-subscriber`, such
+//! as [`fmt`] and [`EnvFilter`], require the standard library, some
+//! functionality, such as the [`Layer`] trait, can still be used in
+//! `no_std` environments.
+//!
+//! The dependency on the standard library is controlled by two crate feature
+//! flags, &quot;std&quot;, which enables the dependency on [`libstd`], and &quot;alloc&quot;, which
+//! enables the dependency on [`liballoc`] (and is enabled by the &quot;std&quot;
+//! feature). These features are enabled by default, but `no_std` users can
+//! disable them using:
+//!
+//! ```toml
+//! # Cargo.toml
+//! tracing-subscriber = { version = &quot;0.3&quot;, default-features = false }
+//! ```
+//!
+//! Additional APIs are available when [`liballoc`] is available. To enable
+//! `liballoc` but not `std`, use:
+//!
+//! ```toml
+//! # Cargo.toml
+//! tracing-subscriber = { version = &quot;0.3&quot;, default-features = false, features = [&quot;alloc&quot;] }
+//! ```
+//!
+//! ### Unstable Features
+//!
+//! These feature flags enable **unstable** features. The public API may break in 0.1.x
+//! releases. To enable these features, the `--cfg tracing_unstable` must be passed to
+//! `rustc` when compiling.
+//!
+//! The following unstable feature flags are currently available:
+//!
+//! * `valuable`: Enables support for serializing values recorded using the
+//!   [`valuable`] crate as structured JSON in the [`format::Json`] formatter.
+//!
+//! #### Enabling Unstable Features
+//!
+//! The easiest way to set the `tracing_unstable` cfg is to use the `RUSTFLAGS`
+//! env variable when running `cargo` commands:
+//!
+//! ```shell
+//! RUSTFLAGS=&quot;--cfg tracing_unstable&quot; cargo build
+//! ```
+//! Alternatively, the following can be added to the `.cargo/config` file in a
+//! project to automatically enable the cfg flag for that project:
+//!
+//! ```toml
+//! [build]
+//! rustflags = [&quot;--cfg&quot;, &quot;tracing_unstable&quot;]
+//! ```
+//!
+//! [feature flags]: https://doc.rust-lang.org/cargo/reference/manifest.html#the-features-section
+//! [`valuable`]: https://crates.io/crates/valuable
+//! [`format::Json`]: crate::fmt::format::Json
+//!
+//! ## Supported Rust Versions
+//!
+//! Tracing is built against the latest stable release. The minimum supported
+//! version is 1.49. The current Tracing version is not guaranteed to build on
+//! Rust versions earlier than the minimum supported version.
+//!
+//! Tracing follows the same compiler support policies as the rest of the Tokio
+//! project. The current stable Rust compiler and the three most recent minor
+//! versions before it will always be supported. For example, if the current
+//! stable compiler version is 1.45, the minimum supported version will not be
+//! increased past 1.42, three minor versions prior. Increasing the minimum
+//! supported compiler version is not considered a semver breaking change as
+//! long as doing so complies with this policy.
+//!
+//! [`tracing`]: https://docs.rs/tracing/latest/tracing/
+//! [`Subscriber`]: https://docs.rs/tracing-core/latest/tracing_core/subscriber/trait.Subscriber.html
+//! [`EnvFilter`]: filter/struct.EnvFilter.html
+//! [`fmt`]: fmt/index.html
+//! [`tracing-log`]: https://crates.io/crates/tracing-log
+//! [`smallvec`]: https://crates.io/crates/smallvec
+//! [`env_logger` crate]: https://crates.io/crates/env_logger
+//! [`parking_lot`]: https://crates.io/crates/parking_lot
+//! [`time` crate]: https://crates.io/crates/time
+//! [`libstd`]: https://doc.rust-lang.org/std/index.html
+//! [`liballoc`]: https://doc.rust-lang.org/alloc/index.html
+</span><span class="attribute">#![doc(html_root_url = <span class="string">&quot;https://docs.rs/tracing-subscriber/0.3.11&quot;</span>)]
+#![doc(
+    html_logo_url = <span class="string">&quot;https://raw.githubusercontent.com/tokio-rs/tracing/master/assets/logo-type.png&quot;</span>,
+    issue_tracker_base_url = <span class="string">&quot;https://github.com/tokio-rs/tracing/issues/&quot;
+</span>)]
+#![cfg_attr(
+    docsrs,
+    <span class="comment">// Allows displaying cfgs/feature flags in the documentation.
+    </span>feature(doc_cfg),
+    <span class="comment">// Allows adding traits to RustDoc&#39;s list of &quot;notable traits&quot;
+    </span>feature(doc_notable_trait),
+    <span class="comment">// Fail the docs build if any intra-docs links are broken
+    </span>deny(rustdoc::broken_intra_doc_links),
+)]
+#![warn(
+    missing_debug_implementations,
+    missing_docs,
+    rust_2018_idioms,
+    unreachable_pub,
+    bad_style,
+    const_err,
+    dead_code,
+    improper_ctypes,
+    non_shorthand_field_patterns,
+    no_mangle_generic_items,
+    overflowing_literals,
+    path_statements,
+    patterns_in_fns_without_body,
+    private_in_public,
+    unconditional_recursion,
+    unused,
+    unused_allocation,
+    unused_comparisons,
+    unused_parens,
+    while_true
+)]
+</span><span class="comment">// Using struct update syntax when a struct has no additional fields avoids
+// a potential source change if additional fields are added to the struct in the
+// future, reducing diff noise. Allow this even though clippy considers it
+// &quot;needless&quot;.
+</span><span class="attribute">#![allow(clippy::needless_update)]
+#![cfg_attr(not(feature = <span class="string">&quot;std&quot;</span>), no_std)]
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">alloc</span>;
+#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">extern crate </span>alloc;
 
-<span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">mod</span> <span class="ident">macros</span>;
+<span class="attribute">#[macro_use]
+</span><span class="kw">mod </span>macros;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">field</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">filter</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">prelude</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">registry</span>;
+<span class="kw">pub mod </span>field;
+<span class="kw">pub mod </span>filter;
+<span class="kw">pub mod </span>prelude;
+<span class="kw">pub mod </span>registry;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">layer</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">util</span>;
+<span class="kw">pub mod </span>layer;
+<span class="kw">pub mod </span>util;
 
-<span class="macro">feature!</span> {
-    <span class="attribute">#![<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>]</span>
-    <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">reload</span>;
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">sync</span>;
+<span class="macro">feature! </span>{
+    <span class="attribute">#![feature = <span class="string">&quot;std&quot;</span>]
+    </span><span class="kw">pub mod </span>reload;
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>sync;
 }
 
-<span class="macro">feature!</span> {
-    <span class="attribute">#![<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;fmt&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">fmt</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">fmt::fmt</span>;
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">fmt::Subscriber</span> <span class="kw">as</span> <span class="ident">FmtSubscriber</span>;
+<span class="macro">feature! </span>{
+    <span class="attribute">#![all(feature = <span class="string">&quot;fmt&quot;</span>, feature = <span class="string">&quot;std&quot;</span>)]
+    </span><span class="kw">pub mod </span>fmt;
+    <span class="kw">pub use </span>fmt::fmt;
+    <span class="kw">pub use </span>fmt::Subscriber <span class="kw">as </span>FmtSubscriber;
 }
 
-<span class="macro">feature!</span> {
-    <span class="attribute">#![<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;env-filter&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">filter::EnvFilter</span>;
+<span class="macro">feature! </span>{
+    <span class="attribute">#![all(feature = <span class="string">&quot;env-filter&quot;</span>, feature = <span class="string">&quot;std&quot;</span>)]
+    </span><span class="kw">pub use </span>filter::EnvFilter;
 }
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">layer::Layer</span>;
+<span class="kw">pub use </span>layer::Layer;
 
-<span class="macro">feature!</span> {
-    <span class="attribute">#![<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;registry&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">registry::Registry</span>;
+<span class="macro">feature! </span>{
+    <span class="attribute">#![all(feature = <span class="string">&quot;registry&quot;</span>, feature = <span class="string">&quot;std&quot;</span>)]
+    </span><span class="kw">pub use </span>registry::Registry;
 
-    <span class="doccomment">///</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">registry</span>() -&gt; <span class="ident">Registry</span> {
-        <span class="ident">Registry::default</span>()
+    <span class="doccomment">///
+    </span><span class="kw">pub fn </span>registry() -&gt; Registry {
+        Registry::default()
     }
 }
 
-<span class="kw">mod</span> <span class="ident">sealed</span> {
-    <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Sealed</span><span class="op">&lt;</span><span class="ident">A</span> <span class="op">=</span> ()<span class="op">&gt;</span> {}
+<span class="kw">mod </span>sealed {
+    <span class="kw">pub trait </span>Sealed&lt;A = ()&gt; {}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="tracing_subscriber" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

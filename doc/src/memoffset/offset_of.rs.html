@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/memoffset-0.6.5/src/offset_of.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>offset_of.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../memoffset/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../memoffset/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../memoffset/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/memoffset-0.6.5/src/offset_of.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>offset_of.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../memoffset/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../memoffset/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../memoffset/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -280,287 +280,287 @@
 <span id="280">280</span>
 <span id="281">281</span>
 <span id="282">282</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2017 Gilad Naaman</span>
-<span class="comment">//</span>
-<span class="comment">// Permission is hereby granted, free of charge, to any person obtaining a copy</span>
-<span class="comment">// of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
-<span class="comment">// in the Software without restriction, including without limitation the rights</span>
-<span class="comment">// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
-<span class="comment">// copies of the Software, and to permit persons to whom the Software is</span>
-<span class="comment">// furnished to do so, subject to the following conditions:</span>
-<span class="comment">//</span>
-<span class="comment">// The above copyright notice and this permission notice shall be included in all</span>
-<span class="comment">// copies or substantial portions of the Software.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
-<span class="comment">// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
-<span class="comment">// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
-<span class="comment">// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
-<span class="comment">// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
-<span class="comment">// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
-<span class="comment">// SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2017 Gilad Naaman
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the &quot;Software&quot;), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
 
-<span class="doccomment">/// Macro to create a local `base_ptr` raw pointer of the given type, avoiding UB as</span>
-<span class="doccomment">/// much as is possible currently.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">maybe_uninit</span>)]</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">_memoffset__let_base_ptr</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="kw">type</span>:<span class="macro-nonterminal">ty</span>) =&gt; {
-        <span class="comment">// No UB here, and the pointer does not dangle, either.</span>
-        <span class="comment">// But we have to make sure that `uninit` lives long enough,</span>
-        <span class="comment">// so it has to be in the same scope as `$name`. That&#39;s why</span>
-        <span class="comment">// `let_base_ptr` declares a variable (several, actually)</span>
-        <span class="comment">// instead of returning one.</span>
-        <span class="kw">let</span> <span class="ident">uninit</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::__priv::mem::MaybeUninit</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="kw">type</span><span class="op">&gt;</span><span class="macro-nonterminal">::uninit</span>();
-        <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="kw-2">*const</span> <span class="macro-nonterminal">$</span><span class="kw">type</span> <span class="op">=</span> <span class="macro-nonterminal">uninit</span>.<span class="ident">as_ptr</span>();
+</span><span class="doccomment">/// Macro to create a local `base_ptr` raw pointer of the given type, avoiding UB as
+/// much as is possible currently.
+</span><span class="attribute">#[cfg(maybe_uninit)]
+#[macro_export]
+#[doc(hidden)]
+</span><span class="macro">macro_rules! </span>_memoffset__let_base_ptr {
+    (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$</span><span class="kw">type</span>:<span class="macro-nonterminal">ty</span>) =&gt; {
+        <span class="comment">// No UB here, and the pointer does not dangle, either.
+        // But we have to make sure that `uninit` lives long enough,
+        // so it has to be in the same scope as `$name`. That&#39;s why
+        // `let_base_ptr` declares a variable (several, actually)
+        // instead of returning one.
+        </span><span class="kw">let </span>uninit = <span class="macro-nonterminal">$crate::__priv::mem::MaybeUninit</span>::&lt;<span class="macro-nonterminal">$</span><span class="kw">type</span>&gt;<span class="macro-nonterminal">::uninit</span>();
+        <span class="kw">let </span><span class="macro-nonterminal">$name</span>: <span class="kw-2">*const </span><span class="macro-nonterminal">$</span><span class="kw">type </span>= <span class="macro-nonterminal">uninit</span>.as_ptr();
     };
 }
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">maybe_uninit</span>))]</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">_memoffset__let_base_ptr</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="kw">type</span>:<span class="macro-nonterminal">ty</span>) =&gt; {
-        <span class="comment">// No UB right here, but we will later dereference this pointer to</span>
-        <span class="comment">// offset into a field, and that is UB because the pointer is dangling.</span>
-        <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::__priv::mem::align_of</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="kw">type</span><span class="op">&gt;</span>() <span class="kw">as</span> <span class="kw-2">*const</span> <span class="macro-nonterminal">$</span><span class="kw">type</span>;
-    };
-}
-
-<span class="doccomment">/// Macro to compute the distance between two pointers.</span>
-<span class="attribute">#[<span class="macro-nonterminal">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_const&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">_memoffset_offset_from_unsafe</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">expr</span>) =&gt; {{
-        <span class="kw">let</span> <span class="ident">field</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>; <span class="comment">// evaluate $field outside the `unsafe` block</span>
-        <span class="kw">let</span> <span class="ident">base</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>; <span class="comment">// evaluate $base outside the `unsafe` block</span>
-        <span class="comment">// Compute offset, with unstable `offset_from` for const-compatibility.</span>
-        <span class="comment">// (Requires the pointers to not dangle, but we already need that for `raw_field!` anyway.)</span>
-        <span class="kw">unsafe</span> { (<span class="ident">field</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u8</span>).<span class="ident">offset_from</span>(<span class="ident">base</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u8</span>) <span class="kw">as</span> <span class="ident">usize</span> }
-    }};
-}
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_const&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">macro_export</span>]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">_memoffset_offset_from_unsafe</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="comment">// Compute offset.</span>
-        (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span> <span class="kw">as</span> <span class="ident">usize</span>) <span class="op">-</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">base</span> <span class="kw">as</span> <span class="ident">usize</span>)
+<span class="attribute">#[cfg(not(maybe_uninit))]
+#[macro_export]
+#[doc(hidden)]
+</span><span class="macro">macro_rules! </span>_memoffset__let_base_ptr {
+    (<span class="macro-nonterminal">$name</span>:ident, <span class="macro-nonterminal">$</span><span class="kw">type</span>:<span class="macro-nonterminal">ty</span>) =&gt; {
+        <span class="comment">// No UB right here, but we will later dereference this pointer to
+        // offset into a field, and that is UB because the pointer is dangling.
+        </span><span class="kw">let </span><span class="macro-nonterminal">$name </span>= <span class="macro-nonterminal">$crate::__priv::mem::align_of</span>::&lt;<span class="macro-nonterminal">$</span><span class="kw">type</span>&gt;() <span class="kw">as </span><span class="kw-2">*const </span><span class="macro-nonterminal">$</span><span class="kw">type</span>;
     };
 }
 
-<span class="doccomment">/// Calculates the offset of the specified field from the start of the named struct.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Examples</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use memoffset::offset_of;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[repr(C, packed)]</span>
-<span class="doccomment">/// struct Foo {</span>
-<span class="doccomment">///     a: u32,</span>
-<span class="doccomment">///     b: u64,</span>
-<span class="doccomment">///     c: [u8; 5]</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// fn main() {</span>
-<span class="doccomment">///     assert_eq!(offset_of!(Foo, a), 0);</span>
-<span class="doccomment">///     assert_eq!(offset_of!(Foo, b), 4);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">macro_export</span>(<span class="ident">local_inner_macros</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">offset_of</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>:<span class="ident">path</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>:<span class="ident">tt</span>) =&gt; {{
-        <span class="comment">// Get a base pointer (non-dangling if rustc supports `MaybeUninit`).</span>
-        <span class="macro">_memoffset__let_base_ptr!</span>(<span class="ident">base_ptr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>);
-        <span class="comment">// Get field pointer.</span>
-        <span class="kw">let</span> <span class="ident">field_ptr</span> <span class="op">=</span> <span class="macro">raw_field!</span>(<span class="ident">base_ptr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>);
-        <span class="comment">// Compute offset.</span>
-        <span class="macro">_memoffset_offset_from_unsafe!</span>(<span class="ident">field_ptr</span>, <span class="ident">base_ptr</span>)
+<span class="doccomment">/// Macro to compute the distance between two pointers.
+</span><span class="attribute">#[<span class="macro-nonterminal">cfg</span>(feature = <span class="string">&quot;unstable_const&quot;</span>)]
+#[macro_export]
+#[doc(hidden)]
+</span><span class="macro">macro_rules! </span>_memoffset_offset_from_unsafe {
+    (<span class="macro-nonterminal">$field</span>:expr, <span class="macro-nonterminal">$base</span>:expr) =&gt; {{
+        <span class="kw">let </span>field = <span class="macro-nonterminal">$field</span>; <span class="comment">// evaluate $field outside the `unsafe` block
+        </span><span class="kw">let </span>base = <span class="macro-nonterminal">$base</span>; <span class="comment">// evaluate $base outside the `unsafe` block
+        // Compute offset, with unstable `offset_from` for const-compatibility.
+        // (Requires the pointers to not dangle, but we already need that for `raw_field!` anyway.)
+        </span><span class="kw">unsafe </span>{ (field <span class="kw">as </span><span class="kw-2">*const </span>u8).offset_from(base <span class="kw">as </span><span class="kw-2">*const </span>u8) <span class="kw">as </span>usize }
+    }};
+}
+<span class="attribute">#[cfg(not(feature = <span class="string">&quot;unstable_const&quot;</span>))]
+#[macro_export]
+#[doc(hidden)]
+</span><span class="macro">macro_rules! </span>_memoffset_offset_from_unsafe {
+    (<span class="macro-nonterminal">$field</span>:expr, <span class="macro-nonterminal">$base</span>:expr) =&gt; {
+        <span class="comment">// Compute offset.
+        </span>(<span class="macro-nonterminal">$field </span><span class="kw">as </span>usize) - (<span class="macro-nonterminal">$base </span><span class="kw">as </span>usize)
+    };
+}
+
+<span class="doccomment">/// Calculates the offset of the specified field from the start of the named struct.
+///
+/// ## Examples
+/// ```
+/// use memoffset::offset_of;
+///
+/// #[repr(C, packed)]
+/// struct Foo {
+///     a: u32,
+///     b: u64,
+///     c: [u8; 5]
+/// }
+///
+/// fn main() {
+///     assert_eq!(offset_of!(Foo, a), 0);
+///     assert_eq!(offset_of!(Foo, b), 4);
+/// }
+/// ```
+</span><span class="attribute">#[macro_export(local_inner_macros)]
+</span><span class="macro">macro_rules! </span>offset_of {
+    (<span class="macro-nonterminal">$parent</span>:path, <span class="macro-nonterminal">$field</span>:tt) =&gt; {{
+        <span class="comment">// Get a base pointer (non-dangling if rustc supports `MaybeUninit`).
+        </span><span class="macro">_memoffset__let_base_ptr!</span>(base_ptr, <span class="macro-nonterminal">$parent</span>);
+        <span class="comment">// Get field pointer.
+        </span><span class="kw">let </span>field_ptr = <span class="macro">raw_field!</span>(base_ptr, <span class="macro-nonterminal">$parent</span>, <span class="macro-nonterminal">$field</span>);
+        <span class="comment">// Compute offset.
+        </span><span class="macro">_memoffset_offset_from_unsafe!</span>(field_ptr, base_ptr)
     }};
 }
 
-<span class="doccomment">/// Calculates the offset of the specified field from the start of the tuple.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Examples</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use memoffset::offset_of_tuple;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// fn main() {</span>
-<span class="doccomment">///     assert!(offset_of_tuple!((u8, u32), 1) &gt;= 0, &quot;Tuples do not have a defined layout&quot;);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">tuple_ty</span>)]</span>
-<span class="attribute">#[<span class="ident">macro_export</span>(<span class="ident">local_inner_macros</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">offset_of_tuple</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>:<span class="ident">tt</span>) =&gt; {{
-        <span class="comment">// Get a base pointer (non-dangling if rustc supports `MaybeUninit`).</span>
-        <span class="macro">_memoffset__let_base_ptr!</span>(<span class="ident">base_ptr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>);
-        <span class="comment">// Get field pointer.</span>
-        <span class="kw">let</span> <span class="ident">field_ptr</span> <span class="op">=</span> <span class="macro">raw_field_tuple!</span>(<span class="ident">base_ptr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">parent</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">field</span>);
-        <span class="comment">// Compute offset.</span>
-        <span class="macro">_memoffset_offset_from_unsafe!</span>(<span class="ident">field_ptr</span>, <span class="ident">base_ptr</span>)
+<span class="doccomment">/// Calculates the offset of the specified field from the start of the tuple.
+///
+/// ## Examples
+/// ```
+/// use memoffset::offset_of_tuple;
+///
+/// fn main() {
+///     assert!(offset_of_tuple!((u8, u32), 1) &gt;= 0, &quot;Tuples do not have a defined layout&quot;);
+/// }
+/// ```
+</span><span class="attribute">#[cfg(tuple_ty)]
+#[macro_export(local_inner_macros)]
+</span><span class="macro">macro_rules! </span>offset_of_tuple {
+    (<span class="macro-nonterminal">$parent</span>:ty, <span class="macro-nonterminal">$field</span>:tt) =&gt; {{
+        <span class="comment">// Get a base pointer (non-dangling if rustc supports `MaybeUninit`).
+        </span><span class="macro">_memoffset__let_base_ptr!</span>(base_ptr, <span class="macro-nonterminal">$parent</span>);
+        <span class="comment">// Get field pointer.
+        </span><span class="kw">let </span>field_ptr = <span class="macro">raw_field_tuple!</span>(base_ptr, <span class="macro-nonterminal">$parent</span>, <span class="macro-nonterminal">$field</span>);
+        <span class="comment">// Compute offset.
+        </span><span class="macro">_memoffset_offset_from_unsafe!</span>(field_ptr, base_ptr)
     }};
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">offset_simple</span>() {
-        <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">Foo</span> {
-            <span class="ident">a</span>: <span class="ident">u32</span>,
-            <span class="ident">b</span>: [<span class="ident">u8</span>; <span class="number">2</span>],
-            <span class="ident">c</span>: <span class="ident">i64</span>,
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>offset_simple() {
+        <span class="attribute">#[repr(C)]
+        </span><span class="kw">struct </span>Foo {
+            a: u32,
+            b: [u8; <span class="number">2</span>],
+            c: i64,
         }
 
-        <span class="macro">assert_eq!</span>(<span class="macro">offset_of!</span>(<span class="ident">Foo</span>, <span class="ident">a</span>), <span class="number">0</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">offset_of!</span>(<span class="ident">Foo</span>, <span class="ident">b</span>), <span class="number">4</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">offset_of!</span>(<span class="ident">Foo</span>, <span class="ident">c</span>), <span class="number">8</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">offset_of!</span>(Foo, a), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">offset_of!</span>(Foo, b), <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">offset_of!</span>(Foo, c), <span class="number">8</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">miri</span>, <span class="ident">ignore</span>)]</span> <span class="comment">// this creates unaligned references</span>
-    <span class="kw">fn</span> <span class="ident">offset_simple_packed</span>() {
-        <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>, <span class="ident">packed</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">Foo</span> {
-            <span class="ident">a</span>: <span class="ident">u32</span>,
-            <span class="ident">b</span>: [<span class="ident">u8</span>; <span class="number">2</span>],
-            <span class="ident">c</span>: <span class="ident">i64</span>,
+    <span class="attribute">#[test]
+    #[cfg_attr(miri, ignore)] </span><span class="comment">// this creates unaligned references
+    </span><span class="kw">fn </span>offset_simple_packed() {
+        <span class="attribute">#[repr(C, packed)]
+        </span><span class="kw">struct </span>Foo {
+            a: u32,
+            b: [u8; <span class="number">2</span>],
+            c: i64,
         }
 
-        <span class="macro">assert_eq!</span>(<span class="macro">offset_of!</span>(<span class="ident">Foo</span>, <span class="ident">a</span>), <span class="number">0</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">offset_of!</span>(<span class="ident">Foo</span>, <span class="ident">b</span>), <span class="number">4</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">offset_of!</span>(<span class="ident">Foo</span>, <span class="ident">c</span>), <span class="number">6</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">offset_of!</span>(Foo, a), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">offset_of!</span>(Foo, b), <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">offset_of!</span>(Foo, c), <span class="number">6</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">tuple_struct</span>() {
-        <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">Tup</span>(<span class="ident">i32</span>, <span class="ident">i32</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>tuple_struct() {
+        <span class="attribute">#[repr(C)]
+        </span><span class="kw">struct </span>Tup(i32, i32);
 
-        <span class="macro">assert_eq!</span>(<span class="macro">offset_of!</span>(<span class="ident">Tup</span>, <span class="number">0</span>), <span class="number">0</span>);
-        <span class="macro">assert_eq!</span>(<span class="macro">offset_of!</span>(<span class="ident">Tup</span>, <span class="number">1</span>), <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">offset_of!</span>(Tup, <span class="number">0</span>), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">offset_of!</span>(Tup, <span class="number">1</span>), <span class="number">4</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">path</span>() {
-        <span class="kw">mod</span> <span class="ident">sub</span> {
-            <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-            <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Foo</span> {
-                <span class="kw">pub</span> <span class="ident">x</span>: <span class="ident">u32</span>,
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>path() {
+        <span class="kw">mod </span>sub {
+            <span class="attribute">#[repr(C)]
+            </span><span class="kw">pub struct </span>Foo {
+                <span class="kw">pub </span>x: u32,
             }
         }
 
-        <span class="macro">assert_eq!</span>(<span class="macro">offset_of!</span>(<span class="ident">sub::Foo</span>, <span class="ident">x</span>), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(<span class="macro">offset_of!</span>(sub::Foo, x), <span class="number">0</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">inside_generic_method</span>() {
-        <span class="kw">struct</span> <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="ident">T</span>, <span class="ident">U</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>inside_generic_method() {
+        <span class="kw">struct </span>Pair&lt;T, U&gt;(T, U);
 
-        <span class="kw">fn</span> <span class="ident">foo</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="kw">_</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span>) -&gt; <span class="ident">usize</span> {
-            <span class="macro">offset_of!</span>(<span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span>, <span class="number">1</span>)
+        <span class="kw">fn </span>foo&lt;T, U&gt;(<span class="kw">_</span>: Pair&lt;T, U&gt;) -&gt; usize {
+            <span class="macro">offset_of!</span>(Pair&lt;T, U&gt;, <span class="number">1</span>)
         }
 
-        <span class="macro">assert_eq!</span>(<span class="ident">foo</span>(<span class="ident">Pair</span>(<span class="number">0</span>, <span class="number">0</span>)), <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(foo(Pair(<span class="number">0</span>, <span class="number">0</span>)), <span class="number">4</span>);
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">tuple_ty</span>)]</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_tuple_offset</span>() {
-        <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> (<span class="number">0i32</span>, <span class="number">0.0f32</span>, <span class="number">0u8</span>);
-        <span class="kw">let</span> <span class="ident">f_ptr</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">f</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>;
-        <span class="kw">let</span> <span class="ident">f1_ptr</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">f</span>.<span class="number">1</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>;
+    <span class="attribute">#[cfg(tuple_ty)]
+    #[test]
+    </span><span class="kw">fn </span>test_tuple_offset() {
+        <span class="kw">let </span>f = (<span class="number">0i32</span>, <span class="number">0.0f32</span>, <span class="number">0u8</span>);
+        <span class="kw">let </span>f_ptr = <span class="kw-2">&amp;</span>f <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>;
+        <span class="kw">let </span>f1_ptr = <span class="kw-2">&amp;</span>f.<span class="number">1 </span><span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>;
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">f1_ptr</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="ident">f_ptr</span> <span class="kw">as</span> <span class="ident">usize</span>,
-            <span class="macro">offset_of_tuple!</span>((<span class="ident">i32</span>, <span class="ident">f32</span>, <span class="ident">u8</span>), <span class="number">1</span>)
+            f1_ptr <span class="kw">as </span>usize - f_ptr <span class="kw">as </span>usize,
+            <span class="macro">offset_of_tuple!</span>((i32, f32, u8), <span class="number">1</span>)
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_raw_field</span>() {
-        <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">Foo</span> {
-            <span class="ident">a</span>: <span class="ident">u32</span>,
-            <span class="ident">b</span>: [<span class="ident">u8</span>; <span class="number">2</span>],
-            <span class="ident">c</span>: <span class="ident">i64</span>,
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_raw_field() {
+        <span class="attribute">#[repr(C)]
+        </span><span class="kw">struct </span>Foo {
+            a: u32,
+            b: [u8; <span class="number">2</span>],
+            c: i64,
         }
 
-        <span class="kw">let</span> <span class="ident">f</span>: <span class="ident">Foo</span> <span class="op">=</span> <span class="ident">Foo</span> {
-            <span class="ident">a</span>: <span class="number">0</span>,
-            <span class="ident">b</span>: [<span class="number">0</span>, <span class="number">0</span>],
-            <span class="ident">c</span>: <span class="number">0</span>,
+        <span class="kw">let </span>f: Foo = Foo {
+            a: <span class="number">0</span>,
+            b: [<span class="number">0</span>, <span class="number">0</span>],
+            c: <span class="number">0</span>,
         };
-        <span class="kw">let</span> <span class="ident">f_ptr</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">f</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>;
-        <span class="macro">assert_eq!</span>(<span class="ident">f_ptr</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="number">0</span>, <span class="macro">raw_field!</span>(<span class="ident">f_ptr</span>, <span class="ident">Foo</span>, <span class="ident">a</span>) <span class="kw">as</span> <span class="ident">usize</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">f_ptr</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="number">4</span>, <span class="macro">raw_field!</span>(<span class="ident">f_ptr</span>, <span class="ident">Foo</span>, <span class="ident">b</span>) <span class="kw">as</span> <span class="ident">usize</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">f_ptr</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">+</span> <span class="number">8</span>, <span class="macro">raw_field!</span>(<span class="ident">f_ptr</span>, <span class="ident">Foo</span>, <span class="ident">c</span>) <span class="kw">as</span> <span class="ident">usize</span>);
+        <span class="kw">let </span>f_ptr = <span class="kw-2">&amp;</span>f <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>;
+        <span class="macro">assert_eq!</span>(f_ptr <span class="kw">as </span>usize + <span class="number">0</span>, <span class="macro">raw_field!</span>(f_ptr, Foo, a) <span class="kw">as </span>usize);
+        <span class="macro">assert_eq!</span>(f_ptr <span class="kw">as </span>usize + <span class="number">4</span>, <span class="macro">raw_field!</span>(f_ptr, Foo, b) <span class="kw">as </span>usize);
+        <span class="macro">assert_eq!</span>(f_ptr <span class="kw">as </span>usize + <span class="number">8</span>, <span class="macro">raw_field!</span>(f_ptr, Foo, c) <span class="kw">as </span>usize);
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">tuple_ty</span>)]</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_raw_field_tuple</span>() {
-        <span class="kw">let</span> <span class="ident">t</span> <span class="op">=</span> (<span class="number">0u32</span>, <span class="number">0u8</span>, <span class="bool-val">false</span>);
-        <span class="kw">let</span> <span class="ident">t_ptr</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">t</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span>;
-        <span class="kw">let</span> <span class="ident">t_addr</span> <span class="op">=</span> <span class="ident">t_ptr</span> <span class="kw">as</span> <span class="ident">usize</span>;
+    <span class="attribute">#[cfg(tuple_ty)]
+    #[test]
+    </span><span class="kw">fn </span>test_raw_field_tuple() {
+        <span class="kw">let </span>t = (<span class="number">0u32</span>, <span class="number">0u8</span>, <span class="bool-val">false</span>);
+        <span class="kw">let </span>t_ptr = <span class="kw-2">&amp;</span>t <span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_</span>;
+        <span class="kw">let </span>t_addr = t_ptr <span class="kw">as </span>usize;
 
         <span class="macro">assert_eq!</span>(
-            <span class="kw-2">&amp;</span><span class="ident">t</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="ident">t_addr</span>,
-            <span class="macro">raw_field_tuple!</span>(<span class="ident">t_ptr</span>, (<span class="ident">u32</span>, <span class="ident">u8</span>, <span class="ident">bool</span>), <span class="number">0</span>) <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="ident">t_addr</span>
+            <span class="kw-2">&amp;</span>t.<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span>usize - t_addr,
+            <span class="macro">raw_field_tuple!</span>(t_ptr, (u32, u8, bool), <span class="number">0</span>) <span class="kw">as </span>usize - t_addr
         );
         <span class="macro">assert_eq!</span>(
-            <span class="kw-2">&amp;</span><span class="ident">t</span>.<span class="number">1</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="ident">t_addr</span>,
-            <span class="macro">raw_field_tuple!</span>(<span class="ident">t_ptr</span>, (<span class="ident">u32</span>, <span class="ident">u8</span>, <span class="ident">bool</span>), <span class="number">1</span>) <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="ident">t_addr</span>
+            <span class="kw-2">&amp;</span>t.<span class="number">1 </span><span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span>usize - t_addr,
+            <span class="macro">raw_field_tuple!</span>(t_ptr, (u32, u8, bool), <span class="number">1</span>) <span class="kw">as </span>usize - t_addr
         );
         <span class="macro">assert_eq!</span>(
-            <span class="kw-2">&amp;</span><span class="ident">t</span>.<span class="number">2</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="ident">t_addr</span>,
-            <span class="macro">raw_field_tuple!</span>(<span class="ident">t_ptr</span>, (<span class="ident">u32</span>, <span class="ident">u8</span>, <span class="ident">bool</span>), <span class="number">2</span>) <span class="kw">as</span> <span class="ident">usize</span> <span class="op">-</span> <span class="ident">t_addr</span>
+            <span class="kw-2">&amp;</span>t.<span class="number">2 </span><span class="kw">as </span><span class="kw-2">*const </span><span class="kw">_ as </span>usize - t_addr,
+            <span class="macro">raw_field_tuple!</span>(t_ptr, (u32, u8, bool), <span class="number">2</span>) <span class="kw">as </span>usize - t_addr
         );
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_const&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">const_offset</span>() {
-        <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">Foo</span> {
-            <span class="ident">a</span>: <span class="ident">u32</span>,
-            <span class="ident">b</span>: [<span class="ident">u8</span>; <span class="number">2</span>],
-            <span class="ident">c</span>: <span class="ident">i64</span>,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;unstable_const&quot;</span>)]
+    #[test]
+    </span><span class="kw">fn </span>const_offset() {
+        <span class="attribute">#[repr(C)]
+        </span><span class="kw">struct </span>Foo {
+            a: u32,
+            b: [u8; <span class="number">2</span>],
+            c: i64,
         }
 
-        <span class="macro">assert_eq!</span>([<span class="number">0</span>; <span class="macro">offset_of!</span>(<span class="ident">Foo</span>, <span class="ident">b</span>)].<span class="ident">len</span>(), <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>([<span class="number">0</span>; <span class="macro">offset_of!</span>(Foo, b)].len(), <span class="number">4</span>);
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_const&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">const_offset_interior_mutable</span>() {
-        <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">Foo</span> {
-            <span class="ident">a</span>: <span class="ident">u32</span>,
-            <span class="ident">b</span>: <span class="ident">core::cell::Cell</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;unstable_const&quot;</span>)]
+    #[test]
+    </span><span class="kw">fn </span>const_offset_interior_mutable() {
+        <span class="attribute">#[repr(C)]
+        </span><span class="kw">struct </span>Foo {
+            a: u32,
+            b: core::cell::Cell&lt;u32&gt;,
         }
 
-        <span class="macro">assert_eq!</span>([<span class="number">0</span>; <span class="macro">offset_of!</span>(<span class="ident">Foo</span>, <span class="ident">b</span>)].<span class="ident">len</span>(), <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>([<span class="number">0</span>; <span class="macro">offset_of!</span>(Foo, b)].len(), <span class="number">4</span>);
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_const&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">const_fn_offset</span>() {
-        <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">test_fn</span>() -&gt; <span class="ident">usize</span> {
-            <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
-            <span class="kw">struct</span> <span class="ident">Foo</span> {
-                <span class="ident">a</span>: <span class="ident">u32</span>,
-                <span class="ident">b</span>: [<span class="ident">u8</span>; <span class="number">2</span>],
-                <span class="ident">c</span>: <span class="ident">i64</span>,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;unstable_const&quot;</span>)]
+    #[test]
+    </span><span class="kw">fn </span>const_fn_offset() {
+        <span class="kw">const fn </span>test_fn() -&gt; usize {
+            <span class="attribute">#[repr(C)]
+            </span><span class="kw">struct </span>Foo {
+                a: u32,
+                b: [u8; <span class="number">2</span>],
+                c: i64,
             }
 
-            <span class="macro">offset_of!</span>(<span class="ident">Foo</span>, <span class="ident">b</span>)
+            <span class="macro">offset_of!</span>(Foo, b)
         }
 
-        <span class="macro">assert_eq!</span>([<span class="number">0</span>; <span class="ident">test_fn</span>()].<span class="ident">len</span>(), <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>([<span class="number">0</span>; test_fn()].len(), <span class="number">4</span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="memoffset" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="memoffset" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

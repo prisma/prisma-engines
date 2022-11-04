@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/builtin-connectors/src/mongodb.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mongodb.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../builtin_psl_connectors/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../builtin_psl_connectors/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../builtin_psl_connectors/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/builtin-connectors/src/mongodb.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mongodb.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../builtin_psl_connectors/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../builtin_psl_connectors/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../builtin_psl_connectors/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -133,140 +133,140 @@
 <span id="133">133</span>
 <span id="134">134</span>
 <span id="135">135</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">mongodb_types</span>;
-<span class="kw">mod</span> <span class="ident">validations</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>mongodb_types;
+<span class="kw">mod </span>validations;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">mongodb_types::MongoDbType</span>;
+<span class="kw">pub use </span>mongodb_types::MongoDbType;
 
-<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
-<span class="kw">use</span> <span class="ident">mongodb_types</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">psl_core</span>::{
-    <span class="ident">datamodel_connector</span>::{
-        <span class="ident">Connector</span>, <span class="ident">ConnectorCapability</span>, <span class="ident">ConstraintScope</span>, <span class="ident">NativeTypeConstructor</span>, <span class="ident">NativeTypeInstance</span>, <span class="ident">RelationMode</span>,
+<span class="kw">use </span>enumflags2::BitFlags;
+<span class="kw">use </span>mongodb_types::<span class="kw-2">*</span>;
+<span class="kw">use </span>psl_core::{
+    datamodel_connector::{
+        Connector, ConnectorCapability, ConstraintScope, NativeTypeConstructor, NativeTypeInstance, RelationMode,
     },
-    <span class="ident">diagnostics</span>::{<span class="ident">Diagnostics</span>, <span class="ident">Span</span>},
-    <span class="ident">parser_database</span>::{<span class="ident">walkers</span>::<span class="kw-2">*</span>, <span class="ident">ReferentialAction</span>, <span class="ident">ScalarType</span>},
+    diagnostics::{Diagnostics, Span},
+    parser_database::{walkers::<span class="kw-2">*</span>, ReferentialAction, ScalarType},
 };
-<span class="kw">use</span> <span class="ident">std::result::Result</span> <span class="kw">as</span> <span class="ident">StdResult</span>;
+<span class="kw">use </span>std::result::Result <span class="kw">as </span>StdResult;
 
-<span class="kw">const</span> <span class="ident">CAPABILITIES</span>: <span class="kw-2">&amp;</span>[<span class="ident">ConnectorCapability</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
-    <span class="ident">ConnectorCapability::Json</span>,
-    <span class="ident">ConnectorCapability::Enums</span>,
-    <span class="ident">ConnectorCapability::EnumArrayPush</span>,
-    <span class="ident">ConnectorCapability::RelationFieldsInArbitraryOrder</span>,
-    <span class="ident">ConnectorCapability::CreateMany</span>,
-    <span class="ident">ConnectorCapability::ScalarLists</span>,
-    <span class="ident">ConnectorCapability::JsonLists</span>,
-    <span class="ident">ConnectorCapability::InsensitiveFilters</span>,
-    <span class="ident">ConnectorCapability::CompositeTypes</span>,
-    <span class="ident">ConnectorCapability::FullTextIndex</span>,
-    <span class="ident">ConnectorCapability::SortOrderInFullTextIndex</span>,
-    <span class="ident">ConnectorCapability::MongoDbQueryRaw</span>,
-    <span class="ident">ConnectorCapability::DefaultValueAuto</span>,
-    <span class="ident">ConnectorCapability::TwoWayEmbeddedManyToManyRelation</span>,
-    <span class="ident">ConnectorCapability::UndefinedType</span>,
+<span class="kw">const </span>CAPABILITIES: <span class="kw-2">&amp;</span>[ConnectorCapability] = <span class="kw-2">&amp;</span>[
+    ConnectorCapability::Json,
+    ConnectorCapability::Enums,
+    ConnectorCapability::EnumArrayPush,
+    ConnectorCapability::RelationFieldsInArbitraryOrder,
+    ConnectorCapability::CreateMany,
+    ConnectorCapability::ScalarLists,
+    ConnectorCapability::JsonLists,
+    ConnectorCapability::InsensitiveFilters,
+    ConnectorCapability::CompositeTypes,
+    ConnectorCapability::FullTextIndex,
+    ConnectorCapability::SortOrderInFullTextIndex,
+    ConnectorCapability::MongoDbQueryRaw,
+    ConnectorCapability::DefaultValueAuto,
+    ConnectorCapability::TwoWayEmbeddedManyToManyRelation,
+    ConnectorCapability::UndefinedType,
 ];
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">MongoDbDatamodelConnector</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>MongoDbDatamodelConnector;
 
-<span class="kw">impl</span> <span class="ident">Connector</span> <span class="kw">for</span> <span class="ident">MongoDbDatamodelConnector</span> {
-    <span class="kw">fn</span> <span class="ident">provider_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="string">&quot;mongodb&quot;</span>
+<span class="kw">impl </span>Connector <span class="kw">for </span>MongoDbDatamodelConnector {
+    <span class="kw">fn </span>provider_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="string">&quot;mongodb&quot;
+    </span>}
+
+    <span class="kw">fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="string">&quot;MongoDB&quot;
+    </span>}
+
+    <span class="kw">fn </span>capabilities(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[ConnectorCapability] {
+        CAPABILITIES
     }
 
-    <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="string">&quot;MongoDB&quot;</span>
+    <span class="kw">fn </span>max_identifier_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="number">127
+    </span>}
+
+    <span class="kw">fn </span>constraint_violation_scopes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[ConstraintScope] {
+        <span class="kw-2">&amp;</span>[ConstraintScope::ModelKeyIndex]
     }
 
-    <span class="kw">fn</span> <span class="ident">capabilities</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">ConnectorCapability</span>] {
-        <span class="ident">CAPABILITIES</span>
+    <span class="kw">fn </span>referential_actions(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BitFlags&lt;ReferentialAction&gt; {
+        BitFlags::empty()
     }
 
-    <span class="kw">fn</span> <span class="ident">max_identifier_length</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="number">127</span>
-    }
+    <span class="kw">fn </span>validate_model(<span class="kw-2">&amp;</span><span class="self">self</span>, model: ModelWalker&lt;<span class="lifetime">&#39;_</span>&gt;, errors: <span class="kw-2">&amp;mut </span>Diagnostics) {
+        validations::id_must_be_defined(model, errors);
 
-    <span class="kw">fn</span> <span class="ident">constraint_violation_scopes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">ConstraintScope</span>] {
-        <span class="kw-2">&amp;</span>[<span class="ident">ConstraintScope::ModelKeyIndex</span>]
-    }
-
-    <span class="kw">fn</span> <span class="ident">referential_actions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
-        <span class="ident">BitFlags::empty</span>()
-    }
-
-    <span class="kw">fn</span> <span class="ident">validate_model</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">model</span>: <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>) {
-        <span class="ident">validations::id_must_be_defined</span>(<span class="ident">model</span>, <span class="ident">errors</span>);
-
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pk</span>) <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_key</span>() {
-            <span class="ident">validations::id_field_must_have_a_correct_mapped_name</span>(<span class="ident">pk</span>, <span class="ident">errors</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(pk) = model.primary_key() {
+            validations::id_field_must_have_a_correct_mapped_name(pk, errors);
         }
 
-        <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">scalar_fields</span>() {
-            <span class="ident">validations::objectid_type_required_with_auto_attribute</span>(<span class="ident">field</span>, <span class="ident">errors</span>);
-            <span class="ident">validations::auto_attribute_must_be_an_id</span>(<span class="ident">field</span>, <span class="ident">errors</span>);
-            <span class="ident">validations::dbgenerated_attribute_is_not_allowed</span>(<span class="ident">field</span>, <span class="ident">errors</span>);
-            <span class="ident">validations::field_name_uses_valid_characters</span>(<span class="ident">field</span>, <span class="ident">errors</span>);
+        <span class="kw">for </span>field <span class="kw">in </span>model.scalar_fields() {
+            validations::objectid_type_required_with_auto_attribute(field, errors);
+            validations::auto_attribute_must_be_an_id(field, errors);
+            validations::dbgenerated_attribute_is_not_allowed(field, errors);
+            validations::field_name_uses_valid_characters(field, errors);
         }
 
-        <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">indexes</span>() {
-            <span class="ident">validations::index_is_not_defined_multiple_times_to_same_fields</span>(<span class="ident">index</span>, <span class="ident">errors</span>);
-            <span class="ident">validations::unique_cannot_be_defined_to_id_field</span>(<span class="ident">index</span>, <span class="ident">errors</span>);
+        <span class="kw">for </span>index <span class="kw">in </span>model.indexes() {
+            validations::index_is_not_defined_multiple_times_to_same_fields(index, errors);
+            validations::unique_cannot_be_defined_to_id_field(index, errors);
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">available_native_type_constructors</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">NativeTypeConstructor</span>] {
-        <span class="ident">mongodb_types::CONSTRUCTORS</span>
+    <span class="kw">fn </span>available_native_type_constructors(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[NativeTypeConstructor] {
+        mongodb_types::CONSTRUCTORS
     }
 
-    <span class="kw">fn</span> <span class="ident">default_native_type_for_scalar_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">scalar_type</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarType</span>) -&gt; <span class="ident">NativeTypeInstance</span> {
-        <span class="kw">let</span> <span class="ident">native_type</span> <span class="op">=</span> <span class="ident">default_for</span>(<span class="ident">scalar_type</span>);
-        <span class="ident">NativeTypeInstance::new</span>::<span class="op">&lt;</span><span class="ident">MongoDbType</span><span class="op">&gt;</span>(<span class="kw-2">*</span><span class="ident">native_type</span>)
+    <span class="kw">fn </span>default_native_type_for_scalar_type(<span class="kw-2">&amp;</span><span class="self">self</span>, scalar_type: <span class="kw-2">&amp;</span>ScalarType) -&gt; NativeTypeInstance {
+        <span class="kw">let </span>native_type = default_for(scalar_type);
+        NativeTypeInstance::new::&lt;MongoDbType&gt;(<span class="kw-2">*</span>native_type)
     }
 
-    <span class="kw">fn</span> <span class="ident">native_type_is_default_for_scalar_type</span>(
+    <span class="kw">fn </span>native_type_is_default_for_scalar_type(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">native_type</span>: <span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span>,
-        <span class="ident">scalar_type</span>: <span class="kw-2">&amp;</span><span class="ident">ScalarType</span>,
-    ) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">default_native_type</span> <span class="op">=</span> <span class="ident">default_for</span>(<span class="ident">scalar_type</span>);
-        <span class="kw">let</span> <span class="ident">native_type</span>: <span class="kw-2">&amp;</span><span class="ident">MongoDbType</span> <span class="op">=</span> <span class="ident">native_type</span>.<span class="ident">downcast_ref</span>();
-        <span class="ident">native_type</span> <span class="op">==</span> <span class="ident">default_native_type</span>
+        native_type: <span class="kw-2">&amp;</span>NativeTypeInstance,
+        scalar_type: <span class="kw-2">&amp;</span>ScalarType,
+    ) -&gt; bool {
+        <span class="kw">let </span>default_native_type = default_for(scalar_type);
+        <span class="kw">let </span>native_type: <span class="kw-2">&amp;</span>MongoDbType = native_type.downcast_ref();
+        native_type == default_native_type
     }
 
-    <span class="kw">fn</span> <span class="ident">parse_native_type</span>(
+    <span class="kw">fn </span>parse_native_type(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
-        <span class="ident">args</span>: <span class="kw-2">&amp;</span>[<span class="ident">String</span>],
-        <span class="ident">span</span>: <span class="ident">Span</span>,
-        <span class="ident">diagnostics</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
-    ) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">NativeTypeInstance</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">native_type</span> <span class="op">=</span> <span class="ident">MongoDbType::from_parts</span>(<span class="ident">name</span>, <span class="ident">args</span>, <span class="ident">span</span>, <span class="ident">diagnostics</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Some</span>(<span class="ident">NativeTypeInstance::new</span>::<span class="op">&lt;</span><span class="ident">MongoDbType</span><span class="op">&gt;</span>(<span class="ident">native_type</span>))
+        name: <span class="kw-2">&amp;</span>str,
+        args: <span class="kw-2">&amp;</span>[String],
+        span: Span,
+        diagnostics: <span class="kw-2">&amp;mut </span>Diagnostics,
+    ) -&gt; <span class="prelude-ty">Option</span>&lt;NativeTypeInstance&gt; {
+        <span class="kw">let </span>native_type = MongoDbType::from_parts(name, args, span, diagnostics)<span class="question-mark">?</span>;
+        <span class="prelude-val">Some</span>(NativeTypeInstance::new::&lt;MongoDbType&gt;(native_type))
     }
 
-    <span class="kw">fn</span> <span class="ident">native_type_to_parts</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">native_type</span>: <span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span>) -&gt; (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) {
-        <span class="ident">native_type</span>.<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="ident">MongoDbType</span><span class="op">&gt;</span>().<span class="ident">to_parts</span>()
+    <span class="kw">fn </span>native_type_to_parts(<span class="kw-2">&amp;</span><span class="self">self</span>, native_type: <span class="kw-2">&amp;</span>NativeTypeInstance) -&gt; (<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, Vec&lt;String&gt;) {
+        native_type.downcast_ref::&lt;MongoDbType&gt;().to_parts()
     }
 
-    <span class="kw">fn</span> <span class="ident">scalar_type_for_native_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_native_type</span>: <span class="kw-2">&amp;</span><span class="ident">NativeTypeInstance</span>) -&gt; <span class="ident">ScalarType</span> {
+    <span class="kw">fn </span>scalar_type_for_native_type(<span class="kw-2">&amp;</span><span class="self">self</span>, _native_type: <span class="kw-2">&amp;</span>NativeTypeInstance) -&gt; ScalarType {
         <span class="macro">todo!</span>()
     }
 
-    <span class="kw">fn</span> <span class="ident">validate_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">url</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">StdResult</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">url</span>.<span class="ident">starts_with</span>(<span class="string">&quot;mongo&quot;</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;must start with the protocol `mongo`.&quot;</span>.<span class="ident">into</span>());
+    <span class="kw">fn </span>validate_url(<span class="kw-2">&amp;</span><span class="self">self</span>, url: <span class="kw-2">&amp;</span>str) -&gt; StdResult&lt;(), String&gt; {
+        <span class="kw">if </span>!url.starts_with(<span class="string">&quot;mongo&quot;</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;must start with the protocol `mongo`.&quot;</span>.into());
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">default_relation_mode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RelationMode</span> {
-        <span class="ident">RelationMode::Prisma</span>
+    <span class="kw">fn </span>default_relation_mode(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RelationMode {
+        RelationMode::Prisma
     }
 
-    <span class="kw">fn</span> <span class="ident">allowed_relation_mode_settings</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">enumflags2::BitFlags</span><span class="op">&lt;</span><span class="ident">RelationMode</span><span class="op">&gt;</span> {
-        <span class="ident">RelationMode::Prisma</span>.<span class="ident">into</span>()
+    <span class="kw">fn </span>allowed_relation_mode_settings(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; enumflags2::BitFlags&lt;RelationMode&gt; {
+        RelationMode::Prisma.into()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="builtin_psl_connectors" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="builtin_psl_connectors" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

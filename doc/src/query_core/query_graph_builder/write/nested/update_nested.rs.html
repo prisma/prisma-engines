@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_graph_builder/write/nested/update_nested.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>update_nested.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../query_core/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/core/src/query_graph_builder/write/nested/update_nested.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>update_nested.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../normalize.css"><link rel="stylesheet" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script><script defer src="../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../query_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../query_core/index.html"><img class="rust-logo" src="../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -167,168 +167,168 @@
 <span id="167">167</span>
 <span id="168">168</span>
 <span id="169">169</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">query_ast</span>::<span class="kw-2">*</span>,
-    <span class="ident">query_graph</span>::{<span class="ident">Node</span>, <span class="ident">NodeRef</span>, <span class="ident">QueryGraph</span>, <span class="ident">QueryGraphDependency</span>},
-    <span class="ident">ParsedInputValue</span>,
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use crate</span>::{
+    query_ast::<span class="kw-2">*</span>,
+    query_graph::{Node, NodeRef, QueryGraph, QueryGraphDependency},
+    ParsedInputValue,
 };
-<span class="kw">use</span> <span class="ident">connector::Filter</span>;
-<span class="kw">use</span> <span class="ident">prisma_models</span>::{<span class="ident">ModelRef</span>, <span class="ident">RelationFieldRef</span>};
-<span class="kw">use</span> <span class="ident">schema_builder::constants::args</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert::TryInto</span>, <span class="ident">sync::Arc</span>};
+<span class="kw">use </span>connector::Filter;
+<span class="kw">use </span>prisma_models::{ModelRef, RelationFieldRef};
+<span class="kw">use </span>schema_builder::constants::args;
+<span class="kw">use </span>std::{convert::TryInto, sync::Arc};
 
-<span class="doccomment">/// Handles nested update (single record) cases.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">///       ┌ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">/// ┌─────    Parent   │─ ─ ─ ─ ─ ┐</span>
-<span class="doccomment">/// │     └ ─ ─ ─ ─ ─ ─</span>
-<span class="doccomment">/// │            │                │</span>
-<span class="doccomment">/// │            ▼                ▼</span>
-<span class="doccomment">/// │     ┌────────────┐    ┌ ─ ─ ─ ─ ─</span>
-<span class="doccomment">/// │     │   Check    │       Result  │</span>
-<span class="doccomment">/// │     └────────────┘    └ ─ ─ ─ ─ ─</span>
-<span class="doccomment">/// │            │</span>
-<span class="doccomment">/// │  ┌ ─ ─ ─ ─ ▼ ─ ─ ─ ─ ┐</span>
-<span class="doccomment">/// │   ┌─────────────────┐</span>
-<span class="doccomment">/// │  ││ Insert onUpdate ││</span>
-<span class="doccomment">/// │   │emulation subtree│</span>
-<span class="doccomment">/// │  ││for all relations││</span>
-<span class="doccomment">/// │   │ pointing to the │</span>
-<span class="doccomment">/// │  ││   Child model   ││</span>
-<span class="doccomment">/// │   └─────────────────┘</span>
-<span class="doccomment">/// │  └ ─ ─ ─ ─ ┬ ─ ─ ─ ─ ┘</span>
-<span class="doccomment">/// │         ┌──┘</span>
-<span class="doccomment">/// │         │</span>
-<span class="doccomment">/// │         ▼</span>
-<span class="doccomment">/// │  ┌────────────┐</span>
-<span class="doccomment">/// └─▶│   Update   │</span>
-<span class="doccomment">///    └────────────┘</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nested_update</span>(
-    <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-    <span class="ident">connector_ctx</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectorContext</span>,
-    <span class="ident">parent</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
-    <span class="ident">parent_relation_field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-    <span class="ident">value</span>: <span class="ident">ParsedInputValue</span>,
-    <span class="ident">child_model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">utils::coerce_vec</span>(<span class="ident">value</span>) {
-        <span class="kw">let</span> (<span class="ident">data</span>, <span class="ident">filter</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">parent_relation_field</span>.<span class="ident">is_list</span>() {
-            <span class="comment">// We have to have a single record filter in &quot;where&quot;.</span>
-            <span class="comment">// This is used to read the children first, to make sure they&#39;re actually connected.</span>
-            <span class="comment">// The update itself operates on the record found by the read check.</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">where_arg</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="ident">args::WHERE</span>).<span class="ident">unwrap</span>().<span class="ident">try_into</span>()<span class="question-mark">?</span>;
+<span class="doccomment">/// Handles nested update (single record) cases.
+///
+/// ```text
+///       ┌ ─ ─ ─ ─ ─ ─
+/// ┌─────    Parent   │─ ─ ─ ─ ─ ┐
+/// │     └ ─ ─ ─ ─ ─ ─
+/// │            │                │
+/// │            ▼                ▼
+/// │     ┌────────────┐    ┌ ─ ─ ─ ─ ─
+/// │     │   Check    │       Result  │
+/// │     └────────────┘    └ ─ ─ ─ ─ ─
+/// │            │
+/// │  ┌ ─ ─ ─ ─ ▼ ─ ─ ─ ─ ┐
+/// │   ┌─────────────────┐
+/// │  ││ Insert onUpdate ││
+/// │   │emulation subtree│
+/// │  ││for all relations││
+/// │   │ pointing to the │
+/// │  ││   Child model   ││
+/// │   └─────────────────┘
+/// │  └ ─ ─ ─ ─ ┬ ─ ─ ─ ─ ┘
+/// │         ┌──┘
+/// │         │
+/// │         ▼
+/// │  ┌────────────┐
+/// └─▶│   Update   │
+///    └────────────┘
+/// ```
+</span><span class="kw">pub fn </span>nested_update(
+    graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+    parent: <span class="kw-2">&amp;</span>NodeRef,
+    parent_relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
+    value: ParsedInputValue,
+    child_model: <span class="kw-2">&amp;</span>ModelRef,
+) -&gt; QueryGraphBuilderResult&lt;()&gt; {
+    <span class="kw">for </span>value <span class="kw">in </span>utils::coerce_vec(value) {
+        <span class="kw">let </span>(data, filter) = <span class="kw">if </span>parent_relation_field.is_list() {
+            <span class="comment">// We have to have a single record filter in &quot;where&quot;.
+            // This is used to read the children first, to make sure they&#39;re actually connected.
+            // The update itself operates on the record found by the read check.
+            </span><span class="kw">let </span><span class="kw-2">mut </span>map: ParsedInputMap = value.try_into()<span class="question-mark">?</span>;
+            <span class="kw">let </span>where_arg: ParsedInputMap = map.remove(args::WHERE).unwrap().try_into()<span class="question-mark">?</span>;
 
-            <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">extract_unique_filter</span>(<span class="ident">where_arg</span>, <span class="ident">child_model</span>)<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="ident">data_value</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="ident">args::DATA</span>).<span class="ident">unwrap</span>();
+            <span class="kw">let </span>filter = extract_unique_filter(where_arg, child_model)<span class="question-mark">?</span>;
+            <span class="kw">let </span>data_value = map.remove(args::DATA).unwrap();
 
-            (<span class="ident">data_value</span>, <span class="ident">filter</span>)
-        } <span class="kw">else</span> {
-            <span class="kw">match</span> <span class="ident">value</span> {
-                <span class="comment">// If the update input is of shape { where?: WhereInput, data: DataInput }</span>
-                <span class="ident">ParsedInputValue::Map</span>(<span class="kw-2">mut</span> <span class="ident">map</span>) <span class="kw">if</span> <span class="ident">map</span>.<span class="ident">is_nested_to_one_update_envelope</span>() =&gt; {
-                    <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">where_arg</span>) <span class="op">=</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="ident">args::WHERE</span>) {
-                        <span class="kw">let</span> <span class="ident">where_arg</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">where_arg</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
+            (data_value, filter)
+        } <span class="kw">else </span>{
+            <span class="kw">match </span>value {
+                <span class="comment">// If the update input is of shape { where?: WhereInput, data: DataInput }
+                </span>ParsedInputValue::Map(<span class="kw-2">mut </span>map) <span class="kw">if </span>map.is_nested_to_one_update_envelope() =&gt; {
+                    <span class="kw">let </span>filter = <span class="kw">if let </span><span class="prelude-val">Some</span>(where_arg) = map.remove(args::WHERE) {
+                        <span class="kw">let </span>where_arg: ParsedInputMap = where_arg.try_into()<span class="question-mark">?</span>;
 
-                        <span class="ident">extract_filter</span>(<span class="ident">where_arg</span>, <span class="ident">child_model</span>)<span class="question-mark">?</span>
-                    } <span class="kw">else</span> {
-                        <span class="ident">Filter::empty</span>()
+                        extract_filter(where_arg, child_model)<span class="question-mark">?
+                    </span>} <span class="kw">else </span>{
+                        Filter::empty()
                     };
 
-                    <span class="kw">let</span> <span class="ident">data_value</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="ident">args::DATA</span>).<span class="ident">unwrap</span>();
+                    <span class="kw">let </span>data_value = map.remove(args::DATA).unwrap();
 
-                    (<span class="ident">data_value</span>, <span class="ident">filter</span>)
+                    (data_value, filter)
                 }
-                <span class="comment">// If the update input is the shorthand shape which directly updates data</span>
-                <span class="ident">x</span> =&gt; (<span class="ident">x</span>, <span class="ident">Filter::empty</span>()),
+                <span class="comment">// If the update input is the shorthand shape which directly updates data
+                </span>x =&gt; (x, Filter::empty()),
             }
         };
 
-        <span class="kw">let</span> <span class="ident">find_child_records_node</span> <span class="op">=</span>
-            <span class="ident">utils::insert_find_children_by_parent_node</span>(<span class="ident">graph</span>, <span class="ident">parent</span>, <span class="ident">parent_relation_field</span>, <span class="ident">filter</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>;
+        <span class="kw">let </span>find_child_records_node =
+            utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter.clone())<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">update_node</span> <span class="op">=</span>
-            <span class="ident">update::update_record_node</span>(<span class="ident">graph</span>, <span class="ident">connector_ctx</span>, <span class="ident">filter</span>, <span class="ident">Arc::clone</span>(<span class="ident">child_model</span>), <span class="ident">data</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>update_node =
+            update::update_record_node(graph, connector_ctx, filter, Arc::clone(child_model), data.try_into()<span class="question-mark">?</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">child_model_identifier</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">related_model</span>().<span class="ident">primary_identifier</span>();
+        <span class="kw">let </span>child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
-        <span class="kw">let</span> <span class="ident">relation_name</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">relation</span>().<span class="ident">name</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">child_model_name</span> <span class="op">=</span> <span class="ident">child_model</span>.<span class="ident">name</span>.<span class="ident">clone</span>();
+        <span class="kw">let </span>relation_name = parent_relation_field.relation().name.clone();
+        <span class="kw">let </span>child_model_name = child_model.name.clone();
 
-        <span class="ident">graph</span>.<span class="ident">create_edge</span>(
-            <span class="kw-2">&amp;</span><span class="ident">find_child_records_node</span>,
-            <span class="kw-2">&amp;</span><span class="ident">update_node</span>,
-            <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
-                <span class="ident">child_model_identifier</span>.<span class="ident">clone</span>(),
-                <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">update_node</span>, <span class="kw-2">mut</span> <span class="ident">child_ids</span><span class="op">|</span> {
-                    <span class="kw">let</span> <span class="ident">child_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">child_ids</span>.<span class="ident">pop</span>() {
-                        <span class="prelude-val">Some</span>(<span class="ident">pid</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">pid</span>),
-                        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">QueryGraphBuilderError::RecordNotFound</span>(<span class="macro">format!</span>(
+        graph.create_edge(
+            <span class="kw-2">&amp;</span>find_child_records_node,
+            <span class="kw-2">&amp;</span>update_node,
+            QueryGraphDependency::ProjectedDataDependency(
+                child_model_identifier.clone(),
+                Box::new(<span class="kw">move </span>|<span class="kw-2">mut </span>update_node, <span class="kw-2">mut </span>child_ids| {
+                    <span class="kw">let </span>child_id = <span class="kw">match </span>child_ids.pop() {
+                        <span class="prelude-val">Some</span>(pid) =&gt; <span class="prelude-val">Ok</span>(pid),
+                        <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(QueryGraphBuilderError::RecordNotFound(<span class="macro">format!</span>(
                             <span class="string">&quot;No &#39;{}&#39; record was found for a nested update on relation &#39;{}&#39;.&quot;</span>,
-                            <span class="ident">child_model_name</span>, <span class="ident">relation_name</span>
+                            child_model_name, relation_name
                         ))),
                     }<span class="question-mark">?</span>;
 
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Write</span>(<span class="ident">WriteQuery::UpdateRecord</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">ur</span>))) <span class="op">=</span> <span class="ident">update_node</span> {
-                        <span class="ident">ur</span>.<span class="ident">set_selectors</span>(<span class="macro">vec!</span>[<span class="ident">child_id</span>]);
+                    <span class="kw">if let </span>Node::Query(Query::Write(WriteQuery::UpdateRecord(<span class="kw-2">ref mut </span>ur))) = update_node {
+                        ur.set_selectors(<span class="macro">vec!</span>[child_id]);
                     }
 
-                    <span class="prelude-val">Ok</span>(<span class="ident">update_node</span>)
+                    <span class="prelude-val">Ok</span>(update_node)
                 }),
             ),
         )<span class="question-mark">?</span>;
 
-        <span class="ident">utils::insert_emulated_on_update</span>(
-            <span class="ident">graph</span>,
-            <span class="ident">connector_ctx</span>,
-            <span class="kw-2">&amp;</span><span class="ident">child_model</span>,
-            <span class="kw-2">&amp;</span><span class="ident">find_child_records_node</span>,
-            <span class="kw-2">&amp;</span><span class="ident">update_node</span>,
+        utils::insert_emulated_on_update(
+            graph,
+            connector_ctx,
+            <span class="kw-2">&amp;</span>child_model,
+            <span class="kw-2">&amp;</span>find_child_records_node,
+            <span class="kw-2">&amp;</span>update_node,
         )<span class="question-mark">?</span>;
     }
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nested_update_many</span>(
-    <span class="ident">graph</span>: <span class="kw-2">&amp;mut</span> <span class="ident">QueryGraph</span>,
-    <span class="ident">connector_ctx</span>: <span class="kw-2">&amp;</span><span class="ident">ConnectorContext</span>,
-    <span class="ident">parent</span>: <span class="kw-2">&amp;</span><span class="ident">NodeRef</span>,
-    <span class="ident">parent_relation_field</span>: <span class="kw-2">&amp;</span><span class="ident">RelationFieldRef</span>,
-    <span class="ident">value</span>: <span class="ident">ParsedInputValue</span>,
-    <span class="ident">child_model</span>: <span class="kw-2">&amp;</span><span class="ident">ModelRef</span>,
-) -&gt; <span class="ident">QueryGraphBuilderResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">utils::coerce_vec</span>(<span class="ident">value</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">where_arg</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="ident">args::WHERE</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">data_value</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="ident">args::DATA</span>).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">data_map</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">data_value</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">where_map</span>: <span class="ident">ParsedInputMap</span> <span class="op">=</span> <span class="ident">where_arg</span>.<span class="ident">try_into</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">child_model_identifier</span> <span class="op">=</span> <span class="ident">parent_relation_field</span>.<span class="ident">related_model</span>().<span class="ident">primary_identifier</span>();
+<span class="kw">pub fn </span>nested_update_many(
+    graph: <span class="kw-2">&amp;mut </span>QueryGraph,
+    connector_ctx: <span class="kw-2">&amp;</span>ConnectorContext,
+    parent: <span class="kw-2">&amp;</span>NodeRef,
+    parent_relation_field: <span class="kw-2">&amp;</span>RelationFieldRef,
+    value: ParsedInputValue,
+    child_model: <span class="kw-2">&amp;</span>ModelRef,
+) -&gt; QueryGraphBuilderResult&lt;()&gt; {
+    <span class="kw">for </span>value <span class="kw">in </span>utils::coerce_vec(value) {
+        <span class="kw">let </span><span class="kw-2">mut </span>map: ParsedInputMap = value.try_into()<span class="question-mark">?</span>;
+        <span class="kw">let </span>where_arg = map.remove(args::WHERE).unwrap();
+        <span class="kw">let </span>data_value = map.remove(args::DATA).unwrap();
+        <span class="kw">let </span>data_map: ParsedInputMap = data_value.try_into()<span class="question-mark">?</span>;
+        <span class="kw">let </span>where_map: ParsedInputMap = where_arg.try_into()<span class="question-mark">?</span>;
+        <span class="kw">let </span>child_model_identifier = parent_relation_field.related_model().primary_identifier();
 
-        <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">extract_filter</span>(<span class="ident">where_map</span>, <span class="ident">child_model</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>filter = extract_filter(where_map, child_model)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">find_child_records_node</span> <span class="op">=</span>
-            <span class="ident">utils::insert_find_children_by_parent_node</span>(<span class="ident">graph</span>, <span class="ident">parent</span>, <span class="ident">parent_relation_field</span>, <span class="ident">filter</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>find_child_records_node =
+            utils::insert_find_children_by_parent_node(graph, parent, parent_relation_field, filter)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">update_many_node</span> <span class="op">=</span>
-            <span class="ident">update::update_many_record_node</span>(<span class="ident">graph</span>, <span class="ident">connector_ctx</span>, <span class="ident">Filter::empty</span>(), <span class="ident">Arc::clone</span>(<span class="ident">child_model</span>), <span class="ident">data_map</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>update_many_node =
+            update::update_many_record_node(graph, connector_ctx, Filter::empty(), Arc::clone(child_model), data_map)<span class="question-mark">?</span>;
 
-        <span class="ident">graph</span>.<span class="ident">create_edge</span>(
-            <span class="kw-2">&amp;</span><span class="ident">find_child_records_node</span>,
-            <span class="kw-2">&amp;</span><span class="ident">update_many_node</span>,
-            <span class="ident">QueryGraphDependency::ProjectedDataDependency</span>(
-                <span class="ident">child_model_identifier</span>.<span class="ident">clone</span>(),
-                <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">update_many_node</span>, <span class="ident">child_ids</span><span class="op">|</span> {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Node::Query</span>(<span class="ident">Query::Write</span>(<span class="ident">WriteQuery::UpdateManyRecords</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">ur</span>))) <span class="op">=</span> <span class="ident">update_many_node</span> {
-                        <span class="comment">// ur.set_filter(Filter::and(vec![ur.filter.clone(), child_ids.filter()]));</span>
-                        <span class="ident">ur</span>.<span class="ident">record_filter</span> <span class="op">=</span> <span class="ident">child_ids</span>.<span class="ident">into</span>();
+        graph.create_edge(
+            <span class="kw-2">&amp;</span>find_child_records_node,
+            <span class="kw-2">&amp;</span>update_many_node,
+            QueryGraphDependency::ProjectedDataDependency(
+                child_model_identifier.clone(),
+                Box::new(<span class="kw">move </span>|<span class="kw-2">mut </span>update_many_node, child_ids| {
+                    <span class="kw">if let </span>Node::Query(Query::Write(WriteQuery::UpdateManyRecords(<span class="kw-2">ref mut </span>ur))) = update_many_node {
+                        <span class="comment">// ur.set_filter(Filter::and(vec![ur.filter.clone(), child_ids.filter()]));
+                        </span>ur.record_filter = child_ids.into();
                     }
 
-                    <span class="prelude-val">Ok</span>(<span class="ident">update_many_node</span>)
+                    <span class="prelude-val">Ok</span>(update_many_node)
                 }),
             ),
         )<span class="question-mark">?</span>;
@@ -337,4 +337,4 @@
     <span class="prelude-val">Ok</span>(())
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="query_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

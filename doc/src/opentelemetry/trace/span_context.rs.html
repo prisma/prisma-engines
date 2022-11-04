@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/trace/span_context.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>span_context.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/trace/span_context.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>span_context.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../opentelemetry/index.html">
                         <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -633,617 +633,617 @@
 <span id="631">631</span>
 <span id="632">632</span>
 <span id="633">633</span>
-</pre><pre class="rust"><code><span class="doccomment">//! # OpenTelemetry SpanContext interface</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! A `SpanContext` represents the portion of a `Span` which must be serialized and propagated along</span>
-<span class="doccomment">//! side of a distributed context. `SpanContext`s are immutable.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The OpenTelemetry `SpanContext` representation conforms to the [w3c TraceContext specification].</span>
-<span class="doccomment">//! It contains two identifiers - a `TraceId` and a `SpanId` - along with a set of common</span>
-<span class="doccomment">//! `TraceFlags` and system-specific `TraceState` values.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The spec can be viewed here: &lt;https://github.com/open-telemetry/opentelemetry-specification/blob/v1.3.0/specification/trace/api.md#spancontext&gt;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [w3c TraceContext specification]: https://www.w3.org/TR/trace-context/</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
-<span class="kw">use</span> <span class="ident">std::collections::VecDeque</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::hash::Hash</span>;
-<span class="kw">use</span> <span class="ident">std::num::ParseIntError</span>;
-<span class="kw">use</span> <span class="ident">std::ops</span>::{<span class="ident">BitAnd</span>, <span class="ident">BitOr</span>, <span class="ident">Not</span>};
-<span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
-<span class="kw">use</span> <span class="ident">thiserror::Error</span>;
+</pre><pre class="rust"><code><span class="doccomment">//! # OpenTelemetry SpanContext interface
+//!
+//! A `SpanContext` represents the portion of a `Span` which must be serialized and propagated along
+//! side of a distributed context. `SpanContext`s are immutable.
+//!
+//! The OpenTelemetry `SpanContext` representation conforms to the [w3c TraceContext specification].
+//! It contains two identifiers - a `TraceId` and a `SpanId` - along with a set of common
+//! `TraceFlags` and system-specific `TraceState` values.
+//!
+//! The spec can be viewed here: &lt;https://github.com/open-telemetry/opentelemetry-specification/blob/v1.3.0/specification/trace/api.md#spancontext&gt;
+//!
+//! [w3c TraceContext specification]: https://www.w3.org/TR/trace-context/
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;serialize&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
+<span class="kw">use </span>std::collections::VecDeque;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::hash::Hash;
+<span class="kw">use </span>std::num::ParseIntError;
+<span class="kw">use </span>std::ops::{BitAnd, BitOr, Not};
+<span class="kw">use </span>std::str::FromStr;
+<span class="kw">use </span>thiserror::Error;
 
-<span class="doccomment">/// Flags that can be set on a [`SpanContext`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The current version of the specification only supports a single flag called `sampled`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See the W3C TraceContext specification&#39;s [trace-flags] section for more details.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [trace-flags]: https://www.w3.org/TR/trace-context/#trace-flags</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Copy</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TraceFlags</span>(<span class="ident">u8</span>);
+<span class="doccomment">/// Flags that can be set on a [`SpanContext`].
+///
+/// The current version of the specification only supports a single flag called `sampled`.
+///
+/// See the W3C TraceContext specification&#39;s [trace-flags] section for more details.
+///
+/// [trace-flags]: https://www.w3.org/TR/trace-context/#trace-flags
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serialize&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Copy, Hash)]
+</span><span class="kw">pub struct </span>TraceFlags(u8);
 
-<span class="kw">impl</span> <span class="ident">TraceFlags</span> {
-    <span class="doccomment">/// Trace flags with the `sampled` flag set to `1`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Spans that are not sampled will be ignored by most tracing tools.</span>
-    <span class="doccomment">/// See the `sampled` section of the [W3C TraceContext specification] for details.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [W3C TraceContext specification]: https://www.w3.org/TR/trace-context/#sampled-flag</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SAMPLED</span>: <span class="ident">TraceFlags</span> <span class="op">=</span> <span class="ident">TraceFlags</span>(<span class="number">0x01</span>);
+<span class="kw">impl </span>TraceFlags {
+    <span class="doccomment">/// Trace flags with the `sampled` flag set to `1`.
+    ///
+    /// Spans that are not sampled will be ignored by most tracing tools.
+    /// See the `sampled` section of the [W3C TraceContext specification] for details.
+    ///
+    /// [W3C TraceContext specification]: https://www.w3.org/TR/trace-context/#sampled-flag
+    </span><span class="kw">pub const </span>SAMPLED: TraceFlags = TraceFlags(<span class="number">0x01</span>);
 
-    <span class="doccomment">/// Construct new trace flags</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">flags</span>: <span class="ident">u8</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">TraceFlags</span>(<span class="ident">flags</span>)
+    <span class="doccomment">/// Construct new trace flags
+    </span><span class="kw">pub const fn </span>new(flags: u8) -&gt; <span class="self">Self </span>{
+        TraceFlags(flags)
     }
 
-    <span class="doccomment">/// Returns `true` if the `sampled` flag is set</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_sampled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        (<span class="kw-2">*</span><span class="self">self</span> <span class="op">&amp;</span> <span class="ident">TraceFlags::SAMPLED</span>) <span class="op">==</span> <span class="ident">TraceFlags::SAMPLED</span>
+    <span class="doccomment">/// Returns `true` if the `sampled` flag is set
+    </span><span class="kw">pub fn </span>is_sampled(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        (<span class="kw-2">*</span><span class="self">self </span>&amp; TraceFlags::SAMPLED) == TraceFlags::SAMPLED
     }
 
-    <span class="doccomment">/// Returns copy of the current flags with the `sampled` flag set.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_sampled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sampled</span>: <span class="ident">bool</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="ident">sampled</span> {
-            <span class="kw-2">*</span><span class="self">self</span> <span class="op">|</span> <span class="ident">TraceFlags::SAMPLED</span>
-        } <span class="kw">else</span> {
-            <span class="kw-2">*</span><span class="self">self</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">TraceFlags::SAMPLED</span>
+    <span class="doccomment">/// Returns copy of the current flags with the `sampled` flag set.
+    </span><span class="kw">pub fn </span>with_sampled(<span class="kw-2">&amp;</span><span class="self">self</span>, sampled: bool) -&gt; <span class="self">Self </span>{
+        <span class="kw">if </span>sampled {
+            <span class="kw-2">*</span><span class="self">self </span>| TraceFlags::SAMPLED
+        } <span class="kw">else </span>{
+            <span class="kw-2">*</span><span class="self">self </span>&amp; !TraceFlags::SAMPLED
         }
     }
 
-    <span class="doccomment">/// Returns the flags as a `u8`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_u8</span>(<span class="self">self</span>) -&gt; <span class="ident">u8</span> {
-        <span class="self">self</span>.<span class="number">0</span>
+    <span class="doccomment">/// Returns the flags as a `u8`
+    </span><span class="kw">pub fn </span>to_u8(<span class="self">self</span>) -&gt; u8 {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
+}
+
+<span class="kw">impl </span>BitAnd <span class="kw">for </span>TraceFlags {
+    <span class="kw">type </span>Output = <span class="self">Self</span>;
+
+    <span class="kw">fn </span>bitand(<span class="self">self</span>, rhs: <span class="self">Self</span>) -&gt; <span class="self">Self</span>::Output {
+        <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0 </span>&amp; rhs.<span class="number">0</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">BitAnd</span> <span class="kw">for</span> <span class="ident">TraceFlags</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
+<span class="kw">impl </span>BitOr <span class="kw">for </span>TraceFlags {
+    <span class="kw">type </span>Output = <span class="self">Self</span>;
 
-    <span class="kw">fn</span> <span class="ident">bitand</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span> <span class="op">&amp;</span> <span class="ident">rhs</span>.<span class="number">0</span>)
+    <span class="kw">fn </span>bitor(<span class="self">self</span>, rhs: <span class="self">Self</span>) -&gt; <span class="self">Self</span>::Output {
+        <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0 </span>| rhs.<span class="number">0</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">BitOr</span> <span class="kw">for</span> <span class="ident">TraceFlags</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
+<span class="kw">impl </span>Not <span class="kw">for </span>TraceFlags {
+    <span class="kw">type </span>Output = <span class="self">Self</span>;
 
-    <span class="kw">fn</span> <span class="ident">bitor</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span> <span class="op">|</span> <span class="ident">rhs</span>.<span class="number">0</span>)
+    <span class="kw">fn </span>not(<span class="self">self</span>) -&gt; <span class="self">Self</span>::Output {
+        <span class="self">Self</span>(!<span class="self">self</span>.<span class="number">0</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Not</span> <span class="kw">for</span> <span class="ident">TraceFlags</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
-
-    <span class="kw">fn</span> <span class="ident">not</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="self">Self</span>(<span class="op">!</span><span class="self">self</span>.<span class="number">0</span>)
+<span class="kw">impl </span>fmt::LowerHex <span class="kw">for </span>TraceFlags {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        fmt::LowerHex::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, f)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::LowerHex</span> <span class="kw">for</span> <span class="ident">TraceFlags</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">fmt::LowerHex::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, <span class="ident">f</span>)
+<span class="doccomment">/// A 16-byte value which identifies a given trace.
+///
+/// The id is valid if it contains at least one non-zero byte.
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serialize&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Clone, PartialEq, Eq, Copy, Hash)]
+</span><span class="kw">pub struct </span>TraceId(<span class="kw">pub</span>(<span class="kw">crate</span>) u128);
+
+<span class="kw">impl </span>TraceId {
+    <span class="doccomment">/// Invalid trace id
+    </span><span class="kw">pub const </span>INVALID: TraceId = TraceId(<span class="number">0</span>);
+
+    <span class="doccomment">/// Create a trace id from its representation as a byte array.
+    </span><span class="kw">pub const fn </span>from_bytes(bytes: [u8; <span class="number">16</span>]) -&gt; <span class="self">Self </span>{
+        TraceId(u128::from_be_bytes(bytes))
+    }
+
+    <span class="doccomment">/// Return the representation of this trace id as a byte array.
+    </span><span class="kw">pub const fn </span>to_bytes(<span class="self">self</span>) -&gt; [u8; <span class="number">16</span>] {
+        <span class="self">self</span>.<span class="number">0</span>.to_be_bytes()
+    }
+
+    <span class="doccomment">/// Converts a string in base 16 to a trace id.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use opentelemetry::trace::TraceId;
+    ///
+    /// assert!(TraceId::from_hex(&quot;42&quot;).is_ok());
+    /// assert!(TraceId::from_hex(&quot;58406520a006649127e371903a2de979&quot;).is_ok());
+    ///
+    /// assert!(TraceId::from_hex(&quot;not_hex&quot;).is_err());
+    /// ```
+    </span><span class="kw">pub fn </span>from_hex(hex: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, ParseIntError&gt; {
+        u128::from_str_radix(hex, <span class="number">16</span>).map(TraceId)
     }
 }
 
-<span class="doccomment">/// A 16-byte value which identifies a given trace.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The id is valid if it contains at least one non-zero byte.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Copy</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TraceId</span>(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">u128</span>);
-
-<span class="kw">impl</span> <span class="ident">TraceId</span> {
-    <span class="doccomment">/// Invalid trace id</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">INVALID</span>: <span class="ident">TraceId</span> <span class="op">=</span> <span class="ident">TraceId</span>(<span class="number">0</span>);
-
-    <span class="doccomment">/// Create a trace id from its representation as a byte array.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_bytes</span>(<span class="ident">bytes</span>: [<span class="ident">u8</span>; <span class="number">16</span>]) -&gt; <span class="self">Self</span> {
-        <span class="ident">TraceId</span>(<span class="ident">u128::from_be_bytes</span>(<span class="ident">bytes</span>))
-    }
-
-    <span class="doccomment">/// Return the representation of this trace id as a byte array.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">to_bytes</span>(<span class="self">self</span>) -&gt; [<span class="ident">u8</span>; <span class="number">16</span>] {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">to_be_bytes</span>()
-    }
-
-    <span class="doccomment">/// Converts a string in base 16 to a trace id.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use opentelemetry::trace::TraceId;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(TraceId::from_hex(&quot;42&quot;).is_ok());</span>
-    <span class="doccomment">/// assert!(TraceId::from_hex(&quot;58406520a006649127e371903a2de979&quot;).is_ok());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(TraceId::from_hex(&quot;not_hex&quot;).is_err());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_hex</span>(<span class="ident">hex</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">ParseIntError</span><span class="op">&gt;</span> {
-        <span class="ident">u128::from_str_radix</span>(<span class="ident">hex</span>, <span class="number">16</span>).<span class="ident">map</span>(<span class="ident">TraceId</span>)
+<span class="kw">impl </span>From&lt;[u8; <span class="number">16</span>]&gt; <span class="kw">for </span>TraceId {
+    <span class="kw">fn </span>from(bytes: [u8; <span class="number">16</span>]) -&gt; <span class="self">Self </span>{
+        TraceId::from_bytes(bytes)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">16</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TraceId</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">bytes</span>: [<span class="ident">u8</span>; <span class="number">16</span>]) -&gt; <span class="self">Self</span> {
-        <span class="ident">TraceId::from_bytes</span>(<span class="ident">bytes</span>)
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>TraceId {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;{:032x}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">TraceId</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:032x}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>))
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>TraceId {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;{:032x}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">TraceId</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:032x}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>))
+<span class="kw">impl </span>fmt::LowerHex <span class="kw">for </span>TraceId {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        fmt::LowerHex::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, f)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::LowerHex</span> <span class="kw">for</span> <span class="ident">TraceId</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">fmt::LowerHex::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, <span class="ident">f</span>)
+<span class="doccomment">/// An 8-byte value which identifies a given span.
+///
+/// The id is valid if it contains at least one non-zero byte.
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serialize&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Clone, PartialEq, Eq, Copy, Hash)]
+</span><span class="kw">pub struct </span>SpanId(<span class="kw">pub</span>(<span class="kw">crate</span>) u64);
+
+<span class="kw">impl </span>SpanId {
+    <span class="doccomment">/// Invalid span id
+    </span><span class="kw">pub const </span>INVALID: SpanId = SpanId(<span class="number">0</span>);
+
+    <span class="doccomment">/// Create a span id from its representation as a byte array.
+    </span><span class="kw">pub const fn </span>from_bytes(bytes: [u8; <span class="number">8</span>]) -&gt; <span class="self">Self </span>{
+        SpanId(u64::from_be_bytes(bytes))
+    }
+
+    <span class="doccomment">/// Return the representation of this span id as a byte array.
+    </span><span class="kw">pub const fn </span>to_bytes(<span class="self">self</span>) -&gt; [u8; <span class="number">8</span>] {
+        <span class="self">self</span>.<span class="number">0</span>.to_be_bytes()
+    }
+
+    <span class="doccomment">/// Converts a string in base 16 to a span id.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use opentelemetry::trace::SpanId;
+    ///
+    /// assert!(SpanId::from_hex(&quot;42&quot;).is_ok());
+    /// assert!(SpanId::from_hex(&quot;58406520a0066491&quot;).is_ok());
+    ///
+    /// assert!(SpanId::from_hex(&quot;not_hex&quot;).is_err());
+    /// ```
+    </span><span class="kw">pub fn </span>from_hex(hex: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, ParseIntError&gt; {
+        u64::from_str_radix(hex, <span class="number">16</span>).map(SpanId)
     }
 }
 
-<span class="doccomment">/// An 8-byte value which identifies a given span.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The id is valid if it contains at least one non-zero byte.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Copy</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SpanId</span>(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">u64</span>);
-
-<span class="kw">impl</span> <span class="ident">SpanId</span> {
-    <span class="doccomment">/// Invalid span id</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">INVALID</span>: <span class="ident">SpanId</span> <span class="op">=</span> <span class="ident">SpanId</span>(<span class="number">0</span>);
-
-    <span class="doccomment">/// Create a span id from its representation as a byte array.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_bytes</span>(<span class="ident">bytes</span>: [<span class="ident">u8</span>; <span class="number">8</span>]) -&gt; <span class="self">Self</span> {
-        <span class="ident">SpanId</span>(<span class="ident">u64::from_be_bytes</span>(<span class="ident">bytes</span>))
-    }
-
-    <span class="doccomment">/// Return the representation of this span id as a byte array.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">to_bytes</span>(<span class="self">self</span>) -&gt; [<span class="ident">u8</span>; <span class="number">8</span>] {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">to_be_bytes</span>()
-    }
-
-    <span class="doccomment">/// Converts a string in base 16 to a span id.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use opentelemetry::trace::SpanId;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(SpanId::from_hex(&quot;42&quot;).is_ok());</span>
-    <span class="doccomment">/// assert!(SpanId::from_hex(&quot;58406520a0066491&quot;).is_ok());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(SpanId::from_hex(&quot;not_hex&quot;).is_err());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_hex</span>(<span class="ident">hex</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">ParseIntError</span><span class="op">&gt;</span> {
-        <span class="ident">u64::from_str_radix</span>(<span class="ident">hex</span>, <span class="number">16</span>).<span class="ident">map</span>(<span class="ident">SpanId</span>)
+<span class="kw">impl </span>From&lt;[u8; <span class="number">8</span>]&gt; <span class="kw">for </span>SpanId {
+    <span class="kw">fn </span>from(bytes: [u8; <span class="number">8</span>]) -&gt; <span class="self">Self </span>{
+        SpanId::from_bytes(bytes)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SpanId</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">bytes</span>: [<span class="ident">u8</span>; <span class="number">8</span>]) -&gt; <span class="self">Self</span> {
-        <span class="ident">SpanId::from_bytes</span>(<span class="ident">bytes</span>)
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>SpanId {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;{:016x}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">SpanId</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:016x}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>))
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>SpanId {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.write_fmt(<span class="macro">format_args!</span>(<span class="string">&quot;{:016x}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">SpanId</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">write_fmt</span>(<span class="macro">format_args!</span>(<span class="string">&quot;{:016x}&quot;</span>, <span class="self">self</span>.<span class="number">0</span>))
+<span class="kw">impl </span>fmt::LowerHex <span class="kw">for </span>SpanId {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        fmt::LowerHex::fmt(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, f)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::LowerHex</span> <span class="kw">for</span> <span class="ident">SpanId</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">fmt::LowerHex::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, <span class="ident">f</span>)
-    }
-}
+<span class="doccomment">/// TraceState carries system-specific configuration data, represented as a list
+/// of key-value pairs. TraceState allows multiple tracing systems to
+/// participate in the same trace.
+///
+/// Please review the [W3C specification] for details on this field.
+///
+/// [W3C specification]: https://www.w3.org/TR/trace-context/#tracestate-header
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serialize&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Clone, Debug, Default, Eq, PartialEq, Hash)]
+</span><span class="kw">pub struct </span>TraceState(<span class="prelude-ty">Option</span>&lt;VecDeque&lt;(String, String)&gt;&gt;);
 
-<span class="doccomment">/// TraceState carries system-specific configuration data, represented as a list</span>
-<span class="doccomment">/// of key-value pairs. TraceState allows multiple tracing systems to</span>
-<span class="doccomment">/// participate in the same trace.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Please review the [W3C specification] for details on this field.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [W3C specification]: https://www.w3.org/TR/trace-context/#tracestate-header</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TraceState</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">VecDeque</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">String</span>)<span class="op">&gt;</span><span class="op">&gt;</span>);
-
-<span class="kw">impl</span> <span class="ident">TraceState</span> {
-    <span class="doccomment">/// Validates that the given `TraceState` list-member key is valid per the [W3 Spec].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [W3 Spec]: https://www.w3.org/TR/trace-context/#key</span>
-    <span class="kw">fn</span> <span class="ident">valid_key</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="ident">key</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">256</span> {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+<span class="kw">impl </span>TraceState {
+    <span class="doccomment">/// Validates that the given `TraceState` list-member key is valid per the [W3 Spec].
+    ///
+    /// [W3 Spec]: https://www.w3.org/TR/trace-context/#key
+    </span><span class="kw">fn </span>valid_key(key: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        <span class="kw">if </span>key.len() &gt; <span class="number">256 </span>{
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">allowed_special</span> <span class="op">=</span> <span class="op">|</span><span class="ident">b</span>: <span class="ident">u8</span><span class="op">|</span> (<span class="ident">b</span> <span class="op">==</span> <span class="string">b&#39;_&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">b</span> <span class="op">==</span> <span class="string">b&#39;-&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">b</span> <span class="op">==</span> <span class="string">b&#39;*&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">b</span> <span class="op">==</span> <span class="string">b&#39;/&#39;</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">vendor_start</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="kw-2">&amp;</span><span class="ident">b</span>) <span class="kw">in</span> <span class="ident">key</span>.<span class="ident">as_bytes</span>().<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">if</span> <span class="op">!</span>(<span class="ident">b</span>.<span class="ident">is_ascii_lowercase</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">b</span>.<span class="ident">is_ascii_digit</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">allowed_special</span>(<span class="ident">b</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">b</span> <span class="op">==</span> <span class="string">b&#39;@&#39;</span>) {
-                <span class="kw">return</span> <span class="bool-val">false</span>;
+        <span class="kw">let </span>allowed_special = |b: u8| (b == <span class="string">b&#39;_&#39; </span>|| b == <span class="string">b&#39;-&#39; </span>|| b == <span class="string">b&#39;*&#39; </span>|| b == <span class="string">b&#39;/&#39;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>vendor_start = <span class="prelude-val">None</span>;
+        <span class="kw">for </span>(i, <span class="kw-2">&amp;</span>b) <span class="kw">in </span>key.as_bytes().iter().enumerate() {
+            <span class="kw">if </span>!(b.is_ascii_lowercase() || b.is_ascii_digit() || allowed_special(b) || b == <span class="string">b&#39;@&#39;</span>) {
+                <span class="kw">return </span><span class="bool-val">false</span>;
             }
 
-            <span class="kw">if</span> <span class="ident">i</span> <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> (<span class="op">!</span><span class="ident">b</span>.<span class="ident">is_ascii_lowercase</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">b</span>.<span class="ident">is_ascii_digit</span>()) {
-                <span class="kw">return</span> <span class="bool-val">false</span>;
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">b</span> <span class="op">==</span> <span class="string">b&#39;@&#39;</span> {
-                <span class="kw">if</span> <span class="ident">vendor_start</span>.<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">i</span> <span class="op">+</span> <span class="number">14</span> <span class="op">&lt;</span> <span class="ident">key</span>.<span class="ident">len</span>() {
-                    <span class="kw">return</span> <span class="bool-val">false</span>;
+            <span class="kw">if </span>i == <span class="number">0 </span>&amp;&amp; (!b.is_ascii_lowercase() &amp;&amp; !b.is_ascii_digit()) {
+                <span class="kw">return </span><span class="bool-val">false</span>;
+            } <span class="kw">else if </span>b == <span class="string">b&#39;@&#39; </span>{
+                <span class="kw">if </span>vendor_start.is_some() || i + <span class="number">14 </span>&lt; key.len() {
+                    <span class="kw">return </span><span class="bool-val">false</span>;
                 }
-                <span class="ident">vendor_start</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>);
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">start</span>) <span class="op">=</span> <span class="ident">vendor_start</span> {
-                <span class="kw">if</span> <span class="ident">i</span> <span class="op">==</span> <span class="ident">start</span> <span class="op">+</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="op">!</span>(<span class="ident">b</span>.<span class="ident">is_ascii_lowercase</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">b</span>.<span class="ident">is_ascii_digit</span>()) {
-                    <span class="kw">return</span> <span class="bool-val">false</span>;
+                vendor_start = <span class="prelude-val">Some</span>(i);
+            } <span class="kw">else if let </span><span class="prelude-val">Some</span>(start) = vendor_start {
+                <span class="kw">if </span>i == start + <span class="number">1 </span>&amp;&amp; !(b.is_ascii_lowercase() || b.is_ascii_digit()) {
+                    <span class="kw">return </span><span class="bool-val">false</span>;
                 }
             }
         }
 
-        <span class="bool-val">true</span>
-    }
+        <span class="bool-val">true
+    </span>}
 
-    <span class="doccomment">/// Validates that the given `TraceState` list-member value is valid per the [W3 Spec].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [W3 Spec]: https://www.w3.org/TR/trace-context/#value</span>
-    <span class="kw">fn</span> <span class="ident">valid_value</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="ident">value</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">256</span> {
-            <span class="kw">return</span> <span class="bool-val">false</span>;
+    <span class="doccomment">/// Validates that the given `TraceState` list-member value is valid per the [W3 Spec].
+    ///
+    /// [W3 Spec]: https://www.w3.org/TR/trace-context/#value
+    </span><span class="kw">fn </span>valid_value(value: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        <span class="kw">if </span>value.len() &gt; <span class="number">256 </span>{
+            <span class="kw">return </span><span class="bool-val">false</span>;
         }
 
-        <span class="op">!</span>(<span class="ident">value</span>.<span class="ident">contains</span>(<span class="string">&#39;,&#39;</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">contains</span>(<span class="string">&#39;=&#39;</span>))
+        !(value.contains(<span class="string">&#39;,&#39;</span>) || value.contains(<span class="string">&#39;=&#39;</span>))
     }
 
-    <span class="doccomment">/// Creates a new `TraceState` from the given key-value collection.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use opentelemetry::trace::{TraceState, TraceStateError};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let kvs = vec![(&quot;foo&quot;, &quot;bar&quot;), (&quot;apple&quot;, &quot;banana&quot;)];</span>
-    <span class="doccomment">/// let trace_state: Result&lt;TraceState, TraceStateError&gt; = TraceState::from_key_value(kvs);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(trace_state.is_ok());</span>
-    <span class="doccomment">/// assert_eq!(trace_state.unwrap().header(), String::from(&quot;foo=bar,apple=banana&quot;))</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_key_value</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>(<span class="ident">trace_state</span>: <span class="ident">T</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">TraceStateError</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (<span class="ident">K</span>, <span class="ident">V</span>)<span class="op">&gt;</span>,
-        <span class="ident">K</span>: <span class="ident">ToString</span>,
-        <span class="ident">V</span>: <span class="ident">ToString</span>,
+    <span class="doccomment">/// Creates a new `TraceState` from the given key-value collection.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use opentelemetry::trace::{TraceState, TraceStateError};
+    ///
+    /// let kvs = vec![(&quot;foo&quot;, &quot;bar&quot;), (&quot;apple&quot;, &quot;banana&quot;)];
+    /// let trace_state: Result&lt;TraceState, TraceStateError&gt; = TraceState::from_key_value(kvs);
+    ///
+    /// assert!(trace_state.is_ok());
+    /// assert_eq!(trace_state.unwrap().header(), String::from(&quot;foo=bar,apple=banana&quot;))
+    /// ```
+    </span><span class="kw">pub fn </span>from_key_value&lt;T, K, V&gt;(trace_state: T) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, TraceStateError&gt;
+    <span class="kw">where
+        </span>T: IntoIterator&lt;Item = (K, V)&gt;,
+        K: ToString,
+        V: ToString,
     {
-        <span class="kw">let</span> <span class="ident">ordered_data</span> <span class="op">=</span> <span class="ident">trace_state</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">key</span>, <span class="ident">value</span>)<span class="op">|</span> {
-                <span class="kw">let</span> (<span class="ident">key</span>, <span class="ident">value</span>) <span class="op">=</span> (<span class="ident">key</span>.<span class="ident">to_string</span>(), <span class="ident">value</span>.<span class="ident">to_string</span>());
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">TraceState::valid_key</span>(<span class="ident">key</span>.<span class="ident">as_str</span>()) {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">TraceStateError::InvalidKey</span>(<span class="ident">key</span>));
+        <span class="kw">let </span>ordered_data = trace_state
+            .into_iter()
+            .map(|(key, value)| {
+                <span class="kw">let </span>(key, value) = (key.to_string(), value.to_string());
+                <span class="kw">if </span>!TraceState::valid_key(key.as_str()) {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(TraceStateError::InvalidKey(key));
                 }
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">TraceState::valid_value</span>(<span class="ident">value</span>.<span class="ident">as_str</span>()) {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">TraceStateError::InvalidValue</span>(<span class="ident">value</span>));
+                <span class="kw">if </span>!TraceState::valid_value(value.as_str()) {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(TraceStateError::InvalidValue(value));
                 }
 
-                <span class="prelude-val">Ok</span>((<span class="ident">key</span>, <span class="ident">value</span>))
+                <span class="prelude-val">Ok</span>((key, value))
             })
-            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">VecDeque</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span>, <span class="ident">TraceStateError</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+            .collect::&lt;<span class="prelude-ty">Result</span>&lt;VecDeque&lt;<span class="kw">_</span>&gt;, TraceStateError&gt;&gt;()<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="ident">ordered_data</span>.<span class="ident">is_empty</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">TraceState</span>(<span class="prelude-val">None</span>))
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">TraceState</span>(<span class="prelude-val">Some</span>(<span class="ident">ordered_data</span>)))
+        <span class="kw">if </span>ordered_data.is_empty() {
+            <span class="prelude-val">Ok</span>(TraceState(<span class="prelude-val">None</span>))
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Ok</span>(TraceState(<span class="prelude-val">Some</span>(ordered_data)))
         }
     }
 
-    <span class="doccomment">/// Retrieves a value for a given key from the `TraceState` if it exists.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">kvs</span><span class="op">|</span> {
-            <span class="ident">kvs</span>.<span class="ident">iter</span>().<span class="ident">find_map</span>(<span class="op">|</span><span class="ident">item</span><span class="op">|</span> {
-                <span class="kw">if</span> <span class="ident">item</span>.<span class="number">0</span>.<span class="ident">as_str</span>() <span class="op">==</span> <span class="ident">key</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">item</span>.<span class="number">1</span>.<span class="ident">as_str</span>())
-                } <span class="kw">else</span> {
-                    <span class="prelude-val">None</span>
-                }
+    <span class="doccomment">/// Retrieves a value for a given key from the `TraceState` if it exists.
+    </span><span class="kw">pub fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>, key: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.as_ref().and_then(|kvs| {
+            kvs.iter().find_map(|item| {
+                <span class="kw">if </span>item.<span class="number">0</span>.as_str() == key {
+                    <span class="prelude-val">Some</span>(item.<span class="number">1</span>.as_str())
+                } <span class="kw">else </span>{
+                    <span class="prelude-val">None
+                </span>}
             })
         })
     }
 
-    <span class="doccomment">/// Inserts the given key-value pair into the `TraceState`. If a value already exists for the</span>
-    <span class="doccomment">/// given key, this updates the value and updates the value&#39;s position. If the key or value are</span>
-    <span class="doccomment">/// invalid per the [W3 Spec] an `Err` is returned, else a new `TraceState` with the</span>
-    <span class="doccomment">/// updated key/value is returned.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [W3 Spec]: https://www.w3.org/TR/trace-context/#mutating-the-tracestate-field</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>, <span class="ident">value</span>: <span class="ident">V</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TraceState</span>, <span class="ident">TraceStateError</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">K</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="ident">V</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Inserts the given key-value pair into the `TraceState`. If a value already exists for the
+    /// given key, this updates the value and updates the value&#39;s position. If the key or value are
+    /// invalid per the [W3 Spec] an `Err` is returned, else a new `TraceState` with the
+    /// updated key/value is returned.
+    ///
+    /// [W3 Spec]: https://www.w3.org/TR/trace-context/#mutating-the-tracestate-field
+    </span><span class="kw">pub fn </span>insert&lt;K, V&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, key: K, value: V) -&gt; <span class="prelude-ty">Result</span>&lt;TraceState, TraceStateError&gt;
+    <span class="kw">where
+        </span>K: Into&lt;String&gt;,
+        V: Into&lt;String&gt;,
     {
-        <span class="kw">let</span> (<span class="ident">key</span>, <span class="ident">value</span>) <span class="op">=</span> (<span class="ident">key</span>.<span class="ident">into</span>(), <span class="ident">value</span>.<span class="ident">into</span>());
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">TraceState::valid_key</span>(<span class="ident">key</span>.<span class="ident">as_str</span>()) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">TraceStateError::InvalidKey</span>(<span class="ident">key</span>));
+        <span class="kw">let </span>(key, value) = (key.into(), value.into());
+        <span class="kw">if </span>!TraceState::valid_key(key.as_str()) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(TraceStateError::InvalidKey(key));
         }
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">TraceState::valid_value</span>(<span class="ident">value</span>.<span class="ident">as_str</span>()) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">TraceStateError::InvalidValue</span>(<span class="ident">value</span>));
+        <span class="kw">if </span>!TraceState::valid_value(value.as_str()) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(TraceStateError::InvalidValue(value));
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">trace_state</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">delete_from_deque</span>(<span class="ident">key</span>.<span class="ident">clone</span>());
-        <span class="kw">let</span> <span class="ident">kvs</span> <span class="op">=</span> <span class="ident">trace_state</span>.<span class="number">0</span>.<span class="ident">get_or_insert</span>(<span class="ident">VecDeque::with_capacity</span>(<span class="number">1</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>trace_state = <span class="self">self</span>.delete_from_deque(key.clone());
+        <span class="kw">let </span>kvs = trace_state.<span class="number">0</span>.get_or_insert(VecDeque::with_capacity(<span class="number">1</span>));
 
-        <span class="ident">kvs</span>.<span class="ident">push_front</span>((<span class="ident">key</span>, <span class="ident">value</span>));
+        kvs.push_front((key, value));
 
-        <span class="prelude-val">Ok</span>(<span class="ident">trace_state</span>)
+        <span class="prelude-val">Ok</span>(trace_state)
     }
 
-    <span class="doccomment">/// Removes the given key-value pair from the `TraceState`. If the key is invalid per the</span>
-    <span class="doccomment">/// [W3 Spec] an `Err` is returned. Else, a new `TraceState`</span>
-    <span class="doccomment">/// with the removed entry is returned.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the key is not in `TraceState`. The original `TraceState` will be cloned and returned.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [W3 Spec]: https://www.w3.org/TR/trace-context/#mutating-the-tracestate-field</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delete</span><span class="op">&lt;</span><span class="ident">K</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TraceState</span>, <span class="ident">TraceStateError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">key</span>.<span class="ident">into</span>();
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">TraceState::valid_key</span>(<span class="ident">key</span>.<span class="ident">as_str</span>()) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">TraceStateError::InvalidKey</span>(<span class="ident">key</span>));
+    <span class="doccomment">/// Removes the given key-value pair from the `TraceState`. If the key is invalid per the
+    /// [W3 Spec] an `Err` is returned. Else, a new `TraceState`
+    /// with the removed entry is returned.
+    ///
+    /// If the key is not in `TraceState`. The original `TraceState` will be cloned and returned.
+    ///
+    /// [W3 Spec]: https://www.w3.org/TR/trace-context/#mutating-the-tracestate-field
+    </span><span class="kw">pub fn </span>delete&lt;K: Into&lt;String&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, key: K) -&gt; <span class="prelude-ty">Result</span>&lt;TraceState, TraceStateError&gt; {
+        <span class="kw">let </span>key = key.into();
+        <span class="kw">if </span>!TraceState::valid_key(key.as_str()) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(TraceStateError::InvalidKey(key));
         }
 
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">delete_from_deque</span>(<span class="ident">key</span>))
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.delete_from_deque(key))
     }
 
-    <span class="doccomment">/// Delete key from trace state&#39;s deque. The key MUST be valid</span>
-    <span class="kw">fn</span> <span class="ident">delete_from_deque</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="ident">String</span>) -&gt; <span class="ident">TraceState</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">owned</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>();
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">kvs</span>) <span class="op">=</span> <span class="ident">owned</span>.<span class="number">0</span>.<span class="ident">as_mut</span>() {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">index</span>) <span class="op">=</span> <span class="ident">kvs</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">x</span>.<span class="number">0</span> <span class="op">==</span> <span class="kw-2">*</span><span class="ident">key</span>) {
-                <span class="ident">kvs</span>.<span class="ident">remove</span>(<span class="ident">index</span>);
+    <span class="doccomment">/// Delete key from trace state&#39;s deque. The key MUST be valid
+    </span><span class="kw">fn </span>delete_from_deque(<span class="kw-2">&amp;</span><span class="self">self</span>, key: String) -&gt; TraceState {
+        <span class="kw">let </span><span class="kw-2">mut </span>owned = <span class="self">self</span>.clone();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(kvs) = owned.<span class="number">0</span>.as_mut() {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(index) = kvs.iter().position(|x| <span class="kw-2">*</span>x.<span class="number">0 </span>== <span class="kw-2">*</span>key) {
+                kvs.remove(index);
             }
         }
-        <span class="ident">owned</span>
+        owned
     }
 
-    <span class="doccomment">/// Creates a new `TraceState` header string, delimiting each key and value with a `=` and each</span>
-    <span class="doccomment">/// entry with a `,`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="self">self</span>.<span class="ident">header_delimited</span>(<span class="string">&quot;=&quot;</span>, <span class="string">&quot;,&quot;</span>)
+    <span class="doccomment">/// Creates a new `TraceState` header string, delimiting each key and value with a `=` and each
+    /// entry with a `,`.
+    </span><span class="kw">pub fn </span>header(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="self">self</span>.header_delimited(<span class="string">&quot;=&quot;</span>, <span class="string">&quot;,&quot;</span>)
     }
 
-    <span class="doccomment">/// Creates a new `TraceState` header string, with the given key/value delimiter and entry delimiter.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">header_delimited</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">entry_delimiter</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">list_delimiter</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-        <span class="self">self</span>.<span class="number">0</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">kvs</span><span class="op">|</span> {
-                <span class="ident">kvs</span>.<span class="ident">iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">key</span>, <span class="ident">value</span>)<span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;{}{}{}&quot;</span>, <span class="ident">key</span>, <span class="ident">entry_delimiter</span>, <span class="ident">value</span>))
-                    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-                    .<span class="ident">join</span>(<span class="ident">list_delimiter</span>)
+    <span class="doccomment">/// Creates a new `TraceState` header string, with the given key/value delimiter and entry delimiter.
+    </span><span class="kw">pub fn </span>header_delimited(<span class="kw-2">&amp;</span><span class="self">self</span>, entry_delimiter: <span class="kw-2">&amp;</span>str, list_delimiter: <span class="kw-2">&amp;</span>str) -&gt; String {
+        <span class="self">self</span>.<span class="number">0
+            </span>.as_ref()
+            .map(|kvs| {
+                kvs.iter()
+                    .map(|(key, value)| <span class="macro">format!</span>(<span class="string">&quot;{}{}{}&quot;</span>, key, entry_delimiter, value))
+                    .collect::&lt;Vec&lt;String&gt;&gt;()
+                    .join(list_delimiter)
             })
-            .<span class="ident">unwrap_or_default</span>()
+            .unwrap_or_default()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">TraceState</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">TraceStateError</span>;
+<span class="kw">impl </span>FromStr <span class="kw">for </span>TraceState {
+    <span class="kw">type </span><span class="prelude-val">Err </span>= TraceStateError;
 
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">list_members</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">split_terminator</span>(<span class="string">&#39;,&#39;</span>).<span class="ident">collect</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">key_value_pairs</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">String</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">list_members</span>.<span class="ident">len</span>());
+    <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
+        <span class="kw">let </span>list_members: Vec&lt;<span class="kw-2">&amp;</span>str&gt; = s.split_terminator(<span class="string">&#39;,&#39;</span>).collect();
+        <span class="kw">let </span><span class="kw-2">mut </span>key_value_pairs: Vec&lt;(String, String)&gt; = Vec::with_capacity(list_members.len());
 
-        <span class="kw">for</span> <span class="ident">list_member</span> <span class="kw">in</span> <span class="ident">list_members</span> {
-            <span class="kw">match</span> <span class="ident">list_member</span>.<span class="ident">find</span>(<span class="string">&#39;=&#39;</span>) {
-                <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">TraceStateError::InvalidList</span>(<span class="ident">list_member</span>.<span class="ident">to_string</span>())),
-                <span class="prelude-val">Some</span>(<span class="ident">separator_index</span>) =&gt; {
-                    <span class="kw">let</span> (<span class="ident">key</span>, <span class="ident">value</span>) <span class="op">=</span> <span class="ident">list_member</span>.<span class="ident">split_at</span>(<span class="ident">separator_index</span>);
-                    <span class="ident">key_value_pairs</span>
-                        .<span class="ident">push</span>((<span class="ident">key</span>.<span class="ident">to_string</span>(), <span class="ident">value</span>.<span class="ident">trim_start_matches</span>(<span class="string">&#39;=&#39;</span>).<span class="ident">to_string</span>()));
+        <span class="kw">for </span>list_member <span class="kw">in </span>list_members {
+            <span class="kw">match </span>list_member.find(<span class="string">&#39;=&#39;</span>) {
+                <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(TraceStateError::InvalidList(list_member.to_string())),
+                <span class="prelude-val">Some</span>(separator_index) =&gt; {
+                    <span class="kw">let </span>(key, value) = list_member.split_at(separator_index);
+                    key_value_pairs
+                        .push((key.to_string(), value.trim_start_matches(<span class="string">&#39;=&#39;</span>).to_string()));
                 }
             }
         }
 
-        <span class="ident">TraceState::from_key_value</span>(<span class="ident">key_value_pairs</span>)
+        TraceState::from_key_value(key_value_pairs)
     }
 }
 
-<span class="doccomment">/// Error returned by `TraceState` operations.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Error</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TraceStateError</span> {
-    <span class="doccomment">/// The key is invalid. See &lt;https://www.w3.org/TR/trace-context/#key&gt; for requirement for keys.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;{0} is not a valid key in TraceState, see https://www.w3.org/TR/trace-context/#key for more details&quot;</span>)]</span>
-    <span class="ident">InvalidKey</span>(<span class="ident">String</span>),
+<span class="doccomment">/// Error returned by `TraceState` operations.
+</span><span class="attribute">#[derive(Error, Debug)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>TraceStateError {
+    <span class="doccomment">/// The key is invalid. See &lt;https://www.w3.org/TR/trace-context/#key&gt; for requirement for keys.
+    </span><span class="attribute">#[error(<span class="string">&quot;{0} is not a valid key in TraceState, see https://www.w3.org/TR/trace-context/#key for more details&quot;</span>)]
+    </span>InvalidKey(String),
 
-    <span class="doccomment">/// The value is invalid. See &lt;https://www.w3.org/TR/trace-context/#value&gt; for requirement for values.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;{0} is not a valid value in TraceState, see https://www.w3.org/TR/trace-context/#value for more details&quot;</span>)]</span>
-    <span class="ident">InvalidValue</span>(<span class="ident">String</span>),
+    <span class="doccomment">/// The value is invalid. See &lt;https://www.w3.org/TR/trace-context/#value&gt; for requirement for values.
+    </span><span class="attribute">#[error(<span class="string">&quot;{0} is not a valid value in TraceState, see https://www.w3.org/TR/trace-context/#value for more details&quot;</span>)]
+    </span>InvalidValue(String),
 
-    <span class="doccomment">/// The value is invalid. See &lt;https://www.w3.org/TR/trace-context/#list&gt; for requirement for list members.</span>
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;{0} is not a valid list member in TraceState, see https://www.w3.org/TR/trace-context/#list for more details&quot;</span>)]</span>
-    <span class="ident">InvalidList</span>(<span class="ident">String</span>),
+    <span class="doccomment">/// The value is invalid. See &lt;https://www.w3.org/TR/trace-context/#list&gt; for requirement for list members.
+    </span><span class="attribute">#[error(<span class="string">&quot;{0} is not a valid list member in TraceState, see https://www.w3.org/TR/trace-context/#list for more details&quot;</span>)]
+    </span>InvalidList(String),
 }
 
-<span class="doccomment">/// Immutable portion of a `Span` which can be serialized and propagated.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Spans that do not have the `sampled` flag set in their [`TraceFlags`] will</span>
-<span class="doccomment">/// be ignored by most tracing tools.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SpanContext</span> {
-    <span class="ident">trace_id</span>: <span class="ident">TraceId</span>,
-    <span class="ident">span_id</span>: <span class="ident">SpanId</span>,
-    <span class="ident">trace_flags</span>: <span class="ident">TraceFlags</span>,
-    <span class="ident">is_remote</span>: <span class="ident">bool</span>,
-    <span class="ident">trace_state</span>: <span class="ident">TraceState</span>,
+<span class="doccomment">/// Immutable portion of a `Span` which can be serialized and propagated.
+///
+/// Spans that do not have the `sampled` flag set in their [`TraceFlags`] will
+/// be ignored by most tracing tools.
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serialize&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Clone, Debug, PartialEq, Hash, Eq)]
+</span><span class="kw">pub struct </span>SpanContext {
+    trace_id: TraceId,
+    span_id: SpanId,
+    trace_flags: TraceFlags,
+    is_remote: bool,
+    trace_state: TraceState,
 }
 
-<span class="kw">impl</span> <span class="ident">SpanContext</span> {
-    <span class="doccomment">/// Create an invalid empty span context</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty_context</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">SpanContext::new</span>(
-            <span class="ident">TraceId::INVALID</span>,
-            <span class="ident">SpanId::INVALID</span>,
-            <span class="ident">TraceFlags::default</span>(),
+<span class="kw">impl </span>SpanContext {
+    <span class="doccomment">/// Create an invalid empty span context
+    </span><span class="kw">pub fn </span>empty_context() -&gt; <span class="self">Self </span>{
+        SpanContext::new(
+            TraceId::INVALID,
+            SpanId::INVALID,
+            TraceFlags::default(),
             <span class="bool-val">false</span>,
-            <span class="ident">TraceState::default</span>(),
+            TraceState::default(),
         )
     }
 
-    <span class="doccomment">/// Construct a new `SpanContext`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">trace_id</span>: <span class="ident">TraceId</span>,
-        <span class="ident">span_id</span>: <span class="ident">SpanId</span>,
-        <span class="ident">trace_flags</span>: <span class="ident">TraceFlags</span>,
-        <span class="ident">is_remote</span>: <span class="ident">bool</span>,
-        <span class="ident">trace_state</span>: <span class="ident">TraceState</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="ident">SpanContext</span> {
-            <span class="ident">trace_id</span>,
-            <span class="ident">span_id</span>,
-            <span class="ident">trace_flags</span>,
-            <span class="ident">is_remote</span>,
-            <span class="ident">trace_state</span>,
+    <span class="doccomment">/// Construct a new `SpanContext`
+    </span><span class="kw">pub fn </span>new(
+        trace_id: TraceId,
+        span_id: SpanId,
+        trace_flags: TraceFlags,
+        is_remote: bool,
+        trace_state: TraceState,
+    ) -&gt; <span class="self">Self </span>{
+        SpanContext {
+            trace_id,
+            span_id,
+            trace_flags,
+            is_remote,
+            trace_state,
         }
     }
 
-    <span class="doccomment">/// A valid trace identifier is a non-zero `u128`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trace_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TraceId</span> {
-        <span class="self">self</span>.<span class="ident">trace_id</span>
+    <span class="doccomment">/// A valid trace identifier is a non-zero `u128`.
+    </span><span class="kw">pub fn </span>trace_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TraceId {
+        <span class="self">self</span>.trace_id
     }
 
-    <span class="doccomment">/// A valid span identifier is a non-zero `u64`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">span_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SpanId</span> {
-        <span class="self">self</span>.<span class="ident">span_id</span>
+    <span class="doccomment">/// A valid span identifier is a non-zero `u64`.
+    </span><span class="kw">pub fn </span>span_id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SpanId {
+        <span class="self">self</span>.span_id
     }
 
-    <span class="doccomment">/// Returns details about the trace. Unlike `TraceState` values, these are</span>
-    <span class="doccomment">/// present in all traces. Currently, the only option is a boolean sampled flag.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trace_flags</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">TraceFlags</span> {
-        <span class="self">self</span>.<span class="ident">trace_flags</span>
+    <span class="doccomment">/// Returns details about the trace. Unlike `TraceState` values, these are
+    /// present in all traces. Currently, the only option is a boolean sampled flag.
+    </span><span class="kw">pub fn </span>trace_flags(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; TraceFlags {
+        <span class="self">self</span>.trace_flags
     }
 
-    <span class="doccomment">/// Returns a bool flag which is true if the `SpanContext` has a valid (non-zero) `trace_id`</span>
-    <span class="doccomment">/// and a valid (non-zero) `span_id`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_valid</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">trace_id</span>.<span class="number">0</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">span_id</span>.<span class="number">0</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
+    <span class="doccomment">/// Returns a bool flag which is true if the `SpanContext` has a valid (non-zero) `trace_id`
+    /// and a valid (non-zero) `span_id`.
+    </span><span class="kw">pub fn </span>is_valid(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.trace_id.<span class="number">0 </span>!= <span class="number">0 </span>&amp;&amp; <span class="self">self</span>.span_id.<span class="number">0 </span>!= <span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Returns true if the `SpanContext` was propagated from a remote parent.
+    </span><span class="kw">pub fn </span>is_remote(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.is_remote
     }
 
-    <span class="doccomment">/// Returns true if the `SpanContext` was propagated from a remote parent.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_remote</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">is_remote</span>
+    <span class="doccomment">/// Returns `true` if the `sampled` trace flag is set.
+    ///
+    /// Spans that are not sampled will be ignored by most tracing tools.
+    </span><span class="kw">pub fn </span>is_sampled(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.trace_flags.is_sampled()
     }
 
-    <span class="doccomment">/// Returns `true` if the `sampled` trace flag is set.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Spans that are not sampled will be ignored by most tracing tools.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_sampled</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">trace_flags</span>.<span class="ident">is_sampled</span>()
-    }
-
-    <span class="doccomment">/// Returns the context&#39;s `TraceState`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">trace_state</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">TraceState</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">trace_state</span>
+    <span class="doccomment">/// Returns the context&#39;s `TraceState`.
+    </span><span class="kw">pub fn </span>trace_state(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>TraceState {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.trace_state
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
-    <span class="kw">fn</span> <span class="ident">trace_id_test_data</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">TraceId</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, [<span class="ident">u8</span>; <span class="number">16</span>])<span class="op">&gt;</span> {
+    <span class="attribute">#[rustfmt::skip]
+    </span><span class="kw">fn </span>trace_id_test_data() -&gt; Vec&lt;(TraceId, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, [u8; <span class="number">16</span>])&gt; {
         <span class="macro">vec!</span>[
-            (<span class="ident">TraceId</span>(<span class="number">0</span>), <span class="string">&quot;00000000000000000000000000000000&quot;</span>, [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]),
-            (<span class="ident">TraceId</span>(<span class="number">42</span>), <span class="string">&quot;0000000000000000000000000000002a&quot;</span>, [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">42</span>]),
-            (<span class="ident">TraceId</span>(<span class="number">126642714606581564793456114182061442190</span>), <span class="string">&quot;5f467fe7bf42676c05e20ba4a90e448e&quot;</span>, [<span class="number">95</span>, <span class="number">70</span>, <span class="number">127</span>, <span class="number">231</span>, <span class="number">191</span>, <span class="number">66</span>, <span class="number">103</span>, <span class="number">108</span>, <span class="number">5</span>, <span class="number">226</span>, <span class="number">11</span>, <span class="number">164</span>, <span class="number">169</span>, <span class="number">14</span>, <span class="number">68</span>, <span class="number">142</span>])
+            (TraceId(<span class="number">0</span>), <span class="string">&quot;00000000000000000000000000000000&quot;</span>, [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]),
+            (TraceId(<span class="number">42</span>), <span class="string">&quot;0000000000000000000000000000002a&quot;</span>, [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">42</span>]),
+            (TraceId(<span class="number">126642714606581564793456114182061442190</span>), <span class="string">&quot;5f467fe7bf42676c05e20ba4a90e448e&quot;</span>, [<span class="number">95</span>, <span class="number">70</span>, <span class="number">127</span>, <span class="number">231</span>, <span class="number">191</span>, <span class="number">66</span>, <span class="number">103</span>, <span class="number">108</span>, <span class="number">5</span>, <span class="number">226</span>, <span class="number">11</span>, <span class="number">164</span>, <span class="number">169</span>, <span class="number">14</span>, <span class="number">68</span>, <span class="number">142</span>])
         ]
     }
 
-    <span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
-    <span class="kw">fn</span> <span class="ident">span_id_test_data</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">SpanId</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, [<span class="ident">u8</span>; <span class="number">8</span>])<span class="op">&gt;</span> {
+    <span class="attribute">#[rustfmt::skip]
+    </span><span class="kw">fn </span>span_id_test_data() -&gt; Vec&lt;(SpanId, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, [u8; <span class="number">8</span>])&gt; {
         <span class="macro">vec!</span>[
-            (<span class="ident">SpanId</span>(<span class="number">0</span>), <span class="string">&quot;0000000000000000&quot;</span>, [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]),
-            (<span class="ident">SpanId</span>(<span class="number">42</span>), <span class="string">&quot;000000000000002a&quot;</span>, [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">42</span>]),
-            (<span class="ident">SpanId</span>(<span class="number">5508496025762705295</span>), <span class="string">&quot;4c721bf33e3caf8f&quot;</span>, [<span class="number">76</span>, <span class="number">114</span>, <span class="number">27</span>, <span class="number">243</span>, <span class="number">62</span>, <span class="number">60</span>, <span class="number">175</span>, <span class="number">143</span>])
+            (SpanId(<span class="number">0</span>), <span class="string">&quot;0000000000000000&quot;</span>, [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]),
+            (SpanId(<span class="number">42</span>), <span class="string">&quot;000000000000002a&quot;</span>, [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">42</span>]),
+            (SpanId(<span class="number">5508496025762705295</span>), <span class="string">&quot;4c721bf33e3caf8f&quot;</span>, [<span class="number">76</span>, <span class="number">114</span>, <span class="number">27</span>, <span class="number">243</span>, <span class="number">62</span>, <span class="number">60</span>, <span class="number">175</span>, <span class="number">143</span>])
         ]
     }
 
-    <span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
-    <span class="kw">fn</span> <span class="ident">trace_state_test_data</span>() -&gt; <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">TraceState</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>)<span class="op">&gt;</span> {
+    <span class="attribute">#[rustfmt::skip]
+    </span><span class="kw">fn </span>trace_state_test_data() -&gt; Vec&lt;(TraceState, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str)&gt; {
         <span class="macro">vec!</span>[
-            (<span class="ident">TraceState::from_key_value</span>(<span class="macro">vec!</span>[(<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>)]).<span class="ident">unwrap</span>(), <span class="string">&quot;foo=bar&quot;</span>, <span class="string">&quot;foo&quot;</span>),
-            (<span class="ident">TraceState::from_key_value</span>(<span class="macro">vec!</span>[(<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;&quot;</span>), (<span class="string">&quot;apple&quot;</span>, <span class="string">&quot;banana&quot;</span>)]).<span class="ident">unwrap</span>(), <span class="string">&quot;foo=,apple=banana&quot;</span>, <span class="string">&quot;apple&quot;</span>),
-            (<span class="ident">TraceState::from_key_value</span>(<span class="macro">vec!</span>[(<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>), (<span class="string">&quot;apple&quot;</span>, <span class="string">&quot;banana&quot;</span>)]).<span class="ident">unwrap</span>(), <span class="string">&quot;foo=bar,apple=banana&quot;</span>, <span class="string">&quot;apple&quot;</span>),
+            (TraceState::from_key_value(<span class="macro">vec!</span>[(<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>)]).unwrap(), <span class="string">&quot;foo=bar&quot;</span>, <span class="string">&quot;foo&quot;</span>),
+            (TraceState::from_key_value(<span class="macro">vec!</span>[(<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;&quot;</span>), (<span class="string">&quot;apple&quot;</span>, <span class="string">&quot;banana&quot;</span>)]).unwrap(), <span class="string">&quot;foo=,apple=banana&quot;</span>, <span class="string">&quot;apple&quot;</span>),
+            (TraceState::from_key_value(<span class="macro">vec!</span>[(<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>), (<span class="string">&quot;apple&quot;</span>, <span class="string">&quot;banana&quot;</span>)]).unwrap(), <span class="string">&quot;foo=bar,apple=banana&quot;</span>, <span class="string">&quot;apple&quot;</span>),
         ]
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_trace_id</span>() {
-        <span class="kw">for</span> <span class="ident">test_case</span> <span class="kw">in</span> <span class="ident">trace_id_test_data</span>() {
-            <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">test_case</span>.<span class="number">0</span>), <span class="ident">test_case</span>.<span class="number">1</span>);
-            <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:032x}&quot;</span>, <span class="ident">test_case</span>.<span class="number">0</span>), <span class="ident">test_case</span>.<span class="number">1</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">test_case</span>.<span class="number">0</span>.<span class="ident">to_bytes</span>(), <span class="ident">test_case</span>.<span class="number">2</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_trace_id() {
+        <span class="kw">for </span>test_case <span class="kw">in </span>trace_id_test_data() {
+            <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, test_case.<span class="number">0</span>), test_case.<span class="number">1</span>);
+            <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:032x}&quot;</span>, test_case.<span class="number">0</span>), test_case.<span class="number">1</span>);
+            <span class="macro">assert_eq!</span>(test_case.<span class="number">0</span>.to_bytes(), test_case.<span class="number">2</span>);
 
-            <span class="macro">assert_eq!</span>(<span class="ident">test_case</span>.<span class="number">0</span>, <span class="ident">TraceId::from_hex</span>(<span class="ident">test_case</span>.<span class="number">1</span>).<span class="ident">unwrap</span>());
-            <span class="macro">assert_eq!</span>(<span class="ident">test_case</span>.<span class="number">0</span>, <span class="ident">TraceId::from_bytes</span>(<span class="ident">test_case</span>.<span class="number">2</span>));
+            <span class="macro">assert_eq!</span>(test_case.<span class="number">0</span>, TraceId::from_hex(test_case.<span class="number">1</span>).unwrap());
+            <span class="macro">assert_eq!</span>(test_case.<span class="number">0</span>, TraceId::from_bytes(test_case.<span class="number">2</span>));
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_span_id</span>() {
-        <span class="kw">for</span> <span class="ident">test_case</span> <span class="kw">in</span> <span class="ident">span_id_test_data</span>() {
-            <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">test_case</span>.<span class="number">0</span>), <span class="ident">test_case</span>.<span class="number">1</span>);
-            <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:016x}&quot;</span>, <span class="ident">test_case</span>.<span class="number">0</span>), <span class="ident">test_case</span>.<span class="number">1</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">test_case</span>.<span class="number">0</span>.<span class="ident">to_bytes</span>(), <span class="ident">test_case</span>.<span class="number">2</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_span_id() {
+        <span class="kw">for </span>test_case <span class="kw">in </span>span_id_test_data() {
+            <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, test_case.<span class="number">0</span>), test_case.<span class="number">1</span>);
+            <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:016x}&quot;</span>, test_case.<span class="number">0</span>), test_case.<span class="number">1</span>);
+            <span class="macro">assert_eq!</span>(test_case.<span class="number">0</span>.to_bytes(), test_case.<span class="number">2</span>);
 
-            <span class="macro">assert_eq!</span>(<span class="ident">test_case</span>.<span class="number">0</span>, <span class="ident">SpanId::from_hex</span>(<span class="ident">test_case</span>.<span class="number">1</span>).<span class="ident">unwrap</span>());
-            <span class="macro">assert_eq!</span>(<span class="ident">test_case</span>.<span class="number">0</span>, <span class="ident">SpanId::from_bytes</span>(<span class="ident">test_case</span>.<span class="number">2</span>));
+            <span class="macro">assert_eq!</span>(test_case.<span class="number">0</span>, SpanId::from_hex(test_case.<span class="number">1</span>).unwrap());
+            <span class="macro">assert_eq!</span>(test_case.<span class="number">0</span>, SpanId::from_bytes(test_case.<span class="number">2</span>));
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_trace_state</span>() {
-        <span class="kw">for</span> <span class="ident">test_case</span> <span class="kw">in</span> <span class="ident">trace_state_test_data</span>() {
-            <span class="macro">assert_eq!</span>(<span class="ident">test_case</span>.<span class="number">0</span>.<span class="ident">clone</span>().<span class="ident">header</span>(), <span class="ident">test_case</span>.<span class="number">1</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_trace_state() {
+        <span class="kw">for </span>test_case <span class="kw">in </span>trace_state_test_data() {
+            <span class="macro">assert_eq!</span>(test_case.<span class="number">0</span>.clone().header(), test_case.<span class="number">1</span>);
 
-            <span class="kw">let</span> <span class="ident">new_key</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}-{}&quot;</span>, <span class="ident">test_case</span>.<span class="number">0</span>.<span class="ident">get</span>(<span class="ident">test_case</span>.<span class="number">2</span>).<span class="ident">unwrap</span>(), <span class="string">&quot;test&quot;</span>);
+            <span class="kw">let </span>new_key = <span class="macro">format!</span>(<span class="string">&quot;{}-{}&quot;</span>, test_case.<span class="number">0</span>.get(test_case.<span class="number">2</span>).unwrap(), <span class="string">&quot;test&quot;</span>);
 
-            <span class="kw">let</span> <span class="ident">updated_trace_state</span> <span class="op">=</span> <span class="ident">test_case</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="ident">test_case</span>.<span class="number">2</span>, <span class="ident">new_key</span>.<span class="ident">clone</span>());
-            <span class="macro">assert!</span>(<span class="ident">updated_trace_state</span>.<span class="ident">is_ok</span>());
-            <span class="kw">let</span> <span class="ident">updated_trace_state</span> <span class="op">=</span> <span class="ident">updated_trace_state</span>.<span class="ident">unwrap</span>();
+            <span class="kw">let </span>updated_trace_state = test_case.<span class="number">0</span>.insert(test_case.<span class="number">2</span>, new_key.clone());
+            <span class="macro">assert!</span>(updated_trace_state.is_ok());
+            <span class="kw">let </span>updated_trace_state = updated_trace_state.unwrap();
 
-            <span class="kw">let</span> <span class="ident">updated</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}={}&quot;</span>, <span class="ident">test_case</span>.<span class="number">2</span>, <span class="ident">new_key</span>);
+            <span class="kw">let </span>updated = <span class="macro">format!</span>(<span class="string">&quot;{}={}&quot;</span>, test_case.<span class="number">2</span>, new_key);
 
-            <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">updated_trace_state</span>.<span class="ident">clone</span>().<span class="ident">header</span>().<span class="ident">find</span>(<span class="kw-2">&amp;</span><span class="ident">updated</span>);
+            <span class="kw">let </span>index = updated_trace_state.clone().header().find(<span class="kw-2">&amp;</span>updated);
 
-            <span class="macro">assert!</span>(<span class="ident">index</span>.<span class="ident">is_some</span>());
-            <span class="macro">assert_eq!</span>(<span class="ident">index</span>.<span class="ident">unwrap</span>(), <span class="number">0</span>);
+            <span class="macro">assert!</span>(index.is_some());
+            <span class="macro">assert_eq!</span>(index.unwrap(), <span class="number">0</span>);
 
-            <span class="kw">let</span> <span class="ident">deleted_trace_state</span> <span class="op">=</span> <span class="ident">updated_trace_state</span>.<span class="ident">delete</span>(<span class="ident">test_case</span>.<span class="number">2</span>.<span class="ident">to_string</span>());
-            <span class="macro">assert!</span>(<span class="ident">deleted_trace_state</span>.<span class="ident">is_ok</span>());
+            <span class="kw">let </span>deleted_trace_state = updated_trace_state.delete(test_case.<span class="number">2</span>.to_string());
+            <span class="macro">assert!</span>(deleted_trace_state.is_ok());
 
-            <span class="kw">let</span> <span class="ident">deleted_trace_state</span> <span class="op">=</span> <span class="ident">deleted_trace_state</span>.<span class="ident">unwrap</span>();
+            <span class="kw">let </span>deleted_trace_state = deleted_trace_state.unwrap();
 
-            <span class="macro">assert!</span>(<span class="ident">deleted_trace_state</span>.<span class="ident">get</span>(<span class="ident">test_case</span>.<span class="number">2</span>).<span class="ident">is_none</span>());
+            <span class="macro">assert!</span>(deleted_trace_state.get(test_case.<span class="number">2</span>).is_none());
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_trace_state_key</span>() {
-        <span class="kw">let</span> <span class="ident">test_data</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">bool</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_trace_state_key() {
+        <span class="kw">let </span>test_data: Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, bool)&gt; = <span class="macro">vec!</span>[
             (<span class="string">&quot;123&quot;</span>, <span class="bool-val">true</span>),
             (<span class="string">&quot;bar&quot;</span>, <span class="bool-val">true</span>),
             (<span class="string">&quot;foo@bar&quot;</span>, <span class="bool-val">true</span>),
@@ -1253,18 +1253,18 @@
             (<span class="string">&quot;你好&quot;</span>, <span class="bool-val">false</span>),
         ];
 
-        <span class="kw">for</span> (<span class="ident">key</span>, <span class="ident">expected</span>) <span class="kw">in</span> <span class="ident">test_data</span> {
-            <span class="macro">assert_eq!</span>(<span class="ident">TraceState::valid_key</span>(<span class="ident">key</span>), <span class="ident">expected</span>, <span class="string">&quot;test key: {:?}&quot;</span>, <span class="ident">key</span>);
+        <span class="kw">for </span>(key, expected) <span class="kw">in </span>test_data {
+            <span class="macro">assert_eq!</span>(TraceState::valid_key(key), expected, <span class="string">&quot;test key: {:?}&quot;</span>, key);
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_trace_state_insert</span>() {
-        <span class="kw">let</span> <span class="ident">trace_state</span> <span class="op">=</span> <span class="ident">TraceState::from_key_value</span>(<span class="macro">vec!</span>[(<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>)]).<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">inserted_trace_state</span> <span class="op">=</span> <span class="ident">trace_state</span>.<span class="ident">insert</span>(<span class="string">&quot;testkey&quot;</span>, <span class="string">&quot;testvalue&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="macro">assert!</span>(<span class="ident">trace_state</span>.<span class="ident">get</span>(<span class="string">&quot;testkey&quot;</span>).<span class="ident">is_none</span>()); <span class="comment">// The original state doesn&#39;t change</span>
-        <span class="macro">assert_eq!</span>(<span class="ident">inserted_trace_state</span>.<span class="ident">get</span>(<span class="string">&quot;testkey&quot;</span>).<span class="ident">unwrap</span>(), <span class="string">&quot;testvalue&quot;</span>); <span class="comment">//</span>
-    }
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_trace_state_insert() {
+        <span class="kw">let </span>trace_state = TraceState::from_key_value(<span class="macro">vec!</span>[(<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>)]).unwrap();
+        <span class="kw">let </span>inserted_trace_state = trace_state.insert(<span class="string">&quot;testkey&quot;</span>, <span class="string">&quot;testvalue&quot;</span>).unwrap();
+        <span class="macro">assert!</span>(trace_state.get(<span class="string">&quot;testkey&quot;</span>).is_none()); <span class="comment">// The original state doesn&#39;t change
+        </span><span class="macro">assert_eq!</span>(inserted_trace_state.get(<span class="string">&quot;testkey&quot;</span>).unwrap(), <span class="string">&quot;testvalue&quot;</span>); <span class="comment">//
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

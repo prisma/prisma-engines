@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rusqlite-0.25.4/src/util/sqlite_string.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sqlite_string.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rusqlite/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rusqlite-0.25.4/src/util/sqlite_string.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sqlite_string.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rusqlite/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rusqlite/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -234,187 +234,187 @@
 <span id="234">234</span>
 <span id="235">235</span>
 <span id="236">236</span>
-</pre><pre class="rust"><code><span class="comment">// This is used when either vtab or modern-sqlite is on. Different methods are</span>
-<span class="comment">// used in each feature. Avoid having to track this for each function. We will</span>
-<span class="comment">// still warn for anything that&#39;s not used by either, though.</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(
-    <span class="ident">not</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;vtab&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;modern-sqlite&quot;</span>)),
-    <span class="ident">allow</span>(<span class="ident">dead_code</span>)
-)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::ffi</span>;
-<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
-<span class="kw">use</span> <span class="ident">std::os::raw</span>::{<span class="ident">c_char</span>, <span class="ident">c_int</span>};
-<span class="kw">use</span> <span class="ident">std::ptr::NonNull</span>;
+</pre><pre class="rust"><code><span class="comment">// This is used when either vtab or modern-sqlite is on. Different methods are
+// used in each feature. Avoid having to track this for each function. We will
+// still warn for anything that&#39;s not used by either, though.
+</span><span class="attribute">#![cfg_attr(
+    not(all(feature = <span class="string">&quot;vtab&quot;</span>, feature = <span class="string">&quot;modern-sqlite&quot;</span>)),
+    allow(dead_code)
+)]
+</span><span class="kw">use </span><span class="kw">crate</span>::ffi;
+<span class="kw">use </span>std::marker::PhantomData;
+<span class="kw">use </span>std::os::raw::{c_char, c_int};
+<span class="kw">use </span>std::ptr::NonNull;
 
-<span class="doccomment">/// A string we own that&#39;s allocated on the SQLite heap. Automatically calls</span>
-<span class="doccomment">/// `sqlite3_free` when dropped, unless `into_raw` (or `into_inner`) is called</span>
-<span class="doccomment">/// on it. If constructed from a rust string, `sqlite3_malloc` is used.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// It has identical representation to a nonnull `*mut c_char`, so you can use</span>
-<span class="doccomment">/// it transparently as one. It&#39;s nonnull, so Option&lt;SqliteMallocString&gt; can be</span>
-<span class="doccomment">/// used for nullable ones (it&#39;s still just one pointer).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Most strings shouldn&#39;t use this! Only places where the string needs to be</span>
-<span class="doccomment">/// freed with `sqlite3_free`. This includes `sqlite3_extended_sql` results,</span>
-<span class="doccomment">/// some error message pointers... Note that misuse is extremely dangerous!</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note that this is *not* a lossless interface. Incoming strings with internal</span>
-<span class="doccomment">/// NULs are modified, and outgoing strings which are non-UTF8 are modified.</span>
-<span class="doccomment">/// This seems unavoidable -- it tries very hard to not panic.</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">SqliteMallocString</span> {
-    <span class="ident">ptr</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">c_char</span><span class="op">&gt;</span>,
-    <span class="ident">_boo</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">c_char</span>]<span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A string we own that&#39;s allocated on the SQLite heap. Automatically calls
+/// `sqlite3_free` when dropped, unless `into_raw` (or `into_inner`) is called
+/// on it. If constructed from a rust string, `sqlite3_malloc` is used.
+///
+/// It has identical representation to a nonnull `*mut c_char`, so you can use
+/// it transparently as one. It&#39;s nonnull, so Option&lt;SqliteMallocString&gt; can be
+/// used for nullable ones (it&#39;s still just one pointer).
+///
+/// Most strings shouldn&#39;t use this! Only places where the string needs to be
+/// freed with `sqlite3_free`. This includes `sqlite3_extended_sql` results,
+/// some error message pointers... Note that misuse is extremely dangerous!
+///
+/// Note that this is *not* a lossless interface. Incoming strings with internal
+/// NULs are modified, and outgoing strings which are non-UTF8 are modified.
+/// This seems unavoidable -- it tries very hard to not panic.
+</span><span class="attribute">#[repr(transparent)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>SqliteMallocString {
+    ptr: NonNull&lt;c_char&gt;,
+    _boo: PhantomData&lt;Box&lt;[c_char]&gt;&gt;,
 }
-<span class="comment">// This is owned data for a primitive type, and thus it&#39;s safe to implement</span>
-<span class="comment">// these. That said, nothing needs them, and they make things easier to misuse.</span>
+<span class="comment">// This is owned data for a primitive type, and thus it&#39;s safe to implement
+// these. That said, nothing needs them, and they make things easier to misuse.
 
-<span class="comment">// unsafe impl Send for SqliteMallocString {}</span>
-<span class="comment">// unsafe impl Sync for SqliteMallocString {}</span>
+// unsafe impl Send for SqliteMallocString {}
+// unsafe impl Sync for SqliteMallocString {}
 
-<span class="kw">impl</span> <span class="ident">SqliteMallocString</span> {
-    <span class="doccomment">/// SAFETY: Caller must be certain that `m` a nul-terminated c string</span>
-    <span class="doccomment">/// allocated by sqlite3_malloc, and that SQLite expects us to free it!</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw_nonnull</span>(<span class="ident">ptr</span>: <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">c_char</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">ptr</span>,
-            <span class="ident">_boo</span>: <span class="ident">PhantomData</span>,
+</span><span class="kw">impl </span>SqliteMallocString {
+    <span class="doccomment">/// SAFETY: Caller must be certain that `m` a nul-terminated c string
+    /// allocated by sqlite3_malloc, and that SQLite expects us to free it!
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe fn </span>from_raw_nonnull(ptr: NonNull&lt;c_char&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            ptr,
+            _boo: PhantomData,
         }
     }
 
-    <span class="doccomment">/// SAFETY: Caller must be certain that `m` a nul-terminated c string</span>
-    <span class="doccomment">/// allocated by sqlite3_malloc, and that SQLite expects us to free it!</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw</span>(<span class="ident">ptr</span>: <span class="kw-2">*mut</span> <span class="ident">c_char</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">NonNull::new</span>(<span class="ident">ptr</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident"><span class="self">Self</span>::from_raw_nonnull</span>(<span class="ident">p</span>))
+    <span class="doccomment">/// SAFETY: Caller must be certain that `m` a nul-terminated c string
+    /// allocated by sqlite3_malloc, and that SQLite expects us to free it!
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">unsafe fn </span>from_raw(ptr: <span class="kw-2">*mut </span>c_char) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        NonNull::new(ptr).map(|p| <span class="self">Self</span>::from_raw_nonnull(p))
     }
 
-    <span class="doccomment">/// Get the pointer behind `self`. After this is called, we no longer manage</span>
-    <span class="doccomment">/// it.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="ident">NonNull</span><span class="op">&lt;</span><span class="ident">c_char</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">ptr</span>;
-        <span class="ident">std::mem::forget</span>(<span class="self">self</span>);
-        <span class="ident">p</span>
+    <span class="doccomment">/// Get the pointer behind `self`. After this is called, we no longer manage
+    /// it.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>into_inner(<span class="self">self</span>) -&gt; NonNull&lt;c_char&gt; {
+        <span class="kw">let </span>p = <span class="self">self</span>.ptr;
+        std::mem::forget(<span class="self">self</span>);
+        p
     }
 
-    <span class="doccomment">/// Get the pointer behind `self`. After this is called, we no longer manage</span>
-    <span class="doccomment">/// it.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">into_raw</span>(<span class="self">self</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">c_char</span> {
-        <span class="self">self</span>.<span class="ident">into_inner</span>().<span class="ident">as_ptr</span>()
+    <span class="doccomment">/// Get the pointer behind `self`. After this is called, we no longer manage
+    /// it.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>into_raw(<span class="self">self</span>) -&gt; <span class="kw-2">*mut </span>c_char {
+        <span class="self">self</span>.into_inner().as_ptr()
     }
 
-    <span class="doccomment">/// Borrow the pointer behind `self`. We still manage it when this function</span>
-    <span class="doccomment">/// returns. If you want to relinquish ownership, use `into_raw`.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const</span> <span class="ident">c_char</span> {
-        <span class="self">self</span>.<span class="ident">ptr</span>.<span class="ident">as_ptr</span>()
+    <span class="doccomment">/// Borrow the pointer behind `self`. We still manage it when this function
+    /// returns. If you want to relinquish ownership, use `into_raw`.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>as_ptr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const </span>c_char {
+        <span class="self">self</span>.ptr.as_ptr()
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">as_cstr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">std::ffi::CStr</span> {
-        <span class="kw">unsafe</span> { <span class="ident">std::ffi::CStr::from_ptr</span>(<span class="self">self</span>.<span class="ident">as_ptr</span>()) }
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>as_cstr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>std::ffi::CStr {
+        <span class="kw">unsafe </span>{ std::ffi::CStr::from_ptr(<span class="self">self</span>.as_ptr()) }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_string_lossy</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">std::borrow::Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">as_cstr</span>().<span class="ident">to_string_lossy</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>to_string_lossy(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; std::borrow::Cow&lt;<span class="lifetime">&#39;_</span>, str&gt; {
+        <span class="self">self</span>.as_cstr().to_string_lossy()
     }
 
-    <span class="doccomment">/// Convert `s` into a SQLite string.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This should almost never be done except for cases like error messages or</span>
-    <span class="doccomment">/// other strings that SQLite frees.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If `s` contains internal NULs, we&#39;ll replace them with</span>
-    <span class="doccomment">/// `NUL_REPLACE_CHAR`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Except for debug_asserts which may trigger during testing, this function</span>
-    <span class="doccomment">/// never panics. If we hit integer overflow or the allocation fails, we</span>
-    <span class="doccomment">/// call `handle_alloc_error` which aborts the program after calling a</span>
-    <span class="doccomment">/// global hook.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This means it&#39;s safe to use in extern &quot;C&quot; functions even outside of</span>
-    <span class="doccomment">/// catch_unwind.</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">as_bytes</span>().<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="number">0</span>) {
-            <span class="ident">std::borrow::Cow::Owned</span>(<span class="ident">make_nonnull</span>(<span class="ident">s</span>))
-        } <span class="kw">else</span> {
-            <span class="ident">std::borrow::Cow::Borrowed</span>(<span class="ident">s</span>)
+    <span class="doccomment">/// Convert `s` into a SQLite string.
+    ///
+    /// This should almost never be done except for cases like error messages or
+    /// other strings that SQLite frees.
+    ///
+    /// If `s` contains internal NULs, we&#39;ll replace them with
+    /// `NUL_REPLACE_CHAR`.
+    ///
+    /// Except for debug_asserts which may trigger during testing, this function
+    /// never panics. If we hit integer overflow or the allocation fails, we
+    /// call `handle_alloc_error` which aborts the program after calling a
+    /// global hook.
+    ///
+    /// This means it&#39;s safe to use in extern &quot;C&quot; functions even outside of
+    /// catch_unwind.
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+        <span class="kw">use </span>std::convert::TryFrom;
+        <span class="kw">let </span>s = <span class="kw">if </span>s.as_bytes().contains(<span class="kw-2">&amp;</span><span class="number">0</span>) {
+            std::borrow::Cow::Owned(make_nonnull(s))
+        } <span class="kw">else </span>{
+            std::borrow::Cow::Borrowed(s)
         };
-        <span class="macro">debug_assert!</span>(<span class="op">!</span><span class="ident">s</span>.<span class="ident">as_bytes</span>().<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="number">0</span>));
-        <span class="kw">let</span> <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="ident">s</span>.<span class="ident">as_ref</span>().<span class="ident">as_bytes</span>();
-        <span class="kw">let</span> <span class="ident">src_ptr</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span> <span class="op">=</span> <span class="ident">bytes</span>.<span class="ident">as_ptr</span>().<span class="ident">cast</span>();
-        <span class="kw">let</span> <span class="ident">src_len</span> <span class="op">=</span> <span class="ident">bytes</span>.<span class="ident">len</span>();
-        <span class="kw">let</span> <span class="ident">maybe_len_plus_1</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">len</span>().<span class="ident">checked_add</span>(<span class="number">1</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">c_int::try_from</span>(<span class="ident">v</span>).<span class="ident">ok</span>());
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">res_ptr</span> <span class="op">=</span> <span class="ident">maybe_len_plus_1</span>
-                .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">len_to_alloc</span><span class="op">|</span> {
-                    <span class="comment">// `&gt;` because we added 1.</span>
-                    <span class="macro">debug_assert!</span>(<span class="ident">len_to_alloc</span> <span class="op">&gt;</span> <span class="number">0</span>);
-                    <span class="macro">debug_assert_eq!</span>((<span class="ident">len_to_alloc</span> <span class="op">-</span> <span class="number">1</span>) <span class="kw">as</span> <span class="ident">usize</span>, <span class="ident">src_len</span>);
-                    <span class="ident">NonNull::new</span>(<span class="ident">ffi::sqlite3_malloc</span>(<span class="ident">len_to_alloc</span>) <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">c_char</span>)
+        <span class="macro">debug_assert!</span>(!s.as_bytes().contains(<span class="kw-2">&amp;</span><span class="number">0</span>));
+        <span class="kw">let </span>bytes: <span class="kw-2">&amp;</span>[u8] = s.as_ref().as_bytes();
+        <span class="kw">let </span>src_ptr: <span class="kw-2">*const </span>c_char = bytes.as_ptr().cast();
+        <span class="kw">let </span>src_len = bytes.len();
+        <span class="kw">let </span>maybe_len_plus_1 = s.len().checked_add(<span class="number">1</span>).and_then(|v| c_int::try_from(v).ok());
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span>res_ptr = maybe_len_plus_1
+                .and_then(|len_to_alloc| {
+                    <span class="comment">// `&gt;` because we added 1.
+                    </span><span class="macro">debug_assert!</span>(len_to_alloc &gt; <span class="number">0</span>);
+                    <span class="macro">debug_assert_eq!</span>((len_to_alloc - <span class="number">1</span>) <span class="kw">as </span>usize, src_len);
+                    NonNull::new(ffi::sqlite3_malloc(len_to_alloc) <span class="kw">as </span><span class="kw-2">*mut </span>c_char)
                 })
-                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                    <span class="kw">use</span> <span class="ident">std::alloc</span>::{<span class="ident">handle_alloc_error</span>, <span class="ident">Layout</span>};
-                    <span class="comment">// Report via handle_alloc_error so that it can be handled with any</span>
-                    <span class="comment">// other allocation errors and properly diagnosed.</span>
-                    <span class="comment">//</span>
-                    <span class="comment">// This is safe:</span>
-                    <span class="comment">// - `align` is never 0</span>
-                    <span class="comment">// - `align` is always a power of 2.</span>
-                    <span class="comment">// - `size` needs no realignment because it&#39;s guaranteed to be aligned</span>
-                    <span class="comment">//   (everything is aligned to 1)</span>
-                    <span class="comment">// - `size` is also never zero, although this function doesn&#39;t actually require</span>
-                    <span class="comment">//   it now.</span>
-                    <span class="kw">let</span> <span class="ident">layout</span> <span class="op">=</span> <span class="ident">Layout::from_size_align_unchecked</span>(<span class="ident">s</span>.<span class="ident">len</span>().<span class="ident">saturating_add</span>(<span class="number">1</span>), <span class="number">1</span>);
-                    <span class="comment">// Note: This call does not return.</span>
-                    <span class="ident">handle_alloc_error</span>(<span class="ident">layout</span>);
+                .unwrap_or_else(|| {
+                    <span class="kw">use </span>std::alloc::{handle_alloc_error, Layout};
+                    <span class="comment">// Report via handle_alloc_error so that it can be handled with any
+                    // other allocation errors and properly diagnosed.
+                    //
+                    // This is safe:
+                    // - `align` is never 0
+                    // - `align` is always a power of 2.
+                    // - `size` needs no realignment because it&#39;s guaranteed to be aligned
+                    //   (everything is aligned to 1)
+                    // - `size` is also never zero, although this function doesn&#39;t actually require
+                    //   it now.
+                    </span><span class="kw">let </span>layout = Layout::from_size_align_unchecked(s.len().saturating_add(<span class="number">1</span>), <span class="number">1</span>);
+                    <span class="comment">// Note: This call does not return.
+                    </span>handle_alloc_error(layout);
                 });
-            <span class="kw">let</span> <span class="ident">buf</span>: <span class="kw-2">*mut</span> <span class="ident">c_char</span> <span class="op">=</span> <span class="ident">res_ptr</span>.<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">c_char</span>;
-            <span class="ident">src_ptr</span>.<span class="ident">copy_to_nonoverlapping</span>(<span class="ident">buf</span>, <span class="ident">src_len</span>);
-            <span class="ident">buf</span>.<span class="ident">add</span>(<span class="ident">src_len</span>).<span class="ident">write</span>(<span class="number">0</span>);
-            <span class="macro">debug_assert_eq!</span>(<span class="ident">std::ffi::CStr::from_ptr</span>(<span class="ident">res_ptr</span>.<span class="ident">as_ptr</span>()).<span class="ident">to_bytes</span>(), <span class="ident">bytes</span>);
-            <span class="ident"><span class="self">Self</span>::from_raw_nonnull</span>(<span class="ident">res_ptr</span>)
+            <span class="kw">let </span>buf: <span class="kw-2">*mut </span>c_char = res_ptr.as_ptr() <span class="kw">as </span><span class="kw-2">*mut </span>c_char;
+            src_ptr.copy_to_nonoverlapping(buf, src_len);
+            buf.add(src_len).write(<span class="number">0</span>);
+            <span class="macro">debug_assert_eq!</span>(std::ffi::CStr::from_ptr(res_ptr.as_ptr()).to_bytes(), bytes);
+            <span class="self">Self</span>::from_raw_nonnull(res_ptr)
         }
     }
 }
 
-<span class="kw">const</span> <span class="ident">NUL_REPLACE</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;␀&quot;</span>;
+<span class="kw">const </span>NUL_REPLACE: <span class="kw-2">&amp;</span>str = <span class="string">&quot;␀&quot;</span>;
 
-<span class="attribute">#[<span class="ident">cold</span>]</span>
-<span class="kw">fn</span> <span class="ident">make_nonnull</span>(<span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-    <span class="ident">v</span>.<span class="ident">replace</span>(<span class="string">&#39;\0&#39;</span>, <span class="ident">NUL_REPLACE</span>)
+<span class="attribute">#[cold]
+</span><span class="kw">fn </span>make_nonnull(v: <span class="kw-2">&amp;</span>str) -&gt; String {
+    v.replace(<span class="string">&#39;\0&#39;</span>, NUL_REPLACE)
 }
 
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">SqliteMallocString</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">ffi::sqlite3_free</span>(<span class="self">self</span>.<span class="ident">ptr</span>.<span class="ident">as_ptr</span>().<span class="ident">cast</span>()) };
+<span class="kw">impl </span>Drop <span class="kw">for </span>SqliteMallocString {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{ ffi::sqlite3_free(<span class="self">self</span>.ptr.as_ptr().cast()) };
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::fmt::Debug</span> <span class="kw">for</span> <span class="ident">SqliteMallocString</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="self">self</span>.<span class="ident">to_string_lossy</span>().<span class="ident">fmt</span>(<span class="ident">f</span>)
+<span class="kw">impl </span>std::fmt::Debug <span class="kw">for </span>SqliteMallocString {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="self">self</span>.to_string_lossy().fmt(f)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::fmt::Display</span> <span class="kw">for</span> <span class="ident">SqliteMallocString</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">std::fmt::Result</span> {
-        <span class="self">self</span>.<span class="ident">to_string_lossy</span>().<span class="ident">fmt</span>(<span class="ident">f</span>)
+<span class="kw">impl </span>std::fmt::Display <span class="kw">for </span>SqliteMallocString {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>std::fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; std::fmt::Result {
+        <span class="self">self</span>.to_string_lossy().fmt(f)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_from_str</span>() {
-        <span class="kw">let</span> <span class="ident">to_check</span> <span class="op">=</span> [
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_from_str() {
+        <span class="kw">let </span>to_check = [
             (<span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>),
             (<span class="string">&quot;\0&quot;</span>, <span class="string">&quot;␀&quot;</span>),
             (<span class="string">&quot;␀&quot;</span>, <span class="string">&quot;␀&quot;</span>),
@@ -425,50 +425,50 @@
             (<span class="string">&quot;foobar0123&quot;</span>, <span class="string">&quot;foobar0123&quot;</span>),
         ];
 
-        <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="ident">input</span>, <span class="ident">output</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">to_check</span> {
-            <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">SqliteMallocString::from_str</span>(<span class="ident">input</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">s</span>.<span class="ident">to_string_lossy</span>(), <span class="ident">output</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">s</span>.<span class="ident">as_cstr</span>().<span class="ident">to_str</span>().<span class="ident">unwrap</span>(), <span class="ident">output</span>);
+        <span class="kw">for </span><span class="kw-2">&amp;</span>(input, output) <span class="kw">in </span><span class="kw-2">&amp;</span>to_check {
+            <span class="kw">let </span>s = SqliteMallocString::from_str(input);
+            <span class="macro">assert_eq!</span>(s.to_string_lossy(), output);
+            <span class="macro">assert_eq!</span>(s.as_cstr().to_str().unwrap(), output);
         }
     }
 
-    <span class="comment">// This will trigger an asan error if into_raw still freed the ptr.</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_lossy</span>() {
-        <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">SqliteMallocString::from_str</span>(<span class="string">&quot;abcd&quot;</span>).<span class="ident">into_raw</span>();
-        <span class="comment">// Make invalid</span>
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="ident">p</span>.<span class="ident">cast</span>::<span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>().<span class="ident">write</span>(<span class="string">b&#39;\xff&#39;</span>);
-            <span class="ident">SqliteMallocString::from_raw</span>(<span class="ident">p</span>).<span class="ident">unwrap</span>()
+    <span class="comment">// This will trigger an asan error if into_raw still freed the ptr.
+    </span><span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_lossy() {
+        <span class="kw">let </span>p = SqliteMallocString::from_str(<span class="string">&quot;abcd&quot;</span>).into_raw();
+        <span class="comment">// Make invalid
+        </span><span class="kw">let </span>s = <span class="kw">unsafe </span>{
+            p.cast::&lt;u8&gt;().write(<span class="string">b&#39;\xff&#39;</span>);
+            SqliteMallocString::from_raw(p).unwrap()
         };
-        <span class="macro">assert_eq!</span>(<span class="ident">s</span>.<span class="ident">to_string_lossy</span>().<span class="ident">as_ref</span>(), <span class="string">&quot;\u{FFFD}bcd&quot;</span>);
+        <span class="macro">assert_eq!</span>(s.to_string_lossy().as_ref(), <span class="string">&quot;\u{FFFD}bcd&quot;</span>);
     }
 
-    <span class="comment">// This will trigger an asan error if into_raw still freed the ptr.</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_into_raw</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="macro">vec!</span>[];
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">1000</span> {
-            <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">SqliteMallocString::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>.<span class="ident">to_string</span>()).<span class="ident">into_raw</span>());
-            <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">SqliteMallocString::from_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;abc {} 😀&quot;</span>, <span class="ident">i</span>)).<span class="ident">into_raw</span>());
+    <span class="comment">// This will trigger an asan error if into_raw still freed the ptr.
+    </span><span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_into_raw() {
+        <span class="kw">let </span><span class="kw-2">mut </span>v = <span class="macro">vec!</span>[];
+        <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..<span class="number">1000 </span>{
+            v.push(SqliteMallocString::from_str(<span class="kw-2">&amp;</span>i.to_string()).into_raw());
+            v.push(SqliteMallocString::from_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;abc {} 😀&quot;</span>, i)).into_raw());
         }
-        <span class="kw">unsafe</span> {
-            <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">s</span>) <span class="kw">in</span> <span class="ident">v</span>.<span class="ident">chunks_mut</span>(<span class="number">2</span>).<span class="ident">enumerate</span>() {
-                <span class="kw">let</span> <span class="ident">s0</span> <span class="op">=</span> <span class="ident">std::mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="ident">s</span>[<span class="number">0</span>], <span class="ident">std::ptr::null_mut</span>());
-                <span class="kw">let</span> <span class="ident">s1</span> <span class="op">=</span> <span class="ident">std::mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="ident">s</span>[<span class="number">1</span>], <span class="ident">std::ptr::null_mut</span>());
+        <span class="kw">unsafe </span>{
+            <span class="kw">for </span>(i, s) <span class="kw">in </span>v.chunks_mut(<span class="number">2</span>).enumerate() {
+                <span class="kw">let </span>s0 = std::mem::replace(<span class="kw-2">&amp;mut </span>s[<span class="number">0</span>], std::ptr::null_mut());
+                <span class="kw">let </span>s1 = std::mem::replace(<span class="kw-2">&amp;mut </span>s[<span class="number">1</span>], std::ptr::null_mut());
                 <span class="macro">assert_eq!</span>(
-                    <span class="ident">std::ffi::CStr::from_ptr</span>(<span class="ident">s0</span>).<span class="ident">to_str</span>().<span class="ident">unwrap</span>(),
-                    <span class="kw-2">&amp;</span><span class="ident">i</span>.<span class="ident">to_string</span>()
+                    std::ffi::CStr::from_ptr(s0).to_str().unwrap(),
+                    <span class="kw-2">&amp;</span>i.to_string()
                 );
                 <span class="macro">assert_eq!</span>(
-                    <span class="ident">std::ffi::CStr::from_ptr</span>(<span class="ident">s1</span>).<span class="ident">to_str</span>().<span class="ident">unwrap</span>(),
-                    <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;abc {} 😀&quot;</span>, <span class="ident">i</span>)
+                    std::ffi::CStr::from_ptr(s1).to_str().unwrap(),
+                    <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;abc {} 😀&quot;</span>, i)
                 );
-                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">SqliteMallocString::from_raw</span>(<span class="ident">s0</span>).<span class="ident">unwrap</span>();
-                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">SqliteMallocString::from_raw</span>(<span class="ident">s1</span>).<span class="ident">unwrap</span>();
+                <span class="kw">let _ </span>= SqliteMallocString::from_raw(s0).unwrap();
+                <span class="kw">let _ </span>= SqliteMallocString::from_raw(s1).unwrap();
             }
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rusqlite" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rusqlite" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

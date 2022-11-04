@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/frunk_core-0.4.0/src/tuples.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tuples.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../frunk_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../frunk_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../frunk_core/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/frunk_core-0.4.0/src/tuples.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tuples.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../frunk_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../frunk_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../frunk_core/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -156,163 +156,163 @@
 <span id="156">156</span>
 <span id="157">157</span>
 <span id="158">158</span>
-</pre><pre class="rust"><code><span class="doccomment">//! This module is held separate to put generated variadic generics for tuples</span>
-<span class="doccomment">//! at the end of the documentation so as to not disturb the reader when reading</span>
-<span class="doccomment">//! documentation.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # #[macro_use] extern crate frunk_core; use frunk_core::hlist::*; fn main() {</span>
-<span class="doccomment">//! let h = hlist![ 42f32, true, &quot;hello&quot; ];</span>
-<span class="doccomment">//! let t: (f32, bool, &amp;str) = h.into();</span>
-<span class="doccomment">//! assert_eq!(t, (42f32, true, &quot;hello&quot;));</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let t2 = (999, false, &quot;world&quot;);</span>
-<span class="doccomment">//! let h2: HList![ isize, bool, &amp;str ] = t2.into();</span>
-<span class="doccomment">//! assert_eq!(h2, hlist![ 999, false, &quot;world&quot; ]);</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! ```</span>
+</pre><pre class="rust"><code><span class="doccomment">//! This module is held separate to put generated variadic generics for tuples
+//! at the end of the documentation so as to not disturb the reader when reading
+//! documentation.
+//!
+//! ```
+//! # #[macro_use] extern crate frunk_core; use frunk_core::hlist::*; fn main() {
+//! let h = hlist![ 42f32, true, &quot;hello&quot; ];
+//! let t: (f32, bool, &amp;str) = h.into();
+//! assert_eq!(t, (42f32, true, &quot;hello&quot;));
+//!
+//! let t2 = (999, false, &quot;world&quot;);
+//! let h2: HList![ isize, bool, &amp;str ] = t2.into();
+//! assert_eq!(h2, hlist![ 999, false, &quot;world&quot; ]);
+//! # }
+//! ```
 
-<span class="kw">use</span> <span class="ident">generic::Generic</span>;
+</span><span class="kw">use </span>generic::Generic;
 
-<span class="macro">macro_rules!</span> <span class="ident">tup_def</span> {
-    ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">dtype</span>: <span class="ident">ident</span>),<span class="op">*</span> ; ; ) =&gt; {};
-    ( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">dtype</span>: <span class="ident">ident</span>),<span class="op">*</span> ;
-      <span class="macro-nonterminal">$</span><span class="macro-nonterminal">fone</span>: <span class="ident">ident</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ftype</span>: <span class="ident">ident</span>)<span class="kw-2">*</span>, ;
-      <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sone</span>: <span class="ident">ident</span> $(, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">stype</span>: <span class="ident">ident</span>)<span class="kw-2">*</span>,
+<span class="macro">macro_rules! </span>tup_def {
+    ( $(<span class="macro-nonterminal">$dtype</span>: ident),* ; ; ) =&gt; {};
+    ( $(<span class="macro-nonterminal">$dtype</span>: ident),* ;
+      <span class="macro-nonterminal">$fone</span>: ident $(, <span class="macro-nonterminal">$ftype</span>: ident)<span class="kw-2">*</span>, ;
+      <span class="macro-nonterminal">$sone</span>: ident $(, <span class="macro-nonterminal">$stype</span>: ident)<span class="kw-2">*</span>,
     ) =&gt; {
-        <span class="macro">tup_def!</span>( $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">dtype</span>,)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sone</span> ; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ftype</span>,)<span class="op">*</span> ; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">stype</span>,)<span class="op">*</span> );
+        <span class="macro">tup_def!</span>( $(<span class="macro-nonterminal">$dtype</span>,)* <span class="macro-nonterminal">$sone </span>; $(<span class="macro-nonterminal">$ftype</span>,)* ; $(<span class="macro-nonterminal">$stype</span>,)* );
 
-        <span class="kw">impl</span><span class="op">&lt;</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">dtype</span>: <span class="ident">Default</span>,)<span class="op">*</span>
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">fone</span> , <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sone</span>:  <span class="ident">From</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">fone</span><span class="op">&gt;</span> ,
-              $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ftype</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">stype</span>: <span class="ident">From</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ftype</span><span class="op">&gt;</span>,)<span class="op">*</span>
-        <span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span> ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">fone</span>, $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ftype</span>, )<span class="op">*</span> ) <span class="op">&gt;</span>
-        <span class="kw">for</span> <span class="macro">HList!</span>[$( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">dtype</span>, )<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sone</span>, $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">stype</span>, )<span class="op">*</span> ] {
-            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">fone</span>, $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ftype</span>, )<span class="op">*</span> )) -&gt; <span class="self">Self</span> {
-                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
-                <span class="kw">let</span> ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">fone</span>, $( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">ftype</span>, )<span class="op">*</span> ) <span class="op">=</span> <span class="ident">f</span>;
-                <span class="macro">hlist!</span>[$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">dtype::default</span>(),)<span class="op">*</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">fone</span>.<span class="ident">into</span>(), $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">ftype</span>.<span class="ident">into</span>(),)<span class="kw-2">*</span>]
+        <span class="kw">impl</span>&lt; $(<span class="macro-nonterminal">$dtype</span>: Default,)*
+                <span class="macro-nonterminal">$fone </span>, <span class="macro-nonterminal">$sone</span>:  From&lt;<span class="macro-nonterminal">$fone</span>&gt; ,
+              $(<span class="macro-nonterminal">$ftype</span>, <span class="macro-nonterminal">$stype</span>: From&lt;<span class="macro-nonterminal">$ftype</span>&gt;,)*
+        &gt; From&lt; ( <span class="macro-nonterminal">$fone</span>, $( <span class="macro-nonterminal">$ftype</span>, )* ) &gt;
+        <span class="kw">for </span><span class="macro">HList!</span>[$( <span class="macro-nonterminal">$dtype</span>, )* <span class="macro-nonterminal">$sone</span>, $( <span class="macro-nonterminal">$stype</span>, )* ] {
+            <span class="kw">fn </span>from(f: ( <span class="macro-nonterminal">$fone</span>, $( <span class="macro-nonterminal">$ftype</span>, )* )) -&gt; <span class="self">Self </span>{
+                <span class="attribute">#[allow(non_snake_case)]
+                </span><span class="kw">let </span>( <span class="macro-nonterminal">$fone</span>, $( <span class="macro-nonterminal">$ftype</span>, )* ) = f;
+                <span class="macro">hlist!</span>[$(<span class="macro-nonterminal">$dtype::default</span>(),)* <span class="macro-nonterminal">$fone</span>.into(), $(<span class="macro-nonterminal">$ftype</span>.into(),)<span class="kw-2">*</span>]
             }
         }
     };
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">tup_iso</span> {
-    ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>: <span class="ident">ident</span> ) =&gt; {
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> <span class="ident">Generic</span> <span class="kw">for</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>,) {
-            <span class="kw">type</span> <span class="ident">Repr</span> <span class="op">=</span> <span class="macro">HList!</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>];
-            <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Repr</span> { <span class="macro">hlist!</span>[<span class="self">self</span>.<span class="number">0</span>] }
-            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">r</span>: <span class="ident"><span class="self">Self</span>::Repr</span>) -&gt; <span class="self">Self</span> { (<span class="ident">r</span>.<span class="ident">head</span>,) }
+<span class="macro">macro_rules! </span>tup_iso {
+    ( <span class="macro-nonterminal">$t</span>: ident ) =&gt; {
+        <span class="kw">impl</span>&lt;<span class="macro-nonterminal">$t</span>&gt; Generic <span class="kw">for </span>(<span class="macro-nonterminal">$t</span>,) {
+            <span class="kw">type </span>Repr = <span class="macro">HList!</span>[<span class="macro-nonterminal">$t</span>];
+            <span class="kw">fn </span>into(<span class="self">self</span>) -&gt; <span class="self">Self</span>::Repr { <span class="macro">hlist!</span>[<span class="self">self</span>.<span class="number">0</span>] }
+            <span class="kw">fn </span>from(r: <span class="self">Self</span>::Repr) -&gt; <span class="self">Self </span>{ (r.head,) }
         }
 
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>,)<span class="op">&gt;</span> <span class="kw">for</span> <span class="macro">HList!</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>] {
-            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">tup</span>: (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>,)) -&gt; <span class="self">Self</span> { <span class="ident">Generic::into</span>(<span class="ident">tup</span>) }
+        <span class="kw">impl</span>&lt;<span class="macro-nonterminal">$t</span>&gt; From&lt;(<span class="macro-nonterminal">$t</span>,)&gt; <span class="kw">for </span><span class="macro">HList!</span>[<span class="macro-nonterminal">$t</span>] {
+            <span class="kw">fn </span>from(tup: (<span class="macro-nonterminal">$t</span>,)) -&gt; <span class="self">Self </span>{ Generic::into(tup) }
         }
 
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::from_over_into</span>)]</span>
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span><span class="op">&gt;</span> <span class="ident">Into</span><span class="op">&lt;</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>,)<span class="op">&gt;</span> <span class="kw">for</span> <span class="macro">HList!</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>] {
-            <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>,) { <span class="ident">Generic::from</span>(<span class="self">self</span>) }
+        <span class="attribute">#[allow(clippy::from_over_into)]
+        </span><span class="kw">impl</span>&lt;<span class="macro-nonterminal">$t</span>&gt; Into&lt;(<span class="macro-nonterminal">$t</span>,)&gt; <span class="kw">for </span><span class="macro">HList!</span>[<span class="macro-nonterminal">$t</span>] {
+            <span class="kw">fn </span>into(<span class="self">self</span>) -&gt; (<span class="macro-nonterminal">$t</span>,) { Generic::from(<span class="self">self</span>) }
         }
     };
 
-    ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">type1</span>: <span class="ident">ident</span>, $( <span class="macro-nonterminal">$</span><span class="kw">type</span>: <span class="macro-nonterminal">ident</span> ),<span class="op">*</span> ) =&gt; {
-        <span class="macro">tup_iso!</span>($( <span class="macro-nonterminal">$</span><span class="kw">type</span> ),<span class="kw-2">*</span>);
+    ( <span class="macro-nonterminal">$type1</span>: ident, $( <span class="macro-nonterminal">$</span><span class="kw">type</span>: <span class="macro-nonterminal">ident </span>),* ) =&gt; {
+        <span class="macro">tup_iso!</span>($( <span class="macro-nonterminal">$</span><span class="kw">type </span>),<span class="kw-2">*</span>);
 
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">type1</span>, $(<span class="macro-nonterminal">$</span><span class="kw">type</span>),<span class="kw-2">*</span><span class="op">&gt;</span> <span class="macro-nonterminal">Generic</span> <span class="kw">for</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type1</span>, $(<span class="macro-nonterminal">$</span><span class="kw">type</span>),<span class="kw-2">*</span>,) {
-            <span class="kw">type</span> <span class="macro-nonterminal">Repr</span> <span class="op">=</span> <span class="macro">HList!</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type1</span>, $(<span class="macro-nonterminal">$</span><span class="kw">type</span>),<span class="kw-2">*</span>,];
+        <span class="kw">impl</span>&lt;<span class="macro-nonterminal">$type1</span>, $(<span class="macro-nonterminal">$</span><span class="kw">type</span>),<span class="kw-2">*</span>&gt; <span class="macro-nonterminal">Generic </span><span class="kw">for </span>(<span class="macro-nonterminal">$type1</span>, $(<span class="macro-nonterminal">$</span><span class="kw">type</span>),<span class="kw-2">*</span>,) {
+            <span class="kw">type </span><span class="macro-nonterminal">Repr </span>= <span class="macro">HList!</span>[<span class="macro-nonterminal">$type1</span>, $(<span class="macro-nonterminal">$</span><span class="kw">type</span>),<span class="kw-2">*</span>,];
 
-            <span class="kw">fn</span> <span class="macro-nonterminal">into</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Repr</span> {
-                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
-                <span class="kw">let</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type1</span>, $(<span class="macro-nonterminal">$</span><span class="kw">type</span>),<span class="kw-2">*</span>,) <span class="op">=</span> <span class="macro-nonterminal">self</span>;
-                <span class="macro">hlist!</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type1</span>, $(<span class="macro-nonterminal">$</span><span class="kw">type</span>),<span class="kw-2">*</span>,]
+            <span class="kw">fn </span><span class="macro-nonterminal">into</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span>::Repr {
+                <span class="attribute">#[allow(non_snake_case)]
+                </span><span class="kw">let </span>(<span class="macro-nonterminal">$type1</span>, $(<span class="macro-nonterminal">$</span><span class="kw">type</span>),<span class="kw-2">*</span>,) = <span class="macro-nonterminal">self</span>;
+                <span class="macro">hlist!</span>[<span class="macro-nonterminal">$type1</span>, $(<span class="macro-nonterminal">$</span><span class="kw">type</span>),<span class="kw-2">*</span>,]
             }
 
-            <span class="kw">fn</span> <span class="macro-nonterminal">from</span>(<span class="ident">r</span>: <span class="ident"><span class="self">Self</span>::Repr</span>) -&gt; <span class="self">Self</span> {
-                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
-                <span class="kw">let</span> <span class="macro">hlist_pat!</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type1</span>, $(<span class="macro-nonterminal">$</span><span class="kw">type</span>),<span class="kw-2">*</span>,] <span class="op">=</span> <span class="macro-nonterminal">r</span>;
-                (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">type1</span>, $(<span class="macro-nonterminal">$</span><span class="kw">type</span>),<span class="kw-2">*</span>,)
-            }
-        }
-
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">type1</span>, $(<span class="macro-nonterminal">$</span><span class="kw">type</span>),<span class="kw-2">*</span><span class="op">&gt;</span> <span class="macro-nonterminal">From</span><span class="op">&lt;</span> ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">type1</span>, $(<span class="macro-nonterminal">$</span><span class="kw">type</span>),<span class="kw-2">*</span>, ) <span class="op">&gt;</span>
-        <span class="kw">for</span> <span class="macro">HList!</span>[ <span class="macro-nonterminal">$</span><span class="macro-nonterminal">type1</span>, $(<span class="macro-nonterminal">$</span><span class="kw">type</span>),<span class="kw-2">*</span>, ] {
-            <span class="kw">fn</span> <span class="macro-nonterminal">from</span>(<span class="ident">tup</span>: ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">type1</span>, $( <span class="macro-nonterminal">$</span><span class="kw">type</span> ),<span class="kw-2">*</span>, ) ) -&gt; <span class="macro-nonterminal">Self</span> {
-                <span class="ident">Generic::into</span>(<span class="ident">tup</span>)
+            <span class="kw">fn </span><span class="macro-nonterminal">from</span>(r: <span class="self">Self</span>::Repr) -&gt; <span class="self">Self </span>{
+                <span class="attribute">#[allow(non_snake_case)]
+                </span><span class="kw">let </span><span class="macro">hlist_pat!</span>[<span class="macro-nonterminal">$type1</span>, $(<span class="macro-nonterminal">$</span><span class="kw">type</span>),<span class="kw-2">*</span>,] = <span class="macro-nonterminal">r</span>;
+                (<span class="macro-nonterminal">$type1</span>, $(<span class="macro-nonterminal">$</span><span class="kw">type</span>),<span class="kw-2">*</span>,)
             }
         }
 
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::from_over_into</span>)]</span>
-        <span class="kw">impl</span><span class="op">&lt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">type1</span>, $(<span class="macro-nonterminal">$</span><span class="kw">type</span>),<span class="kw-2">*</span><span class="op">&gt;</span> <span class="macro-nonterminal">Into</span><span class="op">&lt;</span> ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">type1</span>, $(<span class="macro-nonterminal">$</span><span class="kw">type</span>),<span class="kw-2">*</span>, ) <span class="op">&gt;</span>
-        <span class="kw">for</span> <span class="macro">HList!</span>[ <span class="macro-nonterminal">$</span><span class="macro-nonterminal">type1</span>, $(<span class="macro-nonterminal">$</span><span class="kw">type</span>),<span class="kw-2">*</span>, ] {
-            <span class="kw">fn</span> <span class="macro-nonterminal">into</span>(<span class="self">self</span>) -&gt; ( <span class="macro-nonterminal">$</span><span class="macro-nonterminal">type1</span>, $( <span class="macro-nonterminal">$</span><span class="kw">type</span> ),<span class="kw-2">*</span>, ) {
+        <span class="kw">impl</span>&lt;<span class="macro-nonterminal">$type1</span>, $(<span class="macro-nonterminal">$</span><span class="kw">type</span>),<span class="kw-2">*</span>&gt; <span class="macro-nonterminal">From</span>&lt; ( <span class="macro-nonterminal">$type1</span>, $(<span class="macro-nonterminal">$</span><span class="kw">type</span>),<span class="kw-2">*</span>, ) &gt;
+        <span class="kw">for </span><span class="macro">HList!</span>[ <span class="macro-nonterminal">$type1</span>, $(<span class="macro-nonterminal">$</span><span class="kw">type</span>),<span class="kw-2">*</span>, ] {
+            <span class="kw">fn </span><span class="macro-nonterminal">from</span>(tup: ( <span class="macro-nonterminal">$type1</span>, $( <span class="macro-nonterminal">$</span><span class="kw">type </span>),<span class="kw-2">*</span>, ) ) -&gt; <span class="macro-nonterminal">Self </span>{
+                Generic::into(tup)
+            }
+        }
+
+        <span class="attribute">#[allow(clippy::from_over_into)]
+        </span><span class="kw">impl</span>&lt; <span class="macro-nonterminal">$type1</span>, $(<span class="macro-nonterminal">$</span><span class="kw">type</span>),<span class="kw-2">*</span>&gt; <span class="macro-nonterminal">Into</span>&lt; ( <span class="macro-nonterminal">$type1</span>, $(<span class="macro-nonterminal">$</span><span class="kw">type</span>),<span class="kw-2">*</span>, ) &gt;
+        <span class="kw">for </span><span class="macro">HList!</span>[ <span class="macro-nonterminal">$type1</span>, $(<span class="macro-nonterminal">$</span><span class="kw">type</span>),<span class="kw-2">*</span>, ] {
+            <span class="kw">fn </span><span class="macro-nonterminal">into</span>(<span class="self">self</span>) -&gt; ( <span class="macro-nonterminal">$type1</span>, $( <span class="macro-nonterminal">$</span><span class="kw">type </span>),<span class="kw-2">*</span>, ) {
                 <span class="macro-nonterminal">Generic::from</span>(<span class="self">self</span>)
             }
         }
     };
 }
 
-<span class="kw">impl</span> <span class="ident">Generic</span> <span class="kw">for</span> () {
-    <span class="kw">type</span> <span class="ident">Repr</span> <span class="op">=</span> <span class="macro">HList!</span>[];
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Repr</span> {
+<span class="kw">impl </span>Generic <span class="kw">for </span>() {
+    <span class="kw">type </span>Repr = <span class="macro">HList!</span>[];
+    <span class="kw">fn </span>into(<span class="self">self</span>) -&gt; <span class="self">Self</span>::Repr {
         <span class="macro">hlist!</span>[]
     }
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="kw">_</span>: <span class="ident"><span class="self">Self</span>::Repr</span>) -&gt; <span class="self">Self</span> {}
+    <span class="kw">fn </span>from(<span class="kw">_</span>: <span class="self">Self</span>::Repr) -&gt; <span class="self">Self </span>{}
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="kw">for</span> <span class="macro">HList!</span>[] {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="kw">_</span>: ()) -&gt; <span class="self">Self</span> {
+<span class="kw">impl </span>From&lt;()&gt; <span class="kw">for </span><span class="macro">HList!</span>[] {
+    <span class="kw">fn </span>from(<span class="kw">_</span>: ()) -&gt; <span class="self">Self </span>{
         <span class="macro">hlist!</span>[]
     }
 }
 
-<span class="macro">tup_def!</span>( <span class="ident">T0</span> ; <span class="ident">F1</span>, ; <span class="ident">T1</span>, );
-<span class="macro">tup_def!</span>( <span class="ident">T0</span> ; <span class="ident">F1</span>, <span class="ident">F2</span>, ;
-               <span class="ident">T1</span>, <span class="ident">T2</span>, );
-<span class="macro">tup_def!</span>( <span class="ident">T0</span> ; <span class="ident">F1</span>, <span class="ident">F2</span>, <span class="ident">F3</span>, ;
-               <span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, );
-<span class="macro">tup_def!</span>( <span class="ident">T0</span> ; <span class="ident">F1</span>, <span class="ident">F2</span>, <span class="ident">F3</span>, <span class="ident">F4</span>, ;
-               <span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, );
-<span class="macro">tup_def!</span>( <span class="ident">T0</span> ; <span class="ident">F1</span>, <span class="ident">F2</span>, <span class="ident">F3</span>, <span class="ident">F4</span>, <span class="ident">F5</span>, ;
-               <span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, );
-<span class="macro">tup_def!</span>( <span class="ident">T0</span> ; <span class="ident">F1</span>, <span class="ident">F2</span>, <span class="ident">F3</span>, <span class="ident">F4</span>, <span class="ident">F5</span>, <span class="ident">F6</span>, ;
-               <span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>, );
-<span class="macro">tup_def!</span>( <span class="ident">T0</span> ; <span class="ident">F1</span>, <span class="ident">F2</span>, <span class="ident">F3</span>, <span class="ident">F4</span>, <span class="ident">F5</span>, <span class="ident">F6</span>, <span class="ident">F7</span>, ;
-               <span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>, <span class="ident">T7</span>, );
-<span class="macro">tup_def!</span>( <span class="ident">T0</span> ; <span class="ident">F1</span>, <span class="ident">F2</span>, <span class="ident">F3</span>, <span class="ident">F4</span>, <span class="ident">F5</span>, <span class="ident">F6</span>, <span class="ident">F7</span>, <span class="ident">F8</span>, ;
-               <span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>, <span class="ident">T7</span>, <span class="ident">T8</span>, );
-<span class="macro">tup_def!</span>( <span class="ident">T0</span> ; <span class="ident">F1</span>, <span class="ident">F2</span>, <span class="ident">F3</span>, <span class="ident">F4</span>, <span class="ident">F5</span>, <span class="ident">F6</span>, <span class="ident">F7</span>, <span class="ident">F8</span>, <span class="ident">F9</span>, ;
-               <span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>, <span class="ident">T7</span>, <span class="ident">T8</span>, <span class="ident">T9</span>, );
-<span class="macro">tup_def!</span>( <span class="ident">T0</span> ; <span class="ident">F1</span>, <span class="ident">F2</span>, <span class="ident">F3</span>, <span class="ident">F4</span>, <span class="ident">F5</span>, <span class="ident">F6</span>, <span class="ident">F7</span>, <span class="ident">F8</span>, <span class="ident">F9</span>, <span class="ident">F10</span>, ;
-               <span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>, <span class="ident">T7</span>, <span class="ident">T8</span>, <span class="ident">T9</span>, <span class="ident">T10</span>, );
-<span class="macro">tup_def!</span>( <span class="ident">T0</span> ; <span class="ident">F1</span>, <span class="ident">F2</span>, <span class="ident">F3</span>, <span class="ident">F4</span>, <span class="ident">F5</span>, <span class="ident">F6</span>, <span class="ident">F7</span>, <span class="ident">F8</span>, <span class="ident">F9</span>, <span class="ident">F10</span>, <span class="ident">F11</span>, ;
-               <span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>, <span class="ident">T7</span>, <span class="ident">T8</span>, <span class="ident">T9</span>, <span class="ident">T10</span>, <span class="ident">T11</span>, );
-<span class="macro">tup_def!</span>( <span class="ident">T0</span> ; <span class="ident">F1</span>, <span class="ident">F2</span>, <span class="ident">F3</span>, <span class="ident">F4</span>, <span class="ident">F5</span>, <span class="ident">F6</span>, <span class="ident">F7</span>, <span class="ident">F8</span>, <span class="ident">F9</span>, <span class="ident">F10</span>, <span class="ident">F11</span>, <span class="ident">F12</span>, ;
-               <span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>, <span class="ident">T7</span>, <span class="ident">T8</span>, <span class="ident">T9</span>, <span class="ident">T10</span>, <span class="ident">T11</span>, <span class="ident">T12</span>, );
-<span class="macro">tup_def!</span>( <span class="ident">T0</span> ; <span class="ident">F1</span>, <span class="ident">F2</span>, <span class="ident">F3</span>, <span class="ident">F4</span>, <span class="ident">F5</span>, <span class="ident">F6</span>, <span class="ident">F7</span>, <span class="ident">F8</span>, <span class="ident">F9</span>, <span class="ident">F10</span>, <span class="ident">F11</span>, <span class="ident">F12</span>, <span class="ident">F13</span>, ;
-               <span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>, <span class="ident">T7</span>, <span class="ident">T8</span>, <span class="ident">T9</span>, <span class="ident">T10</span>, <span class="ident">T11</span>, <span class="ident">T12</span>, <span class="ident">T13</span>,);
-<span class="macro">tup_def!</span>( <span class="ident">T0</span> ; <span class="ident">F1</span>, <span class="ident">F2</span>, <span class="ident">F3</span>, <span class="ident">F4</span>, <span class="ident">F5</span>, <span class="ident">F6</span>, <span class="ident">F7</span>, <span class="ident">F8</span>, <span class="ident">F9</span>, <span class="ident">F10</span>, <span class="ident">F11</span>, <span class="ident">F12</span>, <span class="ident">F13</span>, <span class="ident">F14</span>, ;
-               <span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>, <span class="ident">T7</span>, <span class="ident">T8</span>, <span class="ident">T9</span>, <span class="ident">T10</span>, <span class="ident">T11</span>, <span class="ident">T12</span>, <span class="ident">T13</span>, <span class="ident">T14</span>, );
-<span class="macro">tup_def!</span>( <span class="ident">T0</span> ; <span class="ident">F1</span>, <span class="ident">F2</span>, <span class="ident">F3</span>, <span class="ident">F4</span>, <span class="ident">F5</span>, <span class="ident">F6</span>, <span class="ident">F7</span>, <span class="ident">F8</span>, <span class="ident">F9</span>, <span class="ident">F10</span>, <span class="ident">F11</span>, <span class="ident">F12</span>, <span class="ident">F13</span>, <span class="ident">F14</span>, <span class="ident">F15</span>,;
-               <span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>, <span class="ident">T7</span>, <span class="ident">T8</span>, <span class="ident">T9</span>, <span class="ident">T10</span>, <span class="ident">T11</span>, <span class="ident">T12</span>, <span class="ident">T13</span>, <span class="ident">T14</span>, <span class="ident">T15</span>, );
-<span class="macro">tup_def!</span>( <span class="ident">T0</span> ; <span class="ident">F1</span>, <span class="ident">F2</span>, <span class="ident">F3</span>, <span class="ident">F4</span>, <span class="ident">F5</span>, <span class="ident">F6</span>, <span class="ident">F7</span>, <span class="ident">F8</span>, <span class="ident">F9</span>, <span class="ident">F10</span>, <span class="ident">F11</span>, <span class="ident">F12</span>, <span class="ident">F13</span>, <span class="ident">F14</span>, <span class="ident">F15</span>, <span class="ident">F16</span>, ;
-               <span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>, <span class="ident">T7</span>, <span class="ident">T8</span>, <span class="ident">T9</span>, <span class="ident">T10</span>, <span class="ident">T11</span>, <span class="ident">T12</span>, <span class="ident">T13</span>, <span class="ident">T14</span>, <span class="ident">T15</span>, <span class="ident">T16</span>,);
-<span class="macro">tup_def!</span>( <span class="ident">T0</span> ; <span class="ident">F1</span>, <span class="ident">F2</span>, <span class="ident">F3</span>, <span class="ident">F4</span>, <span class="ident">F5</span>, <span class="ident">F6</span>, <span class="ident">F7</span>, <span class="ident">F8</span>, <span class="ident">F9</span>, <span class="ident">F10</span>, <span class="ident">F11</span>, <span class="ident">F12</span>, <span class="ident">F13</span>, <span class="ident">F14</span>, <span class="ident">F15</span>, <span class="ident">F16</span>, <span class="ident">F17</span>, ;
-               <span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>, <span class="ident">T7</span>, <span class="ident">T8</span>, <span class="ident">T9</span>, <span class="ident">T10</span>, <span class="ident">T11</span>, <span class="ident">T12</span>, <span class="ident">T13</span>, <span class="ident">T14</span>, <span class="ident">T15</span>, <span class="ident">T16</span>, <span class="ident">T17</span>, );
-<span class="macro">tup_def!</span>( <span class="ident">T0</span> ; <span class="ident">F1</span>, <span class="ident">F2</span>, <span class="ident">F3</span>, <span class="ident">F4</span>, <span class="ident">F5</span>, <span class="ident">F6</span>, <span class="ident">F7</span>, <span class="ident">F8</span>, <span class="ident">F9</span>, <span class="ident">F10</span>, <span class="ident">F11</span>, <span class="ident">F12</span>, <span class="ident">F13</span>, <span class="ident">F14</span>, <span class="ident">F15</span>, <span class="ident">F16</span>, <span class="ident">F17</span>, <span class="ident">F18</span>, ;
-               <span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>, <span class="ident">T7</span>, <span class="ident">T8</span>, <span class="ident">T9</span>, <span class="ident">T10</span>, <span class="ident">T11</span>, <span class="ident">T12</span>, <span class="ident">T13</span>, <span class="ident">T14</span>, <span class="ident">T15</span>, <span class="ident">T16</span>, <span class="ident">T17</span>, <span class="ident">T18</span>,);
-<span class="macro">tup_def!</span>( <span class="ident">T0</span> ; <span class="ident">F1</span>, <span class="ident">F2</span>, <span class="ident">F3</span>, <span class="ident">F4</span>, <span class="ident">F5</span>, <span class="ident">F6</span>, <span class="ident">F7</span>, <span class="ident">F8</span>, <span class="ident">F9</span>, <span class="ident">F10</span>, <span class="ident">F11</span>, <span class="ident">F12</span>, <span class="ident">F13</span>, <span class="ident">F14</span>, <span class="ident">F15</span>, <span class="ident">F16</span>, <span class="ident">F17</span>, <span class="ident">F18</span>, <span class="ident">F19</span>, ;
-               <span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>, <span class="ident">T7</span>, <span class="ident">T8</span>, <span class="ident">T9</span>, <span class="ident">T10</span>, <span class="ident">T11</span>, <span class="ident">T12</span>, <span class="ident">T13</span>, <span class="ident">T14</span>, <span class="ident">T15</span>, <span class="ident">T16</span>, <span class="ident">T17</span>, <span class="ident">T18</span>, <span class="ident">T19</span>,);
-<span class="macro">tup_def!</span>( <span class="ident">T0</span> ; <span class="ident">F1</span>, <span class="ident">F2</span>, <span class="ident">F3</span>, <span class="ident">F4</span>, <span class="ident">F5</span>, <span class="ident">F6</span>, <span class="ident">F7</span>, <span class="ident">F8</span>, <span class="ident">F9</span>, <span class="ident">F10</span>, <span class="ident">F11</span>, <span class="ident">F12</span>, <span class="ident">F13</span>, <span class="ident">F14</span>, <span class="ident">F15</span>, <span class="ident">F16</span>, <span class="ident">F17</span>, <span class="ident">F18</span>, <span class="ident">F19</span>, <span class="ident">F20</span>, ;
-               <span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>, <span class="ident">T7</span>, <span class="ident">T8</span>, <span class="ident">T9</span>, <span class="ident">T10</span>, <span class="ident">T11</span>, <span class="ident">T12</span>, <span class="ident">T13</span>, <span class="ident">T14</span>, <span class="ident">T15</span>, <span class="ident">T16</span>, <span class="ident">T17</span>, <span class="ident">T18</span>, <span class="ident">T19</span>, <span class="ident">T20</span>,);
-<span class="macro">tup_def!</span>( <span class="ident">T0</span> ; <span class="ident">F1</span>, <span class="ident">F2</span>, <span class="ident">F3</span>, <span class="ident">F4</span>, <span class="ident">F5</span>, <span class="ident">F6</span>, <span class="ident">F7</span>, <span class="ident">F8</span>, <span class="ident">F9</span>, <span class="ident">F10</span>, <span class="ident">F11</span>, <span class="ident">F12</span>, <span class="ident">F13</span>, <span class="ident">F14</span>, <span class="ident">F15</span>, <span class="ident">F16</span>, <span class="ident">F17</span>, <span class="ident">F18</span>, <span class="ident">F19</span>, <span class="ident">F20</span>, <span class="ident">F21</span>, ;
-               <span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>, <span class="ident">T7</span>, <span class="ident">T8</span>, <span class="ident">T9</span>, <span class="ident">T10</span>, <span class="ident">T11</span>, <span class="ident">T12</span>, <span class="ident">T13</span>, <span class="ident">T14</span>, <span class="ident">T15</span>, <span class="ident">T16</span>, <span class="ident">T17</span>, <span class="ident">T18</span>, <span class="ident">T19</span>, <span class="ident">T20</span>, <span class="ident">T21</span>, );
-<span class="macro">tup_def!</span>( <span class="ident">T0</span> ; <span class="ident">F1</span>, <span class="ident">F2</span>, <span class="ident">F3</span>, <span class="ident">F4</span>, <span class="ident">F5</span>, <span class="ident">F6</span>, <span class="ident">F7</span>, <span class="ident">F8</span>, <span class="ident">F9</span>, <span class="ident">F10</span>, <span class="ident">F11</span>, <span class="ident">F12</span>, <span class="ident">F13</span>, <span class="ident">F14</span>, <span class="ident">F15</span>, <span class="ident">F16</span>, <span class="ident">F17</span>, <span class="ident">F18</span>, <span class="ident">F19</span>, <span class="ident">F20</span>, <span class="ident">F21</span>, <span class="ident">F22</span>, ;
-               <span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>, <span class="ident">T7</span>, <span class="ident">T8</span>, <span class="ident">T9</span>, <span class="ident">T10</span>, <span class="ident">T11</span>, <span class="ident">T12</span>, <span class="ident">T13</span>, <span class="ident">T14</span>, <span class="ident">T15</span>, <span class="ident">T16</span>, <span class="ident">T17</span>, <span class="ident">T18</span>, <span class="ident">T19</span>, <span class="ident">T20</span>, <span class="ident">T21</span>, <span class="ident">T22</span>, );
-<span class="macro">tup_def!</span>( <span class="ident">T0</span> ; <span class="ident">F1</span>, <span class="ident">F2</span>, <span class="ident">F3</span>, <span class="ident">F4</span>, <span class="ident">F5</span>, <span class="ident">F6</span>, <span class="ident">F7</span>, <span class="ident">F8</span>, <span class="ident">F9</span>, <span class="ident">F10</span>, <span class="ident">F11</span>, <span class="ident">F12</span>, <span class="ident">F13</span>, <span class="ident">F14</span>, <span class="ident">F15</span>, <span class="ident">F16</span>, <span class="ident">F17</span>, <span class="ident">F18</span>, <span class="ident">F19</span>, <span class="ident">F20</span>, <span class="ident">F21</span>, <span class="ident">F22</span>, <span class="ident">F23</span>, ;
-               <span class="ident">T1</span>, <span class="ident">T2</span>, <span class="ident">T3</span>, <span class="ident">T4</span>, <span class="ident">T5</span>, <span class="ident">T6</span>, <span class="ident">T7</span>, <span class="ident">T8</span>, <span class="ident">T9</span>, <span class="ident">T10</span>, <span class="ident">T11</span>, <span class="ident">T12</span>, <span class="ident">T13</span>, <span class="ident">T14</span>, <span class="ident">T15</span>, <span class="ident">T16</span>, <span class="ident">T17</span>, <span class="ident">T18</span>, <span class="ident">T19</span>, <span class="ident">T20</span>, <span class="ident">T21</span>, <span class="ident">T22</span>, <span class="ident">T23</span>, );
+<span class="macro">tup_def!</span>( T0 ; F1, ; T1, );
+<span class="macro">tup_def!</span>( T0 ; F1, F2, ;
+               T1, T2, );
+<span class="macro">tup_def!</span>( T0 ; F1, F2, F3, ;
+               T1, T2, T3, );
+<span class="macro">tup_def!</span>( T0 ; F1, F2, F3, F4, ;
+               T1, T2, T3, T4, );
+<span class="macro">tup_def!</span>( T0 ; F1, F2, F3, F4, F5, ;
+               T1, T2, T3, T4, T5, );
+<span class="macro">tup_def!</span>( T0 ; F1, F2, F3, F4, F5, F6, ;
+               T1, T2, T3, T4, T5, T6, );
+<span class="macro">tup_def!</span>( T0 ; F1, F2, F3, F4, F5, F6, F7, ;
+               T1, T2, T3, T4, T5, T6, T7, );
+<span class="macro">tup_def!</span>( T0 ; F1, F2, F3, F4, F5, F6, F7, F8, ;
+               T1, T2, T3, T4, T5, T6, T7, T8, );
+<span class="macro">tup_def!</span>( T0 ; F1, F2, F3, F4, F5, F6, F7, F8, F9, ;
+               T1, T2, T3, T4, T5, T6, T7, T8, T9, );
+<span class="macro">tup_def!</span>( T0 ; F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, ;
+               T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, );
+<span class="macro">tup_def!</span>( T0 ; F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, ;
+               T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, );
+<span class="macro">tup_def!</span>( T0 ; F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, ;
+               T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, );
+<span class="macro">tup_def!</span>( T0 ; F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, ;
+               T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13,);
+<span class="macro">tup_def!</span>( T0 ; F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, ;
+               T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, );
+<span class="macro">tup_def!</span>( T0 ; F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15,;
+               T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, );
+<span class="macro">tup_def!</span>( T0 ; F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, ;
+               T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16,);
+<span class="macro">tup_def!</span>( T0 ; F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, ;
+               T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, );
+<span class="macro">tup_def!</span>( T0 ; F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, ;
+               T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18,);
+<span class="macro">tup_def!</span>( T0 ; F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, ;
+               T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19,);
+<span class="macro">tup_def!</span>( T0 ; F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, ;
+               T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20,);
+<span class="macro">tup_def!</span>( T0 ; F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, ;
+               T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, );
+<span class="macro">tup_def!</span>( T0 ; F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, ;
+               T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, );
+<span class="macro">tup_def!</span>( T0 ; F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22, F23, ;
+               T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, );
 
 <span class="macro">tup_iso!</span>(
-    <span class="ident">T23</span>, <span class="ident">T22</span>, <span class="ident">T21</span>, <span class="ident">T20</span>, <span class="ident">T19</span>, <span class="ident">T18</span>, <span class="ident">T17</span>, <span class="ident">T16</span>, <span class="ident">T15</span>, <span class="ident">T14</span>, <span class="ident">T13</span>, <span class="ident">T12</span>, <span class="ident">T11</span>, <span class="ident">T10</span>, <span class="ident">T9</span>, <span class="ident">T8</span>, <span class="ident">T7</span>, <span class="ident">T6</span>, <span class="ident">T5</span>, <span class="ident">T4</span>,
-    <span class="ident">T3</span>, <span class="ident">T2</span>, <span class="ident">T1</span>, <span class="ident">T0</span>
+    T23, T22, T21, T20, T19, T18, T17, T16, T15, T14, T13, T12, T11, T10, T9, T8, T7, T6, T5, T4,
+    T3, T2, T1, T0
 );
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="frunk_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="frunk_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

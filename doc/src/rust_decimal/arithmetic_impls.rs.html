@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rust_decimal-1.26.1/src/arithmetic_impls.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>arithmetic_impls.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rust_decimal/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rust_decimal/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rust_decimal/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rust_decimal-1.26.1/src/arithmetic_impls.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>arithmetic_impls.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../rust_decimal/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../rust_decimal/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rust_decimal/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -327,334 +327,334 @@
 <span id="327">327</span>
 <span id="328">328</span>
 <span id="329">329</span>
-</pre><pre class="rust"><code><span class="comment">// #[rustfmt::skip] is being used because `rustfmt` poorly formats `#[doc = concat!(..)]`. See</span>
-<span class="comment">// https://github.com/rust-lang/rustfmt/issues/5062 for more information.</span>
+</pre><pre class="rust"><code><span class="comment">// #[rustfmt::skip] is being used because `rustfmt` poorly formats `#[doc = concat!(..)]`. See
+// https://github.com/rust-lang/rustfmt/issues/5062 for more information.
 
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">decimal::CalculationResult</span>, <span class="ident">ops</span>, <span class="ident">Decimal</span>};
-<span class="kw">use</span> <span class="ident">core::ops</span>::{<span class="ident">Add</span>, <span class="ident">Div</span>, <span class="ident">Mul</span>, <span class="ident">Rem</span>, <span class="ident">Sub</span>};
-<span class="kw">use</span> <span class="ident">num_traits</span>::{<span class="ident">CheckedAdd</span>, <span class="ident">CheckedDiv</span>, <span class="ident">CheckedMul</span>, <span class="ident">CheckedRem</span>, <span class="ident">CheckedSub</span>, <span class="ident">Inv</span>};
+</span><span class="kw">use crate</span>::{decimal::CalculationResult, ops, Decimal};
+<span class="kw">use </span>core::ops::{Add, Div, Mul, Rem, Sub};
+<span class="kw">use </span>num_traits::{CheckedAdd, CheckedDiv, CheckedMul, CheckedRem, CheckedSub, Inv};
 
-<span class="comment">// Macros and `Decimal` implementations</span>
+<span class="comment">// Macros and `Decimal` implementations
 
-<span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">impl_checked</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">long</span>:<span class="ident">literal</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">short</span>:<span class="ident">literal</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">fun</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="kw">impl</span>:<span class="macro-nonterminal">ident</span>) =&gt; {
-        <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">concat!</span>(
+</span><span class="attribute">#[rustfmt::skip]
+</span><span class="macro">macro_rules! </span>impl_checked {
+    (<span class="macro-nonterminal">$long</span>:literal, <span class="macro-nonterminal">$short</span>:literal, <span class="macro-nonterminal">$fun</span>:ident, <span class="macro-nonterminal">$</span><span class="kw">impl</span>:<span class="macro-nonterminal">ident</span>) =&gt; {
+        <span class="attribute">#[doc = <span class="macro">concat!</span>(
             <span class="string">&quot;Checked &quot;</span>,
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">long</span>,
+            <span class="macro-nonterminal">$long</span>,
             <span class="string">&quot;. Computes `self &quot;</span>,
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">short</span>,
-            <span class="string">&quot; other`, returning `None` if overflow occurred.&quot;</span>
-        )]</span>
-        <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-        <span class="attribute">#[<span class="ident">must_use</span>]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">fun</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Decimal</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Decimal</span><span class="op">&gt;</span> {
-            <span class="kw">match</span> <span class="ident">ops</span>::<span class="macro-nonterminal">$</span><span class="kw">impl</span>(<span class="kw-2">&amp;</span><span class="macro-nonterminal">self</span>, <span class="kw-2">&amp;</span><span class="ident">other</span>) {
-                <span class="ident">CalculationResult::Ok</span>(<span class="ident">result</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">result</span>),
-                <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="macro-nonterminal">$short</span>,
+            <span class="string">&quot; other`, returning `None` if overflow occurred.&quot;
+        </span>)]
+        #[inline(always)]
+        #[must_use]
+        </span><span class="kw">pub fn </span><span class="macro-nonterminal">$fun</span>(<span class="self">self</span>, other: Decimal) -&gt; <span class="prelude-ty">Option</span>&lt;Decimal&gt; {
+            <span class="kw">match </span>ops::<span class="macro-nonterminal">$</span><span class="kw">impl</span>(<span class="kw-2">&amp;</span><span class="macro-nonterminal">self</span>, <span class="kw-2">&amp;</span>other) {
+                CalculationResult::Ok(result) =&gt; <span class="prelude-val">Some</span>(result),
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
             }
         }
     };
 }
 
-<span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
-<span class="macro">macro_rules!</span> <span class="ident">impl_saturating</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">long</span>:<span class="ident">literal</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">short</span>:<span class="ident">literal</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">fun</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="kw">impl</span>:<span class="macro-nonterminal">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">cmp</span>:<span class="ident">ident</span>) =&gt; {
-        <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="macro">concat!</span>(
+<span class="attribute">#[rustfmt::skip]
+</span><span class="macro">macro_rules! </span>impl_saturating {
+    (<span class="macro-nonterminal">$long</span>:literal, <span class="macro-nonterminal">$short</span>:literal, <span class="macro-nonterminal">$fun</span>:ident, <span class="macro-nonterminal">$</span><span class="kw">impl</span>:<span class="macro-nonterminal">ident</span>, <span class="macro-nonterminal">$cmp</span>:ident) =&gt; {
+        <span class="attribute">#[doc = <span class="macro">concat!</span>(
             <span class="string">&quot;Saturating &quot;</span>,
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">long</span>,
+            <span class="macro-nonterminal">$long</span>,
             <span class="string">&quot;. Computes `self &quot;</span>,
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">short</span>,
+            <span class="macro-nonterminal">$short</span>,
             <span class="string">&quot; other`, saturating at the relevant upper or lower boundary.&quot;</span>,
-        )]</span>
-        <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-        <span class="attribute">#[<span class="ident">must_use</span>]</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">fun</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Decimal</span>) -&gt; <span class="ident">Decimal</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">elem</span>) <span class="op">=</span> <span class="self">self</span>.<span class="macro-nonterminal">$</span><span class="kw">impl</span>(<span class="macro-nonterminal">other</span>) {
-                <span class="ident">elem</span>
-            } <span class="kw">else</span> {
-                <span class="macro-nonterminal">$</span><span class="macro-nonterminal">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">&amp;</span><span class="ident">other</span>)
+        )]
+        #[inline(always)]
+        #[must_use]
+        </span><span class="kw">pub fn </span><span class="macro-nonterminal">$fun</span>(<span class="self">self</span>, other: Decimal) -&gt; Decimal {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(elem) = <span class="self">self</span>.<span class="macro-nonterminal">$</span><span class="kw">impl</span>(<span class="macro-nonterminal">other</span>) {
+                elem
+            } <span class="kw">else </span>{
+                <span class="macro-nonterminal">$cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">&amp;</span>other)
             }
         }
     };
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">impl_checked_and_saturating</span> {
+<span class="macro">macro_rules! </span>impl_checked_and_saturating {
     (
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">op_long</span>:<span class="ident">literal</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">op_short</span>:<span class="ident">literal</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">checked_fun</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">checked_impl</span>:<span class="ident">ident</span>,
+        <span class="macro-nonterminal">$op_long</span>:literal,
+        <span class="macro-nonterminal">$op_short</span>:literal,
+        <span class="macro-nonterminal">$checked_fun</span>:ident,
+        <span class="macro-nonterminal">$checked_impl</span>:ident,
 
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">saturating_fun</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">saturating_cmp</span>:<span class="ident">ident</span>
+        <span class="macro-nonterminal">$saturating_fun</span>:ident,
+        <span class="macro-nonterminal">$saturating_cmp</span>:ident
     ) =&gt; {
-        <span class="macro">impl_checked!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">op_long</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">op_short</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">checked_fun</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">checked_impl</span>);
+        <span class="macro">impl_checked!</span>(<span class="macro-nonterminal">$op_long</span>, <span class="macro-nonterminal">$op_short</span>, <span class="macro-nonterminal">$checked_fun</span>, <span class="macro-nonterminal">$checked_impl</span>);
         <span class="macro">impl_saturating!</span>(
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">op_long</span>,
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">op_short</span>,
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">saturating_fun</span>,
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">checked_fun</span>,
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">saturating_cmp</span>
-        );
+            <span class="macro-nonterminal">$op_long</span>,
+            <span class="macro-nonterminal">$op_short</span>,
+            <span class="macro-nonterminal">$saturating_fun</span>,
+            <span class="macro-nonterminal">$checked_fun</span>,
+            <span class="macro-nonterminal">$saturating_cmp
+        </span>);
     };
 }
 
-<span class="kw">impl</span> <span class="ident">Decimal</span> {
+<span class="kw">impl </span>Decimal {
     <span class="macro">impl_checked_and_saturating!</span>(
         <span class="string">&quot;addition&quot;</span>,
         <span class="string">&quot;+&quot;</span>,
-        <span class="ident">checked_add</span>,
-        <span class="ident">add_impl</span>,
-        <span class="ident">saturating_add</span>,
-        <span class="ident">if_a_is_positive_then_max</span>
+        checked_add,
+        add_impl,
+        saturating_add,
+        if_a_is_positive_then_max
     );
     <span class="macro">impl_checked_and_saturating!</span>(
         <span class="string">&quot;multiplication&quot;</span>,
         <span class="string">&quot;*&quot;</span>,
-        <span class="ident">checked_mul</span>,
-        <span class="ident">mul_impl</span>,
-        <span class="ident">saturating_mul</span>,
-        <span class="ident">if_xnor_then_max</span>
+        checked_mul,
+        mul_impl,
+        saturating_mul,
+        if_xnor_then_max
     );
     <span class="macro">impl_checked_and_saturating!</span>(
         <span class="string">&quot;subtraction&quot;</span>,
         <span class="string">&quot;-&quot;</span>,
-        <span class="ident">checked_sub</span>,
-        <span class="ident">sub_impl</span>,
-        <span class="ident">saturating_sub</span>,
-        <span class="ident">if_a_is_positive_then_max</span>
+        checked_sub,
+        sub_impl,
+        saturating_sub,
+        if_a_is_positive_then_max
     );
 
-    <span class="macro">impl_checked!</span>(<span class="string">&quot;division&quot;</span>, <span class="string">&quot;/&quot;</span>, <span class="ident">checked_div</span>, <span class="ident">div_impl</span>);
-    <span class="macro">impl_checked!</span>(<span class="string">&quot;remainder&quot;</span>, <span class="string">&quot;%&quot;</span>, <span class="ident">checked_rem</span>, <span class="ident">rem_impl</span>);
+    <span class="macro">impl_checked!</span>(<span class="string">&quot;division&quot;</span>, <span class="string">&quot;/&quot;</span>, checked_div, div_impl);
+    <span class="macro">impl_checked!</span>(<span class="string">&quot;remainder&quot;</span>, <span class="string">&quot;%&quot;</span>, checked_rem, rem_impl);
 }
 
-<span class="comment">// Macros and trait implementations</span>
+<span class="comment">// Macros and trait implementations
 
-<span class="macro">macro_rules!</span> <span class="ident">forward_all_binop</span> {
-    (<span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span>:<span class="ident">ident</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>:<span class="ident">ident</span>) =&gt; {
-        <span class="macro">forward_val_val_binop!</span>(<span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>);
-        <span class="macro">forward_ref_val_binop!</span>(<span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>);
-        <span class="macro">forward_val_ref_binop!</span>(<span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>);
+</span><span class="macro">macro_rules! </span>forward_all_binop {
+    (<span class="kw">impl </span><span class="macro-nonterminal">$imp</span>:ident <span class="kw">for </span><span class="macro-nonterminal">$res</span>:ty, <span class="macro-nonterminal">$method</span>:ident) =&gt; {
+        <span class="macro">forward_val_val_binop!</span>(<span class="kw">impl </span><span class="macro-nonterminal">$imp </span><span class="kw">for </span><span class="macro-nonterminal">$res</span>, <span class="macro-nonterminal">$method</span>);
+        <span class="macro">forward_ref_val_binop!</span>(<span class="kw">impl </span><span class="macro-nonterminal">$imp </span><span class="kw">for </span><span class="macro-nonterminal">$res</span>, <span class="macro-nonterminal">$method</span>);
+        <span class="macro">forward_val_ref_binop!</span>(<span class="kw">impl </span><span class="macro-nonterminal">$imp </span><span class="kw">for </span><span class="macro-nonterminal">$res</span>, <span class="macro-nonterminal">$method</span>);
     };
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">forward_ref_val_binop</span> {
-    (<span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span>:<span class="ident">ident</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>:<span class="ident">ident</span>) =&gt; {
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span> {
-            <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>;
+<span class="macro">macro_rules! </span>forward_ref_val_binop {
+    (<span class="kw">impl </span><span class="macro-nonterminal">$imp</span>:ident <span class="kw">for </span><span class="macro-nonterminal">$res</span>:ty, <span class="macro-nonterminal">$method</span>:ident) =&gt; {
+        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="macro-nonterminal">$imp</span>&lt;<span class="macro-nonterminal">$res</span>&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="macro-nonterminal">$res </span>{
+            <span class="kw">type </span>Output = <span class="macro-nonterminal">$res</span>;
 
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span> {
-                <span class="self">self</span>.<span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>)
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span><span class="macro-nonterminal">$method</span>(<span class="self">self</span>, other: <span class="macro-nonterminal">$res</span>) -&gt; <span class="macro-nonterminal">$res </span>{
+                <span class="self">self</span>.<span class="macro-nonterminal">$method</span>(<span class="kw-2">&amp;</span>other)
             }
         }
     };
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">forward_val_ref_binop</span> {
-    (<span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span>:<span class="ident">ident</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>:<span class="ident">ident</span>) =&gt; {
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span> {
-            <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>;
+<span class="macro">macro_rules! </span>forward_val_ref_binop {
+    (<span class="kw">impl </span><span class="macro-nonterminal">$imp</span>:ident <span class="kw">for </span><span class="macro-nonterminal">$res</span>:ty, <span class="macro-nonterminal">$method</span>:ident) =&gt; {
+        <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; <span class="macro-nonterminal">$imp</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="macro-nonterminal">$res</span>&gt; <span class="kw">for </span><span class="macro-nonterminal">$res </span>{
+            <span class="kw">type </span>Output = <span class="macro-nonterminal">$res</span>;
 
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span> {
-                (<span class="kw-2">&amp;</span><span class="self">self</span>).<span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>(<span class="ident">other</span>)
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span><span class="macro-nonterminal">$method</span>(<span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$res</span>) -&gt; <span class="macro-nonterminal">$res </span>{
+                (<span class="kw-2">&amp;</span><span class="self">self</span>).<span class="macro-nonterminal">$method</span>(other)
             }
         }
     };
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">forward_val_val_binop</span> {
-    (<span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span>:<span class="ident">ident</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>:<span class="ident">ty</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>:<span class="ident">ident</span>) =&gt; {
-        <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">imp</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span> {
-            <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>;
+<span class="macro">macro_rules! </span>forward_val_val_binop {
+    (<span class="kw">impl </span><span class="macro-nonterminal">$imp</span>:ident <span class="kw">for </span><span class="macro-nonterminal">$res</span>:ty, <span class="macro-nonterminal">$method</span>:ident) =&gt; {
+        <span class="kw">impl </span><span class="macro-nonterminal">$imp</span>&lt;<span class="macro-nonterminal">$res</span>&gt; <span class="kw">for </span><span class="macro-nonterminal">$res </span>{
+            <span class="kw">type </span>Output = <span class="macro-nonterminal">$res</span>;
 
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">res</span> {
-                (<span class="kw-2">&amp;</span><span class="self">self</span>).<span class="macro-nonterminal">$</span><span class="macro-nonterminal">method</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>)
+            <span class="attribute">#[inline]
+            </span><span class="kw">fn </span><span class="macro-nonterminal">$method</span>(<span class="self">self</span>, other: <span class="macro-nonterminal">$res</span>) -&gt; <span class="macro-nonterminal">$res </span>{
+                (<span class="kw-2">&amp;</span><span class="self">self</span>).<span class="macro-nonterminal">$method</span>(<span class="kw-2">&amp;</span>other)
             }
         }
     };
 }
 
-<span class="macro">forward_all_binop!</span>(<span class="kw">impl</span> <span class="ident">Add</span> <span class="kw">for</span> <span class="ident">Decimal</span>, <span class="ident">add</span>);
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">Add</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">Decimal</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Decimal</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Decimal</span>;
+<span class="macro">forward_all_binop!</span>(<span class="kw">impl </span>Add <span class="kw">for </span>Decimal, add);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; Add&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>Decimal&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Decimal {
+    <span class="kw">type </span>Output = Decimal;
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">add</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Decimal</span>) -&gt; <span class="ident">Decimal</span> {
-        <span class="kw">match</span> <span class="ident">ops::add_impl</span>(<span class="self">self</span>, <span class="ident">other</span>) {
-            <span class="ident">CalculationResult::Ok</span>(<span class="ident">sum</span>) =&gt; <span class="ident">sum</span>,
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Addition overflowed&quot;</span>),
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>add(<span class="self">self</span>, other: <span class="kw-2">&amp;</span>Decimal) -&gt; Decimal {
+        <span class="kw">match </span>ops::add_impl(<span class="self">self</span>, other) {
+            CalculationResult::Ok(sum) =&gt; sum,
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Addition overflowed&quot;</span>),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CheckedAdd</span> <span class="kw">for</span> <span class="ident">Decimal</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">checked_add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">Decimal</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Decimal</span><span class="op">&gt;</span> {
-        <span class="ident">Decimal::checked_add</span>(<span class="kw-2">*</span><span class="self">self</span>, <span class="kw-2">*</span><span class="ident">v</span>)
+<span class="kw">impl </span>CheckedAdd <span class="kw">for </span>Decimal {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>checked_add(<span class="kw-2">&amp;</span><span class="self">self</span>, v: <span class="kw-2">&amp;</span>Decimal) -&gt; <span class="prelude-ty">Option</span>&lt;Decimal&gt; {
+        Decimal::checked_add(<span class="kw-2">*</span><span class="self">self</span>, <span class="kw-2">*</span>v)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CheckedSub</span> <span class="kw">for</span> <span class="ident">Decimal</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">checked_sub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">Decimal</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Decimal</span><span class="op">&gt;</span> {
-        <span class="ident">Decimal::checked_sub</span>(<span class="kw-2">*</span><span class="self">self</span>, <span class="kw-2">*</span><span class="ident">v</span>)
+<span class="kw">impl </span>CheckedSub <span class="kw">for </span>Decimal {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>checked_sub(<span class="kw-2">&amp;</span><span class="self">self</span>, v: <span class="kw-2">&amp;</span>Decimal) -&gt; <span class="prelude-ty">Option</span>&lt;Decimal&gt; {
+        Decimal::checked_sub(<span class="kw-2">*</span><span class="self">self</span>, <span class="kw-2">*</span>v)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CheckedMul</span> <span class="kw">for</span> <span class="ident">Decimal</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">checked_mul</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">Decimal</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Decimal</span><span class="op">&gt;</span> {
-        <span class="ident">Decimal::checked_mul</span>(<span class="kw-2">*</span><span class="self">self</span>, <span class="kw-2">*</span><span class="ident">v</span>)
+<span class="kw">impl </span>CheckedMul <span class="kw">for </span>Decimal {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>checked_mul(<span class="kw-2">&amp;</span><span class="self">self</span>, v: <span class="kw-2">&amp;</span>Decimal) -&gt; <span class="prelude-ty">Option</span>&lt;Decimal&gt; {
+        Decimal::checked_mul(<span class="kw-2">*</span><span class="self">self</span>, <span class="kw-2">*</span>v)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CheckedDiv</span> <span class="kw">for</span> <span class="ident">Decimal</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">checked_div</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">Decimal</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Decimal</span><span class="op">&gt;</span> {
-        <span class="ident">Decimal::checked_div</span>(<span class="kw-2">*</span><span class="self">self</span>, <span class="kw-2">*</span><span class="ident">v</span>)
+<span class="kw">impl </span>CheckedDiv <span class="kw">for </span>Decimal {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>checked_div(<span class="kw-2">&amp;</span><span class="self">self</span>, v: <span class="kw-2">&amp;</span>Decimal) -&gt; <span class="prelude-ty">Option</span>&lt;Decimal&gt; {
+        Decimal::checked_div(<span class="kw-2">*</span><span class="self">self</span>, <span class="kw-2">*</span>v)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">CheckedRem</span> <span class="kw">for</span> <span class="ident">Decimal</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">checked_rem</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">Decimal</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Decimal</span><span class="op">&gt;</span> {
-        <span class="ident">Decimal::checked_rem</span>(<span class="kw-2">*</span><span class="self">self</span>, <span class="kw-2">*</span><span class="ident">v</span>)
+<span class="kw">impl </span>CheckedRem <span class="kw">for </span>Decimal {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>checked_rem(<span class="kw-2">&amp;</span><span class="self">self</span>, v: <span class="kw-2">&amp;</span>Decimal) -&gt; <span class="prelude-ty">Option</span>&lt;Decimal&gt; {
+        Decimal::checked_rem(<span class="kw-2">*</span><span class="self">self</span>, <span class="kw-2">*</span>v)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Inv</span> <span class="kw">for</span> <span class="ident">Decimal</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
+<span class="kw">impl </span>Inv <span class="kw">for </span>Decimal {
+    <span class="kw">type </span>Output = <span class="self">Self</span>;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">inv</span>(<span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Decimal::ONE</span> <span class="op">/</span> <span class="self">self</span>
-    }
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>inv(<span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        Decimal::ONE / <span class="self">self
+    </span>}
 }
 
-<span class="macro">forward_all_binop!</span>(<span class="kw">impl</span> <span class="ident">Div</span> <span class="kw">for</span> <span class="ident">Decimal</span>, <span class="ident">div</span>);
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">Div</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">Decimal</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Decimal</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Decimal</span>;
+<span class="macro">forward_all_binop!</span>(<span class="kw">impl </span>Div <span class="kw">for </span>Decimal, div);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; Div&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>Decimal&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Decimal {
+    <span class="kw">type </span>Output = Decimal;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Decimal</span>) -&gt; <span class="ident">Decimal</span> {
-        <span class="kw">match</span> <span class="ident">ops::div_impl</span>(<span class="self">self</span>, <span class="ident">other</span>) {
-            <span class="ident">CalculationResult::Ok</span>(<span class="ident">quot</span>) =&gt; <span class="ident">quot</span>,
-            <span class="ident">CalculationResult::Overflow</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Division overflowed&quot;</span>),
-            <span class="ident">CalculationResult::DivByZero</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Division by zero&quot;</span>),
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>div(<span class="self">self</span>, other: <span class="kw-2">&amp;</span>Decimal) -&gt; Decimal {
+        <span class="kw">match </span>ops::div_impl(<span class="self">self</span>, other) {
+            CalculationResult::Ok(quot) =&gt; quot,
+            CalculationResult::Overflow =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Division overflowed&quot;</span>),
+            CalculationResult::DivByZero =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Division by zero&quot;</span>),
         }
     }
 }
 
-<span class="macro">forward_all_binop!</span>(<span class="kw">impl</span> <span class="ident">Mul</span> <span class="kw">for</span> <span class="ident">Decimal</span>, <span class="ident">mul</span>);
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">Mul</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">Decimal</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Decimal</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Decimal</span>;
+<span class="macro">forward_all_binop!</span>(<span class="kw">impl </span>Mul <span class="kw">for </span>Decimal, mul);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; Mul&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>Decimal&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Decimal {
+    <span class="kw">type </span>Output = Decimal;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Decimal</span>) -&gt; <span class="ident">Decimal</span> {
-        <span class="kw">match</span> <span class="ident">ops::mul_impl</span>(<span class="self">self</span>, <span class="ident">other</span>) {
-            <span class="ident">CalculationResult::Ok</span>(<span class="ident">prod</span>) =&gt; <span class="ident">prod</span>,
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Multiplication overflowed&quot;</span>),
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>mul(<span class="self">self</span>, other: <span class="kw-2">&amp;</span>Decimal) -&gt; Decimal {
+        <span class="kw">match </span>ops::mul_impl(<span class="self">self</span>, other) {
+            CalculationResult::Ok(prod) =&gt; prod,
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Multiplication overflowed&quot;</span>),
         }
     }
 }
 
-<span class="macro">forward_all_binop!</span>(<span class="kw">impl</span> <span class="ident">Rem</span> <span class="kw">for</span> <span class="ident">Decimal</span>, <span class="ident">rem</span>);
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">Rem</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">Decimal</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Decimal</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Decimal</span>;
+<span class="macro">forward_all_binop!</span>(<span class="kw">impl </span>Rem <span class="kw">for </span>Decimal, rem);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; Rem&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>Decimal&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Decimal {
+    <span class="kw">type </span>Output = Decimal;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">rem</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Decimal</span>) -&gt; <span class="ident">Decimal</span> {
-        <span class="kw">match</span> <span class="ident">ops::rem_impl</span>(<span class="self">self</span>, <span class="ident">other</span>) {
-            <span class="ident">CalculationResult::Ok</span>(<span class="ident">rem</span>) =&gt; <span class="ident">rem</span>,
-            <span class="ident">CalculationResult::Overflow</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Division overflowed&quot;</span>),
-            <span class="ident">CalculationResult::DivByZero</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Division by zero&quot;</span>),
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>rem(<span class="self">self</span>, other: <span class="kw-2">&amp;</span>Decimal) -&gt; Decimal {
+        <span class="kw">match </span>ops::rem_impl(<span class="self">self</span>, other) {
+            CalculationResult::Ok(rem) =&gt; rem,
+            CalculationResult::Overflow =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Division overflowed&quot;</span>),
+            CalculationResult::DivByZero =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Division by zero&quot;</span>),
         }
     }
 }
 
-<span class="macro">forward_all_binop!</span>(<span class="kw">impl</span> <span class="ident">Sub</span> <span class="kw">for</span> <span class="ident">Decimal</span>, <span class="ident">sub</span>);
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">Decimal</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Decimal</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Decimal</span>;
+<span class="macro">forward_all_binop!</span>(<span class="kw">impl </span>Sub <span class="kw">for </span>Decimal, sub);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; Sub&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>Decimal&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Decimal {
+    <span class="kw">type </span>Output = Decimal;
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Decimal</span>) -&gt; <span class="ident">Decimal</span> {
-        <span class="kw">match</span> <span class="ident">ops::sub_impl</span>(<span class="self">self</span>, <span class="ident">other</span>) {
-            <span class="ident">CalculationResult::Ok</span>(<span class="ident">sum</span>) =&gt; <span class="ident">sum</span>,
-            <span class="kw">_</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Subtraction overflowed&quot;</span>),
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>sub(<span class="self">self</span>, other: <span class="kw-2">&amp;</span>Decimal) -&gt; Decimal {
+        <span class="kw">match </span>ops::sub_impl(<span class="self">self</span>, other) {
+            CalculationResult::Ok(sum) =&gt; sum,
+            <span class="kw">_ </span>=&gt; <span class="macro">panic!</span>(<span class="string">&quot;Subtraction overflowed&quot;</span>),
         }
     }
 }
 
-<span class="comment">// This function signature is expected by `impl_saturating`, thus the reason of `_b`.</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">const</span> <span class="kw">fn</span> <span class="ident">if_a_is_positive_then_max</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">Decimal</span>, <span class="ident">_b</span>: <span class="kw-2">&amp;</span><span class="ident">Decimal</span>) -&gt; <span class="ident">Decimal</span> {
-    <span class="kw">if</span> <span class="ident">a</span>.<span class="ident">is_sign_positive</span>() {
-        <span class="ident">Decimal::MAX</span>
-    } <span class="kw">else</span> {
-        <span class="ident">Decimal::MIN</span>
+<span class="comment">// This function signature is expected by `impl_saturating`, thus the reason of `_b`.
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">const fn </span>if_a_is_positive_then_max(a: <span class="kw-2">&amp;</span>Decimal, _b: <span class="kw-2">&amp;</span>Decimal) -&gt; Decimal {
+    <span class="kw">if </span>a.is_sign_positive() {
+        Decimal::MAX
+    } <span class="kw">else </span>{
+        Decimal::MIN
     }
 }
 
-<span class="comment">// Used by saturating multiplications.</span>
-<span class="comment">//</span>
-<span class="comment">// If the `a` and `b` combination represents a XNOR bit operation, returns MAX. Otherwise,</span>
-<span class="comment">// returns MIN.</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">const</span> <span class="kw">fn</span> <span class="ident">if_xnor_then_max</span>(<span class="ident">a</span>: <span class="kw-2">&amp;</span><span class="ident">Decimal</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span><span class="ident">Decimal</span>) -&gt; <span class="ident">Decimal</span> {
-    <span class="kw">match</span> (<span class="ident">a</span>.<span class="ident">is_sign_positive</span>(), <span class="ident">b</span>.<span class="ident">is_sign_positive</span>()) {
-        (<span class="bool-val">true</span>, <span class="bool-val">true</span>) =&gt; <span class="ident">Decimal::MAX</span>,
-        (<span class="bool-val">true</span>, <span class="bool-val">false</span>) =&gt; <span class="ident">Decimal::MIN</span>,
-        (<span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; <span class="ident">Decimal::MIN</span>,
-        (<span class="bool-val">false</span>, <span class="bool-val">false</span>) =&gt; <span class="ident">Decimal::MAX</span>,
+<span class="comment">// Used by saturating multiplications.
+//
+// If the `a` and `b` combination represents a XNOR bit operation, returns MAX. Otherwise,
+// returns MIN.
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">const fn </span>if_xnor_then_max(a: <span class="kw-2">&amp;</span>Decimal, b: <span class="kw-2">&amp;</span>Decimal) -&gt; Decimal {
+    <span class="kw">match </span>(a.is_sign_positive(), b.is_sign_positive()) {
+        (<span class="bool-val">true</span>, <span class="bool-val">true</span>) =&gt; Decimal::MAX,
+        (<span class="bool-val">true</span>, <span class="bool-val">false</span>) =&gt; Decimal::MIN,
+        (<span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; Decimal::MIN,
+        (<span class="bool-val">false</span>, <span class="bool-val">false</span>) =&gt; Decimal::MAX,
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Decimal</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">crate</span>::Decimal;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">checked_methods_have_correct_output</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">Decimal::MAX</span>.<span class="ident">checked_add</span>(<span class="ident">Decimal::MAX</span>), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Decimal::MAX</span>.<span class="ident">checked_add</span>(<span class="ident">Decimal::MIN</span>), <span class="prelude-val">Some</span>(<span class="ident">Decimal::ZERO</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">Decimal::MAX</span>.<span class="ident">checked_div</span>(<span class="ident">Decimal::ZERO</span>), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Decimal::MAX</span>.<span class="ident">checked_mul</span>(<span class="ident">Decimal::MAX</span>), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Decimal::MAX</span>.<span class="ident">checked_mul</span>(<span class="ident">Decimal::MIN</span>), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Decimal::MAX</span>.<span class="ident">checked_rem</span>(<span class="ident">Decimal::ZERO</span>), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Decimal::MAX</span>.<span class="ident">checked_sub</span>(<span class="ident">Decimal::MAX</span>), <span class="prelude-val">Some</span>(<span class="ident">Decimal::ZERO</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">Decimal::MAX</span>.<span class="ident">checked_sub</span>(<span class="ident">Decimal::MIN</span>), <span class="prelude-val">None</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>checked_methods_have_correct_output() {
+        <span class="macro">assert_eq!</span>(Decimal::MAX.checked_add(Decimal::MAX), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(Decimal::MAX.checked_add(Decimal::MIN), <span class="prelude-val">Some</span>(Decimal::ZERO));
+        <span class="macro">assert_eq!</span>(Decimal::MAX.checked_div(Decimal::ZERO), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(Decimal::MAX.checked_mul(Decimal::MAX), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(Decimal::MAX.checked_mul(Decimal::MIN), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(Decimal::MAX.checked_rem(Decimal::ZERO), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(Decimal::MAX.checked_sub(Decimal::MAX), <span class="prelude-val">Some</span>(Decimal::ZERO));
+        <span class="macro">assert_eq!</span>(Decimal::MAX.checked_sub(Decimal::MIN), <span class="prelude-val">None</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">Decimal::MIN</span>.<span class="ident">checked_add</span>(<span class="ident">Decimal::MAX</span>), <span class="prelude-val">Some</span>(<span class="ident">Decimal::ZERO</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">Decimal::MIN</span>.<span class="ident">checked_add</span>(<span class="ident">Decimal::MIN</span>), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Decimal::MIN</span>.<span class="ident">checked_div</span>(<span class="ident">Decimal::ZERO</span>), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Decimal::MIN</span>.<span class="ident">checked_mul</span>(<span class="ident">Decimal::MAX</span>), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Decimal::MIN</span>.<span class="ident">checked_mul</span>(<span class="ident">Decimal::MIN</span>), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Decimal::MIN</span>.<span class="ident">checked_rem</span>(<span class="ident">Decimal::ZERO</span>), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Decimal::MIN</span>.<span class="ident">checked_sub</span>(<span class="ident">Decimal::MAX</span>), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Decimal::MIN</span>.<span class="ident">checked_sub</span>(<span class="ident">Decimal::MIN</span>), <span class="prelude-val">Some</span>(<span class="ident">Decimal::ZERO</span>));
+        <span class="macro">assert_eq!</span>(Decimal::MIN.checked_add(Decimal::MAX), <span class="prelude-val">Some</span>(Decimal::ZERO));
+        <span class="macro">assert_eq!</span>(Decimal::MIN.checked_add(Decimal::MIN), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(Decimal::MIN.checked_div(Decimal::ZERO), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(Decimal::MIN.checked_mul(Decimal::MAX), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(Decimal::MIN.checked_mul(Decimal::MIN), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(Decimal::MIN.checked_rem(Decimal::ZERO), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(Decimal::MIN.checked_sub(Decimal::MAX), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(Decimal::MIN.checked_sub(Decimal::MIN), <span class="prelude-val">Some</span>(Decimal::ZERO));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">saturated_methods_have_correct_output</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">Decimal::MAX</span>.<span class="ident">saturating_add</span>(<span class="ident">Decimal::MAX</span>), <span class="ident">Decimal::MAX</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Decimal::MAX</span>.<span class="ident">saturating_add</span>(<span class="ident">Decimal::MIN</span>), <span class="ident">Decimal::ZERO</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Decimal::MAX</span>.<span class="ident">saturating_mul</span>(<span class="ident">Decimal::MAX</span>), <span class="ident">Decimal::MAX</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Decimal::MAX</span>.<span class="ident">saturating_mul</span>(<span class="ident">Decimal::MIN</span>), <span class="ident">Decimal::MIN</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Decimal::MAX</span>.<span class="ident">saturating_sub</span>(<span class="ident">Decimal::MAX</span>), <span class="ident">Decimal::ZERO</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Decimal::MAX</span>.<span class="ident">saturating_sub</span>(<span class="ident">Decimal::MIN</span>), <span class="ident">Decimal::MAX</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>saturated_methods_have_correct_output() {
+        <span class="macro">assert_eq!</span>(Decimal::MAX.saturating_add(Decimal::MAX), Decimal::MAX);
+        <span class="macro">assert_eq!</span>(Decimal::MAX.saturating_add(Decimal::MIN), Decimal::ZERO);
+        <span class="macro">assert_eq!</span>(Decimal::MAX.saturating_mul(Decimal::MAX), Decimal::MAX);
+        <span class="macro">assert_eq!</span>(Decimal::MAX.saturating_mul(Decimal::MIN), Decimal::MIN);
+        <span class="macro">assert_eq!</span>(Decimal::MAX.saturating_sub(Decimal::MAX), Decimal::ZERO);
+        <span class="macro">assert_eq!</span>(Decimal::MAX.saturating_sub(Decimal::MIN), Decimal::MAX);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">Decimal::MIN</span>.<span class="ident">saturating_add</span>(<span class="ident">Decimal::MAX</span>), <span class="ident">Decimal::ZERO</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Decimal::MIN</span>.<span class="ident">saturating_add</span>(<span class="ident">Decimal::MIN</span>), <span class="ident">Decimal::MIN</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Decimal::MIN</span>.<span class="ident">saturating_mul</span>(<span class="ident">Decimal::MAX</span>), <span class="ident">Decimal::MIN</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Decimal::MIN</span>.<span class="ident">saturating_mul</span>(<span class="ident">Decimal::MIN</span>), <span class="ident">Decimal::MAX</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Decimal::MIN</span>.<span class="ident">saturating_sub</span>(<span class="ident">Decimal::MAX</span>), <span class="ident">Decimal::MIN</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Decimal::MIN</span>.<span class="ident">saturating_sub</span>(<span class="ident">Decimal::MIN</span>), <span class="ident">Decimal::ZERO</span>);
+        <span class="macro">assert_eq!</span>(Decimal::MIN.saturating_add(Decimal::MAX), Decimal::ZERO);
+        <span class="macro">assert_eq!</span>(Decimal::MIN.saturating_add(Decimal::MIN), Decimal::MIN);
+        <span class="macro">assert_eq!</span>(Decimal::MIN.saturating_mul(Decimal::MAX), Decimal::MIN);
+        <span class="macro">assert_eq!</span>(Decimal::MIN.saturating_mul(Decimal::MIN), Decimal::MAX);
+        <span class="macro">assert_eq!</span>(Decimal::MIN.saturating_sub(Decimal::MAX), Decimal::MIN);
+        <span class="macro">assert_eq!</span>(Decimal::MIN.saturating_sub(Decimal::MIN), Decimal::ZERO);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rust_decimal" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rust_decimal" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

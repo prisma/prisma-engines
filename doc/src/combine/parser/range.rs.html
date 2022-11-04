@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/combine-3.8.1/src/parser/range.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>range.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../combine/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/combine-3.8.1/src/parser/range.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>range.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../combine/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -695,500 +695,500 @@
 <span id="695">695</span>
 <span id="696">696</span>
 <span id="697">697</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Module containing zero-copy parsers.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! These parsers require the [`RangeStream`][] bound instead of a plain [`Stream`][].</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`RangeStream`]: ../../stream/trait.RangeStream.html</span>
-<span class="doccomment">//! [`Stream`]: ../../stream/trait.Stream.html</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Module containing zero-copy parsers.
+//!
+//! These parsers require the [`RangeStream`][] bound instead of a plain [`Stream`][].
+//!
+//! [`RangeStream`]: ../../stream/trait.RangeStream.html
+//! [`Stream`]: ../../stream/trait.Stream.html
 
-<span class="kw">use</span> <span class="ident">lib::marker::PhantomData</span>;
+</span><span class="kw">use </span>lib::marker::PhantomData;
 
-<span class="kw">use</span> <span class="ident">error::FastResult</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">error</span>::{<span class="ident">ConsumedResult</span>, <span class="ident">Info</span>, <span class="ident">ParseError</span>, <span class="ident">StreamError</span>, <span class="ident">Tracked</span>};
-<span class="kw">use</span> <span class="ident">parser::ParseMode</span>;
-<span class="kw">use</span> <span class="ident">stream</span>::{
-    <span class="ident">uncons_range</span>, <span class="ident">uncons_while</span>, <span class="ident">uncons_while1</span>, <span class="ident">wrap_stream_error</span>, <span class="ident">FullRangeStream</span>,
-    <span class="ident">Range</span> <span class="kw">as</span> <span class="ident">StreamRange</span>, <span class="ident">RangeStream</span>, <span class="ident">RangeStreamOnce</span>, <span class="ident">Resetable</span>, <span class="ident">StreamOnce</span>,
+<span class="kw">use </span>error::FastResult::<span class="kw-2">*</span>;
+<span class="kw">use </span>error::{ConsumedResult, Info, ParseError, StreamError, Tracked};
+<span class="kw">use </span>parser::ParseMode;
+<span class="kw">use </span>stream::{
+    uncons_range, uncons_while, uncons_while1, wrap_stream_error, FullRangeStream,
+    Range <span class="kw">as </span>StreamRange, RangeStream, RangeStreamOnce, Resetable, StreamOnce,
 };
-<span class="kw">use</span> <span class="ident">Parser</span>;
+<span class="kw">use </span>Parser;
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">I::Range</span>)
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">RangeStream</span>;
+<span class="kw">pub struct </span>Range&lt;I&gt;(I::Range)
+<span class="kw">where
+    </span>I: RangeStream;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">RangeStream</span>,
-    <span class="ident">I::Range</span>: <span class="ident">PartialEq</span> <span class="op">+</span> <span class="ident">::stream::Range</span>,
+<span class="kw">impl</span>&lt;I&gt; Parser <span class="kw">for </span>Range&lt;I&gt;
+<span class="kw">where
+    </span>I: RangeStream,
+    I::Range: PartialEq + ::stream::Range,
 {
-    <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">I::Range</span>;
-    <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ();
+    <span class="kw">type </span>Input = I;
+    <span class="kw">type </span>Output = I::Range;
+    <span class="kw">type </span>PartialState = ();
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">stream::Range</span>;
-        <span class="kw">let</span> <span class="ident">position</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">position</span>();
-        <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">uncons_range</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">len</span>()) {
-            <span class="prelude-val">Ok</span>(<span class="ident">other</span>) =&gt; {
-                <span class="kw">if</span> <span class="ident">other</span> <span class="op">==</span> <span class="self">self</span>.<span class="number">0</span> {
-                    <span class="ident">ConsumedOk</span>(<span class="ident">other</span>)
-                } <span class="kw">else</span> {
-                    <span class="ident">EmptyErr</span>(<span class="ident">I::Error::empty</span>(<span class="ident">position</span>).<span class="ident">into</span>())
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>parse_lazy(<span class="kw-2">&amp;mut </span><span class="self">self</span>, input: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Input) -&gt; ConsumedResult&lt;<span class="self">Self</span>::Output, <span class="self">Self</span>::Input&gt; {
+        <span class="kw">use </span>stream::Range;
+        <span class="kw">let </span>position = input.position();
+        <span class="kw">match </span>input.uncons_range(<span class="self">self</span>.<span class="number">0</span>.len()) {
+            <span class="prelude-val">Ok</span>(other) =&gt; {
+                <span class="kw">if </span>other == <span class="self">self</span>.<span class="number">0 </span>{
+                    ConsumedOk(other)
+                } <span class="kw">else </span>{
+                    EmptyErr(I::Error::empty(position).into())
                 }
             }
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; <span class="ident">wrap_stream_error</span>(<span class="ident">input</span>, <span class="ident">err</span>),
+            <span class="prelude-val">Err</span>(err) =&gt; wrap_stream_error(input, err),
         }
     }
-    <span class="kw">fn</span> <span class="ident">add_error</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Tracked</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span>) {
-        <span class="comment">// TODO Add unexpected message?</span>
-        <span class="ident">errors</span>.<span class="ident">error</span>.<span class="ident">add_expected</span>(<span class="ident">Info::Range</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">clone</span>()));
+    <span class="kw">fn </span>add_error(<span class="kw-2">&amp;mut </span><span class="self">self</span>, errors: <span class="kw-2">&amp;mut </span>Tracked&lt;&lt;<span class="self">Self</span>::Input <span class="kw">as </span>StreamOnce&gt;::Error&gt;) {
+        <span class="comment">// TODO Add unexpected message?
+        </span>errors.error.add_expected(Info::Range(<span class="self">self</span>.<span class="number">0</span>.clone()));
     }
 }
 
-<span class="macro">parser!</span> {
-    <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Recognize</span>;
-    <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">RecognizeWithValue</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">Parser</span><span class="op">&gt;</span><span class="ident">::PartialState</span>;
-    <span class="doccomment">/// Zero-copy parser which returns consumed input range.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`combinator::recognize`][] is a non-`RangeStream` alternative.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`combinator::recognize`]: ../../parser/combinator/fn.recognize.html</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # extern crate combine;</span>
-    <span class="doccomment">/// # use combine::parser::range::recognize;</span>
-    <span class="doccomment">/// # use combine::parser::char::letter;</span>
-    <span class="doccomment">/// # use combine::*;</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// let mut parser = recognize(skip_many1(letter()));</span>
-    <span class="doccomment">/// assert_eq!(parser.parse(&quot;hello world&quot;), Ok((&quot;hello&quot;, &quot; world&quot;)));</span>
-    <span class="doccomment">/// assert!(parser.parse(&quot;!&quot;).is_err());</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">recognize</span>[<span class="ident">P</span>](<span class="ident">parser</span>: <span class="ident">P</span>)(<span class="ident">P::Input</span>) -&gt; <span class="op">&lt;</span><span class="ident">P::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Range</span>
-    <span class="kw">where</span> [
-        <span class="ident">P</span>: <span class="ident">Parser</span>,
-        <span class="ident">P::Input</span>: <span class="ident">RangeStream</span>,
-        <span class="op">&lt;</span><span class="ident">P::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Range</span>: <span class="ident">::stream::Range</span>,
+<span class="macro">parser! </span>{
+    <span class="attribute">#[derive(Clone)]
+    </span><span class="kw">pub struct </span>Recognize;
+    <span class="kw">type </span>PartialState = &lt;RecognizeWithValue&lt;P&gt; <span class="kw">as </span>Parser&gt;::PartialState;
+    <span class="doccomment">/// Zero-copy parser which returns consumed input range.
+    ///
+    /// [`combinator::recognize`][] is a non-`RangeStream` alternative.
+    ///
+    /// [`combinator::recognize`]: ../../parser/combinator/fn.recognize.html
+    /// ```
+    /// # extern crate combine;
+    /// # use combine::parser::range::recognize;
+    /// # use combine::parser::char::letter;
+    /// # use combine::*;
+    /// # fn main() {
+    /// let mut parser = recognize(skip_many1(letter()));
+    /// assert_eq!(parser.parse(&quot;hello world&quot;), Ok((&quot;hello&quot;, &quot; world&quot;)));
+    /// assert!(parser.parse(&quot;!&quot;).is_err());
+    /// # }
+    /// ```
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub fn </span>recognize[P](parser: P)(P::Input) -&gt; &lt;P::Input <span class="kw">as </span>StreamOnce&gt;::Range
+    <span class="kw">where </span>[
+        P: Parser,
+        P::Input: RangeStream,
+        &lt;P::Input <span class="kw">as </span>StreamOnce&gt;::Range: ::stream::Range,
     ]
     {
-        <span class="ident">recognize_with_value</span>(<span class="ident">parser</span>).<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">range</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">range</span>)
+        recognize_with_value(parser).map(|(range, <span class="kw">_</span>)| range)
     }
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">parse_partial_range</span><span class="op">&lt;</span><span class="ident">M</span>, <span class="ident">F</span>, <span class="ident">G</span>, <span class="ident">S</span>, <span class="ident">I</span><span class="op">&gt;</span>(
-    <span class="ident">mode</span>: <span class="ident">M</span>,
-    <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">I</span>,
-    <span class="ident">distance_state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">usize</span>,
-    <span class="ident">state</span>: <span class="ident">S</span>,
-    <span class="ident">first</span>: <span class="ident">F</span>,
-    <span class="ident">resume</span>: <span class="ident">G</span>,
-) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">I::Range</span>, <span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">M</span>: <span class="ident">ParseMode</span>,
-    <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">I</span>, <span class="ident">S</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">I::Range</span>, <span class="ident">I</span><span class="op">&gt;</span>,
-    <span class="ident">G</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">I</span>, <span class="ident">S</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident">I::Range</span>, <span class="ident">I</span><span class="op">&gt;</span>,
-    <span class="ident">I</span>: <span class="ident">RangeStream</span>,
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>parse_partial_range&lt;M, F, G, S, I&gt;(
+    mode: M,
+    input: <span class="kw-2">&amp;mut </span>I,
+    distance_state: <span class="kw-2">&amp;mut </span>usize,
+    state: S,
+    first: F,
+    resume: G,
+) -&gt; ConsumedResult&lt;I::Range, I&gt;
+<span class="kw">where
+    </span>M: ParseMode,
+    F: FnOnce(<span class="kw-2">&amp;mut </span>I, S) -&gt; ConsumedResult&lt;I::Range, I&gt;,
+    G: FnOnce(<span class="kw-2">&amp;mut </span>I, S) -&gt; ConsumedResult&lt;I::Range, I&gt;,
+    I: RangeStream,
 {
-    <span class="kw">let</span> <span class="ident">before</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">checkpoint</span>();
+    <span class="kw">let </span>before = input.checkpoint();
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">input</span>.<span class="ident">is_partial</span>() {
-        <span class="ident">first</span>(<span class="ident">input</span>, <span class="ident">state</span>)
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">mode</span>.<span class="ident">is_first</span>() <span class="op">|</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">distance_state</span> <span class="op">==</span> <span class="number">0</span> {
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">first</span>(<span class="ident">input</span>, <span class="ident">state</span>);
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ConsumedErr</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="ident">result</span> {
-            <span class="kw-2">*</span><span class="ident">distance_state</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">distance</span>(<span class="kw-2">&amp;</span><span class="ident">before</span>);
-            <span class="ident">input</span>.<span class="ident">reset</span>(<span class="ident">before</span>);
+    <span class="kw">if </span>!input.is_partial() {
+        first(input, state)
+    } <span class="kw">else if </span>mode.is_first() || <span class="kw-2">*</span>distance_state == <span class="number">0 </span>{
+        <span class="kw">let </span>result = first(input, state);
+        <span class="kw">if let </span>ConsumedErr(<span class="kw">_</span>) = result {
+            <span class="kw-2">*</span>distance_state = input.distance(<span class="kw-2">&amp;</span>before);
+            input.reset(before);
         }
-        <span class="ident">result</span>
-    } <span class="kw">else</span> {
-        <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">uncons_range</span>(<span class="kw-2">*</span><span class="ident">distance_state</span>).<span class="ident">is_err</span>() {
+        result
+    } <span class="kw">else </span>{
+        <span class="kw">if </span>input.uncons_range(<span class="kw-2">*</span>distance_state).is_err() {
             <span class="macro">panic!</span>(<span class="string">&quot;recognize errored when restoring the input stream to its expected state&quot;</span>);
         }
 
-        <span class="kw">match</span> <span class="ident">resume</span>(<span class="ident">input</span>, <span class="ident">state</span>) {
-            <span class="ident">ConsumedOk</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">EmptyOk</span>(<span class="kw">_</span>) =&gt; (),
-            <span class="ident">EmptyErr</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="ident">EmptyErr</span>(<span class="ident">err</span>),
-            <span class="ident">ConsumedErr</span>(<span class="ident">err</span>) =&gt; {
-                <span class="kw-2">*</span><span class="ident">distance_state</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">distance</span>(<span class="kw-2">&amp;</span><span class="ident">before</span>);
-                <span class="ident">input</span>.<span class="ident">reset</span>(<span class="ident">before</span>);
-                <span class="kw">return</span> <span class="ident">ConsumedErr</span>(<span class="ident">err</span>);
+        <span class="kw">match </span>resume(input, state) {
+            ConsumedOk(<span class="kw">_</span>) | EmptyOk(<span class="kw">_</span>) =&gt; (),
+            EmptyErr(err) =&gt; <span class="kw">return </span>EmptyErr(err),
+            ConsumedErr(err) =&gt; {
+                <span class="kw-2">*</span>distance_state = input.distance(<span class="kw-2">&amp;</span>before);
+                input.reset(before);
+                <span class="kw">return </span>ConsumedErr(err);
             }
         }
 
-        <span class="kw">let</span> <span class="ident">distance</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">distance</span>(<span class="kw-2">&amp;</span><span class="ident">before</span>);
-        <span class="ident">input</span>.<span class="ident">reset</span>(<span class="ident">before</span>);
-        <span class="ident">take</span>(<span class="ident">distance</span>).<span class="ident">parse_lazy</span>(<span class="ident">input</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">range</span><span class="op">|</span> {
-            <span class="kw-2">*</span><span class="ident">distance_state</span> <span class="op">=</span> <span class="number">0</span>;
-            <span class="ident">range</span>
+        <span class="kw">let </span>distance = input.distance(<span class="kw-2">&amp;</span>before);
+        input.reset(before);
+        take(distance).parse_lazy(input).map(|range| {
+            <span class="kw-2">*</span>distance_state = <span class="number">0</span>;
+            range
         })
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RecognizeWithValue</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="ident">P</span>);
+<span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub struct </span>RecognizeWithValue&lt;P&gt;(P);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">RecognizeWithValue</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">Parser</span>,
-    <span class="ident">P::Input</span>: <span class="ident">RangeStream</span>,
-    <span class="op">&lt;</span><span class="ident">P::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Range</span>: <span class="ident">::stream::Range</span>,
+<span class="kw">impl</span>&lt;P&gt; Parser <span class="kw">for </span>RecognizeWithValue&lt;P&gt;
+<span class="kw">where
+    </span>P: Parser,
+    P::Input: RangeStream,
+    &lt;P::Input <span class="kw">as </span>StreamOnce&gt;::Range: ::stream::Range,
 {
-    <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">P::Input</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> (<span class="op">&lt;</span><span class="ident">P::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Range</span>, <span class="ident">P::Output</span>);
-    <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> (<span class="ident">usize</span>, <span class="ident">P::PartialState</span>);
+    <span class="kw">type </span>Input = P::Input;
+    <span class="kw">type </span>Output = (&lt;P::Input <span class="kw">as </span>StreamOnce&gt;::Range, P::Output);
+    <span class="kw">type </span>PartialState = (usize, P::PartialState);
 
     <span class="macro">parse_mode!</span>();
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_mode</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">mode</span>: <span class="ident">M</span>,
-        <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
-        <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-    ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">M</span>: <span class="ident">ParseMode</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>parse_mode&lt;M&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        mode: M,
+        input: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Input,
+        state: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::PartialState,
+    ) -&gt; ConsumedResult&lt;<span class="self">Self</span>::Output, <span class="self">Self</span>::Input&gt;
+    <span class="kw">where
+        </span>M: ParseMode,
     {
-        <span class="kw">let</span> (<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">distance_state</span>, <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">child_state</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">state</span>;
+        <span class="kw">let </span>(<span class="kw-2">ref mut </span>distance_state, <span class="kw-2">ref mut </span>child_state) = <span class="kw-2">*</span>state;
 
-        <span class="kw">let</span> <span class="ident">before</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">checkpoint</span>();
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">mode</span>.<span class="ident">is_first</span>() {
-            <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">uncons_range</span>(<span class="kw-2">*</span><span class="ident">distance_state</span>).<span class="ident">is_err</span>() {
+        <span class="kw">let </span>before = input.checkpoint();
+        <span class="kw">if </span>!mode.is_first() {
+            <span class="kw">if </span>input.uncons_range(<span class="kw-2">*</span>distance_state).is_err() {
                 <span class="macro">panic!</span>(<span class="string">&quot;recognize errored when restoring the input stream to its expected state&quot;</span>);
             }
         }
 
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">parse_mode</span>(<span class="ident">mode</span>, <span class="ident">input</span>, <span class="ident">child_state</span>) {
-            <span class="ident">ConsumedOk</span>(<span class="ident">x</span>) <span class="op">|</span> <span class="ident">EmptyOk</span>(<span class="ident">x</span>) =&gt; <span class="ident">x</span>,
-            <span class="ident">EmptyErr</span>(<span class="ident">err</span>) =&gt; <span class="kw">return</span> <span class="ident">EmptyErr</span>(<span class="ident">err</span>),
-            <span class="ident">ConsumedErr</span>(<span class="ident">err</span>) =&gt; {
-                <span class="kw-2">*</span><span class="ident">distance_state</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">distance</span>(<span class="kw-2">&amp;</span><span class="ident">before</span>);
-                <span class="ident">input</span>.<span class="ident">reset</span>(<span class="ident">before</span>);
-                <span class="kw">return</span> <span class="ident">ConsumedErr</span>(<span class="ident">err</span>);
+        <span class="kw">let </span>value = <span class="kw">match </span><span class="self">self</span>.<span class="number">0</span>.parse_mode(mode, input, child_state) {
+            ConsumedOk(x) | EmptyOk(x) =&gt; x,
+            EmptyErr(err) =&gt; <span class="kw">return </span>EmptyErr(err),
+            ConsumedErr(err) =&gt; {
+                <span class="kw-2">*</span>distance_state = input.distance(<span class="kw-2">&amp;</span>before);
+                input.reset(before);
+                <span class="kw">return </span>ConsumedErr(err);
             }
         };
 
-        <span class="kw">let</span> <span class="ident">distance</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">distance</span>(<span class="kw-2">&amp;</span><span class="ident">before</span>);
-        <span class="ident">input</span>.<span class="ident">reset</span>(<span class="ident">before</span>);
-        <span class="ident">take</span>(<span class="ident">distance</span>).<span class="ident">parse_lazy</span>(<span class="ident">input</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">range</span><span class="op">|</span> {
-            <span class="kw-2">*</span><span class="ident">distance_state</span> <span class="op">=</span> <span class="number">0</span>;
-            (<span class="ident">range</span>, <span class="ident">value</span>)
+        <span class="kw">let </span>distance = input.distance(<span class="kw-2">&amp;</span>before);
+        input.reset(before);
+        take(distance).parse_lazy(input).map(|range| {
+            <span class="kw-2">*</span>distance_state = <span class="number">0</span>;
+            (range, value)
         })
     }
-    <span class="kw">fn</span> <span class="ident">add_error</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Tracked</span><span class="op">&lt;</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Error</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">add_error</span>(<span class="ident">errors</span>)
+    <span class="kw">fn </span>add_error(<span class="kw-2">&amp;mut </span><span class="self">self</span>, errors: <span class="kw-2">&amp;mut </span>Tracked&lt;&lt;<span class="self">Self</span>::Input <span class="kw">as </span>StreamOnce&gt;::Error&gt;) {
+        <span class="self">self</span>.<span class="number">0</span>.add_error(errors)
     }
 }
 
-<span class="doccomment">/// Zero-copy parser which returns a pair: (consumed input range, parsed value).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`combinator::recognize_with_value`][] is a non-`RangeStream` alternative.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`combinator::recognize_with_value`]: ../../parser/combinator/fn.recognize_with_value.html</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # extern crate combine;</span>
-<span class="doccomment">/// # use combine::parser::range::recognize_with_value;</span>
-<span class="doccomment">/// # use combine::parser::char::{digit, char};</span>
-<span class="doccomment">/// # use combine::*;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// let mut parser = recognize_with_value((</span>
-<span class="doccomment">///     skip_many1(digit()),</span>
-<span class="doccomment">///     optional((attempt(char(&#39;.&#39;)), skip_many1(digit()))),</span>
-<span class="doccomment">/// ).map(|(_, opt)| opt.is_some()));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(parser.parse(&quot;1234!&quot;), Ok(((&quot;1234&quot;, false), &quot;!&quot;)));</span>
-<span class="doccomment">/// assert_eq!(parser.parse(&quot;1234.0001!&quot;), Ok(((&quot;1234.0001&quot;, true), &quot;!&quot;)));</span>
-<span class="doccomment">/// assert!(parser.parse(&quot;!&quot;).is_err());</span>
-<span class="doccomment">/// assert!(parser.parse(&quot;1234.&quot;).is_err());</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">recognize_with_value</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>(<span class="ident">parser</span>: <span class="ident">P</span>) -&gt; <span class="ident">RecognizeWithValue</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">Parser</span>,
-    <span class="ident">P::Input</span>: <span class="ident">RangeStream</span>,
-    <span class="op">&lt;</span><span class="ident">P::Input</span> <span class="kw">as</span> <span class="ident">StreamOnce</span><span class="op">&gt;</span><span class="ident">::Range</span>: <span class="ident">::stream::Range</span>,
+<span class="doccomment">/// Zero-copy parser which returns a pair: (consumed input range, parsed value).
+///
+///
+/// [`combinator::recognize_with_value`][] is a non-`RangeStream` alternative.
+///
+/// [`combinator::recognize_with_value`]: ../../parser/combinator/fn.recognize_with_value.html
+/// ```
+/// # extern crate combine;
+/// # use combine::parser::range::recognize_with_value;
+/// # use combine::parser::char::{digit, char};
+/// # use combine::*;
+/// # fn main() {
+/// let mut parser = recognize_with_value((
+///     skip_many1(digit()),
+///     optional((attempt(char(&#39;.&#39;)), skip_many1(digit()))),
+/// ).map(|(_, opt)| opt.is_some()));
+///
+/// assert_eq!(parser.parse(&quot;1234!&quot;), Ok(((&quot;1234&quot;, false), &quot;!&quot;)));
+/// assert_eq!(parser.parse(&quot;1234.0001!&quot;), Ok(((&quot;1234.0001&quot;, true), &quot;!&quot;)));
+/// assert!(parser.parse(&quot;!&quot;).is_err());
+/// assert!(parser.parse(&quot;1234.&quot;).is_err());
+/// # }
+/// ```
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>recognize_with_value&lt;P&gt;(parser: P) -&gt; RecognizeWithValue&lt;P&gt;
+<span class="kw">where
+    </span>P: Parser,
+    P::Input: RangeStream,
+    &lt;P::Input <span class="kw">as </span>StreamOnce&gt;::Range: ::stream::Range,
 {
-    <span class="ident">RecognizeWithValue</span>(<span class="ident">parser</span>)
+    RecognizeWithValue(parser)
 }
 
-<span class="doccomment">/// Zero-copy parser which reads a range of length `i.len()` and succeeds if `i` is equal to that</span>
-<span class="doccomment">/// range.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`tokens2`][] is a non-`RangeStream` alternative.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`tokens2`]: ../../parser/item/fn.tokens2.html</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # extern crate combine;</span>
-<span class="doccomment">/// # use combine::parser::range::range;</span>
-<span class="doccomment">/// # use combine::*;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// let mut parser = range(&quot;hello&quot;);</span>
-<span class="doccomment">/// let result = parser.parse(&quot;hello world&quot;);</span>
-<span class="doccomment">/// assert_eq!(result, Ok((&quot;hello&quot;, &quot; world&quot;)));</span>
-<span class="doccomment">/// let result = parser.parse(&quot;hel world&quot;);</span>
-<span class="doccomment">/// assert!(result.is_err());</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">range</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">i</span>: <span class="ident">I::Range</span>) -&gt; <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">RangeStream</span>,
-    <span class="ident">I::Range</span>: <span class="ident">PartialEq</span>,
+<span class="doccomment">/// Zero-copy parser which reads a range of length `i.len()` and succeeds if `i` is equal to that
+/// range.
+///
+/// [`tokens2`][] is a non-`RangeStream` alternative.
+///
+/// [`tokens2`]: ../../parser/item/fn.tokens2.html
+/// ```
+/// # extern crate combine;
+/// # use combine::parser::range::range;
+/// # use combine::*;
+/// # fn main() {
+/// let mut parser = range(&quot;hello&quot;);
+/// let result = parser.parse(&quot;hello world&quot;);
+/// assert_eq!(result, Ok((&quot;hello&quot;, &quot; world&quot;)));
+/// let result = parser.parse(&quot;hel world&quot;);
+/// assert!(result.is_err());
+/// # }
+/// ```
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>range&lt;I&gt;(i: I::Range) -&gt; Range&lt;I&gt;
+<span class="kw">where
+    </span>I: RangeStream,
+    I::Range: PartialEq,
 {
-    <span class="ident">Range</span>(<span class="ident">i</span>)
+    Range(i)
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Take</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">usize</span>, <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">I</span>) -&gt; <span class="ident">I</span><span class="op">&gt;</span>);
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">Take</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">RangeStream</span>,
+<span class="kw">pub struct </span>Take&lt;I&gt;(usize, PhantomData&lt;<span class="kw">fn</span>(I) -&gt; I&gt;);
+<span class="kw">impl</span>&lt;I&gt; Parser <span class="kw">for </span>Take&lt;I&gt;
+<span class="kw">where
+    </span>I: RangeStream,
 {
-    <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">I::Range</span>;
-    <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> ();
+    <span class="kw">type </span>Input = I;
+    <span class="kw">type </span>Output = I::Range;
+    <span class="kw">type </span>PartialState = ();
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_lazy</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Input</span>) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
-        <span class="ident">uncons_range</span>(<span class="ident">input</span>, <span class="self">self</span>.<span class="number">0</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>parse_lazy(<span class="kw-2">&amp;mut </span><span class="self">self</span>, input: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Input) -&gt; ConsumedResult&lt;<span class="self">Self</span>::Output, <span class="self">Self</span>::Input&gt; {
+        uncons_range(input, <span class="self">self</span>.<span class="number">0</span>)
     }
 }
 
-<span class="doccomment">/// Zero-copy parser which reads a range of length `n`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`count_min_max`][] is a non-`RangeStream` alternative.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`count_min_max`]: ../../parser/repeat/fn.count_min_max.html</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # extern crate combine;</span>
-<span class="doccomment">/// # use combine::parser::range::take;</span>
-<span class="doccomment">/// # use combine::*;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// let mut parser = take(1);</span>
-<span class="doccomment">/// let result = parser.parse(&quot;1&quot;);</span>
-<span class="doccomment">/// assert_eq!(result, Ok((&quot;1&quot;, &quot;&quot;)));</span>
-<span class="doccomment">/// let mut parser = take(4);</span>
-<span class="doccomment">/// let result = parser.parse(&quot;123abc&quot;);</span>
-<span class="doccomment">/// assert_eq!(result, Ok((&quot;123a&quot;, &quot;bc&quot;)));</span>
-<span class="doccomment">/// let result = parser.parse(&quot;abc&quot;);</span>
-<span class="doccomment">/// assert!(result.is_err());</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Take</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">RangeStream</span>,
+<span class="doccomment">/// Zero-copy parser which reads a range of length `n`.
+///
+/// [`count_min_max`][] is a non-`RangeStream` alternative.
+///
+/// [`count_min_max`]: ../../parser/repeat/fn.count_min_max.html
+/// ```
+/// # extern crate combine;
+/// # use combine::parser::range::take;
+/// # use combine::*;
+/// # fn main() {
+/// let mut parser = take(1);
+/// let result = parser.parse(&quot;1&quot;);
+/// assert_eq!(result, Ok((&quot;1&quot;, &quot;&quot;)));
+/// let mut parser = take(4);
+/// let result = parser.parse(&quot;123abc&quot;);
+/// assert_eq!(result, Ok((&quot;123a&quot;, &quot;bc&quot;)));
+/// let result = parser.parse(&quot;abc&quot;);
+/// assert!(result.is_err());
+/// # }
+/// ```
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>take&lt;I&gt;(n: usize) -&gt; Take&lt;I&gt;
+<span class="kw">where
+    </span>I: RangeStream,
 {
-    <span class="ident">Take</span>(<span class="ident">n</span>, <span class="ident">PhantomData</span>)
+    Take(n, PhantomData)
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TakeWhile</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">F</span>, <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">I</span>) -&gt; <span class="ident">I</span><span class="op">&gt;</span>);
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">TakeWhile</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">RangeStream</span>,
-    <span class="ident">I::Range</span>: <span class="ident">::stream::Range</span>,
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">I::Item</span>) -&gt; <span class="ident">bool</span>,
+<span class="kw">pub struct </span>TakeWhile&lt;I, F&gt;(F, PhantomData&lt;<span class="kw">fn</span>(I) -&gt; I&gt;);
+<span class="kw">impl</span>&lt;I, F&gt; Parser <span class="kw">for </span>TakeWhile&lt;I, F&gt;
+<span class="kw">where
+    </span>I: RangeStream,
+    I::Range: ::stream::Range,
+    F: FnMut(I::Item) -&gt; bool,
 {
-    <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">I::Range</span>;
-    <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> <span class="ident">usize</span>;
+    <span class="kw">type </span>Input = I;
+    <span class="kw">type </span>Output = I::Range;
+    <span class="kw">type </span>PartialState = usize;
 
     <span class="macro">parse_mode!</span>();
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_mode_impl</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">mode</span>: <span class="ident">M</span>,
-        <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
-        <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-    ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">M</span>: <span class="ident">ParseMode</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>parse_mode_impl&lt;M&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        mode: M,
+        input: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Input,
+        state: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::PartialState,
+    ) -&gt; ConsumedResult&lt;<span class="self">Self</span>::Output, <span class="self">Self</span>::Input&gt;
+    <span class="kw">where
+        </span>M: ParseMode,
     {
-        <span class="ident">parse_partial_range</span>(
-            <span class="ident">mode</span>,
-            <span class="ident">input</span>,
-            <span class="ident">state</span>,
-            <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="number">0</span>,
-            <span class="op">|</span><span class="ident">input</span>, <span class="ident">predicate</span><span class="op">|</span> <span class="ident">uncons_while</span>(<span class="ident">input</span>, <span class="ident">predicate</span>),
-            <span class="op">|</span><span class="ident">input</span>, <span class="ident">predicate</span><span class="op">|</span> <span class="ident">uncons_while</span>(<span class="ident">input</span>, <span class="ident">predicate</span>),
+        parse_partial_range(
+            mode,
+            input,
+            state,
+            <span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0</span>,
+            |input, predicate| uncons_while(input, predicate),
+            |input, predicate| uncons_while(input, predicate),
         )
     }
 }
 
-<span class="doccomment">/// Zero-copy parser which reads a range of 0 or more tokens which satisfy `f`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`many`][] is a non-`RangeStream` alternative.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`many`]: ../../parser/repeat/fn.many.html</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # extern crate combine;</span>
-<span class="doccomment">/// # use combine::parser::range::take_while;</span>
-<span class="doccomment">/// # use combine::*;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// let mut parser = take_while(|c: char| c.is_digit(10));</span>
-<span class="doccomment">/// let result = parser.parse(&quot;123abc&quot;);</span>
-<span class="doccomment">/// assert_eq!(result, Ok((&quot;123&quot;, &quot;abc&quot;)));</span>
-<span class="doccomment">/// let result = parser.parse(&quot;abc&quot;);</span>
-<span class="doccomment">/// assert_eq!(result, Ok((&quot;&quot;, &quot;abc&quot;)));</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_while</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">TakeWhile</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">RangeStream</span>,
-    <span class="ident">I::Range</span>: <span class="ident">::stream::Range</span>,
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">I::Item</span>) -&gt; <span class="ident">bool</span>,
+<span class="doccomment">/// Zero-copy parser which reads a range of 0 or more tokens which satisfy `f`.
+///
+/// [`many`][] is a non-`RangeStream` alternative.
+///
+/// [`many`]: ../../parser/repeat/fn.many.html
+/// ```
+/// # extern crate combine;
+/// # use combine::parser::range::take_while;
+/// # use combine::*;
+/// # fn main() {
+/// let mut parser = take_while(|c: char| c.is_digit(10));
+/// let result = parser.parse(&quot;123abc&quot;);
+/// assert_eq!(result, Ok((&quot;123&quot;, &quot;abc&quot;)));
+/// let result = parser.parse(&quot;abc&quot;);
+/// assert_eq!(result, Ok((&quot;&quot;, &quot;abc&quot;)));
+/// # }
+/// ```
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>take_while&lt;I, F&gt;(f: F) -&gt; TakeWhile&lt;I, F&gt;
+<span class="kw">where
+    </span>I: RangeStream,
+    I::Range: ::stream::Range,
+    F: FnMut(I::Item) -&gt; bool,
 {
-    <span class="ident">TakeWhile</span>(<span class="ident">f</span>, <span class="ident">PhantomData</span>)
+    TakeWhile(f, PhantomData)
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TakeWhile1</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">F</span>, <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">I</span>) -&gt; <span class="ident">I</span><span class="op">&gt;</span>);
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">TakeWhile1</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">RangeStream</span>,
-    <span class="ident">I::Range</span>: <span class="ident">::stream::Range</span>,
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">I::Item</span>) -&gt; <span class="ident">bool</span>,
+<span class="kw">pub struct </span>TakeWhile1&lt;I, F&gt;(F, PhantomData&lt;<span class="kw">fn</span>(I) -&gt; I&gt;);
+<span class="kw">impl</span>&lt;I, F&gt; Parser <span class="kw">for </span>TakeWhile1&lt;I, F&gt;
+<span class="kw">where
+    </span>I: RangeStream,
+    I::Range: ::stream::Range,
+    F: FnMut(I::Item) -&gt; bool,
 {
-    <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">I::Range</span>;
-    <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> <span class="ident">usize</span>;
+    <span class="kw">type </span>Input = I;
+    <span class="kw">type </span>Output = I::Range;
+    <span class="kw">type </span>PartialState = usize;
 
     <span class="macro">parse_mode!</span>();
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_mode_impl</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">mode</span>: <span class="ident">M</span>,
-        <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
-        <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-    ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">M</span>: <span class="ident">ParseMode</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>parse_mode_impl&lt;M&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        mode: M,
+        input: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Input,
+        state: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::PartialState,
+    ) -&gt; ConsumedResult&lt;<span class="self">Self</span>::Output, <span class="self">Self</span>::Input&gt;
+    <span class="kw">where
+        </span>M: ParseMode,
     {
-        <span class="ident">parse_partial_range</span>(
-            <span class="ident">mode</span>,
-            <span class="ident">input</span>,
-            <span class="ident">state</span>,
-            <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="number">0</span>,
-            <span class="op">|</span><span class="ident">input</span>, <span class="ident">predicate</span><span class="op">|</span> <span class="ident">uncons_while1</span>(<span class="ident">input</span>, <span class="ident">predicate</span>),
-            <span class="op">|</span><span class="ident">input</span>, <span class="ident">predicate</span><span class="op">|</span> <span class="ident">uncons_while</span>(<span class="ident">input</span>, <span class="ident">predicate</span>),
+        parse_partial_range(
+            mode,
+            input,
+            state,
+            <span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0</span>,
+            |input, predicate| uncons_while1(input, predicate),
+            |input, predicate| uncons_while(input, predicate),
         )
     }
 }
 
-<span class="doccomment">/// Zero-copy parser which reads a range of 1 or more tokens which satisfy `f`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`many1`][] is a non-`RangeStream` alternative.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`many1`]: ../../parser/repeat/fn.many1.html</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # extern crate combine;</span>
-<span class="doccomment">/// # use combine::parser::range::take_while1;</span>
-<span class="doccomment">/// # use combine::*;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// let mut parser = take_while1(|c: char| c.is_digit(10));</span>
-<span class="doccomment">/// let result = parser.parse(&quot;123abc&quot;);</span>
-<span class="doccomment">/// assert_eq!(result, Ok((&quot;123&quot;, &quot;abc&quot;)));</span>
-<span class="doccomment">/// let result = parser.parse(&quot;abc&quot;);</span>
-<span class="doccomment">/// assert!(result.is_err());</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_while1</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">TakeWhile1</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">F</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">RangeStream</span>,
-    <span class="ident">I::Range</span>: <span class="ident">::stream::Range</span>,
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">I::Item</span>) -&gt; <span class="ident">bool</span>,
+<span class="doccomment">/// Zero-copy parser which reads a range of 1 or more tokens which satisfy `f`.
+///
+/// [`many1`][] is a non-`RangeStream` alternative.
+///
+/// [`many1`]: ../../parser/repeat/fn.many1.html
+/// ```
+/// # extern crate combine;
+/// # use combine::parser::range::take_while1;
+/// # use combine::*;
+/// # fn main() {
+/// let mut parser = take_while1(|c: char| c.is_digit(10));
+/// let result = parser.parse(&quot;123abc&quot;);
+/// assert_eq!(result, Ok((&quot;123&quot;, &quot;abc&quot;)));
+/// let result = parser.parse(&quot;abc&quot;);
+/// assert!(result.is_err());
+/// # }
+/// ```
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>take_while1&lt;I, F&gt;(f: F) -&gt; TakeWhile1&lt;I, F&gt;
+<span class="kw">where
+    </span>I: RangeStream,
+    I::Range: ::stream::Range,
+    F: FnMut(I::Item) -&gt; bool,
 {
-    <span class="ident">TakeWhile1</span>(<span class="ident">f</span>, <span class="ident">PhantomData</span>)
+    TakeWhile1(f, PhantomData)
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TakeUntilRange</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">I::Range</span>)
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">RangeStream</span>;
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">TakeUntilRange</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">RangeStream</span>,
-    <span class="ident">I::Range</span>: <span class="ident">PartialEq</span> <span class="op">+</span> <span class="ident">::stream::Range</span>,
+<span class="kw">pub struct </span>TakeUntilRange&lt;I&gt;(I::Range)
+<span class="kw">where
+    </span>I: RangeStream;
+<span class="kw">impl</span>&lt;I&gt; Parser <span class="kw">for </span>TakeUntilRange&lt;I&gt;
+<span class="kw">where
+    </span>I: RangeStream,
+    I::Range: PartialEq + ::stream::Range,
 {
-    <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">I::Range</span>;
-    <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> <span class="ident">usize</span>;
+    <span class="kw">type </span>Input = I;
+    <span class="kw">type </span>Output = I::Range;
+    <span class="kw">type </span>PartialState = usize;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_partial</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
-        <span class="ident">to_consume</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-    ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">stream::Range</span>;
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>parse_partial(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        input: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Input,
+        to_consume: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::PartialState,
+    ) -&gt; ConsumedResult&lt;<span class="self">Self</span>::Output, <span class="self">Self</span>::Input&gt; {
+        <span class="kw">use </span>stream::Range;
 
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">len</span>();
-        <span class="kw">let</span> <span class="ident">before</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">checkpoint</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">first_stream_error</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+        <span class="kw">let </span>len = <span class="self">self</span>.<span class="number">0</span>.len();
+        <span class="kw">let </span>before = input.checkpoint();
+        <span class="kw">let </span><span class="kw-2">mut </span>first_stream_error = <span class="prelude-val">None</span>;
 
-        <span class="comment">// Skip until the end of the last parse attempt</span>
-        <span class="macro">ctry!</span>(<span class="ident">uncons_range</span>(<span class="ident">input</span>, <span class="kw-2">*</span><span class="ident">to_consume</span>));
+        <span class="comment">// Skip until the end of the last parse attempt
+        </span><span class="macro">ctry!</span>(uncons_range(input, <span class="kw-2">*</span>to_consume));
 
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">look_ahead_input</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">checkpoint</span>();
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>look_ahead_input = input.checkpoint();
 
-            <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">uncons_range</span>(<span class="ident">len</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">xs</span>) =&gt; {
-                    <span class="kw">if</span> <span class="ident">xs</span> <span class="op">==</span> <span class="self">self</span>.<span class="number">0</span> {
-                        <span class="kw">let</span> <span class="ident">distance</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">distance</span>(<span class="kw-2">&amp;</span><span class="ident">before</span>) <span class="op">-</span> <span class="ident">len</span>;
-                        <span class="ident">input</span>.<span class="ident">reset</span>(<span class="ident">before</span>);
+            <span class="kw">match </span>input.uncons_range(len) {
+                <span class="prelude-val">Ok</span>(xs) =&gt; {
+                    <span class="kw">if </span>xs == <span class="self">self</span>.<span class="number">0 </span>{
+                        <span class="kw">let </span>distance = input.distance(<span class="kw-2">&amp;</span>before) - len;
+                        input.reset(before);
 
-                        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">consumed</span>) <span class="op">=</span> <span class="ident">input</span>.<span class="ident">uncons_range</span>(<span class="ident">distance</span>) {
-                            <span class="kw">if</span> <span class="ident">distance</span> <span class="op">==</span> <span class="number">0</span> {
-                                <span class="kw">return</span> <span class="ident">EmptyOk</span>(<span class="ident">consumed</span>);
-                            } <span class="kw">else</span> {
-                                <span class="kw-2">*</span><span class="ident">to_consume</span> <span class="op">=</span> <span class="number">0</span>;
-                                <span class="kw">return</span> <span class="ident">ConsumedOk</span>(<span class="ident">consumed</span>);
+                        <span class="kw">if let </span><span class="prelude-val">Ok</span>(consumed) = input.uncons_range(distance) {
+                            <span class="kw">if </span>distance == <span class="number">0 </span>{
+                                <span class="kw">return </span>EmptyOk(consumed);
+                            } <span class="kw">else </span>{
+                                <span class="kw-2">*</span>to_consume = <span class="number">0</span>;
+                                <span class="kw">return </span>ConsumedOk(consumed);
                             }
                         }
 
-                        <span class="comment">// We are guaranteed able to uncons to_consume characters here</span>
-                        <span class="comment">// because we&#39;ve already done it on look_ahead_input.</span>
-                        <span class="macro">unreachable!</span>();
-                    } <span class="kw">else</span> {
-                        <span class="comment">// Reset the stream back to where it was when we entered the top of the loop</span>
-                        <span class="ident">input</span>.<span class="ident">reset</span>(<span class="ident">look_ahead_input</span>);
+                        <span class="comment">// We are guaranteed able to uncons to_consume characters here
+                        // because we&#39;ve already done it on look_ahead_input.
+                        </span><span class="macro">unreachable!</span>();
+                    } <span class="kw">else </span>{
+                        <span class="comment">// Reset the stream back to where it was when we entered the top of the loop
+                        </span>input.reset(look_ahead_input);
 
-                        <span class="comment">// Advance the stream by one item</span>
-                        <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">uncons</span>().<span class="ident">is_err</span>() {
+                        <span class="comment">// Advance the stream by one item
+                        </span><span class="kw">if </span>input.uncons().is_err() {
                             <span class="macro">unreachable!</span>();
                         }
                     }
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">first_error</span>) =&gt; {
-                    <span class="comment">// If we are unable to find a successful parse even after advancing with `uncons`</span>
-                    <span class="comment">// below we must reset the stream to its state before the first error.</span>
-                    <span class="comment">// If we don&#39;t we may try and match the range `::` against `:&lt;EOF&gt;` which would</span>
-                    <span class="comment">// fail as only one `:` is present at this parse attempt. But when we later resume</span>
-                    <span class="comment">// with more input we must start parsing again at the first time we errored so we</span>
-                    <span class="comment">// can see the entire `::`</span>
-                    <span class="kw">if</span> <span class="ident">first_stream_error</span>.<span class="ident">is_none</span>() {
-                        <span class="ident">first_stream_error</span> <span class="op">=</span> <span class="prelude-val">Some</span>((<span class="ident">first_error</span>, <span class="ident">input</span>.<span class="ident">distance</span>(<span class="kw-2">&amp;</span><span class="ident">before</span>)));
+                <span class="prelude-val">Err</span>(first_error) =&gt; {
+                    <span class="comment">// If we are unable to find a successful parse even after advancing with `uncons`
+                    // below we must reset the stream to its state before the first error.
+                    // If we don&#39;t we may try and match the range `::` against `:&lt;EOF&gt;` which would
+                    // fail as only one `:` is present at this parse attempt. But when we later resume
+                    // with more input we must start parsing again at the first time we errored so we
+                    // can see the entire `::`
+                    </span><span class="kw">if </span>first_stream_error.is_none() {
+                        first_stream_error = <span class="prelude-val">Some</span>((first_error, input.distance(<span class="kw-2">&amp;</span>before)));
                     }
 
-                    <span class="comment">// Reset the stream back to where it was when we entered the top of the loop</span>
-                    <span class="ident">input</span>.<span class="ident">reset</span>(<span class="ident">look_ahead_input</span>);
+                    <span class="comment">// Reset the stream back to where it was when we entered the top of the loop
+                    </span>input.reset(look_ahead_input);
 
-                    <span class="comment">// See if we can advance anyway</span>
-                    <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">uncons</span>().<span class="ident">is_err</span>() {
-                        <span class="kw">let</span> (<span class="ident">first_error</span>, <span class="ident">first_error_distance</span>) <span class="op">=</span> <span class="ident">first_stream_error</span>.<span class="ident">unwrap</span>();
+                    <span class="comment">// See if we can advance anyway
+                    </span><span class="kw">if </span>input.uncons().is_err() {
+                        <span class="kw">let </span>(first_error, first_error_distance) = first_stream_error.unwrap();
 
-                        <span class="comment">// Reset the stream</span>
-                        <span class="ident">input</span>.<span class="ident">reset</span>(<span class="ident">before</span>);
-                        <span class="kw-2">*</span><span class="ident">to_consume</span> <span class="op">=</span> <span class="ident">first_error_distance</span>;
+                        <span class="comment">// Reset the stream
+                        </span>input.reset(before);
+                        <span class="kw-2">*</span>to_consume = first_error_distance;
 
-                        <span class="comment">// Return the original error if uncons failed</span>
-                        <span class="kw">return</span> <span class="ident">wrap_stream_error</span>(<span class="ident">input</span>, <span class="ident">first_error</span>);
+                        <span class="comment">// Return the original error if uncons failed
+                        </span><span class="kw">return </span>wrap_stream_error(input, first_error);
                     }
                 }
             };
@@ -1196,201 +1196,201 @@
     }
 }
 
-<span class="doccomment">/// Zero-copy parser which reads a range of 0 or more tokens until `r` is found.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The range `r` will not be consumed. If `r` is not found, the parser will</span>
-<span class="doccomment">/// return an error.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`repeat::take_until`][] is a non-`RangeStream` alternative.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`repeat::take_until`]: ../../parser/repeat/fn.take_until.html</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # extern crate combine;</span>
-<span class="doccomment">/// # use combine::parser::range::{range, take_until_range};</span>
-<span class="doccomment">/// # use combine::*;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// let mut parser = take_until_range(&quot;\r\n&quot;);</span>
-<span class="doccomment">/// let result = parser.parse(&quot;To: user@example.com\r\n&quot;);</span>
-<span class="doccomment">/// assert_eq!(result, Ok((&quot;To: user@example.com&quot;, &quot;\r\n&quot;)));</span>
-<span class="doccomment">/// let result = parser.parse(&quot;Hello, world\n&quot;);</span>
-<span class="doccomment">/// assert!(result.is_err());</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_until_range</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">r</span>: <span class="ident">I::Range</span>) -&gt; <span class="ident">TakeUntilRange</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">RangeStream</span>,
+<span class="doccomment">/// Zero-copy parser which reads a range of 0 or more tokens until `r` is found.
+///
+/// The range `r` will not be consumed. If `r` is not found, the parser will
+/// return an error.
+///
+/// [`repeat::take_until`][] is a non-`RangeStream` alternative.
+///
+/// [`repeat::take_until`]: ../../parser/repeat/fn.take_until.html
+/// ```
+/// # extern crate combine;
+/// # use combine::parser::range::{range, take_until_range};
+/// # use combine::*;
+/// # fn main() {
+/// let mut parser = take_until_range(&quot;\r\n&quot;);
+/// let result = parser.parse(&quot;To: user@example.com\r\n&quot;);
+/// assert_eq!(result, Ok((&quot;To: user@example.com&quot;, &quot;\r\n&quot;)));
+/// let result = parser.parse(&quot;Hello, world\n&quot;);
+/// assert!(result.is_err());
+/// # }
+/// ```
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>take_until_range&lt;I&gt;(r: I::Range) -&gt; TakeUntilRange&lt;I&gt;
+<span class="kw">where
+    </span>I: RangeStream,
 {
-    <span class="ident">TakeUntilRange</span>(<span class="ident">r</span>)
+    TakeUntilRange(r)
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">TakeRange</span> {
-    <span class="doccomment">/// Found the pattern at this offset</span>
-    <span class="ident">Found</span>(<span class="ident">usize</span>),
-    <span class="doccomment">/// Did not find the pattern but the parser can skip ahead to this offset.</span>
-    <span class="ident">NotFound</span>(<span class="ident">usize</span>),
+<span class="attribute">#[derive(Debug, PartialEq)]
+</span><span class="kw">pub enum </span>TakeRange {
+    <span class="doccomment">/// Found the pattern at this offset
+    </span>Found(usize),
+    <span class="doccomment">/// Did not find the pattern but the parser can skip ahead to this offset.
+    </span>NotFound(usize),
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">TakeRange</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">opt</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) -&gt; <span class="ident">TakeRange</span> {
-        <span class="kw">match</span> <span class="ident">opt</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; <span class="ident">TakeRange::Found</span>(<span class="ident">i</span>),
-            <span class="prelude-val">None</span> =&gt; <span class="ident">TakeRange::NotFound</span>(<span class="number">0</span>),
+<span class="kw">impl </span>From&lt;<span class="prelude-ty">Option</span>&lt;usize&gt;&gt; <span class="kw">for </span>TakeRange {
+    <span class="kw">fn </span>from(opt: <span class="prelude-ty">Option</span>&lt;usize&gt;) -&gt; TakeRange {
+        <span class="kw">match </span>opt {
+            <span class="prelude-val">Some</span>(i) =&gt; TakeRange::Found(i),
+            <span class="prelude-val">None </span>=&gt; TakeRange::NotFound(<span class="number">0</span>),
         }
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TakeFn</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">I</span><span class="op">&gt;</span> {
-    <span class="ident">searcher</span>: <span class="ident">F</span>,
-    <span class="ident">_marker</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">I</span>)<span class="op">&gt;</span>,
+<span class="kw">pub struct </span>TakeFn&lt;F, I&gt; {
+    searcher: F,
+    _marker: PhantomData&lt;<span class="kw">fn</span>(I)&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span>, <span class="ident">I</span><span class="op">&gt;</span> <span class="ident">Parser</span> <span class="kw">for</span> <span class="ident">TakeFn</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">I::Range</span>) -&gt; <span class="ident">R</span>,
-    <span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">TakeRange</span><span class="op">&gt;</span>,
-    <span class="ident">I</span>: <span class="ident">RangeStream</span> <span class="op">+</span> <span class="ident">FullRangeStream</span>,
-    <span class="ident">I::Range</span>: <span class="ident">::stream::Range</span>,
+<span class="kw">impl</span>&lt;F, R, I&gt; Parser <span class="kw">for </span>TakeFn&lt;F, I&gt;
+<span class="kw">where
+    </span>F: FnMut(I::Range) -&gt; R,
+    R: Into&lt;TakeRange&gt;,
+    I: RangeStream + FullRangeStream,
+    I::Range: ::stream::Range,
 {
-    <span class="kw">type</span> <span class="ident">Input</span> <span class="op">=</span> <span class="ident">I</span>;
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">I::Range</span>;
-    <span class="kw">type</span> <span class="ident">PartialState</span> <span class="op">=</span> <span class="ident">usize</span>;
+    <span class="kw">type </span>Input = I;
+    <span class="kw">type </span>Output = I::Range;
+    <span class="kw">type </span>PartialState = usize;
 
     <span class="macro">parse_mode!</span>();
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_mode</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">mode</span>: <span class="ident">M</span>,
-        <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Input</span>,
-        <span class="ident">offset</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::PartialState</span>,
-    ) -&gt; <span class="ident">ConsumedResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span>, <span class="ident"><span class="self">Self</span>::Input</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">M</span>: <span class="ident">ParseMode</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>parse_mode&lt;M&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        mode: M,
+        input: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Input,
+        offset: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::PartialState,
+    ) -&gt; ConsumedResult&lt;<span class="self">Self</span>::Output, <span class="self">Self</span>::Input&gt;
+    <span class="kw">where
+        </span>M: ParseMode,
     {
-        <span class="kw">let</span> <span class="ident">checkpoint</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">checkpoint</span>();
+        <span class="kw">let </span>checkpoint = input.checkpoint();
 
-        <span class="kw">if</span> <span class="ident">mode</span>.<span class="ident">is_first</span>() {
-            <span class="kw-2">*</span><span class="ident">offset</span> <span class="op">=</span> <span class="number">0</span>;
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">uncons_range</span>(<span class="kw-2">*</span><span class="ident">offset</span>);
+        <span class="kw">if </span>mode.is_first() {
+            <span class="kw-2">*</span>offset = <span class="number">0</span>;
+        } <span class="kw">else </span>{
+            <span class="kw">let _ </span>= input.uncons_range(<span class="kw-2">*</span>offset);
         }
 
-        <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">searcher</span>)(<span class="ident">input</span>.<span class="ident">range</span>()).<span class="ident">into</span>() {
-            <span class="ident">TakeRange::Found</span>(<span class="ident">i</span>) =&gt; {
-                <span class="ident">input</span>.<span class="ident">reset</span>(<span class="ident">checkpoint</span>);
-                <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">uncons_range</span>(<span class="ident">input</span>, <span class="kw-2">*</span><span class="ident">offset</span> <span class="op">+</span> <span class="ident">i</span>);
-                <span class="kw">if</span> <span class="ident">result</span>.<span class="ident">is_ok</span>() {
-                    <span class="kw-2">*</span><span class="ident">offset</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="kw">match </span>(<span class="self">self</span>.searcher)(input.range()).into() {
+            TakeRange::Found(i) =&gt; {
+                input.reset(checkpoint);
+                <span class="kw">let </span>result = uncons_range(input, <span class="kw-2">*</span>offset + i);
+                <span class="kw">if </span>result.is_ok() {
+                    <span class="kw-2">*</span>offset = <span class="number">0</span>;
                 }
-                <span class="ident">result</span>
+                result
             }
-            <span class="ident">TakeRange::NotFound</span>(<span class="ident">next_offset</span>) =&gt; {
-                <span class="kw-2">*</span><span class="ident">offset</span> <span class="op">=</span> <span class="ident">next_offset</span>;
+            TakeRange::NotFound(next_offset) =&gt; {
+                <span class="kw-2">*</span>offset = next_offset;
 
-                <span class="kw">let</span> <span class="ident">range</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">range</span>();
-                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">uncons_range</span>(<span class="ident">range</span>.<span class="ident">len</span>());
-                <span class="kw">let</span> <span class="ident">position</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">position</span>();
-                <span class="ident">input</span>.<span class="ident">reset</span>(<span class="ident">checkpoint</span>);
+                <span class="kw">let </span>range = input.range();
+                <span class="kw">let _ </span>= input.uncons_range(range.len());
+                <span class="kw">let </span>position = input.position();
+                input.reset(checkpoint);
 
-                <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">I::Error::from_error</span>(<span class="ident">position</span>, <span class="ident">StreamError::end_of_input</span>());
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">input</span>.<span class="ident">is_partial</span>() <span class="op">&amp;&amp;</span> <span class="ident">range</span>.<span class="ident">is_empty</span>() {
-                    <span class="ident">EmptyErr</span>(<span class="ident">err</span>.<span class="ident">into</span>())
-                } <span class="kw">else</span> {
-                    <span class="ident">ConsumedErr</span>(<span class="ident">err</span>)
+                <span class="kw">let </span>err = I::Error::from_error(position, StreamError::end_of_input());
+                <span class="kw">if </span>!input.is_partial() &amp;&amp; range.is_empty() {
+                    EmptyErr(err.into())
+                } <span class="kw">else </span>{
+                    ConsumedErr(err)
                 }
             }
         }
     }
 }
 
-<span class="doccomment">/// Searches the entire range using `searcher` and then consumes a range of `Some(n)`.</span>
-<span class="doccomment">/// If `f` can not find anything in the range it must return `None/NotFound` which indicates an end of input error.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If partial parsing is used the `TakeRange` enum can be returned instead of `Option`. By</span>
-<span class="doccomment">/// returning `TakeRange::NotFound(n)` it indicates that the input can skip ahead until `n`</span>
-<span class="doccomment">/// when parsing is next resumed.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See [`take_until_bytes`](../byte/fn.take_until_bytes.html) for a usecase.</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take_fn</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span>, <span class="ident">I</span><span class="op">&gt;</span>(<span class="ident">searcher</span>: <span class="ident">F</span>) -&gt; <span class="ident">TakeFn</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">I::Range</span>) -&gt; <span class="ident">R</span>,
-    <span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">TakeRange</span><span class="op">&gt;</span>,
-    <span class="ident">I</span>: <span class="ident">FullRangeStream</span>,
-    <span class="ident">I::Range</span>: <span class="ident">::stream::Range</span>,
+<span class="doccomment">/// Searches the entire range using `searcher` and then consumes a range of `Some(n)`.
+/// If `f` can not find anything in the range it must return `None/NotFound` which indicates an end of input error.
+///
+/// If partial parsing is used the `TakeRange` enum can be returned instead of `Option`. By
+/// returning `TakeRange::NotFound(n)` it indicates that the input can skip ahead until `n`
+/// when parsing is next resumed.
+///
+/// See [`take_until_bytes`](../byte/fn.take_until_bytes.html) for a usecase.
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>take_fn&lt;F, R, I&gt;(searcher: F) -&gt; TakeFn&lt;F, I&gt;
+<span class="kw">where
+    </span>F: FnMut(I::Range) -&gt; R,
+    R: Into&lt;TakeRange&gt;,
+    I: FullRangeStream,
+    I::Range: ::stream::Range,
 {
-    <span class="ident">TakeFn</span> {
-        <span class="ident">searcher</span>,
-        <span class="ident">_marker</span>: <span class="ident">PhantomData</span>,
+    TakeFn {
+        searcher,
+        _marker: PhantomData,
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">Parser</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>Parser;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">take_while_test</span>() {
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">take_while</span>(<span class="op">|</span><span class="ident">c</span>: <span class="ident">char</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_digit</span>(<span class="number">10</span>)).<span class="ident">parse</span>(<span class="string">&quot;123abc&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">result</span>, <span class="prelude-val">Ok</span>((<span class="string">&quot;123&quot;</span>, <span class="string">&quot;abc&quot;</span>)));
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">take_while</span>(<span class="op">|</span><span class="ident">c</span>: <span class="ident">char</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_digit</span>(<span class="number">10</span>)).<span class="ident">parse</span>(<span class="string">&quot;abc&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">result</span>, <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="string">&quot;abc&quot;</span>)));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>take_while_test() {
+        <span class="kw">let </span>result = take_while(|c: char| c.is_digit(<span class="number">10</span>)).parse(<span class="string">&quot;123abc&quot;</span>);
+        <span class="macro">assert_eq!</span>(result, <span class="prelude-val">Ok</span>((<span class="string">&quot;123&quot;</span>, <span class="string">&quot;abc&quot;</span>)));
+        <span class="kw">let </span>result = take_while(|c: char| c.is_digit(<span class="number">10</span>)).parse(<span class="string">&quot;abc&quot;</span>);
+        <span class="macro">assert_eq!</span>(result, <span class="prelude-val">Ok</span>((<span class="string">&quot;&quot;</span>, <span class="string">&quot;abc&quot;</span>)));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">take_while1_test</span>() {
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">take_while1</span>(<span class="op">|</span><span class="ident">c</span>: <span class="ident">char</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_digit</span>(<span class="number">10</span>)).<span class="ident">parse</span>(<span class="string">&quot;123abc&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">result</span>, <span class="prelude-val">Ok</span>((<span class="string">&quot;123&quot;</span>, <span class="string">&quot;abc&quot;</span>)));
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">take_while1</span>(<span class="op">|</span><span class="ident">c</span>: <span class="ident">char</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_digit</span>(<span class="number">10</span>)).<span class="ident">parse</span>(<span class="string">&quot;abc&quot;</span>);
-        <span class="macro">assert!</span>(<span class="ident">result</span>.<span class="ident">is_err</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>take_while1_test() {
+        <span class="kw">let </span>result = take_while1(|c: char| c.is_digit(<span class="number">10</span>)).parse(<span class="string">&quot;123abc&quot;</span>);
+        <span class="macro">assert_eq!</span>(result, <span class="prelude-val">Ok</span>((<span class="string">&quot;123&quot;</span>, <span class="string">&quot;abc&quot;</span>)));
+        <span class="kw">let </span>result = take_while1(|c: char| c.is_digit(<span class="number">10</span>)).parse(<span class="string">&quot;abc&quot;</span>);
+        <span class="macro">assert!</span>(result.is_err());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">range_string_no_char_boundary_error</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parser</span> <span class="op">=</span> <span class="ident">range</span>(<span class="string">&quot;hello&quot;</span>);
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parse</span>(<span class="string">&quot;hell\u{00EE} world&quot;</span>);
-        <span class="macro">assert!</span>(<span class="ident">result</span>.<span class="ident">is_err</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>range_string_no_char_boundary_error() {
+        <span class="kw">let </span><span class="kw-2">mut </span>parser = range(<span class="string">&quot;hello&quot;</span>);
+        <span class="kw">let </span>result = parser.parse(<span class="string">&quot;hell\u{00EE} world&quot;</span>);
+        <span class="macro">assert!</span>(result.is_err());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">take_until_range_1</span>() {
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">take_until_range</span>(<span class="string">&quot;\&quot;&quot;</span>).<span class="ident">parse</span>(<span class="string">&quot;Foo baz bar quux\&quot;&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">result</span>, <span class="prelude-val">Ok</span>((<span class="string">&quot;Foo baz bar quux&quot;</span>, <span class="string">&quot;\&quot;&quot;</span>)));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>take_until_range_1() {
+        <span class="kw">let </span>result = take_until_range(<span class="string">&quot;\&quot;&quot;</span>).parse(<span class="string">&quot;Foo baz bar quux\&quot;&quot;</span>);
+        <span class="macro">assert_eq!</span>(result, <span class="prelude-val">Ok</span>((<span class="string">&quot;Foo baz bar quux&quot;</span>, <span class="string">&quot;\&quot;&quot;</span>)));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">take_until_range_2</span>() {
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">take_until_range</span>(<span class="string">&quot;===&quot;</span>).<span class="ident">parse</span>(<span class="string">&quot;if ((pointless_comparison == 3) === true) {&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>take_until_range_2() {
+        <span class="kw">let </span>result = take_until_range(<span class="string">&quot;===&quot;</span>).parse(<span class="string">&quot;if ((pointless_comparison == 3) === true) {&quot;</span>);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">result</span>,
+            result,
             <span class="prelude-val">Ok</span>((<span class="string">&quot;if ((pointless_comparison == 3) &quot;</span>, <span class="string">&quot;=== true) {&quot;</span>))
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">take_until_range_unicode_1</span>() {
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">take_until_range</span>(<span class="string">&quot;🦀&quot;</span>)
-            .<span class="ident">parse</span>(<span class="string">&quot;😃 Ferris the friendly rustacean 🦀 and his snake friend 🐍&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>take_until_range_unicode_1() {
+        <span class="kw">let </span>result = take_until_range(<span class="string">&quot;🦀&quot;</span>)
+            .parse(<span class="string">&quot;😃 Ferris the friendly rustacean 🦀 and his snake friend 🐍&quot;</span>);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">result</span>,
+            result,
             <span class="prelude-val">Ok</span>((
                 <span class="string">&quot;😃 Ferris the friendly rustacean &quot;</span>,
-                <span class="string">&quot;🦀 and his snake friend 🐍&quot;</span>
-            ))
+                <span class="string">&quot;🦀 and his snake friend 🐍&quot;
+            </span>))
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">take_until_range_unicode_2</span>() {
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">take_until_range</span>(<span class="string">&quot;⁘⁙/⁘&quot;</span>)
-            .<span class="ident">parse</span>(<span class="string">&quot;⚙️🛠️🦀=🏎️⁘⁙⁘⁘⁙/⁘⁘⁙/⁘&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>take_until_range_unicode_2() {
+        <span class="kw">let </span>result = take_until_range(<span class="string">&quot;⁘⁙/⁘&quot;</span>)
+            .parse(<span class="string">&quot;⚙️🛠️🦀=🏎️⁘⁙⁘⁘⁙/⁘⁘⁙/⁘&quot;</span>);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">result</span>,
+            result,
             <span class="prelude-val">Ok</span>((<span class="string">&quot;⚙️🛠️🦀=🏎️⁘⁙⁘&quot;</span>, <span class="string">&quot;⁘⁙/⁘⁘⁙/⁘&quot;</span>))
         );
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="combine" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="combine" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/metrics-exporter-prometheus-0.10.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../metrics_exporter_prometheus/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../metrics_exporter_prometheus/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../metrics_exporter_prometheus/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/metrics-exporter-prometheus-0.10.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../metrics_exporter_prometheus/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../metrics_exporter_prometheus/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../metrics_exporter_prometheus/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -113,120 +113,120 @@
 <span id="113">113</span>
 <span id="114">114</span>
 <span id="115">115</span>
-</pre><pre class="rust"><code><span class="doccomment">//! A [`metrics`]-compatible exporter for sending metrics to Prometheus.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Basics</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! `metrics-exporter-prometheus` is a [`metrics`]-compatible exporter for either exposing an HTTP</span>
-<span class="doccomment">//! endpoint that can be scraped by Prometheus, or that can push metrics to a Prometheus push</span>
-<span class="doccomment">//! gateway.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## High-level features</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - scrape endpoint support</span>
-<span class="doccomment">//! - push gateway support</span>
-<span class="doccomment">//! - IP-based allowlist for scrape endpoint</span>
-<span class="doccomment">//! - ability to push histograms as either aggregated summaries or aggregated histograms, with</span>
-<span class="doccomment">//!   configurable quantiles/buckets</span>
-<span class="doccomment">//! - ability to control bucket configuration on a per-metric basis</span>
-<span class="doccomment">//! - configurable global labels (applied to all metrics, overridden by metric&#39;s own labels if present)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Behavior</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! In general, interacting with the exporter should look and feel like interacting with any other</span>
-<span class="doccomment">//! implementation of a Prometheus scrape endpoint or push gateway implementation, but there are</span>
-<span class="doccomment">//! some small caveats around metric naming.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! We strive to match both the Prometheus [data model] and follow the [exposition format]</span>
-<span class="doccomment">//! specification, but due to the decoupled nature of [`metrics`][metrics], the exporter makes some</span>
-<span class="doccomment">//! specific trade-offs when ensuring compliance with the specification when it comes to metric</span>
-<span class="doccomment">//! names and label keys.  Below is a matrix of scenarios where the exporter will modify a metric</span>
-<span class="doccomment">//! name or label key:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - metric name starts with, or contains, an invalid character: **replace character with</span>
-<span class="doccomment">//!   underscore**</span>
-<span class="doccomment">//! - label key starts with, or contains, an invalid character: **replace character with</span>
-<span class="doccomment">//!   underscore**</span>
-<span class="doccomment">//! - label key starts with two underscores: **add additional underscore** (three underscores total)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This behavior may be confusing at first since [`metrics`][metrics] itself allows any valid UTF-8</span>
-<span class="doccomment">//! string for a metric name or label, but there is no way to report to the user that a metric name</span>
-<span class="doccomment">//! or label key is invalid only when using the Prometheus exporter, so we must cope with these</span>
-<span class="doccomment">//! situations by replacing invalid characters at runtime.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Usage</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Using the exporter is straightforward:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```ignore</span>
-<span class="doccomment">//! // First, create a builder.</span>
-<span class="doccomment">//! //</span>
-<span class="doccomment">//! // The builder can configure many aspects of the exporter, such as changing the</span>
-<span class="doccomment">//! // listen address, adjusting how histograms will be reported, changing how long</span>
-<span class="doccomment">//! // metrics can be idle before being removed, and more.</span>
-<span class="doccomment">//! let builder = PrometheusBuilder::new();</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Normally, most users will want to &quot;install&quot; the exporter which sets it as the</span>
-<span class="doccomment">//! // global recorder for all `metrics` calls, and installs either an HTTP listener</span>
-<span class="doccomment">//! // when running as a scrape endpoint, or a simple asynchronous task which pushes</span>
-<span class="doccomment">//! // to the configured push gateway on the given interval.</span>
-<span class="doccomment">//! //</span>
-<span class="doccomment">//! // If you&#39;re already inside a Tokio runtime, this will spawn a task for the</span>
-<span class="doccomment">//! // exporter on that runtime, and otherwise, a new background thread will be</span>
-<span class="doccomment">//! // spawned which a Tokio single-threaded runtime is launched on to, where we then</span>
-<span class="doccomment">//! // finally launch the exporter:</span>
-<span class="doccomment">//! builder.install().expect(&quot;failed to install recorder/exporter&quot;);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Maybe you already have an HTTP endpoint that you want to expose a metrics</span>
-<span class="doccomment">//! // endpoint on.. no problem!  You can build the recorder and install it, and get</span>
-<span class="doccomment">//! // back a handle that can be used to generate the Prometheus scrape output on</span>
-<span class="doccomment">//! // demand:</span>
-<span class="doccomment">//! let handle = builder.install_recorder().expect(&quot;failed to install recorder&quot;);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Maybe you have a more complicated setup and want to be handed back the recorder</span>
-<span class="doccomment">//! // object and a future that can run the HTTP listener / push gateway so you can</span>
-<span class="doccomment">//! // install/spawn them in a specific way.. also not a problem!</span>
-<span class="doccomment">//! //</span>
-<span class="doccomment">//! // As this is a more advanced method, it _must_ be called from within an existing</span>
-<span class="doccomment">//! // Tokio runtime when the exporter is running in HTTP listener/scrape endpoint mode.</span>
-<span class="doccomment">//! let (recorder, exporter) = builder.build().expect(&quot;failed to build recorder/exporter&quot;);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Finally, maybe you literally only want to build the recorder and nothing else,</span>
-<span class="doccomment">//! // and we&#39;ve got you covered there, too:</span>
-<span class="doccomment">//! let recorder = builder.build_recorder().expect(&quot;failed to build recorder&quot;);</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Features</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Two main feature flags control which modes that exporter can run in:</span>
-<span class="doccomment">//! - **`http-listener`**: allows running the exporter as a scrape endpoint (_enabled by default_)</span>
-<span class="doccomment">//! - **`push-gateway`**: allows running the exporter in push gateway mode (_enabled by default_)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Neither of these flags are required to create, or install, only a recorder.  However, in order</span>
-<span class="doccomment">//! to create or build an exporter, at least one of these feature flags must be enabled.  Builder</span>
-<span class="doccomment">//! methods that require certain feature flags will be documented as such.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [metrics]: https://docs.rs/metrics/latest/metrics/</span>
-<span class="doccomment">//! [data model]: https://prometheus.io/docs/concepts/data_model/</span>
-<span class="doccomment">//! [exposition format]: https://prometheus.io/docs/instrumenting/exposition_formats/#text-based-format</span>
-<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">clippy::all</span>)]</span>
-<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">clippy::pedantic</span>)]</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::must_use_candidate</span>)]</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::module_name_repetitions</span>)]</span>
-<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">missing_docs</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">feature</span>(<span class="ident">doc_cfg</span>), <span class="ident">deny</span>(<span class="ident">rustdoc::broken_intra_doc_links</span>))]</span>
-<span class="kw">mod</span> <span class="ident">common</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::common</span>::{<span class="ident">BuildError</span>, <span class="ident">Matcher</span>};
+</pre><pre class="rust"><code><span class="doccomment">//! A [`metrics`]-compatible exporter for sending metrics to Prometheus.
+//!
+//! ## Basics
+//!
+//! `metrics-exporter-prometheus` is a [`metrics`]-compatible exporter for either exposing an HTTP
+//! endpoint that can be scraped by Prometheus, or that can push metrics to a Prometheus push
+//! gateway.
+//!
+//! ## High-level features
+//!
+//! - scrape endpoint support
+//! - push gateway support
+//! - IP-based allowlist for scrape endpoint
+//! - ability to push histograms as either aggregated summaries or aggregated histograms, with
+//!   configurable quantiles/buckets
+//! - ability to control bucket configuration on a per-metric basis
+//! - configurable global labels (applied to all metrics, overridden by metric&#39;s own labels if present)
+//!
+//! ## Behavior
+//!
+//! In general, interacting with the exporter should look and feel like interacting with any other
+//! implementation of a Prometheus scrape endpoint or push gateway implementation, but there are
+//! some small caveats around metric naming.
+//!
+//! We strive to match both the Prometheus [data model] and follow the [exposition format]
+//! specification, but due to the decoupled nature of [`metrics`][metrics], the exporter makes some
+//! specific trade-offs when ensuring compliance with the specification when it comes to metric
+//! names and label keys.  Below is a matrix of scenarios where the exporter will modify a metric
+//! name or label key:
+//!
+//! - metric name starts with, or contains, an invalid character: **replace character with
+//!   underscore**
+//! - label key starts with, or contains, an invalid character: **replace character with
+//!   underscore**
+//! - label key starts with two underscores: **add additional underscore** (three underscores total)
+//!
+//! This behavior may be confusing at first since [`metrics`][metrics] itself allows any valid UTF-8
+//! string for a metric name or label, but there is no way to report to the user that a metric name
+//! or label key is invalid only when using the Prometheus exporter, so we must cope with these
+//! situations by replacing invalid characters at runtime.
+//!
+//! ## Usage
+//!
+//! Using the exporter is straightforward:
+//!
+//! ```ignore
+//! // First, create a builder.
+//! //
+//! // The builder can configure many aspects of the exporter, such as changing the
+//! // listen address, adjusting how histograms will be reported, changing how long
+//! // metrics can be idle before being removed, and more.
+//! let builder = PrometheusBuilder::new();
+//!
+//! // Normally, most users will want to &quot;install&quot; the exporter which sets it as the
+//! // global recorder for all `metrics` calls, and installs either an HTTP listener
+//! // when running as a scrape endpoint, or a simple asynchronous task which pushes
+//! // to the configured push gateway on the given interval.
+//! //
+//! // If you&#39;re already inside a Tokio runtime, this will spawn a task for the
+//! // exporter on that runtime, and otherwise, a new background thread will be
+//! // spawned which a Tokio single-threaded runtime is launched on to, where we then
+//! // finally launch the exporter:
+//! builder.install().expect(&quot;failed to install recorder/exporter&quot;);
+//!
+//! // Maybe you already have an HTTP endpoint that you want to expose a metrics
+//! // endpoint on.. no problem!  You can build the recorder and install it, and get
+//! // back a handle that can be used to generate the Prometheus scrape output on
+//! // demand:
+//! let handle = builder.install_recorder().expect(&quot;failed to install recorder&quot;);
+//!
+//! // Maybe you have a more complicated setup and want to be handed back the recorder
+//! // object and a future that can run the HTTP listener / push gateway so you can
+//! // install/spawn them in a specific way.. also not a problem!
+//! //
+//! // As this is a more advanced method, it _must_ be called from within an existing
+//! // Tokio runtime when the exporter is running in HTTP listener/scrape endpoint mode.
+//! let (recorder, exporter) = builder.build().expect(&quot;failed to build recorder/exporter&quot;);
+//!
+//! // Finally, maybe you literally only want to build the recorder and nothing else,
+//! // and we&#39;ve got you covered there, too:
+//! let recorder = builder.build_recorder().expect(&quot;failed to build recorder&quot;);
+//! ```
+//!
+//! ## Features
+//!
+//! Two main feature flags control which modes that exporter can run in:
+//! - **`http-listener`**: allows running the exporter as a scrape endpoint (_enabled by default_)
+//! - **`push-gateway`**: allows running the exporter in push gateway mode (_enabled by default_)
+//!
+//! Neither of these flags are required to create, or install, only a recorder.  However, in order
+//! to create or build an exporter, at least one of these feature flags must be enabled.  Builder
+//! methods that require certain feature flags will be documented as such.
+//!
+//! [metrics]: https://docs.rs/metrics/latest/metrics/
+//! [data model]: https://prometheus.io/docs/concepts/data_model/
+//! [exposition format]: https://prometheus.io/docs/instrumenting/exposition_formats/#text-based-format
+</span><span class="attribute">#![deny(clippy::all)]
+#![deny(clippy::pedantic)]
+#![allow(clippy::must_use_candidate)]
+#![allow(clippy::module_name_repetitions)]
+#![deny(missing_docs)]
+#![cfg_attr(docsrs, feature(doc_cfg), deny(rustdoc::broken_intra_doc_links))]
+</span><span class="kw">mod </span>common;
+<span class="kw">pub use </span><span class="self">self</span>::common::{BuildError, Matcher};
 
-<span class="kw">mod</span> <span class="ident">distribution</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">distribution</span>::{<span class="ident">Distribution</span>, <span class="ident">DistributionBuilder</span>};
+<span class="kw">mod </span>distribution;
+<span class="kw">pub use </span>distribution::{Distribution, DistributionBuilder};
 
-<span class="kw">mod</span> <span class="ident">builder</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::builder::PrometheusBuilder</span>;
+<span class="kw">mod </span>builder;
+<span class="kw">pub use </span><span class="self">self</span>::builder::PrometheusBuilder;
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">formatting</span>;
-<span class="kw">mod</span> <span class="ident">recorder</span>;
+<span class="kw">pub mod </span>formatting;
+<span class="kw">mod </span>recorder;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::recorder</span>::{<span class="ident">PrometheusHandle</span>, <span class="ident">PrometheusRecorder</span>};
+<span class="kw">pub use </span><span class="self">self</span>::recorder::{PrometheusHandle, PrometheusRecorder};
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="metrics_exporter_prometheus" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="metrics_exporter_prometheus" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

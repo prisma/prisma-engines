@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/psl-core/src/validate/validation_pipeline/validations/relations/many_to_many/embedded.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>embedded.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../../../storage.js"></script><script defer src="../../../../../../../source-script.js"></script><script defer src="../../../../../../../source-files.js"></script><script defer src="../../../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../../../psl_core/index.html"><img class="rust-logo" src="../../../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/psl-core/src/validate/validation_pipeline/validations/relations/many_to_many/embedded.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>embedded.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../../../../normalize.css"><link rel="stylesheet" href="../../../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../../../../dark.css" disabled><link rel="stylesheet" href="../../../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../../../storage.js"></script><script defer src="../../../../../../../source-script.js"></script><script defer src="../../../../../../../source-files.js"></script><script defer src="../../../../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../../../psl_core/index.html"><img class="rust-logo" src="../../../../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -202,209 +202,209 @@
 <span id="202">202</span>
 <span id="203">203</span>
 <span id="204">204</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::datamodel_connector::ConnectorCapability</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">diagnostics::DatamodelError</span>, <span class="ident">validate::validation_pipeline::context::Context</span>};
-<span class="kw">use</span> <span class="ident">parser_database</span>::{<span class="ident">ast::WithSpan</span>, <span class="ident">walkers::TwoWayEmbeddedManyToManyRelationWalker</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::datamodel_connector::ConnectorCapability;
+<span class="kw">use crate</span>::{diagnostics::DatamodelError, validate::validation_pipeline::context::Context};
+<span class="kw">use </span>parser_database::{ast::WithSpan, walkers::TwoWayEmbeddedManyToManyRelationWalker};
 
-<span class="doccomment">/// Only MongoDb should support embedded M:N relations.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">supports_embedded_relations</span>(<span class="ident">relation</span>: <span class="ident">TwoWayEmbeddedManyToManyRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">if</span> <span class="ident">ctx</span>
-        .<span class="ident">connector</span>
-        .<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::TwoWayEmbeddedManyToManyRelation</span>)
+<span class="doccomment">/// Only MongoDb should support embedded M:N relations.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>supports_embedded_relations(relation: TwoWayEmbeddedManyToManyRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">if </span>ctx
+        .connector
+        .has_capability(ConnectorCapability::TwoWayEmbeddedManyToManyRelation)
     {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">spans</span> <span class="op">=</span> [<span class="ident">relation</span>.<span class="ident">field_a</span>(), <span class="ident">relation</span>.<span class="ident">field_b</span>()]
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>());
+    <span class="kw">let </span>spans = [relation.field_a(), relation.field_b()]
+        .into_iter()
+        .map(|r| r.ast_field().span());
 
-    <span class="kw">let</span> <span class="ident">connector_name</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">name</span>();
+    <span class="kw">let </span>connector_name = ctx.connector.name();
 
-    <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(
+    <span class="kw">let </span>msg = <span class="macro">format!</span>(
         <span class="string">&quot;Embedded many-to-many relations are not supported on {connector_name}. Please use the syntax defined in https://pris.ly/d/relational-database-many-to-many&quot;</span>,
     );
 
-    <span class="kw">for</span> <span class="ident">span</span> <span class="kw">in</span> <span class="ident">spans</span> {
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">span</span>));
+    <span class="kw">for </span>span <span class="kw">in </span>spans {
+        ctx.push_error(DatamodelError::new_validation_error(<span class="kw-2">&amp;</span>msg, span));
     }
 }
 
-<span class="doccomment">/// Both relation fields must have `references` argument that points to an exactly one scalar field.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">defines_references_on_both_sides</span>(
-    <span class="ident">relation</span>: <span class="ident">TwoWayEmbeddedManyToManyRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Both relation fields must have `references` argument that points to an exactly one scalar field.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>defines_references_on_both_sides(
+    relation: TwoWayEmbeddedManyToManyRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) {
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>
-        .<span class="ident">connector</span>
-        .<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::TwoWayEmbeddedManyToManyRelation</span>)
+    <span class="kw">if </span>!ctx
+        .connector
+        .has_capability(ConnectorCapability::TwoWayEmbeddedManyToManyRelation)
     {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">spans</span> <span class="op">=</span> [<span class="ident">relation</span>.<span class="ident">field_a</span>(), <span class="ident">relation</span>.<span class="ident">field_b</span>()]
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">r</span>.<span class="ident">referenced_fields</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">fields</span>) <span class="kw">if</span> <span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> =&gt; <span class="prelude-val">None</span>,
-            <span class="kw">_</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">ast_field</span> <span class="op">=</span> <span class="ident">r</span>.<span class="ident">ast_field</span>();
+    <span class="kw">let </span>spans = [relation.field_a(), relation.field_b()]
+        .into_iter()
+        .filter_map(|r| <span class="kw">match </span>r.referenced_fields() {
+            <span class="prelude-val">Some</span>(fields) <span class="kw">if </span>fields.len() == <span class="number">1 </span>=&gt; <span class="prelude-val">None</span>,
+            <span class="kw">_ </span>=&gt; {
+                <span class="kw">let </span>ast_field = r.ast_field();
 
-                <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">ast_field</span>
-                    .<span class="ident">span_for_argument</span>(<span class="string">&quot;relation&quot;</span>, <span class="string">&quot;references&quot;</span>)
-                    .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">ast_field</span>.<span class="ident">span_for_attribute</span>(<span class="string">&quot;relation&quot;</span>))
-                    .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">ast_field</span>.<span class="ident">span</span>());
+                <span class="kw">let </span>span = ast_field
+                    .span_for_argument(<span class="string">&quot;relation&quot;</span>, <span class="string">&quot;references&quot;</span>)
+                    .or_else(|| ast_field.span_for_attribute(<span class="string">&quot;relation&quot;</span>))
+                    .unwrap_or_else(|| ast_field.span());
 
-                <span class="prelude-val">Some</span>(<span class="ident">span</span>)
+                <span class="prelude-val">Some</span>(span)
             }
         });
 
-    <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;The `references` argument must be defined and must point to exactly one scalar field. https://pris.ly/d/many-to-many-relations&quot;</span>;
+    <span class="kw">let </span>msg = <span class="string">&quot;The `references` argument must be defined and must point to exactly one scalar field. https://pris.ly/d/many-to-many-relations&quot;</span>;
 
-    <span class="kw">for</span> <span class="ident">span</span> <span class="kw">in</span> <span class="ident">spans</span> {
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(<span class="ident">msg</span>, <span class="string">&quot;@relation&quot;</span>, <span class="ident">span</span>));
+    <span class="kw">for </span>span <span class="kw">in </span>spans {
+        ctx.push_error(DatamodelError::new_attribute_validation_error(msg, <span class="string">&quot;@relation&quot;</span>, span));
     }
 }
 
-<span class="doccomment">/// Both sides must define the `fields` argument and the argument must point to</span>
-<span class="doccomment">/// exactly one scalar field.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">defines_fields_on_both_sides</span>(
-    <span class="ident">relation</span>: <span class="ident">TwoWayEmbeddedManyToManyRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Both sides must define the `fields` argument and the argument must point to
+/// exactly one scalar field.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>defines_fields_on_both_sides(
+    relation: TwoWayEmbeddedManyToManyRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) {
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>
-        .<span class="ident">connector</span>
-        .<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::TwoWayEmbeddedManyToManyRelation</span>)
+    <span class="kw">if </span>!ctx
+        .connector
+        .has_capability(ConnectorCapability::TwoWayEmbeddedManyToManyRelation)
     {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">spans</span> <span class="op">=</span> [<span class="ident">relation</span>.<span class="ident">field_a</span>(), <span class="ident">relation</span>.<span class="ident">field_b</span>()]
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">r</span>.<span class="ident">referencing_fields</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">fields</span>) <span class="kw">if</span> <span class="ident">fields</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> =&gt; <span class="prelude-val">None</span>,
-            <span class="kw">_</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">ast_field</span> <span class="op">=</span> <span class="ident">r</span>.<span class="ident">ast_field</span>();
+    <span class="kw">let </span>spans = [relation.field_a(), relation.field_b()]
+        .into_iter()
+        .filter_map(|r| <span class="kw">match </span>r.referencing_fields() {
+            <span class="prelude-val">Some</span>(fields) <span class="kw">if </span>fields.len() == <span class="number">1 </span>=&gt; <span class="prelude-val">None</span>,
+            <span class="kw">_ </span>=&gt; {
+                <span class="kw">let </span>ast_field = r.ast_field();
 
-                <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">ast_field</span>
-                    .<span class="ident">span_for_argument</span>(<span class="string">&quot;relation&quot;</span>, <span class="string">&quot;fields&quot;</span>)
-                    .<span class="ident">or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">ast_field</span>.<span class="ident">span_for_attribute</span>(<span class="string">&quot;relation&quot;</span>))
-                    .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">ast_field</span>.<span class="ident">span</span>());
+                <span class="kw">let </span>span = ast_field
+                    .span_for_argument(<span class="string">&quot;relation&quot;</span>, <span class="string">&quot;fields&quot;</span>)
+                    .or_else(|| ast_field.span_for_attribute(<span class="string">&quot;relation&quot;</span>))
+                    .unwrap_or_else(|| ast_field.span());
 
-                <span class="prelude-val">Some</span>(<span class="ident">span</span>)
+                <span class="prelude-val">Some</span>(span)
             }
         });
 
-    <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;The `fields` argument must be defined and must point to exactly one scalar field. https://pris.ly/d/many-to-many-relations&quot;</span>;
+    <span class="kw">let </span>msg = <span class="string">&quot;The `fields` argument must be defined and must point to exactly one scalar field. https://pris.ly/d/many-to-many-relations&quot;</span>;
 
-    <span class="kw">for</span> <span class="ident">span</span> <span class="kw">in</span> <span class="ident">spans</span> {
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(<span class="ident">msg</span>, <span class="string">&quot;@relation&quot;</span>, <span class="ident">span</span>));
+    <span class="kw">for </span>span <span class="kw">in </span>spans {
+        ctx.push_error(DatamodelError::new_attribute_validation_error(msg, <span class="string">&quot;@relation&quot;</span>, span));
     }
 }
 
-<span class="doccomment">/// We only support referencing an id field, no uniques or no normal fields allowed.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">references_id_from_both_sides</span>(
-    <span class="ident">relation</span>: <span class="ident">TwoWayEmbeddedManyToManyRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+<span class="doccomment">/// We only support referencing an id field, no uniques or no normal fields allowed.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>references_id_from_both_sides(
+    relation: TwoWayEmbeddedManyToManyRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) {
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>
-        .<span class="ident">connector</span>
-        .<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::TwoWayEmbeddedManyToManyRelation</span>)
+    <span class="kw">if </span>!ctx
+        .connector
+        .has_capability(ConnectorCapability::TwoWayEmbeddedManyToManyRelation)
     {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">spans</span> <span class="op">=</span> [<span class="ident">relation</span>.<span class="ident">field_a</span>(), <span class="ident">relation</span>.<span class="ident">field_b</span>()].<span class="ident">into_iter</span>().<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> {
-        <span class="kw">match</span> <span class="ident">r</span>.<span class="ident">referenced_fields</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">next</span>()) {
-            <span class="prelude-val">Some</span>(<span class="ident">field</span>) <span class="kw">if</span> <span class="op">!</span><span class="ident">field</span>.<span class="ident">is_single_pk</span>() =&gt; {
-                <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">r</span>
-                    .<span class="ident">ast_field</span>()
-                    .<span class="ident">span_for_argument</span>(<span class="string">&quot;relation&quot;</span>, <span class="string">&quot;references&quot;</span>)
-                    .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">ast_field</span>().<span class="ident">span</span>());
+    <span class="kw">let </span>spans = [relation.field_a(), relation.field_b()].into_iter().filter_map(|r| {
+        <span class="kw">match </span>r.referenced_fields().and_then(|<span class="kw-2">mut </span>r| r.next()) {
+            <span class="prelude-val">Some</span>(field) <span class="kw">if </span>!field.is_single_pk() =&gt; {
+                <span class="kw">let </span>span = r
+                    .ast_field()
+                    .span_for_argument(<span class="string">&quot;relation&quot;</span>, <span class="string">&quot;references&quot;</span>)
+                    .unwrap_or_else(|| r.ast_field().span());
 
-                <span class="prelude-val">Some</span>(<span class="ident">span</span>)
+                <span class="prelude-val">Some</span>(span)
             }
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     });
 
-    <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;The `references` argument must point to a singular `id` field&quot;</span>;
+    <span class="kw">let </span>msg = <span class="string">&quot;The `references` argument must point to a singular `id` field&quot;</span>;
 
-    <span class="kw">for</span> <span class="ident">span</span> <span class="kw">in</span> <span class="ident">spans</span> {
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(<span class="ident">msg</span>, <span class="string">&quot;@relation&quot;</span>, <span class="ident">span</span>));
+    <span class="kw">for </span>span <span class="kw">in </span>spans {
+        ctx.push_error(DatamodelError::new_attribute_validation_error(msg, <span class="string">&quot;@relation&quot;</span>, span));
     }
 }
 
-<span class="doccomment">/// The `fields` argument has one scalar field of an array type. The</span>
-<span class="doccomment">/// `references` argument must be of same type, but not an array.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">referencing_with_an_array_field_of_correct_type</span>(
-    <span class="ident">relation</span>: <span class="ident">TwoWayEmbeddedManyToManyRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+<span class="doccomment">/// The `fields` argument has one scalar field of an array type. The
+/// `references` argument must be of same type, but not an array.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>referencing_with_an_array_field_of_correct_type(
+    relation: TwoWayEmbeddedManyToManyRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) {
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>
-        .<span class="ident">connector</span>
-        .<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::TwoWayEmbeddedManyToManyRelation</span>)
+    <span class="kw">if </span>!ctx
+        .connector
+        .has_capability(ConnectorCapability::TwoWayEmbeddedManyToManyRelation)
     {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">error_msg</span> <span class="op">=</span>
+    <span class="kw">let </span>error_msg =
         <span class="string">&quot;The scalar field defined in `fields` argument must be an array of the same type defined in `references`&quot;</span>;
 
-    <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> [<span class="ident">relation</span>.<span class="ident">field_a</span>(), <span class="ident">relation</span>.<span class="ident">field_b</span>()] {
-        <span class="kw">let</span> <span class="ident">referencing</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">referencing_fields</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">next</span>());
+    <span class="kw">for </span>field <span class="kw">in </span>[relation.field_a(), relation.field_b()] {
+        <span class="kw">let </span>referencing = field.referencing_fields().and_then(|<span class="kw-2">mut </span>r| r.next());
 
-        <span class="kw">let</span> <span class="ident">referenced</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">referenced_fields</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">next</span>());
+        <span class="kw">let </span>referenced = field.referenced_fields().and_then(|<span class="kw-2">mut </span>r| r.next());
 
-        <span class="kw">let</span> (<span class="ident">referencing</span>, <span class="ident">referenced</span>) <span class="op">=</span> <span class="kw">match</span> (<span class="ident">referencing</span>, <span class="ident">referenced</span>) {
-            (<span class="prelude-val">Some</span>(<span class="ident">fields</span>), <span class="prelude-val">Some</span>(<span class="ident">references</span>)) =&gt; (<span class="ident">fields</span>, <span class="ident">references</span>),
-            <span class="kw">_</span> =&gt; <span class="kw">continue</span>,
+        <span class="kw">let </span>(referencing, referenced) = <span class="kw">match </span>(referencing, referenced) {
+            (<span class="prelude-val">Some</span>(fields), <span class="prelude-val">Some</span>(references)) =&gt; (fields, references),
+            <span class="kw">_ </span>=&gt; <span class="kw">continue</span>,
         };
 
-        <span class="kw">let</span> <span class="ident">types_match</span> <span class="op">=</span> <span class="ident">referencing</span>.<span class="ident">scalar_field_type</span>() <span class="op">==</span> <span class="ident">referenced</span>.<span class="ident">scalar_field_type</span>();
-        <span class="kw">let</span> <span class="ident">references_a_singular_field</span> <span class="op">=</span> <span class="op">!</span><span class="ident">referenced</span>.<span class="ident">ast_field</span>().<span class="ident">arity</span>.<span class="ident">is_list</span>();
+        <span class="kw">let </span>types_match = referencing.scalar_field_type() == referenced.scalar_field_type();
+        <span class="kw">let </span>references_a_singular_field = !referenced.ast_field().arity.is_list();
 
-        <span class="kw">let</span> <span class="ident">raw_types_match</span> <span class="op">=</span> <span class="ident">referencing</span>.<span class="ident">raw_native_type</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="number">1</span>) <span class="op">==</span> <span class="ident">referenced</span>.<span class="ident">raw_native_type</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="number">1</span>);
+        <span class="kw">let </span>raw_types_match = referencing.raw_native_type().map(|r| r.<span class="number">1</span>) == referenced.raw_native_type().map(|r| r.<span class="number">1</span>);
 
-        <span class="kw">if</span> <span class="ident">referencing</span>.<span class="ident">ast_field</span>().<span class="ident">arity</span>.<span class="ident">is_list</span>() <span class="op">&amp;&amp;</span> <span class="ident">types_match</span> <span class="op">&amp;&amp;</span> <span class="ident">raw_types_match</span> <span class="op">&amp;&amp;</span> <span class="ident">references_a_singular_field</span> {
+        <span class="kw">if </span>referencing.ast_field().arity.is_list() &amp;&amp; types_match &amp;&amp; raw_types_match &amp;&amp; references_a_singular_field {
             <span class="kw">continue</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">ast_field</span> <span class="op">=</span> <span class="ident">field</span>.<span class="ident">ast_field</span>();
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">ast_field</span>
-            .<span class="ident">span_for_attribute</span>(<span class="string">&quot;relation&quot;</span>)
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">ast_field</span>.<span class="ident">span</span>());
+        <span class="kw">let </span>ast_field = field.ast_field();
+        <span class="kw">let </span>span = ast_field
+            .span_for_attribute(<span class="string">&quot;relation&quot;</span>)
+            .unwrap_or_else(|| ast_field.span());
 
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_attribute_validation_error</span>(
-            <span class="ident">error_msg</span>,
+        ctx.push_error(DatamodelError::new_attribute_validation_error(
+            error_msg,
             <span class="string">&quot;@relation&quot;</span>,
-            <span class="ident">span</span>,
+            span,
         ));
     }
 }
 
-<span class="doccomment">/// No referential actions allowed in embedded 2-way relations (yet).</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">validate_no_referential_actions</span>(
-    <span class="ident">relation</span>: <span class="ident">TwoWayEmbeddedManyToManyRelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+<span class="doccomment">/// No referential actions allowed in embedded 2-way relations (yet).
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>validate_no_referential_actions(
+    relation: TwoWayEmbeddedManyToManyRelationWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) {
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>
-        .<span class="ident">connector</span>
-        .<span class="ident">has_capability</span>(<span class="ident">ConnectorCapability::TwoWayEmbeddedManyToManyRelation</span>)
+    <span class="kw">if </span>!ctx
+        .connector
+        .has_capability(ConnectorCapability::TwoWayEmbeddedManyToManyRelation)
     {
         <span class="kw">return</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">referential_action_spans</span> <span class="op">=</span> [<span class="ident">relation</span>.<span class="ident">field_a</span>(), <span class="ident">relation</span>.<span class="ident">field_b</span>()].<span class="ident">into_iter</span>().<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">field</span><span class="op">|</span> {
-        <span class="ident">field</span>
-            .<span class="ident">explicit_on_delete_span</span>()
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">chain</span>(<span class="ident">field</span>.<span class="ident">explicit_on_update_span</span>().<span class="ident">into_iter</span>())
+    <span class="kw">let </span>referential_action_spans = [relation.field_a(), relation.field_b()].into_iter().flat_map(|field| {
+        field
+            .explicit_on_delete_span()
+            .into_iter()
+            .chain(field.explicit_on_update_span().into_iter())
     });
 
-    <span class="kw">for</span> <span class="ident">span</span> <span class="kw">in</span> <span class="ident">referential_action_spans</span> {
-        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="string">&quot;Referential actions on two-way embedded many-to-many relations are not supported&quot;</span>;
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(<span class="ident">msg</span>, <span class="ident">span</span>));
+    <span class="kw">for </span>span <span class="kw">in </span>referential_action_spans {
+        <span class="kw">let </span>msg = <span class="string">&quot;Referential actions on two-way embedded many-to-many relations are not supported&quot;</span>;
+        ctx.push_error(DatamodelError::new_validation_error(msg, span));
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../../../" data-current-crate="psl_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../../../../" data-current-crate="psl_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

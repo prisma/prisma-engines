@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pin-project-internal-1.0.12/src/pinned_drop.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>pinned_drop.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../pin_project_internal/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../pin_project_internal/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../pin_project_internal/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/pin-project-internal-1.0.12/src/pinned_drop.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>pinned_drop.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../pin_project_internal/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../pin_project_internal/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../pin_project_internal/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -224,231 +224,231 @@
 <span id="224">224</span>
 <span id="225">225</span>
 <span id="226">226</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">proc_macro2::TokenStream</span>;
-<span class="kw">use</span> <span class="ident">quote</span>::{<span class="ident">format_ident</span>, <span class="ident">quote</span>, <span class="ident">ToTokens</span>};
-<span class="kw">use</span> <span class="ident">syn</span>::{
-    <span class="ident">parse_quote</span>, <span class="ident">spanned::Spanned</span>, <span class="ident">visit_mut::VisitMut</span>, <span class="ident">Error</span>, <span class="ident">FnArg</span>, <span class="ident">GenericArgument</span>, <span class="ident">ImplItem</span>,
-    <span class="ident">ItemImpl</span>, <span class="ident">Pat</span>, <span class="ident">PatIdent</span>, <span class="ident">Path</span>, <span class="ident">PathArguments</span>, <span class="prelude-ty">Result</span>, <span class="ident">ReturnType</span>, <span class="ident">Signature</span>, <span class="ident">Token</span>, <span class="ident">Type</span>,
-    <span class="ident">TypePath</span>, <span class="ident">TypeReference</span>,
+</pre><pre class="rust"><code><span class="kw">use </span>proc_macro2::TokenStream;
+<span class="kw">use </span>quote::{format_ident, quote, ToTokens};
+<span class="kw">use </span>syn::{
+    parse_quote, spanned::Spanned, visit_mut::VisitMut, Error, FnArg, GenericArgument, ImplItem,
+    ItemImpl, Pat, PatIdent, Path, PathArguments, <span class="prelude-ty">Result</span>, ReturnType, Signature, Token, Type,
+    TypePath, TypeReference,
 };
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils</span>::{<span class="ident">parse_as_empty</span>, <span class="ident">prepend_underscore_to_self</span>, <span class="ident">ReplaceReceiver</span>, <span class="ident">SliceExt</span>};
+<span class="kw">use </span><span class="kw">crate</span>::utils::{parse_as_empty, prepend_underscore_to_self, ReplaceReceiver, SliceExt};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">attribute</span>(<span class="ident">args</span>: <span class="kw-2">&amp;</span><span class="ident">TokenStream</span>, <span class="kw-2">mut</span> <span class="ident">input</span>: <span class="ident">ItemImpl</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> (<span class="op">|</span><span class="op">|</span> -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">parse_as_empty</span>(<span class="ident">args</span>)<span class="question-mark">?</span>;
-        <span class="ident">validate_impl</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>)<span class="question-mark">?</span>;
-        <span class="ident">expand_impl</span>(<span class="kw-2">&amp;mut</span> <span class="ident">input</span>);
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>attribute(args: <span class="kw-2">&amp;</span>TokenStream, <span class="kw-2">mut </span>input: ItemImpl) -&gt; TokenStream {
+    <span class="kw">let </span>res = (|| -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+        parse_as_empty(args)<span class="question-mark">?</span>;
+        validate_impl(<span class="kw-2">&amp;</span>input)<span class="question-mark">?</span>;
+        expand_impl(<span class="kw-2">&amp;mut </span>input);
         <span class="prelude-val">Ok</span>(())
     })();
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> <span class="ident">res</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tokens</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">to_compile_error</span>();
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Type::Path</span>(<span class="ident">self_ty</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">input</span>.<span class="ident">self_ty</span> {
-            <span class="kw">let</span> (<span class="ident">impl_generics</span>, <span class="kw">_</span>, <span class="ident">where_clause</span>) <span class="op">=</span> <span class="ident">input</span>.<span class="ident">generics</span>.<span class="ident">split_for_impl</span>();
+    <span class="kw">if let </span><span class="prelude-val">Err</span>(e) = res {
+        <span class="kw">let </span><span class="kw-2">mut </span>tokens = e.to_compile_error();
+        <span class="kw">if let </span>Type::Path(self_ty) = <span class="kw-2">&amp;*</span>input.self_ty {
+            <span class="kw">let </span>(impl_generics, <span class="kw">_</span>, where_clause) = input.generics.split_for_impl();
 
-            <span class="comment">// Generate a dummy impl of `PinnedDrop`.</span>
-            <span class="comment">// In many cases, `#[pinned_drop] impl` is declared after `#[pin_project]`.</span>
-            <span class="comment">// Therefore, if `pinned_drop` compile fails, you will also get an error</span>
-            <span class="comment">// about `PinnedDrop` not being implemented.</span>
-            <span class="comment">// This can be prevented to some extent by generating a dummy</span>
-            <span class="comment">// `PinnedDrop` implementation.</span>
-            <span class="comment">// We already know that we will get a compile error, so this won&#39;t</span>
-            <span class="comment">// accidentally compile successfully.</span>
-            <span class="comment">//</span>
-            <span class="comment">// However, if `input.self_ty` is not Type::Path, there is a high possibility that</span>
-            <span class="comment">// the type does not exist (since #[pin_project] can only be used on struct/enum</span>
-            <span class="comment">// definitions), so do not generate a dummy impl.</span>
-            <span class="ident">tokens</span>.<span class="ident">extend</span>(<span class="macro">quote!</span> {
-                <span class="kw">impl</span> #<span class="ident">impl_generics</span> <span class="ident">::pin_project::__private::PinnedDrop</span> <span class="kw">for</span> #<span class="ident">self_ty</span>
-                #<span class="ident">where_clause</span>
+            <span class="comment">// Generate a dummy impl of `PinnedDrop`.
+            // In many cases, `#[pinned_drop] impl` is declared after `#[pin_project]`.
+            // Therefore, if `pinned_drop` compile fails, you will also get an error
+            // about `PinnedDrop` not being implemented.
+            // This can be prevented to some extent by generating a dummy
+            // `PinnedDrop` implementation.
+            // We already know that we will get a compile error, so this won&#39;t
+            // accidentally compile successfully.
+            //
+            // However, if `input.self_ty` is not Type::Path, there is a high possibility that
+            // the type does not exist (since #[pin_project] can only be used on struct/enum
+            // definitions), so do not generate a dummy impl.
+            </span>tokens.extend(<span class="macro">quote! </span>{
+                <span class="kw">impl </span>#impl_generics ::pin_project::__private::PinnedDrop <span class="kw">for </span>#self_ty
+                #where_clause
                 {
-                    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">drop</span>(<span class="self">self</span>: <span class="ident">::pin_project::__private::Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>) {}
+                    <span class="kw">unsafe fn </span>drop(<span class="self">self</span>: ::pin_project::__private::Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;) {}
                 }
             });
         }
-        <span class="ident">tokens</span>
-    } <span class="kw">else</span> {
-        <span class="ident">input</span>.<span class="ident">into_token_stream</span>()
+        tokens
+    } <span class="kw">else </span>{
+        input.into_token_stream()
     }
 }
 
-<span class="doccomment">/// Validates the signature of given `PinnedDrop` impl.</span>
-<span class="kw">fn</span> <span class="ident">validate_impl</span>(<span class="ident">item</span>: <span class="kw-2">&amp;</span><span class="ident">ItemImpl</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">const</span> <span class="ident">INVALID_ITEM</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span>
+<span class="doccomment">/// Validates the signature of given `PinnedDrop` impl.
+</span><span class="kw">fn </span>validate_impl(item: <span class="kw-2">&amp;</span>ItemImpl) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    <span class="kw">const </span>INVALID_ITEM: <span class="kw-2">&amp;</span>str =
         <span class="string">&quot;#[pinned_drop] may only be used on implementation for the `PinnedDrop` trait&quot;</span>;
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">attr</span>) <span class="op">=</span> <span class="ident">item</span>.<span class="ident">attrs</span>.<span class="ident">find</span>(<span class="string">&quot;pinned_drop&quot;</span>) {
-        <span class="macro">bail!</span>(<span class="ident">attr</span>, <span class="string">&quot;duplicate #[pinned_drop] attribute&quot;</span>);
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(attr) = item.attrs.find(<span class="string">&quot;pinned_drop&quot;</span>) {
+        <span class="macro">bail!</span>(attr, <span class="string">&quot;duplicate #[pinned_drop] attribute&quot;</span>);
     }
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">path</span>, <span class="kw">_</span>)) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">trait_</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="string">&quot;PinnedDrop&quot;</span>) {
-            <span class="macro">bail!</span>(<span class="ident">path</span>, <span class="ident">INVALID_ITEM</span>);
+    <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="kw">_</span>, path, <span class="kw">_</span>)) = <span class="kw-2">&amp;</span>item.trait_ {
+        <span class="kw">if </span>!path.is_ident(<span class="string">&quot;PinnedDrop&quot;</span>) {
+            <span class="macro">bail!</span>(path, INVALID_ITEM);
         }
-    } <span class="kw">else</span> {
-        <span class="macro">bail!</span>(<span class="ident">item</span>.<span class="ident">self_ty</span>, <span class="ident">INVALID_ITEM</span>);
+    } <span class="kw">else </span>{
+        <span class="macro">bail!</span>(item.self_ty, INVALID_ITEM);
     }
 
-    <span class="kw">if</span> <span class="ident">item</span>.<span class="ident">unsafety</span>.<span class="ident">is_some</span>() {
-        <span class="macro">bail!</span>(<span class="ident">item</span>.<span class="ident">unsafety</span>, <span class="string">&quot;implementing the trait `PinnedDrop` is not unsafe&quot;</span>);
+    <span class="kw">if </span>item.unsafety.is_some() {
+        <span class="macro">bail!</span>(item.unsafety, <span class="string">&quot;implementing the trait `PinnedDrop` is not unsafe&quot;</span>);
     }
-    <span class="kw">if</span> <span class="ident">item</span>.<span class="ident">items</span>.<span class="ident">is_empty</span>() {
-        <span class="macro">bail!</span>(<span class="ident">item</span>, <span class="string">&quot;not all trait items implemented, missing: `drop`&quot;</span>);
-    }
-
-    <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">item</span>.<span class="ident">self_ty</span> {
-        <span class="ident">Type::Path</span>(<span class="kw">_</span>) =&gt; {}
-        <span class="ident">ty</span> =&gt; {
-            <span class="macro">bail!</span>(<span class="ident">ty</span>, <span class="string">&quot;implementing the trait `PinnedDrop` on this type is unsupported&quot;</span>);
-        }
+    <span class="kw">if </span>item.items.is_empty() {
+        <span class="macro">bail!</span>(item, <span class="string">&quot;not all trait items implemented, missing: `drop`&quot;</span>);
     }
 
-    <span class="ident">item</span>.<span class="ident">items</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>().<span class="ident">try_for_each</span>(<span class="op">|</span>(<span class="ident">i</span>, <span class="ident">item</span>)<span class="op">|</span> <span class="kw">match</span> <span class="ident">item</span> {
-        <span class="ident">ImplItem::Const</span>(<span class="ident">item</span>) =&gt; {
-            <span class="macro">bail!</span>(<span class="ident">item</span>, <span class="string">&quot;const `{}` is not a member of trait `PinnedDrop`&quot;</span>, <span class="ident">item</span>.<span class="ident">ident</span>)
+    <span class="kw">match </span><span class="kw-2">&amp;*</span>item.self_ty {
+        Type::Path(<span class="kw">_</span>) =&gt; {}
+        ty =&gt; {
+            <span class="macro">bail!</span>(ty, <span class="string">&quot;implementing the trait `PinnedDrop` on this type is unsupported&quot;</span>);
         }
-        <span class="ident">ImplItem::Type</span>(<span class="ident">item</span>) =&gt; {
-            <span class="macro">bail!</span>(<span class="ident">item</span>, <span class="string">&quot;type `{}` is not a member of trait `PinnedDrop`&quot;</span>, <span class="ident">item</span>.<span class="ident">ident</span>)
+    }
+
+    item.items.iter().enumerate().try_for_each(|(i, item)| <span class="kw">match </span>item {
+        ImplItem::Const(item) =&gt; {
+            <span class="macro">bail!</span>(item, <span class="string">&quot;const `{}` is not a member of trait `PinnedDrop`&quot;</span>, item.ident)
         }
-        <span class="ident">ImplItem::Method</span>(<span class="ident">method</span>) =&gt; {
-            <span class="ident">validate_sig</span>(<span class="kw-2">&amp;</span><span class="ident">method</span>.<span class="ident">sig</span>)<span class="question-mark">?</span>;
-            <span class="kw">if</span> <span class="ident">i</span> <span class="op">==</span> <span class="number">0</span> {
+        ImplItem::Type(item) =&gt; {
+            <span class="macro">bail!</span>(item, <span class="string">&quot;type `{}` is not a member of trait `PinnedDrop`&quot;</span>, item.ident)
+        }
+        ImplItem::Method(method) =&gt; {
+            validate_sig(<span class="kw-2">&amp;</span>method.sig)<span class="question-mark">?</span>;
+            <span class="kw">if </span>i == <span class="number">0 </span>{
                 <span class="prelude-val">Ok</span>(())
-            } <span class="kw">else</span> {
-                <span class="macro">bail!</span>(<span class="ident">method</span>, <span class="string">&quot;duplicate definitions with name `drop`&quot;</span>)
+            } <span class="kw">else </span>{
+                <span class="macro">bail!</span>(method, <span class="string">&quot;duplicate definitions with name `drop`&quot;</span>)
             }
         }
-        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;unexpected ImplItem&quot;</span>),
+        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;unexpected ImplItem&quot;</span>),
     })
 }
 
-<span class="doccomment">/// Validates the signature of given `PinnedDrop::drop` method.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The correct signature is: `(mut) self: (&lt;path&gt;::)Pin&lt;&amp;mut Self&gt;`</span>
-<span class="kw">fn</span> <span class="ident">validate_sig</span>(<span class="ident">sig</span>: <span class="kw-2">&amp;</span><span class="ident">Signature</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">get_ty_path</span>(<span class="ident">ty</span>: <span class="kw-2">&amp;</span><span class="ident">Type</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Path</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Type::Path</span>(<span class="ident">TypePath</span> { <span class="ident">qself</span>: <span class="prelude-val">None</span>, <span class="ident">path</span> }) <span class="op">=</span> <span class="ident">ty</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">path</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
+<span class="doccomment">/// Validates the signature of given `PinnedDrop::drop` method.
+///
+/// The correct signature is: `(mut) self: (&lt;path&gt;::)Pin&lt;&amp;mut Self&gt;`
+</span><span class="kw">fn </span>validate_sig(sig: <span class="kw-2">&amp;</span>Signature) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    <span class="kw">fn </span>get_ty_path(ty: <span class="kw-2">&amp;</span>Type) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Path&gt; {
+        <span class="kw">if let </span>Type::Path(TypePath { qself: <span class="prelude-val">None</span>, path }) = ty {
+            <span class="prelude-val">Some</span>(path)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
+    }
+
+    <span class="kw">const </span>INVALID_ARGUMENT: <span class="kw-2">&amp;</span>str = <span class="string">&quot;method `drop` must take an argument `self: Pin&lt;&amp;mut Self&gt;`&quot;</span>;
+
+    <span class="kw">if </span>sig.ident != <span class="string">&quot;drop&quot; </span>{
+        <span class="macro">bail!</span>(sig.ident, <span class="string">&quot;method `{}` is not a member of trait `PinnedDrop&quot;</span>, sig.ident,);
+    }
+
+    <span class="kw">if let </span>ReturnType::Type(<span class="kw">_</span>, ty) = <span class="kw-2">&amp;</span>sig.output {
+        <span class="kw">match </span><span class="kw-2">&amp;**</span>ty {
+            Type::Tuple(ty) <span class="kw">if </span>ty.elems.is_empty() =&gt; {}
+            <span class="kw">_ </span>=&gt; <span class="macro">bail!</span>(ty, <span class="string">&quot;method `drop` must return the unit type&quot;</span>),
         }
     }
 
-    <span class="kw">const</span> <span class="ident">INVALID_ARGUMENT</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;method `drop` must take an argument `self: Pin&lt;&amp;mut Self&gt;`&quot;</span>;
-
-    <span class="kw">if</span> <span class="ident">sig</span>.<span class="ident">ident</span> <span class="op">!</span><span class="op">=</span> <span class="string">&quot;drop&quot;</span> {
-        <span class="macro">bail!</span>(<span class="ident">sig</span>.<span class="ident">ident</span>, <span class="string">&quot;method `{}` is not a member of trait `PinnedDrop&quot;</span>, <span class="ident">sig</span>.<span class="ident">ident</span>,);
+    <span class="kw">match </span>sig.inputs.len() {
+        <span class="number">1 </span>=&gt; {}
+        <span class="number">0 </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::new(sig.paren_token.span, INVALID_ARGUMENT)),
+        <span class="kw">_ </span>=&gt; <span class="macro">bail!</span>(sig.inputs, INVALID_ARGUMENT),
     }
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ReturnType::Type</span>(<span class="kw">_</span>, <span class="ident">ty</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">sig</span>.<span class="ident">output</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">ty</span> {
-            <span class="ident">Type::Tuple</span>(<span class="ident">ty</span>) <span class="kw">if</span> <span class="ident">ty</span>.<span class="ident">elems</span>.<span class="ident">is_empty</span>() =&gt; {}
-            <span class="kw">_</span> =&gt; <span class="macro">bail!</span>(<span class="ident">ty</span>, <span class="string">&quot;method `drop` must return the unit type&quot;</span>),
-        }
-    }
-
-    <span class="kw">match</span> <span class="ident">sig</span>.<span class="ident">inputs</span>.<span class="ident">len</span>() {
-        <span class="number">1</span> =&gt; {}
-        <span class="number">0</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::new</span>(<span class="ident">sig</span>.<span class="ident">paren_token</span>.<span class="ident">span</span>, <span class="ident">INVALID_ARGUMENT</span>)),
-        <span class="kw">_</span> =&gt; <span class="macro">bail!</span>(<span class="ident">sig</span>.<span class="ident">inputs</span>, <span class="ident">INVALID_ARGUMENT</span>),
-    }
-
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">FnArg::Typed</span>(<span class="ident">arg</span>)) <span class="op">=</span> <span class="ident">sig</span>.<span class="ident">receiver</span>() {
-        <span class="comment">// (mut) self: &lt;path&gt;</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">path</span>) <span class="op">=</span> <span class="ident">get_ty_path</span>(<span class="kw-2">&amp;</span><span class="ident">arg</span>.<span class="ident">ty</span>) {
-            <span class="kw">let</span> <span class="ident">ty</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">segments</span>.<span class="ident">last</span>().<span class="ident">unwrap</span>();
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">PathArguments::AngleBracketed</span>(<span class="ident">args</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ty</span>.<span class="ident">arguments</span> {
-                <span class="comment">// (mut) self: (&lt;path&gt;::)&lt;ty&gt;&lt;&amp;mut &lt;elem&gt;..&gt;</span>
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">GenericArgument::Type</span>(<span class="ident">Type::Reference</span>(<span class="ident">TypeReference</span> {
-                    <span class="ident">mutability</span>: <span class="prelude-val">Some</span>(<span class="kw">_</span>),
-                    <span class="ident">elem</span>,
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(FnArg::Typed(arg)) = sig.receiver() {
+        <span class="comment">// (mut) self: &lt;path&gt;
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(path) = get_ty_path(<span class="kw-2">&amp;</span>arg.ty) {
+            <span class="kw">let </span>ty = path.segments.last().unwrap();
+            <span class="kw">if let </span>PathArguments::AngleBracketed(args) = <span class="kw-2">&amp;</span>ty.arguments {
+                <span class="comment">// (mut) self: (&lt;path&gt;::)&lt;ty&gt;&lt;&amp;mut &lt;elem&gt;..&gt;
+                </span><span class="kw">if let </span><span class="prelude-val">Some</span>(GenericArgument::Type(Type::Reference(TypeReference {
+                    mutability: <span class="prelude-val">Some</span>(<span class="kw">_</span>),
+                    elem,
                     ..
-                }))) <span class="op">=</span> <span class="ident">args</span>.<span class="ident">args</span>.<span class="ident">first</span>()
+                }))) = args.args.first()
                 {
-                    <span class="comment">// (mut) self: (&lt;path&gt;::)Pin&lt;&amp;mut Self&gt;</span>
-                    <span class="kw">if</span> <span class="ident">args</span>.<span class="ident">args</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span>
-                        <span class="op">&amp;&amp;</span> <span class="ident">ty</span>.<span class="ident">ident</span> <span class="op">==</span> <span class="string">&quot;Pin&quot;</span>
-                        <span class="op">&amp;&amp;</span> <span class="ident">get_ty_path</span>(<span class="ident">elem</span>).<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">path</span><span class="op">|</span> <span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="string">&quot;Self&quot;</span>))
+                    <span class="comment">// (mut) self: (&lt;path&gt;::)Pin&lt;&amp;mut Self&gt;
+                    </span><span class="kw">if </span>args.args.len() == <span class="number">1
+                        </span>&amp;&amp; ty.ident == <span class="string">&quot;Pin&quot;
+                        </span>&amp;&amp; get_ty_path(elem).map_or(<span class="bool-val">false</span>, |path| path.is_ident(<span class="string">&quot;Self&quot;</span>))
                     {
-                        <span class="kw">if</span> <span class="ident">sig</span>.<span class="ident">unsafety</span>.<span class="ident">is_some</span>() {
-                            <span class="macro">bail!</span>(<span class="ident">sig</span>.<span class="ident">unsafety</span>, <span class="string">&quot;implementing the method `drop` is not unsafe&quot;</span>);
+                        <span class="kw">if </span>sig.unsafety.is_some() {
+                            <span class="macro">bail!</span>(sig.unsafety, <span class="string">&quot;implementing the method `drop` is not unsafe&quot;</span>);
                         }
-                        <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+                        <span class="kw">return </span><span class="prelude-val">Ok</span>(());
                     }
                 }
             }
         }
     }
 
-    <span class="macro">bail!</span>(<span class="ident">sig</span>.<span class="ident">inputs</span>[<span class="number">0</span>], <span class="ident">INVALID_ARGUMENT</span>)
+    <span class="macro">bail!</span>(sig.inputs[<span class="number">0</span>], INVALID_ARGUMENT)
 }
 
-<span class="comment">// from:</span>
-<span class="comment">//</span>
-<span class="comment">// fn drop(self: Pin&lt;&amp;mut Self&gt;) {</span>
-<span class="comment">//     // ...</span>
-<span class="comment">// }</span>
-<span class="comment">//</span>
-<span class="comment">// into:</span>
-<span class="comment">//</span>
-<span class="comment">// unsafe fn drop(self: Pin&lt;&amp;mut Self&gt;) {</span>
-<span class="comment">//     fn __drop_inner&lt;T&gt;(__self: Pin&lt;&amp;mut Foo&lt;&#39;_, T&gt;&gt;) {</span>
-<span class="comment">//         fn __drop_inner() {}</span>
-<span class="comment">//         // ...</span>
-<span class="comment">//     }</span>
-<span class="comment">//     __drop_inner(self);</span>
-<span class="comment">// }</span>
-<span class="comment">//</span>
-<span class="kw">fn</span> <span class="ident">expand_impl</span>(<span class="ident">item</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ItemImpl</span>) {
-    <span class="kw">fn</span> <span class="ident">get_arg_pat</span>(<span class="ident">arg</span>: <span class="kw-2">&amp;mut</span> <span class="ident">FnArg</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">PatIdent</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">FnArg::Typed</span>(<span class="ident">arg</span>) <span class="op">=</span> <span class="ident">arg</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Pat::Ident</span>(<span class="ident">ident</span>) <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">arg</span>.<span class="ident">pat</span> {
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">ident</span>);
+<span class="comment">// from:
+//
+// fn drop(self: Pin&lt;&amp;mut Self&gt;) {
+//     // ...
+// }
+//
+// into:
+//
+// unsafe fn drop(self: Pin&lt;&amp;mut Self&gt;) {
+//     fn __drop_inner&lt;T&gt;(__self: Pin&lt;&amp;mut Foo&lt;&#39;_, T&gt;&gt;) {
+//         fn __drop_inner() {}
+//         // ...
+//     }
+//     __drop_inner(self);
+// }
+//
+</span><span class="kw">fn </span>expand_impl(item: <span class="kw-2">&amp;mut </span>ItemImpl) {
+    <span class="kw">fn </span>get_arg_pat(arg: <span class="kw-2">&amp;mut </span>FnArg) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>PatIdent&gt; {
+        <span class="kw">if let </span>FnArg::Typed(arg) = arg {
+            <span class="kw">if let </span>Pat::Ident(ident) = <span class="kw-2">&amp;mut *</span>arg.pat {
+                <span class="kw">return </span><span class="prelude-val">Some</span>(ident);
             }
         }
-        <span class="prelude-val">None</span>
-    }
+        <span class="prelude-val">None
+    </span>}
 
-    <span class="comment">// `PinnedDrop` is a private trait and should not appear in docs.</span>
-    <span class="ident">item</span>.<span class="ident">attrs</span>.<span class="ident">push</span>(<span class="macro">parse_quote!</span>(<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>));
+    <span class="comment">// `PinnedDrop` is a private trait and should not appear in docs.
+    </span>item.attrs.push(<span class="macro">parse_quote!</span>(<span class="attribute">#[doc(hidden)]</span>));
 
-    <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">item</span>.<span class="ident">trait_</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="number">1</span>;
-    <span class="kw-2">*</span><span class="ident">path</span> <span class="op">=</span> <span class="macro">parse_quote_spanned!</span> { <span class="ident">path</span>.<span class="ident">span</span>() =&gt;
-        <span class="ident">::pin_project::__private::PinnedDrop</span>
+    <span class="kw">let </span>path = <span class="kw-2">&amp;mut </span>item.trait_.as_mut().unwrap().<span class="number">1</span>;
+    <span class="kw-2">*</span>path = <span class="macro">parse_quote_spanned! </span>{ path.span() =&gt;
+        ::pin_project::__private::PinnedDrop
     };
 
-    <span class="kw">let</span> <span class="ident">method</span> <span class="op">=</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ImplItem::Method</span>(<span class="ident">method</span>) <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">item</span>.<span class="ident">items</span>[<span class="number">0</span>] { <span class="ident">method</span> } <span class="kw">else</span> { <span class="macro">unreachable!</span>() };
+    <span class="kw">let </span>method =
+        <span class="kw">if let </span>ImplItem::Method(method) = <span class="kw-2">&amp;mut </span>item.items[<span class="number">0</span>] { method } <span class="kw">else </span>{ <span class="macro">unreachable!</span>() };
 
-    <span class="comment">// `fn drop(mut self: Pin&lt;&amp;mut Self&gt;)` -&gt; `fn __drop_inner&lt;T&gt;(mut __self: Pin&lt;&amp;mut Receiver&gt;)`</span>
-    <span class="kw">let</span> <span class="ident">drop_inner</span> <span class="op">=</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">drop_inner</span> <span class="op">=</span> <span class="ident">method</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">ident</span> <span class="op">=</span> <span class="macro">format_ident!</span>(<span class="string">&quot;__drop_inner&quot;</span>);
-        <span class="comment">// Add a dummy `__drop_inner` function to prevent users call outer `__drop_inner`.</span>
-        <span class="ident">drop_inner</span>.<span class="ident">block</span>.<span class="ident">stmts</span>.<span class="ident">insert</span>(<span class="number">0</span>, <span class="macro">parse_quote!</span>(<span class="kw">fn</span> #<span class="ident">ident</span>() {}));
-        <span class="ident">drop_inner</span>.<span class="ident">sig</span>.<span class="ident">ident</span> <span class="op">=</span> <span class="ident">ident</span>;
-        <span class="ident">drop_inner</span>.<span class="ident">sig</span>.<span class="ident">generics</span> <span class="op">=</span> <span class="ident">item</span>.<span class="ident">generics</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">self_pat</span> <span class="op">=</span> <span class="ident">get_arg_pat</span>(<span class="kw-2">&amp;mut</span> <span class="ident">drop_inner</span>.<span class="ident">sig</span>.<span class="ident">inputs</span>[<span class="number">0</span>]).<span class="ident">unwrap</span>();
-        <span class="ident">prepend_underscore_to_self</span>(<span class="kw-2">&amp;mut</span> <span class="ident">self_pat</span>.<span class="ident">ident</span>);
-        <span class="kw">let</span> <span class="ident">self_ty</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Type::Path</span>(<span class="ident">ty</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">item</span>.<span class="ident">self_ty</span> { <span class="ident">ty</span> } <span class="kw">else</span> { <span class="macro">unreachable!</span>() };
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">visitor</span> <span class="op">=</span> <span class="ident">ReplaceReceiver</span>(<span class="ident">self_ty</span>);
-        <span class="ident">visitor</span>.<span class="ident">visit_signature_mut</span>(<span class="kw-2">&amp;mut</span> <span class="ident">drop_inner</span>.<span class="ident">sig</span>);
-        <span class="ident">visitor</span>.<span class="ident">visit_block_mut</span>(<span class="kw-2">&amp;mut</span> <span class="ident">drop_inner</span>.<span class="ident">block</span>);
-        <span class="ident">drop_inner</span>
+    <span class="comment">// `fn drop(mut self: Pin&lt;&amp;mut Self&gt;)` -&gt; `fn __drop_inner&lt;T&gt;(mut __self: Pin&lt;&amp;mut Receiver&gt;)`
+    </span><span class="kw">let </span>drop_inner = {
+        <span class="kw">let </span><span class="kw-2">mut </span>drop_inner = method.clone();
+        <span class="kw">let </span>ident = <span class="macro">format_ident!</span>(<span class="string">&quot;__drop_inner&quot;</span>);
+        <span class="comment">// Add a dummy `__drop_inner` function to prevent users call outer `__drop_inner`.
+        </span>drop_inner.block.stmts.insert(<span class="number">0</span>, <span class="macro">parse_quote!</span>(<span class="kw">fn </span>#ident() {}));
+        drop_inner.sig.ident = ident;
+        drop_inner.sig.generics = item.generics.clone();
+        <span class="kw">let </span>self_pat = get_arg_pat(<span class="kw-2">&amp;mut </span>drop_inner.sig.inputs[<span class="number">0</span>]).unwrap();
+        prepend_underscore_to_self(<span class="kw-2">&amp;mut </span>self_pat.ident);
+        <span class="kw">let </span>self_ty = <span class="kw">if let </span>Type::Path(ty) = <span class="kw-2">&amp;*</span>item.self_ty { ty } <span class="kw">else </span>{ <span class="macro">unreachable!</span>() };
+        <span class="kw">let </span><span class="kw-2">mut </span>visitor = ReplaceReceiver(self_ty);
+        visitor.visit_signature_mut(<span class="kw-2">&amp;mut </span>drop_inner.sig);
+        visitor.visit_block_mut(<span class="kw-2">&amp;mut </span>drop_inner.block);
+        drop_inner
     };
 
-    <span class="comment">// `fn drop(mut self: Pin&lt;&amp;mut Self&gt;)` -&gt; `unsafe fn drop(self: Pin&lt;&amp;mut Self&gt;)`</span>
-    <span class="ident">method</span>.<span class="ident">sig</span>.<span class="ident">unsafety</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="op">&lt;</span><span class="macro">Token!</span>[<span class="kw">unsafe</span>]<span class="op">&gt;</span><span class="ident">::default</span>());
-    <span class="kw">let</span> <span class="ident">self_pat</span> <span class="op">=</span> <span class="ident">get_arg_pat</span>(<span class="kw-2">&amp;mut</span> <span class="ident">method</span>.<span class="ident">sig</span>.<span class="ident">inputs</span>[<span class="number">0</span>]).<span class="ident">unwrap</span>();
-    <span class="ident">self_pat</span>.<span class="ident">mutability</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-    <span class="kw">let</span> <span class="ident">self_token</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">self_pat</span>.<span class="ident">ident</span>;
+    <span class="comment">// `fn drop(mut self: Pin&lt;&amp;mut Self&gt;)` -&gt; `unsafe fn drop(self: Pin&lt;&amp;mut Self&gt;)`
+    </span>method.sig.unsafety = <span class="prelude-val">Some</span>(&lt;<span class="macro">Token!</span>[<span class="kw">unsafe</span>]&gt;::default());
+    <span class="kw">let </span>self_pat = get_arg_pat(<span class="kw-2">&amp;mut </span>method.sig.inputs[<span class="number">0</span>]).unwrap();
+    self_pat.mutability = <span class="prelude-val">None</span>;
+    <span class="kw">let </span>self_token = <span class="kw-2">&amp;</span>self_pat.ident;
 
-    <span class="ident">method</span>.<span class="ident">block</span>.<span class="ident">stmts</span> <span class="op">=</span> <span class="macro">parse_quote!</span> {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::needless_pass_by_value</span>)]</span> <span class="comment">// This lint does not warn the receiver.</span>
-        #<span class="ident">drop_inner</span>
-        <span class="ident">__drop_inner</span>(#<span class="ident">self_token</span>);
+    method.block.stmts = <span class="macro">parse_quote! </span>{
+        <span class="attribute">#[allow(clippy::needless_pass_by_value)] </span><span class="comment">// This lint does not warn the receiver.
+        </span>#drop_inner
+        __drop_inner(#self_token);
     };
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="pin_project_internal" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="pin_project_internal" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

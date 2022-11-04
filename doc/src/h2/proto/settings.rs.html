@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/h2-0.3.14/src/proto/settings.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>settings.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../h2/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/h2-0.3.14/src/proto/settings.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>settings.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../h2/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../h2/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -149,156 +149,156 @@
 <span id="149">149</span>
 <span id="150">150</span>
 <span id="151">151</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::codec::UserError</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::Reason</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::frame</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::proto</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::codec::UserError;
+<span class="kw">use </span><span class="kw">crate</span>::error::Reason;
+<span class="kw">use </span><span class="kw">crate</span>::frame;
+<span class="kw">use </span><span class="kw">crate</span>::proto::<span class="kw-2">*</span>;
+<span class="kw">use </span>std::task::{Context, Poll};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Settings</span> {
-    <span class="doccomment">/// Our local SETTINGS sync state with the remote.</span>
-    <span class="ident">local</span>: <span class="ident">Local</span>,
-    <span class="doccomment">/// Received SETTINGS frame pending processing. The ACK must be written to</span>
-    <span class="doccomment">/// the socket first then the settings applied **before** receiving any</span>
-    <span class="doccomment">/// further frames.</span>
-    <span class="ident">remote</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">frame::Settings</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Settings {
+    <span class="doccomment">/// Our local SETTINGS sync state with the remote.
+    </span>local: Local,
+    <span class="doccomment">/// Received SETTINGS frame pending processing. The ACK must be written to
+    /// the socket first then the settings applied **before** receiving any
+    /// further frames.
+    </span>remote: <span class="prelude-ty">Option</span>&lt;frame::Settings&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">enum</span> <span class="ident">Local</span> {
-    <span class="doccomment">/// We want to send these SETTINGS to the remote when the socket is ready.</span>
-    <span class="ident">ToSend</span>(<span class="ident">frame::Settings</span>),
-    <span class="doccomment">/// We have sent these SETTINGS and are waiting for the remote to ACK</span>
-    <span class="doccomment">/// before we apply them.</span>
-    <span class="ident">WaitingAck</span>(<span class="ident">frame::Settings</span>),
-    <span class="doccomment">/// Our local settings are in sync with the remote.</span>
-    <span class="ident">Synced</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">enum </span>Local {
+    <span class="doccomment">/// We want to send these SETTINGS to the remote when the socket is ready.
+    </span>ToSend(frame::Settings),
+    <span class="doccomment">/// We have sent these SETTINGS and are waiting for the remote to ACK
+    /// before we apply them.
+    </span>WaitingAck(frame::Settings),
+    <span class="doccomment">/// Our local settings are in sync with the remote.
+    </span>Synced,
 }
 
-<span class="kw">impl</span> <span class="ident">Settings</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">local</span>: <span class="ident">frame::Settings</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Settings</span> {
-            <span class="comment">// We assume the initial local SETTINGS were flushed during</span>
-            <span class="comment">// the handshake process.</span>
-            <span class="ident">local</span>: <span class="ident">Local::WaitingAck</span>(<span class="ident">local</span>),
-            <span class="ident">remote</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl </span>Settings {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(local: frame::Settings) -&gt; <span class="self">Self </span>{
+        Settings {
+            <span class="comment">// We assume the initial local SETTINGS were flushed during
+            // the handshake process.
+            </span>local: Local::WaitingAck(local),
+            remote: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">recv_settings</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span>, <span class="ident">C</span>, <span class="ident">P</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">frame</span>: <span class="ident">frame::Settings</span>,
-        <span class="ident">codec</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Codec</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span>,
-        <span class="ident">streams</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Streams</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">P</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-        <span class="ident">B</span>: <span class="ident">Buf</span>,
-        <span class="ident">C</span>: <span class="ident">Buf</span>,
-        <span class="ident">P</span>: <span class="ident">Peer</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>recv_settings&lt;T, B, C, P&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        frame: frame::Settings,
+        codec: <span class="kw-2">&amp;mut </span>Codec&lt;T, B&gt;,
+        streams: <span class="kw-2">&amp;mut </span>Streams&lt;C, P&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt;
+    <span class="kw">where
+        </span>T: AsyncWrite + Unpin,
+        B: Buf,
+        C: Buf,
+        P: Peer,
     {
-        <span class="kw">if</span> <span class="ident">frame</span>.<span class="ident">is_ack</span>() {
-            <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">local</span> {
-                <span class="ident">Local::WaitingAck</span>(<span class="ident">local</span>) =&gt; {
-                    <span class="macro">tracing::debug!</span>(<span class="string">&quot;received settings ACK; applying {:?}&quot;</span>, <span class="ident">local</span>);
+        <span class="kw">if </span>frame.is_ack() {
+            <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.local {
+                Local::WaitingAck(local) =&gt; {
+                    <span class="macro">tracing::debug!</span>(<span class="string">&quot;received settings ACK; applying {:?}&quot;</span>, local);
 
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">max</span>) <span class="op">=</span> <span class="ident">local</span>.<span class="ident">max_frame_size</span>() {
-                        <span class="ident">codec</span>.<span class="ident">set_max_recv_frame_size</span>(<span class="ident">max</span> <span class="kw">as</span> <span class="ident">usize</span>);
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(max) = local.max_frame_size() {
+                        codec.set_max_recv_frame_size(max <span class="kw">as </span>usize);
                     }
 
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">max</span>) <span class="op">=</span> <span class="ident">local</span>.<span class="ident">max_header_list_size</span>() {
-                        <span class="ident">codec</span>.<span class="ident">set_max_recv_header_list_size</span>(<span class="ident">max</span> <span class="kw">as</span> <span class="ident">usize</span>);
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(max) = local.max_header_list_size() {
+                        codec.set_max_recv_header_list_size(max <span class="kw">as </span>usize);
                     }
 
-                    <span class="ident">streams</span>.<span class="ident">apply_local_settings</span>(<span class="ident">local</span>)<span class="question-mark">?</span>;
-                    <span class="self">self</span>.<span class="ident">local</span> <span class="op">=</span> <span class="ident">Local::Synced</span>;
+                    streams.apply_local_settings(local)<span class="question-mark">?</span>;
+                    <span class="self">self</span>.local = Local::Synced;
                     <span class="prelude-val">Ok</span>(())
                 }
-                <span class="ident">Local::ToSend</span>(..) <span class="op">|</span> <span class="ident">Local::Synced</span> =&gt; {
-                    <span class="comment">// We haven&#39;t sent any SETTINGS frames to be ACKed, so</span>
-                    <span class="comment">// this is very bizarre! Remote is either buggy or malicious.</span>
-                    <span class="macro">proto_err!</span>(<span class="ident">conn</span>: <span class="string">&quot;received unexpected settings ack&quot;</span>);
-                    <span class="prelude-val">Err</span>(<span class="ident">Error::library_go_away</span>(<span class="ident">Reason::PROTOCOL_ERROR</span>))
+                Local::ToSend(..) | Local::Synced =&gt; {
+                    <span class="comment">// We haven&#39;t sent any SETTINGS frames to be ACKed, so
+                    // this is very bizarre! Remote is either buggy or malicious.
+                    </span><span class="macro">proto_err!</span>(conn: <span class="string">&quot;received unexpected settings ack&quot;</span>);
+                    <span class="prelude-val">Err</span>(Error::library_go_away(Reason::PROTOCOL_ERROR))
                 }
             }
-        } <span class="kw">else</span> {
-            <span class="comment">// We always ACK before reading more frames, so `remote` should</span>
-            <span class="comment">// always be none!</span>
-            <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">remote</span>.<span class="ident">is_none</span>());
-            <span class="self">self</span>.<span class="ident">remote</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">frame</span>);
+        } <span class="kw">else </span>{
+            <span class="comment">// We always ACK before reading more frames, so `remote` should
+            // always be none!
+            </span><span class="macro">assert!</span>(<span class="self">self</span>.remote.is_none());
+            <span class="self">self</span>.remote = <span class="prelude-val">Some</span>(frame);
             <span class="prelude-val">Ok</span>(())
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">send_settings</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">frame</span>: <span class="ident">frame::Settings</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">UserError</span><span class="op">&gt;</span> {
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">frame</span>.<span class="ident">is_ack</span>());
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">local</span> {
-            <span class="ident">Local::ToSend</span>(..) <span class="op">|</span> <span class="ident">Local::WaitingAck</span>(..) =&gt; <span class="prelude-val">Err</span>(<span class="ident">UserError::SendSettingsWhilePending</span>),
-            <span class="ident">Local::Synced</span> =&gt; {
-                <span class="macro">tracing::trace!</span>(<span class="string">&quot;queue to send local settings: {:?}&quot;</span>, <span class="ident">frame</span>);
-                <span class="self">self</span>.<span class="ident">local</span> <span class="op">=</span> <span class="ident">Local::ToSend</span>(<span class="ident">frame</span>);
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>send_settings(<span class="kw-2">&amp;mut </span><span class="self">self</span>, frame: frame::Settings) -&gt; <span class="prelude-ty">Result</span>&lt;(), UserError&gt; {
+        <span class="macro">assert!</span>(!frame.is_ack());
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.local {
+            Local::ToSend(..) | Local::WaitingAck(..) =&gt; <span class="prelude-val">Err</span>(UserError::SendSettingsWhilePending),
+            Local::Synced =&gt; {
+                <span class="macro">tracing::trace!</span>(<span class="string">&quot;queue to send local settings: {:?}&quot;</span>, frame);
+                <span class="self">self</span>.local = Local::ToSend(frame);
                 <span class="prelude-val">Ok</span>(())
             }
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">poll_send</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span>, <span class="ident">C</span>, <span class="ident">P</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span>,
-        <span class="ident">dst</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Codec</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">B</span><span class="op">&gt;</span>,
-        <span class="ident">streams</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Streams</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">P</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">T</span>: <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span>,
-        <span class="ident">B</span>: <span class="ident">Buf</span>,
-        <span class="ident">C</span>: <span class="ident">Buf</span>,
-        <span class="ident">P</span>: <span class="ident">Peer</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>poll_send&lt;T, B, C, P&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        cx: <span class="kw-2">&amp;mut </span>Context,
+        dst: <span class="kw-2">&amp;mut </span>Codec&lt;T, B&gt;,
+        streams: <span class="kw-2">&amp;mut </span>Streams&lt;C, P&gt;,
+    ) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), Error&gt;&gt;
+    <span class="kw">where
+        </span>T: AsyncWrite + Unpin,
+        B: Buf,
+        C: Buf,
+        P: Peer,
     {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">settings</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">remote</span> {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">dst</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>)<span class="question-mark">?</span>.<span class="ident">is_ready</span>() {
-                <span class="kw">return</span> <span class="ident">Poll::Pending</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(settings) = <span class="kw-2">&amp;</span><span class="self">self</span>.remote {
+            <span class="kw">if </span>!dst.poll_ready(cx)<span class="question-mark">?</span>.is_ready() {
+                <span class="kw">return </span>Poll::Pending;
             }
 
-            <span class="comment">// Create an ACK settings frame</span>
-            <span class="kw">let</span> <span class="ident">frame</span> <span class="op">=</span> <span class="ident">frame::Settings::ack</span>();
+            <span class="comment">// Create an ACK settings frame
+            </span><span class="kw">let </span>frame = frame::Settings::ack();
 
-            <span class="comment">// Buffer the settings frame</span>
-            <span class="ident">dst</span>.<span class="ident">buffer</span>(<span class="ident">frame</span>.<span class="ident">into</span>()).<span class="ident">expect</span>(<span class="string">&quot;invalid settings frame&quot;</span>);
+            <span class="comment">// Buffer the settings frame
+            </span>dst.buffer(frame.into()).expect(<span class="string">&quot;invalid settings frame&quot;</span>);
 
             <span class="macro">tracing::trace!</span>(<span class="string">&quot;ACK sent; applying settings&quot;</span>);
 
-            <span class="ident">streams</span>.<span class="ident">apply_remote_settings</span>(<span class="ident">settings</span>)<span class="question-mark">?</span>;
+            streams.apply_remote_settings(settings)<span class="question-mark">?</span>;
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span> <span class="ident">settings</span>.<span class="ident">header_table_size</span>() {
-                <span class="ident">dst</span>.<span class="ident">set_send_header_table_size</span>(<span class="ident">val</span> <span class="kw">as</span> <span class="ident">usize</span>);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(val) = settings.header_table_size() {
+                dst.set_send_header_table_size(val <span class="kw">as </span>usize);
             }
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span> <span class="ident">settings</span>.<span class="ident">max_frame_size</span>() {
-                <span class="ident">dst</span>.<span class="ident">set_max_send_frame_size</span>(<span class="ident">val</span> <span class="kw">as</span> <span class="ident">usize</span>);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(val) = settings.max_frame_size() {
+                dst.set_max_send_frame_size(val <span class="kw">as </span>usize);
             }
         }
 
-        <span class="self">self</span>.<span class="ident">remote</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+        <span class="self">self</span>.remote = <span class="prelude-val">None</span>;
 
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">local</span> {
-            <span class="ident">Local::ToSend</span>(<span class="ident">settings</span>) =&gt; {
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">dst</span>.<span class="ident">poll_ready</span>(<span class="ident">cx</span>)<span class="question-mark">?</span>.<span class="ident">is_ready</span>() {
-                    <span class="kw">return</span> <span class="ident">Poll::Pending</span>;
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.local {
+            Local::ToSend(settings) =&gt; {
+                <span class="kw">if </span>!dst.poll_ready(cx)<span class="question-mark">?</span>.is_ready() {
+                    <span class="kw">return </span>Poll::Pending;
                 }
 
-                <span class="comment">// Buffer the settings frame</span>
-                <span class="ident">dst</span>.<span class="ident">buffer</span>(<span class="ident">settings</span>.<span class="ident">clone</span>().<span class="ident">into</span>())
-                    .<span class="ident">expect</span>(<span class="string">&quot;invalid settings frame&quot;</span>);
-                <span class="macro">tracing::trace!</span>(<span class="string">&quot;local settings sent; waiting for ack: {:?}&quot;</span>, <span class="ident">settings</span>);
+                <span class="comment">// Buffer the settings frame
+                </span>dst.buffer(settings.clone().into())
+                    .expect(<span class="string">&quot;invalid settings frame&quot;</span>);
+                <span class="macro">tracing::trace!</span>(<span class="string">&quot;local settings sent; waiting for ack: {:?}&quot;</span>, settings);
 
-                <span class="self">self</span>.<span class="ident">local</span> <span class="op">=</span> <span class="ident">Local::WaitingAck</span>(<span class="ident">settings</span>.<span class="ident">clone</span>());
+                <span class="self">self</span>.local = Local::WaitingAck(settings.clone());
             }
-            <span class="ident">Local::WaitingAck</span>(..) <span class="op">|</span> <span class="ident">Local::Synced</span> =&gt; {}
+            Local::WaitingAck(..) | Local::Synced =&gt; {}
         }
 
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
+        Poll::Ready(<span class="prelude-val">Ok</span>(()))
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="h2" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="h2" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

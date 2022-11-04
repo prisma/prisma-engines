@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/misc/raw/bytes.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bytes.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mysql_common/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mysql_common-0.29.1/src/misc/raw/bytes.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bytes.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mysql_common/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mysql_common/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -347,354 +347,354 @@
 <span id="347">347</span>
 <span id="348">348</span>
 <span id="349">349</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2021 Anatoly Ikorsky</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0</span>
-<span class="comment">// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT</span>
-<span class="comment">// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. All files in the project carrying such notice may not be copied,</span>
-<span class="comment">// modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright (c) 2021 Anatoly Ikorsky
+//
+// Licensed under the Apache License, Version 2.0
+// &lt;LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT
+// license &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+// option. All files in the project carrying such notice may not be copied,
+// modified, or distributed except according to those terms.
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::int::LenEnc</span>;
+</span><span class="kw">pub use </span><span class="kw">super</span>::int::LenEnc;
 
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">borrow::Cow</span>, <span class="ident">cmp::min</span>, <span class="ident">fmt</span>, <span class="ident">io</span>, <span class="ident">marker::PhantomData</span>};
+<span class="kw">use </span>std::{borrow::Cow, cmp::min, fmt, io, marker::PhantomData};
 
-<span class="kw">use</span> <span class="ident">bytes::BufMut</span>;
+<span class="kw">use </span>bytes::BufMut;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">io</span>::{<span class="ident">BufMutExt</span>, <span class="ident">ParseBuf</span>},
-    <span class="ident">misc::unexpected_buf_eof</span>,
-    <span class="ident">proto</span>::{<span class="ident">MyDeserialize</span>, <span class="ident">MySerialize</span>},
+<span class="kw">use crate</span>::{
+    io::{BufMutExt, ParseBuf},
+    misc::unexpected_buf_eof,
+    proto::{MyDeserialize, MySerialize},
 };
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">int::VarLen</span>, <span class="ident">RawInt</span>};
+<span class="kw">use super</span>::{int::VarLen, RawInt};
 
-<span class="doccomment">/// Wrapper for a raw byte sequence, that came from a server.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `T` encodes the serialized representation.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Ord</span>, <span class="ident">PartialOrd</span>, <span class="ident">Hash</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RawBytes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">BytesRepr</span><span class="op">&gt;</span>(<span class="kw">pub</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span>, <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
+<span class="doccomment">/// Wrapper for a raw byte sequence, that came from a server.
+///
+/// `T` encodes the serialized representation.
+</span><span class="attribute">#[derive(Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash)]
+#[repr(transparent)]
+</span><span class="kw">pub struct </span>RawBytes&lt;<span class="lifetime">&#39;a</span>, T: BytesRepr&gt;(<span class="kw">pub </span>Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;, PhantomData&lt;T&gt;);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">BytesRepr</span><span class="op">&gt;</span> <span class="ident">RawBytes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Wraps the given value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">text</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">text</span>.<span class="ident">into</span>(), <span class="ident">PhantomData</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: BytesRepr&gt; RawBytes&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+    <span class="doccomment">/// Wraps the given value.
+    </span><span class="kw">pub fn </span>new(text: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(text.into(), PhantomData)
     }
 
-    <span class="doccomment">/// Converts self to a &#39;static version.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_owned</span>(<span class="self">self</span>) -&gt; <span class="ident">RawBytes</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">RawBytes</span>(<span class="ident">Cow::Owned</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">into_owned</span>()), <span class="ident">PhantomData</span>)
+    <span class="doccomment">/// Converts self to a &#39;static version.
+    </span><span class="kw">pub fn </span>into_owned(<span class="self">self</span>) -&gt; RawBytes&lt;<span class="lifetime">&#39;static</span>, T&gt; {
+        RawBytes(Cow::Owned(<span class="self">self</span>.<span class="number">0</span>.into_owned()), PhantomData)
     }
 
-    <span class="doccomment">/// Returns `true` if bytes is empty.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>
+    <span class="doccomment">/// Returns `true` if bytes is empty.
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.len() == <span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Returns the _effective_ length of a string, which is no more than `T::MAX_LEN`.
+    </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        min(<span class="self">self</span>.<span class="number">0</span>.as_ref().len(), T::MAX_LEN)
     }
 
-    <span class="doccomment">/// Returns the _effective_ length of a string, which is no more than `T::MAX_LEN`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="ident">min</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_ref</span>().<span class="ident">len</span>(), <span class="ident">T::MAX_LEN</span>)
+    <span class="doccomment">/// Returns the _effective_ bytes (see `RawBytes::len`).
+    </span><span class="kw">pub fn </span>as_bytes(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8] {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.as_ref()[..<span class="self">self</span>.len()]
     }
 
-    <span class="doccomment">/// Returns the _effective_ bytes (see `RawBytes::len`).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_bytes</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>] {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_ref</span>()[..<span class="self">self</span>.<span class="ident">len</span>()]
-    }
-
-    <span class="doccomment">/// Returns the value as a UTF-8 string (lossy contverted).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="ident">String::from_utf8_lossy</span>(<span class="self">self</span>.<span class="ident">as_bytes</span>())
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">U</span>: <span class="ident">BytesRepr</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RawBytes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">U</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">bytes</span>: <span class="ident">T</span>) -&gt; <span class="ident">RawBytes</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">U</span><span class="op">&gt;</span> {
-        <span class="ident">RawBytes::new</span>(<span class="ident">bytes</span>)
+    <span class="doccomment">/// Returns the value as a UTF-8 string (lossy contverted).
+    </span><span class="kw">pub fn </span>as_str(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; Cow&lt;<span class="lifetime">&#39;a</span>, str&gt; {
+        String::from_utf8_lossy(<span class="self">self</span>.as_bytes())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">BytesRepr</span><span class="op">&gt;</span> <span class="ident">PartialEq</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RawBytes</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_ref</span>().<span class="ident">eq</span>(<span class="ident">other</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T: Into&lt;Cow&lt;<span class="lifetime">&#39;a</span>, [u8]&gt;&gt;, U: BytesRepr&gt; From&lt;T&gt; <span class="kw">for </span>RawBytes&lt;<span class="lifetime">&#39;a</span>, U&gt; {
+    <span class="kw">fn </span>from(bytes: T) -&gt; RawBytes&lt;<span class="lifetime">&#39;a</span>, U&gt; {
+        RawBytes::new(bytes)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">BytesRepr</span><span class="op">&gt;</span> <span class="ident">MySerialize</span> <span class="kw">for</span> <span class="ident">RawBytes</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-        <span class="ident">T::serialize</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">as_ref</span>(), <span class="ident">buf</span>)
+<span class="kw">impl</span>&lt;T: BytesRepr&gt; PartialEq&lt;[u8]&gt; <span class="kw">for </span>RawBytes&lt;<span class="lifetime">&#39;_</span>, T&gt; {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>[u8]) -&gt; bool {
+        <span class="self">self</span>.<span class="number">0</span>.as_ref().eq(other)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">T</span>: <span class="ident">BytesRepr</span><span class="op">&gt;</span> <span class="ident">MyDeserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RawBytes</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">T::SIZE</span>;
-    <span class="kw">type</span> <span class="ident">Ctx</span> <span class="op">=</span> <span class="ident">T::Ctx</span>;
-
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">deserialize</span>(<span class="ident">ctx</span>: <span class="ident"><span class="self">Self</span>::Ctx</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(<span class="ident">T::deserialize</span>(<span class="ident">ctx</span>, <span class="ident">buf</span>)<span class="question-mark">?</span>, <span class="ident">PhantomData</span>))
+<span class="kw">impl</span>&lt;T: BytesRepr&gt; MySerialize <span class="kw">for </span>RawBytes&lt;<span class="lifetime">&#39;_</span>, T&gt; {
+    <span class="kw">fn </span>serialize(<span class="kw-2">&amp;</span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+        T::serialize(<span class="self">self</span>.<span class="number">0</span>.as_ref(), buf)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">BytesRepr</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">RawBytes</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;RawBytes&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;value&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">as_str</span>())
-            .<span class="ident">field</span>(
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, T: BytesRepr&gt; MyDeserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>RawBytes&lt;<span class="lifetime">&#39;de</span>, T&gt; {
+    <span class="kw">const </span>SIZE: <span class="prelude-ty">Option</span>&lt;usize&gt; = T::SIZE;
+    <span class="kw">type </span>Ctx = T::Ctx;
+
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>deserialize(ctx: <span class="self">Self</span>::Ctx, buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;de</span>&gt;) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">Self</span>(T::deserialize(ctx, buf)<span class="question-mark">?</span>, PhantomData))
+    }
+}
+
+<span class="kw">impl</span>&lt;T: BytesRepr&gt; fmt::Debug <span class="kw">for </span>RawBytes&lt;<span class="lifetime">&#39;_</span>, T&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;RawBytes&quot;</span>)
+            .field(<span class="string">&quot;value&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.as_str())
+            .field(
                 <span class="string">&quot;max_len&quot;</span>,
-                <span class="kw-2">&amp;</span>(<span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">T::MAX_LEN</span> {
-                    <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">T::MAX_LEN</span>)
-                } <span class="kw">else</span> {
-                    <span class="macro">format!</span>(<span class="string">&quot;{} EXCEEDED!&quot;</span>, <span class="ident">T::MAX_LEN</span>)
+                <span class="kw-2">&amp;</span>(<span class="kw">if </span><span class="self">self</span>.<span class="number">0</span>.len() &lt;= T::MAX_LEN {
+                    <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, T::MAX_LEN)
+                } <span class="kw">else </span>{
+                    <span class="macro">format!</span>(<span class="string">&quot;{} EXCEEDED!&quot;</span>, T::MAX_LEN)
                 }),
             )
-            .<span class="ident">finish</span>()
+            .finish()
     }
 }
 
-<span class="doccomment">/// Representation of a serialized bytes.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">BytesRepr</span> {
-    <span class="doccomment">/// Maximum length of bytes for this repr (depends on how lenght is stored).</span>
-    <span class="kw">const</span> <span class="ident">MAX_LEN</span>: <span class="ident">usize</span>;
-    <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>;
-    <span class="kw">type</span> <span class="ident">Ctx</span>;
+<span class="doccomment">/// Representation of a serialized bytes.
+</span><span class="kw">pub trait </span>BytesRepr {
+    <span class="doccomment">/// Maximum length of bytes for this repr (depends on how lenght is stored).
+    </span><span class="kw">const </span>MAX_LEN: usize;
+    <span class="kw">const </span>SIZE: <span class="prelude-ty">Option</span>&lt;usize&gt;;
+    <span class="kw">type </span>Ctx;
 
-    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="ident">text</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>);
+    <span class="kw">fn </span>serialize(text: <span class="kw-2">&amp;</span>[u8], buf: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;);
 
-    <span class="doccomment">/// Implementation must check the length of the buffer if `Self::SIZE.is_none()`.</span>
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>(<span class="ident">ctx</span>: <span class="ident"><span class="self">Self</span>::Ctx</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Implementation must check the length of the buffer if `Self::SIZE.is_none()`.
+    </span><span class="kw">fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>&gt;(ctx: <span class="self">Self</span>::Ctx, buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;de</span>&gt;) -&gt; io::Result&lt;Cow&lt;<span class="lifetime">&#39;de</span>, [u8]&gt;&gt;;
 }
 
-<span class="kw">impl</span> <span class="ident">BytesRepr</span> <span class="kw">for</span> <span class="ident">LenEnc</span> {
-    <span class="kw">const</span> <span class="ident">MAX_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">usize::MAX</span>;
-    <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-    <span class="kw">type</span> <span class="ident">Ctx</span> <span class="op">=</span> ();
+<span class="kw">impl </span>BytesRepr <span class="kw">for </span>LenEnc {
+    <span class="kw">const </span>MAX_LEN: usize = usize::MAX;
+    <span class="kw">const </span>SIZE: <span class="prelude-ty">Option</span>&lt;usize&gt; = <span class="prelude-val">None</span>;
+    <span class="kw">type </span>Ctx = ();
 
-    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="ident">text</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-        <span class="ident">buf</span>.<span class="ident">put_lenenc_int</span>(<span class="ident">text</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>);
-        <span class="ident">buf</span>.<span class="ident">put_slice</span>(<span class="ident">text</span>);
+    <span class="kw">fn </span>serialize(text: <span class="kw-2">&amp;</span>[u8], buf: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+        buf.put_lenenc_int(text.len() <span class="kw">as </span>u64);
+        buf.put_slice(text);
     }
 
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>((): <span class="ident"><span class="self">Self</span>::Ctx</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">LenEnc</span><span class="op">&gt;</span><span class="op">&gt;</span>(())<span class="question-mark">?</span>;
-        <span class="ident">buf</span>.<span class="ident">checked_eat</span>(<span class="ident">len</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>)
-            .<span class="ident">map</span>(<span class="ident">Cow::Borrowed</span>)
-            .<span class="ident">ok_or_else</span>(<span class="ident">unexpected_buf_eof</span>)
-    }
-}
-
-<span class="doccomment">/// A byte sequence prepended by it&#39;s u8 length.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `serialize` will truncate byte sequence if its too long.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">U8Bytes</span>;
-
-<span class="kw">impl</span> <span class="ident">BytesRepr</span> <span class="kw">for</span> <span class="ident">U8Bytes</span> {
-    <span class="kw">const</span> <span class="ident">MAX_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">u8::MAX</span> <span class="kw">as</span> <span class="ident">usize</span>;
-    <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-    <span class="kw">type</span> <span class="ident">Ctx</span> <span class="op">=</span> ();
-
-    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="ident">text</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-        <span class="ident">buf</span>.<span class="ident">put_u8_str</span>(<span class="ident">text</span>);
-    }
-
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>((): <span class="ident"><span class="self">Self</span>::Ctx</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">len</span>: <span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">parse</span>(())<span class="question-mark">?</span>;
-        <span class="ident">buf</span>.<span class="ident">checked_eat</span>(<span class="ident">len</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>)
-            .<span class="ident">map</span>(<span class="ident">Cow::Borrowed</span>)
-            .<span class="ident">ok_or_else</span>(<span class="ident">unexpected_buf_eof</span>)
+    <span class="kw">fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>&gt;((): <span class="self">Self</span>::Ctx, buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;de</span>&gt;) -&gt; io::Result&lt;Cow&lt;<span class="lifetime">&#39;de</span>, [u8]&gt;&gt; {
+        <span class="kw">let </span>len = buf.parse::&lt;RawInt&lt;LenEnc&gt;&gt;(())<span class="question-mark">?</span>;
+        buf.checked_eat(len.<span class="number">0 </span><span class="kw">as </span>usize)
+            .map(Cow::Borrowed)
+            .ok_or_else(unexpected_buf_eof)
     }
 }
 
-<span class="doccomment">/// A byte sequence prepended by it&#39;s u32 length.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `serialize` will truncate byte sequence if its too long.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">U32Bytes</span>;
+<span class="doccomment">/// A byte sequence prepended by it&#39;s u8 length.
+///
+/// `serialize` will truncate byte sequence if its too long.
+</span><span class="attribute">#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
+</span><span class="kw">pub struct </span>U8Bytes;
 
-<span class="kw">impl</span> <span class="ident">BytesRepr</span> <span class="kw">for</span> <span class="ident">U32Bytes</span> {
-    <span class="kw">const</span> <span class="ident">MAX_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">u32::MAX</span> <span class="kw">as</span> <span class="ident">usize</span>;
-    <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-    <span class="kw">type</span> <span class="ident">Ctx</span> <span class="op">=</span> ();
+<span class="kw">impl </span>BytesRepr <span class="kw">for </span>U8Bytes {
+    <span class="kw">const </span>MAX_LEN: usize = u8::MAX <span class="kw">as </span>usize;
+    <span class="kw">const </span>SIZE: <span class="prelude-ty">Option</span>&lt;usize&gt; = <span class="prelude-val">None</span>;
+    <span class="kw">type </span>Ctx = ();
 
-    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="ident">text</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-        <span class="ident">buf</span>.<span class="ident">put_u32_str</span>(<span class="ident">text</span>);
+    <span class="kw">fn </span>serialize(text: <span class="kw-2">&amp;</span>[u8], buf: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+        buf.put_u8_str(text);
     }
 
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>((): <span class="ident"><span class="self">Self</span>::Ctx</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">buf</span>.<span class="ident">checked_eat_u32_str</span>()
-            .<span class="ident">map</span>(<span class="ident">Cow::Borrowed</span>)
-            .<span class="ident">ok_or_else</span>(<span class="ident">unexpected_buf_eof</span>)
+    <span class="kw">fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>&gt;((): <span class="self">Self</span>::Ctx, buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;de</span>&gt;) -&gt; io::Result&lt;Cow&lt;<span class="lifetime">&#39;de</span>, [u8]&gt;&gt; {
+        <span class="kw">let </span>len: RawInt&lt;u8&gt; = buf.parse(())<span class="question-mark">?</span>;
+        buf.checked_eat(len.<span class="number">0 </span><span class="kw">as </span>usize)
+            .map(Cow::Borrowed)
+            .ok_or_else(unexpected_buf_eof)
     }
 }
 
-<span class="doccomment">/// Null-terminated byte sequence.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `deserialize()` will error with `InvalidData` if there is no `0`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NullBytes</span>;
+<span class="doccomment">/// A byte sequence prepended by it&#39;s u32 length.
+///
+/// `serialize` will truncate byte sequence if its too long.
+</span><span class="attribute">#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
+</span><span class="kw">pub struct </span>U32Bytes;
 
-<span class="kw">impl</span> <span class="ident">BytesRepr</span> <span class="kw">for</span> <span class="ident">NullBytes</span> {
-    <span class="kw">const</span> <span class="ident">MAX_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">usize::MAX</span>;
-    <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-    <span class="kw">type</span> <span class="ident">Ctx</span> <span class="op">=</span> ();
+<span class="kw">impl </span>BytesRepr <span class="kw">for </span>U32Bytes {
+    <span class="kw">const </span>MAX_LEN: usize = u32::MAX <span class="kw">as </span>usize;
+    <span class="kw">const </span>SIZE: <span class="prelude-ty">Option</span>&lt;usize&gt; = <span class="prelude-val">None</span>;
+    <span class="kw">type </span>Ctx = ();
 
-    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="ident">text</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">last</span> <span class="op">=</span> <span class="ident">text</span>
-            .<span class="ident">iter</span>()
-            .<span class="ident">position</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">x</span> <span class="op">==</span> <span class="number">0</span>)
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">text</span>.<span class="ident">len</span>());
-        <span class="ident">buf</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="ident">text</span>[..<span class="ident">last</span>]);
-        <span class="ident">buf</span>.<span class="ident">put_u8</span>(<span class="number">0</span>);
+    <span class="kw">fn </span>serialize(text: <span class="kw-2">&amp;</span>[u8], buf: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+        buf.put_u32_str(text);
     }
 
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>((): <span class="ident"><span class="self">Self</span>::Ctx</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">buf</span>.<span class="number">0</span>.<span class="ident">iter</span>().<span class="ident">position</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">x</span> <span class="op">==</span> <span class="number">0</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">i</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">eat</span>(<span class="ident">i</span>);
-                <span class="ident">buf</span>.<span class="ident">skip</span>(<span class="number">1</span>);
-                <span class="prelude-val">Ok</span>(<span class="ident">Cow::Borrowed</span>(<span class="ident">out</span>))
+    <span class="kw">fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>&gt;((): <span class="self">Self</span>::Ctx, buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;de</span>&gt;) -&gt; io::Result&lt;Cow&lt;<span class="lifetime">&#39;de</span>, [u8]&gt;&gt; {
+        buf.checked_eat_u32_str()
+            .map(Cow::Borrowed)
+            .ok_or_else(unexpected_buf_eof)
+    }
+}
+
+<span class="doccomment">/// Null-terminated byte sequence.
+///
+/// `deserialize()` will error with `InvalidData` if there is no `0`.
+</span><span class="attribute">#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
+</span><span class="kw">pub struct </span>NullBytes;
+
+<span class="kw">impl </span>BytesRepr <span class="kw">for </span>NullBytes {
+    <span class="kw">const </span>MAX_LEN: usize = usize::MAX;
+    <span class="kw">const </span>SIZE: <span class="prelude-ty">Option</span>&lt;usize&gt; = <span class="prelude-val">None</span>;
+    <span class="kw">type </span>Ctx = ();
+
+    <span class="kw">fn </span>serialize(text: <span class="kw-2">&amp;</span>[u8], buf: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+        <span class="kw">let </span>last = text
+            .iter()
+            .position(|x| <span class="kw-2">*</span>x == <span class="number">0</span>)
+            .unwrap_or_else(|| text.len());
+        buf.put_slice(<span class="kw-2">&amp;</span>text[..last]);
+        buf.put_u8(<span class="number">0</span>);
+    }
+
+    <span class="kw">fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>&gt;((): <span class="self">Self</span>::Ctx, buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;de</span>&gt;) -&gt; io::Result&lt;Cow&lt;<span class="lifetime">&#39;de</span>, [u8]&gt;&gt; {
+        <span class="kw">match </span>buf.<span class="number">0</span>.iter().position(|x| <span class="kw-2">*</span>x == <span class="number">0</span>) {
+            <span class="prelude-val">Some</span>(i) =&gt; {
+                <span class="kw">let </span>out = buf.eat(i);
+                buf.skip(<span class="number">1</span>);
+                <span class="prelude-val">Ok</span>(Cow::Borrowed(out))
             }
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
-                <span class="ident">io::ErrorKind::InvalidData</span>,
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(io::Error::new(
+                io::ErrorKind::InvalidData,
                 <span class="string">&quot;no null terminator for null-terminated string&quot;</span>,
             )),
         }
     }
 }
 
-<span class="doccomment">/// A byte sequence that lasts from the current position to the end of the buffer.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EofBytes</span>;
+<span class="doccomment">/// A byte sequence that lasts from the current position to the end of the buffer.
+</span><span class="attribute">#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
+</span><span class="kw">pub struct </span>EofBytes;
 
-<span class="kw">impl</span> <span class="ident">BytesRepr</span> <span class="kw">for</span> <span class="ident">EofBytes</span> {
-    <span class="kw">const</span> <span class="ident">MAX_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">usize::MAX</span>;
-    <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-    <span class="kw">type</span> <span class="ident">Ctx</span> <span class="op">=</span> ();
+<span class="kw">impl </span>BytesRepr <span class="kw">for </span>EofBytes {
+    <span class="kw">const </span>MAX_LEN: usize = usize::MAX;
+    <span class="kw">const </span>SIZE: <span class="prelude-ty">Option</span>&lt;usize&gt; = <span class="prelude-val">None</span>;
+    <span class="kw">type </span>Ctx = ();
 
-    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="ident">text</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-        <span class="ident">buf</span>.<span class="ident">put_slice</span>(<span class="ident">text</span>);
+    <span class="kw">fn </span>serialize(text: <span class="kw-2">&amp;</span>[u8], buf: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+        buf.put_slice(text);
     }
 
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>((): <span class="ident"><span class="self">Self</span>::Ctx</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">Cow::Borrowed</span>(<span class="ident">buf</span>.<span class="ident">eat_all</span>()))
-    }
-}
-
-<span class="doccomment">/// A byte sequence without length.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Its length is stored somewhere else.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BareBytes</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">MAX_LEN</span>: <span class="ident">usize</span><span class="op">&gt;</span>;
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">MAX_LEN</span>: <span class="ident">usize</span><span class="op">&gt;</span> <span class="ident">BytesRepr</span> <span class="kw">for</span> <span class="ident">BareBytes</span><span class="op">&lt;</span><span class="ident">MAX_LEN</span><span class="op">&gt;</span> {
-    <span class="kw">const</span> <span class="ident">MAX_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">MAX_LEN</span>;
-    <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-    <span class="kw">type</span> <span class="ident">Ctx</span> <span class="op">=</span> <span class="ident">usize</span>;
-
-    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="ident">text</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">min</span>(<span class="ident">text</span>.<span class="ident">len</span>(), <span class="ident">MAX_LEN</span>);
-        <span class="ident">buf</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="ident">text</span>[..<span class="ident">len</span>]);
-    }
-
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>(<span class="ident">len</span>: <span class="ident">usize</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">buf</span>.<span class="ident">checked_eat</span>(<span class="ident">len</span>)
-            .<span class="ident">ok_or_else</span>(<span class="ident">unexpected_buf_eof</span>)
-            .<span class="ident">map</span>(<span class="ident">Cow::Borrowed</span>)
+    <span class="kw">fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>&gt;((): <span class="self">Self</span>::Ctx, buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;de</span>&gt;) -&gt; io::Result&lt;Cow&lt;<span class="lifetime">&#39;de</span>, [u8]&gt;&gt; {
+        <span class="prelude-val">Ok</span>(Cow::Borrowed(buf.eat_all()))
     }
 }
 
-<span class="doccomment">/// `BareBytes` with `u8` len.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">BareU8Bytes</span> <span class="op">=</span> <span class="ident">BareBytes</span><span class="op">&lt;</span>{ <span class="ident">u8::MAX</span> <span class="kw">as</span> <span class="ident">usize</span> }<span class="op">&gt;</span>;
+<span class="doccomment">/// A byte sequence without length.
+///
+/// Its length is stored somewhere else.
+</span><span class="attribute">#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+</span><span class="kw">pub struct </span>BareBytes&lt;<span class="kw">const </span>MAX_LEN: usize&gt;;
 
-<span class="doccomment">/// `BareBytes` with `u16` len.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">BareU16Bytes</span> <span class="op">=</span> <span class="ident">BareBytes</span><span class="op">&lt;</span>{ <span class="ident">u16::MAX</span> <span class="kw">as</span> <span class="ident">usize</span> }<span class="op">&gt;</span>;
+<span class="kw">impl</span>&lt;<span class="kw">const </span>MAX_LEN: usize&gt; BytesRepr <span class="kw">for </span>BareBytes&lt;MAX_LEN&gt; {
+    <span class="kw">const </span>MAX_LEN: usize = MAX_LEN;
+    <span class="kw">const </span>SIZE: <span class="prelude-ty">Option</span>&lt;usize&gt; = <span class="prelude-val">None</span>;
+    <span class="kw">type </span>Ctx = usize;
 
-<span class="doccomment">/// A fixed length byte sequence (right-padded with `0x00`).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `serialize()` truncates the value if it&#39;s loo long.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FixedLengthText</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">LEN</span>: <span class="ident">usize</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>serialize(text: <span class="kw-2">&amp;</span>[u8], buf: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+        <span class="kw">let </span>len = min(text.len(), MAX_LEN);
+        buf.put_slice(<span class="kw-2">&amp;</span>text[..len]);
+    }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">LEN</span>: <span class="ident">usize</span><span class="op">&gt;</span> <span class="ident">BytesRepr</span> <span class="kw">for</span> <span class="ident">FixedLengthText</span><span class="op">&lt;</span><span class="ident">LEN</span><span class="op">&gt;</span> {
-    <span class="kw">const</span> <span class="ident">MAX_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">LEN</span>;
-    <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">LEN</span>);
-    <span class="kw">type</span> <span class="ident">Ctx</span> <span class="op">=</span> ();
+    <span class="kw">fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>&gt;(len: usize, buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;de</span>&gt;) -&gt; io::Result&lt;Cow&lt;<span class="lifetime">&#39;de</span>, [u8]&gt;&gt; {
+        buf.checked_eat(len)
+            .ok_or_else(unexpected_buf_eof)
+            .map(Cow::Borrowed)
+    }
+}
 
-    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="ident">text</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">min</span>(<span class="ident">LEN</span>, <span class="ident">text</span>.<span class="ident">len</span>());
-        <span class="ident">buf</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="ident">text</span>[..<span class="ident">len</span>]);
-        <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..(<span class="ident">LEN</span> <span class="op">-</span> <span class="ident">len</span>) {
-            <span class="ident">buf</span>.<span class="ident">put_u8</span>(<span class="number">0</span>);
+<span class="doccomment">/// `BareBytes` with `u8` len.
+</span><span class="kw">pub type </span>BareU8Bytes = BareBytes&lt;{ u8::MAX <span class="kw">as </span>usize }&gt;;
+
+<span class="doccomment">/// `BareBytes` with `u16` len.
+</span><span class="kw">pub type </span>BareU16Bytes = BareBytes&lt;{ u16::MAX <span class="kw">as </span>usize }&gt;;
+
+<span class="doccomment">/// A fixed length byte sequence (right-padded with `0x00`).
+///
+/// `serialize()` truncates the value if it&#39;s loo long.
+</span><span class="attribute">#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
+</span><span class="kw">pub struct </span>FixedLengthText&lt;<span class="kw">const </span>LEN: usize&gt;;
+
+<span class="kw">impl</span>&lt;<span class="kw">const </span>LEN: usize&gt; BytesRepr <span class="kw">for </span>FixedLengthText&lt;LEN&gt; {
+    <span class="kw">const </span>MAX_LEN: usize = LEN;
+    <span class="kw">const </span>SIZE: <span class="prelude-ty">Option</span>&lt;usize&gt; = <span class="prelude-val">Some</span>(LEN);
+    <span class="kw">type </span>Ctx = ();
+
+    <span class="kw">fn </span>serialize(text: <span class="kw-2">&amp;</span>[u8], buf: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+        <span class="kw">let </span>len = min(LEN, text.len());
+        buf.put_slice(<span class="kw-2">&amp;</span>text[..len]);
+        <span class="kw">for _ in </span><span class="number">0</span>..(LEN - len) {
+            buf.put_u8(<span class="number">0</span>);
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>((): <span class="ident"><span class="self">Self</span>::Ctx</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident"><span class="self">Self</span>::SIZE</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">len</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Cow::Borrowed</span>(<span class="ident">buf</span>.<span class="ident">eat</span>(<span class="ident">len</span>))),
-            <span class="prelude-val">None</span> =&gt; <span class="ident">buf</span>
-                .<span class="ident">checked_eat</span>(<span class="ident">LEN</span>)
-                .<span class="ident">map</span>(<span class="ident">Cow::Borrowed</span>)
-                .<span class="ident">ok_or_else</span>(<span class="ident">unexpected_buf_eof</span>),
+    <span class="kw">fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>&gt;((): <span class="self">Self</span>::Ctx, buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;de</span>&gt;) -&gt; io::Result&lt;Cow&lt;<span class="lifetime">&#39;de</span>, [u8]&gt;&gt; {
+        <span class="kw">match </span><span class="self">Self</span>::SIZE {
+            <span class="prelude-val">Some</span>(len) =&gt; <span class="prelude-val">Ok</span>(Cow::Borrowed(buf.eat(len))),
+            <span class="prelude-val">None </span>=&gt; buf
+                .checked_eat(LEN)
+                .map(Cow::Borrowed)
+                .ok_or_else(unexpected_buf_eof),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">BytesRepr</span> <span class="kw">for</span> <span class="ident">VarLen</span> {
-    <span class="kw">const</span> <span class="ident">MAX_LEN</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">u32::MAX</span> <span class="kw">as</span> <span class="ident">usize</span>;
-    <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-    <span class="kw">type</span> <span class="ident">Ctx</span> <span class="op">=</span> ();
+<span class="kw">impl </span>BytesRepr <span class="kw">for </span>VarLen {
+    <span class="kw">const </span>MAX_LEN: usize = u32::MAX <span class="kw">as </span>usize;
+    <span class="kw">const </span>SIZE: <span class="prelude-ty">Option</span>&lt;usize&gt; = <span class="prelude-val">None</span>;
+    <span class="kw">type </span>Ctx = ();
 
-    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="ident">text</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-        <span class="ident">buf</span>.<span class="ident">put_lenenc_int</span>(<span class="ident">text</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>);
-        <span class="ident">buf</span>.<span class="ident">put_slice</span>(<span class="ident">text</span>);
+    <span class="kw">fn </span>serialize(text: <span class="kw-2">&amp;</span>[u8], buf: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+        buf.put_lenenc_int(text.len() <span class="kw">as </span>u64);
+        buf.put_slice(text);
     }
 
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>((): <span class="ident"><span class="self">Self</span>::Ctx</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">RawInt</span><span class="op">&lt;</span><span class="ident">VarLen</span><span class="op">&gt;</span><span class="op">&gt;</span>(())<span class="question-mark">?</span>;
-        <span class="ident">buf</span>.<span class="ident">checked_eat</span>(<span class="ident">len</span>.<span class="number">0</span> <span class="kw">as</span> <span class="ident">usize</span>)
-            .<span class="ident">map</span>(<span class="ident">Cow::Borrowed</span>)
-            .<span class="ident">ok_or_else</span>(<span class="ident">unexpected_buf_eof</span>)
+    <span class="kw">fn </span>deserialize&lt;<span class="lifetime">&#39;de</span>&gt;((): <span class="self">Self</span>::Ctx, buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;de</span>&gt;) -&gt; io::Result&lt;Cow&lt;<span class="lifetime">&#39;de</span>, [u8]&gt;&gt; {
+        <span class="kw">let </span>len = buf.parse::&lt;RawInt&lt;VarLen&gt;&gt;(())<span class="question-mark">?</span>;
+        buf.checked_eat(len.<span class="number">0 </span><span class="kw">as </span>usize)
+            .map(Cow::Borrowed)
+            .ok_or_else(unexpected_buf_eof)
     }
 }
 
-<span class="doccomment">/// Constantly known byte string.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConstBytes</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="kw">const</span> <span class="ident">LEN</span>: <span class="ident">usize</span><span class="op">&gt;</span>(<span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>);
+<span class="doccomment">/// Constantly known byte string.
+</span><span class="attribute">#[derive(Debug, Default, Clone, Copy, PartialEq, Eq, Hash)]
+</span><span class="kw">pub struct </span>ConstBytes&lt;T, <span class="kw">const </span>LEN: usize&gt;(PhantomData&lt;T&gt;);
 
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">ConstBytesValue</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">LEN</span>: <span class="ident">usize</span><span class="op">&gt;</span> {
-    <span class="kw">const</span> <span class="ident">VALUE</span>: [<span class="ident">u8</span>; <span class="ident">LEN</span>];
-    <span class="kw">type</span> <span class="ident">Error</span>: <span class="ident">Default</span> <span class="op">+</span> <span class="ident">std::error::Error</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>;
+<span class="kw">pub trait </span>ConstBytesValue&lt;<span class="kw">const </span>LEN: usize&gt; {
+    <span class="kw">const </span>VALUE: [u8; LEN];
+    <span class="kw">type </span>Error: Default + std::error::Error + Send + Sync + <span class="lifetime">&#39;static</span>;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span>, <span class="ident">T</span>, <span class="kw">const</span> <span class="ident">LEN</span>: <span class="ident">usize</span><span class="op">&gt;</span> <span class="ident">MyDeserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ConstBytes</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">LEN</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">Default</span>,
-    <span class="ident">T</span>: <span class="ident">ConstBytesValue</span><span class="op">&lt;</span><span class="ident">LEN</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, T, <span class="kw">const </span>LEN: usize&gt; MyDeserialize&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span>ConstBytes&lt;T, LEN&gt;
+<span class="kw">where
+    </span>T: Default,
+    T: ConstBytesValue&lt;LEN&gt;,
 {
-    <span class="kw">const</span> <span class="ident">SIZE</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">LEN</span>);
-    <span class="kw">type</span> <span class="ident">Ctx</span> <span class="op">=</span> ();
+    <span class="kw">const </span>SIZE: <span class="prelude-ty">Option</span>&lt;usize&gt; = <span class="prelude-val">Some</span>(LEN);
+    <span class="kw">type </span>Ctx = ();
 
-    <span class="kw">fn</span> <span class="ident">deserialize</span>((): <span class="ident"><span class="self">Self</span>::Ctx</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParseBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">bytes</span>: [<span class="ident">u8</span>; <span class="ident">LEN</span>] <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">parse_unchecked</span>(())<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">bytes</span> <span class="op">==</span> <span class="ident">T::VALUE</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">Default::default</span>())
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(
-                <span class="ident">io::ErrorKind::InvalidData</span>,
-                <span class="ident">T::Error::default</span>(),
+    <span class="kw">fn </span>deserialize((): <span class="self">Self</span>::Ctx, buf: <span class="kw-2">&amp;mut </span>ParseBuf&lt;<span class="lifetime">&#39;de</span>&gt;) -&gt; io::Result&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span>bytes: [u8; LEN] = buf.parse_unchecked(())<span class="question-mark">?</span>;
+        <span class="kw">if </span>bytes == T::VALUE {
+            <span class="prelude-val">Ok</span>(Default::default())
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(io::Error::new(
+                io::ErrorKind::InvalidData,
+                T::Error::default(),
             ))
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="kw">const</span> <span class="ident">LEN</span>: <span class="ident">usize</span><span class="op">&gt;</span> <span class="ident">MySerialize</span> <span class="kw">for</span> <span class="ident">ConstBytes</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">LEN</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">ConstBytesValue</span><span class="op">&lt;</span><span class="ident">LEN</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;T, <span class="kw">const </span>LEN: usize&gt; MySerialize <span class="kw">for </span>ConstBytes&lt;T, LEN&gt;
+<span class="kw">where
+    </span>T: ConstBytesValue&lt;LEN&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) {
-        <span class="ident">T::VALUE</span>.<span class="ident">serialize</span>(<span class="ident">buf</span>)
+    <span class="kw">fn </span>serialize(<span class="kw-2">&amp;</span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;) {
+        T::VALUE.serialize(buf)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mysql_common" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

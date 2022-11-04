@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/parking_lot-0.12.1/src/deadlock.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>deadlock.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../parking_lot/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../parking_lot/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../parking_lot/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/parking_lot-0.12.1/src/deadlock.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>deadlock.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../parking_lot/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../parking_lot/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../parking_lot/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -230,237 +230,237 @@
 <span id="230">230</span>
 <span id="231">231</span>
 <span id="232">232</span>
-</pre><pre class="rust"><code><span class="doccomment">//! \[Experimental\] Deadlock detection</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This feature is optional and can be enabled via the `deadlock_detection` feature flag.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Example</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! #[cfg(feature = &quot;deadlock_detection&quot;)]</span>
-<span class="doccomment">//! { // only for #[cfg]</span>
-<span class="doccomment">//! use std::thread;</span>
-<span class="doccomment">//! use std::time::Duration;</span>
-<span class="doccomment">//! use parking_lot::deadlock;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Create a background thread which checks for deadlocks every 10s</span>
-<span class="doccomment">//! thread::spawn(move || {</span>
-<span class="doccomment">//!     loop {</span>
-<span class="doccomment">//!         thread::sleep(Duration::from_secs(10));</span>
-<span class="doccomment">//!         let deadlocks = deadlock::check_deadlock();</span>
-<span class="doccomment">//!         if deadlocks.is_empty() {</span>
-<span class="doccomment">//!             continue;</span>
-<span class="doccomment">//!         }</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//!         println!(&quot;{} deadlocks detected&quot;, deadlocks.len());</span>
-<span class="doccomment">//!         for (i, threads) in deadlocks.iter().enumerate() {</span>
-<span class="doccomment">//!             println!(&quot;Deadlock #{}&quot;, i);</span>
-<span class="doccomment">//!             for t in threads {</span>
-<span class="doccomment">//!                 println!(&quot;Thread Id {:#?}&quot;, t.thread_id());</span>
-<span class="doccomment">//!                 println!(&quot;{:#?}&quot;, t.backtrace());</span>
-<span class="doccomment">//!             }</span>
-<span class="doccomment">//!         }</span>
-<span class="doccomment">//!     }</span>
-<span class="doccomment">//! });</span>
-<span class="doccomment">//! } // only for #[cfg]</span>
-<span class="doccomment">//! ```</span>
+</pre><pre class="rust"><code><span class="doccomment">//! \[Experimental\] Deadlock detection
+//!
+//! This feature is optional and can be enabled via the `deadlock_detection` feature flag.
+//!
+//! # Example
+//!
+//! ```
+//! #[cfg(feature = &quot;deadlock_detection&quot;)]
+//! { // only for #[cfg]
+//! use std::thread;
+//! use std::time::Duration;
+//! use parking_lot::deadlock;
+//!
+//! // Create a background thread which checks for deadlocks every 10s
+//! thread::spawn(move || {
+//!     loop {
+//!         thread::sleep(Duration::from_secs(10));
+//!         let deadlocks = deadlock::check_deadlock();
+//!         if deadlocks.is_empty() {
+//!             continue;
+//!         }
+//!
+//!         println!(&quot;{} deadlocks detected&quot;, deadlocks.len());
+//!         for (i, threads) in deadlocks.iter().enumerate() {
+//!             println!(&quot;Deadlock #{}&quot;, i);
+//!             for t in threads {
+//!                 println!(&quot;Thread Id {:#?}&quot;, t.thread_id());
+//!                 println!(&quot;{:#?}&quot;, t.backtrace());
+//!             }
+//!         }
+//!     }
+//! });
+//! } // only for #[cfg]
+//! ```
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;deadlock_detection&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">parking_lot_core::deadlock::check_deadlock</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">parking_lot_core::deadlock</span>::{<span class="ident">acquire_resource</span>, <span class="ident">release_resource</span>};
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;deadlock_detection&quot;</span>)]
+</span><span class="kw">pub use </span>parking_lot_core::deadlock::check_deadlock;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>parking_lot_core::deadlock::{acquire_resource, release_resource};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;deadlock_detection&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Mutex</span>, <span class="ident">ReentrantMutex</span>, <span class="ident">RwLock</span>};
-    <span class="kw">use</span> <span class="ident">std::sync</span>::{<span class="ident">Arc</span>, <span class="ident">Barrier</span>};
-    <span class="kw">use</span> <span class="ident">std::thread</span>::{<span class="self">self</span>, <span class="ident">sleep</span>};
-    <span class="kw">use</span> <span class="ident">std::time::Duration</span>;
+<span class="attribute">#[cfg(test)]
+#[cfg(feature = <span class="string">&quot;deadlock_detection&quot;</span>)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use crate</span>::{Mutex, ReentrantMutex, RwLock};
+    <span class="kw">use </span>std::sync::{Arc, Barrier};
+    <span class="kw">use </span>std::thread::{<span class="self">self</span>, sleep};
+    <span class="kw">use </span>std::time::Duration;
 
-    <span class="comment">// We need to serialize these tests since deadlock detection uses global state</span>
-    <span class="kw">static</span> <span class="ident">DEADLOCK_DETECTION_LOCK</span>: <span class="ident">Mutex</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::const_mutex</span>(());
+    <span class="comment">// We need to serialize these tests since deadlock detection uses global state
+    </span><span class="kw">static </span>DEADLOCK_DETECTION_LOCK: Mutex&lt;()&gt; = <span class="kw">crate</span>::const_mutex(());
 
-    <span class="kw">fn</span> <span class="ident">check_deadlock</span>() -&gt; <span class="ident">bool</span> {
-        <span class="kw">use</span> <span class="ident">parking_lot_core::deadlock::check_deadlock</span>;
-        <span class="op">!</span><span class="ident">check_deadlock</span>().<span class="ident">is_empty</span>()
+    <span class="kw">fn </span>check_deadlock() -&gt; bool {
+        <span class="kw">use </span>parking_lot_core::deadlock::check_deadlock;
+        !check_deadlock().is_empty()
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_mutex_deadlock</span>() {
-        <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">DEADLOCK_DETECTION_LOCK</span>.<span class="ident">lock</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_mutex_deadlock() {
+        <span class="kw">let </span>_guard = DEADLOCK_DETECTION_LOCK.lock();
 
-        <span class="kw">let</span> <span class="ident">m1</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Default::default</span>();
-        <span class="kw">let</span> <span class="ident">m2</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Default::default</span>();
-        <span class="kw">let</span> <span class="ident">m3</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Default::default</span>();
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Barrier::new</span>(<span class="number">4</span>));
+        <span class="kw">let </span>m1: Arc&lt;Mutex&lt;()&gt;&gt; = Default::default();
+        <span class="kw">let </span>m2: Arc&lt;Mutex&lt;()&gt;&gt; = Default::default();
+        <span class="kw">let </span>m3: Arc&lt;Mutex&lt;()&gt;&gt; = Default::default();
+        <span class="kw">let </span>b = Arc::new(Barrier::new(<span class="number">4</span>));
 
-        <span class="kw">let</span> <span class="ident">m1_</span> <span class="op">=</span> <span class="ident">m1</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">m2_</span> <span class="op">=</span> <span class="ident">m2</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">m3_</span> <span class="op">=</span> <span class="ident">m3</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">b1</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">b2</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">b3</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">clone</span>();
+        <span class="kw">let </span>m1_ = m1.clone();
+        <span class="kw">let </span>m2_ = m2.clone();
+        <span class="kw">let </span>m3_ = m3.clone();
+        <span class="kw">let </span>b1 = b.clone();
+        <span class="kw">let </span>b2 = b.clone();
+        <span class="kw">let </span>b3 = b.clone();
 
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">check_deadlock</span>());
+        <span class="macro">assert!</span>(!check_deadlock());
 
-        <span class="kw">let</span> <span class="ident">_t1</span> <span class="op">=</span> <span class="ident">thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">_g</span> <span class="op">=</span> <span class="ident">m1</span>.<span class="ident">lock</span>();
-            <span class="ident">b1</span>.<span class="ident">wait</span>();
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">m2_</span>.<span class="ident">lock</span>();
+        <span class="kw">let </span>_t1 = thread::spawn(<span class="kw">move </span>|| {
+            <span class="kw">let </span>_g = m1.lock();
+            b1.wait();
+            <span class="kw">let _ </span>= m2_.lock();
         });
 
-        <span class="kw">let</span> <span class="ident">_t2</span> <span class="op">=</span> <span class="ident">thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">_g</span> <span class="op">=</span> <span class="ident">m2</span>.<span class="ident">lock</span>();
-            <span class="ident">b2</span>.<span class="ident">wait</span>();
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">m3_</span>.<span class="ident">lock</span>();
+        <span class="kw">let </span>_t2 = thread::spawn(<span class="kw">move </span>|| {
+            <span class="kw">let </span>_g = m2.lock();
+            b2.wait();
+            <span class="kw">let _ </span>= m3_.lock();
         });
 
-        <span class="kw">let</span> <span class="ident">_t3</span> <span class="op">=</span> <span class="ident">thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">_g</span> <span class="op">=</span> <span class="ident">m3</span>.<span class="ident">lock</span>();
-            <span class="ident">b3</span>.<span class="ident">wait</span>();
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">m1_</span>.<span class="ident">lock</span>();
+        <span class="kw">let </span>_t3 = thread::spawn(<span class="kw">move </span>|| {
+            <span class="kw">let </span>_g = m3.lock();
+            b3.wait();
+            <span class="kw">let _ </span>= m1_.lock();
         });
 
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">check_deadlock</span>());
+        <span class="macro">assert!</span>(!check_deadlock());
 
-        <span class="ident">b</span>.<span class="ident">wait</span>();
-        <span class="ident">sleep</span>(<span class="ident">Duration::from_millis</span>(<span class="number">50</span>));
-        <span class="macro">assert!</span>(<span class="ident">check_deadlock</span>());
+        b.wait();
+        sleep(Duration::from_millis(<span class="number">50</span>));
+        <span class="macro">assert!</span>(check_deadlock());
 
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">check_deadlock</span>());
+        <span class="macro">assert!</span>(!check_deadlock());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_mutex_deadlock_reentrant</span>() {
-        <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">DEADLOCK_DETECTION_LOCK</span>.<span class="ident">lock</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_mutex_deadlock_reentrant() {
+        <span class="kw">let </span>_guard = DEADLOCK_DETECTION_LOCK.lock();
 
-        <span class="kw">let</span> <span class="ident">m1</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Default::default</span>();
+        <span class="kw">let </span>m1: Arc&lt;Mutex&lt;()&gt;&gt; = Default::default();
 
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">check_deadlock</span>());
+        <span class="macro">assert!</span>(!check_deadlock());
 
-        <span class="kw">let</span> <span class="ident">_t1</span> <span class="op">=</span> <span class="ident">thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">_g</span> <span class="op">=</span> <span class="ident">m1</span>.<span class="ident">lock</span>();
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">m1</span>.<span class="ident">lock</span>();
+        <span class="kw">let </span>_t1 = thread::spawn(<span class="kw">move </span>|| {
+            <span class="kw">let </span>_g = m1.lock();
+            <span class="kw">let _ </span>= m1.lock();
         });
 
-        <span class="ident">sleep</span>(<span class="ident">Duration::from_millis</span>(<span class="number">50</span>));
-        <span class="macro">assert!</span>(<span class="ident">check_deadlock</span>());
+        sleep(Duration::from_millis(<span class="number">50</span>));
+        <span class="macro">assert!</span>(check_deadlock());
 
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">check_deadlock</span>());
+        <span class="macro">assert!</span>(!check_deadlock());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_remutex_deadlock</span>() {
-        <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">DEADLOCK_DETECTION_LOCK</span>.<span class="ident">lock</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_remutex_deadlock() {
+        <span class="kw">let </span>_guard = DEADLOCK_DETECTION_LOCK.lock();
 
-        <span class="kw">let</span> <span class="ident">m1</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ReentrantMutex</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Default::default</span>();
-        <span class="kw">let</span> <span class="ident">m2</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ReentrantMutex</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Default::default</span>();
-        <span class="kw">let</span> <span class="ident">m3</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ReentrantMutex</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Default::default</span>();
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Barrier::new</span>(<span class="number">4</span>));
+        <span class="kw">let </span>m1: Arc&lt;ReentrantMutex&lt;()&gt;&gt; = Default::default();
+        <span class="kw">let </span>m2: Arc&lt;ReentrantMutex&lt;()&gt;&gt; = Default::default();
+        <span class="kw">let </span>m3: Arc&lt;ReentrantMutex&lt;()&gt;&gt; = Default::default();
+        <span class="kw">let </span>b = Arc::new(Barrier::new(<span class="number">4</span>));
 
-        <span class="kw">let</span> <span class="ident">m1_</span> <span class="op">=</span> <span class="ident">m1</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">m2_</span> <span class="op">=</span> <span class="ident">m2</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">m3_</span> <span class="op">=</span> <span class="ident">m3</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">b1</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">b2</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">b3</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">clone</span>();
+        <span class="kw">let </span>m1_ = m1.clone();
+        <span class="kw">let </span>m2_ = m2.clone();
+        <span class="kw">let </span>m3_ = m3.clone();
+        <span class="kw">let </span>b1 = b.clone();
+        <span class="kw">let </span>b2 = b.clone();
+        <span class="kw">let </span>b3 = b.clone();
 
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">check_deadlock</span>());
+        <span class="macro">assert!</span>(!check_deadlock());
 
-        <span class="kw">let</span> <span class="ident">_t1</span> <span class="op">=</span> <span class="ident">thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">_g</span> <span class="op">=</span> <span class="ident">m1</span>.<span class="ident">lock</span>();
-            <span class="kw">let</span> <span class="ident">_g</span> <span class="op">=</span> <span class="ident">m1</span>.<span class="ident">lock</span>();
-            <span class="ident">b1</span>.<span class="ident">wait</span>();
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">m2_</span>.<span class="ident">lock</span>();
+        <span class="kw">let </span>_t1 = thread::spawn(<span class="kw">move </span>|| {
+            <span class="kw">let </span>_g = m1.lock();
+            <span class="kw">let </span>_g = m1.lock();
+            b1.wait();
+            <span class="kw">let _ </span>= m2_.lock();
         });
 
-        <span class="kw">let</span> <span class="ident">_t2</span> <span class="op">=</span> <span class="ident">thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">_g</span> <span class="op">=</span> <span class="ident">m2</span>.<span class="ident">lock</span>();
-            <span class="kw">let</span> <span class="ident">_g</span> <span class="op">=</span> <span class="ident">m2</span>.<span class="ident">lock</span>();
-            <span class="ident">b2</span>.<span class="ident">wait</span>();
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">m3_</span>.<span class="ident">lock</span>();
+        <span class="kw">let </span>_t2 = thread::spawn(<span class="kw">move </span>|| {
+            <span class="kw">let </span>_g = m2.lock();
+            <span class="kw">let </span>_g = m2.lock();
+            b2.wait();
+            <span class="kw">let _ </span>= m3_.lock();
         });
 
-        <span class="kw">let</span> <span class="ident">_t3</span> <span class="op">=</span> <span class="ident">thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">_g</span> <span class="op">=</span> <span class="ident">m3</span>.<span class="ident">lock</span>();
-            <span class="kw">let</span> <span class="ident">_g</span> <span class="op">=</span> <span class="ident">m3</span>.<span class="ident">lock</span>();
-            <span class="ident">b3</span>.<span class="ident">wait</span>();
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">m1_</span>.<span class="ident">lock</span>();
+        <span class="kw">let </span>_t3 = thread::spawn(<span class="kw">move </span>|| {
+            <span class="kw">let </span>_g = m3.lock();
+            <span class="kw">let </span>_g = m3.lock();
+            b3.wait();
+            <span class="kw">let _ </span>= m1_.lock();
         });
 
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">check_deadlock</span>());
+        <span class="macro">assert!</span>(!check_deadlock());
 
-        <span class="ident">b</span>.<span class="ident">wait</span>();
-        <span class="ident">sleep</span>(<span class="ident">Duration::from_millis</span>(<span class="number">50</span>));
-        <span class="macro">assert!</span>(<span class="ident">check_deadlock</span>());
+        b.wait();
+        sleep(Duration::from_millis(<span class="number">50</span>));
+        <span class="macro">assert!</span>(check_deadlock());
 
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">check_deadlock</span>());
+        <span class="macro">assert!</span>(!check_deadlock());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_rwlock_deadlock</span>() {
-        <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">DEADLOCK_DETECTION_LOCK</span>.<span class="ident">lock</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_rwlock_deadlock() {
+        <span class="kw">let </span>_guard = DEADLOCK_DETECTION_LOCK.lock();
 
-        <span class="kw">let</span> <span class="ident">m1</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Default::default</span>();
-        <span class="kw">let</span> <span class="ident">m2</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Default::default</span>();
-        <span class="kw">let</span> <span class="ident">m3</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Default::default</span>();
-        <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Barrier::new</span>(<span class="number">4</span>));
+        <span class="kw">let </span>m1: Arc&lt;RwLock&lt;()&gt;&gt; = Default::default();
+        <span class="kw">let </span>m2: Arc&lt;RwLock&lt;()&gt;&gt; = Default::default();
+        <span class="kw">let </span>m3: Arc&lt;RwLock&lt;()&gt;&gt; = Default::default();
+        <span class="kw">let </span>b = Arc::new(Barrier::new(<span class="number">4</span>));
 
-        <span class="kw">let</span> <span class="ident">m1_</span> <span class="op">=</span> <span class="ident">m1</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">m2_</span> <span class="op">=</span> <span class="ident">m2</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">m3_</span> <span class="op">=</span> <span class="ident">m3</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">b1</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">b2</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="ident">b3</span> <span class="op">=</span> <span class="ident">b</span>.<span class="ident">clone</span>();
+        <span class="kw">let </span>m1_ = m1.clone();
+        <span class="kw">let </span>m2_ = m2.clone();
+        <span class="kw">let </span>m3_ = m3.clone();
+        <span class="kw">let </span>b1 = b.clone();
+        <span class="kw">let </span>b2 = b.clone();
+        <span class="kw">let </span>b3 = b.clone();
 
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">check_deadlock</span>());
+        <span class="macro">assert!</span>(!check_deadlock());
 
-        <span class="kw">let</span> <span class="ident">_t1</span> <span class="op">=</span> <span class="ident">thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">_g</span> <span class="op">=</span> <span class="ident">m1</span>.<span class="ident">read</span>();
-            <span class="ident">b1</span>.<span class="ident">wait</span>();
-            <span class="kw">let</span> <span class="ident">_g</span> <span class="op">=</span> <span class="ident">m2_</span>.<span class="ident">write</span>();
+        <span class="kw">let </span>_t1 = thread::spawn(<span class="kw">move </span>|| {
+            <span class="kw">let </span>_g = m1.read();
+            b1.wait();
+            <span class="kw">let </span>_g = m2_.write();
         });
 
-        <span class="kw">let</span> <span class="ident">_t2</span> <span class="op">=</span> <span class="ident">thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">_g</span> <span class="op">=</span> <span class="ident">m2</span>.<span class="ident">read</span>();
-            <span class="ident">b2</span>.<span class="ident">wait</span>();
-            <span class="kw">let</span> <span class="ident">_g</span> <span class="op">=</span> <span class="ident">m3_</span>.<span class="ident">write</span>();
+        <span class="kw">let </span>_t2 = thread::spawn(<span class="kw">move </span>|| {
+            <span class="kw">let </span>_g = m2.read();
+            b2.wait();
+            <span class="kw">let </span>_g = m3_.write();
         });
 
-        <span class="kw">let</span> <span class="ident">_t3</span> <span class="op">=</span> <span class="ident">thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">_g</span> <span class="op">=</span> <span class="ident">m3</span>.<span class="ident">read</span>();
-            <span class="ident">b3</span>.<span class="ident">wait</span>();
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">m1_</span>.<span class="ident">write</span>();
+        <span class="kw">let </span>_t3 = thread::spawn(<span class="kw">move </span>|| {
+            <span class="kw">let </span>_g = m3.read();
+            b3.wait();
+            <span class="kw">let _ </span>= m1_.write();
         });
 
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">check_deadlock</span>());
+        <span class="macro">assert!</span>(!check_deadlock());
 
-        <span class="ident">b</span>.<span class="ident">wait</span>();
-        <span class="ident">sleep</span>(<span class="ident">Duration::from_millis</span>(<span class="number">50</span>));
-        <span class="macro">assert!</span>(<span class="ident">check_deadlock</span>());
+        b.wait();
+        sleep(Duration::from_millis(<span class="number">50</span>));
+        <span class="macro">assert!</span>(check_deadlock());
 
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">check_deadlock</span>());
+        <span class="macro">assert!</span>(!check_deadlock());
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">rwlock_deadlock_detection_not_supported</span>)]</span>
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_rwlock_deadlock_reentrant</span>() {
-        <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">DEADLOCK_DETECTION_LOCK</span>.<span class="ident">lock</span>();
+    <span class="attribute">#[cfg(rwlock_deadlock_detection_not_supported)]
+    #[test]
+    </span><span class="kw">fn </span>test_rwlock_deadlock_reentrant() {
+        <span class="kw">let </span>_guard = DEADLOCK_DETECTION_LOCK.lock();
 
-        <span class="kw">let</span> <span class="ident">m1</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Default::default</span>();
+        <span class="kw">let </span>m1: Arc&lt;RwLock&lt;()&gt;&gt; = Default::default();
 
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">check_deadlock</span>());
+        <span class="macro">assert!</span>(!check_deadlock());
 
-        <span class="kw">let</span> <span class="ident">_t1</span> <span class="op">=</span> <span class="ident">thread::spawn</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">_g</span> <span class="op">=</span> <span class="ident">m1</span>.<span class="ident">read</span>();
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">m1</span>.<span class="ident">write</span>();
+        <span class="kw">let </span>_t1 = thread::spawn(<span class="kw">move </span>|| {
+            <span class="kw">let </span>_g = m1.read();
+            <span class="kw">let _ </span>= m1.write();
         });
 
-        <span class="ident">sleep</span>(<span class="ident">Duration::from_millis</span>(<span class="number">50</span>));
-        <span class="macro">assert!</span>(<span class="ident">check_deadlock</span>());
+        sleep(Duration::from_millis(<span class="number">50</span>));
+        <span class="macro">assert!</span>(check_deadlock());
 
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">check_deadlock</span>());
+        <span class="macro">assert!</span>(!check_deadlock());
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="parking_lot" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="parking_lot" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

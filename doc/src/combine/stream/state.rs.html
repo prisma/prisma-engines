@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/combine-3.8.1/src/stream/state.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>state.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../combine/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/combine-3.8.1/src/stream/state.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>state.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../combine/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../combine/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -373,380 +373,380 @@
 <span id="373">373</span>
 <span id="374">374</span>
 <span id="375">375</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">lib::fmt</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>lib::fmt;
 
-<span class="kw">use</span> <span class="ident">error</span>::{<span class="ident">FastResult</span>, <span class="ident">ParseError</span>, <span class="ident">StreamError</span>};
-<span class="kw">use</span> <span class="ident">stream</span>::{
-    <span class="ident">FullRangeStream</span>, <span class="ident">IteratorStream</span>, <span class="ident">Positioned</span>, <span class="ident">RangeStreamOnce</span>, <span class="ident">Resetable</span>, <span class="ident">SliceStream</span>,
-    <span class="ident">StreamErrorFor</span>, <span class="ident">StreamOnce</span>,
+<span class="kw">use </span>error::{FastResult, ParseError, StreamError};
+<span class="kw">use </span>stream::{
+    FullRangeStream, IteratorStream, Positioned, RangeStreamOnce, Resetable, SliceStream,
+    StreamErrorFor, StreamOnce,
 };
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">stream::ReadStream</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">use </span>stream::ReadStream;
 
-<span class="doccomment">/// Trait for tracking the current position of a `Stream`.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Positioner</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The type which keeps track of the position</span>
-    <span class="kw">type</span> <span class="ident">Position</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Ord</span>;
-    <span class="doccomment">/// Returns the current position</span>
-    <span class="kw">fn</span> <span class="ident">position</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Position</span>;
-    <span class="doccomment">/// Updates the position given that `item` has been taken from the stream</span>
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">item</span>: <span class="kw-2">&amp;</span><span class="ident">Item</span>);
+<span class="doccomment">/// Trait for tracking the current position of a `Stream`.
+</span><span class="kw">pub trait </span>Positioner&lt;Item&gt; {
+    <span class="doccomment">/// The type which keeps track of the position
+    </span><span class="kw">type </span>Position: Clone + Ord;
+    <span class="doccomment">/// Returns the current position
+    </span><span class="kw">fn </span>position(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Position;
+    <span class="doccomment">/// Updates the position given that `item` has been taken from the stream
+    </span><span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, item: <span class="kw-2">&amp;</span>Item);
 }
 
-<span class="doccomment">/// Trait for tracking the current position of a `RangeStream`.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">RangePositioner</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span><span class="op">&gt;</span>: <span class="ident">Positioner</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Updates the position given that `range` has been taken from the stream</span>
-    <span class="kw">fn</span> <span class="ident">update_range</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">range</span>: <span class="kw-2">&amp;</span><span class="ident">Range</span>);
+<span class="doccomment">/// Trait for tracking the current position of a `RangeStream`.
+</span><span class="kw">pub trait </span>RangePositioner&lt;Item, Range&gt;: Positioner&lt;Item&gt; {
+    <span class="doccomment">/// Updates the position given that `range` has been taken from the stream
+    </span><span class="kw">fn </span>update_range(<span class="kw-2">&amp;mut </span><span class="self">self</span>, range: <span class="kw-2">&amp;</span>Range);
 }
 
-<span class="doccomment">/// Defines a default `Positioner` type for a particular `Stream` type.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DefaultPositioned</span> {
-    <span class="kw">type</span> <span class="ident">Positioner</span>: <span class="ident">Default</span>;
+<span class="doccomment">/// Defines a default `Positioner` type for a particular `Stream` type.
+</span><span class="kw">pub trait </span>DefaultPositioned {
+    <span class="kw">type </span>Positioner: Default;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">DefaultPositioned</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span> {
-    <span class="kw">type</span> <span class="ident">Positioner</span> <span class="op">=</span> <span class="ident">SourcePosition</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; DefaultPositioned <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str {
+    <span class="kw">type </span>Positioner = SourcePosition;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">DefaultPositioned</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">T</span>] {
-    <span class="kw">type</span> <span class="ident">Positioner</span> <span class="op">=</span> <span class="ident">IndexPositioner</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; DefaultPositioned <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[T] {
+    <span class="kw">type </span>Positioner = IndexPositioner;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">DefaultPositioned</span> <span class="kw">for</span> <span class="ident">SliceStream</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Positioner</span> <span class="op">=</span> <span class="ident">IndexPositioner</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; DefaultPositioned <span class="kw">for </span>SliceStream&lt;<span class="lifetime">&#39;a</span>, T&gt; {
+    <span class="kw">type </span>Positioner = IndexPositioner;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">DefaultPositioned</span> <span class="kw">for</span> <span class="ident">IteratorStream</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Positioner</span> <span class="op">=</span> <span class="ident">IndexPositioner</span>;
+<span class="kw">impl</span>&lt;T&gt; DefaultPositioned <span class="kw">for </span>IteratorStream&lt;T&gt; {
+    <span class="kw">type </span>Positioner = IndexPositioner;
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> <span class="ident">DefaultPositioned</span> <span class="kw">for</span> <span class="ident">ReadStream</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Positioner</span> <span class="op">=</span> <span class="ident">IndexPositioner</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+</span><span class="kw">impl</span>&lt;R&gt; DefaultPositioned <span class="kw">for </span>ReadStream&lt;R&gt; {
+    <span class="kw">type </span>Positioner = IndexPositioner;
 }
 
-<span class="doccomment">/// The `State&lt;I&gt;` struct maintains the current position in the stream `I` using</span>
-<span class="doccomment">/// the `Positioner` trait to track the position.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # #![cfg(feature = &quot;std&quot;)]</span>
-<span class="doccomment">/// # extern crate combine;</span>
-<span class="doccomment">/// # use combine::{token, Parser};</span>
-<span class="doccomment">/// # use combine::stream::easy;</span>
-<span class="doccomment">/// # use combine::stream::state::State;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">///     let result = token(b&#39;9&#39;)</span>
-<span class="doccomment">///         .message(&quot;Not a nine&quot;)</span>
-<span class="doccomment">///         .easy_parse(State::new(&amp;b&quot;8&quot;[..]));</span>
-<span class="doccomment">///     assert_eq!(result, Err(easy::Errors {</span>
-<span class="doccomment">///         position: 0,</span>
-<span class="doccomment">///         errors: vec![</span>
-<span class="doccomment">///             easy::Error::Unexpected(b&#39;8&#39;.into()),</span>
-<span class="doccomment">///             easy::Error::Expected(b&#39;9&#39;.into()),</span>
-<span class="doccomment">///             easy::Error::Message(&quot;Not a nine&quot;.into())</span>
-<span class="doccomment">///         ]</span>
-<span class="doccomment">///     }));</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">X</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The input stream used when items are requested</span>
-    <span class="kw">pub</span> <span class="ident">input</span>: <span class="ident">I</span>,
-    <span class="doccomment">/// The positioner used to update the current position</span>
-    <span class="kw">pub</span> <span class="ident">positioner</span>: <span class="ident">X</span>,
+<span class="doccomment">/// The `State&lt;I&gt;` struct maintains the current position in the stream `I` using
+/// the `Positioner` trait to track the position.
+///
+/// ```
+/// # #![cfg(feature = &quot;std&quot;)]
+/// # extern crate combine;
+/// # use combine::{token, Parser};
+/// # use combine::stream::easy;
+/// # use combine::stream::state::State;
+/// # fn main() {
+///     let result = token(b&#39;9&#39;)
+///         .message(&quot;Not a nine&quot;)
+///         .easy_parse(State::new(&amp;b&quot;8&quot;[..]));
+///     assert_eq!(result, Err(easy::Errors {
+///         position: 0,
+///         errors: vec![
+///             easy::Error::Unexpected(b&#39;8&#39;.into()),
+///             easy::Error::Expected(b&#39;9&#39;.into()),
+///             easy::Error::Message(&quot;Not a nine&quot;.into())
+///         ]
+///     }));
+/// # }
+/// ```
+</span><span class="attribute">#[derive(Clone, Debug, PartialEq)]
+</span><span class="kw">pub struct </span>State&lt;I, X&gt; {
+    <span class="doccomment">/// The input stream used when items are requested
+    </span><span class="kw">pub </span>input: I,
+    <span class="doccomment">/// The positioner used to update the current position
+    </span><span class="kw">pub </span>positioner: X,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">X</span><span class="op">&gt;</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">X</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">StreamOnce</span>,
-    <span class="ident">X</span>: <span class="ident">Positioner</span><span class="op">&lt;</span><span class="ident">I::Item</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;I, X&gt; State&lt;I, X&gt;
+<span class="kw">where
+    </span>I: StreamOnce,
+    X: Positioner&lt;I::Item&gt;,
 {
-    <span class="doccomment">/// Creates a new `State&lt;I, X&gt;` from an input stream and a positioner.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_positioner</span>(<span class="ident">input</span>: <span class="ident">I</span>, <span class="ident">positioner</span>: <span class="ident">X</span>) -&gt; <span class="ident">State</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">X</span><span class="op">&gt;</span> {
-        <span class="ident">State</span> { <span class="ident">input</span>, <span class="ident">positioner</span> }
+    <span class="doccomment">/// Creates a new `State&lt;I, X&gt;` from an input stream and a positioner.
+    </span><span class="kw">pub fn </span>with_positioner(input: I, positioner: X) -&gt; State&lt;I, X&gt; {
+        State { input, positioner }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">I::Positioner</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">StreamOnce</span> <span class="op">+</span> <span class="ident">DefaultPositioned</span>,
-    <span class="ident">I::Positioner</span>: <span class="ident">Positioner</span><span class="op">&lt;</span><span class="ident">I::Item</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;I&gt; State&lt;I, I::Positioner&gt;
+<span class="kw">where
+    </span>I: StreamOnce + DefaultPositioned,
+    I::Positioner: Positioner&lt;I::Item&gt;,
 {
-    <span class="doccomment">/// Creates a new `State&lt;I, X&gt;` from an input stream and its default positioner.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">input</span>: <span class="ident">I</span>) -&gt; <span class="ident">State</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">I::Positioner</span><span class="op">&gt;</span> {
-        <span class="ident">State::with_positioner</span>(<span class="ident">input</span>, <span class="ident">I::Positioner::default</span>())
+    <span class="doccomment">/// Creates a new `State&lt;I, X&gt;` from an input stream and its default positioner.
+    </span><span class="kw">pub fn </span>new(input: I) -&gt; State&lt;I, I::Positioner&gt; {
+        State::with_positioner(input, I::Positioner::default())
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">X</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">Positioned</span> <span class="kw">for</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">X</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">StreamOnce</span>,
-    <span class="ident">X</span>: <span class="ident">Positioner</span><span class="op">&lt;</span><span class="ident">I::Item</span><span class="op">&gt;</span>,
-    <span class="ident">E</span>: <span class="ident">StreamError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span><span class="op">&gt;</span>,
-    <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">X::Position</span>, <span class="ident">StreamError</span> <span class="op">=</span> <span class="ident">E</span><span class="op">&gt;</span>,
-    <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span>, <span class="ident">StreamError</span> <span class="op">=</span> <span class="ident">E</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;I, X, E&gt; Positioned <span class="kw">for </span>State&lt;I, X&gt;
+<span class="kw">where
+    </span>I: StreamOnce,
+    X: Positioner&lt;I::Item&gt;,
+    E: StreamError&lt;I::Item, I::Range&gt;,
+    I::Error: ParseError&lt;I::Item, I::Range, X::Position, StreamError = E&gt;,
+    I::Error: ParseError&lt;I::Item, I::Range, I::Position, StreamError = E&gt;,
 {
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">position</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Position</span> {
-        <span class="self">self</span>.<span class="ident">positioner</span>.<span class="ident">position</span>()
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>position(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Position {
+        <span class="self">self</span>.positioner.position()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">X</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">StreamOnce</span> <span class="kw">for</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">X</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">StreamOnce</span>,
-    <span class="ident">X</span>: <span class="ident">Positioner</span><span class="op">&lt;</span><span class="ident">I::Item</span><span class="op">&gt;</span>,
-    <span class="ident">S</span>: <span class="ident">StreamError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span><span class="op">&gt;</span>,
-    <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">X::Position</span>, <span class="ident">StreamError</span> <span class="op">=</span> <span class="ident">S</span><span class="op">&gt;</span>,
-    <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span>, <span class="ident">StreamError</span> <span class="op">=</span> <span class="ident">S</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;I, X, S&gt; StreamOnce <span class="kw">for </span>State&lt;I, X&gt;
+<span class="kw">where
+    </span>I: StreamOnce,
+    X: Positioner&lt;I::Item&gt;,
+    S: StreamError&lt;I::Item, I::Range&gt;,
+    I::Error: ParseError&lt;I::Item, I::Range, X::Position, StreamError = S&gt;,
+    I::Error: ParseError&lt;I::Item, I::Range, I::Position, StreamError = S&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="ident">I::Item</span>;
-    <span class="kw">type</span> <span class="ident">Range</span> <span class="op">=</span> <span class="ident">I::Range</span>;
-    <span class="kw">type</span> <span class="ident">Position</span> <span class="op">=</span> <span class="ident">X::Position</span>;
-    <span class="kw">type</span> <span class="ident">Error</span> <span class="op">=</span> <span class="ident">I::Error</span>;
+    <span class="kw">type </span>Item = I::Item;
+    <span class="kw">type </span>Range = I::Range;
+    <span class="kw">type </span>Position = X::Position;
+    <span class="kw">type </span>Error = I::Error;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">uncons</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">input</span>.<span class="ident">uncons</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> {
-            <span class="self">self</span>.<span class="ident">positioner</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>);
-            <span class="ident">c</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>uncons(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;I::Item, StreamErrorFor&lt;<span class="self">Self</span>&gt;&gt; {
+        <span class="self">self</span>.input.uncons().map(|c| {
+            <span class="self">self</span>.positioner.update(<span class="kw-2">&amp;</span>c);
+            c
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">is_partial</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">input</span>.<span class="ident">is_partial</span>()
+    <span class="kw">fn </span>is_partial(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.input.is_partial()
     }
 }
 
-<span class="doccomment">/// The `IndexPositioner&lt;Item, Range&gt;` struct maintains the current index into the stream `I`.  The</span>
-<span class="doccomment">/// initial index is index 0.  Each `Item` consumed increments the index by 1; each `range` consumed</span>
-<span class="doccomment">/// increments the position by `range.len()`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IndexPositioner</span>(<span class="ident">usize</span>);
+<span class="doccomment">/// The `IndexPositioner&lt;Item, Range&gt;` struct maintains the current index into the stream `I`.  The
+/// initial index is index 0.  Each `Item` consumed increments the index by 1; each `range` consumed
+/// increments the position by `range.len()`.
+</span><span class="attribute">#[derive(Clone, Debug, Default, PartialEq)]
+</span><span class="kw">pub struct </span>IndexPositioner(usize);
 
-<span class="macro">clone_resetable!</span> { () <span class="ident">IndexPositioner</span> }
+<span class="macro">clone_resetable! </span>{ () IndexPositioner }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span> <span class="ident">Positioner</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">IndexPositioner</span>
-<span class="kw">where</span>
-    <span class="ident">Item</span>: <span class="ident">PartialEq</span> <span class="op">+</span> <span class="ident">Clone</span>,
+<span class="kw">impl</span>&lt;Item&gt; Positioner&lt;Item&gt; <span class="kw">for </span>IndexPositioner
+<span class="kw">where
+    </span>Item: PartialEq + Clone,
 {
-    <span class="kw">type</span> <span class="ident">Position</span> <span class="op">=</span> <span class="ident">usize</span>;
+    <span class="kw">type </span>Position = usize;
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">position</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="number">0</span>
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>position(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _item: <span class="kw-2">&amp;</span>Item) {
+        <span class="self">self</span>.<span class="number">0 </span>+= <span class="number">1
+    </span>}
+}
+
+<span class="kw">impl </span>IndexPositioner {
+    <span class="kw">pub fn </span>new() -&gt; IndexPositioner {
+        IndexPositioner::new_with_position(<span class="number">0</span>)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_item</span>: <span class="kw-2">&amp;</span><span class="ident">Item</span>) {
-        <span class="self">self</span>.<span class="number">0</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>
+    <span class="kw">pub fn </span>new_with_position(position: usize) -&gt; IndexPositioner {
+        IndexPositioner(position)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">IndexPositioner</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">IndexPositioner</span> {
-        <span class="ident">IndexPositioner::new_with_position</span>(<span class="number">0</span>)
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_position</span>(<span class="ident">position</span>: <span class="ident">usize</span>) -&gt; <span class="ident">IndexPositioner</span> {
-        <span class="ident">IndexPositioner</span>(<span class="ident">position</span>)
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span><span class="op">&gt;</span> <span class="ident">RangePositioner</span><span class="op">&lt;</span><span class="ident">Item</span>, <span class="ident">Range</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">IndexPositioner</span>
-<span class="kw">where</span>
-    <span class="ident">Item</span>: <span class="ident">PartialEq</span> <span class="op">+</span> <span class="ident">Clone</span>,
-    <span class="ident">Range</span>: <span class="ident">PartialEq</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">::stream::Range</span>,
+<span class="kw">impl</span>&lt;Item, Range&gt; RangePositioner&lt;Item, Range&gt; <span class="kw">for </span>IndexPositioner
+<span class="kw">where
+    </span>Item: PartialEq + Clone,
+    Range: PartialEq + Clone + ::stream::Range,
 {
-    <span class="kw">fn</span> <span class="ident">update_range</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">range</span>: <span class="kw-2">&amp;</span><span class="ident">Range</span>) {
-        <span class="self">self</span>.<span class="number">0</span> <span class="op">+</span><span class="op">=</span> <span class="ident">range</span>.<span class="ident">len</span>()
+    <span class="kw">fn </span>update_range(<span class="kw-2">&amp;mut </span><span class="self">self</span>, range: <span class="kw-2">&amp;</span>Range) {
+        <span class="self">self</span>.<span class="number">0 </span>+= range.len()
     }
 }
 
-<span class="doccomment">/// Struct which represents a position in a source file.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Ord</span>, <span class="ident">PartialOrd</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SourcePosition</span> {
-    <span class="doccomment">/// Current line of the input</span>
-    <span class="kw">pub</span> <span class="ident">line</span>: <span class="ident">i32</span>,
-    <span class="doccomment">/// Current column of the input</span>
-    <span class="kw">pub</span> <span class="ident">column</span>: <span class="ident">i32</span>,
+<span class="doccomment">/// Struct which represents a position in a source file.
+</span><span class="attribute">#[derive(Clone, Copy, Debug, Eq, PartialEq, Ord, PartialOrd)]
+</span><span class="kw">pub struct </span>SourcePosition {
+    <span class="doccomment">/// Current line of the input
+    </span><span class="kw">pub </span>line: i32,
+    <span class="doccomment">/// Current column of the input
+    </span><span class="kw">pub </span>column: i32,
 }
 
-<span class="macro">clone_resetable!</span> { () <span class="ident">SourcePosition</span> }
+<span class="macro">clone_resetable! </span>{ () SourcePosition }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">SourcePosition</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">SourcePosition</span> { <span class="ident">line</span>: <span class="number">1</span>, <span class="ident">column</span>: <span class="number">1</span> }
+<span class="kw">impl </span>Default <span class="kw">for </span>SourcePosition {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        SourcePosition { line: <span class="number">1</span>, column: <span class="number">1 </span>}
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">SourcePosition</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;line: {}, column: {}&quot;</span>, <span class="self">self</span>.<span class="ident">line</span>, <span class="self">self</span>.<span class="ident">column</span>)
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>SourcePosition {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;line: {}, column: {}&quot;</span>, <span class="self">self</span>.line, <span class="self">self</span>.column)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">SourcePosition</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">SourcePosition::default</span>()
+<span class="kw">impl </span>SourcePosition {
+    <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        SourcePosition::default()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Positioner</span><span class="op">&lt;</span><span class="ident">char</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SourcePosition</span> {
-    <span class="kw">type</span> <span class="ident">Position</span> <span class="op">=</span> <span class="ident">SourcePosition</span>;
+<span class="kw">impl </span>Positioner&lt;char&gt; <span class="kw">for </span>SourcePosition {
+    <span class="kw">type </span>Position = SourcePosition;
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">position</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">SourcePosition</span> {
-        <span class="self">self</span>.<span class="ident">clone</span>()
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>position(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SourcePosition {
+        <span class="self">self</span>.clone()
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">item</span>: <span class="kw-2">&amp;</span><span class="ident">char</span>) {
-        <span class="self">self</span>.<span class="ident">column</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">item</span> <span class="op">==</span> <span class="string">&#39;\n&#39;</span> {
-            <span class="self">self</span>.<span class="ident">column</span> <span class="op">=</span> <span class="number">1</span>;
-            <span class="self">self</span>.<span class="ident">line</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, item: <span class="kw-2">&amp;</span>char) {
+        <span class="self">self</span>.column += <span class="number">1</span>;
+        <span class="kw">if </span><span class="kw-2">*</span>item == <span class="string">&#39;\n&#39; </span>{
+            <span class="self">self</span>.column = <span class="number">1</span>;
+            <span class="self">self</span>.line += <span class="number">1</span>;
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">RangePositioner</span><span class="op">&lt;</span><span class="ident">char</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SourcePosition</span> {
-    <span class="kw">fn</span> <span class="ident">update_range</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">range</span>: <span class="op">&amp;&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) {
-        <span class="kw">for</span> <span class="ident">c</span> <span class="kw">in</span> <span class="ident">range</span>.<span class="ident">chars</span>() {
-            <span class="self">self</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; RangePositioner&lt;char, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; <span class="kw">for </span>SourcePosition {
+    <span class="kw">fn </span>update_range(<span class="kw-2">&amp;mut </span><span class="self">self</span>, range: &amp;&amp;<span class="lifetime">&#39;a </span>str) {
+        <span class="kw">for </span>c <span class="kw">in </span>range.chars() {
+            <span class="self">self</span>.update(<span class="kw-2">&amp;</span>c);
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">X</span>, <span class="ident">S</span><span class="op">&gt;</span> <span class="ident">RangeStreamOnce</span> <span class="kw">for</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">X</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">RangeStreamOnce</span>,
-    <span class="ident">X</span>: <span class="ident">Resetable</span> <span class="op">+</span> <span class="ident">RangePositioner</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span><span class="op">&gt;</span>,
-    <span class="ident">S</span>: <span class="ident">StreamError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span><span class="op">&gt;</span>,
-    <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">X::Position</span>, <span class="ident">StreamError</span> <span class="op">=</span> <span class="ident">S</span><span class="op">&gt;</span>,
-    <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span>, <span class="ident">StreamError</span> <span class="op">=</span> <span class="ident">S</span><span class="op">&gt;</span>,
-    <span class="ident">I::Position</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Ord</span>,
+<span class="kw">impl</span>&lt;I, X, S&gt; RangeStreamOnce <span class="kw">for </span>State&lt;I, X&gt;
+<span class="kw">where
+    </span>I: RangeStreamOnce,
+    X: Resetable + RangePositioner&lt;I::Item, I::Range&gt;,
+    S: StreamError&lt;I::Item, I::Range&gt;,
+    I::Error: ParseError&lt;I::Item, I::Range, X::Position, StreamError = S&gt;,
+    I::Error: ParseError&lt;I::Item, I::Range, I::Position, StreamError = S&gt;,
+    I::Position: Clone + Ord,
 {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">uncons_range</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">size</span>: <span class="ident">usize</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">I::Range</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">input</span>.<span class="ident">uncons_range</span>(<span class="ident">size</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">range</span><span class="op">|</span> {
-            <span class="self">self</span>.<span class="ident">positioner</span>.<span class="ident">update_range</span>(<span class="kw-2">&amp;</span><span class="ident">range</span>);
-            <span class="ident">range</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>uncons_range(<span class="kw-2">&amp;mut </span><span class="self">self</span>, size: usize) -&gt; <span class="prelude-ty">Result</span>&lt;I::Range, StreamErrorFor&lt;<span class="self">Self</span>&gt;&gt; {
+        <span class="self">self</span>.input.uncons_range(size).map(|range| {
+            <span class="self">self</span>.positioner.update_range(<span class="kw-2">&amp;</span>range);
+            range
         })
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">uncons_while</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">predicate</span>: <span class="ident">F</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">I::Range</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident">I::Item</span>) -&gt; <span class="ident">bool</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>uncons_while&lt;F&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>predicate: F) -&gt; <span class="prelude-ty">Result</span>&lt;I::Range, StreamErrorFor&lt;<span class="self">Self</span>&gt;&gt;
+    <span class="kw">where
+        </span>F: FnMut(I::Item) -&gt; bool,
     {
-        <span class="kw">let</span> <span class="ident">positioner</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">positioner</span>;
-        <span class="self">self</span>.<span class="ident">input</span>.<span class="ident">uncons_while</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="ident">predicate</span>(<span class="ident">t</span>.<span class="ident">clone</span>()) {
-                <span class="ident">positioner</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">t</span>);
-                <span class="bool-val">true</span>
-            } <span class="kw">else</span> {
-                <span class="bool-val">false</span>
-            }
+        <span class="kw">let </span>positioner = <span class="kw-2">&amp;mut </span><span class="self">self</span>.positioner;
+        <span class="self">self</span>.input.uncons_while(|t| {
+            <span class="kw">if </span>predicate(t.clone()) {
+                positioner.update(<span class="kw-2">&amp;</span>t);
+                <span class="bool-val">true
+            </span>} <span class="kw">else </span>{
+                <span class="bool-val">false
+            </span>}
         })
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">uncons_while1</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="kw-2">mut</span> <span class="ident">predicate</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="ident">FastResult</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Range</span>, <span class="ident">StreamErrorFor</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="ident"><span class="self">Self</span>::Item</span>) -&gt; <span class="ident">bool</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>uncons_while1&lt;F&gt;(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        <span class="kw-2">mut </span>predicate: F,
+    ) -&gt; FastResult&lt;<span class="self">Self</span>::Range, StreamErrorFor&lt;<span class="self">Self</span>&gt;&gt;
+    <span class="kw">where
+        </span>F: FnMut(<span class="self">Self</span>::Item) -&gt; bool,
     {
-        <span class="kw">let</span> <span class="ident">positioner</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">positioner</span>;
-        <span class="self">self</span>.<span class="ident">input</span>.<span class="ident">uncons_while1</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="ident">predicate</span>(<span class="ident">t</span>.<span class="ident">clone</span>()) {
-                <span class="ident">positioner</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">t</span>);
-                <span class="bool-val">true</span>
-            } <span class="kw">else</span> {
-                <span class="bool-val">false</span>
-            }
+        <span class="kw">let </span>positioner = <span class="kw-2">&amp;mut </span><span class="self">self</span>.positioner;
+        <span class="self">self</span>.input.uncons_while1(|t| {
+            <span class="kw">if </span>predicate(t.clone()) {
+                positioner.update(<span class="kw-2">&amp;</span>t);
+                <span class="bool-val">true
+            </span>} <span class="kw">else </span>{
+                <span class="bool-val">false
+            </span>}
         })
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">distance</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">end</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Checkpoint</span>) -&gt; <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="ident">input</span>.<span class="ident">distance</span>(<span class="kw-2">&amp;</span><span class="ident">end</span>.<span class="ident">input</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>distance(<span class="kw-2">&amp;</span><span class="self">self</span>, end: <span class="kw-2">&amp;</span><span class="self">Self</span>::Checkpoint) -&gt; usize {
+        <span class="self">self</span>.input.distance(<span class="kw-2">&amp;</span>end.input)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">X</span><span class="op">&gt;</span> <span class="ident">Resetable</span> <span class="kw">for</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">X</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Resetable</span>,
-    <span class="ident">X</span>: <span class="ident">Resetable</span>,
+<span class="kw">impl</span>&lt;I, X&gt; Resetable <span class="kw">for </span>State&lt;I, X&gt;
+<span class="kw">where
+    </span>I: Resetable,
+    X: Resetable,
 {
-    <span class="kw">type</span> <span class="ident">Checkpoint</span> <span class="op">=</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">I::Checkpoint</span>, <span class="ident">X::Checkpoint</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">checkpoint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Checkpoint</span> {
-        <span class="ident">State</span> {
-            <span class="ident">input</span>: <span class="self">self</span>.<span class="ident">input</span>.<span class="ident">checkpoint</span>(),
-            <span class="ident">positioner</span>: <span class="self">self</span>.<span class="ident">positioner</span>.<span class="ident">checkpoint</span>(),
+    <span class="kw">type </span>Checkpoint = State&lt;I::Checkpoint, X::Checkpoint&gt;;
+    <span class="kw">fn </span>checkpoint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Checkpoint {
+        State {
+            input: <span class="self">self</span>.input.checkpoint(),
+            positioner: <span class="self">self</span>.positioner.checkpoint(),
         }
     }
-    <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">checkpoint</span>: <span class="ident"><span class="self">Self</span>::Checkpoint</span>) {
-        <span class="self">self</span>.<span class="ident">input</span>.<span class="ident">reset</span>(<span class="ident">checkpoint</span>.<span class="ident">input</span>);
-        <span class="self">self</span>.<span class="ident">positioner</span>.<span class="ident">reset</span>(<span class="ident">checkpoint</span>.<span class="ident">positioner</span>);
+    <span class="kw">fn </span>reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>, checkpoint: <span class="self">Self</span>::Checkpoint) {
+        <span class="self">self</span>.input.reset(checkpoint.input);
+        <span class="self">self</span>.positioner.reset(checkpoint.positioner);
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">X</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="ident">FullRangeStream</span> <span class="kw">for</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">X</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">FullRangeStream</span> <span class="op">+</span> <span class="ident">Resetable</span>,
-    <span class="ident">I::Position</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Ord</span>,
-    <span class="ident">E</span>: <span class="ident">StreamError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span><span class="op">&gt;</span>,
-    <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">X::Position</span>, <span class="ident">StreamError</span> <span class="op">=</span> <span class="ident">E</span><span class="op">&gt;</span>,
-    <span class="ident">I::Error</span>: <span class="ident">ParseError</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span>, <span class="ident">I::Position</span>, <span class="ident">StreamError</span> <span class="op">=</span> <span class="ident">E</span><span class="op">&gt;</span>,
-    <span class="ident">X</span>: <span class="ident">Resetable</span> <span class="op">+</span> <span class="ident">RangePositioner</span><span class="op">&lt;</span><span class="ident">I::Item</span>, <span class="ident">I::Range</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;I, X, E&gt; FullRangeStream <span class="kw">for </span>State&lt;I, X&gt;
+<span class="kw">where
+    </span>I: FullRangeStream + Resetable,
+    I::Position: Clone + Ord,
+    E: StreamError&lt;I::Item, I::Range&gt;,
+    I::Error: ParseError&lt;I::Item, I::Range, X::Position, StreamError = E&gt;,
+    I::Error: ParseError&lt;I::Item, I::Range, I::Position, StreamError = E&gt;,
+    X: Resetable + RangePositioner&lt;I::Item, I::Range&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">range</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Range</span> {
-        <span class="self">self</span>.<span class="ident">input</span>.<span class="ident">range</span>()
+    <span class="kw">fn </span>range(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Range {
+        <span class="self">self</span>.input.range()
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">test</span>))]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">Parser</span>;
+<span class="attribute">#[cfg(all(feature = <span class="string">&quot;std&quot;</span>, test))]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>Parser;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_positioner</span>() {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> [<span class="string">&quot;a&quot;</span>.<span class="ident">to_string</span>(), <span class="string">&quot;b&quot;</span>.<span class="ident">to_string</span>()];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parser</span> <span class="op">=</span> <span class="ident">::any</span>();
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parse</span>(<span class="ident">State::new</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>[..]));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_positioner() {
+        <span class="kw">let </span>input = [<span class="string">&quot;a&quot;</span>.to_string(), <span class="string">&quot;b&quot;</span>.to_string()];
+        <span class="kw">let </span><span class="kw-2">mut </span>parser = ::any();
+        <span class="kw">let </span>result = parser.parse(State::new(<span class="kw-2">&amp;</span>input[..]));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">result</span>,
+            result,
             <span class="prelude-val">Ok</span>((
-                <span class="string">&quot;a&quot;</span>.<span class="ident">to_string</span>(),
-                <span class="ident">State::with_positioner</span>(
-                    <span class="kw-2">&amp;</span>[<span class="string">&quot;b&quot;</span>.<span class="ident">to_string</span>()][..],
-                    <span class="ident">IndexPositioner::new_with_position</span>(<span class="number">1</span>)
+                <span class="string">&quot;a&quot;</span>.to_string(),
+                State::with_positioner(
+                    <span class="kw-2">&amp;</span>[<span class="string">&quot;b&quot;</span>.to_string()][..],
+                    IndexPositioner::new_with_position(<span class="number">1</span>)
                 )
             ))
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_range_positioner</span>() {
-        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> [<span class="string">&quot;a&quot;</span>.<span class="ident">to_string</span>(), <span class="string">&quot;b&quot;</span>.<span class="ident">to_string</span>(), <span class="string">&quot;c&quot;</span>.<span class="ident">to_string</span>()];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parser</span> <span class="op">=</span> <span class="ident">::parser::range::take</span>(<span class="number">2</span>);
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">parser</span>.<span class="ident">parse</span>(<span class="ident">State::new</span>(<span class="kw-2">&amp;</span><span class="ident">input</span>[..]));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_range_positioner() {
+        <span class="kw">let </span>input = [<span class="string">&quot;a&quot;</span>.to_string(), <span class="string">&quot;b&quot;</span>.to_string(), <span class="string">&quot;c&quot;</span>.to_string()];
+        <span class="kw">let </span><span class="kw-2">mut </span>parser = ::parser::range::take(<span class="number">2</span>);
+        <span class="kw">let </span>result = parser.parse(State::new(<span class="kw-2">&amp;</span>input[..]));
         <span class="macro">assert_eq!</span>(
-            <span class="ident">result</span>,
+            result,
             <span class="prelude-val">Ok</span>((
-                <span class="kw-2">&amp;</span>[<span class="string">&quot;a&quot;</span>.<span class="ident">to_string</span>(), <span class="string">&quot;b&quot;</span>.<span class="ident">to_string</span>()][..],
-                <span class="ident">State::with_positioner</span>(
-                    <span class="kw-2">&amp;</span>[<span class="string">&quot;c&quot;</span>.<span class="ident">to_string</span>()][..],
-                    <span class="ident">IndexPositioner::new_with_position</span>(<span class="number">2</span>)
+                <span class="kw-2">&amp;</span>[<span class="string">&quot;a&quot;</span>.to_string(), <span class="string">&quot;b&quot;</span>.to_string()][..],
+                State::with_positioner(
+                    <span class="kw-2">&amp;</span>[<span class="string">&quot;c&quot;</span>.to_string()][..],
+                    IndexPositioner::new_with_position(<span class="number">2</span>)
                 )
             ))
         );
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="combine" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="combine" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

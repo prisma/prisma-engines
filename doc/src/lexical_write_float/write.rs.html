@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-write-float-0.8.5/src/write.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>write.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_write_float/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_write_float/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_write_float/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-write-float-0.8.5/src/write.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>write.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_write_float/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_write_float/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_write_float/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -182,189 +182,189 @@
 <span id="182">182</span>
 <span id="183">183</span>
 <span id="184">184</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Shared trait and methods for writing floats.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Shared trait and methods for writing floats.
 
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+</span><span class="attribute">#![doc(hidden)]
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::algorithm::write_float</span> <span class="kw">as</span> <span class="ident">write_float_decimal</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::binary</span>;
-<span class="doccomment">/// Select the back-end.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::compact::write_float</span> <span class="kw">as</span> <span class="ident">write_float_decimal</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::hex</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::radix</span>;
+#[cfg(not(feature = <span class="string">&quot;compact&quot;</span>))]
+</span><span class="kw">use </span><span class="kw">crate</span>::algorithm::write_float <span class="kw">as </span>write_float_decimal;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;power-of-two&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::binary;
+<span class="doccomment">/// Select the back-end.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;compact&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::compact::write_float <span class="kw">as </span>write_float_decimal;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;power-of-two&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::hex;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;radix&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::radix;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::float::RawFloat</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::options::Options</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;f16&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">lexical_util::bf16::bf16</span>;
-<span class="kw">use</span> <span class="ident">lexical_util::constants::FormattedSize</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;f16&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">lexical_util::f16::f16</span>;
-<span class="kw">use</span> <span class="ident">lexical_util::format::NumberFormat</span>;
-<span class="kw">use</span> <span class="ident">lexical_write_integer::write::WriteInteger</span>;
+<span class="kw">use </span><span class="kw">crate</span>::float::RawFloat;
+<span class="kw">use </span><span class="kw">crate</span>::options::Options;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;f16&quot;</span>)]
+</span><span class="kw">use </span>lexical_util::bf16::bf16;
+<span class="kw">use </span>lexical_util::constants::FormattedSize;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;f16&quot;</span>)]
+</span><span class="kw">use </span>lexical_util::f16::f16;
+<span class="kw">use </span>lexical_util::format::NumberFormat;
+<span class="kw">use </span>lexical_write_integer::write::WriteInteger;
 
-<span class="doccomment">/// Write float trait.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">WriteFloat</span>: <span class="ident">RawFloat</span> {
-    <span class="doccomment">/// Forward write integer parameters to an unoptimized backend.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Safety</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Safe as long as the buffer can hold [`FORMATTED_SIZE`] elements</span>
-    <span class="doccomment">/// (or [`FORMATTED_SIZE_DECIMAL`] for decimal). If using custom digit</span>
-    <span class="doccomment">/// precision control (such as specifying a minimum number of significant</span>
-    <span class="doccomment">/// digits), or disabling scientific notation, then more digits may be</span>
-    <span class="doccomment">/// required (up to `1075` for the leading or trailing zeros, `1` for</span>
-    <span class="doccomment">/// the sign and `1` for the decimal point). So,</span>
-    <span class="doccomment">/// `1077 + min_significant_digits.max(52)`, so ~1200 for a reasonable</span>
-    <span class="doccomment">/// threshold.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if the number format is invalid, or if scientific notation</span>
-    <span class="doccomment">/// is used and the exponent base does not equal the mantissa radix</span>
-    <span class="doccomment">/// and the format is not a hexadecimal float. It also panics</span>
-    <span class="doccomment">/// if `options.nan_string` or `options.inf_string` is None and asked</span>
-    <span class="doccomment">/// to serialize a NaN or Inf value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`FORMATTED_SIZE`]: lexical_util::constants::FormattedSize::FORMATTED_SIZE</span>
-    <span class="doccomment">/// [`FORMATTED_SIZE_DECIMAL`]: lexical_util::constants::FormattedSize::FORMATTED_SIZE_DECIMAL</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">write_float</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>], <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">Options</span>) -&gt; <span class="ident">usize</span>
-    <span class="kw">where</span>
-        <span class="ident"><span class="self">Self</span>::Unsigned</span>: <span class="ident">FormattedSize</span> <span class="op">+</span> <span class="ident">WriteInteger</span>,
+<span class="doccomment">/// Write float trait.
+</span><span class="kw">pub trait </span>WriteFloat: RawFloat {
+    <span class="doccomment">/// Forward write integer parameters to an unoptimized backend.
+    ///
+    /// # Safety
+    ///
+    /// Safe as long as the buffer can hold [`FORMATTED_SIZE`] elements
+    /// (or [`FORMATTED_SIZE_DECIMAL`] for decimal). If using custom digit
+    /// precision control (such as specifying a minimum number of significant
+    /// digits), or disabling scientific notation, then more digits may be
+    /// required (up to `1075` for the leading or trailing zeros, `1` for
+    /// the sign and `1` for the decimal point). So,
+    /// `1077 + min_significant_digits.max(52)`, so ~1200 for a reasonable
+    /// threshold.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the number format is invalid, or if scientific notation
+    /// is used and the exponent base does not equal the mantissa radix
+    /// and the format is not a hexadecimal float. It also panics
+    /// if `options.nan_string` or `options.inf_string` is None and asked
+    /// to serialize a NaN or Inf value.
+    ///
+    /// [`FORMATTED_SIZE`]: lexical_util::constants::FormattedSize::FORMATTED_SIZE
+    /// [`FORMATTED_SIZE_DECIMAL`]: lexical_util::constants::FormattedSize::FORMATTED_SIZE_DECIMAL
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">unsafe fn </span>write_float&lt;<span class="kw">const </span>FORMAT: u128&gt;(<span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>[u8], options: <span class="kw-2">&amp;</span>Options) -&gt; usize
+    <span class="kw">where
+        </span><span class="self">Self</span>::Unsigned: FormattedSize + WriteInteger,
     {
-        <span class="comment">// Validate our format options.</span>
-        <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">NumberFormat</span>::<span class="op">&lt;</span><span class="ident">FORMAT</span><span class="op">&gt;</span> {};
-        <span class="macro">assert!</span>(<span class="ident">format</span>.<span class="ident">is_valid</span>());
-        <span class="comment">// Avoid any false assumptions for 128-bit floats.</span>
-        <span class="macro">assert!</span>(<span class="ident"><span class="self">Self</span>::BITS</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">64</span>);
+        <span class="comment">// Validate our format options.
+        </span><span class="kw">let </span>format = NumberFormat::&lt;FORMAT&gt; {};
+        <span class="macro">assert!</span>(format.is_valid());
+        <span class="comment">// Avoid any false assumptions for 128-bit floats.
+        </span><span class="macro">assert!</span>(<span class="self">Self</span>::BITS &lt;= <span class="number">64</span>);
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>)]</span>
-        {
-            <span class="kw">if</span> <span class="ident">format</span>.<span class="ident">radix</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">format</span>.<span class="ident">exponent_base</span>() {
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;power-of-two&quot;</span>)]
+        </span>{
+            <span class="kw">if </span>format.radix() != format.exponent_base() {
                 <span class="macro">assert!</span>(<span class="macro">matches!</span>(
-                    (<span class="ident">format</span>.<span class="ident">radix</span>(), <span class="ident">format</span>.<span class="ident">exponent_base</span>()),
-                    (<span class="number">4</span>, <span class="number">2</span>) <span class="op">|</span> (<span class="number">8</span>, <span class="number">2</span>) <span class="op">|</span> (<span class="number">16</span>, <span class="number">2</span>) <span class="op">|</span> (<span class="number">32</span>, <span class="number">2</span>) <span class="op">|</span> (<span class="number">16</span>, <span class="number">4</span>)
+                    (format.radix(), format.exponent_base()),
+                    (<span class="number">4</span>, <span class="number">2</span>) | (<span class="number">8</span>, <span class="number">2</span>) | (<span class="number">16</span>, <span class="number">2</span>) | (<span class="number">32</span>, <span class="number">2</span>) | (<span class="number">16</span>, <span class="number">4</span>)
                 ));
             }
         }
 
-        <span class="kw">let</span> (<span class="ident">float</span>, <span class="ident">count</span>, <span class="ident">bytes</span>) <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span> <span class="op">&lt;</span> <span class="ident"><span class="self">Self</span>::ZERO</span> {
-            <span class="comment">// SAFETY: safe if `bytes.len() &gt; 1`.</span>
-            <span class="kw">unsafe</span> { <span class="macro">index_unchecked_mut!</span>(<span class="ident">bytes</span>[<span class="number">0</span>]) <span class="op">=</span> <span class="string">b&#39;-&#39;</span> };
-            (<span class="op">-</span><span class="self">self</span>, <span class="number">1</span>, <span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> <span class="macro">index_unchecked_mut!</span>(<span class="ident">bytes</span>[<span class="number">1</span>..]) })
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>) <span class="op">&amp;&amp;</span> <span class="ident">format</span>.<span class="ident">required_mantissa_sign</span>() {
-            <span class="comment">// SAFETY: safe if `bytes.len() &gt; 1`.</span>
-            <span class="kw">unsafe</span> { <span class="macro">index_unchecked_mut!</span>(<span class="ident">bytes</span>[<span class="number">0</span>]) <span class="op">=</span> <span class="string">b&#39;+&#39;</span> };
-            (<span class="self">self</span>, <span class="number">1</span>, <span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> <span class="macro">index_unchecked_mut!</span>(<span class="ident">bytes</span>[<span class="number">1</span>..]) })
-        } <span class="kw">else</span> {
-            (<span class="self">self</span>, <span class="number">0</span>, <span class="ident">bytes</span>)
+        <span class="kw">let </span>(float, count, bytes) = <span class="kw">if </span><span class="self">self </span>&lt; <span class="self">Self</span>::ZERO {
+            <span class="comment">// SAFETY: safe if `bytes.len() &gt; 1`.
+            </span><span class="kw">unsafe </span>{ <span class="macro">index_unchecked_mut!</span>(bytes[<span class="number">0</span>]) = <span class="string">b&#39;-&#39; </span>};
+            (-<span class="self">self</span>, <span class="number">1</span>, <span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut </span><span class="macro">index_unchecked_mut!</span>(bytes[<span class="number">1</span>..]) })
+        } <span class="kw">else if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;format&quot;</span>) &amp;&amp; format.required_mantissa_sign() {
+            <span class="comment">// SAFETY: safe if `bytes.len() &gt; 1`.
+            </span><span class="kw">unsafe </span>{ <span class="macro">index_unchecked_mut!</span>(bytes[<span class="number">0</span>]) = <span class="string">b&#39;+&#39; </span>};
+            (<span class="self">self</span>, <span class="number">1</span>, <span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut </span><span class="macro">index_unchecked_mut!</span>(bytes[<span class="number">1</span>..]) })
+        } <span class="kw">else </span>{
+            (<span class="self">self</span>, <span class="number">0</span>, bytes)
         };
 
-        <span class="comment">// Handle special values.</span>
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_special</span>() {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>)))]</span>
-            {
-                <span class="comment">// SAFETY: safe if the buffer can hold the significant digits</span>
-                <span class="kw">let</span> <span class="ident">radix</span> <span class="op">=</span> <span class="ident">format</span>.<span class="ident">radix</span>();
-                <span class="kw">let</span> <span class="ident">exponent_base</span> <span class="op">=</span> <span class="ident">format</span>.<span class="ident">exponent_base</span>();
-                <span class="ident">count</span>
-                    <span class="op">+</span> <span class="kw">if</span> <span class="ident">radix</span> <span class="op">==</span> <span class="number">10</span> {
-                        <span class="kw">unsafe</span> { <span class="ident">write_float_decimal</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">float</span>, <span class="ident">bytes</span>, <span class="ident">options</span>) }
-                    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">radix</span> <span class="op">!</span><span class="op">=</span> <span class="ident">exponent_base</span> {
-                        <span class="kw">unsafe</span> { <span class="ident">hex::write_float</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">float</span>, <span class="ident">bytes</span>, <span class="ident">options</span>) }
-                    } <span class="kw">else</span> {
-                        <span class="kw">unsafe</span> { <span class="ident">binary::write_float</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">float</span>, <span class="ident">bytes</span>, <span class="ident">options</span>) }
+        <span class="comment">// Handle special values.
+        </span><span class="kw">if </span>!<span class="self">self</span>.is_special() {
+            <span class="attribute">#[cfg(all(feature = <span class="string">&quot;power-of-two&quot;</span>, not(feature = <span class="string">&quot;radix&quot;</span>)))]
+            </span>{
+                <span class="comment">// SAFETY: safe if the buffer can hold the significant digits
+                </span><span class="kw">let </span>radix = format.radix();
+                <span class="kw">let </span>exponent_base = format.exponent_base();
+                count
+                    + <span class="kw">if </span>radix == <span class="number">10 </span>{
+                        <span class="kw">unsafe </span>{ write_float_decimal::&lt;<span class="kw">_</span>, FORMAT&gt;(float, bytes, options) }
+                    } <span class="kw">else if </span>radix != exponent_base {
+                        <span class="kw">unsafe </span>{ hex::write_float::&lt;<span class="kw">_</span>, FORMAT&gt;(float, bytes, options) }
+                    } <span class="kw">else </span>{
+                        <span class="kw">unsafe </span>{ binary::write_float::&lt;<span class="kw">_</span>, FORMAT&gt;(float, bytes, options) }
                     }
             }
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>)]</span>
-            {
-                <span class="comment">// SAFETY: safe if the buffer can hold the significant digits</span>
-                <span class="kw">let</span> <span class="ident">radix</span> <span class="op">=</span> <span class="ident">format</span>.<span class="ident">radix</span>();
-                <span class="kw">let</span> <span class="ident">exponent_base</span> <span class="op">=</span> <span class="ident">format</span>.<span class="ident">exponent_base</span>();
-                <span class="ident">count</span>
-                    <span class="op">+</span> <span class="kw">if</span> <span class="ident">radix</span> <span class="op">==</span> <span class="number">10</span> {
-                        <span class="kw">unsafe</span> { <span class="ident">write_float_decimal</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">float</span>, <span class="ident">bytes</span>, <span class="ident">options</span>) }
-                    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">radix</span> <span class="op">!</span><span class="op">=</span> <span class="ident">exponent_base</span> {
-                        <span class="kw">unsafe</span> { <span class="ident">hex::write_float</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">float</span>, <span class="ident">bytes</span>, <span class="ident">options</span>) }
-                    } <span class="kw">else</span> <span class="kw">if</span> <span class="macro">matches!</span>(<span class="ident">radix</span>, <span class="number">2</span> <span class="op">|</span> <span class="number">4</span> <span class="op">|</span> <span class="number">8</span> <span class="op">|</span> <span class="number">16</span> <span class="op">|</span> <span class="number">32</span>) {
-                        <span class="kw">unsafe</span> { <span class="ident">binary::write_float</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">float</span>, <span class="ident">bytes</span>, <span class="ident">options</span>) }
-                    } <span class="kw">else</span> {
-                        <span class="kw">unsafe</span> { <span class="ident">radix::write_float</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">float</span>, <span class="ident">bytes</span>, <span class="ident">options</span>) }
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;radix&quot;</span>)]
+            </span>{
+                <span class="comment">// SAFETY: safe if the buffer can hold the significant digits
+                </span><span class="kw">let </span>radix = format.radix();
+                <span class="kw">let </span>exponent_base = format.exponent_base();
+                count
+                    + <span class="kw">if </span>radix == <span class="number">10 </span>{
+                        <span class="kw">unsafe </span>{ write_float_decimal::&lt;<span class="kw">_</span>, FORMAT&gt;(float, bytes, options) }
+                    } <span class="kw">else if </span>radix != exponent_base {
+                        <span class="kw">unsafe </span>{ hex::write_float::&lt;<span class="kw">_</span>, FORMAT&gt;(float, bytes, options) }
+                    } <span class="kw">else if </span><span class="macro">matches!</span>(radix, <span class="number">2 </span>| <span class="number">4 </span>| <span class="number">8 </span>| <span class="number">16 </span>| <span class="number">32</span>) {
+                        <span class="kw">unsafe </span>{ binary::write_float::&lt;<span class="kw">_</span>, FORMAT&gt;(float, bytes, options) }
+                    } <span class="kw">else </span>{
+                        <span class="kw">unsafe </span>{ radix::write_float::&lt;<span class="kw">_</span>, FORMAT&gt;(float, bytes, options) }
                     }
             }
 
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>))]</span>
-            {
-                <span class="comment">// SAFETY: safe if the buffer can hold the significant digits</span>
-                <span class="ident">count</span> <span class="op">+</span> <span class="kw">unsafe</span> { <span class="ident">write_float_decimal</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">float</span>, <span class="ident">bytes</span>, <span class="ident">options</span>) }
+            <span class="attribute">#[cfg(not(feature = <span class="string">&quot;power-of-two&quot;</span>))]
+            </span>{
+                <span class="comment">// SAFETY: safe if the buffer can hold the significant digits
+                </span>count + <span class="kw">unsafe </span>{ write_float_decimal::&lt;<span class="kw">_</span>, FORMAT&gt;(float, bytes, options) }
             }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_nan</span>() {
-            <span class="comment">// SAFETY: safe if the buffer is longer than the NaN string.</span>
-            <span class="comment">// The NaN string must be &lt;= 50 characters, so safe as long as</span>
-            <span class="comment">// the options were build using safe methods.</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">nan_string</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">nan_string</span>() {
-                <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">nan_string</span>.<span class="ident">len</span>();
-                <span class="kw">unsafe</span> {
-                    <span class="kw">let</span> <span class="ident">src</span> <span class="op">=</span> <span class="ident">nan_string</span>.<span class="ident">as_ptr</span>();
-                    <span class="kw">let</span> <span class="ident">dst</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="macro">index_unchecked_mut!</span>(<span class="ident">bytes</span>[..<span class="ident">length</span>]);
-                    <span class="macro">copy_nonoverlapping_unchecked!</span>(<span class="ident">dst</span>, <span class="ident">src</span>, <span class="ident">length</span>);
+        } <span class="kw">else if </span><span class="self">self</span>.is_nan() {
+            <span class="comment">// SAFETY: safe if the buffer is longer than the NaN string.
+            // The NaN string must be &lt;= 50 characters, so safe as long as
+            // the options were build using safe methods.
+            </span><span class="kw">if let </span><span class="prelude-val">Some</span>(nan_string) = options.nan_string() {
+                <span class="kw">let </span>length = nan_string.len();
+                <span class="kw">unsafe </span>{
+                    <span class="kw">let </span>src = nan_string.as_ptr();
+                    <span class="kw">let </span>dst = <span class="kw-2">&amp;mut </span><span class="macro">index_unchecked_mut!</span>(bytes[..length]);
+                    <span class="macro">copy_nonoverlapping_unchecked!</span>(dst, src, length);
                 }
-                <span class="ident">count</span> <span class="op">+</span> <span class="ident">length</span>
-            } <span class="kw">else</span> {
-                <span class="comment">// PANIC: cannot serialize NaN.</span>
-                <span class="macro">panic!</span>(<span class="string">&quot;NaN explicitly disabled but asked to write NaN as string.&quot;</span>);
+                count + length
+            } <span class="kw">else </span>{
+                <span class="comment">// PANIC: cannot serialize NaN.
+                </span><span class="macro">panic!</span>(<span class="string">&quot;NaN explicitly disabled but asked to write NaN as string.&quot;</span>);
             }
-        } <span class="kw">else</span> {
-            <span class="comment">// is_inf</span>
-            <span class="comment">// SAFETY: safe if the buffer is longer than the Inf string.</span>
-            <span class="comment">// The Inf string must be &lt;= 50 characters, so safe as long as</span>
-            <span class="comment">// the options were build using safe methods.</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">inf_string</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">inf_string</span>() {
-                <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">inf_string</span>.<span class="ident">len</span>();
-                <span class="kw">unsafe</span> {
-                    <span class="kw">let</span> <span class="ident">src</span> <span class="op">=</span> <span class="ident">inf_string</span>.<span class="ident">as_ptr</span>();
-                    <span class="kw">let</span> <span class="ident">dst</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="macro">index_unchecked_mut!</span>(<span class="ident">bytes</span>[..<span class="ident">length</span>]);
-                    <span class="macro">copy_nonoverlapping_unchecked!</span>(<span class="ident">dst</span>, <span class="ident">src</span>, <span class="ident">length</span>);
+        } <span class="kw">else </span>{
+            <span class="comment">// is_inf
+            // SAFETY: safe if the buffer is longer than the Inf string.
+            // The Inf string must be &lt;= 50 characters, so safe as long as
+            // the options were build using safe methods.
+            </span><span class="kw">if let </span><span class="prelude-val">Some</span>(inf_string) = options.inf_string() {
+                <span class="kw">let </span>length = inf_string.len();
+                <span class="kw">unsafe </span>{
+                    <span class="kw">let </span>src = inf_string.as_ptr();
+                    <span class="kw">let </span>dst = <span class="kw-2">&amp;mut </span><span class="macro">index_unchecked_mut!</span>(bytes[..length]);
+                    <span class="macro">copy_nonoverlapping_unchecked!</span>(dst, src, length);
                 }
-                <span class="ident">count</span> <span class="op">+</span> <span class="ident">length</span>
-            } <span class="kw">else</span> {
-                <span class="comment">// PANIC: cannot serialize inf.</span>
-                <span class="macro">panic!</span>(<span class="string">&quot;Inf explicitly disabled but asked to write Inf as string.&quot;</span>);
+                count + length
+            } <span class="kw">else </span>{
+                <span class="comment">// PANIC: cannot serialize inf.
+                </span><span class="macro">panic!</span>(<span class="string">&quot;Inf explicitly disabled but asked to write Inf as string.&quot;</span>);
             }
         }
     }
 }
 
-<span class="macro">macro_rules!</span> <span class="ident">write_float_impl</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>)<span class="kw-2">*</span>) =&gt; ($(
-        <span class="kw">impl</span> <span class="ident">WriteFloat</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {}
+<span class="macro">macro_rules! </span>write_float_impl {
+    ($(<span class="macro-nonterminal">$t</span>:ty)<span class="kw-2">*</span>) =&gt; ($(
+        <span class="kw">impl </span>WriteFloat <span class="kw">for </span><span class="macro-nonterminal">$t </span>{}
     )<span class="kw-2">*</span>)
 }
 
-<span class="macro">write_float_impl!</span> { <span class="ident">f32</span> <span class="ident">f64</span> }
+<span class="macro">write_float_impl! </span>{ f32 f64 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;f16&quot;</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">write_float_as_f32</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ty</span>)<span class="kw-2">*</span>) =&gt; ($(
-        <span class="kw">impl</span> <span class="ident">WriteFloat</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
-            <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">write_float</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>], <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">Options</span>) -&gt; <span class="ident">usize</span>
+<span class="attribute">#[cfg(feature = <span class="string">&quot;f16&quot;</span>)]
+</span><span class="macro">macro_rules! </span>write_float_as_f32 {
+    ($(<span class="macro-nonterminal">$t</span>:ty)<span class="kw-2">*</span>) =&gt; ($(
+        <span class="kw">impl </span>WriteFloat <span class="kw">for </span><span class="macro-nonterminal">$t </span>{
+            <span class="attribute">#[inline]
+            </span><span class="kw">unsafe fn </span>write_float&lt;<span class="kw">const </span>FORMAT: u128&gt;(<span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>[u8], options: <span class="kw-2">&amp;</span>Options) -&gt; usize
             {
-                <span class="comment">// SAFETY: safe if `bytes` is large enough to hold the written bytes.</span>
-                <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">as_f32</span>().<span class="ident">write_float</span>::<span class="op">&lt;</span><span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">bytes</span>, <span class="ident">options</span>) }
+                <span class="comment">// SAFETY: safe if `bytes` is large enough to hold the written bytes.
+                </span><span class="kw">unsafe </span>{ <span class="self">self</span>.as_f32().write_float::&lt;FORMAT&gt;(bytes, options) }
             }
         }
     )<span class="kw-2">*</span>)
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;f16&quot;</span>)]</span>
-<span class="macro">write_float_as_f32!</span> { <span class="ident">bf16</span> <span class="ident">f16</span> }
+<span class="attribute">#[cfg(feature = <span class="string">&quot;f16&quot;</span>)]
+</span><span class="macro">write_float_as_f32! </span>{ bf16 f16 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_write_float" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_write_float" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

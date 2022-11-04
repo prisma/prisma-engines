@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/frunk_core-0.4.0/src/coproduct.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>coproduct.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../frunk_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../frunk_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../frunk_core/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/frunk_core-0.4.0/src/coproduct.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>coproduct.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../frunk_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../frunk_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../frunk_core/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1189,1196 +1189,1196 @@
 <span id="1189">1189</span>
 <span id="1190">1190</span>
 <span id="1191">1191</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Module that holds Coproduct data structures, traits, and implementations</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Think of &quot;Coproduct&quot; as ad-hoc enums; allowing you to do something like this</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! #[macro_use]</span>
-<span class="doccomment">//! extern crate frunk;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # fn main() {</span>
-<span class="doccomment">//! // For simplicity, assign our Coproduct type to a type alias</span>
-<span class="doccomment">//! // This is purely optional.</span>
-<span class="doccomment">//! type I32Bool = Coprod!(i32, bool);</span>
-<span class="doccomment">//! // Inject things into our Coproduct type</span>
-<span class="doccomment">//! let co1 = I32Bool::inject(3);</span>
-<span class="doccomment">//! let co2 = I32Bool::inject(true);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Getting stuff</span>
-<span class="doccomment">//! let get_from_1a: Option&lt;&amp;i32&gt; = co1.get();</span>
-<span class="doccomment">//! let get_from_1b: Option&lt;&amp;bool&gt; = co1.get();</span>
-<span class="doccomment">//! assert_eq!(get_from_1a, Some(&amp;3));</span>
-<span class="doccomment">//! assert_eq!(get_from_1b, None);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let get_from_2a: Option&lt;&amp;i32&gt; = co2.get();</span>
-<span class="doccomment">//! let get_from_2b: Option&lt;&amp;bool&gt; = co2.get();</span>
-<span class="doccomment">//! assert_eq!(get_from_2a, None);</span>
-<span class="doccomment">//! assert_eq!(get_from_2b, Some(&amp;true));</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // *Taking* stuff (by value)</span>
-<span class="doccomment">//! let take_from_1a: Option&lt;i32&gt; = co1.take();</span>
-<span class="doccomment">//! assert_eq!(take_from_1a, Some(3));</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Or with a Result</span>
-<span class="doccomment">//! let uninject_from_1a: Result&lt;i32, _&gt; = co1.uninject();</span>
-<span class="doccomment">//! let uninject_from_1b: Result&lt;bool, _&gt; = co1.uninject();</span>
-<span class="doccomment">//! assert_eq!(uninject_from_1a, Ok(3));</span>
-<span class="doccomment">//! assert!(uninject_from_1b.is_err());</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Or, if you want to &quot;fold&quot; over all possible values of a coproduct</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # #[macro_use] extern crate frunk;</span>
-<span class="doccomment">//! # fn main() {</span>
-<span class="doccomment">//! # type I32Bool = Coprod!(i32, bool);</span>
-<span class="doccomment">//! # let co1 = I32Bool::inject(3);</span>
-<span class="doccomment">//! # let co2 = I32Bool::inject(true);</span>
-<span class="doccomment">//! // In the below, we use unreachable!() to make it obvious hat we know what type of</span>
-<span class="doccomment">//! // item is inside our coproducts co1 and co2 but in real life, you should be writing</span>
-<span class="doccomment">//! // complete functions for all the cases when folding coproducts</span>
-<span class="doccomment">//! //</span>
-<span class="doccomment">//! // to_ref borrows every item so that we can fold without consuming the coproduct.</span>
-<span class="doccomment">//! assert_eq!(</span>
-<span class="doccomment">//!     co1.to_ref().fold(hlist![|&amp;i| format!(&quot;i32 {}&quot;, i),</span>
-<span class="doccomment">//!                              |&amp;b| unreachable!() /* we know this won&#39;t happen for co1 */ ]),</span>
-<span class="doccomment">//!     &quot;i32 3&quot;.to_string());</span>
-<span class="doccomment">//! assert_eq!(</span>
-<span class="doccomment">//!     co2.to_ref().fold(hlist![|&amp;i| unreachable!() /* we know this won&#39;t happen for co2 */,</span>
-<span class="doccomment">//!                              |&amp;b| String::from(if b { &quot;t&quot; } else { &quot;f&quot; })]),</span>
-<span class="doccomment">//!     &quot;t&quot;.to_string());</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Here, we use the poly_fn! macro to declare a polymorphic function to avoid caring</span>
-<span class="doccomment">//! // about the order in which declare handlers for the types in our coproduct</span>
-<span class="doccomment">//! let folded = co1.fold(</span>
-<span class="doccomment">//!       poly_fn![</span>
-<span class="doccomment">//!         |_b: bool| -&gt; String { unreachable!() }, /* we know this won&#39;t happen for co1 */</span>
-<span class="doccomment">//!         |i:  i32 | -&gt; String { format!(&quot;i32 {}&quot;, i) },</span>
-<span class="doccomment">//!       ]</span>
-<span class="doccomment">//!      );</span>
-<span class="doccomment">//! assert_eq!(folded, &quot;i32 3&quot;.to_string());</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! ```</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Module that holds Coproduct data structures, traits, and implementations
+//!
+//! Think of &quot;Coproduct&quot; as ad-hoc enums; allowing you to do something like this
+//!
+//! ```
+//! #[macro_use]
+//! extern crate frunk;
+//!
+//! # fn main() {
+//! // For simplicity, assign our Coproduct type to a type alias
+//! // This is purely optional.
+//! type I32Bool = Coprod!(i32, bool);
+//! // Inject things into our Coproduct type
+//! let co1 = I32Bool::inject(3);
+//! let co2 = I32Bool::inject(true);
+//!
+//! // Getting stuff
+//! let get_from_1a: Option&lt;&amp;i32&gt; = co1.get();
+//! let get_from_1b: Option&lt;&amp;bool&gt; = co1.get();
+//! assert_eq!(get_from_1a, Some(&amp;3));
+//! assert_eq!(get_from_1b, None);
+//!
+//! let get_from_2a: Option&lt;&amp;i32&gt; = co2.get();
+//! let get_from_2b: Option&lt;&amp;bool&gt; = co2.get();
+//! assert_eq!(get_from_2a, None);
+//! assert_eq!(get_from_2b, Some(&amp;true));
+//!
+//! // *Taking* stuff (by value)
+//! let take_from_1a: Option&lt;i32&gt; = co1.take();
+//! assert_eq!(take_from_1a, Some(3));
+//!
+//! // Or with a Result
+//! let uninject_from_1a: Result&lt;i32, _&gt; = co1.uninject();
+//! let uninject_from_1b: Result&lt;bool, _&gt; = co1.uninject();
+//! assert_eq!(uninject_from_1a, Ok(3));
+//! assert!(uninject_from_1b.is_err());
+//! # }
+//! ```
+//!
+//! Or, if you want to &quot;fold&quot; over all possible values of a coproduct
+//!
+//! ```
+//! # #[macro_use] extern crate frunk;
+//! # fn main() {
+//! # type I32Bool = Coprod!(i32, bool);
+//! # let co1 = I32Bool::inject(3);
+//! # let co2 = I32Bool::inject(true);
+//! // In the below, we use unreachable!() to make it obvious hat we know what type of
+//! // item is inside our coproducts co1 and co2 but in real life, you should be writing
+//! // complete functions for all the cases when folding coproducts
+//! //
+//! // to_ref borrows every item so that we can fold without consuming the coproduct.
+//! assert_eq!(
+//!     co1.to_ref().fold(hlist![|&amp;i| format!(&quot;i32 {}&quot;, i),
+//!                              |&amp;b| unreachable!() /* we know this won&#39;t happen for co1 */ ]),
+//!     &quot;i32 3&quot;.to_string());
+//! assert_eq!(
+//!     co2.to_ref().fold(hlist![|&amp;i| unreachable!() /* we know this won&#39;t happen for co2 */,
+//!                              |&amp;b| String::from(if b { &quot;t&quot; } else { &quot;f&quot; })]),
+//!     &quot;t&quot;.to_string());
+//!
+//! // Here, we use the poly_fn! macro to declare a polymorphic function to avoid caring
+//! // about the order in which declare handlers for the types in our coproduct
+//! let folded = co1.fold(
+//!       poly_fn![
+//!         |_b: bool| -&gt; String { unreachable!() }, /* we know this won&#39;t happen for co1 */
+//!         |i:  i32 | -&gt; String { format!(&quot;i32 {}&quot;, i) },
+//!       ]
+//!      );
+//! assert_eq!(folded, &quot;i32 3&quot;.to_string());
+//! # }
+//! ```
 
-<span class="kw">use</span> <span class="ident">hlist</span>::{<span class="ident">HCons</span>, <span class="ident">HNil</span>};
-<span class="kw">use</span> <span class="ident">indices</span>::{<span class="ident">Here</span>, <span class="ident">There</span>};
-<span class="kw">use</span> <span class="ident">traits</span>::{<span class="ident">Func</span>, <span class="ident">Poly</span>, <span class="ident">ToMut</span>, <span class="ident">ToRef</span>};
+</span><span class="kw">use </span>hlist::{HCons, HNil};
+<span class="kw">use </span>indices::{Here, There};
+<span class="kw">use </span>traits::{Func, Poly, ToMut, ToRef};
 
-<span class="doccomment">/// Enum type representing a Coproduct. Think of this as a Result, but capable</span>
-<span class="doccomment">/// of supporting any arbitrary number of types instead of just 2.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// To construct a Coproduct, you would typically declare a type using the `Coprod!` type</span>
-<span class="doccomment">/// macro and then use the `inject` method.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # #[macro_use] extern crate frunk;</span>
-<span class="doccomment">/// # fn main() {</span>
-<span class="doccomment">/// type I32Bool = Coprod!(i32, bool);</span>
-<span class="doccomment">/// let co1 = I32Bool::inject(3);</span>
-<span class="doccomment">/// let get_from_1a: Option&lt;&amp;i32&gt; = co1.get();</span>
-<span class="doccomment">/// let get_from_1b: Option&lt;&amp;bool&gt; = co1.get();</span>
-<span class="doccomment">/// assert_eq!(get_from_1a, Some(&amp;3));</span>
-<span class="doccomment">/// assert_eq!(get_from_1b, None);</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Coproduct</span><span class="op">&lt;</span><span class="ident">H</span>, <span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Coproduct is either H or T, in this case, it is H</span>
-    <span class="ident">Inl</span>(<span class="ident">H</span>),
-    <span class="doccomment">/// Coproduct is either H or T, in this case, it is T</span>
-    <span class="ident">Inr</span>(<span class="ident">T</span>),
+<span class="doccomment">/// Enum type representing a Coproduct. Think of this as a Result, but capable
+/// of supporting any arbitrary number of types instead of just 2.
+///
+/// To construct a Coproduct, you would typically declare a type using the `Coprod!` type
+/// macro and then use the `inject` method.
+///
+/// # Examples
+///
+/// ```
+/// # #[macro_use] extern crate frunk;
+/// # fn main() {
+/// type I32Bool = Coprod!(i32, bool);
+/// let co1 = I32Bool::inject(3);
+/// let get_from_1a: Option&lt;&amp;i32&gt; = co1.get();
+/// let get_from_1b: Option&lt;&amp;bool&gt; = co1.get();
+/// assert_eq!(get_from_1a, Some(&amp;3));
+/// assert_eq!(get_from_1b, None);
+/// # }
+/// ```
+</span><span class="attribute">#[derive(PartialEq, Debug, Eq, Clone, Copy, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = <span class="string">&quot;serde&quot;</span>, derive(Serialize, Deserialize))]
+</span><span class="kw">pub enum </span>Coproduct&lt;H, T&gt; {
+    <span class="doccomment">/// Coproduct is either H or T, in this case, it is H
+    </span>Inl(H),
+    <span class="doccomment">/// Coproduct is either H or T, in this case, it is T
+    </span>Inr(T),
 }
 
-<span class="doccomment">/// Phantom type for signature purposes only (has no value)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Used by the macro to terminate the Coproduct type signature</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">CNil</span> {}
+<span class="doccomment">/// Phantom type for signature purposes only (has no value)
+///
+/// Used by the macro to terminate the Coproduct type signature
+</span><span class="attribute">#[derive(PartialEq, Debug, Eq, Clone, Copy, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = <span class="string">&quot;serde&quot;</span>, derive(Serialize, Deserialize))]
+</span><span class="kw">pub enum </span>CNil {}
 
-<span class="comment">// Inherent methods</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Head</span>, <span class="ident">Tail</span><span class="op">&gt;</span> <span class="ident">Coproduct</span><span class="op">&lt;</span><span class="ident">Head</span>, <span class="ident">Tail</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Instantiate a coproduct from an element.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is generally much nicer than nested usage of `Coproduct::{Inl, Inr}`.</span>
-    <span class="doccomment">/// The method uses a trick with type inference to automatically build the correct variant</span>
-    <span class="doccomment">/// according to the input type.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// In standard usage, the `Index` type parameter can be ignored,</span>
-    <span class="doccomment">/// as it will typically be solved for using type inference.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Rules</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the type does not appear in the coproduct, the conversion is forbidden.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the type appears multiple times in the coproduct, type inference will fail.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # #[macro_use] extern crate frunk;</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// use frunk::Coproduct;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// type I32F32 = Coprod!(i32, f32);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Constructing coproducts using inject:</span>
-    <span class="doccomment">/// let co1_nice: I32F32 = Coproduct::inject(1i32);</span>
-    <span class="doccomment">/// let co2_nice: I32F32 = Coproduct::inject(42f32);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Compare this to the &quot;hard way&quot;:</span>
-    <span class="doccomment">/// let co1_ugly: I32F32 = Coproduct::Inl(1i32);</span>
-    <span class="doccomment">/// let co2_ugly: I32F32 = Coproduct::Inr(Coproduct::Inl(42f32));</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(co1_nice, co1_ugly);</span>
-    <span class="doccomment">/// assert_eq!(co2_nice, co2_ugly);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Feel free to use `inject` on a type alias, or even directly on the</span>
-    <span class="doccomment">/// // `Coprod!` macro. (the latter requires wrapping the type in `&lt;&gt;`)</span>
-    <span class="doccomment">/// let _ = I32F32::inject(42f32);</span>
-    <span class="doccomment">/// let _ = &lt;Coprod!(i32, f32)&gt;::inject(42f32);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // You can also use a turbofish to specify the type of the input when</span>
-    <span class="doccomment">/// // it is ambiguous (e.g. an empty `vec![]`).</span>
-    <span class="doccomment">/// // The Index parameter should be left as `_`.</span>
-    <span class="doccomment">/// type Vi32Vf32 = Coprod!(Vec&lt;i32&gt;, Vec&lt;f32&gt;);</span>
-    <span class="doccomment">/// let _: Vi32Vf32 = Coproduct::inject::&lt;Vec&lt;i32&gt;, _&gt;(vec![]);</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">inject</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Index</span><span class="op">&gt;</span>(<span class="ident">to_insert</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">CoprodInjector</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Index</span><span class="op">&gt;</span>,
+<span class="comment">// Inherent methods
+</span><span class="kw">impl</span>&lt;Head, Tail&gt; Coproduct&lt;Head, Tail&gt; {
+    <span class="doccomment">/// Instantiate a coproduct from an element.
+    ///
+    /// This is generally much nicer than nested usage of `Coproduct::{Inl, Inr}`.
+    /// The method uses a trick with type inference to automatically build the correct variant
+    /// according to the input type.
+    ///
+    /// In standard usage, the `Index` type parameter can be ignored,
+    /// as it will typically be solved for using type inference.
+    ///
+    /// # Rules
+    ///
+    /// If the type does not appear in the coproduct, the conversion is forbidden.
+    ///
+    /// If the type appears multiple times in the coproduct, type inference will fail.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # #[macro_use] extern crate frunk;
+    /// # fn main() {
+    /// use frunk::Coproduct;
+    ///
+    /// type I32F32 = Coprod!(i32, f32);
+    ///
+    /// // Constructing coproducts using inject:
+    /// let co1_nice: I32F32 = Coproduct::inject(1i32);
+    /// let co2_nice: I32F32 = Coproduct::inject(42f32);
+    ///
+    /// // Compare this to the &quot;hard way&quot;:
+    /// let co1_ugly: I32F32 = Coproduct::Inl(1i32);
+    /// let co2_ugly: I32F32 = Coproduct::Inr(Coproduct::Inl(42f32));
+    ///
+    /// assert_eq!(co1_nice, co1_ugly);
+    /// assert_eq!(co2_nice, co2_ugly);
+    ///
+    /// // Feel free to use `inject` on a type alias, or even directly on the
+    /// // `Coprod!` macro. (the latter requires wrapping the type in `&lt;&gt;`)
+    /// let _ = I32F32::inject(42f32);
+    /// let _ = &lt;Coprod!(i32, f32)&gt;::inject(42f32);
+    ///
+    /// // You can also use a turbofish to specify the type of the input when
+    /// // it is ambiguous (e.g. an empty `vec![]`).
+    /// // The Index parameter should be left as `_`.
+    /// type Vi32Vf32 = Coprod!(Vec&lt;i32&gt;, Vec&lt;f32&gt;);
+    /// let _: Vi32Vf32 = Coproduct::inject::&lt;Vec&lt;i32&gt;, _&gt;(vec![]);
+    /// # }
+    /// ```
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub fn </span>inject&lt;T, Index&gt;(to_insert: T) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span><span class="self">Self</span>: CoprodInjector&lt;T, Index&gt;,
     {
-        <span class="ident">CoprodInjector::inject</span>(<span class="ident">to_insert</span>)
+        CoprodInjector::inject(to_insert)
     }
 
-    <span class="doccomment">/// Borrow an element from a coproduct by type.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # #[macro_use] extern crate frunk;</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// type I32F32 = Coprod!(i32, f32);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // You can let type inference find the desired type:</span>
-    <span class="doccomment">/// let co1 = I32F32::inject(42f32);</span>
-    <span class="doccomment">/// let co1_as_i32: Option&lt;&amp;i32&gt; = co1.get();</span>
-    <span class="doccomment">/// let co1_as_f32: Option&lt;&amp;f32&gt; = co1.get();</span>
-    <span class="doccomment">/// assert_eq!(co1_as_i32, None);</span>
-    <span class="doccomment">/// assert_eq!(co1_as_f32, Some(&amp;42f32));</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // You can also use turbofish syntax to specify the type.</span>
-    <span class="doccomment">/// // The Index parameter should be left as `_`.</span>
-    <span class="doccomment">/// let co2 = I32F32::inject(1i32);</span>
-    <span class="doccomment">/// assert_eq!(co2.get::&lt;i32, _&gt;(), Some(&amp;1));</span>
-    <span class="doccomment">/// assert_eq!(co2.get::&lt;f32, _&gt;(), None);</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">Index</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">S</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">CoproductSelector</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">Index</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Borrow an element from a coproduct by type.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # #[macro_use] extern crate frunk;
+    /// # fn main() {
+    /// type I32F32 = Coprod!(i32, f32);
+    ///
+    /// // You can let type inference find the desired type:
+    /// let co1 = I32F32::inject(42f32);
+    /// let co1_as_i32: Option&lt;&amp;i32&gt; = co1.get();
+    /// let co1_as_f32: Option&lt;&amp;f32&gt; = co1.get();
+    /// assert_eq!(co1_as_i32, None);
+    /// assert_eq!(co1_as_f32, Some(&amp;42f32));
+    ///
+    /// // You can also use turbofish syntax to specify the type.
+    /// // The Index parameter should be left as `_`.
+    /// let co2 = I32F32::inject(1i32);
+    /// assert_eq!(co2.get::&lt;i32, _&gt;(), Some(&amp;1));
+    /// assert_eq!(co2.get::&lt;f32, _&gt;(), None);
+    /// # }
+    /// ```
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub fn </span>get&lt;S, Index&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>S&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: CoproductSelector&lt;S, Index&gt;,
     {
-        <span class="ident">CoproductSelector::get</span>(<span class="self">self</span>)
+        CoproductSelector::get(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Retrieve an element from a coproduct by type, ignoring all others.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # #[macro_use] extern crate frunk;</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// type I32F32 = Coprod!(i32, f32);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // You can let type inference find the desired type:</span>
-    <span class="doccomment">/// let co1 = I32F32::inject(42f32);</span>
-    <span class="doccomment">/// let co1_as_i32: Option&lt;i32&gt; = co1.take();</span>
-    <span class="doccomment">/// let co1_as_f32: Option&lt;f32&gt; = co1.take();</span>
-    <span class="doccomment">/// assert_eq!(co1_as_i32, None);</span>
-    <span class="doccomment">/// assert_eq!(co1_as_f32, Some(42f32));</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // You can also use turbofish syntax to specify the type.</span>
-    <span class="doccomment">/// // The Index parameter should be left as `_`.</span>
-    <span class="doccomment">/// let co2 = I32F32::inject(1i32);</span>
-    <span class="doccomment">/// assert_eq!(co2.take::&lt;i32, _&gt;(), Some(1));</span>
-    <span class="doccomment">/// assert_eq!(co2.take::&lt;f32, _&gt;(), None);</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">take</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Index</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">CoproductTaker</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Index</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Retrieve an element from a coproduct by type, ignoring all others.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # #[macro_use] extern crate frunk;
+    /// # fn main() {
+    /// type I32F32 = Coprod!(i32, f32);
+    ///
+    /// // You can let type inference find the desired type:
+    /// let co1 = I32F32::inject(42f32);
+    /// let co1_as_i32: Option&lt;i32&gt; = co1.take();
+    /// let co1_as_f32: Option&lt;f32&gt; = co1.take();
+    /// assert_eq!(co1_as_i32, None);
+    /// assert_eq!(co1_as_f32, Some(42f32));
+    ///
+    /// // You can also use turbofish syntax to specify the type.
+    /// // The Index parameter should be left as `_`.
+    /// let co2 = I32F32::inject(1i32);
+    /// assert_eq!(co2.take::&lt;i32, _&gt;(), Some(1));
+    /// assert_eq!(co2.take::&lt;f32, _&gt;(), None);
+    /// # }
+    /// ```
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub fn </span>take&lt;T, Index&gt;(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: CoproductTaker&lt;T, Index&gt;,
     {
-        <span class="ident">CoproductTaker::take</span>(<span class="self">self</span>)
+        CoproductTaker::take(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Attempt to extract a value from a coproduct (or get the remaining possibilities).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// By chaining calls to this, one can exhaustively match all variants of a coproduct.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Basic usage:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # #[macro_use] extern crate frunk;</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// type I32F32 = Coprod!(i32, f32);</span>
-    <span class="doccomment">/// type I32 = Coprod!(i32); // remainder after uninjecting f32</span>
-    <span class="doccomment">/// type F32 = Coprod!(f32); // remainder after uninjecting i32</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let co1 = I32F32::inject(42f32);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // You can let type inference find the desired type.</span>
-    <span class="doccomment">/// let co1 = I32F32::inject(42f32);</span>
-    <span class="doccomment">/// let co1_as_i32: Result&lt;i32, F32&gt; = co1.uninject();</span>
-    <span class="doccomment">/// let co1_as_f32: Result&lt;f32, I32&gt; = co1.uninject();</span>
-    <span class="doccomment">/// assert_eq!(co1_as_i32, Err(F32::inject(42f32)));</span>
-    <span class="doccomment">/// assert_eq!(co1_as_f32, Ok(42f32));</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // It is not necessary to annotate the type of the remainder:</span>
-    <span class="doccomment">/// let res: Result&lt;i32, _&gt; = co1.uninject();</span>
-    <span class="doccomment">/// assert!(res.is_err());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // You can also use turbofish syntax to specify the type.</span>
-    <span class="doccomment">/// // The Index parameter should be left as `_`.</span>
-    <span class="doccomment">/// let co2 = I32F32::inject(1i32);</span>
-    <span class="doccomment">/// assert_eq!(co2.uninject::&lt;i32, _&gt;(), Ok(1));</span>
-    <span class="doccomment">/// assert_eq!(co2.uninject::&lt;f32, _&gt;(), Err(I32::inject(1)));</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Chaining calls for an exhaustive match:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # #[macro_use] extern crate frunk;</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// type I32F32 = Coprod!(i32, f32);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Be aware that this particular example could be</span>
-    <span class="doccomment">/// // written far more succinctly using `fold`.</span>
-    <span class="doccomment">/// fn handle_i32_f32(co: I32F32) -&gt; &amp;&#39;static str {</span>
-    <span class="doccomment">///     // Remove i32 from the coproduct</span>
-    <span class="doccomment">///     let co = match co.uninject::&lt;i32, _&gt;() {</span>
-    <span class="doccomment">///         Ok(x) =&gt; return &quot;integer!&quot;,</span>
-    <span class="doccomment">///         Err(co) =&gt; co,</span>
-    <span class="doccomment">///     };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     // Remove f32 from the coproduct</span>
-    <span class="doccomment">///     let co = match co.uninject::&lt;f32, _&gt;() {</span>
-    <span class="doccomment">///         Ok(x) =&gt; return &quot;float!&quot;,</span>
-    <span class="doccomment">///         Err(co) =&gt; co,</span>
-    <span class="doccomment">///     };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     // Now co is empty</span>
-    <span class="doccomment">///     match co { /* unreachable */ }</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(handle_i32_f32(I32F32::inject(3)), &quot;integer!&quot;);</span>
-    <span class="doccomment">/// assert_eq!(handle_i32_f32(I32F32::inject(3.0)), &quot;float!&quot;);</span>
-    <span class="doccomment">/// # }</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">uninject</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Index</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">CoprodUninjector</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Index</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Remainder</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">CoprodUninjector</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Index</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Attempt to extract a value from a coproduct (or get the remaining possibilities).
+    ///
+    /// By chaining calls to this, one can exhaustively match all variants of a coproduct.
+    ///
+    /// # Examples
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// # #[macro_use] extern crate frunk;
+    /// # fn main() {
+    /// type I32F32 = Coprod!(i32, f32);
+    /// type I32 = Coprod!(i32); // remainder after uninjecting f32
+    /// type F32 = Coprod!(f32); // remainder after uninjecting i32
+    ///
+    /// let co1 = I32F32::inject(42f32);
+    ///
+    /// // You can let type inference find the desired type.
+    /// let co1 = I32F32::inject(42f32);
+    /// let co1_as_i32: Result&lt;i32, F32&gt; = co1.uninject();
+    /// let co1_as_f32: Result&lt;f32, I32&gt; = co1.uninject();
+    /// assert_eq!(co1_as_i32, Err(F32::inject(42f32)));
+    /// assert_eq!(co1_as_f32, Ok(42f32));
+    ///
+    /// // It is not necessary to annotate the type of the remainder:
+    /// let res: Result&lt;i32, _&gt; = co1.uninject();
+    /// assert!(res.is_err());
+    ///
+    /// // You can also use turbofish syntax to specify the type.
+    /// // The Index parameter should be left as `_`.
+    /// let co2 = I32F32::inject(1i32);
+    /// assert_eq!(co2.uninject::&lt;i32, _&gt;(), Ok(1));
+    /// assert_eq!(co2.uninject::&lt;f32, _&gt;(), Err(I32::inject(1)));
+    /// # }
+    /// ```
+    ///
+    /// Chaining calls for an exhaustive match:
+    ///
+    /// ```rust
+    /// # #[macro_use] extern crate frunk;
+    /// # fn main() {
+    /// type I32F32 = Coprod!(i32, f32);
+    ///
+    /// // Be aware that this particular example could be
+    /// // written far more succinctly using `fold`.
+    /// fn handle_i32_f32(co: I32F32) -&gt; &amp;&#39;static str {
+    ///     // Remove i32 from the coproduct
+    ///     let co = match co.uninject::&lt;i32, _&gt;() {
+    ///         Ok(x) =&gt; return &quot;integer!&quot;,
+    ///         Err(co) =&gt; co,
+    ///     };
+    ///
+    ///     // Remove f32 from the coproduct
+    ///     let co = match co.uninject::&lt;f32, _&gt;() {
+    ///         Ok(x) =&gt; return &quot;float!&quot;,
+    ///         Err(co) =&gt; co,
+    ///     };
+    ///
+    ///     // Now co is empty
+    ///     match co { /* unreachable */ }
+    /// }
+    ///
+    /// assert_eq!(handle_i32_f32(I32F32::inject(3)), &quot;integer!&quot;);
+    /// assert_eq!(handle_i32_f32(I32F32::inject(3.0)), &quot;float!&quot;);
+    /// # }
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub fn </span>uninject&lt;T, Index&gt;(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;T, &lt;<span class="self">Self </span><span class="kw">as </span>CoprodUninjector&lt;T, Index&gt;&gt;::Remainder&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: CoprodUninjector&lt;T, Index&gt;,
     {
-        <span class="ident">CoprodUninjector::uninject</span>(<span class="self">self</span>)
+        CoprodUninjector::uninject(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Extract a subset of the possible types in a coproduct (or get the remaining possibilities)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is basically [`uninject`] on steroids.  It lets you remove a number</span>
-    <span class="doccomment">/// of types from a coproduct at once, leaving behind the remainder in an `Err`.</span>
-    <span class="doccomment">/// For instance, one can extract `Coprod!(C, A)` from `Coprod!(A, B, C, D)`</span>
-    <span class="doccomment">/// to produce `Result&lt;Coprod!(C, A), Coprod!(B, D)&gt;`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Each type in the extracted subset is required to be part of the input coproduct.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`uninject`]: #method.uninject</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Basic usage:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # #[macro_use] extern crate frunk;</span>
-    <span class="doccomment">/// use ::frunk::Coproduct;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// type I32BoolF32 = Coprod!(i32, bool, f32);</span>
-    <span class="doccomment">/// type I32F32 = Coprod!(i32, f32);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let co1 = I32BoolF32::inject(42_f32);</span>
-    <span class="doccomment">/// let co2 = I32BoolF32::inject(true);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let sub1: Result&lt;Coprod!(i32, f32), _&gt; = co1.subset();</span>
-    <span class="doccomment">/// let sub2: Result&lt;Coprod!(i32, f32), _&gt; = co2.subset();</span>
-    <span class="doccomment">/// assert!(sub1.is_ok());</span>
-    <span class="doccomment">/// assert!(sub2.is_err());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Turbofish syntax for specifying the target subset is also supported.</span>
-    <span class="doccomment">/// // The Indices parameter should be left to type inference using `_`.</span>
-    <span class="doccomment">/// assert!(co1.subset::&lt;Coprod!(i32, f32), _&gt;().is_ok());</span>
-    <span class="doccomment">/// assert!(co2.subset::&lt;Coprod!(i32, f32), _&gt;().is_err());</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Order doesn&#39;t matter.</span>
-    <span class="doccomment">/// assert!(co1.subset::&lt;Coprod!(f32, i32), _&gt;().is_ok());</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Like `uninject`, `subset` can be used for exhaustive matching,</span>
-    <span class="doccomment">/// with the advantage that it can remove more than one type at a time:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # #[macro_use] extern crate frunk;</span>
-    <span class="doccomment">/// use frunk::Coproduct;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// fn handle_stringly_things(co: Coprod!(&amp;&#39;static str, String)) -&gt; String {</span>
-    <span class="doccomment">///     co.fold(hlist![</span>
-    <span class="doccomment">///         |s| format!(&quot;&amp;str {}&quot;, s),</span>
-    <span class="doccomment">///         |s| format!(&quot;String {}&quot;, s),</span>
-    <span class="doccomment">///     ])</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// fn handle_countly_things(co: Coprod!(u32)) -&gt; String {</span>
-    <span class="doccomment">///     co.fold(hlist![</span>
-    <span class="doccomment">///         |n| vec![&quot;.&quot;; n as usize].concat(),</span>
-    <span class="doccomment">///     ])</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// fn handle_all(co: Coprod!(String, u32, &amp;&#39;static str)) -&gt; String {</span>
-    <span class="doccomment">///     // co is currently Coprod!(String, u32, &amp;&#39;static str)</span>
-    <span class="doccomment">///     let co = match co.subset().map(handle_stringly_things) {</span>
-    <span class="doccomment">///         Ok(s) =&gt; return s,</span>
-    <span class="doccomment">///         Err(co) =&gt; co,</span>
-    <span class="doccomment">///     };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     // Now co is Coprod!(u32).</span>
-    <span class="doccomment">///     let co = match co.subset().map(handle_countly_things) {</span>
-    <span class="doccomment">///         Ok(s) =&gt; return s,</span>
-    <span class="doccomment">///         Err(co) =&gt; co,</span>
-    <span class="doccomment">///     };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">///     // Now co is empty.</span>
-    <span class="doccomment">///     match co { /* unreachable */ }</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(handle_all(Coproduct::inject(&quot;hello&quot;)), &quot;&amp;str hello&quot;);</span>
-    <span class="doccomment">/// assert_eq!(handle_all(Coproduct::inject(String::from(&quot;World!&quot;))), &quot;String World!&quot;);</span>
-    <span class="doccomment">/// assert_eq!(handle_all(Coproduct::inject(4)), &quot;....&quot;);</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">subset</span><span class="op">&lt;</span><span class="ident">Targets</span>, <span class="ident">Indices</span><span class="op">&gt;</span>(
+    <span class="doccomment">/// Extract a subset of the possible types in a coproduct (or get the remaining possibilities)
+    ///
+    /// This is basically [`uninject`] on steroids.  It lets you remove a number
+    /// of types from a coproduct at once, leaving behind the remainder in an `Err`.
+    /// For instance, one can extract `Coprod!(C, A)` from `Coprod!(A, B, C, D)`
+    /// to produce `Result&lt;Coprod!(C, A), Coprod!(B, D)&gt;`.
+    ///
+    /// Each type in the extracted subset is required to be part of the input coproduct.
+    ///
+    /// [`uninject`]: #method.uninject
+    ///
+    /// # Example
+    ///
+    /// Basic usage:
+    ///
+    /// ```
+    /// # #[macro_use] extern crate frunk;
+    /// use ::frunk::Coproduct;
+    ///
+    /// # fn main() {
+    /// type I32BoolF32 = Coprod!(i32, bool, f32);
+    /// type I32F32 = Coprod!(i32, f32);
+    ///
+    /// let co1 = I32BoolF32::inject(42_f32);
+    /// let co2 = I32BoolF32::inject(true);
+    ///
+    /// let sub1: Result&lt;Coprod!(i32, f32), _&gt; = co1.subset();
+    /// let sub2: Result&lt;Coprod!(i32, f32), _&gt; = co2.subset();
+    /// assert!(sub1.is_ok());
+    /// assert!(sub2.is_err());
+    ///
+    /// // Turbofish syntax for specifying the target subset is also supported.
+    /// // The Indices parameter should be left to type inference using `_`.
+    /// assert!(co1.subset::&lt;Coprod!(i32, f32), _&gt;().is_ok());
+    /// assert!(co2.subset::&lt;Coprod!(i32, f32), _&gt;().is_err());
+    ///
+    /// // Order doesn&#39;t matter.
+    /// assert!(co1.subset::&lt;Coprod!(f32, i32), _&gt;().is_ok());
+    /// # }
+    /// ```
+    ///
+    /// Like `uninject`, `subset` can be used for exhaustive matching,
+    /// with the advantage that it can remove more than one type at a time:
+    ///
+    /// ```
+    /// # #[macro_use] extern crate frunk;
+    /// use frunk::Coproduct;
+    ///
+    /// # fn main() {
+    /// fn handle_stringly_things(co: Coprod!(&amp;&#39;static str, String)) -&gt; String {
+    ///     co.fold(hlist![
+    ///         |s| format!(&quot;&amp;str {}&quot;, s),
+    ///         |s| format!(&quot;String {}&quot;, s),
+    ///     ])
+    /// }
+    ///
+    /// fn handle_countly_things(co: Coprod!(u32)) -&gt; String {
+    ///     co.fold(hlist![
+    ///         |n| vec![&quot;.&quot;; n as usize].concat(),
+    ///     ])
+    /// }
+    ///
+    /// fn handle_all(co: Coprod!(String, u32, &amp;&#39;static str)) -&gt; String {
+    ///     // co is currently Coprod!(String, u32, &amp;&#39;static str)
+    ///     let co = match co.subset().map(handle_stringly_things) {
+    ///         Ok(s) =&gt; return s,
+    ///         Err(co) =&gt; co,
+    ///     };
+    ///
+    ///     // Now co is Coprod!(u32).
+    ///     let co = match co.subset().map(handle_countly_things) {
+    ///         Ok(s) =&gt; return s,
+    ///         Err(co) =&gt; co,
+    ///     };
+    ///
+    ///     // Now co is empty.
+    ///     match co { /* unreachable */ }
+    /// }
+    ///
+    /// assert_eq!(handle_all(Coproduct::inject(&quot;hello&quot;)), &quot;&amp;str hello&quot;);
+    /// assert_eq!(handle_all(Coproduct::inject(String::from(&quot;World!&quot;))), &quot;String World!&quot;);
+    /// assert_eq!(handle_all(Coproduct::inject(4)), &quot;....&quot;);
+    /// # }
+    /// ```
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub fn </span>subset&lt;Targets, Indices&gt;(
         <span class="self">self</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Targets</span>, <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">CoproductSubsetter</span><span class="op">&lt;</span><span class="ident">Targets</span>, <span class="ident">Indices</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Remainder</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">CoproductSubsetter</span><span class="op">&lt;</span><span class="ident">Targets</span>, <span class="ident">Indices</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Targets, &lt;<span class="self">Self </span><span class="kw">as </span>CoproductSubsetter&lt;Targets, Indices&gt;&gt;::Remainder&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: CoproductSubsetter&lt;Targets, Indices&gt;,
     {
-        <span class="ident">CoproductSubsetter::subset</span>(<span class="self">self</span>)
+        CoproductSubsetter::subset(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Convert a coproduct into another that can hold its variants.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This converts a coproduct into another one which is capable of holding each</span>
-    <span class="doccomment">/// of its types. The most well-supported use-cases (i.e. those where type inference</span>
-    <span class="doccomment">/// is capable of solving for the indices) are:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * Reordering variants: `Coprod!(C, A, B) -&gt; Coprod!(A, B, C)`</span>
-    <span class="doccomment">/// * Embedding into a superset: `Coprod!(B, D) -&gt; Coprod!(A, B, C, D, E)`</span>
-    <span class="doccomment">/// * Coalescing duplicate inputs: `Coprod!(B, B, B, B) -&gt; Coprod!(A, B, C)`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// and of course any combination thereof.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Rules</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If any type in the input does not appear in the output, the conversion is forbidden.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If any type in the input appears multiple times in the output, type inference will fail.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// All of these rules fall naturally out of its fairly simple definition,</span>
-    <span class="doccomment">/// which is equivalent to:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```text</span>
-    <span class="doccomment">/// coprod.fold(hlist![</span>
-    <span class="doccomment">///     |x| Coproduct::inject(x),</span>
-    <span class="doccomment">///     |x| Coproduct::inject(x),</span>
-    <span class="doccomment">///             ...</span>
-    <span class="doccomment">///     |x| Coproduct::inject(x),</span>
-    <span class="doccomment">/// ])</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # #[macro_use] extern crate frunk;</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// type I32BoolF32 = Coprod!(i32, bool, f32);</span>
-    <span class="doccomment">/// type BoolI32 = Coprod!(bool, i32);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let co = BoolI32::inject(true);</span>
-    <span class="doccomment">/// let embedded: I32BoolF32 = co.embed();</span>
-    <span class="doccomment">/// assert_eq!(embedded, I32BoolF32::inject(true));</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Turbofish syntax for specifying the output type is also supported.</span>
-    <span class="doccomment">/// // The Indices parameter should be left to type inference using `_`.</span>
-    <span class="doccomment">/// let embedded = co.embed::&lt;I32BoolF32, _&gt;();</span>
-    <span class="doccomment">/// assert_eq!(embedded, I32BoolF32::inject(true));</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">embed</span><span class="op">&lt;</span><span class="ident">Targets</span>, <span class="ident">Indices</span><span class="op">&gt;</span>(<span class="self">self</span>) -&gt; <span class="ident">Targets</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">CoproductEmbedder</span><span class="op">&lt;</span><span class="ident">Targets</span>, <span class="ident">Indices</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Convert a coproduct into another that can hold its variants.
+    ///
+    /// This converts a coproduct into another one which is capable of holding each
+    /// of its types. The most well-supported use-cases (i.e. those where type inference
+    /// is capable of solving for the indices) are:
+    ///
+    /// * Reordering variants: `Coprod!(C, A, B) -&gt; Coprod!(A, B, C)`
+    /// * Embedding into a superset: `Coprod!(B, D) -&gt; Coprod!(A, B, C, D, E)`
+    /// * Coalescing duplicate inputs: `Coprod!(B, B, B, B) -&gt; Coprod!(A, B, C)`
+    ///
+    /// and of course any combination thereof.
+    ///
+    /// # Rules
+    ///
+    /// If any type in the input does not appear in the output, the conversion is forbidden.
+    ///
+    /// If any type in the input appears multiple times in the output, type inference will fail.
+    ///
+    /// All of these rules fall naturally out of its fairly simple definition,
+    /// which is equivalent to:
+    ///
+    /// ```text
+    /// coprod.fold(hlist![
+    ///     |x| Coproduct::inject(x),
+    ///     |x| Coproduct::inject(x),
+    ///             ...
+    ///     |x| Coproduct::inject(x),
+    /// ])
+    /// ```
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # #[macro_use] extern crate frunk;
+    /// # fn main() {
+    /// type I32BoolF32 = Coprod!(i32, bool, f32);
+    /// type BoolI32 = Coprod!(bool, i32);
+    ///
+    /// let co = BoolI32::inject(true);
+    /// let embedded: I32BoolF32 = co.embed();
+    /// assert_eq!(embedded, I32BoolF32::inject(true));
+    ///
+    /// // Turbofish syntax for specifying the output type is also supported.
+    /// // The Indices parameter should be left to type inference using `_`.
+    /// let embedded = co.embed::&lt;I32BoolF32, _&gt;();
+    /// assert_eq!(embedded, I32BoolF32::inject(true));
+    /// # }
+    /// ```
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub fn </span>embed&lt;Targets, Indices&gt;(<span class="self">self</span>) -&gt; Targets
+    <span class="kw">where
+        </span><span class="self">Self</span>: CoproductEmbedder&lt;Targets, Indices&gt;,
     {
-        <span class="ident">CoproductEmbedder::embed</span>(<span class="self">self</span>)
+        CoproductEmbedder::embed(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Borrow each variant of the Coproduct.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Composing with `subset` to match a subset of variants without</span>
-    <span class="doccomment">/// consuming the coproduct:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # #[macro_use] extern crate frunk; fn main() {</span>
-    <span class="doccomment">/// use frunk::Coproduct;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let co: Coprod!(i32, bool, String) = Coproduct::inject(true);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(co.to_ref().subset::&lt;Coprod!(&amp;bool, &amp;String), _&gt;().is_ok());</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_ref</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ToRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Output</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">ToRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Borrow each variant of the Coproduct.
+    ///
+    /// # Example
+    ///
+    /// Composing with `subset` to match a subset of variants without
+    /// consuming the coproduct:
+    ///
+    /// ```
+    /// # #[macro_use] extern crate frunk; fn main() {
+    /// use frunk::Coproduct;
+    ///
+    /// let co: Coprod!(i32, bool, String) = Coproduct::inject(true);
+    ///
+    /// assert!(co.to_ref().subset::&lt;Coprod!(&amp;bool, &amp;String), _&gt;().is_ok());
+    /// # }
+    /// ```
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub fn </span>to_ref&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; &lt;<span class="self">Self </span><span class="kw">as </span>ToRef&lt;<span class="lifetime">&#39;a</span>&gt;&gt;::Output
+    <span class="kw">where
+        </span><span class="self">Self</span>: ToRef&lt;<span class="lifetime">&#39;a</span>&gt;,
     {
-        <span class="ident">ToRef::to_ref</span>(<span class="self">self</span>)
+        ToRef::to_ref(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Borrow each variant of the `Coproduct` mutably.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Composing with `subset` to match a subset of variants without</span>
-    <span class="doccomment">/// consuming the coproduct:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # #[macro_use] extern crate frunk; fn main() {</span>
-    <span class="doccomment">/// use frunk::Coproduct;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut co: Coprod!(i32, bool, String) = Coproduct::inject(true);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(co.to_mut().subset::&lt;Coprod!(&amp;mut bool, &amp;mut String), _&gt;().is_ok());</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_mut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">ToMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Output</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">ToMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Borrow each variant of the `Coproduct` mutably.
+    ///
+    /// # Example
+    ///
+    /// Composing with `subset` to match a subset of variants without
+    /// consuming the coproduct:
+    ///
+    /// ```
+    /// # #[macro_use] extern crate frunk; fn main() {
+    /// use frunk::Coproduct;
+    ///
+    /// let mut co: Coprod!(i32, bool, String) = Coproduct::inject(true);
+    ///
+    /// assert!(co.to_mut().subset::&lt;Coprod!(&amp;mut bool, &amp;mut String), _&gt;().is_ok());
+    /// # }
+    /// ```
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub fn </span>to_mut&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>) -&gt; &lt;<span class="self">Self </span><span class="kw">as </span>ToMut&lt;<span class="lifetime">&#39;a</span>&gt;&gt;::Output
+    <span class="kw">where
+        </span><span class="self">Self</span>: ToMut&lt;<span class="lifetime">&#39;a</span>&gt;,
     {
-        <span class="ident">ToMut::to_mut</span>(<span class="self">self</span>)
+        ToMut::to_mut(<span class="self">self</span>)
     }
 
-    <span class="doccomment">/// Use functions to transform a Coproduct into a single value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// A variety of types are supported for the `Folder` argument:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * An `hlist![]` of closures (one for each type, in order).</span>
-    <span class="doccomment">/// * A single closure (for a Coproduct that is homogenous).</span>
-    <span class="doccomment">/// * A single [`Poly`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Poly`]: ../traits/struct.Poly.html</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # #[macro_use] extern crate frunk;</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// type I32F32StrBool = Coprod!(i32, f32, bool);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let co1 = I32F32StrBool::inject(3);</span>
-    <span class="doccomment">/// let co2 = I32F32StrBool::inject(true);</span>
-    <span class="doccomment">/// let co3 = I32F32StrBool::inject(42f32);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let folder = hlist![|&amp;i| format!(&quot;int {}&quot;, i),</span>
-    <span class="doccomment">///                     |&amp;f| format!(&quot;float {}&quot;, f),</span>
-    <span class="doccomment">///                     |&amp;b| (if b { &quot;t&quot; } else { &quot;f&quot; }).to_string()];</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(co1.to_ref().fold(folder), &quot;int 3&quot;.to_string());</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Using a polymorphic function type has the advantage of not</span>
-    <span class="doccomment">/// forcing you to care about the order in which you declare</span>
-    <span class="doccomment">/// handlers for the types in your Coproduct.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// # #[macro_use] extern crate frunk;</span>
-    <span class="doccomment">/// # fn main() {</span>
-    <span class="doccomment">/// use frunk::{Poly, Func};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// type I32F32StrBool = Coprod!(i32, f32, bool);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// impl Func&lt;i32&gt; for P {</span>
-    <span class="doccomment">///     type Output = bool;</span>
-    <span class="doccomment">///     fn call(args: i32) -&gt; Self::Output {</span>
-    <span class="doccomment">///         args &gt; 100</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// impl Func&lt;bool&gt; for P {</span>
-    <span class="doccomment">///     type Output = bool;</span>
-    <span class="doccomment">///     fn call(args: bool) -&gt; Self::Output {</span>
-    <span class="doccomment">///         args</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// impl Func&lt;f32&gt; for P {</span>
-    <span class="doccomment">///     type Output = bool;</span>
-    <span class="doccomment">///     fn call(args: f32) -&gt; Self::Output {</span>
-    <span class="doccomment">///         args &gt; 9000f32</span>
-    <span class="doccomment">///     }</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// struct P;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let co1 = I32F32StrBool::inject(3);</span>
-    <span class="doccomment">/// let folded = co1.fold(Poly(P));</span>
-    <span class="doccomment">/// # }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fold</span><span class="op">&lt;</span><span class="ident">Output</span>, <span class="ident">Folder</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">folder</span>: <span class="ident">Folder</span>) -&gt; <span class="ident">Output</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">CoproductFoldable</span><span class="op">&lt;</span><span class="ident">Folder</span>, <span class="ident">Output</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Use functions to transform a Coproduct into a single value.
+    ///
+    /// A variety of types are supported for the `Folder` argument:
+    ///
+    /// * An `hlist![]` of closures (one for each type, in order).
+    /// * A single closure (for a Coproduct that is homogenous).
+    /// * A single [`Poly`].
+    ///
+    /// [`Poly`]: ../traits/struct.Poly.html
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # #[macro_use] extern crate frunk;
+    /// # fn main() {
+    /// type I32F32StrBool = Coprod!(i32, f32, bool);
+    ///
+    /// let co1 = I32F32StrBool::inject(3);
+    /// let co2 = I32F32StrBool::inject(true);
+    /// let co3 = I32F32StrBool::inject(42f32);
+    ///
+    /// let folder = hlist![|&amp;i| format!(&quot;int {}&quot;, i),
+    ///                     |&amp;f| format!(&quot;float {}&quot;, f),
+    ///                     |&amp;b| (if b { &quot;t&quot; } else { &quot;f&quot; }).to_string()];
+    ///
+    /// assert_eq!(co1.to_ref().fold(folder), &quot;int 3&quot;.to_string());
+    /// # }
+    /// ```
+    ///
+    /// Using a polymorphic function type has the advantage of not
+    /// forcing you to care about the order in which you declare
+    /// handlers for the types in your Coproduct.
+    ///
+    /// ```
+    /// # #[macro_use] extern crate frunk;
+    /// # fn main() {
+    /// use frunk::{Poly, Func};
+    ///
+    /// type I32F32StrBool = Coprod!(i32, f32, bool);
+    ///
+    /// impl Func&lt;i32&gt; for P {
+    ///     type Output = bool;
+    ///     fn call(args: i32) -&gt; Self::Output {
+    ///         args &gt; 100
+    ///     }
+    /// }
+    /// impl Func&lt;bool&gt; for P {
+    ///     type Output = bool;
+    ///     fn call(args: bool) -&gt; Self::Output {
+    ///         args
+    ///     }
+    /// }
+    /// impl Func&lt;f32&gt; for P {
+    ///     type Output = bool;
+    ///     fn call(args: f32) -&gt; Self::Output {
+    ///         args &gt; 9000f32
+    ///     }
+    /// }
+    /// struct P;
+    ///
+    /// let co1 = I32F32StrBool::inject(3);
+    /// let folded = co1.fold(Poly(P));
+    /// # }
+    /// ```
+    </span><span class="attribute">#[inline(always)]
+    </span><span class="kw">pub fn </span>fold&lt;Output, Folder&gt;(<span class="self">self</span>, folder: Folder) -&gt; Output
+    <span class="kw">where
+        </span><span class="self">Self</span>: CoproductFoldable&lt;Folder, Output&gt;,
     {
-        <span class="ident">CoproductFoldable::fold</span>(<span class="self">self</span>, <span class="ident">folder</span>)
+        CoproductFoldable::fold(<span class="self">self</span>, folder)
     }
 }
 
-<span class="doccomment">/// Trait for instantiating a coproduct from an element</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This trait is part of the implementation of the inherent static method</span>
-<span class="doccomment">/// [`Coproduct::inject`]. Please see that method for more information.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You only need to import this trait when working with generic</span>
-<span class="doccomment">/// Coproducts of unknown type. In most code, `Coproduct::inject` will</span>
-<span class="doccomment">/// &quot;just work,&quot; with or without this trait.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Coproduct::inject`]: enum.Coproduct.html#method.inject</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">CoprodInjector</span><span class="op">&lt;</span><span class="ident">InjectType</span>, <span class="ident">Index</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Instantiate a coproduct from an element.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Please see the [inherent static method] for more information.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The only difference between that inherent method and this</span>
-    <span class="doccomment">/// trait method is the location of the type parameters.</span>
-    <span class="doccomment">/// (here, they are on the trait rather than the method)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [inherent static method]: enum.Coproduct.html#method.inject</span>
-    <span class="kw">fn</span> <span class="ident">inject</span>(<span class="ident">to_insert</span>: <span class="ident">InjectType</span>) -&gt; <span class="self">Self</span>;
+<span class="doccomment">/// Trait for instantiating a coproduct from an element
+///
+/// This trait is part of the implementation of the inherent static method
+/// [`Coproduct::inject`]. Please see that method for more information.
+///
+/// You only need to import this trait when working with generic
+/// Coproducts of unknown type. In most code, `Coproduct::inject` will
+/// &quot;just work,&quot; with or without this trait.
+///
+/// [`Coproduct::inject`]: enum.Coproduct.html#method.inject
+</span><span class="kw">pub trait </span>CoprodInjector&lt;InjectType, Index&gt; {
+    <span class="doccomment">/// Instantiate a coproduct from an element.
+    ///
+    /// Please see the [inherent static method] for more information.
+    ///
+    /// The only difference between that inherent method and this
+    /// trait method is the location of the type parameters.
+    /// (here, they are on the trait rather than the method)
+    ///
+    /// [inherent static method]: enum.Coproduct.html#method.inject
+    </span><span class="kw">fn </span>inject(to_insert: InjectType) -&gt; <span class="self">Self</span>;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">Tail</span><span class="op">&gt;</span> <span class="ident">CoprodInjector</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">Here</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Coproduct</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">Tail</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">inject</span>(<span class="ident">to_insert</span>: <span class="ident">I</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Coproduct::Inl</span>(<span class="ident">to_insert</span>)
+<span class="kw">impl</span>&lt;I, Tail&gt; CoprodInjector&lt;I, Here&gt; <span class="kw">for </span>Coproduct&lt;I, Tail&gt; {
+    <span class="kw">fn </span>inject(to_insert: I) -&gt; <span class="self">Self </span>{
+        Coproduct::Inl(to_insert)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Head</span>, <span class="ident">I</span>, <span class="ident">Tail</span>, <span class="ident">TailIndex</span><span class="op">&gt;</span> <span class="ident">CoprodInjector</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">There</span><span class="op">&lt;</span><span class="ident">TailIndex</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Coproduct</span><span class="op">&lt;</span><span class="ident">Head</span>, <span class="ident">Tail</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">Tail</span>: <span class="ident">CoprodInjector</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">TailIndex</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;Head, I, Tail, TailIndex&gt; CoprodInjector&lt;I, There&lt;TailIndex&gt;&gt; <span class="kw">for </span>Coproduct&lt;Head, Tail&gt;
+<span class="kw">where
+    </span>Tail: CoprodInjector&lt;I, TailIndex&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">inject</span>(<span class="ident">to_insert</span>: <span class="ident">I</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">tail_inserted</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">Tail</span> <span class="kw">as</span> <span class="ident">CoprodInjector</span><span class="op">&lt;</span><span class="ident">I</span>, <span class="ident">TailIndex</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::inject</span>(<span class="ident">to_insert</span>);
-        <span class="ident">Coproduct::Inr</span>(<span class="ident">tail_inserted</span>)
+    <span class="kw">fn </span>inject(to_insert: I) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>tail_inserted = &lt;Tail <span class="kw">as </span>CoprodInjector&lt;I, TailIndex&gt;&gt;::inject(to_insert);
+        Coproduct::Inr(tail_inserted)
     }
 }
 
-<span class="comment">// For turning something into a Coproduct --&gt;</span>
+<span class="comment">// For turning something into a Coproduct --&gt;
 
-<span class="doccomment">/// Trait for borrowing a coproduct element by type</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This trait is part of the implementation of the inherent method</span>
-<span class="doccomment">/// [`Coproduct::get`]. Please see that method for more information.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You only need to import this trait when working with generic</span>
-<span class="doccomment">/// Coproducts of unknown type. If you have a Coproduct of known type,</span>
-<span class="doccomment">/// then `co.get()` should &quot;just work&quot; even without the trait.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Coproduct::get`]: enum.Coproduct.html#method.get</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">CoproductSelector</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">I</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Borrow an element from a coproduct by type.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Please see the [inherent method] for more information.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The only difference between that inherent method and this</span>
-    <span class="doccomment">/// trait method is the location of the type parameters.</span>
-    <span class="doccomment">/// (here, they are on the trait rather than the method)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [inherent method]: enum.Coproduct.html#method.get</span>
-    <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">S</span><span class="op">&gt;</span>;
+</span><span class="doccomment">/// Trait for borrowing a coproduct element by type
+///
+/// This trait is part of the implementation of the inherent method
+/// [`Coproduct::get`]. Please see that method for more information.
+///
+/// You only need to import this trait when working with generic
+/// Coproducts of unknown type. If you have a Coproduct of known type,
+/// then `co.get()` should &quot;just work&quot; even without the trait.
+///
+/// [`Coproduct::get`]: enum.Coproduct.html#method.get
+</span><span class="kw">pub trait </span>CoproductSelector&lt;S, I&gt; {
+    <span class="doccomment">/// Borrow an element from a coproduct by type.
+    ///
+    /// Please see the [inherent method] for more information.
+    ///
+    /// The only difference between that inherent method and this
+    /// trait method is the location of the type parameters.
+    /// (here, they are on the trait rather than the method)
+    ///
+    /// [inherent method]: enum.Coproduct.html#method.get
+    </span><span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>S&gt;;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Head</span>, <span class="ident">Tail</span><span class="op">&gt;</span> <span class="ident">CoproductSelector</span><span class="op">&lt;</span><span class="ident">Head</span>, <span class="ident">Here</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Coproduct</span><span class="op">&lt;</span><span class="ident">Head</span>, <span class="ident">Tail</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Head</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::Coproduct</span>::<span class="kw-2">*</span>;
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Inl</span>(<span class="kw-2">ref</span> <span class="ident">thing</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">thing</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>, <span class="comment">// Impossible</span>
-        }
+<span class="kw">impl</span>&lt;Head, Tail&gt; CoproductSelector&lt;Head, Here&gt; <span class="kw">for </span>Coproduct&lt;Head, Tail&gt; {
+    <span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>Head&gt; {
+        <span class="kw">use </span><span class="self">self</span>::Coproduct::<span class="kw-2">*</span>;
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Inl(<span class="kw-2">ref </span>thing) =&gt; <span class="prelude-val">Some</span>(thing),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>, <span class="comment">// Impossible
+        </span>}
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Head</span>, <span class="ident">FromTail</span>, <span class="ident">Tail</span>, <span class="ident">TailIndex</span><span class="op">&gt;</span> <span class="ident">CoproductSelector</span><span class="op">&lt;</span><span class="ident">FromTail</span>, <span class="ident">There</span><span class="op">&lt;</span><span class="ident">TailIndex</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">for</span> <span class="ident">Coproduct</span><span class="op">&lt;</span><span class="ident">Head</span>, <span class="ident">Tail</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">Tail</span>: <span class="ident">CoproductSelector</span><span class="op">&lt;</span><span class="ident">FromTail</span>, <span class="ident">TailIndex</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;Head, FromTail, Tail, TailIndex&gt; CoproductSelector&lt;FromTail, There&lt;TailIndex&gt;&gt;
+    <span class="kw">for </span>Coproduct&lt;Head, Tail&gt;
+<span class="kw">where
+    </span>Tail: CoproductSelector&lt;FromTail, TailIndex&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">FromTail</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::Coproduct</span>::<span class="kw-2">*</span>;
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Inr</span>(<span class="kw-2">ref</span> <span class="ident">rest</span>) =&gt; <span class="ident">rest</span>.<span class="ident">get</span>(),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>, <span class="comment">// Impossible</span>
-        }
+    <span class="kw">fn </span>get(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>FromTail&gt; {
+        <span class="kw">use </span><span class="self">self</span>::Coproduct::<span class="kw-2">*</span>;
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Inr(<span class="kw-2">ref </span>rest) =&gt; rest.get(),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>, <span class="comment">// Impossible
+        </span>}
     }
 }
 
-<span class="doccomment">/// Trait for retrieving a coproduct element by type</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This trait is part of the implementation of the inherent method</span>
-<span class="doccomment">/// [`Coproduct::take`]. Please see that method for more information.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You only need to import this trait when working with generic</span>
-<span class="doccomment">/// Coproducts of unknown type. If you have a Coproduct of known type,</span>
-<span class="doccomment">/// then `co.take()` should &quot;just work&quot; even without the trait.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Coproduct::take`]: enum.Coproduct.html#method.take</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">CoproductTaker</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">I</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Retrieve an element from a coproduct by type, ignoring all others.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Please see the [inherent method] for more information.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The only difference between that inherent method and this</span>
-    <span class="doccomment">/// trait method is the location of the type parameters.</span>
-    <span class="doccomment">/// (here, they are on the trait rather than the method)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [inherent method]: enum.Coproduct.html#method.take</span>
-    <span class="kw">fn</span> <span class="ident">take</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Trait for retrieving a coproduct element by type
+///
+/// This trait is part of the implementation of the inherent method
+/// [`Coproduct::take`]. Please see that method for more information.
+///
+/// You only need to import this trait when working with generic
+/// Coproducts of unknown type. If you have a Coproduct of known type,
+/// then `co.take()` should &quot;just work&quot; even without the trait.
+///
+/// [`Coproduct::take`]: enum.Coproduct.html#method.take
+</span><span class="kw">pub trait </span>CoproductTaker&lt;S, I&gt; {
+    <span class="doccomment">/// Retrieve an element from a coproduct by type, ignoring all others.
+    ///
+    /// Please see the [inherent method] for more information.
+    ///
+    /// The only difference between that inherent method and this
+    /// trait method is the location of the type parameters.
+    /// (here, they are on the trait rather than the method)
+    ///
+    /// [inherent method]: enum.Coproduct.html#method.take
+    </span><span class="kw">fn </span>take(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;S&gt;;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Head</span>, <span class="ident">Tail</span><span class="op">&gt;</span> <span class="ident">CoproductTaker</span><span class="op">&lt;</span><span class="ident">Head</span>, <span class="ident">Here</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Coproduct</span><span class="op">&lt;</span><span class="ident">Head</span>, <span class="ident">Tail</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">take</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Head</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::Coproduct</span>::<span class="kw-2">*</span>;
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Inl</span>(<span class="ident">thing</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">thing</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>, <span class="comment">// Impossible</span>
-        }
+<span class="kw">impl</span>&lt;Head, Tail&gt; CoproductTaker&lt;Head, Here&gt; <span class="kw">for </span>Coproduct&lt;Head, Tail&gt; {
+    <span class="kw">fn </span>take(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Head&gt; {
+        <span class="kw">use </span><span class="self">self</span>::Coproduct::<span class="kw-2">*</span>;
+        <span class="kw">match </span><span class="self">self </span>{
+            Inl(thing) =&gt; <span class="prelude-val">Some</span>(thing),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>, <span class="comment">// Impossible
+        </span>}
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Head</span>, <span class="ident">FromTail</span>, <span class="ident">Tail</span>, <span class="ident">TailIndex</span><span class="op">&gt;</span> <span class="ident">CoproductTaker</span><span class="op">&lt;</span><span class="ident">FromTail</span>, <span class="ident">There</span><span class="op">&lt;</span><span class="ident">TailIndex</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">for</span> <span class="ident">Coproduct</span><span class="op">&lt;</span><span class="ident">Head</span>, <span class="ident">Tail</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">Tail</span>: <span class="ident">CoproductTaker</span><span class="op">&lt;</span><span class="ident">FromTail</span>, <span class="ident">TailIndex</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;Head, FromTail, Tail, TailIndex&gt; CoproductTaker&lt;FromTail, There&lt;TailIndex&gt;&gt;
+    <span class="kw">for </span>Coproduct&lt;Head, Tail&gt;
+<span class="kw">where
+    </span>Tail: CoproductTaker&lt;FromTail, TailIndex&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">take</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FromTail</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::Coproduct</span>::<span class="kw-2">*</span>;
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Inr</span>(<span class="ident">rest</span>) =&gt; <span class="ident">rest</span>.<span class="ident">take</span>(),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>, <span class="comment">// Impossible</span>
-        }
+    <span class="kw">fn </span>take(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;FromTail&gt; {
+        <span class="kw">use </span><span class="self">self</span>::Coproduct::<span class="kw-2">*</span>;
+        <span class="kw">match </span><span class="self">self </span>{
+            Inr(rest) =&gt; rest.take(),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>, <span class="comment">// Impossible
+        </span>}
     }
 }
 
-<span class="doccomment">/// Trait for folding a coproduct into a single value.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This trait is part of the implementation of the inherent method</span>
-<span class="doccomment">/// [`Coproduct::fold`]. Please see that method for more information.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You only need to import this trait when working with generic</span>
-<span class="doccomment">/// Coproducts or Folders of unknown type. If the type of everything is known,</span>
-<span class="doccomment">/// then `co.fold(folder)` should &quot;just work&quot; even without the trait.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Coproduct::fold`]: enum.Coproduct.html#method.fold</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">CoproductFoldable</span><span class="op">&lt;</span><span class="ident">Folder</span>, <span class="ident">Output</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Use functions to fold a coproduct into a single value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Please see the [inherent method] for more information.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The only difference between that inherent method and this</span>
-    <span class="doccomment">/// trait method is the location of the type parameters.</span>
-    <span class="doccomment">/// (here, they are on the trait rather than the method)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [inherent method]: enum.Coproduct.html#method.fold</span>
-    <span class="kw">fn</span> <span class="ident">fold</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">Folder</span>) -&gt; <span class="ident">Output</span>;
+<span class="doccomment">/// Trait for folding a coproduct into a single value.
+///
+/// This trait is part of the implementation of the inherent method
+/// [`Coproduct::fold`]. Please see that method for more information.
+///
+/// You only need to import this trait when working with generic
+/// Coproducts or Folders of unknown type. If the type of everything is known,
+/// then `co.fold(folder)` should &quot;just work&quot; even without the trait.
+///
+/// [`Coproduct::fold`]: enum.Coproduct.html#method.fold
+</span><span class="kw">pub trait </span>CoproductFoldable&lt;Folder, Output&gt; {
+    <span class="doccomment">/// Use functions to fold a coproduct into a single value.
+    ///
+    /// Please see the [inherent method] for more information.
+    ///
+    /// The only difference between that inherent method and this
+    /// trait method is the location of the type parameters.
+    /// (here, they are on the trait rather than the method)
+    ///
+    /// [inherent method]: enum.Coproduct.html#method.fold
+    </span><span class="kw">fn </span>fold(<span class="self">self</span>, f: Folder) -&gt; Output;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">P</span>, <span class="ident">R</span>, <span class="ident">CH</span>, <span class="ident">CTail</span><span class="op">&gt;</span> <span class="ident">CoproductFoldable</span><span class="op">&lt;</span><span class="ident">Poly</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Coproduct</span><span class="op">&lt;</span><span class="ident">CH</span>, <span class="ident">CTail</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">P</span>: <span class="ident">Func</span><span class="op">&lt;</span><span class="ident">CH</span>, <span class="ident">Output</span> <span class="op">=</span> <span class="ident">R</span><span class="op">&gt;</span>,
-    <span class="ident">CTail</span>: <span class="ident">CoproductFoldable</span><span class="op">&lt;</span><span class="ident">Poly</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>, <span class="ident">R</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;P, R, CH, CTail&gt; CoproductFoldable&lt;Poly&lt;P&gt;, R&gt; <span class="kw">for </span>Coproduct&lt;CH, CTail&gt;
+<span class="kw">where
+    </span>P: Func&lt;CH, Output = R&gt;,
+    CTail: CoproductFoldable&lt;Poly&lt;P&gt;, R&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">fold</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">Poly</span><span class="op">&lt;</span><span class="ident">P</span><span class="op">&gt;</span>) -&gt; <span class="ident">R</span> {
-        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::Coproduct</span>::<span class="kw-2">*</span>;
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Inl</span>(<span class="ident">r</span>) =&gt; <span class="ident">P::call</span>(<span class="ident">r</span>),
-            <span class="ident">Inr</span>(<span class="ident">rest</span>) =&gt; <span class="ident">rest</span>.<span class="ident">fold</span>(<span class="ident">f</span>),
+    <span class="kw">fn </span>fold(<span class="self">self</span>, f: Poly&lt;P&gt;) -&gt; R {
+        <span class="kw">use </span><span class="self">self</span>::Coproduct::<span class="kw-2">*</span>;
+        <span class="kw">match </span><span class="self">self </span>{
+            Inl(r) =&gt; P::call(r),
+            Inr(rest) =&gt; rest.fold(f),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span>, <span class="ident">FTail</span>, <span class="ident">CH</span>, <span class="ident">CTail</span><span class="op">&gt;</span> <span class="ident">CoproductFoldable</span><span class="op">&lt;</span><span class="ident">HCons</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">FTail</span><span class="op">&gt;</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Coproduct</span><span class="op">&lt;</span><span class="ident">CH</span>, <span class="ident">CTail</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="ident">CH</span>) -&gt; <span class="ident">R</span>,
-    <span class="ident">CTail</span>: <span class="ident">CoproductFoldable</span><span class="op">&lt;</span><span class="ident">FTail</span>, <span class="ident">R</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;F, R, FTail, CH, CTail&gt; CoproductFoldable&lt;HCons&lt;F, FTail&gt;, R&gt; <span class="kw">for </span>Coproduct&lt;CH, CTail&gt;
+<span class="kw">where
+    </span>F: FnOnce(CH) -&gt; R,
+    CTail: CoproductFoldable&lt;FTail, R&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">fold</span>(<span class="self">self</span>, <span class="ident">f</span>: <span class="ident">HCons</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">FTail</span><span class="op">&gt;</span>) -&gt; <span class="ident">R</span> {
-        <span class="kw">use</span> <span class="ident"><span class="self">self</span>::Coproduct</span>::<span class="kw-2">*</span>;
-        <span class="kw">let</span> <span class="ident">f_head</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">head</span>;
-        <span class="kw">let</span> <span class="ident">f_tail</span> <span class="op">=</span> <span class="ident">f</span>.<span class="ident">tail</span>;
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Inl</span>(<span class="ident">r</span>) =&gt; (<span class="ident">f_head</span>)(<span class="ident">r</span>),
-            <span class="ident">Inr</span>(<span class="ident">rest</span>) =&gt; <span class="ident">rest</span>.<span class="ident">fold</span>(<span class="ident">f_tail</span>),
+    <span class="kw">fn </span>fold(<span class="self">self</span>, f: HCons&lt;F, FTail&gt;) -&gt; R {
+        <span class="kw">use </span><span class="self">self</span>::Coproduct::<span class="kw-2">*</span>;
+        <span class="kw">let </span>f_head = f.head;
+        <span class="kw">let </span>f_tail = f.tail;
+        <span class="kw">match </span><span class="self">self </span>{
+            Inl(r) =&gt; (f_head)(r),
+            Inr(rest) =&gt; rest.fold(f_tail),
         }
     }
 }
 
-<span class="doccomment">/// This is literally impossible; CNil is not instantiable</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">CoproductFoldable</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CNil</span> {
-    <span class="kw">fn</span> <span class="ident">fold</span>(<span class="self">self</span>, <span class="kw">_</span>: <span class="ident">F</span>) -&gt; <span class="ident">R</span> {
+<span class="doccomment">/// This is literally impossible; CNil is not instantiable
+</span><span class="kw">impl</span>&lt;F, R&gt; CoproductFoldable&lt;F, R&gt; <span class="kw">for </span>CNil {
+    <span class="kw">fn </span>fold(<span class="self">self</span>, <span class="kw">_</span>: F) -&gt; R {
         <span class="macro">unreachable!</span>()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">CH</span>: <span class="lifetime">&#39;a</span>, <span class="ident">CTail</span><span class="op">&gt;</span> <span class="ident">ToRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Coproduct</span><span class="op">&lt;</span><span class="ident">CH</span>, <span class="ident">CTail</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">CTail</span>: <span class="ident">ToRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, CH: <span class="lifetime">&#39;a</span>, CTail&gt; ToRef&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>Coproduct&lt;CH, CTail&gt;
+<span class="kw">where
+    </span>CTail: ToRef&lt;<span class="lifetime">&#39;a</span>&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Coproduct</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">CH</span>, <span class="op">&lt;</span><span class="ident">CTail</span> <span class="kw">as</span> <span class="ident">ToRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Output</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Output = Coproduct&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>CH, &lt;CTail <span class="kw">as </span>ToRef&lt;<span class="lifetime">&#39;a</span>&gt;&gt;::Output&gt;;
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">to_ref</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Coproduct::Inl</span>(<span class="kw-2">ref</span> <span class="ident">r</span>) =&gt; <span class="ident">Coproduct::Inl</span>(<span class="ident">r</span>),
-            <span class="ident">Coproduct::Inr</span>(<span class="kw-2">ref</span> <span class="ident">rest</span>) =&gt; <span class="ident">Coproduct::Inr</span>(<span class="ident">rest</span>.<span class="ident">to_ref</span>()),
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>to_ref(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Output {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Coproduct::Inl(<span class="kw-2">ref </span>r) =&gt; Coproduct::Inl(r),
+            Coproduct::Inr(<span class="kw-2">ref </span>rest) =&gt; Coproduct::Inr(rest.to_ref()),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ToRef</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CNil</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">CNil</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ToRef&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>CNil {
+    <span class="kw">type </span>Output = CNil;
 
-    <span class="kw">fn</span> <span class="ident">to_ref</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>) -&gt; <span class="ident">CNil</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {}
+    <span class="kw">fn </span>to_ref(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>) -&gt; CNil {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{}
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">CH</span>: <span class="lifetime">&#39;a</span>, <span class="ident">CTail</span><span class="op">&gt;</span> <span class="ident">ToMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Coproduct</span><span class="op">&lt;</span><span class="ident">CH</span>, <span class="ident">CTail</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">CTail</span>: <span class="ident">ToMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, CH: <span class="lifetime">&#39;a</span>, CTail&gt; ToMut&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>Coproduct&lt;CH, CTail&gt;
+<span class="kw">where
+    </span>CTail: ToMut&lt;<span class="lifetime">&#39;a</span>&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Coproduct</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">CH</span>, <span class="op">&lt;</span><span class="ident">CTail</span> <span class="kw">as</span> <span class="ident">ToMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Output</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Output = Coproduct&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>CH, &lt;CTail <span class="kw">as </span>ToMut&lt;<span class="lifetime">&#39;a</span>&gt;&gt;::Output&gt;;
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">to_mut</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Coproduct::Inl</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">r</span>) =&gt; <span class="ident">Coproduct::Inl</span>(<span class="ident">r</span>),
-            <span class="ident">Coproduct::Inr</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">rest</span>) =&gt; <span class="ident">Coproduct::Inr</span>(<span class="ident">rest</span>.<span class="ident">to_mut</span>()),
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>to_mut(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="self">Self</span>::Output {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Coproduct::Inl(<span class="kw-2">ref mut </span>r) =&gt; Coproduct::Inl(r),
+            Coproduct::Inr(<span class="kw-2">ref mut </span>rest) =&gt; Coproduct::Inr(rest.to_mut()),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ToMut</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CNil</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">CNil</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; ToMut&lt;<span class="lifetime">&#39;a</span>&gt; <span class="kw">for </span>CNil {
+    <span class="kw">type </span>Output = CNil;
 
-    <span class="kw">fn</span> <span class="ident">to_mut</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">CNil</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {}
+    <span class="kw">fn </span>to_mut(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span><span class="self">self</span>) -&gt; CNil {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{}
     }
 }
 
-<span class="doccomment">/// Trait for extracting a value from a coproduct in an exhaustive way.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This trait is part of the implementation of the inherent method</span>
-<span class="doccomment">/// [`Coproduct::uninject`]. Please see that method for more information.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You only need to import this trait when working with generic</span>
-<span class="doccomment">/// Coproducts of unknown type. If you have a Coproduct of known type,</span>
-<span class="doccomment">/// then `co.uninject()` should &quot;just work&quot; even without the trait.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Coproduct::uninject`]: enum.Coproduct.html#method.uninject</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">CoprodUninjector</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Idx</span><span class="op">&gt;</span>: <span class="ident">CoprodInjector</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Idx</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Remainder</span>;
+<span class="doccomment">/// Trait for extracting a value from a coproduct in an exhaustive way.
+///
+/// This trait is part of the implementation of the inherent method
+/// [`Coproduct::uninject`]. Please see that method for more information.
+///
+/// You only need to import this trait when working with generic
+/// Coproducts of unknown type. If you have a Coproduct of known type,
+/// then `co.uninject()` should &quot;just work&quot; even without the trait.
+///
+/// [`Coproduct::uninject`]: enum.Coproduct.html#method.uninject
+</span><span class="kw">pub trait </span>CoprodUninjector&lt;T, Idx&gt;: CoprodInjector&lt;T, Idx&gt; {
+    <span class="kw">type </span>Remainder;
 
-    <span class="doccomment">/// Attempt to extract a value from a coproduct (or get the remaining possibilities).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Please see the [inherent method] for more information.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The only difference between that inherent method and this</span>
-    <span class="doccomment">/// trait method is the location of the type parameters.</span>
-    <span class="doccomment">/// (here, they are on the trait rather than the method)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [inherent method]: enum.Coproduct.html#method.uninject</span>
-    <span class="kw">fn</span> <span class="ident">uninject</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident"><span class="self">Self</span>::Remainder</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Attempt to extract a value from a coproduct (or get the remaining possibilities).
+    ///
+    /// Please see the [inherent method] for more information.
+    ///
+    /// The only difference between that inherent method and this
+    /// trait method is the location of the type parameters.
+    /// (here, they are on the trait rather than the method)
+    ///
+    /// [inherent method]: enum.Coproduct.html#method.uninject
+    </span><span class="kw">fn </span>uninject(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;T, <span class="self">Self</span>::Remainder&gt;;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Hd</span>, <span class="ident">Tl</span><span class="op">&gt;</span> <span class="ident">CoprodUninjector</span><span class="op">&lt;</span><span class="ident">Hd</span>, <span class="ident">Here</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Coproduct</span><span class="op">&lt;</span><span class="ident">Hd</span>, <span class="ident">Tl</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Remainder</span> <span class="op">=</span> <span class="ident">Tl</span>;
+<span class="kw">impl</span>&lt;Hd, Tl&gt; CoprodUninjector&lt;Hd, Here&gt; <span class="kw">for </span>Coproduct&lt;Hd, Tl&gt; {
+    <span class="kw">type </span>Remainder = Tl;
 
-    <span class="kw">fn</span> <span class="ident">uninject</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Hd</span>, <span class="ident">Tl</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Coproduct::Inl</span>(<span class="ident">h</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">h</span>),
-            <span class="ident">Coproduct::Inr</span>(<span class="ident">t</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">t</span>),
+    <span class="kw">fn </span>uninject(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Hd, Tl&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            Coproduct::Inl(h) =&gt; <span class="prelude-val">Ok</span>(h),
+            Coproduct::Inr(t) =&gt; <span class="prelude-val">Err</span>(t),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Hd</span>, <span class="ident">Tl</span>, <span class="ident">T</span>, <span class="ident">N</span><span class="op">&gt;</span> <span class="ident">CoprodUninjector</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">There</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Coproduct</span><span class="op">&lt;</span><span class="ident">Hd</span>, <span class="ident">Tl</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">Tl</span>: <span class="ident">CoprodUninjector</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">N</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;Hd, Tl, T, N&gt; CoprodUninjector&lt;T, There&lt;N&gt;&gt; <span class="kw">for </span>Coproduct&lt;Hd, Tl&gt;
+<span class="kw">where
+    </span>Tl: CoprodUninjector&lt;T, N&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Remainder</span> <span class="op">=</span> <span class="ident">Coproduct</span><span class="op">&lt;</span><span class="ident">Hd</span>, <span class="ident">Tl::Remainder</span><span class="op">&gt;</span>;
+    <span class="kw">type </span>Remainder = Coproduct&lt;Hd, Tl::Remainder&gt;;
 
-    <span class="kw">fn</span> <span class="ident">uninject</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident"><span class="self">Self</span>::Remainder</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Coproduct::Inl</span>(<span class="ident">h</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">Coproduct::Inl</span>(<span class="ident">h</span>)),
-            <span class="ident">Coproduct::Inr</span>(<span class="ident">t</span>) =&gt; <span class="ident">t</span>.<span class="ident">uninject</span>().<span class="ident">map_err</span>(<span class="ident">Coproduct::Inr</span>),
+    <span class="kw">fn </span>uninject(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;T, <span class="self">Self</span>::Remainder&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+            Coproduct::Inl(h) =&gt; <span class="prelude-val">Err</span>(Coproduct::Inl(h)),
+            Coproduct::Inr(t) =&gt; t.uninject().map_err(Coproduct::Inr),
         }
     }
 }
 
-<span class="doccomment">/// Trait for extracting a subset of the possible types in a coproduct.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This trait is part of the implementation of the inherent method</span>
-<span class="doccomment">/// [`Coproduct::subset`]. Please see that method for more information.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You only need to import this trait when working with generic</span>
-<span class="doccomment">/// Coproducts of unknown type. If you have a Coproduct of known type,</span>
-<span class="doccomment">/// then `co.subset()` should &quot;just work&quot; even without the trait.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Coproduct::subset`]: enum.Coproduct.html#method.subset</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">CoproductSubsetter</span><span class="op">&lt;</span><span class="ident">Targets</span>, <span class="ident">Indices</span><span class="op">&gt;</span>: <span class="ident">Sized</span> {
-    <span class="kw">type</span> <span class="ident">Remainder</span>;
+<span class="doccomment">/// Trait for extracting a subset of the possible types in a coproduct.
+///
+/// This trait is part of the implementation of the inherent method
+/// [`Coproduct::subset`]. Please see that method for more information.
+///
+/// You only need to import this trait when working with generic
+/// Coproducts of unknown type. If you have a Coproduct of known type,
+/// then `co.subset()` should &quot;just work&quot; even without the trait.
+///
+/// [`Coproduct::subset`]: enum.Coproduct.html#method.subset
+</span><span class="kw">pub trait </span>CoproductSubsetter&lt;Targets, Indices&gt;: Sized {
+    <span class="kw">type </span>Remainder;
 
-    <span class="doccomment">/// Extract a subset of the possible types in a coproduct (or get the remaining possibilities)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Please see the [inherent method] for more information.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The only difference between that inherent method and this</span>
-    <span class="doccomment">/// trait method is the location of the type parameters.</span>
-    <span class="doccomment">/// (here, they are on the trait rather than the method)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [inherent method]: enum.Coproduct.html#method.subset</span>
-    <span class="kw">fn</span> <span class="ident">subset</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Targets</span>, <span class="ident"><span class="self">Self</span>::Remainder</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Extract a subset of the possible types in a coproduct (or get the remaining possibilities)
+    ///
+    /// Please see the [inherent method] for more information.
+    ///
+    /// The only difference between that inherent method and this
+    /// trait method is the location of the type parameters.
+    /// (here, they are on the trait rather than the method)
+    ///
+    /// [inherent method]: enum.Coproduct.html#method.subset
+    </span><span class="kw">fn </span>subset(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Targets, <span class="self">Self</span>::Remainder&gt;;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Choices</span>, <span class="ident">THead</span>, <span class="ident">TTail</span>, <span class="ident">NHead</span>, <span class="ident">NTail</span>, <span class="ident">Rem</span><span class="op">&gt;</span>
-    <span class="ident">CoproductSubsetter</span><span class="op">&lt;</span><span class="ident">Coproduct</span><span class="op">&lt;</span><span class="ident">THead</span>, <span class="ident">TTail</span><span class="op">&gt;</span>, <span class="ident">HCons</span><span class="op">&lt;</span><span class="ident">NHead</span>, <span class="ident">NTail</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Choices</span>
-<span class="kw">where</span>
-    <span class="self">Self</span>: <span class="ident">CoprodUninjector</span><span class="op">&lt;</span><span class="ident">THead</span>, <span class="ident">NHead</span>, <span class="ident">Remainder</span> <span class="op">=</span> <span class="ident">Rem</span><span class="op">&gt;</span>,
-    <span class="ident">Rem</span>: <span class="ident">CoproductSubsetter</span><span class="op">&lt;</span><span class="ident">TTail</span>, <span class="ident">NTail</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;Choices, THead, TTail, NHead, NTail, Rem&gt;
+    CoproductSubsetter&lt;Coproduct&lt;THead, TTail&gt;, HCons&lt;NHead, NTail&gt;&gt; <span class="kw">for </span>Choices
+<span class="kw">where
+    </span><span class="self">Self</span>: CoprodUninjector&lt;THead, NHead, Remainder = Rem&gt;,
+    Rem: CoproductSubsetter&lt;TTail, NTail&gt;,
 {
-    <span class="kw">type</span> <span class="ident">Remainder</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">Rem</span> <span class="kw">as</span> <span class="ident">CoproductSubsetter</span><span class="op">&lt;</span><span class="ident">TTail</span>, <span class="ident">NTail</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="ident">::Remainder</span>;
+    <span class="kw">type </span>Remainder = &lt;Rem <span class="kw">as </span>CoproductSubsetter&lt;TTail, NTail&gt;&gt;::Remainder;
 
-    <span class="doccomment">/// Attempt to extract a value from a subset of the types.</span>
-    <span class="kw">fn</span> <span class="ident">subset</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Coproduct</span><span class="op">&lt;</span><span class="ident">THead</span>, <span class="ident">TTail</span><span class="op">&gt;</span>, <span class="ident"><span class="self">Self</span>::Remainder</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">uninject</span>() {
-            <span class="prelude-val">Ok</span>(<span class="ident">good</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Coproduct::Inl</span>(<span class="ident">good</span>)),
-            <span class="prelude-val">Err</span>(<span class="ident">bads</span>) =&gt; <span class="kw">match</span> <span class="ident">bads</span>.<span class="ident">subset</span>() {
-                <span class="prelude-val">Ok</span>(<span class="ident">goods</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Coproduct::Inr</span>(<span class="ident">goods</span>)),
-                <span class="prelude-val">Err</span>(<span class="ident">bads</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">bads</span>),
+    <span class="doccomment">/// Attempt to extract a value from a subset of the types.
+    </span><span class="kw">fn </span>subset(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Coproduct&lt;THead, TTail&gt;, <span class="self">Self</span>::Remainder&gt; {
+        <span class="kw">match </span><span class="self">self</span>.uninject() {
+            <span class="prelude-val">Ok</span>(good) =&gt; <span class="prelude-val">Ok</span>(Coproduct::Inl(good)),
+            <span class="prelude-val">Err</span>(bads) =&gt; <span class="kw">match </span>bads.subset() {
+                <span class="prelude-val">Ok</span>(goods) =&gt; <span class="prelude-val">Ok</span>(Coproduct::Inr(goods)),
+                <span class="prelude-val">Err</span>(bads) =&gt; <span class="prelude-val">Err</span>(bads),
             },
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Choices</span><span class="op">&gt;</span> <span class="ident">CoproductSubsetter</span><span class="op">&lt;</span><span class="ident">CNil</span>, <span class="ident">HNil</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Choices</span> {
-    <span class="kw">type</span> <span class="ident">Remainder</span> <span class="op">=</span> <span class="self">Self</span>;
+<span class="kw">impl</span>&lt;Choices&gt; CoproductSubsetter&lt;CNil, HNil&gt; <span class="kw">for </span>Choices {
+    <span class="kw">type </span>Remainder = <span class="self">Self</span>;
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">subset</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CNil</span>, <span class="ident"><span class="self">Self</span>::Remainder</span><span class="op">&gt;</span> {
+    <span class="attribute">#[inline(always)]
+    </span><span class="kw">fn </span>subset(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;CNil, <span class="self">Self</span>::Remainder&gt; {
         <span class="prelude-val">Err</span>(<span class="self">self</span>)
     }
 }
 
-<span class="doccomment">/// Trait for converting a coproduct into another that can hold its variants.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This trait is part of the implementation of the inherent method</span>
-<span class="doccomment">/// [`Coproduct::embed`]. Please see that method for more information.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// You only need to import this trait when working with generic</span>
-<span class="doccomment">/// Coproducts of unknown type. If you have a Coproduct of known type,</span>
-<span class="doccomment">/// then `co.embed()` should &quot;just work&quot; even without the trait.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Coproduct::embed`]: enum.Coproduct.html#method.embed</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">CoproductEmbedder</span><span class="op">&lt;</span><span class="ident">Out</span>, <span class="ident">Indices</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Convert a coproduct into another that can hold its variants.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Please see the [inherent method] for more information.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The only difference between that inherent method and this</span>
-    <span class="doccomment">/// trait method is the location of the type parameters.</span>
-    <span class="doccomment">/// (here, they are on the trait rather than the method)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [inherent method]: enum.Coproduct.html#method.embed</span>
-    <span class="kw">fn</span> <span class="ident">embed</span>(<span class="self">self</span>) -&gt; <span class="ident">Out</span>;
+<span class="doccomment">/// Trait for converting a coproduct into another that can hold its variants.
+///
+/// This trait is part of the implementation of the inherent method
+/// [`Coproduct::embed`]. Please see that method for more information.
+///
+/// You only need to import this trait when working with generic
+/// Coproducts of unknown type. If you have a Coproduct of known type,
+/// then `co.embed()` should &quot;just work&quot; even without the trait.
+///
+/// [`Coproduct::embed`]: enum.Coproduct.html#method.embed
+</span><span class="kw">pub trait </span>CoproductEmbedder&lt;Out, Indices&gt; {
+    <span class="doccomment">/// Convert a coproduct into another that can hold its variants.
+    ///
+    /// Please see the [inherent method] for more information.
+    ///
+    /// The only difference between that inherent method and this
+    /// trait method is the location of the type parameters.
+    /// (here, they are on the trait rather than the method)
+    ///
+    /// [inherent method]: enum.Coproduct.html#method.embed
+    </span><span class="kw">fn </span>embed(<span class="self">self</span>) -&gt; Out;
 }
 
-<span class="kw">impl</span> <span class="ident">CoproductEmbedder</span><span class="op">&lt;</span><span class="ident">CNil</span>, <span class="ident">HNil</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CNil</span> {
-    <span class="kw">fn</span> <span class="ident">embed</span>(<span class="self">self</span>) -&gt; <span class="ident">CNil</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-        <span class="comment">// impossible!</span>
-    }
+<span class="kw">impl </span>CoproductEmbedder&lt;CNil, HNil&gt; <span class="kw">for </span>CNil {
+    <span class="kw">fn </span>embed(<span class="self">self</span>) -&gt; CNil {
+        <span class="kw">match </span><span class="self">self </span>{
+        <span class="comment">// impossible!
+    </span>}
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Head</span>, <span class="ident">Tail</span><span class="op">&gt;</span> <span class="ident">CoproductEmbedder</span><span class="op">&lt;</span><span class="ident">Coproduct</span><span class="op">&lt;</span><span class="ident">Head</span>, <span class="ident">Tail</span><span class="op">&gt;</span>, <span class="ident">HNil</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">CNil</span>
-<span class="kw">where</span>
-    <span class="ident">CNil</span>: <span class="ident">CoproductEmbedder</span><span class="op">&lt;</span><span class="ident">Tail</span>, <span class="ident">HNil</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;Head, Tail&gt; CoproductEmbedder&lt;Coproduct&lt;Head, Tail&gt;, HNil&gt; <span class="kw">for </span>CNil
+<span class="kw">where
+    </span>CNil: CoproductEmbedder&lt;Tail, HNil&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">embed</span>(<span class="self">self</span>) -&gt; <span class="ident">Coproduct</span><span class="op">&lt;</span><span class="ident">Head</span>, <span class="ident">Tail</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-        <span class="comment">// impossible!</span>
-    }
+    <span class="kw">fn </span>embed(<span class="self">self</span>) -&gt; Coproduct&lt;Head, Tail&gt; {
+        <span class="kw">match </span><span class="self">self </span>{
+        <span class="comment">// impossible!
+    </span>}
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">Head</span>, <span class="ident">Tail</span>, <span class="ident">Out</span>, <span class="ident">NHead</span>, <span class="ident">NTail</span><span class="op">&gt;</span> <span class="ident">CoproductEmbedder</span><span class="op">&lt;</span><span class="ident">Out</span>, <span class="ident">HCons</span><span class="op">&lt;</span><span class="ident">NHead</span>, <span class="ident">NTail</span><span class="op">&gt;</span><span class="op">&gt;</span>
-    <span class="kw">for</span> <span class="ident">Coproduct</span><span class="op">&lt;</span><span class="ident">Head</span>, <span class="ident">Tail</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">Out</span>: <span class="ident">CoprodInjector</span><span class="op">&lt;</span><span class="ident">Head</span>, <span class="ident">NHead</span><span class="op">&gt;</span>,
-    <span class="ident">Tail</span>: <span class="ident">CoproductEmbedder</span><span class="op">&lt;</span><span class="ident">Out</span>, <span class="ident">NTail</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;Head, Tail, Out, NHead, NTail&gt; CoproductEmbedder&lt;Out, HCons&lt;NHead, NTail&gt;&gt;
+    <span class="kw">for </span>Coproduct&lt;Head, Tail&gt;
+<span class="kw">where
+    </span>Out: CoprodInjector&lt;Head, NHead&gt;,
+    Tail: CoproductEmbedder&lt;Out, NTail&gt;,
 {
-    <span class="kw">fn</span> <span class="ident">embed</span>(<span class="self">self</span>) -&gt; <span class="ident">Out</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Coproduct::Inl</span>(<span class="ident">this</span>) =&gt; <span class="ident">Out::inject</span>(<span class="ident">this</span>),
-            <span class="ident">Coproduct::Inr</span>(<span class="ident">those</span>) =&gt; <span class="ident">those</span>.<span class="ident">embed</span>(),
+    <span class="kw">fn </span>embed(<span class="self">self</span>) -&gt; Out {
+        <span class="kw">match </span><span class="self">self </span>{
+            Coproduct::Inl(this) =&gt; Out::inject(this),
+            Coproduct::Inr(those) =&gt; those.embed(),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Coproduct</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">super</span>::Coproduct::<span class="kw-2">*</span>;
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_coproduct_inject</span>() {
-        <span class="kw">type</span> <span class="ident">I32StrBool</span> <span class="op">=</span> <span class="macro">Coprod!</span>(<span class="ident">i32</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">bool</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_coproduct_inject() {
+        <span class="kw">type </span>I32StrBool = <span class="macro">Coprod!</span>(i32, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, bool);
 
-        <span class="kw">let</span> <span class="ident">co1</span> <span class="op">=</span> <span class="ident">I32StrBool::inject</span>(<span class="number">3</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">co1</span>, <span class="ident">Inl</span>(<span class="number">3</span>));
-        <span class="kw">let</span> <span class="ident">get_from_1a</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">co1</span>.<span class="ident">get</span>();
-        <span class="kw">let</span> <span class="ident">get_from_1b</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">co1</span>.<span class="ident">get</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">get_from_1a</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">3</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">get_from_1b</span>, <span class="prelude-val">None</span>);
+        <span class="kw">let </span>co1 = I32StrBool::inject(<span class="number">3</span>);
+        <span class="macro">assert_eq!</span>(co1, Inl(<span class="number">3</span>));
+        <span class="kw">let </span>get_from_1a: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>i32&gt; = co1.get();
+        <span class="kw">let </span>get_from_1b: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>bool&gt; = co1.get();
+        <span class="macro">assert_eq!</span>(get_from_1a, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">3</span>));
+        <span class="macro">assert_eq!</span>(get_from_1b, <span class="prelude-val">None</span>);
 
-        <span class="kw">let</span> <span class="ident">co2</span> <span class="op">=</span> <span class="ident">I32StrBool::inject</span>(<span class="bool-val">false</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">co2</span>, <span class="ident">Inr</span>(<span class="ident">Inr</span>(<span class="ident">Inl</span>(<span class="bool-val">false</span>))));
-        <span class="kw">let</span> <span class="ident">get_from_2a</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">co2</span>.<span class="ident">get</span>();
-        <span class="kw">let</span> <span class="ident">get_from_2b</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">co2</span>.<span class="ident">get</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">get_from_2a</span>, <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">get_from_2b</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="bool-val">false</span>));
+        <span class="kw">let </span>co2 = I32StrBool::inject(<span class="bool-val">false</span>);
+        <span class="macro">assert_eq!</span>(co2, Inr(Inr(Inl(<span class="bool-val">false</span>))));
+        <span class="kw">let </span>get_from_2a: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>i32&gt; = co2.get();
+        <span class="kw">let </span>get_from_2b: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>bool&gt; = co2.get();
+        <span class="macro">assert_eq!</span>(get_from_2a, <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(get_from_2b, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="bool-val">false</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">test_coproduct_fold_consuming</span>() {
-        <span class="kw">type</span> <span class="ident">I32F32StrBool</span> <span class="op">=</span> <span class="macro">Coprod!</span>(<span class="ident">i32</span>, <span class="ident">f32</span>, <span class="ident">bool</span>);
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+    </span><span class="kw">fn </span>test_coproduct_fold_consuming() {
+        <span class="kw">type </span>I32F32StrBool = <span class="macro">Coprod!</span>(i32, f32, bool);
 
-        <span class="kw">let</span> <span class="ident">co1</span> <span class="op">=</span> <span class="ident">I32F32StrBool::inject</span>(<span class="number">3</span>);
-        <span class="kw">let</span> <span class="ident">folded</span> <span class="op">=</span> <span class="ident">co1</span>.<span class="ident">fold</span>(<span class="macro">hlist!</span>[
-            <span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;int {}&quot;</span>, <span class="ident">i</span>),
-            <span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;float {}&quot;</span>, <span class="ident">f</span>),
-            <span class="op">|</span><span class="ident">b</span><span class="op">|</span> (<span class="kw">if</span> <span class="ident">b</span> { <span class="string">&quot;t&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;f&quot;</span> }).<span class="ident">to_string</span>(),
+        <span class="kw">let </span>co1 = I32F32StrBool::inject(<span class="number">3</span>);
+        <span class="kw">let </span>folded = co1.fold(<span class="macro">hlist!</span>[
+            |i| <span class="macro">format!</span>(<span class="string">&quot;int {}&quot;</span>, i),
+            |f| <span class="macro">format!</span>(<span class="string">&quot;float {}&quot;</span>, f),
+            |b| (<span class="kw">if </span>b { <span class="string">&quot;t&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;f&quot; </span>}).to_string(),
         ]);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">folded</span>, <span class="string">&quot;int 3&quot;</span>.<span class="ident">to_string</span>());
+        <span class="macro">assert_eq!</span>(folded, <span class="string">&quot;int 3&quot;</span>.to_string());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_coproduct_poly_fold_consuming</span>() {
-        <span class="kw">type</span> <span class="ident">I32F32StrBool</span> <span class="op">=</span> <span class="macro">Coprod!</span>(<span class="ident">i32</span>, <span class="ident">f32</span>, <span class="ident">bool</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_coproduct_poly_fold_consuming() {
+        <span class="kw">type </span>I32F32StrBool = <span class="macro">Coprod!</span>(i32, f32, bool);
 
-        <span class="kw">impl</span> <span class="ident">Func</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">P</span> {
-            <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">bool</span>;
-            <span class="kw">fn</span> <span class="ident">call</span>(<span class="ident">args</span>: <span class="ident">i32</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-                <span class="ident">args</span> <span class="op">&gt;</span> <span class="number">100</span>
+        <span class="kw">impl </span>Func&lt;i32&gt; <span class="kw">for </span>P {
+            <span class="kw">type </span>Output = bool;
+            <span class="kw">fn </span>call(args: i32) -&gt; <span class="self">Self</span>::Output {
+                args &gt; <span class="number">100
+            </span>}
+        }
+        <span class="kw">impl </span>Func&lt;bool&gt; <span class="kw">for </span>P {
+            <span class="kw">type </span>Output = bool;
+            <span class="kw">fn </span>call(args: bool) -&gt; <span class="self">Self</span>::Output {
+                args
             }
         }
-        <span class="kw">impl</span> <span class="ident">Func</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">P</span> {
-            <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">bool</span>;
-            <span class="kw">fn</span> <span class="ident">call</span>(<span class="ident">args</span>: <span class="ident">bool</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-                <span class="ident">args</span>
-            }
+        <span class="kw">impl </span>Func&lt;f32&gt; <span class="kw">for </span>P {
+            <span class="kw">type </span>Output = bool;
+            <span class="kw">fn </span>call(args: f32) -&gt; <span class="self">Self</span>::Output {
+                args &gt; <span class="number">9000f32
+            </span>}
         }
-        <span class="kw">impl</span> <span class="ident">Func</span><span class="op">&lt;</span><span class="ident">f32</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">P</span> {
-            <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">bool</span>;
-            <span class="kw">fn</span> <span class="ident">call</span>(<span class="ident">args</span>: <span class="ident">f32</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-                <span class="ident">args</span> <span class="op">&gt;</span> <span class="number">9000f32</span>
-            }
-        }
-        <span class="kw">struct</span> <span class="ident">P</span>;
+        <span class="kw">struct </span>P;
 
-        <span class="kw">let</span> <span class="ident">co1</span> <span class="op">=</span> <span class="ident">I32F32StrBool::inject</span>(<span class="number">3</span>);
-        <span class="kw">let</span> <span class="ident">folded</span> <span class="op">=</span> <span class="ident">co1</span>.<span class="ident">fold</span>(<span class="ident">Poly</span>(<span class="ident">P</span>));
+        <span class="kw">let </span>co1 = I32F32StrBool::inject(<span class="number">3</span>);
+        <span class="kw">let </span>folded = co1.fold(Poly(P));
 
-        <span class="macro">assert_eq!</span>(<span class="ident">folded</span>, <span class="bool-val">false</span>);
+        <span class="macro">assert_eq!</span>(folded, <span class="bool-val">false</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">test_coproduct_fold_non_consuming</span>() {
-        <span class="kw">type</span> <span class="ident">I32F32Bool</span> <span class="op">=</span> <span class="macro">Coprod!</span>(<span class="ident">i32</span>, <span class="ident">f32</span>, <span class="ident">bool</span>);
+    <span class="attribute">#[test]
+    #[cfg(feature = <span class="string">&quot;std&quot;</span>)]
+    </span><span class="kw">fn </span>test_coproduct_fold_non_consuming() {
+        <span class="kw">type </span>I32F32Bool = <span class="macro">Coprod!</span>(i32, f32, bool);
 
-        <span class="kw">let</span> <span class="ident">co1</span> <span class="op">=</span> <span class="ident">I32F32Bool::inject</span>(<span class="number">3</span>);
-        <span class="kw">let</span> <span class="ident">co2</span> <span class="op">=</span> <span class="ident">I32F32Bool::inject</span>(<span class="bool-val">true</span>);
-        <span class="kw">let</span> <span class="ident">co3</span> <span class="op">=</span> <span class="ident">I32F32Bool::inject</span>(<span class="number">42f32</span>);
+        <span class="kw">let </span>co1 = I32F32Bool::inject(<span class="number">3</span>);
+        <span class="kw">let </span>co2 = I32F32Bool::inject(<span class="bool-val">true</span>);
+        <span class="kw">let </span>co3 = I32F32Bool::inject(<span class="number">42f32</span>);
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">co1</span>.<span class="ident">to_ref</span>().<span class="ident">fold</span>(<span class="macro">hlist!</span>[
-                <span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">i</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;int {}&quot;</span>, <span class="ident">i</span>),
-                <span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">f</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;float {}&quot;</span>, <span class="ident">f</span>),
-                <span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">b</span><span class="op">|</span> (<span class="kw">if</span> <span class="ident">b</span> { <span class="string">&quot;t&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;f&quot;</span> }).<span class="ident">to_string</span>(),
+            co1.to_ref().fold(<span class="macro">hlist!</span>[
+                |<span class="kw-2">&amp;</span>i| <span class="macro">format!</span>(<span class="string">&quot;int {}&quot;</span>, i),
+                |<span class="kw-2">&amp;</span>f| <span class="macro">format!</span>(<span class="string">&quot;float {}&quot;</span>, f),
+                |<span class="kw-2">&amp;</span>b| (<span class="kw">if </span>b { <span class="string">&quot;t&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;f&quot; </span>}).to_string(),
             ]),
-            <span class="string">&quot;int 3&quot;</span>.<span class="ident">to_string</span>()
+            <span class="string">&quot;int 3&quot;</span>.to_string()
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">co2</span>.<span class="ident">to_ref</span>().<span class="ident">fold</span>(<span class="macro">hlist!</span>[
-                <span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">i</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;int {}&quot;</span>, <span class="ident">i</span>),
-                <span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">f</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;float {}&quot;</span>, <span class="ident">f</span>),
-                <span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">b</span><span class="op">|</span> (<span class="kw">if</span> <span class="ident">b</span> { <span class="string">&quot;t&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;f&quot;</span> }).<span class="ident">to_string</span>(),
+            co2.to_ref().fold(<span class="macro">hlist!</span>[
+                |<span class="kw-2">&amp;</span>i| <span class="macro">format!</span>(<span class="string">&quot;int {}&quot;</span>, i),
+                |<span class="kw-2">&amp;</span>f| <span class="macro">format!</span>(<span class="string">&quot;float {}&quot;</span>, f),
+                |<span class="kw-2">&amp;</span>b| (<span class="kw">if </span>b { <span class="string">&quot;t&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;f&quot; </span>}).to_string(),
             ]),
-            <span class="string">&quot;t&quot;</span>.<span class="ident">to_string</span>()
+            <span class="string">&quot;t&quot;</span>.to_string()
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">co3</span>.<span class="ident">to_ref</span>().<span class="ident">fold</span>(<span class="macro">hlist!</span>[
-                <span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">i</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;int {}&quot;</span>, <span class="ident">i</span>),
-                <span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">f</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;float {}&quot;</span>, <span class="ident">f</span>),
-                <span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">b</span><span class="op">|</span> (<span class="kw">if</span> <span class="ident">b</span> { <span class="string">&quot;t&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;f&quot;</span> }).<span class="ident">to_string</span>(),
+            co3.to_ref().fold(<span class="macro">hlist!</span>[
+                |<span class="kw-2">&amp;</span>i| <span class="macro">format!</span>(<span class="string">&quot;int {}&quot;</span>, i),
+                |<span class="kw-2">&amp;</span>f| <span class="macro">format!</span>(<span class="string">&quot;float {}&quot;</span>, f),
+                |<span class="kw-2">&amp;</span>b| (<span class="kw">if </span>b { <span class="string">&quot;t&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;f&quot; </span>}).to_string(),
             ]),
-            <span class="string">&quot;float 42&quot;</span>.<span class="ident">to_string</span>()
+            <span class="string">&quot;float 42&quot;</span>.to_string()
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_coproduct_uninject</span>() {
-        <span class="kw">type</span> <span class="ident">I32StrBool</span> <span class="op">=</span> <span class="macro">Coprod!</span>(<span class="ident">i32</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">bool</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_coproduct_uninject() {
+        <span class="kw">type </span>I32StrBool = <span class="macro">Coprod!</span>(i32, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, bool);
 
-        <span class="kw">let</span> <span class="ident">co1</span> <span class="op">=</span> <span class="ident">I32StrBool::inject</span>(<span class="number">3</span>);
-        <span class="kw">let</span> <span class="ident">co2</span> <span class="op">=</span> <span class="ident">I32StrBool::inject</span>(<span class="string">&quot;hello&quot;</span>);
-        <span class="kw">let</span> <span class="ident">co3</span> <span class="op">=</span> <span class="ident">I32StrBool::inject</span>(<span class="bool-val">false</span>);
+        <span class="kw">let </span>co1 = I32StrBool::inject(<span class="number">3</span>);
+        <span class="kw">let </span>co2 = I32StrBool::inject(<span class="string">&quot;hello&quot;</span>);
+        <span class="kw">let </span>co3 = I32StrBool::inject(<span class="bool-val">false</span>);
 
-        <span class="kw">let</span> <span class="ident">uninject_i32_co1</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i32</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">co1</span>.<span class="ident">uninject</span>();
-        <span class="kw">let</span> <span class="ident">uninject_str_co1</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">co1</span>.<span class="ident">uninject</span>();
-        <span class="kw">let</span> <span class="ident">uninject_bool_co1</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">co1</span>.<span class="ident">uninject</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">uninject_i32_co1</span>, <span class="prelude-val">Ok</span>(<span class="number">3</span>));
-        <span class="macro">assert!</span>(<span class="ident">uninject_str_co1</span>.<span class="ident">is_err</span>());
-        <span class="macro">assert!</span>(<span class="ident">uninject_bool_co1</span>.<span class="ident">is_err</span>());
+        <span class="kw">let </span>uninject_i32_co1: <span class="prelude-ty">Result</span>&lt;i32, <span class="kw">_</span>&gt; = co1.uninject();
+        <span class="kw">let </span>uninject_str_co1: <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, <span class="kw">_</span>&gt; = co1.uninject();
+        <span class="kw">let </span>uninject_bool_co1: <span class="prelude-ty">Result</span>&lt;bool, <span class="kw">_</span>&gt; = co1.uninject();
+        <span class="macro">assert_eq!</span>(uninject_i32_co1, <span class="prelude-val">Ok</span>(<span class="number">3</span>));
+        <span class="macro">assert!</span>(uninject_str_co1.is_err());
+        <span class="macro">assert!</span>(uninject_bool_co1.is_err());
 
-        <span class="kw">let</span> <span class="ident">uninject_i32_co2</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i32</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">co2</span>.<span class="ident">uninject</span>();
-        <span class="kw">let</span> <span class="ident">uninject_str_co2</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">co2</span>.<span class="ident">uninject</span>();
-        <span class="kw">let</span> <span class="ident">uninject_bool_co2</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">co2</span>.<span class="ident">uninject</span>();
-        <span class="macro">assert!</span>(<span class="ident">uninject_i32_co2</span>.<span class="ident">is_err</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">uninject_str_co2</span>, <span class="prelude-val">Ok</span>(<span class="string">&quot;hello&quot;</span>));
-        <span class="macro">assert!</span>(<span class="ident">uninject_bool_co2</span>.<span class="ident">is_err</span>());
+        <span class="kw">let </span>uninject_i32_co2: <span class="prelude-ty">Result</span>&lt;i32, <span class="kw">_</span>&gt; = co2.uninject();
+        <span class="kw">let </span>uninject_str_co2: <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, <span class="kw">_</span>&gt; = co2.uninject();
+        <span class="kw">let </span>uninject_bool_co2: <span class="prelude-ty">Result</span>&lt;bool, <span class="kw">_</span>&gt; = co2.uninject();
+        <span class="macro">assert!</span>(uninject_i32_co2.is_err());
+        <span class="macro">assert_eq!</span>(uninject_str_co2, <span class="prelude-val">Ok</span>(<span class="string">&quot;hello&quot;</span>));
+        <span class="macro">assert!</span>(uninject_bool_co2.is_err());
 
-        <span class="kw">let</span> <span class="ident">uninject_i32_co3</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">i32</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">co3</span>.<span class="ident">uninject</span>();
-        <span class="kw">let</span> <span class="ident">uninject_str_co3</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">co3</span>.<span class="ident">uninject</span>();
-        <span class="kw">let</span> <span class="ident">uninject_bool_co3</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">co3</span>.<span class="ident">uninject</span>();
-        <span class="macro">assert!</span>(<span class="ident">uninject_i32_co3</span>.<span class="ident">is_err</span>());
-        <span class="macro">assert!</span>(<span class="ident">uninject_str_co3</span>.<span class="ident">is_err</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">uninject_bool_co3</span>, <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>));
+        <span class="kw">let </span>uninject_i32_co3: <span class="prelude-ty">Result</span>&lt;i32, <span class="kw">_</span>&gt; = co3.uninject();
+        <span class="kw">let </span>uninject_str_co3: <span class="prelude-ty">Result</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, <span class="kw">_</span>&gt; = co3.uninject();
+        <span class="kw">let </span>uninject_bool_co3: <span class="prelude-ty">Result</span>&lt;bool, <span class="kw">_</span>&gt; = co3.uninject();
+        <span class="macro">assert!</span>(uninject_i32_co3.is_err());
+        <span class="macro">assert!</span>(uninject_str_co3.is_err());
+        <span class="macro">assert_eq!</span>(uninject_bool_co3, <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_coproduct_subset</span>() {
-        <span class="kw">type</span> <span class="ident">I32StrBool</span> <span class="op">=</span> <span class="macro">Coprod!</span>(<span class="ident">i32</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">bool</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_coproduct_subset() {
+        <span class="kw">type </span>I32StrBool = <span class="macro">Coprod!</span>(i32, <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, bool);
 
-        <span class="comment">// CNil can be extracted from anything.</span>
-        <span class="kw">let</span> <span class="ident">res</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CNil</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">I32StrBool::inject</span>(<span class="number">3</span>).<span class="ident">subset</span>();
-        <span class="macro">assert!</span>(<span class="ident">res</span>.<span class="ident">is_err</span>());
+        <span class="comment">// CNil can be extracted from anything.
+        </span><span class="kw">let </span>res: <span class="prelude-ty">Result</span>&lt;CNil, <span class="kw">_</span>&gt; = I32StrBool::inject(<span class="number">3</span>).subset();
+        <span class="macro">assert!</span>(res.is_err());
 
-        <span class="kw">if</span> <span class="bool-val">false</span> {
-            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unreachable_code</span>)]</span>
-            {
-                <span class="comment">// ...including CNil.</span>
-                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
-                <span class="kw">let</span> <span class="ident">cnil</span>: <span class="ident">CNil</span> <span class="op">=</span> <span class="macro">panic!</span>();
-                <span class="kw">let</span> <span class="ident">res</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CNil</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">cnil</span>.<span class="ident">subset</span>();
-                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">res</span>;
+        <span class="kw">if </span><span class="bool-val">false </span>{
+            <span class="attribute">#[allow(unreachable_code)]
+            </span>{
+                <span class="comment">// ...including CNil.
+                </span><span class="attribute">#[allow(unused)]
+                </span><span class="kw">let </span>cnil: CNil = <span class="macro">panic!</span>();
+                <span class="kw">let </span>res: <span class="prelude-ty">Result</span>&lt;CNil, <span class="kw">_</span>&gt; = cnil.subset();
+                <span class="kw">let _ </span>= res;
             }
         }
 
         {
-            <span class="comment">// Order does not matter.</span>
-            <span class="kw">let</span> <span class="ident">co</span> <span class="op">=</span> <span class="ident">I32StrBool::inject</span>(<span class="number">3</span>);
-            <span class="kw">let</span> <span class="ident">res</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="macro">Coprod!</span>(<span class="ident">bool</span>, <span class="ident">i32</span>), <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">co</span>.<span class="ident">subset</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">res</span>, <span class="prelude-val">Ok</span>(<span class="ident">Coproduct::Inr</span>(<span class="ident">Coproduct::Inl</span>(<span class="number">3</span>))));
+            <span class="comment">// Order does not matter.
+            </span><span class="kw">let </span>co = I32StrBool::inject(<span class="number">3</span>);
+            <span class="kw">let </span>res: <span class="prelude-ty">Result</span>&lt;<span class="macro">Coprod!</span>(bool, i32), <span class="kw">_</span>&gt; = co.subset();
+            <span class="macro">assert_eq!</span>(res, <span class="prelude-val">Ok</span>(Coproduct::Inr(Coproduct::Inl(<span class="number">3</span>))));
 
-            <span class="kw">let</span> <span class="ident">co</span> <span class="op">=</span> <span class="ident">I32StrBool::inject</span>(<span class="string">&quot;4&quot;</span>);
-            <span class="kw">let</span> <span class="ident">res</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="macro">Coprod!</span>(<span class="ident">bool</span>, <span class="ident">i32</span>), <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">co</span>.<span class="ident">subset</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">res</span>, <span class="prelude-val">Err</span>(<span class="ident">Coproduct::Inl</span>(<span class="string">&quot;4&quot;</span>)));
+            <span class="kw">let </span>co = I32StrBool::inject(<span class="string">&quot;4&quot;</span>);
+            <span class="kw">let </span>res: <span class="prelude-ty">Result</span>&lt;<span class="macro">Coprod!</span>(bool, i32), <span class="kw">_</span>&gt; = co.subset();
+            <span class="macro">assert_eq!</span>(res, <span class="prelude-val">Err</span>(Coproduct::Inl(<span class="string">&quot;4&quot;</span>)));
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_coproduct_embed</span>() {
-        <span class="comment">// CNil can be embedded into any coproduct.</span>
-        <span class="kw">if</span> <span class="bool-val">false</span> {
-            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unreachable_code</span>)]</span>
-            {
-                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
-                <span class="kw">let</span> <span class="ident">cnil</span>: <span class="ident">CNil</span> <span class="op">=</span> <span class="macro">panic!</span>();
-                <span class="kw">let</span> <span class="kw">_</span>: <span class="ident">CNil</span> <span class="op">=</span> <span class="ident">cnil</span>.<span class="ident">embed</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_coproduct_embed() {
+        <span class="comment">// CNil can be embedded into any coproduct.
+        </span><span class="kw">if </span><span class="bool-val">false </span>{
+            <span class="attribute">#[allow(unreachable_code)]
+            </span>{
+                <span class="attribute">#[allow(unused)]
+                </span><span class="kw">let </span>cnil: CNil = <span class="macro">panic!</span>();
+                <span class="kw">let _</span>: CNil = cnil.embed();
 
-                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
-                <span class="kw">let</span> <span class="ident">cnil</span>: <span class="ident">CNil</span> <span class="op">=</span> <span class="macro">panic!</span>();
-                <span class="kw">let</span> <span class="kw">_</span>: <span class="macro">Coprod!</span>(<span class="ident">i32</span>, <span class="ident">bool</span>) <span class="op">=</span> <span class="ident">cnil</span>.<span class="ident">embed</span>();
+                <span class="attribute">#[allow(unused)]
+                </span><span class="kw">let </span>cnil: CNil = <span class="macro">panic!</span>();
+                <span class="kw">let _</span>: <span class="macro">Coprod!</span>(i32, bool) = cnil.embed();
             }
         }
 
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">A</span>;
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">B</span>;
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-        <span class="kw">struct</span> <span class="ident">C</span>;
+        <span class="attribute">#[derive(Debug, PartialEq)]
+        </span><span class="kw">struct </span>A;
+        <span class="attribute">#[derive(Debug, PartialEq)]
+        </span><span class="kw">struct </span>B;
+        <span class="attribute">#[derive(Debug, PartialEq)]
+        </span><span class="kw">struct </span>C;
 
         {
-            <span class="comment">// Order does not matter.</span>
-            <span class="kw">let</span> <span class="ident">co_a</span> <span class="op">=</span> <span class="op">&lt;</span><span class="macro">Coprod!</span>(<span class="ident">C</span>, <span class="ident">A</span>, <span class="ident">B</span>)<span class="op">&gt;</span><span class="ident">::inject</span>(<span class="ident">A</span>);
-            <span class="kw">let</span> <span class="ident">co_b</span> <span class="op">=</span> <span class="op">&lt;</span><span class="macro">Coprod!</span>(<span class="ident">C</span>, <span class="ident">A</span>, <span class="ident">B</span>)<span class="op">&gt;</span><span class="ident">::inject</span>(<span class="ident">B</span>);
-            <span class="kw">let</span> <span class="ident">co_c</span> <span class="op">=</span> <span class="op">&lt;</span><span class="macro">Coprod!</span>(<span class="ident">C</span>, <span class="ident">A</span>, <span class="ident">B</span>)<span class="op">&gt;</span><span class="ident">::inject</span>(<span class="ident">C</span>);
-            <span class="kw">let</span> <span class="ident">out_a</span>: <span class="macro">Coprod!</span>(<span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>) <span class="op">=</span> <span class="ident">co_a</span>.<span class="ident">embed</span>();
-            <span class="kw">let</span> <span class="ident">out_b</span>: <span class="macro">Coprod!</span>(<span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>) <span class="op">=</span> <span class="ident">co_b</span>.<span class="ident">embed</span>();
-            <span class="kw">let</span> <span class="ident">out_c</span>: <span class="macro">Coprod!</span>(<span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>) <span class="op">=</span> <span class="ident">co_c</span>.<span class="ident">embed</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">out_a</span>, <span class="ident">Coproduct::Inl</span>(<span class="ident">A</span>));
-            <span class="macro">assert_eq!</span>(<span class="ident">out_b</span>, <span class="ident">Coproduct::Inr</span>(<span class="ident">Coproduct::Inl</span>(<span class="ident">B</span>)));
-            <span class="macro">assert_eq!</span>(<span class="ident">out_c</span>, <span class="ident">Coproduct::Inr</span>(<span class="ident">Coproduct::Inr</span>(<span class="ident">Coproduct::Inl</span>(<span class="ident">C</span>))));
+            <span class="comment">// Order does not matter.
+            </span><span class="kw">let </span>co_a = &lt;<span class="macro">Coprod!</span>(C, A, B)&gt;::inject(A);
+            <span class="kw">let </span>co_b = &lt;<span class="macro">Coprod!</span>(C, A, B)&gt;::inject(B);
+            <span class="kw">let </span>co_c = &lt;<span class="macro">Coprod!</span>(C, A, B)&gt;::inject(C);
+            <span class="kw">let </span>out_a: <span class="macro">Coprod!</span>(A, B, C) = co_a.embed();
+            <span class="kw">let </span>out_b: <span class="macro">Coprod!</span>(A, B, C) = co_b.embed();
+            <span class="kw">let </span>out_c: <span class="macro">Coprod!</span>(A, B, C) = co_c.embed();
+            <span class="macro">assert_eq!</span>(out_a, Coproduct::Inl(A));
+            <span class="macro">assert_eq!</span>(out_b, Coproduct::Inr(Coproduct::Inl(B)));
+            <span class="macro">assert_eq!</span>(out_c, Coproduct::Inr(Coproduct::Inr(Coproduct::Inl(C))));
         }
 
         {
-            <span class="comment">// Multiple variants can resolve to the same output w/o type annotations</span>
-            <span class="kw">type</span> <span class="ident">ABC</span> <span class="op">=</span> <span class="macro">Coprod!</span>(<span class="ident">A</span>, <span class="ident">B</span>, <span class="ident">C</span>);
-            <span class="kw">type</span> <span class="ident">BBB</span> <span class="op">=</span> <span class="macro">Coprod!</span>(<span class="ident">B</span>, <span class="ident">B</span>, <span class="ident">B</span>);
+            <span class="comment">// Multiple variants can resolve to the same output w/o type annotations
+            </span><span class="kw">type </span>ABC = <span class="macro">Coprod!</span>(A, B, C);
+            <span class="kw">type </span>BBB = <span class="macro">Coprod!</span>(B, B, B);
 
-            <span class="kw">let</span> <span class="ident">b1</span> <span class="op">=</span> <span class="ident">BBB::inject</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">Here</span><span class="op">&gt;</span>(<span class="ident">B</span>);
-            <span class="kw">let</span> <span class="ident">b2</span> <span class="op">=</span> <span class="ident">BBB::inject</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">There</span><span class="op">&lt;</span><span class="ident">Here</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">B</span>);
-            <span class="kw">let</span> <span class="ident">out1</span>: <span class="ident">ABC</span> <span class="op">=</span> <span class="ident">b1</span>.<span class="ident">embed</span>();
-            <span class="kw">let</span> <span class="ident">out2</span>: <span class="ident">ABC</span> <span class="op">=</span> <span class="ident">b2</span>.<span class="ident">embed</span>();
-            <span class="macro">assert_eq!</span>(<span class="ident">out1</span>, <span class="ident">Coproduct::Inr</span>(<span class="ident">Coproduct::Inl</span>(<span class="ident">B</span>)));
-            <span class="macro">assert_eq!</span>(<span class="ident">out2</span>, <span class="ident">Coproduct::Inr</span>(<span class="ident">Coproduct::Inl</span>(<span class="ident">B</span>)));
+            <span class="kw">let </span>b1 = BBB::inject::&lt;<span class="kw">_</span>, Here&gt;(B);
+            <span class="kw">let </span>b2 = BBB::inject::&lt;<span class="kw">_</span>, There&lt;Here&gt;&gt;(B);
+            <span class="kw">let </span>out1: ABC = b1.embed();
+            <span class="kw">let </span>out2: ABC = b2.embed();
+            <span class="macro">assert_eq!</span>(out1, Coproduct::Inr(Coproduct::Inl(B)));
+            <span class="macro">assert_eq!</span>(out2, Coproduct::Inr(Coproduct::Inl(B)));
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="frunk_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="frunk_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

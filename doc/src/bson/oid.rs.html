@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.4.0/src/oid.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>oid.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../bson/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bson-2.4.0/src/oid.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>oid.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../bson/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../bson/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -334,341 +334,341 @@
 <span id="334">334</span>
 <span id="335">335</span>
 <span id="336">336</span>
-</pre><pre class="rust"><code><span class="doccomment">//! ObjectId</span>
+</pre><pre class="rust"><code><span class="doccomment">//! ObjectId
 
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">convert::TryInto</span>,
-    <span class="ident">error</span>,
-    <span class="ident">fmt</span>,
-    <span class="ident">result</span>,
-    <span class="ident">str::FromStr</span>,
-    <span class="ident">sync::atomic</span>::{<span class="ident">AtomicUsize</span>, <span class="ident">Ordering</span>},
-    <span class="ident">time::SystemTime</span>,
+</span><span class="kw">use </span>std::{
+    convert::TryInto,
+    error,
+    fmt,
+    result,
+    str::FromStr,
+    sync::atomic::{AtomicUsize, Ordering},
+    time::SystemTime,
 };
 
-<span class="kw">use</span> <span class="ident">hex</span>::{<span class="self">self</span>, <span class="ident">FromHexError</span>};
-<span class="kw">use</span> <span class="ident">rand</span>::{<span class="ident">thread_rng</span>, <span class="ident">Rng</span>};
+<span class="kw">use </span>hex::{<span class="self">self</span>, FromHexError};
+<span class="kw">use </span>rand::{thread_rng, Rng};
 
-<span class="kw">use</span> <span class="ident">lazy_static::lazy_static</span>;
+<span class="kw">use </span>lazy_static::lazy_static;
 
-<span class="kw">const</span> <span class="ident">TIMESTAMP_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">4</span>;
-<span class="kw">const</span> <span class="ident">PROCESS_ID_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">5</span>;
-<span class="kw">const</span> <span class="ident">COUNTER_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">3</span>;
+<span class="kw">const </span>TIMESTAMP_SIZE: usize = <span class="number">4</span>;
+<span class="kw">const </span>PROCESS_ID_SIZE: usize = <span class="number">5</span>;
+<span class="kw">const </span>COUNTER_SIZE: usize = <span class="number">3</span>;
 
-<span class="kw">const</span> <span class="ident">TIMESTAMP_OFFSET</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
-<span class="kw">const</span> <span class="ident">PROCESS_ID_OFFSET</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">TIMESTAMP_OFFSET</span> <span class="op">+</span> <span class="ident">TIMESTAMP_SIZE</span>;
-<span class="kw">const</span> <span class="ident">COUNTER_OFFSET</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">PROCESS_ID_OFFSET</span> <span class="op">+</span> <span class="ident">PROCESS_ID_SIZE</span>;
+<span class="kw">const </span>TIMESTAMP_OFFSET: usize = <span class="number">0</span>;
+<span class="kw">const </span>PROCESS_ID_OFFSET: usize = TIMESTAMP_OFFSET + TIMESTAMP_SIZE;
+<span class="kw">const </span>COUNTER_OFFSET: usize = PROCESS_ID_OFFSET + PROCESS_ID_SIZE;
 
-<span class="kw">const</span> <span class="ident">MAX_U24</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0xFF_FFFF</span>;
+<span class="kw">const </span>MAX_U24: usize = <span class="number">0xFF_FFFF</span>;
 
-<span class="macro">lazy_static!</span> {
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">OID_COUNTER</span>: <span class="ident">AtomicUsize</span> <span class="op">=</span> <span class="ident">AtomicUsize::new</span>(<span class="ident">thread_rng</span>().<span class="ident">gen_range</span>(<span class="number">0</span>..<span class="op">=</span><span class="ident">MAX_U24</span>));
+<span class="macro">lazy_static! </span>{
+    <span class="kw">static </span><span class="kw-2">ref </span>OID_COUNTER: AtomicUsize = AtomicUsize::new(thread_rng().gen_range(<span class="number">0</span>..=MAX_U24));
 }
 
-<span class="doccomment">/// Errors that can occur during [`ObjectId`] construction and generation.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Error</span> {
-    <span class="doccomment">/// An invalid character was found in the provided hex string. Valid characters are: `0...9`,</span>
-    <span class="doccomment">/// `a...f`, or `A...F`.</span>
-    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-    <span class="ident">InvalidHexStringCharacter</span> { <span class="ident">c</span>: <span class="ident">char</span>, <span class="ident">index</span>: <span class="ident">usize</span>, <span class="ident">hex</span>: <span class="ident">String</span> },
+<span class="doccomment">/// Errors that can occur during [`ObjectId`] construction and generation.
+</span><span class="attribute">#[derive(Clone, Debug)]
+#[non_exhaustive]
+</span><span class="kw">pub enum </span>Error {
+    <span class="doccomment">/// An invalid character was found in the provided hex string. Valid characters are: `0...9`,
+    /// `a...f`, or `A...F`.
+    </span><span class="attribute">#[non_exhaustive]
+    </span>InvalidHexStringCharacter { c: char, index: usize, hex: String },
 
-    <span class="doccomment">/// An [`ObjectId`]&#39;s hex string representation must be an exactly 12-byte (24-char)</span>
-    <span class="doccomment">/// hexadecimal string.</span>
-    <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
-    <span class="ident">InvalidHexStringLength</span> { <span class="ident">length</span>: <span class="ident">usize</span>, <span class="ident">hex</span>: <span class="ident">String</span> },
+    <span class="doccomment">/// An [`ObjectId`]&#39;s hex string representation must be an exactly 12-byte (24-char)
+    /// hexadecimal string.
+    </span><span class="attribute">#[non_exhaustive]
+    </span>InvalidHexStringLength { length: usize, hex: String },
 }
 
-<span class="doccomment">/// Alias for Result&lt;T, oid::Error&gt;.</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">result::Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Alias for Result&lt;T, oid::Error&gt;.
+</span><span class="kw">pub type </span><span class="prelude-ty">Result</span>&lt;T&gt; = result::Result&lt;T, Error&gt;;
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Error::InvalidHexStringCharacter</span> { <span class="ident">c</span>, <span class="ident">index</span>, <span class="ident">hex</span> } =&gt; {
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Error {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            Error::InvalidHexStringCharacter { c, index, hex } =&gt; {
                 <span class="macro">write!</span>(
-                    <span class="ident">fmt</span>,
+                    fmt,
                     <span class="string">&quot;invalid character &#39;{}&#39; was found at index {} in the provided hex string: \
                      \&quot;{}\&quot;&quot;</span>,
-                    <span class="ident">c</span>, <span class="ident">index</span>, <span class="ident">hex</span>
+                    c, index, hex
                 )
             }
-            <span class="ident">Error::InvalidHexStringLength</span> { <span class="ident">length</span>, <span class="ident">hex</span> } =&gt; {
+            Error::InvalidHexStringLength { length, hex } =&gt; {
                 <span class="macro">write!</span>(
-                    <span class="ident">fmt</span>,
+                    fmt,
                     <span class="string">&quot;provided hex string representation must be exactly 12 bytes, instead got: \
                      \&quot;{}\&quot;, length {}&quot;</span>,
-                    <span class="ident">hex</span>, <span class="ident">length</span>
+                    hex, length
                 )
             }
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">error::Error</span> <span class="kw">for</span> <span class="ident">Error</span> {}
+<span class="kw">impl </span>error::Error <span class="kw">for </span>Error {}
 
-<span class="doccomment">/// A wrapper around raw 12-byte ObjectId representations.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Eq</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ObjectId</span> {
-    <span class="ident">id</span>: [<span class="ident">u8</span>; <span class="number">12</span>],
+<span class="doccomment">/// A wrapper around raw 12-byte ObjectId representations.
+</span><span class="attribute">#[derive(Clone, Copy, PartialEq, PartialOrd, Eq, Ord, Hash)]
+</span><span class="kw">pub struct </span>ObjectId {
+    id: [u8; <span class="number">12</span>],
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ObjectId</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>()
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">ObjectId</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">Error</span>;
-
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">std::result::Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
-        <span class="ident"><span class="self">Self</span>::parse_str</span>(<span class="ident">s</span>)
+<span class="kw">impl </span>Default <span class="kw">for </span>ObjectId {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">12</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ObjectId</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">bytes</span>: [<span class="ident">u8</span>; <span class="number">12</span>]) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">id</span>: <span class="ident">bytes</span> }
+<span class="kw">impl </span>FromStr <span class="kw">for </span>ObjectId {
+    <span class="kw">type </span><span class="prelude-val">Err </span>= Error;
+
+    <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; std::result::Result&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
+        <span class="self">Self</span>::parse_str(s)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">ObjectId</span> {
-    <span class="doccomment">/// Generates a new [`ObjectId`], represented in bytes.</span>
-    <span class="doccomment">/// See the [docs](http://www.mongodb.com/docs/manual/reference/object-id/)</span>
-    <span class="doccomment">/// for more information.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">ObjectId</span> {
-        <span class="kw">let</span> <span class="ident">timestamp</span> <span class="op">=</span> <span class="ident">ObjectId::gen_timestamp</span>();
-        <span class="kw">let</span> <span class="ident">process_id</span> <span class="op">=</span> <span class="ident">ObjectId::gen_process_id</span>();
-        <span class="kw">let</span> <span class="ident">counter</span> <span class="op">=</span> <span class="ident">ObjectId::gen_count</span>();
+<span class="kw">impl </span>From&lt;[u8; <span class="number">12</span>]&gt; <span class="kw">for </span>ObjectId {
+    <span class="kw">fn </span>from(bytes: [u8; <span class="number">12</span>]) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ id: bytes }
+    }
+}
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span>: [<span class="ident">u8</span>; <span class="number">12</span>] <span class="op">=</span> [<span class="number">0</span>; <span class="number">12</span>];
-        <span class="ident">buf</span>[<span class="ident">TIMESTAMP_OFFSET</span>..(<span class="ident">TIMESTAMP_SIZE</span> <span class="op">+</span> <span class="ident">TIMESTAMP_OFFSET</span>)]
-            .<span class="ident">clone_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">timestamp</span>[..<span class="ident">TIMESTAMP_SIZE</span>]);
-        <span class="ident">buf</span>[<span class="ident">PROCESS_ID_OFFSET</span>..(<span class="ident">PROCESS_ID_SIZE</span> <span class="op">+</span> <span class="ident">PROCESS_ID_OFFSET</span>)]
-            .<span class="ident">clone_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">process_id</span>[..<span class="ident">PROCESS_ID_SIZE</span>]);
-        <span class="ident">buf</span>[<span class="ident">COUNTER_OFFSET</span>..(<span class="ident">COUNTER_SIZE</span> <span class="op">+</span> <span class="ident">COUNTER_OFFSET</span>)]
-            .<span class="ident">clone_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">counter</span>[..<span class="ident">COUNTER_SIZE</span>]);
+<span class="kw">impl </span>ObjectId {
+    <span class="doccomment">/// Generates a new [`ObjectId`], represented in bytes.
+    /// See the [docs](http://www.mongodb.com/docs/manual/reference/object-id/)
+    /// for more information.
+    </span><span class="kw">pub fn </span>new() -&gt; ObjectId {
+        <span class="kw">let </span>timestamp = ObjectId::gen_timestamp();
+        <span class="kw">let </span>process_id = ObjectId::gen_process_id();
+        <span class="kw">let </span>counter = ObjectId::gen_count();
 
-        <span class="ident">ObjectId::from_bytes</span>(<span class="ident">buf</span>)
+        <span class="kw">let </span><span class="kw-2">mut </span>buf: [u8; <span class="number">12</span>] = [<span class="number">0</span>; <span class="number">12</span>];
+        buf[TIMESTAMP_OFFSET..(TIMESTAMP_SIZE + TIMESTAMP_OFFSET)]
+            .clone_from_slice(<span class="kw-2">&amp;</span>timestamp[..TIMESTAMP_SIZE]);
+        buf[PROCESS_ID_OFFSET..(PROCESS_ID_SIZE + PROCESS_ID_OFFSET)]
+            .clone_from_slice(<span class="kw-2">&amp;</span>process_id[..PROCESS_ID_SIZE]);
+        buf[COUNTER_OFFSET..(COUNTER_SIZE + COUNTER_OFFSET)]
+            .clone_from_slice(<span class="kw-2">&amp;</span>counter[..COUNTER_SIZE]);
+
+        ObjectId::from_bytes(buf)
     }
 
-    <span class="doccomment">/// Constructs a new ObjectId wrapper around the raw byte representation.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_bytes</span>(<span class="ident">bytes</span>: [<span class="ident">u8</span>; <span class="number">12</span>]) -&gt; <span class="ident">ObjectId</span> {
-        <span class="ident">ObjectId</span> { <span class="ident">id</span>: <span class="ident">bytes</span> }
+    <span class="doccomment">/// Constructs a new ObjectId wrapper around the raw byte representation.
+    </span><span class="kw">pub const fn </span>from_bytes(bytes: [u8; <span class="number">12</span>]) -&gt; ObjectId {
+        ObjectId { id: bytes }
     }
 
-    <span class="doccomment">/// Creates an ObjectID using a 12-byte (24-char) hexadecimal string.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_str</span>(<span class="ident">s</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ObjectId</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">s</span>.<span class="ident">as_ref</span>();
+    <span class="doccomment">/// Creates an ObjectID using a 12-byte (24-char) hexadecimal string.
+    </span><span class="kw">pub fn </span>parse_str(s: <span class="kw">impl </span>AsRef&lt;str&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;ObjectId&gt; {
+        <span class="kw">let </span>s = s.as_ref();
 
-        <span class="kw">let</span> <span class="ident">bytes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">hex::decode</span>(<span class="ident">s</span>.<span class="ident">as_bytes</span>()).<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">e</span> {
-            <span class="ident">FromHexError::InvalidHexCharacter</span> { <span class="ident">c</span>, <span class="ident">index</span> } =&gt; <span class="ident">Error::InvalidHexStringCharacter</span> {
-                <span class="ident">c</span>,
-                <span class="ident">index</span>,
-                <span class="ident">hex</span>: <span class="ident">s</span>.<span class="ident">to_string</span>(),
+        <span class="kw">let </span>bytes: Vec&lt;u8&gt; = hex::decode(s.as_bytes()).map_err(|e| <span class="kw">match </span>e {
+            FromHexError::InvalidHexCharacter { c, index } =&gt; Error::InvalidHexStringCharacter {
+                c,
+                index,
+                hex: s.to_string(),
             },
-            <span class="ident">FromHexError::InvalidStringLength</span> <span class="op">|</span> <span class="ident">FromHexError::OddLength</span> =&gt; {
-                <span class="ident">Error::InvalidHexStringLength</span> {
-                    <span class="ident">length</span>: <span class="ident">s</span>.<span class="ident">len</span>(),
-                    <span class="ident">hex</span>: <span class="ident">s</span>.<span class="ident">to_string</span>(),
+            FromHexError::InvalidStringLength | FromHexError::OddLength =&gt; {
+                Error::InvalidHexStringLength {
+                    length: s.len(),
+                    hex: s.to_string(),
                 }
             }
         })<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">12</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidHexStringLength</span> {
-                <span class="ident">length</span>: <span class="ident">s</span>.<span class="ident">len</span>(),
-                <span class="ident">hex</span>: <span class="ident">s</span>.<span class="ident">to_string</span>(),
+        <span class="kw">if </span>bytes.len() != <span class="number">12 </span>{
+            <span class="prelude-val">Err</span>(Error::InvalidHexStringLength {
+                length: s.len(),
+                hex: s.to_string(),
             })
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">byte_array</span>: [<span class="ident">u8</span>; <span class="number">12</span>] <span class="op">=</span> [<span class="number">0</span>; <span class="number">12</span>];
-            <span class="ident">byte_array</span>[..].<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>[..]);
-            <span class="prelude-val">Ok</span>(<span class="ident">ObjectId::from_bytes</span>(<span class="ident">byte_array</span>))
+        } <span class="kw">else </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>byte_array: [u8; <span class="number">12</span>] = [<span class="number">0</span>; <span class="number">12</span>];
+            byte_array[..].copy_from_slice(<span class="kw-2">&amp;</span>bytes[..]);
+            <span class="prelude-val">Ok</span>(ObjectId::from_bytes(byte_array))
         }
     }
 
-    <span class="doccomment">/// Retrieves the timestamp from an [`ObjectId`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timestamp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="kw">crate</span>::DateTime</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">4</span>];
-        <span class="ident">buf</span>.<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">id</span>[<span class="number">0</span>..<span class="number">4</span>]);
-        <span class="kw">let</span> <span class="ident">seconds_since_epoch</span> <span class="op">=</span> <span class="ident">u32::from_be_bytes</span>(<span class="ident">buf</span>);
+    <span class="doccomment">/// Retrieves the timestamp from an [`ObjectId`].
+    </span><span class="kw">pub fn </span>timestamp(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">crate</span>::DateTime {
+        <span class="kw">let </span><span class="kw-2">mut </span>buf = [<span class="number">0</span>; <span class="number">4</span>];
+        buf.copy_from_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.id[<span class="number">0</span>..<span class="number">4</span>]);
+        <span class="kw">let </span>seconds_since_epoch = u32::from_be_bytes(buf);
 
-        <span class="comment">// This doesn&#39;t overflow since u32::MAX * 1000 &lt; i64::MAX</span>
-        <span class="ident"><span class="kw">crate</span>::DateTime::from_millis</span>(<span class="ident">seconds_since_epoch</span> <span class="kw">as</span> <span class="ident">i64</span> <span class="op">*</span> <span class="number">1000</span>)
+        <span class="comment">// This doesn&#39;t overflow since u32::MAX * 1000 &lt; i64::MAX
+        </span><span class="kw">crate</span>::DateTime::from_millis(seconds_since_epoch <span class="kw">as </span>i64 * <span class="number">1000</span>)
     }
 
-    <span class="doccomment">/// Returns the raw byte representation of an ObjectId.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [<span class="ident">u8</span>; <span class="number">12</span>] {
-        <span class="self">self</span>.<span class="ident">id</span>
+    <span class="doccomment">/// Returns the raw byte representation of an ObjectId.
+    </span><span class="kw">pub const fn </span>bytes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [u8; <span class="number">12</span>] {
+        <span class="self">self</span>.id
     }
 
-    <span class="doccomment">/// Convert this [`ObjectId`] to its hex string representation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_hex</span>(<span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="ident">hex::encode</span>(<span class="self">self</span>.<span class="ident">id</span>)
+    <span class="doccomment">/// Convert this [`ObjectId`] to its hex string representation.
+    </span><span class="kw">pub fn </span>to_hex(<span class="self">self</span>) -&gt; String {
+        hex::encode(<span class="self">self</span>.id)
     }
 
-    <span class="doccomment">/// Generates a new timestamp representing the current seconds since epoch.</span>
-    <span class="doccomment">/// Represented in Big Endian.</span>
-    <span class="kw">fn</span> <span class="ident">gen_timestamp</span>() -&gt; [<span class="ident">u8</span>; <span class="number">4</span>] {
-        <span class="kw">let</span> <span class="ident">timestamp</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="ident">SystemTime::now</span>()
-            .<span class="ident">duration_since</span>(<span class="ident">SystemTime::UNIX_EPOCH</span>)
-            .<span class="ident">expect</span>(<span class="string">&quot;system clock is before 1970&quot;</span>)
-            .<span class="ident">as_secs</span>()
-            .<span class="ident">try_into</span>()
-            .<span class="ident">unwrap</span>(); <span class="comment">// will succeed until 2106 since timestamp is unsigned</span>
-        <span class="ident">timestamp</span>.<span class="ident">to_be_bytes</span>()
+    <span class="doccomment">/// Generates a new timestamp representing the current seconds since epoch.
+    /// Represented in Big Endian.
+    </span><span class="kw">fn </span>gen_timestamp() -&gt; [u8; <span class="number">4</span>] {
+        <span class="kw">let </span>timestamp: u32 = SystemTime::now()
+            .duration_since(SystemTime::UNIX_EPOCH)
+            .expect(<span class="string">&quot;system clock is before 1970&quot;</span>)
+            .as_secs()
+            .try_into()
+            .unwrap(); <span class="comment">// will succeed until 2106 since timestamp is unsigned
+        </span>timestamp.to_be_bytes()
     }
 
-    <span class="doccomment">/// Generate a random 5-byte array.</span>
-    <span class="kw">fn</span> <span class="ident">gen_process_id</span>() -&gt; [<span class="ident">u8</span>; <span class="number">5</span>] {
-        <span class="macro">lazy_static!</span> {
-            <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">BUF</span>: [<span class="ident">u8</span>; <span class="number">5</span>] <span class="op">=</span> <span class="ident">thread_rng</span>().<span class="ident">gen</span>();
+    <span class="doccomment">/// Generate a random 5-byte array.
+    </span><span class="kw">fn </span>gen_process_id() -&gt; [u8; <span class="number">5</span>] {
+        <span class="macro">lazy_static! </span>{
+            <span class="kw">static </span><span class="kw-2">ref </span>BUF: [u8; <span class="number">5</span>] = thread_rng().gen();
         }
 
-        <span class="kw-2">*</span><span class="ident">BUF</span>
+        <span class="kw-2">*</span>BUF
     }
 
-    <span class="doccomment">/// Gets an incremental 3-byte count.</span>
-    <span class="doccomment">/// Represented in Big Endian.</span>
-    <span class="kw">fn</span> <span class="ident">gen_count</span>() -&gt; [<span class="ident">u8</span>; <span class="number">3</span>] {
-        <span class="kw">let</span> <span class="ident">u_counter</span> <span class="op">=</span> <span class="ident">OID_COUNTER</span>.<span class="ident">fetch_add</span>(<span class="number">1</span>, <span class="ident">Ordering::SeqCst</span>);
+    <span class="doccomment">/// Gets an incremental 3-byte count.
+    /// Represented in Big Endian.
+    </span><span class="kw">fn </span>gen_count() -&gt; [u8; <span class="number">3</span>] {
+        <span class="kw">let </span>u_counter = OID_COUNTER.fetch_add(<span class="number">1</span>, Ordering::SeqCst);
 
-        <span class="comment">// Mod result instead of OID_COUNTER to prevent threading issues.</span>
-        <span class="kw">let</span> <span class="ident">u</span> <span class="op">=</span> <span class="ident">u_counter</span> <span class="op">%</span> (<span class="ident">MAX_U24</span> <span class="op">+</span> <span class="number">1</span>);
+        <span class="comment">// Mod result instead of OID_COUNTER to prevent threading issues.
+        </span><span class="kw">let </span>u = u_counter % (MAX_U24 + <span class="number">1</span>);
 
-        <span class="comment">// Convert usize to writable u64, then extract the first three bytes.</span>
-        <span class="kw">let</span> <span class="ident">u_int</span> <span class="op">=</span> <span class="ident">u</span> <span class="kw">as</span> <span class="ident">u64</span>;
+        <span class="comment">// Convert usize to writable u64, then extract the first three bytes.
+        </span><span class="kw">let </span>u_int = u <span class="kw">as </span>u64;
 
-        <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">u_int</span>.<span class="ident">to_be_bytes</span>();
-        <span class="kw">let</span> <span class="ident">buf_u24</span>: [<span class="ident">u8</span>; <span class="number">3</span>] <span class="op">=</span> [<span class="ident">buf</span>[<span class="number">5</span>], <span class="ident">buf</span>[<span class="number">6</span>], <span class="ident">buf</span>[<span class="number">7</span>]];
-        <span class="ident">buf_u24</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ObjectId</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">to_hex</span>())
+        <span class="kw">let </span>buf = u_int.to_be_bytes();
+        <span class="kw">let </span>buf_u24: [u8; <span class="number">3</span>] = [buf[<span class="number">5</span>], buf[<span class="number">6</span>], buf[<span class="number">7</span>]];
+        buf_u24
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">ObjectId</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_tuple</span>(<span class="string">&quot;ObjectId&quot;</span>).<span class="ident">field</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">to_hex</span>()).<span class="ident">finish</span>()
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>ObjectId {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        f.write_str(<span class="kw-2">&amp;</span><span class="self">self</span>.to_hex())
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::tests::LOCK</span>;
-
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">count_generated_is_big_endian</span>() {
-    <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">LOCK</span>.<span class="ident">run_exclusively</span>();
-    <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="number">1_122_866</span>;
-    <span class="ident">OID_COUNTER</span>.<span class="ident">store</span>(<span class="ident">start</span>, <span class="ident">Ordering::SeqCst</span>);
-
-    <span class="comment">// Test count generates correct value 1122866</span>
-    <span class="kw">let</span> <span class="ident">count_bytes</span> <span class="op">=</span> <span class="ident">ObjectId::gen_count</span>();
-
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span>: [<span class="ident">u8</span>; <span class="number">4</span>] <span class="op">=</span> [<span class="number">0</span>; <span class="number">4</span>];
-    <span class="ident">buf</span>[<span class="number">1</span>..<span class="op">=</span><span class="ident">COUNTER_SIZE</span>].<span class="ident">clone_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">count_bytes</span>[..<span class="ident">COUNTER_SIZE</span>]);
-
-    <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">u32::from_be_bytes</span>(<span class="ident">buf</span>);
-    <span class="macro">assert_eq!</span>(<span class="ident">start</span> <span class="kw">as</span> <span class="ident">u32</span>, <span class="ident">count</span>);
-
-    <span class="comment">// Test OID formats count correctly as big endian</span>
-    <span class="kw">let</span> <span class="ident">oid</span> <span class="op">=</span> <span class="ident">ObjectId::new</span>();
-
-    <span class="macro">assert_eq!</span>(<span class="number">0x11u8</span>, <span class="ident">oid</span>.<span class="ident">bytes</span>()[<span class="ident">COUNTER_OFFSET</span>]);
-    <span class="macro">assert_eq!</span>(<span class="number">0x22u8</span>, <span class="ident">oid</span>.<span class="ident">bytes</span>()[<span class="ident">COUNTER_OFFSET</span> <span class="op">+</span> <span class="number">1</span>]);
-    <span class="macro">assert_eq!</span>(<span class="number">0x33u8</span>, <span class="ident">oid</span>.<span class="ident">bytes</span>()[<span class="ident">COUNTER_OFFSET</span> <span class="op">+</span> <span class="number">2</span>]);
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>ObjectId {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        f.debug_tuple(<span class="string">&quot;ObjectId&quot;</span>).field(<span class="kw-2">&amp;</span><span class="self">self</span>.to_hex()).finish()
+    }
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_counter_overflow_u24_max</span>() {
-    <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">LOCK</span>.<span class="ident">run_exclusively</span>();
-    <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">MAX_U24</span>;
-    <span class="ident">OID_COUNTER</span>.<span class="ident">store</span>(<span class="ident">start</span>, <span class="ident">Ordering::SeqCst</span>);
-    <span class="kw">let</span> <span class="ident">oid</span> <span class="op">=</span> <span class="ident">ObjectId::new</span>();
-    <span class="macro">assert_eq!</span>(<span class="number">0xFFu8</span>, <span class="ident">oid</span>.<span class="ident">bytes</span>()[<span class="ident">COUNTER_OFFSET</span>]);
-    <span class="macro">assert_eq!</span>(<span class="number">0xFFu8</span>, <span class="ident">oid</span>.<span class="ident">bytes</span>()[<span class="ident">COUNTER_OFFSET</span> <span class="op">+</span> <span class="number">1</span>]);
-    <span class="macro">assert_eq!</span>(<span class="number">0xFFu8</span>, <span class="ident">oid</span>.<span class="ident">bytes</span>()[<span class="ident">COUNTER_OFFSET</span> <span class="op">+</span> <span class="number">2</span>]);
-    <span class="comment">// Test counter overflows to 0 when set to MAX_24 + 1</span>
-    <span class="kw">let</span> <span class="ident">oid_new</span> <span class="op">=</span> <span class="ident">ObjectId::new</span>();
-    <span class="macro">assert_eq!</span>(<span class="number">0x00u8</span>, <span class="ident">oid_new</span>.<span class="ident">bytes</span>()[<span class="ident">COUNTER_OFFSET</span>]);
-    <span class="macro">assert_eq!</span>(<span class="number">0x00u8</span>, <span class="ident">oid_new</span>.<span class="ident">bytes</span>()[<span class="ident">COUNTER_OFFSET</span> <span class="op">+</span> <span class="number">1</span>]);
-    <span class="macro">assert_eq!</span>(<span class="number">0x00u8</span>, <span class="ident">oid_new</span>.<span class="ident">bytes</span>()[<span class="ident">COUNTER_OFFSET</span> <span class="op">+</span> <span class="number">2</span>]);
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">use </span><span class="kw">crate</span>::tests::LOCK;
+
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>count_generated_is_big_endian() {
+    <span class="kw">let </span>_guard = LOCK.run_exclusively();
+    <span class="kw">let </span>start = <span class="number">1_122_866</span>;
+    OID_COUNTER.store(start, Ordering::SeqCst);
+
+    <span class="comment">// Test count generates correct value 1122866
+    </span><span class="kw">let </span>count_bytes = ObjectId::gen_count();
+
+    <span class="kw">let </span><span class="kw-2">mut </span>buf: [u8; <span class="number">4</span>] = [<span class="number">0</span>; <span class="number">4</span>];
+    buf[<span class="number">1</span>..=COUNTER_SIZE].clone_from_slice(<span class="kw-2">&amp;</span>count_bytes[..COUNTER_SIZE]);
+
+    <span class="kw">let </span>count = u32::from_be_bytes(buf);
+    <span class="macro">assert_eq!</span>(start <span class="kw">as </span>u32, count);
+
+    <span class="comment">// Test OID formats count correctly as big endian
+    </span><span class="kw">let </span>oid = ObjectId::new();
+
+    <span class="macro">assert_eq!</span>(<span class="number">0x11u8</span>, oid.bytes()[COUNTER_OFFSET]);
+    <span class="macro">assert_eq!</span>(<span class="number">0x22u8</span>, oid.bytes()[COUNTER_OFFSET + <span class="number">1</span>]);
+    <span class="macro">assert_eq!</span>(<span class="number">0x33u8</span>, oid.bytes()[COUNTER_OFFSET + <span class="number">2</span>]);
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="kw">fn</span> <span class="ident">test_counter_overflow_usize_max</span>() {
-    <span class="kw">let</span> <span class="ident">_guard</span> <span class="op">=</span> <span class="ident">LOCK</span>.<span class="ident">run_exclusively</span>();
-    <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">usize::max_value</span>();
-    <span class="ident">OID_COUNTER</span>.<span class="ident">store</span>(<span class="ident">start</span>, <span class="ident">Ordering::SeqCst</span>);
-    <span class="comment">// Test counter overflows to u24_max when set to usize_max</span>
-    <span class="kw">let</span> <span class="ident">oid</span> <span class="op">=</span> <span class="ident">ObjectId::new</span>();
-    <span class="macro">assert_eq!</span>(<span class="number">0xFFu8</span>, <span class="ident">oid</span>.<span class="ident">bytes</span>()[<span class="ident">COUNTER_OFFSET</span>]);
-    <span class="macro">assert_eq!</span>(<span class="number">0xFFu8</span>, <span class="ident">oid</span>.<span class="ident">bytes</span>()[<span class="ident">COUNTER_OFFSET</span> <span class="op">+</span> <span class="number">1</span>]);
-    <span class="macro">assert_eq!</span>(<span class="number">0xFFu8</span>, <span class="ident">oid</span>.<span class="ident">bytes</span>()[<span class="ident">COUNTER_OFFSET</span> <span class="op">+</span> <span class="number">2</span>]);
-    <span class="comment">// Test counter overflows to 0 when set to usize_max + 1</span>
-    <span class="kw">let</span> <span class="ident">oid_new</span> <span class="op">=</span> <span class="ident">ObjectId::new</span>();
-    <span class="macro">assert_eq!</span>(<span class="number">0x00u8</span>, <span class="ident">oid_new</span>.<span class="ident">bytes</span>()[<span class="ident">COUNTER_OFFSET</span>]);
-    <span class="macro">assert_eq!</span>(<span class="number">0x00u8</span>, <span class="ident">oid_new</span>.<span class="ident">bytes</span>()[<span class="ident">COUNTER_OFFSET</span> <span class="op">+</span> <span class="number">1</span>]);
-    <span class="macro">assert_eq!</span>(<span class="number">0x00u8</span>, <span class="ident">oid_new</span>.<span class="ident">bytes</span>()[<span class="ident">COUNTER_OFFSET</span> <span class="op">+</span> <span class="number">2</span>]);
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>test_counter_overflow_u24_max() {
+    <span class="kw">let </span>_guard = LOCK.run_exclusively();
+    <span class="kw">let </span>start = MAX_U24;
+    OID_COUNTER.store(start, Ordering::SeqCst);
+    <span class="kw">let </span>oid = ObjectId::new();
+    <span class="macro">assert_eq!</span>(<span class="number">0xFFu8</span>, oid.bytes()[COUNTER_OFFSET]);
+    <span class="macro">assert_eq!</span>(<span class="number">0xFFu8</span>, oid.bytes()[COUNTER_OFFSET + <span class="number">1</span>]);
+    <span class="macro">assert_eq!</span>(<span class="number">0xFFu8</span>, oid.bytes()[COUNTER_OFFSET + <span class="number">2</span>]);
+    <span class="comment">// Test counter overflows to 0 when set to MAX_24 + 1
+    </span><span class="kw">let </span>oid_new = ObjectId::new();
+    <span class="macro">assert_eq!</span>(<span class="number">0x00u8</span>, oid_new.bytes()[COUNTER_OFFSET]);
+    <span class="macro">assert_eq!</span>(<span class="number">0x00u8</span>, oid_new.bytes()[COUNTER_OFFSET + <span class="number">1</span>]);
+    <span class="macro">assert_eq!</span>(<span class="number">0x00u8</span>, oid_new.bytes()[COUNTER_OFFSET + <span class="number">2</span>]);
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="ident">time::macros::datetime</span>;
+<span class="attribute">#[test]
+</span><span class="kw">fn </span>test_counter_overflow_usize_max() {
+    <span class="kw">let </span>_guard = LOCK.run_exclusively();
+    <span class="kw">let </span>start = usize::max_value();
+    OID_COUNTER.store(start, Ordering::SeqCst);
+    <span class="comment">// Test counter overflows to u24_max when set to usize_max
+    </span><span class="kw">let </span>oid = ObjectId::new();
+    <span class="macro">assert_eq!</span>(<span class="number">0xFFu8</span>, oid.bytes()[COUNTER_OFFSET]);
+    <span class="macro">assert_eq!</span>(<span class="number">0xFFu8</span>, oid.bytes()[COUNTER_OFFSET + <span class="number">1</span>]);
+    <span class="macro">assert_eq!</span>(<span class="number">0xFFu8</span>, oid.bytes()[COUNTER_OFFSET + <span class="number">2</span>]);
+    <span class="comment">// Test counter overflows to 0 when set to usize_max + 1
+    </span><span class="kw">let </span>oid_new = ObjectId::new();
+    <span class="macro">assert_eq!</span>(<span class="number">0x00u8</span>, oid_new.bytes()[COUNTER_OFFSET]);
+    <span class="macro">assert_eq!</span>(<span class="number">0x00u8</span>, oid_new.bytes()[COUNTER_OFFSET + <span class="number">1</span>]);
+    <span class="macro">assert_eq!</span>(<span class="number">0x00u8</span>, oid_new.bytes()[COUNTER_OFFSET + <span class="number">2</span>]);
+}
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_display</span>() {
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::ObjectId::parse_str</span>(<span class="string">&quot;53e37d08776f724e42000000&quot;</span>).<span class="ident">unwrap</span>();
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use </span>time::macros::datetime;
 
-        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">id</span>), <span class="string">&quot;53e37d08776f724e42000000&quot;</span>)
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_display() {
+        <span class="kw">let </span>id = <span class="kw">super</span>::ObjectId::parse_str(<span class="string">&quot;53e37d08776f724e42000000&quot;</span>).unwrap();
+
+        <span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, id), <span class="string">&quot;53e37d08776f724e42000000&quot;</span>)
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_debug</span>() {
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::ObjectId::parse_str</span>(<span class="string">&quot;53e37d08776f724e42000000&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_debug() {
+        <span class="kw">let </span>id = <span class="kw">super</span>::ObjectId::parse_str(<span class="string">&quot;53e37d08776f724e42000000&quot;</span>).unwrap();
 
         <span class="macro">assert_eq!</span>(
-            <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">id</span>),
-            <span class="string">&quot;ObjectId(\&quot;53e37d08776f724e42000000\&quot;)&quot;</span>
-        );
+            <span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, id),
+            <span class="string">&quot;ObjectId(\&quot;53e37d08776f724e42000000\&quot;)&quot;
+        </span>);
         <span class="macro">assert_eq!</span>(
-            <span class="macro">format!</span>(<span class="string">&quot;{:#?}&quot;</span>, <span class="ident">id</span>),
-            <span class="string">&quot;ObjectId(\n    \&quot;53e37d08776f724e42000000\&quot;,\n)&quot;</span>
-        );
+            <span class="macro">format!</span>(<span class="string">&quot;{:#?}&quot;</span>, id),
+            <span class="string">&quot;ObjectId(\n    \&quot;53e37d08776f724e42000000\&quot;,\n)&quot;
+        </span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_timestamp</span>() {
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::ObjectId::parse_str</span>(<span class="string">&quot;000000000000000000000000&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="comment">// &quot;Jan 1st, 1970 00:00:00 UTC&quot;</span>
-        <span class="macro">assert_eq!</span>(<span class="macro">datetime!</span>(<span class="number">1970</span><span class="op">-</span><span class="number">01</span><span class="op">-</span><span class="number">01</span> <span class="number">0</span>:<span class="number">00</span> <span class="ident">UTC</span>), <span class="ident">id</span>.<span class="ident">timestamp</span>().<span class="ident">to_time_0_3</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_timestamp() {
+        <span class="kw">let </span>id = <span class="kw">super</span>::ObjectId::parse_str(<span class="string">&quot;000000000000000000000000&quot;</span>).unwrap();
+        <span class="comment">// &quot;Jan 1st, 1970 00:00:00 UTC&quot;
+        </span><span class="macro">assert_eq!</span>(<span class="macro">datetime!</span>(<span class="number">1970</span>-<span class="number">01</span>-<span class="number">01 0</span>:<span class="number">00 </span>UTC), id.timestamp().to_time_0_3());
 
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::ObjectId::parse_str</span>(<span class="string">&quot;7FFFFFFF0000000000000000&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="comment">// &quot;Jan 19th, 2038 03:14:07 UTC&quot;</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="macro">datetime!</span>(<span class="number">2038</span><span class="op">-</span><span class="number">01</span><span class="op">-</span><span class="number">19</span> <span class="number">3</span>:<span class="number">14</span>:<span class="number">07</span> <span class="ident">UTC</span>),
-            <span class="ident">id</span>.<span class="ident">timestamp</span>().<span class="ident">to_time_0_3</span>()
-        );
-
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::ObjectId::parse_str</span>(<span class="string">&quot;800000000000000000000000&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="comment">// &quot;Jan 19th, 2038 03:14:08 UTC&quot;</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="macro">datetime!</span>(<span class="number">2038</span><span class="op">-</span><span class="number">01</span><span class="op">-</span><span class="number">19</span> <span class="number">3</span>:<span class="number">14</span>:<span class="number">08</span> <span class="ident">UTC</span>),
-            <span class="ident">id</span>.<span class="ident">timestamp</span>().<span class="ident">to_time_0_3</span>()
+        <span class="kw">let </span>id = <span class="kw">super</span>::ObjectId::parse_str(<span class="string">&quot;7FFFFFFF0000000000000000&quot;</span>).unwrap();
+        <span class="comment">// &quot;Jan 19th, 2038 03:14:07 UTC&quot;
+        </span><span class="macro">assert_eq!</span>(
+            <span class="macro">datetime!</span>(<span class="number">2038</span>-<span class="number">01</span>-<span class="number">19 3</span>:<span class="number">14</span>:<span class="number">07 </span>UTC),
+            id.timestamp().to_time_0_3()
         );
 
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident"><span class="kw">super</span>::ObjectId::parse_str</span>(<span class="string">&quot;FFFFFFFF0000000000000000&quot;</span>).<span class="ident">unwrap</span>();
-        <span class="comment">// &quot;Feb 7th, 2106 06:28:15 UTC&quot;</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="macro">datetime!</span>(<span class="number">2106</span><span class="op">-</span><span class="number">02</span><span class="op">-</span><span class="number">07</span> <span class="number">6</span>:<span class="number">28</span>:<span class="number">15</span> <span class="ident">UTC</span>),
-            <span class="ident">id</span>.<span class="ident">timestamp</span>().<span class="ident">to_time_0_3</span>()
+        <span class="kw">let </span>id = <span class="kw">super</span>::ObjectId::parse_str(<span class="string">&quot;800000000000000000000000&quot;</span>).unwrap();
+        <span class="comment">// &quot;Jan 19th, 2038 03:14:08 UTC&quot;
+        </span><span class="macro">assert_eq!</span>(
+            <span class="macro">datetime!</span>(<span class="number">2038</span>-<span class="number">01</span>-<span class="number">19 3</span>:<span class="number">14</span>:<span class="number">08 </span>UTC),
+            id.timestamp().to_time_0_3()
+        );
+
+        <span class="kw">let </span>id = <span class="kw">super</span>::ObjectId::parse_str(<span class="string">&quot;FFFFFFFF0000000000000000&quot;</span>).unwrap();
+        <span class="comment">// &quot;Feb 7th, 2106 06:28:15 UTC&quot;
+        </span><span class="macro">assert_eq!</span>(
+            <span class="macro">datetime!</span>(<span class="number">2106</span>-<span class="number">02</span>-<span class="number">07 6</span>:<span class="number">28</span>:<span class="number">15 </span>UTC),
+            id.timestamp().to_time_0_3()
         );
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="bson" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="bson" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

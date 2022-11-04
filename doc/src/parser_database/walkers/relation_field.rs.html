@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/parser-database/src/walkers/relation_field.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>relation_field.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../parser_database/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/parser-database/src/walkers/relation_field.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>relation_field.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../parser_database/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -278,285 +278,285 @@
 <span id="278">278</span>
 <span id="279">279</span>
 <span id="280">280</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">FieldArity</span>},
-    <span class="ident">types::RelationField</span>,
-    <span class="ident">walkers</span>::{<span class="ident">ModelWalker</span>, <span class="ident">RelationWalker</span>, <span class="ident">ScalarFieldWalker</span>},
-    <span class="ident">ParserDatabase</span>, <span class="ident">ReferentialAction</span>,
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
+    ast::{<span class="self">self</span>, FieldArity},
+    types::RelationField,
+    walkers::{ModelWalker, RelationWalker, ScalarFieldWalker},
+    ParserDatabase, ReferentialAction,
 };
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">borrow::Cow</span>,
-    <span class="ident">fmt</span>,
-    <span class="ident">hash</span>::{<span class="ident">Hash</span>, <span class="ident">Hasher</span>},
+<span class="kw">use </span>std::{
+    borrow::Cow,
+    fmt,
+    hash::{Hash, Hasher},
 };
 
-<span class="doccomment">/// A relation field on a model in the schema.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">field_id</span>: <span class="ident">ast::FieldId</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">db</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ParserDatabase</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">relation_field</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">RelationField</span>,
+<span class="doccomment">/// A relation field on a model in the schema.
+</span><span class="attribute">#[derive(Copy, Clone, Debug)]
+</span><span class="kw">pub struct </span>RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) model_id: ast::ModelId,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) field_id: ast::FieldId,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) db: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ParserDatabase,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) relation_field: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>RelationField,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">model_id</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">model_id</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">field_id</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">field_id</span>
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">Hash</span> <span class="kw">for</span> <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">Hasher</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">H</span>) {
-        <span class="self">self</span>.<span class="ident">model_id</span>.<span class="ident">hash</span>(<span class="ident">state</span>);
-        <span class="self">self</span>.<span class="ident">field_id</span>.<span class="ident">hash</span>(<span class="ident">state</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; PartialEq <span class="kw">for </span>RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="self">self</span>.model_id == other.model_id &amp;&amp; <span class="self">self</span>.field_id == other.field_id
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">RelationFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// The ID of the AST node of the field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">field_id</span>(<span class="self">self</span>) -&gt; <span class="ident">ast::FieldId</span> {
-        <span class="self">self</span>.<span class="ident">field_id</span>
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; Eq <span class="kw">for </span>RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; Hash <span class="kw">for </span>RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">fn </span>hash&lt;H: Hasher&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, state: <span class="kw-2">&amp;mut </span>H) {
+        <span class="self">self</span>.model_id.hash(state);
+        <span class="self">self</span>.field_id.hash(state);
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; RelationFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="doccomment">/// The ID of the AST node of the field.
+    </span><span class="kw">pub fn </span>field_id(<span class="self">self</span>) -&gt; ast::FieldId {
+        <span class="self">self</span>.field_id
     }
 
-    <span class="doccomment">/// The foreign key name of the relation (`@relation(map: ...)`).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mapped_name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">attributes</span>().<span class="ident">mapped_name</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">string_id</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>[<span class="ident">string_id</span>])
+    <span class="doccomment">/// The foreign key name of the relation (`@relation(map: ...)`).
+    </span><span class="kw">pub fn </span>mapped_name(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str&gt; {
+        <span class="self">self</span>.attributes().mapped_name.map(|string_id| <span class="kw-2">&amp;</span><span class="self">self</span>.db[string_id])
     }
 
-    <span class="doccomment">/// The field name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">ast_field</span>().<span class="ident">name</span>()
+    <span class="doccomment">/// The field name.
+    </span><span class="kw">pub fn </span>name(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str {
+        <span class="self">self</span>.ast_field().name()
     }
 
-    <span class="doccomment">/// The AST node of the field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ast_field</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Field</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="self">self</span>.<span class="ident">model_id</span>][<span class="self">self</span>.<span class="ident">field_id</span>]
+    <span class="doccomment">/// The AST node of the field.
+    </span><span class="kw">pub fn </span>ast_field(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Field {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.db.ast[<span class="self">self</span>.model_id][<span class="self">self</span>.field_id]
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">attributes</span>(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">RelationField</span> {
-        <span class="self">self</span>.<span class="ident">relation_field</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>attributes(<span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>RelationField {
+        <span class="self">self</span>.relation_field
     }
 
-    <span class="doccomment">/// The onDelete argument on the relation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">explicit_on_delete</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">attributes</span>().<span class="ident">on_delete</span>.<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">action</span>, <span class="ident">_span</span>)<span class="op">|</span> <span class="ident">action</span>)
+    <span class="doccomment">/// The onDelete argument on the relation.
+    </span><span class="kw">pub fn </span>explicit_on_delete(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ReferentialAction&gt; {
+        <span class="self">self</span>.attributes().on_delete.map(|(action, _span)| action)
     }
 
-    <span class="doccomment">/// The onDelete argument on the relation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">explicit_on_delete_span</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ast::Span</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">attributes</span>().<span class="ident">on_delete</span>.<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">_action</span>, <span class="ident">span</span>)<span class="op">|</span> <span class="ident">span</span>)
+    <span class="doccomment">/// The onDelete argument on the relation.
+    </span><span class="kw">pub fn </span>explicit_on_delete_span(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ast::Span&gt; {
+        <span class="self">self</span>.attributes().on_delete.map(|(_action, span)| span)
     }
 
-    <span class="doccomment">/// The onUpdate argument on the relation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">explicit_on_update</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReferentialAction</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">attributes</span>().<span class="ident">on_update</span>.<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">action</span>, <span class="ident">_span</span>)<span class="op">|</span> <span class="ident">action</span>)
+    <span class="doccomment">/// The onUpdate argument on the relation.
+    </span><span class="kw">pub fn </span>explicit_on_update(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ReferentialAction&gt; {
+        <span class="self">self</span>.attributes().on_update.map(|(action, _span)| action)
     }
 
-    <span class="doccomment">/// The onUpdate argument on the relation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">explicit_on_update_span</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ast::Span</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">attributes</span>().<span class="ident">on_update</span>.<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">_action</span>, <span class="ident">span</span>)<span class="op">|</span> <span class="ident">span</span>)
+    <span class="doccomment">/// The onUpdate argument on the relation.
+    </span><span class="kw">pub fn </span>explicit_on_update_span(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;ast::Span&gt; {
+        <span class="self">self</span>.attributes().on_update.map(|(_action, span)| span)
     }
 
-    <span class="doccomment">/// The relation name explicitly written in the schema source.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">explicit_relation_name</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">relation_field</span>.<span class="ident">name</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">string_id</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>[<span class="ident">string_id</span>])
+    <span class="doccomment">/// The relation name explicitly written in the schema source.
+    </span><span class="kw">pub fn </span>explicit_relation_name(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str&gt; {
+        <span class="self">self</span>.relation_field.name.map(|string_id| <span class="kw-2">&amp;</span><span class="self">self</span>.db[string_id])
     }
 
-    <span class="doccomment">/// Is there an `@ignore` attribute on the field?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_ignored</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">relation_field</span>.<span class="ident">is_ignored</span>
+    <span class="doccomment">/// Is there an `@ignore` attribute on the field?
+    </span><span class="kw">pub fn </span>is_ignored(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.relation_field.is_ignored
     }
 
-    <span class="doccomment">/// Is the field required? (not optional, not list)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_required</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">ast_field</span>().<span class="ident">arity</span>.<span class="ident">is_required</span>()
+    <span class="doccomment">/// Is the field required? (not optional, not list)
+    </span><span class="kw">pub fn </span>is_required(<span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.ast_field().arity.is_required()
     }
 
-    <span class="doccomment">/// The model containing the field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">model</span>(<span class="self">self</span>) -&gt; <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk</span>(<span class="self">self</span>.<span class="ident">model_id</span>)
+    <span class="doccomment">/// The model containing the field.
+    </span><span class="kw">pub fn </span>model(<span class="self">self</span>) -&gt; ModelWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+        <span class="self">self</span>.db.walk(<span class="self">self</span>.model_id)
     }
 
-    <span class="doccomment">/// The `@relation` attribute in the field AST.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_attribute</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Attribute</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">attributes</span>().<span class="ident">relation_attribute</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">ast</span>[<span class="ident">id</span>])
+    <span class="doccomment">/// The `@relation` attribute in the field AST.
+    </span><span class="kw">pub fn </span>relation_attribute(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Attribute&gt; {
+        <span class="self">self</span>.attributes().relation_attribute.map(|id| <span class="kw-2">&amp;</span><span class="self">self</span>.db.ast[id])
     }
 
-    <span class="doccomment">/// Does the relation field reference the passed in model?</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">references_model</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">ast::ModelId</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">relation_field</span>.<span class="ident">referenced_model</span> <span class="op">==</span> <span class="ident">other</span>
+    <span class="doccomment">/// Does the relation field reference the passed in model?
+    </span><span class="kw">pub fn </span>references_model(<span class="self">self</span>, other: ast::ModelId) -&gt; bool {
+        <span class="self">self</span>.relation_field.referenced_model == other
     }
 
-    <span class="doccomment">/// The model referenced by the relation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">related_model</span>(<span class="self">self</span>) -&gt; <span class="ident">ModelWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">db</span>.<span class="ident">walk</span>(<span class="self">self</span>.<span class="ident">relation_field</span>.<span class="ident">referenced_model</span>)
+    <span class="doccomment">/// The model referenced by the relation.
+    </span><span class="kw">pub fn </span>related_model(<span class="self">self</span>) -&gt; ModelWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+        <span class="self">self</span>.db.walk(<span class="self">self</span>.relation_field.referenced_model)
     }
 
-    <span class="doccomment">/// The fields in the `@relation(references: ...)` argument.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referenced_fields</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">attributes</span>().<span class="ident">references</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">references</span><span class="op">|</span> {
-            <span class="ident">references</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">field_id</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">related_model</span>().<span class="ident">scalar_field</span>(<span class="kw-2">*</span><span class="ident">field_id</span>))
+    <span class="doccomment">/// The fields in the `@relation(references: ...)` argument.
+    </span><span class="kw">pub fn </span>referenced_fields(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw">impl </span>ExactSizeIterator&lt;Item = ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt;&gt; {
+        <span class="self">self</span>.attributes().references.as_ref().map(|references| {
+            references
+                .iter()
+                .map(<span class="kw">move </span>|field_id| <span class="self">self</span>.related_model().scalar_field(<span class="kw-2">*</span>field_id))
         })
     }
 
-    <span class="doccomment">/// The relation this field is part of.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation</span>(<span class="self">self</span>) -&gt; <span class="ident">RelationWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">model</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">model</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">relations</span> <span class="op">=</span> <span class="ident">model</span>.<span class="ident">relations_from</span>().<span class="ident">chain</span>(<span class="ident">model</span>.<span class="ident">relations_to</span>());
-        <span class="ident">relations</span>.<span class="ident">find</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">r</span>.<span class="ident">has_field</span>(<span class="self">self</span>.<span class="ident">model_id</span>, <span class="self">self</span>.<span class="ident">field_id</span>)).<span class="ident">unwrap</span>()
+    <span class="doccomment">/// The relation this field is part of.
+    </span><span class="kw">pub fn </span>relation(<span class="self">self</span>) -&gt; RelationWalker&lt;<span class="lifetime">&#39;db</span>&gt; {
+        <span class="kw">let </span>model = <span class="self">self</span>.model();
+        <span class="kw">let </span><span class="kw-2">mut </span>relations = model.relations_from().chain(model.relations_to());
+        relations.find(|r| r.has_field(<span class="self">self</span>.model_id, <span class="self">self</span>.field_id)).unwrap()
     }
 
-    <span class="doccomment">/// The name of the relation. Either uses the `name` (or default) argument,</span>
-    <span class="doccomment">/// or generates an implicit name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_name</span>(<span class="self">self</span>) -&gt; <span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">explicit_relation_name</span>()
-            .<span class="ident">map</span>(<span class="ident">RelationName::Explicit</span>)
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">RelationName::generated</span>(<span class="self">self</span>.<span class="ident">model</span>().<span class="ident">name</span>(), <span class="self">self</span>.<span class="ident">related_model</span>().<span class="ident">name</span>()))
+    <span class="doccomment">/// The name of the relation. Either uses the `name` (or default) argument,
+    /// or generates an implicit name.
+    </span><span class="kw">pub fn </span>relation_name(<span class="self">self</span>) -&gt; RelationName&lt;<span class="lifetime">&#39;db</span>&gt; {
+        <span class="self">self</span>.explicit_relation_name()
+            .map(RelationName::Explicit)
+            .unwrap_or_else(|| RelationName::generated(<span class="self">self</span>.model().name(), <span class="self">self</span>.related_model().name()))
     }
 
-    <span class="doccomment">/// The arity to enforce, based on the arity of the fields. If any referencing field is</span>
-    <span class="doccomment">/// required, this will be required.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Prisma allows setting the relation field as optional, even if one of the</span>
-    <span class="doccomment">/// underlying scalar fields is required. For the purpose of referential</span>
-    <span class="doccomment">/// actions, we count the relation field required if any of the underlying</span>
-    <span class="doccomment">/// fields is required.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referential_arity</span>(<span class="self">self</span>) -&gt; <span class="ident">FieldArity</span> {
-        <span class="kw">let</span> <span class="ident">some_required</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">fields</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">mut</span> <span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">any</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">ast_field</span>().<span class="ident">arity</span>.<span class="ident">is_required</span>()))
-            .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>);
+    <span class="doccomment">/// The arity to enforce, based on the arity of the fields. If any referencing field is
+    /// required, this will be required.
+    ///
+    /// Prisma allows setting the relation field as optional, even if one of the
+    /// underlying scalar fields is required. For the purpose of referential
+    /// actions, we count the relation field required if any of the underlying
+    /// fields is required.
+    </span><span class="kw">pub fn </span>referential_arity(<span class="self">self</span>) -&gt; FieldArity {
+        <span class="kw">let </span>some_required = <span class="self">self
+            </span>.fields()
+            .map(|<span class="kw-2">mut </span>f| f.any(|f| f.ast_field().arity.is_required()))
+            .unwrap_or(<span class="bool-val">false</span>);
 
-        <span class="kw">if</span> <span class="ident">some_required</span> {
-            <span class="ident">FieldArity::Required</span>
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">ast_field</span>().<span class="ident">arity</span>
+        <span class="kw">if </span>some_required {
+            FieldArity::Required
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.ast_field().arity
         }
     }
 
-    <span class="doccomment">/// Used for validation.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">references_singular_id_field</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">singular_referenced_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">attributes</span>().<span class="ident">references</span>.<span class="ident">as_deref</span>() {
-            <span class="prelude-val">Some</span>([<span class="ident">field_id</span>]) =&gt; <span class="ident">field_id</span>,
-            <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="bool-val">false</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="bool-val">true</span>, <span class="comment">// implicitly, these are referencing the singular id</span>
-        };
+    <span class="doccomment">/// Used for validation.
+    </span><span class="kw">pub fn </span>references_singular_id_field(<span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span>singular_referenced_id = <span class="kw">match </span><span class="self">self</span>.attributes().references.as_deref() {
+            <span class="prelude-val">Some</span>([field_id]) =&gt; field_id,
+            <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="bool-val">false</span>,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="bool-val">true</span>, <span class="comment">// implicitly, these are referencing the singular id
+        </span>};
 
-        <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">related_model</span>().<span class="ident">primary_key</span>(), <span class="prelude-val">Some</span>(<span class="ident">pk</span>) <span class="kw">if</span> <span class="ident">pk</span>.<span class="ident">contains_exactly_fields_by_id</span>(<span class="kw-2">&amp;</span>[<span class="kw-2">*</span><span class="ident">singular_referenced_id</span>]))
+        <span class="macro">matches!</span>(<span class="self">self</span>.related_model().primary_key(), <span class="prelude-val">Some</span>(pk) <span class="kw">if </span>pk.contains_exactly_fields_by_id(<span class="kw-2">&amp;</span>[<span class="kw-2">*</span>singular_referenced_id]))
     }
 
-    <span class="doccomment">/// The fields in the `fields: [...]` argument in the forward relation field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">referencing_fields</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">fields</span>()
+    <span class="doccomment">/// The fields in the `fields: [...]` argument in the forward relation field.
+    </span><span class="kw">pub fn </span>referencing_fields(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw">impl </span>ExactSizeIterator&lt;Item = ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt;&gt; {
+        <span class="self">self</span>.fields()
     }
 
-    <span class="doccomment">/// The fields in the `fields: [...]` argument in the forward relation field.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">impl</span> <span class="ident">ExactSizeIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">ScalarFieldWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">model_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">model_id</span>;
-        <span class="kw">let</span> <span class="ident">attributes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">attributes</span>();
-        <span class="ident">attributes</span>.<span class="ident">fields</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">fields</span><span class="op">|</span> {
-            <span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">field_id</span><span class="op">|</span> <span class="ident">ScalarFieldWalker</span> {
-                <span class="ident">model_id</span>,
-                <span class="ident">field_id</span>: <span class="kw-2">*</span><span class="ident">field_id</span>,
-                <span class="ident">db</span>: <span class="self">self</span>.<span class="ident">db</span>,
-                <span class="ident">scalar_field</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">db</span>.<span class="ident">types</span>.<span class="ident">scalar_fields</span>[<span class="kw-2">&amp;</span>(<span class="ident">model_id</span>, <span class="kw-2">*</span><span class="ident">field_id</span>)],
+    <span class="doccomment">/// The fields in the `fields: [...]` argument in the forward relation field.
+    </span><span class="kw">pub fn </span>fields(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw">impl </span>ExactSizeIterator&lt;Item = ScalarFieldWalker&lt;<span class="lifetime">&#39;db</span>&gt;&gt;&gt; {
+        <span class="kw">let </span>model_id = <span class="self">self</span>.model_id;
+        <span class="kw">let </span>attributes = <span class="self">self</span>.attributes();
+        attributes.fields.as_ref().map(<span class="kw">move </span>|fields| {
+            fields.iter().map(<span class="kw">move </span>|field_id| ScalarFieldWalker {
+                model_id,
+                field_id: <span class="kw-2">*</span>field_id,
+                db: <span class="self">self</span>.db,
+                scalar_field: <span class="kw-2">&amp;</span><span class="self">self</span>.db.types.scalar_fields[<span class="kw-2">&amp;</span>(model_id, <span class="kw-2">*</span>field_id)],
             })
         })
     }
 }
 
-<span class="doccomment">/// The relation name.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// A relation name specified in the AST.</span>
-    <span class="ident">Explicit</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">str</span>),
-    <span class="doccomment">/// An inferred relation name.</span>
-    <span class="ident">Generated</span>(<span class="ident">String</span>),
+<span class="doccomment">/// The relation name.
+</span><span class="attribute">#[derive(Debug, Clone)]
+</span><span class="kw">pub enum </span>RelationName&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="doccomment">/// A relation name specified in the AST.
+    </span>Explicit(<span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>str),
+    <span class="doccomment">/// An inferred relation name.
+    </span>Generated(String),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">match</span> (<span class="self">self</span>, <span class="ident">other</span>) {
-            (<span class="ident"><span class="self">Self</span>::Explicit</span>(<span class="ident">l0</span>), <span class="ident"><span class="self">Self</span>::Explicit</span>(<span class="ident">r0</span>)) =&gt; <span class="ident">l0</span> <span class="op">==</span> <span class="ident">r0</span>,
-            (<span class="ident"><span class="self">Self</span>::Generated</span>(<span class="ident">l0</span>), <span class="ident"><span class="self">Self</span>::Generated</span>(<span class="ident">r0</span>)) =&gt; <span class="ident">l0</span> <span class="op">==</span> <span class="ident">r0</span>,
-            (<span class="ident"><span class="self">Self</span>::Explicit</span>(<span class="ident">l0</span>), <span class="ident"><span class="self">Self</span>::Generated</span>(<span class="ident">r0</span>)) =&gt; <span class="ident">l0</span> <span class="op">==</span> <span class="ident">r0</span>,
-            (<span class="ident"><span class="self">Self</span>::Generated</span>(<span class="ident">l0</span>), <span class="ident"><span class="self">Self</span>::Explicit</span>(<span class="ident">r0</span>)) =&gt; <span class="ident">l0</span> <span class="op">==</span> <span class="ident">r0</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; PartialEq <span class="kw">for </span>RelationName&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="kw">match </span>(<span class="self">self</span>, other) {
+            (<span class="self">Self</span>::Explicit(l0), <span class="self">Self</span>::Explicit(r0)) =&gt; l0 == r0,
+            (<span class="self">Self</span>::Generated(l0), <span class="self">Self</span>::Generated(r0)) =&gt; l0 == r0,
+            (<span class="self">Self</span>::Explicit(l0), <span class="self">Self</span>::Generated(r0)) =&gt; l0 == r0,
+            (<span class="self">Self</span>::Generated(l0), <span class="self">Self</span>::Explicit(r0)) =&gt; l0 == r0,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {}
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; Eq <span class="kw">for </span>RelationName&lt;<span class="lifetime">&#39;db</span>&gt; {}
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">std::cmp::Ordering</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> (<span class="self">self</span>, <span class="ident">other</span>) {
-            (<span class="ident"><span class="self">Self</span>::Explicit</span>(<span class="ident">l0</span>), <span class="ident"><span class="self">Self</span>::Explicit</span>(<span class="ident">r0</span>)) =&gt; <span class="ident">l0</span>.<span class="ident">partial_cmp</span>(<span class="ident">r0</span>),
-            (<span class="ident"><span class="self">Self</span>::Generated</span>(<span class="ident">l0</span>), <span class="ident"><span class="self">Self</span>::Generated</span>(<span class="ident">r0</span>)) =&gt; <span class="ident">l0</span>.<span class="ident">partial_cmp</span>(<span class="ident">r0</span>),
-            (<span class="ident"><span class="self">Self</span>::Explicit</span>(<span class="ident">l0</span>), <span class="ident"><span class="self">Self</span>::Generated</span>(<span class="ident">r0</span>)) =&gt; <span class="ident">l0</span>.<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="ident">r0</span>.<span class="ident">as_str</span>()),
-            (<span class="ident"><span class="self">Self</span>::Generated</span>(<span class="ident">l0</span>), <span class="ident"><span class="self">Self</span>::Explicit</span>(<span class="ident">r0</span>)) =&gt; <span class="ident">l0</span>.<span class="ident">as_str</span>().<span class="ident">partial_cmp</span>(<span class="kw-2">*</span><span class="ident">r0</span>),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; PartialOrd <span class="kw">for </span>RelationName&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;std::cmp::Ordering&gt; {
+        <span class="kw">match </span>(<span class="self">self</span>, other) {
+            (<span class="self">Self</span>::Explicit(l0), <span class="self">Self</span>::Explicit(r0)) =&gt; l0.partial_cmp(r0),
+            (<span class="self">Self</span>::Generated(l0), <span class="self">Self</span>::Generated(r0)) =&gt; l0.partial_cmp(r0),
+            (<span class="self">Self</span>::Explicit(l0), <span class="self">Self</span>::Generated(r0)) =&gt; l0.partial_cmp(<span class="kw-2">&amp;</span>r0.as_str()),
+            (<span class="self">Self</span>::Generated(l0), <span class="self">Self</span>::Explicit(r0)) =&gt; l0.as_str().partial_cmp(<span class="kw-2">*</span>r0),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">std::cmp::Ordering</span> {
-        <span class="kw">match</span> (<span class="self">self</span>, <span class="ident">other</span>) {
-            (<span class="ident"><span class="self">Self</span>::Explicit</span>(<span class="ident">l0</span>), <span class="ident"><span class="self">Self</span>::Explicit</span>(<span class="ident">r0</span>)) =&gt; <span class="ident">l0</span>.<span class="ident">cmp</span>(<span class="ident">r0</span>),
-            (<span class="ident"><span class="self">Self</span>::Generated</span>(<span class="ident">l0</span>), <span class="ident"><span class="self">Self</span>::Generated</span>(<span class="ident">r0</span>)) =&gt; <span class="ident">l0</span>.<span class="ident">cmp</span>(<span class="ident">r0</span>),
-            (<span class="ident"><span class="self">Self</span>::Explicit</span>(<span class="ident">l0</span>), <span class="ident"><span class="self">Self</span>::Generated</span>(<span class="ident">r0</span>)) =&gt; <span class="ident">l0</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">r0</span>.<span class="ident">as_str</span>()),
-            (<span class="ident"><span class="self">Self</span>::Generated</span>(<span class="ident">l0</span>), <span class="ident"><span class="self">Self</span>::Explicit</span>(<span class="ident">r0</span>)) =&gt; <span class="ident">l0</span>.<span class="ident">as_str</span>().<span class="ident">cmp</span>(<span class="kw-2">*</span><span class="ident">r0</span>),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; Ord <span class="kw">for </span>RelationName&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; std::cmp::Ordering {
+        <span class="kw">match </span>(<span class="self">self</span>, other) {
+            (<span class="self">Self</span>::Explicit(l0), <span class="self">Self</span>::Explicit(r0)) =&gt; l0.cmp(r0),
+            (<span class="self">Self</span>::Generated(l0), <span class="self">Self</span>::Generated(r0)) =&gt; l0.cmp(r0),
+            (<span class="self">Self</span>::Explicit(l0), <span class="self">Self</span>::Generated(r0)) =&gt; l0.cmp(<span class="kw-2">&amp;</span>r0.as_str()),
+            (<span class="self">Self</span>::Generated(l0), <span class="self">Self</span>::Explicit(r0)) =&gt; l0.as_str().cmp(<span class="kw-2">*</span>r0),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">std::hash::Hash</span> <span class="kw">for</span> <span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">Hasher</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">H</span>) {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RelationName::Explicit</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">hash</span>(<span class="ident">state</span>),
-            <span class="ident">RelationName::Generated</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>.<span class="ident">hash</span>(<span class="ident">state</span>),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; std::hash::Hash <span class="kw">for </span>RelationName&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">fn </span>hash&lt;H: Hasher&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, state: <span class="kw-2">&amp;mut </span>H) {
+        <span class="kw">match </span><span class="self">self </span>{
+            RelationName::Explicit(s) =&gt; s.hash(state),
+            RelationName::Generated(s) =&gt; s.hash(state),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">generated</span>(<span class="ident">model_a</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">model_b</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="ident">model_a</span> <span class="op">&lt;</span> <span class="ident">model_b</span> {
-            <span class="ident"><span class="self">Self</span>::Generated</span>(<span class="macro">format!</span>(<span class="string">&quot;{}To{}&quot;</span>, <span class="ident">model_a</span>, <span class="ident">model_b</span>))
-        } <span class="kw">else</span> {
-            <span class="ident"><span class="self">Self</span>::Generated</span>(<span class="macro">format!</span>(<span class="string">&quot;{}To{}&quot;</span>, <span class="ident">model_b</span>, <span class="ident">model_a</span>))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; RelationName&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>generated(model_a: <span class="kw-2">&amp;</span>str, model_b: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+        <span class="kw">if </span>model_a &lt; model_b {
+            <span class="self">Self</span>::Generated(<span class="macro">format!</span>(<span class="string">&quot;{}To{}&quot;</span>, model_a, model_b))
+        } <span class="kw">else </span>{
+            <span class="self">Self</span>::Generated(<span class="macro">format!</span>(<span class="string">&quot;{}To{}&quot;</span>, model_b, model_a))
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RelationName::Explicit</span>(<span class="ident">s</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">s</span>),
-            <span class="ident">RelationName::Generated</span>(<span class="ident">s</span>) =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">s</span>),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; fmt::Display <span class="kw">for </span>RelationName&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            RelationName::Explicit(s) =&gt; f.write_str(s),
+            RelationName::Generated(s) =&gt; f.write_str(s),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">RelationName::Explicit</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>,
-            <span class="ident">RelationName::Generated</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; AsRef&lt;str&gt; <span class="kw">for </span>RelationName&lt;<span class="lifetime">&#39;db</span>&gt; {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw">match </span><span class="self">self </span>{
+            RelationName::Explicit(s) =&gt; s,
+            RelationName::Generated(s) =&gt; s,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span>, <span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">name</span>: <span class="ident">RelationName</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">match</span> <span class="ident">name</span> {
-            <span class="ident">RelationName::Explicit</span>(<span class="ident">name</span>) =&gt; <span class="ident">Cow::from</span>(<span class="ident">name</span>),
-            <span class="ident">RelationName::Generated</span>(<span class="ident">name</span>) =&gt; <span class="ident">Cow::from</span>(<span class="ident">name</span>),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;db</span>&gt; From&lt;RelationName&lt;<span class="lifetime">&#39;db</span>&gt;&gt; <span class="kw">for </span>Cow&lt;<span class="lifetime">&#39;db</span>, str&gt; {
+    <span class="kw">fn </span>from(name: RelationName&lt;<span class="lifetime">&#39;db</span>&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">match </span>name {
+            RelationName::Explicit(name) =&gt; Cow::from(name),
+            RelationName::Generated(name) =&gt; Cow::from(name),
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="parser_database" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="parser_database" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

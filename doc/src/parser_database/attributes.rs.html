@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/parser-database/src/attributes.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>attributes.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../parser_database/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/parser-database/src/attributes.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>attributes.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../parser_database/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../parser_database/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1092,1099 +1092,1099 @@
 <span id="1092">1092</span>
 <span id="1093">1093</span>
 <span id="1094">1094</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">default</span>;
-<span class="kw">mod</span> <span class="ident">id</span>;
-<span class="kw">mod</span> <span class="ident">map</span>;
-<span class="kw">mod</span> <span class="ident">native_types</span>;
-<span class="kw">mod</span> <span class="ident">schema</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>default;
+<span class="kw">mod </span>id;
+<span class="kw">mod </span>map;
+<span class="kw">mod </span>native_types;
+<span class="kw">mod </span>schema;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">ast</span>::{<span class="self">self</span>, <span class="ident">WithName</span>, <span class="ident">WithSpan</span>},
-    <span class="ident">coerce</span>, <span class="ident">coerce_array</span>,
-    <span class="ident">context::Context</span>,
-    <span class="ident">types</span>::{
-        <span class="ident">EnumAttributes</span>, <span class="ident">FieldWithArgs</span>, <span class="ident">IndexAlgorithm</span>, <span class="ident">IndexAttribute</span>, <span class="ident">IndexFieldPath</span>, <span class="ident">IndexType</span>, <span class="ident">ModelAttributes</span>,
-        <span class="ident">OperatorClassStore</span>, <span class="ident">RelationField</span>, <span class="ident">ScalarField</span>, <span class="ident">ScalarFieldType</span>, <span class="ident">SortOrder</span>,
+<span class="kw">use crate</span>::{
+    ast::{<span class="self">self</span>, WithName, WithSpan},
+    coerce, coerce_array,
+    context::Context,
+    types::{
+        EnumAttributes, FieldWithArgs, IndexAlgorithm, IndexAttribute, IndexFieldPath, IndexType, ModelAttributes,
+        OperatorClassStore, RelationField, ScalarField, ScalarFieldType, SortOrder,
     },
-    <span class="ident">DatamodelError</span>, <span class="ident">StringId</span>,
+    DatamodelError, StringId,
 };
-<span class="kw">use</span> <span class="ident">diagnostics::Span</span>;
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+<span class="kw">use </span>diagnostics::Span;
+<span class="kw">use </span>std::borrow::Cow;
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">resolve_attributes</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">for</span> <span class="ident">top</span> <span class="kw">in</span> <span class="ident">ctx</span>.<span class="ident">ast</span>.<span class="ident">iter_tops</span>() {
-        <span class="kw">match</span> <span class="ident">top</span> {
-            (<span class="ident">ast::TopId::Model</span>(<span class="ident">model_id</span>), <span class="ident">ast::Top::Model</span>(<span class="ident">model</span>)) =&gt; <span class="ident">resolve_model_attributes</span>(<span class="ident">model_id</span>, <span class="ident">model</span>, <span class="ident">ctx</span>),
-            (<span class="ident">ast::TopId::Enum</span>(<span class="ident">enum_id</span>), <span class="ident">ast::Top::Enum</span>(<span class="ident">ast_enum</span>)) =&gt; <span class="ident">resolve_enum_attributes</span>(<span class="ident">enum_id</span>, <span class="ident">ast_enum</span>, <span class="ident">ctx</span>),
-            (<span class="ident">ast::TopId::CompositeType</span>(<span class="ident">ctid</span>), <span class="ident">ast::Top::CompositeType</span>(<span class="ident">ct</span>)) =&gt; {
-                <span class="ident">resolve_composite_type_attributes</span>(<span class="ident">ctid</span>, <span class="ident">ct</span>, <span class="ident">ctx</span>)
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>resolve_attributes(ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">for </span>top <span class="kw">in </span>ctx.ast.iter_tops() {
+        <span class="kw">match </span>top {
+            (ast::TopId::Model(model_id), ast::Top::Model(model)) =&gt; resolve_model_attributes(model_id, model, ctx),
+            (ast::TopId::Enum(enum_id), ast::Top::Enum(ast_enum)) =&gt; resolve_enum_attributes(enum_id, ast_enum, ctx),
+            (ast::TopId::CompositeType(ctid), ast::Top::CompositeType(ct)) =&gt; {
+                resolve_composite_type_attributes(ctid, ct, ctx)
             }
-            <span class="kw">_</span> =&gt; (),
+            <span class="kw">_ </span>=&gt; (),
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">resolve_composite_type_attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>(
-    <span class="ident">ctid</span>: <span class="ident">ast::CompositeTypeId</span>,
-    <span class="ident">ct</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::CompositeType</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>,
+<span class="kw">fn </span>resolve_composite_type_attributes&lt;<span class="lifetime">&#39;db</span>&gt;(
+    ctid: ast::CompositeTypeId,
+    ct: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::CompositeType,
+    ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;db</span>&gt;,
 ) {
-    <span class="kw">for</span> (<span class="ident">field_id</span>, <span class="ident">field</span>) <span class="kw">in</span> <span class="ident">ct</span>.<span class="ident">iter_fields</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctfield</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">types</span>.<span class="ident">composite_type_fields</span>[<span class="kw-2">&amp;</span>(<span class="ident">ctid</span>, <span class="ident">field_id</span>)].<span class="ident">clone</span>();
+    <span class="kw">for </span>(field_id, field) <span class="kw">in </span>ct.iter_fields() {
+        <span class="kw">let </span><span class="kw-2">mut </span>ctfield = ctx.types.composite_type_fields[<span class="kw-2">&amp;</span>(ctid, field_id)].clone();
 
-        <span class="ident">ctx</span>.<span class="ident">visit_attributes</span>((<span class="ident">ctid</span>, <span class="ident">field_id</span>).<span class="ident">into</span>());
+        ctx.visit_attributes((ctid, field_id).into());
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ScalarFieldType::BuiltInScalar</span>(<span class="ident">_scalar_type</span>) <span class="op">=</span> <span class="ident">ctfield</span>.<span class="ident">r#type</span> {
-            <span class="comment">// native type attributes</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">datasource_name</span>, <span class="ident">type_name</span>, <span class="ident">args</span>)) <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">visit_datasource_scoped</span>() {
-                <span class="ident">native_types::visit_composite_type_field_native_type_attribute</span>(
-                    <span class="ident">datasource_name</span>,
-                    <span class="ident">type_name</span>,
-                    <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">args</span>],
-                    <span class="kw-2">&amp;mut</span> <span class="ident">ctfield</span>,
+        <span class="kw">if let </span>ScalarFieldType::BuiltInScalar(_scalar_type) = ctfield.r#type {
+            <span class="comment">// native type attributes
+            </span><span class="kw">if let </span><span class="prelude-val">Some</span>((datasource_name, type_name, args)) = ctx.visit_datasource_scoped() {
+                native_types::visit_composite_type_field_native_type_attribute(
+                    datasource_name,
+                    type_name,
+                    <span class="kw-2">&amp;</span>ctx.ast[args],
+                    <span class="kw-2">&amp;mut </span>ctfield,
                 )
             }
         }
 
-        <span class="comment">// @map</span>
-        <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">visit_optional_single_attr</span>(<span class="string">&quot;map&quot;</span>) {
-            <span class="ident">map::composite_type_field</span>(<span class="ident">ct</span>, <span class="ident">field</span>, <span class="ident">ctid</span>, <span class="ident">field_id</span>, <span class="kw-2">&amp;mut</span> <span class="ident">ctfield</span>, <span class="ident">ctx</span>);
-            <span class="ident">ctx</span>.<span class="ident">validate_visited_arguments</span>();
+        <span class="comment">// @map
+        </span><span class="kw">if </span>ctx.visit_optional_single_attr(<span class="string">&quot;map&quot;</span>) {
+            map::composite_type_field(ct, field, ctid, field_id, <span class="kw-2">&amp;mut </span>ctfield, ctx);
+            ctx.validate_visited_arguments();
         }
 
-        <span class="comment">// @default</span>
-        <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">visit_optional_single_attr</span>(<span class="string">&quot;default&quot;</span>) {
-            <span class="ident">default::visit_composite_field_default</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ctfield</span>, <span class="ident">ctid</span>, <span class="ident">field_id</span>, <span class="ident">ctx</span>);
-            <span class="ident">ctx</span>.<span class="ident">validate_visited_arguments</span>();
+        <span class="comment">// @default
+        </span><span class="kw">if </span>ctx.visit_optional_single_attr(<span class="string">&quot;default&quot;</span>) {
+            default::visit_composite_field_default(<span class="kw-2">&amp;mut </span>ctfield, ctid, field_id, ctx);
+            ctx.validate_visited_arguments();
         }
 
-        <span class="ident">ctx</span>.<span class="ident">types</span>.<span class="ident">composite_type_fields</span>.<span class="ident">insert</span>((<span class="ident">ctid</span>, <span class="ident">field_id</span>), <span class="ident">ctfield</span>);
-        <span class="ident">ctx</span>.<span class="ident">validate_visited_attributes</span>();
+        ctx.types.composite_type_fields.insert((ctid, field_id), ctfield);
+        ctx.validate_visited_attributes();
     }
 }
 
-<span class="kw">fn</span> <span class="ident">resolve_enum_attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>(<span class="ident">enum_id</span>: <span class="ident">ast::EnumId</span>, <span class="ident">ast_enum</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Enum</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">enum_attributes</span> <span class="op">=</span> <span class="ident">EnumAttributes::default</span>();
+<span class="kw">fn </span>resolve_enum_attributes&lt;<span class="lifetime">&#39;db</span>&gt;(enum_id: ast::EnumId, ast_enum: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Enum, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;db</span>&gt;) {
+    <span class="kw">let </span><span class="kw-2">mut </span>enum_attributes = EnumAttributes::default();
 
-    <span class="kw">for</span> <span class="ident">value_idx</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">ast_enum</span>.<span class="ident">values</span>.<span class="ident">len</span>() {
-        <span class="ident">ctx</span>.<span class="ident">visit_attributes</span>((<span class="ident">enum_id</span>, <span class="ident">value_idx</span> <span class="kw">as</span> <span class="ident">u32</span>).<span class="ident">into</span>());
-        <span class="comment">// @map</span>
-        <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">visit_optional_single_attr</span>(<span class="string">&quot;map&quot;</span>) {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">mapped_name</span>) <span class="op">=</span> <span class="ident">map::visit_map_attribute</span>(<span class="ident">ctx</span>) {
-                <span class="ident">enum_attributes</span>.<span class="ident">mapped_values</span>.<span class="ident">insert</span>(<span class="ident">value_idx</span> <span class="kw">as</span> <span class="ident">u32</span>, <span class="ident">mapped_name</span>);
-                <span class="ident">ctx</span>.<span class="ident">mapped_enum_value_names</span>
-                    .<span class="ident">insert</span>((<span class="ident">enum_id</span>, <span class="ident">mapped_name</span>), <span class="ident">value_idx</span> <span class="kw">as</span> <span class="ident">u32</span>);
+    <span class="kw">for </span>value_idx <span class="kw">in </span><span class="number">0</span>..ast_enum.values.len() {
+        ctx.visit_attributes((enum_id, value_idx <span class="kw">as </span>u32).into());
+        <span class="comment">// @map
+        </span><span class="kw">if </span>ctx.visit_optional_single_attr(<span class="string">&quot;map&quot;</span>) {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(mapped_name) = map::visit_map_attribute(ctx) {
+                enum_attributes.mapped_values.insert(value_idx <span class="kw">as </span>u32, mapped_name);
+                ctx.mapped_enum_value_names
+                    .insert((enum_id, mapped_name), value_idx <span class="kw">as </span>u32);
             }
-            <span class="ident">ctx</span>.<span class="ident">validate_visited_arguments</span>();
+            ctx.validate_visited_arguments();
         }
-        <span class="ident">ctx</span>.<span class="ident">validate_visited_attributes</span>();
+        ctx.validate_visited_attributes();
     }
 
-    <span class="comment">// Now validate the enum attributes.</span>
+    <span class="comment">// Now validate the enum attributes.
 
-    <span class="ident">ctx</span>.<span class="ident">visit_attributes</span>(<span class="ident">enum_id</span>.<span class="ident">into</span>());
+    </span>ctx.visit_attributes(enum_id.into());
 
-    <span class="comment">// @@map</span>
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">visit_optional_single_attr</span>(<span class="string">&quot;map&quot;</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">mapped_name</span>) <span class="op">=</span> <span class="ident">map::visit_map_attribute</span>(<span class="ident">ctx</span>) {
-            <span class="ident">enum_attributes</span>.<span class="ident">mapped_name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">mapped_name</span>);
-            <span class="ident">ctx</span>.<span class="ident">mapped_enum_names</span>.<span class="ident">insert</span>(<span class="ident">mapped_name</span>, <span class="ident">enum_id</span>);
+    <span class="comment">// @@map
+    </span><span class="kw">if </span>ctx.visit_optional_single_attr(<span class="string">&quot;map&quot;</span>) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(mapped_name) = map::visit_map_attribute(ctx) {
+            enum_attributes.mapped_name = <span class="prelude-val">Some</span>(mapped_name);
+            ctx.mapped_enum_names.insert(mapped_name, enum_id);
         }
-        <span class="ident">ctx</span>.<span class="ident">validate_visited_arguments</span>();
+        ctx.validate_visited_arguments();
     }
 
-    <span class="comment">// @@schema</span>
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">visit_optional_single_attr</span>(<span class="string">&quot;schema&quot;</span>) {
-        <span class="ident">schema</span>::<span class="ident">r#enum</span>(<span class="kw-2">&amp;mut</span> <span class="ident">enum_attributes</span>, <span class="ident">ctx</span>);
-        <span class="ident">ctx</span>.<span class="ident">validate_visited_arguments</span>();
+    <span class="comment">// @@schema
+    </span><span class="kw">if </span>ctx.visit_optional_single_attr(<span class="string">&quot;schema&quot;</span>) {
+        schema::r#enum(<span class="kw-2">&amp;mut </span>enum_attributes, ctx);
+        ctx.validate_visited_arguments();
     }
 
-    <span class="ident">ctx</span>.<span class="ident">types</span>.<span class="ident">enum_attributes</span>.<span class="ident">insert</span>(<span class="ident">enum_id</span>, <span class="ident">enum_attributes</span>);
-    <span class="ident">ctx</span>.<span class="ident">validate_visited_attributes</span>();
+    ctx.types.enum_attributes.insert(enum_id, enum_attributes);
+    ctx.validate_visited_attributes();
 }
 
-<span class="kw">fn</span> <span class="ident">resolve_model_attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>(<span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>, <span class="ident">ast_model</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Model</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">model_attributes</span> <span class="op">=</span> <span class="ident">ModelAttributes::default</span>();
+<span class="kw">fn </span>resolve_model_attributes&lt;<span class="lifetime">&#39;db</span>&gt;(model_id: ast::ModelId, ast_model: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Model, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;db</span>&gt;) {
+    <span class="kw">let </span><span class="kw-2">mut </span>model_attributes = ModelAttributes::default();
 
-    <span class="comment">// First resolve all the attributes defined on fields **in isolation**.</span>
-    <span class="kw">for</span> (<span class="ident">field_id</span>, <span class="ident">ast_field</span>) <span class="kw">in</span> <span class="ident">ast_model</span>.<span class="ident">iter_fields</span>() {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">scalar_field</span>) <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">types</span>.<span class="ident">take_scalar_field</span>(<span class="ident">model_id</span>, <span class="ident">field_id</span>) {
-            <span class="ident">visit_scalar_field_attributes</span>(
-                <span class="ident">model_id</span>,
-                <span class="ident">field_id</span>,
-                <span class="ident">ast_model</span>,
-                <span class="ident">ast_field</span>,
-                <span class="kw-2">&amp;mut</span> <span class="ident">model_attributes</span>,
-                <span class="kw-2">&amp;mut</span> <span class="ident">scalar_field</span>,
-                <span class="ident">ctx</span>,
+    <span class="comment">// First resolve all the attributes defined on fields **in isolation**.
+    </span><span class="kw">for </span>(field_id, ast_field) <span class="kw">in </span>ast_model.iter_fields() {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>scalar_field) = ctx.types.take_scalar_field(model_id, field_id) {
+            visit_scalar_field_attributes(
+                model_id,
+                field_id,
+                ast_model,
+                ast_field,
+                <span class="kw-2">&amp;mut </span>model_attributes,
+                <span class="kw-2">&amp;mut </span>scalar_field,
+                ctx,
             );
 
-            <span class="ident">ctx</span>.<span class="ident">types</span>.<span class="ident">scalar_fields</span>.<span class="ident">insert</span>((<span class="ident">model_id</span>, <span class="ident">field_id</span>), <span class="ident">scalar_field</span>);
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">mut</span> <span class="ident">rf</span>) <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">types</span>.<span class="ident">take_relation_field</span>(<span class="ident">model_id</span>, <span class="ident">field_id</span>) {
-            <span class="ident">visit_relation_field_attributes</span>(<span class="ident">model_id</span>, <span class="ident">field_id</span>, <span class="ident">ast_field</span>, <span class="kw-2">&amp;mut</span> <span class="ident">rf</span>, <span class="ident">ctx</span>);
-            <span class="ident">ctx</span>.<span class="ident">types</span>.<span class="ident">relation_fields</span>.<span class="ident">insert</span>((<span class="ident">model_id</span>, <span class="ident">field_id</span>), <span class="ident">rf</span>);
-        } <span class="kw">else</span> {
+            ctx.types.scalar_fields.insert((model_id, field_id), scalar_field);
+        } <span class="kw">else if let </span><span class="prelude-val">Some</span>(<span class="kw-2">mut </span>rf) = ctx.types.take_relation_field(model_id, field_id) {
+            visit_relation_field_attributes(model_id, field_id, ast_field, <span class="kw-2">&amp;mut </span>rf, ctx);
+            ctx.types.relation_fields.insert((model_id, field_id), rf);
+        } <span class="kw">else </span>{
             <span class="macro">unreachable!</span>(
                 <span class="string">&quot;{}.{} is neither a scalar field nor a relation field&quot;</span>,
-                <span class="ident">ast_model</span>.<span class="ident">name</span>(),
-                <span class="ident">ast_field</span>.<span class="ident">name</span>()
+                ast_model.name(),
+                ast_field.name()
             )
         }
     }
 
-    <span class="comment">// Resolve all the attributes defined on the model itself **in isolation**.</span>
-    <span class="ident">ctx</span>.<span class="ident">visit_attributes</span>(<span class="ident">model_id</span>.<span class="ident">into</span>());
+    <span class="comment">// Resolve all the attributes defined on the model itself **in isolation**.
+    </span>ctx.visit_attributes(model_id.into());
 
-    <span class="comment">// @@ignore</span>
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">visit_optional_single_attr</span>(<span class="string">&quot;ignore&quot;</span>) {
-        <span class="ident">visit_model_ignore</span>(<span class="ident">model_id</span>, <span class="kw-2">&amp;mut</span> <span class="ident">model_attributes</span>, <span class="ident">ctx</span>);
-        <span class="ident">ctx</span>.<span class="ident">validate_visited_arguments</span>();
+    <span class="comment">// @@ignore
+    </span><span class="kw">if </span>ctx.visit_optional_single_attr(<span class="string">&quot;ignore&quot;</span>) {
+        visit_model_ignore(model_id, <span class="kw-2">&amp;mut </span>model_attributes, ctx);
+        ctx.validate_visited_arguments();
     }
 
-    <span class="comment">// @@id</span>
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">visit_optional_single_attr</span>(<span class="string">&quot;id&quot;</span>) {
-        <span class="ident">id::model</span>(<span class="kw-2">&amp;mut</span> <span class="ident">model_attributes</span>, <span class="ident">model_id</span>, <span class="ident">ctx</span>);
-        <span class="ident">ctx</span>.<span class="ident">validate_visited_arguments</span>();
+    <span class="comment">// @@id
+    </span><span class="kw">if </span>ctx.visit_optional_single_attr(<span class="string">&quot;id&quot;</span>) {
+        id::model(<span class="kw-2">&amp;mut </span>model_attributes, model_id, ctx);
+        ctx.validate_visited_arguments();
     }
 
-    <span class="comment">// @@map</span>
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">visit_optional_single_attr</span>(<span class="string">&quot;map&quot;</span>) {
-        <span class="ident">map::model</span>(<span class="kw-2">&amp;mut</span> <span class="ident">model_attributes</span>, <span class="ident">ctx</span>);
-        <span class="ident">ctx</span>.<span class="ident">validate_visited_arguments</span>();
+    <span class="comment">// @@map
+    </span><span class="kw">if </span>ctx.visit_optional_single_attr(<span class="string">&quot;map&quot;</span>) {
+        map::model(<span class="kw-2">&amp;mut </span>model_attributes, ctx);
+        ctx.validate_visited_arguments();
     }
 
-    <span class="comment">// @@schema</span>
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">visit_optional_single_attr</span>(<span class="string">&quot;schema&quot;</span>) {
-        <span class="ident">schema::model</span>(<span class="kw-2">&amp;mut</span> <span class="ident">model_attributes</span>, <span class="ident">ctx</span>);
-        <span class="ident">ctx</span>.<span class="ident">validate_visited_arguments</span>();
+    <span class="comment">// @@schema
+    </span><span class="kw">if </span>ctx.visit_optional_single_attr(<span class="string">&quot;schema&quot;</span>) {
+        schema::model(<span class="kw-2">&amp;mut </span>model_attributes, ctx);
+        ctx.validate_visited_arguments();
     }
 
-    <span class="comment">// @@index</span>
-    <span class="kw">while</span> <span class="ident">ctx</span>.<span class="ident">visit_repeated_attr</span>(<span class="string">&quot;index&quot;</span>) {
-        <span class="ident">model_index</span>(<span class="kw-2">&amp;mut</span> <span class="ident">model_attributes</span>, <span class="ident">model_id</span>, <span class="ident">ctx</span>);
-        <span class="ident">ctx</span>.<span class="ident">validate_visited_arguments</span>();
+    <span class="comment">// @@index
+    </span><span class="kw">while </span>ctx.visit_repeated_attr(<span class="string">&quot;index&quot;</span>) {
+        model_index(<span class="kw-2">&amp;mut </span>model_attributes, model_id, ctx);
+        ctx.validate_visited_arguments();
     }
 
-    <span class="comment">// @@unique</span>
-    <span class="kw">while</span> <span class="ident">ctx</span>.<span class="ident">visit_repeated_attr</span>(<span class="string">&quot;unique&quot;</span>) {
-        <span class="ident">model_unique</span>(<span class="kw-2">&amp;mut</span> <span class="ident">model_attributes</span>, <span class="ident">model_id</span>, <span class="ident">ctx</span>);
-        <span class="ident">ctx</span>.<span class="ident">validate_visited_arguments</span>();
+    <span class="comment">// @@unique
+    </span><span class="kw">while </span>ctx.visit_repeated_attr(<span class="string">&quot;unique&quot;</span>) {
+        model_unique(<span class="kw-2">&amp;mut </span>model_attributes, model_id, ctx);
+        ctx.validate_visited_arguments();
     }
 
-    <span class="comment">// @@fulltext</span>
-    <span class="kw">while</span> <span class="ident">ctx</span>.<span class="ident">visit_repeated_attr</span>(<span class="string">&quot;fulltext&quot;</span>) {
-        <span class="ident">model_fulltext</span>(<span class="kw-2">&amp;mut</span> <span class="ident">model_attributes</span>, <span class="ident">model_id</span>, <span class="ident">ctx</span>);
-        <span class="ident">ctx</span>.<span class="ident">validate_visited_arguments</span>();
+    <span class="comment">// @@fulltext
+    </span><span class="kw">while </span>ctx.visit_repeated_attr(<span class="string">&quot;fulltext&quot;</span>) {
+        model_fulltext(<span class="kw-2">&amp;mut </span>model_attributes, model_id, ctx);
+        ctx.validate_visited_arguments();
     }
 
-    <span class="comment">// Model-global validations</span>
-    <span class="ident">id::validate_id_field_arities</span>(<span class="ident">model_id</span>, <span class="kw-2">&amp;</span><span class="ident">model_attributes</span>, <span class="ident">ctx</span>);
+    <span class="comment">// Model-global validations
+    </span>id::validate_id_field_arities(model_id, <span class="kw-2">&amp;</span>model_attributes, ctx);
 
-    <span class="ident">ctx</span>.<span class="ident">types</span>.<span class="ident">model_attributes</span>.<span class="ident">insert</span>(<span class="ident">model_id</span>, <span class="ident">model_attributes</span>);
-    <span class="ident">ctx</span>.<span class="ident">validate_visited_attributes</span>();
+    ctx.types.model_attributes.insert(model_id, model_attributes);
+    ctx.validate_visited_attributes();
 }
 
-<span class="kw">fn</span> <span class="ident">visit_scalar_field_attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>(
-    <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>,
-    <span class="ident">field_id</span>: <span class="ident">ast::FieldId</span>,
-    <span class="ident">ast_model</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Model</span>,
-    <span class="ident">ast_field</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Field</span>,
-    <span class="ident">model_attributes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ModelAttributes</span>,
-    <span class="ident">scalar_field_data</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ScalarField</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>,
+<span class="kw">fn </span>visit_scalar_field_attributes&lt;<span class="lifetime">&#39;db</span>&gt;(
+    model_id: ast::ModelId,
+    field_id: ast::FieldId,
+    ast_model: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Model,
+    ast_field: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Field,
+    model_attributes: <span class="kw-2">&amp;mut </span>ModelAttributes,
+    scalar_field_data: <span class="kw-2">&amp;mut </span>ScalarField,
+    ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;db</span>&gt;,
 ) {
-    <span class="ident">ctx</span>.<span class="ident">visit_scalar_field_attributes</span>(<span class="ident">model_id</span>, <span class="ident">field_id</span>);
+    ctx.visit_scalar_field_attributes(model_id, field_id);
 
-    <span class="comment">// @map</span>
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">visit_optional_single_attr</span>(<span class="string">&quot;map&quot;</span>) {
-        <span class="ident">map::scalar_field</span>(<span class="ident">ast_model</span>, <span class="ident">ast_field</span>, <span class="ident">model_id</span>, <span class="ident">field_id</span>, <span class="ident">scalar_field_data</span>, <span class="ident">ctx</span>);
-        <span class="ident">ctx</span>.<span class="ident">validate_visited_arguments</span>();
+    <span class="comment">// @map
+    </span><span class="kw">if </span>ctx.visit_optional_single_attr(<span class="string">&quot;map&quot;</span>) {
+        map::scalar_field(ast_model, ast_field, model_id, field_id, scalar_field_data, ctx);
+        ctx.validate_visited_arguments();
     }
 
-    <span class="comment">// @ignore</span>
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">visit_optional_single_attr</span>(<span class="string">&quot;ignore&quot;</span>) {
-        <span class="kw">if</span> <span class="macro">matches!</span>(<span class="ident">scalar_field_data</span>.<span class="ident">r#type</span>, <span class="ident">ScalarFieldType::Unsupported</span>(<span class="kw">_</span>)) {
-            <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="string">&quot;Fields of type `Unsupported` cannot take an `@ignore` attribute. They are already treated as ignored by the client due to their type.&quot;</span>);
-        } <span class="kw">else</span> {
-            <span class="ident">scalar_field_data</span>.<span class="ident">is_ignored</span> <span class="op">=</span> <span class="bool-val">true</span>;
+    <span class="comment">// @ignore
+    </span><span class="kw">if </span>ctx.visit_optional_single_attr(<span class="string">&quot;ignore&quot;</span>) {
+        <span class="kw">if </span><span class="macro">matches!</span>(scalar_field_data.r#type, ScalarFieldType::Unsupported(<span class="kw">_</span>)) {
+            ctx.push_attribute_validation_error(<span class="string">&quot;Fields of type `Unsupported` cannot take an `@ignore` attribute. They are already treated as ignored by the client due to their type.&quot;</span>);
+        } <span class="kw">else </span>{
+            scalar_field_data.is_ignored = <span class="bool-val">true</span>;
         }
-        <span class="ident">ctx</span>.<span class="ident">validate_visited_arguments</span>();
+        ctx.validate_visited_arguments();
     }
 
-    <span class="comment">// @relation</span>
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">visit_optional_single_attr</span>(<span class="string">&quot;relation&quot;</span>) {
-        <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="string">&quot;Invalid field type, not a relation.&quot;</span>);
-        <span class="ident">ctx</span>.<span class="ident">validate_visited_arguments</span>();
+    <span class="comment">// @relation
+    </span><span class="kw">if </span>ctx.visit_optional_single_attr(<span class="string">&quot;relation&quot;</span>) {
+        ctx.push_attribute_validation_error(<span class="string">&quot;Invalid field type, not a relation.&quot;</span>);
+        ctx.validate_visited_arguments();
     }
 
-    <span class="comment">// @id</span>
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">visit_optional_single_attr</span>(<span class="string">&quot;id&quot;</span>) {
-        <span class="ident">id::field</span>(<span class="ident">ast_model</span>, <span class="ident">field_id</span>, <span class="ident">model_attributes</span>, <span class="ident">ctx</span>);
-        <span class="ident">ctx</span>.<span class="ident">validate_visited_arguments</span>();
+    <span class="comment">// @id
+    </span><span class="kw">if </span>ctx.visit_optional_single_attr(<span class="string">&quot;id&quot;</span>) {
+        id::field(ast_model, field_id, model_attributes, ctx);
+        ctx.validate_visited_arguments();
     }
 
-    <span class="comment">// @updatedAt</span>
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">visit_optional_single_attr</span>(<span class="string">&quot;updatedAt&quot;</span>) {
-        <span class="kw">if</span> <span class="op">!</span><span class="macro">matches!</span>(
-            <span class="ident">scalar_field_data</span>.<span class="ident">r#type</span>,
-            <span class="ident">ScalarFieldType::BuiltInScalar</span>(<span class="ident"><span class="kw">crate</span>::ScalarType::DateTime</span>)
+    <span class="comment">// @updatedAt
+    </span><span class="kw">if </span>ctx.visit_optional_single_attr(<span class="string">&quot;updatedAt&quot;</span>) {
+        <span class="kw">if </span>!<span class="macro">matches!</span>(
+            scalar_field_data.r#type,
+            ScalarFieldType::BuiltInScalar(<span class="kw">crate</span>::ScalarType::DateTime)
         ) {
-            <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="string">&quot;Fields that are marked with @updatedAt must be of type DateTime.&quot;</span>);
+            ctx.push_attribute_validation_error(<span class="string">&quot;Fields that are marked with @updatedAt must be of type DateTime.&quot;</span>);
         }
 
-        <span class="kw">if</span> <span class="ident">ast_field</span>.<span class="ident">arity</span>.<span class="ident">is_list</span>() {
-            <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="string">&quot;Fields that are marked with @updatedAt cannot be lists.&quot;</span>);
+        <span class="kw">if </span>ast_field.arity.is_list() {
+            ctx.push_attribute_validation_error(<span class="string">&quot;Fields that are marked with @updatedAt cannot be lists.&quot;</span>);
         }
 
-        <span class="ident">scalar_field_data</span>.<span class="ident">is_updated_at</span> <span class="op">=</span> <span class="bool-val">true</span>;
-        <span class="ident">ctx</span>.<span class="ident">validate_visited_arguments</span>();
+        scalar_field_data.is_updated_at = <span class="bool-val">true</span>;
+        ctx.validate_visited_arguments();
     }
 
-    <span class="comment">// @default</span>
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">visit_optional_single_attr</span>(<span class="string">&quot;default&quot;</span>) {
-        <span class="ident">default::visit_model_field_default</span>(<span class="ident">scalar_field_data</span>, <span class="ident">model_id</span>, <span class="ident">field_id</span>, <span class="ident">ctx</span>);
-        <span class="ident">ctx</span>.<span class="ident">validate_visited_arguments</span>();
+    <span class="comment">// @default
+    </span><span class="kw">if </span>ctx.visit_optional_single_attr(<span class="string">&quot;default&quot;</span>) {
+        default::visit_model_field_default(scalar_field_data, model_id, field_id, ctx);
+        ctx.validate_visited_arguments();
     }
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ScalarFieldType::BuiltInScalar</span>(<span class="ident">_scalar_type</span>) <span class="op">=</span> <span class="ident">scalar_field_data</span>.<span class="ident">r#type</span> {
-        <span class="comment">// native type attributes</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">datasource_name</span>, <span class="ident">type_name</span>, <span class="ident">attribute_id</span>)) <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">visit_datasource_scoped</span>() {
-            <span class="kw">let</span> <span class="ident">attribute</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">attribute_id</span>];
-            <span class="ident">native_types::visit_model_field_native_type_attribute</span>(
-                <span class="ident">datasource_name</span>,
-                <span class="ident">type_name</span>,
-                <span class="ident">attribute</span>,
-                <span class="ident">scalar_field_data</span>,
+    <span class="kw">if let </span>ScalarFieldType::BuiltInScalar(_scalar_type) = scalar_field_data.r#type {
+        <span class="comment">// native type attributes
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>((datasource_name, type_name, attribute_id)) = ctx.visit_datasource_scoped() {
+            <span class="kw">let </span>attribute = <span class="kw-2">&amp;</span>ctx.ast[attribute_id];
+            native_types::visit_model_field_native_type_attribute(
+                datasource_name,
+                type_name,
+                attribute,
+                scalar_field_data,
             );
         }
     }
 
-    <span class="comment">// @unique</span>
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">visit_optional_single_attr</span>(<span class="string">&quot;unique&quot;</span>) {
-        <span class="ident">visit_field_unique</span>(<span class="ident">field_id</span>, <span class="ident">model_attributes</span>, <span class="ident">ctx</span>);
-        <span class="ident">ctx</span>.<span class="ident">validate_visited_arguments</span>();
+    <span class="comment">// @unique
+    </span><span class="kw">if </span>ctx.visit_optional_single_attr(<span class="string">&quot;unique&quot;</span>) {
+        visit_field_unique(field_id, model_attributes, ctx);
+        ctx.validate_visited_arguments();
     }
 
-    <span class="ident">ctx</span>.<span class="ident">validate_visited_attributes</span>();
+    ctx.validate_visited_attributes();
 }
 
-<span class="kw">fn</span> <span class="ident">visit_field_unique</span>(<span class="ident">field_id</span>: <span class="ident">ast::FieldId</span>, <span class="ident">model_attributes</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ModelAttributes</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="ident">mapped_name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ctx</span>
-        .<span class="ident">visit_optional_arg</span>(<span class="string">&quot;map&quot;</span>)
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">coerce::string</span>(<span class="ident">arg</span>, <span class="ident">ctx</span>.<span class="ident">diagnostics</span>))
+<span class="kw">fn </span>visit_field_unique(field_id: ast::FieldId, model_attributes: <span class="kw-2">&amp;mut </span>ModelAttributes, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">let </span>mapped_name = <span class="kw">match </span>ctx
+        .visit_optional_arg(<span class="string">&quot;map&quot;</span>)
+        .and_then(|arg| coerce::string(arg, ctx.diagnostics))
     {
         <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>) =&gt; {
-            <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="string">&quot;The `map` argument cannot be an empty string.&quot;</span>);
-            <span class="prelude-val">None</span>
-        }
-        <span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">ctx</span>.<span class="ident">interner</span>.<span class="ident">intern</span>(<span class="ident">name</span>)),
-        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+            ctx.push_attribute_validation_error(<span class="string">&quot;The `map` argument cannot be an empty string.&quot;</span>);
+            <span class="prelude-val">None
+        </span>}
+        <span class="prelude-val">Some</span>(name) =&gt; <span class="prelude-val">Some</span>(ctx.interner.intern(name)),
+        <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
     };
 
-    <span class="kw">let</span> <span class="ident">length</span> <span class="op">=</span> <span class="ident">ctx</span>
-        .<span class="ident">visit_optional_arg</span>(<span class="string">&quot;length&quot;</span>)
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">length</span><span class="op">|</span> <span class="ident">coerce::integer</span>(<span class="ident">length</span>, <span class="ident">ctx</span>.<span class="ident">diagnostics</span>))
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">len</span><span class="op">|</span> <span class="ident">len</span> <span class="kw">as</span> <span class="ident">u32</span>);
+    <span class="kw">let </span>length = ctx
+        .visit_optional_arg(<span class="string">&quot;length&quot;</span>)
+        .and_then(|length| coerce::integer(length, ctx.diagnostics))
+        .map(|len| len <span class="kw">as </span>u32);
 
-    <span class="kw">let</span> <span class="ident">sort_order</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ctx</span>
-        .<span class="ident">visit_optional_arg</span>(<span class="string">&quot;sort&quot;</span>)
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">sort</span><span class="op">|</span> <span class="ident">coerce::constant</span>(<span class="ident">sort</span>, <span class="ident">ctx</span>.<span class="ident">diagnostics</span>))
+    <span class="kw">let </span>sort_order = <span class="kw">match </span>ctx
+        .visit_optional_arg(<span class="string">&quot;sort&quot;</span>)
+        .and_then(|sort| coerce::constant(sort, ctx.diagnostics))
     {
-        <span class="prelude-val">Some</span>(<span class="string">&quot;Desc&quot;</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">SortOrder::Desc</span>),
-        <span class="prelude-val">Some</span>(<span class="string">&quot;Asc&quot;</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">SortOrder::Asc</span>),
-        <span class="prelude-val">Some</span>(<span class="ident">other</span>) =&gt; {
-            <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
+        <span class="prelude-val">Some</span>(<span class="string">&quot;Desc&quot;</span>) =&gt; <span class="prelude-val">Some</span>(SortOrder::Desc),
+        <span class="prelude-val">Some</span>(<span class="string">&quot;Asc&quot;</span>) =&gt; <span class="prelude-val">Some</span>(SortOrder::Asc),
+        <span class="prelude-val">Some</span>(other) =&gt; {
+            ctx.push_attribute_validation_error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(
                 <span class="string">&quot;The `sort` argument can only be `Asc` or `Desc` you provided: {}.&quot;</span>,
-                <span class="ident">other</span>
+                other
             ));
-            <span class="prelude-val">None</span>
-        }
-        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+            <span class="prelude-val">None
+        </span>}
+        <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
     };
 
-    <span class="kw">let</span> <span class="ident">clustered</span> <span class="op">=</span> <span class="ident">validate_clustering_setting</span>(<span class="ident">ctx</span>);
+    <span class="kw">let </span>clustered = validate_clustering_setting(ctx);
 
-    <span class="ident">model_attributes</span>.<span class="ident">ast_indexes</span>.<span class="ident">push</span>((
-        <span class="ident">ctx</span>.<span class="ident">current_attribute_id</span>(),
-        <span class="ident">IndexAttribute</span> {
-            <span class="ident">r#type</span>: <span class="ident">IndexType::Unique</span>,
-            <span class="ident">fields</span>: <span class="macro">vec!</span>[<span class="ident">FieldWithArgs</span> {
-                <span class="ident">path</span>: <span class="ident">IndexFieldPath::new</span>(<span class="ident">field_id</span>),
-                <span class="ident">sort_order</span>,
-                <span class="ident">length</span>,
-                <span class="ident">operator_class</span>: <span class="prelude-val">None</span>,
+    model_attributes.ast_indexes.push((
+        ctx.current_attribute_id(),
+        IndexAttribute {
+            r#type: IndexType::Unique,
+            fields: <span class="macro">vec!</span>[FieldWithArgs {
+                path: IndexFieldPath::new(field_id),
+                sort_order,
+                length,
+                operator_class: <span class="prelude-val">None</span>,
             }],
-            <span class="ident">source_field</span>: <span class="prelude-val">Some</span>(<span class="ident">field_id</span>),
-            <span class="ident">mapped_name</span>,
-            <span class="ident">clustered</span>,
-            ..<span class="ident">Default::default</span>()
+            source_field: <span class="prelude-val">Some</span>(field_id),
+            mapped_name,
+            clustered,
+            ..Default::default()
         },
     ))
 }
 
-<span class="kw">fn</span> <span class="ident">visit_relation_field_attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>(
-    <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>,
-    <span class="ident">field_id</span>: <span class="ident">ast::FieldId</span>,
-    <span class="ident">ast_field</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Field</span>,
-    <span class="ident">relation_field</span>: <span class="kw-2">&amp;mut</span> <span class="ident">RelationField</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>,
+<span class="kw">fn </span>visit_relation_field_attributes&lt;<span class="lifetime">&#39;db</span>&gt;(
+    model_id: ast::ModelId,
+    field_id: ast::FieldId,
+    ast_field: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Field,
+    relation_field: <span class="kw-2">&amp;mut </span>RelationField,
+    ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;db</span>&gt;,
 ) {
-    <span class="ident">ctx</span>.<span class="ident">visit_attributes</span>((<span class="ident">model_id</span>, <span class="ident">field_id</span>).<span class="ident">into</span>());
+    ctx.visit_attributes((model_id, field_id).into());
 
-    <span class="comment">// @relation</span>
-    <span class="comment">// Relation attributes are not required at this stage.</span>
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">visit_optional_single_attr</span>(<span class="string">&quot;relation&quot;</span>) {
-        <span class="ident">visit_relation</span>(<span class="ident">model_id</span>, <span class="ident">relation_field</span>, <span class="ident">ctx</span>);
-        <span class="ident">ctx</span>.<span class="ident">validate_visited_arguments</span>();
+    <span class="comment">// @relation
+    // Relation attributes are not required at this stage.
+    </span><span class="kw">if </span>ctx.visit_optional_single_attr(<span class="string">&quot;relation&quot;</span>) {
+        visit_relation(model_id, relation_field, ctx);
+        ctx.validate_visited_arguments();
     }
 
-    <span class="comment">// @id</span>
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">visit_optional_single_attr</span>(<span class="string">&quot;id&quot;</span>) {
-        <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(
+    <span class="comment">// @id
+    </span><span class="kw">if </span>ctx.visit_optional_single_attr(<span class="string">&quot;id&quot;</span>) {
+        <span class="kw">let </span>msg = <span class="macro">format!</span>(
             <span class="string">&quot;The field `{}` is a relation field and cannot be marked with `@id`. Only scalar fields can be declared as id.&quot;</span>,
-            <span class="kw-2">&amp;</span><span class="ident">ast_field</span>.<span class="ident">name</span>(),
+            <span class="kw-2">&amp;</span>ast_field.name(),
         );
-        <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>);
-        <span class="ident">ctx</span>.<span class="ident">discard_arguments</span>();
+        ctx.push_attribute_validation_error(<span class="kw-2">&amp;</span>msg);
+        ctx.discard_arguments();
     }
 
-    <span class="comment">// @ignore</span>
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">visit_optional_single_attr</span>(<span class="string">&quot;ignore&quot;</span>) {
-        <span class="ident">relation_field</span>.<span class="ident">is_ignored</span> <span class="op">=</span> <span class="bool-val">true</span>;
-        <span class="ident">ctx</span>.<span class="ident">validate_visited_arguments</span>();
+    <span class="comment">// @ignore
+    </span><span class="kw">if </span>ctx.visit_optional_single_attr(<span class="string">&quot;ignore&quot;</span>) {
+        relation_field.is_ignored = <span class="bool-val">true</span>;
+        ctx.validate_visited_arguments();
     }
 
-    <span class="comment">// @default</span>
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">visit_optional_single_attr</span>(<span class="string">&quot;default&quot;</span>) {
-        <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="string">&quot;Cannot set a default value on a relation field.&quot;</span>);
-        <span class="ident">ctx</span>.<span class="ident">discard_arguments</span>();
+    <span class="comment">// @default
+    </span><span class="kw">if </span>ctx.visit_optional_single_attr(<span class="string">&quot;default&quot;</span>) {
+        ctx.push_attribute_validation_error(<span class="string">&quot;Cannot set a default value on a relation field.&quot;</span>);
+        ctx.discard_arguments();
     }
 
-    <span class="comment">// @map</span>
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">visit_optional_single_attr</span>(<span class="string">&quot;map&quot;</span>) {
-        <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="string">&quot;The attribute `@map` cannot be used on relation fields.&quot;</span>);
+    <span class="comment">// @map
+    </span><span class="kw">if </span>ctx.visit_optional_single_attr(<span class="string">&quot;map&quot;</span>) {
+        ctx.push_attribute_validation_error(<span class="string">&quot;The attribute `@map` cannot be used on relation fields.&quot;</span>);
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">visit_default_arg</span>(<span class="string">&quot;name&quot;</span>) {
-            <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">err</span>)
+        <span class="kw">if let </span><span class="prelude-val">Err</span>(err) = ctx.visit_default_arg(<span class="string">&quot;name&quot;</span>) {
+            ctx.push_error(err)
         }
-        <span class="ident">ctx</span>.<span class="ident">discard_arguments</span>();
+        ctx.discard_arguments();
     }
 
-    <span class="comment">// @unique</span>
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">visit_optional_single_attr</span>(<span class="string">&quot;unique&quot;</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">suggested_fields</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+    <span class="comment">// @unique
+    </span><span class="kw">if </span>ctx.visit_optional_single_attr(<span class="string">&quot;unique&quot;</span>) {
+        <span class="kw">let </span><span class="kw-2">mut </span>suggested_fields = Vec::new();
 
-        <span class="kw">for</span> <span class="ident">underlying_field</span> <span class="kw">in</span> <span class="ident">relation_field</span>.<span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">flatten</span>() {
-            <span class="ident">suggested_fields</span>.<span class="ident">push</span>(<span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">model_id</span>][<span class="kw-2">*</span><span class="ident">underlying_field</span>].<span class="ident">name</span>());
+        <span class="kw">for </span>underlying_field <span class="kw">in </span>relation_field.fields.iter().flatten() {
+            suggested_fields.push(ctx.ast[model_id][<span class="kw-2">*</span>underlying_field].name());
         }
 
-        <span class="kw">let</span> <span class="ident">suggestion</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">suggested_fields</span>.<span class="ident">len</span>() {
-            <span class="number">0</span> =&gt; <span class="ident">String::new</span>(),
-            <span class="number">1</span> =&gt; <span class="macro">format!</span>(<span class="string">&quot; Did you mean to put it on `{field}`?&quot;</span>, <span class="ident">field</span> <span class="op">=</span> <span class="ident">suggested_fields</span>[<span class="number">0</span>],),
-            <span class="kw">_</span> =&gt; {
+        <span class="kw">let </span>suggestion = <span class="kw">match </span>suggested_fields.len() {
+            <span class="number">0 </span>=&gt; String::new(),
+            <span class="number">1 </span>=&gt; <span class="macro">format!</span>(<span class="string">&quot; Did you mean to put it on `{field}`?&quot;</span>, field = suggested_fields[<span class="number">0</span>],),
+            <span class="kw">_ </span>=&gt; {
                 <span class="macro">format!</span>(
                     <span class="string">&quot; Did you mean to provide `@@unique([{fields}])`?&quot;</span>,
-                    <span class="ident">fields</span> <span class="op">=</span> <span class="ident">suggested_fields</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>),
+                    fields = suggested_fields.join(<span class="string">&quot;, &quot;</span>),
                 )
             }
         };
 
-        <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(
+        ctx.push_attribute_validation_error(
             <span class="kw-2">&amp;</span><span class="macro">format!</span>(
                 <span class="string">&quot;The field `{relation_field_name}` is a relation field and cannot be marked with `unique`. Only scalar fields can be made unique.{suggestion}&quot;</span>,
-                <span class="ident">relation_field_name</span> <span class="op">=</span> <span class="ident">ast_field</span>.<span class="ident">name</span>(),
-                <span class="ident">suggestion</span> <span class="op">=</span> <span class="ident">suggestion</span>
+                relation_field_name = ast_field.name(),
+                suggestion = suggestion
             )
         );
-        <span class="ident">ctx</span>.<span class="ident">discard_arguments</span>();
+        ctx.discard_arguments();
     }
 
-    <span class="ident">ctx</span>.<span class="ident">validate_visited_attributes</span>();
+    ctx.validate_visited_attributes();
 }
 
-<span class="kw">fn</span> <span class="ident">visit_model_ignore</span>(<span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>, <span class="ident">model_data</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ModelAttributes</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="ident">ignored_field_errors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ctx</span>
-        .<span class="ident">types</span>
-        .<span class="ident">range_model_scalar_fields</span>(<span class="ident">model_id</span>)
-        .<span class="ident">filter</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">sf</span>)<span class="op">|</span> <span class="ident">sf</span>.<span class="ident">is_ignored</span>)
-        .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">field_id</span>, <span class="kw">_</span>)<span class="op">|</span> {
-            <span class="ident">DatamodelError::new_attribute_validation_error</span>(
+<span class="kw">fn </span>visit_model_ignore(model_id: ast::ModelId, model_data: <span class="kw-2">&amp;mut </span>ModelAttributes, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">let </span>ignored_field_errors: Vec&lt;<span class="kw">_</span>&gt; = ctx
+        .types
+        .range_model_scalar_fields(model_id)
+        .filter(|(<span class="kw">_</span>, sf)| sf.is_ignored)
+        .map(|(field_id, <span class="kw">_</span>)| {
+            DatamodelError::new_attribute_validation_error(
                 <span class="string">&quot;Fields on an already ignored Model do not need an `@ignore` annotation.&quot;</span>,
                 <span class="string">&quot;@ignore&quot;</span>,
-                <span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">model_id</span>][<span class="ident">field_id</span>].<span class="ident">span</span>(),
+                ctx.ast[model_id][field_id].span(),
             )
         })
-        .<span class="ident">collect</span>();
+        .collect();
 
-    <span class="kw">for</span> <span class="ident">error</span> <span class="kw">in</span> <span class="ident">ignored_field_errors</span> {
-        <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">error</span>)
+    <span class="kw">for </span>error <span class="kw">in </span>ignored_field_errors {
+        ctx.push_error(error)
     }
 
-    <span class="ident">model_data</span>.<span class="ident">is_ignored</span> <span class="op">=</span> <span class="bool-val">true</span>;
+    model_data.is_ignored = <span class="bool-val">true</span>;
 }
 
-<span class="doccomment">/// Validate @@fulltext on models</span>
-<span class="kw">fn</span> <span class="ident">model_fulltext</span>(<span class="ident">data</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ModelAttributes</span>, <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">index_attribute</span> <span class="op">=</span> <span class="ident">IndexAttribute</span> {
-        <span class="ident">r#type</span>: <span class="ident">IndexType::Fulltext</span>,
-        ..<span class="ident">Default::default</span>()
+<span class="doccomment">/// Validate @@fulltext on models
+</span><span class="kw">fn </span>model_fulltext(data: <span class="kw-2">&amp;mut </span>ModelAttributes, model_id: ast::ModelId, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">let </span><span class="kw-2">mut </span>index_attribute = IndexAttribute {
+        r#type: IndexType::Fulltext,
+        ..Default::default()
     };
 
-    <span class="ident">common_index_validations</span>(
-        <span class="kw-2">&amp;mut</span> <span class="ident">index_attribute</span>,
-        <span class="ident">model_id</span>,
-        <span class="ident">FieldResolvingSetup::FollowComposites</span>,
-        <span class="ident">ctx</span>,
+    common_index_validations(
+        <span class="kw-2">&amp;mut </span>index_attribute,
+        model_id,
+        FieldResolvingSetup::FollowComposites,
+        ctx,
     );
 
-    <span class="kw">let</span> <span class="ident">mapped_name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ctx</span>
-        .<span class="ident">visit_optional_arg</span>(<span class="string">&quot;map&quot;</span>)
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="ident">coerce::string</span>(<span class="ident">name</span>, <span class="ident">ctx</span>.<span class="ident">diagnostics</span>))
+    <span class="kw">let </span>mapped_name = <span class="kw">match </span>ctx
+        .visit_optional_arg(<span class="string">&quot;map&quot;</span>)
+        .and_then(|name| coerce::string(name, ctx.diagnostics))
     {
         <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>) =&gt; {
-            <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="string">&quot;The `map` argument cannot be an empty string.&quot;</span>);
-            <span class="prelude-val">None</span>
-        }
-        <span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">ctx</span>.<span class="ident">interner</span>.<span class="ident">intern</span>(<span class="ident">name</span>)),
-        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+            ctx.push_attribute_validation_error(<span class="string">&quot;The `map` argument cannot be an empty string.&quot;</span>);
+            <span class="prelude-val">None
+        </span>}
+        <span class="prelude-val">Some</span>(name) =&gt; <span class="prelude-val">Some</span>(ctx.interner.intern(name)),
+        <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
     };
 
-    <span class="ident">index_attribute</span>.<span class="ident">mapped_name</span> <span class="op">=</span> <span class="ident">mapped_name</span>;
+    index_attribute.mapped_name = mapped_name;
 
-    <span class="ident">data</span>.<span class="ident">ast_indexes</span>.<span class="ident">push</span>((<span class="ident">ctx</span>.<span class="ident">current_attribute_id</span>(), <span class="ident">index_attribute</span>));
+    data.ast_indexes.push((ctx.current_attribute_id(), index_attribute));
 }
 
-<span class="doccomment">/// Validate @@index on models.</span>
-<span class="kw">fn</span> <span class="ident">model_index</span>(<span class="ident">data</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ModelAttributes</span>, <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">index_attribute</span> <span class="op">=</span> <span class="ident">IndexAttribute</span> {
-        <span class="ident">r#type</span>: <span class="ident">IndexType::Normal</span>,
-        ..<span class="ident">Default::default</span>()
+<span class="doccomment">/// Validate @@index on models.
+</span><span class="kw">fn </span>model_index(data: <span class="kw-2">&amp;mut </span>ModelAttributes, model_id: ast::ModelId, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">let </span><span class="kw-2">mut </span>index_attribute = IndexAttribute {
+        r#type: IndexType::Normal,
+        ..Default::default()
     };
 
-    <span class="ident">common_index_validations</span>(
-        <span class="kw-2">&amp;mut</span> <span class="ident">index_attribute</span>,
-        <span class="ident">model_id</span>,
-        <span class="ident">FieldResolvingSetup::FollowComposites</span>,
-        <span class="ident">ctx</span>,
+    common_index_validations(
+        <span class="kw-2">&amp;mut </span>index_attribute,
+        model_id,
+        FieldResolvingSetup::FollowComposites,
+        ctx,
     );
 
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">get_name_argument</span>(<span class="ident">ctx</span>);
+    <span class="kw">let </span>name = get_name_argument(ctx);
 
-    <span class="kw">let</span> <span class="ident">mapped_name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ctx</span>
-        .<span class="ident">visit_optional_arg</span>(<span class="string">&quot;map&quot;</span>)
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="ident">coerce::string</span>(<span class="ident">name</span>, <span class="ident">ctx</span>.<span class="ident">diagnostics</span>))
+    <span class="kw">let </span>mapped_name = <span class="kw">match </span>ctx
+        .visit_optional_arg(<span class="string">&quot;map&quot;</span>)
+        .and_then(|name| coerce::string(name, ctx.diagnostics))
     {
         <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>) =&gt; {
-            <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="string">&quot;The `map` argument cannot be an empty string.&quot;</span>);
-            <span class="prelude-val">None</span>
-        }
-        <span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">ctx</span>.<span class="ident">interner</span>.<span class="ident">intern</span>(<span class="ident">name</span>)),
-        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+            ctx.push_attribute_validation_error(<span class="string">&quot;The `map` argument cannot be an empty string.&quot;</span>);
+            <span class="prelude-val">None
+        </span>}
+        <span class="prelude-val">Some</span>(name) =&gt; <span class="prelude-val">Some</span>(ctx.interner.intern(name)),
+        <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
     };
 
-    <span class="comment">// We do not want to break existing datamodels for client purposes that</span>
-    <span class="comment">// use the old `@@index([field], name: &quot;onlydbname&quot;)` This would</span>
-    <span class="comment">// strictly speaking be invalid now since `name` in the index definition</span>
-    <span class="comment">// translates to the client name (which non-unique indexes do not have)</span>
-    <span class="comment">// and `map` translates to the db constraint name.</span>
-    <span class="comment">//</span>
-    <span class="comment">// To prevent existing datamodels from failing to parse after an upgrade</span>
-    <span class="comment">// we will keep accepting the `name` property on @@index. If it is</span>
-    <span class="comment">// present we will interpret it as the `map` property and populate it</span>
-    <span class="comment">// accordingly. If the datamodel gets freshly rendered it will then be</span>
-    <span class="comment">// rendered correctly as `map`. We will however error if both `map` and</span>
-    <span class="comment">// `name` are being used.</span>
-    <span class="ident">index_attribute</span>.<span class="ident">mapped_name</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">name</span>, <span class="ident">mapped_name</span>) {
+    <span class="comment">// We do not want to break existing datamodels for client purposes that
+    // use the old `@@index([field], name: &quot;onlydbname&quot;)` This would
+    // strictly speaking be invalid now since `name` in the index definition
+    // translates to the client name (which non-unique indexes do not have)
+    // and `map` translates to the db constraint name.
+    //
+    // To prevent existing datamodels from failing to parse after an upgrade
+    // we will keep accepting the `name` property on @@index. If it is
+    // present we will interpret it as the `map` property and populate it
+    // accordingly. If the datamodel gets freshly rendered it will then be
+    // rendered correctly as `map`. We will however error if both `map` and
+    // `name` are being used.
+    </span>index_attribute.mapped_name = <span class="kw">match </span>(name, mapped_name) {
         (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; {
-            <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="string">&quot;The `@@index` attribute accepts the `name` argument as an alias for the `map` argument for legacy reasons. It does not accept both though. Please use the `map` argument to specify the database name of the index.&quot;</span>);
-            <span class="prelude-val">None</span>
-        }
-        <span class="comment">// backwards compatibility, accept name arg on normal indexes and use it as map arg.</span>
-        (<span class="prelude-val">Some</span>(<span class="ident">name</span>), <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">name</span>),
-        (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">map</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">map</span>),
+            ctx.push_attribute_validation_error(<span class="string">&quot;The `@@index` attribute accepts the `name` argument as an alias for the `map` argument for legacy reasons. It does not accept both though. Please use the `map` argument to specify the database name of the index.&quot;</span>);
+            <span class="prelude-val">None
+        </span>}
+        <span class="comment">// backwards compatibility, accept name arg on normal indexes and use it as map arg.
+        </span>(<span class="prelude-val">Some</span>(name), <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">Some</span>(name),
+        (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(map)) =&gt; <span class="prelude-val">Some</span>(map),
         (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">None</span>,
     };
 
-    <span class="kw">let</span> <span class="ident">algo</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ctx</span>
-        .<span class="ident">visit_optional_arg</span>(<span class="string">&quot;type&quot;</span>)
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">sort</span><span class="op">|</span> <span class="ident">coerce::constant</span>(<span class="ident">sort</span>, <span class="ident">ctx</span>.<span class="ident">diagnostics</span>))
+    <span class="kw">let </span>algo = <span class="kw">match </span>ctx
+        .visit_optional_arg(<span class="string">&quot;type&quot;</span>)
+        .and_then(|sort| coerce::constant(sort, ctx.diagnostics))
     {
-        <span class="prelude-val">Some</span>(<span class="string">&quot;BTree&quot;</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::BTree</span>),
-        <span class="prelude-val">Some</span>(<span class="string">&quot;Hash&quot;</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::Hash</span>),
-        <span class="prelude-val">Some</span>(<span class="string">&quot;Gist&quot;</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::Gist</span>),
-        <span class="prelude-val">Some</span>(<span class="string">&quot;Gin&quot;</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::Gin</span>),
-        <span class="prelude-val">Some</span>(<span class="string">&quot;SpGist&quot;</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::SpGist</span>),
-        <span class="prelude-val">Some</span>(<span class="string">&quot;Brin&quot;</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::Brin</span>),
-        <span class="prelude-val">Some</span>(<span class="ident">other</span>) =&gt; {
-            <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;Unknown index type: {}.&quot;</span>, <span class="ident">other</span>));
-            <span class="prelude-val">None</span>
-        }
-        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+        <span class="prelude-val">Some</span>(<span class="string">&quot;BTree&quot;</span>) =&gt; <span class="prelude-val">Some</span>(IndexAlgorithm::BTree),
+        <span class="prelude-val">Some</span>(<span class="string">&quot;Hash&quot;</span>) =&gt; <span class="prelude-val">Some</span>(IndexAlgorithm::Hash),
+        <span class="prelude-val">Some</span>(<span class="string">&quot;Gist&quot;</span>) =&gt; <span class="prelude-val">Some</span>(IndexAlgorithm::Gist),
+        <span class="prelude-val">Some</span>(<span class="string">&quot;Gin&quot;</span>) =&gt; <span class="prelude-val">Some</span>(IndexAlgorithm::Gin),
+        <span class="prelude-val">Some</span>(<span class="string">&quot;SpGist&quot;</span>) =&gt; <span class="prelude-val">Some</span>(IndexAlgorithm::SpGist),
+        <span class="prelude-val">Some</span>(<span class="string">&quot;Brin&quot;</span>) =&gt; <span class="prelude-val">Some</span>(IndexAlgorithm::Brin),
+        <span class="prelude-val">Some</span>(other) =&gt; {
+            ctx.push_attribute_validation_error(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;Unknown index type: {}.&quot;</span>, other));
+            <span class="prelude-val">None
+        </span>}
+        <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
     };
 
-    <span class="ident">index_attribute</span>.<span class="ident">algorithm</span> <span class="op">=</span> <span class="ident">algo</span>;
-    <span class="ident">index_attribute</span>.<span class="ident">clustered</span> <span class="op">=</span> <span class="ident">validate_clustering_setting</span>(<span class="ident">ctx</span>);
+    index_attribute.algorithm = algo;
+    index_attribute.clustered = validate_clustering_setting(ctx);
 
-    <span class="ident">data</span>.<span class="ident">ast_indexes</span>.<span class="ident">push</span>((<span class="ident">ctx</span>.<span class="ident">current_attribute_id</span>(), <span class="ident">index_attribute</span>));
+    data.ast_indexes.push((ctx.current_attribute_id(), index_attribute));
 }
 
-<span class="doccomment">/// Validate @@unique on models.</span>
-<span class="kw">fn</span> <span class="ident">model_unique</span>(<span class="ident">data</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ModelAttributes</span>, <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">index_attribute</span> <span class="op">=</span> <span class="ident">IndexAttribute</span> {
-        <span class="ident">r#type</span>: <span class="ident">IndexType::Unique</span>,
-        ..<span class="ident">Default::default</span>()
+<span class="doccomment">/// Validate @@unique on models.
+</span><span class="kw">fn </span>model_unique(data: <span class="kw-2">&amp;mut </span>ModelAttributes, model_id: ast::ModelId, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">let </span><span class="kw-2">mut </span>index_attribute = IndexAttribute {
+        r#type: IndexType::Unique,
+        ..Default::default()
     };
 
-    <span class="ident">common_index_validations</span>(
-        <span class="kw-2">&amp;mut</span> <span class="ident">index_attribute</span>,
-        <span class="ident">model_id</span>,
-        <span class="ident">FieldResolvingSetup::FollowComposites</span>,
-        <span class="ident">ctx</span>,
+    common_index_validations(
+        <span class="kw-2">&amp;mut </span>index_attribute,
+        model_id,
+        FieldResolvingSetup::FollowComposites,
+        ctx,
     );
 
-    <span class="kw">let</span> <span class="ident">current_attribute</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">current_attribute</span>();
-    <span class="kw">let</span> <span class="ident">current_attribute_id</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">current_attribute_id</span>();
-    <span class="kw">let</span> <span class="ident">ast_model</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">model_id</span>];
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">get_name_argument</span>(<span class="ident">ctx</span>);
+    <span class="kw">let </span>current_attribute = ctx.current_attribute();
+    <span class="kw">let </span>current_attribute_id = ctx.current_attribute_id();
+    <span class="kw">let </span>ast_model = <span class="kw-2">&amp;</span>ctx.ast[model_id];
+    <span class="kw">let </span>name = get_name_argument(ctx);
 
-    <span class="kw">let</span> <span class="ident">mapped_name</span> <span class="op">=</span> {
-        <span class="comment">// We do not want to break existing datamodels for client purposes that</span>
-        <span class="comment">// use the old `@@unique([field], name: &quot;ClientANDdbname&quot;)` Since we</span>
-        <span class="comment">// still parse the name argument and pass it to the client they will</span>
-        <span class="comment">// keep working Migrate will however get a new generated db name for the</span>
-        <span class="comment">// constraint in that case and try to change the underlying constraint</span>
-        <span class="comment">// name</span>
-        <span class="comment">//</span>
-        <span class="comment">// We are fine with that since this is not automatically breaking but</span>
-        <span class="comment">// rather prompts a migration upon the first run on migrate. The client</span>
-        <span class="comment">// is unaffected by this.</span>
-        <span class="kw">let</span> <span class="ident">mapped_name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ctx</span>
-            .<span class="ident">visit_optional_arg</span>(<span class="string">&quot;map&quot;</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="ident">coerce::string</span>(<span class="ident">name</span>, <span class="ident">ctx</span>.<span class="ident">diagnostics</span>))
+    <span class="kw">let </span>mapped_name = {
+        <span class="comment">// We do not want to break existing datamodels for client purposes that
+        // use the old `@@unique([field], name: &quot;ClientANDdbname&quot;)` Since we
+        // still parse the name argument and pass it to the client they will
+        // keep working Migrate will however get a new generated db name for the
+        // constraint in that case and try to change the underlying constraint
+        // name
+        //
+        // We are fine with that since this is not automatically breaking but
+        // rather prompts a migration upon the first run on migrate. The client
+        // is unaffected by this.
+        </span><span class="kw">let </span>mapped_name = <span class="kw">match </span>ctx
+            .visit_optional_arg(<span class="string">&quot;map&quot;</span>)
+            .and_then(|name| coerce::string(name, ctx.diagnostics))
         {
             <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>) =&gt; {
-                <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="string">&quot;The `map` argument cannot be an empty string.&quot;</span>);
-                <span class="prelude-val">None</span>
-            }
-            <span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">ctx</span>.<span class="ident">interner</span>.<span class="ident">intern</span>(<span class="ident">name</span>)),
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+                ctx.push_attribute_validation_error(<span class="string">&quot;The `map` argument cannot be an empty string.&quot;</span>);
+                <span class="prelude-val">None
+            </span>}
+            <span class="prelude-val">Some</span>(name) =&gt; <span class="prelude-val">Some</span>(ctx.interner.intern(name)),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
         };
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">name</span> {
-            <span class="ident">validate_client_name</span>(<span class="ident">current_attribute</span>.<span class="ident">span</span>, <span class="ident">ast_model</span>.<span class="ident">name</span>(), <span class="ident">name</span>, <span class="string">&quot;@@unique&quot;</span>, <span class="ident">ctx</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(name) = name {
+            validate_client_name(current_attribute.span, ast_model.name(), name, <span class="string">&quot;@@unique&quot;</span>, ctx);
         }
 
-        <span class="ident">mapped_name</span>
+        mapped_name
     };
 
-    <span class="ident">index_attribute</span>.<span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>;
-    <span class="ident">index_attribute</span>.<span class="ident">mapped_name</span> <span class="op">=</span> <span class="ident">mapped_name</span>;
-    <span class="ident">index_attribute</span>.<span class="ident">clustered</span> <span class="op">=</span> <span class="ident">validate_clustering_setting</span>(<span class="ident">ctx</span>);
+    index_attribute.name = name;
+    index_attribute.mapped_name = mapped_name;
+    index_attribute.clustered = validate_clustering_setting(ctx);
 
-    <span class="ident">data</span>.<span class="ident">ast_indexes</span>.<span class="ident">push</span>((<span class="ident">current_attribute_id</span>, <span class="ident">index_attribute</span>));
+    data.ast_indexes.push((current_attribute_id, index_attribute));
 }
 
-<span class="kw">fn</span> <span class="ident">common_index_validations</span>(
-    <span class="ident">index_data</span>: <span class="kw-2">&amp;mut</span> <span class="ident">IndexAttribute</span>,
-    <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>,
-    <span class="ident">resolving</span>: <span class="ident">FieldResolvingSetup</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+<span class="kw">fn </span>common_index_validations(
+    index_data: <span class="kw-2">&amp;mut </span>IndexAttribute,
+    model_id: ast::ModelId,
+    resolving: FieldResolvingSetup,
+    ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
 ) {
-    <span class="kw">let</span> <span class="ident">current_attribute</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">current_attribute</span>();
-    <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ctx</span>.<span class="ident">visit_default_arg</span>(<span class="string">&quot;fields&quot;</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">fields</span>) =&gt; <span class="ident">fields</span>,
-        <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
-            <span class="kw">return</span> <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">err</span>);
+    <span class="kw">let </span>current_attribute = ctx.current_attribute();
+    <span class="kw">let </span>fields = <span class="kw">match </span>ctx.visit_default_arg(<span class="string">&quot;fields&quot;</span>) {
+        <span class="prelude-val">Ok</span>(fields) =&gt; fields,
+        <span class="prelude-val">Err</span>(err) =&gt; {
+            <span class="kw">return </span>ctx.push_error(err);
         }
     };
 
-    <span class="kw">match</span> <span class="ident">resolve_field_array_with_args</span>(<span class="ident">fields</span>, <span class="ident">current_attribute</span>.<span class="ident">span</span>, <span class="ident">model_id</span>, <span class="ident">resolving</span>, <span class="ident">ctx</span>) {
-        <span class="prelude-val">Ok</span>(<span class="ident">fields</span>) =&gt; {
-            <span class="ident">index_data</span>.<span class="ident">fields</span> <span class="op">=</span> <span class="ident">fields</span>;
+    <span class="kw">match </span>resolve_field_array_with_args(fields, current_attribute.span, model_id, resolving, ctx) {
+        <span class="prelude-val">Ok</span>(fields) =&gt; {
+            index_data.fields = fields;
         }
-        <span class="prelude-val">Err</span>(<span class="ident">FieldResolutionError::AlreadyDealtWith</span>) =&gt; (),
-        <span class="prelude-val">Err</span>(<span class="ident">FieldResolutionError::ProblematicFields</span> {
-            <span class="ident">unknown_fields</span>: <span class="ident">unresolvable_fields</span>,
-            <span class="ident">relation_fields</span>,
+        <span class="prelude-val">Err</span>(FieldResolutionError::AlreadyDealtWith) =&gt; (),
+        <span class="prelude-val">Err</span>(FieldResolutionError::ProblematicFields {
+            unknown_fields: unresolvable_fields,
+            relation_fields,
         }) =&gt; {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">unresolvable_fields</span>.<span class="ident">is_empty</span>() {
-                <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="ident">unresolvable_fields</span>
-                    .<span class="ident">iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">top_id</span>, <span class="ident">field_name</span>)<span class="op">|</span> <span class="kw">match</span> <span class="ident">top_id</span> {
-                        <span class="ident">ast::TopId::CompositeType</span>(<span class="ident">ctid</span>) =&gt; {
-                            <span class="kw">let</span> <span class="ident">composite_type</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="kw-2">*</span><span class="ident">ctid</span>].<span class="ident">name</span>();
+            <span class="kw">if </span>!unresolvable_fields.is_empty() {
+                <span class="kw">let </span>fields = unresolvable_fields
+                    .iter()
+                    .map(|(top_id, field_name)| <span class="kw">match </span>top_id {
+                        ast::TopId::CompositeType(ctid) =&gt; {
+                            <span class="kw">let </span>composite_type = <span class="kw-2">&amp;</span>ctx.ast[<span class="kw-2">*</span>ctid].name();
 
-                            <span class="ident">Cow::from</span>(<span class="macro">format!</span>(<span class="string">&quot;{field_name} in type {composite_type}&quot;</span>))
+                            Cow::from(<span class="macro">format!</span>(<span class="string">&quot;{field_name} in type {composite_type}&quot;</span>))
                         }
-                        <span class="ident">ast::TopId::Model</span>(<span class="kw">_</span>) =&gt; <span class="ident">Cow::from</span>(<span class="kw-2">*</span><span class="ident">field_name</span>),
-                        <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+                        ast::TopId::Model(<span class="kw">_</span>) =&gt; Cow::from(<span class="kw-2">*</span>field_name),
+                        <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
                     })
-                    .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+                    .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-                <span class="ident">ctx</span>.<span class="ident">push_error</span>({
-                    <span class="kw">let</span> <span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">format!</span>(
+                ctx.push_error({
+                    <span class="kw">let </span>message: <span class="kw-2">&amp;</span>str = <span class="kw-2">&amp;</span><span class="macro">format!</span>(
                         <span class="string">&quot;The {}index definition refers to the unknown fields: {}.&quot;</span>,
-                        <span class="kw">if</span> <span class="ident">index_data</span>.<span class="ident">is_unique</span>() { <span class="string">&quot;unique &quot;</span> } <span class="kw">else</span> { <span class="string">&quot;&quot;</span> },
-                        <span class="ident">fields</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>),
+                        <span class="kw">if </span>index_data.is_unique() { <span class="string">&quot;unique &quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>},
+                        fields.join(<span class="string">&quot;, &quot;</span>),
                     );
-                    <span class="kw">let</span> <span class="ident">model_name</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">model_id</span>].<span class="ident">name</span>();
-                    <span class="ident">DatamodelError::new_model_validation_error</span>(<span class="ident">message</span>, <span class="ident">model_name</span>, <span class="ident">current_attribute</span>.<span class="ident">span</span>)
+                    <span class="kw">let </span>model_name = ctx.ast[model_id].name();
+                    DatamodelError::new_model_validation_error(message, model_name, current_attribute.span)
                 });
             }
 
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">relation_fields</span>.<span class="ident">is_empty</span>() {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">suggested_fields</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+            <span class="kw">if </span>!relation_fields.is_empty() {
+                <span class="kw">let </span><span class="kw-2">mut </span>suggested_fields = Vec::new();
 
-                <span class="kw">for</span> (<span class="kw">_</span>, <span class="ident">field_id</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">relation_fields</span> {
-                    <span class="kw">let</span> <span class="ident">relation_field</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">types</span>.<span class="ident">relation_fields</span>[<span class="kw-2">&amp;</span>(<span class="ident">model_id</span>, <span class="kw-2">*</span><span class="ident">field_id</span>)];
-                    <span class="kw">for</span> <span class="ident">underlying_field</span> <span class="kw">in</span> <span class="ident">relation_field</span>.<span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">flatten</span>() {
-                        <span class="ident">suggested_fields</span>.<span class="ident">push</span>(<span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">model_id</span>][<span class="kw-2">*</span><span class="ident">underlying_field</span>].<span class="ident">name</span>());
+                <span class="kw">for </span>(<span class="kw">_</span>, field_id) <span class="kw">in </span><span class="kw-2">&amp;</span>relation_fields {
+                    <span class="kw">let </span>relation_field = <span class="kw-2">&amp;</span>ctx.types.relation_fields[<span class="kw-2">&amp;</span>(model_id, <span class="kw-2">*</span>field_id)];
+                    <span class="kw">for </span>underlying_field <span class="kw">in </span>relation_field.fields.iter().flatten() {
+                        suggested_fields.push(ctx.ast[model_id][<span class="kw-2">*</span>underlying_field].name());
                     }
                 }
 
-                <span class="kw">let</span> <span class="ident">suggestion</span> <span class="op">=</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">suggested_fields</span>.<span class="ident">is_empty</span>() {
+                <span class="kw">let </span>suggestion = <span class="kw">if </span>!suggested_fields.is_empty() {
                     <span class="macro">format!</span>(
                         <span class="string">&quot; Did you mean `@@{attribute_name}([{fields}])`?&quot;</span>,
-                        <span class="ident">attribute_name</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">index_data</span>.<span class="ident">is_unique</span>() { <span class="string">&quot;unique&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;index&quot;</span> },
-                        <span class="ident">fields</span> <span class="op">=</span> <span class="ident">suggested_fields</span>.<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>)
+                        attribute_name = <span class="kw">if </span>index_data.is_unique() { <span class="string">&quot;unique&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;index&quot; </span>},
+                        fields = suggested_fields.join(<span class="string">&quot;, &quot;</span>)
                     )
-                } <span class="kw">else</span> {
-                    <span class="ident">String::new</span>()
+                } <span class="kw">else </span>{
+                    String::new()
                 };
 
-                <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_model_validation_error</span>(
+                ctx.push_error(DatamodelError::new_model_validation_error(
                     <span class="kw-2">&amp;</span><span class="macro">format!</span>(
                         <span class="string">&quot;The {prefix}index definition refers to the relation fields {the_fields}. Index definitions must reference only scalar fields.{suggestion}&quot;</span>,
-                        <span class="ident">prefix</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">index_data</span>.<span class="ident">is_unique</span>() { <span class="string">&quot;unique &quot;</span> } <span class="kw">else</span> { <span class="string">&quot;&quot;</span> },
-                        <span class="ident">the_fields</span> <span class="op">=</span> <span class="ident">relation_fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">f</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>()).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>),
-                        <span class="ident">suggestion</span> <span class="op">=</span> <span class="ident">suggestion</span>
+                        prefix = <span class="kw">if </span>index_data.is_unique() { <span class="string">&quot;unique &quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;&quot; </span>},
+                        the_fields = relation_fields.iter().map(|(f, <span class="kw">_</span>)| f.name()).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;().join(<span class="string">&quot;, &quot;</span>),
+                        suggestion = suggestion
                     ),
-                    <span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">model_id</span>].<span class="ident">name</span>(),
-                    <span class="ident">current_attribute</span>.<span class="ident">span</span>,
+                    ctx.ast[model_id].name(),
+                    current_attribute.span,
                 ));
             }
         }
     }
 }
 
-<span class="doccomment">/// @relation validation for relation fields.</span>
-<span class="kw">fn</span> <span class="ident">visit_relation</span>(<span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>, <span class="ident">relation_field</span>: <span class="kw-2">&amp;mut</span> <span class="ident">RelationField</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="ident">attr</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">current_attribute</span>();
-    <span class="ident">relation_field</span>.<span class="ident">relation_attribute</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ctx</span>.<span class="ident">current_attribute_id</span>());
+<span class="doccomment">/// @relation validation for relation fields.
+</span><span class="kw">fn </span>visit_relation(model_id: ast::ModelId, relation_field: <span class="kw-2">&amp;mut </span>RelationField, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">let </span>attr = ctx.current_attribute();
+    relation_field.relation_attribute = <span class="prelude-val">Some</span>(ctx.current_attribute_id());
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">fields</span>) <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">visit_optional_arg</span>(<span class="string">&quot;fields&quot;</span>) {
-        <span class="kw">let</span> <span class="ident">fields</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">resolve_field_array_without_args</span>(<span class="ident">fields</span>, <span class="ident">attr</span>.<span class="ident">span</span>, <span class="ident">model_id</span>, <span class="ident">ctx</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">fields</span>) =&gt; <span class="ident">fields</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">FieldResolutionError::AlreadyDealtWith</span>) =&gt; <span class="ident">Vec::new</span>(),
-            <span class="prelude-val">Err</span>(<span class="ident">FieldResolutionError::ProblematicFields</span> {
-                <span class="ident">unknown_fields</span>: <span class="ident">unresolvable_fields</span>,
-                <span class="ident">relation_fields</span>,
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(fields) = ctx.visit_optional_arg(<span class="string">&quot;fields&quot;</span>) {
+        <span class="kw">let </span>fields = <span class="kw">match </span>resolve_field_array_without_args(fields, attr.span, model_id, ctx) {
+            <span class="prelude-val">Ok</span>(fields) =&gt; fields,
+            <span class="prelude-val">Err</span>(FieldResolutionError::AlreadyDealtWith) =&gt; Vec::new(),
+            <span class="prelude-val">Err</span>(FieldResolutionError::ProblematicFields {
+                unknown_fields: unresolvable_fields,
+                relation_fields,
             }) =&gt; {
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">unresolvable_fields</span>.<span class="ident">is_empty</span>() {
-                    <span class="kw">let</span> <span class="ident">unresolvable_fields</span> <span class="op">=</span> <span class="ident">unresolvable_fields</span>
-                        .<span class="ident">into_iter</span>()
-                        .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">field</span>)<span class="op">|</span> <span class="ident">field</span>)
-                        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-                        .<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>);
+                <span class="kw">if </span>!unresolvable_fields.is_empty() {
+                    <span class="kw">let </span>unresolvable_fields = unresolvable_fields
+                        .into_iter()
+                        .map(|(<span class="kw">_</span>, field)| field)
+                        .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
+                        .join(<span class="string">&quot;, &quot;</span>);
 
-                    <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;The argument fields must refer only to existing fields. The following fields do not exist in this model: {unresolvable_fields}&quot;</span>);
+                    <span class="kw">let </span>msg = <span class="macro">format!</span>(<span class="string">&quot;The argument fields must refer only to existing fields. The following fields do not exist in this model: {unresolvable_fields}&quot;</span>);
 
-                    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">fields</span>.<span class="ident">span</span>()))
+                    ctx.push_error(DatamodelError::new_validation_error(<span class="kw-2">&amp;</span>msg, fields.span()))
                 }
 
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">relation_fields</span>.<span class="ident">is_empty</span>() {
-                    <span class="kw">let</span> <span class="ident">relation_fields</span> <span class="op">=</span> <span class="ident">relation_fields</span>
-                        .<span class="ident">into_iter</span>()
-                        .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">f</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>())
-                        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-                        .<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>);
+                <span class="kw">if </span>!relation_fields.is_empty() {
+                    <span class="kw">let </span>relation_fields = relation_fields
+                        .into_iter()
+                        .map(|(f, <span class="kw">_</span>)| f.name())
+                        .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
+                        .join(<span class="string">&quot;, &quot;</span>);
 
-                    <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;The argument fields must refer only to scalar fields. But it is referencing the following relation fields: {relation_fields}&quot;</span>);
+                    <span class="kw">let </span>msg = <span class="macro">format!</span>(<span class="string">&quot;The argument fields must refer only to scalar fields. But it is referencing the following relation fields: {relation_fields}&quot;</span>);
 
-                    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">fields</span>.<span class="ident">span</span>()));
+                    ctx.push_error(DatamodelError::new_validation_error(<span class="kw-2">&amp;</span>msg, fields.span()));
                 }
 
-                <span class="ident">Vec::new</span>()
+                Vec::new()
             }
         };
 
-        <span class="ident">relation_field</span>.<span class="ident">fields</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">fields</span>);
+        relation_field.fields = <span class="prelude-val">Some</span>(fields);
     }
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">references</span>) <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">visit_optional_arg</span>(<span class="string">&quot;references&quot;</span>) {
-        <span class="kw">let</span> <span class="ident">references</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">resolve_field_array_without_args</span>(
-            <span class="ident">references</span>,
-            <span class="ident">attr</span>.<span class="ident">span</span>,
-            <span class="ident">relation_field</span>.<span class="ident">referenced_model</span>,
-            <span class="ident">ctx</span>,
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(references) = ctx.visit_optional_arg(<span class="string">&quot;references&quot;</span>) {
+        <span class="kw">let </span>references = <span class="kw">match </span>resolve_field_array_without_args(
+            references,
+            attr.span,
+            relation_field.referenced_model,
+            ctx,
         ) {
-            <span class="prelude-val">Ok</span>(<span class="ident">references</span>) =&gt; <span class="ident">references</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">FieldResolutionError::AlreadyDealtWith</span>) =&gt; <span class="ident">Vec::new</span>(),
-            <span class="prelude-val">Err</span>(<span class="ident">FieldResolutionError::ProblematicFields</span> {
-                <span class="ident">relation_fields</span>,
-                <span class="ident">unknown_fields</span>,
+            <span class="prelude-val">Ok</span>(references) =&gt; references,
+            <span class="prelude-val">Err</span>(FieldResolutionError::AlreadyDealtWith) =&gt; Vec::new(),
+            <span class="prelude-val">Err</span>(FieldResolutionError::ProblematicFields {
+                relation_fields,
+                unknown_fields,
             }) =&gt; {
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">unknown_fields</span>.<span class="ident">is_empty</span>() {
-                    <span class="kw">let</span> <span class="ident">model_name</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">relation_field</span>.<span class="ident">referenced_model</span>].<span class="ident">name</span>();
+                <span class="kw">if </span>!unknown_fields.is_empty() {
+                    <span class="kw">let </span>model_name = ctx.ast[relation_field.referenced_model].name();
 
-                    <span class="kw">let</span> <span class="ident">field_names</span> <span class="op">=</span> <span class="ident">unknown_fields</span>
-                        .<span class="ident">into_iter</span>()
-                        .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">field_name</span>)<span class="op">|</span> <span class="ident">field_name</span>)
-                        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
-                        .<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>);
+                    <span class="kw">let </span>field_names = unknown_fields
+                        .into_iter()
+                        .map(|(<span class="kw">_</span>, field_name)| field_name)
+                        .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
+                        .join(<span class="string">&quot;, &quot;</span>);
 
-                    <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(
+                    <span class="kw">let </span>msg = <span class="macro">format!</span>(
                         <span class="string">&quot;The argument `references` must refer only to existing fields in the related model `{model_name}`. The following fields do not exist in the related model: {field_names}&quot;</span>,
                     );
 
-                    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">attr</span>.<span class="ident">span</span>));
+                    ctx.push_error(DatamodelError::new_validation_error(<span class="kw-2">&amp;</span>msg, attr.span));
                 }
 
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">relation_fields</span>.<span class="ident">is_empty</span>() {
-                    <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="macro">format!</span>(
+                <span class="kw">if </span>!relation_fields.is_empty() {
+                    <span class="kw">let </span>msg = <span class="macro">format!</span>(
                         <span class="string">&quot;The argument `references` must refer only to scalar fields in the related model `{}`. But it is referencing the following relation fields: {}&quot;</span>,
-                        <span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">relation_field</span>.<span class="ident">referenced_model</span>].<span class="ident">name</span>(),
-                        <span class="ident">relation_fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">f</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>()).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>().<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>),
+                        ctx.ast[relation_field.referenced_model].name(),
+                        relation_fields.iter().map(|(f, <span class="kw">_</span>)| f.name()).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;().join(<span class="string">&quot;, &quot;</span>),
                     );
-                    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_validation_error</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">attr</span>.<span class="ident">span</span>));
+                    ctx.push_error(DatamodelError::new_validation_error(<span class="kw-2">&amp;</span>msg, attr.span));
                 }
 
-                <span class="ident">Vec::new</span>()
+                Vec::new()
             }
         };
 
-        <span class="ident">relation_field</span>.<span class="ident">references</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">references</span>);
+        relation_field.references = <span class="prelude-val">Some</span>(references);
     }
 
-    <span class="comment">// Validate the `name` argument if present.</span>
-    <span class="kw">match</span> <span class="ident">ctx</span>
-        .<span class="ident">visit_default_arg</span>(<span class="string">&quot;name&quot;</span>)
-        .<span class="ident">ok</span>()
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="ident">coerce::string</span>(<span class="ident">arg</span>, <span class="ident">ctx</span>.<span class="ident">diagnostics</span>))
+    <span class="comment">// Validate the `name` argument if present.
+    </span><span class="kw">match </span>ctx
+        .visit_default_arg(<span class="string">&quot;name&quot;</span>)
+        .ok()
+        .and_then(|arg| coerce::string(arg, ctx.diagnostics))
     {
-        <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>) =&gt; <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="string">&quot;A relation cannot have an empty name.&quot;</span>),
-        <span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">interned_name</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">interner</span>.<span class="ident">intern</span>(<span class="ident">name</span>);
-            <span class="ident">relation_field</span>.<span class="ident">name</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">interned_name</span>);
+        <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>) =&gt; ctx.push_attribute_validation_error(<span class="string">&quot;A relation cannot have an empty name.&quot;</span>),
+        <span class="prelude-val">Some</span>(name) =&gt; {
+            <span class="kw">let </span>interned_name = ctx.interner.intern(name);
+            relation_field.name = <span class="prelude-val">Some</span>(interned_name);
         }
-        <span class="prelude-val">None</span> =&gt; (),
+        <span class="prelude-val">None </span>=&gt; (),
     }
 
-    <span class="comment">// Validate referential actions.</span>
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">on_delete</span>) <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">visit_optional_arg</span>(<span class="string">&quot;onDelete&quot;</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">action</span>) <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::ReferentialAction::try_from_expression</span>(<span class="ident">on_delete</span>, <span class="ident">ctx</span>.<span class="ident">diagnostics</span>) {
-            <span class="ident">relation_field</span>.<span class="ident">on_delete</span> <span class="op">=</span> <span class="prelude-val">Some</span>((<span class="ident">action</span>, <span class="ident">on_delete</span>.<span class="ident">span</span>()));
-        }
-    }
-
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">on_update</span>) <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">visit_optional_arg</span>(<span class="string">&quot;onUpdate&quot;</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">action</span>) <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::ReferentialAction::try_from_expression</span>(<span class="ident">on_update</span>, <span class="ident">ctx</span>.<span class="ident">diagnostics</span>) {
-            <span class="ident">relation_field</span>.<span class="ident">on_update</span> <span class="op">=</span> <span class="prelude-val">Some</span>((<span class="ident">action</span>, <span class="ident">on_update</span>.<span class="ident">span</span>()));
+    <span class="comment">// Validate referential actions.
+    </span><span class="kw">if let </span><span class="prelude-val">Some</span>(on_delete) = ctx.visit_optional_arg(<span class="string">&quot;onDelete&quot;</span>) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(action) = <span class="kw">crate</span>::ReferentialAction::try_from_expression(on_delete, ctx.diagnostics) {
+            relation_field.on_delete = <span class="prelude-val">Some</span>((action, on_delete.span()));
         }
     }
 
-    <span class="kw">let</span> <span class="ident">fk_name</span> <span class="op">=</span> {
-        <span class="kw">let</span> <span class="ident">mapped_name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ctx</span>
-            .<span class="ident">visit_optional_arg</span>(<span class="string">&quot;map&quot;</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="ident">coerce::string</span>(<span class="ident">name</span>, <span class="ident">ctx</span>.<span class="ident">diagnostics</span>))
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(on_update) = ctx.visit_optional_arg(<span class="string">&quot;onUpdate&quot;</span>) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(action) = <span class="kw">crate</span>::ReferentialAction::try_from_expression(on_update, ctx.diagnostics) {
+            relation_field.on_update = <span class="prelude-val">Some</span>((action, on_update.span()));
+        }
+    }
+
+    <span class="kw">let </span>fk_name = {
+        <span class="kw">let </span>mapped_name = <span class="kw">match </span>ctx
+            .visit_optional_arg(<span class="string">&quot;map&quot;</span>)
+            .and_then(|name| coerce::string(name, ctx.diagnostics))
         {
             <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>) =&gt; {
-                <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="string">&quot;The `map` argument cannot be an empty string.&quot;</span>);
-                <span class="prelude-val">None</span>
-            }
-            <span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">ctx</span>.<span class="ident">interner</span>.<span class="ident">intern</span>(<span class="ident">name</span>)),
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+                ctx.push_attribute_validation_error(<span class="string">&quot;The `map` argument cannot be an empty string.&quot;</span>);
+                <span class="prelude-val">None
+            </span>}
+            <span class="prelude-val">Some</span>(name) =&gt; <span class="prelude-val">Some</span>(ctx.interner.intern(name)),
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
         };
 
-        <span class="ident">mapped_name</span>
+        mapped_name
     };
 
-    <span class="ident">relation_field</span>.<span class="ident">mapped_name</span> <span class="op">=</span> <span class="ident">fk_name</span>;
+    relation_field.mapped_name = fk_name;
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">enum</span> <span class="ident">FieldResolutionError</span><span class="op">&lt;</span><span class="lifetime">&#39;ast</span><span class="op">&gt;</span> {
-    <span class="ident">AlreadyDealtWith</span>,
-    <span class="ident">ProblematicFields</span> {
-        <span class="doccomment">/// Fields that do not exist on the model.</span>
-        <span class="ident">unknown_fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">ast::TopId</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">str</span>)<span class="op">&gt;</span>,
-        <span class="doccomment">/// Fields that exist on the model but are relation fields.</span>
-        <span class="ident">relation_fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;ast</span> <span class="ident">ast::Field</span>, <span class="ident">ast::FieldId</span>)<span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">enum </span>FieldResolutionError&lt;<span class="lifetime">&#39;ast</span>&gt; {
+    AlreadyDealtWith,
+    ProblematicFields {
+        <span class="doccomment">/// Fields that do not exist on the model.
+        </span>unknown_fields: Vec&lt;(ast::TopId, <span class="kw-2">&amp;</span><span class="lifetime">&#39;ast </span>str)&gt;,
+        <span class="doccomment">/// Fields that exist on the model but are relation fields.
+        </span>relation_fields: Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;ast </span>ast::Field, ast::FieldId)&gt;,
     },
 }
 
-<span class="doccomment">/// Takes an attribute argument, validates it as an array of constants, then</span>
-<span class="doccomment">/// resolves  the constant as field names on the model. The error variant</span>
-<span class="doccomment">/// contains the fields that are not in the model.</span>
-<span class="kw">fn</span> <span class="ident">resolve_field_array_without_args</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>(
-    <span class="ident">values</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Expression</span>,
-    <span class="ident">attribute_span</span>: <span class="ident">ast::Span</span>,
-    <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ast::FieldId</span><span class="op">&gt;</span>, <span class="ident">FieldResolutionError</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">constant_array</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">coerce_array</span>(<span class="ident">values</span>, <span class="kw-2">&amp;</span><span class="ident">coerce::constant</span>, <span class="ident">ctx</span>.<span class="ident">diagnostics</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">values</span>) =&gt; <span class="ident">values</span>,
-        <span class="prelude-val">None</span> =&gt; {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">FieldResolutionError::AlreadyDealtWith</span>);
+<span class="doccomment">/// Takes an attribute argument, validates it as an array of constants, then
+/// resolves  the constant as field names on the model. The error variant
+/// contains the fields that are not in the model.
+</span><span class="kw">fn </span>resolve_field_array_without_args&lt;<span class="lifetime">&#39;db</span>&gt;(
+    values: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Expression,
+    attribute_span: ast::Span,
+    model_id: ast::ModelId,
+    ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;db</span>&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;ast::FieldId&gt;, FieldResolutionError&lt;<span class="lifetime">&#39;db</span>&gt;&gt; {
+    <span class="kw">let </span>constant_array = <span class="kw">match </span>coerce_array(values, <span class="kw-2">&amp;</span>coerce::constant, ctx.diagnostics) {
+        <span class="prelude-val">Some</span>(values) =&gt; values,
+        <span class="prelude-val">None </span>=&gt; {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(FieldResolutionError::AlreadyDealtWith);
         }
     };
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field_ids</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">constant_array</span>.<span class="ident">len</span>());
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">unknown_fields</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">relation_fields</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-    <span class="kw">let</span> <span class="ident">ast_model</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">model_id</span>];
+    <span class="kw">let </span><span class="kw-2">mut </span>field_ids = Vec::with_capacity(constant_array.len());
+    <span class="kw">let </span><span class="kw-2">mut </span>unknown_fields = Vec::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>relation_fields = Vec::new();
+    <span class="kw">let </span>ast_model = <span class="kw-2">&amp;</span>ctx.ast[model_id];
 
-    <span class="kw">for</span> <span class="ident">field_name</span> <span class="kw">in</span> <span class="ident">constant_array</span> {
-        <span class="kw">if</span> <span class="ident">field_name</span>.<span class="ident">contains</span>(<span class="string">&#39;.&#39;</span>) {
-            <span class="ident">unknown_fields</span>.<span class="ident">push</span>((<span class="ident">ast::TopId::Model</span>(<span class="ident">model_id</span>), <span class="ident">field_name</span>));
+    <span class="kw">for </span>field_name <span class="kw">in </span>constant_array {
+        <span class="kw">if </span>field_name.contains(<span class="string">&#39;.&#39;</span>) {
+            unknown_fields.push((ast::TopId::Model(model_id), field_name));
             <span class="kw">continue</span>;
         }
 
-        <span class="comment">// Does the field exist?</span>
-        <span class="kw">let</span> <span class="ident">field_id</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">field_id</span>) <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">find_model_field</span>(<span class="ident">model_id</span>, <span class="ident">field_name</span>) {
-            <span class="ident">field_id</span>
-        } <span class="kw">else</span> {
-            <span class="ident">unknown_fields</span>.<span class="ident">push</span>((<span class="ident">ast::TopId::Model</span>(<span class="ident">model_id</span>), <span class="ident">field_name</span>));
+        <span class="comment">// Does the field exist?
+        </span><span class="kw">let </span>field_id = <span class="kw">if let </span><span class="prelude-val">Some</span>(field_id) = ctx.find_model_field(model_id, field_name) {
+            field_id
+        } <span class="kw">else </span>{
+            unknown_fields.push((ast::TopId::Model(model_id), field_name));
             <span class="kw">continue</span>;
         };
 
-        <span class="comment">// Is the field a scalar field?</span>
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">types</span>.<span class="ident">scalar_fields</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span>(<span class="ident">model_id</span>, <span class="ident">field_id</span>)) {
-            <span class="ident">relation_fields</span>.<span class="ident">push</span>((<span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">model_id</span>][<span class="ident">field_id</span>], <span class="ident">field_id</span>));
+        <span class="comment">// Is the field a scalar field?
+        </span><span class="kw">if </span>!ctx.types.scalar_fields.contains_key(<span class="kw-2">&amp;</span>(model_id, field_id)) {
+            relation_fields.push((<span class="kw-2">&amp;</span>ctx.ast[model_id][field_id], field_id));
             <span class="kw">continue</span>;
         }
 
-        <span class="comment">// Is the field used twice?</span>
-        <span class="kw">if</span> <span class="ident">field_ids</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">field_id</span>) {
-            <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_model_validation_error</span>(
+        <span class="comment">// Is the field used twice?
+        </span><span class="kw">if </span>field_ids.contains(<span class="kw-2">&amp;</span>field_id) {
+            ctx.push_error(DatamodelError::new_model_validation_error(
                 <span class="kw-2">&amp;</span><span class="macro">format!</span>(
                     <span class="string">&quot;The unique index definition refers to the field {} multiple times.&quot;</span>,
-                    <span class="ident">ast_model</span>[<span class="ident">field_id</span>].<span class="ident">name</span>()
+                    ast_model[field_id].name()
                 ),
-                <span class="ident">ast_model</span>.<span class="ident">name</span>(),
-                <span class="ident">attribute_span</span>,
+                ast_model.name(),
+                attribute_span,
             ));
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">FieldResolutionError::AlreadyDealtWith</span>);
+            <span class="kw">return </span><span class="prelude-val">Err</span>(FieldResolutionError::AlreadyDealtWith);
         }
 
-        <span class="ident">field_ids</span>.<span class="ident">push</span>(<span class="ident">field_id</span>);
+        field_ids.push(field_id);
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">unknown_fields</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">relation_fields</span>.<span class="ident">is_empty</span>() {
-        <span class="prelude-val">Err</span>(<span class="ident">FieldResolutionError::ProblematicFields</span> {
-            <span class="ident">unknown_fields</span>,
-            <span class="ident">relation_fields</span>,
+    <span class="kw">if </span>!unknown_fields.is_empty() || !relation_fields.is_empty() {
+        <span class="prelude-val">Err</span>(FieldResolutionError::ProblematicFields {
+            unknown_fields,
+            relation_fields,
         })
-    } <span class="kw">else</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">field_ids</span>)
+    } <span class="kw">else </span>{
+        <span class="prelude-val">Ok</span>(field_ids)
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">enum</span> <span class="ident">FieldResolvingSetup</span> {
-    <span class="ident">OnlyTopLevel</span>,
-    <span class="ident">FollowComposites</span>,
+<span class="attribute">#[derive(Debug, Clone, Copy)]
+</span><span class="kw">enum </span>FieldResolvingSetup {
+    OnlyTopLevel,
+    FollowComposites,
 }
 
-<span class="kw">impl</span> <span class="ident">FieldResolvingSetup</span> {
-    <span class="kw">fn</span> <span class="ident">follow_composites</span>(<span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="ident"><span class="self">Self</span>::FollowComposites</span>)
+<span class="kw">impl </span>FieldResolvingSetup {
+    <span class="kw">fn </span>follow_composites(<span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="self">self</span>, <span class="self">Self</span>::FollowComposites)
     }
 }
 
-<span class="doccomment">/// Takes an attribute argument, validates it as an array of fields with potentially args,</span>
-<span class="doccomment">/// then resolves  the constant literal as field names on the model. The error variant</span>
-<span class="doccomment">/// contains the fields that are not in the model.</span>
-<span class="kw">fn</span> <span class="ident">resolve_field_array_with_args</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>(
-    <span class="ident">values</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db</span> <span class="ident">ast::Expression</span>,
-    <span class="ident">attribute_span</span>: <span class="ident">ast::Span</span>,
-    <span class="ident">model_id</span>: <span class="ident">ast::ModelId</span>,
-    <span class="ident">resolving</span>: <span class="ident">FieldResolvingSetup</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">FieldWithArgs</span><span class="op">&gt;</span>, <span class="ident">FieldResolutionError</span><span class="op">&lt;</span><span class="lifetime">&#39;db</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">constant_array</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident"><span class="kw">crate</span>::types::index_fields::coerce_field_array_with_args</span>(<span class="ident">values</span>, <span class="ident">ctx</span>.<span class="ident">diagnostics</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">values</span>) =&gt; <span class="ident">values</span>,
-        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">FieldResolutionError::AlreadyDealtWith</span>),
+<span class="doccomment">/// Takes an attribute argument, validates it as an array of fields with potentially args,
+/// then resolves  the constant literal as field names on the model. The error variant
+/// contains the fields that are not in the model.
+</span><span class="kw">fn </span>resolve_field_array_with_args&lt;<span class="lifetime">&#39;db</span>&gt;(
+    values: <span class="kw-2">&amp;</span><span class="lifetime">&#39;db </span>ast::Expression,
+    attribute_span: ast::Span,
+    model_id: ast::ModelId,
+    resolving: FieldResolvingSetup,
+    ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;db</span>&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;FieldWithArgs&gt;, FieldResolutionError&lt;<span class="lifetime">&#39;db</span>&gt;&gt; {
+    <span class="kw">let </span>constant_array = <span class="kw">match </span><span class="kw">crate</span>::types::index_fields::coerce_field_array_with_args(values, ctx.diagnostics) {
+        <span class="prelude-val">Some</span>(values) =&gt; values,
+        <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(FieldResolutionError::AlreadyDealtWith),
     };
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field_ids</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">constant_array</span>.<span class="ident">len</span>());
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">unknown_fields</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">relation_fields</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+    <span class="kw">let </span><span class="kw-2">mut </span>field_ids = Vec::with_capacity(constant_array.len());
+    <span class="kw">let </span><span class="kw-2">mut </span>unknown_fields = Vec::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>relation_fields = Vec::new();
 
-    <span class="kw">let</span> <span class="ident">ast_model</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">model_id</span>];
+    <span class="kw">let </span>ast_model = <span class="kw-2">&amp;</span>ctx.ast[model_id];
 
-    <span class="lifetime">&#39;fields</span>: <span class="kw">for</span> <span class="ident">attrs</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">constant_array</span> {
-        <span class="kw">let</span> <span class="ident">path</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">attrs</span>.<span class="ident">field_name</span>.<span class="ident">contains</span>(<span class="string">&#39;.&#39;</span>) {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">resolving</span>.<span class="ident">follow_composites</span>() {
-                <span class="ident">unknown_fields</span>.<span class="ident">push</span>((<span class="ident">ast::TopId::Model</span>(<span class="ident">model_id</span>), <span class="ident">attrs</span>.<span class="ident">field_name</span>));
-                <span class="kw">continue</span> <span class="lifetime">&#39;fields</span>;
+    <span class="lifetime">&#39;fields</span>: <span class="kw">for </span>attrs <span class="kw">in </span><span class="kw-2">&amp;</span>constant_array {
+        <span class="kw">let </span>path = <span class="kw">if </span>attrs.field_name.contains(<span class="string">&#39;.&#39;</span>) {
+            <span class="kw">if </span>!resolving.follow_composites() {
+                unknown_fields.push((ast::TopId::Model(model_id), attrs.field_name));
+                <span class="kw">continue </span><span class="lifetime">&#39;fields</span>;
             }
 
-            <span class="kw">let</span> <span class="ident">field_count</span> <span class="op">=</span> <span class="ident">attrs</span>.<span class="ident">field_name</span>.<span class="ident">split</span>(<span class="string">&#39;.&#39;</span>).<span class="ident">count</span>();
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">path_in_schema</span> <span class="op">=</span> <span class="ident">attrs</span>.<span class="ident">field_name</span>.<span class="ident">split</span>(<span class="string">&#39;.&#39;</span>).<span class="ident">enumerate</span>();
+            <span class="kw">let </span>field_count = attrs.field_name.split(<span class="string">&#39;.&#39;</span>).count();
+            <span class="kw">let </span><span class="kw-2">mut </span>path_in_schema = attrs.field_name.split(<span class="string">&#39;.&#39;</span>).enumerate();
 
-            <span class="kw">let</span> (<span class="kw-2">mut</span> <span class="ident">path</span>, <span class="kw-2">mut</span> <span class="ident">next_type</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">path_in_schema</span>.<span class="ident">next</span>() {
-                <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">field_shard</span>)) =&gt; {
-                    <span class="kw">let</span> <span class="ident">field_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ctx</span>.<span class="ident">find_model_field</span>(<span class="ident">model_id</span>, <span class="ident">field_shard</span>) {
-                        <span class="prelude-val">Some</span>(<span class="ident">field_id</span>) =&gt; <span class="ident">field_id</span>,
-                        <span class="prelude-val">None</span> =&gt; {
-                            <span class="ident">unknown_fields</span>.<span class="ident">push</span>((<span class="ident">ast::TopId::Model</span>(<span class="ident">model_id</span>), <span class="ident">field_shard</span>));
-                            <span class="kw">continue</span> <span class="lifetime">&#39;fields</span>;
+            <span class="kw">let </span>(<span class="kw-2">mut </span>path, <span class="kw-2">mut </span>next_type) = <span class="kw">match </span>path_in_schema.next() {
+                <span class="prelude-val">Some</span>((<span class="kw">_</span>, field_shard)) =&gt; {
+                    <span class="kw">let </span>field_id = <span class="kw">match </span>ctx.find_model_field(model_id, field_shard) {
+                        <span class="prelude-val">Some</span>(field_id) =&gt; field_id,
+                        <span class="prelude-val">None </span>=&gt; {
+                            unknown_fields.push((ast::TopId::Model(model_id), field_shard));
+                            <span class="kw">continue </span><span class="lifetime">&#39;fields</span>;
                         }
                     };
 
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">types</span>.<span class="ident">scalar_fields</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span>(<span class="ident">model_id</span>, <span class="ident">field_id</span>)) {
-                        <span class="ident">relation_fields</span>.<span class="ident">push</span>((<span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">model_id</span>][<span class="ident">field_id</span>], <span class="ident">field_id</span>));
-                        <span class="kw">continue</span> <span class="lifetime">&#39;fields</span>;
+                    <span class="kw">if </span>!ctx.types.scalar_fields.contains_key(<span class="kw-2">&amp;</span>(model_id, field_id)) {
+                        relation_fields.push((<span class="kw-2">&amp;</span>ctx.ast[model_id][field_id], field_id));
+                        <span class="kw">continue </span><span class="lifetime">&#39;fields</span>;
                     }
 
-                    <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">types</span>.<span class="ident">scalar_fields</span>[<span class="kw-2">&amp;</span>(<span class="ident">model_id</span>, <span class="ident">field_id</span>)].<span class="ident">r#type</span> {
-                        <span class="ident">ScalarFieldType::CompositeType</span>(<span class="ident">ctid</span>) =&gt; (<span class="ident">IndexFieldPath::new</span>(<span class="ident">field_id</span>), <span class="kw-2">*</span><span class="ident">ctid</span>),
-                        <span class="kw">_</span> =&gt; {
-                            <span class="ident">unknown_fields</span>.<span class="ident">push</span>((<span class="ident">ast::TopId::Model</span>(<span class="ident">model_id</span>), <span class="ident">attrs</span>.<span class="ident">field_name</span>));
-                            <span class="kw">continue</span> <span class="lifetime">&#39;fields</span>;
+                    <span class="kw">match </span><span class="kw-2">&amp;</span>ctx.types.scalar_fields[<span class="kw-2">&amp;</span>(model_id, field_id)].r#type {
+                        ScalarFieldType::CompositeType(ctid) =&gt; (IndexFieldPath::new(field_id), <span class="kw-2">*</span>ctid),
+                        <span class="kw">_ </span>=&gt; {
+                            unknown_fields.push((ast::TopId::Model(model_id), attrs.field_name));
+                            <span class="kw">continue </span><span class="lifetime">&#39;fields</span>;
                         }
                     }
                 }
-                <span class="prelude-val">None</span> =&gt; {
-                    <span class="comment">// TODO: See if we need to actually error here, or if this</span>
-                    <span class="comment">// case is handled earlier.</span>
-                    <span class="kw">continue</span> <span class="lifetime">&#39;fields</span>;
+                <span class="prelude-val">None </span>=&gt; {
+                    <span class="comment">// TODO: See if we need to actually error here, or if this
+                    // case is handled earlier.
+                    </span><span class="kw">continue </span><span class="lifetime">&#39;fields</span>;
                 }
             };
 
-            <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">field_shard</span>) <span class="kw">in</span> <span class="ident">path_in_schema</span> {
-                <span class="kw">let</span> <span class="ident">field_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ctx</span>.<span class="ident">find_composite_type_field</span>(<span class="ident">next_type</span>, <span class="ident">field_shard</span>) {
-                    <span class="prelude-val">Some</span>(<span class="ident">field_id</span>) =&gt; <span class="ident">field_id</span>,
-                    <span class="prelude-val">None</span> =&gt; {
-                        <span class="ident">unknown_fields</span>.<span class="ident">push</span>((<span class="ident">ast::TopId::CompositeType</span>(<span class="ident">next_type</span>), <span class="ident">field_shard</span>));
-                        <span class="kw">continue</span> <span class="lifetime">&#39;fields</span>;
+            <span class="kw">for </span>(i, field_shard) <span class="kw">in </span>path_in_schema {
+                <span class="kw">let </span>field_id = <span class="kw">match </span>ctx.find_composite_type_field(next_type, field_shard) {
+                    <span class="prelude-val">Some</span>(field_id) =&gt; field_id,
+                    <span class="prelude-val">None </span>=&gt; {
+                        unknown_fields.push((ast::TopId::CompositeType(next_type), field_shard));
+                        <span class="kw">continue </span><span class="lifetime">&#39;fields</span>;
                     }
                 };
 
-                <span class="ident">path</span>.<span class="ident">push_field</span>(<span class="ident">next_type</span>, <span class="ident">field_id</span>);
+                path.push_field(next_type, field_id);
 
-                <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">types</span>.<span class="ident">composite_type_fields</span>[<span class="kw-2">&amp;</span>(<span class="ident">next_type</span>, <span class="ident">field_id</span>)].<span class="ident">r#type</span> {
-                    <span class="ident">ScalarFieldType::CompositeType</span>(<span class="ident">ctid</span>) =&gt; {
-                        <span class="ident">next_type</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">ctid</span>;
+                <span class="kw">match </span><span class="kw-2">&amp;</span>ctx.types.composite_type_fields[<span class="kw-2">&amp;</span>(next_type, field_id)].r#type {
+                    ScalarFieldType::CompositeType(ctid) =&gt; {
+                        next_type = <span class="kw-2">*</span>ctid;
                     }
-                    <span class="kw">_</span> <span class="kw">if</span> <span class="ident">i</span> <span class="op">&lt;</span> <span class="ident">field_count</span> <span class="op">-</span> <span class="number">1</span> =&gt; {
-                        <span class="ident">unknown_fields</span>.<span class="ident">push</span>((<span class="ident">ast::TopId::Model</span>(<span class="ident">model_id</span>), <span class="ident">attrs</span>.<span class="ident">field_name</span>));
-                        <span class="kw">continue</span> <span class="lifetime">&#39;fields</span>;
+                    <span class="kw">_ if </span>i &lt; field_count - <span class="number">1 </span>=&gt; {
+                        unknown_fields.push((ast::TopId::Model(model_id), attrs.field_name));
+                        <span class="kw">continue </span><span class="lifetime">&#39;fields</span>;
                     }
-                    <span class="kw">_</span> =&gt; (),
+                    <span class="kw">_ </span>=&gt; (),
                 }
             }
 
-            <span class="ident">path</span>
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">field_id</span>) <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">find_model_field</span>(<span class="ident">model_id</span>, <span class="ident">attrs</span>.<span class="ident">field_name</span>) {
-            <span class="comment">// Is the field a scalar field?</span>
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">types</span>.<span class="ident">scalar_fields</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span>(<span class="ident">model_id</span>, <span class="ident">field_id</span>)) {
-                <span class="ident">relation_fields</span>.<span class="ident">push</span>((<span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">model_id</span>][<span class="ident">field_id</span>], <span class="ident">field_id</span>));
+            path
+        } <span class="kw">else if let </span><span class="prelude-val">Some</span>(field_id) = ctx.find_model_field(model_id, attrs.field_name) {
+            <span class="comment">// Is the field a scalar field?
+            </span><span class="kw">if </span>!ctx.types.scalar_fields.contains_key(<span class="kw-2">&amp;</span>(model_id, field_id)) {
+                relation_fields.push((<span class="kw-2">&amp;</span>ctx.ast[model_id][field_id], field_id));
                 <span class="kw">continue</span>;
-            } <span class="kw">else</span> {
-                <span class="ident">IndexFieldPath::new</span>(<span class="ident">field_id</span>)
+            } <span class="kw">else </span>{
+                IndexFieldPath::new(field_id)
             }
-        } <span class="kw">else</span> {
-            <span class="ident">unknown_fields</span>.<span class="ident">push</span>((<span class="ident">ast::TopId::Model</span>(<span class="ident">model_id</span>), <span class="ident">attrs</span>.<span class="ident">field_name</span>));
+        } <span class="kw">else </span>{
+            unknown_fields.push((ast::TopId::Model(model_id), attrs.field_name));
             <span class="kw">continue</span>;
         };
 
-        <span class="comment">// Is the field used twice?</span>
-        <span class="kw">if</span> <span class="ident">field_ids</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>) {
-            <span class="kw">let</span> <span class="ident">path_str</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">path</span>.<span class="ident">type_holding_the_indexed_field</span>() {
-                <span class="prelude-val">None</span> =&gt; <span class="ident">Cow::from</span>(<span class="ident">attrs</span>.<span class="ident">field_name</span>),
-                <span class="prelude-val">Some</span>(<span class="ident">ctid</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">field_id</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">field_in_index</span>();
-                    <span class="kw">let</span> <span class="ident">field_name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">ctid</span>][<span class="ident">field_id</span>].<span class="ident">name</span>();
-                    <span class="kw">let</span> <span class="ident">composite_type</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">ast</span>[<span class="ident">ctid</span>].<span class="ident">name</span>();
+        <span class="comment">// Is the field used twice?
+        </span><span class="kw">if </span>field_ids.contains(<span class="kw-2">&amp;</span>path) {
+            <span class="kw">let </span>path_str = <span class="kw">match </span>path.type_holding_the_indexed_field() {
+                <span class="prelude-val">None </span>=&gt; Cow::from(attrs.field_name),
+                <span class="prelude-val">Some</span>(ctid) =&gt; {
+                    <span class="kw">let </span>field_id = path.field_in_index();
+                    <span class="kw">let </span>field_name = <span class="kw-2">&amp;</span>ctx.ast[ctid][field_id].name();
+                    <span class="kw">let </span>composite_type = <span class="kw-2">&amp;</span>ctx.ast[ctid].name();
 
-                    <span class="ident">Cow::from</span>(<span class="macro">format!</span>(<span class="string">&quot;{field_name} in type {composite_type}&quot;</span>))
+                    Cow::from(<span class="macro">format!</span>(<span class="string">&quot;{field_name} in type {composite_type}&quot;</span>))
                 }
             };
 
-            <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_model_validation_error</span>(
+            ctx.push_error(DatamodelError::new_model_validation_error(
                 <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;The unique index definition refers to the field {path_str} multiple times.&quot;</span>,),
-                <span class="ident">ast_model</span>.<span class="ident">name</span>(),
-                <span class="ident">attribute_span</span>,
+                ast_model.name(),
+                attribute_span,
             ));
 
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">FieldResolutionError::AlreadyDealtWith</span>);
+            <span class="kw">return </span><span class="prelude-val">Err</span>(FieldResolutionError::AlreadyDealtWith);
         }
 
-        <span class="ident">field_ids</span>.<span class="ident">push</span>(<span class="ident">path</span>);
+        field_ids.push(path);
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">unknown_fields</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">relation_fields</span>.<span class="ident">is_empty</span>() {
-        <span class="prelude-val">Err</span>(<span class="ident">FieldResolutionError::ProblematicFields</span> {
-            <span class="ident">unknown_fields</span>,
-            <span class="ident">relation_fields</span>,
+    <span class="kw">if </span>!unknown_fields.is_empty() || !relation_fields.is_empty() {
+        <span class="prelude-val">Err</span>(FieldResolutionError::ProblematicFields {
+            unknown_fields,
+            relation_fields,
         })
-    } <span class="kw">else</span> {
-        <span class="kw">let</span> <span class="ident">fields_with_args</span> <span class="op">=</span> <span class="ident">constant_array</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">zip</span>(<span class="ident">field_ids</span>)
-            .<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">attrs</span>, <span class="ident">field_location</span>)<span class="op">|</span> <span class="ident">FieldWithArgs</span> {
-                <span class="ident">path</span>: <span class="ident">field_location</span>,
-                <span class="ident">sort_order</span>: <span class="ident">attrs</span>.<span class="ident">sort_order</span>,
-                <span class="ident">length</span>: <span class="ident">attrs</span>.<span class="ident">length</span>,
-                <span class="ident">operator_class</span>: <span class="ident">attrs</span>.<span class="ident">operator_class</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">convert_op_class</span>(<span class="ident">c</span>, <span class="ident">ctx</span>)),
+    } <span class="kw">else </span>{
+        <span class="kw">let </span>fields_with_args = constant_array
+            .into_iter()
+            .zip(field_ids)
+            .map(|(attrs, field_location)| FieldWithArgs {
+                path: field_location,
+                sort_order: attrs.sort_order,
+                length: attrs.length,
+                operator_class: attrs.operator_class.map(|c| convert_op_class(c, ctx)),
             })
-            .<span class="ident">collect</span>();
+            .collect();
 
-        <span class="prelude-val">Ok</span>(<span class="ident">fields_with_args</span>)
+        <span class="prelude-val">Ok</span>(fields_with_args)
     }
 }
 
-<span class="kw">fn</span> <span class="ident">convert_op_class</span>(<span class="ident">raw</span>: <span class="ident"><span class="kw">crate</span>::types::index_fields::OperatorClass</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">OperatorClassStore</span> {
-    <span class="kw">match</span> <span class="ident">raw</span> {
-        <span class="ident"><span class="kw">crate</span>::types::index_fields::OperatorClass::Constant</span>(<span class="ident">class</span>) =&gt; <span class="ident">OperatorClassStore::from</span>(<span class="ident">class</span>),
-        <span class="ident"><span class="kw">crate</span>::types::index_fields::OperatorClass::Raw</span>(<span class="ident">s</span>) =&gt; <span class="ident">OperatorClassStore::raw</span>(<span class="ident">ctx</span>.<span class="ident">interner</span>.<span class="ident">intern</span>(<span class="ident">s</span>)),
+<span class="kw">fn </span>convert_op_class(raw: <span class="kw">crate</span>::types::index_fields::OperatorClass&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; OperatorClassStore {
+    <span class="kw">match </span>raw {
+        <span class="kw">crate</span>::types::index_fields::OperatorClass::Constant(class) =&gt; OperatorClassStore::from(class),
+        <span class="kw">crate</span>::types::index_fields::OperatorClass::Raw(s) =&gt; OperatorClassStore::raw(ctx.interner.intern(s)),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">get_name_argument</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">StringId</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">ctx</span>
-        .<span class="ident">visit_optional_arg</span>(<span class="string">&quot;name&quot;</span>)
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">name</span><span class="op">|</span> <span class="ident">coerce::string</span>(<span class="ident">name</span>, <span class="ident">ctx</span>.<span class="ident">diagnostics</span>))
+<span class="kw">fn </span>get_name_argument(ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;StringId&gt; {
+    <span class="kw">match </span>ctx
+        .visit_optional_arg(<span class="string">&quot;name&quot;</span>)
+        .and_then(|name| coerce::string(name, ctx.diagnostics))
     {
         <span class="prelude-val">Some</span>(<span class="string">&quot;&quot;</span>) =&gt; {
-            <span class="ident">ctx</span>.<span class="ident">push_attribute_validation_error</span>(<span class="string">&quot;The `name` argument cannot be an empty string.&quot;</span>);
-            <span class="prelude-val">None</span>
-        }
-        <span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">ctx</span>.<span class="ident">interner</span>.<span class="ident">intern</span>(<span class="ident">name</span>)),
-        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+            ctx.push_attribute_validation_error(<span class="string">&quot;The `name` argument cannot be an empty string.&quot;</span>);
+            <span class="prelude-val">None
+        </span>}
+        <span class="prelude-val">Some</span>(name) =&gt; <span class="prelude-val">Some</span>(ctx.interner.intern(name)),
+        <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
     }
 }
 
-<span class="kw">fn</span> <span class="ident">validate_client_name</span>(<span class="ident">span</span>: <span class="ident">Span</span>, <span class="ident">object_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">name</span>: <span class="ident">StringId</span>, <span class="ident">attribute</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="comment">// only Alphanumeric characters and underscore are allowed due to this making its way into the client API</span>
-    <span class="comment">// todo what about starting with a number or underscore?</span>
-    {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">ctx</span>[<span class="ident">name</span>];
+<span class="kw">fn </span>validate_client_name(span: Span, object_name: <span class="kw-2">&amp;</span>str, name: StringId, attribute: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="comment">// only Alphanumeric characters and underscore are allowed due to this making its way into the client API
+    // todo what about starting with a number or underscore?
+    </span>{
+        <span class="kw">let </span>name = <span class="kw-2">&amp;</span>ctx[name];
 
-        <span class="kw">let</span> <span class="ident">is_valid</span> <span class="op">=</span> <span class="ident">name</span>
-            .<span class="ident">chars</span>()
-            .<span class="ident">all</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;_&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_ascii_digit</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">is_ascii_alphabetic</span>());
+        <span class="kw">let </span>is_valid = name
+            .chars()
+            .all(|c| c == <span class="string">&#39;_&#39; </span>|| c.is_ascii_digit() || c.is_ascii_alphabetic());
 
-        <span class="kw">if</span> <span class="ident">is_valid</span> {
+        <span class="kw">if </span>is_valid {
             <span class="kw">return</span>;
         }
     }
 
-    <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_model_validation_error</span>(
+    ctx.push_error(DatamodelError::new_model_validation_error(
         <span class="kw-2">&amp;</span><span class="macro">format!</span>(
             <span class="string">&quot;The `name` property within the `{}` attribute only allows for the following characters: `_a-zA-Z0-9`.&quot;</span>,
-            <span class="ident">attribute</span>
+            attribute
         ),
-        <span class="ident">object_name</span>,
-        <span class="ident">span</span>,
+        object_name,
+        span,
     ))
 }
 
-<span class="kw">fn</span> <span class="ident">validate_clustering_setting</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-    <span class="ident">ctx</span>.<span class="ident">visit_optional_arg</span>(<span class="string">&quot;clustered&quot;</span>)
-        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">sort</span><span class="op">|</span> <span class="ident">coerce::boolean</span>(<span class="ident">sort</span>, <span class="ident">ctx</span>.<span class="ident">diagnostics</span>))
+<span class="kw">fn </span>validate_clustering_setting(ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;bool&gt; {
+    ctx.visit_optional_arg(<span class="string">&quot;clustered&quot;</span>)
+        .and_then(|sort| coerce::boolean(sort, ctx.diagnostics))
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="parser_database" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="parser_database" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

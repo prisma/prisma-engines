@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../trust_dns_proto/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../trust_dns_proto/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -244,251 +244,251 @@
 <span id="244">244</span>
 <span id="245">245</span>
 <span id="246">246</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2017 Benjamin Fry &lt;benjaminfry@me.com&gt;</span>
-<span class="comment">// Copyright 2017 Google LLC.</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2017 Benjamin Fry &lt;benjaminfry@me.com&gt;
+// Copyright 2017 Google LLC.
+//
+// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="comment">// LIBRARY WARNINGS</span>
-<span class="attribute">#![<span class="ident">warn</span>(
-    <span class="ident">clippy::default_trait_access</span>,
-    <span class="ident">clippy::dbg_macro</span>,
-    <span class="ident">clippy::print_stdout</span>,
-    <span class="ident">clippy::unimplemented</span>,
-    <span class="ident">clippy::use_self</span>,
-    <span class="ident">missing_copy_implementations</span>,
-    <span class="ident">missing_docs</span>,
-    <span class="ident">non_snake_case</span>,
-    <span class="ident">non_upper_case_globals</span>,
-    <span class="ident">rust_2018_idioms</span>,
-    <span class="ident">unreachable_pub</span>
-)]</span>
-<span class="attribute">#![<span class="ident">allow</span>(
-    <span class="ident">clippy::single_component_path_imports</span>,
-    <span class="ident">clippy::upper_case_acronyms</span>, <span class="comment">// can be removed on a major release boundary</span>
-)]</span>
-<span class="attribute">#![<span class="ident">recursion_limit</span> <span class="op">=</span> <span class="string">&quot;2048&quot;</span>]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">feature</span>(<span class="ident">doc_cfg</span>))]</span>
+// LIBRARY WARNINGS
+</span><span class="attribute">#![warn(
+    clippy::default_trait_access,
+    clippy::dbg_macro,
+    clippy::print_stdout,
+    clippy::unimplemented,
+    clippy::use_self,
+    missing_copy_implementations,
+    missing_docs,
+    non_snake_case,
+    non_upper_case_globals,
+    rust_2018_idioms,
+    unreachable_pub
+)]
+#![allow(
+    clippy::single_component_path_imports,
+    clippy::upper_case_acronyms, <span class="comment">// can be removed on a major release boundary
+</span>)]
+#![recursion_limit = <span class="string">&quot;2048&quot;</span>]
+#![cfg_attr(docsrs, feature(doc_cfg))]
 
-<span class="doccomment">//! Trust-DNS Protocol library</span>
+</span><span class="doccomment">//! Trust-DNS Protocol library
 
-<span class="kw">use</span> <span class="ident">async_trait::async_trait</span>;
-<span class="kw">use</span> <span class="ident">futures_util::future::Future</span>;
+</span><span class="kw">use </span>async_trait::async_trait;
+<span class="kw">use </span>futures_util::future::Future;
 
-<span class="kw">use</span> <span class="ident">std::marker::Send</span>;
-<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">tokio::runtime::Runtime</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">tokio::task::JoinHandle</span>;
+<span class="kw">use </span>std::marker::Send;
+<span class="kw">use </span>std::time::Duration;
+<span class="attribute">#[cfg(any(test, feature = <span class="string">&quot;tokio-runtime&quot;</span>))]
+</span><span class="kw">use </span>tokio::runtime::Runtime;
+<span class="attribute">#[cfg(any(test, feature = <span class="string">&quot;tokio-runtime&quot;</span>))]
+</span><span class="kw">use </span>tokio::task::JoinHandle;
 
-<span class="macro">macro_rules!</span> <span class="ident">try_ready_stream</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) =&gt; {{
-        <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span> {
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(<span class="ident">t</span>))) =&gt; <span class="ident">t</span>,
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>) =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">None</span>),
-            <span class="ident">Poll::Pending</span> =&gt; <span class="kw">return</span> <span class="ident">Poll::Pending</span>,
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">e</span>))) =&gt; <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(<span class="ident">From::from</span>(<span class="ident">e</span>)))),
+<span class="macro">macro_rules! </span>try_ready_stream {
+    (<span class="macro-nonterminal">$e</span>:expr) =&gt; {{
+        <span class="kw">match </span><span class="macro-nonterminal">$e </span>{
+            Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(t))) =&gt; t,
+            Poll::Ready(<span class="prelude-val">None</span>) =&gt; <span class="kw">return </span>Poll::Ready(<span class="prelude-val">None</span>),
+            Poll::Pending =&gt; <span class="kw">return </span>Poll::Pending,
+            Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(e))) =&gt; <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Some</span>(<span class="prelude-val">Err</span>(From::from(e)))),
         }
     }};
 }
 
-<span class="doccomment">/// Spawn a background task, if it was present</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">spawn_bg</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="ident">R</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>, <span class="ident">R</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>(
-    <span class="ident">runtime</span>: <span class="kw-2">&amp;</span><span class="ident">Runtime</span>,
-    <span class="ident">background</span>: <span class="ident">F</span>,
-) -&gt; <span class="ident">JoinHandle</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-    <span class="ident">runtime</span>.<span class="ident">spawn</span>(<span class="ident">background</span>)
+<span class="doccomment">/// Spawn a background task, if it was present
+</span><span class="attribute">#[cfg(any(test, feature = <span class="string">&quot;tokio-runtime&quot;</span>))]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;tokio-runtime&quot;</span>)))]
+</span><span class="kw">pub fn </span>spawn_bg&lt;F: Future&lt;Output = R&gt; + Send + <span class="lifetime">&#39;static</span>, R: Send + <span class="lifetime">&#39;static</span>&gt;(
+    runtime: <span class="kw-2">&amp;</span>Runtime,
+    background: F,
+) -&gt; JoinHandle&lt;R&gt; {
+    runtime.spawn(background)
 }
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">error</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-https&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-https&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">https</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mdns&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;mdns&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">multicast</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-native-tls&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-native-tls&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">native_tls</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">op</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-openssl&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-openssl&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">openssl</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">rr</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-rustls&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dns-over-rustls&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">rustls</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">serialize</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">tcp</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;testing&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;testing&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">tests</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">udp</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">xfer</span>;
+<span class="kw">pub mod </span>error;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;dns-over-https&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dns-over-https&quot;</span>)))]
+</span><span class="kw">pub mod </span>https;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;mdns&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;mdns&quot;</span>)))]
+</span><span class="kw">pub mod </span>multicast;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;dns-over-native-tls&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dns-over-native-tls&quot;</span>)))]
+</span><span class="kw">pub mod </span>native_tls;
+<span class="kw">pub mod </span>op;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;dns-over-openssl&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dns-over-openssl&quot;</span>)))]
+</span><span class="kw">pub mod </span>openssl;
+<span class="kw">pub mod </span>rr;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;dns-over-rustls&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;dns-over-rustls&quot;</span>)))]
+</span><span class="kw">pub mod </span>rustls;
+<span class="kw">pub mod </span>serialize;
+<span class="kw">pub mod </span>tcp;
+<span class="attribute">#[cfg(any(test, feature = <span class="string">&quot;testing&quot;</span>))]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;testing&quot;</span>)))]
+</span><span class="kw">pub mod </span>tests;
+<span class="kw">pub mod </span>udp;
+<span class="kw">pub mod </span>xfer;
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::xfer::dns_handle</span>::{<span class="ident">DnsHandle</span>, <span class="ident">DnsStreamHandle</span>};
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::xfer::dns_multiplexer::DnsMultiplexer</span>;
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;dnssec&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::xfer::dnssec_dns_handle::DnssecDnsHandle</span>;
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::xfer::retry_dns_handle::RetryDnsHandle</span>;
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::xfer::BufDnsStreamHandle</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;backtrace&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;backtrace&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">error::ExtBacktrace</span>;
+<span class="attribute">#[doc(hidden)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::xfer::dns_handle::{DnsHandle, DnsStreamHandle};
+<span class="attribute">#[doc(hidden)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::xfer::dns_multiplexer::DnsMultiplexer;
+<span class="attribute">#[doc(hidden)]
+#[cfg(feature = <span class="string">&quot;dnssec&quot;</span>)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::xfer::dnssec_dns_handle::DnssecDnsHandle;
+<span class="attribute">#[doc(hidden)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::xfer::retry_dns_handle::RetryDnsHandle;
+<span class="attribute">#[doc(hidden)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::xfer::BufDnsStreamHandle;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;backtrace&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;backtrace&quot;</span>)))]
+</span><span class="kw">pub use </span>error::ExtBacktrace;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">iocompat</span> {
-    <span class="kw">use</span> <span class="ident">std::io</span>;
-    <span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
-    <span class="kw">use</span> <span class="ident">std::task</span>::{<span class="ident">Context</span>, <span class="ident">Poll</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tokio-runtime&quot;</span>)]
+#[doc(hidden)]
+</span><span class="kw">pub mod </span>iocompat {
+    <span class="kw">use </span>std::io;
+    <span class="kw">use </span>std::pin::Pin;
+    <span class="kw">use </span>std::task::{Context, Poll};
 
-    <span class="kw">use</span> <span class="ident">futures_io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>};
-    <span class="kw">use</span> <span class="ident">tokio::io</span>::{<span class="ident">AsyncRead</span> <span class="kw">as</span> <span class="ident">TokioAsyncRead</span>, <span class="ident">AsyncWrite</span> <span class="kw">as</span> <span class="ident">TokioAsyncWrite</span>, <span class="ident">ReadBuf</span>};
+    <span class="kw">use </span>futures_io::{AsyncRead, AsyncWrite};
+    <span class="kw">use </span>tokio::io::{AsyncRead <span class="kw">as </span>TokioAsyncRead, AsyncWrite <span class="kw">as </span>TokioAsyncWrite, ReadBuf};
 
-    <span class="doccomment">/// Conversion from `tokio::io::{AsyncRead, AsyncWrite}` to `std::io::{AsyncRead, AsyncWrite}`</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AsyncIoTokioAsStd</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">TokioAsyncRead</span> <span class="op">+</span> <span class="ident">TokioAsyncWrite</span><span class="op">&gt;</span>(<span class="kw">pub</span> <span class="ident">T</span>);
+    <span class="doccomment">/// Conversion from `tokio::io::{AsyncRead, AsyncWrite}` to `std::io::{AsyncRead, AsyncWrite}`
+    </span><span class="kw">pub struct </span>AsyncIoTokioAsStd&lt;T: TokioAsyncRead + TokioAsyncWrite&gt;(<span class="kw">pub </span>T);
 
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">TokioAsyncRead</span> <span class="op">+</span> <span class="ident">TokioAsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span><span class="op">&gt;</span> <span class="ident">Unpin</span> <span class="kw">for</span> <span class="ident">AsyncIoTokioAsStd</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">TokioAsyncRead</span> <span class="op">+</span> <span class="ident">TokioAsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span><span class="op">&gt;</span> <span class="ident">AsyncRead</span> <span class="kw">for</span> <span class="ident">AsyncIoTokioAsStd</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">poll_read</span>(
-            <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-            <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-            <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-        ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">ReadBuf::new</span>(<span class="ident">buf</span>);
-            <span class="kw">let</span> <span class="ident">polled</span> <span class="op">=</span> <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="number">0</span>).<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="kw-2">&amp;mut</span> <span class="ident">buf</span>);
+    <span class="kw">impl</span>&lt;T: TokioAsyncRead + TokioAsyncWrite + Unpin&gt; Unpin <span class="kw">for </span>AsyncIoTokioAsStd&lt;T&gt; {}
+    <span class="kw">impl</span>&lt;R: TokioAsyncRead + TokioAsyncWrite + Unpin&gt; AsyncRead <span class="kw">for </span>AsyncIoTokioAsStd&lt;R&gt; {
+        <span class="kw">fn </span>poll_read(
+            <span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+            cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+            buf: <span class="kw-2">&amp;mut </span>[u8],
+        ) -&gt; Poll&lt;io::Result&lt;usize&gt;&gt; {
+            <span class="kw">let </span><span class="kw-2">mut </span>buf = ReadBuf::new(buf);
+            <span class="kw">let </span>polled = Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0</span>).poll_read(cx, <span class="kw-2">&amp;mut </span>buf);
 
-            <span class="ident">polled</span>.<span class="ident">map_ok</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">buf</span>.<span class="ident">filled</span>().<span class="ident">len</span>())
+            polled.map_ok(|<span class="kw">_</span>| buf.filled().len())
         }
     }
 
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">TokioAsyncRead</span> <span class="op">+</span> <span class="ident">TokioAsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span><span class="op">&gt;</span> <span class="ident">AsyncWrite</span> <span class="kw">for</span> <span class="ident">AsyncIoTokioAsStd</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">poll_write</span>(
-            <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-            <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-            <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-        ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="number">0</span>).<span class="ident">poll_write</span>(<span class="ident">cx</span>, <span class="ident">buf</span>)
+    <span class="kw">impl</span>&lt;W: TokioAsyncRead + TokioAsyncWrite + Unpin&gt; AsyncWrite <span class="kw">for </span>AsyncIoTokioAsStd&lt;W&gt; {
+        <span class="kw">fn </span>poll_write(
+            <span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+            cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+            buf: <span class="kw-2">&amp;</span>[u8],
+        ) -&gt; Poll&lt;io::Result&lt;usize&gt;&gt; {
+            Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0</span>).poll_write(cx, buf)
         }
-        <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="number">0</span>).<span class="ident">poll_flush</span>(<span class="ident">cx</span>)
+        <span class="kw">fn </span>poll_flush(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+            Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0</span>).poll_flush(cx)
         }
-        <span class="kw">fn</span> <span class="ident">poll_close</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="number">0</span>).<span class="ident">poll_shutdown</span>(<span class="ident">cx</span>)
-        }
-    }
-
-    <span class="doccomment">/// Conversion from `std::io::{AsyncRead, AsyncWrite}` to `tokio::io::{AsyncRead, AsyncWrite}`</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AsyncIoStdAsTokio</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span><span class="op">&gt;</span>(<span class="kw">pub</span> <span class="ident">T</span>);
-
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span><span class="op">&gt;</span> <span class="ident">Unpin</span> <span class="kw">for</span> <span class="ident">AsyncIoStdAsTokio</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {}
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">R</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span><span class="op">&gt;</span> <span class="ident">TokioAsyncRead</span> <span class="kw">for</span> <span class="ident">AsyncIoStdAsTokio</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">poll_read</span>(
-            <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-            <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-            <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ReadBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">get_mut</span>().<span class="number">0</span>)
-                .<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="ident">buf</span>.<span class="ident">initialized_mut</span>())
-                .<span class="ident">map_ok</span>(<span class="op">|</span><span class="ident">len</span><span class="op">|</span> <span class="ident">buf</span>.<span class="ident">advance</span>(<span class="ident">len</span>))
+        <span class="kw">fn </span>poll_close(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+            Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.<span class="number">0</span>).poll_shutdown(cx)
         }
     }
 
-    <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Unpin</span><span class="op">&gt;</span> <span class="ident">TokioAsyncWrite</span> <span class="kw">for</span> <span class="ident">AsyncIoStdAsTokio</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">poll_write</span>(
-            <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-            <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-            <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-        ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">get_mut</span>().<span class="number">0</span>).<span class="ident">poll_write</span>(<span class="ident">cx</span>, <span class="ident">buf</span>)
-        }
+    <span class="doccomment">/// Conversion from `std::io::{AsyncRead, AsyncWrite}` to `tokio::io::{AsyncRead, AsyncWrite}`
+    </span><span class="kw">pub struct </span>AsyncIoStdAsTokio&lt;T: AsyncRead + AsyncWrite&gt;(<span class="kw">pub </span>T);
 
-        <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">get_mut</span>().<span class="number">0</span>).<span class="ident">poll_flush</span>(<span class="ident">cx</span>)
-        }
-
-        <span class="kw">fn</span> <span class="ident">poll_shutdown</span>(
-            <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-            <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">io::Error</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">get_mut</span>().<span class="number">0</span>).<span class="ident">poll_close</span>(<span class="ident">cx</span>)
+    <span class="kw">impl</span>&lt;T: AsyncRead + AsyncWrite + Unpin&gt; Unpin <span class="kw">for </span>AsyncIoStdAsTokio&lt;T&gt; {}
+    <span class="kw">impl</span>&lt;R: AsyncRead + AsyncWrite + Unpin&gt; TokioAsyncRead <span class="kw">for </span>AsyncIoStdAsTokio&lt;R&gt; {
+        <span class="kw">fn </span>poll_read(
+            <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+            cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+            buf: <span class="kw-2">&amp;mut </span>ReadBuf&lt;<span class="lifetime">&#39;_</span>&gt;,
+        ) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+            Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.get_mut().<span class="number">0</span>)
+                .poll_read(cx, buf.initialized_mut())
+                .map_ok(|len| buf.advance(len))
         }
     }
-}
 
-<span class="doccomment">/// Generic executor.</span>
-<span class="comment">// This trait is created to facilitate running the tests defined in the tests mod using different types of</span>
-<span class="comment">// executors. It&#39;s used in Fuchsia OS, please be mindful when update it.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Executor</span> {
-    <span class="doccomment">/// Create the implementor itself.</span>
-    <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span>;
+    <span class="kw">impl</span>&lt;W: AsyncRead + AsyncWrite + Unpin&gt; TokioAsyncWrite <span class="kw">for </span>AsyncIoStdAsTokio&lt;W&gt; {
+        <span class="kw">fn </span>poll_write(
+            <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+            cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+            buf: <span class="kw-2">&amp;</span>[u8],
+        ) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;usize, io::Error&gt;&gt; {
+            Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.get_mut().<span class="number">0</span>).poll_write(cx, buf)
+        }
 
-    <span class="doccomment">/// Spawns a future object to run synchronously or asynchronously depending on the specific</span>
-    <span class="doccomment">/// executor.</span>
-    <span class="kw">fn</span> <span class="ident">block_on</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Future</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">future</span>: <span class="ident">F</span>) -&gt; <span class="ident">F::Output</span>;
-}
+        <span class="kw">fn </span>poll_flush(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), io::Error&gt;&gt; {
+            Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.get_mut().<span class="number">0</span>).poll_flush(cx)
+        }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)))]</span>
-<span class="kw">impl</span> <span class="ident">Executor</span> <span class="kw">for</span> <span class="ident">Runtime</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::new</span>().<span class="ident">expect</span>(<span class="string">&quot;failed to create tokio runtime&quot;</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">block_on</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">Future</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">future</span>: <span class="ident">F</span>) -&gt; <span class="ident">F::Output</span> {
-        <span class="ident"><span class="self">Self</span>::block_on</span>(<span class="self">self</span>, <span class="ident">future</span>)
+        <span class="kw">fn </span>poll_shutdown(
+            <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+            cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        ) -&gt; Poll&lt;<span class="prelude-ty">Result</span>&lt;(), io::Error&gt;&gt; {
+            Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.get_mut().<span class="number">0</span>).poll_close(cx)
+        }
     }
 }
 
-<span class="doccomment">/// Generic Time for Delay and Timeout.</span>
-<span class="comment">// This trait is created to allow to use different types of time systems. It&#39;s used in Fuchsia OS, please be mindful when update it.</span>
-<span class="attribute">#[<span class="ident">async_trait</span>]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Time</span> {
-    <span class="doccomment">/// Return a type that implements `Future` that will wait until the specified duration has</span>
-    <span class="doccomment">/// elapsed.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delay_for</span>(<span class="ident">duration</span>: <span class="ident">Duration</span>);
+<span class="doccomment">/// Generic executor.
+</span><span class="comment">// This trait is created to facilitate running the tests defined in the tests mod using different types of
+// executors. It&#39;s used in Fuchsia OS, please be mindful when update it.
+</span><span class="kw">pub trait </span>Executor {
+    <span class="doccomment">/// Create the implementor itself.
+    </span><span class="kw">fn </span>new() -&gt; <span class="self">Self</span>;
 
-    <span class="doccomment">/// Return a type that implement `Future` to complete before the specified duration has elapsed.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">timeout</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Future</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>(
-        <span class="ident">duration</span>: <span class="ident">Duration</span>,
-        <span class="ident">future</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">F::Output</span>, <span class="ident">std::io::Error</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Spawns a future object to run synchronously or asynchronously depending on the specific
+    /// executor.
+    </span><span class="kw">fn </span>block_on&lt;F: Future&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, future: F) -&gt; F::Output;
 }
 
-<span class="doccomment">/// New type which is implemented using tokio::time::{Delay, Timeout}</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TokioTime</span>;
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio-runtime&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">async_trait</span>]</span>
-<span class="kw">impl</span> <span class="ident">Time</span> <span class="kw">for</span> <span class="ident">TokioTime</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delay_for</span>(<span class="ident">duration</span>: <span class="ident">Duration</span>) {
-        <span class="ident">tokio::time::sleep</span>(<span class="ident">duration</span>).<span class="kw">await</span>
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tokio-runtime&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;tokio-runtime&quot;</span>)))]
+</span><span class="kw">impl </span>Executor <span class="kw">for </span>Runtime {
+    <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::new().expect(<span class="string">&quot;failed to create tokio runtime&quot;</span>)
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">timeout</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Future</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>(
-        <span class="ident">duration</span>: <span class="ident">Duration</span>,
-        <span class="ident">future</span>: <span class="ident">F</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">F::Output</span>, <span class="ident">std::io::Error</span><span class="op">&gt;</span> {
-        <span class="ident">tokio::time::timeout</span>(<span class="ident">duration</span>, <span class="ident">future</span>)
-            .<span class="kw">await</span>
-            .<span class="ident">map_err</span>(<span class="kw">move</span> <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">std::io::Error::new</span>(<span class="ident">std::io::ErrorKind::TimedOut</span>, <span class="string">&quot;future timed out&quot;</span>))
+    <span class="kw">fn </span>block_on&lt;F: Future&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, future: F) -&gt; F::Output {
+        <span class="self">Self</span>::block_on(<span class="self">self</span>, future)
+    }
+}
+
+<span class="doccomment">/// Generic Time for Delay and Timeout.
+</span><span class="comment">// This trait is created to allow to use different types of time systems. It&#39;s used in Fuchsia OS, please be mindful when update it.
+</span><span class="attribute">#[async_trait]
+</span><span class="kw">pub trait </span>Time {
+    <span class="doccomment">/// Return a type that implements `Future` that will wait until the specified duration has
+    /// elapsed.
+    </span><span class="kw">async fn </span>delay_for(duration: Duration);
+
+    <span class="doccomment">/// Return a type that implement `Future` to complete before the specified duration has elapsed.
+    </span><span class="kw">async fn </span>timeout&lt;F: <span class="lifetime">&#39;static </span>+ Future + Send&gt;(
+        duration: Duration,
+        future: F,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;F::Output, std::io::Error&gt;;
+}
+
+<span class="doccomment">/// New type which is implemented using tokio::time::{Delay, Timeout}
+</span><span class="attribute">#[cfg(any(test, feature = <span class="string">&quot;tokio-runtime&quot;</span>))]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;tokio-runtime&quot;</span>)))]
+#[derive(Clone, Copy, Debug)]
+</span><span class="kw">pub struct </span>TokioTime;
+
+<span class="attribute">#[cfg(any(test, feature = <span class="string">&quot;tokio-runtime&quot;</span>))]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;tokio-runtime&quot;</span>)))]
+#[async_trait]
+</span><span class="kw">impl </span>Time <span class="kw">for </span>TokioTime {
+    <span class="kw">async fn </span>delay_for(duration: Duration) {
+        tokio::time::sleep(duration).<span class="kw">await
+    </span>}
+
+    <span class="kw">async fn </span>timeout&lt;F: <span class="lifetime">&#39;static </span>+ Future + Send&gt;(
+        duration: Duration,
+        future: F,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;F::Output, std::io::Error&gt; {
+        tokio::time::timeout(duration, future)
+            .<span class="kw">await
+            </span>.map_err(<span class="kw">move </span>|<span class="kw">_</span>| std::io::Error::new(std::io::ErrorKind::TimedOut, <span class="string">&quot;future timed out&quot;</span>))
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

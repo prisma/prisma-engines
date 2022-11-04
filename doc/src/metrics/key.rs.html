@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/metrics-0.19.0/src/key.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>key.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../metrics/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../metrics/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../metrics/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/metrics-0.19.0/src/key.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>key.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../metrics/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../metrics/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../metrics/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -351,358 +351,358 @@
 <span id="351">351</span>
 <span id="352">352</span>
 <span id="353">353</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">cow::Cow</span>, <span class="ident">IntoLabels</span>, <span class="ident">KeyHasher</span>, <span class="ident">Label</span>, <span class="ident">SharedString</span>};
-<span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">string::String</span>, <span class="ident">vec::Vec</span>};
-<span class="kw">use</span> <span class="ident">core</span>::{<span class="ident">fmt</span>, <span class="ident">hash::Hash</span>, <span class="ident">slice::Iter</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">cmp</span>,
-    <span class="ident">hash::Hasher</span>,
-    <span class="ident">sync::atomic</span>::{<span class="ident">AtomicBool</span>, <span class="ident">AtomicU64</span>, <span class="ident">Ordering</span>},
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{cow::Cow, IntoLabels, KeyHasher, Label, SharedString};
+<span class="kw">use </span>alloc::{string::String, vec::Vec};
+<span class="kw">use </span>core::{fmt, hash::Hash, slice::Iter};
+<span class="kw">use </span>std::{
+    cmp,
+    hash::Hasher,
+    sync::atomic::{AtomicBool, AtomicU64, Ordering},
 };
 
-<span class="kw">const</span> <span class="ident">NO_LABELS</span>: [<span class="ident">Label</span>; <span class="number">0</span>] <span class="op">=</span> [];
+<span class="kw">const </span>NO_LABELS: [Label; <span class="number">0</span>] = [];
 
-<span class="doccomment">/// Name component of a key.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">KeyName</span>(<span class="ident">SharedString</span>);
+<span class="doccomment">/// Name component of a key.
+</span><span class="attribute">#[derive(Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+</span><span class="kw">pub struct </span>KeyName(SharedString);
 
-<span class="kw">impl</span> <span class="ident">KeyName</span> {
-    <span class="doccomment">/// Creates a `KeyName` from a static string.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_const_str</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">KeyName</span>(<span class="ident">SharedString::const_str</span>(<span class="ident">name</span>))
+<span class="kw">impl </span>KeyName {
+    <span class="doccomment">/// Creates a `KeyName` from a static string.
+    </span><span class="kw">pub const fn </span>from_const_str(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="self">Self </span>{
+        KeyName(SharedString::const_str(name))
     }
 
-    <span class="doccomment">/// Gets a reference to the strin used for this name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
+    <span class="doccomment">/// Gets a reference to the strin used for this name.
+    </span><span class="kw">pub fn </span>as_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
+    </span>}
+}
+
+<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; <span class="kw">for </span>KeyName {
+    <span class="kw">fn </span>from(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="self">Self </span>{
+        KeyName(SharedString::from(name))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">KeyName</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">KeyName</span>(<span class="ident">SharedString::from</span>(<span class="ident">name</span>))
+<span class="kw">impl </span>From&lt;String&gt; <span class="kw">for </span>KeyName {
+    <span class="kw">fn </span>from(name: String) -&gt; <span class="self">Self </span>{
+        KeyName(SharedString::from(name))
     }
 }
-
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">KeyName</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">name</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">KeyName</span>(<span class="ident">SharedString::from</span>(<span class="ident">name</span>))
-    }
-}
-<span class="doccomment">/// A metric identifier.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A key represents both the name and labels of a metric.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">/// Clippy will report any usage of `Key` as the key of a map/set as &quot;mutable key type&quot;, meaning</span>
-<span class="doccomment">/// that it believes that there is interior mutability present which could lead to a key being</span>
-<span class="doccomment">/// hashed different over time.  That behavior could lead to unexpected behavior, as standard</span>
-<span class="doccomment">/// maps/sets depend on keys having stable hashes over time, related to times when they must be</span>
-<span class="doccomment">/// recomputed as the internal storage is resized and items are moved around.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// In this case, the `Hash` implementation of `Key` does _not_ depend on the fields which Clippy</span>
-<span class="doccomment">/// considers mutable (the atomics) and so it is actually safe against differing hashes being</span>
-<span class="doccomment">/// generated.  We personally allow this Clippy lint in places where we store the key, such as</span>
-<span class="doccomment">/// helper types in the `metrics-util` crate, and you may need to do the same if you&#39;re using it in</span>
-<span class="doccomment">/// such a way as well.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Key</span> {
-    <span class="ident">name</span>: <span class="ident">KeyName</span>,
-    <span class="ident">labels</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, [<span class="ident">Label</span>]<span class="op">&gt;</span>,
-    <span class="ident">hashed</span>: <span class="ident">AtomicBool</span>,
-    <span class="ident">hash</span>: <span class="ident">AtomicU64</span>,
+<span class="doccomment">/// A metric identifier.
+///
+/// A key represents both the name and labels of a metric.
+///
+/// # Safety
+/// Clippy will report any usage of `Key` as the key of a map/set as &quot;mutable key type&quot;, meaning
+/// that it believes that there is interior mutability present which could lead to a key being
+/// hashed different over time.  That behavior could lead to unexpected behavior, as standard
+/// maps/sets depend on keys having stable hashes over time, related to times when they must be
+/// recomputed as the internal storage is resized and items are moved around.
+///
+/// In this case, the `Hash` implementation of `Key` does _not_ depend on the fields which Clippy
+/// considers mutable (the atomics) and so it is actually safe against differing hashes being
+/// generated.  We personally allow this Clippy lint in places where we store the key, such as
+/// helper types in the `metrics-util` crate, and you may need to do the same if you&#39;re using it in
+/// such a way as well.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Key {
+    name: KeyName,
+    labels: Cow&lt;<span class="lifetime">&#39;static</span>, [Label]&gt;,
+    hashed: AtomicBool,
+    hash: AtomicU64,
 }
 
-<span class="kw">impl</span> <span class="ident">Key</span> {
-    <span class="doccomment">/// Creates a [`Key`] from a name.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_name</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">N</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">N</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">KeyName</span><span class="op">&gt;</span>,
+<span class="kw">impl </span>Key {
+    <span class="doccomment">/// Creates a [`Key`] from a name.
+    </span><span class="kw">pub fn </span>from_name&lt;N&gt;(name: N) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>N: Into&lt;KeyName&gt;,
     {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">into</span>();
-        <span class="kw">let</span> <span class="ident">labels</span> <span class="op">=</span> <span class="ident">Cow::owned</span>(<span class="ident">Vec::new</span>());
+        <span class="kw">let </span>name = name.into();
+        <span class="kw">let </span>labels = Cow::owned(Vec::new());
 
-        <span class="ident"><span class="self">Self</span>::builder</span>(<span class="ident">name</span>, <span class="ident">labels</span>)
+        <span class="self">Self</span>::builder(name, labels)
     }
 
-    <span class="doccomment">/// Creates a [`Key`] from a name and set of labels.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_parts</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">L</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">N</span>, <span class="ident">labels</span>: <span class="ident">L</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">N</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">KeyName</span><span class="op">&gt;</span>,
-        <span class="ident">L</span>: <span class="ident">IntoLabels</span>,
+    <span class="doccomment">/// Creates a [`Key`] from a name and set of labels.
+    </span><span class="kw">pub fn </span>from_parts&lt;N, L&gt;(name: N, labels: L) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>N: Into&lt;KeyName&gt;,
+        L: IntoLabels,
     {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">into</span>();
-        <span class="kw">let</span> <span class="ident">labels</span> <span class="op">=</span> <span class="ident">Cow::owned</span>(<span class="ident">labels</span>.<span class="ident">into_labels</span>());
+        <span class="kw">let </span>name = name.into();
+        <span class="kw">let </span>labels = Cow::owned(labels.into_labels());
 
-        <span class="ident"><span class="self">Self</span>::builder</span>(<span class="ident">name</span>, <span class="ident">labels</span>)
+        <span class="self">Self</span>::builder(name, labels)
     }
 
-    <span class="doccomment">/// Creates a [`Key`] from a non-static name and a static set of labels.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_static_labels</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">N</span>, <span class="ident">labels</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">Label</span>]) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="ident">N</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">KeyName</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Creates a [`Key`] from a non-static name and a static set of labels.
+    </span><span class="kw">pub fn </span>from_static_labels&lt;N&gt;(name: N, labels: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[Label]) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span>N: Into&lt;KeyName&gt;,
     {
-        <span class="self">Self</span> {
-            <span class="ident">name</span>: <span class="ident">name</span>.<span class="ident">into</span>(),
-            <span class="ident">labels</span>: <span class="ident">Cow</span>::<span class="op">&lt;</span>[<span class="ident">Label</span>]<span class="op">&gt;</span><span class="ident">::const_slice</span>(<span class="ident">labels</span>),
-            <span class="ident">hashed</span>: <span class="ident">AtomicBool::new</span>(<span class="bool-val">false</span>),
-            <span class="ident">hash</span>: <span class="ident">AtomicU64::new</span>(<span class="number">0</span>),
+        <span class="self">Self </span>{
+            name: name.into(),
+            labels: Cow::&lt;[Label]&gt;::const_slice(labels),
+            hashed: AtomicBool::new(<span class="bool-val">false</span>),
+            hash: AtomicU64::new(<span class="number">0</span>),
         }
     }
 
-    <span class="doccomment">/// Creates a [`Key`] from a static name.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function is `const`, so it can be used in a static context.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_static_name</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::from_static_parts</span>(<span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="ident">NO_LABELS</span>)
+    <span class="doccomment">/// Creates a [`Key`] from a static name.
+    ///
+    /// This function is `const`, so it can be used in a static context.
+    </span><span class="kw">pub const fn </span>from_static_name(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::from_static_parts(name, <span class="kw-2">&amp;</span>NO_LABELS)
     }
 
-    <span class="doccomment">/// Creates a [`Key`] from a static name and static set of labels.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This function is `const`, so it can be used in a static context.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">from_static_parts</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">labels</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">Label</span>]) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">name</span>: <span class="ident">KeyName::from_const_str</span>(<span class="ident">name</span>),
-            <span class="ident">labels</span>: <span class="ident">Cow</span>::<span class="op">&lt;</span>[<span class="ident">Label</span>]<span class="op">&gt;</span><span class="ident">::const_slice</span>(<span class="ident">labels</span>),
-            <span class="ident">hashed</span>: <span class="ident">AtomicBool::new</span>(<span class="bool-val">false</span>),
-            <span class="ident">hash</span>: <span class="ident">AtomicU64::new</span>(<span class="number">0</span>),
+    <span class="doccomment">/// Creates a [`Key`] from a static name and static set of labels.
+    ///
+    /// This function is `const`, so it can be used in a static context.
+    </span><span class="kw">pub const fn </span>from_static_parts(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, labels: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[Label]) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            name: KeyName::from_const_str(name),
+            labels: Cow::&lt;[Label]&gt;::const_slice(labels),
+            hashed: AtomicBool::new(<span class="bool-val">false</span>),
+            hash: AtomicU64::new(<span class="number">0</span>),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">builder</span>(<span class="ident">name</span>: <span class="ident">KeyName</span>, <span class="ident">labels</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, [<span class="ident">Label</span>]<span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">hash</span> <span class="op">=</span> <span class="ident">generate_key_hash</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="ident">labels</span>);
+    <span class="kw">fn </span>builder(name: KeyName, labels: Cow&lt;<span class="lifetime">&#39;static</span>, [Label]&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>hash = generate_key_hash(<span class="kw-2">&amp;</span>name, <span class="kw-2">&amp;</span>labels);
 
-        <span class="self">Self</span> { <span class="ident">name</span>, <span class="ident">labels</span>, <span class="ident">hashed</span>: <span class="ident">AtomicBool::new</span>(<span class="bool-val">true</span>), <span class="ident">hash</span>: <span class="ident">AtomicU64::new</span>(<span class="ident">hash</span>) }
+        <span class="self">Self </span>{ name, labels, hashed: AtomicBool::new(<span class="bool-val">true</span>), hash: AtomicU64::new(hash) }
     }
 
-    <span class="doccomment">/// Name of this key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="self">self</span>.<span class="ident">name</span>.<span class="number">0</span>.<span class="ident">as_ref</span>()
+    <span class="doccomment">/// Name of this key.
+    </span><span class="kw">pub fn </span>name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="self">self</span>.name.<span class="number">0</span>.as_ref()
     }
 
-    <span class="doccomment">/// Labels of this key, if they exist.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">labels</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Iter</span><span class="op">&lt;</span><span class="ident">Label</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">labels</span>.<span class="ident">iter</span>()
+    <span class="doccomment">/// Labels of this key, if they exist.
+    </span><span class="kw">pub fn </span>labels(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Iter&lt;Label&gt; {
+        <span class="self">self</span>.labels.iter()
     }
 
-    <span class="doccomment">/// Consumes this [`Key`], returning the name parts and any labels.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_parts</span>(<span class="self">self</span>) -&gt; (<span class="ident">KeyName</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Label</span><span class="op">&gt;</span>) {
-        (<span class="self">self</span>.<span class="ident">name</span>, <span class="self">self</span>.<span class="ident">labels</span>.<span class="ident">into_owned</span>())
+    <span class="doccomment">/// Consumes this [`Key`], returning the name parts and any labels.
+    </span><span class="kw">pub fn </span>into_parts(<span class="self">self</span>) -&gt; (KeyName, Vec&lt;Label&gt;) {
+        (<span class="self">self</span>.name, <span class="self">self</span>.labels.into_owned())
     }
 
-    <span class="doccomment">/// Clones this [`Key`], and expands the existing set of labels.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_extra_labels</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">extra_labels</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Label</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="ident">extra_labels</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="self">self</span>.<span class="ident">clone</span>();
+    <span class="doccomment">/// Clones this [`Key`], and expands the existing set of labels.
+    </span><span class="kw">pub fn </span>with_extra_labels(<span class="kw-2">&amp;</span><span class="self">self</span>, extra_labels: Vec&lt;Label&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">if </span>extra_labels.is_empty() {
+            <span class="kw">return </span><span class="self">self</span>.clone();
         }
 
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">clone</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">labels</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">labels</span>.<span class="ident">clone</span>().<span class="ident">into_owned</span>();
-        <span class="ident">labels</span>.<span class="ident">extend</span>(<span class="ident">extra_labels</span>);
+        <span class="kw">let </span>name = <span class="self">self</span>.name.clone();
+        <span class="kw">let </span><span class="kw-2">mut </span>labels = <span class="self">self</span>.labels.clone().into_owned();
+        labels.extend(extra_labels);
 
-        <span class="ident"><span class="self">Self</span>::builder</span>(<span class="ident">name</span>, <span class="ident">labels</span>.<span class="ident">into</span>())
+        <span class="self">Self</span>::builder(name, labels.into())
     }
 
-    <span class="doccomment">/// Gets the hash value for this key.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_hash</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">hashed</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>) {
-            <span class="self">self</span>.<span class="ident">hash</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>)
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">hash</span> <span class="op">=</span> <span class="ident">generate_key_hash</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">labels</span>);
-            <span class="self">self</span>.<span class="ident">hash</span>.<span class="ident">store</span>(<span class="ident">hash</span>, <span class="ident">Ordering::Release</span>);
-            <span class="self">self</span>.<span class="ident">hashed</span>.<span class="ident">store</span>(<span class="bool-val">true</span>, <span class="ident">Ordering::Release</span>);
-            <span class="ident">hash</span>
-        }
-    }
-}
-
-<span class="kw">fn</span> <span class="ident">generate_key_hash</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">KeyName</span>, <span class="ident">labels</span>: <span class="kw-2">&amp;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, [<span class="ident">Label</span>]<span class="op">&gt;</span>) -&gt; <span class="ident">u64</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hasher</span> <span class="op">=</span> <span class="ident">KeyHasher::default</span>();
-    <span class="ident">key_hasher_impl</span>(<span class="kw-2">&amp;mut</span> <span class="ident">hasher</span>, <span class="ident">name</span>, <span class="ident">labels</span>);
-    <span class="ident">hasher</span>.<span class="ident">finish</span>()
-}
-
-<span class="kw">fn</span> <span class="ident">key_hasher_impl</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">Hasher</span><span class="op">&gt;</span>(<span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">H</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">KeyName</span>, <span class="ident">labels</span>: <span class="kw-2">&amp;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, [<span class="ident">Label</span>]<span class="op">&gt;</span>) {
-    <span class="ident">name</span>.<span class="number">0</span>.<span class="ident">hash</span>(<span class="ident">state</span>);
-    <span class="ident">labels</span>.<span class="ident">hash</span>(<span class="ident">state</span>);
-}
-
-<span class="kw">impl</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Key</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">name</span>: <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-            <span class="ident">labels</span>: <span class="self">self</span>.<span class="ident">labels</span>.<span class="ident">clone</span>(),
-            <span class="ident">hashed</span>: <span class="ident">AtomicBool::new</span>(<span class="self">self</span>.<span class="ident">hashed</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>)),
-            <span class="ident">hash</span>: <span class="ident">AtomicU64::new</span>(<span class="self">self</span>.<span class="ident">hash</span>.<span class="ident">load</span>(<span class="ident">Ordering::Acquire</span>)),
+    <span class="doccomment">/// Gets the hash value for this key.
+    </span><span class="kw">pub fn </span>get_hash(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u64 {
+        <span class="kw">if </span><span class="self">self</span>.hashed.load(Ordering::Acquire) {
+            <span class="self">self</span>.hash.load(Ordering::Acquire)
+        } <span class="kw">else </span>{
+            <span class="kw">let </span>hash = generate_key_hash(<span class="kw-2">&amp;</span><span class="self">self</span>.name, <span class="kw-2">&amp;</span><span class="self">self</span>.labels);
+            <span class="self">self</span>.hash.store(hash, Ordering::Release);
+            <span class="self">self</span>.hashed.store(<span class="bool-val">true</span>, Ordering::Release);
+            hash
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">Key</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">name</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">labels</span> <span class="op">==</span> <span class="ident">other</span>.<span class="ident">labels</span>
+<span class="kw">fn </span>generate_key_hash(name: <span class="kw-2">&amp;</span>KeyName, labels: <span class="kw-2">&amp;</span>Cow&lt;<span class="lifetime">&#39;static</span>, [Label]&gt;) -&gt; u64 {
+    <span class="kw">let </span><span class="kw-2">mut </span>hasher = KeyHasher::default();
+    key_hasher_impl(<span class="kw-2">&amp;mut </span>hasher, name, labels);
+    hasher.finish()
+}
+
+<span class="kw">fn </span>key_hasher_impl&lt;H: Hasher&gt;(state: <span class="kw-2">&amp;mut </span>H, name: <span class="kw-2">&amp;</span>KeyName, labels: <span class="kw-2">&amp;</span>Cow&lt;<span class="lifetime">&#39;static</span>, [Label]&gt;) {
+    name.<span class="number">0</span>.hash(state);
+    labels.hash(state);
+}
+
+<span class="kw">impl </span>Clone <span class="kw">for </span>Key {
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            name: <span class="self">self</span>.name.clone(),
+            labels: <span class="self">self</span>.labels.clone(),
+            hashed: AtomicBool::new(<span class="self">self</span>.hashed.load(Ordering::Acquire)),
+            hash: AtomicU64::new(<span class="self">self</span>.hash.load(Ordering::Acquire)),
+        }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Eq</span> <span class="kw">for</span> <span class="ident">Key</span> {}
-
-<span class="kw">impl</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">Key</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">cmp::Ordering</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">cmp</span>(<span class="ident">other</span>))
+<span class="kw">impl </span>PartialEq <span class="kw">for </span>Key {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; bool {
+        <span class="self">self</span>.name == other.name &amp;&amp; <span class="self">self</span>.labels == other.labels
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">Key</span> {
-    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">cmp::Ordering</span> {
-        (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">labels</span>).<span class="ident">cmp</span>(<span class="kw-2">&amp;</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">labels</span>))
+<span class="kw">impl </span>Eq <span class="kw">for </span>Key {}
+
+<span class="kw">impl </span>PartialOrd <span class="kw">for </span>Key {
+    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;cmp::Ordering&gt; {
+        <span class="prelude-val">Some</span>(<span class="self">self</span>.cmp(other))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Hash</span> <span class="kw">for</span> <span class="ident">Key</span> {
-    <span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">Hasher</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">H</span>) {
-        <span class="ident">key_hasher_impl</span>(<span class="ident">state</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">labels</span>);
+<span class="kw">impl </span>Ord <span class="kw">for </span>Key {
+    <span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; cmp::Ordering {
+        (<span class="kw-2">&amp;</span><span class="self">self</span>.name, <span class="kw-2">&amp;</span><span class="self">self</span>.labels).cmp(<span class="kw-2">&amp;</span>(<span class="kw-2">&amp;</span>other.name, <span class="kw-2">&amp;</span>other.labels))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Key</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">labels</span>.<span class="ident">is_empty</span>() {
-            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Key({})&quot;</span>, <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">as_str</span>())
-        } <span class="kw">else</span> {
-            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Key({}, [&quot;</span>, <span class="self">self</span>.<span class="ident">name</span>.<span class="ident">as_str</span>())<span class="question-mark">?</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">first</span> <span class="op">=</span> <span class="bool-val">true</span>;
-            <span class="kw">for</span> <span class="ident">label</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">labels</span>.<span class="ident">as_ref</span>() {
-                <span class="kw">if</span> <span class="ident">first</span> {
-                    <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{} = {}&quot;</span>, <span class="ident">label</span>.<span class="number">0</span>, <span class="ident">label</span>.<span class="number">1</span>)<span class="question-mark">?</span>;
-                    <span class="ident">first</span> <span class="op">=</span> <span class="bool-val">false</span>;
-                } <span class="kw">else</span> {
-                    <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;, {} = {}&quot;</span>, <span class="ident">label</span>.<span class="number">0</span>, <span class="ident">label</span>.<span class="number">1</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>Hash <span class="kw">for </span>Key {
+    <span class="kw">fn </span>hash&lt;H: Hasher&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, state: <span class="kw-2">&amp;mut </span>H) {
+        key_hasher_impl(state, <span class="kw-2">&amp;</span><span class="self">self</span>.name, <span class="kw-2">&amp;</span><span class="self">self</span>.labels);
+    }
+}
+
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Key {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="kw">if </span><span class="self">self</span>.labels.is_empty() {
+            <span class="macro">write!</span>(f, <span class="string">&quot;Key({})&quot;</span>, <span class="self">self</span>.name.as_str())
+        } <span class="kw">else </span>{
+            <span class="macro">write!</span>(f, <span class="string">&quot;Key({}, [&quot;</span>, <span class="self">self</span>.name.as_str())<span class="question-mark">?</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>first = <span class="bool-val">true</span>;
+            <span class="kw">for </span>label <span class="kw">in </span><span class="self">self</span>.labels.as_ref() {
+                <span class="kw">if </span>first {
+                    <span class="macro">write!</span>(f, <span class="string">&quot;{} = {}&quot;</span>, label.<span class="number">0</span>, label.<span class="number">1</span>)<span class="question-mark">?</span>;
+                    first = <span class="bool-val">false</span>;
+                } <span class="kw">else </span>{
+                    <span class="macro">write!</span>(f, <span class="string">&quot;, {} = {}&quot;</span>, label.<span class="number">0</span>, label.<span class="number">1</span>)<span class="question-mark">?</span>;
                 }
             }
-            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;])&quot;</span>)
+            <span class="macro">write!</span>(f, <span class="string">&quot;])&quot;</span>)
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Key</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">name</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::from_name</span>(<span class="ident">name</span>)
+<span class="kw">impl </span>From&lt;String&gt; <span class="kw">for </span>Key {
+    <span class="kw">fn </span>from(name: String) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::from_name(name)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Key</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::from_name</span>(<span class="ident">name</span>)
+<span class="kw">impl </span>From&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt; <span class="kw">for </span>Key {
+    <span class="kw">fn </span>from(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::from_name(name)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">N</span>, <span class="ident">L</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="ident">N</span>, <span class="ident">L</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Key</span>
-<span class="kw">where</span>
-    <span class="ident">N</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">KeyName</span><span class="op">&gt;</span>,
-    <span class="ident">L</span>: <span class="ident">IntoLabels</span>,
+<span class="kw">impl</span>&lt;N, L&gt; From&lt;(N, L)&gt; <span class="kw">for </span>Key
+<span class="kw">where
+    </span>N: Into&lt;KeyName&gt;,
+    L: IntoLabels,
 {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">parts</span>: (<span class="ident">N</span>, <span class="ident">L</span>)) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::from_parts</span>(<span class="ident">parts</span>.<span class="number">0</span>, <span class="ident">parts</span>.<span class="number">1</span>)
+    <span class="kw">fn </span>from(parts: (N, L)) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::from_parts(parts.<span class="number">0</span>, parts.<span class="number">1</span>)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Key</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Label</span>;
-    <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">super</span>::Key;
+    <span class="kw">use </span><span class="kw">crate</span>::Label;
+    <span class="kw">use </span>std::collections::HashMap;
 
-    <span class="kw">static</span> <span class="ident">BORROWED_NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;name&quot;</span>;
-    <span class="kw">static</span> <span class="ident">FOOBAR_NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;foobar&quot;</span>;
-    <span class="kw">static</span> <span class="ident">BORROWED_BASIC</span>: <span class="ident">Key</span> <span class="op">=</span> <span class="ident">Key::from_static_name</span>(<span class="kw-2">&amp;</span><span class="ident">BORROWED_NAME</span>);
-    <span class="kw">static</span> <span class="ident">LABELS</span>: [<span class="ident">Label</span>; <span class="number">1</span>] <span class="op">=</span> [<span class="ident">Label::from_static_parts</span>(<span class="string">&quot;key&quot;</span>, <span class="string">&quot;value&quot;</span>)];
-    <span class="kw">static</span> <span class="ident">BORROWED_LABELS</span>: <span class="ident">Key</span> <span class="op">=</span> <span class="ident">Key::from_static_parts</span>(<span class="kw-2">&amp;</span><span class="ident">BORROWED_NAME</span>, <span class="kw-2">&amp;</span><span class="ident">LABELS</span>);
+    <span class="kw">static </span>BORROWED_NAME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;name&quot;</span>;
+    <span class="kw">static </span>FOOBAR_NAME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;foobar&quot;</span>;
+    <span class="kw">static </span>BORROWED_BASIC: Key = Key::from_static_name(<span class="kw-2">&amp;</span>BORROWED_NAME);
+    <span class="kw">static </span>LABELS: [Label; <span class="number">1</span>] = [Label::from_static_parts(<span class="string">&quot;key&quot;</span>, <span class="string">&quot;value&quot;</span>)];
+    <span class="kw">static </span>BORROWED_LABELS: Key = Key::from_static_parts(<span class="kw-2">&amp;</span>BORROWED_NAME, <span class="kw-2">&amp;</span>LABELS);
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_key_ord_and_partialord</span>() {
-        <span class="kw">let</span> <span class="ident">keys_expected</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Key</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[
-            <span class="ident">Key::from_name</span>(<span class="string">&quot;aaaa&quot;</span>).<span class="ident">into</span>(),
-            <span class="ident">Key::from_name</span>(<span class="string">&quot;bbbb&quot;</span>).<span class="ident">into</span>(),
-            <span class="ident">Key::from_name</span>(<span class="string">&quot;cccc&quot;</span>).<span class="ident">into</span>(),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_key_ord_and_partialord() {
+        <span class="kw">let </span>keys_expected: Vec&lt;Key&gt; = <span class="macro">vec!</span>[
+            Key::from_name(<span class="string">&quot;aaaa&quot;</span>).into(),
+            Key::from_name(<span class="string">&quot;bbbb&quot;</span>).into(),
+            Key::from_name(<span class="string">&quot;cccc&quot;</span>).into(),
         ];
 
-        <span class="kw">let</span> <span class="ident">keys_unsorted</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Key</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec!</span>[
-            <span class="ident">Key::from_name</span>(<span class="string">&quot;bbbb&quot;</span>).<span class="ident">into</span>(),
-            <span class="ident">Key::from_name</span>(<span class="string">&quot;cccc&quot;</span>).<span class="ident">into</span>(),
-            <span class="ident">Key::from_name</span>(<span class="string">&quot;aaaa&quot;</span>).<span class="ident">into</span>(),
+        <span class="kw">let </span>keys_unsorted: Vec&lt;Key&gt; = <span class="macro">vec!</span>[
+            Key::from_name(<span class="string">&quot;bbbb&quot;</span>).into(),
+            Key::from_name(<span class="string">&quot;cccc&quot;</span>).into(),
+            Key::from_name(<span class="string">&quot;aaaa&quot;</span>).into(),
         ];
 
-        <span class="kw">let</span> <span class="ident">keys</span> <span class="op">=</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">keys</span> <span class="op">=</span> <span class="ident">keys_unsorted</span>.<span class="ident">clone</span>();
-            <span class="ident">keys</span>.<span class="ident">sort</span>();
-            <span class="ident">keys</span>
+        <span class="kw">let </span>keys = {
+            <span class="kw">let </span><span class="kw-2">mut </span>keys = keys_unsorted.clone();
+            keys.sort();
+            keys
         };
-        <span class="macro">assert_eq!</span>(<span class="ident">keys</span>, <span class="ident">keys_expected</span>);
+        <span class="macro">assert_eq!</span>(keys, keys_expected);
 
-        <span class="kw">let</span> <span class="ident">keys</span> <span class="op">=</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">keys</span> <span class="op">=</span> <span class="ident">keys_unsorted</span>.<span class="ident">clone</span>();
-            <span class="ident">keys</span>.<span class="ident">sort_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">partial_cmp</span>(<span class="ident">b</span>).<span class="ident">unwrap</span>());
-            <span class="ident">keys</span>
+        <span class="kw">let </span>keys = {
+            <span class="kw">let </span><span class="kw-2">mut </span>keys = keys_unsorted.clone();
+            keys.sort_by(|a, b| a.partial_cmp(b).unwrap());
+            keys
         };
-        <span class="macro">assert_eq!</span>(<span class="ident">keys</span>, <span class="ident">keys_expected</span>);
+        <span class="macro">assert_eq!</span>(keys, keys_expected);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_key_eq_and_hash</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">keys</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_key_eq_and_hash() {
+        <span class="kw">let </span><span class="kw-2">mut </span>keys = HashMap::new();
 
-        <span class="kw">let</span> <span class="ident">owned_basic</span>: <span class="ident">Key</span> <span class="op">=</span> <span class="ident">Key::from_name</span>(<span class="string">&quot;name&quot;</span>).<span class="ident">into</span>();
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">owned_basic</span>, <span class="kw-2">&amp;</span><span class="ident">BORROWED_BASIC</span>);
+        <span class="kw">let </span>owned_basic: Key = Key::from_name(<span class="string">&quot;name&quot;</span>).into();
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>owned_basic, <span class="kw-2">&amp;</span>BORROWED_BASIC);
 
-        <span class="kw">let</span> <span class="ident">previous</span> <span class="op">=</span> <span class="ident">keys</span>.<span class="ident">insert</span>(<span class="ident">owned_basic</span>, <span class="number">42</span>);
-        <span class="macro">assert!</span>(<span class="ident">previous</span>.<span class="ident">is_none</span>());
+        <span class="kw">let </span>previous = keys.insert(owned_basic, <span class="number">42</span>);
+        <span class="macro">assert!</span>(previous.is_none());
 
-        <span class="kw">let</span> <span class="ident">previous</span> <span class="op">=</span> <span class="ident">keys</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">BORROWED_BASIC</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">previous</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">42</span>));
+        <span class="kw">let </span>previous = keys.get(<span class="kw-2">&amp;</span>BORROWED_BASIC);
+        <span class="macro">assert_eq!</span>(previous, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">42</span>));
 
-        <span class="kw">let</span> <span class="ident">labels</span> <span class="op">=</span> <span class="ident">LABELS</span>.<span class="ident">to_vec</span>();
-        <span class="kw">let</span> <span class="ident">owned_labels</span> <span class="op">=</span> <span class="ident">Key::from_parts</span>(<span class="kw-2">&amp;</span><span class="ident">BORROWED_NAME</span>[..], <span class="ident">labels</span>);
-        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">owned_labels</span>, <span class="kw-2">&amp;</span><span class="ident">BORROWED_LABELS</span>);
+        <span class="kw">let </span>labels = LABELS.to_vec();
+        <span class="kw">let </span>owned_labels = Key::from_parts(<span class="kw-2">&amp;</span>BORROWED_NAME[..], labels);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>owned_labels, <span class="kw-2">&amp;</span>BORROWED_LABELS);
 
-        <span class="kw">let</span> <span class="ident">previous</span> <span class="op">=</span> <span class="ident">keys</span>.<span class="ident">insert</span>(<span class="ident">owned_labels</span>, <span class="number">43</span>);
-        <span class="macro">assert!</span>(<span class="ident">previous</span>.<span class="ident">is_none</span>());
+        <span class="kw">let </span>previous = keys.insert(owned_labels, <span class="number">43</span>);
+        <span class="macro">assert!</span>(previous.is_none());
 
-        <span class="kw">let</span> <span class="ident">previous</span> <span class="op">=</span> <span class="ident">keys</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">BORROWED_LABELS</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">previous</span>, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">43</span>));
+        <span class="kw">let </span>previous = keys.get(<span class="kw-2">&amp;</span>BORROWED_LABELS);
+        <span class="macro">assert_eq!</span>(previous, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="number">43</span>));
 
-        <span class="kw">let</span> <span class="ident">basic</span>: <span class="ident">Key</span> <span class="op">=</span> <span class="string">&quot;constant_key&quot;</span>.<span class="ident">into</span>();
-        <span class="kw">let</span> <span class="ident">cloned_basic</span> <span class="op">=</span> <span class="ident">basic</span>.<span class="ident">clone</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">basic</span>, <span class="ident">cloned_basic</span>);
+        <span class="kw">let </span>basic: Key = <span class="string">&quot;constant_key&quot;</span>.into();
+        <span class="kw">let </span>cloned_basic = basic.clone();
+        <span class="macro">assert_eq!</span>(basic, cloned_basic);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_key_data_proper_display</span>() {
-        <span class="kw">let</span> <span class="ident">key1</span> <span class="op">=</span> <span class="ident">Key::from_name</span>(<span class="string">&quot;foobar&quot;</span>);
-        <span class="kw">let</span> <span class="ident">result1</span> <span class="op">=</span> <span class="ident">key1</span>.<span class="ident">to_string</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">result1</span>, <span class="string">&quot;Key(foobar)&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_key_data_proper_display() {
+        <span class="kw">let </span>key1 = Key::from_name(<span class="string">&quot;foobar&quot;</span>);
+        <span class="kw">let </span>result1 = key1.to_string();
+        <span class="macro">assert_eq!</span>(result1, <span class="string">&quot;Key(foobar)&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">key2</span> <span class="op">=</span> <span class="ident">Key::from_parts</span>(<span class="kw-2">&amp;</span><span class="ident">FOOBAR_NAME</span>[..], <span class="macro">vec!</span>[<span class="ident">Label::new</span>(<span class="string">&quot;system&quot;</span>, <span class="string">&quot;http&quot;</span>)]);
-        <span class="kw">let</span> <span class="ident">result2</span> <span class="op">=</span> <span class="ident">key2</span>.<span class="ident">to_string</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">result2</span>, <span class="string">&quot;Key(foobar, [system = http])&quot;</span>);
+        <span class="kw">let </span>key2 = Key::from_parts(<span class="kw-2">&amp;</span>FOOBAR_NAME[..], <span class="macro">vec!</span>[Label::new(<span class="string">&quot;system&quot;</span>, <span class="string">&quot;http&quot;</span>)]);
+        <span class="kw">let </span>result2 = key2.to_string();
+        <span class="macro">assert_eq!</span>(result2, <span class="string">&quot;Key(foobar, [system = http])&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">key3</span> <span class="op">=</span> <span class="ident">Key::from_parts</span>(
-            <span class="kw-2">&amp;</span><span class="ident">FOOBAR_NAME</span>[..],
-            <span class="macro">vec!</span>[<span class="ident">Label::new</span>(<span class="string">&quot;system&quot;</span>, <span class="string">&quot;http&quot;</span>), <span class="ident">Label::new</span>(<span class="string">&quot;user&quot;</span>, <span class="string">&quot;joe&quot;</span>)],
+        <span class="kw">let </span>key3 = Key::from_parts(
+            <span class="kw-2">&amp;</span>FOOBAR_NAME[..],
+            <span class="macro">vec!</span>[Label::new(<span class="string">&quot;system&quot;</span>, <span class="string">&quot;http&quot;</span>), Label::new(<span class="string">&quot;user&quot;</span>, <span class="string">&quot;joe&quot;</span>)],
         );
-        <span class="kw">let</span> <span class="ident">result3</span> <span class="op">=</span> <span class="ident">key3</span>.<span class="ident">to_string</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">result3</span>, <span class="string">&quot;Key(foobar, [system = http, user = joe])&quot;</span>);
+        <span class="kw">let </span>result3 = key3.to_string();
+        <span class="macro">assert_eq!</span>(result3, <span class="string">&quot;Key(foobar, [system = http, user = joe])&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">key4</span> <span class="op">=</span> <span class="ident">Key::from_parts</span>(
-            <span class="kw-2">&amp;</span><span class="ident">FOOBAR_NAME</span>[..],
+        <span class="kw">let </span>key4 = Key::from_parts(
+            <span class="kw-2">&amp;</span>FOOBAR_NAME[..],
             <span class="macro">vec!</span>[
-                <span class="ident">Label::new</span>(<span class="string">&quot;black&quot;</span>, <span class="string">&quot;black&quot;</span>),
-                <span class="ident">Label::new</span>(<span class="string">&quot;lives&quot;</span>, <span class="string">&quot;lives&quot;</span>),
-                <span class="ident">Label::new</span>(<span class="string">&quot;matter&quot;</span>, <span class="string">&quot;matter&quot;</span>),
+                Label::new(<span class="string">&quot;black&quot;</span>, <span class="string">&quot;black&quot;</span>),
+                Label::new(<span class="string">&quot;lives&quot;</span>, <span class="string">&quot;lives&quot;</span>),
+                Label::new(<span class="string">&quot;matter&quot;</span>, <span class="string">&quot;matter&quot;</span>),
             ],
         );
-        <span class="kw">let</span> <span class="ident">result4</span> <span class="op">=</span> <span class="ident">key4</span>.<span class="ident">to_string</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">result4</span>, <span class="string">&quot;Key(foobar, [black = black, lives = lives, matter = matter])&quot;</span>);
+        <span class="kw">let </span>result4 = key4.to_string();
+        <span class="macro">assert_eq!</span>(result4, <span class="string">&quot;Key(foobar, [black = black, lives = lives, matter = matter])&quot;</span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="metrics" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="metrics" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

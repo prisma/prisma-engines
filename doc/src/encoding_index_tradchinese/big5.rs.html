@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/encoding-index-tradchinese-1.20141219.5/big5.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>big5.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../encoding_index_tradchinese/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../encoding_index_tradchinese/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../encoding_index_tradchinese/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/encoding-index-tradchinese-1.20141219.5/big5.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>big5.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../encoding_index_tradchinese/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../encoding_index_tradchinese/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../encoding_index_tradchinese/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -6600,18 +6600,18 @@
 <span id="6600">6600</span>
 <span id="6601">6601</span>
 <span id="6602">6602</span>
-</pre><pre class="rust"><code><span class="comment">// AUTOGENERATED FROM index-big5.txt, ORIGINAL COMMENT FOLLOWS:</span>
-<span class="comment">//</span>
-<span class="comment">// Any copyright is dedicated to the Public Domain.</span>
-<span class="comment">// https://creativecommons.org/publicdomain/zero/1.0/</span>
-<span class="comment">//</span>
-<span class="comment">// For details on index index-big5.txt see the Encoding Standard</span>
-<span class="comment">// https://encoding.spec.whatwg.org/</span>
-<span class="comment">//</span>
-<span class="comment">// Identifier: 8dfc771062e7be0810919082c2c06baa2236147909e0ecc235b1cb9ad782ac82</span>
-<span class="comment">// Date: 2014-12-19</span>
+</pre><pre class="rust"><code><span class="comment">// AUTOGENERATED FROM index-big5.txt, ORIGINAL COMMENT FOLLOWS:
+//
+// Any copyright is dedicated to the Public Domain.
+// https://creativecommons.org/publicdomain/zero/1.0/
+//
+// For details on index index-big5.txt see the Encoding Standard
+// https://encoding.spec.whatwg.org/
+//
+// Identifier: 8dfc771062e7be0810919082c2c06baa2236147909e0ecc235b1cb9ad782ac82
+// Date: 2014-12-19
 
-<span class="kw">static</span> <span class="ident">FORWARD_TABLE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u16</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+</span><span class="kw">static </span>FORWARD_TABLE: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[u16] = <span class="kw-2">&amp;</span>[
     <span class="number">17392</span>, <span class="number">19506</span>, <span class="number">17923</span>, <span class="number">17830</span>, <span class="number">17784</span>, <span class="number">29287</span>, <span class="number">19831</span>, <span class="number">17843</span>, <span class="number">31921</span>, <span class="number">19682</span>,
     <span class="number">31941</span>, <span class="number">15253</span>, <span class="number">18230</span>, <span class="number">18244</span>, <span class="number">19527</span>, <span class="number">19520</span>, <span class="number">17087</span>, <span class="number">13847</span>, <span class="number">29522</span>, <span class="number">28299</span>,
     <span class="number">28882</span>, <span class="number">19543</span>, <span class="number">41809</span>, <span class="number">18255</span>, <span class="number">17882</span>, <span class="number">19589</span>, <span class="number">31852</span>, <span class="number">19719</span>, <span class="number">19108</span>, <span class="number">18081</span>,
@@ -8465,7 +8465,7 @@
     <span class="number">31545</span>, <span class="number">31036</span>, <span class="number">31145</span>, <span class="number">28202</span>, <span class="number">28966</span>, <span class="number">16040</span>, <span class="number">31174</span>, <span class="number">37133</span>, <span class="number">31188</span>,
 ];
 
-<span class="kw">static</span> <span class="ident">FORWARD_TABLE_MORE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u32</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">static </span>FORWARD_TABLE_MORE: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[u32] = <span class="kw-2">&amp;</span>[
     <span class="number">1147077920</span>, <span class="number">3095548431</span>, <span class="number">1073742072</span>, <span class="number">72263968</span>, <span class="number">0</span>, <span class="number">68404</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">201326592</span>,
     <span class="number">64</span>, <span class="number">0</span>, <span class="number">5768192</span>, <span class="number">60</span>, <span class="number">1551892480</span>, <span class="number">3153321133</span>, <span class="number">3991815113</span>, <span class="number">3240497060</span>,
     <span class="number">4025644699</span>, <span class="number">4160420830</span>, <span class="number">2940482063</span>, <span class="number">4278054910</span>, <span class="number">11558929</span>, <span class="number">2165907712</span>,
@@ -8508,18 +8508,18 @@
     <span class="number">24412416</span>, <span class="number">965050898</span>, <span class="number">3724552519</span>, <span class="number">2281783650</span>, <span class="number">2174567329</span>, <span class="number">4760008</span>,
 ];
 
-<span class="doccomment">/// Returns the index code point for pointer `code` in this index.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">forward</span>(<span class="ident">code</span>: <span class="ident">u16</span>) -&gt; <span class="ident">u32</span> {
-    <span class="kw">let</span> <span class="ident">code</span> <span class="op">=</span> (<span class="ident">code</span> <span class="kw">as</span> <span class="ident">usize</span>).<span class="ident">wrapping_sub</span>(<span class="number">942</span>);
-    <span class="kw">if</span> <span class="ident">code</span> <span class="op">&lt;</span> <span class="number">18840</span> {
-        (<span class="ident">FORWARD_TABLE</span>[<span class="ident">code</span>] <span class="kw">as</span> <span class="ident">u32</span>) <span class="op">|</span> (((<span class="ident">FORWARD_TABLE_MORE</span>[<span class="ident">code</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">5</span>] <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="ident">code</span> <span class="op">&amp;</span> <span class="number">31</span>)) <span class="op">&amp;</span> <span class="number">1</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">17</span>)
-    } <span class="kw">else</span> {
-        <span class="number">0xffff</span>
-    }
+<span class="doccomment">/// Returns the index code point for pointer `code` in this index.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>forward(code: u16) -&gt; u32 {
+    <span class="kw">let </span>code = (code <span class="kw">as </span>usize).wrapping_sub(<span class="number">942</span>);
+    <span class="kw">if </span>code &lt; <span class="number">18840 </span>{
+        (FORWARD_TABLE[code] <span class="kw">as </span>u32) | (((FORWARD_TABLE_MORE[code &gt;&gt; <span class="number">5</span>] &gt;&gt; (code &amp; <span class="number">31</span>)) &amp; <span class="number">1</span>) &lt;&lt; <span class="number">17</span>)
+    } <span class="kw">else </span>{
+        <span class="number">0xffff
+    </span>}
 }
 
-<span class="kw">static</span> <span class="ident">BACKWARD_TABLE_LOWER</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u16</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">static </span>BACKWARD_TABLE_LOWER: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[u16] = <span class="kw-2">&amp;</span>[
     <span class="number">65535</span>, <span class="number">65535</span>, <span class="number">65535</span>, <span class="number">65535</span>, <span class="number">65535</span>, <span class="number">65535</span>, <span class="number">65535</span>, <span class="number">65535</span>, <span class="number">65535</span>, <span class="number">65535</span>,
     <span class="number">65535</span>, <span class="number">65535</span>, <span class="number">65535</span>, <span class="number">65535</span>, <span class="number">65535</span>, <span class="number">65535</span>, <span class="number">65535</span>, <span class="number">65535</span>, <span class="number">65535</span>, <span class="number">65535</span>,
     <span class="number">65535</span>, <span class="number">65535</span>, <span class="number">65535</span>, <span class="number">5103</span>, <span class="number">10951</span>, <span class="number">65535</span>, <span class="number">65535</span>, <span class="number">65535</span>, <span class="number">65535</span>, <span class="number">65535</span>, <span class="number">65535</span>,
@@ -12541,7 +12541,7 @@
     <span class="number">65535</span>,
 ];
 
-<span class="kw">static</span> <span class="ident">BACKWARD_TABLE_UPPER</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u16</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[
+<span class="kw">static </span>BACKWARD_TABLE_UPPER: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>[u16] = <span class="kw-2">&amp;</span>[
     <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">16</span>, <span class="number">32</span>, <span class="number">48</span>, <span class="number">64</span>, <span class="number">80</span>, <span class="number">96</span>, <span class="number">112</span>, <span class="number">128</span>, <span class="number">144</span>, <span class="number">0</span>,
     <span class="number">160</span>, <span class="number">176</span>, <span class="number">192</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">208</span>, <span class="number">224</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">240</span>, <span class="number">256</span>, <span class="number">272</span>,
     <span class="number">288</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">304</span>, <span class="number">320</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">336</span>, <span class="number">352</span>, <span class="number">368</span>,
@@ -13178,18 +13178,18 @@
     <span class="number">43376</span>, <span class="number">0</span>, <span class="number">43392</span>,
 ];
 
-<span class="doccomment">/// Returns the index pointer for code point `code` in this index.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">backward</span>(<span class="ident">code</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u16</span> {
-    <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> (<span class="ident">code</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">4</span>) <span class="kw">as</span> <span class="ident">usize</span>;
-    <span class="kw">let</span> <span class="ident">offset</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">offset</span> <span class="op">&lt;</span> <span class="number">12190</span> {<span class="ident">BACKWARD_TABLE_UPPER</span>[<span class="ident">offset</span>] <span class="kw">as</span> <span class="ident">usize</span>} <span class="kw">else</span> {<span class="number">0</span>};
-    <span class="ident">BACKWARD_TABLE_LOWER</span>[<span class="ident">offset</span> <span class="op">+</span> ((<span class="ident">code</span> <span class="op">&amp;</span> <span class="number">15</span>) <span class="kw">as</span> <span class="ident">usize</span>)]
+<span class="doccomment">/// Returns the index pointer for code point `code` in this index.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>backward(code: u32) -&gt; u16 {
+    <span class="kw">let </span>offset = (code &gt;&gt; <span class="number">4</span>) <span class="kw">as </span>usize;
+    <span class="kw">let </span>offset = <span class="kw">if </span>offset &lt; <span class="number">12190 </span>{BACKWARD_TABLE_UPPER[offset] <span class="kw">as </span>usize} <span class="kw">else </span>{<span class="number">0</span>};
+    BACKWARD_TABLE_LOWER[offset + ((code &amp; <span class="number">15</span>) <span class="kw">as </span>usize)]
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="macro">multi_byte_tests!</span>(
-    <span class="kw">mod</span> <span class="op">=</span> <span class="ident">big5</span>,
-    <span class="ident">dups</span> <span class="op">=</span> [
+<span class="attribute">#[cfg(test)]
+</span><span class="macro">multi_byte_tests!</span>(
+    <span class="kw">mod </span>= big5,
+    dups = [
         <span class="number">1133</span>, <span class="number">1135</span>, <span class="number">1164</span>, <span class="number">1166</span>, <span class="number">2673</span>, <span class="number">3437</span>, <span class="number">4369</span>, <span class="number">4748</span>, <span class="number">4828</span>, <span class="number">4898</span>, <span class="number">4902</span>, <span class="number">4981</span>,
         <span class="number">4982</span>, <span class="number">4997</span>, <span class="number">5206</span>, <span class="number">5207</span>, <span class="number">5208</span>, <span class="number">5209</span>, <span class="number">5214</span>, <span class="number">5512</span>, <span class="number">5599</span>, <span class="number">6410</span>, <span class="number">6422</span>, <span class="number">6543</span>,
         <span class="number">6732</span>, <span class="number">7300</span>, <span class="number">7410</span>, <span class="number">7915</span>, <span class="number">8240</span>, <span class="number">8281</span>, <span class="number">8870</span>, <span class="number">9081</span>, <span class="number">9103</span>, <span class="number">9741</span>, <span class="number">9802</span>, <span class="number">9810</span>,
@@ -13203,4 +13203,4 @@
     ]
 );
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="encoding_index_tradchinese" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="encoding_index_tradchinese" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

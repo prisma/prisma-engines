@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.21.0/src/process/unix/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tokio/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.21.0/src/process/unix/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tokio/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -291,298 +291,298 @@
 <span id="291">291</span>
 <span id="292">292</span>
 <span id="293">293</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Unix handling of child processes.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Right now the only &quot;fancy&quot; thing about this is how we implement the</span>
-<span class="doccomment">//! `Future` implementation on `Child` to get the exit status. Unix offers</span>
-<span class="doccomment">//! no way to register a child with epoll, and the only real way to get a</span>
-<span class="doccomment">//! notification when a process exits is the SIGCHLD signal.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Signal handling in general is *super* hairy and complicated, and it&#39;s even</span>
-<span class="doccomment">//! more complicated here with the fact that signals are coalesced, so we may</span>
-<span class="doccomment">//! not get a SIGCHLD-per-child.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Our best approximation here is to check *all spawned processes* for all</span>
-<span class="doccomment">//! SIGCHLD signals received. To do that we create a `Signal`, implemented in</span>
-<span class="doccomment">//! the `tokio-net` crate, which is a stream over signals being received.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Later when we poll the process&#39;s exit status we simply check to see if a</span>
-<span class="doccomment">//! SIGCHLD has happened since we last checked, and while that returns &quot;yes&quot; we</span>
-<span class="doccomment">//! keep trying.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Note that this means that this isn&#39;t really scalable, but then again</span>
-<span class="doccomment">//! processes in general aren&#39;t scalable (e.g. millions) so it shouldn&#39;t be that</span>
-<span class="doccomment">//! bad in theory...</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Unix handling of child processes.
+//!
+//! Right now the only &quot;fancy&quot; thing about this is how we implement the
+//! `Future` implementation on `Child` to get the exit status. Unix offers
+//! no way to register a child with epoll, and the only real way to get a
+//! notification when a process exits is the SIGCHLD signal.
+//!
+//! Signal handling in general is *super* hairy and complicated, and it&#39;s even
+//! more complicated here with the fact that signals are coalesced, so we may
+//! not get a SIGCHLD-per-child.
+//!
+//! Our best approximation here is to check *all spawned processes* for all
+//! SIGCHLD signals received. To do that we create a `Signal`, implemented in
+//! the `tokio-net` crate, which is a stream over signals being received.
+//!
+//! Later when we poll the process&#39;s exit status we simply check to see if a
+//! SIGCHLD has happened since we last checked, and while that returns &quot;yes&quot; we
+//! keep trying.
+//!
+//! Note that this means that this isn&#39;t really scalable, but then again
+//! processes in general aren&#39;t scalable (e.g. millions) so it shouldn&#39;t be that
+//! bad in theory...
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">driver</span>;
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>driver;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">orphan</span>;
-<span class="kw">use</span> <span class="ident">orphan</span>::{<span class="ident">OrphanQueue</span>, <span class="ident">OrphanQueueImpl</span>, <span class="ident">Wait</span>};
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod </span>orphan;
+<span class="kw">use </span>orphan::{OrphanQueue, OrphanQueueImpl, Wait};
 
-<span class="kw">mod</span> <span class="ident">reap</span>;
-<span class="kw">use</span> <span class="ident">reap::Reaper</span>;
+<span class="kw">mod </span>reap;
+<span class="kw">use </span>reap::Reaper;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>, <span class="ident">PollEvented</span>, <span class="ident">ReadBuf</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::process::kill::Kill</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::process::SpawnedChild</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::signal::unix::driver::Handle</span> <span class="kw">as</span> <span class="ident">SignalHandle</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::signal::unix</span>::{<span class="ident">signal</span>, <span class="ident">Signal</span>, <span class="ident">SignalKind</span>};
+<span class="kw">use </span><span class="kw">crate</span>::io::{AsyncRead, AsyncWrite, PollEvented, ReadBuf};
+<span class="kw">use </span><span class="kw">crate</span>::process::kill::Kill;
+<span class="kw">use </span><span class="kw">crate</span>::process::SpawnedChild;
+<span class="kw">use </span><span class="kw">crate</span>::signal::unix::driver::Handle <span class="kw">as </span>SignalHandle;
+<span class="kw">use </span><span class="kw">crate</span>::signal::unix::{signal, Signal, SignalKind};
 
-<span class="kw">use</span> <span class="ident">mio::event::Source</span>;
-<span class="kw">use</span> <span class="ident">mio::unix::SourceFd</span>;
-<span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::fs::File</span>;
-<span class="kw">use</span> <span class="ident">std::future::Future</span>;
-<span class="kw">use</span> <span class="ident">std::io</span>;
-<span class="kw">use</span> <span class="ident">std::os::unix::io</span>::{<span class="ident">AsRawFd</span>, <span class="ident">FromRawFd</span>, <span class="ident">IntoRawFd</span>, <span class="ident">RawFd</span>};
-<span class="kw">use</span> <span class="ident">std::pin::Pin</span>;
-<span class="kw">use</span> <span class="ident">std::process</span>::{<span class="ident">Child</span> <span class="kw">as</span> <span class="ident">StdChild</span>, <span class="ident">ExitStatus</span>, <span class="ident">Stdio</span>};
-<span class="kw">use</span> <span class="ident">std::task::Context</span>;
-<span class="kw">use</span> <span class="ident">std::task::Poll</span>;
+<span class="kw">use </span>mio::event::Source;
+<span class="kw">use </span>mio::unix::SourceFd;
+<span class="kw">use </span>once_cell::sync::Lazy;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::fs::File;
+<span class="kw">use </span>std::future::Future;
+<span class="kw">use </span>std::io;
+<span class="kw">use </span>std::os::unix::io::{AsRawFd, FromRawFd, IntoRawFd, RawFd};
+<span class="kw">use </span>std::pin::Pin;
+<span class="kw">use </span>std::process::{Child <span class="kw">as </span>StdChild, ExitStatus, Stdio};
+<span class="kw">use </span>std::task::Context;
+<span class="kw">use </span>std::task::Poll;
 
-<span class="kw">impl</span> <span class="ident">Wait</span> <span class="kw">for</span> <span class="ident">StdChild</span> {
-    <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">id</span>()
+<span class="kw">impl </span>Wait <span class="kw">for </span>StdChild {
+    <span class="kw">fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.id()
     }
 
-    <span class="kw">fn</span> <span class="ident">try_wait</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ExitStatus</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">try_wait</span>()
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Kill</span> <span class="kw">for</span> <span class="ident">StdChild</span> {
-    <span class="kw">fn</span> <span class="ident">kill</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">kill</span>()
+    <span class="kw">fn </span>try_wait(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;<span class="prelude-ty">Option</span>&lt;ExitStatus&gt;&gt; {
+        <span class="self">self</span>.try_wait()
     }
 }
 
-<span class="kw">static</span> <span class="ident">ORPHAN_QUEUE</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">OrphanQueueImpl</span><span class="op">&lt;</span><span class="ident">StdChild</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="ident">OrphanQueueImpl::new</span>);
-
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">GlobalOrphanQueue</span>;
-
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">GlobalOrphanQueue</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">ORPHAN_QUEUE</span>.<span class="ident">fmt</span>(<span class="ident">fmt</span>)
+<span class="kw">impl </span>Kill <span class="kw">for </span>StdChild {
+    <span class="kw">fn </span>kill(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;()&gt; {
+        <span class="self">self</span>.kill()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">GlobalOrphanQueue</span> {
-    <span class="kw">fn</span> <span class="ident">reap_orphans</span>(<span class="ident">handle</span>: <span class="kw-2">&amp;</span><span class="ident">SignalHandle</span>) {
-        <span class="ident">ORPHAN_QUEUE</span>.<span class="ident">reap_orphans</span>(<span class="ident">handle</span>)
+<span class="kw">static </span>ORPHAN_QUEUE: Lazy&lt;OrphanQueueImpl&lt;StdChild&gt;&gt; = Lazy::new(OrphanQueueImpl::new);
+
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>GlobalOrphanQueue;
+
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>GlobalOrphanQueue {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        ORPHAN_QUEUE.fmt(fmt)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">OrphanQueue</span><span class="op">&lt;</span><span class="ident">StdChild</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GlobalOrphanQueue</span> {
-    <span class="kw">fn</span> <span class="ident">push_orphan</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">orphan</span>: <span class="ident">StdChild</span>) {
-        <span class="ident">ORPHAN_QUEUE</span>.<span class="ident">push_orphan</span>(<span class="ident">orphan</span>)
+<span class="kw">impl </span>GlobalOrphanQueue {
+    <span class="kw">fn </span>reap_orphans(handle: <span class="kw-2">&amp;</span>SignalHandle) {
+        ORPHAN_QUEUE.reap_orphans(handle)
     }
 }
 
-<span class="attribute">#[<span class="ident">must_use</span> <span class="op">=</span> <span class="string">&quot;futures do nothing unless polled&quot;</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Child</span> {
-    <span class="ident">inner</span>: <span class="ident">Reaper</span><span class="op">&lt;</span><span class="ident">StdChild</span>, <span class="ident">GlobalOrphanQueue</span>, <span class="ident">Signal</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Child</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">fmt</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Child&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;pid&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">id</span>())
-            .<span class="ident">finish</span>()
+<span class="kw">impl </span>OrphanQueue&lt;StdChild&gt; <span class="kw">for </span>GlobalOrphanQueue {
+    <span class="kw">fn </span>push_orphan(<span class="kw-2">&amp;</span><span class="self">self</span>, orphan: StdChild) {
+        ORPHAN_QUEUE.push_orphan(orphan)
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">spawn_child</span>(<span class="ident">cmd</span>: <span class="kw-2">&amp;mut</span> <span class="ident">std::process::Command</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">SpawnedChild</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">child</span> <span class="op">=</span> <span class="ident">cmd</span>.<span class="ident">spawn</span>()<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">stdin</span> <span class="op">=</span> <span class="ident">child</span>.<span class="ident">stdin</span>.<span class="ident">take</span>().<span class="ident">map</span>(<span class="ident">stdio</span>).<span class="ident">transpose</span>()<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">stdout</span> <span class="op">=</span> <span class="ident">child</span>.<span class="ident">stdout</span>.<span class="ident">take</span>().<span class="ident">map</span>(<span class="ident">stdio</span>).<span class="ident">transpose</span>()<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">stderr</span> <span class="op">=</span> <span class="ident">child</span>.<span class="ident">stderr</span>.<span class="ident">take</span>().<span class="ident">map</span>(<span class="ident">stdio</span>).<span class="ident">transpose</span>()<span class="question-mark">?</span>;
+<span class="attribute">#[must_use = <span class="string">&quot;futures do nothing unless polled&quot;</span>]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Child {
+    inner: Reaper&lt;StdChild, GlobalOrphanQueue, Signal&gt;,
+}
 
-    <span class="kw">let</span> <span class="ident">signal</span> <span class="op">=</span> <span class="ident">signal</span>(<span class="ident">SignalKind::child</span>())<span class="question-mark">?</span>;
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Child {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        fmt.debug_struct(<span class="string">&quot;Child&quot;</span>)
+            .field(<span class="string">&quot;pid&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.inner.id())
+            .finish()
+    }
+}
 
-    <span class="prelude-val">Ok</span>(<span class="ident">SpawnedChild</span> {
-        <span class="ident">child</span>: <span class="ident">Child</span> {
-            <span class="ident">inner</span>: <span class="ident">Reaper::new</span>(<span class="ident">child</span>, <span class="ident">GlobalOrphanQueue</span>, <span class="ident">signal</span>),
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>spawn_child(cmd: <span class="kw-2">&amp;mut </span>std::process::Command) -&gt; io::Result&lt;SpawnedChild&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>child = cmd.spawn()<span class="question-mark">?</span>;
+    <span class="kw">let </span>stdin = child.stdin.take().map(stdio).transpose()<span class="question-mark">?</span>;
+    <span class="kw">let </span>stdout = child.stdout.take().map(stdio).transpose()<span class="question-mark">?</span>;
+    <span class="kw">let </span>stderr = child.stderr.take().map(stdio).transpose()<span class="question-mark">?</span>;
+
+    <span class="kw">let </span>signal = signal(SignalKind::child())<span class="question-mark">?</span>;
+
+    <span class="prelude-val">Ok</span>(SpawnedChild {
+        child: Child {
+            inner: Reaper::new(child, GlobalOrphanQueue, signal),
         },
-        <span class="ident">stdin</span>,
-        <span class="ident">stdout</span>,
-        <span class="ident">stderr</span>,
+        stdin,
+        stdout,
+        stderr,
     })
 }
 
-<span class="kw">impl</span> <span class="ident">Child</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">id</span>()
+<span class="kw">impl </span>Child {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>id(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; u32 {
+        <span class="self">self</span>.inner.id()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">try_wait</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ExitStatus</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">inner_mut</span>().<span class="ident">try_wait</span>()
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Kill</span> <span class="kw">for</span> <span class="ident">Child</span> {
-    <span class="kw">fn</span> <span class="ident">kill</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">kill</span>()
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>try_wait(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;<span class="prelude-ty">Option</span>&lt;ExitStatus&gt;&gt; {
+        <span class="self">self</span>.inner.inner_mut().try_wait()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">Child</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">ExitStatus</span><span class="op">&gt;</span>;
-
-    <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Output</span><span class="op">&gt;</span> {
-        <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">inner</span>).<span class="ident">poll</span>(<span class="ident">cx</span>)
+<span class="kw">impl </span>Kill <span class="kw">for </span>Child {
+    <span class="kw">fn </span>kill(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;()&gt; {
+        <span class="self">self</span>.inner.kill()
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Pipe</span> {
-    <span class="comment">// Actually a pipe and not a File. However, we are reusing `File` to get</span>
-    <span class="comment">// close on drop. This is a similar trick as `mio`.</span>
-    <span class="ident">fd</span>: <span class="ident">File</span>,
-}
+<span class="kw">impl </span>Future <span class="kw">for </span>Child {
+    <span class="kw">type </span>Output = io::Result&lt;ExitStatus&gt;;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">IntoRawFd</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Pipe</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">fd</span>: <span class="ident">T</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">fd</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">File::from_raw_fd</span>(<span class="ident">fd</span>.<span class="ident">into_raw_fd</span>()) };
-        <span class="self">Self</span> { <span class="ident">fd</span> }
+    <span class="kw">fn </span>poll(<span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;<span class="self">Self</span>::Output&gt; {
+        Pin::new(<span class="kw-2">&amp;mut </span><span class="self">self</span>.inner).poll(cx)
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">io::Read</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Pipe</span> {
-    <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">fd</span>).<span class="ident">read</span>(<span class="ident">bytes</span>)
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Pipe {
+    <span class="comment">// Actually a pipe and not a File. However, we are reusing `File` to get
+    // close on drop. This is a similar trick as `mio`.
+    </span>fd: File,
+}
+
+<span class="kw">impl</span>&lt;T: IntoRawFd&gt; From&lt;T&gt; <span class="kw">for </span>Pipe {
+    <span class="kw">fn </span>from(fd: T) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>fd = <span class="kw">unsafe </span>{ File::from_raw_fd(fd.into_raw_fd()) };
+        <span class="self">Self </span>{ fd }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">io::Write</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Pipe</span> {
-    <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
-        (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">fd</span>).<span class="ident">write</span>(<span class="ident">bytes</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">flush</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        (<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">fd</span>).<span class="ident">flush</span>()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; io::Read <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Pipe {
+    <span class="kw">fn </span>read(<span class="kw-2">&amp;mut </span><span class="self">self</span>, bytes: <span class="kw-2">&amp;mut </span>[u8]) -&gt; io::Result&lt;usize&gt; {
+        (<span class="kw-2">&amp;</span><span class="self">self</span>.fd).read(bytes)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">AsRawFd</span> <span class="kw">for</span> <span class="ident">Pipe</span> {
-    <span class="kw">fn</span> <span class="ident">as_raw_fd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RawFd</span> {
-        <span class="self">self</span>.<span class="ident">fd</span>.<span class="ident">as_raw_fd</span>()
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; io::Write <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Pipe {
+    <span class="kw">fn </span>write(<span class="kw-2">&amp;mut </span><span class="self">self</span>, bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; io::Result&lt;usize&gt; {
+        (<span class="kw-2">&amp;</span><span class="self">self</span>.fd).write(bytes)
+    }
+
+    <span class="kw">fn </span>flush(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; io::Result&lt;()&gt; {
+        (<span class="kw-2">&amp;</span><span class="self">self</span>.fd).flush()
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">convert_to_stdio</span>(<span class="ident">io</span>: <span class="ident">ChildStdio</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">Stdio</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fd</span> <span class="op">=</span> <span class="ident">io</span>.<span class="ident">inner</span>.<span class="ident">into_inner</span>()<span class="question-mark">?</span>.<span class="ident">fd</span>;
-
-    <span class="comment">// Ensure that the fd to be inherited is set to *blocking* mode, as this</span>
-    <span class="comment">// is the default that virtually all programs expect to have. Those</span>
-    <span class="comment">// programs that know how to work with nonblocking stdio will know how to</span>
-    <span class="comment">// change it to nonblocking mode.</span>
-    <span class="ident">set_nonblocking</span>(<span class="kw-2">&amp;mut</span> <span class="ident">fd</span>, <span class="bool-val">false</span>)<span class="question-mark">?</span>;
-
-    <span class="prelude-val">Ok</span>(<span class="ident">Stdio::from</span>(<span class="ident">fd</span>))
-}
-
-<span class="kw">impl</span> <span class="ident">Source</span> <span class="kw">for</span> <span class="ident">Pipe</span> {
-    <span class="kw">fn</span> <span class="ident">register</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">registry</span>: <span class="kw-2">&amp;</span><span class="ident">mio::Registry</span>,
-        <span class="ident">token</span>: <span class="ident">mio::Token</span>,
-        <span class="ident">interest</span>: <span class="ident">mio::Interest</span>,
-    ) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">SourceFd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">as_raw_fd</span>()).<span class="ident">register</span>(<span class="ident">registry</span>, <span class="ident">token</span>, <span class="ident">interest</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">reregister</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">registry</span>: <span class="kw-2">&amp;</span><span class="ident">mio::Registry</span>,
-        <span class="ident">token</span>: <span class="ident">mio::Token</span>,
-        <span class="ident">interest</span>: <span class="ident">mio::Interest</span>,
-    ) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">SourceFd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">as_raw_fd</span>()).<span class="ident">reregister</span>(<span class="ident">registry</span>, <span class="ident">token</span>, <span class="ident">interest</span>)
-    }
-
-    <span class="kw">fn</span> <span class="ident">deregister</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">registry</span>: <span class="kw-2">&amp;</span><span class="ident">mio::Registry</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="ident">SourceFd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">as_raw_fd</span>()).<span class="ident">deregister</span>(<span class="ident">registry</span>)
+<span class="kw">impl </span>AsRawFd <span class="kw">for </span>Pipe {
+    <span class="kw">fn </span>as_raw_fd(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RawFd {
+        <span class="self">self</span>.fd.as_raw_fd()
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ChildStdio</span> {
-    <span class="ident">inner</span>: <span class="ident">PollEvented</span><span class="op">&lt;</span><span class="ident">Pipe</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>convert_to_stdio(io: ChildStdio) -&gt; io::Result&lt;Stdio&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>fd = io.inner.into_inner()<span class="question-mark">?</span>.fd;
+
+    <span class="comment">// Ensure that the fd to be inherited is set to *blocking* mode, as this
+    // is the default that virtually all programs expect to have. Those
+    // programs that know how to work with nonblocking stdio will know how to
+    // change it to nonblocking mode.
+    </span>set_nonblocking(<span class="kw-2">&amp;mut </span>fd, <span class="bool-val">false</span>)<span class="question-mark">?</span>;
+
+    <span class="prelude-val">Ok</span>(Stdio::from(fd))
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">ChildStdio</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">fmt</span>(<span class="ident">fmt</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">AsRawFd</span> <span class="kw">for</span> <span class="ident">ChildStdio</span> {
-    <span class="kw">fn</span> <span class="ident">as_raw_fd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">RawFd</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">as_raw_fd</span>()
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">AsyncWrite</span> <span class="kw">for</span> <span class="ident">ChildStdio</span> {
-    <span class="kw">fn</span> <span class="ident">poll_write</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">poll_write</span>(<span class="ident">cx</span>, <span class="ident">buf</span>)
+<span class="kw">impl </span>Source <span class="kw">for </span>Pipe {
+    <span class="kw">fn </span>register(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        registry: <span class="kw-2">&amp;</span>mio::Registry,
+        token: mio::Token,
+        interest: mio::Interest,
+    ) -&gt; io::Result&lt;()&gt; {
+        SourceFd(<span class="kw-2">&amp;</span><span class="self">self</span>.as_raw_fd()).register(registry, token, interest)
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">_cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
+    <span class="kw">fn </span>reregister(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        registry: <span class="kw-2">&amp;</span>mio::Registry,
+        token: mio::Token,
+        interest: mio::Interest,
+    ) -&gt; io::Result&lt;()&gt; {
+        SourceFd(<span class="kw-2">&amp;</span><span class="self">self</span>.as_raw_fd()).reregister(registry, token, interest)
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_shutdown</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">_cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">AsyncRead</span> <span class="kw">for</span> <span class="ident">ChildStdio</span> {
-    <span class="kw">fn</span> <span class="ident">poll_read</span>(
-        <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ReadBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="comment">// Safety: pipes support reading into uninitialized memory</span>
-        <span class="kw">unsafe</span> { <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="ident">buf</span>) }
+    <span class="kw">fn </span>deregister(<span class="kw-2">&amp;mut </span><span class="self">self</span>, registry: <span class="kw-2">&amp;</span>mio::Registry) -&gt; io::Result&lt;()&gt; {
+        SourceFd(<span class="kw-2">&amp;</span><span class="self">self</span>.as_raw_fd()).deregister(registry)
     }
 }
 
-<span class="kw">fn</span> <span class="ident">set_nonblocking</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRawFd</span><span class="op">&gt;</span>(<span class="ident">fd</span>: <span class="kw-2">&amp;mut</span> <span class="ident">T</span>, <span class="ident">nonblocking</span>: <span class="ident">bool</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">unsafe</span> {
-        <span class="kw">let</span> <span class="ident">fd</span> <span class="op">=</span> <span class="ident">fd</span>.<span class="ident">as_raw_fd</span>();
-        <span class="kw">let</span> <span class="ident">previous</span> <span class="op">=</span> <span class="ident">libc::fcntl</span>(<span class="ident">fd</span>, <span class="ident">libc::F_GETFL</span>);
-        <span class="kw">if</span> <span class="ident">previous</span> <span class="op">==</span> <span class="op">-</span><span class="number">1</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::last_os_error</span>());
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ChildStdio {
+    inner: PollEvented&lt;Pipe&gt;,
+}
+
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>ChildStdio {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="self">self</span>.inner.fmt(fmt)
+    }
+}
+
+<span class="kw">impl </span>AsRawFd <span class="kw">for </span>ChildStdio {
+    <span class="kw">fn </span>as_raw_fd(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; RawFd {
+        <span class="self">self</span>.inner.as_raw_fd()
+    }
+}
+
+<span class="kw">impl </span>AsyncWrite <span class="kw">for </span>ChildStdio {
+    <span class="kw">fn </span>poll_write(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        buf: <span class="kw-2">&amp;</span>[u8],
+    ) -&gt; Poll&lt;io::Result&lt;usize&gt;&gt; {
+        <span class="self">self</span>.inner.poll_write(cx, buf)
+    }
+
+    <span class="kw">fn </span>poll_flush(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, _cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+        Poll::Ready(<span class="prelude-val">Ok</span>(()))
+    }
+
+    <span class="kw">fn </span>poll_shutdown(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, _cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+        Poll::Ready(<span class="prelude-val">Ok</span>(()))
+    }
+}
+
+<span class="kw">impl </span>AsyncRead <span class="kw">for </span>ChildStdio {
+    <span class="kw">fn </span>poll_read(
+        <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        buf: <span class="kw-2">&amp;mut </span>ReadBuf&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;io::Result&lt;()&gt;&gt; {
+        <span class="comment">// Safety: pipes support reading into uninitialized memory
+        </span><span class="kw">unsafe </span>{ <span class="self">self</span>.inner.poll_read(cx, buf) }
+    }
+}
+
+<span class="kw">fn </span>set_nonblocking&lt;T: AsRawFd&gt;(fd: <span class="kw-2">&amp;mut </span>T, nonblocking: bool) -&gt; io::Result&lt;()&gt; {
+    <span class="kw">unsafe </span>{
+        <span class="kw">let </span>fd = fd.as_raw_fd();
+        <span class="kw">let </span>previous = libc::fcntl(fd, libc::F_GETFL);
+        <span class="kw">if </span>previous == -<span class="number">1 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(io::Error::last_os_error());
         }
 
-        <span class="kw">let</span> <span class="ident">new</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">nonblocking</span> {
-            <span class="ident">previous</span> <span class="op">|</span> <span class="ident">libc::O_NONBLOCK</span>
-        } <span class="kw">else</span> {
-            <span class="ident">previous</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">libc::O_NONBLOCK</span>
+        <span class="kw">let </span>new = <span class="kw">if </span>nonblocking {
+            previous | libc::O_NONBLOCK
+        } <span class="kw">else </span>{
+            previous &amp; !libc::O_NONBLOCK
         };
 
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">libc::fcntl</span>(<span class="ident">fd</span>, <span class="ident">libc::F_SETFL</span>, <span class="ident">new</span>);
-        <span class="kw">if</span> <span class="ident">r</span> <span class="op">==</span> <span class="op">-</span><span class="number">1</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::last_os_error</span>());
+        <span class="kw">let </span>r = libc::fcntl(fd, libc::F_SETFL, new);
+        <span class="kw">if </span>r == -<span class="number">1 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(io::Error::last_os_error());
         }
     }
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">stdio</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">io</span>: <span class="ident">T</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">ChildStdio</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">IntoRawFd</span>,
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>stdio&lt;T&gt;(io: T) -&gt; io::Result&lt;ChildStdio&gt;
+<span class="kw">where
+    </span>T: IntoRawFd,
 {
-    <span class="comment">// Set the fd to nonblocking before we pass it to the event loop</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pipe</span> <span class="op">=</span> <span class="ident">Pipe::from</span>(<span class="ident">io</span>);
-    <span class="ident">set_nonblocking</span>(<span class="kw-2">&amp;mut</span> <span class="ident">pipe</span>, <span class="bool-val">true</span>)<span class="question-mark">?</span>;
+    <span class="comment">// Set the fd to nonblocking before we pass it to the event loop
+    </span><span class="kw">let </span><span class="kw-2">mut </span>pipe = Pipe::from(io);
+    set_nonblocking(<span class="kw-2">&amp;mut </span>pipe, <span class="bool-val">true</span>)<span class="question-mark">?</span>;
 
-    <span class="ident">PollEvented::new</span>(<span class="ident">pipe</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">inner</span><span class="op">|</span> <span class="ident">ChildStdio</span> { <span class="ident">inner</span> })
+    PollEvented::new(pipe).map(|inner| ChildStdio { inner })
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

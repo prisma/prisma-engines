@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/datamodel-renderer/src/configuration/datasource.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>datasource.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../datamodel_renderer/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../datamodel_renderer/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../datamodel_renderer/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/datamodel-renderer/src/configuration/datasource.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>datasource.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../datamodel_renderer/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../datamodel_renderer/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../datamodel_renderer/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -191,182 +191,182 @@
 <span id="191">191</span>
 <span id="192">192</span>
 <span id="193">193</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::value</span>::{<span class="ident">Array</span>, <span class="ident">Documentation</span>, <span class="ident">Env</span>, <span class="ident">Text</span>, <span class="ident">Value</span>};
-<span class="kw">use</span> <span class="ident">core::fmt</span>;
-<span class="kw">use</span> <span class="ident">psl::datamodel_connector::RelationMode</span>;
-<span class="kw">use</span> <span class="ident">std::default::Default</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::value::{Array, Documentation, Env, Text, Value};
+<span class="kw">use </span>core::fmt;
+<span class="kw">use </span>psl::datamodel_connector::RelationMode;
+<span class="kw">use </span>std::default::Default;
 
-<span class="doccomment">/// The datasource block in a PSL file.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Datasource</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
-    <span class="ident">provider</span>: <span class="ident">Text</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span>,
-    <span class="ident">url</span>: <span class="ident">Env</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-    <span class="ident">shadow_database_url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Env</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">relation_mode</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RelationMode</span><span class="op">&gt;</span>,
-    <span class="ident">custom_properties</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
-    <span class="ident">documentation</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Documentation</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">namespaces</span>: <span class="ident">Array</span><span class="op">&lt;</span><span class="ident">Text</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// The datasource block in a PSL file.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>Datasource&lt;<span class="lifetime">&#39;a</span>&gt; {
+    name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
+    provider: Text&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;,
+    url: Env&lt;<span class="lifetime">&#39;a</span>&gt;,
+    shadow_database_url: <span class="prelude-ty">Option</span>&lt;Env&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    relation_mode: <span class="prelude-ty">Option</span>&lt;RelationMode&gt;,
+    custom_properties: Vec&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, Value&lt;<span class="lifetime">&#39;a</span>&gt;)&gt;,
+    documentation: <span class="prelude-ty">Option</span>&lt;Documentation&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    namespaces: Array&lt;Text&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Datasource</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Create a new datasource with all required properties.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// datasource db {</span>
-    <span class="doccomment">/// //         ^^ name</span>
-    <span class="doccomment">///   provider = &quot;postgresql&quot;</span>
-    <span class="doccomment">/// //            ^^^^^^^^^^ provider</span>
-    <span class="doccomment">///   url      = env(&quot;DATABASE_URL&quot;)</span>
-    <span class="doccomment">/// //                ^^^^^^^^^^^^ url</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">provider</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">url</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Env</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">name</span>,
-            <span class="ident">provider</span>: <span class="ident">Text</span>(<span class="ident">provider</span>),
-            <span class="ident">url</span>: <span class="ident">url</span>.<span class="ident">into</span>(),
-            <span class="ident">shadow_database_url</span>: <span class="prelude-val">None</span>,
-            <span class="ident">relation_mode</span>: <span class="prelude-val">None</span>,
-            <span class="ident">custom_properties</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">documentation</span>: <span class="prelude-val">None</span>,
-            <span class="ident">namespaces</span>: <span class="ident">Array::new</span>(),
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Datasource&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Create a new datasource with all required properties.
+    ///
+    /// ```ignore
+    /// datasource db {
+    /// //         ^^ name
+    ///   provider = &quot;postgresql&quot;
+    /// //            ^^^^^^^^^^ provider
+    ///   url      = env(&quot;DATABASE_URL&quot;)
+    /// //                ^^^^^^^^^^^^ url
+    /// }
+    /// ```
+    </span><span class="kw">pub fn </span>new(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, provider: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, url: <span class="kw">impl </span>Into&lt;Env&lt;<span class="lifetime">&#39;a</span>&gt;&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            name,
+            provider: Text(provider),
+            url: url.into(),
+            shadow_database_url: <span class="prelude-val">None</span>,
+            relation_mode: <span class="prelude-val">None</span>,
+            custom_properties: Default::default(),
+            documentation: <span class="prelude-val">None</span>,
+            namespaces: Array::new(),
         }
     }
 
-    <span class="doccomment">/// Used for migration engine to reflect the contents of</span>
-    <span class="doccomment">/// migrations directory to diff against the actual database.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// datasource db {</span>
-    <span class="doccomment">///   provider          = &quot;postgresql&quot;</span>
-    <span class="doccomment">///   url               = env(&quot;DATABASE_URL&quot;)</span>
-    <span class="doccomment">///   shadowDatabaseUrl = env(&quot;SHADOW_DATABASE_URL&quot;)</span>
-    <span class="doccomment">/// //                         ^^^^^^^^^^^^^^^^^^^ this</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shadow_database_url</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">url</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Env</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">shadow_database_url</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">url</span>.<span class="ident">into</span>());
+    <span class="doccomment">/// Used for migration engine to reflect the contents of
+    /// migrations directory to diff against the actual database.
+    ///
+    /// ```ignore
+    /// datasource db {
+    ///   provider          = &quot;postgresql&quot;
+    ///   url               = env(&quot;DATABASE_URL&quot;)
+    ///   shadowDatabaseUrl = env(&quot;SHADOW_DATABASE_URL&quot;)
+    /// //                         ^^^^^^^^^^^^^^^^^^^ this
+    /// }
+    /// ```
+    </span><span class="kw">pub fn </span>shadow_database_url(<span class="kw-2">&amp;mut </span><span class="self">self</span>, url: <span class="kw">impl </span>Into&lt;Env&lt;<span class="lifetime">&#39;a</span>&gt;&gt;) {
+        <span class="self">self</span>.shadow_database_url = <span class="prelude-val">Some</span>(url.into());
     }
 
-    <span class="doccomment">/// Who handles referential integrity.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// datasource db {</span>
-    <span class="doccomment">///   provider     = &quot;postgresql&quot;</span>
-    <span class="doccomment">///   url          = env(&quot;DATABASE_URL&quot;)</span>
-    <span class="doccomment">///   relationMode = &quot;foreignKeys&quot;</span>
-    <span class="doccomment">/// //                ^^^^^^^^^^^ this</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">relation_mode</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">relation_mode</span>: <span class="ident">RelationMode</span>) {
-        <span class="self">self</span>.<span class="ident">relation_mode</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">relation_mode</span>);
+    <span class="doccomment">/// Who handles referential integrity.
+    ///
+    /// ```ignore
+    /// datasource db {
+    ///   provider     = &quot;postgresql&quot;
+    ///   url          = env(&quot;DATABASE_URL&quot;)
+    ///   relationMode = &quot;foreignKeys&quot;
+    /// //                ^^^^^^^^^^^ this
+    /// }
+    /// ```
+    </span><span class="kw">pub fn </span>relation_mode(<span class="kw-2">&amp;mut </span><span class="self">self</span>, relation_mode: RelationMode) {
+        <span class="self">self</span>.relation_mode = <span class="prelude-val">Some</span>(relation_mode);
     }
 
-    <span class="doccomment">/// Add a custom connector-specific property to the datasource.</span>
-    <span class="doccomment">/// Use this for settings that are only for a single database. For</span>
-    <span class="doccomment">/// shared things, add an explicit property to the `Datasource`</span>
-    <span class="doccomment">/// struct.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// An example for PostgreSQL extensions, using an array of functions:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// datasource db {</span>
-    <span class="doccomment">///   provider   = &quot;postgresql&quot;</span>
-    <span class="doccomment">///   url          = env(&quot;DATABASE_URL&quot;)</span>
-    <span class="doccomment">///   extensions = [citext(version: &quot;2.1&quot;)]</span>
-    <span class="doccomment">/// //             ^^^^^^^^^^^^^^^^^^^^^^^^ value</span>
-    <span class="doccomment">/// //^^^^^^^^^^ key</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_custom_property</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>, <span class="ident">value</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">custom_properties</span>.<span class="ident">push</span>((<span class="ident">key</span>, <span class="ident">value</span>.<span class="ident">into</span>()));
+    <span class="doccomment">/// Add a custom connector-specific property to the datasource.
+    /// Use this for settings that are only for a single database. For
+    /// shared things, add an explicit property to the `Datasource`
+    /// struct.
+    ///
+    /// An example for PostgreSQL extensions, using an array of functions:
+    ///
+    /// ```ignore
+    /// datasource db {
+    ///   provider   = &quot;postgresql&quot;
+    ///   url          = env(&quot;DATABASE_URL&quot;)
+    ///   extensions = [citext(version: &quot;2.1&quot;)]
+    /// //             ^^^^^^^^^^^^^^^^^^^^^^^^ value
+    /// //^^^^^^^^^^ key
+    /// }
+    /// ```
+    </span><span class="kw">pub fn </span>push_custom_property(<span class="kw-2">&amp;mut </span><span class="self">self</span>, key: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, value: <span class="kw">impl </span>Into&lt;Value&lt;<span class="lifetime">&#39;a</span>&gt;&gt;) {
+        <span class="self">self</span>.custom_properties.push((key, value.into()));
     }
 
-    <span class="doccomment">/// The documentation on top of the datasource.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```ignore</span>
-    <span class="doccomment">/// /// This here is the documentation.</span>
-    <span class="doccomment">/// datasource db {</span>
-    <span class="doccomment">///   provider = &quot;postgresql&quot;</span>
-    <span class="doccomment">///   url      = env(&quot;DATABASE_URL&quot;)</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">documentation</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">documentation</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>) {
-        <span class="self">self</span>.<span class="ident">documentation</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Documentation</span>(<span class="ident">documentation</span>));
+    <span class="doccomment">/// The documentation on top of the datasource.
+    ///
+    /// ```ignore
+    /// /// This here is the documentation.
+    /// datasource db {
+    ///   provider = &quot;postgresql&quot;
+    ///   url      = env(&quot;DATABASE_URL&quot;)
+    /// }
+    /// ```
+    </span><span class="kw">pub fn </span>documentation(<span class="kw-2">&amp;mut </span><span class="self">self</span>, documentation: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) {
+        <span class="self">self</span>.documentation = <span class="prelude-val">Some</span>(Documentation(documentation));
     }
 
-    <span class="doccomment">/// Create a rendering from a PSL datasource.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_psl</span>(<span class="ident">psl_ds</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">psl::Datasource</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">shadow_database_url</span> <span class="op">=</span> <span class="ident">psl_ds</span>.<span class="ident">shadow_database_url</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">url</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">Env::from</span>(<span class="ident">url</span>));
-        <span class="kw">let</span> <span class="ident">namespaces</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Text</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">psl_ds</span>.<span class="ident">namespaces</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">ns</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">Text</span>(<span class="ident">ns</span>.<span class="ident">as_str</span>())).<span class="ident">collect</span>();
+    <span class="doccomment">/// Create a rendering from a PSL datasource.
+    </span><span class="kw">pub fn </span>from_psl(psl_ds: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>psl::Datasource) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>shadow_database_url = psl_ds.shadow_database_url.as_ref().map(|(url, <span class="kw">_</span>)| Env::from(url));
+        <span class="kw">let </span>namespaces: Vec&lt;Text&lt;<span class="kw">_</span>&gt;&gt; = psl_ds.namespaces.iter().map(|(ns, <span class="kw">_</span>)| Text(ns.as_str())).collect();
 
-        <span class="self">Self</span> {
-            <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">psl_ds</span>.<span class="ident">name</span>,
-            <span class="ident">provider</span>: <span class="ident">Text</span>(<span class="kw-2">&amp;</span><span class="ident">psl_ds</span>.<span class="ident">provider</span>),
-            <span class="ident">url</span>: <span class="ident">Env::from</span>(<span class="kw-2">&amp;</span><span class="ident">psl_ds</span>.<span class="ident">url</span>),
-            <span class="ident">shadow_database_url</span>,
-            <span class="ident">relation_mode</span>: <span class="ident">psl_ds</span>.<span class="ident">relation_mode</span>,
-            <span class="ident">documentation</span>: <span class="ident">psl_ds</span>.<span class="ident">documentation</span>.<span class="ident">as_deref</span>().<span class="ident">map</span>(<span class="ident">Documentation</span>),
-            <span class="ident">custom_properties</span>: <span class="ident">Default::default</span>(),
-            <span class="ident">namespaces</span>: <span class="ident">Array::from</span>(<span class="ident">namespaces</span>),
+        <span class="self">Self </span>{
+            name: <span class="kw-2">&amp;</span>psl_ds.name,
+            provider: Text(<span class="kw-2">&amp;</span>psl_ds.provider),
+            url: Env::from(<span class="kw-2">&amp;</span>psl_ds.url),
+            shadow_database_url,
+            relation_mode: psl_ds.relation_mode,
+            documentation: psl_ds.documentation.as_deref().map(Documentation),
+            custom_properties: Default::default(),
+            namespaces: Array::from(namespaces),
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Datasource</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">doc</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">documentation</span> {
-            <span class="ident">doc</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)<span class="question-mark">?</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; fmt::Display <span class="kw">for </span>Datasource&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>doc) = <span class="self">self</span>.documentation {
+            doc.fmt(f)<span class="question-mark">?</span>;
         }
 
-        <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;datasource {} {{&quot;</span>, <span class="self">self</span>.<span class="ident">name</span>)<span class="question-mark">?</span>;
-        <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;provider = {}&quot;</span>, <span class="self">self</span>.<span class="ident">provider</span>)<span class="question-mark">?</span>;
-        <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;url = {}&quot;</span>, <span class="self">self</span>.<span class="ident">url</span>)<span class="question-mark">?</span>;
+        <span class="macro">writeln!</span>(f, <span class="string">&quot;datasource {} {{&quot;</span>, <span class="self">self</span>.name)<span class="question-mark">?</span>;
+        <span class="macro">writeln!</span>(f, <span class="string">&quot;provider = {}&quot;</span>, <span class="self">self</span>.provider)<span class="question-mark">?</span>;
+        <span class="macro">writeln!</span>(f, <span class="string">&quot;url = {}&quot;</span>, <span class="self">self</span>.url)<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">url</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">shadow_database_url</span> {
-            <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;shadowDatabaseUrl = {}&quot;</span>, <span class="ident">url</span>)<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(url) = <span class="self">self</span>.shadow_database_url {
+            <span class="macro">writeln!</span>(f, <span class="string">&quot;shadowDatabaseUrl = {}&quot;</span>, url)<span class="question-mark">?</span>;
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">relation_mode</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">relation_mode</span> {
-            <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;relationMode = \&quot;{}\&quot;&quot;</span>, <span class="ident">relation_mode</span>)<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(relation_mode) = <span class="self">self</span>.relation_mode {
+            <span class="macro">writeln!</span>(f, <span class="string">&quot;relationMode = \&quot;{}\&quot;&quot;</span>, relation_mode)<span class="question-mark">?</span>;
         }
 
-        <span class="kw">for</span> (<span class="ident">key</span>, <span class="ident">value</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">custom_properties</span>.<span class="ident">iter</span>() {
-            <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;{key} = {value}&quot;</span>)<span class="question-mark">?</span>;
+        <span class="kw">for </span>(key, value) <span class="kw">in </span><span class="self">self</span>.custom_properties.iter() {
+            <span class="macro">writeln!</span>(f, <span class="string">&quot;{key} = {value}&quot;</span>)<span class="question-mark">?</span>;
         }
 
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">namespaces</span>.<span class="ident">is_empty</span>() {
-            <span class="macro">writeln!</span>(<span class="ident">f</span>, <span class="string">&quot;schemas = {}&quot;</span>, <span class="self">self</span>.<span class="ident">namespaces</span>)<span class="question-mark">?</span>;
+        <span class="kw">if </span>!<span class="self">self</span>.namespaces.is_empty() {
+            <span class="macro">writeln!</span>(f, <span class="string">&quot;schemas = {}&quot;</span>, <span class="self">self</span>.namespaces)<span class="question-mark">?</span>;
         }
 
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;}\n&quot;</span>)<span class="question-mark">?</span>;
+        f.write_str(<span class="string">&quot;}\n&quot;</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">configuration</span>::<span class="kw-2">*</span>, <span class="ident">value</span>::<span class="kw-2">*</span>};
-    <span class="kw">use</span> <span class="ident">expect_test::expect</span>;
-    <span class="kw">use</span> <span class="ident">psl::datamodel_connector::RelationMode</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use crate</span>::{configuration::<span class="kw-2">*</span>, value::<span class="kw-2">*</span>};
+    <span class="kw">use </span>expect_test::expect;
+    <span class="kw">use </span>psl::datamodel_connector::RelationMode;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">kitchen_sink</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">datasource</span> <span class="op">=</span> <span class="ident">Datasource::new</span>(<span class="string">&quot;db&quot;</span>, <span class="string">&quot;postgres&quot;</span>, <span class="ident">Env::variable</span>(<span class="string">&quot;DATABASE_URL&quot;</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>kitchen_sink() {
+        <span class="kw">let </span><span class="kw-2">mut </span>datasource = Datasource::new(<span class="string">&quot;db&quot;</span>, <span class="string">&quot;postgres&quot;</span>, Env::variable(<span class="string">&quot;DATABASE_URL&quot;</span>));
 
-        <span class="ident">datasource</span>.<span class="ident">documentation</span>(<span class="string">&quot;Here comes the sun king...\n\nEverybody&#39;s laughing,\nEverybody&#39;s happy!&quot;</span>);
-        <span class="ident">datasource</span>.<span class="ident">shadow_database_url</span>(<span class="ident">Env::variable</span>(<span class="string">&quot;SHADOW_DATABASE_URL&quot;</span>));
-        <span class="ident">datasource</span>.<span class="ident">relation_mode</span>(<span class="ident">RelationMode::ForeignKeys</span>);
+        datasource.documentation(<span class="string">&quot;Here comes the sun king...\n\nEverybody&#39;s laughing,\nEverybody&#39;s happy!&quot;</span>);
+        datasource.shadow_database_url(Env::variable(<span class="string">&quot;SHADOW_DATABASE_URL&quot;</span>));
+        datasource.relation_mode(RelationMode::ForeignKeys);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">extensions</span> <span class="op">=</span> <span class="ident">Array::new</span>();
-        <span class="ident">extensions</span>.<span class="ident">push</span>(<span class="ident">Function::new</span>(<span class="string">&quot;postgis&quot;</span>));
-        <span class="ident">extensions</span>.<span class="ident">push</span>(<span class="ident">Function::new</span>(<span class="string">&quot;uuid-ossp&quot;</span>));
+        <span class="kw">let </span><span class="kw-2">mut </span>extensions = Array::new();
+        extensions.push(Function::new(<span class="string">&quot;postgis&quot;</span>));
+        extensions.push(Function::new(<span class="string">&quot;uuid-ossp&quot;</span>));
 
-        <span class="ident">datasource</span>.<span class="ident">push_custom_property</span>(<span class="string">&quot;extensions&quot;</span>, <span class="ident">extensions</span>);
+        datasource.push_custom_property(<span class="string">&quot;extensions&quot;</span>, extensions);
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">expect!</span>[[<span class="string">r#&quot;
+        <span class="kw">let </span>expected = <span class="macro">expect!</span>[[<span class="string">r#&quot;
             /// Here comes the sun king...
             ///
             /// Everybody&#39;s laughing,
@@ -380,9 +380,9 @@
             }
         &quot;#</span>]];
 
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">psl::reformat</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{datasource}&quot;</span>), <span class="number">2</span>).<span class="ident">unwrap</span>();
-        <span class="ident">expected</span>.<span class="ident">assert_eq</span>(<span class="kw-2">&amp;</span><span class="ident">rendered</span>);
+        <span class="kw">let </span>rendered = psl::reformat(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{datasource}&quot;</span>), <span class="number">2</span>).unwrap();
+        expected.assert_eq(<span class="kw-2">&amp;</span>rendered);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="datamodel_renderer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="datamodel_renderer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

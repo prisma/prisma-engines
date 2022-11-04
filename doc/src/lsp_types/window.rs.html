@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lsp-types-0.91.1/src/window.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>window.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lsp_types/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lsp-types-0.91.1/src/window.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>window.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lsp_types/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lsp_types/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -174,181 +174,181 @@
 <span id="174">174</span>
 <span id="175">175</span>
 <span id="176">176</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
 
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="kw">use</span> <span class="ident">serde_json::Value</span>;
+<span class="kw">use </span>serde_json::Value;
 
-<span class="kw">use</span> <span class="ident">url::Url</span>;
+<span class="kw">use </span>url::Url;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Range</span>;
+<span class="kw">use </span><span class="kw">crate</span>::Range;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageType</span>(<span class="ident">i32</span>);
-<span class="macro">lsp_enum!</span> {
-<span class="kw">impl</span> <span class="ident">MessageType</span> {
-    <span class="doccomment">/// An error message.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">ERROR</span>: <span class="ident">MessageType</span> <span class="op">=</span> <span class="ident">MessageType</span>(<span class="number">1</span>);
-    <span class="doccomment">/// A warning message.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">WARNING</span>: <span class="ident">MessageType</span> <span class="op">=</span> <span class="ident">MessageType</span>(<span class="number">2</span>);
-    <span class="doccomment">/// An information message;</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">INFO</span>: <span class="ident">MessageType</span> <span class="op">=</span> <span class="ident">MessageType</span>(<span class="number">3</span>);
-    <span class="doccomment">/// A log message.</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">LOG</span>: <span class="ident">MessageType</span> <span class="op">=</span> <span class="ident">MessageType</span>(<span class="number">4</span>);
+<span class="attribute">#[derive(Eq, PartialEq, Clone, Copy, Deserialize, Serialize)]
+#[serde(transparent)]
+</span><span class="kw">pub struct </span>MessageType(i32);
+<span class="macro">lsp_enum! </span>{
+<span class="kw">impl </span>MessageType {
+    <span class="doccomment">/// An error message.
+    </span><span class="kw">pub const </span>ERROR: MessageType = MessageType(<span class="number">1</span>);
+    <span class="doccomment">/// A warning message.
+    </span><span class="kw">pub const </span>WARNING: MessageType = MessageType(<span class="number">2</span>);
+    <span class="doccomment">/// An information message;
+    </span><span class="kw">pub const </span>INFO: MessageType = MessageType(<span class="number">3</span>);
+    <span class="doccomment">/// A log message.
+    </span><span class="kw">pub const </span>LOG: MessageType = MessageType(<span class="number">4</span>);
 }
 }
 
-<span class="doccomment">/// Window specific client capabilities.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WindowClientCapabilities</span> {
-    <span class="doccomment">/// Whether client supports handling progress notifications. If set</span>
-    <span class="doccomment">/// servers are allowed to report in `workDoneProgress` property in the</span>
-    <span class="doccomment">/// request specific server capabilities.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// @since 3.15.0</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">work_done_progress</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Window specific client capabilities.
+</span><span class="attribute">#[derive(Debug, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>WindowClientCapabilities {
+    <span class="doccomment">/// Whether client supports handling progress notifications. If set
+    /// servers are allowed to report in `workDoneProgress` property in the
+    /// request specific server capabilities.
+    ///
+    /// @since 3.15.0
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>work_done_progress: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="doccomment">/// Capabilities specific to the showMessage request.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// @since 3.16.0</span>
-    <span class="doccomment">///</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">show_message</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ShowMessageRequestClientCapabilities</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Capabilities specific to the showMessage request.
+    ///
+    /// @since 3.16.0
+    ///
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>show_message: <span class="prelude-ty">Option</span>&lt;ShowMessageRequestClientCapabilities&gt;,
 
-    <span class="doccomment">/// Client capabilities for the show document request.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// @since 3.16.0</span>
-    <span class="doccomment">///</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">show_document</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ShowDocumentClientCapabilities</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Client capabilities for the show document request.
+    ///
+    /// @since 3.16.0
+    ///
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>show_document: <span class="prelude-ty">Option</span>&lt;ShowDocumentClientCapabilities&gt;,
 }
 
-<span class="doccomment">/// Show message request client capabilities</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ShowMessageRequestClientCapabilities</span> {
-    <span class="doccomment">/// Capabilities specific to the `MessageActionItem` type.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">message_action_item</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageActionItemCapabilities</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Show message request client capabilities
+</span><span class="attribute">#[derive(Debug, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>ShowMessageRequestClientCapabilities {
+    <span class="doccomment">/// Capabilities specific to the `MessageActionItem` type.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>message_action_item: <span class="prelude-ty">Option</span>&lt;MessageActionItemCapabilities&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageActionItemCapabilities</span> {
-    <span class="doccomment">/// Whether the client supports additional attribues which</span>
-    <span class="doccomment">/// are preserved and send back to the server in the</span>
-    <span class="doccomment">/// request&#39;s response.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">additional_properties_support</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>MessageActionItemCapabilities {
+    <span class="doccomment">/// Whether the client supports additional attribues which
+    /// are preserved and send back to the server in the
+    /// request&#39;s response.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>additional_properties_support: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageActionItem</span> {
-    <span class="doccomment">/// A short title like &#39;Retry&#39;, &#39;Open Log&#39; etc.</span>
-    <span class="kw">pub</span> <span class="ident">title</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>MessageActionItem {
+    <span class="doccomment">/// A short title like &#39;Retry&#39;, &#39;Open Log&#39; etc.
+    </span><span class="kw">pub </span>title: String,
 
-    <span class="doccomment">/// Additional attributes that the client preserves and</span>
-    <span class="doccomment">/// sends back to the server. This depends on the client</span>
-    <span class="doccomment">/// capability window.messageActionItem.additionalPropertiesSupport</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">flatten</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">properties</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">MessageActionItemProperty</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Additional attributes that the client preserves and
+    /// sends back to the server. This depends on the client
+    /// capability window.messageActionItem.additionalPropertiesSupport
+    </span><span class="attribute">#[serde(flatten)]
+    </span><span class="kw">pub </span>properties: HashMap&lt;String, MessageActionItemProperty&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">untagged</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">MessageActionItemProperty</span> {
-    <span class="ident">String</span>(<span class="ident">String</span>),
-    <span class="ident">Boolean</span>(<span class="ident">bool</span>),
-    <span class="ident">Integer</span>(<span class="ident">i32</span>),
-    <span class="ident">Object</span>(<span class="ident">Value</span>),
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+#[serde(untagged)]
+</span><span class="kw">pub enum </span>MessageActionItemProperty {
+    String(String),
+    Boolean(bool),
+    Integer(i32),
+    Object(Value),
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LogMessageParams</span> {
-    <span class="doccomment">/// The message type. See {@link MessageType}</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">typ</span>: <span class="ident">MessageType</span>,
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+</span><span class="kw">pub struct </span>LogMessageParams {
+    <span class="doccomment">/// The message type. See {@link MessageType}
+    </span><span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="kw">pub </span>typ: MessageType,
 
-    <span class="doccomment">/// The actual message</span>
-    <span class="kw">pub</span> <span class="ident">message</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// The actual message
+    </span><span class="kw">pub </span>message: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ShowMessageParams</span> {
-    <span class="doccomment">/// The message type. See {@link MessageType}.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">typ</span>: <span class="ident">MessageType</span>,
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+</span><span class="kw">pub struct </span>ShowMessageParams {
+    <span class="doccomment">/// The message type. See {@link MessageType}.
+    </span><span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="kw">pub </span>typ: MessageType,
 
-    <span class="doccomment">/// The actual message.</span>
-    <span class="kw">pub</span> <span class="ident">message</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// The actual message.
+    </span><span class="kw">pub </span>message: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ShowMessageRequestParams</span> {
-    <span class="doccomment">/// The message type. See {@link MessageType}</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">typ</span>: <span class="ident">MessageType</span>,
+<span class="attribute">#[derive(Debug, Eq, PartialEq, Clone, Deserialize, Serialize)]
+</span><span class="kw">pub struct </span>ShowMessageRequestParams {
+    <span class="doccomment">/// The message type. See {@link MessageType}
+    </span><span class="attribute">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+    </span><span class="kw">pub </span>typ: MessageType,
 
-    <span class="doccomment">/// The actual message</span>
-    <span class="kw">pub</span> <span class="ident">message</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// The actual message
+    </span><span class="kw">pub </span>message: String,
 
-    <span class="doccomment">/// The message action items to present.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">actions</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MessageActionItem</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// The message action items to present.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>actions: <span class="prelude-ty">Option</span>&lt;Vec&lt;MessageActionItem&gt;&gt;,
 }
 
-<span class="doccomment">/// Client capabilities for the show document request.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ShowDocumentClientCapabilities</span> {
-    <span class="doccomment">/// The client has support for the show document request.</span>
-    <span class="kw">pub</span> <span class="ident">support</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// Client capabilities for the show document request.
+</span><span class="attribute">#[derive(Debug, PartialEq, Clone, Default, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>ShowDocumentClientCapabilities {
+    <span class="doccomment">/// The client has support for the show document request.
+    </span><span class="kw">pub </span>support: bool,
 }
 
-<span class="doccomment">/// Params to show a document.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// @since 3.16.0</span>
-<span class="doccomment">///</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ShowDocumentParams</span> {
-    <span class="doccomment">/// The document uri to show.</span>
-    <span class="kw">pub</span> <span class="ident">uri</span>: <span class="ident">Url</span>,
+<span class="doccomment">/// Params to show a document.
+///
+/// @since 3.16.0
+///
+</span><span class="attribute">#[derive(Debug, PartialEq, Clone, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>ShowDocumentParams {
+    <span class="doccomment">/// The document uri to show.
+    </span><span class="kw">pub </span>uri: Url,
 
-    <span class="doccomment">/// Indicates to show the resource in an external program.</span>
-    <span class="doccomment">/// To show for example `https://code.visualstudio.com/`</span>
-    <span class="doccomment">/// in the default WEB browser set `external` to `true`.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">external</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Indicates to show the resource in an external program.
+    /// To show for example `https://code.visualstudio.com/`
+    /// in the default WEB browser set `external` to `true`.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>external: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="doccomment">///  An optional property to indicate whether the editor</span>
-    <span class="doccomment">///  showing the document should take focus or not.</span>
-    <span class="doccomment">///  Clients might ignore this property if an external</span>
-    <span class="doccomment">///  program in started.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">take_focus</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    <span class="doccomment">///  An optional property to indicate whether the editor
+    ///  showing the document should take focus or not.
+    ///  Clients might ignore this property if an external
+    ///  program in started.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>take_focus: <span class="prelude-ty">Option</span>&lt;bool&gt;,
 
-    <span class="doccomment">///  An optional selection range if the document is a text</span>
-    <span class="doccomment">///  document. Clients might ignore the property if an</span>
-    <span class="doccomment">///  external program is started or the file is not a text</span>
-    <span class="doccomment">///  file.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">selection</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Range</span><span class="op">&gt;</span>,
+    <span class="doccomment">///  An optional selection range if the document is a text
+    ///  document. Clients might ignore the property if an
+    ///  external program is started or the file is not a text
+    ///  file.
+    </span><span class="attribute">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>selection: <span class="prelude-ty">Option</span>&lt;Range&gt;,
 }
 
-<span class="doccomment">/// The result of an show document request.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// @since 3.16.0</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ShowDocumentResult</span> {
-    <span class="doccomment">/// A boolean indicating if the show was successful.</span>
-    <span class="kw">pub</span> <span class="ident">success</span>: <span class="ident">bool</span>,
+<span class="doccomment">/// The result of an show document request.
+///
+/// @since 3.16.0
+</span><span class="attribute">#[derive(Debug, PartialEq, Clone, Deserialize, Serialize)]
+#[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
+</span><span class="kw">pub struct </span>ShowDocumentResult {
+    <span class="doccomment">/// A boolean indicating if the show was successful.
+    </span><span class="kw">pub </span>success: bool,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lsp_types" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lsp_types" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

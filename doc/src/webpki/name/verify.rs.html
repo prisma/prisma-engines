@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/webpki-0.22.0/src/name/verify.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>verify.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../webpki/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../webpki/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../webpki/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/webpki-0.22.0/src/name/verify.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>verify.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../webpki/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../webpki/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../webpki/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -326,96 +326,96 @@
 <span id="326">326</span>
 <span id="327">327</span>
 <span id="328">328</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015 Brian Smith.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
-<span class="comment">// purpose with or without fee is hereby granted, provided that the above</span>
-<span class="comment">// copyright notice and this permission notice appear in all copies.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES</span>
-<span class="comment">// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR</span>
-<span class="comment">// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span>
-<span class="comment">// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN</span>
-<span class="comment">// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF</span>
-<span class="comment">// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015 Brian Smith.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR
+// ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+// ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+// OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-<span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">dns_name</span>::{<span class="self">self</span>, <span class="ident">DnsNameRef</span>},
-    <span class="ident">ip_address</span>,
+</span><span class="kw">use super</span>::{
+    dns_name::{<span class="self">self</span>, DnsNameRef},
+    ip_address,
 };
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">cert</span>::{<span class="ident">Cert</span>, <span class="ident">EndEntityOrCa</span>},
-    <span class="ident">der</span>, <span class="ident">Error</span>,
+<span class="kw">use crate</span>::{
+    cert::{Cert, EndEntityOrCa},
+    der, Error,
 };
 
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">verify_cert_dns_name</span>(
-    <span class="ident">cert</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="kw">crate</span>::EndEntityCert</span>,
-    <span class="ident">dns_name</span>: <span class="ident">DnsNameRef</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">cert</span> <span class="op">=</span> <span class="ident">cert</span>.<span class="ident">inner</span>();
-    <span class="kw">let</span> <span class="ident">dns_name</span> <span class="op">=</span> <span class="ident">untrusted::Input::from</span>(<span class="ident">dns_name</span>.<span class="ident">as_ref</span>().<span class="ident">as_ref</span>());
-    <span class="ident">iterate_names</span>(
-        <span class="ident">cert</span>.<span class="ident">subject</span>,
-        <span class="ident">cert</span>.<span class="ident">subject_alt_name</span>,
-        <span class="prelude-val">Err</span>(<span class="ident">Error::CertNotValidForName</span>),
-        <span class="kw-2">&amp;</span><span class="op">|</span><span class="ident">name</span><span class="op">|</span> {
-            <span class="kw">match</span> <span class="ident">name</span> {
-                <span class="ident">GeneralName::DnsName</span>(<span class="ident">presented_id</span>) =&gt; {
-                    <span class="kw">match</span> <span class="ident">dns_name::presented_id_matches_reference_id</span>(<span class="ident">presented_id</span>, <span class="ident">dns_name</span>) {
+<span class="kw">pub fn </span>verify_cert_dns_name(
+    cert: <span class="kw-2">&amp;</span><span class="kw">crate</span>::EndEntityCert,
+    dns_name: DnsNameRef,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+    <span class="kw">let </span>cert = cert.inner();
+    <span class="kw">let </span>dns_name = untrusted::Input::from(dns_name.as_ref().as_ref());
+    iterate_names(
+        cert.subject,
+        cert.subject_alt_name,
+        <span class="prelude-val">Err</span>(Error::CertNotValidForName),
+        <span class="kw-2">&amp;</span>|name| {
+            <span class="kw">match </span>name {
+                GeneralName::DnsName(presented_id) =&gt; {
+                    <span class="kw">match </span>dns_name::presented_id_matches_reference_id(presented_id, dns_name) {
                         <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) =&gt; {
-                            <span class="kw">return</span> <span class="ident">NameIteration::Stop</span>(<span class="prelude-val">Ok</span>(()));
+                            <span class="kw">return </span>NameIteration::Stop(<span class="prelude-val">Ok</span>(()));
                         }
                         <span class="prelude-val">Some</span>(<span class="bool-val">false</span>) =&gt; (),
-                        <span class="prelude-val">None</span> =&gt; {
-                            <span class="kw">return</span> <span class="ident">NameIteration::Stop</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::BadDer</span>));
+                        <span class="prelude-val">None </span>=&gt; {
+                            <span class="kw">return </span>NameIteration::Stop(<span class="prelude-val">Err</span>(Error::BadDer));
                         }
                     }
                 }
-                <span class="kw">_</span> =&gt; (),
+                <span class="kw">_ </span>=&gt; (),
             }
-            <span class="ident">NameIteration::KeepGoing</span>
+            NameIteration::KeepGoing
         },
     )
 }
 
-<span class="comment">// https://tools.ietf.org/html/rfc5280#section-4.2.1.10</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check_name_constraints</span>(
-    <span class="ident">input</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span><span class="op">&gt;</span>,
-    <span class="ident">subordinate_certs</span>: <span class="kw-2">&amp;</span><span class="ident">Cert</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">input</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">input</span>) =&gt; <span class="ident">input</span>,
-        <span class="prelude-val">None</span> =&gt; {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+<span class="comment">// https://tools.ietf.org/html/rfc5280#section-4.2.1.10
+</span><span class="kw">pub fn </span>check_name_constraints(
+    input: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;mut </span>untrusted::Reader&gt;,
+    subordinate_certs: <span class="kw-2">&amp;</span>Cert,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+    <span class="kw">let </span>input = <span class="kw">match </span>input {
+        <span class="prelude-val">Some</span>(input) =&gt; input,
+        <span class="prelude-val">None </span>=&gt; {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(());
         }
     };
 
-    <span class="kw">fn</span> <span class="ident">parse_subtrees</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(
-        <span class="ident">inner</span>: <span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>,
-        <span class="ident">subtrees_tag</span>: <span class="ident">der::Tag</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">inner</span>.<span class="ident">peek</span>(<span class="ident">subtrees_tag</span>.<span class="ident">into</span>()) {
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
+    <span class="kw">fn </span>parse_subtrees&lt;<span class="lifetime">&#39;b</span>&gt;(
+        inner: <span class="kw-2">&amp;mut </span>untrusted::Reader&lt;<span class="lifetime">&#39;b</span>&gt;,
+        subtrees_tag: der::Tag,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;untrusted::Input&lt;<span class="lifetime">&#39;b</span>&gt;&gt;, Error&gt; {
+        <span class="kw">if </span>!inner.peek(subtrees_tag.into()) {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
         }
-        <span class="kw">let</span> <span class="ident">subtrees</span> <span class="op">=</span> <span class="ident">der::nested</span>(<span class="ident">inner</span>, <span class="ident">subtrees_tag</span>, <span class="ident">Error::BadDer</span>, <span class="op">|</span><span class="ident">tagged</span><span class="op">|</span> {
-            <span class="ident">der::expect_tag_and_get_value</span>(<span class="ident">tagged</span>, <span class="ident">der::Tag::Sequence</span>)
+        <span class="kw">let </span>subtrees = der::nested(inner, subtrees_tag, Error::BadDer, |tagged| {
+            der::expect_tag_and_get_value(tagged, der::Tag::Sequence)
         })<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">subtrees</span>))
+        <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(subtrees))
     }
 
-    <span class="kw">let</span> <span class="ident">permitted_subtrees</span> <span class="op">=</span> <span class="ident">parse_subtrees</span>(<span class="ident">input</span>, <span class="ident">der::Tag::ContextSpecificConstructed0</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">excluded_subtrees</span> <span class="op">=</span> <span class="ident">parse_subtrees</span>(<span class="ident">input</span>, <span class="ident">der::Tag::ContextSpecificConstructed1</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>permitted_subtrees = parse_subtrees(input, der::Tag::ContextSpecificConstructed0)<span class="question-mark">?</span>;
+    <span class="kw">let </span>excluded_subtrees = parse_subtrees(input, der::Tag::ContextSpecificConstructed1)<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">child</span> <span class="op">=</span> <span class="ident">subordinate_certs</span>;
-    <span class="kw">loop</span> {
-        <span class="ident">iterate_names</span>(<span class="ident">child</span>.<span class="ident">subject</span>, <span class="ident">child</span>.<span class="ident">subject_alt_name</span>, <span class="prelude-val">Ok</span>(()), <span class="kw-2">&amp;</span><span class="op">|</span><span class="ident">name</span><span class="op">|</span> {
-            <span class="ident">check_presented_id_conforms_to_constraints</span>(<span class="ident">name</span>, <span class="ident">permitted_subtrees</span>, <span class="ident">excluded_subtrees</span>)
+    <span class="kw">let </span><span class="kw-2">mut </span>child = subordinate_certs;
+    <span class="kw">loop </span>{
+        iterate_names(child.subject, child.subject_alt_name, <span class="prelude-val">Ok</span>(()), <span class="kw-2">&amp;</span>|name| {
+            check_presented_id_conforms_to_constraints(name, permitted_subtrees, excluded_subtrees)
         })<span class="question-mark">?</span>;
 
-        <span class="ident">child</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">child</span>.<span class="ident">ee_or_ca</span> {
-            <span class="ident">EndEntityOrCa::Ca</span>(<span class="ident">child_cert</span>) =&gt; <span class="ident">child_cert</span>,
-            <span class="ident">EndEntityOrCa::EndEntity</span> =&gt; {
+        child = <span class="kw">match </span>child.ee_or_ca {
+            EndEntityOrCa::Ca(child_cert) =&gt; child_cert,
+            EndEntityOrCa::EndEntity =&gt; {
                 <span class="kw">break</span>;
             }
         };
@@ -424,235 +424,235 @@
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">fn</span> <span class="ident">check_presented_id_conforms_to_constraints</span>(
-    <span class="ident">name</span>: <span class="ident">GeneralName</span>,
-    <span class="ident">permitted_subtrees</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">untrusted::Input</span><span class="op">&gt;</span>,
-    <span class="ident">excluded_subtrees</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">untrusted::Input</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">NameIteration</span> {
-    <span class="kw">match</span> <span class="ident">check_presented_id_conforms_to_constraints_in_subtree</span>(
-        <span class="ident">name</span>,
-        <span class="ident">Subtrees::PermittedSubtrees</span>,
-        <span class="ident">permitted_subtrees</span>,
+<span class="kw">fn </span>check_presented_id_conforms_to_constraints(
+    name: GeneralName,
+    permitted_subtrees: <span class="prelude-ty">Option</span>&lt;untrusted::Input&gt;,
+    excluded_subtrees: <span class="prelude-ty">Option</span>&lt;untrusted::Input&gt;,
+) -&gt; NameIteration {
+    <span class="kw">match </span>check_presented_id_conforms_to_constraints_in_subtree(
+        name,
+        Subtrees::PermittedSubtrees,
+        permitted_subtrees,
     ) {
-        <span class="ident">stop</span> @ <span class="ident">NameIteration::Stop</span>(..) =&gt; {
-            <span class="kw">return</span> <span class="ident">stop</span>;
+        stop @ NameIteration::Stop(..) =&gt; {
+            <span class="kw">return </span>stop;
         }
-        <span class="ident">NameIteration::KeepGoing</span> =&gt; (),
+        NameIteration::KeepGoing =&gt; (),
     };
 
-    <span class="ident">check_presented_id_conforms_to_constraints_in_subtree</span>(
-        <span class="ident">name</span>,
-        <span class="ident">Subtrees::ExcludedSubtrees</span>,
-        <span class="ident">excluded_subtrees</span>,
+    check_presented_id_conforms_to_constraints_in_subtree(
+        name,
+        Subtrees::ExcludedSubtrees,
+        excluded_subtrees,
     )
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">enum</span> <span class="ident">Subtrees</span> {
-    <span class="ident">PermittedSubtrees</span>,
-    <span class="ident">ExcludedSubtrees</span>,
+<span class="attribute">#[derive(Clone, Copy)]
+</span><span class="kw">enum </span>Subtrees {
+    PermittedSubtrees,
+    ExcludedSubtrees,
 }
 
-<span class="kw">fn</span> <span class="ident">check_presented_id_conforms_to_constraints_in_subtree</span>(
-    <span class="ident">name</span>: <span class="ident">GeneralName</span>,
-    <span class="ident">subtrees</span>: <span class="ident">Subtrees</span>,
-    <span class="ident">constraints</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">untrusted::Input</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">NameIteration</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">constraints</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">constraints</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">constraints</span>) =&gt; <span class="ident">untrusted::Reader::new</span>(<span class="ident">constraints</span>),
-        <span class="prelude-val">None</span> =&gt; {
-            <span class="kw">return</span> <span class="ident">NameIteration::KeepGoing</span>;
+<span class="kw">fn </span>check_presented_id_conforms_to_constraints_in_subtree(
+    name: GeneralName,
+    subtrees: Subtrees,
+    constraints: <span class="prelude-ty">Option</span>&lt;untrusted::Input&gt;,
+) -&gt; NameIteration {
+    <span class="kw">let </span><span class="kw-2">mut </span>constraints = <span class="kw">match </span>constraints {
+        <span class="prelude-val">Some</span>(constraints) =&gt; untrusted::Reader::new(constraints),
+        <span class="prelude-val">None </span>=&gt; {
+            <span class="kw">return </span>NameIteration::KeepGoing;
         }
     };
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">has_permitted_subtrees_match</span> <span class="op">=</span> <span class="bool-val">false</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">has_permitted_subtrees_mismatch</span> <span class="op">=</span> <span class="bool-val">false</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>has_permitted_subtrees_match = <span class="bool-val">false</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>has_permitted_subtrees_mismatch = <span class="bool-val">false</span>;
 
-    <span class="kw">loop</span> {
-        <span class="comment">// http://tools.ietf.org/html/rfc5280#section-4.2.1.10: &quot;Within this</span>
-        <span class="comment">// profile, the minimum and maximum fields are not used with any name</span>
-        <span class="comment">// forms, thus, the minimum MUST be zero, and maximum MUST be absent.&quot;</span>
-        <span class="comment">//</span>
-        <span class="comment">// Since the default value isn&#39;t allowed to be encoded according to the</span>
-        <span class="comment">// DER encoding rules for DEFAULT, this is equivalent to saying that</span>
-        <span class="comment">// neither minimum or maximum must be encoded.</span>
-        <span class="kw">fn</span> <span class="ident">general_subtree</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>(
-            <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>,
-        ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GeneralName</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">general_subtree</span> <span class="op">=</span> <span class="ident">der::expect_tag_and_get_value</span>(<span class="ident">input</span>, <span class="ident">der::Tag::Sequence</span>)<span class="question-mark">?</span>;
-            <span class="ident">general_subtree</span>.<span class="ident">read_all</span>(<span class="ident">Error::BadDer</span>, <span class="op">|</span><span class="ident">subtree</span><span class="op">|</span> <span class="ident">general_name</span>(<span class="ident">subtree</span>))
+    <span class="kw">loop </span>{
+        <span class="comment">// http://tools.ietf.org/html/rfc5280#section-4.2.1.10: &quot;Within this
+        // profile, the minimum and maximum fields are not used with any name
+        // forms, thus, the minimum MUST be zero, and maximum MUST be absent.&quot;
+        //
+        // Since the default value isn&#39;t allowed to be encoded according to the
+        // DER encoding rules for DEFAULT, this is equivalent to saying that
+        // neither minimum or maximum must be encoded.
+        </span><span class="kw">fn </span>general_subtree&lt;<span class="lifetime">&#39;b</span>&gt;(
+            input: <span class="kw-2">&amp;mut </span>untrusted::Reader&lt;<span class="lifetime">&#39;b</span>&gt;,
+        ) -&gt; <span class="prelude-ty">Result</span>&lt;GeneralName&lt;<span class="lifetime">&#39;b</span>&gt;, Error&gt; {
+            <span class="kw">let </span>general_subtree = der::expect_tag_and_get_value(input, der::Tag::Sequence)<span class="question-mark">?</span>;
+            general_subtree.read_all(Error::BadDer, |subtree| general_name(subtree))
         }
 
-        <span class="kw">let</span> <span class="ident">base</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">general_subtree</span>(<span class="kw-2">&amp;mut</span> <span class="ident">constraints</span>) {
-            <span class="prelude-val">Ok</span>(<span class="ident">base</span>) =&gt; <span class="ident">base</span>,
-            <span class="prelude-val">Err</span>(<span class="ident">err</span>) =&gt; {
-                <span class="kw">return</span> <span class="ident">NameIteration::Stop</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>));
+        <span class="kw">let </span>base = <span class="kw">match </span>general_subtree(<span class="kw-2">&amp;mut </span>constraints) {
+            <span class="prelude-val">Ok</span>(base) =&gt; base,
+            <span class="prelude-val">Err</span>(err) =&gt; {
+                <span class="kw">return </span>NameIteration::Stop(<span class="prelude-val">Err</span>(err));
             }
         };
 
-        <span class="kw">let</span> <span class="ident">matches</span> <span class="op">=</span> <span class="kw">match</span> (<span class="ident">name</span>, <span class="ident">base</span>) {
-            (<span class="ident">GeneralName::DnsName</span>(<span class="ident">name</span>), <span class="ident">GeneralName::DnsName</span>(<span class="ident">base</span>)) =&gt; {
-                <span class="ident">dns_name::presented_id_matches_constraint</span>(<span class="ident">name</span>, <span class="ident">base</span>).<span class="ident">ok_or</span>(<span class="ident">Error::BadDer</span>)
+        <span class="kw">let </span>matches = <span class="kw">match </span>(name, base) {
+            (GeneralName::DnsName(name), GeneralName::DnsName(base)) =&gt; {
+                dns_name::presented_id_matches_constraint(name, base).ok_or(Error::BadDer)
             }
 
-            (<span class="ident">GeneralName::DirectoryName</span>(<span class="ident">name</span>), <span class="ident">GeneralName::DirectoryName</span>(<span class="ident">base</span>)) =&gt; <span class="prelude-val">Ok</span>(
-                <span class="ident">presented_directory_name_matches_constraint</span>(<span class="ident">name</span>, <span class="ident">base</span>, <span class="ident">subtrees</span>),
+            (GeneralName::DirectoryName(name), GeneralName::DirectoryName(base)) =&gt; <span class="prelude-val">Ok</span>(
+                presented_directory_name_matches_constraint(name, base, subtrees),
             ),
 
-            (<span class="ident">GeneralName::IpAddress</span>(<span class="ident">name</span>), <span class="ident">GeneralName::IpAddress</span>(<span class="ident">base</span>)) =&gt; {
-                <span class="ident">ip_address::presented_id_matches_constraint</span>(<span class="ident">name</span>, <span class="ident">base</span>)
+            (GeneralName::IpAddress(name), GeneralName::IpAddress(base)) =&gt; {
+                ip_address::presented_id_matches_constraint(name, base)
             }
 
-            <span class="comment">// RFC 4280 says &quot;If a name constraints extension that is marked as</span>
-            <span class="comment">// critical imposes constraints on a particular name form, and an</span>
-            <span class="comment">// instance of that name form appears in the subject field or</span>
-            <span class="comment">// subjectAltName extension of a subsequent certificate, then the</span>
-            <span class="comment">// application MUST either process the constraint or reject the</span>
-            <span class="comment">// certificate.&quot; Later, the CABForum agreed to support non-critical</span>
-            <span class="comment">// constraints, so it is important to reject the cert without</span>
-            <span class="comment">// considering whether the name constraint it critical.</span>
-            (<span class="ident">GeneralName::Unsupported</span>(<span class="ident">name_tag</span>), <span class="ident">GeneralName::Unsupported</span>(<span class="ident">base_tag</span>))
-                <span class="kw">if</span> <span class="ident">name_tag</span> <span class="op">==</span> <span class="ident">base_tag</span> =&gt;
+            <span class="comment">// RFC 4280 says &quot;If a name constraints extension that is marked as
+            // critical imposes constraints on a particular name form, and an
+            // instance of that name form appears in the subject field or
+            // subjectAltName extension of a subsequent certificate, then the
+            // application MUST either process the constraint or reject the
+            // certificate.&quot; Later, the CABForum agreed to support non-critical
+            // constraints, so it is important to reject the cert without
+            // considering whether the name constraint it critical.
+            </span>(GeneralName::Unsupported(name_tag), GeneralName::Unsupported(base_tag))
+                <span class="kw">if </span>name_tag == base_tag =&gt;
             {
-                <span class="prelude-val">Err</span>(<span class="ident">Error::NameConstraintViolation</span>)
+                <span class="prelude-val">Err</span>(Error::NameConstraintViolation)
             }
 
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
         };
 
-        <span class="kw">match</span> (<span class="ident">subtrees</span>, <span class="ident">matches</span>) {
-            (<span class="ident">Subtrees::PermittedSubtrees</span>, <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>)) =&gt; {
-                <span class="ident">has_permitted_subtrees_match</span> <span class="op">=</span> <span class="bool-val">true</span>;
+        <span class="kw">match </span>(subtrees, matches) {
+            (Subtrees::PermittedSubtrees, <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>)) =&gt; {
+                has_permitted_subtrees_match = <span class="bool-val">true</span>;
             }
 
-            (<span class="ident">Subtrees::PermittedSubtrees</span>, <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>)) =&gt; {
-                <span class="ident">has_permitted_subtrees_mismatch</span> <span class="op">=</span> <span class="bool-val">true</span>;
+            (Subtrees::PermittedSubtrees, <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>)) =&gt; {
+                has_permitted_subtrees_mismatch = <span class="bool-val">true</span>;
             }
 
-            (<span class="ident">Subtrees::ExcludedSubtrees</span>, <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>)) =&gt; {
-                <span class="kw">return</span> <span class="ident">NameIteration::Stop</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::NameConstraintViolation</span>));
+            (Subtrees::ExcludedSubtrees, <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>)) =&gt; {
+                <span class="kw">return </span>NameIteration::Stop(<span class="prelude-val">Err</span>(Error::NameConstraintViolation));
             }
 
-            (<span class="ident">Subtrees::ExcludedSubtrees</span>, <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>)) =&gt; (),
+            (Subtrees::ExcludedSubtrees, <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>)) =&gt; (),
 
-            (<span class="kw">_</span>, <span class="prelude-val">Err</span>(<span class="ident">err</span>)) =&gt; {
-                <span class="kw">return</span> <span class="ident">NameIteration::Stop</span>(<span class="prelude-val">Err</span>(<span class="ident">err</span>));
+            (<span class="kw">_</span>, <span class="prelude-val">Err</span>(err)) =&gt; {
+                <span class="kw">return </span>NameIteration::Stop(<span class="prelude-val">Err</span>(err));
             }
         }
 
-        <span class="kw">if</span> <span class="ident">constraints</span>.<span class="ident">at_end</span>() {
+        <span class="kw">if </span>constraints.at_end() {
             <span class="kw">break</span>;
         }
     }
 
-    <span class="kw">if</span> <span class="ident">has_permitted_subtrees_mismatch</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">has_permitted_subtrees_match</span> {
-        <span class="comment">// If there was any entry of the given type in permittedSubtrees, then</span>
-        <span class="comment">// it required that at least one of them must match. Since none of them</span>
-        <span class="comment">// did, we have a failure.</span>
-        <span class="ident">NameIteration::Stop</span>(<span class="prelude-val">Err</span>(<span class="ident">Error::NameConstraintViolation</span>))
-    } <span class="kw">else</span> {
-        <span class="ident">NameIteration::KeepGoing</span>
+    <span class="kw">if </span>has_permitted_subtrees_mismatch &amp;&amp; !has_permitted_subtrees_match {
+        <span class="comment">// If there was any entry of the given type in permittedSubtrees, then
+        // it required that at least one of them must match. Since none of them
+        // did, we have a failure.
+        </span>NameIteration::Stop(<span class="prelude-val">Err</span>(Error::NameConstraintViolation))
+    } <span class="kw">else </span>{
+        NameIteration::KeepGoing
     }
 }
 
-<span class="comment">// TODO: document this.</span>
-<span class="kw">fn</span> <span class="ident">presented_directory_name_matches_constraint</span>(
-    <span class="ident">name</span>: <span class="ident">untrusted::Input</span>,
-    <span class="ident">constraint</span>: <span class="ident">untrusted::Input</span>,
-    <span class="ident">subtrees</span>: <span class="ident">Subtrees</span>,
-) -&gt; <span class="ident">bool</span> {
-    <span class="kw">match</span> <span class="ident">subtrees</span> {
-        <span class="ident">Subtrees::PermittedSubtrees</span> =&gt; <span class="ident">name</span> <span class="op">==</span> <span class="ident">constraint</span>,
-        <span class="ident">Subtrees::ExcludedSubtrees</span> =&gt; <span class="bool-val">true</span>,
+<span class="comment">// TODO: document this.
+</span><span class="kw">fn </span>presented_directory_name_matches_constraint(
+    name: untrusted::Input,
+    constraint: untrusted::Input,
+    subtrees: Subtrees,
+) -&gt; bool {
+    <span class="kw">match </span>subtrees {
+        Subtrees::PermittedSubtrees =&gt; name == constraint,
+        Subtrees::ExcludedSubtrees =&gt; <span class="bool-val">true</span>,
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">enum</span> <span class="ident">NameIteration</span> {
-    <span class="ident">KeepGoing</span>,
-    <span class="ident">Stop</span>(<span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>),
+<span class="attribute">#[derive(Clone, Copy)]
+</span><span class="kw">enum </span>NameIteration {
+    KeepGoing,
+    Stop(<span class="prelude-ty">Result</span>&lt;(), Error&gt;),
 }
 
-<span class="kw">fn</span> <span class="ident">iterate_names</span>(
-    <span class="ident">subject</span>: <span class="ident">untrusted::Input</span>,
-    <span class="ident">subject_alt_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">untrusted::Input</span><span class="op">&gt;</span>,
-    <span class="ident">result_if_never_stopped_early</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>,
-    <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="ident">GeneralName</span>) -&gt; <span class="ident">NameIteration</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="ident">subject_alt_name</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">subject_alt_name</span>) =&gt; {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">subject_alt_name</span> <span class="op">=</span> <span class="ident">untrusted::Reader::new</span>(<span class="ident">subject_alt_name</span>);
-            <span class="comment">// https://bugzilla.mozilla.org/show_bug.cgi?id=1143085: An empty</span>
-            <span class="comment">// subjectAltName is not legal, but some certificates have an empty</span>
-            <span class="comment">// subjectAltName. Since we don&#39;t support CN-IDs, the certificate</span>
-            <span class="comment">// will be rejected either way, but checking `at_end` before</span>
-            <span class="comment">// attempting to parse the first entry allows us to return a better</span>
-            <span class="comment">// error code.</span>
-            <span class="kw">while</span> <span class="op">!</span><span class="ident">subject_alt_name</span>.<span class="ident">at_end</span>() {
-                <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">general_name</span>(<span class="kw-2">&amp;mut</span> <span class="ident">subject_alt_name</span>)<span class="question-mark">?</span>;
-                <span class="kw">match</span> <span class="ident">f</span>(<span class="ident">name</span>) {
-                    <span class="ident">NameIteration::Stop</span>(<span class="ident">result</span>) =&gt; {
-                        <span class="kw">return</span> <span class="ident">result</span>;
+<span class="kw">fn </span>iterate_names(
+    subject: untrusted::Input,
+    subject_alt_name: <span class="prelude-ty">Option</span>&lt;untrusted::Input&gt;,
+    result_if_never_stopped_early: <span class="prelude-ty">Result</span>&lt;(), Error&gt;,
+    f: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Fn(GeneralName) -&gt; NameIteration,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+    <span class="kw">match </span>subject_alt_name {
+        <span class="prelude-val">Some</span>(subject_alt_name) =&gt; {
+            <span class="kw">let </span><span class="kw-2">mut </span>subject_alt_name = untrusted::Reader::new(subject_alt_name);
+            <span class="comment">// https://bugzilla.mozilla.org/show_bug.cgi?id=1143085: An empty
+            // subjectAltName is not legal, but some certificates have an empty
+            // subjectAltName. Since we don&#39;t support CN-IDs, the certificate
+            // will be rejected either way, but checking `at_end` before
+            // attempting to parse the first entry allows us to return a better
+            // error code.
+            </span><span class="kw">while </span>!subject_alt_name.at_end() {
+                <span class="kw">let </span>name = general_name(<span class="kw-2">&amp;mut </span>subject_alt_name)<span class="question-mark">?</span>;
+                <span class="kw">match </span>f(name) {
+                    NameIteration::Stop(result) =&gt; {
+                        <span class="kw">return </span>result;
                     }
-                    <span class="ident">NameIteration::KeepGoing</span> =&gt; (),
+                    NameIteration::KeepGoing =&gt; (),
                 }
             }
         }
-        <span class="prelude-val">None</span> =&gt; (),
+        <span class="prelude-val">None </span>=&gt; (),
     }
 
-    <span class="kw">match</span> <span class="ident">f</span>(<span class="ident">GeneralName::DirectoryName</span>(<span class="ident">subject</span>)) {
-        <span class="ident">NameIteration::Stop</span>(<span class="ident">result</span>) =&gt; <span class="ident">result</span>,
-        <span class="ident">NameIteration::KeepGoing</span> =&gt; <span class="ident">result_if_never_stopped_early</span>,
+    <span class="kw">match </span>f(GeneralName::DirectoryName(subject)) {
+        NameIteration::Stop(result) =&gt; result,
+        NameIteration::KeepGoing =&gt; result_if_never_stopped_early,
     }
 }
 
-<span class="comment">// It is *not* valid to derive `Eq`, `PartialEq, etc. for this type. In</span>
-<span class="comment">// particular, for the types of `GeneralName`s that we don&#39;t understand, we</span>
-<span class="comment">// don&#39;t even store the value. Also, the meaning of a `GeneralName` in a name</span>
-<span class="comment">// constraint is different than the meaning of the identically-represented</span>
-<span class="comment">// `GeneralName` in other contexts.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>)]</span>
-<span class="kw">enum</span> <span class="ident">GeneralName</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">DnsName</span>(<span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
-    <span class="ident">DirectoryName</span>(<span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
-    <span class="ident">IpAddress</span>(<span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>),
+<span class="comment">// It is *not* valid to derive `Eq`, `PartialEq, etc. for this type. In
+// particular, for the types of `GeneralName`s that we don&#39;t understand, we
+// don&#39;t even store the value. Also, the meaning of a `GeneralName` in a name
+// constraint is different than the meaning of the identically-represented
+// `GeneralName` in other contexts.
+</span><span class="attribute">#[derive(Clone, Copy)]
+</span><span class="kw">enum </span>GeneralName&lt;<span class="lifetime">&#39;a</span>&gt; {
+    DnsName(untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;),
+    DirectoryName(untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;),
+    IpAddress(untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;),
 
-    <span class="comment">// The value is the `tag &amp; ~(der::CONTEXT_SPECIFIC | der::CONSTRUCTED)` so</span>
-    <span class="comment">// that the name constraint checking matches tags regardless of whether</span>
-    <span class="comment">// those bits are set.</span>
-    <span class="ident">Unsupported</span>(<span class="ident">u8</span>),
+    <span class="comment">// The value is the `tag &amp; ~(der::CONTEXT_SPECIFIC | der::CONSTRUCTED)` so
+    // that the name constraint checking matches tags regardless of whether
+    // those bits are set.
+    </span>Unsupported(u8),
 }
 
-<span class="kw">fn</span> <span class="ident">general_name</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GeneralName</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">use</span> <span class="ident">ring::io::der</span>::{<span class="ident">CONSTRUCTED</span>, <span class="ident">CONTEXT_SPECIFIC</span>};
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::identity_op</span>)]</span>
-    <span class="kw">const</span> <span class="ident">OTHER_NAME_TAG</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="ident">CONTEXT_SPECIFIC</span> <span class="op">|</span> <span class="ident">CONSTRUCTED</span> <span class="op">|</span> <span class="number">0</span>;
-    <span class="kw">const</span> <span class="ident">RFC822_NAME_TAG</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="ident">CONTEXT_SPECIFIC</span> <span class="op">|</span> <span class="number">1</span>;
-    <span class="kw">const</span> <span class="ident">DNS_NAME_TAG</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="ident">CONTEXT_SPECIFIC</span> <span class="op">|</span> <span class="number">2</span>;
-    <span class="kw">const</span> <span class="ident">X400_ADDRESS_TAG</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="ident">CONTEXT_SPECIFIC</span> <span class="op">|</span> <span class="ident">CONSTRUCTED</span> <span class="op">|</span> <span class="number">3</span>;
-    <span class="kw">const</span> <span class="ident">DIRECTORY_NAME_TAG</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="ident">CONTEXT_SPECIFIC</span> <span class="op">|</span> <span class="ident">CONSTRUCTED</span> <span class="op">|</span> <span class="number">4</span>;
-    <span class="kw">const</span> <span class="ident">EDI_PARTY_NAME_TAG</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="ident">CONTEXT_SPECIFIC</span> <span class="op">|</span> <span class="ident">CONSTRUCTED</span> <span class="op">|</span> <span class="number">5</span>;
-    <span class="kw">const</span> <span class="ident">UNIFORM_RESOURCE_IDENTIFIER_TAG</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="ident">CONTEXT_SPECIFIC</span> <span class="op">|</span> <span class="number">6</span>;
-    <span class="kw">const</span> <span class="ident">IP_ADDRESS_TAG</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="ident">CONTEXT_SPECIFIC</span> <span class="op">|</span> <span class="number">7</span>;
-    <span class="kw">const</span> <span class="ident">REGISTERED_ID_TAG</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="ident">CONTEXT_SPECIFIC</span> <span class="op">|</span> <span class="number">8</span>;
+<span class="kw">fn </span>general_name&lt;<span class="lifetime">&#39;a</span>&gt;(input: <span class="kw-2">&amp;mut </span>untrusted::Reader&lt;<span class="lifetime">&#39;a</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;GeneralName&lt;<span class="lifetime">&#39;a</span>&gt;, Error&gt; {
+    <span class="kw">use </span>ring::io::der::{CONSTRUCTED, CONTEXT_SPECIFIC};
+    <span class="attribute">#[allow(clippy::identity_op)]
+    </span><span class="kw">const </span>OTHER_NAME_TAG: u8 = CONTEXT_SPECIFIC | CONSTRUCTED | <span class="number">0</span>;
+    <span class="kw">const </span>RFC822_NAME_TAG: u8 = CONTEXT_SPECIFIC | <span class="number">1</span>;
+    <span class="kw">const </span>DNS_NAME_TAG: u8 = CONTEXT_SPECIFIC | <span class="number">2</span>;
+    <span class="kw">const </span>X400_ADDRESS_TAG: u8 = CONTEXT_SPECIFIC | CONSTRUCTED | <span class="number">3</span>;
+    <span class="kw">const </span>DIRECTORY_NAME_TAG: u8 = CONTEXT_SPECIFIC | CONSTRUCTED | <span class="number">4</span>;
+    <span class="kw">const </span>EDI_PARTY_NAME_TAG: u8 = CONTEXT_SPECIFIC | CONSTRUCTED | <span class="number">5</span>;
+    <span class="kw">const </span>UNIFORM_RESOURCE_IDENTIFIER_TAG: u8 = CONTEXT_SPECIFIC | <span class="number">6</span>;
+    <span class="kw">const </span>IP_ADDRESS_TAG: u8 = CONTEXT_SPECIFIC | <span class="number">7</span>;
+    <span class="kw">const </span>REGISTERED_ID_TAG: u8 = CONTEXT_SPECIFIC | <span class="number">8</span>;
 
-    <span class="kw">let</span> (<span class="ident">tag</span>, <span class="ident">value</span>) <span class="op">=</span> <span class="ident">der::read_tag_and_get_value</span>(<span class="ident">input</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">tag</span> {
-        <span class="ident">DNS_NAME_TAG</span> =&gt; <span class="ident">GeneralName::DnsName</span>(<span class="ident">value</span>),
-        <span class="ident">DIRECTORY_NAME_TAG</span> =&gt; <span class="ident">GeneralName::DirectoryName</span>(<span class="ident">value</span>),
-        <span class="ident">IP_ADDRESS_TAG</span> =&gt; <span class="ident">GeneralName::IpAddress</span>(<span class="ident">value</span>),
+    <span class="kw">let </span>(tag, value) = der::read_tag_and_get_value(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>name = <span class="kw">match </span>tag {
+        DNS_NAME_TAG =&gt; GeneralName::DnsName(value),
+        DIRECTORY_NAME_TAG =&gt; GeneralName::DirectoryName(value),
+        IP_ADDRESS_TAG =&gt; GeneralName::IpAddress(value),
 
-        <span class="ident">OTHER_NAME_TAG</span>
-        <span class="op">|</span> <span class="ident">RFC822_NAME_TAG</span>
-        <span class="op">|</span> <span class="ident">X400_ADDRESS_TAG</span>
-        <span class="op">|</span> <span class="ident">EDI_PARTY_NAME_TAG</span>
-        <span class="op">|</span> <span class="ident">UNIFORM_RESOURCE_IDENTIFIER_TAG</span>
-        <span class="op">|</span> <span class="ident">REGISTERED_ID_TAG</span> =&gt; <span class="ident">GeneralName::Unsupported</span>(<span class="ident">tag</span> <span class="op">&amp;</span> <span class="op">!</span>(<span class="ident">CONTEXT_SPECIFIC</span> <span class="op">|</span> <span class="ident">CONSTRUCTED</span>)),
+        OTHER_NAME_TAG
+        | RFC822_NAME_TAG
+        | X400_ADDRESS_TAG
+        | EDI_PARTY_NAME_TAG
+        | UNIFORM_RESOURCE_IDENTIFIER_TAG
+        | REGISTERED_ID_TAG =&gt; GeneralName::Unsupported(tag &amp; !(CONTEXT_SPECIFIC | CONSTRUCTED)),
 
-        <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::BadDer</span>),
+        <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Error::BadDer),
     };
-    <span class="prelude-val">Ok</span>(<span class="ident">name</span>)
+    <span class="prelude-val">Ok</span>(name)
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="webpki" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="webpki" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

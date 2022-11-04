@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-epoch-0.9.10/src/default.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>default.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../crossbeam_epoch/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../crossbeam_epoch/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../crossbeam_epoch/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/crossbeam-epoch-0.9.10/src/default.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>default.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../crossbeam_epoch/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../crossbeam_epoch/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../crossbeam_epoch/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -83,90 +83,90 @@
 <span id="83">83</span>
 <span id="84">84</span>
 <span id="85">85</span>
-</pre><pre class="rust"><code><span class="doccomment">//! The default garbage collector.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! For each thread, a participant is lazily initialized on its first use, when the current thread</span>
-<span class="doccomment">//! is registered in the default collector.  If initialized, the thread&#39;s participant will get</span>
-<span class="doccomment">//! destructed on thread exit, which in turn unregisters the thread.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! The default garbage collector.
+//!
+//! For each thread, a participant is lazily initialized on its first use, when the current thread
+//! is registered in the default collector.  If initialized, the thread&#39;s participant will get
+//! destructed on thread exit, which in turn unregisters the thread.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::collector</span>::{<span class="ident">Collector</span>, <span class="ident">LocalHandle</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::guard::Guard</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::primitive::thread_local</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">crossbeam_loom</span>))]</span>
-<span class="kw">use</span> <span class="ident">once_cell::sync::Lazy</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::collector::{Collector, LocalHandle};
+<span class="kw">use </span><span class="kw">crate</span>::guard::Guard;
+<span class="kw">use </span><span class="kw">crate</span>::primitive::thread_local;
+<span class="attribute">#[cfg(not(crossbeam_loom))]
+</span><span class="kw">use </span>once_cell::sync::Lazy;
 
-<span class="doccomment">/// The global data for the default garbage collector.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">crossbeam_loom</span>))]</span>
-<span class="kw">static</span> <span class="ident">COLLECTOR</span>: <span class="ident">Lazy</span><span class="op">&lt;</span><span class="ident">Collector</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Lazy::new</span>(<span class="ident">Collector::new</span>);
-<span class="comment">// FIXME: loom does not currently provide the equivalent of Lazy:</span>
-<span class="comment">// https://github.com/tokio-rs/loom/issues/263</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">crossbeam_loom</span>)]</span>
-<span class="macro">loom::lazy_static!</span> {
-    <span class="doccomment">/// The global data for the default garbage collector.</span>
-    <span class="kw">static</span> <span class="kw-2">ref</span> <span class="ident">COLLECTOR</span>: <span class="ident">Collector</span> <span class="op">=</span> <span class="ident">Collector::new</span>();
+<span class="doccomment">/// The global data for the default garbage collector.
+</span><span class="attribute">#[cfg(not(crossbeam_loom))]
+</span><span class="kw">static </span>COLLECTOR: Lazy&lt;Collector&gt; = Lazy::new(Collector::new);
+<span class="comment">// FIXME: loom does not currently provide the equivalent of Lazy:
+// https://github.com/tokio-rs/loom/issues/263
+</span><span class="attribute">#[cfg(crossbeam_loom)]
+</span><span class="macro">loom::lazy_static! </span>{
+    <span class="doccomment">/// The global data for the default garbage collector.
+    </span><span class="kw">static </span><span class="kw-2">ref </span>COLLECTOR: Collector = Collector::new();
 }
 
-<span class="macro">thread_local!</span> {
-    <span class="doccomment">/// The per-thread participant for the default garbage collector.</span>
-    <span class="kw">static</span> <span class="ident">HANDLE</span>: <span class="ident">LocalHandle</span> <span class="op">=</span> <span class="ident">COLLECTOR</span>.<span class="ident">register</span>();
+<span class="macro">thread_local! </span>{
+    <span class="doccomment">/// The per-thread participant for the default garbage collector.
+    </span><span class="kw">static </span>HANDLE: LocalHandle = COLLECTOR.register();
 }
 
-<span class="doccomment">/// Pins the current thread.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pin</span>() -&gt; <span class="ident">Guard</span> {
-    <span class="ident">with_handle</span>(<span class="op">|</span><span class="ident">handle</span><span class="op">|</span> <span class="ident">handle</span>.<span class="ident">pin</span>())
+<span class="doccomment">/// Pins the current thread.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>pin() -&gt; Guard {
+    with_handle(|handle| handle.pin())
 }
 
-<span class="doccomment">/// Returns `true` if the current thread is pinned.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_pinned</span>() -&gt; <span class="ident">bool</span> {
-    <span class="ident">with_handle</span>(<span class="op">|</span><span class="ident">handle</span><span class="op">|</span> <span class="ident">handle</span>.<span class="ident">is_pinned</span>())
+<span class="doccomment">/// Returns `true` if the current thread is pinned.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>is_pinned() -&gt; bool {
+    with_handle(|handle| handle.is_pinned())
 }
 
-<span class="doccomment">/// Returns the default global collector.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_collector</span>() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">Collector</span> {
-    <span class="kw-2">&amp;</span><span class="ident">COLLECTOR</span>
+<span class="doccomment">/// Returns the default global collector.
+</span><span class="kw">pub fn </span>default_collector() -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>Collector {
+    <span class="kw-2">&amp;</span>COLLECTOR
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">with_handle</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">f</span>: <span class="ident">F</span>) -&gt; <span class="ident">R</span>
-<span class="kw">where</span>
-    <span class="ident">F</span>: <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">LocalHandle</span>) -&gt; <span class="ident">R</span>,
+<span class="attribute">#[inline]
+</span><span class="kw">fn </span>with_handle&lt;F, R&gt;(<span class="kw-2">mut </span>f: F) -&gt; R
+<span class="kw">where
+    </span>F: FnMut(<span class="kw-2">&amp;</span>LocalHandle) -&gt; R,
 {
-    <span class="ident">HANDLE</span>
-        .<span class="ident">try_with</span>(<span class="op">|</span><span class="ident">h</span><span class="op">|</span> <span class="ident">f</span>(<span class="ident">h</span>))
-        .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="ident">COLLECTOR</span>.<span class="ident">register</span>()))
+    HANDLE
+        .try_with(|h| f(h))
+        .unwrap_or_else(|<span class="kw">_</span>| f(<span class="kw-2">&amp;</span>COLLECTOR.register()))
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">not</span>(<span class="ident">crossbeam_loom</span>)))]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident">crossbeam_utils::thread</span>;
+<span class="attribute">#[cfg(all(test, not(crossbeam_loom)))]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span>crossbeam_utils::thread;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">pin_while_exiting</span>() {
-        <span class="kw">struct</span> <span class="ident">Foo</span>;
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>pin_while_exiting() {
+        <span class="kw">struct </span>Foo;
 
-        <span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Foo</span> {
-            <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-                <span class="comment">// Pin after `HANDLE` has been dropped. This must not panic.</span>
-                <span class="ident"><span class="kw">super</span>::pin</span>();
+        <span class="kw">impl </span>Drop <span class="kw">for </span>Foo {
+            <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+                <span class="comment">// Pin after `HANDLE` has been dropped. This must not panic.
+                </span><span class="kw">super</span>::pin();
             }
         }
 
-        <span class="macro">thread_local!</span> {
-            <span class="kw">static</span> <span class="ident">FOO</span>: <span class="ident">Foo</span> <span class="op">=</span> <span class="ident">Foo</span>;
+        <span class="macro">thread_local! </span>{
+            <span class="kw">static </span>FOO: Foo = Foo;
         }
 
-        <span class="ident">thread::scope</span>(<span class="op">|</span><span class="ident">scope</span><span class="op">|</span> {
-            <span class="ident">scope</span>.<span class="ident">spawn</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                <span class="comment">// Initialize `FOO` and then `HANDLE`.</span>
-                <span class="ident">FOO</span>.<span class="ident">with</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ());
-                <span class="ident"><span class="kw">super</span>::pin</span>();
-                <span class="comment">// At thread exit, `HANDLE` gets dropped first and `FOO` second.</span>
-            });
+        thread::scope(|scope| {
+            scope.spawn(|<span class="kw">_</span>| {
+                <span class="comment">// Initialize `FOO` and then `HANDLE`.
+                </span>FOO.with(|<span class="kw">_</span>| ());
+                <span class="kw">super</span>::pin();
+                <span class="comment">// At thread exit, `HANDLE` gets dropped first and `FOO` second.
+            </span>});
         })
-        .<span class="ident">unwrap</span>();
+        .unwrap();
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="crossbeam_epoch" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="crossbeam_epoch" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

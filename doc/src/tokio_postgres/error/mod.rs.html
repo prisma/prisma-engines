@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/rust-postgres-dc0fca9be721a90f/064a6a5/tokio-postgres/src/error/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tokio_postgres/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/rust-postgres-dc0fca9be721a90f/064a6a5/tokio-postgres/src/error/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tokio_postgres/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tokio_postgres/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -508,515 +508,515 @@
 <span id="508">508</span>
 <span id="509">509</span>
 <span id="510">510</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Errors.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Errors.
 
-<span class="kw">use</span> <span class="ident">fallible_iterator::FallibleIterator</span>;
-<span class="kw">use</span> <span class="ident">postgres_protocol::message::backend</span>::{<span class="ident">ErrorFields</span>, <span class="ident">ErrorResponseBody</span>};
-<span class="kw">use</span> <span class="ident">std::error</span>::{<span class="self">self</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">_Error</span>};
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::io</span>;
+</span><span class="kw">use </span>fallible_iterator::FallibleIterator;
+<span class="kw">use </span>postgres_protocol::message::backend::{ErrorFields, ErrorResponseBody};
+<span class="kw">use </span>std::error::{<span class="self">self</span>, Error <span class="kw">as </span>_Error};
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::io;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::sqlstate</span>::<span class="kw-2">*</span>;
+<span class="kw">pub use </span><span class="self">self</span>::sqlstate::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::unreadable_literal</span>)]</span>
-<span class="kw">mod</span> <span class="ident">sqlstate</span>;
+<span class="attribute">#[allow(clippy::unreadable_literal)]
+</span><span class="kw">mod </span>sqlstate;
 
-<span class="doccomment">/// The severity of a Postgres error or notice.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Severity</span> {
-    <span class="doccomment">/// PANIC</span>
-    <span class="ident">Panic</span>,
-    <span class="doccomment">/// FATAL</span>
-    <span class="ident">Fatal</span>,
-    <span class="doccomment">/// ERROR</span>
-    <span class="ident">Error</span>,
-    <span class="doccomment">/// WARNING</span>
-    <span class="ident">Warning</span>,
-    <span class="doccomment">/// NOTICE</span>
-    <span class="ident">Notice</span>,
-    <span class="doccomment">/// DEBUG</span>
-    <span class="ident">Debug</span>,
-    <span class="doccomment">/// INFO</span>
-    <span class="ident">Info</span>,
-    <span class="doccomment">/// LOG</span>
-    <span class="ident">Log</span>,
+<span class="doccomment">/// The severity of a Postgres error or notice.
+</span><span class="attribute">#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+</span><span class="kw">pub enum </span>Severity {
+    <span class="doccomment">/// PANIC
+    </span>Panic,
+    <span class="doccomment">/// FATAL
+    </span>Fatal,
+    <span class="doccomment">/// ERROR
+    </span>Error,
+    <span class="doccomment">/// WARNING
+    </span>Warning,
+    <span class="doccomment">/// NOTICE
+    </span>Notice,
+    <span class="doccomment">/// DEBUG
+    </span>Debug,
+    <span class="doccomment">/// INFO
+    </span>Info,
+    <span class="doccomment">/// LOG
+    </span>Log,
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Severity</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Severity::Panic</span> =&gt; <span class="string">&quot;PANIC&quot;</span>,
-            <span class="ident">Severity::Fatal</span> =&gt; <span class="string">&quot;FATAL&quot;</span>,
-            <span class="ident">Severity::Error</span> =&gt; <span class="string">&quot;ERROR&quot;</span>,
-            <span class="ident">Severity::Warning</span> =&gt; <span class="string">&quot;WARNING&quot;</span>,
-            <span class="ident">Severity::Notice</span> =&gt; <span class="string">&quot;NOTICE&quot;</span>,
-            <span class="ident">Severity::Debug</span> =&gt; <span class="string">&quot;DEBUG&quot;</span>,
-            <span class="ident">Severity::Info</span> =&gt; <span class="string">&quot;INFO&quot;</span>,
-            <span class="ident">Severity::Log</span> =&gt; <span class="string">&quot;LOG&quot;</span>,
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Severity {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">let </span>s = <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Severity::Panic =&gt; <span class="string">&quot;PANIC&quot;</span>,
+            Severity::Fatal =&gt; <span class="string">&quot;FATAL&quot;</span>,
+            Severity::Error =&gt; <span class="string">&quot;ERROR&quot;</span>,
+            Severity::Warning =&gt; <span class="string">&quot;WARNING&quot;</span>,
+            Severity::Notice =&gt; <span class="string">&quot;NOTICE&quot;</span>,
+            Severity::Debug =&gt; <span class="string">&quot;DEBUG&quot;</span>,
+            Severity::Info =&gt; <span class="string">&quot;INFO&quot;</span>,
+            Severity::Log =&gt; <span class="string">&quot;LOG&quot;</span>,
         };
-        <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="ident">s</span>)
+        fmt.write_str(s)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Severity</span> {
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Severity</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">s</span> {
-            <span class="string">&quot;PANIC&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Severity::Panic</span>),
-            <span class="string">&quot;FATAL&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Severity::Fatal</span>),
-            <span class="string">&quot;ERROR&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Severity::Error</span>),
-            <span class="string">&quot;WARNING&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Severity::Warning</span>),
-            <span class="string">&quot;NOTICE&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Severity::Notice</span>),
-            <span class="string">&quot;DEBUG&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Severity::Debug</span>),
-            <span class="string">&quot;INFO&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Severity::Info</span>),
-            <span class="string">&quot;LOG&quot;</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Severity::Log</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+<span class="kw">impl </span>Severity {
+    <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;Severity&gt; {
+        <span class="kw">match </span>s {
+            <span class="string">&quot;PANIC&quot; </span>=&gt; <span class="prelude-val">Some</span>(Severity::Panic),
+            <span class="string">&quot;FATAL&quot; </span>=&gt; <span class="prelude-val">Some</span>(Severity::Fatal),
+            <span class="string">&quot;ERROR&quot; </span>=&gt; <span class="prelude-val">Some</span>(Severity::Error),
+            <span class="string">&quot;WARNING&quot; </span>=&gt; <span class="prelude-val">Some</span>(Severity::Warning),
+            <span class="string">&quot;NOTICE&quot; </span>=&gt; <span class="prelude-val">Some</span>(Severity::Notice),
+            <span class="string">&quot;DEBUG&quot; </span>=&gt; <span class="prelude-val">Some</span>(Severity::Debug),
+            <span class="string">&quot;INFO&quot; </span>=&gt; <span class="prelude-val">Some</span>(Severity::Info),
+            <span class="string">&quot;LOG&quot; </span>=&gt; <span class="prelude-val">Some</span>(Severity::Log),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="doccomment">/// A Postgres error or notice.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DbError</span> {
-    <span class="ident">severity</span>: <span class="ident">String</span>,
-    <span class="ident">parsed_severity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Severity</span><span class="op">&gt;</span>,
-    <span class="ident">code</span>: <span class="ident">SqlState</span>,
-    <span class="ident">message</span>: <span class="ident">String</span>,
-    <span class="ident">detail</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">hint</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">position</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ErrorPosition</span><span class="op">&gt;</span>,
-    <span class="ident">where_</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">schema</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">table</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">column</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">datatype</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">constraint</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">file</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">line</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>,
-    <span class="ident">routine</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A Postgres error or notice.
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq, Eq)]
+</span><span class="kw">pub struct </span>DbError {
+    severity: String,
+    parsed_severity: <span class="prelude-ty">Option</span>&lt;Severity&gt;,
+    code: SqlState,
+    message: String,
+    detail: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    hint: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    position: <span class="prelude-ty">Option</span>&lt;ErrorPosition&gt;,
+    where_: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    schema: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    table: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    column: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    datatype: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    constraint: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    file: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    line: <span class="prelude-ty">Option</span>&lt;u32&gt;,
+    routine: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">DbError</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">fields</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ErrorFields</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">io::Result</span><span class="op">&lt;</span><span class="ident">DbError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">severity</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">parsed_severity</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">code</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">message</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">detail</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hint</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">normal_position</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">internal_position</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">internal_query</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">where_</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">schema</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">table</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">column</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">datatype</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">constraint</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">file</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">line</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">routine</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+<span class="kw">impl </span>DbError {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse(fields: <span class="kw-2">&amp;mut </span>ErrorFields&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; io::Result&lt;DbError&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>severity = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>parsed_severity = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>code = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>message = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>detail = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>hint = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>normal_position = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>internal_position = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>internal_query = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>where_ = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>schema = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>table = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>column = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>datatype = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>constraint = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>file = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>line = <span class="prelude-val">None</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>routine = <span class="prelude-val">None</span>;
 
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>) <span class="op">=</span> <span class="ident">fields</span>.<span class="ident">next</span>()<span class="question-mark">?</span> {
-            <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">type_</span>() {
-                <span class="string">b&#39;S&#39;</span> =&gt; <span class="ident">severity</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
-                <span class="string">b&#39;C&#39;</span> =&gt; <span class="ident">code</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">SqlState::from_code</span>(<span class="ident">field</span>.<span class="ident">value</span>())),
-                <span class="string">b&#39;M&#39;</span> =&gt; <span class="ident">message</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
-                <span class="string">b&#39;D&#39;</span> =&gt; <span class="ident">detail</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
-                <span class="string">b&#39;H&#39;</span> =&gt; <span class="ident">hint</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
-                <span class="string">b&#39;P&#39;</span> =&gt; {
-                    <span class="ident">normal_position</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                        <span class="ident">io::Error::new</span>(
-                            <span class="ident">io::ErrorKind::InvalidInput</span>,
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(field) = fields.next()<span class="question-mark">? </span>{
+            <span class="kw">match </span>field.type_() {
+                <span class="string">b&#39;S&#39; </span>=&gt; severity = <span class="prelude-val">Some</span>(field.value().to_owned()),
+                <span class="string">b&#39;C&#39; </span>=&gt; code = <span class="prelude-val">Some</span>(SqlState::from_code(field.value())),
+                <span class="string">b&#39;M&#39; </span>=&gt; message = <span class="prelude-val">Some</span>(field.value().to_owned()),
+                <span class="string">b&#39;D&#39; </span>=&gt; detail = <span class="prelude-val">Some</span>(field.value().to_owned()),
+                <span class="string">b&#39;H&#39; </span>=&gt; hint = <span class="prelude-val">Some</span>(field.value().to_owned()),
+                <span class="string">b&#39;P&#39; </span>=&gt; {
+                    normal_position = <span class="prelude-val">Some</span>(field.value().parse::&lt;u32&gt;().map_err(|<span class="kw">_</span>| {
+                        io::Error::new(
+                            io::ErrorKind::InvalidInput,
                             <span class="string">&quot;`P` field did not contain an integer&quot;</span>,
                         )
                     })<span class="question-mark">?</span>);
                 }
-                <span class="string">b&#39;p&#39;</span> =&gt; {
-                    <span class="ident">internal_position</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                        <span class="ident">io::Error::new</span>(
-                            <span class="ident">io::ErrorKind::InvalidInput</span>,
+                <span class="string">b&#39;p&#39; </span>=&gt; {
+                    internal_position = <span class="prelude-val">Some</span>(field.value().parse::&lt;u32&gt;().map_err(|<span class="kw">_</span>| {
+                        io::Error::new(
+                            io::ErrorKind::InvalidInput,
                             <span class="string">&quot;`p` field did not contain an integer&quot;</span>,
                         )
                     })<span class="question-mark">?</span>);
                 }
-                <span class="string">b&#39;q&#39;</span> =&gt; <span class="ident">internal_query</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
-                <span class="string">b&#39;W&#39;</span> =&gt; <span class="ident">where_</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
-                <span class="string">b&#39;s&#39;</span> =&gt; <span class="ident">schema</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
-                <span class="string">b&#39;t&#39;</span> =&gt; <span class="ident">table</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
-                <span class="string">b&#39;c&#39;</span> =&gt; <span class="ident">column</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
-                <span class="string">b&#39;d&#39;</span> =&gt; <span class="ident">datatype</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
-                <span class="string">b&#39;n&#39;</span> =&gt; <span class="ident">constraint</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
-                <span class="string">b&#39;F&#39;</span> =&gt; <span class="ident">file</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
-                <span class="string">b&#39;L&#39;</span> =&gt; {
-                    <span class="ident">line</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> {
-                        <span class="ident">io::Error::new</span>(
-                            <span class="ident">io::ErrorKind::InvalidInput</span>,
+                <span class="string">b&#39;q&#39; </span>=&gt; internal_query = <span class="prelude-val">Some</span>(field.value().to_owned()),
+                <span class="string">b&#39;W&#39; </span>=&gt; where_ = <span class="prelude-val">Some</span>(field.value().to_owned()),
+                <span class="string">b&#39;s&#39; </span>=&gt; schema = <span class="prelude-val">Some</span>(field.value().to_owned()),
+                <span class="string">b&#39;t&#39; </span>=&gt; table = <span class="prelude-val">Some</span>(field.value().to_owned()),
+                <span class="string">b&#39;c&#39; </span>=&gt; column = <span class="prelude-val">Some</span>(field.value().to_owned()),
+                <span class="string">b&#39;d&#39; </span>=&gt; datatype = <span class="prelude-val">Some</span>(field.value().to_owned()),
+                <span class="string">b&#39;n&#39; </span>=&gt; constraint = <span class="prelude-val">Some</span>(field.value().to_owned()),
+                <span class="string">b&#39;F&#39; </span>=&gt; file = <span class="prelude-val">Some</span>(field.value().to_owned()),
+                <span class="string">b&#39;L&#39; </span>=&gt; {
+                    line = <span class="prelude-val">Some</span>(field.value().parse::&lt;u32&gt;().map_err(|<span class="kw">_</span>| {
+                        io::Error::new(
+                            io::ErrorKind::InvalidInput,
                             <span class="string">&quot;`L` field did not contain an integer&quot;</span>,
                         )
                     })<span class="question-mark">?</span>);
                 }
-                <span class="string">b&#39;R&#39;</span> =&gt; <span class="ident">routine</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>.<span class="ident">value</span>().<span class="ident">to_owned</span>()),
-                <span class="string">b&#39;V&#39;</span> =&gt; {
-                    <span class="ident">parsed_severity</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Severity::from_str</span>(<span class="ident">field</span>.<span class="ident">value</span>()).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                        <span class="ident">io::Error::new</span>(
-                            <span class="ident">io::ErrorKind::InvalidInput</span>,
+                <span class="string">b&#39;R&#39; </span>=&gt; routine = <span class="prelude-val">Some</span>(field.value().to_owned()),
+                <span class="string">b&#39;V&#39; </span>=&gt; {
+                    parsed_severity = <span class="prelude-val">Some</span>(Severity::from_str(field.value()).ok_or_else(|| {
+                        io::Error::new(
+                            io::ErrorKind::InvalidInput,
                             <span class="string">&quot;`V` field contained an invalid value&quot;</span>,
                         )
                     })<span class="question-mark">?</span>);
                 }
-                <span class="kw">_</span> =&gt; {}
+                <span class="kw">_ </span>=&gt; {}
             }
         }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">DbError</span> {
-            <span class="ident">severity</span>: <span class="ident">severity</span>
-                .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::InvalidInput</span>, <span class="string">&quot;`S` field missing&quot;</span>))<span class="question-mark">?</span>,
-            <span class="ident">parsed_severity</span>,
-            <span class="ident">code</span>: <span class="ident">code</span>
-                .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::InvalidInput</span>, <span class="string">&quot;`C` field missing&quot;</span>))<span class="question-mark">?</span>,
-            <span class="ident">message</span>: <span class="ident">message</span>
-                .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::InvalidInput</span>, <span class="string">&quot;`M` field missing&quot;</span>))<span class="question-mark">?</span>,
-            <span class="ident">detail</span>,
-            <span class="ident">hint</span>,
-            <span class="ident">position</span>: <span class="kw">match</span> <span class="ident">normal_position</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">position</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">ErrorPosition::Original</span>(<span class="ident">position</span>)),
-                <span class="prelude-val">None</span> =&gt; <span class="kw">match</span> <span class="ident">internal_position</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">position</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">ErrorPosition::Internal</span> {
-                        <span class="ident">position</span>,
-                        <span class="ident">query</span>: <span class="ident">internal_query</span>.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                            <span class="ident">io::Error::new</span>(
-                                <span class="ident">io::ErrorKind::InvalidInput</span>,
+        <span class="prelude-val">Ok</span>(DbError {
+            severity: severity
+                .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidInput, <span class="string">&quot;`S` field missing&quot;</span>))<span class="question-mark">?</span>,
+            parsed_severity,
+            code: code
+                .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidInput, <span class="string">&quot;`C` field missing&quot;</span>))<span class="question-mark">?</span>,
+            message: message
+                .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidInput, <span class="string">&quot;`M` field missing&quot;</span>))<span class="question-mark">?</span>,
+            detail,
+            hint,
+            position: <span class="kw">match </span>normal_position {
+                <span class="prelude-val">Some</span>(position) =&gt; <span class="prelude-val">Some</span>(ErrorPosition::Original(position)),
+                <span class="prelude-val">None </span>=&gt; <span class="kw">match </span>internal_position {
+                    <span class="prelude-val">Some</span>(position) =&gt; <span class="prelude-val">Some</span>(ErrorPosition::Internal {
+                        position,
+                        query: internal_query.ok_or_else(|| {
+                            io::Error::new(
+                                io::ErrorKind::InvalidInput,
                                 <span class="string">&quot;`q` field missing but `p` field present&quot;</span>,
                             )
                         })<span class="question-mark">?</span>,
                     }),
-                    <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+                    <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
                 },
             },
-            <span class="ident">where_</span>,
-            <span class="ident">schema</span>,
-            <span class="ident">table</span>,
-            <span class="ident">column</span>,
-            <span class="ident">datatype</span>,
-            <span class="ident">constraint</span>,
-            <span class="ident">file</span>,
-            <span class="ident">line</span>,
-            <span class="ident">routine</span>,
+            where_,
+            schema,
+            table,
+            column,
+            datatype,
+            constraint,
+            file,
+            line,
+            routine,
         })
     }
 
-    <span class="doccomment">/// The field contents are ERROR, FATAL, or PANIC (in an error message),</span>
-    <span class="doccomment">/// or WARNING, NOTICE, DEBUG, INFO, or LOG (in a notice message), or a</span>
-    <span class="doccomment">/// localized translation of one of these.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">severity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">severity</span>
+    <span class="doccomment">/// The field contents are ERROR, FATAL, or PANIC (in an error message),
+    /// or WARNING, NOTICE, DEBUG, INFO, or LOG (in a notice message), or a
+    /// localized translation of one of these.
+    </span><span class="kw">pub fn </span>severity(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.severity
     }
 
-    <span class="doccomment">/// A parsed, nonlocalized version of `severity`. (PostgreSQL 9.6+)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parsed_severity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Severity</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">parsed_severity</span>
+    <span class="doccomment">/// A parsed, nonlocalized version of `severity`. (PostgreSQL 9.6+)
+    </span><span class="kw">pub fn </span>parsed_severity(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Severity&gt; {
+        <span class="self">self</span>.parsed_severity
     }
 
-    <span class="doccomment">/// The SQLSTATE code for the error.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">SqlState</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">code</span>
+    <span class="doccomment">/// The SQLSTATE code for the error.
+    </span><span class="kw">pub fn </span>code(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>SqlState {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.code
     }
 
-    <span class="doccomment">/// The primary human-readable error message.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This should be accurate but terse (typically one line).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">message</span>
+    <span class="doccomment">/// The primary human-readable error message.
+    ///
+    /// This should be accurate but terse (typically one line).
+    </span><span class="kw">pub fn </span>message(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.message
     }
 
-    <span class="doccomment">/// An optional secondary error message carrying more detail about the</span>
-    <span class="doccomment">/// problem.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Might run to multiple lines.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">detail</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">detail</span>.<span class="ident">as_deref</span>()
+    <span class="doccomment">/// An optional secondary error message carrying more detail about the
+    /// problem.
+    ///
+    /// Might run to multiple lines.
+    </span><span class="kw">pub fn </span>detail(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.detail.as_deref()
     }
 
-    <span class="doccomment">/// An optional suggestion what to do about the problem.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is intended to differ from `detail` in that it offers advice</span>
-    <span class="doccomment">/// (potentially inappropriate) rather than hard facts. Might run to</span>
-    <span class="doccomment">/// multiple lines.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">hint</span>.<span class="ident">as_deref</span>()
+    <span class="doccomment">/// An optional suggestion what to do about the problem.
+    ///
+    /// This is intended to differ from `detail` in that it offers advice
+    /// (potentially inappropriate) rather than hard facts. Might run to
+    /// multiple lines.
+    </span><span class="kw">pub fn </span>hint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.hint.as_deref()
     }
 
-    <span class="doccomment">/// An optional error cursor position into either the original query string</span>
-    <span class="doccomment">/// or an internally generated query.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">position</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ErrorPosition</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">position</span>.<span class="ident">as_ref</span>()
+    <span class="doccomment">/// An optional error cursor position into either the original query string
+    /// or an internally generated query.
+    </span><span class="kw">pub fn </span>position(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ErrorPosition&gt; {
+        <span class="self">self</span>.position.as_ref()
     }
 
-    <span class="doccomment">/// An indication of the context in which the error occurred.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Presently this includes a call stack traceback of active procedural</span>
-    <span class="doccomment">/// language functions and internally-generated queries. The trace is one</span>
-    <span class="doccomment">/// entry per line, most recent first.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">where_</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">where_</span>.<span class="ident">as_deref</span>()
+    <span class="doccomment">/// An indication of the context in which the error occurred.
+    ///
+    /// Presently this includes a call stack traceback of active procedural
+    /// language functions and internally-generated queries. The trace is one
+    /// entry per line, most recent first.
+    </span><span class="kw">pub fn </span>where_(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.where_.as_deref()
     }
 
-    <span class="doccomment">/// If the error was associated with a specific database object, the name</span>
-    <span class="doccomment">/// of the schema containing that object, if any. (PostgreSQL 9.3+)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">schema</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">schema</span>.<span class="ident">as_deref</span>()
+    <span class="doccomment">/// If the error was associated with a specific database object, the name
+    /// of the schema containing that object, if any. (PostgreSQL 9.3+)
+    </span><span class="kw">pub fn </span>schema(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.schema.as_deref()
     }
 
-    <span class="doccomment">/// If the error was associated with a specific table, the name of the</span>
-    <span class="doccomment">/// table. (Refer to the schema name field for the name of the table&#39;s</span>
-    <span class="doccomment">/// schema.) (PostgreSQL 9.3+)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">table</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">table</span>.<span class="ident">as_deref</span>()
+    <span class="doccomment">/// If the error was associated with a specific table, the name of the
+    /// table. (Refer to the schema name field for the name of the table&#39;s
+    /// schema.) (PostgreSQL 9.3+)
+    </span><span class="kw">pub fn </span>table(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.table.as_deref()
     }
 
-    <span class="doccomment">/// If the error was associated with a specific table column, the name of</span>
-    <span class="doccomment">/// the column.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// (Refer to the schema and table name fields to identify the table.)</span>
-    <span class="doccomment">/// (PostgreSQL 9.3+)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">column</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">column</span>.<span class="ident">as_deref</span>()
+    <span class="doccomment">/// If the error was associated with a specific table column, the name of
+    /// the column.
+    ///
+    /// (Refer to the schema and table name fields to identify the table.)
+    /// (PostgreSQL 9.3+)
+    </span><span class="kw">pub fn </span>column(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.column.as_deref()
     }
 
-    <span class="doccomment">/// If the error was associated with a specific data type, the name of the</span>
-    <span class="doccomment">/// data type. (Refer to the schema name field for the name of the data</span>
-    <span class="doccomment">/// type&#39;s schema.) (PostgreSQL 9.3+)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">datatype</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">datatype</span>.<span class="ident">as_deref</span>()
+    <span class="doccomment">/// If the error was associated with a specific data type, the name of the
+    /// data type. (Refer to the schema name field for the name of the data
+    /// type&#39;s schema.) (PostgreSQL 9.3+)
+    </span><span class="kw">pub fn </span>datatype(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.datatype.as_deref()
     }
 
-    <span class="doccomment">/// If the error was associated with a specific constraint, the name of the</span>
-    <span class="doccomment">/// constraint.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Refer to fields listed above for the associated table or domain.</span>
-    <span class="doccomment">/// (For this purpose, indexes are treated as constraints, even if they</span>
-    <span class="doccomment">/// weren&#39;t created with constraint syntax.) (PostgreSQL 9.3+)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">constraint</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">constraint</span>.<span class="ident">as_deref</span>()
+    <span class="doccomment">/// If the error was associated with a specific constraint, the name of the
+    /// constraint.
+    ///
+    /// Refer to fields listed above for the associated table or domain.
+    /// (For this purpose, indexes are treated as constraints, even if they
+    /// weren&#39;t created with constraint syntax.) (PostgreSQL 9.3+)
+    </span><span class="kw">pub fn </span>constraint(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.constraint.as_deref()
     }
 
-    <span class="doccomment">/// The file name of the source-code location where the error was reported.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">file</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">file</span>.<span class="ident">as_deref</span>()
+    <span class="doccomment">/// The file name of the source-code location where the error was reported.
+    </span><span class="kw">pub fn </span>file(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.file.as_deref()
     }
 
-    <span class="doccomment">/// The line number of the source-code location where the error was</span>
-    <span class="doccomment">/// reported.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">line</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">line</span>
+    <span class="doccomment">/// The line number of the source-code location where the error was
+    /// reported.
+    </span><span class="kw">pub fn </span>line(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;u32&gt; {
+        <span class="self">self</span>.line
     }
 
-    <span class="doccomment">/// The name of the source-code routine reporting the error.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">routine</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">routine</span>.<span class="ident">as_deref</span>()
+    <span class="doccomment">/// The name of the source-code routine reporting the error.
+    </span><span class="kw">pub fn </span>routine(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+        <span class="self">self</span>.routine.as_deref()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">DbError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;{}: {}&quot;</span>, <span class="self">self</span>.<span class="ident">severity</span>, <span class="self">self</span>.<span class="ident">message</span>)<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">detail</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">detail</span> {
-            <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;\nDETAIL: {}&quot;</span>, <span class="ident">detail</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>DbError {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">write!</span>(fmt, <span class="string">&quot;{}: {}&quot;</span>, <span class="self">self</span>.severity, <span class="self">self</span>.message)<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(detail) = <span class="kw-2">&amp;</span><span class="self">self</span>.detail {
+            <span class="macro">write!</span>(fmt, <span class="string">&quot;\nDETAIL: {}&quot;</span>, detail)<span class="question-mark">?</span>;
         }
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">hint</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">hint</span> {
-            <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;\nHINT: {}&quot;</span>, <span class="ident">hint</span>)<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(hint) = <span class="kw-2">&amp;</span><span class="self">self</span>.hint {
+            <span class="macro">write!</span>(fmt, <span class="string">&quot;\nHINT: {}&quot;</span>, hint)<span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">error::Error</span> <span class="kw">for</span> <span class="ident">DbError</span> {}
+<span class="kw">impl </span>error::Error <span class="kw">for </span>DbError {}
 
-<span class="doccomment">/// Represents the position of an error in a query.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ErrorPosition</span> {
-    <span class="doccomment">/// A position in the original query.</span>
-    <span class="ident">Original</span>(<span class="ident">u32</span>),
-    <span class="doccomment">/// A position in an internally generated query.</span>
-    <span class="ident">Internal</span> {
-        <span class="doccomment">/// The byte position.</span>
-        <span class="ident">position</span>: <span class="ident">u32</span>,
-        <span class="doccomment">/// A query generated by the Postgres server.</span>
-        <span class="ident">query</span>: <span class="ident">String</span>,
+<span class="doccomment">/// Represents the position of an error in a query.
+</span><span class="attribute">#[derive(Clone, PartialEq, Eq, Debug)]
+</span><span class="kw">pub enum </span>ErrorPosition {
+    <span class="doccomment">/// A position in the original query.
+    </span>Original(u32),
+    <span class="doccomment">/// A position in an internally generated query.
+    </span>Internal {
+        <span class="doccomment">/// The byte position.
+        </span>position: u32,
+        <span class="doccomment">/// A query generated by the Postgres server.
+        </span>query: String,
     },
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">enum</span> <span class="ident">Kind</span> {
-    <span class="ident">Io</span>,
-    <span class="ident">UnexpectedMessage</span>,
-    <span class="ident">Tls</span>,
-    <span class="ident">ToSql</span>(<span class="ident">usize</span>),
-    <span class="ident">FromSql</span>(<span class="ident">usize</span>),
-    <span class="ident">Column</span>(<span class="ident">String</span>),
-    <span class="ident">Closed</span>,
-    <span class="ident">Db</span>,
-    <span class="ident">Parse</span>,
-    <span class="ident">Encode</span>,
-    <span class="ident">Authentication</span>,
-    <span class="ident">ConfigParse</span>,
-    <span class="ident">Config</span>,
-    <span class="ident">RowCount</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-    <span class="ident">Connect</span>,
-    <span class="ident">Timeout</span>,
+<span class="attribute">#[derive(Debug, PartialEq)]
+</span><span class="kw">enum </span>Kind {
+    Io,
+    UnexpectedMessage,
+    Tls,
+    ToSql(usize),
+    FromSql(usize),
+    Column(String),
+    Closed,
+    Db,
+    Parse,
+    Encode,
+    Authentication,
+    ConfigParse,
+    Config,
+    RowCount,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+    </span>Connect,
+    Timeout,
 }
 
-<span class="kw">struct</span> <span class="ident">ErrorInner</span> {
-    <span class="ident">kind</span>: <span class="ident">Kind</span>,
-    <span class="ident">cause</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="kw">struct </span>ErrorInner {
+    kind: Kind,
+    cause: <span class="prelude-ty">Option</span>&lt;Box&lt;<span class="kw">dyn </span>error::Error + Sync + Send&gt;&gt;,
 }
 
-<span class="doccomment">/// An error communicating with the Postgres server.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Error</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ErrorInner</span><span class="op">&gt;</span>);
+<span class="doccomment">/// An error communicating with the Postgres server.
+</span><span class="kw">pub struct </span>Error(Box&lt;ErrorInner&gt;);
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">fmt</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Error&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;kind&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">kind</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;cause&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">cause</span>)
-            .<span class="ident">finish</span>()
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>Error {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        fmt.debug_struct(<span class="string">&quot;Error&quot;</span>)
+            .field(<span class="string">&quot;kind&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.kind)
+            .field(<span class="string">&quot;cause&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.cause)
+            .finish()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">kind</span> {
-            <span class="ident">Kind::Io</span> =&gt; <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;error communicating with the server&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">Kind::UnexpectedMessage</span> =&gt; <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;unexpected message from server&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">Kind::Tls</span> =&gt; <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;error performing TLS handshake&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">Kind::ToSql</span>(<span class="ident">idx</span>) =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;error serializing parameter {}&quot;</span>, <span class="ident">idx</span>)<span class="question-mark">?</span>,
-            <span class="ident">Kind::FromSql</span>(<span class="ident">idx</span>) =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;error deserializing column {}&quot;</span>, <span class="ident">idx</span>)<span class="question-mark">?</span>,
-            <span class="ident">Kind::Column</span>(<span class="ident">column</span>) =&gt; <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;invalid column `{}`&quot;</span>, <span class="ident">column</span>)<span class="question-mark">?</span>,
-            <span class="ident">Kind::Closed</span> =&gt; <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;connection closed&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">Kind::Db</span> =&gt; <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;db error&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">Kind::Parse</span> =&gt; <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;error parsing response from server&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">Kind::Encode</span> =&gt; <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;error encoding message to server&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">Kind::Authentication</span> =&gt; <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;authentication error&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">Kind::ConfigParse</span> =&gt; <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;invalid connection string&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">Kind::Config</span> =&gt; <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;invalid configuration&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">Kind::RowCount</span> =&gt; <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;query returned an unexpected number of rows&quot;</span>)<span class="question-mark">?</span>,
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-            <span class="ident">Kind::Connect</span> =&gt; <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;error connecting to server&quot;</span>)<span class="question-mark">?</span>,
-            <span class="ident">Kind::Timeout</span> =&gt; <span class="ident">fmt</span>.<span class="ident">write_str</span>(<span class="string">&quot;timeout waiting for server&quot;</span>)<span class="question-mark">?</span>,
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Error {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, fmt: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>.kind {
+            Kind::Io =&gt; fmt.write_str(<span class="string">&quot;error communicating with the server&quot;</span>)<span class="question-mark">?</span>,
+            Kind::UnexpectedMessage =&gt; fmt.write_str(<span class="string">&quot;unexpected message from server&quot;</span>)<span class="question-mark">?</span>,
+            Kind::Tls =&gt; fmt.write_str(<span class="string">&quot;error performing TLS handshake&quot;</span>)<span class="question-mark">?</span>,
+            Kind::ToSql(idx) =&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;error serializing parameter {}&quot;</span>, idx)<span class="question-mark">?</span>,
+            Kind::FromSql(idx) =&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;error deserializing column {}&quot;</span>, idx)<span class="question-mark">?</span>,
+            Kind::Column(column) =&gt; <span class="macro">write!</span>(fmt, <span class="string">&quot;invalid column `{}`&quot;</span>, column)<span class="question-mark">?</span>,
+            Kind::Closed =&gt; fmt.write_str(<span class="string">&quot;connection closed&quot;</span>)<span class="question-mark">?</span>,
+            Kind::Db =&gt; fmt.write_str(<span class="string">&quot;db error&quot;</span>)<span class="question-mark">?</span>,
+            Kind::Parse =&gt; fmt.write_str(<span class="string">&quot;error parsing response from server&quot;</span>)<span class="question-mark">?</span>,
+            Kind::Encode =&gt; fmt.write_str(<span class="string">&quot;error encoding message to server&quot;</span>)<span class="question-mark">?</span>,
+            Kind::Authentication =&gt; fmt.write_str(<span class="string">&quot;authentication error&quot;</span>)<span class="question-mark">?</span>,
+            Kind::ConfigParse =&gt; fmt.write_str(<span class="string">&quot;invalid connection string&quot;</span>)<span class="question-mark">?</span>,
+            Kind::Config =&gt; fmt.write_str(<span class="string">&quot;invalid configuration&quot;</span>)<span class="question-mark">?</span>,
+            Kind::RowCount =&gt; fmt.write_str(<span class="string">&quot;query returned an unexpected number of rows&quot;</span>)<span class="question-mark">?</span>,
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+            </span>Kind::Connect =&gt; fmt.write_str(<span class="string">&quot;error connecting to server&quot;</span>)<span class="question-mark">?</span>,
+            Kind::Timeout =&gt; fmt.write_str(<span class="string">&quot;timeout waiting for server&quot;</span>)<span class="question-mark">?</span>,
         };
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">cause</span>) <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">cause</span> {
-            <span class="macro">write!</span>(<span class="ident">fmt</span>, <span class="string">&quot;: {}&quot;</span>, <span class="ident">cause</span>)<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>cause) = <span class="self">self</span>.<span class="number">0</span>.cause {
+            <span class="macro">write!</span>(fmt, <span class="string">&quot;: {}&quot;</span>, cause)<span class="question-mark">?</span>;
         }
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="kw">impl</span> <span class="ident">error::Error</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">source</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>(<span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>)<span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">cause</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">e</span> <span class="kw">as</span> <span class="kw">_</span>)
+<span class="kw">impl </span>error::Error <span class="kw">for </span>Error {
+    <span class="kw">fn </span>source(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>(<span class="kw">dyn </span>error::Error + <span class="lifetime">&#39;static</span>)&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.cause.as_ref().map(|e| <span class="kw-2">&amp;**</span>e <span class="kw">as _</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Error</span> {
-    <span class="doccomment">/// Consumes the error, returning its cause.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_source</span>(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">cause</span>
+<span class="kw">impl </span>Error {
+    <span class="doccomment">/// Consumes the error, returning its cause.
+    </span><span class="kw">pub fn </span>into_source(<span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Box&lt;<span class="kw">dyn </span>error::Error + Sync + Send&gt;&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.cause
     }
 
-    <span class="doccomment">/// Returns the source of this error if it was a `DbError`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is a simple convenience method.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_db_error</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">DbError</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">source</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">e</span>.<span class="ident">downcast_ref</span>::<span class="op">&lt;</span><span class="ident">DbError</span><span class="op">&gt;</span>())
+    <span class="doccomment">/// Returns the source of this error if it was a `DbError`.
+    ///
+    /// This is a simple convenience method.
+    </span><span class="kw">pub fn </span>as_db_error(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>DbError&gt; {
+        <span class="self">self</span>.source().and_then(|e| e.downcast_ref::&lt;DbError&gt;())
     }
 
-    <span class="doccomment">/// Determines if the error was associated with closed connection.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_closed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">kind</span> <span class="op">==</span> <span class="ident">Kind::Closed</span>
+    <span class="doccomment">/// Determines if the error was associated with closed connection.
+    </span><span class="kw">pub fn </span>is_closed(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.<span class="number">0</span>.kind == Kind::Closed
     }
 
-    <span class="doccomment">/// Returns the SQLSTATE error code associated with the error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is a convenience method that downcasts the cause to a `DbError` and returns its code.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">code</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SqlState</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">as_db_error</span>().<span class="ident">map</span>(<span class="ident">DbError::code</span>)
+    <span class="doccomment">/// Returns the SQLSTATE error code associated with the error.
+    ///
+    /// This is a convenience method that downcasts the cause to a `DbError` and returns its code.
+    </span><span class="kw">pub fn </span>code(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>SqlState&gt; {
+        <span class="self">self</span>.as_db_error().map(DbError::code)
     }
 
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">kind</span>: <span class="ident">Kind</span>, <span class="ident">cause</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">Error</span> {
-        <span class="ident">Error</span>(<span class="ident">Box::new</span>(<span class="ident">ErrorInner</span> { <span class="ident">kind</span>, <span class="ident">cause</span> }))
+    <span class="kw">fn </span>new(kind: Kind, cause: <span class="prelude-ty">Option</span>&lt;Box&lt;<span class="kw">dyn </span>error::Error + Sync + Send&gt;&gt;) -&gt; Error {
+        Error(Box::new(ErrorInner { kind, cause }))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">closed</span>() -&gt; <span class="ident">Error</span> {
-        <span class="ident">Error::new</span>(<span class="ident">Kind::Closed</span>, <span class="prelude-val">None</span>)
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>closed() -&gt; Error {
+        Error::new(Kind::Closed, <span class="prelude-val">None</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">unexpected_message</span>() -&gt; <span class="ident">Error</span> {
-        <span class="ident">Error::new</span>(<span class="ident">Kind::UnexpectedMessage</span>, <span class="prelude-val">None</span>)
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>unexpected_message() -&gt; Error {
+        Error::new(Kind::UnexpectedMessage, <span class="prelude-val">None</span>)
     }
 
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::needless_pass_by_value</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">db</span>(<span class="ident">error</span>: <span class="ident">ErrorResponseBody</span>) -&gt; <span class="ident">Error</span> {
-        <span class="kw">match</span> <span class="ident">DbError::parse</span>(<span class="kw-2">&amp;mut</span> <span class="ident">error</span>.<span class="ident">fields</span>()) {
-            <span class="prelude-val">Ok</span>(<span class="ident">e</span>) =&gt; <span class="ident">Error::new</span>(<span class="ident">Kind::Db</span>, <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>))),
-            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="ident">Error::new</span>(<span class="ident">Kind::Parse</span>, <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>))),
+    <span class="attribute">#[allow(clippy::needless_pass_by_value)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>db(error: ErrorResponseBody) -&gt; Error {
+        <span class="kw">match </span>DbError::parse(<span class="kw-2">&amp;mut </span>error.fields()) {
+            <span class="prelude-val">Ok</span>(e) =&gt; Error::new(Kind::Db, <span class="prelude-val">Some</span>(Box::new(e))),
+            <span class="prelude-val">Err</span>(e) =&gt; Error::new(Kind::Parse, <span class="prelude-val">Some</span>(Box::new(e))),
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">e</span>: <span class="ident">io::Error</span>) -&gt; <span class="ident">Error</span> {
-        <span class="ident">Error::new</span>(<span class="ident">Kind::Parse</span>, <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse(e: io::Error) -&gt; Error {
+        Error::new(Kind::Parse, <span class="prelude-val">Some</span>(Box::new(e)))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">encode</span>(<span class="ident">e</span>: <span class="ident">io::Error</span>) -&gt; <span class="ident">Error</span> {
-        <span class="ident">Error::new</span>(<span class="ident">Kind::Encode</span>, <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>encode(e: io::Error) -&gt; Error {
+        Error::new(Kind::Encode, <span class="prelude-val">Some</span>(Box::new(e)))
     }
 
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::wrong_self_convention</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_sql</span>(<span class="ident">e</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Error</span> {
-        <span class="ident">Error::new</span>(<span class="ident">Kind::ToSql</span>(<span class="ident">idx</span>), <span class="prelude-val">Some</span>(<span class="ident">e</span>))
+    <span class="attribute">#[allow(clippy::wrong_self_convention)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>to_sql(e: Box&lt;<span class="kw">dyn </span>error::Error + Sync + Send&gt;, idx: usize) -&gt; Error {
+        Error::new(Kind::ToSql(idx), <span class="prelude-val">Some</span>(e))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_sql</span>(<span class="ident">e</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Error</span> {
-        <span class="ident">Error::new</span>(<span class="ident">Kind::FromSql</span>(<span class="ident">idx</span>), <span class="prelude-val">Some</span>(<span class="ident">e</span>))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>from_sql(e: Box&lt;<span class="kw">dyn </span>error::Error + Sync + Send&gt;, idx: usize) -&gt; Error {
+        Error::new(Kind::FromSql(idx), <span class="prelude-val">Some</span>(e))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">column</span>(<span class="ident">column</span>: <span class="ident">String</span>) -&gt; <span class="ident">Error</span> {
-        <span class="ident">Error::new</span>(<span class="ident">Kind::Column</span>(<span class="ident">column</span>), <span class="prelude-val">None</span>)
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>column(column: String) -&gt; Error {
+        Error::new(Kind::Column(column), <span class="prelude-val">None</span>)
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">tls</span>(<span class="ident">e</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>) -&gt; <span class="ident">Error</span> {
-        <span class="ident">Error::new</span>(<span class="ident">Kind::Tls</span>, <span class="prelude-val">Some</span>(<span class="ident">e</span>))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>tls(e: Box&lt;<span class="kw">dyn </span>error::Error + Sync + Send&gt;) -&gt; Error {
+        Error::new(Kind::Tls, <span class="prelude-val">Some</span>(e))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">io</span>(<span class="ident">e</span>: <span class="ident">io::Error</span>) -&gt; <span class="ident">Error</span> {
-        <span class="ident">Error::new</span>(<span class="ident">Kind::Io</span>, <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>io(e: io::Error) -&gt; Error {
+        Error::new(Kind::Io, <span class="prelude-val">Some</span>(Box::new(e)))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">authentication</span>(<span class="ident">e</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>) -&gt; <span class="ident">Error</span> {
-        <span class="ident">Error::new</span>(<span class="ident">Kind::Authentication</span>, <span class="prelude-val">Some</span>(<span class="ident">e</span>))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>authentication(e: Box&lt;<span class="kw">dyn </span>error::Error + Sync + Send&gt;) -&gt; Error {
+        Error::new(Kind::Authentication, <span class="prelude-val">Some</span>(e))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">config_parse</span>(<span class="ident">e</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>) -&gt; <span class="ident">Error</span> {
-        <span class="ident">Error::new</span>(<span class="ident">Kind::ConfigParse</span>, <span class="prelude-val">Some</span>(<span class="ident">e</span>))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>config_parse(e: Box&lt;<span class="kw">dyn </span>error::Error + Sync + Send&gt;) -&gt; Error {
+        Error::new(Kind::ConfigParse, <span class="prelude-val">Some</span>(e))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">config</span>(<span class="ident">e</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">error::Error</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">Send</span><span class="op">&gt;</span>) -&gt; <span class="ident">Error</span> {
-        <span class="ident">Error::new</span>(<span class="ident">Kind::Config</span>, <span class="prelude-val">Some</span>(<span class="ident">e</span>))
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>config(e: Box&lt;<span class="kw">dyn </span>error::Error + Sync + Send&gt;) -&gt; Error {
+        Error::new(Kind::Config, <span class="prelude-val">Some</span>(e))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">row_count</span>() -&gt; <span class="ident">Error</span> {
-        <span class="ident">Error::new</span>(<span class="ident">Kind::RowCount</span>, <span class="prelude-val">None</span>)
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>row_count() -&gt; Error {
+        Error::new(Kind::RowCount, <span class="prelude-val">None</span>)
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;runtime&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">connect</span>(<span class="ident">e</span>: <span class="ident">io::Error</span>) -&gt; <span class="ident">Error</span> {
-        <span class="ident">Error::new</span>(<span class="ident">Kind::Connect</span>, <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">e</span>)))
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;runtime&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>connect(e: io::Error) -&gt; Error {
+        Error::new(Kind::Connect, <span class="prelude-val">Some</span>(Box::new(e)))
     }
 
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">__private_api_timeout</span>() -&gt; <span class="ident">Error</span> {
-        <span class="ident">Error::new</span>(<span class="ident">Kind::Timeout</span>, <span class="prelude-val">None</span>)
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub fn </span>__private_api_timeout() -&gt; Error {
+        Error::new(Kind::Timeout, <span class="prelude-val">None</span>)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tokio_postgres" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tokio_postgres" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/clap-2.34.0/src/osstringext.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>osstringext.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../clap/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/clap-2.34.0/src/osstringext.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>osstringext.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../clap/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -201,208 +201,208 @@
 <span id="201">201</span>
 <span id="202">202</span>
 <span id="203">203</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::ffi::OsStr</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>, <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)))]</span>
-<span class="kw">use</span> <span class="ident">std::os::unix::ffi::OsStrExt</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>, <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::INVALID_UTF8</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::ffi::OsStr;
+<span class="attribute">#[cfg(not(any(target_os = <span class="string">&quot;windows&quot;</span>, target_arch = <span class="string">&quot;wasm32&quot;</span>)))]
+</span><span class="kw">use </span>std::os::unix::ffi::OsStrExt;
+<span class="attribute">#[cfg(any(target_os = <span class="string">&quot;windows&quot;</span>, target_arch = <span class="string">&quot;wasm32&quot;</span>))]
+</span><span class="kw">use </span><span class="kw">crate</span>::INVALID_UTF8;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>, <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>))]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">OsStrExt3</span> {
-    <span class="kw">fn</span> <span class="ident">from_bytes</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>;
-    <span class="kw">fn</span> <span class="ident">as_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>];
+<span class="attribute">#[cfg(any(target_os = <span class="string">&quot;windows&quot;</span>, target_arch = <span class="string">&quot;wasm32&quot;</span>))]
+</span><span class="kw">pub trait </span>OsStrExt3 {
+    <span class="kw">fn </span>from_bytes(b: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>;
+    <span class="kw">fn </span>as_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8];
 }
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">OsStrExt2</span> {
-    <span class="kw">fn</span> <span class="ident">starts_with</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">bool</span>;
-    <span class="kw">fn</span> <span class="ident">split_at_byte</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">b</span>: <span class="ident">u8</span>) -&gt; (<span class="kw-2">&amp;</span><span class="ident">OsStr</span>, <span class="kw-2">&amp;</span><span class="ident">OsStr</span>);
-    <span class="kw">fn</span> <span class="ident">split_at</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">i</span>: <span class="ident">usize</span>) -&gt; (<span class="kw-2">&amp;</span><span class="ident">OsStr</span>, <span class="kw-2">&amp;</span><span class="ident">OsStr</span>);
-    <span class="kw">fn</span> <span class="ident">trim_left_matches</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">b</span>: <span class="ident">u8</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">OsStr</span>;
-    <span class="kw">fn</span> <span class="ident">contains_byte</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">b</span>: <span class="ident">u8</span>) -&gt; <span class="ident">bool</span>;
-    <span class="kw">fn</span> <span class="ident">split</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">b</span>: <span class="ident">u8</span>) -&gt; <span class="ident">OsSplit</span>;
+<span class="attribute">#[doc(hidden)]
+</span><span class="kw">pub trait </span>OsStrExt2 {
+    <span class="kw">fn </span>starts_with(<span class="kw-2">&amp;</span><span class="self">self</span>, s: <span class="kw-2">&amp;</span>[u8]) -&gt; bool;
+    <span class="kw">fn </span>split_at_byte(<span class="kw-2">&amp;</span><span class="self">self</span>, b: u8) -&gt; (<span class="kw-2">&amp;</span>OsStr, <span class="kw-2">&amp;</span>OsStr);
+    <span class="kw">fn </span>split_at(<span class="kw-2">&amp;</span><span class="self">self</span>, i: usize) -&gt; (<span class="kw-2">&amp;</span>OsStr, <span class="kw-2">&amp;</span>OsStr);
+    <span class="kw">fn </span>trim_left_matches(<span class="kw-2">&amp;</span><span class="self">self</span>, b: u8) -&gt; <span class="kw-2">&amp;</span>OsStr;
+    <span class="kw">fn </span>contains_byte(<span class="kw-2">&amp;</span><span class="self">self</span>, b: u8) -&gt; bool;
+    <span class="kw">fn </span>split(<span class="kw-2">&amp;</span><span class="self">self</span>, b: u8) -&gt; OsSplit;
 }
 
-<span class="comment">// A starts-with implementation that does not panic when the OsStr contains</span>
-<span class="comment">// invalid Unicode.</span>
-<span class="comment">//</span>
-<span class="comment">// A Windows OsStr is usually UTF-16. If `prefix` is valid UTF-8, we can</span>
-<span class="comment">// re-encode it as UTF-16, and ask whether `osstr` starts with the same series</span>
-<span class="comment">// of u16 code units. If `prefix` is not valid UTF-8, then this comparison</span>
-<span class="comment">// isn&#39;t meaningful, and we just return false.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>)]</span>
-<span class="kw">fn</span> <span class="ident">windows_osstr_starts_with</span>(<span class="ident">osstr</span>: <span class="kw-2">&amp;</span><span class="ident">OsStr</span>, <span class="ident">prefix</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">bool</span> {
-    <span class="kw">use</span> <span class="ident">std::os::windows::ffi::OsStrExt</span>;
-    <span class="kw">let</span> <span class="ident">prefix_str</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="ident">std::str::from_utf8</span>(<span class="ident">prefix</span>) {
-        <span class="ident">s</span>
-    } <span class="kw">else</span> {
-        <span class="kw">return</span> <span class="bool-val">false</span>;
+<span class="comment">// A starts-with implementation that does not panic when the OsStr contains
+// invalid Unicode.
+//
+// A Windows OsStr is usually UTF-16. If `prefix` is valid UTF-8, we can
+// re-encode it as UTF-16, and ask whether `osstr` starts with the same series
+// of u16 code units. If `prefix` is not valid UTF-8, then this comparison
+// isn&#39;t meaningful, and we just return false.
+</span><span class="attribute">#[cfg(target_os = <span class="string">&quot;windows&quot;</span>)]
+</span><span class="kw">fn </span>windows_osstr_starts_with(osstr: <span class="kw-2">&amp;</span>OsStr, prefix: <span class="kw-2">&amp;</span>[u8]) -&gt; bool {
+    <span class="kw">use </span>std::os::windows::ffi::OsStrExt;
+    <span class="kw">let </span>prefix_str = <span class="kw">if let </span><span class="prelude-val">Ok</span>(s) = std::str::from_utf8(prefix) {
+        s
+    } <span class="kw">else </span>{
+        <span class="kw">return </span><span class="bool-val">false</span>;
     };
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">osstr_units</span> <span class="op">=</span> <span class="ident">osstr</span>.<span class="ident">encode_wide</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">prefix_units</span> <span class="op">=</span> <span class="ident">prefix_str</span>.<span class="ident">encode_utf16</span>();
-    <span class="kw">loop</span> {
-        <span class="kw">match</span> (<span class="ident">osstr_units</span>.<span class="ident">next</span>(), <span class="ident">prefix_units</span>.<span class="ident">next</span>()) {
-            <span class="comment">// These code units match. Keep looping.</span>
-            (<span class="prelude-val">Some</span>(<span class="ident">o</span>), <span class="prelude-val">Some</span>(<span class="ident">p</span>)) <span class="kw">if</span> <span class="ident">o</span> <span class="op">==</span> <span class="ident">p</span> =&gt; <span class="kw">continue</span>,
-            <span class="comment">// We&#39;ve reached the end of the prefix. It&#39;s a match.</span>
-            (<span class="kw">_</span>, <span class="prelude-val">None</span>) =&gt; <span class="kw">return</span> <span class="bool-val">true</span>,
-            <span class="comment">// Otherwise, it&#39;s not a match.</span>
-            <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="bool-val">false</span>,
+    <span class="kw">let </span><span class="kw-2">mut </span>osstr_units = osstr.encode_wide();
+    <span class="kw">let </span><span class="kw-2">mut </span>prefix_units = prefix_str.encode_utf16();
+    <span class="kw">loop </span>{
+        <span class="kw">match </span>(osstr_units.next(), prefix_units.next()) {
+            <span class="comment">// These code units match. Keep looping.
+            </span>(<span class="prelude-val">Some</span>(o), <span class="prelude-val">Some</span>(p)) <span class="kw">if </span>o == p =&gt; <span class="kw">continue</span>,
+            <span class="comment">// We&#39;ve reached the end of the prefix. It&#39;s a match.
+            </span>(<span class="kw">_</span>, <span class="prelude-val">None</span>) =&gt; <span class="kw">return </span><span class="bool-val">true</span>,
+            <span class="comment">// Otherwise, it&#39;s not a match.
+            </span><span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="bool-val">false</span>,
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">test</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>)]</span>
-<span class="kw">fn</span> <span class="ident">test_windows_osstr_starts_with</span>() {
-    <span class="kw">use</span> <span class="ident">std::ffi::OsString</span>;
-    <span class="kw">use</span> <span class="ident">std::os::windows::ffi::OsStringExt</span>;
+<span class="attribute">#[test]
+#[cfg(target_os = <span class="string">&quot;windows&quot;</span>)]
+</span><span class="kw">fn </span>test_windows_osstr_starts_with() {
+    <span class="kw">use </span>std::ffi::OsString;
+    <span class="kw">use </span>std::os::windows::ffi::OsStringExt;
 
-    <span class="kw">fn</span> <span class="ident">from_ascii</span>(<span class="ident">ascii</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">OsString</span> {
-        <span class="kw">let</span> <span class="ident">u16_vec</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">ascii</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span> <span class="kw">as</span> <span class="ident">u16</span>).<span class="ident">collect</span>();
-        <span class="ident">OsString::from_wide</span>(<span class="kw-2">&amp;</span><span class="ident">u16_vec</span>)
+    <span class="kw">fn </span>from_ascii(ascii: <span class="kw-2">&amp;</span>[u8]) -&gt; OsString {
+        <span class="kw">let </span>u16_vec: Vec&lt;u16&gt; = ascii.iter().map(|<span class="kw-2">&amp;</span>c| c <span class="kw">as </span>u16).collect();
+        OsString::from_wide(<span class="kw-2">&amp;</span>u16_vec)
     }
 
-    <span class="comment">// Test all the basic cases.</span>
-    <span class="macro">assert!</span>(<span class="ident">windows_osstr_starts_with</span>(<span class="kw-2">&amp;</span><span class="ident">from_ascii</span>(<span class="string">b&quot;abcdef&quot;</span>), <span class="string">b&quot;abc&quot;</span>));
-    <span class="macro">assert!</span>(<span class="ident">windows_osstr_starts_with</span>(<span class="kw-2">&amp;</span><span class="ident">from_ascii</span>(<span class="string">b&quot;abcdef&quot;</span>), <span class="string">b&quot;abcdef&quot;</span>));
-    <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">windows_osstr_starts_with</span>(<span class="kw-2">&amp;</span><span class="ident">from_ascii</span>(<span class="string">b&quot;abcdef&quot;</span>), <span class="string">b&quot;def&quot;</span>));
-    <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">windows_osstr_starts_with</span>(<span class="kw-2">&amp;</span><span class="ident">from_ascii</span>(<span class="string">b&quot;abc&quot;</span>), <span class="string">b&quot;abcd&quot;</span>));
+    <span class="comment">// Test all the basic cases.
+    </span><span class="macro">assert!</span>(windows_osstr_starts_with(<span class="kw-2">&amp;</span>from_ascii(<span class="string">b&quot;abcdef&quot;</span>), <span class="string">b&quot;abc&quot;</span>));
+    <span class="macro">assert!</span>(windows_osstr_starts_with(<span class="kw-2">&amp;</span>from_ascii(<span class="string">b&quot;abcdef&quot;</span>), <span class="string">b&quot;abcdef&quot;</span>));
+    <span class="macro">assert!</span>(!windows_osstr_starts_with(<span class="kw-2">&amp;</span>from_ascii(<span class="string">b&quot;abcdef&quot;</span>), <span class="string">b&quot;def&quot;</span>));
+    <span class="macro">assert!</span>(!windows_osstr_starts_with(<span class="kw-2">&amp;</span>from_ascii(<span class="string">b&quot;abc&quot;</span>), <span class="string">b&quot;abcd&quot;</span>));
 
-    <span class="comment">// Test the case where the candidate prefix is not valid UTF-8. Note that a</span>
-    <span class="comment">// standalone \xff byte is valid ASCII but not valid UTF-8. Thus although</span>
-    <span class="comment">// these strings look identical, they do not match.</span>
-    <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">windows_osstr_starts_with</span>(<span class="kw-2">&amp;</span><span class="ident">from_ascii</span>(<span class="string">b&quot;\xff&quot;</span>), <span class="string">b&quot;\xff&quot;</span>));
+    <span class="comment">// Test the case where the candidate prefix is not valid UTF-8. Note that a
+    // standalone \xff byte is valid ASCII but not valid UTF-8. Thus although
+    // these strings look identical, they do not match.
+    </span><span class="macro">assert!</span>(!windows_osstr_starts_with(<span class="kw-2">&amp;</span>from_ascii(<span class="string">b&quot;\xff&quot;</span>), <span class="string">b&quot;\xff&quot;</span>));
 
-    <span class="comment">// Test the case where the OsString is not valid UTF-16. It should still be</span>
-    <span class="comment">// possible to match the valid characters at the front.</span>
-    <span class="comment">//</span>
-    <span class="comment">// UTF-16 surrogate characters are only valid in pairs. Including one on</span>
-    <span class="comment">// the end by itself makes this invalid UTF-16.</span>
-    <span class="kw">let</span> <span class="ident">surrogate_char</span>: <span class="ident">u16</span> <span class="op">=</span> <span class="number">0xDC00</span>;
-    <span class="kw">let</span> <span class="ident">invalid_unicode</span> <span class="op">=</span>
-        <span class="ident">OsString::from_wide</span>(<span class="kw-2">&amp;</span>[<span class="string">&#39;a&#39;</span> <span class="kw">as</span> <span class="ident">u16</span>, <span class="string">&#39;b&#39;</span> <span class="kw">as</span> <span class="ident">u16</span>, <span class="string">&#39;c&#39;</span> <span class="kw">as</span> <span class="ident">u16</span>, <span class="ident">surrogate_char</span>]);
+    <span class="comment">// Test the case where the OsString is not valid UTF-16. It should still be
+    // possible to match the valid characters at the front.
+    //
+    // UTF-16 surrogate characters are only valid in pairs. Including one on
+    // the end by itself makes this invalid UTF-16.
+    </span><span class="kw">let </span>surrogate_char: u16 = <span class="number">0xDC00</span>;
+    <span class="kw">let </span>invalid_unicode =
+        OsString::from_wide(<span class="kw-2">&amp;</span>[<span class="string">&#39;a&#39; </span><span class="kw">as </span>u16, <span class="string">&#39;b&#39; </span><span class="kw">as </span>u16, <span class="string">&#39;c&#39; </span><span class="kw">as </span>u16, surrogate_char]);
     <span class="macro">assert!</span>(
-        <span class="ident">invalid_unicode</span>.<span class="ident">to_str</span>().<span class="ident">is_none</span>(),
+        invalid_unicode.to_str().is_none(),
         <span class="string">&quot;This string is invalid Unicode, and conversion to &amp;str should fail.&quot;</span>,
     );
-    <span class="macro">assert!</span>(<span class="ident">windows_osstr_starts_with</span>(<span class="kw-2">&amp;</span><span class="ident">invalid_unicode</span>, <span class="string">b&quot;abc&quot;</span>));
-    <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">windows_osstr_starts_with</span>(<span class="kw-2">&amp;</span><span class="ident">invalid_unicode</span>, <span class="string">b&quot;abcd&quot;</span>));
+    <span class="macro">assert!</span>(windows_osstr_starts_with(<span class="kw-2">&amp;</span>invalid_unicode, <span class="string">b&quot;abc&quot;</span>));
+    <span class="macro">assert!</span>(!windows_osstr_starts_with(<span class="kw-2">&amp;</span>invalid_unicode, <span class="string">b&quot;abcd&quot;</span>));
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>, <span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>))]</span>
-<span class="kw">impl</span> <span class="ident">OsStrExt3</span> <span class="kw">for</span> <span class="ident">OsStr</span> {
-    <span class="kw">fn</span> <span class="ident">from_bytes</span>(<span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span> {
-        <span class="kw">use</span> <span class="ident">std::mem</span>;
-        <span class="kw">unsafe</span> { <span class="ident">mem::transmute</span>(<span class="ident">b</span>) }
+<span class="attribute">#[cfg(any(target_os = <span class="string">&quot;windows&quot;</span>, target_arch = <span class="string">&quot;wasm32&quot;</span>))]
+</span><span class="kw">impl </span>OsStrExt3 <span class="kw">for </span>OsStr {
+    <span class="kw">fn </span>from_bytes(b: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="kw-2">&amp;</span><span class="self">Self </span>{
+        <span class="kw">use </span>std::mem;
+        <span class="kw">unsafe </span>{ mem::transmute(b) }
     }
-    <span class="kw">fn</span> <span class="ident">as_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] {
-        <span class="self">self</span>.<span class="ident">to_str</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">as_bytes</span>()).<span class="ident">expect</span>(<span class="ident">INVALID_UTF8</span>)
+    <span class="kw">fn </span>as_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[u8] {
+        <span class="self">self</span>.to_str().map(|s| s.as_bytes()).expect(INVALID_UTF8)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">OsStrExt2</span> <span class="kw">for</span> <span class="ident">OsStr</span> {
-    <span class="kw">fn</span> <span class="ident">starts_with</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">bool</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>)]</span>
-        {
-            <span class="comment">// On Windows, the as_bytes() method will panic if the OsStr</span>
-            <span class="comment">// contains invalid Unicode. To avoid this, we use a</span>
-            <span class="comment">// Windows-specific starts-with function that doesn&#39;t rely on</span>
-            <span class="comment">// as_bytes(). This is necessary for Windows command line</span>
-            <span class="comment">// applications to handle non-Unicode arguments successfully. This</span>
-            <span class="comment">// allows common cases like `clap.exe [invalid]` to succeed, though</span>
-            <span class="comment">// cases that require string splitting will still fail, like</span>
-            <span class="comment">// `clap.exe --arg=[invalid]`. Note that this entire module is</span>
-            <span class="comment">// replaced in Clap 3.x, so this workaround is specific to the 2.x</span>
-            <span class="comment">// branch.</span>
-            <span class="ident">windows_osstr_starts_with</span>(<span class="self">self</span>, <span class="ident">s</span>)
+<span class="kw">impl </span>OsStrExt2 <span class="kw">for </span>OsStr {
+    <span class="kw">fn </span>starts_with(<span class="kw-2">&amp;</span><span class="self">self</span>, s: <span class="kw-2">&amp;</span>[u8]) -&gt; bool {
+        <span class="attribute">#[cfg(target_os = <span class="string">&quot;windows&quot;</span>)]
+        </span>{
+            <span class="comment">// On Windows, the as_bytes() method will panic if the OsStr
+            // contains invalid Unicode. To avoid this, we use a
+            // Windows-specific starts-with function that doesn&#39;t rely on
+            // as_bytes(). This is necessary for Windows command line
+            // applications to handle non-Unicode arguments successfully. This
+            // allows common cases like `clap.exe [invalid]` to succeed, though
+            // cases that require string splitting will still fail, like
+            // `clap.exe --arg=[invalid]`. Note that this entire module is
+            // replaced in Clap 3.x, so this workaround is specific to the 2.x
+            // branch.
+            </span>windows_osstr_starts_with(<span class="self">self</span>, s)
         }
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_os</span> <span class="op">=</span> <span class="string">&quot;windows&quot;</span>))]</span>
-        {
-            <span class="self">self</span>.<span class="ident">as_bytes</span>().<span class="ident">starts_with</span>(<span class="ident">s</span>)
+        <span class="attribute">#[cfg(not(target_os = <span class="string">&quot;windows&quot;</span>))]
+        </span>{
+            <span class="self">self</span>.as_bytes().starts_with(s)
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">contains_byte</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">byte</span>: <span class="ident">u8</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">for</span> <span class="ident">b</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">as_bytes</span>() {
-            <span class="kw">if</span> <span class="ident">b</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">byte</span> {
-                <span class="kw">return</span> <span class="bool-val">true</span>;
+    <span class="kw">fn </span>contains_byte(<span class="kw-2">&amp;</span><span class="self">self</span>, byte: u8) -&gt; bool {
+        <span class="kw">for </span>b <span class="kw">in </span><span class="self">self</span>.as_bytes() {
+            <span class="kw">if </span>b == <span class="kw-2">&amp;</span>byte {
+                <span class="kw">return </span><span class="bool-val">true</span>;
             }
         }
-        <span class="bool-val">false</span>
-    }
+        <span class="bool-val">false
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">split_at_byte</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">byte</span>: <span class="ident">u8</span>) -&gt; (<span class="kw-2">&amp;</span><span class="ident">OsStr</span>, <span class="kw-2">&amp;</span><span class="ident">OsStr</span>) {
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">b</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">as_bytes</span>().<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">if</span> <span class="ident">b</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="ident">byte</span> {
-                <span class="kw">return</span> (
-                    <span class="ident">OsStr::from_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">as_bytes</span>()[..<span class="ident">i</span>]),
-                    <span class="ident">OsStr::from_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">as_bytes</span>()[<span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>..]),
+    <span class="kw">fn </span>split_at_byte(<span class="kw-2">&amp;</span><span class="self">self</span>, byte: u8) -&gt; (<span class="kw-2">&amp;</span>OsStr, <span class="kw-2">&amp;</span>OsStr) {
+        <span class="kw">for </span>(i, b) <span class="kw">in </span><span class="self">self</span>.as_bytes().iter().enumerate() {
+            <span class="kw">if </span>b == <span class="kw-2">&amp;</span>byte {
+                <span class="kw">return </span>(
+                    OsStr::from_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>.as_bytes()[..i]),
+                    OsStr::from_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>.as_bytes()[i + <span class="number">1</span>..]),
                 );
             }
         }
         (
-            <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>,
-            <span class="ident">OsStr::from_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">as_bytes</span>()[<span class="self">self</span>.<span class="ident">len</span>()..<span class="self">self</span>.<span class="ident">len</span>()]),
+            <span class="kw-2">&amp;*</span><span class="self">self</span>,
+            OsStr::from_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>.as_bytes()[<span class="self">self</span>.len()..<span class="self">self</span>.len()]),
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">trim_left_matches</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">byte</span>: <span class="ident">u8</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">OsStr</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">found</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="ident">b</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">as_bytes</span>().<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">if</span> <span class="ident">b</span> <span class="op">!</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">byte</span> {
-                <span class="kw">return</span> <span class="ident">OsStr::from_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">as_bytes</span>()[<span class="ident">i</span>..]);
-            } <span class="kw">else</span> {
-                <span class="ident">found</span> <span class="op">=</span> <span class="bool-val">true</span>;
+    <span class="kw">fn </span>trim_left_matches(<span class="kw-2">&amp;</span><span class="self">self</span>, byte: u8) -&gt; <span class="kw-2">&amp;</span>OsStr {
+        <span class="kw">let </span><span class="kw-2">mut </span>found = <span class="bool-val">false</span>;
+        <span class="kw">for </span>(i, b) <span class="kw">in </span><span class="self">self</span>.as_bytes().iter().enumerate() {
+            <span class="kw">if </span>b != <span class="kw-2">&amp;</span>byte {
+                <span class="kw">return </span>OsStr::from_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>.as_bytes()[i..]);
+            } <span class="kw">else </span>{
+                found = <span class="bool-val">true</span>;
             }
         }
-        <span class="kw">if</span> <span class="ident">found</span> {
-            <span class="kw">return</span> <span class="ident">OsStr::from_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">as_bytes</span>()[<span class="self">self</span>.<span class="ident">len</span>()..]);
+        <span class="kw">if </span>found {
+            <span class="kw">return </span>OsStr::from_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>.as_bytes()[<span class="self">self</span>.len()..]);
         }
-        <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>
-    }
+        <span class="kw-2">&amp;*</span><span class="self">self
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">split_at</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">i</span>: <span class="ident">usize</span>) -&gt; (<span class="kw-2">&amp;</span><span class="ident">OsStr</span>, <span class="kw-2">&amp;</span><span class="ident">OsStr</span>) {
+    <span class="kw">fn </span>split_at(<span class="kw-2">&amp;</span><span class="self">self</span>, i: usize) -&gt; (<span class="kw-2">&amp;</span>OsStr, <span class="kw-2">&amp;</span>OsStr) {
         (
-            <span class="ident">OsStr::from_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">as_bytes</span>()[..<span class="ident">i</span>]),
-            <span class="ident">OsStr::from_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">as_bytes</span>()[<span class="ident">i</span>..]),
+            OsStr::from_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>.as_bytes()[..i]),
+            OsStr::from_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>.as_bytes()[i..]),
         )
     }
 
-    <span class="kw">fn</span> <span class="ident">split</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">b</span>: <span class="ident">u8</span>) -&gt; <span class="ident">OsSplit</span> {
-        <span class="ident">OsSplit</span> {
-            <span class="ident">sep</span>: <span class="ident">b</span>,
-            <span class="ident">val</span>: <span class="self">self</span>.<span class="ident">as_bytes</span>(),
-            <span class="ident">pos</span>: <span class="number">0</span>,
+    <span class="kw">fn </span>split(<span class="kw-2">&amp;</span><span class="self">self</span>, b: u8) -&gt; OsSplit {
+        OsSplit {
+            sep: b,
+            val: <span class="self">self</span>.as_bytes(),
+            pos: <span class="number">0</span>,
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">OsSplit</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">sep</span>: <span class="ident">u8</span>,
-    <span class="ident">val</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>],
-    <span class="ident">pos</span>: <span class="ident">usize</span>,
+<span class="attribute">#[doc(hidden)]
+#[derive(Clone, Debug)]
+</span><span class="kw">pub struct </span>OsSplit&lt;<span class="lifetime">&#39;a</span>&gt; {
+    sep: u8,
+    val: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[u8],
+    pos: usize,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Iterator</span> <span class="kw">for</span> <span class="ident">OsSplit</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">OsStr</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Iterator <span class="kw">for </span>OsSplit&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">type </span>Item = <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>OsStr;
 
-    <span class="kw">fn</span> <span class="ident">next</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">OsStr</span><span class="op">&gt;</span> {
+    <span class="kw">fn </span>next(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>OsStr&gt; {
         <span class="macro">debugln!</span>(<span class="string">&quot;OsSplit::next: self={:?}&quot;</span>, <span class="self">self</span>);
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">pos</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">val</span>.<span class="ident">len</span>() {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+        <span class="kw">if </span><span class="self">self</span>.pos == <span class="self">self</span>.val.len() {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
-        <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">pos</span>;
-        <span class="kw">for</span> <span class="ident">b</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">val</span>[<span class="ident">start</span>..] {
-            <span class="self">self</span>.<span class="ident">pos</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">b</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">sep</span> {
-                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">OsStr::from_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">val</span>[<span class="ident">start</span>..<span class="self">self</span>.<span class="ident">pos</span> <span class="op">-</span> <span class="number">1</span>]));
+        <span class="kw">let </span>start = <span class="self">self</span>.pos;
+        <span class="kw">for </span>b <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.val[start..] {
+            <span class="self">self</span>.pos += <span class="number">1</span>;
+            <span class="kw">if </span><span class="kw-2">*</span>b == <span class="self">self</span>.sep {
+                <span class="kw">return </span><span class="prelude-val">Some</span>(OsStr::from_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>.val[start..<span class="self">self</span>.pos - <span class="number">1</span>]));
             }
         }
-        <span class="prelude-val">Some</span>(<span class="ident">OsStr::from_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">val</span>[<span class="ident">start</span>..]))
+        <span class="prelude-val">Some</span>(OsStr::from_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>.val[start..]))
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="clap" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="clap" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

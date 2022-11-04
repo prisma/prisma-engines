@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-write-integer-0.8.5/src/table_decimal.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>table_decimal.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_write_integer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_write_integer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_write_integer/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-write-integer-0.8.5/src/table_decimal.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>table_decimal.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_write_integer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_write_integer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_write_integer/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -41,35 +41,35 @@
 <span id="41">41</span>
 <span id="42">42</span>
 <span id="43">43</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Pre-computed tables for writing decimal strings.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Pre-computed tables for writing decimal strings.
 
-<span class="attribute">#![<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>))]</span>
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+</span><span class="attribute">#![cfg(not(feature = <span class="string">&quot;compact&quot;</span>))]
+#![doc(hidden)]
 
-<span class="comment">// RADIX^2 TABLES</span>
-<span class="comment">// --------------</span>
+</span><span class="comment">// RADIX^2 TABLES
+// --------------
 
-<span class="comment">// Conditionally compile the precompiled radix**2 tables.</span>
-<span class="comment">// These tables take `2 * (value % (radix^2))`, and return</span>
-<span class="comment">// two consecutive values corresponding to both digits.</span>
-<span class="comment">//</span>
-<span class="comment">// Total array storage:</span>
-<span class="comment">//  Without radix: ~430 B:</span>
-<span class="comment">//      200 u8</span>
-<span class="comment">//      11 f32</span>
-<span class="comment">//      23 f64</span>
-<span class="comment">//  With radix: ~55 KB.</span>
-<span class="comment">//      32210 u8</span>
-<span class="comment">//      518 f32</span>
-<span class="comment">//      2610 f64</span>
-<span class="comment">// Provides ~5x performance enhancement.</span>
-<span class="comment">//</span>
-<span class="comment">// These arrays are cache-friendly, for each BASE[2-36] table,</span>
-<span class="comment">// elements can be access sequentially 2-at-a-time, preventing as many</span>
-<span class="comment">// cache misses inside inner loops. For example, accessing the two elements</span>
-<span class="comment">// for a remainder of `3` for the radix^2 in radix 2 will give you `1` and `1`,</span>
-<span class="comment">// at indexes 6 and 7.</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DIGIT_TO_BASE10_SQUARED</span>: [<span class="ident">u8</span>; <span class="number">200</span>] <span class="op">=</span> [
+// Conditionally compile the precompiled radix**2 tables.
+// These tables take `2 * (value % (radix^2))`, and return
+// two consecutive values corresponding to both digits.
+//
+// Total array storage:
+//  Without radix: ~430 B:
+//      200 u8
+//      11 f32
+//      23 f64
+//  With radix: ~55 KB.
+//      32210 u8
+//      518 f32
+//      2610 f64
+// Provides ~5x performance enhancement.
+//
+// These arrays are cache-friendly, for each BASE[2-36] table,
+// elements can be access sequentially 2-at-a-time, preventing as many
+// cache misses inside inner loops. For example, accessing the two elements
+// for a remainder of `3` for the radix^2 in radix 2 will give you `1` and `1`,
+// at indexes 6 and 7.
+</span><span class="kw">pub const </span>DIGIT_TO_BASE10_SQUARED: [u8; <span class="number">200</span>] = [
     <span class="string">b&#39;0&#39;</span>, <span class="string">b&#39;0&#39;</span>, <span class="string">b&#39;0&#39;</span>, <span class="string">b&#39;1&#39;</span>, <span class="string">b&#39;0&#39;</span>, <span class="string">b&#39;2&#39;</span>, <span class="string">b&#39;0&#39;</span>, <span class="string">b&#39;3&#39;</span>, <span class="string">b&#39;0&#39;</span>, <span class="string">b&#39;4&#39;</span>, <span class="string">b&#39;0&#39;</span>, <span class="string">b&#39;5&#39;</span>, <span class="string">b&#39;0&#39;</span>, <span class="string">b&#39;6&#39;</span>, <span class="string">b&#39;0&#39;</span>, <span class="string">b&#39;7&#39;</span>,
     <span class="string">b&#39;0&#39;</span>, <span class="string">b&#39;8&#39;</span>, <span class="string">b&#39;0&#39;</span>, <span class="string">b&#39;9&#39;</span>, <span class="string">b&#39;1&#39;</span>, <span class="string">b&#39;0&#39;</span>, <span class="string">b&#39;1&#39;</span>, <span class="string">b&#39;1&#39;</span>, <span class="string">b&#39;1&#39;</span>, <span class="string">b&#39;2&#39;</span>, <span class="string">b&#39;1&#39;</span>, <span class="string">b&#39;3&#39;</span>, <span class="string">b&#39;1&#39;</span>, <span class="string">b&#39;4&#39;</span>, <span class="string">b&#39;1&#39;</span>, <span class="string">b&#39;5&#39;</span>,
     <span class="string">b&#39;1&#39;</span>, <span class="string">b&#39;6&#39;</span>, <span class="string">b&#39;1&#39;</span>, <span class="string">b&#39;7&#39;</span>, <span class="string">b&#39;1&#39;</span>, <span class="string">b&#39;8&#39;</span>, <span class="string">b&#39;1&#39;</span>, <span class="string">b&#39;9&#39;</span>, <span class="string">b&#39;2&#39;</span>, <span class="string">b&#39;0&#39;</span>, <span class="string">b&#39;2&#39;</span>, <span class="string">b&#39;1&#39;</span>, <span class="string">b&#39;2&#39;</span>, <span class="string">b&#39;2&#39;</span>, <span class="string">b&#39;2&#39;</span>, <span class="string">b&#39;3&#39;</span>,
@@ -85,4 +85,4 @@
     <span class="string">b&#39;9&#39;</span>, <span class="string">b&#39;6&#39;</span>, <span class="string">b&#39;9&#39;</span>, <span class="string">b&#39;7&#39;</span>, <span class="string">b&#39;9&#39;</span>, <span class="string">b&#39;8&#39;</span>, <span class="string">b&#39;9&#39;</span>, <span class="string">b&#39;9&#39;</span>,
 ];
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_write_integer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_write_integer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

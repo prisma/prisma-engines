@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-timer-3.0.2/src/native/heap.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>heap.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../futures_timer/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../futures_timer/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../futures_timer/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/futures-timer-3.0.2/src/native/heap.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>heap.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../futures_timer/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../futures_timer/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../futures_timer/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -348,355 +348,355 @@
 <span id="348">348</span>
 <span id="349">349</span>
 <span id="350">350</span>
-</pre><pre class="rust"><code><span class="doccomment">//! A simple binary heap with support for removal of arbitrary elements</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This heap is used to manage timer state in the event loop. All timeouts go</span>
-<span class="doccomment">//! into this heap and we also cancel timeouts from this heap. The crucial</span>
-<span class="doccomment">//! feature of this heap over the standard library&#39;s `BinaryHeap` is the ability</span>
-<span class="doccomment">//! to remove arbitrary elements. (e.g. when a timer is canceled)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Note that this heap is not at all optimized right now, it should hopefully</span>
-<span class="doccomment">//! just work.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! A simple binary heap with support for removal of arbitrary elements
+//!
+//! This heap is used to manage timer state in the event loop. All timeouts go
+//! into this heap and we also cancel timeouts from this heap. The crucial
+//! feature of this heap over the standard library&#39;s `BinaryHeap` is the ability
+//! to remove arbitrary elements. (e.g. when a timer is canceled)
+//!
+//! Note that this heap is not at all optimized right now, it should hopefully
+//! just work.
 
-<span class="kw">use</span> <span class="ident">std::mem</span>;
+</span><span class="kw">use </span>std::mem;
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Heap</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="comment">// Binary heap of items, plus the slab index indicating what position in the</span>
-    <span class="comment">// list they&#39;re in.</span>
-    <span class="ident">items</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">T</span>, <span class="ident">usize</span>)<span class="op">&gt;</span>,
+<span class="kw">pub struct </span>Heap&lt;T&gt; {
+    <span class="comment">// Binary heap of items, plus the slab index indicating what position in the
+    // list they&#39;re in.
+    </span>items: Vec&lt;(T, usize)&gt;,
 
-    <span class="comment">// A map from a slab index (assigned to an item above) to the actual index</span>
-    <span class="comment">// in the array the item appears at.</span>
-    <span class="ident">index</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SlabSlot</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">next_index</span>: <span class="ident">usize</span>,
+    <span class="comment">// A map from a slab index (assigned to an item above) to the actual index
+    // in the array the item appears at.
+    </span>index: Vec&lt;SlabSlot&lt;usize&gt;&gt;,
+    next_index: usize,
 }
 
-<span class="kw">enum</span> <span class="ident">SlabSlot</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="ident">Empty</span> { <span class="ident">next</span>: <span class="ident">usize</span> },
-    <span class="ident">Full</span> { <span class="ident">value</span>: <span class="ident">T</span> },
+<span class="kw">enum </span>SlabSlot&lt;T&gt; {
+    Empty { next: usize },
+    Full { value: T },
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Slot</span> {
-    <span class="ident">idx</span>: <span class="ident">usize</span>,
+<span class="kw">pub struct </span>Slot {
+    idx: usize,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Ord</span><span class="op">&gt;</span> <span class="ident">Heap</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Heap</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="ident">Heap</span> {
-            <span class="ident">items</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">index</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">next_index</span>: <span class="number">0</span>,
+<span class="kw">impl</span>&lt;T: Ord&gt; Heap&lt;T&gt; {
+    <span class="kw">pub fn </span>new() -&gt; Heap&lt;T&gt; {
+        Heap {
+            items: Vec::new(),
+            index: Vec::new(),
+            next_index: <span class="number">0</span>,
         }
     }
 
-    <span class="doccomment">/// Pushes an element onto this heap, returning a slot token indicating</span>
-    <span class="doccomment">/// where it was pushed on to.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The slot can later get passed to `remove` to remove the element from the</span>
-    <span class="doccomment">/// heap, but only if the element was previously not removed from the heap.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">t</span>: <span class="ident">T</span>) -&gt; <span class="ident">Slot</span> {
-        <span class="self">self</span>.<span class="ident">assert_consistent</span>();
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">items</span>.<span class="ident">len</span>();
-        <span class="kw">let</span> <span class="ident">slot</span> <span class="op">=</span> <span class="ident">SlabSlot::Full</span> { <span class="ident">value</span>: <span class="ident">len</span> };
-        <span class="kw">let</span> <span class="ident">slot_idx</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">next_index</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">index</span>.<span class="ident">len</span>() {
-            <span class="self">self</span>.<span class="ident">next_index</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="self">self</span>.<span class="ident">index</span>.<span class="ident">push</span>(<span class="ident">slot</span>);
-            <span class="self">self</span>.<span class="ident">index</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>
-        } <span class="kw">else</span> {
-            <span class="kw">match</span> <span class="ident">mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">index</span>[<span class="self">self</span>.<span class="ident">next_index</span>], <span class="ident">slot</span>) {
-                <span class="ident">SlabSlot::Empty</span> { <span class="ident">next</span> } =&gt; <span class="ident">mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">next_index</span>, <span class="ident">next</span>),
-                <span class="ident">SlabSlot::Full</span> { .. } =&gt; <span class="macro">panic!</span>(),
+    <span class="doccomment">/// Pushes an element onto this heap, returning a slot token indicating
+    /// where it was pushed on to.
+    ///
+    /// The slot can later get passed to `remove` to remove the element from the
+    /// heap, but only if the element was previously not removed from the heap.
+    </span><span class="kw">pub fn </span>push(<span class="kw-2">&amp;mut </span><span class="self">self</span>, t: T) -&gt; Slot {
+        <span class="self">self</span>.assert_consistent();
+        <span class="kw">let </span>len = <span class="self">self</span>.items.len();
+        <span class="kw">let </span>slot = SlabSlot::Full { value: len };
+        <span class="kw">let </span>slot_idx = <span class="kw">if </span><span class="self">self</span>.next_index == <span class="self">self</span>.index.len() {
+            <span class="self">self</span>.next_index += <span class="number">1</span>;
+            <span class="self">self</span>.index.push(slot);
+            <span class="self">self</span>.index.len() - <span class="number">1
+        </span>} <span class="kw">else </span>{
+            <span class="kw">match </span>mem::replace(<span class="kw-2">&amp;mut </span><span class="self">self</span>.index[<span class="self">self</span>.next_index], slot) {
+                SlabSlot::Empty { next } =&gt; mem::replace(<span class="kw-2">&amp;mut </span><span class="self">self</span>.next_index, next),
+                SlabSlot::Full { .. } =&gt; <span class="macro">panic!</span>(),
             }
         };
-        <span class="self">self</span>.<span class="ident">items</span>.<span class="ident">push</span>((<span class="ident">t</span>, <span class="ident">slot_idx</span>));
-        <span class="self">self</span>.<span class="ident">percolate_up</span>(<span class="ident">len</span>);
-        <span class="self">self</span>.<span class="ident">assert_consistent</span>();
-        <span class="ident">Slot</span> { <span class="ident">idx</span>: <span class="ident">slot_idx</span> }
+        <span class="self">self</span>.items.push((t, slot_idx));
+        <span class="self">self</span>.percolate_up(len);
+        <span class="self">self</span>.assert_consistent();
+        Slot { idx: slot_idx }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">peek</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">assert_consistent</span>();
-        <span class="self">self</span>.<span class="ident">items</span>.<span class="ident">get</span>(<span class="number">0</span>).<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">i</span>.<span class="number">0</span>)
+    <span class="kw">pub fn </span>peek(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>T&gt; {
+        <span class="self">self</span>.assert_consistent();
+        <span class="self">self</span>.items.get(<span class="number">0</span>).map(|i| <span class="kw-2">&amp;</span>i.<span class="number">0</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">assert_consistent</span>();
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">items</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="kw">pub fn </span>pop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;T&gt; {
+        <span class="self">self</span>.assert_consistent();
+        <span class="kw">if </span><span class="self">self</span>.items.is_empty() {
+            <span class="kw">return </span><span class="prelude-val">None</span>;
         }
-        <span class="kw">let</span> <span class="ident">slot</span> <span class="op">=</span> <span class="ident">Slot</span> {
-            <span class="ident">idx</span>: <span class="self">self</span>.<span class="ident">items</span>[<span class="number">0</span>].<span class="number">1</span>,
+        <span class="kw">let </span>slot = Slot {
+            idx: <span class="self">self</span>.items[<span class="number">0</span>].<span class="number">1</span>,
         };
-        <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">remove</span>(<span class="ident">slot</span>))
+        <span class="prelude-val">Some</span>(<span class="self">self</span>.remove(slot))
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">slot</span>: <span class="ident">Slot</span>) -&gt; <span class="ident">T</span> {
-        <span class="self">self</span>.<span class="ident">assert_consistent</span>();
-        <span class="kw">let</span> <span class="ident">empty</span> <span class="op">=</span> <span class="ident">SlabSlot::Empty</span> {
-            <span class="ident">next</span>: <span class="self">self</span>.<span class="ident">next_index</span>,
+    <span class="kw">pub fn </span>remove(<span class="kw-2">&amp;mut </span><span class="self">self</span>, slot: Slot) -&gt; T {
+        <span class="self">self</span>.assert_consistent();
+        <span class="kw">let </span>empty = SlabSlot::Empty {
+            next: <span class="self">self</span>.next_index,
         };
-        <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">index</span>[<span class="ident">slot</span>.<span class="ident">idx</span>], <span class="ident">empty</span>) {
-            <span class="ident">SlabSlot::Full</span> { <span class="ident">value</span> } =&gt; <span class="ident">value</span>,
-            <span class="ident">SlabSlot::Empty</span> { .. } =&gt; <span class="macro">panic!</span>(),
+        <span class="kw">let </span>idx = <span class="kw">match </span>mem::replace(<span class="kw-2">&amp;mut </span><span class="self">self</span>.index[slot.idx], empty) {
+            SlabSlot::Full { value } =&gt; value,
+            SlabSlot::Empty { .. } =&gt; <span class="macro">panic!</span>(),
         };
-        <span class="self">self</span>.<span class="ident">next_index</span> <span class="op">=</span> <span class="ident">slot</span>.<span class="ident">idx</span>;
-        <span class="kw">let</span> (<span class="ident">item</span>, <span class="ident">slot_idx</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">items</span>.<span class="ident">swap_remove</span>(<span class="ident">idx</span>);
-        <span class="macro">debug_assert_eq!</span>(<span class="ident">slot</span>.<span class="ident">idx</span>, <span class="ident">slot_idx</span>);
-        <span class="kw">if</span> <span class="ident">idx</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">items</span>.<span class="ident">len</span>() {
-            <span class="ident">set_index</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">index</span>, <span class="self">self</span>.<span class="ident">items</span>[<span class="ident">idx</span>].<span class="number">1</span>, <span class="ident">idx</span>);
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">items</span>[<span class="ident">idx</span>].<span class="number">0</span> <span class="op">&lt;</span> <span class="ident">item</span> {
-                <span class="self">self</span>.<span class="ident">percolate_up</span>(<span class="ident">idx</span>);
-            } <span class="kw">else</span> {
-                <span class="self">self</span>.<span class="ident">percolate_down</span>(<span class="ident">idx</span>);
+        <span class="self">self</span>.next_index = slot.idx;
+        <span class="kw">let </span>(item, slot_idx) = <span class="self">self</span>.items.swap_remove(idx);
+        <span class="macro">debug_assert_eq!</span>(slot.idx, slot_idx);
+        <span class="kw">if </span>idx &lt; <span class="self">self</span>.items.len() {
+            set_index(<span class="kw-2">&amp;mut </span><span class="self">self</span>.index, <span class="self">self</span>.items[idx].<span class="number">1</span>, idx);
+            <span class="kw">if </span><span class="self">self</span>.items[idx].<span class="number">0 </span>&lt; item {
+                <span class="self">self</span>.percolate_up(idx);
+            } <span class="kw">else </span>{
+                <span class="self">self</span>.percolate_down(idx);
             }
         }
-        <span class="self">self</span>.<span class="ident">assert_consistent</span>();
-        <span class="ident">item</span>
+        <span class="self">self</span>.assert_consistent();
+        item
     }
 
-    <span class="kw">fn</span> <span class="ident">percolate_up</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">while</span> <span class="ident">idx</span> <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="kw">let</span> <span class="ident">parent</span> <span class="op">=</span> (<span class="ident">idx</span> <span class="op">-</span> <span class="number">1</span>) <span class="op">/</span> <span class="number">2</span>;
-            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">items</span>[<span class="ident">idx</span>].<span class="number">0</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">items</span>[<span class="ident">parent</span>].<span class="number">0</span> {
+    <span class="kw">fn </span>percolate_up(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>idx: usize) -&gt; usize {
+        <span class="kw">while </span>idx &gt; <span class="number">0 </span>{
+            <span class="kw">let </span>parent = (idx - <span class="number">1</span>) / <span class="number">2</span>;
+            <span class="kw">if </span><span class="self">self</span>.items[idx].<span class="number">0 </span>&gt;= <span class="self">self</span>.items[parent].<span class="number">0 </span>{
                 <span class="kw">break</span>;
             }
-            <span class="kw">let</span> (<span class="ident">a</span>, <span class="ident">b</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">items</span>.<span class="ident">split_at_mut</span>(<span class="ident">idx</span>);
-            <span class="ident">mem::swap</span>(<span class="kw-2">&amp;mut</span> <span class="ident">a</span>[<span class="ident">parent</span>], <span class="kw-2">&amp;mut</span> <span class="ident">b</span>[<span class="number">0</span>]);
-            <span class="ident">set_index</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">index</span>, <span class="ident">a</span>[<span class="ident">parent</span>].<span class="number">1</span>, <span class="ident">parent</span>);
-            <span class="ident">set_index</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">index</span>, <span class="ident">b</span>[<span class="number">0</span>].<span class="number">1</span>, <span class="ident">idx</span>);
-            <span class="ident">idx</span> <span class="op">=</span> <span class="ident">parent</span>;
+            <span class="kw">let </span>(a, b) = <span class="self">self</span>.items.split_at_mut(idx);
+            mem::swap(<span class="kw-2">&amp;mut </span>a[parent], <span class="kw-2">&amp;mut </span>b[<span class="number">0</span>]);
+            set_index(<span class="kw-2">&amp;mut </span><span class="self">self</span>.index, a[parent].<span class="number">1</span>, parent);
+            set_index(<span class="kw-2">&amp;mut </span><span class="self">self</span>.index, b[<span class="number">0</span>].<span class="number">1</span>, idx);
+            idx = parent;
         }
-        <span class="ident">idx</span>
+        idx
     }
 
-    <span class="kw">fn</span> <span class="ident">percolate_down</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">left</span> <span class="op">=</span> <span class="number">2</span> <span class="op">*</span> <span class="ident">idx</span> <span class="op">+</span> <span class="number">1</span>;
-            <span class="kw">let</span> <span class="ident">right</span> <span class="op">=</span> <span class="number">2</span> <span class="op">*</span> <span class="ident">idx</span> <span class="op">+</span> <span class="number">2</span>;
+    <span class="kw">fn </span>percolate_down(<span class="kw-2">&amp;mut </span><span class="self">self</span>, <span class="kw-2">mut </span>idx: usize) -&gt; usize {
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>left = <span class="number">2 </span>* idx + <span class="number">1</span>;
+            <span class="kw">let </span>right = <span class="number">2 </span>* idx + <span class="number">2</span>;
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">swap_left</span> <span class="op">=</span> <span class="bool-val">true</span>;
-            <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">items</span>.<span class="ident">get</span>(<span class="ident">left</span>), <span class="self">self</span>.<span class="ident">items</span>.<span class="ident">get</span>(<span class="ident">right</span>)) {
-                (<span class="prelude-val">Some</span>(<span class="ident">left</span>), <span class="prelude-val">None</span>) =&gt; {
-                    <span class="kw">if</span> <span class="ident">left</span>.<span class="number">0</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">items</span>[<span class="ident">idx</span>].<span class="number">0</span> {
+            <span class="kw">let </span><span class="kw-2">mut </span>swap_left = <span class="bool-val">true</span>;
+            <span class="kw">match </span>(<span class="self">self</span>.items.get(left), <span class="self">self</span>.items.get(right)) {
+                (<span class="prelude-val">Some</span>(left), <span class="prelude-val">None</span>) =&gt; {
+                    <span class="kw">if </span>left.<span class="number">0 </span>&gt;= <span class="self">self</span>.items[idx].<span class="number">0 </span>{
                         <span class="kw">break</span>;
                     }
                 }
-                (<span class="prelude-val">Some</span>(<span class="ident">left</span>), <span class="prelude-val">Some</span>(<span class="ident">right</span>)) =&gt; {
-                    <span class="kw">if</span> <span class="ident">left</span>.<span class="number">0</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">items</span>[<span class="ident">idx</span>].<span class="number">0</span> {
-                        <span class="kw">if</span> <span class="ident">right</span>.<span class="number">0</span> <span class="op">&lt;</span> <span class="ident">left</span>.<span class="number">0</span> {
-                            <span class="ident">swap_left</span> <span class="op">=</span> <span class="bool-val">false</span>;
+                (<span class="prelude-val">Some</span>(left), <span class="prelude-val">Some</span>(right)) =&gt; {
+                    <span class="kw">if </span>left.<span class="number">0 </span>&lt; <span class="self">self</span>.items[idx].<span class="number">0 </span>{
+                        <span class="kw">if </span>right.<span class="number">0 </span>&lt; left.<span class="number">0 </span>{
+                            swap_left = <span class="bool-val">false</span>;
                         }
-                    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">right</span>.<span class="number">0</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">items</span>[<span class="ident">idx</span>].<span class="number">0</span> {
-                        <span class="ident">swap_left</span> <span class="op">=</span> <span class="bool-val">false</span>;
-                    } <span class="kw">else</span> {
+                    } <span class="kw">else if </span>right.<span class="number">0 </span>&lt; <span class="self">self</span>.items[idx].<span class="number">0 </span>{
+                        swap_left = <span class="bool-val">false</span>;
+                    } <span class="kw">else </span>{
                         <span class="kw">break</span>;
                     }
                 }
 
                 (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="kw">break</span>,
-                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">_right</span>)) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;not possible&quot;</span>),
+                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(_right)) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;not possible&quot;</span>),
             }
 
-            <span class="kw">let</span> (<span class="ident">a</span>, <span class="ident">b</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">swap_left</span> {
-                <span class="self">self</span>.<span class="ident">items</span>.<span class="ident">split_at_mut</span>(<span class="ident">left</span>)
-            } <span class="kw">else</span> {
-                <span class="self">self</span>.<span class="ident">items</span>.<span class="ident">split_at_mut</span>(<span class="ident">right</span>)
+            <span class="kw">let </span>(a, b) = <span class="kw">if </span>swap_left {
+                <span class="self">self</span>.items.split_at_mut(left)
+            } <span class="kw">else </span>{
+                <span class="self">self</span>.items.split_at_mut(right)
             };
-            <span class="ident">mem::swap</span>(<span class="kw-2">&amp;mut</span> <span class="ident">a</span>[<span class="ident">idx</span>], <span class="kw-2">&amp;mut</span> <span class="ident">b</span>[<span class="number">0</span>]);
-            <span class="ident">set_index</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">index</span>, <span class="ident">a</span>[<span class="ident">idx</span>].<span class="number">1</span>, <span class="ident">idx</span>);
-            <span class="ident">set_index</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">index</span>, <span class="ident">b</span>[<span class="number">0</span>].<span class="number">1</span>, <span class="ident">a</span>.<span class="ident">len</span>());
-            <span class="ident">idx</span> <span class="op">=</span> <span class="ident">a</span>.<span class="ident">len</span>();
+            mem::swap(<span class="kw-2">&amp;mut </span>a[idx], <span class="kw-2">&amp;mut </span>b[<span class="number">0</span>]);
+            set_index(<span class="kw-2">&amp;mut </span><span class="self">self</span>.index, a[idx].<span class="number">1</span>, idx);
+            set_index(<span class="kw-2">&amp;mut </span><span class="self">self</span>.index, b[<span class="number">0</span>].<span class="number">1</span>, a.len());
+            idx = a.len();
         }
-        <span class="ident">idx</span>
+        idx
     }
 
-    <span class="kw">fn</span> <span class="ident">assert_consistent</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">if</span> <span class="op">!</span><span class="macro">cfg!</span>(<span class="ident">assert_timer_heap_consistent</span>) {
+    <span class="kw">fn </span>assert_consistent(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">if </span>!<span class="macro">cfg!</span>(assert_timer_heap_consistent) {
             <span class="kw">return</span>;
         }
 
         <span class="macro">assert_eq!</span>(
-            <span class="self">self</span>.<span class="ident">items</span>.<span class="ident">len</span>(),
-            <span class="self">self</span>.<span class="ident">index</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">slot</span><span class="op">|</span> {
-                    <span class="kw">match</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">slot</span> {
-                        <span class="ident">SlabSlot::Full</span> { .. } =&gt; <span class="bool-val">true</span>,
-                        <span class="ident">SlabSlot::Empty</span> { .. } =&gt; <span class="bool-val">false</span>,
+            <span class="self">self</span>.items.len(),
+            <span class="self">self</span>.index
+                .iter()
+                .filter(|slot| {
+                    <span class="kw">match </span><span class="kw-2">**</span>slot {
+                        SlabSlot::Full { .. } =&gt; <span class="bool-val">true</span>,
+                        SlabSlot::Empty { .. } =&gt; <span class="bool-val">false</span>,
                     }
                 })
-                .<span class="ident">count</span>()
+                .count()
         );
 
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="kw-2">&amp;</span>(<span class="kw">_</span>, <span class="ident">j</span>)) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">items</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">index</span>[<span class="ident">j</span>] {
-                <span class="ident">SlabSlot::Full</span> { <span class="ident">value</span> } =&gt; <span class="ident">value</span>,
-                <span class="ident">SlabSlot::Empty</span> { .. } =&gt; <span class="macro">panic!</span>(),
+        <span class="kw">for </span>(i, <span class="kw-2">&amp;</span>(<span class="kw">_</span>, j)) <span class="kw">in </span><span class="self">self</span>.items.iter().enumerate() {
+            <span class="kw">let </span>index = <span class="kw">match </span><span class="self">self</span>.index[j] {
+                SlabSlot::Full { value } =&gt; value,
+                SlabSlot::Empty { .. } =&gt; <span class="macro">panic!</span>(),
             };
-            <span class="kw">if</span> <span class="ident">index</span> <span class="op">!</span><span class="op">=</span> <span class="ident">i</span> {
+            <span class="kw">if </span>index != i {
                 <span class="macro">panic!</span>(
                     <span class="string">&quot;self.index[j] != i : i={} j={} self.index[j]={}&quot;</span>,
-                    <span class="ident">i</span>, <span class="ident">j</span>, <span class="ident">index</span>
+                    i, j, index
                 );
             }
         }
 
-        <span class="kw">for</span> (<span class="ident">i</span>, <span class="kw-2">&amp;</span>(<span class="kw-2">ref</span> <span class="ident">item</span>, <span class="kw">_</span>)) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">items</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">if</span> <span class="ident">i</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                <span class="macro">assert!</span>(<span class="kw-2">*</span><span class="ident">item</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">items</span>[(<span class="ident">i</span> <span class="op">-</span> <span class="number">1</span>) <span class="op">/</span> <span class="number">2</span>].<span class="number">0</span>, <span class="string">&quot;bad at index: {}&quot;</span>, <span class="ident">i</span>);
+        <span class="kw">for </span>(i, <span class="kw-2">&amp;</span>(<span class="kw-2">ref </span>item, <span class="kw">_</span>)) <span class="kw">in </span><span class="self">self</span>.items.iter().enumerate() {
+            <span class="kw">if </span>i &gt; <span class="number">0 </span>{
+                <span class="macro">assert!</span>(<span class="kw-2">*</span>item &gt;= <span class="self">self</span>.items[(i - <span class="number">1</span>) / <span class="number">2</span>].<span class="number">0</span>, <span class="string">&quot;bad at index: {}&quot;</span>, i);
             }
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">left</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">items</span>.<span class="ident">get</span>(<span class="number">2</span> <span class="op">*</span> <span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>) {
-                <span class="macro">assert!</span>(<span class="kw-2">*</span><span class="ident">item</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">left</span>.<span class="number">0</span>, <span class="string">&quot;bad left at index: {}&quot;</span>, <span class="ident">i</span>);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(left) = <span class="self">self</span>.items.get(<span class="number">2 </span>* i + <span class="number">1</span>) {
+                <span class="macro">assert!</span>(<span class="kw-2">*</span>item &lt;= left.<span class="number">0</span>, <span class="string">&quot;bad left at index: {}&quot;</span>, i);
             }
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">right</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">items</span>.<span class="ident">get</span>(<span class="number">2</span> <span class="op">*</span> <span class="ident">i</span> <span class="op">+</span> <span class="number">2</span>) {
-                <span class="macro">assert!</span>(<span class="kw-2">*</span><span class="ident">item</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">right</span>.<span class="number">0</span>, <span class="string">&quot;bad right at index: {}&quot;</span>, <span class="ident">i</span>);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(right) = <span class="self">self</span>.items.get(<span class="number">2 </span>* i + <span class="number">2</span>) {
+                <span class="macro">assert!</span>(<span class="kw-2">*</span>item &lt;= right.<span class="number">0</span>, <span class="string">&quot;bad right at index: {}&quot;</span>, i);
             }
         }
     }
 }
 
-<span class="kw">fn</span> <span class="ident">set_index</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">slab</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SlabSlot</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">slab_slot</span>: <span class="ident">usize</span>, <span class="ident">val</span>: <span class="ident">T</span>) {
-    <span class="kw">match</span> <span class="ident">slab</span>[<span class="ident">slab_slot</span>] {
-        <span class="ident">SlabSlot::Full</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">value</span> } =&gt; <span class="kw-2">*</span><span class="ident">value</span> <span class="op">=</span> <span class="ident">val</span>,
-        <span class="ident">SlabSlot::Empty</span> { .. } =&gt; <span class="macro">panic!</span>(),
+<span class="kw">fn </span>set_index&lt;T&gt;(slab: <span class="kw-2">&amp;mut </span>Vec&lt;SlabSlot&lt;T&gt;&gt;, slab_slot: usize, val: T) {
+    <span class="kw">match </span>slab[slab_slot] {
+        SlabSlot::Full { <span class="kw-2">ref mut </span>value } =&gt; <span class="kw-2">*</span>value = val,
+        SlabSlot::Empty { .. } =&gt; <span class="macro">panic!</span>(),
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Heap</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use </span><span class="kw">super</span>::Heap;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">simple</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">Heap::new</span>();
-        <span class="ident">h</span>.<span class="ident">push</span>(<span class="number">1</span>);
-        <span class="ident">h</span>.<span class="ident">push</span>(<span class="number">2</span>);
-        <span class="ident">h</span>.<span class="ident">push</span>(<span class="number">8</span>);
-        <span class="ident">h</span>.<span class="ident">push</span>(<span class="number">4</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">h</span>.<span class="ident">pop</span>(), <span class="prelude-val">Some</span>(<span class="number">1</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">h</span>.<span class="ident">pop</span>(), <span class="prelude-val">Some</span>(<span class="number">2</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">h</span>.<span class="ident">pop</span>(), <span class="prelude-val">Some</span>(<span class="number">4</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">h</span>.<span class="ident">pop</span>(), <span class="prelude-val">Some</span>(<span class="number">8</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">h</span>.<span class="ident">pop</span>(), <span class="prelude-val">None</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">h</span>.<span class="ident">pop</span>(), <span class="prelude-val">None</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>simple() {
+        <span class="kw">let </span><span class="kw-2">mut </span>h = Heap::new();
+        h.push(<span class="number">1</span>);
+        h.push(<span class="number">2</span>);
+        h.push(<span class="number">8</span>);
+        h.push(<span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(h.pop(), <span class="prelude-val">Some</span>(<span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(h.pop(), <span class="prelude-val">Some</span>(<span class="number">2</span>));
+        <span class="macro">assert_eq!</span>(h.pop(), <span class="prelude-val">Some</span>(<span class="number">4</span>));
+        <span class="macro">assert_eq!</span>(h.pop(), <span class="prelude-val">Some</span>(<span class="number">8</span>));
+        <span class="macro">assert_eq!</span>(h.pop(), <span class="prelude-val">None</span>);
+        <span class="macro">assert_eq!</span>(h.pop(), <span class="prelude-val">None</span>);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">simple2</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">Heap::new</span>();
-        <span class="ident">h</span>.<span class="ident">push</span>(<span class="number">5</span>);
-        <span class="ident">h</span>.<span class="ident">push</span>(<span class="number">4</span>);
-        <span class="ident">h</span>.<span class="ident">push</span>(<span class="number">3</span>);
-        <span class="ident">h</span>.<span class="ident">push</span>(<span class="number">2</span>);
-        <span class="ident">h</span>.<span class="ident">push</span>(<span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">h</span>.<span class="ident">pop</span>(), <span class="prelude-val">Some</span>(<span class="number">1</span>));
-        <span class="ident">h</span>.<span class="ident">push</span>(<span class="number">8</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">h</span>.<span class="ident">pop</span>(), <span class="prelude-val">Some</span>(<span class="number">2</span>));
-        <span class="ident">h</span>.<span class="ident">push</span>(<span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">h</span>.<span class="ident">pop</span>(), <span class="prelude-val">Some</span>(<span class="number">1</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">h</span>.<span class="ident">pop</span>(), <span class="prelude-val">Some</span>(<span class="number">3</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">h</span>.<span class="ident">pop</span>(), <span class="prelude-val">Some</span>(<span class="number">4</span>));
-        <span class="ident">h</span>.<span class="ident">push</span>(<span class="number">5</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">h</span>.<span class="ident">pop</span>(), <span class="prelude-val">Some</span>(<span class="number">5</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">h</span>.<span class="ident">pop</span>(), <span class="prelude-val">Some</span>(<span class="number">5</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">h</span>.<span class="ident">pop</span>(), <span class="prelude-val">Some</span>(<span class="number">8</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>simple2() {
+        <span class="kw">let </span><span class="kw-2">mut </span>h = Heap::new();
+        h.push(<span class="number">5</span>);
+        h.push(<span class="number">4</span>);
+        h.push(<span class="number">3</span>);
+        h.push(<span class="number">2</span>);
+        h.push(<span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(h.pop(), <span class="prelude-val">Some</span>(<span class="number">1</span>));
+        h.push(<span class="number">8</span>);
+        <span class="macro">assert_eq!</span>(h.pop(), <span class="prelude-val">Some</span>(<span class="number">2</span>));
+        h.push(<span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(h.pop(), <span class="prelude-val">Some</span>(<span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(h.pop(), <span class="prelude-val">Some</span>(<span class="number">3</span>));
+        <span class="macro">assert_eq!</span>(h.pop(), <span class="prelude-val">Some</span>(<span class="number">4</span>));
+        h.push(<span class="number">5</span>);
+        <span class="macro">assert_eq!</span>(h.pop(), <span class="prelude-val">Some</span>(<span class="number">5</span>));
+        <span class="macro">assert_eq!</span>(h.pop(), <span class="prelude-val">Some</span>(<span class="number">5</span>));
+        <span class="macro">assert_eq!</span>(h.pop(), <span class="prelude-val">Some</span>(<span class="number">8</span>));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">remove</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">Heap::new</span>();
-        <span class="ident">h</span>.<span class="ident">push</span>(<span class="number">5</span>);
-        <span class="ident">h</span>.<span class="ident">push</span>(<span class="number">4</span>);
-        <span class="ident">h</span>.<span class="ident">push</span>(<span class="number">3</span>);
-        <span class="kw">let</span> <span class="ident">two</span> <span class="op">=</span> <span class="ident">h</span>.<span class="ident">push</span>(<span class="number">2</span>);
-        <span class="ident">h</span>.<span class="ident">push</span>(<span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">h</span>.<span class="ident">pop</span>(), <span class="prelude-val">Some</span>(<span class="number">1</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">h</span>.<span class="ident">remove</span>(<span class="ident">two</span>), <span class="number">2</span>);
-        <span class="ident">h</span>.<span class="ident">push</span>(<span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">h</span>.<span class="ident">pop</span>(), <span class="prelude-val">Some</span>(<span class="number">1</span>));
-        <span class="macro">assert_eq!</span>(<span class="ident">h</span>.<span class="ident">pop</span>(), <span class="prelude-val">Some</span>(<span class="number">3</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>remove() {
+        <span class="kw">let </span><span class="kw-2">mut </span>h = Heap::new();
+        h.push(<span class="number">5</span>);
+        h.push(<span class="number">4</span>);
+        h.push(<span class="number">3</span>);
+        <span class="kw">let </span>two = h.push(<span class="number">2</span>);
+        h.push(<span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(h.pop(), <span class="prelude-val">Some</span>(<span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(h.remove(two), <span class="number">2</span>);
+        h.push(<span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(h.pop(), <span class="prelude-val">Some</span>(<span class="number">1</span>));
+        <span class="macro">assert_eq!</span>(h.pop(), <span class="prelude-val">Some</span>(<span class="number">3</span>));
     }
 
-    <span class="kw">fn</span> <span class="ident">vec2heap</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Ord</span><span class="op">&gt;</span>(<span class="ident">v</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">Heap</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident">Heap::new</span>();
-        <span class="kw">for</span> <span class="ident">t</span> <span class="kw">in</span> <span class="ident">v</span> {
-            <span class="ident">h</span>.<span class="ident">push</span>(<span class="ident">t</span>);
+    <span class="kw">fn </span>vec2heap&lt;T: Ord&gt;(v: Vec&lt;T&gt;) -&gt; Heap&lt;T&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>h = Heap::new();
+        <span class="kw">for </span>t <span class="kw">in </span>v {
+            h.push(t);
         }
-        <span class="kw">return</span> <span class="ident">h</span>;
+        <span class="kw">return </span>h;
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_peek_and_pop</span>() {
-        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">2</span>, <span class="number">4</span>, <span class="number">6</span>, <span class="number">2</span>, <span class="number">1</span>, <span class="number">8</span>, <span class="number">10</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">0</span>, <span class="number">9</span>, <span class="number">1</span>];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sorted</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">clone</span>();
-        <span class="ident">sorted</span>.<span class="ident">sort</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">heap</span> <span class="op">=</span> <span class="ident">vec2heap</span>(<span class="ident">data</span>);
-        <span class="kw">while</span> <span class="ident">heap</span>.<span class="ident">peek</span>().<span class="ident">is_some</span>() {
-            <span class="macro">assert_eq!</span>(<span class="ident">heap</span>.<span class="ident">peek</span>().<span class="ident">unwrap</span>(), <span class="ident">sorted</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>());
-            <span class="macro">assert_eq!</span>(<span class="ident">heap</span>.<span class="ident">pop</span>().<span class="ident">unwrap</span>(), <span class="ident">sorted</span>.<span class="ident">remove</span>(<span class="number">0</span>));
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_peek_and_pop() {
+        <span class="kw">let </span>data = <span class="macro">vec!</span>[<span class="number">2</span>, <span class="number">4</span>, <span class="number">6</span>, <span class="number">2</span>, <span class="number">1</span>, <span class="number">8</span>, <span class="number">10</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">0</span>, <span class="number">9</span>, <span class="number">1</span>];
+        <span class="kw">let </span><span class="kw-2">mut </span>sorted = data.clone();
+        sorted.sort();
+        <span class="kw">let </span><span class="kw-2">mut </span>heap = vec2heap(data);
+        <span class="kw">while </span>heap.peek().is_some() {
+            <span class="macro">assert_eq!</span>(heap.peek().unwrap(), sorted.first().unwrap());
+            <span class="macro">assert_eq!</span>(heap.pop().unwrap(), sorted.remove(<span class="number">0</span>));
         }
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_push</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">heap</span> <span class="op">=</span> <span class="ident">Heap::new</span>();
-        <span class="ident">heap</span>.<span class="ident">push</span>(<span class="op">-</span><span class="number">2</span>);
-        <span class="ident">heap</span>.<span class="ident">push</span>(<span class="op">-</span><span class="number">4</span>);
-        <span class="ident">heap</span>.<span class="ident">push</span>(<span class="op">-</span><span class="number">9</span>);
-        <span class="macro">assert!</span>(<span class="kw-2">*</span><span class="ident">heap</span>.<span class="ident">peek</span>().<span class="ident">unwrap</span>() <span class="op">==</span> <span class="op">-</span><span class="number">9</span>);
-        <span class="ident">heap</span>.<span class="ident">push</span>(<span class="op">-</span><span class="number">11</span>);
-        <span class="macro">assert!</span>(<span class="kw-2">*</span><span class="ident">heap</span>.<span class="ident">peek</span>().<span class="ident">unwrap</span>() <span class="op">==</span> <span class="op">-</span><span class="number">11</span>);
-        <span class="ident">heap</span>.<span class="ident">push</span>(<span class="op">-</span><span class="number">5</span>);
-        <span class="macro">assert!</span>(<span class="kw-2">*</span><span class="ident">heap</span>.<span class="ident">peek</span>().<span class="ident">unwrap</span>() <span class="op">==</span> <span class="op">-</span><span class="number">11</span>);
-        <span class="ident">heap</span>.<span class="ident">push</span>(<span class="op">-</span><span class="number">27</span>);
-        <span class="macro">assert!</span>(<span class="kw-2">*</span><span class="ident">heap</span>.<span class="ident">peek</span>().<span class="ident">unwrap</span>() <span class="op">==</span> <span class="op">-</span><span class="number">27</span>);
-        <span class="ident">heap</span>.<span class="ident">push</span>(<span class="op">-</span><span class="number">3</span>);
-        <span class="macro">assert!</span>(<span class="kw-2">*</span><span class="ident">heap</span>.<span class="ident">peek</span>().<span class="ident">unwrap</span>() <span class="op">==</span> <span class="op">-</span><span class="number">27</span>);
-        <span class="ident">heap</span>.<span class="ident">push</span>(<span class="op">-</span><span class="number">103</span>);
-        <span class="macro">assert!</span>(<span class="kw-2">*</span><span class="ident">heap</span>.<span class="ident">peek</span>().<span class="ident">unwrap</span>() <span class="op">==</span> <span class="op">-</span><span class="number">103</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_push() {
+        <span class="kw">let </span><span class="kw-2">mut </span>heap = Heap::new();
+        heap.push(-<span class="number">2</span>);
+        heap.push(-<span class="number">4</span>);
+        heap.push(-<span class="number">9</span>);
+        <span class="macro">assert!</span>(<span class="kw-2">*</span>heap.peek().unwrap() == -<span class="number">9</span>);
+        heap.push(-<span class="number">11</span>);
+        <span class="macro">assert!</span>(<span class="kw-2">*</span>heap.peek().unwrap() == -<span class="number">11</span>);
+        heap.push(-<span class="number">5</span>);
+        <span class="macro">assert!</span>(<span class="kw-2">*</span>heap.peek().unwrap() == -<span class="number">11</span>);
+        heap.push(-<span class="number">27</span>);
+        <span class="macro">assert!</span>(<span class="kw-2">*</span>heap.peek().unwrap() == -<span class="number">27</span>);
+        heap.push(-<span class="number">3</span>);
+        <span class="macro">assert!</span>(<span class="kw-2">*</span>heap.peek().unwrap() == -<span class="number">27</span>);
+        heap.push(-<span class="number">103</span>);
+        <span class="macro">assert!</span>(<span class="kw-2">*</span>heap.peek().unwrap() == -<span class="number">103</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">check_to_vec</span>(<span class="kw-2">mut</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">heap</span> <span class="op">=</span> <span class="ident">Heap::new</span>();
-        <span class="kw">for</span> <span class="ident">data</span> <span class="kw">in</span> <span class="ident">data</span>.<span class="ident">iter</span>() {
-            <span class="ident">heap</span>.<span class="ident">push</span>(<span class="kw-2">*</span><span class="ident">data</span>);
+    <span class="kw">fn </span>check_to_vec(<span class="kw-2">mut </span>data: Vec&lt;i32&gt;) {
+        <span class="kw">let </span><span class="kw-2">mut </span>heap = Heap::new();
+        <span class="kw">for </span>data <span class="kw">in </span>data.iter() {
+            heap.push(<span class="kw-2">*</span>data);
         }
-        <span class="ident">data</span>.<span class="ident">sort</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">i</span>) <span class="op">=</span> <span class="ident">heap</span>.<span class="ident">pop</span>() {
-            <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">i</span>);
+        data.sort();
+        <span class="kw">let </span><span class="kw-2">mut </span>v = Vec::new();
+        <span class="kw">while let </span><span class="prelude-val">Some</span>(i) = heap.pop() {
+            v.push(i);
         }
-        <span class="macro">assert_eq!</span>(<span class="ident">v</span>, <span class="ident">data</span>);
+        <span class="macro">assert_eq!</span>(v, data);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_to_vec</span>() {
-        <span class="ident">check_to_vec</span>(<span class="macro">vec!</span>[]);
-        <span class="ident">check_to_vec</span>(<span class="macro">vec!</span>[<span class="number">5</span>]);
-        <span class="ident">check_to_vec</span>(<span class="macro">vec!</span>[<span class="number">3</span>, <span class="number">2</span>]);
-        <span class="ident">check_to_vec</span>(<span class="macro">vec!</span>[<span class="number">2</span>, <span class="number">3</span>]);
-        <span class="ident">check_to_vec</span>(<span class="macro">vec!</span>[<span class="number">5</span>, <span class="number">1</span>, <span class="number">2</span>]);
-        <span class="ident">check_to_vec</span>(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">100</span>, <span class="number">2</span>, <span class="number">3</span>]);
-        <span class="ident">check_to_vec</span>(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">9</span>, <span class="number">2</span>, <span class="number">4</span>, <span class="number">6</span>, <span class="number">8</span>, <span class="number">0</span>]);
-        <span class="ident">check_to_vec</span>(<span class="macro">vec!</span>[<span class="number">2</span>, <span class="number">4</span>, <span class="number">6</span>, <span class="number">2</span>, <span class="number">1</span>, <span class="number">8</span>, <span class="number">10</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">0</span>, <span class="number">9</span>, <span class="number">1</span>]);
-        <span class="ident">check_to_vec</span>(<span class="macro">vec!</span>[<span class="number">9</span>, <span class="number">11</span>, <span class="number">9</span>, <span class="number">9</span>, <span class="number">9</span>, <span class="number">9</span>, <span class="number">11</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">11</span>, <span class="number">9</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]);
-        <span class="ident">check_to_vec</span>(<span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>, <span class="number">10</span>]);
-        <span class="ident">check_to_vec</span>(<span class="macro">vec!</span>[<span class="number">10</span>, <span class="number">9</span>, <span class="number">8</span>, <span class="number">7</span>, <span class="number">6</span>, <span class="number">5</span>, <span class="number">4</span>, <span class="number">3</span>, <span class="number">2</span>, <span class="number">1</span>, <span class="number">0</span>]);
-        <span class="ident">check_to_vec</span>(<span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>]);
-        <span class="ident">check_to_vec</span>(<span class="macro">vec!</span>[<span class="number">5</span>, <span class="number">4</span>, <span class="number">3</span>, <span class="number">2</span>, <span class="number">1</span>, <span class="number">5</span>, <span class="number">4</span>, <span class="number">3</span>, <span class="number">2</span>, <span class="number">1</span>, <span class="number">5</span>, <span class="number">4</span>, <span class="number">3</span>, <span class="number">2</span>, <span class="number">1</span>]);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_to_vec() {
+        check_to_vec(<span class="macro">vec!</span>[]);
+        check_to_vec(<span class="macro">vec!</span>[<span class="number">5</span>]);
+        check_to_vec(<span class="macro">vec!</span>[<span class="number">3</span>, <span class="number">2</span>]);
+        check_to_vec(<span class="macro">vec!</span>[<span class="number">2</span>, <span class="number">3</span>]);
+        check_to_vec(<span class="macro">vec!</span>[<span class="number">5</span>, <span class="number">1</span>, <span class="number">2</span>]);
+        check_to_vec(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">100</span>, <span class="number">2</span>, <span class="number">3</span>]);
+        check_to_vec(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">9</span>, <span class="number">2</span>, <span class="number">4</span>, <span class="number">6</span>, <span class="number">8</span>, <span class="number">0</span>]);
+        check_to_vec(<span class="macro">vec!</span>[<span class="number">2</span>, <span class="number">4</span>, <span class="number">6</span>, <span class="number">2</span>, <span class="number">1</span>, <span class="number">8</span>, <span class="number">10</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">7</span>, <span class="number">0</span>, <span class="number">9</span>, <span class="number">1</span>]);
+        check_to_vec(<span class="macro">vec!</span>[<span class="number">9</span>, <span class="number">11</span>, <span class="number">9</span>, <span class="number">9</span>, <span class="number">9</span>, <span class="number">9</span>, <span class="number">11</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">11</span>, <span class="number">9</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]);
+        check_to_vec(<span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>, <span class="number">10</span>]);
+        check_to_vec(<span class="macro">vec!</span>[<span class="number">10</span>, <span class="number">9</span>, <span class="number">8</span>, <span class="number">7</span>, <span class="number">6</span>, <span class="number">5</span>, <span class="number">4</span>, <span class="number">3</span>, <span class="number">2</span>, <span class="number">1</span>, <span class="number">0</span>]);
+        check_to_vec(<span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">9</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>]);
+        check_to_vec(<span class="macro">vec!</span>[<span class="number">5</span>, <span class="number">4</span>, <span class="number">3</span>, <span class="number">2</span>, <span class="number">1</span>, <span class="number">5</span>, <span class="number">4</span>, <span class="number">3</span>, <span class="number">2</span>, <span class="number">1</span>, <span class="number">5</span>, <span class="number">4</span>, <span class="number">3</span>, <span class="number">2</span>, <span class="number">1</span>]);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_empty_pop</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">heap</span> <span class="op">=</span> <span class="ident">Heap</span>::<span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span><span class="ident">::new</span>();
-        <span class="macro">assert!</span>(<span class="ident">heap</span>.<span class="ident">pop</span>().<span class="ident">is_none</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_empty_pop() {
+        <span class="kw">let </span><span class="kw-2">mut </span>heap = Heap::&lt;i32&gt;::new();
+        <span class="macro">assert!</span>(heap.pop().is_none());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_empty_peek</span>() {
-        <span class="kw">let</span> <span class="ident">empty</span> <span class="op">=</span> <span class="ident">Heap</span>::<span class="op">&lt;</span><span class="ident">i32</span><span class="op">&gt;</span><span class="ident">::new</span>();
-        <span class="macro">assert!</span>(<span class="ident">empty</span>.<span class="ident">peek</span>().<span class="ident">is_none</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_empty_peek() {
+        <span class="kw">let </span>empty = Heap::&lt;i32&gt;::new();
+        <span class="macro">assert!</span>(empty.peek().is_none());
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="futures_timer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="futures_timer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

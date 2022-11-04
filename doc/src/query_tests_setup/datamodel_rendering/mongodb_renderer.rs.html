@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connector-test-kit-rs/query-tests-setup/src/datamodel_rendering/mongodb_renderer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mongodb_renderer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_tests_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_tests_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_tests_setup/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connector-test-kit-rs/query-tests-setup/src/datamodel_rendering/mongodb_renderer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mongodb_renderer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../query_tests_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../query_tests_setup/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../query_tests_setup/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -102,109 +102,109 @@
 <span id="102">102</span>
 <span id="103">103</span>
 <span id="104">104</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Directive</span>;
+</pre><pre class="rust"><code><span class="kw">use super</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::Directive;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MongoDbSchemaRenderer</span> {}
+<span class="attribute">#[derive(Debug, Default)]
+</span><span class="kw">pub struct </span>MongoDbSchemaRenderer {}
 
-<span class="kw">impl</span> <span class="ident">MongoDbSchemaRenderer</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::default</span>()
+<span class="kw">impl </span>MongoDbSchemaRenderer {
+    <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">DatamodelRenderer</span> <span class="kw">for</span> <span class="ident">MongoDbSchemaRenderer</span> {
-    <span class="kw">fn</span> <span class="ident">render_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">id</span>: <span class="ident">IdFragment</span>) -&gt; <span class="ident">String</span> {
-        <span class="comment">// Mongo IDs require an `_id` mapping.</span>
-        <span class="ident">id</span>.<span class="ident">upsert_directive</span>(<span class="string">&quot;map&quot;</span>, <span class="op">|</span><span class="ident">existing</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">existing</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">dir</span>) =&gt; {
-                <span class="ident">dir</span>.<span class="ident">args</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="string">&quot;\&quot;_id\&quot;&quot;</span>.<span class="ident">to_owned</span>()];
-                <span class="prelude-val">None</span>
-            }
-            <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Directive::new</span>(<span class="string">&quot;map&quot;</span>, <span class="macro">vec!</span>[<span class="string">&quot;\&quot;_id\&quot;&quot;</span>])),
+<span class="kw">impl </span>DatamodelRenderer <span class="kw">for </span>MongoDbSchemaRenderer {
+    <span class="kw">fn </span>render_id(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut </span>id: IdFragment) -&gt; String {
+        <span class="comment">// Mongo IDs require an `_id` mapping.
+        </span>id.upsert_directive(<span class="string">&quot;map&quot;</span>, |existing| <span class="kw">match </span>existing {
+            <span class="prelude-val">Some</span>(dir) =&gt; {
+                dir.args = <span class="macro">vec!</span>[<span class="string">&quot;\&quot;_id\&quot;&quot;</span>.to_owned()];
+                <span class="prelude-val">None
+            </span>}
+            <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Some</span>(Directive::new(<span class="string">&quot;map&quot;</span>, <span class="macro">vec!</span>[<span class="string">&quot;\&quot;_id\&quot;&quot;</span>])),
         });
 
-        <span class="ident">id</span>.<span class="ident">to_string</span>()
+        id.to_string()
     }
 
-    <span class="comment">// Currently just an accepted hack for MongoDB</span>
-    <span class="kw">fn</span> <span class="ident">render_m2m</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">m2m</span>: <span class="ident">M2mFragment</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">let</span> <span class="ident">M2mFragment</span> {
-            <span class="ident">field_name</span>,
-            <span class="ident">field_type</span>,
-            <span class="ident">opposing_name</span>,
-            <span class="ident">opposing_type</span>,
-            <span class="ident">relation_name</span>,
-        } <span class="op">=</span> <span class="ident">m2m</span>;
+    <span class="comment">// Currently just an accepted hack for MongoDB
+    </span><span class="kw">fn </span>render_m2m(<span class="kw-2">&amp;</span><span class="self">self</span>, m2m: M2mFragment) -&gt; String {
+        <span class="kw">let </span>M2mFragment {
+            field_name,
+            field_type,
+            opposing_name,
+            opposing_type,
+            relation_name,
+        } = m2m;
 
-        <span class="comment">// Add an array field for mongo, name: &quot;&lt;rel_field_name&gt;_ids &lt;Opposing type&gt;[]&quot;</span>
-        <span class="kw">let</span> <span class="ident">fk_field_name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{field_name}_ids&quot;</span>);
-        <span class="kw">let</span> <span class="ident">additional_fk_field</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{fk_field_name} {opposing_type}[]&quot;</span>);
+        <span class="comment">// Add an array field for mongo, name: &quot;&lt;rel_field_name&gt;_ids &lt;Opposing type&gt;[]&quot;
+        </span><span class="kw">let </span>fk_field_name = <span class="macro">format!</span>(<span class="string">&quot;{field_name}_ids&quot;</span>);
+        <span class="kw">let </span>additional_fk_field = <span class="macro">format!</span>(<span class="string">&quot;{fk_field_name} {opposing_type}[]&quot;</span>);
 
-        <span class="comment">// Add @relation directive that specifies the local array to hold the FKs.</span>
-        <span class="kw">let</span> <span class="ident">relation_directive</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">relation_name</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; {
+        <span class="comment">// Add @relation directive that specifies the local array to hold the FKs.
+        </span><span class="kw">let </span>relation_directive = <span class="kw">match </span>relation_name {
+            <span class="prelude-val">Some</span>(name) =&gt; {
                 <span class="macro">format!</span>(<span class="string">r#&quot;@relation(name: &quot;{name}&quot;, fields: [{fk_field_name}], references: [{opposing_name}])&quot;#</span>,)
             }
-            <span class="prelude-val">None</span> =&gt; <span class="macro">format!</span>(<span class="string">r#&quot;@relation(fields: [{fk_field_name}], references: [{opposing_name}])&quot;#</span>),
+            <span class="prelude-val">None </span>=&gt; <span class="macro">format!</span>(<span class="string">r#&quot;@relation(fields: [{fk_field_name}], references: [{opposing_name}])&quot;#</span>),
         };
 
         <span class="macro">format!</span>(<span class="string">&quot;{additional_fk_field}\n{field_name} {field_type} {relation_directive}&quot;</span>)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">mongo_render_tests</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::IdFragment</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>mongo_render_tests {
+    <span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::IdFragment;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">add_id_mapping</span>() {
-        <span class="kw">let</span> <span class="ident">fragment</span> <span class="op">=</span> <span class="ident">IdFragment</span> {
-            <span class="ident">field_name</span>: <span class="string">&quot;someIdField&quot;</span>.<span class="ident">to_owned</span>(),
-            <span class="ident">field_type</span>: <span class="string">&quot;SomeType&quot;</span>.<span class="ident">to_owned</span>(),
-            <span class="ident">directives</span>: <span class="macro">vec!</span>[<span class="ident">Directive::new</span>(<span class="string">&quot;id&quot;</span>, <span class="macro">vec!</span>[])],
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>add_id_mapping() {
+        <span class="kw">let </span>fragment = IdFragment {
+            field_name: <span class="string">&quot;someIdField&quot;</span>.to_owned(),
+            field_type: <span class="string">&quot;SomeType&quot;</span>.to_owned(),
+            directives: <span class="macro">vec!</span>[Directive::new(<span class="string">&quot;id&quot;</span>, <span class="macro">vec!</span>[])],
         };
 
-        <span class="kw">let</span> <span class="ident">renderer</span> <span class="op">=</span> <span class="ident">MongoDbSchemaRenderer::new</span>();
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">renderer</span>.<span class="ident">render_id</span>(<span class="ident">fragment</span>);
+        <span class="kw">let </span>renderer = MongoDbSchemaRenderer::new();
+        <span class="kw">let </span>rendered = renderer.render_id(fragment);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">rendered</span>, <span class="string">r#&quot;someIdField SomeType @id @map(&quot;_id&quot;)&quot;#</span>)
+        <span class="macro">assert_eq!</span>(rendered, <span class="string">r#&quot;someIdField SomeType @id @map(&quot;_id&quot;)&quot;#</span>)
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">update_id_mapping</span>() {
-        <span class="kw">let</span> <span class="ident">fragment</span> <span class="op">=</span> <span class="ident">IdFragment</span> {
-            <span class="ident">field_name</span>: <span class="string">&quot;someIdField&quot;</span>.<span class="ident">to_owned</span>(),
-            <span class="ident">field_type</span>: <span class="string">&quot;SomeType&quot;</span>.<span class="ident">to_owned</span>(),
-            <span class="ident">directives</span>: <span class="macro">vec!</span>[<span class="ident">Directive::new</span>(<span class="string">&quot;id&quot;</span>, <span class="macro">vec!</span>[]), <span class="ident">Directive::new</span>(<span class="string">&quot;map&quot;</span>, <span class="macro">vec!</span>[<span class="string">&quot;\&quot;not_id\&quot;&quot;</span>])],
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>update_id_mapping() {
+        <span class="kw">let </span>fragment = IdFragment {
+            field_name: <span class="string">&quot;someIdField&quot;</span>.to_owned(),
+            field_type: <span class="string">&quot;SomeType&quot;</span>.to_owned(),
+            directives: <span class="macro">vec!</span>[Directive::new(<span class="string">&quot;id&quot;</span>, <span class="macro">vec!</span>[]), Directive::new(<span class="string">&quot;map&quot;</span>, <span class="macro">vec!</span>[<span class="string">&quot;\&quot;not_id\&quot;&quot;</span>])],
         };
 
-        <span class="kw">let</span> <span class="ident">renderer</span> <span class="op">=</span> <span class="ident">MongoDbSchemaRenderer::new</span>();
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">renderer</span>.<span class="ident">render_id</span>(<span class="ident">fragment</span>);
+        <span class="kw">let </span>renderer = MongoDbSchemaRenderer::new();
+        <span class="kw">let </span>rendered = renderer.render_id(fragment);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">rendered</span>, <span class="string">r#&quot;someIdField SomeType @id @map(&quot;_id&quot;)&quot;#</span>)
+        <span class="macro">assert_eq!</span>(rendered, <span class="string">r#&quot;someIdField SomeType @id @map(&quot;_id&quot;)&quot;#</span>)
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">add_m2m_mapping</span>() {
-        <span class="kw">let</span> <span class="ident">fragment</span> <span class="op">=</span> <span class="ident">M2mFragment</span> {
-            <span class="ident">field_name</span>: <span class="string">&quot;posts&quot;</span>.<span class="ident">to_owned</span>(),
-            <span class="ident">field_type</span>: <span class="string">&quot;Post[]&quot;</span>.<span class="ident">to_owned</span>(),
-            <span class="ident">opposing_name</span>: <span class="string">&quot;id&quot;</span>.<span class="ident">to_owned</span>(),
-            <span class="ident">opposing_type</span>: <span class="string">&quot;String&quot;</span>.<span class="ident">to_owned</span>(),
-            <span class="ident">relation_name</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;test&quot;</span>.<span class="ident">to_owned</span>()),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>add_m2m_mapping() {
+        <span class="kw">let </span>fragment = M2mFragment {
+            field_name: <span class="string">&quot;posts&quot;</span>.to_owned(),
+            field_type: <span class="string">&quot;Post[]&quot;</span>.to_owned(),
+            opposing_name: <span class="string">&quot;id&quot;</span>.to_owned(),
+            opposing_type: <span class="string">&quot;String&quot;</span>.to_owned(),
+            relation_name: <span class="prelude-val">Some</span>(<span class="string">&quot;test&quot;</span>.to_owned()),
         };
 
-        <span class="kw">let</span> <span class="ident">renderer</span> <span class="op">=</span> <span class="ident">MongoDbSchemaRenderer::new</span>();
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">renderer</span>.<span class="ident">render_m2m</span>(<span class="ident">fragment</span>);
+        <span class="kw">let </span>renderer = MongoDbSchemaRenderer::new();
+        <span class="kw">let </span>rendered = renderer.render_m2m(fragment);
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">rendered</span>.<span class="ident">trim</span>(),
-            <span class="string">&quot;posts_ids String[]\nposts Post[] @relation(name: \&quot;test\&quot;, fields: [posts_ids], references: [id])&quot;</span>
-        )
+            rendered.trim(),
+            <span class="string">&quot;posts_ids String[]\nposts Post[] @relation(name: \&quot;test\&quot;, fields: [posts_ids], references: [id])&quot;
+        </span>)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_tests_setup" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="query_tests_setup" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

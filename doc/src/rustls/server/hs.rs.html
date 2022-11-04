@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/server/hs.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>hs.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/rustls-0.20.6/src/server/hs.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>hs.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../rustls/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rustls/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -521,528 +521,528 @@
 <span id="521">521</span>
 <span id="522">522</span>
 <span id="523">523</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::conn</span>::{<span class="ident">CommonState</span>, <span class="ident">ConnectionRandoms</span>, <span class="ident">State</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::Error</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::hash_hs</span>::{<span class="ident">HandshakeHash</span>, <span class="ident">HandshakeHashBuffer</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;logging&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::log</span>::{<span class="ident">debug</span>, <span class="ident">trace</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::enums::CipherSuite</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::enums</span>::{<span class="ident">AlertDescription</span>, <span class="ident">Compression</span>, <span class="ident">ExtensionType</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::enums</span>::{<span class="ident">HandshakeType</span>, <span class="ident">ProtocolVersion</span>, <span class="ident">SignatureScheme</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::handshake::SessionID</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::handshake</span>::{<span class="ident">ClientHelloPayload</span>, <span class="ident">Random</span>, <span class="ident">ServerExtension</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::handshake</span>::{<span class="ident">ConvertProtocolNameList</span>, <span class="ident">ConvertServerNameList</span>, <span class="ident">HandshakePayload</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::message</span>::{<span class="ident">Message</span>, <span class="ident">MessagePayload</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::msgs::persist</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::server</span>::{<span class="ident">ClientHello</span>, <span class="ident">ServerConfig</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::suites</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::SupportedCipherSuite</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::conn::{CommonState, ConnectionRandoms, State};
+<span class="kw">use </span><span class="kw">crate</span>::error::Error;
+<span class="kw">use </span><span class="kw">crate</span>::hash_hs::{HandshakeHash, HandshakeHashBuffer};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;logging&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::log::{debug, trace};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::msgs::enums::CipherSuite;
+<span class="kw">use </span><span class="kw">crate</span>::msgs::enums::{AlertDescription, Compression, ExtensionType};
+<span class="kw">use </span><span class="kw">crate</span>::msgs::enums::{HandshakeType, ProtocolVersion, SignatureScheme};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::SessionID;
+<span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::{ClientHelloPayload, Random, ServerExtension};
+<span class="kw">use </span><span class="kw">crate</span>::msgs::handshake::{ConvertProtocolNameList, ConvertServerNameList, HandshakePayload};
+<span class="kw">use </span><span class="kw">crate</span>::msgs::message::{Message, MessagePayload};
+<span class="kw">use </span><span class="kw">crate</span>::msgs::persist;
+<span class="kw">use </span><span class="kw">crate</span>::server::{ClientHello, ServerConfig};
+<span class="kw">use </span><span class="kw">crate</span>::suites;
+<span class="kw">use </span><span class="kw">crate</span>::SupportedCipherSuite;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::server_conn::ServerConnectionData</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::tls12</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::server::common::ActiveCertifiedKey</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::server::tls13</span>;
+<span class="kw">use </span><span class="kw">super</span>::server_conn::ServerConnectionData;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">super</span>::tls12;
+<span class="kw">use </span><span class="kw">crate</span>::server::common::ActiveCertifiedKey;
+<span class="kw">use </span><span class="kw">crate</span>::server::tls13;
 
-<span class="kw">use</span> <span class="ident">std::sync::Arc</span>;
+<span class="kw">use </span>std::sync::Arc;
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">type</span> <span class="ident">NextState</span> <span class="op">=</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">ServerConnectionData</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">type</span> <span class="ident">NextStateOrError</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">NextState</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">type</span> <span class="ident">ServerContext</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::conn::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ServerConnectionData</span><span class="op">&gt;</span>;
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">type </span>NextState = Box&lt;<span class="kw">dyn </span>State&lt;ServerConnectionData&gt;&gt;;
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">type </span>NextStateOrError = <span class="prelude-ty">Result</span>&lt;NextState, Error&gt;;
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">type </span>ServerContext&lt;<span class="lifetime">&#39;a</span>&gt; = <span class="kw">crate</span>::conn::Context&lt;<span class="lifetime">&#39;a</span>, ServerConnectionData&gt;;
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">incompatible</span>(<span class="ident">common</span>: <span class="kw-2">&amp;mut</span> <span class="ident">CommonState</span>, <span class="ident">why</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Error</span> {
-    <span class="ident">common</span>.<span class="ident">send_fatal_alert</span>(<span class="ident">AlertDescription::HandshakeFailure</span>);
-    <span class="ident">Error::PeerIncompatibleError</span>(<span class="ident">why</span>.<span class="ident">to_string</span>())
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>incompatible(common: <span class="kw-2">&amp;mut </span>CommonState, why: <span class="kw-2">&amp;</span>str) -&gt; Error {
+    common.send_fatal_alert(AlertDescription::HandshakeFailure);
+    Error::PeerIncompatibleError(why.to_string())
 }
 
-<span class="kw">fn</span> <span class="ident">bad_version</span>(<span class="ident">common</span>: <span class="kw-2">&amp;mut</span> <span class="ident">CommonState</span>, <span class="ident">why</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Error</span> {
-    <span class="ident">common</span>.<span class="ident">send_fatal_alert</span>(<span class="ident">AlertDescription::ProtocolVersion</span>);
-    <span class="ident">Error::PeerIncompatibleError</span>(<span class="ident">why</span>.<span class="ident">to_string</span>())
+<span class="kw">fn </span>bad_version(common: <span class="kw-2">&amp;mut </span>CommonState, why: <span class="kw-2">&amp;</span>str) -&gt; Error {
+    common.send_fatal_alert(AlertDescription::ProtocolVersion);
+    Error::PeerIncompatibleError(why.to_string())
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">decode_error</span>(<span class="ident">common</span>: <span class="kw-2">&amp;mut</span> <span class="ident">CommonState</span>, <span class="ident">why</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Error</span> {
-    <span class="ident">common</span>.<span class="ident">send_fatal_alert</span>(<span class="ident">AlertDescription::DecodeError</span>);
-    <span class="ident">Error::PeerMisbehavedError</span>(<span class="ident">why</span>.<span class="ident">to_string</span>())
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>decode_error(common: <span class="kw-2">&amp;mut </span>CommonState, why: <span class="kw-2">&amp;</span>str) -&gt; Error {
+    common.send_fatal_alert(AlertDescription::DecodeError);
+    Error::PeerMisbehavedError(why.to_string())
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">can_resume</span>(
-    <span class="ident">suite</span>: <span class="ident">SupportedCipherSuite</span>,
-    <span class="ident">sni</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">webpki::DnsName</span><span class="op">&gt;</span>,
-    <span class="ident">using_ems</span>: <span class="ident">bool</span>,
-    <span class="ident">resumedata</span>: <span class="kw-2">&amp;</span><span class="ident">persist::ServerSessionValue</span>,
-) -&gt; <span class="ident">bool</span> {
-    <span class="comment">// The RFCs underspecify what happens if we try to resume to</span>
-    <span class="comment">// an unoffered/varying suite.  We merely don&#39;t resume in weird cases.</span>
-    <span class="comment">//</span>
-    <span class="comment">// RFC 6066 says &quot;A server that implements this extension MUST NOT accept</span>
-    <span class="comment">// the request to resume the session if the server_name extension contains</span>
-    <span class="comment">// a different name. Instead, it proceeds with a full handshake to</span>
-    <span class="comment">// establish a new session.&quot;</span>
-    <span class="ident">resumedata</span>.<span class="ident">cipher_suite</span> <span class="op">==</span> <span class="ident">suite</span>.<span class="ident">suite</span>()
-        <span class="op">&amp;&amp;</span> (<span class="ident">resumedata</span>.<span class="ident">extended_ms</span> <span class="op">==</span> <span class="ident">using_ems</span> <span class="op">|</span><span class="op">|</span> (<span class="ident">resumedata</span>.<span class="ident">extended_ms</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">using_ems</span>))
-        <span class="op">&amp;&amp;</span> <span class="kw-2">&amp;</span><span class="ident">resumedata</span>.<span class="ident">sni</span> <span class="op">==</span> <span class="ident">sni</span>
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>can_resume(
+    suite: SupportedCipherSuite,
+    sni: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;webpki::DnsName&gt;,
+    using_ems: bool,
+    resumedata: <span class="kw-2">&amp;</span>persist::ServerSessionValue,
+) -&gt; bool {
+    <span class="comment">// The RFCs underspecify what happens if we try to resume to
+    // an unoffered/varying suite.  We merely don&#39;t resume in weird cases.
+    //
+    // RFC 6066 says &quot;A server that implements this extension MUST NOT accept
+    // the request to resume the session if the server_name extension contains
+    // a different name. Instead, it proceeds with a full handshake to
+    // establish a new session.&quot;
+    </span>resumedata.cipher_suite == suite.suite()
+        &amp;&amp; (resumedata.extended_ms == using_ems || (resumedata.extended_ms &amp;&amp; !using_ems))
+        &amp;&amp; <span class="kw-2">&amp;</span>resumedata.sni == sni
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">ExtensionProcessing</span> {
-    <span class="comment">// extensions to reply with</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">exts</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ServerExtension</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">send_ticket</span>: <span class="ident">bool</span>,
+<span class="attribute">#[derive(Default)]
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>ExtensionProcessing {
+    <span class="comment">// extensions to reply with
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) exts: Vec&lt;ServerExtension&gt;,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) send_ticket: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">ExtensionProcessing</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">Default::default</span>()
+<span class="kw">impl </span>ExtensionProcessing {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
+        Default::default()
     }
 
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">process_common</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">ServerConfig</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ServerContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">ocsp_response</span>: <span class="kw-2">&amp;mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-        <span class="ident">sct_list</span>: <span class="kw-2">&amp;mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-        <span class="ident">hello</span>: <span class="kw-2">&amp;</span><span class="ident">ClientHelloPayload</span>,
-        <span class="ident">resumedata</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">persist::ServerSessionValue</span><span class="op">&gt;</span>,
-        <span class="ident">extra_exts</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ServerExtension</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
-        <span class="comment">// ALPN</span>
-        <span class="kw">let</span> <span class="ident">our_protocols</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">config</span>.<span class="ident">alpn_protocols</span>;
-        <span class="kw">let</span> <span class="ident">maybe_their_protocols</span> <span class="op">=</span> <span class="ident">hello</span>.<span class="ident">get_alpn_extension</span>();
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">their_protocols</span>) <span class="op">=</span> <span class="ident">maybe_their_protocols</span> {
-            <span class="kw">let</span> <span class="ident">their_protocols</span> <span class="op">=</span> <span class="ident">their_protocols</span>.<span class="ident">to_slices</span>();
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>process_common(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        config: <span class="kw-2">&amp;</span>ServerConfig,
+        cx: <span class="kw-2">&amp;mut </span>ServerContext&lt;<span class="lifetime">&#39;_</span>&gt;,
+        ocsp_response: <span class="kw-2">&amp;mut </span><span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[u8]&gt;,
+        sct_list: <span class="kw-2">&amp;mut </span><span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[u8]&gt;,
+        hello: <span class="kw-2">&amp;</span>ClientHelloPayload,
+        resumedata: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>persist::ServerSessionValue&gt;,
+        extra_exts: Vec&lt;ServerExtension&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(), Error&gt; {
+        <span class="comment">// ALPN
+        </span><span class="kw">let </span>our_protocols = <span class="kw-2">&amp;</span>config.alpn_protocols;
+        <span class="kw">let </span>maybe_their_protocols = hello.get_alpn_extension();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(their_protocols) = maybe_their_protocols {
+            <span class="kw">let </span>their_protocols = their_protocols.to_slices();
 
-            <span class="kw">if</span> <span class="ident">their_protocols</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">any</span>(<span class="op">|</span><span class="ident">protocol</span><span class="op">|</span> <span class="ident">protocol</span>.<span class="ident">is_empty</span>())
+            <span class="kw">if </span>their_protocols
+                .iter()
+                .any(|protocol| protocol.is_empty())
             {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::PeerMisbehavedError</span>(
-                    <span class="string">&quot;client offered empty ALPN protocol&quot;</span>.<span class="ident">to_string</span>(),
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::PeerMisbehavedError(
+                    <span class="string">&quot;client offered empty ALPN protocol&quot;</span>.to_string(),
                 ));
             }
 
-            <span class="ident">cx</span>.<span class="ident">common</span>.<span class="ident">alpn_protocol</span> <span class="op">=</span> <span class="ident">our_protocols</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">find</span>(<span class="op">|</span><span class="ident">protocol</span><span class="op">|</span> <span class="ident">their_protocols</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">protocol</span>.<span class="ident">as_slice</span>()))
-                .<span class="ident">cloned</span>();
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">selected_protocol</span>) <span class="op">=</span> <span class="ident">cx</span>.<span class="ident">common</span>.<span class="ident">alpn_protocol</span> {
-                <span class="macro">debug!</span>(<span class="string">&quot;Chosen ALPN protocol {:?}&quot;</span>, <span class="ident">selected_protocol</span>);
-                <span class="self">self</span>.<span class="ident">exts</span>
-                    .<span class="ident">push</span>(<span class="ident">ServerExtension::make_alpn</span>(<span class="kw-2">&amp;</span>[<span class="ident">selected_protocol</span>]));
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">our_protocols</span>.<span class="ident">is_empty</span>() {
-                <span class="ident">cx</span>.<span class="ident">common</span>
-                    .<span class="ident">send_fatal_alert</span>(<span class="ident">AlertDescription::NoApplicationProtocol</span>);
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::NoApplicationProtocol</span>);
+            cx.common.alpn_protocol = our_protocols
+                .iter()
+                .find(|protocol| their_protocols.contains(<span class="kw-2">&amp;</span>protocol.as_slice()))
+                .cloned();
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>selected_protocol) = cx.common.alpn_protocol {
+                <span class="macro">debug!</span>(<span class="string">&quot;Chosen ALPN protocol {:?}&quot;</span>, selected_protocol);
+                <span class="self">self</span>.exts
+                    .push(ServerExtension::make_alpn(<span class="kw-2">&amp;</span>[selected_protocol]));
+            } <span class="kw">else if </span>!our_protocols.is_empty() {
+                cx.common
+                    .send_fatal_alert(AlertDescription::NoApplicationProtocol);
+                <span class="kw">return </span><span class="prelude-val">Err</span>(Error::NoApplicationProtocol);
             }
         }
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;quic&quot;</span>)]</span>
-        {
-            <span class="kw">if</span> <span class="ident">cx</span>.<span class="ident">common</span>.<span class="ident">is_quic</span>() {
-                <span class="comment">// QUIC has strict ALPN, unlike TLS&#39;s more backwards-compatible behavior. RFC 9001</span>
-                <span class="comment">// says: &quot;The server MUST treat the inability to select a compatible application</span>
-                <span class="comment">// protocol as a connection error of type 0x0178&quot;. We judge that ALPN was desired</span>
-                <span class="comment">// (rather than some out-of-band protocol negotiation mechanism) iff any ALPN</span>
-                <span class="comment">// protocols were configured locally or offered by the client. This helps prevent</span>
-                <span class="comment">// successful establishment of connections between peers that can&#39;t understand</span>
-                <span class="comment">// each other.</span>
-                <span class="kw">if</span> <span class="ident">cx</span>.<span class="ident">common</span>.<span class="ident">alpn_protocol</span>.<span class="ident">is_none</span>()
-                    <span class="op">&amp;&amp;</span> (<span class="op">!</span><span class="ident">our_protocols</span>.<span class="ident">is_empty</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">maybe_their_protocols</span>.<span class="ident">is_some</span>())
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;quic&quot;</span>)]
+        </span>{
+            <span class="kw">if </span>cx.common.is_quic() {
+                <span class="comment">// QUIC has strict ALPN, unlike TLS&#39;s more backwards-compatible behavior. RFC 9001
+                // says: &quot;The server MUST treat the inability to select a compatible application
+                // protocol as a connection error of type 0x0178&quot;. We judge that ALPN was desired
+                // (rather than some out-of-band protocol negotiation mechanism) iff any ALPN
+                // protocols were configured locally or offered by the client. This helps prevent
+                // successful establishment of connections between peers that can&#39;t understand
+                // each other.
+                </span><span class="kw">if </span>cx.common.alpn_protocol.is_none()
+                    &amp;&amp; (!our_protocols.is_empty() || maybe_their_protocols.is_some())
                 {
-                    <span class="ident">cx</span>.<span class="ident">common</span>
-                        .<span class="ident">send_fatal_alert</span>(<span class="ident">AlertDescription::NoApplicationProtocol</span>);
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::NoApplicationProtocol</span>);
+                    cx.common
+                        .send_fatal_alert(AlertDescription::NoApplicationProtocol);
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(Error::NoApplicationProtocol);
                 }
 
-                <span class="kw">match</span> <span class="ident">hello</span>.<span class="ident">get_quic_params_extension</span>() {
-                    <span class="prelude-val">Some</span>(<span class="ident">params</span>) =&gt; <span class="ident">cx</span>.<span class="ident">common</span>.<span class="ident">quic</span>.<span class="ident">params</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">params</span>),
-                    <span class="prelude-val">None</span> =&gt; {
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">cx</span>
-                            .<span class="ident">common</span>
-                            .<span class="ident">missing_extension</span>(<span class="string">&quot;QUIC transport parameters not found&quot;</span>));
+                <span class="kw">match </span>hello.get_quic_params_extension() {
+                    <span class="prelude-val">Some</span>(params) =&gt; cx.common.quic.params = <span class="prelude-val">Some</span>(params),
+                    <span class="prelude-val">None </span>=&gt; {
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(cx
+                            .common
+                            .missing_extension(<span class="string">&quot;QUIC transport parameters not found&quot;</span>));
                     }
                 }
             }
         }
 
-        <span class="kw">let</span> <span class="ident">for_resume</span> <span class="op">=</span> <span class="ident">resumedata</span>.<span class="ident">is_some</span>();
-        <span class="comment">// SNI</span>
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">for_resume</span> <span class="op">&amp;&amp;</span> <span class="ident">hello</span>.<span class="ident">get_sni_extension</span>().<span class="ident">is_some</span>() {
-            <span class="self">self</span>.<span class="ident">exts</span>
-                .<span class="ident">push</span>(<span class="ident">ServerExtension::ServerNameAck</span>);
+        <span class="kw">let </span>for_resume = resumedata.is_some();
+        <span class="comment">// SNI
+        </span><span class="kw">if </span>!for_resume &amp;&amp; hello.get_sni_extension().is_some() {
+            <span class="self">self</span>.exts
+                .push(ServerExtension::ServerNameAck);
         }
 
-        <span class="comment">// Send status_request response if we have one.  This is not allowed</span>
-        <span class="comment">// if we&#39;re resuming, and is only triggered if we have an OCSP response</span>
-        <span class="comment">// to send.</span>
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">for_resume</span>
-            <span class="op">&amp;&amp;</span> <span class="ident">hello</span>
-                .<span class="ident">find_extension</span>(<span class="ident">ExtensionType::StatusRequest</span>)
-                .<span class="ident">is_some</span>()
+        <span class="comment">// Send status_request response if we have one.  This is not allowed
+        // if we&#39;re resuming, and is only triggered if we have an OCSP response
+        // to send.
+        </span><span class="kw">if </span>!for_resume
+            &amp;&amp; hello
+                .find_extension(ExtensionType::StatusRequest)
+                .is_some()
         {
-            <span class="kw">if</span> <span class="ident">ocsp_response</span>.<span class="ident">is_some</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">cx</span>.<span class="ident">common</span>.<span class="ident">is_tls13</span>() {
-                <span class="comment">// Only TLS1.2 sends confirmation in ServerHello</span>
-                <span class="self">self</span>.<span class="ident">exts</span>
-                    .<span class="ident">push</span>(<span class="ident">ServerExtension::CertificateStatusAck</span>);
+            <span class="kw">if </span>ocsp_response.is_some() &amp;&amp; !cx.common.is_tls13() {
+                <span class="comment">// Only TLS1.2 sends confirmation in ServerHello
+                </span><span class="self">self</span>.exts
+                    .push(ServerExtension::CertificateStatusAck);
             }
-        } <span class="kw">else</span> {
-            <span class="comment">// Throw away any OCSP response so we don&#39;t try to send it later.</span>
-            <span class="ident">ocsp_response</span>.<span class="ident">take</span>();
+        } <span class="kw">else </span>{
+            <span class="comment">// Throw away any OCSP response so we don&#39;t try to send it later.
+            </span>ocsp_response.take();
         }
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">for_resume</span>
-            <span class="op">&amp;&amp;</span> <span class="ident">hello</span>
-                .<span class="ident">find_extension</span>(<span class="ident">ExtensionType::SCT</span>)
-                .<span class="ident">is_some</span>()
+        <span class="kw">if </span>!for_resume
+            &amp;&amp; hello
+                .find_extension(ExtensionType::SCT)
+                .is_some()
         {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">cx</span>.<span class="ident">common</span>.<span class="ident">is_tls13</span>() {
-                <span class="comment">// Take the SCT list, if any, so we don&#39;t send it later,</span>
-                <span class="comment">// and put it in the legacy extension.</span>
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">sct_list</span>) <span class="op">=</span> <span class="ident">sct_list</span>.<span class="ident">take</span>() {
-                    <span class="self">self</span>.<span class="ident">exts</span>
-                        .<span class="ident">push</span>(<span class="ident">ServerExtension::make_sct</span>(<span class="ident">sct_list</span>.<span class="ident">to_vec</span>()));
+            <span class="kw">if </span>!cx.common.is_tls13() {
+                <span class="comment">// Take the SCT list, if any, so we don&#39;t send it later,
+                // and put it in the legacy extension.
+                </span><span class="kw">if let </span><span class="prelude-val">Some</span>(sct_list) = sct_list.take() {
+                    <span class="self">self</span>.exts
+                        .push(ServerExtension::make_sct(sct_list.to_vec()));
                 }
             }
-        } <span class="kw">else</span> {
-            <span class="comment">// Throw away any SCT list so we don&#39;t send it later.</span>
-            <span class="ident">sct_list</span>.<span class="ident">take</span>();
+        } <span class="kw">else </span>{
+            <span class="comment">// Throw away any SCT list so we don&#39;t send it later.
+            </span>sct_list.take();
         }
 
-        <span class="self">self</span>.<span class="ident">exts</span>.<span class="ident">extend</span>(<span class="ident">extra_exts</span>);
+        <span class="self">self</span>.exts.extend(extra_exts);
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">process_tls12</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">config</span>: <span class="kw-2">&amp;</span><span class="ident">ServerConfig</span>,
-        <span class="ident">hello</span>: <span class="kw-2">&amp;</span><span class="ident">ClientHelloPayload</span>,
-        <span class="ident">using_ems</span>: <span class="ident">bool</span>,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>process_tls12(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        config: <span class="kw-2">&amp;</span>ServerConfig,
+        hello: <span class="kw-2">&amp;</span>ClientHelloPayload,
+        using_ems: bool,
     ) {
-        <span class="comment">// Renegotiation.</span>
-        <span class="comment">// (We don&#39;t do reneg at all, but would support the secure version if we did.)</span>
-        <span class="kw">let</span> <span class="ident">secure_reneg_offered</span> <span class="op">=</span> <span class="ident">hello</span>
-            .<span class="ident">find_extension</span>(<span class="ident">ExtensionType::RenegotiationInfo</span>)
-            .<span class="ident">is_some</span>()
-            <span class="op">|</span><span class="op">|</span> <span class="ident">hello</span>
-                .<span class="ident">cipher_suites</span>
-                .<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">CipherSuite::TLS_EMPTY_RENEGOTIATION_INFO_SCSV</span>);
+        <span class="comment">// Renegotiation.
+        // (We don&#39;t do reneg at all, but would support the secure version if we did.)
+        </span><span class="kw">let </span>secure_reneg_offered = hello
+            .find_extension(ExtensionType::RenegotiationInfo)
+            .is_some()
+            || hello
+                .cipher_suites
+                .contains(<span class="kw-2">&amp;</span>CipherSuite::TLS_EMPTY_RENEGOTIATION_INFO_SCSV);
 
-        <span class="kw">if</span> <span class="ident">secure_reneg_offered</span> {
-            <span class="self">self</span>.<span class="ident">exts</span>
-                .<span class="ident">push</span>(<span class="ident">ServerExtension::make_empty_renegotiation_info</span>());
+        <span class="kw">if </span>secure_reneg_offered {
+            <span class="self">self</span>.exts
+                .push(ServerExtension::make_empty_renegotiation_info());
         }
 
-        <span class="comment">// Tickets:</span>
-        <span class="comment">// If we get any SessionTicket extension and have tickets enabled,</span>
-        <span class="comment">// we send an ack.</span>
-        <span class="kw">if</span> <span class="ident">hello</span>
-            .<span class="ident">find_extension</span>(<span class="ident">ExtensionType::SessionTicket</span>)
-            .<span class="ident">is_some</span>()
-            <span class="op">&amp;&amp;</span> <span class="ident">config</span>.<span class="ident">ticketer</span>.<span class="ident">enabled</span>()
+        <span class="comment">// Tickets:
+        // If we get any SessionTicket extension and have tickets enabled,
+        // we send an ack.
+        </span><span class="kw">if </span>hello
+            .find_extension(ExtensionType::SessionTicket)
+            .is_some()
+            &amp;&amp; config.ticketer.enabled()
         {
-            <span class="self">self</span>.<span class="ident">send_ticket</span> <span class="op">=</span> <span class="bool-val">true</span>;
-            <span class="self">self</span>.<span class="ident">exts</span>
-                .<span class="ident">push</span>(<span class="ident">ServerExtension::SessionTicketAck</span>);
+            <span class="self">self</span>.send_ticket = <span class="bool-val">true</span>;
+            <span class="self">self</span>.exts
+                .push(ServerExtension::SessionTicketAck);
         }
 
-        <span class="comment">// Confirm use of EMS if offered.</span>
-        <span class="kw">if</span> <span class="ident">using_ems</span> {
-            <span class="self">self</span>.<span class="ident">exts</span>
-                .<span class="ident">push</span>(<span class="ident">ServerExtension::ExtendedMasterSecretAck</span>);
+        <span class="comment">// Confirm use of EMS if offered.
+        </span><span class="kw">if </span>using_ems {
+            <span class="self">self</span>.exts
+                .push(ServerExtension::ExtendedMasterSecretAck);
         }
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct</span> <span class="ident">ExpectClientHello</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">config</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ServerConfig</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">extra_exts</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ServerExtension</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">transcript</span>: <span class="ident">HandshakeHashOrBuffer</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">session_id</span>: <span class="ident">SessionID</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">using_ems</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">done_retry</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">send_ticket</span>: <span class="ident">bool</span>,
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">struct </span>ExpectClientHello {
+    <span class="kw">pub</span>(<span class="kw">super</span>) config: Arc&lt;ServerConfig&gt;,
+    <span class="kw">pub</span>(<span class="kw">super</span>) extra_exts: Vec&lt;ServerExtension&gt;,
+    <span class="kw">pub</span>(<span class="kw">super</span>) transcript: HandshakeHashOrBuffer,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) session_id: SessionID,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) using_ems: bool,
+    <span class="kw">pub</span>(<span class="kw">super</span>) done_retry: bool,
+    <span class="kw">pub</span>(<span class="kw">super</span>) send_ticket: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">ExpectClientHello</span> {
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">config</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ServerConfig</span><span class="op">&gt;</span>, <span class="ident">extra_exts</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ServerExtension</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">transcript_buffer</span> <span class="op">=</span> <span class="ident">HandshakeHashBuffer::new</span>();
+<span class="kw">impl </span>ExpectClientHello {
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new(config: Arc&lt;ServerConfig&gt;, extra_exts: Vec&lt;ServerExtension&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>transcript_buffer = HandshakeHashBuffer::new();
 
-        <span class="kw">if</span> <span class="ident">config</span>.<span class="ident">verifier</span>.<span class="ident">offer_client_auth</span>() {
-            <span class="ident">transcript_buffer</span>.<span class="ident">set_client_auth_enabled</span>();
+        <span class="kw">if </span>config.verifier.offer_client_auth() {
+            transcript_buffer.set_client_auth_enabled();
         }
 
-        <span class="self">Self</span> {
-            <span class="ident">config</span>,
-            <span class="ident">extra_exts</span>,
-            <span class="ident">transcript</span>: <span class="ident">HandshakeHashOrBuffer::Buffer</span>(<span class="ident">transcript_buffer</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-            <span class="ident">session_id</span>: <span class="ident">SessionID::empty</span>(),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-            <span class="ident">using_ems</span>: <span class="bool-val">false</span>,
-            <span class="ident">done_retry</span>: <span class="bool-val">false</span>,
-            <span class="ident">send_ticket</span>: <span class="bool-val">false</span>,
+        <span class="self">Self </span>{
+            config,
+            extra_exts,
+            transcript: HandshakeHashOrBuffer::Buffer(transcript_buffer),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+            </span>session_id: SessionID::empty(),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+            </span>using_ems: <span class="bool-val">false</span>,
+            done_retry: <span class="bool-val">false</span>,
+            send_ticket: <span class="bool-val">false</span>,
         }
     }
 
-    <span class="doccomment">/// Continues handling of a `ClientHello` message once config and certificate are available.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">with_certified_key</span>(
+    <span class="doccomment">/// Continues handling of a `ClientHello` message once config and certificate are available.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>with_certified_key(
         <span class="self">self</span>,
-        <span class="ident">sig_schemes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SignatureScheme</span><span class="op">&gt;</span>,
-        <span class="ident">client_hello</span>: <span class="kw-2">&amp;</span><span class="ident">ClientHelloPayload</span>,
-        <span class="ident">m</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ServerContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">NextStateOrError</span> {
-        <span class="kw">let</span> <span class="ident">tls13_enabled</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">config</span>
-            .<span class="ident">supports_version</span>(<span class="ident">ProtocolVersion::TLSv1_3</span>);
-        <span class="kw">let</span> <span class="ident">tls12_enabled</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">config</span>
-            .<span class="ident">supports_version</span>(<span class="ident">ProtocolVersion::TLSv1_2</span>);
+        sig_schemes: Vec&lt;SignatureScheme&gt;,
+        client_hello: <span class="kw-2">&amp;</span>ClientHelloPayload,
+        m: <span class="kw-2">&amp;</span>Message,
+        cx: <span class="kw-2">&amp;mut </span>ServerContext&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; NextStateOrError {
+        <span class="kw">let </span>tls13_enabled = <span class="self">self
+            </span>.config
+            .supports_version(ProtocolVersion::TLSv1_3);
+        <span class="kw">let </span>tls12_enabled = <span class="self">self
+            </span>.config
+            .supports_version(ProtocolVersion::TLSv1_2);
 
-        <span class="comment">// Are we doing TLS1.3?</span>
-        <span class="kw">let</span> <span class="ident">maybe_versions_ext</span> <span class="op">=</span> <span class="ident">client_hello</span>.<span class="ident">get_versions_extension</span>();
-        <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">versions</span>) <span class="op">=</span> <span class="ident">maybe_versions_ext</span> {
-            <span class="kw">if</span> <span class="ident">versions</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">ProtocolVersion::TLSv1_3</span>) <span class="op">&amp;&amp;</span> <span class="ident">tls13_enabled</span> {
-                <span class="ident">ProtocolVersion::TLSv1_3</span>
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">versions</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">ProtocolVersion::TLSv1_2</span>) <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">tls12_enabled</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">bad_version</span>(<span class="ident">cx</span>.<span class="ident">common</span>, <span class="string">&quot;TLS1.2 not offered/enabled&quot;</span>));
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">cx</span>.<span class="ident">common</span>.<span class="ident">is_quic</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">bad_version</span>(
-                    <span class="ident">cx</span>.<span class="ident">common</span>,
+        <span class="comment">// Are we doing TLS1.3?
+        </span><span class="kw">let </span>maybe_versions_ext = client_hello.get_versions_extension();
+        <span class="kw">let </span>version = <span class="kw">if let </span><span class="prelude-val">Some</span>(versions) = maybe_versions_ext {
+            <span class="kw">if </span>versions.contains(<span class="kw-2">&amp;</span>ProtocolVersion::TLSv1_3) &amp;&amp; tls13_enabled {
+                ProtocolVersion::TLSv1_3
+            } <span class="kw">else if </span>!versions.contains(<span class="kw-2">&amp;</span>ProtocolVersion::TLSv1_2) || !tls12_enabled {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(bad_version(cx.common, <span class="string">&quot;TLS1.2 not offered/enabled&quot;</span>));
+            } <span class="kw">else if </span>cx.common.is_quic() {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(bad_version(
+                    cx.common,
                     <span class="string">&quot;Expecting QUIC connection, but client does not support TLSv1_3&quot;</span>,
                 ));
-            } <span class="kw">else</span> {
-                <span class="ident">ProtocolVersion::TLSv1_2</span>
+            } <span class="kw">else </span>{
+                ProtocolVersion::TLSv1_2
             }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">client_hello</span>.<span class="ident">client_version</span>.<span class="ident">get_u16</span>() <span class="op">&lt;</span> <span class="ident">ProtocolVersion::TLSv1_2</span>.<span class="ident">get_u16</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">bad_version</span>(<span class="ident">cx</span>.<span class="ident">common</span>, <span class="string">&quot;Client does not support TLSv1_2&quot;</span>));
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">tls12_enabled</span> <span class="op">&amp;&amp;</span> <span class="ident">tls13_enabled</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">bad_version</span>(
-                <span class="ident">cx</span>.<span class="ident">common</span>,
+        } <span class="kw">else if </span>client_hello.client_version.get_u16() &lt; ProtocolVersion::TLSv1_2.get_u16() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(bad_version(cx.common, <span class="string">&quot;Client does not support TLSv1_2&quot;</span>));
+        } <span class="kw">else if </span>!tls12_enabled &amp;&amp; tls13_enabled {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(bad_version(
+                cx.common,
                 <span class="string">&quot;Server requires TLS1.3, but client omitted versions ext&quot;</span>,
             ));
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">cx</span>.<span class="ident">common</span>.<span class="ident">is_quic</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">bad_version</span>(
-                <span class="ident">cx</span>.<span class="ident">common</span>,
+        } <span class="kw">else if </span>cx.common.is_quic() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(bad_version(
+                cx.common,
                 <span class="string">&quot;Expecting QUIC connection, but client does not support TLSv1_3&quot;</span>,
             ));
-        } <span class="kw">else</span> {
-            <span class="ident">ProtocolVersion::TLSv1_2</span>
+        } <span class="kw">else </span>{
+            ProtocolVersion::TLSv1_2
         };
 
-        <span class="ident">cx</span>.<span class="ident">common</span>.<span class="ident">negotiated_version</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">version</span>);
+        cx.common.negotiated_version = <span class="prelude-val">Some</span>(version);
 
-        <span class="comment">// Choose a certificate.</span>
-        <span class="kw">let</span> <span class="ident">certkey</span> <span class="op">=</span> {
-            <span class="kw">let</span> <span class="ident">client_hello</span> <span class="op">=</span> <span class="ident">ClientHello::new</span>(
-                <span class="kw-2">&amp;</span><span class="ident">cx</span>.<span class="ident">data</span>.<span class="ident">sni</span>,
-                <span class="kw-2">&amp;</span><span class="ident">sig_schemes</span>,
-                <span class="ident">client_hello</span>.<span class="ident">get_alpn_extension</span>(),
-                <span class="kw-2">&amp;</span><span class="ident">client_hello</span>.<span class="ident">cipher_suites</span>,
+        <span class="comment">// Choose a certificate.
+        </span><span class="kw">let </span>certkey = {
+            <span class="kw">let </span>client_hello = ClientHello::new(
+                <span class="kw-2">&amp;</span>cx.data.sni,
+                <span class="kw-2">&amp;</span>sig_schemes,
+                client_hello.get_alpn_extension(),
+                <span class="kw-2">&amp;</span>client_hello.cipher_suites,
             );
 
-            <span class="kw">let</span> <span class="ident">certkey</span> <span class="op">=</span> <span class="self">self</span>
-                .<span class="ident">config</span>
-                .<span class="ident">cert_resolver</span>
-                .<span class="ident">resolve</span>(<span class="ident">client_hello</span>);
+            <span class="kw">let </span>certkey = <span class="self">self
+                </span>.config
+                .cert_resolver
+                .resolve(client_hello);
 
-            <span class="ident">certkey</span>.<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                <span class="ident">cx</span>.<span class="ident">common</span>
-                    .<span class="ident">send_fatal_alert</span>(<span class="ident">AlertDescription::AccessDenied</span>);
-                <span class="ident">Error::General</span>(<span class="string">&quot;no server certificate chain resolved&quot;</span>.<span class="ident">to_string</span>())
-            })<span class="question-mark">?</span>
-        };
-        <span class="kw">let</span> <span class="ident">certkey</span> <span class="op">=</span> <span class="ident">ActiveCertifiedKey::from_certified_key</span>(<span class="kw-2">&amp;</span><span class="ident">certkey</span>);
+            certkey.ok_or_else(|| {
+                cx.common
+                    .send_fatal_alert(AlertDescription::AccessDenied);
+                Error::General(<span class="string">&quot;no server certificate chain resolved&quot;</span>.to_string())
+            })<span class="question-mark">?
+        </span>};
+        <span class="kw">let </span>certkey = ActiveCertifiedKey::from_certified_key(<span class="kw-2">&amp;</span>certkey);
 
-        <span class="comment">// Reduce our supported ciphersuites by the certificate.</span>
-        <span class="comment">// (no-op for TLS1.3)</span>
-        <span class="kw">let</span> <span class="ident">suitable_suites</span> <span class="op">=</span>
-            <span class="ident">suites::reduce_given_sigalg</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">config</span>.<span class="ident">cipher_suites</span>, <span class="ident">certkey</span>.<span class="ident">get_key</span>().<span class="ident">algorithm</span>());
+        <span class="comment">// Reduce our supported ciphersuites by the certificate.
+        // (no-op for TLS1.3)
+        </span><span class="kw">let </span>suitable_suites =
+            suites::reduce_given_sigalg(<span class="kw-2">&amp;</span><span class="self">self</span>.config.cipher_suites, certkey.get_key().algorithm());
 
-        <span class="comment">// And version</span>
-        <span class="kw">let</span> <span class="ident">suitable_suites</span> <span class="op">=</span> <span class="ident">suites::reduce_given_version</span>(<span class="kw-2">&amp;</span><span class="ident">suitable_suites</span>, <span class="ident">version</span>);
+        <span class="comment">// And version
+        </span><span class="kw">let </span>suitable_suites = suites::reduce_given_version(<span class="kw-2">&amp;</span>suitable_suites, version);
 
-        <span class="kw">let</span> <span class="ident">suite</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">config</span>.<span class="ident">ignore_client_order</span> {
-            <span class="ident">suites::choose_ciphersuite_preferring_server</span>(
-                <span class="kw-2">&amp;</span><span class="ident">client_hello</span>.<span class="ident">cipher_suites</span>,
-                <span class="kw-2">&amp;</span><span class="ident">suitable_suites</span>,
+        <span class="kw">let </span>suite = <span class="kw">if </span><span class="self">self</span>.config.ignore_client_order {
+            suites::choose_ciphersuite_preferring_server(
+                <span class="kw-2">&amp;</span>client_hello.cipher_suites,
+                <span class="kw-2">&amp;</span>suitable_suites,
             )
-        } <span class="kw">else</span> {
-            <span class="ident">suites::choose_ciphersuite_preferring_client</span>(
-                <span class="kw-2">&amp;</span><span class="ident">client_hello</span>.<span class="ident">cipher_suites</span>,
-                <span class="kw-2">&amp;</span><span class="ident">suitable_suites</span>,
+        } <span class="kw">else </span>{
+            suites::choose_ciphersuite_preferring_client(
+                <span class="kw-2">&amp;</span>client_hello.cipher_suites,
+                <span class="kw-2">&amp;</span>suitable_suites,
             )
         }
-        .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">incompatible</span>(<span class="ident">cx</span>.<span class="ident">common</span>, <span class="string">&quot;no ciphersuites in common&quot;</span>))<span class="question-mark">?</span>;
+        .ok_or_else(|| incompatible(cx.common, <span class="string">&quot;no ciphersuites in common&quot;</span>))<span class="question-mark">?</span>;
 
-        <span class="macro">debug!</span>(<span class="string">&quot;decided upon suite {:?}&quot;</span>, <span class="ident">suite</span>);
-        <span class="ident">cx</span>.<span class="ident">common</span>.<span class="ident">suite</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">suite</span>);
+        <span class="macro">debug!</span>(<span class="string">&quot;decided upon suite {:?}&quot;</span>, suite);
+        cx.common.suite = <span class="prelude-val">Some</span>(suite);
 
-        <span class="comment">// Start handshake hash.</span>
-        <span class="kw">let</span> <span class="ident">starting_hash</span> <span class="op">=</span> <span class="ident">suite</span>.<span class="ident">hash_algorithm</span>();
-        <span class="kw">let</span> <span class="ident">transcript</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">transcript</span> {
-            <span class="ident">HandshakeHashOrBuffer::Buffer</span>(<span class="ident">inner</span>) =&gt; <span class="ident">inner</span>.<span class="ident">start_hash</span>(<span class="ident">starting_hash</span>),
-            <span class="ident">HandshakeHashOrBuffer::Hash</span>(<span class="ident">inner</span>) <span class="kw">if</span> <span class="ident">inner</span>.<span class="ident">algorithm</span>() <span class="op">==</span> <span class="ident">starting_hash</span> =&gt; <span class="ident">inner</span>,
-            <span class="kw">_</span> =&gt; {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">cx</span>
-                    .<span class="ident">common</span>
-                    .<span class="ident">illegal_param</span>(<span class="string">&quot;hash differed on retry&quot;</span>));
+        <span class="comment">// Start handshake hash.
+        </span><span class="kw">let </span>starting_hash = suite.hash_algorithm();
+        <span class="kw">let </span>transcript = <span class="kw">match </span><span class="self">self</span>.transcript {
+            HandshakeHashOrBuffer::Buffer(inner) =&gt; inner.start_hash(starting_hash),
+            HandshakeHashOrBuffer::Hash(inner) <span class="kw">if </span>inner.algorithm() == starting_hash =&gt; inner,
+            <span class="kw">_ </span>=&gt; {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(cx
+                    .common
+                    .illegal_param(<span class="string">&quot;hash differed on retry&quot;</span>));
             }
         };
 
-        <span class="comment">// Save their Random.</span>
-        <span class="kw">let</span> <span class="ident">randoms</span> <span class="op">=</span> <span class="ident">ConnectionRandoms::new</span>(<span class="ident">client_hello</span>.<span class="ident">random</span>, <span class="ident">Random::new</span>()<span class="question-mark">?</span>);
-        <span class="kw">match</span> <span class="ident">suite</span> {
-            <span class="ident">SupportedCipherSuite::Tls13</span>(<span class="ident">suite</span>) =&gt; <span class="ident">tls13::CompleteClientHelloHandling</span> {
-                <span class="ident">config</span>: <span class="self">self</span>.<span class="ident">config</span>,
-                <span class="ident">transcript</span>,
-                <span class="ident">suite</span>,
-                <span class="ident">randoms</span>,
-                <span class="ident">done_retry</span>: <span class="self">self</span>.<span class="ident">done_retry</span>,
-                <span class="ident">send_ticket</span>: <span class="self">self</span>.<span class="ident">send_ticket</span>,
-                <span class="ident">extra_exts</span>: <span class="self">self</span>.<span class="ident">extra_exts</span>,
+        <span class="comment">// Save their Random.
+        </span><span class="kw">let </span>randoms = ConnectionRandoms::new(client_hello.random, Random::new()<span class="question-mark">?</span>);
+        <span class="kw">match </span>suite {
+            SupportedCipherSuite::Tls13(suite) =&gt; tls13::CompleteClientHelloHandling {
+                config: <span class="self">self</span>.config,
+                transcript,
+                suite,
+                randoms,
+                done_retry: <span class="self">self</span>.done_retry,
+                send_ticket: <span class="self">self</span>.send_ticket,
+                extra_exts: <span class="self">self</span>.extra_exts,
             }
-            .<span class="ident">handle_client_hello</span>(<span class="ident">cx</span>, <span class="ident">certkey</span>, <span class="ident">m</span>, <span class="ident">client_hello</span>, <span class="ident">sig_schemes</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls12&quot;</span>)]</span>
-            <span class="ident">SupportedCipherSuite::Tls12</span>(<span class="ident">suite</span>) =&gt; <span class="ident">tls12::CompleteClientHelloHandling</span> {
-                <span class="ident">config</span>: <span class="self">self</span>.<span class="ident">config</span>,
-                <span class="ident">transcript</span>,
-                <span class="ident">session_id</span>: <span class="self">self</span>.<span class="ident">session_id</span>,
-                <span class="ident">suite</span>,
-                <span class="ident">using_ems</span>: <span class="self">self</span>.<span class="ident">using_ems</span>,
-                <span class="ident">randoms</span>,
-                <span class="ident">send_ticket</span>: <span class="self">self</span>.<span class="ident">send_ticket</span>,
-                <span class="ident">extra_exts</span>: <span class="self">self</span>.<span class="ident">extra_exts</span>,
+            .handle_client_hello(cx, certkey, m, client_hello, sig_schemes),
+            <span class="attribute">#[cfg(feature = <span class="string">&quot;tls12&quot;</span>)]
+            </span>SupportedCipherSuite::Tls12(suite) =&gt; tls12::CompleteClientHelloHandling {
+                config: <span class="self">self</span>.config,
+                transcript,
+                session_id: <span class="self">self</span>.session_id,
+                suite,
+                using_ems: <span class="self">self</span>.using_ems,
+                randoms,
+                send_ticket: <span class="self">self</span>.send_ticket,
+                extra_exts: <span class="self">self</span>.extra_exts,
             }
-            .<span class="ident">handle_client_hello</span>(
-                <span class="ident">cx</span>,
-                <span class="ident">certkey</span>,
-                <span class="ident">m</span>,
-                <span class="ident">client_hello</span>,
-                <span class="ident">sig_schemes</span>,
-                <span class="ident">tls13_enabled</span>,
+            .handle_client_hello(
+                cx,
+                certkey,
+                m,
+                client_hello,
+                sig_schemes,
+                tls13_enabled,
             ),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">ServerConnectionData</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ExpectClientHello</span> {
-    <span class="kw">fn</span> <span class="ident">handle</span>(<span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ServerContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">m</span>: <span class="ident">Message</span>) -&gt; <span class="ident">NextStateOrError</span> {
-        <span class="kw">let</span> (<span class="ident">client_hello</span>, <span class="ident">sig_schemes</span>) <span class="op">=</span> <span class="ident">process_client_hello</span>(
-            <span class="kw-2">&amp;</span><span class="ident">m</span>,
-            <span class="self">self</span>.<span class="ident">done_retry</span>,
-            <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">config</span>.<span class="ident">cipher_suites</span>,
-            <span class="ident">cx</span>.<span class="ident">common</span>,
-            <span class="ident">cx</span>.<span class="ident">data</span>,
+<span class="kw">impl </span>State&lt;ServerConnectionData&gt; <span class="kw">for </span>ExpectClientHello {
+    <span class="kw">fn </span>handle(<span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;, cx: <span class="kw-2">&amp;mut </span>ServerContext&lt;<span class="lifetime">&#39;_</span>&gt;, m: Message) -&gt; NextStateOrError {
+        <span class="kw">let </span>(client_hello, sig_schemes) = process_client_hello(
+            <span class="kw-2">&amp;</span>m,
+            <span class="self">self</span>.done_retry,
+            <span class="kw-2">&amp;</span><span class="self">self</span>.config.cipher_suites,
+            cx.common,
+            cx.data,
         )<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">with_certified_key</span>(<span class="ident">sig_schemes</span>, <span class="ident">client_hello</span>, <span class="kw-2">&amp;</span><span class="ident">m</span>, <span class="ident">cx</span>)
+        <span class="self">self</span>.with_certified_key(sig_schemes, client_hello, <span class="kw-2">&amp;</span>m, cx)
     }
 }
 
-<span class="doccomment">/// Configuration-independent validation of a `ClientHello` message.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This represents the first part of the `ClientHello` handling, where we do all validation that</span>
-<span class="doccomment">/// doesn&#39;t depend on a `ServerConfig` being available and extract everything needed to build a</span>
-<span class="doccomment">/// [`ClientHello`] value for a [`ResolvesServerConfig`]/`ResolvesServerCert`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note that this will modify `data.sni` even if config or certificate resolution fail.</span>
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">process_client_hello</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">m</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Message</span>,
-    <span class="ident">done_retry</span>: <span class="ident">bool</span>,
-    <span class="ident">supported_cipher_suites</span>: <span class="kw-2">&amp;</span>[<span class="ident">SupportedCipherSuite</span>],
-    <span class="ident">common</span>: <span class="kw-2">&amp;mut</span> <span class="ident">CommonState</span>,
-    <span class="ident">data</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ServerConnectionData</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">ClientHelloPayload</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SignatureScheme</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">client_hello</span> <span class="op">=</span>
-        <span class="macro">require_handshake_msg!</span>(<span class="ident">m</span>, <span class="ident">HandshakeType::ClientHello</span>, <span class="ident">HandshakePayload::ClientHello</span>)<span class="question-mark">?</span>;
-    <span class="macro">trace!</span>(<span class="string">&quot;we got a clienthello {:?}&quot;</span>, <span class="ident">client_hello</span>);
+<span class="doccomment">/// Configuration-independent validation of a `ClientHello` message.
+///
+/// This represents the first part of the `ClientHello` handling, where we do all validation that
+/// doesn&#39;t depend on a `ServerConfig` being available and extract everything needed to build a
+/// [`ClientHello`] value for a [`ResolvesServerConfig`]/`ResolvesServerCert`].
+///
+/// Note that this will modify `data.sni` even if config or certificate resolution fail.
+</span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>process_client_hello&lt;<span class="lifetime">&#39;a</span>&gt;(
+    m: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Message,
+    done_retry: bool,
+    supported_cipher_suites: <span class="kw-2">&amp;</span>[SupportedCipherSuite],
+    common: <span class="kw-2">&amp;mut </span>CommonState,
+    data: <span class="kw-2">&amp;mut </span>ServerConnectionData,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>ClientHelloPayload, Vec&lt;SignatureScheme&gt;), Error&gt; {
+    <span class="kw">let </span>client_hello =
+        <span class="macro">require_handshake_msg!</span>(m, HandshakeType::ClientHello, HandshakePayload::ClientHello)<span class="question-mark">?</span>;
+    <span class="macro">trace!</span>(<span class="string">&quot;we got a clienthello {:?}&quot;</span>, client_hello);
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">client_hello</span>
-        .<span class="ident">compression_methods</span>
-        .<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">Compression::Null</span>)
+    <span class="kw">if </span>!client_hello
+        .compression_methods
+        .contains(<span class="kw-2">&amp;</span>Compression::Null)
     {
-        <span class="ident">common</span>.<span class="ident">send_fatal_alert</span>(<span class="ident">AlertDescription::IllegalParameter</span>);
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::PeerIncompatibleError</span>(
-            <span class="string">&quot;client did not offer Null compression&quot;</span>.<span class="ident">to_string</span>(),
+        common.send_fatal_alert(AlertDescription::IllegalParameter);
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::PeerIncompatibleError(
+            <span class="string">&quot;client did not offer Null compression&quot;</span>.to_string(),
         ));
     }
 
-    <span class="kw">if</span> <span class="ident">client_hello</span>.<span class="ident">has_duplicate_extension</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">decode_error</span>(<span class="ident">common</span>, <span class="string">&quot;client sent duplicate extensions&quot;</span>));
+    <span class="kw">if </span>client_hello.has_duplicate_extension() {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(decode_error(common, <span class="string">&quot;client sent duplicate extensions&quot;</span>));
     }
 
-    <span class="comment">// No handshake messages should follow this one in this flight.</span>
-    <span class="ident">common</span>.<span class="ident">check_aligned_handshake</span>()<span class="question-mark">?</span>;
+    <span class="comment">// No handshake messages should follow this one in this flight.
+    </span>common.check_aligned_handshake()<span class="question-mark">?</span>;
 
-    <span class="comment">// Extract and validate the SNI DNS name, if any, before giving it to</span>
-    <span class="comment">// the cert resolver. In particular, if it is invalid then we should</span>
-    <span class="comment">// send an Illegal Parameter alert instead of the Internal Error alert</span>
-    <span class="comment">// (or whatever) that we&#39;d send if this were checked later or in a</span>
-    <span class="comment">// different way.</span>
-    <span class="kw">let</span> <span class="ident">sni</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">webpki::DnsName</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">client_hello</span>.<span class="ident">get_sni_extension</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">sni</span>) =&gt; {
-            <span class="kw">if</span> <span class="ident">sni</span>.<span class="ident">has_duplicate_names_for_type</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">decode_error</span>(
-                    <span class="ident">common</span>,
+    <span class="comment">// Extract and validate the SNI DNS name, if any, before giving it to
+    // the cert resolver. In particular, if it is invalid then we should
+    // send an Illegal Parameter alert instead of the Internal Error alert
+    // (or whatever) that we&#39;d send if this were checked later or in a
+    // different way.
+    </span><span class="kw">let </span>sni: <span class="prelude-ty">Option</span>&lt;webpki::DnsName&gt; = <span class="kw">match </span>client_hello.get_sni_extension() {
+        <span class="prelude-val">Some</span>(sni) =&gt; {
+            <span class="kw">if </span>sni.has_duplicate_names_for_type() {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(decode_error(
+                    common,
                     <span class="string">&quot;ClientHello SNI contains duplicate name types&quot;</span>,
                 ));
             }
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">hostname</span>) <span class="op">=</span> <span class="ident">sni</span>.<span class="ident">get_single_hostname</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">hostname</span>.<span class="ident">into</span>())
-            } <span class="kw">else</span> {
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">common</span>.<span class="ident">illegal_param</span>(<span class="string">&quot;ClientHello SNI did not contain a hostname&quot;</span>));
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(hostname) = sni.get_single_hostname() {
+                <span class="prelude-val">Some</span>(hostname.into())
+            } <span class="kw">else </span>{
+                <span class="kw">return </span><span class="prelude-val">Err</span>(common.illegal_param(<span class="string">&quot;ClientHello SNI did not contain a hostname&quot;</span>));
             }
         }
-        <span class="prelude-val">None</span> =&gt; <span class="prelude-val">None</span>,
+        <span class="prelude-val">None </span>=&gt; <span class="prelude-val">None</span>,
     };
 
-    <span class="comment">// save only the first SNI</span>
-    <span class="kw">if</span> <span class="kw">let</span> (<span class="prelude-val">Some</span>(<span class="ident">sni</span>), <span class="bool-val">false</span>) <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="ident">sni</span>, <span class="ident">done_retry</span>) {
-        <span class="comment">// Save the SNI into the session.</span>
-        <span class="comment">// The SNI hostname is immutable once set.</span>
-        <span class="macro">assert!</span>(<span class="ident">data</span>.<span class="ident">sni</span>.<span class="ident">is_none</span>());
-        <span class="ident">data</span>.<span class="ident">sni</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">sni</span>.<span class="ident">clone</span>())
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">data</span>.<span class="ident">sni</span> <span class="op">!</span><span class="op">=</span> <span class="ident">sni</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::PeerIncompatibleError</span>(
-            <span class="string">&quot;SNI differed on retry&quot;</span>.<span class="ident">to_string</span>(),
+    <span class="comment">// save only the first SNI
+    </span><span class="kw">if let </span>(<span class="prelude-val">Some</span>(sni), <span class="bool-val">false</span>) = (<span class="kw-2">&amp;</span>sni, done_retry) {
+        <span class="comment">// Save the SNI into the session.
+        // The SNI hostname is immutable once set.
+        </span><span class="macro">assert!</span>(data.sni.is_none());
+        data.sni = <span class="prelude-val">Some</span>(sni.clone())
+    } <span class="kw">else if </span>data.sni != sni {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(Error::PeerIncompatibleError(
+            <span class="string">&quot;SNI differed on retry&quot;</span>.to_string(),
         ));
     }
 
-    <span class="comment">// We communicate to the upper layer what kind of key they should choose</span>
-    <span class="comment">// via the sigschemes value.  Clients tend to treat this extension</span>
-    <span class="comment">// orthogonally to offered ciphersuites (even though, in TLS1.2 it is not).</span>
-    <span class="comment">// So: reduce the offered sigschemes to those compatible with the</span>
-    <span class="comment">// intersection of ciphersuites.</span>
-    <span class="kw">let</span> <span class="ident">client_suites</span> <span class="op">=</span> <span class="ident">supported_cipher_suites</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">copied</span>()
-        .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">scs</span><span class="op">|</span> {
-            <span class="ident">client_hello</span>
-                .<span class="ident">cipher_suites</span>
-                .<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">scs</span>.<span class="ident">suite</span>())
+    <span class="comment">// We communicate to the upper layer what kind of key they should choose
+    // via the sigschemes value.  Clients tend to treat this extension
+    // orthogonally to offered ciphersuites (even though, in TLS1.2 it is not).
+    // So: reduce the offered sigschemes to those compatible with the
+    // intersection of ciphersuites.
+    </span><span class="kw">let </span>client_suites = supported_cipher_suites
+        .iter()
+        .copied()
+        .filter(|scs| {
+            client_hello
+                .cipher_suites
+                .contains(<span class="kw-2">&amp;</span>scs.suite())
         })
-        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+        .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sig_schemes</span> <span class="op">=</span> <span class="ident">client_hello</span>
-        .<span class="ident">get_sigalgs_extension</span>()
-        .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">incompatible</span>(<span class="ident">common</span>, <span class="string">&quot;client didn&#39;t describe signature schemes&quot;</span>))<span class="question-mark">?</span>
-        .<span class="ident">clone</span>();
-    <span class="ident">sig_schemes</span>.<span class="ident">retain</span>(<span class="op">|</span><span class="ident">scheme</span><span class="op">|</span> <span class="ident">suites::compatible_sigscheme_for_suites</span>(<span class="kw-2">*</span><span class="ident">scheme</span>, <span class="kw-2">&amp;</span><span class="ident">client_suites</span>));
+    <span class="kw">let </span><span class="kw-2">mut </span>sig_schemes = client_hello
+        .get_sigalgs_extension()
+        .ok_or_else(|| incompatible(common, <span class="string">&quot;client didn&#39;t describe signature schemes&quot;</span>))<span class="question-mark">?
+        </span>.clone();
+    sig_schemes.retain(|scheme| suites::compatible_sigscheme_for_suites(<span class="kw-2">*</span>scheme, <span class="kw-2">&amp;</span>client_suites));
 
-    <span class="prelude-val">Ok</span>((<span class="ident">client_hello</span>, <span class="ident">sig_schemes</span>))
+    <span class="prelude-val">Ok</span>((client_hello, sig_schemes))
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::large_enum_variant</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">HandshakeHashOrBuffer</span> {
-    <span class="ident">Buffer</span>(<span class="ident">HandshakeHashBuffer</span>),
-    <span class="ident">Hash</span>(<span class="ident">HandshakeHash</span>),
+<span class="attribute">#[allow(clippy::large_enum_variant)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>HandshakeHashOrBuffer {
+    Buffer(HandshakeHashBuffer),
+    Hash(HandshakeHash),
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rustls" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

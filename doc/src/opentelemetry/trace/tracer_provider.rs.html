@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/trace/tracer_provider.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tracer_provider.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.17.0/src/trace/tracer_provider.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tracer_provider.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../opentelemetry/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../opentelemetry/index.html">
                         <img src="https://raw.githubusercontent.com/open-telemetry/opentelemetry-rust/main/assets/logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -68,73 +68,73 @@
 <span id="66">66</span>
 <span id="67">67</span>
 <span id="68">68</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::trace</span>::{<span class="ident">TraceResult</span>, <span class="ident">Tracer</span>};
-<span class="kw">use</span> <span class="ident">std::borrow::Cow</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::trace::{TraceResult, Tracer};
+<span class="kw">use </span>std::borrow::Cow;
 
-<span class="doccomment">/// Types that can create instances of [`Tracer`].</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">TracerProvider</span> {
-    <span class="doccomment">/// The [`Tracer`] type that this provider will return.</span>
-    <span class="kw">type</span> <span class="ident">Tracer</span>: <span class="ident">Tracer</span>;
+<span class="doccomment">/// Types that can create instances of [`Tracer`].
+</span><span class="kw">pub trait </span>TracerProvider {
+    <span class="doccomment">/// The [`Tracer`] type that this provider will return.
+    </span><span class="kw">type </span>Tracer: Tracer;
 
-    <span class="doccomment">/// Returns a new tracer with the given name.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The `name` should be the application name or the name of the library</span>
-    <span class="doccomment">/// providing instrumentation. If the name is empty, then an</span>
-    <span class="doccomment">/// implementation-defined default name may be used instead.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use opentelemetry::{global, trace::TracerProvider};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let provider = global::tracer_provider();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // tracer used in applications/binaries</span>
-    <span class="doccomment">/// let tracer = provider.tracer(&quot;my_app&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // tracer used in libraries/crates that optionally includes version and schema url</span>
-    <span class="doccomment">/// let tracer = provider.versioned_tracer(</span>
-    <span class="doccomment">///     &quot;my_library&quot;,</span>
-    <span class="doccomment">///     Some(env!(&quot;CARGO_PKG_VERSION&quot;)),</span>
-    <span class="doccomment">///     Some(&quot;https://opentelemetry.io/schema/1.0.0&quot;)</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">tracer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident"><span class="self">Self</span>::Tracer</span> {
-        <span class="self">self</span>.<span class="ident">versioned_tracer</span>(<span class="ident">name</span>, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
+    <span class="doccomment">/// Returns a new tracer with the given name.
+    ///
+    /// The `name` should be the application name or the name of the library
+    /// providing instrumentation. If the name is empty, then an
+    /// implementation-defined default name may be used instead.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use opentelemetry::{global, trace::TracerProvider};
+    ///
+    /// let provider = global::tracer_provider();
+    ///
+    /// // tracer used in applications/binaries
+    /// let tracer = provider.tracer(&quot;my_app&quot;);
+    ///
+    /// // tracer used in libraries/crates that optionally includes version and schema url
+    /// let tracer = provider.versioned_tracer(
+    ///     &quot;my_library&quot;,
+    ///     Some(env!(&quot;CARGO_PKG_VERSION&quot;)),
+    ///     Some(&quot;https://opentelemetry.io/schema/1.0.0&quot;)
+    /// );
+    /// ```
+    </span><span class="kw">fn </span>tracer(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;) -&gt; <span class="self">Self</span>::Tracer {
+        <span class="self">self</span>.versioned_tracer(name, <span class="prelude-val">None</span>, <span class="prelude-val">None</span>)
     }
 
-    <span class="doccomment">/// Returns a new versioned tracer with a given name.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The `name` should be the application name or the name of the library</span>
-    <span class="doccomment">/// providing instrumentation. If the name is empty, then an</span>
-    <span class="doccomment">/// implementation-defined default name may be used instead.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use opentelemetry::{global, trace::TracerProvider};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let provider = global::tracer_provider();</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // tracer used in applications/binaries</span>
-    <span class="doccomment">/// let tracer = provider.tracer(&quot;my_app&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // tracer used in libraries/crates that optionally includes version and schema url</span>
-    <span class="doccomment">/// let tracer = provider.versioned_tracer(</span>
-    <span class="doccomment">///     &quot;my_library&quot;,</span>
-    <span class="doccomment">///     Some(env!(&quot;CARGO_PKG_VERSION&quot;)),</span>
-    <span class="doccomment">///     Some(&quot;https://opentelemetry.io/schema/1.0.0&quot;)</span>
-    <span class="doccomment">/// );</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">versioned_tracer</span>(
+    <span class="doccomment">/// Returns a new versioned tracer with a given name.
+    ///
+    /// The `name` should be the application name or the name of the library
+    /// providing instrumentation. If the name is empty, then an
+    /// implementation-defined default name may be used instead.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use opentelemetry::{global, trace::TracerProvider};
+    ///
+    /// let provider = global::tracer_provider();
+    ///
+    /// // tracer used in applications/binaries
+    /// let tracer = provider.tracer(&quot;my_app&quot;);
+    ///
+    /// // tracer used in libraries/crates that optionally includes version and schema url
+    /// let tracer = provider.versioned_tracer(
+    ///     &quot;my_library&quot;,
+    ///     Some(env!(&quot;CARGO_PKG_VERSION&quot;)),
+    ///     Some(&quot;https://opentelemetry.io/schema/1.0.0&quot;)
+    /// );
+    /// ```
+    </span><span class="kw">fn </span>versioned_tracer(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">name</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;static</span>, <span class="ident">str</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">version</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>,
-        <span class="ident">schema_url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident"><span class="self">Self</span>::Tracer</span>;
+        name: <span class="kw">impl </span>Into&lt;Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;&gt;,
+        version: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;,
+        schema_url: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str&gt;,
+    ) -&gt; <span class="self">Self</span>::Tracer;
 
-    <span class="doccomment">/// Force flush all remaining spans in span processors and return results.</span>
-    <span class="kw">fn</span> <span class="ident">force_flush</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TraceResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Force flush all remaining spans in span processors and return results.
+    </span><span class="kw">fn </span>force_flush(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;TraceResult&lt;()&gt;&gt;;
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="opentelemetry" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

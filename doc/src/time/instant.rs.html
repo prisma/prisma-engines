@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-0.3.14/src/instant.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>instant.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://avatars0.githubusercontent.com/u/55999857"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../time/index.html"><div class="logo-container"><img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../time/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/time-0.3.14/src/instant.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>instant.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://avatars0.githubusercontent.com/u/55999857"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../time/index.html"><div class="logo-container"><img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../time/index.html"><div class="logo-container">
                     <img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../time/index.html">
                         <img src="https://avatars0.githubusercontent.com/u/55999857" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -263,268 +263,268 @@
 <span id="261">261</span>
 <span id="262">262</span>
 <span id="263">263</span>
-</pre><pre class="rust"><code><span class="doccomment">//! The [`Instant`] struct and its associated `impl`s.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! The [`Instant`] struct and its associated `impl`s.
 
-<span class="kw">use</span> <span class="ident">core::cmp</span>::{<span class="ident">Ord</span>, <span class="ident">Ordering</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>};
-<span class="kw">use</span> <span class="ident">core::ops</span>::{<span class="ident">Add</span>, <span class="ident">Sub</span>};
-<span class="kw">use</span> <span class="ident">core::time::Duration</span> <span class="kw">as</span> <span class="ident">StdDuration</span>;
-<span class="kw">use</span> <span class="ident">std::borrow::Borrow</span>;
-<span class="kw">use</span> <span class="ident">std::time::Instant</span> <span class="kw">as</span> <span class="ident">StdInstant</span>;
+</span><span class="kw">use </span>core::cmp::{Ord, Ordering, PartialEq, PartialOrd};
+<span class="kw">use </span>core::ops::{Add, Sub};
+<span class="kw">use </span>core::time::Duration <span class="kw">as </span>StdDuration;
+<span class="kw">use </span>std::borrow::Borrow;
+<span class="kw">use </span>std::time::Instant <span class="kw">as </span>StdInstant;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Duration</span>;
+<span class="kw">use </span><span class="kw">crate</span>::Duration;
 
-<span class="doccomment">/// A measurement of a monotonically non-decreasing clock. Opaque and useful only with [`Duration`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Instants are always guaranteed to be no less than any previously measured instant when created,</span>
-<span class="doccomment">/// and are often useful for tasks such as measuring benchmarks or timing how long an operation</span>
-<span class="doccomment">/// takes.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note, however, that instants are not guaranteed to be **steady**. In other words, each tick of</span>
-<span class="doccomment">/// the underlying clock may not be the same length (e.g. some seconds may be longer than others).</span>
-<span class="doccomment">/// An instant may jump forwards or experience time dilation (slow down or speed up), but it will</span>
-<span class="doccomment">/// never go backwards.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Instants are opaque types that can only be compared to one another. There is no method to get</span>
-<span class="doccomment">/// &quot;the number of seconds&quot; from an instant. Instead, it only allows measuring the duration between</span>
-<span class="doccomment">/// two instants (or comparing two instants).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This implementation allows for operations with signed [`Duration`]s, but is otherwise identical</span>
-<span class="doccomment">/// to [`std::time::Instant`].</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">__time_03_docs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)))]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Instant</span>(<span class="kw">pub</span> <span class="ident">StdInstant</span>);
+<span class="doccomment">/// A measurement of a monotonically non-decreasing clock. Opaque and useful only with [`Duration`].
+///
+/// Instants are always guaranteed to be no less than any previously measured instant when created,
+/// and are often useful for tasks such as measuring benchmarks or timing how long an operation
+/// takes.
+///
+/// Note, however, that instants are not guaranteed to be **steady**. In other words, each tick of
+/// the underlying clock may not be the same length (e.g. some seconds may be longer than others).
+/// An instant may jump forwards or experience time dilation (slow down or speed up), but it will
+/// never go backwards.
+///
+/// Instants are opaque types that can only be compared to one another. There is no method to get
+/// &quot;the number of seconds&quot; from an instant. Instead, it only allows measuring the duration between
+/// two instants (or comparing two instants).
+///
+/// This implementation allows for operations with signed [`Duration`]s, but is otherwise identical
+/// to [`std::time::Instant`].
+</span><span class="attribute">#[cfg_attr(__time_03_docs, doc(cfg(feature = <span class="string">&quot;std&quot;</span>)))]
+#[repr(transparent)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+</span><span class="kw">pub struct </span>Instant(<span class="kw">pub </span>StdInstant);
 
-<span class="kw">impl</span> <span class="ident">Instant</span> {
-    <span class="comment">// region: delegation</span>
-    <span class="doccomment">/// Returns an `Instant` corresponding to &quot;now&quot;.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::Instant;</span>
-    <span class="doccomment">/// println!(&quot;{:?}&quot;, Instant::now());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">now</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">StdInstant::now</span>())
+<span class="kw">impl </span>Instant {
+    <span class="comment">// region: delegation
+    </span><span class="doccomment">/// Returns an `Instant` corresponding to &quot;now&quot;.
+    ///
+    /// ```rust
+    /// # use time::Instant;
+    /// println!(&quot;{:?}&quot;, Instant::now());
+    /// ```
+    </span><span class="kw">pub fn </span>now() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(StdInstant::now())
     }
 
-    <span class="doccomment">/// Returns the amount of time elapsed since this instant was created. The duration will always</span>
-    <span class="doccomment">/// be nonnegative if the instant is not synthetically created.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Instant, ext::{NumericalStdDuration, NumericalDuration}};</span>
-    <span class="doccomment">/// # use std::thread;</span>
-    <span class="doccomment">/// let instant = Instant::now();</span>
-    <span class="doccomment">/// thread::sleep(1.std_milliseconds());</span>
-    <span class="doccomment">/// assert!(instant.elapsed() &gt;= 1.milliseconds());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">elapsed</span>(<span class="self">self</span>) -&gt; <span class="ident">Duration</span> {
-        <span class="ident"><span class="self">Self</span>::now</span>() <span class="op">-</span> <span class="self">self</span>
-    }
-    <span class="comment">// endregion delegation</span>
+    <span class="doccomment">/// Returns the amount of time elapsed since this instant was created. The duration will always
+    /// be nonnegative if the instant is not synthetically created.
+    ///
+    /// ```rust
+    /// # use time::{Instant, ext::{NumericalStdDuration, NumericalDuration}};
+    /// # use std::thread;
+    /// let instant = Instant::now();
+    /// thread::sleep(1.std_milliseconds());
+    /// assert!(instant.elapsed() &gt;= 1.milliseconds());
+    /// ```
+    </span><span class="kw">pub fn </span>elapsed(<span class="self">self</span>) -&gt; Duration {
+        <span class="self">Self</span>::now() - <span class="self">self
+    </span>}
+    <span class="comment">// endregion delegation
 
-    <span class="comment">// region: checked arithmetic</span>
-    <span class="doccomment">/// Returns `Some(t)` where `t` is the time `self + duration` if `t` can be represented as</span>
-    <span class="doccomment">/// `Instant` (which means it&#39;s inside the bounds of the underlying data structure), `None`</span>
-    <span class="doccomment">/// otherwise.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Instant, ext::NumericalDuration};</span>
-    <span class="doccomment">/// let now = Instant::now();</span>
-    <span class="doccomment">/// assert_eq!(now.checked_add(5.seconds()), Some(now + 5.seconds()));</span>
-    <span class="doccomment">/// assert_eq!(now.checked_add((-5).seconds()), Some(now + (-5).seconds()));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_add</span>(<span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">duration</span>.<span class="ident">is_zero</span>() {
+    // region: checked arithmetic
+    </span><span class="doccomment">/// Returns `Some(t)` where `t` is the time `self + duration` if `t` can be represented as
+    /// `Instant` (which means it&#39;s inside the bounds of the underlying data structure), `None`
+    /// otherwise.
+    ///
+    /// ```rust
+    /// # use time::{Instant, ext::NumericalDuration};
+    /// let now = Instant::now();
+    /// assert_eq!(now.checked_add(5.seconds()), Some(now + 5.seconds()));
+    /// assert_eq!(now.checked_add((-5).seconds()), Some(now + (-5).seconds()));
+    /// ```
+    </span><span class="kw">pub fn </span>checked_add(<span class="self">self</span>, duration: Duration) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">if </span>duration.is_zero() {
             <span class="prelude-val">Some</span>(<span class="self">self</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">duration</span>.<span class="ident">is_positive</span>() {
-            <span class="self">self</span>.<span class="number">0</span>.<span class="ident">checked_add</span>(<span class="ident">duration</span>.<span class="ident">unsigned_abs</span>()).<span class="ident">map</span>(<span class="self">Self</span>)
-        } <span class="kw">else</span> {
-            <span class="macro">debug_assert!</span>(<span class="ident">duration</span>.<span class="ident">is_negative</span>());
-            <span class="self">self</span>.<span class="number">0</span>.<span class="ident">checked_sub</span>(<span class="ident">duration</span>.<span class="ident">unsigned_abs</span>()).<span class="ident">map</span>(<span class="self">Self</span>)
+        } <span class="kw">else if </span>duration.is_positive() {
+            <span class="self">self</span>.<span class="number">0</span>.checked_add(duration.unsigned_abs()).map(<span class="self">Self</span>)
+        } <span class="kw">else </span>{
+            <span class="macro">debug_assert!</span>(duration.is_negative());
+            <span class="self">self</span>.<span class="number">0</span>.checked_sub(duration.unsigned_abs()).map(<span class="self">Self</span>)
         }
     }
 
-    <span class="doccomment">/// Returns `Some(t)` where `t` is the time `self - duration` if `t` can be represented as</span>
-    <span class="doccomment">/// `Instant` (which means it&#39;s inside the bounds of the underlying data structure), `None`</span>
-    <span class="doccomment">/// otherwise.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::{Instant, ext::NumericalDuration};</span>
-    <span class="doccomment">/// let now = Instant::now();</span>
-    <span class="doccomment">/// assert_eq!(now.checked_sub(5.seconds()), Some(now - 5.seconds()));</span>
-    <span class="doccomment">/// assert_eq!(now.checked_sub((-5).seconds()), Some(now - (-5).seconds()));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">checked_sub</span>(<span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">duration</span>.<span class="ident">is_zero</span>() {
+    <span class="doccomment">/// Returns `Some(t)` where `t` is the time `self - duration` if `t` can be represented as
+    /// `Instant` (which means it&#39;s inside the bounds of the underlying data structure), `None`
+    /// otherwise.
+    ///
+    /// ```rust
+    /// # use time::{Instant, ext::NumericalDuration};
+    /// let now = Instant::now();
+    /// assert_eq!(now.checked_sub(5.seconds()), Some(now - 5.seconds()));
+    /// assert_eq!(now.checked_sub((-5).seconds()), Some(now - (-5).seconds()));
+    /// ```
+    </span><span class="kw">pub fn </span>checked_sub(<span class="self">self</span>, duration: Duration) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">if </span>duration.is_zero() {
             <span class="prelude-val">Some</span>(<span class="self">self</span>)
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">duration</span>.<span class="ident">is_positive</span>() {
-            <span class="self">self</span>.<span class="number">0</span>.<span class="ident">checked_sub</span>(<span class="ident">duration</span>.<span class="ident">unsigned_abs</span>()).<span class="ident">map</span>(<span class="self">Self</span>)
-        } <span class="kw">else</span> {
-            <span class="macro">debug_assert!</span>(<span class="ident">duration</span>.<span class="ident">is_negative</span>());
-            <span class="self">self</span>.<span class="number">0</span>.<span class="ident">checked_add</span>(<span class="ident">duration</span>.<span class="ident">unsigned_abs</span>()).<span class="ident">map</span>(<span class="self">Self</span>)
+        } <span class="kw">else if </span>duration.is_positive() {
+            <span class="self">self</span>.<span class="number">0</span>.checked_sub(duration.unsigned_abs()).map(<span class="self">Self</span>)
+        } <span class="kw">else </span>{
+            <span class="macro">debug_assert!</span>(duration.is_negative());
+            <span class="self">self</span>.<span class="number">0</span>.checked_add(duration.unsigned_abs()).map(<span class="self">Self</span>)
         }
     }
-    <span class="comment">// endregion checked arithmetic</span>
+    <span class="comment">// endregion checked arithmetic
 
-    <span class="doccomment">/// Obtain the inner [`std::time::Instant`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use time::Instant;</span>
-    <span class="doccomment">/// let now = Instant::now();</span>
-    <span class="doccomment">/// assert_eq!(now.into_inner(), now.0);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; <span class="ident">StdInstant</span> {
-        <span class="self">self</span>.<span class="number">0</span>
+    </span><span class="doccomment">/// Obtain the inner [`std::time::Instant`].
+    ///
+    /// ```rust
+    /// # use time::Instant;
+    /// let now = Instant::now();
+    /// assert_eq!(now.into_inner(), now.0);
+    /// ```
+    </span><span class="kw">pub const fn </span>into_inner(<span class="self">self</span>) -&gt; StdInstant {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
+}
+
+<span class="comment">// region: trait impls
+</span><span class="kw">impl </span>From&lt;StdInstant&gt; <span class="kw">for </span>Instant {
+    <span class="kw">fn </span>from(instant: StdInstant) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>(instant)
     }
 }
 
-<span class="comment">// region: trait impls</span>
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">StdInstant</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Instant</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">instant</span>: <span class="ident">StdInstant</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span>(<span class="ident">instant</span>)
-    }
+<span class="kw">impl </span>From&lt;Instant&gt; <span class="kw">for </span>StdInstant {
+    <span class="kw">fn </span>from(instant: Instant) -&gt; <span class="self">Self </span>{
+        instant.<span class="number">0
+    </span>}
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StdInstant</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">instant</span>: <span class="ident">Instant</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">instant</span>.<span class="number">0</span>
-    }
-}
+<span class="kw">impl </span>Sub <span class="kw">for </span>Instant {
+    <span class="kw">type </span>Output = Duration;
 
-<span class="kw">impl</span> <span class="ident">Sub</span> <span class="kw">for</span> <span class="ident">Instant</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Duration</span>;
-
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="number">0</span>) {
-            <span class="ident">Ordering::Equal</span> =&gt; <span class="ident">Duration::ZERO</span>,
-            <span class="ident">Ordering::Greater</span> =&gt; (<span class="self">self</span>.<span class="number">0</span> <span class="op">-</span> <span class="ident">other</span>.<span class="number">0</span>)
-                .<span class="ident">try_into</span>()
-                .<span class="ident">expect</span>(<span class="string">&quot;overflow converting `std::time::Duration` to `time::Duration`&quot;</span>),
-            <span class="ident">Ordering::Less</span> =&gt; <span class="op">-</span><span class="ident">Duration::try_from</span>(<span class="ident">other</span>.<span class="number">0</span> <span class="op">-</span> <span class="self">self</span>.<span class="number">0</span>)
-                .<span class="ident">expect</span>(<span class="string">&quot;overflow converting `std::time::Duration` to `time::Duration`&quot;</span>),
-        }
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">StdInstant</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Instant</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Duration</span>;
-
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">StdInstant</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="self">self</span> <span class="op">-</span> <span class="self">Self</span>(<span class="ident">other</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StdInstant</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Duration</span>;
-
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">Instant</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="ident">Instant</span>(<span class="self">self</span>) <span class="op">-</span> <span class="ident">other</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Add</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Instant</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
-
-    <span class="kw">fn</span> <span class="ident">add</span>(<span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="kw">if</span> <span class="ident">duration</span>.<span class="ident">is_positive</span>() {
-            <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span> <span class="op">+</span> <span class="ident">duration</span>.<span class="ident">unsigned_abs</span>())
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">duration</span>.<span class="ident">is_negative</span>() {
-            <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span> <span class="op">-</span> <span class="ident">duration</span>.<span class="ident">unsigned_abs</span>())
-        } <span class="kw">else</span> {
-            <span class="macro">debug_assert!</span>(<span class="ident">duration</span>.<span class="ident">is_zero</span>());
-            <span class="self">self</span>
+    <span class="kw">fn </span>sub(<span class="self">self</span>, other: <span class="self">Self</span>) -&gt; <span class="self">Self</span>::Output {
+        <span class="kw">match </span><span class="self">self</span>.<span class="number">0</span>.cmp(<span class="kw-2">&amp;</span>other.<span class="number">0</span>) {
+            Ordering::Equal =&gt; Duration::ZERO,
+            Ordering::Greater =&gt; (<span class="self">self</span>.<span class="number">0 </span>- other.<span class="number">0</span>)
+                .try_into()
+                .expect(<span class="string">&quot;overflow converting `std::time::Duration` to `time::Duration`&quot;</span>),
+            Ordering::Less =&gt; -Duration::try_from(other.<span class="number">0 </span>- <span class="self">self</span>.<span class="number">0</span>)
+                .expect(<span class="string">&quot;overflow converting `std::time::Duration` to `time::Duration`&quot;</span>),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Add</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StdInstant</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
+<span class="kw">impl </span>Sub&lt;StdInstant&gt; <span class="kw">for </span>Instant {
+    <span class="kw">type </span>Output = Duration;
 
-    <span class="kw">fn</span> <span class="ident">add</span>(<span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-        (<span class="ident">Instant</span>(<span class="self">self</span>) <span class="op">+</span> <span class="ident">duration</span>).<span class="number">0</span>
+    <span class="kw">fn </span>sub(<span class="self">self</span>, other: StdInstant) -&gt; <span class="self">Self</span>::Output {
+        <span class="self">self </span>- <span class="self">Self</span>(other)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Add</span><span class="op">&lt;</span><span class="ident">StdDuration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Instant</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
+<span class="kw">impl </span>Sub&lt;Instant&gt; <span class="kw">for </span>StdInstant {
+    <span class="kw">type </span>Output = Duration;
 
-    <span class="kw">fn</span> <span class="ident">add</span>(<span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">StdDuration</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span> <span class="op">+</span> <span class="ident">duration</span>)
+    <span class="kw">fn </span>sub(<span class="self">self</span>, other: Instant) -&gt; <span class="self">Self</span>::Output {
+        Instant(<span class="self">self</span>) - other
     }
 }
 
-<span class="macro">impl_add_assign!</span>(<span class="ident">Instant</span>: <span class="ident">Duration</span>, <span class="ident">StdDuration</span>);
-<span class="macro">impl_add_assign!</span>(<span class="ident">StdInstant</span>: <span class="ident">Duration</span>);
+<span class="kw">impl </span>Add&lt;Duration&gt; <span class="kw">for </span>Instant {
+    <span class="kw">type </span>Output = <span class="self">Self</span>;
 
-<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Instant</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
-
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="kw">if</span> <span class="ident">duration</span>.<span class="ident">is_positive</span>() {
-            <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span> <span class="op">-</span> <span class="ident">duration</span>.<span class="ident">unsigned_abs</span>())
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">duration</span>.<span class="ident">is_negative</span>() {
-            <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span> <span class="op">+</span> <span class="ident">duration</span>.<span class="ident">unsigned_abs</span>())
-        } <span class="kw">else</span> {
-            <span class="macro">debug_assert!</span>(<span class="ident">duration</span>.<span class="ident">is_zero</span>());
-            <span class="self">self</span>
-        }
+    <span class="kw">fn </span>add(<span class="self">self</span>, duration: Duration) -&gt; <span class="self">Self</span>::Output {
+        <span class="kw">if </span>duration.is_positive() {
+            <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0 </span>+ duration.unsigned_abs())
+        } <span class="kw">else if </span>duration.is_negative() {
+            <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0 </span>- duration.unsigned_abs())
+        } <span class="kw">else </span>{
+            <span class="macro">debug_assert!</span>(duration.is_zero());
+            <span class="self">self
+        </span>}
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StdInstant</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
+<span class="kw">impl </span>Add&lt;Duration&gt; <span class="kw">for </span>StdInstant {
+    <span class="kw">type </span>Output = <span class="self">Self</span>;
 
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-        (<span class="ident">Instant</span>(<span class="self">self</span>) <span class="op">-</span> <span class="ident">duration</span>).<span class="number">0</span>
+    <span class="kw">fn </span>add(<span class="self">self</span>, duration: Duration) -&gt; <span class="self">Self</span>::Output {
+        (Instant(<span class="self">self</span>) + duration).<span class="number">0
+    </span>}
+}
+
+<span class="kw">impl </span>Add&lt;StdDuration&gt; <span class="kw">for </span>Instant {
+    <span class="kw">type </span>Output = <span class="self">Self</span>;
+
+    <span class="kw">fn </span>add(<span class="self">self</span>, duration: StdDuration) -&gt; <span class="self">Self</span>::Output {
+        <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0 </span>+ duration)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Sub</span><span class="op">&lt;</span><span class="ident">StdDuration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Instant</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
+<span class="macro">impl_add_assign!</span>(Instant: Duration, StdDuration);
+<span class="macro">impl_add_assign!</span>(StdInstant: Duration);
 
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">StdDuration</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
-        <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0</span> <span class="op">-</span> <span class="ident">duration</span>)
+<span class="kw">impl </span>Sub&lt;Duration&gt; <span class="kw">for </span>Instant {
+    <span class="kw">type </span>Output = <span class="self">Self</span>;
+
+    <span class="kw">fn </span>sub(<span class="self">self</span>, duration: Duration) -&gt; <span class="self">Self</span>::Output {
+        <span class="kw">if </span>duration.is_positive() {
+            <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0 </span>- duration.unsigned_abs())
+        } <span class="kw">else if </span>duration.is_negative() {
+            <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0 </span>+ duration.unsigned_abs())
+        } <span class="kw">else </span>{
+            <span class="macro">debug_assert!</span>(duration.is_zero());
+            <span class="self">self
+        </span>}
     }
 }
 
-<span class="macro">impl_sub_assign!</span>(<span class="ident">Instant</span>: <span class="ident">Duration</span>, <span class="ident">StdDuration</span>);
-<span class="macro">impl_sub_assign!</span>(<span class="ident">StdInstant</span>: <span class="ident">Duration</span>);
+<span class="kw">impl </span>Sub&lt;Duration&gt; <span class="kw">for </span>StdInstant {
+    <span class="kw">type </span>Output = <span class="self">Self</span>;
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">StdInstant</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Instant</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="ident">StdInstant</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">eq</span>(<span class="ident">rhs</span>)
+    <span class="kw">fn </span>sub(<span class="self">self</span>, duration: Duration) -&gt; <span class="self">Self</span>::Output {
+        (Instant(<span class="self">self</span>) - duration).<span class="number">0
+    </span>}
+}
+
+<span class="kw">impl </span>Sub&lt;StdDuration&gt; <span class="kw">for </span>Instant {
+    <span class="kw">type </span>Output = <span class="self">Self</span>;
+
+    <span class="kw">fn </span>sub(<span class="self">self</span>, duration: StdDuration) -&gt; <span class="self">Self</span>::Output {
+        <span class="self">Self</span>(<span class="self">self</span>.<span class="number">0 </span>- duration)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialEq</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StdInstant</span> {
-    <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="ident">Instant</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="ident">rhs</span>.<span class="number">0</span>)
+<span class="macro">impl_sub_assign!</span>(Instant: Duration, StdDuration);
+<span class="macro">impl_sub_assign!</span>(StdInstant: Duration);
+
+<span class="kw">impl </span>PartialEq&lt;StdInstant&gt; <span class="kw">for </span>Instant {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs: <span class="kw-2">&amp;</span>StdInstant) -&gt; bool {
+        <span class="self">self</span>.<span class="number">0</span>.eq(rhs)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">StdInstant</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Instant</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="ident">StdInstant</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">partial_cmp</span>(<span class="ident">rhs</span>)
+<span class="kw">impl </span>PartialEq&lt;Instant&gt; <span class="kw">for </span>StdInstant {
+    <span class="kw">fn </span>eq(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs: <span class="kw-2">&amp;</span>Instant) -&gt; bool {
+        <span class="self">self</span>.eq(<span class="kw-2">&amp;</span>rhs.<span class="number">0</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">PartialOrd</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StdInstant</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="ident">Instant</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ordering</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="ident">rhs</span>.<span class="number">0</span>)
+<span class="kw">impl </span>PartialOrd&lt;StdInstant&gt; <span class="kw">for </span>Instant {
+    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs: <span class="kw-2">&amp;</span>StdInstant) -&gt; <span class="prelude-ty">Option</span>&lt;Ordering&gt; {
+        <span class="self">self</span>.<span class="number">0</span>.partial_cmp(rhs)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">StdInstant</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Instant</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">StdInstant</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
+<span class="kw">impl </span>PartialOrd&lt;Instant&gt; <span class="kw">for </span>StdInstant {
+    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, rhs: <span class="kw-2">&amp;</span>Instant) -&gt; <span class="prelude-ty">Option</span>&lt;Ordering&gt; {
+        <span class="self">self</span>.partial_cmp(<span class="kw-2">&amp;</span>rhs.<span class="number">0</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Borrow</span><span class="op">&lt;</span><span class="ident">StdInstant</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Instant</span> {
-    <span class="kw">fn</span> <span class="ident">borrow</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">StdInstant</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
-    }
+<span class="kw">impl </span>AsRef&lt;StdInstant&gt; <span class="kw">for </span>Instant {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>StdInstant {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
+    </span>}
 }
-<span class="comment">// endregion trait impls</span>
-</code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="time" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+
+<span class="kw">impl </span>Borrow&lt;StdInstant&gt; <span class="kw">for </span>Instant {
+    <span class="kw">fn </span>borrow(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>StdInstant {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
+    </span>}
+}
+<span class="comment">// endregion trait impls
+</span></code></pre></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="time" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

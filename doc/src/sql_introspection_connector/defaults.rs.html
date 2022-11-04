@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/connectors/sql-introspection-connector/src/defaults.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>defaults.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_introspection_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/connectors/sql-introspection-connector/src/defaults.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>defaults.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_introspection_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -102,109 +102,109 @@
 <span id="102">102</span>
 <span id="103">103</span>
 <span id="104">104</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::calculate_datamodel::CalculateDatamodelContext</span> <span class="kw">as</span> <span class="ident">Context</span>;
-<span class="kw">use</span> <span class="ident">psl::dml</span>;
-<span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">sql</span>, <span class="ident">postgres::PostgresSchemaExt</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::calculate_datamodel::CalculateDatamodelContext <span class="kw">as </span>Context;
+<span class="kw">use </span>psl::dml;
+<span class="kw">use </span>sql_schema_describer::{<span class="self">self </span><span class="kw">as </span>sql, postgres::PostgresSchemaExt};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">calculate_default</span>(<span class="ident">column</span>: <span class="ident">sql::ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">dml::DefaultValue</span><span class="op">&gt;</span> {
-    <span class="kw">match</span> (<span class="ident">column</span>.<span class="ident">default</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">kind</span>()), <span class="kw-2">&amp;</span><span class="ident">column</span>.<span class="ident">column_type_family</span>()) {
-        (<span class="prelude-val">Some</span>(<span class="ident">sql::DefaultKind::Sequence</span>(<span class="ident">name</span>)), <span class="kw">_</span>) <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">is_cockroach</span>() =&gt; {
-            <span class="kw">use</span> <span class="ident">dml::PrismaValue</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>calculate_default(column: sql::ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;</span>Context) -&gt; <span class="prelude-ty">Option</span>&lt;dml::DefaultValue&gt; {
+    <span class="kw">match </span>(column.default().map(|d| d.kind()), <span class="kw-2">&amp;</span>column.column_type_family()) {
+        (<span class="prelude-val">Some</span>(sql::DefaultKind::Sequence(name)), <span class="kw">_</span>) <span class="kw">if </span>ctx.is_cockroach() =&gt; {
+            <span class="kw">use </span>dml::PrismaValue;
 
-            <span class="kw">let</span> <span class="ident">connector_data</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
-            <span class="kw">let</span> <span class="ident">sequence_idx</span> <span class="op">=</span> <span class="ident">connector_data</span>
-                .<span class="ident">sequences</span>
-                .<span class="ident">binary_search_by_key</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>, <span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">s</span>.<span class="ident">name</span>)
-                .<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">sequence</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">connector_data</span>.<span class="ident">sequences</span>[<span class="ident">sequence_idx</span>];
+            <span class="kw">let </span>connector_data: <span class="kw-2">&amp;</span>PostgresSchemaExt = ctx.schema.downcast_connector_data();
+            <span class="kw">let </span>sequence_idx = connector_data
+                .sequences
+                .binary_search_by_key(<span class="kw-2">&amp;</span>name, |s| <span class="kw-2">&amp;</span>s.name)
+                .unwrap();
+            <span class="kw">let </span>sequence = <span class="kw-2">&amp;</span>connector_data.sequences[sequence_idx];
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+            <span class="kw">let </span><span class="kw-2">mut </span>args = Vec::new();
 
-            <span class="kw">if</span> <span class="ident">sequence</span>.<span class="ident">min_value</span> <span class="op">!</span><span class="op">=</span> <span class="number">1</span> {
-                <span class="ident">args</span>.<span class="ident">push</span>((<span class="prelude-val">Some</span>(<span class="string">&quot;minValue&quot;</span>.<span class="ident">to_owned</span>()), <span class="ident">PrismaValue::Int</span>(<span class="ident">sequence</span>.<span class="ident">min_value</span>)));
+            <span class="kw">if </span>sequence.min_value != <span class="number">1 </span>{
+                args.push((<span class="prelude-val">Some</span>(<span class="string">&quot;minValue&quot;</span>.to_owned()), PrismaValue::Int(sequence.min_value)));
             }
 
-            <span class="kw">if</span> <span class="ident">sequence</span>.<span class="ident">max_value</span> <span class="op">!</span><span class="op">=</span> <span class="ident">i64::MAX</span> {
-                <span class="ident">args</span>.<span class="ident">push</span>((<span class="prelude-val">Some</span>(<span class="string">&quot;maxValue&quot;</span>.<span class="ident">to_owned</span>()), <span class="ident">PrismaValue::Int</span>(<span class="ident">sequence</span>.<span class="ident">max_value</span>)));
+            <span class="kw">if </span>sequence.max_value != i64::MAX {
+                args.push((<span class="prelude-val">Some</span>(<span class="string">&quot;maxValue&quot;</span>.to_owned()), PrismaValue::Int(sequence.max_value)));
             }
 
-            <span class="kw">if</span> <span class="ident">sequence</span>.<span class="ident">cache_size</span> <span class="op">!</span><span class="op">=</span> <span class="number">1</span> {
-                <span class="ident">args</span>.<span class="ident">push</span>((<span class="prelude-val">Some</span>(<span class="string">&quot;cache&quot;</span>.<span class="ident">to_owned</span>()), <span class="ident">PrismaValue::Int</span>(<span class="ident">sequence</span>.<span class="ident">cache_size</span>)));
+            <span class="kw">if </span>sequence.cache_size != <span class="number">1 </span>{
+                args.push((<span class="prelude-val">Some</span>(<span class="string">&quot;cache&quot;</span>.to_owned()), PrismaValue::Int(sequence.cache_size)));
             }
 
-            <span class="kw">if</span> <span class="ident">sequence</span>.<span class="ident">increment_by</span> <span class="op">!</span><span class="op">=</span> <span class="number">1</span> {
-                <span class="ident">args</span>.<span class="ident">push</span>((<span class="prelude-val">Some</span>(<span class="string">&quot;increment&quot;</span>.<span class="ident">to_owned</span>()), <span class="ident">PrismaValue::Int</span>(<span class="ident">sequence</span>.<span class="ident">increment_by</span>)));
+            <span class="kw">if </span>sequence.increment_by != <span class="number">1 </span>{
+                args.push((<span class="prelude-val">Some</span>(<span class="string">&quot;increment&quot;</span>.to_owned()), PrismaValue::Int(sequence.increment_by)));
             }
 
-            <span class="kw">if</span> <span class="ident">sequence</span>.<span class="ident">start_value</span> <span class="op">!</span><span class="op">=</span> <span class="number">1</span> {
-                <span class="ident">args</span>.<span class="ident">push</span>((<span class="prelude-val">Some</span>(<span class="string">&quot;start&quot;</span>.<span class="ident">to_owned</span>()), <span class="ident">PrismaValue::Int</span>(<span class="ident">sequence</span>.<span class="ident">start_value</span>)));
+            <span class="kw">if </span>sequence.start_value != <span class="number">1 </span>{
+                args.push((<span class="prelude-val">Some</span>(<span class="string">&quot;start&quot;</span>.to_owned()), PrismaValue::Int(sequence.start_value)));
             }
 
-            <span class="prelude-val">Some</span>(<span class="ident">dml::DefaultValue::new_expression</span>(<span class="ident">dml::ValueGenerator::new_sequence</span>(
-                <span class="ident">args</span>,
+            <span class="prelude-val">Some</span>(dml::DefaultValue::new_expression(dml::ValueGenerator::new_sequence(
+                args,
             )))
         }
-        (<span class="kw">_</span>, <span class="ident">sql::ColumnTypeFamily::Int</span>) <span class="kw">if</span> <span class="ident">column</span>.<span class="ident">is_autoincrement</span>() =&gt; <span class="prelude-val">Some</span>(<span class="ident">dml::DefaultValue::new_expression</span>(
-            <span class="ident">dml::ValueGenerator::new_autoincrement</span>(),
+        (<span class="kw">_</span>, sql::ColumnTypeFamily::Int) <span class="kw">if </span>column.is_autoincrement() =&gt; <span class="prelude-val">Some</span>(dml::DefaultValue::new_expression(
+            dml::ValueGenerator::new_autoincrement(),
         )),
-        (<span class="kw">_</span>, <span class="ident">sql::ColumnTypeFamily::BigInt</span>) <span class="kw">if</span> <span class="ident">column</span>.<span class="ident">is_autoincrement</span>() =&gt; <span class="prelude-val">Some</span>(<span class="ident">dml::DefaultValue::new_expression</span>(
-            <span class="ident">dml::ValueGenerator::new_autoincrement</span>(),
+        (<span class="kw">_</span>, sql::ColumnTypeFamily::BigInt) <span class="kw">if </span>column.is_autoincrement() =&gt; <span class="prelude-val">Some</span>(dml::DefaultValue::new_expression(
+            dml::ValueGenerator::new_autoincrement(),
         )),
-        (<span class="kw">_</span>, <span class="ident">sql::ColumnTypeFamily::Int</span>) <span class="kw">if</span> <span class="ident">is_sequence</span>(<span class="ident">column</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">dml::DefaultValue::new_expression</span>(
-            <span class="ident">dml::ValueGenerator::new_autoincrement</span>(),
+        (<span class="kw">_</span>, sql::ColumnTypeFamily::Int) <span class="kw">if </span>is_sequence(column) =&gt; <span class="prelude-val">Some</span>(dml::DefaultValue::new_expression(
+            dml::ValueGenerator::new_autoincrement(),
         )),
-        (<span class="kw">_</span>, <span class="ident">sql::ColumnTypeFamily::BigInt</span>) <span class="kw">if</span> <span class="ident">is_sequence</span>(<span class="ident">column</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">dml::DefaultValue::new_expression</span>(
-            <span class="ident">dml::ValueGenerator::new_autoincrement</span>(),
+        (<span class="kw">_</span>, sql::ColumnTypeFamily::BigInt) <span class="kw">if </span>is_sequence(column) =&gt; <span class="prelude-val">Some</span>(dml::DefaultValue::new_expression(
+            dml::ValueGenerator::new_autoincrement(),
         )),
-        (<span class="prelude-val">Some</span>(<span class="ident">sql::DefaultKind::Sequence</span>(<span class="kw">_</span>)), <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">dml::DefaultValue::new_expression</span>(
-            <span class="ident">dml::ValueGenerator::new_autoincrement</span>(),
+        (<span class="prelude-val">Some</span>(sql::DefaultKind::Sequence(<span class="kw">_</span>)), <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(dml::DefaultValue::new_expression(
+            dml::ValueGenerator::new_autoincrement(),
         )),
-        (<span class="prelude-val">Some</span>(<span class="ident">sql::DefaultKind::Now</span>), <span class="ident">sql::ColumnTypeFamily::DateTime</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">set_default</span>(
-            <span class="ident">dml::DefaultValue::new_expression</span>(<span class="ident">dml::ValueGenerator::new_now</span>()),
-            <span class="ident">column</span>,
+        (<span class="prelude-val">Some</span>(sql::DefaultKind::Now), sql::ColumnTypeFamily::DateTime) =&gt; <span class="prelude-val">Some</span>(set_default(
+            dml::DefaultValue::new_expression(dml::ValueGenerator::new_now()),
+            column,
         )),
-        (<span class="prelude-val">Some</span>(<span class="ident">sql::DefaultKind::DbGenerated</span>(<span class="ident">default_string</span>)), <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">set_default</span>(
-            <span class="ident">dml::DefaultValue::new_expression</span>(<span class="ident">dml::ValueGenerator::new_dbgenerated</span>(
-                <span class="ident">default_string</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap</span>().<span class="ident">clone</span>(),
+        (<span class="prelude-val">Some</span>(sql::DefaultKind::DbGenerated(default_string)), <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(set_default(
+            dml::DefaultValue::new_expression(dml::ValueGenerator::new_dbgenerated(
+                default_string.as_ref().unwrap().clone(),
             )),
-            <span class="ident">column</span>,
+            column,
         )),
-        (<span class="prelude-val">Some</span>(<span class="ident">sql::DefaultKind::Value</span>(<span class="ident">dml::PrismaValue::Enum</span>(<span class="ident">variant</span>))), <span class="ident">sql::ColumnTypeFamily::Enum</span>(<span class="ident">enum_id</span>)) =&gt; {
-            <span class="kw">let</span> <span class="ident">variant_name</span> <span class="op">=</span> <span class="ident">ctx</span>
-                .<span class="ident">existing_enum</span>(<span class="kw-2">*</span><span class="ident">enum_id</span>)
-                .<span class="ident">into_iter</span>()
-                .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">enm</span><span class="op">|</span> <span class="ident">enm</span>.<span class="ident">values</span>())
-                .<span class="ident">find</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">mapped_name</span>() <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">variant</span>))
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="ident">value</span>.<span class="ident">name</span>())
-                .<span class="ident">unwrap_or</span>(<span class="ident">variant</span>);
+        (<span class="prelude-val">Some</span>(sql::DefaultKind::Value(dml::PrismaValue::Enum(variant))), sql::ColumnTypeFamily::Enum(enum_id)) =&gt; {
+            <span class="kw">let </span>variant_name = ctx
+                .existing_enum(<span class="kw-2">*</span>enum_id)
+                .into_iter()
+                .flat_map(|enm| enm.values())
+                .find(|value| value.mapped_name() == <span class="prelude-val">Some</span>(variant))
+                .map(|value| value.name())
+                .unwrap_or(variant);
 
-            <span class="prelude-val">Some</span>(<span class="ident">set_default</span>(
-                <span class="ident">dml::DefaultValue::new_single</span>(<span class="ident">dml::PrismaValue::Enum</span>(<span class="ident">variant_name</span>.<span class="ident">to_owned</span>())),
-                <span class="ident">column</span>,
+            <span class="prelude-val">Some</span>(set_default(
+                dml::DefaultValue::new_single(dml::PrismaValue::Enum(variant_name.to_owned())),
+                column,
             ))
         }
-        (<span class="prelude-val">Some</span>(<span class="ident">sql::DefaultKind::Value</span>(<span class="ident">val</span>)), <span class="kw">_</span>) =&gt; {
-            <span class="prelude-val">Some</span>(<span class="ident">set_default</span>(<span class="ident">dml::DefaultValue::new_single</span>(<span class="ident">val</span>.<span class="ident">clone</span>()), <span class="ident">column</span>))
+        (<span class="prelude-val">Some</span>(sql::DefaultKind::Value(val)), <span class="kw">_</span>) =&gt; {
+            <span class="prelude-val">Some</span>(set_default(dml::DefaultValue::new_single(val.clone()), column))
         }
-        (<span class="prelude-val">Some</span>(<span class="ident">sql::DefaultKind::UniqueRowid</span>), <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">dml::DefaultValue::new_expression</span>(
-            <span class="ident">dml::ValueGenerator::new_autoincrement</span>(),
+        (<span class="prelude-val">Some</span>(sql::DefaultKind::UniqueRowid), <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(dml::DefaultValue::new_expression(
+            dml::ValueGenerator::new_autoincrement(),
         )),
-        <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>,
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
     }
 }
 
-<span class="kw">fn</span> <span class="ident">set_default</span>(<span class="kw-2">mut</span> <span class="ident">default</span>: <span class="ident">dml::DefaultValue</span>, <span class="ident">column</span>: <span class="ident">sql::ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">dml::DefaultValue</span> {
-    <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="ident">column</span>.<span class="ident">default</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">df</span><span class="op">|</span> <span class="ident">df</span>.<span class="ident">constraint_name</span>());
+<span class="kw">fn </span>set_default(<span class="kw-2">mut </span>default: dml::DefaultValue, column: sql::ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; dml::DefaultValue {
+    <span class="kw">let </span>db_name = column.default().and_then(|df| df.constraint_name());
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">db_name</span> {
-        <span class="ident">default</span>.<span class="ident">set_db_name</span>(<span class="ident">name</span>);
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(name) = db_name {
+        default.set_db_name(name);
     }
 
-    <span class="ident">default</span>
+    default
 }
 
-<span class="kw">fn</span> <span class="ident">is_sequence</span>(<span class="ident">column</span>: <span class="ident">sql::ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-    <span class="ident">column</span>.<span class="ident">is_single_primary_key</span>() <span class="op">&amp;&amp;</span> <span class="macro">matches!</span>(<span class="kw-2">&amp;</span><span class="ident">column</span>.<span class="ident">default</span>(), <span class="prelude-val">Some</span>(<span class="ident">d</span>) <span class="kw">if</span> <span class="ident">d</span>.<span class="ident">is_sequence</span>())
+<span class="kw">fn </span>is_sequence(column: sql::ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+    column.is_single_primary_key() &amp;&amp; <span class="macro">matches!</span>(<span class="kw-2">&amp;</span>column.default(), <span class="prelude-val">Some</span>(d) <span class="kw">if </span>d.is_sequence())
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_introspection_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_introspection_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

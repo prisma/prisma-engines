@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/async-trait-0.1.57/src/lifetime.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lifetime.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../async_trait/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../async_trait/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../async_trait/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/async-trait-0.1.57/src/lifetime.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lifetime.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../async_trait/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../async_trait/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../async_trait/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -113,120 +113,120 @@
 <span id="113">113</span>
 <span id="114">114</span>
 <span id="115">115</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">proc_macro2</span>::{<span class="ident">Span</span>, <span class="ident">TokenStream</span>};
-<span class="kw">use</span> <span class="ident">std::mem</span>;
-<span class="kw">use</span> <span class="ident">syn::visit_mut</span>::{<span class="self">self</span>, <span class="ident">VisitMut</span>};
-<span class="kw">use</span> <span class="ident">syn</span>::{
-    <span class="ident">parse_quote_spanned</span>, <span class="ident">token</span>, <span class="ident">Expr</span>, <span class="ident">GenericArgument</span>, <span class="ident">Lifetime</span>, <span class="ident">Receiver</span>, <span class="ident">ReturnType</span>, <span class="ident">Type</span>,
-    <span class="ident">TypeBareFn</span>, <span class="ident">TypeImplTrait</span>, <span class="ident">TypeParen</span>, <span class="ident">TypePtr</span>, <span class="ident">TypeReference</span>,
+</pre><pre class="rust"><code><span class="kw">use </span>proc_macro2::{Span, TokenStream};
+<span class="kw">use </span>std::mem;
+<span class="kw">use </span>syn::visit_mut::{<span class="self">self</span>, VisitMut};
+<span class="kw">use </span>syn::{
+    parse_quote_spanned, token, Expr, GenericArgument, Lifetime, Receiver, ReturnType, Type,
+    TypeBareFn, TypeImplTrait, TypeParen, TypePtr, TypeReference,
 };
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CollectLifetimes</span> {
-    <span class="kw">pub</span> <span class="ident">elided</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Lifetime</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">explicit</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Lifetime</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
-    <span class="kw">pub</span> <span class="ident">default_span</span>: <span class="ident">Span</span>,
+<span class="kw">pub struct </span>CollectLifetimes {
+    <span class="kw">pub </span>elided: Vec&lt;Lifetime&gt;,
+    <span class="kw">pub </span>explicit: Vec&lt;Lifetime&gt;,
+    <span class="kw">pub </span>name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str,
+    <span class="kw">pub </span>default_span: Span,
 }
 
-<span class="kw">impl</span> <span class="ident">CollectLifetimes</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">default_span</span>: <span class="ident">Span</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">CollectLifetimes</span> {
-            <span class="ident">elided</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">explicit</span>: <span class="ident">Vec::new</span>(),
-            <span class="ident">name</span>,
-            <span class="ident">default_span</span>,
+<span class="kw">impl </span>CollectLifetimes {
+    <span class="kw">pub fn </span>new(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str, default_span: Span) -&gt; <span class="self">Self </span>{
+        CollectLifetimes {
+            elided: Vec::new(),
+            explicit: Vec::new(),
+            name,
+            default_span,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_opt_lifetime</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">lifetime</span>: <span class="kw-2">&amp;mut</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Lifetime</span><span class="op">&gt;</span>) {
-        <span class="kw">match</span> <span class="ident">lifetime</span> {
-            <span class="prelude-val">None</span> =&gt; <span class="kw-2">*</span><span class="ident">lifetime</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">next_lifetime</span>(<span class="prelude-val">None</span>)),
-            <span class="prelude-val">Some</span>(<span class="ident">lifetime</span>) =&gt; <span class="self">self</span>.<span class="ident">visit_lifetime</span>(<span class="ident">lifetime</span>),
+    <span class="kw">fn </span>visit_opt_lifetime(<span class="kw-2">&amp;mut </span><span class="self">self</span>, lifetime: <span class="kw-2">&amp;mut </span><span class="prelude-ty">Option</span>&lt;Lifetime&gt;) {
+        <span class="kw">match </span>lifetime {
+            <span class="prelude-val">None </span>=&gt; <span class="kw-2">*</span>lifetime = <span class="prelude-val">Some</span>(<span class="self">self</span>.next_lifetime(<span class="prelude-val">None</span>)),
+            <span class="prelude-val">Some</span>(lifetime) =&gt; <span class="self">self</span>.visit_lifetime(lifetime),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_lifetime</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">lifetime</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Lifetime</span>) {
-        <span class="kw">if</span> <span class="ident">lifetime</span>.<span class="ident">ident</span> <span class="op">==</span> <span class="string">&quot;_&quot;</span> {
-            <span class="kw-2">*</span><span class="ident">lifetime</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">next_lifetime</span>(<span class="ident">lifetime</span>.<span class="ident">span</span>());
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">explicit</span>.<span class="ident">push</span>(<span class="ident">lifetime</span>.<span class="ident">clone</span>());
+    <span class="kw">fn </span>visit_lifetime(<span class="kw-2">&amp;mut </span><span class="self">self</span>, lifetime: <span class="kw-2">&amp;mut </span>Lifetime) {
+        <span class="kw">if </span>lifetime.ident == <span class="string">&quot;_&quot; </span>{
+            <span class="kw-2">*</span>lifetime = <span class="self">self</span>.next_lifetime(lifetime.span());
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.explicit.push(lifetime.clone());
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">next_lifetime</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Span</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">span</span>: <span class="ident">S</span>) -&gt; <span class="ident">Lifetime</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="self">self</span>.<span class="ident">name</span>, <span class="self">self</span>.<span class="ident">elided</span>.<span class="ident">len</span>());
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">into</span>().<span class="ident">unwrap_or</span>(<span class="self">self</span>.<span class="ident">default_span</span>);
-        <span class="kw">let</span> <span class="ident">life</span> <span class="op">=</span> <span class="ident">Lifetime::new</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>, <span class="ident">span</span>);
-        <span class="self">self</span>.<span class="ident">elided</span>.<span class="ident">push</span>(<span class="ident">life</span>.<span class="ident">clone</span>());
-        <span class="ident">life</span>
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">VisitMut</span> <span class="kw">for</span> <span class="ident">CollectLifetimes</span> {
-    <span class="kw">fn</span> <span class="ident">visit_receiver_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">arg</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Receiver</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="kw">_</span>, <span class="ident">lifetime</span>)) <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">arg</span>.<span class="ident">reference</span> {
-            <span class="self">self</span>.<span class="ident">visit_opt_lifetime</span>(<span class="ident">lifetime</span>);
-        }
-    }
-
-    <span class="kw">fn</span> <span class="ident">visit_type_reference_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ty</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TypeReference</span>) {
-        <span class="self">self</span>.<span class="ident">visit_opt_lifetime</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ty</span>.<span class="ident">lifetime</span>);
-        <span class="ident">visit_mut::visit_type_reference_mut</span>(<span class="self">self</span>, <span class="ident">ty</span>);
-    }
-
-    <span class="kw">fn</span> <span class="ident">visit_generic_argument_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">gen</span>: <span class="kw-2">&amp;mut</span> <span class="ident">GenericArgument</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">GenericArgument::Lifetime</span>(<span class="ident">lifetime</span>) <span class="op">=</span> <span class="ident">gen</span> {
-            <span class="self">self</span>.<span class="ident">visit_lifetime</span>(<span class="ident">lifetime</span>);
-        }
-        <span class="ident">visit_mut::visit_generic_argument_mut</span>(<span class="self">self</span>, <span class="ident">gen</span>);
+    <span class="kw">fn </span>next_lifetime&lt;S: Into&lt;<span class="prelude-ty">Option</span>&lt;Span&gt;&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, span: S) -&gt; Lifetime {
+        <span class="kw">let </span>name = <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, <span class="self">self</span>.name, <span class="self">self</span>.elided.len());
+        <span class="kw">let </span>span = span.into().unwrap_or(<span class="self">self</span>.default_span);
+        <span class="kw">let </span>life = Lifetime::new(<span class="kw-2">&amp;</span>name, span);
+        <span class="self">self</span>.elided.push(life.clone());
+        life
     }
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AddLifetimeToImplTrait</span>;
-
-<span class="kw">impl</span> <span class="ident">VisitMut</span> <span class="kw">for</span> <span class="ident">AddLifetimeToImplTrait</span> {
-    <span class="kw">fn</span> <span class="ident">visit_type_impl_trait_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ty</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TypeImplTrait</span>) {
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">ty</span>.<span class="ident">impl_token</span>.<span class="ident">span</span>;
-        <span class="kw">let</span> <span class="ident">lifetime</span> <span class="op">=</span> <span class="macro">parse_quote_spanned!</span>(<span class="ident">span</span>=&gt; <span class="lifetime">&#39;async_trait</span>);
-        <span class="ident">ty</span>.<span class="ident">bounds</span>.<span class="ident">insert</span>(<span class="number">0</span>, <span class="ident">lifetime</span>);
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">punct</span>) <span class="op">=</span> <span class="ident">ty</span>.<span class="ident">bounds</span>.<span class="ident">pairs_mut</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">punct_mut</span>() {
-            <span class="ident">punct</span>.<span class="ident">span</span> <span class="op">=</span> <span class="ident">span</span>;
+<span class="kw">impl </span>VisitMut <span class="kw">for </span>CollectLifetimes {
+    <span class="kw">fn </span>visit_receiver_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, arg: <span class="kw-2">&amp;mut </span>Receiver) {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="kw">_</span>, lifetime)) = <span class="kw-2">&amp;mut </span>arg.reference {
+            <span class="self">self</span>.visit_opt_lifetime(lifetime);
         }
-        <span class="ident">visit_mut::visit_type_impl_trait_mut</span>(<span class="self">self</span>, <span class="ident">ty</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_type_reference_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ty</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TypeReference</span>) {
-        <span class="ident">parenthesize_impl_trait</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ty</span>.<span class="ident">elem</span>, <span class="ident">ty</span>.<span class="ident">and_token</span>.<span class="ident">span</span>);
-        <span class="ident">visit_mut::visit_type_reference_mut</span>(<span class="self">self</span>, <span class="ident">ty</span>);
+    <span class="kw">fn </span>visit_type_reference_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ty: <span class="kw-2">&amp;mut </span>TypeReference) {
+        <span class="self">self</span>.visit_opt_lifetime(<span class="kw-2">&amp;mut </span>ty.lifetime);
+        visit_mut::visit_type_reference_mut(<span class="self">self</span>, ty);
     }
 
-    <span class="kw">fn</span> <span class="ident">visit_type_ptr_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ty</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TypePtr</span>) {
-        <span class="ident">parenthesize_impl_trait</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ty</span>.<span class="ident">elem</span>, <span class="ident">ty</span>.<span class="ident">star_token</span>.<span class="ident">span</span>);
-        <span class="ident">visit_mut::visit_type_ptr_mut</span>(<span class="self">self</span>, <span class="ident">ty</span>);
-    }
-
-    <span class="kw">fn</span> <span class="ident">visit_type_bare_fn_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">ty</span>: <span class="kw-2">&amp;mut</span> <span class="ident">TypeBareFn</span>) {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">ReturnType::Type</span>(<span class="ident">arrow</span>, <span class="ident">return_type</span>) <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">ty</span>.<span class="ident">output</span> {
-            <span class="ident">parenthesize_impl_trait</span>(<span class="ident">return_type</span>, <span class="ident">arrow</span>.<span class="ident">spans</span>[<span class="number">0</span>]);
+    <span class="kw">fn </span>visit_generic_argument_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, gen: <span class="kw-2">&amp;mut </span>GenericArgument) {
+        <span class="kw">if let </span>GenericArgument::Lifetime(lifetime) = gen {
+            <span class="self">self</span>.visit_lifetime(lifetime);
         }
-        <span class="ident">visit_mut::visit_type_bare_fn_mut</span>(<span class="self">self</span>, <span class="ident">ty</span>);
-    }
-
-    <span class="kw">fn</span> <span class="ident">visit_expr_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_e</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Expr</span>) {
-        <span class="comment">// Do not recurse into impl Traits inside of an array length expression.</span>
-        <span class="comment">//</span>
-        <span class="comment">//    fn outer(arg: [u8; { fn inner(_: impl Trait) {}; 0 }]);</span>
+        visit_mut::visit_generic_argument_mut(<span class="self">self</span>, gen);
     }
 }
 
-<span class="kw">fn</span> <span class="ident">parenthesize_impl_trait</span>(<span class="ident">elem</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Type</span>, <span class="ident">paren_span</span>: <span class="ident">Span</span>) {
-    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Type::ImplTrait</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">elem</span> {
-        <span class="kw">let</span> <span class="ident">placeholder</span> <span class="op">=</span> <span class="ident">Type::Verbatim</span>(<span class="ident">TokenStream::new</span>());
-        <span class="kw-2">*</span><span class="ident">elem</span> <span class="op">=</span> <span class="ident">Type::Paren</span>(<span class="ident">TypeParen</span> {
-            <span class="ident">paren_token</span>: <span class="ident">token::Paren</span>(<span class="ident">paren_span</span>),
-            <span class="ident">elem</span>: <span class="ident">Box::new</span>(<span class="ident">mem::replace</span>(<span class="ident">elem</span>, <span class="ident">placeholder</span>)),
+<span class="kw">pub struct </span>AddLifetimeToImplTrait;
+
+<span class="kw">impl </span>VisitMut <span class="kw">for </span>AddLifetimeToImplTrait {
+    <span class="kw">fn </span>visit_type_impl_trait_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ty: <span class="kw-2">&amp;mut </span>TypeImplTrait) {
+        <span class="kw">let </span>span = ty.impl_token.span;
+        <span class="kw">let </span>lifetime = <span class="macro">parse_quote_spanned!</span>(span=&gt; <span class="lifetime">&#39;async_trait</span>);
+        ty.bounds.insert(<span class="number">0</span>, lifetime);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(punct) = ty.bounds.pairs_mut().next().unwrap().punct_mut() {
+            punct.span = span;
+        }
+        visit_mut::visit_type_impl_trait_mut(<span class="self">self</span>, ty);
+    }
+
+    <span class="kw">fn </span>visit_type_reference_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ty: <span class="kw-2">&amp;mut </span>TypeReference) {
+        parenthesize_impl_trait(<span class="kw-2">&amp;mut </span>ty.elem, ty.and_token.span);
+        visit_mut::visit_type_reference_mut(<span class="self">self</span>, ty);
+    }
+
+    <span class="kw">fn </span>visit_type_ptr_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ty: <span class="kw-2">&amp;mut </span>TypePtr) {
+        parenthesize_impl_trait(<span class="kw-2">&amp;mut </span>ty.elem, ty.star_token.span);
+        visit_mut::visit_type_ptr_mut(<span class="self">self</span>, ty);
+    }
+
+    <span class="kw">fn </span>visit_type_bare_fn_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, ty: <span class="kw-2">&amp;mut </span>TypeBareFn) {
+        <span class="kw">if let </span>ReturnType::Type(arrow, return_type) = <span class="kw-2">&amp;mut </span>ty.output {
+            parenthesize_impl_trait(return_type, arrow.spans[<span class="number">0</span>]);
+        }
+        visit_mut::visit_type_bare_fn_mut(<span class="self">self</span>, ty);
+    }
+
+    <span class="kw">fn </span>visit_expr_mut(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _e: <span class="kw-2">&amp;mut </span>Expr) {
+        <span class="comment">// Do not recurse into impl Traits inside of an array length expression.
+        //
+        //    fn outer(arg: [u8; { fn inner(_: impl Trait) {}; 0 }]);
+    </span>}
+}
+
+<span class="kw">fn </span>parenthesize_impl_trait(elem: <span class="kw-2">&amp;mut </span>Type, paren_span: Span) {
+    <span class="kw">if let </span>Type::ImplTrait(<span class="kw">_</span>) = <span class="kw-2">*</span>elem {
+        <span class="kw">let </span>placeholder = Type::Verbatim(TokenStream::new());
+        <span class="kw-2">*</span>elem = Type::Paren(TypeParen {
+            paren_token: token::Paren(paren_span),
+            elem: Box::new(mem::replace(elem, placeholder)),
         });
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="async_trait" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="async_trait" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

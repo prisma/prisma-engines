@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/psl-core/src/validate/validation_pipeline/validations.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>validations.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../psl_core/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/psl-core/src/validate/validation_pipeline/validations.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>validations.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../psl_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../psl_core/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -194,201 +194,201 @@
 <span id="194">194</span>
 <span id="195">195</span>
 <span id="196">196</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">autoincrement</span>;
-<span class="kw">mod</span> <span class="ident">composite_types</span>;
-<span class="kw">mod</span> <span class="ident">constraint_namespace</span>;
-<span class="kw">mod</span> <span class="ident">database_name</span>;
-<span class="kw">mod</span> <span class="ident">datasource</span>;
-<span class="kw">mod</span> <span class="ident">default_value</span>;
-<span class="kw">mod</span> <span class="ident">enums</span>;
-<span class="kw">mod</span> <span class="ident">fields</span>;
-<span class="kw">mod</span> <span class="ident">indexes</span>;
-<span class="kw">mod</span> <span class="ident">models</span>;
-<span class="kw">mod</span> <span class="ident">names</span>;
-<span class="kw">mod</span> <span class="ident">relation_fields</span>;
-<span class="kw">mod</span> <span class="ident">relations</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>autoincrement;
+<span class="kw">mod </span>composite_types;
+<span class="kw">mod </span>constraint_namespace;
+<span class="kw">mod </span>database_name;
+<span class="kw">mod </span>datasource;
+<span class="kw">mod </span>default_value;
+<span class="kw">mod </span>enums;
+<span class="kw">mod </span>fields;
+<span class="kw">mod </span>indexes;
+<span class="kw">mod </span>models;
+<span class="kw">mod </span>names;
+<span class="kw">mod </span>relation_fields;
+<span class="kw">mod </span>relations;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::context::Context</span>;
-<span class="kw">use</span> <span class="ident">names::Names</span>;
-<span class="kw">use</span> <span class="ident">parser_database::walkers::RefinedRelationWalker</span>;
+<span class="kw">use </span><span class="kw">super</span>::context::Context;
+<span class="kw">use </span>names::Names;
+<span class="kw">use </span>parser_database::walkers::RefinedRelationWalker;
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">validate</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-    <span class="kw">let</span> <span class="ident">names</span> <span class="op">=</span> <span class="ident">Names::new</span>(<span class="ident">ctx</span>);
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>validate(ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+    <span class="kw">let </span>names = Names::new(ctx);
 
-    <span class="ident">composite_types::detect_composite_cycles</span>(<span class="ident">ctx</span>);
-    <span class="kw">for</span> <span class="ident">composite_type</span> <span class="kw">in</span> <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">walk_composite_types</span>() {
-        <span class="ident">composite_types::composite_types_support</span>(<span class="ident">composite_type</span>, <span class="ident">ctx</span>);
+    composite_types::detect_composite_cycles(ctx);
+    <span class="kw">for </span>composite_type <span class="kw">in </span>ctx.db.walk_composite_types() {
+        composite_types::composite_types_support(composite_type, ctx);
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">diagnostics</span>.<span class="ident">has_errors</span>() {
-            <span class="ident">composite_types::more_than_one_field</span>(<span class="ident">composite_type</span>, <span class="ident">ctx</span>);
+        <span class="kw">if </span>!ctx.diagnostics.has_errors() {
+            composite_types::more_than_one_field(composite_type, ctx);
 
-            <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">composite_type</span>.<span class="ident">fields</span>() {
-                <span class="ident">composite_types::validate_default_value</span>(<span class="ident">field</span>, <span class="ident">ctx</span>);
-                <span class="ident">fields::validate_native_type_arguments</span>(<span class="ident">field</span>, <span class="ident">ctx</span>);
+            <span class="kw">for </span>field <span class="kw">in </span>composite_type.fields() {
+                composite_types::validate_default_value(field, ctx);
+                fields::validate_native_type_arguments(field, ctx);
             }
         }
     }
 
-    <span class="ident">ctx</span>.<span class="ident">connector</span>
-        .<span class="ident">validate_scalar_field_unknown_default_functions</span>(<span class="ident">ctx</span>.<span class="ident">db</span>, <span class="ident">ctx</span>.<span class="ident">diagnostics</span>);
+    ctx.connector
+        .validate_scalar_field_unknown_default_functions(ctx.db, ctx.diagnostics);
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ds</span>) <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">datasource</span> {
-        <span class="ident">datasource::schemas_property_without_preview_feature</span>(<span class="ident">ds</span>, <span class="ident">ctx</span>);
-        <span class="ident">datasource::schemas_property_with_no_connector_support</span>(<span class="ident">ds</span>, <span class="ident">ctx</span>);
-        <span class="ident">ctx</span>.<span class="ident">connector</span>
-            .<span class="ident">validate_datasource</span>(<span class="ident">ctx</span>.<span class="ident">preview_features</span>, <span class="ident">ds</span>, <span class="ident">ctx</span>.<span class="ident">diagnostics</span>);
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(ds) = ctx.datasource {
+        datasource::schemas_property_without_preview_feature(ds, ctx);
+        datasource::schemas_property_with_no_connector_support(ds, ctx);
+        ctx.connector
+            .validate_datasource(ctx.preview_features, ds, ctx.diagnostics);
     }
 
-    <span class="comment">// Model validations</span>
-    <span class="ident">models::database_name_clashes</span>(<span class="ident">ctx</span>);
+    <span class="comment">// Model validations
+    </span>models::database_name_clashes(ctx);
 
-    <span class="kw">for</span> <span class="ident">model</span> <span class="kw">in</span> <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">walk_models</span>() {
-        <span class="ident">models::has_a_strict_unique_criteria</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
-        <span class="ident">models::has_a_unique_primary_key_name</span>(<span class="ident">model</span>, <span class="kw-2">&amp;</span><span class="ident">names</span>, <span class="ident">ctx</span>);
-        <span class="ident">models::has_a_unique_custom_primary_key_name_per_model</span>(<span class="ident">model</span>, <span class="kw-2">&amp;</span><span class="ident">names</span>, <span class="ident">ctx</span>);
-        <span class="ident">models::id_has_fields</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
-        <span class="ident">models::id_client_name_does_not_clash_with_field</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
-        <span class="ident">models::primary_key_connector_specific</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
-        <span class="ident">models::primary_key_length_prefix_supported</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
-        <span class="ident">models::primary_key_sort_order_supported</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
-        <span class="ident">models::only_one_fulltext_attribute_allowed</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
-        <span class="ident">models::multischema_feature_flag_needed</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
-        <span class="ident">models::schema_is_defined_in_the_datasource</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
-        <span class="ident">models::schema_attribute_supported_in_connector</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
-        <span class="ident">models::schema_attribute_missing</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
-        <span class="ident">models::connector_specific</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
+    <span class="kw">for </span>model <span class="kw">in </span>ctx.db.walk_models() {
+        models::has_a_strict_unique_criteria(model, ctx);
+        models::has_a_unique_primary_key_name(model, <span class="kw-2">&amp;</span>names, ctx);
+        models::has_a_unique_custom_primary_key_name_per_model(model, <span class="kw-2">&amp;</span>names, ctx);
+        models::id_has_fields(model, ctx);
+        models::id_client_name_does_not_clash_with_field(model, ctx);
+        models::primary_key_connector_specific(model, ctx);
+        models::primary_key_length_prefix_supported(model, ctx);
+        models::primary_key_sort_order_supported(model, ctx);
+        models::only_one_fulltext_attribute_allowed(model, ctx);
+        models::multischema_feature_flag_needed(model, ctx);
+        models::schema_is_defined_in_the_datasource(model, ctx);
+        models::schema_attribute_supported_in_connector(model, ctx);
+        models::schema_attribute_missing(model, ctx);
+        models::connector_specific(model, ctx);
 
-        <span class="ident">autoincrement::validate_auto_increment</span>(<span class="ident">model</span>, <span class="ident">ctx</span>);
+        autoincrement::validate_auto_increment(model, ctx);
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pk</span>) <span class="op">=</span> <span class="ident">model</span>.<span class="ident">primary_key</span>() {
-            <span class="kw">for</span> <span class="ident">field_attribute</span> <span class="kw">in</span> <span class="ident">pk</span>.<span class="ident">scalar_field_attributes</span>() {
-                <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">pk</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>;
-                <span class="kw">let</span> <span class="ident">attribute</span> <span class="op">=</span> (<span class="ident">pk</span>.<span class="ident">attribute_name</span>(), <span class="ident">span</span>);
-                <span class="ident">fields::validate_length_used_with_correct_types</span>(<span class="ident">field_attribute</span>, <span class="ident">attribute</span>, <span class="ident">ctx</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(pk) = model.primary_key() {
+            <span class="kw">for </span>field_attribute <span class="kw">in </span>pk.scalar_field_attributes() {
+                <span class="kw">let </span>span = pk.ast_attribute().span;
+                <span class="kw">let </span>attribute = (pk.attribute_name(), span);
+                fields::validate_length_used_with_correct_types(field_attribute, attribute, ctx);
             }
 
-            <span class="ident">fields::id_supports_clustering_setting</span>(<span class="ident">pk</span>, <span class="ident">ctx</span>);
-            <span class="ident">fields::clustering_can_be_defined_only_once</span>(<span class="ident">pk</span>, <span class="ident">ctx</span>);
+            fields::id_supports_clustering_setting(pk, ctx);
+            fields::clustering_can_be_defined_only_once(pk, ctx);
         }
 
-        <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">scalar_fields</span>() {
-            <span class="ident">fields::validate_scalar_field_connector_specific</span>(<span class="ident">field</span>, <span class="ident">ctx</span>);
-            <span class="ident">fields::validate_client_name</span>(<span class="ident">field</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="ident">names</span>, <span class="ident">ctx</span>);
-            <span class="ident">fields::has_a_unique_default_constraint_name</span>(<span class="ident">field</span>, <span class="kw-2">&amp;</span><span class="ident">names</span>, <span class="ident">ctx</span>);
-            <span class="ident">fields::validate_native_type_arguments</span>(<span class="ident">field</span>, <span class="ident">ctx</span>);
-            <span class="ident">fields::validate_default_value</span>(<span class="ident">field</span>, <span class="ident">ctx</span>);
-            <span class="ident">fields::validate_unsupported_field_type</span>(<span class="ident">field</span>, <span class="ident">ctx</span>)
+        <span class="kw">for </span>field <span class="kw">in </span>model.scalar_fields() {
+            fields::validate_scalar_field_connector_specific(field, ctx);
+            fields::validate_client_name(field.into(), <span class="kw-2">&amp;</span>names, ctx);
+            fields::has_a_unique_default_constraint_name(field, <span class="kw-2">&amp;</span>names, ctx);
+            fields::validate_native_type_arguments(field, ctx);
+            fields::validate_default_value(field, ctx);
+            fields::validate_unsupported_field_type(field, ctx)
         }
 
-        <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">relation_fields</span>() {
-            <span class="comment">// We don&#39;t want to spam, so with ambiguous relations we should exit</span>
-            <span class="comment">// immediately if any errors.</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">error</span>) <span class="op">=</span> <span class="ident">relation_fields::ambiguity</span>(<span class="ident">field</span>, <span class="kw-2">&amp;</span><span class="ident">names</span>) {
-                <span class="ident">ctx</span>.<span class="ident">push_error</span>(<span class="ident">error</span>);
+        <span class="kw">for </span>field <span class="kw">in </span>model.relation_fields() {
+            <span class="comment">// We don&#39;t want to spam, so with ambiguous relations we should exit
+            // immediately if any errors.
+            </span><span class="kw">if let </span><span class="prelude-val">Err</span>(error) = relation_fields::ambiguity(field, <span class="kw-2">&amp;</span>names) {
+                ctx.push_error(error);
                 <span class="kw">return</span>;
             }
 
-            <span class="ident">fields::validate_client_name</span>(<span class="ident">field</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="ident">names</span>, <span class="ident">ctx</span>);
+            fields::validate_client_name(field.into(), <span class="kw-2">&amp;</span>names, ctx);
 
-            <span class="ident">relation_fields::ignored_related_model</span>(<span class="ident">field</span>, <span class="ident">ctx</span>);
-            <span class="ident">relation_fields::referential_actions</span>(<span class="ident">field</span>, <span class="ident">ctx</span>);
-            <span class="ident">relation_fields::map</span>(<span class="ident">field</span>, <span class="ident">ctx</span>);
+            relation_fields::ignored_related_model(field, ctx);
+            relation_fields::referential_actions(field, ctx);
+            relation_fields::map(field, ctx);
         }
 
-        <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">indexes</span>() {
-            <span class="ident">indexes::has_fields</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
-            <span class="ident">indexes::has_a_unique_constraint_name</span>(<span class="ident">index</span>, <span class="kw-2">&amp;</span><span class="ident">names</span>, <span class="ident">ctx</span>);
-            <span class="ident">indexes::unique_client_name_does_not_clash_with_field</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
-            <span class="ident">indexes::unique_index_has_a_unique_custom_name_per_model</span>(<span class="ident">index</span>, <span class="kw-2">&amp;</span><span class="ident">names</span>, <span class="ident">ctx</span>);
-            <span class="ident">indexes::field_length_prefix_supported</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
-            <span class="ident">indexes::index_algorithm_is_supported</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
-            <span class="ident">indexes::hash_index_must_not_use_sort_param</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
-            <span class="ident">indexes::fulltext_index_preview_feature_enabled</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
-            <span class="ident">indexes::fulltext_index_supported</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
-            <span class="ident">indexes::fulltext_columns_should_not_define_length</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
-            <span class="ident">indexes::fulltext_column_sort_is_supported</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
-            <span class="ident">indexes::fulltext_text_columns_should_be_bundled_together</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
-            <span class="ident">indexes::has_valid_mapped_name</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
-            <span class="ident">indexes::supports_clustering_setting</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
-            <span class="ident">indexes::clustering_can_be_defined_only_once</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
-            <span class="ident">indexes::opclasses_are_not_allowed_with_other_than_normal_indices</span>(<span class="ident">index</span>, <span class="ident">ctx</span>);
+        <span class="kw">for </span>index <span class="kw">in </span>model.indexes() {
+            indexes::has_fields(index, ctx);
+            indexes::has_a_unique_constraint_name(index, <span class="kw-2">&amp;</span>names, ctx);
+            indexes::unique_client_name_does_not_clash_with_field(index, ctx);
+            indexes::unique_index_has_a_unique_custom_name_per_model(index, <span class="kw-2">&amp;</span>names, ctx);
+            indexes::field_length_prefix_supported(index, ctx);
+            indexes::index_algorithm_is_supported(index, ctx);
+            indexes::hash_index_must_not_use_sort_param(index, ctx);
+            indexes::fulltext_index_preview_feature_enabled(index, ctx);
+            indexes::fulltext_index_supported(index, ctx);
+            indexes::fulltext_columns_should_not_define_length(index, ctx);
+            indexes::fulltext_column_sort_is_supported(index, ctx);
+            indexes::fulltext_text_columns_should_be_bundled_together(index, ctx);
+            indexes::has_valid_mapped_name(index, ctx);
+            indexes::supports_clustering_setting(index, ctx);
+            indexes::clustering_can_be_defined_only_once(index, ctx);
+            indexes::opclasses_are_not_allowed_with_other_than_normal_indices(index, ctx);
 
-            <span class="kw">for</span> <span class="ident">field_attribute</span> <span class="kw">in</span> <span class="ident">index</span>.<span class="ident">scalar_field_attributes</span>() {
-                <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">index</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>;
-                <span class="kw">let</span> <span class="ident">attribute</span> <span class="op">=</span> (<span class="ident">index</span>.<span class="ident">attribute_name</span>(), <span class="ident">span</span>);
+            <span class="kw">for </span>field_attribute <span class="kw">in </span>index.scalar_field_attributes() {
+                <span class="kw">let </span>span = index.ast_attribute().span;
+                <span class="kw">let </span>attribute = (index.attribute_name(), span);
 
-                <span class="ident">fields::validate_length_used_with_correct_types</span>(<span class="ident">field_attribute</span>, <span class="ident">attribute</span>, <span class="ident">ctx</span>);
+                fields::validate_length_used_with_correct_types(field_attribute, attribute, ctx);
             }
         }
     }
 
-    <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">supports_enums</span>() {
-        <span class="ident">enums::database_name_clashes</span>(<span class="ident">ctx</span>);
+    <span class="kw">if </span>ctx.connector.supports_enums() {
+        enums::database_name_clashes(ctx);
     }
 
-    <span class="kw">for</span> <span class="ident">r#enum</span> <span class="kw">in</span> <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">walk_enums</span>() {
-        <span class="ident">enums::connector_supports_enums</span>(<span class="ident">r#enum</span>, <span class="ident">ctx</span>);
-        <span class="ident">enums::multischema_feature_flag_needed</span>(<span class="ident">r#enum</span>, <span class="ident">ctx</span>);
-        <span class="ident">enums::schema_is_defined_in_the_datasource</span>(<span class="ident">r#enum</span>, <span class="ident">ctx</span>);
-        <span class="ident">enums::schema_attribute_supported_in_connector</span>(<span class="ident">r#enum</span>, <span class="ident">ctx</span>);
-        <span class="ident">enums::schema_attribute_missing</span>(<span class="ident">r#enum</span>, <span class="ident">ctx</span>);
+    <span class="kw">for </span>r#enum <span class="kw">in </span>ctx.db.walk_enums() {
+        enums::connector_supports_enums(r#enum, ctx);
+        enums::multischema_feature_flag_needed(r#enum, ctx);
+        enums::schema_is_defined_in_the_datasource(r#enum, ctx);
+        enums::schema_attribute_supported_in_connector(r#enum, ctx);
+        enums::schema_attribute_missing(r#enum, ctx);
 
-        <span class="ident">ctx</span>.<span class="ident">connector</span>.<span class="ident">validate_enum</span>(<span class="ident">r#enum</span>, <span class="ident">ctx</span>.<span class="ident">diagnostics</span>);
+        ctx.connector.validate_enum(r#enum, ctx.diagnostics);
     }
 
-    <span class="kw">for</span> <span class="ident">relation</span> <span class="kw">in</span> <span class="ident">ctx</span>.<span class="ident">db</span>.<span class="ident">walk_relations</span>() {
-        <span class="kw">match</span> <span class="ident">relation</span>.<span class="ident">refine</span>() {
-            <span class="comment">// 1:1, 1:n</span>
-            <span class="ident">RefinedRelationWalker::Inline</span>(<span class="ident">relation</span>) =&gt; {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">relation</span>) <span class="op">=</span> <span class="ident">relation</span>.<span class="ident">as_complete</span>() {
-                    <span class="ident">relations::cycles</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
-                    <span class="ident">relations::multiple_cascading_paths</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
+    <span class="kw">for </span>relation <span class="kw">in </span>ctx.db.walk_relations() {
+        <span class="kw">match </span>relation.refine() {
+            <span class="comment">// 1:1, 1:n
+            </span>RefinedRelationWalker::Inline(relation) =&gt; {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(relation) = relation.as_complete() {
+                    relations::cycles(relation, ctx);
+                    relations::multiple_cascading_paths(relation, ctx);
                 }
 
-                <span class="ident">relations::references_unique_fields</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
-                <span class="ident">relations::same_length_in_referencing_and_referenced</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
-                <span class="ident">relations::field_arity</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
-                <span class="ident">relations::referencing_scalar_field_types</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
-                <span class="ident">relations::has_a_unique_constraint_name</span>(<span class="kw-2">&amp;</span><span class="ident">names</span>, <span class="ident">relation</span>, <span class="ident">ctx</span>);
-                <span class="ident">relations::required_relation_cannot_use_set_null</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
+                relations::references_unique_fields(relation, ctx);
+                relations::same_length_in_referencing_and_referenced(relation, ctx);
+                relations::field_arity(relation, ctx);
+                relations::referencing_scalar_field_types(relation, ctx);
+                relations::has_a_unique_constraint_name(<span class="kw-2">&amp;</span>names, relation, ctx);
+                relations::required_relation_cannot_use_set_null(relation, ctx);
 
-                <span class="kw">if</span> <span class="ident">relation</span>.<span class="ident">is_one_to_one</span>() {
-                    <span class="ident">relations::one_to_one::both_sides_are_defined</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
-                    <span class="ident">relations::one_to_one::fields_and_references_are_defined</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
-                    <span class="ident">relations::one_to_one::fields_and_references_defined_on_one_side_only</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
-                    <span class="ident">relations::one_to_one::referential_actions</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
-                    <span class="ident">relations::one_to_one::fields_must_be_a_unique_constraint</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
-                    <span class="ident">relations::one_to_one::fields_references_mixups</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
-                    <span class="ident">relations::one_to_one::back_relation_arity_is_optional</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
-                    <span class="ident">relations::one_to_one::fields_and_references_on_wrong_side</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
-                } <span class="kw">else</span> {
-                    <span class="ident">relations::one_to_many::both_sides_are_defined</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
-                    <span class="ident">relations::one_to_many::fields_and_references_are_defined</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
-                    <span class="ident">relations::one_to_many::referential_actions</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
+                <span class="kw">if </span>relation.is_one_to_one() {
+                    relations::one_to_one::both_sides_are_defined(relation, ctx);
+                    relations::one_to_one::fields_and_references_are_defined(relation, ctx);
+                    relations::one_to_one::fields_and_references_defined_on_one_side_only(relation, ctx);
+                    relations::one_to_one::referential_actions(relation, ctx);
+                    relations::one_to_one::fields_must_be_a_unique_constraint(relation, ctx);
+                    relations::one_to_one::fields_references_mixups(relation, ctx);
+                    relations::one_to_one::back_relation_arity_is_optional(relation, ctx);
+                    relations::one_to_one::fields_and_references_on_wrong_side(relation, ctx);
+                } <span class="kw">else </span>{
+                    relations::one_to_many::both_sides_are_defined(relation, ctx);
+                    relations::one_to_many::fields_and_references_are_defined(relation, ctx);
+                    relations::one_to_many::referential_actions(relation, ctx);
                 }
             }
 
-            <span class="ident">RefinedRelationWalker::ImplicitManyToMany</span>(<span class="ident">relation</span>) =&gt; {
-                <span class="kw">use</span> <span class="ident">relations::many_to_many::implicit</span>;
+            RefinedRelationWalker::ImplicitManyToMany(relation) =&gt; {
+                <span class="kw">use </span>relations::many_to_many::implicit;
 
-                <span class="ident">implicit::supports_implicit_relations</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
-                <span class="ident">implicit::validate_singular_id</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
-                <span class="ident">implicit::validate_no_referential_actions</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
-                <span class="ident">implicit::cannot_define_references_argument</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
+                implicit::supports_implicit_relations(relation, ctx);
+                implicit::validate_singular_id(relation, ctx);
+                implicit::validate_no_referential_actions(relation, ctx);
+                implicit::cannot_define_references_argument(relation, ctx);
             }
 
-            <span class="ident">RefinedRelationWalker::TwoWayEmbeddedManyToMany</span>(<span class="ident">relation</span>) =&gt; {
-                <span class="kw">use</span> <span class="ident">relations::many_to_many::embedded</span>;
+            RefinedRelationWalker::TwoWayEmbeddedManyToMany(relation) =&gt; {
+                <span class="kw">use </span>relations::many_to_many::embedded;
 
-                <span class="ident">embedded::supports_embedded_relations</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
-                <span class="ident">embedded::defines_references_on_both_sides</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
-                <span class="ident">embedded::defines_fields_on_both_sides</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
-                <span class="ident">embedded::references_id_from_both_sides</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
-                <span class="ident">embedded::referencing_with_an_array_field_of_correct_type</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
-                <span class="ident">embedded::validate_no_referential_actions</span>(<span class="ident">relation</span>, <span class="ident">ctx</span>);
+                embedded::supports_embedded_relations(relation, ctx);
+                embedded::defines_references_on_both_sides(relation, ctx);
+                embedded::defines_fields_on_both_sides(relation, ctx);
+                embedded::references_id_from_both_sides(relation, ctx);
+                embedded::referencing_with_an_array_field_of_correct_type(relation, ctx);
+                embedded::validate_no_referential_actions(relation, ctx);
             }
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="psl_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="psl_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

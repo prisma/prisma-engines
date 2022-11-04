@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-core-0.8.5/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_core/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-core-0.8.5/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_core/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_core/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -867,874 +867,874 @@
 <span id="867">867</span>
 <span id="868">868</span>
 <span id="869">869</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Fast lexical conversion routines for a no_std environment.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! lexical-core is a low-level API for number-to-string and</span>
-<span class="doccomment">//! string-to-number conversions, without requiring a system</span>
-<span class="doccomment">//! allocator. If you would like to use a high-level API that</span>
-<span class="doccomment">//! writes to and parses from `String` and `&amp;str`, respectively,</span>
-<span class="doccomment">//! please look at [lexical](https://crates.io/crates/lexical)</span>
-<span class="doccomment">//! instead.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Despite the low-level API and focus on performance, lexical-core</span>
-<span class="doccomment">//! strives to be simple and yet configurable: despite supporting nearly</span>
-<span class="doccomment">//! every float and integer format available, it only exports 4 write</span>
-<span class="doccomment">//! functions and 4 parse functions.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! lexical-core is well-tested, and has been downloaded more than 5 million</span>
-<span class="doccomment">//! times and currently has no known errors in correctness. lexical-core</span>
-<span class="doccomment">//! prioritizes performance above all else, and aims to be competitive</span>
-<span class="doccomment">//! or faster than any other float or integer parser and writer.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! In addition, despite having a large number of features, configurability,</span>
-<span class="doccomment">//! and a focus on performance, we also strive for fast compile times.</span>
-<span class="doccomment">//! Recent versions also add support for smaller binary sizes, as well</span>
-<span class="doccomment">//! ideal for embedded or web environments, where executable bloat can</span>
-<span class="doccomment">//! be much more detrimental than performance.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Getting Started</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! # #[cfg(all(</span>
-<span class="doccomment">//! #     feature = &quot;parse-floats&quot;,</span>
-<span class="doccomment">//! #     feature = &quot;parse-integers&quot;,</span>
-<span class="doccomment">//! #     feature = &quot;write-floats&quot;,</span>
-<span class="doccomment">//! #     feature = &quot;write-integers&quot;,</span>
-<span class="doccomment">//! # ))]</span>
-<span class="doccomment">//! # {</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // String to number using Rust slices.</span>
-<span class="doccomment">//! // The argument is the byte string parsed.</span>
-<span class="doccomment">//! let f: f32 = lexical_core::parse(b&quot;3.5&quot;).unwrap();   // 3.5</span>
-<span class="doccomment">//! let i: i32 = lexical_core::parse(b&quot;15&quot;).unwrap();    // 15</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // All lexical_core parsers are checked, they validate the</span>
-<span class="doccomment">//! // input data is entirely correct, and stop parsing when invalid data</span>
-<span class="doccomment">//! // is found, or upon numerical overflow.</span>
-<span class="doccomment">//! let r = lexical_core::parse::&lt;u8&gt;(b&quot;256&quot;); // Err(ErrorCode::Overflow.into())</span>
-<span class="doccomment">//! let r = lexical_core::parse::&lt;u8&gt;(b&quot;1a5&quot;); // Err(ErrorCode::InvalidDigit.into())</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // In order to extract and parse a number from a substring of the input</span>
-<span class="doccomment">//! // data, use `parse_partial`. These functions return the parsed value and</span>
-<span class="doccomment">//! // the number of processed digits, allowing you to extract and parse the</span>
-<span class="doccomment">//! // number in a single pass.</span>
-<span class="doccomment">//! let r = lexical_core::parse_partial::&lt;i8&gt;(b&quot;3a5&quot;); // Ok((3, 1))</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // If an insufficiently long buffer is passed, the serializer will panic.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // PANICS</span>
-<span class="doccomment">//! let mut buf = [b&#39;0&#39;; 1];</span>
-<span class="doccomment">//! //let slc = lexical_core::write::&lt;i64&gt;(15, &amp;mut buf);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // In order to guarantee the buffer is long enough, always ensure there</span>
-<span class="doccomment">//! // are at least `T::FORMATTED_SIZE` bytes, which requires the</span>
-<span class="doccomment">//! // `lexical_core::FormattedSize` trait to be in scope.</span>
-<span class="doccomment">//! use lexical_core::FormattedSize;</span>
-<span class="doccomment">//! let mut buf = [b&#39;0&#39;; f64::FORMATTED_SIZE];</span>
-<span class="doccomment">//! let slc = lexical_core::write::&lt;f64&gt;(15.1, &amp;mut buf);</span>
-<span class="doccomment">//! assert_eq!(slc, b&quot;15.1&quot;);</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // When the `radix` feature is enabled, for decimal floats, using</span>
-<span class="doccomment">//! // `T::FORMATTED_SIZE` may significantly overestimate the space</span>
-<span class="doccomment">//! // required to format the number. Therefore, the</span>
-<span class="doccomment">//! // `T::FORMATTED_SIZE_DECIMAL` constants allow you to get a much</span>
-<span class="doccomment">//! // tighter bound on the space required.</span>
-<span class="doccomment">//! let mut buf = [b&#39;0&#39;; f64::FORMATTED_SIZE_DECIMAL];</span>
-<span class="doccomment">//! let slc = lexical_core::write::&lt;f64&gt;(15.1, &amp;mut buf);</span>
-<span class="doccomment">//! assert_eq!(slc, b&quot;15.1&quot;);</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Conversion API</span>
-<span class="doccomment">//!</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; **Write**&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [`write`]&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [`write_unchecked`]&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [`write_with_options`]&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [`write_with_options_unchecked`]&quot;</span>)]</span>
-<span class="doccomment">//!</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; **From String**&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parse&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [`parse`]&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parse&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [`parse_partial`]&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parse&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [`parse_with_options`]&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parse&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [`parse_partial_with_options`]&quot;</span>)]</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Features</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! In accordance with the Rust ethos, all features are additive: the crate</span>
-<span class="doccomment">//! may be build with `--all-features` without issue.  The following features are enabled</span>
-<span class="doccomment">//! by default:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! * `std`</span>
-<span class="doccomment">//! * `write-integers`</span>
-<span class="doccomment">//! * `write-floats`</span>
-<span class="doccomment">//! * `parse-integers`</span>
-<span class="doccomment">//! * `parse-floats`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! A complete description of supported features includes:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### std</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Enable use of the standard library. Currently, the standard library</span>
-<span class="doccomment">//! is not used for any functionality, and may be disabled without any</span>
-<span class="doccomment">//! change in functionality on stable.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### write-integers</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Enable support for writing integers to string.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### write-floats</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Enable support for writing floating-point numbers to string.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### parse-integers</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Enable support for parsing integers from string.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### parsing-floats</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Enable support for parsing floating-point numbers from string.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### format</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Adds support for the entire format API (using [`NumberFormatBuilder`]).</span>
-<span class="doccomment">//! This allows extensive configurability for parsing and writing numbers</span>
-<span class="doccomment">//! in custom formats, with different valid syntax requirements.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! For example, in JSON, the following floats are valid or invalid:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```text</span>
-<span class="doccomment">//! -1          // valid</span>
-<span class="doccomment">//! +1          // invalid</span>
-<span class="doccomment">//! 1           // valid</span>
-<span class="doccomment">//! 1.          // invalid</span>
-<span class="doccomment">//! .1          // invalid</span>
-<span class="doccomment">//! 0.1         // valid</span>
-<span class="doccomment">//! nan         // invalid</span>
-<span class="doccomment">//! inf         // invalid</span>
-<span class="doccomment">//! Infinity    // invalid</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! All of the finite numbers are valid in Rust, and Rust provides constants</span>
-<span class="doccomment">//! for non-finite floats. In order to parse standard-conforming JSON floats</span>
-<span class="doccomment">//! using lexical, you may use the following approach:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```rust</span>
-<span class="doccomment">//! # #[cfg(all(feature = &quot;parse-floats&quot;, feature = &quot;format&quot;))] {</span>
-<span class="doccomment">//! use lexical_core::{format, parse_with_options, ParseFloatOptions, Result};</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! fn parse_json_float&lt;Bytes: AsRef&lt;[u8]&gt;&gt;(bytes: Bytes) -&gt; Result&lt;f64&gt; {</span>
-<span class="doccomment">//!     let options = ParseFloatOptions::new();</span>
-<span class="doccomment">//!     parse_with_options::&lt;_, { format::JSON }&gt;(bytes.as_ref(), &amp;options)</span>
-<span class="doccomment">//! }</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! See the [Number Format](#number-format) section below for more information.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### power-of-two</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Enable doing numeric conversions to and from strings with power-of-two</span>
-<span class="doccomment">//! radixes. This avoids most of the overhead and binary bloat of the radix</span>
-<span class="doccomment">//! feature, while enabling support for the most commonly-used radixes.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### radix</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Enable doing numeric conversions to and from strings for all radixes.</span>
-<span class="doccomment">//! This requires substantially more static storage than `power-of-two`,</span>
-<span class="doccomment">//! and increases compile times by a fair amount, but can be quite useful</span>
-<span class="doccomment">//! for esoteric programming languages which use duodecimal floats, for</span>
-<span class="doccomment">//! example.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### compact</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Reduce the generated code size at the cost of performance. This minimizes</span>
-<span class="doccomment">//! the number of static tables, inlining, and generics used, drastically</span>
-<span class="doccomment">//! reducing the size of the generated binaries.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ### safe</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! All numeric parsers are memory-safe by default, since parsing complex</span>
-<span class="doccomment">//! input is a major source of memory vulnerabilities. However, numeric</span>
-<span class="doccomment">//! writers often opt-in for unchecked writes, for major performance</span>
-<span class="doccomment">//! improvements. This may be disabled entirely by enabling the `safe`</span>
-<span class="doccomment">//! feature. In addition, to simplify memory safety guarantees, extensive</span>
-<span class="doccomment">//! edge-cases, property-based tests, and fuzzing is done with both the</span>
-<span class="doccomment">//! safe feature enabled and disabled, with the tests verified by Miri</span>
-<span class="doccomment">//! and Valgrind.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Configuration API</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Lexical provides two main levels of configuration:</span>
-<span class="doccomment">//! - The [`NumberFormatBuilder`], creating a packed struct with custom</span>
-<span class="doccomment">//!     formatting options.</span>
-<span class="doccomment">//! - The Options API.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Number Format</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The number format class provides numerous flags to specify</span>
-<span class="doccomment">//! number parsing or writing. When the `power-of-two` feature is</span>
-<span class="doccomment">//! enabled, additional flags are added:</span>
-<span class="doccomment">//! - The radix for the significant digits (default `10`).</span>
-<span class="doccomment">//! - The radix for the exponent base (default `10`).</span>
-<span class="doccomment">//! - The radix for the exponent digits (default `10`).</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! When the `format` feature is enabled, numerous other syntax and</span>
-<span class="doccomment">//! digit separator flags are enabled, including:</span>
-<span class="doccomment">//! - A digit separator character, to group digits for increased legibility.</span>
-<span class="doccomment">//! - Whether leading, trailing, internal, and consecutive digit separators are allowed.</span>
-<span class="doccomment">//! - Toggling required float components, such as digits before the decimal point.</span>
-<span class="doccomment">//! - Toggling whether special floats are allowed or are case-sensitive.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Many pre-defined constants therefore exist to simplify common use-cases,</span>
-<span class="doccomment">//! including:</span>
-<span class="doccomment">//! - JSON, XML, TOML, YAML, SQLite, and many more.</span>
-<span class="doccomment">//! - Rust, Python, C#, FORTRAN, COBOL literals and strings, and many more.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Options API</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The Options API provides high-level options to specify number parsing</span>
-<span class="doccomment">//! or writing, options not intrinsically tied to a number format.</span>
-<span class="doccomment">//! For example, the Options API provides:</span>
-<span class="doccomment">//! - The exponent character (default `b&#39;e&#39;`, or `b&#39;^&#39;`).</span>
-<span class="doccomment">//! - The decimal point character (default `b&#39;.&#39;`).</span>
-<span class="doccomment">//! - Custom `NaN`, `Infinity` string representations.</span>
-<span class="doccomment">//! - Whether to trim the fraction component from integral floats.</span>
-<span class="doccomment">//! - The exponent break point for scientific notation.</span>
-<span class="doccomment">//! - The maximum and minimum number of significant digits to write.</span>
-<span class="doccomment">//! - The rounding mode when truncating significant digits while writing.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The available options are:</span>
-<span class="doccomment">//!</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parse-floats&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [`ParseFloatOptions`]&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parse-integers&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [`ParseIntegerOptions`]&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write-floats&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [`WriteFloatOptions`]&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write-integers&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [`WriteIntegerOptions`]&quot;</span>)]</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! In addition, pre-defined constants for each category of options may</span>
-<span class="doccomment">//! be found in their respective modules.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Example</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! An example of creating your own options to parse European-style</span>
-<span class="doccomment">//! numbers (which use commas as decimal points, and periods as digit</span>
-<span class="doccomment">//! separators) is as follows:</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//! # pub fn main() {</span>
-<span class="doccomment">//! # #[cfg(all(feature = &quot;parse_floats&quot;, feature = &quot;format&quot;))] {</span>
-<span class="doccomment">//! // This creates a format to parse a European-style float number.</span>
-<span class="doccomment">//! // The decimal point is a comma, and the digit separators (optional)</span>
-<span class="doccomment">//! // are periods.</span>
-<span class="doccomment">//! const EUROPEAN: u128 = lexical_core::NumberFormatBuilder::new()</span>
-<span class="doccomment">//!     .digit_separator(b&#39;.&#39;)</span>
-<span class="doccomment">//!     .build();</span>
-<span class="doccomment">//! let options = lexical_core::ParseFloatOptions::builder()</span>
-<span class="doccomment">//!     .decimal_point(b&#39;,&#39;)</span>
-<span class="doccomment">//!     .build()</span>
-<span class="doccomment">//!     .unwrap();</span>
-<span class="doccomment">//! assert_eq!(</span>
-<span class="doccomment">//!     lexical_core::parse_with_options::&lt;f32, EUROPEAN&gt;(b&quot;300,10&quot;, &amp;options),</span>
-<span class="doccomment">//!     Ok(300.10)</span>
-<span class="doccomment">//! );</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! // Another example, using a pre-defined constant for JSON.</span>
-<span class="doccomment">//! const JSON: u128 = lexical_core::format::JSON;</span>
-<span class="doccomment">//! let options = lexical_core::ParseFloatOptions::new();</span>
-<span class="doccomment">//! assert_eq!(</span>
-<span class="doccomment">//!     lexical_core::parse_with_options::&lt;f32, JSON&gt;(b&quot;0e1&quot;, &amp;options),</span>
-<span class="doccomment">//!     Ok(0.0)</span>
-<span class="doccomment">//! );</span>
-<span class="doccomment">//! assert_eq!(</span>
-<span class="doccomment">//!     lexical_core::parse_with_options::&lt;f32, JSON&gt;(b&quot;1E+2&quot;, &amp;options),</span>
-<span class="doccomment">//!     Ok(100.0)</span>
-<span class="doccomment">//! );</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Algorithms</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [Parsing Floats](https://github.com/Alexhuszagh/rust-lexical/blob/main/lexical-parse-float/docs/Algorithm.md)</span>
-<span class="doccomment">//! - [Parsing Integers](https://github.com/Alexhuszagh/rust-lexical/blob/main/lexical-parse-integer/docs/Algorithm.md)</span>
-<span class="doccomment">//! - [Writing Floats](https://github.com/Alexhuszagh/rust-lexical/blob/main/lexical-write-float/docs/Algorithm.md)</span>
-<span class="doccomment">//! - [Writing Integers](https://github.com/Alexhuszagh/rust-lexical/blob/main/lexical-write-integer/docs/Algorithm.md)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Benchmarks</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [Parsing Floats](https://github.com/Alexhuszagh/rust-lexical/blob/main/lexical-parse-float/docs/Benchmarks.md)</span>
-<span class="doccomment">//! - [Parsing Integers](https://github.com/Alexhuszagh/rust-lexical/blob/main/lexical-parse-integer/docs/Benchmarks.md)</span>
-<span class="doccomment">//! - [Writing Floats](https://github.com/Alexhuszagh/rust-lexical/blob/main/lexical-write-float/docs/Benchmarks.md)</span>
-<span class="doccomment">//! - [Writing Integers](https://github.com/Alexhuszagh/rust-lexical/blob/main/lexical-write-integer/docs/Benchmarks.md)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Design</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [Binary Size](https://github.com/Alexhuszagh/rust-lexical/blob/main/docs/BinarySize.md)</span>
-<span class="doccomment">//! - [Build Timings](https://github.com/Alexhuszagh/rust-lexical/blob/main/docs/BuildTimings.md)</span>
-<span class="doccomment">//! - [Digit Separators](https://github.com/Alexhuszagh/rust-lexical/blob/main/docs/DigitSeparators.md)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Version Support</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! The minimum, standard, required version is 1.51.0, for const generic</span>
-<span class="doccomment">//! support. Older versions of lexical support older Rust versions.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`write`]: crate::write</span>
-<span class="doccomment">//! [`write_unchecked`]: crate::write_unchecked</span>
-<span class="doccomment">//! [`write_with_options`]: crate::write_with_options</span>
-<span class="doccomment">//! [`write_with_options_unchecked`]: crate::write_with_options_unchecked</span>
-<span class="doccomment">//! [`parse`]: crate::parse</span>
-<span class="doccomment">//! [`parse_partial`]: crate::parse_partial</span>
-<span class="doccomment">//! [`parse_with_options`]: crate::parse_with_options</span>
-<span class="doccomment">//! [`parse_partial_with_options`]: crate::parse_partial_with_options</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [`NumberFormatBuilder`]: crate::NumberFormatBuilder</span>
-<span class="doccomment">//! [`ParseFloatOptions`]: crate::ParseFloatOptions</span>
-<span class="doccomment">//! [`ParseIntegerOptions`]: crate::ParseIntegerOptions</span>
-<span class="doccomment">//! [`WriteFloatOptions`]: crate::WriteFloatOptions</span>
-<span class="doccomment">//! [`WriteIntegerOptions`]: crate::WriteIntegerOptions</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Fast lexical conversion routines for a no_std environment.
+//!
+//! lexical-core is a low-level API for number-to-string and
+//! string-to-number conversions, without requiring a system
+//! allocator. If you would like to use a high-level API that
+//! writes to and parses from `String` and `&amp;str`, respectively,
+//! please look at [lexical](https://crates.io/crates/lexical)
+//! instead.
+//!
+//! Despite the low-level API and focus on performance, lexical-core
+//! strives to be simple and yet configurable: despite supporting nearly
+//! every float and integer format available, it only exports 4 write
+//! functions and 4 parse functions.
+//!
+//! lexical-core is well-tested, and has been downloaded more than 5 million
+//! times and currently has no known errors in correctness. lexical-core
+//! prioritizes performance above all else, and aims to be competitive
+//! or faster than any other float or integer parser and writer.
+//!
+//! In addition, despite having a large number of features, configurability,
+//! and a focus on performance, we also strive for fast compile times.
+//! Recent versions also add support for smaller binary sizes, as well
+//! ideal for embedded or web environments, where executable bloat can
+//! be much more detrimental than performance.
+//!
+//! # Getting Started
+//!
+//! ```rust
+//! # #[cfg(all(
+//! #     feature = &quot;parse-floats&quot;,
+//! #     feature = &quot;parse-integers&quot;,
+//! #     feature = &quot;write-floats&quot;,
+//! #     feature = &quot;write-integers&quot;,
+//! # ))]
+//! # {
+//!
+//! // String to number using Rust slices.
+//! // The argument is the byte string parsed.
+//! let f: f32 = lexical_core::parse(b&quot;3.5&quot;).unwrap();   // 3.5
+//! let i: i32 = lexical_core::parse(b&quot;15&quot;).unwrap();    // 15
+//!
+//! // All lexical_core parsers are checked, they validate the
+//! // input data is entirely correct, and stop parsing when invalid data
+//! // is found, or upon numerical overflow.
+//! let r = lexical_core::parse::&lt;u8&gt;(b&quot;256&quot;); // Err(ErrorCode::Overflow.into())
+//! let r = lexical_core::parse::&lt;u8&gt;(b&quot;1a5&quot;); // Err(ErrorCode::InvalidDigit.into())
+//!
+//! // In order to extract and parse a number from a substring of the input
+//! // data, use `parse_partial`. These functions return the parsed value and
+//! // the number of processed digits, allowing you to extract and parse the
+//! // number in a single pass.
+//! let r = lexical_core::parse_partial::&lt;i8&gt;(b&quot;3a5&quot;); // Ok((3, 1))
+//!
+//! // If an insufficiently long buffer is passed, the serializer will panic.
+//!
+//! // PANICS
+//! let mut buf = [b&#39;0&#39;; 1];
+//! //let slc = lexical_core::write::&lt;i64&gt;(15, &amp;mut buf);
+//!
+//! // In order to guarantee the buffer is long enough, always ensure there
+//! // are at least `T::FORMATTED_SIZE` bytes, which requires the
+//! // `lexical_core::FormattedSize` trait to be in scope.
+//! use lexical_core::FormattedSize;
+//! let mut buf = [b&#39;0&#39;; f64::FORMATTED_SIZE];
+//! let slc = lexical_core::write::&lt;f64&gt;(15.1, &amp;mut buf);
+//! assert_eq!(slc, b&quot;15.1&quot;);
+//!
+//! // When the `radix` feature is enabled, for decimal floats, using
+//! // `T::FORMATTED_SIZE` may significantly overestimate the space
+//! // required to format the number. Therefore, the
+//! // `T::FORMATTED_SIZE_DECIMAL` constants allow you to get a much
+//! // tighter bound on the space required.
+//! let mut buf = [b&#39;0&#39;; f64::FORMATTED_SIZE_DECIMAL];
+//! let slc = lexical_core::write::&lt;f64&gt;(15.1, &amp;mut buf);
+//! assert_eq!(slc, b&quot;15.1&quot;);
+//! # }
+//! ```
+//!
+//! # Conversion API
+//!
+</span><span class="attribute">#![cfg_attr(feature = <span class="string">&quot;write&quot;</span>, doc = <span class="string">&quot; **Write**&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;write&quot;</span>, doc = <span class="string">&quot;&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;write&quot;</span>, doc = <span class="string">&quot; - [`write`]&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;write&quot;</span>, doc = <span class="string">&quot; - [`write_unchecked`]&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;write&quot;</span>, doc = <span class="string">&quot; - [`write_with_options`]&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;write&quot;</span>, doc = <span class="string">&quot; - [`write_with_options_unchecked`]&quot;</span>)]
+</span><span class="doccomment">//!
+</span><span class="attribute">#![cfg_attr(feature = <span class="string">&quot;write&quot;</span>, doc = <span class="string">&quot; **From String**&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;write&quot;</span>, doc = <span class="string">&quot;&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;parse&quot;</span>, doc = <span class="string">&quot; - [`parse`]&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;parse&quot;</span>, doc = <span class="string">&quot; - [`parse_partial`]&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;parse&quot;</span>, doc = <span class="string">&quot; - [`parse_with_options`]&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;parse&quot;</span>, doc = <span class="string">&quot; - [`parse_partial_with_options`]&quot;</span>)]
+</span><span class="doccomment">//!
+//! # Features
+//!
+//! In accordance with the Rust ethos, all features are additive: the crate
+//! may be build with `--all-features` without issue.  The following features are enabled
+//! by default:
+//!
+//! * `std`
+//! * `write-integers`
+//! * `write-floats`
+//! * `parse-integers`
+//! * `parse-floats`
+//!
+//! A complete description of supported features includes:
+//!
+//! ### std
+//!
+//! Enable use of the standard library. Currently, the standard library
+//! is not used for any functionality, and may be disabled without any
+//! change in functionality on stable.
+//!
+//! ### write-integers
+//!
+//! Enable support for writing integers to string.
+//!
+//! ### write-floats
+//!
+//! Enable support for writing floating-point numbers to string.
+//!
+//! ### parse-integers
+//!
+//! Enable support for parsing integers from string.
+//!
+//! ### parsing-floats
+//!
+//! Enable support for parsing floating-point numbers from string.
+//!
+//! ### format
+//!
+//! Adds support for the entire format API (using [`NumberFormatBuilder`]).
+//! This allows extensive configurability for parsing and writing numbers
+//! in custom formats, with different valid syntax requirements.
+//!
+//! For example, in JSON, the following floats are valid or invalid:
+//!
+//! ```text
+//! -1          // valid
+//! +1          // invalid
+//! 1           // valid
+//! 1.          // invalid
+//! .1          // invalid
+//! 0.1         // valid
+//! nan         // invalid
+//! inf         // invalid
+//! Infinity    // invalid
+//! ```
+//!
+//! All of the finite numbers are valid in Rust, and Rust provides constants
+//! for non-finite floats. In order to parse standard-conforming JSON floats
+//! using lexical, you may use the following approach:
+//!
+//! ```rust
+//! # #[cfg(all(feature = &quot;parse-floats&quot;, feature = &quot;format&quot;))] {
+//! use lexical_core::{format, parse_with_options, ParseFloatOptions, Result};
+//!
+//! fn parse_json_float&lt;Bytes: AsRef&lt;[u8]&gt;&gt;(bytes: Bytes) -&gt; Result&lt;f64&gt; {
+//!     let options = ParseFloatOptions::new();
+//!     parse_with_options::&lt;_, { format::JSON }&gt;(bytes.as_ref(), &amp;options)
+//! }
+//! # }
+//! ```
+//!
+//! See the [Number Format](#number-format) section below for more information.
+//!
+//! ### power-of-two
+//!
+//! Enable doing numeric conversions to and from strings with power-of-two
+//! radixes. This avoids most of the overhead and binary bloat of the radix
+//! feature, while enabling support for the most commonly-used radixes.
+//!
+//! ### radix
+//!
+//! Enable doing numeric conversions to and from strings for all radixes.
+//! This requires substantially more static storage than `power-of-two`,
+//! and increases compile times by a fair amount, but can be quite useful
+//! for esoteric programming languages which use duodecimal floats, for
+//! example.
+//!
+//! ### compact
+//!
+//! Reduce the generated code size at the cost of performance. This minimizes
+//! the number of static tables, inlining, and generics used, drastically
+//! reducing the size of the generated binaries.
+//!
+//! ### safe
+//!
+//! All numeric parsers are memory-safe by default, since parsing complex
+//! input is a major source of memory vulnerabilities. However, numeric
+//! writers often opt-in for unchecked writes, for major performance
+//! improvements. This may be disabled entirely by enabling the `safe`
+//! feature. In addition, to simplify memory safety guarantees, extensive
+//! edge-cases, property-based tests, and fuzzing is done with both the
+//! safe feature enabled and disabled, with the tests verified by Miri
+//! and Valgrind.
+//!
+//! # Configuration API
+//!
+//! Lexical provides two main levels of configuration:
+//! - The [`NumberFormatBuilder`], creating a packed struct with custom
+//!     formatting options.
+//! - The Options API.
+//!
+//! ## Number Format
+//!
+//! The number format class provides numerous flags to specify
+//! number parsing or writing. When the `power-of-two` feature is
+//! enabled, additional flags are added:
+//! - The radix for the significant digits (default `10`).
+//! - The radix for the exponent base (default `10`).
+//! - The radix for the exponent digits (default `10`).
+//!
+//! When the `format` feature is enabled, numerous other syntax and
+//! digit separator flags are enabled, including:
+//! - A digit separator character, to group digits for increased legibility.
+//! - Whether leading, trailing, internal, and consecutive digit separators are allowed.
+//! - Toggling required float components, such as digits before the decimal point.
+//! - Toggling whether special floats are allowed or are case-sensitive.
+//!
+//! Many pre-defined constants therefore exist to simplify common use-cases,
+//! including:
+//! - JSON, XML, TOML, YAML, SQLite, and many more.
+//! - Rust, Python, C#, FORTRAN, COBOL literals and strings, and many more.
+//!
+//! ## Options API
+//!
+//! The Options API provides high-level options to specify number parsing
+//! or writing, options not intrinsically tied to a number format.
+//! For example, the Options API provides:
+//! - The exponent character (default `b&#39;e&#39;`, or `b&#39;^&#39;`).
+//! - The decimal point character (default `b&#39;.&#39;`).
+//! - Custom `NaN`, `Infinity` string representations.
+//! - Whether to trim the fraction component from integral floats.
+//! - The exponent break point for scientific notation.
+//! - The maximum and minimum number of significant digits to write.
+//! - The rounding mode when truncating significant digits while writing.
+//!
+//! The available options are:
+//!
+</span><span class="attribute">#![cfg_attr(feature = <span class="string">&quot;parse-floats&quot;</span>, doc = <span class="string">&quot; - [`ParseFloatOptions`]&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;parse-integers&quot;</span>, doc = <span class="string">&quot; - [`ParseIntegerOptions`]&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;write-floats&quot;</span>, doc = <span class="string">&quot; - [`WriteFloatOptions`]&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;write-integers&quot;</span>, doc = <span class="string">&quot; - [`WriteIntegerOptions`]&quot;</span>)]
+</span><span class="doccomment">//!
+//! In addition, pre-defined constants for each category of options may
+//! be found in their respective modules.
+//!
+//! ## Example
+//!
+//! An example of creating your own options to parse European-style
+//! numbers (which use commas as decimal points, and periods as digit
+//! separators) is as follows:
+//!
+//! ```
+//! # pub fn main() {
+//! # #[cfg(all(feature = &quot;parse_floats&quot;, feature = &quot;format&quot;))] {
+//! // This creates a format to parse a European-style float number.
+//! // The decimal point is a comma, and the digit separators (optional)
+//! // are periods.
+//! const EUROPEAN: u128 = lexical_core::NumberFormatBuilder::new()
+//!     .digit_separator(b&#39;.&#39;)
+//!     .build();
+//! let options = lexical_core::ParseFloatOptions::builder()
+//!     .decimal_point(b&#39;,&#39;)
+//!     .build()
+//!     .unwrap();
+//! assert_eq!(
+//!     lexical_core::parse_with_options::&lt;f32, EUROPEAN&gt;(b&quot;300,10&quot;, &amp;options),
+//!     Ok(300.10)
+//! );
+//!
+//! // Another example, using a pre-defined constant for JSON.
+//! const JSON: u128 = lexical_core::format::JSON;
+//! let options = lexical_core::ParseFloatOptions::new();
+//! assert_eq!(
+//!     lexical_core::parse_with_options::&lt;f32, JSON&gt;(b&quot;0e1&quot;, &amp;options),
+//!     Ok(0.0)
+//! );
+//! assert_eq!(
+//!     lexical_core::parse_with_options::&lt;f32, JSON&gt;(b&quot;1E+2&quot;, &amp;options),
+//!     Ok(100.0)
+//! );
+//! # }
+//! # }
+//! ```
+//!
+//! # Algorithms
+//!
+//! - [Parsing Floats](https://github.com/Alexhuszagh/rust-lexical/blob/main/lexical-parse-float/docs/Algorithm.md)
+//! - [Parsing Integers](https://github.com/Alexhuszagh/rust-lexical/blob/main/lexical-parse-integer/docs/Algorithm.md)
+//! - [Writing Floats](https://github.com/Alexhuszagh/rust-lexical/blob/main/lexical-write-float/docs/Algorithm.md)
+//! - [Writing Integers](https://github.com/Alexhuszagh/rust-lexical/blob/main/lexical-write-integer/docs/Algorithm.md)
+//!
+//! # Benchmarks
+//!
+//! - [Parsing Floats](https://github.com/Alexhuszagh/rust-lexical/blob/main/lexical-parse-float/docs/Benchmarks.md)
+//! - [Parsing Integers](https://github.com/Alexhuszagh/rust-lexical/blob/main/lexical-parse-integer/docs/Benchmarks.md)
+//! - [Writing Floats](https://github.com/Alexhuszagh/rust-lexical/blob/main/lexical-write-float/docs/Benchmarks.md)
+//! - [Writing Integers](https://github.com/Alexhuszagh/rust-lexical/blob/main/lexical-write-integer/docs/Benchmarks.md)
+//!
+//! # Design
+//!
+//! - [Binary Size](https://github.com/Alexhuszagh/rust-lexical/blob/main/docs/BinarySize.md)
+//! - [Build Timings](https://github.com/Alexhuszagh/rust-lexical/blob/main/docs/BuildTimings.md)
+//! - [Digit Separators](https://github.com/Alexhuszagh/rust-lexical/blob/main/docs/DigitSeparators.md)
+//!
+//! # Version Support
+//!
+//! The minimum, standard, required version is 1.51.0, for const generic
+//! support. Older versions of lexical support older Rust versions.
+//!
+//! [`write`]: crate::write
+//! [`write_unchecked`]: crate::write_unchecked
+//! [`write_with_options`]: crate::write_with_options
+//! [`write_with_options_unchecked`]: crate::write_with_options_unchecked
+//! [`parse`]: crate::parse
+//! [`parse_partial`]: crate::parse_partial
+//! [`parse_with_options`]: crate::parse_with_options
+//! [`parse_partial_with_options`]: crate::parse_partial_with_options
+//!
+//! [`NumberFormatBuilder`]: crate::NumberFormatBuilder
+//! [`ParseFloatOptions`]: crate::ParseFloatOptions
+//! [`ParseIntegerOptions`]: crate::ParseIntegerOptions
+//! [`WriteFloatOptions`]: crate::WriteFloatOptions
+//! [`WriteIntegerOptions`]: crate::WriteIntegerOptions
 
-<span class="comment">// We want to have the same safety guarantees as Rust core,</span>
-<span class="comment">// so we allow unused unsafe to clearly document safety guarantees.</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">unused_unsafe</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;lint&quot;</span>, <span class="ident">warn</span>(<span class="ident">unsafe_op_in_unsafe_fn</span>))]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>), <span class="ident">no_std</span>)]</span>
+</span><span class="comment">// We want to have the same safety guarantees as Rust core,
+// so we allow unused unsafe to clearly document safety guarantees.
+</span><span class="attribute">#![allow(unused_unsafe)]
+#![cfg_attr(feature = <span class="string">&quot;lint&quot;</span>, warn(unsafe_op_in_unsafe_fn))]
+#![cfg_attr(not(feature = <span class="string">&quot;std&quot;</span>), no_std)]
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parse-floats&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">lexical_parse_float</span>::{
-    <span class="ident">FromLexical</span> <span class="kw">as</span> <span class="ident">FromFloat</span>,
-    <span class="ident">FromLexicalWithOptions</span> <span class="kw">as</span> <span class="ident">FromFloatWithOptions</span>,
+#[cfg(feature = <span class="string">&quot;parse-floats&quot;</span>)]
+</span><span class="kw">use </span>lexical_parse_float::{
+    FromLexical <span class="kw">as </span>FromFloat,
+    FromLexicalWithOptions <span class="kw">as </span>FromFloatWithOptions,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parse-integers&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">lexical_parse_integer</span>::{
-    <span class="ident">FromLexical</span> <span class="kw">as</span> <span class="ident">FromInteger</span>,
-    <span class="ident">FromLexicalWithOptions</span> <span class="kw">as</span> <span class="ident">FromIntegerWithOptions</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;parse-integers&quot;</span>)]
+</span><span class="kw">use </span>lexical_parse_integer::{
+    FromLexical <span class="kw">as </span>FromInteger,
+    FromLexicalWithOptions <span class="kw">as </span>FromIntegerWithOptions,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parse&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">lexical_util</span>::{<span class="ident">from_lexical</span>, <span class="ident">from_lexical_with_options</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">lexical_util</span>::{<span class="ident">to_lexical</span>, <span class="ident">to_lexical_with_options</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write-floats&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">lexical_write_float</span>::{<span class="ident">ToLexical</span> <span class="kw">as</span> <span class="ident">ToFloat</span>, <span class="ident">ToLexicalWithOptions</span> <span class="kw">as</span> <span class="ident">ToFloatWithOptions</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write-integers&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">lexical_write_integer</span>::{<span class="ident">ToLexical</span> <span class="kw">as</span> <span class="ident">ToInteger</span>, <span class="ident">ToLexicalWithOptions</span> <span class="kw">as</span> <span class="ident">ToIntegerWithOptions</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;parse&quot;</span>)]
+</span><span class="kw">use </span>lexical_util::{from_lexical, from_lexical_with_options};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;write&quot;</span>)]
+</span><span class="kw">use </span>lexical_util::{to_lexical, to_lexical_with_options};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;write-floats&quot;</span>)]
+</span><span class="kw">use </span>lexical_write_float::{ToLexical <span class="kw">as </span>ToFloat, ToLexicalWithOptions <span class="kw">as </span>ToFloatWithOptions};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;write-integers&quot;</span>)]
+</span><span class="kw">use </span>lexical_write_integer::{ToLexical <span class="kw">as </span>ToInteger, ToLexicalWithOptions <span class="kw">as </span>ToIntegerWithOptions};
 
-<span class="comment">// Re-exports</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parse-floats&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">lexical_parse_float</span>::{
-    <span class="ident">options</span> <span class="kw">as</span> <span class="ident">parse_float_options</span>,
-    <span class="ident">Options</span> <span class="kw">as</span> <span class="ident">ParseFloatOptions</span>,
-    <span class="ident">OptionsBuilder</span> <span class="kw">as</span> <span class="ident">ParseFloatOptionsBuilder</span>,
+<span class="comment">// Re-exports
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;parse-floats&quot;</span>)]
+</span><span class="kw">pub use </span>lexical_parse_float::{
+    options <span class="kw">as </span>parse_float_options,
+    Options <span class="kw">as </span>ParseFloatOptions,
+    OptionsBuilder <span class="kw">as </span>ParseFloatOptionsBuilder,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parse-integers&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">lexical_parse_integer</span>::{
-    <span class="ident">options</span> <span class="kw">as</span> <span class="ident">parse_integer_options</span>,
-    <span class="ident">Options</span> <span class="kw">as</span> <span class="ident">ParseIntegerOptions</span>,
-    <span class="ident">OptionsBuilder</span> <span class="kw">as</span> <span class="ident">ParseIntegerOptionsBuilder</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;parse-integers&quot;</span>)]
+</span><span class="kw">pub use </span>lexical_parse_integer::{
+    options <span class="kw">as </span>parse_integer_options,
+    Options <span class="kw">as </span>ParseIntegerOptions,
+    OptionsBuilder <span class="kw">as </span>ParseIntegerOptionsBuilder,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;f16&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">lexical_util::bf16::bf16</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">lexical_util::constants</span>::{<span class="ident">FormattedSize</span>, <span class="ident">BUFFER_SIZE</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parse&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">lexical_util::error::Error</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;f16&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">lexical_util::f16::f16</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">lexical_util::format</span>::{<span class="self">self</span>, <span class="ident">format_error</span>, <span class="ident">format_is_valid</span>, <span class="ident">NumberFormatBuilder</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parse&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">lexical_util::options::ParseOptions</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">lexical_util::options::WriteOptions</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parse&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">lexical_util::result::Result</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write-floats&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">lexical_write_float</span>::{
-    <span class="ident">options</span> <span class="kw">as</span> <span class="ident">write_float_options</span>,
-    <span class="ident">Options</span> <span class="kw">as</span> <span class="ident">WriteFloatOptions</span>,
-    <span class="ident">OptionsBuilder</span> <span class="kw">as</span> <span class="ident">WriteFloatOptionsBuilder</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;f16&quot;</span>)]
+</span><span class="kw">pub use </span>lexical_util::bf16::bf16;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;write&quot;</span>)]
+</span><span class="kw">pub use </span>lexical_util::constants::{FormattedSize, BUFFER_SIZE};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;parse&quot;</span>)]
+</span><span class="kw">pub use </span>lexical_util::error::Error;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;f16&quot;</span>)]
+</span><span class="kw">pub use </span>lexical_util::f16::f16;
+<span class="kw">pub use </span>lexical_util::format::{<span class="self">self</span>, format_error, format_is_valid, NumberFormatBuilder};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;parse&quot;</span>)]
+</span><span class="kw">pub use </span>lexical_util::options::ParseOptions;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;write&quot;</span>)]
+</span><span class="kw">pub use </span>lexical_util::options::WriteOptions;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;parse&quot;</span>)]
+</span><span class="kw">pub use </span>lexical_util::result::Result;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;write-floats&quot;</span>)]
+</span><span class="kw">pub use </span>lexical_write_float::{
+    options <span class="kw">as </span>write_float_options,
+    Options <span class="kw">as </span>WriteFloatOptions,
+    OptionsBuilder <span class="kw">as </span>WriteFloatOptionsBuilder,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write-integers&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">lexical_write_integer</span>::{
-    <span class="ident">options</span> <span class="kw">as</span> <span class="ident">write_integer_options</span>,
-    <span class="ident">Options</span> <span class="kw">as</span> <span class="ident">WriteIntegerOptions</span>,
-    <span class="ident">OptionsBuilder</span> <span class="kw">as</span> <span class="ident">WriteIntegerOptionsBuilder</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;write-integers&quot;</span>)]
+</span><span class="kw">pub use </span>lexical_write_integer::{
+    options <span class="kw">as </span>write_integer_options,
+    Options <span class="kw">as </span>WriteIntegerOptions,
+    OptionsBuilder <span class="kw">as </span>WriteIntegerOptionsBuilder,
 };
 
-<span class="comment">// API</span>
-<span class="comment">// ---</span>
+<span class="comment">// API
+// ---
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parse&quot;</span>)]</span>
-<span class="macro">from_lexical!</span>();
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parse&quot;</span>)]</span>
-<span class="macro">from_lexical_with_options!</span>();
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write&quot;</span>)]</span>
-<span class="macro">to_lexical!</span>();
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write&quot;</span>)]</span>
-<span class="macro">to_lexical_with_options!</span>();
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;parse&quot;</span>)]
+</span><span class="macro">from_lexical!</span>();
+<span class="attribute">#[cfg(feature = <span class="string">&quot;parse&quot;</span>)]
+</span><span class="macro">from_lexical_with_options!</span>();
+<span class="attribute">#[cfg(feature = <span class="string">&quot;write&quot;</span>)]
+</span><span class="macro">to_lexical!</span>();
+<span class="attribute">#[cfg(feature = <span class="string">&quot;write&quot;</span>)]
+</span><span class="macro">to_lexical_with_options!</span>();
 
-<span class="doccomment">/// Implement `FromLexical` and `FromLexicalWithOptions` for numeric type.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parse&quot;</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">from_lexical_impl</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">from</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_options</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">options</span>:<span class="ident">ident</span>) =&gt; {
-        <span class="kw">impl</span> <span class="ident">FromLexical</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
-            <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>), <span class="ident">inline</span>)]</span>
-            <span class="kw">fn</span> <span class="ident">from_lexical</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-                <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">from</span><span class="op">&gt;</span><span class="ident">::from_lexical</span>(<span class="ident">bytes</span>)
+<span class="doccomment">/// Implement `FromLexical` and `FromLexicalWithOptions` for numeric type.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;parse&quot;</span>)]
+</span><span class="macro">macro_rules! </span>from_lexical_impl {
+    (<span class="macro-nonterminal">$t</span>:ident, <span class="macro-nonterminal">$from</span>:ident, <span class="macro-nonterminal">$from_options</span>:ident, <span class="macro-nonterminal">$options</span>:ident) =&gt; {
+        <span class="kw">impl </span>FromLexical <span class="kw">for </span><span class="macro-nonterminal">$t </span>{
+            <span class="attribute">#[cfg_attr(not(feature = <span class="string">&quot;compact&quot;</span>), inline)]
+            </span><span class="kw">fn </span>from_lexical(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+                &lt;<span class="self">Self </span><span class="kw">as </span><span class="macro-nonterminal">$from</span>&gt;::from_lexical(bytes)
             }
 
-            <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>), <span class="ident">inline</span>)]</span>
-            <span class="kw">fn</span> <span class="ident">from_lexical_partial</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="self">Self</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
-                <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">from</span><span class="op">&gt;</span><span class="ident">::from_lexical_partial</span>(<span class="ident">bytes</span>)
+            <span class="attribute">#[cfg_attr(not(feature = <span class="string">&quot;compact&quot;</span>), inline)]
+            </span><span class="kw">fn </span>from_lexical_partial(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;(<span class="self">Self</span>, usize)&gt; {
+                &lt;<span class="self">Self </span><span class="kw">as </span><span class="macro-nonterminal">$from</span>&gt;::from_lexical_partial(bytes)
             }
         }
 
-        <span class="kw">impl</span> <span class="ident">FromLexicalWithOptions</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
-            <span class="kw">type</span> <span class="ident">Options</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">options</span>;
+        <span class="kw">impl </span>FromLexicalWithOptions <span class="kw">for </span><span class="macro-nonterminal">$t </span>{
+            <span class="kw">type </span>Options = <span class="macro-nonterminal">$options</span>;
 
-            <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>), <span class="ident">inline</span>)]</span>
-            <span class="kw">fn</span> <span class="ident">from_lexical_with_options</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
-                <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-                <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Options</span>,
-            ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-                <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_options</span><span class="op">&gt;</span><span class="ident">::from_lexical_with_options</span>::<span class="op">&lt;</span><span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">bytes</span>, <span class="ident">options</span>)
+            <span class="attribute">#[cfg_attr(not(feature = <span class="string">&quot;compact&quot;</span>), inline)]
+            </span><span class="kw">fn </span>from_lexical_with_options&lt;<span class="kw">const </span>FORMAT: u128&gt;(
+                bytes: <span class="kw-2">&amp;</span>[u8],
+                options: <span class="kw-2">&amp;</span><span class="self">Self</span>::Options,
+            ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
+                &lt;<span class="self">Self </span><span class="kw">as </span><span class="macro-nonterminal">$from_options</span>&gt;::from_lexical_with_options::&lt;FORMAT&gt;(bytes, options)
             }
 
-            <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>), <span class="ident">inline</span>)]</span>
-            <span class="kw">fn</span> <span class="ident">from_lexical_partial_with_options</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
-                <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-                <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Options</span>,
-            ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="self">Self</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
-                <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_options</span><span class="op">&gt;</span><span class="ident">::from_lexical_partial_with_options</span>::<span class="op">&lt;</span><span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">bytes</span>, <span class="ident">options</span>)
+            <span class="attribute">#[cfg_attr(not(feature = <span class="string">&quot;compact&quot;</span>), inline)]
+            </span><span class="kw">fn </span>from_lexical_partial_with_options&lt;<span class="kw">const </span>FORMAT: u128&gt;(
+                bytes: <span class="kw-2">&amp;</span>[u8],
+                options: <span class="kw-2">&amp;</span><span class="self">Self</span>::Options,
+            ) -&gt; <span class="prelude-ty">Result</span>&lt;(<span class="self">Self</span>, usize)&gt; {
+                &lt;<span class="self">Self </span><span class="kw">as </span><span class="macro-nonterminal">$from_options</span>&gt;::from_lexical_partial_with_options::&lt;FORMAT&gt;(bytes, options)
             }
         }
     };
 }
 
-<span class="doccomment">/// Implement `FromLexical` and `FromLexicalWithOptions` for integers.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parse-integers&quot;</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">integer_from_lexical</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ident</span>)<span class="kw-2">*</span>) =&gt; ($(
-        <span class="macro">from_lexical_impl!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>, <span class="ident">FromInteger</span>, <span class="ident">FromIntegerWithOptions</span>, <span class="ident">ParseIntegerOptions</span>);
+<span class="doccomment">/// Implement `FromLexical` and `FromLexicalWithOptions` for integers.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;parse-integers&quot;</span>)]
+</span><span class="macro">macro_rules! </span>integer_from_lexical {
+    ($(<span class="macro-nonterminal">$t</span>:ident)<span class="kw-2">*</span>) =&gt; ($(
+        <span class="macro">from_lexical_impl!</span>(<span class="macro-nonterminal">$t</span>, FromInteger, FromIntegerWithOptions, ParseIntegerOptions);
     )<span class="kw-2">*</span>);
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parse-integers&quot;</span>)]</span>
-<span class="macro">integer_from_lexical!</span> { <span class="ident">u8</span> <span class="ident">u16</span> <span class="ident">u32</span> <span class="ident">u64</span> <span class="ident">u128</span> <span class="ident">usize</span> <span class="ident">i8</span> <span class="ident">i16</span> <span class="ident">i32</span> <span class="ident">i64</span> <span class="ident">i128</span> <span class="ident">isize</span> }
+<span class="attribute">#[cfg(feature = <span class="string">&quot;parse-integers&quot;</span>)]
+</span><span class="macro">integer_from_lexical! </span>{ u8 u16 u32 u64 u128 usize i8 i16 i32 i64 i128 isize }
 
-<span class="doccomment">/// Implement `FromLexical` and `FromLexicalWithOptions` for floats.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parse-floats&quot;</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">float_from_lexical</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ident</span>)<span class="kw-2">*</span>) =&gt; ($(
-        <span class="macro">from_lexical_impl!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>, <span class="ident">FromFloat</span>, <span class="ident">FromFloatWithOptions</span>, <span class="ident">ParseFloatOptions</span>);
+<span class="doccomment">/// Implement `FromLexical` and `FromLexicalWithOptions` for floats.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;parse-floats&quot;</span>)]
+</span><span class="macro">macro_rules! </span>float_from_lexical {
+    ($(<span class="macro-nonterminal">$t</span>:ident)<span class="kw-2">*</span>) =&gt; ($(
+        <span class="macro">from_lexical_impl!</span>(<span class="macro-nonterminal">$t</span>, FromFloat, FromFloatWithOptions, ParseFloatOptions);
     )<span class="kw-2">*</span>);
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parse-floats&quot;</span>)]</span>
-<span class="macro">float_from_lexical!</span> { <span class="ident">f32</span> <span class="ident">f64</span> }
+<span class="attribute">#[cfg(feature = <span class="string">&quot;parse-floats&quot;</span>)]
+</span><span class="macro">float_from_lexical! </span>{ f32 f64 }
 
-<span class="comment">// Implement ToLexical for numeric type.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write&quot;</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">to_lexical_impl</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">to</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">to_options</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">options</span>:<span class="ident">ident</span>) =&gt; {
-        <span class="kw">impl</span> <span class="ident">ToLexical</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
-            <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>), <span class="ident">inline</span>)]</span>
-            <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">to_lexical_unchecked</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>]) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>] {
-                <span class="comment">// SAFETY: safe as long as `bytes` is large enough to hold the significant digits.</span>
-                <span class="kw">unsafe</span> { <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">to</span><span class="op">&gt;</span><span class="ident">::to_lexical_unchecked</span>(<span class="self">self</span>, <span class="ident">bytes</span>) }
+<span class="comment">// Implement ToLexical for numeric type.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;write&quot;</span>)]
+</span><span class="macro">macro_rules! </span>to_lexical_impl {
+    (<span class="macro-nonterminal">$t</span>:ident, <span class="macro-nonterminal">$to</span>:ident, <span class="macro-nonterminal">$to_options</span>:ident, <span class="macro-nonterminal">$options</span>:ident) =&gt; {
+        <span class="kw">impl </span>ToLexical <span class="kw">for </span><span class="macro-nonterminal">$t </span>{
+            <span class="attribute">#[cfg_attr(not(feature = <span class="string">&quot;compact&quot;</span>), inline)]
+            </span><span class="kw">unsafe fn </span>to_lexical_unchecked&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>, bytes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8]) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8] {
+                <span class="comment">// SAFETY: safe as long as `bytes` is large enough to hold the significant digits.
+                </span><span class="kw">unsafe </span>{ &lt;<span class="self">Self </span><span class="kw">as </span><span class="macro-nonterminal">$to</span>&gt;::to_lexical_unchecked(<span class="self">self</span>, bytes) }
             }
 
-            <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>), <span class="ident">inline</span>)]</span>
-            <span class="kw">fn</span> <span class="ident">to_lexical</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>]) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>] {
-                <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">to</span><span class="op">&gt;</span><span class="ident">::to_lexical</span>(<span class="self">self</span>, <span class="ident">bytes</span>)
+            <span class="attribute">#[cfg_attr(not(feature = <span class="string">&quot;compact&quot;</span>), inline)]
+            </span><span class="kw">fn </span>to_lexical&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="self">self</span>, bytes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8]) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8] {
+                &lt;<span class="self">Self </span><span class="kw">as </span><span class="macro-nonterminal">$to</span>&gt;::to_lexical(<span class="self">self</span>, bytes)
             }
         }
 
-        <span class="kw">impl</span> <span class="ident">ToLexicalWithOptions</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span> {
-            <span class="kw">type</span> <span class="ident">Options</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">options</span>;
+        <span class="kw">impl </span>ToLexicalWithOptions <span class="kw">for </span><span class="macro-nonterminal">$t </span>{
+            <span class="kw">type </span>Options = <span class="macro-nonterminal">$options</span>;
 
-            <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>), <span class="ident">inline</span>)]</span>
-            <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">to_lexical_with_options_unchecked</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
+            <span class="attribute">#[cfg_attr(not(feature = <span class="string">&quot;compact&quot;</span>), inline)]
+            </span><span class="kw">unsafe fn </span>to_lexical_with_options_unchecked&lt;<span class="lifetime">&#39;a</span>, <span class="kw">const </span>FORMAT: u128&gt;(
                 <span class="self">self</span>,
-                <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>],
-                <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Options</span>,
-            ) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>] {
-                <span class="comment">// SAFETY: safe as long as `bytes` is large enough to hold the significant digits.</span>
-                <span class="kw">unsafe</span> {
-                    <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">to_options</span><span class="op">&gt;</span><span class="ident">::to_lexical_with_options_unchecked</span>::<span class="op">&lt;</span><span class="ident">FORMAT</span><span class="op">&gt;</span>(
-                        <span class="self">self</span>, <span class="ident">bytes</span>, <span class="ident">options</span>,
+                bytes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8],
+                options: <span class="kw-2">&amp;</span><span class="self">Self</span>::Options,
+            ) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8] {
+                <span class="comment">// SAFETY: safe as long as `bytes` is large enough to hold the significant digits.
+                </span><span class="kw">unsafe </span>{
+                    &lt;<span class="self">Self </span><span class="kw">as </span><span class="macro-nonterminal">$to_options</span>&gt;::to_lexical_with_options_unchecked::&lt;FORMAT&gt;(
+                        <span class="self">self</span>, bytes, options,
                     )
                 }
             }
 
-            <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>), <span class="ident">inline</span>)]</span>
-            <span class="kw">fn</span> <span class="ident">to_lexical_with_options</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
+            <span class="attribute">#[cfg_attr(not(feature = <span class="string">&quot;compact&quot;</span>), inline)]
+            </span><span class="kw">fn </span>to_lexical_with_options&lt;<span class="lifetime">&#39;a</span>, <span class="kw">const </span>FORMAT: u128&gt;(
                 <span class="self">self</span>,
-                <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>],
-                <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Options</span>,
-            ) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>] {
-                <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">to_options</span><span class="op">&gt;</span><span class="ident">::to_lexical_with_options</span>::<span class="op">&lt;</span><span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">bytes</span>, <span class="ident">options</span>)
+                bytes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8],
+                options: <span class="kw-2">&amp;</span><span class="self">Self</span>::Options,
+            ) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8] {
+                &lt;<span class="self">Self </span><span class="kw">as </span><span class="macro-nonterminal">$to_options</span>&gt;::to_lexical_with_options::&lt;FORMAT&gt;(<span class="self">self</span>, bytes, options)
             }
         }
     };
 }
 
-<span class="doccomment">/// Implement `ToLexical` and `ToLexicalWithOptions` for integers.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write-integers&quot;</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">integer_to_lexical</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ident</span>)<span class="kw-2">*</span>) =&gt; ($(
-        <span class="macro">to_lexical_impl!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>, <span class="ident">ToInteger</span>, <span class="ident">ToIntegerWithOptions</span>, <span class="ident">WriteIntegerOptions</span>);
+<span class="doccomment">/// Implement `ToLexical` and `ToLexicalWithOptions` for integers.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;write-integers&quot;</span>)]
+</span><span class="macro">macro_rules! </span>integer_to_lexical {
+    ($(<span class="macro-nonterminal">$t</span>:ident)<span class="kw-2">*</span>) =&gt; ($(
+        <span class="macro">to_lexical_impl!</span>(<span class="macro-nonterminal">$t</span>, ToInteger, ToIntegerWithOptions, WriteIntegerOptions);
     )<span class="kw-2">*</span>);
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write-integers&quot;</span>)]</span>
-<span class="macro">integer_to_lexical!</span> { <span class="ident">u8</span> <span class="ident">u16</span> <span class="ident">u32</span> <span class="ident">u64</span> <span class="ident">u128</span> <span class="ident">usize</span> <span class="ident">i8</span> <span class="ident">i16</span> <span class="ident">i32</span> <span class="ident">i64</span> <span class="ident">i128</span> <span class="ident">isize</span> }
+<span class="attribute">#[cfg(feature = <span class="string">&quot;write-integers&quot;</span>)]
+</span><span class="macro">integer_to_lexical! </span>{ u8 u16 u32 u64 u128 usize i8 i16 i32 i64 i128 isize }
 
-<span class="doccomment">/// Implement `ToLexical` and `ToLexicalWithOptions` for floats.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write-floats&quot;</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">float_to_lexical</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>:<span class="ident">ident</span>)<span class="kw-2">*</span>) =&gt; ($(
-        <span class="macro">to_lexical_impl!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">t</span>, <span class="ident">ToFloat</span>, <span class="ident">ToFloatWithOptions</span>, <span class="ident">WriteFloatOptions</span>);
+<span class="doccomment">/// Implement `ToLexical` and `ToLexicalWithOptions` for floats.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;write-floats&quot;</span>)]
+</span><span class="macro">macro_rules! </span>float_to_lexical {
+    ($(<span class="macro-nonterminal">$t</span>:ident)<span class="kw-2">*</span>) =&gt; ($(
+        <span class="macro">to_lexical_impl!</span>(<span class="macro-nonterminal">$t</span>, ToFloat, ToFloatWithOptions, WriteFloatOptions);
     )<span class="kw-2">*</span>);
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write-floats&quot;</span>)]</span>
-<span class="macro">float_to_lexical!</span> { <span class="ident">f32</span> <span class="ident">f64</span> }
+<span class="attribute">#[cfg(feature = <span class="string">&quot;write-floats&quot;</span>)]
+</span><span class="macro">float_to_lexical! </span>{ f32 f64 }
 
-<span class="doccomment">/// Write number to string.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Returns a subslice of the input buffer containing the written bytes,</span>
-<span class="doccomment">/// starting from the same address in memory as the input slice.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * `value`   - Number to serialize.</span>
-<span class="doccomment">/// * `bytes`   - Buffer to write number to.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Panics</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Panics if the buffer may not be large enough to hold the serialized</span>
-<span class="doccomment">/// number. In order to ensure the function will not panic, provide a</span>
-<span class="doccomment">/// buffer with at least `{integer}::FORMATTED_SIZE` elements.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # pub fn main() {</span>
-<span class="doccomment">/// #[cfg(feature = &quot;write-floats&quot;)] {</span>
-<span class="doccomment">/// // import `BUFFER_SIZE` to get the maximum bytes written by the number.</span>
-<span class="doccomment">/// use lexical_core::BUFFER_SIZE;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut buffer = [0u8; BUFFER_SIZE];</span>
-<span class="doccomment">/// let float = 3.14159265359_f32;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// lexical_core::write(float, &amp;mut buffer);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(&amp;buffer[0..9], b&quot;3.1415927&quot;);</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This will panic, because the buffer is not large enough:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```should_panic</span>
-<span class="doccomment">/// # #[cfg(feature = &quot;write-floats&quot;)] {</span>
-<span class="doccomment">/// // note: the buffer is only one byte large</span>
-<span class="doccomment">/// let mut buffer = [0u8; 1];</span>
-<span class="doccomment">/// let float = 3.14159265359_f32;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// lexical_core::write(float, &amp;mut buffer);</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// # #[cfg(not(feature = &quot;write-floats&quot;))] {</span>
-<span class="doccomment">/// #     panic!(&quot;&quot;);</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">ToLexical</span><span class="op">&gt;</span>(<span class="ident">n</span>: <span class="ident">N</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>] {
-    <span class="ident">n</span>.<span class="ident">to_lexical</span>(<span class="ident">bytes</span>)
+<span class="doccomment">/// Write number to string.
+///
+/// Returns a subslice of the input buffer containing the written bytes,
+/// starting from the same address in memory as the input slice.
+///
+/// * `value`   - Number to serialize.
+/// * `bytes`   - Buffer to write number to.
+///
+/// # Panics
+///
+/// Panics if the buffer may not be large enough to hold the serialized
+/// number. In order to ensure the function will not panic, provide a
+/// buffer with at least `{integer}::FORMATTED_SIZE` elements.
+///
+/// # Example
+///
+/// ```
+/// # pub fn main() {
+/// #[cfg(feature = &quot;write-floats&quot;)] {
+/// // import `BUFFER_SIZE` to get the maximum bytes written by the number.
+/// use lexical_core::BUFFER_SIZE;
+///
+/// let mut buffer = [0u8; BUFFER_SIZE];
+/// let float = 3.14159265359_f32;
+///
+/// lexical_core::write(float, &amp;mut buffer);
+///
+/// assert_eq!(&amp;buffer[0..9], b&quot;3.1415927&quot;);
+/// # }
+/// # }
+/// ```
+///
+/// This will panic, because the buffer is not large enough:
+///
+/// ```should_panic
+/// # #[cfg(feature = &quot;write-floats&quot;)] {
+/// // note: the buffer is only one byte large
+/// let mut buffer = [0u8; 1];
+/// let float = 3.14159265359_f32;
+///
+/// lexical_core::write(float, &amp;mut buffer);
+/// # }
+/// # #[cfg(not(feature = &quot;write-floats&quot;))] {
+/// #     panic!(&quot;&quot;);
+/// # }
+/// ```
+</span><span class="attribute">#[inline]
+#[cfg(feature = <span class="string">&quot;write&quot;</span>)]
+</span><span class="kw">pub fn </span>write&lt;N: ToLexical&gt;(n: N, bytes: <span class="kw-2">&amp;mut </span>[u8]) -&gt; <span class="kw-2">&amp;mut </span>[u8] {
+    n.to_lexical(bytes)
 }
 
-<span class="doccomment">/// Write number to string, without bounds checking the buffer.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Returns a subslice of the input buffer containing the written bytes,</span>
-<span class="doccomment">/// starting from the same address in memory as the input slice.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * `value`   - Number to serialize.</span>
-<span class="doccomment">/// * `bytes`   - Buffer to write number to.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If the buffer is not be large enough to hold the serialized number,</span>
-<span class="doccomment">/// it will overflow the buffer unless the `safe` feature is enabled.</span>
-<span class="doccomment">/// Buffer overflows are severe security vulnerabilities, and therefore</span>
-<span class="doccomment">/// to ensure the function will not overwrite the buffer, provide a</span>
-<span class="doccomment">/// buffer with at least `{integer}::FORMATTED_SIZE` elements.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # pub fn main() {</span>
-<span class="doccomment">/// #[cfg(feature = &quot;write-floats&quot;)] {</span>
-<span class="doccomment">/// // import `BUFFER_SIZE` to get the maximum bytes written by the number.</span>
-<span class="doccomment">/// use lexical_core::BUFFER_SIZE;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut buffer = [0u8; BUFFER_SIZE];</span>
-<span class="doccomment">/// let float = 3.14159265359_f32;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// unsafe {</span>
-<span class="doccomment">///     lexical_core::write_unchecked(float, &amp;mut buffer);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(&amp;buffer[0..9], b&quot;3.1415927&quot;);</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">write_unchecked</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">ToLexical</span><span class="op">&gt;</span>(<span class="ident">n</span>: <span class="ident">N</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>] {
-    <span class="comment">// SAFETY: safe if the provided buffer is large enough for the numerical string</span>
-    <span class="kw">unsafe</span> { <span class="ident">n</span>.<span class="ident">to_lexical_unchecked</span>(<span class="ident">bytes</span>) }
+<span class="doccomment">/// Write number to string, without bounds checking the buffer.
+///
+/// Returns a subslice of the input buffer containing the written bytes,
+/// starting from the same address in memory as the input slice.
+///
+/// * `value`   - Number to serialize.
+/// * `bytes`   - Buffer to write number to.
+///
+/// # Safety
+///
+/// If the buffer is not be large enough to hold the serialized number,
+/// it will overflow the buffer unless the `safe` feature is enabled.
+/// Buffer overflows are severe security vulnerabilities, and therefore
+/// to ensure the function will not overwrite the buffer, provide a
+/// buffer with at least `{integer}::FORMATTED_SIZE` elements.
+///
+/// # Example
+///
+/// ```
+/// # pub fn main() {
+/// #[cfg(feature = &quot;write-floats&quot;)] {
+/// // import `BUFFER_SIZE` to get the maximum bytes written by the number.
+/// use lexical_core::BUFFER_SIZE;
+///
+/// let mut buffer = [0u8; BUFFER_SIZE];
+/// let float = 3.14159265359_f32;
+///
+/// unsafe {
+///     lexical_core::write_unchecked(float, &amp;mut buffer);
+/// }
+///
+/// assert_eq!(&amp;buffer[0..9], b&quot;3.1415927&quot;);
+/// # }
+/// # }
+/// ```
+</span><span class="attribute">#[inline]
+#[cfg(feature = <span class="string">&quot;write&quot;</span>)]
+</span><span class="kw">pub unsafe fn </span>write_unchecked&lt;N: ToLexical&gt;(n: N, bytes: <span class="kw-2">&amp;mut </span>[u8]) -&gt; <span class="kw-2">&amp;mut </span>[u8] {
+    <span class="comment">// SAFETY: safe if the provided buffer is large enough for the numerical string
+    </span><span class="kw">unsafe </span>{ n.to_lexical_unchecked(bytes) }
 }
 
-<span class="doccomment">/// Write number to string with custom options.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Returns a subslice of the input buffer containing the written bytes,</span>
-<span class="doccomment">/// starting from the same address in memory as the input slice.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * `FORMAT`  - Packed struct containing the number format.</span>
-<span class="doccomment">/// * `value`   - Number to serialize.</span>
-<span class="doccomment">/// * `bytes`   - Buffer to write number to.</span>
-<span class="doccomment">/// * `options` - Options to customize number parsing.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Panics</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Panics if the buffer may not be large enough to hold the serialized</span>
-<span class="doccomment">/// number. In order to ensure the function will not panic, provide a</span>
-<span class="doccomment">/// buffer with at least `{integer}::FORMATTED_SIZE` elements. If you</span>
-<span class="doccomment">/// are using custom digit precision control or exponent break points</span>
-<span class="doccomment">/// for writing floats, these constants may be insufficient to store</span>
-<span class="doccomment">/// the serialized number, and up to 1200 bytes may be required with</span>
-<span class="doccomment">/// radix support.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If the provided `FORMAT` is not valid, the function may panic. Please</span>
-<span class="doccomment">/// ensure `is_valid()` is called prior to using the format, or checking</span>
-<span class="doccomment">/// its validity using a static assertion.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # pub fn main() {</span>
-<span class="doccomment">/// #[cfg(feature = &quot;write-floats&quot;)] {</span>
-<span class="doccomment">/// // import `BUFFER_SIZE` to get the maximum bytes written by the number.</span>
-<span class="doccomment">/// use lexical_core::BUFFER_SIZE;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut buffer = [0u8; BUFFER_SIZE];</span>
-<span class="doccomment">/// let float = 3.14159265359_f32;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// const FORMAT: u128 = lexical_core::format::STANDARD;</span>
-<span class="doccomment">/// let options = lexical_core::WriteFloatOptions::new();</span>
-<span class="doccomment">/// lexical_core::write_with_options::&lt;_, FORMAT&gt;(float, &amp;mut buffer, &amp;options);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(&amp;buffer[0..9], b&quot;3.1415927&quot;);</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This will panic, because the buffer is not large enough:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```should_panic</span>
-<span class="doccomment">/// # #[cfg(feature = &quot;write-floats&quot;)] {</span>
-<span class="doccomment">/// // note: the buffer is only one byte large</span>
-<span class="doccomment">/// let mut buffer = [0u8; 1];</span>
-<span class="doccomment">/// let float = 3.14159265359_f32;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// const FORMAT: u128 = lexical_core::format::STANDARD;</span>
-<span class="doccomment">/// let options = lexical_core::WriteFloatOptions::new();</span>
-<span class="doccomment">/// lexical_core::write_with_options::&lt;_, FORMAT&gt;(float, &amp;mut buffer, &amp;options);</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// # #[cfg(not(feature = &quot;write-floats&quot;))] {</span>
-<span class="doccomment">/// #     panic!(&quot;&quot;);</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_with_options</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>: <span class="ident">ToLexicalWithOptions</span>, <span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
-    <span class="ident">n</span>: <span class="ident">N</span>,
-    <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>],
-    <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">N::Options</span>,
-) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>] {
-    <span class="ident">n</span>.<span class="ident">to_lexical_with_options</span>::<span class="op">&lt;</span><span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">bytes</span>, <span class="ident">options</span>)
+<span class="doccomment">/// Write number to string with custom options.
+///
+/// Returns a subslice of the input buffer containing the written bytes,
+/// starting from the same address in memory as the input slice.
+///
+/// * `FORMAT`  - Packed struct containing the number format.
+/// * `value`   - Number to serialize.
+/// * `bytes`   - Buffer to write number to.
+/// * `options` - Options to customize number parsing.
+///
+/// # Panics
+///
+/// Panics if the buffer may not be large enough to hold the serialized
+/// number. In order to ensure the function will not panic, provide a
+/// buffer with at least `{integer}::FORMATTED_SIZE` elements. If you
+/// are using custom digit precision control or exponent break points
+/// for writing floats, these constants may be insufficient to store
+/// the serialized number, and up to 1200 bytes may be required with
+/// radix support.
+///
+/// If the provided `FORMAT` is not valid, the function may panic. Please
+/// ensure `is_valid()` is called prior to using the format, or checking
+/// its validity using a static assertion.
+///
+/// # Example
+///
+/// ```
+/// # pub fn main() {
+/// #[cfg(feature = &quot;write-floats&quot;)] {
+/// // import `BUFFER_SIZE` to get the maximum bytes written by the number.
+/// use lexical_core::BUFFER_SIZE;
+///
+/// let mut buffer = [0u8; BUFFER_SIZE];
+/// let float = 3.14159265359_f32;
+///
+/// const FORMAT: u128 = lexical_core::format::STANDARD;
+/// let options = lexical_core::WriteFloatOptions::new();
+/// lexical_core::write_with_options::&lt;_, FORMAT&gt;(float, &amp;mut buffer, &amp;options);
+///
+/// assert_eq!(&amp;buffer[0..9], b&quot;3.1415927&quot;);
+/// # }
+/// # }
+/// ```
+///
+/// This will panic, because the buffer is not large enough:
+///
+/// ```should_panic
+/// # #[cfg(feature = &quot;write-floats&quot;)] {
+/// // note: the buffer is only one byte large
+/// let mut buffer = [0u8; 1];
+/// let float = 3.14159265359_f32;
+///
+/// const FORMAT: u128 = lexical_core::format::STANDARD;
+/// let options = lexical_core::WriteFloatOptions::new();
+/// lexical_core::write_with_options::&lt;_, FORMAT&gt;(float, &amp;mut buffer, &amp;options);
+/// # }
+/// # #[cfg(not(feature = &quot;write-floats&quot;))] {
+/// #     panic!(&quot;&quot;);
+/// # }
+/// ```
+</span><span class="attribute">#[inline]
+#[cfg(feature = <span class="string">&quot;write&quot;</span>)]
+</span><span class="kw">pub fn </span>write_with_options&lt;<span class="lifetime">&#39;a</span>, N: ToLexicalWithOptions, <span class="kw">const </span>FORMAT: u128&gt;(
+    n: N,
+    bytes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8],
+    options: <span class="kw-2">&amp;</span>N::Options,
+) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8] {
+    n.to_lexical_with_options::&lt;FORMAT&gt;(bytes, options)
 }
 
-<span class="doccomment">/// Write number to string with custom options.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Returns a subslice of the input buffer containing the written bytes,</span>
-<span class="doccomment">/// starting from the same address in memory as the input slice.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * `FORMAT`  - Packed struct containing the number format.</span>
-<span class="doccomment">/// * `value`   - Number to serialize.</span>
-<span class="doccomment">/// * `bytes`   - Buffer to write number to.</span>
-<span class="doccomment">/// * `options` - Options to customize number parsing.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If the buffer is not be large enough to hold the serialized number,</span>
-<span class="doccomment">/// it will overflow the buffer unless the `safe` feature is enabled.</span>
-<span class="doccomment">/// Buffer overflows are severe security vulnerabilities, and therefore</span>
-<span class="doccomment">/// to ensure the function will not overwrite the buffer, provide a</span>
-<span class="doccomment">/// buffer with at least `{integer}::FORMATTED_SIZE` elements. If you</span>
-<span class="doccomment">/// are using custom digit precision control or exponent break points</span>
-<span class="doccomment">/// for writing floats, these constants may be insufficient to store</span>
-<span class="doccomment">/// the serialized number, and up to 1200 bytes may be required with</span>
-<span class="doccomment">/// radix support.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Panics</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If the provided `FORMAT` is not valid, the function may panic. Please</span>
-<span class="doccomment">/// ensure `is_valid()` is called prior to using the format, or checking</span>
-<span class="doccomment">/// its validity using a static assertion.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # pub fn main() {</span>
-<span class="doccomment">/// #[cfg(feature = &quot;write-floats&quot;)] {</span>
-<span class="doccomment">/// // import `BUFFER_SIZE` to get the maximum bytes written by the number.</span>
-<span class="doccomment">/// use lexical_core::BUFFER_SIZE;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut buffer = [0u8; BUFFER_SIZE];</span>
-<span class="doccomment">/// let float = 3.14159265359_f32;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// const FORMAT: u128 = lexical_core::format::STANDARD;</span>
-<span class="doccomment">/// let options = lexical_core::WriteFloatOptions::new();</span>
-<span class="doccomment">/// unsafe {</span>
-<span class="doccomment">///     lexical_core::write_with_options_unchecked::&lt;_, FORMAT&gt;(float, &amp;mut buffer, &amp;options);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// assert_eq!(&amp;buffer[0..9], b&quot;3.1415927&quot;);</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;write&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">write_with_options_unchecked</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">N</span>: <span class="ident">ToLexicalWithOptions</span>, <span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
-    <span class="ident">n</span>: <span class="ident">N</span>,
-    <span class="ident">bytes</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>],
-    <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">N::Options</span>,
-) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> [<span class="ident">u8</span>] {
-    <span class="comment">// SAFETY: safe if the provided buffer is large enough for the numerical string</span>
-    <span class="kw">unsafe</span> { <span class="ident">n</span>.<span class="ident">to_lexical_with_options_unchecked</span>::<span class="op">&lt;</span><span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">bytes</span>, <span class="ident">options</span>) }
+<span class="doccomment">/// Write number to string with custom options.
+///
+/// Returns a subslice of the input buffer containing the written bytes,
+/// starting from the same address in memory as the input slice.
+///
+/// * `FORMAT`  - Packed struct containing the number format.
+/// * `value`   - Number to serialize.
+/// * `bytes`   - Buffer to write number to.
+/// * `options` - Options to customize number parsing.
+///
+/// # Safety
+///
+/// If the buffer is not be large enough to hold the serialized number,
+/// it will overflow the buffer unless the `safe` feature is enabled.
+/// Buffer overflows are severe security vulnerabilities, and therefore
+/// to ensure the function will not overwrite the buffer, provide a
+/// buffer with at least `{integer}::FORMATTED_SIZE` elements. If you
+/// are using custom digit precision control or exponent break points
+/// for writing floats, these constants may be insufficient to store
+/// the serialized number, and up to 1200 bytes may be required with
+/// radix support.
+///
+/// # Panics
+///
+/// If the provided `FORMAT` is not valid, the function may panic. Please
+/// ensure `is_valid()` is called prior to using the format, or checking
+/// its validity using a static assertion.
+///
+/// # Example
+///
+/// ```
+/// # pub fn main() {
+/// #[cfg(feature = &quot;write-floats&quot;)] {
+/// // import `BUFFER_SIZE` to get the maximum bytes written by the number.
+/// use lexical_core::BUFFER_SIZE;
+///
+/// let mut buffer = [0u8; BUFFER_SIZE];
+/// let float = 3.14159265359_f32;
+///
+/// const FORMAT: u128 = lexical_core::format::STANDARD;
+/// let options = lexical_core::WriteFloatOptions::new();
+/// unsafe {
+///     lexical_core::write_with_options_unchecked::&lt;_, FORMAT&gt;(float, &amp;mut buffer, &amp;options);
+/// }
+///
+/// assert_eq!(&amp;buffer[0..9], b&quot;3.1415927&quot;);
+/// # }
+/// # }
+/// ```
+</span><span class="attribute">#[inline]
+#[cfg(feature = <span class="string">&quot;write&quot;</span>)]
+</span><span class="kw">pub unsafe fn </span>write_with_options_unchecked&lt;<span class="lifetime">&#39;a</span>, N: ToLexicalWithOptions, <span class="kw">const </span>FORMAT: u128&gt;(
+    n: N,
+    bytes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8],
+    options: <span class="kw-2">&amp;</span>N::Options,
+) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>[u8] {
+    <span class="comment">// SAFETY: safe if the provided buffer is large enough for the numerical string
+    </span><span class="kw">unsafe </span>{ n.to_lexical_with_options_unchecked::&lt;FORMAT&gt;(bytes, options) }
 }
 
-<span class="doccomment">/// Parse complete number from string.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This method parses the entire string, returning an error if</span>
-<span class="doccomment">/// any invalid digits are found during parsing.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * `bytes`   - Byte slice containing a numeric string.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # pub fn main() {</span>
-<span class="doccomment">/// #[cfg(feature = &quot;parse-floats&quot;)] {</span>
-<span class="doccomment">/// let string = &quot;3.14159265359&quot;;</span>
-<span class="doccomment">/// let result = lexical_core::parse::&lt;f32&gt;(string.as_bytes());</span>
-<span class="doccomment">/// assert_eq!(result, Ok(3.14159265359_f32));</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parse&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">FromLexical</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
-    <span class="ident">N::from_lexical</span>(<span class="ident">bytes</span>)
+<span class="doccomment">/// Parse complete number from string.
+///
+/// This method parses the entire string, returning an error if
+/// any invalid digits are found during parsing.
+///
+/// * `bytes`   - Byte slice containing a numeric string.
+///
+/// # Example
+///
+/// ```
+/// # pub fn main() {
+/// #[cfg(feature = &quot;parse-floats&quot;)] {
+/// let string = &quot;3.14159265359&quot;;
+/// let result = lexical_core::parse::&lt;f32&gt;(string.as_bytes());
+/// assert_eq!(result, Ok(3.14159265359_f32));
+/// # }
+/// # }
+/// ```
+</span><span class="attribute">#[inline]
+#[cfg(feature = <span class="string">&quot;parse&quot;</span>)]
+</span><span class="kw">pub fn </span>parse&lt;N: FromLexical&gt;(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;N&gt; {
+    N::from_lexical(bytes)
 }
 
-<span class="doccomment">/// Parse partial number from string.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This method parses until an invalid digit is found (or the end</span>
-<span class="doccomment">/// of the string), returning the number of processed digits</span>
-<span class="doccomment">/// and the parsed value until that point.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * `bytes`   - Byte slice containing a numeric string.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # pub fn main() {</span>
-<span class="doccomment">/// #[cfg(feature = &quot;parse-floats&quot;)] {</span>
-<span class="doccomment">/// let string = &quot;3.14159265359 hello&quot;;</span>
-<span class="doccomment">/// let result = lexical_core::parse_partial::&lt;f32&gt;(string.as_bytes());</span>
-<span class="doccomment">/// assert_eq!(result, Ok((3.14159265359_f32, 13)));</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parse&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_partial</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">FromLexical</span><span class="op">&gt;</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">N</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
-    <span class="ident">N::from_lexical_partial</span>(<span class="ident">bytes</span>)
+<span class="doccomment">/// Parse partial number from string.
+///
+/// This method parses until an invalid digit is found (or the end
+/// of the string), returning the number of processed digits
+/// and the parsed value until that point.
+///
+/// * `bytes`   - Byte slice containing a numeric string.
+///
+/// # Example
+///
+/// ```
+/// # pub fn main() {
+/// #[cfg(feature = &quot;parse-floats&quot;)] {
+/// let string = &quot;3.14159265359 hello&quot;;
+/// let result = lexical_core::parse_partial::&lt;f32&gt;(string.as_bytes());
+/// assert_eq!(result, Ok((3.14159265359_f32, 13)));
+/// # }
+/// # }
+/// ```
+</span><span class="attribute">#[inline]
+#[cfg(feature = <span class="string">&quot;parse&quot;</span>)]
+</span><span class="kw">pub fn </span>parse_partial&lt;N: FromLexical&gt;(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;(N, usize)&gt; {
+    N::from_lexical_partial(bytes)
 }
 
-<span class="doccomment">/// Parse complete number from string with custom parsing options.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This method parses the entire string, returning an error if</span>
-<span class="doccomment">/// any invalid digits are found during parsing.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * `FORMAT`  - Packed struct containing the number format.</span>
-<span class="doccomment">/// * `bytes`   - Byte slice containing a numeric string.</span>
-<span class="doccomment">/// * `options` - Options to customize number parsing.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # pub fn main() {</span>
-<span class="doccomment">/// #[cfg(all(feature = &quot;parse-floats&quot;, feature = &quot;format&quot;))] {</span>
-<span class="doccomment">/// const JSON: u128 = lexical_core::format::JSON;</span>
-<span class="doccomment">/// let options = lexical_core::ParseFloatOptions::new();</span>
-<span class="doccomment">/// let string = &quot;3.14159265359&quot;;</span>
-<span class="doccomment">/// let result = lexical_core::parse_with_options::&lt;f32, JSON&gt;(string.as_bytes(), &amp;options);</span>
-<span class="doccomment">/// assert_eq!(result, Ok(3.14159265359_f32));</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parse&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_with_options</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">FromLexicalWithOptions</span>, <span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
-    <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">N::Options</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span> {
-    <span class="ident">N::from_lexical_with_options</span>::<span class="op">&lt;</span><span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">bytes</span>, <span class="ident">options</span>)
+<span class="doccomment">/// Parse complete number from string with custom parsing options.
+///
+/// This method parses the entire string, returning an error if
+/// any invalid digits are found during parsing.
+///
+/// * `FORMAT`  - Packed struct containing the number format.
+/// * `bytes`   - Byte slice containing a numeric string.
+/// * `options` - Options to customize number parsing.
+///
+/// # Example
+///
+/// ```
+/// # pub fn main() {
+/// #[cfg(all(feature = &quot;parse-floats&quot;, feature = &quot;format&quot;))] {
+/// const JSON: u128 = lexical_core::format::JSON;
+/// let options = lexical_core::ParseFloatOptions::new();
+/// let string = &quot;3.14159265359&quot;;
+/// let result = lexical_core::parse_with_options::&lt;f32, JSON&gt;(string.as_bytes(), &amp;options);
+/// assert_eq!(result, Ok(3.14159265359_f32));
+/// # }
+/// # }
+/// ```
+</span><span class="attribute">#[inline]
+#[cfg(feature = <span class="string">&quot;parse&quot;</span>)]
+</span><span class="kw">pub fn </span>parse_with_options&lt;N: FromLexicalWithOptions, <span class="kw">const </span>FORMAT: u128&gt;(
+    bytes: <span class="kw-2">&amp;</span>[u8],
+    options: <span class="kw-2">&amp;</span>N::Options,
+) -&gt; <span class="prelude-ty">Result</span>&lt;N&gt; {
+    N::from_lexical_with_options::&lt;FORMAT&gt;(bytes, options)
 }
 
-<span class="doccomment">/// Parse partial number from string with custom parsing options.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This method parses until an invalid digit is found (or the end</span>
-<span class="doccomment">/// of the string), returning the number of processed digits</span>
-<span class="doccomment">/// and the parsed value until that point.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// * `FORMAT`  - Packed struct containing the number format.</span>
-<span class="doccomment">/// * `bytes`   - Byte slice containing a numeric string.</span>
-<span class="doccomment">/// * `options` - Options to customize number parsing.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # pub fn main() {</span>
-<span class="doccomment">/// #[cfg(all(feature = &quot;parse-floats&quot;, feature = &quot;format&quot;))] {</span>
-<span class="doccomment">/// const JSON: u128 = lexical_core::format::JSON;</span>
-<span class="doccomment">/// let options = lexical_core::ParseFloatOptions::new();</span>
-<span class="doccomment">/// let string = &quot;3.14159265359 hello&quot;;</span>
-<span class="doccomment">/// let result = lexical_core::parse_partial_with_options::&lt;f32, JSON&gt;(string.as_bytes(), &amp;options);</span>
-<span class="doccomment">/// assert_eq!(result, Ok((3.14159265359_f32, 13)));</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;parse&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_partial_with_options</span><span class="op">&lt;</span><span class="ident">N</span>: <span class="ident">FromLexicalWithOptions</span>, <span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
-    <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">N::Options</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">N</span>, <span class="ident">usize</span>)<span class="op">&gt;</span> {
-    <span class="ident">N::from_lexical_partial_with_options</span>::<span class="op">&lt;</span><span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">bytes</span>, <span class="ident">options</span>)
+<span class="doccomment">/// Parse partial number from string with custom parsing options.
+///
+/// This method parses until an invalid digit is found (or the end
+/// of the string), returning the number of processed digits
+/// and the parsed value until that point.
+///
+/// * `FORMAT`  - Packed struct containing the number format.
+/// * `bytes`   - Byte slice containing a numeric string.
+/// * `options` - Options to customize number parsing.
+///
+/// # Example
+///
+/// ```
+/// # pub fn main() {
+/// #[cfg(all(feature = &quot;parse-floats&quot;, feature = &quot;format&quot;))] {
+/// const JSON: u128 = lexical_core::format::JSON;
+/// let options = lexical_core::ParseFloatOptions::new();
+/// let string = &quot;3.14159265359 hello&quot;;
+/// let result = lexical_core::parse_partial_with_options::&lt;f32, JSON&gt;(string.as_bytes(), &amp;options);
+/// assert_eq!(result, Ok((3.14159265359_f32, 13)));
+/// # }
+/// # }
+/// ```
+</span><span class="attribute">#[inline]
+#[cfg(feature = <span class="string">&quot;parse&quot;</span>)]
+</span><span class="kw">pub fn </span>parse_partial_with_options&lt;N: FromLexicalWithOptions, <span class="kw">const </span>FORMAT: u128&gt;(
+    bytes: <span class="kw-2">&amp;</span>[u8],
+    options: <span class="kw-2">&amp;</span>N::Options,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(N, usize)&gt; {
+    N::from_lexical_partial_with_options::&lt;FORMAT&gt;(bytes, options)
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_core" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

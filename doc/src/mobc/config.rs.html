@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mobc-711820eed980cd14/80462c4/src/config.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>config.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mobc/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mobc/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mobc/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/git/checkouts/mobc-711820eed980cd14/80462c4/src/config.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>config.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../mobc/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../mobc/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../mobc/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -260,267 +260,267 @@
 <span id="260">260</span>
 <span id="261">261</span>
 <span id="262">262</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::metrics_utils::describe_metrics</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Manager</span>, <span class="ident">Pool</span>};
-<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
-<span class="kw">use</span> <span class="ident">std::time::Duration</span>;
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::metrics_utils::describe_metrics;
+<span class="kw">use crate</span>::{Manager, Pool};
+<span class="kw">use </span>std::marker::PhantomData;
+<span class="kw">use </span>std::time::Duration;
 
-<span class="kw">const</span> <span class="ident">DEFAULT_MAX_IDLE_CONNS</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">2</span>;
-<span class="kw">const</span> <span class="ident">DEFAULT_MAX_OPEN_CONNS</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">10</span>;
-<span class="kw">const</span> <span class="ident">DEFAULT_BAD_CONN_RETRIES</span>: <span class="ident">u32</span> <span class="op">=</span> <span class="number">2</span>;
+<span class="kw">const </span>DEFAULT_MAX_IDLE_CONNS: u64 = <span class="number">2</span>;
+<span class="kw">const </span>DEFAULT_MAX_OPEN_CONNS: u64 = <span class="number">10</span>;
+<span class="kw">const </span>DEFAULT_BAD_CONN_RETRIES: u32 = <span class="number">2</span>;
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Config</span> {
-    <span class="kw">pub</span> <span class="ident">max_open</span>: <span class="ident">u64</span>,
-    <span class="kw">pub</span> <span class="ident">max_idle</span>: <span class="ident">u64</span>,
-    <span class="kw">pub</span> <span class="ident">max_lifetime</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">max_idle_lifetime</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">clean_rate</span>: <span class="ident">Duration</span>,
-    <span class="kw">pub</span> <span class="ident">max_bad_conn_retries</span>: <span class="ident">u32</span>,
-    <span class="kw">pub</span> <span class="ident">get_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">health_check_interval</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">health_check</span>: <span class="ident">bool</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Config {
+    <span class="kw">pub </span>max_open: u64,
+    <span class="kw">pub </span>max_idle: u64,
+    <span class="kw">pub </span>max_lifetime: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    <span class="kw">pub </span>max_idle_lifetime: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    <span class="kw">pub </span>clean_rate: Duration,
+    <span class="kw">pub </span>max_bad_conn_retries: u32,
+    <span class="kw">pub </span>get_timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    <span class="kw">pub </span>health_check_interval: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    <span class="kw">pub </span>health_check: bool,
 }
 
-<span class="kw">impl</span> <span class="ident">Config</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">split</span>(<span class="self">self</span>) -&gt; (<span class="ident">ShareConfig</span>, <span class="ident">InternalConfig</span>) {
-        <span class="kw">let</span> <span class="ident">share</span> <span class="op">=</span> <span class="ident">ShareConfig</span> {
-            <span class="ident">clean_rate</span>: <span class="self">self</span>.<span class="ident">clean_rate</span>,
-            <span class="ident">max_bad_conn_retries</span>: <span class="self">self</span>.<span class="ident">max_bad_conn_retries</span>,
-            <span class="ident">get_timeout</span>: <span class="self">self</span>.<span class="ident">get_timeout</span>,
-            <span class="ident">health_check</span>: <span class="self">self</span>.<span class="ident">health_check</span>,
-            <span class="ident">health_check_interval</span>: <span class="self">self</span>.<span class="ident">health_check_interval</span>,
+<span class="kw">impl </span>Config {
+    <span class="kw">pub fn </span>split(<span class="self">self</span>) -&gt; (ShareConfig, InternalConfig) {
+        <span class="kw">let </span>share = ShareConfig {
+            clean_rate: <span class="self">self</span>.clean_rate,
+            max_bad_conn_retries: <span class="self">self</span>.max_bad_conn_retries,
+            get_timeout: <span class="self">self</span>.get_timeout,
+            health_check: <span class="self">self</span>.health_check,
+            health_check_interval: <span class="self">self</span>.health_check_interval,
         };
 
-        <span class="kw">let</span> <span class="ident">internal</span> <span class="op">=</span> <span class="ident">InternalConfig</span> {
-            <span class="ident">max_open</span>: <span class="self">self</span>.<span class="ident">max_open</span>,
-            <span class="ident">max_idle</span>: <span class="self">self</span>.<span class="ident">max_idle</span>,
-            <span class="ident">max_lifetime</span>: <span class="self">self</span>.<span class="ident">max_lifetime</span>,
-            <span class="ident">max_idle_lifetime</span>: <span class="self">self</span>.<span class="ident">max_idle_lifetime</span>,
+        <span class="kw">let </span>internal = InternalConfig {
+            max_open: <span class="self">self</span>.max_open,
+            max_idle: <span class="self">self</span>.max_idle,
+            max_lifetime: <span class="self">self</span>.max_lifetime,
+            max_idle_lifetime: <span class="self">self</span>.max_idle_lifetime,
         };
 
-        (<span class="ident">share</span>, <span class="ident">internal</span>)
+        (share, internal)
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ShareConfig</span> {
-    <span class="kw">pub</span> <span class="ident">clean_rate</span>: <span class="ident">Duration</span>,
-    <span class="kw">pub</span> <span class="ident">max_bad_conn_retries</span>: <span class="ident">u32</span>,
-    <span class="kw">pub</span> <span class="ident">get_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">health_check</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span> <span class="ident">health_check_interval</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>ShareConfig {
+    <span class="kw">pub </span>clean_rate: Duration,
+    <span class="kw">pub </span>max_bad_conn_retries: u32,
+    <span class="kw">pub </span>get_timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    <span class="kw">pub </span>health_check: bool,
+    <span class="kw">pub </span>health_check_interval: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">InternalConfig</span> {
-    <span class="kw">pub</span> <span class="ident">max_open</span>: <span class="ident">u64</span>,
-    <span class="kw">pub</span> <span class="ident">max_idle</span>: <span class="ident">u64</span>,
-    <span class="kw">pub</span> <span class="ident">max_lifetime</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">max_idle_lifetime</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>InternalConfig {
+    <span class="kw">pub </span>max_open: u64,
+    <span class="kw">pub </span>max_idle: u64,
+    <span class="kw">pub </span>max_lifetime: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    <span class="kw">pub </span>max_idle_lifetime: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
 }
 
-<span class="doccomment">/// A builder for a connection pool.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Builder</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-    <span class="ident">max_open</span>: <span class="ident">u64</span>,
-    <span class="ident">max_idle</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="ident">max_lifetime</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="ident">max_idle_lifetime</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="ident">clean_rate</span>: <span class="ident">Duration</span>,
-    <span class="ident">max_bad_conn_retries</span>: <span class="ident">u32</span>,
-    <span class="ident">get_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="ident">health_check_interval</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
-    <span class="ident">health_check</span>: <span class="ident">bool</span>,
-    <span class="ident">_keep</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A builder for a connection pool.
+</span><span class="kw">pub struct </span>Builder&lt;M&gt; {
+    max_open: u64,
+    max_idle: <span class="prelude-ty">Option</span>&lt;u64&gt;,
+    max_lifetime: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    max_idle_lifetime: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    clean_rate: Duration,
+    max_bad_conn_retries: u32,
+    get_timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    health_check_interval: <span class="prelude-ty">Option</span>&lt;Duration&gt;,
+    health_check: bool,
+    _keep: PhantomData&lt;M&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Builder</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">max_open</span>: <span class="ident">DEFAULT_MAX_OPEN_CONNS</span>,
-            <span class="ident">max_idle</span>: <span class="prelude-val">None</span>,
-            <span class="ident">max_lifetime</span>: <span class="prelude-val">None</span>,
-            <span class="ident">max_idle_lifetime</span>: <span class="prelude-val">None</span>,
-            <span class="ident">clean_rate</span>: <span class="ident">Duration::from_secs</span>(<span class="number">1</span>),
-            <span class="ident">max_bad_conn_retries</span>: <span class="ident">DEFAULT_BAD_CONN_RETRIES</span>,
-            <span class="ident">get_timeout</span>: <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">30</span>)),
-            <span class="ident">_keep</span>: <span class="ident">PhantomData</span>,
-            <span class="ident">health_check</span>: <span class="bool-val">true</span>,
-            <span class="ident">health_check_interval</span>: <span class="prelude-val">None</span>,
+<span class="kw">impl</span>&lt;M&gt; Default <span class="kw">for </span>Builder&lt;M&gt; {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            max_open: DEFAULT_MAX_OPEN_CONNS,
+            max_idle: <span class="prelude-val">None</span>,
+            max_lifetime: <span class="prelude-val">None</span>,
+            max_idle_lifetime: <span class="prelude-val">None</span>,
+            clean_rate: Duration::from_secs(<span class="number">1</span>),
+            max_bad_conn_retries: DEFAULT_BAD_CONN_RETRIES,
+            get_timeout: <span class="prelude-val">Some</span>(Duration::from_secs(<span class="number">30</span>)),
+            _keep: PhantomData,
+            health_check: <span class="bool-val">true</span>,
+            health_check_interval: <span class="prelude-val">None</span>,
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">M</span>: <span class="ident">Manager</span><span class="op">&gt;</span> <span class="ident">Builder</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Constructs a new `Builder`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Parameters are initialized with their default values.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">Default::default</span>()
+<span class="kw">impl</span>&lt;M: Manager&gt; Builder&lt;M&gt; {
+    <span class="doccomment">/// Constructs a new `Builder`.
+    ///
+    /// Parameters are initialized with their default values.
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        Default::default()
     }
 
-    <span class="doccomment">/// Sets the maximum number of connections managed by the pool.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - 0 means unlimited.</span>
-    <span class="doccomment">/// - Defaults to 10.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_open</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_open</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">max_open</span> <span class="op">=</span> <span class="ident">max_open</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the maximum number of connections managed by the pool.
+    ///
+    /// - 0 means unlimited.
+    /// - Defaults to 10.
+    </span><span class="kw">pub fn </span>max_open(<span class="kw-2">mut </span><span class="self">self</span>, max_open: u64) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.max_open = max_open;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the maximum idle connection count maintained by the pool.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The pool will maintain at most this many idle connections</span>
-    <span class="doccomment">/// at all times, while respecting the value of `max_open`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - Defaults to 2.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_idle</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_idle</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">max_idle</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">max_idle</span>);
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// Sets the maximum idle connection count maintained by the pool.
+    ///
+    /// The pool will maintain at most this many idle connections
+    /// at all times, while respecting the value of `max_open`.
+    ///
+    /// - Defaults to 2.
+    </span><span class="kw">pub fn </span>max_idle(<span class="kw-2">mut </span><span class="self">self</span>, max_idle: u64) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.max_idle = <span class="prelude-val">Some</span>(max_idle);
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// If true, the health of a connection will be verified via a call to</span>
-    <span class="doccomment">/// `Manager::check` before it is checked out of the pool.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - Defaults to true.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">test_on_check_out</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">health_check</span>: <span class="ident">bool</span>) -&gt; <span class="ident">Builder</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">health_check</span> <span class="op">=</span> <span class="ident">health_check</span>;
-        <span class="self">self</span>
-    }
+    <span class="doccomment">/// If true, the health of a connection will be verified via a call to
+    /// `Manager::check` before it is checked out of the pool.
+    ///
+    /// - Defaults to true.
+    </span><span class="kw">pub fn </span>test_on_check_out(<span class="kw-2">mut </span><span class="self">self</span>, health_check: bool) -&gt; Builder&lt;M&gt; {
+        <span class="self">self</span>.health_check = health_check;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the maximum lifetime of connections in the pool.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Expired connections may be closed lazily before reuse.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - `None` means reuse forever.</span>
-    <span class="doccomment">/// - Defaults to `None`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if `max_lifetime` is the zero `Duration`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_lifetime</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_lifetime</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+    <span class="doccomment">/// Sets the maximum lifetime of connections in the pool.
+    ///
+    /// Expired connections may be closed lazily before reuse.
+    ///
+    /// - `None` means reuse forever.
+    /// - Defaults to `None`.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `max_lifetime` is the zero `Duration`.
+    </span><span class="kw">pub fn </span>max_lifetime(<span class="kw-2">mut </span><span class="self">self</span>, max_lifetime: <span class="prelude-ty">Option</span>&lt;Duration&gt;) -&gt; <span class="self">Self </span>{
         <span class="macro">assert_ne!</span>(
-            <span class="ident">max_lifetime</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">0</span>)),
-            <span class="string">&quot;max_lifetime must be positive&quot;</span>
-        );
-        <span class="self">self</span>.<span class="ident">max_lifetime</span> <span class="op">=</span> <span class="ident">max_lifetime</span>;
-        <span class="self">self</span>
-    }
+            max_lifetime,
+            <span class="prelude-val">Some</span>(Duration::from_secs(<span class="number">0</span>)),
+            <span class="string">&quot;max_lifetime must be positive&quot;
+        </span>);
+        <span class="self">self</span>.max_lifetime = max_lifetime;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the maximum lifetime of connection to be idle in the pool,</span>
-    <span class="doccomment">/// resetting the timer when connection is used.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Expired connections may be closed lazily before reuse.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - `None` means reuse forever.</span>
-    <span class="doccomment">/// - Defaults to `None`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if `max_idle_lifetime` is the zero `Duration`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_idle_lifetime</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">max_idle_lifetime</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+    <span class="doccomment">/// Sets the maximum lifetime of connection to be idle in the pool,
+    /// resetting the timer when connection is used.
+    ///
+    /// Expired connections may be closed lazily before reuse.
+    ///
+    /// - `None` means reuse forever.
+    /// - Defaults to `None`.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `max_idle_lifetime` is the zero `Duration`.
+    </span><span class="kw">pub fn </span>max_idle_lifetime(<span class="kw-2">mut </span><span class="self">self</span>, max_idle_lifetime: <span class="prelude-ty">Option</span>&lt;Duration&gt;) -&gt; <span class="self">Self </span>{
         <span class="macro">assert_ne!</span>(
-            <span class="ident">max_idle_lifetime</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">0</span>)),
-            <span class="string">&quot;max_idle_lifetime must be positive&quot;</span>
-        );
-        <span class="self">self</span>.<span class="ident">max_idle_lifetime</span> <span class="op">=</span> <span class="ident">max_idle_lifetime</span>;
-        <span class="self">self</span>
-    }
+            max_idle_lifetime,
+            <span class="prelude-val">Some</span>(Duration::from_secs(<span class="number">0</span>)),
+            <span class="string">&quot;max_idle_lifetime must be positive&quot;
+        </span>);
+        <span class="self">self</span>.max_idle_lifetime = max_idle_lifetime;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the get timeout used by the pool.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Calls to `Pool::get` will wait this long for a connection to become</span>
-    <span class="doccomment">/// available before returning an error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - `None` means never timeout.</span>
-    <span class="doccomment">/// - Defaults to 30 seconds.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if `connection_timeout` is the zero duration</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_timeout</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">get_timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+    <span class="doccomment">/// Sets the get timeout used by the pool.
+    ///
+    /// Calls to `Pool::get` will wait this long for a connection to become
+    /// available before returning an error.
+    ///
+    /// - `None` means never timeout.
+    /// - Defaults to 30 seconds.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `connection_timeout` is the zero duration
+    </span><span class="kw">pub fn </span>get_timeout(<span class="kw-2">mut </span><span class="self">self</span>, get_timeout: <span class="prelude-ty">Option</span>&lt;Duration&gt;) -&gt; <span class="self">Self </span>{
         <span class="macro">assert_ne!</span>(
-            <span class="ident">get_timeout</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">0</span>)),
-            <span class="string">&quot;get_timeout must be positive&quot;</span>
-        );
+            get_timeout,
+            <span class="prelude-val">Some</span>(Duration::from_secs(<span class="number">0</span>)),
+            <span class="string">&quot;get_timeout must be positive&quot;
+        </span>);
 
-        <span class="self">self</span>.<span class="ident">get_timeout</span> <span class="op">=</span> <span class="ident">get_timeout</span>;
-        <span class="self">self</span>
-    }
+        <span class="self">self</span>.get_timeout = get_timeout;
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Sets the interval how often a connection will be checked when returning</span>
-    <span class="doccomment">/// an existing connection from the pool. If set to `None`, a connection is</span>
-    <span class="doccomment">/// checked every time when returning from the pool. Must be used together</span>
-    <span class="doccomment">/// with [`test_on_check_out`] set to `true`, otherwise does nothing.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - `None` means a connection is checked every time when returning from the</span>
-    <span class="doccomment">///   pool.</span>
-    <span class="doccomment">/// - Defaults to `None`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if `connection_timeout` is the zero duration</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`test_on_check_out`]: #method.test_on_check_out</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">health_check_interval</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">health_check_interval</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
+    <span class="doccomment">/// Sets the interval how often a connection will be checked when returning
+    /// an existing connection from the pool. If set to `None`, a connection is
+    /// checked every time when returning from the pool. Must be used together
+    /// with [`test_on_check_out`] set to `true`, otherwise does nothing.
+    ///
+    /// - `None` means a connection is checked every time when returning from the
+    ///   pool.
+    /// - Defaults to `None`.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `connection_timeout` is the zero duration
+    ///
+    /// [`test_on_check_out`]: #method.test_on_check_out
+    </span><span class="kw">pub fn </span>health_check_interval(<span class="kw-2">mut </span><span class="self">self</span>, health_check_interval: <span class="prelude-ty">Option</span>&lt;Duration&gt;) -&gt; <span class="self">Self </span>{
         <span class="macro">assert_ne!</span>(
-            <span class="ident">health_check_interval</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">Duration::from_secs</span>(<span class="number">0</span>)),
-            <span class="string">&quot;health_check_interval must be positive&quot;</span>
-        );
+            health_check_interval,
+            <span class="prelude-val">Some</span>(Duration::from_secs(<span class="number">0</span>)),
+            <span class="string">&quot;health_check_interval must be positive&quot;
+        </span>);
 
-        <span class="self">self</span>.<span class="ident">health_check_interval</span> <span class="op">=</span> <span class="ident">health_check_interval</span>;
-        <span class="self">self</span>
-    }
-    <span class="comment">// used by tests</span>
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">clean_rate</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">clean_rate</span>: <span class="ident">Duration</span>) -&gt; <span class="ident">Builder</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.health_check_interval = health_check_interval;
+        <span class="self">self
+    </span>}
+    <span class="comment">// used by tests
+    </span><span class="attribute">#[doc(hidden)]
+    #[allow(dead_code)]
+    </span><span class="kw">pub fn </span>clean_rate(<span class="kw-2">mut </span><span class="self">self</span>, clean_rate: Duration) -&gt; Builder&lt;M&gt; {
         <span class="macro">assert!</span>(
-            <span class="ident">clean_rate</span> <span class="op">&gt;</span> <span class="ident">Duration::from_secs</span>(<span class="number">0</span>),
-            <span class="string">&quot;connection_timeout must be positive&quot;</span>
-        );
+            clean_rate &gt; Duration::from_secs(<span class="number">0</span>),
+            <span class="string">&quot;connection_timeout must be positive&quot;
+        </span>);
 
-        <span class="kw">if</span> <span class="ident">clean_rate</span> <span class="op">&gt;</span> <span class="ident">Duration::from_secs</span>(<span class="number">1</span>) {
-            <span class="self">self</span>.<span class="ident">clean_rate</span> <span class="op">=</span> <span class="ident">clean_rate</span>;
+        <span class="kw">if </span>clean_rate &gt; Duration::from_secs(<span class="number">1</span>) {
+            <span class="self">self</span>.clean_rate = clean_rate;
         }
 
-        <span class="self">self</span>
-    }
+        <span class="self">self
+    </span>}
 
-    <span class="doccomment">/// Consumes the builder, returning a new, initialized pool.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if `max_idle` is greater than `max_size`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">build</span>(<span class="self">self</span>, <span class="ident">manager</span>: <span class="ident">M</span>) -&gt; <span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span> {
-        <span class="kw">use</span> <span class="ident">std::cmp</span>;
+    <span class="doccomment">/// Consumes the builder, returning a new, initialized pool.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `max_idle` is greater than `max_size`.
+    </span><span class="kw">pub fn </span>build(<span class="self">self</span>, manager: M) -&gt; Pool&lt;M&gt; {
+        <span class="kw">use </span>std::cmp;
 
-        <span class="ident">describe_metrics</span>();
-        <span class="kw">let</span> <span class="ident">max_idle</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">max_idle</span>
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">cmp::min</span>(<span class="self">self</span>.<span class="ident">max_open</span>, <span class="ident">DEFAULT_MAX_IDLE_CONNS</span>));
+        describe_metrics();
+        <span class="kw">let </span>max_idle = <span class="self">self
+            </span>.max_idle
+            .unwrap_or_else(|| cmp::min(<span class="self">self</span>.max_open, DEFAULT_MAX_IDLE_CONNS));
 
         <span class="macro">assert!</span>(
-            <span class="self">self</span>.<span class="ident">max_open</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">max_idle</span>,
-            <span class="string">&quot;max_idle must be no larger than max_open&quot;</span>
-        );
+            <span class="self">self</span>.max_open &gt;= max_idle,
+            <span class="string">&quot;max_idle must be no larger than max_open&quot;
+        </span>);
 
-        <span class="kw">let</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">Config</span> {
-            <span class="ident">max_open</span>: <span class="self">self</span>.<span class="ident">max_open</span>,
-            <span class="ident">max_idle</span>,
-            <span class="ident">max_lifetime</span>: <span class="self">self</span>.<span class="ident">max_lifetime</span>,
-            <span class="ident">max_idle_lifetime</span>: <span class="self">self</span>.<span class="ident">max_idle_lifetime</span>,
-            <span class="ident">get_timeout</span>: <span class="self">self</span>.<span class="ident">get_timeout</span>,
-            <span class="ident">clean_rate</span>: <span class="self">self</span>.<span class="ident">clean_rate</span>,
-            <span class="ident">max_bad_conn_retries</span>: <span class="self">self</span>.<span class="ident">max_bad_conn_retries</span>,
-            <span class="ident">health_check</span>: <span class="self">self</span>.<span class="ident">health_check</span>,
-            <span class="ident">health_check_interval</span>: <span class="self">self</span>.<span class="ident">health_check_interval</span>,
+        <span class="kw">let </span>config = Config {
+            max_open: <span class="self">self</span>.max_open,
+            max_idle,
+            max_lifetime: <span class="self">self</span>.max_lifetime,
+            max_idle_lifetime: <span class="self">self</span>.max_idle_lifetime,
+            get_timeout: <span class="self">self</span>.get_timeout,
+            clean_rate: <span class="self">self</span>.clean_rate,
+            max_bad_conn_retries: <span class="self">self</span>.max_bad_conn_retries,
+            health_check: <span class="self">self</span>.health_check,
+            health_check_interval: <span class="self">self</span>.health_check_interval,
         };
 
-        <span class="ident">Pool::new_inner</span>(<span class="ident">manager</span>, <span class="ident">config</span>)
+        Pool::new_inner(manager, config)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mobc" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="mobc" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

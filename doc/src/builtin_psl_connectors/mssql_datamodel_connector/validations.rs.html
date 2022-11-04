@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/builtin-connectors/src/mssql_datamodel_connector/validations.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>validations.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../builtin_psl_connectors/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../builtin_psl_connectors/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../builtin_psl_connectors/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `psl/builtin-connectors/src/mssql_datamodel_connector/validations.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>validations.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../builtin_psl_connectors/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../builtin_psl_connectors/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../builtin_psl_connectors/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -69,71 +69,71 @@
 <span id="69">69</span>
 <span id="70">70</span>
 <span id="71">71</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::MsSqlType</span>;
-<span class="kw">use</span> <span class="ident">psl_core</span>::{
-    <span class="ident">datamodel_connector</span>::{<span class="ident">walker_ext_traits::ScalarFieldWalkerExt</span>, <span class="ident">Connector</span>},
-    <span class="ident">diagnostics</span>::{<span class="ident">DatamodelError</span>, <span class="ident">Diagnostics</span>},
-    <span class="ident">parser_database</span>::{
-        <span class="ident">walkers</span>::{<span class="ident">IndexWalker</span>, <span class="ident">PrimaryKeyWalker</span>},
-        <span class="ident">ScalarType</span>,
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::MsSqlType;
+<span class="kw">use </span>psl_core::{
+    datamodel_connector::{walker_ext_traits::ScalarFieldWalkerExt, Connector},
+    diagnostics::{DatamodelError, Diagnostics},
+    parser_database::{
+        walkers::{IndexWalker, PrimaryKeyWalker},
+        ScalarType,
     },
 };
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">index_uses_correct_field_types</span>(
-    <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>,
-    <span class="ident">index</span>: <span class="ident">IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>index_uses_correct_field_types(
+    connector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Connector,
+    index: IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
+    errors: <span class="kw-2">&amp;mut </span>Diagnostics,
 ) {
-    <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">index</span>.<span class="ident">fields</span>() {
-        <span class="kw">let</span> <span class="ident">native_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">field</span>.<span class="ident">native_type_instance</span>(<span class="ident">connector</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">native_type</span>) =&gt; <span class="ident">native_type</span>,
-            <span class="prelude-val">None</span> =&gt; <span class="kw">continue</span>,
+    <span class="kw">for </span>field <span class="kw">in </span>index.fields() {
+        <span class="kw">let </span>native_type = <span class="kw">match </span>field.native_type_instance(connector) {
+            <span class="prelude-val">Some</span>(native_type) =&gt; native_type,
+            <span class="prelude-val">None </span>=&gt; <span class="kw">continue</span>,
         };
 
-        <span class="kw">let</span> <span class="ident">r#type</span>: <span class="kw-2">&amp;</span><span class="ident">MsSqlType</span> <span class="op">=</span> <span class="ident">native_type</span>.<span class="ident">downcast_ref</span>();
+        <span class="kw">let </span>r#type: <span class="kw-2">&amp;</span>MsSqlType = native_type.downcast_ref();
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident"><span class="kw">super</span>::heap_allocated_types</span>().<span class="ident">contains</span>(<span class="ident">r#type</span>) {
+        <span class="kw">if </span>!<span class="kw">super</span>::heap_allocated_types().contains(r#type) {
             <span class="kw">continue</span>;
         }
 
-        <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">connector</span>.<span class="ident">native_instance_error</span>(<span class="kw-2">&amp;</span><span class="ident">native_type</span>);
+        <span class="kw">let </span>error = connector.native_instance_error(<span class="kw-2">&amp;</span>native_type);
 
-        <span class="kw">if</span> <span class="ident">index</span>.<span class="ident">is_unique</span>() {
-            <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">error</span>.<span class="ident">new_incompatible_native_type_with_unique</span>(<span class="string">&quot;&quot;</span>, <span class="ident">index</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>))
-        } <span class="kw">else</span> {
-            <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">error</span>.<span class="ident">new_incompatible_native_type_with_index</span>(<span class="string">&quot;&quot;</span>, <span class="ident">index</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>))
+        <span class="kw">if </span>index.is_unique() {
+            errors.push_error(error.new_incompatible_native_type_with_unique(<span class="string">&quot;&quot;</span>, index.ast_attribute().span))
+        } <span class="kw">else </span>{
+            errors.push_error(error.new_incompatible_native_type_with_index(<span class="string">&quot;&quot;</span>, index.ast_attribute().span))
         };
 
         <span class="kw">break</span>;
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">primary_key_uses_correct_field_types</span>(
-    <span class="ident">connector</span>: <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">Connector</span>,
-    <span class="ident">pk</span>: <span class="ident">PrimaryKeyWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">errors</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Diagnostics</span>,
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>primary_key_uses_correct_field_types(
+    connector: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Connector,
+    pk: PrimaryKeyWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
+    errors: <span class="kw-2">&amp;mut </span>Diagnostics,
 ) {
-    <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">pk</span>.<span class="ident">fields</span>() {
-        <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">pk</span>.<span class="ident">ast_attribute</span>().<span class="ident">span</span>;
+    <span class="kw">for </span>field <span class="kw">in </span>pk.fields() {
+        <span class="kw">let </span>span = pk.ast_attribute().span;
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">native_type</span>) <span class="op">=</span> <span class="ident">field</span>.<span class="ident">native_type_instance</span>(<span class="ident">connector</span>) {
-            <span class="kw">let</span> <span class="ident">r#type</span>: <span class="kw-2">&amp;</span><span class="ident">MsSqlType</span> <span class="op">=</span> <span class="ident">native_type</span>.<span class="ident">downcast_ref</span>();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(native_type) = field.native_type_instance(connector) {
+            <span class="kw">let </span>r#type: <span class="kw-2">&amp;</span>MsSqlType = native_type.downcast_ref();
 
-            <span class="kw">if</span> <span class="ident"><span class="kw">super</span>::heap_allocated_types</span>().<span class="ident">contains</span>(<span class="ident">r#type</span>) {
-                <span class="kw">let</span> <span class="ident">error</span> <span class="op">=</span> <span class="ident">connector</span>
-                    .<span class="ident">native_instance_error</span>(<span class="kw-2">&amp;</span><span class="ident">native_type</span>)
-                    .<span class="ident">new_incompatible_native_type_with_id</span>(<span class="string">&quot;&quot;</span>, <span class="ident">span</span>);
+            <span class="kw">if </span><span class="kw">super</span>::heap_allocated_types().contains(r#type) {
+                <span class="kw">let </span>error = connector
+                    .native_instance_error(<span class="kw-2">&amp;</span>native_type)
+                    .new_incompatible_native_type_with_id(<span class="string">&quot;&quot;</span>, span);
 
-                <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">error</span>);
+                errors.push_error(error);
 
                 <span class="kw">break</span>;
             }
         };
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ScalarType::Bytes</span>) <span class="op">=</span> <span class="ident">field</span>.<span class="ident">scalar_type</span>() {
-            <span class="ident">errors</span>.<span class="ident">push_error</span>(<span class="ident">DatamodelError::new_invalid_model_error</span>(
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(ScalarType::Bytes) = field.scalar_type() {
+            errors.push_error(DatamodelError::new_invalid_model_error(
                 <span class="string">&quot;Using Bytes type is not allowed in the model&#39;s id.&quot;</span>,
-                <span class="ident">span</span>,
+                span,
             ));
 
             <span class="kw">break</span>;
@@ -141,4 +141,4 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="builtin_psl_connectors" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="builtin_psl_connectors" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

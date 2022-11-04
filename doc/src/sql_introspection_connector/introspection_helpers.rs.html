@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/connectors/sql-introspection-connector/src/introspection_helpers.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>introspection_helpers.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_introspection_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/connectors/sql-introspection-connector/src/introspection_helpers.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>introspection_helpers.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_introspection_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_introspection_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -458,465 +458,465 @@
 <span id="458">458</span>
 <span id="459">459</span>
 <span id="460">460</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">calculate_datamodel::CalculateDatamodelContext</span> <span class="kw">as</span> <span class="ident">Context</span>, <span class="ident">SqlFamilyTrait</span>};
-<span class="kw">use</span> <span class="ident">psl</span>::{
-    <span class="ident">datamodel_connector::constraint_names::ConstraintNames</span>,
-    <span class="ident">dml</span>::{
-        <span class="ident">Datamodel</span>, <span class="ident">FieldArity</span>, <span class="ident">FieldType</span>, <span class="ident">IndexAlgorithm</span>, <span class="ident">IndexDefinition</span>, <span class="ident">IndexField</span>, <span class="ident">OperatorClass</span>, <span class="ident">ScalarField</span>,
-        <span class="ident">ScalarType</span>, <span class="ident">SortOrder</span>,
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{calculate_datamodel::CalculateDatamodelContext <span class="kw">as </span>Context, SqlFamilyTrait};
+<span class="kw">use </span>psl::{
+    datamodel_connector::constraint_names::ConstraintNames,
+    dml::{
+        Datamodel, FieldArity, FieldType, IndexAlgorithm, IndexDefinition, IndexField, OperatorClass, ScalarField,
+        ScalarType, SortOrder,
     },
-    <span class="ident">parser_database</span> <span class="kw">as</span> <span class="ident">db</span>,
-    <span class="ident">schema_ast::ast::WithDocumentation</span>,
-    <span class="ident">PreviewFeature</span>,
+    parser_database <span class="kw">as </span>db,
+    schema_ast::ast::WithDocumentation,
+    PreviewFeature,
 };
-<span class="kw">use</span> <span class="ident">sql::walkers</span>::{<span class="ident">ColumnWalker</span>, <span class="ident">TableWalker</span>};
-<span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{
-    <span class="self">self</span> <span class="kw">as</span> <span class="ident">sql</span>, <span class="ident">mssql::MssqlSchemaExt</span>, <span class="ident">postgres::PostgresSchemaExt</span>, <span class="ident">ColumnArity</span>, <span class="ident">ColumnTypeFamily</span>, <span class="ident">IndexType</span>,
-    <span class="ident">SQLSortOrder</span>, <span class="ident">SqlSchema</span>,
+<span class="kw">use </span>sql::walkers::{ColumnWalker, TableWalker};
+<span class="kw">use </span>sql_schema_describer::{
+    <span class="self">self </span><span class="kw">as </span>sql, mssql::MssqlSchemaExt, postgres::PostgresSchemaExt, ColumnArity, ColumnTypeFamily, IndexType,
+    SQLSortOrder, SqlSchema,
 };
-<span class="kw">use</span> <span class="ident">std::cmp</span>;
-<span class="kw">use</span> <span class="ident">tracing::debug</span>;
+<span class="kw">use </span>std::cmp;
+<span class="kw">use </span>tracing::debug;
 
-<span class="doccomment">/// This function implements the reverse behaviour of the `Ord` implementation for `Option`: it</span>
-<span class="doccomment">/// puts `None` values last, and otherwise orders `Some`s by their contents, like the `Ord` impl.</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">compare_options_none_last</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">cmp::Ord</span><span class="op">&gt;</span>(<span class="ident">a</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">b</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">cmp::Ordering</span> {
-    <span class="kw">match</span> (<span class="ident">a</span>, <span class="ident">b</span>) {
-        (<span class="prelude-val">Some</span>(<span class="ident">a</span>), <span class="prelude-val">Some</span>(<span class="ident">b</span>)) =&gt; <span class="ident">a</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">b</span>),
-        (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) =&gt; <span class="ident">cmp::Ordering::Less</span>,
-        (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; <span class="ident">cmp::Ordering::Greater</span>,
-        (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="ident">cmp::Ordering::Equal</span>,
+<span class="doccomment">/// This function implements the reverse behaviour of the `Ord` implementation for `Option`: it
+/// puts `None` values last, and otherwise orders `Some`s by their contents, like the `Ord` impl.
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>compare_options_none_last&lt;T: cmp::Ord&gt;(a: <span class="prelude-ty">Option</span>&lt;T&gt;, b: <span class="prelude-ty">Option</span>&lt;T&gt;) -&gt; cmp::Ordering {
+    <span class="kw">match </span>(a, b) {
+        (<span class="prelude-val">Some</span>(a), <span class="prelude-val">Some</span>(b)) =&gt; a.cmp(<span class="kw-2">&amp;</span>b),
+        (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) =&gt; cmp::Ordering::Less,
+        (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) =&gt; cmp::Ordering::Greater,
+        (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; cmp::Ordering::Equal,
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_old_migration_table</span>(<span class="ident">table</span>: <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-    <span class="ident">table</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="string">&quot;_Migration&quot;</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="string">&quot;revision&quot;</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="string">&quot;name&quot;</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="string">&quot;datamodel&quot;</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="string">&quot;status&quot;</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="string">&quot;applied&quot;</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="string">&quot;rolled_back&quot;</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="string">&quot;datamodel_steps&quot;</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="string">&quot;database_migration&quot;</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="string">&quot;errors&quot;</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="string">&quot;started_at&quot;</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="string">&quot;finished_at&quot;</span>)
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_old_migration_table(table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+    table.name() == <span class="string">&quot;_Migration&quot;
+        </span>&amp;&amp; table.columns().any(|c| c.name() == <span class="string">&quot;revision&quot;</span>)
+        &amp;&amp; table.columns().any(|c| c.name() == <span class="string">&quot;name&quot;</span>)
+        &amp;&amp; table.columns().any(|c| c.name() == <span class="string">&quot;datamodel&quot;</span>)
+        &amp;&amp; table.columns().any(|c| c.name() == <span class="string">&quot;status&quot;</span>)
+        &amp;&amp; table.columns().any(|c| c.name() == <span class="string">&quot;applied&quot;</span>)
+        &amp;&amp; table.columns().any(|c| c.name() == <span class="string">&quot;rolled_back&quot;</span>)
+        &amp;&amp; table.columns().any(|c| c.name() == <span class="string">&quot;datamodel_steps&quot;</span>)
+        &amp;&amp; table.columns().any(|c| c.name() == <span class="string">&quot;database_migration&quot;</span>)
+        &amp;&amp; table.columns().any(|c| c.name() == <span class="string">&quot;errors&quot;</span>)
+        &amp;&amp; table.columns().any(|c| c.name() == <span class="string">&quot;started_at&quot;</span>)
+        &amp;&amp; table.columns().any(|c| c.name() == <span class="string">&quot;finished_at&quot;</span>)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_new_migration_table</span>(<span class="ident">table</span>: <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-    <span class="ident">table</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="string">&quot;_prisma_migrations&quot;</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="string">&quot;id&quot;</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="string">&quot;checksum&quot;</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="string">&quot;finished_at&quot;</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="string">&quot;migration_name&quot;</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="string">&quot;logs&quot;</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="string">&quot;rolled_back_at&quot;</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="string">&quot;started_at&quot;</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="string">&quot;applied_steps_count&quot;</span>)
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_new_migration_table(table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+    table.name() == <span class="string">&quot;_prisma_migrations&quot;
+        </span>&amp;&amp; table.columns().any(|c| c.name() == <span class="string">&quot;id&quot;</span>)
+        &amp;&amp; table.columns().any(|c| c.name() == <span class="string">&quot;checksum&quot;</span>)
+        &amp;&amp; table.columns().any(|c| c.name() == <span class="string">&quot;finished_at&quot;</span>)
+        &amp;&amp; table.columns().any(|c| c.name() == <span class="string">&quot;migration_name&quot;</span>)
+        &amp;&amp; table.columns().any(|c| c.name() == <span class="string">&quot;logs&quot;</span>)
+        &amp;&amp; table.columns().any(|c| c.name() == <span class="string">&quot;rolled_back_at&quot;</span>)
+        &amp;&amp; table.columns().any(|c| c.name() == <span class="string">&quot;started_at&quot;</span>)
+        &amp;&amp; table.columns().any(|c| c.name() == <span class="string">&quot;applied_steps_count&quot;</span>)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_relay_table</span>(<span class="ident">table</span>: <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-    <span class="ident">table</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="string">&quot;_RelayId&quot;</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">column</span>(<span class="string">&quot;id&quot;</span>).<span class="ident">is_some</span>()
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>
-            .<span class="ident">columns</span>()
-            .<span class="ident">any</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">name</span>().<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;stablemodelidentifier&quot;</span>))
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_relay_table(table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+    table.name() == <span class="string">&quot;_RelayId&quot;
+        </span>&amp;&amp; table.column(<span class="string">&quot;id&quot;</span>).is_some()
+        &amp;&amp; table
+            .columns()
+            .any(|col| col.name().eq_ignore_ascii_case(<span class="string">&quot;stablemodelidentifier&quot;</span>))
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">has_created_at_and_updated_at</span>(<span class="ident">table</span>: <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">let</span> <span class="ident">has_created_at</span> <span class="op">=</span> <span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> {
-        <span class="ident">col</span>.<span class="ident">name</span>().<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;createdat&quot;</span>) <span class="op">&amp;&amp;</span> <span class="ident">col</span>.<span class="ident">column_type</span>().<span class="ident">family</span> <span class="op">==</span> <span class="ident">ColumnTypeFamily::DateTime</span>
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>has_created_at_and_updated_at(table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+    <span class="kw">let </span>has_created_at = table.columns().any(|col| {
+        col.name().eq_ignore_ascii_case(<span class="string">&quot;createdat&quot;</span>) &amp;&amp; col.column_type().family == ColumnTypeFamily::DateTime
     });
 
-    <span class="kw">let</span> <span class="ident">has_updated_at</span> <span class="op">=</span> <span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> {
-        <span class="ident">col</span>.<span class="ident">name</span>().<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;updatedat&quot;</span>) <span class="op">&amp;&amp;</span> <span class="ident">col</span>.<span class="ident">column_type</span>().<span class="ident">family</span> <span class="op">==</span> <span class="ident">ColumnTypeFamily::DateTime</span>
+    <span class="kw">let </span>has_updated_at = table.columns().any(|col| {
+        col.name().eq_ignore_ascii_case(<span class="string">&quot;updatedat&quot;</span>) &amp;&amp; col.column_type().family == ColumnTypeFamily::DateTime
     });
 
-    <span class="ident">has_created_at</span> <span class="op">&amp;&amp;</span> <span class="ident">has_updated_at</span>
+    has_created_at &amp;&amp; has_updated_at
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_prisma_join_table</span>(<span class="ident">t</span>: <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-    <span class="ident">is_prisma_1_point_0_join_table</span>(<span class="ident">t</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">is_prisma_1_point_1_or_2_join_table</span>(<span class="ident">t</span>)
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_prisma_join_table(t: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+    is_prisma_1_point_0_join_table(t) || is_prisma_1_point_1_or_2_join_table(t)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_prisma_1_or_11_list_table</span>(<span class="ident">table</span>: <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-    <span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">len</span>() <span class="op">==</span> <span class="number">3</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">name</span>().<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;nodeid&quot;</span>))
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">column</span>(<span class="string">&quot;position&quot;</span>).<span class="ident">is_some</span>()
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">column</span>(<span class="string">&quot;value&quot;</span>).<span class="ident">is_some</span>()
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_prisma_1_or_11_list_table(table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+    table.columns().len() == <span class="number">3
+        </span>&amp;&amp; table.columns().any(|col| col.name().eq_ignore_ascii_case(<span class="string">&quot;nodeid&quot;</span>))
+        &amp;&amp; table.column(<span class="string">&quot;position&quot;</span>).is_some()
+        &amp;&amp; table.column(<span class="string">&quot;value&quot;</span>).is_some()
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_prisma_1_point_1_or_2_join_table</span>(<span class="ident">table</span>: <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-    <span class="ident">table</span>.<span class="ident">name</span>();
-    <span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">len</span>() <span class="op">==</span> <span class="number">2</span> <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">indexes</span>().<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">2</span> <span class="op">&amp;&amp;</span> <span class="ident">common_prisma_m_to_n_relation_conditions</span>(<span class="ident">table</span>)
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_prisma_1_point_1_or_2_join_table(table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+    table.name();
+    table.columns().len() == <span class="number">2 </span>&amp;&amp; table.indexes().len() &gt;= <span class="number">2 </span>&amp;&amp; common_prisma_m_to_n_relation_conditions(table)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_prisma_1_point_0_join_table</span>(<span class="ident">table</span>: <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-    <span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">len</span>() <span class="op">==</span> <span class="number">3</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">indexes</span>().<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">2</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="string">&quot;id&quot;</span>)
-        <span class="op">&amp;&amp;</span> <span class="ident">common_prisma_m_to_n_relation_conditions</span>(<span class="ident">table</span>)
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_prisma_1_point_0_join_table(table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+    table.columns().len() == <span class="number">3
+        </span>&amp;&amp; table.indexes().len() &gt;= <span class="number">2
+        </span>&amp;&amp; table.columns().any(|c| c.name() == <span class="string">&quot;id&quot;</span>)
+        &amp;&amp; common_prisma_m_to_n_relation_conditions(table)
 }
 
-<span class="kw">fn</span> <span class="ident">common_prisma_m_to_n_relation_conditions</span>(<span class="ident">table</span>: <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">fn</span> <span class="ident">is_a</span>(<span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">column</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;a&quot;</span>)
+<span class="kw">fn </span>common_prisma_m_to_n_relation_conditions(table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; bool {
+    <span class="kw">fn </span>is_a(column: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        column.eq_ignore_ascii_case(<span class="string">&quot;a&quot;</span>)
     }
 
-    <span class="kw">fn</span> <span class="ident">is_b</span>(<span class="ident">column</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">bool</span> {
-        <span class="ident">column</span>.<span class="ident">eq_ignore_ascii_case</span>(<span class="string">&quot;b&quot;</span>)
+    <span class="kw">fn </span>is_b(column: <span class="kw-2">&amp;</span>str) -&gt; bool {
+        column.eq_ignore_ascii_case(<span class="string">&quot;b&quot;</span>)
     }
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fks</span> <span class="op">=</span> <span class="ident">table</span>.<span class="ident">foreign_keys</span>();
-    <span class="kw">let</span> <span class="ident">first_fk</span> <span class="op">=</span> <span class="ident">fks</span>.<span class="ident">next</span>();
-    <span class="kw">let</span> <span class="ident">second_fk</span> <span class="op">=</span> <span class="ident">fks</span>.<span class="ident">next</span>();
-    <span class="kw">let</span> <span class="ident">a_b_match</span> <span class="op">=</span> <span class="op">|</span><span class="op">|</span> {
-        <span class="kw">let</span> <span class="ident">first_fk</span> <span class="op">=</span> <span class="ident">first_fk</span>.<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">second_fk</span> <span class="op">=</span> <span class="ident">second_fk</span>.<span class="ident">unwrap</span>();
-        <span class="kw">let</span> <span class="ident">first_fk_col</span> <span class="op">=</span> <span class="ident">first_fk</span>.<span class="ident">constrained_columns</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">name</span>();
-        <span class="kw">let</span> <span class="ident">second_fk_col</span> <span class="op">=</span> <span class="ident">second_fk</span>.<span class="ident">constrained_columns</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">name</span>();
-        (<span class="ident">first_fk</span>.<span class="ident">referenced_table</span>().<span class="ident">name</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">second_fk</span>.<span class="ident">referenced_table</span>().<span class="ident">name</span>()
-            <span class="op">&amp;&amp;</span> <span class="ident">is_a</span>(<span class="ident">first_fk_col</span>)
-            <span class="op">&amp;&amp;</span> <span class="ident">is_b</span>(<span class="ident">second_fk_col</span>))
-            <span class="op">|</span><span class="op">|</span> (<span class="ident">second_fk</span>.<span class="ident">referenced_table</span>().<span class="ident">name</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">first_fk</span>.<span class="ident">referenced_table</span>().<span class="ident">name</span>()
-                <span class="op">&amp;&amp;</span> <span class="ident">is_b</span>(<span class="ident">first_fk_col</span>)
-                <span class="op">&amp;&amp;</span> <span class="ident">is_a</span>(<span class="ident">second_fk_col</span>))
+    <span class="kw">let </span><span class="kw-2">mut </span>fks = table.foreign_keys();
+    <span class="kw">let </span>first_fk = fks.next();
+    <span class="kw">let </span>second_fk = fks.next();
+    <span class="kw">let </span>a_b_match = || {
+        <span class="kw">let </span>first_fk = first_fk.unwrap();
+        <span class="kw">let </span>second_fk = second_fk.unwrap();
+        <span class="kw">let </span>first_fk_col = first_fk.constrained_columns().next().unwrap().name();
+        <span class="kw">let </span>second_fk_col = second_fk.constrained_columns().next().unwrap().name();
+        (first_fk.referenced_table().name() &lt;= second_fk.referenced_table().name()
+            &amp;&amp; is_a(first_fk_col)
+            &amp;&amp; is_b(second_fk_col))
+            || (second_fk.referenced_table().name() &lt;= first_fk.referenced_table().name()
+                &amp;&amp; is_b(first_fk_col)
+                &amp;&amp; is_a(second_fk_col))
     };
-    <span class="ident">table</span>.<span class="ident">name</span>().<span class="ident">starts_with</span>(<span class="string">&#39;_&#39;</span>)
-        <span class="comment">//UNIQUE INDEX [A,B]</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">indexes</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> {
-            <span class="ident">i</span>.<span class="ident">columns</span>().<span class="ident">len</span>() <span class="op">==</span> <span class="number">2</span>
-                <span class="op">&amp;&amp;</span> <span class="ident">is_a</span>(<span class="ident">i</span>.<span class="ident">columns</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">as_column</span>().<span class="ident">name</span>())
-                <span class="op">&amp;&amp;</span> <span class="ident">is_b</span>(<span class="ident">i</span>.<span class="ident">columns</span>().<span class="ident">nth</span>(<span class="number">1</span>).<span class="ident">unwrap</span>().<span class="ident">as_column</span>().<span class="ident">name</span>())
-                <span class="op">&amp;&amp;</span> <span class="ident">i</span>.<span class="ident">is_unique</span>()
+    table.name().starts_with(<span class="string">&#39;_&#39;</span>)
+        <span class="comment">//UNIQUE INDEX [A,B]
+        </span>&amp;&amp; table.indexes().any(|i| {
+            i.columns().len() == <span class="number">2
+                </span>&amp;&amp; is_a(i.columns().next().unwrap().as_column().name())
+                &amp;&amp; is_b(i.columns().nth(<span class="number">1</span>).unwrap().as_column().name())
+                &amp;&amp; i.is_unique()
         })
-    <span class="comment">//INDEX [B]</span>
-    <span class="op">&amp;&amp;</span> <span class="ident">table</span>
-        .<span class="ident">indexes</span>()
-        .<span class="ident">any</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">columns</span>().<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="ident">is_b</span>(<span class="ident">i</span>.<span class="ident">columns</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">as_column</span>().<span class="ident">name</span>()) <span class="op">&amp;&amp;</span> <span class="ident">i</span>.<span class="ident">index_type</span>() <span class="op">==</span> <span class="ident">IndexType::Normal</span>)
-        <span class="comment">// 2 FKs</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">table</span>.<span class="ident">foreign_keys</span>().<span class="ident">len</span>() <span class="op">==</span> <span class="number">2</span>
-        <span class="comment">// Lexicographically lower model referenced by A</span>
-        <span class="op">&amp;&amp;</span> <span class="ident">a_b_match</span>()
+    <span class="comment">//INDEX [B]
+    </span>&amp;&amp; table
+        .indexes()
+        .any(|i| i.columns().len() == <span class="number">1 </span>&amp;&amp; is_b(i.columns().next().unwrap().as_column().name()) &amp;&amp; i.index_type() == IndexType::Normal)
+        <span class="comment">// 2 FKs
+        </span>&amp;&amp; table.foreign_keys().len() == <span class="number">2
+        </span><span class="comment">// Lexicographically lower model referenced by A
+        </span>&amp;&amp; a_b_match()
 }
 
-<span class="comment">//calculators</span>
+<span class="comment">//calculators
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">calculate_index</span>(<span class="ident">index</span>: <span class="ident">sql::walkers::IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IndexDefinition</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">tpe</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">index</span>.<span class="ident">index_type</span>() {
-        <span class="ident">IndexType::Unique</span> =&gt; <span class="ident">psl::dml::IndexType::Unique</span>,
-        <span class="ident">IndexType::Normal</span> =&gt; <span class="ident">psl::dml::IndexType::Normal</span>,
-        <span class="ident">IndexType::Fulltext</span> <span class="kw">if</span> <span class="ident">ctx</span>.<span class="ident">config</span>.<span class="ident">preview_features</span>().<span class="ident">contains</span>(<span class="ident">PreviewFeature::FullTextIndex</span>) =&gt; {
-            <span class="ident">psl::dml::IndexType::Fulltext</span>
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>calculate_index(index: sql::walkers::IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;</span>Context) -&gt; <span class="prelude-ty">Option</span>&lt;IndexDefinition&gt; {
+    <span class="kw">let </span>tpe = <span class="kw">match </span>index.index_type() {
+        IndexType::Unique =&gt; psl::dml::IndexType::Unique,
+        IndexType::Normal =&gt; psl::dml::IndexType::Normal,
+        IndexType::Fulltext <span class="kw">if </span>ctx.config.preview_features().contains(PreviewFeature::FullTextIndex) =&gt; {
+            psl::dml::IndexType::Fulltext
         }
-        <span class="ident">IndexType::Fulltext</span> =&gt; <span class="ident">psl::dml::IndexType::Normal</span>,
-        <span class="ident">IndexType::PrimaryKey</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+        IndexType::Fulltext =&gt; psl::dml::IndexType::Normal,
+        IndexType::PrimaryKey =&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
     };
 
-    <span class="kw">let</span> <span class="ident">default_constraint_name</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">index</span>.<span class="ident">index_type</span>() {
-        <span class="ident">IndexType::Unique</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">index</span>.<span class="ident">column_names</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-            <span class="ident">ConstraintNames::unique_index_name</span>(<span class="ident">index</span>.<span class="ident">table</span>().<span class="ident">name</span>(), <span class="kw-2">&amp;</span><span class="ident">columns</span>, <span class="ident">ctx</span>.<span class="ident">active_connector</span>())
+    <span class="kw">let </span>default_constraint_name = <span class="kw">match </span>index.index_type() {
+        IndexType::Unique =&gt; {
+            <span class="kw">let </span>columns = index.column_names().collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+            ConstraintNames::unique_index_name(index.table().name(), <span class="kw-2">&amp;</span>columns, ctx.active_connector())
         }
-        <span class="kw">_</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">columns</span> <span class="op">=</span> <span class="ident">index</span>.<span class="ident">column_names</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-            <span class="ident">ConstraintNames::non_unique_index_name</span>(<span class="ident">index</span>.<span class="ident">table</span>().<span class="ident">name</span>(), <span class="kw-2">&amp;</span><span class="ident">columns</span>, <span class="ident">ctx</span>.<span class="ident">active_connector</span>())
+        <span class="kw">_ </span>=&gt; {
+            <span class="kw">let </span>columns = index.column_names().collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+            ConstraintNames::non_unique_index_name(index.table().name(), <span class="kw-2">&amp;</span>columns, ctx.active_connector())
         }
     };
 
-    <span class="kw">let</span> <span class="ident">db_name</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">index</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">default_constraint_name</span> {
-        <span class="prelude-val">None</span>
-    } <span class="kw">else</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">index</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>())
+    <span class="kw">let </span>db_name = <span class="kw">if </span>index.name() == default_constraint_name {
+        <span class="prelude-val">None
+    </span>} <span class="kw">else </span>{
+        <span class="prelude-val">Some</span>(index.name().to_owned())
     };
 
-    <span class="prelude-val">Some</span>(<span class="ident">IndexDefinition</span> {
-        <span class="ident">name</span>: <span class="prelude-val">None</span>,
-        <span class="ident">db_name</span>,
-        <span class="ident">fields</span>: <span class="ident">index</span>
-            .<span class="ident">columns</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">sort_order</span> <span class="op">=</span> <span class="ident">c</span>.<span class="ident">sort_order</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">sort</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">sort</span> {
-                    <span class="ident">SQLSortOrder::Asc</span> =&gt; <span class="prelude-val">None</span>,
-                    <span class="ident">SQLSortOrder::Desc</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">SortOrder::Desc</span>),
+    <span class="prelude-val">Some</span>(IndexDefinition {
+        name: <span class="prelude-val">None</span>,
+        db_name,
+        fields: index
+            .columns()
+            .map(|c| {
+                <span class="kw">let </span>sort_order = c.sort_order().and_then(|sort| <span class="kw">match </span>sort {
+                    SQLSortOrder::Asc =&gt; <span class="prelude-val">None</span>,
+                    SQLSortOrder::Desc =&gt; <span class="prelude-val">Some</span>(SortOrder::Desc),
                 });
 
-                <span class="kw">let</span> <span class="ident">operator_class</span> <span class="op">=</span> <span class="ident">get_opclass</span>(<span class="ident">c</span>.<span class="ident">id</span>, <span class="ident">index</span>.<span class="ident">schema</span>, <span class="ident">ctx</span>);
+                <span class="kw">let </span>operator_class = get_opclass(c.id, index.schema, ctx);
 
-                <span class="ident">IndexField</span> {
-                    <span class="ident">path</span>: <span class="macro">vec!</span>[(<span class="ident">ctx</span>.<span class="ident">column_prisma_name</span>(<span class="ident">c</span>.<span class="ident">as_column</span>().<span class="ident">id</span>).<span class="ident">to_owned</span>(), <span class="prelude-val">None</span>)],
-                    <span class="ident">sort_order</span>,
-                    <span class="ident">length</span>: <span class="ident">c</span>.<span class="ident">length</span>(),
-                    <span class="ident">operator_class</span>,
+                IndexField {
+                    path: <span class="macro">vec!</span>[(ctx.column_prisma_name(c.as_column().id).to_owned(), <span class="prelude-val">None</span>)],
+                    sort_order,
+                    length: c.length(),
+                    operator_class,
                 }
             })
-            .<span class="ident">collect</span>(),
-        <span class="ident">tpe</span>,
-        <span class="ident">defined_on_field</span>: <span class="ident">index</span>.<span class="ident">columns</span>().<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span>,
-        <span class="ident">algorithm</span>: <span class="ident">index_algorithm</span>(<span class="ident">index</span>, <span class="ident">ctx</span>),
-        <span class="ident">clustered</span>: <span class="ident">index_is_clustered</span>(<span class="ident">index</span>.<span class="ident">id</span>, <span class="ident">index</span>.<span class="ident">schema</span>, <span class="ident">ctx</span>),
+            .collect(),
+        tpe,
+        defined_on_field: index.columns().len() == <span class="number">1</span>,
+        algorithm: index_algorithm(index, ctx),
+        clustered: index_is_clustered(index.id, index.schema, ctx),
     })
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">calculate_scalar_field</span>(
-    <span class="ident">column</span>: <span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">remapped_fields</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident"><span class="kw">crate</span>::warnings::ModelAndField</span><span class="op">&gt;</span>,
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">ScalarField</span> {
-    <span class="kw">let</span> <span class="ident">existing_field</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">existing_scalar_field</span>(<span class="ident">column</span>.<span class="ident">id</span>);
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>calculate_scalar_field(
+    column: ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;,
+    remapped_fields: <span class="kw-2">&amp;mut </span>Vec&lt;<span class="kw">crate</span>::warnings::ModelAndField&gt;,
+    ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+) -&gt; ScalarField {
+    <span class="kw">let </span>existing_field = ctx.existing_scalar_field(column.id);
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">field</span>) <span class="op">=</span> <span class="ident">existing_field</span>.<span class="ident">filter</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">mapped_name</span>().<span class="ident">is_some</span>()) {
-        <span class="ident">remapped_fields</span>.<span class="ident">push</span>(<span class="ident"><span class="kw">crate</span>::warnings::ModelAndField</span> {
-            <span class="ident">model</span>: <span class="ident">field</span>.<span class="ident">model</span>().<span class="ident">name</span>().<span class="ident">to_owned</span>(),
-            <span class="ident">field</span>: <span class="ident">field</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>(),
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(field) = existing_field.filter(|f| f.mapped_name().is_some()) {
+        remapped_fields.push(<span class="kw">crate</span>::warnings::ModelAndField {
+            model: field.model().name().to_owned(),
+            field: field.name().to_owned(),
         });
     }
 
-    <span class="kw">let</span> <span class="ident">arity</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">column</span>.<span class="ident">column_type</span>().<span class="ident">arity</span> {
-        <span class="kw">_</span> <span class="kw">if</span> <span class="ident">column</span>.<span class="ident">is_single_primary_key</span>() <span class="op">&amp;&amp;</span> <span class="ident">column</span>.<span class="ident">is_autoincrement</span>() =&gt; <span class="ident">FieldArity::Required</span>,
-        <span class="ident">ColumnArity::Required</span> =&gt; <span class="ident">FieldArity::Required</span>,
-        <span class="ident">ColumnArity::Nullable</span> =&gt; <span class="ident">FieldArity::Optional</span>,
-        <span class="ident">ColumnArity::List</span> =&gt; <span class="ident">FieldArity::List</span>,
+    <span class="kw">let </span>arity = <span class="kw">match </span>column.column_type().arity {
+        <span class="kw">_ if </span>column.is_single_primary_key() &amp;&amp; column.is_autoincrement() =&gt; FieldArity::Required,
+        ColumnArity::Required =&gt; FieldArity::Required,
+        ColumnArity::Nullable =&gt; FieldArity::Optional,
+        ColumnArity::List =&gt; FieldArity::List,
     };
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">default_value</span> <span class="op">=</span> <span class="ident"><span class="kw">crate</span>::defaults::calculate_default</span>(<span class="ident">column</span>, <span class="ident">ctx</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>default_value = <span class="kw">crate</span>::defaults::calculate_default(column, ctx);
 
-    <span class="kw">let</span> <span class="ident">default_default_value</span> <span class="op">=</span>
-        <span class="ident">ConstraintNames::default_name</span>(<span class="ident">column</span>.<span class="ident">table</span>().<span class="ident">name</span>(), <span class="ident">column</span>.<span class="ident">name</span>(), <span class="ident">ctx</span>.<span class="ident">active_connector</span>());
+    <span class="kw">let </span>default_default_value =
+        ConstraintNames::default_name(column.table().name(), column.name(), ctx.active_connector());
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">default_value</span>) <span class="op">=</span> <span class="ident">default_value</span> {
-        <span class="kw">if</span> <span class="ident">default_value</span>.<span class="ident">db_name</span> <span class="op">==</span> <span class="prelude-val">Some</span>(<span class="ident">default_default_value</span>) {
-            <span class="ident">default_value</span>.<span class="ident">db_name</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref mut </span>default_value) = default_value {
+        <span class="kw">if </span>default_value.db_name == <span class="prelude-val">Some</span>(default_default_value) {
+            default_value.db_name = <span class="prelude-val">None</span>;
         }
     }
 
-    <span class="ident">ScalarField</span> {
-        <span class="ident">name</span>: <span class="ident">existing_field</span>
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">name</span>())
-            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">column</span>.<span class="ident">name</span>())
-            .<span class="ident">to_owned</span>(),
-        <span class="ident">arity</span>,
-        <span class="ident">field_type</span>: <span class="ident">calculate_scalar_field_type_with_native_types</span>(<span class="ident">column</span>, <span class="ident">ctx</span>),
-        <span class="ident">database_name</span>: <span class="ident">existing_field</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">mapped_name</span>()).<span class="ident">map</span>(<span class="ident">ToOwned::to_owned</span>),
-        <span class="ident">documentation</span>: <span class="ident">existing_field</span>
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">ast_field</span>().<span class="ident">documentation</span>())
-            .<span class="ident">map</span>(<span class="ident">ToOwned::to_owned</span>),
-        <span class="ident">default_value</span>,
-        <span class="ident">is_generated</span>: <span class="bool-val">false</span>,
-        <span class="ident">is_commented_out</span>: <span class="bool-val">false</span>,
-        <span class="ident">is_updated_at</span>: <span class="ident">existing_field</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">is_updated_at</span>()).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>),
-        <span class="ident">is_ignored</span>: <span class="ident">existing_field</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">is_ignored</span>()).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>),
+    ScalarField {
+        name: existing_field
+            .map(|f| f.name())
+            .unwrap_or_else(|| column.name())
+            .to_owned(),
+        arity,
+        field_type: calculate_scalar_field_type_with_native_types(column, ctx),
+        database_name: existing_field.and_then(|f| f.mapped_name()).map(ToOwned::to_owned),
+        documentation: existing_field
+            .and_then(|f| f.ast_field().documentation())
+            .map(ToOwned::to_owned),
+        default_value,
+        is_generated: <span class="bool-val">false</span>,
+        is_commented_out: <span class="bool-val">false</span>,
+        is_updated_at: existing_field.map(|f| f.is_updated_at()).unwrap_or(<span class="bool-val">false</span>),
+        is_ignored: existing_field.map(|f| f.is_ignored()).unwrap_or(<span class="bool-val">false</span>),
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">calculate_scalar_field_type_for_native_type</span>(<span class="ident">column</span>: <span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="ident">FieldType</span> {
-    <span class="macro">debug!</span>(<span class="string">&quot;Calculating field type for &#39;{}&#39;&quot;</span>, <span class="ident">column</span>.<span class="ident">name</span>());
-    <span class="kw">let</span> <span class="ident">fdt</span> <span class="op">=</span> <span class="ident">column</span>.<span class="ident">column_type</span>().<span class="ident">full_data_type</span>.<span class="ident">to_owned</span>();
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>calculate_scalar_field_type_for_native_type(column: ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;</span>Context) -&gt; FieldType {
+    <span class="macro">debug!</span>(<span class="string">&quot;Calculating field type for &#39;{}&#39;&quot;</span>, column.name());
+    <span class="kw">let </span>fdt = column.column_type().full_data_type.to_owned();
 
-    <span class="kw">match</span> <span class="ident">column</span>.<span class="ident">column_type_family</span>() {
-        <span class="ident">ColumnTypeFamily::Int</span> =&gt; <span class="ident">FieldType::Scalar</span>(<span class="ident">ScalarType::Int</span>, <span class="prelude-val">None</span>),
-        <span class="ident">ColumnTypeFamily::BigInt</span> =&gt; <span class="ident">FieldType::Scalar</span>(<span class="ident">ScalarType::BigInt</span>, <span class="prelude-val">None</span>),
-        <span class="ident">ColumnTypeFamily::Float</span> =&gt; <span class="ident">FieldType::Scalar</span>(<span class="ident">ScalarType::Float</span>, <span class="prelude-val">None</span>),
-        <span class="ident">ColumnTypeFamily::Decimal</span> =&gt; <span class="ident">FieldType::Scalar</span>(<span class="ident">ScalarType::Decimal</span>, <span class="prelude-val">None</span>),
-        <span class="ident">ColumnTypeFamily::Boolean</span> =&gt; <span class="ident">FieldType::Scalar</span>(<span class="ident">ScalarType::Boolean</span>, <span class="prelude-val">None</span>),
-        <span class="ident">ColumnTypeFamily::String</span> =&gt; <span class="ident">FieldType::Scalar</span>(<span class="ident">ScalarType::String</span>, <span class="prelude-val">None</span>),
-        <span class="ident">ColumnTypeFamily::DateTime</span> =&gt; <span class="ident">FieldType::Scalar</span>(<span class="ident">ScalarType::DateTime</span>, <span class="prelude-val">None</span>),
-        <span class="ident">ColumnTypeFamily::Json</span> =&gt; <span class="ident">FieldType::Scalar</span>(<span class="ident">ScalarType::Json</span>, <span class="prelude-val">None</span>),
-        <span class="ident">ColumnTypeFamily::Uuid</span> =&gt; <span class="ident">FieldType::Scalar</span>(<span class="ident">ScalarType::String</span>, <span class="prelude-val">None</span>),
-        <span class="ident">ColumnTypeFamily::Binary</span> =&gt; <span class="ident">FieldType::Scalar</span>(<span class="ident">ScalarType::Bytes</span>, <span class="prelude-val">None</span>),
-        <span class="ident">ColumnTypeFamily::Enum</span>(<span class="ident">id</span>) =&gt; <span class="ident">FieldType::Enum</span>(<span class="ident">ctx</span>.<span class="ident">enum_prisma_name</span>(<span class="kw-2">*</span><span class="ident">id</span>).<span class="ident">to_owned</span>()),
-        <span class="ident">ColumnTypeFamily::Unsupported</span>(<span class="kw">_</span>) =&gt; <span class="ident">FieldType::Unsupported</span>(<span class="ident">fdt</span>),
+    <span class="kw">match </span>column.column_type_family() {
+        ColumnTypeFamily::Int =&gt; FieldType::Scalar(ScalarType::Int, <span class="prelude-val">None</span>),
+        ColumnTypeFamily::BigInt =&gt; FieldType::Scalar(ScalarType::BigInt, <span class="prelude-val">None</span>),
+        ColumnTypeFamily::Float =&gt; FieldType::Scalar(ScalarType::Float, <span class="prelude-val">None</span>),
+        ColumnTypeFamily::Decimal =&gt; FieldType::Scalar(ScalarType::Decimal, <span class="prelude-val">None</span>),
+        ColumnTypeFamily::Boolean =&gt; FieldType::Scalar(ScalarType::Boolean, <span class="prelude-val">None</span>),
+        ColumnTypeFamily::String =&gt; FieldType::Scalar(ScalarType::String, <span class="prelude-val">None</span>),
+        ColumnTypeFamily::DateTime =&gt; FieldType::Scalar(ScalarType::DateTime, <span class="prelude-val">None</span>),
+        ColumnTypeFamily::Json =&gt; FieldType::Scalar(ScalarType::Json, <span class="prelude-val">None</span>),
+        ColumnTypeFamily::Uuid =&gt; FieldType::Scalar(ScalarType::String, <span class="prelude-val">None</span>),
+        ColumnTypeFamily::Binary =&gt; FieldType::Scalar(ScalarType::Bytes, <span class="prelude-val">None</span>),
+        ColumnTypeFamily::Enum(id) =&gt; FieldType::Enum(ctx.enum_prisma_name(<span class="kw-2">*</span>id).to_owned()),
+        ColumnTypeFamily::Unsupported(<span class="kw">_</span>) =&gt; FieldType::Unsupported(fdt),
     }
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">calculate_scalar_field_type_with_native_types</span>(<span class="ident">column</span>: <span class="ident">sql::ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="ident">FieldType</span> {
-    <span class="macro">debug!</span>(<span class="string">&quot;Calculating native field type for &#39;{}&#39;&quot;</span>, <span class="ident">column</span>.<span class="ident">name</span>());
-    <span class="kw">let</span> <span class="ident">scalar_type</span> <span class="op">=</span> <span class="ident">calculate_scalar_field_type_for_native_type</span>(<span class="ident">column</span>, <span class="ident">ctx</span>);
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>calculate_scalar_field_type_with_native_types(column: sql::ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;</span>Context) -&gt; FieldType {
+    <span class="macro">debug!</span>(<span class="string">&quot;Calculating native field type for &#39;{}&#39;&quot;</span>, column.name());
+    <span class="kw">let </span>scalar_type = calculate_scalar_field_type_for_native_type(column, ctx);
 
-    <span class="kw">match</span> <span class="ident">scalar_type</span> {
-        <span class="ident">FieldType::Scalar</span>(<span class="ident">scal_type</span>, <span class="kw">_</span>) =&gt; <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">column</span>.<span class="ident">column_type</span>().<span class="ident">native_type</span> {
-            <span class="prelude-val">None</span> =&gt; <span class="ident">scalar_type</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">native_type</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">is_default</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">active_connector</span>().<span class="ident">native_type_is_default_for_scalar_type</span>(
-                    <span class="ident">native_type</span>,
-                    <span class="kw-2">&amp;</span><span class="ident">dml_scalar_type_to_parser_database_scalar_type</span>(<span class="ident">scal_type</span>),
+    <span class="kw">match </span>scalar_type {
+        FieldType::Scalar(scal_type, <span class="kw">_</span>) =&gt; <span class="kw">match </span><span class="kw-2">&amp;</span>column.column_type().native_type {
+            <span class="prelude-val">None </span>=&gt; scalar_type,
+            <span class="prelude-val">Some</span>(native_type) =&gt; {
+                <span class="kw">let </span>is_default = ctx.active_connector().native_type_is_default_for_scalar_type(
+                    native_type,
+                    <span class="kw-2">&amp;</span>dml_scalar_type_to_parser_database_scalar_type(scal_type),
                 );
 
-                <span class="kw">if</span> <span class="ident">is_default</span> {
-                    <span class="ident">FieldType::Scalar</span>(<span class="ident">scal_type</span>, <span class="prelude-val">None</span>)
-                } <span class="kw">else</span> {
-                    <span class="kw">let</span> <span class="ident">instance</span> <span class="op">=</span> <span class="ident">psl::dml::NativeTypeInstance::new</span>(<span class="ident">native_type</span>.<span class="ident">clone</span>(), <span class="ident">ctx</span>.<span class="ident">active_connector</span>());
+                <span class="kw">if </span>is_default {
+                    FieldType::Scalar(scal_type, <span class="prelude-val">None</span>)
+                } <span class="kw">else </span>{
+                    <span class="kw">let </span>instance = psl::dml::NativeTypeInstance::new(native_type.clone(), ctx.active_connector());
 
-                    <span class="ident">FieldType::Scalar</span>(<span class="ident">scal_type</span>, <span class="prelude-val">Some</span>(<span class="ident">instance</span>))
+                    FieldType::Scalar(scal_type, <span class="prelude-val">Some</span>(instance))
                 }
             }
         },
-        <span class="ident">field_type</span> =&gt; <span class="ident">field_type</span>,
+        field_type =&gt; field_type,
     }
 }
 
-<span class="kw">fn</span> <span class="ident">dml_scalar_type_to_parser_database_scalar_type</span>(<span class="ident">st</span>: <span class="ident">ScalarType</span>) -&gt; <span class="ident">db::ScalarType</span> {
-    <span class="kw">match</span> <span class="ident">st</span> {
-        <span class="ident">ScalarType::Int</span> =&gt; <span class="ident">db::ScalarType::Int</span>,
-        <span class="ident">ScalarType::BigInt</span> =&gt; <span class="ident">db::ScalarType::BigInt</span>,
-        <span class="ident">ScalarType::Float</span> =&gt; <span class="ident">db::ScalarType::Float</span>,
-        <span class="ident">ScalarType::Boolean</span> =&gt; <span class="ident">db::ScalarType::Boolean</span>,
-        <span class="ident">ScalarType::String</span> =&gt; <span class="ident">db::ScalarType::String</span>,
-        <span class="ident">ScalarType::DateTime</span> =&gt; <span class="ident">db::ScalarType::DateTime</span>,
-        <span class="ident">ScalarType::Json</span> =&gt; <span class="ident">db::ScalarType::Json</span>,
-        <span class="ident">ScalarType::Bytes</span> =&gt; <span class="ident">db::ScalarType::Bytes</span>,
-        <span class="ident">ScalarType::Decimal</span> =&gt; <span class="ident">db::ScalarType::Decimal</span>,
+<span class="kw">fn </span>dml_scalar_type_to_parser_database_scalar_type(st: ScalarType) -&gt; db::ScalarType {
+    <span class="kw">match </span>st {
+        ScalarType::Int =&gt; db::ScalarType::Int,
+        ScalarType::BigInt =&gt; db::ScalarType::BigInt,
+        ScalarType::Float =&gt; db::ScalarType::Float,
+        ScalarType::Boolean =&gt; db::ScalarType::Boolean,
+        ScalarType::String =&gt; db::ScalarType::String,
+        ScalarType::DateTime =&gt; db::ScalarType::DateTime,
+        ScalarType::Json =&gt; db::ScalarType::Json,
+        ScalarType::Bytes =&gt; db::ScalarType::Bytes,
+        ScalarType::Decimal =&gt; db::ScalarType::Decimal,
     }
 }
 
-<span class="comment">// misc</span>
+<span class="comment">// misc
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">deduplicate_relation_field_names</span>(<span class="ident">datamodel</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Datamodel</span>) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">duplicated_relation_fields</span> <span class="op">=</span> <span class="macro">vec!</span>[];
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>deduplicate_relation_field_names(datamodel: <span class="kw-2">&amp;mut </span>Datamodel) {
+    <span class="kw">let </span><span class="kw-2">mut </span>duplicated_relation_fields = <span class="macro">vec!</span>[];
 
-    <span class="kw">for</span> <span class="ident">model</span> <span class="kw">in</span> <span class="ident">datamodel</span>.<span class="ident">models</span>() {
-        <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">relation_fields</span>() {
-            <span class="kw">if</span> <span class="ident">model</span>.<span class="ident">fields</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">field</span>.<span class="ident">name</span> <span class="op">==</span> <span class="ident">f</span>.<span class="ident">name</span>()).<span class="ident">count</span>() <span class="op">&gt;</span> <span class="number">1</span> {
-                <span class="ident">duplicated_relation_fields</span>.<span class="ident">push</span>((
-                    <span class="ident">model</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-                    <span class="ident">field</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-                    <span class="ident">field</span>.<span class="ident">relation_info</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
+    <span class="kw">for </span>model <span class="kw">in </span>datamodel.models() {
+        <span class="kw">for </span>field <span class="kw">in </span>model.relation_fields() {
+            <span class="kw">if </span>model.fields().filter(|f| field.name == f.name()).count() &gt; <span class="number">1 </span>{
+                duplicated_relation_fields.push((
+                    model.name.clone(),
+                    field.name.clone(),
+                    field.relation_info.name.clone(),
                 ));
             }
         }
     }
 
-    <span class="ident">duplicated_relation_fields</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">for_each</span>(<span class="op">|</span>(<span class="ident">model</span>, <span class="ident">field</span>, <span class="ident">relation_name</span>)<span class="op">|</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">field</span> <span class="op">=</span> <span class="ident">datamodel</span>.<span class="ident">find_model_mut</span>(<span class="ident">model</span>).<span class="ident">find_relation_field_mut</span>(<span class="ident">field</span>);
-            <span class="comment">//todo self vs normal relation?</span>
-            <span class="ident">field</span>.<span class="ident">name</span> <span class="op">=</span> <span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, <span class="ident">field</span>.<span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="ident">relation_name</span>);
+    duplicated_relation_fields
+        .iter()
+        .for_each(|(model, field, relation_name)| {
+            <span class="kw">let </span><span class="kw-2">mut </span>field = datamodel.find_model_mut(model).find_relation_field_mut(field);
+            <span class="comment">//todo self vs normal relation?
+            </span>field.name = <span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, field.name, <span class="kw-2">&amp;</span>relation_name);
         });
 }
 
-<span class="kw">fn</span> <span class="ident">index_algorithm</span>(<span class="ident">index</span>: <span class="ident">sql::walkers::IndexWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IndexAlgorithm</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">sql_family</span>().<span class="ident">is_postgres</span>() {
-        <span class="kw">return</span> <span class="prelude-val">None</span>;
+<span class="kw">fn </span>index_algorithm(index: sql::walkers::IndexWalker&lt;<span class="lifetime">&#39;_</span>&gt;, ctx: <span class="kw-2">&amp;</span>Context) -&gt; <span class="prelude-ty">Option</span>&lt;IndexAlgorithm&gt; {
+    <span class="kw">if </span>!ctx.sql_family().is_postgres() {
+        <span class="kw">return </span><span class="prelude-val">None</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="ident">index</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
+    <span class="kw">let </span>data: <span class="kw-2">&amp;</span>PostgresSchemaExt = index.schema.downcast_connector_data();
 
-    <span class="kw">match</span> <span class="ident">data</span>.<span class="ident">index_algorithm</span>(<span class="ident">index</span>.<span class="ident">id</span>) {
-        <span class="ident">sql::postgres::SqlIndexAlgorithm::BTree</span> =&gt; <span class="prelude-val">None</span>,
-        <span class="ident">sql::postgres::SqlIndexAlgorithm::Hash</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::Hash</span>),
-        <span class="ident">sql::postgres::SqlIndexAlgorithm::Gist</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::Gist</span>),
-        <span class="ident">sql::postgres::SqlIndexAlgorithm::Gin</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::Gin</span>),
-        <span class="ident">sql::postgres::SqlIndexAlgorithm::SpGist</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::SpGist</span>),
-        <span class="ident">sql::postgres::SqlIndexAlgorithm::Brin</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::Brin</span>),
+    <span class="kw">match </span>data.index_algorithm(index.id) {
+        sql::postgres::SqlIndexAlgorithm::BTree =&gt; <span class="prelude-val">None</span>,
+        sql::postgres::SqlIndexAlgorithm::Hash =&gt; <span class="prelude-val">Some</span>(IndexAlgorithm::Hash),
+        sql::postgres::SqlIndexAlgorithm::Gist =&gt; <span class="prelude-val">Some</span>(IndexAlgorithm::Gist),
+        sql::postgres::SqlIndexAlgorithm::Gin =&gt; <span class="prelude-val">Some</span>(IndexAlgorithm::Gin),
+        sql::postgres::SqlIndexAlgorithm::SpGist =&gt; <span class="prelude-val">Some</span>(IndexAlgorithm::SpGist),
+        sql::postgres::SqlIndexAlgorithm::Brin =&gt; <span class="prelude-val">Some</span>(IndexAlgorithm::Brin),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">index_is_clustered</span>(<span class="ident">index_id</span>: <span class="ident">sql::IndexId</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">SqlSchema</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">sql_family</span>().<span class="ident">is_mssql</span>() {
-        <span class="kw">return</span> <span class="prelude-val">None</span>;
+<span class="kw">fn </span>index_is_clustered(index_id: sql::IndexId, schema: <span class="kw-2">&amp;</span>SqlSchema, ctx: <span class="kw-2">&amp;</span>Context) -&gt; <span class="prelude-ty">Option</span>&lt;bool&gt; {
+    <span class="kw">if </span>!ctx.sql_family().is_mssql() {
+        <span class="kw">return </span><span class="prelude-val">None</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="ident">MssqlSchemaExt</span> <span class="op">=</span> <span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
-    <span class="kw">let</span> <span class="ident">clustered</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">index_is_clustered</span>(<span class="ident">index_id</span>);
+    <span class="kw">let </span>ext: <span class="kw-2">&amp;</span>MssqlSchemaExt = schema.downcast_connector_data();
+    <span class="kw">let </span>clustered = ext.index_is_clustered(index_id);
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">clustered</span> {
-        <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="kw">if </span>!clustered {
+        <span class="kw">return </span><span class="prelude-val">None</span>;
     }
 
-    <span class="prelude-val">Some</span>(<span class="ident">clustered</span>)
+    <span class="prelude-val">Some</span>(clustered)
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">primary_key_is_clustered</span>(<span class="ident">pkid</span>: <span class="ident">sql::IndexId</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">sql_family</span>().<span class="ident">is_mssql</span>() {
-        <span class="kw">return</span> <span class="prelude-val">None</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>primary_key_is_clustered(pkid: sql::IndexId, ctx: <span class="kw-2">&amp;</span>Context) -&gt; <span class="prelude-ty">Option</span>&lt;bool&gt; {
+    <span class="kw">if </span>!ctx.sql_family().is_mssql() {
+        <span class="kw">return </span><span class="prelude-val">None</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="ident">MssqlSchemaExt</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
+    <span class="kw">let </span>ext: <span class="kw-2">&amp;</span>MssqlSchemaExt = ctx.schema.downcast_connector_data();
 
-    <span class="kw">let</span> <span class="ident">clustered</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">index_is_clustered</span>(<span class="ident">pkid</span>);
+    <span class="kw">let </span>clustered = ext.index_is_clustered(pkid);
 
-    <span class="kw">if</span> <span class="ident">clustered</span> {
-        <span class="kw">return</span> <span class="prelude-val">None</span>;
+    <span class="kw">if </span>clustered {
+        <span class="kw">return </span><span class="prelude-val">None</span>;
     }
 
-    <span class="prelude-val">Some</span>(<span class="ident">clustered</span>)
+    <span class="prelude-val">Some</span>(clustered)
 }
 
-<span class="kw">fn</span> <span class="ident">get_opclass</span>(<span class="ident">index_field_id</span>: <span class="ident">sql::IndexColumnId</span>, <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">SqlSchema</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OperatorClass</span><span class="op">&gt;</span> {
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">ctx</span>.<span class="ident">sql_family</span>().<span class="ident">is_postgres</span>() {
-        <span class="kw">return</span> <span class="prelude-val">None</span>;
+<span class="kw">fn </span>get_opclass(index_field_id: sql::IndexColumnId, schema: <span class="kw-2">&amp;</span>SqlSchema, ctx: <span class="kw-2">&amp;</span>Context) -&gt; <span class="prelude-ty">Option</span>&lt;OperatorClass&gt; {
+    <span class="kw">if </span>!ctx.sql_family().is_postgres() {
+        <span class="kw">return </span><span class="prelude-val">None</span>;
     }
 
-    <span class="kw">let</span> <span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="ident">schema</span>.<span class="ident">downcast_connector_data</span>();
+    <span class="kw">let </span>ext: <span class="kw-2">&amp;</span>PostgresSchemaExt = schema.downcast_connector_data();
 
-    <span class="kw">let</span> <span class="ident">opclass</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">ext</span>.<span class="ident">get_opclass</span>(<span class="ident">index_field_id</span>) {
-        <span class="prelude-val">Some</span>(<span class="ident">opclass</span>) =&gt; <span class="ident">opclass</span>,
-        <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="prelude-val">None</span>,
+    <span class="kw">let </span>opclass = <span class="kw">match </span>ext.get_opclass(index_field_id) {
+        <span class="prelude-val">Some</span>(opclass) =&gt; opclass,
+        <span class="prelude-val">None </span>=&gt; <span class="kw">return </span><span class="prelude-val">None</span>,
     };
 
-    <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">opclass</span>.<span class="ident">kind</span> {
-        <span class="kw">_</span> <span class="kw">if</span> <span class="ident">opclass</span>.<span class="ident">is_default</span> =&gt; <span class="prelude-val">None</span>,
-        <span class="ident">sql::postgres::SQLOperatorClassKind::InetOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::InetOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::JsonbOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::JsonbOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::JsonbPathOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::JsonbPathOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::ArrayOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::ArrayOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::TextOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::TextOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::BitMinMaxOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::BitMinMaxOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::VarBitMinMaxOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::VarBitMinMaxOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::BpcharBloomOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::BpcharBloomOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::BpcharMinMaxOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::BpcharMinMaxOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::ByteaBloomOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::ByteaBloomOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::ByteaMinMaxOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::ByteaMinMaxOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::DateBloomOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::DateBloomOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::DateMinMaxOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::DateMinMaxOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::DateMinMaxMultiOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::DateMinMaxMultiOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::Float4BloomOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::Float4BloomOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::Float4MinMaxOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::Float4MinMaxOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::Float4MinMaxMultiOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::Float4MinMaxMultiOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::Float8BloomOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::Float8BloomOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::Float8MinMaxOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::Float8MinMaxOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::Float8MinMaxMultiOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::Float8MinMaxMultiOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::InetInclusionOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::InetInclusionOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::InetBloomOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::InetBloomOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::InetMinMaxOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::InetMinMaxOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::InetMinMaxMultiOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::InetMinMaxMultiOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::Int2BloomOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::Int2BloomOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::Int2MinMaxOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::Int2MinMaxOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::Int2MinMaxMultiOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::Int2MinMaxMultiOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::Int4BloomOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::Int4BloomOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::Int4MinMaxOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::Int4MinMaxOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::Int4MinMaxMultiOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::Int4MinMaxMultiOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::Int8BloomOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::Int8BloomOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::Int8MinMaxOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::Int8MinMaxOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::Int8MinMaxMultiOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::Int8MinMaxMultiOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::NumericBloomOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::NumericBloomOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::NumericMinMaxOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::NumericMinMaxOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::NumericMinMaxMultiOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::NumericMinMaxMultiOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::OidBloomOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::OidBloomOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::OidMinMaxOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::OidMinMaxOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::OidMinMaxMultiOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::OidMinMaxMultiOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::TextBloomOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::TextBloomOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::TextMinMaxOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::TextMinMaxOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::TimestampBloomOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::TimestampBloomOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::TimestampMinMaxOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::TimestampMinMaxOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::TimestampMinMaxMultiOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::TimestampMinMaxMultiOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::TimestampTzBloomOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::TimestampTzBloomOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::TimestampTzMinMaxOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::TimestampTzMinMaxOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::TimestampTzMinMaxMultiOps</span> =&gt; {
-            <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::TimestampTzMinMaxMultiOps</span>)
+    <span class="kw">match </span><span class="kw-2">&amp;</span>opclass.kind {
+        <span class="kw">_ if </span>opclass.is_default =&gt; <span class="prelude-val">None</span>,
+        sql::postgres::SQLOperatorClassKind::InetOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::InetOps),
+        sql::postgres::SQLOperatorClassKind::JsonbOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::JsonbOps),
+        sql::postgres::SQLOperatorClassKind::JsonbPathOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::JsonbPathOps),
+        sql::postgres::SQLOperatorClassKind::ArrayOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::ArrayOps),
+        sql::postgres::SQLOperatorClassKind::TextOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::TextOps),
+        sql::postgres::SQLOperatorClassKind::BitMinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::BitMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::VarBitMinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::VarBitMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::BpcharBloomOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::BpcharBloomOps),
+        sql::postgres::SQLOperatorClassKind::BpcharMinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::BpcharMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::ByteaBloomOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::ByteaBloomOps),
+        sql::postgres::SQLOperatorClassKind::ByteaMinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::ByteaMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::DateBloomOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::DateBloomOps),
+        sql::postgres::SQLOperatorClassKind::DateMinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::DateMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::DateMinMaxMultiOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::DateMinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::Float4BloomOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::Float4BloomOps),
+        sql::postgres::SQLOperatorClassKind::Float4MinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::Float4MinMaxOps),
+        sql::postgres::SQLOperatorClassKind::Float4MinMaxMultiOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::Float4MinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::Float8BloomOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::Float8BloomOps),
+        sql::postgres::SQLOperatorClassKind::Float8MinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::Float8MinMaxOps),
+        sql::postgres::SQLOperatorClassKind::Float8MinMaxMultiOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::Float8MinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::InetInclusionOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::InetInclusionOps),
+        sql::postgres::SQLOperatorClassKind::InetBloomOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::InetBloomOps),
+        sql::postgres::SQLOperatorClassKind::InetMinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::InetMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::InetMinMaxMultiOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::InetMinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::Int2BloomOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::Int2BloomOps),
+        sql::postgres::SQLOperatorClassKind::Int2MinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::Int2MinMaxOps),
+        sql::postgres::SQLOperatorClassKind::Int2MinMaxMultiOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::Int2MinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::Int4BloomOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::Int4BloomOps),
+        sql::postgres::SQLOperatorClassKind::Int4MinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::Int4MinMaxOps),
+        sql::postgres::SQLOperatorClassKind::Int4MinMaxMultiOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::Int4MinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::Int8BloomOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::Int8BloomOps),
+        sql::postgres::SQLOperatorClassKind::Int8MinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::Int8MinMaxOps),
+        sql::postgres::SQLOperatorClassKind::Int8MinMaxMultiOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::Int8MinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::NumericBloomOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::NumericBloomOps),
+        sql::postgres::SQLOperatorClassKind::NumericMinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::NumericMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::NumericMinMaxMultiOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::NumericMinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::OidBloomOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::OidBloomOps),
+        sql::postgres::SQLOperatorClassKind::OidMinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::OidMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::OidMinMaxMultiOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::OidMinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::TextBloomOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::TextBloomOps),
+        sql::postgres::SQLOperatorClassKind::TextMinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::TextMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::TimestampBloomOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::TimestampBloomOps),
+        sql::postgres::SQLOperatorClassKind::TimestampMinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::TimestampMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::TimestampMinMaxMultiOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::TimestampMinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::TimestampTzBloomOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::TimestampTzBloomOps),
+        sql::postgres::SQLOperatorClassKind::TimestampTzMinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::TimestampTzMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::TimestampTzMinMaxMultiOps =&gt; {
+            <span class="prelude-val">Some</span>(OperatorClass::TimestampTzMinMaxMultiOps)
         }
-        <span class="ident">sql::postgres::SQLOperatorClassKind::TimeBloomOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::TimeBloomOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::TimeMinMaxOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::TimeMinMaxOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::TimeMinMaxMultiOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::TimeMinMaxMultiOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::TimeTzBloomOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::TimeTzBloomOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::TimeTzMinMaxOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::TimeTzMinMaxOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::TimeTzMinMaxMultiOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::TimeTzMinMaxMultiOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::UuidBloomOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::UuidBloomOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::UuidMinMaxOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::UuidMinMaxOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::UuidMinMaxMultiOps</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::UuidMinMaxMultiOps</span>),
-        <span class="ident">sql::postgres::SQLOperatorClassKind::Raw</span>(<span class="ident">c</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">OperatorClass::Raw</span>(<span class="ident">c</span>.<span class="ident">to_string</span>().<span class="ident">into</span>())),
+        sql::postgres::SQLOperatorClassKind::TimeBloomOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::TimeBloomOps),
+        sql::postgres::SQLOperatorClassKind::TimeMinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::TimeMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::TimeMinMaxMultiOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::TimeMinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::TimeTzBloomOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::TimeTzBloomOps),
+        sql::postgres::SQLOperatorClassKind::TimeTzMinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::TimeTzMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::TimeTzMinMaxMultiOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::TimeTzMinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::UuidBloomOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::UuidBloomOps),
+        sql::postgres::SQLOperatorClassKind::UuidMinMaxOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::UuidMinMaxOps),
+        sql::postgres::SQLOperatorClassKind::UuidMinMaxMultiOps =&gt; <span class="prelude-val">Some</span>(OperatorClass::UuidMinMaxMultiOps),
+        sql::postgres::SQLOperatorClassKind::Raw(c) =&gt; <span class="prelude-val">Some</span>(OperatorClass::Raw(c.to_string().into())),
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_introspection_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_introspection_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

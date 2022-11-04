@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/vte_generate_state_changes-0.1.1/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../vte_generate_state_changes/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../vte_generate_state_changes/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../vte_generate_state_changes/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/vte_generate_state_changes-0.1.1/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../vte_generate_state_changes/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../vte_generate_state_changes/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../vte_generate_state_changes/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -172,179 +172,179 @@
 <span id="172">172</span>
 <span id="173">173</span>
 <span id="174">174</span>
-</pre><pre class="rust"><code><span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
+</pre><pre class="rust"><code><span class="kw">extern crate </span>proc_macro;
 
-<span class="kw">use</span> <span class="ident">std::iter::Peekable</span>;
+<span class="kw">use </span>std::iter::Peekable;
 
-<span class="kw">use</span> <span class="ident">proc_macro2::TokenTree</span>::{<span class="ident">Group</span>, <span class="ident">Literal</span>, <span class="ident">Punct</span>};
-<span class="kw">use</span> <span class="ident">proc_macro2</span>::{<span class="ident">token_stream</span>, <span class="ident">TokenStream</span>, <span class="ident">TokenTree</span>};
-<span class="kw">use</span> <span class="ident">quote::quote</span>;
+<span class="kw">use </span>proc_macro2::TokenTree::{Group, Literal, Punct};
+<span class="kw">use </span>proc_macro2::{token_stream, TokenStream, TokenTree};
+<span class="kw">use </span>quote::quote;
 
-<span class="doccomment">/// Create a `const fn` which will return an array with all state changes.</span>
-<span class="attribute">#[<span class="ident">proc_macro</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">generate_state_changes</span>(<span class="ident">item</span>: <span class="ident">proc_macro::TokenStream</span>) -&gt; <span class="ident">proc_macro::TokenStream</span> {
-    <span class="comment">// Convert from proc_macro -&gt; proc_macro2</span>
-    <span class="kw">let</span> <span class="ident">item</span>: <span class="ident">TokenStream</span> <span class="op">=</span> <span class="ident">item</span>.<span class="ident">into</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">item</span>.<span class="ident">into_iter</span>().<span class="ident">peekable</span>();
+<span class="doccomment">/// Create a `const fn` which will return an array with all state changes.
+</span><span class="attribute">#[proc_macro]
+</span><span class="kw">pub fn </span>generate_state_changes(item: proc_macro::TokenStream) -&gt; proc_macro::TokenStream {
+    <span class="comment">// Convert from proc_macro -&gt; proc_macro2
+    </span><span class="kw">let </span>item: TokenStream = item.into();
+    <span class="kw">let </span><span class="kw-2">mut </span>iter = item.into_iter().peekable();
 
-    <span class="comment">// Determine output function name</span>
-    <span class="kw">let</span> <span class="ident">fn_name</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>();
+    <span class="comment">// Determine output function name
+    </span><span class="kw">let </span>fn_name = iter.next().unwrap();
 
-    <span class="comment">// Separator between name and body with state changes</span>
-    <span class="ident">expect_punct</span>(<span class="kw-2">&amp;mut</span> <span class="ident">iter</span>, <span class="string">&#39;,&#39;</span>);
+    <span class="comment">// Separator between name and body with state changes
+    </span>expect_punct(<span class="kw-2">&amp;mut </span>iter, <span class="string">&#39;,&#39;</span>);
 
-    <span class="comment">// Create token stream to assign each state change to the array</span>
-    <span class="kw">let</span> <span class="ident">assignments_stream</span> <span class="op">=</span> <span class="ident">states_stream</span>(<span class="kw-2">&amp;mut</span> <span class="ident">iter</span>);
+    <span class="comment">// Create token stream to assign each state change to the array
+    </span><span class="kw">let </span>assignments_stream = states_stream(<span class="kw-2">&amp;mut </span>iter);
 
     <span class="macro">quote!</span>(
-        <span class="kw">const</span> <span class="kw">fn</span> #<span class="ident">fn_name</span>() -&gt; [[<span class="ident">u8</span>; <span class="number">256</span>]; <span class="number">16</span>] {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state_changes</span> <span class="op">=</span> [[<span class="number">0</span>; <span class="number">256</span>]; <span class="number">16</span>];
+        <span class="kw">const fn </span>#fn_name() -&gt; [[u8; <span class="number">256</span>]; <span class="number">16</span>] {
+            <span class="kw">let </span><span class="kw-2">mut </span>state_changes = [[<span class="number">0</span>; <span class="number">256</span>]; <span class="number">16</span>];
 
-            #<span class="ident">assignments_stream</span>
+            #assignments_stream
 
-            <span class="ident">state_changes</span>
+            state_changes
         }
     )
-    .<span class="ident">into</span>()
+    .into()
 }
 
-<span class="doccomment">/// Generate the array assignment statements for all origin states.</span>
-<span class="kw">fn</span> <span class="ident">states_stream</span>(<span class="ident">iter</span>: <span class="kw-2">&amp;mut</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">TokenTree</span><span class="op">&gt;</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">states_stream</span> <span class="op">=</span> <span class="ident">next_group</span>(<span class="ident">iter</span>).<span class="ident">into_iter</span>().<span class="ident">peekable</span>();
+<span class="doccomment">/// Generate the array assignment statements for all origin states.
+</span><span class="kw">fn </span>states_stream(iter: <span class="kw-2">&amp;mut </span><span class="kw">impl </span>Iterator&lt;Item = TokenTree&gt;) -&gt; TokenStream {
+    <span class="kw">let </span><span class="kw-2">mut </span>states_stream = next_group(iter).into_iter().peekable();
 
-    <span class="comment">// Loop over all origin state entries</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tokens</span> <span class="op">=</span> <span class="macro">quote!</span>();
-    <span class="kw">while</span> <span class="ident">states_stream</span>.<span class="ident">peek</span>().<span class="ident">is_some</span>() {
-        <span class="comment">// Add all mappings for this state</span>
-        <span class="ident">tokens</span>.<span class="ident">extend</span>(<span class="ident">state_entry_stream</span>(<span class="kw-2">&amp;mut</span> <span class="ident">states_stream</span>));
+    <span class="comment">// Loop over all origin state entries
+    </span><span class="kw">let </span><span class="kw-2">mut </span>tokens = <span class="macro">quote!</span>();
+    <span class="kw">while </span>states_stream.peek().is_some() {
+        <span class="comment">// Add all mappings for this state
+        </span>tokens.extend(state_entry_stream(<span class="kw-2">&amp;mut </span>states_stream));
 
-        <span class="comment">// Allow trailing comma</span>
-        <span class="ident">optional_punct</span>(<span class="kw-2">&amp;mut</span> <span class="ident">states_stream</span>, <span class="string">&#39;,&#39;</span>);
+        <span class="comment">// Allow trailing comma
+        </span>optional_punct(<span class="kw-2">&amp;mut </span>states_stream, <span class="string">&#39;,&#39;</span>);
     }
-    <span class="ident">tokens</span>
+    tokens
 }
 
-<span class="doccomment">/// Generate the array assignment statements for one origin state.</span>
-<span class="kw">fn</span> <span class="ident">state_entry_stream</span>(<span class="ident">iter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Peekable</span><span class="op">&lt;</span><span class="ident">token_stream::IntoIter</span><span class="op">&gt;</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="comment">// Origin state name</span>
-    <span class="kw">let</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">into</span>();
+<span class="doccomment">/// Generate the array assignment statements for one origin state.
+</span><span class="kw">fn </span>state_entry_stream(iter: <span class="kw-2">&amp;mut </span>Peekable&lt;token_stream::IntoIter&gt;) -&gt; TokenStream {
+    <span class="comment">// Origin state name
+    </span><span class="kw">let </span>state = iter.next().unwrap().into();
 
-    <span class="comment">// Token stream with all the byte-&gt;target mappings</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">changes_stream</span> <span class="op">=</span> <span class="ident">next_group</span>(<span class="ident">iter</span>).<span class="ident">into_iter</span>().<span class="ident">peekable</span>();
+    <span class="comment">// Token stream with all the byte-&gt;target mappings
+    </span><span class="kw">let </span><span class="kw-2">mut </span>changes_stream = next_group(iter).into_iter().peekable();
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tokens</span> <span class="op">=</span> <span class="macro">quote!</span>();
-    <span class="kw">while</span> <span class="ident">changes_stream</span>.<span class="ident">peek</span>().<span class="ident">is_some</span>() {
-        <span class="comment">// Add next mapping for this state</span>
-        <span class="ident">tokens</span>.<span class="ident">extend</span>(<span class="ident">change_stream</span>(<span class="kw-2">&amp;mut</span> <span class="ident">changes_stream</span>, <span class="kw-2">&amp;</span><span class="ident">state</span>));
+    <span class="kw">let </span><span class="kw-2">mut </span>tokens = <span class="macro">quote!</span>();
+    <span class="kw">while </span>changes_stream.peek().is_some() {
+        <span class="comment">// Add next mapping for this state
+        </span>tokens.extend(change_stream(<span class="kw-2">&amp;mut </span>changes_stream, <span class="kw-2">&amp;</span>state));
 
-        <span class="comment">// Allow trailing comma</span>
-        <span class="ident">optional_punct</span>(<span class="kw-2">&amp;mut</span> <span class="ident">changes_stream</span>, <span class="string">&#39;,&#39;</span>);
+        <span class="comment">// Allow trailing comma
+        </span>optional_punct(<span class="kw-2">&amp;mut </span>changes_stream, <span class="string">&#39;,&#39;</span>);
     }
-    <span class="ident">tokens</span>
+    tokens
 }
 
-<span class="doccomment">/// Generate the array assignment statement for a single byte-&gt;target mapping for one state.</span>
-<span class="kw">fn</span> <span class="ident">change_stream</span>(<span class="ident">iter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Peekable</span><span class="op">&lt;</span><span class="ident">token_stream::IntoIter</span><span class="op">&gt;</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="ident">TokenTree</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="comment">// Start of input byte range</span>
-    <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">next_usize</span>(<span class="ident">iter</span>);
+<span class="doccomment">/// Generate the array assignment statement for a single byte-&gt;target mapping for one state.
+</span><span class="kw">fn </span>change_stream(iter: <span class="kw-2">&amp;mut </span>Peekable&lt;token_stream::IntoIter&gt;, state: <span class="kw-2">&amp;</span>TokenTree) -&gt; TokenStream {
+    <span class="comment">// Start of input byte range
+    </span><span class="kw">let </span>start = next_usize(iter);
 
-    <span class="comment">// End of input byte range</span>
-    <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">optional_punct</span>(<span class="ident">iter</span>, <span class="string">&#39;.&#39;</span>) {
-        <span class="comment">// Read inclusive end of range</span>
-        <span class="ident">expect_punct</span>(<span class="ident">iter</span>, <span class="string">&#39;.&#39;</span>);
-        <span class="ident">expect_punct</span>(<span class="ident">iter</span>, <span class="string">&#39;=&#39;</span>);
-        <span class="ident">next_usize</span>(<span class="ident">iter</span>)
-    } <span class="kw">else</span> {
-        <span class="comment">// Without range, end is equal to start</span>
-        <span class="ident">start</span>
+    <span class="comment">// End of input byte range
+    </span><span class="kw">let </span>end = <span class="kw">if </span>optional_punct(iter, <span class="string">&#39;.&#39;</span>) {
+        <span class="comment">// Read inclusive end of range
+        </span>expect_punct(iter, <span class="string">&#39;.&#39;</span>);
+        expect_punct(iter, <span class="string">&#39;=&#39;</span>);
+        next_usize(iter)
+    } <span class="kw">else </span>{
+        <span class="comment">// Without range, end is equal to start
+        </span>start
     };
 
-    <span class="comment">// Separator between byte input range and output state</span>
-    <span class="ident">expect_punct</span>(<span class="ident">iter</span>, <span class="string">&#39;=&#39;</span>);
-    <span class="ident">expect_punct</span>(<span class="ident">iter</span>, <span class="string">&#39;&gt;&#39;</span>);
+    <span class="comment">// Separator between byte input range and output state
+    </span>expect_punct(iter, <span class="string">&#39;=&#39;</span>);
+    expect_punct(iter, <span class="string">&#39;&gt;&#39;</span>);
 
-    <span class="comment">// Token stream with target state and action</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">target_change_stream</span> <span class="op">=</span> <span class="ident">next_group</span>(<span class="ident">iter</span>).<span class="ident">into_iter</span>().<span class="ident">peekable</span>();
+    <span class="comment">// Token stream with target state and action
+    </span><span class="kw">let </span><span class="kw-2">mut </span>target_change_stream = next_group(iter).into_iter().peekable();
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tokens</span> <span class="op">=</span> <span class="macro">quote!</span>();
-    <span class="kw">while</span> <span class="ident">target_change_stream</span>.<span class="ident">peek</span>().<span class="ident">is_some</span>() {
-        <span class="comment">// Target state/action for all bytes in the range</span>
-        <span class="kw">let</span> (<span class="ident">target_state</span>, <span class="ident">target_action</span>) <span class="op">=</span> <span class="ident">target_change</span>(<span class="kw-2">&amp;mut</span> <span class="ident">target_change_stream</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>tokens = <span class="macro">quote!</span>();
+    <span class="kw">while </span>target_change_stream.peek().is_some() {
+        <span class="comment">// Target state/action for all bytes in the range
+        </span><span class="kw">let </span>(target_state, target_action) = target_change(<span class="kw-2">&amp;mut </span>target_change_stream);
 
-        <span class="comment">// Create a new entry for every byte in the range</span>
-        <span class="kw">for</span> <span class="ident">byte</span> <span class="kw">in</span> <span class="ident">start</span>..<span class="op">=</span><span class="ident">end</span> {
-            <span class="comment">// TODO: Force adding `State::` and `Action::`?</span>
-            <span class="comment">// TODO: Should we really use `pack` here without import?</span>
-            <span class="ident">tokens</span>.<span class="ident">extend</span>(<span class="macro">quote!</span>(
-                <span class="ident">state_changes</span>[<span class="ident">State</span>::#<span class="ident">state</span> <span class="kw">as</span> <span class="ident">usize</span>][#<span class="ident">byte</span>] <span class="op">=</span>
-                    <span class="ident">pack</span>(<span class="ident">State</span>::#<span class="ident">target_state</span>, <span class="ident">Action</span>::#<span class="ident">target_action</span>);
+        <span class="comment">// Create a new entry for every byte in the range
+        </span><span class="kw">for </span>byte <span class="kw">in </span>start..=end {
+            <span class="comment">// TODO: Force adding `State::` and `Action::`?
+            // TODO: Should we really use `pack` here without import?
+            </span>tokens.extend(<span class="macro">quote!</span>(
+                state_changes[State::#state <span class="kw">as </span>usize][#byte] =
+                    pack(State::#target_state, Action::#target_action);
             ));
         }
     }
-    <span class="ident">tokens</span>
+    tokens
 }
 
-<span class="doccomment">/// Get next target state and action.</span>
-<span class="kw">fn</span> <span class="ident">target_change</span>(<span class="ident">iter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Peekable</span><span class="op">&lt;</span><span class="ident">token_stream::IntoIter</span><span class="op">&gt;</span>) -&gt; (<span class="ident">TokenTree</span>, <span class="ident">TokenTree</span>) {
-    <span class="kw">let</span> <span class="ident">target_state</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>();
+<span class="doccomment">/// Get next target state and action.
+</span><span class="kw">fn </span>target_change(iter: <span class="kw-2">&amp;mut </span>Peekable&lt;token_stream::IntoIter&gt;) -&gt; (TokenTree, TokenTree) {
+    <span class="kw">let </span>target_state = iter.next().unwrap();
 
-    <span class="comment">// Separator between state and action</span>
-    <span class="ident">expect_punct</span>(<span class="ident">iter</span>, <span class="string">&#39;,&#39;</span>);
+    <span class="comment">// Separator between state and action
+    </span>expect_punct(iter, <span class="string">&#39;,&#39;</span>);
 
-    <span class="kw">let</span> <span class="ident">target_action</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>();
+    <span class="kw">let </span>target_action = iter.next().unwrap();
 
-    (<span class="ident">target_state</span>, <span class="ident">target_action</span>)
+    (target_state, target_action)
 }
 
-<span class="doccomment">/// Check if next token matches specific punctuation.</span>
-<span class="kw">fn</span> <span class="ident">optional_punct</span>(<span class="ident">iter</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Peekable</span><span class="op">&lt;</span><span class="ident">token_stream::IntoIter</span><span class="op">&gt;</span>, <span class="ident">c</span>: <span class="ident">char</span>) -&gt; <span class="ident">bool</span> {
-    <span class="kw">match</span> <span class="ident">iter</span>.<span class="ident">peek</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">Punct</span>(<span class="ident">punct</span>)) <span class="kw">if</span> <span class="ident">punct</span>.<span class="ident">as_char</span>() <span class="op">==</span> <span class="ident">c</span> =&gt; <span class="ident">iter</span>.<span class="ident">next</span>().<span class="ident">is_some</span>(),
-        <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
+<span class="doccomment">/// Check if next token matches specific punctuation.
+</span><span class="kw">fn </span>optional_punct(iter: <span class="kw-2">&amp;mut </span>Peekable&lt;token_stream::IntoIter&gt;, c: char) -&gt; bool {
+    <span class="kw">match </span>iter.peek() {
+        <span class="prelude-val">Some</span>(Punct(punct)) <span class="kw">if </span>punct.as_char() == c =&gt; iter.next().is_some(),
+        <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
     }
 }
 
-<span class="doccomment">/// Ensure next token matches specific punctuation.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Panics</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Panics if the punctuation does not match.</span>
-<span class="kw">fn</span> <span class="ident">expect_punct</span>(<span class="ident">iter</span>: <span class="kw-2">&amp;mut</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">TokenTree</span><span class="op">&gt;</span>, <span class="ident">c</span>: <span class="ident">char</span>) {
-    <span class="kw">match</span> <span class="ident">iter</span>.<span class="ident">next</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">Punct</span>(<span class="kw-2">ref</span> <span class="ident">punct</span>)) <span class="kw">if</span> <span class="ident">punct</span>.<span class="ident">as_char</span>() <span class="op">==</span> <span class="ident">c</span> =&gt; (),
-        <span class="ident">token</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected punctuation &#39;{}&#39;, but got {:?}&quot;</span>, <span class="ident">c</span>, <span class="ident">token</span>),
+<span class="doccomment">/// Ensure next token matches specific punctuation.
+///
+/// # Panics
+///
+/// Panics if the punctuation does not match.
+</span><span class="kw">fn </span>expect_punct(iter: <span class="kw-2">&amp;mut </span><span class="kw">impl </span>Iterator&lt;Item = TokenTree&gt;, c: char) {
+    <span class="kw">match </span>iter.next() {
+        <span class="prelude-val">Some</span>(Punct(<span class="kw-2">ref </span>punct)) <span class="kw">if </span>punct.as_char() == c =&gt; (),
+        token =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected punctuation &#39;{}&#39;, but got {:?}&quot;</span>, c, token),
     }
 }
 
-<span class="doccomment">/// Get next token as [`usize`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Panics</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Panics if the next token is not a [`usize`] in hex or decimal literal format.</span>
-<span class="kw">fn</span> <span class="ident">next_usize</span>(<span class="ident">iter</span>: <span class="kw-2">&amp;mut</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">TokenTree</span><span class="op">&gt;</span>) -&gt; <span class="ident">usize</span> {
-    <span class="kw">match</span> <span class="ident">iter</span>.<span class="ident">next</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">Literal</span>(<span class="ident">literal</span>)) =&gt; {
-            <span class="kw">let</span> <span class="ident">literal</span> <span class="op">=</span> <span class="ident">literal</span>.<span class="ident">to_string</span>();
-            <span class="kw">if</span> <span class="ident">literal</span>.<span class="ident">starts_with</span>(<span class="string">&quot;0x&quot;</span>) {
-                <span class="ident">usize::from_str_radix</span>(<span class="kw-2">&amp;</span><span class="ident">literal</span>[<span class="number">2</span>..], <span class="number">16</span>).<span class="ident">unwrap</span>()
-            } <span class="kw">else</span> {
-                <span class="ident">usize::from_str_radix</span>(<span class="kw-2">&amp;</span><span class="ident">literal</span>, <span class="number">10</span>).<span class="ident">unwrap</span>()
+<span class="doccomment">/// Get next token as [`usize`].
+///
+/// # Panics
+///
+/// Panics if the next token is not a [`usize`] in hex or decimal literal format.
+</span><span class="kw">fn </span>next_usize(iter: <span class="kw-2">&amp;mut </span><span class="kw">impl </span>Iterator&lt;Item = TokenTree&gt;) -&gt; usize {
+    <span class="kw">match </span>iter.next() {
+        <span class="prelude-val">Some</span>(Literal(literal)) =&gt; {
+            <span class="kw">let </span>literal = literal.to_string();
+            <span class="kw">if </span>literal.starts_with(<span class="string">&quot;0x&quot;</span>) {
+                usize::from_str_radix(<span class="kw-2">&amp;</span>literal[<span class="number">2</span>..], <span class="number">16</span>).unwrap()
+            } <span class="kw">else </span>{
+                usize::from_str_radix(<span class="kw-2">&amp;</span>literal, <span class="number">10</span>).unwrap()
             }
         },
-        <span class="ident">token</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected literal, but got {:?}&quot;</span>, <span class="ident">token</span>),
+        token =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected literal, but got {:?}&quot;</span>, token),
     }
 }
 
-<span class="doccomment">/// Get next token as [`Group`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Panics</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Panics if the next token is not a [`Group`].</span>
-<span class="kw">fn</span> <span class="ident">next_group</span>(<span class="ident">iter</span>: <span class="kw-2">&amp;mut</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">TokenTree</span><span class="op">&gt;</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="kw">match</span> <span class="ident">iter</span>.<span class="ident">next</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">Group</span>(<span class="ident">group</span>)) =&gt; <span class="ident">group</span>.<span class="ident">stream</span>(),
-        <span class="ident">token</span> =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected group, but got {:?}&quot;</span>, <span class="ident">token</span>),
+<span class="doccomment">/// Get next token as [`Group`].
+///
+/// # Panics
+///
+/// Panics if the next token is not a [`Group`].
+</span><span class="kw">fn </span>next_group(iter: <span class="kw-2">&amp;mut </span><span class="kw">impl </span>Iterator&lt;Item = TokenTree&gt;) -&gt; TokenStream {
+    <span class="kw">match </span>iter.next() {
+        <span class="prelude-val">Some</span>(Group(group)) =&gt; group.stream(),
+        token =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Expected group, but got {:?}&quot;</span>, token),
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="vte_generate_state_changes" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="vte_generate_state_changes" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

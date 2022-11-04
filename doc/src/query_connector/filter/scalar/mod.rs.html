@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/query-connector/src/filter/scalar/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../query_connector/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `query-engine/connectors/query-connector/src/filter/scalar/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../query_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../query_connector/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -146,153 +146,153 @@
 <span id="146">146</span>
 <span id="147">147</span>
 <span id="148">148</span>
-</pre><pre class="rust"><code><span class="kw">mod</span> <span class="ident">compare</span>;
-<span class="kw">mod</span> <span class="ident">condition</span>;
-<span class="kw">mod</span> <span class="ident">projection</span>;
+</pre><pre class="rust"><code><span class="kw">mod </span>compare;
+<span class="kw">mod </span>condition;
+<span class="kw">mod </span>projection;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">compare</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">condition</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">projection</span>::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>compare::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>condition::<span class="kw-2">*</span>;
+<span class="kw">pub use </span>projection::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident">prisma_models</span>::<span class="kw-2">*</span>;
+<span class="kw">use </span>prisma_models::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident">std::collections::BTreeSet</span>;
+<span class="kw">use </span>std::collections::BTreeSet;
 
-<span class="doccomment">/// Filtering with a scalar value. From a GraphQL point of view this is in the</span>
-<span class="doccomment">/// head of the query:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```graphql</span>
-<span class="doccomment">/// findManyUser(where: { id: 5 })</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This translates to a projection of one column `id` with a condition where</span>
-<span class="doccomment">/// the column value equals `5`.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ScalarFilter</span> {
-    <span class="kw">pub</span> <span class="ident">projection</span>: <span class="ident">ScalarProjection</span>,
-    <span class="kw">pub</span> <span class="ident">condition</span>: <span class="ident">ScalarCondition</span>,
-    <span class="kw">pub</span> <span class="ident">mode</span>: <span class="ident">QueryMode</span>,
+<span class="doccomment">/// Filtering with a scalar value. From a GraphQL point of view this is in the
+/// head of the query:
+///
+/// ```graphql
+/// findManyUser(where: { id: 5 })
+/// ```
+///
+/// This translates to a projection of one column `id` with a condition where
+/// the column value equals `5`.
+</span><span class="attribute">#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+</span><span class="kw">pub struct </span>ScalarFilter {
+    <span class="kw">pub </span>projection: ScalarProjection,
+    <span class="kw">pub </span>condition: ScalarCondition,
+    <span class="kw">pub </span>mode: QueryMode,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">QueryMode</span> {
-    <span class="ident">Default</span>,
-    <span class="ident">Insensitive</span>,
+<span class="attribute">#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+</span><span class="kw">pub enum </span>QueryMode {
+    Default,
+    Insensitive,
 }
 
-<span class="kw">impl</span> <span class="ident">ScalarFilter</span> {
-    <span class="doccomment">/// The number of values in the filter. `IN` and `NOT IN` may contain more</span>
-    <span class="doccomment">/// than one.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">condition</span> {
-            <span class="ident">ScalarCondition::In</span>(<span class="kw-2">ref</span> <span class="ident">l</span>) =&gt; <span class="ident">l</span>.<span class="ident">len</span>(),
-            <span class="ident">ScalarCondition::NotIn</span>(<span class="kw-2">ref</span> <span class="ident">l</span>) =&gt; <span class="ident">l</span>.<span class="ident">len</span>(),
-            <span class="kw">_</span> =&gt; <span class="number">1</span>,
+<span class="kw">impl </span>ScalarFilter {
+    <span class="doccomment">/// The number of values in the filter. `IN` and `NOT IN` may contain more
+    /// than one.
+    </span><span class="kw">pub fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="kw">match </span><span class="self">self</span>.condition {
+            ScalarCondition::In(<span class="kw-2">ref </span>l) =&gt; l.len(),
+            ScalarCondition::NotIn(<span class="kw-2">ref </span>l) =&gt; l.len(),
+            <span class="kw">_ </span>=&gt; <span class="number">1</span>,
         }
     }
 
-    <span class="doccomment">/// Returns `true` if the number of values in the filter is 0.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">0</span>
+    <span class="doccomment">/// Returns `true` if the number of values in the filter is 0.
+    </span><span class="kw">pub fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.len() == <span class="number">0
+    </span>}
+
+    <span class="doccomment">/// If `true`, the filter should be split into smaller filters executed in
+    /// separate queries.
+    </span><span class="kw">pub fn </span>should_batch(<span class="kw-2">&amp;</span><span class="self">self</span>, chunk_size: usize) -&gt; bool {
+        <span class="self">self</span>.len() &gt; chunk_size
     }
 
-    <span class="doccomment">/// If `true`, the filter should be split into smaller filters executed in</span>
-    <span class="doccomment">/// separate queries.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">should_batch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">chunk_size</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">chunk_size</span>
-    }
-
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">can_batch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="op">!</span><span class="macro">matches!</span>(
-            <span class="self">self</span>.<span class="ident">condition</span>,
-            <span class="ident">ScalarCondition::NotContains</span>(<span class="kw">_</span>)
-                <span class="op">|</span> <span class="ident">ScalarCondition::NotEquals</span>(<span class="kw">_</span>)
-                <span class="op">|</span> <span class="ident">ScalarCondition::NotIn</span>(<span class="kw">_</span>)
-                <span class="op">|</span> <span class="ident">ScalarCondition::NotSearch</span>(..)
-                <span class="op">|</span> <span class="ident">ScalarCondition::NotStartsWith</span>(<span class="kw">_</span>)
-                <span class="op">|</span> <span class="ident">ScalarCondition::NotEndsWith</span>(<span class="kw">_</span>)
+    <span class="kw">pub fn </span>can_batch(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        !<span class="macro">matches!</span>(
+            <span class="self">self</span>.condition,
+            ScalarCondition::NotContains(<span class="kw">_</span>)
+                | ScalarCondition::NotEquals(<span class="kw">_</span>)
+                | ScalarCondition::NotIn(<span class="kw">_</span>)
+                | ScalarCondition::NotSearch(..)
+                | ScalarCondition::NotStartsWith(<span class="kw">_</span>)
+                | ScalarCondition::NotEndsWith(<span class="kw">_</span>)
         )
     }
 
-    <span class="doccomment">/// If possible, converts the filter into multiple smaller filters.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">batched</span>(<span class="self">self</span>, <span class="ident">chunk_size</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ScalarFilter</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">inner</span>(<span class="kw-2">mut</span> <span class="ident">list</span>: <span class="ident">PrismaListValue</span>, <span class="ident">chunk_size</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PrismaListValue</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">dedup_list</span>: <span class="ident">BTreeSet</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">list</span>.<span class="ident">drain</span>(..).<span class="ident">collect</span>();
+    <span class="doccomment">/// If possible, converts the filter into multiple smaller filters.
+    </span><span class="kw">pub fn </span>batched(<span class="self">self</span>, chunk_size: usize) -&gt; Vec&lt;ScalarFilter&gt; {
+        <span class="kw">fn </span>inner(<span class="kw-2">mut </span>list: PrismaListValue, chunk_size: usize) -&gt; Vec&lt;PrismaListValue&gt; {
+            <span class="kw">let </span>dedup_list: BTreeSet&lt;<span class="kw">_</span>&gt; = list.drain(..).collect();
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">batches</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">list</span>.<span class="ident">len</span>() <span class="op">%</span> <span class="ident">chunk_size</span> <span class="op">+</span> <span class="number">1</span>);
-            <span class="ident">batches</span>.<span class="ident">push</span>(<span class="ident">Vec::with_capacity</span>(<span class="ident">chunk_size</span>));
+            <span class="kw">let </span><span class="kw-2">mut </span>batches = Vec::with_capacity(list.len() % chunk_size + <span class="number">1</span>);
+            batches.push(Vec::with_capacity(chunk_size));
 
-            <span class="kw">for</span> (<span class="ident">idx</span>, <span class="ident">item</span>) <span class="kw">in</span> <span class="ident">dedup_list</span>.<span class="ident">into_iter</span>().<span class="ident">enumerate</span>() {
-                <span class="kw">if</span> <span class="ident">idx</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">idx</span> <span class="op">%</span> <span class="ident">chunk_size</span> <span class="op">==</span> <span class="number">0</span> {
-                    <span class="ident">batches</span>.<span class="ident">push</span>(<span class="ident">Vec::with_capacity</span>(<span class="ident">chunk_size</span>));
+            <span class="kw">for </span>(idx, item) <span class="kw">in </span>dedup_list.into_iter().enumerate() {
+                <span class="kw">if </span>idx != <span class="number">0 </span>&amp;&amp; idx % chunk_size == <span class="number">0 </span>{
+                    batches.push(Vec::with_capacity(chunk_size));
                 }
 
-                <span class="ident">batches</span>.<span class="ident">last_mut</span>().<span class="ident">unwrap</span>().<span class="ident">push</span>(<span class="ident">item</span>);
+                batches.last_mut().unwrap().push(item);
             }
 
-            <span class="ident">batches</span>
+            batches
         }
 
-        <span class="kw">let</span> <span class="ident">mode</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">mode</span>.<span class="ident">clone</span>();
+        <span class="kw">let </span>mode = <span class="self">self</span>.mode.clone();
 
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">condition</span> {
-            <span class="ident">ScalarCondition::In</span>(<span class="ident">ConditionListValue::List</span>(<span class="ident">list</span>)) =&gt; {
-                <span class="kw">let</span> <span class="ident">projection</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">projection</span>;
+        <span class="kw">match </span><span class="self">self</span>.condition {
+            ScalarCondition::In(ConditionListValue::List(list)) =&gt; {
+                <span class="kw">let </span>projection = <span class="self">self</span>.projection;
 
-                <span class="ident">inner</span>(<span class="ident">list</span>, <span class="ident">chunk_size</span>)
-                    .<span class="ident">into_iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">batch</span><span class="op">|</span> <span class="ident">ScalarFilter</span> {
-                        <span class="ident">projection</span>: <span class="ident">projection</span>.<span class="ident">clone</span>(),
-                        <span class="ident">condition</span>: <span class="ident">ScalarCondition::In</span>(<span class="ident">ConditionListValue::list</span>(<span class="ident">batch</span>)),
-                        <span class="ident">mode</span>: <span class="ident">mode</span>.<span class="ident">clone</span>(),
+                inner(list, chunk_size)
+                    .into_iter()
+                    .map(|batch| ScalarFilter {
+                        projection: projection.clone(),
+                        condition: ScalarCondition::In(ConditionListValue::list(batch)),
+                        mode: mode.clone(),
                     })
-                    .<span class="ident">collect</span>()
+                    .collect()
             }
 
-            <span class="ident">ScalarCondition::NotIn</span>(<span class="ident">ConditionListValue::List</span>(<span class="ident">list</span>)) =&gt; {
-                <span class="kw">let</span> <span class="ident">projection</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">projection</span>;
+            ScalarCondition::NotIn(ConditionListValue::List(list)) =&gt; {
+                <span class="kw">let </span>projection = <span class="self">self</span>.projection;
 
-                <span class="ident">inner</span>(<span class="ident">list</span>, <span class="ident">chunk_size</span>)
-                    .<span class="ident">into_iter</span>()
-                    .<span class="ident">map</span>(<span class="op">|</span><span class="ident">batch</span><span class="op">|</span> <span class="ident">ScalarFilter</span> {
-                        <span class="ident">projection</span>: <span class="ident">projection</span>.<span class="ident">clone</span>(),
-                        <span class="ident">condition</span>: <span class="ident">ScalarCondition::NotIn</span>(<span class="ident">ConditionListValue::list</span>(<span class="ident">batch</span>)),
-                        <span class="ident">mode</span>: <span class="ident">mode</span>.<span class="ident">clone</span>(),
+                inner(list, chunk_size)
+                    .into_iter()
+                    .map(|batch| ScalarFilter {
+                        projection: projection.clone(),
+                        condition: ScalarCondition::NotIn(ConditionListValue::list(batch)),
+                        mode: mode.clone(),
                     })
-                    .<span class="ident">collect</span>()
+                    .collect()
             }
-            <span class="kw">_</span> =&gt; <span class="macro">vec!</span>[<span class="self">self</span>],
+            <span class="kw">_ </span>=&gt; <span class="macro">vec!</span>[<span class="self">self</span>],
         }
     }
 
-    <span class="doccomment">/// Returns the referenced scalar field if there is one.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_field_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">condition</span>.<span class="ident">as_field_ref</span>()
+    <span class="doccomment">/// Returns the referenced scalar field if there is one.
+    </span><span class="kw">pub fn </span>as_field_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ScalarFieldRef&gt; {
+        <span class="self">self</span>.condition.as_field_ref()
     }
 
-    <span class="doccomment">/// Returns all the scalar fields related to a scalar filter.</span>
-    <span class="doccomment">/// It also includes the referenced field if there is one.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_fields</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fields</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">projection</span>.<span class="ident">scalar_fields</span>();
+    <span class="doccomment">/// Returns all the scalar fields related to a scalar filter.
+    /// It also includes the referenced field if there is one.
+    </span><span class="kw">pub fn </span>scalar_fields(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Vec&lt;<span class="kw-2">&amp;</span>ScalarFieldRef&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>fields = <span class="self">self</span>.projection.scalar_fields();
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">field_ref</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">as_field_ref</span>() {
-            <span class="ident">fields</span>.<span class="ident">push</span>(<span class="ident">field_ref</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(field_ref) = <span class="self">self</span>.as_field_ref() {
+            fields.push(field_ref);
         }
 
-        <span class="ident">fields</span>
+        fields
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_unique</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">sf</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">scalar_ref</span>() {
-            <span class="ident">sf</span>.<span class="ident">unique</span>()
-        } <span class="kw">else</span> {
-            <span class="bool-val">false</span>
-        }
+    <span class="kw">pub fn </span>is_unique(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(sf) = <span class="self">self</span>.scalar_ref() {
+            sf.unique()
+        } <span class="kw">else </span>{
+            <span class="bool-val">false
+        </span>}
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scalar_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ScalarFieldRef</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">projection</span>.<span class="ident">as_single</span>()
+    <span class="kw">pub fn </span>scalar_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>ScalarFieldRef&gt; {
+        <span class="self">self</span>.projection.as_single()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="query_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

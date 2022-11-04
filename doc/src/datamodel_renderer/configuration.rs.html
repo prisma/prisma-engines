@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/datamodel-renderer/src/configuration.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>configuration.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../datamodel_renderer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../datamodel_renderer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../datamodel_renderer/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `introspection-engine/datamodel-renderer/src/configuration.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>configuration.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../datamodel_renderer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../datamodel_renderer/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../datamodel_renderer/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -120,82 +120,82 @@
 <span id="120">120</span>
 <span id="121">121</span>
 <span id="122">122</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Types related to the _configuration section_ in the PSL.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Includes the `datasource` and `generator` definitions.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Types related to the _configuration section_ in the PSL.
+//!
+//! Includes the `datasource` and `generator` definitions.
 
-<span class="kw">mod</span> <span class="ident">datasource</span>;
-<span class="kw">mod</span> <span class="ident">generator</span>;
+</span><span class="kw">mod </span>datasource;
+<span class="kw">mod </span>generator;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">datasource::Datasource</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">generator::Generator</span>;
+<span class="kw">pub use </span>datasource::Datasource;
+<span class="kw">pub use </span>generator::Generator;
 
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
+<span class="kw">use </span>std::fmt;
 
-<span class="doccomment">/// The configuration part of a data model. First the generators, then</span>
-<span class="doccomment">/// the datasources.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Configuration</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">generators</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Generator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">datasources</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Datasource</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// The configuration part of a data model. First the generators, then
+/// the datasources.
+</span><span class="attribute">#[derive(Debug, Default)]
+</span><span class="kw">pub struct </span>Configuration&lt;<span class="lifetime">&#39;a</span>&gt; {
+    generators: Vec&lt;Generator&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    datasources: Vec&lt;Datasource&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Configuration</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Add a new generator to the configuration.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_generator</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">generator</span>: <span class="ident">Generator</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">generators</span>.<span class="ident">push</span>(<span class="ident">generator</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; Configuration&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Add a new generator to the configuration.
+    </span><span class="kw">pub fn </span>push_generator(<span class="kw-2">&amp;mut </span><span class="self">self</span>, generator: Generator&lt;<span class="lifetime">&#39;a</span>&gt;) {
+        <span class="self">self</span>.generators.push(generator);
     }
 
-    <span class="doccomment">/// Add a new datasource to the configuration.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">push_datasource</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">datasource</span>: <span class="ident">Datasource</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) {
-        <span class="self">self</span>.<span class="ident">datasources</span>.<span class="ident">push</span>(<span class="ident">datasource</span>);
+    <span class="doccomment">/// Add a new datasource to the configuration.
+    </span><span class="kw">pub fn </span>push_datasource(<span class="kw-2">&amp;mut </span><span class="self">self</span>, datasource: Datasource&lt;<span class="lifetime">&#39;a</span>&gt;) {
+        <span class="self">self</span>.datasources.push(datasource);
     }
 
-    <span class="doccomment">/// Create a rendering from a PSL datasource.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_psl</span>(<span class="ident">psl_cfg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">psl::Configuration</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::default</span>();
+    <span class="doccomment">/// Create a rendering from a PSL datasource.
+    </span><span class="kw">pub fn </span>from_psl(psl_cfg: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>psl::Configuration) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span><span class="kw-2">mut </span>config = <span class="self">Self</span>::default();
 
-        <span class="kw">for</span> <span class="ident">generator</span> <span class="kw">in</span> <span class="ident">psl_cfg</span>.<span class="ident">generators</span>.<span class="ident">iter</span>() {
-            <span class="ident">config</span>.<span class="ident">push_generator</span>(<span class="ident">Generator::from_psl</span>(<span class="ident">generator</span>));
+        <span class="kw">for </span>generator <span class="kw">in </span>psl_cfg.generators.iter() {
+            config.push_generator(Generator::from_psl(generator));
         }
 
-        <span class="kw">for</span> <span class="ident">datasource</span> <span class="kw">in</span> <span class="ident">psl_cfg</span>.<span class="ident">datasources</span>.<span class="ident">iter</span>() {
-            <span class="ident">config</span>.<span class="ident">push_datasource</span>(<span class="ident">Datasource::from_psl</span>(<span class="ident">datasource</span>));
+        <span class="kw">for </span>datasource <span class="kw">in </span>psl_cfg.datasources.iter() {
+            config.push_datasource(Datasource::from_psl(datasource));
         }
 
-        <span class="ident">config</span>
+        config
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Configuration</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">for</span> <span class="ident">generator</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">generators</span>.<span class="ident">iter</span>() {
-            <span class="ident">generator</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)<span class="question-mark">?</span>
-        }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; fmt::Display <span class="kw">for </span>Configuration&lt;<span class="lifetime">&#39;a</span>&gt; {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">for </span>generator <span class="kw">in </span><span class="self">self</span>.generators.iter() {
+            generator.fmt(f)<span class="question-mark">?
+        </span>}
 
-        <span class="kw">for</span> <span class="ident">datasource</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">datasources</span>.<span class="ident">iter</span>() {
-            <span class="ident">datasource</span>.<span class="ident">fmt</span>(<span class="ident">f</span>)<span class="question-mark">?</span>;
+        <span class="kw">for </span>datasource <span class="kw">in </span><span class="self">self</span>.datasources.iter() {
+            datasource.fmt(f)<span class="question-mark">?</span>;
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">configuration</span>::<span class="kw-2">*</span>, <span class="ident">value</span>::<span class="kw-2">*</span>};
-    <span class="kw">use</span> <span class="ident">expect_test::expect</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="kw">use crate</span>::{configuration::<span class="kw-2">*</span>, value::<span class="kw-2">*</span>};
+    <span class="kw">use </span>expect_test::expect;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">minimal</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">Configuration::default</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>minimal() {
+        <span class="kw">let </span><span class="kw-2">mut </span>config = Configuration::default();
 
-        <span class="ident">config</span>.<span class="ident">push_generator</span>(<span class="ident">Generator::new</span>(<span class="string">&quot;client&quot;</span>, <span class="ident">Env::value</span>(<span class="string">&quot;prisma-client-js&quot;</span>)));
-        <span class="ident">config</span>.<span class="ident">push_datasource</span>(<span class="ident">Datasource::new</span>(<span class="string">&quot;db&quot;</span>, <span class="string">&quot;postgres&quot;</span>, <span class="ident">Env::variable</span>(<span class="string">&quot;DATABASE_URL&quot;</span>)));
+        config.push_generator(Generator::new(<span class="string">&quot;client&quot;</span>, Env::value(<span class="string">&quot;prisma-client-js&quot;</span>)));
+        config.push_datasource(Datasource::new(<span class="string">&quot;db&quot;</span>, <span class="string">&quot;postgres&quot;</span>, Env::variable(<span class="string">&quot;DATABASE_URL&quot;</span>)));
 
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">psl::reformat</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{config}&quot;</span>), <span class="number">2</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let </span>rendered = psl::reformat(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{config}&quot;</span>), <span class="number">2</span>).unwrap();
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">expect!</span>[[<span class="string">r#&quot;
+        <span class="kw">let </span>expected = <span class="macro">expect!</span>[[<span class="string">r#&quot;
             generator client {
               provider = &quot;prisma-client-js&quot;
             }
@@ -206,19 +206,19 @@
             }
         &quot;#</span>]];
 
-        <span class="ident">expected</span>.<span class="ident">assert_eq</span>(<span class="kw-2">&amp;</span><span class="ident">rendered</span>);
+        expected.assert_eq(<span class="kw-2">&amp;</span>rendered);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">not_so_minimal</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">Configuration::default</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>not_so_minimal() {
+        <span class="kw">let </span><span class="kw-2">mut </span>config = Configuration::default();
 
-        <span class="ident">config</span>.<span class="ident">push_generator</span>(<span class="ident">Generator::new</span>(<span class="string">&quot;js&quot;</span>, <span class="ident">Env::value</span>(<span class="string">&quot;prisma-client-js&quot;</span>)));
-        <span class="ident">config</span>.<span class="ident">push_generator</span>(<span class="ident">Generator::new</span>(<span class="string">&quot;go&quot;</span>, <span class="ident">Env::value</span>(<span class="string">&quot;prisma-client-go&quot;</span>)));
-        <span class="ident">config</span>.<span class="ident">push_datasource</span>(<span class="ident">Datasource::new</span>(<span class="string">&quot;pg&quot;</span>, <span class="string">&quot;postgres&quot;</span>, <span class="ident">Env::variable</span>(<span class="string">&quot;PG_DATABASE_URL&quot;</span>)));
-        <span class="ident">config</span>.<span class="ident">push_datasource</span>(<span class="ident">Datasource::new</span>(<span class="string">&quot;my&quot;</span>, <span class="string">&quot;mysql&quot;</span>, <span class="ident">Env::variable</span>(<span class="string">&quot;MY_DATABASE_URL&quot;</span>)));
+        config.push_generator(Generator::new(<span class="string">&quot;js&quot;</span>, Env::value(<span class="string">&quot;prisma-client-js&quot;</span>)));
+        config.push_generator(Generator::new(<span class="string">&quot;go&quot;</span>, Env::value(<span class="string">&quot;prisma-client-go&quot;</span>)));
+        config.push_datasource(Datasource::new(<span class="string">&quot;pg&quot;</span>, <span class="string">&quot;postgres&quot;</span>, Env::variable(<span class="string">&quot;PG_DATABASE_URL&quot;</span>)));
+        config.push_datasource(Datasource::new(<span class="string">&quot;my&quot;</span>, <span class="string">&quot;mysql&quot;</span>, Env::variable(<span class="string">&quot;MY_DATABASE_URL&quot;</span>)));
 
-        <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">expect!</span>[[<span class="string">r#&quot;
+        <span class="kw">let </span>expected = <span class="macro">expect!</span>[[<span class="string">r#&quot;
             generator js {
               provider = &quot;prisma-client-js&quot;
             }
@@ -238,9 +238,9 @@
             }
         &quot;#</span>]];
 
-        <span class="kw">let</span> <span class="ident">rendered</span> <span class="op">=</span> <span class="ident">psl::reformat</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{config}&quot;</span>), <span class="number">2</span>).<span class="ident">unwrap</span>();
-        <span class="ident">expected</span>.<span class="ident">assert_eq</span>(<span class="kw-2">&amp;</span><span class="ident">rendered</span>);
+        <span class="kw">let </span>rendered = psl::reformat(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{config}&quot;</span>), <span class="number">2</span>).unwrap();
+        expected.assert_eq(<span class="kw-2">&amp;</span>rendered);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="datamodel_renderer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="datamodel_renderer" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

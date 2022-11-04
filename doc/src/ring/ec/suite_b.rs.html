@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/ec/suite_b.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>suite_b.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../ring/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ring-0.16.20/src/ec/suite_b.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>suite_b.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../ring/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../ring/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -235,242 +235,242 @@
 <span id="235">235</span>
 <span id="236">236</span>
 <span id="237">237</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2016 Brian Smith.</span>
-<span class="comment">//</span>
-<span class="comment">// Permission to use, copy, modify, and/or distribute this software for any</span>
-<span class="comment">// purpose with or without fee is hereby granted, provided that the above</span>
-<span class="comment">// copyright notice and this permission notice appear in all copies.</span>
-<span class="comment">//</span>
-<span class="comment">// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES</span>
-<span class="comment">// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF</span>
-<span class="comment">// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY</span>
-<span class="comment">// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES</span>
-<span class="comment">// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION</span>
-<span class="comment">// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN</span>
-<span class="comment">// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2016 Brian Smith.
+//
+// Permission to use, copy, modify, and/or distribute this software for any
+// purpose with or without fee is hereby granted, provided that the above
+// copyright notice and this permission notice appear in all copies.
+//
+// THE SOFTWARE IS PROVIDED &quot;AS IS&quot; AND THE AUTHORS DISCLAIM ALL WARRANTIES
+// WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+// MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY
+// SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+// WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION
+// OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+// CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-<span class="doccomment">//! Elliptic curve operations on P-256 &amp; P-384.</span>
+</span><span class="doccomment">//! Elliptic curve operations on P-256 &amp; P-384.
 
-<span class="kw">use</span> <span class="ident"><span class="self">self</span>::ops</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">arithmetic::montgomery</span>::<span class="kw-2">*</span>, <span class="ident">cpu</span>, <span class="ident">ec</span>, <span class="ident">error</span>, <span class="ident">io::der</span>, <span class="ident">limb::LimbMask</span>, <span class="ident">pkcs8</span>};
+</span><span class="kw">use </span><span class="self">self</span>::ops::<span class="kw-2">*</span>;
+<span class="kw">use crate</span>::{arithmetic::montgomery::<span class="kw-2">*</span>, cpu, ec, error, io::der, limb::LimbMask, pkcs8};
 
-<span class="comment">// NIST SP 800-56A Step 3: &quot;If q is an odd prime p, verify that</span>
-<span class="comment">// yQ**2 = xQ**3 + axQ + b in GF(p), where the arithmetic is performed modulo</span>
-<span class="comment">// p.&quot;</span>
-<span class="comment">//</span>
-<span class="comment">// That is, verify that (x, y) is on the curve, which is true iif:</span>
-<span class="comment">//</span>
-<span class="comment">//     y**2 == x**3 + a*x + b (mod q)</span>
-<span class="comment">//</span>
-<span class="comment">// Or, equivalently, but more efficiently:</span>
-<span class="comment">//</span>
-<span class="comment">//     y**2 == (x**2 + a)*x + b  (mod q)</span>
-<span class="comment">//</span>
-<span class="kw">fn</span> <span class="ident">verify_affine_point_is_on_the_curve</span>(
-    <span class="ident">ops</span>: <span class="kw-2">&amp;</span><span class="ident">CommonOps</span>,
-    (<span class="ident">x</span>, <span class="ident">y</span>): (<span class="kw-2">&amp;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>),
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-    <span class="ident">verify_affine_point_is_on_the_curve_scaled</span>(<span class="ident">ops</span>, (<span class="ident">x</span>, <span class="ident">y</span>), <span class="kw-2">&amp;</span><span class="ident">ops</span>.<span class="ident">a</span>, <span class="kw-2">&amp;</span><span class="ident">ops</span>.<span class="ident">b</span>)
+<span class="comment">// NIST SP 800-56A Step 3: &quot;If q is an odd prime p, verify that
+// yQ**2 = xQ**3 + axQ + b in GF(p), where the arithmetic is performed modulo
+// p.&quot;
+//
+// That is, verify that (x, y) is on the curve, which is true iif:
+//
+//     y**2 == x**3 + a*x + b (mod q)
+//
+// Or, equivalently, but more efficiently:
+//
+//     y**2 == (x**2 + a)*x + b  (mod q)
+//
+</span><span class="kw">fn </span>verify_affine_point_is_on_the_curve(
+    ops: <span class="kw-2">&amp;</span>CommonOps,
+    (x, y): (<span class="kw-2">&amp;</span>Elem&lt;R&gt;, <span class="kw-2">&amp;</span>Elem&lt;R&gt;),
+) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt; {
+    verify_affine_point_is_on_the_curve_scaled(ops, (x, y), <span class="kw-2">&amp;</span>ops.a, <span class="kw-2">&amp;</span>ops.b)
 }
 
-<span class="comment">// Use `verify_affine_point_is_on_the_curve` instead of this function whenever</span>
-<span class="comment">// the affine coordinates are available or will become available. This function</span>
-<span class="comment">// should only be used then the affine coordinates are never calculated. See</span>
-<span class="comment">// the notes for `verify_affine_point_is_on_the_curve_scaled`.</span>
-<span class="comment">//</span>
-<span class="comment">// The value `z**2` is returned on success because it is useful for ECDSA</span>
-<span class="comment">// verification.</span>
-<span class="comment">//</span>
-<span class="comment">// This function also verifies that the point is not at infinity.</span>
-<span class="kw">fn</span> <span class="ident">verify_jacobian_point_is_on_the_curve</span>(
-    <span class="ident">ops</span>: <span class="kw-2">&amp;</span><span class="ident">CommonOps</span>,
-    <span class="ident">p</span>: <span class="kw-2">&amp;</span><span class="ident">Point</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>, <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">z</span> <span class="op">=</span> <span class="ident">ops</span>.<span class="ident">point_z</span>(<span class="ident">p</span>);
+<span class="comment">// Use `verify_affine_point_is_on_the_curve` instead of this function whenever
+// the affine coordinates are available or will become available. This function
+// should only be used then the affine coordinates are never calculated. See
+// the notes for `verify_affine_point_is_on_the_curve_scaled`.
+//
+// The value `z**2` is returned on success because it is useful for ECDSA
+// verification.
+//
+// This function also verifies that the point is not at infinity.
+</span><span class="kw">fn </span>verify_jacobian_point_is_on_the_curve(
+    ops: <span class="kw-2">&amp;</span>CommonOps,
+    p: <span class="kw-2">&amp;</span>Point,
+) -&gt; <span class="prelude-ty">Result</span>&lt;Elem&lt;R&gt;, error::Unspecified&gt; {
+    <span class="kw">let </span>z = ops.point_z(p);
 
-    <span class="comment">// Verify that the point is not at infinity.</span>
-    <span class="ident">ops</span>.<span class="ident">elem_verify_is_not_zero</span>(<span class="kw-2">&amp;</span><span class="ident">z</span>)<span class="question-mark">?</span>;
+    <span class="comment">// Verify that the point is not at infinity.
+    </span>ops.elem_verify_is_not_zero(<span class="kw-2">&amp;</span>z)<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">ops</span>.<span class="ident">point_x</span>(<span class="ident">p</span>);
-    <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="ident">ops</span>.<span class="ident">point_y</span>(<span class="ident">p</span>);
+    <span class="kw">let </span>x = ops.point_x(p);
+    <span class="kw">let </span>y = ops.point_y(p);
 
-    <span class="comment">// We are given Jacobian coordinates (x, y, z). So, we have:</span>
-    <span class="comment">//</span>
-    <span class="comment">//    (x/z**2, y/z**3) == (x&#39;, y&#39;),</span>
-    <span class="comment">//</span>
-    <span class="comment">// where (x&#39;, y&#39;) are the affine coordinates. The curve equation is:</span>
-    <span class="comment">//</span>
-    <span class="comment">//     y&#39;**2  ==  x&#39;**3 + a*x&#39; + b  ==  (x&#39;**2 + a)*x&#39; + b</span>
-    <span class="comment">//</span>
-    <span class="comment">// Substituting our Jacobian coordinates, we get:</span>
-    <span class="comment">//</span>
-    <span class="comment">//    /   y  \**2       /  /   x  \**2       \   /   x  \</span>
-    <span class="comment">//    | ---- |      ==  |  | ---- |    +  a  | * | ---- |  +  b</span>
-    <span class="comment">//    \ z**3 /          \  \ z**2 /          /   \ z**2 /</span>
-    <span class="comment">//</span>
-    <span class="comment">// Simplify:</span>
-    <span class="comment">//</span>
-    <span class="comment">//            y**2      / x**2       \     x</span>
-    <span class="comment">//            ----  ==  | ----  +  a | * ----  +  b</span>
-    <span class="comment">//            z**6      \ z**4       /   z**2</span>
-    <span class="comment">//</span>
-    <span class="comment">// Multiply both sides by z**6:</span>
-    <span class="comment">//</span>
-    <span class="comment">//     z**6             / x**2       \   z**6</span>
-    <span class="comment">//     ---- * y**2  ==  | ----  +  a | * ---- * x  +  (z**6) * b</span>
-    <span class="comment">//     z**6             \ z**4       /   z**2</span>
-    <span class="comment">//</span>
-    <span class="comment">// Simplify:</span>
-    <span class="comment">//</span>
-    <span class="comment">//                      / x**2       \</span>
-    <span class="comment">//            y**2  ==  | ----  +  a | * z**4 * x  +  (z**6) * b</span>
-    <span class="comment">//                      \ z**4       /</span>
-    <span class="comment">//</span>
-    <span class="comment">// Distribute z**4:</span>
-    <span class="comment">//</span>
-    <span class="comment">//                      / z**4                     \</span>
-    <span class="comment">//            y**2  ==  | ---- * x**2  +  z**4 * a | * x  +  (z**6) * b</span>
-    <span class="comment">//                      \ z**4                     /</span>
-    <span class="comment">//</span>
-    <span class="comment">// Simplify:</span>
-    <span class="comment">//</span>
-    <span class="comment">//            y**2  ==  (x**2  +  z**4 * a) * x  +  (z**6) * b</span>
-    <span class="comment">//</span>
-    <span class="kw">let</span> <span class="ident">z2</span> <span class="op">=</span> <span class="ident">ops</span>.<span class="ident">elem_squared</span>(<span class="kw-2">&amp;</span><span class="ident">z</span>);
-    <span class="kw">let</span> <span class="ident">z4</span> <span class="op">=</span> <span class="ident">ops</span>.<span class="ident">elem_squared</span>(<span class="kw-2">&amp;</span><span class="ident">z2</span>);
-    <span class="kw">let</span> <span class="ident">z4_a</span> <span class="op">=</span> <span class="ident">ops</span>.<span class="ident">elem_product</span>(<span class="kw-2">&amp;</span><span class="ident">z4</span>, <span class="kw-2">&amp;</span><span class="ident">ops</span>.<span class="ident">a</span>);
-    <span class="kw">let</span> <span class="ident">z6</span> <span class="op">=</span> <span class="ident">ops</span>.<span class="ident">elem_product</span>(<span class="kw-2">&amp;</span><span class="ident">z4</span>, <span class="kw-2">&amp;</span><span class="ident">z2</span>);
-    <span class="kw">let</span> <span class="ident">z6_b</span> <span class="op">=</span> <span class="ident">ops</span>.<span class="ident">elem_product</span>(<span class="kw-2">&amp;</span><span class="ident">z6</span>, <span class="kw-2">&amp;</span><span class="ident">ops</span>.<span class="ident">b</span>);
-    <span class="ident">verify_affine_point_is_on_the_curve_scaled</span>(<span class="ident">ops</span>, (<span class="kw-2">&amp;</span><span class="ident">x</span>, <span class="kw-2">&amp;</span><span class="ident">y</span>), <span class="kw-2">&amp;</span><span class="ident">z4_a</span>, <span class="kw-2">&amp;</span><span class="ident">z6_b</span>)<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>(<span class="ident">z2</span>)
+    <span class="comment">// We are given Jacobian coordinates (x, y, z). So, we have:
+    //
+    //    (x/z**2, y/z**3) == (x&#39;, y&#39;),
+    //
+    // where (x&#39;, y&#39;) are the affine coordinates. The curve equation is:
+    //
+    //     y&#39;**2  ==  x&#39;**3 + a*x&#39; + b  ==  (x&#39;**2 + a)*x&#39; + b
+    //
+    // Substituting our Jacobian coordinates, we get:
+    //
+    //    /   y  \**2       /  /   x  \**2       \   /   x  \
+    //    | ---- |      ==  |  | ---- |    +  a  | * | ---- |  +  b
+    //    \ z**3 /          \  \ z**2 /          /   \ z**2 /
+    //
+    // Simplify:
+    //
+    //            y**2      / x**2       \     x
+    //            ----  ==  | ----  +  a | * ----  +  b
+    //            z**6      \ z**4       /   z**2
+    //
+    // Multiply both sides by z**6:
+    //
+    //     z**6             / x**2       \   z**6
+    //     ---- * y**2  ==  | ----  +  a | * ---- * x  +  (z**6) * b
+    //     z**6             \ z**4       /   z**2
+    //
+    // Simplify:
+    //
+    //                      / x**2       \
+    //            y**2  ==  | ----  +  a | * z**4 * x  +  (z**6) * b
+    //                      \ z**4       /
+    //
+    // Distribute z**4:
+    //
+    //                      / z**4                     \
+    //            y**2  ==  | ---- * x**2  +  z**4 * a | * x  +  (z**6) * b
+    //                      \ z**4                     /
+    //
+    // Simplify:
+    //
+    //            y**2  ==  (x**2  +  z**4 * a) * x  +  (z**6) * b
+    //
+    </span><span class="kw">let </span>z2 = ops.elem_squared(<span class="kw-2">&amp;</span>z);
+    <span class="kw">let </span>z4 = ops.elem_squared(<span class="kw-2">&amp;</span>z2);
+    <span class="kw">let </span>z4_a = ops.elem_product(<span class="kw-2">&amp;</span>z4, <span class="kw-2">&amp;</span>ops.a);
+    <span class="kw">let </span>z6 = ops.elem_product(<span class="kw-2">&amp;</span>z4, <span class="kw-2">&amp;</span>z2);
+    <span class="kw">let </span>z6_b = ops.elem_product(<span class="kw-2">&amp;</span>z6, <span class="kw-2">&amp;</span>ops.b);
+    verify_affine_point_is_on_the_curve_scaled(ops, (<span class="kw-2">&amp;</span>x, <span class="kw-2">&amp;</span>y), <span class="kw-2">&amp;</span>z4_a, <span class="kw-2">&amp;</span>z6_b)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>(z2)
 }
 
-<span class="comment">// Handles the common logic of point-is-on-the-curve checks for both affine and</span>
-<span class="comment">// Jacobian cases.</span>
-<span class="comment">//</span>
-<span class="comment">// When doing the check that the point is on the curve after a computation,</span>
-<span class="comment">// to avoid fault attacks or mitigate potential bugs, it is better for security</span>
-<span class="comment">// to use `verify_affine_point_is_on_the_curve` on the affine coordinates,</span>
-<span class="comment">// because it provides some protection against faults that occur in the</span>
-<span class="comment">// computation of the inverse of `z`. See the paper and presentation &quot;Fault</span>
-<span class="comment">// Attacks on Projective-to-Affine Coordinates Conversion&quot; by Diana Maimuţ,</span>
-<span class="comment">// Cédric Murdica, David Naccache, Mehdi Tibouchi. That presentation concluded</span>
-<span class="comment">// simply &quot;Check the validity of the result after conversion to affine</span>
-<span class="comment">// coordinates.&quot; (It seems like a good idea to verify that</span>
-<span class="comment">// z_inv * z == 1 mod q too).</span>
-<span class="comment">//</span>
-<span class="comment">// In the case of affine coordinates (x, y), `a_scaled` and `b_scaled` are</span>
-<span class="comment">// `a` and `b`, respectively. In the case of Jacobian coordinates (x, y, z),</span>
-<span class="comment">// the computation and comparison is the same, except `a_scaled` and `b_scaled`</span>
-<span class="comment">// are (z**4 * a) and (z**6 * b), respectively. Thus, performance is another</span>
-<span class="comment">// reason to prefer doing the check on the affine coordinates, as Jacobian</span>
-<span class="comment">// computation requires 3 extra multiplications and 2 extra squarings.</span>
-<span class="comment">//</span>
-<span class="comment">// An example of a fault attack that isn&#39;t mitigated by a point-on-the-curve</span>
-<span class="comment">// check after multiplication is given in &quot;Sign Change Fault Attacks On</span>
-<span class="comment">// Elliptic Curve Cryptosystems&quot; by Johannes Blömer, Martin Otto, and</span>
-<span class="comment">// Jean-Pierre Seifert.</span>
-<span class="kw">fn</span> <span class="ident">verify_affine_point_is_on_the_curve_scaled</span>(
-    <span class="ident">ops</span>: <span class="kw-2">&amp;</span><span class="ident">CommonOps</span>,
-    (<span class="ident">x</span>, <span class="ident">y</span>): (<span class="kw-2">&amp;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>),
-    <span class="ident">a_scaled</span>: <span class="kw-2">&amp;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
-    <span class="ident">b_scaled</span>: <span class="kw-2">&amp;</span><span class="ident">Elem</span><span class="op">&lt;</span><span class="ident">R</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">error::Unspecified</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">lhs</span> <span class="op">=</span> <span class="ident">ops</span>.<span class="ident">elem_squared</span>(<span class="ident">y</span>);
+<span class="comment">// Handles the common logic of point-is-on-the-curve checks for both affine and
+// Jacobian cases.
+//
+// When doing the check that the point is on the curve after a computation,
+// to avoid fault attacks or mitigate potential bugs, it is better for security
+// to use `verify_affine_point_is_on_the_curve` on the affine coordinates,
+// because it provides some protection against faults that occur in the
+// computation of the inverse of `z`. See the paper and presentation &quot;Fault
+// Attacks on Projective-to-Affine Coordinates Conversion&quot; by Diana Maimuţ,
+// Cédric Murdica, David Naccache, Mehdi Tibouchi. That presentation concluded
+// simply &quot;Check the validity of the result after conversion to affine
+// coordinates.&quot; (It seems like a good idea to verify that
+// z_inv * z == 1 mod q too).
+//
+// In the case of affine coordinates (x, y), `a_scaled` and `b_scaled` are
+// `a` and `b`, respectively. In the case of Jacobian coordinates (x, y, z),
+// the computation and comparison is the same, except `a_scaled` and `b_scaled`
+// are (z**4 * a) and (z**6 * b), respectively. Thus, performance is another
+// reason to prefer doing the check on the affine coordinates, as Jacobian
+// computation requires 3 extra multiplications and 2 extra squarings.
+//
+// An example of a fault attack that isn&#39;t mitigated by a point-on-the-curve
+// check after multiplication is given in &quot;Sign Change Fault Attacks On
+// Elliptic Curve Cryptosystems&quot; by Johannes Blömer, Martin Otto, and
+// Jean-Pierre Seifert.
+</span><span class="kw">fn </span>verify_affine_point_is_on_the_curve_scaled(
+    ops: <span class="kw-2">&amp;</span>CommonOps,
+    (x, y): (<span class="kw-2">&amp;</span>Elem&lt;R&gt;, <span class="kw-2">&amp;</span>Elem&lt;R&gt;),
+    a_scaled: <span class="kw-2">&amp;</span>Elem&lt;R&gt;,
+    b_scaled: <span class="kw-2">&amp;</span>Elem&lt;R&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(), error::Unspecified&gt; {
+    <span class="kw">let </span>lhs = ops.elem_squared(y);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rhs</span> <span class="op">=</span> <span class="ident">ops</span>.<span class="ident">elem_squared</span>(<span class="ident">x</span>);
-    <span class="ident">ops</span>.<span class="ident">elem_add</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rhs</span>, <span class="ident">a_scaled</span>);
-    <span class="ident">ops</span>.<span class="ident">elem_mul</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rhs</span>, <span class="ident">x</span>);
-    <span class="ident">ops</span>.<span class="ident">elem_add</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rhs</span>, <span class="ident">b_scaled</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>rhs = ops.elem_squared(x);
+    ops.elem_add(<span class="kw-2">&amp;mut </span>rhs, a_scaled);
+    ops.elem_mul(<span class="kw-2">&amp;mut </span>rhs, x);
+    ops.elem_add(<span class="kw-2">&amp;mut </span>rhs, b_scaled);
 
-    <span class="kw">if</span> <span class="ident">ops</span>.<span class="ident">elems_are_equal</span>(<span class="kw-2">&amp;</span><span class="ident">lhs</span>, <span class="kw-2">&amp;</span><span class="ident">rhs</span>) <span class="op">!</span><span class="op">=</span> <span class="ident">LimbMask::True</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::Unspecified</span>);
+    <span class="kw">if </span>ops.elems_are_equal(<span class="kw-2">&amp;</span>lhs, <span class="kw-2">&amp;</span>rhs) != LimbMask::True {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(error::Unspecified);
     }
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">key_pair_from_pkcs8</span>(
-    <span class="ident">curve</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">ec::Curve</span>,
-    <span class="ident">template</span>: <span class="kw-2">&amp;</span><span class="ident">pkcs8::Template</span>,
-    <span class="ident">input</span>: <span class="ident">untrusted::Input</span>,
-    <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ec::KeyPair</span>, <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> (<span class="ident">ec_private_key</span>, <span class="kw">_</span>) <span class="op">=</span> <span class="ident">pkcs8::unwrap_key</span>(<span class="ident">template</span>, <span class="ident">pkcs8::Version::V1Only</span>, <span class="ident">input</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> (<span class="ident">private_key</span>, <span class="ident">public_key</span>) <span class="op">=</span>
-        <span class="ident">ec_private_key</span>.<span class="ident">read_all</span>(<span class="ident">error::KeyRejected::invalid_encoding</span>(), <span class="op">|</span><span class="ident">input</span><span class="op">|</span> {
-            <span class="comment">// https://tools.ietf.org/html/rfc5915#section-3</span>
-            <span class="ident">der::nested</span>(
-                <span class="ident">input</span>,
-                <span class="ident">der::Tag::Sequence</span>,
-                <span class="ident">error::KeyRejected::invalid_encoding</span>(),
-                <span class="op">|</span><span class="ident">input</span><span class="op">|</span> <span class="ident">key_pair_from_pkcs8_</span>(<span class="ident">template</span>, <span class="ident">input</span>),
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>key_pair_from_pkcs8(
+    curve: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>ec::Curve,
+    template: <span class="kw-2">&amp;</span>pkcs8::Template,
+    input: untrusted::Input,
+    cpu_features: cpu::Features,
+) -&gt; <span class="prelude-ty">Result</span>&lt;ec::KeyPair, error::KeyRejected&gt; {
+    <span class="kw">let </span>(ec_private_key, <span class="kw">_</span>) = pkcs8::unwrap_key(template, pkcs8::Version::V1Only, input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(private_key, public_key) =
+        ec_private_key.read_all(error::KeyRejected::invalid_encoding(), |input| {
+            <span class="comment">// https://tools.ietf.org/html/rfc5915#section-3
+            </span>der::nested(
+                input,
+                der::Tag::Sequence,
+                error::KeyRejected::invalid_encoding(),
+                |input| key_pair_from_pkcs8_(template, input),
             )
         })<span class="question-mark">?</span>;
-    <span class="ident">key_pair_from_bytes</span>(<span class="ident">curve</span>, <span class="ident">private_key</span>, <span class="ident">public_key</span>, <span class="ident">cpu_features</span>)
+    key_pair_from_bytes(curve, private_key, public_key, cpu_features)
 }
 
-<span class="kw">fn</span> <span class="ident">key_pair_from_pkcs8_</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
-    <span class="ident">template</span>: <span class="kw-2">&amp;</span><span class="ident">pkcs8::Template</span>,
-    <span class="ident">input</span>: <span class="kw-2">&amp;mut</span> <span class="ident">untrusted::Reader</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, <span class="ident">untrusted::Input</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>), <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">der::small_nonnegative_integer</span>(<span class="ident">input</span>)
-        .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error::Unspecified</span><span class="op">|</span> <span class="ident">error::KeyRejected::invalid_encoding</span>())<span class="question-mark">?</span>;
-    <span class="kw">if</span> <span class="ident">version</span> <span class="op">!</span><span class="op">=</span> <span class="number">1</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::KeyRejected::version_not_supported</span>());
+<span class="kw">fn </span>key_pair_from_pkcs8_&lt;<span class="lifetime">&#39;a</span>&gt;(
+    template: <span class="kw-2">&amp;</span>pkcs8::Template,
+    input: <span class="kw-2">&amp;mut </span>untrusted::Reader&lt;<span class="lifetime">&#39;a</span>&gt;,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;, untrusted::Input&lt;<span class="lifetime">&#39;a</span>&gt;), error::KeyRejected&gt; {
+    <span class="kw">let </span>version = der::small_nonnegative_integer(input)
+        .map_err(|error::Unspecified| error::KeyRejected::invalid_encoding())<span class="question-mark">?</span>;
+    <span class="kw">if </span>version != <span class="number">1 </span>{
+        <span class="kw">return </span><span class="prelude-val">Err</span>(error::KeyRejected::version_not_supported());
     }
 
-    <span class="kw">let</span> <span class="ident">private_key</span> <span class="op">=</span> <span class="ident">der::expect_tag_and_get_value</span>(<span class="ident">input</span>, <span class="ident">der::Tag::OctetString</span>)
-        .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error::Unspecified</span><span class="op">|</span> <span class="ident">error::KeyRejected::invalid_encoding</span>())<span class="question-mark">?</span>;
+    <span class="kw">let </span>private_key = der::expect_tag_and_get_value(input, der::Tag::OctetString)
+        .map_err(|error::Unspecified| error::KeyRejected::invalid_encoding())<span class="question-mark">?</span>;
 
-    <span class="comment">// [0] parameters (optional).</span>
-    <span class="kw">if</span> <span class="ident">input</span>.<span class="ident">peek</span>(<span class="ident">u8::from</span>(<span class="ident">der::Tag::ContextSpecificConstructed0</span>)) {
-        <span class="kw">let</span> <span class="ident">actual_alg_id</span> <span class="op">=</span>
-            <span class="ident">der::expect_tag_and_get_value</span>(<span class="ident">input</span>, <span class="ident">der::Tag::ContextSpecificConstructed0</span>)
-                .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error::Unspecified</span><span class="op">|</span> <span class="ident">error::KeyRejected::invalid_encoding</span>())<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="ident">actual_alg_id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">template</span>.<span class="ident">curve_oid</span>() {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::KeyRejected::wrong_algorithm</span>());
+    <span class="comment">// [0] parameters (optional).
+    </span><span class="kw">if </span>input.peek(u8::from(der::Tag::ContextSpecificConstructed0)) {
+        <span class="kw">let </span>actual_alg_id =
+            der::expect_tag_and_get_value(input, der::Tag::ContextSpecificConstructed0)
+                .map_err(|error::Unspecified| error::KeyRejected::invalid_encoding())<span class="question-mark">?</span>;
+        <span class="kw">if </span>actual_alg_id != template.curve_oid() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(error::KeyRejected::wrong_algorithm());
         }
     }
 
-    <span class="comment">// [1] publicKey. The RFC says it is optional, but we require it</span>
-    <span class="comment">// to be present.</span>
-    <span class="kw">let</span> <span class="ident">public_key</span> <span class="op">=</span> <span class="ident">der::nested</span>(
-        <span class="ident">input</span>,
-        <span class="ident">der::Tag::ContextSpecificConstructed1</span>,
-        <span class="ident">error::Unspecified</span>,
-        <span class="ident">der::bit_string_with_no_unused_bits</span>,
+    <span class="comment">// [1] publicKey. The RFC says it is optional, but we require it
+    // to be present.
+    </span><span class="kw">let </span>public_key = der::nested(
+        input,
+        der::Tag::ContextSpecificConstructed1,
+        error::Unspecified,
+        der::bit_string_with_no_unused_bits,
     )
-    .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error::Unspecified</span><span class="op">|</span> <span class="ident">error::KeyRejected::invalid_encoding</span>())<span class="question-mark">?</span>;
+    .map_err(|error::Unspecified| error::KeyRejected::invalid_encoding())<span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>((<span class="ident">private_key</span>, <span class="ident">public_key</span>))
+    <span class="prelude-val">Ok</span>((private_key, public_key))
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">key_pair_from_bytes</span>(
-    <span class="ident">curve</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">ec::Curve</span>,
-    <span class="ident">private_key_bytes</span>: <span class="ident">untrusted::Input</span>,
-    <span class="ident">public_key_bytes</span>: <span class="ident">untrusted::Input</span>,
-    <span class="ident">cpu_features</span>: <span class="ident">cpu::Features</span>,
-) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ec::KeyPair</span>, <span class="ident">error::KeyRejected</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">seed</span> <span class="op">=</span> <span class="ident">ec::Seed::from_bytes</span>(<span class="ident">curve</span>, <span class="ident">private_key_bytes</span>, <span class="ident">cpu_features</span>)
-        .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error::Unspecified</span><span class="op">|</span> <span class="ident">error::KeyRejected::invalid_component</span>())<span class="question-mark">?</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>key_pair_from_bytes(
+    curve: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>ec::Curve,
+    private_key_bytes: untrusted::Input,
+    public_key_bytes: untrusted::Input,
+    cpu_features: cpu::Features,
+) -&gt; <span class="prelude-ty">Result</span>&lt;ec::KeyPair, error::KeyRejected&gt; {
+    <span class="kw">let </span>seed = ec::Seed::from_bytes(curve, private_key_bytes, cpu_features)
+        .map_err(|error::Unspecified| error::KeyRejected::invalid_component())<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">ec::KeyPair::derive</span>(<span class="ident">seed</span>)
-        .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">error::Unspecified</span><span class="op">|</span> <span class="ident">error::KeyRejected::unexpected_error</span>())<span class="question-mark">?</span>;
-    <span class="kw">if</span> <span class="ident">public_key_bytes</span> <span class="op">!</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">r</span>.<span class="ident">public_key</span>().<span class="ident">as_ref</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error::KeyRejected::inconsistent_components</span>());
+    <span class="kw">let </span>r = ec::KeyPair::derive(seed)
+        .map_err(|error::Unspecified| error::KeyRejected::unexpected_error())<span class="question-mark">?</span>;
+    <span class="kw">if </span>public_key_bytes != <span class="kw-2">*</span>r.public_key().as_ref() {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(error::KeyRejected::inconsistent_components());
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">r</span>)
+    <span class="prelude-val">Ok</span>(r)
 }
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">curve</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">ecdh</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">ecdsa</span>;
+<span class="kw">pub mod </span>curve;
+<span class="kw">pub mod </span>ecdh;
+<span class="kw">pub mod </span>ecdsa;
 
-<span class="kw">mod</span> <span class="ident">ops</span>;
+<span class="kw">mod </span>ops;
 
-<span class="kw">mod</span> <span class="ident">private_key</span>;
-<span class="kw">mod</span> <span class="ident">public_key</span>;
+<span class="kw">mod </span>private_key;
+<span class="kw">mod </span>public_key;
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="ring" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

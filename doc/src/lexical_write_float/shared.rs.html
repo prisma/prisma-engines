@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-write-float-0.8.5/src/shared.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>shared.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_write_float/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_write_float/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_write_float/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-write-float-0.8.5/src/shared.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>shared.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_write_float/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_write_float/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_write_float/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -203,210 +203,210 @@
 <span id="203">203</span>
 <span id="204">204</span>
 <span id="205">205</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Shared utilities for writing floats.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Shared utilities for writing floats.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::options</span>::{<span class="ident">Options</span>, <span class="ident">RoundMode</span>};
-<span class="kw">use</span> <span class="ident">lexical_util::digit</span>::{<span class="ident">char_to_valid_digit_const</span>, <span class="ident">digit_to_char_const</span>};
-<span class="kw">use</span> <span class="ident">lexical_util::format::NumberFormat</span>;
-<span class="kw">use</span> <span class="ident">lexical_write_integer::write::WriteInteger</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::options::{Options, RoundMode};
+<span class="kw">use </span>lexical_util::digit::{char_to_valid_digit_const, digit_to_char_const};
+<span class="kw">use </span>lexical_util::format::NumberFormat;
+<span class="kw">use </span>lexical_write_integer::write::WriteInteger;
 
-<span class="doccomment">/// Get the exact number of digits from a minimum bound.</span>
-<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">min_exact_digits</span>(<span class="ident">digit_count</span>: <span class="ident">usize</span>, <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">Options</span>) -&gt; <span class="ident">usize</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">exact_count</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">digit_count</span>;
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">min_digits</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">min_significant_digits</span>() {
-        <span class="ident">exact_count</span> <span class="op">=</span> <span class="ident">min_digits</span>.<span class="ident">get</span>().<span class="ident">max</span>(<span class="ident">exact_count</span>);
+<span class="doccomment">/// Get the exact number of digits from a minimum bound.
+</span><span class="attribute">#[inline(always)]
+</span><span class="kw">pub fn </span>min_exact_digits(digit_count: usize, options: <span class="kw-2">&amp;</span>Options) -&gt; usize {
+    <span class="kw">let </span><span class="kw-2">mut </span>exact_count: usize = digit_count;
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(min_digits) = options.min_significant_digits() {
+        exact_count = min_digits.get().max(exact_count);
     }
-    <span class="ident">exact_count</span>
+    exact_count
 }
 
-<span class="doccomment">/// Round-up the last digit, from a buffer of digits.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Round up the last digit, incrementally handling all subsequent</span>
-<span class="doccomment">/// digits in case of overflow.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Safe as long as `count &lt;= digits.len()`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>), <span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">round_up</span>(<span class="ident">digits</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>], <span class="ident">count</span>: <span class="ident">usize</span>, <span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; (<span class="ident">usize</span>, <span class="ident">bool</span>) {
-    <span class="macro">debug_assert!</span>(<span class="ident">count</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">digits</span>.<span class="ident">len</span>());
+<span class="doccomment">/// Round-up the last digit, from a buffer of digits.
+///
+/// Round up the last digit, incrementally handling all subsequent
+/// digits in case of overflow.
+///
+/// # Safety
+///
+/// Safe as long as `count &lt;= digits.len()`.
+</span><span class="attribute">#[cfg_attr(not(feature = <span class="string">&quot;compact&quot;</span>), inline)]
+</span><span class="kw">pub unsafe fn </span>round_up(digits: <span class="kw-2">&amp;mut </span>[u8], count: usize, radix: u32) -&gt; (usize, bool) {
+    <span class="macro">debug_assert!</span>(count &lt;= digits.len());
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">index</span> <span class="op">=</span> <span class="ident">count</span>;
-    <span class="kw">let</span> <span class="ident">max_char</span> <span class="op">=</span> <span class="ident">digit_to_char_const</span>(<span class="ident">radix</span> <span class="op">-</span> <span class="number">1</span>, <span class="ident">radix</span>);
-    <span class="kw">while</span> <span class="ident">index</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-        <span class="comment">// SAFETY: safe if `count &lt;= digits.len()`, since then</span>
-        <span class="comment">// `index &gt; 0 &amp;&amp; index &lt;= digits.len()`.</span>
-        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="macro">index_unchecked!</span>(<span class="ident">digits</span>[<span class="ident">index</span> <span class="op">-</span> <span class="number">1</span>]) };
-        <span class="kw">if</span> <span class="ident">c</span> <span class="op">&lt;</span> <span class="ident">max_char</span> {
-            <span class="comment">// SAFETY: safe since `index &gt; 0 &amp;&amp; index &lt;= digits.len()`.</span>
-            <span class="kw">let</span> <span class="ident">digit</span> <span class="op">=</span> <span class="ident">char_to_valid_digit_const</span>(<span class="ident">c</span>, <span class="ident">radix</span>);
-            <span class="kw">let</span> <span class="ident">rounded</span> <span class="op">=</span> <span class="ident">digit_to_char_const</span>(<span class="ident">digit</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">radix</span>);
-            <span class="kw">unsafe</span> { <span class="macro">index_unchecked_mut!</span>(<span class="ident">digits</span>[<span class="ident">index</span> <span class="op">-</span> <span class="number">1</span>]) <span class="op">=</span> <span class="ident">rounded</span> };
-            <span class="kw">return</span> (<span class="ident">index</span>, <span class="bool-val">false</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>index = count;
+    <span class="kw">let </span>max_char = digit_to_char_const(radix - <span class="number">1</span>, radix);
+    <span class="kw">while </span>index != <span class="number">0 </span>{
+        <span class="comment">// SAFETY: safe if `count &lt;= digits.len()`, since then
+        // `index &gt; 0 &amp;&amp; index &lt;= digits.len()`.
+        </span><span class="kw">let </span>c = <span class="kw">unsafe </span>{ <span class="macro">index_unchecked!</span>(digits[index - <span class="number">1</span>]) };
+        <span class="kw">if </span>c &lt; max_char {
+            <span class="comment">// SAFETY: safe since `index &gt; 0 &amp;&amp; index &lt;= digits.len()`.
+            </span><span class="kw">let </span>digit = char_to_valid_digit_const(c, radix);
+            <span class="kw">let </span>rounded = digit_to_char_const(digit + <span class="number">1</span>, radix);
+            <span class="kw">unsafe </span>{ <span class="macro">index_unchecked_mut!</span>(digits[index - <span class="number">1</span>]) = rounded };
+            <span class="kw">return </span>(index, <span class="bool-val">false</span>);
         }
-        <span class="comment">// Don&#39;t have to assign b&#39;0&#39; otherwise, since we&#39;re just carrying</span>
-        <span class="comment">// to the next digit.</span>
-        <span class="ident">index</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="comment">// Don&#39;t have to assign b&#39;0&#39; otherwise, since we&#39;re just carrying
+        // to the next digit.
+        </span>index -= <span class="number">1</span>;
     }
 
-    <span class="comment">// Means all digits were max digit: we need to round up.</span>
-    <span class="comment">// SAFETY: safe since `digits.len() &gt; 1`.</span>
-    <span class="kw">unsafe</span> { <span class="macro">index_unchecked_mut!</span>(<span class="ident">digits</span>[<span class="number">0</span>]) <span class="op">=</span> <span class="string">b&#39;1&#39;</span> };
+    <span class="comment">// Means all digits were max digit: we need to round up.
+    // SAFETY: safe since `digits.len() &gt; 1`.
+    </span><span class="kw">unsafe </span>{ <span class="macro">index_unchecked_mut!</span>(digits[<span class="number">0</span>]) = <span class="string">b&#39;1&#39; </span>};
 
     (<span class="number">1</span>, <span class="bool-val">true</span>)
 }
 
-<span class="doccomment">/// Round the number of digits based on the maximum digits, for decimal digits.</span>
-<span class="doccomment">/// `digits` is a mutable buffer of the current digits, `digit_count` is the</span>
-<span class="doccomment">/// length of the written digits in `digits`, and `exp` is the decimal exponent</span>
-<span class="doccomment">/// relative to the digits. Returns the digit count, resulting exp, and if</span>
-<span class="doccomment">/// the input carried to the next digit.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Safe as long as `digit_count &lt;= digits.len()`.</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::comparison_chain</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>), <span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">truncate_and_round_decimal</span>(
-    <span class="ident">digits</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-    <span class="ident">digit_count</span>: <span class="ident">usize</span>,
-    <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="ident">Options</span>,
-) -&gt; (<span class="ident">usize</span>, <span class="ident">bool</span>) {
-    <span class="macro">debug_assert!</span>(<span class="ident">digit_count</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">digits</span>.<span class="ident">len</span>());
+<span class="doccomment">/// Round the number of digits based on the maximum digits, for decimal digits.
+/// `digits` is a mutable buffer of the current digits, `digit_count` is the
+/// length of the written digits in `digits`, and `exp` is the decimal exponent
+/// relative to the digits. Returns the digit count, resulting exp, and if
+/// the input carried to the next digit.
+///
+/// # Safety
+///
+/// Safe as long as `digit_count &lt;= digits.len()`.
+</span><span class="attribute">#[allow(clippy::comparison_chain)]
+#[cfg_attr(not(feature = <span class="string">&quot;compact&quot;</span>), inline)]
+</span><span class="kw">pub unsafe fn </span>truncate_and_round_decimal(
+    digits: <span class="kw-2">&amp;mut </span>[u8],
+    digit_count: usize,
+    options: <span class="kw-2">&amp;</span>Options,
+) -&gt; (usize, bool) {
+    <span class="macro">debug_assert!</span>(digit_count &lt;= digits.len());
 
-    <span class="kw">let</span> <span class="ident">max_digits</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">digits</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">max_significant_digits</span>() {
-        <span class="ident">digits</span>.<span class="ident">get</span>()
-    } <span class="kw">else</span> {
-        <span class="kw">return</span> (<span class="ident">digit_count</span>, <span class="bool-val">false</span>);
+    <span class="kw">let </span>max_digits = <span class="kw">if let </span><span class="prelude-val">Some</span>(digits) = options.max_significant_digits() {
+        digits.get()
+    } <span class="kw">else </span>{
+        <span class="kw">return </span>(digit_count, <span class="bool-val">false</span>);
     };
-    <span class="kw">if</span> <span class="ident">max_digits</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">digit_count</span> {
-        <span class="kw">return</span> (<span class="ident">digit_count</span>, <span class="bool-val">false</span>);
+    <span class="kw">if </span>max_digits &gt;= digit_count {
+        <span class="kw">return </span>(digit_count, <span class="bool-val">false</span>);
     }
 
-    <span class="comment">// Check if we&#39;re truncating, if so, shorten the digits in the input.</span>
-    <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">round_mode</span>() <span class="op">==</span> <span class="ident">RoundMode::Truncate</span> {
-        <span class="comment">// Don&#39;t round input, just shorten number of digits emitted.</span>
-        <span class="kw">return</span> (<span class="ident">max_digits</span>, <span class="bool-val">false</span>);
+    <span class="comment">// Check if we&#39;re truncating, if so, shorten the digits in the input.
+    </span><span class="kw">if </span>options.round_mode() == RoundMode::Truncate {
+        <span class="comment">// Don&#39;t round input, just shorten number of digits emitted.
+        </span><span class="kw">return </span>(max_digits, <span class="bool-val">false</span>);
     }
 
-    <span class="comment">// We need to round-nearest, tie-even, so we need to handle</span>
-    <span class="comment">// the truncation **here**. If the representation is above</span>
-    <span class="comment">// halfway at all, we need to round up, even if 1 digit.</span>
+    <span class="comment">// We need to round-nearest, tie-even, so we need to handle
+    // the truncation **here**. If the representation is above
+    // halfway at all, we need to round up, even if 1 digit.
 
-    <span class="comment">// Get the last non-truncated digit, and the remaining ones.</span>
-    <span class="comment">// SAFETY: safe if `digit_count &lt; digits.len()`, since `max_digits &lt; digit_count`.</span>
-    <span class="kw">let</span> <span class="ident">truncated</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="macro">index_unchecked!</span>(<span class="ident">digits</span>[<span class="ident">max_digits</span>]) };
-    <span class="kw">let</span> (<span class="ident">digits</span>, <span class="ident">carried</span>) <span class="op">=</span> <span class="kw">if</span> <span class="ident">truncated</span> <span class="op">&lt;</span> <span class="string">b&#39;5&#39;</span> {
-        <span class="comment">// Just truncate, going to round-down anyway.</span>
-        (<span class="ident">max_digits</span>, <span class="bool-val">false</span>)
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">truncated</span> <span class="op">&gt;</span> <span class="string">b&#39;5&#39;</span> {
-        <span class="comment">// Round-up always.</span>
-        <span class="comment">// SAFETY: safe if `digit_count &lt;= digits.len()`, because `max_digits &lt; digit_count`.</span>
-        <span class="kw">unsafe</span> { <span class="ident">round_up</span>(<span class="ident">digits</span>, <span class="ident">max_digits</span>, <span class="number">10</span>) }
-    } <span class="kw">else</span> {
-        <span class="comment">// Have a near-halfway case, resolve it.</span>
-        <span class="comment">// SAFETY: safe if `digit_count &lt; digits.len()`.</span>
-        <span class="kw">let</span> (<span class="ident">is_odd</span>, <span class="ident">is_above</span>) <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">to_round</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">index_unchecked!</span>(<span class="ident">digits</span>[<span class="ident">max_digits</span> <span class="op">-</span> <span class="number">1</span>..<span class="ident">digit_count</span>]);
-            <span class="kw">let</span> <span class="ident">is_odd</span> <span class="op">=</span> <span class="macro">index_unchecked!</span>(<span class="ident">to_round</span>[<span class="number">0</span>]) <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">1</span>;
-            <span class="kw">let</span> <span class="ident">is_above</span> <span class="op">=</span> <span class="macro">index_unchecked!</span>(<span class="ident">to_round</span>[<span class="number">2</span>..]).<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">!</span><span class="op">=</span> <span class="string">b&#39;0&#39;</span>);
-            (<span class="ident">is_odd</span>, <span class="ident">is_above</span>)
+    // Get the last non-truncated digit, and the remaining ones.
+    // SAFETY: safe if `digit_count &lt; digits.len()`, since `max_digits &lt; digit_count`.
+    </span><span class="kw">let </span>truncated = <span class="kw">unsafe </span>{ <span class="macro">index_unchecked!</span>(digits[max_digits]) };
+    <span class="kw">let </span>(digits, carried) = <span class="kw">if </span>truncated &lt; <span class="string">b&#39;5&#39; </span>{
+        <span class="comment">// Just truncate, going to round-down anyway.
+        </span>(max_digits, <span class="bool-val">false</span>)
+    } <span class="kw">else if </span>truncated &gt; <span class="string">b&#39;5&#39; </span>{
+        <span class="comment">// Round-up always.
+        // SAFETY: safe if `digit_count &lt;= digits.len()`, because `max_digits &lt; digit_count`.
+        </span><span class="kw">unsafe </span>{ round_up(digits, max_digits, <span class="number">10</span>) }
+    } <span class="kw">else </span>{
+        <span class="comment">// Have a near-halfway case, resolve it.
+        // SAFETY: safe if `digit_count &lt; digits.len()`.
+        </span><span class="kw">let </span>(is_odd, is_above) = <span class="kw">unsafe </span>{
+            <span class="kw">let </span>to_round = <span class="kw-2">&amp;</span><span class="macro">index_unchecked!</span>(digits[max_digits - <span class="number">1</span>..digit_count]);
+            <span class="kw">let </span>is_odd = <span class="macro">index_unchecked!</span>(to_round[<span class="number">0</span>]) % <span class="number">2 </span>== <span class="number">1</span>;
+            <span class="kw">let </span>is_above = <span class="macro">index_unchecked!</span>(to_round[<span class="number">2</span>..]).iter().any(|<span class="kw-2">&amp;</span>x| x != <span class="string">b&#39;0&#39;</span>);
+            (is_odd, is_above)
         };
-        <span class="kw">if</span> <span class="ident">is_odd</span> <span class="op">|</span><span class="op">|</span> <span class="ident">is_above</span> {
-            <span class="comment">// SAFETY: safe if `digit_count &lt;= digits.len()`, because `max_digits &lt; digit_count`.</span>
-            <span class="kw">unsafe</span> { <span class="ident">round_up</span>(<span class="ident">digits</span>, <span class="ident">max_digits</span>, <span class="number">10</span>) }
-        } <span class="kw">else</span> {
-            (<span class="ident">max_digits</span>, <span class="bool-val">false</span>)
+        <span class="kw">if </span>is_odd || is_above {
+            <span class="comment">// SAFETY: safe if `digit_count &lt;= digits.len()`, because `max_digits &lt; digit_count`.
+            </span><span class="kw">unsafe </span>{ round_up(digits, max_digits, <span class="number">10</span>) }
+        } <span class="kw">else </span>{
+            (max_digits, <span class="bool-val">false</span>)
         }
     };
 
-    (<span class="ident">digits</span>, <span class="ident">carried</span>)
+    (digits, carried)
 }
 
-<span class="doccomment">/// Write the sign for the exponent.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Safe if `bytes` is large enough to hold the largest possible exponent,</span>
-<span class="doccomment">/// with an extra byte for the sign.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>), <span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">write_exponent_sign</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
-    <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-    <span class="ident">cursor</span>: <span class="kw-2">&amp;mut</span> <span class="ident">usize</span>,
-    <span class="ident">exp</span>: <span class="ident">i32</span>,
-) -&gt; <span class="ident">u32</span> {
-    <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span> {};
-    <span class="kw">if</span> <span class="ident">exp</span> <span class="op">&lt;</span> <span class="number">0</span> {
-        <span class="comment">// SAFETY: safe if bytes is large enough to hold the output</span>
-        <span class="kw">unsafe</span> { <span class="macro">index_unchecked_mut!</span>(<span class="ident">bytes</span>[<span class="kw-2">*</span><span class="ident">cursor</span>]) <span class="op">=</span> <span class="string">b&#39;-&#39;</span> };
-        <span class="kw-2">*</span><span class="ident">cursor</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="ident">exp</span>.<span class="ident">wrapping_neg</span>() <span class="kw">as</span> <span class="ident">u32</span>
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>) <span class="op">&amp;&amp;</span> <span class="ident">format</span>.<span class="ident">required_exponent_sign</span>() {
-        <span class="comment">// SAFETY: safe if bytes is large enough to hold the output</span>
-        <span class="kw">unsafe</span> { <span class="macro">index_unchecked_mut!</span>(<span class="ident">bytes</span>[<span class="kw-2">*</span><span class="ident">cursor</span>]) <span class="op">=</span> <span class="string">b&#39;+&#39;</span> };
-        <span class="kw-2">*</span><span class="ident">cursor</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="ident">exp</span> <span class="kw">as</span> <span class="ident">u32</span>
-    } <span class="kw">else</span> {
-        <span class="ident">exp</span> <span class="kw">as</span> <span class="ident">u32</span>
+<span class="doccomment">/// Write the sign for the exponent.
+///
+/// # Safety
+///
+/// Safe if `bytes` is large enough to hold the largest possible exponent,
+/// with an extra byte for the sign.
+</span><span class="attribute">#[cfg_attr(not(feature = <span class="string">&quot;compact&quot;</span>), inline)]
+</span><span class="kw">pub unsafe fn </span>write_exponent_sign&lt;<span class="kw">const </span>FORMAT: u128&gt;(
+    bytes: <span class="kw-2">&amp;mut </span>[u8],
+    cursor: <span class="kw-2">&amp;mut </span>usize,
+    exp: i32,
+) -&gt; u32 {
+    <span class="kw">let </span>format = NumberFormat::&lt;{ FORMAT }&gt; {};
+    <span class="kw">if </span>exp &lt; <span class="number">0 </span>{
+        <span class="comment">// SAFETY: safe if bytes is large enough to hold the output
+        </span><span class="kw">unsafe </span>{ <span class="macro">index_unchecked_mut!</span>(bytes[<span class="kw-2">*</span>cursor]) = <span class="string">b&#39;-&#39; </span>};
+        <span class="kw-2">*</span>cursor += <span class="number">1</span>;
+        exp.wrapping_neg() <span class="kw">as </span>u32
+    } <span class="kw">else if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;format&quot;</span>) &amp;&amp; format.required_exponent_sign() {
+        <span class="comment">// SAFETY: safe if bytes is large enough to hold the output
+        </span><span class="kw">unsafe </span>{ <span class="macro">index_unchecked_mut!</span>(bytes[<span class="kw-2">*</span>cursor]) = <span class="string">b&#39;+&#39; </span>};
+        <span class="kw-2">*</span>cursor += <span class="number">1</span>;
+        exp <span class="kw">as </span>u32
+    } <span class="kw">else </span>{
+        exp <span class="kw">as </span>u32
     }
 }
 
-<span class="doccomment">/// Write the symbol, sign, and digits for the exponent.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Safety</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Safe if the buffer can hold all the significant digits and the sign</span>
-<span class="doccomment">/// starting from cursor.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>), <span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">write_exponent</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
-    <span class="ident">bytes</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>],
-    <span class="ident">cursor</span>: <span class="kw-2">&amp;mut</span> <span class="ident">usize</span>,
-    <span class="ident">exp</span>: <span class="ident">i32</span>,
-    <span class="ident">exponent_character</span>: <span class="ident">u8</span>,
+<span class="doccomment">/// Write the symbol, sign, and digits for the exponent.
+///
+/// # Safety
+///
+/// Safe if the buffer can hold all the significant digits and the sign
+/// starting from cursor.
+</span><span class="attribute">#[cfg_attr(not(feature = <span class="string">&quot;compact&quot;</span>), inline)]
+</span><span class="kw">pub unsafe fn </span>write_exponent&lt;<span class="kw">const </span>FORMAT: u128&gt;(
+    bytes: <span class="kw-2">&amp;mut </span>[u8],
+    cursor: <span class="kw-2">&amp;mut </span>usize,
+    exp: i32,
+    exponent_character: u8,
 ) {
-    <span class="kw-2">*</span><span class="ident">cursor</span> <span class="op">+</span><span class="op">=</span> <span class="kw">unsafe</span> {
-        <span class="macro">index_unchecked_mut!</span>(<span class="ident">bytes</span>[<span class="kw-2">*</span><span class="ident">cursor</span>]) <span class="op">=</span> <span class="ident">exponent_character</span>;
-        <span class="kw-2">*</span><span class="ident">cursor</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="kw">let</span> <span class="ident">positive_exp</span> <span class="op">=</span> <span class="ident">write_exponent_sign</span>::<span class="op">&lt;</span><span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">bytes</span>, <span class="ident">cursor</span>, <span class="ident">exp</span>);
-        <span class="ident">positive_exp</span>.<span class="ident">write_exponent</span>::<span class="op">&lt;</span><span class="ident">u32</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="macro">index_unchecked_mut!</span>(<span class="ident">bytes</span>[<span class="kw-2">*</span><span class="ident">cursor</span>..]))
+    <span class="kw-2">*</span>cursor += <span class="kw">unsafe </span>{
+        <span class="macro">index_unchecked_mut!</span>(bytes[<span class="kw-2">*</span>cursor]) = exponent_character;
+        <span class="kw-2">*</span>cursor += <span class="number">1</span>;
+        <span class="kw">let </span>positive_exp = write_exponent_sign::&lt;FORMAT&gt;(bytes, cursor, exp);
+        positive_exp.write_exponent::&lt;u32, FORMAT&gt;(<span class="kw-2">&amp;mut </span><span class="macro">index_unchecked_mut!</span>(bytes[<span class="kw-2">*</span>cursor..]))
     };
 }
 
-<span class="doccomment">/// Detect the notation to use for the float formatter and call the appropriate function..</span>
-<span class="macro">macro_rules!</span> <span class="ident">write_float</span> {
+<span class="doccomment">/// Detect the notation to use for the float formatter and call the appropriate function..
+</span><span class="macro">macro_rules! </span>write_float {
     (
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sci_exp</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">options</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">write_scientific</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">write_positive</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">write_negative</span>:<span class="ident">ident</span>,
-        $(<span class="ident">generic</span> =&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">generic</span>:<span class="ident">tt</span>,)<span class="question-mark">?</span>
-        <span class="ident">args</span> =&gt; $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>:<span class="ident">expr</span>,)<span class="op">*</span>
+        <span class="macro-nonterminal">$format</span>:ident,
+        <span class="macro-nonterminal">$sci_exp</span>:ident,
+        <span class="macro-nonterminal">$options</span>:ident,
+        <span class="macro-nonterminal">$write_scientific</span>:ident,
+        <span class="macro-nonterminal">$write_positive</span>:ident,
+        <span class="macro-nonterminal">$write_negative</span>:ident,
+        $(generic =&gt; <span class="macro-nonterminal">$generic</span>:tt,)<span class="question-mark">?
+        </span>args =&gt; $(<span class="macro-nonterminal">$args</span>:expr,)*
     ) =&gt; {{
-        <span class="kw">use</span> <span class="ident">lexical_util::format::NumberFormat</span>;
+        <span class="kw">use </span>lexical_util::format::NumberFormat;
 
-        <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span> }<span class="op">&gt;</span> {};
-        <span class="kw">let</span> <span class="ident">min_exp</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">options</span>.<span class="ident">negative_exponent_break</span>().<span class="ident">map_or</span>(<span class="op">-</span><span class="number">5</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">get</span>());
-        <span class="kw">let</span> <span class="ident">max_exp</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">options</span>.<span class="ident">positive_exponent_break</span>().<span class="ident">map_or</span>(<span class="number">9</span>, <span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">get</span>());
+        <span class="kw">let </span>format = NumberFormat::&lt;{ <span class="macro-nonterminal">$format </span>}&gt; {};
+        <span class="kw">let </span>min_exp = <span class="macro-nonterminal">$options</span>.negative_exponent_break().map_or(-<span class="number">5</span>, |x| x.get());
+        <span class="kw">let </span>max_exp = <span class="macro-nonterminal">$options</span>.positive_exponent_break().map_or(<span class="number">9</span>, |x| x.get());
 
-        <span class="kw">let</span> <span class="ident">outside_break</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sci_exp</span> <span class="op">&lt;</span> <span class="ident">min_exp</span> <span class="op">|</span><span class="op">|</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sci_exp</span> <span class="op">&gt;</span> <span class="ident">max_exp</span>;
-        <span class="kw">let</span> <span class="ident">require_exponent</span> <span class="op">=</span> <span class="ident">format</span>.<span class="ident">required_exponent_notation</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">outside_break</span>;
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">format</span>.<span class="ident">no_exponent_notation</span>() <span class="op">&amp;&amp;</span> <span class="ident">require_exponent</span> {
-            <span class="comment">// Write digits in scientific notation.</span>
-            <span class="comment">// SAFETY: safe as long as bytes is large enough to hold all the digits.</span>
-            <span class="kw">unsafe</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">write_scientific</span>::<span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">generic</span>,)<span class="question-mark">?</span> <span class="ident">FORMAT</span><span class="op">&gt;</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>,)<span class="kw-2">*</span>) }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">sci_exp</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="comment">// Write positive exponent without scientific notation.</span>
-            <span class="comment">// SAFETY: safe as long as bytes is large enough to hold all the digits.</span>
-            <span class="kw">unsafe</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">write_positive</span>::<span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">generic</span>,)<span class="question-mark">?</span> <span class="ident">FORMAT</span><span class="op">&gt;</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>,)<span class="kw-2">*</span>) }
-        } <span class="kw">else</span> {
-            <span class="comment">// Write negative exponent without scientific notation.</span>
-            <span class="comment">// SAFETY: safe as long as bytes is large enough to hold all the digits.</span>
-            <span class="kw">unsafe</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">write_negative</span>::<span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">generic</span>,)<span class="question-mark">?</span> <span class="ident">FORMAT</span><span class="op">&gt;</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">args</span>,)<span class="kw-2">*</span>) }
+        <span class="kw">let </span>outside_break = <span class="macro-nonterminal">$sci_exp </span>&lt; min_exp || <span class="macro-nonterminal">$sci_exp </span>&gt; max_exp;
+        <span class="kw">let </span>require_exponent = format.required_exponent_notation() || outside_break;
+        <span class="kw">if </span>!format.no_exponent_notation() &amp;&amp; require_exponent {
+            <span class="comment">// Write digits in scientific notation.
+            // SAFETY: safe as long as bytes is large enough to hold all the digits.
+            </span><span class="kw">unsafe </span>{ <span class="macro-nonterminal">$write_scientific</span>::&lt;$(<span class="macro-nonterminal">$generic</span>,)<span class="question-mark">? </span>FORMAT&gt;($(<span class="macro-nonterminal">$args</span>,)<span class="kw-2">*</span>) }
+        } <span class="kw">else if </span><span class="macro-nonterminal">$sci_exp </span>&gt;= <span class="number">0 </span>{
+            <span class="comment">// Write positive exponent without scientific notation.
+            // SAFETY: safe as long as bytes is large enough to hold all the digits.
+            </span><span class="kw">unsafe </span>{ <span class="macro-nonterminal">$write_positive</span>::&lt;$(<span class="macro-nonterminal">$generic</span>,)<span class="question-mark">? </span>FORMAT&gt;($(<span class="macro-nonterminal">$args</span>,)<span class="kw-2">*</span>) }
+        } <span class="kw">else </span>{
+            <span class="comment">// Write negative exponent without scientific notation.
+            // SAFETY: safe as long as bytes is large enough to hold all the digits.
+            </span><span class="kw">unsafe </span>{ <span class="macro-nonterminal">$write_negative</span>::&lt;$(<span class="macro-nonterminal">$generic</span>,)<span class="question-mark">? </span>FORMAT&gt;($(<span class="macro-nonterminal">$args</span>,)<span class="kw-2">*</span>) }
         }
     }};
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_write_float" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_write_float" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

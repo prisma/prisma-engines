@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/sql_schema_calculator/sql_schema_calculator_flavour/postgres.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>postgres.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../sql_migration_connector/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/sql_schema_calculator/sql_schema_calculator_flavour/postgres.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>postgres.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../sql_migration_connector/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -392,399 +392,399 @@
 <span id="392">392</span>
 <span id="393">393</span>
 <span id="394">394</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident"><span class="kw">super</span>::Context</span>, <span class="ident">SqlSchemaCalculatorFlavour</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::flavour</span>::{<span class="ident">PostgresFlavour</span>, <span class="ident">SqlFlavour</span>};
-<span class="kw">use</span> <span class="ident">either::Either</span>;
-<span class="kw">use</span> <span class="ident">psl</span>::{
-    <span class="ident">builtin_connectors</span>::{<span class="ident">cockroach_datamodel_connector::SequenceFunction</span>, <span class="ident">PostgresDatasourceProperties</span>},
-    <span class="ident">datamodel_connector::walker_ext_traits::IndexWalkerExt</span>,
-    <span class="ident">parser_database</span>::{<span class="ident">IndexAlgorithm</span>, <span class="ident">OperatorClass</span>},
+</pre><pre class="rust"><code><span class="kw">use super</span>::{<span class="kw">super</span>::Context, SqlSchemaCalculatorFlavour};
+<span class="kw">use </span><span class="kw">crate</span>::flavour::{PostgresFlavour, SqlFlavour};
+<span class="kw">use </span>either::Either;
+<span class="kw">use </span>psl::{
+    builtin_connectors::{cockroach_datamodel_connector::SequenceFunction, PostgresDatasourceProperties},
+    datamodel_connector::walker_ext_traits::IndexWalkerExt,
+    parser_database::{IndexAlgorithm, OperatorClass},
 };
-<span class="kw">use</span> <span class="ident">sql::postgres::DatabaseExtension</span>;
-<span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">sql</span>, <span class="ident">postgres::PostgresSchemaExt</span>};
+<span class="kw">use </span>sql::postgres::DatabaseExtension;
+<span class="kw">use </span>sql_schema_describer::{<span class="self">self </span><span class="kw">as </span>sql, postgres::PostgresSchemaExt};
 
-<span class="kw">impl</span> <span class="ident">SqlSchemaCalculatorFlavour</span> <span class="kw">for</span> <span class="ident">PostgresFlavour</span> {
-    <span class="kw">fn</span> <span class="ident">calculate_enums</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-        <span class="kw">for</span> <span class="ident">prisma_enum</span> <span class="kw">in</span> <span class="ident">ctx</span>.<span class="ident">datamodel</span>.<span class="ident">db</span>.<span class="ident">walk_enums</span>() {
-            <span class="kw">let</span> <span class="ident">sql_namespace_id</span>: <span class="ident">sql::NamespaceId</span> <span class="op">=</span> <span class="ident">prisma_enum</span>
-                .<span class="ident">schema</span>()
-                .<span class="ident">and_then</span>(<span class="op">|</span>(<span class="ident">name</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">ctx</span>.<span class="ident">schemas</span>.<span class="ident">get</span>(<span class="ident">name</span>).<span class="ident">cloned</span>())
-                .<span class="ident">unwrap_or_default</span>();
-            <span class="kw">let</span> <span class="ident">sql_enum_id</span> <span class="op">=</span> <span class="ident">ctx</span>
-                .<span class="ident">schema</span>
-                .<span class="ident">describer_schema</span>
-                .<span class="ident">push_enum</span>(<span class="ident">sql_namespace_id</span>, <span class="ident">prisma_enum</span>.<span class="ident">name</span>().<span class="ident">to_owned</span>());
-            <span class="ident">ctx</span>.<span class="ident">enum_ids</span>.<span class="ident">insert</span>(<span class="ident">prisma_enum</span>.<span class="ident">id</span>, <span class="ident">sql_enum_id</span>);
+<span class="kw">impl </span>SqlSchemaCalculatorFlavour <span class="kw">for </span>PostgresFlavour {
+    <span class="kw">fn </span>calculate_enums(<span class="kw-2">&amp;</span><span class="self">self</span>, ctx: <span class="kw-2">&amp;mut </span>Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+        <span class="kw">for </span>prisma_enum <span class="kw">in </span>ctx.datamodel.db.walk_enums() {
+            <span class="kw">let </span>sql_namespace_id: sql::NamespaceId = prisma_enum
+                .schema()
+                .and_then(|(name, <span class="kw">_</span>)| ctx.schemas.get(name).cloned())
+                .unwrap_or_default();
+            <span class="kw">let </span>sql_enum_id = ctx
+                .schema
+                .describer_schema
+                .push_enum(sql_namespace_id, prisma_enum.name().to_owned());
+            ctx.enum_ids.insert(prisma_enum.id, sql_enum_id);
 
-            <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="ident">prisma_enum</span>.<span class="ident">values</span>() {
-                <span class="kw">let</span> <span class="ident">value_name</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">database_name</span>().<span class="ident">to_owned</span>();
-                <span class="ident">ctx</span>.<span class="ident">schema</span>.<span class="ident">describer_schema</span>.<span class="ident">push_enum_variant</span>(<span class="ident">sql_enum_id</span>, <span class="ident">value_name</span>);
+            <span class="kw">for </span>value <span class="kw">in </span>prisma_enum.values() {
+                <span class="kw">let </span>value_name = value.database_name().to_owned();
+                ctx.schema.describer_schema.push_enum_variant(sql_enum_id, value_name);
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">column_default_value_for_autoincrement</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">sql::DefaultValue</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_cockroachdb</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">sql::DefaultValue::unique_rowid</span>())
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">sql::DefaultValue::sequence</span>(<span class="string">&quot;&quot;</span>))
+    <span class="kw">fn </span>column_default_value_for_autoincrement(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;sql::DefaultValue&gt; {
+        <span class="kw">if </span><span class="self">self</span>.is_cockroachdb() {
+            <span class="prelude-val">Some</span>(sql::DefaultValue::unique_rowid())
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Some</span>(sql::DefaultValue::sequence(<span class="string">&quot;&quot;</span>))
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">push_connector_data</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">super</span>::<span class="kw">super</span>::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">postgres_ext</span> <span class="op">=</span> <span class="ident">PostgresSchemaExt::default</span>();
-        <span class="kw">let</span> <span class="ident">db</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">context</span>.<span class="ident">datamodel</span>.<span class="ident">db</span>;
+    <span class="kw">fn </span>push_connector_data(<span class="kw-2">&amp;</span><span class="self">self</span>, context: <span class="kw-2">&amp;mut </span><span class="kw">super</span>::<span class="kw">super</span>::Context&lt;<span class="lifetime">&#39;_</span>&gt;) {
+        <span class="kw">let </span><span class="kw-2">mut </span>postgres_ext = PostgresSchemaExt::default();
+        <span class="kw">let </span>db = <span class="kw-2">&amp;</span>context.datamodel.db;
 
-        <span class="kw">let</span> <span class="ident">postgres_psl</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PostgresDatasourceProperties</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">context</span>
-            .<span class="ident">datamodel</span>
-            .<span class="ident">configuration</span>
-            .<span class="ident">datasources</span>
-            .<span class="ident">first</span>()
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">ds</span><span class="op">|</span> <span class="ident">ds</span>.<span class="ident">downcast_connector_data</span>());
+        <span class="kw">let </span>postgres_psl: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>PostgresDatasourceProperties&gt; = context
+            .datamodel
+            .configuration
+            .datasources
+            .first()
+            .and_then(|ds| ds.downcast_connector_data());
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">extensions</span>) <span class="op">=</span> <span class="ident">postgres_psl</span>.<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">props</span><span class="op">|</span> <span class="ident">props</span>.<span class="ident">extensions</span>()) {
-            <span class="kw">for</span> <span class="ident">extension</span> <span class="kw">in</span> <span class="ident">extensions</span>.<span class="ident">extensions</span>() {
-                <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">extension</span>
-                    .<span class="ident">db_name</span>()
-                    .<span class="ident">to_owned</span>()
-                    .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">extension</span>.<span class="ident">name</span>())
-                    .<span class="ident">to_owned</span>();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(extensions) = postgres_psl.and_then(|props| props.extensions()) {
+            <span class="kw">for </span>extension <span class="kw">in </span>extensions.extensions() {
+                <span class="kw">let </span>name = extension
+                    .db_name()
+                    .to_owned()
+                    .unwrap_or_else(|| extension.name())
+                    .to_owned();
 
-                <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="ident">extension</span>.<span class="ident">schema</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">to_owned</span>()).<span class="ident">unwrap_or_default</span>();
-                <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">extension</span>.<span class="ident">version</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">to_owned</span>()).<span class="ident">unwrap_or_default</span>();
+                <span class="kw">let </span>schema = extension.schema().map(|s| s.to_owned()).unwrap_or_default();
+                <span class="kw">let </span>version = extension.version().map(|s| s.to_owned()).unwrap_or_default();
 
-                <span class="ident">postgres_ext</span>.<span class="ident">push_extension</span>(<span class="ident">DatabaseExtension</span> {
-                    <span class="ident">name</span>,
-                    <span class="ident">schema</span>,
-                    <span class="ident">version</span>,
-                    <span class="ident">relocatable</span>: <span class="ident">Default::default</span>(),
+                postgres_ext.push_extension(DatabaseExtension {
+                    name,
+                    schema,
+                    version,
+                    relocatable: Default::default(),
                 });
             }
         }
 
-        <span class="kw">for</span> <span class="ident">model</span> <span class="kw">in</span> <span class="ident">db</span>.<span class="ident">walk_models</span>() {
-            <span class="kw">let</span> <span class="ident">table_id</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">model_id_to_table_id</span>[<span class="kw-2">&amp;</span><span class="ident">model</span>.<span class="ident">model_id</span>()];
+        <span class="kw">for </span>model <span class="kw">in </span>db.walk_models() {
+            <span class="kw">let </span>table_id = context.model_id_to_table_id[<span class="kw-2">&amp;</span>model.model_id()];
 
-            <span class="comment">// Add index algorithms and opclasses.</span>
-            <span class="kw">for</span> <span class="ident">index</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">indexes</span>() {
-                <span class="kw">let</span> <span class="ident">sql_index</span> <span class="op">=</span> <span class="ident">context</span>
-                    .<span class="ident">schema</span>
-                    .<span class="ident">walk</span>(<span class="ident">table_id</span>)
-                    .<span class="ident">indexes</span>()
-                    .<span class="ident">find</span>(<span class="op">|</span><span class="ident">idx</span><span class="op">|</span> <span class="ident">idx</span>.<span class="ident">name</span>() <span class="op">==</span> <span class="ident">index</span>.<span class="ident">constraint_name</span>(<span class="self">self</span>.<span class="ident">datamodel_connector</span>()))
-                    .<span class="ident">unwrap</span>();
+            <span class="comment">// Add index algorithms and opclasses.
+            </span><span class="kw">for </span>index <span class="kw">in </span>model.indexes() {
+                <span class="kw">let </span>sql_index = context
+                    .schema
+                    .walk(table_id)
+                    .indexes()
+                    .find(|idx| idx.name() == index.constraint_name(<span class="self">self</span>.datamodel_connector()))
+                    .unwrap();
 
-                <span class="kw">let</span> <span class="ident">sql_index_algorithm</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">index</span>.<span class="ident">algorithm</span>() {
-                    <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::BTree</span>) <span class="op">|</span> <span class="prelude-val">None</span> =&gt; <span class="ident">sql::postgres::SqlIndexAlgorithm::BTree</span>,
-                    <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::Gin</span>) =&gt; <span class="ident">sql::postgres::SqlIndexAlgorithm::Gin</span>,
-                    <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::Hash</span>) =&gt; <span class="ident">sql::postgres::SqlIndexAlgorithm::Hash</span>,
-                    <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::SpGist</span>) =&gt; <span class="ident">sql::postgres::SqlIndexAlgorithm::SpGist</span>,
-                    <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::Gist</span>) =&gt; <span class="ident">sql::postgres::SqlIndexAlgorithm::Gist</span>,
-                    <span class="prelude-val">Some</span>(<span class="ident">IndexAlgorithm::Brin</span>) =&gt; <span class="ident">sql::postgres::SqlIndexAlgorithm::Brin</span>,
+                <span class="kw">let </span>sql_index_algorithm = <span class="kw">match </span>index.algorithm() {
+                    <span class="prelude-val">Some</span>(IndexAlgorithm::BTree) | <span class="prelude-val">None </span>=&gt; sql::postgres::SqlIndexAlgorithm::BTree,
+                    <span class="prelude-val">Some</span>(IndexAlgorithm::Gin) =&gt; sql::postgres::SqlIndexAlgorithm::Gin,
+                    <span class="prelude-val">Some</span>(IndexAlgorithm::Hash) =&gt; sql::postgres::SqlIndexAlgorithm::Hash,
+                    <span class="prelude-val">Some</span>(IndexAlgorithm::SpGist) =&gt; sql::postgres::SqlIndexAlgorithm::SpGist,
+                    <span class="prelude-val">Some</span>(IndexAlgorithm::Gist) =&gt; sql::postgres::SqlIndexAlgorithm::Gist,
+                    <span class="prelude-val">Some</span>(IndexAlgorithm::Brin) =&gt; sql::postgres::SqlIndexAlgorithm::Brin,
                 };
-                <span class="ident">postgres_ext</span>.<span class="ident">indexes</span>.<span class="ident">push</span>((<span class="ident">sql_index</span>.<span class="ident">id</span>, <span class="ident">sql_index_algorithm</span>));
+                postgres_ext.indexes.push((sql_index.id, sql_index_algorithm));
 
-                <span class="kw">for</span> (<span class="ident">field_idx</span>, <span class="ident">attrs</span>) <span class="kw">in</span> <span class="ident">index</span>.<span class="ident">scalar_field_attributes</span>().<span class="ident">enumerate</span>() {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">opclass</span>) <span class="op">=</span> <span class="ident">attrs</span>.<span class="ident">operator_class</span>() {
-                        <span class="kw">let</span> <span class="ident">field_id</span> <span class="op">=</span> <span class="ident">sql_index</span>.<span class="ident">columns</span>().<span class="ident">nth</span>(<span class="ident">field_idx</span>).<span class="ident">unwrap</span>().<span class="ident">id</span>;
+                <span class="kw">for </span>(field_idx, attrs) <span class="kw">in </span>index.scalar_field_attributes().enumerate() {
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(opclass) = attrs.operator_class() {
+                        <span class="kw">let </span>field_id = sql_index.columns().nth(field_idx).unwrap().id;
 
-                        <span class="kw">let</span> <span class="ident">opclass</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">opclass</span>.<span class="ident">get</span>() {
-                            <span class="ident">Either::Left</span>(<span class="ident">class</span>) =&gt; <span class="ident">convert_opclass</span>(<span class="ident">class</span>, <span class="ident">index</span>.<span class="ident">algorithm</span>()),
-                            <span class="ident">Either::Right</span>(<span class="ident">s</span>) =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-                                <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::Raw</span>(<span class="ident">s</span>.<span class="ident">to_owned</span>()),
-                                <span class="ident">is_default</span>: <span class="bool-val">false</span>,
+                        <span class="kw">let </span>opclass = <span class="kw">match </span>opclass.get() {
+                            Either::Left(class) =&gt; convert_opclass(class, index.algorithm()),
+                            Either::Right(s) =&gt; sql::postgres::SQLOperatorClass {
+                                kind: sql::postgres::SQLOperatorClassKind::Raw(s.to_owned()),
+                                is_default: <span class="bool-val">false</span>,
                             },
                         };
 
-                        <span class="ident">postgres_ext</span>.<span class="ident">opclasses</span>.<span class="ident">push</span>((<span class="ident">field_id</span>, <span class="ident">opclass</span>));
+                        postgres_ext.opclasses.push((field_id, opclass));
                     }
                 }
             }
 
-            <span class="comment">// Add sequences for the fields with a default sequence in the model.</span>
-            <span class="kw">for</span> <span class="ident">field</span> <span class="kw">in</span> <span class="ident">model</span>.<span class="ident">scalar_fields</span>() {
-                <span class="kw">let</span> <span class="ident">field_default</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">d</span>) <span class="op">=</span> <span class="ident">field</span>.<span class="ident">default_value</span>() {
-                    <span class="ident">d</span>
-                } <span class="kw">else</span> {
+            <span class="comment">// Add sequences for the fields with a default sequence in the model.
+            </span><span class="kw">for </span>field <span class="kw">in </span>model.scalar_fields() {
+                <span class="kw">let </span>field_default = <span class="kw">if let </span><span class="prelude-val">Some</span>(d) = field.default_value() {
+                    d
+                } <span class="kw">else </span>{
                     <span class="kw">continue</span>;
                 };
 
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">field_default</span>.<span class="ident">is_sequence</span>() {
+                <span class="kw">if </span>!field_default.is_sequence() {
                     <span class="kw">continue</span>;
                 }
 
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sequence</span> <span class="op">=</span> <span class="ident">sql::postgres::Sequence</span> {
-                    <span class="ident">name</span>: <span class="macro">format!</span>(<span class="string">&quot;prisma_sequence_{}_{}&quot;</span>, <span class="ident">model</span>.<span class="ident">database_name</span>(), <span class="ident">field</span>.<span class="ident">database_name</span>()),
-                    ..<span class="ident">Default::default</span>()
+                <span class="kw">let </span><span class="kw-2">mut </span>sequence = sql::postgres::Sequence {
+                    name: <span class="macro">format!</span>(<span class="string">&quot;prisma_sequence_{}_{}&quot;</span>, model.database_name(), field.database_name()),
+                    ..Default::default()
                 };
-                <span class="kw">let</span> <span class="ident">sequence_fn</span> <span class="op">=</span> <span class="ident">field_default</span>.<span class="ident">ast_attribute</span>().<span class="ident">arguments</span>.<span class="ident">arguments</span>[<span class="number">0</span>]
-                    .<span class="ident">value</span>
-                    .<span class="ident">as_function</span>()
-                    .<span class="ident">unwrap</span>()
+                <span class="kw">let </span>sequence_fn = field_default.ast_attribute().arguments.arguments[<span class="number">0</span>]
+                    .value
+                    .as_function()
+                    .unwrap()
                     .<span class="number">1</span>;
-                <span class="kw">let</span> <span class="ident">sequence_details</span> <span class="op">=</span> <span class="ident">SequenceFunction::build_unchecked</span>(<span class="ident">sequence_fn</span>);
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">start</span>) <span class="op">=</span> <span class="ident">sequence_details</span>.<span class="ident">start</span> {
-                    <span class="ident">sequence</span>.<span class="ident">start_value</span> <span class="op">=</span> <span class="ident">start</span>;
+                <span class="kw">let </span>sequence_details = SequenceFunction::build_unchecked(sequence_fn);
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(start) = sequence_details.start {
+                    sequence.start_value = start;
                 }
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">sequence_details</span>.<span class="ident">cache</span> {
-                    <span class="ident">sequence</span>.<span class="ident">cache_size</span> <span class="op">=</span> <span class="ident">cache</span>;
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(cache) = sequence_details.cache {
+                    sequence.cache_size = cache;
                 }
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">max_value</span>) <span class="op">=</span> <span class="ident">sequence_details</span>.<span class="ident">max_value</span> {
-                    <span class="ident">sequence</span>.<span class="ident">max_value</span> <span class="op">=</span> <span class="ident">max_value</span>;
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(max_value) = sequence_details.max_value {
+                    sequence.max_value = max_value;
                 }
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">min_value</span>) <span class="op">=</span> <span class="ident">sequence_details</span>.<span class="ident">min_value</span> {
-                    <span class="ident">sequence</span>.<span class="ident">min_value</span> <span class="op">=</span> <span class="ident">min_value</span>;
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(min_value) = sequence_details.min_value {
+                    sequence.min_value = min_value;
                 }
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">increment</span>) <span class="op">=</span> <span class="ident">sequence_details</span>.<span class="ident">increment</span> {
-                    <span class="ident">sequence</span>.<span class="ident">increment_by</span> <span class="op">=</span> <span class="ident">increment</span>;
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(increment) = sequence_details.increment {
+                    sequence.increment_by = increment;
                 }
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">r#virtual</span>) <span class="op">=</span> <span class="ident">sequence_details</span>.<span class="ident">r#virtual</span> {
-                    <span class="ident">sequence</span>.<span class="ident">r#virtual</span> <span class="op">=</span> <span class="ident">r#virtual</span>;
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(r#virtual) = sequence_details.r#virtual {
+                    sequence.r#virtual = r#virtual;
                 }
 
-                <span class="ident">postgres_ext</span>.<span class="ident">sequences</span>.<span class="ident">push</span>(<span class="ident">sequence</span>);
+                postgres_ext.sequences.push(sequence);
             }
         }
 
-        <span class="ident">context</span>
-            .<span class="ident">schema</span>
-            .<span class="ident">describer_schema</span>
-            .<span class="ident">set_connector_data</span>(<span class="ident">Box::new</span>(<span class="ident">postgres_ext</span>));
+        context
+            .schema
+            .describer_schema
+            .set_connector_data(Box::new(postgres_ext));
     }
 }
 
-<span class="kw">fn</span> <span class="ident">convert_opclass</span>(<span class="ident">opclass</span>: <span class="ident">OperatorClass</span>, <span class="ident">algo</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">IndexAlgorithm</span><span class="op">&gt;</span>) -&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-    <span class="kw">match</span> <span class="ident">opclass</span> {
-        <span class="ident">OperatorClass::InetOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::InetOps</span>,
-            <span class="ident">is_default</span>: <span class="ident">algo</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">a</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">is_spgist</span>()).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>),
+<span class="kw">fn </span>convert_opclass(opclass: OperatorClass, algo: <span class="prelude-ty">Option</span>&lt;IndexAlgorithm&gt;) -&gt; sql::postgres::SQLOperatorClass {
+    <span class="kw">match </span>opclass {
+        OperatorClass::InetOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::InetOps,
+            is_default: algo.map(|a| a.is_spgist()).unwrap_or(<span class="bool-val">false</span>),
         },
-        <span class="ident">OperatorClass::JsonbOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::JsonbOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">true</span>,
+        OperatorClass::JsonbOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::JsonbOps,
+            is_default: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::JsonbPathOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::JsonbPathOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">false</span>,
+        OperatorClass::JsonbPathOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::JsonbPathOps,
+            is_default: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::ArrayOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::ArrayOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">true</span>,
+        OperatorClass::ArrayOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::ArrayOps,
+            is_default: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::TextOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::TextOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">true</span>,
+        OperatorClass::TextOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::TextOps,
+            is_default: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::BitMinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::BitMinMaxOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">true</span>,
+        OperatorClass::BitMinMaxOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::BitMinMaxOps,
+            is_default: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::VarBitMinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::VarBitMinMaxOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">true</span>,
+        OperatorClass::VarBitMinMaxOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::VarBitMinMaxOps,
+            is_default: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::BpcharBloomOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::BpcharBloomOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">false</span>,
+        OperatorClass::BpcharBloomOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::BpcharBloomOps,
+            is_default: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::BpcharMinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::BpcharMinMaxOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">true</span>,
+        OperatorClass::BpcharMinMaxOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::BpcharMinMaxOps,
+            is_default: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::ByteaBloomOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::ByteaBloomOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">false</span>,
+        OperatorClass::ByteaBloomOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::ByteaBloomOps,
+            is_default: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::ByteaMinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::ByteaMinMaxOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">true</span>,
+        OperatorClass::ByteaMinMaxOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::ByteaMinMaxOps,
+            is_default: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::DateBloomOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::DateBloomOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">false</span>,
+        OperatorClass::DateBloomOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::DateBloomOps,
+            is_default: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::DateMinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::DateMinMaxOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">true</span>,
+        OperatorClass::DateMinMaxOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::DateMinMaxOps,
+            is_default: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::DateMinMaxMultiOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::DateMinMaxMultiOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">false</span>,
+        OperatorClass::DateMinMaxMultiOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::DateMinMaxMultiOps,
+            is_default: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::Float4BloomOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::Float4BloomOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">false</span>,
+        OperatorClass::Float4BloomOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::Float4BloomOps,
+            is_default: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::Float4MinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::Float4MinMaxOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">true</span>,
+        OperatorClass::Float4MinMaxOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::Float4MinMaxOps,
+            is_default: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::Float4MinMaxMultiOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::Float4MinMaxMultiOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">false</span>,
+        OperatorClass::Float4MinMaxMultiOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::Float4MinMaxMultiOps,
+            is_default: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::Float8BloomOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::Float8BloomOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">false</span>,
+        OperatorClass::Float8BloomOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::Float8BloomOps,
+            is_default: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::Float8MinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::Float8MinMaxOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">true</span>,
+        OperatorClass::Float8MinMaxOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::Float8MinMaxOps,
+            is_default: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::Float8MinMaxMultiOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::Float8MinMaxMultiOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">false</span>,
+        OperatorClass::Float8MinMaxMultiOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::Float8MinMaxMultiOps,
+            is_default: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::InetInclusionOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::InetInclusionOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">true</span>,
+        OperatorClass::InetInclusionOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::InetInclusionOps,
+            is_default: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::InetBloomOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::InetBloomOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">false</span>,
+        OperatorClass::InetBloomOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::InetBloomOps,
+            is_default: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::InetMinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::InetMinMaxOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">true</span>,
+        OperatorClass::InetMinMaxOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::InetMinMaxOps,
+            is_default: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::InetMinMaxMultiOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::InetMinMaxMultiOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">false</span>,
+        OperatorClass::InetMinMaxMultiOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::InetMinMaxMultiOps,
+            is_default: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::Int2BloomOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::Int2BloomOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">false</span>,
+        OperatorClass::Int2BloomOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::Int2BloomOps,
+            is_default: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::Int2MinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::Int2MinMaxOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">true</span>,
+        OperatorClass::Int2MinMaxOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::Int2MinMaxOps,
+            is_default: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::Int2MinMaxMultiOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::Int2MinMaxMultiOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">false</span>,
+        OperatorClass::Int2MinMaxMultiOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::Int2MinMaxMultiOps,
+            is_default: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::Int4BloomOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::Int4BloomOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">false</span>,
+        OperatorClass::Int4BloomOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::Int4BloomOps,
+            is_default: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::Int4MinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::Int4MinMaxOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">true</span>,
+        OperatorClass::Int4MinMaxOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::Int4MinMaxOps,
+            is_default: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::Int4MinMaxMultiOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::Int4MinMaxMultiOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">false</span>,
+        OperatorClass::Int4MinMaxMultiOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::Int4MinMaxMultiOps,
+            is_default: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::Int8BloomOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::Int8BloomOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">false</span>,
+        OperatorClass::Int8BloomOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::Int8BloomOps,
+            is_default: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::Int8MinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::Int8MinMaxOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">true</span>,
+        OperatorClass::Int8MinMaxOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::Int8MinMaxOps,
+            is_default: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::Int8MinMaxMultiOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::Int8MinMaxMultiOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">false</span>,
+        OperatorClass::Int8MinMaxMultiOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::Int8MinMaxMultiOps,
+            is_default: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::NumericBloomOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::NumericBloomOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">false</span>,
+        OperatorClass::NumericBloomOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::NumericBloomOps,
+            is_default: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::NumericMinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::NumericMinMaxOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">true</span>,
+        OperatorClass::NumericMinMaxOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::NumericMinMaxOps,
+            is_default: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::NumericMinMaxMultiOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::NumericMinMaxMultiOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">false</span>,
+        OperatorClass::NumericMinMaxMultiOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::NumericMinMaxMultiOps,
+            is_default: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::OidBloomOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::OidBloomOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">false</span>,
+        OperatorClass::OidBloomOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::OidBloomOps,
+            is_default: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::OidMinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::OidMinMaxOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">true</span>,
+        OperatorClass::OidMinMaxOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::OidMinMaxOps,
+            is_default: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::OidMinMaxMultiOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::OidMinMaxMultiOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">false</span>,
+        OperatorClass::OidMinMaxMultiOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::OidMinMaxMultiOps,
+            is_default: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::TextBloomOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::TextBloomOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">false</span>,
+        OperatorClass::TextBloomOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::TextBloomOps,
+            is_default: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::TextMinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::TextMinMaxOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">true</span>,
+        OperatorClass::TextMinMaxOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::TextMinMaxOps,
+            is_default: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::TimestampBloomOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::TimestampBloomOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">false</span>,
+        OperatorClass::TimestampBloomOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::TimestampBloomOps,
+            is_default: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::TimestampMinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::TimestampMinMaxOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">true</span>,
+        OperatorClass::TimestampMinMaxOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::TimestampMinMaxOps,
+            is_default: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::TimestampMinMaxMultiOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::TimestampMinMaxMultiOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">false</span>,
+        OperatorClass::TimestampMinMaxMultiOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::TimestampMinMaxMultiOps,
+            is_default: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::TimestampTzBloomOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::TimestampTzBloomOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">false</span>,
+        OperatorClass::TimestampTzBloomOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::TimestampTzBloomOps,
+            is_default: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::TimestampTzMinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::TimestampTzMinMaxOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">true</span>,
+        OperatorClass::TimestampTzMinMaxOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::TimestampTzMinMaxOps,
+            is_default: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::TimestampTzMinMaxMultiOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::TimestampTzMinMaxMultiOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">false</span>,
+        OperatorClass::TimestampTzMinMaxMultiOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::TimestampTzMinMaxMultiOps,
+            is_default: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::TimeBloomOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::TimeBloomOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">false</span>,
+        OperatorClass::TimeBloomOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::TimeBloomOps,
+            is_default: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::TimeMinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::TimeMinMaxOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">true</span>,
+        OperatorClass::TimeMinMaxOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::TimeMinMaxOps,
+            is_default: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::TimeMinMaxMultiOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::TimeMinMaxMultiOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">false</span>,
+        OperatorClass::TimeMinMaxMultiOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::TimeMinMaxMultiOps,
+            is_default: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::TimeTzBloomOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::TimeTzBloomOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">false</span>,
+        OperatorClass::TimeTzBloomOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::TimeTzBloomOps,
+            is_default: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::TimeTzMinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::TimeTzMinMaxOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">true</span>,
+        OperatorClass::TimeTzMinMaxOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::TimeTzMinMaxOps,
+            is_default: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::TimeTzMinMaxMultiOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::TimeTzMinMaxMultiOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">false</span>,
+        OperatorClass::TimeTzMinMaxMultiOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::TimeTzMinMaxMultiOps,
+            is_default: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::UuidBloomOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::UuidBloomOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">false</span>,
+        OperatorClass::UuidBloomOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::UuidBloomOps,
+            is_default: <span class="bool-val">false</span>,
         },
-        <span class="ident">OperatorClass::UuidMinMaxOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::UuidMinMaxOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">true</span>,
+        OperatorClass::UuidMinMaxOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::UuidMinMaxOps,
+            is_default: <span class="bool-val">true</span>,
         },
-        <span class="ident">OperatorClass::UuidMinMaxMultiOps</span> =&gt; <span class="ident">sql::postgres::SQLOperatorClass</span> {
-            <span class="ident">kind</span>: <span class="ident">sql::postgres::SQLOperatorClassKind::UuidMinMaxMultiOps</span>,
-            <span class="ident">is_default</span>: <span class="bool-val">false</span>,
+        OperatorClass::UuidMinMaxMultiOps =&gt; sql::postgres::SQLOperatorClass {
+            kind: sql::postgres::SQLOperatorClassKind::UuidMinMaxMultiOps,
+            is_default: <span class="bool-val">false</span>,
         },
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

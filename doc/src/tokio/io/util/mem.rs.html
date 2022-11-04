@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.21.0/src/io/util/mem.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mem.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tokio/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-1.21.0/src/io/util/mem.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mem.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tokio/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tokio/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -293,300 +293,300 @@
 <span id="293">293</span>
 <span id="294">294</span>
 <span id="295">295</span>
-</pre><pre class="rust"><code><span class="doccomment">//! In-process memory IO types.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! In-process memory IO types.
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>, <span class="ident">ReadBuf</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::loom::sync::Mutex</span>;
+</span><span class="kw">use </span><span class="kw">crate</span>::io::{AsyncRead, AsyncWrite, ReadBuf};
+<span class="kw">use </span><span class="kw">crate</span>::loom::sync::Mutex;
 
-<span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">Buf</span>, <span class="ident">BytesMut</span>};
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">pin::Pin</span>,
-    <span class="ident">sync::Arc</span>,
-    <span class="ident">task</span>::{<span class="self">self</span>, <span class="ident">Poll</span>, <span class="ident">Waker</span>},
+<span class="kw">use </span>bytes::{Buf, BytesMut};
+<span class="kw">use </span>std::{
+    pin::Pin,
+    sync::Arc,
+    task::{<span class="self">self</span>, Poll, Waker},
 };
 
-<span class="doccomment">/// A bidirectional pipe to read and write bytes in memory.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A pair of `DuplexStream`s are created together, and they act as a &quot;channel&quot;</span>
-<span class="doccomment">/// that can be used as in-memory IO types. Writing to one of the pairs will</span>
-<span class="doccomment">/// allow that data to be read from the other, and vice versa.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Closing a `DuplexStream`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If one end of the `DuplexStream` channel is dropped, any pending reads on</span>
-<span class="doccomment">/// the other side will continue to read data until the buffer is drained, then</span>
-<span class="doccomment">/// they will signal EOF by returning 0 bytes. Any writes to the other side,</span>
-<span class="doccomment">/// including pending ones (that are waiting for free space in the buffer) will</span>
-<span class="doccomment">/// return `Err(BrokenPipe)` immediately.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Example</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// # async fn ex() -&gt; std::io::Result&lt;()&gt; {</span>
-<span class="doccomment">/// # use tokio::io::{AsyncReadExt, AsyncWriteExt};</span>
-<span class="doccomment">/// let (mut client, mut server) = tokio::io::duplex(64);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// client.write_all(b&quot;ping&quot;).await?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// let mut buf = [0u8; 4];</span>
-<span class="doccomment">/// server.read_exact(&amp;mut buf).await?;</span>
-<span class="doccomment">/// assert_eq!(&amp;buf, b&quot;ping&quot;);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// server.write_all(b&quot;pong&quot;).await?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// client.read_exact(&amp;mut buf).await?;</span>
-<span class="doccomment">/// assert_eq!(&amp;buf, b&quot;pong&quot;);</span>
-<span class="doccomment">/// # Ok(())</span>
-<span class="doccomment">/// # }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;io-util&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DuplexStream</span> {
-    <span class="ident">read</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Pipe</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">write</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Pipe</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A bidirectional pipe to read and write bytes in memory.
+///
+/// A pair of `DuplexStream`s are created together, and they act as a &quot;channel&quot;
+/// that can be used as in-memory IO types. Writing to one of the pairs will
+/// allow that data to be read from the other, and vice versa.
+///
+/// # Closing a `DuplexStream`
+///
+/// If one end of the `DuplexStream` channel is dropped, any pending reads on
+/// the other side will continue to read data until the buffer is drained, then
+/// they will signal EOF by returning 0 bytes. Any writes to the other side,
+/// including pending ones (that are waiting for free space in the buffer) will
+/// return `Err(BrokenPipe)` immediately.
+///
+/// # Example
+///
+/// ```
+/// # async fn ex() -&gt; std::io::Result&lt;()&gt; {
+/// # use tokio::io::{AsyncReadExt, AsyncWriteExt};
+/// let (mut client, mut server) = tokio::io::duplex(64);
+///
+/// client.write_all(b&quot;ping&quot;).await?;
+///
+/// let mut buf = [0u8; 4];
+/// server.read_exact(&amp;mut buf).await?;
+/// assert_eq!(&amp;buf, b&quot;ping&quot;);
+///
+/// server.write_all(b&quot;pong&quot;).await?;
+///
+/// client.read_exact(&amp;mut buf).await?;
+/// assert_eq!(&amp;buf, b&quot;pong&quot;);
+/// # Ok(())
+/// # }
+/// ```
+</span><span class="attribute">#[derive(Debug)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;io-util&quot;</span>)))]
+</span><span class="kw">pub struct </span>DuplexStream {
+    read: Arc&lt;Mutex&lt;Pipe&gt;&gt;,
+    write: Arc&lt;Mutex&lt;Pipe&gt;&gt;,
 }
 
-<span class="doccomment">/// A unidirectional IO over a piece of memory.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Data can be written to the pipe, and reading will return that data.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">struct</span> <span class="ident">Pipe</span> {
-    <span class="doccomment">/// The buffer storing the bytes written, also read from.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Using a `BytesMut` because it has efficient `Buf` and `BufMut`</span>
-    <span class="doccomment">/// functionality already. Additionally, it can try to copy data in the</span>
-    <span class="doccomment">/// same buffer if there read index has advanced far enough.</span>
-    <span class="ident">buffer</span>: <span class="ident">BytesMut</span>,
-    <span class="doccomment">/// Determines if the write side has been closed.</span>
-    <span class="ident">is_closed</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// The maximum amount of bytes that can be written before returning</span>
-    <span class="doccomment">/// `Poll::Pending`.</span>
-    <span class="ident">max_buf_size</span>: <span class="ident">usize</span>,
-    <span class="doccomment">/// If the `read` side has been polled and is pending, this is the waker</span>
-    <span class="doccomment">/// for that parked task.</span>
-    <span class="ident">read_waker</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Waker</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// If the `write` side has filled the `max_buf_size` and returned</span>
-    <span class="doccomment">/// `Poll::Pending`, this is the waker for that parked task.</span>
-    <span class="ident">write_waker</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Waker</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A unidirectional IO over a piece of memory.
+///
+/// Data can be written to the pipe, and reading will return that data.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">struct </span>Pipe {
+    <span class="doccomment">/// The buffer storing the bytes written, also read from.
+    ///
+    /// Using a `BytesMut` because it has efficient `Buf` and `BufMut`
+    /// functionality already. Additionally, it can try to copy data in the
+    /// same buffer if there read index has advanced far enough.
+    </span>buffer: BytesMut,
+    <span class="doccomment">/// Determines if the write side has been closed.
+    </span>is_closed: bool,
+    <span class="doccomment">/// The maximum amount of bytes that can be written before returning
+    /// `Poll::Pending`.
+    </span>max_buf_size: usize,
+    <span class="doccomment">/// If the `read` side has been polled and is pending, this is the waker
+    /// for that parked task.
+    </span>read_waker: <span class="prelude-ty">Option</span>&lt;Waker&gt;,
+    <span class="doccomment">/// If the `write` side has filled the `max_buf_size` and returned
+    /// `Poll::Pending`, this is the waker for that parked task.
+    </span>write_waker: <span class="prelude-ty">Option</span>&lt;Waker&gt;,
 }
 
-<span class="comment">// ===== impl DuplexStream =====</span>
+<span class="comment">// ===== impl DuplexStream =====
 
-<span class="doccomment">/// Create a new pair of `DuplexStream`s that act like a pair of connected sockets.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The `max_buf_size` argument is the maximum amount of bytes that can be</span>
-<span class="doccomment">/// written to a side before the write returns `Poll::Pending`.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;io-util&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">duplex</span>(<span class="ident">max_buf_size</span>: <span class="ident">usize</span>) -&gt; (<span class="ident">DuplexStream</span>, <span class="ident">DuplexStream</span>) {
-    <span class="kw">let</span> <span class="ident">one</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">Pipe::new</span>(<span class="ident">max_buf_size</span>)));
-    <span class="kw">let</span> <span class="ident">two</span> <span class="op">=</span> <span class="ident">Arc::new</span>(<span class="ident">Mutex::new</span>(<span class="ident">Pipe::new</span>(<span class="ident">max_buf_size</span>)));
+</span><span class="doccomment">/// Create a new pair of `DuplexStream`s that act like a pair of connected sockets.
+///
+/// The `max_buf_size` argument is the maximum amount of bytes that can be
+/// written to a side before the write returns `Poll::Pending`.
+</span><span class="attribute">#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;io-util&quot;</span>)))]
+</span><span class="kw">pub fn </span>duplex(max_buf_size: usize) -&gt; (DuplexStream, DuplexStream) {
+    <span class="kw">let </span>one = Arc::new(Mutex::new(Pipe::new(max_buf_size)));
+    <span class="kw">let </span>two = Arc::new(Mutex::new(Pipe::new(max_buf_size)));
 
     (
-        <span class="ident">DuplexStream</span> {
-            <span class="ident">read</span>: <span class="ident">one</span>.<span class="ident">clone</span>(),
-            <span class="ident">write</span>: <span class="ident">two</span>.<span class="ident">clone</span>(),
+        DuplexStream {
+            read: one.clone(),
+            write: two.clone(),
         },
-        <span class="ident">DuplexStream</span> {
-            <span class="ident">read</span>: <span class="ident">two</span>,
-            <span class="ident">write</span>: <span class="ident">one</span>,
+        DuplexStream {
+            read: two,
+            write: one,
         },
     )
 }
 
-<span class="kw">impl</span> <span class="ident">AsyncRead</span> <span class="kw">for</span> <span class="ident">DuplexStream</span> {
-    <span class="comment">// Previous rustc required this `self` to be `mut`, even though newer</span>
-    <span class="comment">// versions recognize it isn&#39;t needed to call `lock()`. So for</span>
-    <span class="comment">// compatibility, we include the `mut` and `allow` the lint.</span>
-    <span class="comment">//</span>
-    <span class="comment">// See https://github.com/rust-lang/rust/issues/73592</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_mut</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">poll_read</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ReadBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">std::io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">read</span>.<span class="ident">lock</span>()).<span class="ident">poll_read</span>(<span class="ident">cx</span>, <span class="ident">buf</span>)
+<span class="kw">impl </span>AsyncRead <span class="kw">for </span>DuplexStream {
+    <span class="comment">// Previous rustc required this `self` to be `mut`, even though newer
+    // versions recognize it isn&#39;t needed to call `lock()`. So for
+    // compatibility, we include the `mut` and `allow` the lint.
+    //
+    // See https://github.com/rust-lang/rust/issues/73592
+    </span><span class="attribute">#[allow(unused_mut)]
+    </span><span class="kw">fn </span>poll_read(
+        <span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        buf: <span class="kw-2">&amp;mut </span>ReadBuf&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;std::io::Result&lt;()&gt;&gt; {
+        Pin::new(<span class="kw-2">&amp;mut *</span><span class="self">self</span>.read.lock()).poll_read(cx, buf)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">AsyncWrite</span> <span class="kw">for</span> <span class="ident">DuplexStream</span> {
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_mut</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">poll_write</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">std::io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">write</span>.<span class="ident">lock</span>()).<span class="ident">poll_write</span>(<span class="ident">cx</span>, <span class="ident">buf</span>)
+<span class="kw">impl </span>AsyncWrite <span class="kw">for </span>DuplexStream {
+    <span class="attribute">#[allow(unused_mut)]
+    </span><span class="kw">fn </span>poll_write(
+        <span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        buf: <span class="kw-2">&amp;</span>[u8],
+    ) -&gt; Poll&lt;std::io::Result&lt;usize&gt;&gt; {
+        Pin::new(<span class="kw-2">&amp;mut *</span><span class="self">self</span>.write.lock()).poll_write(cx, buf)
     }
 
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_mut</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">poll_flush</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">std::io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">write</span>.<span class="ident">lock</span>()).<span class="ident">poll_flush</span>(<span class="ident">cx</span>)
+    <span class="attribute">#[allow(unused_mut)]
+    </span><span class="kw">fn </span>poll_flush(
+        <span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;std::io::Result&lt;()&gt;&gt; {
+        Pin::new(<span class="kw-2">&amp;mut *</span><span class="self">self</span>.write.lock()).poll_flush(cx)
     }
 
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_mut</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">poll_shutdown</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">std::io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Pin::new</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">write</span>.<span class="ident">lock</span>()).<span class="ident">poll_shutdown</span>(<span class="ident">cx</span>)
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">DuplexStream</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="comment">// notify the other side of the closure</span>
-        <span class="self">self</span>.<span class="ident">write</span>.<span class="ident">lock</span>().<span class="ident">close_write</span>();
-        <span class="self">self</span>.<span class="ident">read</span>.<span class="ident">lock</span>().<span class="ident">close_read</span>();
+    <span class="attribute">#[allow(unused_mut)]
+    </span><span class="kw">fn </span>poll_shutdown(
+        <span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;std::io::Result&lt;()&gt;&gt; {
+        Pin::new(<span class="kw-2">&amp;mut *</span><span class="self">self</span>.write.lock()).poll_shutdown(cx)
     }
 }
 
-<span class="comment">// ===== impl Pipe =====</span>
+<span class="kw">impl </span>Drop <span class="kw">for </span>DuplexStream {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="comment">// notify the other side of the closure
+        </span><span class="self">self</span>.write.lock().close_write();
+        <span class="self">self</span>.read.lock().close_read();
+    }
+}
 
-<span class="kw">impl</span> <span class="ident">Pipe</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">max_buf_size</span>: <span class="ident">usize</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Pipe</span> {
-            <span class="ident">buffer</span>: <span class="ident">BytesMut::new</span>(),
-            <span class="ident">is_closed</span>: <span class="bool-val">false</span>,
-            <span class="ident">max_buf_size</span>,
-            <span class="ident">read_waker</span>: <span class="prelude-val">None</span>,
-            <span class="ident">write_waker</span>: <span class="prelude-val">None</span>,
+<span class="comment">// ===== impl Pipe =====
+
+</span><span class="kw">impl </span>Pipe {
+    <span class="kw">fn </span>new(max_buf_size: usize) -&gt; <span class="self">Self </span>{
+        Pipe {
+            buffer: BytesMut::new(),
+            is_closed: <span class="bool-val">false</span>,
+            max_buf_size,
+            read_waker: <span class="prelude-val">None</span>,
+            write_waker: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">close_write</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">is_closed</span> <span class="op">=</span> <span class="bool-val">true</span>;
-        <span class="comment">// needs to notify any readers that no more data will come</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">waker</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">read_waker</span>.<span class="ident">take</span>() {
-            <span class="ident">waker</span>.<span class="ident">wake</span>();
+    <span class="kw">fn </span>close_write(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.is_closed = <span class="bool-val">true</span>;
+        <span class="comment">// needs to notify any readers that no more data will come
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(waker) = <span class="self">self</span>.read_waker.take() {
+            waker.wake();
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">close_read</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">is_closed</span> <span class="op">=</span> <span class="bool-val">true</span>;
-        <span class="comment">// needs to notify any writers that they have to abort</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">waker</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">write_waker</span>.<span class="ident">take</span>() {
-            <span class="ident">waker</span>.<span class="ident">wake</span>();
+    <span class="kw">fn </span>close_read(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.is_closed = <span class="bool-val">true</span>;
+        <span class="comment">// needs to notify any writers that they have to abort
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(waker) = <span class="self">self</span>.write_waker.take() {
+            waker.wake();
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_read_internal</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ReadBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">std::io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">has_remaining</span>() {
-            <span class="kw">let</span> <span class="ident">max</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">remaining</span>().<span class="ident">min</span>(<span class="ident">buf</span>.<span class="ident">remaining</span>());
-            <span class="ident">buf</span>.<span class="ident">put_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">buffer</span>[..<span class="ident">max</span>]);
-            <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">advance</span>(<span class="ident">max</span>);
-            <span class="kw">if</span> <span class="ident">max</span> <span class="op">&gt;</span> <span class="number">0</span> {
-                <span class="comment">// The passed `buf` might have been empty, don&#39;t wake up if</span>
-                <span class="comment">// no bytes have been moved.</span>
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">waker</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">write_waker</span>.<span class="ident">take</span>() {
-                    <span class="ident">waker</span>.<span class="ident">wake</span>();
+    <span class="kw">fn </span>poll_read_internal(
+        <span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        buf: <span class="kw-2">&amp;mut </span>ReadBuf&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;std::io::Result&lt;()&gt;&gt; {
+        <span class="kw">if </span><span class="self">self</span>.buffer.has_remaining() {
+            <span class="kw">let </span>max = <span class="self">self</span>.buffer.remaining().min(buf.remaining());
+            buf.put_slice(<span class="kw-2">&amp;</span><span class="self">self</span>.buffer[..max]);
+            <span class="self">self</span>.buffer.advance(max);
+            <span class="kw">if </span>max &gt; <span class="number">0 </span>{
+                <span class="comment">// The passed `buf` might have been empty, don&#39;t wake up if
+                // no bytes have been moved.
+                </span><span class="kw">if let </span><span class="prelude-val">Some</span>(waker) = <span class="self">self</span>.write_waker.take() {
+                    waker.wake();
                 }
             }
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_closed</span> {
-            <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">read_waker</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">cx</span>.<span class="ident">waker</span>().<span class="ident">clone</span>());
-            <span class="ident">Poll::Pending</span>
+            Poll::Ready(<span class="prelude-val">Ok</span>(()))
+        } <span class="kw">else if </span><span class="self">self</span>.is_closed {
+            Poll::Ready(<span class="prelude-val">Ok</span>(()))
+        } <span class="kw">else </span>{
+            <span class="self">self</span>.read_waker = <span class="prelude-val">Some</span>(cx.waker().clone());
+            Poll::Pending
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_write_internal</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">std::io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_closed</span> {
-            <span class="kw">return</span> <span class="ident">Poll::Ready</span>(<span class="prelude-val">Err</span>(<span class="ident">std::io::ErrorKind::BrokenPipe</span>.<span class="ident">into</span>()));
+    <span class="kw">fn </span>poll_write_internal(
+        <span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+        buf: <span class="kw-2">&amp;</span>[u8],
+    ) -&gt; Poll&lt;std::io::Result&lt;usize&gt;&gt; {
+        <span class="kw">if </span><span class="self">self</span>.is_closed {
+            <span class="kw">return </span>Poll::Ready(<span class="prelude-val">Err</span>(std::io::ErrorKind::BrokenPipe.into()));
         }
-        <span class="kw">let</span> <span class="ident">avail</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">max_buf_size</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">len</span>();
-        <span class="kw">if</span> <span class="ident">avail</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="self">self</span>.<span class="ident">write_waker</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">cx</span>.<span class="ident">waker</span>().<span class="ident">clone</span>());
-            <span class="kw">return</span> <span class="ident">Poll::Pending</span>;
+        <span class="kw">let </span>avail = <span class="self">self</span>.max_buf_size - <span class="self">self</span>.buffer.len();
+        <span class="kw">if </span>avail == <span class="number">0 </span>{
+            <span class="self">self</span>.write_waker = <span class="prelude-val">Some</span>(cx.waker().clone());
+            <span class="kw">return </span>Poll::Pending;
         }
 
-        <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">buf</span>.<span class="ident">len</span>().<span class="ident">min</span>(<span class="ident">avail</span>);
-        <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">buf</span>[..<span class="ident">len</span>]);
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">waker</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">read_waker</span>.<span class="ident">take</span>() {
-            <span class="ident">waker</span>.<span class="ident">wake</span>();
+        <span class="kw">let </span>len = buf.len().min(avail);
+        <span class="self">self</span>.buffer.extend_from_slice(<span class="kw-2">&amp;</span>buf[..len]);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(waker) = <span class="self">self</span>.read_waker.take() {
+            waker.wake();
         }
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(<span class="ident">len</span>))
-    }
-}
-
-<span class="kw">impl</span> <span class="ident">AsyncRead</span> <span class="kw">for</span> <span class="ident">Pipe</span> {
-    <span class="macro">cfg_coop!</span> {
-        <span class="kw">fn</span> <span class="ident">poll_read</span>(
-            <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-            <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-            <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ReadBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">std::io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">coop</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="ident"><span class="kw">crate</span>::coop::poll_proceed</span>(<span class="ident">cx</span>));
-
-            <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">poll_read_internal</span>(<span class="ident">cx</span>, <span class="ident">buf</span>);
-            <span class="kw">if</span> <span class="ident">ret</span>.<span class="ident">is_ready</span>() {
-                <span class="ident">coop</span>.<span class="ident">made_progress</span>();
-            }
-            <span class="ident">ret</span>
-        }
-    }
-
-    <span class="macro">cfg_not_coop!</span> {
-        <span class="kw">fn</span> <span class="ident">poll_read</span>(
-            <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-            <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-            <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ReadBuf</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">std::io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="self">self</span>.<span class="ident">poll_read_internal</span>(<span class="ident">cx</span>, <span class="ident">buf</span>)
-        }
+        Poll::Ready(<span class="prelude-val">Ok</span>(len))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">AsyncWrite</span> <span class="kw">for</span> <span class="ident">Pipe</span> {
-    <span class="macro">cfg_coop!</span> {
-        <span class="kw">fn</span> <span class="ident">poll_write</span>(
-            <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-            <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-            <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-        ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">std::io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">coop</span> <span class="op">=</span> <span class="macro">ready!</span>(<span class="ident"><span class="kw">crate</span>::coop::poll_proceed</span>(<span class="ident">cx</span>));
+<span class="kw">impl </span>AsyncRead <span class="kw">for </span>Pipe {
+    <span class="macro">cfg_coop! </span>{
+        <span class="kw">fn </span>poll_read(
+            <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+            cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+            buf: <span class="kw-2">&amp;mut </span>ReadBuf&lt;<span class="lifetime">&#39;_</span>&gt;,
+        ) -&gt; Poll&lt;std::io::Result&lt;()&gt;&gt; {
+            <span class="kw">let </span>coop = <span class="macro">ready!</span>(<span class="kw">crate</span>::coop::poll_proceed(cx));
 
-            <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">poll_write_internal</span>(<span class="ident">cx</span>, <span class="ident">buf</span>);
-            <span class="kw">if</span> <span class="ident">ret</span>.<span class="ident">is_ready</span>() {
-                <span class="ident">coop</span>.<span class="ident">made_progress</span>();
+            <span class="kw">let </span>ret = <span class="self">self</span>.poll_read_internal(cx, buf);
+            <span class="kw">if </span>ret.is_ready() {
+                coop.made_progress();
             }
-            <span class="ident">ret</span>
+            ret
         }
     }
 
-    <span class="macro">cfg_not_coop!</span> {
-        <span class="kw">fn</span> <span class="ident">poll_write</span>(
-            <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-            <span class="ident">cx</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-            <span class="ident">buf</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-        ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">std::io::Result</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-            <span class="self">self</span>.<span class="ident">poll_write_internal</span>(<span class="ident">cx</span>, <span class="ident">buf</span>)
+    <span class="macro">cfg_not_coop! </span>{
+        <span class="kw">fn </span>poll_read(
+            <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+            cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+            buf: <span class="kw-2">&amp;mut </span>ReadBuf&lt;<span class="lifetime">&#39;_</span>&gt;,
+        ) -&gt; Poll&lt;std::io::Result&lt;()&gt;&gt; {
+            <span class="self">self</span>.poll_read_internal(cx, buf)
+        }
+    }
+}
+
+<span class="kw">impl </span>AsyncWrite <span class="kw">for </span>Pipe {
+    <span class="macro">cfg_coop! </span>{
+        <span class="kw">fn </span>poll_write(
+            <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+            cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+            buf: <span class="kw-2">&amp;</span>[u8],
+        ) -&gt; Poll&lt;std::io::Result&lt;usize&gt;&gt; {
+            <span class="kw">let </span>coop = <span class="macro">ready!</span>(<span class="kw">crate</span>::coop::poll_proceed(cx));
+
+            <span class="kw">let </span>ret = <span class="self">self</span>.poll_write_internal(cx, buf);
+            <span class="kw">if </span>ret.is_ready() {
+                coop.made_progress();
+            }
+            ret
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_flush</span>(<span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="kw">_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">std::io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
+    <span class="macro">cfg_not_coop! </span>{
+        <span class="kw">fn </span>poll_write(
+            <span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+            cx: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+            buf: <span class="kw-2">&amp;</span>[u8],
+        ) -&gt; Poll&lt;std::io::Result&lt;usize&gt;&gt; {
+            <span class="self">self</span>.poll_write_internal(cx, buf)
+        }
     }
 
-    <span class="kw">fn</span> <span class="ident">poll_shutdown</span>(
-        <span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span>,
-        <span class="kw">_</span>: <span class="kw-2">&amp;mut</span> <span class="ident">task::Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">Poll</span><span class="op">&lt;</span><span class="ident">std::io::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">close_write</span>();
-        <span class="ident">Poll::Ready</span>(<span class="prelude-val">Ok</span>(()))
+    <span class="kw">fn </span>poll_flush(<span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; Poll&lt;std::io::Result&lt;()&gt;&gt; {
+        Poll::Ready(<span class="prelude-val">Ok</span>(()))
+    }
+
+    <span class="kw">fn </span>poll_shutdown(
+        <span class="kw-2">mut </span><span class="self">self</span>: Pin&lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;,
+        <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>task::Context&lt;<span class="lifetime">&#39;_</span>&gt;,
+    ) -&gt; Poll&lt;std::io::Result&lt;()&gt;&gt; {
+        <span class="self">self</span>.close_write();
+        Poll::Ready(<span class="prelude-val">Ok</span>(()))
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tokio" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

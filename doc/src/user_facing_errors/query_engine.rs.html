@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/user-facing-errors/src/query_engine.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>query_engine.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../user_facing_errors/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../user_facing_errors/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../user_facing_errors/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `libs/user-facing-errors/src/query_engine.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>query_engine.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../user_facing_errors/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../user_facing_errors/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../user_facing_errors/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -345,352 +345,352 @@
 <span id="345">345</span>
 <span id="346">346</span>
 <span id="347">347</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde::Serialize</span>;
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">user_facing_error_macros</span>::<span class="kw-2">*</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>serde::Serialize;
+<span class="kw">use </span>std::fmt;
+<span class="kw">use </span>user_facing_error_macros::<span class="kw-2">*</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Serialize</span>, <span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">untagged</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DatabaseConstraint</span> {
-    <span class="ident">Fields</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>),
-    <span class="ident">Index</span>(<span class="ident">String</span>),
-    <span class="ident">ForeignKey</span>,
-    <span class="ident">CannotParse</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Eq, Serialize, Clone)]
+#[serde(untagged)]
+</span><span class="kw">pub enum </span>DatabaseConstraint {
+    Fields(Vec&lt;String&gt;),
+    Index(String),
+    ForeignKey,
+    CannotParse,
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">DatabaseConstraint</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident"><span class="self">Self</span>::Fields</span>(<span class="ident">fields</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">quoted_fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">fields</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;`{}`&quot;</span>, <span class="ident">f</span>)).<span class="ident">collect</span>();
-                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;fields: ({})&quot;</span>, <span class="ident">quoted_fields</span>.<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>))
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>DatabaseConstraint {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Fields(fields) =&gt; {
+                <span class="kw">let </span>quoted_fields: Vec&lt;String&gt; = fields.iter().map(|f| <span class="macro">format!</span>(<span class="string">&quot;`{}`&quot;</span>, f)).collect();
+                <span class="macro">write!</span>(f, <span class="string">&quot;fields: ({})&quot;</span>, quoted_fields.join(<span class="string">&quot;,&quot;</span>))
             }
-            <span class="ident"><span class="self">Self</span>::Index</span>(<span class="ident">index</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;constraint: `{}`&quot;</span>, <span class="ident">index</span>),
-            <span class="ident"><span class="self">Self</span>::ForeignKey</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;foreign key&quot;</span>),
-            <span class="ident"><span class="self">Self</span>::CannotParse</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;(not available)&quot;</span>),
+            <span class="self">Self</span>::Index(index) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;constraint: `{}`&quot;</span>, index),
+            <span class="self">Self</span>::ForeignKey =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;foreign key&quot;</span>),
+            <span class="self">Self</span>::CannotParse =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;(not available)&quot;</span>),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">DatabaseConstraint</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::Fields</span>(<span class="ident">fields</span>)
+<span class="kw">impl </span>From&lt;Vec&lt;String&gt;&gt; <span class="kw">for </span>DatabaseConstraint {
+    <span class="kw">fn </span>from(fields: Vec&lt;String&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::Fields(fields)
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(
-    <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2000&quot;</span>,
-    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;The provided value for the column is too long for the column&#39;s type. Column: {column_name}&quot;</span>
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InputValueTooLong</span> {
-    <span class="kw">pub</span> <span class="ident">column_name</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = <span class="string">&quot;P2000&quot;</span>,
+    message = <span class="string">&quot;The provided value for the column is too long for the column&#39;s type. Column: {column_name}&quot;
+</span>)]
+</span><span class="kw">pub struct </span>InputValueTooLong {
+    <span class="kw">pub </span>column_name: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(
-    <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2001&quot;</span>,
-    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;The record searched for in the where condition (`{model_name}.{argument_name} = {argument_value}`) does not exist&quot;</span>
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RecordNotFound</span> {
-    <span class="doccomment">/// Model name from Prisma schema</span>
-    <span class="kw">pub</span> <span class="ident">model_name</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = <span class="string">&quot;P2001&quot;</span>,
+    message = <span class="string">&quot;The record searched for in the where condition (`{model_name}.{argument_name} = {argument_value}`) does not exist&quot;
+</span>)]
+</span><span class="kw">pub struct </span>RecordNotFound {
+    <span class="doccomment">/// Model name from Prisma schema
+    </span><span class="kw">pub </span>model_name: String,
 
-    <span class="doccomment">/// Argument name from a supported query on a Prisma schema model</span>
-    <span class="kw">pub</span> <span class="ident">argument_name</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// Argument name from a supported query on a Prisma schema model
+    </span><span class="kw">pub </span>argument_name: String,
 
-    <span class="doccomment">/// Concrete value provided for an argument on a query. Should be peeked/truncated if too long</span>
-    <span class="doccomment">/// to display in the error message</span>
-    <span class="kw">pub</span> <span class="ident">argument_value</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// Concrete value provided for an argument on a query. Should be peeked/truncated if too long
+    /// to display in the error message
+    </span><span class="kw">pub </span>argument_value: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(<span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2002&quot;</span>, <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Unique constraint failed on the {constraint}&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UniqueKeyViolation</span> {
-    <span class="doccomment">/// Field name from one model from Prisma schema</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;target&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">constraint</span>: <span class="ident">DatabaseConstraint</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = <span class="string">&quot;P2002&quot;</span>, message = <span class="string">&quot;Unique constraint failed on the {constraint}&quot;</span>)]
+</span><span class="kw">pub struct </span>UniqueKeyViolation {
+    <span class="doccomment">/// Field name from one model from Prisma schema
+    </span><span class="attribute">#[serde(rename = <span class="string">&quot;target&quot;</span>)]
+    </span><span class="kw">pub </span>constraint: DatabaseConstraint,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(
-    <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2003&quot;</span>,
-    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Foreign key constraint failed on the field: `{field_name}`&quot;</span>
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ForeignKeyViolation</span> {
-    <span class="doccomment">/// Field name from one model from Prisma schema</span>
-    <span class="kw">pub</span> <span class="ident">field_name</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = <span class="string">&quot;P2003&quot;</span>,
+    message = <span class="string">&quot;Foreign key constraint failed on the field: `{field_name}`&quot;
+</span>)]
+</span><span class="kw">pub struct </span>ForeignKeyViolation {
+    <span class="doccomment">/// Field name from one model from Prisma schema
+    </span><span class="kw">pub </span>field_name: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(<span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2004&quot;</span>, <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;A constraint failed on the database: `{database_error}`&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConstraintViolation</span> {
-    <span class="doccomment">/// Database error returned by the underlying data source</span>
-    <span class="kw">pub</span> <span class="ident">database_error</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = <span class="string">&quot;P2004&quot;</span>, message = <span class="string">&quot;A constraint failed on the database: `{database_error}`&quot;</span>)]
+</span><span class="kw">pub struct </span>ConstraintViolation {
+    <span class="doccomment">/// Database error returned by the underlying data source
+    </span><span class="kw">pub </span>database_error: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(
-    <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2005&quot;</span>,
-    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;The value `{field_value}` stored in the database for the field `{field_name}` is invalid for the field&#39;s type&quot;</span>
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StoredValueIsInvalid</span> {
-    <span class="doccomment">/// Concrete value provided for a field on a model in Prisma schema. Should be peeked/truncated if too long to display in the error message</span>
-    <span class="kw">pub</span> <span class="ident">field_value</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = <span class="string">&quot;P2005&quot;</span>,
+    message = <span class="string">&quot;The value `{field_value}` stored in the database for the field `{field_name}` is invalid for the field&#39;s type&quot;
+</span>)]
+</span><span class="kw">pub struct </span>StoredValueIsInvalid {
+    <span class="doccomment">/// Concrete value provided for a field on a model in Prisma schema. Should be peeked/truncated if too long to display in the error message
+    </span><span class="kw">pub </span>field_value: String,
 
-    <span class="doccomment">/// Field name from one model from Prisma schema</span>
-    <span class="kw">pub</span> <span class="ident">field_name</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// Field name from one model from Prisma schema
+    </span><span class="kw">pub </span>field_name: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(
-    <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2006&quot;</span>,
-    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;The provided value `{field_value}` for `{model_name}` field `{field_name}` is not valid&quot;</span>
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TypeMismatch</span> {
-    <span class="doccomment">/// Concrete value provided for a field on a model in Prisma schema. Should be peeked/truncated if too long to display in the error message</span>
-    <span class="kw">pub</span> <span class="ident">field_value</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = <span class="string">&quot;P2006&quot;</span>,
+    message = <span class="string">&quot;The provided value `{field_value}` for `{model_name}` field `{field_name}` is not valid&quot;
+</span>)]
+</span><span class="kw">pub struct </span>TypeMismatch {
+    <span class="doccomment">/// Concrete value provided for a field on a model in Prisma schema. Should be peeked/truncated if too long to display in the error message
+    </span><span class="kw">pub </span>field_value: String,
 
-    <span class="doccomment">/// Model name from Prisma schema</span>
-    <span class="kw">pub</span> <span class="ident">model_name</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// Model name from Prisma schema
+    </span><span class="kw">pub </span>model_name: String,
 
-    <span class="doccomment">/// Field name from one model from Prisma schema</span>
-    <span class="kw">pub</span> <span class="ident">field_name</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// Field name from one model from Prisma schema
+    </span><span class="kw">pub </span>field_name: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(<span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2007&quot;</span>, <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Data validation error `{database_error}`&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TypeMismatchInvalidCustomType</span> {
-    <span class="doccomment">/// Database error returned by the underlying data source</span>
-    <span class="kw">pub</span> <span class="ident">database_error</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = <span class="string">&quot;P2007&quot;</span>, message = <span class="string">&quot;Data validation error `{database_error}`&quot;</span>)]
+</span><span class="kw">pub struct </span>TypeMismatchInvalidCustomType {
+    <span class="doccomment">/// Database error returned by the underlying data source
+    </span><span class="kw">pub </span>database_error: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(
-    <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2008&quot;</span>,
-    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Failed to parse the query `{query_parsing_error}` at `{query_position}`&quot;</span>
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">QueryParsingFailed</span> {
-    <span class="doccomment">/// Error(s) encountered when trying to parse a query in the query engine</span>
-    <span class="kw">pub</span> <span class="ident">query_parsing_error</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = <span class="string">&quot;P2008&quot;</span>,
+    message = <span class="string">&quot;Failed to parse the query `{query_parsing_error}` at `{query_position}`&quot;
+</span>)]
+</span><span class="kw">pub struct </span>QueryParsingFailed {
+    <span class="doccomment">/// Error(s) encountered when trying to parse a query in the query engine
+    </span><span class="kw">pub </span>query_parsing_error: String,
 
-    <span class="doccomment">/// Location of the incorrect parsing, validation in a query. Represented by tuple or object with (line, character)</span>
-    <span class="kw">pub</span> <span class="ident">query_position</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// Location of the incorrect parsing, validation in a query. Represented by tuple or object with (line, character)
+    </span><span class="kw">pub </span>query_position: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(
-    <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2009&quot;</span>,
-    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Failed to validate the query: `{query_validation_error}` at `{query_position}`&quot;</span>
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">QueryValidationFailed</span> {
-    <span class="doccomment">/// Error(s) encountered when trying to validate a query in the query engine</span>
-    <span class="kw">pub</span> <span class="ident">query_validation_error</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = <span class="string">&quot;P2009&quot;</span>,
+    message = <span class="string">&quot;Failed to validate the query: `{query_validation_error}` at `{query_position}`&quot;
+</span>)]
+</span><span class="kw">pub struct </span>QueryValidationFailed {
+    <span class="doccomment">/// Error(s) encountered when trying to validate a query in the query engine
+    </span><span class="kw">pub </span>query_validation_error: String,
 
-    <span class="doccomment">/// Location of the incorrect parsing, validation in a query. Represented by tuple or object with (line, character)</span>
-    <span class="kw">pub</span> <span class="ident">query_position</span>: <span class="ident">String</span>,
+    <span class="doccomment">/// Location of the incorrect parsing, validation in a query. Represented by tuple or object with (line, character)
+    </span><span class="kw">pub </span>query_position: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(<span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2010&quot;</span>, <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Raw query failed. Code: `{code}`. Message: `{message}`&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RawQueryFailed</span> {
-    <span class="kw">pub</span> <span class="ident">code</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">message</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = <span class="string">&quot;P2010&quot;</span>, message = <span class="string">&quot;Raw query failed. Code: `{code}`. Message: `{message}`&quot;</span>)]
+</span><span class="kw">pub struct </span>RawQueryFailed {
+    <span class="kw">pub </span>code: String,
+    <span class="kw">pub </span>message: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(<span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2011&quot;</span>, <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Null constraint violation on the {constraint}&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NullConstraintViolation</span> {
-    <span class="kw">pub</span> <span class="ident">constraint</span>: <span class="ident">DatabaseConstraint</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = <span class="string">&quot;P2011&quot;</span>, message = <span class="string">&quot;Null constraint violation on the {constraint}&quot;</span>)]
+</span><span class="kw">pub struct </span>NullConstraintViolation {
+    <span class="kw">pub </span>constraint: DatabaseConstraint,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(<span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2012&quot;</span>, <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Missing a required value at `{path}`&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MissingRequiredValue</span> {
-    <span class="kw">pub</span> <span class="ident">path</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = <span class="string">&quot;P2012&quot;</span>, message = <span class="string">&quot;Missing a required value at `{path}`&quot;</span>)]
+</span><span class="kw">pub struct </span>MissingRequiredValue {
+    <span class="kw">pub </span>path: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(
-    <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2013&quot;</span>,
-    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Missing the required argument `{argument_name}` for field `{field_name}` on `{object_name}`.&quot;</span>
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MissingRequiredArgument</span> {
-    <span class="kw">pub</span> <span class="ident">argument_name</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">field_name</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">object_name</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = <span class="string">&quot;P2013&quot;</span>,
+    message = <span class="string">&quot;Missing the required argument `{argument_name}` for field `{field_name}` on `{object_name}`.&quot;
+</span>)]
+</span><span class="kw">pub struct </span>MissingRequiredArgument {
+    <span class="kw">pub </span>argument_name: String,
+    <span class="kw">pub </span>field_name: String,
+    <span class="kw">pub </span>object_name: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(
-    <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2014&quot;</span>,
-    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;The change you are trying to make would violate the required relation &#39;{relation_name}&#39; between the `{model_a_name}` and `{model_b_name}` models.&quot;</span>
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RelationViolation</span> {
-    <span class="kw">pub</span> <span class="ident">relation_name</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">model_a_name</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">model_b_name</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = <span class="string">&quot;P2014&quot;</span>,
+    message = <span class="string">&quot;The change you are trying to make would violate the required relation &#39;{relation_name}&#39; between the `{model_a_name}` and `{model_b_name}` models.&quot;
+</span>)]
+</span><span class="kw">pub struct </span>RelationViolation {
+    <span class="kw">pub </span>relation_name: String,
+    <span class="kw">pub </span>model_a_name: String,
+    <span class="kw">pub </span>model_b_name: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(<span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2015&quot;</span>, <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;A related record could not be found. {details}&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RelatedRecordNotFound</span> {
-    <span class="kw">pub</span> <span class="ident">details</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = <span class="string">&quot;P2015&quot;</span>, message = <span class="string">&quot;A related record could not be found. {details}&quot;</span>)]
+</span><span class="kw">pub struct </span>RelatedRecordNotFound {
+    <span class="kw">pub </span>details: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(<span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2016&quot;</span>, <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Query interpretation error. {details}&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InterpretationError</span> {
-    <span class="kw">pub</span> <span class="ident">details</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = <span class="string">&quot;P2016&quot;</span>, message = <span class="string">&quot;Query interpretation error. {details}&quot;</span>)]
+</span><span class="kw">pub struct </span>InterpretationError {
+    <span class="kw">pub </span>details: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(
-    <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2017&quot;</span>,
-    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;The records for relation `{relation_name}` between the `{parent_name}` and `{child_name}` models are not connected.&quot;</span>
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RecordsNotConnected</span> {
-    <span class="kw">pub</span> <span class="ident">relation_name</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">parent_name</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">child_name</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = <span class="string">&quot;P2017&quot;</span>,
+    message = <span class="string">&quot;The records for relation `{relation_name}` between the `{parent_name}` and `{child_name}` models are not connected.&quot;
+</span>)]
+</span><span class="kw">pub struct </span>RecordsNotConnected {
+    <span class="kw">pub </span>relation_name: String,
+    <span class="kw">pub </span>parent_name: String,
+    <span class="kw">pub </span>child_name: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(<span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2018&quot;</span>, <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;The required connected records were not found. {details}&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ConnectedRecordsNotFound</span> {
-    <span class="kw">pub</span> <span class="ident">details</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = <span class="string">&quot;P2018&quot;</span>, message = <span class="string">&quot;The required connected records were not found. {details}&quot;</span>)]
+</span><span class="kw">pub struct </span>ConnectedRecordsNotFound {
+    <span class="kw">pub </span>details: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(<span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2019&quot;</span>, <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Input error. {details}&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InputError</span> {
-    <span class="kw">pub</span> <span class="ident">details</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = <span class="string">&quot;P2019&quot;</span>, message = <span class="string">&quot;Input error. {details}&quot;</span>)]
+</span><span class="kw">pub struct </span>InputError {
+    <span class="kw">pub </span>details: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(<span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2020&quot;</span>, <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Value out of range for the type. {details}&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ValueOutOfRange</span> {
-    <span class="kw">pub</span> <span class="ident">details</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = <span class="string">&quot;P2020&quot;</span>, message = <span class="string">&quot;Value out of range for the type. {details}&quot;</span>)]
+</span><span class="kw">pub struct </span>ValueOutOfRange {
+    <span class="kw">pub </span>details: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(
-    <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2021&quot;</span>,
-    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;The table `{table}` does not exist in the current database.&quot;</span>
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TableDoesNotExist</span> {
-    <span class="kw">pub</span> <span class="ident">table</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = <span class="string">&quot;P2021&quot;</span>,
+    message = <span class="string">&quot;The table `{table}` does not exist in the current database.&quot;
+</span>)]
+</span><span class="kw">pub struct </span>TableDoesNotExist {
+    <span class="kw">pub </span>table: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(
-    <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2022&quot;</span>,
-    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;The column `{column}` does not exist in the current database.&quot;</span>
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ColumnDoesNotExist</span> {
-    <span class="kw">pub</span> <span class="ident">column</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = <span class="string">&quot;P2022&quot;</span>,
+    message = <span class="string">&quot;The column `{column}` does not exist in the current database.&quot;
+</span>)]
+</span><span class="kw">pub struct </span>ColumnDoesNotExist {
+    <span class="kw">pub </span>column: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(<span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2023&quot;</span>, <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Inconsistent column data: {message}&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InconsistentColumnData</span> {
-    <span class="kw">pub</span> <span class="ident">message</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = <span class="string">&quot;P2023&quot;</span>, message = <span class="string">&quot;Inconsistent column data: {message}&quot;</span>)]
+</span><span class="kw">pub struct </span>InconsistentColumnData {
+    <span class="kw">pub </span>message: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(
-    <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2024&quot;</span>,
-    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: {timeout}, connection limit: {connection_limit})&quot;</span>
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PoolTimeout</span> {
-    <span class="kw">pub</span> <span class="ident">connection_limit</span>: <span class="ident">u64</span>,
-    <span class="kw">pub</span> <span class="ident">timeout</span>: <span class="ident">u64</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = <span class="string">&quot;P2024&quot;</span>,
+    message = <span class="string">&quot;Timed out fetching a new connection from the connection pool. More info: http://pris.ly/d/connection-pool (Current connection pool timeout: {timeout}, connection limit: {connection_limit})&quot;
+</span>)]
+</span><span class="kw">pub struct </span>PoolTimeout {
+    <span class="kw">pub </span>connection_limit: u64,
+    <span class="kw">pub </span>timeout: u64,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(
-    <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2025&quot;</span>,
-    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;An operation failed because it depends on one or more records that were required but not found. {cause}&quot;</span>
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RecordRequiredButNotFound</span> {
-    <span class="kw">pub</span> <span class="ident">cause</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = <span class="string">&quot;P2025&quot;</span>,
+    message = <span class="string">&quot;An operation failed because it depends on one or more records that were required but not found. {cause}&quot;
+</span>)]
+</span><span class="kw">pub struct </span>RecordRequiredButNotFound {
+    <span class="kw">pub </span>cause: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(
-    <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2026&quot;</span>,
-    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;The current database provider doesn&#39;t support a feature that the query used: {feature}&quot;</span>
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UnsupportedFeature</span> {
-    <span class="kw">pub</span> <span class="ident">feature</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = <span class="string">&quot;P2026&quot;</span>,
+    message = <span class="string">&quot;The current database provider doesn&#39;t support a feature that the query used: {feature}&quot;
+</span>)]
+</span><span class="kw">pub struct </span>UnsupportedFeature {
+    <span class="kw">pub </span>feature: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(
-    <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2027&quot;</span>,
-    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Multiple errors occurred on the database during query execution: {errors}&quot;</span>
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MultiError</span> {
-    <span class="kw">pub</span> <span class="ident">errors</span>: <span class="ident">String</span>, <span class="comment">// Might want to change it to collection of user facing errors.</span>
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = <span class="string">&quot;P2027&quot;</span>,
+    message = <span class="string">&quot;Multiple errors occurred on the database during query execution: {errors}&quot;
+</span>)]
+</span><span class="kw">pub struct </span>MultiError {
+    <span class="kw">pub </span>errors: String, <span class="comment">// Might want to change it to collection of user facing errors.
+</span>}
+
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = <span class="string">&quot;P2028&quot;</span>, message = <span class="string">&quot;Transaction API error: {error}&quot;</span>)]
+</span><span class="kw">pub struct </span>InteractiveTransactionError {
+    <span class="kw">pub </span>error: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(<span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2028&quot;</span>, <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Transaction API error: {error}&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InteractiveTransactionError</span> {
-    <span class="kw">pub</span> <span class="ident">error</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = <span class="string">&quot;P2029&quot;</span>, message = <span class="string">&quot;Query parameter limit exceeded error: {message}.&quot;</span>)]
+</span><span class="kw">pub struct </span>QueryParameterLimitExceeded {
+    <span class="kw">pub </span>message: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(<span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2029&quot;</span>, <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Query parameter limit exceeded error: {message}.&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">QueryParameterLimitExceeded</span> {
-    <span class="kw">pub</span> <span class="ident">message</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = <span class="string">&quot;P2030&quot;</span>,
+    message = <span class="string">&quot;Cannot find a fulltext index to use for the search, try adding a @@fulltext([Fields...]) to your schema&quot;
+</span>)]
+</span><span class="kw">pub struct </span>MissingFullTextSearchIndex {}
+
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = <span class="string">&quot;P2031&quot;</span>,
+    message = <span class="string">&quot;Prisma needs to perform transactions, which requires your MongoDB server to be run as a replica set. https://pris.ly/d/mongodb-replica-set&quot;
+</span>)]
+</span><span class="kw">pub struct </span>MongoReplicaSetRequired {}
+
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = <span class="string">&quot;P2032&quot;</span>,
+    message = <span class="string">&quot;Error converting field \&quot;{field}\&quot; of expected non-nullable type \&quot;{expected_type}\&quot;, found incompatible value of \&quot;{found}\&quot;.&quot;
+</span>)]
+
+</span><span class="kw">pub struct </span>MissingFieldsInModel {
+    <span class="kw">pub </span>field: String,
+    <span class="kw">pub </span>expected_type: String,
+    <span class="kw">pub </span>found: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(
-    <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2030&quot;</span>,
-    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Cannot find a fulltext index to use for the search, try adding a @@fulltext([Fields...]) to your schema&quot;</span>
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MissingFullTextSearchIndex</span> {}
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = <span class="string">&quot;P2033&quot;</span>, message = <span class="string">&quot;{details}&quot;</span>)]
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(
-    <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2031&quot;</span>,
-    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Prisma needs to perform transactions, which requires your MongoDB server to be run as a replica set. https://pris.ly/d/mongodb-replica-set&quot;</span>
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MongoReplicaSetRequired</span> {}
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(
-    <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2032&quot;</span>,
-    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Error converting field \&quot;{field}\&quot; of expected non-nullable type \&quot;{expected_type}\&quot;, found incompatible value of \&quot;{found}\&quot;.&quot;</span>
-)]</span>
-
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MissingFieldsInModel</span> {
-    <span class="kw">pub</span> <span class="ident">field</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">expected_type</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">found</span>: <span class="ident">String</span>,
+</span><span class="kw">pub struct </span>ValueFitError {
+    <span class="kw">pub </span>details: String,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(<span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2033&quot;</span>, <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;{details}&quot;</span>)]</span>
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(
+    code = <span class="string">&quot;P2034&quot;</span>,
+    message = <span class="string">&quot;Transaction failed due to a write conflict or a deadlock. Please retry your transaction&quot;
+</span>)]
+</span><span class="kw">pub struct </span>TransactionWriteConflict {}
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ValueFitError</span> {
-    <span class="kw">pub</span> <span class="ident">details</span>: <span class="ident">String</span>,
-}
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(
-    <span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2034&quot;</span>,
-    <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Transaction failed due to a write conflict or a deadlock. Please retry your transaction&quot;</span>
-)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TransactionWriteConflict</span> {}
-
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">UserFacingError</span>, <span class="ident">Serialize</span>)]</span>
-<span class="attribute">#[<span class="ident">user_facing</span>(<span class="ident">code</span> <span class="op">=</span> <span class="string">&quot;P2035&quot;</span>, <span class="ident">message</span> <span class="op">=</span> <span class="string">&quot;Assertion violation on the database: `{database_error}`&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">DatabaseAssertionViolation</span> {
-    <span class="doccomment">/// Database error returned by the underlying connector driver.</span>
-    <span class="kw">pub</span> <span class="ident">database_error</span>: <span class="ident">String</span>,
+<span class="attribute">#[derive(Debug, UserFacingError, Serialize)]
+#[user_facing(code = <span class="string">&quot;P2035&quot;</span>, message = <span class="string">&quot;Assertion violation on the database: `{database_error}`&quot;</span>)]
+</span><span class="kw">pub struct </span>DatabaseAssertionViolation {
+    <span class="doccomment">/// Database error returned by the underlying connector driver.
+    </span><span class="kw">pub </span>database_error: String,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="user_facing_errors" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="user_facing_errors" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

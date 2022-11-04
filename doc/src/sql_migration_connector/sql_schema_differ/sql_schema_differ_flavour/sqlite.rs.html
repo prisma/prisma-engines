@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/sql_schema_differ/sql_schema_differ_flavour/sqlite.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sqlite.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../sql_migration_connector/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/sql_schema_differ/sql_schema_differ_flavour/sqlite.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sqlite.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../sql_migration_connector/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -63,70 +63,70 @@
 <span id="63">63</span>
 <span id="64">64</span>
 <span id="65">65</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::SqlSchemaDifferFlavour</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">flavour::SqliteFlavour</span>, <span class="ident">pair::Pair</span>, <span class="ident">sql_schema_differ::column::ColumnTypeChange</span>,
-    <span class="ident">sql_schema_differ::differ_database::DifferDatabase</span>,
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::SqlSchemaDifferFlavour;
+<span class="kw">use crate</span>::{
+    flavour::SqliteFlavour, pair::Pair, sql_schema_differ::column::ColumnTypeChange,
+    sql_schema_differ::differ_database::DifferDatabase,
 };
-<span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{<span class="ident">walkers::ColumnWalker</span>, <span class="ident">ColumnTypeFamily</span>};
+<span class="kw">use </span>sql_schema_describer::{walkers::ColumnWalker, ColumnTypeFamily};
 
-<span class="kw">impl</span> <span class="ident">SqlSchemaDifferFlavour</span> <span class="kw">for</span> <span class="ident">SqliteFlavour</span> {
-    <span class="kw">fn</span> <span class="ident">can_rename_foreign_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
-    }
+<span class="kw">impl </span>SqlSchemaDifferFlavour <span class="kw">for </span>SqliteFlavour {
+    <span class="kw">fn </span>can_rename_foreign_key(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">can_redefine_tables_with_inbound_foreign_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">true</span>
-    }
+    <span class="kw">fn </span>can_redefine_tables_with_inbound_foreign_keys(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">true
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">can_rename_index</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
-    }
+    <span class="kw">fn </span>can_rename_index(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">column_autoincrement_changed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_columns</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
-    }
+    <span class="kw">fn </span>column_autoincrement_changed(<span class="kw-2">&amp;</span><span class="self">self</span>, _columns: Pair&lt;ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">column_type_change</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">differ</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ColumnTypeChange</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> (<span class="ident">differ</span>.<span class="ident">previous</span>.<span class="ident">column_type_family</span>(), <span class="ident">differ</span>.<span class="ident">next</span>.<span class="ident">column_type_family</span>()) {
-            (<span class="ident">a</span>, <span class="ident">b</span>) <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="ident">b</span> =&gt; <span class="prelude-val">None</span>,
-            (<span class="kw">_</span>, <span class="ident">ColumnTypeFamily::String</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">ColumnTypeChange::SafeCast</span>),
-            (<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">ColumnTypeChange::RiskyCast</span>),
+    <span class="kw">fn </span>column_type_change(<span class="kw-2">&amp;</span><span class="self">self</span>, differ: Pair&lt;ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;ColumnTypeChange&gt; {
+        <span class="kw">match </span>(differ.previous.column_type_family(), differ.next.column_type_family()) {
+            (a, b) <span class="kw">if </span>a == b =&gt; <span class="prelude-val">None</span>,
+            (<span class="kw">_</span>, ColumnTypeFamily::String) =&gt; <span class="prelude-val">Some</span>(ColumnTypeChange::SafeCast),
+            (<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(ColumnTypeChange::RiskyCast),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">should_drop_indexes_from_dropped_tables</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">true</span>
-    }
+    <span class="kw">fn </span>should_drop_indexes_from_dropped_tables(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">true
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">set_tables_to_redefine</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">differ</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DifferDatabase</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) {
-        <span class="ident">differ</span>.<span class="ident">tables_to_redefine</span> <span class="op">=</span> <span class="ident">differ</span>
-            .<span class="ident">table_pairs</span>()
-            .<span class="ident">filter</span>(<span class="op">|</span><span class="ident">differ</span><span class="op">|</span> {
-                <span class="ident">differ</span>.<span class="ident">created_primary_key</span>().<span class="ident">is_some</span>()
-                    <span class="op">|</span><span class="op">|</span> <span class="ident">differ</span>.<span class="ident">dropped_primary_key</span>().<span class="ident">is_some</span>()
-                    <span class="op">|</span><span class="op">|</span> <span class="ident">differ</span>.<span class="ident">primary_key_changed</span>()
-                    <span class="op">|</span><span class="op">|</span> <span class="ident">differ</span>.<span class="ident">dropped_columns</span>().<span class="ident">next</span>().<span class="ident">is_some</span>()
-                    <span class="op">|</span><span class="op">|</span> <span class="ident">differ</span>.<span class="ident">added_columns</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">col</span><span class="op">|</span> <span class="ident">col</span>.<span class="ident">arity</span>().<span class="ident">is_required</span>())
-                    <span class="op">|</span><span class="op">|</span> <span class="ident">differ</span>.<span class="ident">any_column_changed</span>()
-                    <span class="op">|</span><span class="op">|</span> <span class="ident">differ</span>.<span class="ident">created_foreign_keys</span>().<span class="ident">next</span>().<span class="ident">is_some</span>()
-                    <span class="op">|</span><span class="op">|</span> <span class="ident">differ</span>.<span class="ident">dropped_foreign_keys</span>().<span class="ident">next</span>().<span class="ident">is_some</span>()
+    <span class="kw">fn </span>set_tables_to_redefine(<span class="kw-2">&amp;</span><span class="self">self</span>, differ: <span class="kw-2">&amp;mut </span>DifferDatabase&lt;<span class="lifetime">&#39;_</span>&gt;) {
+        differ.tables_to_redefine = differ
+            .table_pairs()
+            .filter(|differ| {
+                differ.created_primary_key().is_some()
+                    || differ.dropped_primary_key().is_some()
+                    || differ.primary_key_changed()
+                    || differ.dropped_columns().next().is_some()
+                    || differ.added_columns().any(|col| col.arity().is_required())
+                    || differ.any_column_changed()
+                    || differ.created_foreign_keys().next().is_some()
+                    || differ.dropped_foreign_keys().next().is_some()
             })
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">table</span><span class="op">|</span> <span class="ident">table</span>.<span class="ident">table_ids</span>())
-            .<span class="ident">collect</span>();
+            .map(|table| table.table_ids())
+            .collect();
     }
 
-    <span class="kw">fn</span> <span class="ident">should_drop_foreign_keys_from_dropped_tables</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
-    }
+    <span class="kw">fn </span>should_drop_foreign_keys_from_dropped_tables(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">should_push_foreign_keys_from_created_tables</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">false</span>
-    }
+    <span class="kw">fn </span>should_push_foreign_keys_from_created_tables(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">false
+    </span>}
 
-    <span class="kw">fn</span> <span class="ident">has_unnamed_foreign_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="bool-val">true</span>
-    }
+    <span class="kw">fn </span>has_unnamed_foreign_keys(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="bool-val">true
+    </span>}
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

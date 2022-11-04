@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/clap-2.34.0/src/app/settings.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>settings.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../clap/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/clap-2.34.0/src/app/settings.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>settings.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../clap/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../clap/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1190,1197 +1190,1197 @@
 <span id="1190">1190</span>
 <span id="1191">1191</span>
 <span id="1192">1192</span>
-</pre><pre class="rust"><code><span class="comment">// Std</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>, <span class="ident">unused_imports</span>)]</span>
-<span class="kw">use</span> <span class="ident">std::ascii::AsciiExt</span>;
-<span class="kw">use</span> <span class="ident">std::ops::BitOr</span>;
-<span class="kw">use</span> <span class="ident">std::str::FromStr</span>;
+</pre><pre class="rust"><code><span class="comment">// Std
+</span><span class="attribute">#[allow(deprecated, unused_imports)]
+</span><span class="kw">use </span>std::ascii::AsciiExt;
+<span class="kw">use </span>std::ops::BitOr;
+<span class="kw">use </span>std::str::FromStr;
 
-<span class="macro">bitflags!</span> {
-    <span class="kw">struct</span> <span class="ident">Flags</span>: <span class="ident">u64</span> {
-        <span class="kw">const</span> <span class="ident">SC_NEGATE_REQS</span>       <span class="op">=</span> <span class="number">1</span>;
-        <span class="kw">const</span> <span class="ident">SC_REQUIRED</span>          <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>;
-        <span class="kw">const</span> <span class="ident">A_REQUIRED_ELSE_HELP</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>;
-        <span class="kw">const</span> <span class="ident">GLOBAL_VERSION</span>       <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>;
-        <span class="kw">const</span> <span class="ident">VERSIONLESS_SC</span>       <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>;
-        <span class="kw">const</span> <span class="ident">UNIFIED_HELP</span>         <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">5</span>;
-        <span class="kw">const</span> <span class="ident">WAIT_ON_ERROR</span>        <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">6</span>;
-        <span class="kw">const</span> <span class="ident">SC_REQUIRED_ELSE_HELP</span><span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">7</span>;
-        <span class="kw">const</span> <span class="ident">NEEDS_LONG_HELP</span>      <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">8</span>;
-        <span class="kw">const</span> <span class="ident">NEEDS_LONG_VERSION</span>   <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">9</span>;
-        <span class="kw">const</span> <span class="ident">NEEDS_SC_HELP</span>        <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">10</span>;
-        <span class="kw">const</span> <span class="ident">DISABLE_VERSION</span>      <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">11</span>;
-        <span class="kw">const</span> <span class="ident">HIDDEN</span>               <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">12</span>;
-        <span class="kw">const</span> <span class="ident">TRAILING_VARARG</span>      <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">13</span>;
-        <span class="kw">const</span> <span class="ident">NO_BIN_NAME</span>          <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">14</span>;
-        <span class="kw">const</span> <span class="ident">ALLOW_UNK_SC</span>         <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">15</span>;
-        <span class="kw">const</span> <span class="ident">UTF8_STRICT</span>          <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">16</span>;
-        <span class="kw">const</span> <span class="ident">UTF8_NONE</span>            <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">17</span>;
-        <span class="kw">const</span> <span class="ident">LEADING_HYPHEN</span>       <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">18</span>;
-        <span class="kw">const</span> <span class="ident">NO_POS_VALUES</span>        <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">19</span>;
-        <span class="kw">const</span> <span class="ident">NEXT_LINE_HELP</span>       <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">20</span>;
-        <span class="kw">const</span> <span class="ident">DERIVE_DISP_ORDER</span>    <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">21</span>;
-        <span class="kw">const</span> <span class="ident">COLORED_HELP</span>         <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">22</span>;
-        <span class="kw">const</span> <span class="ident">COLOR_ALWAYS</span>         <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">23</span>;
-        <span class="kw">const</span> <span class="ident">COLOR_AUTO</span>           <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">24</span>;
-        <span class="kw">const</span> <span class="ident">COLOR_NEVER</span>          <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">25</span>;
-        <span class="kw">const</span> <span class="ident">DONT_DELIM_TRAIL</span>     <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">26</span>;
-        <span class="kw">const</span> <span class="ident">ALLOW_NEG_NUMS</span>       <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">27</span>;
-        <span class="kw">const</span> <span class="ident">LOW_INDEX_MUL_POS</span>    <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">28</span>;
-        <span class="kw">const</span> <span class="ident">DISABLE_HELP_SC</span>      <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">29</span>;
-        <span class="kw">const</span> <span class="ident">DONT_COLLAPSE_ARGS</span>   <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">30</span>;
-        <span class="kw">const</span> <span class="ident">ARGS_NEGATE_SCS</span>      <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">31</span>;
-        <span class="kw">const</span> <span class="ident">PROPAGATE_VALS_DOWN</span>  <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">32</span>;
-        <span class="kw">const</span> <span class="ident">ALLOW_MISSING_POS</span>    <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">33</span>;
-        <span class="kw">const</span> <span class="ident">TRAILING_VALUES</span>      <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">34</span>;
-        <span class="kw">const</span> <span class="ident">VALID_NEG_NUM_FOUND</span>  <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">35</span>;
-        <span class="kw">const</span> <span class="ident">PROPAGATED</span>           <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">36</span>;
-        <span class="kw">const</span> <span class="ident">VALID_ARG_FOUND</span>      <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">37</span>;
-        <span class="kw">const</span> <span class="ident">INFER_SUBCOMMANDS</span>    <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">38</span>;
-        <span class="kw">const</span> <span class="ident">CONTAINS_LAST</span>        <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">39</span>;
-        <span class="kw">const</span> <span class="ident">ARGS_OVERRIDE_SELF</span>   <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">40</span>;
-        <span class="kw">const</span> <span class="ident">DISABLE_HELP_FLAGS</span>   <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">41</span>;
+<span class="macro">bitflags! </span>{
+    <span class="kw">struct </span>Flags: u64 {
+        <span class="kw">const </span>SC_NEGATE_REQS       = <span class="number">1</span>;
+        <span class="kw">const </span>SC_REQUIRED          = <span class="number">1 </span>&lt;&lt; <span class="number">1</span>;
+        <span class="kw">const </span>A_REQUIRED_ELSE_HELP = <span class="number">1 </span>&lt;&lt; <span class="number">2</span>;
+        <span class="kw">const </span>GLOBAL_VERSION       = <span class="number">1 </span>&lt;&lt; <span class="number">3</span>;
+        <span class="kw">const </span>VERSIONLESS_SC       = <span class="number">1 </span>&lt;&lt; <span class="number">4</span>;
+        <span class="kw">const </span>UNIFIED_HELP         = <span class="number">1 </span>&lt;&lt; <span class="number">5</span>;
+        <span class="kw">const </span>WAIT_ON_ERROR        = <span class="number">1 </span>&lt;&lt; <span class="number">6</span>;
+        <span class="kw">const </span>SC_REQUIRED_ELSE_HELP= <span class="number">1 </span>&lt;&lt; <span class="number">7</span>;
+        <span class="kw">const </span>NEEDS_LONG_HELP      = <span class="number">1 </span>&lt;&lt; <span class="number">8</span>;
+        <span class="kw">const </span>NEEDS_LONG_VERSION   = <span class="number">1 </span>&lt;&lt; <span class="number">9</span>;
+        <span class="kw">const </span>NEEDS_SC_HELP        = <span class="number">1 </span>&lt;&lt; <span class="number">10</span>;
+        <span class="kw">const </span>DISABLE_VERSION      = <span class="number">1 </span>&lt;&lt; <span class="number">11</span>;
+        <span class="kw">const </span>HIDDEN               = <span class="number">1 </span>&lt;&lt; <span class="number">12</span>;
+        <span class="kw">const </span>TRAILING_VARARG      = <span class="number">1 </span>&lt;&lt; <span class="number">13</span>;
+        <span class="kw">const </span>NO_BIN_NAME          = <span class="number">1 </span>&lt;&lt; <span class="number">14</span>;
+        <span class="kw">const </span>ALLOW_UNK_SC         = <span class="number">1 </span>&lt;&lt; <span class="number">15</span>;
+        <span class="kw">const </span>UTF8_STRICT          = <span class="number">1 </span>&lt;&lt; <span class="number">16</span>;
+        <span class="kw">const </span>UTF8_NONE            = <span class="number">1 </span>&lt;&lt; <span class="number">17</span>;
+        <span class="kw">const </span>LEADING_HYPHEN       = <span class="number">1 </span>&lt;&lt; <span class="number">18</span>;
+        <span class="kw">const </span>NO_POS_VALUES        = <span class="number">1 </span>&lt;&lt; <span class="number">19</span>;
+        <span class="kw">const </span>NEXT_LINE_HELP       = <span class="number">1 </span>&lt;&lt; <span class="number">20</span>;
+        <span class="kw">const </span>DERIVE_DISP_ORDER    = <span class="number">1 </span>&lt;&lt; <span class="number">21</span>;
+        <span class="kw">const </span>COLORED_HELP         = <span class="number">1 </span>&lt;&lt; <span class="number">22</span>;
+        <span class="kw">const </span>COLOR_ALWAYS         = <span class="number">1 </span>&lt;&lt; <span class="number">23</span>;
+        <span class="kw">const </span>COLOR_AUTO           = <span class="number">1 </span>&lt;&lt; <span class="number">24</span>;
+        <span class="kw">const </span>COLOR_NEVER          = <span class="number">1 </span>&lt;&lt; <span class="number">25</span>;
+        <span class="kw">const </span>DONT_DELIM_TRAIL     = <span class="number">1 </span>&lt;&lt; <span class="number">26</span>;
+        <span class="kw">const </span>ALLOW_NEG_NUMS       = <span class="number">1 </span>&lt;&lt; <span class="number">27</span>;
+        <span class="kw">const </span>LOW_INDEX_MUL_POS    = <span class="number">1 </span>&lt;&lt; <span class="number">28</span>;
+        <span class="kw">const </span>DISABLE_HELP_SC      = <span class="number">1 </span>&lt;&lt; <span class="number">29</span>;
+        <span class="kw">const </span>DONT_COLLAPSE_ARGS   = <span class="number">1 </span>&lt;&lt; <span class="number">30</span>;
+        <span class="kw">const </span>ARGS_NEGATE_SCS      = <span class="number">1 </span>&lt;&lt; <span class="number">31</span>;
+        <span class="kw">const </span>PROPAGATE_VALS_DOWN  = <span class="number">1 </span>&lt;&lt; <span class="number">32</span>;
+        <span class="kw">const </span>ALLOW_MISSING_POS    = <span class="number">1 </span>&lt;&lt; <span class="number">33</span>;
+        <span class="kw">const </span>TRAILING_VALUES      = <span class="number">1 </span>&lt;&lt; <span class="number">34</span>;
+        <span class="kw">const </span>VALID_NEG_NUM_FOUND  = <span class="number">1 </span>&lt;&lt; <span class="number">35</span>;
+        <span class="kw">const </span>PROPAGATED           = <span class="number">1 </span>&lt;&lt; <span class="number">36</span>;
+        <span class="kw">const </span>VALID_ARG_FOUND      = <span class="number">1 </span>&lt;&lt; <span class="number">37</span>;
+        <span class="kw">const </span>INFER_SUBCOMMANDS    = <span class="number">1 </span>&lt;&lt; <span class="number">38</span>;
+        <span class="kw">const </span>CONTAINS_LAST        = <span class="number">1 </span>&lt;&lt; <span class="number">39</span>;
+        <span class="kw">const </span>ARGS_OVERRIDE_SELF   = <span class="number">1 </span>&lt;&lt; <span class="number">40</span>;
+        <span class="kw">const </span>DISABLE_HELP_FLAGS   = <span class="number">1 </span>&lt;&lt; <span class="number">41</span>;
     }
 }
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AppFlags</span>(<span class="ident">Flags</span>);
+<span class="attribute">#[doc(hidden)]
+#[derive(Debug, Copy, Clone, PartialEq)]
+</span><span class="kw">pub struct </span>AppFlags(Flags);
 
-<span class="kw">impl</span> <span class="ident">BitOr</span> <span class="kw">for</span> <span class="ident">AppFlags</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
-    <span class="kw">fn</span> <span class="ident">bitor</span>(<span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">AppFlags</span>(<span class="self">self</span>.<span class="number">0</span> <span class="op">|</span> <span class="ident">rhs</span>.<span class="number">0</span>)
+<span class="kw">impl </span>BitOr <span class="kw">for </span>AppFlags {
+    <span class="kw">type </span>Output = <span class="self">Self</span>;
+    <span class="kw">fn </span>bitor(<span class="self">self</span>, rhs: <span class="self">Self</span>) -&gt; <span class="self">Self </span>{
+        AppFlags(<span class="self">self</span>.<span class="number">0 </span>| rhs.<span class="number">0</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">AppFlags</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">AppFlags</span>(
-            <span class="ident">Flags::NEEDS_LONG_VERSION</span>
-                <span class="op">|</span> <span class="ident">Flags::NEEDS_LONG_HELP</span>
-                <span class="op">|</span> <span class="ident">Flags::NEEDS_SC_HELP</span>
-                <span class="op">|</span> <span class="ident">Flags::UTF8_NONE</span>
-                <span class="op">|</span> <span class="ident">Flags::COLOR_AUTO</span>,
+<span class="kw">impl </span>Default <span class="kw">for </span>AppFlags {
+    <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
+        AppFlags(
+            Flags::NEEDS_LONG_VERSION
+                | Flags::NEEDS_LONG_HELP
+                | Flags::NEEDS_SC_HELP
+                | Flags::UTF8_NONE
+                | Flags::COLOR_AUTO,
         )
     }
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
-<span class="kw">impl</span> <span class="ident">AppFlags</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">AppFlags::default</span>()
+<span class="attribute">#[allow(deprecated)]
+</span><span class="kw">impl </span>AppFlags {
+    <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        AppFlags::default()
     }
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">zeroed</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">AppFlags</span>(<span class="ident">Flags::empty</span>())
+    <span class="kw">pub fn </span>zeroed() -&gt; <span class="self">Self </span>{
+        AppFlags(Flags::empty())
     }
 
-    <span class="macro">impl_settings!</span> { <span class="ident">AppSettings</span>,
-        <span class="ident">ArgRequiredElseHelp</span> =&gt; <span class="ident">Flags::A_REQUIRED_ELSE_HELP</span>,
-        <span class="ident">ArgsNegateSubcommands</span> =&gt; <span class="ident">Flags::ARGS_NEGATE_SCS</span>,
-        <span class="ident">AllArgsOverrideSelf</span> =&gt; <span class="ident">Flags::ARGS_OVERRIDE_SELF</span>,
-        <span class="ident">AllowExternalSubcommands</span> =&gt; <span class="ident">Flags::ALLOW_UNK_SC</span>,
-        <span class="ident">AllowInvalidUtf8</span> =&gt; <span class="ident">Flags::UTF8_NONE</span>,
-        <span class="ident">AllowLeadingHyphen</span> =&gt; <span class="ident">Flags::LEADING_HYPHEN</span>,
-        <span class="ident">AllowNegativeNumbers</span> =&gt; <span class="ident">Flags::ALLOW_NEG_NUMS</span>,
-        <span class="ident">AllowMissingPositional</span> =&gt; <span class="ident">Flags::ALLOW_MISSING_POS</span>,
-        <span class="ident">ColoredHelp</span> =&gt; <span class="ident">Flags::COLORED_HELP</span>,
-        <span class="ident">ColorAlways</span> =&gt; <span class="ident">Flags::COLOR_ALWAYS</span>,
-        <span class="ident">ColorAuto</span> =&gt; <span class="ident">Flags::COLOR_AUTO</span>,
-        <span class="ident">ColorNever</span> =&gt; <span class="ident">Flags::COLOR_NEVER</span>,
-        <span class="ident">DontDelimitTrailingValues</span> =&gt; <span class="ident">Flags::DONT_DELIM_TRAIL</span>,
-        <span class="ident">DontCollapseArgsInUsage</span> =&gt; <span class="ident">Flags::DONT_COLLAPSE_ARGS</span>,
-        <span class="ident">DeriveDisplayOrder</span> =&gt; <span class="ident">Flags::DERIVE_DISP_ORDER</span>,
-        <span class="ident">DisableHelpFlags</span> =&gt; <span class="ident">Flags::DISABLE_HELP_FLAGS</span>,
-        <span class="ident">DisableHelpSubcommand</span> =&gt; <span class="ident">Flags::DISABLE_HELP_SC</span>,
-        <span class="ident">DisableVersion</span> =&gt; <span class="ident">Flags::DISABLE_VERSION</span>,
-        <span class="ident">GlobalVersion</span> =&gt; <span class="ident">Flags::GLOBAL_VERSION</span>,
-        <span class="ident">HidePossibleValuesInHelp</span> =&gt; <span class="ident">Flags::NO_POS_VALUES</span>,
-        <span class="ident">Hidden</span> =&gt; <span class="ident">Flags::HIDDEN</span>,
-        <span class="ident">LowIndexMultiplePositional</span> =&gt; <span class="ident">Flags::LOW_INDEX_MUL_POS</span>,
-        <span class="ident">NeedsLongHelp</span> =&gt; <span class="ident">Flags::NEEDS_LONG_HELP</span>,
-        <span class="ident">NeedsLongVersion</span> =&gt; <span class="ident">Flags::NEEDS_LONG_VERSION</span>,
-        <span class="ident">NeedsSubcommandHelp</span> =&gt; <span class="ident">Flags::NEEDS_SC_HELP</span>,
-        <span class="ident">NoBinaryName</span> =&gt; <span class="ident">Flags::NO_BIN_NAME</span>,
-        <span class="ident">PropagateGlobalValuesDown</span>=&gt; <span class="ident">Flags::PROPAGATE_VALS_DOWN</span>,
-        <span class="ident">StrictUtf8</span> =&gt; <span class="ident">Flags::UTF8_STRICT</span>,
-        <span class="ident">SubcommandsNegateReqs</span> =&gt; <span class="ident">Flags::SC_NEGATE_REQS</span>,
-        <span class="ident">SubcommandRequired</span> =&gt; <span class="ident">Flags::SC_REQUIRED</span>,
-        <span class="ident">SubcommandRequiredElseHelp</span> =&gt; <span class="ident">Flags::SC_REQUIRED_ELSE_HELP</span>,
-        <span class="ident">TrailingVarArg</span> =&gt; <span class="ident">Flags::TRAILING_VARARG</span>,
-        <span class="ident">UnifiedHelpMessage</span> =&gt; <span class="ident">Flags::UNIFIED_HELP</span>,
-        <span class="ident">NextLineHelp</span> =&gt; <span class="ident">Flags::NEXT_LINE_HELP</span>,
-        <span class="ident">VersionlessSubcommands</span> =&gt; <span class="ident">Flags::VERSIONLESS_SC</span>,
-        <span class="ident">WaitOnError</span> =&gt; <span class="ident">Flags::WAIT_ON_ERROR</span>,
-        <span class="ident">TrailingValues</span> =&gt; <span class="ident">Flags::TRAILING_VALUES</span>,
-        <span class="ident">ValidNegNumFound</span> =&gt; <span class="ident">Flags::VALID_NEG_NUM_FOUND</span>,
-        <span class="ident">Propagated</span> =&gt; <span class="ident">Flags::PROPAGATED</span>,
-        <span class="ident">ValidArgFound</span> =&gt; <span class="ident">Flags::VALID_ARG_FOUND</span>,
-        <span class="ident">InferSubcommands</span> =&gt; <span class="ident">Flags::INFER_SUBCOMMANDS</span>,
-        <span class="ident">ContainsLast</span> =&gt; <span class="ident">Flags::CONTAINS_LAST</span>
+    <span class="macro">impl_settings! </span>{ AppSettings,
+        ArgRequiredElseHelp =&gt; Flags::A_REQUIRED_ELSE_HELP,
+        ArgsNegateSubcommands =&gt; Flags::ARGS_NEGATE_SCS,
+        AllArgsOverrideSelf =&gt; Flags::ARGS_OVERRIDE_SELF,
+        AllowExternalSubcommands =&gt; Flags::ALLOW_UNK_SC,
+        AllowInvalidUtf8 =&gt; Flags::UTF8_NONE,
+        AllowLeadingHyphen =&gt; Flags::LEADING_HYPHEN,
+        AllowNegativeNumbers =&gt; Flags::ALLOW_NEG_NUMS,
+        AllowMissingPositional =&gt; Flags::ALLOW_MISSING_POS,
+        ColoredHelp =&gt; Flags::COLORED_HELP,
+        ColorAlways =&gt; Flags::COLOR_ALWAYS,
+        ColorAuto =&gt; Flags::COLOR_AUTO,
+        ColorNever =&gt; Flags::COLOR_NEVER,
+        DontDelimitTrailingValues =&gt; Flags::DONT_DELIM_TRAIL,
+        DontCollapseArgsInUsage =&gt; Flags::DONT_COLLAPSE_ARGS,
+        DeriveDisplayOrder =&gt; Flags::DERIVE_DISP_ORDER,
+        DisableHelpFlags =&gt; Flags::DISABLE_HELP_FLAGS,
+        DisableHelpSubcommand =&gt; Flags::DISABLE_HELP_SC,
+        DisableVersion =&gt; Flags::DISABLE_VERSION,
+        GlobalVersion =&gt; Flags::GLOBAL_VERSION,
+        HidePossibleValuesInHelp =&gt; Flags::NO_POS_VALUES,
+        Hidden =&gt; Flags::HIDDEN,
+        LowIndexMultiplePositional =&gt; Flags::LOW_INDEX_MUL_POS,
+        NeedsLongHelp =&gt; Flags::NEEDS_LONG_HELP,
+        NeedsLongVersion =&gt; Flags::NEEDS_LONG_VERSION,
+        NeedsSubcommandHelp =&gt; Flags::NEEDS_SC_HELP,
+        NoBinaryName =&gt; Flags::NO_BIN_NAME,
+        PropagateGlobalValuesDown=&gt; Flags::PROPAGATE_VALS_DOWN,
+        StrictUtf8 =&gt; Flags::UTF8_STRICT,
+        SubcommandsNegateReqs =&gt; Flags::SC_NEGATE_REQS,
+        SubcommandRequired =&gt; Flags::SC_REQUIRED,
+        SubcommandRequiredElseHelp =&gt; Flags::SC_REQUIRED_ELSE_HELP,
+        TrailingVarArg =&gt; Flags::TRAILING_VARARG,
+        UnifiedHelpMessage =&gt; Flags::UNIFIED_HELP,
+        NextLineHelp =&gt; Flags::NEXT_LINE_HELP,
+        VersionlessSubcommands =&gt; Flags::VERSIONLESS_SC,
+        WaitOnError =&gt; Flags::WAIT_ON_ERROR,
+        TrailingValues =&gt; Flags::TRAILING_VALUES,
+        ValidNegNumFound =&gt; Flags::VALID_NEG_NUM_FOUND,
+        Propagated =&gt; Flags::PROPAGATED,
+        ValidArgFound =&gt; Flags::VALID_ARG_FOUND,
+        InferSubcommands =&gt; Flags::INFER_SUBCOMMANDS,
+        ContainsLast =&gt; Flags::CONTAINS_LAST
     }
 }
 
-<span class="doccomment">/// Application level settings, which affect how [`App`] operates</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// **NOTE:** When these settings are used, they apply only to current command, and are *not*</span>
-<span class="doccomment">/// propagated down or up through child or parent subcommands</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`App`]: ./struct.App.html</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">AppSettings</span> {
-    <span class="doccomment">/// Specifies that any invalid UTF-8 code points should *not* be treated as an error.</span>
-    <span class="doccomment">/// This is the default behavior of `clap`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **NOTE:** Using argument values with invalid UTF-8 code points requires using</span>
-    <span class="doccomment">/// [`ArgMatches::os_value_of`], [`ArgMatches::os_values_of`], [`ArgMatches::lossy_value_of`],</span>
-    <span class="doccomment">/// or [`ArgMatches::lossy_values_of`] for those particular arguments which may contain invalid</span>
-    <span class="doccomment">/// UTF-8 values</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **NOTE:** This rule only applies to  argument values, as flags, options, and</span>
-    <span class="doccomment">/// [`SubCommand`]s themselves only allow valid UTF-8 code points.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Platform Specific</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Non Windows systems only</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">unix</span>), <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; ```ignore&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">unix</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; ```&quot;</span>)]</span>
-    <span class="doccomment">/// # use clap::{App, AppSettings};</span>
-    <span class="doccomment">/// use std::ffi::OsString;</span>
-    <span class="doccomment">/// use std::os::unix::ffi::{OsStrExt,OsStringExt};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let r = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///   //.setting(AppSettings::AllowInvalidUtf8)</span>
-    <span class="doccomment">///     .arg_from_usage(&quot;&lt;arg&gt; &#39;some positional arg&#39;&quot;)</span>
-    <span class="doccomment">///     .get_matches_from_safe(</span>
-    <span class="doccomment">///         vec![</span>
-    <span class="doccomment">///             OsString::from(&quot;myprog&quot;),</span>
-    <span class="doccomment">///             OsString::from_vec(vec![0xe9])]);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(r.is_ok());</span>
-    <span class="doccomment">/// let m = r.unwrap();</span>
-    <span class="doccomment">/// assert_eq!(m.value_of_os(&quot;arg&quot;).unwrap().as_bytes(), &amp;[0xe9]);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [`ArgMatches::os_value_of`]: ./struct.ArgMatches.html#method.os_value_of</span>
-    <span class="doccomment">/// [`ArgMatches::os_values_of`]: ./struct.ArgMatches.html#method.os_values_of</span>
-    <span class="doccomment">/// [`ArgMatches::lossy_value_of`]: ./struct.ArgMatches.html#method.lossy_value_of</span>
-    <span class="doccomment">/// [`ArgMatches::lossy_values_of`]: ./struct.ArgMatches.html#method.lossy_values_of</span>
-    <span class="doccomment">/// [`SubCommand`]: ./struct.SubCommand.html</span>
-    <span class="ident">AllowInvalidUtf8</span>,
+<span class="doccomment">/// Application level settings, which affect how [`App`] operates
+///
+/// **NOTE:** When these settings are used, they apply only to current command, and are *not*
+/// propagated down or up through child or parent subcommands
+///
+/// [`App`]: ./struct.App.html
+</span><span class="attribute">#[derive(Debug, PartialEq, Copy, Clone)]
+</span><span class="kw">pub enum </span>AppSettings {
+    <span class="doccomment">/// Specifies that any invalid UTF-8 code points should *not* be treated as an error.
+    /// This is the default behavior of `clap`.
+    ///
+    /// **NOTE:** Using argument values with invalid UTF-8 code points requires using
+    /// [`ArgMatches::os_value_of`], [`ArgMatches::os_values_of`], [`ArgMatches::lossy_value_of`],
+    /// or [`ArgMatches::lossy_values_of`] for those particular arguments which may contain invalid
+    /// UTF-8 values
+    ///
+    /// **NOTE:** This rule only applies to  argument values, as flags, options, and
+    /// [`SubCommand`]s themselves only allow valid UTF-8 code points.
+    ///
+    /// # Platform Specific
+    ///
+    /// Non Windows systems only
+    ///
+    /// # Examples
+    ///
+    </span><span class="attribute">#[cfg_attr(not(unix), doc = <span class="string">&quot; ```ignore&quot;</span>)]
+    #[cfg_attr(unix, doc = <span class="string">&quot; ```&quot;</span>)]
+    </span><span class="doccomment">/// # use clap::{App, AppSettings};
+    /// use std::ffi::OsString;
+    /// use std::os::unix::ffi::{OsStrExt,OsStringExt};
+    ///
+    /// let r = App::new(&quot;myprog&quot;)
+    ///   //.setting(AppSettings::AllowInvalidUtf8)
+    ///     .arg_from_usage(&quot;&lt;arg&gt; &#39;some positional arg&#39;&quot;)
+    ///     .get_matches_from_safe(
+    ///         vec![
+    ///             OsString::from(&quot;myprog&quot;),
+    ///             OsString::from_vec(vec![0xe9])]);
+    ///
+    /// assert!(r.is_ok());
+    /// let m = r.unwrap();
+    /// assert_eq!(m.value_of_os(&quot;arg&quot;).unwrap().as_bytes(), &amp;[0xe9]);
+    /// ```
+    /// [`ArgMatches::os_value_of`]: ./struct.ArgMatches.html#method.os_value_of
+    /// [`ArgMatches::os_values_of`]: ./struct.ArgMatches.html#method.os_values_of
+    /// [`ArgMatches::lossy_value_of`]: ./struct.ArgMatches.html#method.lossy_value_of
+    /// [`ArgMatches::lossy_values_of`]: ./struct.ArgMatches.html#method.lossy_values_of
+    /// [`SubCommand`]: ./struct.SubCommand.html
+    </span>AllowInvalidUtf8,
 
-    <span class="doccomment">/// Essentially sets [`Arg::overrides_with(&quot;itself&quot;)`] for all arguments.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **WARNING:** Positional arguments cannot override themselves (or we would never be able</span>
-    <span class="doccomment">/// to advance to the next positional). This setting ignores positional arguments.</span>
-    <span class="doccomment">/// [`Arg::overrides_with(&quot;itself&quot;)`]: ./struct.Arg.html#method.overrides_with</span>
-    <span class="ident">AllArgsOverrideSelf</span>,
+    <span class="doccomment">/// Essentially sets [`Arg::overrides_with(&quot;itself&quot;)`] for all arguments.
+    ///
+    /// **WARNING:** Positional arguments cannot override themselves (or we would never be able
+    /// to advance to the next positional). This setting ignores positional arguments.
+    /// [`Arg::overrides_with(&quot;itself&quot;)`]: ./struct.Arg.html#method.overrides_with
+    </span>AllArgsOverrideSelf,
 
-    <span class="doccomment">/// Specifies that leading hyphens are allowed in argument *values*, such as negative numbers</span>
-    <span class="doccomment">/// like `-10`. (which would otherwise be parsed as another flag or option)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **NOTE:** Use this setting with caution as it silences certain circumstances which would</span>
-    <span class="doccomment">/// otherwise be an error (such as accidentally forgetting to specify a value for leading</span>
-    <span class="doccomment">/// option). It is preferred to set this on a per argument basis, via [`Arg::allow_hyphen_values`]</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{Arg, App, AppSettings};</span>
-    <span class="doccomment">/// // Imagine you needed to represent negative numbers as well, such as -10</span>
-    <span class="doccomment">/// let m = App::new(&quot;nums&quot;)</span>
-    <span class="doccomment">///     .setting(AppSettings::AllowLeadingHyphen)</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;neg&quot;).index(1))</span>
-    <span class="doccomment">///     .get_matches_from(vec![</span>
-    <span class="doccomment">///         &quot;nums&quot;, &quot;-20&quot;</span>
-    <span class="doccomment">///     ]);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(m.value_of(&quot;neg&quot;), Some(&quot;-20&quot;));</span>
-    <span class="doccomment">/// # ;</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [`Arg::allow_hyphen_values`]: ./struct.Arg.html#method.allow_hyphen_values</span>
-    <span class="ident">AllowLeadingHyphen</span>,
+    <span class="doccomment">/// Specifies that leading hyphens are allowed in argument *values*, such as negative numbers
+    /// like `-10`. (which would otherwise be parsed as another flag or option)
+    ///
+    /// **NOTE:** Use this setting with caution as it silences certain circumstances which would
+    /// otherwise be an error (such as accidentally forgetting to specify a value for leading
+    /// option). It is preferred to set this on a per argument basis, via [`Arg::allow_hyphen_values`]
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use clap::{Arg, App, AppSettings};
+    /// // Imagine you needed to represent negative numbers as well, such as -10
+    /// let m = App::new(&quot;nums&quot;)
+    ///     .setting(AppSettings::AllowLeadingHyphen)
+    ///     .arg(Arg::with_name(&quot;neg&quot;).index(1))
+    ///     .get_matches_from(vec![
+    ///         &quot;nums&quot;, &quot;-20&quot;
+    ///     ]);
+    ///
+    /// assert_eq!(m.value_of(&quot;neg&quot;), Some(&quot;-20&quot;));
+    /// # ;
+    /// ```
+    /// [`Arg::allow_hyphen_values`]: ./struct.Arg.html#method.allow_hyphen_values
+    </span>AllowLeadingHyphen,
 
-    <span class="doccomment">/// Allows negative numbers to pass as values. This is similar to</span>
-    <span class="doccomment">/// `AllowLeadingHyphen` except that it only allows numbers, all</span>
-    <span class="doccomment">/// other undefined leading hyphens will fail to parse.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg, AppSettings};</span>
-    <span class="doccomment">/// let res = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .version(&quot;v1.1&quot;)</span>
-    <span class="doccomment">///     .setting(AppSettings::AllowNegativeNumbers)</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;num&quot;))</span>
-    <span class="doccomment">///     .get_matches_from_safe(vec![</span>
-    <span class="doccomment">///         &quot;myprog&quot;, &quot;-20&quot;</span>
-    <span class="doccomment">///     ]);</span>
-    <span class="doccomment">/// assert!(res.is_ok());</span>
-    <span class="doccomment">/// let m = res.unwrap();</span>
-    <span class="doccomment">/// assert_eq!(m.value_of(&quot;num&quot;).unwrap(), &quot;-20&quot;);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [`AllowLeadingHyphen`]: ./enum.AppSettings.html#variant.AllowLeadingHyphen</span>
-    <span class="ident">AllowNegativeNumbers</span>,
+    <span class="doccomment">/// Allows negative numbers to pass as values. This is similar to
+    /// `AllowLeadingHyphen` except that it only allows numbers, all
+    /// other undefined leading hyphens will fail to parse.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg, AppSettings};
+    /// let res = App::new(&quot;myprog&quot;)
+    ///     .version(&quot;v1.1&quot;)
+    ///     .setting(AppSettings::AllowNegativeNumbers)
+    ///     .arg(Arg::with_name(&quot;num&quot;))
+    ///     .get_matches_from_safe(vec![
+    ///         &quot;myprog&quot;, &quot;-20&quot;
+    ///     ]);
+    /// assert!(res.is_ok());
+    /// let m = res.unwrap();
+    /// assert_eq!(m.value_of(&quot;num&quot;).unwrap(), &quot;-20&quot;);
+    /// ```
+    /// [`AllowLeadingHyphen`]: ./enum.AppSettings.html#variant.AllowLeadingHyphen
+    </span>AllowNegativeNumbers,
 
-    <span class="doccomment">/// Allows one to implement two styles of CLIs where positionals can be used out of order.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The first example is a CLI where the second to last positional argument is optional, but</span>
-    <span class="doccomment">/// the final positional argument is required. Such as `$ prog [optional] &lt;required&gt;` where one</span>
-    <span class="doccomment">/// of the two following usages is allowed:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `$ prog [optional] &lt;required&gt;`</span>
-    <span class="doccomment">/// * `$ prog &lt;required&gt;`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This would otherwise not be allowed. This is useful when `[optional]` has a default value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note:** when using this style of &quot;missing positionals&quot; the final positional *must* be</span>
-    <span class="doccomment">/// [required] if `--` will not be used to skip to the final positional argument.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note:** This style also only allows a single positional argument to be &quot;skipped&quot; without</span>
-    <span class="doccomment">/// the use of `--`. To skip more than one, see the second example.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The second example is when one wants to skip multiple optional positional arguments, and use</span>
-    <span class="doccomment">/// of the `--` operator is OK (but not required if all arguments will be specified anyways).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// For example, imagine a CLI which has three positional arguments `[foo] [bar] [baz]...` where</span>
-    <span class="doccomment">/// `baz` accepts multiple values (similar to man `ARGS...` style training arguments).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// With this setting the following invocations are possible:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `$ prog foo bar baz1 baz2 baz3`</span>
-    <span class="doccomment">/// * `$ prog foo -- baz1 baz2 baz3`</span>
-    <span class="doccomment">/// * `$ prog -- baz1 baz2 baz3`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Style number one from above:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg, AppSettings};</span>
-    <span class="doccomment">/// // Assume there is an external subcommand named &quot;subcmd&quot;</span>
-    <span class="doccomment">/// let m = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .setting(AppSettings::AllowMissingPositional)</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;arg1&quot;))</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;arg2&quot;)</span>
-    <span class="doccomment">///         .required(true))</span>
-    <span class="doccomment">///     .get_matches_from(vec![</span>
-    <span class="doccomment">///         &quot;prog&quot;, &quot;other&quot;</span>
-    <span class="doccomment">///     ]);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(m.value_of(&quot;arg1&quot;), None);</span>
-    <span class="doccomment">/// assert_eq!(m.value_of(&quot;arg2&quot;), Some(&quot;other&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Now the same example, but using a default value for the first optional positional argument</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg, AppSettings};</span>
-    <span class="doccomment">/// // Assume there is an external subcommand named &quot;subcmd&quot;</span>
-    <span class="doccomment">/// let m = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .setting(AppSettings::AllowMissingPositional)</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;arg1&quot;)</span>
-    <span class="doccomment">///         .default_value(&quot;something&quot;))</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;arg2&quot;)</span>
-    <span class="doccomment">///         .required(true))</span>
-    <span class="doccomment">///     .get_matches_from(vec![</span>
-    <span class="doccomment">///         &quot;prog&quot;, &quot;other&quot;</span>
-    <span class="doccomment">///     ]);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(m.value_of(&quot;arg1&quot;), Some(&quot;something&quot;));</span>
-    <span class="doccomment">/// assert_eq!(m.value_of(&quot;arg2&quot;), Some(&quot;other&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// Style number two from above:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg, AppSettings};</span>
-    <span class="doccomment">/// // Assume there is an external subcommand named &quot;subcmd&quot;</span>
-    <span class="doccomment">/// let m = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .setting(AppSettings::AllowMissingPositional)</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;foo&quot;))</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;bar&quot;))</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;baz&quot;).multiple(true))</span>
-    <span class="doccomment">///     .get_matches_from(vec![</span>
-    <span class="doccomment">///         &quot;prog&quot;, &quot;foo&quot;, &quot;bar&quot;, &quot;baz1&quot;, &quot;baz2&quot;, &quot;baz3&quot;</span>
-    <span class="doccomment">///     ]);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(m.value_of(&quot;foo&quot;), Some(&quot;foo&quot;));</span>
-    <span class="doccomment">/// assert_eq!(m.value_of(&quot;bar&quot;), Some(&quot;bar&quot;));</span>
-    <span class="doccomment">/// assert_eq!(m.values_of(&quot;baz&quot;).unwrap().collect::&lt;Vec&lt;_&gt;&gt;(), &amp;[&quot;baz1&quot;, &quot;baz2&quot;, &quot;baz3&quot;]);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Now notice if we don&#39;t specify `foo` or `baz` but use the `--` operator.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg, AppSettings};</span>
-    <span class="doccomment">/// // Assume there is an external subcommand named &quot;subcmd&quot;</span>
-    <span class="doccomment">/// let m = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .setting(AppSettings::AllowMissingPositional)</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;foo&quot;))</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;bar&quot;))</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;baz&quot;).multiple(true))</span>
-    <span class="doccomment">///     .get_matches_from(vec![</span>
-    <span class="doccomment">///         &quot;prog&quot;, &quot;--&quot;, &quot;baz1&quot;, &quot;baz2&quot;, &quot;baz3&quot;</span>
-    <span class="doccomment">///     ]);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(m.value_of(&quot;foo&quot;), None);</span>
-    <span class="doccomment">/// assert_eq!(m.value_of(&quot;bar&quot;), None);</span>
-    <span class="doccomment">/// assert_eq!(m.values_of(&quot;baz&quot;).unwrap().collect::&lt;Vec&lt;_&gt;&gt;(), &amp;[&quot;baz1&quot;, &quot;baz2&quot;, &quot;baz3&quot;]);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [required]: ./struct.Arg.html#method.required</span>
-    <span class="ident">AllowMissingPositional</span>,
+    <span class="doccomment">/// Allows one to implement two styles of CLIs where positionals can be used out of order.
+    ///
+    /// The first example is a CLI where the second to last positional argument is optional, but
+    /// the final positional argument is required. Such as `$ prog [optional] &lt;required&gt;` where one
+    /// of the two following usages is allowed:
+    ///
+    /// * `$ prog [optional] &lt;required&gt;`
+    /// * `$ prog &lt;required&gt;`
+    ///
+    /// This would otherwise not be allowed. This is useful when `[optional]` has a default value.
+    ///
+    /// **Note:** when using this style of &quot;missing positionals&quot; the final positional *must* be
+    /// [required] if `--` will not be used to skip to the final positional argument.
+    ///
+    /// **Note:** This style also only allows a single positional argument to be &quot;skipped&quot; without
+    /// the use of `--`. To skip more than one, see the second example.
+    ///
+    /// The second example is when one wants to skip multiple optional positional arguments, and use
+    /// of the `--` operator is OK (but not required if all arguments will be specified anyways).
+    ///
+    /// For example, imagine a CLI which has three positional arguments `[foo] [bar] [baz]...` where
+    /// `baz` accepts multiple values (similar to man `ARGS...` style training arguments).
+    ///
+    /// With this setting the following invocations are possible:
+    ///
+    /// * `$ prog foo bar baz1 baz2 baz3`
+    /// * `$ prog foo -- baz1 baz2 baz3`
+    /// * `$ prog -- baz1 baz2 baz3`
+    ///
+    /// # Examples
+    ///
+    /// Style number one from above:
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg, AppSettings};
+    /// // Assume there is an external subcommand named &quot;subcmd&quot;
+    /// let m = App::new(&quot;myprog&quot;)
+    ///     .setting(AppSettings::AllowMissingPositional)
+    ///     .arg(Arg::with_name(&quot;arg1&quot;))
+    ///     .arg(Arg::with_name(&quot;arg2&quot;)
+    ///         .required(true))
+    ///     .get_matches_from(vec![
+    ///         &quot;prog&quot;, &quot;other&quot;
+    ///     ]);
+    ///
+    /// assert_eq!(m.value_of(&quot;arg1&quot;), None);
+    /// assert_eq!(m.value_of(&quot;arg2&quot;), Some(&quot;other&quot;));
+    /// ```
+    ///
+    /// Now the same example, but using a default value for the first optional positional argument
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg, AppSettings};
+    /// // Assume there is an external subcommand named &quot;subcmd&quot;
+    /// let m = App::new(&quot;myprog&quot;)
+    ///     .setting(AppSettings::AllowMissingPositional)
+    ///     .arg(Arg::with_name(&quot;arg1&quot;)
+    ///         .default_value(&quot;something&quot;))
+    ///     .arg(Arg::with_name(&quot;arg2&quot;)
+    ///         .required(true))
+    ///     .get_matches_from(vec![
+    ///         &quot;prog&quot;, &quot;other&quot;
+    ///     ]);
+    ///
+    /// assert_eq!(m.value_of(&quot;arg1&quot;), Some(&quot;something&quot;));
+    /// assert_eq!(m.value_of(&quot;arg2&quot;), Some(&quot;other&quot;));
+    /// ```
+    /// Style number two from above:
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg, AppSettings};
+    /// // Assume there is an external subcommand named &quot;subcmd&quot;
+    /// let m = App::new(&quot;myprog&quot;)
+    ///     .setting(AppSettings::AllowMissingPositional)
+    ///     .arg(Arg::with_name(&quot;foo&quot;))
+    ///     .arg(Arg::with_name(&quot;bar&quot;))
+    ///     .arg(Arg::with_name(&quot;baz&quot;).multiple(true))
+    ///     .get_matches_from(vec![
+    ///         &quot;prog&quot;, &quot;foo&quot;, &quot;bar&quot;, &quot;baz1&quot;, &quot;baz2&quot;, &quot;baz3&quot;
+    ///     ]);
+    ///
+    /// assert_eq!(m.value_of(&quot;foo&quot;), Some(&quot;foo&quot;));
+    /// assert_eq!(m.value_of(&quot;bar&quot;), Some(&quot;bar&quot;));
+    /// assert_eq!(m.values_of(&quot;baz&quot;).unwrap().collect::&lt;Vec&lt;_&gt;&gt;(), &amp;[&quot;baz1&quot;, &quot;baz2&quot;, &quot;baz3&quot;]);
+    /// ```
+    ///
+    /// Now notice if we don&#39;t specify `foo` or `baz` but use the `--` operator.
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg, AppSettings};
+    /// // Assume there is an external subcommand named &quot;subcmd&quot;
+    /// let m = App::new(&quot;myprog&quot;)
+    ///     .setting(AppSettings::AllowMissingPositional)
+    ///     .arg(Arg::with_name(&quot;foo&quot;))
+    ///     .arg(Arg::with_name(&quot;bar&quot;))
+    ///     .arg(Arg::with_name(&quot;baz&quot;).multiple(true))
+    ///     .get_matches_from(vec![
+    ///         &quot;prog&quot;, &quot;--&quot;, &quot;baz1&quot;, &quot;baz2&quot;, &quot;baz3&quot;
+    ///     ]);
+    ///
+    /// assert_eq!(m.value_of(&quot;foo&quot;), None);
+    /// assert_eq!(m.value_of(&quot;bar&quot;), None);
+    /// assert_eq!(m.values_of(&quot;baz&quot;).unwrap().collect::&lt;Vec&lt;_&gt;&gt;(), &amp;[&quot;baz1&quot;, &quot;baz2&quot;, &quot;baz3&quot;]);
+    /// ```
+    /// [required]: ./struct.Arg.html#method.required
+    </span>AllowMissingPositional,
 
-    <span class="doccomment">/// Specifies that an unexpected positional argument,</span>
-    <span class="doccomment">/// which would otherwise cause a [`ErrorKind::UnknownArgument`] error,</span>
-    <span class="doccomment">/// should instead be treated as a [`SubCommand`] within the [`ArgMatches`] struct.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **NOTE:** Use this setting with caution,</span>
-    <span class="doccomment">/// as a truly unexpected argument (i.e. one that is *NOT* an external subcommand)</span>
-    <span class="doccomment">/// will **not** cause an error and instead be treated as a potential subcommand.</span>
-    <span class="doccomment">/// One should check for such cases manually and inform the user appropriately.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, AppSettings};</span>
-    <span class="doccomment">/// // Assume there is an external subcommand named &quot;subcmd&quot;</span>
-    <span class="doccomment">/// let m = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .setting(AppSettings::AllowExternalSubcommands)</span>
-    <span class="doccomment">///     .get_matches_from(vec![</span>
-    <span class="doccomment">///         &quot;myprog&quot;, &quot;subcmd&quot;, &quot;--option&quot;, &quot;value&quot;, &quot;-fff&quot;, &quot;--flag&quot;</span>
-    <span class="doccomment">///     ]);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // All trailing arguments will be stored under the subcommand&#39;s sub-matches using an empty</span>
-    <span class="doccomment">/// // string argument name</span>
-    <span class="doccomment">/// match m.subcommand() {</span>
-    <span class="doccomment">///     (external, Some(ext_m)) =&gt; {</span>
-    <span class="doccomment">///          let ext_args: Vec&lt;&amp;str&gt; = ext_m.values_of(&quot;&quot;).unwrap().collect();</span>
-    <span class="doccomment">///          assert_eq!(external, &quot;subcmd&quot;);</span>
-    <span class="doccomment">///          assert_eq!(ext_args, [&quot;--option&quot;, &quot;value&quot;, &quot;-fff&quot;, &quot;--flag&quot;]);</span>
-    <span class="doccomment">///     },</span>
-    <span class="doccomment">///     _ =&gt; {},</span>
-    <span class="doccomment">/// }</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [`ErrorKind::UnknownArgument`]: ./enum.ErrorKind.html#variant.UnknownArgument</span>
-    <span class="doccomment">/// [`SubCommand`]: ./struct.SubCommand.html</span>
-    <span class="doccomment">/// [`ArgMatches`]: ./struct.ArgMatches.html</span>
-    <span class="ident">AllowExternalSubcommands</span>,
+    <span class="doccomment">/// Specifies that an unexpected positional argument,
+    /// which would otherwise cause a [`ErrorKind::UnknownArgument`] error,
+    /// should instead be treated as a [`SubCommand`] within the [`ArgMatches`] struct.
+    ///
+    /// **NOTE:** Use this setting with caution,
+    /// as a truly unexpected argument (i.e. one that is *NOT* an external subcommand)
+    /// will **not** cause an error and instead be treated as a potential subcommand.
+    /// One should check for such cases manually and inform the user appropriately.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use clap::{App, AppSettings};
+    /// // Assume there is an external subcommand named &quot;subcmd&quot;
+    /// let m = App::new(&quot;myprog&quot;)
+    ///     .setting(AppSettings::AllowExternalSubcommands)
+    ///     .get_matches_from(vec![
+    ///         &quot;myprog&quot;, &quot;subcmd&quot;, &quot;--option&quot;, &quot;value&quot;, &quot;-fff&quot;, &quot;--flag&quot;
+    ///     ]);
+    ///
+    /// // All trailing arguments will be stored under the subcommand&#39;s sub-matches using an empty
+    /// // string argument name
+    /// match m.subcommand() {
+    ///     (external, Some(ext_m)) =&gt; {
+    ///          let ext_args: Vec&lt;&amp;str&gt; = ext_m.values_of(&quot;&quot;).unwrap().collect();
+    ///          assert_eq!(external, &quot;subcmd&quot;);
+    ///          assert_eq!(ext_args, [&quot;--option&quot;, &quot;value&quot;, &quot;-fff&quot;, &quot;--flag&quot;]);
+    ///     },
+    ///     _ =&gt; {},
+    /// }
+    /// ```
+    /// [`ErrorKind::UnknownArgument`]: ./enum.ErrorKind.html#variant.UnknownArgument
+    /// [`SubCommand`]: ./struct.SubCommand.html
+    /// [`ArgMatches`]: ./struct.ArgMatches.html
+    </span>AllowExternalSubcommands,
 
-    <span class="doccomment">/// Specifies that use of a valid [argument] negates [subcommands] being used after. By default</span>
-    <span class="doccomment">/// `clap` allows arguments between subcommands such as</span>
-    <span class="doccomment">/// `&lt;cmd&gt; [cmd_args] &lt;cmd2&gt; [cmd2_args] &lt;cmd3&gt; [cmd3_args]`. This setting disables that</span>
-    <span class="doccomment">/// functionality and says that arguments can only follow the *final* subcommand. For instance</span>
-    <span class="doccomment">/// using this setting makes only the following invocations possible:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `&lt;cmd&gt; &lt;cmd2&gt; &lt;cmd3&gt; [cmd3_args]`</span>
-    <span class="doccomment">/// * `&lt;cmd&gt; &lt;cmd2&gt; [cmd2_args]`</span>
-    <span class="doccomment">/// * `&lt;cmd&gt; [cmd_args]`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, AppSettings};</span>
-    <span class="doccomment">/// App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .setting(AppSettings::ArgsNegateSubcommands)</span>
-    <span class="doccomment">/// # ;</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [subcommands]: ./struct.SubCommand.html</span>
-    <span class="doccomment">/// [argument]: ./struct.Arg.html</span>
-    <span class="ident">ArgsNegateSubcommands</span>,
+    <span class="doccomment">/// Specifies that use of a valid [argument] negates [subcommands] being used after. By default
+    /// `clap` allows arguments between subcommands such as
+    /// `&lt;cmd&gt; [cmd_args] &lt;cmd2&gt; [cmd2_args] &lt;cmd3&gt; [cmd3_args]`. This setting disables that
+    /// functionality and says that arguments can only follow the *final* subcommand. For instance
+    /// using this setting makes only the following invocations possible:
+    ///
+    /// * `&lt;cmd&gt; &lt;cmd2&gt; &lt;cmd3&gt; [cmd3_args]`
+    /// * `&lt;cmd&gt; &lt;cmd2&gt; [cmd2_args]`
+    /// * `&lt;cmd&gt; [cmd_args]`
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use clap::{App, AppSettings};
+    /// App::new(&quot;myprog&quot;)
+    ///     .setting(AppSettings::ArgsNegateSubcommands)
+    /// # ;
+    /// ```
+    /// [subcommands]: ./struct.SubCommand.html
+    /// [argument]: ./struct.Arg.html
+    </span>ArgsNegateSubcommands,
 
-    <span class="doccomment">/// Specifies that the help text should be displayed (and then exit gracefully),</span>
-    <span class="doccomment">/// if no arguments are present at runtime (i.e. an empty run such as, `$ myprog`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **NOTE:** [`SubCommand`]s count as arguments</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **NOTE:** Setting [`Arg::default_value`] effectively disables this option as it will</span>
-    <span class="doccomment">/// ensure that some argument is always present.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, AppSettings};</span>
-    <span class="doccomment">/// App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .setting(AppSettings::ArgRequiredElseHelp)</span>
-    <span class="doccomment">/// # ;</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [`SubCommand`]: ./struct.SubCommand.html</span>
-    <span class="doccomment">/// [`Arg::default_value`]: ./struct.Arg.html#method.default_value</span>
-    <span class="ident">ArgRequiredElseHelp</span>,
+    <span class="doccomment">/// Specifies that the help text should be displayed (and then exit gracefully),
+    /// if no arguments are present at runtime (i.e. an empty run such as, `$ myprog`.
+    ///
+    /// **NOTE:** [`SubCommand`]s count as arguments
+    ///
+    /// **NOTE:** Setting [`Arg::default_value`] effectively disables this option as it will
+    /// ensure that some argument is always present.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use clap::{App, AppSettings};
+    /// App::new(&quot;myprog&quot;)
+    ///     .setting(AppSettings::ArgRequiredElseHelp)
+    /// # ;
+    /// ```
+    /// [`SubCommand`]: ./struct.SubCommand.html
+    /// [`Arg::default_value`]: ./struct.Arg.html#method.default_value
+    </span>ArgRequiredElseHelp,
 
-    <span class="doccomment">/// Uses colorized help messages.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **NOTE:** Must be compiled with the `color` cargo feature</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Platform Specific</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This setting only applies to Unix, Linux, and macOS (i.e. non-Windows platforms)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # use clap::{App, Arg, SubCommand, AppSettings};</span>
-    <span class="doccomment">/// App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .setting(AppSettings::ColoredHelp)</span>
-    <span class="doccomment">///     .get_matches();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">ColoredHelp</span>,
+    <span class="doccomment">/// Uses colorized help messages.
+    ///
+    /// **NOTE:** Must be compiled with the `color` cargo feature
+    ///
+    /// # Platform Specific
+    ///
+    /// This setting only applies to Unix, Linux, and macOS (i.e. non-Windows platforms)
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// # use clap::{App, Arg, SubCommand, AppSettings};
+    /// App::new(&quot;myprog&quot;)
+    ///     .setting(AppSettings::ColoredHelp)
+    ///     .get_matches();
+    /// ```
+    </span>ColoredHelp,
 
-    <span class="doccomment">/// Enables colored output only when the output is going to a terminal or TTY.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **NOTE:** This is the default behavior of `clap`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **NOTE:** Must be compiled with the `color` cargo feature.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Platform Specific</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This setting only applies to Unix, Linux, and macOS (i.e. non-Windows platforms).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # use clap::{App, Arg, SubCommand, AppSettings};</span>
-    <span class="doccomment">/// App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .setting(AppSettings::ColorAuto)</span>
-    <span class="doccomment">///     .get_matches();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">ColorAuto</span>,
+    <span class="doccomment">/// Enables colored output only when the output is going to a terminal or TTY.
+    ///
+    /// **NOTE:** This is the default behavior of `clap`.
+    ///
+    /// **NOTE:** Must be compiled with the `color` cargo feature.
+    ///
+    /// # Platform Specific
+    ///
+    /// This setting only applies to Unix, Linux, and macOS (i.e. non-Windows platforms).
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// # use clap::{App, Arg, SubCommand, AppSettings};
+    /// App::new(&quot;myprog&quot;)
+    ///     .setting(AppSettings::ColorAuto)
+    ///     .get_matches();
+    /// ```
+    </span>ColorAuto,
 
-    <span class="doccomment">/// Enables colored output regardless of whether or not the output is going to a terminal/TTY.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **NOTE:** Must be compiled with the `color` cargo feature.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Platform Specific</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This setting only applies to Unix, Linux, and macOS (i.e. non-Windows platforms).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # use clap::{App, Arg, SubCommand, AppSettings};</span>
-    <span class="doccomment">/// App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .setting(AppSettings::ColorAlways)</span>
-    <span class="doccomment">///     .get_matches();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">ColorAlways</span>,
+    <span class="doccomment">/// Enables colored output regardless of whether or not the output is going to a terminal/TTY.
+    ///
+    /// **NOTE:** Must be compiled with the `color` cargo feature.
+    ///
+    /// # Platform Specific
+    ///
+    /// This setting only applies to Unix, Linux, and macOS (i.e. non-Windows platforms).
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// # use clap::{App, Arg, SubCommand, AppSettings};
+    /// App::new(&quot;myprog&quot;)
+    ///     .setting(AppSettings::ColorAlways)
+    ///     .get_matches();
+    /// ```
+    </span>ColorAlways,
 
-    <span class="doccomment">/// Disables colored output no matter if the output is going to a terminal/TTY, or not.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **NOTE:** Must be compiled with the `color` cargo feature</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Platform Specific</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This setting only applies to Unix, Linux, and macOS (i.e. non-Windows platforms)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # use clap::{App, Arg, SubCommand, AppSettings};</span>
-    <span class="doccomment">/// App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .setting(AppSettings::ColorNever)</span>
-    <span class="doccomment">///     .get_matches();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">ColorNever</span>,
+    <span class="doccomment">/// Disables colored output no matter if the output is going to a terminal/TTY, or not.
+    ///
+    /// **NOTE:** Must be compiled with the `color` cargo feature
+    ///
+    /// # Platform Specific
+    ///
+    /// This setting only applies to Unix, Linux, and macOS (i.e. non-Windows platforms)
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// # use clap::{App, Arg, SubCommand, AppSettings};
+    /// App::new(&quot;myprog&quot;)
+    ///     .setting(AppSettings::ColorNever)
+    ///     .get_matches();
+    /// ```
+    </span>ColorNever,
 
-    <span class="doccomment">/// Disables the automatic collapsing of positional args into `[ARGS]` inside the usage string</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # use clap::{App, Arg, SubCommand, AppSettings};</span>
-    <span class="doccomment">/// App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .setting(AppSettings::DontCollapseArgsInUsage)</span>
-    <span class="doccomment">///     .get_matches();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">DontCollapseArgsInUsage</span>,
+    <span class="doccomment">/// Disables the automatic collapsing of positional args into `[ARGS]` inside the usage string
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// # use clap::{App, Arg, SubCommand, AppSettings};
+    /// App::new(&quot;myprog&quot;)
+    ///     .setting(AppSettings::DontCollapseArgsInUsage)
+    ///     .get_matches();
+    /// ```
+    </span>DontCollapseArgsInUsage,
 
-    <span class="doccomment">/// Disables the automatic delimiting of values when `--` or [`AppSettings::TrailingVarArg`]</span>
-    <span class="doccomment">/// was used.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **NOTE:** The same thing can be done manually by setting the final positional argument to</span>
-    <span class="doccomment">/// [`Arg::use_delimiter(false)`]. Using this setting is safer, because it&#39;s easier to locate</span>
-    <span class="doccomment">/// when making changes.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # use clap::{App, Arg, SubCommand, AppSettings};</span>
-    <span class="doccomment">/// App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .setting(AppSettings::DontDelimitTrailingValues)</span>
-    <span class="doccomment">///     .get_matches();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [`AppSettings::TrailingVarArg`]: ./enum.AppSettings.html#variant.TrailingVarArg</span>
-    <span class="doccomment">/// [`Arg::use_delimiter(false)`]: ./struct.Arg.html#method.use_delimiter</span>
-    <span class="ident">DontDelimitTrailingValues</span>,
+    <span class="doccomment">/// Disables the automatic delimiting of values when `--` or [`AppSettings::TrailingVarArg`]
+    /// was used.
+    ///
+    /// **NOTE:** The same thing can be done manually by setting the final positional argument to
+    /// [`Arg::use_delimiter(false)`]. Using this setting is safer, because it&#39;s easier to locate
+    /// when making changes.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// # use clap::{App, Arg, SubCommand, AppSettings};
+    /// App::new(&quot;myprog&quot;)
+    ///     .setting(AppSettings::DontDelimitTrailingValues)
+    ///     .get_matches();
+    /// ```
+    /// [`AppSettings::TrailingVarArg`]: ./enum.AppSettings.html#variant.TrailingVarArg
+    /// [`Arg::use_delimiter(false)`]: ./struct.Arg.html#method.use_delimiter
+    </span>DontDelimitTrailingValues,
 
-    <span class="doccomment">/// Disables `-h` and `--help` [`App`] without affecting any of the [`SubCommand`]s</span>
-    <span class="doccomment">/// (Defaults to `false`; application *does* have help flags)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, AppSettings, ErrorKind};</span>
-    <span class="doccomment">/// let res = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .setting(AppSettings::DisableHelpFlags)</span>
-    <span class="doccomment">///     .get_matches_from_safe(vec![</span>
-    <span class="doccomment">///         &quot;myprog&quot;, &quot;-h&quot;</span>
-    <span class="doccomment">///     ]);</span>
-    <span class="doccomment">/// assert!(res.is_err());</span>
-    <span class="doccomment">/// assert_eq!(res.unwrap_err().kind, ErrorKind::UnknownArgument);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, SubCommand, AppSettings, ErrorKind};</span>
-    <span class="doccomment">/// let res = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .setting(AppSettings::DisableHelpFlags)</span>
-    <span class="doccomment">///     .subcommand(SubCommand::with_name(&quot;test&quot;))</span>
-    <span class="doccomment">///     .get_matches_from_safe(vec![</span>
-    <span class="doccomment">///         &quot;myprog&quot;, &quot;test&quot;, &quot;-h&quot;</span>
-    <span class="doccomment">///     ]);</span>
-    <span class="doccomment">/// assert!(res.is_err());</span>
-    <span class="doccomment">/// assert_eq!(res.unwrap_err().kind, ErrorKind::HelpDisplayed);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [`SubCommand`]: ./struct.SubCommand.html</span>
-    <span class="doccomment">/// [`App`]: ./struct.App.html</span>
-    <span class="ident">DisableHelpFlags</span>,
+    <span class="doccomment">/// Disables `-h` and `--help` [`App`] without affecting any of the [`SubCommand`]s
+    /// (Defaults to `false`; application *does* have help flags)
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use clap::{App, AppSettings, ErrorKind};
+    /// let res = App::new(&quot;myprog&quot;)
+    ///     .setting(AppSettings::DisableHelpFlags)
+    ///     .get_matches_from_safe(vec![
+    ///         &quot;myprog&quot;, &quot;-h&quot;
+    ///     ]);
+    /// assert!(res.is_err());
+    /// assert_eq!(res.unwrap_err().kind, ErrorKind::UnknownArgument);
+    /// ```
+    ///
+    /// ```rust
+    /// # use clap::{App, SubCommand, AppSettings, ErrorKind};
+    /// let res = App::new(&quot;myprog&quot;)
+    ///     .setting(AppSettings::DisableHelpFlags)
+    ///     .subcommand(SubCommand::with_name(&quot;test&quot;))
+    ///     .get_matches_from_safe(vec![
+    ///         &quot;myprog&quot;, &quot;test&quot;, &quot;-h&quot;
+    ///     ]);
+    /// assert!(res.is_err());
+    /// assert_eq!(res.unwrap_err().kind, ErrorKind::HelpDisplayed);
+    /// ```
+    /// [`SubCommand`]: ./struct.SubCommand.html
+    /// [`App`]: ./struct.App.html
+    </span>DisableHelpFlags,
 
-    <span class="doccomment">/// Disables the `help` subcommand</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, AppSettings, ErrorKind, SubCommand};</span>
-    <span class="doccomment">/// let res = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .version(&quot;v1.1&quot;)</span>
-    <span class="doccomment">///     .setting(AppSettings::DisableHelpSubcommand)</span>
-    <span class="doccomment">///     // Normally, creating a subcommand causes a `help` subcommand to automatically</span>
-    <span class="doccomment">///     // be generated as well</span>
-    <span class="doccomment">///     .subcommand(SubCommand::with_name(&quot;test&quot;))</span>
-    <span class="doccomment">///     .get_matches_from_safe(vec![</span>
-    <span class="doccomment">///         &quot;myprog&quot;, &quot;help&quot;</span>
-    <span class="doccomment">///     ]);</span>
-    <span class="doccomment">/// assert!(res.is_err());</span>
-    <span class="doccomment">/// assert_eq!(res.unwrap_err().kind, ErrorKind::UnknownArgument);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [`SubCommand`]: ./struct.SubCommand.html</span>
-    <span class="ident">DisableHelpSubcommand</span>,
+    <span class="doccomment">/// Disables the `help` subcommand
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use clap::{App, AppSettings, ErrorKind, SubCommand};
+    /// let res = App::new(&quot;myprog&quot;)
+    ///     .version(&quot;v1.1&quot;)
+    ///     .setting(AppSettings::DisableHelpSubcommand)
+    ///     // Normally, creating a subcommand causes a `help` subcommand to automatically
+    ///     // be generated as well
+    ///     .subcommand(SubCommand::with_name(&quot;test&quot;))
+    ///     .get_matches_from_safe(vec![
+    ///         &quot;myprog&quot;, &quot;help&quot;
+    ///     ]);
+    /// assert!(res.is_err());
+    /// assert_eq!(res.unwrap_err().kind, ErrorKind::UnknownArgument);
+    /// ```
+    /// [`SubCommand`]: ./struct.SubCommand.html
+    </span>DisableHelpSubcommand,
 
-    <span class="doccomment">/// Disables `-V` and `--version` [`App`] without affecting any of the [`SubCommand`]s</span>
-    <span class="doccomment">/// (Defaults to `false`; application *does* have a version flag)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, AppSettings, ErrorKind};</span>
-    <span class="doccomment">/// let res = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .version(&quot;v1.1&quot;)</span>
-    <span class="doccomment">///     .setting(AppSettings::DisableVersion)</span>
-    <span class="doccomment">///     .get_matches_from_safe(vec![</span>
-    <span class="doccomment">///         &quot;myprog&quot;, &quot;-V&quot;</span>
-    <span class="doccomment">///     ]);</span>
-    <span class="doccomment">/// assert!(res.is_err());</span>
-    <span class="doccomment">/// assert_eq!(res.unwrap_err().kind, ErrorKind::UnknownArgument);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, SubCommand, AppSettings, ErrorKind};</span>
-    <span class="doccomment">/// let res = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .version(&quot;v1.1&quot;)</span>
-    <span class="doccomment">///     .setting(AppSettings::DisableVersion)</span>
-    <span class="doccomment">///     .subcommand(SubCommand::with_name(&quot;test&quot;))</span>
-    <span class="doccomment">///     .get_matches_from_safe(vec![</span>
-    <span class="doccomment">///         &quot;myprog&quot;, &quot;test&quot;, &quot;-V&quot;</span>
-    <span class="doccomment">///     ]);</span>
-    <span class="doccomment">/// assert!(res.is_err());</span>
-    <span class="doccomment">/// assert_eq!(res.unwrap_err().kind, ErrorKind::VersionDisplayed);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [`SubCommand`]: ./struct.SubCommand.html</span>
-    <span class="doccomment">/// [`App`]: ./struct.App.html</span>
-    <span class="ident">DisableVersion</span>,
+    <span class="doccomment">/// Disables `-V` and `--version` [`App`] without affecting any of the [`SubCommand`]s
+    /// (Defaults to `false`; application *does* have a version flag)
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use clap::{App, AppSettings, ErrorKind};
+    /// let res = App::new(&quot;myprog&quot;)
+    ///     .version(&quot;v1.1&quot;)
+    ///     .setting(AppSettings::DisableVersion)
+    ///     .get_matches_from_safe(vec![
+    ///         &quot;myprog&quot;, &quot;-V&quot;
+    ///     ]);
+    /// assert!(res.is_err());
+    /// assert_eq!(res.unwrap_err().kind, ErrorKind::UnknownArgument);
+    /// ```
+    ///
+    /// ```rust
+    /// # use clap::{App, SubCommand, AppSettings, ErrorKind};
+    /// let res = App::new(&quot;myprog&quot;)
+    ///     .version(&quot;v1.1&quot;)
+    ///     .setting(AppSettings::DisableVersion)
+    ///     .subcommand(SubCommand::with_name(&quot;test&quot;))
+    ///     .get_matches_from_safe(vec![
+    ///         &quot;myprog&quot;, &quot;test&quot;, &quot;-V&quot;
+    ///     ]);
+    /// assert!(res.is_err());
+    /// assert_eq!(res.unwrap_err().kind, ErrorKind::VersionDisplayed);
+    /// ```
+    /// [`SubCommand`]: ./struct.SubCommand.html
+    /// [`App`]: ./struct.App.html
+    </span>DisableVersion,
 
-    <span class="doccomment">/// Displays the arguments and [`SubCommand`]s in the help message in the order that they were</span>
-    <span class="doccomment">/// declared in, and not alphabetically which is the default.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # use clap::{App, Arg, SubCommand, AppSettings};</span>
-    <span class="doccomment">/// App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .setting(AppSettings::DeriveDisplayOrder)</span>
-    <span class="doccomment">///     .get_matches();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [`SubCommand`]: ./struct.SubCommand.html</span>
-    <span class="ident">DeriveDisplayOrder</span>,
+    <span class="doccomment">/// Displays the arguments and [`SubCommand`]s in the help message in the order that they were
+    /// declared in, and not alphabetically which is the default.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// # use clap::{App, Arg, SubCommand, AppSettings};
+    /// App::new(&quot;myprog&quot;)
+    ///     .setting(AppSettings::DeriveDisplayOrder)
+    ///     .get_matches();
+    /// ```
+    /// [`SubCommand`]: ./struct.SubCommand.html
+    </span>DeriveDisplayOrder,
 
-    <span class="doccomment">/// Specifies to use the version of the current command for all child [`SubCommand`]s.</span>
-    <span class="doccomment">/// (Defaults to `false`; subcommands have independent version strings from their parents.)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **NOTE:** The version for the current command **and** this setting must be set **prior** to</span>
-    <span class="doccomment">/// adding any child subcommands</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # use clap::{App, Arg, SubCommand, AppSettings};</span>
-    <span class="doccomment">/// App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .version(&quot;v1.1&quot;)</span>
-    <span class="doccomment">///     .setting(AppSettings::GlobalVersion)</span>
-    <span class="doccomment">///     .subcommand(SubCommand::with_name(&quot;test&quot;))</span>
-    <span class="doccomment">///     .get_matches();</span>
-    <span class="doccomment">/// // running `$ myprog test --version` will display</span>
-    <span class="doccomment">/// // &quot;myprog-test v1.1&quot;</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [`SubCommand`]: ./struct.SubCommand.html</span>
-    <span class="ident">GlobalVersion</span>,
+    <span class="doccomment">/// Specifies to use the version of the current command for all child [`SubCommand`]s.
+    /// (Defaults to `false`; subcommands have independent version strings from their parents.)
+    ///
+    /// **NOTE:** The version for the current command **and** this setting must be set **prior** to
+    /// adding any child subcommands
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// # use clap::{App, Arg, SubCommand, AppSettings};
+    /// App::new(&quot;myprog&quot;)
+    ///     .version(&quot;v1.1&quot;)
+    ///     .setting(AppSettings::GlobalVersion)
+    ///     .subcommand(SubCommand::with_name(&quot;test&quot;))
+    ///     .get_matches();
+    /// // running `$ myprog test --version` will display
+    /// // &quot;myprog-test v1.1&quot;
+    /// ```
+    /// [`SubCommand`]: ./struct.SubCommand.html
+    </span>GlobalVersion,
 
-    <span class="doccomment">/// Specifies that this [`SubCommand`] should be hidden from help messages</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg, AppSettings, SubCommand};</span>
-    <span class="doccomment">/// App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .subcommand(SubCommand::with_name(&quot;test&quot;)</span>
-    <span class="doccomment">///     .setting(AppSettings::Hidden))</span>
-    <span class="doccomment">/// # ;</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [`SubCommand`]: ./struct.SubCommand.html</span>
-    <span class="ident">Hidden</span>,
+    <span class="doccomment">/// Specifies that this [`SubCommand`] should be hidden from help messages
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg, AppSettings, SubCommand};
+    /// App::new(&quot;myprog&quot;)
+    ///     .subcommand(SubCommand::with_name(&quot;test&quot;)
+    ///     .setting(AppSettings::Hidden))
+    /// # ;
+    /// ```
+    /// [`SubCommand`]: ./struct.SubCommand.html
+    </span>Hidden,
 
-    <span class="doccomment">/// Tells `clap` *not* to print possible values when displaying help information.</span>
-    <span class="doccomment">/// This can be useful if there are many values, or they are explained elsewhere.</span>
-    <span class="ident">HidePossibleValuesInHelp</span>,
+    <span class="doccomment">/// Tells `clap` *not* to print possible values when displaying help information.
+    /// This can be useful if there are many values, or they are explained elsewhere.
+    </span>HidePossibleValuesInHelp,
 
-    <span class="doccomment">/// Tries to match unknown args to partial [`subcommands`] or their [aliases]. For example to</span>
-    <span class="doccomment">/// match a subcommand named `test`, one could use `t`, `te`, `tes`, and `test`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **NOTE:** The match *must not* be ambiguous at all in order to succeed. i.e. to match `te`</span>
-    <span class="doccomment">/// to `test` there could not also be a subcommand or alias `temp` because both start with `te`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **CAUTION:** This setting can interfere with [positional/free arguments], take care when</span>
-    <span class="doccomment">/// designing CLIs which allow inferred subcommands and have potential positional/free</span>
-    <span class="doccomment">/// arguments whose values could start with the same characters as subcommands. If this is the</span>
-    <span class="doccomment">/// case, it&#39;s recommended to use settings such as [`AppSeettings::ArgsNegateSubcommands`] in</span>
-    <span class="doccomment">/// conjunction with this setting.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # use clap::{App, Arg, SubCommand, AppSettings};</span>
-    <span class="doccomment">/// let m = App::new(&quot;prog&quot;)</span>
-    <span class="doccomment">///     .setting(AppSettings::InferSubcommands)</span>
-    <span class="doccomment">///     .subcommand(SubCommand::with_name(&quot;test&quot;))</span>
-    <span class="doccomment">///     .get_matches_from(vec![</span>
-    <span class="doccomment">///         &quot;prog&quot;, &quot;te&quot;</span>
-    <span class="doccomment">///     ]);</span>
-    <span class="doccomment">/// assert_eq!(m.subcommand_name(), Some(&quot;test&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [`subcommands`]: ./struct.SubCommand.html</span>
-    <span class="doccomment">/// [positional/free arguments]: ./struct.Arg.html#method.index</span>
-    <span class="doccomment">/// [aliases]: ./struct.App.html#method.alias</span>
-    <span class="doccomment">/// [`AppSeettings::ArgsNegateSubcommands`]: ./enum.AppSettings.html#variant.ArgsNegateSubcommands</span>
-    <span class="ident">InferSubcommands</span>,
+    <span class="doccomment">/// Tries to match unknown args to partial [`subcommands`] or their [aliases]. For example to
+    /// match a subcommand named `test`, one could use `t`, `te`, `tes`, and `test`.
+    ///
+    /// **NOTE:** The match *must not* be ambiguous at all in order to succeed. i.e. to match `te`
+    /// to `test` there could not also be a subcommand or alias `temp` because both start with `te`
+    ///
+    /// **CAUTION:** This setting can interfere with [positional/free arguments], take care when
+    /// designing CLIs which allow inferred subcommands and have potential positional/free
+    /// arguments whose values could start with the same characters as subcommands. If this is the
+    /// case, it&#39;s recommended to use settings such as [`AppSeettings::ArgsNegateSubcommands`] in
+    /// conjunction with this setting.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// # use clap::{App, Arg, SubCommand, AppSettings};
+    /// let m = App::new(&quot;prog&quot;)
+    ///     .setting(AppSettings::InferSubcommands)
+    ///     .subcommand(SubCommand::with_name(&quot;test&quot;))
+    ///     .get_matches_from(vec![
+    ///         &quot;prog&quot;, &quot;te&quot;
+    ///     ]);
+    /// assert_eq!(m.subcommand_name(), Some(&quot;test&quot;));
+    /// ```
+    /// [`subcommands`]: ./struct.SubCommand.html
+    /// [positional/free arguments]: ./struct.Arg.html#method.index
+    /// [aliases]: ./struct.App.html#method.alias
+    /// [`AppSeettings::ArgsNegateSubcommands`]: ./enum.AppSettings.html#variant.ArgsNegateSubcommands
+    </span>InferSubcommands,
 
-    <span class="doccomment">/// Specifies that the parser should not assume the first argument passed is the binary name.</span>
-    <span class="doccomment">/// This is normally the case when using a &quot;daemon&quot; style mode, or an interactive CLI where one</span>
-    <span class="doccomment">/// one would not normally type the binary or program name for each command.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg, AppSettings};</span>
-    <span class="doccomment">/// let m = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .setting(AppSettings::NoBinaryName)</span>
-    <span class="doccomment">///     .arg(Arg::from_usage(&quot;&lt;cmd&gt;... &#39;commands to run&#39;&quot;))</span>
-    <span class="doccomment">///     .get_matches_from(vec![&quot;command&quot;, &quot;set&quot;]);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let cmds: Vec&lt;&amp;str&gt; = m.values_of(&quot;cmd&quot;).unwrap().collect();</span>
-    <span class="doccomment">/// assert_eq!(cmds, [&quot;command&quot;, &quot;set&quot;]);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">NoBinaryName</span>,
+    <span class="doccomment">/// Specifies that the parser should not assume the first argument passed is the binary name.
+    /// This is normally the case when using a &quot;daemon&quot; style mode, or an interactive CLI where one
+    /// one would not normally type the binary or program name for each command.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg, AppSettings};
+    /// let m = App::new(&quot;myprog&quot;)
+    ///     .setting(AppSettings::NoBinaryName)
+    ///     .arg(Arg::from_usage(&quot;&lt;cmd&gt;... &#39;commands to run&#39;&quot;))
+    ///     .get_matches_from(vec![&quot;command&quot;, &quot;set&quot;]);
+    ///
+    /// let cmds: Vec&lt;&amp;str&gt; = m.values_of(&quot;cmd&quot;).unwrap().collect();
+    /// assert_eq!(cmds, [&quot;command&quot;, &quot;set&quot;]);
+    /// ```
+    </span>NoBinaryName,
 
-    <span class="doccomment">/// Places the help string for all arguments on the line after the argument.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # use clap::{App, Arg, SubCommand, AppSettings};</span>
-    <span class="doccomment">/// App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .setting(AppSettings::NextLineHelp)</span>
-    <span class="doccomment">///     .get_matches();</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">NextLineHelp</span>,
+    <span class="doccomment">/// Places the help string for all arguments on the line after the argument.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// # use clap::{App, Arg, SubCommand, AppSettings};
+    /// App::new(&quot;myprog&quot;)
+    ///     .setting(AppSettings::NextLineHelp)
+    ///     .get_matches();
+    /// ```
+    </span>NextLineHelp,
 
-    <span class="doccomment">/// **DEPRECATED**: This setting is no longer required in order to propagate values up or down</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Specifies that the parser should propagate global arg&#39;s values down or up through any *used*</span>
-    <span class="doccomment">/// child subcommands. Meaning, if a subcommand wasn&#39;t used, the values won&#39;t be propagated to</span>
-    <span class="doccomment">/// said subcommand.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg, AppSettings, SubCommand};</span>
-    <span class="doccomment">/// let m = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .arg(Arg::from_usage(&quot;[cmd] &#39;command to run&#39;&quot;)</span>
-    <span class="doccomment">///         .global(true))</span>
-    <span class="doccomment">///     .subcommand(SubCommand::with_name(&quot;foo&quot;))</span>
-    <span class="doccomment">///     .get_matches_from(vec![&quot;myprog&quot;, &quot;set&quot;, &quot;foo&quot;]);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(m.value_of(&quot;cmd&quot;), Some(&quot;set&quot;));</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let sub_m = m.subcommand_matches(&quot;foo&quot;).unwrap();</span>
-    <span class="doccomment">/// assert_eq!(sub_m.value_of(&quot;cmd&quot;), Some(&quot;set&quot;));</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// Now doing the same thing, but *not* using any subcommands will result in the value not being</span>
-    <span class="doccomment">/// propagated down.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg, AppSettings, SubCommand};</span>
-    <span class="doccomment">/// let m = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .arg(Arg::from_usage(&quot;[cmd] &#39;command to run&#39;&quot;)</span>
-    <span class="doccomment">///         .global(true))</span>
-    <span class="doccomment">///     .subcommand(SubCommand::with_name(&quot;foo&quot;))</span>
-    <span class="doccomment">///     .get_matches_from(vec![&quot;myprog&quot;, &quot;set&quot;]);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert_eq!(m.value_of(&quot;cmd&quot;), Some(&quot;set&quot;));</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(m.subcommand_matches(&quot;foo&quot;).is_none());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;2.27.0&quot;</span>, <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;No longer required to propagate values&quot;</span>)]</span>
-    <span class="ident">PropagateGlobalValuesDown</span>,
+    <span class="doccomment">/// **DEPRECATED**: This setting is no longer required in order to propagate values up or down
+    ///
+    /// Specifies that the parser should propagate global arg&#39;s values down or up through any *used*
+    /// child subcommands. Meaning, if a subcommand wasn&#39;t used, the values won&#39;t be propagated to
+    /// said subcommand.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg, AppSettings, SubCommand};
+    /// let m = App::new(&quot;myprog&quot;)
+    ///     .arg(Arg::from_usage(&quot;[cmd] &#39;command to run&#39;&quot;)
+    ///         .global(true))
+    ///     .subcommand(SubCommand::with_name(&quot;foo&quot;))
+    ///     .get_matches_from(vec![&quot;myprog&quot;, &quot;set&quot;, &quot;foo&quot;]);
+    ///
+    /// assert_eq!(m.value_of(&quot;cmd&quot;), Some(&quot;set&quot;));
+    ///
+    /// let sub_m = m.subcommand_matches(&quot;foo&quot;).unwrap();
+    /// assert_eq!(sub_m.value_of(&quot;cmd&quot;), Some(&quot;set&quot;));
+    /// ```
+    /// Now doing the same thing, but *not* using any subcommands will result in the value not being
+    /// propagated down.
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg, AppSettings, SubCommand};
+    /// let m = App::new(&quot;myprog&quot;)
+    ///     .arg(Arg::from_usage(&quot;[cmd] &#39;command to run&#39;&quot;)
+    ///         .global(true))
+    ///     .subcommand(SubCommand::with_name(&quot;foo&quot;))
+    ///     .get_matches_from(vec![&quot;myprog&quot;, &quot;set&quot;]);
+    ///
+    /// assert_eq!(m.value_of(&quot;cmd&quot;), Some(&quot;set&quot;));
+    ///
+    /// assert!(m.subcommand_matches(&quot;foo&quot;).is_none());
+    /// ```
+    </span><span class="attribute">#[deprecated(since = <span class="string">&quot;2.27.0&quot;</span>, note = <span class="string">&quot;No longer required to propagate values&quot;</span>)]
+    </span>PropagateGlobalValuesDown,
 
-    <span class="doccomment">/// Allows [`SubCommand`]s to override all requirements of the parent command.</span>
-    <span class="doccomment">/// For example if you had a subcommand or top level application with a required argument</span>
-    <span class="doccomment">/// that is only required as long as there is no subcommand present,</span>
-    <span class="doccomment">/// using this setting would allow you to set those arguments to [`Arg::required(true)`]</span>
-    <span class="doccomment">/// and yet receive no error so long as the user uses a valid subcommand instead.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **NOTE:** This defaults to false (using subcommand does *not* negate requirements)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This first example shows that it is an error to not use a required argument</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg, AppSettings, SubCommand, ErrorKind};</span>
-    <span class="doccomment">/// let err = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .setting(AppSettings::SubcommandsNegateReqs)</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;opt&quot;).required(true))</span>
-    <span class="doccomment">///     .subcommand(SubCommand::with_name(&quot;test&quot;))</span>
-    <span class="doccomment">///     .get_matches_from_safe(vec![</span>
-    <span class="doccomment">///         &quot;myprog&quot;</span>
-    <span class="doccomment">///     ]);</span>
-    <span class="doccomment">/// assert!(err.is_err());</span>
-    <span class="doccomment">/// assert_eq!(err.unwrap_err().kind, ErrorKind::MissingRequiredArgument);</span>
-    <span class="doccomment">/// # ;</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This next example shows that it is no longer error to not use a required argument if a</span>
-    <span class="doccomment">/// valid subcommand is used.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg, AppSettings, SubCommand, ErrorKind};</span>
-    <span class="doccomment">/// let noerr = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .setting(AppSettings::SubcommandsNegateReqs)</span>
-    <span class="doccomment">///     .arg(Arg::with_name(&quot;opt&quot;).required(true))</span>
-    <span class="doccomment">///     .subcommand(SubCommand::with_name(&quot;test&quot;))</span>
-    <span class="doccomment">///     .get_matches_from_safe(vec![</span>
-    <span class="doccomment">///         &quot;myprog&quot;, &quot;test&quot;</span>
-    <span class="doccomment">///     ]);</span>
-    <span class="doccomment">/// assert!(noerr.is_ok());</span>
-    <span class="doccomment">/// # ;</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [`Arg::required(true)`]: ./struct.Arg.html#method.required</span>
-    <span class="doccomment">/// [`SubCommand`]: ./struct.SubCommand.html</span>
-    <span class="ident">SubcommandsNegateReqs</span>,
+    <span class="doccomment">/// Allows [`SubCommand`]s to override all requirements of the parent command.
+    /// For example if you had a subcommand or top level application with a required argument
+    /// that is only required as long as there is no subcommand present,
+    /// using this setting would allow you to set those arguments to [`Arg::required(true)`]
+    /// and yet receive no error so long as the user uses a valid subcommand instead.
+    ///
+    /// **NOTE:** This defaults to false (using subcommand does *not* negate requirements)
+    ///
+    /// # Examples
+    ///
+    /// This first example shows that it is an error to not use a required argument
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg, AppSettings, SubCommand, ErrorKind};
+    /// let err = App::new(&quot;myprog&quot;)
+    ///     .setting(AppSettings::SubcommandsNegateReqs)
+    ///     .arg(Arg::with_name(&quot;opt&quot;).required(true))
+    ///     .subcommand(SubCommand::with_name(&quot;test&quot;))
+    ///     .get_matches_from_safe(vec![
+    ///         &quot;myprog&quot;
+    ///     ]);
+    /// assert!(err.is_err());
+    /// assert_eq!(err.unwrap_err().kind, ErrorKind::MissingRequiredArgument);
+    /// # ;
+    /// ```
+    ///
+    /// This next example shows that it is no longer error to not use a required argument if a
+    /// valid subcommand is used.
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg, AppSettings, SubCommand, ErrorKind};
+    /// let noerr = App::new(&quot;myprog&quot;)
+    ///     .setting(AppSettings::SubcommandsNegateReqs)
+    ///     .arg(Arg::with_name(&quot;opt&quot;).required(true))
+    ///     .subcommand(SubCommand::with_name(&quot;test&quot;))
+    ///     .get_matches_from_safe(vec![
+    ///         &quot;myprog&quot;, &quot;test&quot;
+    ///     ]);
+    /// assert!(noerr.is_ok());
+    /// # ;
+    /// ```
+    /// [`Arg::required(true)`]: ./struct.Arg.html#method.required
+    /// [`SubCommand`]: ./struct.SubCommand.html
+    </span>SubcommandsNegateReqs,
 
-    <span class="doccomment">/// Specifies that the help text should be displayed (before exiting gracefully) if no</span>
-    <span class="doccomment">/// [`SubCommand`]s are present at runtime (i.e. an empty run such as `$ myprog`).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **NOTE:** This should *not* be used with [`AppSettings::SubcommandRequired`] as they do</span>
-    <span class="doccomment">/// nearly same thing; this prints the help text, and the other prints an error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **NOTE:** If the user specifies arguments at runtime, but no subcommand the help text will</span>
-    <span class="doccomment">/// still be displayed and exit. If this is *not* the desired result, consider using</span>
-    <span class="doccomment">/// [`AppSettings::ArgRequiredElseHelp`] instead.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg, AppSettings};</span>
-    <span class="doccomment">/// App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .setting(AppSettings::SubcommandRequiredElseHelp)</span>
-    <span class="doccomment">/// # ;</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [`SubCommand`]: ./struct.SubCommand.html</span>
-    <span class="doccomment">/// [`AppSettings::SubcommandRequired`]: ./enum.AppSettings.html#variant.SubcommandRequired</span>
-    <span class="doccomment">/// [`AppSettings::ArgRequiredElseHelp`]: ./enum.AppSettings.html#variant.ArgRequiredElseHelp</span>
-    <span class="ident">SubcommandRequiredElseHelp</span>,
+    <span class="doccomment">/// Specifies that the help text should be displayed (before exiting gracefully) if no
+    /// [`SubCommand`]s are present at runtime (i.e. an empty run such as `$ myprog`).
+    ///
+    /// **NOTE:** This should *not* be used with [`AppSettings::SubcommandRequired`] as they do
+    /// nearly same thing; this prints the help text, and the other prints an error.
+    ///
+    /// **NOTE:** If the user specifies arguments at runtime, but no subcommand the help text will
+    /// still be displayed and exit. If this is *not* the desired result, consider using
+    /// [`AppSettings::ArgRequiredElseHelp`] instead.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg, AppSettings};
+    /// App::new(&quot;myprog&quot;)
+    ///     .setting(AppSettings::SubcommandRequiredElseHelp)
+    /// # ;
+    /// ```
+    /// [`SubCommand`]: ./struct.SubCommand.html
+    /// [`AppSettings::SubcommandRequired`]: ./enum.AppSettings.html#variant.SubcommandRequired
+    /// [`AppSettings::ArgRequiredElseHelp`]: ./enum.AppSettings.html#variant.ArgRequiredElseHelp
+    </span>SubcommandRequiredElseHelp,
 
-    <span class="doccomment">/// Specifies that any invalid UTF-8 code points should be treated as an error and fail</span>
-    <span class="doccomment">/// with a [`ErrorKind::InvalidUtf8`] error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **NOTE:** This rule only applies to argument values; Things such as flags, options, and</span>
-    <span class="doccomment">/// [`SubCommand`]s themselves only allow valid UTF-8 code points.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Platform Specific</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Non Windows systems only</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">unix</span>), <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; ```ignore&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">unix</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; ```&quot;</span>)]</span>
-    <span class="doccomment">/// # use clap::{App, AppSettings, ErrorKind};</span>
-    <span class="doccomment">/// use std::ffi::OsString;</span>
-    <span class="doccomment">/// use std::os::unix::ffi::OsStringExt;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let m = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .setting(AppSettings::StrictUtf8)</span>
-    <span class="doccomment">///     .arg_from_usage(&quot;&lt;arg&gt; &#39;some positional arg&#39;&quot;)</span>
-    <span class="doccomment">///     .get_matches_from_safe(</span>
-    <span class="doccomment">///         vec![</span>
-    <span class="doccomment">///             OsString::from(&quot;myprog&quot;),</span>
-    <span class="doccomment">///             OsString::from_vec(vec![0xe9])]);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(m.is_err());</span>
-    <span class="doccomment">/// assert_eq!(m.unwrap_err().kind, ErrorKind::InvalidUtf8);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [`SubCommand`]: ./struct.SubCommand.html</span>
-    <span class="doccomment">/// [`ErrorKind::InvalidUtf8`]: ./enum.ErrorKind.html#variant.InvalidUtf8</span>
-    <span class="ident">StrictUtf8</span>,
+    <span class="doccomment">/// Specifies that any invalid UTF-8 code points should be treated as an error and fail
+    /// with a [`ErrorKind::InvalidUtf8`] error.
+    ///
+    /// **NOTE:** This rule only applies to argument values; Things such as flags, options, and
+    /// [`SubCommand`]s themselves only allow valid UTF-8 code points.
+    ///
+    /// # Platform Specific
+    ///
+    /// Non Windows systems only
+    ///
+    /// # Examples
+    ///
+    </span><span class="attribute">#[cfg_attr(not(unix), doc = <span class="string">&quot; ```ignore&quot;</span>)]
+    #[cfg_attr(unix, doc = <span class="string">&quot; ```&quot;</span>)]
+    </span><span class="doccomment">/// # use clap::{App, AppSettings, ErrorKind};
+    /// use std::ffi::OsString;
+    /// use std::os::unix::ffi::OsStringExt;
+    ///
+    /// let m = App::new(&quot;myprog&quot;)
+    ///     .setting(AppSettings::StrictUtf8)
+    ///     .arg_from_usage(&quot;&lt;arg&gt; &#39;some positional arg&#39;&quot;)
+    ///     .get_matches_from_safe(
+    ///         vec![
+    ///             OsString::from(&quot;myprog&quot;),
+    ///             OsString::from_vec(vec![0xe9])]);
+    ///
+    /// assert!(m.is_err());
+    /// assert_eq!(m.unwrap_err().kind, ErrorKind::InvalidUtf8);
+    /// ```
+    /// [`SubCommand`]: ./struct.SubCommand.html
+    /// [`ErrorKind::InvalidUtf8`]: ./enum.ErrorKind.html#variant.InvalidUtf8
+    </span>StrictUtf8,
 
-    <span class="doccomment">/// Allows specifying that if no [`SubCommand`] is present at runtime,</span>
-    <span class="doccomment">/// error and exit gracefully.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **NOTE:** This defaults to `false` (subcommands do *not* need to be present)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, AppSettings, SubCommand, ErrorKind};</span>
-    <span class="doccomment">/// let err = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .setting(AppSettings::SubcommandRequired)</span>
-    <span class="doccomment">///     .subcommand(SubCommand::with_name(&quot;test&quot;))</span>
-    <span class="doccomment">///     .get_matches_from_safe(vec![</span>
-    <span class="doccomment">///         &quot;myprog&quot;,</span>
-    <span class="doccomment">///     ]);</span>
-    <span class="doccomment">/// assert!(err.is_err());</span>
-    <span class="doccomment">/// assert_eq!(err.unwrap_err().kind, ErrorKind::MissingSubcommand);</span>
-    <span class="doccomment">/// # ;</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [`SubCommand`]: ./struct.SubCommand.html</span>
-    <span class="ident">SubcommandRequired</span>,
+    <span class="doccomment">/// Allows specifying that if no [`SubCommand`] is present at runtime,
+    /// error and exit gracefully.
+    ///
+    /// **NOTE:** This defaults to `false` (subcommands do *not* need to be present)
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use clap::{App, AppSettings, SubCommand, ErrorKind};
+    /// let err = App::new(&quot;myprog&quot;)
+    ///     .setting(AppSettings::SubcommandRequired)
+    ///     .subcommand(SubCommand::with_name(&quot;test&quot;))
+    ///     .get_matches_from_safe(vec![
+    ///         &quot;myprog&quot;,
+    ///     ]);
+    /// assert!(err.is_err());
+    /// assert_eq!(err.unwrap_err().kind, ErrorKind::MissingSubcommand);
+    /// # ;
+    /// ```
+    /// [`SubCommand`]: ./struct.SubCommand.html
+    </span>SubcommandRequired,
 
-    <span class="doccomment">/// Specifies that the final positional argument is a &quot;VarArg&quot; and that `clap` should not</span>
-    <span class="doccomment">/// attempt to parse any further args.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The values of the trailing positional argument will contain all args from itself on.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **NOTE:** The final positional argument **must** have [`Arg::multiple(true)`] or the usage</span>
-    <span class="doccomment">/// string equivalent.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg, AppSettings};</span>
-    <span class="doccomment">/// let m = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .setting(AppSettings::TrailingVarArg)</span>
-    <span class="doccomment">///     .arg(Arg::from_usage(&quot;&lt;cmd&gt;... &#39;commands to run&#39;&quot;))</span>
-    <span class="doccomment">///     .get_matches_from(vec![&quot;myprog&quot;, &quot;arg1&quot;, &quot;-r&quot;, &quot;val1&quot;]);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let trail: Vec&lt;&amp;str&gt; = m.values_of(&quot;cmd&quot;).unwrap().collect();</span>
-    <span class="doccomment">/// assert_eq!(trail, [&quot;arg1&quot;, &quot;-r&quot;, &quot;val1&quot;]);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [`Arg::multiple(true)`]: ./struct.Arg.html#method.multiple</span>
-    <span class="ident">TrailingVarArg</span>,
+    <span class="doccomment">/// Specifies that the final positional argument is a &quot;VarArg&quot; and that `clap` should not
+    /// attempt to parse any further args.
+    ///
+    /// The values of the trailing positional argument will contain all args from itself on.
+    ///
+    /// **NOTE:** The final positional argument **must** have [`Arg::multiple(true)`] or the usage
+    /// string equivalent.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg, AppSettings};
+    /// let m = App::new(&quot;myprog&quot;)
+    ///     .setting(AppSettings::TrailingVarArg)
+    ///     .arg(Arg::from_usage(&quot;&lt;cmd&gt;... &#39;commands to run&#39;&quot;))
+    ///     .get_matches_from(vec![&quot;myprog&quot;, &quot;arg1&quot;, &quot;-r&quot;, &quot;val1&quot;]);
+    ///
+    /// let trail: Vec&lt;&amp;str&gt; = m.values_of(&quot;cmd&quot;).unwrap().collect();
+    /// assert_eq!(trail, [&quot;arg1&quot;, &quot;-r&quot;, &quot;val1&quot;]);
+    /// ```
+    /// [`Arg::multiple(true)`]: ./struct.Arg.html#method.multiple
+    </span>TrailingVarArg,
 
-    <span class="doccomment">/// Groups flags and options together, presenting a more unified help message</span>
-    <span class="doccomment">/// (a la `getopts` or `docopt` style).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The default is that the auto-generated help message will group flags, and options</span>
-    <span class="doccomment">/// separately.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **NOTE:** This setting is cosmetic only and does not affect any functionality.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```no_run</span>
-    <span class="doccomment">/// # use clap::{App, Arg, SubCommand, AppSettings};</span>
-    <span class="doccomment">/// App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .setting(AppSettings::UnifiedHelpMessage)</span>
-    <span class="doccomment">///     .get_matches();</span>
-    <span class="doccomment">/// // running `myprog --help` will display a unified &quot;docopt&quot; or &quot;getopts&quot; style help message</span>
-    <span class="doccomment">/// ```</span>
-    <span class="ident">UnifiedHelpMessage</span>,
+    <span class="doccomment">/// Groups flags and options together, presenting a more unified help message
+    /// (a la `getopts` or `docopt` style).
+    ///
+    /// The default is that the auto-generated help message will group flags, and options
+    /// separately.
+    ///
+    /// **NOTE:** This setting is cosmetic only and does not affect any functionality.
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// # use clap::{App, Arg, SubCommand, AppSettings};
+    /// App::new(&quot;myprog&quot;)
+    ///     .setting(AppSettings::UnifiedHelpMessage)
+    ///     .get_matches();
+    /// // running `myprog --help` will display a unified &quot;docopt&quot; or &quot;getopts&quot; style help message
+    /// ```
+    </span>UnifiedHelpMessage,
 
-    <span class="doccomment">/// Disables `-V` and `--version` for all [`SubCommand`]s</span>
-    <span class="doccomment">/// (Defaults to `false`; subcommands *do* have version flags.)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **NOTE:** This setting must be set **prior** to adding any subcommands.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, SubCommand, AppSettings, ErrorKind};</span>
-    <span class="doccomment">/// let res = App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .version(&quot;v1.1&quot;)</span>
-    <span class="doccomment">///     .setting(AppSettings::VersionlessSubcommands)</span>
-    <span class="doccomment">///     .subcommand(SubCommand::with_name(&quot;test&quot;))</span>
-    <span class="doccomment">///     .get_matches_from_safe(vec![</span>
-    <span class="doccomment">///         &quot;myprog&quot;, &quot;test&quot;, &quot;-V&quot;</span>
-    <span class="doccomment">///     ]);</span>
-    <span class="doccomment">/// assert!(res.is_err());</span>
-    <span class="doccomment">/// assert_eq!(res.unwrap_err().kind, ErrorKind::UnknownArgument);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [`SubCommand`]: ./struct.SubCommand.html</span>
-    <span class="ident">VersionlessSubcommands</span>,
+    <span class="doccomment">/// Disables `-V` and `--version` for all [`SubCommand`]s
+    /// (Defaults to `false`; subcommands *do* have version flags.)
+    ///
+    /// **NOTE:** This setting must be set **prior** to adding any subcommands.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use clap::{App, SubCommand, AppSettings, ErrorKind};
+    /// let res = App::new(&quot;myprog&quot;)
+    ///     .version(&quot;v1.1&quot;)
+    ///     .setting(AppSettings::VersionlessSubcommands)
+    ///     .subcommand(SubCommand::with_name(&quot;test&quot;))
+    ///     .get_matches_from_safe(vec![
+    ///         &quot;myprog&quot;, &quot;test&quot;, &quot;-V&quot;
+    ///     ]);
+    /// assert!(res.is_err());
+    /// assert_eq!(res.unwrap_err().kind, ErrorKind::UnknownArgument);
+    /// ```
+    /// [`SubCommand`]: ./struct.SubCommand.html
+    </span>VersionlessSubcommands,
 
-    <span class="doccomment">/// Will display a message &quot;Press \[ENTER\]/\[RETURN\] to continue...&quot; and wait for user before</span>
-    <span class="doccomment">/// exiting</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This is most useful when writing an application which is run from a GUI shortcut, or on</span>
-    <span class="doccomment">/// Windows where a user tries to open the binary by double-clicking instead of using the</span>
-    <span class="doccomment">/// command line.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **NOTE:** This setting is **not** recursive with [`SubCommand`]s, meaning if you wish this</span>
-    <span class="doccomment">/// behavior for all subcommands, you must set this on each command (needing this is extremely</span>
-    <span class="doccomment">/// rare)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Examples</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust</span>
-    <span class="doccomment">/// # use clap::{App, Arg, AppSettings};</span>
-    <span class="doccomment">/// App::new(&quot;myprog&quot;)</span>
-    <span class="doccomment">///     .setting(AppSettings::WaitOnError)</span>
-    <span class="doccomment">/// # ;</span>
-    <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// [`SubCommand`]: ./struct.SubCommand.html</span>
-    <span class="ident">WaitOnError</span>,
+    <span class="doccomment">/// Will display a message &quot;Press \[ENTER\]/\[RETURN\] to continue...&quot; and wait for user before
+    /// exiting
+    ///
+    /// This is most useful when writing an application which is run from a GUI shortcut, or on
+    /// Windows where a user tries to open the binary by double-clicking instead of using the
+    /// command line.
+    ///
+    /// **NOTE:** This setting is **not** recursive with [`SubCommand`]s, meaning if you wish this
+    /// behavior for all subcommands, you must set this on each command (needing this is extremely
+    /// rare)
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # use clap::{App, Arg, AppSettings};
+    /// App::new(&quot;myprog&quot;)
+    ///     .setting(AppSettings::WaitOnError)
+    /// # ;
+    /// ```
+    /// [`SubCommand`]: ./struct.SubCommand.html
+    </span>WaitOnError,
 
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="ident">NeedsLongVersion</span>,
+    <span class="attribute">#[doc(hidden)]
+    </span>NeedsLongVersion,
 
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="ident">NeedsLongHelp</span>,
+    <span class="attribute">#[doc(hidden)]
+    </span>NeedsLongHelp,
 
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="ident">NeedsSubcommandHelp</span>,
+    <span class="attribute">#[doc(hidden)]
+    </span>NeedsSubcommandHelp,
 
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="ident">LowIndexMultiplePositional</span>,
+    <span class="attribute">#[doc(hidden)]
+    </span>LowIndexMultiplePositional,
 
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="ident">TrailingValues</span>,
+    <span class="attribute">#[doc(hidden)]
+    </span>TrailingValues,
 
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="ident">ValidNegNumFound</span>,
+    <span class="attribute">#[doc(hidden)]
+    </span>ValidNegNumFound,
 
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="ident">Propagated</span>,
+    <span class="attribute">#[doc(hidden)]
+    </span>Propagated,
 
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="ident">ValidArgFound</span>,
+    <span class="attribute">#[doc(hidden)]
+    </span>ValidArgFound,
 
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="ident">ContainsLast</span>,
+    <span class="attribute">#[doc(hidden)]
+    </span>ContainsLast,
 }
 
-<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">AppSettings</span> {
-    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">String</span>;
-    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">FromStr</span><span class="op">&gt;</span><span class="ident">::Err</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">s</span>.<span class="ident">to_ascii_lowercase</span>() {
-            <span class="string">&quot;disablehelpflags&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AppSettings::DisableHelpFlags</span>),
-            <span class="string">&quot;argrequiredelsehelp&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AppSettings::ArgRequiredElseHelp</span>),
-            <span class="string">&quot;argsnegatesubcommands&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AppSettings::ArgsNegateSubcommands</span>),
-            <span class="string">&quot;allowinvalidutf8&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AppSettings::AllowInvalidUtf8</span>),
-            <span class="string">&quot;allowleadinghyphen&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AppSettings::AllowLeadingHyphen</span>),
-            <span class="string">&quot;allowexternalsubcommands&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AppSettings::AllowExternalSubcommands</span>),
-            <span class="string">&quot;allownegativenumbers&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AppSettings::AllowNegativeNumbers</span>),
-            <span class="string">&quot;colorauto&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AppSettings::ColorAuto</span>),
-            <span class="string">&quot;coloralways&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AppSettings::ColorAlways</span>),
-            <span class="string">&quot;colornever&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AppSettings::ColorNever</span>),
-            <span class="string">&quot;coloredhelp&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AppSettings::ColoredHelp</span>),
-            <span class="string">&quot;derivedisplayorder&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AppSettings::DeriveDisplayOrder</span>),
-            <span class="string">&quot;dontcollapseargsinusage&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AppSettings::DontCollapseArgsInUsage</span>),
-            <span class="string">&quot;dontdelimittrailingvalues&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AppSettings::DontDelimitTrailingValues</span>),
-            <span class="string">&quot;disablehelpsubcommand&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AppSettings::DisableHelpSubcommand</span>),
-            <span class="string">&quot;disableversion&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AppSettings::DisableVersion</span>),
-            <span class="string">&quot;globalversion&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AppSettings::GlobalVersion</span>),
-            <span class="string">&quot;hidden&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AppSettings::Hidden</span>),
-            <span class="string">&quot;hidepossiblevaluesinhelp&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AppSettings::HidePossibleValuesInHelp</span>),
-            <span class="string">&quot;infersubcommands&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AppSettings::InferSubcommands</span>),
-            <span class="string">&quot;lowindexmultiplepositional&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AppSettings::LowIndexMultiplePositional</span>),
-            <span class="string">&quot;nobinaryname&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AppSettings::NoBinaryName</span>),
-            <span class="string">&quot;nextlinehelp&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AppSettings::NextLineHelp</span>),
-            <span class="string">&quot;strictutf8&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AppSettings::StrictUtf8</span>),
-            <span class="string">&quot;subcommandsnegatereqs&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AppSettings::SubcommandsNegateReqs</span>),
-            <span class="string">&quot;subcommandrequired&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AppSettings::SubcommandRequired</span>),
-            <span class="string">&quot;subcommandrequiredelsehelp&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AppSettings::SubcommandRequiredElseHelp</span>),
-            <span class="string">&quot;trailingvararg&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AppSettings::TrailingVarArg</span>),
-            <span class="string">&quot;unifiedhelpmessage&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AppSettings::UnifiedHelpMessage</span>),
-            <span class="string">&quot;versionlesssubcommands&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AppSettings::VersionlessSubcommands</span>),
-            <span class="string">&quot;waitonerror&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AppSettings::WaitOnError</span>),
-            <span class="string">&quot;validnegnumfound&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AppSettings::ValidNegNumFound</span>),
-            <span class="string">&quot;validargfound&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AppSettings::ValidArgFound</span>),
-            <span class="string">&quot;propagated&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AppSettings::Propagated</span>),
-            <span class="string">&quot;trailingvalues&quot;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="ident">AppSettings::TrailingValues</span>),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="string">&quot;unknown AppSetting, cannot convert from str&quot;</span>.<span class="ident">to_owned</span>()),
+<span class="kw">impl </span>FromStr <span class="kw">for </span>AppSettings {
+    <span class="kw">type </span><span class="prelude-val">Err </span>= String;
+    <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, &lt;<span class="self">Self </span><span class="kw">as </span>FromStr&gt;::Err&gt; {
+        <span class="kw">match </span><span class="kw-2">&amp;*</span>s.to_ascii_lowercase() {
+            <span class="string">&quot;disablehelpflags&quot; </span>=&gt; <span class="prelude-val">Ok</span>(AppSettings::DisableHelpFlags),
+            <span class="string">&quot;argrequiredelsehelp&quot; </span>=&gt; <span class="prelude-val">Ok</span>(AppSettings::ArgRequiredElseHelp),
+            <span class="string">&quot;argsnegatesubcommands&quot; </span>=&gt; <span class="prelude-val">Ok</span>(AppSettings::ArgsNegateSubcommands),
+            <span class="string">&quot;allowinvalidutf8&quot; </span>=&gt; <span class="prelude-val">Ok</span>(AppSettings::AllowInvalidUtf8),
+            <span class="string">&quot;allowleadinghyphen&quot; </span>=&gt; <span class="prelude-val">Ok</span>(AppSettings::AllowLeadingHyphen),
+            <span class="string">&quot;allowexternalsubcommands&quot; </span>=&gt; <span class="prelude-val">Ok</span>(AppSettings::AllowExternalSubcommands),
+            <span class="string">&quot;allownegativenumbers&quot; </span>=&gt; <span class="prelude-val">Ok</span>(AppSettings::AllowNegativeNumbers),
+            <span class="string">&quot;colorauto&quot; </span>=&gt; <span class="prelude-val">Ok</span>(AppSettings::ColorAuto),
+            <span class="string">&quot;coloralways&quot; </span>=&gt; <span class="prelude-val">Ok</span>(AppSettings::ColorAlways),
+            <span class="string">&quot;colornever&quot; </span>=&gt; <span class="prelude-val">Ok</span>(AppSettings::ColorNever),
+            <span class="string">&quot;coloredhelp&quot; </span>=&gt; <span class="prelude-val">Ok</span>(AppSettings::ColoredHelp),
+            <span class="string">&quot;derivedisplayorder&quot; </span>=&gt; <span class="prelude-val">Ok</span>(AppSettings::DeriveDisplayOrder),
+            <span class="string">&quot;dontcollapseargsinusage&quot; </span>=&gt; <span class="prelude-val">Ok</span>(AppSettings::DontCollapseArgsInUsage),
+            <span class="string">&quot;dontdelimittrailingvalues&quot; </span>=&gt; <span class="prelude-val">Ok</span>(AppSettings::DontDelimitTrailingValues),
+            <span class="string">&quot;disablehelpsubcommand&quot; </span>=&gt; <span class="prelude-val">Ok</span>(AppSettings::DisableHelpSubcommand),
+            <span class="string">&quot;disableversion&quot; </span>=&gt; <span class="prelude-val">Ok</span>(AppSettings::DisableVersion),
+            <span class="string">&quot;globalversion&quot; </span>=&gt; <span class="prelude-val">Ok</span>(AppSettings::GlobalVersion),
+            <span class="string">&quot;hidden&quot; </span>=&gt; <span class="prelude-val">Ok</span>(AppSettings::Hidden),
+            <span class="string">&quot;hidepossiblevaluesinhelp&quot; </span>=&gt; <span class="prelude-val">Ok</span>(AppSettings::HidePossibleValuesInHelp),
+            <span class="string">&quot;infersubcommands&quot; </span>=&gt; <span class="prelude-val">Ok</span>(AppSettings::InferSubcommands),
+            <span class="string">&quot;lowindexmultiplepositional&quot; </span>=&gt; <span class="prelude-val">Ok</span>(AppSettings::LowIndexMultiplePositional),
+            <span class="string">&quot;nobinaryname&quot; </span>=&gt; <span class="prelude-val">Ok</span>(AppSettings::NoBinaryName),
+            <span class="string">&quot;nextlinehelp&quot; </span>=&gt; <span class="prelude-val">Ok</span>(AppSettings::NextLineHelp),
+            <span class="string">&quot;strictutf8&quot; </span>=&gt; <span class="prelude-val">Ok</span>(AppSettings::StrictUtf8),
+            <span class="string">&quot;subcommandsnegatereqs&quot; </span>=&gt; <span class="prelude-val">Ok</span>(AppSettings::SubcommandsNegateReqs),
+            <span class="string">&quot;subcommandrequired&quot; </span>=&gt; <span class="prelude-val">Ok</span>(AppSettings::SubcommandRequired),
+            <span class="string">&quot;subcommandrequiredelsehelp&quot; </span>=&gt; <span class="prelude-val">Ok</span>(AppSettings::SubcommandRequiredElseHelp),
+            <span class="string">&quot;trailingvararg&quot; </span>=&gt; <span class="prelude-val">Ok</span>(AppSettings::TrailingVarArg),
+            <span class="string">&quot;unifiedhelpmessage&quot; </span>=&gt; <span class="prelude-val">Ok</span>(AppSettings::UnifiedHelpMessage),
+            <span class="string">&quot;versionlesssubcommands&quot; </span>=&gt; <span class="prelude-val">Ok</span>(AppSettings::VersionlessSubcommands),
+            <span class="string">&quot;waitonerror&quot; </span>=&gt; <span class="prelude-val">Ok</span>(AppSettings::WaitOnError),
+            <span class="string">&quot;validnegnumfound&quot; </span>=&gt; <span class="prelude-val">Ok</span>(AppSettings::ValidNegNumFound),
+            <span class="string">&quot;validargfound&quot; </span>=&gt; <span class="prelude-val">Ok</span>(AppSettings::ValidArgFound),
+            <span class="string">&quot;propagated&quot; </span>=&gt; <span class="prelude-val">Ok</span>(AppSettings::Propagated),
+            <span class="string">&quot;trailingvalues&quot; </span>=&gt; <span class="prelude-val">Ok</span>(AppSettings::TrailingValues),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(<span class="string">&quot;unknown AppSetting, cannot convert from str&quot;</span>.to_owned()),
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::AppSettings</span>;
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use </span><span class="kw">super</span>::AppSettings;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">app_settings_fromstr</span>() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>app_settings_fromstr() {
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;disablehelpflags&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">AppSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">AppSettings::DisableHelpFlags</span>
+            <span class="string">&quot;disablehelpflags&quot;</span>.parse::&lt;AppSettings&gt;().unwrap(),
+            AppSettings::DisableHelpFlags
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;argsnegatesubcommands&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">AppSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">AppSettings::ArgsNegateSubcommands</span>
+            <span class="string">&quot;argsnegatesubcommands&quot;</span>.parse::&lt;AppSettings&gt;().unwrap(),
+            AppSettings::ArgsNegateSubcommands
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;argrequiredelsehelp&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">AppSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">AppSettings::ArgRequiredElseHelp</span>
+            <span class="string">&quot;argrequiredelsehelp&quot;</span>.parse::&lt;AppSettings&gt;().unwrap(),
+            AppSettings::ArgRequiredElseHelp
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;allowexternalsubcommands&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">AppSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">AppSettings::AllowExternalSubcommands</span>
+            <span class="string">&quot;allowexternalsubcommands&quot;</span>.parse::&lt;AppSettings&gt;().unwrap(),
+            AppSettings::AllowExternalSubcommands
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;allowinvalidutf8&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">AppSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">AppSettings::AllowInvalidUtf8</span>
+            <span class="string">&quot;allowinvalidutf8&quot;</span>.parse::&lt;AppSettings&gt;().unwrap(),
+            AppSettings::AllowInvalidUtf8
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;allowleadinghyphen&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">AppSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">AppSettings::AllowLeadingHyphen</span>
+            <span class="string">&quot;allowleadinghyphen&quot;</span>.parse::&lt;AppSettings&gt;().unwrap(),
+            AppSettings::AllowLeadingHyphen
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;allownegativenumbers&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">AppSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">AppSettings::AllowNegativeNumbers</span>
+            <span class="string">&quot;allownegativenumbers&quot;</span>.parse::&lt;AppSettings&gt;().unwrap(),
+            AppSettings::AllowNegativeNumbers
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;coloredhelp&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">AppSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">AppSettings::ColoredHelp</span>
+            <span class="string">&quot;coloredhelp&quot;</span>.parse::&lt;AppSettings&gt;().unwrap(),
+            AppSettings::ColoredHelp
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;colorauto&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">AppSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">AppSettings::ColorAuto</span>
+            <span class="string">&quot;colorauto&quot;</span>.parse::&lt;AppSettings&gt;().unwrap(),
+            AppSettings::ColorAuto
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;coloralways&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">AppSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">AppSettings::ColorAlways</span>
+            <span class="string">&quot;coloralways&quot;</span>.parse::&lt;AppSettings&gt;().unwrap(),
+            AppSettings::ColorAlways
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;colornever&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">AppSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">AppSettings::ColorNever</span>
+            <span class="string">&quot;colornever&quot;</span>.parse::&lt;AppSettings&gt;().unwrap(),
+            AppSettings::ColorNever
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;disablehelpsubcommand&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">AppSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">AppSettings::DisableHelpSubcommand</span>
+            <span class="string">&quot;disablehelpsubcommand&quot;</span>.parse::&lt;AppSettings&gt;().unwrap(),
+            AppSettings::DisableHelpSubcommand
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;disableversion&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">AppSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">AppSettings::DisableVersion</span>
+            <span class="string">&quot;disableversion&quot;</span>.parse::&lt;AppSettings&gt;().unwrap(),
+            AppSettings::DisableVersion
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;dontcollapseargsinusage&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">AppSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">AppSettings::DontCollapseArgsInUsage</span>
+            <span class="string">&quot;dontcollapseargsinusage&quot;</span>.parse::&lt;AppSettings&gt;().unwrap(),
+            AppSettings::DontCollapseArgsInUsage
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;dontdelimittrailingvalues&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">AppSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">AppSettings::DontDelimitTrailingValues</span>
+            <span class="string">&quot;dontdelimittrailingvalues&quot;</span>.parse::&lt;AppSettings&gt;().unwrap(),
+            AppSettings::DontDelimitTrailingValues
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;derivedisplayorder&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">AppSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">AppSettings::DeriveDisplayOrder</span>
+            <span class="string">&quot;derivedisplayorder&quot;</span>.parse::&lt;AppSettings&gt;().unwrap(),
+            AppSettings::DeriveDisplayOrder
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;globalversion&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">AppSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">AppSettings::GlobalVersion</span>
+            <span class="string">&quot;globalversion&quot;</span>.parse::&lt;AppSettings&gt;().unwrap(),
+            AppSettings::GlobalVersion
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;hidden&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">AppSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">AppSettings::Hidden</span>
+            <span class="string">&quot;hidden&quot;</span>.parse::&lt;AppSettings&gt;().unwrap(),
+            AppSettings::Hidden
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;hidepossiblevaluesinhelp&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">AppSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">AppSettings::HidePossibleValuesInHelp</span>
+            <span class="string">&quot;hidepossiblevaluesinhelp&quot;</span>.parse::&lt;AppSettings&gt;().unwrap(),
+            AppSettings::HidePossibleValuesInHelp
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;lowindexmultiplePositional&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">AppSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">AppSettings::LowIndexMultiplePositional</span>
+            <span class="string">&quot;lowindexmultiplePositional&quot;</span>.parse::&lt;AppSettings&gt;().unwrap(),
+            AppSettings::LowIndexMultiplePositional
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;nobinaryname&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">AppSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">AppSettings::NoBinaryName</span>
+            <span class="string">&quot;nobinaryname&quot;</span>.parse::&lt;AppSettings&gt;().unwrap(),
+            AppSettings::NoBinaryName
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;nextlinehelp&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">AppSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">AppSettings::NextLineHelp</span>
+            <span class="string">&quot;nextlinehelp&quot;</span>.parse::&lt;AppSettings&gt;().unwrap(),
+            AppSettings::NextLineHelp
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;subcommandsnegatereqs&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">AppSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">AppSettings::SubcommandsNegateReqs</span>
+            <span class="string">&quot;subcommandsnegatereqs&quot;</span>.parse::&lt;AppSettings&gt;().unwrap(),
+            AppSettings::SubcommandsNegateReqs
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;subcommandrequired&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">AppSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">AppSettings::SubcommandRequired</span>
+            <span class="string">&quot;subcommandrequired&quot;</span>.parse::&lt;AppSettings&gt;().unwrap(),
+            AppSettings::SubcommandRequired
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;subcommandrequiredelsehelp&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">AppSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">AppSettings::SubcommandRequiredElseHelp</span>
+            <span class="string">&quot;subcommandrequiredelsehelp&quot;</span>.parse::&lt;AppSettings&gt;().unwrap(),
+            AppSettings::SubcommandRequiredElseHelp
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;strictutf8&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">AppSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">AppSettings::StrictUtf8</span>
+            <span class="string">&quot;strictutf8&quot;</span>.parse::&lt;AppSettings&gt;().unwrap(),
+            AppSettings::StrictUtf8
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;trailingvararg&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">AppSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">AppSettings::TrailingVarArg</span>
+            <span class="string">&quot;trailingvararg&quot;</span>.parse::&lt;AppSettings&gt;().unwrap(),
+            AppSettings::TrailingVarArg
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;unifiedhelpmessage&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">AppSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">AppSettings::UnifiedHelpMessage</span>
+            <span class="string">&quot;unifiedhelpmessage&quot;</span>.parse::&lt;AppSettings&gt;().unwrap(),
+            AppSettings::UnifiedHelpMessage
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;versionlesssubcommands&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">AppSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">AppSettings::VersionlessSubcommands</span>
+            <span class="string">&quot;versionlesssubcommands&quot;</span>.parse::&lt;AppSettings&gt;().unwrap(),
+            AppSettings::VersionlessSubcommands
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;waitonerror&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">AppSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">AppSettings::WaitOnError</span>
+            <span class="string">&quot;waitonerror&quot;</span>.parse::&lt;AppSettings&gt;().unwrap(),
+            AppSettings::WaitOnError
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;validnegnumfound&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">AppSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">AppSettings::ValidNegNumFound</span>
+            <span class="string">&quot;validnegnumfound&quot;</span>.parse::&lt;AppSettings&gt;().unwrap(),
+            AppSettings::ValidNegNumFound
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;validargfound&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">AppSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">AppSettings::ValidArgFound</span>
+            <span class="string">&quot;validargfound&quot;</span>.parse::&lt;AppSettings&gt;().unwrap(),
+            AppSettings::ValidArgFound
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;propagated&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">AppSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">AppSettings::Propagated</span>
+            <span class="string">&quot;propagated&quot;</span>.parse::&lt;AppSettings&gt;().unwrap(),
+            AppSettings::Propagated
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;trailingvalues&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">AppSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">AppSettings::TrailingValues</span>
+            <span class="string">&quot;trailingvalues&quot;</span>.parse::&lt;AppSettings&gt;().unwrap(),
+            AppSettings::TrailingValues
         );
         <span class="macro">assert_eq!</span>(
-            <span class="string">&quot;infersubcommands&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">AppSettings</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(),
-            <span class="ident">AppSettings::InferSubcommands</span>
+            <span class="string">&quot;infersubcommands&quot;</span>.parse::&lt;AppSettings&gt;().unwrap(),
+            AppSettings::InferSubcommands
         );
-        <span class="macro">assert!</span>(<span class="string">&quot;hahahaha&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">AppSettings</span><span class="op">&gt;</span>().<span class="ident">is_err</span>());
+        <span class="macro">assert!</span>(<span class="string">&quot;hahahaha&quot;</span>.parse::&lt;AppSettings&gt;().is_err());
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="clap" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="clap" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

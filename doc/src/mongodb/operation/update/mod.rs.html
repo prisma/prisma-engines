@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/operation/update/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mongodb/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/mongodb-2.3.0/src/operation/update/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../mongodb/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../mongodb/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -163,170 +163,170 @@
 <span id="163">163</span>
 <span id="164">164</span>
 <span id="165">165</span>
-</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span>;
+</pre><pre class="rust"><code><span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test;
 
-<span class="kw">use</span> <span class="ident">serde::Deserialize</span>;
+<span class="kw">use </span>serde::Deserialize;
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">bson</span>::{<span class="ident">doc</span>, <span class="ident">Bson</span>, <span class="ident">Document</span>},
-    <span class="ident">bson_util</span>,
-    <span class="ident">cmap</span>::{<span class="ident">Command</span>, <span class="ident">RawCommandResponse</span>, <span class="ident">StreamDescription</span>},
-    <span class="ident">error</span>::{<span class="ident">convert_bulk_errors</span>, <span class="prelude-ty">Result</span>},
-    <span class="ident">operation</span>::{<span class="ident">Operation</span>, <span class="ident">Retryability</span>, <span class="ident">WriteResponseBody</span>},
-    <span class="ident">options</span>::{<span class="ident">UpdateModifications</span>, <span class="ident">UpdateOptions</span>, <span class="ident">WriteConcern</span>},
-    <span class="ident">results::UpdateResult</span>,
-    <span class="ident">Namespace</span>,
+<span class="kw">use crate</span>::{
+    bson::{doc, Bson, Document},
+    bson_util,
+    cmap::{Command, RawCommandResponse, StreamDescription},
+    error::{convert_bulk_errors, <span class="prelude-ty">Result</span>},
+    operation::{Operation, Retryability, WriteResponseBody},
+    options::{UpdateModifications, UpdateOptions, WriteConcern},
+    results::UpdateResult,
+    Namespace,
 };
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Update</span> {
-    <span class="ident">ns</span>: <span class="ident">Namespace</span>,
-    <span class="ident">filter</span>: <span class="ident">Document</span>,
-    <span class="ident">update</span>: <span class="ident">UpdateModifications</span>,
-    <span class="ident">multi</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="ident">options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UpdateOptions</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>Update {
+    ns: Namespace,
+    filter: Document,
+    update: UpdateModifications,
+    multi: <span class="prelude-ty">Option</span>&lt;bool&gt;,
+    options: <span class="prelude-ty">Option</span>&lt;UpdateOptions&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">Update</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">empty</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident">Update::new</span>(
-            <span class="ident">Namespace</span> {
-                <span class="ident">db</span>: <span class="ident">String::new</span>(),
-                <span class="ident">coll</span>: <span class="ident">String::new</span>(),
+<span class="kw">impl </span>Update {
+    <span class="attribute">#[cfg(test)]
+    </span><span class="kw">fn </span>empty() -&gt; <span class="self">Self </span>{
+        Update::new(
+            Namespace {
+                db: String::new(),
+                coll: String::new(),
             },
-            <span class="ident">Document::new</span>(),
-            <span class="ident">UpdateModifications::Document</span>(<span class="ident">Document::new</span>()),
+            Document::new(),
+            UpdateModifications::Document(Document::new()),
             <span class="bool-val">false</span>,
             <span class="prelude-val">None</span>,
         )
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(
-        <span class="ident">ns</span>: <span class="ident">Namespace</span>,
-        <span class="ident">filter</span>: <span class="ident">Document</span>,
-        <span class="ident">update</span>: <span class="ident">UpdateModifications</span>,
-        <span class="ident">multi</span>: <span class="ident">bool</span>,
-        <span class="ident">options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UpdateOptions</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">ns</span>,
-            <span class="ident">filter</span>,
-            <span class="ident">update</span>,
-            <span class="ident">multi</span>: <span class="kw">if</span> <span class="ident">multi</span> { <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) } <span class="kw">else</span> { <span class="prelude-val">None</span> },
-            <span class="ident">options</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(
+        ns: Namespace,
+        filter: Document,
+        update: UpdateModifications,
+        multi: bool,
+        options: <span class="prelude-ty">Option</span>&lt;UpdateOptions&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            ns,
+            filter,
+            update,
+            multi: <span class="kw">if </span>multi { <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) } <span class="kw">else </span>{ <span class="prelude-val">None </span>},
+            options,
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Operation</span> <span class="kw">for</span> <span class="ident">Update</span> {
-    <span class="kw">type</span> <span class="ident">O</span> <span class="op">=</span> <span class="ident">UpdateResult</span>;
-    <span class="kw">type</span> <span class="ident">Command</span> <span class="op">=</span> <span class="ident">Document</span>;
+<span class="kw">impl </span>Operation <span class="kw">for </span>Update {
+    <span class="kw">type </span>O = UpdateResult;
+    <span class="kw">type </span>Command = Document;
 
-    <span class="kw">const</span> <span class="ident">NAME</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;update&quot;</span>;
+    <span class="kw">const </span>NAME: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;update&quot;</span>;
 
-    <span class="kw">fn</span> <span class="ident">build</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">_description</span>: <span class="kw-2">&amp;</span><span class="ident">StreamDescription</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Command</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">body</span> <span class="op">=</span> <span class="macro">doc!</span> {
-            <span class="ident"><span class="self">Self</span>::NAME</span>: <span class="self">self</span>.<span class="ident">ns</span>.<span class="ident">coll</span>.<span class="ident">clone</span>(),
+    <span class="kw">fn </span>build(<span class="kw-2">&amp;mut </span><span class="self">self</span>, _description: <span class="kw-2">&amp;</span>StreamDescription) -&gt; <span class="prelude-ty">Result</span>&lt;Command&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>body = <span class="macro">doc! </span>{
+            <span class="self">Self</span>::NAME: <span class="self">self</span>.ns.coll.clone(),
         };
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">update</span> <span class="op">=</span> <span class="macro">doc!</span> {
-            <span class="string">&quot;q&quot;</span>: <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">clone</span>(),
-            <span class="string">&quot;u&quot;</span>: <span class="self">self</span>.<span class="ident">update</span>.<span class="ident">to_bson</span>(),
+        <span class="kw">let </span><span class="kw-2">mut </span>update = <span class="macro">doc! </span>{
+            <span class="string">&quot;q&quot;</span>: <span class="self">self</span>.filter.clone(),
+            <span class="string">&quot;u&quot;</span>: <span class="self">self</span>.update.to_bson(),
         };
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">options</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">options</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">upsert</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">upsert</span> {
-                <span class="ident">update</span>.<span class="ident">insert</span>(<span class="string">&quot;upsert&quot;</span>, <span class="ident">upsert</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>options) = <span class="self">self</span>.options {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(upsert) = options.upsert {
+                update.insert(<span class="string">&quot;upsert&quot;</span>, upsert);
             }
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">array_filters</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">array_filters</span> {
-                <span class="ident">update</span>.<span class="ident">insert</span>(<span class="string">&quot;arrayFilters&quot;</span>, <span class="ident">bson_util::to_bson_array</span>(<span class="ident">array_filters</span>));
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>array_filters) = options.array_filters {
+                update.insert(<span class="string">&quot;arrayFilters&quot;</span>, bson_util::to_bson_array(array_filters));
             }
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">hint</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">hint</span> {
-                <span class="ident">update</span>.<span class="ident">insert</span>(<span class="string">&quot;hint&quot;</span>, <span class="ident">hint</span>.<span class="ident">to_bson</span>());
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>hint) = options.hint {
+                update.insert(<span class="string">&quot;hint&quot;</span>, hint.to_bson());
             }
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">collation</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">collation</span> {
-                <span class="ident">update</span>.<span class="ident">insert</span>(<span class="string">&quot;collation&quot;</span>, <span class="ident">bson::to_bson</span>(<span class="ident">collation</span>)<span class="question-mark">?</span>);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>collation) = options.collation {
+                update.insert(<span class="string">&quot;collation&quot;</span>, bson::to_bson(collation)<span class="question-mark">?</span>);
             }
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">bypass_doc_validation</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">bypass_document_validation</span> {
-                <span class="ident">body</span>.<span class="ident">insert</span>(<span class="string">&quot;bypassDocumentValidation&quot;</span>, <span class="ident">bypass_doc_validation</span>);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(bypass_doc_validation) = options.bypass_document_validation {
+                body.insert(<span class="string">&quot;bypassDocumentValidation&quot;</span>, bypass_doc_validation);
             }
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">write_concern</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">write_concern</span> {
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">write_concern</span>.<span class="ident">is_empty</span>() {
-                    <span class="ident">body</span>.<span class="ident">insert</span>(<span class="string">&quot;writeConcern&quot;</span>, <span class="ident">bson::to_bson</span>(<span class="ident">write_concern</span>)<span class="question-mark">?</span>);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>write_concern) = options.write_concern {
+                <span class="kw">if </span>!write_concern.is_empty() {
+                    body.insert(<span class="string">&quot;writeConcern&quot;</span>, bson::to_bson(write_concern)<span class="question-mark">?</span>);
                 }
             }
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">let_vars</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">let_vars</span> {
-                <span class="ident">body</span>.<span class="ident">insert</span>(<span class="string">&quot;let&quot;</span>, <span class="ident">let_vars</span>);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>let_vars) = options.let_vars {
+                body.insert(<span class="string">&quot;let&quot;</span>, let_vars);
             }
         };
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">multi</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">multi</span> {
-            <span class="ident">update</span>.<span class="ident">insert</span>(<span class="string">&quot;multi&quot;</span>, <span class="ident">multi</span>);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(multi) = <span class="self">self</span>.multi {
+            update.insert(<span class="string">&quot;multi&quot;</span>, multi);
         }
 
-        <span class="ident">body</span>.<span class="ident">insert</span>(<span class="string">&quot;updates&quot;</span>, <span class="macro">vec!</span>[<span class="ident">Bson::Document</span>(<span class="ident">update</span>)]);
-        <span class="ident">body</span>.<span class="ident">insert</span>(<span class="string">&quot;ordered&quot;</span>, <span class="bool-val">true</span>); <span class="comment">// command monitoring tests expect this (SPEC-1130)</span>
+        body.insert(<span class="string">&quot;updates&quot;</span>, <span class="macro">vec!</span>[Bson::Document(update)]);
+        body.insert(<span class="string">&quot;ordered&quot;</span>, <span class="bool-val">true</span>); <span class="comment">// command monitoring tests expect this (SPEC-1130)
 
-        <span class="prelude-val">Ok</span>(<span class="ident">Command::new</span>(
-            <span class="ident"><span class="self">Self</span>::NAME</span>.<span class="ident">to_string</span>(),
-            <span class="self">self</span>.<span class="ident">ns</span>.<span class="ident">db</span>.<span class="ident">clone</span>(),
-            <span class="ident">body</span>,
+        </span><span class="prelude-val">Ok</span>(Command::new(
+            <span class="self">Self</span>::NAME.to_string(),
+            <span class="self">self</span>.ns.db.clone(),
+            body,
         ))
     }
 
-    <span class="kw">fn</span> <span class="ident">handle_response</span>(
+    <span class="kw">fn </span>handle_response(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">raw_response</span>: <span class="ident">RawCommandResponse</span>,
-        <span class="ident">_description</span>: <span class="kw-2">&amp;</span><span class="ident">StreamDescription</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::O</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">response</span>: <span class="ident">WriteResponseBody</span><span class="op">&lt;</span><span class="ident">UpdateBody</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">raw_response</span>.<span class="ident">body_utf8_lossy</span>()<span class="question-mark">?</span>;
-        <span class="ident">response</span>.<span class="ident">validate</span>().<span class="ident">map_err</span>(<span class="ident">convert_bulk_errors</span>)<span class="question-mark">?</span>;
+        raw_response: RawCommandResponse,
+        _description: <span class="kw-2">&amp;</span>StreamDescription,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::O&gt; {
+        <span class="kw">let </span>response: WriteResponseBody&lt;UpdateBody&gt; = raw_response.body_utf8_lossy()<span class="question-mark">?</span>;
+        response.validate().map_err(convert_bulk_errors)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">modified_count</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">n_modified</span>;
-        <span class="kw">let</span> <span class="ident">upserted_id</span> <span class="op">=</span> <span class="ident">response</span>
-            .<span class="ident">upserted</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">first</span>())
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">doc</span><span class="op">|</span> <span class="ident">doc</span>.<span class="ident">get</span>(<span class="string">&quot;_id&quot;</span>))
-            .<span class="ident">map</span>(<span class="ident">Clone::clone</span>);
+        <span class="kw">let </span>modified_count = response.n_modified;
+        <span class="kw">let </span>upserted_id = response
+            .upserted
+            .as_ref()
+            .and_then(|v| v.first())
+            .and_then(|doc| doc.get(<span class="string">&quot;_id&quot;</span>))
+            .map(Clone::clone);
 
-        <span class="kw">let</span> <span class="ident">matched_count</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">upserted_id</span>.<span class="ident">is_some</span>() { <span class="number">0</span> } <span class="kw">else</span> { <span class="ident">response</span>.<span class="ident">n</span> };
+        <span class="kw">let </span>matched_count = <span class="kw">if </span>upserted_id.is_some() { <span class="number">0 </span>} <span class="kw">else </span>{ response.n };
 
-        <span class="prelude-val">Ok</span>(<span class="ident">UpdateResult</span> {
-            <span class="ident">matched_count</span>,
-            <span class="ident">modified_count</span>,
-            <span class="ident">upserted_id</span>,
+        <span class="prelude-val">Ok</span>(UpdateResult {
+            matched_count,
+            modified_count,
+            upserted_id,
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">write_concern</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">WriteConcern</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">options</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">opts</span><span class="op">|</span> <span class="ident">opts</span>.<span class="ident">write_concern</span>.<span class="ident">as_ref</span>())
+    <span class="kw">fn </span>write_concern(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>WriteConcern&gt; {
+        <span class="self">self</span>.options
+            .as_ref()
+            .and_then(|opts| opts.write_concern.as_ref())
     }
 
-    <span class="kw">fn</span> <span class="ident">retryability</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Retryability</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">multi</span> <span class="op">!</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) {
-            <span class="ident">Retryability::Write</span>
-        } <span class="kw">else</span> {
-            <span class="ident">Retryability::None</span>
+    <span class="kw">fn </span>retryability(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Retryability {
+        <span class="kw">if </span><span class="self">self</span>.multi != <span class="prelude-val">Some</span>(<span class="bool-val">true</span>) {
+            Retryability::Write
+        } <span class="kw">else </span>{
+            Retryability::None
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">UpdateBody</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;nModified&quot;</span>)]</span>
-    <span class="ident">n_modified</span>: <span class="ident">u64</span>,
-    <span class="ident">upserted</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Document</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Deserialize)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>UpdateBody {
+    <span class="attribute">#[serde(rename = <span class="string">&quot;nModified&quot;</span>)]
+    </span>n_modified: u64,
+    upserted: <span class="prelude-ty">Option</span>&lt;Vec&lt;Document&gt;&gt;,
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="mongodb" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

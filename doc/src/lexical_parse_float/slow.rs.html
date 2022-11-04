@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-parse-float-0.8.5/src/slow.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>slow.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_parse_float/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_parse_float/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_parse_float/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-parse-float-0.8.5/src/slow.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>slow.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_parse_float/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_parse_float/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_parse_float/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -757,275 +757,275 @@
 <span id="757">757</span>
 <span id="758">758</span>
 <span id="759">759</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Slow, fallback cases where we cannot unambiguously round a float.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This occurs when we cannot determine the exact representation using</span>
-<span class="doccomment">//! both the fast path (native) cases nor the Lemire/Bellerophon algorithms,</span>
-<span class="doccomment">//! and therefore must fallback to a slow, arbitrary-precision representation.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Slow, fallback cases where we cannot unambiguously round a float.
+//!
+//! This occurs when we cannot determine the exact representation using
+//! both the fast path (native) cases nor the Lemire/Bellerophon algorithms,
+//! and therefore must fallback to a slow, arbitrary-precision representation.
 
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+</span><span class="attribute">#![doc(hidden)]
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::bigint::Bigfloat</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::bigint</span>::{<span class="ident">Bigint</span>, <span class="ident">Limb</span>, <span class="ident">LIMB_BITS</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::float</span>::{<span class="ident">extended_to_float</span>, <span class="ident">ExtendedFloat80</span>, <span class="ident">RawFloat</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::limits</span>::{<span class="ident">u32_power_limit</span>, <span class="ident">u64_power_limit</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::number::Number</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::shared</span>;
-<span class="kw">use</span> <span class="ident">core::cmp</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>))]</span>
-<span class="kw">use</span> <span class="ident">lexical_parse_integer::algorithm</span>;
-<span class="kw">use</span> <span class="ident">lexical_util::digit::char_to_valid_digit_const</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">lexical_util::digit::digit_to_char_const</span>;
-<span class="kw">use</span> <span class="ident">lexical_util::format::NumberFormat</span>;
-<span class="kw">use</span> <span class="ident">lexical_util::iterator</span>::{<span class="ident">AsBytes</span>, <span class="ident">BytesIter</span>};
-<span class="kw">use</span> <span class="ident">lexical_util::num</span>::{<span class="ident">AsPrimitive</span>, <span class="ident">Integer</span>};
+#[cfg(feature = <span class="string">&quot;radix&quot;</span>)]
+</span><span class="kw">use </span><span class="kw">crate</span>::bigint::Bigfloat;
+<span class="kw">use </span><span class="kw">crate</span>::bigint::{Bigint, Limb, LIMB_BITS};
+<span class="kw">use </span><span class="kw">crate</span>::float::{extended_to_float, ExtendedFloat80, RawFloat};
+<span class="kw">use </span><span class="kw">crate</span>::limits::{u32_power_limit, u64_power_limit};
+<span class="kw">use </span><span class="kw">crate</span>::number::Number;
+<span class="kw">use </span><span class="kw">crate</span>::shared;
+<span class="kw">use </span>core::cmp;
+<span class="attribute">#[cfg(not(feature = <span class="string">&quot;compact&quot;</span>))]
+</span><span class="kw">use </span>lexical_parse_integer::algorithm;
+<span class="kw">use </span>lexical_util::digit::char_to_valid_digit_const;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;radix&quot;</span>)]
+</span><span class="kw">use </span>lexical_util::digit::digit_to_char_const;
+<span class="kw">use </span>lexical_util::format::NumberFormat;
+<span class="kw">use </span>lexical_util::iterator::{AsBytes, BytesIter};
+<span class="kw">use </span>lexical_util::num::{AsPrimitive, Integer};
 
-<span class="comment">// ALGORITHM</span>
-<span class="comment">// ---------</span>
+<span class="comment">// ALGORITHM
+// ---------
 
-<span class="doccomment">/// Parse the significant digits and biased, binary exponent of a float.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is a fallback algorithm that uses a big-integer representation</span>
-<span class="doccomment">/// of the float, and therefore is considerably slower than faster</span>
-<span class="doccomment">/// approximations. However, it will always determine how to round</span>
-<span class="doccomment">/// the significant digits to the nearest machine float, allowing</span>
-<span class="doccomment">/// use to handle near half-way cases.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Near half-way cases are halfway between two consecutive machine floats.</span>
-<span class="doccomment">/// For example, the float `16777217.0` has a bitwise representation of</span>
-<span class="doccomment">/// `100000000000000000000000 1`. Rounding to a single-precision float,</span>
-<span class="doccomment">/// the trailing `1` is truncated. Using round-nearest, tie-even, any</span>
-<span class="doccomment">/// value above `16777217.0` must be rounded up to `16777218.0`, while</span>
-<span class="doccomment">/// any value before or equal to `16777217.0` must be rounded down</span>
-<span class="doccomment">/// to `16777216.0`. These near-halfway conversions therefore may require</span>
-<span class="doccomment">/// a large number of digits to unambiguously determine how to round.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">slow_radix</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">RawFloat</span>, <span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
-    <span class="ident">num</span>: <span class="ident">Number</span>,
-    <span class="ident">fp</span>: <span class="ident">ExtendedFloat80</span>,
-) -&gt; <span class="ident">ExtendedFloat80</span> {
-    <span class="comment">// Ensure our preconditions are valid:</span>
-    <span class="comment">//  1. The significant digits are not shifted into place.</span>
-    <span class="macro">debug_assert!</span>(<span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">&amp;</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">63</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>);
+</span><span class="doccomment">/// Parse the significant digits and biased, binary exponent of a float.
+///
+/// This is a fallback algorithm that uses a big-integer representation
+/// of the float, and therefore is considerably slower than faster
+/// approximations. However, it will always determine how to round
+/// the significant digits to the nearest machine float, allowing
+/// use to handle near half-way cases.
+///
+/// Near half-way cases are halfway between two consecutive machine floats.
+/// For example, the float `16777217.0` has a bitwise representation of
+/// `100000000000000000000000 1`. Rounding to a single-precision float,
+/// the trailing `1` is truncated. Using round-nearest, tie-even, any
+/// value above `16777217.0` must be rounded up to `16777218.0`, while
+/// any value before or equal to `16777217.0` must be rounded down
+/// to `16777216.0`. These near-halfway conversions therefore may require
+/// a large number of digits to unambiguously determine how to round.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>slow_radix&lt;F: RawFloat, <span class="kw">const </span>FORMAT: u128&gt;(
+    num: Number,
+    fp: ExtendedFloat80,
+) -&gt; ExtendedFloat80 {
+    <span class="comment">// Ensure our preconditions are valid:
+    //  1. The significant digits are not shifted into place.
+    </span><span class="macro">debug_assert!</span>(fp.mant &amp; (<span class="number">1 </span>&lt;&lt; <span class="number">63</span>) != <span class="number">0</span>);
 
-    <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span> {};
+    <span class="kw">let </span>format = NumberFormat::&lt;{ FORMAT }&gt; {};
 
-    <span class="comment">// This assumes the sign bit has already been parsed, and we&#39;re</span>
-    <span class="comment">// starting with the integer digits, and the float format has been</span>
-    <span class="comment">// correctly validated.</span>
-    <span class="kw">let</span> <span class="ident">sci_exp</span> <span class="op">=</span> <span class="ident">scientific_exponent</span>::<span class="op">&lt;</span><span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">num</span>);
+    <span class="comment">// This assumes the sign bit has already been parsed, and we&#39;re
+    // starting with the integer digits, and the float format has been
+    // correctly validated.
+    </span><span class="kw">let </span>sci_exp = scientific_exponent::&lt;FORMAT&gt;(<span class="kw-2">&amp;</span>num);
 
-    <span class="comment">// We have 3 major algorithms we use for this:</span>
-    <span class="comment">//  1. An algorithm with a finite number of digits and a positive exponent.</span>
-    <span class="comment">//  2. An algorithm with a finite number of digits and a negative exponent.</span>
-    <span class="comment">//  3. A fallback algorithm with a non-finite number of digits.</span>
+    <span class="comment">// We have 3 major algorithms we use for this:
+    //  1. An algorithm with a finite number of digits and a positive exponent.
+    //  2. An algorithm with a finite number of digits and a negative exponent.
+    //  3. A fallback algorithm with a non-finite number of digits.
 
-    <span class="comment">// In order for a float in radix `b` with a finite number of digits</span>
-    <span class="comment">// to have a finite representation in radix `y`, `b` should divide</span>
-    <span class="comment">// an integer power of `y`. This means for binary, all even radixes</span>
-    <span class="comment">// have finite representations, and all odd ones do not.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>)]</span>
-    {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">max_digits</span>) <span class="op">=</span> <span class="ident">F::max_digits</span>(<span class="ident">format</span>.<span class="ident">radix</span>()) {
-            <span class="comment">// Can use our finite number of digit algorithm.</span>
-            <span class="ident">digit_comp</span>::<span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">num</span>, <span class="ident">fp</span>, <span class="ident">sci_exp</span>, <span class="ident">max_digits</span>)
-        } <span class="kw">else</span> {
-            <span class="comment">// Fallback to infinite digits.</span>
-            <span class="ident">byte_comp</span>::<span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">num</span>, <span class="ident">fp</span>, <span class="ident">sci_exp</span>)
+    // In order for a float in radix `b` with a finite number of digits
+    // to have a finite representation in radix `y`, `b` should divide
+    // an integer power of `y`. This means for binary, all even radixes
+    // have finite representations, and all odd ones do not.
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;radix&quot;</span>)]
+    </span>{
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(max_digits) = F::max_digits(format.radix()) {
+            <span class="comment">// Can use our finite number of digit algorithm.
+            </span>digit_comp::&lt;F, FORMAT&gt;(num, fp, sci_exp, max_digits)
+        } <span class="kw">else </span>{
+            <span class="comment">// Fallback to infinite digits.
+            </span>byte_comp::&lt;F, FORMAT&gt;(num, fp, sci_exp)
         }
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>))]</span>
-    {
-        <span class="comment">// Can use our finite number of digit algorithm.</span>
-        <span class="kw">let</span> <span class="ident">max_digits</span> <span class="op">=</span> <span class="ident">F::max_digits</span>(<span class="ident">format</span>.<span class="ident">radix</span>()).<span class="ident">unwrap</span>();
-        <span class="ident">digit_comp</span>::<span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">num</span>, <span class="ident">fp</span>, <span class="ident">sci_exp</span>, <span class="ident">max_digits</span>)
+    <span class="attribute">#[cfg(not(feature = <span class="string">&quot;radix&quot;</span>))]
+    </span>{
+        <span class="comment">// Can use our finite number of digit algorithm.
+        </span><span class="kw">let </span>max_digits = F::max_digits(format.radix()).unwrap();
+        digit_comp::&lt;F, FORMAT&gt;(num, fp, sci_exp, max_digits)
     }
 }
 
-<span class="doccomment">/// Algorithm that generates the mantissa for a finite representation.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For a positive exponent relative to the significant digits, this</span>
-<span class="doccomment">/// is just a multiplication by an exponent power. For a negative</span>
-<span class="doccomment">/// exponent relative to the significant digits, we scale the real</span>
-<span class="doccomment">/// digits to the theoretical digits for `b` and determine if we</span>
-<span class="doccomment">/// need to round-up.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">digit_comp</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">RawFloat</span>, <span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
-    <span class="ident">num</span>: <span class="ident">Number</span>,
-    <span class="ident">fp</span>: <span class="ident">ExtendedFloat80</span>,
-    <span class="ident">sci_exp</span>: <span class="ident">i32</span>,
-    <span class="ident">max_digits</span>: <span class="ident">usize</span>,
-) -&gt; <span class="ident">ExtendedFloat80</span> {
-    <span class="kw">let</span> (<span class="ident">bigmant</span>, <span class="ident">digits</span>) <span class="op">=</span> <span class="ident">parse_mantissa</span>::<span class="op">&lt;</span><span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">num</span>, <span class="ident">max_digits</span>);
-    <span class="comment">// This can&#39;t underflow, since `digits` is at most `max_digits`.</span>
-    <span class="kw">let</span> <span class="ident">exponent</span> <span class="op">=</span> <span class="ident">sci_exp</span> <span class="op">+</span> <span class="number">1</span> <span class="op">-</span> <span class="ident">digits</span> <span class="kw">as</span> <span class="ident">i32</span>;
-    <span class="kw">if</span> <span class="ident">exponent</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> {
-        <span class="ident">positive_digit_comp</span>::<span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">bigmant</span>, <span class="ident">exponent</span>)
-    } <span class="kw">else</span> {
-        <span class="ident">negative_digit_comp</span>::<span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">bigmant</span>, <span class="ident">fp</span>, <span class="ident">exponent</span>)
+<span class="doccomment">/// Algorithm that generates the mantissa for a finite representation.
+///
+/// For a positive exponent relative to the significant digits, this
+/// is just a multiplication by an exponent power. For a negative
+/// exponent relative to the significant digits, we scale the real
+/// digits to the theoretical digits for `b` and determine if we
+/// need to round-up.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>digit_comp&lt;F: RawFloat, <span class="kw">const </span>FORMAT: u128&gt;(
+    num: Number,
+    fp: ExtendedFloat80,
+    sci_exp: i32,
+    max_digits: usize,
+) -&gt; ExtendedFloat80 {
+    <span class="kw">let </span>(bigmant, digits) = parse_mantissa::&lt;FORMAT&gt;(num, max_digits);
+    <span class="comment">// This can&#39;t underflow, since `digits` is at most `max_digits`.
+    </span><span class="kw">let </span>exponent = sci_exp + <span class="number">1 </span>- digits <span class="kw">as </span>i32;
+    <span class="kw">if </span>exponent &gt;= <span class="number">0 </span>{
+        positive_digit_comp::&lt;F, FORMAT&gt;(bigmant, exponent)
+    } <span class="kw">else </span>{
+        negative_digit_comp::&lt;F, FORMAT&gt;(bigmant, fp, exponent)
     }
 }
 
-<span class="doccomment">/// Generate the significant digits with a positive exponent relative to mantissa.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">positive_digit_comp</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">RawFloat</span>, <span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
-    <span class="kw-2">mut</span> <span class="ident">bigmant</span>: <span class="ident">Bigint</span>,
-    <span class="ident">exponent</span>: <span class="ident">i32</span>,
-) -&gt; <span class="ident">ExtendedFloat80</span> {
-    <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span> {};
+<span class="doccomment">/// Generate the significant digits with a positive exponent relative to mantissa.
+</span><span class="kw">pub fn </span>positive_digit_comp&lt;F: RawFloat, <span class="kw">const </span>FORMAT: u128&gt;(
+    <span class="kw-2">mut </span>bigmant: Bigint,
+    exponent: i32,
+) -&gt; ExtendedFloat80 {
+    <span class="kw">let </span>format = NumberFormat::&lt;{ FORMAT }&gt; {};
 
-    <span class="comment">// Simple, we just need to multiply by the power of the radix.</span>
-    <span class="comment">// Now, we can calculate the mantissa and the exponent from this.</span>
-    <span class="comment">// The binary exponent is the binary exponent for the mantissa</span>
-    <span class="comment">// shifted to the hidden bit.</span>
-    <span class="ident">bigmant</span>.<span class="ident">pow</span>(<span class="ident">format</span>.<span class="ident">radix</span>(), <span class="ident">exponent</span> <span class="kw">as</span> <span class="ident">u32</span>).<span class="ident">unwrap</span>();
+    <span class="comment">// Simple, we just need to multiply by the power of the radix.
+    // Now, we can calculate the mantissa and the exponent from this.
+    // The binary exponent is the binary exponent for the mantissa
+    // shifted to the hidden bit.
+    </span>bigmant.pow(format.radix(), exponent <span class="kw">as </span>u32).unwrap();
 
-    <span class="comment">// Get the exact representation of the float from the big integer.</span>
-    <span class="comment">// hi64 checks **all** the remaining bits after the mantissa,</span>
-    <span class="comment">// so it will check if **any** truncated digits exist.</span>
-    <span class="kw">let</span> (<span class="ident">mant</span>, <span class="ident">is_truncated</span>) <span class="op">=</span> <span class="ident">bigmant</span>.<span class="ident">hi64</span>();
-    <span class="kw">let</span> <span class="ident">exp</span> <span class="op">=</span> <span class="ident">bigmant</span>.<span class="ident">bit_length</span>() <span class="kw">as</span> <span class="ident">i32</span> <span class="op">-</span> <span class="number">64</span> <span class="op">+</span> <span class="ident">F::EXPONENT_BIAS</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fp</span> <span class="op">=</span> <span class="ident">ExtendedFloat80</span> {
-        <span class="ident">mant</span>,
-        <span class="ident">exp</span>,
+    <span class="comment">// Get the exact representation of the float from the big integer.
+    // hi64 checks **all** the remaining bits after the mantissa,
+    // so it will check if **any** truncated digits exist.
+    </span><span class="kw">let </span>(mant, is_truncated) = bigmant.hi64();
+    <span class="kw">let </span>exp = bigmant.bit_length() <span class="kw">as </span>i32 - <span class="number">64 </span>+ F::EXPONENT_BIAS;
+    <span class="kw">let </span><span class="kw-2">mut </span>fp = ExtendedFloat80 {
+        mant,
+        exp,
     };
 
-    <span class="comment">// Shift the digits into position and determine if we need to round-up.</span>
-    <span class="ident">shared::round</span>::<span class="op">&lt;</span><span class="ident">F</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="ident">fp</span>, <span class="op">|</span><span class="ident">f</span>, <span class="ident">s</span><span class="op">|</span> {
-        <span class="ident">shared::round_nearest_tie_even</span>(<span class="ident">f</span>, <span class="ident">s</span>, <span class="op">|</span><span class="ident">is_odd</span>, <span class="ident">is_halfway</span>, <span class="ident">is_above</span><span class="op">|</span> {
-            <span class="ident">is_above</span> <span class="op">|</span><span class="op">|</span> (<span class="ident">is_halfway</span> <span class="op">&amp;&amp;</span> <span class="ident">is_truncated</span>) <span class="op">|</span><span class="op">|</span> (<span class="ident">is_odd</span> <span class="op">&amp;&amp;</span> <span class="ident">is_halfway</span>)
+    <span class="comment">// Shift the digits into position and determine if we need to round-up.
+    </span>shared::round::&lt;F, <span class="kw">_</span>&gt;(<span class="kw-2">&amp;mut </span>fp, |f, s| {
+        shared::round_nearest_tie_even(f, s, |is_odd, is_halfway, is_above| {
+            is_above || (is_halfway &amp;&amp; is_truncated) || (is_odd &amp;&amp; is_halfway)
         });
     });
-    <span class="ident">fp</span>
+    fp
 }
 
-<span class="doccomment">/// Generate the significant digits with a negative exponent relative to mantissa.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This algorithm is quite simple: we have the significant digits `m1 * b^N1`,</span>
-<span class="doccomment">/// where `m1` is the bigint mantissa, `b` is the radix, and `N1` is the radix</span>
-<span class="doccomment">/// exponent. We then calculate the theoretical representation of `b+h`, which</span>
-<span class="doccomment">/// is `m2 * 2^N2`, where `m2` is the bigint mantissa and `N2` is the binary</span>
-<span class="doccomment">/// exponent. If we had infinite, efficient floating precision, this would be</span>
-<span class="doccomment">/// equal to `m1 / b^-N1` and then compare it to `m2 * 2^N2`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Since we cannot divide and keep precision, we must multiply the other:</span>
-<span class="doccomment">/// if we want to do `m1 / b^-N1 &gt;= m2 * 2^N2`, we can do</span>
-<span class="doccomment">/// `m1 &gt;= m2 * b^-N1 * 2^N2` Going to the decimal case, we can show and example</span>
-<span class="doccomment">/// and simplify this further: `m1 &gt;= m2 * 2^N2 * 10^-N1`. Since we can remove</span>
-<span class="doccomment">/// a power-of-two, this is `m1 &gt;= m2 * 2^(N2 - N1) * 5^-N1`. Therefore, if</span>
-<span class="doccomment">/// `N2 - N1 &gt; 0`, we need have `m1 &gt;= m2 * 2^(N2 - N1) * 5^-N1`, otherwise,</span>
-<span class="doccomment">/// we have `m1 * 2^(N1 - N2) &gt;= m2 * 5^-N1`, where the resulting exponents</span>
-<span class="doccomment">/// are all positive.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This allows us to compare both floats using integers efficiently</span>
-<span class="doccomment">/// without any loss of precision.</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::comparison_chain</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">negative_digit_comp</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">RawFloat</span>, <span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
-    <span class="ident">bigmant</span>: <span class="ident">Bigint</span>,
-    <span class="kw-2">mut</span> <span class="ident">fp</span>: <span class="ident">ExtendedFloat80</span>,
-    <span class="ident">exponent</span>: <span class="ident">i32</span>,
-) -&gt; <span class="ident">ExtendedFloat80</span> {
-    <span class="comment">// Ensure our preconditions are valid:</span>
-    <span class="comment">//  1. The significant digits are not shifted into place.</span>
-    <span class="macro">debug_assert!</span>(<span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">&amp;</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">63</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>);
+<span class="doccomment">/// Generate the significant digits with a negative exponent relative to mantissa.
+///
+/// This algorithm is quite simple: we have the significant digits `m1 * b^N1`,
+/// where `m1` is the bigint mantissa, `b` is the radix, and `N1` is the radix
+/// exponent. We then calculate the theoretical representation of `b+h`, which
+/// is `m2 * 2^N2`, where `m2` is the bigint mantissa and `N2` is the binary
+/// exponent. If we had infinite, efficient floating precision, this would be
+/// equal to `m1 / b^-N1` and then compare it to `m2 * 2^N2`.
+///
+/// Since we cannot divide and keep precision, we must multiply the other:
+/// if we want to do `m1 / b^-N1 &gt;= m2 * 2^N2`, we can do
+/// `m1 &gt;= m2 * b^-N1 * 2^N2` Going to the decimal case, we can show and example
+/// and simplify this further: `m1 &gt;= m2 * 2^N2 * 10^-N1`. Since we can remove
+/// a power-of-two, this is `m1 &gt;= m2 * 2^(N2 - N1) * 5^-N1`. Therefore, if
+/// `N2 - N1 &gt; 0`, we need have `m1 &gt;= m2 * 2^(N2 - N1) * 5^-N1`, otherwise,
+/// we have `m1 * 2^(N1 - N2) &gt;= m2 * 5^-N1`, where the resulting exponents
+/// are all positive.
+///
+/// This allows us to compare both floats using integers efficiently
+/// without any loss of precision.
+</span><span class="attribute">#[allow(clippy::comparison_chain)]
+</span><span class="kw">pub fn </span>negative_digit_comp&lt;F: RawFloat, <span class="kw">const </span>FORMAT: u128&gt;(
+    bigmant: Bigint,
+    <span class="kw-2">mut </span>fp: ExtendedFloat80,
+    exponent: i32,
+) -&gt; ExtendedFloat80 {
+    <span class="comment">// Ensure our preconditions are valid:
+    //  1. The significant digits are not shifted into place.
+    </span><span class="macro">debug_assert!</span>(fp.mant &amp; (<span class="number">1 </span>&lt;&lt; <span class="number">63</span>) != <span class="number">0</span>);
 
-    <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">NumberFormat</span>::<span class="op">&lt;</span><span class="ident">FORMAT</span><span class="op">&gt;</span> {};
-    <span class="kw">let</span> <span class="ident">radix</span> <span class="op">=</span> <span class="ident">format</span>.<span class="ident">radix</span>();
+    <span class="kw">let </span>format = NumberFormat::&lt;FORMAT&gt; {};
+    <span class="kw">let </span>radix = format.radix();
 
-    <span class="comment">// Get the significant digits and radix exponent for the real digits.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">real_digits</span> <span class="op">=</span> <span class="ident">bigmant</span>;
-    <span class="kw">let</span> <span class="ident">real_exp</span> <span class="op">=</span> <span class="ident">exponent</span>;
-    <span class="macro">debug_assert!</span>(<span class="ident">real_exp</span> <span class="op">&lt;</span> <span class="number">0</span>);
+    <span class="comment">// Get the significant digits and radix exponent for the real digits.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>real_digits = bigmant;
+    <span class="kw">let </span>real_exp = exponent;
+    <span class="macro">debug_assert!</span>(real_exp &lt; <span class="number">0</span>);
 
-    <span class="comment">// Round down our extended-precision float and calculate `b`.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">fp</span>;
-    <span class="ident">shared::round</span>::<span class="op">&lt;</span><span class="ident">F</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="ident">b</span>, <span class="ident">shared::round_down</span>);
-    <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">extended_to_float</span>::<span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">b</span>);
+    <span class="comment">// Round down our extended-precision float and calculate `b`.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>b = fp;
+    shared::round::&lt;F, <span class="kw">_</span>&gt;(<span class="kw-2">&amp;mut </span>b, shared::round_down);
+    <span class="kw">let </span>b = extended_to_float::&lt;F&gt;(b);
 
-    <span class="comment">// Get the significant digits and the binary exponent for `b+h`.</span>
-    <span class="kw">let</span> <span class="ident">theor</span> <span class="op">=</span> <span class="ident">bh</span>(<span class="ident">b</span>);
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">theor_digits</span> <span class="op">=</span> <span class="ident">Bigint::from_u64</span>(<span class="ident">theor</span>.<span class="ident">mant</span>);
-    <span class="kw">let</span> <span class="ident">theor_exp</span> <span class="op">=</span> <span class="ident">theor</span>.<span class="ident">exp</span>;
+    <span class="comment">// Get the significant digits and the binary exponent for `b+h`.
+    </span><span class="kw">let </span>theor = bh(b);
+    <span class="kw">let </span><span class="kw-2">mut </span>theor_digits = Bigint::from_u64(theor.mant);
+    <span class="kw">let </span>theor_exp = theor.exp;
 
-    <span class="comment">// We need to scale the real digits and `b+h` digits to be the same</span>
-    <span class="comment">// order. We currently have `real_exp`, in `radix`, that needs to be</span>
-    <span class="comment">// shifted to `theor_digits` (since it is negative), and `theor_exp`</span>
-    <span class="comment">// to either `theor_digits` or `real_digits` as a power of 2 (since it</span>
-    <span class="comment">// may be positive or negative). Try to remove as many powers of 2</span>
-    <span class="comment">// as possible. All values are relative to `theor_digits`, that is,</span>
-    <span class="comment">// reflect the power you need to multiply `theor_digits` by.</span>
-    <span class="kw">let</span> (<span class="ident">binary_exp</span>, <span class="ident">halfradix_exp</span>, <span class="ident">radix_exp</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">radix</span>.<span class="ident">is_even</span>() {
-        <span class="comment">// Can remove a power-of-two.</span>
-        <span class="comment">// Both are on opposite-sides of equation, can factor out a</span>
-        <span class="comment">// power of two.</span>
-        <span class="comment">//</span>
-        <span class="comment">// Example: 10^-10, 2^-10   -&gt; ( 0, 10, 0)</span>
-        <span class="comment">// Example: 10^-10, 2^-15   -&gt; (-5, 10, 0)</span>
-        <span class="comment">// Example: 10^-10, 2^-5    -&gt; ( 5, 10, 0)</span>
-        <span class="comment">// Example: 10^-10, 2^5     -&gt; (15, 10, 0)</span>
-        <span class="bool-val">true</span> =&gt; (<span class="ident">theor_exp</span> <span class="op">-</span> <span class="ident">real_exp</span>, <span class="op">-</span><span class="ident">real_exp</span>, <span class="number">0</span>),
-        <span class="comment">// Cannot remove a power-of-two.</span>
-        <span class="bool-val">false</span> =&gt; (<span class="ident">theor_exp</span>, <span class="number">0</span>, <span class="op">-</span><span class="ident">real_exp</span>),
+    <span class="comment">// We need to scale the real digits and `b+h` digits to be the same
+    // order. We currently have `real_exp`, in `radix`, that needs to be
+    // shifted to `theor_digits` (since it is negative), and `theor_exp`
+    // to either `theor_digits` or `real_digits` as a power of 2 (since it
+    // may be positive or negative). Try to remove as many powers of 2
+    // as possible. All values are relative to `theor_digits`, that is,
+    // reflect the power you need to multiply `theor_digits` by.
+    </span><span class="kw">let </span>(binary_exp, halfradix_exp, radix_exp) = <span class="kw">match </span>radix.is_even() {
+        <span class="comment">// Can remove a power-of-two.
+        // Both are on opposite-sides of equation, can factor out a
+        // power of two.
+        //
+        // Example: 10^-10, 2^-10   -&gt; ( 0, 10, 0)
+        // Example: 10^-10, 2^-15   -&gt; (-5, 10, 0)
+        // Example: 10^-10, 2^-5    -&gt; ( 5, 10, 0)
+        // Example: 10^-10, 2^5     -&gt; (15, 10, 0)
+        </span><span class="bool-val">true </span>=&gt; (theor_exp - real_exp, -real_exp, <span class="number">0</span>),
+        <span class="comment">// Cannot remove a power-of-two.
+        </span><span class="bool-val">false </span>=&gt; (theor_exp, <span class="number">0</span>, -real_exp),
     };
 
-    <span class="kw">if</span> <span class="ident">halfradix_exp</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-        <span class="ident">theor_digits</span>.<span class="ident">pow</span>(<span class="ident">radix</span> <span class="op">/</span> <span class="number">2</span>, <span class="ident">halfradix_exp</span> <span class="kw">as</span> <span class="ident">u32</span>).<span class="ident">unwrap</span>();
+    <span class="kw">if </span>halfradix_exp != <span class="number">0 </span>{
+        theor_digits.pow(radix / <span class="number">2</span>, halfradix_exp <span class="kw">as </span>u32).unwrap();
     }
-    <span class="kw">if</span> <span class="ident">radix_exp</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-        <span class="ident">theor_digits</span>.<span class="ident">pow</span>(<span class="ident">radix</span>, <span class="ident">radix_exp</span> <span class="kw">as</span> <span class="ident">u32</span>).<span class="ident">unwrap</span>();
+    <span class="kw">if </span>radix_exp != <span class="number">0 </span>{
+        theor_digits.pow(radix, radix_exp <span class="kw">as </span>u32).unwrap();
     }
-    <span class="kw">if</span> <span class="ident">binary_exp</span> <span class="op">&gt;</span> <span class="number">0</span> {
-        <span class="ident">theor_digits</span>.<span class="ident">pow</span>(<span class="number">2</span>, <span class="ident">binary_exp</span> <span class="kw">as</span> <span class="ident">u32</span>).<span class="ident">unwrap</span>();
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">binary_exp</span> <span class="op">&lt;</span> <span class="number">0</span> {
-        <span class="ident">real_digits</span>.<span class="ident">pow</span>(<span class="number">2</span>, (<span class="op">-</span><span class="ident">binary_exp</span>) <span class="kw">as</span> <span class="ident">u32</span>).<span class="ident">unwrap</span>();
+    <span class="kw">if </span>binary_exp &gt; <span class="number">0 </span>{
+        theor_digits.pow(<span class="number">2</span>, binary_exp <span class="kw">as </span>u32).unwrap();
+    } <span class="kw">else if </span>binary_exp &lt; <span class="number">0 </span>{
+        real_digits.pow(<span class="number">2</span>, (-binary_exp) <span class="kw">as </span>u32).unwrap();
     }
 
-    <span class="comment">// Compare our theoretical and real digits and round nearest, tie even.</span>
-    <span class="kw">let</span> <span class="ident">ord</span> <span class="op">=</span> <span class="ident">real_digits</span>.<span class="ident">data</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">theor_digits</span>.<span class="ident">data</span>);
-    <span class="ident">shared::round</span>::<span class="op">&lt;</span><span class="ident">F</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="ident">fp</span>, <span class="op">|</span><span class="ident">f</span>, <span class="ident">s</span><span class="op">|</span> {
-        <span class="ident">shared::round_nearest_tie_even</span>(<span class="ident">f</span>, <span class="ident">s</span>, <span class="op">|</span><span class="ident">is_odd</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">|</span> {
-            <span class="comment">// Can ignore `is_halfway` and `is_above`, since those were</span>
-            <span class="comment">// calculates using less significant digits.</span>
-            <span class="kw">match</span> <span class="ident">ord</span> {
-                <span class="ident">cmp::Ordering::Greater</span> =&gt; <span class="bool-val">true</span>,
-                <span class="ident">cmp::Ordering::Less</span> =&gt; <span class="bool-val">false</span>,
-                <span class="ident">cmp::Ordering::Equal</span> <span class="kw">if</span> <span class="ident">is_odd</span> =&gt; <span class="bool-val">true</span>,
-                <span class="ident">cmp::Ordering::Equal</span> =&gt; <span class="bool-val">false</span>,
+    <span class="comment">// Compare our theoretical and real digits and round nearest, tie even.
+    </span><span class="kw">let </span>ord = real_digits.data.cmp(<span class="kw-2">&amp;</span>theor_digits.data);
+    shared::round::&lt;F, <span class="kw">_</span>&gt;(<span class="kw-2">&amp;mut </span>fp, |f, s| {
+        shared::round_nearest_tie_even(f, s, |is_odd, <span class="kw">_</span>, <span class="kw">_</span>| {
+            <span class="comment">// Can ignore `is_halfway` and `is_above`, since those were
+            // calculates using less significant digits.
+            </span><span class="kw">match </span>ord {
+                cmp::Ordering::Greater =&gt; <span class="bool-val">true</span>,
+                cmp::Ordering::Less =&gt; <span class="bool-val">false</span>,
+                cmp::Ordering::Equal <span class="kw">if </span>is_odd =&gt; <span class="bool-val">true</span>,
+                cmp::Ordering::Equal =&gt; <span class="bool-val">false</span>,
             }
         });
     });
-    <span class="ident">fp</span>
+    fp
 }
 
-<span class="doccomment">/// Try to parse 8 digits at a time.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>))]</span>
-<span class="macro">macro_rules!</span> <span class="ident">try_parse_8digits</span> {
+<span class="doccomment">/// Try to parse 8 digits at a time.
+</span><span class="attribute">#[cfg(not(feature = <span class="string">&quot;compact&quot;</span>))]
+</span><span class="macro">macro_rules! </span>try_parse_8digits {
     (
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">iter</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">count</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">counter</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">step</span>:<span class="ident">ident</span>,
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">max_digits</span>:<span class="ident">ident</span>
+        <span class="macro-nonterminal">$format</span>:ident,
+        <span class="macro-nonterminal">$iter</span>:ident,
+        <span class="macro-nonterminal">$value</span>:ident,
+        <span class="macro-nonterminal">$count</span>:ident,
+        <span class="macro-nonterminal">$counter</span>:ident,
+        <span class="macro-nonterminal">$step</span>:ident,
+        <span class="macro-nonterminal">$max_digits</span>:ident
     ) =&gt; {{
-        <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">NumberFormat</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span><span class="op">&gt;</span> {};
-        <span class="kw">let</span> <span class="ident">radix</span> <span class="op">=</span> <span class="ident">format</span>.<span class="ident">radix</span>() <span class="kw">as</span> <span class="ident">Limb</span>;
+        <span class="kw">let </span>format = NumberFormat::&lt;<span class="macro-nonterminal">$format</span>&gt; {};
+        <span class="kw">let </span>radix = format.radix() <span class="kw">as </span>Limb;
 
-        <span class="comment">// Try 8-digit optimizations.</span>
-        <span class="kw">if</span> <span class="macro">can_try_parse_8digits!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">iter</span>, <span class="ident">radix</span>) {
-            <span class="kw">let</span> <span class="ident">radix2</span> <span class="op">=</span> <span class="ident">radix</span>.<span class="ident">wrapping_mul</span>(<span class="ident">radix</span>);
-            <span class="kw">let</span> <span class="ident">radix4</span> <span class="op">=</span> <span class="ident">radix2</span>.<span class="ident">wrapping_mul</span>(<span class="ident">radix2</span>);
-            <span class="kw">let</span> <span class="ident">radix8</span> <span class="op">=</span> <span class="ident">radix4</span>.<span class="ident">wrapping_mul</span>(<span class="ident">radix4</span>);
+        <span class="comment">// Try 8-digit optimizations.
+        </span><span class="kw">if </span><span class="macro">can_try_parse_8digits!</span>(<span class="macro-nonterminal">$iter</span>, radix) {
+            <span class="kw">let </span>radix2 = radix.wrapping_mul(radix);
+            <span class="kw">let </span>radix4 = radix2.wrapping_mul(radix2);
+            <span class="kw">let </span>radix8 = radix4.wrapping_mul(radix4);
 
-            <span class="kw">while</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">step</span> <span class="op">-</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">counter</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">8</span> <span class="op">&amp;&amp;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">max_digits</span> <span class="op">-</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">count</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">8</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="ident">algorithm::try_parse_8digits</span>::<span class="op">&lt;</span><span class="ident">Limb</span>, <span class="kw">_</span>, <span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">iter</span>) {
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>.<span class="ident">wrapping_mul</span>(<span class="ident">radix8</span>).<span class="ident">wrapping_add</span>(<span class="ident">v</span>);
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">counter</span> <span class="op">+</span><span class="op">=</span> <span class="number">8</span>;
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">count</span> <span class="op">+</span><span class="op">=</span> <span class="number">8</span>;
-                } <span class="kw">else</span> {
+            <span class="kw">while </span><span class="macro-nonterminal">$step </span>- <span class="macro-nonterminal">$counter </span>&gt;= <span class="number">8 </span>&amp;&amp; <span class="macro-nonterminal">$max_digits </span>- <span class="macro-nonterminal">$count </span>&gt;= <span class="number">8 </span>{
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(v) = algorithm::try_parse_8digits::&lt;Limb, <span class="kw">_</span>, FORMAT&gt;(<span class="kw-2">&amp;mut </span><span class="macro-nonterminal">$iter</span>) {
+                    <span class="macro-nonterminal">$value </span>= <span class="macro-nonterminal">$value</span>.wrapping_mul(radix8).wrapping_add(v);
+                    <span class="macro-nonterminal">$counter </span>+= <span class="number">8</span>;
+                    <span class="macro-nonterminal">$count </span>+= <span class="number">8</span>;
+                } <span class="kw">else </span>{
                     <span class="kw">break</span>;
                 }
             }
@@ -1033,488 +1033,488 @@
     }};
 }
 
-<span class="doccomment">/// Add a digit to the temporary value.</span>
-<span class="macro">macro_rules!</span> <span class="ident">add_digit</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">radix</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">counter</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">count</span>:<span class="ident">ident</span>) =&gt; {{
-        <span class="kw">let</span> <span class="ident">digit</span> <span class="op">=</span> <span class="ident">char_to_valid_digit_const</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">c</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">radix</span>);
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span> <span class="kw-2">*</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">radix</span> <span class="kw">as</span> <span class="ident">Limb</span>;
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span> <span class="op">+</span><span class="op">=</span> <span class="ident">digit</span> <span class="kw">as</span> <span class="ident">Limb</span>;
+<span class="doccomment">/// Add a digit to the temporary value.
+</span><span class="macro">macro_rules! </span>add_digit {
+    (<span class="macro-nonterminal">$c</span>:ident, <span class="macro-nonterminal">$radix</span>:ident, <span class="macro-nonterminal">$value</span>:ident, <span class="macro-nonterminal">$counter</span>:ident, <span class="macro-nonterminal">$count</span>:ident) =&gt; {{
+        <span class="kw">let </span>digit = char_to_valid_digit_const(<span class="macro-nonterminal">$c</span>, <span class="macro-nonterminal">$radix</span>);
+        <span class="macro-nonterminal">$value </span><span class="kw-2">*</span>= <span class="macro-nonterminal">$radix </span><span class="kw">as </span>Limb;
+        <span class="macro-nonterminal">$value </span>+= digit <span class="kw">as </span>Limb;
 
-        <span class="comment">// Increment our counters.</span>
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">counter</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        <span class="comment">// Increment our counters.
+        </span><span class="macro-nonterminal">$counter </span>+= <span class="number">1</span>;
+        <span class="macro-nonterminal">$count </span>+= <span class="number">1</span>;
     }};
 }
 
-<span class="doccomment">/// Add a temporary value to our mantissa.</span>
-<span class="macro">macro_rules!</span> <span class="ident">add_temporary</span> {
-    <span class="comment">// Multiply by the small power and add the native value.</span>
-    (@<span class="ident">mul</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">power</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">expr</span>) =&gt; {
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>.<span class="ident">data</span>.<span class="ident">mul_small</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">power</span>).<span class="ident">unwrap</span>();
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>.<span class="ident">data</span>.<span class="ident">add_small</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>).<span class="ident">unwrap</span>();
+<span class="doccomment">/// Add a temporary value to our mantissa.
+</span><span class="macro">macro_rules! </span>add_temporary {
+    <span class="comment">// Multiply by the small power and add the native value.
+    </span>(@mul <span class="macro-nonterminal">$result</span>:ident, <span class="macro-nonterminal">$power</span>:expr, <span class="macro-nonterminal">$value</span>:expr) =&gt; {
+        <span class="macro-nonterminal">$result</span>.data.mul_small(<span class="macro-nonterminal">$power</span>).unwrap();
+        <span class="macro-nonterminal">$result</span>.data.add_small(<span class="macro-nonterminal">$value</span>).unwrap();
     };
 
-    <span class="comment">// Add a temporary where we won&#39;t read the counter results internally.</span>
-    <span class="comment">//</span>
-    <span class="comment">// # Safety</span>
-    <span class="comment">//</span>
-    <span class="comment">// Safe is `counter &lt;= step`, or smaller than the table size.</span>
-    (@<span class="ident">end</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">counter</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">ident</span>) =&gt; {
-        <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">counter</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="comment">// SAFETY: safe, since `counter &lt;= step`, or smaller than the table size.</span>
-            <span class="kw">let</span> <span class="ident">small_power</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">f64::int_pow_fast_path</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">counter</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>.<span class="ident">radix</span>()) };
-            <span class="macro">add_temporary!</span>(@<span class="ident">mul</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>, <span class="ident">small_power</span> <span class="kw">as</span> <span class="ident">Limb</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>);
+    <span class="comment">// Add a temporary where we won&#39;t read the counter results internally.
+    //
+    // # Safety
+    //
+    // Safe is `counter &lt;= step`, or smaller than the table size.
+    </span>(@end <span class="macro-nonterminal">$format</span>:ident, <span class="macro-nonterminal">$result</span>:ident, <span class="macro-nonterminal">$counter</span>:ident, <span class="macro-nonterminal">$value</span>:ident) =&gt; {
+        <span class="kw">if </span><span class="macro-nonterminal">$counter </span>!= <span class="number">0 </span>{
+            <span class="comment">// SAFETY: safe, since `counter &lt;= step`, or smaller than the table size.
+            </span><span class="kw">let </span>small_power = <span class="kw">unsafe </span>{ f64::int_pow_fast_path(<span class="macro-nonterminal">$counter</span>, <span class="macro-nonterminal">$format</span>.radix()) };
+            <span class="macro">add_temporary!</span>(@mul <span class="macro-nonterminal">$result</span>, small_power <span class="kw">as </span>Limb, <span class="macro-nonterminal">$value</span>);
         }
     };
 
-    <span class="comment">// Add the maximum native value.</span>
-    (@<span class="ident">max</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">counter</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">max</span>:<span class="ident">ident</span>) =&gt; {
-        <span class="macro">add_temporary!</span>(@<span class="ident">mul</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">max</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span>);
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">counter</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value</span> <span class="op">=</span> <span class="number">0</span>;
+    <span class="comment">// Add the maximum native value.
+    </span>(@max <span class="macro-nonterminal">$format</span>:ident, <span class="macro-nonterminal">$result</span>:ident, <span class="macro-nonterminal">$counter</span>:ident, <span class="macro-nonterminal">$value</span>:ident, <span class="macro-nonterminal">$max</span>:ident) =&gt; {
+        <span class="macro">add_temporary!</span>(@mul <span class="macro-nonterminal">$result</span>, <span class="macro-nonterminal">$max</span>, <span class="macro-nonterminal">$value</span>);
+        <span class="macro-nonterminal">$counter </span>= <span class="number">0</span>;
+        <span class="macro-nonterminal">$value </span>= <span class="number">0</span>;
     };
 }
 
-<span class="doccomment">/// Round-up a truncated value.</span>
-<span class="macro">macro_rules!</span> <span class="ident">round_up_truncated</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">count</span>:<span class="ident">ident</span>) =&gt; {{
-        <span class="comment">// Need to round-up.</span>
-        <span class="comment">// Can&#39;t just add 1, since this can accidentally round-up</span>
-        <span class="comment">// values to a halfway point, which can cause invalid results.</span>
-        <span class="macro">add_temporary!</span>(@<span class="ident">mul</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>.<span class="ident">radix</span>() <span class="kw">as</span> <span class="ident">Limb</span>, <span class="number">1</span>);
-        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+<span class="doccomment">/// Round-up a truncated value.
+</span><span class="macro">macro_rules! </span>round_up_truncated {
+    (<span class="macro-nonterminal">$format</span>:ident, <span class="macro-nonterminal">$result</span>:ident, <span class="macro-nonterminal">$count</span>:ident) =&gt; {{
+        <span class="comment">// Need to round-up.
+        // Can&#39;t just add 1, since this can accidentally round-up
+        // values to a halfway point, which can cause invalid results.
+        </span><span class="macro">add_temporary!</span>(@mul <span class="macro-nonterminal">$result</span>, <span class="macro-nonterminal">$format</span>.radix() <span class="kw">as </span>Limb, <span class="number">1</span>);
+        <span class="macro-nonterminal">$count </span>+= <span class="number">1</span>;
     }};
 }
 
-<span class="doccomment">/// Check and round-up the fraction if any non-zero digits exist.</span>
-<span class="macro">macro_rules!</span> <span class="ident">round_up_nonzero</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">iter</span>:<span class="ident">expr</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">count</span>:<span class="ident">ident</span>) =&gt; {{
-        <span class="comment">// NOTE: All digits must be valid.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">iter</span>;
+<span class="doccomment">/// Check and round-up the fraction if any non-zero digits exist.
+</span><span class="macro">macro_rules! </span>round_up_nonzero {
+    (<span class="macro-nonterminal">$format</span>:ident, <span class="macro-nonterminal">$iter</span>:expr, <span class="macro-nonterminal">$result</span>:ident, <span class="macro-nonterminal">$count</span>:ident) =&gt; {{
+        <span class="comment">// NOTE: All digits must be valid.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>iter = <span class="macro-nonterminal">$iter</span>;
 
-        <span class="comment">// First try reading 8-digits at a time.</span>
-        <span class="kw">if</span> <span class="ident">iter</span>.<span class="ident">is_contiguous</span>() {
-            <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">read</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>() {
-                <span class="comment">// SAFETY: safe since we have at least 8 bytes in the buffer.</span>
-                <span class="kw">unsafe</span> { <span class="ident">iter</span>.<span class="ident">step_by_unchecked</span>(<span class="number">8</span>) };
-                <span class="kw">if</span> <span class="ident">value</span> <span class="op">!</span><span class="op">=</span> <span class="number">0x3030_3030_3030_3030</span> {
-                    <span class="comment">// Have non-zero digits, exit early.</span>
-                    <span class="macro">round_up_truncated!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">count</span>);
-                    <span class="kw">return</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">count</span>);
+        <span class="comment">// First try reading 8-digits at a time.
+        </span><span class="kw">if </span>iter.is_contiguous() {
+            <span class="kw">while let </span><span class="prelude-val">Some</span>(value) = iter.read::&lt;u64&gt;() {
+                <span class="comment">// SAFETY: safe since we have at least 8 bytes in the buffer.
+                </span><span class="kw">unsafe </span>{ iter.step_by_unchecked(<span class="number">8</span>) };
+                <span class="kw">if </span>value != <span class="number">0x3030_3030_3030_3030 </span>{
+                    <span class="comment">// Have non-zero digits, exit early.
+                    </span><span class="macro">round_up_truncated!</span>(<span class="macro-nonterminal">$format</span>, <span class="macro-nonterminal">$result</span>, <span class="macro-nonterminal">$count</span>);
+                    <span class="kw">return </span>(<span class="macro-nonterminal">$result</span>, <span class="macro-nonterminal">$count</span>);
                 }
             }
         }
 
-        <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">digit</span> <span class="kw">in</span> <span class="ident">iter</span> {
-            <span class="kw">if</span> <span class="ident">digit</span> <span class="op">!</span><span class="op">=</span> <span class="string">b&#39;0&#39;</span> {
-                <span class="macro">round_up_truncated!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">format</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">count</span>);
-                <span class="kw">return</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">count</span>);
+        <span class="kw">for </span><span class="kw-2">&amp;</span>digit <span class="kw">in </span>iter {
+            <span class="kw">if </span>digit != <span class="string">b&#39;0&#39; </span>{
+                <span class="macro">round_up_truncated!</span>(<span class="macro-nonterminal">$format</span>, <span class="macro-nonterminal">$result</span>, <span class="macro-nonterminal">$count</span>);
+                <span class="kw">return </span>(<span class="macro-nonterminal">$result</span>, <span class="macro-nonterminal">$count</span>);
             }
         }
     }};
 }
 
-<span class="doccomment">/// Parse the full mantissa into a big integer.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Returns the parsed mantissa and the number of digits in the mantissa.</span>
-<span class="doccomment">/// The max digits is the maximum number of digits plus one.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_mantissa</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(<span class="ident">num</span>: <span class="ident">Number</span>, <span class="ident">max_digits</span>: <span class="ident">usize</span>) -&gt; (<span class="ident">Bigint</span>, <span class="ident">usize</span>) {
-    <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">NumberFormat</span>::<span class="op">&lt;</span><span class="ident">FORMAT</span><span class="op">&gt;</span> {};
-    <span class="kw">let</span> <span class="ident">radix</span> <span class="op">=</span> <span class="ident">format</span>.<span class="ident">radix</span>();
+<span class="doccomment">/// Parse the full mantissa into a big integer.
+///
+/// Returns the parsed mantissa and the number of digits in the mantissa.
+/// The max digits is the maximum number of digits plus one.
+</span><span class="kw">pub fn </span>parse_mantissa&lt;<span class="kw">const </span>FORMAT: u128&gt;(num: Number, max_digits: usize) -&gt; (Bigint, usize) {
+    <span class="kw">let </span>format = NumberFormat::&lt;FORMAT&gt; {};
+    <span class="kw">let </span>radix = format.radix();
 
-    <span class="comment">// Iteratively process all the data in the mantissa.</span>
-    <span class="comment">// We do this via small, intermediate values which once we reach</span>
-    <span class="comment">// the maximum number of digits we can process without overflow,</span>
-    <span class="comment">// we add the temporary to the big integer.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">counter</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">count</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">value</span>: <span class="ident">Limb</span> <span class="op">=</span> <span class="number">0</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">Bigint::new</span>();
+    <span class="comment">// Iteratively process all the data in the mantissa.
+    // We do this via small, intermediate values which once we reach
+    // the maximum number of digits we can process without overflow,
+    // we add the temporary to the big integer.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>counter: usize = <span class="number">0</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>count: usize = <span class="number">0</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>value: Limb = <span class="number">0</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>result = Bigint::new();
 
-    <span class="comment">// Now use our pre-computed small powers iteratively.</span>
-    <span class="kw">let</span> <span class="ident">step</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">LIMB_BITS</span> <span class="op">==</span> <span class="number">32</span> {
-        <span class="ident">u32_power_limit</span>(<span class="ident">format</span>.<span class="ident">radix</span>())
-    } <span class="kw">else</span> {
-        <span class="ident">u64_power_limit</span>(<span class="ident">format</span>.<span class="ident">radix</span>())
-    } <span class="kw">as</span> <span class="ident">usize</span>;
-    <span class="kw">let</span> <span class="ident">max_native</span> <span class="op">=</span> (<span class="ident">format</span>.<span class="ident">radix</span>() <span class="kw">as</span> <span class="ident">Limb</span>).<span class="ident">pow</span>(<span class="ident">step</span> <span class="kw">as</span> <span class="ident">u32</span>);
+    <span class="comment">// Now use our pre-computed small powers iteratively.
+    </span><span class="kw">let </span>step = <span class="kw">if </span>LIMB_BITS == <span class="number">32 </span>{
+        u32_power_limit(format.radix())
+    } <span class="kw">else </span>{
+        u64_power_limit(format.radix())
+    } <span class="kw">as </span>usize;
+    <span class="kw">let </span>max_native = (format.radix() <span class="kw">as </span>Limb).pow(step <span class="kw">as </span>u32);
 
-    <span class="comment">// Process the integer digits.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">integer</span> <span class="op">=</span> <span class="ident">num</span>.<span class="ident">integer</span>.<span class="ident">bytes</span>::<span class="op">&lt;</span><span class="ident">FORMAT</span><span class="op">&gt;</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">integer_iter</span> <span class="op">=</span> <span class="ident">integer</span>.<span class="ident">integer_iter</span>();
-    <span class="ident">integer_iter</span>.<span class="ident">skip_zeros</span>();
-    <span class="lifetime">&#39;integer</span>: <span class="kw">loop</span> {
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>))]</span>
-        <span class="macro">try_parse_8digits!</span>(<span class="ident">FORMAT</span>, <span class="ident">integer_iter</span>, <span class="ident">value</span>, <span class="ident">count</span>, <span class="ident">counter</span>, <span class="ident">step</span>, <span class="ident">max_digits</span>);
+    <span class="comment">// Process the integer digits.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>integer = num.integer.bytes::&lt;FORMAT&gt;();
+    <span class="kw">let </span><span class="kw-2">mut </span>integer_iter = integer.integer_iter();
+    integer_iter.skip_zeros();
+    <span class="lifetime">&#39;integer</span>: <span class="kw">loop </span>{
+        <span class="attribute">#[cfg(not(feature = <span class="string">&quot;compact&quot;</span>))]
+        </span><span class="macro">try_parse_8digits!</span>(FORMAT, integer_iter, value, count, counter, step, max_digits);
 
-        <span class="comment">// Parse a digit at a time, until we reach step.</span>
-        <span class="kw">while</span> <span class="ident">counter</span> <span class="op">&lt;</span> <span class="ident">step</span> <span class="op">&amp;&amp;</span> <span class="ident">count</span> <span class="op">&lt;</span> <span class="ident">max_digits</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>) <span class="op">=</span> <span class="ident">integer_iter</span>.<span class="ident">next</span>() {
-                <span class="macro">add_digit!</span>(<span class="ident">c</span>, <span class="ident">radix</span>, <span class="ident">value</span>, <span class="ident">counter</span>, <span class="ident">count</span>);
-            } <span class="kw">else</span> {
-                <span class="kw">break</span> <span class="lifetime">&#39;integer</span>;
+        <span class="comment">// Parse a digit at a time, until we reach step.
+        </span><span class="kw">while </span>counter &lt; step &amp;&amp; count &lt; max_digits {
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>c) = integer_iter.next() {
+                <span class="macro">add_digit!</span>(c, radix, value, counter, count);
+            } <span class="kw">else </span>{
+                <span class="kw">break </span><span class="lifetime">&#39;integer</span>;
             }
         }
 
-        <span class="comment">// Check if we&#39;ve exhausted our max digits.</span>
-        <span class="kw">if</span> <span class="ident">count</span> <span class="op">==</span> <span class="ident">max_digits</span> {
-            <span class="comment">// Need to check if we&#39;re truncated, and round-up accordingly.</span>
-            <span class="comment">// SAFETY: safe since `counter &lt;= step`.</span>
-            <span class="macro">add_temporary!</span>(@<span class="ident">end</span> <span class="ident">format</span>, <span class="ident">result</span>, <span class="ident">counter</span>, <span class="ident">value</span>);
-            <span class="macro">round_up_nonzero!</span>(<span class="ident">format</span>, <span class="ident">integer_iter</span>, <span class="ident">result</span>, <span class="ident">count</span>);
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">fraction</span>) <span class="op">=</span> <span class="ident">num</span>.<span class="ident">fraction</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fraction</span> <span class="op">=</span> <span class="ident">fraction</span>.<span class="ident">bytes</span>::<span class="op">&lt;</span><span class="ident">FORMAT</span><span class="op">&gt;</span>();
-                <span class="macro">round_up_nonzero!</span>(<span class="ident">format</span>, <span class="ident">fraction</span>.<span class="ident">fraction_iter</span>(), <span class="ident">result</span>, <span class="ident">count</span>)
+        <span class="comment">// Check if we&#39;ve exhausted our max digits.
+        </span><span class="kw">if </span>count == max_digits {
+            <span class="comment">// Need to check if we&#39;re truncated, and round-up accordingly.
+            // SAFETY: safe since `counter &lt;= step`.
+            </span><span class="macro">add_temporary!</span>(@end format, result, counter, value);
+            <span class="macro">round_up_nonzero!</span>(format, integer_iter, result, count);
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(fraction) = num.fraction {
+                <span class="kw">let </span><span class="kw-2">mut </span>fraction = fraction.bytes::&lt;FORMAT&gt;();
+                <span class="macro">round_up_nonzero!</span>(format, fraction.fraction_iter(), result, count)
             }
-            <span class="kw">return</span> (<span class="ident">result</span>, <span class="ident">count</span>);
-        } <span class="kw">else</span> {
-            <span class="comment">// Add our temporary from the loop.</span>
-            <span class="comment">// SAFETY: safe since `counter &lt;= step`.</span>
-            <span class="macro">add_temporary!</span>(@<span class="ident">max</span> <span class="ident">format</span>, <span class="ident">result</span>, <span class="ident">counter</span>, <span class="ident">value</span>, <span class="ident">max_native</span>);
+            <span class="kw">return </span>(result, count);
+        } <span class="kw">else </span>{
+            <span class="comment">// Add our temporary from the loop.
+            // SAFETY: safe since `counter &lt;= step`.
+            </span><span class="macro">add_temporary!</span>(@max format, result, counter, value, max_native);
         }
     }
 
-    <span class="comment">// Process the fraction digits.</span>
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">fraction</span>) <span class="op">=</span> <span class="ident">num</span>.<span class="ident">fraction</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fraction</span> <span class="op">=</span> <span class="ident">fraction</span>.<span class="ident">bytes</span>::<span class="op">&lt;</span><span class="ident">FORMAT</span><span class="op">&gt;</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fraction_iter</span> <span class="op">=</span> <span class="ident">fraction</span>.<span class="ident">integer_iter</span>();
-        <span class="kw">if</span> <span class="ident">count</span> <span class="op">==</span> <span class="number">0</span> {
-            <span class="comment">// No digits added yet, can skip leading fraction zeros too.</span>
-            <span class="ident">fraction_iter</span>.<span class="ident">skip_zeros</span>();
+    <span class="comment">// Process the fraction digits.
+    </span><span class="kw">if let </span><span class="prelude-val">Some</span>(fraction) = num.fraction {
+        <span class="kw">let </span><span class="kw-2">mut </span>fraction = fraction.bytes::&lt;FORMAT&gt;();
+        <span class="kw">let </span><span class="kw-2">mut </span>fraction_iter = fraction.integer_iter();
+        <span class="kw">if </span>count == <span class="number">0 </span>{
+            <span class="comment">// No digits added yet, can skip leading fraction zeros too.
+            </span>fraction_iter.skip_zeros();
         }
-        <span class="lifetime">&#39;fraction</span>: <span class="kw">loop</span> {
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;compact&quot;</span>))]</span>
-            <span class="macro">try_parse_8digits!</span>(<span class="ident">FORMAT</span>, <span class="ident">fraction_iter</span>, <span class="ident">value</span>, <span class="ident">count</span>, <span class="ident">counter</span>, <span class="ident">step</span>, <span class="ident">max_digits</span>);
+        <span class="lifetime">&#39;fraction</span>: <span class="kw">loop </span>{
+            <span class="attribute">#[cfg(not(feature = <span class="string">&quot;compact&quot;</span>))]
+            </span><span class="macro">try_parse_8digits!</span>(FORMAT, fraction_iter, value, count, counter, step, max_digits);
 
-            <span class="comment">// Parse a digit at a time, until we reach step.</span>
-            <span class="kw">while</span> <span class="ident">counter</span> <span class="op">&lt;</span> <span class="ident">step</span> <span class="op">&amp;&amp;</span> <span class="ident">count</span> <span class="op">&lt;</span> <span class="ident">max_digits</span> {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">c</span>) <span class="op">=</span> <span class="ident">fraction_iter</span>.<span class="ident">next</span>() {
-                    <span class="macro">add_digit!</span>(<span class="ident">c</span>, <span class="ident">radix</span>, <span class="ident">value</span>, <span class="ident">counter</span>, <span class="ident">count</span>);
-                } <span class="kw">else</span> {
-                    <span class="kw">break</span> <span class="lifetime">&#39;fraction</span>;
+            <span class="comment">// Parse a digit at a time, until we reach step.
+            </span><span class="kw">while </span>counter &lt; step &amp;&amp; count &lt; max_digits {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>c) = fraction_iter.next() {
+                    <span class="macro">add_digit!</span>(c, radix, value, counter, count);
+                } <span class="kw">else </span>{
+                    <span class="kw">break </span><span class="lifetime">&#39;fraction</span>;
                 }
             }
 
-            <span class="comment">// Check if we&#39;ve exhausted our max digits.</span>
-            <span class="kw">if</span> <span class="ident">count</span> <span class="op">==</span> <span class="ident">max_digits</span> {
-                <span class="comment">// SAFETY: safe since `counter &lt;= step`.</span>
-                <span class="macro">add_temporary!</span>(@<span class="ident">end</span> <span class="ident">format</span>, <span class="ident">result</span>, <span class="ident">counter</span>, <span class="ident">value</span>);
-                <span class="macro">round_up_nonzero!</span>(<span class="ident">format</span>, <span class="ident">fraction_iter</span>, <span class="ident">result</span>, <span class="ident">count</span>);
-                <span class="kw">return</span> (<span class="ident">result</span>, <span class="ident">count</span>);
-            } <span class="kw">else</span> {
-                <span class="comment">// Add our temporary from the loop.</span>
-                <span class="comment">// SAFETY: safe since `counter &lt;= step`.</span>
-                <span class="macro">add_temporary!</span>(@<span class="ident">max</span> <span class="ident">format</span>, <span class="ident">result</span>, <span class="ident">counter</span>, <span class="ident">value</span>, <span class="ident">max_native</span>);
+            <span class="comment">// Check if we&#39;ve exhausted our max digits.
+            </span><span class="kw">if </span>count == max_digits {
+                <span class="comment">// SAFETY: safe since `counter &lt;= step`.
+                </span><span class="macro">add_temporary!</span>(@end format, result, counter, value);
+                <span class="macro">round_up_nonzero!</span>(format, fraction_iter, result, count);
+                <span class="kw">return </span>(result, count);
+            } <span class="kw">else </span>{
+                <span class="comment">// Add our temporary from the loop.
+                // SAFETY: safe since `counter &lt;= step`.
+                </span><span class="macro">add_temporary!</span>(@max format, result, counter, value, max_native);
             }
         }
     }
 
-    <span class="comment">// We will always have a remainder, as long as we entered the loop</span>
-    <span class="comment">// once, or counter % step is 0.</span>
-    <span class="comment">// SAFETY: safe since `counter &lt;= step`.</span>
-    <span class="macro">add_temporary!</span>(@<span class="ident">end</span> <span class="ident">format</span>, <span class="ident">result</span>, <span class="ident">counter</span>, <span class="ident">value</span>);
+    <span class="comment">// We will always have a remainder, as long as we entered the loop
+    // once, or counter % step is 0.
+    // SAFETY: safe since `counter &lt;= step`.
+    </span><span class="macro">add_temporary!</span>(@end format, result, counter, value);
 
-    (<span class="ident">result</span>, <span class="ident">count</span>)
+    (result, count)
 }
 
-<span class="doccomment">/// Compare actual integer digits to the theoretical digits.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">integer_compare</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">iter</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">num</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">den</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">radix</span>:<span class="ident">ident</span>) =&gt; {{
-        <span class="comment">// Compare the integer digits.</span>
-        <span class="kw">while</span> <span class="op">!</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">num</span>.<span class="ident">data</span>.<span class="ident">is_empty</span>() {
-            <span class="comment">// All digits **must** be valid.</span>
-            <span class="kw">let</span> <span class="ident">actual</span> <span class="op">=</span> <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">iter</span>.<span class="ident">next</span>() {
-                <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>) =&gt; <span class="ident">v</span>,
-                <span class="comment">// Could have hit the decimal point.</span>
-                <span class="kw">_</span> =&gt; <span class="kw">break</span>,
+<span class="doccomment">/// Compare actual integer digits to the theoretical digits.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;radix&quot;</span>)]
+</span><span class="macro">macro_rules! </span>integer_compare {
+    (<span class="macro-nonterminal">$iter</span>:ident, <span class="macro-nonterminal">$num</span>:ident, <span class="macro-nonterminal">$den</span>:ident, <span class="macro-nonterminal">$radix</span>:ident) =&gt; {{
+        <span class="comment">// Compare the integer digits.
+        </span><span class="kw">while </span>!<span class="macro-nonterminal">$num</span>.data.is_empty() {
+            <span class="comment">// All digits **must** be valid.
+            </span><span class="kw">let </span>actual = <span class="kw">match </span><span class="macro-nonterminal">$iter</span>.next() {
+                <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>v) =&gt; v,
+                <span class="comment">// Could have hit the decimal point.
+                </span><span class="kw">_ </span>=&gt; <span class="kw">break</span>,
             };
-            <span class="kw">let</span> <span class="ident">rem</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">num</span>.<span class="ident">data</span>.<span class="ident">quorem</span>(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">den</span>.<span class="ident">data</span>) <span class="kw">as</span> <span class="ident">u32</span>;
-            <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">digit_to_char_const</span>(<span class="ident">rem</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">radix</span>);
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">num</span>.<span class="ident">data</span>.<span class="ident">mul_small</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">radix</span> <span class="kw">as</span> <span class="ident">Limb</span>).<span class="ident">unwrap</span>();
-            <span class="kw">if</span> <span class="ident">actual</span> <span class="op">&lt;</span> <span class="ident">expected</span> {
-                <span class="kw">return</span> <span class="ident">cmp::Ordering::Less</span>;
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">actual</span> <span class="op">&gt;</span> <span class="ident">expected</span> {
-                <span class="kw">return</span> <span class="ident">cmp::Ordering::Greater</span>;
+            <span class="kw">let </span>rem = <span class="macro-nonterminal">$num</span>.data.quorem(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$den</span>.data) <span class="kw">as </span>u32;
+            <span class="kw">let </span>expected = digit_to_char_const(rem, <span class="macro-nonterminal">$radix</span>);
+            <span class="macro-nonterminal">$num</span>.data.mul_small(<span class="macro-nonterminal">$radix </span><span class="kw">as </span>Limb).unwrap();
+            <span class="kw">if </span>actual &lt; expected {
+                <span class="kw">return </span>cmp::Ordering::Less;
+            } <span class="kw">else if </span>actual &gt; expected {
+                <span class="kw">return </span>cmp::Ordering::Greater;
             }
         }
 
-        <span class="comment">// Still have integer digits, check if any are non-zero.</span>
-        <span class="kw">if</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">num</span>.<span class="ident">data</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">digit</span> <span class="kw">in</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">iter</span> {
-                <span class="kw">if</span> <span class="ident">digit</span> <span class="op">!</span><span class="op">=</span> <span class="string">b&#39;0&#39;</span> {
-                    <span class="kw">return</span> <span class="ident">cmp::Ordering::Greater</span>;
+        <span class="comment">// Still have integer digits, check if any are non-zero.
+        </span><span class="kw">if </span><span class="macro-nonterminal">$num</span>.data.is_empty() {
+            <span class="kw">for </span><span class="kw-2">&amp;</span>digit <span class="kw">in </span><span class="macro-nonterminal">$iter </span>{
+                <span class="kw">if </span>digit != <span class="string">b&#39;0&#39; </span>{
+                    <span class="kw">return </span>cmp::Ordering::Greater;
                 }
             }
         }
     }};
 }
 
-<span class="doccomment">/// Compare actual fraction digits to the theoretical digits.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>)]</span>
-<span class="macro">macro_rules!</span> <span class="ident">fraction_compare</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">iter</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">num</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">den</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">radix</span>:<span class="ident">ident</span>) =&gt; {{
-        <span class="comment">// Compare the fraction digits.</span>
-        <span class="comment">// We can only be here if we hit a decimal point.</span>
-        <span class="kw">while</span> <span class="op">!</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">num</span>.<span class="ident">data</span>.<span class="ident">is_empty</span>() {
-            <span class="comment">// All digits **must** be valid.</span>
-            <span class="kw">let</span> <span class="ident">actual</span> <span class="op">=</span> <span class="kw">match</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">iter</span>.<span class="ident">next</span>() {
-                <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>) =&gt; <span class="ident">v</span>,
-                <span class="comment">// No more actual digits, or hit the exponent.</span>
-                <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="ident">cmp::Ordering::Less</span>,
+<span class="doccomment">/// Compare actual fraction digits to the theoretical digits.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;radix&quot;</span>)]
+</span><span class="macro">macro_rules! </span>fraction_compare {
+    (<span class="macro-nonterminal">$iter</span>:ident, <span class="macro-nonterminal">$num</span>:ident, <span class="macro-nonterminal">$den</span>:ident, <span class="macro-nonterminal">$radix</span>:ident) =&gt; {{
+        <span class="comment">// Compare the fraction digits.
+        // We can only be here if we hit a decimal point.
+        </span><span class="kw">while </span>!<span class="macro-nonterminal">$num</span>.data.is_empty() {
+            <span class="comment">// All digits **must** be valid.
+            </span><span class="kw">let </span>actual = <span class="kw">match </span><span class="macro-nonterminal">$iter</span>.next() {
+                <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>v) =&gt; v,
+                <span class="comment">// No more actual digits, or hit the exponent.
+                </span><span class="kw">_ </span>=&gt; <span class="kw">return </span>cmp::Ordering::Less,
             };
-            <span class="kw">let</span> <span class="ident">rem</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">num</span>.<span class="ident">data</span>.<span class="ident">quorem</span>(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">den</span>.<span class="ident">data</span>) <span class="kw">as</span> <span class="ident">u32</span>;
-            <span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="ident">digit_to_char_const</span>(<span class="ident">rem</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">radix</span>);
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">num</span>.<span class="ident">data</span>.<span class="ident">mul_small</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">radix</span> <span class="kw">as</span> <span class="ident">Limb</span>).<span class="ident">unwrap</span>();
-            <span class="kw">if</span> <span class="ident">actual</span> <span class="op">&lt;</span> <span class="ident">expected</span> {
-                <span class="kw">return</span> <span class="ident">cmp::Ordering::Less</span>;
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">actual</span> <span class="op">&gt;</span> <span class="ident">expected</span> {
-                <span class="kw">return</span> <span class="ident">cmp::Ordering::Greater</span>;
+            <span class="kw">let </span>rem = <span class="macro-nonterminal">$num</span>.data.quorem(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$den</span>.data) <span class="kw">as </span>u32;
+            <span class="kw">let </span>expected = digit_to_char_const(rem, <span class="macro-nonterminal">$radix</span>);
+            <span class="macro-nonterminal">$num</span>.data.mul_small(<span class="macro-nonterminal">$radix </span><span class="kw">as </span>Limb).unwrap();
+            <span class="kw">if </span>actual &lt; expected {
+                <span class="kw">return </span>cmp::Ordering::Less;
+            } <span class="kw">else if </span>actual &gt; expected {
+                <span class="kw">return </span>cmp::Ordering::Greater;
             }
         }
 
-        <span class="comment">// Still have fraction digits, check if any are non-zero.</span>
-        <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">digit</span> <span class="kw">in</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">iter</span> {
-            <span class="kw">if</span> <span class="ident">digit</span> <span class="op">!</span><span class="op">=</span> <span class="string">b&#39;0&#39;</span> {
-                <span class="kw">return</span> <span class="ident">cmp::Ordering::Greater</span>;
+        <span class="comment">// Still have fraction digits, check if any are non-zero.
+        </span><span class="kw">for </span><span class="kw-2">&amp;</span>digit <span class="kw">in </span><span class="macro-nonterminal">$iter </span>{
+            <span class="kw">if </span>digit != <span class="string">b&#39;0&#39; </span>{
+                <span class="kw">return </span>cmp::Ordering::Greater;
             }
         }
     }};
 }
 
-<span class="doccomment">/// Compare theoretical digits to halfway point from theoretical digits.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Generates a float representing the halfway point, and generates</span>
-<span class="doccomment">/// theoretical digits as bytes, and compares the generated digits to</span>
-<span class="doccomment">/// the actual input.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Compares the known string to theoretical digits generated on the</span>
-<span class="doccomment">/// fly for `b+h`, where a string representation of a float is between</span>
-<span class="doccomment">/// `b` and `b+u`, where `b+u` is 1 unit in the least-precision. Therefore,</span>
-<span class="doccomment">/// the string must be close to `b+h`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Adapted from &quot;Bigcomp: Deciding Truncated, Near Halfway Conversions&quot;,</span>
-<span class="doccomment">/// available [here](https://www.exploringbinary.com/bigcomp-deciding-truncated-near-halfway-conversions/).</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::comparison_chain</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">byte_comp</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">RawFloat</span>, <span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
-    <span class="ident">number</span>: <span class="ident">Number</span>,
-    <span class="kw-2">mut</span> <span class="ident">fp</span>: <span class="ident">ExtendedFloat80</span>,
-    <span class="ident">sci_exp</span>: <span class="ident">i32</span>,
-) -&gt; <span class="ident">ExtendedFloat80</span> {
-    <span class="comment">// Ensure our preconditions are valid:</span>
-    <span class="comment">//  1. The significant digits are not shifted into place.</span>
-    <span class="macro">debug_assert!</span>(<span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">&amp;</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">63</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>);
+<span class="doccomment">/// Compare theoretical digits to halfway point from theoretical digits.
+///
+/// Generates a float representing the halfway point, and generates
+/// theoretical digits as bytes, and compares the generated digits to
+/// the actual input.
+///
+/// Compares the known string to theoretical digits generated on the
+/// fly for `b+h`, where a string representation of a float is between
+/// `b` and `b+u`, where `b+u` is 1 unit in the least-precision. Therefore,
+/// the string must be close to `b+h`.
+///
+/// Adapted from &quot;Bigcomp: Deciding Truncated, Near Halfway Conversions&quot;,
+/// available [here](https://www.exploringbinary.com/bigcomp-deciding-truncated-near-halfway-conversions/).
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;radix&quot;</span>)]
+#[allow(clippy::comparison_chain)]
+</span><span class="kw">pub fn </span>byte_comp&lt;F: RawFloat, <span class="kw">const </span>FORMAT: u128&gt;(
+    number: Number,
+    <span class="kw-2">mut </span>fp: ExtendedFloat80,
+    sci_exp: i32,
+) -&gt; ExtendedFloat80 {
+    <span class="comment">// Ensure our preconditions are valid:
+    //  1. The significant digits are not shifted into place.
+    </span><span class="macro">debug_assert!</span>(fp.mant &amp; (<span class="number">1 </span>&lt;&lt; <span class="number">63</span>) != <span class="number">0</span>);
 
-    <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">NumberFormat</span>::<span class="op">&lt;</span><span class="ident">FORMAT</span><span class="op">&gt;</span> {};
+    <span class="kw">let </span>format = NumberFormat::&lt;FORMAT&gt; {};
 
-    <span class="comment">// Round down our extended-precision float and calculate `b`.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">fp</span>;
-    <span class="ident">shared::round</span>::<span class="op">&lt;</span><span class="ident">F</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="ident">b</span>, <span class="ident">shared::round_down</span>);
-    <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">extended_to_float</span>::<span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">b</span>);
+    <span class="comment">// Round down our extended-precision float and calculate `b`.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>b = fp;
+    shared::round::&lt;F, <span class="kw">_</span>&gt;(<span class="kw-2">&amp;mut </span>b, shared::round_down);
+    <span class="kw">let </span>b = extended_to_float::&lt;F&gt;(b);
 
-    <span class="comment">// Calculate `b+h` to create a ratio for our theoretical digits.</span>
-    <span class="kw">let</span> <span class="ident">theor</span> <span class="op">=</span> <span class="ident">Bigfloat::from_float</span>(<span class="ident">bh</span>::<span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">b</span>));
+    <span class="comment">// Calculate `b+h` to create a ratio for our theoretical digits.
+    </span><span class="kw">let </span>theor = Bigfloat::from_float(bh::&lt;F&gt;(b));
 
-    <span class="comment">// Now, create a scaling factor for the digit count.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">factor</span> <span class="op">=</span> <span class="ident">Bigfloat::from_u32</span>(<span class="number">1</span>);
-    <span class="ident">factor</span>.<span class="ident">pow</span>(<span class="ident">format</span>.<span class="ident">radix</span>(), <span class="ident">sci_exp</span>.<span class="ident">unsigned_abs</span>()).<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">num</span>: <span class="ident">Bigfloat</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">den</span>: <span class="ident">Bigfloat</span>;
+    <span class="comment">// Now, create a scaling factor for the digit count.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>factor = Bigfloat::from_u32(<span class="number">1</span>);
+    factor.pow(format.radix(), sci_exp.unsigned_abs()).unwrap();
+    <span class="kw">let </span><span class="kw-2">mut </span>num: Bigfloat;
+    <span class="kw">let </span><span class="kw-2">mut </span>den: Bigfloat;
 
-    <span class="kw">if</span> <span class="ident">sci_exp</span> <span class="op">&lt;</span> <span class="number">0</span> {
-        <span class="comment">// Need to have the basen factor be the numerator, and the fp</span>
-        <span class="comment">// be the denominator. Since we assumed that theor was the numerator,</span>
-        <span class="comment">// if it&#39;s the denominator, we need to multiply it into the numerator.</span>
-        <span class="ident">num</span> <span class="op">=</span> <span class="ident">factor</span>;
-        <span class="ident">num</span>.<span class="ident">data</span> <span class="kw-2">*</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">theor</span>.<span class="ident">data</span>;
-        <span class="ident">den</span> <span class="op">=</span> <span class="ident">Bigfloat::from_u32</span>(<span class="number">1</span>);
-        <span class="ident">den</span>.<span class="ident">exp</span> <span class="op">=</span> <span class="op">-</span><span class="ident">theor</span>.<span class="ident">exp</span>;
-    } <span class="kw">else</span> {
-        <span class="ident">num</span> <span class="op">=</span> <span class="ident">theor</span>;
-        <span class="ident">den</span> <span class="op">=</span> <span class="ident">factor</span>;
+    <span class="kw">if </span>sci_exp &lt; <span class="number">0 </span>{
+        <span class="comment">// Need to have the basen factor be the numerator, and the fp
+        // be the denominator. Since we assumed that theor was the numerator,
+        // if it&#39;s the denominator, we need to multiply it into the numerator.
+        </span>num = factor;
+        num.data <span class="kw-2">*</span>= <span class="kw-2">&amp;</span>theor.data;
+        den = Bigfloat::from_u32(<span class="number">1</span>);
+        den.exp = -theor.exp;
+    } <span class="kw">else </span>{
+        num = theor;
+        den = factor;
     }
 
-    <span class="comment">// Scale the denominator so it has the number of bits</span>
-    <span class="comment">// in the radix as the number of leading zeros.</span>
-    <span class="kw">let</span> <span class="ident">wlz</span> <span class="op">=</span> <span class="ident">integral_binary_factor</span>(<span class="ident">format</span>.<span class="ident">radix</span>());
-    <span class="kw">let</span> <span class="ident">nlz</span> <span class="op">=</span> <span class="ident">den</span>.<span class="ident">leading_zeros</span>().<span class="ident">wrapping_sub</span>(<span class="ident">wlz</span>) <span class="op">&amp;</span> (<span class="number">32</span> <span class="op">-</span> <span class="number">1</span>);
-    <span class="kw">if</span> <span class="ident">nlz</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-        <span class="ident">den</span>.<span class="ident">shl_bits</span>(<span class="ident">nlz</span> <span class="kw">as</span> <span class="ident">usize</span>).<span class="ident">unwrap</span>();
-        <span class="ident">den</span>.<span class="ident">exp</span> <span class="op">-</span><span class="op">=</span> <span class="ident">nlz</span> <span class="kw">as</span> <span class="ident">i32</span>;
+    <span class="comment">// Scale the denominator so it has the number of bits
+    // in the radix as the number of leading zeros.
+    </span><span class="kw">let </span>wlz = integral_binary_factor(format.radix());
+    <span class="kw">let </span>nlz = den.leading_zeros().wrapping_sub(wlz) &amp; (<span class="number">32 </span>- <span class="number">1</span>);
+    <span class="kw">if </span>nlz != <span class="number">0 </span>{
+        den.shl_bits(nlz <span class="kw">as </span>usize).unwrap();
+        den.exp -= nlz <span class="kw">as </span>i32;
     }
 
-    <span class="comment">// Need to scale the numerator or denominator to the same value.</span>
-    <span class="comment">// We don&#39;t want to shift the denominator, so...</span>
-    <span class="kw">let</span> <span class="ident">diff</span> <span class="op">=</span> <span class="ident">den</span>.<span class="ident">exp</span> <span class="op">-</span> <span class="ident">num</span>.<span class="ident">exp</span>;
-    <span class="kw">let</span> <span class="ident">shift</span> <span class="op">=</span> <span class="ident">diff</span>.<span class="ident">unsigned_abs</span>() <span class="kw">as</span> <span class="ident">usize</span>;
-    <span class="kw">if</span> <span class="ident">diff</span> <span class="op">&lt;</span> <span class="number">0</span> {
-        <span class="comment">// Need to shift the numerator left.</span>
-        <span class="ident">num</span>.<span class="ident">shl</span>(<span class="ident">shift</span>).<span class="ident">unwrap</span>();
-        <span class="ident">num</span>.<span class="ident">exp</span> <span class="op">-</span><span class="op">=</span> <span class="ident">shift</span> <span class="kw">as</span> <span class="ident">i32</span>;
-    } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">diff</span> <span class="op">&gt;</span> <span class="number">0</span> {
-        <span class="comment">// Need to shift denominator left, go by a power of LIMB_BITS.</span>
-        <span class="comment">// After this, the numerator will be non-normalized, and the</span>
-        <span class="comment">// denominator will be normalized. We need to add one to the</span>
-        <span class="comment">// quotient,since we&#39;re calculating the ceiling of the divmod.</span>
-        <span class="kw">let</span> (<span class="ident">q</span>, <span class="ident">r</span>) <span class="op">=</span> <span class="ident">shift</span>.<span class="ident">ceil_divmod</span>(<span class="ident">LIMB_BITS</span>);
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="op">-</span><span class="ident">r</span>;
-        <span class="kw">if</span> <span class="ident">r</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="ident">num</span>.<span class="ident">shl_bits</span>(<span class="ident">r</span> <span class="kw">as</span> <span class="ident">usize</span>).<span class="ident">unwrap</span>();
-            <span class="ident">num</span>.<span class="ident">exp</span> <span class="op">-</span><span class="op">=</span> <span class="ident">r</span>;
+    <span class="comment">// Need to scale the numerator or denominator to the same value.
+    // We don&#39;t want to shift the denominator, so...
+    </span><span class="kw">let </span>diff = den.exp - num.exp;
+    <span class="kw">let </span>shift = diff.unsigned_abs() <span class="kw">as </span>usize;
+    <span class="kw">if </span>diff &lt; <span class="number">0 </span>{
+        <span class="comment">// Need to shift the numerator left.
+        </span>num.shl(shift).unwrap();
+        num.exp -= shift <span class="kw">as </span>i32;
+    } <span class="kw">else if </span>diff &gt; <span class="number">0 </span>{
+        <span class="comment">// Need to shift denominator left, go by a power of LIMB_BITS.
+        // After this, the numerator will be non-normalized, and the
+        // denominator will be normalized. We need to add one to the
+        // quotient,since we&#39;re calculating the ceiling of the divmod.
+        </span><span class="kw">let </span>(q, r) = shift.ceil_divmod(LIMB_BITS);
+        <span class="kw">let </span>r = -r;
+        <span class="kw">if </span>r != <span class="number">0 </span>{
+            num.shl_bits(r <span class="kw">as </span>usize).unwrap();
+            num.exp -= r;
         }
-        <span class="kw">if</span> <span class="ident">q</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-            <span class="ident">den</span>.<span class="ident">shl_limbs</span>(<span class="ident">q</span>).<span class="ident">unwrap</span>();
-            <span class="ident">den</span>.<span class="ident">exp</span> <span class="op">-</span><span class="op">=</span> <span class="ident">LIMB_BITS</span> <span class="kw">as</span> <span class="ident">i32</span> <span class="op">*</span> <span class="ident">q</span> <span class="kw">as</span> <span class="ident">i32</span>;
+        <span class="kw">if </span>q != <span class="number">0 </span>{
+            den.shl_limbs(q).unwrap();
+            den.exp -= LIMB_BITS <span class="kw">as </span>i32 * q <span class="kw">as </span>i32;
         }
     }
 
-    <span class="comment">// Compare our theoretical and real digits and round nearest, tie even.</span>
-    <span class="kw">let</span> <span class="ident">ord</span> <span class="op">=</span> <span class="ident">compare_bytes</span>::<span class="op">&lt;</span><span class="ident">FORMAT</span><span class="op">&gt;</span>(<span class="ident">number</span>, <span class="ident">num</span>, <span class="ident">den</span>);
-    <span class="ident">shared::round</span>::<span class="op">&lt;</span><span class="ident">F</span>, <span class="kw">_</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="ident">fp</span>, <span class="op">|</span><span class="ident">f</span>, <span class="ident">s</span><span class="op">|</span> {
-        <span class="ident">shared::round_nearest_tie_even</span>(<span class="ident">f</span>, <span class="ident">s</span>, <span class="op">|</span><span class="ident">is_odd</span>, <span class="kw">_</span>, <span class="kw">_</span><span class="op">|</span> {
-            <span class="comment">// Can ignore `is_halfway` and `is_above`, since those were</span>
-            <span class="comment">// calculates using less significant digits.</span>
-            <span class="kw">match</span> <span class="ident">ord</span> {
-                <span class="ident">cmp::Ordering::Greater</span> =&gt; <span class="bool-val">true</span>,
-                <span class="ident">cmp::Ordering::Less</span> =&gt; <span class="bool-val">false</span>,
-                <span class="ident">cmp::Ordering::Equal</span> <span class="kw">if</span> <span class="ident">is_odd</span> =&gt; <span class="bool-val">true</span>,
-                <span class="ident">cmp::Ordering::Equal</span> =&gt; <span class="bool-val">false</span>,
+    <span class="comment">// Compare our theoretical and real digits and round nearest, tie even.
+    </span><span class="kw">let </span>ord = compare_bytes::&lt;FORMAT&gt;(number, num, den);
+    shared::round::&lt;F, <span class="kw">_</span>&gt;(<span class="kw-2">&amp;mut </span>fp, |f, s| {
+        shared::round_nearest_tie_even(f, s, |is_odd, <span class="kw">_</span>, <span class="kw">_</span>| {
+            <span class="comment">// Can ignore `is_halfway` and `is_above`, since those were
+            // calculates using less significant digits.
+            </span><span class="kw">match </span>ord {
+                cmp::Ordering::Greater =&gt; <span class="bool-val">true</span>,
+                cmp::Ordering::Less =&gt; <span class="bool-val">false</span>,
+                cmp::Ordering::Equal <span class="kw">if </span>is_odd =&gt; <span class="bool-val">true</span>,
+                cmp::Ordering::Equal =&gt; <span class="bool-val">false</span>,
             }
         });
     });
-    <span class="ident">fp</span>
+    fp
 }
 
-<span class="doccomment">/// Compare digits between the generated values the ratio and the actual view.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compare_bytes</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(
-    <span class="ident">number</span>: <span class="ident">Number</span>,
-    <span class="kw-2">mut</span> <span class="ident">num</span>: <span class="ident">Bigfloat</span>,
-    <span class="ident">den</span>: <span class="ident">Bigfloat</span>,
-) -&gt; <span class="ident">cmp::Ordering</span> {
-    <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">NumberFormat</span>::<span class="op">&lt;</span><span class="ident">FORMAT</span><span class="op">&gt;</span> {};
-    <span class="kw">let</span> <span class="ident">radix</span> <span class="op">=</span> <span class="ident">format</span>.<span class="ident">radix</span>();
+<span class="doccomment">/// Compare digits between the generated values the ratio and the actual view.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;radix&quot;</span>)]
+</span><span class="kw">pub fn </span>compare_bytes&lt;<span class="kw">const </span>FORMAT: u128&gt;(
+    number: Number,
+    <span class="kw-2">mut </span>num: Bigfloat,
+    den: Bigfloat,
+) -&gt; cmp::Ordering {
+    <span class="kw">let </span>format = NumberFormat::&lt;FORMAT&gt; {};
+    <span class="kw">let </span>radix = format.radix();
 
-    <span class="comment">// Now need to compare the theoretical digits. First, I need to trim</span>
-    <span class="comment">// any leading zeros, and will also need to ignore trailing ones.</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">integer</span> <span class="op">=</span> <span class="ident">number</span>.<span class="ident">integer</span>.<span class="ident">bytes</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span>();
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">integer_iter</span> <span class="op">=</span> <span class="ident">integer</span>.<span class="ident">integer_iter</span>();
-    <span class="ident">integer_iter</span>.<span class="ident">skip_zeros</span>();
-    <span class="kw">if</span> <span class="ident">integer_iter</span>.<span class="ident">is_done</span>() {
-        <span class="comment">// Cannot be empty, since we must have at least **some** significant digits.</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fraction</span> <span class="op">=</span> <span class="ident">number</span>.<span class="ident">fraction</span>.<span class="ident">unwrap</span>().<span class="ident">bytes</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fraction_iter</span> <span class="op">=</span> <span class="ident">fraction</span>.<span class="ident">fraction_iter</span>();
-        <span class="ident">fraction_iter</span>.<span class="ident">skip_zeros</span>();
-        <span class="macro">fraction_compare!</span>(<span class="ident">fraction_iter</span>, <span class="ident">num</span>, <span class="ident">den</span>, <span class="ident">radix</span>);
-    } <span class="kw">else</span> {
-        <span class="macro">integer_compare!</span>(<span class="ident">integer_iter</span>, <span class="ident">num</span>, <span class="ident">den</span>, <span class="ident">radix</span>);
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">fraction</span>) <span class="op">=</span> <span class="ident">number</span>.<span class="ident">fraction</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fraction</span> <span class="op">=</span> <span class="ident">fraction</span>.<span class="ident">bytes</span>::<span class="op">&lt;</span>{ <span class="ident">FORMAT</span> }<span class="op">&gt;</span>();
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fraction_iter</span> <span class="op">=</span> <span class="ident">fraction</span>.<span class="ident">fraction_iter</span>();
-            <span class="macro">fraction_compare!</span>(<span class="ident">fraction_iter</span>, <span class="ident">num</span>, <span class="ident">den</span>, <span class="ident">radix</span>);
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">num</span>.<span class="ident">data</span>.<span class="ident">is_empty</span>() {
-            <span class="comment">// We had more theoretical digits, but no more actual digits.</span>
-            <span class="kw">return</span> <span class="ident">cmp::Ordering::Less</span>;
+    <span class="comment">// Now need to compare the theoretical digits. First, I need to trim
+    // any leading zeros, and will also need to ignore trailing ones.
+    </span><span class="kw">let </span><span class="kw-2">mut </span>integer = number.integer.bytes::&lt;{ FORMAT }&gt;();
+    <span class="kw">let </span><span class="kw-2">mut </span>integer_iter = integer.integer_iter();
+    integer_iter.skip_zeros();
+    <span class="kw">if </span>integer_iter.is_done() {
+        <span class="comment">// Cannot be empty, since we must have at least **some** significant digits.
+        </span><span class="kw">let </span><span class="kw-2">mut </span>fraction = number.fraction.unwrap().bytes::&lt;{ FORMAT }&gt;();
+        <span class="kw">let </span><span class="kw-2">mut </span>fraction_iter = fraction.fraction_iter();
+        fraction_iter.skip_zeros();
+        <span class="macro">fraction_compare!</span>(fraction_iter, num, den, radix);
+    } <span class="kw">else </span>{
+        <span class="macro">integer_compare!</span>(integer_iter, num, den, radix);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(fraction) = number.fraction {
+            <span class="kw">let </span><span class="kw-2">mut </span>fraction = fraction.bytes::&lt;{ FORMAT }&gt;();
+            <span class="kw">let </span><span class="kw-2">mut </span>fraction_iter = fraction.fraction_iter();
+            <span class="macro">fraction_compare!</span>(fraction_iter, num, den, radix);
+        } <span class="kw">else if </span>!num.data.is_empty() {
+            <span class="comment">// We had more theoretical digits, but no more actual digits.
+            </span><span class="kw">return </span>cmp::Ordering::Less;
         }
     }
 
-    <span class="comment">// Exhausted both, must be equal.</span>
-    <span class="ident">cmp::Ordering::Equal</span>
+    <span class="comment">// Exhausted both, must be equal.
+    </span>cmp::Ordering::Equal
 }
 
-<span class="comment">// SCALING</span>
-<span class="comment">// -------</span>
+<span class="comment">// SCALING
+// -------
 
-<span class="doccomment">/// Calculate the scientific exponent from a `Number` value.</span>
-<span class="doccomment">/// Any other attempts would require slowdowns for faster algorithms.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">scientific_exponent</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>(<span class="ident">num</span>: <span class="kw-2">&amp;</span><span class="ident">Number</span>) -&gt; <span class="ident">i32</span> {
-    <span class="comment">// This has the significant digits and exponent relative to those</span>
-    <span class="comment">// digits: therefore, we just need to scale to mantissa to `[1, radix)`.</span>
-    <span class="comment">// This doesn&#39;t need to be very fast.</span>
-    <span class="kw">let</span> <span class="ident">format</span> <span class="op">=</span> <span class="ident">NumberFormat</span>::<span class="op">&lt;</span><span class="ident">FORMAT</span><span class="op">&gt;</span> {};
+</span><span class="doccomment">/// Calculate the scientific exponent from a `Number` value.
+/// Any other attempts would require slowdowns for faster algorithms.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>scientific_exponent&lt;<span class="kw">const </span>FORMAT: u128&gt;(num: <span class="kw-2">&amp;</span>Number) -&gt; i32 {
+    <span class="comment">// This has the significant digits and exponent relative to those
+    // digits: therefore, we just need to scale to mantissa to `[1, radix)`.
+    // This doesn&#39;t need to be very fast.
+    </span><span class="kw">let </span>format = NumberFormat::&lt;FORMAT&gt; {};
 
-    <span class="comment">// Use power reduction to make this faster: we need at least</span>
-    <span class="comment">// F::MANTISSA_SIZE bits, so we must have at least radix^4 digits.</span>
-    <span class="comment">// IF we&#39;re using base 3, we can have at most 11 divisions, and</span>
-    <span class="comment">// base 36, at most ~4. So, this is reasonably efficient.</span>
-    <span class="kw">let</span> <span class="ident">radix</span> <span class="op">=</span> <span class="ident">format</span>.<span class="ident">radix</span>() <span class="kw">as</span> <span class="ident">u64</span>;
-    <span class="kw">let</span> <span class="ident">radix2</span> <span class="op">=</span> <span class="ident">radix</span> <span class="op">*</span> <span class="ident">radix</span>;
-    <span class="kw">let</span> <span class="ident">radix4</span> <span class="op">=</span> <span class="ident">radix2</span> <span class="op">*</span> <span class="ident">radix2</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mantissa</span> <span class="op">=</span> <span class="ident">num</span>.<span class="ident">mantissa</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">exponent</span> <span class="op">=</span> <span class="ident">num</span>.<span class="ident">exponent</span>;
-    <span class="kw">while</span> <span class="ident">mantissa</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">radix4</span> {
-        <span class="ident">mantissa</span> <span class="op">/</span><span class="op">=</span> <span class="ident">radix4</span>;
-        <span class="ident">exponent</span> <span class="op">+</span><span class="op">=</span> <span class="number">4</span>;
+    <span class="comment">// Use power reduction to make this faster: we need at least
+    // F::MANTISSA_SIZE bits, so we must have at least radix^4 digits.
+    // IF we&#39;re using base 3, we can have at most 11 divisions, and
+    // base 36, at most ~4. So, this is reasonably efficient.
+    </span><span class="kw">let </span>radix = format.radix() <span class="kw">as </span>u64;
+    <span class="kw">let </span>radix2 = radix * radix;
+    <span class="kw">let </span>radix4 = radix2 * radix2;
+    <span class="kw">let </span><span class="kw-2">mut </span>mantissa = num.mantissa;
+    <span class="kw">let </span><span class="kw-2">mut </span>exponent = num.exponent;
+    <span class="kw">while </span>mantissa &gt;= radix4 {
+        mantissa /= radix4;
+        exponent += <span class="number">4</span>;
     }
-    <span class="kw">while</span> <span class="ident">mantissa</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">radix2</span> {
-        <span class="ident">mantissa</span> <span class="op">/</span><span class="op">=</span> <span class="ident">radix2</span>;
-        <span class="ident">exponent</span> <span class="op">+</span><span class="op">=</span> <span class="number">2</span>;
+    <span class="kw">while </span>mantissa &gt;= radix2 {
+        mantissa /= radix2;
+        exponent += <span class="number">2</span>;
     }
-    <span class="kw">while</span> <span class="ident">mantissa</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">radix</span> {
-        <span class="ident">mantissa</span> <span class="op">/</span><span class="op">=</span> <span class="ident">radix</span>;
-        <span class="ident">exponent</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+    <span class="kw">while </span>mantissa &gt;= radix {
+        mantissa /= radix;
+        exponent += <span class="number">1</span>;
     }
-    <span class="ident">exponent</span> <span class="kw">as</span> <span class="ident">i32</span>
+    exponent <span class="kw">as </span>i32
 }
 
-<span class="doccomment">/// Calculate `b` from a a representation of `b` as a float.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">b</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">RawFloat</span><span class="op">&gt;</span>(<span class="ident">float</span>: <span class="ident">F</span>) -&gt; <span class="ident">ExtendedFloat80</span> {
-    <span class="ident">ExtendedFloat80</span> {
-        <span class="ident">mant</span>: <span class="ident">float</span>.<span class="ident">mantissa</span>().<span class="ident">as_u64</span>(),
-        <span class="ident">exp</span>: <span class="ident">float</span>.<span class="ident">exponent</span>(),
-    }
-}
-
-<span class="doccomment">/// Calculate `b+h` from a a representation of `b` as a float.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bh</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">RawFloat</span><span class="op">&gt;</span>(<span class="ident">float</span>: <span class="ident">F</span>) -&gt; <span class="ident">ExtendedFloat80</span> {
-    <span class="kw">let</span> <span class="ident">fp</span> <span class="op">=</span> <span class="ident">b</span>(<span class="ident">float</span>);
-    <span class="ident">ExtendedFloat80</span> {
-        <span class="ident">mant</span>: (<span class="ident">fp</span>.<span class="ident">mant</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>) <span class="op">+</span> <span class="number">1</span>,
-        <span class="ident">exp</span>: <span class="ident">fp</span>.<span class="ident">exp</span> <span class="op">-</span> <span class="number">1</span>,
+<span class="doccomment">/// Calculate `b` from a a representation of `b` as a float.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>b&lt;F: RawFloat&gt;(float: F) -&gt; ExtendedFloat80 {
+    ExtendedFloat80 {
+        mant: float.mantissa().as_u64(),
+        exp: float.exponent(),
     }
 }
 
-<span class="doccomment">/// Calculate the integral ceiling of the binary factor from a basen number.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">integral_binary_factor</span>(<span class="ident">radix</span>: <span class="ident">u32</span>) -&gt; <span class="ident">u32</span> {
-    <span class="kw">match</span> <span class="ident">radix</span> {
-        <span class="number">3</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">2</span>,
-        <span class="number">5</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">3</span>,
-        <span class="number">6</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">3</span>,
-        <span class="number">7</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">3</span>,
-        <span class="number">9</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">4</span>,
-        <span class="number">10</span> =&gt; <span class="number">4</span>,
-        <span class="number">11</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">4</span>,
-        <span class="number">12</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">4</span>,
-        <span class="number">13</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">4</span>,
-        <span class="number">14</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">4</span>,
-        <span class="number">15</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">4</span>,
-        <span class="number">17</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
-        <span class="number">18</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
-        <span class="number">19</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
-        <span class="number">20</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
-        <span class="number">21</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
-        <span class="number">22</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
-        <span class="number">23</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
-        <span class="number">24</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
-        <span class="number">25</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
-        <span class="number">26</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
-        <span class="number">27</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
-        <span class="number">28</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
-        <span class="number">29</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
-        <span class="number">30</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
-        <span class="number">31</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
-        <span class="number">33</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
-        <span class="number">34</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
-        <span class="number">35</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
-        <span class="number">36</span> <span class="kw">if</span> <span class="macro">cfg!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
-        <span class="comment">// Invalid radix</span>
-        <span class="kw">_</span> =&gt; <span class="number">0</span>,
+<span class="doccomment">/// Calculate `b+h` from a a representation of `b` as a float.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub fn </span>bh&lt;F: RawFloat&gt;(float: F) -&gt; ExtendedFloat80 {
+    <span class="kw">let </span>fp = b(float);
+    ExtendedFloat80 {
+        mant: (fp.mant &lt;&lt; <span class="number">1</span>) + <span class="number">1</span>,
+        exp: fp.exp - <span class="number">1</span>,
+    }
+}
+
+<span class="doccomment">/// Calculate the integral ceiling of the binary factor from a basen number.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub const fn </span>integral_binary_factor(radix: u32) -&gt; u32 {
+    <span class="kw">match </span>radix {
+        <span class="number">3 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">2</span>,
+        <span class="number">5 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">3</span>,
+        <span class="number">6 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">3</span>,
+        <span class="number">7 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">3</span>,
+        <span class="number">9 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">4</span>,
+        <span class="number">10 </span>=&gt; <span class="number">4</span>,
+        <span class="number">11 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">4</span>,
+        <span class="number">12 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">4</span>,
+        <span class="number">13 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">4</span>,
+        <span class="number">14 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">4</span>,
+        <span class="number">15 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">4</span>,
+        <span class="number">17 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
+        <span class="number">18 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
+        <span class="number">19 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
+        <span class="number">20 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
+        <span class="number">21 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
+        <span class="number">22 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
+        <span class="number">23 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
+        <span class="number">24 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
+        <span class="number">25 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
+        <span class="number">26 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
+        <span class="number">27 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
+        <span class="number">28 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
+        <span class="number">29 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
+        <span class="number">30 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
+        <span class="number">31 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">5</span>,
+        <span class="number">33 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
+        <span class="number">34 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
+        <span class="number">35 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
+        <span class="number">36 </span><span class="kw">if </span><span class="macro">cfg!</span>(feature = <span class="string">&quot;radix&quot;</span>) =&gt; <span class="number">6</span>,
+        <span class="comment">// Invalid radix
+        </span><span class="kw">_ </span>=&gt; <span class="number">0</span>,
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_parse_float" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_parse_float" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/transport/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tonic/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/transport/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../tonic/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../tonic/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -117,122 +117,122 @@
 <span id="115">115</span>
 <span id="116">116</span>
 <span id="117">117</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Batteries included server and client.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This module provides a set of batteries included, fully featured and</span>
-<span class="doccomment">//! fast set of HTTP/2 server and client&#39;s. These components each provide a or</span>
-<span class="doccomment">//! `rustls` tls backend when the respective feature flag is enabled, and</span>
-<span class="doccomment">//! provides builders to configure transport behavior.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Features</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - TLS support via [rustls].</span>
-<span class="doccomment">//! - Load balancing</span>
-<span class="doccomment">//! - Timeouts</span>
-<span class="doccomment">//! - Concurrency Limits</span>
-<span class="doccomment">//! - Rate limiting</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Examples</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Client</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```no_run</span>
-<span class="doccomment">//! # use tonic::transport::{Channel, Certificate, ClientTlsConfig};</span>
-<span class="doccomment">//! # use std::time::Duration;</span>
-<span class="doccomment">//! # use tonic::body::BoxBody;</span>
-<span class="doccomment">//! # use tonic::client::GrpcService;;</span>
-<span class="doccomment">//! # use http::Request;</span>
-<span class="doccomment">//! # #[cfg(feature = &quot;rustls&quot;)]</span>
-<span class="doccomment">//! # async fn do_thing() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-<span class="doccomment">//! let cert = std::fs::read_to_string(&quot;ca.pem&quot;)?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let mut channel = Channel::from_static(&quot;https://example.com&quot;)</span>
-<span class="doccomment">//!     .tls_config(ClientTlsConfig::new()</span>
-<span class="doccomment">//!         .ca_certificate(Certificate::from_pem(&amp;cert))</span>
-<span class="doccomment">//!         .domain_name(&quot;example.com&quot;.to_string()))?</span>
-<span class="doccomment">//!     .timeout(Duration::from_secs(5))</span>
-<span class="doccomment">//!     .rate_limit(5, Duration::from_secs(1))</span>
-<span class="doccomment">//!     .concurrency_limit(256)</span>
-<span class="doccomment">//!     .connect()</span>
-<span class="doccomment">//!     .await?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! channel.call(Request::new(BoxBody::empty())).await?;</span>
-<span class="doccomment">//! # Ok(())</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ## Server</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```no_run</span>
-<span class="doccomment">//! # use tonic::transport::{Server, Identity, ServerTlsConfig};</span>
-<span class="doccomment">//! # use tower::{Service, service_fn};</span>
-<span class="doccomment">//! # use futures_util::future::{err, ok};</span>
-<span class="doccomment">//! # #[cfg(feature = &quot;rustls&quot;)]</span>
-<span class="doccomment">//! # async fn do_thing() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
-<span class="doccomment">//! # #[derive(Clone)]</span>
-<span class="doccomment">//! # pub struct Svc;</span>
-<span class="doccomment">//! # impl Service&lt;hyper::Request&lt;hyper::Body&gt;&gt; for Svc {</span>
-<span class="doccomment">//! #   type Response = hyper::Response&lt;tonic::body::BoxBody&gt;;</span>
-<span class="doccomment">//! #   type Error = tonic::Status;</span>
-<span class="doccomment">//! #   type Future = futures_util::future::Ready&lt;Result&lt;Self::Response, Self::Error&gt;&gt;;</span>
-<span class="doccomment">//! #   fn poll_ready(&amp;mut self, _cx: &amp;mut std::task::Context&lt;&#39;_&gt;) -&gt; std::task::Poll&lt;Result&lt;(), Self::Error&gt;&gt; {</span>
-<span class="doccomment">//! #       Ok(()).into()</span>
-<span class="doccomment">//! #  }</span>
-<span class="doccomment">//! #   fn call(&amp;mut self, _req: hyper::Request&lt;hyper::Body&gt;) -&gt; Self::Future {</span>
-<span class="doccomment">//! #       unimplemented!()</span>
-<span class="doccomment">//! #   }</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! # impl tonic::transport::NamedService for Svc {</span>
-<span class="doccomment">//! # const NAME: &amp;&#39;static str = &quot;some_svc&quot;;</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! # let my_svc = Svc;</span>
-<span class="doccomment">//! let cert = std::fs::read_to_string(&quot;server.pem&quot;)?;</span>
-<span class="doccomment">//! let key = std::fs::read_to_string(&quot;server.key&quot;)?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! let addr = &quot;[::1]:50051&quot;.parse()?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Server::builder()</span>
-<span class="doccomment">//!     .tls_config(ServerTlsConfig::new()</span>
-<span class="doccomment">//!         .identity(Identity::from_pem(&amp;cert, &amp;key)))?</span>
-<span class="doccomment">//!     .concurrency_limit_per_connection(256)</span>
-<span class="doccomment">//!     .add_service(my_svc)</span>
-<span class="doccomment">//!     .serve(addr)</span>
-<span class="doccomment">//!     .await?;</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Ok(())</span>
-<span class="doccomment">//! # }</span>
-<span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [rustls]: https://docs.rs/rustls/0.16.0/rustls/</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Batteries included server and client.
+//!
+//! This module provides a set of batteries included, fully featured and
+//! fast set of HTTP/2 server and client&#39;s. These components each provide a or
+//! `rustls` tls backend when the respective feature flag is enabled, and
+//! provides builders to configure transport behavior.
+//!
+//! # Features
+//!
+//! - TLS support via [rustls].
+//! - Load balancing
+//! - Timeouts
+//! - Concurrency Limits
+//! - Rate limiting
+//!
+//! # Examples
+//!
+//! ## Client
+//!
+//! ```no_run
+//! # use tonic::transport::{Channel, Certificate, ClientTlsConfig};
+//! # use std::time::Duration;
+//! # use tonic::body::BoxBody;
+//! # use tonic::client::GrpcService;;
+//! # use http::Request;
+//! # #[cfg(feature = &quot;rustls&quot;)]
+//! # async fn do_thing() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+//! let cert = std::fs::read_to_string(&quot;ca.pem&quot;)?;
+//!
+//! let mut channel = Channel::from_static(&quot;https://example.com&quot;)
+//!     .tls_config(ClientTlsConfig::new()
+//!         .ca_certificate(Certificate::from_pem(&amp;cert))
+//!         .domain_name(&quot;example.com&quot;.to_string()))?
+//!     .timeout(Duration::from_secs(5))
+//!     .rate_limit(5, Duration::from_secs(1))
+//!     .concurrency_limit(256)
+//!     .connect()
+//!     .await?;
+//!
+//! channel.call(Request::new(BoxBody::empty())).await?;
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! ## Server
+//!
+//! ```no_run
+//! # use tonic::transport::{Server, Identity, ServerTlsConfig};
+//! # use tower::{Service, service_fn};
+//! # use futures_util::future::{err, ok};
+//! # #[cfg(feature = &quot;rustls&quot;)]
+//! # async fn do_thing() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {
+//! # #[derive(Clone)]
+//! # pub struct Svc;
+//! # impl Service&lt;hyper::Request&lt;hyper::Body&gt;&gt; for Svc {
+//! #   type Response = hyper::Response&lt;tonic::body::BoxBody&gt;;
+//! #   type Error = tonic::Status;
+//! #   type Future = futures_util::future::Ready&lt;Result&lt;Self::Response, Self::Error&gt;&gt;;
+//! #   fn poll_ready(&amp;mut self, _cx: &amp;mut std::task::Context&lt;&#39;_&gt;) -&gt; std::task::Poll&lt;Result&lt;(), Self::Error&gt;&gt; {
+//! #       Ok(()).into()
+//! #  }
+//! #   fn call(&amp;mut self, _req: hyper::Request&lt;hyper::Body&gt;) -&gt; Self::Future {
+//! #       unimplemented!()
+//! #   }
+//! # }
+//! # impl tonic::transport::NamedService for Svc {
+//! # const NAME: &amp;&#39;static str = &quot;some_svc&quot;;
+//! # }
+//! # let my_svc = Svc;
+//! let cert = std::fs::read_to_string(&quot;server.pem&quot;)?;
+//! let key = std::fs::read_to_string(&quot;server.key&quot;)?;
+//!
+//! let addr = &quot;[::1]:50051&quot;.parse()?;
+//!
+//! Server::builder()
+//!     .tls_config(ServerTlsConfig::new()
+//!         .identity(Identity::from_pem(&amp;cert, &amp;key)))?
+//!     .concurrency_limit_per_connection(256)
+//!     .add_service(my_svc)
+//!     .serve(addr)
+//!     .await?;
+//!
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! [rustls]: https://docs.rs/rustls/0.16.0/rustls/
 
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">channel</span>;
-<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">server</span>;
+</span><span class="kw">pub mod </span>channel;
+<span class="kw">pub mod </span>server;
 
-<span class="kw">mod</span> <span class="ident">error</span>;
-<span class="kw">mod</span> <span class="ident">service</span>;
-<span class="kw">mod</span> <span class="ident">tls</span>;
+<span class="kw">mod </span>error;
+<span class="kw">mod </span>service;
+<span class="kw">mod </span>tls;
 
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::channel</span>::{<span class="ident">Channel</span>, <span class="ident">Endpoint</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::error::Error</span>;
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::server</span>::{<span class="ident">NamedService</span>, <span class="ident">Server</span>};
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">inline</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::service::TimeoutExpired</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::tls::Certificate</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">hyper</span>::{<span class="ident">Body</span>, <span class="ident">Uri</span>};
+<span class="attribute">#[doc(inline)]
+</span><span class="kw">pub use </span><span class="self">self</span>::channel::{Channel, Endpoint};
+<span class="kw">pub use </span><span class="self">self</span>::error::Error;
+<span class="attribute">#[doc(inline)]
+</span><span class="kw">pub use </span><span class="self">self</span>::server::{NamedService, Server};
+<span class="attribute">#[doc(inline)]
+</span><span class="kw">pub use </span><span class="self">self</span>::service::TimeoutExpired;
+<span class="kw">pub use </span><span class="self">self</span>::tls::Certificate;
+<span class="kw">pub use </span>hyper::{Body, Uri};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::channel::ClientTlsConfig</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::server::ServerTlsConfig</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="self">self</span>::tls::Identity</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;tls&quot;</span>)))]
+</span><span class="kw">pub use </span><span class="self">self</span>::channel::ClientTlsConfig;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;tls&quot;</span>)))]
+</span><span class="kw">pub use </span><span class="self">self</span>::server::ServerTlsConfig;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;tls&quot;</span>)))]
+</span><span class="kw">pub use </span><span class="self">self</span>::tls::Identity;
 
-<span class="kw">type</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span> <span class="op">=</span>
-    <span class="ident">std::pin::Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">std::future::Future</span><span class="op">&lt;</span><span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">E</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="kw">type </span>BoxFuture&lt;T, E&gt; =
+    std::pin::Pin&lt;Box&lt;<span class="kw">dyn </span>std::future::Future&lt;Output = <span class="prelude-ty">Result</span>&lt;T, E&gt;&gt; + Send + <span class="lifetime">&#39;static</span>&gt;&gt;;
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tonic" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="tonic" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-util-0.8.5/src/format.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>format.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_util/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/lexical-util-0.8.5/src/format.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>format.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../lexical_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../lexical_util/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../lexical_util/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -342,349 +342,349 @@
 <span id="342">342</span>
 <span id="343">343</span>
 <span id="344">344</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Public API for the number format packed struct.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This has a consistent API whether or not the `format` feature is</span>
-<span class="doccomment">//! enabled, however, most functionality will be disabled if the feature</span>
-<span class="doccomment">//! is not enabled.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Pre-Defined Formats</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! These are the pre-defined formats for parsing numbers from various</span>
-<span class="doccomment">//! programming, markup, and data languages.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [STANDARD](crate::format::STANDARD)</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [RUST_LITERAL](crate::format::RUST_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [RUST_STRING](crate::format::RUST_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [PYTHON_LITERAL](crate::format::PYTHON_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [PYTHON_STRING](crate::format::PYTHON_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [PYTHON3_LITERAL](crate::format::PYTHON3_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [PYTHON3_STRING](crate::format::PYTHON3_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [PYTHON36_LITERAL](crate::format::PYTHON36_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [PYTHON35_LITERAL](crate::format::PYTHON35_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [PYTHON2_LITERAL](crate::format::PYTHON2_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [PYTHON2_STRING](crate::format::PYTHON2_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CXX_LITERAL](crate::format::CXX_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CXX_STRING](crate::format::CXX_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(
-    <span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>),
-    <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CXX_HEX_LITERAL](crate::format::CXX_HEX_LITERAL)&quot;</span>
-)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(
-    <span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>),
-    <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CXX_HEX_STRING](crate::format::CXX_HEX_STRING)&quot;</span>
-)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CXX20_LITERAL](crate::format::CXX20_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CXX20_STRING](crate::format::CXX20_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(
-    <span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>),
-    <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CXX20_HEX_LITERAL](crate::format::CXX20_HEX_LITERAL)&quot;</span>
-)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(
-    <span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>),
-    <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CXX20_HEX_STRING](crate::format::CXX20_HEX_STRING)&quot;</span>
-)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CXX17_LITERAL](crate::format::CXX17_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CXX17_STRING](crate::format::CXX17_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(
-    <span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>),
-    <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CXX17_HEX_LITERAL](crate::format::CXX17_HEX_LITERAL)&quot;</span>
-)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(
-    <span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>),
-    <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CXX17_HEX_STRING](crate::format::CXX17_HEX_STRING)&quot;</span>
-)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CXX14_LITERAL](crate::format::CXX14_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CXX14_STRING](crate::format::CXX14_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(
-    <span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>),
-    <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CXX14_HEX_STRING](crate::format::CXX14_HEX_STRING)&quot;</span>
-)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CXX11_LITERAL](crate::format::CXX11_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CXX11_STRING](crate::format::CXX11_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(
-    <span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>),
-    <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CXX11_HEX_STRING](crate::format::CXX11_HEX_STRING)&quot;</span>
-)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CXX03_LITERAL](crate::format::CXX03_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CXX03_STRING](crate::format::CXX03_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CXX98_LITERAL](crate::format::CXX98_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CXX98_STRING](crate::format::CXX98_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [C_LITERAL](crate::format::C_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [C_STRING](crate::format::C_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(
-    <span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>),
-    <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [C_HEX_LITERAL](crate::format::C_HEX_LITERAL)&quot;</span>
-)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(
-    <span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>),
-    <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [C_HEX_STRING](crate::format::C_HEX_STRING)&quot;</span>
-)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [C18_LITERAL](crate::format::C18_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [C18_STRING](crate::format::C18_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(
-    <span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>),
-    <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [C18_HEX_LITERAL](crate::format::C18_HEX_LITERAL)&quot;</span>
-)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(
-    <span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>),
-    <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [C18_HEX_STRING](crate::format::C18_HEX_STRING)&quot;</span>
-)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [C11_LITERAL](crate::format::C11_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [C11_STRING](crate::format::C11_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(
-    <span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>),
-    <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [C11_HEX_LITERAL](crate::format::C11_HEX_LITERAL)&quot;</span>
-)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(
-    <span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>),
-    <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [C11_HEX_STRING](crate::format::C11_HEX_STRING)&quot;</span>
-)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [C99_LITERAL](crate::format::C99_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [C99_STRING](crate::format::C99_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(
-    <span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>),
-    <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [C99_HEX_LITERAL](crate::format::C99_HEX_LITERAL)&quot;</span>
-)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(
-    <span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>),
-    <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [C99_HEX_STRING](crate::format::C99_HEX_STRING)&quot;</span>
-)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [C90_LITERAL](crate::format::C90_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [C90_STRING](crate::format::C90_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(
-    <span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>),
-    <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [C90_HEX_STRING](crate::format::C90_HEX_STRING)&quot;</span>
-)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [C89_LITERAL](crate::format::C89_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [C89_STRING](crate::format::C89_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(
-    <span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>),
-    <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [C89_HEX_STRING](crate::format::C89_HEX_STRING)&quot;</span>
-)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [RUBY_LITERAL](crate::format::RUBY_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(
-    <span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>),
-    <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [RUBY_OCTAL_LITERAL](crate::format::RUBY_OCTAL_LITERAL)&quot;</span>
-)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [RUBY_STRING](crate::format::RUBY_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [SWIFT_LITERAL](crate::format::SWIFT_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [SWIFT_STRING](crate::format::SWIFT_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [GO_LITERAL](crate::format::GO_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [GO_STRING](crate::format::GO_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [HASKELL_LITERAL](crate::format::HASKELL_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [HASKELL_STRING](crate::format::HASKELL_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [JAVASCRIPT_LITERAL](crate::format::JAVASCRIPT_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [JAVASCRIPT_STRING](crate::format::JAVASCRIPT_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [PERL_LITERAL](crate::format::PERL_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [PERL_STRING](crate::format::PERL_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [PHP_LITERAL](crate::format::PHP_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [PHP_STRING](crate::format::PHP_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [JAVA_LITERAL](crate::format::JAVA_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [JAVA_STRING](crate::format::JAVA_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [R_LITERAL](crate::format::R_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [R_STRING](crate::format::R_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [KOTLIN_LITERAL](crate::format::KOTLIN_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [KOTLIN_STRING](crate::format::KOTLIN_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [JULIA_LITERAL](crate::format::JULIA_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [JULIA_STRING](crate::format::JULIA_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(
-    <span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>),
-    <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [JULIA_HEX_LITERAL](crate::format::JULIA_HEX_LITERAL)&quot;</span>
-)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(
-    <span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;power-of-two&quot;</span>),
-    <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [JULIA_HEX_STRING](crate::format::JULIA_HEX_STRING)&quot;</span>
-)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CSHARP_LITERAL](crate::format::CSHARP_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CSHARP_STRING](crate::format::CSHARP_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CSHARP7_LITERAL](crate::format::CSHARP7_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CSHARP7_STRING](crate::format::CSHARP7_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CSHARP6_LITERAL](crate::format::CSHARP6_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CSHARP6_STRING](crate::format::CSHARP6_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CSHARP5_LITERAL](crate::format::CSHARP5_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CSHARP5_STRING](crate::format::CSHARP5_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CSHARP4_LITERAL](crate::format::CSHARP4_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CSHARP4_STRING](crate::format::CSHARP4_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CSHARP3_LITERAL](crate::format::CSHARP3_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CSHARP3_STRING](crate::format::CSHARP3_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CSHARP2_LITERAL](crate::format::CSHARP2_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CSHARP2_STRING](crate::format::CSHARP2_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CSHARP1_LITERAL](crate::format::CSHARP1_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CSHARP1_STRING](crate::format::CSHARP1_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [KAWA_LITERAL](crate::format::KAWA_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [KAWA_STRING](crate::format::KAWA_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [GAMBITC_LITERAL](crate::format::GAMBITC_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [GAMBITC_STRING](crate::format::GAMBITC_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [GUILE_LITERAL](crate::format::GUILE_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [GUILE_STRING](crate::format::GUILE_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CLOJURE_LITERAL](crate::format::CLOJURE_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [CLOJURE_STRING](crate::format::CLOJURE_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [ERLANG_LITERAL](crate::format::ERLANG_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [ERLANG_STRING](crate::format::ERLANG_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [ELM_LITERAL](crate::format::ELM_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [ELM_STRING](crate::format::ELM_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [SCALA_LITERAL](crate::format::SCALA_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [SCALA_STRING](crate::format::SCALA_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [ELIXIR_LITERAL](crate::format::ELIXIR_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [ELIXIR_STRING](crate::format::ELIXIR_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [FORTRAN_LITERAL](crate::format::FORTRAN_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [FORTRAN_STRING](crate::format::FORTRAN_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [D_LITERAL](crate::format::D_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [D_STRING](crate::format::D_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>,
-    <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [COFFEESCRIPT_LITERAL](crate::format::COFFEESCRIPT_LITERAL)&quot;</span>
-)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(
-    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>,
-    <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [COFFEESCRIPT_STRING](crate::format::COFFEESCRIPT_STRING)&quot;</span>
-)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [COBOL_LITERAL](crate::format::COBOL_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [COBOL_STRING](crate::format::COBOL_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [FSHARP_LITERAL](crate::format::FSHARP_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [FSHARP_STRING](crate::format::FSHARP_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [VB_LITERAL](crate::format::VB_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [VB_STRING](crate::format::VB_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [OCAML_LITERAL](crate::format::OCAML_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [OCAML_STRING](crate::format::OCAML_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [OBJECTIVEC_LITERAL](crate::format::OBJECTIVEC_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [OBJECTIVEC_STRING](crate::format::OBJECTIVEC_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [REASONML_LITERAL](crate::format::REASONML_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [REASONML_STRING](crate::format::REASONML_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [OCTAVE_LITERAL](crate::format::OCTAVE_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [OCTAVE_STRING](crate::format::OCTAVE_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [MATLAB_LITERAL](crate::format::MATLAB_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [MATLAB_STRING](crate::format::MATLAB_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [ZIG_LITERAL](crate::format::ZIG_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [ZIG_STRING](crate::format::ZIG_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [SAGE_LITERAL](crate::format::SAGE_LITERAL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [SAGE_STRING](crate::format::SAGE_STRING)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [JSON](crate::format::JSON)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [TOML](crate::format::TOML)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [YAML](crate::format::YAML)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [XML](crate::format::XML)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [SQLITE](crate::format::SQLITE)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [POSTGRESQL](crate::format::POSTGRESQL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [MYSQL](crate::format::MYSQL)&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>, <span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; - [MONGODB](crate::format::MONGODB)&quot;</span>)]</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Syntax Flags</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Bitflags to get and set syntax flags for the format packed struct.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [REQUIRED_INTEGER_DIGITS](crate::format::REQUIRED_INTEGER_DIGITS)</span>
-<span class="doccomment">//! - [REQUIRED_FRACTION_DIGITS](crate::format::REQUIRED_FRACTION_DIGITS)</span>
-<span class="doccomment">//! - [REQUIRED_EXPONENT_DIGITS](crate::format::REQUIRED_EXPONENT_DIGITS)</span>
-<span class="doccomment">//! - [REQUIRED_MANTISSA_DIGITS](crate::format::REQUIRED_MANTISSA_DIGITS)</span>
-<span class="doccomment">//! - [REQUIRED_DIGITS](crate::format::REQUIRED_DIGITS)</span>
-<span class="doccomment">//! - [NO_POSITIVE_MANTISSA_SIGN](crate::format::NO_POSITIVE_MANTISSA_SIGN)</span>
-<span class="doccomment">//! - [REQUIRED_MANTISSA_SIGN](crate::format::REQUIRED_MANTISSA_SIGN)</span>
-<span class="doccomment">//! - [NO_EXPONENT_NOTATION](crate::format::NO_EXPONENT_NOTATION)</span>
-<span class="doccomment">//! - [NO_POSITIVE_EXPONENT_SIGN](crate::format::NO_POSITIVE_EXPONENT_SIGN)</span>
-<span class="doccomment">//! - [REQUIRED_EXPONENT_SIGN](crate::format::REQUIRED_EXPONENT_SIGN)</span>
-<span class="doccomment">//! - [NO_EXPONENT_WITHOUT_FRACTION](crate::format::NO_EXPONENT_WITHOUT_FRACTION)</span>
-<span class="doccomment">//! - [NO_SPECIAL](crate::format::NO_SPECIAL)</span>
-<span class="doccomment">//! - [CASE_SENSITIVE_SPECIAL](crate::format::CASE_SENSITIVE_SPECIAL)</span>
-<span class="doccomment">//! - [NO_INTEGER_LEADING_ZEROS](crate::format::NO_INTEGER_LEADING_ZEROS)</span>
-<span class="doccomment">//! - [NO_FLOAT_LEADING_ZEROS](crate::format::NO_FLOAT_LEADING_ZEROS)</span>
-<span class="doccomment">//! - [REQUIRED_EXPONENT_NOTATION](crate::format::REQUIRED_EXPONENT_NOTATION)</span>
-<span class="doccomment">//! - [CASE_SENSITIVE_EXPONENT](crate::format::CASE_SENSITIVE_EXPONENT)</span>
-<span class="doccomment">//! - [CASE_SENSITIVE_BASE_PREFIX](crate::format::CASE_SENSITIVE_BASE_PREFIX)</span>
-<span class="doccomment">//! - [CASE_SENSITIVE_BASE_SUFFIX](crate::format::CASE_SENSITIVE_BASE_SUFFIX)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Digit Separator Flags</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Bitflags to get and set digit separators flags for the format</span>
-<span class="doccomment">//! packed struct.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [INTEGER_INTERNAL_DIGIT_SEPARATOR](crate::format::INTEGER_INTERNAL_DIGIT_SEPARATOR)</span>
-<span class="doccomment">//! - [FRACTION_INTERNAL_DIGIT_SEPARATOR](crate::format::FRACTION_INTERNAL_DIGIT_SEPARATOR)</span>
-<span class="doccomment">//! - [EXPONENT_INTERNAL_DIGIT_SEPARATOR](crate::format::EXPONENT_INTERNAL_DIGIT_SEPARATOR)</span>
-<span class="doccomment">//! - [INTEGER_LEADING_DIGIT_SEPARATOR](crate::format::INTEGER_LEADING_DIGIT_SEPARATOR)</span>
-<span class="doccomment">//! - [FRACTION_LEADING_DIGIT_SEPARATOR](crate::format::FRACTION_LEADING_DIGIT_SEPARATOR)</span>
-<span class="doccomment">//! - [EXPONENT_LEADING_DIGIT_SEPARATOR](crate::format::EXPONENT_LEADING_DIGIT_SEPARATOR)</span>
-<span class="doccomment">//! - [INTEGER_TRAILING_DIGIT_SEPARATOR](crate::format::INTEGER_TRAILING_DIGIT_SEPARATOR)</span>
-<span class="doccomment">//! - [FRACTION_TRAILING_DIGIT_SEPARATOR](crate::format::FRACTION_TRAILING_DIGIT_SEPARATOR)</span>
-<span class="doccomment">//! - [EXPONENT_TRAILING_DIGIT_SEPARATOR](crate::format::EXPONENT_TRAILING_DIGIT_SEPARATOR)</span>
-<span class="doccomment">//! - [INTEGER_CONSECUTIVE_DIGIT_SEPARATOR](crate::format::INTEGER_CONSECUTIVE_DIGIT_SEPARATOR)</span>
-<span class="doccomment">//! - [FRACTION_CONSECUTIVE_DIGIT_SEPARATOR](crate::format::FRACTION_CONSECUTIVE_DIGIT_SEPARATOR)</span>
-<span class="doccomment">//! - [EXPONENT_CONSECUTIVE_DIGIT_SEPARATOR](crate::format::EXPONENT_CONSECUTIVE_DIGIT_SEPARATOR)</span>
-<span class="doccomment">//! - [INTERNAL_DIGIT_SEPARATOR](crate::format::INTERNAL_DIGIT_SEPARATOR)</span>
-<span class="doccomment">//! - [LEADING_DIGIT_SEPARATOR](crate::format::LEADING_DIGIT_SEPARATOR)</span>
-<span class="doccomment">//! - [TRAILING_DIGIT_SEPARATOR](crate::format::TRAILING_DIGIT_SEPARATOR)</span>
-<span class="doccomment">//! - [CONSECUTIVE_DIGIT_SEPARATOR](crate::format::CONSECUTIVE_DIGIT_SEPARATOR)</span>
-<span class="doccomment">//! - [SPECIAL_DIGIT_SEPARATOR](crate::format::SPECIAL_DIGIT_SEPARATOR)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Character Shifts and Masks</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Bitmasks and bitshifts to get and set control characters for the format</span>
-<span class="doccomment">//! packed struct.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [DIGIT_SEPARATOR_SHIFT](crate::format::DIGIT_SEPARATOR_SHIFT)</span>
-<span class="doccomment">//! - [DIGIT_SEPARATOR](crate::format::DIGIT_SEPARATOR)</span>
-<span class="doccomment">//! - [BASE_PREFIX_SHIFT](crate::format::BASE_PREFIX_SHIFT)</span>
-<span class="doccomment">//! - [BASE_PREFIX](crate::format::BASE_PREFIX)</span>
-<span class="doccomment">//! - [BASE_SUFFIX_SHIFT](crate::format::BASE_SUFFIX_SHIFT)</span>
-<span class="doccomment">//! - [BASE_SUFFIX](crate::format::BASE_SUFFIX)</span>
-<span class="doccomment">//! - [MANTISSA_RADIX_SHIFT](crate::format::MANTISSA_RADIX_SHIFT)</span>
-<span class="doccomment">//! - [MANTISSA_RADIX](crate::format::MANTISSA_RADIX)</span>
-<span class="doccomment">//! - [RADIX_SHIFT](crate::format::RADIX_SHIFT)</span>
-<span class="doccomment">//! - [RADIX](crate::format::RADIX)</span>
-<span class="doccomment">//! - [EXPONENT_BASE_SHIFT](crate::format::EXPONENT_BASE_SHIFT)</span>
-<span class="doccomment">//! - [EXPONENT_BASE](crate::format::EXPONENT_BASE)</span>
-<span class="doccomment">//! - [EXPONENT_RADIX_SHIFT](crate::format::EXPONENT_RADIX_SHIFT)</span>
-<span class="doccomment">//! - [EXPONENT_RADIX](crate::format::EXPONENT_RADIX)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Character Functions</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Functions to get control characters from the format packed struct.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [digit_separator](crate::format::digit_separator)</span>
-<span class="doccomment">//! - [base_prefix](crate::format::base_prefix)</span>
-<span class="doccomment">//! - [base_suffix](crate::format::base_suffix)</span>
-<span class="doccomment">//! - [mantissa_radix](crate::format::mantissa_radix)</span>
-<span class="doccomment">//! - [exponent_base](crate::format::exponent_base)</span>
-<span class="doccomment">//! - [exponent_radix](crate::format::exponent_radix)</span>
-<span class="doccomment">//! - [radix_from_flags](crate::format::radix_from_flags)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! # Validators</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! Functions to validate control characters for the format packed struct.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! - [is_valid_digit_separator](is_valid_digit_separator)</span>
-<span class="doccomment">//! - [is_valid_base_prefix](is_valid_base_prefix)</span>
-<span class="doccomment">//! - [is_valid_base_suffix](is_valid_base_suffix)</span>
-<span class="doccomment">//! - [is_valid_punctuation](is_valid_punctuation)</span>
-<span class="doccomment">//! - [is_valid_radix](is_valid_radix)</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Public API for the number format packed struct.
+//!
+//! This has a consistent API whether or not the `format` feature is
+//! enabled, however, most functionality will be disabled if the feature
+//! is not enabled.
+//!
+//! # Pre-Defined Formats
+//!
+//! These are the pre-defined formats for parsing numbers from various
+//! programming, markup, and data languages.
+//!
+//! - [STANDARD](crate::format::STANDARD)
+</span><span class="attribute">#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [RUST_LITERAL](crate::format::RUST_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [RUST_STRING](crate::format::RUST_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [PYTHON_LITERAL](crate::format::PYTHON_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [PYTHON_STRING](crate::format::PYTHON_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [PYTHON3_LITERAL](crate::format::PYTHON3_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [PYTHON3_STRING](crate::format::PYTHON3_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [PYTHON36_LITERAL](crate::format::PYTHON36_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [PYTHON35_LITERAL](crate::format::PYTHON35_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [PYTHON2_LITERAL](crate::format::PYTHON2_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [PYTHON2_STRING](crate::format::PYTHON2_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [CXX_LITERAL](crate::format::CXX_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [CXX_STRING](crate::format::CXX_STRING)&quot;</span>)]
+#![cfg_attr(
+    all(feature = <span class="string">&quot;format&quot;</span>, feature = <span class="string">&quot;power-of-two&quot;</span>),
+    doc = <span class="string">&quot; - [CXX_HEX_LITERAL](crate::format::CXX_HEX_LITERAL)&quot;
+</span>)]
+#![cfg_attr(
+    all(feature = <span class="string">&quot;format&quot;</span>, feature = <span class="string">&quot;power-of-two&quot;</span>),
+    doc = <span class="string">&quot; - [CXX_HEX_STRING](crate::format::CXX_HEX_STRING)&quot;
+</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [CXX20_LITERAL](crate::format::CXX20_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [CXX20_STRING](crate::format::CXX20_STRING)&quot;</span>)]
+#![cfg_attr(
+    all(feature = <span class="string">&quot;format&quot;</span>, feature = <span class="string">&quot;power-of-two&quot;</span>),
+    doc = <span class="string">&quot; - [CXX20_HEX_LITERAL](crate::format::CXX20_HEX_LITERAL)&quot;
+</span>)]
+#![cfg_attr(
+    all(feature = <span class="string">&quot;format&quot;</span>, feature = <span class="string">&quot;power-of-two&quot;</span>),
+    doc = <span class="string">&quot; - [CXX20_HEX_STRING](crate::format::CXX20_HEX_STRING)&quot;
+</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [CXX17_LITERAL](crate::format::CXX17_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [CXX17_STRING](crate::format::CXX17_STRING)&quot;</span>)]
+#![cfg_attr(
+    all(feature = <span class="string">&quot;format&quot;</span>, feature = <span class="string">&quot;power-of-two&quot;</span>),
+    doc = <span class="string">&quot; - [CXX17_HEX_LITERAL](crate::format::CXX17_HEX_LITERAL)&quot;
+</span>)]
+#![cfg_attr(
+    all(feature = <span class="string">&quot;format&quot;</span>, feature = <span class="string">&quot;power-of-two&quot;</span>),
+    doc = <span class="string">&quot; - [CXX17_HEX_STRING](crate::format::CXX17_HEX_STRING)&quot;
+</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [CXX14_LITERAL](crate::format::CXX14_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [CXX14_STRING](crate::format::CXX14_STRING)&quot;</span>)]
+#![cfg_attr(
+    all(feature = <span class="string">&quot;format&quot;</span>, feature = <span class="string">&quot;power-of-two&quot;</span>),
+    doc = <span class="string">&quot; - [CXX14_HEX_STRING](crate::format::CXX14_HEX_STRING)&quot;
+</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [CXX11_LITERAL](crate::format::CXX11_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [CXX11_STRING](crate::format::CXX11_STRING)&quot;</span>)]
+#![cfg_attr(
+    all(feature = <span class="string">&quot;format&quot;</span>, feature = <span class="string">&quot;power-of-two&quot;</span>),
+    doc = <span class="string">&quot; - [CXX11_HEX_STRING](crate::format::CXX11_HEX_STRING)&quot;
+</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [CXX03_LITERAL](crate::format::CXX03_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [CXX03_STRING](crate::format::CXX03_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [CXX98_LITERAL](crate::format::CXX98_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [CXX98_STRING](crate::format::CXX98_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [C_LITERAL](crate::format::C_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [C_STRING](crate::format::C_STRING)&quot;</span>)]
+#![cfg_attr(
+    all(feature = <span class="string">&quot;format&quot;</span>, feature = <span class="string">&quot;power-of-two&quot;</span>),
+    doc = <span class="string">&quot; - [C_HEX_LITERAL](crate::format::C_HEX_LITERAL)&quot;
+</span>)]
+#![cfg_attr(
+    all(feature = <span class="string">&quot;format&quot;</span>, feature = <span class="string">&quot;power-of-two&quot;</span>),
+    doc = <span class="string">&quot; - [C_HEX_STRING](crate::format::C_HEX_STRING)&quot;
+</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [C18_LITERAL](crate::format::C18_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [C18_STRING](crate::format::C18_STRING)&quot;</span>)]
+#![cfg_attr(
+    all(feature = <span class="string">&quot;format&quot;</span>, feature = <span class="string">&quot;power-of-two&quot;</span>),
+    doc = <span class="string">&quot; - [C18_HEX_LITERAL](crate::format::C18_HEX_LITERAL)&quot;
+</span>)]
+#![cfg_attr(
+    all(feature = <span class="string">&quot;format&quot;</span>, feature = <span class="string">&quot;power-of-two&quot;</span>),
+    doc = <span class="string">&quot; - [C18_HEX_STRING](crate::format::C18_HEX_STRING)&quot;
+</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [C11_LITERAL](crate::format::C11_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [C11_STRING](crate::format::C11_STRING)&quot;</span>)]
+#![cfg_attr(
+    all(feature = <span class="string">&quot;format&quot;</span>, feature = <span class="string">&quot;power-of-two&quot;</span>),
+    doc = <span class="string">&quot; - [C11_HEX_LITERAL](crate::format::C11_HEX_LITERAL)&quot;
+</span>)]
+#![cfg_attr(
+    all(feature = <span class="string">&quot;format&quot;</span>, feature = <span class="string">&quot;power-of-two&quot;</span>),
+    doc = <span class="string">&quot; - [C11_HEX_STRING](crate::format::C11_HEX_STRING)&quot;
+</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [C99_LITERAL](crate::format::C99_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [C99_STRING](crate::format::C99_STRING)&quot;</span>)]
+#![cfg_attr(
+    all(feature = <span class="string">&quot;format&quot;</span>, feature = <span class="string">&quot;power-of-two&quot;</span>),
+    doc = <span class="string">&quot; - [C99_HEX_LITERAL](crate::format::C99_HEX_LITERAL)&quot;
+</span>)]
+#![cfg_attr(
+    all(feature = <span class="string">&quot;format&quot;</span>, feature = <span class="string">&quot;power-of-two&quot;</span>),
+    doc = <span class="string">&quot; - [C99_HEX_STRING](crate::format::C99_HEX_STRING)&quot;
+</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [C90_LITERAL](crate::format::C90_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [C90_STRING](crate::format::C90_STRING)&quot;</span>)]
+#![cfg_attr(
+    all(feature = <span class="string">&quot;format&quot;</span>, feature = <span class="string">&quot;power-of-two&quot;</span>),
+    doc = <span class="string">&quot; - [C90_HEX_STRING](crate::format::C90_HEX_STRING)&quot;
+</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [C89_LITERAL](crate::format::C89_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [C89_STRING](crate::format::C89_STRING)&quot;</span>)]
+#![cfg_attr(
+    all(feature = <span class="string">&quot;format&quot;</span>, feature = <span class="string">&quot;power-of-two&quot;</span>),
+    doc = <span class="string">&quot; - [C89_HEX_STRING](crate::format::C89_HEX_STRING)&quot;
+</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [RUBY_LITERAL](crate::format::RUBY_LITERAL)&quot;</span>)]
+#![cfg_attr(
+    all(feature = <span class="string">&quot;format&quot;</span>, feature = <span class="string">&quot;power-of-two&quot;</span>),
+    doc = <span class="string">&quot; - [RUBY_OCTAL_LITERAL](crate::format::RUBY_OCTAL_LITERAL)&quot;
+</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [RUBY_STRING](crate::format::RUBY_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [SWIFT_LITERAL](crate::format::SWIFT_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [SWIFT_STRING](crate::format::SWIFT_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [GO_LITERAL](crate::format::GO_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [GO_STRING](crate::format::GO_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [HASKELL_LITERAL](crate::format::HASKELL_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [HASKELL_STRING](crate::format::HASKELL_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [JAVASCRIPT_LITERAL](crate::format::JAVASCRIPT_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [JAVASCRIPT_STRING](crate::format::JAVASCRIPT_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [PERL_LITERAL](crate::format::PERL_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [PERL_STRING](crate::format::PERL_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [PHP_LITERAL](crate::format::PHP_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [PHP_STRING](crate::format::PHP_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [JAVA_LITERAL](crate::format::JAVA_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [JAVA_STRING](crate::format::JAVA_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [R_LITERAL](crate::format::R_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [R_STRING](crate::format::R_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [KOTLIN_LITERAL](crate::format::KOTLIN_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [KOTLIN_STRING](crate::format::KOTLIN_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [JULIA_LITERAL](crate::format::JULIA_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [JULIA_STRING](crate::format::JULIA_STRING)&quot;</span>)]
+#![cfg_attr(
+    all(feature = <span class="string">&quot;format&quot;</span>, feature = <span class="string">&quot;power-of-two&quot;</span>),
+    doc = <span class="string">&quot; - [JULIA_HEX_LITERAL](crate::format::JULIA_HEX_LITERAL)&quot;
+</span>)]
+#![cfg_attr(
+    all(feature = <span class="string">&quot;format&quot;</span>, feature = <span class="string">&quot;power-of-two&quot;</span>),
+    doc = <span class="string">&quot; - [JULIA_HEX_STRING](crate::format::JULIA_HEX_STRING)&quot;
+</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [CSHARP_LITERAL](crate::format::CSHARP_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [CSHARP_STRING](crate::format::CSHARP_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [CSHARP7_LITERAL](crate::format::CSHARP7_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [CSHARP7_STRING](crate::format::CSHARP7_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [CSHARP6_LITERAL](crate::format::CSHARP6_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [CSHARP6_STRING](crate::format::CSHARP6_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [CSHARP5_LITERAL](crate::format::CSHARP5_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [CSHARP5_STRING](crate::format::CSHARP5_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [CSHARP4_LITERAL](crate::format::CSHARP4_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [CSHARP4_STRING](crate::format::CSHARP4_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [CSHARP3_LITERAL](crate::format::CSHARP3_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [CSHARP3_STRING](crate::format::CSHARP3_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [CSHARP2_LITERAL](crate::format::CSHARP2_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [CSHARP2_STRING](crate::format::CSHARP2_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [CSHARP1_LITERAL](crate::format::CSHARP1_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [CSHARP1_STRING](crate::format::CSHARP1_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [KAWA_LITERAL](crate::format::KAWA_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [KAWA_STRING](crate::format::KAWA_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [GAMBITC_LITERAL](crate::format::GAMBITC_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [GAMBITC_STRING](crate::format::GAMBITC_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [GUILE_LITERAL](crate::format::GUILE_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [GUILE_STRING](crate::format::GUILE_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [CLOJURE_LITERAL](crate::format::CLOJURE_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [CLOJURE_STRING](crate::format::CLOJURE_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [ERLANG_LITERAL](crate::format::ERLANG_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [ERLANG_STRING](crate::format::ERLANG_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [ELM_LITERAL](crate::format::ELM_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [ELM_STRING](crate::format::ELM_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [SCALA_LITERAL](crate::format::SCALA_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [SCALA_STRING](crate::format::SCALA_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [ELIXIR_LITERAL](crate::format::ELIXIR_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [ELIXIR_STRING](crate::format::ELIXIR_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [FORTRAN_LITERAL](crate::format::FORTRAN_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [FORTRAN_STRING](crate::format::FORTRAN_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [D_LITERAL](crate::format::D_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [D_STRING](crate::format::D_STRING)&quot;</span>)]
+#![cfg_attr(
+    feature = <span class="string">&quot;format&quot;</span>,
+    doc = <span class="string">&quot; - [COFFEESCRIPT_LITERAL](crate::format::COFFEESCRIPT_LITERAL)&quot;
+</span>)]
+#![cfg_attr(
+    feature = <span class="string">&quot;format&quot;</span>,
+    doc = <span class="string">&quot; - [COFFEESCRIPT_STRING](crate::format::COFFEESCRIPT_STRING)&quot;
+</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [COBOL_LITERAL](crate::format::COBOL_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [COBOL_STRING](crate::format::COBOL_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [FSHARP_LITERAL](crate::format::FSHARP_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [FSHARP_STRING](crate::format::FSHARP_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [VB_LITERAL](crate::format::VB_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [VB_STRING](crate::format::VB_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [OCAML_LITERAL](crate::format::OCAML_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [OCAML_STRING](crate::format::OCAML_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [OBJECTIVEC_LITERAL](crate::format::OBJECTIVEC_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [OBJECTIVEC_STRING](crate::format::OBJECTIVEC_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [REASONML_LITERAL](crate::format::REASONML_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [REASONML_STRING](crate::format::REASONML_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [OCTAVE_LITERAL](crate::format::OCTAVE_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [OCTAVE_STRING](crate::format::OCTAVE_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [MATLAB_LITERAL](crate::format::MATLAB_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [MATLAB_STRING](crate::format::MATLAB_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [ZIG_LITERAL](crate::format::ZIG_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [ZIG_STRING](crate::format::ZIG_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [SAGE_LITERAL](crate::format::SAGE_LITERAL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [SAGE_STRING](crate::format::SAGE_STRING)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [JSON](crate::format::JSON)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [TOML](crate::format::TOML)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [YAML](crate::format::YAML)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [XML](crate::format::XML)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [SQLITE](crate::format::SQLITE)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [POSTGRESQL](crate::format::POSTGRESQL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [MYSQL](crate::format::MYSQL)&quot;</span>)]
+#![cfg_attr(feature = <span class="string">&quot;format&quot;</span>, doc = <span class="string">&quot; - [MONGODB](crate::format::MONGODB)&quot;</span>)]
+</span><span class="doccomment">//!
+//! # Syntax Flags
+//!
+//! Bitflags to get and set syntax flags for the format packed struct.
+//!
+//! - [REQUIRED_INTEGER_DIGITS](crate::format::REQUIRED_INTEGER_DIGITS)
+//! - [REQUIRED_FRACTION_DIGITS](crate::format::REQUIRED_FRACTION_DIGITS)
+//! - [REQUIRED_EXPONENT_DIGITS](crate::format::REQUIRED_EXPONENT_DIGITS)
+//! - [REQUIRED_MANTISSA_DIGITS](crate::format::REQUIRED_MANTISSA_DIGITS)
+//! - [REQUIRED_DIGITS](crate::format::REQUIRED_DIGITS)
+//! - [NO_POSITIVE_MANTISSA_SIGN](crate::format::NO_POSITIVE_MANTISSA_SIGN)
+//! - [REQUIRED_MANTISSA_SIGN](crate::format::REQUIRED_MANTISSA_SIGN)
+//! - [NO_EXPONENT_NOTATION](crate::format::NO_EXPONENT_NOTATION)
+//! - [NO_POSITIVE_EXPONENT_SIGN](crate::format::NO_POSITIVE_EXPONENT_SIGN)
+//! - [REQUIRED_EXPONENT_SIGN](crate::format::REQUIRED_EXPONENT_SIGN)
+//! - [NO_EXPONENT_WITHOUT_FRACTION](crate::format::NO_EXPONENT_WITHOUT_FRACTION)
+//! - [NO_SPECIAL](crate::format::NO_SPECIAL)
+//! - [CASE_SENSITIVE_SPECIAL](crate::format::CASE_SENSITIVE_SPECIAL)
+//! - [NO_INTEGER_LEADING_ZEROS](crate::format::NO_INTEGER_LEADING_ZEROS)
+//! - [NO_FLOAT_LEADING_ZEROS](crate::format::NO_FLOAT_LEADING_ZEROS)
+//! - [REQUIRED_EXPONENT_NOTATION](crate::format::REQUIRED_EXPONENT_NOTATION)
+//! - [CASE_SENSITIVE_EXPONENT](crate::format::CASE_SENSITIVE_EXPONENT)
+//! - [CASE_SENSITIVE_BASE_PREFIX](crate::format::CASE_SENSITIVE_BASE_PREFIX)
+//! - [CASE_SENSITIVE_BASE_SUFFIX](crate::format::CASE_SENSITIVE_BASE_SUFFIX)
+//!
+//! # Digit Separator Flags
+//!
+//! Bitflags to get and set digit separators flags for the format
+//! packed struct.
+//!
+//! - [INTEGER_INTERNAL_DIGIT_SEPARATOR](crate::format::INTEGER_INTERNAL_DIGIT_SEPARATOR)
+//! - [FRACTION_INTERNAL_DIGIT_SEPARATOR](crate::format::FRACTION_INTERNAL_DIGIT_SEPARATOR)
+//! - [EXPONENT_INTERNAL_DIGIT_SEPARATOR](crate::format::EXPONENT_INTERNAL_DIGIT_SEPARATOR)
+//! - [INTEGER_LEADING_DIGIT_SEPARATOR](crate::format::INTEGER_LEADING_DIGIT_SEPARATOR)
+//! - [FRACTION_LEADING_DIGIT_SEPARATOR](crate::format::FRACTION_LEADING_DIGIT_SEPARATOR)
+//! - [EXPONENT_LEADING_DIGIT_SEPARATOR](crate::format::EXPONENT_LEADING_DIGIT_SEPARATOR)
+//! - [INTEGER_TRAILING_DIGIT_SEPARATOR](crate::format::INTEGER_TRAILING_DIGIT_SEPARATOR)
+//! - [FRACTION_TRAILING_DIGIT_SEPARATOR](crate::format::FRACTION_TRAILING_DIGIT_SEPARATOR)
+//! - [EXPONENT_TRAILING_DIGIT_SEPARATOR](crate::format::EXPONENT_TRAILING_DIGIT_SEPARATOR)
+//! - [INTEGER_CONSECUTIVE_DIGIT_SEPARATOR](crate::format::INTEGER_CONSECUTIVE_DIGIT_SEPARATOR)
+//! - [FRACTION_CONSECUTIVE_DIGIT_SEPARATOR](crate::format::FRACTION_CONSECUTIVE_DIGIT_SEPARATOR)
+//! - [EXPONENT_CONSECUTIVE_DIGIT_SEPARATOR](crate::format::EXPONENT_CONSECUTIVE_DIGIT_SEPARATOR)
+//! - [INTERNAL_DIGIT_SEPARATOR](crate::format::INTERNAL_DIGIT_SEPARATOR)
+//! - [LEADING_DIGIT_SEPARATOR](crate::format::LEADING_DIGIT_SEPARATOR)
+//! - [TRAILING_DIGIT_SEPARATOR](crate::format::TRAILING_DIGIT_SEPARATOR)
+//! - [CONSECUTIVE_DIGIT_SEPARATOR](crate::format::CONSECUTIVE_DIGIT_SEPARATOR)
+//! - [SPECIAL_DIGIT_SEPARATOR](crate::format::SPECIAL_DIGIT_SEPARATOR)
+//!
+//! # Character Shifts and Masks
+//!
+//! Bitmasks and bitshifts to get and set control characters for the format
+//! packed struct.
+//!
+//! - [DIGIT_SEPARATOR_SHIFT](crate::format::DIGIT_SEPARATOR_SHIFT)
+//! - [DIGIT_SEPARATOR](crate::format::DIGIT_SEPARATOR)
+//! - [BASE_PREFIX_SHIFT](crate::format::BASE_PREFIX_SHIFT)
+//! - [BASE_PREFIX](crate::format::BASE_PREFIX)
+//! - [BASE_SUFFIX_SHIFT](crate::format::BASE_SUFFIX_SHIFT)
+//! - [BASE_SUFFIX](crate::format::BASE_SUFFIX)
+//! - [MANTISSA_RADIX_SHIFT](crate::format::MANTISSA_RADIX_SHIFT)
+//! - [MANTISSA_RADIX](crate::format::MANTISSA_RADIX)
+//! - [RADIX_SHIFT](crate::format::RADIX_SHIFT)
+//! - [RADIX](crate::format::RADIX)
+//! - [EXPONENT_BASE_SHIFT](crate::format::EXPONENT_BASE_SHIFT)
+//! - [EXPONENT_BASE](crate::format::EXPONENT_BASE)
+//! - [EXPONENT_RADIX_SHIFT](crate::format::EXPONENT_RADIX_SHIFT)
+//! - [EXPONENT_RADIX](crate::format::EXPONENT_RADIX)
+//!
+//! # Character Functions
+//!
+//! Functions to get control characters from the format packed struct.
+//!
+//! - [digit_separator](crate::format::digit_separator)
+//! - [base_prefix](crate::format::base_prefix)
+//! - [base_suffix](crate::format::base_suffix)
+//! - [mantissa_radix](crate::format::mantissa_radix)
+//! - [exponent_base](crate::format::exponent_base)
+//! - [exponent_radix](crate::format::exponent_radix)
+//! - [radix_from_flags](crate::format::radix_from_flags)
+//!
+//! # Validators
+//!
+//! Functions to validate control characters for the format packed struct.
+//!
+//! - [is_valid_digit_separator](is_valid_digit_separator)
+//! - [is_valid_base_prefix](is_valid_base_prefix)
+//! - [is_valid_base_suffix](is_valid_base_suffix)
+//! - [is_valid_punctuation](is_valid_punctuation)
+//! - [is_valid_radix](is_valid_radix)
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::feature_format</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::format_builder</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::format_flags</span>::<span class="kw-2">*</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;format&quot;</span>))]</span>
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::not_feature_format</span>::<span class="kw-2">*</span>;
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;format&quot;</span>)]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::feature_format::<span class="kw-2">*</span>;
+<span class="kw">pub use </span><span class="kw">crate</span>::format_builder::<span class="kw-2">*</span>;
+<span class="kw">pub use </span><span class="kw">crate</span>::format_flags::<span class="kw-2">*</span>;
+<span class="attribute">#[cfg(not(feature = <span class="string">&quot;format&quot;</span>))]
+</span><span class="kw">pub use </span><span class="kw">crate</span>::not_feature_format::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error::Error</span>;
-<span class="kw">use</span> <span class="ident">static_assertions::const_assert</span>;
+<span class="kw">use </span><span class="kw">crate</span>::error::Error;
+<span class="kw">use </span>static_assertions::const_assert;
 
-<span class="doccomment">/// Determine if the format packed struct is valid.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">format_is_valid</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>() -&gt; <span class="ident">bool</span> {
-    <span class="ident">NumberFormat</span>::<span class="op">&lt;</span><span class="ident">FORMAT</span><span class="op">&gt;</span> {}.<span class="ident">is_valid</span>()
+<span class="doccomment">/// Determine if the format packed struct is valid.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub const fn </span>format_is_valid&lt;<span class="kw">const </span>FORMAT: u128&gt;() -&gt; bool {
+    NumberFormat::&lt;FORMAT&gt; {}.is_valid()
 }
 
-<span class="doccomment">/// Get the error type from the format packed struct.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// An error type of `Error::Success` means the format is valid, any</span>
-<span class="doccomment">/// other error signifies an invalid format.</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">format_error</span><span class="op">&lt;</span><span class="kw">const</span> <span class="ident">FORMAT</span>: <span class="ident">u128</span><span class="op">&gt;</span>() -&gt; <span class="ident">Error</span> {
-    <span class="ident">NumberFormat</span>::<span class="op">&lt;</span><span class="ident">FORMAT</span><span class="op">&gt;</span> {}.<span class="ident">error</span>()
+<span class="doccomment">/// Get the error type from the format packed struct.
+///
+/// An error type of `Error::Success` means the format is valid, any
+/// other error signifies an invalid format.
+</span><span class="attribute">#[inline]
+</span><span class="kw">pub const fn </span>format_error&lt;<span class="kw">const </span>FORMAT: u128&gt;() -&gt; Error {
+    NumberFormat::&lt;FORMAT&gt; {}.error()
 }
 
-<span class="doccomment">/// Standard number format. This is identical to the Rust string format.</span>
-<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">STANDARD</span>: <span class="ident">u128</span> <span class="op">=</span> <span class="ident">NumberFormatBuilder::new</span>().<span class="ident">build</span>();
-<span class="macro">const_assert!</span>(<span class="ident">NumberFormat</span>::<span class="op">&lt;</span>{ <span class="ident">STANDARD</span> }<span class="op">&gt;</span> {}.<span class="ident">is_valid</span>());
+<span class="doccomment">/// Standard number format. This is identical to the Rust string format.
+</span><span class="kw">pub const </span>STANDARD: u128 = NumberFormatBuilder::new().build();
+<span class="macro">const_assert!</span>(NumberFormat::&lt;{ STANDARD }&gt; {}.is_valid());
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="lexical_util" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

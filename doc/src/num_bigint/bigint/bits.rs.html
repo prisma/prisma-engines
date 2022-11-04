@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/num-bigint-0.4.3/src/bigint/bits.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bits.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../num_bigint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../num_bigint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../num_bigint/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/num-bigint-0.4.3/src/bigint/bits.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bits.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../num_bigint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../num_bigint/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../num_bigint/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -529,536 +529,536 @@
 <span id="529">529</span>
 <span id="530">530</span>
 <span id="531">531</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::BigInt</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Sign</span>::{<span class="ident">Minus</span>, <span class="ident">NoSign</span>, <span class="ident">Plus</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::BigInt;
+<span class="kw">use </span><span class="kw">super</span>::Sign::{Minus, NoSign, Plus};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::big_digit</span>::{<span class="self">self</span>, <span class="ident">BigDigit</span>, <span class="ident">DoubleBigDigit</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::biguint::IntDigits</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::std_alloc::Vec</span>;
+<span class="kw">use </span><span class="kw">crate</span>::big_digit::{<span class="self">self</span>, BigDigit, DoubleBigDigit};
+<span class="kw">use </span><span class="kw">crate</span>::biguint::IntDigits;
+<span class="kw">use </span><span class="kw">crate</span>::std_alloc::Vec;
 
-<span class="kw">use</span> <span class="ident">core::cmp::Ordering</span>::{<span class="ident">Equal</span>, <span class="ident">Greater</span>, <span class="ident">Less</span>};
-<span class="kw">use</span> <span class="ident">core::ops</span>::{<span class="ident">BitAnd</span>, <span class="ident">BitAndAssign</span>, <span class="ident">BitOr</span>, <span class="ident">BitOrAssign</span>, <span class="ident">BitXor</span>, <span class="ident">BitXorAssign</span>};
-<span class="kw">use</span> <span class="ident">num_traits</span>::{<span class="ident">ToPrimitive</span>, <span class="ident">Zero</span>};
+<span class="kw">use </span>core::cmp::Ordering::{Equal, Greater, Less};
+<span class="kw">use </span>core::ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign};
+<span class="kw">use </span>num_traits::{ToPrimitive, Zero};
 
-<span class="comment">// Negation in two&#39;s complement.</span>
-<span class="comment">// acc must be initialized as 1 for least-significant digit.</span>
-<span class="comment">//</span>
-<span class="comment">// When negating, a carry (acc == 1) means that all the digits</span>
-<span class="comment">// considered to this point were zero. This means that if all the</span>
-<span class="comment">// digits of a negative BigInt have been considered, carry must be</span>
-<span class="comment">// zero as we cannot have negative zero.</span>
-<span class="comment">//</span>
-<span class="comment">//    01 -&gt; ...f    ff</span>
-<span class="comment">//    ff -&gt; ...f    01</span>
-<span class="comment">// 01 00 -&gt; ...f ff 00</span>
-<span class="comment">// 01 01 -&gt; ...f fe ff</span>
-<span class="comment">// 01 ff -&gt; ...f fe 01</span>
-<span class="comment">// ff 00 -&gt; ...f 01 00</span>
-<span class="comment">// ff 01 -&gt; ...f 00 ff</span>
-<span class="comment">// ff ff -&gt; ...f 00 01</span>
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">fn</span> <span class="ident">negate_carry</span>(<span class="ident">a</span>: <span class="ident">BigDigit</span>, <span class="ident">acc</span>: <span class="kw-2">&amp;mut</span> <span class="ident">DoubleBigDigit</span>) -&gt; <span class="ident">BigDigit</span> {
-    <span class="kw-2">*</span><span class="ident">acc</span> <span class="op">+</span><span class="op">=</span> <span class="ident">DoubleBigDigit::from</span>(<span class="op">!</span><span class="ident">a</span>);
-    <span class="kw">let</span> <span class="ident">lo</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">acc</span> <span class="kw">as</span> <span class="ident">BigDigit</span>;
-    <span class="kw-2">*</span><span class="ident">acc</span> <span class="op">&gt;</span><span class="op">&gt;</span><span class="op">=</span> <span class="ident">big_digit::BITS</span>;
-    <span class="ident">lo</span>
+<span class="comment">// Negation in two&#39;s complement.
+// acc must be initialized as 1 for least-significant digit.
+//
+// When negating, a carry (acc == 1) means that all the digits
+// considered to this point were zero. This means that if all the
+// digits of a negative BigInt have been considered, carry must be
+// zero as we cannot have negative zero.
+//
+//    01 -&gt; ...f    ff
+//    ff -&gt; ...f    01
+// 01 00 -&gt; ...f ff 00
+// 01 01 -&gt; ...f fe ff
+// 01 ff -&gt; ...f fe 01
+// ff 00 -&gt; ...f 01 00
+// ff 01 -&gt; ...f 00 ff
+// ff ff -&gt; ...f 00 01
+</span><span class="attribute">#[inline]
+</span><span class="kw">fn </span>negate_carry(a: BigDigit, acc: <span class="kw-2">&amp;mut </span>DoubleBigDigit) -&gt; BigDigit {
+    <span class="kw-2">*</span>acc += DoubleBigDigit::from(!a);
+    <span class="kw">let </span>lo = <span class="kw-2">*</span>acc <span class="kw">as </span>BigDigit;
+    <span class="kw-2">*</span>acc &gt;&gt;= big_digit::BITS;
+    lo
 }
 
-<span class="comment">// + 1 &amp; -ff = ...0 01 &amp; ...f 01 = ...0 01 = + 1</span>
-<span class="comment">// +ff &amp; - 1 = ...0 ff &amp; ...f ff = ...0 ff = +ff</span>
-<span class="comment">// answer is pos, has length of a</span>
-<span class="kw">fn</span> <span class="ident">bitand_pos_neg</span>(<span class="ident">a</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">BigDigit</span><span class="op">&gt;</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">BigDigit</span>]) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">carry_b</span> <span class="op">=</span> <span class="number">1</span>;
-    <span class="kw">for</span> (<span class="ident">ai</span>, <span class="kw-2">&amp;</span><span class="ident">bi</span>) <span class="kw">in</span> <span class="ident">a</span>.<span class="ident">iter_mut</span>().<span class="ident">zip</span>(<span class="ident">b</span>.<span class="ident">iter</span>()) {
-        <span class="kw">let</span> <span class="ident">twos_b</span> <span class="op">=</span> <span class="ident">negate_carry</span>(<span class="ident">bi</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_b</span>);
-        <span class="kw-2">*</span><span class="ident">ai</span> <span class="op">&amp;=</span> <span class="ident">twos_b</span>;
+<span class="comment">// + 1 &amp; -ff = ...0 01 &amp; ...f 01 = ...0 01 = + 1
+// +ff &amp; - 1 = ...0 ff &amp; ...f ff = ...0 ff = +ff
+// answer is pos, has length of a
+</span><span class="kw">fn </span>bitand_pos_neg(a: <span class="kw-2">&amp;mut </span>Vec&lt;BigDigit&gt;, b: <span class="kw-2">&amp;</span>[BigDigit]) {
+    <span class="kw">let </span><span class="kw-2">mut </span>carry_b = <span class="number">1</span>;
+    <span class="kw">for </span>(ai, <span class="kw-2">&amp;</span>bi) <span class="kw">in </span>a.iter_mut().zip(b.iter()) {
+        <span class="kw">let </span>twos_b = negate_carry(bi, <span class="kw-2">&amp;mut </span>carry_b);
+        <span class="kw-2">*</span>ai &amp;= twos_b;
     }
-    <span class="macro">debug_assert!</span>(<span class="ident">b</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">a</span>.<span class="ident">len</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">carry_b</span> <span class="op">==</span> <span class="number">0</span>);
+    <span class="macro">debug_assert!</span>(b.len() &gt; a.len() || carry_b == <span class="number">0</span>);
 }
 
-<span class="comment">// - 1 &amp; +ff = ...f ff &amp; ...0 ff = ...0 ff = +ff</span>
-<span class="comment">// -ff &amp; + 1 = ...f 01 &amp; ...0 01 = ...0 01 = + 1</span>
-<span class="comment">// answer is pos, has length of b</span>
-<span class="kw">fn</span> <span class="ident">bitand_neg_pos</span>(<span class="ident">a</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">BigDigit</span><span class="op">&gt;</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">BigDigit</span>]) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">carry_a</span> <span class="op">=</span> <span class="number">1</span>;
-    <span class="kw">for</span> (<span class="ident">ai</span>, <span class="kw-2">&amp;</span><span class="ident">bi</span>) <span class="kw">in</span> <span class="ident">a</span>.<span class="ident">iter_mut</span>().<span class="ident">zip</span>(<span class="ident">b</span>.<span class="ident">iter</span>()) {
-        <span class="kw">let</span> <span class="ident">twos_a</span> <span class="op">=</span> <span class="ident">negate_carry</span>(<span class="kw-2">*</span><span class="ident">ai</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_a</span>);
-        <span class="kw-2">*</span><span class="ident">ai</span> <span class="op">=</span> <span class="ident">twos_a</span> <span class="op">&amp;</span> <span class="ident">bi</span>;
+<span class="comment">// - 1 &amp; +ff = ...f ff &amp; ...0 ff = ...0 ff = +ff
+// -ff &amp; + 1 = ...f 01 &amp; ...0 01 = ...0 01 = + 1
+// answer is pos, has length of b
+</span><span class="kw">fn </span>bitand_neg_pos(a: <span class="kw-2">&amp;mut </span>Vec&lt;BigDigit&gt;, b: <span class="kw-2">&amp;</span>[BigDigit]) {
+    <span class="kw">let </span><span class="kw-2">mut </span>carry_a = <span class="number">1</span>;
+    <span class="kw">for </span>(ai, <span class="kw-2">&amp;</span>bi) <span class="kw">in </span>a.iter_mut().zip(b.iter()) {
+        <span class="kw">let </span>twos_a = negate_carry(<span class="kw-2">*</span>ai, <span class="kw-2">&amp;mut </span>carry_a);
+        <span class="kw-2">*</span>ai = twos_a &amp; bi;
     }
-    <span class="macro">debug_assert!</span>(<span class="ident">a</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">b</span>.<span class="ident">len</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">carry_a</span> <span class="op">==</span> <span class="number">0</span>);
-    <span class="kw">match</span> <span class="ident">Ord::cmp</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="ident">len</span>(), <span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="ident">len</span>()) {
-        <span class="ident">Greater</span> =&gt; <span class="ident">a</span>.<span class="ident">truncate</span>(<span class="ident">b</span>.<span class="ident">len</span>()),
-        <span class="ident">Equal</span> =&gt; {}
-        <span class="ident">Less</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">extra</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">b</span>[<span class="ident">a</span>.<span class="ident">len</span>()..];
-            <span class="ident">a</span>.<span class="ident">extend</span>(<span class="ident">extra</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>());
+    <span class="macro">debug_assert!</span>(a.len() &gt; b.len() || carry_a == <span class="number">0</span>);
+    <span class="kw">match </span>Ord::cmp(<span class="kw-2">&amp;</span>a.len(), <span class="kw-2">&amp;</span>b.len()) {
+        Greater =&gt; a.truncate(b.len()),
+        Equal =&gt; {}
+        Less =&gt; {
+            <span class="kw">let </span>extra = <span class="kw-2">&amp;</span>b[a.len()..];
+            a.extend(extra.iter().cloned());
         }
     }
 }
 
-<span class="comment">// - 1 &amp; -ff = ...f ff &amp; ...f 01 = ...f 01 = - ff</span>
-<span class="comment">// -ff &amp; - 1 = ...f 01 &amp; ...f ff = ...f 01 = - ff</span>
-<span class="comment">// -ff &amp; -fe = ...f 01 &amp; ...f 02 = ...f 00 = -100</span>
-<span class="comment">// answer is neg, has length of longest with a possible carry</span>
-<span class="kw">fn</span> <span class="ident">bitand_neg_neg</span>(<span class="ident">a</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">BigDigit</span><span class="op">&gt;</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">BigDigit</span>]) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">carry_a</span> <span class="op">=</span> <span class="number">1</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">carry_b</span> <span class="op">=</span> <span class="number">1</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">carry_and</span> <span class="op">=</span> <span class="number">1</span>;
-    <span class="kw">for</span> (<span class="ident">ai</span>, <span class="kw-2">&amp;</span><span class="ident">bi</span>) <span class="kw">in</span> <span class="ident">a</span>.<span class="ident">iter_mut</span>().<span class="ident">zip</span>(<span class="ident">b</span>.<span class="ident">iter</span>()) {
-        <span class="kw">let</span> <span class="ident">twos_a</span> <span class="op">=</span> <span class="ident">negate_carry</span>(<span class="kw-2">*</span><span class="ident">ai</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_a</span>);
-        <span class="kw">let</span> <span class="ident">twos_b</span> <span class="op">=</span> <span class="ident">negate_carry</span>(<span class="ident">bi</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_b</span>);
-        <span class="kw-2">*</span><span class="ident">ai</span> <span class="op">=</span> <span class="ident">negate_carry</span>(<span class="ident">twos_a</span> <span class="op">&amp;</span> <span class="ident">twos_b</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_and</span>);
+<span class="comment">// - 1 &amp; -ff = ...f ff &amp; ...f 01 = ...f 01 = - ff
+// -ff &amp; - 1 = ...f 01 &amp; ...f ff = ...f 01 = - ff
+// -ff &amp; -fe = ...f 01 &amp; ...f 02 = ...f 00 = -100
+// answer is neg, has length of longest with a possible carry
+</span><span class="kw">fn </span>bitand_neg_neg(a: <span class="kw-2">&amp;mut </span>Vec&lt;BigDigit&gt;, b: <span class="kw-2">&amp;</span>[BigDigit]) {
+    <span class="kw">let </span><span class="kw-2">mut </span>carry_a = <span class="number">1</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>carry_b = <span class="number">1</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>carry_and = <span class="number">1</span>;
+    <span class="kw">for </span>(ai, <span class="kw-2">&amp;</span>bi) <span class="kw">in </span>a.iter_mut().zip(b.iter()) {
+        <span class="kw">let </span>twos_a = negate_carry(<span class="kw-2">*</span>ai, <span class="kw-2">&amp;mut </span>carry_a);
+        <span class="kw">let </span>twos_b = negate_carry(bi, <span class="kw-2">&amp;mut </span>carry_b);
+        <span class="kw-2">*</span>ai = negate_carry(twos_a &amp; twos_b, <span class="kw-2">&amp;mut </span>carry_and);
     }
-    <span class="macro">debug_assert!</span>(<span class="ident">a</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">b</span>.<span class="ident">len</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">carry_a</span> <span class="op">==</span> <span class="number">0</span>);
-    <span class="macro">debug_assert!</span>(<span class="ident">b</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">a</span>.<span class="ident">len</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">carry_b</span> <span class="op">==</span> <span class="number">0</span>);
-    <span class="kw">match</span> <span class="ident">Ord::cmp</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="ident">len</span>(), <span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="ident">len</span>()) {
-        <span class="ident">Greater</span> =&gt; {
-            <span class="kw">for</span> <span class="ident">ai</span> <span class="kw">in</span> <span class="ident">a</span>[<span class="ident">b</span>.<span class="ident">len</span>()..].<span class="ident">iter_mut</span>() {
-                <span class="kw">let</span> <span class="ident">twos_a</span> <span class="op">=</span> <span class="ident">negate_carry</span>(<span class="kw-2">*</span><span class="ident">ai</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_a</span>);
-                <span class="kw-2">*</span><span class="ident">ai</span> <span class="op">=</span> <span class="ident">negate_carry</span>(<span class="ident">twos_a</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_and</span>);
+    <span class="macro">debug_assert!</span>(a.len() &gt; b.len() || carry_a == <span class="number">0</span>);
+    <span class="macro">debug_assert!</span>(b.len() &gt; a.len() || carry_b == <span class="number">0</span>);
+    <span class="kw">match </span>Ord::cmp(<span class="kw-2">&amp;</span>a.len(), <span class="kw-2">&amp;</span>b.len()) {
+        Greater =&gt; {
+            <span class="kw">for </span>ai <span class="kw">in </span>a[b.len()..].iter_mut() {
+                <span class="kw">let </span>twos_a = negate_carry(<span class="kw-2">*</span>ai, <span class="kw-2">&amp;mut </span>carry_a);
+                <span class="kw-2">*</span>ai = negate_carry(twos_a, <span class="kw-2">&amp;mut </span>carry_and);
             }
-            <span class="macro">debug_assert!</span>(<span class="ident">carry_a</span> <span class="op">==</span> <span class="number">0</span>);
+            <span class="macro">debug_assert!</span>(carry_a == <span class="number">0</span>);
         }
-        <span class="ident">Equal</span> =&gt; {}
-        <span class="ident">Less</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">extra</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">b</span>[<span class="ident">a</span>.<span class="ident">len</span>()..];
-            <span class="ident">a</span>.<span class="ident">extend</span>(<span class="ident">extra</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">bi</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">twos_b</span> <span class="op">=</span> <span class="ident">negate_carry</span>(<span class="ident">bi</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_b</span>);
-                <span class="ident">negate_carry</span>(<span class="ident">twos_b</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_and</span>)
+        Equal =&gt; {}
+        Less =&gt; {
+            <span class="kw">let </span>extra = <span class="kw-2">&amp;</span>b[a.len()..];
+            a.extend(extra.iter().map(|<span class="kw-2">&amp;</span>bi| {
+                <span class="kw">let </span>twos_b = negate_carry(bi, <span class="kw-2">&amp;mut </span>carry_b);
+                negate_carry(twos_b, <span class="kw-2">&amp;mut </span>carry_and)
             }));
-            <span class="macro">debug_assert!</span>(<span class="ident">carry_b</span> <span class="op">==</span> <span class="number">0</span>);
+            <span class="macro">debug_assert!</span>(carry_b == <span class="number">0</span>);
         }
     }
-    <span class="kw">if</span> <span class="ident">carry_and</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-        <span class="ident">a</span>.<span class="ident">push</span>(<span class="number">1</span>);
+    <span class="kw">if </span>carry_and != <span class="number">0 </span>{
+        a.push(<span class="number">1</span>);
     }
 }
 
-<span class="macro">forward_val_val_binop!</span>(<span class="kw">impl</span> <span class="ident">BitAnd</span> <span class="kw">for</span> <span class="ident">BigInt</span>, <span class="ident">bitand</span>);
-<span class="macro">forward_ref_val_binop!</span>(<span class="kw">impl</span> <span class="ident">BitAnd</span> <span class="kw">for</span> <span class="ident">BigInt</span>, <span class="ident">bitand</span>);
+<span class="macro">forward_val_val_binop!</span>(<span class="kw">impl </span>BitAnd <span class="kw">for </span>BigInt, bitand);
+<span class="macro">forward_ref_val_binop!</span>(<span class="kw">impl </span>BitAnd <span class="kw">for </span>BigInt, bitand);
 
-<span class="comment">// do not use forward_ref_ref_binop_commutative! for bitand so that we can</span>
-<span class="comment">// clone as needed, avoiding over-allocation</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">BitAnd</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">BigInt</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigInt</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigInt</span>;
+<span class="comment">// do not use forward_ref_ref_binop_commutative! for bitand so that we can
+// clone as needed, avoiding over-allocation
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; BitAnd&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>BigInt&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigInt {
+    <span class="kw">type </span>Output = BigInt;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">bitand</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">BigInt</span>) -&gt; <span class="ident">BigInt</span> {
-        <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">sign</span>, <span class="ident">other</span>.<span class="ident">sign</span>) {
-            (<span class="ident">NoSign</span>, <span class="kw">_</span>) <span class="op">|</span> (<span class="kw">_</span>, <span class="ident">NoSign</span>) =&gt; <span class="ident">BigInt::zero</span>(),
-            (<span class="ident">Plus</span>, <span class="ident">Plus</span>) =&gt; <span class="ident">BigInt::from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span> <span class="op">&amp;</span> <span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">data</span>),
-            (<span class="ident">Plus</span>, <span class="ident">Minus</span>) =&gt; <span class="self">self</span>.<span class="ident">clone</span>() <span class="op">&amp;</span> <span class="ident">other</span>,
-            (<span class="ident">Minus</span>, <span class="ident">Plus</span>) =&gt; <span class="ident">other</span>.<span class="ident">clone</span>() <span class="op">&amp;</span> <span class="self">self</span>,
-            (<span class="ident">Minus</span>, <span class="ident">Minus</span>) =&gt; {
-                <span class="comment">// forward to val-ref, choosing the larger to clone</span>
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">len</span>() {
-                    <span class="self">self</span>.<span class="ident">clone</span>() <span class="op">&amp;</span> <span class="ident">other</span>
-                } <span class="kw">else</span> {
-                    <span class="ident">other</span>.<span class="ident">clone</span>() <span class="op">&amp;</span> <span class="self">self</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>bitand(<span class="self">self</span>, other: <span class="kw-2">&amp;</span>BigInt) -&gt; BigInt {
+        <span class="kw">match </span>(<span class="self">self</span>.sign, other.sign) {
+            (NoSign, <span class="kw">_</span>) | (<span class="kw">_</span>, NoSign) =&gt; BigInt::zero(),
+            (Plus, Plus) =&gt; BigInt::from(<span class="kw-2">&amp;</span><span class="self">self</span>.data &amp; <span class="kw-2">&amp;</span>other.data),
+            (Plus, Minus) =&gt; <span class="self">self</span>.clone() &amp; other,
+            (Minus, Plus) =&gt; other.clone() &amp; <span class="self">self</span>,
+            (Minus, Minus) =&gt; {
+                <span class="comment">// forward to val-ref, choosing the larger to clone
+                </span><span class="kw">if </span><span class="self">self</span>.len() &gt;= other.len() {
+                    <span class="self">self</span>.clone() &amp; other
+                } <span class="kw">else </span>{
+                    other.clone() &amp; <span class="self">self
+                </span>}
+            }
+        }
+    }
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; BitAnd&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigInt&gt; <span class="kw">for </span>BigInt {
+    <span class="kw">type </span>Output = BigInt;
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>bitand(<span class="kw-2">mut </span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>BigInt) -&gt; BigInt {
+        <span class="self">self </span>&amp;= other;
+        <span class="self">self
+    </span>}
+}
+
+<span class="macro">forward_val_assign!</span>(<span class="kw">impl </span>BitAndAssign <span class="kw">for </span>BigInt, bitand_assign);
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; BitAndAssign&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigInt&gt; <span class="kw">for </span>BigInt {
+    <span class="kw">fn </span>bitand_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>BigInt) {
+        <span class="kw">match </span>(<span class="self">self</span>.sign, other.sign) {
+            (NoSign, <span class="kw">_</span>) =&gt; {}
+            (<span class="kw">_</span>, NoSign) =&gt; <span class="self">self</span>.set_zero(),
+            (Plus, Plus) =&gt; {
+                <span class="self">self</span>.data &amp;= <span class="kw-2">&amp;</span>other.data;
+                <span class="kw">if </span><span class="self">self</span>.data.is_zero() {
+                    <span class="self">self</span>.sign = NoSign;
                 }
             }
-        }
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">BitAnd</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigInt</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigInt</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigInt</span>;
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">bitand</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">BigInt</span>) -&gt; <span class="ident">BigInt</span> {
-        <span class="self">self</span> <span class="op">&amp;=</span> <span class="ident">other</span>;
-        <span class="self">self</span>
-    }
-}
-
-<span class="macro">forward_val_assign!</span>(<span class="kw">impl</span> <span class="ident">BitAndAssign</span> <span class="kw">for</span> <span class="ident">BigInt</span>, <span class="ident">bitand_assign</span>);
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">BitAndAssign</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigInt</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigInt</span> {
-    <span class="kw">fn</span> <span class="ident">bitand_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">BigInt</span>) {
-        <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">sign</span>, <span class="ident">other</span>.<span class="ident">sign</span>) {
-            (<span class="ident">NoSign</span>, <span class="kw">_</span>) =&gt; {}
-            (<span class="kw">_</span>, <span class="ident">NoSign</span>) =&gt; <span class="self">self</span>.<span class="ident">set_zero</span>(),
-            (<span class="ident">Plus</span>, <span class="ident">Plus</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">data</span> <span class="op">&amp;=</span> <span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">data</span>;
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">is_zero</span>() {
-                    <span class="self">self</span>.<span class="ident">sign</span> <span class="op">=</span> <span class="ident">NoSign</span>;
-                }
+            (Plus, Minus) =&gt; {
+                bitand_pos_neg(<span class="self">self</span>.digits_mut(), other.digits());
+                <span class="self">self</span>.normalize();
             }
-            (<span class="ident">Plus</span>, <span class="ident">Minus</span>) =&gt; {
-                <span class="ident">bitand_pos_neg</span>(<span class="self">self</span>.<span class="ident">digits_mut</span>(), <span class="ident">other</span>.<span class="ident">digits</span>());
-                <span class="self">self</span>.<span class="ident">normalize</span>();
+            (Minus, Plus) =&gt; {
+                bitand_neg_pos(<span class="self">self</span>.digits_mut(), other.digits());
+                <span class="self">self</span>.sign = Plus;
+                <span class="self">self</span>.normalize();
             }
-            (<span class="ident">Minus</span>, <span class="ident">Plus</span>) =&gt; {
-                <span class="ident">bitand_neg_pos</span>(<span class="self">self</span>.<span class="ident">digits_mut</span>(), <span class="ident">other</span>.<span class="ident">digits</span>());
-                <span class="self">self</span>.<span class="ident">sign</span> <span class="op">=</span> <span class="ident">Plus</span>;
-                <span class="self">self</span>.<span class="ident">normalize</span>();
-            }
-            (<span class="ident">Minus</span>, <span class="ident">Minus</span>) =&gt; {
-                <span class="ident">bitand_neg_neg</span>(<span class="self">self</span>.<span class="ident">digits_mut</span>(), <span class="ident">other</span>.<span class="ident">digits</span>());
-                <span class="self">self</span>.<span class="ident">normalize</span>();
+            (Minus, Minus) =&gt; {
+                bitand_neg_neg(<span class="self">self</span>.digits_mut(), other.digits());
+                <span class="self">self</span>.normalize();
             }
         }
     }
 }
 
-<span class="comment">// + 1 | -ff = ...0 01 | ...f 01 = ...f 01 = -ff</span>
-<span class="comment">// +ff | - 1 = ...0 ff | ...f ff = ...f ff = - 1</span>
-<span class="comment">// answer is neg, has length of b</span>
-<span class="kw">fn</span> <span class="ident">bitor_pos_neg</span>(<span class="ident">a</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">BigDigit</span><span class="op">&gt;</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">BigDigit</span>]) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">carry_b</span> <span class="op">=</span> <span class="number">1</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">carry_or</span> <span class="op">=</span> <span class="number">1</span>;
-    <span class="kw">for</span> (<span class="ident">ai</span>, <span class="kw-2">&amp;</span><span class="ident">bi</span>) <span class="kw">in</span> <span class="ident">a</span>.<span class="ident">iter_mut</span>().<span class="ident">zip</span>(<span class="ident">b</span>.<span class="ident">iter</span>()) {
-        <span class="kw">let</span> <span class="ident">twos_b</span> <span class="op">=</span> <span class="ident">negate_carry</span>(<span class="ident">bi</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_b</span>);
-        <span class="kw-2">*</span><span class="ident">ai</span> <span class="op">=</span> <span class="ident">negate_carry</span>(<span class="kw-2">*</span><span class="ident">ai</span> <span class="op">|</span> <span class="ident">twos_b</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_or</span>);
+<span class="comment">// + 1 | -ff = ...0 01 | ...f 01 = ...f 01 = -ff
+// +ff | - 1 = ...0 ff | ...f ff = ...f ff = - 1
+// answer is neg, has length of b
+</span><span class="kw">fn </span>bitor_pos_neg(a: <span class="kw-2">&amp;mut </span>Vec&lt;BigDigit&gt;, b: <span class="kw-2">&amp;</span>[BigDigit]) {
+    <span class="kw">let </span><span class="kw-2">mut </span>carry_b = <span class="number">1</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>carry_or = <span class="number">1</span>;
+    <span class="kw">for </span>(ai, <span class="kw-2">&amp;</span>bi) <span class="kw">in </span>a.iter_mut().zip(b.iter()) {
+        <span class="kw">let </span>twos_b = negate_carry(bi, <span class="kw-2">&amp;mut </span>carry_b);
+        <span class="kw-2">*</span>ai = negate_carry(<span class="kw-2">*</span>ai | twos_b, <span class="kw-2">&amp;mut </span>carry_or);
     }
-    <span class="macro">debug_assert!</span>(<span class="ident">b</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">a</span>.<span class="ident">len</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">carry_b</span> <span class="op">==</span> <span class="number">0</span>);
-    <span class="kw">match</span> <span class="ident">Ord::cmp</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="ident">len</span>(), <span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="ident">len</span>()) {
-        <span class="ident">Greater</span> =&gt; {
-            <span class="ident">a</span>.<span class="ident">truncate</span>(<span class="ident">b</span>.<span class="ident">len</span>());
+    <span class="macro">debug_assert!</span>(b.len() &gt; a.len() || carry_b == <span class="number">0</span>);
+    <span class="kw">match </span>Ord::cmp(<span class="kw-2">&amp;</span>a.len(), <span class="kw-2">&amp;</span>b.len()) {
+        Greater =&gt; {
+            a.truncate(b.len());
         }
-        <span class="ident">Equal</span> =&gt; {}
-        <span class="ident">Less</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">extra</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">b</span>[<span class="ident">a</span>.<span class="ident">len</span>()..];
-            <span class="ident">a</span>.<span class="ident">extend</span>(<span class="ident">extra</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">bi</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">twos_b</span> <span class="op">=</span> <span class="ident">negate_carry</span>(<span class="ident">bi</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_b</span>);
-                <span class="ident">negate_carry</span>(<span class="ident">twos_b</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_or</span>)
+        Equal =&gt; {}
+        Less =&gt; {
+            <span class="kw">let </span>extra = <span class="kw-2">&amp;</span>b[a.len()..];
+            a.extend(extra.iter().map(|<span class="kw-2">&amp;</span>bi| {
+                <span class="kw">let </span>twos_b = negate_carry(bi, <span class="kw-2">&amp;mut </span>carry_b);
+                negate_carry(twos_b, <span class="kw-2">&amp;mut </span>carry_or)
             }));
-            <span class="macro">debug_assert!</span>(<span class="ident">carry_b</span> <span class="op">==</span> <span class="number">0</span>);
+            <span class="macro">debug_assert!</span>(carry_b == <span class="number">0</span>);
         }
     }
-    <span class="comment">// for carry_or to be non-zero, we would need twos_b == 0</span>
-    <span class="macro">debug_assert!</span>(<span class="ident">carry_or</span> <span class="op">==</span> <span class="number">0</span>);
+    <span class="comment">// for carry_or to be non-zero, we would need twos_b == 0
+    </span><span class="macro">debug_assert!</span>(carry_or == <span class="number">0</span>);
 }
 
-<span class="comment">// - 1 | +ff = ...f ff | ...0 ff = ...f ff = - 1</span>
-<span class="comment">// -ff | + 1 = ...f 01 | ...0 01 = ...f 01 = -ff</span>
-<span class="comment">// answer is neg, has length of a</span>
-<span class="kw">fn</span> <span class="ident">bitor_neg_pos</span>(<span class="ident">a</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">BigDigit</span><span class="op">&gt;</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">BigDigit</span>]) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">carry_a</span> <span class="op">=</span> <span class="number">1</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">carry_or</span> <span class="op">=</span> <span class="number">1</span>;
-    <span class="kw">for</span> (<span class="ident">ai</span>, <span class="kw-2">&amp;</span><span class="ident">bi</span>) <span class="kw">in</span> <span class="ident">a</span>.<span class="ident">iter_mut</span>().<span class="ident">zip</span>(<span class="ident">b</span>.<span class="ident">iter</span>()) {
-        <span class="kw">let</span> <span class="ident">twos_a</span> <span class="op">=</span> <span class="ident">negate_carry</span>(<span class="kw-2">*</span><span class="ident">ai</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_a</span>);
-        <span class="kw-2">*</span><span class="ident">ai</span> <span class="op">=</span> <span class="ident">negate_carry</span>(<span class="ident">twos_a</span> <span class="op">|</span> <span class="ident">bi</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_or</span>);
+<span class="comment">// - 1 | +ff = ...f ff | ...0 ff = ...f ff = - 1
+// -ff | + 1 = ...f 01 | ...0 01 = ...f 01 = -ff
+// answer is neg, has length of a
+</span><span class="kw">fn </span>bitor_neg_pos(a: <span class="kw-2">&amp;mut </span>Vec&lt;BigDigit&gt;, b: <span class="kw-2">&amp;</span>[BigDigit]) {
+    <span class="kw">let </span><span class="kw-2">mut </span>carry_a = <span class="number">1</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>carry_or = <span class="number">1</span>;
+    <span class="kw">for </span>(ai, <span class="kw-2">&amp;</span>bi) <span class="kw">in </span>a.iter_mut().zip(b.iter()) {
+        <span class="kw">let </span>twos_a = negate_carry(<span class="kw-2">*</span>ai, <span class="kw-2">&amp;mut </span>carry_a);
+        <span class="kw-2">*</span>ai = negate_carry(twos_a | bi, <span class="kw-2">&amp;mut </span>carry_or);
     }
-    <span class="macro">debug_assert!</span>(<span class="ident">a</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">b</span>.<span class="ident">len</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">carry_a</span> <span class="op">==</span> <span class="number">0</span>);
-    <span class="kw">if</span> <span class="ident">a</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">b</span>.<span class="ident">len</span>() {
-        <span class="kw">for</span> <span class="ident">ai</span> <span class="kw">in</span> <span class="ident">a</span>[<span class="ident">b</span>.<span class="ident">len</span>()..].<span class="ident">iter_mut</span>() {
-            <span class="kw">let</span> <span class="ident">twos_a</span> <span class="op">=</span> <span class="ident">negate_carry</span>(<span class="kw-2">*</span><span class="ident">ai</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_a</span>);
-            <span class="kw-2">*</span><span class="ident">ai</span> <span class="op">=</span> <span class="ident">negate_carry</span>(<span class="ident">twos_a</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_or</span>);
+    <span class="macro">debug_assert!</span>(a.len() &gt; b.len() || carry_a == <span class="number">0</span>);
+    <span class="kw">if </span>a.len() &gt; b.len() {
+        <span class="kw">for </span>ai <span class="kw">in </span>a[b.len()..].iter_mut() {
+            <span class="kw">let </span>twos_a = negate_carry(<span class="kw-2">*</span>ai, <span class="kw-2">&amp;mut </span>carry_a);
+            <span class="kw-2">*</span>ai = negate_carry(twos_a, <span class="kw-2">&amp;mut </span>carry_or);
         }
-        <span class="macro">debug_assert!</span>(<span class="ident">carry_a</span> <span class="op">==</span> <span class="number">0</span>);
+        <span class="macro">debug_assert!</span>(carry_a == <span class="number">0</span>);
     }
-    <span class="comment">// for carry_or to be non-zero, we would need twos_a == 0</span>
-    <span class="macro">debug_assert!</span>(<span class="ident">carry_or</span> <span class="op">==</span> <span class="number">0</span>);
+    <span class="comment">// for carry_or to be non-zero, we would need twos_a == 0
+    </span><span class="macro">debug_assert!</span>(carry_or == <span class="number">0</span>);
 }
 
-<span class="comment">// - 1 | -ff = ...f ff | ...f 01 = ...f ff = -1</span>
-<span class="comment">// -ff | - 1 = ...f 01 | ...f ff = ...f ff = -1</span>
-<span class="comment">// answer is neg, has length of shortest</span>
-<span class="kw">fn</span> <span class="ident">bitor_neg_neg</span>(<span class="ident">a</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">BigDigit</span><span class="op">&gt;</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">BigDigit</span>]) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">carry_a</span> <span class="op">=</span> <span class="number">1</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">carry_b</span> <span class="op">=</span> <span class="number">1</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">carry_or</span> <span class="op">=</span> <span class="number">1</span>;
-    <span class="kw">for</span> (<span class="ident">ai</span>, <span class="kw-2">&amp;</span><span class="ident">bi</span>) <span class="kw">in</span> <span class="ident">a</span>.<span class="ident">iter_mut</span>().<span class="ident">zip</span>(<span class="ident">b</span>.<span class="ident">iter</span>()) {
-        <span class="kw">let</span> <span class="ident">twos_a</span> <span class="op">=</span> <span class="ident">negate_carry</span>(<span class="kw-2">*</span><span class="ident">ai</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_a</span>);
-        <span class="kw">let</span> <span class="ident">twos_b</span> <span class="op">=</span> <span class="ident">negate_carry</span>(<span class="ident">bi</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_b</span>);
-        <span class="kw-2">*</span><span class="ident">ai</span> <span class="op">=</span> <span class="ident">negate_carry</span>(<span class="ident">twos_a</span> <span class="op">|</span> <span class="ident">twos_b</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_or</span>);
+<span class="comment">// - 1 | -ff = ...f ff | ...f 01 = ...f ff = -1
+// -ff | - 1 = ...f 01 | ...f ff = ...f ff = -1
+// answer is neg, has length of shortest
+</span><span class="kw">fn </span>bitor_neg_neg(a: <span class="kw-2">&amp;mut </span>Vec&lt;BigDigit&gt;, b: <span class="kw-2">&amp;</span>[BigDigit]) {
+    <span class="kw">let </span><span class="kw-2">mut </span>carry_a = <span class="number">1</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>carry_b = <span class="number">1</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>carry_or = <span class="number">1</span>;
+    <span class="kw">for </span>(ai, <span class="kw-2">&amp;</span>bi) <span class="kw">in </span>a.iter_mut().zip(b.iter()) {
+        <span class="kw">let </span>twos_a = negate_carry(<span class="kw-2">*</span>ai, <span class="kw-2">&amp;mut </span>carry_a);
+        <span class="kw">let </span>twos_b = negate_carry(bi, <span class="kw-2">&amp;mut </span>carry_b);
+        <span class="kw-2">*</span>ai = negate_carry(twos_a | twos_b, <span class="kw-2">&amp;mut </span>carry_or);
     }
-    <span class="macro">debug_assert!</span>(<span class="ident">a</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">b</span>.<span class="ident">len</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">carry_a</span> <span class="op">==</span> <span class="number">0</span>);
-    <span class="macro">debug_assert!</span>(<span class="ident">b</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">a</span>.<span class="ident">len</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">carry_b</span> <span class="op">==</span> <span class="number">0</span>);
-    <span class="kw">if</span> <span class="ident">a</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">b</span>.<span class="ident">len</span>() {
-        <span class="ident">a</span>.<span class="ident">truncate</span>(<span class="ident">b</span>.<span class="ident">len</span>());
+    <span class="macro">debug_assert!</span>(a.len() &gt; b.len() || carry_a == <span class="number">0</span>);
+    <span class="macro">debug_assert!</span>(b.len() &gt; a.len() || carry_b == <span class="number">0</span>);
+    <span class="kw">if </span>a.len() &gt; b.len() {
+        a.truncate(b.len());
     }
-    <span class="comment">// for carry_or to be non-zero, we would need twos_a == 0 or twos_b == 0</span>
-    <span class="macro">debug_assert!</span>(<span class="ident">carry_or</span> <span class="op">==</span> <span class="number">0</span>);
+    <span class="comment">// for carry_or to be non-zero, we would need twos_a == 0 or twos_b == 0
+    </span><span class="macro">debug_assert!</span>(carry_or == <span class="number">0</span>);
 }
 
-<span class="macro">forward_val_val_binop!</span>(<span class="kw">impl</span> <span class="ident">BitOr</span> <span class="kw">for</span> <span class="ident">BigInt</span>, <span class="ident">bitor</span>);
-<span class="macro">forward_ref_val_binop!</span>(<span class="kw">impl</span> <span class="ident">BitOr</span> <span class="kw">for</span> <span class="ident">BigInt</span>, <span class="ident">bitor</span>);
+<span class="macro">forward_val_val_binop!</span>(<span class="kw">impl </span>BitOr <span class="kw">for </span>BigInt, bitor);
+<span class="macro">forward_ref_val_binop!</span>(<span class="kw">impl </span>BitOr <span class="kw">for </span>BigInt, bitor);
 
-<span class="comment">// do not use forward_ref_ref_binop_commutative! for bitor so that we can</span>
-<span class="comment">// clone as needed, avoiding over-allocation</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">BitOr</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">BigInt</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigInt</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigInt</span>;
+<span class="comment">// do not use forward_ref_ref_binop_commutative! for bitor so that we can
+// clone as needed, avoiding over-allocation
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span>&gt; BitOr&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;b </span>BigInt&gt; <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigInt {
+    <span class="kw">type </span>Output = BigInt;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">bitor</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">BigInt</span>) -&gt; <span class="ident">BigInt</span> {
-        <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">sign</span>, <span class="ident">other</span>.<span class="ident">sign</span>) {
-            (<span class="ident">NoSign</span>, <span class="kw">_</span>) =&gt; <span class="ident">other</span>.<span class="ident">clone</span>(),
-            (<span class="kw">_</span>, <span class="ident">NoSign</span>) =&gt; <span class="self">self</span>.<span class="ident">clone</span>(),
-            (<span class="ident">Plus</span>, <span class="ident">Plus</span>) =&gt; <span class="ident">BigInt::from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">data</span> <span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">data</span>),
-            (<span class="ident">Plus</span>, <span class="ident">Minus</span>) =&gt; <span class="ident">other</span>.<span class="ident">clone</span>() <span class="op">|</span> <span class="self">self</span>,
-            (<span class="ident">Minus</span>, <span class="ident">Plus</span>) =&gt; <span class="self">self</span>.<span class="ident">clone</span>() <span class="op">|</span> <span class="ident">other</span>,
-            (<span class="ident">Minus</span>, <span class="ident">Minus</span>) =&gt; {
-                <span class="comment">// forward to val-ref, choosing the smaller to clone</span>
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">len</span>() {
-                    <span class="self">self</span>.<span class="ident">clone</span>() <span class="op">|</span> <span class="ident">other</span>
-                } <span class="kw">else</span> {
-                    <span class="ident">other</span>.<span class="ident">clone</span>() <span class="op">|</span> <span class="self">self</span>
-                }
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>bitor(<span class="self">self</span>, other: <span class="kw-2">&amp;</span>BigInt) -&gt; BigInt {
+        <span class="kw">match </span>(<span class="self">self</span>.sign, other.sign) {
+            (NoSign, <span class="kw">_</span>) =&gt; other.clone(),
+            (<span class="kw">_</span>, NoSign) =&gt; <span class="self">self</span>.clone(),
+            (Plus, Plus) =&gt; BigInt::from(<span class="kw-2">&amp;</span><span class="self">self</span>.data | <span class="kw-2">&amp;</span>other.data),
+            (Plus, Minus) =&gt; other.clone() | <span class="self">self</span>,
+            (Minus, Plus) =&gt; <span class="self">self</span>.clone() | other,
+            (Minus, Minus) =&gt; {
+                <span class="comment">// forward to val-ref, choosing the smaller to clone
+                </span><span class="kw">if </span><span class="self">self</span>.len() &lt;= other.len() {
+                    <span class="self">self</span>.clone() | other
+                } <span class="kw">else </span>{
+                    other.clone() | <span class="self">self
+                </span>}
             }
         }
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">BitOr</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigInt</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigInt</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigInt</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; BitOr&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigInt&gt; <span class="kw">for </span>BigInt {
+    <span class="kw">type </span>Output = BigInt;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">bitor</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">BigInt</span>) -&gt; <span class="ident">BigInt</span> {
-        <span class="self">self</span> <span class="op">|</span><span class="op">=</span> <span class="ident">other</span>;
-        <span class="self">self</span>
-    }
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>bitor(<span class="kw-2">mut </span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>BigInt) -&gt; BigInt {
+        <span class="self">self </span>|= other;
+        <span class="self">self
+    </span>}
 }
 
-<span class="macro">forward_val_assign!</span>(<span class="kw">impl</span> <span class="ident">BitOrAssign</span> <span class="kw">for</span> <span class="ident">BigInt</span>, <span class="ident">bitor_assign</span>);
+<span class="macro">forward_val_assign!</span>(<span class="kw">impl </span>BitOrAssign <span class="kw">for </span>BigInt, bitor_assign);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">BitOrAssign</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigInt</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigInt</span> {
-    <span class="kw">fn</span> <span class="ident">bitor_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">BigInt</span>) {
-        <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">sign</span>, <span class="ident">other</span>.<span class="ident">sign</span>) {
-            (<span class="kw">_</span>, <span class="ident">NoSign</span>) =&gt; {}
-            (<span class="ident">NoSign</span>, <span class="kw">_</span>) =&gt; <span class="self">self</span>.<span class="ident">clone_from</span>(<span class="ident">other</span>),
-            (<span class="ident">Plus</span>, <span class="ident">Plus</span>) =&gt; <span class="self">self</span>.<span class="ident">data</span> <span class="op">|</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">data</span>,
-            (<span class="ident">Plus</span>, <span class="ident">Minus</span>) =&gt; {
-                <span class="ident">bitor_pos_neg</span>(<span class="self">self</span>.<span class="ident">digits_mut</span>(), <span class="ident">other</span>.<span class="ident">digits</span>());
-                <span class="self">self</span>.<span class="ident">sign</span> <span class="op">=</span> <span class="ident">Minus</span>;
-                <span class="self">self</span>.<span class="ident">normalize</span>();
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; BitOrAssign&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigInt&gt; <span class="kw">for </span>BigInt {
+    <span class="kw">fn </span>bitor_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>BigInt) {
+        <span class="kw">match </span>(<span class="self">self</span>.sign, other.sign) {
+            (<span class="kw">_</span>, NoSign) =&gt; {}
+            (NoSign, <span class="kw">_</span>) =&gt; <span class="self">self</span>.clone_from(other),
+            (Plus, Plus) =&gt; <span class="self">self</span>.data |= <span class="kw-2">&amp;</span>other.data,
+            (Plus, Minus) =&gt; {
+                bitor_pos_neg(<span class="self">self</span>.digits_mut(), other.digits());
+                <span class="self">self</span>.sign = Minus;
+                <span class="self">self</span>.normalize();
             }
-            (<span class="ident">Minus</span>, <span class="ident">Plus</span>) =&gt; {
-                <span class="ident">bitor_neg_pos</span>(<span class="self">self</span>.<span class="ident">digits_mut</span>(), <span class="ident">other</span>.<span class="ident">digits</span>());
-                <span class="self">self</span>.<span class="ident">normalize</span>();
+            (Minus, Plus) =&gt; {
+                bitor_neg_pos(<span class="self">self</span>.digits_mut(), other.digits());
+                <span class="self">self</span>.normalize();
             }
-            (<span class="ident">Minus</span>, <span class="ident">Minus</span>) =&gt; {
-                <span class="ident">bitor_neg_neg</span>(<span class="self">self</span>.<span class="ident">digits_mut</span>(), <span class="ident">other</span>.<span class="ident">digits</span>());
-                <span class="self">self</span>.<span class="ident">normalize</span>();
+            (Minus, Minus) =&gt; {
+                bitor_neg_neg(<span class="self">self</span>.digits_mut(), other.digits());
+                <span class="self">self</span>.normalize();
             }
         }
     }
 }
 
-<span class="comment">// + 1 ^ -ff = ...0 01 ^ ...f 01 = ...f 00 = -100</span>
-<span class="comment">// +ff ^ - 1 = ...0 ff ^ ...f ff = ...f 00 = -100</span>
-<span class="comment">// answer is neg, has length of longest with a possible carry</span>
-<span class="kw">fn</span> <span class="ident">bitxor_pos_neg</span>(<span class="ident">a</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">BigDigit</span><span class="op">&gt;</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">BigDigit</span>]) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">carry_b</span> <span class="op">=</span> <span class="number">1</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">carry_xor</span> <span class="op">=</span> <span class="number">1</span>;
-    <span class="kw">for</span> (<span class="ident">ai</span>, <span class="kw-2">&amp;</span><span class="ident">bi</span>) <span class="kw">in</span> <span class="ident">a</span>.<span class="ident">iter_mut</span>().<span class="ident">zip</span>(<span class="ident">b</span>.<span class="ident">iter</span>()) {
-        <span class="kw">let</span> <span class="ident">twos_b</span> <span class="op">=</span> <span class="ident">negate_carry</span>(<span class="ident">bi</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_b</span>);
-        <span class="kw-2">*</span><span class="ident">ai</span> <span class="op">=</span> <span class="ident">negate_carry</span>(<span class="kw-2">*</span><span class="ident">ai</span> <span class="op">^</span> <span class="ident">twos_b</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_xor</span>);
+<span class="comment">// + 1 ^ -ff = ...0 01 ^ ...f 01 = ...f 00 = -100
+// +ff ^ - 1 = ...0 ff ^ ...f ff = ...f 00 = -100
+// answer is neg, has length of longest with a possible carry
+</span><span class="kw">fn </span>bitxor_pos_neg(a: <span class="kw-2">&amp;mut </span>Vec&lt;BigDigit&gt;, b: <span class="kw-2">&amp;</span>[BigDigit]) {
+    <span class="kw">let </span><span class="kw-2">mut </span>carry_b = <span class="number">1</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>carry_xor = <span class="number">1</span>;
+    <span class="kw">for </span>(ai, <span class="kw-2">&amp;</span>bi) <span class="kw">in </span>a.iter_mut().zip(b.iter()) {
+        <span class="kw">let </span>twos_b = negate_carry(bi, <span class="kw-2">&amp;mut </span>carry_b);
+        <span class="kw-2">*</span>ai = negate_carry(<span class="kw-2">*</span>ai ^ twos_b, <span class="kw-2">&amp;mut </span>carry_xor);
     }
-    <span class="macro">debug_assert!</span>(<span class="ident">b</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">a</span>.<span class="ident">len</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">carry_b</span> <span class="op">==</span> <span class="number">0</span>);
-    <span class="kw">match</span> <span class="ident">Ord::cmp</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="ident">len</span>(), <span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="ident">len</span>()) {
-        <span class="ident">Greater</span> =&gt; {
-            <span class="kw">for</span> <span class="ident">ai</span> <span class="kw">in</span> <span class="ident">a</span>[<span class="ident">b</span>.<span class="ident">len</span>()..].<span class="ident">iter_mut</span>() {
-                <span class="kw">let</span> <span class="ident">twos_b</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>;
-                <span class="kw-2">*</span><span class="ident">ai</span> <span class="op">=</span> <span class="ident">negate_carry</span>(<span class="kw-2">*</span><span class="ident">ai</span> <span class="op">^</span> <span class="ident">twos_b</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_xor</span>);
+    <span class="macro">debug_assert!</span>(b.len() &gt; a.len() || carry_b == <span class="number">0</span>);
+    <span class="kw">match </span>Ord::cmp(<span class="kw-2">&amp;</span>a.len(), <span class="kw-2">&amp;</span>b.len()) {
+        Greater =&gt; {
+            <span class="kw">for </span>ai <span class="kw">in </span>a[b.len()..].iter_mut() {
+                <span class="kw">let </span>twos_b = !<span class="number">0</span>;
+                <span class="kw-2">*</span>ai = negate_carry(<span class="kw-2">*</span>ai ^ twos_b, <span class="kw-2">&amp;mut </span>carry_xor);
             }
         }
-        <span class="ident">Equal</span> =&gt; {}
-        <span class="ident">Less</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">extra</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">b</span>[<span class="ident">a</span>.<span class="ident">len</span>()..];
-            <span class="ident">a</span>.<span class="ident">extend</span>(<span class="ident">extra</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">bi</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">twos_b</span> <span class="op">=</span> <span class="ident">negate_carry</span>(<span class="ident">bi</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_b</span>);
-                <span class="ident">negate_carry</span>(<span class="ident">twos_b</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_xor</span>)
+        Equal =&gt; {}
+        Less =&gt; {
+            <span class="kw">let </span>extra = <span class="kw-2">&amp;</span>b[a.len()..];
+            a.extend(extra.iter().map(|<span class="kw-2">&amp;</span>bi| {
+                <span class="kw">let </span>twos_b = negate_carry(bi, <span class="kw-2">&amp;mut </span>carry_b);
+                negate_carry(twos_b, <span class="kw-2">&amp;mut </span>carry_xor)
             }));
-            <span class="macro">debug_assert!</span>(<span class="ident">carry_b</span> <span class="op">==</span> <span class="number">0</span>);
+            <span class="macro">debug_assert!</span>(carry_b == <span class="number">0</span>);
         }
     }
-    <span class="kw">if</span> <span class="ident">carry_xor</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-        <span class="ident">a</span>.<span class="ident">push</span>(<span class="number">1</span>);
+    <span class="kw">if </span>carry_xor != <span class="number">0 </span>{
+        a.push(<span class="number">1</span>);
     }
 }
 
-<span class="comment">// - 1 ^ +ff = ...f ff ^ ...0 ff = ...f 00 = -100</span>
-<span class="comment">// -ff ^ + 1 = ...f 01 ^ ...0 01 = ...f 00 = -100</span>
-<span class="comment">// answer is neg, has length of longest with a possible carry</span>
-<span class="kw">fn</span> <span class="ident">bitxor_neg_pos</span>(<span class="ident">a</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">BigDigit</span><span class="op">&gt;</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">BigDigit</span>]) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">carry_a</span> <span class="op">=</span> <span class="number">1</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">carry_xor</span> <span class="op">=</span> <span class="number">1</span>;
-    <span class="kw">for</span> (<span class="ident">ai</span>, <span class="kw-2">&amp;</span><span class="ident">bi</span>) <span class="kw">in</span> <span class="ident">a</span>.<span class="ident">iter_mut</span>().<span class="ident">zip</span>(<span class="ident">b</span>.<span class="ident">iter</span>()) {
-        <span class="kw">let</span> <span class="ident">twos_a</span> <span class="op">=</span> <span class="ident">negate_carry</span>(<span class="kw-2">*</span><span class="ident">ai</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_a</span>);
-        <span class="kw-2">*</span><span class="ident">ai</span> <span class="op">=</span> <span class="ident">negate_carry</span>(<span class="ident">twos_a</span> <span class="op">^</span> <span class="ident">bi</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_xor</span>);
+<span class="comment">// - 1 ^ +ff = ...f ff ^ ...0 ff = ...f 00 = -100
+// -ff ^ + 1 = ...f 01 ^ ...0 01 = ...f 00 = -100
+// answer is neg, has length of longest with a possible carry
+</span><span class="kw">fn </span>bitxor_neg_pos(a: <span class="kw-2">&amp;mut </span>Vec&lt;BigDigit&gt;, b: <span class="kw-2">&amp;</span>[BigDigit]) {
+    <span class="kw">let </span><span class="kw-2">mut </span>carry_a = <span class="number">1</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>carry_xor = <span class="number">1</span>;
+    <span class="kw">for </span>(ai, <span class="kw-2">&amp;</span>bi) <span class="kw">in </span>a.iter_mut().zip(b.iter()) {
+        <span class="kw">let </span>twos_a = negate_carry(<span class="kw-2">*</span>ai, <span class="kw-2">&amp;mut </span>carry_a);
+        <span class="kw-2">*</span>ai = negate_carry(twos_a ^ bi, <span class="kw-2">&amp;mut </span>carry_xor);
     }
-    <span class="macro">debug_assert!</span>(<span class="ident">a</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">b</span>.<span class="ident">len</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">carry_a</span> <span class="op">==</span> <span class="number">0</span>);
-    <span class="kw">match</span> <span class="ident">Ord::cmp</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="ident">len</span>(), <span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="ident">len</span>()) {
-        <span class="ident">Greater</span> =&gt; {
-            <span class="kw">for</span> <span class="ident">ai</span> <span class="kw">in</span> <span class="ident">a</span>[<span class="ident">b</span>.<span class="ident">len</span>()..].<span class="ident">iter_mut</span>() {
-                <span class="kw">let</span> <span class="ident">twos_a</span> <span class="op">=</span> <span class="ident">negate_carry</span>(<span class="kw-2">*</span><span class="ident">ai</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_a</span>);
-                <span class="kw-2">*</span><span class="ident">ai</span> <span class="op">=</span> <span class="ident">negate_carry</span>(<span class="ident">twos_a</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_xor</span>);
+    <span class="macro">debug_assert!</span>(a.len() &gt; b.len() || carry_a == <span class="number">0</span>);
+    <span class="kw">match </span>Ord::cmp(<span class="kw-2">&amp;</span>a.len(), <span class="kw-2">&amp;</span>b.len()) {
+        Greater =&gt; {
+            <span class="kw">for </span>ai <span class="kw">in </span>a[b.len()..].iter_mut() {
+                <span class="kw">let </span>twos_a = negate_carry(<span class="kw-2">*</span>ai, <span class="kw-2">&amp;mut </span>carry_a);
+                <span class="kw-2">*</span>ai = negate_carry(twos_a, <span class="kw-2">&amp;mut </span>carry_xor);
             }
-            <span class="macro">debug_assert!</span>(<span class="ident">carry_a</span> <span class="op">==</span> <span class="number">0</span>);
+            <span class="macro">debug_assert!</span>(carry_a == <span class="number">0</span>);
         }
-        <span class="ident">Equal</span> =&gt; {}
-        <span class="ident">Less</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">extra</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">b</span>[<span class="ident">a</span>.<span class="ident">len</span>()..];
-            <span class="ident">a</span>.<span class="ident">extend</span>(<span class="ident">extra</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">bi</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">twos_a</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>;
-                <span class="ident">negate_carry</span>(<span class="ident">twos_a</span> <span class="op">^</span> <span class="ident">bi</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_xor</span>)
+        Equal =&gt; {}
+        Less =&gt; {
+            <span class="kw">let </span>extra = <span class="kw-2">&amp;</span>b[a.len()..];
+            a.extend(extra.iter().map(|<span class="kw-2">&amp;</span>bi| {
+                <span class="kw">let </span>twos_a = !<span class="number">0</span>;
+                negate_carry(twos_a ^ bi, <span class="kw-2">&amp;mut </span>carry_xor)
             }));
         }
     }
-    <span class="kw">if</span> <span class="ident">carry_xor</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-        <span class="ident">a</span>.<span class="ident">push</span>(<span class="number">1</span>);
+    <span class="kw">if </span>carry_xor != <span class="number">0 </span>{
+        a.push(<span class="number">1</span>);
     }
 }
 
-<span class="comment">// - 1 ^ -ff = ...f ff ^ ...f 01 = ...0 fe = +fe</span>
-<span class="comment">// -ff &amp; - 1 = ...f 01 ^ ...f ff = ...0 fe = +fe</span>
-<span class="comment">// answer is pos, has length of longest</span>
-<span class="kw">fn</span> <span class="ident">bitxor_neg_neg</span>(<span class="ident">a</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">BigDigit</span><span class="op">&gt;</span>, <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">BigDigit</span>]) {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">carry_a</span> <span class="op">=</span> <span class="number">1</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">carry_b</span> <span class="op">=</span> <span class="number">1</span>;
-    <span class="kw">for</span> (<span class="ident">ai</span>, <span class="kw-2">&amp;</span><span class="ident">bi</span>) <span class="kw">in</span> <span class="ident">a</span>.<span class="ident">iter_mut</span>().<span class="ident">zip</span>(<span class="ident">b</span>.<span class="ident">iter</span>()) {
-        <span class="kw">let</span> <span class="ident">twos_a</span> <span class="op">=</span> <span class="ident">negate_carry</span>(<span class="kw-2">*</span><span class="ident">ai</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_a</span>);
-        <span class="kw">let</span> <span class="ident">twos_b</span> <span class="op">=</span> <span class="ident">negate_carry</span>(<span class="ident">bi</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_b</span>);
-        <span class="kw-2">*</span><span class="ident">ai</span> <span class="op">=</span> <span class="ident">twos_a</span> <span class="op">^</span> <span class="ident">twos_b</span>;
+<span class="comment">// - 1 ^ -ff = ...f ff ^ ...f 01 = ...0 fe = +fe
+// -ff &amp; - 1 = ...f 01 ^ ...f ff = ...0 fe = +fe
+// answer is pos, has length of longest
+</span><span class="kw">fn </span>bitxor_neg_neg(a: <span class="kw-2">&amp;mut </span>Vec&lt;BigDigit&gt;, b: <span class="kw-2">&amp;</span>[BigDigit]) {
+    <span class="kw">let </span><span class="kw-2">mut </span>carry_a = <span class="number">1</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>carry_b = <span class="number">1</span>;
+    <span class="kw">for </span>(ai, <span class="kw-2">&amp;</span>bi) <span class="kw">in </span>a.iter_mut().zip(b.iter()) {
+        <span class="kw">let </span>twos_a = negate_carry(<span class="kw-2">*</span>ai, <span class="kw-2">&amp;mut </span>carry_a);
+        <span class="kw">let </span>twos_b = negate_carry(bi, <span class="kw-2">&amp;mut </span>carry_b);
+        <span class="kw-2">*</span>ai = twos_a ^ twos_b;
     }
-    <span class="macro">debug_assert!</span>(<span class="ident">a</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">b</span>.<span class="ident">len</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">carry_a</span> <span class="op">==</span> <span class="number">0</span>);
-    <span class="macro">debug_assert!</span>(<span class="ident">b</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">a</span>.<span class="ident">len</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">carry_b</span> <span class="op">==</span> <span class="number">0</span>);
-    <span class="kw">match</span> <span class="ident">Ord::cmp</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="ident">len</span>(), <span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="ident">len</span>()) {
-        <span class="ident">Greater</span> =&gt; {
-            <span class="kw">for</span> <span class="ident">ai</span> <span class="kw">in</span> <span class="ident">a</span>[<span class="ident">b</span>.<span class="ident">len</span>()..].<span class="ident">iter_mut</span>() {
-                <span class="kw">let</span> <span class="ident">twos_a</span> <span class="op">=</span> <span class="ident">negate_carry</span>(<span class="kw-2">*</span><span class="ident">ai</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_a</span>);
-                <span class="kw">let</span> <span class="ident">twos_b</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>;
-                <span class="kw-2">*</span><span class="ident">ai</span> <span class="op">=</span> <span class="ident">twos_a</span> <span class="op">^</span> <span class="ident">twos_b</span>;
+    <span class="macro">debug_assert!</span>(a.len() &gt; b.len() || carry_a == <span class="number">0</span>);
+    <span class="macro">debug_assert!</span>(b.len() &gt; a.len() || carry_b == <span class="number">0</span>);
+    <span class="kw">match </span>Ord::cmp(<span class="kw-2">&amp;</span>a.len(), <span class="kw-2">&amp;</span>b.len()) {
+        Greater =&gt; {
+            <span class="kw">for </span>ai <span class="kw">in </span>a[b.len()..].iter_mut() {
+                <span class="kw">let </span>twos_a = negate_carry(<span class="kw-2">*</span>ai, <span class="kw-2">&amp;mut </span>carry_a);
+                <span class="kw">let </span>twos_b = !<span class="number">0</span>;
+                <span class="kw-2">*</span>ai = twos_a ^ twos_b;
             }
-            <span class="macro">debug_assert!</span>(<span class="ident">carry_a</span> <span class="op">==</span> <span class="number">0</span>);
+            <span class="macro">debug_assert!</span>(carry_a == <span class="number">0</span>);
         }
-        <span class="ident">Equal</span> =&gt; {}
-        <span class="ident">Less</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">extra</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">b</span>[<span class="ident">a</span>.<span class="ident">len</span>()..];
-            <span class="ident">a</span>.<span class="ident">extend</span>(<span class="ident">extra</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">bi</span><span class="op">|</span> {
-                <span class="kw">let</span> <span class="ident">twos_a</span> <span class="op">=</span> <span class="op">!</span><span class="number">0</span>;
-                <span class="kw">let</span> <span class="ident">twos_b</span> <span class="op">=</span> <span class="ident">negate_carry</span>(<span class="ident">bi</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_b</span>);
-                <span class="ident">twos_a</span> <span class="op">^</span> <span class="ident">twos_b</span>
+        Equal =&gt; {}
+        Less =&gt; {
+            <span class="kw">let </span>extra = <span class="kw-2">&amp;</span>b[a.len()..];
+            a.extend(extra.iter().map(|<span class="kw-2">&amp;</span>bi| {
+                <span class="kw">let </span>twos_a = !<span class="number">0</span>;
+                <span class="kw">let </span>twos_b = negate_carry(bi, <span class="kw-2">&amp;mut </span>carry_b);
+                twos_a ^ twos_b
             }));
-            <span class="macro">debug_assert!</span>(<span class="ident">carry_b</span> <span class="op">==</span> <span class="number">0</span>);
+            <span class="macro">debug_assert!</span>(carry_b == <span class="number">0</span>);
         }
     }
 }
 
-<span class="macro">forward_all_binop_to_val_ref_commutative!</span>(<span class="kw">impl</span> <span class="ident">BitXor</span> <span class="kw">for</span> <span class="ident">BigInt</span>, <span class="ident">bitxor</span>);
+<span class="macro">forward_all_binop_to_val_ref_commutative!</span>(<span class="kw">impl </span>BitXor <span class="kw">for </span>BigInt, bitxor);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">BitXor</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigInt</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigInt</span> {
-    <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">BigInt</span>;
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; BitXor&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigInt&gt; <span class="kw">for </span>BigInt {
+    <span class="kw">type </span>Output = BigInt;
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">bitxor</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">BigInt</span>) -&gt; <span class="ident">BigInt</span> {
-        <span class="self">self</span> <span class="op">^</span><span class="op">=</span> <span class="ident">other</span>;
-        <span class="self">self</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>bitxor(<span class="kw-2">mut </span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>BigInt) -&gt; BigInt {
+        <span class="self">self </span>^= other;
+        <span class="self">self
+    </span>}
+}
+
+<span class="macro">forward_val_assign!</span>(<span class="kw">impl </span>BitXorAssign <span class="kw">for </span>BigInt, bitxor_assign);
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; BitXorAssign&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>BigInt&gt; <span class="kw">for </span>BigInt {
+    <span class="kw">fn </span>bitxor_assign(<span class="kw-2">&amp;mut </span><span class="self">self</span>, other: <span class="kw-2">&amp;</span>BigInt) {
+        <span class="kw">match </span>(<span class="self">self</span>.sign, other.sign) {
+            (<span class="kw">_</span>, NoSign) =&gt; {}
+            (NoSign, <span class="kw">_</span>) =&gt; <span class="self">self</span>.clone_from(other),
+            (Plus, Plus) =&gt; {
+                <span class="self">self</span>.data ^= <span class="kw-2">&amp;</span>other.data;
+                <span class="kw">if </span><span class="self">self</span>.data.is_zero() {
+                    <span class="self">self</span>.sign = NoSign;
+                }
+            }
+            (Plus, Minus) =&gt; {
+                bitxor_pos_neg(<span class="self">self</span>.digits_mut(), other.digits());
+                <span class="self">self</span>.sign = Minus;
+                <span class="self">self</span>.normalize();
+            }
+            (Minus, Plus) =&gt; {
+                bitxor_neg_pos(<span class="self">self</span>.digits_mut(), other.digits());
+                <span class="self">self</span>.normalize();
+            }
+            (Minus, Minus) =&gt; {
+                bitxor_neg_neg(<span class="self">self</span>.digits_mut(), other.digits());
+                <span class="self">self</span>.sign = Plus;
+                <span class="self">self</span>.normalize();
+            }
+        }
     }
 }
 
-<span class="macro">forward_val_assign!</span>(<span class="kw">impl</span> <span class="ident">BitXorAssign</span> <span class="kw">for</span> <span class="ident">BigInt</span>, <span class="ident">bitxor_assign</span>);
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>set_negative_bit(x: <span class="kw-2">&amp;mut </span>BigInt, bit: u64, value: bool) {
+    <span class="macro">debug_assert_eq!</span>(x.sign, Minus);
+    <span class="kw">let </span>data = <span class="kw-2">&amp;mut </span>x.data;
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">BitXorAssign</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">BigInt</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">BigInt</span> {
-    <span class="kw">fn</span> <span class="ident">bitxor_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">BigInt</span>) {
-        <span class="kw">match</span> (<span class="self">self</span>.<span class="ident">sign</span>, <span class="ident">other</span>.<span class="ident">sign</span>) {
-            (<span class="kw">_</span>, <span class="ident">NoSign</span>) =&gt; {}
-            (<span class="ident">NoSign</span>, <span class="kw">_</span>) =&gt; <span class="self">self</span>.<span class="ident">clone_from</span>(<span class="ident">other</span>),
-            (<span class="ident">Plus</span>, <span class="ident">Plus</span>) =&gt; {
-                <span class="self">self</span>.<span class="ident">data</span> <span class="op">^</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">data</span>;
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">data</span>.<span class="ident">is_zero</span>() {
-                    <span class="self">self</span>.<span class="ident">sign</span> <span class="op">=</span> <span class="ident">NoSign</span>;
-                }
-            }
-            (<span class="ident">Plus</span>, <span class="ident">Minus</span>) =&gt; {
-                <span class="ident">bitxor_pos_neg</span>(<span class="self">self</span>.<span class="ident">digits_mut</span>(), <span class="ident">other</span>.<span class="ident">digits</span>());
-                <span class="self">self</span>.<span class="ident">sign</span> <span class="op">=</span> <span class="ident">Minus</span>;
-                <span class="self">self</span>.<span class="ident">normalize</span>();
-            }
-            (<span class="ident">Minus</span>, <span class="ident">Plus</span>) =&gt; {
-                <span class="ident">bitxor_neg_pos</span>(<span class="self">self</span>.<span class="ident">digits_mut</span>(), <span class="ident">other</span>.<span class="ident">digits</span>());
-                <span class="self">self</span>.<span class="ident">normalize</span>();
-            }
-            (<span class="ident">Minus</span>, <span class="ident">Minus</span>) =&gt; {
-                <span class="ident">bitxor_neg_neg</span>(<span class="self">self</span>.<span class="ident">digits_mut</span>(), <span class="ident">other</span>.<span class="ident">digits</span>());
-                <span class="self">self</span>.<span class="ident">sign</span> <span class="op">=</span> <span class="ident">Plus</span>;
-                <span class="self">self</span>.<span class="ident">normalize</span>();
-            }
+    <span class="kw">let </span>bits_per_digit = u64::from(big_digit::BITS);
+    <span class="kw">if </span>bit &gt;= bits_per_digit * data.len() <span class="kw">as </span>u64 {
+        <span class="kw">if </span>!value {
+            data.set_bit(bit, <span class="bool-val">true</span>);
         }
-    }
-}
+    } <span class="kw">else </span>{
+        <span class="comment">// If the Uint number is
+        //   ... 0  x 1 0 ... 0
+        // then the two&#39;s complement is
+        //   ... 1 !x 1 0 ... 0
+        //            |-- bit at position &#39;trailing_zeros&#39;
+        // where !x is obtained from x by flipping each bit
+        </span><span class="kw">let </span>trailing_zeros = data.trailing_zeros().unwrap();
+        <span class="kw">if </span>bit &gt; trailing_zeros {
+            data.set_bit(bit, !value);
+        } <span class="kw">else if </span>bit == trailing_zeros &amp;&amp; !value {
+            <span class="comment">// Clearing the bit at position `trailing_zeros` is dealt with by doing
+            // similarly to what `bitand_neg_pos` does, except we start at digit
+            // `bit_index`. All digits below `bit_index` are guaranteed to be zero,
+            // so initially we have `carry_in` = `carry_out` = 1. Furthermore, we
+            // stop traversing the digits when there are no more carries.
+            </span><span class="kw">let </span>bit_index = (bit / bits_per_digit).to_usize().unwrap();
+            <span class="kw">let </span>bit_mask = (<span class="number">1 </span><span class="kw">as </span>BigDigit) &lt;&lt; (bit % bits_per_digit);
+            <span class="kw">let </span><span class="kw-2">mut </span>digit_iter = data.digits_mut().iter_mut().skip(bit_index);
+            <span class="kw">let </span><span class="kw-2">mut </span>carry_in = <span class="number">1</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>carry_out = <span class="number">1</span>;
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">set_negative_bit</span>(<span class="ident">x</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BigInt</span>, <span class="ident">bit</span>: <span class="ident">u64</span>, <span class="ident">value</span>: <span class="ident">bool</span>) {
-    <span class="macro">debug_assert_eq!</span>(<span class="ident">x</span>.<span class="ident">sign</span>, <span class="ident">Minus</span>);
-    <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">x</span>.<span class="ident">data</span>;
+            <span class="kw">let </span>digit = digit_iter.next().unwrap();
+            <span class="kw">let </span>twos_in = negate_carry(<span class="kw-2">*</span>digit, <span class="kw-2">&amp;mut </span>carry_in);
+            <span class="kw">let </span>twos_out = twos_in &amp; !bit_mask;
+            <span class="kw-2">*</span>digit = negate_carry(twos_out, <span class="kw-2">&amp;mut </span>carry_out);
 
-    <span class="kw">let</span> <span class="ident">bits_per_digit</span> <span class="op">=</span> <span class="ident">u64::from</span>(<span class="ident">big_digit::BITS</span>);
-    <span class="kw">if</span> <span class="ident">bit</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">bits_per_digit</span> <span class="op">*</span> <span class="ident">data</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span> {
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">value</span> {
-            <span class="ident">data</span>.<span class="ident">set_bit</span>(<span class="ident">bit</span>, <span class="bool-val">true</span>);
-        }
-    } <span class="kw">else</span> {
-        <span class="comment">// If the Uint number is</span>
-        <span class="comment">//   ... 0  x 1 0 ... 0</span>
-        <span class="comment">// then the two&#39;s complement is</span>
-        <span class="comment">//   ... 1 !x 1 0 ... 0</span>
-        <span class="comment">//            |-- bit at position &#39;trailing_zeros&#39;</span>
-        <span class="comment">// where !x is obtained from x by flipping each bit</span>
-        <span class="kw">let</span> <span class="ident">trailing_zeros</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">trailing_zeros</span>().<span class="ident">unwrap</span>();
-        <span class="kw">if</span> <span class="ident">bit</span> <span class="op">&gt;</span> <span class="ident">trailing_zeros</span> {
-            <span class="ident">data</span>.<span class="ident">set_bit</span>(<span class="ident">bit</span>, <span class="op">!</span><span class="ident">value</span>);
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">bit</span> <span class="op">==</span> <span class="ident">trailing_zeros</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">value</span> {
-            <span class="comment">// Clearing the bit at position `trailing_zeros` is dealt with by doing</span>
-            <span class="comment">// similarly to what `bitand_neg_pos` does, except we start at digit</span>
-            <span class="comment">// `bit_index`. All digits below `bit_index` are guaranteed to be zero,</span>
-            <span class="comment">// so initially we have `carry_in` = `carry_out` = 1. Furthermore, we</span>
-            <span class="comment">// stop traversing the digits when there are no more carries.</span>
-            <span class="kw">let</span> <span class="ident">bit_index</span> <span class="op">=</span> (<span class="ident">bit</span> <span class="op">/</span> <span class="ident">bits_per_digit</span>).<span class="ident">to_usize</span>().<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">bit_mask</span> <span class="op">=</span> (<span class="number">1</span> <span class="kw">as</span> <span class="ident">BigDigit</span>) <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="ident">bit</span> <span class="op">%</span> <span class="ident">bits_per_digit</span>);
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">digit_iter</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">digits_mut</span>().<span class="ident">iter_mut</span>().<span class="ident">skip</span>(<span class="ident">bit_index</span>);
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">carry_in</span> <span class="op">=</span> <span class="number">1</span>;
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">carry_out</span> <span class="op">=</span> <span class="number">1</span>;
-
-            <span class="kw">let</span> <span class="ident">digit</span> <span class="op">=</span> <span class="ident">digit_iter</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">twos_in</span> <span class="op">=</span> <span class="ident">negate_carry</span>(<span class="kw-2">*</span><span class="ident">digit</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_in</span>);
-            <span class="kw">let</span> <span class="ident">twos_out</span> <span class="op">=</span> <span class="ident">twos_in</span> <span class="op">&amp;</span> <span class="op">!</span><span class="ident">bit_mask</span>;
-            <span class="kw-2">*</span><span class="ident">digit</span> <span class="op">=</span> <span class="ident">negate_carry</span>(<span class="ident">twos_out</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_out</span>);
-
-            <span class="kw">for</span> <span class="ident">digit</span> <span class="kw">in</span> <span class="ident">digit_iter</span> {
-                <span class="kw">if</span> <span class="ident">carry_in</span> <span class="op">==</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">carry_out</span> <span class="op">==</span> <span class="number">0</span> {
-                    <span class="comment">// Exit the loop since no more digits can change</span>
-                    <span class="kw">break</span>;
+            <span class="kw">for </span>digit <span class="kw">in </span>digit_iter {
+                <span class="kw">if </span>carry_in == <span class="number">0 </span>&amp;&amp; carry_out == <span class="number">0 </span>{
+                    <span class="comment">// Exit the loop since no more digits can change
+                    </span><span class="kw">break</span>;
                 }
-                <span class="kw">let</span> <span class="ident">twos</span> <span class="op">=</span> <span class="ident">negate_carry</span>(<span class="kw-2">*</span><span class="ident">digit</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_in</span>);
-                <span class="kw-2">*</span><span class="ident">digit</span> <span class="op">=</span> <span class="ident">negate_carry</span>(<span class="ident">twos</span>, <span class="kw-2">&amp;mut</span> <span class="ident">carry_out</span>);
+                <span class="kw">let </span>twos = negate_carry(<span class="kw-2">*</span>digit, <span class="kw-2">&amp;mut </span>carry_in);
+                <span class="kw-2">*</span>digit = negate_carry(twos, <span class="kw-2">&amp;mut </span>carry_out);
             }
 
-            <span class="kw">if</span> <span class="ident">carry_out</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                <span class="comment">// All digits have been traversed and there is a carry</span>
-                <span class="macro">debug_assert_eq!</span>(<span class="ident">carry_in</span>, <span class="number">0</span>);
-                <span class="ident">data</span>.<span class="ident">digits_mut</span>().<span class="ident">push</span>(<span class="number">1</span>);
+            <span class="kw">if </span>carry_out != <span class="number">0 </span>{
+                <span class="comment">// All digits have been traversed and there is a carry
+                </span><span class="macro">debug_assert_eq!</span>(carry_in, <span class="number">0</span>);
+                data.digits_mut().push(<span class="number">1</span>);
             }
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">bit</span> <span class="op">&lt;</span> <span class="ident">trailing_zeros</span> <span class="op">&amp;&amp;</span> <span class="ident">value</span> {
-            <span class="comment">// Flip each bit from position &#39;bit&#39; to &#39;trailing_zeros&#39;, both inclusive</span>
-            <span class="comment">//       ... 1 !x 1 0 ... 0 ... 0</span>
-            <span class="comment">//                        |-- bit at position &#39;bit&#39;</span>
-            <span class="comment">//                |-- bit at position &#39;trailing_zeros&#39;</span>
-            <span class="comment">// bit_mask:      1 1 ... 1 0 .. 0</span>
-            <span class="comment">// This is done by xor&#39;ing with the bit_mask</span>
-            <span class="kw">let</span> <span class="ident">index_lo</span> <span class="op">=</span> (<span class="ident">bit</span> <span class="op">/</span> <span class="ident">bits_per_digit</span>).<span class="ident">to_usize</span>().<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">index_hi</span> <span class="op">=</span> (<span class="ident">trailing_zeros</span> <span class="op">/</span> <span class="ident">bits_per_digit</span>).<span class="ident">to_usize</span>().<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">bit_mask_lo</span> <span class="op">=</span> <span class="ident">big_digit::MAX</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="ident">bit</span> <span class="op">%</span> <span class="ident">bits_per_digit</span>);
-            <span class="kw">let</span> <span class="ident">bit_mask_hi</span> <span class="op">=</span>
-                <span class="ident">big_digit::MAX</span> <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="ident">bits_per_digit</span> <span class="op">-</span> <span class="number">1</span> <span class="op">-</span> (<span class="ident">trailing_zeros</span> <span class="op">%</span> <span class="ident">bits_per_digit</span>));
-            <span class="kw">let</span> <span class="ident">digits</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">digits_mut</span>();
+        } <span class="kw">else if </span>bit &lt; trailing_zeros &amp;&amp; value {
+            <span class="comment">// Flip each bit from position &#39;bit&#39; to &#39;trailing_zeros&#39;, both inclusive
+            //       ... 1 !x 1 0 ... 0 ... 0
+            //                        |-- bit at position &#39;bit&#39;
+            //                |-- bit at position &#39;trailing_zeros&#39;
+            // bit_mask:      1 1 ... 1 0 .. 0
+            // This is done by xor&#39;ing with the bit_mask
+            </span><span class="kw">let </span>index_lo = (bit / bits_per_digit).to_usize().unwrap();
+            <span class="kw">let </span>index_hi = (trailing_zeros / bits_per_digit).to_usize().unwrap();
+            <span class="kw">let </span>bit_mask_lo = big_digit::MAX &lt;&lt; (bit % bits_per_digit);
+            <span class="kw">let </span>bit_mask_hi =
+                big_digit::MAX &gt;&gt; (bits_per_digit - <span class="number">1 </span>- (trailing_zeros % bits_per_digit));
+            <span class="kw">let </span>digits = data.digits_mut();
 
-            <span class="kw">if</span> <span class="ident">index_lo</span> <span class="op">==</span> <span class="ident">index_hi</span> {
-                <span class="ident">digits</span>[<span class="ident">index_lo</span>] <span class="op">^</span><span class="op">=</span> <span class="ident">bit_mask_lo</span> <span class="op">&amp;</span> <span class="ident">bit_mask_hi</span>;
-            } <span class="kw">else</span> {
-                <span class="ident">digits</span>[<span class="ident">index_lo</span>] <span class="op">=</span> <span class="ident">bit_mask_lo</span>;
-                <span class="kw">for</span> <span class="ident">digit</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="ident">digits</span>[<span class="ident">index_lo</span> <span class="op">+</span> <span class="number">1</span>..<span class="ident">index_hi</span>] {
-                    <span class="kw-2">*</span><span class="ident">digit</span> <span class="op">=</span> <span class="ident">big_digit::MAX</span>;
+            <span class="kw">if </span>index_lo == index_hi {
+                digits[index_lo] ^= bit_mask_lo &amp; bit_mask_hi;
+            } <span class="kw">else </span>{
+                digits[index_lo] = bit_mask_lo;
+                <span class="kw">for </span>digit <span class="kw">in </span><span class="kw-2">&amp;mut </span>digits[index_lo + <span class="number">1</span>..index_hi] {
+                    <span class="kw-2">*</span>digit = big_digit::MAX;
                 }
-                <span class="ident">digits</span>[<span class="ident">index_hi</span>] <span class="op">^</span><span class="op">=</span> <span class="ident">bit_mask_hi</span>;
+                digits[index_hi] ^= bit_mask_hi;
             }
-        } <span class="kw">else</span> {
-            <span class="comment">// We end up here in two cases:</span>
-            <span class="comment">//   bit == trailing_zeros &amp;&amp; value: Bit is already set</span>
-            <span class="comment">//   bit &lt; trailing_zeros &amp;&amp; !value: Bit is already cleared</span>
-        }
+        } <span class="kw">else </span>{
+            <span class="comment">// We end up here in two cases:
+            //   bit == trailing_zeros &amp;&amp; value: Bit is already set
+            //   bit &lt; trailing_zeros &amp;&amp; !value: Bit is already cleared
+        </span>}
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="num_bigint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="num_bigint" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

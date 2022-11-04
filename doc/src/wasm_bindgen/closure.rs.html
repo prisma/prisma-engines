@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/wasm-bindgen-0.2.83/src/closure.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>closure.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../wasm_bindgen/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../wasm_bindgen/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../wasm_bindgen/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/wasm-bindgen-0.2.83/src/closure.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>closure.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../wasm_bindgen/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../wasm_bindgen/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../wasm_bindgen/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -883,890 +883,890 @@
 <span id="883">883</span>
 <span id="884">884</span>
 <span id="885">885</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Support for long-lived closures in `wasm-bindgen`</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! This module defines the `Closure` type which is used to pass &quot;owned</span>
-<span class="doccomment">//! closures&quot; from Rust to JS. Some more details can be found on the `Closure`</span>
-<span class="doccomment">//! type itself.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Support for long-lived closures in `wasm-bindgen`
+//!
+//! This module defines the `Closure` type which is used to pass &quot;owned
+//! closures&quot; from Rust to JS. Some more details can be found on the `Closure`
+//! type itself.
 
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::mem</span>::{<span class="self">self</span>, <span class="ident">ManuallyDrop</span>};
-<span class="kw">use</span> <span class="ident">std::prelude::v1</span>::<span class="kw-2">*</span>;
+</span><span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::mem::{<span class="self">self</span>, ManuallyDrop};
+<span class="kw">use </span>std::prelude::v1::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::convert</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::describe</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::throw_str</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::JsValue</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::UnwrapThrowExt</span>;
+<span class="kw">use </span><span class="kw">crate</span>::convert::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::describe::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::throw_str;
+<span class="kw">use </span><span class="kw">crate</span>::JsValue;
+<span class="kw">use </span><span class="kw">crate</span>::UnwrapThrowExt;
 
-<span class="doccomment">/// A handle to both a closure in Rust as well as JS closure which will invoke</span>
-<span class="doccomment">/// the Rust closure.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A `Closure` is the primary way that a `&#39;static` lifetime closure is</span>
-<span class="doccomment">/// transferred from Rust to JS. `Closure` currently requires that the closures</span>
-<span class="doccomment">/// it&#39;s created with have the `&#39;static` lifetime in Rust for soundness reasons.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This type is a &quot;handle&quot; in the sense that whenever it is dropped it will</span>
-<span class="doccomment">/// invalidate the JS closure that it refers to. Any usage of the closure in JS</span>
-<span class="doccomment">/// after the `Closure` has been dropped will raise an exception. It&#39;s then up</span>
-<span class="doccomment">/// to you to arrange for `Closure` to be properly deallocate at an appropriate</span>
-<span class="doccomment">/// location in your program.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The type parameter on `Closure` is the type of closure that this represents.</span>
-<span class="doccomment">/// Currently this can only be the `Fn` and `FnMut` traits with up to 7</span>
-<span class="doccomment">/// arguments (and an optional return value).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// # Examples</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Here are a number of examples of using `Closure`.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Using the `setInterval` API</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Sample usage of `Closure` to invoke the `setInterval` API.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use wasm_bindgen::prelude::*;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[wasm_bindgen]</span>
-<span class="doccomment">/// extern &quot;C&quot; {</span>
-<span class="doccomment">///     fn setInterval(closure: &amp;Closure&lt;dyn FnMut()&gt;, time: u32) -&gt; i32;</span>
-<span class="doccomment">///     fn clearInterval(id: i32);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     #[wasm_bindgen(js_namespace = console)]</span>
-<span class="doccomment">///     fn log(s: &amp;str);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[wasm_bindgen]</span>
-<span class="doccomment">/// pub struct IntervalHandle {</span>
-<span class="doccomment">///     interval_id: i32,</span>
-<span class="doccomment">///     _closure: Closure&lt;dyn FnMut()&gt;,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// impl Drop for IntervalHandle {</span>
-<span class="doccomment">///     fn drop(&amp;mut self) {</span>
-<span class="doccomment">///         clearInterval(self.interval_id);</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[wasm_bindgen]</span>
-<span class="doccomment">/// pub fn run() -&gt; IntervalHandle {</span>
-<span class="doccomment">///     // First up we use `Closure::new` to wrap up a Rust closure and create</span>
-<span class="doccomment">///     // a JS closure.</span>
-<span class="doccomment">///     let cb = Closure::new(|| {</span>
-<span class="doccomment">///         log(&quot;interval elapsed!&quot;);</span>
-<span class="doccomment">///     });</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     // Next we pass this via reference to the `setInterval` function, and</span>
-<span class="doccomment">///     // `setInterval` gets a handle to the corresponding JS closure.</span>
-<span class="doccomment">///     let interval_id = setInterval(&amp;cb, 1_000);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     // If we were to drop `cb` here it would cause an exception to be raised</span>
-<span class="doccomment">///     // whenever the interval elapses. Instead we *return* our handle back to JS</span>
-<span class="doccomment">///     // so JS can decide when to cancel the interval and deallocate the closure.</span>
-<span class="doccomment">///     IntervalHandle {</span>
-<span class="doccomment">///         interval_id,</span>
-<span class="doccomment">///         _closure: cb,</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Casting a `Closure` to a `js_sys::Function`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is the same `setInterval` example as above, except it is using</span>
-<span class="doccomment">/// `web_sys` (which uses `js_sys::Function` for callbacks) instead of manually</span>
-<span class="doccomment">/// writing bindings to `setInterval` and other Web APIs.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,ignore</span>
-<span class="doccomment">/// use wasm_bindgen::JsCast;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[wasm_bindgen]</span>
-<span class="doccomment">/// pub struct IntervalHandle {</span>
-<span class="doccomment">///     interval_id: i32,</span>
-<span class="doccomment">///     _closure: Closure&lt;dyn FnMut()&gt;,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// impl Drop for IntervalHandle {</span>
-<span class="doccomment">///     fn drop(&amp;mut self) {</span>
-<span class="doccomment">///         let window = web_sys::window().unwrap();</span>
-<span class="doccomment">///         window.clear_interval_with_handle(self.interval_id);</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[wasm_bindgen]</span>
-<span class="doccomment">/// pub fn run() -&gt; Result&lt;IntervalHandle, JsValue&gt; {</span>
-<span class="doccomment">///     let cb = Closure::new(|| {</span>
-<span class="doccomment">///         web_sys::console::log_1(&amp;&quot;interval elapsed!&quot;.into());</span>
-<span class="doccomment">///     });</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     let window = web_sys::window().unwrap();</span>
-<span class="doccomment">///     let interval_id = window.set_interval_with_callback_and_timeout_and_arguments_0(</span>
-<span class="doccomment">///         // Note this method call, which uses `as_ref()` to get a `JsValue`</span>
-<span class="doccomment">///         // from our `Closure` which is then converted to a `&amp;Function`</span>
-<span class="doccomment">///         // using the `JsCast::unchecked_ref` function.</span>
-<span class="doccomment">///         cb.as_ref().unchecked_ref(),</span>
-<span class="doccomment">///         1_000,</span>
-<span class="doccomment">///     )?;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     // Same as above.</span>
-<span class="doccomment">///     Ok(IntervalHandle {</span>
-<span class="doccomment">///         interval_id,</span>
-<span class="doccomment">///         _closure: cb,</span>
-<span class="doccomment">///     })</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Using `FnOnce` and `Closure::once` with `requestAnimationFrame`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Because `requestAnimationFrame` only calls its callback once, we can use</span>
-<span class="doccomment">/// `FnOnce` and `Closure::once` with it.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```rust,no_run</span>
-<span class="doccomment">/// use wasm_bindgen::prelude::*;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[wasm_bindgen]</span>
-<span class="doccomment">/// extern &quot;C&quot; {</span>
-<span class="doccomment">///     fn requestAnimationFrame(closure: &amp;Closure&lt;dyn FnMut()&gt;) -&gt; u32;</span>
-<span class="doccomment">///     fn cancelAnimationFrame(id: u32);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     #[wasm_bindgen(js_namespace = console)]</span>
-<span class="doccomment">///     fn log(s: &amp;str);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[wasm_bindgen]</span>
-<span class="doccomment">/// pub struct AnimationFrameHandle {</span>
-<span class="doccomment">///     animation_id: u32,</span>
-<span class="doccomment">///     _closure: Closure&lt;dyn FnMut()&gt;,</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// impl Drop for AnimationFrameHandle {</span>
-<span class="doccomment">///     fn drop(&amp;mut self) {</span>
-<span class="doccomment">///         cancelAnimationFrame(self.animation_id);</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // A type that will log a message when it is dropped.</span>
-<span class="doccomment">/// struct LogOnDrop(&amp;&#39;static str);</span>
-<span class="doccomment">/// impl Drop for LogOnDrop {</span>
-<span class="doccomment">///     fn drop(&amp;mut self) {</span>
-<span class="doccomment">///         log(self.0);</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[wasm_bindgen]</span>
-<span class="doccomment">/// pub fn run() -&gt; AnimationFrameHandle {</span>
-<span class="doccomment">///     // We are using `Closure::once` which takes a `FnOnce`, so the function</span>
-<span class="doccomment">///     // can drop and/or move things that it closes over.</span>
-<span class="doccomment">///     let fired = LogOnDrop(&quot;animation frame fired or canceled&quot;);</span>
-<span class="doccomment">///     let cb = Closure::once(move || drop(fired));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     // Schedule the animation frame!</span>
-<span class="doccomment">///     let animation_id = requestAnimationFrame(&amp;cb);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     // Again, return a handle to JS, so that the closure is not dropped</span>
-<span class="doccomment">///     // immediately and JS can decide whether to cancel the animation frame.</span>
-<span class="doccomment">///     AnimationFrameHandle {</span>
-<span class="doccomment">///         animation_id,</span>
-<span class="doccomment">///         _closure: cb,</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ## Converting `FnOnce`s directly into JavaScript Functions with `Closure::once_into_js`</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If we don&#39;t want to allow a `FnOnce` to be eagerly dropped (maybe because we</span>
-<span class="doccomment">/// just want it to drop after it is called and don&#39;t care about cancellation)</span>
-<span class="doccomment">/// then we can use the `Closure::once_into_js` function.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This is the same `requestAnimationFrame` example as above, but without</span>
-<span class="doccomment">/// supporting early cancellation.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">/// use wasm_bindgen::prelude::*;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[wasm_bindgen]</span>
-<span class="doccomment">/// extern &quot;C&quot; {</span>
-<span class="doccomment">///     // We modify the binding to take an untyped `JsValue` since that is what</span>
-<span class="doccomment">///     // is returned by `Closure::once_into_js`.</span>
-<span class="doccomment">///     //</span>
-<span class="doccomment">///     // If we were using the `web_sys` binding for `requestAnimationFrame`,</span>
-<span class="doccomment">///     // then the call sites would cast the `JsValue` into a `&amp;js_sys::Function`</span>
-<span class="doccomment">///     // using `f.unchecked_ref::&lt;js_sys::Function&gt;()`. See the `web_sys`</span>
-<span class="doccomment">///     // example above for details.</span>
-<span class="doccomment">///     fn requestAnimationFrame(callback: JsValue);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     #[wasm_bindgen(js_namespace = console)]</span>
-<span class="doccomment">///     fn log(s: &amp;str);</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// // A type that will log a message when it is dropped.</span>
-<span class="doccomment">/// struct LogOnDrop(&amp;&#39;static str);</span>
-<span class="doccomment">/// impl Drop for LogOnDrop {</span>
-<span class="doccomment">///     fn drop(&amp;mut self) {</span>
-<span class="doccomment">///         log(self.0);</span>
-<span class="doccomment">///     }</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// #[wasm_bindgen]</span>
-<span class="doccomment">/// pub fn run() {</span>
-<span class="doccomment">///     // We are using `Closure::once_into_js` which takes a `FnOnce` and</span>
-<span class="doccomment">///     // converts it into a JavaScript function, which is returned as a</span>
-<span class="doccomment">///     // `JsValue`.</span>
-<span class="doccomment">///     let fired = LogOnDrop(&quot;animation frame fired&quot;);</span>
-<span class="doccomment">///     let cb = Closure::once_into_js(move || drop(fired));</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     // Schedule the animation frame!</span>
-<span class="doccomment">///     requestAnimationFrame(cb);</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///     // No need to worry about whether or not we drop a `Closure`</span>
-<span class="doccomment">///     // here or return some sort of handle to JS!</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Closure</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> {
-    <span class="ident">js</span>: <span class="ident">ManuallyDrop</span><span class="op">&lt;</span><span class="ident">JsValue</span><span class="op">&gt;</span>,
-    <span class="ident">data</span>: <span class="ident">ManuallyDrop</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+<span class="doccomment">/// A handle to both a closure in Rust as well as JS closure which will invoke
+/// the Rust closure.
+///
+/// A `Closure` is the primary way that a `&#39;static` lifetime closure is
+/// transferred from Rust to JS. `Closure` currently requires that the closures
+/// it&#39;s created with have the `&#39;static` lifetime in Rust for soundness reasons.
+///
+/// This type is a &quot;handle&quot; in the sense that whenever it is dropped it will
+/// invalidate the JS closure that it refers to. Any usage of the closure in JS
+/// after the `Closure` has been dropped will raise an exception. It&#39;s then up
+/// to you to arrange for `Closure` to be properly deallocate at an appropriate
+/// location in your program.
+///
+/// The type parameter on `Closure` is the type of closure that this represents.
+/// Currently this can only be the `Fn` and `FnMut` traits with up to 7
+/// arguments (and an optional return value).
+///
+/// # Examples
+///
+/// Here are a number of examples of using `Closure`.
+///
+/// ## Using the `setInterval` API
+///
+/// Sample usage of `Closure` to invoke the `setInterval` API.
+///
+/// ```rust,no_run
+/// use wasm_bindgen::prelude::*;
+///
+/// #[wasm_bindgen]
+/// extern &quot;C&quot; {
+///     fn setInterval(closure: &amp;Closure&lt;dyn FnMut()&gt;, time: u32) -&gt; i32;
+///     fn clearInterval(id: i32);
+///
+///     #[wasm_bindgen(js_namespace = console)]
+///     fn log(s: &amp;str);
+/// }
+///
+/// #[wasm_bindgen]
+/// pub struct IntervalHandle {
+///     interval_id: i32,
+///     _closure: Closure&lt;dyn FnMut()&gt;,
+/// }
+///
+/// impl Drop for IntervalHandle {
+///     fn drop(&amp;mut self) {
+///         clearInterval(self.interval_id);
+///     }
+/// }
+///
+/// #[wasm_bindgen]
+/// pub fn run() -&gt; IntervalHandle {
+///     // First up we use `Closure::new` to wrap up a Rust closure and create
+///     // a JS closure.
+///     let cb = Closure::new(|| {
+///         log(&quot;interval elapsed!&quot;);
+///     });
+///
+///     // Next we pass this via reference to the `setInterval` function, and
+///     // `setInterval` gets a handle to the corresponding JS closure.
+///     let interval_id = setInterval(&amp;cb, 1_000);
+///
+///     // If we were to drop `cb` here it would cause an exception to be raised
+///     // whenever the interval elapses. Instead we *return* our handle back to JS
+///     // so JS can decide when to cancel the interval and deallocate the closure.
+///     IntervalHandle {
+///         interval_id,
+///         _closure: cb,
+///     }
+/// }
+/// ```
+///
+/// ## Casting a `Closure` to a `js_sys::Function`
+///
+/// This is the same `setInterval` example as above, except it is using
+/// `web_sys` (which uses `js_sys::Function` for callbacks) instead of manually
+/// writing bindings to `setInterval` and other Web APIs.
+///
+/// ```rust,ignore
+/// use wasm_bindgen::JsCast;
+///
+/// #[wasm_bindgen]
+/// pub struct IntervalHandle {
+///     interval_id: i32,
+///     _closure: Closure&lt;dyn FnMut()&gt;,
+/// }
+///
+/// impl Drop for IntervalHandle {
+///     fn drop(&amp;mut self) {
+///         let window = web_sys::window().unwrap();
+///         window.clear_interval_with_handle(self.interval_id);
+///     }
+/// }
+///
+/// #[wasm_bindgen]
+/// pub fn run() -&gt; Result&lt;IntervalHandle, JsValue&gt; {
+///     let cb = Closure::new(|| {
+///         web_sys::console::log_1(&amp;&quot;interval elapsed!&quot;.into());
+///     });
+///
+///     let window = web_sys::window().unwrap();
+///     let interval_id = window.set_interval_with_callback_and_timeout_and_arguments_0(
+///         // Note this method call, which uses `as_ref()` to get a `JsValue`
+///         // from our `Closure` which is then converted to a `&amp;Function`
+///         // using the `JsCast::unchecked_ref` function.
+///         cb.as_ref().unchecked_ref(),
+///         1_000,
+///     )?;
+///
+///     // Same as above.
+///     Ok(IntervalHandle {
+///         interval_id,
+///         _closure: cb,
+///     })
+/// }
+/// ```
+///
+/// ## Using `FnOnce` and `Closure::once` with `requestAnimationFrame`
+///
+/// Because `requestAnimationFrame` only calls its callback once, we can use
+/// `FnOnce` and `Closure::once` with it.
+///
+/// ```rust,no_run
+/// use wasm_bindgen::prelude::*;
+///
+/// #[wasm_bindgen]
+/// extern &quot;C&quot; {
+///     fn requestAnimationFrame(closure: &amp;Closure&lt;dyn FnMut()&gt;) -&gt; u32;
+///     fn cancelAnimationFrame(id: u32);
+///
+///     #[wasm_bindgen(js_namespace = console)]
+///     fn log(s: &amp;str);
+/// }
+///
+/// #[wasm_bindgen]
+/// pub struct AnimationFrameHandle {
+///     animation_id: u32,
+///     _closure: Closure&lt;dyn FnMut()&gt;,
+/// }
+///
+/// impl Drop for AnimationFrameHandle {
+///     fn drop(&amp;mut self) {
+///         cancelAnimationFrame(self.animation_id);
+///     }
+/// }
+///
+/// // A type that will log a message when it is dropped.
+/// struct LogOnDrop(&amp;&#39;static str);
+/// impl Drop for LogOnDrop {
+///     fn drop(&amp;mut self) {
+///         log(self.0);
+///     }
+/// }
+///
+/// #[wasm_bindgen]
+/// pub fn run() -&gt; AnimationFrameHandle {
+///     // We are using `Closure::once` which takes a `FnOnce`, so the function
+///     // can drop and/or move things that it closes over.
+///     let fired = LogOnDrop(&quot;animation frame fired or canceled&quot;);
+///     let cb = Closure::once(move || drop(fired));
+///
+///     // Schedule the animation frame!
+///     let animation_id = requestAnimationFrame(&amp;cb);
+///
+///     // Again, return a handle to JS, so that the closure is not dropped
+///     // immediately and JS can decide whether to cancel the animation frame.
+///     AnimationFrameHandle {
+///         animation_id,
+///         _closure: cb,
+///     }
+/// }
+/// ```
+///
+/// ## Converting `FnOnce`s directly into JavaScript Functions with `Closure::once_into_js`
+///
+/// If we don&#39;t want to allow a `FnOnce` to be eagerly dropped (maybe because we
+/// just want it to drop after it is called and don&#39;t care about cancellation)
+/// then we can use the `Closure::once_into_js` function.
+///
+/// This is the same `requestAnimationFrame` example as above, but without
+/// supporting early cancellation.
+///
+/// ```
+/// use wasm_bindgen::prelude::*;
+///
+/// #[wasm_bindgen]
+/// extern &quot;C&quot; {
+///     // We modify the binding to take an untyped `JsValue` since that is what
+///     // is returned by `Closure::once_into_js`.
+///     //
+///     // If we were using the `web_sys` binding for `requestAnimationFrame`,
+///     // then the call sites would cast the `JsValue` into a `&amp;js_sys::Function`
+///     // using `f.unchecked_ref::&lt;js_sys::Function&gt;()`. See the `web_sys`
+///     // example above for details.
+///     fn requestAnimationFrame(callback: JsValue);
+///
+///     #[wasm_bindgen(js_namespace = console)]
+///     fn log(s: &amp;str);
+/// }
+///
+/// // A type that will log a message when it is dropped.
+/// struct LogOnDrop(&amp;&#39;static str);
+/// impl Drop for LogOnDrop {
+///     fn drop(&amp;mut self) {
+///         log(self.0);
+///     }
+/// }
+///
+/// #[wasm_bindgen]
+/// pub fn run() {
+///     // We are using `Closure::once_into_js` which takes a `FnOnce` and
+///     // converts it into a JavaScript function, which is returned as a
+///     // `JsValue`.
+///     let fired = LogOnDrop(&quot;animation frame fired&quot;);
+///     let cb = Closure::once_into_js(move || drop(fired));
+///
+///     // Schedule the animation frame!
+///     requestAnimationFrame(cb);
+///
+///     // No need to worry about whether or not we drop a `Closure`
+///     // here or return some sort of handle to JS!
+/// }
+/// ```
+</span><span class="kw">pub struct </span>Closure&lt;T: <span class="question-mark">?</span>Sized&gt; {
+    js: ManuallyDrop&lt;JsValue&gt;,
+    data: ManuallyDrop&lt;Box&lt;T&gt;&gt;,
 }
 
-<span class="kw">union</span> <span class="ident">FatPtr</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> {
-    <span class="ident">ptr</span>: <span class="kw-2">*mut</span> <span class="ident">T</span>,
-    <span class="ident">fields</span>: (<span class="ident">usize</span>, <span class="ident">usize</span>),
+<span class="kw">union </span>FatPtr&lt;T: <span class="question-mark">?</span>Sized&gt; {
+    ptr: <span class="kw-2">*mut </span>T,
+    fields: (usize, usize),
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Closure</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="ident">WasmClosure</span>,
+<span class="kw">impl</span>&lt;T&gt; Closure&lt;T&gt;
+<span class="kw">where
+    </span>T: <span class="question-mark">?</span>Sized + WasmClosure,
 {
-    <span class="doccomment">/// Creates a new instance of `Closure` from the provided Rust function.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Note that the closure provided here, `F`, has a few requirements</span>
-    <span class="doccomment">/// associated with it:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * It must implement `Fn` or `FnMut` (for `FnOnce` functions see</span>
-    <span class="doccomment">///   `Closure::once` and `Closure::once_into_js`).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * It must be `&#39;static`, aka no stack references (use the `move`</span>
-    <span class="doccomment">///   keyword).</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * It can have at most 7 arguments.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * Its arguments and return values are all types that can be shared with</span>
-    <span class="doccomment">///   JS (i.e. have `#[wasm_bindgen]` annotations or are simple numbers,</span>
-    <span class="doccomment">///   etc.)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">t</span>: <span class="ident">F</span>) -&gt; <span class="ident">Closure</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">IntoWasmClosure</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="doccomment">/// Creates a new instance of `Closure` from the provided Rust function.
+    ///
+    /// Note that the closure provided here, `F`, has a few requirements
+    /// associated with it:
+    ///
+    /// * It must implement `Fn` or `FnMut` (for `FnOnce` functions see
+    ///   `Closure::once` and `Closure::once_into_js`).
+    ///
+    /// * It must be `&#39;static`, aka no stack references (use the `move`
+    ///   keyword).
+    ///
+    /// * It can have at most 7 arguments.
+    ///
+    /// * Its arguments and return values are all types that can be shared with
+    ///   JS (i.e. have `#[wasm_bindgen]` annotations or are simple numbers,
+    ///   etc.)
+    </span><span class="kw">pub fn </span>new&lt;F&gt;(t: F) -&gt; Closure&lt;T&gt;
+    <span class="kw">where
+        </span>F: IntoWasmClosure&lt;T&gt; + <span class="lifetime">&#39;static</span>,
     {
-        <span class="ident">Closure::wrap</span>(<span class="ident">Box::new</span>(<span class="ident">t</span>).<span class="ident">unsize</span>())
+        Closure::wrap(Box::new(t).unsize())
     }
 
-    <span class="doccomment">/// A more direct version of `Closure::new` which creates a `Closure` from</span>
-    <span class="doccomment">/// a `Box&lt;dyn Fn&gt;`/`Box&lt;dyn FnMut&gt;`, which is how it&#39;s kept internally.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wrap</span>(<span class="kw-2">mut</span> <span class="ident">data</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">Closure</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-        <span class="macro">assert_eq!</span>(<span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="kw-2">*const</span> <span class="ident">T</span><span class="op">&gt;</span>(), <span class="ident">mem::size_of</span>::<span class="op">&lt;</span><span class="ident">FatPtr</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>());
-        <span class="kw">let</span> (<span class="ident">a</span>, <span class="ident">b</span>) <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="ident">FatPtr</span> {
-                <span class="ident">ptr</span>: <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">data</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">T</span>,
+    <span class="doccomment">/// A more direct version of `Closure::new` which creates a `Closure` from
+    /// a `Box&lt;dyn Fn&gt;`/`Box&lt;dyn FnMut&gt;`, which is how it&#39;s kept internally.
+    </span><span class="kw">pub fn </span>wrap(<span class="kw-2">mut </span>data: Box&lt;T&gt;) -&gt; Closure&lt;T&gt; {
+        <span class="macro">assert_eq!</span>(mem::size_of::&lt;<span class="kw-2">*const </span>T&gt;(), mem::size_of::&lt;FatPtr&lt;T&gt;&gt;());
+        <span class="kw">let </span>(a, b) = <span class="kw">unsafe </span>{
+            FatPtr {
+                ptr: <span class="kw-2">&amp;mut *</span>data <span class="kw">as </span><span class="kw-2">*mut </span>T,
             }
-            .<span class="ident">fields</span>
+            .fields
         };
 
-        <span class="comment">// Here we need to create a `JsValue` with the data and `T::invoke()`</span>
-        <span class="comment">// function pointer. To do that we... take a few unconventional turns.</span>
-        <span class="comment">// In essence what happens here is this:</span>
-        <span class="comment">//</span>
-        <span class="comment">// 1. First up, below we call a function, `breaks_if_inlined`. This</span>
-        <span class="comment">//    function, as the name implies, does not work if it&#39;s inlined.</span>
-        <span class="comment">//    More on that in a moment.</span>
-        <span class="comment">// 2. This function internally calls a special import recognized by the</span>
-        <span class="comment">//    `wasm-bindgen` CLI tool, `__wbindgen_describe_closure`. This</span>
-        <span class="comment">//    imported symbol is similar to `__wbindgen_describe` in that it&#39;s</span>
-        <span class="comment">//    not intended to show up in the final binary but it&#39;s an</span>
-        <span class="comment">//    intermediate state for a `wasm-bindgen` binary.</span>
-        <span class="comment">// 3. The `__wbindgen_describe_closure` import is namely passed a</span>
-        <span class="comment">//    descriptor function, monomorphized for each invocation.</span>
-        <span class="comment">//</span>
-        <span class="comment">// Most of this doesn&#39;t actually make sense to happen at runtime! The</span>
-        <span class="comment">// real magic happens when `wasm-bindgen` comes along and updates our</span>
-        <span class="comment">// generated code. When `wasm-bindgen` runs it performs a few tasks:</span>
-        <span class="comment">//</span>
-        <span class="comment">// * First, it finds all functions that call</span>
-        <span class="comment">//   `__wbindgen_describe_closure`. These are all `breaks_if_inlined`</span>
-        <span class="comment">//   defined below as the symbol isn&#39;t called anywhere else.</span>
-        <span class="comment">// * Next, `wasm-bindgen` executes the `breaks_if_inlined`</span>
-        <span class="comment">//   monomorphized functions, passing it dummy arguments. This will</span>
-        <span class="comment">//   execute the function just enough to invoke the special import,</span>
-        <span class="comment">//   namely telling us about the function pointer that is the describe</span>
-        <span class="comment">//   shim.</span>
-        <span class="comment">// * This knowledge is then used to actually find the descriptor in the</span>
-        <span class="comment">//   function table which is then executed to figure out the signature</span>
-        <span class="comment">//   of the closure.</span>
-        <span class="comment">// * Finally, and probably most heinously, the call to</span>
-        <span class="comment">//   `breaks_if_inlined` is rewritten to call an otherwise globally</span>
-        <span class="comment">//   imported function. This globally imported function will generate</span>
-        <span class="comment">//   the `JsValue` for this closure specialized for the signature in</span>
-        <span class="comment">//   question.</span>
-        <span class="comment">//</span>
-        <span class="comment">// Later on `wasm-gc` will clean up all the dead code and ensure that</span>
-        <span class="comment">// we don&#39;t actually call `__wbindgen_describe_closure` at runtime. This</span>
-        <span class="comment">// means we will end up not actually calling `breaks_if_inlined` in the</span>
-        <span class="comment">// final binary, all calls to that function should be pruned.</span>
-        <span class="comment">//</span>
-        <span class="comment">// See crates/cli-support/src/js/closures.rs for a more information</span>
-        <span class="comment">// about what&#39;s going on here.</span>
+        <span class="comment">// Here we need to create a `JsValue` with the data and `T::invoke()`
+        // function pointer. To do that we... take a few unconventional turns.
+        // In essence what happens here is this:
+        //
+        // 1. First up, below we call a function, `breaks_if_inlined`. This
+        //    function, as the name implies, does not work if it&#39;s inlined.
+        //    More on that in a moment.
+        // 2. This function internally calls a special import recognized by the
+        //    `wasm-bindgen` CLI tool, `__wbindgen_describe_closure`. This
+        //    imported symbol is similar to `__wbindgen_describe` in that it&#39;s
+        //    not intended to show up in the final binary but it&#39;s an
+        //    intermediate state for a `wasm-bindgen` binary.
+        // 3. The `__wbindgen_describe_closure` import is namely passed a
+        //    descriptor function, monomorphized for each invocation.
+        //
+        // Most of this doesn&#39;t actually make sense to happen at runtime! The
+        // real magic happens when `wasm-bindgen` comes along and updates our
+        // generated code. When `wasm-bindgen` runs it performs a few tasks:
+        //
+        // * First, it finds all functions that call
+        //   `__wbindgen_describe_closure`. These are all `breaks_if_inlined`
+        //   defined below as the symbol isn&#39;t called anywhere else.
+        // * Next, `wasm-bindgen` executes the `breaks_if_inlined`
+        //   monomorphized functions, passing it dummy arguments. This will
+        //   execute the function just enough to invoke the special import,
+        //   namely telling us about the function pointer that is the describe
+        //   shim.
+        // * This knowledge is then used to actually find the descriptor in the
+        //   function table which is then executed to figure out the signature
+        //   of the closure.
+        // * Finally, and probably most heinously, the call to
+        //   `breaks_if_inlined` is rewritten to call an otherwise globally
+        //   imported function. This globally imported function will generate
+        //   the `JsValue` for this closure specialized for the signature in
+        //   question.
+        //
+        // Later on `wasm-gc` will clean up all the dead code and ensure that
+        // we don&#39;t actually call `__wbindgen_describe_closure` at runtime. This
+        // means we will end up not actually calling `breaks_if_inlined` in the
+        // final binary, all calls to that function should be pruned.
+        //
+        // See crates/cli-support/src/js/closures.rs for a more information
+        // about what&#39;s going on here.
 
-        <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">describe</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">WasmClosure</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>() {
-            <span class="ident">inform</span>(<span class="ident">CLOSURE</span>);
-            <span class="ident">T::describe</span>()
+        </span><span class="kw">extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>describe&lt;T: WasmClosure + <span class="question-mark">?</span>Sized&gt;() {
+            inform(CLOSURE);
+            T::describe()
         }
 
-        <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">never</span>)]</span>
-        <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">breaks_if_inlined</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">WasmClosure</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span>(<span class="ident">a</span>: <span class="ident">usize</span>, <span class="ident">b</span>: <span class="ident">usize</span>) -&gt; <span class="ident">u32</span> {
-            <span class="ident"><span class="kw">super</span>::__wbindgen_describe_closure</span>(<span class="ident">a</span> <span class="kw">as</span> <span class="ident">u32</span>, <span class="ident">b</span> <span class="kw">as</span> <span class="ident">u32</span>, <span class="ident">describe</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">u32</span>)
+        <span class="attribute">#[inline(never)]
+        </span><span class="kw">unsafe fn </span>breaks_if_inlined&lt;T: WasmClosure + <span class="question-mark">?</span>Sized&gt;(a: usize, b: usize) -&gt; u32 {
+            <span class="kw">super</span>::__wbindgen_describe_closure(a <span class="kw">as </span>u32, b <span class="kw">as </span>u32, describe::&lt;T&gt; <span class="kw">as </span>u32)
         }
 
-        <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">breaks_if_inlined</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">a</span>, <span class="ident">b</span>) };
+        <span class="kw">let </span>idx = <span class="kw">unsafe </span>{ breaks_if_inlined::&lt;T&gt;(a, b) };
 
-        <span class="ident">Closure</span> {
-            <span class="ident">js</span>: <span class="ident">ManuallyDrop::new</span>(<span class="ident">JsValue::_new</span>(<span class="ident">idx</span>)),
-            <span class="ident">data</span>: <span class="ident">ManuallyDrop::new</span>(<span class="ident">data</span>),
+        Closure {
+            js: ManuallyDrop::new(JsValue::_new(idx)),
+            data: ManuallyDrop::new(data),
         }
     }
 
-    <span class="doccomment">/// Release memory management of this closure from Rust to the JS GC.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// When a `Closure` is dropped it will release the Rust memory and</span>
-    <span class="doccomment">/// invalidate the associated JS closure, but this isn&#39;t always desired.</span>
-    <span class="doccomment">/// Some callbacks are alive for the entire duration of the program or for a</span>
-    <span class="doccomment">/// lifetime dynamically managed by the JS GC. This function can be used</span>
-    <span class="doccomment">/// to drop this `Closure` while keeping the associated JS function still</span>
-    <span class="doccomment">/// valid.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// By default this function will leak memory. This can be dangerous if this</span>
-    <span class="doccomment">/// function is called many times in an application because the memory leak</span>
-    <span class="doccomment">/// will overwhelm the page quickly and crash the wasm.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the browser, however, supports weak references, then this function</span>
-    <span class="doccomment">/// will not leak memory. Instead the Rust memory will be reclaimed when the</span>
-    <span class="doccomment">/// JS closure is GC&#39;d. Weak references are not enabled by default since</span>
-    <span class="doccomment">/// they&#39;re still a proposal for the JS standard. They can be enabled with</span>
-    <span class="doccomment">/// `WASM_BINDGEN_WEAKREF=1` when running `wasm-bindgen`, however.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_js_value</span>(<span class="self">self</span>) -&gt; <span class="ident">JsValue</span> {
-        <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">js</span>.<span class="ident">idx</span>;
-        <span class="ident">mem::forget</span>(<span class="self">self</span>);
-        <span class="ident">JsValue::_new</span>(<span class="ident">idx</span>)
+    <span class="doccomment">/// Release memory management of this closure from Rust to the JS GC.
+    ///
+    /// When a `Closure` is dropped it will release the Rust memory and
+    /// invalidate the associated JS closure, but this isn&#39;t always desired.
+    /// Some callbacks are alive for the entire duration of the program or for a
+    /// lifetime dynamically managed by the JS GC. This function can be used
+    /// to drop this `Closure` while keeping the associated JS function still
+    /// valid.
+    ///
+    /// By default this function will leak memory. This can be dangerous if this
+    /// function is called many times in an application because the memory leak
+    /// will overwhelm the page quickly and crash the wasm.
+    ///
+    /// If the browser, however, supports weak references, then this function
+    /// will not leak memory. Instead the Rust memory will be reclaimed when the
+    /// JS closure is GC&#39;d. Weak references are not enabled by default since
+    /// they&#39;re still a proposal for the JS standard. They can be enabled with
+    /// `WASM_BINDGEN_WEAKREF=1` when running `wasm-bindgen`, however.
+    </span><span class="kw">pub fn </span>into_js_value(<span class="self">self</span>) -&gt; JsValue {
+        <span class="kw">let </span>idx = <span class="self">self</span>.js.idx;
+        mem::forget(<span class="self">self</span>);
+        JsValue::_new(idx)
     }
 
-    <span class="doccomment">/// Same as `into_js_value`, but doesn&#39;t return a value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">forget</span>(<span class="self">self</span>) {
-        <span class="ident">drop</span>(<span class="self">self</span>.<span class="ident">into_js_value</span>());
+    <span class="doccomment">/// Same as `into_js_value`, but doesn&#39;t return a value.
+    </span><span class="kw">pub fn </span>forget(<span class="self">self</span>) {
+        drop(<span class="self">self</span>.into_js_value());
     }
 }
 
-<span class="comment">// NB: we use a specific `T` for this `Closure&lt;T&gt;` impl block to avoid every</span>
-<span class="comment">// call site having to provide an explicit, turbo-fished type like</span>
-<span class="comment">// `Closure::&lt;dyn FnOnce()&gt;::once(...)`.</span>
-<span class="kw">impl</span> <span class="ident">Closure</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">FnOnce</span>()<span class="op">&gt;</span> {
-    <span class="doccomment">/// Create a `Closure` from a function that can only be called once.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Since we have no way of enforcing that JS cannot attempt to call this</span>
-    <span class="doccomment">/// `FnOne(A...) -&gt; R` more than once, this produces a `Closure&lt;dyn FnMut(A...)</span>
-    <span class="doccomment">/// -&gt; R&gt;` that will dynamically throw a JavaScript error if called more</span>
-    <span class="doccomment">/// than once.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Example</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,no_run</span>
-    <span class="doccomment">/// use wasm_bindgen::prelude::*;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Create an non-`Copy`, owned `String`.</span>
-    <span class="doccomment">/// let mut s = String::from(&quot;Hello&quot;);</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Close over `s`. Since `f` returns `s`, it is `FnOnce` and can only be</span>
-    <span class="doccomment">/// // called once. If it was called a second time, it wouldn&#39;t have any `s`</span>
-    <span class="doccomment">/// // to work with anymore!</span>
-    <span class="doccomment">/// let f = move || {</span>
-    <span class="doccomment">///     s += &quot;, World!&quot;;</span>
-    <span class="doccomment">///     s</span>
-    <span class="doccomment">/// };</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// // Create a `Closure` from `f`. Note that the `Closure`&#39;s type parameter</span>
-    <span class="doccomment">/// // is `FnMut`, even though `f` is `FnOnce`.</span>
-    <span class="doccomment">/// let closure: Closure&lt;dyn FnMut() -&gt; String&gt; = Closure::once(f);</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">once</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">A</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">fn_once</span>: <span class="ident">F</span>) -&gt; <span class="ident">Closure</span><span class="op">&lt;</span><span class="ident">F::FnMut</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">WasmClosureFnOnce</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">R</span><span class="op">&gt;</span>,
+<span class="comment">// NB: we use a specific `T` for this `Closure&lt;T&gt;` impl block to avoid every
+// call site having to provide an explicit, turbo-fished type like
+// `Closure::&lt;dyn FnOnce()&gt;::once(...)`.
+</span><span class="kw">impl </span>Closure&lt;<span class="kw">dyn </span>FnOnce()&gt; {
+    <span class="doccomment">/// Create a `Closure` from a function that can only be called once.
+    ///
+    /// Since we have no way of enforcing that JS cannot attempt to call this
+    /// `FnOne(A...) -&gt; R` more than once, this produces a `Closure&lt;dyn FnMut(A...)
+    /// -&gt; R&gt;` that will dynamically throw a JavaScript error if called more
+    /// than once.
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// use wasm_bindgen::prelude::*;
+    ///
+    /// // Create an non-`Copy`, owned `String`.
+    /// let mut s = String::from(&quot;Hello&quot;);
+    ///
+    /// // Close over `s`. Since `f` returns `s`, it is `FnOnce` and can only be
+    /// // called once. If it was called a second time, it wouldn&#39;t have any `s`
+    /// // to work with anymore!
+    /// let f = move || {
+    ///     s += &quot;, World!&quot;;
+    ///     s
+    /// };
+    ///
+    /// // Create a `Closure` from `f`. Note that the `Closure`&#39;s type parameter
+    /// // is `FnMut`, even though `f` is `FnOnce`.
+    /// let closure: Closure&lt;dyn FnMut() -&gt; String&gt; = Closure::once(f);
+    /// ```
+    </span><span class="kw">pub fn </span>once&lt;F, A, R&gt;(fn_once: F) -&gt; Closure&lt;F::FnMut&gt;
+    <span class="kw">where
+        </span>F: <span class="lifetime">&#39;static </span>+ WasmClosureFnOnce&lt;A, R&gt;,
     {
-        <span class="ident">Closure::wrap</span>(<span class="ident">fn_once</span>.<span class="ident">into_fn_mut</span>())
+        Closure::wrap(fn_once.into_fn_mut())
     }
 
-    <span class="doccomment">/// Convert a `FnOnce(A...) -&gt; R` into a JavaScript `Function` object.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If the JavaScript function is invoked more than once, it will throw an</span>
-    <span class="doccomment">/// exception.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Unlike `Closure::once`, this does *not* return a `Closure` that can be</span>
-    <span class="doccomment">/// dropped before the function is invoked to deallocate the closure. The</span>
-    <span class="doccomment">/// only way the `FnOnce` is deallocated is by calling the JavaScript</span>
-    <span class="doccomment">/// function. If the JavaScript function is never called then the `FnOnce`</span>
-    <span class="doccomment">/// and everything it closes over will leak.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// ```rust,ignore</span>
-    <span class="doccomment">/// use wasm_bindgen::{prelude::*, JsCast};</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// let f = Closure::once_into_js(move || {</span>
-    <span class="doccomment">///     // ...</span>
-    <span class="doccomment">/// });</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// assert!(f.is_instance_of::&lt;js_sys::Function&gt;());</span>
-    <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">once_into_js</span><span class="op">&lt;</span><span class="ident">F</span>, <span class="ident">A</span>, <span class="ident">R</span><span class="op">&gt;</span>(<span class="ident">fn_once</span>: <span class="ident">F</span>) -&gt; <span class="ident">JsValue</span>
-    <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">WasmClosureFnOnce</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">R</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Convert a `FnOnce(A...) -&gt; R` into a JavaScript `Function` object.
+    ///
+    /// If the JavaScript function is invoked more than once, it will throw an
+    /// exception.
+    ///
+    /// Unlike `Closure::once`, this does *not* return a `Closure` that can be
+    /// dropped before the function is invoked to deallocate the closure. The
+    /// only way the `FnOnce` is deallocated is by calling the JavaScript
+    /// function. If the JavaScript function is never called then the `FnOnce`
+    /// and everything it closes over will leak.
+    ///
+    /// ```rust,ignore
+    /// use wasm_bindgen::{prelude::*, JsCast};
+    ///
+    /// let f = Closure::once_into_js(move || {
+    ///     // ...
+    /// });
+    ///
+    /// assert!(f.is_instance_of::&lt;js_sys::Function&gt;());
+    /// ```
+    </span><span class="kw">pub fn </span>once_into_js&lt;F, A, R&gt;(fn_once: F) -&gt; JsValue
+    <span class="kw">where
+        </span>F: <span class="lifetime">&#39;static </span>+ WasmClosureFnOnce&lt;A, R&gt;,
     {
-        <span class="ident">fn_once</span>.<span class="ident">into_js_function</span>()
+        fn_once.into_js_function()
     }
 }
 
-<span class="doccomment">/// A trait for converting an `FnOnce(A...) -&gt; R` into a `FnMut(A...) -&gt; R` that</span>
-<span class="doccomment">/// will throw if ever called more than once.</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">WasmClosureFnOnce</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">R</span><span class="op">&gt;</span>: <span class="lifetime">&#39;static</span> {
-    <span class="kw">type</span> <span class="ident">FnMut</span>: <span class="question-mark">?</span><span class="ident">Sized</span> <span class="op">+</span> <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">WasmClosure</span>;
+<span class="doccomment">/// A trait for converting an `FnOnce(A...) -&gt; R` into a `FnMut(A...) -&gt; R` that
+/// will throw if ever called more than once.
+</span><span class="attribute">#[doc(hidden)]
+</span><span class="kw">pub trait </span>WasmClosureFnOnce&lt;A, R&gt;: <span class="lifetime">&#39;static </span>{
+    <span class="kw">type </span>FnMut: <span class="question-mark">?</span>Sized + <span class="lifetime">&#39;static </span>+ WasmClosure;
 
-    <span class="kw">fn</span> <span class="ident">into_fn_mut</span>(<span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::FnMut</span><span class="op">&gt;</span>;
+    <span class="kw">fn </span>into_fn_mut(<span class="self">self</span>) -&gt; Box&lt;<span class="self">Self</span>::FnMut&gt;;
 
-    <span class="kw">fn</span> <span class="ident">into_js_function</span>(<span class="self">self</span>) -&gt; <span class="ident">JsValue</span>;
+    <span class="kw">fn </span>into_js_function(<span class="self">self</span>) -&gt; JsValue;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">JsValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Closure</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">as_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">JsValue</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">js</span>
+<span class="kw">impl</span>&lt;T: <span class="question-mark">?</span>Sized&gt; AsRef&lt;JsValue&gt; <span class="kw">for </span>Closure&lt;T&gt; {
+    <span class="kw">fn </span>as_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>JsValue {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.js
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">WasmDescribe</span> <span class="kw">for</span> <span class="ident">Closure</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">WasmClosure</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
+<span class="kw">impl</span>&lt;T&gt; WasmDescribe <span class="kw">for </span>Closure&lt;T&gt;
+<span class="kw">where
+    </span>T: WasmClosure + <span class="question-mark">?</span>Sized,
 {
-    <span class="kw">fn</span> <span class="ident">describe</span>() {
-        <span class="ident">inform</span>(<span class="ident">EXTERNREF</span>);
+    <span class="kw">fn </span>describe() {
+        inform(EXTERNREF);
     }
 }
 
-<span class="comment">// `Closure` can only be passed by reference to imports.</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">IntoWasmAbi</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Closure</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">WasmClosure</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
+<span class="comment">// `Closure` can only be passed by reference to imports.
+</span><span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; IntoWasmAbi <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Closure&lt;T&gt;
+<span class="kw">where
+    </span>T: WasmClosure + <span class="question-mark">?</span>Sized,
 {
-    <span class="kw">type</span> <span class="ident">Abi</span> <span class="op">=</span> <span class="ident">u32</span>;
+    <span class="kw">type </span>Abi = u32;
 
-    <span class="kw">fn</span> <span class="ident">into_abi</span>(<span class="self">self</span>) -&gt; <span class="ident">u32</span> {
-        (<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>.<span class="ident">js</span>).<span class="ident">into_abi</span>()
+    <span class="kw">fn </span>into_abi(<span class="self">self</span>) -&gt; u32 {
+        (<span class="kw-2">&amp;*</span><span class="self">self</span>.js).into_abi()
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> <span class="ident">OptionIntoWasmAbi</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Closure</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="ident">WasmClosure</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>, T&gt; OptionIntoWasmAbi <span class="kw">for </span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Closure&lt;T&gt;
+<span class="kw">where
+    </span>T: WasmClosure + <span class="question-mark">?</span>Sized,
 {
-    <span class="kw">fn</span> <span class="ident">none</span>() -&gt; <span class="ident"><span class="self">Self</span>::Abi</span> {
-        <span class="number">0</span>
+    <span class="kw">fn </span>none() -&gt; <span class="self">Self</span>::Abi {
+        <span class="number">0
+    </span>}
+}
+
+<span class="kw">fn </span>_check() {
+    <span class="kw">fn </span>_assert&lt;T: IntoWasmAbi&gt;() {}
+    _assert::&lt;<span class="kw-2">&amp;</span>Closure&lt;<span class="kw">dyn </span>Fn()&gt;&gt;();
+    _assert::&lt;<span class="kw-2">&amp;</span>Closure&lt;<span class="kw">dyn </span>Fn(String)&gt;&gt;();
+    _assert::&lt;<span class="kw-2">&amp;</span>Closure&lt;<span class="kw">dyn </span>Fn() -&gt; String&gt;&gt;();
+    _assert::&lt;<span class="kw-2">&amp;</span>Closure&lt;<span class="kw">dyn </span>FnMut()&gt;&gt;();
+    _assert::&lt;<span class="kw-2">&amp;</span>Closure&lt;<span class="kw">dyn </span>FnMut(String)&gt;&gt;();
+    _assert::&lt;<span class="kw-2">&amp;</span>Closure&lt;<span class="kw">dyn </span>FnMut() -&gt; String&gt;&gt;();
+}
+
+<span class="kw">impl</span>&lt;T&gt; fmt::Debug <span class="kw">for </span>Closure&lt;T&gt;
+<span class="kw">where
+    </span>T: <span class="question-mark">?</span>Sized,
+{
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;Closure {{ ... }}&quot;</span>)
     }
 }
 
-<span class="kw">fn</span> <span class="ident">_check</span>() {
-    <span class="kw">fn</span> <span class="ident">_assert</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">IntoWasmAbi</span><span class="op">&gt;</span>() {}
-    <span class="ident">_assert</span>::<span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Closure</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>()<span class="op">&gt;</span><span class="op">&gt;</span>();
-    <span class="ident">_assert</span>::<span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Closure</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="ident">String</span>)<span class="op">&gt;</span><span class="op">&gt;</span>();
-    <span class="ident">_assert</span>::<span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Closure</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>() -&gt; <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-    <span class="ident">_assert</span>::<span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Closure</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">FnMut</span>()<span class="op">&gt;</span><span class="op">&gt;</span>();
-    <span class="ident">_assert</span>::<span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Closure</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">FnMut</span>(<span class="ident">String</span>)<span class="op">&gt;</span><span class="op">&gt;</span>();
-    <span class="ident">_assert</span>::<span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Closure</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">FnMut</span>() -&gt; <span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Closure</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
+<span class="kw">impl</span>&lt;T&gt; Drop <span class="kw">for </span>Closure&lt;T&gt;
+<span class="kw">where
+    </span>T: <span class="question-mark">?</span>Sized,
 {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Closure {{ ... }}&quot;</span>)
-    }
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Closure</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span>,
-{
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="comment">// this will implicitly drop our strong reference in addition to</span>
-            <span class="comment">// invalidating all future invocations of the closure</span>
-            <span class="kw">if</span> <span class="ident"><span class="kw">super</span>::__wbindgen_cb_drop</span>(<span class="self">self</span>.<span class="ident">js</span>.<span class="ident">idx</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-                <span class="ident">ManuallyDrop::drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">data</span>);
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{
+            <span class="comment">// this will implicitly drop our strong reference in addition to
+            // invalidating all future invocations of the closure
+            </span><span class="kw">if </span><span class="kw">super</span>::__wbindgen_cb_drop(<span class="self">self</span>.js.idx) != <span class="number">0 </span>{
+                ManuallyDrop::drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>.data);
             }
         }
     }
 }
 
-<span class="doccomment">/// An internal trait for the `Closure` type.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This trait is not stable and it&#39;s not recommended to use this in bounds or</span>
-<span class="doccomment">/// implement yourself.</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">trait</span> <span class="ident">WasmClosure</span> {
-    <span class="kw">fn</span> <span class="ident">describe</span>();
+<span class="doccomment">/// An internal trait for the `Closure` type.
+///
+/// This trait is not stable and it&#39;s not recommended to use this in bounds or
+/// implement yourself.
+</span><span class="attribute">#[doc(hidden)]
+</span><span class="kw">pub unsafe trait </span>WasmClosure {
+    <span class="kw">fn </span>describe();
 }
 
-<span class="doccomment">/// An internal trait for the `Closure` type.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This trait is not stable and it&#39;s not recommended to use this in bounds or</span>
-<span class="doccomment">/// implement yourself.</span>
-<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IntoWasmClosure</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="question-mark">?</span><span class="ident">Sized</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">unsize</span>(<span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
+<span class="doccomment">/// An internal trait for the `Closure` type.
+///
+/// This trait is not stable and it&#39;s not recommended to use this in bounds or
+/// implement yourself.
+</span><span class="attribute">#[doc(hidden)]
+</span><span class="kw">pub trait </span>IntoWasmClosure&lt;T: <span class="question-mark">?</span>Sized&gt; {
+    <span class="kw">fn </span>unsize(<span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;) -&gt; Box&lt;T&gt;;
 }
 
-<span class="comment">// The memory safety here in these implementations below is a bit tricky. We</span>
-<span class="comment">// want to be able to drop the `Closure` object from within the invocation of a</span>
-<span class="comment">// `Closure` for cases like promises. That means that while it&#39;s running we</span>
-<span class="comment">// might drop the `Closure`, but that shouldn&#39;t invalidate the environment yet.</span>
-<span class="comment">//</span>
-<span class="comment">// Instead what we do is to wrap closures in `Rc` variables. The main `Closure`</span>
-<span class="comment">// has a strong reference count which keeps the trait object alive. Each</span>
-<span class="comment">// invocation of a closure then *also* clones this and gets a new reference</span>
-<span class="comment">// count. When the closure returns it will release the reference count.</span>
-<span class="comment">//</span>
-<span class="comment">// This means that if the main `Closure` is dropped while it&#39;s being invoked</span>
-<span class="comment">// then destruction is deferred until execution returns. Otherwise it&#39;ll</span>
-<span class="comment">// deallocate data immediately.</span>
+<span class="comment">// The memory safety here in these implementations below is a bit tricky. We
+// want to be able to drop the `Closure` object from within the invocation of a
+// `Closure` for cases like promises. That means that while it&#39;s running we
+// might drop the `Closure`, but that shouldn&#39;t invalidate the environment yet.
+//
+// Instead what we do is to wrap closures in `Rc` variables. The main `Closure`
+// has a strong reference count which keeps the trait object alive. Each
+// invocation of a closure then *also* clones this and gets a new reference
+// count. When the closure returns it will release the reference count.
+//
+// This means that if the main `Closure` is dropped while it&#39;s being invoked
+// then destruction is deferred until execution returns. Otherwise it&#39;ll
+// deallocate data immediately.
 
-<span class="macro">macro_rules!</span> <span class="ident">doit</span> {
+</span><span class="macro">macro_rules! </span>doit {
     ($(
-        ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>:<span class="ident">ident</span>)<span class="kw-2">*</span>)
+        ($(<span class="macro-nonterminal">$var</span>:ident)<span class="kw-2">*</span>)
     )<span class="kw-2">*</span>) =&gt; ($(
-        <span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>,)<span class="op">*</span> <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">WasmClosure</span> <span class="kw">for</span> <span class="kw">dyn</span> <span class="ident">Fn</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>),<span class="kw-2">*</span>) -&gt; <span class="ident">R</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>
-            <span class="kw">where</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>: <span class="ident">FromWasmAbi</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,)<span class="op">*</span>
-                  <span class="ident">R</span>: <span class="ident">ReturnWasmAbi</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+        <span class="kw">unsafe impl</span>&lt;$(<span class="macro-nonterminal">$var</span>,)* R&gt; WasmClosure <span class="kw">for dyn </span>Fn($(<span class="macro-nonterminal">$var</span>),<span class="kw-2">*</span>) -&gt; R + <span class="lifetime">&#39;static
+            </span><span class="kw">where </span>$(<span class="macro-nonterminal">$var</span>: FromWasmAbi + <span class="lifetime">&#39;static</span>,)*
+                  R: ReturnWasmAbi + <span class="lifetime">&#39;static</span>,
         {
-            <span class="kw">fn</span> <span class="ident">describe</span>() {
-                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
-                <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">invoke</span><span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>: <span class="ident">FromWasmAbi</span>,)<span class="op">*</span> <span class="ident">R</span>: <span class="ident">ReturnWasmAbi</span><span class="op">&gt;</span>(
-                    <span class="ident">a</span>: <span class="ident">usize</span>,
-                    <span class="ident">b</span>: <span class="ident">usize</span>,
-                    $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>: <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span> <span class="kw">as</span> <span class="ident">FromWasmAbi</span><span class="op">&gt;</span><span class="ident">::Abi</span>),<span class="op">*</span>
-                ) -&gt; <span class="op">&lt;</span><span class="ident">R</span> <span class="kw">as</span> <span class="ident">ReturnWasmAbi</span><span class="op">&gt;</span><span class="ident">::Abi</span> {
-                    <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="number">0</span> {
-                        <span class="ident">throw_str</span>(<span class="string">&quot;closure invoked recursively or destroyed already&quot;</span>);
+            <span class="kw">fn </span>describe() {
+                <span class="attribute">#[allow(non_snake_case)]
+                </span><span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>invoke&lt;$(<span class="macro-nonterminal">$var</span>: FromWasmAbi,)* R: ReturnWasmAbi&gt;(
+                    a: usize,
+                    b: usize,
+                    $(<span class="macro-nonterminal">$var</span>: &lt;<span class="macro-nonterminal">$var </span><span class="kw">as </span>FromWasmAbi&gt;::Abi),*
+                ) -&gt; &lt;R <span class="kw">as </span>ReturnWasmAbi&gt;::Abi {
+                    <span class="kw">if </span>a == <span class="number">0 </span>{
+                        throw_str(<span class="string">&quot;closure invoked recursively or destroyed already&quot;</span>);
                     }
-                    <span class="comment">// Make sure all stack variables are converted before we</span>
-                    <span class="comment">// convert `ret` as it may throw (for `Result`, for</span>
-                    <span class="comment">// example)</span>
-                    <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> {
-                        <span class="kw">let</span> <span class="ident">f</span>: <span class="kw-2">*const</span> <span class="kw">dyn</span> <span class="ident">Fn</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>),<span class="kw-2">*</span>) -&gt; <span class="ident">R</span> <span class="op">=</span>
-                            <span class="ident">FatPtr</span> { <span class="ident">fields</span>: (<span class="ident">a</span>, <span class="ident">b</span>) }.<span class="ident">ptr</span>;
+                    <span class="comment">// Make sure all stack variables are converted before we
+                    // convert `ret` as it may throw (for `Result`, for
+                    // example)
+                    </span><span class="kw">let </span>ret = {
+                        <span class="kw">let </span>f: <span class="kw-2">*const </span><span class="kw">dyn </span>Fn($(<span class="macro-nonterminal">$var</span>),<span class="kw-2">*</span>) -&gt; R =
+                            FatPtr { fields: (a, b) }.ptr;
                         $(
-                            <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span> <span class="op">=</span> <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span> <span class="kw">as</span> <span class="ident">FromWasmAbi</span><span class="op">&gt;</span><span class="ident">::from_abi</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>);
-                        )<span class="op">*</span>
-                        (<span class="kw-2">*</span><span class="ident">f</span>)($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>),<span class="kw-2">*</span>)
+                            <span class="kw">let </span><span class="macro-nonterminal">$var </span>= &lt;<span class="macro-nonterminal">$var </span><span class="kw">as </span>FromWasmAbi&gt;::from_abi(<span class="macro-nonterminal">$var</span>);
+                        )*
+                        (<span class="kw-2">*</span>f)($(<span class="macro-nonterminal">$var</span>),<span class="kw-2">*</span>)
                     };
-                    <span class="ident">ret</span>.<span class="ident">return_abi</span>()
+                    ret.return_abi()
                 }
 
-                <span class="ident">inform</span>(<span class="ident">invoke</span>::<span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>,)<span class="op">*</span> <span class="ident">R</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">u32</span>);
+                inform(invoke::&lt;$(<span class="macro-nonterminal">$var</span>,)* R&gt; <span class="kw">as </span>u32);
 
-                <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="kw">fn</span> <span class="ident">destroy</span><span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>: <span class="ident">FromWasmAbi</span>,)<span class="op">*</span> <span class="ident">R</span>: <span class="ident">ReturnWasmAbi</span><span class="op">&gt;</span>(
-                    <span class="ident">a</span>: <span class="ident">usize</span>,
-                    <span class="ident">b</span>: <span class="ident">usize</span>,
+                <span class="kw">unsafe extern fn </span>destroy&lt;$(<span class="macro-nonterminal">$var</span>: FromWasmAbi,)* R: ReturnWasmAbi&gt;(
+                    a: usize,
+                    b: usize,
                 ) {
-                    <span class="comment">// This can be called by the JS glue in erroneous situations</span>
-                    <span class="comment">// such as when the closure has already been destroyed. If</span>
-                    <span class="comment">// that&#39;s the case let&#39;s not make things worse by</span>
-                    <span class="comment">// segfaulting and/or asserting, so just ignore null</span>
-                    <span class="comment">// pointers.</span>
-                    <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="number">0</span> {
+                    <span class="comment">// This can be called by the JS glue in erroneous situations
+                    // such as when the closure has already been destroyed. If
+                    // that&#39;s the case let&#39;s not make things worse by
+                    // segfaulting and/or asserting, so just ignore null
+                    // pointers.
+                    </span><span class="kw">if </span>a == <span class="number">0 </span>{
                         <span class="kw">return</span>;
                     }
-                    <span class="ident">drop</span>(<span class="ident">Box::from_raw</span>(<span class="ident">FatPtr</span>::<span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>,)<span class="kw-2">*</span>) -&gt; <span class="ident">R</span><span class="op">&gt;</span> {
-                        <span class="ident">fields</span>: (<span class="ident">a</span>, <span class="ident">b</span>)
-                    }.<span class="ident">ptr</span>));
+                    drop(Box::from_raw(FatPtr::&lt;<span class="kw">dyn </span>Fn($(<span class="macro-nonterminal">$var</span>,)<span class="kw-2">*</span>) -&gt; R&gt; {
+                        fields: (a, b)
+                    }.ptr));
                 }
-                <span class="ident">inform</span>(<span class="ident">destroy</span>::<span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>,)<span class="op">*</span> <span class="ident">R</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">u32</span>);
+                inform(destroy::&lt;$(<span class="macro-nonterminal">$var</span>,)* R&gt; <span class="kw">as </span>u32);
 
-                <span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="self">Self</span><span class="op">&gt;</span><span class="ident">::describe</span>();
+                &lt;<span class="kw-2">&amp;</span><span class="self">Self</span>&gt;::describe();
             }
         }
 
-        <span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>,)<span class="op">*</span> <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">WasmClosure</span> <span class="kw">for</span> <span class="kw">dyn</span> <span class="ident">FnMut</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>),<span class="kw-2">*</span>) -&gt; <span class="ident">R</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>
-            <span class="kw">where</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>: <span class="ident">FromWasmAbi</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,)<span class="op">*</span>
-                  <span class="ident">R</span>: <span class="ident">ReturnWasmAbi</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+        <span class="kw">unsafe impl</span>&lt;$(<span class="macro-nonterminal">$var</span>,)* R&gt; WasmClosure <span class="kw">for dyn </span>FnMut($(<span class="macro-nonterminal">$var</span>),<span class="kw-2">*</span>) -&gt; R + <span class="lifetime">&#39;static
+            </span><span class="kw">where </span>$(<span class="macro-nonterminal">$var</span>: FromWasmAbi + <span class="lifetime">&#39;static</span>,)*
+                  R: ReturnWasmAbi + <span class="lifetime">&#39;static</span>,
         {
-            <span class="kw">fn</span> <span class="ident">describe</span>() {
-                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
-                <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">invoke</span><span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>: <span class="ident">FromWasmAbi</span>,)<span class="op">*</span> <span class="ident">R</span>: <span class="ident">ReturnWasmAbi</span><span class="op">&gt;</span>(
-                    <span class="ident">a</span>: <span class="ident">usize</span>,
-                    <span class="ident">b</span>: <span class="ident">usize</span>,
-                    $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>: <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span> <span class="kw">as</span> <span class="ident">FromWasmAbi</span><span class="op">&gt;</span><span class="ident">::Abi</span>),<span class="op">*</span>
-                ) -&gt; <span class="op">&lt;</span><span class="ident">R</span> <span class="kw">as</span> <span class="ident">ReturnWasmAbi</span><span class="op">&gt;</span><span class="ident">::Abi</span> {
-                    <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="number">0</span> {
-                        <span class="ident">throw_str</span>(<span class="string">&quot;closure invoked recursively or destroyed already&quot;</span>);
+            <span class="kw">fn </span>describe() {
+                <span class="attribute">#[allow(non_snake_case)]
+                </span><span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>invoke&lt;$(<span class="macro-nonterminal">$var</span>: FromWasmAbi,)* R: ReturnWasmAbi&gt;(
+                    a: usize,
+                    b: usize,
+                    $(<span class="macro-nonterminal">$var</span>: &lt;<span class="macro-nonterminal">$var </span><span class="kw">as </span>FromWasmAbi&gt;::Abi),*
+                ) -&gt; &lt;R <span class="kw">as </span>ReturnWasmAbi&gt;::Abi {
+                    <span class="kw">if </span>a == <span class="number">0 </span>{
+                        throw_str(<span class="string">&quot;closure invoked recursively or destroyed already&quot;</span>);
                     }
-                    <span class="comment">// Make sure all stack variables are converted before we</span>
-                    <span class="comment">// convert `ret` as it may throw (for `Result`, for</span>
-                    <span class="comment">// example)</span>
-                    <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> {
-                        <span class="kw">let</span> <span class="ident">f</span>: <span class="kw-2">*const</span> <span class="kw">dyn</span> <span class="ident">FnMut</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>),<span class="kw-2">*</span>) -&gt; <span class="ident">R</span> <span class="op">=</span>
-                            <span class="ident">FatPtr</span> { <span class="ident">fields</span>: (<span class="ident">a</span>, <span class="ident">b</span>) }.<span class="ident">ptr</span>;
-                        <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">f</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">dyn</span> <span class="ident">FnMut</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>),<span class="kw-2">*</span>) -&gt; <span class="ident">R</span>;
+                    <span class="comment">// Make sure all stack variables are converted before we
+                    // convert `ret` as it may throw (for `Result`, for
+                    // example)
+                    </span><span class="kw">let </span>ret = {
+                        <span class="kw">let </span>f: <span class="kw-2">*const </span><span class="kw">dyn </span>FnMut($(<span class="macro-nonterminal">$var</span>),<span class="kw-2">*</span>) -&gt; R =
+                            FatPtr { fields: (a, b) }.ptr;
+                        <span class="kw">let </span>f = f <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">dyn </span>FnMut($(<span class="macro-nonterminal">$var</span>),<span class="kw-2">*</span>) -&gt; R;
                         $(
-                            <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span> <span class="op">=</span> <span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span> <span class="kw">as</span> <span class="ident">FromWasmAbi</span><span class="op">&gt;</span><span class="ident">::from_abi</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>);
-                        )<span class="op">*</span>
-                        (<span class="kw-2">*</span><span class="ident">f</span>)($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>),<span class="kw-2">*</span>)
+                            <span class="kw">let </span><span class="macro-nonterminal">$var </span>= &lt;<span class="macro-nonterminal">$var </span><span class="kw">as </span>FromWasmAbi&gt;::from_abi(<span class="macro-nonterminal">$var</span>);
+                        )*
+                        (<span class="kw-2">*</span>f)($(<span class="macro-nonterminal">$var</span>),<span class="kw-2">*</span>)
                     };
-                    <span class="ident">ret</span>.<span class="ident">return_abi</span>()
+                    ret.return_abi()
                 }
 
-                <span class="ident">inform</span>(<span class="ident">invoke</span>::<span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>,)<span class="op">*</span> <span class="ident">R</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">u32</span>);
+                inform(invoke::&lt;$(<span class="macro-nonterminal">$var</span>,)* R&gt; <span class="kw">as </span>u32);
 
-                <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="kw">fn</span> <span class="ident">destroy</span><span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>: <span class="ident">FromWasmAbi</span>,)<span class="op">*</span> <span class="ident">R</span>: <span class="ident">ReturnWasmAbi</span><span class="op">&gt;</span>(
-                    <span class="ident">a</span>: <span class="ident">usize</span>,
-                    <span class="ident">b</span>: <span class="ident">usize</span>,
+                <span class="kw">unsafe extern fn </span>destroy&lt;$(<span class="macro-nonterminal">$var</span>: FromWasmAbi,)* R: ReturnWasmAbi&gt;(
+                    a: usize,
+                    b: usize,
                 ) {
-                    <span class="comment">// See `Fn()` above for why we simply return</span>
-                    <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="number">0</span> {
+                    <span class="comment">// See `Fn()` above for why we simply return
+                    </span><span class="kw">if </span>a == <span class="number">0 </span>{
                         <span class="kw">return</span>;
                     }
-                    <span class="ident">drop</span>(<span class="ident">Box::from_raw</span>(<span class="ident">FatPtr</span>::<span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">FnMut</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>,)<span class="kw-2">*</span>) -&gt; <span class="ident">R</span><span class="op">&gt;</span> {
-                        <span class="ident">fields</span>: (<span class="ident">a</span>, <span class="ident">b</span>)
-                    }.<span class="ident">ptr</span>));
+                    drop(Box::from_raw(FatPtr::&lt;<span class="kw">dyn </span>FnMut($(<span class="macro-nonterminal">$var</span>,)<span class="kw-2">*</span>) -&gt; R&gt; {
+                        fields: (a, b)
+                    }.ptr));
                 }
-                <span class="ident">inform</span>(<span class="ident">destroy</span>::<span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>,)<span class="op">*</span> <span class="ident">R</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">u32</span>);
+                inform(destroy::&lt;$(<span class="macro-nonterminal">$var</span>,)* R&gt; <span class="kw">as </span>u32);
 
-                <span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span><span class="ident">::describe</span>();
+                &lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;::describe();
             }
         }
 
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_snake_case</span>, <span class="ident">unused_parens</span>)]</span>
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>,)<span class="op">*</span> <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">WasmClosureFnOnce</span><span class="op">&lt;</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>),<span class="kw-2">*</span>), <span class="ident">R</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">T</span>
-            <span class="kw">where</span> <span class="ident">T</span>: <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">FnOnce</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>),<span class="kw-2">*</span>) -&gt; <span class="ident">R</span>,
-                  $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>: <span class="ident">FromWasmAbi</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,)<span class="op">*</span>
-                  <span class="ident">R</span>: <span class="ident">ReturnWasmAbi</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>
-        {
-            <span class="kw">type</span> <span class="ident">FnMut</span> <span class="op">=</span> <span class="kw">dyn</span> <span class="ident">FnMut</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>),<span class="kw-2">*</span>) -&gt; <span class="ident">R</span>;
+        <span class="attribute">#[allow(non_snake_case, unused_parens)]
+        </span><span class="kw">impl</span>&lt;T, $(<span class="macro-nonterminal">$var</span>,)* R&gt; WasmClosureFnOnce&lt;($(<span class="macro-nonterminal">$var</span>),<span class="kw-2">*</span>), R&gt; <span class="kw">for </span>T
+            <span class="kw">where </span>T: <span class="lifetime">&#39;static </span>+ FnOnce($(<span class="macro-nonterminal">$var</span>),<span class="kw-2">*</span>) -&gt; R,
+                  $(<span class="macro-nonterminal">$var</span>: FromWasmAbi + <span class="lifetime">&#39;static</span>,)*
+                  R: ReturnWasmAbi + <span class="lifetime">&#39;static
+        </span>{
+            <span class="kw">type </span>FnMut = <span class="kw">dyn </span>FnMut($(<span class="macro-nonterminal">$var</span>),<span class="kw-2">*</span>) -&gt; R;
 
-            <span class="kw">fn</span> <span class="ident">into_fn_mut</span>(<span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::FnMut</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">me</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="self">self</span>);
-                <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>),<span class="kw-2">*</span><span class="op">|</span> {
-                    <span class="kw">let</span> <span class="ident">me</span> <span class="op">=</span> <span class="ident">me</span>.<span class="ident">take</span>().<span class="ident">expect_throw</span>(<span class="string">&quot;FnOnce called more than once&quot;</span>);
-                    <span class="ident">me</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>),<span class="kw-2">*</span>)
+            <span class="kw">fn </span>into_fn_mut(<span class="self">self</span>) -&gt; Box&lt;<span class="self">Self</span>::FnMut&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>me = <span class="prelude-val">Some</span>(<span class="self">self</span>);
+                Box::new(<span class="kw">move </span>|$(<span class="macro-nonterminal">$var</span>),<span class="kw-2">*</span>| {
+                    <span class="kw">let </span>me = me.take().expect_throw(<span class="string">&quot;FnOnce called more than once&quot;</span>);
+                    me($(<span class="macro-nonterminal">$var</span>),<span class="kw-2">*</span>)
                 })
             }
 
-            <span class="kw">fn</span> <span class="ident">into_js_function</span>(<span class="self">self</span>) -&gt; <span class="ident">JsValue</span> {
-                <span class="kw">use</span> <span class="ident">std::rc::Rc</span>;
-                <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::__rt::WasmRefCell</span>;
+            <span class="kw">fn </span>into_js_function(<span class="self">self</span>) -&gt; JsValue {
+                <span class="kw">use </span>std::rc::Rc;
+                <span class="kw">use </span><span class="kw">crate</span>::__rt::WasmRefCell;
 
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">me</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="self">self</span>);
+                <span class="kw">let </span><span class="kw-2">mut </span>me = <span class="prelude-val">Some</span>(<span class="self">self</span>);
 
-                <span class="kw">let</span> <span class="ident">rc1</span> <span class="op">=</span> <span class="ident">Rc::new</span>(<span class="ident">WasmRefCell::new</span>(<span class="prelude-val">None</span>));
-                <span class="kw">let</span> <span class="ident">rc2</span> <span class="op">=</span> <span class="ident">rc1</span>.<span class="ident">clone</span>();
+                <span class="kw">let </span>rc1 = Rc::new(WasmRefCell::new(<span class="prelude-val">None</span>));
+                <span class="kw">let </span>rc2 = rc1.clone();
 
-                <span class="kw">let</span> <span class="ident">closure</span> <span class="op">=</span> <span class="ident">Closure::wrap</span>(<span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>),<span class="kw-2">*</span><span class="op">|</span> {
-                    <span class="comment">// Invoke ourself and get the result.</span>
-                    <span class="kw">let</span> <span class="ident">me</span> <span class="op">=</span> <span class="ident">me</span>.<span class="ident">take</span>().<span class="ident">expect_throw</span>(<span class="string">&quot;FnOnce called more than once&quot;</span>);
-                    <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">me</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>),<span class="kw-2">*</span>);
+                <span class="kw">let </span>closure = Closure::wrap(Box::new(<span class="kw">move </span>|$(<span class="macro-nonterminal">$var</span>),<span class="kw-2">*</span>| {
+                    <span class="comment">// Invoke ourself and get the result.
+                    </span><span class="kw">let </span>me = me.take().expect_throw(<span class="string">&quot;FnOnce called more than once&quot;</span>);
+                    <span class="kw">let </span>result = me($(<span class="macro-nonterminal">$var</span>),<span class="kw-2">*</span>);
 
-                    <span class="comment">// And then drop the `Rc` holding this function&#39;s `Closure`</span>
-                    <span class="comment">// alive.</span>
-                    <span class="macro">debug_assert_eq!</span>(<span class="ident">Rc::strong_count</span>(<span class="kw-2">&amp;</span><span class="ident">rc2</span>), <span class="number">1</span>);
-                    <span class="kw">let</span> <span class="ident">option_closure</span> <span class="op">=</span> <span class="ident">rc2</span>.<span class="ident">borrow_mut</span>().<span class="ident">take</span>();
-                    <span class="macro">debug_assert!</span>(<span class="ident">option_closure</span>.<span class="ident">is_some</span>());
-                    <span class="ident">drop</span>(<span class="ident">option_closure</span>);
+                    <span class="comment">// And then drop the `Rc` holding this function&#39;s `Closure`
+                    // alive.
+                    </span><span class="macro">debug_assert_eq!</span>(Rc::strong_count(<span class="kw-2">&amp;</span>rc2), <span class="number">1</span>);
+                    <span class="kw">let </span>option_closure = rc2.borrow_mut().take();
+                    <span class="macro">debug_assert!</span>(option_closure.is_some());
+                    drop(option_closure);
 
-                    <span class="ident">result</span>
-                }) <span class="kw">as</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">FnMut</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>),<span class="kw-2">*</span>) -&gt; <span class="ident">R</span><span class="op">&gt;</span>);
+                    result
+                }) <span class="kw">as </span>Box&lt;<span class="kw">dyn </span>FnMut($(<span class="macro-nonterminal">$var</span>),<span class="kw-2">*</span>) -&gt; R&gt;);
 
-                <span class="kw">let</span> <span class="ident">js_val</span> <span class="op">=</span> <span class="ident">closure</span>.<span class="ident">as_ref</span>().<span class="ident">clone</span>();
+                <span class="kw">let </span>js_val = closure.as_ref().clone();
 
-                <span class="kw-2">*</span><span class="ident">rc1</span>.<span class="ident">borrow_mut</span>() <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">closure</span>);
-                <span class="macro">debug_assert_eq!</span>(<span class="ident">Rc::strong_count</span>(<span class="kw-2">&amp;</span><span class="ident">rc1</span>), <span class="number">2</span>);
-                <span class="ident">drop</span>(<span class="ident">rc1</span>);
+                <span class="kw-2">*</span>rc1.borrow_mut() = <span class="prelude-val">Some</span>(closure);
+                <span class="macro">debug_assert_eq!</span>(Rc::strong_count(<span class="kw-2">&amp;</span>rc1), <span class="number">2</span>);
+                drop(rc1);
 
-                <span class="ident">js_val</span>
+                js_val
             }
         }
 
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>,)<span class="op">*</span> <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">IntoWasmClosure</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">FnMut</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>),<span class="kw-2">*</span>) -&gt; <span class="ident">R</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">T</span>
-            <span class="kw">where</span> <span class="ident">T</span>: <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">FnMut</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>),<span class="kw-2">*</span>) -&gt; <span class="ident">R</span>,
-                  $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>: <span class="ident">FromWasmAbi</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,)<span class="op">*</span>
-                  <span class="ident">R</span>: <span class="ident">ReturnWasmAbi</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+        <span class="kw">impl</span>&lt;T, $(<span class="macro-nonterminal">$var</span>,)* R&gt; IntoWasmClosure&lt;<span class="kw">dyn </span>FnMut($(<span class="macro-nonterminal">$var</span>),<span class="kw-2">*</span>) -&gt; R&gt; <span class="kw">for </span>T
+            <span class="kw">where </span>T: <span class="lifetime">&#39;static </span>+ FnMut($(<span class="macro-nonterminal">$var</span>),<span class="kw-2">*</span>) -&gt; R,
+                  $(<span class="macro-nonterminal">$var</span>: FromWasmAbi + <span class="lifetime">&#39;static</span>,)*
+                  R: ReturnWasmAbi + <span class="lifetime">&#39;static</span>,
         {
-            <span class="kw">fn</span> <span class="ident">unsize</span>(<span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">FnMut</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>),<span class="kw-2">*</span>) -&gt; <span class="ident">R</span><span class="op">&gt;</span> { <span class="self">self</span> }
+            <span class="kw">fn </span>unsize(<span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;) -&gt; Box&lt;<span class="kw">dyn </span>FnMut($(<span class="macro-nonterminal">$var</span>),<span class="kw-2">*</span>) -&gt; R&gt; { <span class="self">self </span>}
         }
 
-        <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>,)<span class="op">*</span> <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">IntoWasmClosure</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>),<span class="kw-2">*</span>) -&gt; <span class="ident">R</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">T</span>
-            <span class="kw">where</span> <span class="ident">T</span>: <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">Fn</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>),<span class="kw-2">*</span>) -&gt; <span class="ident">R</span>,
-                  $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>: <span class="ident">FromWasmAbi</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,)<span class="op">*</span>
-                  <span class="ident">R</span>: <span class="ident">ReturnWasmAbi</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+        <span class="kw">impl</span>&lt;T, $(<span class="macro-nonterminal">$var</span>,)* R&gt; IntoWasmClosure&lt;<span class="kw">dyn </span>Fn($(<span class="macro-nonterminal">$var</span>),<span class="kw-2">*</span>) -&gt; R&gt; <span class="kw">for </span>T
+            <span class="kw">where </span>T: <span class="lifetime">&#39;static </span>+ Fn($(<span class="macro-nonterminal">$var</span>),<span class="kw-2">*</span>) -&gt; R,
+                  $(<span class="macro-nonterminal">$var</span>: FromWasmAbi + <span class="lifetime">&#39;static</span>,)*
+                  R: ReturnWasmAbi + <span class="lifetime">&#39;static</span>,
         {
-            <span class="kw">fn</span> <span class="ident">unsize</span>(<span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">var</span>),<span class="kw-2">*</span>) -&gt; <span class="ident">R</span><span class="op">&gt;</span> { <span class="self">self</span> }
+            <span class="kw">fn </span>unsize(<span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;) -&gt; Box&lt;<span class="kw">dyn </span>Fn($(<span class="macro-nonterminal">$var</span>),<span class="kw-2">*</span>) -&gt; R&gt; { <span class="self">self </span>}
         }
     )<span class="kw-2">*</span>)
 }
 
-<span class="macro">doit!</span> {
+<span class="macro">doit! </span>{
     ()
-    (<span class="ident">A</span>)
-    (<span class="ident">A</span> <span class="ident">B</span>)
-    (<span class="ident">A</span> <span class="ident">B</span> <span class="ident">C</span>)
-    (<span class="ident">A</span> <span class="ident">B</span> <span class="ident">C</span> <span class="ident">D</span>)
-    (<span class="ident">A</span> <span class="ident">B</span> <span class="ident">C</span> <span class="ident">D</span> <span class="ident">E</span>)
-    (<span class="ident">A</span> <span class="ident">B</span> <span class="ident">C</span> <span class="ident">D</span> <span class="ident">E</span> <span class="ident">F</span>)
-    (<span class="ident">A</span> <span class="ident">B</span> <span class="ident">C</span> <span class="ident">D</span> <span class="ident">E</span> <span class="ident">F</span> <span class="ident">G</span>)
-    (<span class="ident">A</span> <span class="ident">B</span> <span class="ident">C</span> <span class="ident">D</span> <span class="ident">E</span> <span class="ident">F</span> <span class="ident">G</span> <span class="ident">H</span>)
+    (A)
+    (A B)
+    (A B C)
+    (A B C D)
+    (A B C D E)
+    (A B C D E F)
+    (A B C D E F G)
+    (A B C D E F G H)
 }
 
-<span class="comment">// Copy the above impls down here for where there&#39;s only one argument and it&#39;s a</span>
-<span class="comment">// reference. We could add more impls for more kinds of references, but it</span>
-<span class="comment">// becomes a combinatorial explosion quickly. Let&#39;s see how far we can get with</span>
-<span class="comment">// just this one! Maybe someone else can figure out voodoo so we don&#39;t have to</span>
-<span class="comment">// duplicate.</span>
+<span class="comment">// Copy the above impls down here for where there&#39;s only one argument and it&#39;s a
+// reference. We could add more impls for more kinds of references, but it
+// becomes a combinatorial explosion quickly. Let&#39;s see how far we can get with
+// just this one! Maybe someone else can figure out voodoo so we don&#39;t have to
+// duplicate.
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">WasmClosure</span> <span class="kw">for</span> <span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">A</span>) -&gt; <span class="ident">R</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">RefFromWasmAbi</span>,
-    <span class="ident">R</span>: <span class="ident">ReturnWasmAbi</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+</span><span class="kw">unsafe impl</span>&lt;A, R&gt; WasmClosure <span class="kw">for dyn </span>Fn(<span class="kw-2">&amp;</span>A) -&gt; R
+<span class="kw">where
+    </span>A: RefFromWasmAbi,
+    R: ReturnWasmAbi + <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">fn</span> <span class="ident">describe</span>() {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
-        <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">invoke</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">RefFromWasmAbi</span>, <span class="ident">R</span>: <span class="ident">ReturnWasmAbi</span><span class="op">&gt;</span>(
-            <span class="ident">a</span>: <span class="ident">usize</span>,
-            <span class="ident">b</span>: <span class="ident">usize</span>,
-            <span class="ident">arg</span>: <span class="op">&lt;</span><span class="ident">A</span> <span class="kw">as</span> <span class="ident">RefFromWasmAbi</span><span class="op">&gt;</span><span class="ident">::Abi</span>,
-        ) -&gt; <span class="op">&lt;</span><span class="ident">R</span> <span class="kw">as</span> <span class="ident">ReturnWasmAbi</span><span class="op">&gt;</span><span class="ident">::Abi</span> {
-            <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="number">0</span> {
-                <span class="ident">throw_str</span>(<span class="string">&quot;closure invoked recursively or destroyed already&quot;</span>);
+    <span class="kw">fn </span>describe() {
+        <span class="attribute">#[allow(non_snake_case)]
+        </span><span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>invoke&lt;A: RefFromWasmAbi, R: ReturnWasmAbi&gt;(
+            a: usize,
+            b: usize,
+            arg: &lt;A <span class="kw">as </span>RefFromWasmAbi&gt;::Abi,
+        ) -&gt; &lt;R <span class="kw">as </span>ReturnWasmAbi&gt;::Abi {
+            <span class="kw">if </span>a == <span class="number">0 </span>{
+                throw_str(<span class="string">&quot;closure invoked recursively or destroyed already&quot;</span>);
             }
-            <span class="comment">// Make sure all stack variables are converted before we</span>
-            <span class="comment">// convert `ret` as it may throw (for `Result`, for</span>
-            <span class="comment">// example)</span>
-            <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> {
-                <span class="kw">let</span> <span class="ident">f</span>: <span class="kw-2">*const</span> <span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">A</span>) -&gt; <span class="ident">R</span> <span class="op">=</span> <span class="ident">FatPtr</span> { <span class="ident">fields</span>: (<span class="ident">a</span>, <span class="ident">b</span>) }.<span class="ident">ptr</span>;
-                <span class="kw">let</span> <span class="ident">arg</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">A</span> <span class="kw">as</span> <span class="ident">RefFromWasmAbi</span><span class="op">&gt;</span><span class="ident">::ref_from_abi</span>(<span class="ident">arg</span>);
-                (<span class="kw-2">*</span><span class="ident">f</span>)(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">arg</span>)
+            <span class="comment">// Make sure all stack variables are converted before we
+            // convert `ret` as it may throw (for `Result`, for
+            // example)
+            </span><span class="kw">let </span>ret = {
+                <span class="kw">let </span>f: <span class="kw-2">*const </span><span class="kw">dyn </span>Fn(<span class="kw-2">&amp;</span>A) -&gt; R = FatPtr { fields: (a, b) }.ptr;
+                <span class="kw">let </span>arg = &lt;A <span class="kw">as </span>RefFromWasmAbi&gt;::ref_from_abi(arg);
+                (<span class="kw-2">*</span>f)(<span class="kw-2">&amp;*</span>arg)
             };
-            <span class="ident">ret</span>.<span class="ident">return_abi</span>()
+            ret.return_abi()
         }
 
-        <span class="ident">inform</span>(<span class="ident">invoke</span>::<span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">u32</span>);
+        inform(invoke::&lt;A, R&gt; <span class="kw">as </span>u32);
 
-        <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">destroy</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">RefFromWasmAbi</span>, <span class="ident">R</span>: <span class="ident">ReturnWasmAbi</span><span class="op">&gt;</span>(<span class="ident">a</span>: <span class="ident">usize</span>, <span class="ident">b</span>: <span class="ident">usize</span>) {
-            <span class="comment">// See `Fn()` above for why we simply return</span>
-            <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="number">0</span> {
+        <span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>destroy&lt;A: RefFromWasmAbi, R: ReturnWasmAbi&gt;(a: usize, b: usize) {
+            <span class="comment">// See `Fn()` above for why we simply return
+            </span><span class="kw">if </span>a == <span class="number">0 </span>{
                 <span class="kw">return</span>;
             }
-            <span class="ident">drop</span>(<span class="ident">Box::from_raw</span>(
-                <span class="ident">FatPtr</span>::<span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">A</span>) -&gt; <span class="ident">R</span><span class="op">&gt;</span> { <span class="ident">fields</span>: (<span class="ident">a</span>, <span class="ident">b</span>) }.<span class="ident">ptr</span>,
+            drop(Box::from_raw(
+                FatPtr::&lt;<span class="kw">dyn </span>Fn(<span class="kw-2">&amp;</span>A) -&gt; R&gt; { fields: (a, b) }.ptr,
             ));
         }
-        <span class="ident">inform</span>(<span class="ident">destroy</span>::<span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">u32</span>);
+        inform(destroy::&lt;A, R&gt; <span class="kw">as </span>u32);
 
-        <span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="self">Self</span><span class="op">&gt;</span><span class="ident">::describe</span>();
+        &lt;<span class="kw-2">&amp;</span><span class="self">Self</span>&gt;::describe();
     }
 }
 
-<span class="kw">unsafe</span> <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">WasmClosure</span> <span class="kw">for</span> <span class="kw">dyn</span> <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">A</span>) -&gt; <span class="ident">R</span>
-<span class="kw">where</span>
-    <span class="ident">A</span>: <span class="ident">RefFromWasmAbi</span>,
-    <span class="ident">R</span>: <span class="ident">ReturnWasmAbi</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="kw">unsafe impl</span>&lt;A, R&gt; WasmClosure <span class="kw">for dyn </span>FnMut(<span class="kw-2">&amp;</span>A) -&gt; R
+<span class="kw">where
+    </span>A: RefFromWasmAbi,
+    R: ReturnWasmAbi + <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">fn</span> <span class="ident">describe</span>() {
-        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
-        <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">invoke</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">RefFromWasmAbi</span>, <span class="ident">R</span>: <span class="ident">ReturnWasmAbi</span><span class="op">&gt;</span>(
-            <span class="ident">a</span>: <span class="ident">usize</span>,
-            <span class="ident">b</span>: <span class="ident">usize</span>,
-            <span class="ident">arg</span>: <span class="op">&lt;</span><span class="ident">A</span> <span class="kw">as</span> <span class="ident">RefFromWasmAbi</span><span class="op">&gt;</span><span class="ident">::Abi</span>,
-        ) -&gt; <span class="op">&lt;</span><span class="ident">R</span> <span class="kw">as</span> <span class="ident">ReturnWasmAbi</span><span class="op">&gt;</span><span class="ident">::Abi</span> {
-            <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="number">0</span> {
-                <span class="ident">throw_str</span>(<span class="string">&quot;closure invoked recursively or destroyed already&quot;</span>);
+    <span class="kw">fn </span>describe() {
+        <span class="attribute">#[allow(non_snake_case)]
+        </span><span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>invoke&lt;A: RefFromWasmAbi, R: ReturnWasmAbi&gt;(
+            a: usize,
+            b: usize,
+            arg: &lt;A <span class="kw">as </span>RefFromWasmAbi&gt;::Abi,
+        ) -&gt; &lt;R <span class="kw">as </span>ReturnWasmAbi&gt;::Abi {
+            <span class="kw">if </span>a == <span class="number">0 </span>{
+                throw_str(<span class="string">&quot;closure invoked recursively or destroyed already&quot;</span>);
             }
-            <span class="comment">// Make sure all stack variables are converted before we</span>
-            <span class="comment">// convert `ret` as it may throw (for `Result`, for</span>
-            <span class="comment">// example)</span>
-            <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> {
-                <span class="kw">let</span> <span class="ident">f</span>: <span class="kw-2">*const</span> <span class="kw">dyn</span> <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">A</span>) -&gt; <span class="ident">R</span> <span class="op">=</span> <span class="ident">FatPtr</span> { <span class="ident">fields</span>: (<span class="ident">a</span>, <span class="ident">b</span>) }.<span class="ident">ptr</span>;
-                <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="ident">f</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="kw">dyn</span> <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">A</span>) -&gt; <span class="ident">R</span>;
-                <span class="kw">let</span> <span class="ident">arg</span> <span class="op">=</span> <span class="op">&lt;</span><span class="ident">A</span> <span class="kw">as</span> <span class="ident">RefFromWasmAbi</span><span class="op">&gt;</span><span class="ident">::ref_from_abi</span>(<span class="ident">arg</span>);
-                (<span class="kw-2">*</span><span class="ident">f</span>)(<span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="ident">arg</span>)
+            <span class="comment">// Make sure all stack variables are converted before we
+            // convert `ret` as it may throw (for `Result`, for
+            // example)
+            </span><span class="kw">let </span>ret = {
+                <span class="kw">let </span>f: <span class="kw-2">*const </span><span class="kw">dyn </span>FnMut(<span class="kw-2">&amp;</span>A) -&gt; R = FatPtr { fields: (a, b) }.ptr;
+                <span class="kw">let </span>f = f <span class="kw">as </span><span class="kw-2">*mut </span><span class="kw">dyn </span>FnMut(<span class="kw-2">&amp;</span>A) -&gt; R;
+                <span class="kw">let </span>arg = &lt;A <span class="kw">as </span>RefFromWasmAbi&gt;::ref_from_abi(arg);
+                (<span class="kw-2">*</span>f)(<span class="kw-2">&amp;*</span>arg)
             };
-            <span class="ident">ret</span>.<span class="ident">return_abi</span>()
+            ret.return_abi()
         }
 
-        <span class="ident">inform</span>(<span class="ident">invoke</span>::<span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">u32</span>);
+        inform(invoke::&lt;A, R&gt; <span class="kw">as </span>u32);
 
-        <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">destroy</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">RefFromWasmAbi</span>, <span class="ident">R</span>: <span class="ident">ReturnWasmAbi</span><span class="op">&gt;</span>(<span class="ident">a</span>: <span class="ident">usize</span>, <span class="ident">b</span>: <span class="ident">usize</span>) {
-            <span class="comment">// See `Fn()` above for why we simply return</span>
-            <span class="kw">if</span> <span class="ident">a</span> <span class="op">==</span> <span class="number">0</span> {
+        <span class="kw">unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn </span>destroy&lt;A: RefFromWasmAbi, R: ReturnWasmAbi&gt;(a: usize, b: usize) {
+            <span class="comment">// See `Fn()` above for why we simply return
+            </span><span class="kw">if </span>a == <span class="number">0 </span>{
                 <span class="kw">return</span>;
             }
-            <span class="ident">drop</span>(<span class="ident">Box::from_raw</span>(
-                <span class="ident">FatPtr</span>::<span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">A</span>) -&gt; <span class="ident">R</span><span class="op">&gt;</span> { <span class="ident">fields</span>: (<span class="ident">a</span>, <span class="ident">b</span>) }.<span class="ident">ptr</span>,
+            drop(Box::from_raw(
+                FatPtr::&lt;<span class="kw">dyn </span>FnMut(<span class="kw-2">&amp;</span>A) -&gt; R&gt; { fields: (a, b) }.ptr,
             ));
         }
-        <span class="ident">inform</span>(<span class="ident">destroy</span>::<span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="kw">as</span> <span class="ident">u32</span>);
+        inform(destroy::&lt;A, R&gt; <span class="kw">as </span>u32);
 
-        <span class="op">&lt;</span><span class="kw-2">&amp;mut</span> <span class="self">Self</span><span class="op">&gt;</span><span class="ident">::describe</span>();
+        &lt;<span class="kw-2">&amp;mut </span><span class="self">Self</span>&gt;::describe();
     }
 }
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">A</span>, <span class="ident">R</span><span class="op">&gt;</span> <span class="ident">WasmClosureFnOnce</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">A</span>,), <span class="ident">R</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">T</span>
-<span class="kw">where</span>
-    <span class="ident">T</span>: <span class="lifetime">&#39;static</span> <span class="op">+</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">A</span>) -&gt; <span class="ident">R</span>,
-    <span class="ident">A</span>: <span class="ident">RefFromWasmAbi</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
-    <span class="ident">R</span>: <span class="ident">ReturnWasmAbi</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+<span class="attribute">#[allow(non_snake_case)]
+</span><span class="kw">impl</span>&lt;T, A, R&gt; WasmClosureFnOnce&lt;(<span class="kw-2">&amp;</span>A,), R&gt; <span class="kw">for </span>T
+<span class="kw">where
+    </span>T: <span class="lifetime">&#39;static </span>+ FnOnce(<span class="kw-2">&amp;</span>A) -&gt; R,
+    A: RefFromWasmAbi + <span class="lifetime">&#39;static</span>,
+    R: ReturnWasmAbi + <span class="lifetime">&#39;static</span>,
 {
-    <span class="kw">type</span> <span class="ident">FnMut</span> <span class="op">=</span> <span class="kw">dyn</span> <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">A</span>) -&gt; <span class="ident">R</span>;
+    <span class="kw">type </span>FnMut = <span class="kw">dyn </span>FnMut(<span class="kw-2">&amp;</span>A) -&gt; R;
 
-    <span class="kw">fn</span> <span class="ident">into_fn_mut</span>(<span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::FnMut</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">me</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="self">self</span>);
-        <span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">arg</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="ident">me</span> <span class="op">=</span> <span class="ident">me</span>.<span class="ident">take</span>().<span class="ident">expect_throw</span>(<span class="string">&quot;FnOnce called more than once&quot;</span>);
-            <span class="ident">me</span>(<span class="ident">arg</span>)
+    <span class="kw">fn </span>into_fn_mut(<span class="self">self</span>) -&gt; Box&lt;<span class="self">Self</span>::FnMut&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>me = <span class="prelude-val">Some</span>(<span class="self">self</span>);
+        Box::new(<span class="kw">move </span>|arg| {
+            <span class="kw">let </span>me = me.take().expect_throw(<span class="string">&quot;FnOnce called more than once&quot;</span>);
+            me(arg)
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">into_js_function</span>(<span class="self">self</span>) -&gt; <span class="ident">JsValue</span> {
-        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::__rt::WasmRefCell</span>;
-        <span class="kw">use</span> <span class="ident">std::rc::Rc</span>;
+    <span class="kw">fn </span>into_js_function(<span class="self">self</span>) -&gt; JsValue {
+        <span class="kw">use </span><span class="kw">crate</span>::__rt::WasmRefCell;
+        <span class="kw">use </span>std::rc::Rc;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">me</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="self">self</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>me = <span class="prelude-val">Some</span>(<span class="self">self</span>);
 
-        <span class="kw">let</span> <span class="ident">rc1</span> <span class="op">=</span> <span class="ident">Rc::new</span>(<span class="ident">WasmRefCell::new</span>(<span class="prelude-val">None</span>));
-        <span class="kw">let</span> <span class="ident">rc2</span> <span class="op">=</span> <span class="ident">rc1</span>.<span class="ident">clone</span>();
+        <span class="kw">let </span>rc1 = Rc::new(WasmRefCell::new(<span class="prelude-val">None</span>));
+        <span class="kw">let </span>rc2 = rc1.clone();
 
-        <span class="kw">let</span> <span class="ident">closure</span> <span class="op">=</span> <span class="ident">Closure::wrap</span>(<span class="ident">Box::new</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">arg</span>: <span class="kw-2">&amp;</span><span class="ident">A</span><span class="op">|</span> {
-            <span class="comment">// Invoke ourself and get the result.</span>
-            <span class="kw">let</span> <span class="ident">me</span> <span class="op">=</span> <span class="ident">me</span>.<span class="ident">take</span>().<span class="ident">expect_throw</span>(<span class="string">&quot;FnOnce called more than once&quot;</span>);
-            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">me</span>(<span class="ident">arg</span>);
+        <span class="kw">let </span>closure = Closure::wrap(Box::new(<span class="kw">move </span>|arg: <span class="kw-2">&amp;</span>A| {
+            <span class="comment">// Invoke ourself and get the result.
+            </span><span class="kw">let </span>me = me.take().expect_throw(<span class="string">&quot;FnOnce called more than once&quot;</span>);
+            <span class="kw">let </span>result = me(arg);
 
-            <span class="comment">// And then drop the `Rc` holding this function&#39;s `Closure`</span>
-            <span class="comment">// alive.</span>
-            <span class="macro">debug_assert_eq!</span>(<span class="ident">Rc::strong_count</span>(<span class="kw-2">&amp;</span><span class="ident">rc2</span>), <span class="number">1</span>);
-            <span class="kw">let</span> <span class="ident">option_closure</span> <span class="op">=</span> <span class="ident">rc2</span>.<span class="ident">borrow_mut</span>().<span class="ident">take</span>();
-            <span class="macro">debug_assert!</span>(<span class="ident">option_closure</span>.<span class="ident">is_some</span>());
-            <span class="ident">drop</span>(<span class="ident">option_closure</span>);
+            <span class="comment">// And then drop the `Rc` holding this function&#39;s `Closure`
+            // alive.
+            </span><span class="macro">debug_assert_eq!</span>(Rc::strong_count(<span class="kw-2">&amp;</span>rc2), <span class="number">1</span>);
+            <span class="kw">let </span>option_closure = rc2.borrow_mut().take();
+            <span class="macro">debug_assert!</span>(option_closure.is_some());
+            drop(option_closure);
 
-            <span class="ident">result</span>
-        }) <span class="kw">as</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">FnMut</span>(<span class="kw-2">&amp;</span><span class="ident">A</span>) -&gt; <span class="ident">R</span><span class="op">&gt;</span>);
+            result
+        }) <span class="kw">as </span>Box&lt;<span class="kw">dyn </span>FnMut(<span class="kw-2">&amp;</span>A) -&gt; R&gt;);
 
-        <span class="kw">let</span> <span class="ident">js_val</span> <span class="op">=</span> <span class="ident">closure</span>.<span class="ident">as_ref</span>().<span class="ident">clone</span>();
+        <span class="kw">let </span>js_val = closure.as_ref().clone();
 
-        <span class="kw-2">*</span><span class="ident">rc1</span>.<span class="ident">borrow_mut</span>() <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">closure</span>);
-        <span class="macro">debug_assert_eq!</span>(<span class="ident">Rc::strong_count</span>(<span class="kw-2">&amp;</span><span class="ident">rc1</span>), <span class="number">2</span>);
-        <span class="ident">drop</span>(<span class="ident">rc1</span>);
+        <span class="kw-2">*</span>rc1.borrow_mut() = <span class="prelude-val">Some</span>(closure);
+        <span class="macro">debug_assert_eq!</span>(Rc::strong_count(<span class="kw-2">&amp;</span>rc1), <span class="number">2</span>);
+        drop(rc1);
 
-        <span class="ident">js_val</span>
+        js_val
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="wasm_bindgen" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="wasm_bindgen" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

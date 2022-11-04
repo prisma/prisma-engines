@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/sql_migration.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sql_migration.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_migration_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `migration-engine/connectors/sql-migration-connector/src/sql_migration.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>sql_migration.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../sql_migration_connector/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../sql_migration_connector/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -681,688 +681,688 @@
 <span id="681">681</span>
 <span id="682">682</span>
 <span id="683">683</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">pair::Pair</span>,
-    <span class="ident">sql_renderer::IteratorJoin</span>,
-    <span class="ident">sql_schema_differ</span>::{<span class="ident">ColumnChange</span>, <span class="ident">ColumnChanges</span>},
+</pre><pre class="rust"><code><span class="kw">use crate</span>::{
+    pair::Pair,
+    sql_renderer::IteratorJoin,
+    sql_schema_differ::{ColumnChange, ColumnChanges},
 };
-<span class="kw">use</span> <span class="ident">enumflags2::BitFlags</span>;
-<span class="kw">use</span> <span class="ident">sql_schema_describer</span>::{
-    <span class="ident">postgres</span>::{<span class="self">self</span>, <span class="ident">PostgresSchemaExt</span>},
-    <span class="ident">walkers</span>::{<span class="ident">ColumnWalker</span>, <span class="ident">TableWalker</span>},
-    <span class="ident">ColumnId</span>, <span class="ident">EnumId</span>, <span class="ident">ForeignKeyId</span>, <span class="ident">IndexId</span>, <span class="ident">SqlSchema</span>, <span class="ident">TableId</span>, <span class="ident">UdtId</span>, <span class="ident">ViewId</span>,
+<span class="kw">use </span>enumflags2::BitFlags;
+<span class="kw">use </span>sql_schema_describer::{
+    postgres::{<span class="self">self</span>, PostgresSchemaExt},
+    walkers::{ColumnWalker, TableWalker},
+    ColumnId, EnumId, ForeignKeyId, IndexId, SqlSchema, TableId, UdtId, ViewId,
 };
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections::BTreeSet</span>, <span class="ident">fmt::Write</span> <span class="kw">as</span> <span class="kw">_</span>};
+<span class="kw">use </span>std::{collections::BTreeSet, fmt::Write <span class="kw">as _</span>};
 
-<span class="doccomment">/// The database migration type for SqlMigrationConnector.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SqlMigration</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">before</span>: <span class="ident">SqlSchema</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">after</span>: <span class="ident">SqlSchema</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">steps</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SqlMigrationStep</span><span class="op">&gt;</span>,
+<span class="doccomment">/// The database migration type for SqlMigrationConnector.
+</span><span class="attribute">#[derive(Debug)]
+</span><span class="kw">pub struct </span>SqlMigration {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) before: SqlSchema,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) after: SqlSchema,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) steps: Vec&lt;SqlMigrationStep&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">SqlMigration</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">schemas</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Pair</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">SqlSchema</span><span class="op">&gt;</span> {
-        <span class="ident">Pair::new</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">before</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">after</span>)
+<span class="kw">impl </span>SqlMigration {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>schemas(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Pair&lt;<span class="kw-2">&amp;</span>SqlSchema&gt; {
+        Pair::new(<span class="kw-2">&amp;</span><span class="self">self</span>.before, <span class="kw-2">&amp;</span><span class="self">self</span>.after)
     }
 
-    <span class="doccomment">/// Exposed for tests.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Rendering of the drift summary proceeds in two steps:</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// - For each step, compute a _prefix_ (DriftItem, &amp;str) containing the</span>
-    <span class="doccomment">///   _type_ of change it is (so we can order between added tables and</span>
-    <span class="doccomment">///   changed enums, for example), and then in which section of the summary</span>
-    <span class="doccomment">///   they appear, when relevant (e.g. changed tables).</span>
-    <span class="doccomment">/// - Based on the computed sections and their ordering, we render each</span>
-    <span class="doccomment">///   block in the summary one by one.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">drift_summary</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">String</span> {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">steps</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">return</span> <span class="string">&quot;No difference detected.&quot;</span>.<span class="ident">to_owned</span>();
+    <span class="doccomment">/// Exposed for tests.
+    ///
+    /// Rendering of the drift summary proceeds in two steps:
+    ///
+    /// - For each step, compute a _prefix_ (DriftItem, &amp;str) containing the
+    ///   _type_ of change it is (so we can order between added tables and
+    ///   changed enums, for example), and then in which section of the summary
+    ///   they appear, when relevant (e.g. changed tables).
+    /// - Based on the computed sections and their ordering, we render each
+    ///   block in the summary one by one.
+    </span><span class="kw">pub fn </span>drift_summary(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="kw">if </span><span class="self">self</span>.steps.is_empty() {
+            <span class="kw">return </span><span class="string">&quot;No difference detected.&quot;</span>.to_owned();
         }
 
-        <span class="comment">// The order of the variants matters</span>
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Eq</span>)]</span>
-        <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-        <span class="kw">enum</span> <span class="ident">DriftType</span> {
-            <span class="ident">AlteredExtension</span>,
-            <span class="ident">DroppedExtension</span>,
-            <span class="ident">CreatedExtension</span>,
-            <span class="ident">AddedEnum</span>,
-            <span class="ident">AddedTable</span>,
-            <span class="ident">RemovedEnum</span>,
-            <span class="ident">RemovedTable</span>,
-            <span class="ident">RemovedUdt</span>,
-            <span class="ident">RemovedView</span>,
-            <span class="ident">RedefinedTable</span>,
-            <span class="ident">ChangedEnum</span>,
-            <span class="ident">ChangedTable</span>,
+        <span class="comment">// The order of the variants matters
+        </span><span class="attribute">#[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Ord, Eq)]
+        #[repr(u8)]
+        </span><span class="kw">enum </span>DriftType {
+            AlteredExtension,
+            DroppedExtension,
+            CreatedExtension,
+            AddedEnum,
+            AddedTable,
+            RemovedEnum,
+            RemovedTable,
+            RemovedUdt,
+            RemovedView,
+            RedefinedTable,
+            ChangedEnum,
+            ChangedTable,
         }
 
-        <span class="comment">// (sort key, item name, step index)</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">drift_items</span>: <span class="ident">BTreeSet</span><span class="op">&lt;</span>(<span class="ident">DriftType</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">u32</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BTreeSet::new</span>();
+        <span class="comment">// (sort key, item name, step index)
+        </span><span class="kw">let </span><span class="kw-2">mut </span>drift_items: BTreeSet&lt;(DriftType, <span class="kw-2">&amp;</span>str, u32)&gt; = BTreeSet::new();
 
-        <span class="kw">for</span> (<span class="ident">idx</span>, <span class="ident">step</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">steps</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">let</span> <span class="ident">idx</span> <span class="op">=</span> <span class="ident">idx</span> <span class="kw">as</span> <span class="ident">u32</span>;
-            <span class="kw">match</span> <span class="ident">step</span> {
-                <span class="ident">SqlMigrationStep::AlterSequence</span>(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; (),
-                <span class="ident">SqlMigrationStep::CreateSchema</span>(<span class="kw">_</span>) =&gt; (), <span class="comment">// todo</span>
-                <span class="ident">SqlMigrationStep::DropView</span>(<span class="ident">drop_view</span>) =&gt; {
-                    <span class="ident">drift_items</span>.<span class="ident">insert</span>((
-                        <span class="ident">DriftType::RemovedView</span>,
-                        <span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">previous</span>.<span class="ident">walk</span>(<span class="ident">drop_view</span>.<span class="ident">view_id</span>).<span class="ident">name</span>(),
-                        <span class="ident">idx</span>,
+        <span class="kw">for </span>(idx, step) <span class="kw">in </span><span class="self">self</span>.steps.iter().enumerate() {
+            <span class="kw">let </span>idx = idx <span class="kw">as </span>u32;
+            <span class="kw">match </span>step {
+                SqlMigrationStep::AlterSequence(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; (),
+                SqlMigrationStep::CreateSchema(<span class="kw">_</span>) =&gt; (), <span class="comment">// todo
+                </span>SqlMigrationStep::DropView(drop_view) =&gt; {
+                    drift_items.insert((
+                        DriftType::RemovedView,
+                        <span class="self">self</span>.schemas().previous.walk(drop_view.view_id).name(),
+                        idx,
                     ));
                 }
-                <span class="ident">SqlMigrationStep::DropUserDefinedType</span>(<span class="ident">drop_udt</span>) =&gt; {
-                    <span class="ident">drift_items</span>.<span class="ident">insert</span>((
-                        <span class="ident">DriftType::RemovedUdt</span>,
-                        <span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">previous</span>.<span class="ident">walk</span>(<span class="ident">drop_udt</span>.<span class="ident">udt_id</span>).<span class="ident">name</span>(),
-                        <span class="ident">idx</span>,
+                SqlMigrationStep::DropUserDefinedType(drop_udt) =&gt; {
+                    drift_items.insert((
+                        DriftType::RemovedUdt,
+                        <span class="self">self</span>.schemas().previous.walk(drop_udt.udt_id).name(),
+                        idx,
                     ));
                 }
-                <span class="ident">SqlMigrationStep::CreateEnum</span>(<span class="kw">_</span>) =&gt; {
-                    <span class="ident">drift_items</span>.<span class="ident">insert</span>((<span class="ident">DriftType::AddedEnum</span>, <span class="string">&quot;&quot;</span>, <span class="ident">idx</span>));
+                SqlMigrationStep::CreateEnum(<span class="kw">_</span>) =&gt; {
+                    drift_items.insert((DriftType::AddedEnum, <span class="string">&quot;&quot;</span>, idx));
                 }
-                <span class="ident">SqlMigrationStep::AlterEnum</span>(<span class="ident">alter_enum</span>) =&gt; {
-                    <span class="ident">drift_items</span>.<span class="ident">insert</span>((
-                        <span class="ident">DriftType::ChangedEnum</span>,
-                        <span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">walk</span>(<span class="ident">alter_enum</span>.<span class="ident">id</span>).<span class="ident">previous</span>.<span class="ident">name</span>(),
-                        <span class="ident">idx</span>,
+                SqlMigrationStep::AlterEnum(alter_enum) =&gt; {
+                    drift_items.insert((
+                        DriftType::ChangedEnum,
+                        <span class="self">self</span>.schemas().walk(alter_enum.id).previous.name(),
+                        idx,
                     ));
                 }
-                <span class="ident">SqlMigrationStep::DropForeignKey</span> { <span class="ident">foreign_key_id</span> } =&gt; {
-                    <span class="ident">drift_items</span>.<span class="ident">insert</span>((
-                        <span class="ident">DriftType::ChangedTable</span>,
-                        <span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">previous</span>.<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">foreign_key_id</span>).<span class="ident">table</span>().<span class="ident">name</span>(),
-                        <span class="ident">idx</span>,
+                SqlMigrationStep::DropForeignKey { foreign_key_id } =&gt; {
+                    drift_items.insert((
+                        DriftType::ChangedTable,
+                        <span class="self">self</span>.schemas().previous.walk(<span class="kw-2">*</span>foreign_key_id).table().name(),
+                        idx,
                     ));
                 }
-                <span class="ident">SqlMigrationStep::AlterPrimaryKey</span>(<span class="ident">table_id</span>) =&gt; {
-                    <span class="ident">drift_items</span>.<span class="ident">insert</span>((<span class="ident">DriftType::ChangedTable</span>, <span class="self">self</span>.<span class="ident">before</span>.<span class="ident">walk</span>(<span class="ident">table_id</span>.<span class="ident">previous</span>).<span class="ident">name</span>(), <span class="ident">idx</span>));
+                SqlMigrationStep::AlterPrimaryKey(table_id) =&gt; {
+                    drift_items.insert((DriftType::ChangedTable, <span class="self">self</span>.before.walk(table_id.previous).name(), idx));
                 }
-                <span class="ident">SqlMigrationStep::DropIndex</span> { <span class="ident">index_id</span> } =&gt; {
-                    <span class="ident">drift_items</span>.<span class="ident">insert</span>((
-                        <span class="ident">DriftType::ChangedTable</span>,
-                        <span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">previous</span>.<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">index_id</span>).<span class="ident">table</span>().<span class="ident">name</span>(),
-                        <span class="ident">idx</span>,
+                SqlMigrationStep::DropIndex { index_id } =&gt; {
+                    drift_items.insert((
+                        DriftType::ChangedTable,
+                        <span class="self">self</span>.schemas().previous.walk(<span class="kw-2">*</span>index_id).table().name(),
+                        idx,
                     ));
                 }
-                <span class="ident">SqlMigrationStep::AlterTable</span>(<span class="ident">alter_table</span>) =&gt; {
-                    <span class="ident">drift_items</span>.<span class="ident">insert</span>((
-                        <span class="ident">DriftType::ChangedTable</span>,
-                        <span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">walk</span>(<span class="ident">alter_table</span>.<span class="ident">table_ids</span>).<span class="ident">previous</span>.<span class="ident">name</span>(),
-                        <span class="ident">idx</span>,
+                SqlMigrationStep::AlterTable(alter_table) =&gt; {
+                    drift_items.insert((
+                        DriftType::ChangedTable,
+                        <span class="self">self</span>.schemas().walk(alter_table.table_ids).previous.name(),
+                        idx,
                     ));
                 }
-                <span class="ident">SqlMigrationStep::DropTable</span> { .. } =&gt; {
-                    <span class="ident">drift_items</span>.<span class="ident">insert</span>((<span class="ident">DriftType::RemovedTable</span>, <span class="string">&quot;&quot;</span>, <span class="ident">idx</span>));
+                SqlMigrationStep::DropTable { .. } =&gt; {
+                    drift_items.insert((DriftType::RemovedTable, <span class="string">&quot;&quot;</span>, idx));
                 }
-                <span class="ident">SqlMigrationStep::DropEnum</span>(<span class="kw">_</span>) =&gt; {
-                    <span class="ident">drift_items</span>.<span class="ident">insert</span>((<span class="ident">DriftType::RemovedEnum</span>, <span class="string">&quot;&quot;</span>, <span class="ident">idx</span>));
+                SqlMigrationStep::DropEnum(<span class="kw">_</span>) =&gt; {
+                    drift_items.insert((DriftType::RemovedEnum, <span class="string">&quot;&quot;</span>, idx));
                 }
-                <span class="ident">SqlMigrationStep::CreateTable</span> { .. } =&gt; {
-                    <span class="ident">drift_items</span>.<span class="ident">insert</span>((<span class="ident">DriftType::AddedTable</span>, <span class="string">&quot;&quot;</span>, <span class="ident">idx</span>));
+                SqlMigrationStep::CreateTable { .. } =&gt; {
+                    drift_items.insert((DriftType::AddedTable, <span class="string">&quot;&quot;</span>, idx));
                 }
-                <span class="ident">SqlMigrationStep::RedefineTables</span>(<span class="ident">redefines</span>) =&gt; {
-                    <span class="kw">for</span> <span class="ident">redefine</span> <span class="kw">in</span> <span class="ident">redefines</span> {
-                        <span class="ident">drift_items</span>.<span class="ident">insert</span>((
-                            <span class="ident">DriftType::RedefinedTable</span>,
-                            <span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">walk</span>(<span class="ident">redefine</span>.<span class="ident">table_ids</span>).<span class="ident">previous</span>.<span class="ident">name</span>(),
-                            <span class="ident">idx</span>,
+                SqlMigrationStep::RedefineTables(redefines) =&gt; {
+                    <span class="kw">for </span>redefine <span class="kw">in </span>redefines {
+                        drift_items.insert((
+                            DriftType::RedefinedTable,
+                            <span class="self">self</span>.schemas().walk(redefine.table_ids).previous.name(),
+                            idx,
                         ));
                     }
                 }
-                <span class="ident">SqlMigrationStep::RenameForeignKey</span> { <span class="ident">foreign_key_id</span> } =&gt; {
-                    <span class="ident">drift_items</span>.<span class="ident">insert</span>((
-                        <span class="ident">DriftType::ChangedTable</span>,
-                        <span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">foreign_key_id</span>).<span class="ident">next</span>.<span class="ident">table</span>().<span class="ident">name</span>(),
-                        <span class="ident">idx</span>,
+                SqlMigrationStep::RenameForeignKey { foreign_key_id } =&gt; {
+                    drift_items.insert((
+                        DriftType::ChangedTable,
+                        <span class="self">self</span>.schemas().walk(<span class="kw-2">*</span>foreign_key_id).next.table().name(),
+                        idx,
                     ));
                 }
-                <span class="ident">SqlMigrationStep::CreateIndex</span> {
-                    <span class="ident">table_id</span>: (<span class="kw">_</span>, <span class="ident">table_id</span>),
+                SqlMigrationStep::CreateIndex {
+                    table_id: (<span class="kw">_</span>, table_id),
                     ..
                 } =&gt; {
-                    <span class="ident">drift_items</span>.<span class="ident">insert</span>((<span class="ident">DriftType::ChangedTable</span>, <span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">next</span>.<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">table_id</span>).<span class="ident">name</span>(), <span class="ident">idx</span>));
+                    drift_items.insert((DriftType::ChangedTable, <span class="self">self</span>.schemas().next.walk(<span class="kw-2">*</span>table_id).name(), idx));
                 }
-                <span class="ident">SqlMigrationStep::AddForeignKey</span> { <span class="ident">foreign_key_id</span>: <span class="ident">id</span> } =&gt; {
-                    <span class="ident">drift_items</span>.<span class="ident">insert</span>((
-                        <span class="ident">DriftType::ChangedTable</span>,
-                        <span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">next</span>.<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">id</span>).<span class="ident">table</span>().<span class="ident">name</span>(),
-                        <span class="ident">idx</span>,
+                SqlMigrationStep::AddForeignKey { foreign_key_id: id } =&gt; {
+                    drift_items.insert((
+                        DriftType::ChangedTable,
+                        <span class="self">self</span>.schemas().next.walk(<span class="kw-2">*</span>id).table().name(),
+                        idx,
                     ));
                 }
-                <span class="ident">SqlMigrationStep::RenameIndex</span> { <span class="ident">index</span> } <span class="op">|</span> <span class="ident">SqlMigrationStep::RedefineIndex</span> { <span class="ident">index</span> } =&gt; {
-                    <span class="ident">drift_items</span>.<span class="ident">insert</span>((
-                        <span class="ident">DriftType::ChangedTable</span>,
-                        <span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">index</span>).<span class="ident">previous</span>.<span class="ident">table</span>().<span class="ident">name</span>(),
-                        <span class="ident">idx</span>,
+                SqlMigrationStep::RenameIndex { index } | SqlMigrationStep::RedefineIndex { index } =&gt; {
+                    drift_items.insert((
+                        DriftType::ChangedTable,
+                        <span class="self">self</span>.schemas().walk(<span class="kw-2">*</span>index).previous.table().name(),
+                        idx,
                     ));
                 }
-                <span class="ident">SqlMigrationStep::CreateExtension</span>(<span class="ident">create_extension</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">next</span>.<span class="ident">downcast_connector_data</span>();
-                    <span class="kw">let</span> <span class="ident">extension</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">get_extension</span>(<span class="ident">create_extension</span>.<span class="ident">id</span>);
+                SqlMigrationStep::CreateExtension(create_extension) =&gt; {
+                    <span class="kw">let </span>ext: <span class="kw-2">&amp;</span>PostgresSchemaExt = <span class="self">self</span>.schemas().next.downcast_connector_data();
+                    <span class="kw">let </span>extension = ext.get_extension(create_extension.id);
 
-                    <span class="ident">drift_items</span>.<span class="ident">insert</span>((<span class="ident">DriftType::CreatedExtension</span>, <span class="kw-2">&amp;</span><span class="ident">extension</span>.<span class="ident">name</span>, <span class="ident">idx</span>));
+                    drift_items.insert((DriftType::CreatedExtension, <span class="kw-2">&amp;</span>extension.name, idx));
                 }
-                <span class="ident">SqlMigrationStep::AlterExtension</span>(<span class="ident">alter_extension</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">previous</span>.<span class="ident">downcast_connector_data</span>();
-                    <span class="kw">let</span> <span class="ident">extension</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">get_extension</span>(<span class="ident">alter_extension</span>.<span class="ident">ids</span>.<span class="ident">previous</span>);
+                SqlMigrationStep::AlterExtension(alter_extension) =&gt; {
+                    <span class="kw">let </span>ext: <span class="kw-2">&amp;</span>PostgresSchemaExt = <span class="self">self</span>.schemas().previous.downcast_connector_data();
+                    <span class="kw">let </span>extension = ext.get_extension(alter_extension.ids.previous);
 
-                    <span class="ident">drift_items</span>.<span class="ident">insert</span>((<span class="ident">DriftType::AlteredExtension</span>, <span class="kw-2">&amp;</span><span class="ident">extension</span>.<span class="ident">name</span>, <span class="ident">idx</span>));
+                    drift_items.insert((DriftType::AlteredExtension, <span class="kw-2">&amp;</span>extension.name, idx));
                 }
-                <span class="ident">SqlMigrationStep::DropExtension</span>(<span class="ident">drop_extension</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">previous</span>.<span class="ident">downcast_connector_data</span>();
-                    <span class="kw">let</span> <span class="ident">extension</span> <span class="op">=</span> <span class="ident">ext</span>.<span class="ident">get_extension</span>(<span class="ident">drop_extension</span>.<span class="ident">id</span>);
+                SqlMigrationStep::DropExtension(drop_extension) =&gt; {
+                    <span class="kw">let </span>ext: <span class="kw-2">&amp;</span>PostgresSchemaExt = <span class="self">self</span>.schemas().previous.downcast_connector_data();
+                    <span class="kw">let </span>extension = ext.get_extension(drop_extension.id);
 
-                    <span class="ident">drift_items</span>.<span class="ident">insert</span>((<span class="ident">DriftType::DroppedExtension</span>, <span class="kw-2">&amp;</span><span class="ident">extension</span>.<span class="ident">name</span>, <span class="ident">idx</span>));
+                    drift_items.insert((DriftType::DroppedExtension, <span class="kw-2">&amp;</span>extension.name, idx));
                 }
             };
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="self">self</span>.<span class="ident">steps</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">20</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">render_state</span> <span class="op">=</span> (<span class="ident">DriftType::AddedEnum</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>out = String::with_capacity(<span class="self">self</span>.steps.len() * <span class="number">20</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>render_state = (DriftType::AddedEnum, <span class="string">&quot;&quot;</span>);
 
-        <span class="kw">for</span> (<span class="ident">line_idx</span>, (<span class="ident">new_state</span>, <span class="ident">item_name</span>, <span class="ident">step_idx</span>)) <span class="kw">in</span> <span class="ident">drift_items</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>() {
-            <span class="kw">if</span> <span class="ident">render_state</span> <span class="op">!</span><span class="op">=</span> (<span class="kw-2">*</span><span class="ident">new_state</span>, <span class="ident">item_name</span>) <span class="op">|</span><span class="op">|</span> <span class="ident">line_idx</span> <span class="op">==</span> <span class="number">0</span> {
-                <span class="kw">match</span> <span class="ident">new_state</span> {
-                    <span class="ident">DriftType::AddedEnum</span> =&gt; {
-                        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;\n[+] Added enums\n&quot;</span>);
+        <span class="kw">for </span>(line_idx, (new_state, item_name, step_idx)) <span class="kw">in </span>drift_items.iter().enumerate() {
+            <span class="kw">if </span>render_state != (<span class="kw-2">*</span>new_state, item_name) || line_idx == <span class="number">0 </span>{
+                <span class="kw">match </span>new_state {
+                    DriftType::AddedEnum =&gt; {
+                        out.push_str(<span class="string">&quot;\n[+] Added enums\n&quot;</span>);
                     }
-                    <span class="ident">DriftType::AddedTable</span> =&gt; {
-                        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;\n[+] Added tables\n&quot;</span>);
+                    DriftType::AddedTable =&gt; {
+                        out.push_str(<span class="string">&quot;\n[+] Added tables\n&quot;</span>);
                     }
-                    <span class="ident">DriftType::RemovedEnum</span> =&gt; <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;\n[-] Removed enums\n&quot;</span>),
-                    <span class="ident">DriftType::RemovedTable</span> =&gt; <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;\n[-] Removed tables\n&quot;</span>),
-                    <span class="ident">DriftType::RemovedUdt</span> =&gt; <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;\n[-] Removed UDTs\n&quot;</span>),
-                    <span class="ident">DriftType::RemovedView</span> =&gt; <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;\n[-] Removed views\n&quot;</span>),
-                    <span class="ident">DriftType::RedefinedTable</span> =&gt; {
-                        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;\n[*] Redefined table `&quot;</span>);
-                        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="ident">item_name</span>);
-                        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;`\n&quot;</span>)
+                    DriftType::RemovedEnum =&gt; out.push_str(<span class="string">&quot;\n[-] Removed enums\n&quot;</span>),
+                    DriftType::RemovedTable =&gt; out.push_str(<span class="string">&quot;\n[-] Removed tables\n&quot;</span>),
+                    DriftType::RemovedUdt =&gt; out.push_str(<span class="string">&quot;\n[-] Removed UDTs\n&quot;</span>),
+                    DriftType::RemovedView =&gt; out.push_str(<span class="string">&quot;\n[-] Removed views\n&quot;</span>),
+                    DriftType::RedefinedTable =&gt; {
+                        out.push_str(<span class="string">&quot;\n[*] Redefined table `&quot;</span>);
+                        out.push_str(item_name);
+                        out.push_str(<span class="string">&quot;`\n&quot;</span>)
                     }
-                    <span class="ident">DriftType::ChangedEnum</span> =&gt; {
-                        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;\n[*] Changed the `&quot;</span>);
-                        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="ident">item_name</span>);
-                        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;` enum\n&quot;</span>);
+                    DriftType::ChangedEnum =&gt; {
+                        out.push_str(<span class="string">&quot;\n[*] Changed the `&quot;</span>);
+                        out.push_str(item_name);
+                        out.push_str(<span class="string">&quot;` enum\n&quot;</span>);
                     }
-                    <span class="ident">DriftType::ChangedTable</span> =&gt; {
-                        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;\n[*] Changed the `&quot;</span>);
-                        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="ident">item_name</span>);
-                        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;` table\n&quot;</span>);
+                    DriftType::ChangedTable =&gt; {
+                        out.push_str(<span class="string">&quot;\n[*] Changed the `&quot;</span>);
+                        out.push_str(item_name);
+                        out.push_str(<span class="string">&quot;` table\n&quot;</span>);
                     }
-                    <span class="ident">DriftType::CreatedExtension</span> =&gt; {
-                        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;\n[+] Added extensions\n&quot;</span>);
+                    DriftType::CreatedExtension =&gt; {
+                        out.push_str(<span class="string">&quot;\n[+] Added extensions\n&quot;</span>);
                     }
-                    <span class="ident">DriftType::AlteredExtension</span> =&gt; {
-                        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;\n[*] Changed the `&quot;</span>);
-                        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="ident">item_name</span>);
-                        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;` extension\n&quot;</span>);
+                    DriftType::AlteredExtension =&gt; {
+                        out.push_str(<span class="string">&quot;\n[*] Changed the `&quot;</span>);
+                        out.push_str(item_name);
+                        out.push_str(<span class="string">&quot;` extension\n&quot;</span>);
                     }
-                    <span class="ident">DriftType::DroppedExtension</span> =&gt; {
-                        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;\n[-] Removed extensions\n`&quot;</span>);
+                    DriftType::DroppedExtension =&gt; {
+                        out.push_str(<span class="string">&quot;\n[-] Removed extensions\n`&quot;</span>);
                     }
                 }
             }
 
-            <span class="ident">render_state</span> <span class="op">=</span> (<span class="kw-2">*</span><span class="ident">new_state</span>, <span class="kw-2">*</span><span class="ident">item_name</span>);
+            render_state = (<span class="kw-2">*</span>new_state, <span class="kw-2">*</span>item_name);
 
-            <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">steps</span>[<span class="kw-2">*</span><span class="ident">step_idx</span> <span class="kw">as</span> <span class="ident">usize</span>] {
-                <span class="ident">SqlMigrationStep::AlterSequence</span>(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; {}
-                <span class="ident">SqlMigrationStep::DropView</span>(<span class="kw">_</span>) =&gt; {}
-                <span class="ident">SqlMigrationStep::DropUserDefinedType</span>(<span class="kw">_</span>) =&gt; {}
-                <span class="ident">SqlMigrationStep::CreateEnum</span>(<span class="ident">enum_id</span>) =&gt; {
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;  - &quot;</span>);
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">next</span>.<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">enum_id</span>).<span class="ident">name</span>());
-                    <span class="ident">out</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
+            <span class="kw">match </span><span class="kw-2">&amp;</span><span class="self">self</span>.steps[<span class="kw-2">*</span>step_idx <span class="kw">as </span>usize] {
+                SqlMigrationStep::AlterSequence(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; {}
+                SqlMigrationStep::DropView(<span class="kw">_</span>) =&gt; {}
+                SqlMigrationStep::DropUserDefinedType(<span class="kw">_</span>) =&gt; {}
+                SqlMigrationStep::CreateEnum(enum_id) =&gt; {
+                    out.push_str(<span class="string">&quot;  - &quot;</span>);
+                    out.push_str(<span class="self">self</span>.schemas().next.walk(<span class="kw-2">*</span>enum_id).name());
+                    out.push(<span class="string">&#39;\n&#39;</span>);
                 }
-                <span class="ident">SqlMigrationStep::CreateSchema</span>(<span class="kw">_</span>) =&gt; {} <span class="comment">// todo</span>
-                <span class="ident">SqlMigrationStep::AlterEnum</span>(<span class="ident">alter_enum</span>) =&gt; {
-                    <span class="kw">for</span> <span class="ident">added</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">alter_enum</span>.<span class="ident">created_variants</span> {
-                        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;  [+] Added variant `&quot;</span>);
-                        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="ident">added</span>);
-                        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;`\n&quot;</span>);
+                SqlMigrationStep::CreateSchema(<span class="kw">_</span>) =&gt; {} <span class="comment">// todo
+                </span>SqlMigrationStep::AlterEnum(alter_enum) =&gt; {
+                    <span class="kw">for </span>added <span class="kw">in </span><span class="kw-2">&amp;</span>alter_enum.created_variants {
+                        out.push_str(<span class="string">&quot;  [+] Added variant `&quot;</span>);
+                        out.push_str(added);
+                        out.push_str(<span class="string">&quot;`\n&quot;</span>);
                     }
 
-                    <span class="kw">for</span> <span class="ident">dropped</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">alter_enum</span>.<span class="ident">dropped_variants</span> {
-                        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;  [-] Removed variant `&quot;</span>);
-                        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="ident">dropped</span>);
-                        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;`\n&quot;</span>);
+                    <span class="kw">for </span>dropped <span class="kw">in </span><span class="kw-2">&amp;</span>alter_enum.dropped_variants {
+                        out.push_str(<span class="string">&quot;  [-] Removed variant `&quot;</span>);
+                        out.push_str(dropped);
+                        out.push_str(<span class="string">&quot;`\n&quot;</span>);
                     }
                 }
-                <span class="ident">SqlMigrationStep::AlterPrimaryKey</span>(<span class="ident">table_id</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">table_name</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">previous</span>.<span class="ident">walk</span>(<span class="ident">table_id</span>.<span class="ident">previous</span>).<span class="ident">name</span>();
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;   [*] Changed the primary key for `&quot;</span>);
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="ident">table_name</span>);
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;`\n&quot;</span>);
+                SqlMigrationStep::AlterPrimaryKey(table_id) =&gt; {
+                    <span class="kw">let </span>table_name = <span class="self">self</span>.schemas().previous.walk(table_id.previous).name();
+                    out.push_str(<span class="string">&quot;   [*] Changed the primary key for `&quot;</span>);
+                    out.push_str(table_name);
+                    out.push_str(<span class="string">&quot;`\n&quot;</span>);
                 }
-                <span class="ident">SqlMigrationStep::DropForeignKey</span> { <span class="ident">foreign_key_id</span> } =&gt; {
-                    <span class="kw">let</span> <span class="ident">fk</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">previous</span>.<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">foreign_key_id</span>);
+                SqlMigrationStep::DropForeignKey { foreign_key_id } =&gt; {
+                    <span class="kw">let </span>fk = <span class="self">self</span>.schemas().previous.walk(<span class="kw-2">*</span>foreign_key_id);
 
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;  [-] Removed foreign key on columns (&quot;</span>);
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">fk</span>.<span class="ident">constrained_columns</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>()).<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>));
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;)\n&quot;</span>)
+                    out.push_str(<span class="string">&quot;  [-] Removed foreign key on columns (&quot;</span>);
+                    out.push_str(<span class="kw-2">&amp;</span>fk.constrained_columns().map(|c| c.name()).join(<span class="string">&quot;, &quot;</span>));
+                    out.push_str(<span class="string">&quot;)\n&quot;</span>)
                 }
-                <span class="ident">SqlMigrationStep::DropIndex</span> { <span class="ident">index_id</span> } =&gt; {
-                    <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">previous</span>.<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">index_id</span>);
+                SqlMigrationStep::DropIndex { index_id } =&gt; {
+                    <span class="kw">let </span>index = <span class="self">self</span>.schemas().previous.walk(<span class="kw-2">*</span>index_id);
 
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;  [-] Removed &quot;</span>);
+                    out.push_str(<span class="string">&quot;  [-] Removed &quot;</span>);
 
-                    <span class="kw">if</span> <span class="ident">index</span>.<span class="ident">is_unique</span>() {
-                        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;unique &quot;</span>);
+                    <span class="kw">if </span>index.is_unique() {
+                        out.push_str(<span class="string">&quot;unique &quot;</span>);
                     }
 
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;index on columns (&quot;</span>);
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">index</span>.<span class="ident">column_names</span>().<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>));
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;)\n&quot;</span>);
+                    out.push_str(<span class="string">&quot;index on columns (&quot;</span>);
+                    out.push_str(<span class="kw-2">&amp;</span>index.column_names().join(<span class="string">&quot;, &quot;</span>));
+                    out.push_str(<span class="string">&quot;)\n&quot;</span>);
                 }
-                <span class="ident">SqlMigrationStep::AlterTable</span>(<span class="ident">alter_table</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">tables</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">walk</span>(<span class="ident">alter_table</span>.<span class="ident">table_ids</span>);
+                SqlMigrationStep::AlterTable(alter_table) =&gt; {
+                    <span class="kw">let </span>tables = <span class="self">self</span>.schemas().walk(alter_table.table_ids);
 
-                    <span class="kw">for</span> <span class="ident">change</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">alter_table</span>.<span class="ident">changes</span> {
-                        <span class="kw">match</span> <span class="ident">change</span> {
-                            <span class="ident">TableChange::AddColumn</span> {
-                                <span class="ident">column_id</span>,
-                                <span class="ident">has_virtual_default</span>: <span class="kw">_</span>,
+                    <span class="kw">for </span>change <span class="kw">in </span><span class="kw-2">&amp;</span>alter_table.changes {
+                        <span class="kw">match </span>change {
+                            TableChange::AddColumn {
+                                column_id,
+                                has_virtual_default: <span class="kw">_</span>,
                             } =&gt; {
-                                <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;  [+] Added column `&quot;</span>);
-                                <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">next</span>.<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">column_id</span>).<span class="ident">name</span>());
-                                <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;`\n&quot;</span>);
+                                out.push_str(<span class="string">&quot;  [+] Added column `&quot;</span>);
+                                out.push_str(<span class="self">self</span>.schemas().next.walk(<span class="kw-2">*</span>column_id).name());
+                                out.push_str(<span class="string">&quot;`\n&quot;</span>);
                             }
-                            <span class="ident">TableChange::AlterColumn</span>(<span class="ident">alter_column</span>) =&gt; {
-                                <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;  [*] Altered column `&quot;</span>);
+                            TableChange::AlterColumn(alter_column) =&gt; {
+                                out.push_str(<span class="string">&quot;  [*] Altered column `&quot;</span>);
                                 <span class="macro">write!</span>(
-                                    <span class="ident">out</span>,
+                                    out,
                                     <span class="string">&quot;{}` &quot;</span>,
-                                    <span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">next</span>.<span class="ident">walk</span>(<span class="ident">alter_column</span>.<span class="ident">column_id</span>.<span class="ident">next</span>).<span class="ident">name</span>(),
+                                    <span class="self">self</span>.schemas().next.walk(alter_column.column_id.next).name(),
                                 )
-                                .<span class="ident">unwrap</span>();
-                                <span class="ident">render_column_changes</span>(
-                                    <span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">walk</span>(<span class="ident">alter_column</span>.<span class="ident">column_id</span>),
-                                    <span class="kw-2">&amp;</span><span class="ident">alter_column</span>.<span class="ident">changes</span>,
-                                    <span class="kw-2">&amp;mut</span> <span class="ident">out</span>,
+                                .unwrap();
+                                render_column_changes(
+                                    <span class="self">self</span>.schemas().walk(alter_column.column_id),
+                                    <span class="kw-2">&amp;</span>alter_column.changes,
+                                    <span class="kw-2">&amp;mut </span>out,
                                 );
-                                <span class="ident">out</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
+                                out.push(<span class="string">&#39;\n&#39;</span>);
                             }
-                            <span class="ident">TableChange::DropColumn</span> { <span class="ident">column_id</span> } =&gt; {
-                                <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;  [-] Removed column `&quot;</span>);
-                                <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">previous</span>.<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">column_id</span>).<span class="ident">name</span>());
-                                <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;`\n&quot;</span>);
+                            TableChange::DropColumn { column_id } =&gt; {
+                                out.push_str(<span class="string">&quot;  [-] Removed column `&quot;</span>);
+                                out.push_str(<span class="self">self</span>.schemas().previous.walk(<span class="kw-2">*</span>column_id).name());
+                                out.push_str(<span class="string">&quot;`\n&quot;</span>);
                             }
-                            <span class="ident">TableChange::DropAndRecreateColumn</span> { <span class="ident">column_id</span>, <span class="ident">changes</span> } =&gt; {
-                                <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;  [*] Column `&quot;</span>);
-                                <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">next</span>.<span class="ident">walk</span>(<span class="ident">column_id</span>.<span class="ident">next</span>).<span class="ident">name</span>());
-                                <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;` would be dropped and recreated &quot;</span>);
-                                <span class="ident">render_column_changes</span>(<span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">column_id</span>), <span class="ident">changes</span>, <span class="kw-2">&amp;mut</span> <span class="ident">out</span>);
-                                <span class="ident">out</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
+                            TableChange::DropAndRecreateColumn { column_id, changes } =&gt; {
+                                out.push_str(<span class="string">&quot;  [*] Column `&quot;</span>);
+                                out.push_str(<span class="self">self</span>.schemas().next.walk(column_id.next).name());
+                                out.push_str(<span class="string">&quot;` would be dropped and recreated &quot;</span>);
+                                render_column_changes(<span class="self">self</span>.schemas().walk(<span class="kw-2">*</span>column_id), changes, <span class="kw-2">&amp;mut </span>out);
+                                out.push(<span class="string">&#39;\n&#39;</span>);
                             }
-                            <span class="ident">TableChange::DropPrimaryKey</span> =&gt; {
-                                <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;  [-] Dropped the primary key on columns (&quot;</span>);
-                                <span class="ident">render_primary_key_column_names</span>(<span class="ident">tables</span>.<span class="ident">previous</span>, <span class="kw-2">&amp;mut</span> <span class="ident">out</span>);
-                                <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;)\n&quot;</span>);
+                            TableChange::DropPrimaryKey =&gt; {
+                                out.push_str(<span class="string">&quot;  [-] Dropped the primary key on columns (&quot;</span>);
+                                render_primary_key_column_names(tables.previous, <span class="kw-2">&amp;mut </span>out);
+                                out.push_str(<span class="string">&quot;)\n&quot;</span>);
                             }
-                            <span class="ident">TableChange::RenamePrimaryKey</span> =&gt; {
-                                <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;  [*] Renamed the primary key on columns (&quot;</span>);
-                                <span class="ident">render_primary_key_column_names</span>(<span class="ident">tables</span>.<span class="ident">previous</span>, <span class="kw-2">&amp;mut</span> <span class="ident">out</span>);
-                                <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;)\n&quot;</span>);
+                            TableChange::RenamePrimaryKey =&gt; {
+                                out.push_str(<span class="string">&quot;  [*] Renamed the primary key on columns (&quot;</span>);
+                                render_primary_key_column_names(tables.previous, <span class="kw-2">&amp;mut </span>out);
+                                out.push_str(<span class="string">&quot;)\n&quot;</span>);
                             }
-                            <span class="ident">TableChange::AddPrimaryKey</span> =&gt; {
-                                <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;  [+] Added primary key on columns (&quot;</span>);
-                                <span class="ident">render_primary_key_column_names</span>(<span class="ident">tables</span>.<span class="ident">next</span>, <span class="kw-2">&amp;mut</span> <span class="ident">out</span>);
-                                <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;)\n&quot;</span>);
-                                <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;)\n&quot;</span>);
+                            TableChange::AddPrimaryKey =&gt; {
+                                out.push_str(<span class="string">&quot;  [+] Added primary key on columns (&quot;</span>);
+                                render_primary_key_column_names(tables.next, <span class="kw-2">&amp;mut </span>out);
+                                out.push_str(<span class="string">&quot;)\n&quot;</span>);
+                                out.push_str(<span class="string">&quot;)\n&quot;</span>);
                             }
                         }
                     }
                 }
-                <span class="ident">SqlMigrationStep::DropTable</span> { <span class="ident">table_id</span> } =&gt; {
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;  - &quot;</span>);
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">previous</span>.<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">table_id</span>).<span class="ident">name</span>());
-                    <span class="ident">out</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
+                SqlMigrationStep::DropTable { table_id } =&gt; {
+                    out.push_str(<span class="string">&quot;  - &quot;</span>);
+                    out.push_str(<span class="self">self</span>.schemas().previous.walk(<span class="kw-2">*</span>table_id).name());
+                    out.push(<span class="string">&#39;\n&#39;</span>);
                 }
-                <span class="ident">SqlMigrationStep::DropEnum</span>(<span class="ident">enum_id</span>) =&gt; {
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;  - &quot;</span>);
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">previous</span>.<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">enum_id</span>).<span class="ident">name</span>());
-                    <span class="ident">out</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
+                SqlMigrationStep::DropEnum(enum_id) =&gt; {
+                    out.push_str(<span class="string">&quot;  - &quot;</span>);
+                    out.push_str(<span class="self">self</span>.schemas().previous.walk(<span class="kw-2">*</span>enum_id).name());
+                    out.push(<span class="string">&#39;\n&#39;</span>);
                 }
-                <span class="ident">SqlMigrationStep::CreateTable</span> { <span class="ident">table_id</span> } =&gt; {
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;  - &quot;</span>);
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">next</span>.<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">table_id</span>).<span class="ident">name</span>());
-                    <span class="ident">out</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
+                SqlMigrationStep::CreateTable { table_id } =&gt; {
+                    out.push_str(<span class="string">&quot;  - &quot;</span>);
+                    out.push_str(<span class="self">self</span>.schemas().next.walk(<span class="kw-2">*</span>table_id).name());
+                    out.push(<span class="string">&#39;\n&#39;</span>);
                 }
-                <span class="ident">SqlMigrationStep::RedefineTables</span>(<span class="kw">_</span>) =&gt; {}
-                <span class="ident">SqlMigrationStep::RenameForeignKey</span> { <span class="ident">foreign_key_id</span> } =&gt; {
-                    <span class="kw">let</span> <span class="ident">fks</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">foreign_key_id</span>);
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;  [*] Renamed the foreign key \&quot;&quot;</span>);
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="ident">fks</span>.<span class="ident">previous</span>.<span class="ident">constraint_name</span>().<span class="ident">unwrap</span>());
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;\&quot; to \&quot;&quot;</span>);
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="ident">fks</span>.<span class="ident">next</span>.<span class="ident">constraint_name</span>().<span class="ident">unwrap</span>());
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;\&quot;\n&quot;</span>);
+                SqlMigrationStep::RedefineTables(<span class="kw">_</span>) =&gt; {}
+                SqlMigrationStep::RenameForeignKey { foreign_key_id } =&gt; {
+                    <span class="kw">let </span>fks = <span class="self">self</span>.schemas().walk(<span class="kw-2">*</span>foreign_key_id);
+                    out.push_str(<span class="string">&quot;  [*] Renamed the foreign key \&quot;&quot;</span>);
+                    out.push_str(fks.previous.constraint_name().unwrap());
+                    out.push_str(<span class="string">&quot;\&quot; to \&quot;&quot;</span>);
+                    out.push_str(fks.next.constraint_name().unwrap());
+                    out.push_str(<span class="string">&quot;\&quot;\n&quot;</span>);
                 }
-                <span class="ident">SqlMigrationStep::CreateIndex</span> {
-                    <span class="ident">table_id</span>: <span class="kw">_</span>,
-                    <span class="ident">index_id</span>,
-                    <span class="ident">from_drop_and_recreate</span>: <span class="kw">_</span>,
+                SqlMigrationStep::CreateIndex {
+                    table_id: <span class="kw">_</span>,
+                    index_id,
+                    from_drop_and_recreate: <span class="kw">_</span>,
                 } =&gt; {
-                    <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">next</span>.<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">index_id</span>);
+                    <span class="kw">let </span>index = <span class="self">self</span>.schemas().next.walk(<span class="kw-2">*</span>index_id);
 
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;  [+] Added &quot;</span>);
+                    out.push_str(<span class="string">&quot;  [+] Added &quot;</span>);
 
-                    <span class="kw">if</span> <span class="ident">index</span>.<span class="ident">is_unique</span>() {
-                        <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;unique &quot;</span>);
+                    <span class="kw">if </span>index.is_unique() {
+                        out.push_str(<span class="string">&quot;unique &quot;</span>);
                     }
 
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;index on columns (&quot;</span>);
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">index</span>.<span class="ident">column_names</span>().<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>));
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;)\n&quot;</span>);
+                    out.push_str(<span class="string">&quot;index on columns (&quot;</span>);
+                    out.push_str(<span class="kw-2">&amp;</span>index.column_names().join(<span class="string">&quot;, &quot;</span>));
+                    out.push_str(<span class="string">&quot;)\n&quot;</span>);
                 }
-                <span class="ident">SqlMigrationStep::AddForeignKey</span> { <span class="ident">foreign_key_id</span> } =&gt; {
-                    <span class="kw">let</span> <span class="ident">foreign_key</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">next</span>.<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">foreign_key_id</span>);
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;  [+] Added foreign key on columns (&quot;</span>);
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">foreign_key</span>.<span class="ident">constrained_columns</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>()).<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>));
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;)\n&quot;</span>)
+                SqlMigrationStep::AddForeignKey { foreign_key_id } =&gt; {
+                    <span class="kw">let </span>foreign_key = <span class="self">self</span>.schemas().next.walk(<span class="kw-2">*</span>foreign_key_id);
+                    out.push_str(<span class="string">&quot;  [+] Added foreign key on columns (&quot;</span>);
+                    out.push_str(<span class="kw-2">&amp;</span>foreign_key.constrained_columns().map(|c| c.name()).join(<span class="string">&quot;, &quot;</span>));
+                    out.push_str(<span class="string">&quot;)\n&quot;</span>)
                 }
-                <span class="ident">SqlMigrationStep::RenameIndex</span> { <span class="ident">index</span> } =&gt; {
-                    <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">index</span>);
+                SqlMigrationStep::RenameIndex { index } =&gt; {
+                    <span class="kw">let </span>index = <span class="self">self</span>.schemas().walk(<span class="kw-2">*</span>index);
 
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;  [*] Renamed index `&quot;</span>);
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="ident">index</span>.<span class="ident">previous</span>.<span class="ident">name</span>());
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;` to `&quot;</span>);
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="ident">index</span>.<span class="ident">next</span>.<span class="ident">name</span>());
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;`\n&quot;</span>);
+                    out.push_str(<span class="string">&quot;  [*] Renamed index `&quot;</span>);
+                    out.push_str(index.previous.name());
+                    out.push_str(<span class="string">&quot;` to `&quot;</span>);
+                    out.push_str(index.next.name());
+                    out.push_str(<span class="string">&quot;`\n&quot;</span>);
                 }
-                <span class="ident">SqlMigrationStep::RedefineIndex</span> { <span class="ident">index</span> } =&gt; {
-                    <span class="kw">let</span> <span class="ident">index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">walk</span>(<span class="kw-2">*</span><span class="ident">index</span>);
+                SqlMigrationStep::RedefineIndex { index } =&gt; {
+                    <span class="kw">let </span>index = <span class="self">self</span>.schemas().walk(<span class="kw-2">*</span>index);
 
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;  [*] Redefined index `&quot;</span>);
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="ident">index</span>.<span class="ident">previous</span>.<span class="ident">name</span>());
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;`\n&quot;</span>);
+                    out.push_str(<span class="string">&quot;  [*] Redefined index `&quot;</span>);
+                    out.push_str(index.previous.name());
+                    out.push_str(<span class="string">&quot;`\n&quot;</span>);
                 }
-                <span class="ident">SqlMigrationStep::CreateExtension</span>(<span class="ident">create_extension</span>) =&gt; {
-                    <span class="kw">let</span> <span class="ident">ext</span>: <span class="kw-2">&amp;</span><span class="ident">PostgresSchemaExt</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">schemas</span>().<span class="ident">next</span>.<span class="ident">downcast_connector_data</span>();
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="string">&quot;  - &quot;</span>);
-                    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">ext</span>.<span class="ident">get_extension</span>(<span class="ident">create_extension</span>.<span class="ident">id</span>).<span class="ident">name</span>);
-                    <span class="ident">out</span>.<span class="ident">push</span>(<span class="string">&#39;\n&#39;</span>);
+                SqlMigrationStep::CreateExtension(create_extension) =&gt; {
+                    <span class="kw">let </span>ext: <span class="kw-2">&amp;</span>PostgresSchemaExt = <span class="self">self</span>.schemas().next.downcast_connector_data();
+                    out.push_str(<span class="string">&quot;  - &quot;</span>);
+                    out.push_str(<span class="kw-2">&amp;</span>ext.get_extension(create_extension.id).name);
+                    out.push(<span class="string">&#39;\n&#39;</span>);
                 }
-                <span class="ident">SqlMigrationStep::AlterExtension</span>(<span class="kw">_</span>) =&gt; {}
-                <span class="ident">SqlMigrationStep::DropExtension</span>(<span class="kw">_</span>) =&gt; {}
+                SqlMigrationStep::AlterExtension(<span class="kw">_</span>) =&gt; {}
+                SqlMigrationStep::DropExtension(<span class="kw">_</span>) =&gt; {}
             }
         }
 
-        <span class="ident">out</span>
+        out
     }
 }
 
-<span class="kw">fn</span> <span class="ident">render_column_changes</span>(<span class="ident">columns</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">changes</span>: <span class="kw-2">&amp;</span><span class="ident">ColumnChanges</span>, <span class="ident">sink</span>: <span class="kw-2">&amp;mut</span> <span class="ident">String</span>) {
-    <span class="kw">let</span> <span class="ident">readable_changes</span> <span class="op">=</span> <span class="ident">changes</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">change</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">change</span> {
-            <span class="ident">ColumnChange::Arity</span> =&gt; <span class="macro">format!</span>(
+<span class="kw">fn </span>render_column_changes(columns: Pair&lt;ColumnWalker&lt;<span class="lifetime">&#39;_</span>&gt;&gt;, changes: <span class="kw-2">&amp;</span>ColumnChanges, sink: <span class="kw-2">&amp;mut </span>String) {
+    <span class="kw">let </span>readable_changes = changes
+        .iter()
+        .map(|change| <span class="kw">match </span>change {
+            ColumnChange::Arity =&gt; <span class="macro">format!</span>(
                 <span class="string">&quot;changed from {:?} to {:?}&quot;</span>,
-                <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">arity</span>(),
-                <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">arity</span>()
+                columns.previous.arity(),
+                columns.next.arity()
             ),
-            <span class="ident">ColumnChange::Default</span> =&gt; <span class="macro">format!</span>(
+            ColumnChange::Default =&gt; <span class="macro">format!</span>(
                 <span class="string">&quot;default changed from `{:?}` to `{:?}`&quot;</span>,
-                <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">default</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">kind</span>()),
-                <span class="ident">columns</span>.<span class="ident">next</span>.<span class="ident">default</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">d</span><span class="op">|</span> <span class="ident">d</span>.<span class="ident">kind</span>())
+                columns.previous.default().map(|d| d.kind()),
+                columns.next.default().map(|d| d.kind())
             ),
-            <span class="ident">ColumnChange::TypeChanged</span> =&gt; <span class="string">&quot;type changed&quot;</span>.<span class="ident">to_owned</span>(),
-            <span class="ident">ColumnChange::Autoincrement</span> =&gt; {
-                <span class="kw">if</span> <span class="ident">columns</span>.<span class="ident">previous</span>.<span class="ident">is_autoincrement</span>() {
-                    <span class="string">&quot;column is no longer autoincrementing&quot;</span>.<span class="ident">to_owned</span>()
-                } <span class="kw">else</span> {
-                    <span class="string">&quot;column became autoincrementing&quot;</span>.<span class="ident">to_owned</span>()
+            ColumnChange::TypeChanged =&gt; <span class="string">&quot;type changed&quot;</span>.to_owned(),
+            ColumnChange::Autoincrement =&gt; {
+                <span class="kw">if </span>columns.previous.is_autoincrement() {
+                    <span class="string">&quot;column is no longer autoincrementing&quot;</span>.to_owned()
+                } <span class="kw">else </span>{
+                    <span class="string">&quot;column became autoincrementing&quot;</span>.to_owned()
                 }
             }
         })
-        .<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>);
+        .join(<span class="string">&quot;, &quot;</span>);
 
-    <span class="ident">sink</span>.<span class="ident">push</span>(<span class="string">&#39;(&#39;</span>);
-    <span class="ident">sink</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">readable_changes</span>);
-    <span class="ident">sink</span>.<span class="ident">push</span>(<span class="string">&#39;)&#39;</span>);
+    sink.push(<span class="string">&#39;(&#39;</span>);
+    sink.push_str(<span class="kw-2">&amp;</span>readable_changes);
+    sink.push(<span class="string">&#39;)&#39;</span>);
 }
 
-<span class="comment">// The order of the variants matters for sorting. The steps are sorted _first_</span>
-<span class="comment">// by variant, then by the contents. Since the contents are mostly indexes in a</span>
-<span class="comment">// SqlSchema struct, the natural ordering of the indexes matches well with what</span>
-<span class="comment">// you would intuitively expect.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">SqlMigrationStep</span> {
-    <span class="ident">CreateSchema</span>(<span class="ident">sql_schema_describer::NamespaceId</span>),
-    <span class="ident">DropExtension</span>(<span class="ident">DropExtension</span>),
-    <span class="ident">CreateExtension</span>(<span class="ident">CreateExtension</span>),
-    <span class="ident">AlterExtension</span>(<span class="ident">AlterExtension</span>),
-    <span class="ident">AlterSequence</span>(<span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>, <span class="ident">SequenceChanges</span>),
-    <span class="ident">DropView</span>(<span class="ident">DropView</span>),
-    <span class="ident">DropUserDefinedType</span>(<span class="ident">DropUserDefinedType</span>),
-    <span class="ident">CreateEnum</span>(<span class="ident">sql_schema_describer::EnumId</span>),
-    <span class="ident">AlterEnum</span>(<span class="ident">AlterEnum</span>),
-    <span class="ident">DropForeignKey</span> {
-        <span class="ident">foreign_key_id</span>: <span class="ident">ForeignKeyId</span>,
+<span class="comment">// The order of the variants matters for sorting. The steps are sorted _first_
+// by variant, then by the contents. Since the contents are mostly indexes in a
+// SqlSchema struct, the natural ordering of the indexes matches well with what
+// you would intuitively expect.
+</span><span class="attribute">#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>SqlMigrationStep {
+    CreateSchema(sql_schema_describer::NamespaceId),
+    DropExtension(DropExtension),
+    CreateExtension(CreateExtension),
+    AlterExtension(AlterExtension),
+    AlterSequence(Pair&lt;u32&gt;, SequenceChanges),
+    DropView(DropView),
+    DropUserDefinedType(DropUserDefinedType),
+    CreateEnum(sql_schema_describer::EnumId),
+    AlterEnum(AlterEnum),
+    DropForeignKey {
+        foreign_key_id: ForeignKeyId,
     },
-    <span class="ident">DropIndex</span> {
-        <span class="ident">index_id</span>: <span class="ident">IndexId</span>,
+    DropIndex {
+        index_id: IndexId,
     },
-    <span class="ident">AlterTable</span>(<span class="ident">AlterTable</span>),
-    <span class="ident">AlterPrimaryKey</span>(<span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">TableId</span><span class="op">&gt;</span>),
-    <span class="comment">// Order matters: we must drop tables before we create indexes,</span>
-    <span class="comment">// because on Postgres and SQLite, we may create indexes whose names</span>
-    <span class="comment">// clash with the names of indexes on the dropped tables.</span>
-    <span class="ident">DropTable</span> {
-        <span class="ident">table_id</span>: <span class="ident">TableId</span>,
+    AlterTable(AlterTable),
+    AlterPrimaryKey(Pair&lt;TableId&gt;),
+    <span class="comment">// Order matters: we must drop tables before we create indexes,
+    // because on Postgres and SQLite, we may create indexes whose names
+    // clash with the names of indexes on the dropped tables.
+    </span>DropTable {
+        table_id: TableId,
     },
-    <span class="comment">// Order matters:</span>
-    <span class="comment">// - We must drop enums before we create tables, because the new tables</span>
-    <span class="comment">//   might be named the same as the dropped enum, and that conflicts on</span>
-    <span class="comment">//   postgres.</span>
-    <span class="comment">// - We must drop enums after we drop tables, or dropping the enum will</span>
-    <span class="comment">//   fail on postgres because objects (=tables) still depend on them.</span>
-    <span class="ident">DropEnum</span>(<span class="ident">sql_schema_describer::EnumId</span>),
-    <span class="ident">CreateTable</span> {
-        <span class="ident">table_id</span>: <span class="ident">TableId</span>,
+    <span class="comment">// Order matters:
+    // - We must drop enums before we create tables, because the new tables
+    //   might be named the same as the dropped enum, and that conflicts on
+    //   postgres.
+    // - We must drop enums after we drop tables, or dropping the enum will
+    //   fail on postgres because objects (=tables) still depend on them.
+    </span>DropEnum(sql_schema_describer::EnumId),
+    CreateTable {
+        table_id: TableId,
     },
-    <span class="ident">RedefineTables</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RedefineTable</span><span class="op">&gt;</span>),
-    <span class="comment">// Order matters: we must create indexes after ALTER TABLEs because the indexes can be</span>
-    <span class="comment">// on fields that are dropped/created there.</span>
-    <span class="ident">CreateIndex</span> {
-        <span class="ident">table_id</span>: (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TableId</span><span class="op">&gt;</span>, <span class="ident">TableId</span>),
-        <span class="ident">index_id</span>: <span class="ident">IndexId</span>,
-        <span class="ident">from_drop_and_recreate</span>: <span class="ident">bool</span>,
+    RedefineTables(Vec&lt;RedefineTable&gt;),
+    <span class="comment">// Order matters: we must create indexes after ALTER TABLEs because the indexes can be
+    // on fields that are dropped/created there.
+    </span>CreateIndex {
+        table_id: (<span class="prelude-ty">Option</span>&lt;TableId&gt;, TableId),
+        index_id: IndexId,
+        from_drop_and_recreate: bool,
     },
-    <span class="ident">RenameForeignKey</span> {
-        <span class="ident">foreign_key_id</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ForeignKeyId</span><span class="op">&gt;</span>,
+    RenameForeignKey {
+        foreign_key_id: Pair&lt;ForeignKeyId&gt;,
     },
-    <span class="comment">// Order matters: this needs to come after create_indexes, because the foreign keys can depend on unique</span>
-    <span class="comment">// indexes created there.</span>
-    <span class="ident">AddForeignKey</span> {
-        <span class="ident">foreign_key_id</span>: <span class="ident">ForeignKeyId</span>,
+    <span class="comment">// Order matters: this needs to come after create_indexes, because the foreign keys can depend on unique
+    // indexes created there.
+    </span>AddForeignKey {
+        foreign_key_id: ForeignKeyId,
     },
-    <span class="ident">RenameIndex</span> {
-        <span class="ident">index</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">IndexId</span><span class="op">&gt;</span>,
+    RenameIndex {
+        index: Pair&lt;IndexId&gt;,
     },
-    <span class="ident">RedefineIndex</span> {
-        <span class="ident">index</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">IndexId</span><span class="op">&gt;</span>,
+    RedefineIndex {
+        index: Pair&lt;IndexId&gt;,
     },
 }
 
-<span class="kw">impl</span> <span class="ident">SqlMigrationStep</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">description</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">SqlMigrationStep::AddForeignKey</span> { .. } =&gt; <span class="string">&quot;AddForeignKey&quot;</span>,
-            <span class="ident">SqlMigrationStep::AlterEnum</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;AlterEnum&quot;</span>,
-            <span class="ident">SqlMigrationStep::AlterPrimaryKey</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;AlterPrimaryKey&quot;</span>,
-            <span class="ident">SqlMigrationStep::AlterSequence</span>(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="string">&quot;AlterSequence&quot;</span>,
-            <span class="ident">SqlMigrationStep::AlterTable</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;AlterTable&quot;</span>,
-            <span class="ident">SqlMigrationStep::CreateEnum</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;CreateEnum&quot;</span>,
-            <span class="ident">SqlMigrationStep::CreateIndex</span> { .. } =&gt; <span class="string">&quot;CreateIndex&quot;</span>,
-            <span class="ident">SqlMigrationStep::CreateSchema</span> { .. } =&gt; <span class="string">&quot;CreateSchema&quot;</span>,
-            <span class="ident">SqlMigrationStep::CreateTable</span> { .. } =&gt; <span class="string">&quot;CreateTable&quot;</span>,
-            <span class="ident">SqlMigrationStep::DropEnum</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;DropEnum&quot;</span>,
-            <span class="ident">SqlMigrationStep::DropForeignKey</span> { .. } =&gt; <span class="string">&quot;DropForeignKey&quot;</span>,
-            <span class="ident">SqlMigrationStep::DropIndex</span> { .. } =&gt; <span class="string">&quot;DropIndex&quot;</span>,
-            <span class="ident">SqlMigrationStep::DropTable</span> { .. } =&gt; <span class="string">&quot;DropTable&quot;</span>,
-            <span class="ident">SqlMigrationStep::DropUserDefinedType</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;DropUserDefinedType&quot;</span>,
-            <span class="ident">SqlMigrationStep::DropView</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;DropView&quot;</span>,
-            <span class="ident">SqlMigrationStep::RedefineIndex</span> { .. } =&gt; <span class="string">&quot;RedefineIndex&quot;</span>,
-            <span class="ident">SqlMigrationStep::RedefineTables</span> { .. } =&gt; <span class="string">&quot;RedefineTables&quot;</span>,
-            <span class="ident">SqlMigrationStep::RenameForeignKey</span> { .. } =&gt; <span class="string">&quot;RenameForeignKey&quot;</span>,
-            <span class="ident">SqlMigrationStep::RenameIndex</span> { .. } =&gt; <span class="string">&quot;RenameIndex&quot;</span>,
-            <span class="ident">SqlMigrationStep::CreateExtension</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;CreateExtension&quot;</span>,
-            <span class="ident">SqlMigrationStep::AlterExtension</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;AlterExtension&quot;</span>,
-            <span class="ident">SqlMigrationStep::DropExtension</span>(<span class="kw">_</span>) =&gt; <span class="string">&quot;DropExtension&quot;</span>,
+<span class="kw">impl </span>SqlMigrationStep {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>description(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str {
+        <span class="kw">match </span><span class="self">self </span>{
+            SqlMigrationStep::AddForeignKey { .. } =&gt; <span class="string">&quot;AddForeignKey&quot;</span>,
+            SqlMigrationStep::AlterEnum(<span class="kw">_</span>) =&gt; <span class="string">&quot;AlterEnum&quot;</span>,
+            SqlMigrationStep::AlterPrimaryKey(<span class="kw">_</span>) =&gt; <span class="string">&quot;AlterPrimaryKey&quot;</span>,
+            SqlMigrationStep::AlterSequence(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="string">&quot;AlterSequence&quot;</span>,
+            SqlMigrationStep::AlterTable(<span class="kw">_</span>) =&gt; <span class="string">&quot;AlterTable&quot;</span>,
+            SqlMigrationStep::CreateEnum(<span class="kw">_</span>) =&gt; <span class="string">&quot;CreateEnum&quot;</span>,
+            SqlMigrationStep::CreateIndex { .. } =&gt; <span class="string">&quot;CreateIndex&quot;</span>,
+            SqlMigrationStep::CreateSchema { .. } =&gt; <span class="string">&quot;CreateSchema&quot;</span>,
+            SqlMigrationStep::CreateTable { .. } =&gt; <span class="string">&quot;CreateTable&quot;</span>,
+            SqlMigrationStep::DropEnum(<span class="kw">_</span>) =&gt; <span class="string">&quot;DropEnum&quot;</span>,
+            SqlMigrationStep::DropForeignKey { .. } =&gt; <span class="string">&quot;DropForeignKey&quot;</span>,
+            SqlMigrationStep::DropIndex { .. } =&gt; <span class="string">&quot;DropIndex&quot;</span>,
+            SqlMigrationStep::DropTable { .. } =&gt; <span class="string">&quot;DropTable&quot;</span>,
+            SqlMigrationStep::DropUserDefinedType(<span class="kw">_</span>) =&gt; <span class="string">&quot;DropUserDefinedType&quot;</span>,
+            SqlMigrationStep::DropView(<span class="kw">_</span>) =&gt; <span class="string">&quot;DropView&quot;</span>,
+            SqlMigrationStep::RedefineIndex { .. } =&gt; <span class="string">&quot;RedefineIndex&quot;</span>,
+            SqlMigrationStep::RedefineTables { .. } =&gt; <span class="string">&quot;RedefineTables&quot;</span>,
+            SqlMigrationStep::RenameForeignKey { .. } =&gt; <span class="string">&quot;RenameForeignKey&quot;</span>,
+            SqlMigrationStep::RenameIndex { .. } =&gt; <span class="string">&quot;RenameIndex&quot;</span>,
+            SqlMigrationStep::CreateExtension(<span class="kw">_</span>) =&gt; <span class="string">&quot;CreateExtension&quot;</span>,
+            SqlMigrationStep::AlterExtension(<span class="kw">_</span>) =&gt; <span class="string">&quot;AlterExtension&quot;</span>,
+            SqlMigrationStep::DropExtension(<span class="kw">_</span>) =&gt; <span class="string">&quot;DropExtension&quot;</span>,
         }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">AlterExtension</span> {
-    <span class="kw">pub</span> <span class="ident">ids</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">postgres::ExtensionId</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">changes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ExtensionChange</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>AlterExtension {
+    <span class="kw">pub </span>ids: Pair&lt;postgres::ExtensionId&gt;,
+    <span class="kw">pub </span>changes: Vec&lt;ExtensionChange&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">CreateExtension</span> {
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">postgres::ExtensionId</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>CreateExtension {
+    <span class="kw">pub </span>id: postgres::ExtensionId,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">DropExtension</span> {
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">postgres::ExtensionId</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>DropExtension {
+    <span class="kw">pub </span>id: postgres::ExtensionId,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">ExtensionChange</span> {
-    <span class="ident">AlterVersion</span>,
-    <span class="ident">AlterSchema</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>ExtensionChange {
+    AlterVersion,
+    AlterSchema,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">AlterTable</span> {
-    <span class="kw">pub</span> <span class="ident">table_ids</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">TableId</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">changes</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">TableChange</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>AlterTable {
+    <span class="kw">pub </span>table_ids: Pair&lt;TableId&gt;,
+    <span class="kw">pub </span>changes: Vec&lt;TableChange&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">TableChange</span> {
-    <span class="ident">AddColumn</span> {
-        <span class="ident">column_id</span>: <span class="ident">ColumnId</span>,
-        <span class="ident">has_virtual_default</span>: <span class="ident">bool</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>TableChange {
+    AddColumn {
+        column_id: ColumnId,
+        has_virtual_default: bool,
     },
-    <span class="ident">AlterColumn</span>(<span class="ident">AlterColumn</span>),
-    <span class="ident">DropColumn</span> {
-        <span class="ident">column_id</span>: <span class="ident">ColumnId</span>,
+    AlterColumn(AlterColumn),
+    DropColumn {
+        column_id: ColumnId,
     },
-    <span class="ident">DropAndRecreateColumn</span> {
-        <span class="ident">column_id</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnId</span><span class="op">&gt;</span>,
-        <span class="doccomment">/// The change mask for the column.</span>
-        <span class="ident">changes</span>: <span class="ident">ColumnChanges</span>,
+    DropAndRecreateColumn {
+        column_id: Pair&lt;ColumnId&gt;,
+        <span class="doccomment">/// The change mask for the column.
+        </span>changes: ColumnChanges,
     },
-    <span class="ident">DropPrimaryKey</span>,
-    <span class="ident">AddPrimaryKey</span>,
-    <span class="ident">RenamePrimaryKey</span>,
+    DropPrimaryKey,
+    AddPrimaryKey,
+    RenamePrimaryKey,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">DropView</span> {
-    <span class="kw">pub</span> <span class="ident">view_id</span>: <span class="ident">ViewId</span>,
+<span class="attribute">#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>DropView {
+    <span class="kw">pub </span>view_id: ViewId,
 }
 
-<span class="kw">impl</span> <span class="ident">DropView</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">view_id</span>: <span class="ident">ViewId</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">view_id</span> }
+<span class="kw">impl </span>DropView {
+    <span class="kw">pub fn </span>new(view_id: ViewId) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ view_id }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">DropUserDefinedType</span> {
-    <span class="kw">pub</span> <span class="ident">udt_id</span>: <span class="ident">UdtId</span>,
+<span class="attribute">#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>DropUserDefinedType {
+    <span class="kw">pub </span>udt_id: UdtId,
 }
 
-<span class="kw">impl</span> <span class="ident">DropUserDefinedType</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">udt_id</span>: <span class="ident">UdtId</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> { <span class="ident">udt_id</span> }
+<span class="kw">impl </span>DropUserDefinedType {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(udt_id: UdtId) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{ udt_id }
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">AlterColumn</span> {
-    <span class="kw">pub</span> <span class="ident">column_id</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnId</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">changes</span>: <span class="ident">ColumnChanges</span>,
-    <span class="kw">pub</span> <span class="ident">type_change</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ColumnTypeChange</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>AlterColumn {
+    <span class="kw">pub </span>column_id: Pair&lt;ColumnId&gt;,
+    <span class="kw">pub </span>changes: ColumnChanges,
+    <span class="kw">pub </span>type_change: <span class="prelude-ty">Option</span>&lt;ColumnTypeChange&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">ColumnTypeChange</span> {
-    <span class="ident">RiskyCast</span>,
-    <span class="ident">SafeCast</span>,
-    <span class="ident">NotCastable</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>ColumnTypeChange {
+    RiskyCast,
+    SafeCast,
+    NotCastable,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">AlterEnum</span> {
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">EnumId</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">created_variants</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">dropped_variants</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// This should be intepreted as prev_colidx, Option&lt;next_colidx&gt;) The second item in the tuple</span>
-    <span class="doccomment">/// is `Some` _only_ when the next column has the same enum as a default, such that the default</span>
-    <span class="doccomment">/// would need to be reinstalled after the drop.</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::type_complexity</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">previous_usages_as_default</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">ColumnId</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ColumnId</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>AlterEnum {
+    <span class="kw">pub </span>id: Pair&lt;EnumId&gt;,
+    <span class="kw">pub </span>created_variants: Vec&lt;String&gt;,
+    <span class="kw">pub </span>dropped_variants: Vec&lt;String&gt;,
+    <span class="doccomment">/// This should be intepreted as prev_colidx, Option&lt;next_colidx&gt;) The second item in the tuple
+    /// is `Some` _only_ when the next column has the same enum as a default, such that the default
+    /// would need to be reinstalled after the drop.
+    </span><span class="attribute">#[allow(clippy::type_complexity)]
+    </span><span class="kw">pub </span>previous_usages_as_default: Vec&lt;(ColumnId, <span class="prelude-ty">Option</span>&lt;ColumnId&gt;)&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">AlterEnum</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">created_variants</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">dropped_variants</span>.<span class="ident">is_empty</span>()
+<span class="kw">impl </span>AlterEnum {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>is_empty(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.created_variants.is_empty() &amp;&amp; <span class="self">self</span>.dropped_variants.is_empty()
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">RedefineTable</span> {
-    <span class="kw">pub</span> <span class="ident">added_columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ColumnId</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">added_columns_with_virtual_defaults</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ColumnId</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">dropped_columns</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ColumnId</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">dropped_primary_key</span>: <span class="ident">bool</span>,
-    <span class="kw">pub</span> <span class="ident">column_pairs</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">ColumnId</span><span class="op">&gt;</span>, <span class="ident">ColumnChanges</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ColumnTypeChange</span><span class="op">&gt;</span>)<span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">table_ids</span>: <span class="ident">Pair</span><span class="op">&lt;</span><span class="ident">TableId</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>RedefineTable {
+    <span class="kw">pub </span>added_columns: Vec&lt;ColumnId&gt;,
+    <span class="kw">pub </span>added_columns_with_virtual_defaults: Vec&lt;ColumnId&gt;,
+    <span class="kw">pub </span>dropped_columns: Vec&lt;ColumnId&gt;,
+    <span class="kw">pub </span>dropped_primary_key: bool,
+    <span class="kw">pub </span>column_pairs: Vec&lt;(Pair&lt;ColumnId&gt;, ColumnChanges, <span class="prelude-ty">Option</span>&lt;ColumnTypeChange&gt;)&gt;,
+    <span class="kw">pub </span>table_ids: Pair&lt;TableId&gt;,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">SequenceChanges</span>(<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">BitFlags</span><span class="op">&lt;</span><span class="ident">SequenceChange</span><span class="op">&gt;</span>);
+<span class="attribute">#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>SequenceChanges(<span class="kw">pub</span>(<span class="kw">crate</span>) BitFlags&lt;SequenceChange&gt;);
 
-<span class="kw">impl</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="ident">SequenceChanges</span> {
-    <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">std::cmp::Ordering</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">bits</span>().<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="number">0</span>.<span class="ident">bits</span>()))
+<span class="kw">impl </span>PartialOrd <span class="kw">for </span>SequenceChanges {
+    <span class="kw">fn </span>partial_cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;std::cmp::Ordering&gt; {
+        <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="number">0</span>.bits().cmp(<span class="kw-2">&amp;</span>other.<span class="number">0</span>.bits()))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="ident">SequenceChanges</span> {
-    <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident">std::cmp::Ordering</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">bits</span>().<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="number">0</span>.<span class="ident">bits</span>())
+<span class="kw">impl </span>Ord <span class="kw">for </span>SequenceChanges {
+    <span class="kw">fn </span>cmp(<span class="kw-2">&amp;</span><span class="self">self</span>, other: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; std::cmp::Ordering {
+        <span class="self">self</span>.<span class="number">0</span>.bits().cmp(<span class="kw-2">&amp;</span>other.<span class="number">0</span>.bits())
     }
 }
 
-<span class="attribute">#[<span class="ident">enumflags2::bitflags</span>]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">SequenceChange</span> {
-    <span class="ident">MinValue</span> <span class="op">=</span> <span class="number">1</span>,
-    <span class="ident">MaxValue</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>,
-    <span class="ident">Start</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">2</span>,
-    <span class="ident">Cache</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>,
-    <span class="ident">Increment</span> <span class="op">=</span> <span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">4</span>,
+<span class="attribute">#[enumflags2::bitflags]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[repr(u8)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum </span>SequenceChange {
+    MinValue = <span class="number">1</span>,
+    MaxValue = <span class="number">1 </span>&lt;&lt; <span class="number">1</span>,
+    Start = <span class="number">1 </span>&lt;&lt; <span class="number">2</span>,
+    Cache = <span class="number">1 </span>&lt;&lt; <span class="number">3</span>,
+    Increment = <span class="number">1 </span>&lt;&lt; <span class="number">4</span>,
 }
 
-<span class="kw">fn</span> <span class="ident">render_primary_key_column_names</span>(<span class="ident">table</span>: <span class="ident">TableWalker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> <span class="ident">String</span>) {
-    <span class="kw">let</span> <span class="ident">cols</span> <span class="op">=</span> <span class="ident">table</span>
-        .<span class="ident">primary_key_columns</span>()
-        .<span class="ident">into_iter</span>()
-        .<span class="ident">flatten</span>()
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>())
-        .<span class="ident">join</span>(<span class="string">&quot;, &quot;</span>);
-    <span class="ident">out</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="ident">cols</span>);
+<span class="kw">fn </span>render_primary_key_column_names(table: TableWalker&lt;<span class="lifetime">&#39;_</span>&gt;, out: <span class="kw-2">&amp;mut </span>String) {
+    <span class="kw">let </span>cols = table
+        .primary_key_columns()
+        .into_iter()
+        .flatten()
+        .map(|c| c.name())
+        .join(<span class="string">&quot;, &quot;</span>);
+    out.push_str(<span class="kw-2">&amp;</span>cols);
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sql_migration_connector" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

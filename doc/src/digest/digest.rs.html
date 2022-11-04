@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/digest-0.10.3/src/digest.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>digest.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/RustCrypto/media/6ee8e381/logo.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../digest/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/RustCrypto/media/6ee8e381/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../digest/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/digest-0.10.3/src/digest.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>digest.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" href="https://raw.githubusercontent.com/RustCrypto/media/6ee8e381/logo.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../digest/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/RustCrypto/media/6ee8e381/logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../digest/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/RustCrypto/media/6ee8e381/logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../digest/index.html">
                         <img src="https://raw.githubusercontent.com/RustCrypto/media/6ee8e381/logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -236,241 +236,241 @@
 <span id="234">234</span>
 <span id="235">235</span>
 <span id="236">236</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">FixedOutput</span>, <span class="ident">FixedOutputReset</span>, <span class="ident">InvalidBufferSize</span>, <span class="ident">Reset</span>, <span class="ident">Update</span>};
-<span class="kw">use</span> <span class="ident">crypto_common</span>::{<span class="ident">typenum::Unsigned</span>, <span class="ident">Output</span>, <span class="ident">OutputSizeUser</span>};
+</pre><pre class="rust"><code><span class="kw">use super</span>::{FixedOutput, FixedOutputReset, InvalidBufferSize, Reset, Update};
+<span class="kw">use </span>crypto_common::{typenum::Unsigned, Output, OutputSizeUser};
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">alloc::boxed::Box</span>;
+<span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+</span><span class="kw">use </span>alloc::boxed::Box;
 
-<span class="doccomment">/// Marker trait for cryptographic hash functions.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">HashMarker</span> {}
+<span class="doccomment">/// Marker trait for cryptographic hash functions.
+</span><span class="kw">pub trait </span>HashMarker {}
 
-<span class="doccomment">/// Convinience wrapper trait covering functionality of cryptographic hash</span>
-<span class="doccomment">/// functions with fixed output size.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This trait wraps [`Update`], [`FixedOutput`], [`Default`], and</span>
-<span class="doccomment">/// [`HashMarker`] traits and provides additional convenience methods.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Digest</span>: <span class="ident">OutputSizeUser</span> {
-    <span class="doccomment">/// Create new hasher instance.</span>
-    <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span>;
+<span class="doccomment">/// Convinience wrapper trait covering functionality of cryptographic hash
+/// functions with fixed output size.
+///
+/// This trait wraps [`Update`], [`FixedOutput`], [`Default`], and
+/// [`HashMarker`] traits and provides additional convenience methods.
+</span><span class="kw">pub trait </span>Digest: OutputSizeUser {
+    <span class="doccomment">/// Create new hasher instance.
+    </span><span class="kw">fn </span>new() -&gt; <span class="self">Self</span>;
 
-    <span class="doccomment">/// Create new hasher instance which has processed the provided data.</span>
-    <span class="kw">fn</span> <span class="ident">new_with_prefix</span>(<span class="ident">data</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) -&gt; <span class="self">Self</span>;
+    <span class="doccomment">/// Create new hasher instance which has processed the provided data.
+    </span><span class="kw">fn </span>new_with_prefix(data: <span class="kw">impl </span>AsRef&lt;[u8]&gt;) -&gt; <span class="self">Self</span>;
 
-    <span class="doccomment">/// Process data, updating the internal state.</span>
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>);
+    <span class="doccomment">/// Process data, updating the internal state.
+    </span><span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, data: <span class="kw">impl </span>AsRef&lt;[u8]&gt;);
 
-    <span class="doccomment">/// Process input data in a chained manner.</span>
-    <span class="attribute">#[<span class="ident">must_use</span>]</span>
-    <span class="kw">fn</span> <span class="ident">chain_update</span>(<span class="self">self</span>, <span class="ident">data</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) -&gt; <span class="self">Self</span>;
+    <span class="doccomment">/// Process input data in a chained manner.
+    </span><span class="attribute">#[must_use]
+    </span><span class="kw">fn </span>chain_update(<span class="self">self</span>, data: <span class="kw">impl </span>AsRef&lt;[u8]&gt;) -&gt; <span class="self">Self</span>;
 
-    <span class="doccomment">/// Retrieve result and consume hasher instance.</span>
-    <span class="kw">fn</span> <span class="ident">finalize</span>(<span class="self">self</span>) -&gt; <span class="ident">Output</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Retrieve result and consume hasher instance.
+    </span><span class="kw">fn </span>finalize(<span class="self">self</span>) -&gt; Output&lt;<span class="self">Self</span>&gt;;
 
-    <span class="doccomment">/// Write result into provided array and consume the hasher instance.</span>
-    <span class="kw">fn</span> <span class="ident">finalize_into</span>(<span class="self">self</span>, <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Output</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>);
+    <span class="doccomment">/// Write result into provided array and consume the hasher instance.
+    </span><span class="kw">fn </span>finalize_into(<span class="self">self</span>, out: <span class="kw-2">&amp;mut </span>Output&lt;<span class="self">Self</span>&gt;);
 
-    <span class="doccomment">/// Retrieve result and reset hasher instance.</span>
-    <span class="kw">fn</span> <span class="ident">finalize_reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Output</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">FixedOutputReset</span>;
+    <span class="doccomment">/// Retrieve result and reset hasher instance.
+    </span><span class="kw">fn </span>finalize_reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Output&lt;<span class="self">Self</span>&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: FixedOutputReset;
 
-    <span class="doccomment">/// Write result into provided array and reset the hasher instance.</span>
-    <span class="kw">fn</span> <span class="ident">finalize_into_reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Output</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>)
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">FixedOutputReset</span>;
+    <span class="doccomment">/// Write result into provided array and reset the hasher instance.
+    </span><span class="kw">fn </span>finalize_into_reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>, out: <span class="kw-2">&amp;mut </span>Output&lt;<span class="self">Self</span>&gt;)
+    <span class="kw">where
+        </span><span class="self">Self</span>: FixedOutputReset;
 
-    <span class="doccomment">/// Reset hasher instance to its initial state.</span>
-    <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>)
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Reset</span>;
+    <span class="doccomment">/// Reset hasher instance to its initial state.
+    </span><span class="kw">fn </span>reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>)
+    <span class="kw">where
+        </span><span class="self">Self</span>: Reset;
 
-    <span class="doccomment">/// Get output size of the hasher</span>
-    <span class="kw">fn</span> <span class="ident">output_size</span>() -&gt; <span class="ident">usize</span>;
+    <span class="doccomment">/// Get output size of the hasher
+    </span><span class="kw">fn </span>output_size() -&gt; usize;
 
-    <span class="doccomment">/// Compute hash of `data`.</span>
-    <span class="kw">fn</span> <span class="ident">digest</span>(<span class="ident">data</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) -&gt; <span class="ident">Output</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Compute hash of `data`.
+    </span><span class="kw">fn </span>digest(data: <span class="kw">impl </span>AsRef&lt;[u8]&gt;) -&gt; Output&lt;<span class="self">Self</span>&gt;;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">FixedOutput</span> <span class="op">+</span> <span class="ident">Default</span> <span class="op">+</span> <span class="ident">Update</span> <span class="op">+</span> <span class="ident">HashMarker</span><span class="op">&gt;</span> <span class="ident">Digest</span> <span class="kw">for</span> <span class="ident">D</span> {
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::default</span>()
+<span class="kw">impl</span>&lt;D: FixedOutput + Default + Update + HashMarker&gt; Digest <span class="kw">for </span>D {
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::default()
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">new_with_prefix</span>(<span class="ident">data</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) -&gt; <span class="self">Self</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Default</span> <span class="op">+</span> <span class="ident">Sized</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>new_with_prefix(data: <span class="kw">impl </span>AsRef&lt;[u8]&gt;) -&gt; <span class="self">Self
+    </span><span class="kw">where
+        </span><span class="self">Self</span>: Default + Sized,
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::default</span>();
-        <span class="ident">h</span>.<span class="ident">update</span>(<span class="ident">data</span>.<span class="ident">as_ref</span>());
-        <span class="ident">h</span>
+        <span class="kw">let </span><span class="kw-2">mut </span>h = <span class="self">Self</span>::default();
+        h.update(data.as_ref());
+        h
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) {
-        <span class="ident">Update::update</span>(<span class="self">self</span>, <span class="ident">data</span>.<span class="ident">as_ref</span>());
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, data: <span class="kw">impl </span>AsRef&lt;[u8]&gt;) {
+        Update::update(<span class="self">self</span>, data.as_ref());
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">chain_update</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Update::update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">data</span>.<span class="ident">as_ref</span>());
-        <span class="self">self</span>
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>chain_update(<span class="kw-2">mut </span><span class="self">self</span>, data: <span class="kw">impl </span>AsRef&lt;[u8]&gt;) -&gt; <span class="self">Self </span>{
+        Update::update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, data.as_ref());
+        <span class="self">self
+    </span>}
+
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>finalize(<span class="self">self</span>) -&gt; Output&lt;<span class="self">Self</span>&gt; {
+        FixedOutput::finalize_fixed(<span class="self">self</span>)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">finalize</span>(<span class="self">self</span>) -&gt; <span class="ident">Output</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="ident">FixedOutput::finalize_fixed</span>(<span class="self">self</span>)
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>finalize_into(<span class="self">self</span>, out: <span class="kw-2">&amp;mut </span>Output&lt;<span class="self">Self</span>&gt;) {
+        FixedOutput::finalize_into(<span class="self">self</span>, out);
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">finalize_into</span>(<span class="self">self</span>, <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Output</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) {
-        <span class="ident">FixedOutput::finalize_into</span>(<span class="self">self</span>, <span class="ident">out</span>);
-    }
-
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">finalize_reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Output</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">FixedOutputReset</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>finalize_reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Output&lt;<span class="self">Self</span>&gt;
+    <span class="kw">where
+        </span><span class="self">Self</span>: FixedOutputReset,
     {
-        <span class="ident">FixedOutputReset::finalize_fixed_reset</span>(<span class="self">self</span>)
+        FixedOutputReset::finalize_fixed_reset(<span class="self">self</span>)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">finalize_into_reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Output</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>)
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">FixedOutputReset</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>finalize_into_reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>, out: <span class="kw-2">&amp;mut </span>Output&lt;<span class="self">Self</span>&gt;)
+    <span class="kw">where
+        </span><span class="self">Self</span>: FixedOutputReset,
     {
-        <span class="ident">FixedOutputReset::finalize_into_reset</span>(<span class="self">self</span>, <span class="ident">out</span>);
+        FixedOutputReset::finalize_into_reset(<span class="self">self</span>, out);
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>)
-    <span class="kw">where</span>
-        <span class="self">Self</span>: <span class="ident">Reset</span>,
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>)
+    <span class="kw">where
+        </span><span class="self">Self</span>: Reset,
     {
-        <span class="ident">Reset::reset</span>(<span class="self">self</span>)
+        Reset::reset(<span class="self">self</span>)
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">output_size</span>() -&gt; <span class="ident">usize</span> {
-        <span class="ident"><span class="self">Self</span>::OutputSize::to_usize</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>output_size() -&gt; usize {
+        <span class="self">Self</span>::OutputSize::to_usize()
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">digest</span>(<span class="ident">data</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) -&gt; <span class="ident">Output</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hasher</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::default</span>();
-        <span class="ident">hasher</span>.<span class="ident">update</span>(<span class="ident">data</span>.<span class="ident">as_ref</span>());
-        <span class="ident">hasher</span>.<span class="ident">finalize</span>()
+    <span class="attribute">#[inline]
+    </span><span class="kw">fn </span>digest(data: <span class="kw">impl </span>AsRef&lt;[u8]&gt;) -&gt; Output&lt;<span class="self">Self</span>&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>hasher = <span class="self">Self</span>::default();
+        hasher.update(data.as_ref());
+        hasher.finalize()
     }
 }
 
-<span class="doccomment">/// Modification of the [`Digest`] trait suitable for trait objects.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DynDigest</span> {
-    <span class="doccomment">/// Digest input data.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This method can be called repeatedly for use with streaming messages.</span>
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]);
+<span class="doccomment">/// Modification of the [`Digest`] trait suitable for trait objects.
+</span><span class="kw">pub trait </span>DynDigest {
+    <span class="doccomment">/// Digest input data.
+    ///
+    /// This method can be called repeatedly for use with streaming messages.
+    </span><span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, data: <span class="kw-2">&amp;</span>[u8]);
 
-    <span class="doccomment">/// Retrieve result and reset hasher instance</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)))]</span>
-    <span class="kw">fn</span> <span class="ident">finalize_reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0</span>; <span class="self">self</span>.<span class="ident">output_size</span>()];
-        <span class="self">self</span>.<span class="ident">finalize_into_reset</span>(<span class="kw-2">&amp;mut</span> <span class="ident">result</span>).<span class="ident">unwrap</span>();
-        <span class="ident">result</span>.<span class="ident">into_boxed_slice</span>()
+    <span class="doccomment">/// Retrieve result and reset hasher instance
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;alloc&quot;</span>)))]
+    </span><span class="kw">fn </span>finalize_reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Box&lt;[u8]&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>result = <span class="macro">vec!</span>[<span class="number">0</span>; <span class="self">self</span>.output_size()];
+        <span class="self">self</span>.finalize_into_reset(<span class="kw-2">&amp;mut </span>result).unwrap();
+        result.into_boxed_slice()
     }
 
-    <span class="doccomment">/// Retrieve result and consume boxed hasher instance</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)))]</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::boxed_local</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">finalize</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0</span>; <span class="self">self</span>.<span class="ident">output_size</span>()];
-        <span class="self">self</span>.<span class="ident">finalize_into_reset</span>(<span class="kw-2">&amp;mut</span> <span class="ident">result</span>).<span class="ident">unwrap</span>();
-        <span class="ident">result</span>.<span class="ident">into_boxed_slice</span>()
+    <span class="doccomment">/// Retrieve result and consume boxed hasher instance
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;alloc&quot;</span>)))]
+    #[allow(clippy::boxed_local)]
+    </span><span class="kw">fn </span>finalize(<span class="kw-2">mut </span><span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;) -&gt; Box&lt;[u8]&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>result = <span class="macro">vec!</span>[<span class="number">0</span>; <span class="self">self</span>.output_size()];
+        <span class="self">self</span>.finalize_into_reset(<span class="kw-2">&amp;mut </span>result).unwrap();
+        result.into_boxed_slice()
     }
 
-    <span class="doccomment">/// Write result into provided array and consume the hasher instance.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns error if buffer length is not equal to `output_size`.</span>
-    <span class="kw">fn</span> <span class="ident">finalize_into</span>(<span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">InvalidBufferSize</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Write result into provided array and consume the hasher instance.
+    ///
+    /// Returns error if buffer length is not equal to `output_size`.
+    </span><span class="kw">fn </span>finalize_into(<span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;(), InvalidBufferSize&gt;;
 
-    <span class="doccomment">/// Write result into provided array and reset the hasher instance.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns error if buffer length is not equal to `output_size`.</span>
-    <span class="kw">fn</span> <span class="ident">finalize_into_reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">out</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">InvalidBufferSize</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Write result into provided array and reset the hasher instance.
+    ///
+    /// Returns error if buffer length is not equal to `output_size`.
+    </span><span class="kw">fn </span>finalize_into_reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>, out: <span class="kw-2">&amp;mut </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;(), InvalidBufferSize&gt;;
 
-    <span class="doccomment">/// Reset hasher instance to its initial state.</span>
-    <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>);
+    <span class="doccomment">/// Reset hasher instance to its initial state.
+    </span><span class="kw">fn </span>reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>);
 
-    <span class="doccomment">/// Get output size of the hasher</span>
-    <span class="kw">fn</span> <span class="ident">output_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span>;
+    <span class="doccomment">/// Get output size of the hasher
+    </span><span class="kw">fn </span>output_size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize;
 
-    <span class="doccomment">/// Clone hasher state into a boxed trait object</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)))]</span>
-    <span class="kw">fn</span> <span class="ident">box_clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">DynDigest</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Clone hasher state into a boxed trait object
+    </span><span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+    #[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;alloc&quot;</span>)))]
+    </span><span class="kw">fn </span>box_clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Box&lt;<span class="kw">dyn </span>DynDigest&gt;;
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Update</span> <span class="op">+</span> <span class="ident">FixedOutputReset</span> <span class="op">+</span> <span class="ident">Reset</span> <span class="op">+</span> <span class="ident">Clone</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span> <span class="ident">DynDigest</span> <span class="kw">for</span> <span class="ident">D</span> {
-    <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
-        <span class="ident">Update::update</span>(<span class="self">self</span>, <span class="ident">data</span>);
+<span class="kw">impl</span>&lt;D: Update + FixedOutputReset + Reset + Clone + <span class="lifetime">&#39;static</span>&gt; DynDigest <span class="kw">for </span>D {
+    <span class="kw">fn </span>update(<span class="kw-2">&amp;mut </span><span class="self">self</span>, data: <span class="kw-2">&amp;</span>[u8]) {
+        Update::update(<span class="self">self</span>, data);
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">finalize_reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> {
-        <span class="ident">FixedOutputReset::finalize_fixed_reset</span>(<span class="self">self</span>)
-            .<span class="ident">to_vec</span>()
-            .<span class="ident">into_boxed_slice</span>()
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+    </span><span class="kw">fn </span>finalize_reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Box&lt;[u8]&gt; {
+        FixedOutputReset::finalize_fixed_reset(<span class="self">self</span>)
+            .to_vec()
+            .into_boxed_slice()
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">finalize</span>(<span class="self">self</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span> {
-        <span class="ident">FixedOutput::finalize_fixed</span>(<span class="kw-2">*</span><span class="self">self</span>)
-            .<span class="ident">to_vec</span>()
-            .<span class="ident">into_boxed_slice</span>()
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+    </span><span class="kw">fn </span>finalize(<span class="self">self</span>: Box&lt;<span class="self">Self</span>&gt;) -&gt; Box&lt;[u8]&gt; {
+        FixedOutput::finalize_fixed(<span class="kw-2">*</span><span class="self">self</span>)
+            .to_vec()
+            .into_boxed_slice()
     }
 
-    <span class="kw">fn</span> <span class="ident">finalize_into</span>(<span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">InvalidBufferSize</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="self">self</span>.<span class="ident">output_size</span>() {
-            <span class="ident">FixedOutput::finalize_into</span>(<span class="self">self</span>, <span class="ident">Output</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="ident">::from_mut_slice</span>(<span class="ident">buf</span>));
+    <span class="kw">fn </span>finalize_into(<span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;(), InvalidBufferSize&gt; {
+        <span class="kw">if </span>buf.len() == <span class="self">self</span>.output_size() {
+            FixedOutput::finalize_into(<span class="self">self</span>, Output::&lt;<span class="self">Self</span>&gt;::from_mut_slice(buf));
             <span class="prelude-val">Ok</span>(())
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">InvalidBufferSize</span>)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(InvalidBufferSize)
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">finalize_into_reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">InvalidBufferSize</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="self">self</span>.<span class="ident">output_size</span>() {
-            <span class="ident">FixedOutputReset::finalize_into_reset</span>(<span class="self">self</span>, <span class="ident">Output</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="ident">::from_mut_slice</span>(<span class="ident">buf</span>));
+    <span class="kw">fn </span>finalize_into_reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>, buf: <span class="kw-2">&amp;mut </span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;(), InvalidBufferSize&gt; {
+        <span class="kw">if </span>buf.len() == <span class="self">self</span>.output_size() {
+            FixedOutputReset::finalize_into_reset(<span class="self">self</span>, Output::&lt;<span class="self">Self</span>&gt;::from_mut_slice(buf));
             <span class="prelude-val">Ok</span>(())
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="ident">InvalidBufferSize</span>)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(InvalidBufferSize)
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">reset</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="ident">Reset::reset</span>(<span class="self">self</span>);
+    <span class="kw">fn </span>reset(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        Reset::reset(<span class="self">self</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">output_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="op">&lt;</span><span class="self">Self</span> <span class="kw">as</span> <span class="ident">OutputSizeUser</span><span class="op">&gt;</span><span class="ident">::OutputSize::to_usize</span>()
+    <span class="kw">fn </span>output_size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        &lt;<span class="self">Self </span><span class="kw">as </span>OutputSizeUser&gt;::OutputSize::to_usize()
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">box_clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">DynDigest</span><span class="op">&gt;</span> {
-        <span class="ident">Box::new</span>(<span class="self">self</span>.<span class="ident">clone</span>())
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+    </span><span class="kw">fn </span>box_clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Box&lt;<span class="kw">dyn </span>DynDigest&gt; {
+        Box::new(<span class="self">self</span>.clone())
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;alloc&quot;</span>)))]</span>
-<span class="kw">impl</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">DynDigest</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">box_clone</span>()
+<span class="attribute">#[cfg(feature = <span class="string">&quot;alloc&quot;</span>)]
+#[cfg_attr(docsrs, doc(cfg(feature = <span class="string">&quot;alloc&quot;</span>)))]
+</span><span class="kw">impl </span>Clone <span class="kw">for </span>Box&lt;<span class="kw">dyn </span>DynDigest&gt; {
+    <span class="kw">fn </span>clone(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.box_clone()
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="digest" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="digest" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

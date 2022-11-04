@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/transport/service/tls.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tls.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tonic/index.html"><div class="logo-container">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tonic-0.6.2/src/transport/service/tls.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>tls.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../tonic/index.html"><div class="logo-container"><img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../tonic/index.html"><div class="logo-container">
                     <img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../tonic/index.html">
                         <img src="https://raw.githubusercontent.com/tokio-rs/website/master/public/img/icons/tonic.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
@@ -247,252 +247,252 @@
 <span id="245">245</span>
 <span id="246">246</span>
 <span id="247">247</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::io::BoxedIo</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::transport</span>::{
-    <span class="ident">server</span>::{<span class="ident">Connected</span>, <span class="ident">TlsStream</span>},
-    <span class="ident">Certificate</span>, <span class="ident">Identity</span>,
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">super</span>::io::BoxedIo;
+<span class="kw">use </span><span class="kw">crate</span>::transport::{
+    server::{Connected, TlsStream},
+    Certificate, Identity,
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls-roots&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">rustls_native_certs</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">sync::Arc</span>};
-<span class="kw">use</span> <span class="ident">tokio::io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">tokio_rustls</span>::{
-    <span class="ident">rustls</span>::{<span class="ident">ClientConfig</span>, <span class="ident">NoClientAuth</span>, <span class="ident">ServerConfig</span>, <span class="ident">Session</span>},
-    <span class="ident">webpki::DNSNameRef</span>,
-    <span class="ident">TlsAcceptor</span> <span class="kw">as</span> <span class="ident">RustlsAcceptor</span>, <span class="ident">TlsConnector</span> <span class="kw">as</span> <span class="ident">RustlsConnector</span>,
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tls-roots&quot;</span>)]
+</span><span class="kw">use </span>rustls_native_certs;
+<span class="kw">use </span>std::{fmt, sync::Arc};
+<span class="kw">use </span>tokio::io::{AsyncRead, AsyncWrite};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+</span><span class="kw">use </span>tokio_rustls::{
+    rustls::{ClientConfig, NoClientAuth, ServerConfig, Session},
+    webpki::DNSNameRef,
+    TlsAcceptor <span class="kw">as </span>RustlsAcceptor, TlsConnector <span class="kw">as </span>RustlsConnector,
 };
 
-<span class="doccomment">/// h2 alpn in plain format for rustls.</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-<span class="kw">const</span> <span class="ident">ALPN_H2</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;h2&quot;</span>;
+<span class="doccomment">/// h2 alpn in plain format for rustls.
+</span><span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+</span><span class="kw">const </span>ALPN_H2: <span class="kw-2">&amp;</span>str = <span class="string">&quot;h2&quot;</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
-<span class="kw">enum</span> <span class="ident">TlsError</span> {
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
-    <span class="ident">H2NotNegotiated</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-    <span class="ident">CertificateParseError</span>,
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-    <span class="ident">PrivateKeyParseError</span>,
+<span class="attribute">#[derive(Debug)]
+</span><span class="kw">enum </span>TlsError {
+    <span class="attribute">#[allow(dead_code)]
+    </span>H2NotNegotiated,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+    </span>CertificateParseError,
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+    </span>PrivateKeyParseError,
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">TlsConnector</span> {
-    <span class="ident">config</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ClientConfig</span><span class="op">&gt;</span>,
-    <span class="ident">domain</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TlsConnector {
+    config: Arc&lt;ClientConfig&gt;,
+    domain: Arc&lt;String&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">TlsConnector</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_with_rustls_cert</span>(
-        <span class="ident">ca_cert</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Certificate</span><span class="op">&gt;</span>,
-        <span class="ident">identity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Identity</span><span class="op">&gt;</span>,
-        <span class="ident">domain</span>: <span class="ident">String</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">config</span> <span class="op">=</span> <span class="ident">ClientConfig::new</span>();
-        <span class="ident">config</span>.<span class="ident">set_protocols</span>(<span class="kw-2">&amp;</span>[<span class="ident">Vec::from</span>(<span class="ident">ALPN_H2</span>)]);
+<span class="kw">impl </span>TlsConnector {
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new_with_rustls_cert(
+        ca_cert: <span class="prelude-ty">Option</span>&lt;Certificate&gt;,
+        identity: <span class="prelude-ty">Option</span>&lt;Identity&gt;,
+        domain: String,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="kw">crate</span>::Error&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>config = ClientConfig::new();
+        config.set_protocols(<span class="kw-2">&amp;</span>[Vec::from(ALPN_H2)]);
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">identity</span>) <span class="op">=</span> <span class="ident">identity</span> {
-            <span class="kw">let</span> (<span class="ident">client_cert</span>, <span class="ident">client_key</span>) <span class="op">=</span> <span class="ident">rustls_keys::load_identity</span>(<span class="ident">identity</span>)<span class="question-mark">?</span>;
-            <span class="ident">config</span>.<span class="ident">set_single_client_cert</span>(<span class="ident">client_cert</span>, <span class="ident">client_key</span>)<span class="question-mark">?</span>;
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(identity) = identity {
+            <span class="kw">let </span>(client_cert, client_key) = rustls_keys::load_identity(identity)<span class="question-mark">?</span>;
+            config.set_single_client_cert(client_cert, client_key)<span class="question-mark">?</span>;
         }
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls-roots&quot;</span>)]</span>
-        {
-            <span class="ident">config</span>.<span class="ident">root_store</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">rustls_native_certs::load_native_certs</span>() {
-                <span class="prelude-val">Ok</span>(<span class="ident">store</span>) <span class="op">|</span> <span class="prelude-val">Err</span>((<span class="prelude-val">Some</span>(<span class="ident">store</span>), <span class="kw">_</span>)) =&gt; <span class="ident">store</span>,
-                <span class="prelude-val">Err</span>((<span class="prelude-val">None</span>, <span class="ident">error</span>)) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">error</span>.<span class="ident">into</span>()),
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;tls-roots&quot;</span>)]
+        </span>{
+            config.root_store = <span class="kw">match </span>rustls_native_certs::load_native_certs() {
+                <span class="prelude-val">Ok</span>(store) | <span class="prelude-val">Err</span>((<span class="prelude-val">Some</span>(store), <span class="kw">_</span>)) =&gt; store,
+                <span class="prelude-val">Err</span>((<span class="prelude-val">None</span>, error)) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(error.into()),
             };
         }
 
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls-webpki-roots&quot;</span>)]</span>
-        {
-            <span class="ident">config</span>
-                .<span class="ident">root_store</span>
-                .<span class="ident">add_server_trust_anchors</span>(<span class="kw-2">&amp;</span><span class="ident">webpki_roots::TLS_SERVER_ROOTS</span>);
+        <span class="attribute">#[cfg(feature = <span class="string">&quot;tls-webpki-roots&quot;</span>)]
+        </span>{
+            config
+                .root_store
+                .add_server_trust_anchors(<span class="kw-2">&amp;</span>webpki_roots::TLS_SERVER_ROOTS);
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cert</span>) <span class="op">=</span> <span class="ident">ca_cert</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">std::io::Cursor::new</span>(<span class="kw-2">&amp;</span><span class="ident">cert</span>.<span class="ident">pem</span>[..]);
-            <span class="ident">config</span>.<span class="ident">root_store</span>.<span class="ident">add_pem_file</span>(<span class="kw-2">&amp;mut</span> <span class="ident">buf</span>).<span class="ident">unwrap</span>();
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(cert) = ca_cert {
+            <span class="kw">let </span><span class="kw-2">mut </span>buf = std::io::Cursor::new(<span class="kw-2">&amp;</span>cert.pem[..]);
+            config.root_store.add_pem_file(<span class="kw-2">&amp;mut </span>buf).unwrap();
         }
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">config</span>: <span class="ident">Arc::new</span>(<span class="ident">config</span>),
-            <span class="ident">domain</span>: <span class="ident">Arc::new</span>(<span class="ident">domain</span>),
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            config: Arc::new(config),
+            domain: Arc::new(domain),
         })
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_with_rustls_raw</span>(
-        <span class="ident">config</span>: <span class="ident">tokio_rustls::rustls::ClientConfig</span>,
-        <span class="ident">domain</span>: <span class="ident">String</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">config</span>: <span class="ident">Arc::new</span>(<span class="ident">config</span>),
-            <span class="ident">domain</span>: <span class="ident">Arc::new</span>(<span class="ident">domain</span>),
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new_with_rustls_raw(
+        config: tokio_rustls::rustls::ClientConfig,
+        domain: String,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="kw">crate</span>::Error&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            config: Arc::new(config),
+            domain: Arc::new(domain),
         })
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connect</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">io</span>: <span class="ident">I</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BoxedIo</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">I</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>connect&lt;I&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, io: I) -&gt; <span class="prelude-ty">Result</span>&lt;BoxedIo, <span class="kw">crate</span>::Error&gt;
+    <span class="kw">where
+        </span>I: AsyncRead + AsyncWrite + Send + Unpin + <span class="lifetime">&#39;static</span>,
     {
-        <span class="kw">let</span> <span class="ident">tls_io</span> <span class="op">=</span> {
-            <span class="kw">let</span> <span class="ident">dns</span> <span class="op">=</span> <span class="ident">DNSNameRef::try_from_ascii_str</span>(<span class="self">self</span>.<span class="ident">domain</span>.<span class="ident">as_str</span>())<span class="question-mark">?</span>.<span class="ident">to_owned</span>();
+        <span class="kw">let </span>tls_io = {
+            <span class="kw">let </span>dns = DNSNameRef::try_from_ascii_str(<span class="self">self</span>.domain.as_str())<span class="question-mark">?</span>.to_owned();
 
-            <span class="kw">let</span> <span class="ident">io</span> <span class="op">=</span> <span class="ident">RustlsConnector::from</span>(<span class="self">self</span>.<span class="ident">config</span>.<span class="ident">clone</span>())
-                .<span class="ident">connect</span>(<span class="ident">dns</span>.<span class="ident">as_ref</span>(), <span class="ident">io</span>)
+            <span class="kw">let </span>io = RustlsConnector::from(<span class="self">self</span>.config.clone())
+                .connect(dns.as_ref(), io)
                 .<span class="kw">await</span><span class="question-mark">?</span>;
 
-            <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">session</span>) <span class="op">=</span> <span class="ident">io</span>.<span class="ident">get_ref</span>();
+            <span class="kw">let </span>(<span class="kw">_</span>, session) = io.get_ref();
 
-            <span class="kw">match</span> <span class="ident">session</span>.<span class="ident">get_alpn_protocol</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">b</span>) <span class="kw">if</span> <span class="ident">b</span> <span class="op">==</span> <span class="string">b&quot;h2&quot;</span> =&gt; (),
-                <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">TlsError::H2NotNegotiated</span>.<span class="ident">into</span>()),
+            <span class="kw">match </span>session.get_alpn_protocol() {
+                <span class="prelude-val">Some</span>(b) <span class="kw">if </span>b == <span class="string">b&quot;h2&quot; </span>=&gt; (),
+                <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(TlsError::H2NotNegotiated.into()),
             };
 
-            <span class="ident">BoxedIo::new</span>(<span class="ident">io</span>)
+            BoxedIo::new(io)
         };
 
-        <span class="prelude-val">Ok</span>(<span class="ident">tls_io</span>)
+        <span class="prelude-val">Ok</span>(tls_io)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">TlsConnector</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;TlsConnector&quot;</span>).<span class="ident">finish</span>()
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>TlsConnector {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;TlsConnector&quot;</span>).finish()
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">TlsAcceptor</span> {
-    <span class="ident">inner</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ServerConfig</span><span class="op">&gt;</span>,
+<span class="attribute">#[derive(Clone)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>TlsAcceptor {
+    inner: Arc&lt;ServerConfig&gt;,
 }
 
-<span class="kw">impl</span> <span class="ident">TlsAcceptor</span> {
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_with_rustls_identity</span>(
-        <span class="ident">identity</span>: <span class="ident">Identity</span>,
-        <span class="ident">client_ca_root</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Certificate</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">cert</span>, <span class="ident">key</span>) <span class="op">=</span> <span class="ident">rustls_keys::load_identity</span>(<span class="ident">identity</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>TlsAcceptor {
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new_with_rustls_identity(
+        identity: Identity,
+        client_ca_root: <span class="prelude-ty">Option</span>&lt;Certificate&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="kw">crate</span>::Error&gt; {
+        <span class="kw">let </span>(cert, key) = rustls_keys::load_identity(identity)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">config</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">client_ca_root</span> {
-            <span class="prelude-val">None</span> =&gt; <span class="ident">ServerConfig::new</span>(<span class="ident">NoClientAuth::new</span>()),
-            <span class="prelude-val">Some</span>(<span class="ident">cert</span>) =&gt; {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cert</span> <span class="op">=</span> <span class="ident">std::io::Cursor::new</span>(<span class="kw-2">&amp;</span><span class="ident">cert</span>.<span class="ident">pem</span>[..]);
+        <span class="kw">let </span><span class="kw-2">mut </span>config = <span class="kw">match </span>client_ca_root {
+            <span class="prelude-val">None </span>=&gt; ServerConfig::new(NoClientAuth::new()),
+            <span class="prelude-val">Some</span>(cert) =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>cert = std::io::Cursor::new(<span class="kw-2">&amp;</span>cert.pem[..]);
 
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client_root_cert_store</span> <span class="op">=</span> <span class="ident">tokio_rustls::rustls::RootCertStore::empty</span>();
-                <span class="kw">if</span> <span class="ident">client_root_cert_store</span>.<span class="ident">add_pem_file</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cert</span>).<span class="ident">is_err</span>() {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Box::new</span>(<span class="ident">TlsError::CertificateParseError</span>));
+                <span class="kw">let </span><span class="kw-2">mut </span>client_root_cert_store = tokio_rustls::rustls::RootCertStore::empty();
+                <span class="kw">if </span>client_root_cert_store.add_pem_file(<span class="kw-2">&amp;mut </span>cert).is_err() {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(Box::new(TlsError::CertificateParseError));
                 }
 
-                <span class="kw">let</span> <span class="ident">client_auth</span> <span class="op">=</span>
-                    <span class="ident">tokio_rustls::rustls::AllowAnyAuthenticatedClient::new</span>(<span class="ident">client_root_cert_store</span>);
-                <span class="ident">ServerConfig::new</span>(<span class="ident">client_auth</span>)
+                <span class="kw">let </span>client_auth =
+                    tokio_rustls::rustls::AllowAnyAuthenticatedClient::new(client_root_cert_store);
+                ServerConfig::new(client_auth)
             }
         };
-        <span class="ident">config</span>.<span class="ident">set_single_cert</span>(<span class="ident">cert</span>, <span class="ident">key</span>)<span class="question-mark">?</span>;
-        <span class="ident">config</span>.<span class="ident">set_protocols</span>(<span class="kw-2">&amp;</span>[<span class="ident">Vec::from</span>(<span class="ident">ALPN_H2</span>)]);
+        config.set_single_cert(cert, key)<span class="question-mark">?</span>;
+        config.set_protocols(<span class="kw-2">&amp;</span>[Vec::from(ALPN_H2)]);
 
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">inner</span>: <span class="ident">Arc::new</span>(<span class="ident">config</span>),
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            inner: Arc::new(config),
         })
     }
 
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_with_rustls_raw</span>(
-        <span class="ident">config</span>: <span class="ident">tokio_rustls::rustls::ServerConfig</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
-            <span class="ident">inner</span>: <span class="ident">Arc::new</span>(<span class="ident">config</span>),
+    <span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+    </span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new_with_rustls_raw(
+        config: tokio_rustls::rustls::ServerConfig,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="kw">crate</span>::Error&gt; {
+        <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
+            inner: Arc::new(config),
         })
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">accept</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">io</span>: <span class="ident">IO</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">TlsStream</span><span class="op">&lt;</span><span class="ident">IO</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">IO</span>: <span class="ident">AsyncRead</span> <span class="op">+</span> <span class="ident">AsyncWrite</span> <span class="op">+</span> <span class="ident">Connected</span> <span class="op">+</span> <span class="ident">Unpin</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async fn </span>accept&lt;IO&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, io: IO) -&gt; <span class="prelude-ty">Result</span>&lt;TlsStream&lt;IO&gt;, <span class="kw">crate</span>::Error&gt;
+    <span class="kw">where
+        </span>IO: AsyncRead + AsyncWrite + Connected + Unpin + Send + <span class="lifetime">&#39;static</span>,
     {
-        <span class="kw">let</span> <span class="ident">acceptor</span> <span class="op">=</span> <span class="ident">RustlsAcceptor::from</span>(<span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">clone</span>());
-        <span class="ident">acceptor</span>.<span class="ident">accept</span>(<span class="ident">io</span>).<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="ident">Into::into</span>)
+        <span class="kw">let </span>acceptor = RustlsAcceptor::from(<span class="self">self</span>.inner.clone());
+        acceptor.accept(io).<span class="kw">await</span>.map_err(Into::into)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">TlsAcceptor</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;TlsAcceptor&quot;</span>).<span class="ident">finish</span>()
+<span class="kw">impl </span>fmt::Debug <span class="kw">for </span>TlsAcceptor {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        f.debug_struct(<span class="string">&quot;TlsAcceptor&quot;</span>).finish()
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">TlsError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">TlsError::H2NotNegotiated</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;HTTP/2 was not negotiated.&quot;</span>),
-            <span class="ident">TlsError::CertificateParseError</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Error parsing TLS certificate.&quot;</span>),
-            <span class="ident">TlsError::PrivateKeyParseError</span> =&gt; <span class="macro">write!</span>(
-                <span class="ident">f</span>,
-                <span class="string">&quot;Error parsing TLS private key - no RSA or PKCS8-encoded keys found.&quot;</span>
-            ),
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>TlsError {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="kw">match </span><span class="self">self </span>{
+            TlsError::H2NotNegotiated =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;HTTP/2 was not negotiated.&quot;</span>),
+            TlsError::CertificateParseError =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Error parsing TLS certificate.&quot;</span>),
+            TlsError::PrivateKeyParseError =&gt; <span class="macro">write!</span>(
+                f,
+                <span class="string">&quot;Error parsing TLS private key - no RSA or PKCS8-encoded keys found.&quot;
+            </span>),
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">std::error::Error</span> <span class="kw">for</span> <span class="ident">TlsError</span> {}
+<span class="kw">impl </span>std::error::Error <span class="kw">for </span>TlsError {}
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tls&quot;</span>)]</span>
-<span class="kw">mod</span> <span class="ident">rustls_keys</span> {
-    <span class="kw">use</span> <span class="ident">tokio_rustls::rustls</span>::{<span class="ident">internal::pemfile</span>, <span class="ident">Certificate</span>, <span class="ident">PrivateKey</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;tls&quot;</span>)]
+</span><span class="kw">mod </span>rustls_keys {
+    <span class="kw">use </span>tokio_rustls::rustls::{internal::pemfile, Certificate, PrivateKey};
 
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::transport::service::tls::TlsError</span>;
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::transport::Identity</span>;
+    <span class="kw">use </span><span class="kw">crate</span>::transport::service::tls::TlsError;
+    <span class="kw">use </span><span class="kw">crate</span>::transport::Identity;
 
-    <span class="kw">fn</span> <span class="ident">load_rustls_private_key</span>(
-        <span class="kw-2">mut</span> <span class="ident">cursor</span>: <span class="ident">std::io::Cursor</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PrivateKey</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
-        <span class="comment">// First attempt to load the private key assuming it is PKCS8-encoded</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="kw-2">mut</span> <span class="ident">keys</span>) <span class="op">=</span> <span class="ident">pemfile::pkcs8_private_keys</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>) {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">keys</span>.<span class="ident">is_empty</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">keys</span>.<span class="ident">remove</span>(<span class="number">0</span>));
+    <span class="kw">fn </span>load_rustls_private_key(
+        <span class="kw-2">mut </span>cursor: std::io::Cursor&lt;<span class="kw-2">&amp;</span>[u8]&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;PrivateKey, <span class="kw">crate</span>::Error&gt; {
+        <span class="comment">// First attempt to load the private key assuming it is PKCS8-encoded
+        </span><span class="kw">if let </span><span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>keys) = pemfile::pkcs8_private_keys(<span class="kw-2">&amp;mut </span>cursor) {
+            <span class="kw">if </span>!keys.is_empty() {
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(keys.remove(<span class="number">0</span>));
             }
         }
 
-        <span class="comment">// If it not, try loading the private key as an RSA key</span>
-        <span class="ident">cursor</span>.<span class="ident">set_position</span>(<span class="number">0</span>);
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="kw-2">mut</span> <span class="ident">keys</span>) <span class="op">=</span> <span class="ident">pemfile::rsa_private_keys</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cursor</span>) {
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">keys</span>.<span class="ident">is_empty</span>() {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">keys</span>.<span class="ident">remove</span>(<span class="number">0</span>));
+        <span class="comment">// If it not, try loading the private key as an RSA key
+        </span>cursor.set_position(<span class="number">0</span>);
+        <span class="kw">if let </span><span class="prelude-val">Ok</span>(<span class="kw-2">mut </span>keys) = pemfile::rsa_private_keys(<span class="kw-2">&amp;mut </span>cursor) {
+            <span class="kw">if </span>!keys.is_empty() {
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(keys.remove(<span class="number">0</span>));
             }
         }
 
-        <span class="comment">// Otherwise we have a Private Key parsing problem</span>
-        <span class="prelude-val">Err</span>(<span class="ident">Box::new</span>(<span class="ident">TlsError::PrivateKeyParseError</span>))
+        <span class="comment">// Otherwise we have a Private Key parsing problem
+        </span><span class="prelude-val">Err</span>(Box::new(TlsError::PrivateKeyParseError))
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">load_identity</span>(
-        <span class="ident">identity</span>: <span class="ident">Identity</span>,
-    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Certificate</span><span class="op">&gt;</span>, <span class="ident">PrivateKey</span>), <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">cert</span> <span class="op">=</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cert</span> <span class="op">=</span> <span class="ident">std::io::Cursor::new</span>(<span class="kw-2">&amp;</span><span class="ident">identity</span>.<span class="ident">cert</span>.<span class="ident">pem</span>[..]);
-            <span class="kw">match</span> <span class="ident">pemfile::certs</span>(<span class="kw-2">&amp;mut</span> <span class="ident">cert</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">certs</span>) =&gt; <span class="ident">certs</span>,
-                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Box::new</span>(<span class="ident">TlsError::CertificateParseError</span>)),
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>load_identity(
+        identity: Identity,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;(Vec&lt;Certificate&gt;, PrivateKey), <span class="kw">crate</span>::Error&gt; {
+        <span class="kw">let </span>cert = {
+            <span class="kw">let </span><span class="kw-2">mut </span>cert = std::io::Cursor::new(<span class="kw-2">&amp;</span>identity.cert.pem[..]);
+            <span class="kw">match </span>pemfile::certs(<span class="kw-2">&amp;mut </span>cert) {
+                <span class="prelude-val">Ok</span>(certs) =&gt; certs,
+                <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(Box::new(TlsError::CertificateParseError)),
             }
         };
 
-        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> {
-            <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">std::io::Cursor::new</span>(<span class="kw-2">&amp;</span><span class="ident">identity</span>.<span class="ident">key</span>[..]);
-            <span class="kw">match</span> <span class="ident">load_rustls_private_key</span>(<span class="ident">key</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">key</span>) =&gt; <span class="ident">key</span>,
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>);
+        <span class="kw">let </span>key = {
+            <span class="kw">let </span>key = std::io::Cursor::new(<span class="kw-2">&amp;</span>identity.key[..]);
+            <span class="kw">match </span>load_rustls_private_key(key) {
+                <span class="prelude-val">Ok</span>(key) =&gt; key,
+                <span class="prelude-val">Err</span>(e) =&gt; {
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(e);
                 }
             }
         };
 
-        <span class="prelude-val">Ok</span>((<span class="ident">cert</span>, <span class="ident">key</span>))
+        <span class="prelude-val">Ok</span>((cert, key))
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tonic" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="tonic" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/rr/rdata/caa.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>caa.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/trust-dns-proto-0.21.2/src/rr/rdata/caa.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>caa.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../../normalize.css"><link rel="stylesheet" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../../ayu.css" disabled><link rel="stylesheet" href="../../../../dark.css" disabled><link rel="stylesheet" href="../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../storage.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script><script defer src="../../../../main.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../../trust_dns_proto/index.html"><div class="logo-container"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../trust_dns_proto/index.html"><img class="rust-logo" src="../../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -1146,1153 +1146,1153 @@
 <span id="1146">1146</span>
 <span id="1147">1147</span>
 <span id="1148">1148</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2017 Benjamin Fry &lt;benjaminfry@me.com&gt;</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or</span>
-<span class="comment">// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be</span>
-<span class="comment">// copied, modified, or distributed except according to those terms.</span>
+</pre><pre class="rust"><code><span class="comment">// Copyright 2015-2017 Benjamin Fry &lt;benjaminfry@me.com&gt;
+//
+// Licensed under the Apache License, Version 2.0, &lt;LICENSE-APACHE or
+// http://apache.org/licenses/LICENSE-2.0&gt; or the MIT license &lt;LICENSE-MIT or
+// http://opensource.org/licenses/MIT&gt;, at your option. This file may not be
+// copied, modified, or distributed except according to those terms.
 
-<span class="doccomment">//! allows a DNS domain name holder to specify one or more Certification</span>
-<span class="doccomment">//! Authorities (CAs) authorized to issue certificates for that domain.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! [RFC 6844, DNS Certification Authority Authorization, January 2013](https://tools.ietf.org/html/rfc6844)</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! ```text</span>
-<span class="doccomment">//! The Certification Authority Authorization (CAA) DNS Resource Record</span>
-<span class="doccomment">//! allows a DNS domain name holder to specify one or more Certification</span>
-<span class="doccomment">//! Authorities (CAs) authorized to issue certificates for that domain.</span>
-<span class="doccomment">//! CAA Resource Records allow a public Certification Authority to</span>
-<span class="doccomment">//! implement additional controls to reduce the risk of unintended</span>
-<span class="doccomment">//! certificate mis-issue.  This document defines the syntax of the CAA</span>
-<span class="doccomment">//! record and rules for processing CAA records by certificate issuers.</span>
-<span class="doccomment">//! ```</span>
+</span><span class="doccomment">//! allows a DNS domain name holder to specify one or more Certification
+//! Authorities (CAs) authorized to issue certificates for that domain.
+//!
+//! [RFC 6844, DNS Certification Authority Authorization, January 2013](https://tools.ietf.org/html/rfc6844)
+//!
+//! ```text
+//! The Certification Authority Authorization (CAA) DNS Resource Record
+//! allows a DNS domain name holder to specify one or more Certification
+//! Authorities (CAs) authorized to issue certificates for that domain.
+//! CAA Resource Records allow a public Certification Authority to
+//! implement additional controls to reduce the risk of unintended
+//! certificate mis-issue.  This document defines the syntax of the CAA
+//! record and rules for processing CAA records by certificate issuers.
+//! ```
 
-<span class="kw">use</span> <span class="ident">std::fmt</span>;
-<span class="kw">use</span> <span class="ident">std::str</span>;
+</span><span class="kw">use </span>std::fmt;
+<span class="kw">use </span>std::str;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="attribute">#[cfg(feature = <span class="string">&quot;serde-config&quot;</span>)]
+</span><span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::error</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::rr::domain::Name</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::serialize::binary</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">url::Url</span>;
+<span class="kw">use </span><span class="kw">crate</span>::error::<span class="kw-2">*</span>;
+<span class="kw">use </span><span class="kw">crate</span>::rr::domain::Name;
+<span class="kw">use </span><span class="kw">crate</span>::serialize::binary::<span class="kw-2">*</span>;
+<span class="kw">use </span>url::Url;
 
-<span class="doccomment">/// The CAA RR Type</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [RFC 6844, DNS Certification Authority Authorization, January 2013](https://tools.ietf.org/html/rfc6844#section-3)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// 3.  The CAA RR Type</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A CAA RR consists of a flags byte and a tag-value pair referred to as</span>
-<span class="doccomment">/// a property.  Multiple properties MAY be associated with the same</span>
-<span class="doccomment">/// domain name by publishing multiple CAA RRs at that domain name.  The</span>
-<span class="doccomment">/// following flag is defined:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Issuer Critical:  If set to &#39;1&#39;, indicates that the corresponding</span>
-<span class="doccomment">///    property tag MUST be understood if the semantics of the CAA record</span>
-<span class="doccomment">///    are to be correctly interpreted by an issuer.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    Issuers MUST NOT issue certificates for a domain if the relevant</span>
-<span class="doccomment">///    CAA Resource Record set contains unknown property tags that have</span>
-<span class="doccomment">///    the Critical bit set.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The following property tags are defined:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// issue &lt;Issuer Domain Name&gt; [; &lt;name&gt;=&lt;value&gt; ]* :  The issue property</span>
-<span class="doccomment">///    entry authorizes the holder of the domain name &lt;Issuer Domain</span>
-<span class="doccomment">///    Name&gt; or a party acting under the explicit authority of the holder</span>
-<span class="doccomment">///    of that domain name to issue certificates for the domain in which</span>
-<span class="doccomment">///    the property is published.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// issuewild &lt;Issuer Domain Name&gt; [; &lt;name&gt;=&lt;value&gt; ]* :  The issuewild</span>
-<span class="doccomment">///    property entry authorizes the holder of the domain name &lt;Issuer</span>
-<span class="doccomment">///    Domain Name&gt; or a party acting under the explicit authority of the</span>
-<span class="doccomment">///    holder of that domain name to issue wildcard certificates for the</span>
-<span class="doccomment">///    domain in which the property is published.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// iodef &lt;URL&gt; :  Specifies a URL to which an issuer MAY report</span>
-<span class="doccomment">///    certificate issue requests that are inconsistent with the issuer&#39;s</span>
-<span class="doccomment">///    Certification Practices or Certificate Policy, or that a</span>
-<span class="doccomment">///    Certificate Evaluator may use to report observation of a possible</span>
-<span class="doccomment">///    policy violation.  The Incident Object Description Exchange Format</span>
-<span class="doccomment">///    (IODEF) format is used [RFC5070].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The following example is a DNS zone file (see [RFC1035]) that informs</span>
-<span class="doccomment">/// CAs that certificates are not to be issued except by the holder of</span>
-<span class="doccomment">/// the domain name &#39;ca.example.net&#39; or an authorized agent thereof.</span>
-<span class="doccomment">/// This policy applies to all subordinate domains under example.com.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// $ORIGIN example.com</span>
-<span class="doccomment">/// .       CAA 0 issue &quot;ca.example.net&quot;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// If the domain name holder specifies one or more iodef properties, a</span>
-<span class="doccomment">/// certificate issuer MAY report invalid certificate requests to that</span>
-<span class="doccomment">/// address.  In the following example, the domain name holder specifies</span>
-<span class="doccomment">/// that reports may be made by means of email with the IODEF data as an</span>
-<span class="doccomment">/// attachment, a Web service [RFC6546], or both:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// $ORIGIN example.com</span>
-<span class="doccomment">/// .       CAA 0 issue &quot;ca.example.net&quot;</span>
-<span class="doccomment">/// .       CAA 0 iodef &quot;mailto:security@example.com&quot;</span>
-<span class="doccomment">/// .       CAA 0 iodef &quot;http://iodef.example.com/&quot;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// A certificate issuer MAY specify additional parameters that allow</span>
-<span class="doccomment">/// customers to specify additional parameters governing certificate</span>
-<span class="doccomment">/// issuance.  This might be the Certificate Policy under which the</span>
-<span class="doccomment">/// certificate is to be issued, the authentication process to be used</span>
-<span class="doccomment">/// might be specified, or an account number specified by the CA to</span>
-<span class="doccomment">/// enable these parameters to be retrieved.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// For example, the CA &#39;ca.example.net&#39; has requested its customer</span>
-<span class="doccomment">/// &#39;example.com&#39; to specify the CA&#39;s account number &#39;230123&#39; in each of</span>
-<span class="doccomment">/// the customer&#39;s CAA records.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// $ORIGIN example.com</span>
-<span class="doccomment">/// .       CAA 0 issue &quot;ca.example.net; account=230123&quot;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The syntax of additional parameters is a sequence of name-value pairs</span>
-<span class="doccomment">/// as defined in Section 5.2.  The semantics of such parameters is left</span>
-<span class="doccomment">/// to site policy and is outside the scope of this document.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// The critical flag is intended to permit future versions CAA to</span>
-<span class="doccomment">/// introduce new semantics that MUST be understood for correct</span>
-<span class="doccomment">/// processing of the record, preventing conforming CAs that do not</span>
-<span class="doccomment">/// recognize the new semantics from issuing certificates for the</span>
-<span class="doccomment">/// indicated domains.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// In the following example, the property &#39;tbs&#39; is flagged as critical.</span>
-<span class="doccomment">/// Neither the example.net CA nor any other issuer is authorized to</span>
-<span class="doccomment">/// issue under either policy unless the processing rules for the &#39;tbs&#39;</span>
-<span class="doccomment">/// property tag are understood.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// $ORIGIN example.com</span>
-<span class="doccomment">/// .       CAA 0 issue &quot;ca.example.net; policy=ev&quot;</span>
-<span class="doccomment">/// .       CAA 128 tbs &quot;Unknown&quot;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Note that the above restrictions only apply at certificate issue.</span>
-<span class="doccomment">/// Since the validity of an end entity certificate is typically a year</span>
-<span class="doccomment">/// or more, it is quite possible that the CAA records published at a</span>
-<span class="doccomment">/// domain will change between the time a certificate was issued and</span>
-<span class="doccomment">/// validation by a relying party.</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CAA</span> {
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">issuer_critical</span>: <span class="ident">bool</span>,
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">tag</span>: <span class="ident">Property</span>,
-    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">value</span>: <span class="ident">Value</span>,
+<span class="doccomment">/// The CAA RR Type
+///
+/// [RFC 6844, DNS Certification Authority Authorization, January 2013](https://tools.ietf.org/html/rfc6844#section-3)
+///
+/// ```text
+/// 3.  The CAA RR Type
+///
+/// A CAA RR consists of a flags byte and a tag-value pair referred to as
+/// a property.  Multiple properties MAY be associated with the same
+/// domain name by publishing multiple CAA RRs at that domain name.  The
+/// following flag is defined:
+///
+/// Issuer Critical:  If set to &#39;1&#39;, indicates that the corresponding
+///    property tag MUST be understood if the semantics of the CAA record
+///    are to be correctly interpreted by an issuer.
+///
+///    Issuers MUST NOT issue certificates for a domain if the relevant
+///    CAA Resource Record set contains unknown property tags that have
+///    the Critical bit set.
+///
+/// The following property tags are defined:
+///
+/// issue &lt;Issuer Domain Name&gt; [; &lt;name&gt;=&lt;value&gt; ]* :  The issue property
+///    entry authorizes the holder of the domain name &lt;Issuer Domain
+///    Name&gt; or a party acting under the explicit authority of the holder
+///    of that domain name to issue certificates for the domain in which
+///    the property is published.
+///
+/// issuewild &lt;Issuer Domain Name&gt; [; &lt;name&gt;=&lt;value&gt; ]* :  The issuewild
+///    property entry authorizes the holder of the domain name &lt;Issuer
+///    Domain Name&gt; or a party acting under the explicit authority of the
+///    holder of that domain name to issue wildcard certificates for the
+///    domain in which the property is published.
+///
+/// iodef &lt;URL&gt; :  Specifies a URL to which an issuer MAY report
+///    certificate issue requests that are inconsistent with the issuer&#39;s
+///    Certification Practices or Certificate Policy, or that a
+///    Certificate Evaluator may use to report observation of a possible
+///    policy violation.  The Incident Object Description Exchange Format
+///    (IODEF) format is used [RFC5070].
+///
+/// The following example is a DNS zone file (see [RFC1035]) that informs
+/// CAs that certificates are not to be issued except by the holder of
+/// the domain name &#39;ca.example.net&#39; or an authorized agent thereof.
+/// This policy applies to all subordinate domains under example.com.
+///
+/// $ORIGIN example.com
+/// .       CAA 0 issue &quot;ca.example.net&quot;
+///
+/// If the domain name holder specifies one or more iodef properties, a
+/// certificate issuer MAY report invalid certificate requests to that
+/// address.  In the following example, the domain name holder specifies
+/// that reports may be made by means of email with the IODEF data as an
+/// attachment, a Web service [RFC6546], or both:
+///
+/// $ORIGIN example.com
+/// .       CAA 0 issue &quot;ca.example.net&quot;
+/// .       CAA 0 iodef &quot;mailto:security@example.com&quot;
+/// .       CAA 0 iodef &quot;http://iodef.example.com/&quot;
+///
+/// A certificate issuer MAY specify additional parameters that allow
+/// customers to specify additional parameters governing certificate
+/// issuance.  This might be the Certificate Policy under which the
+/// certificate is to be issued, the authentication process to be used
+/// might be specified, or an account number specified by the CA to
+/// enable these parameters to be retrieved.
+///
+/// For example, the CA &#39;ca.example.net&#39; has requested its customer
+/// &#39;example.com&#39; to specify the CA&#39;s account number &#39;230123&#39; in each of
+/// the customer&#39;s CAA records.
+///
+/// $ORIGIN example.com
+/// .       CAA 0 issue &quot;ca.example.net; account=230123&quot;
+///
+/// The syntax of additional parameters is a sequence of name-value pairs
+/// as defined in Section 5.2.  The semantics of such parameters is left
+/// to site policy and is outside the scope of this document.
+///
+/// The critical flag is intended to permit future versions CAA to
+/// introduce new semantics that MUST be understood for correct
+/// processing of the record, preventing conforming CAs that do not
+/// recognize the new semantics from issuing certificates for the
+/// indicated domains.
+///
+/// In the following example, the property &#39;tbs&#39; is flagged as critical.
+/// Neither the example.net CA nor any other issuer is authorized to
+/// issue under either policy unless the processing rules for the &#39;tbs&#39;
+/// property tag are understood.
+///
+/// $ORIGIN example.com
+/// .       CAA 0 issue &quot;ca.example.net; policy=ev&quot;
+/// .       CAA 128 tbs &quot;Unknown&quot;
+///
+/// Note that the above restrictions only apply at certificate issue.
+/// Since the validity of an end entity certificate is typically a year
+/// or more, it is quite possible that the CAA records published at a
+/// domain will change between the time a certificate was issued and
+/// validation by a relying party.
+/// ```
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serde-config&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Debug, PartialEq, Eq, Hash, Clone)]
+</span><span class="kw">pub struct </span>CAA {
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>issuer_critical: bool,
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>tag: Property,
+    <span class="attribute">#[doc(hidden)]
+    </span><span class="kw">pub </span>value: Value,
 }
 
-<span class="kw">impl</span> <span class="ident">CAA</span> {
-    <span class="kw">fn</span> <span class="ident">issue</span>(
-        <span class="ident">issuer_critical</span>: <span class="ident">bool</span>,
-        <span class="ident">tag</span>: <span class="ident">Property</span>,
-        <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Name</span><span class="op">&gt;</span>,
-        <span class="ident">options</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="macro">assert!</span>(<span class="ident">tag</span>.<span class="ident">is_issue</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">tag</span>.<span class="ident">is_issuewild</span>());
+<span class="kw">impl </span>CAA {
+    <span class="kw">fn </span>issue(
+        issuer_critical: bool,
+        tag: Property,
+        name: <span class="prelude-ty">Option</span>&lt;Name&gt;,
+        options: Vec&lt;KeyValue&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="macro">assert!</span>(tag.is_issue() || tag.is_issuewild());
 
-        <span class="self">Self</span> {
-            <span class="ident">issuer_critical</span>,
-            <span class="ident">tag</span>,
-            <span class="ident">value</span>: <span class="ident">Value::Issuer</span>(<span class="ident">name</span>, <span class="ident">options</span>),
+        <span class="self">Self </span>{
+            issuer_critical,
+            tag,
+            value: Value::Issuer(name, options),
         }
     }
 
-    <span class="doccomment">/// Creates a new CAA issue record data, the tag is `issue`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `issuer_critical` - indicates that the corresponding property tag MUST be understood if the semantics of the CAA record are to be correctly interpreted by an issuer</span>
-    <span class="doccomment">/// * `name` - authorized to issue certificates for the associated record label</span>
-    <span class="doccomment">/// * `options` - additional options for the issuer, e.g. &#39;account&#39;, etc.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_issue</span>(<span class="ident">issuer_critical</span>: <span class="ident">bool</span>, <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Name</span><span class="op">&gt;</span>, <span class="ident">options</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::issue</span>(<span class="ident">issuer_critical</span>, <span class="ident">Property::Issue</span>, <span class="ident">name</span>, <span class="ident">options</span>)
+    <span class="doccomment">/// Creates a new CAA issue record data, the tag is `issue`
+    ///
+    /// # Arguments
+    ///
+    /// * `issuer_critical` - indicates that the corresponding property tag MUST be understood if the semantics of the CAA record are to be correctly interpreted by an issuer
+    /// * `name` - authorized to issue certificates for the associated record label
+    /// * `options` - additional options for the issuer, e.g. &#39;account&#39;, etc.
+    </span><span class="kw">pub fn </span>new_issue(issuer_critical: bool, name: <span class="prelude-ty">Option</span>&lt;Name&gt;, options: Vec&lt;KeyValue&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::issue(issuer_critical, Property::Issue, name, options)
     }
 
-    <span class="doccomment">/// Creates a new CAA issue record data, the tag is `issuewild`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `issuer_critical` - indicates that the corresponding property tag MUST be understood if the semantics of the CAA record are to be correctly interpreted by an issuer</span>
-    <span class="doccomment">/// * `name` - authorized to issue certificates for the associated record label</span>
-    <span class="doccomment">/// * `options` - additional options for the issuer, e.g. &#39;account&#39;, etc.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_issuewild</span>(
-        <span class="ident">issuer_critical</span>: <span class="ident">bool</span>,
-        <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Name</span><span class="op">&gt;</span>,
-        <span class="ident">options</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="self">Self</span> {
-        <span class="ident"><span class="self">Self</span>::issue</span>(<span class="ident">issuer_critical</span>, <span class="ident">Property::IssueWild</span>, <span class="ident">name</span>, <span class="ident">options</span>)
+    <span class="doccomment">/// Creates a new CAA issue record data, the tag is `issuewild`
+    ///
+    /// # Arguments
+    ///
+    /// * `issuer_critical` - indicates that the corresponding property tag MUST be understood if the semantics of the CAA record are to be correctly interpreted by an issuer
+    /// * `name` - authorized to issue certificates for the associated record label
+    /// * `options` - additional options for the issuer, e.g. &#39;account&#39;, etc.
+    </span><span class="kw">pub fn </span>new_issuewild(
+        issuer_critical: bool,
+        name: <span class="prelude-ty">Option</span>&lt;Name&gt;,
+        options: Vec&lt;KeyValue&gt;,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::issue(issuer_critical, Property::IssueWild, name, options)
     }
 
-    <span class="doccomment">/// Creates a new CAA issue record data, the tag is `iodef`</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `issuer_critical` - indicates that the corresponding property tag MUST be understood if the semantics of the CAA record are to be correctly interpreted by an issuer</span>
-    <span class="doccomment">/// * `url` - Url where issuer errors should be reported</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If `value` is not `Value::Issuer`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_iodef</span>(<span class="ident">issuer_critical</span>: <span class="ident">bool</span>, <span class="ident">url</span>: <span class="ident">Url</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">issuer_critical</span>,
-            <span class="ident">tag</span>: <span class="ident">Property::Iodef</span>,
-            <span class="ident">value</span>: <span class="ident">Value::Url</span>(<span class="ident">url</span>),
+    <span class="doccomment">/// Creates a new CAA issue record data, the tag is `iodef`
+    ///
+    /// # Arguments
+    ///
+    /// * `issuer_critical` - indicates that the corresponding property tag MUST be understood if the semantics of the CAA record are to be correctly interpreted by an issuer
+    /// * `url` - Url where issuer errors should be reported
+    ///
+    /// # Panics
+    ///
+    /// If `value` is not `Value::Issuer`
+    </span><span class="kw">pub fn </span>new_iodef(issuer_critical: bool, url: Url) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            issuer_critical,
+            tag: Property::Iodef,
+            value: Value::Url(url),
         }
     }
 
-    <span class="doccomment">/// Indicates that the corresponding property tag MUST be understood if the semantics of the CAA record are to be correctly interpreted by an issuer</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">issuer_critical</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">issuer_critical</span>
+    <span class="doccomment">/// Indicates that the corresponding property tag MUST be understood if the semantics of the CAA record are to be correctly interpreted by an issuer
+    </span><span class="kw">pub fn </span>issuer_critical(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.issuer_critical
     }
 
-    <span class="doccomment">/// The property tag, see struct documentation</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tag</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Property</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">tag</span>
+    <span class="doccomment">/// The property tag, see struct documentation
+    </span><span class="kw">pub fn </span>tag(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Property {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.tag
     }
 
-    <span class="doccomment">/// a potentially associated value with the property tag, see struct documentation</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Value</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">value</span>
+    <span class="doccomment">/// a potentially associated value with the property tag, see struct documentation
+    </span><span class="kw">pub fn </span>value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Value {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.value
     }
 }
 
-<span class="doccomment">/// Specifies in what contexts this key may be trusted for use</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Property</span> {
-    <span class="doccomment">/// The issue property</span>
-    <span class="doccomment">///    entry authorizes the holder of the domain name &lt;Issuer Domain</span>
-    <span class="doccomment">///    Name&gt; or a party acting under the explicit authority of the holder</span>
-    <span class="doccomment">///    of that domain name to issue certificates for the domain in which</span>
-    <span class="doccomment">///    the property is published.</span>
-    <span class="ident">Issue</span>,
-    <span class="doccomment">/// The issuewild</span>
-    <span class="doccomment">///    property entry authorizes the holder of the domain name &lt;Issuer</span>
-    <span class="doccomment">///    Domain Name&gt; or a party acting under the explicit authority of the</span>
-    <span class="doccomment">///    holder of that domain name to issue wildcard certificates for the</span>
-    <span class="doccomment">///    domain in which the property is published.</span>
-    <span class="ident">IssueWild</span>,
-    <span class="doccomment">/// Specifies a URL to which an issuer MAY report</span>
-    <span class="doccomment">///    certificate issue requests that are inconsistent with the issuer&#39;s</span>
-    <span class="doccomment">///    Certification Practices or Certificate Policy, or that a</span>
-    <span class="doccomment">///    Certificate Evaluator may use to report observation of a possible</span>
-    <span class="doccomment">///    policy violation. The Incident Object Description Exchange Format</span>
-    <span class="doccomment">///    (IODEF) format is used [RFC5070](https://tools.ietf.org/html/rfc5070).</span>
-    <span class="ident">Iodef</span>,
-    <span class="doccomment">/// Unknown format to Trust-DNS</span>
-    <span class="ident">Unknown</span>(<span class="ident">String</span>),
+<span class="doccomment">/// Specifies in what contexts this key may be trusted for use
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serde-config&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Debug, PartialEq, Eq, Hash, Clone)]
+</span><span class="kw">pub enum </span>Property {
+    <span class="doccomment">/// The issue property
+    ///    entry authorizes the holder of the domain name &lt;Issuer Domain
+    ///    Name&gt; or a party acting under the explicit authority of the holder
+    ///    of that domain name to issue certificates for the domain in which
+    ///    the property is published.
+    </span>Issue,
+    <span class="doccomment">/// The issuewild
+    ///    property entry authorizes the holder of the domain name &lt;Issuer
+    ///    Domain Name&gt; or a party acting under the explicit authority of the
+    ///    holder of that domain name to issue wildcard certificates for the
+    ///    domain in which the property is published.
+    </span>IssueWild,
+    <span class="doccomment">/// Specifies a URL to which an issuer MAY report
+    ///    certificate issue requests that are inconsistent with the issuer&#39;s
+    ///    Certification Practices or Certificate Policy, or that a
+    ///    Certificate Evaluator may use to report observation of a possible
+    ///    policy violation. The Incident Object Description Exchange Format
+    ///    (IODEF) format is used [RFC5070](https://tools.ietf.org/html/rfc5070).
+    </span>Iodef,
+    <span class="doccomment">/// Unknown format to Trust-DNS
+    </span>Unknown(String),
 }
 
-<span class="kw">impl</span> <span class="ident">Property</span> {
-    <span class="doccomment">/// Convert to string form</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Property::Issue</span> =&gt; <span class="string">&quot;issue&quot;</span>,
-            <span class="ident">Property::IssueWild</span> =&gt; <span class="string">&quot;issuewild&quot;</span>,
-            <span class="ident">Property::Iodef</span> =&gt; <span class="string">&quot;iodef&quot;</span>,
-            <span class="ident">Property::Unknown</span>(<span class="kw-2">ref</span> <span class="ident">property</span>) =&gt; <span class="ident">property</span>,
+<span class="kw">impl </span>Property {
+    <span class="doccomment">/// Convert to string form
+    </span><span class="kw">pub fn </span>as_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self </span>{
+            Property::Issue =&gt; <span class="string">&quot;issue&quot;</span>,
+            Property::IssueWild =&gt; <span class="string">&quot;issuewild&quot;</span>,
+            Property::Iodef =&gt; <span class="string">&quot;iodef&quot;</span>,
+            Property::Unknown(<span class="kw-2">ref </span>property) =&gt; property,
         }
     }
 
-    <span class="doccomment">/// true if the property is `issue`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_issue</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="kw-2">*</span><span class="self">self</span>, <span class="ident">Property::Issue</span>)
+    <span class="doccomment">/// true if the property is `issue`
+    </span><span class="kw">pub fn </span>is_issue(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="kw-2">*</span><span class="self">self</span>, Property::Issue)
     }
 
-    <span class="doccomment">/// true if the property is `issueworld`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_issuewild</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="kw-2">*</span><span class="self">self</span>, <span class="ident">Property::IssueWild</span>)
+    <span class="doccomment">/// true if the property is `issueworld`
+    </span><span class="kw">pub fn </span>is_issuewild(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="kw-2">*</span><span class="self">self</span>, Property::IssueWild)
     }
 
-    <span class="doccomment">/// true if the property is `iodef`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_iodef</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="kw-2">*</span><span class="self">self</span>, <span class="ident">Property::Iodef</span>)
+    <span class="doccomment">/// true if the property is `iodef`
+    </span><span class="kw">pub fn </span>is_iodef(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="kw-2">*</span><span class="self">self</span>, Property::Iodef)
     }
 
-    <span class="doccomment">/// true if the property is not known to Trust-DNS</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_unknown</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="kw-2">*</span><span class="self">self</span>, <span class="ident">Property::Unknown</span>(<span class="kw">_</span>))
+    <span class="doccomment">/// true if the property is not known to Trust-DNS
+    </span><span class="kw">pub fn </span>is_unknown(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="kw-2">*</span><span class="self">self</span>, Property::Unknown(<span class="kw">_</span>))
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Property</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">tag</span>: <span class="ident">String</span>) -&gt; <span class="self">Self</span> {
-        <span class="comment">// RFC6488 section 5.1 states that &quot;Matching of tag values is case</span>
-        <span class="comment">// insensitive.&quot;</span>
-        <span class="kw">let</span> <span class="ident">lower</span> <span class="op">=</span> <span class="ident">tag</span>.<span class="ident">to_ascii_lowercase</span>();
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">lower</span> <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
-            <span class="string">&quot;issue&quot;</span> =&gt; <span class="kw">return</span> <span class="ident"><span class="self">Self</span>::Issue</span>,
-            <span class="string">&quot;issuewild&quot;</span> =&gt; <span class="kw">return</span> <span class="ident"><span class="self">Self</span>::IssueWild</span>,
-            <span class="string">&quot;iodef&quot;</span> =&gt; <span class="kw">return</span> <span class="ident"><span class="self">Self</span>::Iodef</span>,
-            <span class="kw-2">&amp;</span><span class="kw">_</span> =&gt; (),
+<span class="kw">impl </span>From&lt;String&gt; <span class="kw">for </span>Property {
+    <span class="kw">fn </span>from(tag: String) -&gt; <span class="self">Self </span>{
+        <span class="comment">// RFC6488 section 5.1 states that &quot;Matching of tag values is case
+        // insensitive.&quot;
+        </span><span class="kw">let </span>lower = tag.to_ascii_lowercase();
+        <span class="kw">match </span><span class="kw-2">&amp;</span>lower <span class="kw">as </span><span class="kw-2">&amp;</span>str {
+            <span class="string">&quot;issue&quot; </span>=&gt; <span class="kw">return </span><span class="self">Self</span>::Issue,
+            <span class="string">&quot;issuewild&quot; </span>=&gt; <span class="kw">return </span><span class="self">Self</span>::IssueWild,
+            <span class="string">&quot;iodef&quot; </span>=&gt; <span class="kw">return </span><span class="self">Self</span>::Iodef,
+            <span class="kw-2">&amp;</span><span class="kw">_ </span>=&gt; (),
         }
 
-        <span class="ident"><span class="self">Self</span>::Unknown</span>(<span class="ident">tag</span>)
+        <span class="self">Self</span>::Unknown(tag)
     }
 }
 
-<span class="doccomment">/// Potential values.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// These are based off the Tag field:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// `Issue` and `IssueWild` =&gt; `Issuer`,</span>
-<span class="doccomment">/// `Iodef` =&gt; `Url`,</span>
-<span class="doccomment">/// `Unknown` =&gt; `Unknown`,</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Value</span> {
-    <span class="doccomment">/// Issuer authorized to issue certs for this zone, and any associated parameters</span>
-    <span class="ident">Issuer</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Name</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span>),
-    <span class="doccomment">/// Url to which to send CA errors</span>
-    <span class="ident">Url</span>(<span class="ident">Url</span>),
-    <span class="doccomment">/// Unrecognized tag and value by Trust-DNS</span>
-    <span class="ident">Unknown</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>),
+<span class="doccomment">/// Potential values.
+///
+/// These are based off the Tag field:
+///
+/// `Issue` and `IssueWild` =&gt; `Issuer`,
+/// `Iodef` =&gt; `Url`,
+/// `Unknown` =&gt; `Unknown`,
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serde-config&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Debug, PartialEq, Eq, Hash, Clone)]
+</span><span class="kw">pub enum </span>Value {
+    <span class="doccomment">/// Issuer authorized to issue certs for this zone, and any associated parameters
+    </span>Issuer(<span class="prelude-ty">Option</span>&lt;Name&gt;, Vec&lt;KeyValue&gt;),
+    <span class="doccomment">/// Url to which to send CA errors
+    </span>Url(Url),
+    <span class="doccomment">/// Unrecognized tag and value by Trust-DNS
+    </span>Unknown(Vec&lt;u8&gt;),
 }
 
-<span class="kw">impl</span> <span class="ident">Value</span> {
-    <span class="doccomment">/// true if this is an `Issuer`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_issuer</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="kw-2">*</span><span class="self">self</span>, <span class="ident">Value::Issuer</span>(..))
+<span class="kw">impl </span>Value {
+    <span class="doccomment">/// true if this is an `Issuer`
+    </span><span class="kw">pub fn </span>is_issuer(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="kw-2">*</span><span class="self">self</span>, Value::Issuer(..))
     }
 
-    <span class="doccomment">/// true if this is a `Url`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="kw-2">*</span><span class="self">self</span>, <span class="ident">Value::Url</span>(..))
+    <span class="doccomment">/// true if this is a `Url`
+    </span><span class="kw">pub fn </span>is_url(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="kw-2">*</span><span class="self">self</span>, Value::Url(..))
     }
 
-    <span class="doccomment">/// true if this is an `Unknown`</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_unknown</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="macro">matches!</span>(<span class="kw-2">*</span><span class="self">self</span>, <span class="ident">Value::Unknown</span>(..))
+    <span class="doccomment">/// true if this is an `Unknown`
+    </span><span class="kw">pub fn </span>is_unknown(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="macro">matches!</span>(<span class="kw-2">*</span><span class="self">self</span>, Value::Unknown(..))
     }
 }
 
-<span class="kw">fn</span> <span class="ident">read_value</span>(
-    <span class="ident">tag</span>: <span class="kw-2">&amp;</span><span class="ident">Property</span>,
-    <span class="ident">decoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    <span class="ident">value_len</span>: <span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
-) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">value_len</span> <span class="op">=</span> <span class="ident">value_len</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">u</span> <span class="kw">as</span> <span class="ident">usize</span>).<span class="ident">unverified</span>(<span class="comment">/*used purely as length safely*/</span>);
-    <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">tag</span> {
-        <span class="ident">Property::Issue</span> <span class="op">|</span> <span class="ident">Property::IssueWild</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">slice</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">read_slice</span>(<span class="ident">value_len</span>)<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*read_issuer verified as safe*/</span>);
-            <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">read_issuer</span>(<span class="ident">slice</span>)<span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(<span class="ident">Value::Issuer</span>(<span class="ident">value</span>.<span class="number">0</span>, <span class="ident">value</span>.<span class="number">1</span>))
+<span class="kw">fn </span>read_value(
+    tag: <span class="kw-2">&amp;</span>Property,
+    decoder: <span class="kw-2">&amp;mut </span>BinDecoder&lt;<span class="lifetime">&#39;_</span>&gt;,
+    value_len: Restrict&lt;u16&gt;,
+) -&gt; ProtoResult&lt;Value&gt; {
+    <span class="kw">let </span>value_len = value_len.map(|u| u <span class="kw">as </span>usize).unverified(<span class="comment">/*used purely as length safely*/</span>);
+    <span class="kw">match </span><span class="kw-2">*</span>tag {
+        Property::Issue | Property::IssueWild =&gt; {
+            <span class="kw">let </span>slice = decoder.read_slice(value_len)<span class="question-mark">?</span>.unverified(<span class="comment">/*read_issuer verified as safe*/</span>);
+            <span class="kw">let </span>value = read_issuer(slice)<span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(Value::Issuer(value.<span class="number">0</span>, value.<span class="number">1</span>))
         }
-        <span class="ident">Property::Iodef</span> =&gt; {
-            <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">read_slice</span>(<span class="ident">value_len</span>)<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*read_iodef verified as safe*/</span>);
-            <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">read_iodef</span>(<span class="ident">url</span>)<span class="question-mark">?</span>;
-            <span class="prelude-val">Ok</span>(<span class="ident">Value::Url</span>(<span class="ident">url</span>))
+        Property::Iodef =&gt; {
+            <span class="kw">let </span>url = decoder.read_slice(value_len)<span class="question-mark">?</span>.unverified(<span class="comment">/*read_iodef verified as safe*/</span>);
+            <span class="kw">let </span>url = read_iodef(url)<span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(Value::Url(url))
         }
-        <span class="ident">Property::Unknown</span>(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Value::Unknown</span>(
-            <span class="ident">decoder</span>.<span class="ident">read_vec</span>(<span class="ident">value_len</span>)<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*unknown will fail in usage*/</span>),
+        Property::Unknown(<span class="kw">_</span>) =&gt; <span class="prelude-val">Ok</span>(Value::Unknown(
+            decoder.read_vec(value_len)<span class="question-mark">?</span>.unverified(<span class="comment">/*unknown will fail in usage*/</span>),
         )),
     }
 }
 
-<span class="kw">fn</span> <span class="ident">emit_value</span>(<span class="ident">encoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">value</span> {
-        <span class="ident">Value::Issuer</span>(<span class="kw-2">ref</span> <span class="ident">name</span>, <span class="kw-2">ref</span> <span class="ident">key_values</span>) =&gt; {
-            <span class="comment">// output the name</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">name</span> {
-                <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">to_string</span>();
-                <span class="ident">encoder</span>.<span class="ident">emit_vec</span>(<span class="ident">name</span>.<span class="ident">as_bytes</span>())<span class="question-mark">?</span>;
+<span class="kw">fn </span>emit_value(encoder: <span class="kw-2">&amp;mut </span>BinEncoder&lt;<span class="lifetime">&#39;_</span>&gt;, value: <span class="kw-2">&amp;</span>Value) -&gt; ProtoResult&lt;()&gt; {
+    <span class="kw">match </span><span class="kw-2">*</span>value {
+        Value::Issuer(<span class="kw-2">ref </span>name, <span class="kw-2">ref </span>key_values) =&gt; {
+            <span class="comment">// output the name
+            </span><span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>name) = <span class="kw-2">*</span>name {
+                <span class="kw">let </span>name = name.to_string();
+                encoder.emit_vec(name.as_bytes())<span class="question-mark">?</span>;
             }
 
-            <span class="comment">// if there was no name, then we just output &#39;;&#39;</span>
-            <span class="kw">if</span> <span class="ident">name</span>.<span class="ident">is_none</span>() <span class="op">&amp;&amp;</span> <span class="ident">key_values</span>.<span class="ident">is_empty</span>() {
-                <span class="kw">return</span> <span class="ident">encoder</span>.<span class="ident">emit</span>(<span class="string">b&#39;;&#39;</span>);
+            <span class="comment">// if there was no name, then we just output &#39;;&#39;
+            </span><span class="kw">if </span>name.is_none() &amp;&amp; key_values.is_empty() {
+                <span class="kw">return </span>encoder.emit(<span class="string">b&#39;;&#39;</span>);
             }
 
-            <span class="kw">for</span> <span class="ident">key_value</span> <span class="kw">in</span> <span class="ident">key_values</span> {
-                <span class="ident">encoder</span>.<span class="ident">emit</span>(<span class="string">b&#39;;&#39;</span>)<span class="question-mark">?</span>;
-                <span class="ident">encoder</span>.<span class="ident">emit</span>(<span class="string">b&#39; &#39;</span>)<span class="question-mark">?</span>;
-                <span class="ident">encoder</span>.<span class="ident">emit_vec</span>(<span class="ident">key_value</span>.<span class="ident">key</span>.<span class="ident">as_bytes</span>())<span class="question-mark">?</span>;
-                <span class="ident">encoder</span>.<span class="ident">emit</span>(<span class="string">b&#39;=&#39;</span>)<span class="question-mark">?</span>;
-                <span class="ident">encoder</span>.<span class="ident">emit_vec</span>(<span class="ident">key_value</span>.<span class="ident">value</span>.<span class="ident">as_bytes</span>())<span class="question-mark">?</span>;
+            <span class="kw">for </span>key_value <span class="kw">in </span>key_values {
+                encoder.emit(<span class="string">b&#39;;&#39;</span>)<span class="question-mark">?</span>;
+                encoder.emit(<span class="string">b&#39; &#39;</span>)<span class="question-mark">?</span>;
+                encoder.emit_vec(key_value.key.as_bytes())<span class="question-mark">?</span>;
+                encoder.emit(<span class="string">b&#39;=&#39;</span>)<span class="question-mark">?</span>;
+                encoder.emit_vec(key_value.value.as_bytes())<span class="question-mark">?</span>;
             }
 
             <span class="prelude-val">Ok</span>(())
         }
-        <span class="ident">Value::Url</span>(<span class="kw-2">ref</span> <span class="ident">url</span>) =&gt; {
-            <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">url</span>.<span class="ident">as_str</span>();
-            <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">url</span>.<span class="ident">as_bytes</span>();
-            <span class="ident">encoder</span>.<span class="ident">emit_vec</span>(<span class="ident">bytes</span>)
+        Value::Url(<span class="kw-2">ref </span>url) =&gt; {
+            <span class="kw">let </span>url = url.as_str();
+            <span class="kw">let </span>bytes = url.as_bytes();
+            encoder.emit_vec(bytes)
         }
-        <span class="ident">Value::Unknown</span>(<span class="kw-2">ref</span> <span class="ident">data</span>) =&gt; <span class="ident">encoder</span>.<span class="ident">emit_vec</span>(<span class="ident">data</span>),
+        Value::Unknown(<span class="kw-2">ref </span>data) =&gt; encoder.emit_vec(data),
     }
 }
 
-<span class="kw">enum</span> <span class="ident">ParseNameKeyPairState</span> {
-    <span class="ident">BeforeKey</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span>),
-    <span class="ident">Key</span> {
-        <span class="ident">first_char</span>: <span class="ident">bool</span>,
-        <span class="ident">key</span>: <span class="ident">String</span>,
-        <span class="ident">key_values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span>,
+<span class="kw">enum </span>ParseNameKeyPairState {
+    BeforeKey(Vec&lt;KeyValue&gt;),
+    Key {
+        first_char: bool,
+        key: String,
+        key_values: Vec&lt;KeyValue&gt;,
     },
-    <span class="ident">Value</span> {
-        <span class="ident">key</span>: <span class="ident">String</span>,
-        <span class="ident">value</span>: <span class="ident">String</span>,
-        <span class="ident">key_values</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span>,
+    Value {
+        key: String,
+        value: String,
+        key_values: Vec&lt;KeyValue&gt;,
     },
 }
 
-<span class="doccomment">/// Reads the issuer field according to the spec</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [RFC 6844, DNS Certification Authority Authorization, January 2013](https://tools.ietf.org/html/rfc6844#section-5.2)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// 5.2.  CAA issue Property</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    The issue property tag is used to request that certificate issuers</span>
-<span class="doccomment">///    perform CAA issue restriction processing for the domain and to grant</span>
-<span class="doccomment">///    authorization to specific certificate issuers.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    The CAA issue property value has the following sub-syntax (specified</span>
-<span class="doccomment">///    in ABNF as per [RFC5234]).</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    issuevalue  = space [domain] space [&quot;;&quot; *(space parameter) space]</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    domain = label *(&quot;.&quot; label)</span>
-<span class="doccomment">///    label = (ALPHA / DIGIT) *( *(&quot;-&quot;) (ALPHA / DIGIT))</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    space = *(SP / HTAB)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    parameter =  tag &quot;=&quot; value</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    tag = 1*(ALPHA / DIGIT)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    value = *VCHAR</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    For consistency with other aspects of DNS administration, domain name</span>
-<span class="doccomment">///    values are specified in letter-digit-hyphen Label (LDH-Label) form.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    A CAA record with an issue parameter tag that does not specify a</span>
-<span class="doccomment">///    domain name is a request that certificate issuers perform CAA issue</span>
-<span class="doccomment">///    restriction processing for the corresponding domain without granting</span>
-<span class="doccomment">///    authorization to any certificate issuer.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    This form of issue restriction would be appropriate to specify that</span>
-<span class="doccomment">///    no certificates are to be issued for the domain in question.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    For example, the following CAA record set requests that no</span>
-<span class="doccomment">///    certificates be issued for the domain &#39;nocerts.example.com&#39; by any</span>
-<span class="doccomment">///    certificate issuer.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    nocerts.example.com       CAA 0 issue &quot;;&quot;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    A CAA record with an issue parameter tag that specifies a domain name</span>
-<span class="doccomment">///    is a request that certificate issuers perform CAA issue restriction</span>
-<span class="doccomment">///    processing for the corresponding domain and grants authorization to</span>
-<span class="doccomment">///    the certificate issuer specified by the domain name.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    For example, the following CAA record set requests that no</span>
-<span class="doccomment">///    certificates be issued for the domain &#39;certs.example.com&#39; by any</span>
-<span class="doccomment">///    certificate issuer other than the example.net certificate issuer.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    certs.example.com       CAA 0 issue &quot;example.net&quot;</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    CAA authorizations are additive; thus, the result of specifying both</span>
-<span class="doccomment">///    the empty issuer and a specified issuer is the same as specifying</span>
-<span class="doccomment">///    just the specified issuer alone.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    An issuer MAY choose to specify issuer-parameters that further</span>
-<span class="doccomment">///    constrain the issue of certificates by that issuer, for example,</span>
-<span class="doccomment">///    specifying that certificates are to be subject to specific validation</span>
-<span class="doccomment">///    polices, billed to certain accounts, or issued under specific trust</span>
-<span class="doccomment">///    anchors.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    The semantics of issuer-parameters are determined by the issuer</span>
-<span class="doccomment">///    alone.</span>
-<span class="doccomment">/// ```</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Updated parsing rules:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [RFC 6844bis, CAA Resource Record, May 2018](https://tools.ietf.org/html/draft-ietf-lamps-rfc6844bis-00)</span>
-<span class="doccomment">/// [RFC 6844, CAA Record Extensions, May 2018](https://tools.ietf.org/html/draft-ietf-acme-caa-04)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// This explicitly allows `-` in key names, diverging from the original RFC. To support this, key names will</span>
-<span class="doccomment">/// allow `-` as non-starting characters. Additionally, this significantly relaxes the characters allowed in the value</span>
-<span class="doccomment">/// to allow URL like characters (it does not validate URL syntax).</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_issuer</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Name</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">KeyValue</span><span class="op">&gt;</span>)<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">byte_iter</span> <span class="op">=</span> <span class="ident">bytes</span>.<span class="ident">iter</span>();
+<span class="doccomment">/// Reads the issuer field according to the spec
+///
+/// [RFC 6844, DNS Certification Authority Authorization, January 2013](https://tools.ietf.org/html/rfc6844#section-5.2)
+///
+/// ```text
+/// 5.2.  CAA issue Property
+///
+///    The issue property tag is used to request that certificate issuers
+///    perform CAA issue restriction processing for the domain and to grant
+///    authorization to specific certificate issuers.
+///
+///    The CAA issue property value has the following sub-syntax (specified
+///    in ABNF as per [RFC5234]).
+///
+///    issuevalue  = space [domain] space [&quot;;&quot; *(space parameter) space]
+///
+///    domain = label *(&quot;.&quot; label)
+///    label = (ALPHA / DIGIT) *( *(&quot;-&quot;) (ALPHA / DIGIT))
+///
+///    space = *(SP / HTAB)
+///
+///    parameter =  tag &quot;=&quot; value
+///
+///    tag = 1*(ALPHA / DIGIT)
+///
+///    value = *VCHAR
+///
+///    For consistency with other aspects of DNS administration, domain name
+///    values are specified in letter-digit-hyphen Label (LDH-Label) form.
+///
+///    A CAA record with an issue parameter tag that does not specify a
+///    domain name is a request that certificate issuers perform CAA issue
+///    restriction processing for the corresponding domain without granting
+///    authorization to any certificate issuer.
+///
+///    This form of issue restriction would be appropriate to specify that
+///    no certificates are to be issued for the domain in question.
+///
+///    For example, the following CAA record set requests that no
+///    certificates be issued for the domain &#39;nocerts.example.com&#39; by any
+///    certificate issuer.
+///
+///    nocerts.example.com       CAA 0 issue &quot;;&quot;
+///
+///    A CAA record with an issue parameter tag that specifies a domain name
+///    is a request that certificate issuers perform CAA issue restriction
+///    processing for the corresponding domain and grants authorization to
+///    the certificate issuer specified by the domain name.
+///
+///    For example, the following CAA record set requests that no
+///    certificates be issued for the domain &#39;certs.example.com&#39; by any
+///    certificate issuer other than the example.net certificate issuer.
+///
+///    certs.example.com       CAA 0 issue &quot;example.net&quot;
+///
+///    CAA authorizations are additive; thus, the result of specifying both
+///    the empty issuer and a specified issuer is the same as specifying
+///    just the specified issuer alone.
+///
+///    An issuer MAY choose to specify issuer-parameters that further
+///    constrain the issue of certificates by that issuer, for example,
+///    specifying that certificates are to be subject to specific validation
+///    polices, billed to certain accounts, or issued under specific trust
+///    anchors.
+///
+///    The semantics of issuer-parameters are determined by the issuer
+///    alone.
+/// ```
+///
+/// Updated parsing rules:
+///
+/// [RFC 6844bis, CAA Resource Record, May 2018](https://tools.ietf.org/html/draft-ietf-lamps-rfc6844bis-00)
+/// [RFC 6844, CAA Record Extensions, May 2018](https://tools.ietf.org/html/draft-ietf-acme-caa-04)
+///
+/// This explicitly allows `-` in key names, diverging from the original RFC. To support this, key names will
+/// allow `-` as non-starting characters. Additionally, this significantly relaxes the characters allowed in the value
+/// to allow URL like characters (it does not validate URL syntax).
+</span><span class="kw">pub fn </span>read_issuer(bytes: <span class="kw-2">&amp;</span>[u8]) -&gt; ProtoResult&lt;(<span class="prelude-ty">Option</span>&lt;Name&gt;, Vec&lt;KeyValue&gt;)&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>byte_iter = bytes.iter();
 
-    <span class="comment">// we want to reuse the name parsing rules</span>
-    <span class="kw">let</span> <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Name</span><span class="op">&gt;</span> <span class="op">=</span> {
-        <span class="kw">let</span> <span class="ident">take_name</span> <span class="op">=</span> <span class="ident">byte_iter</span>.<span class="ident">by_ref</span>().<span class="ident">take_while</span>(<span class="op">|</span><span class="ident">ch</span><span class="op">|</span> <span class="ident">char::from</span>(<span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">ch</span>) <span class="op">!</span><span class="op">=</span> <span class="string">&#39;;&#39;</span>);
-        <span class="kw">let</span> <span class="ident">name_str</span> <span class="op">=</span> <span class="ident">take_name</span>.<span class="ident">cloned</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+    <span class="comment">// we want to reuse the name parsing rules
+    </span><span class="kw">let </span>name: <span class="prelude-ty">Option</span>&lt;Name&gt; = {
+        <span class="kw">let </span>take_name = byte_iter.by_ref().take_while(|ch| char::from(<span class="kw-2">**</span>ch) != <span class="string">&#39;;&#39;</span>);
+        <span class="kw">let </span>name_str = take_name.cloned().collect::&lt;Vec&lt;u8&gt;&gt;();
 
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">name_str</span>.<span class="ident">is_empty</span>() {
-            <span class="kw">let</span> <span class="ident">name_str</span> <span class="op">=</span> <span class="ident">str::from_utf8</span>(<span class="kw-2">&amp;</span><span class="ident">name_str</span>)<span class="question-mark">?</span>;
-            <span class="prelude-val">Some</span>(<span class="ident">Name::parse</span>(<span class="ident">name_str</span>, <span class="prelude-val">None</span>)<span class="question-mark">?</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        }
+        <span class="kw">if </span>!name_str.is_empty() {
+            <span class="kw">let </span>name_str = str::from_utf8(<span class="kw-2">&amp;</span>name_str)<span class="question-mark">?</span>;
+            <span class="prelude-val">Some</span>(Name::parse(name_str, <span class="prelude-val">None</span>)<span class="question-mark">?</span>)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>}
     };
 
-    <span class="comment">// initial state is looking for a key &#39;;&#39; is valid...</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">ParseNameKeyPairState::BeforeKey</span>(<span class="macro">vec!</span>[]);
+    <span class="comment">// initial state is looking for a key &#39;;&#39; is valid...
+    </span><span class="kw">let </span><span class="kw-2">mut </span>state = ParseNameKeyPairState::BeforeKey(<span class="macro">vec!</span>[]);
 
-    <span class="comment">// run the state machine through all remaining data, collecting all key/value pairs.</span>
-    <span class="kw">for</span> <span class="ident">ch</span> <span class="kw">in</span> <span class="ident">byte_iter</span> {
-        <span class="kw">match</span> <span class="ident">state</span> {
-            <span class="comment">// Name was already successfully parsed, otherwise we couldn&#39;t get here.</span>
-            <span class="ident">ParseNameKeyPairState::BeforeKey</span>(<span class="ident">key_values</span>) =&gt; {
-                <span class="kw">match</span> <span class="ident">char::from</span>(<span class="kw-2">*</span><span class="ident">ch</span>) {
-                    <span class="comment">// gobble &#39;;&#39;, &#39; &#39;, and tab</span>
-                    <span class="string">&#39;;&#39;</span> <span class="op">|</span> <span class="string">&#39; &#39;</span> <span class="op">|</span> <span class="string">&#39;\u{0009}&#39;</span> =&gt; <span class="ident">state</span> <span class="op">=</span> <span class="ident">ParseNameKeyPairState::BeforeKey</span>(<span class="ident">key_values</span>),
-                    <span class="ident">ch</span> <span class="kw">if</span> <span class="ident">ch</span>.<span class="ident">is_alphanumeric</span>() <span class="op">&amp;&amp;</span> <span class="ident">ch</span> <span class="op">!</span><span class="op">=</span> <span class="string">&#39;=&#39;</span> =&gt; {
-                        <span class="comment">// We found the beginning of a new Key</span>
-                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">String::new</span>();
-                        <span class="ident">key</span>.<span class="ident">push</span>(<span class="ident">ch</span>);
+    <span class="comment">// run the state machine through all remaining data, collecting all key/value pairs.
+    </span><span class="kw">for </span>ch <span class="kw">in </span>byte_iter {
+        <span class="kw">match </span>state {
+            <span class="comment">// Name was already successfully parsed, otherwise we couldn&#39;t get here.
+            </span>ParseNameKeyPairState::BeforeKey(key_values) =&gt; {
+                <span class="kw">match </span>char::from(<span class="kw-2">*</span>ch) {
+                    <span class="comment">// gobble &#39;;&#39;, &#39; &#39;, and tab
+                    </span><span class="string">&#39;;&#39; </span>| <span class="string">&#39; &#39; </span>| <span class="string">&#39;\u{0009}&#39; </span>=&gt; state = ParseNameKeyPairState::BeforeKey(key_values),
+                    ch <span class="kw">if </span>ch.is_alphanumeric() &amp;&amp; ch != <span class="string">&#39;=&#39; </span>=&gt; {
+                        <span class="comment">// We found the beginning of a new Key
+                        </span><span class="kw">let </span><span class="kw-2">mut </span>key = String::new();
+                        key.push(ch);
 
-                        <span class="ident">state</span> <span class="op">=</span> <span class="ident">ParseNameKeyPairState::Key</span> {
-                            <span class="ident">first_char</span>: <span class="bool-val">true</span>,
-                            <span class="ident">key</span>,
-                            <span class="ident">key_values</span>,
+                        state = ParseNameKeyPairState::Key {
+                            first_char: <span class="bool-val">true</span>,
+                            key,
+                            key_values,
                         }
                     }
-                    <span class="ident">ch</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;bad character in CAA issuer key: {}&quot;</span>, <span class="ident">ch</span>).<span class="ident">into</span>()),
+                    ch =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;bad character in CAA issuer key: {}&quot;</span>, ch).into()),
                 }
             }
-            <span class="ident">ParseNameKeyPairState::Key</span> {
-                <span class="ident">first_char</span>,
-                <span class="kw-2">mut</span> <span class="ident">key</span>,
-                <span class="ident">key_values</span>,
+            ParseNameKeyPairState::Key {
+                first_char,
+                <span class="kw-2">mut </span>key,
+                key_values,
             } =&gt; {
-                <span class="kw">match</span> <span class="ident">char::from</span>(<span class="kw-2">*</span><span class="ident">ch</span>) {
-                    <span class="comment">// transition to value</span>
-                    <span class="string">&#39;=&#39;</span> =&gt; {
-                        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">String::new</span>();
-                        <span class="ident">state</span> <span class="op">=</span> <span class="ident">ParseNameKeyPairState::Value</span> {
-                            <span class="ident">key</span>,
-                            <span class="ident">value</span>,
-                            <span class="ident">key_values</span>,
+                <span class="kw">match </span>char::from(<span class="kw-2">*</span>ch) {
+                    <span class="comment">// transition to value
+                    </span><span class="string">&#39;=&#39; </span>=&gt; {
+                        <span class="kw">let </span>value = String::new();
+                        state = ParseNameKeyPairState::Value {
+                            key,
+                            value,
+                            key_values,
                         }
                     }
-                    <span class="comment">// push onto the existing key</span>
-                    <span class="ident">ch</span> <span class="kw">if</span> (<span class="ident">ch</span>.<span class="ident">is_alphanumeric</span>() <span class="op">|</span><span class="op">|</span> (<span class="op">!</span><span class="ident">first_char</span> <span class="op">&amp;&amp;</span> <span class="ident">ch</span> <span class="op">==</span> <span class="string">&#39;-&#39;</span>))
-                        <span class="op">&amp;&amp;</span> <span class="ident">ch</span> <span class="op">!</span><span class="op">=</span> <span class="string">&#39;=&#39;</span>
-                        <span class="op">&amp;&amp;</span> <span class="ident">ch</span> <span class="op">!</span><span class="op">=</span> <span class="string">&#39;;&#39;</span> =&gt;
+                    <span class="comment">// push onto the existing key
+                    </span>ch <span class="kw">if </span>(ch.is_alphanumeric() || (!first_char &amp;&amp; ch == <span class="string">&#39;-&#39;</span>))
+                        &amp;&amp; ch != <span class="string">&#39;=&#39;
+                        </span>&amp;&amp; ch != <span class="string">&#39;;&#39; </span>=&gt;
                     {
-                        <span class="ident">key</span>.<span class="ident">push</span>(<span class="ident">ch</span>);
-                        <span class="ident">state</span> <span class="op">=</span> <span class="ident">ParseNameKeyPairState::Key</span> {
-                            <span class="ident">first_char</span>: <span class="bool-val">false</span>,
-                            <span class="ident">key</span>,
-                            <span class="ident">key_values</span>,
+                        key.push(ch);
+                        state = ParseNameKeyPairState::Key {
+                            first_char: <span class="bool-val">false</span>,
+                            key,
+                            key_values,
                         }
                     }
-                    <span class="ident">ch</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;bad character in CAA issuer key: {}&quot;</span>, <span class="ident">ch</span>).<span class="ident">into</span>()),
+                    ch =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;bad character in CAA issuer key: {}&quot;</span>, ch).into()),
                 }
             }
-            <span class="ident">ParseNameKeyPairState::Value</span> {
-                <span class="ident">key</span>,
-                <span class="kw-2">mut</span> <span class="ident">value</span>,
-                <span class="kw-2">mut</span> <span class="ident">key_values</span>,
+            ParseNameKeyPairState::Value {
+                key,
+                <span class="kw-2">mut </span>value,
+                <span class="kw-2">mut </span>key_values,
             } =&gt; {
-                <span class="kw">match</span> <span class="ident">char::from</span>(<span class="kw-2">*</span><span class="ident">ch</span>) {
-                    <span class="comment">// transition back to find another pair</span>
-                    <span class="string">&#39;;&#39;</span> =&gt; {
-                        <span class="ident">key_values</span>.<span class="ident">push</span>(<span class="ident">KeyValue</span> { <span class="ident">key</span>, <span class="ident">value</span> });
-                        <span class="ident">state</span> <span class="op">=</span> <span class="ident">ParseNameKeyPairState::BeforeKey</span>(<span class="ident">key_values</span>);
+                <span class="kw">match </span>char::from(<span class="kw-2">*</span>ch) {
+                    <span class="comment">// transition back to find another pair
+                    </span><span class="string">&#39;;&#39; </span>=&gt; {
+                        key_values.push(KeyValue { key, value });
+                        state = ParseNameKeyPairState::BeforeKey(key_values);
                     }
-                    <span class="comment">// push onto the existing key</span>
-                    <span class="ident">ch</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">ch</span>.<span class="ident">is_control</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">ch</span>.<span class="ident">is_whitespace</span>() =&gt; {
-                        <span class="ident">value</span>.<span class="ident">push</span>(<span class="ident">ch</span>);
+                    <span class="comment">// push onto the existing key
+                    </span>ch <span class="kw">if </span>!ch.is_control() &amp;&amp; !ch.is_whitespace() =&gt; {
+                        value.push(ch);
 
-                        <span class="ident">state</span> <span class="op">=</span> <span class="ident">ParseNameKeyPairState::Value</span> {
-                            <span class="ident">key</span>,
-                            <span class="ident">value</span>,
-                            <span class="ident">key_values</span>,
+                        state = ParseNameKeyPairState::Value {
+                            key,
+                            value,
+                            key_values,
                         }
                     }
-                    <span class="ident">ch</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;bad character in CAA issuer value: &#39;{}&#39;&quot;</span>, <span class="ident">ch</span>).<span class="ident">into</span>()),
+                    ch =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;bad character in CAA issuer value: &#39;{}&#39;&quot;</span>, ch).into()),
                 }
             }
         }
     }
 
-    <span class="comment">// valid final states are BeforeKey, where there was a final &#39;;&#39; but nothing followed it.</span>
-    <span class="comment">//                        Value, where we collected the final chars of the value, but no more data</span>
-    <span class="kw">let</span> <span class="ident">key_values</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">state</span> {
-        <span class="ident">ParseNameKeyPairState::BeforeKey</span>(<span class="ident">key_values</span>) =&gt; <span class="ident">key_values</span>,
-        <span class="ident">ParseNameKeyPairState::Value</span> {
-            <span class="ident">key</span>,
-            <span class="ident">value</span>,
-            <span class="kw-2">mut</span> <span class="ident">key_values</span>,
+    <span class="comment">// valid final states are BeforeKey, where there was a final &#39;;&#39; but nothing followed it.
+    //                        Value, where we collected the final chars of the value, but no more data
+    </span><span class="kw">let </span>key_values = <span class="kw">match </span>state {
+        ParseNameKeyPairState::BeforeKey(key_values) =&gt; key_values,
+        ParseNameKeyPairState::Value {
+            key,
+            value,
+            <span class="kw-2">mut </span>key_values,
         } =&gt; {
-            <span class="ident">key_values</span>.<span class="ident">push</span>(<span class="ident">KeyValue</span> { <span class="ident">key</span>, <span class="ident">value</span> });
-            <span class="ident">key_values</span>
+            key_values.push(KeyValue { key, value });
+            key_values
         }
-        <span class="ident">ParseNameKeyPairState::Key</span> { <span class="ident">key</span>, .. } =&gt; {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;key missing value: {}&quot;</span>, <span class="ident">key</span>).<span class="ident">into</span>());
+        ParseNameKeyPairState::Key { key, .. } =&gt; {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;key missing value: {}&quot;</span>, key).into());
         }
     };
 
-    <span class="prelude-val">Ok</span>((<span class="ident">name</span>, <span class="ident">key_values</span>))
+    <span class="prelude-val">Ok</span>((name, key_values))
 }
 
-<span class="doccomment">/// Incident Object Description Exchange Format</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [RFC 6844, DNS Certification Authority Authorization, January 2013](https://tools.ietf.org/html/rfc6844#section-5.4)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// 5.4.  CAA iodef Property</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    The iodef property specifies a means of reporting certificate issue</span>
-<span class="doccomment">///    requests or cases of certificate issue for the corresponding domain</span>
-<span class="doccomment">///    that violate the security policy of the issuer or the domain name</span>
-<span class="doccomment">///    holder.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    The Incident Object Description Exchange Format (IODEF) [RFC5070] is</span>
-<span class="doccomment">///    used to present the incident report in machine-readable form.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    The iodef property takes a URL as its parameter.  The URL scheme type</span>
-<span class="doccomment">///    determines the method used for reporting:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    mailto:  The IODEF incident report is reported as a MIME email</span>
-<span class="doccomment">///       attachment to an SMTP email that is submitted to the mail address</span>
-<span class="doccomment">///       specified.  The mail message sent SHOULD contain a brief text</span>
-<span class="doccomment">///       message to alert the recipient to the nature of the attachment.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///    http or https:  The IODEF report is submitted as a Web service</span>
-<span class="doccomment">///       request to the HTTP address specified using the protocol specified</span>
-<span class="doccomment">///       in [RFC6546].</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_iodef</span>(<span class="ident">url</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">Url</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">str::from_utf8</span>(<span class="ident">url</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">Url::parse</span>(<span class="ident">url</span>)<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>(<span class="ident">url</span>)
+<span class="doccomment">/// Incident Object Description Exchange Format
+///
+/// [RFC 6844, DNS Certification Authority Authorization, January 2013](https://tools.ietf.org/html/rfc6844#section-5.4)
+///
+/// ```text
+/// 5.4.  CAA iodef Property
+///
+///    The iodef property specifies a means of reporting certificate issue
+///    requests or cases of certificate issue for the corresponding domain
+///    that violate the security policy of the issuer or the domain name
+///    holder.
+///
+///    The Incident Object Description Exchange Format (IODEF) [RFC5070] is
+///    used to present the incident report in machine-readable form.
+///
+///    The iodef property takes a URL as its parameter.  The URL scheme type
+///    determines the method used for reporting:
+///
+///    mailto:  The IODEF incident report is reported as a MIME email
+///       attachment to an SMTP email that is submitted to the mail address
+///       specified.  The mail message sent SHOULD contain a brief text
+///       message to alert the recipient to the nature of the attachment.
+///
+///    http or https:  The IODEF report is submitted as a Web service
+///       request to the HTTP address specified using the protocol specified
+///       in [RFC6546].
+/// ```
+</span><span class="kw">pub fn </span>read_iodef(url: <span class="kw-2">&amp;</span>[u8]) -&gt; ProtoResult&lt;Url&gt; {
+    <span class="kw">let </span>url = str::from_utf8(url)<span class="question-mark">?</span>;
+    <span class="kw">let </span>url = Url::parse(url)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>(url)
 }
 
-<span class="doccomment">/// Issuer key and value pairs.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// See [RFC 6844, DNS Certification Authority Authorization, January 2013](https://tools.ietf.org/html/rfc6844#section-5.2)</span>
-<span class="doccomment">/// for more explanation.</span>
-<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde-config&quot;</span>, <span class="ident">derive</span>(<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>))]</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">KeyValue</span> {
-    <span class="ident">key</span>: <span class="ident">String</span>,
-    <span class="ident">value</span>: <span class="ident">String</span>,
+<span class="doccomment">/// Issuer key and value pairs.
+///
+/// See [RFC 6844, DNS Certification Authority Authorization, January 2013](https://tools.ietf.org/html/rfc6844#section-5.2)
+/// for more explanation.
+</span><span class="attribute">#[cfg_attr(feature = <span class="string">&quot;serde-config&quot;</span>, derive(Deserialize, Serialize))]
+#[derive(Debug, PartialEq, Eq, Hash, Clone)]
+</span><span class="kw">pub struct </span>KeyValue {
+    key: String,
+    value: String,
 }
 
-<span class="kw">impl</span> <span class="ident">KeyValue</span> {
-    <span class="doccomment">/// Construct a new KeyValue pair</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">K</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">V</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">key</span>: <span class="ident">K</span>, <span class="ident">value</span>: <span class="ident">V</span>) -&gt; <span class="self">Self</span> {
-        <span class="self">Self</span> {
-            <span class="ident">key</span>: <span class="ident">key</span>.<span class="ident">into</span>(),
-            <span class="ident">value</span>: <span class="ident">value</span>.<span class="ident">into</span>(),
+<span class="kw">impl </span>KeyValue {
+    <span class="doccomment">/// Construct a new KeyValue pair
+    </span><span class="kw">pub fn </span>new&lt;K: Into&lt;String&gt;, V: Into&lt;String&gt;&gt;(key: K, value: V) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            key: key.into(),
+            value: value.into(),
         }
     }
 
-    <span class="doccomment">/// Gets a reference to the key of the pair.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">key</span>
+    <span class="doccomment">/// Gets a reference to the key of the pair.
+    </span><span class="kw">pub fn </span>key(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.key
     }
 
-    <span class="doccomment">/// Gets a reference to the value of the pair.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">value</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">value</span>
+    <span class="doccomment">/// Gets a reference to the value of the pair.
+    </span><span class="kw">pub fn </span>value(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.value
     }
 }
 
-<span class="doccomment">/// Read the binary CAA format</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [RFC 6844, DNS Certification Authority Authorization, January 2013](https://tools.ietf.org/html/rfc6844#section-5.1)</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// ```text</span>
-<span class="doccomment">/// 5.1.  Syntax</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   A CAA RR contains a single property entry consisting of a tag-value</span>
-<span class="doccomment">///   pair.  Each tag represents a property of the CAA record.  The value</span>
-<span class="doccomment">///   of a CAA property is that specified in the corresponding value field.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   A domain name MAY have multiple CAA RRs associated with it and a</span>
-<span class="doccomment">///   given property MAY be specified more than once.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   The CAA data field contains one property entry.  A property entry</span>
-<span class="doccomment">///   consists of the following data fields:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   +0-1-2-3-4-5-6-7-|0-1-2-3-4-5-6-7-|</span>
-<span class="doccomment">///   | Flags          | Tag Length = n |</span>
-<span class="doccomment">///   +----------------+----------------+...+---------------+</span>
-<span class="doccomment">///   | Tag char 0     | Tag char 1     |...| Tag char n-1  |</span>
-<span class="doccomment">///   +----------------+----------------+...+---------------+</span>
-<span class="doccomment">///   +----------------+----------------+.....+----------------+</span>
-<span class="doccomment">///   | Value byte 0   | Value byte 1   |.....| Value byte m-1 |</span>
-<span class="doccomment">///   +----------------+----------------+.....+----------------+</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   Where n is the length specified in the Tag length field and m is the</span>
-<span class="doccomment">///   remaining octets in the Value field (m = d - n - 2) where d is the</span>
-<span class="doccomment">///   length of the RDATA section.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   The data fields are defined as follows:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   Flags:  One octet containing the following fields:</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///      Bit 0, Issuer Critical Flag:  If the value is set to &#39;1&#39;, the</span>
-<span class="doccomment">///         critical flag is asserted and the property MUST be understood</span>
-<span class="doccomment">///         if the CAA record is to be correctly processed by a certificate</span>
-<span class="doccomment">///         issuer.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///         A Certification Authority MUST NOT issue certificates for any</span>
-<span class="doccomment">///         Domain that contains a CAA critical property for an unknown or</span>
-<span class="doccomment">///         unsupported property tag that for which the issuer critical</span>
-<span class="doccomment">///         flag is set.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///      Note that according to the conventions set out in [RFC1035], bit 0</span>
-<span class="doccomment">///      is the Most Significant Bit and bit 7 is the Least Significant</span>
-<span class="doccomment">///      Bit. Thus, the Flags value 1 means that bit 7 is set while a value</span>
-<span class="doccomment">///      of 128 means that bit 0 is set according to this convention.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///      All other bit positions are reserved for future use.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///      To ensure compatibility with future extensions to CAA, DNS records</span>
-<span class="doccomment">///      compliant with this version of the CAA specification MUST clear</span>
-<span class="doccomment">///      (set to &quot;0&quot;) all reserved flags bits.  Applications that interpret</span>
-<span class="doccomment">///      CAA records MUST ignore the value of all reserved flag bits.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   Tag Length:  A single octet containing an unsigned integer specifying</span>
-<span class="doccomment">///      the tag length in octets.  The tag length MUST be at least 1 and</span>
-<span class="doccomment">///      SHOULD be no more than 15.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   Tag:  The property identifier, a sequence of US-ASCII characters.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///      Tag values MAY contain US-ASCII characters &#39;a&#39; through &#39;z&#39;, &#39;A&#39;</span>
-<span class="doccomment">///      through &#39;Z&#39;, and the numbers 0 through 9.  Tag values SHOULD NOT</span>
-<span class="doccomment">///      contain any other characters.  Matching of tag values is case</span>
-<span class="doccomment">///      insensitive.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///      Tag values submitted for registration by IANA MUST NOT contain any</span>
-<span class="doccomment">///      characters other than the (lowercase) US-ASCII characters &#39;a&#39;</span>
-<span class="doccomment">///      through &#39;z&#39; and the numbers 0 through 9.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///   Value:  A sequence of octets representing the property value.</span>
-<span class="doccomment">///      Property values are encoded as binary values and MAY employ sub-</span>
-<span class="doccomment">///      formats.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">///      The length of the value field is specified implicitly as the</span>
-<span class="doccomment">///      remaining length of the enclosing Resource Record data field.</span>
-<span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">rdata_length</span>: <span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">CAA</span><span class="op">&gt;</span> {
-    <span class="comment">// the spec declares that other flags should be ignored for future compatibility...</span>
-    <span class="kw">let</span> <span class="ident">issuer_critical</span>: <span class="ident">bool</span> <span class="op">=</span>
-        <span class="ident">decoder</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>.<span class="ident">unverified</span>(<span class="comment">/*used as bitfield*/</span>) <span class="op">&amp;</span> <span class="number">0b1000_0000</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>;
+<span class="doccomment">/// Read the binary CAA format
+///
+/// [RFC 6844, DNS Certification Authority Authorization, January 2013](https://tools.ietf.org/html/rfc6844#section-5.1)
+///
+/// ```text
+/// 5.1.  Syntax
+///
+///   A CAA RR contains a single property entry consisting of a tag-value
+///   pair.  Each tag represents a property of the CAA record.  The value
+///   of a CAA property is that specified in the corresponding value field.
+///
+///   A domain name MAY have multiple CAA RRs associated with it and a
+///   given property MAY be specified more than once.
+///
+///   The CAA data field contains one property entry.  A property entry
+///   consists of the following data fields:
+///
+///   +0-1-2-3-4-5-6-7-|0-1-2-3-4-5-6-7-|
+///   | Flags          | Tag Length = n |
+///   +----------------+----------------+...+---------------+
+///   | Tag char 0     | Tag char 1     |...| Tag char n-1  |
+///   +----------------+----------------+...+---------------+
+///   +----------------+----------------+.....+----------------+
+///   | Value byte 0   | Value byte 1   |.....| Value byte m-1 |
+///   +----------------+----------------+.....+----------------+
+///
+///   Where n is the length specified in the Tag length field and m is the
+///   remaining octets in the Value field (m = d - n - 2) where d is the
+///   length of the RDATA section.
+///
+///   The data fields are defined as follows:
+///
+///   Flags:  One octet containing the following fields:
+///
+///      Bit 0, Issuer Critical Flag:  If the value is set to &#39;1&#39;, the
+///         critical flag is asserted and the property MUST be understood
+///         if the CAA record is to be correctly processed by a certificate
+///         issuer.
+///
+///         A Certification Authority MUST NOT issue certificates for any
+///         Domain that contains a CAA critical property for an unknown or
+///         unsupported property tag that for which the issuer critical
+///         flag is set.
+///
+///      Note that according to the conventions set out in [RFC1035], bit 0
+///      is the Most Significant Bit and bit 7 is the Least Significant
+///      Bit. Thus, the Flags value 1 means that bit 7 is set while a value
+///      of 128 means that bit 0 is set according to this convention.
+///
+///      All other bit positions are reserved for future use.
+///
+///      To ensure compatibility with future extensions to CAA, DNS records
+///      compliant with this version of the CAA specification MUST clear
+///      (set to &quot;0&quot;) all reserved flags bits.  Applications that interpret
+///      CAA records MUST ignore the value of all reserved flag bits.
+///
+///   Tag Length:  A single octet containing an unsigned integer specifying
+///      the tag length in octets.  The tag length MUST be at least 1 and
+///      SHOULD be no more than 15.
+///
+///   Tag:  The property identifier, a sequence of US-ASCII characters.
+///
+///      Tag values MAY contain US-ASCII characters &#39;a&#39; through &#39;z&#39;, &#39;A&#39;
+///      through &#39;Z&#39;, and the numbers 0 through 9.  Tag values SHOULD NOT
+///      contain any other characters.  Matching of tag values is case
+///      insensitive.
+///
+///      Tag values submitted for registration by IANA MUST NOT contain any
+///      characters other than the (lowercase) US-ASCII characters &#39;a&#39;
+///      through &#39;z&#39; and the numbers 0 through 9.
+///
+///   Value:  A sequence of octets representing the property value.
+///      Property values are encoded as binary values and MAY employ sub-
+///      formats.
+///
+///      The length of the value field is specified implicitly as the
+///      remaining length of the enclosing Resource Record data field.
+/// ```
+</span><span class="kw">pub fn </span>read(decoder: <span class="kw-2">&amp;mut </span>BinDecoder&lt;<span class="lifetime">&#39;_</span>&gt;, rdata_length: Restrict&lt;u16&gt;) -&gt; ProtoResult&lt;CAA&gt; {
+    <span class="comment">// the spec declares that other flags should be ignored for future compatibility...
+    </span><span class="kw">let </span>issuer_critical: bool =
+        decoder.read_u8()<span class="question-mark">?</span>.unverified(<span class="comment">/*used as bitfield*/</span>) &amp; <span class="number">0b1000_0000 </span>!= <span class="number">0</span>;
 
-    <span class="kw">let</span> <span class="ident">tag_len</span> <span class="op">=</span> <span class="ident">decoder</span>.<span class="ident">read_u8</span>()<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">value_len</span>: <span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">rdata_length</span>
-        .<span class="ident">checked_sub</span>(<span class="ident">u16::from</span>(<span class="ident">tag_len</span>.<span class="ident">unverified</span>(<span class="comment">/*safe usage here*/</span>)))
-        .<span class="ident">checked_sub</span>(<span class="number">2</span>)
-        .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">ProtoError::from</span>(<span class="string">&quot;CAA tag character(s) out of bounds&quot;</span>))<span class="question-mark">?</span>;
+    <span class="kw">let </span>tag_len = decoder.read_u8()<span class="question-mark">?</span>;
+    <span class="kw">let </span>value_len: Restrict&lt;u16&gt; = rdata_length
+        .checked_sub(u16::from(tag_len.unverified(<span class="comment">/*safe usage here*/</span>)))
+        .checked_sub(<span class="number">2</span>)
+        .map_err(|<span class="kw">_</span>| ProtoError::from(<span class="string">&quot;CAA tag character(s) out of bounds&quot;</span>))<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">tag</span> <span class="op">=</span> <span class="ident">read_tag</span>(<span class="ident">decoder</span>, <span class="ident">tag_len</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">tag</span> <span class="op">=</span> <span class="ident">Property::from</span>(<span class="ident">tag</span>);
-    <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">read_value</span>(<span class="kw-2">&amp;</span><span class="ident">tag</span>, <span class="ident">decoder</span>, <span class="ident">value_len</span>)<span class="question-mark">?</span>;
+    <span class="kw">let </span>tag = read_tag(decoder, tag_len)<span class="question-mark">?</span>;
+    <span class="kw">let </span>tag = Property::from(tag);
+    <span class="kw">let </span>value = read_value(<span class="kw-2">&amp;</span>tag, decoder, value_len)<span class="question-mark">?</span>;
 
-    <span class="prelude-val">Ok</span>(<span class="ident">CAA</span> {
-        <span class="ident">issuer_critical</span>,
-        <span class="ident">tag</span>,
-        <span class="ident">value</span>,
+    <span class="prelude-val">Ok</span>(CAA {
+        issuer_critical,
+        tag,
+        value,
     })
 }
 
-<span class="comment">// TODO: change this to return &amp;str</span>
-<span class="kw">fn</span> <span class="ident">read_tag</span>(<span class="ident">decoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">len</span>: <span class="ident">Restrict</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">len</span>
-        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">len</span><span class="op">|</span> <span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>)
-        .<span class="ident">verify_unwrap</span>(<span class="op">|</span><span class="ident">len</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">len</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">15</span>)
-        .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">ProtoError::from</span>(<span class="string">&quot;CAA tag length out of bounds, 1-15&quot;</span>))<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tag</span> <span class="op">=</span> <span class="ident">String::with_capacity</span>(<span class="ident">len</span>);
+<span class="comment">// TODO: change this to return &amp;str
+</span><span class="kw">fn </span>read_tag(decoder: <span class="kw-2">&amp;mut </span>BinDecoder&lt;<span class="lifetime">&#39;_</span>&gt;, len: Restrict&lt;u8&gt;) -&gt; ProtoResult&lt;String&gt; {
+    <span class="kw">let </span>len = len
+        .map(|len| len <span class="kw">as </span>usize)
+        .verify_unwrap(|len| <span class="kw-2">*</span>len &gt; <span class="number">0 </span>&amp;&amp; <span class="kw-2">*</span>len &lt;= <span class="number">15</span>)
+        .map_err(|<span class="kw">_</span>| ProtoError::from(<span class="string">&quot;CAA tag length out of bounds, 1-15&quot;</span>))<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>tag = String::with_capacity(len);
 
-    <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">len</span> {
-        <span class="kw">let</span> <span class="ident">ch</span> <span class="op">=</span> <span class="ident">decoder</span>
-            .<span class="ident">pop</span>()<span class="question-mark">?</span>
-            .<span class="ident">map</span>(<span class="ident">char::from</span>)
-            .<span class="ident">verify_unwrap</span>(<span class="op">|</span><span class="ident">ch</span><span class="op">|</span> <span class="macro">matches!</span>(<span class="ident">ch</span>, <span class="string">&#39;a&#39;</span>..<span class="op">=</span><span class="string">&#39;z&#39;</span> <span class="op">|</span> <span class="string">&#39;A&#39;</span>..<span class="op">=</span><span class="string">&#39;Z&#39;</span> <span class="op">|</span> <span class="string">&#39;0&#39;</span>..<span class="op">=</span><span class="string">&#39;9&#39;</span>))
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">ProtoError::from</span>(<span class="string">&quot;CAA tag character(s) out of bounds&quot;</span>))<span class="question-mark">?</span>;
+    <span class="kw">for _ in </span><span class="number">0</span>..len {
+        <span class="kw">let </span>ch = decoder
+            .pop()<span class="question-mark">?
+            </span>.map(char::from)
+            .verify_unwrap(|ch| <span class="macro">matches!</span>(ch, <span class="string">&#39;a&#39;</span>..=<span class="string">&#39;z&#39; </span>| <span class="string">&#39;A&#39;</span>..=<span class="string">&#39;Z&#39; </span>| <span class="string">&#39;0&#39;</span>..=<span class="string">&#39;9&#39;</span>))
+            .map_err(|<span class="kw">_</span>| ProtoError::from(<span class="string">&quot;CAA tag character(s) out of bounds&quot;</span>))<span class="question-mark">?</span>;
 
-        <span class="ident">tag</span>.<span class="ident">push</span>(<span class="ident">ch</span>);
+        tag.push(ch);
     }
 
-    <span class="prelude-val">Ok</span>(<span class="ident">tag</span>)
+    <span class="prelude-val">Ok</span>(tag)
 }
 
-<span class="doccomment">/// writes out the tag in binary form to the buffer, returning the number of bytes written</span>
-<span class="kw">fn</span> <span class="ident">emit_tag</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">u8</span>], <span class="ident">tag</span>: <span class="kw-2">&amp;</span><span class="ident">Property</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">property</span> <span class="op">=</span> <span class="ident">tag</span>.<span class="ident">as_str</span>();
-    <span class="kw">let</span> <span class="ident">property</span> <span class="op">=</span> <span class="ident">property</span>.<span class="ident">as_bytes</span>();
+<span class="doccomment">/// writes out the tag in binary form to the buffer, returning the number of bytes written
+</span><span class="kw">fn </span>emit_tag(buf: <span class="kw-2">&amp;mut </span>[u8], tag: <span class="kw-2">&amp;</span>Property) -&gt; ProtoResult&lt;u8&gt; {
+    <span class="kw">let </span>property = tag.as_str();
+    <span class="kw">let </span>property = property.as_bytes();
 
-    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">property</span>.<span class="ident">len</span>();
-    <span class="kw">if</span> <span class="ident">len</span> <span class="op">&gt;</span> <span class="ident">::std::u8::MAX</span> <span class="kw">as</span> <span class="ident">usize</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;CAA property too long: {}&quot;</span>, <span class="ident">len</span>).<span class="ident">into</span>());
+    <span class="kw">let </span>len = property.len();
+    <span class="kw">if </span>len &gt; ::std::u8::MAX <span class="kw">as </span>usize {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">format!</span>(<span class="string">&quot;CAA property too long: {}&quot;</span>, len).into());
     }
-    <span class="kw">if</span> <span class="ident">buf</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="ident">len</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="macro">format!</span>(
+    <span class="kw">if </span>buf.len() &lt; len {
+        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">format!</span>(
             <span class="string">&quot;insufficient capacity in CAA buffer: {} for tag: {}&quot;</span>,
-            <span class="ident">buf</span>.<span class="ident">len</span>(),
-            <span class="ident">len</span>
+            buf.len(),
+            len
         )
-        .<span class="ident">into</span>());
+        .into());
     }
 
-    <span class="comment">// copy into the buffer</span>
-    <span class="kw">let</span> <span class="ident">buf</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="ident">buf</span>[<span class="number">0</span>..<span class="ident">len</span>];
-    <span class="ident">buf</span>.<span class="ident">copy_from_slice</span>(<span class="ident">property</span>);
+    <span class="comment">// copy into the buffer
+    </span><span class="kw">let </span>buf = <span class="kw-2">&amp;mut </span>buf[<span class="number">0</span>..len];
+    buf.copy_from_slice(property);
 
-    <span class="prelude-val">Ok</span>(<span class="ident">len</span> <span class="kw">as</span> <span class="ident">u8</span>)
+    <span class="prelude-val">Ok</span>(len <span class="kw">as </span>u8)
 }
 
-<span class="doccomment">/// Write the RData from the given Decoder</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">emit</span>(<span class="ident">encoder</span>: <span class="kw-2">&amp;mut</span> <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">caa</span>: <span class="kw-2">&amp;</span><span class="ident">CAA</span>) -&gt; <span class="ident">ProtoResult</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">flags</span> <span class="op">=</span> <span class="number">0_u8</span>;
+<span class="doccomment">/// Write the RData from the given Decoder
+</span><span class="kw">pub fn </span>emit(encoder: <span class="kw-2">&amp;mut </span>BinEncoder&lt;<span class="lifetime">&#39;_</span>&gt;, caa: <span class="kw-2">&amp;</span>CAA) -&gt; ProtoResult&lt;()&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>flags = <span class="number">0_u8</span>;
 
-    <span class="kw">if</span> <span class="ident">caa</span>.<span class="ident">issuer_critical</span> {
-        <span class="ident">flags</span> <span class="op">|</span><span class="op">=</span> <span class="number">0b1000_0000</span>;
+    <span class="kw">if </span>caa.issuer_critical {
+        flags |= <span class="number">0b1000_0000</span>;
     }
 
-    <span class="ident">encoder</span>.<span class="ident">emit</span>(<span class="ident">flags</span>)<span class="question-mark">?</span>;
-    <span class="comment">// TODO: it might be interesting to use the new place semantics here to output all the data, then place the length back to the beginning...</span>
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tag_buf</span> <span class="op">=</span> [<span class="number">0_u8</span>; <span class="ident">::std::u8::MAX</span> <span class="kw">as</span> <span class="ident">usize</span>];
-    <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">emit_tag</span>(<span class="kw-2">&amp;mut</span> <span class="ident">tag_buf</span>, <span class="kw-2">&amp;</span><span class="ident">caa</span>.<span class="ident">tag</span>)<span class="question-mark">?</span>;
+    encoder.emit(flags)<span class="question-mark">?</span>;
+    <span class="comment">// TODO: it might be interesting to use the new place semantics here to output all the data, then place the length back to the beginning...
+    </span><span class="kw">let </span><span class="kw-2">mut </span>tag_buf = [<span class="number">0_u8</span>; ::std::u8::MAX <span class="kw">as </span>usize];
+    <span class="kw">let </span>len = emit_tag(<span class="kw-2">&amp;mut </span>tag_buf, <span class="kw-2">&amp;</span>caa.tag)<span class="question-mark">?</span>;
 
-    <span class="comment">// now write to the encoder</span>
-    <span class="ident">encoder</span>.<span class="ident">emit</span>(<span class="ident">len</span>)<span class="question-mark">?</span>;
-    <span class="ident">encoder</span>.<span class="ident">emit_vec</span>(<span class="kw-2">&amp;</span><span class="ident">tag_buf</span>[<span class="number">0</span>..<span class="ident">len</span> <span class="kw">as</span> <span class="ident">usize</span>])<span class="question-mark">?</span>;
-    <span class="ident">emit_value</span>(<span class="ident">encoder</span>, <span class="kw-2">&amp;</span><span class="ident">caa</span>.<span class="ident">value</span>)<span class="question-mark">?</span>;
+    <span class="comment">// now write to the encoder
+    </span>encoder.emit(len)<span class="question-mark">?</span>;
+    encoder.emit_vec(<span class="kw-2">&amp;</span>tag_buf[<span class="number">0</span>..len <span class="kw">as </span>usize])<span class="question-mark">?</span>;
+    emit_value(encoder, <span class="kw-2">&amp;</span>caa.value)<span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Property</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Property::Issue</span> =&gt; <span class="string">&quot;issue&quot;</span>,
-            <span class="ident">Property::IssueWild</span> =&gt; <span class="string">&quot;issuewild&quot;</span>,
-            <span class="ident">Property::Iodef</span> =&gt; <span class="string">&quot;iodef&quot;</span>,
-            <span class="ident">Property::Unknown</span>(<span class="ident">s</span>) =&gt; <span class="ident">s</span>,
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Property {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), fmt::Error&gt; {
+        <span class="kw">let </span>s = <span class="kw">match </span><span class="self">self </span>{
+            Property::Issue =&gt; <span class="string">&quot;issue&quot;</span>,
+            Property::IssueWild =&gt; <span class="string">&quot;issuewild&quot;</span>,
+            Property::Iodef =&gt; <span class="string">&quot;iodef&quot;</span>,
+            Property::Unknown(s) =&gt; s,
         };
 
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">s</span>)
+        f.write_str(s)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Value</span> {
-    <span class="comment">// https://datatracker.ietf.org/doc/html/rfc6844#section-5.1.1</span>
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;\&quot;&quot;</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Value {
+    <span class="comment">// https://datatracker.ietf.org/doc/html/rfc6844#section-5.1.1
+    </span><span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), fmt::Error&gt; {
+        f.write_str(<span class="string">&quot;\&quot;&quot;</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Value::Issuer</span>(<span class="ident">name</span>, <span class="ident">values</span>) =&gt; {
-                <span class="kw">match</span> <span class="ident">name</span> {
-                    <span class="prelude-val">Some</span>(<span class="ident">name</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">name</span>)<span class="question-mark">?</span>,
-                    <span class="prelude-val">None</span> =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;;&quot;</span>)<span class="question-mark">?</span>,
+        <span class="kw">match </span><span class="self">self </span>{
+            Value::Issuer(name, values) =&gt; {
+                <span class="kw">match </span>name {
+                    <span class="prelude-val">Some</span>(name) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, name)<span class="question-mark">?</span>,
+                    <span class="prelude-val">None </span>=&gt; <span class="macro">write!</span>(f, <span class="string">&quot;;&quot;</span>)<span class="question-mark">?</span>,
                 }
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span> <span class="ident">values</span>.<span class="ident">first</span>() {
-                    <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot; {}&quot;</span>, <span class="ident">value</span>)<span class="question-mark">?</span>;
-                    <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">values</span>[<span class="number">1</span>..] {
-                        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;; {}&quot;</span>, <span class="ident">value</span>)<span class="question-mark">?</span>;
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(value) = values.first() {
+                    <span class="macro">write!</span>(f, <span class="string">&quot; {}&quot;</span>, value)<span class="question-mark">?</span>;
+                    <span class="kw">for </span>value <span class="kw">in </span><span class="kw-2">&amp;</span>values[<span class="number">1</span>..] {
+                        <span class="macro">write!</span>(f, <span class="string">&quot;; {}&quot;</span>, value)<span class="question-mark">?</span>;
                     }
                 }
             }
-            <span class="ident">Value::Url</span>(<span class="ident">url</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">url</span>)<span class="question-mark">?</span>,
-            <span class="ident">Value::Unknown</span>(<span class="ident">v</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{:?}&quot;</span>, <span class="ident">v</span>)<span class="question-mark">?</span>,
+            Value::Url(url) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, url)<span class="question-mark">?</span>,
+            Value::Unknown(v) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{:?}&quot;</span>, v)<span class="question-mark">?</span>,
         }
 
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;\&quot;&quot;</span>)
+        f.write_str(<span class="string">&quot;\&quot;&quot;</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">KeyValue</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
-        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">key</span>)<span class="question-mark">?</span>;
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">value</span>.<span class="ident">is_empty</span>() {
-            <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;={}&quot;</span>, <span class="self">self</span>.<span class="ident">value</span>)<span class="question-mark">?</span>;
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>KeyValue {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), fmt::Error&gt; {
+        f.write_str(<span class="kw-2">&amp;</span><span class="self">self</span>.key)<span class="question-mark">?</span>;
+        <span class="kw">if </span>!<span class="self">self</span>.value.is_empty() {
+            <span class="macro">write!</span>(f, <span class="string">&quot;={}&quot;</span>, <span class="self">self</span>.value)<span class="question-mark">?</span>;
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 }
 
-<span class="comment">// FIXME: this needs to be verified to be correct, add tests...</span>
-<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">CAA</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">critical</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">issuer_critical</span> { <span class="string">&quot;1&quot;</span> } <span class="kw">else</span> { <span class="string">&quot;0&quot;</span> };
+<span class="comment">// FIXME: this needs to be verified to be correct, add tests...
+</span><span class="kw">impl </span>fmt::Display <span class="kw">for </span>CAA {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;(), fmt::Error&gt; {
+        <span class="kw">let </span>critical = <span class="kw">if </span><span class="self">self</span>.issuer_critical { <span class="string">&quot;1&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;0&quot; </span>};
 
         <span class="macro">write!</span>(
-            <span class="ident">f</span>,
+            f,
             <span class="string">&quot;{critical} {tag} {value}&quot;</span>,
-            <span class="ident">critical</span> <span class="op">=</span> <span class="ident">critical</span>,
-            <span class="ident">tag</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tag</span>,
-            <span class="ident">value</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">value</span>
+            critical = critical,
+            tag = <span class="self">self</span>.tag,
+            value = <span class="self">self</span>.value
         )
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">tests</span> {
-    <span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy::dbg_macro</span>, <span class="ident">clippy::print_stdout</span>)]</span>
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>tests {
+    <span class="attribute">#![allow(clippy::dbg_macro, clippy::print_stdout)]
 
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use</span> <span class="ident">std::str</span>;
+    </span><span class="kw">use super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use </span>std::str;
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_read_tag</span>() {
-        <span class="kw">let</span> <span class="ident">ok_under15</span> <span class="op">=</span> <span class="string">b&quot;abcxyzABCXYZ019&quot;</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span> <span class="op">=</span> <span class="ident">BinDecoder::new</span>(<span class="ident">ok_under15</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_read_tag() {
+        <span class="kw">let </span>ok_under15 = <span class="string">b&quot;abcxyzABCXYZ019&quot;</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>decoder = BinDecoder::new(ok_under15);
 
-        <span class="kw">let</span> <span class="ident">read</span> <span class="op">=</span> <span class="ident">read_tag</span>(<span class="kw-2">&amp;mut</span> <span class="ident">decoder</span>, <span class="ident">Restrict::new</span>(<span class="ident">ok_under15</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u8</span>))
-            .<span class="ident">expect</span>(<span class="string">&quot;failed to read tag&quot;</span>);
+        <span class="kw">let </span>read = read_tag(<span class="kw-2">&amp;mut </span>decoder, Restrict::new(ok_under15.len() <span class="kw">as </span>u8))
+            .expect(<span class="string">&quot;failed to read tag&quot;</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">str::from_utf8</span>(<span class="ident">ok_under15</span>).<span class="ident">unwrap</span>(), <span class="ident">read</span>);
+        <span class="macro">assert_eq!</span>(str::from_utf8(ok_under15).unwrap(), read);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_bad_tag</span>() {
-        <span class="kw">let</span> <span class="ident">bad_under15</span> <span class="op">=</span> <span class="string">b&quot;-&quot;</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span> <span class="op">=</span> <span class="ident">BinDecoder::new</span>(<span class="ident">bad_under15</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_bad_tag() {
+        <span class="kw">let </span>bad_under15 = <span class="string">b&quot;-&quot;</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>decoder = BinDecoder::new(bad_under15);
 
-        <span class="macro">assert!</span>(<span class="ident">read_tag</span>(<span class="kw-2">&amp;mut</span> <span class="ident">decoder</span>, <span class="ident">Restrict::new</span>(<span class="ident">bad_under15</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u8</span>)).<span class="ident">is_err</span>());
+        <span class="macro">assert!</span>(read_tag(<span class="kw-2">&amp;mut </span>decoder, Restrict::new(bad_under15.len() <span class="kw">as </span>u8)).is_err());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_too_short_tag</span>() {
-        <span class="kw">let</span> <span class="ident">too_short</span> <span class="op">=</span> <span class="string">b&quot;&quot;</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span> <span class="op">=</span> <span class="ident">BinDecoder::new</span>(<span class="ident">too_short</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_too_short_tag() {
+        <span class="kw">let </span>too_short = <span class="string">b&quot;&quot;</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>decoder = BinDecoder::new(too_short);
 
-        <span class="macro">assert!</span>(<span class="ident">read_tag</span>(<span class="kw-2">&amp;mut</span> <span class="ident">decoder</span>, <span class="ident">Restrict::new</span>(<span class="ident">too_short</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u8</span>)).<span class="ident">is_err</span>());
+        <span class="macro">assert!</span>(read_tag(<span class="kw-2">&amp;mut </span>decoder, Restrict::new(too_short.len() <span class="kw">as </span>u8)).is_err());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_too_long_tag</span>() {
-        <span class="kw">let</span> <span class="ident">too_long</span> <span class="op">=</span> <span class="string">b&quot;0123456789abcdef&quot;</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span> <span class="op">=</span> <span class="ident">BinDecoder::new</span>(<span class="ident">too_long</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_too_long_tag() {
+        <span class="kw">let </span>too_long = <span class="string">b&quot;0123456789abcdef&quot;</span>;
+        <span class="kw">let </span><span class="kw-2">mut </span>decoder = BinDecoder::new(too_long);
 
-        <span class="macro">assert!</span>(<span class="ident">read_tag</span>(<span class="kw-2">&amp;mut</span> <span class="ident">decoder</span>, <span class="ident">Restrict::new</span>(<span class="ident">too_long</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u8</span>)).<span class="ident">is_err</span>());
+        <span class="macro">assert!</span>(read_tag(<span class="kw-2">&amp;mut </span>decoder, Restrict::new(too_long.len() <span class="kw">as </span>u8)).is_err());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_from_str_property</span>() {
-        <span class="macro">assert_eq!</span>(<span class="ident">Property::from</span>(<span class="string">&quot;Issue&quot;</span>.<span class="ident">to_string</span>()), <span class="ident">Property::Issue</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Property::from</span>(<span class="string">&quot;issueWild&quot;</span>.<span class="ident">to_string</span>()), <span class="ident">Property::IssueWild</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">Property::from</span>(<span class="string">&quot;iodef&quot;</span>.<span class="ident">to_string</span>()), <span class="ident">Property::Iodef</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_from_str_property() {
+        <span class="macro">assert_eq!</span>(Property::from(<span class="string">&quot;Issue&quot;</span>.to_string()), Property::Issue);
+        <span class="macro">assert_eq!</span>(Property::from(<span class="string">&quot;issueWild&quot;</span>.to_string()), Property::IssueWild);
+        <span class="macro">assert_eq!</span>(Property::from(<span class="string">&quot;iodef&quot;</span>.to_string()), Property::Iodef);
         <span class="macro">assert_eq!</span>(
-            <span class="ident">Property::from</span>(<span class="string">&quot;unknown&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">Property::Unknown</span>(<span class="string">&quot;unknown&quot;</span>.<span class="ident">to_string</span>())
+            Property::from(<span class="string">&quot;unknown&quot;</span>.to_string()),
+            Property::Unknown(<span class="string">&quot;unknown&quot;</span>.to_string())
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_read_issuer</span>() {
-        <span class="comment">// (Option&lt;Name&gt;, Vec&lt;KeyValue&gt;)</span>
-        <span class="macro">assert_eq!</span>(
-            <span class="ident">read_issuer</span>(<span class="string">b&quot;ca.example.net; account=230123&quot;</span>).<span class="ident">unwrap</span>(),
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_read_issuer() {
+        <span class="comment">// (Option&lt;Name&gt;, Vec&lt;KeyValue&gt;)
+        </span><span class="macro">assert_eq!</span>(
+            read_issuer(<span class="string">b&quot;ca.example.net; account=230123&quot;</span>).unwrap(),
             (
-                <span class="prelude-val">Some</span>(<span class="ident">Name::parse</span>(<span class="string">&quot;ca.example.net&quot;</span>, <span class="prelude-val">None</span>).<span class="ident">unwrap</span>()),
-                <span class="macro">vec!</span>[<span class="ident">KeyValue</span> {
-                    <span class="ident">key</span>: <span class="string">&quot;account&quot;</span>.<span class="ident">to_string</span>(),
-                    <span class="ident">value</span>: <span class="string">&quot;230123&quot;</span>.<span class="ident">to_string</span>(),
+                <span class="prelude-val">Some</span>(Name::parse(<span class="string">&quot;ca.example.net&quot;</span>, <span class="prelude-val">None</span>).unwrap()),
+                <span class="macro">vec!</span>[KeyValue {
+                    key: <span class="string">&quot;account&quot;</span>.to_string(),
+                    value: <span class="string">&quot;230123&quot;</span>.to_string(),
                 }],
             )
         );
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">read_issuer</span>(<span class="string">b&quot;ca.example.net&quot;</span>).<span class="ident">unwrap</span>(),
-            (<span class="prelude-val">Some</span>(<span class="ident">Name::parse</span>(<span class="string">&quot;ca.example.net&quot;</span>, <span class="prelude-val">None</span>,).<span class="ident">unwrap</span>(),), <span class="macro">vec!</span>[],)
+            read_issuer(<span class="string">b&quot;ca.example.net&quot;</span>).unwrap(),
+            (<span class="prelude-val">Some</span>(Name::parse(<span class="string">&quot;ca.example.net&quot;</span>, <span class="prelude-val">None</span>,).unwrap(),), <span class="macro">vec!</span>[],)
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">read_issuer</span>(<span class="string">b&quot;ca.example.net; policy=ev&quot;</span>).<span class="ident">unwrap</span>(),
+            read_issuer(<span class="string">b&quot;ca.example.net; policy=ev&quot;</span>).unwrap(),
             (
-                <span class="prelude-val">Some</span>(<span class="ident">Name::parse</span>(<span class="string">&quot;ca.example.net&quot;</span>, <span class="prelude-val">None</span>).<span class="ident">unwrap</span>(),),
-                <span class="macro">vec!</span>[<span class="ident">KeyValue</span> {
-                    <span class="ident">key</span>: <span class="string">&quot;policy&quot;</span>.<span class="ident">to_string</span>(),
-                    <span class="ident">value</span>: <span class="string">&quot;ev&quot;</span>.<span class="ident">to_string</span>(),
+                <span class="prelude-val">Some</span>(Name::parse(<span class="string">&quot;ca.example.net&quot;</span>, <span class="prelude-val">None</span>).unwrap(),),
+                <span class="macro">vec!</span>[KeyValue {
+                    key: <span class="string">&quot;policy&quot;</span>.to_string(),
+                    value: <span class="string">&quot;ev&quot;</span>.to_string(),
                 }],
             )
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">read_issuer</span>(<span class="string">b&quot;ca.example.net; account=230123; policy=ev&quot;</span>).<span class="ident">unwrap</span>(),
+            read_issuer(<span class="string">b&quot;ca.example.net; account=230123; policy=ev&quot;</span>).unwrap(),
             (
-                <span class="prelude-val">Some</span>(<span class="ident">Name::parse</span>(<span class="string">&quot;ca.example.net&quot;</span>, <span class="prelude-val">None</span>).<span class="ident">unwrap</span>(),),
+                <span class="prelude-val">Some</span>(Name::parse(<span class="string">&quot;ca.example.net&quot;</span>, <span class="prelude-val">None</span>).unwrap(),),
                 <span class="macro">vec!</span>[
-                    <span class="ident">KeyValue</span> {
-                        <span class="ident">key</span>: <span class="string">&quot;account&quot;</span>.<span class="ident">to_string</span>(),
-                        <span class="ident">value</span>: <span class="string">&quot;230123&quot;</span>.<span class="ident">to_string</span>(),
+                    KeyValue {
+                        key: <span class="string">&quot;account&quot;</span>.to_string(),
+                        value: <span class="string">&quot;230123&quot;</span>.to_string(),
                     },
-                    <span class="ident">KeyValue</span> {
-                        <span class="ident">key</span>: <span class="string">&quot;policy&quot;</span>.<span class="ident">to_string</span>(),
-                        <span class="ident">value</span>: <span class="string">&quot;ev&quot;</span>.<span class="ident">to_string</span>(),
+                    KeyValue {
+                        key: <span class="string">&quot;policy&quot;</span>.to_string(),
+                        value: <span class="string">&quot;ev&quot;</span>.to_string(),
                     },
                 ],
             )
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">read_issuer</span>(<span class="string">b&quot;example.net; account-uri=https://example.net/account/1234; validation-methods=dns-01&quot;</span>).<span class="ident">unwrap</span>(),
+            read_issuer(<span class="string">b&quot;example.net; account-uri=https://example.net/account/1234; validation-methods=dns-01&quot;</span>).unwrap(),
             (
-                <span class="prelude-val">Some</span>(<span class="ident">Name::parse</span>(<span class="string">&quot;example.net&quot;</span>, <span class="prelude-val">None</span>).<span class="ident">unwrap</span>(),),
+                <span class="prelude-val">Some</span>(Name::parse(<span class="string">&quot;example.net&quot;</span>, <span class="prelude-val">None</span>).unwrap(),),
                 <span class="macro">vec!</span>[
-                    <span class="ident">KeyValue</span> {
-                        <span class="ident">key</span>: <span class="string">&quot;account-uri&quot;</span>.<span class="ident">to_string</span>(),
-                        <span class="ident">value</span>: <span class="string">&quot;https://example.net/account/1234&quot;</span>.<span class="ident">to_string</span>(),
+                    KeyValue {
+                        key: <span class="string">&quot;account-uri&quot;</span>.to_string(),
+                        value: <span class="string">&quot;https://example.net/account/1234&quot;</span>.to_string(),
                     },
-                    <span class="ident">KeyValue</span> {
-                        <span class="ident">key</span>: <span class="string">&quot;validation-methods&quot;</span>.<span class="ident">to_string</span>(),
-                        <span class="ident">value</span>: <span class="string">&quot;dns-01&quot;</span>.<span class="ident">to_string</span>(),
+                    KeyValue {
+                        key: <span class="string">&quot;validation-methods&quot;</span>.to_string(),
+                        value: <span class="string">&quot;dns-01&quot;</span>.to_string(),
                     },
                 ],
             )
         );
-        <span class="macro">assert_eq!</span>(<span class="ident">read_issuer</span>(<span class="string">b&quot;;&quot;</span>).<span class="ident">unwrap</span>(), (<span class="prelude-val">None</span>, <span class="macro">vec!</span>[]));
+        <span class="macro">assert_eq!</span>(read_issuer(<span class="string">b&quot;;&quot;</span>).unwrap(), (<span class="prelude-val">None</span>, <span class="macro">vec!</span>[]));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_read_iodef</span>() {
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_read_iodef() {
         <span class="macro">assert_eq!</span>(
-            <span class="ident">read_iodef</span>(<span class="string">b&quot;mailto:security@example.com&quot;</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">Url::parse</span>(<span class="string">&quot;mailto:security@example.com&quot;</span>).<span class="ident">unwrap</span>()
+            read_iodef(<span class="string">b&quot;mailto:security@example.com&quot;</span>).unwrap(),
+            Url::parse(<span class="string">&quot;mailto:security@example.com&quot;</span>).unwrap()
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">read_iodef</span>(<span class="string">b&quot;http://iodef.example.com/&quot;</span>).<span class="ident">unwrap</span>(),
-            <span class="ident">Url::parse</span>(<span class="string">&quot;http://iodef.example.com/&quot;</span>).<span class="ident">unwrap</span>()
+            read_iodef(<span class="string">b&quot;http://iodef.example.com/&quot;</span>).unwrap(),
+            Url::parse(<span class="string">&quot;http://iodef.example.com/&quot;</span>).unwrap()
         );
     }
 
-    <span class="kw">fn</span> <span class="ident">test_encode_decode</span>(<span class="ident">rdata</span>: <span class="ident">CAA</span>) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span>: <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BinEncoder::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>);
-        <span class="ident">emit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">encoder</span>, <span class="kw-2">&amp;</span><span class="ident">rdata</span>).<span class="ident">expect</span>(<span class="string">&quot;failed to emit caa&quot;</span>);
-        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">into_bytes</span>();
+    <span class="kw">fn </span>test_encode_decode(rdata: CAA) {
+        <span class="kw">let </span><span class="kw-2">mut </span>bytes = Vec::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>encoder: BinEncoder&lt;<span class="lifetime">&#39;_</span>&gt; = BinEncoder::new(<span class="kw-2">&amp;mut </span>bytes);
+        emit(<span class="kw-2">&amp;mut </span>encoder, <span class="kw-2">&amp;</span>rdata).expect(<span class="string">&quot;failed to emit caa&quot;</span>);
+        <span class="kw">let </span>bytes = encoder.into_bytes();
 
-        <span class="macro">println!</span>(<span class="string">&quot;bytes: {:?}&quot;</span>, <span class="ident">bytes</span>);
+        <span class="macro">println!</span>(<span class="string">&quot;bytes: {:?}&quot;</span>, bytes);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span>: <span class="ident">BinDecoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BinDecoder::new</span>(<span class="ident">bytes</span>);
-        <span class="kw">let</span> <span class="ident">read_rdata</span> <span class="op">=</span>
-            <span class="ident">read</span>(<span class="kw-2">&amp;mut</span> <span class="ident">decoder</span>, <span class="ident">Restrict::new</span>(<span class="ident">bytes</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u16</span>)).<span class="ident">expect</span>(<span class="string">&quot;failed to read back&quot;</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">rdata</span>, <span class="ident">read_rdata</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>decoder: BinDecoder&lt;<span class="lifetime">&#39;_</span>&gt; = BinDecoder::new(bytes);
+        <span class="kw">let </span>read_rdata =
+            read(<span class="kw-2">&amp;mut </span>decoder, Restrict::new(bytes.len() <span class="kw">as </span>u16)).expect(<span class="string">&quot;failed to read back&quot;</span>);
+        <span class="macro">assert_eq!</span>(rdata, read_rdata);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_encode_decode_issue</span>() {
-        <span class="ident">test_encode_decode</span>(<span class="ident">CAA::new_issue</span>(<span class="bool-val">true</span>, <span class="prelude-val">None</span>, <span class="macro">vec!</span>[]));
-        <span class="ident">test_encode_decode</span>(<span class="ident">CAA::new_issue</span>(
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_encode_decode_issue() {
+        test_encode_decode(CAA::new_issue(<span class="bool-val">true</span>, <span class="prelude-val">None</span>, <span class="macro">vec!</span>[]));
+        test_encode_decode(CAA::new_issue(
             <span class="bool-val">true</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">Name::parse</span>(<span class="string">&quot;example.com&quot;</span>, <span class="prelude-val">None</span>).<span class="ident">unwrap</span>()),
+            <span class="prelude-val">Some</span>(Name::parse(<span class="string">&quot;example.com&quot;</span>, <span class="prelude-val">None</span>).unwrap()),
             <span class="macro">vec!</span>[],
         ));
-        <span class="ident">test_encode_decode</span>(<span class="ident">CAA::new_issue</span>(
+        test_encode_decode(CAA::new_issue(
             <span class="bool-val">true</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">Name::parse</span>(<span class="string">&quot;example.com&quot;</span>, <span class="prelude-val">None</span>).<span class="ident">unwrap</span>()),
-            <span class="macro">vec!</span>[<span class="ident">KeyValue::new</span>(<span class="string">&quot;key&quot;</span>, <span class="string">&quot;value&quot;</span>)],
+            <span class="prelude-val">Some</span>(Name::parse(<span class="string">&quot;example.com&quot;</span>, <span class="prelude-val">None</span>).unwrap()),
+            <span class="macro">vec!</span>[KeyValue::new(<span class="string">&quot;key&quot;</span>, <span class="string">&quot;value&quot;</span>)],
         ));
-        <span class="comment">// technically the this parser supports this case, though it&#39;s not clear it&#39;s something the spec allows for</span>
-        <span class="ident">test_encode_decode</span>(<span class="ident">CAA::new_issue</span>(
+        <span class="comment">// technically the this parser supports this case, though it&#39;s not clear it&#39;s something the spec allows for
+        </span>test_encode_decode(CAA::new_issue(
             <span class="bool-val">true</span>,
             <span class="prelude-val">None</span>,
-            <span class="macro">vec!</span>[<span class="ident">KeyValue::new</span>(<span class="string">&quot;key&quot;</span>, <span class="string">&quot;value&quot;</span>)],
+            <span class="macro">vec!</span>[KeyValue::new(<span class="string">&quot;key&quot;</span>, <span class="string">&quot;value&quot;</span>)],
         ));
-        <span class="comment">// test fqdn</span>
-        <span class="ident">test_encode_decode</span>(<span class="ident">CAA::new_issue</span>(
+        <span class="comment">// test fqdn
+        </span>test_encode_decode(CAA::new_issue(
             <span class="bool-val">true</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">Name::parse</span>(<span class="string">&quot;example.com.&quot;</span>, <span class="prelude-val">None</span>).<span class="ident">unwrap</span>()),
+            <span class="prelude-val">Some</span>(Name::parse(<span class="string">&quot;example.com.&quot;</span>, <span class="prelude-val">None</span>).unwrap()),
             <span class="macro">vec!</span>[],
         ));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_encode_decode_issuewild</span>() {
-        <span class="ident">test_encode_decode</span>(<span class="ident">CAA::new_issuewild</span>(<span class="bool-val">false</span>, <span class="prelude-val">None</span>, <span class="macro">vec!</span>[]));
-        <span class="comment">// other variants handled in test_encode_decode_issue</span>
-    }
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_encode_decode_issuewild() {
+        test_encode_decode(CAA::new_issuewild(<span class="bool-val">false</span>, <span class="prelude-val">None</span>, <span class="macro">vec!</span>[]));
+        <span class="comment">// other variants handled in test_encode_decode_issue
+    </span>}
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_encode_decode_iodef</span>() {
-        <span class="ident">test_encode_decode</span>(<span class="ident">CAA::new_iodef</span>(
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_encode_decode_iodef() {
+        test_encode_decode(CAA::new_iodef(
             <span class="bool-val">true</span>,
-            <span class="ident">Url::parse</span>(<span class="string">&quot;http://www.example.com&quot;</span>).<span class="ident">unwrap</span>(),
+            Url::parse(<span class="string">&quot;http://www.example.com&quot;</span>).unwrap(),
         ));
-        <span class="ident">test_encode_decode</span>(<span class="ident">CAA::new_iodef</span>(
+        test_encode_decode(CAA::new_iodef(
             <span class="bool-val">false</span>,
-            <span class="ident">Url::parse</span>(<span class="string">&quot;mailto:root@example.com&quot;</span>).<span class="ident">unwrap</span>(),
+            Url::parse(<span class="string">&quot;mailto:root@example.com&quot;</span>).unwrap(),
         ));
     }
 
-    <span class="kw">fn</span> <span class="ident">test_encode</span>(<span class="ident">rdata</span>: <span class="ident">CAA</span>, <span class="ident">encoded</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span>: <span class="ident">BinEncoder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">BinEncoder::new</span>(<span class="kw-2">&amp;mut</span> <span class="ident">bytes</span>);
-        <span class="ident">emit</span>(<span class="kw-2">&amp;mut</span> <span class="ident">encoder</span>, <span class="kw-2">&amp;</span><span class="ident">rdata</span>).<span class="ident">expect</span>(<span class="string">&quot;failed to emit caa&quot;</span>);
-        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">encoder</span>.<span class="ident">into_bytes</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">bytes</span> <span class="kw">as</span> <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">encoded</span>);
+    <span class="kw">fn </span>test_encode(rdata: CAA, encoded: <span class="kw-2">&amp;</span>[u8]) {
+        <span class="kw">let </span><span class="kw-2">mut </span>bytes = Vec::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>encoder: BinEncoder&lt;<span class="lifetime">&#39;_</span>&gt; = BinEncoder::new(<span class="kw-2">&amp;mut </span>bytes);
+        emit(<span class="kw-2">&amp;mut </span>encoder, <span class="kw-2">&amp;</span>rdata).expect(<span class="string">&quot;failed to emit caa&quot;</span>);
+        <span class="kw">let </span>bytes = encoder.into_bytes();
+        <span class="macro">assert_eq!</span>(bytes <span class="kw">as </span><span class="kw-2">&amp;</span>[u8], encoded);
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_encode_non_fqdn</span>() {
-        <span class="kw">let</span> <span class="ident">name_bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="string">b&quot;issueexample.com&quot;</span>;
-        <span class="kw">let</span> <span class="ident">header</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="kw-2">&amp;</span>[<span class="number">128</span>, <span class="number">5</span>];
-        <span class="kw">let</span> <span class="ident">encoded</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">header</span>.<span class="ident">iter</span>().<span class="ident">chain</span>(<span class="ident">name_bytes</span>.<span class="ident">iter</span>()).<span class="ident">cloned</span>().<span class="ident">collect</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_encode_non_fqdn() {
+        <span class="kw">let </span>name_bytes: <span class="kw-2">&amp;</span>[u8] = <span class="string">b&quot;issueexample.com&quot;</span>;
+        <span class="kw">let </span>header: <span class="kw-2">&amp;</span>[u8] = <span class="kw-2">&amp;</span>[<span class="number">128</span>, <span class="number">5</span>];
+        <span class="kw">let </span>encoded: Vec&lt;u8&gt; = header.iter().chain(name_bytes.iter()).cloned().collect();
 
-        <span class="ident">test_encode</span>(
-            <span class="ident">CAA::new_issue</span>(
+        test_encode(
+            CAA::new_issue(
                 <span class="bool-val">true</span>,
-                <span class="prelude-val">Some</span>(<span class="ident">Name::parse</span>(<span class="string">&quot;example.com&quot;</span>, <span class="prelude-val">None</span>).<span class="ident">unwrap</span>()),
+                <span class="prelude-val">Some</span>(Name::parse(<span class="string">&quot;example.com&quot;</span>, <span class="prelude-val">None</span>).unwrap()),
                 <span class="macro">vec!</span>[],
             ),
-            <span class="kw-2">&amp;</span><span class="ident">encoded</span>,
+            <span class="kw-2">&amp;</span>encoded,
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_encode_fqdn</span>() {
-        <span class="kw">let</span> <span class="ident">name_bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="string">b&quot;issueexample.com.&quot;</span>;
-        <span class="kw">let</span> <span class="ident">header</span>: [<span class="ident">u8</span>; <span class="number">2</span>] <span class="op">=</span> [<span class="number">128</span>, <span class="number">5</span>];
-        <span class="kw">let</span> <span class="ident">encoded</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">header</span>.<span class="ident">iter</span>().<span class="ident">chain</span>(<span class="ident">name_bytes</span>.<span class="ident">iter</span>()).<span class="ident">cloned</span>().<span class="ident">collect</span>();
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_encode_fqdn() {
+        <span class="kw">let </span>name_bytes: <span class="kw-2">&amp;</span>[u8] = <span class="string">b&quot;issueexample.com.&quot;</span>;
+        <span class="kw">let </span>header: [u8; <span class="number">2</span>] = [<span class="number">128</span>, <span class="number">5</span>];
+        <span class="kw">let </span>encoded: Vec&lt;u8&gt; = header.iter().chain(name_bytes.iter()).cloned().collect();
 
-        <span class="ident">test_encode</span>(
-            <span class="ident">CAA::new_issue</span>(
+        test_encode(
+            CAA::new_issue(
                 <span class="bool-val">true</span>,
-                <span class="prelude-val">Some</span>(<span class="ident">Name::parse</span>(<span class="string">&quot;example.com.&quot;</span>, <span class="prelude-val">None</span>).<span class="ident">unwrap</span>()),
+                <span class="prelude-val">Some</span>(Name::parse(<span class="string">&quot;example.com.&quot;</span>, <span class="prelude-val">None</span>).unwrap()),
                 <span class="macro">vec!</span>[],
             ),
-            <span class="kw-2">&amp;</span><span class="ident">encoded</span>,
+            <span class="kw-2">&amp;</span>encoded,
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_tostring</span>() {
-        <span class="kw">let</span> <span class="ident">deny</span> <span class="op">=</span> <span class="ident">CAA::new_issue</span>(<span class="bool-val">false</span>, <span class="prelude-val">None</span>, <span class="macro">vec!</span>[]);
-        <span class="macro">assert_eq!</span>(<span class="ident">deny</span>.<span class="ident">to_string</span>(), <span class="string">&quot;0 issue \&quot;;\&quot;&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_tostring() {
+        <span class="kw">let </span>deny = CAA::new_issue(<span class="bool-val">false</span>, <span class="prelude-val">None</span>, <span class="macro">vec!</span>[]);
+        <span class="macro">assert_eq!</span>(deny.to_string(), <span class="string">&quot;0 issue \&quot;;\&quot;&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">empty_options</span> <span class="op">=</span> <span class="ident">CAA::new_issue</span>(
+        <span class="kw">let </span>empty_options = CAA::new_issue(
             <span class="bool-val">false</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">Name::parse</span>(<span class="string">&quot;example.com&quot;</span>, <span class="prelude-val">None</span>).<span class="ident">unwrap</span>()),
+            <span class="prelude-val">Some</span>(Name::parse(<span class="string">&quot;example.com&quot;</span>, <span class="prelude-val">None</span>).unwrap()),
             <span class="macro">vec!</span>[],
         );
-        <span class="macro">assert_eq!</span>(<span class="ident">empty_options</span>.<span class="ident">to_string</span>(), <span class="string">&quot;0 issue \&quot;example.com\&quot;&quot;</span>);
+        <span class="macro">assert_eq!</span>(empty_options.to_string(), <span class="string">&quot;0 issue \&quot;example.com\&quot;&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">one_option</span> <span class="op">=</span> <span class="ident">CAA::new_issue</span>(
+        <span class="kw">let </span>one_option = CAA::new_issue(
             <span class="bool-val">false</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">Name::parse</span>(<span class="string">&quot;example.com&quot;</span>, <span class="prelude-val">None</span>).<span class="ident">unwrap</span>()),
-            <span class="macro">vec!</span>[<span class="ident">KeyValue::new</span>(<span class="string">&quot;one&quot;</span>, <span class="string">&quot;1&quot;</span>)],
+            <span class="prelude-val">Some</span>(Name::parse(<span class="string">&quot;example.com&quot;</span>, <span class="prelude-val">None</span>).unwrap()),
+            <span class="macro">vec!</span>[KeyValue::new(<span class="string">&quot;one&quot;</span>, <span class="string">&quot;1&quot;</span>)],
         );
-        <span class="macro">assert_eq!</span>(<span class="ident">one_option</span>.<span class="ident">to_string</span>(), <span class="string">&quot;0 issue \&quot;example.com one=1\&quot;&quot;</span>);
+        <span class="macro">assert_eq!</span>(one_option.to_string(), <span class="string">&quot;0 issue \&quot;example.com one=1\&quot;&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">two_options</span> <span class="op">=</span> <span class="ident">CAA::new_issue</span>(
+        <span class="kw">let </span>two_options = CAA::new_issue(
             <span class="bool-val">false</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">Name::parse</span>(<span class="string">&quot;example.com&quot;</span>, <span class="prelude-val">None</span>).<span class="ident">unwrap</span>()),
-            <span class="macro">vec!</span>[<span class="ident">KeyValue::new</span>(<span class="string">&quot;one&quot;</span>, <span class="string">&quot;1&quot;</span>), <span class="ident">KeyValue::new</span>(<span class="string">&quot;two&quot;</span>, <span class="string">&quot;2&quot;</span>)],
+            <span class="prelude-val">Some</span>(Name::parse(<span class="string">&quot;example.com&quot;</span>, <span class="prelude-val">None</span>).unwrap()),
+            <span class="macro">vec!</span>[KeyValue::new(<span class="string">&quot;one&quot;</span>, <span class="string">&quot;1&quot;</span>), KeyValue::new(<span class="string">&quot;two&quot;</span>, <span class="string">&quot;2&quot;</span>)],
         );
         <span class="macro">assert_eq!</span>(
-            <span class="ident">two_options</span>.<span class="ident">to_string</span>(),
-            <span class="string">&quot;0 issue \&quot;example.com one=1; two=2\&quot;&quot;</span>
-        );
+            two_options.to_string(),
+            <span class="string">&quot;0 issue \&quot;example.com one=1; two=2\&quot;&quot;
+        </span>);
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.64.0 (a55dd71d5 2022-09-19)" ></div></body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="trust_dns_proto" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>
